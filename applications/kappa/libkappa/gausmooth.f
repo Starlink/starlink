@@ -21,13 +21,13 @@
 
 *  Description:
 *     This application smooths an NDF using a one- or two-dimensional
-*     symmetrical Gaussian point spread function (PSF) of specified 
+*     symmetrical Gaussian point spread function (PSF) of specified
 *     width, or widths and orientation.  Each output pixel is the
-*     PSF-weighted mean of the input pixels within the filter box. 
+*     PSF-weighted mean of the input pixels within the filter box.
 *
 *     The NDF may have up to three dimensions.  If it has three
 *     dimensions, then the filter is applied in turn to each plane in
-*     the cube and the result written to the corresponding plane in the 
+*     the cube and the result written to the corresponding plane in the
 *     output cube.  The orientation of the smoothing plane can be
 *     specified using the AXES parameter.
 
@@ -36,12 +36,12 @@
 
 *  ADAM Parameters:
 *     AXES(2) = _INTEGER (Read)
-*        This parameter is only accessed if the NDF has exactly three 
+*        This parameter is only accessed if the NDF has exactly three
 *        significant pixel axes.  It should be set to the indices of the
 *        NDF  pixel axes which span the plane in which smoothing is to
-*        be applied.  All pixel planes parallel to the specified plane 
-*        will be smoothed independently of each other.  The dynamic 
-*        default comprises the indices of the first two significant 
+*        be applied.  All pixel planes parallel to the specified plane
+*        will be smoothed independently of each other.  The dynamic
+*        default comprises the indices of the first two significant
 *        axes in the NDF. []
 *     BOX() = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the rectangular region over
@@ -76,7 +76,7 @@
 *        smoothing will increase in approximate proportion to the
 *        value(s) of FWHM.  The suggested default is the current value.
 *     IN = NDF (Read)
-*        The input NDF containing the one-, two-, or three-dimensional 
+*        The input NDF containing the one-, two-, or three-dimensional
 *        image to which Gaussian smoothing is to be applied.
 *     ORIENT = _REAL (Read)
 *        The orientation of the major axis of the elliptical Gaussian
@@ -177,7 +177,7 @@
 *     a variance array is present in the input NDF.
 
 *  Copyright:
-*     Copyright (C) 1990, 1992 Science & Engineering Research Council. 
+*     Copyright (C) 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2000, 2004 Central Laboratory
 *         of the Research Councils. All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -248,7 +248,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -262,7 +262,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER NDIM               ! Dimensionality required
       PARAMETER( NDIM = 2 )
 
@@ -289,10 +289,10 @@
       INTEGER NERR               ! Number of type-conversion errors
       INTEGER NOFWHM             ! Number of FWHM values
       INTEGER NVAL               ! Number of BOX values
-      INTEGER PAXHI              ! Upper pixel bound of perp. axis 
-      INTEGER PAXLO              ! Lower pixel bound of perp. axis 
-      INTEGER PAXVAL             ! Current pixel value on perp. axis 
-      INTEGER PERPAX             ! Index of axis perp. to smoothing 
+      INTEGER PAXHI              ! Upper pixel bound of perp. axis
+      INTEGER PAXLO              ! Lower pixel bound of perp. axis
+      INTEGER PAXVAL             ! Current pixel value on perp. axis
+      INTEGER PERPAX             ! Index of axis perp. to smoothing
                                  ! plane
       INTEGER PNTR1( 2 )         ! Pointers for mapped input arrays
       INTEGER PNTR2( 2 )         ! Pointers for mapped output arrays
@@ -341,7 +341,7 @@
 *  Obtain the input NDF, its significant axes up to the maximum two
 *  dimensions for processing, and the NDF's bounds.  If the NDF
 *  possesses three significant dimensions, obtain an iteration axis
-*  through parameter AXES, so that planes along that axis can be 
+*  through parameter AXES, so that planes along that axis can be
 *  processed in sequence.
       CALL KPG1_GNDFP( 'IN', 'AXES', NDIM, 'READ', NDFI, SDIM, LBND,
      :                 UBND, PERPAX, STATUS )
@@ -369,7 +369,7 @@
      :                   STATUS )
          NOFWHM = 1
       ELSE
-         CALL PAR_DEF1R( 'FWHM', 1, 2.0, STATUS )      
+         CALL PAR_DEF1R( 'FWHM', 1, 2.0, STATUS )
          CALL PAR_GDRVR( 'FWHM', NDIM, 0.1, 10000.0, FWHM, NOFWHM,
      :                   STATUS )
 
@@ -436,7 +436,7 @@
          K( 3 ) = 3.0 * SIGMA( 1 ) * SIN( RORI )
          K( 2 ) = 3.0 * SIGMA( 2 ) * SIN( RORI )
          K( 4 ) = 3.0 * SIGMA( 2 ) * COS( RORI )
-      
+
 *  Find the orientation in polar co-ordinates of the points in the
 *  locus that correspond to the maximum x and y co-ordinates.  This is
 *  done by differentiating the x-y co-ordinates with respect to polar
@@ -513,7 +513,7 @@
 
 *  Create an output NDF based on the input one.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL LPG_PROP( NDFI, 'WCS,Axis,Quality,Units', 'OUT', NDFO, 
+      CALL LPG_PROP( NDFI, 'WCS,Axis,Quality,Units', 'OUT', NDFO,
      :               STATUS )
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
@@ -547,14 +547,14 @@
 *  a Gaussian.
          CALL KPS1_PSEVL( 1.0, AXISR, RORI, MIN( FWHM( 1 ), FWHM( 2 ) ),
      :                    2.0, 1, 2 * IBOX + 1, 1, 2 * JBOX + 1,
-     :                    REAL( IBOX ) + 0.5, REAL( JBOX ) + 0.5, 
+     :                    REAL( IBOX ) + 0.5, REAL( JBOX ) + 0.5,
      :                    %VAL( CNF_PVAL( WPNTR1 ) ), STATUS )
 
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
 *  Make a double-precision copy of the array of weights.
             CALL VEC_RTOD( .FALSE., WDIM, %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                     %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                     %VAL( CNF_PVAL( WPNTR2 ) ),
      :                     IERR, NERR, STATUS )
          END IF
 
@@ -595,19 +595,19 @@
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
      :                          DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
-     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
-     :                          BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ),
      :                          %VAL( CNF_PVAL( WPNTR2 ) ),
      :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
-     :                          DIM( 2 ), BAD, .FALSE., 
+     :                          DIM( 2 ), BAD, .FALSE.,
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), BADOUT, 
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), BADOUT,
      :                          %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                          %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
      :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
             END IF
 
@@ -619,18 +619,18 @@
                IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
      :                             DIM( 1 ), DIM( 2 ), BAD, .TRUE.,
-     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
-     :                             BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
      :                             DIM( 2 ), BAD, .TRUE.,
-     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
-     :                             BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ),
      :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
                END IF
@@ -647,18 +647,18 @@
 *  Apply smoothing to the mapped data array, using the appropriate
 *  numeric type of processing.
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_AKERR( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR1 ) ), 
+               CALL KPG1_AKERR( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR1 ) ),
      :                          SAMBAD,
      :                          SNGL( WLIM ), DIM( 1 ), DIM( 2 ), BAD,
      :                          .FALSE., %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                          BADOUT, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_AKERD( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR2 ) ), 
+               CALL KPG1_AKERD( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR2 ) ),
      :                          SAMBAD,
      :                          WLIM, DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
-     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                          BADOUT, STATUS )
             END IF
@@ -669,21 +669,21 @@
 *  If a variance array is present, then also apply smoothing to it.
             IF ( VAR ) THEN
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_AKERR( IBOX, JBOX, 
+                  CALL KPG1_AKERR( IBOX, JBOX,
      :                             %VAL( CNF_PVAL( WPNTR1 ) ), SAMBAD,
-     :                             SNGL( WLIM ), DIM( 1 ), DIM( 2 ), 
-     :                             BAD, .TRUE., 
+     :                             SNGL( WLIM ), DIM( 1 ), DIM( 2 ),
+     :                             BAD, .TRUE.,
      :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                             BADOUT, STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_AKERD( IBOX, JBOX, 
+                  CALL KPG1_AKERD( IBOX, JBOX,
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), SAMBAD,
      :                             WLIM, DIM( 1 ), DIM( 2 ), BAD,
-     :                             .TRUE., 
+     :                             .TRUE.,
      :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
-     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                             BADOUT, STATUS )
                END IF
 

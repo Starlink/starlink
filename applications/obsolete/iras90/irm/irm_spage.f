@@ -13,15 +13,15 @@
 *     CALL IRM_SPAGE( ON )
 
 *  Description:
-*     Routine IRM_PTOUT produces paged output on the screen. Such 
-*     output may be suppressed by the user by supplying a non-blank 
+*     Routine IRM_PTOUT produces paged output on the screen. Such
+*     output may be suppressed by the user by supplying a non-blank
 *     string when asked to "Press RETURN to continue". This routine
 *     returns a flag indicating if output is currently enabled or
 *     suppressed.
 
 *  Arguments:
 *     ON = LOGICAL (Returned)
-*        True if text passed to IRM_PTOUT will actually appear on the 
+*        True if text passed to IRM_PTOUT will actually appear on the
 *        screen. False if the user has suppressed such output.
 
 *  Authors:

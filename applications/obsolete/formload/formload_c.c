@@ -1,6 +1,6 @@
 /* *********************************************************************
-*  FORMLOAD_C.C -- C subroutines called by FORMLOAD.FOR 
-*    
+*  FORMLOAD_C.C -- C subroutines called by FORMLOAD.FOR
+*
 *  Contains:-
 *    WHATSY      Gets if VMS or UNIX
 *    GENV        Gets value of environment variable
@@ -27,7 +27,7 @@
 
 *  Arguments:
 *     KN = INTEGER (Returned)
-*        0 = UNIX 1 = VMS   
+*        0 = UNIX 1 = VMS
 
 *  Examples:
 
@@ -38,7 +38,7 @@
 *  References:
 *     -  POSIX standard (1988), section 4.6.1
 *     -  ANSI C standard (1989), section 4.10.4.4
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -74,7 +74,7 @@
 #define F77_MACROS
 
 #define F77_EXTERNAL_NAME(X) X ## _
-#define F77_INTEGER_TYPE   int 
+#define F77_INTEGER_TYPE   int
 #define F77_CHARACTER_TYPE char
 #define F77_WORD_TYPE      short int
 #define F77_SUBROUTINE(X)  void F77_EXTERNAL_NAME(X)
@@ -98,10 +98,10 @@
 #define GENPTR_CHARACTER(X) \
    F77_CHARACTER_TYPE *X = X/**/_arg->dsc$a_pointer; \
    int X/**/_length = X/**/_arg->dsc$w_length;
-#endif  
+#endif
 
 #if defined(sun)		/* sun4				*/
-#endif  
+#endif
 
 #if defined(mips)		/* mips			    */
 #if !defined(__STDC__)
@@ -110,7 +110,7 @@
 #undef  TRAIL
 #define TRAIL(X) ,int X/**/_length
 #endif  /* of non ANSI redefinitions			    */
-#endif  
+#endif
 
 #endif
 
@@ -166,7 +166,7 @@ F77_SUBROUTINE(whatsy)( INTEGER(kn) )
 *     -  On VMS, there are four special environment variables.
 *        HOME = The home directory of the user,
 *               e.g. DISK$USER1:[PMA]
-*        PATH = The default place(s) where files are looked for, 
+*        PATH = The default place(s) where files are looked for,
 *               i.e. the current default directory,
 *               e.g. DISK$SCRATCH:[PMA.CCD]
 *        TERM = The type of terminal attached to the process,
@@ -187,7 +187,7 @@ F77_SUBROUTINE(whatsy)( INTEGER(kn) )
 *  References:
 *     -  POSIX standard (1988), section 4.6.1
 *     -  ANSI C standard (1989), section 4.10.4.4
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -238,7 +238,7 @@ void psx1_init_rtl ( void );
 #define F77_MACROS
 
 #define F77_EXTERNAL_NAME(X) X ## _
-#define F77_INTEGER_TYPE   int 
+#define F77_INTEGER_TYPE   int
 #define F77_CHARACTER_TYPE char
 #define F77_WORD_TYPE      short int
 #define F77_SUBROUTINE(X)  void F77_EXTERNAL_NAME(X)
@@ -262,10 +262,10 @@ void psx1_init_rtl ( void );
 #define GENPTR_CHARACTER(X) \
    F77_CHARACTER_TYPE *X = X/**/_arg->dsc$a_pointer; \
    int X/**/_length = X/**/_arg->dsc$w_length;
-#endif  
+#endif
 
 #if defined(sun)		/* sun4				*/
-#endif  
+#endif
 
 #if defined(mips)		/* mips			    */
 #if !defined(__STDC__)
@@ -274,7 +274,7 @@ void psx1_init_rtl ( void );
 #undef  TRAIL
 #define TRAIL(X) ,int X/**/_length
 #endif  /* of non ANSI redefinitions			    */
-#endif  
+#endif
 
 #endif
 
@@ -292,7 +292,7 @@ F77_SUBROUTINE(genv)( CHARACTER(name),
    GENPTR_CHARACTER(name)
    GENPTR_CHARACTER(trans)
    GENPTR_INTEGER(status)
-   
+
 /* Local Variables:							    */
 
    char *temp_name;		 /* Pointer to local copy of name 	    */
@@ -305,7 +305,7 @@ F77_SUBROUTINE(genv)( CHARACTER(name),
 #endif
 
    temp_name = cnf_creim ( name, name_length );		/* Convert Fortran string to C string */
-   ptr = getenv ( temp_name );				/* Get environment variable pointer */	
+   ptr = getenv ( temp_name );				/* Get environment variable pointer */
 
    if ( ptr != 0 )
       { cnf_exprt( ptr, trans, trans_length ) ;  	/* variable to the Fortran string trans. */

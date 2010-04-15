@@ -1,5 +1,5 @@
-      SUBROUTINE GRP1_EXPAN( GRPEXP, START, END, BSIZE, SLOT1, SLOT2, 
-     :                       GINDEX, EDEP, EIFILE, EMODGP, EMODIN, 
+      SUBROUTINE GRP1_EXPAN( GRPEXP, START, END, BSIZE, SLOT1, SLOT2,
+     :                       GINDEX, EDEP, EIFILE, EMODGP, EMODIN,
      :                       NADDED, NAME, FLAG, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GRP1_EXPAN( GRPEXP, START, END, BSIZE, SLOT1, SLOT2, GINDEX, 
+*     CALL GRP1_EXPAN( GRPEXP, START, END, BSIZE, SLOT1, SLOT2, GINDEX,
 *                      EDEP, EIFILE, EMODGP, EMODIN, NADDED, NAME, FLAG,
 *                      STATUS )
 
@@ -47,8 +47,8 @@
 *        The index of the last character to be considered from the
 *        group expression.
 *     BSIZE = INTEGER (Given)
-*        The number of elements from the basis group which are to be 
-*        used. Basis group elements with index larger than BSIZE are 
+*        The number of elements from the basis group which are to be
+*        used. Basis group elements with index larger than BSIZE are
 *        ignored.
 *     SLOT1 = INTEGER (Given)
 *        The slot number for an existing group to be used as the basis
@@ -85,7 +85,7 @@
 *        Returned true if the given section of the group expression
 *        contained a single literal name.
 *     FLAG = LOGICAL (Returned)
-*        Returned true if the last element read from an indirection 
+*        Returned true if the last element read from an indirection
 *        file is flagged.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -100,12 +100,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -214,7 +214,7 @@
          NAME = .TRUE.
 
 *  Otherwise, get the required syntax characters for the group being expanded.
-      ELSE 
+      ELSE
          CALL GRP1_CONC( SLOT2, GRP__PINDC, INDCC, INDOK, STATUS )
          CALL GRP1_CONC( SLOT2, GRP__PMNMC, MNMCC, MNMOK, STATUS )
          CALL GRP1_CONC( SLOT2, GRP__PESCC, ESCCC, ESCOK, STATUS )
@@ -253,7 +253,7 @@
                ELSE
                   CALL GRP1_PTELM( SLOT2, GINDEX + NADDED, ' ', EDEP,
      :                             EIFILE, EMODGP, EMODIN, STATUS )
-               END IF               
+               END IF
 
 *  Increment the number of names added to the group.
                NADDED = NADDED + 1
@@ -275,7 +275,7 @@
                   ELSE
                      CALL GRP1_PTELM( SLOT2, GINDEX + NADDED, ' ', EDEP,
      :                                EIFILE, EMODGP, EMODIN, STATUS )
-                  END IF               
+                  END IF
 
                   NADDED = NADDED + 1
 
@@ -300,7 +300,7 @@
 
 *  If the first non-blank character is the group's indirection
 *  character, this is an indirection element.
-                     IF( GRP1_CHKCC( GRPEXP, F, INDCC, ESCCC, ESCOK ) 
+                     IF( GRP1_CHKCC( GRPEXP, F, INDCC, ESCCC, ESCOK )
      :                   .AND. INDOK ) THEN
 
 *  Report an error if the file name is null.
@@ -351,7 +351,7 @@
 *  This is a modification ELEMENT if a basis group was supplied, and if
 *  the element consists of just the NAME_TOKEN control character.
                         IF( BSIZE .GT. 0 .AND. MNMOK .AND.
-     :                      F .EQ. L .AND. GRP1_CHKCC( GRPEXP, F, 
+     :                      F .EQ. L .AND. GRP1_CHKCC( GRPEXP, F,
      :                      MNMCC, ESCCC, ESCOK ) ) THEN
 
 *  Copy the basis group into the output group.
@@ -380,7 +380,7 @@
                         END IF
 
                      END IF
-      
+
                   END IF
 
                END IF

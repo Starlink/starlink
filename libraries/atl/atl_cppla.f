@@ -24,8 +24,8 @@
 *        The destination Plot.
 *     FIXATE = LOGICAL (Given)
 *        If .FALSE., then attribute values are only set in IPLOT2 if they
-*        have been assigned an explicit value (i.e. are not defaulted) in 
-*        IPLOT1. If .TRUE., then values are set explicitly in IPLOT2 whether 
+*        have been assigned an explicit value (i.e. are not defaulted) in
+*        IPLOT1. If .TRUE., then values are set explicitly in IPLOT2 whether
 *        they are default values or not.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,23 +84,23 @@
 
 *  Local Constants:
       INTEGER NUATTR             ! No. of unqualified attr names
-      PARAMETER ( NUATTR = 13 )      
+      PARAMETER ( NUATTR = 13 )
 
       INTEGER NEATTR             ! No. of attr names qualified by element
-      PARAMETER ( NEATTR = 5 )      
+      PARAMETER ( NEATTR = 5 )
 
       INTEGER NAATTR             ! No. of attr names qualified by axis
-      PARAMETER ( NAATTR = 16 )      
+      PARAMETER ( NAATTR = 16 )
 
       INTEGER NELEM              ! No. of element names
-      PARAMETER ( NELEM = 15 )      
+      PARAMETER ( NELEM = 15 )
 
 *  Local Variables:
       CHARACTER ANAME( NAATTR )*15 ! Attr names qualified by (axis)
       CHARACTER ATTR*40            ! Full attribute name
       CHARACTER ELEM( NELEM )*15   ! Plot element names
       CHARACTER ENAME( NEATTR )*15 ! Attr names qualified by (element)
-      CHARACTER UNAME( NUATTR )*15 ! Unqualified attribute names         
+      CHARACTER UNAME( NUATTR )*15 ! Unqualified attribute names
       INTEGER I                    ! Attribute index
       INTEGER IAT                  ! Length of attribute name
       INTEGER J                    ! Element index
@@ -162,16 +162,16 @@
      :            '(Ticks2)',
      :            '(Title)' /
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Copy the values of all unqualified attribute. Unless FIXATE is .TRUE.,
-*  only those attributes that have explicitly been assigned a value are 
-*  copied (in which case we ensure attributes that are unset in IPLOT1 
+*  only those attributes that have explicitly been assigned a value are
+*  copied (in which case we ensure attributes that are unset in IPLOT1
 *  are also unset in IPLOT2).
       DO I = 1, NUATTR
-         IF( FIXATE .OR. AST_TEST( IPLOT1, UNAME( I ), STATUS ) ) THEN 
-            CALL AST_SETC( IPLOT2, UNAME( I ), 
+         IF( FIXATE .OR. AST_TEST( IPLOT1, UNAME( I ), STATUS ) ) THEN
+            CALL AST_SETC( IPLOT2, UNAME( I ),
      :                     AST_GETC( IPLOT1, UNAME( I ), STATUS ),
      :                     STATUS )
          ELSE
@@ -186,7 +186,7 @@
 
          ATTR( IAT : ) = '(1)'
          IF( FIXATE .OR. AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
-            CALL AST_SETC( IPLOT2, ATTR, 
+            CALL AST_SETC( IPLOT2, ATTR,
      :                     AST_GETC( IPLOT1, ATTR, STATUS ),
      :                     STATUS )
          ELSE
@@ -195,7 +195,7 @@
 
          ATTR( IAT : ) = '(2)'
          IF( FIXATE .OR. AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
-            CALL AST_SETC( IPLOT2, ATTR, 
+            CALL AST_SETC( IPLOT2, ATTR,
      :                     AST_GETC( IPLOT1, ATTR, STATUS ),
      :                     STATUS )
          ELSE
@@ -212,7 +212,7 @@
          DO J = 1, NELEM
             ATTR( IAT : ) = ELEM( J )
             IF( FIXATE .OR. AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
-               CALL AST_SETC( IPLOT2, ATTR, 
+               CALL AST_SETC( IPLOT2, ATTR,
      :                        AST_GETC( IPLOT1, ATTR, STATUS ),
      :                        STATUS )
             ELSE

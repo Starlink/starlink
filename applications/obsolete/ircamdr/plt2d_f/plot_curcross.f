@@ -84,7 +84,7 @@
 	IF( STATUS. NE. SAI__OK)THEN
 
           CALL ERR_REP('ERR', 'Error : PLOT_CURCROSS after PAR_GETS',
-     :                  STATUS )      
+     :                  STATUS )
 	  RETURN
 
 	END IF
@@ -106,9 +106,9 @@
 
 	IF( STATUS. NE. SAI__OK)THEN
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :           'Error : PLOT_CURCROSS after PAR_GET cursor position',
-     :                  STATUS )      
+     :                  STATUS )
 	  RETURN
 
 	END IF

@@ -20,10 +20,10 @@
 
 *  Description:
 *     This application calculates cumulative statistics over a group
-*     of NDFs.  It can either generate the statistics of each 
+*     of NDFs.  It can either generate the statistics of each
 *     corresponding pixel in the input array components and output
 *     a new NDF with array components containing the result, or
-*     calculate statistics at a single point specified in the 
+*     calculate statistics at a single point specified in the
 *     current co-ordinate Frame of the input NDFs.
 *
 *     In array mode (SINGLE=FALSE), statistics are calculated for each
@@ -34,7 +34,7 @@
 *     There is a selection of statistics available to form the output
 *     values.
 *
-*     The input NDFs must all have the same number of dimensions, but 
+*     The input NDFs must all have the same number of dimensions, but
 *     need not all be the same shape.  The shape of the output NDF can
 *     be set to either the intersection or the union of the shapes of
 *     the input NDFs using the TRIM parameter.
@@ -57,16 +57,16 @@
 *        alternative to "Variance" and causes the square root of the
 *        variance values to be used).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
-*        the range 0 to 255).  In cases other than "Data", which is 
-*        always present, a missing component will be treated as having 
+*        the range 0 to 255).  In cases other than "Data", which is
+*        always present, a missing component will be treated as having
 *        all pixels set to the `bad' value.  ["Data"]
 *     CLIP = _REAL (Read)
 *        The number of standard deviations about the mean at which to
-*        clip outliers for the "Mode", "Cmean" and "Csigma" statistics 
-*        (see Parameter ESTIMATOR).  The application first computes 
+*        clip outliers for the "Mode", "Cmean" and "Csigma" statistics
+*        (see Parameter ESTIMATOR).  The application first computes
 *        statistics using all the available pixels.  It then rejects
 *        all those pixels whose values lie beyond CLIP standard
-*        deviations from the mean and will then re-evaluate the 
+*        deviations from the mean and will then re-evaluate the
 *        statistics.   For "Cmean" and "Csigma" there is currently only
 *        one iteration , but up to seven for "Mode".
 
@@ -74,14 +74,14 @@
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values from
 *        the multiple input pixels at each pixel index.  It
-*        can be one of the following options. 
+*        can be one of the following options.
 *          "Mean"   -- Mean value
-*          "WMean"  -- Weighted mean in which each data value is 
-*                      weighted by the reciprocal of the associated 
+*          "WMean"  -- Weighted mean in which each data value is
+*                      weighted by the reciprocal of the associated
 *                      variance.  (2)
 *          "Mode"   -- Modal value  (4)
 *          "Median" -- Median value.  Note that this is extremely memory
-*                      and CPU intensive for large datasets; use with 
+*                      and CPU intensive for large datasets; use with
 *                      care!  If strange things happen, use "Mean".  (3)
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
 *                      (2)
@@ -89,14 +89,14 @@
 *          "Csigma" -- Sigma-clipped standard deviation.  (4)
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
-*          "Integ"  -- Integrated value, being the sum of the products 
+*          "Integ"  -- Integrated value, being the sum of the products
 *                      of the value and pixel width in world
 *                      co-ordinates.
-*          "Iwc"    -- Intensity-weighted co-ordinate, being the sum of 
+*          "Iwc"    -- Intensity-weighted co-ordinate, being the sum of
 *                      each value times its co-ordinate, all divided by
 *                      the integrated value (see the "Integ" option).
 *          "Iwd"    -- Intensity-weighted dispersion of the
-*                      co-ordinate, normalised like "Iwc" by the 
+*                      co-ordinate, normalised like "Iwc" by the
 *                      integrated value.  (4)
 *          "Max"    -- Maximum value.
 *          "Min"    -- Minimum value.
@@ -107,33 +107,33 @@
 *        Where needed, the co-ordinates are the indices of the input
 *        NDFs in the supplied order.  Thus the calculations behave like
 *        the NDFs were stacked one upon another to form an extra axis,
-*        and that axis had GRID co-ordinates.  Care using wildcards is 
+*        and that axis had GRID co-ordinates.  Care using wildcards is
 *        necessary, to achieve a specific order, say for a time series,
-*        and hence assign the desired co-ordinate for a each NDF.  
+*        and hence assign the desired co-ordinate for a each NDF.
 *        Indirection through a text file is recommended.
 *
 *        The selection is restricted if there are only a few input NDFs.
 *        For instance, measures of dispersion like "Sigma" and "Iwd" are
-*        meaningless for combining only two NDFs.  The minimum number of 
-*        input NDFs for each estimator is given in parentheses in the 
-*        list above.  Where there is no number, there is no restriction. 
+*        meaningless for combining only two NDFs.  The minimum number of
+*        input NDFs for each estimator is given in parentheses in the
+*        list above.  Where there is no number, there is no restriction.
 *        If you supply an unavailable option, you will be informed, and
 *        presented with the available options.   ["Mean"]
 *     IN = GROUP (Read)
-*        A group of input NDFs.  They may have different shapes, but 
-*        must all have the same number of dimensions.  This should 
-*        be given as a comma separated list, in which each list element 
+*        A group of input NDFs.  They may have different shapes, but
+*        must all have the same number of dimensions.  This should
+*        be given as a comma separated list, in which each list element
 *        can be one of the following.
 *
-*        - An NDF name, optionally containing wild-cards and/or regular 
+*        - An NDF name, optionally containing wild-cards and/or regular
 *        expressions ("*", "?", "[a-z]" etc.).
 *
-*        - The name of a text file, preceded by an up-arrow character 
-*        "^".  Each line in the text file should contain a 
-*        comma-separated list of elements, each of which can in turn be 
-*        an NDF name (with optional wild-cards, etc.), or another file 
-*        specification (preceded by an up-arrow).  Comments can be 
-*        included in the file by commencing lines with a hash character 
+*        - The name of a text file, preceded by an up-arrow character
+*        "^".  Each line in the text file should contain a
+*        comma-separated list of elements, each of which can in turn be
+*        an NDF name (with optional wild-cards, etc.), or another file
+*        specification (preceded by an up-arrow).  Comments can be
+*        included in the file by commencing lines with a hash character
 *        "#".
 *
 *        If the value supplied for this parameter ends with a minus
@@ -154,9 +154,9 @@
 *     POS = LITERAL (Read)
 *        In Single pixel mode (SINGLE=TRUE), this parameter gives the
 *        position in the current co-ordinate Frame at which the
-*        statistics should be calculated (supplying a colon ":" will 
-*        display details of the required co-ordinate Frame).  The 
-*        position should be supplied as a list of formatted axis values 
+*        statistics should be calculated (supplying a colon ":" will
+*        display details of the required co-ordinate Frame).  The
+*        position should be supplied as a list of formatted axis values
 *        separated by spaces or commas.  The pixel covering this point
 *        in each input array, if any, will be used.
 *     SINGLE = _LOGICAL (Read)
@@ -168,46 +168,46 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF.  ["KAPPA - Mstats"]
 *     TRIM = _LOGICAL (Read)
-*        This parameter controls the shape of the output NDF.  If 
+*        This parameter controls the shape of the output NDF.  If
 *        TRIM=TRUE, then the output NDF is the shape of the intersection
 *        of all the input NDFs, i.e. only pixels which appear in all the
 *        input arrays will be represented in the output.  If TRIM=FALSE,
 *        the output is the shape of the union of the inputs, i.e. every
-*        pixel which appears in the input arrays will be represented in 
+*        pixel which appears in the input arrays will be represented in
 *        the output.  [TRUE]
 *     VAR = _DOUBLE (Write)
-*        An output parameter to which is written the variance of the 
+*        An output parameter to which is written the variance of the
 *        pixel values, if SINGLE=TRUE.
 *     VARIANCE = _LOGICAL (Read)
 *        A flag indicating whether a variance array present in the
-*        NDF is used to weight the array values while forming the 
-*        estimator's statistic, and to derive output variance.  If 
-*        VARIANCE is TRUE and all the input NDFs contain a variance 
+*        NDF is used to weight the array values while forming the
+*        estimator's statistic, and to derive output variance.  If
+*        VARIANCE is TRUE and all the input NDFs contain a variance
 *        array, this array will be used to define the weights, otherwise
 *        all the weights will be set equal.  [TRUE]
 *     WLIM = _REAL (Read)
 *        If the input NDFs contain bad pixels, then this parameter
-*        may be used to determine at a given pixel location the number 
-*        of good pixels which must be present within the input NDFs 
-*        before a valid output pixel is generated.  It can be used, for 
-*        example, to prevent output pixels from being generated in 
-*        regions where there are relatively few good pixels to 
+*        may be used to determine at a given pixel location the number
+*        of good pixels which must be present within the input NDFs
+*        before a valid output pixel is generated.  It can be used, for
+*        example, to prevent output pixels from being generated in
+*        regions where there are relatively few good pixels to
 *        contribute to the result of combining the input NDFs.
 *
 *        WLIM specifies the minimum fraction of good pixels which must
-*        be present in order to generate a good output pixel.  If this 
+*        be present in order to generate a good output pixel.  If this
 *        specified minimum fraction of good input pixels is not present,
-*        then a bad output pixel will result, otherwise a good output 
-*        value will be calculated.  The value of this parameter should 
+*        then a bad output pixel will result, otherwise a good output
+*        value will be calculated.  The value of this parameter should
 *        lie between 0.0 and 1.0 (the actual number used will be rounded
 *        up if necessary to correspond to at least one pixel). [0.3]
 
 *  Examples:
 *     mstats idat* ostats
-*        This calculates the mean of each pixel in the Data arrays of 
-*        all the NDFs in the current directory with names that start 
-*        "idat", and writes the result in a new NDF called "ostats".  
-*        The shape of ostats will be the intersection of the volumes of 
+*        This calculates the mean of each pixel in the Data arrays of
+*        all the NDFs in the current directory with names that start
+*        "idat", and writes the result in a new NDF called "ostats".
+*        The shape of ostats will be the intersection of the volumes of
 *        all the indat* NDFs.
 *     mstats idat* ostats trim=false
 *        This does the same as the previous example, except that the
@@ -222,12 +222,12 @@
 *     mstats idat* ostats comp=variance variance
 *        This does the same as the first example except that statistics
 *        are calculated on the VARIANCE components of all the input
-*        NDFs.  Thus the pixels of the VARIANCE component of "ostats" 
+*        NDFs.  Thus the pixels of the VARIANCE component of "ostats"
 *        will be the variances of the variances of the input data.
-*     mstats m31* single=true pos="0:42:38,40:52:20" 
+*     mstats m31* single=true pos="0:42:38,40:52:20"
 *        This example is analysing the pixel brightness at the indicated
 *        sky position in a number of NDFs whose name start with "m31",
-*        which all have SKY as their current co-ordinate Frame.  The 
+*        which all have SKY as their current co-ordinate Frame.  The
 *        mean and variance of the pixels at that position in all the
 *        NDFs are printed to the screen.  If the reporting level is
 *        verbose, the command also prints the value of the sampled pixel
@@ -241,31 +241,31 @@
 *        output value.
 
 *  Notes:
-*     -  A warning is issued (at the normal reporting level) whenever 
-*     any output values are set bad because there are too few 
-*     contributing data values.  This reports the fraction of flagged 
-*     output data generated by the WLIM parameter's threshold.  
+*     -  A warning is issued (at the normal reporting level) whenever
+*     any output values are set bad because there are too few
+*     contributing data values.  This reports the fraction of flagged
+*     output data generated by the WLIM parameter's threshold.
 *
-*     No warning is given when parameter WLIM=0.  Input data containing 
-*     only bad values are not counted in the flagged fraction, since no 
+*     No warning is given when parameter WLIM=0.  Input data containing
+*     only bad values are not counted in the flagged fraction, since no
 *     potential good output value has been lost.
 *
 *     - For SINGLE=TRUE the value of the MSG_FILTER environment
 *     variable is used to output messages.  If it is QUIET, nothing is
-*     reported on the screen.  If it is undefined, NORMAL or VERBOSE, 
-*     the statistics are reported.  If it is VERBOSE, the individual 
-*     pixel values are also reported. 
+*     reported on the screen.  If it is undefined, NORMAL or VERBOSE,
+*     the statistics are reported.  If it is VERBOSE, the individual
+*     pixel values are also reported.
 
 *  Related Applications:
 *     CCDPACK: MAKEMOS, MAKECAL, MAKEFLAT.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,
-*     QUALITY, LABEL, TITLE, UNITS, WCS, and HISTORY components of the 
+*     QUALITY, LABEL, TITLE, UNITS, WCS, and HISTORY components of the
 *     first input NDF and propagates all its extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
-*     -  All non-complex numeric data types can be handled.  
+*     -  All non-complex numeric data types can be handled.
 *     Calculations are performed using the more appropriate of the
 *     data types real or double precision.  If the input NDFs'
 *     structures contain values with other data types, then conversion
@@ -274,8 +274,8 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. 
-*     Copyright (C) 2006 Particle Physics & Astronomy Research 
+*     Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research
 *     Council.
 *     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
@@ -312,8 +312,8 @@
 *        lines.
 *     2008 April 13 (MJC):
 *        Extend the choice of estimators for the full array with nww
-*        parameters ESTIMATOR and WLIM, replacing SMODE.  Selecting 
-*        ESTMATOR="Mean" computes only the mean and no longer generates 
+*        parameters ESTIMATOR and WLIM, replacing SMODE.  Selecting
+*        ESTMATOR="Mean" computes only the mean and no longer generates
 *        a variance too unless new parameter VARIANCE is TRUE.  Use NDF
 *        blocking.
 *     2008 May 4 (MJC):
@@ -354,7 +354,7 @@
       REAL CLPDEF                ! Default no. of standard deviations to
       PARAMETER( CLPDEF = 3.0 )  ! clip for mode, clipped mean & std dev
 
-      INTEGER MAXPIX 
+      INTEGER MAXPIX
       PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 megapixels
 
 *  Local Variables:
@@ -375,7 +375,7 @@
       INTEGER I                  ! Loop variable
       INTEGER IBL                ! Identifier for input-NDF block
       INTEGER IBLOCK             ! Loop counter for the NDF blocks
-      INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing 
+      INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing
                                  ! large datasets in blocks
       INTEGER IGRP               ! GRP identifier for input-NDFs group
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
@@ -385,7 +385,7 @@
       INTEGER IPODAT             ! Pointer to output data array
       INTEGER IPOUT( 2 )         ! Pointers to mapped output arrays
       INTEGER IPOVAR             ! Pointer to output variance array
-      INTEGER IPPTR              ! Pointer to array of pointers to 
+      INTEGER IPPTR              ! Pointer to array of pointers to
                                  ! mapped arrays
       INTEGER IPW1               ! Pointer to first work array
       INTEGER IPW2               ! Pointer to second work array
@@ -415,7 +415,7 @@
       INTEGER NGOOD1             ! Number of pixels used
       INTEGER NNDF               ! The number of input NDFs
       INTEGER OBL                ! Identifier for output-NDF block
-      INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing 
+      INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing
                                  ! large datasets in blocks
       INTEGER ONDF               ! NDF identifier of output NDF
       LOGICAL PVAR               ! Process variances?
@@ -427,7 +427,7 @@
       LOGICAL TRIM               ! Will be trim or pad arrays?
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds of the
                                  ! output NDF
-      INTEGER UBNDO( NDF__MXDIM - 1 )! Upper pixel index bounds of the 
+      INTEGER UBNDO( NDF__MXDIM - 1 )! Upper pixel index bounds of the
                                  ! output NDF block
       INTEGER UBNDS( NDF__MXDIM ) ! Upper pixel index bounds of the
                                  ! section of the input NDF
@@ -449,7 +449,7 @@
 
 *  Get a group containing the names of the NDFs to be processed.
       NNDF = 0
-      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', IGRP, 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', IGRP,
      :                 NNDF, STATUS )
 
 *  Determine whether we are in single pixel or array mode.
@@ -467,7 +467,7 @@
          CALL PSX_CALLOC( NNDF, '_DOUBLE', IPDAT, STATUS )
 
 *  Get the pixels from which to calculate the statistics.
-         CALL KPS1_MSS( IGRP, NNDF, COMP, NGOOD, 
+         CALL KPS1_MSS( IGRP, NNDF, COMP, NGOOD,
      :                  %VAL( CNF_PVAL( IPDAT ) ),
      :                  STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -476,10 +476,10 @@
          IF ( NGOOD .GT. 0 ) THEN
 
 *  If so, calculate the median.
-*  (Note: the first argument should properly be .FALSE., but this 
+*  (Note: the first argument should properly be .FALSE., but this
 *  currently falls foul of a bug in KPG1_MEDUD.  This version is
 *  correct, and is hardly a performance bottleneck).
-            CALL KPG1_MEDUD( .TRUE., NGOOD, %VAL( CNF_PVAL( IPDAT ) ), 
+            CALL KPG1_MEDUD( .TRUE., NGOOD, %VAL( CNF_PVAL( IPDAT ) ),
      :                       MED,
      :                       NGOOD1, STATUS )
 
@@ -487,7 +487,7 @@
             SUM = 0D0
             SUM2 = 0D0
             DO I = 1, NGOOD
-               CALL KPG1_RETRD( NGOOD, I, %VAL( CNF_PVAL( IPDAT ) ), 
+               CALL KPG1_RETRD( NGOOD, I, %VAL( CNF_PVAL( IPDAT ) ),
      :                          DATUM, STATUS )
                SUM = SUM + DATUM
                SUM2 = SUM2 + DATUM * DATUM
@@ -497,7 +497,7 @@
 
 *  Output the results, if required.
             CALL MSG_SETD( 'MED', MED )
-            CALL MSG_OUTIF( MSG__NORM, ' ', 
+            CALL MSG_OUTIF( MSG__NORM, ' ',
      :                      '    Pixel median:      ^MED', STATUS )
             CALL MSG_SETD( 'MEAN', MEAN )
             CALL MSG_OUTIF( MSG__NORM, ' ',
@@ -564,12 +564,12 @@
          END IF
 
 *  Get the ESTIMATOR and WLIM parameters.
-         CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', ESTIMO, .FALSE., ESTIM, 
+         CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', ESTIMO, .FALSE., ESTIM,
      :                   STATUS )
 
          CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
-*  See whether the output NDF will be the union or intersection of the 
+*  See whether the output NDF will be the union or intersection of the
 *  inputs.
          CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
          IF ( TRIM ) THEN
@@ -585,7 +585,7 @@
             CALL PAR_GDR0R( 'CLIP', CLPDEF, VAL__SMLR, VAL__MAXR,
      :                      .FALSE., CLIP, STATUS )
          ELSE
-            CLIP = CLPDEF  
+            CLIP = CLPDEF
          END IF
 
 *  Obtain NDF identifiers and bounds.
@@ -593,7 +593,7 @@
 *  Allocate some work space.
          CALL PSX_CALLOC( NNDF, '_INTEGER', IPNDF, STATUS )
 
-*  Obtain identifiers and bounds of pixel-matched requested components 
+*  Obtain identifiers and bounds of pixel-matched requested components
 *  of all the NDFs.
          CALL KPS1_MSBS( IGRP, NNDF, COMP, STRIM, 'OUT', ITYPE,
      :                   %VAL( CNF_PVAL( IPNDF ) ), ONDF, STATUS )
@@ -610,10 +610,10 @@
 *  are going to create an extra dimension in these blocks that stores
 *  the values at each input pixel.  That's how the COLLAPSE routines
 *  operate.  By definition, therefore we need all the pixels along this
-*  pseudo dimension to always be present in full for each output pixel 
+*  pseudo dimension to always be present in full for each output pixel
 *  along the other pixel axes.  If this leaves room for a full span of a
 *  dimension that becomes the block size along that axis.  Partial fills
-*  take the remaining maximum size and subsequent dimensions' block 
+*  take the remaining maximum size and subsequent dimensions' block
 *  sizes are unity.
          CAXIS = NDIM + 1
          IBLSIZ( CAXIS ) = NNDF
@@ -655,7 +655,7 @@
 *  Determine the number of blocks.
          CALL NDF_NBLOC( ONDF, NDIM, IBLSIZ, NBLOCK, STATUS )
 
-*  The total number of elements in the output array is needed for the 
+*  The total number of elements in the output array is needed for the
 *  calculation of the fraction of bad pixels generated by the
 *  statistical calculations in conjunction with the WLIM parameter.
 *  The count of the bad pixels generated is summed within KPS1_CLPSx.
@@ -666,7 +666,7 @@
          DO IBLOCK = 1, NBLOCK
             CALL NDF_BEGIN
 
-*  Make blocks from the input NDFs, and concatenate them, so as to 
+*  Make blocks from the input NDFs, and concatenate them, so as to
 *  make an array one dimension larger, which is then collapsed.
 *  The routine returns the pointer to the mapped component.
             IF ( ITYPE .EQ. '_DOUBLE' ) THEN
@@ -709,7 +709,7 @@
 *  Obtain co-ordinates along the collapse axis for the following
 *  methods.
             IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
-     :           ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR. 
+     :           ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR.
      :           ESTIM .EQ. 'INTEG' ) THEN
 
 *  Since the collapse axis is only notional, being the order of the
@@ -742,7 +742,7 @@
 *  Obtain AXIS widths along the collapse axis for the following
 *  methods.
             IF ( ESTIM .EQ. 'INTEG' ) THEN
-         
+
 *  Allocate work space for the widths to be derived from the
 *  co-ordinates.  These will be 1.0 for all values since the notional
 *  collapse axis has GRID co-ordinates.
@@ -759,37 +759,37 @@
 *  Now do the work, using a routine appropriate to the numeric type.
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPS1_CLPSR( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM,
-     :                          CLIP, EL, NDIM, LBNDS, UBNDS, 
+     :                          CLIP, EL, NDIM, LBNDS, UBNDS,
      :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ),
      :                          %VAL( CNF_PVAL( IPCO ) ),
      :                          NDIMO, LBNDO, UBNDO, HIGHER, NFLAG,
-     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                          %VAL( CNF_PVAL( IPWID ) ), 
-     :                          %VAL( CNF_PVAL( IPW1 ) ), 
-     :                          %VAL( CNF_PVAL( IPW2 ) ), 
+     :                          %VAL( CNF_PVAL( IPWID ) ),
+     :                          %VAL( CNF_PVAL( IPW1 ) ),
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_CLPSD( CAXIS, 1, NNDF, PVAR, ESTIM, WLIM,
-     :                          CLIP, EL, NDIM, LBNDS, UBNDS, 
+     :                          CLIP, EL, NDIM, LBNDS, UBNDS,
      :                          %VAL( CNF_PVAL( IPIN( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ),
      :                          %VAL( CNF_PVAL( IPCO ) ),
      :                          NDIMO, LBNDO, UBNDO, HIGHER, NFLAG,
-     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                          %VAL( CNF_PVAL( IPWID ) ), 
-     :                          %VAL( CNF_PVAL( IPW1 ) ), 
-     :                          %VAL( CNF_PVAL( IPW2 ) ), 
+     :                          %VAL( CNF_PVAL( IPWID ) ),
+     :                          %VAL( CNF_PVAL( IPW1 ) ),
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
             ELSE IF ( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'T', ITYPE )
                CALL ERR_REP( 'MSTATS_ERR5', 'MSTATS: Unsupported '//
-     :                       'data type ^T (programming error).', 
+     :                       'data type ^T (programming error).',
      :                       STATUS )
             END IF
 
@@ -799,7 +799,7 @@
      :           ESTIM .EQ. 'INTEG' ) THEN
                 CALL PSX_FREE( IPCO, STATUS )
             END IF
-         
+
             IF ( ESTIM .EQ. 'INTEG' ) THEN
                CALL PSX_FREE( IPWID, STATUS )
             END IF
@@ -822,11 +822,11 @@
 *  Warn about lost pixels due to insufficient input values.
 *  ========================================================
 
-*  For some applications such as spectral-cube analysis where large 
-*  sections may be flagged, the wrong WLIM may lead to surprising 
+*  For some applications such as spectral-cube analysis where large
+*  sections may be flagged, the wrong WLIM may lead to surprising
 *  results.  While the WLIM default could be set to zero, this is not
 *  the normal default of 0.3 used elsewhere in KAPPA.  At the risk of
-*  annoying some users, report the number of output data that were 
+*  annoying some users, report the number of output data that were
 *  flagged by the WLIM threshold at the normal reporting level.
        IF ( NFLAG .GT. 0 ) THEN
          CALL MSG_FMTR( 'WLIM', 'F6.4', WLIM )
@@ -868,7 +868,7 @@
 
 *  Report a contextual message if anything went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'MSTATS_ERR2', 
+         CALL ERR_REP( 'MSTATS_ERR2',
      :                 'MSTATS: Unable to calculate statistics.',
      :                 STATUS )
       END IF

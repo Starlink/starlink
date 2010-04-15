@@ -67,7 +67,7 @@
              TZ(I) = TZ(I-1)
           ENDIF
   100  CONTINUE
- 
+
        STRING = '              Te( )'
        DO 200 I = 1, 4
           WRITE (STRING(18:18),'(I1)',IOSTAT=IX) I
@@ -85,7 +85,7 @@
           OK = .FALSE.
           GOTO 1000
        ENDIF
- 
+
        STRING = '                Ne X'
        CALL PUTEXT(TEXT,LLEN,ELDENS)
        CALL UPDATE(STRING,TEXT,LLEN,MODE3,OK,ELDENS,STATUS)
@@ -109,7 +109,7 @@
           OK = .FALSE.
           GOTO 1000
        ENDIF
- 
+
        LOGF(1) = TSTVAL
        LOGF(2) = TSTVAL
        CALL DECODE('Line Flux',STRING,0,2,LOGF,' ',OK)
@@ -133,7 +133,7 @@
           CALL UPDATE(STRING,TEXT,LLEN,MODE2,OK,FHELOG,STATUS)
           IF (.NOT.OK) GOTO 1000
        ENDIF
- 
+
        READ (IUNIT,*,IOSTAT=IX) CHB
        IF (IX.NE.0) THEN
           WRITE (*,
@@ -141,7 +141,7 @@
           OK = .FALSE.
           GOTO 1000
        ENDIF
- 
+
        STRING = '               ''C'' X'
        CALL PUTEXT(TEXT,LLEN,CHB)
        CALL UPDATE(STRING,TEXT,LLEN,MODE2,OK,CHB,STATUS)
@@ -223,7 +223,7 @@
              FZ(I,J) = 0.001*FZ(I,J)
   550     CONTINUE
   600  CONTINUE
- 
+
        AMS = 2.051E-21*COLHP
        DO 700 I = 1, 4
           DMS(I) = AMS*(FZ(1,I)+FZ(2,I)+FZ(3,I)+FZ(4,I))
@@ -238,17 +238,17 @@
           DMS(I) = DMS(I)*I**2*(EXP(XMS)*(1.0+XMS/FNMS(I))+1.0)
      :    /SQRT(TZ(I))
   800  CONTINUE
- 
+
        HER = FZ(5,1)
        HEPR = FZ(5,2)
- 
+
        CALL NEBCONT(NPOINT,X,Y,TZ,HER,HEPR,ELDENS,COLHP,FHBETA)
- 
+
        DO 900 I = 1, NPOINT
           XS = X(I)
           Y(I) = Y(I) + FNEB(XS,COLHP,TZ,FZ,DMS)
   900  CONTINUE
- 
+
        WRITE (TEXT,'(1PE15.5)',IOSTAT=IX) COLHP
        CALL SSTRIP(TEXT)
        LLEN = SLEN(TEXT)
@@ -256,7 +256,7 @@
        WRITE (*,'(''   NEBCONT:  N(H+) = '',A)') TEXT(1:LLEN)
        TEXT = ' Nebular continuum'
        CALL UPUSH(ASIZE1,X,Y,NPOINT,MAXBRK,BREAK,NBREAK,TEXT,1.0,OK)
- 
+
  1000  CONTINUE
 
        END

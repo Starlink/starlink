@@ -82,7 +82,7 @@
 
 *  Arguments Given:
       INTEGER IGRP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -112,7 +112,7 @@
 
 *  Get the group size.  If it zero there are no defined regions, so
 *  warn the user and return.
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )      
+      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
       IF( SIZE .EQ. 0 ) THEN
          CALL MSG_OUT( 'KPS1_AGNLS_MSG1', 'There are currently no '/
      :                 /'regions defined.', STATUS )
@@ -124,7 +124,7 @@
 
 *  Display a heading.  Abort if an error occurs while writing to the
 *  screen.
-      CALL SHL_PAGTXT( ' Region          Region Description', STATUS ) 
+      CALL SHL_PAGTXT( ' Region          Region Description', STATUS )
       CALL SHL_PAGTXT( ' Index', STATUS )
 
 *  Put a blank line above the first region.
@@ -146,7 +146,7 @@
             REG = REG + 1
 
             IF ( BLANK ) THEN
-               CALL SHL_PAGTXT( ' ', STATUS ) 
+               CALL SHL_PAGTXT( ' ', STATUS )
                BLANK = .FALSE.
             END IF
 
@@ -168,11 +168,11 @@
 
 *  Display the stored text.
          LINLEN = CHR_LEN( LINE )
-         CALL SHL_PAGTXT( LINE( : LINLEN ), STATUS ) 
+         CALL SHL_PAGTXT( LINE( : LINLEN ), STATUS )
 
       END DO
 
-      CALL SHL_PAGTXT( ' ', STATUS ) 
+      CALL SHL_PAGTXT( ' ', STATUS )
 
  999  CONTINUE
 

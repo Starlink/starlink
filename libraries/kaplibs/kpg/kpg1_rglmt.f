@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_RGLMT( SCT, RNGWRD, BERNG, BELG, EDRNG, EDLG, 
+      SUBROUTINE KPG1_RGLMT( SCT, RNGWRD, BERNG, BELG, EDRNG, EDLG,
      :                       STATUS )
 *+
 *  Name:
@@ -15,20 +15,20 @@
 
 *  Description:
 *     This routine returns begin and end limits of a range specified by
-*     a range word.  
+*     a range word.
 
 *  Arguments:
 *     SCT = CHARACTER*(*) (Given)
 *        String which specifies a range with the range word specified
 *        by argument RNGWRD.
 *     RNAWRD = CHARACTER*(*) (Given)
-*        Gives a range word, such as "TO", "-", etc, which is used in 
+*        Gives a range word, such as "TO", "-", etc, which is used in
 *        range specification.
 *     BERNG = INTEGER (Returned)
 *        Begin limit of the range.
 *     BELG = LOGICAL (Returned)
 *        If the begin limit of the range has been omitted. it equals
-*        true, otherwise, false.  
+*        true, otherwise, false.
 *     EDRNG = INTEGER (Returned)
 *        End limit of the range.
 *     EDLG = LOGINCAL (Returned)
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,17 +90,17 @@
       LOGICAL BELG
       INTEGER EDRNG
       LOGICAL EDLG
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External Reference:
-      INTEGER CHR_LEN            ! Find used length of a string.  
+      INTEGER CHR_LEN            ! Find used length of a string.
 *  Local Variables:
       INTEGER LNSCT              ! Used length of input string.
       INTEGER LNWRD              ! Length of the range word.
       CHARACTER*(10) BERNGC      ! Begin number string of the range.
-      CHARACTER*(10) EDRNGC      ! End number string of the range. 
+      CHARACTER*(10) EDRNGC      ! End number string of the range.
 *.
 
 *  Check inherited global status.
@@ -115,7 +115,7 @@
 
 *  Conver all lower-case letter in SCT to upper case.
       CALL CHR_UCASE( SCT )
-  
+
 *  Strip the leading bland of the string SCT.
       CALL CHR_LDBLK( SCT )
 
@@ -123,16 +123,16 @@
       LNSCT = CHR_LEN( SCT )
 
 *  Get the length of range word.
-      LNWRD = CHR_LEN( RNGWRD )           
+      LNWRD = CHR_LEN( RNGWRD )
 
-*  Get the begin limit. 
+*  Get the begin limit.
       IF( INDEX( SCT, RNGWRD ) .GT. 1 ) THEN
          BELG = .FALSE.
          BERNGC = SCT( : INDEX( SCT, RNGWRD ) - 1 )
          CALL CHR_CTOI( BERNGC, BERNG, STATUS )
 
 *  Check, if error, exit.
-         IF( STATUS .NE. SAI__OK ) GOTO 999        
+         IF( STATUS .NE. SAI__OK ) GOTO 999
 
 *  If begin limit is omitted, set its flag.
       ELSE
@@ -151,8 +151,8 @@
 *  If end limit is omitted, set its flag.
       ELSE
          EDLG = .TRUE.
-      END IF           
+      END IF
 
  999  CONTINUE
-      
+
       END

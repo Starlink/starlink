@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,7 +129,7 @@
       IF (STATUS.NE.0) GO TO 500
       FOPEN=.TRUE.
 
-*  Start to read through the definition file 
+*  Start to read through the definition file
       FILE_LINE=0
       STRUCT_LINE=0
       STRUCT_DEF=.FALSE.
@@ -165,7 +165,7 @@
             IF ((CHR.NE.' ').AND.(CHR.NE.'*')) THEN
 
 *           It isn't a comment.  So, it ought to start with one of
-*           the keywords (VARIANT,VARIABLE,STRUCTURE,END,IF or EQUATE) 
+*           the keywords (VARIANT,VARIABLE,STRUCTURE,END,IF or EQUATE)
 *           or be a structure element definition, in which case it begins
 *           with a '.'.  Note that the parsing performed by this
 *           routine is rather 'brute force' in nature, and isn't
@@ -488,8 +488,8 @@
 
 *  Utility routine for DSA_READ_STRUCT_DEF.  Outputs an error
 *  description (ERROR), the name of the structure file in question
-*  (FULL_NAME) the text (LINE) and line number (FILE_LINE) of the line 
-*  causing the error, and sets the status (STATUS) to an error value, 
+*  (FULL_NAME) the text (LINE) and line number (FILE_LINE) of the line
+*  causing the error, and sets the status (STATUS) to an error value,
 *  if it does not already indicate an error.  Should be regarded as an
 *  internal routine of DSA_READ_STRUCT_DEF.
 

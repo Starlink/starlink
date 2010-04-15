@@ -120,7 +120,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -193,7 +193,7 @@
 *  Read the column into the flux array.
       CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR, FLUX, BAD,
      :             FSTAT )
-      
+
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
          CALL COF_FIOER( FSTAT, 'COF_LWS_RDDAT', 'FTGCVE',

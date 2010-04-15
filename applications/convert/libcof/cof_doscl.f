@@ -14,13 +14,13 @@
 
 *  Description:
 *     This routine sets the scale and offset of a FITS data array
-*     for FITSIO, and obtains the data type of the scaled 
+*     for FITSIO, and obtains the data type of the scaled
 *     floating-point array.
 
 *  Arguments:
 *     FUNITH = INTEGER (Given)
 *        The FITS unit number associated with the header.  This may
-*        differ from that associated with the data if a merged header 
+*        differ from that associated with the data if a merged header
 *        has been constructed.
 *     FUNITD = INTEGER (Given)
 *        The FITS unit number associated with the data.
@@ -40,7 +40,7 @@
 *        floating-point data type depends on the number of significant
 *        digits in the BSCALE and BZERO keywords.
 *     TYPE = CHARACTER * ( NDF__SZTYP ) (Given and returned)
-*        Given as the type of the NDF component.  It is returned as the 
+*        Given as the type of the NDF component.  It is returned as the
 *        effective data type for the data array based upon keywords
 *        BSCALE and BZERO.  It is either '_REAL' or '_DOUBLE' if the
 *        scale and offset do not take their defaults of one and zero
@@ -82,7 +82,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +91,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
-      INTEGER FUNITH             ! FITS unit for the (merged?) FITS 
+      INTEGER FUNITH             ! FITS unit for the (merged?) FITS
                                  ! header
       INTEGER FUNITD             ! FITS unit for the FITS file
       LOGICAL FMTCNV             ! Format conversion required?
@@ -157,7 +157,7 @@
          END IF
 
 *  To prevent scaling, the scale and offset must be set to one and zero
-*  respectively.  Note that this does not affect the keywords in the 
+*  respectively.  Note that this does not affect the keywords in the
 *  header of the input FITS file.  Note that the values are double
 *  precision.
       ELSE

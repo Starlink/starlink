@@ -1,11 +1,11 @@
 #ifndef HEADGEN____sc2store_pro_h
-#define HEADGEN____sc2store_pro_h 
- 
- 
+#define HEADGEN____sc2store_pro_h
+
+
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
-void sc2store_compress 
-( 
+void sc2store_compress
+(
 size_t nval,            /* number of values in frame (given) */
 const int stackz[],     /* stackzero frame to be subtracted (given) */
 int digits[],           /* integer values (given and returned) */
@@ -37,7 +37,7 @@ double gridsize,           /* size in arcsec of grid step (given) */
 const int *jigext,               /* Table of SMU pattern extents for a single
                               bolometer (given) */
 double jigsize,            /* size in arcsec of SMU step (given) */
-const int gridwtsdim[],          /* dimensions of grid interpolation weights 
+const int gridwtsdim[],          /* dimensions of grid interpolation weights
                               (given) */
 const double *gridwts,           /* grid interpolation weights (given) */
 int invmatdim,             /* dimension of inverted matrix (given) */
@@ -49,8 +49,8 @@ int *status                /* global status (given and returned) */
 
 /*+ sc2store_decompress - decompress frame of unsigned short to integers */
 
-void sc2store_decompress 
-( 
+void sc2store_decompress
+(
 size_t nval,                  /* number of values in frame (given) */
 const int stackz[],           /* stackzero frame to be added (given) */
 int bzero,                    /* zero offset for compressed values (given) */
@@ -145,7 +145,7 @@ double *gridsize,          /* size in arcsec of grid step (returned) */
 int **jigext,               /* Table of SMU pattern extents for a single
                               bolometer (returned) */
 double *jigsize,           /* size in arcsec of SMU step (returned) */
-int gridwtsdim[],          /* dimensions of grid interpolation weights 
+int gridwtsdim[],          /* dimensions of grid interpolation weights
                               (returned) */
 double **gridwts,          /* grid interpolation weights (returned) */
 int *invmatdim,            /* dimension of inverted matrix (returned) */
@@ -318,9 +318,9 @@ int *status              /* global status (given and returned) */
 void sc2store_resize_head
 (
 int indf,                /* Id. for NDF holding the JCMTSTATE extension */
-HDSLoc **xloc,           /* Locator for the JCMTSTATE extension (annuled on 
+HDSLoc **xloc,           /* Locator for the JCMTSTATE extension (annuled on
                             exit) */
-HDSLoc **yloc,           /* Locator for new HDS object containing resized 
+HDSLoc **yloc,           /* Locator for new HDS object containing resized
                             arrays. */
 int *status              /* Global status (given and returned) */
 );
@@ -452,7 +452,7 @@ int jigvert[][2],           /* Array of jiggle vertices (given) */
 size_t nvert,               /* Number of jiggle vertices (given) */
 double jigpath[][2],        /* Path of SMU during jiggle cycle (given) */
 size_t npath,               /* Number of positions in jiggle path (given) */
-const char *xmlfile,        /* name of CONFIGURE XML file (given) */ 
+const char *xmlfile,        /* name of CONFIGURE XML file (given) */
 int *status                 /* global status (given and returned) */
 );
 
@@ -476,6 +476,6 @@ void sc2store_force_initialised
 int *status                 /* global status (given and returned) */
 );
 
- 
- 
+
+
 #endif

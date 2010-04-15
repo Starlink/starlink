@@ -1,4 +1,4 @@
-              
+
 *+  POW2D - takes the power of each pixel of an image (specified power)
 
       SUBROUTINE POW2D ( STATUS )
@@ -20,7 +20,7 @@
 *     POWER  =  REAL( READ )
 *         Power to be taken of each input image pixel
 *     OUTPIC  =  IMAGE( WRITE )
-*         Output image holding result of processed image 
+*         Output image holding result of processed image
 *     OTITLE  =  CHAR( READ )
 *         Title string for output image structure
 *
@@ -69,8 +69,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'          
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 *    Status :
 
@@ -83,8 +83,8 @@
       PARAMETER( NDIMS  =  2 )    ! 2-d only
 
       REAL
-     :    MAXPOW,                 ! maximum power allowed 
-     :    MINPOW                  ! minimum   "      "     
+     :    MAXPOW,                 ! maximum power allowed
+     :    MINPOW                  ! minimum   "      "
       PARAMETER( MAXPOW  =  100 )
       PARAMETER( MINPOW  = -100 )
 
@@ -118,7 +118,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the input structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS)
@@ -139,7 +139,7 @@
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                map a data array component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )
@@ -149,7 +149,7 @@
 
 *                   call working subroutine to take power of each pixel
 *                   of input image, result going into output image
-                     CALL POWARR2D( %VAL( PNTRI ), IDIMS(1), IDIMS(2), 
+                     CALL POWARR2D( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
      :                                POWER, %VAL( PNTRO ), STATUS )
 
 *                end of if-no-error-before-accessing-pointers check

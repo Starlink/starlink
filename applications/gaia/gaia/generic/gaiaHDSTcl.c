@@ -10,11 +10,11 @@
 
  *  Authors:
  *     PWD: Peter W. Draper, JAC - University of Durham
- 
+
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as

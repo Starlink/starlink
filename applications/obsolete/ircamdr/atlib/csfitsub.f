@@ -40,7 +40,7 @@
 	OPEN( UNIT=LUN, FILE=OUTFILE, STATUS='NEW')
 
 *      Write header line to output file
-	WRITE( LUN, '(A)') 
+	WRITE( LUN, '(A)')
      :	'## CSFIT - Pixel, Standard deviation, '//
      :  'number pixels, x-pixel, y-pixel'
 
@@ -83,7 +83,7 @@
 *                Test if current pixel different from centre pixel
 	          IF( ( L-J) .NE. 0 .OR. ( K-I) .NE. 0) THEN
 
-*                  Increment number of pixels in CS pattern for this 
+*                  Increment number of pixels in CS pattern for this
 *                  centre variable
 	            NPIX = NPIX + 1
 
@@ -119,7 +119,7 @@
 	              DEVTHETA = 0.0
 	            END IF
 
-*                  Calculate sum-of-squares of deviation over whole pattern 
+*                  Calculate sum-of-squares of deviation over whole pattern
 *                  area for curent centre pixel
 	            SUMSQD = SUMSQD + DEVTHETA**2
 	            SUMD = SUMD + DEVTHETA
@@ -162,7 +162,7 @@
 	COUNTER = AXST-1
 
 *      Write line to output file to tell this is x scan
-	WRITE( LUN, '(A)') 
+	WRITE( LUN, '(A)')
      :	  '## Scan through calculated centre in X'
 
 *      Scan through optimum pixel in x and re-calculate statistic
@@ -197,7 +197,7 @@
 *              Test if current pixel different from centre pixel
 	        IF( ( L-J) .NE. 0 .OR. ( K-I) .NE. 0) THEN
 
-*                Increment number of pixels in CS pattern for this 
+*                Increment number of pixels in CS pattern for this
 *                centre variable
 	          NPIX = NPIX + 1
 
@@ -233,7 +233,7 @@
 	            DEVTHETA = 0.0
 	          END IF
 
-*                Calculate sum-of-squares of deviation over whole pattern 
+*                Calculate sum-of-squares of deviation over whole pattern
 *                area for curent centre pixel
 	          SUMSQD = SUMSQD + DEVTHETA**2
 	          SUMD = SUMD + DEVTHETA
@@ -268,7 +268,7 @@
 	COUNTER = AYST-1
 
 *      Write line to output file to tell this is y scan
-	WRITE( LUN, '(A)') 
+	WRITE( LUN, '(A)')
      :	  '## Scan through calculated centre in Y'
 
 *      Scan through optimum pixel in y and re-calculate statistic
@@ -303,7 +303,7 @@
 *              Test if current pixel different from centre pixel
 	        IF( ( L-J) .NE. 0 .OR. ( K-I) .NE. 0) THEN
 
-*                Increment number of pixels in CS pattern for this 
+*                Increment number of pixels in CS pattern for this
 *                centre variable
 	          NPIX = NPIX + 1
 
@@ -339,7 +339,7 @@
 	            DEVTHETA = 0.0
 	          END IF
 
-*                Calculate sum-of-squares of deviation over whole pattern 
+*                Calculate sum-of-squares of deviation over whole pattern
 *                area for curent centre pixel
 	          SUMSQD = SUMSQD + DEVTHETA**2
 	          SUMD = SUMD + DEVTHETA
@@ -374,7 +374,7 @@
 	CLOSE( LUN)
 	CALL FIO_PUNIT( LUN, STATUS )
 
-*      Loops to scan through array creating best fit centro-symmetric 
+*      Loops to scan through array creating best fit centro-symmetric
 *      pattern using p image as map to where to put vectors
 	DO I = 1, NY
 	  DO J = 1, NX

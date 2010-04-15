@@ -1,6 +1,6 @@
 proc red4NormObs {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -23,11 +23,11 @@ proc red4NormObs {taskname} {
     set Red4Widgets(NO_LAB01) [label $top.l1 -text "Filename"]
     set Red4Widgets(NO_ENT01) [entry $top.e1 -width 40]
     pack $Red4Widgets(NO_LAB01) $Red4Widgets(NO_ENT01) -in $top -side left
-    $Red4Widgets(NO_ENT01) insert end $Red4Widgets(RO) 
+    $Red4Widgets(NO_ENT01) insert end $Red4Widgets(RO)
     bind $Red4Widgets(NO_LAB01) <Button-2> "red4Update red4NormObs ALL"
     bind $Red4Widgets(NO_ENT01) <Button-2> "red4Update red4NormObs NO_ENT01"
     bind $Red4Widgets(NO_ENT01) <Double-Button-2> "$Red4Widgets(NO_ENT01) delete 0 end"
- 
+
     set pf [radiobutton $bot.pf -text "Polyfit" -variable Red4Widgets(NO_METHOD) -value "POLYFIT"]
     set sm [radiobutton $bot.sm -text "Smooth" -variable Red4Widgets(NO_METHOD) -value "SMOOTH"]
     set Red4Widgets(NO_LAB02) [label $bot.l2 -text "Polynomial"]

@@ -19,14 +19,14 @@
 
 *  Arguments:
 *     GI = INTEGER (Given)
-*        Generic component identifier. 
-*     ATTRIB = CHARACTER * ( * ) (Given) 
-*        Name of the attribute of the component. 
-*     VALUE = CHARACTER * ( * ) (Given and Returned) 
+*        Generic component identifier.
+*     ATTRIB = CHARACTER * ( * ) (Given)
+*        Name of the attribute of the component.
+*     VALUE = CHARACTER * ( * ) (Given and Returned)
 *        Value of the named attribute. If the named attribute does not
 *        exist, the supplied value is returned unchanged.
-*     STATUS = INTEGER (Given and Returned) 
-*        The global status. 
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Notes:
 *    - No error is reported if the named attribute does not exist.
@@ -34,7 +34,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
 
 *  If the attribute does not exist, annul the error.
       IF( STATUS .EQ. CAT__NOATT .OR.
-     :    STATUS .EQ. CAT__NOCMP .OR. 
+     :    STATUS .EQ. CAT__NOCMP .OR.
      :    STATUS .EQ. CAT__INVPR ) THEN
          CALL ERR_ANNUL( STATUS )
       END IF

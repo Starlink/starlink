@@ -10,7 +10,7 @@
 
 *  Invocation:
 *     Call from C
-*     int hdsstructwrite( HDSLoc *toploc, char *data, char **taglist, 
+*     int hdsstructwrite( HDSLoc *toploc, char *data, char **taglist,
 *                     int numtags, int ndims, int dims[],
 *                     IDL_VPTR var, int *status )
 
@@ -128,14 +128,14 @@ int cmpelt_len;
             tagname = taglist[tagno];
 
 /*    Get the tag info */
-            offset = IDL_StructTagInfoByIndex( 
+            offset = IDL_StructTagInfoByIndex(
                sdef, tagno, IDL_MSG_LONGJMP, &cmpvar );
             cmpdata = (char *) data + offset;
 
             cmptaglist = tagstrip( tagname, taglist );
 
 /*    Get the sub-object details, create the required HDS object and fill it */
-            getobjectdetails( cmpvar, cmpdata, cmptaglist, objhdstype, 
+            getobjectdetails( cmpvar, cmpdata, cmptaglist, objhdstype,
                &cmpnumtags, &cmpndims, cmpdims, &cmpelt_len, status );
 
 /*    Set the HDS component type - */
@@ -157,7 +157,7 @@ int cmpelt_len;
                datCell( vecloc, 1, &cellno, &cmploc, status );
                cellno++;
             } else {
-               datNew( 
+               datNew(
                   toploc, tagname, cmphdstype, cmpndims, cmpdims, status );
                datFind( toploc, tagname, &cmploc, status );
             }
@@ -171,7 +171,7 @@ int cmpelt_len;
 
             } else {
 /*    We have a primitive */
-               hdsprimwrite( cmploc, objhdstype, cmpndims, cmpdims, cmpdata, 
+               hdsprimwrite( cmploc, objhdstype, cmpndims, cmpdims, cmpdata,
                  status );
             }
 

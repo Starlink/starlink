@@ -77,8 +77,8 @@
 *      14-AUG-2005 (TIMJ):
 *        Minor tweak to multiplication statement to make it standards compliant.
 *      10-JAN-2008 (DSB):
-*        - For increased precision, store the Epoch directly in the SkyFrame 
-*        using AST_SETD rather than indirectly via the MJD-OBS FITS header. 
+*        - For increased precision, store the Epoch directly in the SkyFrame
+*        using AST_SETD rather than indirectly via the MJD-OBS FITS header.
 *        - Use AST attributes ObsLon/Lat instead of GeoLon/Lat
 *        - Convert observation date from UT1 (sed by SPECX) to TDB (used
 *        by AST) before storing it in the output WCS.
@@ -87,8 +87,8 @@
 *      11-JAN-2008 (DSB):
 *        - The specx user guide says that JFINC is a topocentric value
 *        and JFCEN is a source frame value. So convert JFINC from topo to
-*        source before using it. This involves backing out of yesterdays 
-*        change that assumed the SPECX axis (i.e. both JFCEN and JFINC) was 
+*        source before using it. This involves backing out of yesterdays
+*        change that assumed the SPECX axis (i.e. both JFCEN and JFINC) was
 *        in the rest frame given by the bottom 4 bits of LSRFLG.
 *        - Use the correct definition of the source velocity (radio,
 *        optical or relativistic) as read from bits 5 and 6 of LSRFLG.
@@ -103,7 +103,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,19 +134,19 @@
       INTEGER IVAL           ! Integer extension item value
       INTEGER IWCS           ! Pointer to NDF's WCS FrameSet
       INTEGER IWCS0          ! Pointer to SPECX's WCS FrameSet
-      INTEGER JFINC          ! Pixel size (Hz) on spectral axis 
+      INTEGER JFINC          ! Pixel size (Hz) on spectral axis
       INTEGER KM1            ! KeyMap for SPECX items
       INTEGER KM2            ! KeyMap for SPECX_MAP items
       INTEGER NDIM           ! No. of pixel axes in output NDF
       LOGICAL THERE          ! Does SPECX_MAP extension exist?
       REAL CT                ! Product of channel spacing and integ time
-      REAL TSYS              ! Tsys 
+      REAL TSYS              ! Tsys
 *.
 
 *  Initialise returned values.
       VAR = VAL__BADR
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -207,7 +207,7 @@
       CALL NDF_XGT0I( IMAP, 'SPECX', KEY, IVAL, STATUS )
       CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
 
-*  Extract the required items from the SPECX_MAP extension (if it exists), 
+*  Extract the required items from the SPECX_MAP extension (if it exists),
 *  and put them in an AST KeyMap as required by ATL_WCSPX.
       CALL NDF_XSTAT( IMAP, 'SPECX_MAP', THERE, STATUS )
       IF( THERE ) THEN
@@ -230,24 +230,24 @@
       END IF
 
 *  The reference pixel is at the middle of the array.
-      CRPIX( 1 ) = 0.5*( DIM( 1 ) + 1 )   
-      CRPIX( 2 ) = 0.5*( DIM( 2 ) + 1 )   
-      CRPIX( 3 ) = 0.5*( DIM( 3 ) + 1 )   
+      CRPIX( 1 ) = 0.5*( DIM( 1 ) + 1 )
+      CRPIX( 2 ) = 0.5*( DIM( 2 ) + 1 )
+      CRPIX( 3 ) = 0.5*( DIM( 3 ) + 1 )
 
 *  Create the FrameSet describing the SPECX WCS information.
       CALL ATL_WCSPX( KM1, KM2, CRPIX, OBSLON, OBSLAT, IWCS0, STATUS )
 
-*  Get a pointer to the FrameSet which forms the default WCS component for 
-*  the output NDF. This just contains GRID, PIXEL and AXIS Frames. The 
+*  Get a pointer to the FrameSet which forms the default WCS component for
+*  the output NDF. This just contains GRID, PIXEL and AXIS Frames. The
 *  GRID Frame will be the Base Frame.
       CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
 *  Add in the current Frame from the new FrameSet.
-      CALL AST_ADDFRAME( IWCS, AST__BASE, 
+      CALL AST_ADDFRAME( IWCS, AST__BASE,
      :                   AST_GETMAPPING( IWCS0, AST__BASE, AST__CURRENT,
      :                                   STATUS ),
      :                   AST_GETFRAME( IWCS0, AST__CURRENT, STATUS ),
-     :                   STATUS )       
+     :                   STATUS )
 
 *  Store the FrameSet back in the NDF.
       CALL NDF_PTWCS( IWCS, INDF, STATUS )

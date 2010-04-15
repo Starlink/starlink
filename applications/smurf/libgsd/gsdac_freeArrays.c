@@ -20,7 +20,7 @@
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     gsdVars = gsdVars* (Given and returned)
-*        GSD headers and array data 
+*        GSD headers and array data
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -74,7 +74,7 @@
 
 #define FUNC_NAME "gsdac_freeArrays.c"
 
-void gsdac_freeArrays ( const dasFlag dasFlag, gsdVars *gsdVars,  
+void gsdac_freeArrays ( const dasFlag dasFlag, gsdVars *gsdVars,
                         int *status )
 {
 
@@ -89,7 +89,7 @@ void gsdac_freeArrays ( const dasFlag dasFlag, gsdVars *gsdVars,
 
   if ( dasFlag == DAS_NONE || dasFlag == DAS_CONT_CAL ) {
     smf_free ( gsdVars->vRadial, status );
-  } 
+  }
 
   smf_free ( gsdVars->scanVars1, status );
   smf_free ( gsdVars->scanVars2, status );
@@ -147,6 +147,6 @@ void gsdac_freeArrays ( const dasFlag dasFlag, gsdVars *gsdVars,
     errRep ( FUNC_NAME, "Error freeing GSD data arrays", status );
     return;
   }
-    
+
 
 }

@@ -16,7 +16,7 @@
 *
 *    Invocation :
 *      CALL RED4_ORMASK( DIM1, DIM2, MASK1, MASK2, OUTPUT, STATUS )
-*    Parameters 
+*    Parameters
 *     DIM1                  = INTEGER( READ )
 *           First dimension of the arrays
 *     DIM2                  = INTEGER( READ )
@@ -86,7 +86,7 @@
       DO J = 1, DIM2
          DO I = 1, DIM1
 
-*         See if the input masks are good or bad, and use this 
+*         See if the input masks are good or bad, and use this
 *         information to decide if the output should be good or bad
 *         (using a logical OR operation).
             MASK1_BAD  = ( MASK1(I,J) .NE. GOOD )

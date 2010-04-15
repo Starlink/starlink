@@ -120,7 +120,7 @@
       REAL SIMUL( MAX_POINTS )
       REAL THRHI
       REAL HIT
-      
+
       INTEGER I
       INTEGER J
       INTEGER MY_N_POINTS
@@ -182,7 +182,7 @@
          MEANSQ( J ) = MEANSQ( J ) / FLOAT( LOOPS )
          FIT_SIGMA( J ) = ABS( MEANSQ( J ) - MEAN( J ) * MEAN( J ) )
       END DO
-      
+
       END
 
 
@@ -195,7 +195,7 @@
 *     Returns gaussian noise with standarad deviation of 1.0.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 

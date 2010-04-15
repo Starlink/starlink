@@ -13,10 +13,10 @@
 *     CALL HISTC0( STRING, LOGPOS, FD, STATUS )
 
 *  Description:
-*     Any tokens in the supplied string are expanded by calling 
+*     Any tokens in the supplied string are expanded by calling
 *     MSG_LOAD. The resulting string is then written to the screen
 *     so long as the conditional message filter level is not MSG__QUIET.
-*     The screen output is paged. If LOGPOS is true, then the text is 
+*     The screen output is paged. If LOGPOS is true, then the text is
 *     also written to the log file.
 
 *  Arguments:
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -78,13 +78,13 @@
 *  Expand any tokens.
       CALL MSG_LOAD( ' ', STRING, BUF, BLEN, STATUS )
 
-*  Write the string to the screen so long as the conditional message 
+*  Write the string to the screen so long as the conditional message
 *  filter level is not MSG__QUIET.
       IF( FILTER .NE. MSG__QUIET ) ISTAT = IRM_PTOUT( BUF( : BLEN ) )
 
-*  Write the string to any log file, restricting the length to 80 
+*  Write the string to any log file, restricting the length to 80
 *  characters to avoid exceeding the log file record length.
-      IF( LOGPOS ) CALL FIO_WRITE( FD, BUF( : MIN( 80, BLEN ) ), 
+      IF( LOGPOS ) CALL FIO_WRITE( FD, BUF( : MIN( 80, BLEN ) ),
      :                             STATUS )
 
       END

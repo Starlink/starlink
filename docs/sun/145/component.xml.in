@@ -17,7 +17,7 @@
     facilities available and how to use them.  This is important
     because Starlink Sites differ in their computer hardware and in
     their versions of Unix.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

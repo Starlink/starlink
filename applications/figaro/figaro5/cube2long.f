@@ -126,7 +126,7 @@
       call dsa_simple_output('output','D','FLOAT',2,dims,status)
 
 * Returns to previous code
-      
+
       call dsa_map_data('cube','READ','float',zptr,slot,status)
       call dsa_map_data('output','UPDATE','float',znptr,slot,status)
 

@@ -28,11 +28,11 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Use CHR_CTOI. If that fails try CHR_CTOD and INT. 
+*     Use CHR_CTOI. If that fails try CHR_CTOD and INT.
 *     (This is a change from previous behaviour which found the nearest
 *     integer but it now does the same as SUBPAR)
 *     If that fails try CHR_CTOL setting 1 if true and 0 if false.
-*     (This is a change, previously these values would not be converted.) 
+*     (This is a change, previously these values would not be converted.)
 
 *  Copyright:
 *     Copyright (C) 1989, 1992-1993 Science & Engineering Research
@@ -75,28 +75,28 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'TASK_ERR'
- 
+
 *  Arguments Given:
       CHARACTER*(*) STRING  ! the character string to be decoded
- 
+
 *  Arguments Returned:
       INTEGER IVAL         ! the returned value
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       DOUBLE PRECISION DVAL ! value in double precision
       LOGICAL LVAL          ! value as logical
- 
+
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *   Use appropriate CHR routine
       CALL CHR_CTOI( STRING, IVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN

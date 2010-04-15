@@ -14,21 +14,21 @@ C                 the file.  If this does not match the value in
 C                 the file, an error condition exists.
 C     (>) NY      (Integer) The number of lines in the image to be
 C                 processed.  See NX.
-C     (<) COEFFS  (Double precision COEFFS(11,NY)) The coefficients 
+C     (<) COEFFS  (Double precision COEFFS(11,NY)) The coefficients
 C                 read from the file.
 C     (<) WMIN    (Real) The lowest value for channel 1 given from the
 C                 various sets of coefficients.
 C     (<) WMAX    (Real) The highest value for channel NX given from
 C                 the various sets of coefficients.
 C     (<) STATUS  (Integer) Return status code.  0 => OK, non-zero
-C                 => some error, for which a message will have been 
+C                 => some error, for which a message will have been
 C                 output by this routine.
 C
 C     Common variables used -  None
 C
 C     Subroutines / function used -
 C
-C     ICH_LEN      (ICH_ package) Position of last non-blank char 
+C     ICH_LEN      (ICH_ package) Position of last non-blank char
 C     GEN_EPOLYD   (GEN_    "   ) Evaluate double precision polynomial
 C     DSA_GET_LU   (VMS standard) Get available logical unit number
 C     DSA_FREE_LU  ( "      "   ) Free logical unit number

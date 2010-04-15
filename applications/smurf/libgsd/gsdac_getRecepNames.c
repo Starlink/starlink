@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[], 
+*     gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
 *                           int recepFlags[], int *status );
 
 *  Arguments:
@@ -38,11 +38,11 @@
 *     2008-03-27 (JB):
 *        Original.
 *     2008-03-31 (JB):
-*        Check for how many receptors for each receiver. 
+*        Check for how many receptors for each receiver.
 *     2008-04-02 (JB):
 *        Use single letter names for one-receptor frontends.
 *     2008-04-25 (JB):
-*        Check for MPI frontend. 
+*        Check for MPI frontend.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -82,7 +82,7 @@
 
 #define FUNC_NAME "gsdac_getRecepNames"
 
-void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[], 
+void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
                            int recepFlags[], int *status )
 {
 
@@ -103,9 +103,9 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
       recepFlags[1] = 1;
     else {
       *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Couldn't obtain receptor names.", 
-                 status ); 
-      return; 
+      errRep ( FUNC_NAME, "Couldn't obtain receptor names.",
+                 status );
+      return;
     }
   }
 
@@ -130,7 +130,7 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
   /* Get the names of the receptors for this frontend, checking
      to see if this frontend had only one receptor. */
   if ( gsdVars->nFEChans == 1 ) {
-  
+
     sprintf ( recepNames[0], "%c", frontendLetter );
 
   } else if ( gsdVars->nFEChans == 2 ) {
@@ -141,7 +141,7 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
 
       if ( recepFlags[1] == 1 )
         sprintf ( recepNames[1], "%cB", frontendLetter );
-    
+
     } else {
 
       if ( recepFlags[1] == 1 ) {
@@ -155,10 +155,10 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
   } else {
 
     *status = SAI__ERROR;
-    msgSeti( "MODE", gsdVars->nFEChans );    
-    errRep ( FUNC_NAME, "Front end should have 1 or 2 receptors, but has ^RECEP.", 
-             status ); 
-    return; 
+    msgSeti( "MODE", gsdVars->nFEChans );
+    errRep ( FUNC_NAME, "Front end should have 1 or 2 receptors, but has ^RECEP.",
+             status );
+    return;
 
   }
 

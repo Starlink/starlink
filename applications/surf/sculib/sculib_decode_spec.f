@@ -1,7 +1,7 @@
-      SUBROUTINE SCULIB_DECODE_SPEC (SPEC, DEMOD_POINTER, 
-     :     N_SWITCHES,N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
-     :     N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, POS_S, 
-     :     SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS) 
+      SUBROUTINE SCULIB_DECODE_SPEC (SPEC, DEMOD_POINTER,
+     :     N_SWITCHES,N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
+     :     N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, POS_S,
+     :     SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
 *+
 *  Name:
 *     SCULIB_DECODE_SPEC
@@ -13,23 +13,23 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_DECODE_SPEC (SPEC, DEMOD_POINTER, 
-*    :     N_SWITCHES,N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
-*    :     N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, POS_S, 
+*     CALL SCULIB_DECODE_SPEC (SPEC, DEMOD_POINTER,
+*    :     N_SWITCHES,N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
+*    :     N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, POS_S,
 *    :     SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
 
 *  Description:
 *     This routine decodes a SCUBA-style data specification. The data-spec
 *     will be of the form {<component>;<component>;...}, where components
 *     are one of the following:-
-*     
+*
 *     - B<index_spec>   - specifying bolometer indices
 *     - P<index_spec>   -            position indices
 *     - S<index_spec>   -            switch indices
 *     - E<index_spec>   -            exposure indices
 *     - I<index_spec>   -            integration indices
 *     - M<index_spec>   -            measurement indices
-*     
+*
 *     and the <index_spec> is a list like, for example, 2,5:7,17 to select
 *     indices 2, 5 through 7 and 17. Alternatively, <index_spec> can be *
 *     which will select all data in that component coordinate.
@@ -38,7 +38,7 @@
 *     By default all components in a dataset are selected. Thus the
 *     empty data-spec {} will return all components selected. Example
 *     data-specs are:-
-*     
+*
 *      - "{}               -         select all data
 *      - "{B7,12;P57}"     -          select data for bolometers 7 and 12 at
 *                                 measurement position 57
@@ -48,18 +48,18 @@
 *      - "{B29}"           -          select all data for bolometer 29
 *      - "{B29;E1}"        -          select data for bolometer 29 in the
 *                                 first exposure of each integration
-*     
+*
 *     The data-spec is case-insensitive and blanks are ignored.
-*     
+*
 *     Errors will occur:-
-*     
+*
 *      - If you attempt to select indices outside the dimensions input to
-*       the routine. 
+*       the routine.
 *      - If you attempt to select data both by position Pxxx and by switch
 *       Sxxx, exposure Exxx, integration Ixxx or measurement Mxxx.
 *      - If you attempt to select by switch Sxxx when the SWITCH_EXPECTED
 *       flag is input .FALSE.
-*     
+*
 *     Output consists of a flag POS_SELECTED, to say whether or not the
 *     data were selected by position, and mask arrays that are set
 *     to 1 at the coordinate of selected data and 0 otherwise. Even if the
@@ -67,7 +67,7 @@
 *     for the position coordinate, will be set correctly. Conversely,
 *     however, the MEAS_S, INT_S, EXP_S and SWITCH_S arrays, which are
 *     masks for the measurement, integration, exposure and switch will not
-*     be set to sensible values if the data are position selected.  
+*     be set to sensible values if the data are position selected.
 
 *  Arguments:
 *     N_SPEC                           = INTEGER (Given)
@@ -142,15 +142,15 @@
 *
 *     Revision 1.2  1997/05/15 21:32:15  timj
 *     Loop over a SPEC array rather than just one spec.
-*     
+*
 *     Revision 1.1  1997/04/02 02:42:30  jfl
 *     Initial revision
-*     
+*
 
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -180,7 +180,7 @@
       INTEGER       BOL_S (N_BOLS)
 
 *  Status:
-      INTEGER STATUS  
+      INTEGER STATUS
 
 *  External routines:
 
@@ -189,7 +189,7 @@
       PARAMETER (MAX__COMP = 8) ! spec
 
 *  Local Variables:
-      LOGICAL      BOL_SELECTED ! .TRUE. if bolometers 
+      LOGICAL      BOL_SELECTED ! .TRUE. if bolometers
                                 ! selected
       CHARACTER*80 COMPONENT (MAX__COMP) ! components in spec
       CHARACTER*1  COMP_TYPE    ! component type
@@ -260,7 +260,7 @@
       STRING = SPEC
       CALL CHR_RMBLK (STRING)
       CALL CHR_UCASE (STRING)
-      
+
 *     an empty {} means select everything, so just return here. Otherwise...
 
       IF (STRING(1:2) .NE. '{}') THEN
@@ -273,7 +273,7 @@
             CALL ERR_REP (' ', 'SCULIB_DECODE_SPEC: opening { is '//
      :           'missing', STATUS)
          END IF
-         
+
          IF (STATUS .EQ. SAI__OK) THEN
             LAST = INDEX (STRING, '}')
             IF (LAST .EQ. 0) THEN
@@ -282,25 +282,25 @@
      :              '} is missing', STATUS)
             END IF
          END IF
-         
+
 *     now go through string and separate its component specifications
-         
+
          IF (STATUS .EQ. SAI__OK) THEN
             N_COMP = 0
             START_COMP = FIRST + 1
             LOOPING = .TRUE.
-            
+
             DO WHILE (LOOPING)
-               
+
 *     look for delimiter
-               
+
                NEXT = INDEX (STRING, ';')
-               
+
                IF (NEXT .NE. 0) THEN
-                  
+
 *     there was one, so a component ends with the character before it, remove
 *     the ; ready for the next pass through the string
-                  
+
                   END_COMP = NEXT - 1
                   STRING (NEXT:NEXT) = ' '
                ELSE
@@ -340,11 +340,11 @@
                   END IF
                END IF
 
-            END DO 
+            END DO
 
          END IF
 
-         
+
          IF (STATUS .EQ. SAI__OK) THEN
             IF (N_COMP .EQ. 0) THEN
                STATUS = SAI__ERROR
@@ -357,7 +357,7 @@
 *     OK, we should now have a set of components
 
          IF (STATUS .EQ. SAI__OK) THEN
-            I_COMP = 0 
+            I_COMP = 0
             LOOPING = .TRUE.
 
             DO WHILE (LOOPING)
@@ -365,7 +365,7 @@
 
                IF (I_COMP .GT. N_COMP) THEN
                   LOOPING = .FALSE.
-               ELSE 
+               ELSE
 
 *     get name and value of component
 
@@ -412,11 +412,11 @@
                      LOOPING = .FALSE.
                   END IF
                END IF
-               
+
             END DO
-            
+
          END IF
-         
+
 *     check the validity of the selection
 
          IF (STATUS .EQ. SAI__OK) THEN
@@ -443,27 +443,27 @@
                END DO
 
                DO ME = 1, N_MEASUREMENTS
-                  IF (MEAS_S (ME) .EQ. 1) THEN               
-                     
+                  IF (MEAS_S (ME) .EQ. 1) THEN
+
                      DO IN = 1, N_INTEGRATIONS
                         IF (INT_S (IN) .EQ. 1) THEN
-                           
+
                            DO EX = 1, N_EXPOSURES
                               IF (EXP_S (EX) .EQ. 1) THEN
-                                 
+
                                  DO SW = 1, N_SWITCHES
                                     IF (SWITCH_S (SW) .EQ. 1) THEN
                                        CALL SCULIB_FIND_SWITCH (
      :                                      DEMOD_POINTER,N_SWITCHES,
-     :                                      N_EXPOSURES, 
+     :                                      N_EXPOSURES,
      :                                      N_INTEGRATIONS,
-     :                                      N_MEASUREMENTS, N_POS, 
-     :                                      SW, EX, IN, ME, 
+     :                                      N_MEASUREMENTS, N_POS,
+     :                                      SW, EX, IN, ME,
      :                                      DATA_START, DATA_END,
      :                                      STATUS)
 
                                        IF ((DATA_START.NE.0) .AND.
-     :                                      (DATA_START .NE. 
+     :                                      (DATA_START .NE.
      :                                      VAL__BADI)) THEN
                                           DO I = DATA_START, DATA_END
                                              POS_S (I) = 1
@@ -472,15 +472,15 @@
 
                                     END IF
                                  END DO
-                                 
+
                               END IF
                            END DO
-                           
+
                         END IF
                      END DO
 
 *     aargh!
-                     
+
                   END IF
                END DO
 

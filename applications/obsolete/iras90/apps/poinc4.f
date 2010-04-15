@@ -4,7 +4,7 @@
 *     POINC4
 
 *  Purpose:
-*     Parabola interpolate three known points. 
+*     Parabola interpolate three known points.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine fits a parabola to three known points at -1, 0 and 1.
-*     And then finds the value at the given position.   
+*     And then finds the value at the given position.
 
 *  Arguments:
 *     YP, Y, YL = REAL (Given)
@@ -39,7 +39,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

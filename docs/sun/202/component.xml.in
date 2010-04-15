@@ -17,8 +17,8 @@
     same way, so it is possible to give a general guide to the
     principles involved.  However, some libraries do differ, and for
     precise details of how to use a particular subroutine library, you
-    should consult the Starlink document for that library. 
-  </p></abstract>  
+    should consult the Starlink document for that library.
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

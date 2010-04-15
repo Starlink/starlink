@@ -15,12 +15,12 @@
 
 *  Description:
 *     Supplies the refraction coefficients A and B for the refraction
-*     formula dz = Atan(z) + B tan(z)**3. At the moment it just uses 
+*     formula dz = Atan(z) + B tan(z)**3. At the moment it just uses
 *     appropriate SLA routine. Commented out in the code is an earlier
 *     version, written before the SLA routine handled the radio case,
-*     which calculated A using the Radio case from Allen. "Astrophysical 
-*     Quantities" p. 124 and did not supply a value for B. The formula for 
-*     the water vapour pressure was obtained from "Vectorial Astrometry" 
+*     which calculated A using the Radio case from Allen. "Astrophysical
+*     Quantities" p. 124 and did not supply a value for B. The formula for
+*     the water vapour pressure was obtained from "Vectorial Astrometry"
 *     C.A. Murray
 
 *  Arguments:
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

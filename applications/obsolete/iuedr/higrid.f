@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE HIGRID
 *
-*   Description: 
+*   Description:
 *      Define wavelength grid for HIRES order.
 *
 *   History:
@@ -16,7 +16,7 @@
 *   Method:
 *     If CUTWV=TRUE then attempt to use echelle order wavelength limits
 *     in CMCUT.
-*     Otherwise, the wavelength grid is defined between "ripple" 
+*     Otherwise, the wavelength grid is defined between "ripple"
 *     x-coordinates (-PI,+PI).
 *     The sample rate is determined from that given i ngeometric pixels
 *     and from the dispersion at the central wavelength.
@@ -56,10 +56,10 @@
 
 *   Set EXTP undefined
       NOEXTP = .TRUE.
- 
+
 *   Wavelength step
       DWAV = GSAMP / DRDW
- 
+
 *   Start and end indices
       IORDW = 0
 
@@ -115,7 +115,7 @@
          CALL ERROUT( 'Error: order is not within image\\', STATUS )
          RETURN
       END IF
- 
+
 *   Form a proper grid
       NWAV = IW2 - IW1 + 1
 
@@ -133,14 +133,14 @@
       DO I = 1, NWAV
          WAV(I) = DBLE(I - 1) * DWAV + WAV1
       END DO
- 
+
 *   Form bin sizes
       CALL CAGRID( STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERROUT( 'Error: forming bin sizes\\', STATUS )
          RETURN
       END IF
- 
+
 *   Centroid and Background Folding Ranges
       BBASE = BKGAV / DRDW
       CBASE = CENAV / DRDW

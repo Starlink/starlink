@@ -125,12 +125,12 @@
       integer ldfjac
       parameter (ldfjac = max_parms)
       double precision wa1(MAX_PARMS)
-      
+
 
       integer lwa
 *      lwa= mpts*n+5*mpts+n
       double precision wa2(MAX_PARMS*MAX_PARMS+5*MAX_PARMS+MAX_PARMS)
-      
+
 
 * number of residual evaluations
 

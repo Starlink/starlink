@@ -8,14 +8,14 @@
 
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_MON( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This is the main routine for the SCUBA reduction A-task.
 
@@ -144,7 +144,7 @@ c Revision 1.2  1996/07/31  18:53:16  timj
 c Add skydip option
 c
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -179,8 +179,8 @@ c
 
 *     Begin a provenance block. This causes event handlers to be registered
 *     with the NDF library so that a handler routine in NDG is called every
-*     time an NDF is opened. This handler routine keeps a record of all NDFs 
-*     that are opened for input or output, until the block is closed by 
+*     time an NDF is opened. This handler routine keeps a record of all NDFs
+*     that are opened for input or output, until the block is closed by
 *     calling NDG_ENDPV.
       CALL NDG_BEGPV( STATUS )
 
@@ -190,11 +190,11 @@ c
          CALL SURF_ADD_DBM (STATUS)
 
       ELSE IF (NAME .EQ. 'BOLREBIN') THEN
-         
+
          CALL SURF_REBIN(NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'CALCSKY') THEN
-         
+
          CALL SURF_REBIN(NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'CHANGE_DATA') THEN
@@ -270,7 +270,7 @@ c
          CALL SURF_REDUCE_NOISE (STATUS)
 
       ELSE IF (NAME .EQ. 'REMIP') THEN
-         
+
          CALL SURF_REMIP ( STATUS )
 
       ELSE IF (NAME .EQ. 'REMSKY') THEN
@@ -310,7 +310,7 @@ c
          CALL SURF_SCUHELP (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUCLIP') THEN
-         
+
          CALL SURF_SCUCLIP (STATUS)
 
       ELSE

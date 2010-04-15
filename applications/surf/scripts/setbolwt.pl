@@ -25,7 +25,7 @@ use Term::ReadLine;
 
 
 # Get the location of KAPPA
- 
+
 if (defined $ENV{"KAPPA_DIR"}) {
   $kappa = $ENV{"KAPPA_DIR"};
 } else {
@@ -73,7 +73,7 @@ push(@ndfs, @ARGV);
 
 
 # Read the command line
-# Simple case: Read in name of NDF. 
+# Simple case: Read in name of NDF.
 #  Check that file is okay.
 
 # If we have done all that and still don't have any input
@@ -103,12 +103,12 @@ foreach $ndf (@ndfs) {
 
   # Remove trailing sdf
   $ndf =~ s/\.sdf$//;
- 
+
   # Check that files exists simply by doing an ndf_find
   # and checking for good status.
- 
+
   ndf_find(&NDF::DAT__ROOT, $ndf, $indf, $status);
- 
+
   if ($status == $good) {
     print "Using the NDF $ndf...\n";
 
@@ -153,7 +153,7 @@ foreach $ndf (@ndfs) {
   }
 
   # Only continue if status is good
-  
+
   if ($status == $good) {
 
     print "\tDimensions: ". join(" x ",@dim) . "\n";
@@ -209,9 +209,9 @@ if ($wtfile =~ /./) {
   foreach $ref (@good) {
     $$ref{WEIGHTS} = \@weights;
   }
-  
+
 } else {
-  
+
 # Now we need to calculate statistics for each bolometer
 # Starlink status drives me mad sometimes
 
@@ -231,20 +231,20 @@ if ($wtfile =~ /./) {
       last if $status != $good;
       print "\tCalculating stats for bolometer $_/$nbol : ";
       $exstat = system("$kappa/stats \'$ndf($_,)\' > /dev/null");
-	
+
       if ($exstat != 0) {
 	$status = &NDF::SAI__ERROR;
 	err_rep(' ','Error from STATS command', $status);
 	print "\n";  # To tidy up the printing
-      } 
+      }
 
       ($sigma) = par_get("sigma", "stats", \$status);
-      
+
       push(@stats, $sigma);
       print "$sigma\n" unless $status != $good;
-      
+
     }
-    
+
     # Store the statistics
     $$ref{STATS} = \@stats;
 
@@ -265,13 +265,13 @@ if ($wtfile =~ /./) {
 
     print "Calculating weights relative to bolometer $refpix of ".
       ${$good[0]}{NAME} . "\n";
-  
-    
+
+
 
     foreach $ref (@good) {
 
       my @weights = ();
- 
+
       foreach $val (@{$$ref{STATS}}) {
 
 	# First check for bad values
@@ -280,11 +280,11 @@ if ($wtfile =~ /./) {
 	  $weight = 0.0;
 
 	} else {
-	  
+
 	  $weight = ($refval / $val)**2;
 	}
 	push(@weights, $weight);
-	
+
       }
 
       $$ref{WEIGHTS} = \@weights;
@@ -309,7 +309,7 @@ foreach $ref (@good) {
   my $ndf = $$ref{NAME};
   my $nbol = $$ref{NBOLS};
   my @weights = @{$$ref{WEIGHTS}};
-  
+
 # Check the size of the weights array
   if ($#weights != $nbol-1) {
     my $total = $#weights + 1;
@@ -346,7 +346,7 @@ foreach $ref (@good) {
     @vals = ($nbol);
     cmp_mod($xloc, 'BOLWT', '_REAL', 1, @vals, $status);
     cmp_put1r($xloc, 'BOLWT', $nbol, @weights, $status);
-  
+
 
   }
 
@@ -428,11 +428,11 @@ Description:
      weights relative to the central pixel. Should not be used when
      a strong source is present.
 
-  2. Read the weights from a text file using the -wtfile option.    
+  2. Read the weights from a text file using the -wtfile option.
 
   Writes to the BOLWT extension. This extension is then read by REBIN.
 
-  Multiple files can be referenced to the first file by specifying 
+  Multiple files can be referenced to the first file by specifying
   multiple files on the command line or by using a REBIN-style input
   file and the -filelist option. In conjunction with the -wtfile option
   all input files are given the same weights.
@@ -445,21 +445,21 @@ Options:
    -wtfile=s\t An ASCII text file containing the weights
 
   The input filename must have been extinction corrected (since currently
-  the EXTINCTION task will not know that it should split the BOLWT 
+  the EXTINCTION task will not know that it should split the BOLWT
   extension).
 
   Multiple filenames can be read from the command line
    e.g. *_lon_ext.sdf
 
-  If the filelist option is used the input file must be of the 
+  If the filelist option is used the input file must be of the
   same format as allowed for REBIN and DESPIKE (ie can in fact just
   be a list of input files (one file per line) but can include comments
   and map shifts)
 
-  When multiple files are read in all the bolometer weights are calculated 
+  When multiple files are read in all the bolometer weights are calculated
   relative to the central pixel of the first map.
 
-  Currently no check is performed to make sure that bolometers from 
+  Currently no check is performed to make sure that bolometers from
   the same array are being compared.
 /;
 
@@ -475,13 +475,13 @@ __END__
 *+
 *  Name:
 *    SETBOLWT
- 
+
 *  Purpose:
 *    Calculate or set bolometer weights
- 
+
 *  Language:
 *    Perl 5
- 
+
 *  Description:
 *    This routine sets the bolometer weights.
 *    It can do this in two ways:
@@ -493,11 +493,11 @@ __END__
 *        each bolometer in turn. The weight is defined as the relative
 *        variance between this bolometer and the reference bolometer.
 *
-*     2. Read the weights from a text file using the -wtfile option.    
+*     2. Read the weights from a text file using the -wtfile option.
 *
 *    Writes to the BOLWT extension. This extension is then read by REBIN.
 *
-*    Multiple files can be referenced to the first file by specifying 
+*    Multiple files can be referenced to the first file by specifying
 *    multiple files on the command line or by using a REBIN-style input
 *    file and the -filelist option. In conjunction with the -wtfile option
 *    all input files are given the same weights.
@@ -520,7 +520,7 @@ __END__
 *      eg *_lon_ext.sdf.
 
 *  Examples:
-*    setbolwt 
+*    setbolwt
 *      The user will be prompted for a list of input NDFs. The weights
 *      will be calculated by setbolwt.
 *    setbolwt -wtfile=weights.dat file1

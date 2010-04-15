@@ -41,7 +41,7 @@
 * History:
 *                                            KS / CIT 20th June 1984
 *    Chi-squared rather than rms TNW/Man 3rd Dec 1985
-*    Changed output message on fitting   AJH/Man 24 Nov 1997 
+*    Changed output message on fitting   AJH/Man 24 Nov 1997
 *-
       implicit none
       include 'SAE_PAR'

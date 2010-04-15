@@ -1,13 +1,13 @@
-*+  THETAFIXSUB - 
+*+  THETAFIXSUB -
 
-	SUBROUTINE THETAFIXSUB( IDIMS1, IDIMS2, ARRAY_IN, ODIMS1, ODIMS2, 
+	SUBROUTINE THETAFIXSUB( IDIMS1, IDIMS2, ARRAY_IN, ODIMS1, ODIMS2,
      :                          ARRAY_OUT, STATUS)
 
 * Description :
 *
 * This routine ...
 *
-* Invocation : 	SUBROUTINE THETAFIXSUB( IDIMS, ARRAY_IN, ODIMS, ARRAY_OUT, 
+* Invocation : 	SUBROUTINE THETAFIXSUB( IDIMS, ARRAY_IN, ODIMS, ARRAY_OUT,
 *                                  STATUS)
 *
 * Parameters :
@@ -41,7 +41,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  IDIMS1, IDIMS2,  ! dimensions of input DATA_ARRAY
      :  ODIMS1, ODIMS2,  ! dimensions of output DATA_ARRAY
      :	I,	     ! counter for array element number
@@ -58,7 +58,7 @@
 	   RETURN
 	END IF
 *
-* loop to scan through all rows and columns of input data 
+* loop to scan through all rows and columns of input data
 *
 	DO K = 1, ODIMS2
 

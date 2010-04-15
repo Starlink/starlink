@@ -33,7 +33,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,7 +102,7 @@
 
          DATELEN = GEN_ILEN( NEWDATE )
          IF ( DATELEN .EQ. 6 .OR. DATELEN .EQ. 8 ) THEN
-  
+
             YYYYMMDD = NEWDATE
             IF ( DATELEN .EQ. 6 ) THEN
                YYYYMMDD(1:2) = '20'
@@ -112,14 +112,14 @@
 *           Current prefix from include block
             CURPRE = GSDNAME
 
-            CALL REPLACE_DATE ( YYYYMMDD, CURPRE, NEWPRE ) 
+            CALL REPLACE_DATE ( YYYYMMDD, CURPRE, NEWPRE )
 
             IF (NEWPRE .NE. CURPRE) THEN
                GSDNAME = NEWPRE
-               print *,'GSD PREFIX now set to: "', 
+               print *,'GSD PREFIX now set to: "',
      &                     NEWPRE(:GEN_ILEN(NEWPRE)),'"'
             ELSE
-               print *,'GSD PREFIX not modified, still "', 
+               print *,'GSD PREFIX not modified, still "',
      &                     CURPRE(:GEN_ILEN(CURPRE)),'"'
             ENDIF
 
@@ -130,7 +130,7 @@
 *           Only if we got the value okay
             IF ( STATUS .EQ. SAI__OK .AND. STATUS .NE. PSX__NOENV ) THEN
                DIRLEN = GEN_ILEN( CURDIR )
-               CALL REPLACE_DATE ( YYYYMMDD, CURDIR, NEWDIR ) 
+               CALL REPLACE_DATE ( YYYYMMDD, CURDIR, NEWDIR )
             ELSEIF ( STATUS .EQ. PSX__NOENV ) THEN
                print *,'No DATADIR environment variable to modify.'
                CALL ERR_ANNUL( STATUS )
@@ -143,7 +143,7 @@
 *           Set the new DATADIR value if modified
             IF (DIRLEN .NE. 0 .AND. NEWDIR .NE. CURDIR) THEN
                CALL UPUTLOG( ENVVAR, NEWDIR, STATUS )
-              
+
                IF (STATUS .NE. SAI__OK ) THEN
                   IFAIL = 18
                   CALL ERR_ANNUL( STATUS )
@@ -163,7 +163,7 @@
             CALL ERR_ANNUL( STATUS )
 
          ENDIF
-        
+
       ENDIF
 
 
@@ -181,7 +181,7 @@
 
       SUBROUTINE REPLACE_DATE (YYYYMMDD, INSTRING, OUTSTRING)
 *     Replaces any 'yyyymmdd' or 'yymmdd' like string in INSTRING.
-*     with (YY)YYMMDD. If embedded completely, the date string searched 
+*     with (YY)YYMMDD. If embedded completely, the date string searched
 *     for is assumed to be enclosed by '/' or '_' characters.
 *     OUTSTING is returns the modified string with the new date.
 
@@ -193,7 +193,7 @@
 
       INTEGER          STRLEN    ! Length INSTRING
       INTEGER          FOUND     ! Number of digits in current string
-      CHARACTER*(132)  TMPSTR    
+      CHARACTER*(132)  TMPSTR
       CHARACTER*(  6)  YYMMDD
       CHARACTER        CURCHAR
 
@@ -208,8 +208,8 @@
       I = 1
 
 *     Search through the strings for date-like parts enclosed
-*     between '/' or '_' (or leading or terminating):      
-      DO WHILE ( I .LE. STRLEN ) 
+*     between '/' or '_' (or leading or terminating):
+      DO WHILE ( I .LE. STRLEN )
 
         CURCHAR = INSTRING(I:I)
 
@@ -218,13 +218,13 @@
      &       .OR. CURCHAR .EQ. ' ' .OR. I .EQ. STRLEN ) THEN
 
 *         Terminating character is number
-          IF ( ICHAR(CURCHAR) .GE. ICHAR('0') .AND. 
+          IF ( ICHAR(CURCHAR) .GE. ICHAR('0') .AND.
      &         ICHAR(CURCHAR) .LE. ICHAR('9') ) THEN
-            FOUND = FOUND + 1 
+            FOUND = FOUND + 1
             TMPSTR(FOUND:FOUND) = CURCHAR
           ENDIF
 
-*         Do poor man's sanity check on number: 
+*         Do poor man's sanity check on number:
 *            month between 1 and 12, day between 1 and 31
           IF ( FOUND .GE. 6 ) THEN
             READ(TMPSTR(3:4),*) IMON
@@ -238,44 +238,44 @@
           ENDIF
 
 *         Short date format found okay month and day: replace
-          IF ( FOUND .EQ. 6 
+          IF ( FOUND .EQ. 6
      &        .AND. IMON .GE. 1 .AND. IMON .LE. 12
      &        .AND. IDAY .GE. 1 .AND. IDAY .LE. 31 ) THEN
              OUTSTRING(ISTART:ISTART+5) = YYMMDD
 
 *         Long date format found with okay month and day: replace
-          ELSEIF ( FOUND .EQ. 8 
-     &        .AND. IMON .GE. 1 .AND. IMON .LE. 12 
+          ELSEIF ( FOUND .EQ. 8
+     &        .AND. IMON .GE. 1 .AND. IMON .LE. 12
      &        .AND. IDAY .GE. 1 .AND. IDAY .LE. 31 ) THEN
              OUTSTRING(ISTART:ISTART+7) = YYYYMMDD
           ENDIF
 
           TMPSTR = ''
-          FOUND = 0  
+          FOUND = 0
           ISTART = 0
-      
+
         ELSEIF ( ICHAR(CURCHAR) .GE. ICHAR('0')
      &           .AND. ICHAR(CURCHAR) .LE. ICHAR('9') ) THEN
-      
+
           IF (FOUND .EQ. 0) THEN
             ISTART = I
           ENDIF
           FOUND = FOUND + 1
           TMPSTR(FOUND:FOUND) = CURCHAR
-      
+
         ELSE
 
           TMPSTR = ''
           FOUND = 0
           ISTART = 0
-      
+
         ENDIF
 
 *       Force termination loop after first blank has been handled
         IF (CURCHAR .EQ. ' ') THEN
           I = STRLEN
         ENDIF
-      
+
         I = I + 1
 
       ENDDO

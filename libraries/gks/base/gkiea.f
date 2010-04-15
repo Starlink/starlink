@@ -64,7 +64,7 @@ C# IL>=b, OL>=0
               IER = 145
            ELSE
 *          Need to inquire display surface size for right and top.
-*             First need to get workstion type 
+*             First need to get workstion type
               CALL GKSONW(IWKID,KQWKC,1,KDAT,1,QDAT,QDAT,1,CH)
               IF(KERROR .NE. 0)THEN
                 IER = KERROR

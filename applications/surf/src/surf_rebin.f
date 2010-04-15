@@ -25,7 +25,7 @@
 *  Description:
 *     This routine rebins the demodulated data from SCUBA MAP observations
 *     onto a rectangular mesh by a variety of methods.
-*     Currently convolution by weighting functions and splines are 
+*     Currently convolution by weighting functions and splines are
 *     supported.
 *     - Weighting functions:
 *       Currently linear and bessel weighting functions are supported.
@@ -33,14 +33,14 @@
 *       spatial information obtained by the telescope at the wavelength of
 *       observation, but suppress higher spatial frequencies. To minimise edge
 *       effects the Bessel function is truncated at a radius of 10 half-widths
-*       from the centre, and apodized over its outer third by a cosine 
-*       function. Viewed in frequency space the method consists of Fourier 
-*       transforming the input dataset(s), multiplying the transform by a 
-*       cylindrical top-hat (the F.T. of the Bessel function), 
+*       from the centre, and apodized over its outer third by a cosine
+*       function. Viewed in frequency space the method consists of Fourier
+*       transforming the input dataset(s), multiplying the transform by a
+*       cylindrical top-hat (the F.T. of the Bessel function),
 *       then transforming back into image space.
 *       A linear weighting function is also available which works out
 *       to one half-width - this has the advantage that it is much faster to
-*       process and is much less susceptible to edge effects. 
+*       process and is much less susceptible to edge effects.
 *
 *     - Splines:
 *       Additionally, spline interpolation and smoothing routines are also
@@ -50,11 +50,11 @@
 *       comments are welcomed.
 
 *     If this task is invoked as BOLREBIN then a separate map will be made
-*     of each bolometer. The output file will contain an NDF for each 
+*     of each bolometer. The output file will contain an NDF for each
 *     bolometer.
 
-*     If this task is invoked as INTREBIN then a separate map will be 
-*     made of each integration. The output file will contain an NDF for each 
+*     If this task is invoked as INTREBIN then a separate map will be
+*     made of each integration. The output file will contain an NDF for each
 *     bolometer.
 
 
@@ -83,7 +83,7 @@
 *        The latitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
 *     LONG_OUT = CHAR (Read)
-*        The longitude of the output map centre. The supplied default value 
+*        The longitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
 *     LOOP = LOGICAL (Read)
 *        Task will ask for multiple input files if true. Only REF is read
@@ -91,15 +91,15 @@
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
 *     OUT = NDF (Write)
-*        For REBIN this is the name of the NDF that will contain the rebinned 
-*        map. For BOLREBIN or INTREBIN this is the name of the HDS container 
-*        file. In REBIN, if a null response is given, the task will 
+*        For REBIN this is the name of the NDF that will contain the rebinned
+*        map. For BOLREBIN or INTREBIN this is the name of the HDS container
+*        file. In REBIN, if a null response is given, the task will
 *        immediately exit with good status -- this can be used to
 *        determine the size of the output map without actually regridding it.
 *     OUT_COORDS = CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are:
-*        - AZ:  Azimuth/elevation offsets 
+*        - AZ:  Azimuth/elevation offsets
 *        - NA:  Nasmyth offsets
 *        - PL:  RA/Dec Offsets from moving centre (eg Planets)
 *        - RB:  RA/Dec (B1950)
@@ -181,11 +181,11 @@
 
 *  Examples:
 *     rebin REBIN_METHOD=LINEAR OUT_COORDS=RJ
-*        Rebin the maps with LINEAR weighting function in J2000 RA/Dec 
+*        Rebin the maps with LINEAR weighting function in J2000 RA/Dec
 *        coordinates. You will be asked for input datasets until a null
 *        value is given.
 *     bolrebin REBIN_METHOD=BESSEL OUT=map
-*        Rebin the maps with Bessel weighting function. Each bolometer is 
+*        Rebin the maps with Bessel weighting function. Each bolometer is
 *        rebinned separately and placed in an NDF in the output container file
 *        map.sdf. Bolometer H7 can be accessed by displaying map.h7.
 *     intrebin noloop IN=test.bat
@@ -198,7 +198,7 @@
 *     values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
 *     and names of other ASCII files. There is one data file per line.
 *     An example file is:
-*    
+*
 *         file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
 *         file2                        # Read file 2 but you will still be
 *                                      # prompted fro WEIGHT, and shifts.
@@ -213,16 +213,16 @@
 *     convert it to NDF format before processing -- this is probably not
 *     what you want.
 
-*  Notes: 
+*  Notes:
 *     For each file name that is entered, values for the parameters
 *     WEIGHT, SHIFT_DX and SHIFT_DY are requested.
-*     - The application can read in up to 100 separate input datasets. 
+*     - The application can read in up to 100 separate input datasets.
 *     - The output map will be large enough to include all data points.
 *     - Spline regridding may have problems with SCAN/MAP (since integrations
 *     contain lots of overlapping data points).
 *     - SCUBA sections can be given along with any input NDF
 *     - The relative weights associated with each point in the output map
-*     are stored in a WEIGHTS NDF in the REDS extension of the output 
+*     are stored in a WEIGHTS NDF in the REDS extension of the output
 *     data. For spline rebinning each point is equivalent to the number
 *     of integrations added into the final data point. For weight function
 *     regridding the situation is more complicated. The weights array is
@@ -521,7 +521,7 @@ c
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -561,11 +561,11 @@ c
 *  Note that if MAX_FILE is increased you should also increase the
 *  SCUBA__MAX_FITS constant in SURF_PAR such that there is enough
 *  space for all the potential extra FITS headers. This is because
-*  we create a FITS header per input file.      
+*  we create a FITS header per input file.
       INTEGER     MAX_FILE             ! max number of input files
       PARAMETER (MAX_FILE = 256)
 
-      
+
 *  Local variables:
       INTEGER          ABOL_DATA_END(MAX_FILE)
                                        ! Pointer to bolometer data end
@@ -583,12 +583,12 @@ c
                                        ! Pointer to bolometer var end
       INTEGER          ABOL_VAR_PTR(MAX_FILE)
                                        ! Pointer to bolometer variance
-      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2) 
+      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2)
                                        ! Angles (wplate,angrot) for each
-                                       ! integration (polarimetry) 
+                                       ! integration (polarimetry)
       REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
                                        ! Angles (wplate,angrot) for each
-                                       ! measurement (polarimetry) 
+                                       ! measurement (polarimetry)
       REAL             ANGROT          ! POLPACK ANGROT (degrees)
       BYTE             BADB            ! Bad bit mask for despiking
       INTEGER          BITNUM          ! Bit set by DESPIKE
@@ -643,7 +643,7 @@ c
       INTEGER          FITSTEMPM       ! Temporary Merged FITS channel
       CHARACTER*80     FITS(SCUBA__MAX_FITS, MAX_FILE)
                                        ! FITS entries for each file
-      LOGICAL          HAVE_MODEL      ! .TRUE. if CALCSKY is using a 
+      LOGICAL          HAVE_MODEL      ! .TRUE. if CALCSKY is using a
                                        ! source model
       CHARACTER*(DAT__SZNAM) HDSNAME   ! Name of the container (not the fname)
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
@@ -662,7 +662,7 @@ c
       INTEGER          INT_NEXT        ! Position of start of next int
       INTEGER          INT_START       ! Position of start of int
       INTEGER          IN_DATA_END (MAX_FILE)
-                                       ! pointer to end of scratch space 
+                                       ! pointer to end of scratch space
                                        ! holding data from input files
       INTEGER          IN_DATA_PTR (MAX_FILE)
                                        ! pointer to scratch space holding
@@ -699,19 +699,19 @@ c
       INTEGER          J_CENTRE        ! J index of central pixel in output
                                        ! map
       DOUBLE PRECISION LAT_OBS         ! Latitude of observatory
-      INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left 
+      INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left
                                        ! corner of output image
       CHARACTER * (5)  MAPNAME         ! Name of each bolometer
       INTEGER          MAP_SIZE(2)     ! Number of pixels in map (x,y)
       INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
-                                       ! pointers to start of each measurement 
+                                       ! pointers to start of each measurement
       CHARACTER* (15)  METHOD          ! rebinning method
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
                                        ! measured positions are calculated
-      DOUBLE PRECISION MODEL_DEC_CEN   ! centre DEC of CALCSKY model 
+      DOUBLE PRECISION MODEL_DEC_CEN   ! centre DEC of CALCSKY model
                                        ! (radians)
-      CHARACTER*80     MODEL_FITS(SCUBA__MAX_FITS) 
+      CHARACTER*80     MODEL_FITS(SCUBA__MAX_FITS)
                                        ! FITS entreis in CALCSKY model
       DOUBLE PRECISION MODEL_RA_CEN    ! centre RA of CALCSKY model
                                        ! (radians)
@@ -746,7 +746,7 @@ c
       INTEGER          OUT_DATA_PTR    ! pointer to output map data array
       DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
                                        ! (radians)
-      DOUBLE PRECISION OUT_LAT         ! longitude of output map centre 
+      DOUBLE PRECISION OUT_LAT         ! longitude of output map centre
                                        ! (radians)
       CHARACTER*(DAT__SZLOC) OUT_LOC   ! locator of HDS item in output file
       DOUBLE PRECISION OUT_LONG        ! longitude of output map centre
@@ -826,7 +826,7 @@ c
       LOGICAL          WEIGHTS         ! Store the weights array
       INTEGER          WEIGHTSIZE      ! Radius of weighting function
       REAL             WPLATE          ! Waveplate angle (for POLPACK)
-      REAL             WTFN (WTFN_MAXRAD * WTFN_MAXRAD * 
+      REAL             WTFN (WTFN_MAXRAD * WTFN_MAXRAD *
      :     WTFNRES * WTFNRES + 1)
                                        ! Weighting function
 
@@ -904,7 +904,7 @@ c
 
 *     Check for NULL response (ie no model)
             IF (STATUS .EQ. SAI__OK) THEN
-               HAVE_MODEL = .TRUE.             
+               HAVE_MODEL = .TRUE.
 
 *  read FITS header
                CALL NDF_XLOC (IMNDF, 'FITS', 'READ', M_FITSX_LOC,
@@ -918,7 +918,7 @@ c
      :                    'contains too many FITS items', STATUS)
                   END IF
                END IF
-               
+
                CALL DAT_GET1C (M_FITSX_LOC, SCUBA__MAX_FITS, MODEL_FITS,
      :              N_M_FITS, STATUS)
                CALL DAT_ANNUL (M_FITSX_LOC, STATUS)
@@ -944,25 +944,25 @@ c
                   MODEL_DEC_CEN = 0.0
                END IF
 
-*               print *, model_ra_cen, model_dec_cen 
+*               print *, model_ra_cen, model_dec_cen
 
 *     NOTE: The model file is kept open until after the despiking.
-            
+
             ELSE IF (STATUS .EQ. PAR__NULL) THEN
 
 *     A null response indicates no model but we have to reset the status
                CALL ERR_ANNUL( STATUS )
 
             END IF
-            
+
          END IF
 
       ELSE
 *     Regridding
-         CALL PAR_CHOIC('REBIN_METHOD', 'Linear', 
-     :        'Linear,Bessel,Gaussian,Spline1,Spline2,Spline3,Median', 
+         CALL PAR_CHOIC('REBIN_METHOD', 'Linear',
+     :        'Linear,Bessel,Gaussian,Spline1,Spline2,Spline3,Median',
      :        .TRUE.,METHOD, STATUS)
-         
+
       END IF
 
 *     get the output coordinate system and set the default centre of the
@@ -972,7 +972,7 @@ c
 *     It does not need to be done if we've already read the coords from
 *     a source model in CALCSKY.
 
-      IF (.NOT. CALCSKY .OR. .NOT. HAVE_MODEL) THEN 
+      IF (.NOT. CALCSKY .OR. .NOT. HAVE_MODEL) THEN
          CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',
      :     .TRUE., OUT_COORDS, STATUS)
       END IF
@@ -980,35 +980,35 @@ c
       HOURS = .TRUE.
       IF (OUT_COORDS .EQ. 'RB') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are FK4 B1950.0', STATUS)
       ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are FK5 J2000.0', STATUS)
       ELSE IF (OUT_COORDS .EQ. 'GA') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :     '^PKG: output coordinates are galactic', STATUS)
          HOURS = .FALSE.
       ELSE IF (OUT_COORDS .EQ. 'RD') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are apparent RA,Dec '//
      :        '(no date as yet)', STATUS)
       ELSE IF (OUT_COORDS .EQ. 'NA') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are nasmyth', STATUS)
          HOURS = .FALSE.
       ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are Az/El offsets', STATUS)
          HOURS = .FALSE.
       ELSE IF (OUT_COORDS .EQ. 'PL') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
+         CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: output coordinates are offsets from moving centre',
      :        STATUS)
          HOURS = .FALSE.
@@ -1034,7 +1034,7 @@ c
       READING = .TRUE.
       FILE = 1
       IF (STATUS .NE. SAI__OK) READING = .FALSE.
-      
+
       DO WHILE (READING)
 
 *  read the name of the file to be read
@@ -1047,7 +1047,7 @@ c
 *     Make sure the parameter is cancelled
 *     IF (FILE.GT.2) CALL PAR_CANCL(PARAM, STATUS)
          END IF
-         
+
 *     Set the default to GLOBAL first (have to do it this way since
 *     the GLOBAL value MUST be associated with an NDF parameter
          IF (FILE .EQ. 1) THEN
@@ -1057,7 +1057,7 @@ c
 
 *     Read in the file and, if required, a section
          CALL PAR_GET0C (PARAM, IN, STATUS)
-         
+
          IF (STATUS .EQ. PAR__NULL) THEN
             READING = .FALSE.
             CALL ERR_ANNUL(STATUS)
@@ -1068,17 +1068,17 @@ c
             NPARS = 0 ! No parameters set before entry
 
             CALL SURF_RECURSE_READ( RLEV, IN, MAX_FILE,
-     :           OUT_COORDS, FILE, N_BOL, N_POS, 
-     :           N_INTS, N_MEAS, IN_UT1, IN_RA_CEN, 
-     :           IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
-     :           SUB_INSTRUMENT, OBJECT, UTDATE, 
+     :           OUT_COORDS, FILE, N_BOL, N_POS,
+     :           N_INTS, N_MEAS, IN_UT1, IN_RA_CEN,
+     :           IN_DEC_CEN, FITS, N_FITS, WAVELENGTH,
+     :           SUB_INSTRUMENT, OBJECT, UTDATE,
      :           UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
-     :           BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
-     :           BOL_DEC_END, IN_DATA_PTR, IN_DATA_END, 
+     :           BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR,
+     :           BOL_DEC_END, IN_DATA_PTR, IN_DATA_END,
      :           IN_VARIANCE_PTR, IN_VARIANCE_END,
      :           QMF, IN_QUALITY_PTR, IN_QUALITY_END, QBITS,
      :           ANG_INT, ANG_MEAS,
-     :           INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, 
+     :           INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX,
      :           SHIFT_DY, NPARS, PARS,
      :           STATUS)
 
@@ -1113,7 +1113,7 @@ c
 *     Finish looping if DOLOOP is false
 
          IF (.NOT.DOLOOP) READING = .FALSE.
-         
+
       END DO
 
 *     FILE is always one larger than the number of successful
@@ -1179,7 +1179,7 @@ c
 *     (obviously we should replace all SURF use of FITS() and N_FITS
 *     with a FITSCHAN but be reasonable)
 *     First time through use the main fitschan, otherwise create new one
-         
+
          FITSTEMP = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS)
 
 *     Skip headers that are SUB_N FILT_N etc
@@ -1189,7 +1189,7 @@ c
      :           FITS(ICARD,I)(1:8) .NE. 'NDFUNITS' .AND.
      :           FITS(ICARD,I) .NE. 'END'
      :           ) THEN
-               CALL AST_PUTFITS( FITSTEMP, FITS( ICARD, I ), .FALSE., 
+               CALL AST_PUTFITS( FITSTEMP, FITS( ICARD, I ), .FALSE.,
      :              STATUS )
             END IF
          END DO
@@ -1227,7 +1227,7 @@ c
 
          DO I = 1, FILE
 
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(I), 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(I),
      :           FITS(1,I), 'SAM_MODE', SAMPLE_MODE, STATUS)
             CALL CHR_UCASE (SAMPLE_MODE)
 
@@ -1235,7 +1235,7 @@ c
                RASTER = .TRUE.
 
 *     Find CHOP_COORDS
-               CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(I), 
+               CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(I),
      :              FITS(1,I), 'CHOP_CRD', CHOP_CRD, STATUS)
 
                IF (CHOP_CRD .EQ. 'LO') THEN
@@ -1261,7 +1261,7 @@ c
      :              'scan data.', STATUS)
 
             END IF
-         
+
          ELSE IF (RASTER) THEN
 
             IF (RAS_CHOP_LO .AND. RAS_CHOP_SC) THEN
@@ -1269,25 +1269,25 @@ c
                CALL MSG_OUTIF(MSG__QUIET, ' ','^TASK: WARNING! '//
      :              'You are combining SCAN/MAP data with different '//
      :              'chopping techniques (SC and LO).', STATUS)
-               
+
             ELSE IF (RAS_CHOP_LO) THEN
 *     If we are using RASTER with only LO chopping we need to check that
 *     the chop configurations are acceptable
 
-               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1),
      :              FITS(1,1), 'CHOP_THR', CHOP_THROW, STATUS)
-               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1),
      :              FITS(1,1), 'CHOP_PA', CHOP_PA, STATUS)
                OKAY = .TRUE.
-               
+
 *     Loop over files comparing chop config
                DO I = 2, FILE
-                  CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(I), 
+                  CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(I),
      :                 FITS(1,I), 'CHOP_THR', NEWTHROW, STATUS)
-                  CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(I), 
+                  CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(I),
      :                 FITS(1,I), 'CHOP_PA', NEWPA, STATUS)
 
-                  IF (NEWPA .NE. CHOP_PA .OR. 
+                  IF (NEWPA .NE. CHOP_PA .OR.
      :                 NEWTHROW .NE. CHOP_THROW) THEN
                      OKAY = .FALSE.
                   END IF
@@ -1308,20 +1308,20 @@ c
 
       ELSE
 *     Retrieve chop information from first scan only
-         CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1), 
+         CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1),
      :        FITS(1,1), 'SAM_MODE', SAMPLE_MODE, STATUS)
          CALL CHR_UCASE (SAMPLE_MODE)
 
          IF (SAMPLE_MODE .EQ. 'RASTER') THEN
 
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1), 
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1),
      :           FITS(1,1), 'CHOP_CRD', CHOP_CRD, STATUS)
-            
+
             IF (CHOP_CRD .EQ. 'LO') THEN
 
-               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1),
      :              FITS(1,1), 'CHOP_THR', CHOP_THROW, STATUS)
-               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1),
      :              FITS(1,1), 'CHOP_PA', CHOP_PA, STATUS)
 
                CHOP_CRD = 'RJ' ! Always chop in RJ
@@ -1336,7 +1336,7 @@ c
 *     Should only get through here if I am trying to rebin NA or AZ
 *     with SCAN data
 
-      IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' 
+      IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ'
      :     .AND. OUT_COORDS.NE.'PL')) THEN
 
 *     Inform the 'RD' regridder the date of regrid
@@ -1345,7 +1345,7 @@ c
             CALL MSG_SETC ('UTDATE', SUTDATE)
             CALL MSG_SETC ('UTSTART', SUTSTART)
             CALL MSG_SETC('PKG', PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
+            CALL MSG_OUTIF(MSG__NORM, ' ',
      :           '^PKG: Using output coordinates of '//
      :           'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
          END IF
@@ -1363,7 +1363,7 @@ c
 *     Request the new apparent ra/dec centre
             CALL SURF_REQUEST_OUTPUT_COORDS( TSKNAME, 'LONG_OUT',
      :           'LAT_OUT', OUT_COORDS, LAT_OBS, OUT_RA_CEN,OUT_DEC_CEN,
-     :           MJD_STANDARD, HOURS, OUT_RA_CEN, OUT_DEC_CEN, 
+     :           MJD_STANDARD, HOURS, OUT_RA_CEN, OUT_DEC_CEN,
      :           OUT_ROTATION, OUT_LONG, OUT_LAT, STATUS)
 
          ELSE
@@ -1378,7 +1378,7 @@ c
 *     we already know the OUT_LONG and OUT_LAT
 
             IF (.NOT. CALCSKY .OR. .NOT. HAVE_MODEL) THEN
-               CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
+               CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN,
      :              MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
             ELSE
                OUT_LONG = MODEL_RA_CEN
@@ -1391,19 +1391,19 @@ c
 *     and OUT_DEC_CEN) as were supplied to SCULIB_CALC_OUTPUT_COORDS)
 
             CALL SCULIB_CALC_APPARENT (LAT_OBS, OUT_LONG, OUT_LAT,0.0D0,
-     :           0.0D0, 0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 
-     :           0.0D0, 0.0D0, OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
+     :           0.0D0, 0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD,
+     :           0.0D0, 0.0D0, OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
      :           STATUS)
 
-         END IF            
+         END IF
 
 *  convert the RA,Decs of the observed points to tangent plane offsets
 *  from the chosen output centre
 
          IF (STATUS .EQ. SAI__OK) THEN
             DO I = 1, FILE
-               CALL SCULIB_APPARENT_2_TP (N_BOL(I) * N_POS(I), 
-     :              %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+               CALL SCULIB_APPARENT_2_TP (N_BOL(I) * N_POS(I),
+     :              %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :              %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :              OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
      :              DBLE(SHIFT_DX(I)), DBLE(SHIFT_DY(I)), STATUS)
@@ -1427,7 +1427,7 @@ c
                CALL SCULIB_ADDCAD(N_BOL(I) * N_POS(I),
      :              %VAL(CNF_PVAL(BOL_DEC_PTR(I))), DBLE(SHIFT_DY(I)),
      :              %VAL(CNF_PVAL(BOL_DEC_PTR(I))))
-               
+
             END DO
          END IF
 
@@ -1459,7 +1459,7 @@ c
       NYQWAV = WAVELENGTH
       IF ( SUB_INSTRUMENT .EQ. 'THUMP' ) NYQWAV = 850.0
 
-      NYQUIST = (DBLE(NYQWAV) * 1.0D-6 ) / 
+      NYQUIST = (DBLE(NYQWAV) * 1.0D-6 ) /
      :     ( 2.0D0 * DBLE(DIAMETER))
 
 *     Now if I want to I can simply write the data out to a file
@@ -1492,10 +1492,10 @@ c
             END IF
 
 *     Write out the data
-            CALL SURF_WRITE_DATA( FD, N_POS(I) * N_BOL(I), 
-     :           %VAL(CNF_PVAL(IN_DATA_PTR(I))), 
+            CALL SURF_WRITE_DATA( FD, N_POS(I) * N_BOL(I),
+     :           %VAL(CNF_PVAL(IN_DATA_PTR(I))),
      :           %VAL(CNF_PVAL(IN_VARIANCE_PTR(I))),
-     :           %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :           %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :           %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :           STATUS)
          END DO
@@ -1513,7 +1513,7 @@ c
 *     points for each map. This is calculated in a different place
 *     for REBIN and BOLREBIN but there doesn't seem to be much gain
 *     in doing this in the shared code.
-            
+
          IF (STATUS .EQ. SAI__OK) THEN
             DO I = 1, FILE
                N_PTS(I) = N_BOL(I) * N_POS(I)
@@ -1535,8 +1535,8 @@ c
 
 *     Bin and despike the data
          CALL SURF_GRID_DESPIKE(FILE, N_PTS, N_POS, N_BOL, BITNUM,
-     :        NYQUIST, BOL_RA_PTR, BOL_DEC_PTR, 
-     :        IN_DATA_PTR, IN_QUALITY_PTR, 
+     :        NYQUIST, BOL_RA_PTR, BOL_DEC_PTR,
+     :        IN_DATA_PTR, IN_QUALITY_PTR,
      :        MAP_SIZE(1), MAP_SIZE(2), I_CENTRE, J_CENTRE, NSPIKES,
      :        QBITS, STATUS)
 
@@ -1547,11 +1547,11 @@ c
          IF (STATUS .EQ. SAI__OK) THEN
             DO I = 1, FILE
                IF (NSPIKES(I) .GT. 0) THEN
-               
+
                   CALL MSG_SETC('FILE', FILENAME(I))
                   CALL MSG_SETI('NS', NSPIKES(I))
                   CALL MSG_SETC('PKG', PACKAGE)
-                  CALL MSG_OUTIF(MSG__NORM, ' ', 
+                  CALL MSG_OUTIF(MSG__NORM, ' ',
      :                 '^PKG: ^NS spikes detected in file ^FILE',
      :                 STATUS)
                END IF
@@ -1583,7 +1583,7 @@ c
             IF (NSPIKES(I) .GT. 0) THEN
 
 *     Generate a default name for the output file
-               CALL SCULIB_CONSTRUCT_OUT(FILENAME(I), SUFFIX_ENV, 
+               CALL SCULIB_CONSTRUCT_OUT(FILENAME(I), SUFFIX_ENV,
      :              SCUBA__N_SUFFIX,
      :              SUFFIX_OPTIONS, SUFFIX_STRINGS, OUT, STATUS)
 
@@ -1593,7 +1593,7 @@ c
 *     Get an NDF identifier to the input file
 *     (could simply do a SYSTEM copy!)
 
-               CALL NDF_FIND (DAT__ROOT, FILENAME(I), ITEMP, STATUS) 
+               CALL NDF_FIND (DAT__ROOT, FILENAME(I), ITEMP, STATUS)
 
 *     OK, propagate the input ndf to the output
 *     If we are using the default output name we
@@ -1613,20 +1613,20 @@ c
      :                 '^TASK: Storing despiked data in ^OUT', STATUS)
 
                ELSE
- 
-                  CALL NDF_PROP (ITEMP, 
+
+                  CALL NDF_PROP (ITEMP,
      :                 'Units,Axis,DATA,VARIANCE,Quality',
      :                 'OUT', OUT_NDF, STATUS)
 
                END IF
-               
+
 *     Check status for NULL (ie didn't want to write a file)
 
                IF (STATUS .EQ. PAR__NULL) THEN
-                  
+
                   CALL ERR_ANNUL(STATUS)
                   CALL NDF_ANNUL(ITEMP, STATUS)
-                     
+
                ELSE
 
 *     Annul the input
@@ -1636,11 +1636,11 @@ c
 
                   CALL NDF_MAP(OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      :                 QPTR, ITEMP, STATUS)
-                  
+
 *     Copy the new quality array
 
                   CALL VEC_UBTOUB(.FALSE., N_POS(I) * N_BOL(I),
-     :                 %VAL(CNF_PVAL(IN_QUALITY_PTR(I))), 
+     :                 %VAL(CNF_PVAL(IN_QUALITY_PTR(I))),
      :                 %VAL(CNF_PVAL(QPTR)), IERR,
      :                 NERR, STATUS)
 
@@ -1648,9 +1648,9 @@ c
                   CALL NDF_BB(OUT_NDF, BADB, STATUS)
                   BADB = SCULIB_BITON(BADB, 4)
                   CALL NDF_SBB(BADB, OUT_NDF, STATUS)
-                  
+
 *     Close output
-               
+
                   CALL NDF_UNMAP(OUT_NDF, 'QUALITY', STATUS)
                   CALL NDF_ANNUL(OUT_NDF, STATUS)
 
@@ -1671,7 +1671,7 @@ c
 *     points for each map. This is calculated in a different place
 *     for REBIN and BOLREBIN but there doesn't seem to be much gain
 *     in doing this in the shared code. Also used in DESPIKE!!!
-            
+
          IF (STATUS .EQ. SAI__OK) THEN
             DO I = 1, FILE
                N_PTS(I) = N_BOL(I) * N_POS(I)
@@ -1689,9 +1689,9 @@ c
             SKY_END(I) = 0
             SKY_VPTR(I) = 0
             SKY_VEND(I) = 0
-            CALL SCULIB_MALLOC(N_POS(I)*VAL__NBR, SKY_PTR(I), 
+            CALL SCULIB_MALLOC(N_POS(I)*VAL__NBR, SKY_PTR(I),
      :           SKY_END(I), STATUS)
-            CALL SCULIB_MALLOC(N_POS(I)*VAL__NBR, SKY_VPTR(I), 
+            CALL SCULIB_MALLOC(N_POS(I)*VAL__NBR, SKY_VPTR(I),
      :           SKY_VEND(I), STATUS)
 
          END DO
@@ -1707,7 +1707,7 @@ c
 *     in pixels
          DO I = 1, FILE
 
-            CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+            CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1),
      :           FITS(1,I), 'EXP_TIME', RTEMP, STATUS)
 
 *     Width of bin must be an integer (and can be 0)
@@ -1717,9 +1717,9 @@ c
 
 *     Calculate the sky contribution
          CALL SURF_GRID_CALCSKY(TSKNAME, FILE, N_PTS, N_POS, N_BOL,
-     :        NYQUIST, IMNDF, N_M_FITS, MODEL_FITS,  
-     :        CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR, 
-     :        BOL_DEC_PTR,  IN_DATA_PTR, IN_QUALITY_PTR, 
+     :        NYQUIST, IMNDF, N_M_FITS, MODEL_FITS,
+     :        CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR,
+     :        BOL_DEC_PTR,  IN_DATA_PTR, IN_QUALITY_PTR,
      :        SKY_PTR, SKY_VPTR, QBITS, STATUS)
 
 *  close the model file
@@ -1731,11 +1731,11 @@ c
          DO I = 1, FILE
 *     Open for read/write access
             CALL NDF_OPEN (DAT__ROOT, FILENAME(I), 'UPDATE',
-     :           'OLD', OUT_NDF, ITEMP, STATUS) 
+     :           'OLD', OUT_NDF, ITEMP, STATUS)
 
 *     Return locator to REDS extension
             IF (STATUS .EQ. SAI__OK) THEN
-               CALL NDF_XLOC (OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+               CALL NDF_XLOC (OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC,
      :              STATUS)
                IF (STATUS .NE. SAI__OK) THEN
                   CALL ERR_ANNUL (STATUS)
@@ -1753,8 +1753,8 @@ c
             IF (THERE) CALL DAT_ERASE(OUT_REDSX_LOC, STEMP, STATUS)
 
 *     Create a new one
-            CALL NDF_PLACE (OUT_REDSX_LOC, STEMP, PLACE, 
-     :           STATUS) 
+            CALL NDF_PLACE (OUT_REDSX_LOC, STEMP, PLACE,
+     :           STATUS)
             CALL NDF_NEW('_REAL', 1, 1, N_POS(I), PLACE, SKYNDF,
      :           STATUS)
 
@@ -1781,7 +1781,7 @@ c
 
 *     Copy in error
             IF (STATUS .EQ. SAI__OK) THEN
-               CALL VEC_RTOR(.FALSE., N_POS(I), 
+               CALL VEC_RTOR(.FALSE., N_POS(I),
      :              %VAL(CNF_PVAL(SKY_VPTR(I))),
      :              %VAL(CNF_PVAL(QPTR)), IERR, NERR, STATUS)
             END IF
@@ -1812,7 +1812,7 @@ c
 
       CALL CHR_CLEAN(SOBJECT)
       CALL CHR_LDBLK(SOBJECT)
-      
+
 *  get the pixel spacing of the output map
 
       OUT_PIXEL = 3.0
@@ -1872,7 +1872,7 @@ c
             ELSE IF (METHOD .EQ. 'GAUSSIAN') THEN
                ITEMP = 3
             END IF
-            
+
             CALL PAR_GDR0I('WTFNRAD',ITEMP, 1, WTFN_MAXRAD, .TRUE.,
      :           WEIGHTSIZE, STATUS)
 
@@ -1883,7 +1883,7 @@ c
          IF (METHOD.EQ.'BESSEL') THEN
 *     Bessel
             CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
+            CALL MSG_OUTIF(MSG__NORM, ' ',
      :           '^PKG: Initialising BESSEL weighting functions',
      :           STATUS)
             CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
@@ -1892,7 +1892,7 @@ c
          ELSE IF (METHOD.EQ.'LINEAR') THEN
 *     Linear
             CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
+            CALL MSG_OUTIF(MSG__NORM, ' ',
      :           '^PKG: Initialising LINEAR weighting functions',
      :           STATUS)
             CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
@@ -1901,7 +1901,7 @@ c
          ELSE IF (METHOD.EQ.'GAUSSIAN') THEN
 *     Gaussian
             CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
+            CALL MSG_OUTIF(MSG__NORM, ' ',
      :           '^PKG: Initialising GAUSSIAN weighting functions',
      :           STATUS)
             CALL SCULIB_GAUSS_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
@@ -1929,7 +1929,7 @@ c
          IF (FILE .EQ. 1) THEN
 
 *     Generate a default name for the output file
-            CALL SCULIB_CONSTRUCT_OUT(FILENAME(1), SUFFIX_ENV, 
+            CALL SCULIB_CONSTRUCT_OUT(FILENAME(1), SUFFIX_ENV,
      :           SCUBA__N_SUFFIX,
      :           SUFFIX_OPTIONS, REB_SUFFIX_STR, STEMP, STATUS)
 
@@ -1979,7 +1979,7 @@ c
       IF (BOLREBIN .OR. INTREBIN) THEN
 *  create the output file that will contain the reduced data in NDFs
 *     The 'type' depends on BOL or INT rebin
- 
+
          CALL PAR_GET0C ('OUT', OUT, STATUS)
 
          IF (BOLREBIN) THEN
@@ -1998,7 +1998,7 @@ c
          IPOSN = MIN( IPOSN, DAT__SZNAM )
          HDSNAME = OUT(1:IPOSN)
 
-         CALL HDS_NEW (OUT, HDSNAME, STEMP, 0, 0, OUT_LOC, 
+         CALL HDS_NEW (OUT, HDSNAME, STEMP, 0, 0, OUT_LOC,
      :        STATUS)
 
       END IF
@@ -2023,7 +2023,7 @@ c
 
             IF (BOLREBIN) THEN
 *     Find bolometer name
-               CALL SCULIB_BOLNAME(BOL_ADC(EACHBOL), BOL_CHAN(EACHBOL), 
+               CALL SCULIB_BOLNAME(BOL_ADC(EACHBOL), BOL_CHAN(EACHBOL),
      :              MAPNAME, STATUS)
 
                CALL MSG_SETC('BOL', MAPNAME)
@@ -2048,30 +2048,30 @@ c
 *     Extract EACHBOL from each file
 *     Need IN_DATA_PTR, BOL_RA_PTR and BOL_DEC_PTR
 *     Get the memory
-                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBR, 
+                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBR,
      :                 ABOL_DATA_PTR(I), ABOL_DATA_END(I), STATUS)
-                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBR, 
+                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBR,
      :                 ABOL_VAR_PTR(I), ABOL_VAR_END(I), STATUS)
-                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBD, 
+                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBD,
      :                 ABOL_RA_PTR(I), ABOL_RA_END(I), STATUS)
-                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBD, 
+                  CALL SCULIB_MALLOC(N_POS(I) * VAL__NBD,
      :                 ABOL_DEC_PTR(I), ABOL_DEC_END(I), STATUS)
 
 *     Extract a bolometer
                   CALL SCULIB_EXTRACT_2DIM_R(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %VAL(CNF_PVAL(IN_DATA_PTR(I))), 
+     :                 %VAL(CNF_PVAL(IN_DATA_PTR(I))),
      :                 %VAL(CNF_PVAL(ABOL_DATA_PTR(I))),
      :                 STATUS)
                   CALL SCULIB_EXTRACT_2DIM_R(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %VAL(CNF_PVAL(IN_VARIANCE_PTR(I))), 
+     :                 %VAL(CNF_PVAL(IN_VARIANCE_PTR(I))),
      :                 %VAL(CNF_PVAL(ABOL_VAR_PTR(I))),
      :                 STATUS)
                   CALL SCULIB_EXTRACT_2DIM_D(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :                 %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :                 %VAL(CNF_PVAL(ABOL_RA_PTR(I))),
      :                 STATUS)
                   CALL SCULIB_EXTRACT_2DIM_D(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %VAL(CNF_PVAL(BOL_DEC_PTR(I))), 
+     :                 %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :                 %VAL(CNF_PVAL(ABOL_DEC_PTR(I))),
      :                 STATUS)
                END DO
@@ -2101,7 +2101,7 @@ c
             CALL PAR_GDR1I('SIZE', 2, MAP_SIZE, 5, 10000, .TRUE.,
      :           MAP_SIZE, STATUS)
 
-*     Need to redefine I_CENTRE and J_CENTRE 
+*     Need to redefine I_CENTRE and J_CENTRE
 *     Put the reference pixels into the centre of the new grid
 *     if the size has changed
 
@@ -2117,7 +2117,7 @@ c
 
 *     Allow for the reference pixel to be redefined - this is required
 *     since sometimes the required size is equal to the actual size
-*     but we *want* the ref pixel to be in the middle of the map 
+*     but we *want* the ref pixel to be in the middle of the map
 *     (eg for scan map reduction) - provide the actual value as the
 *     default modified to the centre if the size was different
 
@@ -2148,7 +2148,7 @@ c
             J_CENTRE = UBND(2)
 
 *     Now that the size of the map is determined we have to work out whether
-*     we are rebinning all integrations into one image (REBIN/BOLREBIN) or 
+*     we are rebinning all integrations into one image (REBIN/BOLREBIN) or
 *     into separate images (INTREBIN).
 
             IF (INTREBIN) THEN
@@ -2161,7 +2161,7 @@ c
                NFILES = 1       ! All lower subroutines assume one input file
 
                NINTS(1) = 1     ! All lower subs assume one integration
-               
+
             ELSE
 *     Normal rebin just needs to loop once
                N_FILE_LOOPS = 1
@@ -2197,7 +2197,7 @@ c
 *     Need to loop through INT_LIST retrieving section
                      INT_START = INT_LIST(CURR_FILE, CURR_INT)
                      INT_NEXT  = INT_LIST(CURR_FILE, CURR_INT + 1)
-                     N_PTS(1)  = (INT_NEXT - INT_START) * 
+                     N_PTS(1)  = (INT_NEXT - INT_START) *
      :                    N_BOL(CURR_FILE)
 
 *     Modify INT_LIST so that the first integration in INT_LIST
@@ -2228,8 +2228,8 @@ c
                      IF (STATUS .EQ. SAI__OK) THEN
                         IF (OFFSET .GT. 0) THEN
 
-                           ABOL_DATA_PTR(1) = CNF_PREG( 
-     :                          CNF_PVAL(IN_DATA_PTR(CURR_FILE)) + 
+                           ABOL_DATA_PTR(1) = CNF_PREG(
+     :                          CNF_PVAL(IN_DATA_PTR(CURR_FILE)) +
      :                          ROFFSET, ISNEWPD)
                            ABOL_VAR_PTR(1) = CNF_PREG(
      :                          CNF_PVAL(IN_VARIANCE_PTR(CURR_FILE)) +
@@ -2250,14 +2250,14 @@ c
                               CALL MSG_SETC( 'PKG', PACKAGE )
                               CALL ERR_REP( ' ','^PKG: Error '//
      :                             'registering pointers with '//
-     :                             'CNF (internal error)', 
+     :                             'CNF (internal error)',
      :                             STATUS)
 
                            END IF
 
                         ELSE
 *     first time through. Make sure the pointer is correct (it should be)
-                           ABOL_DATA_PTR(1) = IN_DATA_PTR(CURR_FILE) 
+                           ABOL_DATA_PTR(1) = IN_DATA_PTR(CURR_FILE)
                            ABOL_VAR_PTR(1) = IN_VARIANCE_PTR(CURR_FILE)
                            ABOL_RA_PTR(1) = BOL_RA_PTR(CURR_FILE)
                            ABOL_DEC_PTR(1) = BOL_DEC_PTR(CURR_FILE)
@@ -2270,7 +2270,7 @@ c
                         END IF
                      END IF
 
-                     
+
 *     Work out mapname
                      MAPNAME = 'I'
                      CALL CHR_ITOC(COUNT, STEMP, ITEMP)
@@ -2290,7 +2290,7 @@ c
 
                   IF (BOLREBIN.OR.INTREBIN) THEN
                      CALL NDF_PLACE(OUT_LOC, MAPNAME, PLACE, STATUS)
-                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
+                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE,
      :                    OUT_NDF, STATUS)
                   ELSE
 
@@ -2301,11 +2301,11 @@ c
 
                      IF (FILE .EQ. 1) THEN
 *     Open the input file and get a section the right size
-                        CALL NDF_FIND (DAT__ROOT, FILENAME(1), ITEMP, 
-     :                       STATUS) 
+                        CALL NDF_FIND (DAT__ROOT, FILENAME(1), ITEMP,
+     :                       STATUS)
                         CALL NDF_SECT(ITEMP, 2, LBND, UBND,
      :                       SECNDF, STATUS)
-*     Ask for the new file name - NULL response indicates 
+*     Ask for the new file name - NULL response indicates
 *     that we should only calculate the map size
                         IF (STATUS .EQ. SAI__OK) THEN
                            CALL NDF_PROP(SECNDF,
@@ -2331,7 +2331,7 @@ c
 
 *     There will be bad pixels in the output map.
 
-                  CALL NDF_SBAD (.TRUE., OUT_NDF, 'Data,Variance', 
+                  CALL NDF_SBAD (.TRUE., OUT_NDF, 'Data,Variance',
      :                 STATUS)
                   CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
@@ -2358,9 +2358,9 @@ c
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL SCULIB_CFILLB (N_PIXELS, BADBIT,
      :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)))
-                     CALL SCULIB_CFILLR(N_PIXELS, 0.0, 
+                     CALL SCULIB_CFILLR(N_PIXELS, 0.0,
      :                    %VAL(CNF_PVAL(OUT_DATA_PTR)))
-                     CALL SCULIB_CFILLR(N_PIXELS, 0.0, 
+                     CALL SCULIB_CFILLR(N_PIXELS, 0.0,
      :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)))
                   END IF
 
@@ -2371,26 +2371,26 @@ c
                   CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
      :                 OUT_WEIGHT_PTR, OUT_WEIGHT_END, STATUS)
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLR (N_PIXELS, 0.0, 
+                     CALL SCULIB_CFILLR (N_PIXELS, 0.0,
      :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)))
                   END IF
 
 
 *     Now time for regrid
-                  IF ((METHOD .EQ. 'BESSEL') .OR. 
+                  IF ((METHOD .EQ. 'BESSEL') .OR.
      :                 (METHOD .EQ. 'LINEAR') .OR.
      :                 (METHOD .EQ. 'GAUSSIAN')) THEN
 
 *     Rebin the data using weighting function
                      CALL SCULIB_WTFN_REGRID( GUARD, NFILES, N_PTS,
-     :                    WTFN_MAXRAD, WTFNRES, WEIGHTSIZE, SCALE, 
-     :                    OUT_PIXEL, MAP_SIZE(1), 
+     :                    WTFN_MAXRAD, WTFNRES, WEIGHTSIZE, SCALE,
+     :                    OUT_PIXEL, MAP_SIZE(1),
      :                    MAP_SIZE(2), I_CENTRE, J_CENTRE, WTFN, WEIGHT,
      :                    BOLWT, N_BOL, SCUBA__NUM_ADC*SCUBA__NUM_CHAN,
-     :                    ABOL_DATA_PTR, ABOL_VAR_PTR, 
-     :                    ABOL_RA_PTR, ABOL_DEC_PTR, 
+     :                    ABOL_DATA_PTR, ABOL_VAR_PTR,
+     :                    ABOL_RA_PTR, ABOL_DEC_PTR,
      :                    %VAL(CNF_PVAL(OUT_DATA_PTR)),
-     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
      :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)), STATUS )
 
@@ -2398,10 +2398,10 @@ c
 
                      CALL SURFLIB_MEDIAN_REGRID(NFILES, N_PTS,
      :                    OUT_PIXEL, MAP_SIZE(1), MAP_SIZE(2),
-     :                    I_CENTRE, J_CENTRE, 
+     :                    I_CENTRE, J_CENTRE,
      :                    ABOL_RA_PTR, ABOL_DEC_PTR,
      :                    ABOL_DATA_PTR,
-     :                    %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)), STATUS)
 
@@ -2415,7 +2415,7 @@ c
      :                       N_PIXELS / 2.0,
      :                       STATUS)
                         CALL PAR_GET0R('SFACTOR', SFACTOR, STATUS)
-                     ELSE 
+                     ELSE
                         SPMETHOD = 'IDSFFT'
                      END IF
 
@@ -2433,14 +2433,14 @@ c
                         EFF_RADIUS = OUT_PIXEL / 2.0
                      END IF
 
-                     CALL SCULIB_SPLINE_REGRID(SPMETHOD, SFACTOR, 
-     :                    MAX_FILE, NFILES, N_BOL, SCUBA__MAX_INT, 
+                     CALL SCULIB_SPLINE_REGRID(SPMETHOD, SFACTOR,
+     :                    MAX_FILE, NFILES, N_BOL, SCUBA__MAX_INT,
      :                    NINTS, EFF_RADIUS, OUT_PIXEL,
      :                    MAP_SIZE(1), MAP_SIZE(2),
-     :                    I_CENTRE, J_CENTRE, WEIGHT, INT_LIST, 
-     :                    ABOL_DATA_PTR, ABOL_VAR_PTR, ABOL_RA_PTR, 
+     :                    I_CENTRE, J_CENTRE, WEIGHT, INT_LIST,
+     :                    ABOL_DATA_PTR, ABOL_VAR_PTR, ABOL_RA_PTR,
      :                    ABOL_DEC_PTR, %VAL(CNF_PVAL(OUT_DATA_PTR)),
-     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
      :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)), STATUS )
 
@@ -2458,18 +2458,18 @@ c
 
 *     Copy the data to the output NDF
 
-                  CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
+                  CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
      :                 NDF_PTR, ITEMP, STATUS)
                   CALL VEC_RTOR(.FALSE., N_PIXELS,
-     :                 %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :                 %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :                 %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                 NERR, STATUS)
                   CALL NDF_UNMAP(OUT_NDF, 'DATA', STATUS)
 
-                  CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 
+                  CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL',
      :                 'WRITE', NDF_PTR, ITEMP, STATUS)
                   CALL VEC_RTOR(.FALSE., N_PIXELS,
-     :                 %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :                 %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :                 %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                 NERR, STATUS)
                   CALL NDF_UNMAP(OUT_NDF, 'VARIANCE', STATUS)
@@ -2491,14 +2491,14 @@ c
 
 *     Trim the image - set the second bit
                      CALL SURFLIB_TRIM_IMAGE( TRIM, MAP_SIZE(1),
-     :                    MAP_SIZE(2), 1, 
+     :                    MAP_SIZE(2), 1,
      :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
      :                    %VAL(CNF_PVAL(NDF_PTR)), STATUS)
 
                   ELSE
 
                      CALL VEC_UBTOUB(.FALSE., N_PIXELS,
-     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
      :                    %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                    NERR, STATUS)
 
@@ -2527,7 +2527,7 @@ c
 *     Extract FILT_1 from the first FITS header so that we can write
 *     the FILTER name to the output FITS
 
-                  CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1), 
+                  CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1),
      :                 FITS(1,1), 'FILT_1', STEMP, STATUS)
 
 *     Extract units from first fits array
@@ -2543,17 +2543,17 @@ c
 *     polarimetry.
                   WPLATE = ANG_INT(CURR_FILE, CURR_INT,1)
                   ANGROT = ANG_INT(CURR_FILE, CURR_INT,2)
-                  
+
 *     Now write the axis and FITS header
 
-                  CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
+                  CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS,
      :                 OUT_TITLE,OUT_UNITS,MJD_STANDARD, FILE, FILENAME,
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE,
      :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STEMP,
-     :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
+     :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW,
      :                 WPLATE, ANGROT, TELESCOPE, INSTRUMENT, FITSCHAN,
      :                 OUTWCS, STATUS )
-                  
+
 
 *     Create a REDS extension
                   CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
@@ -2566,18 +2566,18 @@ c
 
                   IF (WEIGHTS) THEN
 
-                     CALL NDF_PLACE (OUT_REDSX_LOC, 'WEIGHTS', PLACE, 
-     :                    STATUS) 
-                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
+                     CALL NDF_PLACE (OUT_REDSX_LOC, 'WEIGHTS', PLACE,
+     :                    STATUS)
+                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE,
      :                    OUT_WEIGHT_NDF, STATUS)
-                     
-                     CALL NDF_MAP (OUT_WEIGHT_NDF, 'DATA', '_REAL', 
+
+                     CALL NDF_MAP (OUT_WEIGHT_NDF, 'DATA', '_REAL',
      :                    'WRITE/ZERO', NDF_PTR, ITEMP, STATUS)
 
 *     Copy the weights into the output NDF
 
                      CALL VEC_RTOR(.FALSE., N_PIXELS,
-     :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)),
      :                    %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                    NERR, STATUS)
 
@@ -2604,16 +2604,16 @@ c
                   IF (TIMES) THEN
 *     Already have a REDS extension so...
 
-                     CALL NDF_PLACE (OUT_REDSX_LOC, 'TIMES', PLACE, 
-     :                    STATUS) 
-                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
+                     CALL NDF_PLACE (OUT_REDSX_LOC, 'TIMES', PLACE,
+     :                    STATUS)
+                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE,
      :                    OUT_WEIGHT_NDF, STATUS)
 
 *     Map the data
-                     CALL NDF_MAP(OUT_WEIGHT_NDF, 'DATA', '_INTEGER', 
+                     CALL NDF_MAP(OUT_WEIGHT_NDF, 'DATA', '_INTEGER',
      :                 'WRITE/ZERO', NDF_PTR, ITEMP, STATUS)
 
-                     
+
                      OUT_QUALITY_PTR = 0
                      OUT_QUALITY_END = 0
                      CALL SCULIB_MALLOC((N_PIXELS * VAL__NBUB),
@@ -2633,7 +2633,7 @@ c
                         CALL SCULIB_MALLOC(( 2 * N_PTS(I) * VAL__NBI),
      :                       IJ_PTR, IJ_PTR_END, STATUS)
 
-                        CALL SURFLIB_CALC_IJPOS(N_PTS(I), 
+                        CALL SURFLIB_CALC_IJPOS(N_PTS(I),
      :                       DBLE(OUT_PIXEL), I_CENTRE, J_CENTRE,
      :                       %VAL(CNF_PVAL(ABOL_RA_PTR(I))),
      :                       %VAL(CNF_PVAL(ABOL_DEC_PTR(I))),
@@ -2643,7 +2643,7 @@ c
      :                       MAP_SIZE(1), MAP_SIZE(2), .TRUE.,
      :                       %VAL(CNF_PVAL(ABOL_DATA_PTR(I))),
      :                       %VAL(CNF_PVAL(OUT_QUALITY_PTR)), BADB,
-     :                       %VAL(CNF_PVAL(IJ_PTR)), 
+     :                       %VAL(CNF_PVAL(IJ_PTR)),
      :                       %VAL(CNF_PVAL(NDF_PTR)), ITEMP,
      :                       ITEMP, ITEMP, STATUS)
 
@@ -2694,7 +2694,7 @@ c
 
                END DO
             END DO
-            
+
          END DO
       END IF
 
@@ -2709,7 +2709,7 @@ c
 *     and STATUS=PAR__ANNUL, then this indicates that we are simply
 *     running REBIN to determine the map size and not to regrid
 
-      IF (TSKNAME .EQ. 'REBIN' .AND. .NOT.DOREBIN .AND. 
+      IF (TSKNAME .EQ. 'REBIN' .AND. .NOT.DOREBIN .AND.
      :     STATUS .EQ. PAR__NULL) THEN
          CALL ERR_ANNUL(STATUS)
          CALL MSG_SETC('TSK',TSKNAME)

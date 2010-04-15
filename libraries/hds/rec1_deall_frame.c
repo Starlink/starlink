@@ -142,7 +142,7 @@ argument of ^BLOC (internal programming error).",
                {
                   entno = _max( i, empty );
                   break;
-               }               
+               }
                else if ( stk[ i ].spare == 0 )
                {
                   empty = i;

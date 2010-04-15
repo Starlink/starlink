@@ -57,32 +57,32 @@ set phsec = ""
 # ----------------------------------------------------------------------
 # Parse the arguments
 #
-while  ($#argv > 0) 
+while  ($#argv > 0)
 
   if ( "$1" =~ "-"[hv]* ) goto help
   if ("$1" == "-m") then
-    shift    
+    shift
     if ($#argv == 0) goto help
     if ( "$1" =~ "-"* ) goto help
     set mode = $1
     set mode = `echo $mode | cut -c1 | tr '[A-Z]' '[a-z]'`
-    shift    
+    shift
   else if ("$1" == "-f") then
-    shift    
+    shift
     if ($#argv == 0) goto help
     if ( "$1" =~ "-"* ) goto help
     set sdf = $1
     set sdf = `echo $sdf | sed s/".sdf"/""/`
-    shift    
+    shift
   else if ("$1" == "-d") then
-    shift    
+    shift
     if ($#argv == 0) goto help
     if ( "$1" =~ "-"* ) goto help
     set ddf = $1
     set ddf = `echo $ddf | sed s/".sdf"/""/`
-    shift    
+    shift
   else if ("$1" == "-s") then
-    shift   
+    shift
     if ($#argv == 0) goto help
     if !( "$1" =~ "-"* ) goto help
     set mn = $1
@@ -92,7 +92,7 @@ while  ($#argv > 0)
     set mx = $1
     shift
   else if ("$1" == "-l") then
-    shift   
+    shift
     if ($#argv == 0) goto help
     if ( "$1" =~ "-"* ) goto help
     @ nl = $1
@@ -131,7 +131,7 @@ if ( "$sdf" == "" ) then
   set answer = "$<"
   set sdf = `echo $answer | sed s/".sdf"/""/`
 endif
-  
+
 if ( "$mn" == "" || "$mx" == "" ) then
     if ( "$mode" == "r" ) then
       set mn = -0.01
@@ -156,7 +156,7 @@ if ( "$lbol" == "" )  then
     echo "Note: additional bolometers can be set via menu below"
     echo -n "Which bolometer(s) [all]? ${lbol} > "
     set answer = "$<"
-    if ( "$answer" != "" ) then       
+    if ( "$answer" != "" ) then
        set lbol = `echo " $answer" | sed s/","/" "/g | sed s/"  "/" "/g | sed s/"b"/""/g`
        set nbol = `echo "$answer" | awk -F" " '{print $NF}'`
     else
@@ -174,15 +174,15 @@ endif
 
 set lbol = `echo $lbol | sed s/","/" "/g | sed s/"  "/" "/g | sed s/"b"/""/g`
 if ( "$lbol" == "all" || "$lbol" == " all"  ) then
-  set lbol = " 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20" 
-  set lbol = "$lbol 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37" 
+  set lbol = " 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20"
+  set lbol = "$lbol 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37"
   @ nbol = 37;
 else if ( "$lbol" == "alls" || "$lbol" == " alls"  ) then
-  set lbol = " 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20" 
+  set lbol = " 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20"
   set lbol = "$lbol 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40"
   set lbol = "$lbol 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60"
-  set lbol = "$lbol 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80" 
-  set lbol = "$lbol 81 82 83 84 85 86 87 88 89 90 91" 
+  set lbol = "$lbol 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80"
+  set lbol = "$lbol 81 82 83 84 85 86 87 88 89 90 91"
   @ nbol = 91;
 endif
 
@@ -243,7 +243,7 @@ while (${iset} < ${nsets})
 
 #
 # Now do some complicated stuff: assemble the bolometers in sets
-# This really is only relevant for mode=r since mlinplot will plot a 
+# This really is only relevant for mode=r since mlinplot will plot a
 # whole set at the time. For the other modes the sets consist of a
 # single bolometer
 #
@@ -340,7 +340,7 @@ while (${iset} < ${nsets})
     echo    " [Y min max], [Y lim]  Y-axis from min:max or -lim:+lim"
     echo    " [U]                   Reset Y-axis"
     if ( "$mode" == "d" ) then
-      echo    " [#], [#:#], [#-#]     Despike point or range of points" 
+      echo    " [#], [#:#], [#-#]     Despike point or range of points"
       echo    "                       Just 'p' activates the cursor."
     endif
     echo    " "
@@ -359,14 +359,14 @@ while (${iset} < ${nsets})
   # Options: Quit, Next, and Menu
   #
   if ( "$answer" =~ [Qq]* ) goto END_ALL
-  
+
   if ( "$answer" =~ [Nn]* ) goto NEXT_BOL
 
   if ( "$answer" =~ [MmHh]* ) then
     set menu = 1
     goto MENU
   endif
- 
+
   # ----------------------------------------------------------------------
   # Option: switch to alternative Bolometer
   #
@@ -422,7 +422,7 @@ while (${iset} < ${nsets})
     set ymx = `echo $limits | awk -F" " '{print $NF}'`
     if ( "$ymn" == "" || "$ymx" == "x" ) then
        echo "Invalid reply"
-    else 
+    else
       if ( "${ymn}" == "${ymx}" ) then
          set ymn = "-${ymx}"
       endif
@@ -489,7 +489,7 @@ while (${iset} < ${nsets})
      echo "Error: '$answer' not a valid option. Try again."
      goto OPTION
   endif
-   
+
   NEXT_BOL:
 
 end
@@ -528,7 +528,7 @@ OPTIONS:
      -m      mode:
                 p: plot bolometers one by one, optionally overlayed with
                    data from the second input file.
-                d: interactively despike the data for the bolometers in 
+                d: interactively despike the data for the bolometers in
                    specified file.
                 r: same as 'p' except that a whole set of bolometers is
                    plotted in a window.
@@ -537,10 +537,10 @@ OPTIONS:
 
      -f      name of SDF file (.sdf may be included in the name).
 
-     -d      name of a second file: e.g. the despiked version of the SDF 
+     -d      name of a second file: e.g. the despiked version of the SDF
              file. The same bolometers will be plotted in a second window or
              overlayed for comparison.
- 
+
      -s      Y-axis scales for plot (can be changed via menu).
 
      -l      number of bolometers per window
@@ -554,7 +554,7 @@ DETAILS:
    understands the Scuba NDF file format, it hides most of the complicated
    syntax from the user.  Mode = 'p' and 'r' are wrappers around plotting
    utilities and facilitate the inspection of the data of each bolometer.
-   The utility allows change to the plot scales via the menu but will keep 
+   The utility allows change to the plot scales via the menu but will keep
    the scales the same for all bolometers which makes is easy to compare
    bolometers. Mode = 'd' allows for interactive despiking. Please read
    the note below the description of the menu on the use of the mouse.
@@ -568,10 +568,10 @@ DETAILS:
    Mode = 'r' or rlinplot (or any r* link to scuplot) is a wrapper around the
    Kappa utility mlinplot. It provides  plots of sets of bolometers in a single
    window with optionally data from a second file in a second window.
-   Obvious files are despiked and non-despiked data or data from different 
+   Obvious files are despiked and non-despiked data or data from different
    exposures to check the noise.
 
-   Mode = 'd' or dspbol (or any d* link to scuplot) can be used to 
+   Mode = 'd' or dspbol (or any d* link to scuplot) can be used to
    interactively despike bolometers. While it is not as fast as a completely
    integrated routine would be, it makes interactive despiking much
    easier by hiding the cycle between linplot and change_quality for the
@@ -583,7 +583,7 @@ DETAILS:
    despiked data, prompt the user to accept the new set and de-zoom to
    the original scale. To reset a previously flagged point, flag the point
    again but do NOT accept it: the point will be set to GOOD again.
-   Please read the note below the derscription of the menu on the use of 
+   Please read the note below the derscription of the menu on the use of
    the mouse.
 
    For each mode the menu items are a subset of:
@@ -596,26 +596,26 @@ DETAILS:
       [R]                   Reset X-axis
       [Y min max], [Y lim]  Y-axis from min:max or -lim:+lim
       [U]                   Reset Y-axis
-      [#], [#:#], [#-#]     Despike point or range of points; 
+      [#], [#:#], [#-#]     Despike point or range of points;
                             Just 'p' activates the cursor.
-   
+
       Option >
 
-   Note that a X center defined with the cursor or [X cen] defaults to 
-   a 20 points window around cen, the position of the spike. Using 
+   Note that a X center defined with the cursor or [X cen] defaults to
+   a 20 points window around cen, the position of the spike. Using
    the CURSOR, the Left Mouse button always defines the point, the Right
    Mouse button exits the cursor task while accepting the last point
    clicked.
 
 
-EXAMPLES:  
+EXAMPLES:
    scuplot  -m p -f s14_lon_ext 12 13 18 20 25 26 19
    pltbol   -f s14_lon_ext -d s14_lon_dsp -s -0.05 0.1 all
    dspbol   -f s14_lon_ext -s -0.05 0.1 all
    rlinplot -f s14_lon_ext -d s14_lon_dsp -s -0.01 0.2 -l 9 all
 
 
-IMPORTANT NOTE: 
+IMPORTANT NOTE:
    IF THE OVERLAY SOMEHOW COMES UP SCRAMBLED, delete the agi_xxx files
    in your home directory and if that does not work also files like
    linplot.sdf in the /home/you/adam subdirectory.
@@ -634,7 +634,7 @@ exit
 *  Name:
 *    SCUPLOT
 *
-*  Purpose: 
+*  Purpose:
 *    Interactive display and despiking
 *
 *  Type of Module:
@@ -662,14 +662,14 @@ exit
 *    bolometer from a second file. Obvious overlays are despiked on
 *    non-despiked data or data from different exposures to check the
 *    noise.
-* 
+*
 *    Mode = 'r' or rlinplot (or any r* link to scuplot) is a wrapper
 *    around the Kappa utility mlinplot. It provides plots of sets of
 *    bolometers in a single window with optionally data from a second
 *    file in a second window.  Obvious files are despiked and
 *    non-despiked data or data from different exposures to check the
 *    noise.
-* 
+*
 *    Mode = 'd' or dspbol (or any d* link to scuplot) can be used to
 *    interactively despike bolometers. While it is not as fast as a
 *    completely integrated routine would be, it makes interactive
@@ -697,9 +697,9 @@ exit
 *      [R]                   Reset X-axis
 *      [Y min max], [Y lim]  Y-axis from min:max or -lim:+lim
 *      [U]                   Reset Y-axis
-*      [#], [#:#], [#-#]     Despike point or range of points; 
+*      [#], [#:#], [#-#]     Despike point or range of points;
 *                            Just 'p' activates the cursor.
-*   
+*
 *      Option >
 *
 *    Note that a X center defined with the cursor or [X cen] defaults to
@@ -715,21 +715,21 @@ exit
 *        Select usage mode:
 *          p: plot bolometers one by one, optionally overlayed with
 *             data from the second input file (equivalent to PLTBOL)
-*          d: interactively despike the data for the bolometers in 
-*             specified file (equivalent to DSPBOL). 
+*          d: interactively despike the data for the bolometers in
+*             specified file (equivalent to DSPBOL).
 *          r: same as 'p' except that a whole set of bolometers is
 *             plotted in a window (equivalent to RLINPLOT).
 *     -f file
 *        name of SDF file (.sdf may be included in the name).
 *     -d file2
-*        name of a second file: e.g. the despiked version of the SDF 
+*        name of a second file: e.g. the despiked version of the SDF
 *        file. The same bolometers will be plotted in a second window or
 *        overlayed for comparison.
 *     -s min max
 *        Y-axis scales for plot (can be changed via menu).
 *     -l #
 *        number of bolometers per window
-*     bol     
+*     bol
 *        list of bolometers to plot. Type 'all' for 1..37 and 'alls'
 *        for 1..91. Can be added via menu if mode = 'r'.
 *

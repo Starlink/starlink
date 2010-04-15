@@ -121,7 +121,7 @@
 *  non-linear constraint needs to be evaluated
 
          IF ((MODE .EQ. 0) .OR. (MODE .EQ. 2)) THEN
-   
+
 *  evaluate the constraint
 
             C (1) = B * ETA_TEL

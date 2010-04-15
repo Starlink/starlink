@@ -30,7 +30,7 @@
 {     1994 May 4 (MJC):
 {        Fixed two bugs (NOQUICK and READF) when reading the data file.
 {     24-JUN-1994 (PDRAPER):
-{        Ported to UNIX. Changed to use correct invocations for 
+{        Ported to UNIX. Changed to use correct invocations for
 {        BEGPLOT (no BASE parameter).
 
 {  Bugs:
@@ -42,7 +42,7 @@ KAPPA
 
 {  Prompt for and read the name of an image display device.
 INPUT "Image display name: " (GDNAME)
-   
+
 {  Set the image display using KAPPA and clear the display.
 GDSET (GDNAME&'') ACCEPT
 GDCLEAR ACCEPT
@@ -106,8 +106,8 @@ READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SYMCOL=2 LABCOL=1 ~
 DEGTOR X
 DEGTOR Y
 
-{  Get the limits from the data using the AITOFF projection, note that the 
-{  RA centre is specified in the form of hh:mm:ss.sss and that below is 
+{  Get the limits from the data using the AITOFF projection, note that the
+{  RA centre is specified in the form of hh:mm:ss.sss and that below is
 {  understood to mean 12 hours.
 DLIMITS PROJECTION=AITOFF RACENTRE=12 DECCENTRE=0
 
@@ -116,7 +116,7 @@ WNAD
 MTEXT T 1.0 0.5 0.5 'Aitoff centre \ga=12\uh\d \gd=0\(2729)'
 
 {  Draw the coordinate grid.
-GRID 
+GRID
 
 {  Plot the points with various symbols.
 PEN 6

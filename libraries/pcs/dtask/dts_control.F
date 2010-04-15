@@ -21,7 +21,7 @@
 *        'SETENV' to set the value of an environment variable for the task
 *     or 'PAR_RESET' to de-activate the parameter system.
 *
-*     If the action is validated as 'DEFAULT' then:-     
+*     If the action is validated as 'DEFAULT' then:-
 *         If the given value has non-zero length set the default directory
 *         to this value. (No environment variable translation is done by this
 *         routine.)
@@ -43,7 +43,7 @@
 *     ACTION = CHARACTER * ( * ) (Given)
 *        A valid 'action' for CONTROL context
 *     VALUE = CHARACTER * ( * ) (Given)
-*       The parameter for the specified action. 
+*       The parameter for the specified action.
 *     MESSID = INTEGER (Given)
 *        The message identifier
 *     STATUS = INTEGER (Given and Returned)
@@ -95,7 +95,7 @@
 *      8-MAR-1993 (AJC):
 *        Remove include DDMSG
 *     30-SEP-1993 (BKM):
-*        Unix version 
+*        Unix version
 *     13-JUN-1995 (AJC):
 *        Add PAR_RESET action
 *     30-JAN-1996 (AJC):
@@ -117,7 +117,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,7 +152,7 @@
 #endif
 
 *  Local Variables:
-      CHARACTER*(MESSYS__VAL_LEN) RVALUE ! Return VALUE string 
+      CHARACTER*(MESSYS__VAL_LEN) RVALUE ! Return VALUE string
       CHARACTER*(SUBPAR__NAMELEN) UACT ! ACTION in upper case
       CHARACTER*(MESSYS__VAL_LEN) DEFN ! Processed VALUE string
       INTEGER LENGTH             ! Local string length variable
@@ -183,11 +183,11 @@
          IF ( LENGTH .GT. 0) THEN
 
 *  Non zero new directory length - effect change
-            ISTAT = CHDIR( VALUE(1:LENGTH) ) 
+            ISTAT = CHDIR( VALUE(1:LENGTH) )
             IF ( ISTAT .NE. 0) THEN
 *  Report failure to set directory
                STATUS = DTASK__BADDEF
-               CALL EMS_REP( 'DTASK_CONTROL', 
+               CALL EMS_REP( 'DTASK_CONTROL',
      :                       'Failed to set new default directory',
      :                       STATUS )
 
@@ -195,13 +195,13 @@
          ENDIF
 
 *  Return new current directory
-         ISTAT = GETCWD( RVALUE ) 
+         ISTAT = GETCWD( RVALUE )
          RLEN = CHR_LEN( RVALUE )
          IF ( ISTAT .NE. 0) THEN
 
 *  Report failure to get directory
             STATUS = DTASK__BADDEF
-            CALL EMS_REP( 'DTASK_CONTROL', 
+            CALL EMS_REP( 'DTASK_CONTROL',
      :                    'Failed to get current default directory',
      :                    STATUS )
          ENDIF
@@ -228,7 +228,7 @@
          EQPTR = INDEX( DEFN(1:LENGTH), "=" )
          IF ( EQPTR .LE. 1 ) THEN
             STATUS = DTASK__BADDEF
-            CALL EMS_REP( 'DTASK_CONTROL', 
+            CALL EMS_REP( 'DTASK_CONTROL',
      :                    'Invalid environment variable specification',
      :                    STATUS )
 
@@ -247,7 +247,7 @@
      :                       STATUS )
 
          ENDIF
-         
+
       ELSE IF ( UACT .EQ. 'PAR_RESET' ) THEN
          RVALUE = VALUE
 *  Find the action number
@@ -259,21 +259,21 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL SUBPAR_DEACT( 'R', STATUS )
          ELSEIF ( LENGTH .EQ. 0 ) THEN
-            CALL ERR_ANNUL( STATUS )                        
+            CALL ERR_ANNUL( STATUS )
             CALL SUBPAR_DEACT( 'R', STATUS )
          ENDIF
 
       ELSE
 *  Invalid CONTROL action
          STATUS = DTASK__INVCONTROL
-         CALL ERR_REP( 'DTASK_CONTROL1', 
+         CALL ERR_REP( 'DTASK_CONTROL1',
      :   'DTASK: Invalid ACTION request for CONTROL context',
      :    STATUS )
 
       ENDIF
 
 *  Acknowledge control message to requesting task
-      
+
       MESSTATUS = STATUS
       STATUS = SAI__OK
       CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTROL, ACTION,

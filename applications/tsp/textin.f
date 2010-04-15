@@ -27,7 +27,7 @@ C                               source.
 C    (5) OBS        (Char)     Observing station (? for list), NO to give
 C                               longitude and latitude explicitly.
 C        LONG       (Double)   Longitude of site (degrees, west +ve)
-C        LAT        (Double)   Geodetic latitude of site (degrees, north +ve) 
+C        LAT        (Double)   Geodetic latitude of site (degrees, north +ve)
 C        EXTCOEF    (Real)     Extinction coefficient (prompt is repeated
 C                              for each channel).
 C
@@ -38,13 +38,13 @@ C
 C-
 C
 C  History:
-C    24/2/1992   Original Version.   JAB/AAO 
+C    24/2/1992   Original Version.   JAB/AAO
 C
 
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'                          
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'USER_ERR'  
+      INCLUDE 'USER_ERR'
 
 *  Status argument
       INTEGER STATUS
@@ -66,8 +66,8 @@ C
       INTEGER IH,ID,IM
       DOUBLE PRECISION SEC,RM,DM
       INTEGER J,SIGN
-      INTEGER NSTRT                        
-      
+      INTEGER NSTRT
+
       CHARACTER*64 LABEL,UNITS
       CHARACTER*64 OBS
       CHARACTER*10 C
@@ -77,7 +77,7 @@ C
       LOGICAL QZ,UZ,VZ
       LOGICAL DONE
       INTEGER N
-      INTEGER STAT      
+      INTEGER STAT
       INTEGER NUM
 
 *  Get Locators to the input and output datasets
@@ -138,7 +138,7 @@ C
 
          CALL SLA_INTIN(DECSTRING,NSTRT,ID,J)
          IF (J .EQ. -1) THEN
-             ID = -ID                     
+             ID = -ID
              SIGN = -1
          ELSE
              SIGN = 1
@@ -148,7 +148,7 @@ C
 
          CALL SLA_INTIN(DECSTRING,NSTRT,IM,J)
          CALL SLA_DFLTIN(DECSTRING,NSTRT,SEC,J)
-         CALL SLA_DAF2R(ID,IM,SEC,DM,J)     
+         CALL SLA_DAF2R(ID,IM,SEC,DM,J)
          IF (SIGN .EQ. -1) THEN
              DM = -DM
          ENDIF
@@ -166,7 +166,7 @@ C
 *  Convert to upper case
              CALL CHR_UCASE(OBS)
              IF (STATUS .NE. SAI__OK) THEN
-                 GOTO 500    
+                 GOTO 500
              ELSE IF (OBS .EQ. 'HELP') THEN
 
 *  If it is HELP output a list of possible station identifiers
@@ -217,10 +217,10 @@ C
              CALL PAR_GET0R('EXTCOEF',%VAL(EPTR+(I-1)*4),STATUS)
              CALL PAR_CANCL('EXTCOEF',STATUS)
          ENDDO
-           
+
 *  Map intensity data
 
-         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)   
+         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)
 
 *  Correct Intensity data
 
@@ -228,7 +228,7 @@ C
              CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
      :                   %VAL(EPTR),%VAL(DPTR))
          ENDIF
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Correct variance data
 
@@ -257,7 +257,7 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
      :                   %VAL(EPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Get Q variance and correct it
@@ -283,7 +283,7 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
      :                   %VAL(EPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Get U variance and correct it
@@ -309,7 +309,7 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
      :                   %VAL(EPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Get V variance and correct it
@@ -330,7 +330,7 @@ C
 
 *  Unmap data and annul locators
 
-      CALL TSP_UNMAP(LOC,STATUS)                                      
+      CALL TSP_UNMAP(LOC,STATUS)
 
 500   CONTINUE
       CALL DAT_ANNUL(ILOC,STATUS)
@@ -344,7 +344,7 @@ C
 C+
 C
 C     T S P _ E X T I N
-C 
+C
 C     Apply extinction correction to a data array. The array C is an
 C     array of extinction coefficients as a function of wavelength which
 C     is used to calculate the extinction correction to the data. The array
@@ -379,10 +379,10 @@ C
 
       DO IX=1,NX
         DO IC=1,NC
-          IF (DATA(IC,IX) .NE. VAL__BADR .AND. 
+          IF (DATA(IC,IX) .NE. VAL__BADR .AND.
      :              C(IC) .NE. VAL__BADR) THEN
              DATA(IC,IX)=DATA(IC,IX)*10.0**(0.4*C(IC)*(AM(IX)-1))
-       
+
           ELSE
              DATA(IC,IX) = VAL__BADR
           ENDIF
@@ -394,7 +394,7 @@ C
 
 
 
-      SUBROUTINE TSP_AIRMASS(RM,DM,LONG,LAT,SIZE,MJD,AM,STATUS) 
+      SUBROUTINE TSP_AIRMASS(RM,DM,LONG,LAT,SIZE,MJD,AM,STATUS)
 *+
 *
 *   T S P _ A I R M A S S
@@ -413,7 +413,7 @@ C
 *
 *   Jeremy Bailey    24/2/1992
 *
-*+  
+*+
       IMPLICIT NONE
 
 *  Parameters
@@ -439,7 +439,7 @@ C
 
 *  Loop over points in the time series
       DO I=1,SIZE
-         
+
 *  Calculate local apparent sidereal time (We ignore the difference between
 *  UTC and UT1, and the fact that SLA_EQEQX should really use TDB rather than
 *  UTC)

@@ -11,7 +11,7 @@ c     astSpecFluxFrame
 f     AST_SPECFLUXFRAME
 
 *  Description:
-*     A SpecFluxFrame combines a SpecFrame and a FluxFrame into a single 
+*     A SpecFluxFrame combines a SpecFrame and a FluxFrame into a single
 *     2-dimensional compound Frame. Such a Frame can for instance be used
 *     to describe a Plot of a spectrum in which the first axis represents
 *     spectral position and the second axis represents flux.
@@ -21,13 +21,13 @@ f     AST_SPECFLUXFRAME
 
 *  Attributes:
 *     The SpecFluxFrame class does not define any new attributes beyond
-*     those which are applicable to all CmpFrames. However, the attributes 
+*     those which are applicable to all CmpFrames. However, the attributes
 *     of the component Frames can be accessed as if they were attributes
-*     of the SpecFluxFrame. For instance, the SpecFluxFrame will recognise 
-*     the "StdOfRest" attribute and forward access requests to the component 
-*     SpecFrame. An axis index can optionally be appended to the end of any 
-*     attribute name, in which case the request to access the attribute will 
-*     be forwarded to the primary Frame defining the specified axis. 
+*     of the SpecFluxFrame. For instance, the SpecFluxFrame will recognise
+*     the "StdOfRest" attribute and forward access requests to the component
+*     SpecFrame. An axis index can optionally be appended to the end of any
+*     attribute name, in which case the request to access the attribute will
+*     be forwarded to the primary Frame defining the specified axis.
 
 *  Functions:
 c     The SpecFluxFrame class does not define any new functions beyond those
@@ -43,12 +43,12 @@ f     The SpecFluxFrame class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -127,7 +127,7 @@ static const char *(* parent_gettitle)( AstFrame *, int * );
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetTitle_Buff[ 0 ] = 0;
@@ -142,8 +142,8 @@ astMAKE_INITGLOBALS(SpecFluxFrame)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 static char gettitle_buff[ 101 ];
@@ -205,9 +205,9 @@ static AstFluxFrame *GetFluxFrame( AstSpecFluxFrame *this, int std, int *status 
 *     this
 *        Pointer to the SpecFluxFrame.
 *     std
-*        If non zero, then the returned FluxFrame is a standardised copy of 
+*        If non zero, then the returned FluxFrame is a standardised copy of
 *        the FluxFrame in the supplied SpecFluxFrame, in which the System has
-*        been set explicitly (rather than potentially being defaulted), and 
+*        been set explicitly (rather than potentially being defaulted), and
 *        the Units have been cleared to use default units appropriate to
 *        the flux System.
 *     status
@@ -218,7 +218,7 @@ static AstFluxFrame *GetFluxFrame( AstSpecFluxFrame *this, int std, int *status 
 *     longer needed.
 
 *  Notes:
-*     NULL is returned if this function is invoked with the global error 
+*     NULL is returned if this function is invoked with the global error
 *     status set or if it should fail for any reason.
 */
 
@@ -274,9 +274,9 @@ static AstSpecFrame *GetSpecFrame( AstSpecFluxFrame *this, int std, int *status 
 *     this
 *        Pointer to the SpecFluxFrame.
 *     std
-*        If non zero, then the returned SpecFrame is a standardised copy of 
+*        If non zero, then the returned SpecFrame is a standardised copy of
 *        the SpecFrame in the supplied SpecFluxFrame, in which the System
-*        and Units have been set explicitly to the values appropriate to the 
+*        and Units have been set explicitly to the values appropriate to the
 *        flux system in use in the FluxFrame in the supplied SpecFluxFrame.
 *     status
 *        Pointer to the inherited status variable.
@@ -286,7 +286,7 @@ static AstSpecFrame *GetSpecFrame( AstSpecFluxFrame *this, int std, int *status 
 *     longer needed.
 
 *  Notes:
-*     NULL is returned if this function is invoked with the global error 
+*     NULL is returned if this function is invoked with the global error
 *     status set or if it should fail for any reason.
 */
 
@@ -342,7 +342,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 *     const char *GetTitle( AstFrame *this_frame, int *status )
 
 *  Class Membership:
-*     SpecFluxFrame member function (over-rides the astGetTitle method 
+*     SpecFluxFrame member function (over-rides the astGetTitle method
 *     inherited from the CmpFrame class).
 
 *  Description:
@@ -366,11 +366,11 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS           
-   AstSpecFluxFrame *this;       
-   AstSpecFrame *sf;             
-   AstFluxFrame *ff;             
-   const char *result;           
+   astDECLARE_GLOBALS
+   AstSpecFluxFrame *this;
+   AstSpecFrame *sf;
+   AstFluxFrame *ff;
+   const char *result;
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -444,7 +444,7 @@ void astInitSpecFluxFrameVtab_(  AstSpecFluxFrameVtab *vtab, const char *name, i
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -529,10 +529,10 @@ static AstMapping *MakeMap2( AstSpecFluxFrame *this, int *status ){
 *     SpecFluxFrame member function.
 
 *  Description:
-*     The second Mapping used by MakeSFMapping contains three Mappings in 
-*     parallel which converts v1 (flux value) and x1 (spectral position) into  
-*     default units, and passes the third axis (a copy of flux value) 
-*     unchanged. 
+*     The second Mapping used by MakeSFMapping contains three Mappings in
+*     parallel which converts v1 (flux value) and x1 (spectral position) into
+*     default units, and passes the third axis (a copy of flux value)
+*     unchanged.
 
 *  Parameters:
 *     this
@@ -545,7 +545,7 @@ static AstMapping *MakeMap2( AstSpecFluxFrame *this, int *status ){
 *     created. The Mapping will have 3 inputs and 3 outputs.
 
 *  Notes:
-*     NULL is returned if this function is invoked with the global error 
+*     NULL is returned if this function is invoked with the global error
 *     status set or if it should fail for any reason.
 */
 
@@ -565,15 +565,15 @@ static AstMapping *MakeMap2( AstSpecFluxFrame *this, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return ret;
 
-/* Input 0 is the supplied FluxFrame value and output 0 is the corresponding 
-   value in the default units for the FluxFrame system. Take a copy of the 
-   supplied FluxFrame, and fix its System value (which may be a default value 
-   based on the Units string), and then clear the Units so that it represents 
+/* Input 0 is the supplied FluxFrame value and output 0 is the corresponding
+   value in the default units for the FluxFrame system. Take a copy of the
+   supplied FluxFrame, and fix its System value (which may be a default value
+   based on the Units string), and then clear the Units so that it represents
    default units for the System. */
    f1 = (AstFrame *) GetFluxFrame( this, 0, status );
    f2 = (AstFrame *) GetFluxFrame( this, 1, status );
 
-/* Now, if conversion was possible, get the Mapping from the supplied 
+/* Now, if conversion was possible, get the Mapping from the supplied
    FluxFrame to the default units FluxFrame. */
    fs = astConvert( f1, f2, "" );
    f1 = astAnnul( f1 );
@@ -583,16 +583,16 @@ static AstMapping *MakeMap2( AstSpecFluxFrame *this, int *status ){
       ax1_map = astGetMapping( fs, AST__BASE, AST__CURRENT );
       fs = astAnnul( fs );
 
-/* Input 1 is the supplied SpecFrame value and output 1 is the corresponding 
+/* Input 1 is the supplied SpecFrame value and output 1 is the corresponding
    value in the spectral system used by the flux system (wavelength or
-   frequency). Take a copy of the supplied SpecFrame, and fix its System 
+   frequency). Take a copy of the supplied SpecFrame, and fix its System
    value to wavelength or frequency (depending on the System value of the
    FluxFrame), and set up units of Hz or Angstrom (these are the spectral
    position units used within the default flux units for a FluxFrame). */
       f1 = (AstFrame *) GetSpecFrame( this, 0, status );
       f2 = (AstFrame *) GetSpecFrame( this, 1, status );
 
-/* Now, if conversion was possible, get the Mapping from the supplied 
+/* Now, if conversion was possible, get the Mapping from the supplied
    SpecFrame to the required SpecFrame. */
       fs = astConvert( f1, f2, "" );
       f1 = astAnnul( f1 );
@@ -644,9 +644,9 @@ static AstMapping *MakeMap3( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
 *     SpecFluxFrame member function.
 
 *  Description:
-*     The third Mapping used by MakeSFMapping converts input (v1,x1) in 
-*     default units to output (v2,x2) in default units. The third axis (x1) 
-*     in original units is converted to x2 in original units. 
+*     The third Mapping used by MakeSFMapping converts input (v1,x1) in
+*     default units to output (v2,x2) in default units. The third axis (x1)
+*     in original units is converted to x2 in original units.
 
 *  Parameters:
 *     target
@@ -661,7 +661,7 @@ static AstMapping *MakeMap3( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
 *     created. The Mapping will have 3 inputs and 3 outputs.
 
 *  Notes:
-*     NULL is returned if this function is invoked with the global error 
+*     NULL is returned if this function is invoked with the global error
 *     status set or if it should fail for any reason.
 */
 
@@ -684,8 +684,8 @@ static AstMapping *MakeMap3( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
    if ( !astOK ) return ret;
 
 /* The first two inputs and outputs are related by a TranMap which
-   converts between standardised (v1,x1) and standardised (v2,x2). Get 
-   pointers to the standardised SpecFrames and FluxFrames in the two 
+   converts between standardised (v1,x1) and standardised (v2,x2). Get
+   pointers to the standardised SpecFrames and FluxFrames in the two
    supplied SpecFluxFrames. */
    ff1 = GetFluxFrame( target, 1, status );
    sf1 = GetSpecFrame( target, 1, status );
@@ -717,8 +717,8 @@ static AstMapping *MakeMap3( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
    if( fmap ) fmap = astAnnul( fmap );
    if( imap ) imap = astAnnul( imap );
 
-/* The third input and output are related by a Mapping which converts 
-   between supplied (x1) and supplied (x2). Get pointers to the original 
+/* The third input and output are related by a Mapping which converts
+   between supplied (x1) and supplied (x2). Get pointers to the original
    unmodified SpecFrames in the two supplied SpecFluxFrames. */
    sf1 = GetSpecFrame( target, 0, status );
    sf2 = GetSpecFrame( result, 0, status );
@@ -748,7 +748,7 @@ static AstMapping *MakeMap3( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
    return ret;
 }
 
-static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1, 
+static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
                              AstFluxFrame *v2, AstSpecFrame *x2, int *status ){
 /*
 *  Name:
@@ -762,15 +762,15 @@ static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
 
 *  Synopsis:
 *     #include "specfluxframe.h"
-*     AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1, 
+*     AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
 *                           AstFluxFrame *v2, AstSpecFrame *x2, int *status )
 
 *  Class Membership:
 *     SpecFluxFrame member function.
 
 *  Description:
-*     Theis creates a 2-input 2-output Mapping which transforms 
-*     input (v1,x1) in default units to output (v2,x2) in default units. 
+*     Theis creates a 2-input 2-output Mapping which transforms
+*     input (v1,x1) in default units to output (v2,x2) in default units.
 
 *  Parameters:
 *     v1
@@ -786,10 +786,10 @@ static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
 
 *  Returned Value:
 *     A pointer to the required Mapping, or NULL if the Mapping cannot be
-*     created. 
+*     created.
 
 *  Notes:
-*     NULL is returned if this function is invoked with the global error 
+*     NULL is returned if this function is invoked with the global error
 *     status set or if it should fail for any reason.
 */
 
@@ -829,7 +829,7 @@ static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
    with respect to input spectral position (x1). */
       rate = astRateMap( m, 0, 0, "", status );
 
-/* A MathMap which is used to divide the flux value (v1) by the absolute rate 
+/* A MathMap which is used to divide the flux value (v1) by the absolute rate
    of change of x2 wrt x1 */
       fwd[ 0 ] = "out=in0/abs(in1)";
       inv[ 0 ] = "in0";
@@ -847,11 +847,11 @@ static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
       outperm[ 2 ] = 1;
       perm = astPermMap( 2, inperm, 3, outperm, NULL, "", status );
 
-/* Now combine these component Mappings together. 
+/* Now combine these component Mappings together.
    --------------------------------------------- */
 
-/* First put the UnitMap and the RateMap in parallel. This produces a 2-in 
-   2-out Mapping in which the inputs are (v1,x1) and the outputs are 
+/* First put the UnitMap and the RateMap in parallel. This produces a 2-in
+   2-out Mapping in which the inputs are (v1,x1) and the outputs are
    (v1,dx2/dx1). */
       cmap1 = astCmpMap( unit, rate, 0, "", status );
 
@@ -865,21 +865,21 @@ static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
    are (v2,x2). */
       cmap3 = astCmpMap( cmap2, m, 0, "", status );
 
-/* Finally put this in series with the PermMap. This results in a 2-in, 
-   2-out Mapping in which the inputs are (v1,x1) and the outputs are 
+/* Finally put this in series with the PermMap. This results in a 2-in,
+   2-out Mapping in which the inputs are (v1,x1) and the outputs are
    (v2,x2). */
       ret = (AstMapping *) astCmpMap( perm, cmap3, 1, "", status );
 
 /* Free resources. */
-      fs = astAnnul( fs );      
-      m = astAnnul( m );      
-      rate = astAnnul( rate );      
-      div= astAnnul( div );      
-      unit = astAnnul( unit );      
-      perm = astAnnul( perm );      
-      cmap1 = astAnnul( cmap1 );      
-      cmap2 = astAnnul( cmap2 );      
-      cmap3 = astAnnul( cmap3 );      
+      fs = astAnnul( fs );
+      m = astAnnul( m );
+      rate = astAnnul( rate );
+      div= astAnnul( div );
+      unit = astAnnul( unit );
+      perm = astAnnul( perm );
+      cmap1 = astAnnul( cmap1 );
+      cmap2 = astAnnul( cmap2 );
+      cmap3 = astAnnul( cmap3 );
    }
 
 /* If an error has occurred, return NULL. */
@@ -889,7 +889,7 @@ static AstMapping *MakeMapF( AstFluxFrame *v1, AstSpecFrame *x1,
    return ret;
 }
 
-static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1, 
+static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
                              AstFluxFrame *v2, AstSpecFrame *x2, int *status ){
 /*
 *  Name:
@@ -903,7 +903,7 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
 
 *  Synopsis:
 *     #include "specfluxframe.h"
-*     AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1, 
+*     AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
 *                           AstFluxFrame *v2, AstSpecFrame *x2 )
 
 *  Class Membership:
@@ -926,10 +926,10 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
 
 *  Returned Value:
 *     A pointer to the required Mapping, or NULL if the Mapping cannot be
-*     created. 
+*     created.
 
 *  Notes:
-*     NULL is returned if this function is invoked with the global error 
+*     NULL is returned if this function is invoked with the global error
 *     status set or if it should fail for any reason.
 */
 
@@ -958,9 +958,9 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
    if ( !astOK ) return ret;
 
 /* We create a CmpMap in which the forward transformation foes from
-   (v2,x2) to (v1,x1) and we finally invert this Mapping to get the 
-   required Mapping in which the *inverse* transformation goes from 
-   (v2,x2) to (v1,x1). 
+   (v2,x2) to (v1,x1) and we finally invert this Mapping to get the
+   required Mapping in which the *inverse* transformation goes from
+   (v2,x2) to (v1,x1).
 
    First create the required component Mappings.
    --------------------------------------------- */
@@ -971,17 +971,17 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
       m = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
 /* A 1-input 1-output Mapping in which the input is spectral position x1
-   and the output is the rate of change of spectral position x2 with 
+   and the output is the rate of change of spectral position x2 with
    respect to spectral position x1. */
       rate = astRateMap( m, 0, 0, "", status );
 
-/* Now invert "m" so that its forward transformation goes from x2 to x1. 
+/* Now invert "m" so that its forward transformation goes from x2 to x1.
    The RateMap created above retains a copy of the original Invert flag
    for "m" and uses it in preference to the current value when transforming
    points. */
       astInvert( m );
 
-/* A MathMap which is used to multiple the flux value v2 by the 
+/* A MathMap which is used to multiple the flux value v2 by the
    absolute rate of change of x2 wrt x1 */
       fwd[ 0 ] = "out=in0*abs(in1)";
       inv[ 0 ] = "in0";
@@ -999,11 +999,11 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
       outperm[ 2 ] = 1;
       perm = astPermMap( 2, inperm, 3, outperm, NULL, "", status );
 
-/* Now combine these component Mappings together. 
+/* Now combine these component Mappings together.
    --------------------------------------------- */
 
-/* First put the UnitMap and the RateMap in parallel. This produces a 2-in 
-   2-out Mapping in which the inputs are (v2,x1) and the outputs are 
+/* First put the UnitMap and the RateMap in parallel. This produces a 2-in
+   2-out Mapping in which the inputs are (v2,x1) and the outputs are
    (v2,dx2/dx1). */
       cmap1 = astCmpMap( unit, rate, 0, "", status );
 
@@ -1022,7 +1022,7 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
 
 /* Now put the UnitMap in parallel with the (x2->x1 Mapping to get a
    2-in, 2-out Mapping in which the inputs are (v2,x2) and the outputs are
-   (v2,x1). */     
+   (v2,x1). */
       cmap5 = astCmpMap( unit, m, 0, "", status );
 
 /* Finally put this in series with "cmap4" to get a 2-in 2-out Mapping
@@ -1034,17 +1034,17 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
       astInvert( ret );
 
 /* Free resources. */
-      fs = astAnnul( fs );      
-      m = astAnnul( m );      
-      rate = astAnnul( rate );      
-      mult = astAnnul( mult );      
-      unit = astAnnul( unit );      
-      perm = astAnnul( perm );      
-      cmap1 = astAnnul( cmap1 );      
-      cmap2 = astAnnul( cmap2 );      
-      cmap3 = astAnnul( cmap3 );      
-      cmap4 = astAnnul( cmap4 );      
-      cmap5 = astAnnul( cmap5 );      
+      fs = astAnnul( fs );
+      m = astAnnul( m );
+      rate = astAnnul( rate );
+      mult = astAnnul( mult );
+      unit = astAnnul( unit );
+      perm = astAnnul( perm );
+      cmap1 = astAnnul( cmap1 );
+      cmap2 = astAnnul( cmap2 );
+      cmap3 = astAnnul( cmap3 );
+      cmap4 = astAnnul( cmap4 );
+      cmap5 = astAnnul( cmap5 );
    }
 
 /* If an error has occurred, return NULL. */
@@ -1054,7 +1054,7 @@ static AstMapping *MakeMapI( AstFluxFrame *v1, AstSpecFrame *x1,
    return ret;
 }
 
-static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result, 
+static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
                           AstMapping **map, int *status ){
 /*
 *  Name:
@@ -1076,8 +1076,8 @@ static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
 
 *  Description:
 *     This function takes two SpecFluxFrames and generates a Mapping that
-*     converts between them, taking account of differences in their 
-*     coordinate systems, systems, units, etc. (but not allowing for any 
+*     converts between them, taking account of differences in their
+*     coordinate systems, systems, units, etc. (but not allowing for any
 *     axis permutations).
 
 *  Parameters:
@@ -1115,8 +1115,8 @@ static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
    AstMapping *tmap3;
    AstMapping *tmap4;
    int inperm[2];
-   int match;                    
-   int outperm[3];     
+   int match;
+   int outperm[3];
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -1153,11 +1153,11 @@ static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
    outperm[ 2 ] = 0;
    map1 = (AstMapping *) astPermMap( 2, inperm, 3, outperm, NULL, "", status );
 
-/* Map2 contains three Mappings in parallel which converts v1 and x1 into 
+/* Map2 contains three Mappings in parallel which converts v1 and x1 into
    default units, and passes the third axis unchanged. */
    map2 = MakeMap2( target, status );
 
-/* Map3 converts ( v1,x1) in default units to (v2,x2) in default units. 
+/* Map3 converts ( v1,x1) in default units to (v2,x2) in default units.
    The third axis (x1) in original units is convert to x2 in original
    units. */
    map3 = map2 ? MakeMap3( target, result, status ) : NULL;
@@ -1178,10 +1178,10 @@ static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
 
 /* Combine all 6 Mappings in series. */
    if( map5 ) {
-      tmap1 = (AstMapping *) astCmpMap( map1, map2, 1, "", status );   
-      tmap2 = (AstMapping *) astCmpMap( tmap1, map3, 1, "", status );   
-      tmap3 = (AstMapping *) astCmpMap( tmap2, map4, 1, "", status );   
-      tmap4 = (AstMapping *) astCmpMap( tmap3, map5, 1, "", status );   
+      tmap1 = (AstMapping *) astCmpMap( map1, map2, 1, "", status );
+      tmap2 = (AstMapping *) astCmpMap( tmap1, map3, 1, "", status );
+      tmap3 = (AstMapping *) astCmpMap( tmap2, map4, 1, "", status );
+      tmap4 = (AstMapping *) astCmpMap( tmap3, map5, 1, "", status );
 
 /* Return the simplified total Mapping. */
       *map = astSimplify( tmap4 );
@@ -1189,15 +1189,15 @@ static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
    }
 
 /* Free resources. */
-   if( map1 ) map1 = astAnnul( map1 );   
-   if( map2 ) map2 = astAnnul( map2 );   
-   if( map3 ) map3 = astAnnul( map3 );   
-   if( map4 ) map4 = astAnnul( map4 );   
-   if( map5 ) map5 = astAnnul( map5 );   
-   if( tmap1 ) tmap1 = astAnnul( tmap1 );   
-   if( tmap2 ) tmap2 = astAnnul( tmap2 );   
-   if( tmap3 ) tmap3 = astAnnul( tmap3 );   
-   if( tmap4 ) tmap4 = astAnnul( tmap4 );   
+   if( map1 ) map1 = astAnnul( map1 );
+   if( map2 ) map2 = astAnnul( map2 );
+   if( map3 ) map3 = astAnnul( map3 );
+   if( map4 ) map4 = astAnnul( map4 );
+   if( map5 ) map5 = astAnnul( map5 );
+   if( tmap1 ) tmap1 = astAnnul( tmap1 );
+   if( tmap2 ) tmap2 = astAnnul( tmap2 );
+   if( tmap3 ) tmap3 = astAnnul( tmap3 );
+   if( tmap4 ) tmap4 = astAnnul( tmap4 );
 
 /* If an error occurred, annul the returned Mapping and clear the
    returned values. */
@@ -1333,14 +1333,14 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Check the global error status. */
    if ( !astOK ) return match;
-   
+
 /* Obtain a pointer to the template SpecFluxFrame structure. */
    template = (AstSpecFluxFrame *) template_frame;
 
-/* If the target is not a SpecFluxFrame, use the results returned by the 
+/* If the target is not a SpecFluxFrame, use the results returned by the
    parent Match method inherited from the CmpFrame class. */
    if( !astIsASpecFluxFrame( target ) ) {
-      match = (*parent_match)( template_frame, target, template_axes, 
+      match = (*parent_match)( template_frame, target, template_axes,
                                target_axes, map, result, status );
 
 
@@ -1348,14 +1348,14 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    and template */
    } else {
 
-/* We must now decide how the order of the axes in the result Frame relates to 
-   the order of axes in the target Frame. There are two factors involved. The 
+/* We must now decide how the order of the axes in the result Frame relates to
+   the order of axes in the target Frame. There are two factors involved. The
    first depends on whether the axis permutation array for the template
    SpecFluxFrame (whose method we are executing) causes an axis
    reversal. Determine this by permuting axis index zero. */
       swap1 = ( astValidateAxis( template, 0, "astMatch" ) != 0 );
 
-/* The second factor depends on whether the axes of the target SpecFluxFrame 
+/* The second factor depends on whether the axes of the target SpecFluxFrame
    causes an axis reversal. Determine this by permuting axis index zero. */
       swap2 = ( astValidateAxis( target, 0, "astMatch" ) != 0 );
 
@@ -1363,13 +1363,13 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    needed. */
       swap = ( swap1 != swap2 );
 
-/* Now check to see if this additional swap is permitted by the template's 
+/* Now check to see if this additional swap is permitted by the template's
    Permute attribute. */
       match = ( !swap || astGetPermute( template ) );
 
 /* Allocate the target and template axes arrays. */
-      *template_axes = astMalloc( sizeof(int)*2 );      
-      *target_axes = astMalloc( sizeof(int)*2 );      
+      *template_axes = astMalloc( sizeof(int)*2 );
+      *target_axes = astMalloc( sizeof(int)*2 );
 
 /* If the Frames still match, we next set up the axis association
    arrays. */
@@ -1540,7 +1540,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* If the template is not a SpecFluxFrame we use the parent SubFrame
    method inherited form the CmpFrame class. */
    if( !template || !astIsASpecFluxFrame( template ) || result_naxes != 2 ) {
-      match = (*parent_subframe)( target_frame, template, result_naxes, 
+      match = (*parent_subframe)( target_frame, template, result_naxes,
                                   target_axes, template_axes, map, result, status );
 
 /* Otherwise... */
@@ -1558,8 +1558,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       astOverlay( template, template_axes, *result );
 
 /* Generate a Mapping that takes account of changes in the coordinate
-   system (system, units, etc.) between the target SpecFluxFrame and the 
-   result SpecFluxFrame. If this Mapping can be generated, set "match" to 
+   system (system, units, etc.) between the target SpecFluxFrame and the
+   result SpecFluxFrame. If this Mapping can be generated, set "match" to
    indicate that coordinate conversion is possible. */
       match = MakeSFMapping( target, (AstSpecFluxFrame *) *result, map, status );
 
@@ -1570,7 +1570,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          target_swap = ( astValidateAxis( target, 0, "astSubFrame" ) != 0 );
 
 /* Coordinates will also be delivered in (flux,spec) pairs, so check
-   to see whether the result SpecFluxFrame coordinate order should be 
+   to see whether the result SpecFluxFrame coordinate order should be
    swapped. */
          result_swap = ( target_swap != ( target_axes[ 0 ] != 0 ) );
 
@@ -1684,7 +1684,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Standard class functions. */
 /* ========================= */
-/* Implement the astIsASpecFluxFrame and astCheckSpecFluxFrame functions using 
+/* Implement the astIsASpecFluxFrame and astCheckSpecFluxFrame functions using
    the macros defined for this purpose in the "object.h" header file. */
 astMAKE_ISA(SpecFluxFrame,CmpFrame)
 astMAKE_CHECK(SpecFluxFrame)
@@ -1716,7 +1716,7 @@ f     RESULT = AST_SPECFLUXFRAME( FRAME1, FRAME2, OPTIONS, STATUS )
 *     This function creates a new SpecFluxFrame and optionally initialises
 *     its attributes.
 *
-*     A SpecFluxFrame combines a SpecFrame and a FluxFrame into a single 
+*     A SpecFluxFrame combines a SpecFrame and a FluxFrame into a single
 *     2-dimensional compound Frame. Such a Frame can for instance be used
 *     to describe a Plot of a spectrum in which the first axis represents
 *     spectral position and the second axis represents flux.

@@ -1,13 +1,13 @@
 	SUBROUTINE CUT_NUMBERS( X_LO, X_HI, Y_LO, Y_HI, XST, XEN, YST, YEN,
-     :	                        CUT_MAGNIF, CUT_AXISRAT, XTICK_START, 
-     :	                        XTICK_INTERVAL, CUT_NUMYTIC, CUT_NUMXTIC, 
+     :	                        CUT_MAGNIF, CUT_AXISRAT, XTICK_START,
+     :	                        XTICK_INTERVAL, CUT_NUMYTIC, CUT_NUMXTIC,
      :	                        STATUS)
 
 * Description : Routine to write numbers on the X and Y axes of a CUT plot
 
-* Invocation : 
+* Invocation :
 
-* Parameters : 
+* Parameters :
 
 * Authors : C.Aspin (UOE)
 
@@ -38,11 +38,11 @@
 
 * Import :
 
-	INTEGER 
+	INTEGER
      :	  CUT_NUMXTIC,
      :	  CUT_NUMYTIC
 
-	REAL 
+	REAL
      :    CUT_MAGNIF,
      :	  CUT_AXISRAT,
      :	  XEN,
@@ -70,7 +70,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :	  FONT,
      :	  J,
      :	  NPOINT,
@@ -79,7 +79,7 @@
      :	  PREC,
      :	  YHIEXP
 
-	REAL 
+	REAL
      :	  DXTICK_INTERVAL,
      :	  DXTICK_START,
      :	  TEXT_HT,
@@ -134,7 +134,7 @@
 
 * test if this is an image cut or a histogram plot
 
-	IF( CUT_HISTOGRAM .EQ. 'YES') THEN 
+	IF( CUT_HISTOGRAM .EQ. 'YES') THEN
 
 * JUST DO SAME AS IMAGE CUT AT THE MOMENT BUT THIS WILL NEED TO BE CHANGED
 * FOR A REAL HISTOGRAM WITH BIN NUMBERS ALONG BOTTOM AXIS
@@ -330,7 +330,7 @@
 
 	  NPOINT = -3
 
-	ELSE 
+	ELSE
 
 	  NPOINT = -4
 

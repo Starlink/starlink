@@ -22,20 +22,20 @@
 
 *  Returned Value:
 *     CHR_LOWER = CHARACTER * 1 (Returned)
-*        Lowercase equivalent of the given character, if the given 
-*        character is an uppercase letter; otherwise the character 
+*        Lowercase equivalent of the given character, if the given
+*        character is an uppercase letter; otherwise the character
 *        is returned unchanged.
 
 *  Algorithm:
-*     This algorithm will only work for character sets which have a 
-*     constant offset between upper and lowercase and is therefore 
+*     This algorithm will only work for character sets which have a
+*     constant offset between upper and lowercase and is therefore
 *     dependent upon the Fortran 77 implementation.
 *
 *     Get the integer code of the given character.
 *     If the given character is not an uppercase letter then
 *        Set the returned value to the given character.
 *     Else
-*        The returned value is set to its lowercase equivalent, 
+*        The returned value is set to its lowercase equivalent,
 *        assuming a constant offset between upper and lowercase.
 *     Endif
 
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

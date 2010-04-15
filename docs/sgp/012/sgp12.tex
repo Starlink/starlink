@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -59,9 +59,9 @@ project office attempting to convert an ADAM application into an AVS module.
 The experiment was successful in that we succeeded in running a KAPPA
 application (ADD) as a module in an AVS network without modifying the
 applications program code in any way. We took many short cuts and it became
-clear that doing the job properly would be a major exercise, but we 
-learned enough to know that the job is feasible and gained a clear idea of 
-what the final system would look like and what it would be capable of.  
+clear that doing the job properly would be a major exercise, but we
+learned enough to know that the job is feasible and gained a clear idea of
+what the final system would look like and what it would be capable of.
 
 \section{What is AVS}
 
@@ -88,7 +88,7 @@ defined by code in the module but can be altered by the user with the ``layout
 editor'' (for example, the widget for an integer parameter could be changed
 from a dial to a text entry field) and parameters can be converted to input
 ports so that they can be connected to the output ports of other modules
-instead of being set directly from the control panel. 
+instead of being set directly from the control panel.
 
 The layout editor can also move controls from one control panel to another and
 could be used to create a single control panel  for an entire network with the
@@ -122,7 +122,7 @@ waiting for it to  finish before invoking the next.
 
 AVS comes with a large number of modules which implement a wide range of 2 and
 3D image processing algorithms and data visualization techniques. It is access
-to these data visualization modules that makes the use of AVS as a GUI for ADAM 
+to these data visualization modules that makes the use of AVS as a GUI for ADAM
 particularly attractive.
 
 \section{AVS Data Types}
@@ -161,7 +161,7 @@ modified to return an error rather than prompting under these circumstances.
 \item[The message/error system]
 Although an AVS module can write to its standard output or error channels, the
 output appears in the terminal window from which AVS was invoked which is not
-ideal. The error and message systems therefore should be modified to call 
+ideal. The error and message systems therefore should be modified to call
 AVS subroutines that display messages in pop-up windows.
 
 \end{description}
@@ -174,7 +174,7 @@ supported but C is the easier option because the routines have to deal with
 pointers and structures and this is somewhat convoluted in Fortran and didn't
 appear very portable. (We initially started work in Fortran but switched to C
 after failing to get certain operations to work---however, we were working
-without manuals and the DEC programmer was not familar with Fortran.) 
+without manuals and the DEC programmer was not familar with Fortran.)
 
 This initialisation routine has to do the following:
 \begin{itemize}
@@ -198,7 +198,7 @@ This initialisation routine has to do the following:
 \item Create AVS parameters of type character string for all input and output NDFs
   to allow the names of the NDFs to be set by the user. This enables the user
   to explicitly set the name of an input or output NDF instead of having some
-  scratch file name generated. This is necessary when a module has ports not 
+  scratch file name generated. This is necessary when a module has ports not
   connected to any other module.
 
 \end{itemize}
@@ -206,7 +206,7 @@ This is straightforward and could conceivably be generated automatically from
 the interface file (perhaps with the addition of some new interface file
 keywords). Alternatively, AVS contains a module generation tool that uses menus
 to define parameters and ports and their properties and will generate the
-neccessary code (in either C or Fortran).      
+neccessary code (in either C or Fortran).
 
 The execution routine has to:
 \begin{itemize}
@@ -220,7 +220,7 @@ If the decision is to execute the application code:
 
 \item Copy the values of the AVS parameters to the corresponding ADAM parameters.
 
-\item Generate names for any output NDFs which don't have their names specified 
+\item Generate names for any output NDFs which don't have their names specified
   by AVS parameters and set the corresponding ADAM parameters.
 
 \item Execute the applications code.
@@ -232,9 +232,9 @@ If the decision is to execute the application code:
 The decision whether to execute the application or not is quite tricky but is
 something along the lines of:
 \begin{quote}
-	If all inputs have either a valid value or the corresponding NDF 
-	name parameter has a value then execute if either ``GO'' was 
-	pressed or one of the inputs has changed its value. 
+	If all inputs have either a valid value or the corresponding NDF
+	name parameter has a value then execute if either ``GO'' was
+	pressed or one of the inputs has changed its value.
 \end{quote}
 
 The destruction routine is called when a module is removed from the network or
@@ -283,26 +283,26 @@ What clouds does this particular silver lining have ?
 \begin{quote}
 	``AVS was originally implemented to run on very high performance,
 	true colour (24 plane) workstations with considerable hardware
-	support for 3D graphics rendering, including gouraud shading, 
-	lighting, texture mapping, and hardware-assisted polygon and 
+	support for 3D graphics rendering, including gouraud shading,
+	lighting, texture mapping, and hardware-assisted polygon and
 	sphere rendering and transformations.''
 \end{quote}
   Having all the applications in a network loaded at once places
   considerable demands on things like system swap space, and the intermediate
   files created as the network executed would stretch the available disk space.
-  Inadequate system resources could easily make the whole thing effectively 
+  Inadequate system resources could easily make the whole thing effectively
   unusable.
 
 \item A non-negligible amount of effort would be required to implement the system,
   although probably not more (and quite possibly less) than other approaches to
   creating a GUI interface for ADAM. I would estimate perhaps 3 man-months to
-  get a system that could demonstrate what could be achieved and another 3 to 
+  get a system that could demonstrate what could be achieved and another 3 to
   get a releaseable system. Elapsed time would probably be double this.
 
 \item The ``global association'' mechanism used to connect the output of one ADAM
   application to the input of another is probably superfluous and may well
-  conflict with way a network works. It may therefore be necessary to modify 
-  all interface files (alternatively it might be better to disable this 
+  conflict with way a network works. It may therefore be necessary to modify
+  all interface files (alternatively it might be better to disable this
   mechanism within the parameter system).
 
 \end{itemize}

@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,14 +143,14 @@
      :                         STATUS )
 
 *  Get a text string from the user.
-            ELSE 
+            ELSE
                CALL PAR_GET0C( PTXT, TXT( NTXT + 1 ), STATUS )
 
 *  If null is supplied, no text will be written at this position but not
 *  exit.
                IF ( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
-      
+
 *  Or if a valid string is obtained, get its used length.
                ELSE IF ( STATUS .EQ. SAI__OK ) THEN
                   NTXT = NTXT + 1

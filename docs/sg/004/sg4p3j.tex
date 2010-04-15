@@ -38,7 +38,7 @@ It is addressed by a tape descriptor, TD.
 \label{S_fio}
 \markboth{Programmers}{\stardocname}
 
-A file is opened by associating it with parameter 
+A file is opened by associating it with parameter
 PAR using the {\bf FIO\_ASSOC}
 routine:
 
@@ -49,7 +49,7 @@ routine:
 \end{small}
 
 This has two more parameters (FORM and RECSZ) than most ASSOC routines.
-The mode of opening, MODE, may be `READ', `WRITE', `UPDATE', or `APPEND'. 
+The mode of opening, MODE, may be `READ', `WRITE', `UPDATE', or `APPEND'.
 A new file is created if it is `WRITE', or if it is `APPEND' and the file does
 not exist.
 FORM specifies the type of formatting and the carriage control processing to be

@@ -5,16 +5,16 @@
 *     SCULIB_DECODE_FILTER
 
 *  Purpose:
-*     decode filter name into names and wavelengths of 
+*     decode filter name into names and wavelengths of
 *     filters in front of each instrument section in use
 
 *  Description:
-*     This routine decodes the filter name to give the name and central 
+*     This routine decodes the filter name to give the name and central
 *     wavelength of the filter in front of each sub-instrument being used.
 *
 *        The filter name should be in format <short>:<long> where these
 *     are the names of the filters in front of the short and long-wave
-*     focal planes. 
+*     focal planes.
 *
 *        <short > can be:-  '350'     short wavelength = 350.0  name = '350'
 *                           '450'                        450.0         '450'
@@ -40,7 +40,7 @@
 *     If the filter name does not fit the `pattern' described an error message
 *     will be output and the routine return with bad status. The routine is
 *     insensitive to the case of `PHOT'.
-*  
+*
 
 *  Invocation:
 *     CALL SCULIB_DECODE_FILTER (FILTER, N_SUB, SUB_INSTRUMENT,
@@ -57,13 +57,13 @@
 *           the name of the filter in front of each sub-instrument
 *     WAVELENGTH (N_SUB)       = REAL (Returned)
 *           the wavelength in microns of the filters in front of the sub
-*           instruments being used. An inappropriate filter will have 
+*           instruments being used. An inappropriate filter will have
 *           wavelength set to VAL__BADR
 *     STATUS                   = INTEGER (Given and returned)
 *           global status
 
 *  Notes:
-*     The wavelength values are probably out of step with those currently 
+*     The wavelength values are probably out of step with those currently
 *     in use by the real-time system.
 
 
@@ -190,9 +190,9 @@
             P2000_WAVE = 350.0
          ELSE IF (LONG .EQ. '450') THEN
             LONG_WAVE = 450.0
-            P1100_WAVE = 450.0 
-            P1300_WAVE = 450.0 
-            P2000_WAVE = 450.0 
+            P1100_WAVE = 450.0
+            P1300_WAVE = 450.0
+            P2000_WAVE = 450.0
          ELSE IF (LONG .EQ. '600') THEN
             LONG_WAVE = 600.0
             P1100_WAVE = 600.0
@@ -202,7 +202,7 @@
             LONG_WAVE = 750.0
             P1100_WAVE = 750.0
             P1300_WAVE = 750.0
-            P2000_WAVE = 750.0 
+            P2000_WAVE = 750.0
          ELSE IF (LONG .EQ. '850') THEN
             LONG_WAVE = 850.0
             P1100_WAVE = 850.0

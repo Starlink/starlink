@@ -4,7 +4,7 @@
 *     gsdac_putJCMTStateS
 
 *  Purpose:
-*     Fill the subband-dependent JCMTState headers. 
+*     Fill the subband-dependent JCMTState headers.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,9 +13,9 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
+*     gsdac_putJCMTStateS ( const gsdVars *gsdVars,
 *                           const unsigned int stepNum, const int subBandNum,
-*                           const dasFlag dasFlag, const gsdWCS *wcs, 
+*                           const dasFlag dasFlag, const gsdWCS *wcs,
 *                           struct JCMTState *record, int *status );
 
 *  Arguments:
@@ -38,7 +38,7 @@
 *     Determines the headers required for a JCMTState header
 *     in an ACSIS format file from a GSD file.  This routine determines
 *     the values of the JCMTState elements which are dependent upon
-*     this particular subband.  
+*     this particular subband.
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
@@ -102,9 +102,9 @@
 #include "jcmt/state.h"
 #include "smurf_par.h"
 
-void gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
+void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
                            const unsigned int stepNum, const int subBandNum,
-                           const dasFlag dasFlag, const gsdWCS *wcs, 
+                           const dasFlag dasFlag, const gsdWCS *wcs,
                            struct JCMTState *record, int *status )
 {
 
@@ -114,13 +114,13 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  /* Get the rts_end which is the TAI time plus half the 
+  /* Get the rts_end which is the TAI time plus half the
      on-source integration time.  For rasters the on-source
-     integration time is the scan_time divided by the 
-     number of map points per scan.  For non-rasters the 
+     integration time is the scan_time divided by the
+     number of map points per scan.  For non-rasters the
      on-source integration time is given by the scan_time. */
   if ( gsdVars->obsContinuous ) {
-    record->rts_end = wcs->tai + 
+    record->rts_end = wcs->tai +
                       ( gsdVars->scanTime / ( gsdVars->nScanPts * 2.0 * SPD ) );
   } else {
     record->rts_end = wcs->tai + ( gsdVars->scanTime / ( 2.0 * SPD ) );
@@ -161,7 +161,7 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
   record->tcs_index = wcs->index;
 
  /* Get the frontend LO frequency. */
-  record->fe_lofreq = gsdVars->LOFreqs[subBandNum]; 
+  record->fe_lofreq = gsdVars->LOFreqs[subBandNum];
 
   /* Use the dasFlag to determine the dimensionality/size of
      the TSKY array. */
@@ -174,7 +174,7 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
 
   record->enviro_air_temp = gsdVars->tamb;
 
-  record->fe_doppler = gsdVars->restFreqs[subBandNum] / 
+  record->fe_doppler = gsdVars->restFreqs[subBandNum] /
                ( record->fe_lofreq + gsdVars->totIFs[subBandNum] );
 
 }

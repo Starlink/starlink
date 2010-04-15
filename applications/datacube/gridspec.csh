@@ -11,18 +11,18 @@
 #     C-shell script.
 #
 #  Usage:
-#     gridspec [-b string] [-i filename] [-z/+z] 
+#     gridspec [-b string] [-i filename] [-z/+z]
 #
 #  Description:
 #     This shell script reads a three-dimensional IFU NDF as input and
 #     if you request zooming the script presents you with a white-light
-#     image of the cube.   You can then select the lower and upper 
-#     spatial limits to plot using the cursor.  You can instead supply 
-#     an NDF section with the filename to define both spatial and 
+#     image of the cube.   You can then select the lower and upper
+#     spatial limits to plot using the cursor.  You can instead supply
+#     an NDF section with the filename to define both spatial and
 #     spectral limits to plot.
 #
-#     The script averages spectra in the chosen region by specified 
-#     compression factors in the spatial domain.  It then displays the 
+#     The script averages spectra in the chosen region by specified
+#     compression factors in the spatial domain.  It then displays the
 #     average spectra in a grid, where the exterior axes indicate the
 #     spatial co-ordinates of the averaged spectra, and the interior axes
 #     the data values against spectra co-ordinates.
@@ -37,10 +37,10 @@
 #       The script will use this as its input file, the specified file should
 #       be a three-dimensional NDF.  By default the script will prompt for the
 #       input file.
-#     -z 
+#     -z
 #       The script will automatically prompt to select a region to zoom
 #       before prompting for the region of interest.  [TRUE]
-#     +z 
+#     +z
 #       The program will not prompt for a zoom before requesting the region
 #       of interest. [FALSE]
 #
@@ -50,7 +50,7 @@
 #     -  The spatial averaging is aligned to obtain the expected number
 #     of pixels irrespective of the pixel origin of the input cube.
 #     Note that this may not be suitable if you wish to preserve alignment
-#     with another compressed dataset.  See KAPPA:COMPAVE parameter ALIGN 
+#     with another compressed dataset.  See KAPPA:COMPAVE parameter ALIGN
 #     for more details.
 #
 #  Implementation Status:
@@ -67,7 +67,7 @@
 #     2006 March 2 (MJC):
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
+#       Corrected the NDF name extraction when both the file extension and
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.
 #     2006 March 16 (MJC):
@@ -115,7 +115,7 @@ while ( $#args > 0 )
       set gotcmp = "TRUE"
       set cmpstring = $args[1]
       shift args
-      breaksw      
+      breaksw
    case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
@@ -125,15 +125,15 @@ while ( $#args > 0 )
    case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
-      breaksw                            
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw  
+   endsw
 end
 
 # Do the package setup.
@@ -150,7 +150,7 @@ if ( $gotcmp == "FALSE" ) then
 endif
 
 # Extract the compression factors.
-set cmpfactors = `echo $cmpstring | awk 'BEGIN {FS=","}{print $1, $2}'` 
+set cmpfactors = `echo $cmpstring | awk 'BEGIN {FS=","}{print $1, $2}'`
 if ( $#cmpfactors == 1 ) then
    set cmpfactors = ( $cmpfactors[1] $cmpfactors[1] )
 endif
@@ -162,7 +162,7 @@ endif
 
 # See if we actually need to compress.
 set blockave = "FALSE"
-if ( $cmpfactors[1] > 1 ||  $cmpfactors[1] > 1 ) then 
+if ( $cmpfactors[1] > 1 ||  $cmpfactors[1] > 1 ) then
    set blockave = "TRUE"
    set cmpfac = "${cmpfactors[1]},${cmpfactors[2]},1"
 endif
@@ -201,13 +201,13 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 # Collapse white-light image.
    echo "      Collapsing:"
    echo "        White-light image: ${dims[1]} x ${dims[2]}"
-   collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+   collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 
 # Display the collapsed image.
    gdclear device=${plotdev}
    paldef device=${plotdev}
    lutgrey device=${plotdev}
-   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
+   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null
 
 # Get the lower limit.
 # --------------------
@@ -241,7 +241,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    set yl = `calc exp="min($y1,$y2)" prec=_REAL`
    set xu = `calc exp="max($x1,$x2)" prec=_REAL`
    set yu = `calc exp="max($y1,$y2)" prec=_REAL`
-   
+
    echo " "
    echo "      Zooming:"
    echo "      Extracting:"
@@ -287,5 +287,5 @@ clinplot ndf=${cmpfile} device=${plotdev} specstyle="colour(curve)=red" \
 # =========
 cleanup:
 
-rm -f ${tmpdir}/${user}/gridspec* >& /dev/null     
+rm -f ${tmpdir}/${user}/gridspec* >& /dev/null
 rmdir ${tmpdir}/${user} >& /dev/null

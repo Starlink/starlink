@@ -113,7 +113,7 @@ proc CCDExtractFitsFromNDF { Top From To } {
    } else {
 
 #  NDF doesn't exist.
-      if { $NDF == "" } { 
+      if { $NDF == "" } {
          CCDIssueInfo "No reference NDF available"
       } else {
          CCDIssueInfo "Failed to locate NDF: $NDF"

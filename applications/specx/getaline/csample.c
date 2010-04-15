@@ -7,7 +7,7 @@
 int main()
 {
   char line[SLEN], prompt[SLEN];
-  
+
   int  llen;
 
   static int  itrm = 1;

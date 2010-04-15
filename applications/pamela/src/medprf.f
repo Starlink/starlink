@@ -1,6 +1,6 @@
 *MEDPRF
 *
-* MEDPRF -- Flat fields, median filters and collapses an image in the 
+* MEDPRF -- Flat fields, median filters and collapses an image in the
 *           Y direction. Can use distortion file from 'track'.
 *
 * Parameters:
@@ -42,7 +42,7 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('IMAGE','READ',IMAGE,STATUS)
 C
@@ -61,7 +61,7 @@ C
      &     CALL GET_TRACK(YPOS, TOFF, STATUS)
 C
 C     Get profile output name
-C     
+C
       CALL NDF_SECT(IMAGE,1,1,1,SMALL,STATUS)
       CALL NDF_PROP(SMALL,' ','PROFILE',PROFILE,STATUS)
       CALL NDF_RESET(PROFILE,'Title',STATUS)
@@ -112,18 +112,18 @@ C
       CALL NDF_RESET(PROFILE,'Data',STATUS)
       CALL NDF_SBND(1,LBND(1),UBND(1),PROFILE,STATUS)
       CALL NDF_STYPE('_REAL',PROFILE,'Data',STATUS)
-C     
+C
 C     Map files
-C     
-      CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)      
-      CALL NDF_MAP(FLAT,'Data','_REAL','READ',FPTR,EL,STATUS)      
-      CALL NDF_MAP(PROFILE,'Data','_REAL','WRITE',PPTR,EL,STATUS)      
+C
+      CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
+      CALL NDF_MAP(FLAT,'Data','_REAL','READ',FPTR,EL,STATUS)
+      CALL NDF_MAP(PROFILE,'Data','_REAL','WRITE',PPTR,EL,STATUS)
       IF(TRACE) THEN
          CALL NDF_TEMP(PLACE, STATUS)
          CALL NDF_NEW('_REAL',2,LBND,UBND,PLACE,WORK,STATUS)
          CALL NDF_MAP(WORK,'Data','_REAL','WRITE',WPTR,EL,STATUS)
       END IF
-      CALL MED_PRF(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)), 
+      CALL MED_PRF(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)),
      &     NXS, NYS, XLO, YLO, %VAL(CNF_PVAL(PPTR)), TRACE,
      &     %VAL(CNF_PVAL(WPTR)), NWIDTH, METHOD, STATUS)
       CALL NDF_END(STATUS)
@@ -161,11 +161,11 @@ C
       END IF
 C
 C     Compute average profile by collapsing in Y
-C     
+C
       IF(.NOT.TRACE) THEN
-C     
+C
 C     No distortion map case
-C     
+C
          DO IX = 1, NXS
             NOK = 0
             DO IY = 1, NYS
@@ -177,7 +177,7 @@ C
             END DO
             IF(NOK.GT.0) THEN
                CALL MEDFILT(YDATA,YFILT,NOK,NWIDTH,IFAIL)
-               SUM = 0.D0    
+               SUM = 0.D0
                DO IY = 1, NOK
                   SUM = SUM + YFILT(IY)
                END DO
@@ -187,16 +187,16 @@ C
             END IF
          END DO
       ELSE
-C     
+C
 C     Distortion coefficient case
-C     
+C
          YREF  = DBLE(2*YLO+NYS-1)/2.
          CALL GET_TRACK(YREF, XREF, STATUS)
          DO IY = 1, NYS
-C     
+C
 C     Compute shift, load into buffer, shift to the right and then
 C     add into profile
-C     
+C
             CALL GET_TRACK(DBLE(IY+YLO-1), XD, STATUS)
             XSHIFT = REAL(XD - XREF)
             DO IX = 1, NXS
@@ -217,16 +217,16 @@ C
                CALL SINCBIN(0,XDATA,NXS,TPROF,NXS,XSHIFT,
      &              0,0.,0,0.,0.,0.)
             END IF
-C     
+C
 C     Mask pixels affected by bad data (only works in linear case)
-C     
+C
             DO IX = 1, NXS
                I1 = INT(REAL(IX)-XSHIFT)
                I2 = I1+1
-               IF((I1.GE.1 .AND. I1.LE.NXS .AND. 
+               IF((I1.GE.1 .AND. I1.LE.NXS .AND.
      &              (DATA(I1,IY).EQ.VAL__BADR .OR.
      &              BAL(I1,IY).EQ.VAL__BADR)) .OR.
-     &              (I2.GE.1 .AND. I2.LE.NXS .AND. 
+     &              (I2.GE.1 .AND. I2.LE.NXS .AND.
      &              (DATA(I2,IY).EQ.VAL__BADR .OR.
      &              BAL(I2,IY).EQ.VAL__BADR))) THEN
                   WORK(IX,IY) = VAL__BADR
@@ -248,7 +248,7 @@ C
             END DO
             IF(NOK.GT.0) THEN
                CALL MEDFILT(YDATA,YFILT,NOK,NWIDTH,IFAIL)
-               SUM = 0.    
+               SUM = 0.
                DO IY = 1, NOK
                   SUM = SUM + YFILT(IY)
                END DO
@@ -259,4 +259,4 @@ C
          END DO
       END IF
       RETURN
-      END      
+      END

@@ -4,7 +4,7 @@
 *     DTASK_OBEY
 
 *  Purpose:
-*     Handle action for "obey" request 
+*     Handle action for "obey" request
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,8 +16,8 @@
 *     CALL DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE, STATUS )
 
 *  Description:
-*     Carry out an OBEY, whether first-time in or as a result of a 
-*     reschedule. After the application has returned, set-up any 
+*     Carry out an OBEY, whether first-time in or as a result of a
+*     reschedule. After the application has returned, set-up any
 *     reschedule it may have requested.
 
 *  Arguments:
@@ -30,9 +30,9 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Call DTASK_APPLIC, check the returned status and set up any 
+*     Call DTASK_APPLIC, check the returned status and set up any
 *     requested rescheduling. If the action has completed send the final
-*     acknowledgment. 
+*     acknowledgment.
 
 *  Copyright:
 *     Copyright (C) 1984-1987, 1989-1993 Science & Engineering Research
@@ -186,7 +186,7 @@
 *  Arguments Given:
       EXTERNAL DTASK_APPLIC      ! address of action routine
       INTEGER ACTPTR             ! index for looking-up the action
-                                 ! details 
+                                 ! details
       CHARACTER*(*) VALUE        ! command line parameter string
 
 *  Status:
@@ -197,19 +197,19 @@
 
 *  Local Variables:
       INTEGER SCHEDTIME              ! time in milliseconds for
-                                     ! rescheduled action 
+                                     ! rescheduled action
       INTEGER SEQ                    ! sequence number for stage of
-                                     ! action 
-      INTEGER ACODE                  ! pointer to the action in the 
+                                     ! action
+      INTEGER ACODE                  ! pointer to the action in the
                                      ! parameter system tables
       INTEGER MESSTATUS              ! status to return in
-                                     ! acknowledgment 
+                                     ! acknowledgment
       CHARACTER*(SUBPAR__NAMELEN) ANAME   ! action name
       CHARACTER*(SUBPAR__NAMELEN) AKEY    ! action keyword
       LOGICAL HANDLED                ! did DTASK_ACT_SCHED detect a
-                                     ! reschedule action request from 
+                                     ! reschedule action request from
                                      ! the application
-      INTEGER REQUEST                ! copy of request code returned 
+      INTEGER REQUEST                ! copy of request code returned
                                      ! from the application
 *.
 
@@ -224,7 +224,7 @@
       SEQ = ACTSEQ(ACTPTR)
 
       CALL DTASK_APPLIC ( OBEY, ACODE, ANAME, ACTPTR, SEQ, VALUE,
-     :  SCHEDTIME, REQUEST, STATUS ) 
+     :  SCHEDTIME, REQUEST, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 *
@@ -269,19 +269,19 @@
 *
                IF ( REQUEST .EQ. SAI__OK ) THEN
                   MESSTATUS = DTASK__IVACTSTAT
-                  CALL ERR_REP ( ' ', 
-     :              'DTASK_OBEY: application returned illegal SAI__OK', 
+                  CALL ERR_REP ( ' ',
+     :              'DTASK_OBEY: application returned illegal SAI__OK',
      :              MESSTATUS )
                ELSE IF ( REQUEST .EQ. DTASK__SYSNORM ) THEN
                   MESSTATUS = DTASK__IVACTSTAT
-                  CALL ERR_REP ( ' ', 
+                  CALL ERR_REP ( ' ',
      :              'DTASK_OBEY: application returned illegal '/
      :              /'SS$_NORMAL', MESSTATUS )
                ELSE IF ( REQUEST .EQ. ACT__CANCEL ) THEN
                   MESSTATUS = DTASK__IVACTSTAT
-                  CALL ERR_REP ( ' ', 
+                  CALL ERR_REP ( ' ',
      :              'DTASK_OBEY: application returned illegal '/
-     :              /'ACT__CANCEL', 
+     :              /'ACT__CANCEL',
      :              MESSTATUS )
                ELSE
                   MESSTATUS = REQUEST

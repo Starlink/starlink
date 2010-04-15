@@ -5,7 +5,7 @@
 *     CHI_SEARCH
 
 *  Purpose:
-*     Create a new catalogue containing only entries that meet the given 
+*     Create a new catalogue containing only entries that meet the given
 *     criteria.
 
 *  Language:
@@ -17,11 +17,11 @@
 *  Description:
 *     Create a new catalogue containing only entries that meet the given
 *     criteria. If an invalid expression error is reported CRITERIA
-*     is returned containing diagnostic information. Any odering information 
+*     is returned containing diagnostic information. Any odering information
 *     in the input catalogue will be preserved in the new catalogue. This
 *     routine is called by CHI_SEARCH when the catalogue being created and the
 *     catalogue being created are in different underlying databases or if the
-*     underlying databases parser is not powerful enough to deal with this 
+*     underlying databases parser is not powerful enough to deal with this
 *     search criteria.
 
 *  Arguments:
@@ -30,7 +30,7 @@
 *     OUTPUT = CHARACTER * ( CHI__SZNAME ) (Given)
 *        Name of the new catalogue containing only the selected entries.
 *     CRITERIA = CHARACTER * ( CHI__SZEXP ) (Given)
-*        Criteria to be applied to each entry in the input catalogue to 
+*        Criteria to be applied to each entry in the input catalogue to
 *        determine if this entry is to be copied into the output catalogue.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status.
@@ -56,7 +56,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -74,7 +74,7 @@
       CHARACTER * ( * ) INPUT
       CHARACTER * ( * ) OUTPUT
       CHARACTER * ( * ) CRITERIA
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -102,19 +102,19 @@
       call chi_1par(input,criteria,fnames,ftypes,status)
 *
 *    If the criteria parsed without errors creat the output catalogue
-*     
+*
       if (status .eq. SAI__OK) then
 *
         call chi_credup( input, 100, output, status )
 *
 *    Loop through the input catalogue until the end reading the data, checking
-*    against the criteria and copying to the output if the criteria is 
+*    against the criteria and copying to the output if the criteria is
 *    satisfied.
 *
         call chi_gnents(input, numents, status)
         do entcount = 1, numents
 *
-          call chi_gdnac(input,fnames,numflds,charvals,doubvals, 
+          call chi_gdnac(input,fnames,numflds,charvals,doubvals,
      :         intvals,logvals,realvals,fldtypes,nulls,status )
 *
 *    And apply the expression to a logical result.
@@ -125,7 +125,7 @@
 *    If the criteria is satisfied copy the entry into the output catalogue.
 *
           if (logval) then
-            call chi_putent( output,fnames,numflds,1,charvals,doubvals, 
+            call chi_putent( output,fnames,numflds,1,charvals,doubvals,
      :           intvals,logvals,realvals,fldtypes,nulls,status )
           endif
         enddo

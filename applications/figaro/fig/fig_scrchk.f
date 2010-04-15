@@ -5,7 +5,7 @@ C     F I G _ S C R C H K
 C
 C     Figaro subroutine that checks whether a set of X values
 C     represent a 'scrunched' - ie a linear - wavelength scale.
-C     
+C
 C     Parameters - (">" input, "<" output)
 C
 C     (>) NX     (Integer) Number of elements in the X array.
@@ -13,7 +13,7 @@ C     (>) XDATA  (Real array XDATA(NX)) X data elements.
 C
 C     Returns -
 C
-C     FIG_SCRCHK (Logical) True if data is on a linear scale 
+C     FIG_SCRCHK (Logical) True if data is on a linear scale
 C                - defined for these purposes as the difference
 C                between successive elements being constant to
 C                some limit calculated roughly to allow for the

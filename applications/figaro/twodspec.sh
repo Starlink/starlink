@@ -12,7 +12,7 @@
 #     source ${TWODSPEC_DIR}/twodspec.sh
 #
 #  Description:
-#     This procedure defines the TWODSPEC commands for use from the 
+#     This procedure defines the TWODSPEC commands for use from the
 #     sh shell by defining the aliases for each command.
 #
 #  Authors:

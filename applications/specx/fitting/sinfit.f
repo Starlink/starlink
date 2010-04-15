@@ -196,7 +196,7 @@ C   and get initial estimates of amplitude and phase
         WRITE (PROMPT, 1036) (SPAR(J),J=1,2)
  1036   FORMAT('[',F6.1,1X,F5.1,'] ','"')
       END IF
-      PROMPT = 
+      PROMPT =
      &'"/'' Estimates of Amplitude and phase for each harmonic''/'//
      &'  '' Term at a time, EOF to finish''//'//
      &'  '' Current units are '//XTITLE//'''//''# '
@@ -300,7 +300,7 @@ C   Calculate required workspace and get some virtual memory
         IFAIL = 51
         GO TO 999
       END IF
-      
+
       NBW= 4 * (NPARAM*(NPARAM+5) + NCONST)
       ISTAT = IGETVM (NBW, .TRUE., 'SINFIT', IWPTR)
       IF (ISTAT .ne. 0) THEN

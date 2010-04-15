@@ -91,7 +91,7 @@ fi
 # minimum size.
     wm minsize . 1 1
 
-# Map the window and find out how big it is and use this as the maximum 
+# Map the window and find out how big it is and use this as the maximum
 # size allowed by the window manager. Also constrain the minimum size so
 # that the buttons are always visible.
     update idletasks
@@ -107,7 +107,7 @@ fi
 proc crossHair {} {
 #+
 # This procedure is called whenever the "crosshair" checkbutton is toggled
-# and either enables the crosshair whenever the pointer is in the gwm 
+# and either enables the crosshair whenever the pointer is in the gwm
 # widget and binds the crosshair position to the pointer or disables the
 # crosshair.
 #-
@@ -123,7 +123,7 @@ proc crossHair {} {
 	$gwm configure -crosshair no
     }
 }
-	
+
 proc showPointer {x y} {
 #+
 # This procedure pops up a panel that displays values of the parameters
@@ -189,7 +189,7 @@ proc loadHelp {} {
            }
        }
        close $file
-   } 
+   }
    return 0
 }
 

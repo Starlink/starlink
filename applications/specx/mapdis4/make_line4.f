@@ -213,8 +213,8 @@
 *     Write map to a file
 
       ISTAT = IGETLUN (IFILE, 'make_line4', .TRUE.)
-      OPEN  (IFILE, 
-     &       FILE   = 'mapplane.tmp', 
+      OPEN  (IFILE,
+     &       FILE   = 'mapplane.tmp',
      &       STATUS = 'NEW',
      &       FORM   = 'UNFORMATTED',
      &       ACCESS = 'SEQUENTIAL',
@@ -241,7 +241,7 @@
 *     TMEM  = IPTR_MAP
 *     PRINT *, 'TMEM = ', TMEM
 
-      ISTAT = IFREEVM (IPTR_MAP) 
+      ISTAT = IFREEVM (IPTR_MAP)
       IF (ISTAT .ne. 0) THEN
         PRINT *,'Trouble freeing virtual memory for map'
         IFAIL = 51

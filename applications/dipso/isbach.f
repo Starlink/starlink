@@ -3,7 +3,7 @@
      : YCALC,YFIT,ALAM,YFIT1,BXCALC,BYFIT,BYFIT1,STATUS)
        INCLUDE 'SAE_PAR'
        INTEGER STATUS
- 
+
 *
 *   'Master routine for controlling InterStellar options.
 *    Based on "BACH" (Clive Davenhall, Dane Maslen, Clive
@@ -11,20 +11,20 @@
 *    by Des Middlemas and Ian Howarth
 *
        EXTERNAL IS_BLK
- 
-       CHARACTER*(*) CMD      
-       CHARACTER*(*) PARAMS  
+
+       CHARACTER*(*) CMD
+       CHARACTER*(*) PARAMS
        CHARACTER*40 ATHEDK
        COMMON /ATHEDC/ ATHEDK
-       INTEGER MAXPT   
+       INTEGER MAXPT
        INTEGER SLEN
        INTEGER WORKSZ
- 
- 
+
+
        PARAMETER (NUT=2800,MOUT=120)
- 
+
        COMMON /DMISCOG/ NFLAM, EWBYLM, N1
-       COMMON /DMISOPT/ OPTCAL, OPTOK, BLEND, COLUMN, QUART, SCALE, 
+       COMMON /DMISOPT/ OPTCAL, OPTOK, BLEND, COLUMN, QUART, SCALE,
      :                  MODE, CONV, THE, SAVE, VEL, V1, V2
        COMMON /IDHIRF/ NRF, MAXNRF, POSN, RF
        COMMON /IDHIRF1/ CTITLE
@@ -35,34 +35,34 @@
        COMMON /MAD3  / WIDTH(3), COLDEN(3), NCYCLE
        COMMON /MAD5  / MARB
 
-       REAL TOTWEI 
+       REAL TOTWEI
        SAVE DMISOPT, MAD, MAD1, MAD3, MAD5, ATHEDC, TOTWEI
- 
+
        LOGICAL OPTCAL, OPTOK, BEEP, MODEL, ATOMIC, PSRF, OK
- 
+
        COMMON /BEEP  / BEEP
        CHARACTER*1 BLEEP
        COMMON /BLEEP / BLEEP
- 
+
        INTEGER BLEND, CONV, MODE, N, NTERMS, Q1K
        INTEGER FITTED, SAVE, NRF, VEL
        INTEGER BNPTS, BNTERM, IBRK(MOUT)
        INTEGER THREE, Q1, OPTION, TABLE, N1
- 
+
        SAVE Q1, Q1K
 
        CHARACTER VALSTR*20, IRFILE*30, COGTIT*28, STKTIT*1
        CHARACTER DATFIL*80, OPTFIL*40, TITLE*80, OPT*1
- 
+
        REAL BPARAM(MOUT), NFLAM(99), EWBYLM(99)
        REAL RESCAL, VSHIFT, WORV, VALUE
        REAL A(MOUT)
        SAVE A
- 
-       REAL XCALC(WORKSZ/8), YCALC(WORKSZ/8), YFIT(WORKSZ/8), 
-     :      BXCALC(WORKSZ/8), BYFIT(WORKSZ/8), BYFIT1(WORKSZ/8), 
+
+       REAL XCALC(WORKSZ/8), YCALC(WORKSZ/8), YFIT(WORKSZ/8),
+     :      BXCALC(WORKSZ/8), BYFIT(WORKSZ/8), BYFIT1(WORKSZ/8),
      :      ALAM(WORKSZ/8), YFIT1(WORKSZ/8)
- 
+
        DATA CO1/2.654418269E-20/, CO2/7.478975686E-37/, TEN13/1.0E13/
        DATA ONE/1.0E0/, ZERO/0.0E0/, IZ/0/, THREE/3/
        DATA IONE/1/, ITWO/2/, THRE/3.0E0/, IFI/5/, IF6/6/
@@ -76,22 +76,22 @@
 *    Return if an error has already occurred.
        ISBACH = .FALSE.
        IF( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Assume OK until error is detected
- 
+
        MAXNRF = 500
        OK = .TRUE.
- 
+
 *    Assume command found until it is not
- 
+
        ISBACH = .TRUE.
- 
+
 *    Set array limit
- 
+
        M = WORKSZ/8
- 
+
 *    Compare command string to those handled here;  act if found.
- 
+
        CALL SSTRIP(PARAMS)
        IF (CMD.EQ.'ISOPT') THEN
           CALL OPTIONS(PARAMS,MAXSTK,NONSTK,OK,STATUS)
@@ -248,7 +248,7 @@
                 ELSEIF (WORV.EQ.1.0) THEN
                    WRITE (*,
      :             '(''   '',A,'':  stack entry'',I3,
-     :             '' is not in velocity units'',A)') 
+     :             '' is not in velocity units'',A)')
      :             CMD(1:SLEN(CMD)), BLEND, BLEEP
                 ELSE
                    WORV = WORV*C
@@ -260,7 +260,7 @@
                    VSHIFT = (RESCAL-1.0)*C
                    DO 165 I = 1, BNPTS
                       IF (BXCALC(BNPTS/2).GT.8E2) THEN
-                         BXCALC(I) = (BXCALC(I)/WORV-ONE)*C*RESCAL + 
+                         BXCALC(I) = (BXCALC(I)/WORV-ONE)*C*RESCAL +
      :                   VSHIFT
                       ELSE
                          BXCALC(I) = BXCALC(I)*RESCAL + VSHIFT
@@ -379,5 +379,5 @@
        ENDIF
 
   300  CONTINUE
- 
+
        END

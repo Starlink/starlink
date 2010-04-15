@@ -28,7 +28,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
-*  Import: 
+*  Import:
       INTEGER  NEL               ! Number of elements
       CHARACTER*80 FITSAR(NEL)   ! FITS array
       INTEGER  POS              ! Position in array

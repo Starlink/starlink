@@ -210,7 +210,7 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Associate the input NDF. 
+*  Associate the input NDF.
 *  ========================
 
 *  Begin an NDF context.
@@ -319,7 +319,7 @@
 *  ==================================================
       DO I = 1, 2
          IF ( LCOMP( I ) ) THEN
-      
+
 *  Map the data arrays.
             CALL KPG1_MAP( NDFI, COMP( I ), ITYPE, 'READ', PNTRI, EL,
      :                    STATUS )
@@ -359,9 +359,9 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          RSUVAL, RNUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
@@ -396,9 +396,9 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          BSUVAL, BNUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
@@ -424,9 +424,9 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          REPVAL, NEWVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
@@ -461,9 +461,9 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ISUVAL, INUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
@@ -498,9 +498,9 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           BSUVAL, BNUVAL,
-     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
@@ -535,9 +535,9 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           WSUVAL, WNUVAL,
-     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
@@ -572,9 +572,9 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          WSUVAL, WNUVAL,
-     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          NREP, STATUS )
 
             END IF

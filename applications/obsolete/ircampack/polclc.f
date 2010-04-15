@@ -121,7 +121,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -184,7 +184,7 @@
      :        I90,               ! Input 90 degrees intensity
      :        IA,                ! Tot. intensity from 0 and 90 degs
      :        IB,                ! Tot. intensity from 45 and 135 degs
-     :        IP,                ! Polarised intensity 
+     :        IP,                ! Polarised intensity
      :        P,                 ! Percentage polarisation
      :        P2,                ! Fractional polarisation squared
      :        Q,                 ! Normalised Q Stokes parameter
@@ -202,7 +202,7 @@
      :        VI,                ! Variance on tot. int. from all inputs
      :        VIA,               ! Variance on tot. int. from 0 and 90
      :        VIB,               ! Variance on tot. int. from 45 and 135
-     :        VIP,               ! Variance on polarised intensity 
+     :        VIP,               ! Variance on polarised intensity
      :        VP,                ! Variance on percentage polarisation
      :        VQ,                ! Variance on normalised Q Stokes par.
      :        VT,                ! Variance on Polarisation angle
@@ -386,7 +386,7 @@
                         U = VAL__BADR
                         P = VAL__BADR
                         T = VAL__BADR
-   
+
                         VIA = VAL__BADR
                         VIB = VAL__BADR
                         VIP = VAL__BADR

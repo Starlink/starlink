@@ -88,7 +88,7 @@ C  must reset MAP_OPEN to false.
 
         USE_OLD_MAP = .NOT.NO_MAP .AND. .NOT.NEW_MAP .AND. MAP_OPEN
         MAP_OPEN = .FALSE.
-        
+
         IF (USE_OLD_MAP) THEN
           PRINT *, 'Attempting to open previous map...'
           CALL OPEN_SPECX_MAP (IFAIL)
@@ -137,7 +137,7 @@ C  Reset title for X-axis etc
         XAXIS_NAME  = 'User'
         XAXIS_UNITS = '????'
       END IF
- 
+
 C  Set up titles for map axes (saved in dump file, but probably wrong!)
 
       CALL SET_MAPTITLE (.FALSE., 0.0, 0.0)    ! X- & Y-axes only
@@ -145,7 +145,7 @@ C  Set up titles for map axes (saved in dump file, but probably wrong!)
       AXTIT(2)  = 'arcsec.'
       MAPTIT(3) = XAXIS_NAME                   ! Map Z-axis
       AXTIT(3)  = XAXIS_UNITS                  !
-  
+
 C  Any others?
 
       INTERP_WAIT = .FALSE.

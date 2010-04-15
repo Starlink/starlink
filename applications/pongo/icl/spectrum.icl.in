@@ -47,7 +47,7 @@ XCOLUMN Wave
 YCOLUMN Flux
 EXCOLUMN 0
 EYCOLUMN 0
-                              
+
 {  Read the data file.
 READF (PONGO_EXAMPLES&'')/swp3196.lap SELCOND="Flux > 0" NOALL
 
@@ -64,8 +64,8 @@ CHANGE COLOUR=1
 {  Draw the labels (use the global values set by READF).
 CHANGE LINEWID=2
 LABEL TITLE="SWP3196, LORES, LAP" COLUMNS
-	
-{  This line resets the plotting pen, font, point fill style, line style 
+
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 

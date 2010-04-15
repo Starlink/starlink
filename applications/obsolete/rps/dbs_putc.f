@@ -40,7 +40,7 @@
       INCLUDE 'com_dbs_bytes.inc'
       INCLUDE 'com_dbs_field.inc'
       INCLUDE 'com_dbs_rec.inc'
- 
+
       DO I=1,60
         BLANK(I:I) = ' '
       END DO

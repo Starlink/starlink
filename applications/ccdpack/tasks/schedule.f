@@ -160,7 +160,7 @@
 *       results in the rejection of any object data (leaving the
 *       equivalent of a map of a blank piece of sky).
 *
-*       TARGET frames will only be used to create flatfields, if no 
+*       TARGET frames will only be used to create flatfields, if no
 *       flatfields (of the correct colour) are present in the input list.
 *       [FALSE]
 *     LOGFILE = FILENAME (Read)
@@ -396,7 +396,7 @@
 *  Because of the way in which this group is manipulated by the rest of
 *  this task, it ought to be treated as a simple GRP group, without the
 *  supplemental information it has acquired from NDG_ASSOC as part of
-*  an NDG group.  We thus cut loose all the supplemental information 
+*  an NDG group.  We thus cut loose all the supplemental information
 *  leaving an unowned group containing only full file specifications.
       CALL GRP_OWN( GIDIN, GIDOWN, STATUS )
       CALL GRP_SOWN( GIDIN, GRP__NOID, STATUS )
@@ -419,18 +419,18 @@
 *  Offer the chance to use TARGETS as flatfields. This is a useful option
 *  for IRDATA users.
       CALL PAR_GET0L( 'IRFLATS', IRFLAT, STATUS )
-      IF ( IRFLAT ) THEN 
-         CALL CCD1_MSG( ' ', 
-     :'  Warning - targets may be used as substitute flatfields', 
+      IF ( IRFLAT ) THEN
+         CALL CCD1_MSG( ' ',
+     :'  Warning - targets may be used as substitute flatfields',
      :   STATUS )
       END IF
 
 *  Take a first look at the processing schedule and decide what we might
 *  attempt.
       CALL CCD1_SCHED( FTYPES, NNDF, DEBICR, DARKCR, DRKTIM, FLASCR,
-     :                 FLSTIM, FLATCR, IRFLAT, VALID, PTEMP1, MKBIAS, 
-     :                 HVBIAS, DODEBI, MKDARK, HVDARK, DODARK, MKFLAS, 
-     :                 HVFLAS, DOFLAS, MKFLAT, HVFLAT, DOFLAT, FILNMS, 
+     :                 FLSTIM, FLATCR, IRFLAT, VALID, PTEMP1, MKBIAS,
+     :                 HVBIAS, DODEBI, MKDARK, HVDARK, DODARK, MKFLAS,
+     :                 HVFLAS, DOFLAS, MKFLAT, HVFLAT, DOFLAT, FILNMS,
      :                 NFILS, STATUS )
 
 *  Find out what type of script to write.
@@ -602,7 +602,7 @@
      :                MKDARK, DARK, HVDARK, DARKCR, DODARK, DRKTIM,
      :                MKFLAS, FLASH, HVFLAS, DOFLAS, FLASCR, FLSTIM,
      :                MKFLAT, FLAT, HVFLAT, DOFLAT, FILNMS, NFILS,
-     :                DEBEXT, DRKEXT, FLSEXT, FLTEXT, SAVER, IRFLAT, 
+     :                DEBEXT, DRKEXT, FLSEXT, FLTEXT, SAVER, IRFLAT,
      :                PTEMP1, PTEMP2, STATUS )
 
 

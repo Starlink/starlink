@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASPRP( NDIM, INDF1, INDF2, MATRIX, OFFSET, 
+      SUBROUTINE KPG1_ASPRP( NDIM, INDF1, INDF2, MATRIX, OFFSET,
      :                       STATUS )
 *+
 *  Name:
@@ -6,7 +6,7 @@
 
 *  Purpose:
 *     Propagates the WCS component from one NDF to another with the same
-*     number of axes, allowing for a linear mapping of the pixel 
+*     number of axes, allowing for a linear mapping of the pixel
 *     co-ordinates.
 
 *  Language:
@@ -18,12 +18,12 @@
 *  Description:
 *     This routine copies the WCS FrameSet from INDF1, re-mapping the
 *     GRID Frame in the process so that pixel co-ordinates in the output
-*     NDF are related to pixel co-ordinates in the input NDF by the 
-*     supplied linear transformation. The mapping from pixel 
-*     co-ordinates in INDF1 ("PIX1") to the corresponding pixel 
+*     NDF are related to pixel co-ordinates in the input NDF by the
+*     supplied linear transformation. The mapping from pixel
+*     co-ordinates in INDF1 ("PIX1") to the corresponding pixel
 *     co-ordinates in INDF2 ("PIX2") is:
 *
-*        PIX2 = MATRIX . PIX1 + OFFSET 
+*        PIX2 = MATRIX . PIX1 + OFFSET
 *
 *     For instance, for NDIM = 2:
 *
@@ -35,11 +35,11 @@
 *        The number of dimensions. This should be the value returned by
 *        NDF_BOUND for INDF2.
 *     INDF1 = INTEGER (Given)
-*        An identifier for the source NDF. If this does not have NDIM 
-*        pixel axes, a NDF section with NDIM axes will be obtained from 
+*        An identifier for the source NDF. If this does not have NDIM
+*        pixel axes, a NDF section with NDIM axes will be obtained from
 *        the supplied NDF.
 *     INDF2 = INTEGER (Given)
-*        An identifier for the destination NDF. This must have NDIM 
+*        An identifier for the destination NDF. This must have NDIM
 *         pixel axes.
 *     MATRIX( NDIM, NDIM ) = DOUBLE PRECISION (Given)
 *        The matrix connecting PIX1 and PIX2.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,13 +84,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -129,7 +129,7 @@
       INTEGER WINMAP             ! AST pointer to WinMap
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Ensure that the input NDF has the specified number of dimensions.
@@ -140,7 +140,7 @@
       CALL NDF_BOUND( INDF2, NDF__MXDIM, LBND, UBND, ND, STATUS )
       IF( ND .NE. NDIM .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL NDF_MSG( 'NDF', INDF2 ) 
+         CALL NDF_MSG( 'NDF', INDF2 )
          CALL MSG_SETI( 'NDIM', NDIM )
          CALL MSG_SETI( 'ND', ND )
          CALL ERR_REP( 'KPG1_ASPRP_2', 'KPG1_ASPRP: Programming error'//
@@ -154,11 +154,11 @@
 *  Create a MatrixMap from the supplied MATRIX array.
       MTRMAP = AST_MATRIXMAP( NDIM, NDIM, 0, MATRIX, ' ', STATUS )
 
-*  Create a WinMap which gives the required shift of pixel origin. 
-*  Map a window in pixel co-ordinates covering 1000 pixels on each 
+*  Create a WinMap which gives the required shift of pixel origin.
+*  Map a window in pixel co-ordinates covering 1000 pixels on each
 *  axis (a typical image size).
       DO I = 1, NDIM
-         INA( I ) = 0.0D0 
+         INA( I ) = 0.0D0
          INB( I ) = 1.0D3
          OUTA( I ) = INA( I ) + OFFSET( I )
          OUTB( I ) = INB( I ) + OFFSET( I )
@@ -166,7 +166,7 @@
 
       WINMAP = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS )
 
-*  Concatenate these two mappings in series to get the mapping from 
+*  Concatenate these two mappings in series to get the mapping from
 *  pixel co-ords in INDF1 to pixel co-ords in INDF2.
       P12MAP = AST_CMPMAP( MTRMAP, WINMAP, .TRUE., ' ', STATUS )
 
@@ -199,7 +199,7 @@
          CALL NDF_MSG( 'NDF', INDF1 )
          CALL NDF_MSG( 'NDIM', NDIM )
          CALL ERR_REP( 'KPG1_ASPRP_3', 'No PIXEL Frame with ^NDIM '//
-     :                 'axes found in the WCS component of ''^NDF''.', 
+     :                 'axes found in the WCS component of ''^NDF''.',
      :                 STATUS )
       END IF
 
@@ -236,7 +236,7 @@
          CALL NDF_MSG( 'NDF', INDF2 )
          CALL NDF_MSG( 'NDIM', NDIM )
          CALL ERR_REP( 'KPG1_ASPRP_4', 'No PIXEL Frame with ^NDIM '//
-     :                 'axes found in the WCS component of ''^NDF''.', 
+     :                 'axes found in the WCS component of ''^NDF''.',
      :                 STATUS )
       END IF
 
@@ -245,7 +245,7 @@
 
 *  Concatenate the mappings "GRID(in)->PIXEL(in)", "PIXEL(in)->PIXEL(out)",
 *  and "PIXEL(out)->GRID(out)" to get the mapping "GRID(in)->GRID(out)".
-      G12MAP = AST_CMPMAP( AST_CMPMAP( GP1MAP, P12MAP, .TRUE., ' ', 
+      G12MAP = AST_CMPMAP( AST_CMPMAP( GP1MAP, P12MAP, .TRUE., ' ',
      :                                STATUS ),
      :                     PG2MAP, .TRUE., ' ', STATUS )
 
@@ -261,11 +261,11 @@
       ICURR = AST_GETI( IWCS1, 'Current', STATUS )
       IBASE = AST_GETI( IWCS1, 'Base', STATUS )
 
-*  Add a copy of the Base (GRID) Frame from the output NDF into the input 
+*  Add a copy of the Base (GRID) Frame from the output NDF into the input
 *  NDFs FrameSet. Connect it to the input NDFs Base (GRID) Frame using the
 *  mapping found above. It becomes the Current Frame in IWCS1.
-      CALL AST_ADDFRAME( IWCS1, AST__BASE, SMAP, 
-     :                   AST_GETFRAME( IWCS2, AST__BASE, STATUS ), 
+      CALL AST_ADDFRAME( IWCS1, AST__BASE, SMAP,
+     :                   AST_GETFRAME( IWCS2, AST__BASE, STATUS ),
      :                   STATUS )
 
 *  Make this new Frame the Base Frame.
@@ -286,13 +286,13 @@
 *  End the AST context.
       CALL AST_END( STATUS )
 
-*  If an error has occurred, flush it, delete the output WCS component, 
-*  and then carry on since an output NDF with no WCS component may still 
+*  If an error has occurred, flush it, delete the output WCS component,
+*  and then carry on since an output NDF with no WCS component may still
 *  be useful.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', INDF2 )
          CALL ERR_REP( 'KPG1_ASPRP_5', 'The output ''^NDF'' will have'//
-     :                 ' no World co-ordinate System information.', 
+     :                 ' no World co-ordinate System information.',
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
          CALL NDF_RESET( INDF2, 'WCS', STATUS )

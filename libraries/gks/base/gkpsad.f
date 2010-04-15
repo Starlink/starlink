@@ -101,7 +101,7 @@ C# IL>=a, OL>=0
              IWSO(2,NSI+1) = IWI
              ISFROM   = ISI + 1
            ENDIF
- 
+
 *          Move sections
            DO 20 ISTO=NSO-NSI,NSI
              IF(ISFROM .GT. NSI)ISFROM = ISFROM - NSI
@@ -109,12 +109,12 @@ C# IL>=a, OL>=0
              IWSO(2,ISTO) = IWSI(2,ISFROM)
              ISFROM = ISFROM + 1
    20      CONTINUE
- 
+
 *          Add New Vertex
            IWSO(1,NSO) = IWN
            IWSO(2,NSO) = IWN + 1
          ENDIF
- 
+
       ELSEIF(IWSI(1,ISI) .GT. IWSI(2,ISI)) THEN
 *<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 *        Reversed Section - insert above
@@ -140,7 +140,7 @@ C# IL>=a, OL>=0
              IWSO(2,NSI+1) = IWI + 1
              ISFROM = ISI + 1
            ENDIF
- 
+
 *          Move sections
            DO 30 ISTO=NSO-NSI,NSI
              IF(ISFROM .GT. NSI)ISFROM = ISFROM - NSI
@@ -148,17 +148,17 @@ C# IL>=a, OL>=0
              IWSO(2,ISTO) = IWSI(2,ISFROM)
              ISFROM = ISFROM + 1
    30      CONTINUE
- 
+
 *          Add New Vertex
            IWSO(1,NSO) = IWN
            IWSO(2,NSO) = IWN + 1
          ENDIF
- 
+
       ELSE
 *0000000000000000000000000000000000000000000000000000000000
 *Zero length section - specified vertex can't belong to it!
 *0000000000000000000000000000000000000000000000000000000000
         CALL GKBUG(-2004,'GKPSAD')
       ENDIF
- 
+
       END

@@ -5,7 +5,7 @@
 
 *    Description :
 *
-*     This routine divides each pixel of an input image 
+*     This routine divides each pixel of an input image
 *     by a scalar. The result goes into a new output image.
 *
 *    Invocation :
@@ -39,8 +39,8 @@
 *                 If no error then
 *                    Call subroutine to divide image by scalar,
 *                     results going into output image
-*                    If status bad on return then 
-*                       Scalar passed was too small - output image is 
+*                    If status bad on return then
+*                       Scalar passed was too small - output image is
 *                       just copy of input - report the error
 *                    Endif
 *                 Endif
@@ -72,7 +72,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'        
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'
 
 *    Status :
@@ -127,7 +127,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the input structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions image
@@ -151,7 +151,7 @@
 *             special, as we must not divide by too small a number, else
 *             we will get an arithmentic overflow, and if we try to divide
 *             by zero, we will get a divide by zero error (naturally enough)
-               IF ( STATUS .EQ. SAI__OK .AND. 
+               IF ( STATUS .EQ. SAI__OK .AND.
      :              ABS( SCALAR ) .GE. SMALLEST ) THEN
 
 *                number is not too small - set valid flag
@@ -159,10 +159,10 @@
 
                ELSE
 
-*                number is too small - output message, cancel parameter 
+*                number is too small - output message, cancel parameter
 *                and loop again
                   CALL MSG_SETR( 'SCALAR', SCALAR )
-                  IF (STATUS .NE. SAI__OK) THEN 
+                  IF (STATUS .NE. SAI__OK) THEN
                      CALL ERR_REP( 'TOO_SMALL',
      : 'Input scalar ^SCALAR is too small for division - try again',
      :  STATUS )
@@ -172,7 +172,7 @@
                      CALL MSG_OUT( 'TOO_SMALL',
      : 'Input scalar ^SCALAR is too small for division - try again',
      :  STATUS )
-                  END IF 
+                  END IF
                   CALL PAR_CANCL( 'SCALAR', STATUS )
 
 *             end of if-scalar-is-not-too-small check
@@ -190,7 +190,7 @@
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                map a data array component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )

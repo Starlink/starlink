@@ -13,7 +13,7 @@
 *     CALL  KPG1_PGCUT( X1, X2, Y1, Y2, STATUS )
 
 *  Description:
-*     This routine sets the PGPLOT viewport so that it covers a specified 
+*     This routine sets the PGPLOT viewport so that it covers a specified
 *     section of the current PGPLOT window. The world co-ordinate bounds
 *     of the corresponding window are set to the supplied bounds.
 
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
       REAL LX1, LX2, LY1, LY2    ! Limited window bounds
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the requested window has non-zero area. Report an error otherwise.
@@ -124,7 +124,7 @@
          LY2 = MIN( WY1, MAX( WY2, Y2 ) )
       END IF
 
-*  Check the requested window overlaps the current window. Report an 
+*  Check the requested window overlaps the current window. Report an
 *  error otherwise.
       IF( LX1 .EQ. LX2 .OR. LY1 .EQ. LY2 ) THEN
          STATUS = SAI__ERROR
@@ -157,10 +157,10 @@
 
 *  Establish the new viewport.
          CALL PGSVP( NVX1, NVX2, NVY1, NVY2 )
-      
+
 *  Establish the new window.
          CALL PGSWIN( LX1, LX2, LY1, LY2 )
-      
+
       END IF
 
  999  CONTINUE

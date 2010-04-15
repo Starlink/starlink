@@ -1,4 +1,4 @@
-      SUBROUTINE SURFLIB_PLOT_GRID (UNIT, NX, NY, NMAX, 
+      SUBROUTINE SURFLIB_PLOT_GRID (UNIT, NX, NY, NMAX,
      :     NSIGMA, IPOS, JPOS, BINS, STATS, PNTS, POS, STATUS)
 *+
 *  Name:
@@ -9,7 +9,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_PLOT_GRID(UNIT, NX, NY, NMAX, NSIGMA, IPOS, JPOS
 *    :    BINS, STATS, PNTS, POS, STATUS)
@@ -94,7 +94,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -169,7 +169,7 @@
 *     Initialise pointers
       MED_X_PTR = 0
       MED_X_END = 0
-      MED_PTR = 0 
+      MED_PTR = 0
       MED_END = 0
       STDEVM_PTR = 0
       STDEVM_END = 0
@@ -186,21 +186,21 @@
 *     value from XRANGE
 
       DO WHILE (STATUS .EQ. SAI__OK)
-            
+
          CALL PAR_GDR1I('XRANGE', 2, XRANGE, 1, NX*NY,
      :        .FALSE., XRANGE, STATUS)
-         
+
          CALL PAR_CANCL('XRANGE', STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
 
 *     Need to check that XRANGE is in the correct order
-*     Just need to change the step to -1 
+*     Just need to change the step to -1
 *     Alternatively I could swap round the range
             IF (XRANGE(1).GT. XRANGE(2)) THEN
-                  
+
                STEP = -1
-               
+
             ELSE
 
                STEP = 1
@@ -209,7 +209,7 @@
 
 
 *     Find the range of the data for plotting
-         
+
             DMIN = VAL__MAXR
             DMAX = VAL__MINR
             FOUND = .FALSE.
@@ -218,16 +218,16 @@
 
                I = IPOS(COUNT)
                J = JPOS(COUNT)
-               
+
                DO N = 1, NMAX
-                  
+
                   IF (BINS(I,J,N) .NE. VAL__BADR) THEN
                      DMIN = MIN(DMIN, BINS(I,J,N))
                      DMAX = MAX(DMAX, BINS(I,J,N))
                      FOUND = .TRUE.
                   END IF
-                  
-               END DO   
+
+               END DO
             END DO
 
 *     Check that we have actually got some data to plot (ie not simply
@@ -242,17 +242,17 @@
                DMIN = DMIN - (0.05 * RANGE)
 
 *     Get some memory for the line drawing routine
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, MED_X_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, MED_X_PTR,
      :              MED_X_END, STATUS)
                CALL SCULIB_MALLOC(NX*NY * VAL__NBD, MED_PTR, MED_END,
      :              STATUS)
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, STDEVM_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, STDEVM_PTR,
      :              STDEVM_END, STATUS)
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, STDEVP_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, STDEVP_PTR,
      :              STDEVP_END, STATUS)
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, SIG_X_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, SIG_X_PTR,
      :              SIG_X_END, STATUS)
-        
+
 
 *     Add a small bit on either end of the plot range
 *     This also allows me to deal with LOW=HIGH plotting problems
@@ -308,22 +308,22 @@
                   I = IPOS(COUNT)
                   J = JPOS(COUNT)
 
-*     Copy the good data from this I,J to the work array 
+*     Copy the good data from this I,J to the work array
 
                   NGOOD = 0
                   XPOS = REAL(COUNT)
-               
+
                   DO N = 1, NMAX
-               
+
                      IF (BINS(I,J,N) .NE. VAL__BADR) THEN
                         NGOOD = NGOOD + 1
                         PNTS(NGOOD) = DBLE(BINS(I,J,N))
                         POS(NGOOD)  = DBLE(XPOS)
                      END IF
-                  
+
                   END DO
-            
-            
+
+
                   IF (NGOOD .GT. 0) THEN
 
 *     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
@@ -338,7 +338,7 @@
                      CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTRS,
      :                    STATUS )
 
-*     Plot the points using AST     
+*     Plot the points using AST
                      CALL KPG1_PLTLN( NGOOD, 1, NGOOD,
      :                    POS, PNTS,
      :                    .FALSE., .FALSE.,
@@ -351,47 +351,47 @@
 
 *     ...and read the statistics associated with this (I,J)
 *     Have to use pointers again for the scratch space
-                  
+
 *     Store the median and sigma for later plotting
 *     D**M pointers!
 
-                     CALL VEC_RTOD(.TRUE., 1, STATS(I,J,1), 
+                     CALL VEC_RTOD(.TRUE., 1, STATS(I,J,1),
      :   %VAL(CNF_PVAL(MED_PTR) + (N_MEDIANS * VAL__NBD)),
      :                    IERR, NERR, STATUS)
-                  
-                     CALL VEC_RTOD(.TRUE., 1, XPOS, 
+
+                     CALL VEC_RTOD(.TRUE., 1, XPOS,
      :   %VAL(CNF_PVAL(MED_X_PTR) + (N_MEDIANS * VAL__NBD)),
      :                    IERR, NERR, STATUS)
-                  
-                  
+
+
                      N_MEDIANS = N_MEDIANS + 1
-                  
+
                      IF (STATS(I,J,2) .NE. VAL__BADR) THEN
 
-                        CALL VEC_RTOD(.TRUE., 1, STATS(I,J,2), 
+                        CALL VEC_RTOD(.TRUE., 1, STATS(I,J,2),
      :   %VAL(CNF_PVAL(STDEVP_PTR) + (N_SIGS * VAL__NBD)),
      :                       IERR, NERR, STATUS)
-                     
-                        CALL VEC_RTOD(.TRUE., 1, STATS(I,J,3), 
+
+                        CALL VEC_RTOD(.TRUE., 1, STATS(I,J,3),
      :   %VAL(CNF_PVAL(STDEVM_PTR) + (N_SIGS * VAL__NBD)),
      :                       IERR, NERR, STATUS)
-                     
-                        CALL VEC_RTOD(.TRUE., 1, XPOS, 
+
+                        CALL VEC_RTOD(.TRUE., 1, XPOS,
      :   %VAL(CNF_PVAL(SIG_X_PTR) + (N_SIGS * VAL__NBD)),
      :                       IERR, NERR, STATUS)
-                      
+
                        N_SIGS = N_SIGS + 1
                      END IF
-                  
+
                   END IF
-                  
+
                END DO
 
 *     Now draw on the lines corresponding to median and sigma
                IF (N_MEDIANS .GT. 0) THEN
 
 *     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
-                  CALL AST_TRAN2( IPLOT, N_MEDIANS, 
+                  CALL AST_TRAN2( IPLOT, N_MEDIANS,
      :                 %VAL(CNF_PVAL(MED_X_PTR)),
      :                 %VAL(CNF_PVAL(MED_PTR)), .FALSE.,
      :                 %VAL(CNF_PVAL(MED_X_PTR)),
@@ -424,7 +424,7 @@
 *     The + SIGMA line
 
 *     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
-                     CALL AST_TRAN2( IPLOT, N_SIGS, 
+                     CALL AST_TRAN2( IPLOT, N_SIGS,
      :                    %VAL(CNF_PVAL(SIG_X_PTR)),
      :                    %VAL(CNF_PVAL(STDEVP_PTR)), .FALSE.,
      :                    %VAL(CNF_PVAL(SIG_X_PTR)),
@@ -450,14 +450,14 @@
 
 *     First need to transform the X coordinates back to DATA from the previous
 *     transformation (or allocate more memory)
-                     CALL AST_TRAN2( IPLOT, N_SIGS, 
+                     CALL AST_TRAN2( IPLOT, N_SIGS,
      :                    %VAL(CNF_PVAL(SIG_X_PTR)),
      :                    %VAL(CNF_PVAL(STDEVP_PTR)), .TRUE.,
      :                    %VAL(CNF_PVAL(SIG_X_PTR)),
      :                    %VAL(CNF_PVAL(STDEVP_PTR)), STATUS )
 
 *     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
-                     CALL AST_TRAN2( IPLOT, N_SIGS, 
+                     CALL AST_TRAN2( IPLOT, N_SIGS,
      :                    %VAL(CNF_PVAL(SIG_X_PTR)),
      :                    %VAL(CNF_PVAL(STDEVM_PTR)), .FALSE.,
      :                    %VAL(CNF_PVAL(SIG_X_PTR)),
@@ -480,16 +480,16 @@
 
                END IF
 C               END IF
-            
+
 *     Free the memory
                CALL SCULIB_FREE('MED_PTR', MED_PTR, MED_END, STATUS)
-               CALL SCULIB_FREE('MED_X_PTR',MED_X_PTR, MED_X_END, 
+               CALL SCULIB_FREE('MED_X_PTR',MED_X_PTR, MED_X_END,
      :              STATUS)
-               CALL SCULIB_FREE('SIG_X_PTR', SIG_X_PTR, SIG_X_END, 
+               CALL SCULIB_FREE('SIG_X_PTR', SIG_X_PTR, SIG_X_END,
      :              STATUS)
-               CALL SCULIB_FREE('STDEVP', STDEVP_PTR, STDEVP_END, 
+               CALL SCULIB_FREE('STDEVP', STDEVP_PTR, STDEVP_END,
      :              STATUS)
-               CALL SCULIB_FREE('STDEVM', STDEVM_PTR, STDEVM_END, 
+               CALL SCULIB_FREE('STDEVM', STDEVM_PTR, STDEVM_END,
      :              STATUS)
 
 *     Close the plot
@@ -499,7 +499,7 @@ C               END IF
 
                CALL MSG_OUTIF(MSG__QUIET,' ','PLOT_GRID: No good '//
      :              'points in selected range', STATUS)
-               
+
             END IF
 
          END IF
@@ -508,5 +508,5 @@ C               END IF
 
 *     Check for null parameter
       IF (STATUS .EQ. PAR__NULL) CALL ERR_ANNUL(STATUS)
-         
+
       END

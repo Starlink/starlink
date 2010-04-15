@@ -110,7 +110,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -197,8 +197,8 @@
 *  Try to open the GASP header file for the dimension information.
 *  Since the file is opened for read access, the recordsize should not
 *  be specified (set to zero), however in practice...  If we cannot open
-*  the header file then we must prompt for the values. 
-         CALL RIO_OPEN( HDRFIL, 'READ', 'UNFORMATTED', 16, FD, STATUS ) 
+*  the header file then we must prompt for the values.
+         CALL RIO_OPEN( HDRFIL, 'READ', 'UNFORMATTED', 16, FD, STATUS )
 
 *  Flush the error.
          IF ( STATUS .NE. SAI__OK ) THEN
@@ -207,7 +207,7 @@
             CALL MSG_OUT( ' ', 'Cannot open GASP header file '/
      :        /'^HDRFIL.  Use the SHAPE parameter.', STATUS )
             CALL MSG_BLANK( STATUS )
-      
+
 *  Obtain the shape of the GASP file.
             CALL PAR_GDR1I( 'SHAPE', NDIM, DEFSHA, 1, 1024, .FALSE.,
      :                      DIMS, STATUS )
@@ -270,7 +270,7 @@
       LBND( 2 ) = 1
       UBND( 2 ) = DIMS( 2 )
 
-*  Create the simple NDF.      
+*  Create the simple NDF.
       CALL NDF_CREAT( 'OUT', '_WORD', NDIM, LBND, UBND, NDF, STATUS )
 
 *  Map the NDF's data array to short signed integers, correspoding to
@@ -278,7 +278,7 @@
       CALL NDF_MAP( NDF, 'Data', '_WORD', 'WRITE', PNTRO, EL, STATUS )
 
 *  Pass mapped array to READGASP.
-      CALL CON_RGASP( GASPFI, DIMS( 1 ), DIMS( 2 ), 
+      CALL CON_RGASP( GASPFI, DIMS( 1 ), DIMS( 2 ),
      :                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                STATUS )
 
@@ -286,7 +286,7 @@
       CALL NDF_UNMAP( NDF, 'Data', STATUS )
 
 *  Close the NDF context.
-      CALL NDF_END( STATUS )                  
+      CALL NDF_END( STATUS )
 
   999 CONTINUE
 

@@ -9,7 +9,7 @@
      & ,            MESID	! Message ID.
       CHARACTER*(*) RUN_TYPE	! NEW, OLD, or DEF (get defaults for name etc.)
       CHARACTER*1 XTYPE		! Q(uit) or Exit - more targets or not
- 
+
 ********************************************************************************
 *  History
 *     1987	Mark Harris	1st Version
@@ -22,12 +22,12 @@
 *					defined.
 *     1994 Jan		M Ricketts	RAL version
 ********************************************************************************
- 
+
 *  Global Variables
       INTEGER PBID	! Pasteboard IDs. SMGLIB
      & ,      KPID	! Keypad ID.
       COMMON / SMG_PANDK / PBID , KPID
- 
+
       LOGICAL SMG
       COMMON / SMG_KEEP / SMG
       INTEGER WIDTH,START_WIDTH
@@ -36,7 +36,7 @@
 
       CHARACTER*8 HELPLIB
       COMMON / HELP_LIB_NAME / HELPLIB
- 
+
       CHARACTER*48 MESF1/'Ctrl/Z > next form/exit, F2 for help            '/
       CHARACTER*48 MESF2/' <ret>, Cursor up/down changes field            '/
       INTEGER MESTART		! Mid point across screen
@@ -60,13 +60,13 @@
       INTEGER TARG_NO		! skip query if 1st target of new form
 
 * We are'nt sure why cval and val both exist - rearrange elements of cval ?
- 
+
       CHARACTER*60 CVAL(100,6) / 600 * ' ' / 	! Values of fields.
 *     & ,           VAL(100)			! Temporary variable.
      & ,           CTEMP
       INTEGER      I 		 		! Loop variables.
      & ,           BEG			! Temporary variables.
-D       & ,           HRI , PSP 
+D       & ,           HRI , PSP
      & ,           N				! Number of fields.
       INTEGER VECTOR_FIELD			! Equivalent of FORM_FIELD
 D      LOGICAL      PASTED			! Dummy variable.
@@ -85,7 +85,7 @@ D      LOGICAL      PASTED			! Dummy variable.
 *     [MDH.SMG] SMG_FORM			! Gets values via a form.
 *     PACKAGE   FORM_CNVRT			! Converts angles to the correct format.
 *    &  ,       FORM_INPUT			! Gets input while in line mode.
- 
+
 *-  Author M.D.C.Harris ( R.A.L )                    10th August 1987.
 *  ________________________________  Executable Code  __________________________
 
@@ -97,7 +97,7 @@ D      LOGICAL      PASTED			! Dummy variable.
       END IF
 
       IF (FORM_PART .EQ. 'COVER') THEN						! Get section-dependent parameters
- 
+
          LIMITS(1) = FLD_LIMS_COVER(1)
          LIMITS(2) = FLD_LIMS_COVER(2)
          KFILE = 1
@@ -137,7 +137,7 @@ D      LOGICAL      PASTED			! Dummy variable.
                ELSE
                   END_COP = 0
                END IF
-            ELSE 
+            ELSE
                END_COP = N
             END IF
             DO I = 1 , END_COP							! Set these fields from record
@@ -146,7 +146,7 @@ D      LOGICAL      PASTED			! Dummy variable.
                CVAL(I,KFILE) = CTEMP(IPOS:)
 *               VAL( I ) = CVAL( I,KFILE )
             END DO
- 
+
             IF (END_COP .LT. N) THEN
                DO I = END_COP + 1 , N						!  Initialise variables using defaults if needed.
 *                 VAL( I ) = CVAL( I,KFILE )
@@ -155,7 +155,7 @@ D      LOGICAL      PASTED			! Dummy variable.
             END IF
          END IF
       ELSE									! Other pages, target, constraints
-                                                                                                                                
+
         IF (RUN_TYPE .NE. 'OLD' ) THEN
            IF (KFILE .EQ.3 ) THEN						! Get target number only
               START = 2
@@ -167,7 +167,7 @@ D      LOGICAL      PASTED			! Dummy variable.
               START = 1
            END IF
            DO I = START , N							!  Initialise variables without defaults.
-             CVAL( I,KFILE ) = DBS_INFOC( REFDB , I + BEG , 'NULVALUE' ) 		! 
+             CVAL( I,KFILE ) = DBS_INFOC( REFDB , I + BEG , 'NULVALUE' ) 		!
            END DO
         ELSE
            DO I = 1 , N								!  Initialise variables with values from rec.
@@ -203,7 +203,7 @@ D      LOGICAL      PASTED			! Dummy variable.
          END IF
 
 * modified 2.2.94: add flenth
-            CALL FORM_INPUT( KFILE, CVAL(1,KFILE), FIELDS(1,KFILE), UNITS(1,KFILE) , FRMT(1,KFILE), 
+            CALL FORM_INPUT( KFILE, CVAL(1,KFILE), FIELDS(1,KFILE), UNITS(1,KFILE) , FRMT(1,KFILE),
      &         FLENTH(1,KFILE), CONDOFF(1,KFILE), CONDNULL(1,KFILE), N , HELPLIB, LIB_PART , VECTOR_FIELD )
  20      CONTINUE
          CALL PUT_VALS(REFDB,LIMITS, CVAL(1,KFILE) )				! Put values in database

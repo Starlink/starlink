@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_ENTRN( LOC, STORE, OBJECT, VALUE, TRNI, TRNC, 
+      SUBROUTINE CCD1_ENTRN( LOC, STORE, OBJECT, VALUE, TRNI, TRNC,
      :                       TRNL, STATUS )
 *+
 *  Name:
@@ -66,14 +66,14 @@
 *     TRNC( 6 ) = CHARACTER * ( * ) (Given and Returned)
 *        Workspace for storing the incremental state. This should not
 *        be modified between calls to this routine. The individual
-*        strings in this case should be long enough to hold the 
-*        functions and comments (CCD1__SZTRN is usual). The elements of 
-*        this array should be set to ' ' before the first call of this 
+*        strings in this case should be long enough to hold the
+*        functions and comments (CCD1__SZTRN is usual). The elements of
+*        this array should be set to ' ' before the first call of this
 *        routine.
 *     TRNL( TRN__MXCLS + 2 ) = LOGICAL (Given and Returned)
 *        Workspace for storing the incremental state. This should not
 *        be modified between calls to this routine. The elements
-*        of this array should be set to .FALSE. before the first call 
+*        of this array should be set to .FALSE. before the first call
 *        to this routine.
 *     STATUS = INTEGER ({status_access_mode})
 *        The global status.
@@ -129,13 +129,13 @@
 
 *  Arguments Given:
       CHARACTER * ( * ) LOC
-      LOGICAL STORE 
+      LOGICAL STORE
       CHARACTER * ( * ) OBJECT
       CHARACTER * ( * ) VALUE
-      
+
 *  Arguments Given and Returned:
       INTEGER TRNI( 2 )
-      CHARACTER * ( * ) TRNC( 6 ) 
+      CHARACTER * ( * ) TRNC( 6 )
       LOGICAL TRNL( * )
 
 *  Status:
@@ -157,34 +157,34 @@
 
 *  Either store the given value or try to create the transform
 *  structure.
-      IF ( STORE ) THEN 
+      IF ( STORE ) THEN
 
-*  Check against all known names, convert the value if necessary and 
+*  Check against all known names, convert the value if necessary and
 *  store it.
-         IF ( OBJECT .EQ. 'TRANSFORM.TRN_VERSION' ) THEN 
+         IF ( OBJECT .EQ. 'TRANSFORM.TRN_VERSION' ) THEN
 
 *  Do nothing.
-         ELSE IF ( OBJECT .EQ. 'TRANSFORM.FORWARD' ) THEN 
-            IF ( VALUE .EQ. 'DEFINED' ) THEN 
-               TRNL( TRN__MXCLS + 1 ) = .TRUE. 
+         ELSE IF ( OBJECT .EQ. 'TRANSFORM.FORWARD' ) THEN
+            IF ( VALUE .EQ. 'DEFINED' ) THEN
+               TRNL( TRN__MXCLS + 1 ) = .TRUE.
             END IF
-         ELSE IF ( OBJECT .EQ. 'TRANSFORM.INVERSE' ) THEN 
-            IF ( VALUE .EQ. 'DEFINED' ) THEN 
-               TRNL( TRN__MXCLS + 2 ) = .TRUE. 
+         ELSE IF ( OBJECT .EQ. 'TRANSFORM.INVERSE' ) THEN
+            IF ( VALUE .EQ. 'DEFINED' ) THEN
+               TRNL( TRN__MXCLS + 2 ) = .TRUE.
             END IF
          ELSE IF ( OBJECT .EQ. 'TRANSFORM.MODULE_ARRAY(1).NVAR_IN' )
      :           THEN
             CALL CHR_CTOI( VALUE, TRNI( 1 ), STATUS )
-         ELSE IF ( OBJECT .EQ. 'TRANSFORM.MODULE_ARRAY(1).NVAR_OUT' ) 
+         ELSE IF ( OBJECT .EQ. 'TRANSFORM.MODULE_ARRAY(1).NVAR_OUT' )
      :           THEN
             CALL CHR_CTOI( VALUE, TRNI( 2 ), STATUS )
          ELSE IF ( OBJECT .EQ. 'TRANSFORM.MODULE_ARRAY(1).COMMENT' )
-     :           THEN 
+     :           THEN
             TRNC( 1 ) = VALUE
          ELSE IF ( OBJECT .EQ. 'TRANSFORM.MODULE_ARRAY(1).PRECISION' )
-     :           THEN 
+     :           THEN
             TRNC( 2 ) = VALUE
-         ELSE IF ( OBJECT .EQ. 
+         ELSE IF ( OBJECT .EQ.
      :           'TRANSFORM.MODULE_ARRAY(1).FORWARD_FUNC(1)' ) THEN
 
 *  Append information to any existing content.
@@ -192,57 +192,57 @@
             CALL CHR_APPND( VALUE, TRNC( 3 ), NC )
 
          ELSE IF ( OBJECT .EQ.
-     :           'TRANSFORM.MODULE_ARRAY(1).FORWARD_FUNC(2)' ) THEN 
+     :           'TRANSFORM.MODULE_ARRAY(1).FORWARD_FUNC(2)' ) THEN
 
 *  Append information to any existing content.
             NC = CHR_LEN( TRNC( 4 ) )
             CALL CHR_APPND( VALUE, TRNC( 4 ), NC )
 
-         ELSE IF ( OBJECT .EQ. 
-     :           'TRANSFORM.MODULE_ARRAY(1).INVERSE_FUNC(1)' ) THEN 
+         ELSE IF ( OBJECT .EQ.
+     :           'TRANSFORM.MODULE_ARRAY(1).INVERSE_FUNC(1)' ) THEN
 
 *  Append information to any existing content.
             NC = CHR_LEN( TRNC( 5 ) )
             CALL CHR_APPND( VALUE, TRNC( 5 ), NC )
 
-         ELSE IF ( OBJECT .EQ. 
-     :           'TRANSFORM.MODULE_ARRAY(1).INVERSE_FUNC(2)' ) THEN 
+         ELSE IF ( OBJECT .EQ.
+     :           'TRANSFORM.MODULE_ARRAY(1).INVERSE_FUNC(2)' ) THEN
 
 *  Append information to any existing content.
             NC = CHR_LEN( TRNC( 6 ) )
             CALL CHR_APPND( VALUE, TRNC( 6 ), NC )
 
-         ELSE IF ( OBJECT .EQ. 
-     :           'TRANSFORM.CLASSIFICATION.LINEAR' ) THEN 
-            TRNL( TRN__LIN ) = .TRUE. 
-         ELSE IF ( OBJECT .EQ. 
-     :           'TRANSFORM.CLASSIFICATION.INDEPENDENT') THEN 
-            TRNL( TRN__INDEP ) = .TRUE. 
-         ELSE IF ( OBJECT .EQ. 
+         ELSE IF ( OBJECT .EQ.
+     :           'TRANSFORM.CLASSIFICATION.LINEAR' ) THEN
+            TRNL( TRN__LIN ) = .TRUE.
+         ELSE IF ( OBJECT .EQ.
+     :           'TRANSFORM.CLASSIFICATION.INDEPENDENT') THEN
+            TRNL( TRN__INDEP ) = .TRUE.
+         ELSE IF ( OBJECT .EQ.
      :           'TRANSFORM.CLASSIFICATION.DIAGONAL' ) THEN
             TRNL( TRN__DIAG ) = .TRUE.
-         ELSE IF ( OBJECT .EQ. 
+         ELSE IF ( OBJECT .EQ.
      :           'TRANSFORM.CLASSIFICATION.ISOTROPIC' ) THEN
             TRNL( TRN__ISOT ) = .TRUE.
-         ELSE IF ( OBJECT .EQ. 
-     :           'TRANSFORM.CLASSIFICATION.POSITIVE_DET' ) THEN 
+         ELSE IF ( OBJECT .EQ.
+     :           'TRANSFORM.CLASSIFICATION.POSITIVE_DET' ) THEN
             TRNL( TRN__POSDT ) = .TRUE.
-         ELSE IF ( OBJECT .EQ. 
-     :           'TRANSFORM.CLASSIFICATION.NEGATIVE_DET' ) THEN 
+         ELSE IF ( OBJECT .EQ.
+     :           'TRANSFORM.CLASSIFICATION.NEGATIVE_DET' ) THEN
             TRNL( TRN__NEGDT ) = .TRUE.
-         ELSE IF ( OBJECT .EQ. 
+         ELSE IF ( OBJECT .EQ.
      :           'TRANSFORM.CLASSIFICATION.CONSTANT_DET' ) THEN
-            TRNL( TRN__CONDT ) = .TRUE. 
-         ELSE IF ( OBJECT .EQ. 
-     :           'TRANSFORM.CLASSIFICATION.UNIT_DET' ) THEN 
+            TRNL( TRN__CONDT ) = .TRUE.
+         ELSE IF ( OBJECT .EQ.
+     :           'TRANSFORM.CLASSIFICATION.UNIT_DET' ) THEN
             TRNL( TRN__UNIDT ) = .TRUE.
-         ELSE 
+         ELSE
 
-*  Unknown object name. 
+*  Unknown object name.
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'OBJ', OBJECT )
-            CALL ERR_REP( 'CCD1_ENTRN_1', 
-     :           '  CCD1_ENTRN: Unrecognised TRANSFORM object ^OBJ', 
+            CALL ERR_REP( 'CCD1_ENTRN_1',
+     :           '  CCD1_ENTRN: Unrecognised TRANSFORM object ^OBJ',
      :           STATUS )
          END IF
       ELSE
@@ -250,21 +250,21 @@
 *  Try to create the TRANSFORM structure. First do some rudimentary
 *  error checking.
          PROCED = .TRUE.
-         IF ( .NOT. TRNL( TRN__MXCLS + 1 ) .AND. 
+         IF ( .NOT. TRNL( TRN__MXCLS + 1 ) .AND.
      :        .NOT. TRNL( TRN__MXCLS + 2 ) ) THEN
 
 *  No transforms have been defined.
             PROCED = .FALSE.
          END IF
-         IF ( TRNL( TRN__MXCLS + 1 ) ) THEN 
-            IF ( TRNC( 3 ) .EQ. ' ' .OR. TRNC( 4 ) .EQ. ' ' ) THEN 
+         IF ( TRNL( TRN__MXCLS + 1 ) ) THEN
+            IF ( TRNC( 3 ) .EQ. ' ' .OR. TRNC( 4 ) .EQ. ' ' ) THEN
 
 *  Lack forward transforms.
                PROCED = .FALSE.
             END IF
          END IF
-         IF ( TRNL( TRN__MXCLS + 2 ) ) THEN 
-            IF ( TRNC( 5 ) .EQ. ' ' .OR. TRNC( 6 ) .EQ. ' ' ) THEN 
+         IF ( TRNL( TRN__MXCLS + 2 ) ) THEN
+            IF ( TRNC( 5 ) .EQ. ' ' .OR. TRNC( 6 ) .EQ. ' ' ) THEN
 
 *  Lack inverse transforms.
                PROCED = .FALSE.
@@ -272,7 +272,7 @@
          END IF
 
 *  Now we proceed.
-         IF ( PROCED ) THEN 
+         IF ( PROCED ) THEN
 
 *  Remove any existing TRANSFORM structure.
             CALL DAT_THERE( LOC, 'TRANSFORM', THERE, STATUS )
@@ -281,15 +281,15 @@
             END IF
 
 *  Now create the structure.
-            CALL TRN_NEW( TRNI( 1 ), TRNI( 2 ), TRNC( 3 ), TRNC( 5 ), 
-     :           TRNC( 2 ), TRNC( 1 ), LOC, 'TRANSFORM', LOCTR, 
+            CALL TRN_NEW( TRNI( 1 ), TRNI( 2 ), TRNC( 3 ), TRNC( 5 ),
+     :           TRNC( 2 ), TRNC( 1 ), LOC, 'TRANSFORM', LOCTR,
      :           STATUS )
             CALL TRN_PTCL( TRNL, LOCTR, STATUS )
             CALL DAT_ANNUL( LOCTR, STATUS )
-         ELSE 
+         ELSE
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'CCD1_ENTRN_2', 
-     :'  CCD1_ENTRN: Information on TRANSFORM structure is incomplete', 
+            CALL ERR_REP( 'CCD1_ENTRN_2',
+     :'  CCD1_ENTRN: Information on TRANSFORM structure is incomplete',
      :           STATUS )
          END IF
       END IF

@@ -24,7 +24,7 @@
  *     26-Apr-1994 (DJA):
  *        Original version.
  *     03-Jan-2008 (TIMJ):
- *        Use CNF to import the fortran pointer.  
+ *        Use CNF to import the fortran pointer.
 
  *-
  */

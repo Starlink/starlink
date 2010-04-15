@@ -16,12 +16,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -57,7 +57,7 @@
       CALL PSX_PUTENV( 'NAME1', 'VALUE1', STATUS )
       CALL PSX_PUTENV( 'NAME2', 'VALUE2', STATUS )
       CALL PSX_PUTENV( 'NAME3', 'VALUE3', STATUS )
-      
+
       IF( STATUS .EQ.SAI__OK ) THEN
 * Now get the values in reverse order
          CALL PSX_GETENV( 'NAME3', RESULT3, STATUS )
@@ -68,24 +68,24 @@
                PRINT *, 'ERROR: Variable NAME1 is ',RESULT1
             ELSE
                PRINT *, 'Variable NAME1 put and get OK'
-            ENDIF 
+            ENDIF
             IF( RESULT2 .NE. 'VALUE2' ) THEN
                PRINT *, 'ERROR: Variable NAME2 is ',RESULT2
             ELSE
                PRINT *, 'Variable NAME2 put and get OK'
-            ENDIF 
+            ENDIF
             IF( RESULT3 .NE. 'VALUE3' ) THEN
                PRINT *, 'ERROR: Variable NAME3 is ',RESULT3
             ELSE
                PRINT *, 'Variable NAME3 put and get OK'
-            ENDIF 
+            ENDIF
 
          ELSE
             PRINT *, 'Failed getting environment variables'
             PRINT *, 'Return status = ',status
-            
+
          ENDIF
-      
+
       ELSE
          PRINT *, 'Failed setting environment variables'
          PRINT *, 'Return status = ',status

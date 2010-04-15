@@ -53,6 +53,6 @@
 
 *   Re-calculate range of records
       CALL QMAN_REORDER( STATUS )
- 
+
 *   Exit subroutine
       END

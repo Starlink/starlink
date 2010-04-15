@@ -27,7 +27,7 @@
 *  ADAM Parameters:
 *     DEVICE = DEVICE (Read)
 *        The name of the image-display device to be panned and zoomed.
-*        The name of the base plane should be given. 
+*        The name of the base plane should be given.
 *        [Current image display]
 
 *  Arguments:
@@ -60,7 +60,7 @@
 *     1990 Apr 11 (MJC):
 *        Original version.
 *     1991 October 28 (MJC):
-*        Made exit trigger number 2.  Inceased maximum number of 
+*        Made exit trigger number 2.  Inceased maximum number of
 *        triggers to 64.  Added a memory-visibility call.
 *     1992 February 19 (MJC):
 *        Removed the memory-visibility call.
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -151,7 +151,7 @@
       CALL IIDQCI( DID, ZOMCAP, NVAL, ZOMRNG, ACTVAL, IDSTAT )
 
 *    Abort if an error has occurred.  Note IDI does not use
-*    inherited status; it resets the status in each subroutine, 
+*    inherited status; it resets the status in each subroutine,
 *    therefore it is necessary to check the status explicitly.
 
       IF ( IDSTAT .NE. IDI__OK ) THEN
@@ -162,7 +162,7 @@
          GOTO 999
       END IF
 
-*    Check that zooming is possible by looking at the maximum zoom 
+*    Check that zooming is possible by looking at the maximum zoom
 *    factor.
 *    =============================================================
 
@@ -312,7 +312,7 @@
  999  CONTINUE
 
       IF ( DEVCAN ) THEN
-      
+
 *       Close down IDI using the parameter system.
 
          CALL IDI_CANCL( 'DEVICE', STATUS )

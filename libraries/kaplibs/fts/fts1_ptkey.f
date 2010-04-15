@@ -35,7 +35,7 @@
 *
 *     This subroutine can not be used to insert comment cards, that is,
 *     the cards with keyword 'COMMENT' or 'HISTORY', etc.
-*         
+*
 *  Arguments:
 *     FTSLOC = CHARACTER * ( * ) (Given)
 *        The locator to the FITS extension of the NDF.
@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -109,7 +109,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,7 +122,7 @@
       INTEGER NKEY
       CHARACTER * ( * ) NAMES( NKEY )
       CHARACTER * ( * ) PSTNS( NKEY )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -206,18 +206,18 @@
 *  the lengths explicitly for the former as the compilers pass the
 *  lengths of the latter as appended arguments .
       CALL FTS1_INKEY_C1( OLDSIZ, NKEY, %VAL( CNF_PVAL( FTSPNT( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( CPNTR( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( CPNTR( 1 ) ) ),
      :                    NAMES, PSTNS, ACTNUM,
-     :                    %VAL( CNF_PVAL( IPNTR1( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPNTR1( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPNTR2( 1 ) ) ),
-     :                    STATUS, %VAL( CNF_CVAL( FITSLN ) ), 
+     :                    STATUS, %VAL( CNF_CVAL( FITSLN ) ),
      :                    %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Unmap the FITS array.
       CALL DAT_UNMAP( FTSLOC, STATUS )
 
 *  Reduce the size of FITS array to the actual number of cards.
-      CALL DAT_ALTER( FTSLOC, 1, ACTNUM, STATUS )   
+      CALL DAT_ALTER( FTSLOC, 1, ACTNUM, STATUS )
 
  990  CONTINUE
 
@@ -228,7 +228,7 @@
       CALL AIF_ANTMP( WKLOC, STATUS )
 
  999  CONTINUE
-      
+
       END
 
 *  This is a dummy routine needed to pass the mapped character arrays
@@ -237,7 +237,7 @@
 *  known.
       SUBROUTINE FTS1_INKEY_C1( OLDSIZ, NKEY, CARDS, CWORK, NAMES,
      :                          PSTNS, ACTNUM, IARY1, IARY2, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -247,7 +247,7 @@
       CHARACTER * ( * ) NAMES( NKEY )
       CHARACTER * ( * ) PSTNS( NKEY )
       INTEGER ACTNUM
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) CARDS( OLDSIZ + NKEY )
       INTEGER IARY1( OLDSIZ + NKEY )
@@ -255,7 +255,7 @@
 
 *  Arguments Returned:
       CHARACTER * ( * ) CWORK( OLDSIZ + NKEY )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 

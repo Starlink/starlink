@@ -14,10 +14,10 @@
 *     CALL SUB_RGS( IPARI, STATUS )
 
 *  Description:
-C      This program reads the intermediate data file and creates a 
+C      This program reads the intermediate data file and creates a
 C      formatted file for output to a printer.
 C
-C      The output contains information relevant to the RGO 
+C      The output contains information relevant to the RGO
 C      26 and 13 inch refracting telescopes and the 1 metre camera.
 C
 C
@@ -53,7 +53,7 @@ C      in the much earlier ICL 1903T version of Chart!
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

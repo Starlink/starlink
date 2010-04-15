@@ -2,7 +2,7 @@
       SUBROUTINE RED4_FILE_STANDARD( STATUS )
 *    Description :
 *     This routine converts the given observation into a STANDARD
-*     and writes its parameters to the index file. 
+*     and writes its parameters to the index file.
 *    Invocation :
 *     CALL RED4_FILE_STANDARD( STATUS )
 *    Parameters :

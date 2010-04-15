@@ -81,7 +81,7 @@
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_RPOLYFIT:'/
      :     /'Action not defined for OBJECTs only', STATUS )
-      ELSE 
+      ELSE
          CALL MSG_OUT( ' ', 'Polyfitting to OBJ-SKY pairs', STATUS )
       ENDIF
 
@@ -139,9 +139,9 @@
 *    Process data (NB: We pass the data, variance and quality arrays here
 *        rather than their pointers as they entered here - a subtle difference!
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL FIG_POLYFIT( NX, NY, W1BYTES, DATA, VAR, QUAL, %val(XPTR), 
-     :     %val(YPTR), %val(WPTR), %val(W1PTR), PF_SAYS1, PF_SAYE1, 
-     :     PF_SAYS2, PF_SAYE2, PF_SAYS3, PF_SAYE3, PF_SAYS4, PF_SAYE4, 
+         CALL FIG_POLYFIT( NX, NY, W1BYTES, DATA, VAR, QUAL, %val(XPTR),
+     :     %val(YPTR), %val(WPTR), %val(W1PTR), PF_SAYS1, PF_SAYE1,
+     :     PF_SAYS2, PF_SAYE2, PF_SAYS3, PF_SAYE3, PF_SAYS4, PF_SAYE4,
      :     PF_DEGREE, PF_NREJECT, PF_WEIGHT )
       ENDIF
 

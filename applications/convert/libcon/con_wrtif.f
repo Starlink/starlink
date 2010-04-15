@@ -1,4 +1,4 @@
-      SUBROUTINE CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, MINI, MAXI, 
+      SUBROUTINE CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, MINI, MAXI,
      :                      OIMAGE, STATUS )
 *+
 *  Name:
@@ -16,12 +16,12 @@
 
 *  Description:
 *     This routine writes a TIFF file for NDF2TIFF.  Given the range
-*     of the data it generates a value to scale the data to the 0--255 
+*     of the data it generates a value to scale the data to the 0--255
 *     range required.  Then it writes out the file header information.
 *     This includes stuff like the image size and the number of bits
 *     per pixel.  Pixel values outside the range are set to the
 *     appropriate TIFF value (0 or 255).  Finally it writes out the image.
-*     If MAXI is less than MINI, a negative image will be produced. 
+*     If MAXI is less than MINI, a negative image will be produced.
 
 *  Arguments:
 *     EL = INTEGER (Given)
@@ -86,17 +86,17 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
- 
-*  Status:     
+
+*  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Arguments Given:
       INTEGER EL                 ! Number of pixels
       INTEGER FLEN               ! Output file length
@@ -134,11 +134,11 @@
       BYTE TEMP( 33000 )         ! Temporary storage
       INTEGER X                  ! Row number
       INTEGER Y                  ! Column number
- 
+
 *  Local Data:
 
 !  These are essential data for the TIFF header.
-      DATA HD /  
+      DATA HD /
      :          73, 73,
 !  Magic number
      :          42,  0,
@@ -159,16 +159,16 @@
 !  Photometric
      :           6,  1,  3,  0,  1,  0,  0,  0,  1,  0,  0,  0,
 !  Strip offsets
-     :          17,  1,  4,  0,  1,  0,  0,  0, 122, 0,  0,  0, 
+     :          17,  1,  4,  0,  1,  0,  0,  0, 122, 0,  0,  0,
 !  SamplesPerPixel
-     :          21,  1,  3,  0,  1,  0,  0,  0,  1,  0,  0,  0, 
+     :          21,  1,  3,  0,  1,  0,  0,  0,  1,  0,  0,  0,
 !  StripBytesCounts
-     :          23,  1,  4,  0,  1,  0,  0,  0,  0,  0,  0,  0, 
+     :          23,  1,  4,  0,  1,  0,  0,  0,  0,  0,  0,  0,
 !  Terminator
      :           0,  0,  0,  0 /
 
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -234,7 +234,7 @@
 
 *   Swap the image rows to avoid inverting the image.
       DO 100 Y = 1, DIMS( 2 ) / 2
-          
+
 *  Fill the temporary storage with row y.
          INDEX1 = 122 + ( Y - 1 ) * DIMS( 1 )
          DO 200 X = 1, DIMS( 1 )
@@ -255,8 +255,8 @@
   100 CONTINUE
 
 *  Write out the header/image data.
-      CALL RIO_WRITE( FIOD, 1, FLEN, OIMAGE, STATUS ) 
+      CALL RIO_WRITE( FIOD, 1, FLEN, OIMAGE, STATUS )
 
   999 CONTINUE
 
-      END 
+      END

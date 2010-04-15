@@ -76,13 +76,13 @@ C
 C  For modifications to the algorithm and many details on its use,
 C  (particularly for econometric applications) see Goffe, Ferrier
 C  and Rogers, "Global Optimization of Statistical Functions with
-C  Simulated Annealing," Journal of Econometrics, vol. 60, no. 1/2, 
+C  Simulated Annealing," Journal of Econometrics, vol. 60, no. 1/2,
 C  Jan./Feb. 1994, pp. 65-100.
-C  For more information, contact 
+C  For more information, contact
 C              Bill Goffe
 C              Department of Economics and International Business
-C              University of Southern Mississippi 
-C              Hattiesburg, MS  39506-5072 
+C              University of Southern Mississippi
+C              Hattiesburg, MS  39506-5072
 C              (601) 266-4484 (office)
 C              (601) 266-4920 (fax)
 C              bgoffe@whale.st.usm.edu (Internet)
@@ -298,10 +298,10 @@ C  Set initial values.
 
       DO 20, I = 1, NEPS
          FSTAR(I) = 1.0D+20
-20    CONTINUE 
+20    CONTINUE
 
-C  If the initial temperature is not positive, notify the user and 
-C  return to the calling routine.  
+C  If the initial temperature is not positive, notify the user and
+C  return to the calling routine.
       IF (T .LE. 0.0) THEN
          WRITE(*,'(/,''  THE INITIAL TEMPERATURE IS NOT POSITIVE. ''
      1             /,''  RESET THE VARIABLE T. ''/)')

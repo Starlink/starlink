@@ -42,7 +42,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -110,7 +110,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -206,12 +206,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -316,8 +316,8 @@ as follows:
      eq = equinox, e.g. 1950 (optional B or J prefix)
      ep = epoch, e.g. 1984.53 or 1983 2 26.4
 \end{verbatim}
-Coordinates type 4 and B default to equinox B1950. Coordinates type 5 default 
-to equinox J2000. In all three of these coordinate systems the epoch defaults 
+Coordinates type 4 and B default to equinox B1950. Coordinates type 5 default
+to equinox J2000. In all three of these coordinate systems the epoch defaults
 to the equinox. For coordinate type G the epoch defaults to B1950.
 
 The following commands are also available:
@@ -415,7 +415,7 @@ library (see SUN/67).
 sources, called the {\it primary}\, and {\it secondary}\ input files.
 To switch to a secondary input file called STARS.DAT, for
 example, would require the command /STARS.DAT.
-(The switch command itself is available only from the primary input file.) 
+(The switch command itself is available only from the primary input file.)
 When an E command, or end of file, is detected during input from
 a secondary file, control reverts to the primary file.
 The same secondary input file may be processed several times in
@@ -459,7 +459,7 @@ Equinoxes are Besselian or Julian epochs.
 They can be preceded by a B or J as appropriate; in default,
 epochs before 1984.0 are assumed to be Besselian, while epochs
 1984.0 and after are assumed to be Julian (the distinction is
-usually unimportant in this context). 
+usually unimportant in this context).
 Valid examples are B1950.0, J2000, 1975.
 
 Epochs may either be expressed as Besselian or Julian epochs,
@@ -559,7 +559,7 @@ Both numbers are required.
 
 \subsection{Ecliptic}
 
-\begin{verbatim} 
+\begin{verbatim}
        lambda  beta
           d      d
 \end{verbatim}

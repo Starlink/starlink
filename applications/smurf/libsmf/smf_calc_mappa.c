@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     result = smf_calc_mappa( smfHead *hdr, const char *system, 
+*     result = smf_calc_mappa( smfHead *hdr, const char *system,
 *                              Frame *sf, int *status );
 
 *  Arguments:
@@ -22,10 +22,10 @@
 *        Pointer to header containing FITS keywords.
 *     system = char* (Given)
 *        Specifies the celestial coordinate system in which the map
-*        position angle is required. It should be a valid value for the 
-*        System attribute of an AST SkyFrame, or "TRACKING". 
+*        position angle is required. It should be a valid value for the
+*        System attribute of an AST SkyFrame, or "TRACKING".
 *     sf = AstFrame * (Given)
-*        A Frame that is used to determine the observers position, and the 
+*        A Frame that is used to determine the observers position, and the
 *        the time at which the position angle is determined.
 *     status = int * (Given and Returned)
 *        The inherited status value.
@@ -86,7 +86,7 @@
 #include "sc2da/sc2ast.h"
 #include "libsmf/smf.h"
 
-double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf, 
+double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
                        int *status ){
 
 /* Local Variables */
@@ -108,7 +108,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
 /* Check inherited status */
    if (*status != SAI__OK) return 0.0;
 
-/* Determine the tracking system, and choose the celestial coordinate system 
+/* Determine the tracking system, and choose the celestial coordinate system
    for the output cube. */
    trsys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
    if( !strcmp( system, "TRACKING" ) ) {

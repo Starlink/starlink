@@ -1,7 +1,7 @@
       SUBROUTINE
-     : CHI_HGDNAC( CATNO, FNAMES, NUMFLDS, 
+     : CHI_HGDNAC( CATNO, FNAMES, NUMFLDS,
      :                  CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS,
-     :                  FLDTYPES, NULLS, STATUS) 
+     :                  FLDTYPES, NULLS, STATUS)
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -38,7 +38,7 @@
       LOGICAL COLFOUND
       CHARACTER*(DAT__SZTYP)  HTYPE
 *.
-      
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -61,7 +61,7 @@
 * Check to see if we are outside the mapped region - if so then
 *   remap all mapped columns to new window centred on LINENO -
 *   could just go from LINENO onwards but this is safer
-*   Map to end of total space available - not just records used 
+*   Map to end of total space available - not just records used
 *   because we may be reading and then writing on the end
 
       IF ( LINENO .GT. CHIH_MAPSEC(2, CATNO) .OR.
@@ -71,17 +71,17 @@
                  CALL DAT_TYPE( CHIH_COLDLOC( I, CATNO), HTYPE, STATUS)
                  CALL DAT_UNMAP( CHIH_SLICELOC( I, CATNO), STATUS)
                  CALL DAT_ANNUL( CHIH_SLICELOC( I, CATNO), STATUS)
-                 CHIH_MAPSEC(1, CATNO) = 
+                 CHIH_MAPSEC(1, CATNO) =
      :                    MAX( LINENO - CHIH_MAXMAPSIZE/2, 1)
-                 CHIH_MAPSEC(2, CATNO) = 
-     :                              MIN( LINENO + CHIH_MAXMAPSIZE/2, 
+                 CHIH_MAPSEC(2, CATNO) =
+     :                              MIN( LINENO + CHIH_MAXMAPSIZE/2,
      :                                   CHIH_TOTSIZE(1, CATNO))
                  CALL DAT_SLICE( CHIH_COLDLOC( I, CATNO), 1,
      :                    CHIH_MAPSEC(1, CATNO), CHIH_MAPSEC(2, CATNO),
      :                    CHIH_SLICELOC( I, CATNO), STATUS)
                  CALL DAT_MAP( CHIH_SLICELOC( I, CATNO), HTYPE,
      :                    CHIH_CHNAM( CHIH_MODE( 1, CATNO) ), 1,
-     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1, 
+     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1,
      :                    CHIH_COLPT( I, CATNO), STATUS)
 
 * repeat for NULLFLAGS
@@ -94,7 +94,7 @@
      :                    CHIH_SLICENLOC( I, CATNO), STATUS)
                  CALL DAT_MAP( CHIH_SLICENLOC( I, CATNO), HTYPE,
      :                    CHIH_CHNAM( CHIH_MODE( 1, CATNO) ), 1,
-     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1, 
+     :                    CHIH_MAPSEC(2, CATNO)-CHIH_MAPSEC(1, CATNO)+1,
      :                    CHIH_NULLPT( I, CATNO), STATUS)
 
              ENDIF
@@ -111,7 +111,7 @@
           FNAMES(I) = CHIH_FNAME(I, CATNO)
 * If the column is not found then explicitly map it, and fill the
 *   common block
-          CALL CHI_HGETCOL( CATNO, FNAMES(I), 
+          CALL CHI_HGETCOL( CATNO, FNAMES(I),
      :                    SELCOL(I), FLDTYPES(I), STATUS )
 
       ENDDO
@@ -139,7 +139,7 @@
               CALL  TBL_GETCVL( %val(PT), OFFSET, 1, 1, NULLS(I), 1)
           ENDIF
       ENDDO
-          
+
 9999  RETURN
 
       END

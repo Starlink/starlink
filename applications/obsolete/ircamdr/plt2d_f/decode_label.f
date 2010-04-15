@@ -5,7 +5,7 @@
 *               from the input string LABEL_STRING for the labelling of
 *               features under the PLT2D LABEL action
 
-* History : 
+* History :
 *  20-JUL-1994 Changed STR$ and LIB$ calls to CHR_, IFIX to INT (SKL@JACH)
 *
 
@@ -43,7 +43,7 @@
 
 * get first word from string as this is the X position of the label
 
-	CALL GET_WORD( LABEL_STRING, X_STRING, NUMBER_CHARS, REST, 
+	CALL GET_WORD( LABEL_STRING, X_STRING, NUMBER_CHARS, REST,
      :                 STATUS)
 
 	IF( STATUS  .NE. SAI__OK) THEN
@@ -52,10 +52,10 @@
 
 * convert X string to real number
 
-        CALL CTOR( X_STRING( 1:NUMBER_CHARS),  X_REAL, STATUS ) 
+        CALL CTOR( X_STRING( 1:NUMBER_CHARS),  X_REAL, STATUS )
 
 	IF( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP('ERR', 'Error converting real to string', 
+          CALL ERR_REP('ERR', 'Error converting real to string',
      :                  STATUS )
 	  RETURN
 	END IF
@@ -70,7 +70,7 @@
 
 * get second word from string as this is the Y position of the label
 
-	CALL GET_WORD( LABEL_STRING, Y_STRING, NUMBER_CHARS, REST, 
+	CALL GET_WORD( LABEL_STRING, Y_STRING, NUMBER_CHARS, REST,
      :                 STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
@@ -79,10 +79,10 @@
 
 * convert Y string to real number
 
-        CALL CTOR( Y_STRING( 1:NUMBER_CHARS),  Y_REAL, STATUS ) 
+        CALL CTOR( Y_STRING( 1:NUMBER_CHARS),  Y_REAL, STATUS )
 
 	IF( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP('ERR', 'Error converting real to string', 
+          CALL ERR_REP('ERR', 'Error converting real to string',
      :                  STATUS )
 	  RETURN
 	END IF
@@ -104,7 +104,7 @@
 
 	  LABEL = REST( START_LABEL:END_LABEL)
 
-	  LABEL_LENGTH = END_LABEL - START_LABEL + 1 
+	  LABEL_LENGTH = END_LABEL - START_LABEL + 1
 
  	END IF
 

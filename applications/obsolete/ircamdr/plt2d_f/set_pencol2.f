@@ -7,7 +7,7 @@
 * Authors : C.Aspin (UOE)
 * History
 *   22-Jul-1994 Changed STR$ calls to CHR_ (SKL@JACH)
-*   26-JUL-1994 Changed error reporting to use ERR_, removed VALUE (SKL@JACH) 
+*   26-JUL-1994 Changed error reporting to use ERR_, removed VALUE (SKL@JACH)
 *
 * Type Definitions
 

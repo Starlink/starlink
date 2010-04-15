@@ -94,8 +94,8 @@ int datPrec( const HDSLoc * loc, size_t *nbytes, int *status ) {
 
   HDSTypes lut[] = {
     { 8, "_DOUBLE" },
-    { 4, "_REAL" }, 
-    { 4, "_INTEGER" }, 
+    { 4, "_REAL" },
+    { 4, "_INTEGER" },
     { 4, "_LOGICAL" },
     { 1, "_CHAR" },
     { 2, "_UWORD" },

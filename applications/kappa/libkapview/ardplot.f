@@ -20,10 +20,10 @@
 *        The global status.
 
 *  Description:
-*     This application draws the outlines of regions described in 
-*     a supplied 2-dimensional ARD file (an `ARD Description' - see 
-*     SUN/183). The outlines are drawn over the top of a previously 
-*     displayed picture, aligned (if possible) in the current coordinate 
+*     This application draws the outlines of regions described in
+*     a supplied 2-dimensional ARD file (an `ARD Description' - see
+*     SUN/183). The outlines are drawn over the top of a previously
+*     displayed picture, aligned (if possible) in the current coordinate
 *     Frame of the previously drawn picture.
 
 *  Usage:
@@ -32,20 +32,20 @@
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
 *        The name of a file containing an `ARD Description' of the regions
-*        to be outlined. The co-ordinate system in which positions within 
-*        this file are given should be indicated by including suitable 
-*        COFRAME or WCS statements within the file (see SUN/183), but will 
-*        default to pixel co-ordinates in the absence of any such 
-*        statements. For instance, starting the file with a line containing 
-*        the text "COFRAME(SKY,System=FK5)" would indicate that positions 
-*        are specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)" 
-*        indicates explicitly that positions are specified in pixel 
+*        to be outlined. The co-ordinate system in which positions within
+*        this file are given should be indicated by including suitable
+*        COFRAME or WCS statements within the file (see SUN/183), but will
+*        default to pixel co-ordinates in the absence of any such
+*        statements. For instance, starting the file with a line containing
+*        the text "COFRAME(SKY,System=FK5)" would indicate that positions
+*        are specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
+*        indicates explicitly that positions are specified in pixel
 *        co-ordinates. The ARDFILE parameter is only accessed if
 *        parameter REGION is given a null (!) value.
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
 *     REGION = FILENAME (Read)
-*        The name of a file containing an AST Region to be outlined, or 
+*        The name of a file containing an AST Region to be outlined, or
 *        null (!) if the ARD region defined by parameter ARDFILE is to be
 *        outlined. Suitable files can be created using the ATOOLS
 *        package. [!]
@@ -54,22 +54,22 @@
 *        outlined. If zero (the default) is supplied, then the plotted
 *        boundary encloses all the regions within the ARD file. If a
 *        positive value is supplied, then only the region with the
-*        specified index is outlined (the first region in the ARD file 
+*        specified index is outlined (the first region in the ARD file
 *        has index 2, for historical reasons). If a negative value is
-*        supplied, then all regions with indices greater than or equal 
+*        supplied, then all regions with indices greater than or equal
 *        to the absolute value of the supplied index are outlined. See
-*        SUN/183 for further information on the numbering of regions 
-*        within an ARD description. The REGVAL parameter is only accessed 
+*        SUN/183 for further information on the numbering of regions
+*        within an ARD description. The REGVAL parameter is only accessed
 *        if parameter REGION is given a null (!) value. [0]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use 
+*        A group of attribute settings describing the plotting style to use
 *        for the curves.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text file
 *        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
+*        contain further comma-separated lists which will be read and
+*        interpreted in the same manner. Attribute settings are applied in
 *        the order in which they occur within the list, with later settings
 *        over-riding any earlier settings given for the same attribute.
 *
@@ -83,23 +83,23 @@
 *        defaulted if a null value (!) is supplied. See section "Plotting
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        reported).
 *
 *        The appearance of the plotted curves is controlled by the attributes
 *        Colour(Curves), Width(Curves), etc. [current value]
 
 *  Examples:
-*     ardplot bulge 
+*     ardplot bulge
 *        Draws an outline around all the regions included in the ardfile
 *        named "bulge". The outline is drawn on the current graphics device
 *        and is drawn in alignment with the previous picture.
 
 *  Notes:
 *     -  A DATA picture must already exist on the selected graphics
-*     device before running this command. An error will be reported if no 
+*     device before running this command. An error will be reported if no
 *     DATA picture can be found.
 *     -  The application stores a new DATA picture in the graphics
-*     database. On exit the current database picture for the chosen 
+*     database. On exit the current database picture for the chosen
 *     device reverts to the input picture.
 
 *  Related Applications:
@@ -108,7 +108,7 @@
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005 Particle Physics & Astronomy
-*     Research Council. 
+*     Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -178,7 +178,7 @@
       INTEGER IPICK              ! AGI identifier for the KEY picture
       INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
-      INTEGER IREG               ! Pointer to supplied AST Region 
+      INTEGER IREG               ! Pointer to supplied AST Region
       INTEGER NEWREG             ! Pointer to AST Region to outline
       INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
       INTEGER REGVAL             ! Requested region value
@@ -201,17 +201,17 @@
       CALL AST_BEGIN( STATUS )
 
 *  Start up the graphics system, checking that there is an existing DATA
-*  picture on the device. This stores a new DATA picture in the AGI 
-*  database with the same bounds as the existing DATA picture. The 
-*  PGPLOT viewport is set so that it matches the area of the DATA picture. 
+*  picture on the device. This stores a new DATA picture in the AGI
+*  database with the same bounds as the existing DATA picture. The
+*  PGPLOT viewport is set so that it matches the area of the DATA picture.
 *  World co-ordinates within the PGPLOT window are set to millimetres
-*  from the bottom left corner of the view surface. An AST Plot is returned 
-*  for drawing in the DATA picture. The Base (GRAPHICS) Frame in the Plot 
+*  from the bottom left corner of the view surface. An AST Plot is returned
+*  for drawing in the DATA picture. The Base (GRAPHICS) Frame in the Plot
 *  corresponds to millimetres from the bottom left corner of the view
 *  port, and the Current Frame is inherited from the existing DATA
 *  picture's WCS FrameSet.
       CALL KPG1_PLOT( AST__NULL, 'OLD', 'KAPPA_ARDPLOT', ' ', MARGIN, 0,
-     :                ' ', ' ', 0.0, 0.0, 'PIXEL', BOX, IPICD, IPICF, 
+     :                ' ', ' ', 0.0, 0.0, 'PIXEL', BOX, IPICD, IPICF,
      :                IPICK, IPLOT, NFRM, ALIGN, STATUS )
 
 *  Abort if an error occurred.
@@ -224,7 +224,7 @@
       IREG = AST__NULL
 
 *  First of all, attempt to get an AST Region.
-      CALL KPG1_GTOBJ( 'REGION', 'Region', AST_ISAREGION, IREG, 
+      CALL KPG1_GTOBJ( 'REGION', 'Region', AST_ISAREGION, IREG,
      :                 STATUS )
 
 *  If no region was supplied, annul the error and proceed to display an
@@ -247,13 +247,13 @@
          CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
 
 *  Get the index of the region to draw.
-         CALL PAR_GET0I( 'REGVAL', REGVAL, STATUS )      
+         CALL PAR_GET0I( 'REGVAL', REGVAL, STATUS )
 
-*  We want to draw the ARD region over the entire plotting area, so get the 
+*  We want to draw the ARD region over the entire plotting area, so get the
 *  bounds of the PGPLOT window (this will be in millimetres).
          CALL PGQWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
 
-*  Select the PIXEL Frame as the current Frame in the Plot so that 
+*  Select the PIXEL Frame as the current Frame in the Plot so that
 *  pixel coords become the default coord system for the ARD file.
          CALL KPG1_ASFFR( IPLOT, 'PIXEL', IPIX, STATUS )
          CALL AST_SETI( IPLOT, 'CURRENT', IPIX, STATUS )
@@ -279,10 +279,10 @@
 *  Now handle cases where an AST Region was supplied.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
-*  We now try to get a region in which the axes are the same in number and 
-*  type (but not necessarily order - AST_CONVERT, called later, will take 
-*  account of any difference in axis order) as those spanned by the current 
-*  Frame in the Plot. 
+*  We now try to get a region in which the axes are the same in number and
+*  type (but not necessarily order - AST_CONVERT, called later, will take
+*  account of any difference in axis order) as those spanned by the current
+*  Frame in the Plot.
          CALL ATL_MATCHREGION( IREG, IPLOT, NEWREG, STATUS )
 
 *  Find the Mapping from the existing Plot to the Frame represented by
@@ -291,7 +291,7 @@
          IBASE = AST_GETI( IPLOT, 'Base', STATUS )
          FS = AST_CONVERT( IPLOT, NEWREG, ' ', STATUS )
 
-*  Get the Domain in which alignment occurred (the Domain of the new 
+*  Get the Domain in which alignment occurred (the Domain of the new
 *  base Frame in the Plot), and then reinstate the original Base Frame.
          CALL AST_INVERT( IPLOT, STATUS )
          ADOM = AST_GETC( IPLOT, 'Domain', STATUS )
@@ -304,15 +304,15 @@
             IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'ARDPLOT_ERR1', 'Cannot align the '//
-     :                       'supplied Region with the displayed plot.', 
+     :                       'supplied Region with the displayed plot.',
      :                       STATUS )
             END IF
 
 *  Otherwise, add the Frame into the plot using the Mapping returned by
 *  AST_CONVERT to connect it to the current Frame in the Plot.
          ELSE
-            CALL AST_ADDFRAME( IPLOT, AST__CURRENT, 
-     :                         AST_GETMAPPING( FS, AST__BASE, 
+            CALL AST_ADDFRAME( IPLOT, AST__CURRENT,
+     :                         AST_GETMAPPING( FS, AST__BASE,
      :                                         AST__CURRENT, STATUS ),
      :                         NEWREG, STATUS )
 

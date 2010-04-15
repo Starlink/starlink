@@ -94,7 +94,7 @@
 
 
 
-size_t smf_get_freemem ( double *mbytes, size_t * pagesize, 
+size_t smf_get_freemem ( double *mbytes, size_t * pagesize,
                          size_t * physsize, int * status ) {
   size_t mem_used = 0;
   size_t mem_free = 0;

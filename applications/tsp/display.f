@@ -9,7 +9,7 @@ C
 C     Function:
 C        Display a 3D TSP dataset on an image display device
 C
-C     Description:   
+C     Description:
 C        Display a 3D time series image dataset on an image display device.
 C        There are a range of options selected with the COMMAND parameter.
 C        The image may be displayed as a single frame, as a movie of a
@@ -35,16 +35,16 @@ C    (5) FIRST     (Integer)   First frame for movie
 C    (6) LAST      (Integer)   Last frame for movie
 C        COMMAND   (Char)      Command to control further options
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         18/11/1991
 C
 C-
 C
 C  History:
-C    19/10/1989   Original Version (MOVIE).   JAB/JAC 
+C    19/10/1989   Original Version (MOVIE).   JAB/JAC
 C    21/10/1989   Change name to DISPLAY, add command mode.  JAB/JAC
 C    18/11/1991   Handle bad values     JAB/AAO
 C
@@ -64,7 +64,7 @@ C
 
 *  Data pointers
       INTEGER PTR,IPTR,TPTR
-      
+
 *  SGSOP Zone
       INTEGER ZONE
 
@@ -72,7 +72,7 @@ C
       INTEGER NDIMS,DIMS(3)
 
 *  Number of display colours
-      REAL COLS  
+      REAL COLS
 
 *  Minimum colour index
       INTEGER CMIN
@@ -89,7 +89,7 @@ C
       LOGICAL FINISHED,OK
       REAL X,Y,XX
       INTEGER NX,NY,N
-      
+
 *  Get the input file
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
 
@@ -165,7 +165,7 @@ C
               CALL MSG_SETI('FRAMES',DIMS(3))
               CALL MSG_OUT(' ',
      :            'Time Series Contains ^FRAMES Frames',STATUS)
-      
+
 *  Prompt user for first frame
               CALL PAR_DEF0I('FIRST',1,STATUS)
               CALL PAR_GET0I('FIRST',F1,STATUS)
@@ -186,9 +186,9 @@ C
      :              %VAL(IPTR),%VAL(TPTR),XMIN,XMAX,F1,F2,COLS,CMIN,
      :              STATUS)
               ENDIF
-          ELSE IF (COMMAND(1:1) .EQ. 'F' .OR. 
+          ELSE IF (COMMAND(1:1) .EQ. 'F' .OR.
      :             COMMAND(1:1) .EQ. 'f') THEN
-       
+
 *  Display a single frame
               F2=F2+1
               IF (F2 .GT. DIMS(3)) F2=DIMS(3)
@@ -211,7 +211,7 @@ C
 
 *  Read cursor position
               OK = .FALSE.
-              DO WHILE (.NOT. OK)  
+              DO WHILE (.NOT. OK)
                   CALL SGS_REQCU(X,Y,N)
                   IF (X .GE. 0.022 .AND. X .LE. 0.978 .AND.
      :                Y .GE. 0.022 .AND. Y .LE. 0.848) THEN
@@ -220,24 +220,24 @@ C
               ENDDO
 
 *  Calculate pixel coordinates
-              NX = INT((X-0.022)/(0.978-0.022)*REAL(DIMS(1)))+1          
-              NY = INT((Y-0.022)/(0.848-0.022)*REAL(DIMS(2)))+1          
-              IF (NX .LT. 1) NX=1                                        
-              IF (NX .GT. DIMS(1)) NX = DIMS(1)                          
-              IF (NY .LT. 1) NY=1                                        
-              IF (NY .GT. DIMS(2)) NY = DIMS(2)                          
+              NX = INT((X-0.022)/(0.978-0.022)*REAL(DIMS(1)))+1
+              NY = INT((Y-0.022)/(0.848-0.022)*REAL(DIMS(2)))+1
+              IF (NX .LT. 1) NX=1
+              IF (NX .GT. DIMS(1)) NX = DIMS(1)
+              IF (NY .LT. 1) NY=1
+              IF (NY .GT. DIMS(2)) NY = DIMS(2)
 
 *  Get the data value for pixel
-              IF (STATUS .EQ. SAI__OK) THEN                              
-                  CALL TSP_DISPLAY_GET(DIMS(1),DIMS(2),DIMS(3),          
-     :                NX,NY,F2,%VAL(PTR),XX)                             
-              ENDIF            
+              IF (STATUS .EQ. SAI__OK) THEN
+                  CALL TSP_DISPLAY_GET(DIMS(1),DIMS(2),DIMS(3),
+     :                NX,NY,F2,%VAL(PTR),XX)
+              ENDIF
 
 *  Output results
-              CALL MSG_SETI('NX',NX)                                     
-              CALL MSG_SETI('NY',NY)                                     
-              CALL MSG_SETR('XX',XX)                                     
-              CALL MSG_OUT(' ','X = ^NX Y = ^NY  ^XX',STATUS)            
+              CALL MSG_SETI('NX',NX)
+              CALL MSG_SETI('NY',NY)
+              CALL MSG_SETR('XX',XX)
+              CALL MSG_OUT(' ','X = ^NX Y = ^NY  ^XX',STATUS)
           ENDIF
       ENDDO
       IF (STATUS .EQ. 2) STATUS = SAI__OK
@@ -250,7 +250,7 @@ C
       CALL TSP_UNMAP(ILOC,STATUS)
       END
 
-      
+
       SUBROUTINE TSP_DISPLAY(N1,N2,N3,X,IX,TD,XMIN,XMAX,F1,F2,COLS,CMIN,
      :    STATUS)
 *+
@@ -285,7 +285,7 @@ C
 *   Modified:
 *     18/11/1991   Handle bad values
 *
-*+  
+*+
       IMPLICIT NONE
 
       INCLUDE 'PRM_PAR'
@@ -438,7 +438,7 @@ C
       INTEGER N1,N2,N3
       REAL X(N1,N2,N3),XMIN,XMAX
       INTEGER STATUS
- 
+
 *  Local variables
       INTEGER I1,I2
 
@@ -552,4 +552,4 @@ C
 *  Copy value
       XX = X(I1,I2,I3)
       END
-      
+

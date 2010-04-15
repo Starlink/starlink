@@ -24,7 +24,7 @@
 *       e) increase the size of axis tick marks.
 *
 *     There are other options controlled by input arguments:
-*       f) control the extents of the x and y axes, rather than letting 
+*       f) control the extents of the x and y axes, rather than letting
 *          NCAR decide;
 *       g) plot the tick marks outside the grid (default is inside);
 *       h) have either or both axes logarithmic;
@@ -207,7 +207,7 @@
          CALL AGGETF( 'X/ORDER.', XORDER )
          CALL AGSETF( 'X/ORDER.', 1.0 )
       END IF
-        
+
 *    Record and modify the y axis polarity.  1.0 means it increases from
 *    top to bottom.
 
@@ -460,11 +460,11 @@
 *    x-axis polarity
 
       IF ( XNEG ) CALL AGSETF( 'X/ORDER.', XORDER )
-        
+
 *    y-axis polarity
 
       IF ( YNEG ) CALL AGSETF( 'Y/ORDER.', YORDER )
-        
+
 *    top-grid value
 
       CALL AGSETF( 'GRID/TOP.', GRID )

@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_MULTARE (NELM, ARRAY1, ARRAY2, ARRAY3, Q1DATA,
-     :  Q2DATA, Q3DATA, E1DATA, E2DATA, E3DATA, QUAL, FLAGS, FBAD, 
+     :  Q2DATA, Q3DATA, E1DATA, E2DATA, E3DATA, QUAL, FLAGS, FBAD,
      :  VARIANCE)
 *+
 *  Name:
@@ -16,7 +16,7 @@
 
 *  Invocation:
 *     CALL SCULIB_MULTARE (NELM, ARRAY1, ARRAY2, ARRAY3, Q1DATA,
-*    :  Q2DATA, Q3DATA, E1DATA, E2DATA, E3DATA, QUAL, FLAGS, FBAD, 
+*    :  Q2DATA, Q3DATA, E1DATA, E2DATA, E3DATA, QUAL, FLAGS, FBAD,
 *    :  VARIANCE)
 
 *  Arguments:
@@ -109,7 +109,7 @@
 
 *.
 
-*  Handle different quality methods separately.  
+*  Handle different quality methods separately.
 
       IF (QUAL) THEN
 

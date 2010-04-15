@@ -132,7 +132,7 @@ This is because a direct WRITE would bypass ADAM's system of output control
 would bypass the parameter system for obtaining parameter values.
 Furthermore, the sub-process in which the program is run may not be connected to
 a terminal.
- 
+
 An example of the source code for a simple program to read a real value from a
 terminal and write it out is:
 
@@ -467,7 +467,7 @@ the message \verb+`TESTR prints x'+ (where \verb+x+ is the value associated
 with the message token \verb+^X+ by the program) is to be displayed in
 preference to the message given in the program (i.e.\ in the source code).
 If the message specification is omitted from the interface file, the text given
-in the source code would be displayed 
+in the source code would be displayed
 (i.e.\ '\verb+Value from TESTR program is x+').
 
 Now that we have the source code stored in file TESTR.FOR and the interface
@@ -780,9 +780,9 @@ part of a message:
           REAL R, RR
     *...........................................................................
           IF (STATUS.NE.SAI__OK) RETURN
-          CALL PAR_GET0R('VALUE', R, STATUS)                        
+          CALL PAR_GET0R('VALUE', R, STATUS)
           IF (STATUS.EQ.SAI__OK) THEN
-             RR = R*R           
+             RR = R*R
              CALL MSG_SETR('RVAL', R)
              CALL MSG_SETR('RSQUARED', RR)
              CALL MSG_OUT(' ', 'The Square of ^RVAL is ^RSQUARED', STATUS)
@@ -790,7 +790,7 @@ part of a message:
           END
 \end{verbatim}
 \end{small}
-                                               
+
 Here, STATUS is used in two tests.
 Firstly:
 
@@ -799,7 +799,7 @@ Firstly:
           IF (STATUS.NE.SAI__OK) RETURN
 \end{verbatim}
 \end{small}
-                                               
+
 to implement the ADAM Error Strategy, and secondly:
 
 \begin{small}
@@ -809,11 +809,11 @@ to implement the ADAM Error Strategy, and secondly:
           END IF
 \end{verbatim}
 \end{small}
-                                               
+
 to ensure that if the STATUS returned from PAR\_GET0R is bad, the rest of the
 routine is not executed with an undefined value of R.
 Actually, it is not necessary to include MSG\_OUT in the IF block as this
-routine would return immediately if STATUS was bad.                  
+routine would return immediately if STATUS was bad.
 
 An example interface file for this program is:
 
@@ -873,13 +873,13 @@ Replace the second IF statement by:
 
 \begin{small}
 \begin{verbatim}
-    IF (STATUS.EQ.SAI__OK) THEN      
-       RR = R*R           
+    IF (STATUS.EQ.SAI__OK) THEN
+       RR = R*R
        CALL PAR_PUT0R('VALUE', RR, STATUS)
     END IF
 \end{verbatim}
 \end{small}
-                            
+
 We could run the modified program from ICL as follows:
 
 \begin{small}
@@ -906,9 +906,9 @@ data object holding the value of the variable is used as the parameter by ICL.
 
 A modification of this scheme is needed with character variables to allow for
 the case where the value of the character variable is itself a device, file
-or object name. 
-In such cases, the supplied name cannot be replaced by some other name so, 
-to indicate that they may not be replaced, name values in variables must be 
+or object name.
+In such cases, the supplied name cannot be replaced by some other name so,
+to indicate that they may not be replaced, name values in variables must be
 preceded by `@'.
 For example, in
 
@@ -1088,7 +1088,7 @@ the commands TESTC, TESTI, TESTL, TESTR in an ICL command file TEST.ICL:
 \end{small}
 
 Now, we are ready to use our monolith TEST.
-Start up ICL in the usual way, then execute the commands which define the 
+Start up ICL in the usual way, then execute the commands which define the
 commands to run the programs by loading the command file TEST.ICL:
 
 \begin{small}

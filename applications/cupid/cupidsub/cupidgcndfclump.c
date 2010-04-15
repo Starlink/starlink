@@ -7,8 +7,8 @@
 #include <stdio.h>
 
 
-void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
-                    int ndim, int *lbox, int *ubox, int list_size, 
+void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
+                    int ndim, int *lbox, int *ubox, int list_size,
                     double *mlist, int *plist, int *lbnd, int iclump,
                     int *dax, AstKeyMap *extra, int bad, int *status ){
 /*
@@ -23,17 +23,17 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
-*                         int ndim, int *lbox, int *ubox, int list_size, 
+*     void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
+*                         int ndim, int *lbox, int *ubox, int list_size,
 *                         double *mlist, int *plist, int *lbnd, int iclump,
 *                         int *dax, AstKeyMap *extra, int bad,
 *                         int *status )
 
 *  Description:
-*     This function creates a temporary NDF and stores the integrated 
-*     intensity of the clump in its Data component. The bounds of the NDF 
-*     will be the smallest possible which still encompass the clump. In 
-*     addition, if required it will create a Cupid extension in the NDF 
+*     This function creates a temporary NDF and stores the integrated
+*     intensity of the clump in its Data component. The bounds of the NDF
+*     will be the smallest possible which still encompass the clump. In
+*     addition, if required it will create a Cupid extension in the NDF
 *     containing
 *
 *     - The parameters of a Gaussian approximation to the clump (if supplied).
@@ -41,7 +41,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 *  Parameters:
 *     obj
-*        A pointer to a locator for an HDS array of NDF objects. The array 
+*        A pointer to a locator for an HDS array of NDF objects. The array
 *        will be extended to accomodate the new NDF. If NULL is supplied a
 *        new temporary HDS object is created, and the locator stored at the
 *        given address.
@@ -50,11 +50,11 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        par[1], this value should not be normalised to the RMS noise.
 *     par
 *        Pointer to an array holding the parameters of a Gaussian
-*        approximation to the clump, or NULL. How many of these are used 
-*        depends on the value of "ndim": if "ndim" is 1 only elements 0 to 
-*        3 are used, if "ndim" is 2 only elements 0 to 6 are used, if "ndim" 
-*        is 3 all elements are used. All axis values are represented in GRID 
-*        pixels: 
+*        approximation to the clump, or NULL. How many of these are used
+*        depends on the value of "ndim": if "ndim" is 1 only elements 0 to
+*        3 are used, if "ndim" is 2 only elements 0 to 6 are used, if "ndim"
+*        is 3 all elements are used. All axis values are represented in GRID
+*        pixels:
 *
 *           par[0]: Peak intensity of clump (in units of the RMS noise level).
 *           par[1]: Constant intensity offset (in units of the RMS noise level).
@@ -62,7 +62,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *           par[3]: Intrinsic FWHM on axis 0 (in pixels)
 *           par[4]: Model centre on internal axis 1 (in pixels)
 *           par[5]: Intrinsic FWHM on axis 1 (in pixels)
-*           par[6]: Spatial orientation angle (in radians, positive from 
+*           par[6]: Spatial orientation angle (in radians, positive from
 *                   +ve GRID1 axis to +ve GRID2 axis).
 *           par[7]: Model centre on internal axis 3 (velocity) (in pixels)
 *           par[8]: Intrinsic FWHM on velocity axis (in pixels)
@@ -87,7 +87,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        each pixel.
 *     plist
 *        An array of "ndim*list_size" elements in which each group of
-*        "ndim" adjacent values forms the grid indices of the corresponding 
+*        "ndim" adjacent values forms the grid indices of the corresponding
 *        value in "mlist". This uses external axis ordering.
 *     lbnd
 *        Pointer to array holding the pixel indices of the first pixel in
@@ -225,13 +225,13 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
      elb[ dax[ i ] ] = lb[ i ];
      eub[ dax[ i ] ] = ub[ i ];
      estep[ dax[ i ] ] = step[ i ];
-   }      
+   }
 
-/* Create a place holder for the new NDF within the new cell. The NDF will be 
+/* Create a place holder for the new NDF within the new cell. The NDF will be
    copied to its final resting place before the program exits. */
    ndfPlace( cloc, " ", &place, status );
 
-/* Create the NDF to receive the clump values. The size of this NDF is the 
+/* Create the NDF to receive the clump values. The size of this NDF is the
    minimum needed to contain the clump. */
    ndfNew( "_DOUBLE", ndim, elb, eub, &place, &indf, status );
 
@@ -254,7 +254,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
             iv += ( pv - elbox[ j ] )*estep[ j ];
             if( pv < elbox[ j ] || pv > eubox[ j ] ) ok = 0;
          }
-         
+
 /* Store the value. */
          if( ok ) ipd[ iv ] = *(m++);
       }
@@ -265,14 +265,14 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 /* If required, create a Cupid extension in the NDF. */
    if( par || extra ) {
-      xloc = NULL;  
+      xloc = NULL;
       ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* First do Gaussian parameters. */
       if( par ) {
 
 /* Store the integrated intensity in the clump. */
-         dloc = NULL;  
+         dloc = NULL;
          datNew( xloc, "SUM", "_DOUBLE", 0, NULL, status );
          datFind( xloc, "SUM", &dloc, status );
          datPutD( dloc, 0, NULL, &sum, status );
@@ -291,63 +291,63 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
          dval = rms*par[ 1 ];
          datPutD( dloc, 0, NULL, &dval, status );
          datAnnul( &dloc, status );
-            
+
          datNew( xloc, cen[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
          datFind( xloc, cen[ dax[ 0 ] ], &dloc, status );
          dval = par[ 2 ] + lbnd[ dax[ 0 ] ] - 1.5;
          datPutD( dloc, 0, NULL, &dval, status );
          datAnnul( &dloc, status );
-            
+
          datNew( xloc, fwhm[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
          datFind( xloc, fwhm[ dax[ 0 ] ], &dloc, status );
          datPutD( dloc, 0, NULL, par + 3, status );
          datAnnul( &dloc, status );
-      
+
          if( ndim > 1 ) {
             datNew( xloc, cen[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
             datFind( xloc, cen[ dax[ 1 ] ], &dloc, status );
             dval = par[ 4 ] + lbnd[ dax[ 1 ] ] - 1.5;
             datPutD( dloc, 0, NULL, &dval, status );
             datAnnul( &dloc, status );
-               
+
             datNew( xloc, fwhm[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
             datFind( xloc, fwhm[ dax[ 1 ] ], &dloc, status );
             datPutD( dloc, 0, NULL, par + 5, status );
             datAnnul( &dloc, status );
-               
+
             datNew( xloc, "ANGLE", "_DOUBLE", 0, NULL, status );
             datFind( xloc, "ANGLE", &dloc, status );
             dval = par[ 6 ]*AST__DR2D;
             datPutD( dloc, 0, NULL,  &dval, status );
             datAnnul( &dloc, status );
-               
+
             if( ndim > 2 ) {
-      
+
                datNew( xloc, cen[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
                datFind( xloc, cen[ dax[ 2 ] ], &dloc, status );
                dval = par[ 7 ] + lbnd[ dax[ 2 ] ] - 1.5;
                datPutD( dloc, 0, NULL, &dval, status );
                datAnnul( &dloc, status );
-                  
+
                datNew( xloc, fwhm[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
                datFind( xloc, fwhm[ dax[ 2 ] ], &dloc, status );
                datPutD( dloc, 0, NULL, par + 8, status );
                datAnnul( &dloc, status );
-               
+
                datNew( xloc, vgrad[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
                datFind( xloc, vgrad[ dax[ 0 ] ], &dloc, status );
                datPutD( dloc, 0, NULL, par + 9, status );
                datAnnul( &dloc, status );
-      
+
                datNew( xloc, vgrad[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
                datFind( xloc, vgrad[ dax[ 1 ] ], &dloc, status );
                datPutD( dloc, 0, NULL, par + 10, status );
                datAnnul( &dloc, status );
-      
+
             }
-         }      
+         }
       }
-      
+
 /* Now store any extra diagnostic information. */
       if( extra ) {
          datNew( xloc, "EXTRA", "EXTRA", 0, NULL, status );

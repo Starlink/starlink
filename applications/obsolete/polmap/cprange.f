@@ -2,24 +2,24 @@
      &                   QU_TRIPLOT,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    C P R A N G E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C WMIN (<), WMAX (<), PMIN (>), PMAX (>), PAUTOLIM (><), PFLUX (><),
 C QU_TRIPLOT (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Sets the range of the polarization panel interactively
 C

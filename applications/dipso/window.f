@@ -5,7 +5,7 @@ C    J.D. Scargle, (1982), Astrophys. J., 263:835.
 C
       IMPLICIT NONE
 C Imports:
-      INTEGER NPT                               ! no. values in array X 
+      INTEGER NPT                               ! no. values in array X
       DOUBLE PRECISION X(NPT)                   ! x data
       DOUBLE PRECISION FRLO                     ! lower limit of frequency range
       DOUBLE PRECISION FRHI                     ! upper limit of frequency range
@@ -14,17 +14,17 @@ C Exports:
       REAL FR(*)                                ! array of frequencies
       REAL WIN(*)                               ! array of window values
       INTEGER NFR                               ! number of (fr,win) pairs
-      LOGICAL OK                                ! success flag 
+      LOGICAL OK                                ! success flag
 C Local:
       DOUBLE PRECISION DX                       ! x-spacings
       DOUBLE PRECISION DXMIN                    ! smallest X-spacing
-      DOUBLE PRECISION FRMAX                    ! pseudo-Nyquist frequency 
+      DOUBLE PRECISION FRMAX                    ! pseudo-Nyquist frequency
       DOUBLE PRECISION FREQ                     ! holds doub. prec. frequencies
       DOUBLE PRECISION SINSUM                   ! sum of sine terms
       DOUBLE PRECISION COSSUM                   ! sum of cosine terms
       DOUBLE PRECISION TPI                      ! two-times-pi
       PARAMETER ( TPI = 6.2831853072D+00 )
-      INTEGER NFRMAX                        ! maximum size of FR and WIN arrays 
+      INTEGER NFRMAX                        ! maximum size of FR and WIN arrays
       PARAMETER ( NFRMAX = 20000 )
       INTEGER I, J                              ! do-loop variables
       OK = .TRUE.
@@ -49,7 +49,7 @@ C
         IF (DX .LT. DXMIN) DXMIN = DX
       ENDDO
 C
-C  Evaluate the Pseudo-Nyquist frequency. This is set equal to half the 
+C  Evaluate the Pseudo-Nyquist frequency. This is set equal to half the
 C reciprocal of the smallest X-spacing
 C
       IF ( DXMIN .GT. 1.0D-10 ) THEN
@@ -66,7 +66,7 @@ C
      :  '(''   PDGWINDO:  too many frequencies specified'')')
         OK = .FALSE.
         RETURN
-      ENDIF      
+      ENDIF
       DO I = 1,NFR
         FREQ = FRLO + FRSP*DBLE( I-1 )
         FR(I) = REAL( FREQ )
@@ -76,7 +76,7 @@ C
         DO J = 1,NPT
           SINSUM = SINSUM + DSIN( FREQ*X(J) )
           COSSUM = COSSUM + DCOS( FREQ*X(J) )
-        ENDDO 
+        ENDDO
         WIN(I) = REAL( (SINSUM**2 + COSSUM**2) / DBLE( NPT**2 ) )
       ENDDO
       RETURN

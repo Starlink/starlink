@@ -10,15 +10,15 @@
 
  *  Purpose:
  *     Define the interface to the err module.
- 
+
  *  Invocation:
  *     #include "ast_tclerr.h"
- 
+
  *  Description:
  *     This include file defines the interface to the err module and
  *     provides the type definitions, function prototypes and macros, etc.
  *     needed to use this module.
- 
+
  *  Inheritance:
  *     The err module is not a class and does not inherit.
 
@@ -42,13 +42,13 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     RFWS: R.F. Warren-Smith (STARLINK)
  *     DSB: David Berry (STARLINK)
  *     PWD: Peter W. Draper (STARLINK)
  *     {enter_new_authors_here}
- 
+
  *  History:
  *     6-NOV-1996 (DSB):
  *        Original version.

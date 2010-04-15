@@ -31,7 +31,7 @@
         DESTRUCTIVE = .FALSE.
         CALL PAR_GET0L( 'DESTRUCTIVE', DESTRUCTIVE, STATUS )
         IF ( DESTRUCTIVE ) THEN
-          IF ( VERBOSE ) CALL MSG_OUT( ' ', 
+          IF ( VERBOSE ) CALL MSG_OUT( ' ',
      :      'Destroying record', STATUS )
           CHARQ( READREC_PTR ) = ' '
           DATEQ( READREC_PTR ) = 0.0

@@ -43,7 +43,7 @@ CD    Print *, ' -- setpix --'
 
 CD    Print *, '    begin and end at map-pts ', X1, X2
 
-*     Now find included pixels. First included pixel is integer 
+*     Now find included pixels. First included pixel is integer
 *     greater than the smaller of X1 & X2, last pixel is integer
 *     smaller than max of X1 & X2.
 

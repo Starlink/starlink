@@ -18,6 +18,6 @@ Version 0.2
   * Internal rewrite to support 3rd malloc option
   * Add STARMEM_DEBUG option
 
-Version 0.1 
+Version 0.1
 
   * Initial release. Support SYSTEM and GC

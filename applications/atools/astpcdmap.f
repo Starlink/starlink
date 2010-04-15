@@ -21,10 +21,10 @@
 
 *  Description:
 *     This application creates a new PcdMap and optionally initialises
-*     its attributes. A PcdMap is a non-linear Mapping which transforms 
-*     2-dimensional positions to correct for the radial distortion introduced 
-*     by some cameras and telescopes. This can take the form either of 
-*     pincushion or barrel distortion, and is characterized by a single 
+*     its attributes. A PcdMap is a non-linear Mapping which transforms
+*     2-dimensional positions to correct for the radial distortion introduced
+*     by some cameras and telescopes. This can take the form either of
+*     pincushion or barrel distortion, and is characterized by a single
 *     distortion coefficient.
 *
 *     A PcdMap is specified by giving this distortion coefficient and the
@@ -33,9 +33,9 @@
 *
 *        RD = R * ( 1 + C * R * R )
 *
-*     where R is the undistorted radial distance from the distortion 
-*     centre (specified by parameter PCDCEN), RD is the radial distance 
-*     from the same centre in the presence of distortion, and C is the 
+*     where R is the undistorted radial distance from the distortion
+*     centre (specified by parameter PCDCEN), RD is the radial distance
+*     from the same centre in the presence of distortion, and C is the
 *     distortion coefficient (given by parameter DISCO).
 *
 *     The inverse transformation of a PcdMap removes the distortion
@@ -48,11 +48,11 @@
 *  ADAM Parameters:
 *     DISCO = _DOUBLE (Read)
 *        The distortion coefficient. Negative values give barrel
-*        distortion, positive values give pincushion distortion, and 
+*        distortion, positive values give pincushion distortion, and
 *        zero gives no distortion.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new PcdMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new PcdMap.
 *     PCDCEN( 2 ) = _DOUBLE (Read)
 *        An array containing the coordinates of the centre of the distortion.
 *     RESULT = LITERAL (Read)
@@ -107,7 +107,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -115,7 +115,7 @@
 
 *  Get the required parameter values.
       CALL PAR_GET0D( 'DISCO', DISCO, STATUS )
-      CALL PAR_EXACD( 'PCDCEN', 2, PCDCEN, STATUS ) 
+      CALL PAR_EXACD( 'PCDCEN', 2, PCDCEN, STATUS )
 
 *  Create the required PcdMap.
       RESULT = AST_PCDMAP( DISCO, PCDCEN, ' ', STATUS )

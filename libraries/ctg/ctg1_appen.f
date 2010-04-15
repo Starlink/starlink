@@ -13,8 +13,8 @@
 *     CALL CTG1_APPEN( IGRP1, IGRP2, TEMPLT, REST, STATUS )
 
 *  Description:
-*     All files matching the supplied file template are appended to IGRP1. 
-*     For each such file appended to IGRP1, a copy of REST is also appended 
+*     All files matching the supplied file template are appended to IGRP1.
+*     For each such file appended to IGRP1, a copy of REST is also appended
 *     to IGRP2.
 
 *  Arguments:
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,7 +83,7 @@
       INTEGER IGRP2
       CHARACTER TEMPLT*(*)
       CHARACTER REST*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -109,11 +109,11 @@
 
 *  Loop round looking for matching files until we get bad status
 *  (which may include ONE__NOFILES)
-         DO WHILE( STATUS .EQ. SAI__OK ) 
+         DO WHILE( STATUS .EQ. SAI__OK )
 
 *  Attempt to find the next matching file.
             FILE = ' '
-            FOUND = ONE_FIND_FILE( TEMPLT, .TRUE., FILE, ICONTX, 
+            FOUND = ONE_FIND_FILE( TEMPLT, .TRUE., FILE, ICONTX,
      :           STATUS )
 
 *  If another file was found which matches the name...

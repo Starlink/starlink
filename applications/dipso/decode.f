@@ -1,5 +1,5 @@
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++!
-! 
+!
 !   SUBROUTINE DECODE
 !
 !   MODIFIED DEM CODE FOR DECODING CHARACTER STRING TO REAL VARIABLES
@@ -8,7 +8,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++!
       SUBROUTINE DECODE(COMMND,STRING,MINPAR,MAXPAR,PARAS,PROMPT,OK)
       INCLUDE 'SAE_PAR'
-C 
+C
 C Subroutine to decode character string STRING into a set of real values
 C PARAS with MINPAR being the minimum no. allowed and MAXPAR the maximum no.
 C If insufficient parameters are found they are prompted for up to MINPAR.
@@ -49,7 +49,7 @@ C       IF ( SUBSTR.EQ.' ' ) THEN
         DO WHILE (SUBSTR.EQ.' ')
 
           STATUS = SAI__OK
-          CALL RDSTR( COMMND, PROMPT( FIRST : LAST ), ' ', 
+          CALL RDSTR( COMMND, PROMPT( FIRST : LAST ), ' ',
      :                SUBSTR, STATUS )
           IF( STATUS .NE. SAI__OK ) THEN
              CALL ERR_FLUSH( STATUS )

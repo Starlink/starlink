@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL DIPWR( UNIT, TITLE, NPTS, FLUX, WAVE, FLUX1, WAVE1, BAD, 
+*     CALL DIPWR( UNIT, TITLE, NPTS, FLUX, WAVE, FLUX1, WAVE1, BAD,
 *                 MAXBRK, BREAK, STATUS )
 
 *  Description:
@@ -79,7 +79,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

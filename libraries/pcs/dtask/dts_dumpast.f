@@ -16,7 +16,7 @@
 *     An AST routine, invoked by VMS.
 
 *  Description:
-*     Generate a stack dump of a task, then reenable the dumping 
+*     Generate a stack dump of a task, then reenable the dumping
 *     facility.
 
 *  Arguments:
@@ -24,7 +24,7 @@
 *           the AST parameter. Unused.
 
 *  Algorithm:
-*     Call LIB$SIGNAL to generate a stack dump. Then call DTASK_SETDUMP 
+*     Call LIB$SIGNAL to generate a stack dump. Then call DTASK_SETDUMP
 *     to reenable the AST.
 
 *  Copyright:

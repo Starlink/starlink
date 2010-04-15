@@ -41,7 +41,7 @@ C                  pointers to DSA_FMTCON rather than arrays. As a
 C                  consequence %VAL must replace DYNAMIC_MEM.
 C     07 Oct 1994  KS / AAO. DSA_FMTCON modified to use arrays rather
 C                  than pointers. DYNAMIC_MEM re-instated (thereby
-C                  fixing, rather belatedly) a bug reported by many 
+C                  fixing, rather belatedly) a bug reported by many
 C                  users!
 C     21 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Bad pixel handling.
@@ -68,7 +68,7 @@ C
       LOGICAL   FLAGGED          ! True if data has flagged values
       INTEGER   I                ! Loop index
       INTEGER   IGNORE           ! Status we don't care about
-      INTEGER   IPTR             ! Dynamic-mem pointer for input data 
+      INTEGER   IPTR             ! Dynamic-mem pointer for input data
                                  ! (or copy)
       INTEGER   LENGTH           ! Number of characters in STRING
       INTEGER   NBAD             ! Number of bad conversions
@@ -76,15 +76,15 @@ C
       INTEGER   NELM             ! Number of elements in data array
       CHARACTER OLDTYPE*32       ! Original type for data
       INTEGER   OLD_PRIM_CODE    ! Original primitive type code
-      CHARACTER OLD_PRIM_TYPE*16 ! Primitive type corresponding to 
+      CHARACTER OLD_PRIM_TYPE*16 ! Primitive type corresponding to
                                  ! OLDTYPE
-      INTEGER   OPTR             ! Dynamic-mem pointer for output data 
+      INTEGER   OPTR             ! Dynamic-mem pointer for output data
       INTEGER   PRIM_CODE        ! Requested primitive type code
       CHARACTER PRIM_TYPE*16     ! Primitive type to use to map data
       LOGICAL   SAME             ! Input and output are the same array?
       INTEGER   SLOT             ! Slot used for data mapping
       INTEGER   STATUS           ! Inherited status used by DSA routines
-      CHARACTER STRING*64        ! Used to format conversion error 
+      CHARACTER STRING*64        ! Used to format conversion error
                                  ! message
       LOGICAL   STRUCT           ! Input array is a structured type?
       CHARACTER TYPE*32          ! Requested data type
@@ -114,7 +114,7 @@ C
       ELSE
          CALL PAR_WRUSER('Input data type is '//
      :                              OLDTYPE(:ICH_LEN(OLDTYPE)),IGNORE)
-      END IF         
+      END IF
 C
 C     Get new type.
 C
@@ -141,8 +141,8 @@ C
       SAME=DSA_SAME_DATA('INPUT','OUTPUT',STATUS)
       IF (SAME) THEN
 C
-C        For the in situ case, get a work array the size of the 
-C        original data array, copy the data into the work array and 
+C        For the in situ case, get a work array the size of the
+C        original data array, copy the data into the work array and
 C        close the input array.
 C
          CALL DSA_GET_WORK_ARRAY (NELM,OLD_PRIM_TYPE,WPTR,
@@ -161,7 +161,7 @@ C
       CALL DSA_MAP_DATA ('OUTPUT','WRITE',PRIM_TYPE,OPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500    ! Error exit
 C
-C     And then convert the input data (or our copy of it) into the 
+C     And then convert the input data (or our copy of it) into the
 C     output array.
 C
       DO I=1,MAX_TYPES

@@ -13,7 +13,7 @@
 *     CALL KPS1_TROP2( NPIX, NLIN, PSFFFT, IN, OUT, STATUS )
 
 *  Description:
-*     This is a version of the KPS1_TROP1 (TROPUS) routine which is used 
+*     This is a version of the KPS1_TROP1 (TROPUS) routine which is used
 *     by MEM2D.  This version is used by LUCY to do the same job
 *     (convolve a image with the transposed PSF to produce a trial
 *     image).  The *inverse* Fourier transform of the supplied image is
@@ -70,7 +70,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,7 +88,7 @@
 *  Arguments Returned:
       REAL OUT( NPIX, NLIN )
 
-*  Global Status: 
+*  Global Status:
       INTEGER STATUS             ! Global status
 
 *.

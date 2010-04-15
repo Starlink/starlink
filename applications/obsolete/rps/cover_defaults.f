@@ -9,29 +9,29 @@
 *     1996 Mar          M Ricketts      tidy filenames
 *******************************************************************************
       SUBROUTINE COVER_DEFAULTS(DEFAULT_FILE,STATUS)
- 
+
 *  Type Declaration
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       CHARACTER*(*) DEFAULT_FILE
       INTEGER STATUS
- 
+
 *  Global Variables
       INCLUDE 'com_form_files.inc'		! Holds File ref nos.
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_rec.inc'		! Holds Record
- 
+
 *-
 *  Functions
       INTEGER DBS_FIELDNO, DBS_INFOI
- 
+
 *  Local Variables
       INTEGER LUN, nbytes, field_no, i, j, rectmp
 
 *  Executable Code
       CALL GETLUN(LUN)				! Get a lun
- 
+
       OPEN(LUN,FILE=DEFAULT_FILE, STATUS='OLD',			! Open the file
      &   ACCESS='DIRECT',RECL = 80, IOSTAT=STATUS)
       IF (STATUS.NE.0) THEN
@@ -64,9 +64,9 @@
       CLOSE(LUN)					! clear up
       CALL FRELUN(LUN)
       IF (STATUS.EQ.0) GOTO 20
- 
+
 10    CONTINUE
       STATUS = -1
 20    CONTINUE
- 
+
       END

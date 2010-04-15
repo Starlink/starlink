@@ -5,26 +5,26 @@
      &Q,QV,U,UV,TMP_STK_TITLE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C
 C   R E A D _ S T K
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C TOP_STK (>), STK_NPTS (>), STK_LAMBDA (>), STK_STOKES_I (>),
 C STK_STOKES_Q (>), STK_STOKES_QV (>), STK_STOKES_U (>), STK_STOKES_UV (>),
 C STK_TITLE (>), NO_IN_SAVE (<), SPEC_SIZE (<), NPTS (<), WA (<), IAR (<),
 C Q (<), QV (<), U (<), UV (<), TMP_STK_TITLE (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Reads in the stack from the mapped arrays
 C
@@ -50,7 +50,7 @@ C
       CHARACTER*(*) STK_TITLE(*)
 C
 C The saved stack arrays that have been mapped
-C 
+C
       INTEGER NO_IN_SAVE
       INTEGER MAXNO,SPEC_SIZE
       REAL IAR(SPEC_SIZE,NO_IN_SAVE)
@@ -75,7 +75,7 @@ C
       ENDIF
 C
 C Read in the stack
-C                   
+C
       DO J = 1,MAXNO
        DO I = 1,SPEC_SIZE
         STK_STOKES_I(I,TOP_STK+J) = IAR(I,J)

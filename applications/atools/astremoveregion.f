@@ -20,12 +20,12 @@
 *        The global status.
 
 *  Description:
-*     This application searches the supplied Mapping (which may be a 
-*     compound Mapping such as a CmpMap) for any component Mappings 
+*     This application searches the supplied Mapping (which may be a
+*     compound Mapping such as a CmpMap) for any component Mappings
 *     that are instances of the AST Region class. It then creates a new
 *     Mapping from which all Regions have been removed. If a Region
 *     cannot simply be removed (for instance, if it is a component of a
-*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap
 *     in the returned Mapping.
 
 *  Usage:
@@ -35,7 +35,7 @@
 *     RESULT = LITERAL (Read)
 *        A text file to receive the modified Mapping.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Mapping. If an NDF is supplied, 
+*        An NDF or text file holding the Mapping. If an NDF is supplied,
 *        the Mapping from the base Frame of the WCS FrameSet to the
 *        current Frame will be used.
 
@@ -90,7 +90,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

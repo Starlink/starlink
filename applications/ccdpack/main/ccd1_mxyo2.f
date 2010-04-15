@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
       NMATCH = 0
 
 *  Loop over possible intercomparisons of the two sets of positions.
-      IF ( N2 .GT. N1 ) THEN 
+      IF ( N2 .GT. N1 ) THEN
          DO 1 I = 1, N1
             DO 2 J = 1, N2
 
@@ -187,7 +187,7 @@
                END IF
  4          CONTINUE
  3       CONTINUE
-      END IF      
+      END IF
 
       END
 * $Id$

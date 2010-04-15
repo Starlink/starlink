@@ -21,7 +21,7 @@ C  time format of hh:mm:ss
       MINS  = 60.*FHOUR
       ISEC  = 3600.*(FHOUR-MINS/60.)
 
-      WRITE (TIME, '(I2.2,'':'',I2.2,'':'',I2.2)', IOSTAT=IERR) 
+      WRITE (TIME, '(I2.2,'':'',I2.2,'':'',I2.2)', IOSTAT=IERR)
      &       IHOUR, MINS, ISEC
 
       RETURN

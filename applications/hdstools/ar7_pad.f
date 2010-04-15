@@ -21,7 +21,7 @@
 *     NDIM = INTEGER (given)
 *        Number of real dimensions
 *     DIMS[7] = INTEGER (given and returned)
-*        Dimensions 
+*        Dimensions
 *     STATUS = INTEGER (given)
 *        The global status.
 
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

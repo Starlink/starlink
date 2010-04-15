@@ -1,15 +1,15 @@
- 
+
  SPECX Millimetre-wave Spectral data reduction v@PACKAGE_VERSION@.
  =====================================================
 
    Welcome to the Unix port of Specx.  It is important to read the
-   relevant item in the on-line help.  If you are running Specx on 
+   relevant item in the on-line help.  If you are running Specx on
    Unix for the first time, type:
 
           >> help
           Topic? news unix
- 
+
    This version uses Native PGPLOT graphics. Device names may differ
    from previous Starlink versions.
 
- 
+

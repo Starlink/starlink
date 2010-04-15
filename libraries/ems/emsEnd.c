@@ -12,7 +12,7 @@
  *     emsEnd( status )
 
  *  Description:
- *     This function provides a C interface for the Error Message 
+ *     This function provides a C interface for the Error Message
  *     Service routine EMS_END (written in Fortran).
 
  *  Arguments:
@@ -30,12 +30,12 @@
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of
  *     the License, or (at your option) any later version.
- *     
+ *
  *     This program is distributed in the hope that it will be
  *     useful,but WITHOUT ANY WARRANTY; without even the implied
  *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *     PURPOSE. See the GNU General Public License for more details.
- *     
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -77,7 +77,7 @@
 #include "ems_defs.h"                  /* EMS_ message table */
 
 /* Function Definitions: */
-void emsEnd( int *status ) 
+void emsEnd( int *status )
 {
     int istat;
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
@@ -87,7 +87,7 @@ void emsEnd( int *status )
 
     /*  First, check if there is a previous context and that the context stack
      *  has not overflowed. */
-    if ( ( msgtab->msglev > msgtab->msgdef ) && 
+    if ( ( msgtab->msglev > msgtab->msgdef ) &&
          ( msgtab->msglev < EMS__MXLEV ) ) {
 
         /*  The current context level is not the default level, nor has the

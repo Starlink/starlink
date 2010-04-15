@@ -312,8 +312,8 @@ This is an ADAM C prologue used in PCS:
       Authors :
 
       History :
-       15Jun 1992: Created: irj 
-       18Jun 1992: Tidied : irj, skr 
+       15Jun 1992: Created: irj
+       18Jun 1992: Tidied : irj, skr
        12Apr 1994: make function static (BDK)
        27Jun 1994: use msp_mkcomq to get command queue of other task (BDK)
  */

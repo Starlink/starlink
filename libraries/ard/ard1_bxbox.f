@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_BXBOX( NDIM, FRM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
+*     CALL ARD1_BXBOX( NDIM, FRM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX,
 *                      NPAR, D, PAR, B, STATUS )
 
 *  Description:
@@ -50,7 +50,7 @@
 *        ...
 *        Pn = ...
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
-*        Parameters; user coords of box centre, followed by length of each 
+*        Parameters; user coords of box centre, followed by length of each
 *        side of the box (in user coords).
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array (in vector form).
@@ -67,12 +67,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,7 +93,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,17 +132,17 @@
      :        LLBOX( ARD__MXDIM ),! Local copy of LBOX
      :        LUBOX( ARD__MXDIM ),! Local copy of UBOX
      :        MDIM,              ! A dimension size in supplied array
-     :        P,                 ! No. of pixels in (N-1)-Dim. object 
+     :        P,                 ! No. of pixels in (N-1)-Dim. object
      :        VA,                ! Vector address within supplied array
      :        VAINC( ARD__MXDIM) ! VA increment between N-D objects
 
       LOGICAL
      :        INSIDE             ! Is pixel inside user box?
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        C( ARD__MXDIM*(1+ARD__MXDIM) ),! Inverse transformation
      :        PCO(ARD__MXDIM),   ! Pixel coordinates
-     :        HW(ARD__MXDIM),    ! Signed half-widths of box on each axis 
+     :        HW(ARD__MXDIM),    ! Signed half-widths of box on each axis
      :        UCO(ARD__MXDIM)    ! User coordinates
 
 *.
@@ -150,15 +150,15 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If the box is null, return without doing anything.                  
+*  If the box is null, return without doing anything.
       IF( LBOX( 1 ) .NE. VAL__MINI ) THEN
 
 *  Find the inverse of the supplied transformation (i.e. from pixel to
 *  user co-ordinates).
          CALL ARD1_INVRS( NDIM, D, C, STATUS )
 
-*  Store the half widths (in user co-ordinates) of the user box. At the 
-*  same time, take a copy of the pixel co-ordinate bounds. If the box is 
+*  Store the half widths (in user co-ordinates) of the user box. At the
+*  same time, take a copy of the pixel co-ordinate bounds. If the box is
 *  infinite, use the bounds of the mask.
          DO I = 1, NDIM
             HW( I ) = 0.5*ABS( PAR( NDIM + I ) )
@@ -258,14 +258,14 @@
             INSIDE = .TRUE.
 
             DO I = 1, NDIM
-               IF( ABS( AST_AXDISTANCE( FRM, I, PAR( I ), UCO( I ), 
+               IF( ABS( AST_AXDISTANCE( FRM, I, PAR( I ), UCO( I ),
      :                                  STATUS ) ) .GT. HW( I ) ) THEN
                   INSIDE = .FALSE.
                END IF
             END DO
 
 *  If the pixel is inside the user box, assign the value to the
-*  current pixel. 
+*  current pixel.
             IF( INSIDE ) B( VA ) = VALUE
 
 *  Increment the B array vector address of the next pixel to be
@@ -278,7 +278,7 @@
 *  If the index is now larger than the corresponding upper bound of the
 *  box...
             I = 1
-            DO WHILE( BINDEX( I ) .GT. LUBOX( I ) ) 
+            DO WHILE( BINDEX( I ) .GT. LUBOX( I ) )
 
 *  Reset the index to the corresponding lower bound.
                BINDEX( I ) = LLBOX( I )
@@ -295,11 +295,11 @@
 *  Increment the index for the next higher dimension.
                   I = I + 1
                   BINDEX( I ) = BINDEX( I ) + 1
-   
+
                END IF
-   
+
             END DO
-   
+
          END DO
 
       END IF

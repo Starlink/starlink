@@ -6,7 +6,7 @@
 *    Description :
 *
 *     This routine determines the best d.c. sky offsets
-*     for a pair of mosaic images. 
+*     for a pair of mosaic images.
 *
 *    Invocation :
 *
@@ -32,7 +32,7 @@
 *         Mosaic corrected images together
 *     OUTPIC2  =  STRUCTURE( READ )
 *         Name of output mosaiced image
-*         
+*
 *    Method :
 *
 *     Check for error on entry - return if not o.k.
@@ -59,8 +59,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'CHR_ERR'
 
 *    Status :
@@ -74,7 +74,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI1,              ! locator for first input data structure
      :    LOCI2,              ! locator for second  "     "      "
      :    LOCO,               ! locator for output IMAGE structure
@@ -110,12 +110,12 @@
          RETURN
       END IF
 
-*    get first input image 
+*    get first input image
       CALL GETINP( 'INPIC1', LOCI1, STATUS )
 
 *    get second input image
       CALL GETINP( 'INPIC2', LOCI2, STATUS )
- 
+
 *    check for error before continuing
       IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -160,7 +160,7 @@
 	          ODIMS( 2) = IDIMS2( 2)
 
 *                create the output image and get a title for it
-                  CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO, 
+                  CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO,
      :	                       STATUS )
 
 *                check for error
@@ -175,13 +175,13 @@
 	          IF( MOSAIC) THEN
 
 *                  set the output image dimensions
-	            ODIMS2( 1) = MAX( IDIMS1( 1), 
+	            ODIMS2( 1) = MAX( IDIMS1( 1),
      :                           ( IDIMS2( 1)+ABS( NXOFF)))
-	            ODIMS2( 2) = MAX( IDIMS1( 2), 
+	            ODIMS2( 2) = MAX( IDIMS1( 2),
      :                           ( IDIMS2( 2)+ABS( NYOFF)))
 
 *                  create the output image and get a title for it
-                    CALL CREOUT( 'OUTPIC2', 'OTITLE', NDIMS, ODIMS2, 
+                    CALL CREOUT( 'OUTPIC2', 'OTITLE', NDIMS, ODIMS2,
      :	                         LOCO2, STATUS )
 
 	            CALL MSG_OUT( 'BLANK', ' ', STATUS)
@@ -215,7 +215,7 @@
 *             write out the results on return
                CALL MSG_SETR( 'OFFA', VALUEA )
                CALL MSG_SETR( 'OFFB', VALUEB )
-	       CALL MSG_OUT( 'MESS', 
+	       CALL MSG_OUT( 'MESS',
      : '1st image value = ^OFFA, 2nd image value = ^OFFB',
      :	 STATUS)
 	       CALL MSG_OUT( 'BLANK', ' ', STATUS)
@@ -230,8 +230,8 @@
                IF ( APPLY ) THEN
 
 *                call subroutine to apply correction to 2nd image
-	          CALL MOSCORSUB2( IDIMS2( 1), IDIMS2( 2), 
-     :	                           %VAL( PNTRI2), ODIMS( 1), 
+	          CALL MOSCORSUB2( IDIMS2( 1), IDIMS2( 2),
+     :	                           %VAL( PNTRI2), ODIMS( 1),
      :                             ODIMS( 2), %VAL( PNTRO),
      :	                           DCOFF, STATUS)
 
@@ -240,10 +240,10 @@
 
 	          IF( MOSAIC) THEN
 
-	            CALL MOSCORSUB3( IDIMS1( 1), IDIMS1( 2), 
-     :                               %VAL( PNTRI1), IDIMS2( 1), 
-     :                               IDIMS2( 2), %VAL( PNTRI2), 
-     :	                             ODIMS2( 1), ODIMS2( 2), 
+	            CALL MOSCORSUB3( IDIMS1( 1), IDIMS1( 2),
+     :                               %VAL( PNTRI1), IDIMS2( 1),
+     :                               IDIMS2( 2), %VAL( PNTRI2),
+     :	                             ODIMS2( 1), ODIMS2( 2),
      :                               %VAL( PNTRO2),
      :	                             NXOFF, NYOFF, DCOFF, STATUS)
 

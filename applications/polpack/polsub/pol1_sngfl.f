@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGFL( INDF, ITER, VSCH, T, PHI,
-     :                       EPS, DIM1, DIM2, DIM3, STOKES, 
-     :                       WORK, NSIGMA, IPDIN, IPVIN, FRDIN, FRVIN, 
+     :                       EPS, DIM1, DIM2, DIM3, STOKES,
+     :                       WORK, NSIGMA, IPDIN, IPVIN, FRDIN, FRVIN,
      :                       STATUS )
 *+
 *  Name:
@@ -14,11 +14,11 @@
 
 *  Invocation:
 *     CALL POL1_SNGFL( INDF, ITER, VSCH, T, PHI, EPS,
-*                      DIM1, DIM2, DIM3, STOKES, WORK, NSIGMA, IPDIN, 
+*                      DIM1, DIM2, DIM3, STOKES, WORK, NSIGMA, IPDIN,
 *                      IPVIN, FRDIN, FRVIN, STATUS )
 
 *  Description:
-*     This routine returns pointers to arrays holding the intensity values 
+*     This routine returns pointers to arrays holding the intensity values
 *     and associated variances to use for a given input intensity NDF.
 
 *  Arguments:
@@ -33,15 +33,15 @@
 *        will have been made that these are available for all input images.
 *
 *        2 - Return the variances supplied with the input images, if
-*        available. If an input image does not have associated variances  
-*        then the returned variances for that image are estimated from the 
-*        spread of input intensity values. 
+*        available. If an input image does not have associated variances
+*        then the returned variances for that image are estimated from the
+*        spread of input intensity values.
 *
-*        3 - Return variances estimated from the spread of input intensity 
+*        3 - Return variances estimated from the spread of input intensity
 *        values. Any variances supplied with the input images are ignored.
 *
-*        4 - Return a constant variance of 1.0 for all input images. Any 
-*        variances supplied with the input images are ignored. 
+*        4 - Return a constant variance of 1.0 for all input images. Any
+*        variances supplied with the input images are ignored.
 *
 *     T = REAL (Given)
 *        The analyser transmission factor for the supplied array.
@@ -119,7 +119,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,13 +152,13 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER PATH*256         ! Full NDF path 
+      CHARACTER PATH*256         ! Full NDF path
       INTEGER EL                 ! No. of pixels in one plane
       INTEGER IPD                ! Pointer to NDF DATA array
       INTEGER NGOOD              ! No. of good pixels remaining
       INTEGER NREJ               ! No. of pixels rejected this iteration
-      INTEGER IPW1               ! Pointer to work array                
-      INTEGER IPW2               ! Pointer to work array                
+      INTEGER IPW1               ! Pointer to work array
+      INTEGER IPW2               ! Pointer to work array
       INTEGER IPWGT              ! Pointer to squared residual weights array
       INTEGER LPATH              ! Used length of PATH
       LOGICAL INVAR              ! Does the NDF have a VARIANCE component?
@@ -181,17 +181,17 @@
       IF( ITER .EQ. 0 ) THEN
 
 *  Map the data array.
-         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPDIN, EL, 
+         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPDIN, EL,
      :                 STATUS )
 
 *  We now need to get the variances for the input image. The scheme
-*  used to do this is selected by VSCH. If the input VARIANCE values 
+*  used to do this is selected by VSCH. If the input VARIANCE values
 *  are to be used...
          IF( VSCH .EQ. 1 .OR. ( VSCH .EQ. 2 .AND. INVAR ) ) THEN
 
 *  Map the VARIANCE array if available, otherwise report an error.
             IF( INVAR ) THEN
-               CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVIN, 
+               CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVIN,
      :                       EL, STATUS )
 
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
@@ -206,7 +206,7 @@
 *  array with the constant value 1.0.
          ELSE
             CALL PSX_CALLOC( EL, '_REAL', IPVIN, STATUS )
-            CALL POL1_FILLR( 1.0, EL, %VAL( CNF_PVAL( IPVIN ) ), 
+            CALL POL1_FILLR( 1.0, EL, %VAL( CNF_PVAL( IPVIN ) ),
      :                       STATUS )
 
 *  Indicate that the variance array must be freed when no longer needed.
@@ -218,7 +218,7 @@
       ELSE
 
 *  Map the NDF data array.
-         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPD, EL, 
+         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPD, EL,
      :                 STATUS )
 
 *  Allocate an array to hold the filtered intensity values, and indicate
@@ -231,23 +231,23 @@
 *  stored in the array pointed to by IPDIN (temporarily). This also
 *  returns the max and min NDF intensity values.
          CALL PSX_CALLOC( EL, '_REAL', IPWGT, STATUS )
-         CALL POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES, 
-     :                    %VAL( CNF_PVAL( IPD ) ), 
+         CALL POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES,
+     :                    %VAL( CNF_PVAL( IPD ) ),
      :                    %VAL( CNF_PVAL( IPDIN ) ), WORK,
-     :                    %VAL( CNF_PVAL( IPWGT ) ), 
+     :                    %VAL( CNF_PVAL( IPWGT ) ),
      :                    DINMAX, DINMIN, STATUS )
 
 *  We now need to get the variances for the input image. The scheme
-*  used to do this is selected by VSCH. If the input VARIANCE values 
+*  used to do this is selected by VSCH. If the input VARIANCE values
 *  are to be used, map them.
          IF( VSCH .EQ. 1 .OR. ( VSCH .EQ. 2 .AND. INVAR ) ) THEN
-            CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVIN, EL, 
+            CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVIN, EL,
      :                    STATUS )
 
-*  Otherwise, we estimate the variances. If constant weights were requested, 
+*  Otherwise, we estimate the variances. If constant weights were requested,
 *  these estimates will be over-written by 1.0 before returning them. The
 *  variances here are then only used to identify any aberant pixels.
-         ELSE      
+         ELSE
 
 *  First allocate a variance array and indicate it is to be freed when no
 *  longer needed.
@@ -259,11 +259,11 @@
             CALL PSX_CALLOC( DIM1, '_DOUBLE', IPW2, STATUS )
 
 
-            CALL POL1_SNGVR( DIM1, DIM2, %VAL( CNF_PVAL( IPDIN ) ), 
+            CALL POL1_SNGVR( DIM1, DIM2, %VAL( CNF_PVAL( IPDIN ) ),
      :                       WORK,
      :                       %VAL( CNF_PVAL( IPWGT ) ), DINMAX, DINMIN,
-     :                       %VAL( CNF_PVAL( IPVIN ) ), 
-     :                       %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       %VAL( CNF_PVAL( IPVIN ) ),
+     :                       %VAL( CNF_PVAL( IPW1 ) ),
      :                       %VAL( CNF_PVAL( IPW2 ) ),
      :                       NOISE, STATUS )
 
@@ -275,21 +275,21 @@
          CALL PSX_FREE( IPWGT, STATUS )
 
 *  Reject aberant data values.
-         CALL POL1_SNGRJ( NSIGMA, EL, %VAL( CNF_PVAL( IPD ) ), 
+         CALL POL1_SNGRJ( NSIGMA, EL, %VAL( CNF_PVAL( IPD ) ),
      :                    %VAL( CNF_PVAL( IPVIN ) ),
-     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    %VAL( CNF_PVAL( IPDIN ) ),
      :                    NREJ, NGOOD, STATUS )
 
 *  If constant weights are required, fill the variance array with 1.0.
          IF( VSCH .EQ. 4 ) THEN
-            CALL POL1_FILLR( 1.0, EL, %VAL( CNF_PVAL( IPVIN ) ), 
+            CALL POL1_FILLR( 1.0, EL, %VAL( CNF_PVAL( IPVIN ) ),
      :                       STATUS )
          END IF
 
 *  Get the ndf name, and find the end of the directory path (i.e. the
 *  final "\" ).
          CALL KPG1_NDFNM( INDF, PATH, LPATH, STATUS )
-             
+
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
          IF( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN

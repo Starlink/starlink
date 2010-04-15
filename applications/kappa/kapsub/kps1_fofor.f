@@ -88,27 +88,27 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message-system constants
- 
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
       LOGICAL UNTANG
- 
+
 *  Arguments Given and Returned:
       REAL DATA( M, N )
- 
+
 *  Arguments Returned:
       REAL WIM1( M, N )
       REAL WIM2( * )
       REAL WIM3( M, N )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       REAL AA                 ! Real part of FFT of (real
                                  ! part of FFT of data)
@@ -140,21 +140,21 @@
       INTEGER NM1H               ! ( N-1 ) / 2
       INTEGER NP1H               ! ( N+1 ) / 2
       INTEGER NP3H               ! ( N+3 ) / 2
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Give an informational message.
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'INFOFOR1',
      :                'Doing forward transformation', STATUS )
       CALL MSG_BLANKIF( MSG__NORM, STATUS )
- 
+
 *  Transform the supplied image, storing the FT in the WIM3 array.
       CALL KPG1_FFTFR( M, N, DATA, WIM2, WIM3, STATUS )
- 
+
 *  Set up frequently used constants.
       MM1 = M - 1
       NM1 = N - 1
@@ -170,7 +170,7 @@
       NHP2 = NHP1 + 1
       FN = 2 * NP1H
       FM = 2 * MP1H
- 
+
 *  Determine whether or not the number of columns and lines are even
 *  numbers.
       IF ( MOD( N, 2 ) .EQ. 0 ) THEN
@@ -180,7 +180,7 @@
          NEVEN = .FALSE.
          KLIM = N
       END IF
- 
+
       IF ( MOD( M, 2 ) .EQ. 0 ) THEN
          MEVEN = .TRUE.
          JLIM = MM1
@@ -188,38 +188,38 @@
          MEVEN = .FALSE.
          JLIM = M
       END IF
- 
+
 *  Swap quadrants round so that zero frequencies are at centre.
 *  Array "DATA" will then hold the final Hermitian output.
       DO J = 1, MHP1
- 
+
          DO K = 1, NHP1
             DATA( MM1H + J, NM1H + K ) = WIM3( J, K )
          END DO
- 
+
          DO K = NHP2, N
             DATA( MM1H + J, K - NHP1 ) = -WIM3( J, K )
          END DO
- 
+
       END DO
- 
+
       DO J = MHP2, M
- 
+
          DO K = 1, NHP1
             DATA( J - MHP1, NM1H + K ) = -WIM3( J, K )
          END DO
- 
+
          DO K = NHP2, N
             DATA( J - MHP1, K - NHP1 ) = WIM3( J, K )
          END DO
- 
+
       END DO
- 
+
 *  The next section will untangle the Hermitian form into straight-
 *  forward real and imaginary images.  If the user doesn't require
 *  these, then skip the next section.
       IF ( UNTANG ) THEN
- 
+
 *  The real and imaginary arrays are formed by linear combinations of
 *  four arrays (though actually only single pixels from each are stored
 *  at one time). These are the real and imaginary parts of the Fourier
@@ -236,37 +236,37 @@
 *  of symmetry).
          WIM1( MP1H, NP1H ) = 0.0E0
          WIM3( MP1H, NP1H ) = DATA( MP1H, NP1H )
- 
+
          DO J = MP3H, JLIM
             WIM3( J, NP1H ) = DATA( J, NP1H )
             WIM3( FM - J, NP1H ) = DATA( J, NP1H )
             WIM1( J, NP1H ) = -DATA( FM - J, NP1H )
             WIM1( FM - J, NP1H ) = DATA( FM - J, NP1H )
          END DO
- 
+
          IF ( MEVEN ) THEN
             WIM1( M, NP1H ) = 0.0E0
             WIM3( M, NP1H ) = DATA( M, NP1H )
          END IF
- 
+
 *  Now do all the higher lines in turn.  If the number of columns
 *  is even then there will be one unmatched line left at the end
 *  which will be dealt with separately.
          DO K = NP3H, KLIM
- 
+
             WIM3( MP1H, K ) = DATA( MP1H, K )
             WIM3( MP1H, FN - K ) = DATA( MP1H, K )
             WIM1( MP1H, K ) = -DATA( MP1H, FN - K )
             WIM1( MP1H, FN - K ) = DATA( MP1H, FN - K )
- 
+
             DO J = MP3H, JLIM
- 
+
 *  Get the four values.
                AA = DATA( J, K )
                BB = DATA( FM - J, FN - K )
                AB = -DATA( FM - J, K )
                BA = -DATA( J, FN - K )
- 
+
                WIM3( J, K ) = AA - BB
                WIM3( FM - J, K ) = AA + BB
                WIM3( J, FN - K ) = AA + BB
@@ -276,37 +276,37 @@
                WIM1( J, FN - K ) = AB - BA
                WIM1( FM - J, FN - K ) = -AB - BA
             END DO
- 
+
             IF ( MEVEN ) THEN
                WIM3( M, K ) = DATA( M, K )
                WIM3( M, FN - K ) = DATA( M, K )
                WIM1( M, K ) = -DATA( M, FN - K )
                WIM1( M, FN - K ) = DATA( M, FN - K )
             END IF
- 
+
          END DO
- 
+
 *  Now deal with any unmatched line.
          IF ( NEVEN ) THEN
- 
+
             WIM3( MP1H, N ) = DATA( MP1H, N )
             WIM1( MP1H, N ) = 0.0E0
- 
+
             DO J = MP3H, JLIM
                WIM3( J, N ) = DATA( J, N )
                WIM3( FM - J, N ) = DATA( J, N )
                WIM1( J, N ) = -DATA( FM - J, N )
                WIM1( FM - J, N ) = DATA( FM - J, N )
             END DO
- 
+
             IF ( MEVEN ) THEN
                WIM3( M, N ) = DATA( M, N )
                WIM1( M, N ) = 0.0E0
             END IF
- 
+
          END IF
- 
+
 *  End of untangling section.
       END IF
- 
+
       END

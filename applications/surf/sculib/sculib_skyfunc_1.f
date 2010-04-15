@@ -33,7 +33,7 @@
 *                   (1 - B * EXP (-TAU * Airmass(i))
 *
 *
-*           J_ATM = J_AMB * X_G 
+*           J_ATM = J_AMB * X_G
 *
 *             X_G = 1 + h1 * h2 * EXP (-TAU * Airmass(i) / X_Gconst)
 *                 .      -------
@@ -60,9 +60,9 @@
 *            df(i)             dJ_ATM
 *     .      -     = (ETA_TEL * ------  -
 *            dx(3)              dTAU
-*                             
+*
 *               ETA_TEL * B * EXP (-TAU * Airmass(i)) *
-*                              
+*
 *                dJ_ATM
 *               (------ - J_ATM * Airmass(i))) / Jnoise (i)
 *                 dTAU
@@ -70,10 +70,10 @@
 *     where:-
 *
 *           dJ_ATM           dX_G
-*     .     ------ = J_AMB * ---- 
+*     .     ------ = J_AMB * ----
 *            dTAU            dTAU
 *
-*            dX_G      H1 * H2 * Airmass(i)        
+*            dX_G      H1 * H2 * Airmass(i)
 *     .      ----  = - -------------------- * EXP (-TAU * Airmass(i)/ X_Gconst)
 *            dTAU        J_AMB * X_Gconst
 *
@@ -82,13 +82,13 @@
 *      - USER (1) = J_TEL
 *      - USER (2) = J_AMB
 *      - USER (3) = not used
-*      - USER (4:M+3)      = the measured airmasses 
-*      - USER (M+4:2M+3)   = the measured sky temperatures 
+*      - USER (4:M+3)      = the measured airmasses
+*      - USER (M+4:2M+3)   = the measured sky temperatures
 *      - USER (2M+4:3M+3)  = the errors on the measured sky temperatures
 *
 
 *  Invocation:
-*     CALL SCULIB_SKYFUNC_1 (MODE, M, N, LDFJ, X, F, FJAC, NSTATE, 
+*     CALL SCULIB_SKYFUNC_1 (MODE, M, N, LDFJ, X, F, FJAC, NSTATE,
 *    :    IUSER, USER)
 
 *  Arguments:
@@ -170,7 +170,7 @@
       DOUBLE PRECISION J_ERROR           ! error on J_MEAS
       DOUBLE PRECISION J_MEAS            ! measured sky brightness
       DOUBLE PRECISION J_TEL             ! brightness temperature of telescope
-      DOUBLE PRECISION J_THEORY          ! theoretical sky brightness 
+      DOUBLE PRECISION J_THEORY          ! theoretical sky brightness
                                          ! temperature at airmass measured
       DOUBLE PRECISION TAU               ! zenith optical depth of fit
       DOUBLE PRECISION X_G               ! fudge factor
@@ -202,10 +202,10 @@
             J_ERROR = USER (I + 3 + 2*M)
 
             IF (ABS(TAU * AIRMASS) .LT. 20.0D0) THEN
-               X_G = 1.0D0 + (H1 * H2 / J_AMB) * 
+               X_G = 1.0D0 + (H1 * H2 / J_AMB) *
      :           EXP (-TAU * AIRMASS / X_GCONST)
 
-               J_ATM = J_AMB * X_G 
+               J_ATM = J_AMB * X_G
 
                J_THEORY = (1.0D0 - ETA_TEL) * J_TEL +
      :           ETA_TEL * J_ATM * (1.0D0 - B * EXP (-TAU * AIRMASS))
@@ -224,7 +224,7 @@
 
       IF ((MODE .EQ. 1) .OR. (MODE .EQ. 2)) THEN
 
-*  calculate Jacobian matrix 
+*  calculate Jacobian matrix
 
          DO I = 1, M
             AIRMASS = USER (I + 3)
@@ -232,20 +232,20 @@
             J_ERROR = USER (I + 3 + 2*M)
 
             IF (ABS(TAU * AIRMASS) .LT. 20.0D0) THEN
-               X_G = 1.0D0 + (H1 * H2 / J_AMB) * 
+               X_G = 1.0D0 + (H1 * H2 / J_AMB) *
      :           EXP (-TAU * AIRMASS / X_GCONST)
 
-               J_ATM = J_AMB * X_G 
+               J_ATM = J_AMB * X_G
 
-               FJAC (I,1) = (- J_TEL + J_ATM - B * J_ATM * 
+               FJAC (I,1) = (- J_TEL + J_ATM - B * J_ATM *
      :           EXP (-TAU * AIRMASS)) / MAX (J_ERROR,1.0D-5)
-               FJAC (I,2) = (- ETA_TEL * J_ATM * 
+               FJAC (I,2) = (- ETA_TEL * J_ATM *
      :           EXP (-TAU * AIRMASS)) / MAX (J_ERROR,1.0D-5)
 
-               DX_GDT = ((-H1 * H2 * AIRMASS) / (J_AMB * X_GCONST)) * 
+               DX_GDT = ((-H1 * H2 * AIRMASS) / (J_AMB * X_GCONST)) *
      :           EXP (-TAU * AIRMASS / X_GCONST)
 
-               DJ_ATMDT = J_AMB * DX_GDT 
+               DJ_ATMDT = J_AMB * DX_GDT
 
                FJAC (I,3) = (ETA_TEL * DJ_ATMDT - B * ETA_TEL *
      :           EXP (-TAU * AIRMASS) * (DJ_ATMDT - J_ATM * AIRMASS)) /

@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -219,7 +219,7 @@
 *
 *                Check that the value is not null.
 
-                  CALL CAT5_GTAEL (ROWS, ROW, %VAL(CNF_PVAL(PTRN)), 
+                  CALL CAT5_GTAEL (ROWS, ROW, %VAL(CNF_PVAL(PTRN)),
      :                             NULFLG,
      :              STATUS)
                   IF (.NOT. NULFLG) THEN
@@ -237,7 +237,7 @@
                      PTR = FPTR__CAT5(FIELD)
 
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_GTAEB (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+                        CALL CAT5_GTAEB (ROWS, ROW, %VAL(CNF_PVAL(PTR)),
      :                                   BVAL,
      :                    STATUS)
                         IVAL = BVAL
@@ -253,7 +253,7 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_GTAEW (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+                        CALL CAT5_GTAEW (ROWS, ROW, %VAL(CNF_PVAL(PTR)),
      :                                   WVAL,
      :                    STATUS)
                         IVAL = WVAL
@@ -269,7 +269,7 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_GTAEI (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+                        CALL CAT5_GTAEI (ROWS, ROW, %VAL(CNF_PVAL(PTR)),
      :                                   IVAL,
      :                    STATUS)
 
@@ -284,7 +284,7 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_GTAER (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+                        CALL CAT5_GTAER (ROWS, ROW, %VAL(CNF_PVAL(PTR)),
      :                                   RVAL,
      :                    STATUS)
 
@@ -299,7 +299,7 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_GTAED (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+                        CALL CAT5_GTAED (ROWS, ROW, %VAL(CNF_PVAL(PTR)),
      :                                   DVAL,
      :                    STATUS)
 
@@ -314,7 +314,7 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_GTAEL (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+                        CALL CAT5_GTAEL (ROWS, ROW, %VAL(CNF_PVAL(PTR)),
      :                                   LVAL,
      :                    STATUS)
 
@@ -329,7 +329,7 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                        CALL CAT5_GTCAE (ROWS, FCSIZE, ROW, 
+                        CALL CAT5_GTCAE (ROWS, FCSIZE, ROW,
      :                                   %VAL(CNF_PVAL(PTR)),
      :                    CVAL, STATUS)
 
@@ -410,10 +410,10 @@
 
                STATUS = CAT__INVID
 
-               CALL CAT1_ERREP ('CAT5_WRTBL_BDID', 
+               CALL CAT1_ERREP ('CAT5_WRTBL_BDID',
      :           'Failed to find any column identifiers.', STATUS)
             ELSE
-               CALL CAT1_ERREP ('CAT5_WRTBL_BDCL', 
+               CALL CAT1_ERREP ('CAT5_WRTBL_BDCL',
      :           'Error locating column identifiers.', STATUS)
             END IF
 

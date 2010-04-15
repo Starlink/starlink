@@ -4,7 +4,7 @@
  The first Starlink release of the POLMAP package by Tim Harries has been
  made.  POLMAP is a package designed for interactive analysis of linera
  sprectropolarimetry data, complimenting facilities available in TSP.
-  
+
  To start POLMAP, type:
 
     % polmapsetup

@@ -21,8 +21,8 @@
 *         Some restructuring and final conversion to SGP/16 style.
 *
 *   Method:
-*      The image display is given a colour table consisting 
-*      of a grey scale from 0 to 239, and 16 individual colours in the 
+*      The image display is given a colour table consisting
+*      of a grey scale from 0 to 239, and 16 individual colours in the
 *      range 240 to 255.
 *
 *-

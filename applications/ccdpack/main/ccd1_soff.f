@@ -1,7 +1,7 @@
       SUBROUTINE CCD1_SOFF( ERROR, MAXDIS, XIN1, YIN1, INDI1, NREC1,
      :                      XIN2, YIN2, INDI2, NREC2, XDIST, YDIST,
      :                      XRANK, CRANK, WORK1, XOUT1, YOUT1, XOUT2,
-     :                      YOUT2, NOUT, XOFF, YOFF, INDO1, INDO2, 
+     :                      YOUT2, NOUT, XOFF, YOFF, INDO1, INDO2,
      :                      STATUS )
 *+
 *  Name:
@@ -49,7 +49,7 @@
 *     ERROR = DOUBLE PRECISION (Given)
 *        The error in the positions.
 *     MAXDIS = DOUBLE PRECISION (Given)
-*        The maximum acceptable displacement in pixels between two 
+*        The maximum acceptable displacement in pixels between two
 *        frames.  If an object match requires a displacement greater
 *        than this it will be rejected.  If it is set to zero, there
 *        are no restrictions.
@@ -152,14 +152,14 @@
 *        Changed to output the XDIFF and YDIFF of the selected position,
 *        rather than a mean derived from this. This caused the
 *        completeness calcs to fail as the same positions are not
-*        guaranteed. 
+*        guaranteed.
 *     8-FEB-1999 (MBT):
 *        Added input index lists.
 *     30-MAR-1999 (MBT):
-*        Modified to reject matches at greater displacements than 
+*        Modified to reject matches at greater displacements than
 *        MAXDIS.
 *     30-JAN-2001 (MBT):
-*        Fixed a (previously harmless) bug in input->output index 
+*        Fixed a (previously harmless) bug in input->output index
 *        indirection.
 *     {enter_further_changes_here}
 
@@ -167,7 +167,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -210,7 +210,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION D2MAX     ! Maximum acceptable displacement squared
-      DOUBLE PRECISION RMS       ! RMS distance 
+      DOUBLE PRECISION RMS       ! RMS distance
       DOUBLE PRECISION RMSMIN    ! RMS minimum
       DOUBLE PRECISION RMSSUM    ! Current sum of RMS values
       DOUBLE PRECISION XDIFF     ! Difference in X values
@@ -317,21 +317,21 @@
                L = I + K - 1
                IF ( L .LE. 0 ) L = I
                IF ( L .GT. NREC1 ) L = I
-            
+
 *  Offset this position pair so that the current translation gives a
 *  mean difference of zero. Work out current X offset.
                XVAL = XDIST( L, KK ) - XDIFF
-            
+
 *  Check to see if the deviation is acceptable within the range of
-*  errors.  
+*  errors.
                IF ( ABS( XVAL ) .LT. ERROR ) THEN
 
 *  Same for Y values.
                   YVAL = YDIST( L, KK ) - YDIFF
-                  IF ( ABS( YVAL ) .LT. ERROR ) THEN 
+                  IF ( ABS( YVAL ) .LT. ERROR ) THEN
                      NCON = NCON + 1
                      RMSSUM = RMSSUM + XVAL * XVAL + YVAL * YVAL
-            
+
 *  The first value which satisfies both will do.
                      GO TO 5
                   END IF
@@ -389,7 +389,7 @@
                XVAL = XDIST( LO, KK ) - XDIFF
                IF ( ABS( XVAL ) .LT. ERROR ) THEN
                   YVAL = YDIST( LO, KK ) - YDIFF
-                  IF ( ABS( YVAL ) .LT. ERROR ) THEN 
+                  IF ( ABS( YVAL ) .LT. ERROR ) THEN
                      NCON = NCON + 1
                      RMSSUM = RMSSUM + XVAL * XVAL + YVAL * YVAL
                      GO TO 5
@@ -400,13 +400,13 @@
                XVAL = XDIST( UP, KK ) - XDIFF
                IF ( ABS( XVAL ) .LT. ERROR ) THEN
                   YVAL = YDIST( UP, KK ) - YDIFF
-                  IF ( ABS( YVAL ) .LT. ERROR ) THEN 
+                  IF ( ABS( YVAL ) .LT. ERROR ) THEN
                      NCON = NCON + 1
                      RMSSUM = RMSSUM + XVAL * XVAL + YVAL * YVAL
                      GO TO 5
                   END IF
                END IF
- 5          CONTINUE      
+ 5          CONTINUE
 
 *  Compare the number of values located. Need more than one.
             IF ( NCON .GT. 1 ) THEN
@@ -431,7 +431,7 @@
 
 *  Same number of matches. Is this a better fit is the sense of having
 *  smaller deviations? If so use this.
-                  IF ( RMS .LT. RMSMIN ) THEN 
+                  IF ( RMS .LT. RMSMIN ) THEN
                      RMSMIN = RMS
                      MAXCON = NCON
                      BESTI = I
@@ -467,16 +467,16 @@
 *  Offset this position pair so that the current translation gives a
 *  mean difference of zero.
                XVAL = XDIST( L, KK ) - XDIFF
-               IF ( ABS( XVAL ) .LE. ERROR ) THEN 
+               IF ( ABS( XVAL ) .LE. ERROR ) THEN
                   YVAL = YDIST( L, KK ) - YDIFF
-                  IF ( ABS( YVAL ) .LE. ERROR ) THEN 
+                  IF ( ABS( YVAL ) .LE. ERROR ) THEN
 
 *  This position pair is selected remember its value.
                      NOUT = NOUT + 1
-                     XOUT1( NOUT ) = XIN1( XRANK( L, KK ) ) 
-                     YOUT1( NOUT ) = YIN1( XRANK( L, KK ) ) 
-                     XOUT2( NOUT ) = XIN2( KK ) 
-                     YOUT2( NOUT ) = YIN2( KK ) 
+                     XOUT1( NOUT ) = XIN1( XRANK( L, KK ) )
+                     YOUT1( NOUT ) = YIN1( XRANK( L, KK ) )
+                     XOUT2( NOUT ) = XIN2( KK )
+                     YOUT2( NOUT ) = YIN2( KK )
 
 *  Record the original positions.
                      INDO1( NOUT ) = INDI1( XRANK( L, KK ) )
@@ -487,7 +487,7 @@
                   END IF
                END IF
  9          CONTINUE
- 8       CONTINUE      
+ 8       CONTINUE
 
 *  Now record the offsets used to determine these matches.
          XOFF = XDIFF

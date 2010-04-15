@@ -5,7 +5,7 @@
 
 # gwm_printDialog:
 #
-# This procedure creates a modal dialog box with controls printing a 
+# This procedure creates a modal dialog box with controls printing a
 # gwm widget. The control that activated the dialog is disabled
 # until the printing operation is complete to prevent attempts to start
 # a second print before the previous one has finished.
@@ -43,7 +43,7 @@ proc gwm_printDialog {w gwm c} {
 # Create and pack three frames one above the other and divide the top frame
 # into two side by side.
 	pack [frame $w.top] [frame $w.file] [frame $w.bot] -fill x
-    
+
 	pack [frame $w.top.l] [frame $w.top.pad -width 10] [frame $w.top.r] \
 	    -side left -fill y
 

@@ -36,7 +36,7 @@
 #        SETSAT
 #        USESET
 #
-#     Additionally, some of these parameters may be prefixed by a 
+#     Additionally, some of these parameters may be prefixed by a
 #     Set Index modifier, which is an integer followed by a comma,
 #     to indicate the value specific to a given Set Index.  E.g.
 #     the value "3,ADC" would be the ADC value for Set Index 3.

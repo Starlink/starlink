@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,7 +171,7 @@
 
 *     Line names.
          CALL SPD_FDAAC( OLDNCO+1, NCOMP, %VAL( CNF_PVAL(CPNTR(1)) ),
-     :                   'unidentified component', STATUS, 
+     :                   'unidentified component', STATUS,
      :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *     Laboratory frequencies.
@@ -185,7 +185,7 @@
 
 *     Component types.
          CALL SPD_FDAAC( OLDNCO+1, NCOMP, %VAL( CNF_PVAL(CPNTR(3)) ),
-     :                   'unknown function', STATUS, 
+     :                   'unknown function', STATUS,
      :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *     Number of result parameters for each spectral component.
@@ -212,7 +212,7 @@
 *  elements.
       IF ( TNPAR .GT. OLDTNP ) THEN
          CALL SPD_FDAAC( OLDTNP+1, TNPAR, %VAL( CNF_PVAL(PPNTR(1)) ),
-     :                   'unknown parameter', STATUS, 
+     :                   'unknown parameter', STATUS,
      :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *  If parameter indexed vectors are shorter now, some retained spectral

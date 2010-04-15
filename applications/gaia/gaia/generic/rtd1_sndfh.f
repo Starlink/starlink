@@ -1,4 +1,4 @@
-      SUBROUTINE RTD1_SNDFH( NDF, BITPIX, BAD, NHEAD, IPHEAD, AVAIL, 
+      SUBROUTINE RTD1_SNDFH( NDF, BITPIX, BAD, NHEAD, IPHEAD, AVAIL,
      :           STATUS )
 *+
 *  Name:
@@ -105,7 +105,7 @@
       INTEGER NCHAR             ! Number of encoded characters
       INTEGER NDIM              ! Number of dimensions
       INTEGER UBND( NDF__MXDIM )! NDF upper bounds
-      
+
 *  Local functions:
       INCLUDE 'NUM_DEC_CVT'     ! Numeric conversion routines.
       INCLUDE 'NUM_DEF_CVT'
@@ -119,7 +119,7 @@
       CALL RTD1_WRFTL( 'SIMPLE', 'T', ' ', IPHEAD, NHEAD, AVAIL, STATUS)
 
 *  Add the BIXPIX header.
-      CALL RTD1_WRFTI( 'BITPIX', BITPIX, ' ', IPHEAD, NHEAD, AVAIL, 
+      CALL RTD1_WRFTI( 'BITPIX', BITPIX, ' ', IPHEAD, NHEAD, AVAIL,
      :                 STATUS)
 
 *  Get the bounds of the NDF.
@@ -128,9 +128,9 @@
 *  Add NAXIS headers.
       CALL RTD1_WRFTI( 'NAXIS', NDIM, ' ', IPHEAD, NHEAD, AVAIL, STATUS)
       KEYWRD = 'NAXIS'
-      DO 1 I = 1, NDIM 
-         CALL CHR_ITOC( I, KEYWRD( 6: ), NCHAR ) 
-         CALL RTD1_WRFTI( KEYWRD, UBND( I ) - LBND( I ) + 1  , ' ', 
+      DO 1 I = 1, NDIM
+         CALL CHR_ITOC( I, KEYWRD( 6: ), NCHAR )
+         CALL RTD1_WRFTI( KEYWRD, UBND( I ) - LBND( I ) + 1  , ' ',
      :                    IPHEAD, NHEAD, AVAIL, STATUS)
  1    CONTINUE
 
@@ -154,7 +154,7 @@ C            WRITE( VALUE, '(G24.17)') VAL__BADD ! Broken in g77 2.91.66 missing
          ELSE IF ( BITPIX .EQ. -8 ) THEN
             WRITE( VALUE, '(I16)') NUM_UBTOI( VAL__BADUB )
          END IF
-         CALL RTD1_WRFTC( 'BLANK', VALUE, ' ', IPHEAD, NHEAD, AVAIL, 
+         CALL RTD1_WRFTC( 'BLANK', VALUE, ' ', IPHEAD, NHEAD, AVAIL,
      :                    STATUS)
       END IF
       END

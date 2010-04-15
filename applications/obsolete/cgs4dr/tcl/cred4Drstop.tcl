@@ -1,4 +1,4 @@
-proc cred4Drstop {taskname} { 
+proc cred4Drstop {taskname} {
   global Cred4NoticeBoard
   global Cred4Widgets
 

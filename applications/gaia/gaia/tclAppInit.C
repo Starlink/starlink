@@ -1,5 +1,5 @@
-/* 
- * tclAppInit.C -- 
+/*
+ * tclAppInit.C --
  *
  * ---------------------------------------------------------------------
  * Note: this file is used to create a Tcl interpreter without Tk for
@@ -97,7 +97,7 @@ main( int argc, char *argv[] )
  * Results:
  *	Returns a standard Tcl completion code, and leaves an error
  *	message in interp->result if an error occurs.
- * 
+ *
  * Side effects:
  *	Depends on the startup script.
  *
@@ -110,12 +110,12 @@ Tcl_AppInit(Tcl_Interp *interp)
   if (Tcl_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }
-  
+
   if (Itcl_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }
   Tcl_StaticPackage(interp, "Itcl", Itcl_Init, (Tcl_PackageInitProc *) NULL);
-  
+
   if (Tclx_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }

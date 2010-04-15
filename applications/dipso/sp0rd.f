@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command SP0RD.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -40,7 +40,7 @@
 *        Original version.
 *     13-DEC-1995 (DSB):
 *        Remove LOC argument from GETNDF call. This argument returned a
-*        primary locator to keep the file open, but the NDF library now 
+*        primary locator to keep the file open, but the NDF library now
 *        looks after it all.
 *     {enter_changes_here}
 
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -59,11 +59,11 @@
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! DIPSO array sizes, etc.
-*        ASIZE1 = INTEGER (Read)  
+*        ASIZE1 = INTEGER (Read)
 *           The declared size of the X and Y current arrays.
 
       INCLUDE 'DECLARE_DATA'     ! DIPSO current arrays
-*        MAXBRK = INTEGER (Read)  
+*        MAXBRK = INTEGER (Read)
 *           The declared size of the break current array.
 *        BREAK( MAXBRK ) = INTEGER (Write)
 *           The pixel indices at which breaks occur in the X and Y arrays.
@@ -106,20 +106,20 @@
       CALL EXPAR( COMM, PARAMS, 2, STATUS )
 
 *  See if zeros in the input data are to be treated as bad values.
-      CALL GET0L( PARAMS, 2, .TRUE., COMM, 'Treat zeros as bad values', 
+      CALL GET0L( PARAMS, 2, .TRUE., COMM, 'Treat zeros as bad values',
      :            .TRUE., BADZER, STATUS )
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Get an identifier for the NDF. 
+*  Get an identifier for the NDF.
       CALL GETNDF( PARAMS, 1, .FALSE., COMM, 'The NDF to be read',
      :             ' ', 'READ', ' ', INDF, STATUS )
 
 *  Tell the user what is about to happen.
       CALL NDF_MSG( 'NDFNAM', INDF )
       CALL MSGOUT( COMM, 'Reading SPECTRUM format 0 data from NDF '//
-     :             '''^NDFNAM'' into the current arrays.', .FALSE., 
+     :             '''^NDFNAM'' into the current arrays.', .FALSE.,
      :             STATUS )
 
 *  Read the data from the NDF into the current arrays.
@@ -127,8 +127,8 @@
 
 *  If required remove any pixels with value zero, and add an entry to
 *  the break array for each block of contiguous zeros.
-      IF( BADZER ) CALL BADCHK( COMM, 0.0, ASIZE1, MAXBRK, NPOINT, 
-     :                          WAVE, FLUX, NBREAK, BREAK, WORKI, 
+      IF( BADZER ) CALL BADCHK( COMM, 0.0, ASIZE1, MAXBRK, NPOINT,
+     :                          WAVE, FLUX, NBREAK, BREAK, WORKI,
      :                          STATUS )
 
 *  End the NDF context.

@@ -192,7 +192,7 @@
                      DO ROW = 1, ROWS
                         CALL CAT_RGET (CI, ROW, STATUS)
                         CALL CAT_EGT0D (FI, VALUE, NULFLG, STATUS)
- 
+
                         IF (.NOT. NULFLG) THEN
                            IF (MINFND) THEN
                               IF (VALUE .LT. MINVAL) THEN

@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -143,7 +143,7 @@
          EXNAM2 = XNAME2
          CALL CHR_UCASE( EXNAM2 )
       END IF
-      
+
 *  The source and destination must both be FITS, if either is FITS.
       IF ( EXNAM1 .EQ. 'FITS' .OR. EXNAM2 .EQ. 'FITS' ) THEN
          IF ( EXNAM1 .NE. EXNAM2 ) THEN
@@ -168,7 +168,7 @@
 
 *  Initialise the character pointer to the start of the header
 *  destination parameter list. Then loop to extract each element from
-*  the list. 
+*  the list.
       I1 = 1
  1    CONTINUE                  ! Start of "DO WHILE" loop
       IF ( (STATUS .EQ. SAI__OK) .AND. (I1 .LE. LEN( PARAM2 )) ) THEN
@@ -201,14 +201,14 @@
 *  If a new parameter slot was allocated then we need to access an NDF.
 *  The NDF data is not mapped in this case for efficiency
 *  reasons. Access using UPDATE as we need to write the header source.
-                  IF ( WASNEW ) CALL IMG1_ASSOC( VPAR2, 'UPDATE', SLOT2, 
+                  IF ( WASNEW ) CALL IMG1_ASSOC( VPAR2, 'UPDATE', SLOT2,
      :                                           STATUS )
-                  IF ( STATUS .EQ. SAI__OK ) THEN 
+                  IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Check that WRITE access can be used on this extension.
                      CALL NDF_ISACC( PCB_INDF( SLOT2 ), 'WRITE', CANMOD,
      :                               STATUS )
-                     IF ( CANMOD ) THEN 
+                     IF ( CANMOD ) THEN
 
 *  Initialise IMG to write to the extension (if not already doing so).
                         CALL IMG1_EXINI( SLOT2, EXNAM2, .TRUE., ESLOT2,
@@ -226,7 +226,7 @@
                            CALL IMG1_REPEX( SLOT1, ESLOT1, SLOT2,
      :                                      ESLOT2, STATUS )
                         END IF
-                     ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
+                     ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Cannot write to this NDF's extension.
                         STATUS = IMG__NOACC

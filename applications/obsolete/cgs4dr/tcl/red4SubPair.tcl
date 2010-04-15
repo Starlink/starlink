@@ -1,6 +1,6 @@
 proc red4SubPair {taskname pair} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -28,7 +28,7 @@ proc red4SubPair {taskname pair} {
       set Red4Widgets(SP_LAB01) [label $top.l1 -text "Filename"]
       set Red4Widgets(SP_ENT01) [entry $top.e1 -width 40]
       pack $Red4Widgets(SP_LAB01) $Red4Widgets(SP_ENT01) -in $top -side left
-      $Red4Widgets(SP_ENT01) insert end $Red4Widgets(OB) 
+      $Red4Widgets(SP_ENT01) insert end $Red4Widgets(OB)
     } elseif {$pair==2} {
       set Red4Widgets(SP_LAB01) [label $top.l1 -text "Object" -width 20]
       set Red4Widgets(SP_ENT01) [entry $top.e1 -width 40]
@@ -36,8 +36,8 @@ proc red4SubPair {taskname pair} {
       set Red4Widgets(SP_ENT02) [entry $bot.e2 -width 40]
       pack $Red4Widgets(SP_LAB01) $Red4Widgets(SP_ENT01) -in $top -side left
       pack $Red4Widgets(SP_LAB02) $Red4Widgets(SP_ENT02) -in $bot -side left
-      $Red4Widgets(SP_ENT01) insert end $Red4Widgets(OB) 
-      $Red4Widgets(SP_ENT02) insert end $Red4Widgets(OB) 
+      $Red4Widgets(SP_ENT01) insert end $Red4Widgets(OB)
+      $Red4Widgets(SP_ENT02) insert end $Red4Widgets(OB)
     }
 
 # Bind the defaults to button-2

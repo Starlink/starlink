@@ -20,7 +20,7 @@
 *        Tidy up input image structure
 *     Endif
 *     Return
-*    
+*
 *    Authors :
 *
 *     Dave Baines (ROE::ASOC5)
@@ -46,8 +46,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'         ! global SSE parameters
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -55,7 +55,7 @@
 
 *    Local constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                 ! input image dimensionality
       PARAMETER ( NDIMS  =  2 ) ! 2-d arrays only
 
@@ -117,7 +117,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          call PEAKFINDSUB to find peak and return values
-            CALL FINDPEAKSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI ), 
+            CALL FINDPEAKSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI ),
      :	                      XSTART, YSTART, XEND, YEND, XPEAK,
      :	                      YPEAK, MAXVAL, STATUS )
 

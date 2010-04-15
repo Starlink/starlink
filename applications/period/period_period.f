@@ -1,7 +1,7 @@
-      SUBROUTINE PERIOD_PERIOD(YPTR, MXCOL, MXSLOT, NPTSARRAY, 
-     :                         INFILEARRAY, YERRORARRAY, DETRENDARRAY, 
+      SUBROUTINE PERIOD_PERIOD(YPTR, MXCOL, MXSLOT, NPTSARRAY,
+     :                         INFILEARRAY, YERRORARRAY, DETRENDARRAY,
      :                         SIG,LOG,LOGUNIT)
- 
+
 C==============================================================================
 C The work-horse routine. Finds periodicities in data using a number of
 C different techniques.
@@ -16,17 +16,17 @@ C Converted to Double Precision (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C==============================================================================
- 
+
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
 
       INCLUDE 'CNF_PAR'
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_PERIOD declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER MXCOL, MXSLOT
       INTEGER YPTR(MXSLOT), NPTSARRAY(MXSLOT)
       INTEGER FIRSTSLOT, LASTSLOT, SLOT, FIRSTOUT, SLOTOUT
@@ -60,20 +60,20 @@ C-----------------------------------------------------------------------------
       DATA ISTEP/50/
       DATA LSIG, NPERMS/.FALSE., 0/
       DATA MINFREQ,MAXFREQ,FINTERVAL/0.0D0,0.0D0,0.0D0/
- 
+
       SAVE MINFREQ,MAXFREQ,FINTERVAL
 
- 
+
 C-----------------------------------------------------------------------------
 C Initialise slot selection logical to guard against accidental erasure.
 C-----------------------------------------------------------------------------
- 
+
       LSELECT = .FALSE.
 
 C-----------------------------------------------------------------------------
 C Initialise frequency limits.
 C-----------------------------------------------------------------------------
-      
+
       MAXFREQ=0.0D0
       MINFREQ=0.0D0
       FINTERVAL=0.0D0
@@ -84,7 +84,7 @@ C-----------------------------------------------------------------------------
 C-----------------------------------------------------------------------------
 C Menu.
 C-----------------------------------------------------------------------------
- 
+
  100  CONTINUE
       WRITE (*, *) ' '
       WRITE (*, *) 'Options.'
@@ -92,7 +92,7 @@ C-----------------------------------------------------------------------------
       WRITE (*, *) ' '
       WRITE (*, *) '  SELECT   --  Select data slots.'
       WRITE (*, *) '  FREQ     --  Set/show frequency search limits.'
-      WRITE (*, *) 
+      WRITE (*, *)
      :            '  CHISQ    --  Chi-squared of sine fit vs frequency.'
       WRITE (*, *) '  CLEAN    --  CLEANed power spectrum.'
       WRITE (*, *) '  FT       --  Discrete Fourier power spectrum.'
@@ -101,7 +101,7 @@ C-----------------------------------------------------------------------------
       WRITE (*, *) '  STRING   --  String-length vs frequency.'
       WRITE (*, *) '  PEAKS    --  Calculate period from periodogram.'
       WRITE (*, *) '  SIG      --  Enable/disable significance calc.'
-      WRITE (*, *) '  PLT      --  Plot the contents of a slot.' 
+      WRITE (*, *) '  PLT      --  Plot the contents of a slot.'
       WRITE (*, *) '  HELP     --  On-line help.'
       WRITE (*, *) '  QUIT     --  Quit PERIOD_PERIOD.'
       WRITE (*, *) '  '
@@ -111,14 +111,14 @@ C-----------------------------------------------------------------------------
       CALL PERIOD_CASE(COMMAND, .TRUE.)
 
       IF ( PERIOD_PARSE(COMMAND,'SELECT') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C SELECT  * Select input and output data slots.
 C**********-------------------------------------------------------------------
- 
+
          WRITE (*, *) ' '
 
-         CALL PERIOD_SELECT(FIRSTSLOT, LASTSLOT, FIRSTOUT, MXSLOT, 
+         CALL PERIOD_SELECT(FIRSTSLOT, LASTSLOT, FIRSTOUT, MXSLOT,
      :                      IFAIL)
 
          IF ( IFAIL.EQ.1 ) THEN
@@ -132,11 +132,11 @@ C**********-------------------------------------------------------------------
 
       ELSE IF ( .NOT.(PERIOD_PARSE(COMMAND,'FREQ')) ) THEN
          IF ( PERIOD_PARSE(COMMAND,'CHISQ') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C CHISQ   * Least-squares sine-curve fitting.
 C**********-------------------------------------------------------------------
- 
+
             IF ( .NOT.LSELECT ) THEN
                CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
@@ -144,11 +144,11 @@ C**********-------------------------------------------------------------------
             ELSE
                LSELECT = .FALSE.
             END IF
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Loop through slots to be processed.
 C-----------------------------------------------------------------------------
- 
+
             DO 290 SLOT = FIRSTSLOT, LASTSLOT
                NDATA = NPTSARRAY(SLOT)
 
@@ -160,21 +160,21 @@ C-----------------------------------------------------------------------------
 
                SLOTOUT = FIRSTOUT + (SLOT-FIRSTSLOT)
                YSLOT1 = YPTR(SLOT)
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Loop through permutations.
 C-----------------------------------------------------------------------------
- 
+
                DO 270 SAMPLE = 1, NPERMS + 1
                   IF ( SAMPLE.EQ.1 ) THEN
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Set frequency limits.
 C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
- 
-                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA,
      :                                   MXCOL,
      :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
@@ -185,7 +185,7 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), 
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)),
      :                                   NDATA,
      :                                   MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
@@ -194,16 +194,16 @@ C-----------------------------------------------------------------------------
                      IF ( IFAIL.EQ.1 ) GO TO 294
                      IF ( FMIN.EQ.0.0D0 ) THEN
                         CALL PERIOD_WRITEBELL()
-                        WRITE (*, *) 
+                        WRITE (*, *)
      :                       '** ERROR: No sine fit for zero frequency.'
                         GO TO 294
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Set zero point to be the mean observation time.
 C-----------------------------------------------------------------------------
- 
-                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), NDATA, 
+
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), NDATA,
      :                                  AVE,
      :                                  ADEV, SDEV, VARI)
                      ZEROPT = AVE
@@ -227,7 +227,7 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_ALLOC('_DOUBLE', MAXPTS, WK2PTR)
 
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Loop through trial frequencies.
 C-----------------------------------------------------------------------------
@@ -248,19 +248,19 @@ C-----------------------------------------------------------------------------
 
                      PERIOD = 1.0D0/FREQ
 
-                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)),
      :                                %VAL(CNF_PVAL(YDATAPTR)),
-     :                                %VAL(CNF_PVAL(YERRPTR)), NDATA, 
-     :                                ZEROPT, 
+     :                                %VAL(CNF_PVAL(YERRPTR)), NDATA,
+     :                                ZEROPT,
      :                                PERIOD, IFAIL)
 
                      IF ( IFAIL.EQ.1 ) GO TO 292
 
-                     CALL PERIOD_SINFIT(%VAL(CNF_PVAL(XDATAPTR)), 
+                     CALL PERIOD_SINFIT(%VAL(CNF_PVAL(XDATAPTR)),
      :                                  %VAL(CNF_PVAL(YDATAPTR)),
-     :                                  %VAL(CNF_PVAL(YERRPTR)), NDATA, 
-     :                                  1.0D0, 
-     :                                  GAMMA, KVEL, PHASE, VAR, NP, F, 
+     :                                  %VAL(CNF_PVAL(YERRPTR)), NDATA,
+     :                                  1.0D0,
+     :                                  GAMMA, KVEL, PHASE, VAR, NP, F,
      :                                  IFAIL)
 
                      IF ( IFAIL.EQ.1 ) THEN
@@ -274,20 +274,20 @@ C-----------------------------------------------------------------------------
                      IF ( SAMPLE.EQ.1 ) THEN
                         IF ( COUNTER.EQ.(LOOP*ISTEP) ) THEN
                            WRITE (*, 99001) FREQ, F/(DFLOAT(NP)-3.0D0)
-99001                      FORMAT ('+Trial Frequency =', D12.6, 
+99001                      FORMAT ('+Trial Frequency =', D12.6,
      :                             ',  Reduced Chi-squared =', D18.6)
                            LOOP = LOOP + 1
                         END IF
                      END IF
- 
+
 
 C-----------------------------------------------------------------------------
 C chisq - If the first permutation, load the output slot.
 C-----------------------------------------------------------------------------
- 
+
                      IF ( SAMPLE.EQ.1 ) THEN
 
-                        CALL PERIOD_LOADOUTONE(%VAL(CNF_PVAL(YSLOT2)), 
+                        CALL PERIOD_LOADOUTONE(%VAL(CNF_PVAL(YSLOT2)),
      :                                         MAXPTS,
      :                                         MXCOL, COUNTER, FREQ,
      :                                         F/(DFLOAT(NP)-3.0D0))
@@ -296,21 +296,21 @@ C-----------------------------------------------------------------------------
 C                    WK2(COUNTER) = F/(DFLOAT(NP)-3.0D0)
 
                      RVAL1 = F/(DFLOAT(NP)-3.0D0)
-                     CALL PERIOD_PUT1D(RVAL1, COUNTER, 
+                     CALL PERIOD_PUT1D(RVAL1, COUNTER,
      :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
                      FREQ = FREQ + FINT
  250              CONTINUE
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Periodogram complete. If first permutation, load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( SAMPLE.EQ.1 ) THEN
                      YERRORARRAY(SLOTOUT) = .FALSE.
                      DETRENDARRAY(SLOTOUT) = .FALSE.
                      INFILEARRAY(SLOTOUT)
-     :                   = 'Reduced Chi**2 vs Trial Freq ' // 'For ' // 
+     :                   = 'Reduced Chi**2 vs Trial Freq ' // 'For ' //
      :                  INFILEARRAY(SLOT)
                      NPTSARRAY(SLOTOUT) = COUNTER
                      SIG(1, SLOTOUT) = -1.0D0
@@ -322,18 +322,18 @@ C-----------------------------------------------------------------------------
                         WRITE (*, *) ' '
                      END IF
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Determine significance information if requested.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DPMX30
 
-                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)),
      :                                     MAXPTS, MXCOL,
      :                                     COUNTER, STAT, MAXPERMS+1,
-     :                                     SAMPLE, 
+     :                                     SAMPLE,
      :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
@@ -341,15 +341,15 @@ C-----------------------------------------------------------------------------
                         WRITE (*, 99002) SAMPLE - 1
 99002                   FORMAT ('+** OK: Processed permutation = ', I4)
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Randomize time-series for next permutation.
 C-----------------------------------------------------------------------------
- 
+
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 260 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YANDESHUFFLE(SEED, 
+                        CALL PERIOD_YANDESHUFFLE(SEED,
      :                              %VAL(CNF_PVAL(YRANPTR)),
      :                              %VAL(CNF_PVAL(ERANPTR)),
      :                              NDATA)
@@ -366,11 +366,11 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_DEALL(YDATAPTR)
                   CALL PERIOD_DEALL(XDATAPTR)
                   CALL PERIOD_DEALL(DATAPTR)
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Permutations complete - calculate significance; load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                IF ( LSIG ) THEN
                   SIGNOISE = 0.0D0
                   DO 280 I = 2, NPERMS + 1
@@ -380,11 +380,11 @@ C-----------------------------------------------------------------------------
                   SIG(1, SLOTOUT) = DFLOAT(NPERMS)
                   SIG(2, SLOTOUT) = SIGNOISE/DFLOAT(NPERMS)
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C chisq - Process the next data slot.
 C-----------------------------------------------------------------------------
- 
+
  290        CONTINUE
             GO TO 100
 
@@ -402,11 +402,11 @@ C-----------------------------------------------------------------------------
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND,'FT') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C FT      * Discrete Fourier power spectrum.
 C**********-------------------------------------------------------------------
- 
+
             IF ( .NOT.LSELECT ) THEN
                CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
@@ -414,11 +414,11 @@ C**********-------------------------------------------------------------------
             ELSE
                LSELECT = .FALSE.
             END IF
- 
+
 C-----------------------------------------------------------------------------
 C ft - Loop through slots to be processed.
 C-----------------------------------------------------------------------------
- 
+
             DO 390 SLOT = FIRSTSLOT, LASTSLOT
                NDATA = NPTSARRAY(SLOT)
 
@@ -430,21 +430,21 @@ C-----------------------------------------------------------------------------
 
                SLOTOUT = FIRSTOUT + (SLOT-FIRSTSLOT)
                YSLOT1 = YPTR(SLOT)
- 
+
 C-----------------------------------------------------------------------------
 C ft - Loop through permutations.
 C-----------------------------------------------------------------------------
- 
+
                DO 370 SAMPLE = 1, NPERMS + 1
                   IF ( SAMPLE.EQ.1 ) THEN
- 
+
 C-----------------------------------------------------------------------------
 C ft - Set frequency limits.
 C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
- 
-                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)),
      :                                   NDATA, MXCOL,
      :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
@@ -481,40 +481,40 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_ALLOC('_DOUBLE', MAXPTS, WK2PTR)
 
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C ft - Loop through trial frequencies.
 C-----------------------------------------------------------------------------
 
-                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA,
      :                                  MXCOL,
-     :                                  SAMPLE, 
+     :                                  SAMPLE,
      :                                  %VAL(CNF_PVAL(XDATAPTR)),
      :                                  %VAL(CNF_PVAL(YDATAPTR)),
      :                                  %VAL(CNF_PVAL(YRANPTR)))
- 
-                  CALL PERIOD_FT(%VAL(CNF_PVAL(XDATAPTR)), 
+
+                  CALL PERIOD_FT(%VAL(CNF_PVAL(XDATAPTR)),
      :                           %VAL(CNF_PVAL(YDATAPTR)),
      :                           NDATA, MAXPTS, FMIN, FMAX, FINT,
-     :                           %VAL(CNF_PVAL(WK1PTR)), 
+     :                           %VAL(CNF_PVAL(WK1PTR)),
      :                           %VAL(CNF_PVAL(WK2PTR)), NOUT,
      :                           SAMPLE)
- 
+
 C-----------------------------------------------------------------------------
 C ft - Periodogram complete. If first permutation, load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( SAMPLE.EQ.1 ) THEN
 
-                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)),
      :                                      NOUT, MXCOL,
-     :                                      %VAL(CNF_PVAL(WK1PTR)), 
+     :                                      %VAL(CNF_PVAL(WK1PTR)),
      :                                      %VAL(CNF_PVAL(WK2PTR)),
      :                                      MAXPTS)
 
                      YERRORARRAY(SLOTOUT) = .FALSE.
                      DETRENDARRAY(SLOTOUT) = .FALSE.
-                     INFILEARRAY(SLOTOUT) = 'Normalised Power ' // 
+                     INFILEARRAY(SLOTOUT) = 'Normalised Power ' //
      :                  'vs Freq For ' // INFILEARRAY(SLOT)
                      NPTSARRAY(SLOTOUT) = NOUT
                      SIG(1, SLOTOUT) = -1.0D0
@@ -526,18 +526,18 @@ C-----------------------------------------------------------------------------
                         WRITE (*, *) ' '
                      END IF
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C ft - Determine significance information if requested.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DNMX30
 
-                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)),
      :                                     MAXPTS, MXCOL,
      :                                     NOUT, STAT, MAXPERMS+1,
-     :                                     SAMPLE, 
+     :                                     SAMPLE,
      :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
@@ -545,15 +545,15 @@ C-----------------------------------------------------------------------------
                         WRITE (*, 99003) SAMPLE - 1
 99003                   FORMAT ('+** OK: Processed permutation = ', I4)
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C ft - Randomize time-series for next permutation.
 C-----------------------------------------------------------------------------
- 
+
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 360 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, 
+                        CALL PERIOD_YSHUFFLE(SEED,
      :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  360                 CONTINUE
@@ -568,11 +568,11 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_DEALL(YDATAPTR)
                   CALL PERIOD_DEALL(XDATAPTR)
                   CALL PERIOD_DEALL(DATAPTR)
- 
+
 C-----------------------------------------------------------------------------
 C ft - Permutations complete - calculate significance; load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                IF ( LSIG ) THEN
                   SIGNOISE = 0.0D0
                   DO 380 I = 2, NPERMS + 1
@@ -581,11 +581,11 @@ C-----------------------------------------------------------------------------
                   SIG(1, SLOTOUT) = DFLOAT(NPERMS)
                   SIG(2, SLOTOUT) = SIGNOISE/DFLOAT(NPERMS)
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C ft - Process the next data slot.
 C-----------------------------------------------------------------------------
- 
+
  390        CONTINUE
             GO TO 100
 
@@ -594,11 +594,11 @@ C-----------------------------------------------------------------------------
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND,'SCARGLE') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C SCARGLE * Fast evaluation of the Lomb-Scargle statistic for each frequency.
 C**********-------------------------------------------------------------------
- 
+
             IF ( .NOT.LSELECT ) THEN
                CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
@@ -606,11 +606,11 @@ C**********-------------------------------------------------------------------
             ELSE
                LSELECT = .FALSE.
             END IF
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Loop through slots to be processed.
 C-----------------------------------------------------------------------------
- 
+
             DO 490 SLOT = FIRSTSLOT, LASTSLOT
                NDATA = NPTSARRAY(SLOT)
 
@@ -622,21 +622,21 @@ C-----------------------------------------------------------------------------
 
                SLOTOUT = FIRSTOUT + (SLOT-FIRSTSLOT)
                YSLOT1 = YPTR(SLOT)
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Loop through permutations.
 C-----------------------------------------------------------------------------
- 
+
                DO 470 SAMPLE = 1, NPERMS + 1
                   IF ( SAMPLE.EQ.1 ) THEN
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Set frequency limits.
 C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
- 
-                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)),
      :                                   NDATA, MXCOL,
      :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
@@ -670,23 +670,23 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_ALLOC('_DOUBLE', NDATA, YRANPTR)
 
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Loop through trial frequencies.
 C-----------------------------------------------------------------------------
 
-                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
+                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)),
      :                                  NDATA, MXCOL,
-     :                                  SAMPLE, 
+     :                                  SAMPLE,
      :                                  %VAL(CNF_PVAL(XDATAPTR)),
      :                                  %VAL(CNF_PVAL(YDATAPTR)),
      :                                  %VAL(CNF_PVAL(YRANPTR)))
- 
+
 C------------------------------------------------------------------------------
 C Compute the mean and variance of the data.
 C------------------------------------------------------------------------------
 
-                  CALL PERIOD_MOMENT(%VAL(CNF_PVAL(YDATAPTR)), NDATA, 
+                  CALL PERIOD_MOMENT(%VAL(CNF_PVAL(YDATAPTR)), NDATA,
      :                               AVE,
      :                               ADEV, SDEV, VARI)
 
@@ -698,7 +698,7 @@ C------------------------------------------------------------------------------
                   END IF
 
                   CALL PERIOD_PREPSCARGLE(%VAL(CNF_PVAL(XDATAPTR)),
-     :                                    %VAL(CNF_PVAL(YDATAPTR)), 
+     :                                    %VAL(CNF_PVAL(YDATAPTR)),
      :                                    NDATA, FMAX,
      :                                    FINT, NWK, XMIN, XDIF, OFAC,
      :                                    HIFAC, NFREQ)
@@ -706,10 +706,10 @@ C------------------------------------------------------------------------------
                   CALL PERIOD_ALLOC('_DOUBLE', NWK, WORK1PTR)
                   CALL PERIOD_ALLOC('_DOUBLE', NWK, WORK2PTR)
 
-                  CALL PERIOD_SCARGLE(%VAL(CNF_PVAL(XDATAPTR)), 
+                  CALL PERIOD_SCARGLE(%VAL(CNF_PVAL(XDATAPTR)),
      :                                %VAL(CNF_PVAL(YDATAPTR)),
      :                                NDATA, %VAL(CNF_PVAL(WORK1PTR)),
-     :                                %VAL(CNF_PVAL(WORK2PTR)), NWK, 
+     :                                %VAL(CNF_PVAL(WORK2PTR)), NWK,
      :                                NOUT,
      :                                IFAIL, FMIN, FMAX, FINT, SAMPLE,
      :                                AVE, VARI, XMIN, XDIF,
@@ -717,19 +717,19 @@ C------------------------------------------------------------------------------
 
                   IF ( IFAIL.EQ.1 ) THEN
                      CALL PERIOD_WRITEBELL()
-                     WRITE (*, *) 
+                     WRITE (*, *)
      :                    '** ERROR: Lomb-Scargle statistic calculation'
      :                    // ' unsuccessful.'
                      GO TO 492
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Periodogram complete. If first permutation, load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( SAMPLE.EQ.1 ) THEN
 
-                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)),
      :                           NOUT, MXCOL,
      :                           %VAL(CNF_PVAL(WORK1PTR)),
      :                           %VAL(CNF_PVAL(WORK2PTR)), NWK)
@@ -737,7 +737,7 @@ C-----------------------------------------------------------------------------
                      YERRORARRAY(SLOTOUT) = .FALSE.
                      DETRENDARRAY(SLOTOUT) = .FALSE.
                      INFILEARRAY(SLOTOUT)
-     :                   = 'Lomb-Scargle Statistic vs Freq ' // 
+     :                   = 'Lomb-Scargle Statistic vs Freq ' //
      :                  'For ' // INFILEARRAY(SLOT)
                      NPTSARRAY(SLOTOUT) = NOUT
                      SIG(1, SLOTOUT) = -1.0D0
@@ -749,33 +749,33 @@ C-----------------------------------------------------------------------------
                         WRITE (*, *) ' '
                      END IF
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Determine significance information if requested.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DNMX30
 
-                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)),
      :                           MAXPTS, MXCOL,
      :                           NOUT, STAT, MAXPERMS+1,
-     :                           SAMPLE, 
+     :                           SAMPLE,
      :                           %VAL(CNF_PVAL(WORK2PTR)), NWK)
 
                      IF ( SAMPLE.GT.1 ) THEN
                         WRITE (*, 99004) SAMPLE - 1
 99004                   FORMAT ('+** OK: Processed permutation = ', I4)
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Randomize time-series for next permutation.
 C-----------------------------------------------------------------------------
- 
+
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 460 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, 
+                        CALL PERIOD_YSHUFFLE(SEED,
      :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  460                 CONTINUE
@@ -791,11 +791,11 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_DEALL(YDATAPTR)
                   CALL PERIOD_DEALL(XDATAPTR)
                   CALL PERIOD_DEALL(DATAPTR)
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Permutations complete - calculate significance; load output arrays
 C-----------------------------------------------------------------------------
- 
+
                IF ( LSIG ) THEN
                   SIGNOISE = 0.0D0
                   DO 480 I = 2, NPERMS + 1
@@ -804,11 +804,11 @@ C-----------------------------------------------------------------------------
                   SIG(1, SLOTOUT) = DFLOAT(NPERMS)
                   SIG(2, SLOTOUT) = SIGNOISE/DFLOAT(NPERMS)
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C scargle - Process the next data slot.
 C-----------------------------------------------------------------------------
- 
+
  490        CONTINUE
             GO TO 100
 
@@ -824,11 +824,11 @@ C-----------------------------------------------------------------------------
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND,'CLEAN') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C CLEAN   * CLEANed power spectrum.
 C**********-------------------------------------------------------------------
- 
+
             IF ( .NOT.LSELECT ) THEN
                CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
@@ -851,11 +851,11 @@ C**********-------------------------------------------------------------------
                WRITE (*, *) '** ERROR: Gain must lie between 0 and 2.'
                GO TO 100
             END IF
- 
+
 C-----------------------------------------------------------------------------
 C clean - Loop through slots to be processed.
 C-----------------------------------------------------------------------------
- 
+
             DO 590 SLOT = FIRSTSLOT, LASTSLOT
                NDATA = NPTSARRAY(SLOT)
 
@@ -867,21 +867,21 @@ C-----------------------------------------------------------------------------
 
                SLOTOUT = FIRSTOUT + (SLOT-FIRSTSLOT)
                YSLOT1 = YPTR(SLOT)
- 
+
 C-----------------------------------------------------------------------------
 C clean - Loop through permutations.
 C-----------------------------------------------------------------------------
- 
+
                DO 570 SAMPLE = 1, NPERMS + 1
                   IF ( SAMPLE.EQ.1 ) THEN
- 
+
 C-----------------------------------------------------------------------------
 C clean - Set frequency limits.
 C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
- 
-                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)),
      :                                   NDATA, MXCOL,
      :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
@@ -917,19 +917,19 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_ALLOC('_DOUBLE', MAXPTS, WK2PTR)
 
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C clean - Loop through trial frequencies.
 C-----------------------------------------------------------------------------
 
-                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA,
      :                                  MXCOL,
-     :                                  SAMPLE, 
+     :                                  SAMPLE,
      :                                  %VAL(CNF_PVAL(XDATAPTR)),
      :                                  %VAL(CNF_PVAL(YDATAPTR)),
      :                                  %VAL(CNF_PVAL(YRANPTR)))
- 
-                  CALL PERIOD_CLEAN(%VAL(CNF_PVAL(XDATAPTR)), 
+
+                  CALL PERIOD_CLEAN(%VAL(CNF_PVAL(XDATAPTR)),
      :                        %VAL(CNF_PVAL(YDATAPTR)),
      :                        NDATA, MAXPTS, FMIN, FMAX, FINT,
      :                        NCL, GAIN, %VAL(CNF_PVAL(WK1PTR)),
@@ -942,24 +942,24 @@ C-----------------------------------------------------------------------------
                      NPTSARRAY(SLOTOUT) = NOUT
                      GO TO 592
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C clean - Periodogram complete. If first permutation, load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( SAMPLE.EQ.1 ) THEN
 
-                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)),
      :                                      NOUT,
-     :                                      MXCOL, 
+     :                                      MXCOL,
      :                                      %VAL(CNF_PVAL(WK1PTR)),
-     :                                      %VAL(CNF_PVAL(WK2PTR)), 
+     :                                      %VAL(CNF_PVAL(WK2PTR)),
      :                                      MAXPTS)
 
                      YERRORARRAY(SLOTOUT) = .FALSE.
                      DETRENDARRAY(SLOTOUT) = .FALSE.
-                     INFILEARRAY(SLOTOUT) = 'CLEANed Power ' // 
-     :                                      'vs Freq For ' // 
+                     INFILEARRAY(SLOTOUT) = 'CLEANed Power ' //
+     :                                      'vs Freq For ' //
      :                                      INFILEARRAY(SLOT)
                      NPTSARRAY(SLOTOUT) = NOUT
                      SIG(1, SLOTOUT) = -1.0D0
@@ -971,18 +971,18 @@ C-----------------------------------------------------------------------------
                         WRITE (*, *) ' '
                      END IF
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C clean - Determine significance information if requested.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DNMX30
 
-                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)),
      :                                     MAXPTS, MXCOL,
      :                                     NOUT, STAT, MAXPERMS+1,
-     :                                     SAMPLE, 
+     :                                     SAMPLE,
      :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
@@ -990,15 +990,15 @@ C-----------------------------------------------------------------------------
                         WRITE (*, 99007) SAMPLE - 1
 99007                   FORMAT ('+** OK: Processed permutation = ', I4)
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C clean - Randomize time-series for next permutation.
 C-----------------------------------------------------------------------------
- 
+
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 560 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, 
+                        CALL PERIOD_YSHUFFLE(SEED,
      :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  560                 CONTINUE
@@ -1013,11 +1013,11 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_DEALL(YDATAPTR)
                   CALL PERIOD_DEALL(XDATAPTR)
                   CALL PERIOD_DEALL(DATAPTR)
- 
+
 C-----------------------------------------------------------------------------
 C clean - Permutations complete - calculate significance; load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                IF ( LSIG ) THEN
                   SIGNOISE = 0.0D0
                   DO 580 I = 2, NPERMS + 1
@@ -1027,11 +1027,11 @@ C-----------------------------------------------------------------------------
                   SIG(1, SLOTOUT) = DFLOAT(NPERMS)
                   SIG(2, SLOTOUT) = SIGNOISE/DFLOAT(NPERMS)
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C clean - Process the next data slot.
 C-----------------------------------------------------------------------------
- 
+
  590        CONTINUE
             GO TO 100
 
@@ -1047,11 +1047,11 @@ C-----------------------------------------------------------------------------
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND,'STRING') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C STRING  * String-length method.
 C**********-------------------------------------------------------------------
- 
+
             IF ( .NOT.LSELECT ) THEN
                CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
@@ -1059,11 +1059,11 @@ C**********-------------------------------------------------------------------
             ELSE
                LSELECT = .FALSE.
             END IF
- 
+
 C-----------------------------------------------------------------------------
 C string - Loop through slots to be processed.
 C-----------------------------------------------------------------------------
- 
+
             DO 690 SLOT = FIRSTSLOT, LASTSLOT
                NDATA = NPTSARRAY(SLOT)
 
@@ -1075,21 +1075,21 @@ C-----------------------------------------------------------------------------
 
                SLOTOUT = FIRSTOUT + (SLOT-FIRSTSLOT)
                YSLOT1 = YPTR(SLOT)
- 
+
 C-----------------------------------------------------------------------------
 C string - Loop through permutations.
 C-----------------------------------------------------------------------------
- 
+
                DO 670 SAMPLE = 1, NPERMS + 1
                   IF ( SAMPLE.EQ.1 ) THEN
- 
+
 C-----------------------------------------------------------------------------
 C string - Set frequency limits.
 C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
- 
-                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)),
      ;                                   NDATA, MXCOL,
      :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
@@ -1100,7 +1100,7 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), 
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)),
      :                                   NDATA, MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
@@ -1108,16 +1108,16 @@ C-----------------------------------------------------------------------------
                      IF ( IFAIL.EQ.1 ) GO TO 694
                      IF ( FMIN.EQ.0.0D0 ) THEN
                         CALL PERIOD_WRITEBELL()
-                        WRITE (*, *) 
+                        WRITE (*, *)
      :                  '** ERROR: No string-length for zero frequency.'
                         GO TO 694
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C string - Set zero point to be the mean observation time.
 C-----------------------------------------------------------------------------
- 
-                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)),
      :                                  NDATA, AVE,
      :                                  ADEV, SDEV, VARI)
                      ZEROPT = AVE
@@ -1140,7 +1140,7 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_ALLOC('_DOUBLE', MAXPTS, WK2PTR)
 
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C string - Fold on trial frequencies and calculate string-lengths.
 C-----------------------------------------------------------------------------
@@ -1150,30 +1150,30 @@ C-----------------------------------------------------------------------------
                   FREQ = FMIN
                   DO 650 WHILE ( FREQ .LE. FMAX )
 
-                     CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
+                     CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)),
      :                                     NDATA, MXCOL,
-     :                                     SAMPLE, 
+     :                                     SAMPLE,
      :                                     %VAL(CNF_PVAL(XDATAPTR)),
      :                                     %VAL(CNF_PVAL(YDATAPTR)),
      :                                     %VAL(CNF_PVAL(YRANPTR)))
                      PERIOD = 1.0D0/FREQ
 
-                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)),
      :                                %VAL(CNF_PVAL(YDATAPTR)),
-     :                                %VAL(CNF_PVAL(YERRPTR)), 
+     :                                %VAL(CNF_PVAL(YERRPTR)),
      :                                NDATA, ZEROPT,
      :                                PERIOD, IFAIL)
 
                      IF ( IFAIL.EQ.1 ) GO TO 692
 
                      CALL PERIOD_STRING(%VAL(CNF_PVAL(XDATAPTR)),
-     :                                  %VAL(CNF_PVAL(YDATAPTR)), 
-     :                                  NDATA, STRING, 
+     :                                  %VAL(CNF_PVAL(YDATAPTR)),
+     :                                  NDATA, STRING,
      :                                  IFAIL)
 
                      IF ( IFAIL.EQ.1 ) THEN
                         CALL PERIOD_WRITEBELL()
-                        WRITE (*, *) '** ERROR: String-length' // 
+                        WRITE (*, *) '** ERROR: String-length' //
      :                               ' calculation unsuccessful.'
                         GO TO 692
                      END IF
@@ -1182,41 +1182,41 @@ C-----------------------------------------------------------------------------
                      IF ( SAMPLE.EQ.1 ) THEN
                         IF ( COUNTER.EQ.(LOOP*ISTEP) ) THEN
                            WRITE (*, 99005) FREQ, STRING
-99005                      FORMAT ('+Trial Frequency =', D12.6, 
+99005                      FORMAT ('+Trial Frequency =', D12.6,
      :                             ',  String Length =', D18.6)
                            LOOP = LOOP + 1
                         END IF
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C string - If the first permutation, load the output slot.
 C-----------------------------------------------------------------------------
 
                      IF ( SAMPLE.EQ.1 ) THEN
 
-                        CALL PERIOD_LOADOUTONE(%VAL(CNF_PVAL(YSLOT2)), 
+                        CALL PERIOD_LOADOUTONE(%VAL(CNF_PVAL(YSLOT2)),
      :                                         MAXPTS,
      :                                         MXCOL, COUNTER, FREQ,
      :                                         STRING)
                      END IF
- 
+
 C                    WK2(COUNTER) = STRING
 
-                     CALL PERIOD_PUT1D(STRING, COUNTER, 
+                     CALL PERIOD_PUT1D(STRING, COUNTER,
      :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
                      FREQ = FREQ + FINT
  650              CONTINUE
- 
+
 C-----------------------------------------------------------------------------
 C string - Periodogram complete. If first permutation, load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( SAMPLE.EQ.1 ) THEN
                      YERRORARRAY(SLOTOUT) = .FALSE.
                      DETRENDARRAY(SLOTOUT) = .FALSE.
                      INFILEARRAY(SLOTOUT)
-     :                   = 'String Length vs Trial Freq ' // 'For ' // 
+     :                   = 'String Length vs Trial Freq ' // 'For ' //
      :                  INFILEARRAY(SLOT)
                      NPTSARRAY(SLOTOUT) = COUNTER
                      SIG(1, SLOTOUT) = -1.0D0
@@ -1228,18 +1228,18 @@ C-----------------------------------------------------------------------------
                         WRITE (*, *) ' '
                      END IF
                   END IF
- 
+
 C-----------------------------------------------------------------------------
 C string - Determine significance information if requested.
 C-----------------------------------------------------------------------------
- 
+
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DPMX30
 
-                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)),
      :                                     MAXPTS, MXCOL,
      :                                     COUNTER, STAT, MAXPERMS+1,
-     :                                     SAMPLE, 
+     :                                     SAMPLE,
      :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
@@ -1247,15 +1247,15 @@ C-----------------------------------------------------------------------------
                         WRITE (*, 99006) SAMPLE - 1
 99006                   FORMAT ('+** OK: Processed permutation = ', I4)
                      END IF
- 
+
 C-----------------------------------------------------------------------------
 C string - Randomize time-series for next permutation.
 C-----------------------------------------------------------------------------
- 
+
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 660 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, 
+                        CALL PERIOD_YSHUFFLE(SEED,
      ;                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  660                 CONTINUE
@@ -1270,11 +1270,11 @@ C-----------------------------------------------------------------------------
                   CALL PERIOD_DEALL(YDATAPTR)
                   CALL PERIOD_DEALL(XDATAPTR)
                   CALL PERIOD_DEALL(DATAPTR)
- 
+
 C-----------------------------------------------------------------------------
 C string - Permutations complete - calculate significance; load output arrays.
 C-----------------------------------------------------------------------------
- 
+
                IF ( LSIG ) THEN
                   SIGNOISE = 0.0D0
                   DO 680 I = 2, NPERMS + 1
@@ -1283,11 +1283,11 @@ C-----------------------------------------------------------------------------
                   SIG(1, SLOTOUT) = DFLOAT(NPERMS)
                   SIG(2, SLOTOUT) = SIGNOISE/DFLOAT(NPERMS)
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C string - Process the next data slot.
 C-----------------------------------------------------------------------------
- 
+
  690        CONTINUE
             GO TO 100
 
@@ -1303,11 +1303,11 @@ C-----------------------------------------------------------------------------
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND,'PDM') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C PDM     * Phase dispersion minimization (PDM) method.
 C**********-------------------------------------------------------------------
- 
+
             IF ( .NOT.LSELECT ) THEN
                CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
@@ -1366,7 +1366,7 @@ C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
 
-                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)),
      :                                   NDATA, MXCOL,
      :                                   1, %VAL(CNF_PVAL(DATAPTR)))
 
@@ -1378,7 +1378,7 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), 
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)),
      :                                   NDATA, MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
@@ -1395,7 +1395,7 @@ C-----------------------------------------------------------------------------
 C pdm - Set zero point to be the mean observation time.
 C-----------------------------------------------------------------------------
 
-                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)),
      :                                  NDATA, AVE,
      :                                  ADEV, SDEV, VARI)
                      ZEROPT = AVE
@@ -1404,11 +1404,11 @@ C-----------------------------------------------------------------------------
 C pdm - Calculate variance of whole dataset.
 C-----------------------------------------------------------------------------
 
-                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)),
      ;                                   NDATA, MXCOL,
      :                                   2, %VAL(CNF_PVAL(DATAPTR)))
 
-                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)),
      ;                                  NDATA, AVE,
      :                                  ADEV, SDEV, VARI)
                      WRITE (*, *) ' '
@@ -1443,23 +1443,23 @@ C-----------------------------------------------------------------------------
                   FREQ = FMIN
                   DO 750 WHILE ( FREQ .LE. FMAX + TOLFACT )
 
-                     CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
+                     CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)),
      ;                                     NDATA, MXCOL,
-     :                                     SAMPLE, 
+     :                                     SAMPLE,
      :                                     %VAL(CNF_PVAL(XDATAPTR)),
      :                                     %VAL(CNF_PVAL(YDATAPTR)),
      :                                     %VAL(CNF_PVAL(YRANPTR)))
                      PERIOD = 1.0D0/FREQ
 
-                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)),
      :                                %VAL(CNF_PVAL(YDATAPTR)),
-     :                                %VAL(CNF_PVAL(YERRPTR)), 
+     :                                %VAL(CNF_PVAL(YERRPTR)),
      ;                                NDATA, ZEROPT,
      :                                PERIOD, IFAIL)
 
                      IF ( IFAIL.EQ.1 ) GO TO 792
 
-                     CALL PERIOD_PDM(%VAL(CNF_PVAL(XDATAPTR)), 
+                     CALL PERIOD_PDM(%VAL(CNF_PVAL(XDATAPTR)),
      :                               %VAL(CNF_PVAL(YDATAPTR)),
      :                               NDATA, NBIN, WBIN, VARI,
      :                               PDM, MAXPTS, IFAIL)
@@ -1495,7 +1495,7 @@ C-----------------------------------------------------------------------------
 
 C                    WK2(COUNTER) = PDM
 
-                     CALL PERIOD_PUT1D(PDM, COUNTER, 
+                     CALL PERIOD_PUT1D(PDM, COUNTER,
      :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
                      FREQ = FREQ + FINT
@@ -1527,10 +1527,10 @@ C-----------------------------------------------------------------------------
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DPMX30
 
-                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)), 
+                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)),
      ;                                     MAXPTS, MXCOL,
      :                                     COUNTER, STAT, MAXPERMS+1,
-     :                                     SAMPLE, 
+     :                                     SAMPLE,
      :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
@@ -1546,7 +1546,7 @@ C-----------------------------------------------------------------------------
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 760 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, 
+                        CALL PERIOD_YSHUFFLE(SEED,
      :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
 
@@ -1595,35 +1595,35 @@ C-----------------------------------------------------------------------------
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND,'PLT') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C PLT     * Call PLT
 C**********-------------------------------------------------------------------
- 
-            CALL PERIOD_PLT(YPTR, NPTSARRAY, MXCOL, 
-     :                      MXSLOT, INFILEARRAY, YERRORARRAY) 
+
+            CALL PERIOD_PLT(YPTR, NPTSARRAY, MXCOL,
+     :                      MXSLOT, INFILEARRAY, YERRORARRAY)
 
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND(1:4),'HELP') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C HELP    * On-line help.
 C**********-------------------------------------------------------------------
- 
+
             CALL PERIOD_HELP(COMMAND)
             GO TO 100
 
          ELSE IF ( PERIOD_PARSE(COMMAND,'PEAKS') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C PEAKS   * Calculate periods from peaks (and troughs) in periodogram.
 C**********-------------------------------------------------------------------
- 
+
             WRITE (*, *) ' '
 
  810        CONTINUE
-            WRITE (*, '(X,A,$)') 'Enter first and last slots ' // 
+            WRITE (*, '(X,A,$)') 'Enter first and last slots ' //
      :                   'containing periodograms (0,0 to quit) : '
             READ (*, *, ERR=810) FIRSTSLOT, LASTSLOT
             IF ( FIRSTSLOT.LE.0 .OR. LASTSLOT.LE.0 ) GO TO 100
@@ -1633,7 +1633,7 @@ C**********-------------------------------------------------------------------
                GO TO 100
             END IF
  820        CONTINUE
-            WRITE (*, '(X,A,$)') 'Enter frequency range to' // 
+            WRITE (*, '(X,A,$)') 'Enter frequency range to' //
      :                     ' analyse (0,0 for whole range) : '
             READ (*, *, ERR=820) FMIN, FMAX
             IF ( LOG ) THEN
@@ -1650,11 +1650,11 @@ C**********-------------------------------------------------------------------
             ELSE
                LOGWRITE = .FALSE.
             END IF
- 
+
 C-----------------------------------------------------------------------------
 C peaks - Loop through periodograms.
 C-----------------------------------------------------------------------------
- 
+
             DO 890 SLOT = FIRSTSLOT, LASTSLOT
                NDATA = NPTSARRAY(SLOT)
                YSLOT1 = YPTR(SLOT)
@@ -1668,9 +1668,9 @@ C-----------------------------------------------------------------------------
 C           IF ( FMIN.LE.0.D0 ) FMIN = Y(1, 1, SLOT)
 C           IF ( FMAX.LE.0.D0 ) FMAX = Y(NDATA, 1, SLOT)
 
-            RVAL1 = PERIOD_GET2D(1, 1, %VAL(CNF_PVAL(YSLOT1)), 
+            RVAL1 = PERIOD_GET2D(1, 1, %VAL(CNF_PVAL(YSLOT1)),
      :                           NDATA, MXCOL)
-            RVAL2 = PERIOD_GET2D(NDATA, 1, %VAL(CNF_PVAL(YSLOT1)), 
+            RVAL2 = PERIOD_GET2D(NDATA, 1, %VAL(CNF_PVAL(YSLOT1)),
      :                           NDATA, MXCOL)
             IF ( FMIN.LE.0.D0 ) FMIN = RVAL1
             IF ( FMAX.LE.0.D0 ) FMAX = RVAL2
@@ -1716,12 +1716,12 @@ C           IF ( FMAX.LE.0.D0 ) FMAX = Y(NDATA, 1, SLOT)
      :                           ' a periodogram.'
                   GO TO 100
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C peaks - Search for highest (or lowest) peak in periodogram between given
 C         frequency range.
 C-----------------------------------------------------------------------------
- 
+
                EL = 0
                PEAK = DNMX30
                TROUGH = DPMX30
@@ -1750,7 +1750,7 @@ C-----------------------------------------------------------------------------
      :                              NDATA, MXCOL)
                IF ( RVAL1.EQ.0.0D0 ) THEN
                   CALL PERIOD_WRITEBELL()
-                  WRITE (*, *) '** ERROR: Peak is at infinite' // 
+                  WRITE (*, *) '** ERROR: Peak is at infinite' //
      :                   ' period or frequency range too small.'
                   GO TO 100
                ELSE
@@ -1762,11 +1762,11 @@ C-----------------------------------------------------------------------------
      :                              NDATA, MXCOL)
                PERROR = 0.5D0*DABS((1.0D0/RVAL2)
      :                              -(1.0D0/RVAL3))
- 
+
 C-----------------------------------------------------------------------------
 C peaks - Determine significances.
 C-----------------------------------------------------------------------------
- 
+
                IF ( LSIG ) THEN
                   IF ( SIG(1,SLOT).GE.0.0D0 ) THEN
                      SIGNOISE = SIG(2, SLOT)
@@ -1792,11 +1792,11 @@ C-----------------------------------------------------------------------------
                      ERRPERIOD = -1.0D0
                   END IF
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C peaks - Output information to screen.
 C-----------------------------------------------------------------------------
- 
+
                WRITE (*, *) ' '
                WRITE (*, *) '** OK: Results for slot number = ',
      :                                                          SLOT
@@ -1841,11 +1841,11 @@ C-----------------------------------------------------------------------------
      :                      '** OK: Error in FAP2               = ',
      :                                                     ERRPERIOD
                END IF
- 
+
 C-----------------------------------------------------------------------------
 C peaks - Output information to log file if requested.
 C-----------------------------------------------------------------------------
- 
+
                IF ( LOGWRITE ) THEN
                   WRITE (LOGUNIT, *) ' '
                   WRITE (LOGUNIT, *)
@@ -1860,19 +1860,19 @@ C-----------------------------------------------------------------------------
      :                                                          FMAX
                   IF ( INFILEARRAY(SLOT)(1:14).EQ.'String Length ' )
      :                                                        THEN
-                     WRITE (LOGUNIT, *) 
+                     WRITE (LOGUNIT, *)
      :                      '** OK: Minimum string-length       = ',
      :                                                        TROUGH
                   ELSE IF
      :            ( INFILEARRAY(SLOT)(1:14).EQ.'PDM Statistic ' )
      :                                                        THEN
-                     WRITE (LOGUNIT, *) 
+                     WRITE (LOGUNIT, *)
      :                      '** OK: Minimum PDM statistic       = ',
      :                                                        TROUGH
                   ELSE IF
      :            ( INFILEARRAY(SLOT)(1:14).EQ.'Reduced Chi**2' )
      :                                                        THEN
-                     WRITE (LOGUNIT, *) 
+                     WRITE (LOGUNIT, *)
      :                      '** OK: Minimum reduced chi-squared = ',
      :                                                        TROUGH
                   END IF
@@ -1880,24 +1880,24 @@ C-----------------------------------------------------------------------------
      :                      '** OK: Maximum power               = ',
      :                                                          PEAK
                   WRITE (LOGUNIT, *)
-     :                      '** OK: Period                      = ', 
+     :                      '** OK: Period                      = ',
      :                                                        PERIOD
                   WRITE (LOGUNIT, *)
-     :                      '** OK: Minimum error in period     = ', 
+     :                      '** OK: Minimum error in period     = ',
      :                                                        PERROR
                   IF ( LSIG ) THEN
                      IF ( LFAP1 ) THEN
-                        WRITE (LOGUNIT, *) 
+                        WRITE (LOGUNIT, *)
      :                      '** OK: False alarm probability 1   = ',
      :                                                      SIGNOISE
-                        WRITE (LOGUNIT, *) 
+                        WRITE (LOGUNIT, *)
      :                      '** OK: Error in FAP1               = ',
      :                                                      ERRNOISE
                      END IF
-                     WRITE (LOGUNIT, *) 
+                     WRITE (LOGUNIT, *)
      :                      '** OK: False alarm probability 2   = ',
      :                                                     SIGPERIOD
-                     WRITE (LOGUNIT, *) 
+                     WRITE (LOGUNIT, *)
      :                      '** OK: Error in FAP2               = ',
      :                                                     ERRPERIOD
                   END IF
@@ -1908,33 +1908,33 @@ C-----------------------------------------------------------------------------
 
          ELSE
             IF ( PERIOD_PARSE(COMMAND,'SIG') ) THEN
- 
+
 C**********-------------------------------------------------------------------
 C SIG     * Calculate significance of period.
 C**********-------------------------------------------------------------------
- 
+
                WRITE (*, *) ' '
                IF ( .NOT.LSIG ) THEN
  910              CONTINUE
-                  WRITE (*, '(X,A,$)') 
+                  WRITE (*, '(X,A,$)')
      :                       'Enter number of permutations in sample : '
                   READ (*, *, ERR=910) NPERMS
                   IF ( NPERMS.LT.100 ) THEN
                      CALL PERIOD_WRITEBELL()
-                     WRITE (*, *) 
+                     WRITE (*, *)
      :                 '** ERROR: Minimum number of permutations = 100.'
                      NPERMS = 0
                      GO TO 100
                   ELSE IF ( NPERMS.GT.1000 ) THEN
                      CALL PERIOD_WRITEBELL()
-                     WRITE (*, *) 
+                     WRITE (*, *)
      :                        '** ERROR: Maximum number of permutations'
      :                        // ' = ', MAXPERMS
                      NPERMS = 0
                      GO TO 100
                   END IF
  920              CONTINUE
-                  WRITE (*, '(X,A,$)') 
+                  WRITE (*, '(X,A,$)')
      :                       'Enter seed for random number generator : '
                   READ (*, *, ERR=920) SEED
 C                 SEED = -ABS(INT(SEED))    !INT of an integer is daft (KPD)
@@ -1942,12 +1942,12 @@ C                 SEED = -ABS(INT(SEED))    !INT of an integer is daft (KPD)
                   RANDOM = PERIOD_RAN1(SEED)
                   LSIG = .TRUE.
                   WRITE (*, *) ' '
-                  WRITE (*, *) 
+                  WRITE (*, *)
      :                        '** OK: Significance calculation enabled.'
                ELSE
                   LSIG = .FALSE.
                   NPERMS = 0
-                  WRITE (*, *) 
+                  WRITE (*, *)
      :                       '** OK: Significance calculation disabled.'
                END IF
             ELSE
@@ -1957,11 +1957,11 @@ C                 SEED = -ABS(INT(SEED))    !INT of an integer is daft (KPD)
             GO TO 100
          END IF
       END IF
- 
+
 C**********-------------------------------------------------------------------
 C FREQ    * Set or show frequency search limits.
 C**********-------------------------------------------------------------------
- 
+
  1010 CONTINUE
       WRITE (*, *) ' '
       WRITE (*, *) 'FREQUENCY SEARCH LIMITS: '
@@ -1974,14 +1974,14 @@ C**********-------------------------------------------------------------------
       END IF
 
       IF ( MAXFREQ.LE.0. ) THEN
-         WRITE (*, *) 
+         WRITE (*, *)
      :              '2. Maximum frequency  = NYQUIST CRITICAL FREQUENCY'
       ELSE
          WRITE (*, *) '2. Maximum frequency  = ', MAXFREQ
       END IF
 
       IF ( FINTERVAL.LE.0.0D0 ) THEN
-         WRITE (*, *) 
+         WRITE (*, *)
      :         '3. Frequency interval = 1 / (4 * OVERALL TIME INTERVAL)'
       ELSE
          WRITE (*, *) '3. Frequency interval = ', FINTERVAL
@@ -1989,22 +1989,22 @@ C**********-------------------------------------------------------------------
       WRITE (*, *) ' '
 
  1020 CONTINUE
-      WRITE (*, '(X,A,$)') 
+      WRITE (*, '(X,A,$)')
      :                  'Enter number you wish to change (0 to quit) : '
       READ (*, *, ERR=1020) NOPTION
       IF ( NOPTION.EQ.1 ) THEN
  1030    CONTINUE
-         WRITE (*, '(X,A,$)') 
+         WRITE (*, '(X,A,$)')
      :                     'Enter minimum frequency  (0 for default) : '
          READ (*, *, ERR=1030) MINFREQ
       ELSE IF ( NOPTION.EQ.2 ) THEN
  1040    CONTINUE
-         WRITE (*, '(X,A,$)') 
+         WRITE (*, '(X,A,$)')
      :                     'Enter maximum frequency  (0 for default) : '
          READ (*, *, ERR=1040) MAXFREQ
       ELSE IF ( NOPTION.EQ.3 ) THEN
  1050    CONTINUE
-         WRITE (*, '(X,A,$)') 
+         WRITE (*, '(X,A,$)')
      :                     'Enter frequency interval (0 for default) : '
          READ (*, *, ERR=1050) FINTERVAL
       ELSE IF ( NOPTION.EQ.0 ) THEN

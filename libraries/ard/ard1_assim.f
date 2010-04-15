@@ -17,9 +17,9 @@
 *     Frame into it, using a simplified version of the Mapping from
 *     Base to Current Frame. The new Frame becomes the Current Frame.
 *
-*     This routine should be called before doing any plotting with a 
+*     This routine should be called before doing any plotting with a
 *     Plot in order to avoid the possiblity of intermediate Frames
-*     being used in which positions are undefined. 
+*     being used in which positions are undefined.
 *
 *     Care should be taken decding where to call this routine since
 *     the simplification process can be expensive. Do not call it within
@@ -27,7 +27,7 @@
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
-*        An AST pointer to the Plot. 
+*        An AST pointer to the Plot.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,11 +80,11 @@
 
 *  Local Variables:
       INTEGER FRM                  ! Pointer to current Frame
-      INTEGER MAP                  ! Simplified Mapping from GRAPHICS to Current 
+      INTEGER MAP                  ! Simplified Mapping from GRAPHICS to Current
       INTEGER MAP0                 ! Original Mapping from GRAPHICS to Current
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Gett he Mapping from the Base Frame in the Plot to the Current Frame.
@@ -97,12 +97,12 @@
       FRM = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
 
 *  Add a copy of the Current Frame into the Plot using the above
-*  Mapping to connect it to the GRAPHICS (Base) Frame. 
-      CALL AST_ADDFRAME( IPLOT, AST__BASE, MAP, FRM, STATUS ) 
+*  Mapping to connect it to the GRAPHICS (Base) Frame.
+      CALL AST_ADDFRAME( IPLOT, AST__BASE, MAP, FRM, STATUS )
 
 *  Annul the pointers.
       CALL AST_ANNUL( MAP0, STATUS )
       CALL AST_ANNUL( MAP, STATUS )
       CALL AST_ANNUL( FRM, STATUS )
 
-      END 
+      END

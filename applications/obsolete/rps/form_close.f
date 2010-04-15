@@ -1,6 +1,6 @@
 *+FORM_CLOSE       Closes database files
 *  History
-*       1989 Jan 	M Ricketts		1st vsn 
+*       1989 Jan 	M Ricketts		1st vsn
 *	8 Apr 1992	M. Duesterhaus (GSFC)	port to UNIX
 *     1993 June         P. Brisco       Recompile with new com_form_files.inc
 *     1993 Jun          P. Brisco               Removed SMG junque.
@@ -9,7 +9,7 @@
       SUBROUTINE FORM_CLOSE
       IMPLICIT NONE
 
- 
+
 *  Global Variables
       INCLUDE 'com_form_files.inc'
       INCLUDE 'aaa_dbs_params.inc'
@@ -28,7 +28,7 @@
       CHARACTER*1 CLOSE_TYPE		! 'E' if to delete old, 'Q' for new
       CHARACTER*110 MESSAGE		!  Screen message
      &   /'Default is to delete the old files, keep new ones               Option 1 deletes the new files, keeps old ones'/
- 
+
 * _____________________________ Executable Code _______________________________
 
 

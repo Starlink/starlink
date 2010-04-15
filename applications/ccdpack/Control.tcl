@@ -13,8 +13,8 @@
 #     [incr Tk] Mega-Widget
 
 #  Description:
-#     This class provides a base from which specific controls can inherit.  
-#     Such controls will have a compact representation (e.g. a button) 
+#     This class provides a base from which specific controls can inherit.
+#     Such controls will have a compact representation (e.g. a button)
 #     which can be placed on a control bar, and will allow the user to
 #     modify a given value or set of values.  It may need to pop up
 #     additional windows for user interaction if a button-sized area
@@ -35,12 +35,12 @@
 #        the widget for longer than a short space of time.
 #
 #     childsite
-#        The pathname of the childsite widget, in which the specific 
+#        The pathname of the childsite widget, in which the specific
 #        control should be put.
 #
 #     command
 #        This gives a command which will be executed whenever the value
-#        of the control changes.  Any occurrence of the sequence "%v" 
+#        of the control changes.  Any occurrence of the sequence "%v"
 #        in the command variable will be replaced by the value of the
 #        variable before it is executed.
 #
@@ -61,13 +61,13 @@
 #        in the valuevar variable will not change.
 #
 #     valuevar
-#        Gives the name of a variable which will behave as a public 
+#        Gives the name of a variable which will behave as a public
 #        variable.  If the widget is configured with -valuevar name,
 #        then the -name option may be used in cget or configure method
 #        calls.
 #
-#        The coding of this is rather ugly and fragile.  This option 
-#        should only be used if the control being used to compose a 
+#        The coding of this is rather ugly and fragile.  This option
+#        should only be used if the control being used to compose a
 #        Mega-Widget.  You'd think there was some clean way round
 #        this using Itk's complicated option handling facilities, but
 #        it doesn't seem to work properly.
@@ -212,7 +212,7 @@
          }
          if { $command != "" } {
             regsub %v $command "{$value}" com
-            eval $com 
+            eval $com
          }
       }
 
@@ -235,7 +235,7 @@
 #-----------------------------------------------------------------------
          if { $valuevar != "" } {
 
-#  Find the level at which we are being called from - the level which 
+#  Find the level at which we are being called from - the level which
 #  contains this variable as a public variable.
             set level 0
             for { set l [ info level ] } { $l > 0 } { incr l -1 } {
@@ -294,6 +294,6 @@
    proc control { pathname args } {
       uplevel Control $pathname $args
    }
-   
+
 
 # $Id$

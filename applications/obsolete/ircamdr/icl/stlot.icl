@@ -66,8 +66,8 @@ proc stlot
     getpar glob stats_median (medval)
     getpar glob stats_std (onesig)
     print "Pixel selected with cursor [centre of box] = " (xpix1) (ypix1)
-    print "Maximum value = " (maxval) 
-    print "Minimum value = " (minval) 
+    print "Maximum value = " (maxval)
+    print "Minimum value = " (minval)
     print "Median signal = " (medval)
     delfile junk.sdf
     obeyw rapi2d CSUB (im) (medval) junk

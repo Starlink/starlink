@@ -48,7 +48,7 @@
 *     virtual memory to another! Z-array of GILDAS image is identical
 *     in all respects to that of our data cube. However...
 *     it turns out that the arrays are upside down and GILDAS is incapable
-*     therefore of plotting them! 
+*     therefore of plotting them!
 *
 *       SUBROUTINE GDF_IMAGE (NAME,NX,NY,NZ,NT,Z,ERROR)
 C----------------------------------------------------------------------

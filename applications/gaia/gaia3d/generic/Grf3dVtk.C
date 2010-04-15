@@ -166,7 +166,7 @@ typedef struct GC {
     vtkPoints *markerPoints;                 // Positions of markers
     vtkIntArray *markerColours;              // Marker colours set using
                                              // scalars that map via lookup
-                                             // table 
+                                             // table
     vtkDoubleArray *markerInfo;              // Marker state information, type
                                              // and size
     int currentMarkerId;                     // Id of the last marker point
@@ -270,7 +270,7 @@ void *Grf3dVtk_Init( vtkRenderer *r, int lac )
 
     gc->textScale = 5.0;
 
-    gc->markerGlyph = NULL; 
+    gc->markerGlyph = NULL;
     gc->markerPoints = NULL;
     gc->markerColours = NULL;
     gc->markerInfo = NULL;
@@ -287,7 +287,7 @@ void *Grf3dVtk_Init( vtkRenderer *r, int lac )
     Grf3dVtk_SetContext( gc );
 
     /*  Get GAIA to use the local functions as the Grf3D interface (done
-     *  once). */ 
+     *  once). */
     if ( ! grfRegistered ) {
         Grf3d_Register( (Grf3DCapFun) &vtkG3DCap,
                         (Grf3DFlushFun) &vtkG3DFlush,
@@ -394,8 +394,8 @@ void Grf3dVtk_Clear()
 
  *  Description:
  *     Set the default colormap, which can be overwritten and extended, but is
- *     only initialised once and shared with all contexts. 
- * 
+ *     only initialised once and shared with all contexts.
+ *
  *     Note also resets additional colours to white.
 
  *-
@@ -439,7 +439,7 @@ void Grf3dVtk_InitColours()
 
  *  Description:
  *     This routine makes a new colour available to the GRF3D interface for
- *     use in all contexts. The colour is specified by three RGB values 
+ *     use in all contexts. The colour is specified by three RGB values
  *     (0 to 1) and an index for the colour.
  *
  *     By default a list of 16 colours are made available. These may be
@@ -804,10 +804,10 @@ static int vtkG3DMark( int n, float *x, float *y, float *z, int type,
     for ( int i = 0; i < n; i++ ) {
         currentGC->markerPoints->
             InsertPoint( currentGC->currentMarkerId, x[i], y[i], z[i] );
-        currentGC->markerColours->InsertTuple1( currentGC->currentMarkerId, 
+        currentGC->markerColours->InsertTuple1( currentGC->currentMarkerId,
                                                 currentGC->configInfo.colour );
-        currentGC->markerInfo->InsertTuple2( currentGC->currentMarkerId, 
-                                             (double) type, 
+        currentGC->markerInfo->InsertTuple2( currentGC->currentMarkerId,
+                                             (double) type,
                                              currentGC->configInfo.size );
         currentGC->currentMarkerId++;
     }
@@ -1128,10 +1128,10 @@ static int vtkG3DTxExt( const char *text, float ref[3], const char *just,
  *  Purpose:
  *     Clear all the props, mappers and data sources for the current context
  *     and remove everything from the render scene.
- 
+
  *-
  */
-void ClearAllObjects() 
+void ClearAllObjects()
 {
     /*  Access all stored actors and remove from the scene. */
     if ( currentGC->assembly != NULL ) {
@@ -1285,7 +1285,7 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
         SetColor( lookupTable->GetTableValue( currentGC->configInfo.colour ) );
     prop->SetProperty( property );
 
-    /* Avoid shading, text should always be same colour from all directions, 
+    /* Avoid shading, text should always be same colour from all directions,
      * so we increase the power for ambient lighting. */
     property->SetAmbient( 10.0 );
 
@@ -1333,7 +1333,7 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
     prop->SetOrientation( orient );
 
     /* Scale of text. */
-    prop->SetScale( currentGC->textScale, currentGC->textScale, 
+    prop->SetScale( currentGC->textScale, currentGC->textScale,
                     currentGC->textScale );
 
     /* Final position of text. */

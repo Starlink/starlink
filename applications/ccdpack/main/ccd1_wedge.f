@@ -142,7 +142,7 @@
 *  Special case, one pixel width strip.
             SUMWEI = 1.0D0
             W( BOUNDS( K ) ) = 1.0D0
-         ELSE IF ( RANGE .EQ. 1.0D0 ) THEN 
+         ELSE IF ( RANGE .EQ. 1.0D0 ) THEN
 
 *  Special case, just two values for strip. Given equal weight
 *  to these.

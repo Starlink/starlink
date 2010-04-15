@@ -14,11 +14,11 @@
 *     CALL LPG_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME, STATUS )
 
 *  Description:
-*     This routine is equivalent to NDF_CREP except that it allows the 
+*     This routine is equivalent to NDF_CREP except that it allows the
 *     NDF to be specified using a GRP group expression (for instance, its
-*     name may be given within a text file, etc.). The first NDF in the 
+*     name may be given within a text file, etc.). The first NDF in the
 *     group expression is returned. Any other names in the group
-*     expression are ignored. Any modification elements in the supplied 
+*     expression are ignored. Any modification elements in the supplied
 *     group expression will be treated literally.
 
 *  Arguments:
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -107,7 +107,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get a group of NDFs from the environment using the supplied parameter.
-*  There is no need to loop if a group expression is given which is 
+*  There is no need to loop if a group expression is given which is
 *  terminated by a flag character since we only want one NDF.
 *  Modification elements are ignored (i.e. treated as a literal file name).
       IGRP = GRP__NOID
@@ -120,9 +120,9 @@
       CALL LPG1_ADDTM( IGRP, 1, STATUS )
 
 *  Get the name of the first NDF in the group.
-      CALL GRP_GET( IGRP, 1, 1, NAME, STATUS ) 
+      CALL GRP_GET( IGRP, 1, 1, NAME, STATUS )
 
-*  Get an NDF identifier for the first NDF in the group.         
+*  Get an NDF identifier for the first NDF in the group.
       CALL NDG_NDFCP( IGRP, 1, FTYPE, NDIM, UBND, INDF, STATUS )
 
 *  Delete the group.

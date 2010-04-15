@@ -10,7 +10,7 @@ C     GROWYT into planes of constant X, and GROWXT into planes of
 C     constant Y.  The operations performed by GROWXY, GROWXT and
 C     GROWYT are the inverses of XYPLANE, XTPLANE and YTPLANE
 C     respectively.
-C     
+C
 C     Command parameters -
 C
 C     IMAGE       (Character) The name of the input image file.
@@ -22,12 +22,12 @@ C                 not exist, or if the 'NEW' keyword is specified,
 C                 a new file is created with all other data elements
 C                 set to zero.
 C
-C     XSTART,     (Numeric) The number of the first plane 
+C     XSTART,     (Numeric) The number of the first plane
 C     YSTART or   into which the image is to be copied.  XSTART
 C     TSTART      is used by GROWYT, YSTART by GROWXT, TSTART by GROWXY.
 C
 C     XEND,       (Numeric) The number of the last plane
-C     YEND, or    into which the image is to be copied.  XEND is 
+C     YEND, or    into which the image is to be copied.  XEND is
 C     TEND        used by GROWYT, YEND by GROWXT, TEND by GROWXY.
 C
 C     XSIZE,      (Numeric) If a new cube has to be created, two
@@ -103,7 +103,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -184,7 +184,7 @@ C
          IF(STATUS.NE.0)GOTO 500
       END IF
 C
-C     Get the appropriate axis start and end parameters.  If we don't 
+C     Get the appropriate axis start and end parameters.  If we don't
 C     have a cube yet, we set ludicrous maximum values for the size
 C     limits.
 C
@@ -227,9 +227,9 @@ C
          NT=DIMS(3)
          CALL DSA_RESHAPE_DATA('CUBE','IMAGE',3,DIMS,STATUS)
 C
-C        Copy IMAGE axes structures (if any) to appropriate 
+C        Copy IMAGE axes structures (if any) to appropriate
 C        structure in CUBE.
-C        
+C
          CALL DSA_SEEK_AXIS('IMAGE',1,EXIST,STATUS)
          IF(EXIST)THEN
             CALL DSA_AXIS_SIZE('IMAGE',1,5,NDIM,DIMS,NELM,STATUS)
@@ -240,8 +240,8 @@ C
                CALL DSA_RESHAPE_AXIS('CUBE',3,'IMAGE',1,NDIM,DIMS,
      :                               STATUS)
             END IF
-         END IF       
-       
+         END IF
+
          CALL DSA_SEEK_AXIS('IMAGE',2,EXIST,STATUS)
          IF(EXIST)THEN
             CALL DSA_AXIS_SIZE('IMAGE',2,5,NDIM,DIMS,NELM,STATUS)
@@ -252,7 +252,7 @@ C
                CALL DSA_RESHAPE_AXIS('CUBE',3,'IMAGE',2,NDIM,DIMS,
      :                                STATUS)
             END IF
-         END IF       
+         END IF
       END IF
 C
 C     Map the cube data and set it to all zeros if new.

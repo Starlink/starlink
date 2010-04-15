@@ -4,7 +4,7 @@
 *     COF_WCSDF
 
 *  Purpose:
-*     Sees if two FrameSets are different after being written to a 
+*     Sees if two FrameSets are different after being written to a
 *     FitsChan.
 
 *  Language:
@@ -15,11 +15,11 @@
 
 *  Description:
 *     The returned function value indicates if the two FrameSets are
-*     inconsistent with each other. The two supplied FrameSets are written 
-*     to two FitsChans, using the specified encoding. All keyword values 
-*     in the two FitsChans are then compared. If any keyword has a 
-*     significantly different value in the two FitsChans, then the 
-*     FrameSets are inconsistent, and a .TRUE value is returned. Otherwise, 
+*     inconsistent with each other. The two supplied FrameSets are written
+*     to two FitsChans, using the specified encoding. All keyword values
+*     in the two FitsChans are then compared. If any keyword has a
+*     significantly different value in the two FitsChans, then the
+*     FrameSets are inconsistent, and a .TRUE value is returned. Otherwise,
 *     .FALSE. is returned.
 
 *  Arguments:
@@ -72,7 +72,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
 *  External References:
       INTEGER CHR_LEN            ! Length of a string less trailing
                                  ! blanks
-                                       
+
 *  Local Variables:
       CHARACTER CARD1*80         ! FITS header card from 1st FitsChan
       CHARACTER CARD2*80         ! FITS header card from 2nd FitsChan
@@ -119,26 +119,26 @@
 *  Write the first FrameSet out to a FitsChan using the supplied encoding.
       FC1 = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
       CALL AST_SETC( FC1, 'ENCODING', ENCOD, STATUS )
-      NOBJ1 = AST_WRITE( FC1, FS1, STATUS )      
+      NOBJ1 = AST_WRITE( FC1, FS1, STATUS )
 
 * Do the same with the other FrameSet.
       FC2 = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
       CALL AST_SETC( FC2, 'ENCODING', ENCOD, STATUS )
-      NOBJ2 = AST_WRITE( FC2, FS2, STATUS )      
+      NOBJ2 = AST_WRITE( FC2, FS2, STATUS )
 
 *  If neither FrameSet could be written out, assume they are consistent
 *  with each other.
       IF( NOBJ1 .EQ. 0 .AND. NOBJ2 .EQ. 0 ) THEN
          COF_WCSDF = .FALSE.
 
-*  If one FrameSet could be written out and the other one could not, assume 
+*  If one FrameSet could be written out and the other one could not, assume
 *  they are inconsistent with each other.
       ELSE IF( NOBJ1 .NE. NOBJ2 ) THEN
          COF_WCSDF = .TRUE.
 
 *  If both FrameSets could be written out, we look at the cards written
-*  into the FitsChans to see if they are consistent. 
-      ELSE 
+*  into the FitsChans to see if they are consistent.
+      ELSE
 
 *  Set up the fractional tolerance for equality between numerical values.
          TOL = 1.0D6*VAL__EPSD
@@ -152,7 +152,7 @@
      :             AST_FINDFITS( FC1, '%f', CARD1, .TRUE., STATUS ) )
 
 *  Ignore comment cards.
-            IF( CARD1( 9 : 9 ) .EQ. '=' .AND. 
+            IF( CARD1( 9 : 9 ) .EQ. '=' .AND.
      :          CARD1( : 8 ) .NE. ' ' .AND.
      :          CARD1( : 8 ) .NE. 'HISTORY' .AND.
      :          CARD1( : 8 ) .NE. 'COMMENT' ) THEN
@@ -162,7 +162,7 @@
 *  If the card is not found, the FrameSets differ.
                CALL AST_CLEAR( FC2, 'Card', STATUS )
                NMLEN = CHR_LEN( CARD1( : 8 ) )
-               IF( .NOT. AST_FINDFITS( FC2, CARD1( : NMLEN ), CARD2, 
+               IF( .NOT. AST_FINDFITS( FC2, CARD1( : NMLEN ), CARD2,
      :                                 .TRUE., STATUS ) ) THEN
                   COF_WCSDF = .TRUE.
 
@@ -174,26 +174,26 @@
                   IF( COM1 .EQ. 0 ) THEN
                      COM1 = 80
                   ELSE
-                     COM1 = COM1 - 1 
+                     COM1 = COM1 - 1
                   END IF
 
                   COM2 = INDEX( CARD2, '/' )
                   IF( COM2 .EQ. 0 ) THEN
                      COM2 = 80
                   ELSE
-                     COM2 = COM2 - 1 
+                     COM2 = COM2 - 1
                   END IF
 
 *  Attempt to extract a floating point value from the keyword value
 *  from the first FrameSet.
-                  ISTAT = SAI__OK 
+                  ISTAT = SAI__OK
                   CALL CHR_CTOD( CARD1( 10 : COM1) , VALUE1, ISTAT )
 
 *  If succesful, attempt to extract a floating point value from the
 *  second FrameSet's card.
                   IF( ISTAT .EQ. SAI__OK ) THEN
 
-                     ISTAT = SAI__OK 
+                     ISTAT = SAI__OK
                      CALL CHR_CTOD( CARD2( 10 : COM2 ) , VALUE2, ISTAT )
 
 *  If this could not be done, the FrameSets differ.
@@ -203,17 +203,17 @@
 *  Otherwise, compare the two floating point values. If they differ
 *  significantly, the two FrameSets differ.
                      ELSE
-                        COF_WCSDF = ( ABS( ( VALUE1 - VALUE2 ) ) .GT. 
+                        COF_WCSDF = ( ABS( ( VALUE1 - VALUE2 ) ) .GT.
      :                                ABS( TOL*( VALUE1 + VALUE2 ) ) )
                      END IF
 
 *  If a floating point value could not be extracted from the first
 *  FrameSet's card, compare the keyword values as text.
                   ELSE
-                     COF_WCSDF = ( CARD1( : COM1 ) .NE. 
+                     COF_WCSDF = ( CARD1( : COM1 ) .NE.
      :                             CARD2( : COM2 ) )
                   END IF
-                  
+
                END IF
 
             END IF

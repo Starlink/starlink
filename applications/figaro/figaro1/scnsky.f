@@ -14,7 +14,7 @@ C     taken using a CCD in scanned mode, hence the name of the routine.
 C
 C     Command parameters -
 C
-C     'IMAGE'    The name of the image 
+C     'IMAGE'    The name of the image
 C
 C     'SECTION'  The number of pixels in each section.
 C
@@ -41,7 +41,7 @@ C     Output data -
 C
 C     SPECTRUM is created with the same structure as IMAGE,
 C     except that the data will only have one dimension, and if
-C     IMAGE has an AXIS(2) structure, this will be omitted.  Any 
+C     IMAGE has an AXIS(2) structure, this will be omitted.  Any
 C     AXIS(1) structure will be copied unchanged.
 C
 C                                     KS / CIT 25th May 1983
@@ -68,14 +68,14 @@ C     Local variables
 C
       INTEGER   DIMS(2)          ! Image dimensions
       INTEGER   IPTR             ! Dynamic-memory pointer for image data
-      INTEGER   LSECT            ! No. of elements per section for 
+      INTEGER   LSECT            ! No. of elements per section for
                                  ! columns
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
       INTEGER   NX               ! First dimension of image
       INTEGER   NY               ! Second dimension of image
       INTEGER   SLOT             ! Slot number for mapped data - ignored
-      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum 
+      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
                                  ! data
       INTEGER   STATUS           ! Running status for DSA routines
       LOGICAL   USEMIN           ! True if the VMIN value is to be used
@@ -87,7 +87,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NO_DATA
       PARAMETER (NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -136,7 +136,7 @@ C
       CALL DSA_OUTPUT('SPECT','SPECTRUM','IMAGE',NO_DATA,0,STATUS)
 C
 C     Create data structure of the appropriate size and copy
-C     the AXIS(1) structure from IMAGE if the number of it's 
+C     the AXIS(1) structure from IMAGE if the number of it's
 C     dimensions equals one.
 C
       CALL DSA_AXIS_SIZE('IMAGE',1,2,NDIM,DIMS,NELM,STATUS)
@@ -196,7 +196,7 @@ C                  ignored in the calculation of the minimum median
 C                  for that column.
 C     (>) USEMIN   (Logical) True if the VMIN value is to be made
 C                  use of.  If false VMIN is ignored.
-C     (W) WORK     (Real array WORK(LEN)) Work array.  
+C     (W) WORK     (Real array WORK(LEN)) Work array.
 C     (<) SPECT    (Real array SPECT(NX)) The resulting sky spectrum.
 C
 C     Subroutines / functions used -
@@ -239,7 +239,7 @@ C
       ISPST=1
       DO WHILE (ISPST.LE.NY)
 C
-C        Work out limits for section - note, all sections are NELM 
+C        Work out limits for section - note, all sections are NELM
 C        long, even at the ends.
 C
          ISPEND=ISPST+LEN-1
@@ -274,7 +274,7 @@ C
   330          CONTINUE
             ELSE
 C
-C              Without checking for unacceptably low pixels, 
+C              Without checking for unacceptably low pixels,
 C
                DO IY=ISPST,ISPEND
                   IPT=IPT+1

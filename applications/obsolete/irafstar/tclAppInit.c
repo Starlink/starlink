@@ -1,4 +1,4 @@
-/* 
+/*
  * tclAppInit.c --
  *
  *	Provides a default version of the Tcl_AppInit procedure.
@@ -33,7 +33,7 @@ extern int ems1_starf_c( char *path,
                          char *mode,
                          char **found,
                          int *pathlen );
-
+
 char * tcl_RcFileName;
 
 /*
@@ -94,12 +94,12 @@ Tcl_AppInit(interp)
      */
 
     /* Attempt to find the file along ADAMADAP_PATH */
-     if ( !ems1_starf_c( 
+     if ( !ems1_starf_c(
        "ADAMADAP_PATH", "adamadap.tcl", "r", &tcl_RcFileName , &pathlen ) ) {
 
     /*   if unsuccessful, try relative to PATH */
-     if ( !ems1_starf_c( 
-        "PATH", "../iraf/irafstar/adamadap.tcl", "r", &tcl_RcFileName, &pathlen ) ) 
+     if ( !ems1_starf_c(
+        "PATH", "../iraf/irafstar/adamadap.tcl", "r", &tcl_RcFileName, &pathlen ) )
 
     /*   as a last resort, use /star/iraf/irafstar */
          tcl_RcFileName = "/star/iraf/irafstar/adamadap.tcl";
@@ -109,7 +109,7 @@ Tcl_AppInit(interp)
 
      return TCL_OK;
 }
-
+
 /*
  *----------------------------------------------------------------------
  *

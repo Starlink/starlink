@@ -34,9 +34,9 @@ C                                  Michael Ashley / MSSSO 12th Dec 1986
 C     Modified -
 C
 C     12th Dec 1986  MCBA / MSSSO. Based on the program ISUPER by
-C                    Keith Shortridge of the AAO, and the program 
+C                    Keith Shortridge of the AAO, and the program
 C                    REBIN by R. F. Warren-Smith of STARLINK.
-C     30th Sep 1994  KS / AAO. Modified to use the DSA library instead 
+C     30th Sep 1994  KS / AAO. Modified to use the DSA library instead
 C                    of explicit DTA calls. Should now work on both DST
 C                    and NDF format data.
 C     24th Jul 1996  MJCL / Starlink, UCL.  Changed to use COS/SIN

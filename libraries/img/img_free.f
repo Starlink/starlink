@@ -40,7 +40,7 @@
 *     considered as potential matches.
 *
 *     - Identifiers obtained using IMG_INDF are not released by this
-*     routine. 
+*     routine.
 
 *  Copyright:
 *     Copyright (C) 1992, 1994 Science & Engineering Research Council.
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -119,7 +119,7 @@
       EXTERNAL IMG1_INIT         ! Initialise common blocks
       EXTERNAL CHR_WILD
       LOGICAL CHR_WILD           ! Wildcard parameter names match
-      
+
 *  Local Variables:
       CHARACTER * ( IMG__SZPAR ) MATCH ! Wildcard match string (junk)
       CHARACTER * ( IMG__SZPAR ) VPAR ! Validated parameter name
@@ -194,7 +194,7 @@
                      IF ( ( PCB_PARAM( SLOT ) .NE. ' ' ) ) THEN
                         OK = CHR_WILD( PCB_PARAM( SLOT ), VPAR( :IEND ),
      :                                 MATCH )
-                        IF ( OK ) THEN 
+                        IF ( OK ) THEN
 
 *  First release any extension resources.
                            DO 3 ESLOT = 1, IMG__MXEXT

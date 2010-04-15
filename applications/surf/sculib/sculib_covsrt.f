@@ -38,7 +38,7 @@
 *  Copyright:
 *     Copyright (C) 1993,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
-*     
+*
 
 
 *  Method:
@@ -63,8 +63,8 @@
 
 *  Arguments Given:
       INTEGER MA
-      INTEGER MFIT 
-      INTEGER NPC 
+      INTEGER MFIT
+      INTEGER NPC
       INTEGER IA (MA)
 
 *  Arguments Given & Returned:

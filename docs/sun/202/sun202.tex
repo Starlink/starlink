@@ -45,7 +45,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -196,12 +196,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -236,30 +236,30 @@
 \section{\xlabel{introduction}Introduction}
 \label{introduction}
 
-This note gives a general overview of the methods available for using 
-Starlink Infrastructure subroutine libraries with applications.  
-There is an outline of how to use the include files for a subroutine 
-library, and a guide to the methods available for linking with the 
+This note gives a general overview of the methods available for using
+Starlink Infrastructure subroutine libraries with applications.
+There is an outline of how to use the include files for a subroutine
+library, and a guide to the methods available for linking with the
 subroutine libraries.
 
 All the Starlink Infrastructure libraries are organised in the same way,
-so it is possible to give a general guide to the principles involved. 
+so it is possible to give a general guide to the principles involved.
 However, some libraries do differ, and for precise details of how to use a
 particular subroutine library, you should consult the Starlink document
-for that library. 
+for that library.
 
 \section{\xlabel{organisation}Organisation}
 \label{organisation}
 
 Suppose you wanted to use an Infrastructure library BLY (there isn't one
 -- this is an example!).  In the Starlink installation, the BLY subroutine
-library has several components: 
+library has several components:
 
 \begin{enumerate}
 
 \item a library file \texttt{libbly.a}
 
-\item a shareable library \texttt{libbly.so} 
+\item a shareable library \texttt{libbly.so}
 
 \item a development script \texttt{bly\_dev}
 
@@ -279,34 +279,34 @@ Those that do not have any \texttt{INCLUDE} files will lack a development
 script.  A few libraries do not need separate ADAM versions, so will not
 have libraries for use with ADAM.
 
-It is best to consult the documentation for a particular library to see 
+It is best to consult the documentation for a particular library to see
 what \texttt{INCLUDE} files and libraries are available.
 
-The components may all be used as part of the development and linking of 
+The components may all be used as part of the development and linking of
 programs that use the Starlink Infrastructure subroutine libraries.
 
 \section{\xlabel{program_development}Program Development -- \texttt{INCLUDE} files}
 \label{program_development}
 
 If the Infrastructure library you want to use has \texttt{INCLUDE} files, you
-need to be able to reference them from your source code. 
+need to be able to reference them from your source code.
 
 You might wish to use the full \texttt{PATH} name for the \texttt{INCLUDE}
 file, \emph{e.g.}, \texttt{/star/include/bly\_par}.  This is fine, and works,
 but is not portable, and could lead to problems if you want to use a
-development version of the library. 
+development version of the library.
 
 The recommended way to use the \texttt{INCLUDE} files for a particular
 library is to create links in your development directory to the {\tt
-INCLUDE} files, and reference the links in your source code. 
+INCLUDE} files, and reference the links in your source code.
 
 A library `\texttt{dev}' script will create the links for you in your
-working directory.  The links are \textbf{UPPER-CASE}, and it is these 
+working directory.  The links are \textbf{UPPER-CASE}, and it is these
 upper-case links you reference in the source code, thus:
 
 \begin{quote}
 \begin{verbatim}
-      PROGRAM MYPROG      
+      PROGRAM MYPROG
 *
 *  demonstrate use of include file
 *
@@ -343,13 +343,13 @@ To remove the links, issue the command again with the \texttt{remove} option:
 \end{verbatim}
 \end{quote}
 
-You should keep the links in place while developing your program.  If you 
-want to move development directories, simply remove the links and create 
-new ones in the new directory.  
+You should keep the links in place while developing your program.  If you
+want to move development directories, simply remove the links and create
+new ones in the new directory.
 
-The Starlink software building system uses the soft link strategy in its 
-makefiles, though the makefiles generate the links themselves.  The links 
-may easily be changed to pick up a development version of a library, 
+The Starlink software building system uses the soft link strategy in its
+makefiles, though the makefiles generate the links themselves.  The links
+may easily be changed to pick up a development version of a library,
 without having to edit source code.
 
 \section{\xlabel{library_link_scripts}Library Link Scripts}
@@ -361,19 +361,19 @@ without having to edit source code.
 The Starlink Infrastructure libraries depend upon one another in a
 hierarchy of dependencies that is quite complicated -- dependencies that
 mean one library may need several others at link time to get a full
-resolution of all the subroutine calls. 
+resolution of all the subroutine calls.
 
 So that users do not have to remember the dependencies of a particular
 library, each library has a link script that contains references
-to its own libraries, and all the other libraries that it depends upon.  
+to its own libraries, and all the other libraries that it depends upon.
 Most of the other references will be to the link scripts for the other
 libraries.
 
-This in itself presents a problem -- the nested links scripts can 
-generate a long list of libraries, often with each library occurring more 
-than once.  
+This in itself presents a problem -- the nested links scripts can
+generate a long list of libraries, often with each library occurring more
+than once.
 
-To avoid this, each link script has an internal mechanism that trims 
+To avoid this, each link script has an internal mechanism that trims
 unnecessary occurrences of a library out of the list.
 
 The link script writes a list of libraries to its standard output, so
@@ -381,9 +381,9 @@ to get the list into your compile or link command, you need to run the
 script as part of the compile or link command.  To do this you just
 back-quote the link script name thus: \texttt{`bly\_link`}.
 
-The result is that when using the link scripts, you do not have to worry 
-about remembering which libraries that the one you need depends upon, and 
-the linker is provided with a simple list of dependant libraries in the 
+The result is that when using the link scripts, you do not have to worry
+about remembering which libraries that the one you need depends upon, and
+the linker is provided with a simple list of dependant libraries in the
 correct order to resolve all external references in your source code.
 
 \subsection{\xlabel{compiling_and_linking_on_liunux}Compiling and Linking on Linux}
@@ -409,8 +409,8 @@ flag for the \texttt{g77} compiler/linker, thus:
 \subsection{\xlabel{static_linking}Static Linking}
 \label{static_linking}
 
-Your application depends upon the BLY library, so when you link (or 
-compile and link -- it does not matter), you need to tell it to link with 
+Your application depends upon the BLY library, so when you link (or
+compile and link -- it does not matter), you need to tell it to link with
 the \texttt{libbly.a} library.
 
 In a one-stage compile and link, you would use the following:
@@ -430,7 +430,7 @@ In a two stage compile and link, you would use the following:
 \end{verbatim}
 \end{quote}
 
-To use the ADAM versions of the library, if you are developing an ADAM 
+To use the ADAM versions of the library, if you are developing an ADAM
 application, use the following:
 
 \begin{quote}
@@ -447,7 +447,7 @@ or:
 \end{quote}
 
 You should also include in the link phase any other library link scripts
-for those libraries that your application calls directly, and any 
+for those libraries that your application calls directly, and any
 libraries of your own \emph{e.g.}:
 
 \begin{quote}
@@ -466,13 +466,13 @@ library \texttt{libmine2.a}.
 
 If you use the link scripts and the \texttt{-L/star/lib} tag in your link
 chain, your executable will be created using the ordinary libraries
-available in \texttt{/star/lib} (unless the linker discovers a shareable 
+available in \texttt{/star/lib} (unless the linker discovers a shareable
 version of a library in \texttt{/star/lib} which it will use by default).
 
 A statically linked binary includes all the necessary object code.  This
 can create very large binaries, but at at load time, startup is quite
 fast, because the runtime linker only has to resolve the system library
-references. 
+references.
 
 In contrast, dynamically linked executables are much smaller -- the
 linker just notes in the binary which shareable libraries were used to
@@ -483,7 +483,7 @@ shared libraries for which it finds references in the binary, and then does a
 `fixup' to resolve all the external references using the libraries.  For
 executables with a large list of shared libraries, this process can take a
 considerable time.  What you save in link time during development and in
-disk space, you may pay for when waiting for the binary to load. 
+disk space, you may pay for when waiting for the binary to load.
 
 Since your binary will need the shared libraries at install time, your
 binary will only be portable to systems containing the Starlink shared
@@ -492,10 +492,10 @@ library set.
 Starlink builds its applications statically linked against the
 Infrastructure libraries, and dynamically linked with the system
 libraries.  The \texttt{alink} command for ADAM applications triggers static
-linking by default. 
+linking by default.
 
-If you want to take advantage of the speed of dynamic linking and the 
-disk space savings, you can use the shared libraries in \texttt{/star/share} 
+If you want to take advantage of the speed of dynamic linking and the
+disk space savings, you can use the shared libraries in \texttt{/star/share}
 to link with:
 
 \begin{quote}
@@ -515,10 +515,10 @@ DEC Alpha Digital Unix machines.
 \item At run time, the loader needs to find the shared libraries.  On a
 Starlink system your \texttt{LD\_LIBRARY\_PATH} will have been set to enable
 this to occur (if you use the Starlink login files).  If not, you should
-add \texttt{/star/share} to your \texttt{LD\_LIBRARY\_PATH}. 
+add \texttt{/star/share} to your \texttt{LD\_LIBRARY\_PATH}.
 
-\item Some Infrastructure libraries do not have shared versions because 
-it is not possible to generate them, even on Intel Linux and SPARC Solaris 2 
+\item Some Infrastructure libraries do not have shared versions because
+it is not possible to generate them, even on Intel Linux and SPARC Solaris 2
 systems.
 
 \end{enumerate}

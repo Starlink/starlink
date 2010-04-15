@@ -3,16 +3,16 @@
 *+
 *  Name:
 *     SUBPAR_DEFNI
- 
+
 *  Purpose:
 *     Set dynamic default values.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_DEFNI ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
- 
+
 *  Description:
 *     Set default values for an n-dimensional primitive object associated
 *     with a Parameter.
@@ -20,16 +20,16 @@
 *     actual number of object dimensions.   The dimensions, MAXDIM, of
 *     to contain the object array.
 *     There is a routine for each access type:
- 
+
 *        PAR_DEFNC    CHARACTER
 *        PAR_DEFND    DOUBLE PRECISION
 *        PAR_DEFNR    REAL
 *        PAR_DEFNI    INTEGER
 *        PAR_DEFNL    LOGICAL
- 
+
 *     If the object data type differs from the access type, then
 *     conversion is performed (if allowed).
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        Code-number of the parameter
@@ -46,12 +46,12 @@
 *        Array containing the actual data dimensions.   These must
 *        match the actual object dimensions.
 *     STATUS=INTEGER
- 
+
 *  Algorithm:
 *     Get a locator to the space in the tasks private HDS parameter
 *     store for storing the dynamic default for the parameter. Store the
 *     values in HDS after doing any necessary type conversions.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1992, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     10-DEC-1984 (BDK):
 *        Original
@@ -91,58 +91,58 @@
 *     26-FEB-1993 (AJC):
 *        Add INCLUDE DAT_PAR
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
- 
+
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! SAI Constants
       INCLUDE 'DAT_PAR'
- 
+
       INCLUDE 'SUBPAR_PAR'
- 
- 
+
+
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter Name
       INTEGER NDIM			! Number of dimensions
       INTEGER MAXD(*)			! Array dimensions
       INTEGER VALUES(*)			! Array to supply values
       INTEGER ACTD(*)			! Object dimensions
- 
+
 *    Status return :
       INTEGER STATUS			! Status Return
- 
- 
+
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
- 
+
+
 *  Local Variables:
       CHARACTER*(DAT__SZLOC) BOTLOC     ! locator to HDS object
       CHARACTER*15 HDSTYPE              ! type of primitive data
                                         ! to be stored
       INTEGER TYPE                      ! encoded data type
       CHARACTER*15 POSTYPES(5)          ! possible primitive data types
- 
- 
+
+
 *  Local Data:
       DATA POSTYPES / '_CHAR', '_REAL', '_DOUBLE', '_INTEGER',
      :  '_LOGICAL' /
- 
- 
- 
- 
+
+
+
+
 *.
- 
- 
+
+
       IF (STATUS .NE. SAI__OK) RETURN
- 
+
 *
 *   Get the type of the parameter
 *
@@ -174,5 +174,5 @@
 *   Annul the locator.
 *
       CALL DAT_ANNUL ( BOTLOC, STATUS )
- 
+
       END

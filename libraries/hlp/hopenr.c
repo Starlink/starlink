@@ -82,11 +82,11 @@ int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
    int nc, jstat, i;
    long iadr;
    char buffer [ LBUF ];
- 
- 
+
+
 /* Abort if the system isn't in the right state. */
    if ( jhelp != -1 && jhelp != 2 ) return hlp_ILLEGAL_STATE;
- 
+
 /* Open (or re-open) the HELP library file. */
    if ( hlpFopr ( nametr, hlnext, &fphl ) )
       return hlp_OPEN_ERROR;
@@ -97,7 +97,7 @@ int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
 
 /* Set HELP state. */
    jhelp = 2;
- 
+
 /* Read the header record to get the file size. */
    iadr = 0l;
    nchh = (long) LBUF;
@@ -106,11 +106,11 @@ int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
    i = 0;
    nchh = hlpDec ( buffer, &i );
    if ( nchh < 0l ) return hlp_OPEN_ERROR;
- 
+
 /* Store the initial index and data addresses. */
    nextx = iadr;
    nextd = nchh - 1l;
- 
+
 /* Set status and exit. */
    return 0;
 }

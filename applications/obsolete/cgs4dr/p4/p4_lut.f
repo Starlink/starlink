@@ -36,7 +36,7 @@
 *    Global variables :
       INCLUDE 'P4COM.INC'                         ! P4 common block
       INCLUDE 'COLOURS.INC'
-*    External references : 
+*    External references :
       INTEGER CHR_LEN
 *    Local variables :
       INTEGER CLEN, CPOS1, CPOS2
@@ -97,7 +97,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 500
 
 *    Extract the colour table values
-      CALL P4_EXTRACT_CT( %val( CT_PTR ), DIMS( 1 ), DIMS( 2 ), 
+      CALL P4_EXTRACT_CT( %val( CT_PTR ), DIMS( 1 ), DIMS( 2 ),
      :  RED, GREEN, BLUE, STATUS )
 
 *    First inquire how many colours there are and set RGB values
@@ -111,14 +111,14 @@
           TEMP = RATIO * I
           J = NINT(TEMP)
           DIFF = ABS(TEMP-J)
-  
+
           IF ( DIFF .LT. AMT ) THEN
             IF ( J .EQ. 1 ) THEN
 
               RED( 1 )   = FG_RD
               GREEN( 1 ) = FG_GR
               BLUE( 1 )  = FG_BL
-            ENDIF 
+            ENDIF
 
             CALL PGSCR( J, RED( I ), GREEN( I ), BLUE( I ) )
           ENDIF
@@ -127,6 +127,6 @@
 
 *    Close DSA and tidy up.
  500  CONTINUE
-      CALL DSA_CLOSE( STATUS ) 
+      CALL DSA_CLOSE( STATUS )
 
       END

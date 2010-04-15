@@ -10,11 +10,11 @@
 #  Description:
 #     If you build the tagging routines using flex in its default
 #     configuration, it fails on some files with very long tokens
-#     (usually comments).  Good examples are to be found in the 
+#     (usually comments).  Good examples are to be found in the
 #     AST package.  This script tries the C tagger against some of
 #     these to see whether it chokes or not.
 #
-#     The build machinery which persuades FLEX to build a scanner 
+#     The build machinery which persuades FLEX to build a scanner
 #     which passes this test involves using a custom flex.skl file.
 #     This may not be very portable.
 #

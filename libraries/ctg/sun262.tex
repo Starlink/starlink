@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2009 Science and Technology Facilities Council.}
 
 % Variable part - replace [xxx] as appropriate.
@@ -24,7 +24,7 @@
 \newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
-This document describes the routines provided within the CTG subroutine 
+This document describes the routines provided within the CTG subroutine
 library for accessing groups of catalogues.
 }
 % ? End of document identification
@@ -85,7 +85,7 @@ library for accessing groups of catalogues.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -521,12 +521,12 @@ library for accessing groups of catalogues.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -580,7 +580,7 @@ applications allow many input catalogues to be specified and the need to
 type in every catalogue name explicitly each time the program is run can
 become time consuming. The CTG package provides a means of giving the
 user the ability to specify a list (or \emph{Group}) of catalogues as a reply
-to a single prompt for a parameter. 
+to a single prompt for a parameter.
 
 \section {Interaction Between CTG and GRP}
 
@@ -594,7 +594,7 @@ As a broad outline, applications use the CTG\_ package as follows:
 
 \begin{enumerate}
 
-\item A call is made to \htmlref{CTG\_ASSOC}{CTG_ASSOC} which causes the user 
+\item A call is made to \htmlref{CTG\_ASSOC}{CTG_ASSOC} which causes the user
 to be prompted for a single parameter. This parameter can be of any type.
 The user replies with a \emph{group expression} (see
 \xref{SUN/150}{sun150}{}), which contains the names of a group of {\em
@@ -616,9 +616,9 @@ explicit catalogue names, which are stored internally within the GRP system.
 
 \item What happens next depends on the application, but a common example may be
 the initiation of a DO loop to loop through the input catalogues (CTG\_ASSOC returns
-the total number of catalogue names in the group). 
+the total number of catalogue names in the group).
 
-\item To access a particular catalogue, the application calls routine 
+\item To access a particular catalogue, the application calls routine
 \htmlref{CTG\_CATAS}{CTG_CATAS} supplying an index, $n$, within the
 group (i.e $n$ is an integer in the range 1 to the group size returned
 by CTG\_ASSOC). CTG\_CATAS returns a CAT identifier to the $n$th
@@ -629,10 +629,10 @@ is no longer needed, and freeing resoures using
 \xref{CAT\_TRLSE}{sun181}{CAT_TRLSE} in the normal way.
 
 \item Once the application has finished processing the group of
-catalogues, it calls \xref{GRP\_DELET}{sun150}{GRP\_DELET} which deletes 
+catalogues, it calls \xref{GRP\_DELET}{sun150}{GRP\_DELET} which deletes
 the group, releasing all resources reserved by the group.
 
-\item Routine CTG\_ASSOC can also be used to append a list of catalogue names 
+\item Routine CTG\_ASSOC can also be used to append a list of catalogue names
 obtained from the environment, to a previously defined group.
 
 The routine \htmlref{CTG\_CREAT}{CTG_CREAT} produces a group
@@ -646,13 +646,13 @@ input catalogue names.  When CTG\_CREAT is called, it creates a group
 of catalogue names either by modifying all the names in a specified
 input group using a \emph{modification element} (see
 \xref{SUN/150}{sun150}{}), or by getting a list of new names from the
-user. 
+user.
 
 \item Applications which produce a group of output catalogues could
 also produce a text file holding the names of the output catalogues. Such a
 file can be used as input to the next application, using the
 indirection facility. A text file listing of all the catalogues in a group
-can be produced by routine \xref{GRP\_LIST}{sun150}{GRP_LIST} (or 
+can be produced by routine \xref{GRP\_LIST}{sun150}{GRP_LIST} (or
 \xref{GRP\_LISTF}{sun150}{GRP_LISTF}).
 
 \end{enumerate}
@@ -663,7 +663,7 @@ of existing and new catalogue names.
 
 \section{An example CTG application}
 
-The following gives a short example of how CTG routines might be 
+The following gives a short example of how CTG routines might be
 used within an ADAM task.
 \begin{quote}
 \latexonly{\small}
@@ -693,7 +693,7 @@ used within an ADAM task.
 *  Create group of input catalogues using the parameter IN.
       CALL CTG_ASSOC( 'IN', .TRUE., GIDIN, NUMIN, FLAG, STATUS )
 
-*  Create group of output catalogues using the parameter OUT, that 
+*  Create group of output catalogues using the parameter OUT, that
 *  possibly works by modifying the values in the input group.
       CALL CTG_CREAT( 'OUT', GIDIN, GIDOUT, NUMOUT, FLAG, STATUS )
 
@@ -722,9 +722,9 @@ used within an ADAM task.
       END
 \end{verbatim}
 \end{quote}
-When this program is compiled and run, the user is asked for 
+When this program is compiled and run, the user is asked for
 two ADAM parameters, IN and OUT.  Each catalogue in the list specified
-by the IN parameter is simply copied to the corresponding name in the 
+by the IN parameter is simply copied to the corresponding name in the
 list specified by the OUT parameter.  For instance, running
 \begin{quote}
 \latexonly{\small}
@@ -742,7 +742,7 @@ a different value for IN.
 Note that a few corners have been cut in the above code, in particular
 checking that the input and output groups have the same size and
 STATUS testing.  Additionally, no action is taken when the FLAG
-character is given at the end of a group 
+character is given at the end of a group
 specification---conventionally this would indicate that the user
 should be allowed to add further members.
 
@@ -877,7 +877,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    \sstdescription{
       A group expression is obtained from the environment using the
       supplied parameter. The expression is parsed (using the facilities
-      of the GRP routine  \xref{GRP\_GROUP}{sun150}{GRP_GROUP}\latex{,see SUN/150}) 
+      of the GRP routine  \xref{GRP\_GROUP}{sun150}{GRP_GROUP}\latex{,see SUN/150})
       to produce a list of explicit names for existing catalogues
       which are appended to the end of the supplied group (a new group
       is created if none is supplied). If an error occurs while
@@ -939,7 +939,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
 	 /bin/sh), and so may contain shell meta-characters
 	 (\emph{e.g.} twiddle, \$HOME, even command substitution and
 	 pipes - but pipe characters {\tt "$|$"} need to be escaped
-	 using a backslash {\tt "$\backslash$"} to avoid them being 
+	 using a backslash {\tt "$\backslash$"} to avoid them being
 	 interpreted as GRP editing characters).
 
          \sstitem
@@ -975,7 +975,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
          automatically deleted when the returned group is deleted using
          GRP\_DELET. The returned group should not be altered using GRP
          directly because corresponding changes may need to be made to the
-         supplemental groups. Routines \htmlref{CTG\_SETSZ}{CTG_SETSZ}, 
+         supplemental groups. Routines \htmlref{CTG\_SETSZ}{CTG_SETSZ},
          \htmlref{CTG\_GTSUP}{CTG_GTSUP} and \htmlref{CTG\_PTSUP}{CTG_PTSUP}
          are provided to manipulate the entire chain of groups. The full
          chain (starting from the head) is as follows:
@@ -1033,8 +1033,8 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
          IGRP = INTEGER (Given)
       }{
          A GRP identifier for a group holding the names of catalogues. This
-         will often be created using \htmlref{CTG\_ASSOC}{CTG_ASSOC}, but groups 
-         created \emph{by hand} using GRP directly (\emph{i.e.} without the 
+         will often be created using \htmlref{CTG\_ASSOC}{CTG_ASSOC}, but groups
+         created \emph{by hand} using GRP directly (\emph{i.e.} without the
          supplemental groups created by CTG\_ASSOC) can also be used.
       }
       \sstsubsection{
@@ -1079,8 +1079,8 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    \sstdescription{
       The routine returns a CAT identifier for a new catalogue. The name
       of the new catalogue is held at a given index within a given group.
-      It is equivalent to \htmlref{CAT\_CREAT}{CAT_CREAT}, except that any 
-      existing catalogue with the specified name is first deleted (unless 
+      It is equivalent to \htmlref{CAT\_CREAT}{CAT_CREAT}, except that any
+      existing catalogue with the specified name is first deleted (unless
       the catalogue specification includes a FITS-extension specifier).
    }
    \sstinvocation{
@@ -1091,7 +1091,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
          IGRP = INTEGER (Given)
       }{
          A GRP identifier for a group holding the names of catalogues. This
-         will often be created using \htmlref{CTG\_CREAT}{CTG_CREAT}, but 
+         will often be created using \htmlref{CTG\_CREAT}{CTG_CREAT}, but
          groups created \emph{by hand} using GRP directly can also be used.
       }
       \sstsubsection{
@@ -1118,12 +1118,12 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    Create a single new catalogue using a specified parameter
 }{
    \sstdescription{
-      This routine is equivalent to \htmlref{CAT\_CREAT}{CAT_CREAT} except 
-      that it allows the catalogue to be specified using a GRP group 
-      expression (for instance, its name may be given within a text file, 
-      {\emph etc.}), and it also ensures that any existing catalogue with 
-      the same name is deleted before the new one is created (so long as no 
-      FITS extension number is included in the catalogue specification). The 
+      This routine is equivalent to \htmlref{CAT\_CREAT}{CAT_CREAT} except
+      that it allows the catalogue to be specified using a GRP group
+      expression (for instance, its name may be given within a text file,
+      {\emph etc.}), and it also ensures that any existing catalogue with
+      the same name is deleted before the new one is created (so long as no
+      FITS extension number is included in the catalogue specification). The
       first catalogue in the group expression is returned. Any other names in
       the group expression are ignored. Any modification elements in the
       supplied group expression will be treated literally.
@@ -1163,7 +1163,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    \sstdescription{
       A group expression is obtained from the environment using the
       supplied parameter. The expression is parsed (using the
-      facilities of the GRP routine 
+      facilities of the GRP routine
       \xref{GRP\_GROUP}{sun150}{GRP_GROUP}\latex{, see SUN/150}) to produce
       a list of explicit catalogue names. These names are appended
       to the group identified by IGRP. The user is re-prompted if an
@@ -1351,7 +1351,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
       \sstsubsection{
          IGRP = INTEGER (Given)
       }{
-         The CTG group as returned by \htmlref{CTG\_ASSOC}{CTG_ASSOC}, \emph{etc.}. 
+         The CTG group as returned by \htmlref{CTG\_ASSOC}{CTG_ASSOC}, \emph{etc.}.
          This should be the last group in a GRP owner-slave chain.
       }
       \sstsubsection{
@@ -1387,9 +1387,9 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    Reduces the size of a CTG group
 }{
    \sstdescription{
-      This routine should be used instead of \xref{GRP\_SETSZ}{sun150}{GRP_SETSZ} 
-      to set the size of a group created by CTG. It sets the size of the supplied 
-      group, and also sets the size of each of the supplemental groups associated 
+      This routine should be used instead of \xref{GRP\_SETSZ}{sun150}{GRP_SETSZ}
+      to set the size of a group created by CTG. It sets the size of the supplied
+      group, and also sets the size of each of the supplemental groups associated
       with the supplied group.
    }
    \sstinvocation{
@@ -1399,7 +1399,7 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
       \sstsubsection{
          IGRP = INTEGER (Given)
       }{
-         The CTG group as returned by \htmlref{CTG\_ASSOC}{CTG_ASSOC}, \emph{etc.} 
+         The CTG group as returned by \htmlref{CTG\_ASSOC}{CTG_ASSOC}, \emph{etc.}
          This should be the last group in a GRP owner-slave chain.
       }
       \sstsubsection{

@@ -9,7 +9,7 @@ C
 C     Function:
 C        Read Hatfield Polarimeter Data
 C
-C     Description:   
+C     Description:
 C        RHATPOL reads polarimetry data files in Figaro format as produced
 C        by the Hatfield Polarimeter systems on UKIRT or the AAT.
 C        A time series dataset is created containing the reduced linear
@@ -26,16 +26,16 @@ C    (3) LINEAR     (Logical)  True for linear data, false for circular.
 C    (4) OUTPUT     (TSP, 2D)  The output time series dataset.
 C    (5) CFILE      (File)     Name of calibration file.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         3/3/1990
 C
 C-
 C
 C  History:
-C    3/3/1990   Original Version.   JAB/AAO 
+C    3/3/1990   Original Version.   JAB/AAO
 C
 
 
@@ -67,9 +67,9 @@ C
 
 *  Needed for time conversion
       INTEGER NSTRT
-      INTEGER IH,IM,IY,ID    
+      INTEGER IH,IM,IY,ID
 
-*  Number of elements and slot id                      
+*  Number of elements and slot id
       INTEGER EL,SL
 
 *  Comment string for FITS header reads
@@ -116,7 +116,7 @@ C
       LENNAME = ICH_LEN(FNAME)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME(:LENNAME),STATUS)
-      
+
 *  Get the data array
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -128,7 +128,7 @@ C
             CALL MSG_OUT('MSG','Dimensions of Input File Invalid',
      :          STATUS)
             STATUS = USER__001
-         ELSE                        
+         ELSE
 
 *  Copy the dimensions
             NPOINTS = DIMS(1)
@@ -161,7 +161,7 @@ C
                 IF (UTSTART(I:I) .EQ. ':') UTSTART(I:I)=' '
                 IF (UTEND(I:I) .EQ. ':') UTEND(I:I)=' '
                 IF (UTDATE(I:I) .EQ. '/') UTDATE(I:I)=' '
-            ENDDO   
+            ENDDO
 
 *  Decode UTSTART string
             NSTRT = 1
@@ -179,9 +179,9 @@ C
             CALL SLA_DTF2D(IH,IM,SEC,DJ1,J)
 
 *  Decode UTEND string
-            NSTRT = 1 
+            NSTRT = 1
 
-*  Hours             
+*  Hours
             CALL SLA_INTIN(UTEND,NSTRT,IH,J)
 
 *  Minutes
@@ -194,9 +194,9 @@ C
             CALL SLA_DTF2D(IH,IM,SEC,DJ2,J)
 
 *  Decode UT data string
-            NSTRT = 1   
+            NSTRT = 1
 
-*  Year           
+*  Year
             CALL SLA_INTIN(UTDATE,NSTRT,IY,J)
 
 *  Month
@@ -213,7 +213,7 @@ C
 
 *  End MJD
             DJ2 = DJM+DJ2
-                             
+
 *  Points per cycle
             CALL PAR_GET0I('NPTS',NPTS,STATUS)
             IF (NPTS .NE. 1 .AND. NPTS .NE. 2) THEN
@@ -269,7 +269,7 @@ C
              IF (STATUS .NE. SAI__OK) THEN
                  GOTO 100
              ENDIF
-   
+
 *  Open the calibration files
              CALL FIO_ASSOC('CFILE','READ','LIST',0,FD,STATUS)
 
@@ -282,14 +282,14 @@ C
                     READ(BUFFER,*) PA(J),EFF(J),PHOT(J),EXT(J),
      :                 VV(J),WW(J)
                  ENDIF
-             ENDDO            
+             ENDDO
 
 *  Loop over channels, getting the channel name and wavelength
              DO J=1,6
-              IF (WAVES(J) .LT. 1) THEN                                 
+              IF (WAVES(J) .LT. 1) THEN
                CALL MSG_SETI('CHN',J)
                CALL MSG_OUT('MSG','Enter Name of channel ^CHN',STATUS)
-               CALL PAR_GET0C('CHANNEL',NAME,STATUS) 
+               CALL PAR_GET0C('CHANNEL',NAME,STATUS)
                CALL PAR_CANCL('CHANNEL',STATUS)
 
 *  Set up the zero point and wavelength if it is a standard band
@@ -340,9 +340,9 @@ C
                   CALL PAR_GET0R('WAVELENGTH',WAVES(J),STATUS)
                   CALL PAR_CANCL('WAVELENGTH',STATUS)
                ENDIF
-              ENDIF                  
-             ENDDO         
-                
+              ENDIF
+             ENDDO
+
 *  Copy the data
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_RHATPOL_COPY(NCYCLES,N2,NPOINTS,NPTS,AG,
@@ -351,7 +351,7 @@ C
      :           %VAL(UPTR),%VAL(VPTR),%VAL(XPTR))
              ENDIF
 
-*  Copy wavelength axis data                         
+*  Copy wavelength axis data
              CALL TSP_MAP_LAMBDA(OLOC,'WRITE',DPTR,DLOC,STATUS)
              CALL GEN_MOVE(4*6,WAVES,%VAL(DPTR))
              CALL TSP_WLU_LAMBDA(OLOC,'Wavelength','Angstroms',STATUS)
@@ -380,7 +380,7 @@ C
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
 
       SUBROUTINE TSP_RHATPOL_COPY(NCYCLES,N2,NPOINTS,NPTS,AG,LINEAR,
@@ -404,7 +404,7 @@ C
 *   (>)   EFF       (Real array(6))    Efficency factors
 *   (>)   PHOT      (Real array(6))    Photometric zero points
 *   (>)   VV        (Real array(6))    Circular poln vector 1
-*   (>)   WW        (Real array(6))    Circular poln vector 2    
+*   (>)   WW        (Real array(6))    Circular poln vector 2
 *   (>)   IN        (Real array(NPOINTS,N2,NCYCLES)   Input data array
 *   (<)   OUT       (Real array(6,NCYCLES*NPTS))      Output intensity array
 *   (<)   Q         (Real array(6,NCYCLES*NPTS))      Q Stokes array
@@ -421,20 +421,20 @@ C
       INTEGER NCYCLES,NPOINTS,NPTS,N2
       DOUBLE PRECISION JD1,JD2,TIMES(NCYCLES*NPTS)
       REAL PA(6),EFF(6),PHOT(6),VV(6),WW(6)
-      REAL IN(NPOINTS,N2,NCYCLES),OUT(6,NCYCLES*NPTS) 
+      REAL IN(NPOINTS,N2,NCYCLES),OUT(6,NCYCLES*NPTS)
       REAL Q(6,NCYCLES*NPTS),U(6,NCYCLES*NPTS),V(6,NCYCLES*NPTS)
       REAL AG
       LOGICAL LINEAR
 
 *  Local variables
-      INTEGER I,J,K,ND    
-      REAL SX(4)        
+      INTEGER I,J,K,ND
+      REAL SX(4)
       DOUBLE PRECISION JD,JDS
-                  
-*  calculate duration of one cycle                        
+
+*  calculate duration of one cycle
       JDS = (JD2-JD1)/(NCYCLES*NPTS)
-                                  
-*  Calculate start time      
+
+*  Calculate start time
       JD = JD1-JDS/2.0
 
 *  Fill time axis array with times
@@ -461,10 +461,10 @@ C
      :    IN,OUT,Q,U)
 
       END
-      
 
 
-                                       
+
+
       Subroutine TSP_WORK_ROUTINE(N1,N2,N3,NPTS,CPA,EFF,PHOT,
      :    ARRAY,OUT,Q,U)
 *+
@@ -500,7 +500,7 @@ C
 *+
       implicit none
 
-*     Arguments      
+*     Arguments
       integer   N1,N2,N3,NPTS
       real      ARRAY(N1,N2,N3)
       real      OUT(6,N3*NPTS),Q(6,N3*NPTS),U(6,N3*NPTS)
@@ -541,7 +541,7 @@ C
 
           OPT_RAW((2*I)-1,J,K)=(ARRAY(((J-1)*6)+K,1,I)+
      $       ARRAY(((J-1)*6)+K+48,1,I))-(ARRAY(((J-1)*6)+K,2,I)+
-     $       ARRAY(((J-1)*6)+K+48,2,I))          
+     $       ARRAY(((J-1)*6)+K+48,2,I))
           OPT_RAW(2*I,J,K)=(ARRAY(((J-1)*6)+K,4,I)+
      $       ARRAY(((J-1)*6)+K+48,4,I))-(ARRAY(((J-1)*6)+K,3,I)+
      $       ARRAY(((J-1)*6)+K+48,3,I))
@@ -552,7 +552,7 @@ C
               OPT_RAW((2*I)-1,J,K) = -OPT_RAW((2*I)-1,J,K)
               OPT_RAW((2*I),J,K) = -OPT_RAW((2*I),J,K)
           ENDIF
-         else 
+         else
 
 *      AAT Data (More than one point per beam position)
 
@@ -584,7 +584,7 @@ C
 *   have been included
 
           OPT_RAW(2*I-1,J,K) = C1/ROTS
-          OPT_RAW(2*I,J,K) = C2/ROTS               
+          OPT_RAW(2*I,J,K) = C2/ROTS
 
 *  Invert data for IR channel for which star and sky are reversed
 
@@ -596,7 +596,7 @@ C
 
         end do !K
        end do !J
-      end do !I   
+      end do !I
 
       NOPT=2*NCYCLE
 
@@ -649,13 +649,13 @@ C
                   IF (PA(K) .LT. 0.0) PA(K) = PA(K)+180.0
                   IF (CPA(K) .LT. 0.0) PA(K) = 180.0-PA(K)
                   QQ(K) = P(K)*COS(2.0*PA(K)/DEGRAD)
-                  UU(K) = P(K)*SIN(2.0*PA(K)/DEGRAD)                  
+                  UU(K) = P(K)*SIN(2.0*PA(K)/DEGRAD)
                   Q(K,J) = QQ(K)*OUT(K,J)/(100.0*EFF(K))
                   U(K,J) = UU(K)*OUT(K,J)/(100.0*EFF(K))
               ENDDO
           ENDIF
-      ENDDO    
-      
+      ENDDO
+
 *  Reduce the cululative data for the run
 
       CALL POL_REDUCE(6,C,CE,M,ME,QQ,QQE,UU,UUE,P,PE,PA,PAE)
@@ -701,7 +701,7 @@ C
      :           STATUS)
       ENDDO
       END
-                                       
+
 
       Subroutine TSP_WORK_ROUTINEC(N1,N2,N3,NPTS,EFF,PHOT,VV,WW,
      :    ARRAY,OUT,V)
@@ -742,7 +742,7 @@ C
 
       implicit none
 
-*     Arguments      
+*     Arguments
 
       integer   N1,N2,N3,NPTS
       real      ARRAY(N1,N2,N3)
@@ -784,7 +784,7 @@ C
 
           OPT_RAW((2*I)-1,J,K)=(ARRAY(((J-1)*6)+K,1,I)+
      $       ARRAY(((J-1)*6)+K+48,1,I))-(ARRAY(((J-1)*6)+K,2,I)+
-     $       ARRAY(((J-1)*6)+K+48,2,I))          
+     $       ARRAY(((J-1)*6)+K+48,2,I))
           OPT_RAW(2*I,J,K)=(ARRAY(((J-1)*6)+K,4,I)+
      $       ARRAY(((J-1)*6)+K+48,4,I))-(ARRAY(((J-1)*6)+K,3,I)+
      $       ARRAY(((J-1)*6)+K+48,3,I))
@@ -795,7 +795,7 @@ C
               OPT_RAW((2*I)-1,J,K) = -OPT_RAW((2*I)-1,J,K)
               OPT_RAW((2*I),J,K) = -OPT_RAW((2*I),J,K)
           ENDIF
-         else 
+         else
 
 *      AAT Data  (More than one point per beam position)
 
@@ -827,7 +827,7 @@ C
 *   have been included
 
           OPT_RAW(2*I-1,J,K) = C1/ROTS
-          OPT_RAW(2*I,J,K) = C2/ROTS               
+          OPT_RAW(2*I,J,K) = C2/ROTS
           IF (K .EQ. 1) THEN
 
 *  Invert data for IR channel which has star and sky reversed
@@ -839,7 +839,7 @@ C
 
         end do !K
        end do !J
-      end do !I   
+      end do !I
 
       NOPT=2*NCYCLE
 
@@ -895,8 +895,8 @@ C
      :                OUT(K,J)/(100.0*EFF(K))
               ENDDO
           ENDIF
-      ENDDO    
-      
+      ENDDO
+
 *  Reduce the cumulative data for this run
 
       CALL POL_REDUCE(6,C,CE,M,ME,QQ,QQE,UU,UUE,P,PE,PA,PAE)

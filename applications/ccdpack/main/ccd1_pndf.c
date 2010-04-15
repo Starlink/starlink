@@ -12,17 +12,17 @@
    void *ccdMall( char *type, int size, int *status );
 
    F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), INTEGER(nset),
-                              INTEGER_ARRAY(imem), INTEGER_ARRAY(imemof), 
-                              INTEGER(namgid), DOUBLE_ARRAY(percnt), 
-                              LOGICAL(skip2), DOUBLE(zoom), INTEGER(maxcnv), 
+                              INTEGER_ARRAY(imem), INTEGER_ARRAY(imemof),
+                              INTEGER(namgid), DOUBLE_ARRAY(percnt),
+                              LOGICAL(skip2), DOUBLE(zoom), INTEGER(maxcnv),
                               INTEGER_ARRAY(windim), INTEGER_ARRAY(prvdim),
-                              CHARACTER(mstya), CHARACTER(mstyb), 
-                              INTEGER(count), 
+                              CHARACTER(mstya), CHARACTER(mstyb),
+                              INTEGER(count),
                               INTEGER_ARRAY(nodes), INTEGER_ARRAY(nmat),
                               DOUBLE_ARRAY(xoff), DOUBLE_ARRAY(yoff),
                               POINTER_ARRAY(ipx1), POINTER_ARRAY(ipy1),
                               POINTER_ARRAY(ipx2), POINTER_ARRAY(ipy2),
-                              INTEGER(status) 
+                              INTEGER(status)
                               TRAIL(mstya) TRAIL(mstyb) ) {
 /*
 *+
@@ -36,20 +36,20 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_PNDF( NDFGID, NSET, IMEM, IMEMOF, NAMGID, PERCNT, SKIP2, 
+*     CALL CCD1_PNDF( NDFGID, NSET, IMEM, IMEMOF, NAMGID, PERCNT, SKIP2,
 *                     ZOOM, MAXCNV, WINDIM, PRVDIM, MSTYA, MSTYB,
-*                     COUNT, NODES, NMAT, XOFF, YOFF, IPX1, IPY1, 
+*                     COUNT, NODES, NMAT, XOFF, YOFF, IPX1, IPY1,
 *                     IPX2, IPY2, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which presents the user with a
 *     graphical method of specifying offsets between pairs of Sets
-*     derived from a group of NDFs, and returns the offsets thus 
+*     derived from a group of NDFs, and returns the offsets thus
 *     obtained.
 
 *  Arguments:
 *     NDFGID = INTEGER (Given)
-*        GRP identifier of the group of NDFs which is to be presented 
+*        GRP identifier of the group of NDFs which is to be presented
 *        to the user.
 *     NSET = INTEGER (Given)
 *        The number of Sets referred to by IMEM.
@@ -59,9 +59,9 @@
 *        Pointers into the IMEM array indicating where each Set's NDFs
 *        begin.  The final entry is a sentinel.
 *     NAMGID = INTEGER (Given)
-*        The GRP identifier for a group holding the Set names 
+*        The GRP identifier for a group holding the Set names
 *        corresponding to the NSET Sets.  It should have NSET members.
-*        Members with a value of ' ', meaning no alignment Set 
+*        Members with a value of ' ', meaning no alignment Set
 *        information is available, are permitted.
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given)
 *        Lower and higher percentiles to use in displaying the images.
@@ -77,10 +77,10 @@
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
 *     PRVDIM( 2 ) = INTEGER (Given and Returned)
-*        Dimensions of the preview window for each Set used in the 
+*        Dimensions of the preview window for each Set used in the
 *        chooser widget.
 *     MSTYA = CHARACTER * ( * ) (Given and Returned)
-*        A string indicating how markers are to be plotted on the first 
+*        A string indicating how markers are to be plotted on the first
 *        image.
 *     MSTYB = CHARACTER * ( * ) (Given and Returned)
 *        A string indicating how markers are to be plotted on the second
@@ -88,7 +88,7 @@
 *     COUNT = INTEGER (Returned)
 *        Number of pairings made by the user.
 *     NODES( 2, * ) = INTEGER (Returned)
-*        For each pairing made, this array contains the indices of the 
+*        For each pairing made, this array contains the indices of the
 *        Sets which form the pair.  The first COUNT pairs
 *        of elements in this array are filled on return.
 *     NMAT( * ) = INTEGER (Returned)
@@ -99,35 +99,35 @@
 *        of this array are filled on return.
 *     XOFF( * ) = DOUBLE PRECISION (Returned)
 *        For each pairing I made this array contains the accurate X
-*        offset between the Sets with indices NODES( 1, I ) and 
+*        offset between the Sets with indices NODES( 1, I ) and
 *        NODES( 2, I ).  The first COUNT elements in this array are
 *        filled on return.
 *     YOFF( * ) = DOUBLE PRECISION (Returned)
 *        For each pairing I made this array contains the accurate Y
-*        offset between the Sets with indices NODES( 1, I ) and 
+*        offset between the Sets with indices NODES( 1, I ) and
 *        NODES( 2, I ).  The first COUNT elements in this array are
 *        filled on return.
 *     IPX1( * ) = INTEGER (Returned)
-*        For each pairing this gives a pointer to the centroided X 
-*        coordinates of the points in the first of the pair which 
+*        For each pairing this gives a pointer to the centroided X
+*        coordinates of the points in the first of the pair which
 *        were successfully matched up.  The array pointed to contains
 *        NMAT( * ) elements.  These pointers are allocated within this
 *        routine.
 *     IPY1( * ) = INTEGER (Returned)
 *        For each pairing this gives a pointer to the centroided Y
-*        coordinates of the points in the first of the pair which 
+*        coordinates of the points in the first of the pair which
 *        were successfully matched up.  The array pointed to contains
 *        NMAT( * ) elements.  These pointers are allocated within this
 *        routine.
 *     IPX2( * ) = INTEGER (Returned)
-*        For each pairing this gives a pointer to the centroided X 
-*        coordinates of the points in the second of the pair which 
+*        For each pairing this gives a pointer to the centroided X
+*        coordinates of the points in the second of the pair which
 *        were successfully matched up.  The array pointed to contains
 *        NMAT( * ) elements.  These pointers are allocated within this
 *        routine.
 *     IPY2( * ) = INTEGER (Returned)
 *        For each pairing this gives a pointer to the centroided Y
-*        coordinates of the points in the second of the pair which 
+*        coordinates of the points in the second of the pair which
 *        were successfully matched up.  The array pointed to contains
 *        NMAT( * ) elements.  These pointers are allocated within this
 *        routine.
@@ -228,7 +228,7 @@
 /* Initialise the Tcl interpreter. */
       cinterp = ccdTclStart( status );
 
-/* Construct a list of NDF names available to the Tcl interpreter as 
+/* Construct a list of NDF names available to the Tcl interpreter as
    the value of the NDFSETS variable. */
       for ( i = 1; i <= *nset; i++ ) {
          setname[0] = '\0';

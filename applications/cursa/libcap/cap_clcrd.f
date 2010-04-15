@@ -199,11 +199,11 @@
 
 *             ... mean equatorial coordinates.
 
-C              print3000, crdval(1), crdval(2), 
+C              print3000, crdval(1), crdval(2),
 C    :           crdval(3), crdval(4), crdval(5), crdval(6), proprf,
 C    :           eqint, eqin, epint, epin,
 C    :           eqoutt, eqout, epoutt, epout
-C3000          format(1x, 'crdval: ', 
+C3000          format(1x, 'crdval: ',
 C    :           0PD12.4, 0PD12.4, 0PD12.4, 0PD12.4, 0PD12.4, 0PD12.4 /
 C    :           1x, 'proprf: ', i6 /
 C    :           1x, 'eqint, eqin: ', a, 1x, F8.1 /

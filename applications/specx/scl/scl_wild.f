@@ -27,7 +27,7 @@
       INTEGER   START,   NEXT
       INTEGER   LSUB,    LVAR,    LSTR
       CHARACTER SUBSTRING*32
- 
+
 *     Functions:
 
       INTEGER   GEN_ILEN

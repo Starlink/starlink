@@ -33,7 +33,7 @@
 *     WORK( *, 7 ) = SOP
 *     WORK( *, 8 ) = OBS
 *
-*     If an error occurs, all values are returned equal to the bad 
+*     If an error occurs, all values are returned equal to the bad
 *     value VAL__BADD.
 
 *  Arguments:
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,7 +143,7 @@
 
       CLDETN = 0
 
-*  Store bad values to indicate that no valid data has yet been stored 
+*  Store bad values to indicate that no valid data has yet been stored
 *  for this NDF.
       DO I = 1, NITEM
          WORK( INDEX, I ) = VAL__BADD
@@ -197,7 +197,7 @@
      :    NINT( SAMP1 ) .LE. UBND( 1 ) ) THEN
 
          WORK( INDEX, 4 ) = DBLE( SAMP1 )
-         WORK( INDEX, 5 ) = DBLE( CLDETN )      
+         WORK( INDEX, 5 ) = DBLE( CLDETN )
 
       ELSE
          WORK( INDEX, 4 ) = 0.0D0

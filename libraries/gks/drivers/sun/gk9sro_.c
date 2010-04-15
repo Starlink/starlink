@@ -17,7 +17,7 @@
  *  04/11/87  PJWR  Converted to leave area to update in workstation workspace
  *                  area and reformatted to usual layout.
  *  05/11/87  PJWR  Release version stabilised.
- *  30/08/89  RMK   Removed test on colour index and setting of error 93 - 
+ *  30/08/89  RMK   Removed test on colour index and setting of error 93 -
  *                  gk9scc now ensures that value is within colour table (S350).
  */
 
@@ -79,8 +79,8 @@ f77_integer gk9sro_(x, y, nxpix, nypix, xdim, raster)
 
   for (line_offset = 0, yr = 0; yr < *nypix; line_offset += *xdim, yr++)
     for (xr = 0; xr < *nxpix; xr++)
-    { 
-      value = (int)gk9scc_(&raster[line_offset+xr]); 
+    {
+      value = (int)gk9scc_(&raster[line_offset+xr]);
       if(pr_put(display, x0 + xr, y0 + yr, value) == PIX_ERR)
       {
         /* Couldn't access pixel */

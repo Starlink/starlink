@@ -19,15 +19,15 @@
 *
 * Arguments:
 *    NL = INTEGER (Given)
-*       
+*
 *    SDENS(NL) = REAL ARRAY (Given)
-*       
+*
 *    IMAX = INTEGER (Given and returned)
-*       
+*
 *    ILIM1 = INTEGER (Returned)
-*       
+*
 *    ILIM2 = INTEGER (Returned)
-*       
+*
 *
 *  Alan Bridger / RGO  10-APR-1984    For use with the arc routines
 *  Revised for use in arcpartii TNW/Manchester 1985

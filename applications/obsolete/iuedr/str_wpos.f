@@ -20,7 +20,7 @@
 *         Conversion to SGP/16 style.
 *
 *   Method:
-*      The FORMAT string is interpretted and used to set the current 
+*      The FORMAT string is interpretted and used to set the current
 *      position in the line parameter. The %p format is processed.
 *
 *-
@@ -30,23 +30,23 @@
 
 *   Import:
       BYTE FORMAT(256)     ! format token
- 
+
       INTEGER MAXC         ! maximum size of line
- 
+
 *   Import/Export:
       BYTE LINE(MAXC)      ! line to be modified
- 
+
       INTEGER BUFPOS       ! character position
- 
+
 *   External references:
       INTEGER str_LEN      ! string length
- 
+
 *   Local variables:
       LOGICAL REL          ! whether relative move
       LOGICAL TERM         ! whether buffer is terminated at position
 
       BYTE OFFSET          ! position offset for relative moves
- 
+
       INTEGER BUFLEN       ! string length
       INTEGER I            ! loop index
       INTEGER NEWPOS       ! temporary new position
@@ -64,7 +64,7 @@
          BUFLEN = str_LEN(LINE)
 
       END IF
- 
+
 *   Decode format
       CALL str_DECP(FORMAT, OFFSET, REL, POS, TERM)
 
@@ -93,10 +93,10 @@
          NEWPOS = POS
 
       END IF
- 
+
 *   Keep new position within buffer limits
       NEWPOS = MAX(1, MIN(MAXC - 1, NEWPOS))
- 
+
 *   Modify buffer
       IF (NEWPOS.GT.BUFLEN + 1) THEN
 

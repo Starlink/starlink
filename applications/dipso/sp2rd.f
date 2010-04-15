@@ -32,7 +32,7 @@
        INTEGER ASIZE1, NPOINT, MAXBRK, NBREAK
        INTEGER IUNIT
        INTEGER BREAK(MAXBRK)
- 
+
        REAL WAVE(ASIZE1), FLUX(ASIZE1), WORV
        CHARACTER*(*) TITLE
        LOGICAL SUBCHK
@@ -44,7 +44,7 @@
 *
        SUBCHK = .TRUE.
        WORV = 1.0
- 
+
        READ (IUNIT,'(A79)',ERR=200) TITLE(1:79)
        WRITE (*,'(''   SP2RD - title:  '',A50)') TITLE(1:50)
        READ (IUNIT,'(A79)',ERR=200) IHHEAD(1:79)
@@ -88,7 +88,7 @@
        NPOINT = I
 *
        CLOSE (IUNIT)
- 
+
        GOTO 300
   200  CONTINUE
        WRITE (*,'(''   SP2RD:  error reading from file'')')

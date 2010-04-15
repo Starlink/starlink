@@ -45,7 +45,7 @@
 #     See itk_option definitions below.
 
 #  Methods:
-#  
+#
 #        close
 #
 #     Closes down the top-level window and reminds the user to save
@@ -53,7 +53,7 @@
 #
 #        do_patch
 #
-#     Calls the RTD foreign command for patching the image with the 
+#     Calls the RTD foreign command for patching the image with the
 #     current replacement and background regions.
 #
 #        undo
@@ -62,7 +62,7 @@
 #
 #        annuli_changed
 #
-#     Usage of annuli as background estimates changed. Removes any 
+#     Usage of annuli as background estimates changed. Removes any
 #     annuli from the display.
 #
 #        read_file [filename]
@@ -411,7 +411,7 @@ itcl::class gaia::GaiaPatch {
             }
             if { $backok } {
 
-               #  Make sure that displayed image is modifiable, if not 
+               #  Make sure that displayed image is modifiable, if not
                #  possible then issue an error.
                set readonly [$itk_option(-rtdimage) readonly 0]
                if { !$readonly } {
@@ -423,7 +423,7 @@ itcl::class gaia::GaiaPatch {
                   lassign $replace_region xk1 yk1 xk2 yk2
                   set region "[min $xb1 $xb2 $xk1 $xk2] [min $yb1 $yb2 $yk1 $yk2] \
                   [max $xb1 $xb2 $xk1 $xk2] [max $yb1 $yb2 $yk1 $yk2]"
-                  
+
                   #  Run patch command.
                   $itk_option(-rtdimage) foreign patch \
                      "-new GaiaPatchNew.ard -fit GaiaPatchFit.ard \

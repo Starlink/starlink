@@ -1,6 +1,6 @@
 *+  RED4_CHECK_OBSERVATION - Check if a specified observation is suitable
       SUBROUTINE RED4_CHECK_OBSERVATION ( OBSREF, TYPE_REQUIRED,
-     :  OBS_MATCH, AMTOLER, OBS_NAME, STATUS) 
+     :  OBS_MATCH, AMTOLER, OBS_NAME, STATUS)
 *    Description :
 *     This subroutine checks that the specified observation will be
 *     suitable for use in the reduction sequence of the observation
@@ -88,7 +88,7 @@
 *     S.M.Beard    (REVAD::SMB)
 *     P.N.Daly     (JACH::PND)
 *    History :
-*      7-Oct-1991: Original version, largely copied from 
+*      7-Oct-1991: Original version, largely copied from
 *                  RED4_SEEK_OBSERVATION                         (SMB, JFL)
 *      8-Oct-1991: OBS_MATCH and AMTOLER included in arguments.  (SMB)
 *      9-Oct-1991: Minor mistakes fixed. Messages shortened.     (SMB)
@@ -119,7 +119,7 @@
 *                                          is required
       CHARACTER*(*) OBS_MATCH          ! String containing the names of the
 *                                      !   items which must match for the
-*                                      !   observation to be considered 
+*                                      !   observation to be considered
 *                                      !   suitable. This string will have
 *                                      !   come from either the FLAT_MATCH,
 *                                      !   CALIB_MATCH or STANDARD_MATCH
@@ -150,7 +150,7 @@
       INTEGER CLEN                     ! Non-blank length of character string
       REAL AMDIFF                      ! The air mass % difference
       CHARACTER*4 COMMENT              ! Dummy comment
-      CHARACTER*132 DIFFERENCES        ! The differences between the 
+      CHARACTER*132 DIFFERENCES        ! The differences between the
 *                                      !    required and the actual
 *                                      !    configuration of an observation.
 *
@@ -160,7 +160,7 @@
       CHARACTER*32 STREDUCE            ! Data reduction time.
       CHARACTER*20 INSTRUMENT          ! The instrument
       CHARACTER*20 SPEC_INSTRUMENT     ! The instrument
-      INTEGER GRATING_ORDER            ! The order in which the grating is 
+      INTEGER GRATING_ORDER            ! The order in which the grating is
 *                                            working
       CHARACTER*10 SLIT_NAME           ! The name of the slit in use
       INTEGER DET_NROWS                ! The number of detector rows
@@ -168,17 +168,17 @@
       INTEGER DET_ENC_BASE             ! The base position of the detector
 *                                           translation mechanism for this
 *                                           observation
-      INTEGER DET_NINCR                ! The number of detector positions 
+      INTEGER DET_NINCR                ! The number of detector positions
 *                                           measured in this observation
       INTEGER CNFINDEX                 ! The instrument configuration index.
       REAL EXPOSURE                    ! The on-chip exposure time used
 *                                           during the observation currently
 *                                           being examined on the index
-      REAL GRATING_WVLNGTH             ! The wavelength to which the grating 
+      REAL GRATING_WVLNGTH             ! The wavelength to which the grating
 *                                           set during the observation
       REAL GRATING_ANGLE               ! The angle of incidence of the input
 *                                           beam on the grating
-      REAL SLIT_ANGLE                  ! The angle of the slit during the 
+      REAL SLIT_ANGLE                  ! The angle of the slit during the
 *                                           observation
       REAL CVF_WAVELENGTH              ! The wavelength to which the CVF was set
 *                                           during the observation
@@ -189,14 +189,14 @@
 *                                           observation to be reduced
       CHARACTER*80 CVF_NAME            ! The name of the CVF used during the
 *                                           observation to be reduced
-      CHARACTER*80 FILTERS             ! The filter combination used during 
+      CHARACTER*80 FILTERS             ! The filter combination used during
 *                                           the observation to be reduced
 *
 *     --- Variables holding description of specified observation ---
 *
       CHARACTER*20 O_OBSTYPE           ! Observation type.
       CHARACTER*20 O_INTTYPE           ! Observation mode.
-      INTEGER O_GRATING_ORDER          ! The order in which the grating is 
+      INTEGER O_GRATING_ORDER          ! The order in which the grating is
 *                                      !   working
       CHARACTER*10 O_SLIT_NAME         ! The name of the slit in use
       INTEGER O_DET_NROWS              ! The number of detector rows
@@ -204,16 +204,16 @@
       INTEGER O_DET_ENC_BASE           ! The base position of the detector
 *                                         translation mechanism for the
 *                                         specified observation
-      INTEGER O_DET_NINCR              ! The number of detector positions 
+      INTEGER O_DET_NINCR              ! The number of detector positions
 *                                          measured in the specified observation
       INTEGER O_CNFINDEX               ! The instrument configuration index.
       REAL O_EXPOSURE                  ! The on-chip exposure time used
 *                                          for the specified observation
-      REAL O_GRATING_WVLNGTH           ! The wavelength to which the grating 
+      REAL O_GRATING_WVLNGTH           ! The wavelength to which the grating
 *                                         set during the specified observation
       REAL O_GRATING_ANGLE             ! The angle of incidence of the input
 *                                         beam on the grating
-      REAL O_SLIT_ANGLE                ! The angle of the slit during the 
+      REAL O_SLIT_ANGLE                ! The angle of the slit during the
 *                                         specified observation
       REAL O_CVF_WAVELENGTH            ! The wavelength to which the CVF was set
 *                                         during the specified observation
@@ -223,8 +223,8 @@
       CHARACTER*80 O_GRATING_NAME      ! The name of the grating used for the
 *                                         specified observation
       CHARACTER*80 O_CVF_NAME          ! The name of the CVF used during the
-*                                         specified observation 
-      CHARACTER*80 O_FILTERS           ! The filter combination used during 
+*                                         specified observation
+      CHARACTER*80 O_FILTERS           ! The filter combination used during
 *                                         the specified observation
 *    Local data :
 *-
@@ -306,7 +306,7 @@
       END IF
 
 *    All observation types require a match with the detector size,
-*    so obtain the size of the detector in the observation being 
+*    so obtain the size of the detector in the observation being
 *    reduced and in the specified observation.
       CALL DSA_GET_FITS_I( OBSREF, 'DCOLUMNS', 0, DET_NCOLUMNS,
      :  COMMENT, DSA_STATUS )
@@ -350,7 +350,7 @@
      :     COMMENT, DSA_STATUS )
          CALL CHR_RMBLK( INSTRUMENT )
          CALL CHR_UCASE( INSTRUMENT )
-         CALL DSA_GET_FITS_C( 'SPEC_OBS', 'INSTRUME', 0, 
+         CALL DSA_GET_FITS_C( 'SPEC_OBS', 'INSTRUME', 0,
      :     SPEC_INSTRUMENT, COMMENT, DSA_STATUS )
          CALL CHR_RMBLK( INSTRUMENT )
          CALL CHR_UCASE( INSTRUMENT )
@@ -373,20 +373,20 @@
             CALL DSA_GET_FITS_C( OBSREF, 'GRATING', 0, GRATING_NAME,
      :        COMMENT, DSA_STATUS )
             CALL CHR_UCASE( GRATING_NAME )
-            CALL DSA_GET_FITS_C( 'SPEC_OBS', 'GRATING', 0, 
+            CALL DSA_GET_FITS_C( 'SPEC_OBS', 'GRATING', 0,
      :        O_GRATING_NAME, COMMENT, DSA_STATUS )
             CALL CHR_UCASE( O_GRATING_NAME )
 
 *         Grating angle
             CALL DSA_GET_FITS_F( OBSREF, 'GANGLE', 0, GRATING_ANGLE,
      :        COMMENT, DSA_STATUS )
-            CALL DSA_GET_FITS_F( 'SPEC_OBS', 'GANGLE', 0, 
+            CALL DSA_GET_FITS_F( 'SPEC_OBS', 'GANGLE', 0,
      :        O_GRATING_ANGLE, COMMENT, DSA_STATUS )
 
 *         Grating order
             CALL DSA_GET_FITS_I( OBSREF, 'GORDER', 0, GRATING_ORDER,
      :        COMMENT, DSA_STATUS )
-            CALL DSA_GET_FITS_I( 'SPEC_OBS', 'GORDER', 0, 
+            CALL DSA_GET_FITS_I( 'SPEC_OBS', 'GORDER', 0,
      :        O_GRATING_ORDER, COMMENT, DSA_STATUS )
 
 *         Grating wavelength
@@ -485,7 +485,7 @@
      :     COMMENT, DSA_STATUS )
       ENDIF
 
-*   If the type required is a STANDARD, then the mean air mass may also be 
+*   If the type required is a STANDARD, then the mean air mass may also be
 *   checked. Assume the mean air mass is mid way between the air mass at
 *   the start and at the end.
       IF ( TYPE_REQUIRED .EQ. 'STANDARD' ) THEN
@@ -549,12 +549,12 @@
          END IF
 
 *      Check the on-chip exposure time.
-         IF ( ABS( O_EXPOSURE - EXPOSURE ) .GE. TOLER ) THEN 
+         IF ( ABS( O_EXPOSURE - EXPOSURE ) .GE. TOLER ) THEN
 
             CALL MSG_SETC( 'OBS_NAME', OBS_NAME )
             CALL MSG_OUT( ' ', '***WARNING: Specified DARK '/
      :        /'^OBS_NAME has a different exposure time.',
-     :        STATUS ) 
+     :        STATUS )
          END IF
 
 *      Check the observing mode (integration type).
@@ -603,7 +603,7 @@
 
                FLAT_OK = .FALSE.
                CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
-               DIFFERENCES = DIFFERENCES(1:CLEN) // 'GRATING ' 
+               DIFFERENCES = DIFFERENCES(1:CLEN) // 'GRATING '
             END IF
          END IF
 
@@ -691,7 +691,7 @@
          IF ( INDEX(OBS_MATCH, 'FILTERS') .NE. 0 ) THEN
 
             IF ( O_FILTERS .NE. FILTERS ) THEN
-   
+
                FLAT_OK = .FALSE.
                CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                DIFFERENCES = DIFFERENCES(1:CLEN+1) // 'FILTERS '
@@ -715,17 +715,17 @@
          IF ( .NOT. FLAT_OK ) THEN
 
             CALL MSG_SETC( 'OBS_NAME', OBS_NAME )
-            CALL MSG_OUT( ' ', '***WARNING: Specified FLAT '/ 
-     :        /'^OBS_NAME differs by these settings:', STATUS ) 
+            CALL MSG_OUT( ' ', '***WARNING: Specified FLAT '/
+     :        /'^OBS_NAME differs by these settings:', STATUS )
 
             CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
-            CALL MSG_SETC( 'DIFFERENCES', DIFFERENCES(1:72) ) 
-            CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS ) 
+            CALL MSG_SETC( 'DIFFERENCES', DIFFERENCES(1:72) )
+            CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS )
 
             IF ( CLEN .GT. 72 ) THEN
 
                CALL MSG_SETC( 'DIFFERENCES2', DIFFERENCES(73:) )
-               CALL MSG_OUT( ' ', ' - ^DIFFERENCES2', STATUS ) 
+               CALL MSG_OUT( ' ', ' - ^DIFFERENCES2', STATUS )
             END IF
          END IF
       ELSE IF (TYPE_REQUIRED .EQ. 'CALIBRATION' ) THEN
@@ -743,13 +743,13 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'OBS_NAME', OBS_NAME )
             CALL ERR_REP( ' ', 'RED4_CHECK_OBSERVATION: '/
-     :        /'Specified CALIBRATION observation '/ 
+     :        /'Specified CALIBRATION observation '/
      :        /'^OBS_NAME has a different number of detector '/
      :        /'columns', STATUS )
             GOTO 700
          END IF
 
-*      Now check the CALIBRATION has the same oversampling 
+*      Now check the CALIBRATION has the same oversampling
 *      parameters. This check is also compulsory.
          IF ( (O_DET_ENC_BASE .NE. DET_ENC_BASE) .OR.
      :        (O_DET_NINCR .NE. DET_NINCR) ) THEN
@@ -757,8 +757,8 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'OBS_NAME', OBS_NAME )
             CALL ERR_REP( ' ', 'RED4_CHECK_OBSERVATION: '/
-     :        /'Specified CALIBRATION observation '/ 
-     :        /'^OBS_NAME has different oversampling parameters', 
+     :        /'Specified CALIBRATION observation '/
+     :        /'^OBS_NAME has different oversampling parameters',
      :        STATUS )
             GOTO 700
          END IF
@@ -776,7 +776,7 @@
 
                CALIB_OK = .FALSE.
                CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
-               DIFFERENCES = DIFFERENCES(1:CLEN) // 'GRATING ' 
+               DIFFERENCES = DIFFERENCES(1:CLEN) // 'GRATING '
             END IF
          END IF
 
@@ -864,7 +864,7 @@
          IF ( INDEX(OBS_MATCH, 'FILTERS') .NE. 0 ) THEN
 
             IF ( O_FILTERS .NE. FILTERS ) THEN
-   
+
                CALIB_OK = .FALSE.
                CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                DIFFERENCES = DIFFERENCES(1:CLEN+1) // 'FILTERS '
@@ -888,17 +888,17 @@
          IF ( .NOT. CALIB_OK ) THEN
 
             CALL MSG_SETC( 'OBS_NAME', OBS_NAME )
-            CALL MSG_OUT( ' ', '***WARNING: Specified CALIBRATION '/ 
+            CALL MSG_OUT( ' ', '***WARNING: Specified CALIBRATION '/
      :        /'^OBS_NAME differs by these settings:', STATUS )
 
             CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
-            CALL MSG_SETC( 'DIFFERENCES', DIFFERENCES(1:72) ) 
-            CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS ) 
+            CALL MSG_SETC( 'DIFFERENCES', DIFFERENCES(1:72) )
+            CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS )
 
             IF ( CLEN .GT. 72 ) THEN
 
                CALL MSG_SETC( 'DIFFERENCES2', DIFFERENCES(73:) )
-               CALL MSG_OUT( ' ', ' - ^DIFFERENCES2', STATUS ) 
+               CALL MSG_OUT( ' ', ' - ^DIFFERENCES2', STATUS )
             END IF
          END IF
       ELSE IF (TYPE_REQUIRED .EQ. 'STANDARD' ) THEN
@@ -922,7 +922,7 @@
             GOTO 700
          END IF
 
-*      Now check the STANDARD has the same oversampling 
+*      Now check the STANDARD has the same oversampling
 *      parameters. This check is also compulsory.
          IF ( (O_DET_ENC_BASE .NE. DET_ENC_BASE) .OR.
      :        (O_DET_NINCR .NE. DET_NINCR) ) THEN
@@ -930,8 +930,8 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'OBS_NAME', OBS_NAME )
             CALL ERR_REP( ' ', 'RED4_CHECK_OBSERVATION: '/
-     :        /'Specified STANDARD group '/ 
-     :        /'^OBS_NAME has different oversampling parameters', 
+     :        /'Specified STANDARD group '/
+     :        /'^OBS_NAME has different oversampling parameters',
      :        STATUS )
             GOTO 700
          END IF
@@ -949,7 +949,7 @@
 
                STANDARD_OK = .FALSE.
                CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
-               DIFFERENCES = DIFFERENCES(1:CLEN) // 'GRATING ' 
+               DIFFERENCES = DIFFERENCES(1:CLEN) // 'GRATING '
             END IF
          END IF
 
@@ -1037,7 +1037,7 @@
          IF ( INDEX(OBS_MATCH, 'FILTERS') .NE. 0 ) THEN
 
             IF ( O_FILTERS .NE. FILTERS ) THEN
-   
+
                STANDARD_OK = .FALSE.
                CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                DIFFERENCES = DIFFERENCES(1:CLEN+1) // 'FILTERS '
@@ -1063,7 +1063,7 @@
 *         this level.
             IF ( AIRMASS .GT. AMTHRESH ) THEN
 
-               AMDIFF = 100.0 * ABS( O_AIRMASS - AIRMASS ) 
+               AMDIFF = 100.0 * ABS( O_AIRMASS - AIRMASS )
      :                     / AIRMASS
 
                IF ( AMDIFF .GT. AMTOLER ) THEN
@@ -1076,7 +1076,7 @@
 
                AMDIFF = ABS( O_AIRMASS - AIRMASS )
 
-               IF ( AMDIFF .GT. (AMTOLER*AMTHRESH/100.0) ) THEN 
+               IF ( AMDIFF .GT. (AMTOLER*AMTHRESH/100.0) ) THEN
 
                   STANDARD_OK = .FALSE.
                   CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
@@ -1091,18 +1091,18 @@
          IF ( .NOT. STANDARD_OK ) THEN
 
             CALL MSG_SETC( 'OBS_NAME', OBS_NAME )
-            CALL MSG_OUT( ' ', '***WARNING: Specified STANDARD '/ 
+            CALL MSG_OUT( ' ', '***WARNING: Specified STANDARD '/
      :        /'^OBS_NAME differs by these settings:',
      :        STATUS )
 
             CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
-            CALL MSG_SETC( 'DIFFERENCES', DIFFERENCES(1:72) ) 
-            CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS ) 
+            CALL MSG_SETC( 'DIFFERENCES', DIFFERENCES(1:72) )
+            CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS )
 
             IF ( CLEN .GT. 72 ) THEN
 
                CALL MSG_SETC( 'DIFFERENCES2', DIFFERENCES(73:) )
-               CALL MSG_OUT( ' ', ' - ^DIFFERENCES2', STATUS ) 
+               CALL MSG_OUT( ' ', ' - ^DIFFERENCES2', STATUS )
             END IF
          END IF
       END IF
@@ -1119,5 +1119,5 @@
          CALL ERR_REP( ' ', 'RED4_CHECK_OBSERVATION: '/
      :     /'Error closing DSA', STATUS )
       END IF
-     
+
       END

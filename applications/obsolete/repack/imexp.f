@@ -3,7 +3,7 @@
       IMPLICIT 	NONE
       INCLUDE	'CONSTANTS.INC'
       INCLUDE	'EXPOS_DEF.INC'
- 
+
 * Input
       RECORD	/EXPOS_DEF/ EXP
       logical	ecor
@@ -13,10 +13,10 @@
       REAL	IMAG(360,181)
       REAL      VAR(NX,NY)
       INTEGER   QUAL(NX,NY)
- 
+
 * output
       INTEGER	STATUS
- 
+
 * Local
       integer	        rdim1, rdim2
 	parameter (rdim1=360, rdim2=180)
@@ -39,17 +39,17 @@
       real		arru(rdim1, rdim2)	! RGW sky maps - uncorr
       real		arrc(rdim1, rdim2)	! RGW sky maps - eff. corr
       real 	        u_corr, corr
- 
+
 * M. Denby OCT 91
 * P. McGale OCT 94 - UNIX mods and add in QUAL and VAR values.
 * P McGale May 95  - option to correct for detector efficiency
 *-
- 
+
       IF (STATUS .NE. 0) RETURN
 *
       DXAZ = 2.*EXP.DAZ/NX
       DXEL = 2.*EXP.DEL/NY
- 
+
       CEL(1) = EXP.FRA
       CEL(2) = EXP.FDEC
       CALL AX_DMAT (CEL,EXP.ROLL,C2I,I2C)
@@ -75,17 +75,17 @@
 * Point to correct FITS extension and read in exposure image.
         if (filt .eq. 1) then
           call ftmahd(lun2, 2, hdutyp, status)	  ! S1a with no det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   arru, anyf, status)
           call ftmahd(lun2, 4, hdutyp, status)	  ! S1a with det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   arrc, anyf, status)
         else
           call ftmahd(lun2, 3, hdutyp, status)	  ! S2a with no det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   arru, anyf, status)
           call ftmahd(lun2, 5, hdutyp, status)	  ! S2a with det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   arrc, anyf, status)
 	endif
 
@@ -94,7 +94,7 @@
         ENDIF
 
       endif
- 
+
 *   Loop over the data
       DO IY = 1,NY
 	XEL = ((REAL(IY)-0.5)*DXEL - EXP.DEL)
@@ -126,7 +126,7 @@
 	  ENDIF
         ENDDO
       ENDDO
- 
+
       if (ecor) call ftclos(lun2, status)
 
       END

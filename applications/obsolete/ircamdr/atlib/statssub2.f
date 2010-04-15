@@ -1,4 +1,4 @@
-	SUBROUTINE STATSSUB2( ARRAY, DIMSX, DIMSY, XSTART, YSTART, XSIZE, 
+	SUBROUTINE STATSSUB2( ARRAY, DIMSX, DIMSY, XSTART, YSTART, XSIZE,
      :	                      YSIZE, MEDIAN, MODE)
 
 * Description : Calculates the median and mode of pixels in sub-array of image
@@ -20,7 +20,7 @@
      :	  STATUS,                      ! adam status
      :	  MAXDATA                      ! Maximum data pixels for sorting
 
-	PARAMETER ( MAXDATA = 100000)  ! Max data pixel 
+	PARAMETER ( MAXDATA = 100000)  ! Max data pixel
 
 	REAL*8
      :	  ACTDATA( MAXDATA)            ! Data for sorting
@@ -95,7 +95,7 @@
 
 *      call subroutine to find median for the input ACTDATA
 
-	CALL MED3D_CALMEDSUB( L, ACTDATA, VALMAX, VALMIN, SUM, MEAN, 
+	CALL MED3D_CALMEDSUB( L, ACTDATA, VALMAX, VALMIN, SUM, MEAN,
      :	                      MEDIAN, MODE)
 
 	END

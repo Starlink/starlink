@@ -13,7 +13,7 @@
 
 # define MAX_DEV          8        /* max no. of open displays on WS  */
 # define MAX_CONFIG       8        /* max no. of configurations       */
-                                   /* (static + dynamic)              */ 
+                                   /* (static + dynamic)              */
 # define MAX_MEM          8        /* max no. of memories for each    */
                                    /* configuration                   */
 # define MAX_LUT          8        /* max no. of luts for display     */
@@ -48,7 +48,7 @@
 # define II_ITT              2
 # define II_LUT              3
 # define II_ROI              4
-# define II_MEMORY           5        
+# define II_MEMORY           5
 # define II_DISPLAY          6
 # define II_COLOR            7
 
@@ -66,7 +66,7 @@
 # define II_BUTT             2
 
 # define II_CROSSHAIR        1        /* cursor shape                */
-# define II_CROSS            2   
+# define II_CROSS            2
 
 # define II_SOLID            1        /* line style                  */
 # define II_DASHED           2
@@ -79,7 +79,7 @@
 
 # define II_IMAGE            1        /* memory type                 */
 # define II_TEXT             2
-# define II_GRAPHIC          4        
+# define II_GRAPHIC          4
 
 # define II_DEFAULT          0        /* Write Mode                  */
 # define II_XOR              1

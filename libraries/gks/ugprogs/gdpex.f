@@ -1,6 +1,6 @@
       PROGRAM GDPEX
 *                      GKS Example Program 2.12
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GHATCH
@@ -10,22 +10,22 @@
       REAL XA(3), YA(3), THETAD(3)
       DATA XC, YC, RADIUS/0.5, 0.5, 0.375/
       DATA THETAD/150.0, 115.0, 95.0/
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Calculate PI
       PI = 4.0 * ATAN (1.0)
 *                      Set Representations for 3 sectors of pie chart
@@ -54,7 +54,7 @@
          XA(1) = XA(3)
          YA(1) = YA(3)
    20 CONTINUE
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing

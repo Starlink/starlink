@@ -10,11 +10,11 @@
 *           Global ADAM status.
 *    Method :
 *    Deficiencies :
-*     The output data label is modified by adding "/STANDARD" to be 
+*     The output data label is modified by adding "/STANDARD" to be
 *     consistent with the rest of the software. Unfortunately, in some
 *     circumstances this label may end up being truncated, as only 32
 *     characters are available. It might be more sensible simply to
-*     replace the label with "Relative flux" and the units with 
+*     replace the label with "Relative flux" and the units with
 *     "arbitrary units".
 *    Bugs :
 *    Authors :
@@ -45,7 +45,7 @@
 *                  observations can be specified explicitly when
 *                  required (DRIMP/5.1 and 5.2).                  (SMB)
 *     24-Jun-1992: Allow RO files to be divided by std (but they
-*                  are still referred to by DSA as GRPFILE in 
+*                  are still referred to by DSA as GRPFILE in
 *                  this code - an unfortunate misnomer)           (PND)
 *     18-Feb-1993: Conform to error strategy                      (PND)
 *     30-Jun-1993: Remove output spec                             (PND)
@@ -116,7 +116,7 @@
 
       CALL MSG_SETC( 'GROUP', GROUP )
       CALL MSG_SETC( 'OUTPUT', OUTPUT )
-      CALL MSG_OUT( ' ', 
+      CALL MSG_OUT( ' ',
      :  'Dividing ^GROUP by a standard to create ^OUTPUT', STATUS )
 
 *   Check this has worked.
@@ -126,7 +126,7 @@
 *      quality array will be used to store bad pixel information.
 *      The group files are assumed to reside in the RGDIR: directory.
          CALL DSA_OPEN( STATUS )
-         CALL DSA_NAMED_INPUT( 'GRPFILE', GROUP, STATUS ) 
+         CALL DSA_NAMED_INPUT( 'GRPFILE', GROUP, STATUS )
          CALL DSA_USE_QUALITY( 'GRPFILE', STATUS )
 
 *      Obtain the number of bytes in an array element of type 'FLOAT'
@@ -156,7 +156,7 @@
      :           'GRPFILE', 0, 0, STATUS )
                CALL DSA_USE_QUALITY( 'OUTFILE', STATUS )
 
-*            Obtain the size of the data array in the input group (which 
+*            Obtain the size of the data array in the input group (which
 *            will also be the same size as the one in the output group).
                CALL DSA_DATA_SIZE( 'GRPFILE', RMAXDIM, NDIM, DIMS,
      :           NELM, STATUS )
@@ -206,8 +206,8 @@
                      CALL MSG_OUT( ' ', 'Using the reduced '/
      :                 /'STANDARD in ^STANDARD', STATUS )
 
-*                  The STANDARD will have already been mapped, and the 
-*                  pointers stored in the RED4 common block. Using these 
+*                  The STANDARD will have already been mapped, and the
+*                  pointers stored in the RED4 common block. Using these
 *                  pointers, together with the ones obtained above, divide
 *                  the input group by the standard and write the result to
 *                  the output group, propagating veriance and quality.

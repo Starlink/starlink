@@ -21,7 +21,7 @@
 *     DETNUM( MAXDET )  = INTEGER (Given)
 *        Detector number for given detector index
 *     IDET = INTEGER (Given)
-*        Detector index for the current detector 
+*        Detector index for the current detector
 *     LOGFID = INTEGER (Returned)
 *        When logging is required, it gives the ID of the logfile.
 *     LOGREQ = LOGICAL (Returned)
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

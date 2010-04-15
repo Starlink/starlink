@@ -8,7 +8,7 @@
 C-----------------------------------------------------------------------------
 C
       SUBROUTINE ASK_PLOT_DEVICE (IOLD, INEW, TERM)
-C      
+C
 C subroutine to prompt user for a new plot device.
 C
 C Arguments:
@@ -48,19 +48,19 @@ C "native" MONGO version.
       IF (IOLD.GE.0 .AND. IOLD.LE.23) THEN
 
 C prompt for new device, given old device
-      
+
         CALL GEN_GETSTR('Terminal / Hardcopy / Null (T/H/N)',
      &                   IANS, 'A1', IANS, JDEF)
-     
+
       ELSE
-     
+
 C ask for new device with no prompt
 
         CALL GEN_GETSTR('Terminal / Hardcopy / Null (T/H/N)',
      &                  ' ', ' ', IANS, JDEF)
-                                 
+
       END IF
-      
+
 C generate new plot device from answer
 
       CALL UUCASE  (IANS)

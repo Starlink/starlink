@@ -29,7 +29,7 @@ C
 C     (>) REF_NAME      (Fixed string,descr) The reference name used for
 C                       the data structure in question.
 C     (>) AXIS          (Integer,ref) The number of the axis in question.
-C     (>) CONTROL       (Fixed string,descr)  A string controlling 
+C     (>) CONTROL       (Fixed string,descr)  A string controlling
 C                       some of the routines options.  Lower case
 C                       characters are ignored.  If CONTROL contains a
 C                       'U' (for 'Unconstrained'), this indicates that
@@ -45,14 +45,14 @@ C                       values will be taken.
 C     (<) START         (Real,ref) The data value of the start of the
 C                       range selected.
 C     (<) END           (Real,ref) The data value of the end of the
-C                       range selected.  
+C                       range selected.
 C     (<) ISTART        (Integer,ref) The lower of the two pixel numbers
-C                       corresponding to START and END.  
+C                       corresponding to START and END.
 C     (<) IEND          (Integer,ref) The higher of the two pixel numbers
-C                       corresponding to START and END. If CONTROL indicates 
-C                       'unconstrained', then START and/or END may be outside 
-C                       the range of axis values.  In this case ISTART/IEND 
-C                       will be returned as 1 or N (= number of elements in 
+C                       corresponding to START and END. If CONTROL indicates
+C                       'unconstrained', then START and/or END may be outside
+C                       the range of axis values.  In this case ISTART/IEND
+C                       will be returned as 1 or N (= number of elements in
 C                       data).  That is, ISTART and IEND always refer to
 C                       valid elements of the data.
 C     (!) STATUS        (Integer,ref) Status code.  If bad status is passed,
@@ -64,7 +64,7 @@ C     DSA_UNMAP, PAR_RDVAL, PAR_SDVAL, GEN_BSEARCH, GEN_RANGEF, GEN_ELEMF
 C     ICH_LEN, DSA_GET_ACTUAL_NAME, DSA_WRUSER, DYN_ELEMENT, PAR_ABORT
 C
 C  Prior requirements:
-C     DSA_OPEN must have been called to initialise the system, and 
+C     DSA_OPEN must have been called to initialise the system, and
 C     the data structure must have been opened, eg by DSA_INPUT.
 C
 C  Support: Keith Shortridge, AAO
@@ -76,7 +76,7 @@ C     ICH_LEN            Position of last non-blank char in string
 C     DSA_GET_AXIS_INFO  Get units etc from axis structure
 C     DSA_SEEK_AXIS      See if axis data array exists
 C     DSA_AXIS_SIZE      Get axis array dimensions
-C     DSA_MAP_AXIS_DATA  Map axis data array 
+C     DSA_MAP_AXIS_DATA  Map axis data array
 C     DSA_UNMAP          Unmap data array mapped by DSA_ routine
 C     PAR_ABORT          Test parameter system abort flag
 C     PAR_RDVAL          Get numberic value from parameter system
@@ -94,13 +94,13 @@ C     5th Sept 1988   PAR_ABORT calls added to support user requested
 C                     aborts.  KS/AAO.
 C     2nd Jan  1990   Revised to improve operation when axis values decrease.
 C                     KS/AAO.
-C     18th Dec 1990   Added a check to make sure ISTART, IEND are within 
+C     18th Dec 1990   Added a check to make sure ISTART, IEND are within
 C                     allowed limits when data array doesn't exist. JMS/AAO.
 C     21st Aug 1992   Automatic portability modifications
 C                     ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
 C     5th  Oct 1992   TABs removed. HME / UoE, Starlink.
-C     2005 June 3     Replace DYNAMIC_MEMORY with 
+C     2005 June 3     Replace DYNAMIC_MEMORY with
 C                     %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
 C                     addressing.  MJC / Starlink
 C+
@@ -143,7 +143,7 @@ C
       REAL      FIRST            ! First value in data array
       INTEGER   IGNORE           ! Dummy status return from PAR_
                                  ! routines
-      INTEGER   ITEMP            ! Used to swop ISTART,IEND 
+      INTEGER   ITEMP            ! Used to swop ISTART,IEND
       REAL      LAST             ! Last value in data array
       LOGICAL   LIMITED          ! Indicates values constrained to axis
                                  ! values
@@ -221,12 +221,12 @@ C
          IF (STATUS.NE.0) GO TO 500                       ! Error exit
 C
 C        Having mapped it, get the maximum and minimum values in it.
-C        Rather than look at each element, we assume that the data 
+C        Rather than look at each element, we assume that the data
 C        extreme values will be at the ends of the data array.  If
 C        the array is multi-dimensional, and the application will
 C        accept that, we take the maximum and minimum over the
 C        whole array.
-C        
+C
          NELM=DIMS(1)
          FIRST=GEN_ELEMF(%VAL(CNF_PVAL(ADDRESS)),1)
          LAST=GEN_ELEMF(%VAL(CNF_PVAL(ADDRESS)),NELM)
@@ -242,7 +242,7 @@ C
 C
 C        If the data doesn't exist, then treat it as the numbers 1..N
 C        (DSA_MAP_AXIS would do that for us, but we don't want to use
-C        that feature if we can avoid its overhead.)  
+C        that feature if we can avoid its overhead.)
 C
          VMIN=1.0
          VMAX=ELEMENTS
@@ -292,7 +292,7 @@ C
          GO TO 500
       END IF
 C
-C     Get the values in terms of element numbers.  Note that this is 
+C     Get the values in terms of element numbers.  Note that this is
 C     done only in terms of the first 1d array of the axis data.
 C
       IF (EXIST) THEN
@@ -313,7 +313,7 @@ C       data values (ie value 1.0 is in pixel 1).  We make sure the pixel
 C       numbers returned are within the actual array range.  VMIN and VMAX
 C       will be 1 and N respectively.
 C
-         IF (START.LT.VMIN) THEN 
+         IF (START.LT.VMIN) THEN
            ISTART=1
          ELSE IF (START.GT.VMAX) THEN
            ISTART=ELEMENTS

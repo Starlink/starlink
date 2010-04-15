@@ -58,7 +58,7 @@ c
          call stopit( status, 'error 8' )
       endif
 
-      if( ast_getc( tf, 'Label', status ) .ne. 
+      if( ast_getc( tf, 'Label', status ) .ne.
      :                              'Modified Julian Date' ) then
          write(*,*)  ast_getc( tf, 'Label', status )
          call stopit( status, 'error 9' )
@@ -69,7 +69,7 @@ c
          call stopit( status, 'error 10' )
       endif
 
-      if( ast_getc( tf, 'Title', status ) .ne. 
+      if( ast_getc( tf, 'Title', status ) .ne.
      :                              'Modified Julian Date' ) then
          write(*,*)  ast_getc( tf, 'Title', status )
          call stopit( status, 'error 11' )
@@ -135,7 +135,7 @@ c
          call stopit( status, 'error 8b' )
       endif
 
-      if( ast_getc( tf, 'Label', status ) .ne. 
+      if( ast_getc( tf, 'Label', status ) .ne.
      :                              'Julian Date' ) then
          write(*,*)  ast_getc( tf, 'Label', status )
          call stopit( status, 'error 9b' )
@@ -146,7 +146,7 @@ c
          call stopit( status, 'error 10b' )
       endif
 
-      if( ast_getc( tf, 'Title', status ) .ne. 
+      if( ast_getc( tf, 'Title', status ) .ne.
      :                              'Julian Date' ) then
          write(*,*)  ast_getc( tf, 'Title', status )
          call stopit( status, 'error 11b' )
@@ -211,7 +211,7 @@ c
          call stopit( status, 'error 8c' )
       endif
 
-      if( ast_getc( tf, 'Label', status ) .ne. 
+      if( ast_getc( tf, 'Label', status ) .ne.
      :                              'Julian Epoch' ) then
          write(*,*)  ast_getc( tf, 'Label', status )
          call stopit( status, 'error 9c' )
@@ -222,7 +222,7 @@ c
          call stopit( status, 'error 10c' )
       endif
 
-      if( ast_getc( tf, 'Title', status ) .ne. 
+      if( ast_getc( tf, 'Title', status ) .ne.
      :                              'Julian Epoch' ) then
          write(*,*)  ast_getc( tf, 'Title', status )
          call stopit( status, 'error 11c' )
@@ -286,7 +286,7 @@ c
          call stopit( status, 'error 8d' )
       endif
 
-      if( ast_getc( tf, 'Label', status ) .ne. 
+      if( ast_getc( tf, 'Label', status ) .ne.
      :                              'Besselian Epoch' ) then
          write(*,*)  ast_getc( tf, 'Label', status )
          call stopit( status, 'error 9d' )
@@ -297,7 +297,7 @@ c
          call stopit( status, 'error 10d' )
       endif
 
-      if( ast_getc( tf, 'Title', status ) .ne. 
+      if( ast_getc( tf, 'Title', status ) .ne.
      :                              'Besselian Epoch' ) then
          write(*,*)  ast_getc( tf, 'Title', status )
          call stopit( status, 'error 11d' )
@@ -328,7 +328,7 @@ c Test CurrentTime method.
 c
       call ast_set( tf, 'system=jepoch,unit=yr,timescale=utc,'//
      :              'timeorigin=0', status )
-      n = 0 
+      n = 0
 
       write(*,*) '   Testing astCurrentTime: approx 1 second pause '//
      :           'following...'
@@ -352,7 +352,7 @@ c
       write(*,*) '   Testing TimeOrigin: approx 1 second pause '//
      :           'following...'
       n = 0
-      do while( ast_currenttime( tf, status ) .lt. 
+      do while( ast_currenttime( tf, status ) .lt.
      :          1.0D0/(86400.0D0*364.25D0) )
          n = n + 1
          if( n .gt. 2000000 ) then
@@ -363,10 +363,10 @@ c
       write(*,*) '   1 second pause finished.'
 
       call ast_set( tf, 'unit=s', status )
-      if( abs( ast_getd( tf, 'TimeOrigin', status ) - 
+      if( abs( ast_getd( tf, 'TimeOrigin', status ) -
      :         origin*86400.0D0 ) .gt. 0.01 ) then
-         write(*,*) abs( ast_getd( tf, 'TimeOrigin', status ) - 
-     :                   origin*86400.0D0 ) 
+         write(*,*) abs( ast_getd( tf, 'TimeOrigin', status ) -
+     :                   origin*86400.0D0 )
          call stopit( status, 'error 17' )
       end if
 
@@ -387,13 +387,13 @@ c
 
 
 
-      tf1 = ast_timeframe( 'system=mjd,timescale=UTC,timeorigin=53000', 
+      tf1 = ast_timeframe( 'system=mjd,timescale=UTC,timeorigin=53000',
      :                     status )
       tf2 = ast_timeframe( 'system=bepoch,timeorigin=2004', status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 20' )
-      else 
+      else
          xin = 100.0D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( abs( xout - 0.2600974092354136D0 ) .gt. 1.0D-10 ) then
@@ -407,19 +407,19 @@ c
 
 
       tf1 = ast_timeframe( 'system=bepoch,timeorigin=0', status )
-      if( status .eq.sai__OK ) then 
+      if( status .eq.sai__OK ) then
          call err_mark
          call ast_set( tf1, 'TimeScale=TAI', status )
          if( status .eq. AST__ATTIN ) then
             call err_annul( status )
-         else 
+         else
             call stopit( status, 'error 21b' );
          endif
 
          call ast_set( tf1, 'Unit=s', status )
          if( status .eq. AST__ATTIN ) then
             call err_annul( status )
-         else 
+         else
             call stopit( status, 'error 21c' );
          endif
          call err_rlse
@@ -431,7 +431,7 @@ c
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 22' )
-      else 
+      else
          xin = 100.0D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( abs( xout - 14.35534169996282 ) .gt. 1.0D-6 ) then
@@ -453,7 +453,7 @@ c Julian date offset from 2450000.5 days [TDB, h]
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 24' )
-      else 
+      else
          xin = 0.1
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( abs( xout - 37933.38284478387D0) .gt. 1.0D-5 ) then
@@ -471,7 +471,7 @@ c Test Formatting and unformatting
 c
       tf1 = ast_timeframe( 'system=jepoch,timeorigin=2005.0', status )
 
-      txt = ast_format( tf1, 1, 100.0D0, status ) 
+      txt = ast_format( tf1, 1, 100.0D0, status )
       if( txt .ne. '100' ) then
          write(*,*) ast_format( tf1, 1, 100.0D0, status )
          call stopit( status, 'error 26' )
@@ -485,7 +485,7 @@ c
 
 
       call ast_set( tf1, 'format=iso', status )
-      txt = ast_format( tf1, 1, 1.0D0, status ) 
+      txt = ast_format( tf1, 1, 1.0D0, status )
       if( txt .ne. '2006-01-01' ) then
          write(*,*) ast_format( tf1, 1, 1.0D0, status )
          call stopit( status, 'error 27' )
@@ -522,7 +522,7 @@ c
       end if
 
       nc = ast_unformat( tf1, 1, txt, xout, status )
-      if( nc .ne. len( txt ) .or. 
+      if( nc .ne. len( txt ) .or.
      :    abs( xout - 10.0D0 ) .gt. 1.0E-3 ) then
          write(*,*) nc, xout
          call stopit( status, 'error 29b' )
@@ -537,7 +537,7 @@ c
       end if
 
       nc = ast_unformat( tf1, 1, txt, xout, status )
-      if( nc .ne. len( txt ) .or. 
+      if( nc .ne. len( txt ) .or.
      :    abs( xout - 10.12D0 ) .gt. 1.0E-3 ) then
          write(*,*) nc, xout
          call stopit( status, 'error 30b' )
@@ -545,7 +545,7 @@ c
 
 
       call ast_set( tf1, 'timescale=utc', status )
-      xin = ast_currenttime( tf1, status ) 
+      xin = ast_currenttime( tf1, status )
       txt = ast_format( tf1, 1, xin, status )
       write(*,*) '   Current system time (UTC): ',
      :           txt( : chr_len( txt ) )
@@ -568,7 +568,7 @@ c
          call stopit( status, 'error 32' )
       end if
 
-      nc = ast_unformat( tf1, 1, '2005-jun-1 12:30 lunch time', xout, 
+      nc = ast_unformat( tf1, 1, '2005-jun-1 12:30 lunch time', xout,
      :                   status )
       if( nc .ne. 17 .or. abs( xout - 0.415525896D0 ) .gt. 1.0E-7 ) then
          write(*,*) nc, xout
@@ -576,11 +576,11 @@ c
       end if
 
       call ast_set( tf1, 'timescale=utc', status )
-      nc = ast_unformat( tf1, 1, 'B2001.5 lunch time', xout, 
+      nc = ast_unformat( tf1, 1, 'B2001.5 lunch time', xout,
      :                   status )
-      if( nc .ne. 8 .or. 
+      if( nc .ne. 8 .or.
      :    abs( xout + 3.50131054408916D0 ) .gt. 1.0E-10 ) then
-         write(*,*) nc, xout, abs( xout + 3.50131054408916D0 ) 
+         write(*,*) nc, xout, abs( xout + 3.50131054408916D0 )
          call stopit( status, 'error 34' )
       end if
 
@@ -593,12 +593,12 @@ c
       nc = ast_unformat( tf1, 1, "1977-01-01 00:00:00", xin, status )
 
 
-      tf2 = ast_timeframe( 'system=mjd,timescale=tai,format=iso.6', 
+      tf2 = ast_timeframe( 'system=mjd,timescale=tai,format=iso.6',
      :                     status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 35' )
-      else 
+      else
          call ast_tran1( fs, 1, xin, .true., xout, status )
          txt = ast_format( tf2, 1, xout, status )
          if( txt .ne. '1977-01-01 00:00:00.000000' ) then
@@ -607,12 +607,12 @@ c
          end if
       end if
 
-      tf2 = ast_timeframe( 'system=mjd,timescale=utc,format=iso.6', 
+      tf2 = ast_timeframe( 'system=mjd,timescale=utc,format=iso.6',
      :                     status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 37' )
-      else 
+      else
          call ast_tran1( fs, 1, xin, .true., xout, status )
          txt = ast_format( tf2, 1, xout, status )
          if( txt .ne. '1976-12-31 23:59:45.000000' ) then
@@ -621,12 +621,12 @@ c
          end if
       end if
 
-      tf2 = ast_timeframe( 'system=mjd,timescale=tt,format=iso.6', 
+      tf2 = ast_timeframe( 'system=mjd,timescale=tt,format=iso.6',
      :                     status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 39' )
-      else 
+      else
          call ast_tran1( fs, 1, xin, .true., xout, status )
          txt = ast_format( tf2, 1, xout, status )
          if( txt .ne. '1977-01-01 00:00:32.184000' ) then
@@ -635,12 +635,12 @@ c
          end if
       end if
 
-      tf2 = ast_timeframe( 'system=mjd,timescale=tdb,format=iso.6', 
+      tf2 = ast_timeframe( 'system=mjd,timescale=tdb,format=iso.6',
      :                     status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 41' )
-      else 
+      else
          call ast_tran1( fs, 1, xin, .true., xout, status )
          txt = ast_format( tf2, 1, xout, status )
          if( txt .ne. '1977-01-01 00:00:32.183935' ) then
@@ -649,12 +649,12 @@ c
          end if
       end if
 
-      tf2 = ast_timeframe( 'system=mjd,timescale=tcb,format=iso.6', 
+      tf2 = ast_timeframe( 'system=mjd,timescale=tcb,format=iso.6',
      :                     status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 43' )
-      else 
+      else
          call ast_tran1( fs, 1, xin, .true., xout, status )
          txt = ast_format( tf2, 1, xout, status )
          if( txt .ne. '1977-01-01 00:00:32.184000' ) then
@@ -663,12 +663,12 @@ c
          end if
       end if
 
-      tf2 = ast_timeframe( 'system=mjd,timescale=tcg,format=iso.6', 
+      tf2 = ast_timeframe( 'system=mjd,timescale=tcg,format=iso.6',
      :                     status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 45' )
-      else 
+      else
          call ast_tran1( fs, 1, xin, .true., xout, status )
          txt = ast_format( tf2, 1, xout, status )
          if( txt .ne. '1977-01-01 00:00:32.184000' ) then
@@ -687,11 +687,11 @@ c
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 47' )
-      else 
+      else
          xin = 1.0D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( xout .ne. 1.25D0 ) then
-            write(*,*) xout 
+            write(*,*) xout
             call stopit( status, 'error 48' )
          end if
          call ast_tran1( fs, 1, xout, .false., xin, status )
@@ -704,16 +704,16 @@ c
 
 *  Test use of DUT1
       tf1 = ast_timeframe( 'system=mjd,timescale=tdb,dut1=0.1', status )
-      tf2 = ast_timeframe( 'system=mjd,timescale=last,dut1=0.1', 
+      tf2 = ast_timeframe( 'system=mjd,timescale=last,dut1=0.1',
      :                      status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 49' )
-      else 
+      else
          xin = 53991.675D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( abs(xout - 53998.6534462938D0) .gt. 1.0D-8 ) then
-            write(*,*) xout 
+            write(*,*) xout
             call stopit( status, 'error 50' )
          end if
          call ast_tran1( fs, 1, xout, .false., xin, status )
@@ -762,7 +762,7 @@ c      call ast_listissued( 'testtime' )
       external mysource, mysink
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -784,7 +784,7 @@ c      call ast_listissued( 'testtime' )
          write(*,*) text
          call stopit( status, 'Cannot read object from channel' )
       end if
-     
+
 
 
       if( ast_getd( obj, 'timeorigin', status ) .ne.
@@ -801,7 +801,7 @@ c      call ast_listissued( 'testtime' )
          call stopit( status, 'Object has changed' )
       end if
 
-      end  
+      end
 
       subroutine sink1( status )
       implicit none
@@ -820,7 +820,7 @@ c      call ast_listissued( 'testtime' )
       if( index( line( : l ),'Unc =' ) .GT. 0 ) then
          done = .true.
 
-      else if( .not. done .and. 
+      else if( .not. done .and.
      :         index( line( : l ),'FrameSet' ) .GT. 0 ) then
          fsfound= .true.
       end if
@@ -834,7 +834,7 @@ c      call ast_listissued( 'testtime' )
       integer status, next, end, ll
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -857,7 +857,7 @@ c      call ast_listissued( 'testtime' )
       character buf*25000
       character line*1000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -876,7 +876,7 @@ c      call ast_listissued( 'testtime' )
          write(*,*) buf( next : next + l)
          write(*,*) 'Line length ',l
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
       endif

@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,16 +88,16 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
@@ -112,12 +112,12 @@
 *        DCB_HRLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator for array of history records.
 *        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Write)
-*           The date/time to attach to the next history record to be 
-*           created, as a UTC Modified Julian Date. If negative, then 
+*           The date/time to attach to the next history record to be
+*           created, as a UTC Modified Julian Date. If negative, then
 *           the current time will be used.
 *        DCB_HTLEN( NDF__MXDCB ) = LOGICAL (Write)
 *           Current history record text length.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
@@ -263,14 +263,14 @@
 *  Quit looping if an error occurs.
                            IF ( STATUS .NE. SAI__OK ) GO TO 2
  1                      CONTINUE
- 2                      CONTINUE                       
+ 2                      CONTINUE
                      END IF
 
 *  Annul the cell locators.
                      CALL DAT_ANNUL( CELL1, STATUS )
                      CALL DAT_ANNUL( CELL2, STATUS )
  3                CONTINUE
- 4                CONTINUE                 
+ 4                CONTINUE
 
 *  If the current history record has been deleted, then reset the
 *  default history writing flag and current record text length to their
@@ -308,7 +308,7 @@
                      CALL DAT_ANNUL( CELL2, STATUS )
                      IF ( STATUS .NE. SAI__OK ) GO TO 6
  5                CONTINUE
- 6                CONTINUE                       
+ 6                CONTINUE
 
 *  Determine the size of the history record array.
                   CALL DAT_SIZE( DCB_HRLOC( IDCB ), MXREC, STATUS )
@@ -332,7 +332,7 @@
                            CALL DAT_ANNUL( CELL2, STATUS )
                            IF ( STATUS .NE. SAI__OK ) GO TO 8
  7                      CONTINUE
- 8                      CONTINUE                       
+ 8                      CONTINUE
 
 *  Truncate the array, leaving one extend size worth of free elements
 *  for future expansion.
@@ -345,7 +345,7 @@
             END IF
          END IF
       END IF
- 
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -353,6 +353,6 @@
      :   'NDF_HPURG: Error deleting records from an NDF history ' //
      :   'component.', STATUS )
          CALL NDF1_TRACE( 'NDF_HPURG', STATUS )
-      END IF      
+      END IF
 
       END

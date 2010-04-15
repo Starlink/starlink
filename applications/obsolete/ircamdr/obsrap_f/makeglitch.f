@@ -19,7 +19,7 @@
 *        Open output bad pixel list file
 *        Get bad pixels from image bad=1, good=0
 *        If no errors then
-*           Scan through input image 
+*           Scan through input image
 *        Endif
 *        Tidy up input structure
 *     Endif
@@ -27,7 +27,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -41,8 +41,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -60,7 +60,7 @@
      :  DIMS( NDIMS ),        ! dimensions of input DATA_ARRAYs
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
-     :  PNTRI                 !    "     " input      " 
+     :  PNTRI                 !    "     " input      "
 
 
       CHARACTER*80
@@ -84,14 +84,14 @@
      :                  PNTRI, NELEMENTS, STATUS )
          CALL NDF_DIM( LOCI, NDIMS, DIMS, ACTDIM, STATUS )
 
-*       check for error 
+*       check for error
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *         ask user for output bad pixel filename
 	   CALL PAR_GET0C( 'OUTFILE', OUTFILE, STATUS)
 
 *         pass everything to the work routine
-           CALL MAKEGLITCHSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+           CALL MAKEGLITCHSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :	                       OUTFILE, STATUS)
 
          END IF

@@ -231,7 +231,7 @@ itcl::class gaia::GaiaRampPrint {
       $image_ plotgrid "font(numlab)=$lfont_
                         size(numlab)=$lsize_
                         colour(border)=$bcolour_
-                        colour(numlab)=$lcolour_ 
+                        colour(numlab)=$lcolour_
                         grid=0 border=1 drawtitle=0 drawaxes=0
                         textlab=0 tickall=0 numlab(1)=1 numlab(2)=0
                         edge(1)=top labelup(1)=0 labelling=exterior

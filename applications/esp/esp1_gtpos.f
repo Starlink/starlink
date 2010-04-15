@@ -20,12 +20,12 @@
 *     position (on all axes) in the Base Frame of the supplied FrameSet.
 *
 *     The parameter is accessed as a single literal string containing a
-*     space or comma separated list of axis values. The allowed formats for 
-*     the axis values depends on the class of the Current Frame in the 
+*     space or comma separated list of axis values. The allowed formats for
+*     the axis values depends on the class of the Current Frame in the
 *     supplied FrameSet, and are described in SUN/210.
 *
 *     If the string supplied for the parameter consists of a single colon,
-*     then a description of the Current co-ordinate Frame is displayed, 
+*     then a description of the Current co-ordinate Frame is displayed,
 *     together with an indication of the format required for each axis
 *     value, and a new parameter value is then obtained.
 
@@ -56,7 +56,7 @@
 *     25-JUN-1999 (DSB):
 *        Increase the accuracy of the formatted default value so that
 *        it accurately represents the supplied default values. Normalize
-*        the supplied default position. 
+*        the supplied default position.
 *     30-AUG-1999 (DSB):
 *        If a null parameter is given use the dynamic default value.
 *     3-SEP-1999 (DSB):
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,11 +125,11 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get a pointer to the Frameset Current and Base Frames, and get the 
-*  number of axes in the Base Frame. Also get a simplified Mapping for 
+*  Get a pointer to the Frameset Current and Base Frames, and get the
+*  number of axes in the Base Frame. Also get a simplified Mapping for
 *  the FrameSet.
-      CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )         
-      BASFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )         
+      CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+      BASFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
       NBAXES = AST_GETI( BASFRM, 'NAXES', STATUS )
       CALL AST_ANNUL( BASFRM, STATUS )
 
@@ -139,7 +139,7 @@
 *  Get the number of axes in the Current Frame.
       NCAXES = AST_GETI( CURFRM, 'NAXES', STATUS )
 
-*  For ESP we cannot cope with more than two-dimensional co-ordinate 
+*  For ESP we cannot cope with more than two-dimensional co-ordinate
 *  systems.
       IF ( NBAXES .GT. 2 .OR. NCAXES .GT. 2 ) THEN
          STATUS = SAI__ERROR
@@ -179,7 +179,7 @@
          IAT = 7
          CALL CHR_PUTI( I, ATT, IAT )
          CALL CHR_APPND( ')', ATT, IAT )
-         CALL CHR_APPND( AST_GETC( CURFRM, ATT( : IAT ), STATUS ), FMT, 
+         CALL CHR_APPND( AST_GETC( CURFRM, ATT( : IAT ), STATUS ), FMT,
      :                   FIAT )
 
       END DO
@@ -187,10 +187,10 @@
 *  Note the Domain of the Current Frame for use in messages.
       DOM = AST_GETC( CURFRM, 'DOMAIN', STATUS )
 
-*  Loop until a valid position has been obtained from the user, or an 
+*  Loop until a valid position has been obtained from the user, or an
 *  error occurs.
       LOOP = .TRUE.
-      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )       
+      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, POS, STATUS )
@@ -205,7 +205,7 @@
             CALL ERR_REP( ' ', 'Blank value supplied for '//
      :                    'parameter %^PAR.', STATUS )
 
-*  Otherwise, if the supplied string is just a colon, display a description 
+*  Otherwise, if the supplied string is just a colon, display a description
 *  of the Current Frame, and the default format.
          ELSE IF( POS( F : L ) .EQ. ':' ) THEN
             CALL ESP1_DSFRM( CURFRM, 'A position is required in the '//
@@ -236,9 +236,9 @@
 *  Find the start of the next but one axis value (if there is more than 1 axis
 *  value remaining in the string).
                IEND = IPOS
-               CALL CHR_TOCHR( ' ', POS, .TRUE., IEND ) 
-               IF( IEND .LT. L ) CALL CHR_SKCHR( ' ', POS, .TRUE., 
-     :                                           IEND ) 
+               CALL CHR_TOCHR( ' ', POS, .TRUE., IEND )
+               IF( IEND .LT. L ) CALL CHR_SKCHR( ' ', POS, .TRUE.,
+     :                                           IEND )
 
 *  Set the index of the last character to be read by AST_UNFORMAT. This
 *  is done since AST_UNFORMAT may allow spaces within axis values, but
@@ -248,10 +248,10 @@
 *  Read the value for the next axis. NC is the number of characters
 *  read by AST_UNFORMAT including trailing spaces.
                I = I + 1
-               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), CC( I ), 
-     :                            STATUS ) 
+               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), CC( I ),
+     :                            STATUS )
 
-*  Get the last character read by AST_UNFORMAT. If there are no characters 
+*  Get the last character read by AST_UNFORMAT. If there are no characters
 *  left pretend the last character read was a space (i.e. an axis delimiter).
                IPOS = IPOS + NC - 1
                IF( IPOS .LT. L ) THEN
@@ -268,7 +268,7 @@
 *  If the supplied string was invalid, report an error. This is the
 *  case if no characters were read form the string, or if the next
 *  character is not a space.
-               IF( ( NC .EQ. 0 .OR. NEXT .NE. ' ' ) .AND. 
+               IF( ( NC .EQ. 0 .OR. NEXT .NE. ' ' ) .AND.
      :             STATUS .EQ. SAI__OK ) THEN
                   LOOP = .TRUE.
                   STATUS = SAI__ERROR
@@ -304,7 +304,7 @@
                   IF( LAB( I + 1 )( : 5 ) .NE. 'axis ' ) THEN
                      CALL ERR_REP( ' ', 'No ^LAB value '//
      :                             '(axis ^I) supplied using '//
-     :                             'parameter %^PAR - ''^POS''.', 
+     :                             'parameter %^PAR - ''^POS''.',
      :                             STATUS )
                   ELSE
                      CALL ERR_REP( ' ', 'No ^LAB value '//
@@ -345,7 +345,7 @@
 
 *  Transform the supplied position into the Base Frame.
             CALL AST_TRANN( MAP, 1, NCAXES, 1, CC, .FALSE., NBAXES,
-     :                      1, BC, STATUS ) 
+     :                      1, BC, STATUS )
 
 *  See if this gave a good Base Frame position.
             GOOD = .TRUE.
@@ -385,7 +385,7 @@
             CALL MSG_SETC( 'DOM', DOM )
             CALL MSG_SETC( 'PAR', PARAM )
             CALL MSG_OUT( ' ', 'Please supply a new ^DOM '//
-     :                    'Domain position for parameter %^PAR.', 
+     :                    'Domain position for parameter %^PAR.',
      :                    STATUS )
 
 *  Cancel the parameter value.

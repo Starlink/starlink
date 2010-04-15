@@ -14,9 +14,9 @@
 *     If START_PTR is not equal to 0 then:
 *
 *      - The sentinel integers above and below the used piece of memory
-*        will be checked against the values they were set to by 
+*        will be checked against the values they were set to by
 *        SCULIB_MALLOC.
-*      - PSX_FREE will be called to free the virtual memory. If 
+*      - PSX_FREE will be called to free the virtual memory. If
 *        that's successful START_PTR and END_PTR will be cleared.
 *        END_PTR will be set to bad.
 *      - If either of the sentinel integers was corrupted then an
@@ -91,7 +91,7 @@
       PARAMETER (SENTINEL = 37 )
 
 *  Local variables:
-      LOGICAL LOWER                        ! .FALSE. if lower sentinel 
+      LOGICAL LOWER                        ! .FALSE. if lower sentinel
                                            ! has been corrupted
       REAL    RTEMP                        ! scratch real
       LOGICAL UPPER                        ! .FALSE. if upper sentinel has been

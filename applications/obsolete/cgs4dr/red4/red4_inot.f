@@ -87,14 +87,14 @@
          CALL DSA_NAMED_INPUT( 'INPUT', INPUT, STATUS )
 
 *      Obtain the dimensions of the data array in INPUT
-         CALL DSA_DATA_SIZE( 'INPUT', MAXDIM, NDIM, DIMS, 
+         CALL DSA_DATA_SIZE( 'INPUT', MAXDIM, NDIM, DIMS,
      :      NELM, STATUS )
 
 *      Open the output structure, using the INPUT structure as
 *      a template. (This will only happen if the STATUS is still ok
 *      at this point).
-         CALL DSA_NAMED_OUTPUT( 'OUTPUT', OUTPUT, 'INPUT', 0, 
-     :      0, STATUS ) 
+         CALL DSA_NAMED_OUTPUT( 'OUTPUT', OUTPUT, 'INPUT', 0,
+     :      0, STATUS )
 
 *      Check that everything has worked up to this point
          IF ( STATUS .EQ. ADAM__OK ) THEN

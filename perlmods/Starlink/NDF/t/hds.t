@@ -19,7 +19,7 @@ err_begin( $status );
 # Initialise the dimension array
 my @dim = (10,20);
 
-# Create a new container file 
+# Create a new container file
 
 hds_new('hds_test', 'HDS_TEST', 'NDF', 0, \@dim, my $loc, $status);
 is( $status, &NDF::SAI__OK, "check status");

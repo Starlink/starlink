@@ -26,7 +26,7 @@
 *     examine your data and decide which columns in the data
 *     are to included in the catalogue. For each of these fields note
 *     the start position and the FORTRAN format that should be used to
-*     read the data in this field. A wide range of sexagesimal formats are 
+*     read the data in this field. A wide range of sexagesimal formats are
 *     also available. A good idea for finding the correct
 *     start positions is to copy the first few entries of the data into
 *     a separate file and include a first line containing
@@ -39,7 +39,7 @@
 *     a column name, format, units, null value, comment and start
 *     position. When you have defined all the fields use the ADAM null
 *     value ! at the column name prompt to move onto the next stage.
-*     
+*
 *     This application creates a Regular catalogue which contains only
 *     real columns. Virtual columns, Catnotes, Cathelp and Parameters
 *     may be added to the catalogue later. Columns may only be scalar
@@ -47,7 +47,7 @@
 *     have an assert expression and all the values are none null.
 
 *  Usage:
-*     ASCIITOCAT INPUT DATAFILE 
+*     ASCIITOCAT INPUT DATAFILE
 
 *  ADAM Parameters:
 *     INPUT = _CHAR (Read)
@@ -68,7 +68,7 @@
 *        [Repeatedly prompted for.]
 
 *  Example:
-*     ASCIITOCAT TEST TESTDATA.DAT 
+*     ASCIITOCAT TEST TESTDATA.DAT
 
 *  Notes:
 *     This application performs no checking on your column definition.
@@ -88,7 +88,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
       INCLUDE 'SAE_PAR'   ! Standard SAE constants
       INCLUDE 'PAR_ERR'   ! PAR errors
       INCLUDE 'CHP_PAR'   ! CHP constants
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -131,7 +131,7 @@
 
        call par_get0c('INPUT', incat, status)
        call par_get0c('DATAFILE', datafile, status)
-* 
+*
 *   Loop prompting for the column details
 *
        numcol = 1
@@ -153,7 +153,7 @@
             ccomments(numcol) = ccomment
             startpos(numcol) = stpos
             incformats(numcol) = cformat
-*   
+*
 *   Replace the input format with one from of the recommended formats.
 *
             numcol = numcol + 1
@@ -163,7 +163,7 @@
         call err_annul(status)
         numcol = numcol - 1
        endif
-*       
+*
        if (status .eq. SAI__OK) then
 *
 *    Make the call.

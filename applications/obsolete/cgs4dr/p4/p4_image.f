@@ -26,13 +26,13 @@
       INTEGER NINFO                           ! Maximum number of info items
       PARAMETER ( NINFO = 2 )
       INTEGER MAXDIM                          ! max number of dimensions
-      PARAMETER ( MAXDIM = 3 )            
-      REAL TOLER                              ! Tolerance for testing 
+      PARAMETER ( MAXDIM = 3 )
+      REAL TOLER                              ! Tolerance for testing
       PARAMETER ( TOLER = 1.0E-10 )
 *    Local variables :
       LOGICAL SAME_UNITS                      ! T if units are same on both axes
       LOGICAL ERRORS                          ! T if want to plot errors
-      LOGICAL QUALITY                         ! T if want to plot quality 
+      LOGICAL QUALITY                         ! T if want to plot quality
       INTEGER XLEN, YLEN, SLEN, TLEN          ! Label lengths
       INTEGER NDIM                            ! Info on size of data array
       INTEGER DIMS( MAXDIM )                  !              "
@@ -44,7 +44,7 @@
       INTEGER QUAL_SLOT                       ! for quality array
       INTEGER QUAL_PTR                        !              "
       INTEGER I, J                            ! Counters
-      REAL RATIO, AMT, TEMP, DIFF             ! Colour scaling 
+      REAL RATIO, AMT, TEMP, DIFF             ! Colour scaling
       REAL XSIZE, YSIZE, ASPECT               ! Size of plot surface
       REAL VPCENTRE_X, VPCENTRE_Y             ! Fudge factors
       REAL VPWIDTH_X, VPWIDTH_Y               ! Fudge factors
@@ -83,7 +83,7 @@
 
 *    Map the data
       IF ( DISPLAY_PLANE( PORT ) .EQ. 'DATA' ) THEN
-         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT', 
+         CALL DSA_MAP_DATA( 'DATA', 'READ', 'FLOAT',
      :      DATA_PTR, DATA_SLOT, STATUS )
 
 *    Or map the errors
@@ -113,7 +113,7 @@
 
 *    Map the quality
       IF ( QUALITY ) THEN
-         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE', 
+         CALL DSA_MAP_QUALITY( 'DATA', 'READ', 'BYTE',
      :      QUAL_PTR, QUAL_SLOT, STATUS )
       ELSE
          QUAL_PTR = 0
@@ -125,10 +125,10 @@
 *    Get the maximum, minimum, mean and sigma (using X/Y STEP of 1)
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL P4_GET_STATS( DIMS(1), DIMS(2), %val(DATA_PTR),
-     :      QUALITY, %val(QUAL_PTR), PLOT_WHOLE(PORT), ISTART( PORT ), 
-     :      IEND( PORT ), 1, JSTART( PORT ), JEND( PORT ), 1 , 
-     :      AUTOSCALE( PORT ), HIGH( PORT ), LOW( PORT ), MEAN( PORT ), 
-     :      SIGMA( PORT ), STATUS ) 
+     :      QUALITY, %val(QUAL_PTR), PLOT_WHOLE(PORT), ISTART( PORT ),
+     :      IEND( PORT ), 1, JSTART( PORT ), JEND( PORT ), 1 ,
+     :      AUTOSCALE( PORT ), HIGH( PORT ), LOW( PORT ), MEAN( PORT ),
+     :      SIGMA( PORT ), STATUS )
       ELSE
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'P4_IMAGE: '/
@@ -141,7 +141,7 @@
       CALL P4_GET_AXLAB( PORT, SAME_UNITS, STATUS )
 
 *    Get an integer work array
-      CALL DSA_GET_WORK_ARRAY( DIMS(1)*DIMS(2), 'INT', IDATA_PTR, 
+      CALL DSA_GET_WORK_ARRAY( DIMS(1)*DIMS(2), 'INT', IDATA_PTR,
      :   IDATA_SLOT, STATUS )
 
 *    Check values of LOW( PORT ) and HIGH( PORT ) are not equal
@@ -187,10 +187,10 @@
 *    port is less than 2:1, then set up the window so that a unit is
 *    square. Otherwise fill the viewport with the window.
       IF ( SAME_UNITS .AND. ( ASPECT .LT. 2.0 ) ) THEN
-         CALL PGWNAD( XSTART( PORT ), XEND( PORT ), 
+         CALL PGWNAD( XSTART( PORT ), XEND( PORT ),
      :      YSTART( PORT ), YEND( PORT ) )
       ELSE
-         CALL PGWINDOW( XSTART( PORT ), XEND( PORT ), 
+         CALL PGWINDOW( XSTART( PORT ), XEND( PORT ),
      :      YSTART( PORT ), YEND( PORT ) )
       ENDIF
 
@@ -245,7 +245,7 @@
      :   /'to lie in range 2 to ^MC', STATUS )
       ENDIF
       CALL P4_SCALE_REAL ( DIMS(1), DIMS(2), %val( DATA_PTR ),
-     :   LOW( PORT ), HIGH( PORT ), 2, CI2( PORT ), 
+     :   LOW( PORT ), HIGH( PORT ), 2, CI2( PORT ),
      :   %val( IDATA_PTR ), STATUS )
 
 *    Plot the image
@@ -253,7 +253,7 @@
         CALL MSG_SETI( 'DIM1', DIMS(1) )
         CALL MSG_SETI( 'DIM2', DIMS(2) )
         CALL MSG_SETI( 'PORT', PORT )
-        CALL MSG_OUT( ' ', 
+        CALL MSG_OUT( ' ',
      :    'P4_IMAGE: Data size is ^DIM1 x ^DIM2 on port ^PORT', STATUS )
         CALL MSG_SETI( 'I1', ISTART(PORT) )
         CALL MSG_SETI( 'I2', IEND(PORT) )
@@ -271,15 +271,15 @@
 
 *   Plot if status is OK
       IF ( STATUS .EQ. SAI__OK ) THEN
-        CALL PGPIXL( %val( IDATA_PTR ), DIMS( 1 ), DIMS( 2 ), 
+        CALL PGPIXL( %val( IDATA_PTR ), DIMS( 1 ), DIMS( 2 ),
      :     ISTART( PORT ), IEND( PORT ), JSTART( PORT ), JEND( PORT ),
      :     XSTART( PORT ), XEND( PORT ), YSTART( PORT ), YEND( PORT ) )
-      ENDIF 
+      ENDIF
 
 *    Plot the ancillary bits if need be
       IF ( PLOT_AXES( PORT ) ) THEN
 
-         CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0, 
+         CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0,
      :      DEVICE_YOPT( PORT ), 0.0, 0)
 
          XLEN = CHR_LEN( XLABEL(PORT) )
@@ -287,7 +287,7 @@
          IF ( TITLE( PORT ) .EQ. 'A_U_T_O' ) THEN
            TLEN = CHR_LEN( DEFTITLE(PORT) )
            SLEN = CHR_LEN( SUBTITLE(PORT) )
-           CALL PGLABEL( XLABEL(PORT)(1:XLEN), 
+           CALL PGLABEL( XLABEL(PORT)(1:XLEN),
      :       YLABEL(PORT)(1:YLEN), DEFTITLE(PORT)(1:TLEN) )
            CALL PGMTEXT( 'T', 0.5, 0.5, 0.5, SUBTITLE(PORT)(1:SLEN) )
          ELSE
@@ -306,7 +306,7 @@
       ENDIF
 
 *    Plot a colour bar
-      IF ( ( STATUS .EQ. SAI__OK ) .AND. 
+      IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :     ( PLOT_AXES( PORT ) ) ) CALL P4_PLOTBAR( PORT, STATUS )
 
 *    Close DSA and update the noticeboard

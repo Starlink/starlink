@@ -63,7 +63,7 @@ C-----------------------------------------------------------------------
       CHARACTER*128 FF
 C
 C Read the font file. If an I/O error occurs, it is ignored; the
-C effect will be that all symbols will be undefined (treated as 
+C effect will be that all symbols will be undefined (treated as
 C blank spaces).
 C
       CALL GRGFIL('FONT', FF)
@@ -72,7 +72,7 @@ C
       CALL GRGLUN(FNTFIL)
       OPEN (UNIT=FNTFIL, FILE=FF(1:L), FORM='UNFORMATTED',
      2      STATUS='OLD', IOSTAT=IER)
-      IF (IER.EQ.0) READ (UNIT=FNTFIL, IOSTAT=IER) 
+      IF (IER.EQ.0) READ (UNIT=FNTFIL, IOSTAT=IER)
      1            NC1,NC2,NC3,INDEX,BUFFER
       IF (IER.EQ.0) CLOSE (UNIT=FNTFIL, IOSTAT=IER)
       CALL GRFLUN(FNTFIL)

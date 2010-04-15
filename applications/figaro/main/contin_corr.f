@@ -33,7 +33,7 @@
 *    AA(MAX_KPLUS1,LINE_COUNT) = DOUBLE PRECISION ARRAY (Workspace)
 *    YLIM(2,LINE_COUNT) = DOUBLE PRECISION ARRAY (Workspace)
 *    USED(LINE_COUNT) = LOGICAL ARRAY (Workspace)
-*    ATHREE(3*MAXNPTS+3*MAX_KPLUS1) = DOUBLE PRECISION ARRAY   
+*    ATHREE(3*MAXNPTS+3*MAX_KPLUS1) = DOUBLE PRECISION ARRAY
 
 * Authors:
 *  TNW: T.N.Wilkins. Manchester until 1/89, Cambridge until 9/92
@@ -81,8 +81,8 @@
      :     'RETRY  : Try again',
      :     'QUIT   : Give up'/
 
-* The following commentary seems to be partially at odds with the code, 
-* as found.  Obtained workspace using multiple DSA_GET_WORK_ARRAY calls 
+* The following commentary seems to be partially at odds with the code,
+* as found.  Obtained workspace using multiple DSA_GET_WORK_ARRAY calls
 * checking required types and sizes against called routines.  Added PTR6
 * rather than different PTR1s. ---MJC
 
@@ -107,7 +107,7 @@
 *     (spdim1*4+line_count) is for SET_POL..
 *     (spdim1*(line_count+4)+440) is for CONTROL..
 
-* Now add element for CPXPTR, multiple by VAL__NBD and add bytes for 
+* Now add element for CPXPTR, multiple by VAL__NBD and add bytes for
 *NPTS
 
       call dsa_get_work_array(spdim1*line_count,'double',w2ptr,slot,

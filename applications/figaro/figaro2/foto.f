@@ -35,14 +35,14 @@ C
 C     Input -
 C
 C     CENTER.DAT contains one record for each point, giving
-C                XCENT,YCENT,IX,IY,DX,DY,AP 
+C                XCENT,YCENT,IX,IY,DX,DY,AP
 C                in the format 2F8.2,2I5,2F8.2,I4 where
 C                XCENT,YCENT give the position of the centroid
 C                IX,IY are the original pixel position of the point.
 C                DX,DY are the offsets in X and Y, and
 C                AP is the value used for APERTURE.
 C                If the centroid for a point cannot be determined, a
-C                record is written giving 
+C                record is written giving
 C                '*** No centroid ',IX,IY,DX,DY,AP
 C                in the format A,2I5,2F8.2,I4.
 C
@@ -55,9 +55,9 @@ C     Modified:
 C
 C     6th  Aug 1987  Revised DSA_ routines - some specs changed. Now
 C                    uses DYN_ routines for dynamic memory handling.
-C     22nd Mar 1988  KS/AAO. Conversion to DSA completed. 
+C     22nd Mar 1988  KS/AAO. Conversion to DSA completed.
 C     4th  Sep 1992  Removed TABs, lowercase file names, changed
-C                    INCLUDE, Changed MAX-declaration to *. 
+C                    INCLUDE, Changed MAX-declaration to *.
 C                    Call GEN_TIME instead of VAX routine DATE. HME/UoE.
 C     25th Sep 1992  HME / UoE, Starlink.  No more confusion about
 C                    Fortran units: PKREAD is now called with IOUT,NFOR
@@ -101,7 +101,7 @@ C
 C     Local variables
 C
       REAL         BAD           !
-      CHARACTER    CDAY*9 
+      CHARACTER    CDAY*9
       CHARACTER    CHOUR*12
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       INTEGER      DPTR          ! Dynamic-memory pointer to data array
@@ -116,7 +116,7 @@ C
       INTEGER      LDAY
       INTEGER      LHOUR
       INTEGER      MSKY          !
-      REAL         MZERO         !  
+      REAL         MZERO         !
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
       INTEGER      NI            !
@@ -136,7 +136,7 @@ C
       INTEGER      SPTR          ! Dynamic-memory pointer to workspace2
       INTEGER      STATUS        ! DSA_ routines running error code
       CHARACTER    STRING*80     !
-      CHARACTER    TODAY*20      ! 
+      CHARACTER    TODAY*20      !
       REAL         VALUE         ! Temporary real number
       INTEGER      WSLOT         ! Map slot number for workspace
       INTEGER      WSLOT2        ! Map slot number for workspace
@@ -302,7 +302,7 @@ C                distribution, PEAK(NR+4) is the sigma and PEAK(NR+5) is
 C                the skew.
 C     (W) QEAK   (Real array QEAK(NR+2)) Used to hold the errors for
 C                the corresponding annuli in PEAK.  QEAK(1 & 2) are unused.
-C     
+C
 C
 C     History -  This routine was originally written at KPNO by Don
 C                Wells.  It was modified slightly at Caltech by JRM,
@@ -316,7 +316,7 @@ C                use of the ability of Figaro to pass the whole image
 C                array to the routine; the coordinate transform code
 C                is explicitly bypassed, although not removed; all
 C                parameters are now passed to the subroutine.  None of
-C                these changes are particularly dramatic, and the 
+C                these changes are particularly dramatic, and the
 C                temptation to make stylistic changes was resisted,
 C                so the result has a slight mixture of commenting
 C                styles.  The real work is done by the routines CAP1
@@ -417,7 +417,7 @@ C-----CALL -MMM- TO GET THE MODE OF THE SKY DISTRIBUTION:
       CALL MMM(SKY,NSKY,NZ3,ZMEAN,ZMEDIAN,PEAK(NR+3),PEAK(NR+4),
      $         PEAK(NR+5),ZREJECT,NITER,1.0)
 C
-C-----PHTPLT PLOTS THE SKY DISTRIBUTION. {KS} 
+C-----PHTPLT PLOTS THE SKY DISTRIBUTION. {KS}
 C
       IF (PLHIST) THEN
          CALL PAR_CNPAR('DISHIST')
@@ -456,7 +456,7 @@ C-----CONVERT THE SUMS TO MAGNITUDES:
          IF(.NOT.LEGVAR(PEAK(I+2)))GO TO 54
          IF(PEAK(I+2).LT.0.0)GO TO 54
 C----    THIS ERROR DET SEC IS AN ADDITION TO WELLS PROG
-C----    ERRORS ARE 1.READOUT NOISE, 2.PHOTON STATISTICS- IMAGE, 
+C----    ERRORS ARE 1.READOUT NOISE, 2.PHOTON STATISTICS- IMAGE,
 C----          3.SKY UNCERTAINTY,4.PHOTON STATS- SKY  [UNITS ARE ADU]
          APAREA=3.14159*RR(I)**2
          ERROR1=SQRT(APAREA)*READNS/PHOTON
@@ -486,7 +486,7 @@ C+
 C
 C     P R D 2
 C
-C     Fills an array with data from a section of a row of the 
+C     Fills an array with data from a section of a row of the
 C     image, setting any non-existent pixels to a flag value.
 C     (The flag value used is -99999.)
 C
@@ -503,7 +503,7 @@ C     (>) IX      (Integer) The first element of the row required.
 C     (>) IR      (Integer) The row required
 C     (>) NI      (Integer) The number of elements to transfer
 C     (<) RAY     (Real array RAY(NI)) The resulting row section.
-C     
+C
 C     Functions / subroutines used - Standard Fortran
 C
 C     Common variables used - None
@@ -674,7 +674,7 @@ C     Returns -
 C
 C     (<) LEGVAR   (Logical) True for a legitimate value, false
 C                  for the flag value.
-C 
+C
 C                                            KS / CIT 30th May 1983
 C+
       IMPLICIT NONE

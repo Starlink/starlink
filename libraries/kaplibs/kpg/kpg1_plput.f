@@ -13,7 +13,7 @@
 *     CALL KPG1_PLPUT( CI1, CI2, LBND, UBND, ARRAY, STATUS )
 
 *  Description:
-*     This routine puts a specified section of the colour palette for the 
+*     This routine puts a specified section of the colour palette for the
 *     currently opened graphics device into the supplied array. Other
 *     elements of the array are left unchanged.
 *
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,10 +93,10 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop count
-  
+
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Inquire the palette colour indices, and store in the array.

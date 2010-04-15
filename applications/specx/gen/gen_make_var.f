@@ -74,7 +74,7 @@
         IERR = 5
         GO TO 99
       END IF
-      
+
 *     Remove any leading blanks (index to start of non-blank string)
 
       I = 1

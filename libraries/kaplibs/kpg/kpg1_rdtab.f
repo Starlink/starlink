@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_RDTAB( PARAM, CURFRM, LABS, IWCS, NPOS, NAX, 
+      SUBROUTINE KPG1_RDTAB( PARAM, CURFRM, LABS, IWCS, NPOS, NAX,
      :                       IPPOS, IPID, TITLE, NAME, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_RDTAB( PARAM, CURFRM, LABS, IWCS, NPOS, NAX, IPPOS, 
+*     CALL KPG1_RDTAB( PARAM, CURFRM, LABS, IWCS, NPOS, NAX, IPPOS,
 *                      IPID, TITLE, NAME, STATUS )
 
 *  Description:
@@ -27,14 +27,14 @@
 *        The name of the parameter to use.
 *     CURFRM = LOGICAL (Given)
 *        If .TRUE. the positions read from the catalogue are Mapped
-*        into the Current Frame of the associated FrameSet before being 
+*        into the Current Frame of the associated FrameSet before being
 *        returned. Otherwise, they are returned in the Base Frame.
 *     LABS = INTEGER (Given and Returned)
-*        A GRP identifier for a group containing the values in the LABEL 
+*        A GRP identifier for a group containing the values in the LABEL
 *        column. If the catalogue contains a LABEL column, then its values
-*        are appended to the end of the supplied group. If LABS holds 
+*        are appended to the end of the supplied group. If LABS holds
 *        GRP__NOID on entry, then a new GRP group is created and its
-*        identifier returned in LABS, but only if the catalogue contains 
+*        identifier returned in LABS, but only if the catalogue contains
 *        a LABEL column (otherwise the supplied value of GRP__NOID is
 *        retained on exit).
 *     IWCS = INTEGER (Returned)
@@ -47,7 +47,7 @@
 *        A pointer to a 2-dimensional DOUBLE PRECISION array holding the
 *        returned positions. Element (I,J) of this array gives axis J for
 *        position I. The first axis will have NPOS elements, and the
-*        second will have NAX elements. Should be released using PSX_FREE 
+*        second will have NAX elements. Should be released using PSX_FREE
 *        when no longer needed.
 *     IPID = INTEGER (Returned)
 *        A pointer to a 1-dimensional INTEGER array holding the integer
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -105,7 +105,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,7 +117,7 @@
       LOGICAL CURFRM
 
 *  Arguments Given and Returned:
-      INTEGER LABS 
+      INTEGER LABS
 
 *  Arguments Returned:
       INTEGER IWCS
@@ -134,7 +134,7 @@
 *.
 
 *  Call KPG1_RDCAT to do the work, supplying a NULL KeyMap pointer.
-      CALL KPG1_RDCAT( PARAM, CURFRM, AST__NULL, LABS, IWCS, NPOS, NAX, 
+      CALL KPG1_RDCAT( PARAM, CURFRM, AST__NULL, LABS, IWCS, NPOS, NAX,
      :                 IPPOS, IPID, TITLE, NAME, STATUS )
 
 

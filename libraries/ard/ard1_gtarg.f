@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_GTARG( FRM, AXIS, ELEM, L, I, OK, MORE, VALUE, 
+      SUBROUTINE ARD1_GTARG( FRM, AXIS, ELEM, L, I, OK, MORE, VALUE,
      :                       STATUS )
 *+
 *  Name:
@@ -24,7 +24,7 @@
 
 *  Arguments:
 *     FRM = INTEGER (Given)
-*        An AST Frame. The AST_UNFORMAT method of this Frame is used to 
+*        An AST Frame. The AST_UNFORMAT method of this Frame is used to
 *        obtained the numerical value from the formatted text string.
 *     AXIS = INTEGER (Given)
 *        The index of the Axis within FRM to which the next value relates.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
 *  Local Variables:
       CHARACTER
      :  ATTR*20,                ! AST attribute name
-     :  DOM*80,                 ! Domain 
+     :  DOM*80,                 ! Domain
      :  LAB*80                  ! Axis label
 
       INTEGER
@@ -130,7 +130,7 @@
 
 *  Initialise the returned flags.
       OK = .FALSE.
-      MORE = .TRUE.      
+      MORE = .TRUE.
 
 *  Find the next non-blank character in ELEM.
  10   CONTINUE
@@ -154,7 +154,7 @@
 *  the pointer to the next character. The next pass through this routine
 *  will pick up any arguments following the delimiter.
          ELSE IF( ELEM( I : I ) .EQ. ',' ) THEN
-            I = I + 1      
+            I = I + 1
 
 *  If the first non-blank character is neither a delimiter nor a closing
 *  parenthesis, assume it is the first character of an argument value.
@@ -164,7 +164,7 @@
 *  delimiter or closing parenthesis (which ever comes first).
             DELIM = INDEX( ELEM( I : ), ',' )
             PAREN = INDEX( ELEM( I : ), ')' )
-         
+
             IF( DELIM .EQ. 0 ) THEN
                END = PAREN
 
@@ -197,14 +197,14 @@
 
 *  Attempt to convert it to a numerical value. If no AST Axis is
 *  specified...
-                  IF( AXIS .LT. 1 ) THEN                  
+                  IF( AXIS .LT. 1 ) THEN
                      CALL CHR_CTOD( ELEM( I : J ), VALUE, STATUS )
 
 *  Otherwise, use the Unformat method of the supplied Frame.
                   ELSE
-                     NC = AST_UNFORMAT( FRM, AXIS, ELEM( I : J ), 
+                     NC = AST_UNFORMAT( FRM, AXIS, ELEM( I : J ),
      :                                   VALUE, STATUS )
-                     IF( NC .NE. J - I + 1 .AND. 
+                     IF( NC .NE. J - I + 1 .AND.
      :                   STATUS .EQ. SAI__OK ) THEN
                         ATTR = 'Label('
                         IAT = 6

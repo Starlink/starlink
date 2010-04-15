@@ -1,7 +1,7 @@
       SUBROUTINE CAT5_GLFMT (EXFMT, LXFMT, STATUS)
 *+
 *  Name:
-*     CAT5_GLFMT 
+*     CAT5_GLFMT
 *  Purpose:
 *     Determine the width of an STL table format.
 *  Language:
@@ -26,7 +26,7 @@
 *       Take a local copy of the specifier
 *       Check whether the specifier contains a full stop.
 *       If so then
-*         Replace the full stop and all following characters with 
+*         Replace the full stop and all following characters with
 *         spaces.
 *       end if
 *       Replace any alphabetic characters with spaces.
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -125,7 +125,7 @@ C3000       format(1x, 'LXFMT on entry, exfmt: ', a / )
             END DO
 
 *
-*          If a full stop was found then replace it and all the 
+*          If a full stop was found then replace it and all the
 *          characters which follow it with spaces.
 
             IF (FOUND) THEN

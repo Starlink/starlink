@@ -10,16 +10,16 @@
 *     07 Mar 2002 (rpt):
 *        Change test USB/LSB to look at sign iffreq
 C-----------------------------------------------------------------------
-      
+
       SUBROUTINE PRSCAN (ICHAN, ILEN)
-      
-C Routine to print details of scan on channel ICHAN      
-      
-C    ICHAN : Channel no. for output   
+
+C Routine to print details of scan on channel ICHAN
+
+C    ICHAN : Channel no. for output
 C    ILEN  : 0 for one line header
 C          : 1 for full details
 C          : 3 one-line header, don't close any output file
-      
+
       IMPLICIT  NONE
 
 *     formal parameters:
@@ -63,7 +63,7 @@ C          : 3 one-line header, don't close any output file
 
       IUT = ' '
       IF (IUTFLG.EQ.1)   IUT = '(UT)'
-      
+
       WRITE  (ICHAN,10) LSCAN, ITITLE, IDATE, ITIME, IUT
    10 FORMAT (1X,'Scan :',I4,'  Title : ',A26/
      &       1X,' Recorded on ',A9,' at ',A8,A4)
@@ -141,6 +141,6 @@ C        IF (JFCEN(1)/1E+06 .LT. LOFREQ(1)) SB = 'LSB'
       END IF
 
       RETURN
-      END  
+      END
 
 C-----------------------------------------------------------------------

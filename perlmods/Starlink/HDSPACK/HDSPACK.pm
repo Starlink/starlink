@@ -178,7 +178,7 @@ The following functions are available using Starlink inherited status:
 
 =item B<retrieve_locs>
 
-Given a full path to a HDS structure, returns an array of 
+Given a full path to a HDS structure, returns an array of
 locators corresponding to each structure referenced in the path.
 
   ($status, @locators) = retrieve_locs("file.more.fits", $mode, $status);
@@ -345,7 +345,7 @@ sub copobj {
     }
 
     # erase it
-    dat_erase($tarlocs[-1], $outname, $status) if $there; 
+    dat_erase($tarlocs[-1], $outname, $status) if $there;
 
     # Copy from one to the other
     dat_copy($srclocs[-1], $tarlocs[-1], $outname, $status);
@@ -612,21 +612,21 @@ sub creobj {
   # Check args
   unless (defined $object) {
     $status = SAI__ERROR;
-    err_rep('NOOBJECT','Starlink::HDSPACK::creobj - no object defined', 
+    err_rep('NOOBJECT','Starlink::HDSPACK::creobj - no object defined',
 	    $status);
     return $status;
   }
 
   unless (defined $type) {
     $status = SAI__ERROR;
-    err_rep('NOTYPE','Starlink::HDSPACK::creobj - no object TYPE defined', 
+    err_rep('NOTYPE','Starlink::HDSPACK::creobj - no object TYPE defined',
 	    $status);
     return $status;
   }
 
   unless (ref($indims) eq 'ARRAY') {
     $status = SAI__ERROR;
-    err_rep('NODIMS','Starlink::HDSPACK::creobj - no dims not array ref', 
+    err_rep('NODIMS','Starlink::HDSPACK::creobj - no dims not array ref',
 	    $status);
     return $status;
   }
@@ -707,7 +707,7 @@ sub _find_loc {
    }
 
    # Get next locator
-   print "# Looking for $nextcmp [$status]\n" if $DEBUG; 
+   print "# Looking for $nextcmp [$status]\n" if $DEBUG;
    dat_find($parent, $nextcmp, my $child, $status);
    print "# Status from dat_find: $status\n" if $DEBUG;
 

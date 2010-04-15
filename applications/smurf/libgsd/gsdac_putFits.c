@@ -15,10 +15,10 @@
 
 *  Invocation:
 *     gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
-*                     const int nSubsys, const int obsNum, 
-*                     const int utDate, const int nSteps, 
+*                     const int nSubsys, const int obsNum,
+*                     const int utDate, const int nSteps,
 *                     const char *backend, const int recepsUsed,
-*                     char *recepNames[], const char *samMode, 
+*                     char *recepNames[], const char *samMode,
 *                     const char *obsType, const dateVars *dateVars,
 *                     const mapVars *mapVars, const double *lineFreqs,
 *                     const double *IFFreqs,
@@ -58,11 +58,11 @@
 *     fitschan = AstFitsChan* (Given and Returned)
 *        FITS headers.
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *     This routine fills the AstFitsChan with the values retrieved
-*     from the GSD headers.  
+*     from the GSD headers.
 
 *  Authors:
 *     J.Balfour (UBC)
@@ -168,9 +168,9 @@
 #define FUNC_NAME "gsdac_putFits"
 
 void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
-                     const int nSubsys, const int obsNum, 
-                     const int utDate, const int nSteps, 
-                     const char *backend, const int recepsUsed, 
+                     const int nSubsys, const int obsNum,
+                     const int utDate, const int nSteps,
+                     const char *backend, const int recepsUsed,
                      char *recepNames[], const char *samMode,
                      const char *obsType, const dateVars *dateVars,
                      const mapVars *mapVars, const double *lineFreqs,
@@ -216,31 +216,31 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   int stBetRef_defined;       /* Use the stBetRef value? */
   double stepTime;            /* RTS step time */
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
-  char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
+  char tauDatSt[SZFITSCARD];  /* time of tau225St observation in
                                  format YYYY-MM-DDTHH:MM:SS */
   const char *transiti;       /* target transition for molecule */
-  int year;                   /* year for time conversion. */  
+  int year;                   /* year for time conversion. */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
   /* Get the cartesian coordinates of the telescope's location. */
-  smf_terr( gsdVars->telLatitude * DD2R, gsdVars->telHeight * 1000.0, 
-            -gsdVars->telLongitude * DD2R, obsgeo );  
+  smf_terr( gsdVars->telLatitude * DD2R, gsdVars->telHeight * 1000.0,
+            -gsdVars->telLongitude * DD2R, obsgeo );
 
   /* Get the telescope efficiency and convert from percentage to decimal */
-  etal = gsdVars->etal / 100.0; 
+  etal = gsdVars->etal / 100.0;
 
 
   /* Obs Id, Date, Pointing Info */
- 
+
   /* Truncate the object names and concatenate. */
   cnfImprt ( gsdVars->object1, 16, object );
 
   if ( strncmp ( gsdVars->object2, " ", 1 ) != 0 ) {
 
     cnfImprt ( gsdVars->object2, 16, object2 );
-    strcat ( object, ", " ); 
+    strcat ( object, ", " );
     strcat ( object, object2 );
 
   }
@@ -258,16 +258,16 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   }
 
   /* Copy the obsID into the obsIDSS and add the subsystem number. */
-  sprintf ( obsIDSS, "%s_%i", dateVars->obsID, 
+  sprintf ( obsIDSS, "%s_%i", dateVars->obsID,
             subBandNum % nSubsys + 1 );
 
 
   /* Integration time related. */
 
   /* Get the sum of the integration times.  This is either the
-     sum of the elements of the intTimes table for grids, or 
+     sum of the elements of the intTimes table for grids, or
      the scan time times the number of scans for rasters. */
-  if ( gsdVars->obsContinuous ) {  
+  if ( gsdVars->obsContinuous ) {
 
     intTime = gsdVars->scanTime * gsdVars->nScan;
 
@@ -289,8 +289,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      status );
 
   /* Get the bandwidth setup. */
-/***** NOTE: may be different for rxb widebands *****/  
-  sprintf ( bwMode, "%iMHzx%i", (int)(gsdVars->bandwidths[subBandNum]), 
+/***** NOTE: may be different for rxb widebands *****/
+  sprintf ( bwMode, "%iMHzx%i", (int)(gsdVars->bandwidths[subBandNum]),
             gsdVars->BEChans[subBandNum] );
 
 /***** NOTE: Possibly undef? *****/
@@ -326,7 +326,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   strcpy ( recptors, recepNames[0] );
   for ( i = 1; i < recepsUsed; i++ ) {
     strcat ( recptors, " " );
-    strcat ( recptors, recepNames[i] );   
+    strcat ( recptors, recepNames[i] );
   }
 
   /* Truncate the doppler velocity definition and set
@@ -338,7 +338,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
     doppler[i] = tolower(curChar);
     i++;
     curChar = doppler[i];
-  }  
+  }
 
 /***** NOTE : Possibly comes from VEL_REF (c12vref). */
   strcpy ( sSysObs, "TOPOCENT" );
@@ -346,9 +346,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Environmental data. */
 
-  /* Convert dates from YYMMDDHHMMSS to 
+  /* Convert dates from YYMMDDHHMMSS to
      YYYY-MM-DDTHH:MM:SS. */
-  parse = sscanf ( gsdVars->tauTime, "%02d%02d%02d%02d%02d", &year, 
+  parse = sscanf ( gsdVars->tauTime, "%02d%02d%02d%02d%02d", &year,
                    &month, &day, &hour, &min );
 
   if ( parse == 0 || parse == EOF ) {
@@ -357,20 +357,20 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
     strcpy ( tauDatSt, "" );
 
   } else {
-    
+
     /* Inelegant method to get YYYY from YY. */
     if ( year > 70 ) year = year + 1900;
     else year = year + 2000;
- 
-    sprintf ( tauDatSt, "%04d-%02d-%02dT%02d:%02d:00", 
+
+    sprintf ( tauDatSt, "%04d-%02d-%02dT%02d:%02d:00",
               year, month, day, hour, min );
 
   }
 
 
-  /* Convert dates from YYMMDDHHMMSS to 
+  /* Convert dates from YYMMDDHHMMSS to
      YYYY-MM-DDTHH:MM:SS. */
-  parse = sscanf ( gsdVars->seeTime, "%02d%02d%02d%02d%02d", &year, 
+  parse = sscanf ( gsdVars->seeTime, "%02d%02d%02d%02d%02d", &year,
                    &month, &day, &hour, &min );
 
   if ( parse == 0 || parse == EOF ) {
@@ -378,12 +378,12 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 	     "Couldn't convert seeing time, continuing anyway.", status);
     strcpy ( seeDatSt, "" );
   } else {
-    
+
     /* Kludge to get YYYY from YY. */
     if ( year > 70 ) year = year + 1900;
     else year = year + 2000;
 
-    sprintf ( seeDatSt, "%04d-%02d-%02dT%02d:%02d:00", 
+    sprintf ( seeDatSt, "%04d-%02d-%02dT%02d:%02d:00",
            year, month, day, hour, min );
 
   }
@@ -393,7 +393,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   /* STEPTIME is SCAN_TIME for grids, and SCAN_TIME divided by the
      number of points in a scan for rasters. */
   if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
-  
+
     if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 )
       stepTime = gsdVars->scanTime / gsdVars->nMapPtsX;
     else
@@ -424,14 +424,14 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
     /* For rasters, determine the number of time scanning
        each point in one row from the total time for
        the row / number of points in the row.  The length
-       of time in the reference is then sqrt (number of 
+       of time in the reference is then sqrt (number of
        points in the row) * (time per point). */
-    nRefStep = sqrt ( (double)(gsdVars->nScanPts) ) * 
+    nRefStep = sqrt ( (double)(gsdVars->nScanPts) ) *
            ( (double)(gsdVars->scanTime) / (double)(gsdVars->nScanPts) );
 
     stBetRef = gsdVars->nScanPts;
 
-  }  
+  }
 
   /* Set a flag indicating if the stBetRef value is defined. */
   stBetRef_defined =   ( strcmp ( mapVars->swMode, "chop" ) != 0 );
@@ -439,19 +439,19 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   /* Get the starting index into the pattern. */
   gsdac_getStartIdx ( gsdVars, samMode, &startIdx, status );
 
- 
+
 
   /************************************/
   /*      WRITE OUT FITS HEADERS      */
   /************************************/
 
-  astSetFitsS ( fitschan, "TELESCOP", gsdVars->telName, 
+  astSetFitsS ( fitschan, "TELESCOP", gsdVars->telName,
 	        "Name of Telescope", 0 );
 
-  astSetFitsS ( fitschan, "ORIGIN", "Joint Astronomy Centre, Hilo", 
+  astSetFitsS ( fitschan, "ORIGIN", "Joint Astronomy Centre, Hilo",
                 "Origin of file", 0 );
 
-  astSetFitsF ( fitschan, "ALT-OBS", gsdVars->telHeight * 1000.0, 
+  astSetFitsF ( fitschan, "ALT-OBS", gsdVars->telHeight * 1000.0,
                 "[m] Height of observation above sea level", 0 );
 
   astSetFitsF ( fitschan, "LAT-OBS", gsdVars->telLatitude,
@@ -461,27 +461,27 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                 "[deg] East longitude of Observatory", 0 );
 
   astSetFitsF ( fitschan, "OBSGEO-X", obsgeo[0],
-                "[m]", 0 );  
+                "[m]", 0 );
 
   astSetFitsF ( fitschan, "OBSGEO-Y", obsgeo[1],
-                "[m]", 0 );  
+                "[m]", 0 );
 
   astSetFitsF ( fitschan, "OBSGEO-Z", obsgeo[2],
-                "[m]", 0 ); 
+                "[m]", 0 );
 
   astSetFitsF ( fitschan, "ETAL", etal,
-                "Telescope efficiency", 0 ); 
+                "Telescope efficiency", 0 );
 
 
   /* OMP and ORAC-DR Specific */
   astSetFitsCM ( fitschan,
                  "---- OMP and ORAC-DR Specific ----", 0 );
 
-  astSetFitsS ( fitschan, "PROJECT", gsdVars->project, 
+  astSetFitsS ( fitschan, "PROJECT", gsdVars->project,
 	        "PATT number", 0 );
 
 /***** NOTE: possiby REDUCE_POINTING for spectral 5 points *****/
-  astSetFitsS ( fitschan, "RECIPE", "REDUCE_SCIENCE", 
+  astSetFitsS ( fitschan, "RECIPE", "REDUCE_SCIENCE",
 	        "ORAC-DR recipe", 0 );
 
   astSetFitsU ( fitschan, "DRGROUP", "Data Reduction group ID", 0 );
@@ -501,37 +501,37 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCM ( fitschan,
                  "---- Obs Id, Date, pointing Info ----", 0 );
 
-  astSetFitsS ( fitschan, "OBJECT", object, 
+  astSetFitsS ( fitschan, "OBJECT", object,
 	        "Object of interest", 0 );
 
-  astSetFitsL ( fitschan, "STANDARD", standard, 
+  astSetFitsL ( fitschan, "STANDARD", standard,
                 "True if the spectral line is a standard", 0 );
 
-  astSetFitsI ( fitschan, "OBSNUM", obsNum, 
+  astSetFitsI ( fitschan, "OBSNUM", obsNum,
                 "Observation number", 0 );
 
   astSetFitsI ( fitschan, "NSUBSCAN", 1,
 		"Sub-scan number", 0 );
 
-  astSetFitsL ( fitschan, "OBSEND", 1, 
+  astSetFitsL ( fitschan, "OBSEND", 1,
                 "True if the file is the last in current observation", 0 );
-  
-  astSetFitsI ( fitschan, "UTDATE", utDate, 
+
+  astSetFitsI ( fitschan, "UTDATE", utDate,
                 "UT Date as integer in yyyymmdd format", 0 );
 
-  astSetFitsS ( fitschan, "DATE-OBS", dateVars->dateObs, 
+  astSetFitsS ( fitschan, "DATE-OBS", dateVars->dateObs,
                 "UTC Datetime of start of observation", 0 );
 
-  astSetFitsS ( fitschan, "DATE-END", dateVars->dateEnd, 
+  astSetFitsS ( fitschan, "DATE-END", dateVars->dateEnd,
                 "UTC Datetime of end of observation", 0 );
 
-  astSetFitsF ( fitschan, "DUT1", gsdVars->obsUT1C, 
+  astSetFitsF ( fitschan, "DUT1", gsdVars->obsUT1C,
                 "[d] UT1-UTC correction", 0 );
 
-  astSetFitsS ( fitschan, "OBSID", dateVars->obsID, 
+  astSetFitsS ( fitschan, "OBSID", dateVars->obsID,
                 "Unique observation identifier", 0 );
 
-  astSetFitsS ( fitschan, "OBSIDSS", obsIDSS, 
+  astSetFitsS ( fitschan, "OBSIDSS", obsIDSS,
                 "Unique observation + subsystem ID", 0 );
 
 /***** NOTE: possibly same as REFRECEP *****/
@@ -601,62 +601,62 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "SUBBANDS", bwMode,
                 "Sub-band setup", 0 );
 
-  astSetFitsI ( fitschan, "NSUBBAND", 1, 
+  astSetFitsI ( fitschan, "NSUBBAND", 1,
                 "Number of subbands", 0 );
 
-  astSetFitsF ( fitschan, "SUBREFP1", refChan, 
+  astSetFitsF ( fitschan, "SUBREFP1", refChan,
                 "Reference channel for subband1", 0 );
 
   astSetFitsU ( fitschan, "SUBREFP2", "Reference channel for subband2", 0 );
 
-  astSetFitsI ( fitschan, "NCHNSUBS", gsdVars->BEChans[subBandNum], 
+  astSetFitsI ( fitschan, "NCHNSUBS", gsdVars->BEChans[subBandNum],
                 "Number of subbands", 0 );
 
-  astSetFitsI ( fitschan, "REFCHAN", refChan, 
+  astSetFitsI ( fitschan, "REFCHAN", refChan,
                 "Reference IF channel No.", 0 );
 
   astSetFitsF ( fitschan, "IFCHANSP", IFchanSp,
-                "[Hz] TOPO IF channel spacing (signed)", 0 ); 
+                "[Hz] TOPO IF channel spacing (signed)", 0 );
 
-  astSetFitsS ( fitschan, "FFT_WIN", "truncate", 
+  astSetFitsS ( fitschan, "FFT_WIN", "truncate",
 	        "Type of window used for FFT", 0 );
 
   if ( strncmp ( gsdVars->backend, "DAS", 3 ) == 0 ) {
 
-    astSetFitsF ( fitschan, "BEDEGFAC", 1.15, 
+    astSetFitsF ( fitschan, "BEDEGFAC", 1.15,
 	          "Backend degradation factor", 0 );
 
   } else if ( strncmp ( gsdVars->backend, "AOSC", 4 ) == 0 ) {
 
-    astSetFitsF ( fitschan, "BEDEGFAC", 1.0, 
+    astSetFitsF ( fitschan, "BEDEGFAC", 1.0,
 	          "Backend degradation factor", 0 );
 
   } else {
 
-    astSetFitsU ( fitschan, "BEDEGFAC", "Backend degradation factor", 0 ); 
+    astSetFitsU ( fitschan, "BEDEGFAC", "Backend degradation factor", 0 );
 
   }
 
-  astSetFitsU ( fitschan, "MSROOT", "Root name of raw measurement sets", 0 ); 
+  astSetFitsU ( fitschan, "MSROOT", "Root name of raw measurement sets", 0 );
 
 
   /* FE Specific. */
   astSetFitsCM ( fitschan,
                  "---- FE Specific ----", 0 );
 
-  astSetFitsS ( fitschan, "INSTRUME", instrume, 
-	        "Front-end receiver", 0 ); 
+  astSetFitsS ( fitschan, "INSTRUME", instrume,
+	        "Front-end receiver", 0 );
 
-  astSetFitsS ( fitschan, "SB_MODE", gsdVars->sbMode, 
-	        "Sideband mode", 0 ); 
+  astSetFitsS ( fitschan, "SB_MODE", gsdVars->sbMode,
+	        "Sideband mode", 0 );
 
   astSetFitsF ( fitschan, "IFFREQ", IFFreqs[subBandNum],
                 "[GHz] IF Frequency", 0 );
 
-  astSetFitsI ( fitschan, "N_MIX", nMix, 
+  astSetFitsI ( fitschan, "N_MIX", nMix,
                 "No. of mixers", 0 );
 
-  astSetFitsS ( fitschan, "OBS_SB", obsSB, 
+  astSetFitsS ( fitschan, "OBS_SB", obsSB,
 		"The observed sideband", 0 );
 
   astSetFitsF ( fitschan, "LOFREQS", gsdVars->LOFreqs[subBandNum],
@@ -668,18 +668,18 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "RECPTORS", recptors,
                 "Active FE receptor IDs for this obs", 0 );
 
-  astSetFitsS ( fitschan, "REFRECEP", recepNames[0], 
+  astSetFitsS ( fitschan, "REFRECEP", recepNames[0],
                 "Receptor with unit sensitivity", 0 );
 
   if ( strcmp ( samMode, "sample" ) == 0 ) {
     astSetFitsU ( fitschan, "MEDTSYS", "[K] Median of the T-sys across all receptors", 0 );
   } else {
-    astSetFitsF ( fitschan, "MEDTSYS", 
+    astSetFitsF ( fitschan, "MEDTSYS",
                   gsdVars->sourceSysTemps[subBandNum],
 		  "[K] Median of the T-sys across all receptors", 0 );
   }
 
-  astSetFitsS ( fitschan, "TEMPSCAL", "TA*", 
+  astSetFitsS ( fitschan, "TEMPSCAL", "TA*",
                 "Temperature scale in use", 0 );
 
   astSetFitsS ( fitschan, "DOPPLER", doppler,
@@ -693,26 +693,26 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCM ( fitschan,
                  "---- Environmental Data ----", 0 );
 
-  astSetFitsF ( fitschan, "ATSTART", gsdVars->tamb, 
+  astSetFitsF ( fitschan, "ATSTART", gsdVars->tamb,
                 "[degC] Air temp at start of observation", 0 );
 
-  astSetFitsF ( fitschan, "ATEND", gsdVars->tamb, 
+  astSetFitsF ( fitschan, "ATEND", gsdVars->tamb,
                 "[degC] Air temp at end of observation", 0 );
 
-  astSetFitsF ( fitschan, "HUMSTART",gsdVars->hamb , 
+  astSetFitsF ( fitschan, "HUMSTART",gsdVars->hamb ,
                 "Rel Humidity at observation start", 0 );
 
-  astSetFitsF ( fitschan, "HUMEND", gsdVars->hamb, 
+  astSetFitsF ( fitschan, "HUMEND", gsdVars->hamb,
                 "Rel Humidity observation end", 0 );
 
-  astSetFitsF ( fitschan, "BPSTART", gsdVars->pamb, 
+  astSetFitsF ( fitschan, "BPSTART", gsdVars->pamb,
                 "[mbar] Pressure at observation start", 0 );
 
-  astSetFitsF ( fitschan, "BPEND", gsdVars->pamb, 
+  astSetFitsF ( fitschan, "BPEND", gsdVars->pamb,
                 "[mbar] Pressure at observation end", 0 );
 
   astSetFitsU ( fitschan, "WNDSPDST", "[km/h] Wind Speed at obs start", 0 );
-  
+
   astSetFitsU ( fitschan, "WNDSPDEN", "[km/h] Wind Speed at obs end", 0 );
 
   astSetFitsU ( fitschan, "WNDDIRST", "[deg] Wind direction, azimuth at obs start", 0 );
@@ -767,8 +767,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCM ( fitschan,
                  "---- Switching and Map setup for the observationi ----", 0 );
 
-  astSetFitsS ( fitschan, "SAM_MODE", samMode, 
-                "Sampling Mode", 0 );  
+  astSetFitsS ( fitschan, "SAM_MODE", samMode,
+                "Sampling Mode", 0 );
 
   astSetFitsS ( fitschan, "SW_MODE", mapVars->swMode,
                 "Switch Mode", 0 );
@@ -777,7 +777,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                 "X co-ord of Reference Position", 0 );
 
   astSetFitsS ( fitschan, "SKYREFY", mapVars->skyRefY,
-                "Y co-ord of Reference Position", 0 );   
+                "Y co-ord of Reference Position", 0 );
 
   astSetFitsS ( fitschan, "OBS_TYPE", obsType,
 		"Type of observation", 0 );
@@ -843,7 +843,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 		  "[arcsec] Requested map offset from telescope centre", 0 );
 
     astSetFitsF ( fitschan, "MAP_Y", gsdVars->centreOffsetY,
-		  "[arcsec] Requested map offset from telescope centre", 0 );  
+		  "[arcsec] Requested map offset from telescope centre", 0 );
 
     astSetFitsS ( fitschan, "SCAN_CRD", mapVars->scanCrd,
 		  "Co-ordinate system for scan", 0 );
@@ -869,7 +869,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
     astSetFitsU ( fitschan, "MAP_X", "[arcsec] Requested map offset from telescope centre", 0 );
 
-    astSetFitsU ( fitschan, "MAP_Y", "[arcsec] Requested map offset from telescope centre", 0 );  
+    astSetFitsU ( fitschan, "MAP_Y", "[arcsec] Requested map offset from telescope centre", 0 );
 
     astSetFitsU ( fitschan, "SCAN_CRD", "Co-ordinate system for scan", 0 );
 
@@ -886,25 +886,25 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCM ( fitschan,
                  "---- SMU ----", 0 );
 
-  astSetFitsF ( fitschan, "ALIGN_DX", gsdVars->smuDX, 
+  astSetFitsF ( fitschan, "ALIGN_DX", gsdVars->smuDX,
 		"SMU tables X axis focus offset", 0 );
 
-  astSetFitsF ( fitschan, "ALIGN_DY", gsdVars->smuDY, 
+  astSetFitsF ( fitschan, "ALIGN_DY", gsdVars->smuDY,
 		"SMU tables Y axis focus offset", 0 );
 
-  astSetFitsF ( fitschan, "FOCUS_DZ", gsdVars->smuDZ, 
+  astSetFitsF ( fitschan, "FOCUS_DZ", gsdVars->smuDZ,
 		"SMU tables Z axis focus offset", 0 );
 
-  astSetFitsF ( fitschan, "DAZ", gsdVars->smuOffsEW, 
+  astSetFitsF ( fitschan, "DAZ", gsdVars->smuOffsEW,
 		"SMU azimuth pointing offset", 0 );
 
-  astSetFitsF ( fitschan, "DEL", gsdVars->smuOffsNS, 
+  astSetFitsF ( fitschan, "DEL", gsdVars->smuOffsNS,
 		"SMU elevation pointing offset", 0 );
 
-  astSetFitsF ( fitschan, "UAZ", gsdVars->errAz, 
+  astSetFitsF ( fitschan, "UAZ", gsdVars->errAz,
 		"User azimuth pointing offset", 0 );
 
-  astSetFitsF ( fitschan, "UEL", gsdVars->errEl, 
+  astSetFitsF ( fitschan, "UEL", gsdVars->errEl,
 		"User elevation pointing offset", 0 );
 
 
@@ -912,13 +912,13 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCM ( fitschan,
                  "---- JOS parameters ----", 0 );
 
-  astSetFitsF ( fitschan, "STEPTIME", stepTime, 
-                "RTS step time during an RTS sequence", 0 ); 
+  astSetFitsF ( fitschan, "STEPTIME", stepTime,
+                "RTS step time during an RTS sequence", 0 );
 
-  astSetFitsI ( fitschan, "NUM_CYC", gsdVars->nCycle, 
-                "Number of times to repeat entire recipe", 0 );  
+  astSetFitsI ( fitschan, "NUM_CYC", gsdVars->nCycle,
+                "Number of times to repeat entire recipe", 0 );
 
-  astSetFitsI ( fitschan, "NUM_NODS", 1, 
+  astSetFitsI ( fitschan, "NUM_NODS", 1,
                 "Number of times to repeat nod set", 0 );
 
   astSetFitsU ( fitschan, "JOS_MULT", "", 0 );//k description
@@ -931,7 +931,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 		"Mean no. of RTS steps for each REF", 0 );
 
   if( stBetRef_defined ) {
-     astSetFitsI ( fitschan, "STBETREF", stBetRef, 
+     astSetFitsI ( fitschan, "STBETREF", stBetRef,
    		   "Target number of RTS steps between REFs", 0 );
   } else {
      astSetFitsU ( fitschan, "STBETREF", "Target number of RTS steps between REFs", 0 );

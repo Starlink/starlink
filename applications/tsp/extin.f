@@ -12,7 +12,7 @@ C
 C     Description:
 C        Correct a polarization spectrum for extinction using a coefficient
 C        spectrum containing the interpolated extinxtion coefficients over
-C        the wavelength range of the spectrum. This can be generated using 
+C        the wavelength range of the spectrum. This can be generated using
 C        Figaro as described in the section on extinction in the Figaro
 C        manual.
 C
@@ -24,16 +24,16 @@ C    (3) AIRMASS    (Real)     The air-mass (approximately sec z) of
 C                                the observation.
 C    (4) OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C           Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C           6/12/1991
 C
 C-
 C
 C  History:
-C    16/8/1990   Original Version.   JAB/AAO 
+C    16/8/1990   Original Version.   JAB/AAO
 C    6/12/1991   Handle bad values.   JAB/AAO
 C
 
@@ -54,7 +54,7 @@ C
 *  HDS locators
       CHARACTER*(DAT__SZLOC) OLOC,ILOC,DLOC,SLOC
       LOGICAL OK,QZ,UZ,VZ
-      INTEGER SIZE,NUM,STAT                                        
+      INTEGER SIZE,NUM,STAT
       CHARACTER*40 LABEL,UNITS
       INTEGER NTYPE,NCH
       INTEGER CSLOT
@@ -64,7 +64,7 @@ C
 
 *  ICH functions
       INTEGER ICH_FOLD, ICH_CLEAN
-                         
+
 *  Get the Input data
 
          CALL DAT_ASSOC('INPUT','READ',ILOC,STATUS)
@@ -106,18 +106,18 @@ C
          IF (DIMS(1) .NE. SIZE) THEN
              CALL MSG_OUT(' ','Spectra have different sizes',STATUS)
              STATUS = USER__001
-         ENDIF    
+         ENDIF
 
 *  Map intensity data
 
-         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)   
+         CALL TSP_MAP_DATA(OLOC,'UPDATE',DPTR,DLOC,STATUS)
 
 *  Correct Intensity data
 
          IF (STATUS .EQ. SAI__OK) THEN
              CALL TSP_EXTIN(SIZE,AM,%VAL(CPTR),%VAL(DPTR))
          ENDIF
-         CALL TSP_UNMAP(DLOC,STATUS)        
+         CALL TSP_UNMAP(DLOC,STATUS)
 
 *  Correct variance data
 
@@ -142,7 +142,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_EXTIN(SIZE,AM,%VAL(CPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
 
@@ -164,7 +164,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_EXTIN(SIZE,AM,%VAL(CPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
 
@@ -186,7 +186,7 @@ C
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_EXTIN(SIZE,AM,%VAL(CPTR),%VAL(DPTR))
-             ENDIF           
+             ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
 
@@ -213,13 +213,13 @@ C
 
       END
 
-      
+
 
       SUBROUTINE TSP_EXTIN (NX,AM,C,DATA)
 C+
 C
 C     T S P _ E X T I N
-C 
+C
 C     Apply extinction correction to a data array. The array C is an
 C     array of extinction coefficients as a function of wavelength which
 C     is used to calcualte the extinction correction to the data for a

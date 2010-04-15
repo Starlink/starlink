@@ -3,8 +3,8 @@
 *    Description :
 *     This subroutine is the head of the tree of routines that reduce an
 *     entire CGS4 observation in one go. The routine creates a reduced
-*     observation file to hold the result then opens the nominated 
-*     observation file, finds from it the type of observation this was, 
+*     observation file to hold the result then opens the nominated
+*     observation file, finds from it the type of observation this was,
 *     and calls the appropriate reduction routine.
 *    Invocation :
 *     CALL RED4_REDUCE_OBSERVATION (STATUS)

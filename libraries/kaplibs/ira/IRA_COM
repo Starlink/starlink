@@ -14,12 +14,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,20 +72,20 @@
       INTEGER          ACM_M1ID
       INTEGER          ACM_M2ID
       INTEGER          ACM_M3ID
-      INTEGER          ACM_NBRK 
+      INTEGER          ACM_NBRK
 
       COMMON /IRA_CMI/ ACM_M1ID, ACM_M2ID, ACM_M3ID, ACM_NBRK
 
 *  Logical variables...
       LOGICAL          ACM_VALID( IRA__MAX )
-      LOGICAL          ACM_OUT 
+      LOGICAL          ACM_OUT
 
       COMMON /IRA_CML/ ACM_VALID, ACM_OUT
 
 *  Real variables...
-      REAL             ACM_BRK( 2, IRA__MXBRK ) 
+      REAL             ACM_BRK( 2, IRA__MXBRK )
       REAL             ACM_DRVPO( 5 )
-      REAL             ACM_LENG 
-      REAL             ACM_VBRK( 2, IRA__MXBRK ) 
+      REAL             ACM_LENG
+      REAL             ACM_VBRK( 2, IRA__MXBRK )
 
       COMMON /IRA_CMR/ ACM_BRK, ACM_LENG, ACM_VBRK, ACM_DRVPO

@@ -1,5 +1,5 @@
-      SUBROUTINE SURFLIB_REMOVE_DC_VIA_SECT(DORLB, N_SPEC, SECTION, 
-     :     USE_SECT, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
+      SUBROUTINE SURFLIB_REMOVE_DC_VIA_SECT(DORLB, N_SPEC, SECTION,
+     :     USE_SECT, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
      :     DEMOD_POINTER,N_BOL, N_POS, IN_DATA, IN_VARIANCE, IN_QUALITY,
      :     OUT_DATA, OUT_VARIANCE, OUT_QUALITY, BADBIT, STATUS)
 *+
@@ -16,7 +16,7 @@
 *    :     OUT_QUALITY, BADBIT, STATUS)
 
 *  Description:
-*     This routine takes a data array and removes a 
+*     This routine takes a data array and removes a
 *     DC offset from each scan. The DC level is the median of the
 *     data specified in the SCUBA section for that particular integration.
 *     The same level is removed for each scan of an integration
@@ -68,7 +68,7 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL: John Lightfoot (RoE)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -100,7 +100,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -153,7 +153,7 @@
       INTEGER IERR                   ! For VEC_
       INTEGER INTEGRATION            ! Integration counter
       INTEGER MASK_END               ! End of mask array
-      INTEGER MASK_PTR               ! Mask byte array 
+      INTEGER MASK_PTR               ! Mask byte array
       INTEGER MEASUREMENT            ! Measurement counter
       DOUBLE PRECISION MEAN          ! Mean of scan
       DOUBLE PRECISION MEDIAN        ! Median of scan
@@ -197,7 +197,7 @@
 *     This allows us to have some values set even if the points are not
 *     good and a baseline can not be fitted - or no section has
 *     been specified for that particular integration
-      
+
       DO BOL = 1, N_BOL
          DO POS = 1, N_POS
             OUT_DATA(BOL,POS) = IN_DATA(BOL,POS)
@@ -210,10 +210,10 @@
       MASK_PTR = 0
       MASK_END = 0
 
-      CALL SCULIB_MALLOC( N_POS * N_BOL * VAL__NBUB, MASK_PTR, 
-     :     MASK_END, STATUS) 
+      CALL SCULIB_MALLOC( N_POS * N_BOL * VAL__NBUB, MASK_PTR,
+     :     MASK_END, STATUS)
 
-*     We are now going to merge the data quality array with 
+*     We are now going to merge the data quality array with
 *     the supplied section. We have to make sure that we set bits
 *     that are already pointing to bad quality via a BADBIT mask.
 *     We do not want to merge the two arrays blindly since this
@@ -241,7 +241,7 @@
 *     Fill the mask  with 0
          BTEMP = 0
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_CFILLB(N_POS * N_BOL, BTEMP, 
+            CALL SCULIB_CFILLB(N_POS * N_BOL, BTEMP,
      :           %VAL(CNF_PVAL(MASK_PTR)))
          END IF
 
@@ -265,7 +265,7 @@
 *     the new section mask
 
       BTEMP = 1  ! Not needed
-      
+
       CALL SCULIB_MASK_DATA(.NOT.USE_SECT, 'BIT', N_SPEC,
      :     SECTION, DEMOD_POINTER, 1, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, N_POS, N_BOL, 1, .FALSE., 0.0, BTEMP,
@@ -276,7 +276,7 @@
 
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
-               
+
 *     Stop looping if STATUS is bad
 
             IF (STATUS .EQ. SAI__OK) THEN
@@ -291,35 +291,35 @@
      :              (SCAN_START .EQ. 0) ) THEN
                   CALL MSG_SETI ('I', INTEGRATION)
                   CALL MSG_SETI ('M', MEASUREMENT)
-                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+                  CALL MSG_OUTIF (MSG__NORM, ' ',
      :                 'REMOVE_DC_OFFSET_SECTION: no data '//
      :                 'for int ^I, meas ^M', STATUS)
                ELSE
 
 
 *     OK, there is some data for the scan
-                     
+
                   CALL MSG_SETI('NI', INTEGRATION)
                   CALL MSG_OUTIF(MSG__NORM,' ',
      :                 'REMOVE_DC_OFFSET_SECTION: Processing'//
      :                 ' integration ^NI', STATUS)
-                     
+
 
 *     Now we need to find out the statistics of the masked
 *     data for this bolometer and integration
-*     This is easy since we can use the mask array as a merged 
+*     This is easy since we can use the mask array as a merged
 *     quality array
-                  
+
                   N_SCAN = SCAN_END - SCAN_START + 1
 
 *     Create workspace for the statistics calculation
-                  CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, QSORT_PTR, 
+                  CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, QSORT_PTR,
      :                 QSORT_END, STATUS)
-                  CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, D_PTR, 
+                  CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, D_PTR,
      :                 D_END, STATUS)
-                  CALL SCULIB_MALLOC(N_SCAN * VAL__NBUB, Q_PTR, 
+                  CALL SCULIB_MALLOC(N_SCAN * VAL__NBUB, Q_PTR,
      :                 Q_END, STATUS)
-                  
+
                   DO BOL = 1, N_BOL
 
 *     Copy the scan data to temporary storage
@@ -328,16 +328,16 @@
                      COUNT = 0
                      DO POS = SCAN_START, SCAN_END
 
-                        CALL VEC_RTOR(.FALSE., 1, 
-     :                       IN_DATA(BOL,POS), 
+                        CALL VEC_RTOR(.FALSE., 1,
+     :                       IN_DATA(BOL,POS),
      :                       %VAL(CNF_PVAL(D_PTR) + COUNT * VAL__NBR),
      :                       IERR, NERR, STATUS)
-                        CALL VEC_UBTOUB(.FALSE., 1, 
+                        CALL VEC_UBTOUB(.FALSE., 1,
      :                       %VAL(CNF_PVAL(MASK_PTR) + ( N_BOL * (POS-1)
      :                       + BOL - 1) * VAL__NBUB),
      :                       %VAL(CNF_PVAL(Q_PTR) + COUNT * VAL__NBUB),
      :                       IERR, NERR, STATUS)
-                        
+
                         COUNT = COUNT + 1
                      END DO
 
@@ -346,8 +346,8 @@
 *     Use 3 sigma clipping by default (make this configurable?)
 
 
-                     CALL SCULIB_STATR(N_SCAN, NSIGMA, 
-     :                    %VAL(CNF_PVAL(D_PTR)), %VAL(CNF_PVAL(Q_PTR)), 
+                     CALL SCULIB_STATR(N_SCAN, NSIGMA,
+     :                    %VAL(CNF_PVAL(D_PTR)), %VAL(CNF_PVAL(Q_PTR)),
      :                    BADBIT,
      :                    NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV,
      :                    %VAL(CNF_PVAL(QSORT_PTR)), STATUS)
@@ -370,40 +370,40 @@
 *     We are removing the DC level
 *     Remove it even if quality is bad
                            IF (DORLB) THEN
-                                 
-                              IF (IN_DATA(BOL,POS) .NE. 
+
+                              IF (IN_DATA(BOL,POS) .NE.
      :                             VAL__BADR) THEN
-                                 
+
                                  IF (DCVALUE .NE. VAL__BADR) THEN
-                                    OUT_DATA(BOL,POS) = 
+                                    OUT_DATA(BOL,POS) =
      :                                   IN_DATA(BOL,POS) - DCVALUE
                                  ELSE
                                     OUT_DATA(BOL,POS) = VAL__BADR
                                  END IF
 
                               ELSE
-                                 OUT_DATA(BOL,POS) = 
+                                 OUT_DATA(BOL,POS) =
      :                                IN_DATA(BOL,POS)
                               END IF
-                              
-                              OUT_QUALITY(BOL, POS) = 
+
+                              OUT_QUALITY(BOL, POS) =
      :                             IN_QUALITY(BOL, POS)
-                              OUT_VARIANCE(BOL, POS) = 
+                              OUT_VARIANCE(BOL, POS) =
      :                             IN_VARIANCE(BOL,POS)
 
-                                 
+
 *     Store the fit
                            ELSE
 
                               OUT_DATA(BOL, POS) = DCVALUE
                               OUT_VARIANCE(BOL,POS) = 0.0
                               OUT_QUALITY(BOL,POS) = 0
-                              
+
                            END IF
-                              
+
                         END DO
 
-                     END IF 
+                     END IF
 
                   END DO
 
@@ -427,5 +427,5 @@
 *     Free the mask
       CALL SCULIB_FREE('MASK', MASK_PTR, MASK_END, STATUS)
 
-      END 
+      END
 

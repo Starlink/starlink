@@ -1,11 +1,11 @@
       PROGRAM CIRIND
 *                      GKS Example Program 2.5
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GINDIV, GLSOLI, GLDASH
       INCLUDE 'GKS_PAR'
- 
+
 *                      Set up parameters with names for the AFSs
       INTEGER    GALN,      GALWSC,    GAPLCI,   GAMK,     GAMKSC
       PARAMETER (GALN=1,    GALWSC=2,  GAPLCI=3, GAMK=4,   GAMKSC=5)
@@ -25,22 +25,22 @@
       REAL WIDTH(4)
       DATA LNTYPE/GLSOLI, GLDASH, GLSOLI, GLDASH/
       DATA WIDTH/1.0, 1.0, 2.0, 2.0/
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Inquire current ASFs and set LINETYPE and
 *                      LINEWIDTH SCALE FACTOR to be INDIVIDUAL
       CALL GQASF (KERROR, JASF)
@@ -62,7 +62,7 @@
 *                      Draw the circle
          CALL GPL (361 , XA , YA)
    20 CONTINUE
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing

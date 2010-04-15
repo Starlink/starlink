@@ -2,22 +2,22 @@
 *+
 *  Name:
 *     VEC_WTOW
- 
+
 *  Purpose:
 *     Copy vectorised WORD values.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL VEC_WTOW( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
- 
+
 *  Description:
 *     The routine copies a vectorised array of WORD values.  It forms
 *     part of the set of type conversion routines, but in this instance
 *     the argument and result types are both the same, so the argument
 *     values are simply copied.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether the argument values (ARGV) may be "bad" (this argument
@@ -45,7 +45,7 @@
 *        returns immediately without action.  This routine cannot
 *        produce numerical errors, so the STATUS argument will not be
 *        changed.
- 
+
 *  Copyright:
 *     Copyright (C) 1988, 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,57 +69,57 @@
 *  Authors:
 *     R.F. Warren-Smith (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     15-AUG-1988 (RFWS):
 *        Original version.
 *     28-OCT-1991 (RFWS):
 *        Revoved VAX-specific call.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INCLUDE 'PRM_PAR'          ! PRM_ public constants
 
- 
+
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
       INTEGER N                  ! Number of elements to process
       INTEGER*2 ARGV( * )           ! Array of input values
- 
+
 *  Arguments Returned:
       INTEGER*2 RESV( * )           ! Array of result values
       INTEGER IERR               ! Numerical error pointer
       INTEGER NERR               ! Numerical error count
- 
+
 *  Status:
       INTEGER STATUS             ! Error status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
 *.
- 
+
 *   Check status.
       IF( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Copy the values.
       DO I = 1, N
          RESV( I ) = ARGV( I )
       ENDDO
- 
+
 *   Set the numerical error pointer and the error count to zero.
       IERR = 0
       NERR = 0
- 
+
 *   Exit routine.
       END

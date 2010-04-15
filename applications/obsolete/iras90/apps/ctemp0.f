@@ -13,7 +13,7 @@
 *     = CTEMP0( NU, T )
 
 *  Description:
-*     The returned value is a surface brightness value in ExaJanskys 
+*     The returned value is a surface brightness value in ExaJanskys
 *     per steradian (1E18 Jy/sr) emitted by a blackbody at temperature T
 *     at frequency NU.
 
@@ -39,7 +39,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,18 +72,18 @@
          IF( ARG .GT. 20.0D0 ) THEN
             CTEMP0 = C1*(NU**3)*EXP( -ARG )
 
-*  Otherwise, use the exact expression.      
+*  Otherwise, use the exact expression.
          ELSE IF( ARG .GT. 0.0D0 ) THEN
             CTEMP0 = C1*(NU**3)/(EXP( ARG ) - 1.0D0 )
 
 *  Return zero for any bad values of ARG.
          ELSE
             CTEMP0 = 0.0D0
-   
-         END IF      
+
+         END IF
 
       ELSE
          CTEMP0 = 0.0D0
-      END IF   
+      END IF
 
       END

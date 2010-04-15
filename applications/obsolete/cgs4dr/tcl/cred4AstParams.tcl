@@ -37,7 +37,7 @@ proc cred4AstParams {} {
     set Cred4Widgets(ERRORS) "FROM_OBS"
 
     set l1 [label $bottop.l1 -text "Sky Weighting Factor"]
-    set sk [entry $bottop.sk -width 15 -textvariable Cred4Widgets(SKYWT)]   
+    set sk [entry $bottop.sk -width 15 -textvariable Cred4Widgets(SKYWT)]
     set vw [checkbutton $bottop.l2 -text "Variance Weighting" -variable Cred4Widgets(VARWT)]
     set l3 [label $bottop.l3 -text " "]
     pack $vw $l3 -in $bottop -side left -pady 2m
@@ -47,7 +47,7 @@ proc cred4AstParams {} {
     $sk delete 0 end
     $sk insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.sky_wt]]
 
-# Middle-Right contains Extract Nodded Spectrum Parameters 
+# Middle-Right contains Extract Nodded Spectrum Parameters
     set toptop [frame $rmiddle.top]
     set midtop [frame $rmiddle.mid]
     set bottop [frame $rmiddle.bot]
@@ -68,12 +68,12 @@ proc cred4AstParams {} {
     set Cred4Widgets(SPC_ALGORITHM) [string trim [string toupper [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.algorithm]]]
     set Cred4Widgets(SPC_INVERT) [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.invert]
 
-    set l1 [label $bottop.l1 -text "Start"]  
-    set l2 [label $bottop.l2 -text "End"]  
-    set l3 [label $bottop.l3 -text "Top Extraction Row" -width 20]  
+    set l1 [label $bottop.l1 -text "Start"]
+    set l2 [label $bottop.l2 -text "End"]
+    set l3 [label $bottop.l3 -text "Top Extraction Row" -width 20]
     set l4 [label $bottop.l4 -text " "]
-    set s1 [entry $bottop.s1 -textvariable Cred4Widgets(SPC_ROW1S)]   
-    set e1 [entry $bottop.e1 -textvariable Cred4Widgets(SPC_ROW1E)]   
+    set s1 [entry $bottop.s1 -textvariable Cred4Widgets(SPC_ROW1S)]
+    set e1 [entry $bottop.e1 -textvariable Cred4Widgets(SPC_ROW1E)]
     pack $l3 $l4 -in $bottop -side left -pady 2m
     pack $e1 $l2 $s1 $l1 -in $bottop -side right -pady 2m
     $s1 delete 0 end
@@ -81,12 +81,12 @@ proc cred4AstParams {} {
     $e1 delete 0 end
     $e1 insert end [string trim [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.row1e]]
 
-    set l1 [label $basetop.l1 -text "Start"]  
-    set l2 [label $basetop.l2 -text "End"]  
-    set l3 [label $basetop.l3 -text "Middle Extraction Row" -width 20]  
+    set l1 [label $basetop.l1 -text "Start"]
+    set l2 [label $basetop.l2 -text "End"]
+    set l3 [label $basetop.l3 -text "Middle Extraction Row" -width 20]
     set l4 [label $basetop.l4 -text " "]
-    set s2 [entry $basetop.s1 -textvariable Cred4Widgets(SPC_ROW2S)]   
-    set e2 [entry $basetop.e1 -textvariable Cred4Widgets(SPC_ROW2E)]   
+    set s2 [entry $basetop.s1 -textvariable Cred4Widgets(SPC_ROW2S)]
+    set e2 [entry $basetop.e1 -textvariable Cred4Widgets(SPC_ROW2E)]
     pack $l3 $l4 -in $basetop -side left -pady 2m
     pack $e2 $l2 $s2 $l1 -in $basetop -side right -pady 2m
     $s2 delete 0 end
@@ -94,12 +94,12 @@ proc cred4AstParams {} {
     $e2 delete 0 end
     $e2 insert end [string trim [nbs get ${Cred4NoticeBoard}.reduction.extract_spc.row2e]]
 
-    set l1 [label $lbasetop.l1 -text "Start"]  
-    set l2 [label $lbasetop.l2 -text "End"]  
-    set l3 [label $lbasetop.l3 -text "Bottom Extraction Row" -width 20]  
+    set l1 [label $lbasetop.l1 -text "Start"]
+    set l2 [label $lbasetop.l2 -text "End"]
+    set l3 [label $lbasetop.l3 -text "Bottom Extraction Row" -width 20]
     set l4 [label $lbasetop.l4 -text " "]
-    set s3 [entry $lbasetop.s1 -textvariable Cred4Widgets(SPC_ROW3S)]   
-    set e3 [entry $lbasetop.e1 -textvariable Cred4Widgets(SPC_ROW3E)]   
+    set s3 [entry $lbasetop.s1 -textvariable Cred4Widgets(SPC_ROW3S)]
+    set e3 [entry $lbasetop.e1 -textvariable Cred4Widgets(SPC_ROW3E)]
     pack $l3 $l4 -in $lbasetop -side left -pady 2m
     pack $e3 $l2 $s3 $l1 -in $lbasetop -side right -pady 2m
     $s3 delete 0 end
@@ -128,9 +128,9 @@ proc cred4AstParams {} {
     set Cred4Widgets(PF_POLYFIT) [string trim [string toupper [nbs get ${Cred4NoticeBoard}.miscellaneous.pf_polyfit]]]
 
     set l1 [label $lev3.l1 -text "Degree"]
-    set dg [entry $lev3.dg -width 15 -textvariable Cred4Widgets(PF_DEGREE)]   
+    set dg [entry $lev3.dg -width 15 -textvariable Cred4Widgets(PF_DEGREE)]
     set l2 [label $lev3.l2 -text "Nreject"]
-    set nr [entry $lev3.nr -width 15 -textvariable Cred4Widgets(PF_NREJECT)]   
+    set nr [entry $lev3.nr -width 15 -textvariable Cred4Widgets(PF_NREJECT)]
     set we [checkbutton $lev3.we -text "Weight" -variable Cred4Widgets(PF_WEIGHT)]
     set l3 [label $lev3.l3 -text " "]
     pack $l1 $dg $l2 $nr -in $lev3 -side left -pady 2m
@@ -141,12 +141,12 @@ proc cred4AstParams {} {
     $nr insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.pf_nreject]]
     set Cred4Widgets(PF_WEIGHT) [nbs get ${Cred4NoticeBoard}.miscellaneous.pf_weight]
 
-    set l1 [label $lev4.l1 -text "Start"]  
-    set l2 [label $lev4.l2 -text "End"]  
-    set l3 [label $lev4.l3 -text "First Sky Area" -width 15]  
+    set l1 [label $lev4.l1 -text "Start"]
+    set l2 [label $lev4.l2 -text "End"]
+    set l3 [label $lev4.l3 -text "First Sky Area" -width 15]
     set l4 [label $lev4.l4 -text " "]
-    set ss1 [entry $lev4.s1 -textvariable Cred4Widgets(PF_SAYS1)]   
-    set se1 [entry $lev4.e1 -textvariable Cred4Widgets(PF_SAYE1)]   
+    set ss1 [entry $lev4.s1 -textvariable Cred4Widgets(PF_SAYS1)]
+    set se1 [entry $lev4.e1 -textvariable Cred4Widgets(PF_SAYE1)]
     pack $l3 $l4 -in $lev4 -side left -pady 2m
     pack $se1 $l2 $ss1 $l1 -in $lev4 -side right -pady 2m
     $ss1 delete 0 end
@@ -154,12 +154,12 @@ proc cred4AstParams {} {
     $se1 delete 0 end
     $se1 insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.pf_saye1]]
 
-    set l1 [label $lev5.l1 -text "Start"]  
-    set l2 [label $lev5.l2 -text "End"]  
-    set l3 [label $lev5.l3 -text "Second Sky Area" -width 15]  
+    set l1 [label $lev5.l1 -text "Start"]
+    set l2 [label $lev5.l2 -text "End"]
+    set l3 [label $lev5.l3 -text "Second Sky Area" -width 15]
     set l4 [label $lev5.l5 -text " "]
-    set ss2 [entry $lev5.s1 -textvariable Cred4Widgets(PF_SAYS2)]   
-    set se2 [entry $lev5.e1 -textvariable Cred4Widgets(PF_SAYE2)]   
+    set ss2 [entry $lev5.s1 -textvariable Cred4Widgets(PF_SAYS2)]
+    set se2 [entry $lev5.e1 -textvariable Cred4Widgets(PF_SAYE2)]
     pack $l3 $l4 -in $lev5 -side left -pady 2m
     pack $se2 $l2 $ss2 $l1 -in $lev5 -side right -pady 2m
     $ss2 delete 0 end
@@ -167,12 +167,12 @@ proc cred4AstParams {} {
     $se2 delete 0 end
     $se2 insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.pf_saye2]]
 
-    set l1 [label $lev6.l1 -text "Start"]  
-    set l2 [label $lev6.l2 -text "End"]  
-    set l3 [label $lev6.l3 -text "Third Sky Area" -width 15]  
+    set l1 [label $lev6.l1 -text "Start"]
+    set l2 [label $lev6.l2 -text "End"]
+    set l3 [label $lev6.l3 -text "Third Sky Area" -width 15]
     set l4 [label $lev6.l6 -text " "]
-    set ss3 [entry $lev6.s1 -textvariable Cred4Widgets(PF_SAYS3)]   
-    set se3 [entry $lev6.e1 -textvariable Cred4Widgets(PF_SAYE3)]   
+    set ss3 [entry $lev6.s1 -textvariable Cred4Widgets(PF_SAYS3)]
+    set se3 [entry $lev6.e1 -textvariable Cred4Widgets(PF_SAYE3)]
     pack $l3 $l4 -in $lev6 -side left -pady 2m
     pack $se3 $l2 $ss3 $l1 -in $lev6 -side right -pady 2m
     $ss3 delete 0 end
@@ -180,12 +180,12 @@ proc cred4AstParams {} {
     $se3 delete 0 end
     $se3 insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.pf_saye3]]
 
-    set l1 [label $lev7.l1 -text "Start"]  
-    set l2 [label $lev7.l2 -text "End"]  
-    set l3 [label $lev7.l3 -text "Fourth Sky Area" -width 15]  
+    set l1 [label $lev7.l1 -text "Start"]
+    set l2 [label $lev7.l2 -text "End"]
+    set l3 [label $lev7.l3 -text "Fourth Sky Area" -width 15]
     set l4 [label $lev7.l7 -text " "]
-    set ss4 [entry $lev7.s1 -textvariable Cred4Widgets(PF_SAYS4)]   
-    set se4 [entry $lev7.e1 -textvariable Cred4Widgets(PF_SAYE4)]   
+    set ss4 [entry $lev7.s1 -textvariable Cred4Widgets(PF_SAYS4)]
+    set se4 [entry $lev7.e1 -textvariable Cred4Widgets(PF_SAYE4)]
     pack $l3 $l4 -in $lev7 -side left -pady 2m
     pack $se4 $l2 $ss4 $l1 -in $lev7 -side right -pady 2m
     $ss4 delete 0 end
@@ -256,7 +256,7 @@ proc cred4AstParams {} {
       nbs put ${Cred4NoticeBoard}.miscellaneous.pf_weight TRUE
       nbs put ${Cred4NoticeBoard}.miscellaneous.pf_degree 1
       nbs put ${Cred4NoticeBoard}.miscellaneous.pf_nreject 0
-      nbs put ${Cred4NoticeBoard}.miscellaneous.pf_says1 20 
+      nbs put ${Cred4NoticeBoard}.miscellaneous.pf_says1 20
       nbs put ${Cred4NoticeBoard}.miscellaneous.pf_saye1 25
       nbs put ${Cred4NoticeBoard}.miscellaneous.pf_says2 35
       nbs put ${Cred4NoticeBoard}.miscellaneous.pf_saye2 40

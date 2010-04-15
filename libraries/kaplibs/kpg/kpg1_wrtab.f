@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_WRTAB( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS,
-     :                       TITLE, ID0, IDENTS, LABS, HIST, NULL, 
+     :                       TITLE, ID0, IDENTS, LABS, HIST, NULL,
      :                       STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_WRTAB( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE, 
+*     CALL KPG1_WRTAB( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE,
 *                      ID0, IDENTS, LABS, HIST, NULL, STATUS )
 
 *  Description:
@@ -24,7 +24,7 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use.
 *     ARRDIM = INTEGER (Given)
-*        The size of the first dimension of the positions array. This must 
+*        The size of the first dimension of the positions array. This must
 *        be larger than or equal to NPOS.
 *     NPOS = INTEGER (Given)
 *        The number of positions to store in the file.
@@ -32,12 +32,12 @@
 *        The number of axes in the Frame specified by IFRM.
 *     POS( ARRDIM, NAX ) = DOUBLE PRECISION (Given)
 *        The positions to store in the file. POS( I, J ) should give the
-*        axis J value for position I. 
+*        axis J value for position I.
 *     IFRM = INTEGER (Given)
 *        The index of the Frame within IWCS to which the supplied
 *        positions relate. Can be AST__BASE or AST__CURRENT.
 *     IWCS = INTEGER (Given)
-*        A pointer to an AST FrameSet to store with the positions. 
+*        A pointer to an AST FrameSet to store with the positions.
 *     TITLE = CHARACTER * ( * ) (Given)
 *        A title to store at the top of the text file. Ignored if blank.
 *     ID0 = INTEGER (Given)
@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -103,7 +103,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,17 +130,17 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER IBASE              ! Index of base Frame 
-      INTEGER ICURR              ! Index of current Frame 
-      INTEGER IDEF               ! Index of default catalogue Frame 
+      INTEGER IBASE              ! Index of base Frame
+      INTEGER ICURR              ! Index of current Frame
+      INTEGER IDEF               ! Index of default catalogue Frame
       INTEGER IPW                ! Pointer to work space
       INTEGER MAP                ! AST Pointer to Mapping
       INTEGER NBAX               ! No. of axes in BASE FRAME
 *.
 
 *  Call KPG1_WRCAT to do the work, suppling a null value for KEYMAP.
-      CALL KPG1_WRCAT( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE, 
-     :                 ID0, IDENTS, AST__NULL, LABS, HIST, NULL, 
+      CALL KPG1_WRCAT( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE,
+     :                 ID0, IDENTS, AST__NULL, LABS, HIST, NULL,
      :                 STATUS )
 
       END

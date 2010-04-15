@@ -1,15 +1,15 @@
- 
- 
-      SUBROUTINE PDA_IDLCTN(ndp,xd,yd,nt,ipt,nl,ipl,xii,yii,iti, 
+
+
+      SUBROUTINE PDA_IDLCTN(ndp,xd,yd,nt,ipt,nl,ipl,xii,yii,iti,
      :                      iwk,wk,istat)
- 
+
 c this subroutine locates a point, i.e., determines to what tri-
 c angle a given point (xii,yii) belongs.  when the given point
 c does not lie inside the data area, this subroutine determines
 c the border line segment when the point lies in an outside
 c rectangular area, and two border line segments when the point
 c lies in an outside triangular area.
- 
+
 c the input parameters are
 c     ndp = number of data points,
 c     xd,yd = arrays of dimension ndp containing the x and y
@@ -24,7 +24,7 @@ c           line segments and their respective triangle
 c           numbers,
 c     xii,yii = x and y coordinates of the point to be
 c           located.
- 
+
 c the output parameter is
 c     iti = triangle number, when the point is inside the
 c           data area, or
@@ -32,23 +32,23 @@ c           two border line segment numbers, il1 and il2,
 c           coded to il1*(nt+nl)+il2, when the point is
 c           outside the data area.
 *     istat = starlink error message.
- 
+
 c the other parameters are
 c     iwk = integer array of dimension 18*ndp used inter-
 c           nally as a work area,
 c     wk  = array of dimension 8*ndp used internally as a
 c           work area.
- 
+
 c declaration statements
       dimension xd(100), yd(100), ipt(585), ipl(300), iwk(1800), wk(800)
       dimension ntsc(9), idsc(9)
       common /idlc  / nit
       integer istat
       save itipv,ntsc
- 
+
 *   check the inherited error status.
       if ( istat.ne.0 ) return
- 
+
 c preliminary processing
       xs1 = 0.0
       xs2 = 0.0
@@ -60,14 +60,14 @@ c preliminary processing
       ntl = nt0 + nl0
       x0 = xii
       y0 = yii
- 
+
 c processing for a new set of data points
       if ( nit.ne.0 ) then
- 
+
 c checks if in the same triangle as previous.
          it0 = itipv
          if ( it0.gt.nt0 ) then
- 
+
 c checks if on the same border line segment.
             il1 = it0/ntl
             il2 = it0 - il1*ntl
@@ -79,7 +79,7 @@ c checks if on the same border line segment.
             x2 = xd(ip2)
             y2 = yd(ip2)
             if ( il2.ne.il1 ) then
- 
+
 c checks if between the same two border line segments.
                if (PDA_SPDT(x1,y1,x2,y2,x0,y0).le.0.0) then
                   ip3 = ipl(3*il2-1)
@@ -111,7 +111,7 @@ c checks if between the same two border line segments.
          end if
       else
          nit = 1
- 
+
 c - divides the x-y plane into nine rectangular sections.
          xmn = xd(1)
          xmx = xmn
@@ -129,7 +129,7 @@ c - divides the x-y plane into nine rectangular sections.
          xs2 = (xmn+xmx+xmx)/3.0
          ys1 = (ymn+ymn+ymx)/3.0
          ys2 = (ymn+ymx+ymx)/3.0
- 
+
 c - determines and stores in the iwk array triangle numbers of
 c - the triangles associated with each of the nine sections.
          do 100 isc = 1, 9
@@ -170,7 +170,7 @@ c - the triangles associated with each of the nine sections.
                   idsc(isc) = 0
                end if
  120        continue
- 
+
 c - stores in the wk array the minimum and maximum of the x and
 c - y coordinate values for each of the triangle.
             jwk = jwk + 4
@@ -180,7 +180,7 @@ c - y coordinate values for each of the triangle.
             wk(jwk) = ymx
  150     continue
       end if
- 
+
 c locates inside the data area.
 c - determines the section in which the point in question lies.
       isc = 1
@@ -188,7 +188,7 @@ c - determines the section in which the point in question lies.
       if ( x0.ge.xs2 ) isc = isc + 1
       if ( y0.ge.ys1 ) isc = isc + 3
       if ( y0.ge.ys2 ) isc = isc + 3
- 
+
 c - searches through the triangles associated with the section.
       ntsci = ntsc(isc)
       if ( ntsci.gt.0 ) then
@@ -223,7 +223,7 @@ c - searches through the triangles associated with the section.
             end if
  200     continue
       end if
- 
+
 c locates outside the data area.
       do 300 il1 = 1, nl0
          il1t3 = il1*3
@@ -250,11 +250,11 @@ c locates outside the data area.
       go to 500
  400  continue
       it0 = il1*ntl + il2
- 
+
 c normal exit
  500  continue
       iti = it0
       itipv = it0
       return
- 
+
       end

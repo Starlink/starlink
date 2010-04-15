@@ -41,7 +41,7 @@
       INTEGER I90__BDETS( I90__MAXDT, I90__BANDS ) ! Detectors in each
                                        ! band in cross scan order.
 
-      INTEGER I90__CWVEL( I90__CBNDS ) ! Wavelength (in microns) of 
+      INTEGER I90__CWVEL( I90__CBNDS ) ! Wavelength (in microns) of
                                        ! each band of CPC image.
       INTEGER I90__DBAND( I90__DETS )  ! The waveband of each detector.
 
@@ -125,13 +125,13 @@
 
 *  Common Block Definitions (one per data type).
 
-      COMMON /I90_CMI/ I90__BDETS, I90__DBAND, I90__DEAD, I90__NDETS, 
+      COMMON /I90_CMI/ I90__BDETS, I90__DBAND, I90__DEAD, I90__NDETS,
      :                 I90__SMALL, I90__SRATE, I90__WAVEL, I90__XDETS,
      :                 I90__CWVEL, I90__DETGP
 
 
-      COMMON /I90_CMR/ I90__BANDW, I90__BNEFD, I90__DETDY, I90__DETDZ, 
-     :                 I90__DETY, I90__DETZ, I90__DNEFD, I90__DY, 
+      COMMON /I90_CMR/ I90__BANDW, I90__BNEFD, I90__DETDY, I90__DETDZ,
+     :                 I90__DETY, I90__DETZ, I90__DNEFD, I90__DY,
      :                 I90__DZ, I90__JY, I90__OCT84, I90__SOLAN
 
-*.                                      
+*.

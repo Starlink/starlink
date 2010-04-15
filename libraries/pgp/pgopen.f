@@ -22,7 +22,7 @@ C should be one of the following:
 C
 C (1) A complete device specification of the form 'device/type' or
 C     'file/type', where 'type' is one of the allowed PGPLOT device
-C     types (installation-dependent) and 'device' or 'file' is the 
+C     types (installation-dependent) and 'device' or 'file' is the
 C     name of a graphics device or disk file appropriate for this type.
 C     The 'device' or 'file' may contain '/' characters; the final
 C     '/' delimits the 'type'. If necessary to avoid ambiguity,
@@ -53,7 +53,7 @@ C     including any trailing spaces).
 C
 C In cases (5) and (6), the device specification is read from the
 C standard input. The user should respond to the prompt with a device
-C specification of the form (1), (2), or (3). If the user types a 
+C specification of the form (1), (2), or (3). If the user types a
 C question-mark in response to the prompt, a list of available device
 C types is displayed and the prompt is re-issued. If the user supplies
 C an invalid device specification, the prompt is re-issued. If the user
@@ -62,13 +62,13 @@ C execution is aborted; this  avoids the possibility of an infinite
 C prompting loop.  A programmer should avoid use of PGPLOT-prompting
 C if this behavior is not desirable.
 C
-C The device type is case-insensitive (e.g., '/ps' and '/PS' are 
+C The device type is case-insensitive (e.g., '/ps' and '/PS' are
 C equivalent). The device or file name may be case-sensitive in some
 C operating systems.
 C
 C Examples of valid DEVICE arguments:
 C
-C (1)  'plot.ps/ps', 'dir/plot.ps/ps', '"dir/plot.ps"/ps', 
+C (1)  'plot.ps/ps', 'dir/plot.ps/ps', '"dir/plot.ps"/ps',
 C      'user:[tjp.plots]plot.ps/PS'
 C (2)  '/ps'      (PGPLOT interprets this as 'pgplot.ps/ps')
 C (3)  'plot.ps'  (if PGPLOT_TYPE is defined as 'ps', PGPLOT

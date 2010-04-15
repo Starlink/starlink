@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 rm -f TESTEPHINPUT -f JPLEPH
 @LN_S@ testephinput.dat TESTEPHINPUT

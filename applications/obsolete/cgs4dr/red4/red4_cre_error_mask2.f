@@ -1,5 +1,5 @@
 *+  RED4_CRE_ERROR_MASK2 - Copies input error array to output data array
-      SUBROUTINE RED4_CRE_ERROR_MASK2( NELMX, NELMY, INPUT, 
+      SUBROUTINE RED4_CRE_ERROR_MASK2( NELMX, NELMY, INPUT,
      :   MASK, STATUS )
 *    Description :
 *     This routine copies the error array of the input file into the

@@ -220,7 +220,7 @@
 *       104  At least one open workstation is not able to generate the
 *            specified generalized drawing primitive
 *     -1042  Error while trying to open internal segment store
-* 
+*
 *  COMMENTS
 *  --------
 *     Both the ww window management toolkit and Xlib are used to
@@ -238,9 +238,9 @@
      :       100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
      :       200, 210, 220, 230, 240, 250, 260, 270, 280,9999,
      :      9999, 310, 320, 330,9999,9999,9999,9999,9999,9999,
-     :      9999, 410, 410, 410, 410, 410, 410, 410, 410, 410, 
+     :      9999, 410, 410, 410, 410, 410, 410, 410, 410, 410,
      :       410, 410,9999,9999,9999,9999,9999,9999,9999,9999,
-     :      9999, 610, 620, 630, 640, 650, 660, 670, 680, 690, 
+     :      9999, 610, 620, 630, 640, 650, 660, 670, 680, 690,
      :       700, 710, 720, 730, 740, 750, 760, 770, 780, 790,
      :       800, 810,9999,9999,9999,9999,9999,9999,9999,9999,
      :      9999, 910, 920, 930 ) IENT
@@ -407,7 +407,7 @@
       IF (KERROR.EQ.0) THEN
         CALL GK0XWW(ISELCT, KWCID(KWKIX))
       IF (KERROR.NE.0) GO TO 9999
-*       Set up device colour. 
+*       Set up device colour.
         CALL GK0XWC(KWPLCI(KWKIX))
 *       Output line a chunk at a time. Use the line utility.
 *       Transform world coordinates to device coordinates and
@@ -423,7 +423,7 @@
      :                QWCLYT(KWKIX),GK0XLN)
   121   CONTINUE
         CALL GKSTDA(KREALS,IOFF)
-      ENDIF        
+      ENDIF
       GOTO 8888
 
 * Polymarker.
@@ -444,7 +444,7 @@
         DO 131 I = 1, NRD, ICHUNK
           IF (NRD - I.LT.ICHUNK) N = NRD - I + 1
           CALL GKTWD(N,RX(I),RY(I),QSTACK(IOFF),QSTACK(IOFF + ICHUNK))
-*         Could change this later to draw first marker 
+*         Could change this later to draw first marker
 *         and copy the others from it.
           CALL GKMTYP(N,QSTACK(IOFF),QSTACK(IOFF + ICHUNK),
      :                   KWMKTY(KWKIX),QNMMKS(KWKIX),QWMKSZ(KWKIX),
@@ -474,7 +474,7 @@
       ELSE
         CALL GKXDCS(NID, IDAT, QWCHWX(KWKIX), QWCHWY(KWKIX),
      :              GK0XXF, GK0XXC)
-      ENDIF   
+      ENDIF
       KWKDAT(ILNTY,KWKIX) = INTA(1)
       KWKDAT(ILNWD,KWKIX) = INTA(2)
       GOTO 8888
@@ -484,7 +484,7 @@
       IF (KCVIS.EQ.GINVIS) GOTO 9999
       CALL GK0XWW(ISELCT, KWCID(KWKIX))
       IF (KERROR.NE.0) GO TO 9999
-*     Set up device colour. 
+*     Set up device colour.
       CALL GK0XWC(KWFACI(KWKIX))
 *     Draw fill area.
       CALL GK0XFA(NRD, RX, RY)
@@ -937,4 +937,4 @@
  9999 CONTINUE
       RETURN
 
-      END 
+      END

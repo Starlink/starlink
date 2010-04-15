@@ -4,7 +4,7 @@ C
 C     F I G _ W A V E S T
 C
 C     Figaro holds wavelength data in an X-array where each element
-C     holds the value corresponding to the CENTER of the element. 
+C     holds the value corresponding to the CENTER of the element.
 C     This routine calculates - by interpolation - the value that
 C     corresponds to the START of the element.  It will also calculate
 C     values that lie outside the actual range of the data, so can be

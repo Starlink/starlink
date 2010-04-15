@@ -6,7 +6,7 @@
 *    Description :
 *
 *     This routine multiplies one image by another, pixel by pixel,
-*     placing the result in a new output image. The two input images 
+*     placing the result in a new output image. The two input images
 *     must have the same dimensions.
 *
 *    Invocation :
@@ -67,7 +67,7 @@
 *    History :
 *
 *     26-06-1986 : First implementation (REVA::MJM)
-*     12-APR-1994  Changed DAT_ and CMP_ calls to NDF (SKL@JACH) 
+*     12-APR-1994  Changed DAT_ and CMP_ calls to NDF (SKL@JACH)
 *     12-AUG-1994  Changed input DIM arguments for MULTARR2D  (SKL@JACH)
 *
 *    Type definitions :
@@ -118,7 +118,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the first structure
-         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ',
      :                  PNTRI1, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI1, NDIMS, DIMS1, NDIM, STATUS)
@@ -133,7 +133,7 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *             map the data array component of the second structure
-               CALL NDF_MAP( LOCI2, 'DATA', '_REAL', 'READ', 
+               CALL NDF_MAP( LOCI2, 'DATA', '_REAL', 'READ',
      :                  PNTRI2, NELEMENTS, STATUS )
 
                CALL NDF_DIM( LOCI2, NDIMS, DIMS2, NDIM, STATUS)
@@ -152,7 +152,7 @@
 
 *                   if no error then continue
                      IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                      map a data array component
                         CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )
@@ -163,7 +163,7 @@
 *                         call working subroutine to multiply first data
 *                         array by second, result going into output
                            CALL MULTARR2D( %VAL(PNTRI1), %VAL(PNTRI2),
-     :                            %VAL(PNTRO), DIMS1(1), DIMS1(2), 
+     :                            %VAL(PNTRO), DIMS1(1), DIMS1(2),
      :                            STATUS )
 
 *                      end of if-no-error-before-accessing-pointers check

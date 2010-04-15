@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -253,13 +253,13 @@ int main()
 
    for ( j=0; j<1000; j++ )
    {
-      ams_send ( path, outmsg_function, outmsg_status, outmsg_context, 
+      ams_send ( path, outmsg_function, outmsg_status, outmsg_context,
         outmsg_name, outmsg_length, outmsg_value, &messid, &status );
-      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
-      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
    }
    if ( status != 0 )
@@ -341,20 +341,20 @@ int main()
    }
    for ( j=0; j<1000; j++ )
    {
-      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status, 
-        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path, 
+      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status,
+        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path,
         &messid, &status );
 
       outmsg_status = DTASK__ACTSTART;
 
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
 
       outmsg_status = SAI__OK;
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
    }
    if ( status != 0 )
    {
@@ -432,7 +432,7 @@ int *status
 );
 
 /*+  AMS_KICK - send a message to this task's kick queue */
-void ams_kick 
+void ams_kick
 (
 char *name,       /* name of the action to be rescheduled (given) */
 int length,       /* number of significant bytes in value (given) */
@@ -452,8 +452,8 @@ int *status             /* global status (given and returned) */
 
 /*+  AMS_PLOOKUP - look up a taskname given a path to it */
 
-void ams_plookup 
-( 
+void ams_plookup
+(
 int path,             /* the path number (given) */
 char *name,           /* the task name (returned) */
 int *status           /* global status (given and returned) */
@@ -461,8 +461,8 @@ int *status           /* global status (given and returned) */
 
 /*+  AMS_RECEIVE - receive any incoming message */
 
-void ams_receive 
-( 
+void ams_receive
+(
 int timeout,              /* timeout time in milliseconds (given) */
 int message_name_s,       /* space for name (given) */
 int message_value_s,      /* space for value (given) */
@@ -480,7 +480,7 @@ int *status               /* global status (given and returned) */
 
 void ams_reply
 (
-int path,               /* the path number for communicating with the other 
+int path,               /* the path number for communicating with the other
                            task (given) */
 int messid,             /* the number identifying the transaction (given) */
 int message_function,   /* message function (given) */
@@ -532,7 +532,7 @@ implemented in C, using the CNF/F77 facilities.
 
 SUBROUTINE FAMS_ASTINT ( STATUS )
 
-INTEGER STATUS         ! global status (given and returned)    
+INTEGER STATUS         ! global status (given and returned)
 
 
 /*+  FAMS_ASTMSG */
@@ -542,14 +542,14 @@ SUBROUTINE FAMS_ASTMSG ( NAME, LENGTH, VALUE, STATUS )
 CHARACTER*(*) NAME     ! name of action (given)
 INTEGER LENGTH         ! length of message in VALUE (given)
 CHARACTER*(*) VALUE    ! string to be sent (given)
-INTEGER STATUS         ! global status (given and returned)    
+INTEGER STATUS         ! global status (given and returned)
 
 
 /*+  FAMS_EXTINT */
 
 SUBROUTINE FAMS_EXTINT ( STATUS )
 
-INTEGER STATUS         ! global status (given and returned)    
+INTEGER STATUS         ! global status (given and returned)
 
 
 /*+  FAMS_GETREPLY */
@@ -565,7 +565,7 @@ INTEGER MESSAGE_CONTEXT       ! GET, SET, OBEY or CANCEL (returned)
 CHARACTER*(*) MESSAGE_NAME    ! name field for message (returned)
 INTEGER MESSAGE_LENGTH        ! length of value string (returned)
 CHARACTER*(*) MESSAGE_VALUE   ! value string (returned)
-INTEGER STATUS                ! global status (given and returned)    
+INTEGER STATUS                ! global status (given and returned)
 
 
 /*+  FAMS_INIT */
@@ -573,7 +573,7 @@ INTEGER STATUS                ! global status (given and returned)
 SUBROUTINE FAMS_INIT ( OWN_NAME, STATUS )
 
 CHARACTER*(*) OWN_NAME        ! name of this task (given)
-INTEGER STATUS                ! global status (given and returned)    
+INTEGER STATUS                ! global status (given and returned)
 
 
 /*+  FAMS_KICK */
@@ -583,7 +583,7 @@ SUBROUTINE FAMS_KICK ( NAME, LENGTH, VALUE, STATUS )
 CHARACTER*(*) NAME     ! name of action (given)
 INTEGER LENGTH         ! length of message in VALUE (given)
 CHARACTER*(*) VALUE    ! string to be sent (given)
-INTEGER STATUS         ! global status (given and returned)    
+INTEGER STATUS         ! global status (given and returned)
 
 
 /*+  FAMS_PATH */
@@ -592,7 +592,7 @@ SUBROUTINE FAMS_PATH ( OTHER_TASK_NAME, PATH, STATUS )
 
 CHARACTER*(*) OTHER_TASK_NAME  ! name of other task (given)
 INTEGER PATH                   ! path to other task (returned)
-INTEGER STATUS                 ! global status (given and returned)    
+INTEGER STATUS                 ! global status (given and returned)
 
 
 /*+  FAMS_PLOOKUP */
@@ -601,7 +601,7 @@ SUBROUTINE FAMS_PLOOKUP ( PATH, NAME, STATUS )
 
 INTEGER PATH)          ! path to another task (given)
 CHARACTER*(*) NAME     ! name of other task (returned)
-INTEGER STATUS         ! global status (given and returned)    
+INTEGER STATUS         ! global status (given and returned)
 
 
 /*+  FAMS_RECEIVE */
@@ -617,7 +617,7 @@ INTEGER MESSAGE_LENGTH        ! length of value string (returned)
 CHARACTER*(*) MESSAGE_VALUE   ! value string (returned)
 INTEGER PATH                  ! path to task (returned)
 INTEGER MESSID                ! message identifier (returned)
-INTEGER STATUS                ! global status (given and returned)    
+INTEGER STATUS                ! global status (given and returned)
 
 
 /*+  FAMS_REPLY */
@@ -634,7 +634,7 @@ INTEGER MESSAGE_CONTEXT       ! GET, SET, OBEY or CANCEL (given)
 CHARACTER*(*) MESSAGE_NAME    ! name field for message (given)
 INTEGER MESSAGE_LENGTH        ! length of value string (given)
 CHARACTER*(*) MESSAGE_VALUE   ! value string (given)
-INTEGER STATUS                ! global status (given and returned)    
+INTEGER STATUS                ! global status (given and returned)
 
 
 /*+  FAMS_RESMSG */
@@ -643,7 +643,7 @@ SUBROUTINE FAMS_RESMSG ( LENGTH, VALUE, STATUS )
 
 INTEGER LENGTH                ! length of message in VALUE (given)
 CHARACTER*(*) VALUE           ! message to be sent (given)
-INTEGER STATUS                ! global status (given and returned)    
+INTEGER STATUS                ! global status (given and returned)
 
 
 /*+  FAMS_SEND */
@@ -661,7 +661,7 @@ CHARACTER*(*) MESSAGE_NAME    ! name field for message (given)
 INTEGER MESSAGE_LENGTH        ! length of value string (given)
 CHARACTER*(*) MESSAGE_VALUE   ! value string (given)
 INTEGER MESSID                ! message identifier (returned)
-INTEGER STATUS                ! global status (given and returned)    
+INTEGER STATUS                ! global status (given and returned)
 
 \end{verbatim}
 

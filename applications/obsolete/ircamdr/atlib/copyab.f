@@ -1,7 +1,7 @@
-*+  COPYAB - puts the odd and even columns of data in an image into separate 
+*+  COPYAB - puts the odd and even columns of data in an image into separate
 * images
 
-	SUBROUTINE COPYAB( IDIMS1, IDIMS2, ARRAY_IN, ODIMS1, ODIMS2, 
+	SUBROUTINE COPYAB( IDIMS1, IDIMS2, ARRAY_IN, ODIMS1, ODIMS2,
      :                     ARRAY_A, ARRAY_B, STATUS)
 
 * Description :
@@ -42,7 +42,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  IDIMS1,  ! dimensions of input DATA_ARRAY
      :  IDIMS2,  ! dimensions of input DATA_ARRAY
      :  ODIMS1,  ! dimensions of output DATA_ARRAY
@@ -63,7 +63,7 @@
 	   RETURN
 	END IF
 *
-* loop to scan through all rows of input data putting each into the output 
+* loop to scan through all rows of input data putting each into the output
 * arrays
 *
 	DO K = 1, MIN( IDIMS2, ODIMS2)
@@ -88,7 +88,7 @@
 	  END DO
 	END DO
 *
-* loop to scan through all rows of input data putting each into the output 
+* loop to scan through all rows of input data putting each into the output
 * arrays
 *
 	DO K = 1, MIN( IDIMS2, ODIMS2)

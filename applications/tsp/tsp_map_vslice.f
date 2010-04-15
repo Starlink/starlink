@@ -22,7 +22,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) LOC		(Fixed string,descr) A locator to the NDF
-C                       structure.            
+C                       structure.
 C     (>) NDIMS         (Integer,ref) The number of dimensions.
 C     (>) LOWER         (Integer array,ref) Array of lower bounds
 C                       for the slice.
@@ -55,7 +55,7 @@ C
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'NDF_ERR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC
@@ -68,7 +68,7 @@ C
 C
 C     Local variables
 C
-      INTEGER ID,ID2,LENGTH             
+      INTEGER ID,ID2,LENGTH
       LOGICAL PRESENT
       logical oldflag
 

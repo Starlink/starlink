@@ -28,10 +28,10 @@
 #     -o filename
 #       An output two-dimensional NDF of the passband image.  By default the
 #       output will only be displayed.
-#     -z 
+#     -z
 #       The script will automatically prompt to select a region to
 #       zoom before prompting for the region of interest. [TRUE]
-#     +z 
+#     +z
 #       The program will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
 #
@@ -69,7 +69,7 @@
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
+#       Corrected the NDF name extraction when both the file extension and
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.  Reset KAPPA:DISPLAY
 #       parameters.
@@ -125,15 +125,15 @@ while ( $#args > 0 )
    case -z:    # zoom
       set gotzoom = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case +z:    # not zoom
       set gotzoom = "FALSE"
       shift args
-      breaksw            
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw  
+   endsw
 end
 
 # Do the package setup.
@@ -155,7 +155,7 @@ if ( $status == 1 ) exit
 # Collapse the white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile}${ndf_section} out=${colfile} axis=3 estimator=mean" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3 estimator=mean" >& /dev/null
 settitle "ndf=${colfile} title='White-light Image'"
 
 # Setup the graphics window.
@@ -165,7 +165,7 @@ lutgrey device=${plotdev}
 
 # Display the collapsed image.
 picbase device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null
 
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================
@@ -261,7 +261,7 @@ endif
 # --------------------
 echo " "
 echo "  Left click on lower boundary."
-   
+
 # Returns cursor position in $pos.
 source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
 set low = $xpos
@@ -270,7 +270,7 @@ set low = $xpos
 # --------------------
 
 echo "  Left click on upper boundary."
-   
+
 # Returns cursor position in $pos.
 source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
 set upp = $xpos
@@ -294,7 +294,7 @@ echo "        ${slabel} : ${low}--${upp} $sunits"
 
 # Collapse the white-light image.
 collapse "in=${infile}${ndf_section} out=${pasfile} estimator=sum" \
-         "axis=3 low=${low} high=${upp}" >& /dev/null 
+         "axis=3 low=${low} high=${upp}" >& /dev/null
 settitle "ndf=${pasfile} title='$low--$upp'"
 
 # Display the passband image.
@@ -310,19 +310,19 @@ picdef "mode=tl fraction=[0.5,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="left"
 
 picdef "mode=cr fraction=[0.5,1.0] device=${plotdev} nooutline"
-piclabel device=${plotdev} label="right" 
+piclabel device=${plotdev} label="right"
 
 # Display the white-light image on the left and the passband image on
 # the right.
-echo "        Left: White-light image." 
+echo "        Left: White-light image."
 picsel label="left" device=${plotdev}
 display ${colfile} device=${plotdev} mode=SCALE \
-        low='!' high='!' reset >&/dev/null 
+        low='!' high='!' reset >&/dev/null
 
-echo "        Right: Passband image (${low}--${upp} ${sunits})" 
+echo "        Right: Passband image (${low}--${upp} ${sunits})"
 picsel label="right" device=${plotdev}
 display ${pasfile} device=${plotdev} mode=SCALE \
-        low='!' high='!' reset >&/dev/null 
+        low='!' high='!' reset >&/dev/null
 
 # Save passband image as an NDF.
 # ==============================
@@ -332,7 +332,7 @@ if ( ${gotoutfile} == "TRUE" ) then
 # Allow the user to enter the NDF name or filename.
    set outfile = ${outfile:r}
    echo "      Output NDF:"
-   echo "        Creating: ${outfile}.sdf" 
+   echo "        Creating: ${outfile}.sdf"
    ndfcopy "in=${pasfile} out=${outfile}"
 
 # Check to see if the NDF has an AXIS structure.  If one does not exist,

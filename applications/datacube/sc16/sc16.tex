@@ -12,8 +12,8 @@
 %     MJC: Malcolm J. Currie (Starlink)
 
 %  Copyright:
-%     Copyright (C) 1997-2006 Particle Physics and Astronomy Research Council. Copyright (C) 1997-2005 Particle Physics and Astronomy Research Council. 
-%     Copyright (C) 2008 Science and Technology Facilities Council. 
+%     Copyright (C) 1997-2006 Particle Physics and Astronomy Research Council. Copyright (C) 1997-2005 Particle Physics and Astronomy Research Council.
+%     Copyright (C) 2008 Science and Technology Facilities Council.
 %     All Rights Reserved.
 %
 %  History:
@@ -29,13 +29,13 @@
 %        Update for revised DATACUBE and KAPPA.  Correct typographical
 %        errors, spelling and punctuation.  Standardised the style.
 %     2006 March 17 (MJC):
-%        Velocity-map section now comprises an introduction, then two 
+%        Velocity-map section now comprises an introduction, then two
 %        paragraphs for the fitting and moments, the latter including
 %        an illustration added now.  Include CLINPLOT in relevant
 %        KAPPA visualisation tasks.  Mention COLLAPSE use for velocity
 %        maps, and PERMAXES in the SPECDRE context.  Added remark that
 %        DATACUBE is not limited to Wavelength.  Notified the existence
-%        of getcurpos.csh in the C-shell scripts section. Further 
+%        of getcurpos.csh in the C-shell scripts section. Further
 %        spelling and typo's corrected.
 %    2006 March 19 (MJC):
 %        Add section on gridspec with illustrated example.
@@ -45,8 +45,8 @@
 %        LateX graphics 25%.  Revise figure placement from default.
 %    2008 July 4 (MJC):
 %        Added section on locating features with CUPID and STILTS.
-%        Update GAIA section and graphics; add new illustrated subsection 
-%        on three-dimensional rendering.  Mention PLUCK and PERMAXES.  
+%        Update GAIA section and graphics; add new illustrated subsection
+%        on three-dimensional rendering.  Mention PLUCK and PERMAXES.
 %        Various minor updates.
 %
 %-
@@ -73,7 +73,7 @@
 \newcommand{\stardoctitle}     {The IFU Data-Product Cookbook}
 \newcommand{\stardocmanual}    {}
 \newcommand{\stardocabstract}
-{This cookbook is a collection of material covering IFU data reduction and analysis. Along 
+{This cookbook is a collection of material covering IFU data reduction and analysis. Along
 with this material are pointers to more advanced documents dealing with the various packages,
 and hints and tips about how to deal with commonly occurring problems.}
 
@@ -126,7 +126,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -199,7 +199,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -311,12 +311,12 @@ and hints and tips about how to deal with commonly occurring problems.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -367,19 +367,19 @@ and hints and tips about how to deal with commonly occurring problems.}
 \newcommand{\XOASIS}{\footnotesize{XOASIS}\normalsize}
 
 % arcminute symbol
-\newcommand{\arcm}{\hbox{$^\prime$}} 
+\newcommand{\arcm}{\hbox{$^\prime$}}
 %\begin{htmlonly}
-%\renewcommand{\arcm}{'}} 
+%\renewcommand{\arcm}{'}}
 %\end{htmlonly}
 
 % arcsec symbol
 \newcommand{\arcsec}{\arcm\hskip -0.1em\arcm}
 %\begin{htmlonly}
-%\renewcommand{\arcsec}{"}} 
+%\renewcommand{\arcsec}{"}}
 %\end{htmlonly}
 
 % decimal-arcsecond symbol
-\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}  
+\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}
 \begin{htmlonly}
 \newcommand{\uarcs}{"}}
 \end{htmlonly}
@@ -412,7 +412,7 @@ and hints and tips about how to deal with commonly occurring problems.}
  \subsection*{Revision history}
 
  \begin{enumerate}
-   \item 1st September 2000; Version 0.1 Original version (AA) 
+   \item 1st September 2000; Version 0.1 Original version (AA)
    \item 24th November 2000; Version 0.2 Added VIMOS information (AA)
    \item 12th December 2000; Version 0.3 Added IDL procedures (AA)
    \item 30th December 2000; Version 0.4 Cleanup for release (AA)
@@ -420,14 +420,14 @@ and hints and tips about how to deal with commonly occurring problems.}
    \item 30th September 2002; Version 1.0-1 Minor changes (AA)
    \item 2005 October; Version 1.1  Updated for DATACUBE version 1.1
                                     and major tidy. (MJC)
-  \item 2006 March 17; Version 1.1-1 Add illustrated velmoment and gridspec 
+  \item 2006 March 17; Version 1.1-1 Add illustrated velmoment and gridspec
                        sections; mention CLINPLOT. (MJC)
-  \item 2006 June 16; Version 1.1.-2 Introduce GAIA `3D' in a new 
-                      illustrated subsection.  List CHANMAP, and smoothing 
+  \item 2006 June 16; Version 1.1.-2 Introduce GAIA `3D' in a new
+                      illustrated subsection.  List CHANMAP, and smoothing
                       of planes by BLOCK and GAUSMOOTH. (MJC)
-  \item 2008 July 4;  Version 1.2  Add section on locating features with CUPID 
-                      and STILTS.  Update GAIA section and graphics; add new 
-                      illustrated subsection on three-dimensional rendering.  
+  \item 2008 July 4;  Version 1.2  Add section on locating features with CUPID
+                      and STILTS.  Update GAIA section and graphics; add new
+                      illustrated subsection on three-dimensional rendering.
                       Mention PLUCK and PERMAXES.  (MJC)
 
  \end{enumerate}
@@ -489,8 +489,8 @@ near-continuous long slit.
 
 \section{\xlabel{sc16_datacubepackage}The Datacube Package\label{sc16_datacubepackage}}
 
-The \htmladdnormallink{Starlink}{http://www.starlink.ac.uk/} 
-\DATACUBEref\ Package 
+The \htmladdnormallink{Starlink}{http://www.starlink.ac.uk/}
+\DATACUBEref\ Package
 \begin{latexonly}
 (see SUN/237)
 \end{latexonly}
@@ -566,13 +566,13 @@ Data-reduction facilities for the instrument are provided by the
 \INTEGRAL\ \IRAFref\normalsize package which contains some standard tasks from
 other \IRAF\ packages (such as \ONEDSPEC, \SPECRED, and \CCDRED) and
 some custom tasks designed to deal with INTEGRAL data.  The package
-can be 
+can be
 \htmladdnormallink{downloaded}{http://andromeda.roque.ing.iac.es/~astrosw/InstSoft/integral/integral-0.3.tar.gz}
 from \goodbreak\latex{{\tt
 http://andromeda.roque.ing.iac.es/$\sim$astrosw/InstSoft/integral/\-integral-0.3.tar.gz}}
 \begin{htmlonly}
 the IAC web pages
-\end{htmlonly} 
+\end{htmlonly}
 along with the package \htmladdnormallink{user
 manual}{http://andromeda.roque.ing.iac.es/~astrosw/InstSoft/integral/manual_de_reducciones.ps.gz},
 which contains installation instructions and a description of the
@@ -645,13 +645,13 @@ instrument team in Cambridge to get the most out of their Gemini time.
 
 The \htmladdnormallink{data-reduction and analysis software for
 CIRPASS}{http://www.ast.cam.ac.uk/~optics/cirpass/docs/install_cirp_software.html}
-runs under \IRAFref.  There is a 
+runs under \IRAFref.  There is a
 \htmladdnormallink{cookbook}{http://www.ast.cam.ac.uk/~optics/cirpass/datared/cookbook_sn1987a.php}
 available\latex{ at
 http://www.ast.cam.ac.uk/$\sim$optics/cirpass/datared/cookbook\_sn1987a.php}.
 
 
-The final data product for the science data is an $x$,$y$,$\lambda$ 
+The final data product for the science data is an $x$,$y$,$\lambda$
 \htmlref{data cube}{sc16_teifufile}\latex{ (see
 Section~\ref{sc16_teifufile})}, which can be visualised as a
 cube where the $z$-axis is wavelength and each plane is a picture of
@@ -722,19 +722,19 @@ the figure)
 \latex{Figure~\ref{sc16_uist_fig})} which is used as the input for the
 spectrometer in place of the long slit.
 
-\myfig{sc16_uist.eps}{height=0.6\textheight}{sc16_uist.gif}{sc16_uist_fig}{The UIST staggered slitlets.} 
+\myfig{sc16_uist.eps}{height=0.6\textheight}{sc16_uist.gif}{sc16_uist_fig}{The UIST staggered slitlets.}
 
 Data acquisition, reduction and control software is provided by the
 \htmladdnormallink{JAC}{http://www.jach.hawaii.edu/} ORAC system.  The
 data-reduction part of the system,
 \htmladdnormallink{ORAC-DR}{http://www.oracdr.org},
-is provided by JAC and distributed by Starlink, and consists of a 
+is provided by JAC and distributed by Starlink, and consists of a
 fully automated perl-based \htmladdnormallink{pipelining
 software}{http://monet.astro.uiuc.edu/adass98/Proceedings/economouf/}\latex{
 (Economou\emph{et~al}. 1999)} sitting on top of the Starlink software
 collection.  A general introduction to the ORAC-DR system can be found
-in \xref{SUN/230}{sun230}{}.  The data-reduction recipes are 
-documented in \xref{SUN/246}{sun246}{} and at the 
+in \xref{SUN/230}{sun230}{}.  The data-reduction recipes are
+documented in \xref{SUN/246}{sun246}{} and at the
 \htmladdnormallink{JAC web
 site}{http://www.jach.hawaii.edu/UKIRT/instruments/uist/ifu/uistoracdr.html}.
 An arc spectrum (Ar or Kr from the UIST calibration unit) is used to
@@ -785,7 +785,7 @@ and FRIDA.
 
 There are two main file format for IFS final data products, and one
 further prospective format.  The \htmlref{first}{sc16_gmosfile} of
-these file formats is a MOS style multi-extension 
+these file formats is a MOS style multi-extension
 \FITSref\ file, and is
 being put forward by the GEMINI group\latex{ (see
 Section~\ref{sc16_gmosfile})}.  The other main format is an
@@ -804,7 +804,7 @@ before these instruments are brought into general use.  The EOS VIMOS
 instrument will provide its final data product in both MEF and
 data-cube formats.
 
-The final IFS format is still in draft, and is the new \IRAF\ 
+The final IFS format is still in draft, and is the new \IRAF\
 spectroscopic \htmlref{file format}{sc16_iraf}\latex{
 (see Section~\ref{sc16_iraf})}.  The specification is intended to
 provide a general description for two-dimensional spectroscopic image
@@ -827,9 +827,9 @@ binary FITS table with separate data, variance and quality planes.
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{cccccc}
-No.\ & Type  & Name & Format & BITPIX & INH\\\hline 
+No.\ & Type  & Name & Format & BITPIX & INH\\\hline
 0  & ifs\_data.fits &  &                                     &  16 &   \\
-1  & BINTABLE  & TAB & $16 \times${\em num.\,of fibres}      &   8 &   \\    
+1  & BINTABLE  & TAB & $16 \times${\em num.\,of fibres}      &   8 &   \\
 2  & IMAGE     & SCI & $\lambda \times${\em num.\,of fibres} & $-$32 & F \\
 3  & IMAGE     & VAR & $\lambda \times${\em num.\,of fibres} & $-$32 & F \\
 4  & IMAGE     & DQ  & $\lambda \times${\em num.\,of fibres} &  16 & F \\ \hline
@@ -837,7 +837,7 @@ No.\ & Type  & Name & Format & BITPIX & INH\\\hline
 \caption{GEMINI MEF file format}
 \end{center}
 \protect\label{tab:mef_file}
-\end{table} 
+\end{table}
 
 The first extension is a binary FITS table with columns: ID, RA, DEC,
 and SKY.  This table would hold information specific to individual
@@ -973,7 +973,7 @@ desirable\latex{ (see Section~\ref{sc16_mef2cub})}.
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{cccccl}
-No.\ & Type  & Name & Format & BITPIX & Comment\\\hline 
+No.\ & Type  & Name & Format & BITPIX & Comment\\\hline
 0 &ifs\_data.fits &  &          &       & \\
 1 & IMAGE & SCI & $x \times y\times \lambda$ & $-$32 & 3-D science array \\
 2 & IMAGE & VAR & $x \times y\times \lambda$ & $-$32 & 3-D variance array \\
@@ -982,7 +982,7 @@ No.\ & Type  & Name & Format & BITPIX & Comment\\\hline
 \caption{TEIFU data-cube format}
 \end{center}
 \protect\label{tab:cub_file}
-\end{table} 
+\end{table}
 
 In the case of this format the IFU geometry information is no longer
 needed, as the input spectra have already been rebinned, but it is
@@ -1013,7 +1013,7 @@ CRVAL3  = 7302.291864499999065 / Axis 3 reference value
 CRPIX1  =                 29.5 / Axis 1 pixel value
 CRPIX2  =                 55.0 / Axis 2 pixel value
 CRPIX3  =                480.5 / Axis 3 pixel value
-WCSDIM  =                    3   
+WCSDIM  =                    3
 CTYPE1  = 'LINEAR  '           / Quantity represented by axis 1
 CTYPE2  = 'LINEAR  '           / Quantity represented by axis 2
 CTYPE3  = 'LAMBDA  '           / Quantity represented by axis 3
@@ -1023,10 +1023,10 @@ CD2_1   =                  0.0 / Axis rotation and scaling matrix
 CD2_3   =                  0.0 / Axis rotation and scaling matrix
 CD3_1   =                  0.0 / Axis rotation and scaling matrix
 CD3_2   =                  0.0 / Axis rotation and scaling matrix
-LTV3    =                -39.0   
-LTM1_1  =                  1.0   
-LTM2_2  =                  1.0  
-LTM3_3  =                  1.0  
+LTV3    =                -39.0
+LTM1_1  =                  1.0
+LTM2_2  =                  1.0
+LTM3_3  =                  1.0
 WAT0_001= 'system=image'
 END
 \end{verbatim}\normalsize
@@ -1046,7 +1046,7 @@ defining FITS header keywords which can be generated by the
 data-acquisition system is provided on the web by the National Optical
 Astronomy Observatories (NOAO)\latex{ at {\tt
 http://iraf.noao.edu/projects/ccdmosaic/imagedef/fitsdic.html}}.
- 
+
 \subsection{\xlabel{sc16_mef2cub}MEF to data-cube format\label{sc16_mef2cub}}
 
 In the Gemini \IRAF\ package the command {\bf gfcube} converts the
@@ -1105,11 +1105,11 @@ IFS_FILE  <NDF>
 
             SKY         <COLUMN>
                COMMENT      <_CHAR*19>
-               DATA(750)    <_INTEGER> 
+               DATA(750)    <_INTEGER>
 
       FITS(790)       <_CHAR*80>
 
-   VARIANCE       <ARRAY> 
+   VARIANCE       <ARRAY>
       DATA(2010,750)  <_REAL>
       ORIGIN(2)       <_INTEGER>
 
@@ -1134,7 +1134,7 @@ in the example below.
     IN - Input FITS file(s) > teifu.fits
     1 file selected.
     OUT - Output NDF data structure(s) > out
-    % 
+    %
 \end{verbatim}
 
 The \FITSref\ file is be converted it into a three-dimensional
@@ -1149,13 +1149,13 @@ IFS_FILE  <NDF>
    DATA_ARRAY     <ARRAY>
       ORIGIN(3)      <_INTEGER>
       DATA(59,110,961)  <_DOUBLE>
-      BAD_PIXEL      <_LOGICAL>  
+      BAD_PIXEL      <_LOGICAL>
 
    MORE           <EXT>
       FITS(45)       <_CHAR*80>
 
-   TITLE          <_CHAR*18> 
-   WCS            <WCS>      
+   TITLE          <_CHAR*18>
+   WCS            <WCS>
       DATA(99)       <_CHAR*32>
 \end{verbatim}\normalsize
 
@@ -1181,7 +1181,7 @@ keywords which contain incorrect information.  If this is the case you
 may need to manually edit your FITS file headers.
 
 \subsubsection{Native FITS files}
- 
+
 A good package to use for \FITSref\ header (and data) manipulation is the
 \htmladdnormallink{\FTOOLS}{
 http://heasarc.gsfc.nasa.gov/docs/software/lheasoft/ftools/} software,
@@ -1240,12 +1240,12 @@ FXREAD} method.
 \small\begin{verbatim}
       ; Read the FITS file
       fxread, 'ifu_file.fit', DATA, HEADER
- 
+
       ; Determine the size of the image
       SIZEX=fxpar(header, 'NAXIS1')
       SIZEY=fxpar(header, 'NAXIS2')
       SIZEZ=fxpar(header, 'NAXIS3')
- 
+
       ; Find the data type being read
       DTYPE=fxpar(header, 'BITPIX')
 \end{verbatim}\normalsize
@@ -1269,7 +1269,7 @@ In addition FITS files can be read into IDL using the
 \CONVERTref\normalsize\ package's \xref{on-the-fly file conversion}{sun55}{sect_auto}
 ability\latex{ (see SUN/55 for more details)} and the \xref{{\tt
 READ\_NDF}}{sun55}{READ_NDF} IDL function.
- 
+
 \subsection{\xlabel{sc16_ndfidl}NDF I/O with IDL\label{sc16_ndfidl}}
 
 There are several methods for reading an \xref{NDF}{sun33}{} file into
@@ -1279,7 +1279,7 @@ package,
 
 \small\begin{verbatim}
     % ndf2fits comp=D
-    IN - Input NDF data structure(s) /@section/ > 
+    IN - Input NDF data structure(s) /@section/ >
     1 NDF selected.
     OUT - Output FITS file(s) /@out/ > section.fit
     %
@@ -1302,7 +1302,7 @@ For example assuming we have a data cube called {\tt file.sdf} which is
 of type {\tt \_REAL}
 
 \small\begin{verbatim}
-    IDL> data_array = read_ndf('file') 
+    IDL> data_array = read_ndf('file')
 \end{verbatim}\normalsize
 
 creates an IDL floating array, data\_array, with the same dimensions
@@ -1337,7 +1337,7 @@ such checks can be carried out, \emph{e.g.}\
 
 \small\begin{verbatim}
     IDL> write_ndf, data_array, 'file', !values.f_nan
-\end{verbatim}\normalsize  
+\end{verbatim}\normalsize
 
 Here any occurrence of the value {\tt NaN} in the array will be
 replaced by the {\tt VAL\_\_BADR} value as defined by the Starlink
@@ -1345,11 +1345,11 @@ replaced by the {\tt VAL\_\_BADR} value as defined by the Starlink
 
 \small\begin{verbatim}
     IDL> write_ndf, var_array, 'file', comp='v'
-\end{verbatim}\normalsize    
- 
+\end{verbatim}\normalsize
+
 writes the IDL array {\tt var\_array} to the {\tt VARIANCE} component
 of the NDF created above.  A check is made that the size of the array
-corresponds with the size of the NDF. 
+corresponds with the size of the NDF.
 
 There is yet another approach to read NDF data into IDL.  Again we
 make use of the \CONVERT\ package, this time we use the \xref{{\bf
@@ -1363,7 +1363,7 @@ the subdirectory {\tt ifu\_data}
     IDL> data_file = filepath('file.dat', SUBDIR='ifu_data')
     IDL> data_template = ascii_template(data_file)
     IDL> data = read_ascii(data_file, TEMPLATE=data_template)
-\end{verbatim}\normalsize 
+\end{verbatim}\normalsize
 
 we create an associated data template using {\tt ascii\_template} GUI
 and read the data into the IDL structure {\tt data}.
@@ -1377,7 +1377,7 @@ the data into IDL, \emph{e.g.}
     IDL> udata_file = filepath('binary.dat', SUBDIR='ifu_data')
     IDL> udata_template = binary_template(udata_file)
     IDL> udata = read_binary(udata_file, TEMPLATE=udata_template)
-\end{verbatim}\normalsize 
+\end{verbatim}\normalsize
 
 will return an IDL structure variable {\tt udata}.
 
@@ -1408,7 +1408,7 @@ the individual spectra are available, data visualisation is often
 intrinisically more intuitive if done on resampled data cubes.  As
 such, this cookbook will (in the main) only deal with applications
 that handle the data-cube format.  If you have already sourced the
-Starlink {\tt /star/etc/login} and {\tt /star/etc/cshrc} 
+Starlink {\tt /star/etc/login} and {\tt /star/etc/cshrc}
 files{\footnote {\tt /star/etc/ is for a standard Starlink installation,
 but the Starlink software may be in a different directory tree on your
 system.} then the commands {\tt kappa}, {\tt figaro}, and {\tt
@@ -1429,49 +1429,49 @@ in SUN/95.}
 \begin{itemize}
 
 \item{\xref{{\bf add}}{sun95}{ADD}}\\
-Adds two NDF data structures 
+Adds two NDF data structures
 \item{\xref{{\bf cadd}}{sun95}{CADD}}\\
-Adds a scalar to an NDF data structure 
+Adds a scalar to an NDF data structure
 \item{\xref{{\bf calc}}{sun95}{CALC}}\\
-Evaluates a mathematical expression  
+Evaluates a mathematical expression
 \item{\xref{{\bf cdiv}}{sun95}{CDIV}}\\
-Divides an NDF by a scalar 
+Divides an NDF by a scalar
 \item{\xref{{\bf cmult}}{sun95}{CMULT}}\\
-Multiplies an NDF by a scalar 
+Multiplies an NDF by a scalar
 \item{\xref{{\bf csub}}{sun95}{CSUB}}\\
-Subtracts a scalar from an NDF data structure 
+Subtracts a scalar from an NDF data structure
 \item{\xref{{\bf div}}{sun95}{DIV}}\\
 Divides one NDF data structure by another
 \item{\xref{{\bf maths}}{sun95}{MATHS}}\\
-Evaluates mathematical expressions applied to NDF data structures 
+Evaluates mathematical expressions applied to NDF data structures
 \item{\xref{{\bf mult}}{sun95}{MULT}}\\
-Multiplies two NDF data structures 
+Multiplies two NDF data structures
 \item{\xref{{\bf normalize}}{sun95}{NORMALIZE}}\\
-Normalises one NDF to a similar NDF by calculating a scale factor and zero-point difference 
-\item{\xref{{\bf pow}}{sun95}{POW}}\\ 
-Takes the specified power of each pixel of a data array 
-\item{\xref{{\bf rift}}{sun95}{RIFT}}\\ 
-Adds a scalar to a section of an NDF data structure to correct rift-valley defects 
+Normalises one NDF to a similar NDF by calculating a scale factor and zero-point difference
+\item{\xref{{\bf pow}}{sun95}{POW}}\\
+Takes the specified power of each pixel of a data array
+\item{\xref{{\bf rift}}{sun95}{RIFT}}\\
+Adds a scalar to a section of an NDF data structure to correct rift-valley defects
 \item{\xref{{\bf sub}}{sun95}{SUB}}\\
-Subtracts one NDF data structure from another 
-\item{\xref{{\bf thresh}}{sun95}{THRESH}}\\ 
-Edits an NDF such that array values below and above two thresholds take constant values 
+Subtracts one NDF data structure from another
+\item{\xref{{\bf thresh}}{sun95}{THRESH}}\\
+Edits an NDF such that array values below and above two thresholds take constant values
 \end{itemize}
 
 \subsubsection{Cube manipulation}
 
 Slightly more complex is manipulation and resampling of the data cube
 itself.  The most important utilities available to do this within
-\KAPPA\ are the \xref{{\bf collapse}}{sun95}{COLLAPSE}, 
+\KAPPA\ are the \xref{{\bf collapse}}{sun95}{COLLAPSE},
 \xref{{\bf chanmap}}{sun95}{CHANMAP}, \xref{{\bf ndfcopy}}{sun95}{NDFCOPY},
 and \xref{{\bf pluck}}{sun95}{PLUCK} applications.  {\bf collapse} can
-produce \htmlref{white-light and passband}{sc16_vis} images\latex{ (see 
+produce \htmlref{white-light and passband}{sc16_vis} images\latex{ (see
 Section~\ref{sc16_vis})} and velocity maps by the appropriate
 selection of statistic.  {\bf chanmap} creates a grid of passbands.
-{\bf ndfcopy} can extract a single spectrum (along pixel axes) or 
-\htmlref{arbitrary cube sections}{sc16_vis} \latex{ (again see 
+{\bf ndfcopy} can extract a single spectrum (along pixel axes) or
+\htmlref{arbitrary cube sections}{sc16_vis} \latex{ (again see
 Section~\ref{sc16_vis} for details)}, while {\bf pluck} uses
-interpolation to extract at {\em arbitrary} positions, such as a 
+interpolation to extract at {\em arbitrary} positions, such as a
 spectrum at nominated equatorial co-ordinates, or an image at a given
 wavelength or frequency.  Some applications require the spectral
 axis to be the first or the third axis; {\bf permaxes} allows
@@ -1481,27 +1481,27 @@ shuffling of the pixel axes.
 \item{\xref{{\bf chanmap}}{sun95}{CHANMAP}}\\
 Creates a channel map from a cube NDF by compressing slices along a nominated axis
 \item{\xref{{\bf collapse}}{sun95}{COLLAPSE}}\\
-Reduces the number of axes in an $N$-dimensional NDF by compressing it along a nominated axis 
+Reduces the number of axes in an $N$-dimensional NDF by compressing it along a nominated axis
 \item{\xref{{\bf compadd}}{sun95}{COMPADD}}\\
-Reduces the size of an NDF by adding values in rectangular boxes 
+Reduces the size of an NDF by adding values in rectangular boxes
 \item{\xref{{\bf compave}}{sun95}{COMPAVE}}\\
-Reduces the size of an NDF by averaging values in rectangular boxes 
+Reduces the size of an NDF by averaging values in rectangular boxes
 \item{\xref{{\bf compick}}{sun95}{COMPICK}}\\
-Reduces the size of an NDF by picking equally spaced pixels 
+Reduces the size of an NDF by picking equally spaced pixels
 \item{\xref{{\bf flip}}{sun95}{FLIP}}\\
-Reverses an NDF's pixels along a specified dimension 
+Reverses an NDF's pixels along a specified dimension
 \item{\xref{{\bf ndfcopy}}{sun95}{NDFCOPY}}\\
-Copies an NDF, or an NDF section, to a new location 
+Copies an NDF, or an NDF section, to a new location
 \item{\xref{{\bf permaxes}}{sun95}{PERMAXES}}\\
 Permutes an NDF's pixel axes
 \item{\xref{{\bf pixdupe}}{sun95}{PIXDUPE}}\\
-Expands an NDF by pixel duplication 
+Expands an NDF by pixel duplication
 \item{\xref{{\bf pluck}}{sun95}{PLUCK}}\\
 Plucks slices from an NDF at arbitrary positions
 \item{\xref{{\bf regrid}}{sun95}{REGRID}}\\
 Applies a geometrical transformation to an NDF
 \item{\xref{{\bf segment}}{sun95}{SEGMENT}}\\
-Copies polygonal segments from one NDF into another 
+Copies polygonal segments from one NDF into another
 \item{\xref{{\bf slide}}{sun95}{SLIDE}}\\
 Realigns an NDF using a translation.
 \end{itemize}
@@ -1517,8 +1517,8 @@ are
 \begin{itemize}
 \item{\xref{{\bf look}}{sun95}{LOOK}}\\
 Outputs the values of a sub-array of a two-dimensional data array to the screen or a text file
-\item{\xref{{\bf median}}{sun95}{MEDIAN}}\\ 
-Smooths a two-dimensional data array using a weighted median filter 
+\item{\xref{{\bf median}}{sun95}{MEDIAN}}\\
+Smooths a two-dimensional data array using a weighted median filter
 \end{itemize}
 
 Some tasks operate in two dimensions, but apply processing to a series
@@ -1531,7 +1531,7 @@ Smooths an NDF using a one- or two-dimensional square or rectangular box filter
 \item{\xref{{\bf gausmooth}}{sun95}{GAUSMOOTH}}\\
 Smooths a one- or two-dimensional NDF using a Gaussian filter
 \item{\xref{{\bf rotate}}{sun95}{ROTATE}}\\
-Rotates two-dimensional NDF about its centre through any angle 
+Rotates two-dimensional NDF about its centre through any angle
 \end{itemize}
 
 
@@ -1544,19 +1544,19 @@ or region, of pixels with an user defined value (including the bad
 \xref{magic value}{sun95}{se_masking}).
 
 \begin{itemize}
-\item{\xref{{\bf chpix}}{sun95}{CHPIX}}\\ 
-Replaces the values of selected pixels in an NDF 
-\item{\xref{{\bf errclip}}{sun95}{ERRCLIP}}\\ 
-Removes pixels with large errors from an NDF 
-\item{\xref{{\bf fillbad}}{sun95}{FILLBAD}}\\ 
-Removes regions of bad values from an NDF 
-\item{\xref{{\bf nomagic}}{sun95}{NOMAGIC}}\\ 
-Replaces all occurrences of \xref{magic value}{sun95}{se_masking}\latex{(see SUN/95 for details)} 
-pixels in an NDF array with a new value 
-\item{\xref{{\bf numb}}{sun95}{NUMB}}\\ 
-Counts the number of elements of an NDF with values or absolute values above or below a threshold 
+\item{\xref{{\bf chpix}}{sun95}{CHPIX}}\\
+Replaces the values of selected pixels in an NDF
+\item{\xref{{\bf errclip}}{sun95}{ERRCLIP}}\\
+Removes pixels with large errors from an NDF
+\item{\xref{{\bf fillbad}}{sun95}{FILLBAD}}\\
+Removes regions of bad values from an NDF
+\item{\xref{{\bf nomagic}}{sun95}{NOMAGIC}}\\
+Replaces all occurrences of \xref{magic value}{sun95}{se_masking}\latex{(see SUN/95 for details)}
+pixels in an NDF array with a new value
+\item{\xref{{\bf numb}}{sun95}{NUMB}}\\
+Counts the number of elements of an NDF with values or absolute values above or below a threshold
 \item{\xref{{\bf substitute}}{sun95}{SUBSTITUTE}}\\
-Replaces all occurrences of a given value in an NDF array with another value 
+Replaces all occurrences of a given value in an NDF array with another value
 \end{itemize}
 
 \subsubsection{Other tools and file manipulation}
@@ -1568,12 +1568,12 @@ below.
 
 \begin{itemize}
 \item{\xref{{\bf ndftrace}}{sun95}{NDFTRACE}}\\
-Displays the attributes of an NDF data structure 
+Displays the attributes of an NDF data structure
 \item{\xref{{\bf parget}}{sun95}{PARGET}}\\
-Obtains the value or values of an application parameter 
+Obtains the value or values of an application parameter
 \item{\xref{{\bf stats}}{sun95}{STATS}}\\
-Computes simple statistics for an NDF's pixels  
-\end{itemize}  
+Computes simple statistics for an NDF's pixels
+\end{itemize}
 
 In some cases NDF information must be modified after a processing step
 (\emph{e.g.}\ the NDF title) or, in the case of a \htmlref{newly
@@ -1583,37 +1583,37 @@ manipulate NDF extensions.
 
 \begin{itemize}
 \item{\xref{{\bf axlabel}}{sun95}{AXLABEL}}\\
-Sets a new label value for an axis within an NDF data structure 
+Sets a new label value for an axis within an NDF data structure
 \item{\xref{{\bf axunits}}{sun95}{AXUNITS}}\\
-Sets a new units value for an axis within an NDF data structure 
+Sets a new units value for an axis within an NDF data structure
 \item{\xref{{\bf setaxis}}{sun95}{SETAXIS}}\\
-Sets values for an axis array component within an NDF data structure 
+Sets values for an axis array component within an NDF data structure
 \item{\xref{{\bf setbad}}{sun95}{SETBAD}}\\
-Sets new bad-pixel flag values for an NDF 
+Sets new bad-pixel flag values for an NDF
 \item{\xref{{\bf setbb}}{sun95}{SETBB}}\\
-Sets a new value for the quality bad-bits mask of an NDF 
+Sets a new value for the quality bad-bits mask of an NDF
 \item{\xref{{\bf setbound}}{sun95}{SETBOUND}}\\
-Sets new bounds for an NDF 
+Sets new bounds for an NDF
 \item{\xref{{\bf setext}}{sun95}{SETEXT}}\\
-Manipulates the contents of a specified NDF extension 
+Manipulates the contents of a specified NDF extension
 \item{\xref{{\bf setlabel}}{sun95}{SETLABEL}}\\
-Sets a new label for an NDF data structure 
+Sets a new label for an NDF data structure
 \item{\xref{{\bf setmagic}}{sun95}{SETMAGIC}}\\
-Replaces all occurrences of a given value in an NDF array with the bad value 
+Replaces all occurrences of a given value in an NDF array with the bad value
 \item{\xref{{\bf setnorm}}{sun95}{SETNORM}}\\
-Sets a new value for one or all of an NDF's axis-normalisation flags 
+Sets a new value for one or all of an NDF's axis-normalisation flags
 \item{\xref{{\bf setorigin}}{sun95}{SETORIGIN}}\\
-Sets a new pixel origin for an NDF 
+Sets a new pixel origin for an NDF
 \item{\xref{{\bf settitle}}{sun95}{SETTITLE}}\\
-Sets a new title for an NDF data structure 
+Sets a new title for an NDF data structure
 \item{\xref{{\bf settype}}{sun95}{SETTYPE}}\\
 Sets a new numeric type for the data and variance components of an NDF
 \item{\xref{{\bf setunits}}{sun95}{SETUNITS}}\\
-Sets a new units value for an NDF data structure 
+Sets a new units value for an NDF data structure
 \item{\xref{{\bf setvar}}{sun95}{SETVAR}}\\
-Sets new values for the variance component of an NDF data structure     
-\end{itemize}  
-  
+Sets new values for the variance component of an NDF data structure
+\end{itemize}
+
 \subsubsection{Visualisation}
 
 Combined with the \htmlref{graphics devices commands}{sc16_graphics}\latex{ (see
@@ -1624,20 +1624,20 @@ these elemental tasks.
 
 \begin{itemize}
 \item{\xref{{\bf clinplot}}{sun95}{CLINPLOT}}\\
-Draws a spatial grid of line plots for an axis of a cube NDF  
+Draws a spatial grid of line plots for an axis of a cube NDF
 \item{\xref{{\bf contour}}{sun95}{CONTOUR}}\\
-Contours a two-dimensional NDF 
+Contours a two-dimensional NDF
 \item{\xref{{\bf cursor}}{sun95}{CURSOR}}\\
-Reports the co-ordinates of positions selected using the cursor 
+Reports the co-ordinates of positions selected using the cursor
 \item{\xref{{\bf display}}{sun95}{DISPLAY}}\\
-Displays a one- or two-dimensional NDF 
+Displays a one- or two-dimensional NDF
 \item{\xref{{\bf drawsig}}{sun95}{DRAWSIG}}\\
-Draws +/-n standard-deviation lines on a line plot 
+Draws +/-n standard-deviation lines on a line plot
 \item{\xref{{\bf linplot}}{sun95}{LINPLOT}}\\
-Draws a line plot of the data values in a one-dimensional NDF 
+Draws a line plot of the data values in a one-dimensional NDF
 \item{\xref{{\bf profile}}{sun95}{PROFILE}}\\
-Creates a one-dimensional profile through an $N$-dimensional NDF 
-\end{itemize}  
+Creates a one-dimensional profile through an $N$-dimensional NDF
+\end{itemize}
 
 \subsubsection{Mosaics}
 
@@ -1646,9 +1646,9 @@ wish to consider, unfortuantely there are \htmlref{problems}{sc16_mos}
 involved in doing so\latex{ (see Section~\ref{sc16_mos})}, however,
 the following tasks from \KAPPA\ may be useful
 
-\begin{itemize}  
+\begin{itemize}
 \item{\xref{{\bf wcsalign}}{sun95}{WCSALIGN}}\\
-Aligns a group of NDFs using World Co-ordinate System information 
+Aligns a group of NDFs using World Co-ordinate System information
 \item{\xref{{\bf wcsmosaic}}{sun95}{WCSMOSAIC}}\\
 Tiles a group of NDFs using World Co-ordinate System information
 \end{itemize}
@@ -1657,7 +1657,7 @@ along with the following tasks from \CCDPACKref.
 
 \begin{itemize}
 \item{\xref{{\bf makemos}}{sun139}{MAKEMOS}}\\
-Makes a mosaic by combining and (optionally) normalising a set of images 
+Makes a mosaic by combining and (optionally) normalising a set of images
 \item{\xref{{\bf drizzle}}{sun139}{DRIZZLE}}\\
 Resamples and mosaics using the drizzling algorithm
 \end{itemize}
@@ -1672,9 +1672,9 @@ at this stage is that many of these applications expect the
 spectroscopic axis to be the first in the cube, whereas for the
 current generation of IFU data cubes the spectral axis is typically the
 third axis in the cube.  \KAPPA\ \xref{{\bf permaxes}}{sun95}{PERMAXES}
-can reconfigure the cube as needed by the various packages.   A full 
-list of \xref{\SPECDRE\ applications}{sun86}{classifspecdre} can be 
-found in SUN/86. 
+can reconfigure the cube as needed by the various packages.   A full
+list of \xref{\SPECDRE\ applications}{sun86}{classifspecdre} can be
+found in SUN/86.
 
 One of the fundamental building blocks of spectral analysis is
 gaussian fitting, amougst other tools, \FIGARO\ provides the
@@ -1690,7 +1690,7 @@ For example,
          cont=${cont} peak=${peak} fwhm=${fwhm} reguess=no remask=no \
          ncomp=1 cf=0 pf=0 wf=0 comp=${component} fitgood=yes \
          centre=${position} logfil=${fitfile} device=xwin \
-         dialog=f 
+         dialog=f
 \end{verbatim}\normalsize
 
 we call the {\bf fitgauss} routine here specifying all the necessary
@@ -1741,7 +1741,7 @@ It offers a choice of clump-finding algorithms with detailed
 configuration control, and generates a catalogue in FITS format
 storing for each peak its centre and centroid co-ordinates, its width,
 peak value, total flux and number of contributing pixels.  Information
-from the catalogue can be extracted into scripts using \STILTSref\ and 
+from the catalogue can be extracted into scripts using \STILTSref\ and
 in particular its powerful \xref{{\bf tpipe}}{sun256}{} command.
 
 \begin{verbatim}
@@ -1810,7 +1810,7 @@ many examples.
 findback}}{sun255}{FINDBACK}.  You may need to run this or \xref{{\bf
 mfittrend}}{sun95}{MFITTREND} to remove the background before feature
 detection.  Note the if you are applying {\bf findback} to the spectra
-independently, the spectral axis must be first, even if this demands a 
+independently, the spectral axis must be first, even if this demands a
 re-orient the cube.
 
 \begin{verbatim}
@@ -1870,7 +1870,7 @@ Each Starlink application which makes use of the standard Starlink
 graphics calls, which is most of them, creates an entry in the
 {\em graphics database}.  This allows the applications to interact, for
 instance you can display an image to an X-Window display device using
-the {\bf display} command, and later query a pixel position using the 
+the {\bf display} command, and later query a pixel position using the
 {\bf cursor} command.
 
 The graphics database is referred to as the AGI database, after the
@@ -1923,10 +1923,10 @@ Starlink applications usually deal with WCS information using the
 SUN/210 for Fortran and \xref{SUN/211}{sun211}{} for C language
 bindings), although notably some parts of \FIGARO\ (such as \SPECDRE)
 have legacy and totally independent methods of dealing with WCS
-information. 
+information.
 \begin{htmlonly}
 See \htmlref{an example}{sc16_wcs2axis}
-\end{htmlonly} 
+\end{htmlonly}
 \latex{See Section~\ref{sc16_wcs2axis} for an example}
 of how to overcome this interoperability issue.
 
@@ -1949,7 +1949,7 @@ be used to copy WCS component from one NDF to another, optionally
 introducing a linear transformation of pixel co-ordinates in the
 process.  This can be used to add WCS information back into an NDF
 which has been stripped of WCS information by non-WCS aware
-applications.  Further details about \xref{WCS Frames}{sun95}{se_resdoms} 
+applications.  Further details about \xref{WCS Frames}{sun95}{se_resdoms}
 are available \latex{in SUN/95 {\em Using World Co-ordinate
 Systems}}.
 
@@ -1965,24 +1965,24 @@ explained \htmlref{later}{sc16_mos}\latex{ in Section~\ref{sc16_mos}}.
 Both \KAPPAref\ and \CCDPACKref\ contain commands to handle WCS NDF
 extensions.  In \KAPPA\ we have the following applications.
 
-\begin{itemize}  
+\begin{itemize}
 \item{\xref{{\bf wcsadd}}{sun95}{WCSADD}}\\
-Adds a new co-ordinate Frame into the WCS component of an NDF 
+Adds a new co-ordinate Frame into the WCS component of an NDF
 \item{\xref{{\bf wcsattrib}}{sun95}{WCSATTRIB}}\\
 Manages attribute values associated with the WCS component of an NDF
-\item{\xref{{\bf wcscopy}}{sun95}{WCSCOPY}}\\ 
-Copies WCS information from one NDF to another 
-\item{\xref{{\bf wcsframe}}{sun95}{WCSFRAME}}\\ 
-Changes the current co-ordinate Frame in the WCS component of an NDF 
+\item{\xref{{\bf wcscopy}}{sun95}{WCSCOPY}}\\
+Copies WCS information from one NDF to another
+\item{\xref{{\bf wcsframe}}{sun95}{WCSFRAME}}\\
+Changes the current co-ordinate Frame in the WCS component of an NDF
 \item{\xref{{\bf wcsremove}}{sun95}{WCSREMOVE}}\\
-Removes co-ordinate Frames from the WCS component of an NDF 
+Removes co-ordinate Frames from the WCS component of an NDF
 \item{\xref{{\bf wcstran}}{sun95}{WCSTRAN}}\\
-Transforms a position from one NDF co-ordinate Frame to another 
+Transforms a position from one NDF co-ordinate Frame to another
 \end{itemize}
 
 while \CCDPACK\ has
 
-\begin{itemize}  
+\begin{itemize}
 \item{\xref{{\bf wcsedit}}{sun139}{WCSEDIT}}\\
 Modifies or examines image co-ordinate system information
 \end{itemize}
@@ -1996,7 +1996,7 @@ For instance,
        WCSEDIT
        =======
      1 NDF accessed using parameter IN
-   MODE - Action to perform (CURRENT,ADD,REMOVE,SET,SHOW) /'SHOW'/ > 
+   MODE - Action to perform (CURRENT,ADD,REMOVE,SET,SHOW) /'SHOW'/ >
 
        Index Cur  Domain            Title
        ----- ---  ------            -----
@@ -2012,7 +2012,7 @@ For instance,
 here we see that {\tt ifu\_file.sdf} has three WCS frames, the base
 GRID frame with origin (1,1,1), a PIXEL frame with origin
 (0.5,0.5,0.5) and an AXIS frame with real world co-ordinate mapped
-on to the PIXEL frame.  
+on to the PIXEL frame.
 
 \xref{{\bf ndftrace}}{sun95}{NDFTRACE} also contains a useful option at this
 point: {\tt FULLFRAME}.  In the following example, most of the {\bf ndftrace}
@@ -2090,7 +2090,7 @@ two-dimensional data.  For many years the \GAIA\ tool had little to
 offer for cube visualisation.  At the appropriately named Version 3.0,
 came a toolbox for cubes to permit inspection of planes individually,
 or as an animation, or as a passband image by collapsing.  Now at the
-time of writing, Version 4.2 \GAIA\ offers further facilities, such as 
+time of writing, Version 4.2 \GAIA\ offers further facilities, such as
 rendering, for cube analysis.  \GAIA\ is also under active delevopment.
 Check the {\tt \$STARLINK\_DIR/news/gaia.news} file for the latest features
 extending upon those summarised below.
@@ -2112,7 +2112,7 @@ In the upper portion you may choose the axis perpendicular to the axes
 visible in the regular two-dimensional display; this will normally be
 the spectral axis, and that is what is assumed this manual.  You can
 select a plane to view in the main display by giving its index or
-adjusting the slider.  
+adjusting the slider.
 
 \myfig{sc16_gaia_cubetool.eps}{height=0.4\textheight}{sc16_gaia_cubetool.gif}{sc16_gaia_cubetool_fig}{The
 \GAIA\ toolbox for displaying a cube.}
@@ -2129,7 +2129,7 @@ The animation can be captured to a GIF.
 
 \item[{\tt Spectrum} tab]
 This extends the basic behaviour of the \htmlref{spectrum
-plot}{sc16_spectral_plot} \latex{(see Section~\ref{sc16_spectral_plot}} 
+plot}{sc16_spectral_plot} \latex{(see Section~\ref{sc16_spectral_plot}}
 including defining the spectral limits.  You can also define spatial
 regions graphically, and thereby form a composite spectrum for an
 object.
@@ -2137,19 +2137,19 @@ object.
 \item[{\tt Collapse} tab]
 This allows you collapse along the spectral axis over a defined range
 and offers a wide selection of combination options.  Most will form
-a `white-light' image in some form, but {\tt Iwc} gives a form of 
+a `white-light' image in some form, but {\tt Iwc} gives a form of
 velocity map, and {\tt Iwd} estimates the line dispersions.
 
 \item[{\tt Chanmap} tab]
 This forms a channel map comprising a grid of passband tiles, each tile
 being the result of collapsing a range of planes using one of the
-Collapse methods.  You can inspect the spectral co-ordinate of each 
+Collapse methods.  You can inspect the spectral co-ordinate of each
 plane and with the cursor mark equivalent positions in every tile.
 
 \item[{\tt Rebin} tab]
 This allows you to increase the signal-to-noise by rebinning along one or
 more dimensions.
- 
+
 \item[{\tt Filter} tab]
 This controls smoothing of image planes.
 
@@ -2159,7 +2159,7 @@ If you need to access the Cube toolbox, go to the {\tt Open cube...}
 option in the {\tt File} menu of the main display.
 
 Once you have an image displayed, be it a plane, passband image or
-channel map, you can then use \GAIA's wide selection of 
+channel map, you can then use \GAIA's wide selection of
 \xref{image-display facilities}{sun214}{image_display_capabilities}
 \latex{described in SUN/214} (also see \xref{SC/17}{sc17}{}) to
 enhance the elements under investigation.  There are also many
@@ -2184,10 +2184,10 @@ earlier}{sc16_cube_toolbox} also allows control of the plotting range
 along both axes. The {\tt Reference: Set} button lets you nominate the
 current spectrum as a reference spectrum.  Then as you subsequently
 drag the mouse you can compare any of the spectra with the reference
-spectrum.  See 
-\begin{htmlonly} 
+spectrum.  See
+\begin{htmlonly}
 the figure below.
-\end{htmlonly} 
+\end{htmlonly}
 \latex{Figure~\ref{sc16_gaia_spectrum_fig}.}
 \newpage
 
@@ -2237,7 +2237,7 @@ provides a number of alignment options in this regard.
 The second function is volume rendering.  It displays all the data within
 two data limits as a single volume.  You assign a colour and opacity to each
 limit.  The controls and options are the same as for the iso-surfaces.
-See 
+See
 \begin{htmlonly}
 the figure below.
 \end{htmlonly}
@@ -2320,13 +2320,13 @@ script to read an IFU data cube into the GUI is shown below,
 
 \small\begin{verbatim}
   pro display_slicer
-      
+
       ; Read in TEIFU data cube
       ifu_data = read_ndf('ifu_file', !values.f_nan)
-      
+
       ; create a pointer to the data array
       ifu_ptr = ptr_new(ifu_data)
-      
+
       ; run slicer3
       slicer3, ifu_ptr
    end
@@ -2371,7 +2371,7 @@ A list of the library routines, broken down by task, can be found at
 \subsubsection{ATV Image Viewer}
 
 \myfig{sc16_atv.eps}{height=0.5\textheight}{sc16_atv.gif}{sc16_atv_fig}{The
-\ATV\ viewer interface.} 
+\ATV\ viewer interface.}
 
 \htmladdnormallink{\ATV}{http://www.physics.uci.edu/~barth/atv/}
 \normalsize\  is a
@@ -2414,7 +2414,7 @@ variance arrays) may be lost when running the Starlink software from
 
 \subsection{\xlabel{sc16_vis}Visualisation using the DATACUBE scripts\label{sc16_vis}}
 
-The scripts shipped within the \DATACUBE\ package are described in 
+The scripts shipped within the \DATACUBE\ package are described in
 \xref{SUN/237}{sun237}{}.  The example dataset has a spectral axis in
 the wavelength system with units of {\AA}ngstrom, however \DATACUBE\ can
 handle other spectral systems and units, as supported by the \FITSref\
@@ -2452,7 +2452,7 @@ both white-light and passband image, \emph{e.g.}\
 \end{verbatim}\normalsize
 
 \myfig{sc16_squash.eps}{height=0.5\textheight}{sc16_squash.gif}{sc16_squash_fig}{The
-{\bf squash} script.} 
+{\bf squash} script.}
 
 Here we make a white-light image from the input data file {\tt
 ifu\_file.sdf}, saving it as a two-dimensional \xref{NDF}{sun33}{} file {\tt out.sdf} as well as
@@ -2497,7 +2497,7 @@ would create a two-dimensional passband image, collapsing a
 200~\AA-wide section of the spectral axis.
 
 \myfig{sc16_passband.eps}{height=0.5\textheight}{sc16_passband_anim.gif}{sc16_passband_fig}{The
-{\bf passband} script.} 
+{\bf passband} script.}
 
 Alternatively, we may choose to generate our passband image
 interactively using the \xref{{\bf passband}}{sun237}{passband} shell
@@ -2506,7 +2506,7 @@ script.
 \small\begin{verbatim}
    %passband
    NDF input file: ifu_file
-         
+
          Input NDF:
            File: ifu_file.sdf
          Shape:
@@ -2516,9 +2516,9 @@ script.
            Total pixels     : 6236890
          Collapsing:
            White-light image: 59 x 110
- 
+
      Left click to extract spectrum.
- 
+
          Extracting:
            (X,Y) pixel             : 32,71
          NDF array analysed        : DATA
@@ -2535,19 +2535,19 @@ script.
             Total number of pixels : 961
             Number of pixels used  : 961 (100.0%)
 
- 
+
    Zoom in (yes/no): yes
- 
+
      Left click on lower zoom boundary.
      Left click on upper zoom boundary.
- 
+
          Zooming:
            Lower Boundary: 5237.92
            Upper Boundary: 5756.03
- 
+
      Left click on lower boundary.
      Left click on upper boundary.
- 
+
          Passband:
            Lower Boundary: 5498.83
            Upper Boundary: 5561.82
@@ -2580,7 +2580,7 @@ below.
 
 \myfig{sc16_step.eps}{height=0.5\textheight}{sc16_step.gif}{sc16_step_fig}{A
 series of 500\AA\ passband images of 3C~27 produced by the
-{\bf step} shell script.} 
+{\bf step} shell script.}
 
 The \DATACUBE\ package provides the \xref{{\bf step}}{sun237}{step}
 shell script to carry out this task.
@@ -2630,25 +2630,25 @@ shell script to carry out this task.
 
 Here we are asked for the lower and upper bounds of the desired
 wavelength range, and a step size.  The script then generates a series
-of \xref{NDF}{sun33}{} two-dimensional passband images named \verb+chunk_*.sdf+. 
+of \xref{NDF}{sun33}{} two-dimensional passband images named \verb+chunk_*.sdf+.
 
 Alternatively, a very simplistic IDL script to step through an TEIFU
 data cube (stored in an NDF called {\tt ifu\_file.sdf}) is shown below.
 
 \small\begin{verbatim}
   pro step
-      
+
       ; Read in TEIFU data cube
       ifu_data = read_ndf('ifu_file', !values.f_nan)
-      
+
       ; Create a window of the right size
       window,xsize=236,ysize=440
-      
+
       ; Step through the data in the lambda direction
       for i = 0, 960 do begin
          tvscl,congrid(ifu_data(*,*,i),236,440)
-      endfor 
-      
+      endfor
+
    end
 \end{verbatim}\normalsize
 
@@ -2658,7 +2658,7 @@ wavelength direction a pixel at a time.
 
 There is now a \KAPPA\ command \xref{{\bf chanmap}}{sun95}{CHANMAP} task
 that forms an image of abutting channels or passbands of equal depth.
-It is also available from the \htmlref{cube toolbox}{sc16_cube_toolbox} 
+It is also available from the \htmlref{cube toolbox}{sc16_cube_toolbox}
 in \GAIAref.  Once created you may view the passband image with \GAIA\ or
 \xref{{\bf display}}{sun95}{DISPLAY}.  To read off the
 three-dimensional co-ordinates of features, in \GAIA\ use
@@ -2672,7 +2672,7 @@ The \xref{{\bf ripper}}{sun237}{ripper} shell script in the
 the \KAPPA\ \xref{{\bf ndfcopy}}{sun95}{NDFCOPY} application.
 
 \myfig{sc16_ripper.eps}{height=0.5\textheight}{sc16_ripper_anim.gif}{sc16_ripper_fig}{The
-{\bf ripper} script.} 
+{\bf ripper} script.}
 
 \small\begin{verbatim}
    % ripper -p
@@ -2686,7 +2686,7 @@ the \KAPPA\ \xref{{\bf ndfcopy}}{sun95}{NDFCOPY} application.
            Total pixels     : 6236890
          Collapsing:
            White-light image: 59 x 110
- 
+
      Left click to extract spectrum.
 
          Extracting:
@@ -2722,21 +2722,21 @@ of the file to only one dimension.
 The \xref{{\bf compare}}{sun237}{compare} script was written to give you
 this capability.  It allows you to continually select spectra from
 different parts of the cube, plotting the two most recent to the right
-of a white-light image of the cube.  See 
+of a white-light image of the cube.  See
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
 \latex{Figure~\ref{sc16_compare_fig}.}
 
 \myfig{sc16_compare.eps}{height=0.5\textheight}{sc16_compare.gif}{sc16_compare_fig}{The
-{\bf compare} script.} 
+{\bf compare} script.}
 
 For instance,
 
 \small\begin{verbatim}
    % compare
       NDF input file: ifu_file
-    
+
          Input NDF:
            File: ifu_file.sdf
          Shape:
@@ -2746,10 +2746,10 @@ For instance,
            Total pixels     : 6236890
          Collapsing:
            White-light image: 59 x 110
- 
+
      Left click to extract a spectrum.
      Right click to exit program.
- 
+
          Extracting:
            (X,Y) pixel             : 31,77
          NDF array analysed        : DATA
@@ -2768,7 +2768,7 @@ For instance,
 
      Left click to extract a spectrum.
      Right click to exit program.
- 
+
          Extracting:
             (X,Y) pixel            : 40,36
          NDF array analysed        : DATA
@@ -2797,7 +2797,7 @@ associated with that pixel in the upper right of the display window.
 We then have the opportunity to select another pixel, the
 corresponding spectrum being displayed in the lower right of the
 display window.  We extract only two spectra during this run of the
-script 
+script
 \begin{htmlonly}
 (see the figure),
 \end{htmlonly}
@@ -2821,14 +2821,14 @@ the figure)
 multistack}}{sun237}{multistack} shell scripts.
 
 \myfig{sc16_stacker.eps}{height=0.5\textheight}{sc16_stacker_anim.gif}{sc16_stacker_fig}{The
-{\bf stacker} script.} 
+{\bf stacker} script.}
 
 A run of the {\bf stacker} script is shown below.
- 
+
 \small\begin{verbatim}
    % stacker
    NDF input file: ifu_file
- 
+
          Input NDF:
            File: ifu_file.sdf
          Shape:
@@ -2838,45 +2838,45 @@ A run of the {\bf stacker} script is shown below.
            Total pixels     : 6236890
          Collapsing:
            White-light image: 59 x 110
- 
+
    Number of spectra: 3
- 
+
      Left click on pixel to be extracted.
- 
+
          Extracting:
            (X,Y) pixel: 24,80
- 
+
      Left click on pixel to be extracted.
- 
+
          Extracting:
            (X,Y) pixel: 30,71
- 
+
      Left click on pixel to be extracted.
- 
+
          Extracting:
            (X,Y) pixel: 30,55
- 
+
    Offset: 200
- 
+
          Adding:
            Adding 0 to spectrum 1
            Adding 200 to spectrum 2
            Adding 400 to spectrum 3
- 
+
          Plotting:
-           Spectrum: 3 
-           Spectrum: 2 
-           Spectrum: 1 
- 
+           Spectrum: 3
+           Spectrum: 2
+           Spectrum: 1
+
    Zoom in (yes/no): yes
- 
+
      Left click on lower zoom boundary.
      Left click on upper zoom boundary.
- 
+
          Zooming:
            Lower Boundary: 6792.26
            Upper Boundary: 7745.58
- 
+
          Plotting:
            Spectrum: 3
            Spectrum: 2
@@ -2893,12 +2893,12 @@ The {\bf multistack} script operates in a similar manner, however, here
 we are prompted for the number of spectral groups required, and the
 number of spectra in each group.  The mean spectrum of for each
 `group' of spectra is calculated, and then all the mean spectra are
-plotted in a stack as before, as seen in the following example. 
+plotted in a stack as before, as seen in the following example.
 
 \small\begin{verbatim}
    % multistacker
    NDF input file: ifu_file
- 
+
          Input NDF:
            File: ifu_file.sdf
          Shape:
@@ -2908,15 +2908,15 @@ plotted in a stack as before, as seen in the following example.
            Total pixels     : 6236890
          Collapsing:
            White-light image: 59 x 110
-  
+
    Number of groups: 3
- 
+
    Number of spectra in group: 4
-  
+
      Left click on pixel to be extracted.
                 .
                 .
-                .	     
+                .
 \end{verbatim}\normalsize
 
 Here we request three groups of four spectra each, \emph{i.e.}\ we'll
@@ -2968,7 +2968,7 @@ given for $x$ and $y$, the two values separated by a comma.
 
           Plotting:
             Clinplot: Grid of spectra, averaged 4 x 4
-               
+
 \end{verbatim}\normalsize
 
 \myfig{sc16_gridspec.eps}{height=0.5\textheight}{sc16_gridspec.gif}{sc16_gridspec_fig}{The
@@ -2997,7 +2997,7 @@ to select the template spectrum, and initial fitting parameters. For
 data well characterised by a Gaussian, {\bf velmap} can produce
 excellent results.  However, it is an expensive algorithm to apply to
 each spatial pixel.  Also Gaussian fitting is not appropriate for all
-data. 
+data.
 
 The alternative offered {\bf velmoment} collapses along the spectral
 axis by deriving the intensity-weighted mean co-ordinate, and converts
@@ -3009,9 +3009,9 @@ single significant emission line.
 \paragraph{\label{sc16_velfit}\latex{\vspace*{0.8em}}By
 fitting\latex{\newline}\xlabel{sc16_velfit}}
 
-\hspace*{-2.1ex}\xref{{\bf velmap}}{sun237}{velmap} allows you to select the highest 
-signal-to-noise spectrum from a white-light image.  You can then 
-interactively fit a line in this spectrum.  The script will attempt to 
+\hspace*{-2.1ex}\xref{{\bf velmap}}{sun237}{velmap} allows you to select the highest
+signal-to-noise spectrum from a white-light image.  You can then
+interactively fit a line in this spectrum.  The script will attempt to
 automatically fit the same line in all the remaining spectra in the
 cube, calculate the Doppler velocity of this line from a rest-frame
 co-ordinate you provide or is read from the NDF WCS, and create a
@@ -3029,7 +3029,7 @@ consisting of the central core of the galaxy.}
 \small\begin{verbatim}
    % velmap -v -p
    NDF input file: section
- 
+
          Input NDF:
            File: section.sdf
          Shape:
@@ -3039,53 +3039,53 @@ consisting of the central core of the galaxy.}
            Total pixels     : 423801
          Collapsing:
            White-light image: 21 x 21
- 
+
      Left click on pixel to be extracted.
-   
+
          Extracting:
            (X,Y) pixel: 31,72
            Variances: Extension present.
-   
+
    Zoom in (yes/no): yes
-    
+
      Left click on lower zoom boundary.
      Left click on upper zoom boundary.
 
          Zooming:
            Lower Boundary: 5289.73
            Upper Boundary: 5714.58
- 
+
      Left click on the lower limit of the fitting region.
      Left click on the upper limit of the fitting region.
- 
+
          Fit Mask:
            Lower Mask Boundary: 5500.97
            Upper Mask Boundary: 5649.73
- 
+
      Left click on your first estimate of the continuum.
      Left click on your second estimate of the continuum.
- 
+
          Continuum:
            First Estimate: 34.2915
            Second Estimate: 10.2744
            Average Value: 22.5659
- 
+
      Left click on the line peak.
-  
+
          Line Position:
            Peak Position: 5526.29
            Peak Height: 979.966
- 
+
      Left click on the left-hand edge of the FWHM.
      Left click on the right-hand edge of the FWHM.
- 
+
          FWHM:
            Lower Bound: 5518.38
            Upper Bound: 5535.79
            FWHM: 17.41
- 
+
    Rest Wavelength: 5007
- 
+
          Rest Wavelength:
            Wavelength: 5007 Angstrom
          Fitting:
@@ -3093,9 +3093,9 @@ consisting of the central core of the galaxy.}
            Peak Height: 1020.167 +- 11.59994
            FWHM: 13.28973 +- 0.1748629
            Line integral: 14431.77 +- 163.9841
- 
+
    Fit okay (yes/no): yes
- 
+
    NDF output file: output
          Fitting:
            Spectrum at (20,60): 5530.940 +- 0.5387596
@@ -3109,7 +3109,7 @@ consisting of the central core of the galaxy.}
                                 31096.465 +- 4.475734 km/s
            Spectrum at (40,80): 5526.596 +- 0.8262261E-01
                                 31132.175 +- 4.943080 km/s
- 
+
          Output NDF:
            Converting: Creating NDF from data.
            Origin: Attaching origin (20,60).
@@ -3121,7 +3121,7 @@ consisting of the central core of the galaxy.}
          Plotting:
            Display: Velocity map using percentile scaling.
            Contour: White-light image with equally spaced contours.
- 
+
    Refit points (yes/no): no
    %
 \end{verbatim}\normalsize
@@ -3137,7 +3137,7 @@ where the script was unable to obtain a fit, you may manually refit
 any data point in the velocity map.
 
 There is a {\tt -a} option where you can review each fit at each
-spatial pixel.   The fit parameters can be logged to a 
+spatial pixel.   The fit parameters can be logged to a
 \xref{Small Text List}{sun190}{} with the {\tt -l} option.
 
 \paragraph{\label{sc16_velmoment}\latex{\vspace*{0.8em}}By
@@ -3153,7 +3153,7 @@ then switches co-ordinate system to one of four velocities, such as
 optical or radio.  It can also cope with NDFs in the
 \htmlref{UK data-cube format}{sc16_teifufile} too.
 
-Then comes the heart of the script---the 
+Then comes the heart of the script---the
 \xref{{\bf collapse}}{sun95}{COLLAPSE} task acting upon the spectral
 axis.  It derives the intensity-weighted velocity moment.  For simple
 spectra, \emph{i.e.} a single or dominant emission line, {\bf
@@ -3189,7 +3189,7 @@ consisting of the central core of the galaxy.}
 \small\begin{verbatim}
 
    % velmoment -b 2 -i ifu_file"(,,5300.:5750.)" -r 5007 -p -c 10
- 
+
          Input NDF:
            File: ifu_file.sdf
          Shape:
@@ -3197,24 +3197,24 @@ consisting of the central core of the galaxy.}
            Dimension size(s): 59 x 110 x 79
            Pixel bounds     : 1:59, 1:110, 135:213
            Total pixels     : 512710
- 
+
    Display white-light image to select subset (yes/no): y
          Collapsing:
            White-light image: 59 x 110
- 
+
      Left click on lower zoom boundary.
      Left click on upper zoom boundary.
- 
+
          Zooming:
          Extracting:
            Lower (X,Y): 14,56
            Upper (X,Y): 46,97
- 
+
          Rest Wavelength :
            Wavelength  : 5007 Angstrom
- 
+
    NDF output file: moment
- 
+
          Collapsing:
            Intensity-weighted co-ordinate image: 16 x 21
          Plotting:
@@ -3231,7 +3231,7 @@ generate a line-strength map.  The interface to this script is very
 similar to that of the \xref{{\bf velmap}}{sun237}{velmap} script
 discussed \latex{in Section~\ref{sc16_velmap}, }
 \begin{htmlonly}
-\htmlref{earlier}{sc16_velmap}, 
+\htmlref{earlier}{sc16_velmap},
 \end{htmlonly}
 and it also generates final output in a similar form, see
 \begin{htmlonly}
@@ -3266,7 +3266,7 @@ fragile to signal-to-noise problems.
 
 Make a line-strength map of the both lines using \xref{{\bf
 peakmap}}{sun237}{peakmap} or passband images using \xref{{\bf
-squash}}{sun237}{squash}, and then use the \KAPPA\ 
+squash}}{sun237}{squash}, and then use the \KAPPA\
 \xref{{\bf div}}{sun95}{DIV} task to divide one by the other to create a
 ratio map.  Here is an example.
 
@@ -3296,7 +3296,7 @@ between different cubes produced by the same instrument.  It is
 therefore very difficult to provide a `catch all' script or even
 recipe to allow you to mosaic two cubes together as yet.  The
 agreement of a standard for the spectroscopic world co-ordinates
-promulgated in FITS (Greisen {\em et al.}, 2006, {\em Representations 
+promulgated in FITS (Greisen {\em et al.}, 2006, {\em Representations
 of spectral coordinates in FITS}, Astronomy \& Astrophysics 446,747)
 should diminish the problem. At the time of writing the Starlink
 \xref{AST}{sun210}{} already supports spectral frames (these are used
@@ -3323,7 +3323,7 @@ FITS headers.
 Then make use of the \CCDPACK\ \xref{{\bf wcsedit}}{sun139}{WCSEDIT}
 application to modify the origin of the PIXEL frame of one of the
 cubes such that the two cubes are aligned in the PIXEL frame.  Next
-we suggest you change the current frame to the PIXEL frame (with 
+we suggest you change the current frame to the PIXEL frame (with
 \xref{{\bf wcsframe}}{sun95}{WCSFRAME}) and use
 \xref{{\bf makemos}}{sun139}{MAKEMOS} to mosaic the cubes together (see
 \begin{htmlonly}
@@ -3335,7 +3335,7 @@ designed for two-dimensional CCD frames) which is why having an
 identical wavelength calibration over the same number of pixels is
 rather crucial.
 
-Alternatively use can be made of the \CCDPACK\ 
+Alternatively use can be made of the \CCDPACK\
 \xref{{\bf wcsreg}}{sun139}{WCSREG} application to align the cubes spatially.
 
 Due to the differences in WCS content between instruments, if you want
@@ -3406,12 +3406,12 @@ co-ordinates from a cursor click on a graphics display window.
    cursor showpixel=true style="Colour(marker)=3" plot=mark \
           maxpos=1 marker=2 device=xwin > /tmp/cursor_lock
 
-   # Wait for cursor input.	  
+   # Wait for cursor input.
    while ( ! -e /tmp/cursor_lock )
       sleep 1
    end
    rm -f /tmp/cursor_lock
-   
+
    # Retrieve WCS co-ordinates.
    set pos = `parget lastpos cursor`
    set x = $pos[1]
@@ -3430,18 +3430,18 @@ This functionality has been encapsulated within the script
 \subsection{How do I overplot contours from one image on to another?}
 
 The following code will overplot the contours of one dataset on to the
-greyscale image of another of the same spatial size using the \KAPPA\ 
+greyscale image of another of the same spatial size using the \KAPPA\
 \xref{{\bf display}}{sun95}{DISPLAY} and \xref{{\bf contour}}{sun95}{CONTOUR}
 tasks.
 
 \small\begin{verbatim}
    # Display greyscale image.
    display in=file1 device=xwin mode=per percentiles=[15,98] \
-           axes=yes lut=$KAPPA_DIR/grey_lut margin=! 
-	   
+           axes=yes lut=$KAPPA_DIR/grey_lut margin=!
+
    # plot contours
    contour ndf=file2 device=xwin clear=no mode=equi axes=no \
-           ncont=${numcont} pens='colour=2' margin=! 
+           ncont=${numcont} pens='colour=2' margin=!
 \end{verbatim}\normalsize
 
 This is useful in many circumstances, for instance, plotting the
@@ -3464,10 +3464,10 @@ notation).
 \small\begin{verbatim}
    # first number
    set num1 = `echo ${num1} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-   
+
    # second number
    set num2 = `echo ${num2} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-   
+
    # answer
    set num3 = `echo "scale = 15; ${num1}-${num2}" | bc`
 \end{verbatim}\normalsize
@@ -3490,7 +3490,7 @@ mathematical expressions, as in this extract.
         `calc exp="'${velocity}*3.0E+08'" prec=_double`
 \end{verbatim}\normalsize
 
-here we evaluate the Doppler velocity of an emission line using three calls 
+here we evaluate the Doppler velocity of an emission line using three calls
 to {\bf calc}, although the velocity could have been derived in a single
 expression.
 
@@ -3524,13 +3524,13 @@ other \KAPPA\ \xref{FITS manipulation tools}{sun95}{se_fitsairlock}.
    # Get the input file name.
    echo -n "NDF input file: "
    set infile = $<
-   
+
    # Check to see if the CTYPE3 keyword exists.
    set status = `fitsexist ${infile} CTYPE3`
-   
+
    # If the keyword exists...
    if ( ${status} == "TRUE" ) then
-   
+
       # get the value of CTYPE3.
       set ctype3 = `fitsval ${infile} CTYPE3`
 
@@ -3538,13 +3538,13 @@ other \KAPPA\ \xref{FITS manipulation tools}{sun95}{se_fitsairlock}.
       if ( ${ctype3} != "LAMBDA" ) then
          echo "Warning: Axis 3 not type LAMBDA"
       endif
-      
+
    # The keyword does not exist.
    else
-   
+
       # Warn the user that the keyword is missing.
       echo "Warning: Axis 3 type keyword missing"
-      
+
    endif
 \end{verbatim}\normalsize
 
@@ -3567,22 +3567,22 @@ NDF extensions until it has the correct specifications.
              maxlen=1024 type='_double'
 
    # Set bad pixels to the magic value VAL__BADD.
-   setmagic in=${tmpfile} out=${outfile} repval=-9999.99 
+   setmagic in=${tmpfile} out=${outfile} repval=-9999.99
    rm -f "${tmpfile}.sdf"
 
    # Set the origin of the output file.
-   setorigin ndf=${outfile} origin=[${lbnd[1]},${lbnd[2]}] 
+   setorigin ndf=${outfile} origin=[${lbnd[1]},${lbnd[2]}]
 
    # Attach the variance array.
    ascii2ndf in=${varfile} comp="Variance" out=${outfile} \
-                shape=[${dims[1]},${dims[2]}] maxlen=1024 type='_double' 
+                shape=[${dims[1]},${dims[2]}] maxlen=1024 type='_double'
 
    # We have a similar shaped NDF from which we want to clone the WCS
    # and AXIS information and attach to our newly created ${outfile}.
-   
+
    # Clone the AXIS information from an similar shaped NDF.
    setaxis ndf=${outfile} like=${likefile}
-   
+
    # Clone the WCS information.  This will be done incorrectly if the
    # AXIS structures does not exits before the WCS extension is cloned
    wcscopy ndf=${outfile} like=${likefile}
@@ -3593,8 +3593,8 @@ of dimensions \verb+$dims[1]+ $\times$ \verb+$dims[2]+, with data type
 {\tt \_DOUBLE}, using {\bf ascii2ndf}.  We then cal upon
 \xref{{\bf setmagic}}{sun95}{SETMAGIC} to flag all pixels that have the
 value $-9999.99$ in the NDF with the \xref{standard bad `magic'
-value}{sun95}{se_masking}, in this case {\tt VAL\_\_BADD}.  
-\xref{{\bf setorigin}}{sun95}{SETORIGIN} sets the pixel origin 
+value}{sun95}{se_masking}, in this case {\tt VAL\_\_BADD}.
+\xref{{\bf setorigin}}{sun95}{SETORIGIN} sets the pixel origin
 to \verb+($lbnd[1],$lbnd[2])+.  We then use {\bf ascii2ndf} again to
 attach a variance array, from the ASCII flat file \verb+$varfile+, to
 our newly created NDF.
@@ -3616,7 +3616,7 @@ information is the same as our newly created NDF.  If we wanted to
 avoid copying the AXIS information (or if the NDF from where we were
 cloning had no WCS information) we could make use of the
 \xref{{\bf wcscopy}}{sun95}{WCSCOPY} command's {\tt TR} parameter to provide
-a transformation matrix.  
+a transformation matrix.
 
 \label{sc16_wcs2axis}\xlabel{sc16_wcs2axis}
 Alternatively, we could make use of the \KAPPA\ {\bf setaxis} command
@@ -3629,10 +3629,10 @@ axis.  Then we copying the AXIS and WCS structures to our new NDF.
    # Create an AXIS structure from a WCS extension
    setaxis ndf=${likefile} mode=wcs comp=Centre dim=1
    setaxis ndf=${likefile} mode=wcs comp=Centre dim=2
-   
+
    # Copy the AXIS structure to our new NDF.
    setaxis ndf=${outfile} like=${likefile}
-   
+
    # Copy the WCS extension to our new NDF
    wcscopy ndf=${outfile} like=${likefile}
 \end{verbatim}\normalsize
@@ -3661,7 +3661,7 @@ increasing come installed by default on platforms other than Linux.
 {\bf XDialog} script based on {\bf velmap}; here it asks for an input file.}
 \myfig{sc16_xvelmap2.eps}{height=0.5\textheight}{sc16_xvelmap2.gif}{sc16_xvelmap2_fig}{The
 same {\bf XDialog} script later in the run; here we are prompted for the
-central wavelength of the line.} 
+central wavelength of the line.}
 
 Most shell scripts are easily converted to use {\bf Xdialog}, for
 example we quickly modified the \xref{{\bf velmap}}{sun237}{velmap}
@@ -3758,7 +3758,7 @@ Valdes}{http://www.noao.edu/noao/scistaff/valdes.html} for their
 co-operation and contributions.
 
 Up-to-date information about UIST data reduction was provided by
-\htmladdnormallink{Stephen Todd}{http://intra.roe.ac.uk/ifa/people/spt.html} who 
+\htmladdnormallink{Stephen Todd}{http://intra.roe.ac.uk/ifa/people/spt.html} who
 wrote the original ORAC-DR IFU recipes for the instrument.
 
 \end{document}

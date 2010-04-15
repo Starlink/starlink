@@ -5,18 +5,18 @@
 *+
 *  Name:
 *     PON_RDFIL
- 
+
 *  Purpose:
 *     Read the data from a text file for PONGO.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PON_RDFIL( ID, SELCOL, ISTLN, IFINLN, DELIM, ICOND, CHRSEL,
 *    :                SELVAl1,SELVAL2, NLIST, CLIST, SIZESCALE,
 *    :                CLRBUFF, HARDCOM, SOFTCOM, STATUS )
- 
+
 *  Description:
 *     Given a file ID, this routine will read a formatted sequential
 *     file with the column numbers specified by XCOL, YCOL etc.
@@ -27,7 +27,7 @@
 *     reading the X or Y data, the routine will ignore that line.
 *     Errors in the error columns cause the corresponding error to be
 *     set to zero.
- 
+
 *  Arguments:
 *     ID = INTEGER (Given)
 *        The FIO file ID.
@@ -63,13 +63,13 @@
 *        The SOFT comment character.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     PDRAPER: P.W. Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     8-FEB-1990 (JBVAD::PAH):
 *        Original version (adapted from the stand-alone version).
@@ -82,29 +82,29 @@
 *        Subsequent to this tidied up the error reporting code.
 *     20-AUG-1997 (PDRAPER):
 *        Removed code that initialises data areas that are not being
-*        read. The documented behaviour is for these areas to remain 
+*        read. The documented behaviour is for these areas to remain
 *        unchanged (so that it is possible to read from more than
 *        one file).
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO global constants
       INCLUDE 'FIO_ERR'          ! FIO_ error codes
       INCLUDE 'PRM_PAR'          ! PRIMDAT public global constants
- 
- 
+
+
 *  Global Variables:
       INCLUDE 'PONGO_CMN'        ! PONGO global variables
- 
+
 *  Arguments Given:
       INTEGER ID
       INTEGER SELCOL
@@ -131,12 +131,12 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Constants:
       INTEGER MXINERR            ! Maximum allowable number of input
                                  ! errors
       PARAMETER ( MXINERR = 5 )
- 
+
 *  Local Variables:
       INTEGER ERRCNT             ! Count of number of errors
       INTEGER IDAT               ! Current number of points read in
@@ -153,22 +153,22 @@
       CHARACTER * ( LENLAB ) CHARVAL ! [local_variable_description]
 
       LOGICAL DUMMY              ! Dummy variable
- 
+
 *  Internal References:
       LOGICAL PON_LSELECT        ! Selection function
       LOGICAL PARINT             ! Convert character to integer
       LOGICAL PAREAL             ! Convert character to real
       LOGICAL PARDBL             ! Convert character to double
       LOGICAL PARPOS             ! Convert character position to arcseco
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       SSS = SQRT( ABS( SIZESCALE ) )
       ILINE = 0
- 
+
 *  If the buffer is to be cleared, reset the data pointer and limits.
       IF ( CLRBUFF ) THEN
          IDAT = 1
@@ -177,14 +177,14 @@
          XMIN = VAL__MAXR
          YMIN = VAL__MAXR
       ELSE
- 
+
 *     Otherwise, set the data pointer to the end of the current data.
          IDAT = NDAT + 1
       END IF
- 
+
 *  Initialize the error count.
       ERRCNT = 0
- 
+
 *  Start the main loop.
 *  DO WHILE loop.
  10   CONTINUE
@@ -193,10 +193,10 @@
      :     .AND. ( ILINE .LE. IFINLN )
      :     .AND. ( IDAT .LE. NDATMAX ) ) THEN
          CALL FIO_READ( ID, CHARBUFF, ILENC, STATUS )
- 
+
 *     Early exit for end of file.
          IF ( STATUS .EQ. FIO__EOF ) GO TO 100
- 
+
 *     ... else carry on if the line is read successfully.
          IF ( STATUS .EQ. SAI__OK ) THEN
             ILINE = ILINE + 1
@@ -205,16 +205,16 @@
      :           .AND. ( CHARBUFF( 1 : 1 ) .NE. SOFTCOM )
      :           .AND. ( CHARBUFF( 1 : 1 ) .NE. HARDCOM )
      :           .AND. ( ILINE .GE. ISTLN ) ) THEN
- 
+
 *           Split the input line up into columns.
                CALL PON_PARSE( CHARBUFF( : ILENC ), DELIM, MAXCOL,
      :                         INPAR, NINPAR, STATUS )
- 
+
 *           Initalize the error indicator.
                IERR1 = 0
- 
+
 *           Get the information in the select column.
-               IF ( ( SELCOL .GT. 0 ) .AND. ( SELCOL .LE. NINPAR ) ) 
+               IF ( ( SELCOL .GT. 0 ) .AND. ( SELCOL .LE. NINPAR ) )
      :         THEN
                   CHARVAL = INPAR( SELCOL )
                   DUMMY = PAREAL( CHARVAL, COLVAL )
@@ -225,10 +225,10 @@
      :                          STATUS )
                   GO TO 100
                END IF
- 
-               IF ( ( ILINE .GE. ISTLN ) .AND. ( ILINE .LE. IFINLN ) ) 
+
+               IF ( ( ILINE .GE. ISTLN ) .AND. ( ILINE .LE. IFINLN ) )
      :         THEN
- 
+
 *              Check if the line is selected.
                   IF ( ( SELCOL .EQ. 0 )
      :                 .OR. ( ( SELCOL .NE. 0 )
@@ -239,26 +239,26 @@
      :                                           CLIST ) ) ) THEN
 
 *                 Read the X column if possible.
-                     IF ( ( XCOL .NE. 0 ) .AND. ( XCOL .LE. NINPAR ) ) 
+                     IF ( ( XCOL .NE. 0 ) .AND. ( XCOL .LE. NINPAR ) )
      :               THEN
                         XDATA( IDAT ) = 0.0D0
- 
+
 *                 First try to interpret it as DOUBLE PRECISION.
-                        IF ( .NOT. 
+                        IF ( .NOT.
      :                       PARDBL( INPAR( XCOL ), XDATA( IDAT ) ) )
      :                  THEN
                            IERR1 = 1
- 
+
 *                       If it fails, try to interpret as a position.
                            IF ( PARPOS( INPAR( XCOL ), XDATA( IDAT ) ) )
      :                     THEN
- 
+
 *                          Convert the position to radians.
-                              XDATA( IDAT ) = 
+                              XDATA( IDAT ) =
      :                                  XDATA( IDAT ) * DAS2R * 15.0D+00
                               IERR1 = 0
                            END IF
- 
+
                            IF ( IERR1 .NE. 0 ) THEN
 
 *                          Signal error and make fatal for this line.
@@ -273,7 +273,7 @@
                            END IF
                         END IF
                      END IF
- 
+
                      IF ( ( YCOL .NE. 0 )
      :                    .AND. ( YCOL .LE. NINPAR ) ) THEN
                         YDATA( IDAT ) = 0.0D0
@@ -286,7 +286,7 @@
                               YDATA( IDAT ) = YDATA( IDAT ) * DAS2R
                               IERR1 = 0
                            END IF
- 
+
                            IF ( IERR1 .NE. 0 ) THEN
                               YDATA( IDAT ) = 0.0D0
                               CALL MSG_SETI( 'LINE', ILINE )
@@ -374,29 +374,29 @@
                      END IF
                   END IF
 
-*              Show all errors generated in this loop and annul the 
+*              Show all errors generated in this loop and annul the
 *              error ready for the next pass.
                   IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
                END IF
             END IF
          ELSE
             CALL MSG_SETI( 'LINE', ILINE )
-            CALL ERR_REP( 'PON_RDFIL_LINE', 'Bad line (^LINE).', 
+            CALL ERR_REP( 'PON_RDFIL_LINE', 'Bad line (^LINE).',
      :                    STATUS )
             ERRCNT = ERRCNT + 1
-            IF ( ERRCNT .LE. MXINERR ) CALL ERR_FLUSH( STATUS )       
+            IF ( ERRCNT .LE. MXINERR ) CALL ERR_FLUSH( STATUS )
          END IF
       GO TO 10
       END IF
- 
+
  100  CONTINUE
       NDAT = IDAT - 1
- 
+
 *  Clean up status if end of file occured.
       IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
 
 
-*  Check number of data points does not exceed the size of the common data 
+*  Check number of data points does not exceed the size of the common data
 *  areas.
       IF ( NDAT .EQ. NDATMAX ) THEN
          IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
@@ -411,6 +411,6 @@
      :                 'WARNING - no data points were read.',
      :                 STATUS )
       END IF
- 
+
       END
 * $Id$

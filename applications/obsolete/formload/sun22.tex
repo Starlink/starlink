@@ -41,7 +41,7 @@ CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
 \vspace{5mm}
 \begin{center}
 {\Large\bf \stardoctitle}
-\end{center}                            
+\end{center}
 \vspace{5mm}
 
 %------------------------------------------------------------------------------
@@ -61,14 +61,14 @@ in' responses in forms and documents.
 
 Whilst the programme is a general purpose one for use with any type of
 document, it is at present supplied with the templates for telescope time
-application documents. 
+application documents.
 
 The user may make other documents, by making her own template and input
-forms, following the directions given in section~\ref{se:make}. 
+forms, following the directions given in section~\ref{se:make}.
 
 To simplify this description of the programme, this document will now
 assume that the user intends to use it for making telescope time
-application forms. 
+application forms.
 
 \section{Telescope Application Forms}
 
@@ -89,14 +89,14 @@ application forms. These are for the following:
 The user places her responses into an ordinary text file. She then uses
 FORMLOAD to turn that file into a `.tex' file which contains both the
 structure of the desired form and her entries. She then uses \LaTeX\ in the
-normal way to make a hardcopy of the form. 
+normal way to make a hardcopy of the form.
 
 An additional advantage in this is that the source for the user's proposal
 resides in that single text file, making modification, storage,
-transmission, and re-use easy. 
+transmission, and re-use easy.
 
 By using the `NULL' example file (see section~\ref{se:use}), the user can
-get an empty form, which can be filled in by hand, if so desired. 
+get an empty form, which can be filled in by hand, if so desired.
 
 Before using the programme, the user thinks of the form as a series of
 questions {\em e.g.}, taking the PATT2 form, the first question on the form
@@ -109,7 +109,7 @@ With this concept of the form, it can be seen that the answers to the
 various questions can be loaded into a text file, and then a program run to
 take the answers from this text file, insert them into a \LaTeX\ template,
 and generate a complete form in the {\tt .tex} \LaTeX\ file
-format. 
+format.
 
 Such an approach has been taken by FORMLOAD. The user has to prepare an
 input text file, which has to be in a standard format (so the program can
@@ -131,10 +131,10 @@ to put in, in a simple way. The `SAMPLE' file shows an example of how to
 make an input file. The `NULL' file can also be used to make an empty form.
 (It should be clear from the contents of the `SAMPLE' file how the
 modifications are done, but section~\ref{se:details} describes this in more
-detail) 
+detail)
 
-FORMLOAD then turns this modified file into the desired \LaTeX\ file, 
-which is \LaTeX ed in the normal way. 
+FORMLOAD then turns this modified file into the desired \LaTeX\ file,
+which is \LaTeX ed in the normal way.
 
 \section{UNIX and VMS}
 
@@ -207,17 +207,17 @@ consult the local Starlink documentation. (A useful tip with the
 
 There are thus three responses the user has to make: the type of form to
 produce; the name of the input file; and the number of the pages of the
-form wanted. The program then makes the output file. 
+form wanted. The program then makes the output file.
 
 \subsection{Selection of Form Type}
 
 The programme puts out one line descriptions of the available forms, together
-with a short response for choosing the type of form. There will be a 
+with a short response for choosing the type of form. There will be a
 default response offered to you, which can be selected by entering the
 'return', 'enter', 'carriage return' response.
 
 (Note the possibility of changing the default or adding or removing
-different types of forms from the list. This is described in 
+different types of forms from the list. This is described in
 section~\ref{se:make}.)
 
 \subsection{The Input file Name}
@@ -225,7 +225,7 @@ section~\ref{se:make}.)
 The user inputs the name of the input file (a default is suggested). If no
 file type (the {\tt .dat} for example) is given, then the input file is
 assumed to be {\tt .dat}. It is advisable that the input file does not have
-the type {\tt .tex}. 
+the type {\tt .tex}.
 
 \subsection{The Pages Desired}
 
@@ -241,7 +241,7 @@ PATT2 :- 1,2,3,4,4a,4b, and/or 5) with spaces or commas between them.
 [For PATT2, the pages 4a and 4b are for the optional extra pages
 of technical information and of references and figures for the scientific
 justification. PATT3 "justification and technical info" are added by the
-author of the application, separately]. 
+author of the application, separately].
 
 \subsection{The Output File Name}
 
@@ -251,7 +251,7 @@ but places it in the current directory, with the type {\tt .tex} .
 \section{Location on Output Paper}
 \label{se:locate}
 
-\subsection{Different Printers} 
+\subsection{Different Printers}
 
 On some printers, the location of the printed output can vary. It is thus
 possible for the output to run off the left or right sides of a page, or
@@ -259,7 +259,7 @@ off the top or bottom. To allow for this, the system manager has the option
 of changing one of the files in `\$FORMLOAD\_DIR'. The user is then, whilst
 running the programme, presented with a menu from which the printer the
 output is intended for can be selected. The output will then have a
-suitable offset for that printer. 
+suitable offset for that printer.
 
 
 \subsection{Cropping}
@@ -267,7 +267,7 @@ suitable offset for that printer.
 On some laser printers, particularly Postscript printer, the extreme tops
 and bottoms of a page are not printed out. This has no effect, except for
 the PATT3 form, where the page numbers at the bottom of the pages can be
-omitted for page 3. 
+omitted for page 3.
 
 \section{Detailed Help on Filling in an Input File}
 \label{se:details}
@@ -275,7 +275,7 @@ omitted for page 3.
 \subsection{A Description of the Lines}
 
 We take the PATT2 form as an example. The other types of form are very
-similar. 
+similar.
 
 Looking at {\tt \$FORMLOAD\_DIR/patt2\_sample.dat}, it will first be noticed
 that each question is preceded by a number. This denotes the PATT2 section,
@@ -283,34 +283,34 @@ sub-section, and question number of each question. This is followed by
 `\#?\$\&', which is used, together with number, as the flag that this line
 is a question start. There is one exception to this numbering scheme, the
 last one `XE\_0\_00'. This refers to something that is not a section of the
-PATT2 form, and thus has its own number. Its use is explained below. 
+PATT2 form, and thus has its own number. Its use is explained below.
 
 Then there is a short summary of the question (compare these with those on
-the form itself). 
+the form itself).
 
 Then there is a symbol and an exclamation mark. This denotes the `type' of
-answer expected and the start of the answer field. 
+answer expected and the start of the answer field.
 
 Lastly there are the somewhat light-hearted sample answers, which are
-designed to show the ranges of responses possible. 
+designed to show the ranges of responses possible.
 
 \subsection{How to Put in the Responses}
 
 The user will make her own file ({\it e.g.}) {\tt patt2\_mine.dat} by
 replacing these answers in \newline ({\it e.g.}) {\tt
-\$FORMLOAD\_DIR/patt2\_sample.dat} with the ones she wants. 
+\$FORMLOAD\_DIR/patt2\_sample.dat} with the ones she wants.
 
 There are two types of questions which are shown on each line of the file
 by the symbol before the !. The types are `p', and `line'. The user can
 fill in something after the ! on each line. If no response is made, then
-the matching question on the form will have no answer. 
+the matching question on the form will have no answer.
 
 {\small
 \begin{tabular}{|l|p{0.6in}|p{1.2in}|p{3.5in}|} \hline
-{\it Type} & {\it symbol in {\tt .dat} file}   & {\it Reply normally seen on 
+{\it Type} & {\it symbol in {\tt .dat} file}   & {\it Reply normally seen on
 form} & {\it Response to put into the {\tt .dat} file} \\ \hline
 line  &     !  &   a line of text  &  A line of text. If the user wants to,
-                                      she can enter this line after the !, 
+                                      she can enter this line after the !,
                                       and/or as new extra lines inserted
                                       after the question line.
                                       These lines must NOT begin with the
@@ -320,12 +320,12 @@ line  &     !  &   a line of text  &  A line of text. If the user wants to,
                                       start to a line tells the FORMLOAD
                                       program that a new question is
                                       being started. It is hoped that the user will
-                                      never by mistake insert such a 
+                                      never by mistake insert such a
                                       sequence --- it seems very unlikely. \\  \hline
 p     &    p!  & lines of text    &   Lines of text. If the user wants to,
-                                      she can enter this line after the !, 
+                                      she can enter this line after the !,
                                       and/or as new extra lines inserted
-                                      after the question line. 
+                                      after the question line.
                                       The same prohibition on the line
                                       starting applies. \\  \hline
 \end{tabular}}
@@ -333,36 +333,36 @@ p     &    p!  & lines of text    &   Lines of text. If the user wants to,
 
 An advantage of this procedure is that the user only has to insert answers
 to the questions where she wants something to appear, so many of the lines
-will be blank. 
+will be blank.
 
 A further note on the `line' and `p' entries --- the user may, and in many
 cases will, want to put \LaTeX\ instructions in these. The default starting
 position of the text is at the top left corner of where text can go in the
 form. Some of the `p' entries may seem to be more suitable to `line' mode,
 but in these cases the  user will have been given the freedom to completely
-fill the space available. 
+fill the space available.
 
 \subsection {Special Responses in the UK PATT forms}
 
 In the UK PATT application forms, there are three other types, `x', `y/n',
-and `n/w'. 
+and `n/w'.
 
 In the `x' mode, it is recommended that only `x' be used, but any smallish
-single character ({\it e.g.}~{\small Y}) will be ok. 
+single character ({\it e.g.}~{\small Y}) will be ok.
 
 In the `y/n' mode, no \LaTeX\ instructions are allowed, only entries of the
 form `yes' or `no' are allowed. Any other entries will be searched for `y'
-and `n' characters. If they are found, then `yes' or `no' will be assumed. 
+and `n' characters. If they are found, then `yes' or `no' will be assumed.
 
 In the `n/w' mode, no \LaTeX\ instructions are allowed, only entries of the
 form `weeks' or `nights' are allowed. Any other entries will be searched
 for `n' and `w' characters. If they are found, then `nights' or `weeks' will
-be assumed. 
+be assumed.
 
 
 {\small
 \begin{tabular}{|l|p{0.6in}|p{1.7in}|p{3.0in}|} \hline
-{\it Type} & {\it symbol in {\tt .dat} file}   & {\it Reply normally seen on 
+{\it Type} & {\it symbol in {\tt .dat} file}   & {\it Reply normally seen on
 form} & {\it Response to put into the {\tt .dat} file} \\ \hline
 x     &    x!  &   x or nothing    &  x or nothing --- i.e. blank characters \\ \hline
 y/n   &  y/n!  &   Y/N or yes/no   &  y or n \\  \hline
@@ -383,17 +383,17 @@ this up. The user may simply get a \LaTeX\ or \TeX\ warning, the page will
 stretch itself automatically to fit the extra text, or the text will
 overrun onto the areas below its proper area. Thus the user
 should check that the the entries do not overflow their allotted areas, and
-that the pages end up the correct length. 
+that the pages end up the correct length.
 
 \item No line in the input file to FORMLOAD should be longer than 132
-characters (including the question numbering, if any). 
+characters (including the question numbering, if any).
 
 \item Remember the limits imposed by the people who read the forms on the
-smallness of the fonts used. 
+smallness of the fonts used.
 
 \item \LaTeX\ assigns a special meaning to many characters. The non-user of
 \LaTeX\  should be aware that use of some characters in the responses can
-cause \LaTeX\ to fail to make the correct file. Some examples of this are: 
+cause \LaTeX\ to fail to make the correct file. Some examples of this are:
 
 \begin{center}
 \begin{tabular}{|l|l|} \hline
@@ -407,7 +407,7 @@ cause \LaTeX\ to fail to make the correct file. Some examples of this are:
 \end{itemize}
 
 So be careful about putting in these characters, and be prepared if
-necessary to learn a bit about how to use \LaTeX . 
+necessary to learn a bit about how to use \LaTeX .
 
 \subsection{A Word of Explanation on the Question Numbering}
 
@@ -418,7 +418,7 @@ sub-section, sometimes nothing as the first, and sometimes nothing for the
 first, then i) for the second. I have followed the forms in general, and
 put 0 where the forms have put nothing. Thus the very first question in
 PATT2 is 01\_1\_01. [There are four sections which PATT2 does not number,
-so I have called these X1, X2, X3, and X4.] 
+so I have called these X1, X2, X3, and X4.]
 
 \subsection{The Last `Question'}
 
@@ -427,7 +427,7 @@ correspond to any on the forms, but can be used to add some definitions
 into the \LaTeX\ file made from these questions. The answer to this last
 question is inserted in the output \LaTeX\ files before the
 `\verb+\begin{document}+' statement and so can be used to set up the user's
-personal definitions (say a font declaration for example). 
+personal definitions (say a font declaration for example).
 
 \subsection{A Possible Simplification}
 
@@ -437,7 +437,7 @@ However, it is sometimes clearer for editing or sharing the input file to
 get it on the same line. A possible way of achieving this is to trim down
 the characters of the question between the question number (say
 07\_2\_01\#?\$\&) and the ! sign. These characters (which are the brief
-question and the answer type) are not accessed by FORMLOAD. 
+question and the answer type) are not accessed by FORMLOAD.
 
 
 
@@ -446,14 +446,14 @@ question and the answer type) are not accessed by FORMLOAD.
 
 On some printers, the location of the printed output can vary. As described
 above in section~\ref{se:locate}, the user can automatically be supplied
-with the correct shifts, or be provided with a choice of offsets. 
+with the correct shifts, or be provided with a choice of offsets.
 
 To bring this about, the system manager has to change the contents of the
 `offsets.dat' file. This allows the system manager to select suitable page
 offsets for the printers at her site, or, if necessary, for the user to
-select suitable offsets depending on which printer is being used. 
+select suitable offsets depending on which printer is being used.
 
-The system manager should change the `offsets.dat' file as follows:- 
+The system manager should change the `offsets.dat' file as follows:-
 
 \subsection{Single Offsets}
 
@@ -464,13 +464,13 @@ line in the file. The first number is the vertical offset in centimetres
 offset in centimetres (positive moving the output to the right) for odd
 numbered output pages. The third is the horizontal shift for even numbered
 pages. The numbers should be in the same format, three digits (within which
-the first may be a `negative sign') before a decimal point and two after. 
+the first may be a `negative sign') before a decimal point and two after.
 
 \subsection{Differing Offsets}
 
 If there are different printers with different problems, then the user has
 to be presented with a choice. This is done by changing the third line in
-the file from: 
+the file from:
 
 \begin{quote}\tt
 no more     (more)
@@ -482,23 +482,23 @@ more     (no more)
 
 Then subsequent lines should contain the various choices and the default.
 Again, these must be in the same format as provided originally. The default
-is in the last line. 
+is in the last line.
 
-The `choice' lines have the format:- 
+The `choice' lines have the format:-
 
 Text to give the user to describe the choice. This space on the line has to
 fall within the `a' and `b' space of the first line. [However if desired
-this space may be increased or decreased by changing the number of `b's.] 
+this space may be increased or decreased by changing the number of `b's.]
 
 Text to give the user the code she must type to select a choice. This space
 on the line has to fall within the `c' space of the first line. [However if
 desired this space may be increased or decreased by changing the number of
-`c's.] 
+`c's.]
 
 The last, `default', line must contain a `y' in the first column, and then
 the code for the default choice. This must be one of those defined in the
 `choice' lines above. This space on the line has to fall within the `a'
-space of the first line, and must be the same length as the `c' space. 
+space of the first line, and must be the same length as the `c' space.
 
 
 \section{Use at Non-Starlink Sites}
@@ -512,8 +512,8 @@ ftp from the Starlink FTP server: {\tt starlink-ftp.rl.ac.uk}. For
 details of the location of the archive file, please email {\tt
 ussc@star.rl.ac.uk}, since it may vary.
 
-The file you need is \verb|formload.tar.Z| which should be binary 
-\verb|ftp'd| to your machine.  Once you have the archive file, proceed as 
+The file you need is \verb|formload.tar.Z| which should be binary
+\verb|ftp'd| to your machine.  Once you have the archive file, proceed as
 follows:
 
 \begin{enumerate}
@@ -562,12 +562,12 @@ You can now run FORMLOAD as detailed in Section \ref{s:demo}.
 \label{se:make}
 
 If you wish to make your own form, then you must make a suitable template
-and a suitable sample file. 
+and a suitable sample file.
 
 \subsection{The Template}
 
 The best way to make a template is to look at one of the existing ones, and
-modify it to your needs. This must be a `.tex' file. 
+modify it to your needs. This must be a `.tex' file.
 
 The component parts of the template are:-
 
@@ -580,7 +580,7 @@ This section tells the programme the two character codes for the pages of
 the form. Each line of the section has to have five of these codes, with
 the last line padded out with blanks. Thus in the example below the page
 codes are `1 ', `2 ', `3 ', `4a', `4b', and `5 '. The format must be
-exactly as given below. 
+exactly as given below.
 
 \begin{verbatim}
 %?#$&pages
@@ -594,11 +594,11 @@ exactly as given below.
 {\bf \large 2. The `questions' section -- Mandatory}
 \vspace*{0.2cm}
 
-This section tells the programme the code names of the questions. 
+This section tells the programme the code names of the questions.
 
 These must be seven characters long, and in the format given below. There
 must be a last question code of `XE\_0\_00' (see in the `commands' section,
-below). 
+below).
 
 \begin{verbatim}
 %?#$&questions
@@ -615,18 +615,18 @@ below).
 This section tells the computer which questions have special responses if
 the user puts an answer containing specified character strings. If no such
 questions exist, this section may be omitted, or the entries themselves
-omitted. 
+omitted.
 
 For each question marked, the specified character strings are given, and
 the character string the programme should insert in the document. This
 different string will be the entire input for that question. Thus any other
-character strings in the input document for the question will be ignored. 
+character strings in the input document for the question will be ignored.
 
 The lines of this section comprise:- the question code (this must be
 exactly seven characters); then sets of  pairs of character strings each
 delineated by the double quotation mark `"'. Each character string can be
 up to twenty characters long. Each question can occur in a number of lines,
-but the total number of pairs for question is twenty. 
+but the total number of pairs for question is twenty.
 
 An example of this section is:-
 
@@ -645,9 +645,9 @@ An example of this section is:-
 
 This section contains a message which is put out on the user's terminal
 when the template is selected. If no such output is desired, this section
-may be omitted, or the entries themselves omitted. 
+may be omitted, or the entries themselves omitted.
 
-An example is given below:- 
+An example is given below:-
 
 \begin{verbatim}
 %?#$&message
@@ -664,22 +664,22 @@ This section gives the scale to be applied to the numbers (in the `input'
 section below) which define the locations of the answers in the output.
 
 The numbers are, in order:- the X scale; the Y scale; the X offset; the Y
-offset. 
+offset.
 
-The format for these numbers is given below. 
+The format for these numbers is given below.
 
 \begin{verbatim}
 %?#$&scale(001.000)(001.000)(000.000)(000.000)
 \end{verbatim}
 
-The leading and trailing numerals are important. Numbers like `(1.000)' 
+The leading and trailing numerals are important. Numbers like `(1.000)'
 or `(001.0)' are not permitted.
 
 \vspace*{0.2cm}
 {\bf \large 6. The `startbeg' section -- Mandatory}
 \vspace*{0.2cm}
 
-This section precedes the \LaTeX\ `documentstyle' entries. The format is:- 
+This section precedes the \LaTeX\ `documentstyle' entries. The format is:-
 
 \begin{verbatim}
 %?#$&startbeg
@@ -693,7 +693,7 @@ This section gives the offsets (vertical and horizontal) that are applied
 to the output. This must occur in the `documentstyle' section and must have
 the format given below. The reason for the specification is that the
 offsets can be changed by the use of the `offsets.dat' file (see
-section~\ref{se:offset}). 
+section~\ref{se:offset}).
 
 \begin{verbatim}
 %?#$&offset
@@ -711,7 +711,7 @@ This section supplies the special \LaTeX\ commands that the programme
 needs. This must occur in the `documentstyle' section and must have the
 format given below. The font determines the default font of the inserted
 text, and thus its value may have to be changed as required, but its name
-must stay as `ajinpfont'. 
+must stay as `ajinpfont'.
 
 \begin{verbatim}
 \font\ajinpfont=cmr10
@@ -731,7 +731,7 @@ must stay as `ajinpfont'.
 This is the marker that tells the programme that the `documentstyle'
 section has ended. All the lines above this will form the start of the
 output file. It must thus appear after the `$\backslash$begin\{document\}'
-statement. It must have the format of:- 
+statement. It must have the format of:-
 
 \begin{verbatim}
 %?#$&startend
@@ -742,10 +742,10 @@ statement. It must have the format of:-
 \vspace*{0.2cm}
 
 This section tells the programme that what comes next is the a page of the
-document. It will be repeated for each page. 
+document. It will be repeated for each page.
 
 It consists of the header line, where the last two characters are the
-`page' code. [In this example the page code is `1 '.) 
+`page' code. [In this example the page code is `1 '.)
 
 \begin{verbatim}
 %?#$&page1
@@ -756,7 +756,7 @@ of the page. They must end with a  line setting the position back at the
 top of the page, and an open `\{$\backslash$ajinpfont' line. This is mandatory.
 
 A sensible way of specify the page is to use the `picture' environment. An
-example of this is:- 
+example of this is:-
 
 \begin{verbatim}
 \vspace*{1.3cm}\hspace*{-0.4cm}{\setlength{\unitlength}{1.0cm}
@@ -781,7 +781,7 @@ example of this is:-
 
 This contains the specifications for the locations of the questions. These
 must be in the format specified. It must be repeated at the end of each
-page. 
+page.
 
 The entries give four numbers, specifying in centimetres:- the horizontal
 location of the top left hand corner of the box containing the answer (from
@@ -790,7 +790,7 @@ horizontal extent; its maximum vertical extent.  The entry also contains
 the question code. It may also include other text, as seen in the second
 example, which will be placed before or after the input text. This is
 particularly useful in setting a default font size for a particular
-question. 
+question.
 
 Example are:-
 
@@ -805,7 +805,7 @@ Example are:-
 }
 \end{verbatim}
 
-The leading and trailing numerals are important. Numbers like `(1.00)' 
+The leading and trailing numerals are important. Numbers like `(1.00)'
 or `(01.0)' are not permitted.
 
 This section must end with a final line:-
@@ -819,7 +819,7 @@ This section must end with a final line:-
 \vspace*{0.2cm}
 
 This contains code telling the programme the document has ended. It must be
-in the format specified. 
+in the format specified.
 
 \begin{verbatim}
 %?#$&end
@@ -830,10 +830,10 @@ in the format specified.
 \subsection{The Input File}
 
 The best way to make an input file is to look at one of the existing sample
-files, and modify it to you needs. This must be a `.dat' file 
+files, and modify it to you needs. This must be a `.dat' file
 
 The component parts of a sample file are the questions. These must be in
-the format:- 
+the format:-
 
 \begin{verbatim}
 01_1_01#?$& Semester                   !
@@ -846,22 +846,22 @@ user an indication of the question. This is ended with an exclamation mark
 (and thus there must not be an exclamation mark in the string). Before the
 exclamation mark there may be an optional character to indicate to the user
 the type of response suitable for the question. The user's reply is
-contained after the exclamation mark and in any succeeding lines. 
+contained after the exclamation mark and in any succeeding lines.
 
-The last question must be the `XE\_0\_00' one as specified above. 
+The last question must be the `XE\_0\_00' one as specified above.
 
 \begin{verbatim}
 XE_0_00#?$& LaTeX setup commands      p!
 \end{verbatim}
 
-Lines at the beginning of the file, before the first question, are ignored. 
+Lines at the beginning of the file, before the first question, are ignored.
 
 
 \subsection{The Options File}
 
 If you wish to have your new form made available to the user of FORMLOAD
 automatically, then it should be included in the `options.dat' file. Also
-the template and input file names must have a specific structure. 
+the template and input file names must have a specific structure.
 
 The format of the `options.dat' file should be clear from inspection, but a
 description is given here. The first line contains the spacings. The number
@@ -870,7 +870,7 @@ twenty `a's or `c's. The `a's delineate the place where the last line
 (which starts with a `y') will store the `default' choice. The `a's and
 `b's delineate where the intermediate lines store the message where the
 user is given information about the choice. The `c's delineate where the
-selection code is. The intermediate lines must leave blanks in the first 
+selection code is. The intermediate lines must leave blanks in the first
 
 An example is:-
 
@@ -884,6 +884,6 @@ The names of the template and input sample files are constructed from the
 selection code, which is added as a prefix to the two names
 `\_template.tex' and `\_sample.dat'. Thus if `PATT2' is selected, the
 programme looks for the files `patt2\_template.tex' and `patt2\_sample.dat'
-(in the directory \$FORMLOAD\_DIR). 
+(in the directory \$FORMLOAD\_DIR).
 
 \end{document}

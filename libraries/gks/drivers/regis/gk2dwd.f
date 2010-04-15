@@ -1,5 +1,5 @@
       SUBROUTINE GK2DWD(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
- 
+
 *---------------------------------------------------------------------
 *
 *
@@ -38,7 +38,7 @@
 *     I/O RY    - Real Y-coordinate data passed to or from workstation
 *     INP NCD   - Size of character array
 *     I/O STR   - Character array
-*    
+*
       INTEGER IENT, NID, IDAT(NID), NRD, NCD
       REAL RX(NRD), RY(NRD)
       CHARACTER*80 STR(NCD)
@@ -126,7 +126,7 @@
       DATA DIGITS/'123456789'/,DOT/'.'/
       DATA ITXF /1,1/,
      :     ITXP /GSTRP,GCHARP/
- 
+
 *
 *  STACK USAGE
 *  -----------
@@ -144,10 +144,10 @@
 *
 *---------------------------------------------------------------------
 *
- 
+
 *
 * Conditional GOTO on entrypoint code
- 
+
       GOTO (       10,  20,  30,  40,  50,  60,  70,  80,9999,
      :       100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
      :       200, 210, 220, 230, 240, 250, 260, 270, 280,9999,
@@ -158,7 +158,7 @@
      :       700, 710, 720, 730, 740, 750, 760, 770, 780, 790,
      :       800, 810,9999,9999,9999,9999,9999,9999,9999,9999,
      :      9999, 910, 920, 930) IENT
- 
+
       GOTO (1111,1111,9999,9999,9999,9999,9999,9999,9999,9999,
      :      1111,1111,1111,1330,1111,1111,1111,1370,1380,1111,
      :      1111,1410,1420,1111,1440,1111,1111,1111,1111,1111,
@@ -167,10 +167,10 @@
      :      1111,1710,1111,1111,1111,1111,1111,1111,1111,1790,
      :      1111,1810,1111,1111,1840,1850,1111,1111,1111,1111,
      :      1111,1111,1111,1111,1111,1111,1960,1970,1111) IENT-119
- 
+
       GOTO 9999
- 
- 
+
+
 * Open workstation
    10 CONTINUE
 * Set up workstation state list and workstation description table
@@ -186,7 +186,7 @@
 
 * Initialise flags used by escapes -1 and -2
          KWKDAT(ICHFLG, KWKIX) = KNIL
-         KWKDAT(ILCFLG, KWKIX) = KNIL 
+         KWKDAT(ILCFLG, KWKIX) = KNIL
 *
 * initialise the workstation
 *
@@ -207,9 +207,9 @@
       ENDIF
       KWI1 = GOUTIN
       GOTO 9999
- 
- 
- 
+
+
+
 * Close workstation
    20 CONTINUE
       IF( KWI1.EQ.1 ) THEN
@@ -219,14 +219,14 @@
         CALL GK2DSP(0)
         CALL GK2DLT(1)
         CALL GKIOCO(KIOSN,' ',NLEFT)
-* 
+*
         CALL GKIOCL(KWKTYP,KCID(KWKIX),KWCID(KWKIX))
         CALL GKCWSL(KWKIX)
         CALL GKSLDL(KSSGPT(KWKIX))
       ENDIF
       GOTO 9999
- 
- 
+
+
 * Clear workstation
    30 CONTINUE
       IF( KWI1.EQ.2 ) THEN
@@ -234,23 +234,23 @@
         CALL GKSLDL(KSSGPT(KWKIX))
       ENDIF
       GOTO 9999
- 
- 
- 
+
+
+
 * Redraw all segments on workstation
    40 CONTINUE
       KWDONE = KRFUSE
       GOTO 9999
- 
- 
- 
+
+
+
 * Update workstation
    50 CONTINUE
       KWDONE = KRFUSE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set deferral state
    60 CONTINUE
       KDFM(KWKIX) = KWI1
@@ -267,30 +267,30 @@
         KRGN = .TRUE.
       ENDIF
       GOTO 9999
- 
- 
- 
+
+
+
 * Do deferred output actions
    70 CONTINUE
       CALL GKIOCO(KIOSN,' ',NLEFT)
       KWI1 = KNFAUP(KWKIX)
       GOTO 9999
- 
- 
- 
+
+
+
 * Clear display surface
    80 CONTINUE
       IF (KWI1.EQ.GALWAY.OR.KDSMT(KWKIX).EQ.GNEMPT) CALL GK2DCL
       CALL GKWCLD
- 
+
       GOTO 9999
- 
- 
+
+
 * Message
   100 CONTINUE
       GOTO 9999
- 
- 
+
+
 * Escape
   110 CONTINUE
 *    Starlink no screen clear escape
@@ -298,11 +298,11 @@
          INOCLR = KWI2
          GOTO 9999
       END IF
- 
+
       CALL GKESC
       GOTO 9999
- 
- 
+
+
 * Polyline
   120 CONTINUE
       IF ( KCVIS.EQ.GINVIS) GO TO 9999
@@ -312,7 +312,7 @@
 
 * Select linetype
          CALL GK2DLT(KWLNTY(KWKIX))
-      
+
 * Select pen colour
         CALL GK2DSP(KWPLCI(KWKIX))
         N = ICHUNK
@@ -332,9 +332,9 @@
       ENDIF
 
       GOTO 8888
- 
- 
- 
+
+
+
 * Polymarker
   130 CONTINUE
       IF ( KCVIS.EQ.GINVIS) GO TO 9999
@@ -354,9 +354,9 @@
         CALL GKSTDA(KREALS,IOFF)
       ENDIF
       GOTO 8888
- 
- 
- 
+
+
+
 * Text
   140 CONTINUE
       IF ( KCVIS.EQ.GINVIS) GO TO 9999
@@ -369,8 +369,8 @@
      :               GK2DXF,GK2DXC)
       ENDIF
       GOTO 8888
- 
- 
+
+
 * Fill area
   150 CONTINUE
       IF ( KCVIS.EQ.GINVIS) GO TO 9999
@@ -378,8 +378,8 @@
       CALL GK2DSP(KWFACI(KWKIX))
       CALL GKFILS(NRD,RX,RY,IFILSC,GK2DLN,GK2DLN)
       GOTO 8888
- 
- 
+
+
 * Cell array ... do minimal simulation
   160 CONTINUE
       IF ( KCVIS.EQ.GINVIS) GO TO 9999
@@ -387,8 +387,8 @@
       CALL GK2DSP(1)
       CALL GKCASM(GK2DLN)
       GOTO 8888
- 
- 
+
+
 * GDP
   170 CONTINUE
       IF (KCVIS.EQ.GINVIS) GOTO 9999
@@ -412,8 +412,8 @@
      :       GK2DLN,GK2DLN)
       ENDIF
       GOTO 8888
- 
- 
+
+
 * Set polyline attributes
   180 CONTINUE
       CALL GKDPLB
@@ -421,8 +421,8 @@
       IF (KWLNTY(KWKIX).LT.0.OR.KWLNTY(KWKIX).GT.5) KWLNTY(KWKIX) = 1
       IF (KWPLCI(KWKIX).GE.KPCI(KWKIX)) KWPLCI(KWKIX) = 1
       GOTO 9999
- 
- 
+
+
 * Set polymarker attributes
   190 CONTINUE
       CALL GKDPMB
@@ -430,8 +430,8 @@
       IF (KWMKTY(KWKIX).LT.0.OR.KWMKTY(KWKIX).GT.5) KWMKTY(KWKIX) = 3
       IF (KWPMCI(KWKIX).GE.KPCI(KWKIX)) KWPMCI(KWKIX) = 1
       GOTO 9999
- 
- 
+
+
 * Set text attributes
   200 CONTINUE
       CALL GKDTXB
@@ -444,7 +444,7 @@
       QWCHRX(KWKIX)=QWCHWX(KWKIX)
       QWCHRY(KWKIX)=QWCHWY(KWKIX)
       GOTO 9999
- 
+
 * Set fill area attributes
   210 CONTINUE
       CALL GKDFAB
@@ -456,34 +456,34 @@
       END IF
       IF (KWFACI(KWKIX).GE.KPCI(KWKIX)) KWFACI(KWKIX) = 1
       GOTO 9999
- 
- 
- 
+
+
+
 * Set pick identifier
   220 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set polyline representation
   230 CONTINUE
       INTA(1) = 5
       CALL GKSRPL(1,INTA,.TRUE.)
       GOTO 9999
- 
- 
- 
+
+
+
 * Set polymarker representation
   240 CONTINUE
       CALL GKSRPM(0,INTA,.TRUE.)
       GOTO 9999
- 
- 
- 
+
+
+
 * Set text representation
   250 CONTINUE
       IF( KWI3.EQ.GSTRKP ) THEN
- 
+
 *       Stroke Precision
 *       Make sure that fonts are available
         IF( KDBFLS.EQ.KFLNA ) THEN
@@ -497,16 +497,16 @@
   255   CONTINUE
         CALL GKSRTX(KFNTMX,KHFONT,IPREC,.FALSE.)
       ELSE
- 
+
 *       String or Char precision
         IPREC(1)=KWI3
         INTA(1)=1
         CALL GKSRTX(1,INTA,IPREC,.FALSE.)
       ENDIF
       GOTO 9999
- 
- 
- 
+
+
+
 * Set fill area representation
   260 CONTINUE
       IF (KWI2.NE.GPATTR) THEN
@@ -515,17 +515,17 @@
         KERROR = 83
       ENDIF
       GOTO 9999
- 
- 
- 
+
+
+
 * Set pattern representation
   270 CONTINUE
 * Pattern not supported
       KERROR = 90
       GOTO 9999
- 
- 
- 
+
+
+
 * Set colour representation
   280 CONTINUE
 * See if colour index valid
@@ -538,89 +538,89 @@
         KERROR = 93
       ENDIF
       GOTO 9999
- 
- 
- 
+
+
+
 * Normalisation transformation
   310 CONTINUE
       CALL GKWKC4
       GOTO 9999
- 
- 
- 
+
+
+
 * Set workstation window
   320 CONTINUE
       CALL GKSWKW
       GOTO 9999
- 
- 
- 
+
+
+
 * Set workstation viewport
   330 CONTINUE
       CALL GKSWKV
       GOTO 9999
- 
- 
- 
+
+
+
 * Segment entrypoints *
   410 CONTINUE
       CALL GKSGWK(IENT,.FALSE.)
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise locator
   610 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise stroke
   620 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise valuator
   630 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise choice
   640 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise pick
   650 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Initialise string
   660 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set input operating modes
   670 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Set input mode
   680 CONTINUE
       CALL GKSIPM
       GOTO 9999
- 
- 
- 
+
+
+
 * Request locator
   690 CONTINUE
- 
+
       IF (KWKDAT(ILCFLG,KWKIX).NE.KNIL .AND. KWI1.EQ.1) THEN
 *        Escape has been used to associate choice device 2 with
 *        locator device 1.
@@ -637,8 +637,8 @@
          CALL GKRQLC(GK2DCS, RX(1), RY(1))
       ENDIF
       GOTO 9999
-   
- 
+
+
 * Request stroke
   700 CONTINUE
 *
@@ -648,20 +648,20 @@
       CALL GKRQIP(GSTROK,KWI1,10,10,INTA,REALA)
 *
 *   Set echoing according to echo switch
-* 
+*
       IF( INTA(KIPE).EQ.GECHO ) THEN
          LCECHO = .TRUE.
       ELSE
          LCECHO = .FALSE.
       ENDIF
 *
-      I = 1 
+      I = 1
   702 CONTINUE
-* 
+*
 *   Read key hit and cursor.
 *
       CALL GK2DCS(LCECHO,ICODE, XDC(2),YDC(2))
- 
+
 *         Branch on key hit (ICODE).
 *         If break (ctrl/Z), then we quit with status=none
 *         If normal terminator (ICODE=13), then finish stroke, not
@@ -692,35 +692,35 @@
       I = I + 1
       IF (I.LE.NRD) GOTO 702
   705 CONTINUE
- 
+
 *   Here, stroke is full. Set KNRR to be maxm # of points
 *   Mark stroke as valid
       KNRR=NRD
       GOTO 707
- 
+
 *   Here, came out of loop on receiving line terminator.
 *   Point indexed by I-1 is the last we received.
   706 KNRR=I-1
- 
+
 *   Here, KNRR (number of points in stroke) is set. Now set status to be
   707 KWI1=GOK
 *   Drop to 709
- 
+
   709 CONTINUE
 *
 *
       GOTO 9999
- 
- 
- 
+
+
+
 * Request valuator
   710 CONTINUE
 *   First get valuator device information
       CALL GKRQIP(GVALUA,KWI1,4,7,INTA,REALA)
- 
+
 *   Display prompt in echo area
       CALL GK2DPD(REALA,'Real value [0.0,1.0]: ')
- 
+
 *   Set echoing according to echo switch
       IF (INTA(KIPE).EQ.GECHO ) THEN
          IFUNC=KIOEN
@@ -728,7 +728,7 @@
          IFUNC=KIONN
       ENDIF
 *
-*      
+*
 *
 *   Iinitialised status = none , i.e. break function is triggered
       KWI1=GNONE
@@ -736,12 +736,12 @@
       CALL GKIOCO(KIOSN,' ',NLEFT)
       CALL GKIOCI(IFUNC,0,' ',VALSTR,NSIGS)
       IF (VALSTR.EQ.CHAR(ICTLZ)) GOTO 715
-      IF (NSIGS.EQ.0) GOTO 715 
+      IF (NSIGS.EQ.0) GOTO 715
 *
 *   Trap illegal characters
 *
       KWI1=2
-      IC=NSIGS 
+      IC=NSIGS
       IF (.NOT.(INDEX(VALSTR(1:IC),'1').GE.1.OR.
      *          INDEX(VALSTR(1:IC),'2').GE.1.OR.
      *          INDEX(VALSTR(1:IC),'3').GE.1.OR.
@@ -753,13 +753,13 @@
      *          INDEX(VALSTR(1:IC),'9').GE.1.OR.
      *          INDEX(VALSTR(1:IC),'0').GE.1))  GOTO 715
 *
- 
+
       CHRSET='1234567890-+.'
- 
+
       DO 718 I=1,IC
          IF (INDEX(CHRSET,VALSTR(I:I)).LE.0) GOTO 715
 718   CONTINUE
- 
+
 *
 *   Otherwise interpret the result.
       READ(VALSTR,'(F7.0)') QWR1
@@ -776,9 +776,9 @@
       WRITE(*,745)CHAR(27),ITOP,ILEFT,CHAR(27)
 *
       GOTO 9999
- 
- 
- 
+
+
+
 * Request choice
   720 CONTINUE
       IF (KWKDAT(ICHFLG,KWKIX) .NE. KNIL .AND. KWI1.EQ.2) THEN
@@ -797,19 +797,19 @@
       ENDIF
       GOTO 9999
 
- 
- 
+
+
 * Request pick
   730 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Request string
   740 CONTINUE
 *   Get string device information
       CALL GKRQIP(GSTRIN,KWI1,9,4,INTA,REALA)
- 
+
 *   Display prompt in echo area
       CALL GK2DPD(REALA, 'String: ')
 *
@@ -822,7 +822,7 @@
 *
       CALL GKIOCO(KIOSN,' ',NLEFT)
       CALL GKIOCI(IFUNC,0,' ',VALSTR,NSIGS)
-*      
+*
 * If there are any characters then convert to integer
 *
       IF (NSIGS.EQ.0) THEN
@@ -842,84 +842,84 @@
       ITOP  =INT(REALA(KIPEYB)/KWKDAT(CHARHI,KWKIX))
 *
       WRITE(*,744)CHAR(27)
-  744 FORMAT(1H+,A,'[?7h',$) 
+  744 FORMAT(1H+,A,'[?7h',$)
 *
       WRITE(*,745)CHAR(27),ITOP,ILEFT,CHAR(27)
   745 FORMAT(1H+,A,'[',I2.2,';',I3.3,'H',A,'[K')
- 
+
       GOTO 9999
- 
- 
+
+
 * Sample locator
   750 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample stroke
   760 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample valuator
   770 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample choice
   780 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample pick
   790 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Sample string
   800 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Flush device events
   810 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Write item to GKSM
   910 CONTINUE
       KERROR = 32
       GOTO 9999
- 
- 
- 
+
+
+
 * Get item type from GKSM
   920 CONTINUE
       KERROR = 34
       GOTO 9999
- 
- 
- 
+
+
+
 * Read item from GKSM
   930 CONTINUE
       KERROR = 34
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire everything *
  1111 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire polyline representation
  1330 CONTINUE
       IF (KWI2.EQ.GSET) THEN
@@ -929,9 +929,9 @@
         QWR1 = 1.0
       ENDIF
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire text representation
 C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
  1370 CONTINUE
@@ -941,7 +941,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       ENDIF
       GOTO 9999
- 
+
 * --------------------------------------------------------------
 * Inquire text extent
 * --------------------------------------------------------------
@@ -963,7 +963,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *     RY(1-4): y-text extent
 *     QWR7   : x-concatenation point
 *     QWR8   : y-concatenation point
- 
+
 *     stroke precision
       IF (KWTXPR(KWKIX) .EQ. GSTRKP) THEN
         CALL GKXQXO(NID,IDAT,RX,RY)
@@ -972,27 +972,27 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *       baseline vector from ws Set text attributes entry
         CALL GKXQXC (NID,IDAT,QWCHRX(KWKIX),QWCHRY(KWKIX),
      :                  RX,RY,GK2DXF)
- 
+
       ENDIF
       GOTO 9999
- 
- 
- 
- 
+
+
+
+
 * Inquire list of pattern indices
  1410 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire pattern representation
  1420 CONTINUE
       KERROR = 90
       GOTO 9999
- 
- 
- 
+
+
+
 * --------------------------------------------------------------
 * Inquire colour representation
 * --------------------------------------------------------------
@@ -1006,7 +1006,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *     QWR1   : colour (red intensity)
 *     QWR2   : colour (green intensity)
 *     QWR3   : colour (blue intensity)
- 
+
       INKWI2=KWI2
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       IF (KWI2.EQ.GREALI) THEN
@@ -1023,16 +1023,16 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 * Inquire pick device state
  1510 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire workstation classification
  1710 CONTINUE
       KWI1 = GRASTR
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire text facilities ... on entry KWI1 specifies list element reque
 * Allow for string and char precision font (number 1) explicitly
  1790 CONTINUE
@@ -1042,13 +1042,13 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         GOTO 9999
       ENDIF
       IF( KWI1.GT.KFNTMX ) THEN
- 
+
 *       String or Char precision font
           IF( KWI1.EQ.KFNTMX+1 ) KWI3 = GSTRP
           IF( KWI1.EQ.KFNTMX+2 ) KWI3 = GCHARP
           KWI2 = 1
       ELSE
- 
+
 *       Stroke precision font
 *       Make sure that fonts are available
           IF( KDBFLS.EQ.KFLNA ) THEN
@@ -1107,41 +1107,41 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         ENDIF
       ENDIF
       GOTO 9999
- 
+
 * Inquire predefined pattern representation
  1840 CONTINUE
       KERROR = 90
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire colour facilities
  1850 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KWI2 = GCOLOR
       KWI1 = 4
       GOTO 9999
- 
+
 *
 * Inquire default choice device data
  1960 CONTINUE
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KWI4=9
       GOTO 9999
- 
- 
- 
+
+
+
 * Inquire default pick device data
  1970 CONTINUE
       GOTO 9999
- 
- 
- 
+
+
+
 *   Here after all output primitives to sort out buffering
  8888 CONTINUE
       KDSMT(KWKIX) = GNEMPT
       IF (KWIO(KWKIX).EQ.GYES) CALL GKIOBO(KIOSN,1,KDAT,NLEFT)
- 
+
  9999 CONTINUE
- 
+
       END

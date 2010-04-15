@@ -8,8 +8,8 @@
 * Author M. Denby Feb-88
 * P McGale Apr 95 - UNIX changes
 *-
- 
+
 	INCLUDE		'CONSTANTS.INC'
- 
+
 	CALL AX_DONVRT (ELO, ELA, ETOC, RA, DEC)
 	END

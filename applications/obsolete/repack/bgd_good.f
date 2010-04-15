@@ -1,17 +1,17 @@
 *+ BGD_GOOD  Decides if background is good at particular time.
 	LOGICAL FUNCTION BGD_GOOD(FIL,EVT)
- 
+
 	implicit  none
 	include 'SMAPDEF.INC'
 
 * Input
 	integer	 fil				! Filter number
 	integer  evt				! Event time
- 
+
 * P. McGale Jun 92.
 * P. McGale Apr 95. - read FITS files instead.
 *-
- 
+
 * Local constants
 	integer maxslots			!  LEVS array size.
  	 parameter (maxslots=250000*32)
@@ -49,10 +49,10 @@
 *
 	data	status/0/
 	data	first/.TRUE./
- 
+
 * If first call of function then open up relevant background discrimination
 * file and read in value.
- 
+
 	if (first) then
 * Decide what filter using, and read in relevant mask array.
 	  call getenv("RECAL", re_res)
@@ -63,7 +63,7 @@
 	    write(*,*)
 	    bgd_good =.FALSE.
 	    status = 1
-	    return	    
+	    return
 	  endif
 	  call chr_fandl(re_res, fc, lc)
           call ftgiou(lunit, status)
@@ -74,11 +74,11 @@
 	    bgd_good = .FALSE.
 	    return
 	  endif
- 
+
 	  filter = cal_filt_n2s(fil)
 	  if (filter .eq. 'S1' ) then
 * Read in scalars and vector.
-	    call ftmahd(lunit, 6, hdutyp, status)	    
+	    call ftmahd(lunit, 6, hdutyp, status)
 	    CALL ftgkyd(lunit, 'MJD1MASK', b_mjd, c_dum, status)
 	    CALL ftgkyj(lunit, 'NAXIS2',    nels, c_dum,  status)
 	    if (nels .gt. maxslots/32) then
@@ -89,7 +89,7 @@
 	    CALL ftgcvj(lunit, 1, 1, 1, nels, -1, levs_w, anyf, status)
 	    CALL ftgkyj(lunit, 'T1MASK',  tslot, c_dum,  status)
 	  else if (filter .eq. 'S2' ) then
-	    call ftmahd(lunit, 6, hdutyp, status)	    
+	    call ftmahd(lunit, 6, hdutyp, status)
 	    CALL ftgkyd(lunit, 'MJD2MASK', b_mjd, c_dum, status)
 	    CALL ftgkyj(lunit, 'NAXIS2',    nels, c_dum,  status)
 	    if (nels .gt. maxslots/32) then
@@ -103,7 +103,7 @@
 	     status=1
 	     write(*,*)  '   No valid mask array available!'
 	  endif
- 
+
 	  if (status .ne. 0 ) then
 	       write(*,*) '   Problem with FITS in BGD_GOOD.'
 	       bgd_good = .FALSE.
@@ -111,13 +111,13 @@
 	  endif
 	  CALL ftclos (lunit, status)
 	  CALL ftfiou (lunit, status)
- 
- 
+
+
 * Note that condition has been run.
 	  d_tslot = 86400.D0/real(tslot)
 	  first = .FALSE.
 	endif
- 
+
 * See if background good or bad at time MJD.
 	mjd    = (evt/conv) + s2_ref_mjd
 	slot   = int((mjd-b_mjd)*d_tslot)
@@ -134,5 +134,5 @@
 	       bgd_good = .FALSE.
           endif
 	endif
- 
+
  	end

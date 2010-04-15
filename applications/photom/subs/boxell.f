@@ -97,7 +97,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -195,7 +195,7 @@
                         SQUARE( 2, 3 ) = Y1
                         SQUARE( 1, 4 ) = X2
                         SQUARE( 2, 4 ) = Y1
-                     
+
 *   Find which of the vertices of the square are inside the ellipse
                         L1 = POLYIN( SQUARE( 1, 1 ), NL, L, NR, R )
                         L2 = POLYIN( SQUARE( 1, 2 ), NL, L, NR, R )
@@ -206,7 +206,7 @@
                         IF ( L1 .AND. L2 .AND. L3 .AND. L4 ) THEN
                            GRID( II, JJ ) = GRID( II, JJ ) + 1.0 * GSIGN
                            AREA = AREA + 1.0
-                           
+
 *   If one or more ( but not all ) vertices of the square are inside
 *   the ellipse then have to do a more careful calculation. This is done
 *   by calculating the intersection of the square and the ellipse.

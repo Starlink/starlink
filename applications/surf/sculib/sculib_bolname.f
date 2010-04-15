@@ -54,7 +54,7 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      INTEGER ADC                
+      INTEGER ADC
       INTEGER CHANNEL
 
 *  Arguments Returned:

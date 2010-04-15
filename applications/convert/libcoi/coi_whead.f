@@ -119,7 +119,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -336,7 +336,7 @@
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This tests for the Starlink ORIGIN card.
             ORIGIN = KEYWRD .EQ. 'ORIGIN'
-*            ORIGIN = ( KEYWRD .EQ. 'ORIGIN' ) .AND. 
+*            ORIGIN = ( KEYWRD .EQ. 'ORIGIN' ) .AND.
 *     :               ( VALUE( 2:23 ) .EQ. 'Starlink Project, U.K.' )
 
 *  Do the test whether to copy the FITS extension header into the output
@@ -423,7 +423,7 @@
                   END IF
                END DO
             END IF
-         END DO      
+         END DO
       END IF
 
   999 CONTINUE

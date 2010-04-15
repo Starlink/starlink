@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     Displays help about KAPRH.  The help information describes individual 
+*     Displays help about KAPRH.  The help information describes individual
 *     commands in detail.
 *
 *     Here are some of the main options.
@@ -85,7 +85,7 @@
 *
 *        o  a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
-* 
+*
 *        o  an ellipsis "..." to display all the text below the
 *           current point in the hierarchy.  For example, "GREYPLOT..."
 *           displays information on the GREYPLOT topic as well as
@@ -96,11 +96,11 @@
 *
 *        o  Just give the first few characters, e.g. "PARA" for
 *           Parameters.
-* 
+*
 *        o  Some topics are composed of several words separated by
 *           underscores.  Each word of the keyword may be abbreviated,
 *           e.g. "Colour_Set" can be shortened to "C_S".
-* 
+*
 *        o  The characters "%" and "*" act as wildcards, where the
 *           percent sign matches any single character, and asterisk
 *           matches any sequence of characters.  Thus to display
@@ -109,7 +109,7 @@
 *
 *        o  If a word contains, but does end with an asterisk wildcard,
 *           it must not be truncated.
-* 
+*
 *        o  The entered string must not contain leading or embedded
 *           spaces.
 *

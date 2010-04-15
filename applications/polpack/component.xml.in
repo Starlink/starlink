@@ -10,7 +10,7 @@
 POLPACK is a package of applications for
 reducing imaging polarimetry or spectropolarimetry data. They cover
 registration, sky subtraction, calculation of Stokes parameters, and
-display of vector maps.  
+display of vector maps.
 </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@

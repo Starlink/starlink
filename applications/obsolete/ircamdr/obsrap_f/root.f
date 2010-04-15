@@ -1,4 +1,4 @@
-*+  ROOT - takes the square root of each pixel of an image 
+*+  ROOT - takes the square root of each pixel of an image
 
       SUBROUTINE ROOT ( STATUS )
 
@@ -17,7 +17,7 @@
 *     INPIC  =  IMAGE( READ )
 *         Input image
 *     OUTPIC  =  IMAGE( WRITE )
-*         Output image holding result of processed image 
+*         Output image holding result of processed image
 *     OTITLE  =  CHAR( READ )
 *         Title string for output image structure
 *
@@ -50,7 +50,7 @@
 *    Authors :
 *
 *     Mark McCaughrean UoE ( REVA::MJM )
-*     Colin Aspin (UKIRT) 
+*     Colin Aspin (UKIRT)
 *
 *    History :
 *
@@ -65,8 +65,8 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -119,7 +119,7 @@
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                map a data array component
                   CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                          PNTRO, NELEMENTS, STATUS )

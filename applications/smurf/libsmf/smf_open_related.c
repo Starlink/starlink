@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_related( const smfGroup *group, const dim_t subindex, 
+*     smf_open_related( const smfGroup *group, const dim_t subindex,
 *                       const char *accmode, smfArray **relfiles,
 *                       int *status );
 
@@ -36,7 +36,7 @@
 
 *  Notes:
 *     - See also smf_close_related.c
-*     - The data should be flatfielded before trying to open them here. 
+*     - The data should be flatfielded before trying to open them here.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -104,8 +104,8 @@
 
 #define FUNC_NAME "smf_open_related"
 
-void smf_open_related ( const smfGroup *group, const dim_t subindex, 
-                        const char *accmode, smfArray **relfiles, 
+void smf_open_related ( const smfGroup *group, const dim_t subindex,
+                        const char *accmode, smfArray **relfiles,
                         int *status ) {
 
   /* Local variables */

@@ -10,7 +10,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_CALC_POLPACK_ANGROT(N_POS, N_EXPOSURES,
 *     :    N_INTEGRATIONS, N_MEASUREMENTS, DEM_PNTR, ANGROT_IN,
@@ -76,7 +76,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! Status
       INCLUDE 'PRM_PAR'         ! For VAL__BAD and VAL__NB
@@ -120,10 +120,10 @@
       INTEGER SCRATCHQ_PTR      ! Start of scratch quality array
       DOUBLE PRECISION STDEV    ! Standard deviation of angle
       DOUBLE PRECISION SUM      ! Sum of angle data
-      DOUBLE PRECISION SUMSQ    ! sum of squares of angle data      
+      DOUBLE PRECISION SUMSQ    ! sum of squares of angle data
 
 *.
-      
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Initialise pointers
@@ -131,7 +131,7 @@
       SCRATCHQ_END = 0
       QSORT_PTR    = 0
       QSORT_END    = 0
-      
+
 *     Loop over integrations
 
       DO MEASUREMENT = 1, N_MEASUREMENTS
@@ -164,14 +164,14 @@
 
                N_PTS = IEND - ISTART + 1
 
-               CALL SCULIB_MALLOC(N_PTS * VAL__NBUB, SCRATCHQ_PTR, 
+               CALL SCULIB_MALLOC(N_PTS * VAL__NBUB, SCRATCHQ_PTR,
      :              SCRATCHQ_END, STATUS)
-               CALL SCULIB_MALLOC(N_PTS * VAL__NBR, QSORT_PTR, 
+               CALL SCULIB_MALLOC(N_PTS * VAL__NBR, QSORT_PTR,
      :              QSORT_END, STATUS)
 
 *     Fill the byte array with 0
                IF (STATUS .EQ. SAI__OK) THEN
-                  CALL SCULIB_CFILLB(N_PTS, 0, 
+                  CALL SCULIB_CFILLB(N_PTS, 0,
      :                               %VAL(CNF_PVAL(SCRATCHQ_PTR)))
                END IF
 
@@ -179,8 +179,8 @@
                MEAN = VAL__BADD
                STDEV = VAL__BADD
 
-               CALL SCULIB_STATR(N_PTS, -1.0, ANGROT_IN(ISTART), 
-     :              %VAL(CNF_PVAL(SCRATCHQ_PTR)), 
+               CALL SCULIB_STATR(N_PTS, -1.0, ANGROT_IN(ISTART),
+     :              %VAL(CNF_PVAL(SCRATCHQ_PTR)),
      :              BADBIT, ITEMP, MEAN, MEDIAN,
      :              SUM, SUMSQ, STDEV, %VAL(CNF_PVAL(QSORT_PTR)) ,
      :              STATUS)
@@ -204,7 +204,7 @@
                CALL SCULIB_FREE('SCRATCHQ', SCRATCHQ_PTR, SCRATCHQ_END,
      :              STATUS)
                CALL SCULIB_FREE('QSORT',QSORT_PTR, QSORT_END, STATUS)
-               
+
             END IF
 
 

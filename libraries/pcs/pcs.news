@@ -18,7 +18,7 @@ Parameter System to be substituted for PCS SUBPAR). (Older versions of MERS
 will still work with this version of PCS.)
 
 A bug in the LEX libarary has been fixed to allow correct parsing of the square
-brackets in a command-line specifier such as IN=file.fits[2]. 
+brackets in a command-line specifier such as IN=file.fits[2].
 
 1 PCS Version 4.0-1
 
@@ -30,7 +30,7 @@ Bugs fixed:
   1. Correctly handle INTERNAL parameter values given on the command line.
   2. Improve error messages if truncation occurs in SUBPAR_GET0C.
   3. Memory leak in SUBPAR_FIFIL.
-  
+
 1 PCS Version 4.0 for Unix has been released.
 
  This version removes the ADAM and MESSYS layers of the ADAM message system.

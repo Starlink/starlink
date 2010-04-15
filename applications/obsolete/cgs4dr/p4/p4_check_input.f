@@ -117,7 +117,7 @@
       END IF
 
 *   Remove any new blank characters
-      CALL CHR_RMBLK( INPUT ) 
+      CALL CHR_RMBLK( INPUT )
 
 *   In verbose mode, state the output file
       IF ( VERBOSE ) THEN

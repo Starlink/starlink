@@ -13,8 +13,8 @@
 *     CALL CHR_CTOL( STRING, LVALUE, STATUS )
 
 *  Description:
-*     The given string is decoded as a logical value. TRUE, T, YES, 
-*     Y and FALSE, F, NO, N are recognised, regardless of case. Other 
+*     The given string is decoded as a logical value. TRUE, T, YES,
+*     Y and FALSE, F, NO, N are recognised, regardless of case. Other
 *     strings result in STATUS being set to SAI__ERROR.
 
 *  Arguments:
@@ -23,15 +23,15 @@
 *     LVALUE = LOGICAL (Returned)
 *        The resulting LOGICAL value.
 *     STATUS = INTEGER (Given and Returned)
-*        The status value: if this value is not SAI__OK on input, 
-*        the routine returns without action; if the routine does 
-*        not complete successfully, STATUS is returned set to 
+*        The status value: if this value is not SAI__OK on input,
+*        the routine returns without action; if the routine does
+*        not complete successfully, STATUS is returned set to
 *        SAI__ERROR.
 
 *  Algorithm:
-*     Check that the used length of the string is .LE.5. If so, 
+*     Check that the used length of the string is .LE.5. If so,
 *     convert the string to uppercase and check against the valid
-*     values and setting LVALUE appropriately. If the string is not 
+*     values and setting LVALUE appropriately. If the string is not
 *     a recognized logical value, set status to SAI__ERROR
 
 *  Copyright:
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -142,7 +142,7 @@
          STATUS = SAI__ERROR
       END IF
 
-*  Check the returned status value and set the returned LOGICAL value 
+*  Check the returned status value and set the returned LOGICAL value
 *  on error.
       IF ( STATUS .EQ. SAI__ERROR ) LVALUE = .FALSE.
 

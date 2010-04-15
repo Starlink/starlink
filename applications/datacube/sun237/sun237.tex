@@ -21,7 +21,7 @@
 \newcommand{\stardoctitle}     {DATACUBE --- An IFS datacube manipulation package}
 \newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {User's Manual}
-\newcommand{\stardocabstract}  {  
+\newcommand{\stardocabstract}  {
 \htmlref{DATACUBE}{DATACUBE} is a package which includes the IFU Data Product Cookbook (\xref{SC/16}{sc16}{}), and a collection of example shell scripts for IFS data cube manipulation.
 }
 
@@ -74,7 +74,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -152,7 +152,7 @@
 %\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 %\latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -566,12 +566,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -598,7 +598,7 @@
  \subsection*{Revision history}
 
  \begin{enumerate}
-   \item 9th November 2000; Version 0.1 Original version (AA) 
+   \item 9th November 2000; Version 0.1 Original version (AA)
    \item 30th December 2000; Version 0.2 Auto-generated code prologs (AA)
    \item 2nd January 2001; Version 1.0 Release version (AA)
    \item 2005 October 20; Version 1.1 Removed applications, and improved scripts (MJC)
@@ -644,22 +644,22 @@ features using the cursor.
 
 \DATACUBE\ provides facilities:
 \begin{itemize}
-\item to view a `white-light' image of the whole and/or part of the 
-      spectral range (\htmlref{{\bf squash}}{squash}, 
-      \htmlref{{\bf passband}}{passband}); 
-\item to view a grid of channel maps of defined spectral width 
-      (\htmlref{{\bf step}}{step}); 
-\item to extract individual spectra (\htmlref{{\bf ripper}}{ripper}); 
-\item to compare spectra (\htmlref{{\bf compare}}{compare}, 
-      \htmlref{{\bf stacker}}{stacker}); 
-\item to average and compare groups of spectra 
-      (\htmlref{{\bf multistack}}{multistack}); 
-\item to plot a grid of spectra with spatial averaging 
+\item to view a `white-light' image of the whole and/or part of the
+      spectral range (\htmlref{{\bf squash}}{squash},
+      \htmlref{{\bf passband}}{passband});
+\item to view a grid of channel maps of defined spectral width
+      (\htmlref{{\bf step}}{step});
+\item to extract individual spectra (\htmlref{{\bf ripper}}{ripper});
+\item to compare spectra (\htmlref{{\bf compare}}{compare},
+      \htmlref{{\bf stacker}}{stacker});
+\item to average and compare groups of spectra
+      (\htmlref{{\bf multistack}}{multistack});
+\item to plot a grid of spectra with spatial averaging
       (\htmlref{{\bf gridspec}}{gridspec});
 \item to build a velocity map from an emission line by line
       fitting (\htmlref{{\bf velmap}}{velmap}) or by intensity-weighted
       moments (\htmlref{{\bf velmoment}}{velmoment});
-\item to build an emmision-line strength map 
+\item to build an emmision-line strength map
       (\htmlref{{\bf peakmap}}{peakmap}); and
 \item to plot multiple spectra from a cube overlaying fitted baselines
       and spectral feature mask (\htmlref{{\bf trendview}}{trendview}).
@@ -713,14 +713,14 @@ message (or one much like it!) should appear
 
 \small\begin{verbatim}
    % datacube
-    
+
       DATACUBE applications are now available -- (Version 1.2)
        Support is available by e-mailing datacube@star.rl.ac.uk
-    
+
            Type cubehelp for help on DATACUBE commands.
       Type 'showme sun237' to browse the hypertext documentation
       or 'showme sc16' to consult the IFU data product cookbook.
-  
+
    %
 \end{verbatim}\normalsize
 
@@ -742,7 +742,7 @@ applications with the {\tt kappa} command
 
 \small\begin{verbatim}
    % kappa
- 
+
         KAPPA commands are now available -- (Version 1.9-8)
 
         Type kaphelp for help on KAPPA commands.
@@ -751,7 +751,7 @@ applications with the {\tt kappa} command
         NOTE, several applications have had major changes made to their
         parameter lists. See the 'Release Notes' section of SUN/95 for
         details.
-   %	
+   %
 \end{verbatim}\normalsize
 
 \section*{\xlabel{sun237_acks}Acknowledgments\label{sun237_acks}}
@@ -801,7 +801,7 @@ co-operation and contributions.
       }
    }
    \sstimplementationstatus{
-      This script invokes a collection of A-tasks from the \KAPPAref\ 
+      This script invokes a collection of A-tasks from the \KAPPAref\
       and \FIGAROref\ packages.
    }
 }
@@ -862,14 +862,14 @@ co-operation and contributions.
 
          \sstitem
          The compression is trimmed, so that only compression-factor
-         multiples of original pixels are included in the plot. 
+         multiples of original pixels are included in the plot.
 
          \sstitem
          The spatial averaging is aligned to obtain the expected number
          of pixels irrespective of the pixel origin of the input cube.
          Note that this may not be suitable if you wish to preserve alignment
          with another compressed dataset.  See
-         \xref{KAPPA:COMPAVE}{sun95}{COMPAVE} parameter ALIGN for more 
+         \xref{KAPPA:COMPAVE}{sun95}{COMPAVE} parameter ALIGN for more
          details.
       }
    }
@@ -885,7 +885,7 @@ co-operation and contributions.
    plots these averaged spectra in a stack
 }{
    \sstdescription{
-      This shell script 
+      This shell script
       reads a three-dimensional IFU NDF as input and presents you with
       a white-light image of the cube.  You can then select a number
       of $X$-$Y$ positions using the cursor.  The script will then
@@ -939,7 +939,7 @@ co-operation and contributions.
    Displays multiple passband images from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script 
+      This shell script
       reads a three-dimensional IFU NDF as input and presents you with
       a white-light image of the cube.  You can then select and
       $X$-$Y$ position using the cursor.  The script will extract and
@@ -986,25 +986,25 @@ co-operation and contributions.
    Builds a map of emission-line strength from a spectral-cube NDF.
 }{
    \sstdescription{
-      This shell script reads a three-dimensional spectral-cube NDF and 
+      This shell script reads a three-dimensional spectral-cube NDF and
       presents you with a white-light image of the cube.  You can then select
       an $X$-$Y$ position using the cursor.  The script will extract and display
       this reference spectrum.  You will then be prompted to specify various
       fitting parameters, such as the peak position, using the cursor.  The
-      script will then attempt to fit the emission line.  The fit will be 
+      script will then attempt to fit the emission line.  The fit will be
       displayed and you are consulted regarding the goodness of fit.  If you
       consider the fit to be good enough, the script will attempt to perform
       similar fits to all spectra within the cube, building a two-dimensional
       NDF image of the strength of the line.  These will use the same initial
       parameters as the reference spectrum, unless option {\tt -a} is selected.
-      You may view this image drawn with a key (option {\tt -d}), and overlay a 
+      You may view this image drawn with a key (option {\tt -d}), and overlay a
       contour plot (with a key) of the white-light image (option {\tt -c}).
 
-      If you do not force the fit to be considered `good' by using the 
+      If you do not force the fit to be considered `good' by using the
       {\tt -f} command-line option, the script will offer the opportunity to
       manually refit the spectral feature for individual pixels, such as those
       that were unsuccessfully fitted by the automatic procedure.  In this case,
-      the line-strength map will be plotted and replotted after the new fit, 
+      the line-strength map will be plotted and replotted after the new fit,
       regardless of the {\tt -p} option.
    }
    \sstusage{
@@ -1017,9 +1017,9 @@ co-operation and contributions.
       \ssthitemlist{
          \sstitem
          {\bf{\tt{-a}}}\\
-           Requests that each fit may be inspected then approved or re-fit, not 
-           just the initial reference fit.  A re-fit will change the initial 
-           parameter guesses for subsequent fits, so it is recommended that you 
+           Requests that each fit may be inspected then approved or re-fit, not
+           just the initial reference fit.  A re-fit will change the initial
+           parameter guesses for subsequent fits, so it is recommended that you
            note the co-ordinates of spectra to re-fit and tackle these
            individually in the final manual re-fit stage.  {\tt [FALSE]}
 
@@ -1031,10 +1031,10 @@ co-operation and contributions.
          \sstitem
          {\bf{\tt{-ci}}} {\em index}\\
            The palette colour index of the contours.  It should be an
-           integer in the range {\tt 0} to {\tt 15}.  It is best to choose 
+           integer in the range {\tt 0} to {\tt 15}.  It is best to choose
            an index corresponding to white, or black or another dark colour
            to make the contours stand out from other elements of the plot.
-           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE} 
+           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
            will list the current palette colours.  {\tt [0]}
 
          \sstitem
@@ -1042,7 +1042,7 @@ co-operation and contributions.
            Force the script to accept the first attempt to fit a Gaussian to
            the line.  This is a dangerous option; if the fit is poor, or
            unobtainable the script may terminate abruptly if it is forced to
-           accept the fit.  This will additionally suppress manual re-fitting 
+           accept the fit.  This will additionally suppress manual re-fitting
            of bad pixels at the end of the run of the script.  {\tt [FALSE]}
 
          \sstitem
@@ -1053,14 +1053,14 @@ co-operation and contributions.
 
          \sstitem
          {\bf{\tt{-l}}} {\em filename}\\
-           The name of an text log file containing the fitted Gaussian 
+           The name of an text log file containing the fitted Gaussian
            coefficients for each spatial pixel.  The file is written as a
            Starlink Small Text List (STL) described in
-           \xref{SUN/190}{sun190}{}).  The STL file comprises a schema to 
-           locate and describe the columns, and store global properties; and a 
-           formatted table of the coefficients.  The schema includes the units 
+           \xref{SUN/190}{sun190}{}).  The STL file comprises a schema to
+           locate and describe the columns, and store global properties; and a
+           formatted table of the coefficients.  The schema includes the units
            and a brief description of each column, and the name of the input
-           NDF used.  The table lists the Gaussian centre, peak height the FWHM, 
+           NDF used.  The table lists the Gaussian centre, peak height the FWHM,
            and integrated flux, each with its fitting error.
 
          \sstitem
@@ -1069,13 +1069,13 @@ co-operation and contributions.
 
          \sstitem
          {\bf{\tt{-p}}}\\
-           The script will plot the final image map to the current display 
+           The script will plot the final image map to the current display
            as well as saving it to an NDF file.  Additionally, it will overplot
            the white-light image as a contour map for comparison. {\tt [FALSE]}
 
          \sstitem
          {\bf{\tt{-v}}}\\
-           The script will generate a \xref{VARIANCE}{sun95}{ap_NDFformat} array 
+           The script will generate a \xref{VARIANCE}{sun95}{ap_NDFformat} array
            from the line fits and attach it to the peak-intensity-map NDF. {\tt [FALSE]}
 
          \sstitem
@@ -1091,13 +1091,13 @@ co-operation and contributions.
       \ssthitemlist{
 
          \sstitem
-         The line-strength image map display scales between the 15 and 98 
-         percentiles.  The map uses a false-colour lookup table. 
+         The line-strength image map display scales between the 15 and 98
+         percentiles.  The map uses a false-colour lookup table.
 
          \sstitem
-         \xref{CURSA:CATCOPY}{sun190}{COPY} may be used to convert the STL 
-         log file (see the {\tt -l} option) to FITS format for analysis with the 
-         likes of \xref{TOPCAT}{sun253}{}, provided the STL has 
+         \xref{CURSA:CATCOPY}{sun190}{COPY} may be used to convert the STL
+         log file (see the {\tt -l} option) to FITS format for analysis with the
+         likes of \xref{TOPCAT}{sun253}{}, provided the STL has
          the {\tt .txt} file extension.  If you want just the tabulated data for
          your own favourite tool, the schema can be easily removed manually,
          or with {\bf sed} excluding the lines up to and including the line beginning
@@ -1106,7 +1106,7 @@ co-operation and contributions.
       }
    }
    \sstimplementationstatus{
-      This script invokes a collection of A-tasks from the \KAPPAref\ 
+      This script invokes a collection of A-tasks from the \KAPPAref\
       and \FIGAROref\ packages.
    }
 }
@@ -1137,7 +1137,7 @@ co-operation and contributions.
 
          \sstitem
          {\bf{\tt{-o}}} {\em filename}\\
-           The filename for the output spectrum.  By default the script will 
+           The filename for the output spectrum.  By default the script will
            prompt for the name of the output file.
 
          \sstitem
@@ -1154,7 +1154,7 @@ co-operation and contributions.
 \sstroutine{
    squash
 }{
-   Extracts a two-dimensional white-light image from a three-dimensional 
+   Extracts a two-dimensional white-light image from a three-dimensional
    IFU NDF.
 }{
    \sstdescription{
@@ -1163,7 +1163,7 @@ co-operation and contributions.
       from the cube to form a white-light image.
    }
    \sstusage{
-      squash  [-i filename] [-l number] [-o filename] [-p] [-u number] 
+      squash  [-i filename] [-l number] [-o filename] [-p] [-u number]
    }
    \sstdiytopic{
       Command-line Arguments
@@ -1191,7 +1191,7 @@ co-operation and contributions.
 
          \sstitem
          {\bf{\tt{-u}}} {\em number}\\
-           Upper spectral-axis bound of the region of interest.  
+           Upper spectral-axis bound of the region of interest.
       }
    }
    \sstimplementationstatus{
@@ -1205,7 +1205,7 @@ co-operation and contributions.
    Plots a stack of spectra extracted from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script 
+      This shell script
       reads a three-dimensional IFU NDF datacube as input and presents
       you with a white-light image of the cube.  You can then select a
       number of $X$-$Y$ position using the cursor.  The script will
@@ -1261,7 +1261,7 @@ co-operation and contributions.
       (optionally) to the screen.
    }
    \sstusage{
-      step [-i filename] [-l number] [-p] [-s number] [-u number] 
+      step [-i filename] [-l number] [-p] [-s number] [-u number]
    }
    \sstdiytopic{
       Command-line Arguments
@@ -1288,7 +1288,7 @@ co-operation and contributions.
 
          \sstitem
          {\bf{\tt{-u}}} {\em number}\\
-           Upper spectral-axis bound of the region of interest.  
+           Upper spectral-axis bound of the region of interest.
       }
    }
    \sstimplementationstatus{
@@ -1306,8 +1306,8 @@ co-operation and contributions.
    \sstdescription{
       This displays whole or part of a spectral cube in a multiple
       line plot graphic of data values versus spectral co-ordinates
-      via \xref{KAPPA:CLINPLOT}{sun95}{CLINPLOT}.  In addition to the 
-      raw data, fitted trends and masks generated by 
+      via \xref{KAPPA:CLINPLOT}{sun95}{CLINPLOT}.  In addition to the
+      raw data, fitted trends and masks generated by
       \xref{KAPPA:MFITTREND}{sun95}{MFITTREND} are overlaid in different
       colours for comparison and quality assessment.  There is an option
       to also draw the residuals.  The raw data appear in yellow, the
@@ -1318,7 +1318,7 @@ co-operation and contributions.
       spectral co-ordinates.
 
       For ease of use the baseline and mask files have defined names
-      given by the name argument and suffix arguments.  See the 
+      given by the name argument and suffix arguments.  See the
       \htmlref{Notes}{trendview_notes}.
    }
    \sstusage{
@@ -1335,17 +1335,17 @@ co-operation and contributions.
 
         \sstitem
         {\bf{\tt{-i}}} {\em filename}\\
-           The name of the raw dataset.  The specified file should be a 
-           three-dimensional NDF.  By default the script will prompt for 
+           The name of the raw dataset.  The specified file should be a
+           three-dimensional NDF.  By default the script will prompt for
            the input file.  A section may be defined to home in either
            or both spatial and spectral regions.
 
        \sstitem
        {\bf{\tt{-o}}}\\
           An offset to apply to the mask, whose good values are 0.  In
-          other words the data-value level at which to draw the mask.  Its 
-          purpose is improve mask visibility; and to narrow the y plotting 
-          range, hence see the residuals between the raw data the fitted 
+          other words the data-value level at which to draw the mask.  Its
+          purpose is improve mask visibility; and to narrow the y plotting
+          range, hence see the residuals between the raw data the fitted
           trends more clearly.  {\tt [0]}
 
        \sstitem
@@ -1356,24 +1356,24 @@ co-operation and contributions.
        {\bf{\tt{-s}}}\\
           The file suffix appended to the baseline and mask file names. {\tt [""]}
 
-       \sstitem  
+       \sstitem
        {\bf{\tt{-y}}} {\em ytop[,ybot]}\\
-          A comma-separated list giving the upper and lower data-value limits 
-          of every spectrum plot in either order.  A positive lower limit 
+          A comma-separated list giving the upper and lower data-value limits
+          of every spectrum plot in either order.  A positive lower limit
           will be ignored if the offset ({\tt -o}) is not positive too or when
-          residuals are to be plotted ({\tt -r}).  A single value is deemed to 
+          residuals are to be plotted ({\tt -r}).  A single value is deemed to
           be the upper limit, and the lower limit is defaulted.
 
-          If this option is not specified, the limits derive from the 
-          range given by the 1 and 99 percentiles, extending by 5\% of this 
-          range below its minimum and 2\% above its maximum.  However, a 
-          positive lower limit may again be substituted by a default 
-          whenever the offset is not positive too, or residuals are 
+          If this option is not specified, the limits derive from the
+          range given by the 1 and 99 percentiles, extending by 5\% of this
+          range below its minimum and 2\% above its maximum.  However, a
+          positive lower limit may again be substituted by a default
+          whenever the offset is not positive too, or residuals are
           to be plotted.
 
-          When the lower limit requires a default, it is set to negative 
-          one twentieth of the upper limit if there is no ({\tt -o}) offset 
-          applied to the mask, otherwise it is the offset level minus a 
+          When the lower limit requires a default, it is set to negative
+          one twentieth of the upper limit if there is no ({\tt -o}) offset
+          applied to the mask, otherwise it is the offset level minus a
           twentieth of the range between the upper limit and the offset.
           {\tt []}
       }
@@ -1402,7 +1402,7 @@ co-operation and contributions.
       }{
          Plots the spectra in NDFs ac9\_trim, ac9\_trim\_bsl\_o4, and
          ac9\_trim\_msk\_o4 between data values derived automatically
-         percentiles in ac9\_trim, with the mask line drawn at value 
+         percentiles in ac9\_trim, with the mask line drawn at value
          {\tt 7}.
       }
       \sstexamplesubsection{
@@ -1420,9 +1420,9 @@ co-operation and contributions.
          \sstitem
 
          The raw data is given by the {\tt -i} argument; the fitted
-	 trends or baselines is called $<$filename$>$\_bsl$<$suffix$>$; 
-         and the mask is called $<$filename$>$\_msk$<$suffix$>$, where 
-         $<$filename$>$ is value of the {\tt -i} option without any section 
+	 trends or baselines is called $<$filename$>$\_bsl$<$suffix$>$;
+         and the mask is called $<$filename$>$\_msk$<$suffix$>$, where
+         $<$filename$>$ is value of the {\tt -i} option without any section
          or file extension and $<$suffix$>$ is the value of option {\tt -s}.
 
          \sstitem
@@ -1433,8 +1433,8 @@ co-operation and contributions.
          is unlikely to cause any hardship while used an exploratory tool.
          However, as is normal for a publication graphic, some adjustments
          of the style options may be required.  See \xref{Descriptions of
-         Plotting Attributes}{sun95}{se_plotting_attr} \latex{in SUN/95} 
-         to be used with STYLE parameter in the CLINPLOT calls, and the 
+         Plotting Attributes}{sun95}{se_plotting_attr} \latex{in SUN/95}
+         to be used with STYLE parameter in the CLINPLOT calls, and the
          margins can be enlarged through the MARGIN parameter.
       }
    }
@@ -1476,25 +1476,25 @@ co-operation and contributions.
    Builds a velocity map of an emission line from a spectral-cube NDF by line fitting.
 }{
    \sstdescription{
-      This shell script reads a three-dimensional spectral-cube NDF and 
-      presents you with a white-light image of the cube.  You can then select 
-      an $X$-$Y$ position using the cursor.  The script will extract and display 
+      This shell script reads a three-dimensional spectral-cube NDF and
+      presents you with a white-light image of the cube.  You can then select
+      an $X$-$Y$ position using the cursor.  The script will extract and display
       this reference spectrum.  You will then be prompted to specify various
-      fitting parameters, such as the peak position, using the cursor.  The 
-      script will then attempt to fit the emission line.  The fit will be 
+      fitting parameters, such as the peak position, using the cursor.  The
+      script will then attempt to fit the emission line.  The fit will be
       displayed and you are consulted regarding the goodness of fit.  If you
       consider the fit to be good enough, the script will attempt to perform
       similar fits to all spectra within the cube, building a two-dimensional
       NDF image of the velocity of the line.  These will use the same initial
       parameters as the reference spectrum, unless option {\tt -a} is selected.
-      You may view this image drawn with a key (option {\tt -d}), and overlay a 
+      You may view this image drawn with a key (option {\tt -d}), and overlay a
       contour plot (with a key) of the white-light image (option {\tt -c}).
 
       If you do not force the fit to be considered `good' by using the {\tt -f}
       command-line option, the script will offer the opportunity to manually
       refit the spectral feature for individual pixels, such as those that
       were unsuccessfully fitted by the automatic procedure.  In this case
-      the velocity map will be plotted and replotted after the new fit, 
+      the velocity map will be plotted and replotted after the new fit,
       regardless of the {\tt -p} option.
    }
    \sstusage{
@@ -1507,9 +1507,9 @@ co-operation and contributions.
       \ssthitemlist{
          \sstitem
          {\bf{\tt{-a}}}\\
-           Requests that each fit may be inspected then approved or re-fit, not 
-           just the initial reference fit.  A re-fit will change the initial 
-           parameter guesses for subsequent fits, so it is recommended that you 
+           Requests that each fit may be inspected then approved or re-fit, not
+           just the initial reference fit.  A re-fit will change the initial
+           parameter guesses for subsequent fits, so it is recommended that you
            note the co-ordinates of spectra to re-fit and tackle these
            individually in the final manual re-fit stage.  {\tt [FALSE]}
 
@@ -1521,10 +1521,10 @@ co-operation and contributions.
          \sstitem
          {\bf{\tt{-ci}}} {\em index}\\
            The palette colour index of the contours.  It should be an
-           integer in the range {\tt 0} to {\tt 15}.  It is best to choose 
+           integer in the range {\tt 0} to {\tt 15}.  It is best to choose
            an index corresponding to white, or black or another dark colour
            to make the contours stand out from other elements of the plot.
-           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE} 
+           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
            will list the current palette colours.  {\tt [0]}
 
          \sstitem
@@ -1543,14 +1543,14 @@ co-operation and contributions.
 
          \sstitem
          {\bf{\tt{-l}}} {\em filename}\\
-           The name of an text log file containing the fitted Gaussian 
+           The name of an text log file containing the fitted Gaussian
            coefficients for each spatial pixel.  The file is written as a
            Starlink Small Text List (STL) described in
-           \xref{SUN/190}{sun190}).  The STL file comprises a schema to 
-           locate and describe the columns, and store global properties; and a 
-           formatted table of the coefficients.  The schema includes the units 
+           \xref{SUN/190}{sun190}).  The STL file comprises a schema to
+           locate and describe the columns, and store global properties; and a
+           formatted table of the coefficients.  The schema includes the units
            and a brief description of each column, and the name of the input
-           NDF used.  The table lists the Gaussian centre, peak height the FWHM, 
+           NDF used.  The table lists the Gaussian centre, peak height the FWHM,
            and integrated flux, each with its fitting error.
 
          \sstitem
@@ -1560,7 +1560,7 @@ co-operation and contributions.
          \sstitem
          {\bf{\tt{-p}}}\\
            The script will plot the final image map to the current display
-           as well as saving it to an NDF file.  It will additionally overplot 
+           as well as saving it to an NDF file.  It will additionally overplot
            the white-light image as a contour map for comparison.
            {\tt [FALSE]}
 
@@ -1603,9 +1603,9 @@ co-operation and contributions.
          appear in red.
 
          \sstitem
-         \xref{CURSA:CATCOPY}{sun190}{COPY} may be used to convert the STL 
-         log file (see the {\tt -l} option) to FITS format for analysis with the 
-         likes of \xref{TOPCAT}{sun253}{}, provided the STL has 
+         \xref{CURSA:CATCOPY}{sun190}{COPY} may be used to convert the STL
+         log file (see the {\tt -l} option) to FITS format for analysis with the
+         likes of \xref{TOPCAT}{sun253}{}, provided the STL has
          the {\tt .txt} file extension.  If you want just the tabulated data for
          your own favourite tool, the schema can be easily removed manually,
          or with {\bf sed} excluding the lines up to and including the line beginning
@@ -1614,7 +1614,7 @@ co-operation and contributions.
       }
    }
    \sstimplementationstatus{
-      This script invokes a collection of A-tasks from the \KAPPAref\ 
+      This script invokes a collection of A-tasks from the \KAPPAref\
       and \FIGAROref\ packages.
    }
 }
@@ -1667,10 +1667,10 @@ co-operation and contributions.
          \sstitem
          {\bf{\tt{-ci}}} {\em index}\\
            The palette colour index of the contours.  It should be an
-           integer in the range {\tt 0} to {\tt 15}.  It is best to choose 
+           integer in the range {\tt 0} to {\tt 15}.  It is best to choose
            an index corresponding to white, or black or another dark colour
            to make the contours stand out from other elements of the plot.
-           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE} 
+           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
            will list the current palette colours.  {\tt [0]}
 
          \sstitem
@@ -1722,13 +1722,13 @@ co-operation and contributions.
 
          \sstitem
          The compression is trimmed, so that only compression-factor
-         multiples of original pixels are included in the plot. 
+         multiples of original pixels are included in the plot.
 
          \sstitem
          The spatial averaging is aligned to obtain the expected number
          of pixels irrespective of the pixel origin of the input cube.
          Note that this may not be suitable if you wish to preserve alignment
-         with another compressed dataset.  See \xref{KAPPA:COMPAVE}{sun95}{COMPAVE} 
+         with another compressed dataset.  See \xref{KAPPA:COMPAVE}{sun95}{COMPAVE}
          parameter ALIGN for more details.
 
          \sstitem
@@ -1741,11 +1741,11 @@ co-operation and contributions.
          If the cube is compressed spatially, so is the contour map.
 
          \sstitem
-         For NDFs in the \xref{UK data-cube format}{sc16}{sc16_teifufile}, 
-         where there is no \xref{SPECTRUM or DSBSPECTRUM Domain}{sun95}{se_domains} 
-         in the WCS Frames, the data are first collapsed in their native wavelengths 
-         in {\AA}ngstrom, then the pixel values are converted to VOPT using the simple 
-         formula $c(\lambda-\lambda_{0})/\lambda_{0}$, where $\lambda$ is the 
+         For NDFs in the \xref{UK data-cube format}{sc16}{sc16_teifufile},
+         where there is no \xref{SPECTRUM or DSBSPECTRUM Domain}{sun95}{se_domains}
+         in the WCS Frames, the data are first collapsed in their native wavelengths
+         in {\AA}ngstrom, then the pixel values are converted to VOPT using the simple
+         formula $c(\lambda-\lambda_{0})/\lambda_{0}$, where $\lambda$ is the
          intensity-weighted wavelength, $\lambda_{0}$ is the rest-frame wavelength
          for the chosen spectral line, and $c$ is the velocity of light in km~s$^{-1}$.
       }
@@ -1763,11 +1763,11 @@ The following new scripts have been added:
 
 \begin{description}
    \item [\htmlref{{\bf gridspec}}{gridspec}] \mbox{}
-       Averages groups of spatially neighbouring spectra of a 
+       Averages groups of spatially neighbouring spectra of a
        three-dimensional IFU NDF and then plots these averaged spectra
        in a grid.
    \item [\htmlref{{\bf velmoment}}{velmoment}] \mbox{}
-       Builds a velocity map from the collapsed intensity-weighted 
+       Builds a velocity map from the collapsed intensity-weighted
        spectral co-ordinates.  It supports spatial compression.
 \end{description}
 
@@ -1783,22 +1783,22 @@ input filename for non-interactive scripting.
 \htmlref{{\bf stacker}}{stacker} plot ordinate limits now always
 make visible all the spectra, regardless of the chosen offset.
 
-\item \htmlref{{\bf passband}}{passband} does not dump WCS mappings 
-in \xref{NDFCOPY}{sun95}{NDFCOPY}.  Ensured that the plots of spectra 
-use the axis co-ordinate system.  Removed unused {\tt -r} option. 
+\item \htmlref{{\bf passband}}{passband} does not dump WCS mappings
+in \xref{NDFCOPY}{sun95}{NDFCOPY}.  Ensured that the plots of spectra
+use the axis co-ordinate system.  Removed unused {\tt -r} option.
 
-\item \htmlref{{\bf peakmap}}{peakmap} now has {\tt -c} option to 
+\item \htmlref{{\bf peakmap}}{peakmap} now has {\tt -c} option to
 specify the number of contour levels to plot.
 
-\item \htmlref{{\bf step}}{step} now plots the image slices in an 
+\item \htmlref{{\bf step}}{step} now plots the image slices in an
 optimally shaped grid rather than full size in quick succession, and
-thereby permits comparison of the slices. 
+thereby permits comparison of the slices.
 
 \item \htmlref{{\bf velmap}}{velmap} generalised the transformation of the
 measured line displacements from the rest-frame co-ordinate in the
 current spectral system into one of four velocity measurements using
 WCSTRAN.  Added a SpecFrame to achieve this functionality for
-UK data-cube files.  Also recognises the 
+UK data-cube files.  Also recognises the
 \xref{SKY-DSBSPECTRUM Domain}{sun95}{se_domains}.
 
 Added the {\tt -s} option to define the co-ordinate system of the
@@ -1820,7 +1820,7 @@ specify the colour index of contours.
 \begin{itemize}
 
 \item The package applications COPYAXIS, GETBOUND, and PUTAXIS have
-been withdrawn.  The scripts that invoked these now call 
+been withdrawn.  The scripts that invoked these now call
 \xref{KAPPA:SETAXIS}{sun95}{SETAXIS} ({\tt setaxis ndf=?~like=?})
 \xref{KAPPA:NDFTRACE}{sun95}{NDFTRACE} (access FLBND and FUBND output
 parameters), and \xref{SETAXIS in WCS mode}{sun95}{SETAXIS}
@@ -1835,8 +1835,8 @@ by the cursor has been fixed.  It was present in most of the scripts.
 
 \item Spectrum plots now use the histogram style for greater clarity.
 
-\item  Reset \xref{KAPPA:DISPLAY}{sun95}{DISPLAY} parameters in a 
-few scripts so that features enabled in other scripts, like a key, 
+\item  Reset \xref{KAPPA:DISPLAY}{sun95}{DISPLAY} parameters in a
+few scripts so that features enabled in other scripts, like a key,
 do not bleed through.
 
 \item Tidied the scripts.  Changes included the silent removal and
@@ -1874,13 +1874,13 @@ The following applications have been modified:
 \item \htmlref{{\bf peakmap}}{peakmap} now has  a {\tt -a} option to
 inspect and approve the fit at each spatial pixel.  There is also a
 {\tt -l} option to log the Gaussian fit parameters and their errors in
-a \xref{Small Text List}{sun190}{} file.  
+a \xref{Small Text List}{sun190}{} file.
 
 It inteprets a non-positive number of contours to mean no contour
 overlay required.  There is a new {\tt -ci} option to specify the
 colour index of contours.
 
-It permits case-insensitive responses to prompts except where a 
+It permits case-insensitive responses to prompts except where a
 prompt requires a file name.
 
 A bug has been fixed that caused the peak-height error to be stored
@@ -1890,13 +1890,13 @@ component, instead of the actual variances.
 \item \htmlref{{\bf velmap}}{velmap} now has a {\tt -a} option to
 inpsect and approve the fit at each spatial pixel. There is also a
 {\tt -l} option to log the Gaussian fit parameters and their errors in
-a Small Text List file.  
+a Small Text List file.
 
-It permits case-insensitive responses to prompts except where a 
+It permits case-insensitive responses to prompts except where a
 prompt requires a file name.
 
 It now recognises \xref{DSBSPECTRUM}{sun95}{se_domains} as a valid
-spectral domain.  
+spectral domain.
 
 A number of bugs were fixed: the velocity variance is stored in the
 output NDF VARIANCE (previously the velocity error had been supplied);

@@ -64,7 +64,7 @@ char empty[5]="####";
       strcpy( hashtab[gen_hashins].name, symbol );
       hashtab[gen_hashins].value = *value;
    } else {
-      gen_hashins = -1;      
+      gen_hashins = -1;
       printf( "-- gen_hashins --\n" );
       printf( "Hash table full\n" );
    }
@@ -126,7 +126,7 @@ int gen_hashsrch;
    if ( !strcmp ( hashtab[gen_hashsrch].name, symbol ) )
       *value =  hashtab[gen_hashsrch].value;
    else
-      gen_hashsrch = -1;      
+      gen_hashsrch = -1;
 
    F77_FREE_CHARACTER(symbol);
    return gen_hashsrch;

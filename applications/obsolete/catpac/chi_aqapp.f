@@ -1,6 +1,6 @@
 
       SUBROUTINE
-     : CHI_AQAPP( CVALUE, DVALUE, IVALUE, LVALUE, RVALUE, RESTYPE, 
+     : CHI_AQAPP( CVALUE, DVALUE, IVALUE, LVALUE, RVALUE, RESTYPE,
      :            STATUS )
 *+
 *  Name:
@@ -22,7 +22,7 @@
 *     the parser on you behalf. CHI_1PAR and CHI_2PAR give you direct access
 *     to the parser when 1 or 2 catalogues are involved and must be called
 *     before CHI_APPLY can be called. This routine applies the expression to
-*     a set of data. Data must be of the correct type and supplied in the 
+*     a set of data. Data must be of the correct type and supplied in the
 *     correct position as defined by CHI_PARSE. This is consistent with the
 *     routine CHI_GETVALALL, so a CHI_1PAR followed by a CHI_GETVALALL and
 *     a CHI_APPLY will work. The type of the result (C,D,I,L,R) is returned
@@ -64,7 +64,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,7 +101,7 @@
 *
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-*   Evaluate the expression via its relational sub-expressions 
+*   Evaluate the expression via its relational sub-expressions
 *   Assume the data is in the common area.
 *
       wptr= 0

@@ -187,12 +187,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -235,7 +235,7 @@
 /* Macros */
 /* ====== */
 /* Define constants used to size global arrays in this module. */
-#define AST__CHANNEL_GETATTRIB_BUFF_LEN 50    
+#define AST__CHANNEL_GETATTRIB_BUFF_LEN 50
 
 /* Define a dummy __attribute__ macro for use on non-GNU compilers. */
 #ifndef __GNUC__
@@ -355,7 +355,7 @@ typedef struct AstChannelValue {
    int is_object;                 /* Whether value is an Object (else string) */
 } AstChannelValue;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -409,10 +409,10 @@ AstChannel *astChannelForId_( const char *(*)( void ),
 
 /* Initialiser. */
 AstChannel *astInitChannel_( void *, size_t, int, AstChannelVtab *,
-                             const char *, const char *(*)( void ), 
-                             char *(*)( const char *(*)( void ), int * ), 
-                             void (*)( const char * ), 
-                             void (*)( void (*)( const char * ), 
+                             const char *, const char *(*)( void ),
+                             char *(*)( const char *(*)( void ), int * ),
+                             void (*)( const char * ),
+                             void (*)( void (*)( const char * ),
                              const char *, int * ), int * );
 
 
@@ -424,7 +424,7 @@ AstChannel *astLoadChannel_( void *, size_t, AstChannelVtab *,
                              const char *, AstChannel *channel, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitChannelGlobals_( AstChannelGlobals * );
 #endif
 #endif

@@ -7,8 +7,8 @@
 #     Test script for STARTCL package
 
 #  Description:
-#     Short test of STARTCL functionality.  It's not exhaustive, but it 
-#     checks that at atclsh shell runs up satisfactorily and uses the 
+#     Short test of STARTCL functionality.  It's not exhaustive, but it
+#     checks that at atclsh shell runs up satisfactorily and uses the
 #     ADAM extension to exchange messages.
 
 #  Author:

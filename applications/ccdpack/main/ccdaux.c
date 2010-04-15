@@ -26,7 +26,7 @@
 *  Return Value:
 *     A pointer to a block of memory which will hold size elements of
 *     type type.  This pointer has been registered with the CCDPACK
-*     memory allocation machinery (and a fortiori the CNF memory 
+*     memory allocation machinery (and a fortiori the CNF memory
 *     allocation machinery) and so must be deallocated using CCD1_MFREE.
 *     The pointer returned is a C pointer, and thus suitable for direct
 *     use by C code.  If it is to be used by Fortran code it must
@@ -74,6 +74,6 @@
                            TRAIL_ARG(ftype) );
       return cnfCptr( ptr );
    }
-                           
+
 
 /* $Id$ */

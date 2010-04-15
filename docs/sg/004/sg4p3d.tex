@@ -40,7 +40,7 @@ code than not!
 Starlink, embodied in a set of general rules.
 As a programmer you should bear in mind the needs of the person who will
 eventually be responsible for maintaining your code.
-You are strongly encouraged to read 
+You are strongly encouraged to read
 \xref{SGP/16}{sgp16}{} if you have not already done so.
 
 ADAM has a number of special requirements which may mean that one of the
@@ -152,7 +152,7 @@ An application must terminate if the {\it abort} response (!!) is made when a
 parameter has been requested.
 Note that this rule does not mean that the application has to test for the abort
 status after every parameter is obtained;  the inherited status will look after
-that. 
+that.
 What matters is the appearance to the user of the application, who should:
 \begin{itemize}
 \item not be re-prompted for the parameter,
@@ -167,12 +167,12 @@ An abort does not absolve the programmer from ensuring that the application
 \subsection{C}
 
 In spite of the first rule (use Fortran) in the Starlink Application
-Programming Standard, 
+Programming Standard,
 \xref{SGP/16}{sgp16}{}, there is a Starlink C Programming Standard ---
 \xref{SGP/4}{sgp4}{}.
 Its general style and philosophy are very similar to the Fortran standard,
 though obviously many of the rules are only directly relevant to one of the
-languages.  
+languages.
 
 The suggestions which it contains are made with maintainability, portability
 and efficiency in mind.
@@ -273,7 +273,7 @@ removed to save space):
 *  History:
 *     {date} ({author_identifier}):
 *        Original version.
-*     {enter_changes_here}   
+*     {enter_changes_here}
 *  Bugs:
 *     {note_any_bugs_here}
 *-
@@ -309,7 +309,7 @@ Software tools are programs which help you write programs.
 Of the ones described below, STARLSE and SST are specific to ADAM programs.
 The others can be used for any type of program.
 
-\subsection{FORCHECK} 
+\subsection{FORCHECK}
 
 \vspace{-10mm}
 
@@ -405,7 +405,7 @@ interfaces and should survive new VMS releases; they are also fast.
 SPAG stands for `Spaghetti Unscrambler'.
 It re-orders blocks of Fortran statements in such a way that the structure of
 the code is improved, while remaining logically equivalent to the original
-program. 
+program.
 The result improves the readability and maintainability of badly-written
 Fortran programs.
 On Starlink, it may be used to convert unstructured Fortran 77 into the
@@ -474,38 +474,38 @@ It helps you write portable Fortran~77 software in a standard Starlink style.
 
 If you normally use a standard screen editor (like EDT), you will probably find
 that using an \mbox{LSE}-based editor for the first time will slow you down
-considerably. 
+considerably.
 All those new keys to remember!
 However, once you get used to it, you will start to realise how much time
 you used to spend doing simple things like moving the cursor, formatting
 prologues, indenting lines of code and going to fetch essential
 documentation --- all things which \mbox{STARLSE} can do far more
-efficiently. 
+efficiently.
 
 One of the strengths of \mbox{LSE}-based editing is that it allows
 you to pick and choose --- to use the features that you personally find
 time-saving, while still being able to type directly over anything which you
-find too fussy. 
+find too fussy.
 In this respect, \mbox{STARLSE} can be regarded as a sort of interactive
 `Manual of Style' which provides guidelines on layout and programming
 standards when you need reminding of them, but lets you work unhindered once
-you know what you are doing. 
+you know what you are doing.
 
 Perhaps the most important component of \mbox{STARLSE} is a version of the
 Fortran~77 programming language called \mbox{STARLINK\_FORTRAN}, which
-defines the style of programming that the editor supports. 
+defines the style of programming that the editor supports.
 This language is used by default for files of type \mbox{.FOR} and
-\mbox{.GEN}. 
+\mbox{.GEN}.
 
 The language is based on the Starlink Application Programming Standard and
 contains only a small number of approved extensions to Fortran~77.
 It is therefore much simpler and easier to use than the \mbox{VAX}~Fortran
 language which comes with `native' \mbox{LSE} (in fact, nearly 80\% of
-\mbox{VAX}~Fortran consists of extensions to the Fortran~77 standard!). 
+\mbox{VAX}~Fortran consists of extensions to the Fortran~77 standard!).
 In \mbox{STARLINK\_FORTRAN}, the number of available options and ambiguous
 abbreviations is greatly reduced, and most of the common language constructs
 can be produced simply by typing a short token, like `DO' or `IF', followed
-by \mbox{ctrl-E}. 
+by \mbox{ctrl-E}.
 
 The most important features of the language are:
 

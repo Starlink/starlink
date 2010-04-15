@@ -128,7 +128,7 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
       }
 #else
        HDS_PTYPE is unknown size (SIZEOF_HDSDIM)
-#endif    
+#endif
 
 /* Return the current global status value.                                  */
    return hds_gl_status;

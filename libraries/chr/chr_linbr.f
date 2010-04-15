@@ -13,8 +13,8 @@
 *     CALL CHR_LINBR( STR1, IPOSN, STR2 )
 
 *  Description:
-*     Break a long line of text into a sequence of shorter lines, 
-*     making the breaks between words at spaces if possible. 
+*     Break a long line of text into a sequence of shorter lines,
+*     making the breaks between words at spaces if possible.
 *     The maximum length of an output line is determined by
 *     the size of the character variable supplied to contain it.
 *     This routine should be called repeatedly to generate successive
@@ -22,16 +22,16 @@
 *     context argument IPOSN should be set to zero; it will be updated
 *     after each call, ready to generate the next output line. A value
 *     of zero is returned for IPOSN when there are no more output
-*     lines. Any unprintable characters (e.g. tabs) are treated as if 
+*     lines. Any unprintable characters (e.g. tabs) are treated as if
 *     they were blanks for the purpose of identifying line-breaks.
 
 *  Arguments:
 *     STR1 = CHARACTER * ( * ) (Given)
-*        The line of text to be broken into shorter lines. Leading 
+*        The line of text to be broken into shorter lines. Leading
 *        blanks are ignored.
 *     IPOSN = INTEGER (Given and Returned)
 *        On entry, this argument specifies the character position in
-*        STR1 from which to start generating the next returned line. 
+*        STR1 from which to start generating the next returned line.
 *        If a value less than 1 is given, then 1 will be used.
 *
 *        On exit, this argument is set to one more than the position
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
                IF ( CVALUE .NE. ' ' ) GO TO 20
             END IF
  10      CONTINUE
- 20      CONTINUE           
+ 20      CONTINUE
 
 *     Store its position as the new starting position.
          IPOSN = I
@@ -163,7 +163,7 @@
          END IF
 
 *     Search backwards from the last possible character position to find
-*     a non-blank printing character which is followed by a suitable 
+*     a non-blank printing character which is followed by a suitable
 *     line-break point.
          DO 30 IEND = LAST, IPOSN, -1
 
@@ -178,7 +178,7 @@
                SPACE = ( CVALUE .EQ. ' ' )
             END IF
 
-*        If so, then note we have a suitable break point once the next 
+*        If so, then note we have a suitable break point once the next
 *        non-blank printing character is found.
             IF ( SPACE ) THEN
                BREAK = .TRUE.

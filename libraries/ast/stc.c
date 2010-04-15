@@ -11,14 +11,14 @@ c     astStc
 f     AST_STC
 
 *  Description:
-*     The Stc class is an implementation of the IVOA STC class which forms 
+*     The Stc class is an implementation of the IVOA STC class which forms
 *     part of the IVOA Space-Time Coordinate Metadata system. See:
 *
 *     http://hea-www.harvard.edu/~arots/nvometa/STC.html
 *
-*     The Stc class does not have a constructor function of its own, as it 
+*     The Stc class does not have a constructor function of its own, as it
 *     is simply a container class for a family of specialised sub-classes
-*     including StcCatalogEntryLocation, StcResourceProfile, StcSearchLocation 
+*     including StcCatalogEntryLocation, StcResourceProfile, StcSearchLocation
 *     and StcObsDataLocation.
 
 *  Inheritance:
@@ -54,12 +54,12 @@ f     - AST_GETSTCNCOORD: Returns the number of AstroCoords elements in an Stc
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -157,7 +157,7 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 /* The keys associated with each component of an AstroCoords element
    within KeyMap */
-static const char *regkey[ NREG ] = { AST__STCERROR, 
+static const char *regkey[ NREG ] = { AST__STCERROR,
                                       AST__STCRES,
                                       AST__STCSIZE,
                                       AST__STCPIXSZ,
@@ -165,17 +165,17 @@ static const char *regkey[ NREG ] = { AST__STCERROR,
 
 /* The comments associated with each component of an AstroCoords element
    within KeyMap */
-static const char *regcom[ NREG ] = { "AstroCoords error region", 
-                                      "AstroCoords resolution region", 
-                                      "AstroCoords size region", 
-                                      "AstroCoords pixel size region", 
+static const char *regcom[ NREG ] = { "AstroCoords error region",
+                                      "AstroCoords resolution region",
+                                      "AstroCoords size region",
+                                      "AstroCoords pixel size region",
                                       "AstroCoords value region" };
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(Stc)
@@ -344,7 +344,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "stc.h"
-*     int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
+*     int Equal( AstObject *this_object, AstObject *that_object, int *status )
 
 *  Class Membership:
 *     Stc member function (over-rides the astEqual protected
@@ -352,7 +352,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Description:
 *     This function returns a boolean result (0 or 1) to indicate whether
-*     two Stcs are equivalent. 
+*     two Stcs are equivalent.
 
 *  Parameters:
 *     this
@@ -374,9 +374,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstStc *that;              
-   AstStc *this;              
-   int result;                   
+   AstStc *that;
+   AstStc *this;
+   int result;
 
 /* Initialise. */
    result = 0;
@@ -552,7 +552,7 @@ MAKE_CLEAR(Negated,negated)
 *
 *        static <Type> Get<Attribute>( AstRegion *this )
 *
-*     that gets the value of a specified Region attribute from the encapsulated 
+*     that gets the value of a specified Region attribute from the encapsulated
 *     Region.
 
 *  Parameters:
@@ -612,7 +612,7 @@ MAKE_GET(Negated,int,0)
 *
 *        static int Test<Attribute>( AstRegion *this )
 *
-*     that test the value of a specified Region attribute from the encapsulated 
+*     that test the value of a specified Region attribute from the encapsulated
 *     Region.
 
 *  Parameters:
@@ -663,7 +663,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "stc.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     Stc member function (over-rides the astGetObjSize protected
@@ -778,7 +778,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Obtain a pointer to the Stc structure. */
@@ -822,7 +822,7 @@ static int GetBounded( AstRegion *this_region, int *status ) {
 
 *  Synopsis:
 *     #include "stc.h"
-*     int GetBounded( AstRegion *this, int *status ) 
+*     int GetBounded( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Stc method (over-rides the astGetBounded method inherited from
@@ -831,7 +831,7 @@ static int GetBounded( AstRegion *this_region, int *status ) {
 *  Description:
 *     This function returns a flag indicating if the Region is bounded.
 *     The implementation provided by the base Region class is suitable
-*     for Region sub-classes representing the inside of a single closed 
+*     for Region sub-classes representing the inside of a single closed
 *     curve (e.g. Circle, Ellipse, Box, etc). Other sub-classes (such as
 *     Stc, PointList, etc ) may need to provide their own implementations.
 
@@ -860,12 +860,12 @@ static int GetBounded( AstRegion *this_region, int *status ) {
    if ( !astOK ) return result;
 
 /* Get a pointer to the Stc structure. */
-   this = (AstStc *) this_region;   
+   this = (AstStc *) this_region;
 
-/* Get the encapsulated Region, and the Negated value which should be used 
-   with it. The returned values take account of whether the supplied Stc has 
-   itself been Negated or not. The returned Region represent a region within 
-   the base Frame of the FrameSet encapsulated by the parent Region 
+/* Get the encapsulated Region, and the Negated value which should be used
+   with it. The returned values take account of whether the supplied Stc has
+   itself been Negated or not. The returned Region represent a region within
+   the base Frame of the FrameSet encapsulated by the parent Region
    structure. */
    GetRegion( this, &reg, &neg, status );
 
@@ -876,10 +876,10 @@ static int GetBounded( AstRegion *this_region, int *status ) {
 /* See if the encapsulated Region is bounded. */
    result = astGetBounded( reg );
 
-/* Re-instate the original value for the Negated attribute of the 
+/* Re-instate the original value for the Negated attribute of the
    encapsulated Region. */
    if( reg ) astSetNegated( reg, neg_old );
-   
+
 /* Free resources. */
    reg = astAnnul( reg );
 
@@ -903,15 +903,15 @@ static AstRegion *GetDefUnc( AstRegion *this_region, int *status ) {
 
 *  Synopsis:
 *     #include "stc.h"
-*     AstRegion *GetDefUnc( AstRegion *this ) 
+*     AstRegion *GetDefUnc( AstRegion *this )
 
 *  Class Membership:
 *     Stc method (over-rides the astGetDefUnc method inherited from
 *     the Region class).
 
 *     This function returns a pointer to a Region which represents the
-*     default uncertainty associated with a position on the boundary of the 
-*     given  Region. The returned Region refers to the base Frame within the 
+*     default uncertainty associated with a position on the boundary of the
+*     given  Region. The returned Region refers to the base Frame within the
 *     FrameSet encapsulated by the supplied Region.
 
 *  Parameters:
@@ -939,16 +939,16 @@ static AstRegion *GetDefUnc( AstRegion *this_region, int *status ) {
    if ( !astOK ) return result;
 
 /* Get a pointer to the Stc structure. */
-   this = (AstStc *) this_region;   
+   this = (AstStc *) this_region;
 
 /* If the encapsulated region has non-default uncertainty, use it as
    the default uncertainty for the Cmpregion. Note, the current Frame of
-   an uncertainty Region is assumed to be the same as the base Frame in the 
+   an uncertainty Region is assumed to be the same as the base Frame in the
    Stc. */
    if( astTestUnc( this->region ) ) {
       result = astGetUncFrm( this->region, AST__CURRENT );
 
-/* Otherwise, use the parent method to determine the default uncertainty. */ 
+/* Otherwise, use the parent method to determine the default uncertainty. */
    } else {
       result = (* parent_getdefunc)( this_region, status );
    }
@@ -974,29 +974,29 @@ static void GetRegion( AstStc *this, AstRegion **reg, int *neg, int *status ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     void GetRegion( AstStc *this, AstRegion **reg, int *neg, int *status ) 
+*     void GetRegion( AstStc *this, AstRegion **reg, int *neg, int *status )
 
 *  Class Membership:
-*     Stc member function 
+*     Stc member function
 
 *  Description:
-*     This function returns a pointer to a Region which is equivalent to 
+*     This function returns a pointer to a Region which is equivalent to
 *     the supplied Stc. If the Stc has been negated, then the returned
 *     "negated" flag will be set such that it represents the negated Stc.
 *
-*     The current Frames in returned encapsulated Region will be equivalent 
-*     to the base Frame in the FrameSet encapsulated by the parent Region 
+*     The current Frames in returned encapsulated Region will be equivalent
+*     to the base Frame in the FrameSet encapsulated by the parent Region
 *     structure.
 
 *  Parameters:
 *     this
 *        Pointer to the Stc.
 *     reg
-*        Address of a location to receive a pointer to the encapsulated 
+*        Address of a location to receive a pointer to the encapsulated
 *        Region. The current Frame in this region will be equivalent to
-*        the base Frame in the FrameSet 
+*        the base Frame in the FrameSet
 *     neg
-*        The value of the Negated attribute to be used with reg. 
+*        The value of the Negated attribute to be used with reg.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -1015,9 +1015,9 @@ static void GetRegion( AstStc *this, AstRegion **reg, int *neg, int *status ) {
 /* Return the component Region pointers. */
    if( reg ) *reg = astClone( this->region );
 
-/* Initialise the other returned items. Note, the Stc initialiser stored a 
+/* Initialise the other returned items. Note, the Stc initialiser stored a
    deep copy of the supplied encapsulated Region, and so we do not
-   need to worry about attributes of the Region having been changed 
+   need to worry about attributes of the Region having been changed
    after the creation of the Stc. This is different to the CmpMap
    class which merely clones its supplied component pointers and so has
    to save copies of the original Invert settings within the CmpMap
@@ -1046,7 +1046,7 @@ static const char *GetRegionClass( AstStc *this, int *status ){
 *     const char *astGetRegionClass( AstStc *this )
 
 *  Class Membership:
-*     Stc virtual function 
+*     Stc virtual function
 
 *  Description:
 *     This function returns a pointer to the value of the RegionClass
@@ -1073,7 +1073,7 @@ static const char *GetRegionClass( AstStc *this, int *status ){
 *-
 */
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return NULL;
 
 /* Obtain and return the class of the encapsulated Region. */
@@ -1110,12 +1110,12 @@ f     RESULT = AST_GETSTCCOORD( THIS, ICOORD, STATUS )
 *     that used to pass the original information to the Stc constructor.
 *     That is, the information is returned in a KeyMap structure
 *     containing elements with one or more of the keys given by symbolic
-*     constants AST__STCNAME, AST__STCVALUE, AST__STCERROR, AST__STCRES, 
-*     AST__STCSIZE and AST__STCPIXSZ. 
+*     constants AST__STCNAME, AST__STCVALUE, AST__STCERROR, AST__STCRES,
+*     AST__STCSIZE and AST__STCPIXSZ.
 *
 *     If the coordinate system represented by the Stc has been changed
 *     since it was created (for instance, by changing its System
-*     attribute), then the sizes and positions in the returned KeyMap 
+*     attribute), then the sizes and positions in the returned KeyMap
 *     will reflect the change in coordinate system.
 
 *  Parameters:
@@ -1124,7 +1124,7 @@ f     THIS = INTEGER (Given)
 *        Pointer to the Stc.
 c     icoord
 f     ICOORD = INTEGER (Given)
-*        The index of the AstroCoords element required. The first has index 
+*        The index of the AstroCoords element required. The first has index
 *        one. The number of AstroCoords elements in the Stc can be found using
 c        function astGetStcNcoord.
 f        function AST_GETSTCNCOORD.
@@ -1182,17 +1182,17 @@ f     function is invoked with STATUS set to an error value, or if it
                    "the supplied %s.", status, nc, astGetClass( this ) );
       }
 
-/* If the index is OK, initialise the returned KeyMap to be a copy of the 
+/* If the index is OK, initialise the returned KeyMap to be a copy of the
    KeyMap holding information about the required AstroCoords element.*/
    } else {
       result = astCopy( this->coord[ icoord - 1 ] );
 
 /* The Regions stored within this KeyMap describe regions within the base
-   Frame of the parent Region structure. If the Mapping from base to current 
+   Frame of the parent Region structure. If the Mapping from base to current
    Frame in the parent Region structure is not a UnitMap, we need to
    change these to represent regions within the current Frame of the
    parent Region structure. */
-      map = astGetMapping( ((AstRegion *)this)->frameset, 
+      map = astGetMapping( ((AstRegion *)this)->frameset,
                            AST__BASE, AST__CURRENT );
       smap = astSimplify( map );
       frm = astGetFrame( ((AstRegion *)this)->frameset, AST__CURRENT );
@@ -1267,7 +1267,7 @@ f     RESULT = AST_GETSTCNCOORD( THIS, STATUS )
 *     Stc method.
 
 *  Description:
-*     This function returns the number of AstroCoords elements stored in 
+*     This function returns the number of AstroCoords elements stored in
 *     an Stc.
 
 *  Parameters:
@@ -1388,7 +1388,7 @@ static int GetUseDefs( AstObject *this_object, int *status ) {
 /* Initialise. */
    result = 0;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Obtain a pointer to the Stc structure. */
@@ -1400,7 +1400,7 @@ static int GetUseDefs( AstObject *this_object, int *status ) {
       result = (*parent_getusedefs)( this_object, status );
 
 /* Otherwise, supply a default value equal to the UseDefs value of the
-   encapsulated Region. */   
+   encapsulated Region. */
    } else {
       result = astGetUseDefs( this->region );
    }
@@ -1439,7 +1439,7 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name, int *status ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1588,7 +1588,7 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name, int *status ) {
    }
 }
 
-static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord, 
+static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
                                          const char *class, int *status ){
 /*
 *  Name:
@@ -1607,14 +1607,14 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
 *                                       const char *class, int *status )
 
 *  Class Membership:
-*     Stc member function 
+*     Stc member function
 
 *  Description:
 *     This function returns a pointer to a new KeyMap containing elements
 *     which correspond to the components of an STC AstroCoords element.
 *     The element with key AST__STCNAME holds a vector of character
 *     strings containing the names associated with each of the axies.
-*     The other elements of the returned KeyMap such as AST__STCERROR, 
+*     The other elements of the returned KeyMap such as AST__STCERROR,
 *     AST__STCRES, etc, hold pointers to Regions describing the error
 *     box, resolution, etc, in the Frame of the supplied Region "reg".
 
@@ -1622,17 +1622,17 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
 *     reg
 *        Pointer to the Region in which the AstroCoords is defined.
 *     coordId
-*        An ID (not a pointer) to a KeyMap defining a single <AstroCoords> 
-*        element, having elements with keys given by constants AST__STCNAME, 
-*        AST__STCVALUE, AST__STCERROR, AST__STCRES, AST__STCSIZE, 
-*        AST__STCPIXSZ. Any of these elements may be omitted, but no other 
-*        elements should be included. If supplied, the AST__STCNAME element 
-*        should be a vector of character string pointers holding the "Name" 
-*        item for each axis. Any other supplied elements should be scalar 
-*        elements, each  holding a pointer to a Region describing the 
-*        associated item of ancillary information (error, resolution, size, 
-*        pixel size or value). These Regions should refer to the coordinate 
-*        system represented by "region". 
+*        An ID (not a pointer) to a KeyMap defining a single <AstroCoords>
+*        element, having elements with keys given by constants AST__STCNAME,
+*        AST__STCVALUE, AST__STCERROR, AST__STCRES, AST__STCSIZE,
+*        AST__STCPIXSZ. Any of these elements may be omitted, but no other
+*        elements should be included. If supplied, the AST__STCNAME element
+*        should be a vector of character string pointers holding the "Name"
+*        item for each axis. Any other supplied elements should be scalar
+*        elements, each  holding a pointer to a Region describing the
+*        associated item of ancillary information (error, resolution, size,
+*        pixel size or value). These Regions should refer to the coordinate
+*        system represented by "region".
 *     class
 *        Pointer to a string holding the STC class name.
 *     status
@@ -1665,7 +1665,7 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if( !astOK ) return result;
 
 /* Confirm it is a genuine KeyMap pointer. */
@@ -1706,7 +1706,7 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
                          "the Stc has %d axes. ", status, class, nv, key,
                          naxes );
                break;
-   
+
             } else if( type != AST__STRINGTYPE ) {
                astError( AST__STCKEY, "astInitStc(%s): The \"%s\" "
                          "values supplied in an AstroCoords list are "
@@ -1714,14 +1714,14 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
                break;
             }
 
-/* Check that all other elements are scalar. */   
+/* Check that all other elements are scalar. */
          } else if( nv != 1 ) {
             astError( AST__STCKEY, "astInitStc(%s): %d \"%s\" "
                       "values supplied in an AstroCoords list, but "
                       "only one is allowed. ", status, class, nv, key );
             break;
-   
-/* Check that all other elements are AST Object pointers. */   
+
+/* Check that all other elements are AST Object pointers. */
          } else if( type != AST__OBJECTTYPE ) {
             astError( AST__STCKEY, "astInitStc(%s): The \"%s\" "
                       "value supplied in an AstroCoords list is "
@@ -1756,14 +1756,14 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
                      astError( AST__STCKEY, "astInitStc(%s): The \"%s\" "
                                "value supplied in an AstroCoords list "
                                "cannot be converted to the coordinate "
-                               "system of its parent Stc object.", status, class, 
+                               "system of its parent Stc object.", status, class,
                                key );
                      break;
 
 /* If necessary, map the Region into the same frame as the supplied
    Region, and replace the Region in the returned KeyMap with the
-   remapped Region. Also set the RegionFS attribute to indicate that the 
-   FrameSet in the Region does not need to be dumped if it contains a 
+   remapped Region. Also set the RegionFS attribute to indicate that the
+   FrameSet in the Region does not need to be dumped if it contains a
    UnitMap. */
                   } else {
                      map = astGetMapping( fs, AST__BASE, AST__CURRENT );
@@ -1799,7 +1799,7 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, 
+static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
 /*
 *  Name:
@@ -1813,8 +1813,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
-*                            AstObject **fail, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
 
 *  Class Membership:
 *     Stc member function (over-rides the astManageLock protected
@@ -1822,7 +1822,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Description:
 *     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
+*     lock can be locked, unlocked or checked by this function as
 *     deteremined by parameter "mode". See astLock for details of the way
 *     these locks are used.
 
@@ -1841,21 +1841,21 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *        AST__CHECKLOCK: Check that the object is locked for use by the
 *        calling thread (report an error if not).
 *     extra
-*        Extra mode-specific information. 
+*        Extra mode-specific information.
 *     fail
 *        If a non-zero function value is returned, a pointer to the
 *        Object that caused the failure is returned at "*fail". This may
 *        be "this" or it may be an Object contained within "this". Note,
 *        the Object's reference count is not incremented, and so the
-*        returned pointer should not be annulled. A NULL pointer is 
+*        returned pointer should not be annulled. A NULL pointer is
 *        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*    A local status value: 
+*    A local status value:
 *        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
+*        1 - Could not lock or unlock the object because it was already
 *            locked by another thread.
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
@@ -1910,18 +1910,18 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 
 *  Synopsis:
 *     #include "stc.h"
-*     int Overlap( AstRegion *this, AstRegion *that, int *status ) 
+*     int Overlap( AstRegion *this, AstRegion *that, int *status )
 
 *  Class Membership:
-*     Stc member function (over-rides the astOverlap method inherited 
+*     Stc member function (over-rides the astOverlap method inherited
 *     from the Region class).
 
 *  Description:
 *     This function returns an integer value indicating if the two
 *     supplied Regions overlap. The two Regions are converted to a commnon
-*     coordinate system before performing the check. If this conversion is 
+*     coordinate system before performing the check. If this conversion is
 *     not possible (for instance because the two Regions represent areas in
-*     different domains), then the check cannot be performed and a zero value 
+*     different domains), then the check cannot be performed and a zero value
 *     is returned to indicate this.
 
 *  Parameters:
@@ -1938,7 +1938,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 *        Possible values are:
 *
 *        0 - The check could not be performed because the second Region
-*            could not be mapped into the coordinate system of the first 
+*            could not be mapped into the coordinate system of the first
 *            Region.
 *
 *        1 - There is no overlap between the two Regions.
@@ -1954,9 +1954,9 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 *        6 - The second Region is the negation of the first Region.
 
 *  Notes:
-*     - The returned values 5 and 6 do not check the value of the Closed 
-*     attribute in the two Regions. 
-*     - A value of zero will be returned if this function is invoked with the 
+*     - The returned values 5 and 6 do not check the value of the Closed
+*     attribute in the two Regions.
+*     - A value of zero will be returned if this function is invoked with the
 *     AST error status set, or if it should fail for any reason.
 
 */
@@ -1981,10 +1981,10 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
 
 *  Synopsis:
 *     #include "stc.h"
-*     int OverlapX( AstRegion *that, AstRegion *this ) 
+*     int OverlapX( AstRegion *that, AstRegion *this )
 
 *  Class Membership:
-*     Stc member function (over-rides the astOverlapX method inherited 
+*     Stc member function (over-rides the astOverlapX method inherited
 *     from the Region class).
 
 *  Description:
@@ -2025,7 +2025,7 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status
 *     RegBaseBox
 
 *  Purpose:
-*     Returns the bounding box of an un-negated Region in the base Frame of 
+*     Returns the bounding box of an un-negated Region in the base Frame of
 *     the encapsulated FrameSet.
 
 *  Type:
@@ -2040,7 +2040,7 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status
 *     method inherited from the Region class).
 
 *  Description:
-*     This function returns the upper and lower axis bounds of a Region in 
+*     This function returns the upper and lower axis bounds of a Region in
 *     the base Frame of the encapsulated FrameSet, assuming the Region
 *     has not been negated. That is, the value of the Negated attribute
 *     is ignored.
@@ -2051,12 +2051,12 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status
 *     lbnd
 *        Pointer to an array in which to return the lower axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     ubnd
 *        Pointer to an array in which to return the upper axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     status
 *        Pointer to the inherited status variable.
@@ -2076,7 +2076,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *     RegBaseMesh
 
 *  Purpose:
-*     Create a new PointSet containing a mesh of points on the boundary of a 
+*     Create a new PointSet containing a mesh of points on the boundary of a
 *     Region in its base Frame.
 
 *  Type:
@@ -2102,7 +2102,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to the PointSet. Annul the pointer using astAnnul when it 
+*     Pointer to the PointSet. Annul the pointer using astAnnul when it
 *     is no longer needed.
 
 *  Notes:
@@ -2120,7 +2120,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
    return astRegMesh( ((AstStc *)this)->region );
 }
 
-static AstRegion *RegBasePick( AstRegion *this_region, int naxes, 
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
                                const int *axes, int *status ){
 /*
 *  Name:
@@ -2135,7 +2135,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 
 *  Synopsis:
 *     #include "stc.h"
-*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes,
 *                             int *status )
 
 *  Class Membership:
@@ -2143,8 +2143,8 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 *     method inherited from the Region class).
 
 *  Description:
-*     This function attempts to return a Region that is spanned by selected 
-*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     This function attempts to return a Region that is spanned by selected
+*     axes from the base Frame of the encapsulated FrameSet of the supplied
 *     Region. This may or may not be possible, depending on the class of
 *     Region. If it is not possible a NULL pointer is returned.
 
@@ -2174,7 +2174,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
    return astRegBasePick( ((AstStc *)this_region)->region, naxes, axes );
 }
 
-static void RegClearAttrib( AstRegion *this_region, const char *attrib, 
+static void RegClearAttrib( AstRegion *this_region, const char *attrib,
                             char **base_attrib, int *status ) {
 /*
 *  Name:
@@ -2188,8 +2188,8 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 
 *  Synopsis:
 *     #include "stc.h"
-*     void RegClearAttrib( AstRegion *this, const char *attrib, 
-*                          char **base_attrib, int *status ) 
+*     void RegClearAttrib( AstRegion *this, const char *attrib,
+*                          char **base_attrib, int *status )
 
 *  Class Membership:
 *     Stc method (over-rides the astRegClearAttrib method inherited from
@@ -2198,25 +2198,25 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 *  Description:
 *     This function clears the value of an attribute in both the base and
 *     current Frame in the FrameSet encapsulated within a Region, without
-*     remapping either Frame. 
+*     remapping either Frame.
 *
-*     No error is reported if the attribute is not recognised by the base 
+*     No error is reported if the attribute is not recognised by the base
 *     Frame.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
 *     attrib
-*        Pointer to a null terminated string containing an attribute name. 
-*        NOTE, IT SHOULD BE ENTIRELY LOWER CASE. 
+*        Pointer to a null terminated string containing an attribute name.
+*        NOTE, IT SHOULD BE ENTIRELY LOWER CASE.
 *     base_attrib
-*        Address of a location at which to return a pointer to the null 
+*        Address of a location at which to return a pointer to the null
 *        terminated string holding the name of the attribute which was
-*        cleared in the base Frame of the encapsulated FrameSet. This may 
-*        differ from the supplied name if the supplied name contains an axis 
+*        cleared in the base Frame of the encapsulated FrameSet. This may
+*        differ from the supplied name if the supplied name contains an axis
 *        index and the current->base Mapping in the FrameSet produces an
 *        axis permutation. The returned pointer should be freed using
-*        astFree when no longer needed. A NULL pointer may be supplied in 
+*        astFree when no longer needed. A NULL pointer may be supplied in
 *        which case no pointer is returned.
 *     status
 *        Pointer to the inherited status variable.
@@ -2224,7 +2224,7 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 */
 
 /* Local Variables: */
-   AstStc *this; 
+   AstStc *this;
    char *batt;
    int rep;
 
@@ -2234,14 +2234,14 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 /* Get a pointer to the Stc  structure. */
    this = (AstStc *) this_region;
 
-/* Use the RegClearAttrib method inherited from the parent class to clear 
-   the attribute in the current and base Frames in the FrameSet encapsulated 
+/* Use the RegClearAttrib method inherited from the parent class to clear
+   the attribute in the current and base Frames in the FrameSet encapsulated
    by the parent Region structure. */
    (*parent_regclearattrib)( this_region, attrib, &batt, status );
 
-/* Now clear the base Frame attribute in the encapsulated Region (the current 
+/* Now clear the base Frame attribute in the encapsulated Region (the current
    Frame within the encapsulated Region is equivalent to the base Frame in the
-   parent Region structure). Annul any "attribute unknown" error that results 
+   parent Region structure). Annul any "attribute unknown" error that results
    from attempting to do this. */
    if( astOK ) {
       rep = astReporting( 0 );
@@ -2281,7 +2281,7 @@ static int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
 
 *  Description:
 *     This function returns a flag indicating if the supplied set of
-*     points all fall on the boundary of the given Stc. 
+*     points all fall on the boundary of the given Stc.
 *
 *     Some tolerance is allowed, as specified by the uncertainty Region
 *     stored in the supplied Stc "this", and the supplied uncertainty
@@ -2291,12 +2291,12 @@ static int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
 *     this
 *        Pointer to the Stc.
 *     pset
-*        Pointer to the PointSet. The points are assumed to refer to the 
+*        Pointer to the PointSet. The points are assumed to refer to the
 *        base Frame of the FrameSet encapsulated by "this".
 *     unc
 *        Pointer to a Region representing the uncertainties in the points
-*        given by "pset". The Region is assumed to represent the base Frame 
-*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed 
+*        given by "pset". The Region is assumed to represent the base Frame
+*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed
 *        if NULL is supplied.
 *     mask
 *        Pointer to location at which to return a pointer to a newly
@@ -2323,7 +2323,7 @@ static int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
    return astRegPins( ((AstStc *)this)->region, pset, unc, mask );
 }
 
-static void RegSetAttrib( AstRegion *this_region, const char *setting, 
+static void RegSetAttrib( AstRegion *this_region, const char *setting,
                           char **base_setting, int *status ) {
 /*
 *  Name:
@@ -2337,7 +2337,7 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 
 *  Synopsis:
 *     #include "stc.h"
-*     void RegSetAttrib( AstRegion *this, const char *setting, 
+*     void RegSetAttrib( AstRegion *this, const char *setting,
 *                        char **base_setting, int *status )
 
 *  Class Membership:
@@ -2347,32 +2347,32 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 *  Description:
 *     This function assigns an attribute value to both the base and
 *     current Frame in the FrameSet encapsulated within a Region, without
-*     remapping either Frame. 
+*     remapping either Frame.
 *
-*     No error is reported if the attribute is not recognised by the base 
+*     No error is reported if the attribute is not recognised by the base
 *     Frame.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
 *     setting
-*        Pointer to a null terminated attribute setting string. NOTE, IT 
-*        SHOULD BE ENTIRELY LOWER CASE. The supplied string will be 
+*        Pointer to a null terminated attribute setting string. NOTE, IT
+*        SHOULD BE ENTIRELY LOWER CASE. The supplied string will be
 *        interpreted using the public interpretation implemented by
-*        astSetAttrib. This can be different to the interpretation of the 
+*        astSetAttrib. This can be different to the interpretation of the
 *        protected accessor functions. For instance, the public
-*        interpretation of an unqualified floating point value for the 
+*        interpretation of an unqualified floating point value for the
 *        Epoch attribute is to interpet the value as a gregorian year,
-*        but the protected interpretation is to interpret the value as an 
+*        but the protected interpretation is to interpret the value as an
 *        MJD.
 *     base_setting
-*        Address of a location at which to return a pointer to the null 
+*        Address of a location at which to return a pointer to the null
 *        terminated attribute setting string which was applied to the
 *        base Frame of the encapsulated FrameSet. This may differ from
-*        the supplied setting if the supplied setting contains an axis 
+*        the supplied setting if the supplied setting contains an axis
 *        index and the current->base Mapping in the FrameSet produces an
 *        axis permutation. The returned pointer should be freed using
-*        astFree when no longer needed. A NULL pointer may be supplied in 
+*        astFree when no longer needed. A NULL pointer may be supplied in
 *        which case no pointer is returned.
 *     status
 *        Pointer to the inherited status variable.
@@ -2382,11 +2382,11 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 /* Local Variables: */
    AstKeyMap *keymap;
    AstObject *obj;
-   AstRegion *reg;   
-   AstStc *this; 
+   AstRegion *reg;
+   AstStc *this;
    char *bset;
-   int i;            
-   int ikey;         
+   int i;
+   int ikey;
    int rep;
 
 /* Check the global error status. */
@@ -2395,14 +2395,14 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 /* Get a pointer to the Stc structure. */
    this = (AstStc *) this_region;
 
-/* Use the RegSetAttrib method inherited from the parent class to apply the 
-   setting to the current and base Frames in the FrameSet encapsulated by the 
+/* Use the RegSetAttrib method inherited from the parent class to apply the
+   setting to the current and base Frames in the FrameSet encapsulated by the
    parent Region structure. */
    (*parent_regsetattrib)( this_region, setting, &bset, status );
 
-/* Now apply the base Frame setting to the encapsulated Region (the current 
+/* Now apply the base Frame setting to the encapsulated Region (the current
    Frame within the encapsulated Region is equivalent to the base Frame in the
-   parent Region structure). Annul any "attribute unknown" error that results 
+   parent Region structure). Annul any "attribute unknown" error that results
    from attempting to do this. Also do any AstroCoords in the Stc. */
    if( astOK ) {
       rep = astReporting( 0 );
@@ -2496,7 +2496,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    AstStc *this;                 /* Pointer to the Stc structure */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
-  
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -2663,7 +2663,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          stc = temp;
       }
 
-/* Modify "temp" by negating both the Stc structure and its encapsulated 
+/* Modify "temp" by negating both the Stc structure and its encapsulated
    Region. */
       astNegate( stc );
       astNegate( stc->region );
@@ -2675,9 +2675,9 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    map = astGetMapping( ((AstRegion *) stc)->frameset, AST__BASE, AST__CURRENT );
    frm = astGetFrame( ((AstRegion *) stc)->frameset, AST__CURRENT );
 
-/* We may be able to perform some more simplication on the encapsulated 
-   Region itself. If the above mapping is not a unit map, remap the 
-   encapsulated Region into the current Frame of the parent Region structure 
+/* We may be able to perform some more simplication on the encapsulated
+   Region itself. If the above mapping is not a unit map, remap the
+   encapsulated Region into the current Frame of the parent Region structure
    and simplify it. This transfers complication from the Mapping in the
    parent Region structure to the encapsulated Region. */
    if( !astIsAUnitMap( map ) ) {
@@ -2690,7 +2690,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    Region (without any remapping) can be simplied. */
    } else {
       newreg = astSimplify( stc->region );
-   }   
+   }
 
 /* If the encapsulated Region has been changed, store it in the returned
    Stc. */
@@ -2710,13 +2710,13 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          stc->region = astClone( newreg );
       }
 
-/* The encapsulated Region now represents an area in the current Frame 
+/* The encapsulated Region now represents an area in the current Frame
    represented by the supplied Stc. Since the encapsulated Region is
    defined as being in the base Frame of the FrameSet in the parent
    Region structure, the parent FrameSet should just be a UnitMap. Modify
    it appropriately (if it not already a UnitMap). */
       if( !astIsAUnitMap( map ) ) astSetRegFS( stc, frm );
-   } 
+   }
 
 /* Free resources */
    newreg = astAnnul( newreg );
@@ -2725,61 +2725,61 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    elements. Loop round all AstroCoords elements. */
    if( stc ) {
       for( i = 0; i < stc->ncoord; i++ ) {
-   
+
 /* Get a pointewr to the KeyMap holding a description of the current
    AstroCoords element. */
          keymap = stc->coord[ i ];
-   
+
 /* Loop round all the elements of this KeyMap which may hold a Region
    pointer. */
          for( ikey = 0; ikey < NREG; ikey++ ) {
-   
+
 /* If the KeyMap contains a Region for this key, get a pointer to it. */
             if( astMapGet0A( keymap, regkey[ ikey ], &obj ) ){
                reg = (AstRegion *) obj;
-   
-/* We have two tasks now, firstly to ensure that this AstroCoords Region 
+
+/* We have two tasks now, firstly to ensure that this AstroCoords Region
    describes an area in the base Frame of the FrameSet in the parent
    Region structure (which may have been changed by the earlier
    simplications performed by this function), and secondly, to attempt to
    simplify the Region.
-   
+
    The Stc structure addressed by the "stc" pointer will have a current
    Frame given by "frm". This will also be its base Frame, and the
    base->current Mapping will consequently be a UnitMap. The Mapping from
-   the original base Frame to the new base Frame is given by "map". Unless 
+   the original base Frame to the new base Frame is given by "map". Unless
    this is a UnitMap, we need to remap the Region.*/
                if( !astIsAUnitMap( map ) ) {
                   treg = astMapRegion( reg, map, frm );
                } else {
                   treg = astClone( reg );
                }
-   
+
 /* Now attempt to simplify the Region.*/
                newreg = astSimplify( treg );
-   
+
 /* If the Region has been changed by either of these steps, we need to
    store the modified Region back in the "stc" structure which is being
-   returned. But we need to be careful we do not modify the supplied Stc 
+   returned. But we need to be careful we do not modify the supplied Stc
    structure. */
                if( newreg != reg ) {
-   
+
                   if( stc == (AstStc *) this_mapping ) {
                      temp = astCopy( stc );
                      (void) astAnnul( stc );
                      stc = temp;
                      keymap = temp->coord[ i ];
                   }
-   
+
                   astMapPut0A( keymap, regkey[ ikey ], newreg, regcom[ ikey ] );
-                  
+
                }
-   
+
 /* Free resources */
                reg = astAnnul( reg );
                treg = astAnnul( treg );
                newreg = astAnnul( newreg );
-   
+
             }
          }
       }
@@ -2788,7 +2788,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Free resources */
    map = astAnnul( map );
    frm = astAnnul( frm );
-   
+
 /* If an error occurred, annul the returned Mapping. */
    if ( !astOK ) stc = astAnnul( stc );
 
@@ -2961,10 +2961,10 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 /* Get a Pointer to the Stc structure */
    this = (AstStc *) this_mapping;
 
-/* Get the encapsulated Region, and the Negated value which should be used 
-   with it. The returned values take account of whether the supplied Stc has 
-   itself been Negated or not. The returned Region represent a region within 
-   the base Frame of the FrameSet encapsulated by the parent Region 
+/* Get the encapsulated Region, and the Negated value which should be used
+   with it. The returned values take account of whether the supplied Stc has
+   itself been Negated or not. The returned Region represent a region within
+   the base Frame of the FrameSet encapsulated by the parent Region
    structure. */
    GetRegion( this, &reg, &neg, status );
 
@@ -2974,18 +2974,18 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Apply the parent mapping using the stored pointer to the Transform member
    function inherited from the parent Region class. This function validates
-   all arguments and generates an output PointSet if necessary, containing 
+   all arguments and generates an output PointSet if necessary, containing
    a copy of the input PointSet. */
    result = (*parent_transform)( this_mapping, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
 
-/* First use the encapsulated FrameSet in the parent Region structure to 
-   transform the supplied positions from the current Frame in the 
-   encapsulated FrameSet (the Frame represented by the Stc), to the 
+/* First use the encapsulated FrameSet in the parent Region structure to
+   transform the supplied positions from the current Frame in the
+   encapsulated FrameSet (the Frame represented by the Stc), to the
    base Frame (the Frame in which the encapsulated Region are defined). Note,
-   the returned pointer may be a clone of the "in" pointer, and so we 
+   the returned pointer may be a clone of the "in" pointer, and so we
    must be carefull not to modify the contents of the returned PointSet. */
    pset_tmp = astRegTransform( this, in, 0, NULL, NULL );
 
@@ -2993,11 +2993,11 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    ps = astTransform( reg, pset_tmp, 0, NULL );
 
 /* Determine the numbers of points and coordinates per point for these base
-   Frame PointSets and obtain pointers for accessing the base Frame and output 
+   Frame PointSets and obtain pointers for accessing the base Frame and output
    coordinate values. */
    npoint = astGetNpoint( pset_tmp );
    ncoord_tmp = astGetNcoord( pset_tmp );
-   ptr = astGetPoints( ps );      
+   ptr = astGetPoints( ps );
    ncoord_out = astGetNcoord( result );
    ptr_out = astGetPoints( result );
 
@@ -3013,17 +3013,17 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                good = 1;
                break;
             }
-         }      
+         }
 
          if( !good ) {
             for ( coord = 0; coord < ncoord_out; coord++ ) {
                ptr_out[ coord ][ point ] = AST__BAD;
             }
-         }      
+         }
       }
    }
 
-/* Re-instate the original value for the Negated attribute of the 
+/* Re-instate the original value for the Negated attribute of the
    encapsulated Region. Do this even if an error has occurred. */
    status_value = astStatus;
    astClearStatus;
@@ -3031,7 +3031,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    if( reg ) astSetNegated( reg, neg_old );
    astReporting( rep );
    astSetStatus( status_value );
-   
+
 /* Free resources. */
    reg = astAnnul( reg );
    ps = astAnnul( ps );
@@ -3068,7 +3068,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 *  Description:
 *     This is a read-only attribute giving the AST class name of the
-*     Region encapsulated within an Stc (that is, the class of the Region 
+*     Region encapsulated within an Stc (that is, the class of the Region
 *     which was supplied when the Stc was created).
 
 *  Applicability:
@@ -3130,7 +3130,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->coord = NULL;
    out->ncoord = 0;
 
-/* Make a copy of the Region and store a pointer to it in the output Stc 
+/* Make a copy of the Region and store a pointer to it in the output Stc
    structure. */
    out->region = astCopy( in->region );
 
@@ -3288,8 +3288,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(Stc,Region)
 astMAKE_CHECK(Stc)
 
-AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab, 
-                     const char *name, AstRegion *region, int ncoords, 
+AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
+                     const char *name, AstRegion *region, int ncoords,
                      AstKeyMap **coords, int *status ) {
 /*
 *+
@@ -3304,8 +3304,8 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
 
 *  Synopsis:
 *     #include "stc.h"
-*      AstStc *astInitStc( void *mem, size_t size, int init, AstStcVtab *vtab, 
-*                          const char *name, AstRegion *region, int ncoords, 
+*      AstStc *astInitStc( void *mem, size_t size, int init, AstStcVtab *vtab,
+*                          const char *name, AstRegion *region, int ncoords,
 *                          AstKeyMap **coords )
 
 *  Class Membership:
@@ -3352,17 +3352,17 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
 *        Ignored if "coords" is NULL.
 *     coords
 *        Pointer to an array of "ncoords" KeyMap pointers, or NULL if
-*        "ncoords" is zero. Each KeyMap defines defines a single <AstroCoords> 
-*        element, and should have elements with keys given by constants 
+*        "ncoords" is zero. Each KeyMap defines defines a single <AstroCoords>
+*        element, and should have elements with keys given by constants
 *        AST__STCNAME, AST__STCVALUE, AST__STCERROR, AST__STCRES, AST__STCSIZE,
-*        AST__STCPIXSZ. Any of these elements may be omitted, but no other 
-*        elements should be included. If supplied, the AST__STCNAME element 
-*        should be a vector of character string pointers holding the "Name" 
-*        item for each axis. Any other supplied elements should be scalar 
-*        elements, each  holding a pointer to a Region describing the 
-*        associated item of ancillary information (error, resolution, size, 
-*        pixel size or value). These Regions should describe a volume within 
-*        the coordinate system represented by "region". 
+*        AST__STCPIXSZ. Any of these elements may be omitted, but no other
+*        elements should be included. If supplied, the AST__STCNAME element
+*        should be a vector of character string pointers holding the "Name"
+*        item for each axis. Any other supplied elements should be scalar
+*        elements, each  holding a pointer to a Region describing the
+*        associated item of ancillary information (error, resolution, size,
+*        pixel size or value). These Regions should describe a volume within
+*        the coordinate system represented by "region".
 
 *  Returned Value:
 *     A pointer to the new Stc.
@@ -3389,13 +3389,13 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
 /* Initialise. */
    new = NULL;
 
-/* If the supplied Region is an Stc, create a new Region by mapping the 
-   encapsulated Region within the supplied Stc into the current Frame of the 
+/* If the supplied Region is an Stc, create a new Region by mapping the
+   encapsulated Region within the supplied Stc into the current Frame of the
    Stc. */
    if( astIsAStc( region ) ) {
       map = astGetMapping( region->frameset, AST__BASE, AST__CURRENT );
       frm = astGetFrame( region->frameset, AST__CURRENT );
-      reg = astMapRegion( ((AstStc *) region)->region, map, frm );      
+      reg = astMapRegion( ((AstStc *) region)->region, map, frm );
       frm = astAnnul( frm );
       map = astAnnul( map );
 
@@ -3408,10 +3408,10 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
    within the Stc structure, allocating memory if necessary. A NULL
    PointSet is suppled as the encapsulated Region will perform the function
    of defining the Region shape. The base Frame of the FrameSet in the
-   parent Region structure will be the same as the current Frames of the 
+   parent Region structure will be the same as the current Frames of the
    FrameSets in the two encapsulated Region. */
    if ( astOK ) {
-      new = (AstStc *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab, 
+      new = (AstStc *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab,
                                       name, reg, NULL, NULL );
 
 /* Initialise the Stc data. */
@@ -3427,7 +3427,7 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
      astRegOverlay( new, reg, 1 );
      if( astTestIdent( reg ) ) astSetIdent( new, astGetIdent( reg ) );
 
-/* If the base->current Mapping in the FrameSet within the encapsulated Region 
+/* If the base->current Mapping in the FrameSet within the encapsulated Region
    is a UnitMap, then the FrameSet does not need to be included in the
    Dump of the new Stc. Set the RegionFS attribute of the encapsulated
    Region to zero to flag this. Note, we do this after the previous class
@@ -3435,14 +3435,14 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
    be copied into the new Stc object. */
       astSetRegionFS( reg, 0 );
 
-/* For each supplied AstroCoords, create a new KeyMap holding Regions 
+/* For each supplied AstroCoords, create a new KeyMap holding Regions
    representing the various elements of the AstroCoords, and store the
    new KeyMap in the Stc structure. */
       if( coords && ncoords > 0 ) {
          new->ncoord = ncoords;
          new->coord = astMalloc( sizeof( AstKeyMap *)*(size_t) ncoords );
          if( new->coord ) {
-            for( i = 0; i < ncoords; i++ ) {      
+            for( i = 0; i < ncoords; i++ ) {
                new->coord[ i ] = MakeAstroCoordsKeyMap( reg, coords[ i ],
                                                         name, status );
             }
@@ -3460,7 +3460,7 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
    return new;
 }
 
-AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab, 
+AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab,
                      const char *name, AstChannel *channel, int *status ) {
 /*
 *+
@@ -3475,7 +3475,7 @@ AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab,
 
 *  Synopsis:
 *     #include "stc.h"
-*     AstStc *astLoadStc( void *mem, size_t size, AstStcVtab *vtab, 
+*     AstStc *astLoadStc( void *mem, size_t size, AstStcVtab *vtab,
 *                         const char *name, AstChannel *channel )
 
 *  Class Membership:
@@ -3603,12 +3603,12 @@ AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab,
       f1 = astGetFrame( ((AstRegion *) new)->frameset, AST__BASE );
 
 /* If the encapsulated Region has a dummy FrameSet rather than the correct
-   FrameSet, the correct FrameSet will have copies of the base Frame of the 
-   new Stc as both its current and base Frames, connected by a UnitMap (this 
-   is equivalent to a FrameSet containing a single Frame). However if the new 
-   Stc being loaded has itself got a dummy FrameSet, then we do not do this 
-   since we do not yet know what the correct FrameSet is. In this case we 
-   wait until the parent Region invokes the astSetRegFS method on the new 
+   FrameSet, the correct FrameSet will have copies of the base Frame of the
+   new Stc as both its current and base Frames, connected by a UnitMap (this
+   is equivalent to a FrameSet containing a single Frame). However if the new
+   Stc being loaded has itself got a dummy FrameSet, then we do not do this
+   since we do not yet know what the correct FrameSet is. In this case we
+   wait until the parent Region invokes the astSetRegFS method on the new
    Stc. */
       if( !astRegDummyFS( new ) ) {
          creg = new->region;
@@ -3634,7 +3634,7 @@ AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab,
                   creg = (AstRegion *) obj;
                   if( astRegDummyFS( creg ) ) {
                      astSetRegFS( creg, f1 );
-                     astMapPut0A( new->coord[ ico - 1 ], regkey[ ikey ], creg, 
+                     astMapPut0A( new->coord[ ico - 1 ], regkey[ ikey ], creg,
                                   regcom[ ikey ] );
                   }
                   creg = astAnnul( creg );

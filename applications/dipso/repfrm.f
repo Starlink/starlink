@@ -8,7 +8,7 @@
 
 *  Language:
 *     Starlink Fortran 77
-      
+
 *  Invocation:
 *     CALL REPFRM( TOKEN, COMM, MESS, STATUS )
 
@@ -46,7 +46,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) TOKEN
       CHARACTER * ( * ) COMM
@@ -56,7 +56,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER 
+      CHARACTER
      :        TEXT*255,          ! The complete message text
      :        ITEXT*255          ! Input text
 
@@ -70,12 +70,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the start and end of the command name.
-      CALL CHR_FANDL( COMM, F, L )      
+      CALL CHR_FANDL( COMM, F, L )
 
 *  If a name was supplied, incorporate it into the message. Expand any
 *  tokens in the message and store the resulting string in TEXT.
       IF( F .LE. L ) THEN
-         ITEXT = '   '//COMM( F : L )//':  '//MESS  
+         ITEXT = '   '//COMM( F : L )//':  '//MESS
          CALL MSG_LOAD( ' ', ITEXT, TEXT, LTEXT, STATUS )
       ELSE
          CALL MSG_LOAD( ' ', MESS, TEXT, LTEXT, STATUS )

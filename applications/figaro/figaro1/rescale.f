@@ -12,14 +12,14 @@ C
 C     Command parameters -
 C
 C     IMAGE  (Character) The name of the structure containing the image.
-C            Uses main data array, or the x-axis data for the XCxxx 
+C            Uses main data array, or the x-axis data for the XCxxx
 C            routines.
 C
 C     LOWFAC (Numeric) The lower limit of the rescaling.
 C
 C     HIGHFAC (Numeric) The upper limit of the rescaling.
 C
-C     OUTPUT (Character) The name of the result of the operation.  This 
+C     OUTPUT (Character) The name of the result of the operation.  This
 C            can be the same as for IMAGE.  If not, a new structure
 C            is created, with everything but the data a direct
 C            copy of the input.
@@ -43,9 +43,9 @@ C
 C     Local variables
 C
       INTEGER      DIMS(10)      ! The sizes of the data's dimensions
-      REAL         HIGHFAC       ! UPPER factor used to operate on the 
+      REAL         HIGHFAC       ! UPPER factor used to operate on the
                                  ! data
-      REAL         LOWFAC        ! LOWER factor used to operate on the 
+      REAL         LOWFAC        ! LOWER factor used to operate on the
                                  ! data
       INTEGER      NDIM          ! The number of dimensions in the data
       INTEGER      NELM          ! Total number of elements in the data
@@ -93,7 +93,7 @@ C
       CALL ADDCAF(%VAL(CNF_PVAL(OUTELM)),NELM,LOWFAC,HIGHFAC,
      :            %VAL(CNF_PVAL(OUTELM)))
 C
-C     Closedown everything 
+C     Closedown everything
 C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
@@ -108,7 +108,7 @@ C     Rescales a spectrum between user-specified limits.
 C
 C     Parameters -   (">" input, "<" output)
 C
-C     (>) IN     (Real array IN(N)) The input array 
+C     (>) IN     (Real array IN(N)) The input array
 C                (Note that IN may be multiply dimensioned
 C                in the calling program.  It is treated as
 C                1D here for efficiency and generality.)

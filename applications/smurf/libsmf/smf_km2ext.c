@@ -4,7 +4,7 @@
 *     smf_km2ext
 
 *  Purpose:
-*     Sort and copy the contents of an AST KeyMap into the time-indexed 
+*     Sort and copy the contents of an AST KeyMap into the time-indexed
 *     extension items in an NDF.
 
 *  Language:
@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, 
+*     void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
 *                      int *timeout, int *status )
 
 *  Arguments:
@@ -32,15 +32,15 @@
 *     timeout = int * (Given)
 *        An array that defines the order in which the time slices values
 *        in the KeyMap are to be stored in the output NDF. Element "j"
-*        of this array holds the index of the time slice within the KeyMap 
+*        of this array holds the index of the time slice within the KeyMap
 *        arrays that is to be used as time slice "j" in the output NDF.
 *     status = int * (Given and Returned)
-*        Inherited status value. 
+*        Inherited status value.
 
 *  Description:
-*     This function copies values from the supplied KeyMap into a named NDF 
-*     extension. Each entry in the KeyMap has a key that is equal to the 
-*     name of the extension component, and a value that is a vectorised 
+*     This function copies values from the supplied KeyMap into a named NDF
+*     extension. Each entry in the KeyMap has a key that is equal to the
+*     name of the extension component, and a value that is a vectorised
 *     list of the values to be put into the extension component.
 
 *  Authors:
@@ -85,7 +85,7 @@
 
 #include "smf.h"
 
-void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, 
+void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
                  int *timeout, int *status ){
 
 /* Local Variables */
@@ -153,7 +153,7 @@ void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
             errRep( "", "The ^X.^K array had an unexpected data type "
                     "in \"^F\".", status );
          }
-   
+
          datAnnul( &cloc, status );
 
       } else if( *status == SAI__OK ) {

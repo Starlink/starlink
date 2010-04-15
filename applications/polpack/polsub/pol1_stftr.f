@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_STFTR( NCARD, FITS, VAL, FTNAM, ICARD, COMMNT, 
+      SUBROUTINE POL1_STFTR( NCARD, FITS, VAL, FTNAM, ICARD, COMMNT,
      :                       NEW, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 *     CALL POL1_STFTR( NCARD, FITS, VAL, FTNAM, ICARD, COMMNT, NEW, STATUS )
 
 *  Description:
-*     This routine stores the supplied real value as a FITS header card 
+*     This routine stores the supplied real value as a FITS header card
 *     using the keyword name given by FTNAM, in an array of character strings.
 *
 *     If the keyword already exists in the FITS array, then its value is
@@ -22,7 +22,7 @@
 
 *  Arguments:
 *     NCARD = INTEGER (Given)
-*        The number of cards to be searched in the FITS array. 
+*        The number of cards to be searched in the FITS array.
 *     FITS( * ) = CHARACTER * ( * ) (Given)
 *        The array holding the FITS cards.
 *     VAL = REAL (Given)
@@ -41,7 +41,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
       CHARACTER FITS( * )*(*)
       REAL VAL
       CHARACTER FTNAM*(*)
-      INTEGER ICARD 
+      INTEGER ICARD
       CHARACTER COMMNT*(*)
 
 *  Arguments Returned:
@@ -89,7 +89,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  See if the keyword already exists in the FITS array.
-      CALL FTS1_GKEYC( NCARD, FITS, 1, FTNAM, 1, THERE, CVAL, COM, 
+      CALL FTS1_GKEYC( NCARD, FITS, 1, FTNAM, 1, THERE, CVAL, COM,
      :                 JCARD, STATUS )
 
 *  If not, create a new card and store it at the supplied index. Otherwise
@@ -101,7 +101,7 @@
          NEW = .FALSE.
       END IF
 
-*  Format the supplied value as a FITS card using the supplied FITS keyword 
+*  Format the supplied value as a FITS card using the supplied FITS keyword
 *  name.
       CALL FTS1_WKEYR( FTNAM, VAL, '/', COMMNT, FITS( JCARD ), STATUS )
 

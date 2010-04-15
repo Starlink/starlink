@@ -18,7 +18,7 @@
 *         Final edit to merge with GRFSUB routines.
 *
 *   Method:
-*      Call (GKS) GSCR to set up the colour table. 
+*      Call (GKS) GSCR to set up the colour table.
 *
 *-
 
@@ -91,7 +91,7 @@
 *   Finish off
       DO I = ISTART, IEND
          CINDEX = I
-         CALL GSCR(WKID, CINDEX, HEATLUT(NCOLR, 1), 
+         CALL GSCR(WKID, CINDEX, HEATLUT(NCOLR, 1),
      :             HEATLUT(NCOLR, 2), HEATLUT(NCOLR, 3))
       END DO
 

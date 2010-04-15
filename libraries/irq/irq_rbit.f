@@ -27,8 +27,8 @@
 *        and the associated quality name information.  They should have
 *        been obtained using routine IRQ_FIND or routine IRQ_NEW.
 *     QNAME = CHARACTER * ( * ) (Given)
-*        The quality name. This quality name must be defined in the NDF 
-*        specified by LOCS. Name definitions can be added to the NDF 
+*        The quality name. This quality name must be defined in the NDF
+*        specified by LOCS. Name definitions can be added to the NDF
 *        using routine IRQ_ADDQN.
 *     BIT = INTEGER (Returned)
 *        The bit number used by the quality name within the quality
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -151,7 +151,7 @@
 
 *  Modify the FIXED, VALUE and BIT settings in the quality name
 *  information.
-         CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, RDONLY, 
+         CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, RDONLY,
      :                  FIXBIT, STATUS )
       END IF
 

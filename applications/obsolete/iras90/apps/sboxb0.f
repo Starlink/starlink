@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
       INSIDE = .FALSE.
       DO WHILE( .NOT. INSIDE .AND. STATUS .EQ. SAI__OK )
 
-*  If the input position is bad, position the cursor at the centre of 
+*  If the input position is bad, position the cursor at the centre of
 *  the zone.
          IF( X .EQ. VAL__BADR .OR. Y .EQ. VAL__BADR ) THEN
             CALL SGS_SETCU( 0.5*( ZX1 + ZX2 ), 0.5*( ZY1 + ZY2 ) )

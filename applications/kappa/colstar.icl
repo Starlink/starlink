@@ -28,7 +28,7 @@ PROC COLSTAR FILE,X,Y,SIZE,OUTFILE
    ELSE
       NDFOUT = (OUTFILE)
    END IF
- 
+
 { Search for the star in a 21x21 pixel box.  The centroid of the
 { star is stored in the ICL variables XC and YC.
    CENTROID NDF=(NDF) INIT=[ (X&','&Y)] XCEN=(XC) YCEN=(YC) ~
@@ -48,7 +48,7 @@ PROC COLSTAR FILE,X,Y,SIZE,OUTFILE
 { Create a new primitive NDF centred on the star.
    NDFCOPY IN=(NDF)((XL):(XU),(YL):(YU)) OUT=(NDFOUT)
 
-{ Draw a perspective histogram around the star on the current 
+{ Draw a perspective histogram around the star on the current
 { graphics device.
    COLUMNAR IN=(NDFOUT)
 

@@ -1,5 +1,5 @@
-#!/bin/sh 
-#!/bin/sh    
+#!/bin/sh
+#!/bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
 exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #+
@@ -13,7 +13,7 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      localserver [port]
 #
 #   Description:
-#      This script is a template for writing local servers that 
+#      This script is a template for writing local servers that
 #      can deal with a catalogue query from GAIA. You may find
 #      this method is useful when faced with a large catalogue that is
 #      to big to just display in GAIA as a local catalogue and the
@@ -21,7 +21,7 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      available to you.
 #
 #      To use this, edit it as appropriate, then run the script in the
-#      background with a suitable user socket. This will edit your 
+#      background with a suitable user socket. This will edit your
 #      your local ~/.skycat/skycat.cfg file to reference it:
 #
 #         serv_type:      catalog
@@ -78,7 +78,7 @@ proc edit_config_file { port } {
             set located 1
          }
       }
-      close $iostream 
+      close $iostream
    } else {
       #  Copy the default file into place.
       if { ! [file exists $env(HOME)/.skycat] } {
@@ -108,7 +108,7 @@ proc server_handler {sock} {
 
    #  Get the client message.
    set message [gets $sock]
-   
+
    #  If client detaches then close the socket.
    if {[eof $sock]} {
       close $sock
@@ -126,23 +126,23 @@ proc accept {sock addr port} {
 
    # Setup handler for future communication on client socket
    fileevent $sock readable [list server_handler $sock]
-   
+
    # Note we've accepted a connection.
    puts "Accept from [fconfigure $sock -peername]"
-   
+
    # Read client input in lines, disable blocking I/O
    fconfigure $sock -buffering line -blocking 0
-   
+
    # Send Acceptance string to client
    puts $sock "$addr:$port, You are connected to the echo server."
    puts $sock "It is now [exec date]"
-   
+
    # log the connection
    puts "Accepted connection from $addr at [exec date]"
 }
 
 #=====================================================================
-#  Procedure to create a server socket. 
+#  Procedure to create a server socket.
 proc start_server { port } {
    socket -server accept $port
 
@@ -175,7 +175,7 @@ proc process_request {sock message} {
          close $sock
       }
    }
-   
+
 }
 
 #=====================================================================
@@ -205,15 +205,15 @@ proc process_catalogue {sock ra dec rad} {
       #puts $sock "ra	dec	emaj	emin	eang	designation	j_m	jmsig	jscom	h_m	hmsig	hscom	k_m	kmsig	kscom	rdf	blfl	ccfl	extd	m	idop	bmopt	rmopt	diopt	phio	nopt	date	hemi	scan	id	glon	glat	jpsfch	hpsfch	kpsfch	j_mstd	jsstd	h_mstd	hsstd	k_mstd	ksstd	ndetfl	j_h	h_k	j_k"
       puts $sock "ra	dec"
       puts $sock "--"
-      set io [open "2mass.tbl" r] 
+      set io [open "2mass.tbl" r]
       set i 0
-      while {[gets $io line] > -1 } { 
-         lappend $line thisra thisdec 
+      while {[gets $io line] > -1 } {
+         lappend $line thisra thisdec
          set thisra [lindex $line 0]
          set thisdec [lindex $line 1]
          puts $sock "$thisra\t $thisdec"
-         incr i 
-         #if { $i > 1000 } { 
+         incr i
+         #if { $i > 1000 } {
          #   break;
          #}
       }

@@ -19,8 +19,8 @@
 *    Global constants :
 
 	INCLUDE 'SAE_PAR'
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -100,7 +100,7 @@
 	      CALL MSG_OUT( 'MESS',
      :         'Images are ^NX by ^NY pixels in size', STATUS )
 
-*            get the start and end of the area of image cs pattern to be 
+*            get the start and end of the area of image cs pattern to be
 *            considered
               CALL AIF_GET0I( 'XSTART', 1, 1, DIMSP( 1), XST, STATUS )
               CALL AIF_GET0I( 'YSTART', 1, 1, DIMSP( 2), YST, STATUS )
@@ -110,13 +110,13 @@
 	      IF( YEN .GT. DIMSP( 2)) YEN = DIMSP( 2)
 
 *            get the start and end of the area centre to be considered
-              CALL AIF_GET0I( 'AXSTART', 1, 1, DIMSP( 1), AXST, 
+              CALL AIF_GET0I( 'AXSTART', 1, 1, DIMSP( 1), AXST,
      :                         STATUS )
-              CALL AIF_GET0I( 'AYSTART', 1, 1, DIMSP( 2), AYST, 
+              CALL AIF_GET0I( 'AYSTART', 1, 1, DIMSP( 2), AYST,
      :                         STATUS )
-              CALL AIF_GET0I( 'AXEND', MAXPIX, 1, MAXPIX, AXEN, 
+              CALL AIF_GET0I( 'AXEND', MAXPIX, 1, MAXPIX, AXEN,
      :                         STATUS )
-              CALL AIF_GET0I( 'AYEND', MAXPIX, 1, MAXPIX, AYEN, 
+              CALL AIF_GET0I( 'AYEND', MAXPIX, 1, MAXPIX, AYEN,
      :                         STATUS )
 	      IF( AXEN .GT. DIMSP( 1)) AXEN = DIMSP( 1)
 	      IF( AYEN .GT. DIMSP( 2)) AYEN = DIMSP( 2)
@@ -131,7 +131,7 @@
 	      IF( STATUS .EQ. SAI__OK) THEN
 
 *              create output image
-	        CALL CREOUT( 'OUTPIC', 'OTITLE', NDIM, DIMSP, LOCOT, 
+	        CALL CREOUT( 'OUTPIC', 'OTITLE', NDIM, DIMSP, LOCOT,
      :	                     STATUS )
 
 *              map output image
@@ -142,10 +142,10 @@
 	        IF( STATUS .EQ. SAI__OK) THEN
 
 *                call subroutine to do work
-	          CALL CSFITSUB( DIMSP( 1), DIMSP( 2), %VAL( PNTRIP), 
-     :	                         %VAL( PNTRIT), XST, YST, XEN, YEN, 
-     :	                         AXST, AYST, AXEN, AYEN, POLMIN, 
-     :	                         OUTFILE,%VAL( PNTROT), RESIDUAL, 
+	          CALL CSFITSUB( DIMSP( 1), DIMSP( 2), %VAL( PNTRIP),
+     :	                         %VAL( PNTRIT), XST, YST, XEN, YEN,
+     :	                         AXST, AYST, AXEN, AYEN, POLMIN,
+     :	                         OUTFILE,%VAL( PNTROT), RESIDUAL,
      :                           XRES, YRES, STATUS)
 
 *                tell user the bad news
@@ -155,19 +155,19 @@
 	          CALL MSG_SETI( 'XE', XEN)
 	          CALL MSG_SETI( 'YE', YEN)
 	          CALL MSG_OUT( 'MESS',
-     :	            'Area of vector map fitted = ^XS,^YS to ^XE,^YE', 
+     :	            'Area of vector map fitted = ^XS,^YS to ^XE,^YE',
      :	            STATUS)
 	          CALL MSG_SETI( 'AXS', AXST)
 	          CALL MSG_SETI( 'AYS', AYST)
 	          CALL MSG_SETI( 'AXE', AXEN)
 	          CALL MSG_SETI( 'AYE', AYEN)
 	          CALL MSG_OUT( 'MESS',
-     :	          'Area considered as center = ^AXS,^AYS to ^AXE,^AYE', 
+     :	          'Area considered as center = ^AXS,^AYS to ^AXE,^AYE',
      :	            STATUS)
 	          CALL MSG_SETI( 'XP', XRES)
 	          CALL MSG_SETI( 'YP', YRES)
 	          CALL MSG_OUT( 'MESS',
-     :	          'Least-squares fit suggests centre pixel = ^XP,^YP' , 
+     :	          'Least-squares fit suggests centre pixel = ^XP,^YP' ,
      :	            STATUS)
 	          CALL MSG_SETR( 'RE', RESIDUAL)
 	          CALL MSG_OUT( 'MESS',
@@ -199,7 +199,7 @@
 	    END IF
 	  END IF
 
-*        tidy up structure 
+*        tidy up structure
 	  CALL NDF_ANNUL(  LOCIP, STATUS )
 	  CALL NDF_ANNUL(  LOCIT, STATUS )
 

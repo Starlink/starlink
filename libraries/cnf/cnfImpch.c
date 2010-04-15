@@ -39,7 +39,7 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 *     No check is made that there is sufficient space allocated to
 *     the C array to hold the FORTRAN string.
 *     It is the responsibility of the programmer to check this.
- 
+
 *  Copyright:
 *     Copyright (C) 1996 Council for the Central Laboratory of the Research
 *     Councils
@@ -49,12 +49,12 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,8 +74,8 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 *     24-SEP-1998 (AJC):
 *        Specify const char * for input strings
 *     19-JUL-2004 (PWD):
-*        Changed to use memmove when bcopy isn't available. Also to 
-*        just do the straight copy when neither is available (very unlikely). 
+*        Changed to use memmove when bcopy isn't available. Also to
+*        just do the straight copy when neither is available (very unlikely).
 *        Note that bcopy is deprecated in POSIX.
 *     19-SEP-2005 (TIMJ):
 *        Prefer memmove over bcopy.

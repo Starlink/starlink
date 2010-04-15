@@ -8,8 +8,8 @@ C  Function:
 C     Records the max and min values for an array in a structure.
 C
 C  Description:
-C     Records the maximum and minimum values for the main data array 
-C     in a structure associated with a specific reference name.  Note 
+C     Records the maximum and minimum values for the main data array
+C     in a structure associated with a specific reference name.  Note
 C     that this will only work if the structure is indeed a structure,
 C     and not just a primitive array.  Normally, if the data array in
 C     a structure is mapped for write or update, then any range data
@@ -41,12 +41,12 @@ C     (>) VMAX         (Real,ref) The maximum data value in the array.
 C     (!) STATUS       (Integer,ref) Status code.  If bad status is
 C                      passed, this routine returns immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only those used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
 C     DSA_REF_SLOT, DSA_WRUSER, DSA_WRNAME, DSA__CREATE_DATA_EXTRA,
-C     DSA__RANGE_STRUCT_NAME, DTA_ERROR, DTA_WRVARI, DTA_RDVARI, 
+C     DSA__RANGE_STRUCT_NAME, DTA_ERROR, DTA_WRVARI, DTA_RDVARI,
 C     DTA_RDVARF, DTA_WRVARF, ICH_LEN
 C
 C  Prior requirements:
@@ -58,7 +58,7 @@ C
 C  Version date: 29th August 1992
 C-
 C  Common variable details:
-C     (<) RANGE_UPDATE  (Logical array) Indicates that the data range values 
+C     (<) RANGE_UPDATE  (Logical array) Indicates that the data range values
 C                       have been updated.
 C
 C  Subroutine / function details:
@@ -120,8 +120,8 @@ C
       INTEGER   LENGTH                      ! Length of range structure name
       REAL      MAXVAL                      ! Existing max value
       REAL      MINVAL                      ! Existing min value
-      CHARACTER OBJ_NAME*80                 ! DTA_ name for range structure 
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      CHARACTER OBJ_NAME*80                 ! DTA_ name for range structure
+      INTEGER   REF_SLOT                    ! Reference table slot #
       LOGICAL   RETRY                       ! Loop control variable
       INTEGER   VALID                       ! Value of valid flag
 C
@@ -164,7 +164,7 @@ C
          ELSE
 C
 C           It didn't work, so - if this is the first time through -
-C           we assume this might be because the structure doesn't exist, 
+C           we assume this might be because the structure doesn't exist,
 C           and we try to create it.  Note the assumption that the
 C           range sub-structure is part of the `extra' information.
 C

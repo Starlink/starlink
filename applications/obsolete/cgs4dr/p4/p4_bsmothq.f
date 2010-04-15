@@ -1,6 +1,6 @@
 *+  P4_BSMOTHQ - Smooth a 1-D REAL array with a simple moving box filter.
       SUBROUTINE P4_BSMOTHQ( NELM, INPUT, INQUAL, BOXSIZE, OUTPUT,
-     :  OUTQUAL, QUALITY, FLAGGED, FBAD, STATUS ) 
+     :  OUTQUAL, QUALITY, FLAGGED, FBAD, STATUS )
 *    Description :
 *     This routine smooths a 1-D REAL array with a moving box filter
 *     with the given box size. The filter uses a very simple top-hat
@@ -8,8 +8,8 @@
 *     the input array are ignored. The output array will contain a bad
 *     value whenever a smoothed value cannot be calculated.
 *    Invocation :
-*      CALL P4_BSMOTHQ( NELM, INPUT, INQUAL, BOXSIZE, OUTPUT, 
-*     :  OUTQUAL, QUALITY, FLAGGED, FBAD, STATUS ) 
+*      CALL P4_BSMOTHQ( NELM, INPUT, INQUAL, BOXSIZE, OUTPUT,
+*     :  OUTQUAL, QUALITY, FLAGGED, FBAD, STATUS )
 *    Parameters :
 *     NELM                 = INTEGER( READ )
 *        The dimension of the array.
@@ -109,7 +109,7 @@
 
 *      Initialise the half box size. (Note this is integer arithmetic,
 *      so the value will be rounded down. 2/2=1 and 3/2=1). Ensure that
-*      BOX is always less than NELM/4. Reset BOXSIZE to the actual size 
+*      BOX is always less than NELM/4. Reset BOXSIZE to the actual size
 *      used.
 
          BOX2 = MIN( NELM/4, BOXSIZE/2 )

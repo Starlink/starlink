@@ -58,7 +58,7 @@ int    *kyo;		/* o: Screen Y position at b.l.h. of image pixel */
       ya = 1.0 + (float) DSZM * (y-(float) DSZPY);
 
       *kxo = (int) xa;
-      *kyo = (int) ya; 
+      *kyo = (int) ya;
 
 
 /*
@@ -106,7 +106,7 @@ int   *kyo;		/* o: Image Y position */
       ya = (float) DSNYS + ( y - (float) DSIYS ) * (float) DSCOMFY ;
 
       *kxo = (int) xa;
-      *kyo = (int) ya; 
+      *kyo = (int) ya;
 
 
 /*

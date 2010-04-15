@@ -13,7 +13,7 @@ C     returns the DTA system name of the axis data array for the
 C     specified axis, should it contain one.  Whether or not the array
 C     actually exists is not the province of this routine, which is just
 C     a repository of naming information, although if there are alternative
-C     locations for arrays it may have to look at the structure to see 
+C     locations for arrays it may have to look at the structure to see
 C     which should be used.
 C
 C  Language:
@@ -48,7 +48,7 @@ C  Version date: 13th February 1995
 C-
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C
 C  History:
@@ -102,7 +102,7 @@ C        that first.
 C
          NAME=OBJ_NAMES(REF_SLOT)(:OBJ_LEN(REF_SLOT))//'.AXIS['//
      :               CHAR(AXIS+ICHAR('0'))//'].MORE.FIGARO.DATA_ARRAY'
-         LENGTH=OBJ_LEN(REF_SLOT)+31       
+         LENGTH=OBJ_LEN(REF_SLOT)+31
          CALL DTA_TYVAR (NAME(:LENGTH),TYPE,DTA_STATUS)
          IF (DTA_STATUS.NE.0) THEN
 C

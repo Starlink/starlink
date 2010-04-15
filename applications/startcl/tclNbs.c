@@ -29,7 +29,7 @@ static void tclnbs_get(char*, Tcl_Interp*, int*);
 static void tclnbs_getnbs(Tcl_Interp*, int, char*, Tcl_DString*, int*);
 static void tclnbs_mapnbs(char*, int*, int*, int*);
 static void tclnbs_put(char*, char*, Tcl_Interp*, int*);
-static void tclnbs_info(char*, Tcl_Interp*, int*); 
+static void tclnbs_info(char*, Tcl_Interp*, int*);
 static void tclnbs_putnbs(Tcl_Interp*, int, char*, char*, int*);
 
 /*   structure for details of each nbs item to be monitored */
@@ -54,7 +54,7 @@ typedef struct timer_struct {
                             } timer_struct;
 
 static void tclnbs_monitor(char*, char*, Tcl_Interp*, int*);
-static void tclnbs_moninfo(Tcl_Interp*, int*); 
+static void tclnbs_moninfo(Tcl_Interp*, int*);
 static void tclnbs_clear(Tcl_Interp*);
 static void tclnbs_scan(ClientData);
 static void tclnbs_start(char*, Tcl_Interp*, timer_struct*, int*);
@@ -72,7 +72,7 @@ Tcl_Interp *interp
 )
 
 /*   Method :
-      Define the nbs command. 
+      Define the nbs command.
      Author :
       B.D.Kelly (ROE)
       D.L.Terrett (RAL)
@@ -114,7 +114,7 @@ char *argv[]
            put the given string into the NBS item
         nbs monitor <nbs_name> <tcl_name>
            add to the list of NBS items being monitored
-        nbs monitor 
+        nbs monitor
            return a list of NBS items being monitored
         nbs clear
            empty the list of items being monitored
@@ -222,7 +222,7 @@ char *argv[]
       {
          if ( argc == 3 )
          {
-            tclnbs_start ( argv[2], interp, (timer_struct*)clientData, 
+            tclnbs_start ( argv[2], interp, (timer_struct*)clientData,
                &tcl_status );
          }
          else
@@ -245,10 +245,10 @@ char *argv[]
             tcl_status = TCL_ERROR;
          }
       }
-      else 
+      else
       {
          Tcl_AppendResult(interp, "bad option \"", argv[1],
-            "\":  should be put, get, monitor, start, stop or info", 
+            "\":  should be put, get, monitor, start, stop or info",
             (char *) NULL);
          tcl_status = TCL_ERROR;
       }
@@ -262,8 +262,8 @@ char *argv[]
 
 /*=  TKNBS_FINDNBS - find an item in a noticeboard */
 
-static void tclnbs_findnbs 
-( 
+static void tclnbs_findnbs
+(
 char *nbs_name,       /* full name of item (given) */
 int nbs_topid,        /* noticeboard id (given) */
 int *nbs_id,          /* nbs id of the item (returned) */
@@ -333,7 +333,7 @@ int *status           /* global status (given and returned) */
 /*=   TKNBS_GET - copy data from NBS to tcl string */
 
 static void tclnbs_get
-( 
+(
 char *nbsitem,          /* full name of NBS item (given) */
 Tcl_Interp *interp,     /* pointer to interpreter structure (given) */
 int *tcl_status         /* global status (given and returned) */
@@ -395,7 +395,7 @@ int *tcl_status         /* global status (given and returned) */
          }
          else
          {
-            Tcl_AppendResult(interp, 
+            Tcl_AppendResult(interp,
                "cannot get value of structured nbs item \"", nbsitem, "\"",
                (char *) NULL);
             *tcl_status = TCL_ERROR;
@@ -420,8 +420,8 @@ int *tcl_status         /* global status (given and returned) */
 
 /*=  TKNBS_GETNBS - get a value from NBS */
 
-static void tclnbs_getnbs 
-( 
+static void tclnbs_getnbs
+(
 Tcl_Interp *interp,      /* tcl interpreter */
 int nbs_id,              /* nbs item identifier (given) */
 char *nbs_type,          /* type of nbs item (given) */
@@ -503,7 +503,7 @@ int *status              /* global status (given and returned) */
    else
    {
       Tcl_DStringSetLength(tcl_value, actbytes);
-      nbc_get_value ( nbs_id, 0, actbytes, Tcl_DStringValue(tcl_value), 
+      nbc_get_value ( nbs_id, 0, actbytes, Tcl_DStringValue(tcl_value),
          &actbytes, status );
       Tcl_DStringSetLength(tcl_value, actbytes);
    }
@@ -512,8 +512,8 @@ int *status              /* global status (given and returned) */
 
 /*=  TKNBS_MAPNBS - map a noticeboard */
 
-static void tclnbs_mapnbs 
-( 
+static void tclnbs_mapnbs
+(
 char *nbs_name,        /* full name of noticeboard item (given) */
 int *nbs_topid,        /* noticeboard id (returned) */
 int *nbs_mapped,       /* flag indicating noticeboard is mapped
@@ -607,8 +607,8 @@ int *status            /* global status (given and returned) */
 
 /*=   TKNBS_PUT - copy data into NBS */
 
-static void tclnbs_put 
-( 
+static void tclnbs_put
+(
 char *nbsitem,          /* full name of NBS item (given) */
 char *value,            /* value to be put (given) */
 Tcl_Interp *interp,     /* pointer to interpreter structure (given) */
@@ -658,15 +658,15 @@ int *tcl_status         /* global status (given and returned) */
             tclnbs_putnbs ( interp, nbsid, nbstype, value, &status );
             if ( status != TCL_OK )
             {
-               Tcl_AppendResult(interp, "\n failed to put nbs item \"", 
+               Tcl_AppendResult(interp, "\n failed to put nbs item \"",
                    nbsitem, "\"", (char *) NULL);
                *tcl_status = TCL_ERROR;
             }
          }
          else
          {
-            Tcl_AppendResult(interp, 
-               "cannot put value of structured nbs item ", nbsitem, 
+            Tcl_AppendResult(interp,
+               "cannot put value of structured nbs item ", nbsitem,
                (char *) NULL);
             *tcl_status = TCL_ERROR;
          }
@@ -690,8 +690,8 @@ int *tcl_status         /* global status (given and returned) */
 
 /*=  TKNBS_PUTNBS - put a value into NBS */
 
-static void tclnbs_putnbs 
-( 
+static void tclnbs_putnbs
+(
 Tcl_Interp *interp,      /* interpreter structure (given and returned) */
 int nbs_id,              /* nbs item identifier (given) */
 char *nbs_type,          /* type of nbs item (given) */
@@ -735,7 +735,7 @@ int *status              /* global status (given and returned) */
       if (strlen(tcl_value) > maxbytes)
       {
          sprintf(cint, "%d", maxbytes);
-         Tcl_AppendResult( interp, "string \"", tcl_value, 
+         Tcl_AppendResult( interp, "string \"", tcl_value,
             "\" is longer than nbs item: should be ", cint, (char *)NULL);
          *status = TCL_ERROR;
       }
@@ -847,7 +847,7 @@ int *status              /* global status (given and returned) */
       if (strlen(tcl_value) != actbytes)
       {
          sprintf(cint, "%d", actbytes);
-         Tcl_AppendResult( interp, "length of string \"", tcl_value, 
+         Tcl_AppendResult( interp, "length of string \"", tcl_value,
             "\" is does not match nbs item: should be ",cint, (char *)NULL);
          *status = TCL_ERROR;
       }
@@ -860,8 +860,8 @@ int *status              /* global status (given and returned) */
 
 /*=   TKNBS_INFO - get info on nbs item */
 
-static void tclnbs_info 
-( 
+static void tclnbs_info
+(
 char *nbsitem,          /* full name of NBS item (given) */
 Tcl_Interp *interp,     /* pointer to interpreter structure (given) */
 int *tcl_status         /* global status (given and returned) */
@@ -915,7 +915,7 @@ int *tcl_status         /* global status (given and returned) */
       }
       else
       {
-         tclnbs_findnbs ( nbsitem, topid, &nbsid, &prim, nbstype, &found, 
+         tclnbs_findnbs ( nbsitem, topid, &nbsid, &prim, nbstype, &found,
            &status );
       }
       if ( found == 1 )
@@ -939,7 +939,7 @@ int *tcl_status         /* global status (given and returned) */
             {
                 nbc_find_nth_item(nbsid, i, &childid, &status);
                 nbc_get_name(childid, name, &status);
-                if (status == TCL_OK) 
+                if (status == TCL_OK)
                 {
                    Tcl_ScanElement(name, &flags);
                    Tcl_ConvertElement(name, expname, flags);
@@ -955,7 +955,7 @@ int *tcl_status         /* global status (given and returned) */
             dims = NULL;
             nbc_get_size(nbsid, &maxbytes, &actbytes, &status);
             nbc_get_shape(nbsid, &maxdims, dims, &actdims, &status);
-            if (status == TCL_OK) 
+            if (status == TCL_OK)
             {
                if (actdims > 0)
                {
@@ -964,7 +964,7 @@ int *tcl_status         /* global status (given and returned) */
                   nbc_get_shape(nbsid, &maxdims, dims, &actdims, &status);
                }
             }
-            if (status == TCL_OK) 
+            if (status == TCL_OK)
             {
                if ( ( strcmp ( nbstype, "_INTEGER" ) == 0 ) ||
                     ( strcmp ( nbstype, "_LOGICAL" ) == 0 ) ||
@@ -976,7 +976,7 @@ int *tcl_status         /* global status (given and returned) */
                {
                   actbytes = actbytes/8;
                }
-               
+
                Tcl_ScanElement(nbstype, &flags);
                Tcl_ConvertElement(nbstype, expname, flags);
                sprintf(cint, " %d {", actbytes);
@@ -1090,7 +1090,7 @@ int *tcl_status           /* tcl status (returned) */
    }
    else
    {
-      Tcl_AppendResult(interp, 
+      Tcl_AppendResult(interp,
                "monitor can't allocate space for new entry", (char *) NULL);
       *tcl_status = TCL_ERROR;
    }
@@ -1110,7 +1110,7 @@ int *tcl_status           /* tcl status (returned) */
    for ( ; ; )
    {
       if ( ptr == 0 ) break;
-      if ( ptr->nbs_name[0] == '\0' || ptr->interp != interp) 
+      if ( ptr->nbs_name[0] == '\0' || ptr->interp != interp)
       {
          ptr = ptr->next;
          continue;
@@ -1161,7 +1161,7 @@ ClientData clientData   /* tcl clienta data (given) */
    for ( ; ; )
    {
       if ( *ptr == 0 ) break;
-      if ( (*ptr)->interp != timer->interp) 
+      if ( (*ptr)->interp != timer->interp)
       {
          ptr = &((*ptr)->next);
          continue;
@@ -1182,7 +1182,7 @@ ClientData clientData   /* tcl clienta data (given) */
       {
          if ( (*ptr)->nbs_found == 0 )
          {
-            tclnbs_findnbs ( (*ptr)->nbs_name, (*ptr)->nbs_topid, 
+            tclnbs_findnbs ( (*ptr)->nbs_name, (*ptr)->nbs_topid,
               &((*ptr)->nbs_id), &prim, (*ptr)->nbs_type, &((*ptr)->nbs_found),
               &status );
             updated = 1;
@@ -1201,13 +1201,13 @@ ClientData clientData   /* tcl clienta data (given) */
             if (updated)
             {
                Tcl_DStringInit( &tempval );
-               tclnbs_getnbs ( timer->interp, (*ptr)->nbs_id, (*ptr)->nbs_type, 
+               tclnbs_getnbs ( timer->interp, (*ptr)->nbs_id, (*ptr)->nbs_type,
                   &tempval, &status );
-               if (status == TCL_OK) 
+               if (status == TCL_OK)
                {
-                  c = Tcl_SetVar ( timer->interp, 
-                    Tcl_DStringValue(&((*ptr)->tcl_name)), 
-                    Tcl_DStringValue(&tempval), 
+                  c = Tcl_SetVar ( timer->interp,
+                    Tcl_DStringValue(&((*ptr)->tcl_name)),
+                    Tcl_DStringValue(&tempval),
                        TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG );
                   if (c == 0)
                   {
@@ -1293,20 +1293,20 @@ int *tcl_status           /* tcl status (returned) */
          }
          timer->milliseconds = msec;
          timer->interp = interp;
-         timer->timertoken = Tcl_CreateTimerHandler ( timer->milliseconds, 
+         timer->timertoken = Tcl_CreateTimerHandler ( timer->milliseconds,
            tclnbs_scan, (ClientData)timer );
          timer->timer_set = 1;
       }
       else
       {
-         Tcl_AppendResult(interp, 
+         Tcl_AppendResult(interp,
             "invalid monitoring interval requested", (char *) NULL);
          *tcl_status = TCL_ERROR;
       }
     }
    else
    {
-      Tcl_AppendResult(interp, 
+      Tcl_AppendResult(interp,
          "invalid monitoring interval requested", (char *) NULL);
    }
 

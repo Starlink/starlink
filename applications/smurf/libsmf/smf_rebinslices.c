@@ -24,7 +24,7 @@
 
 *  Description:
 *     This function uses astRebinSeq to paste all time slices in the
-*     current input NDF into the output image, using a simple regridding 
+*     current input NDF into the output image, using a simple regridding
 *     of data. This routine is designed to be used with the smf_add_job
 *     routine.
 
@@ -152,14 +152,14 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    for( islice = 0; islice < nslice; islice++, boldata += nbol ) {
 
 /* Calculate the bolometer to map-pixel transformation for this tslice */
-      bolo2map = smf_rebin_totmap( data, islice, abskyfrm, sky2map, moving, 
+      bolo2map = smf_rebin_totmap( data, islice, abskyfrm, sky2map, moving,
                                    status );
       /* skip if we did not get a mapping this time round */
       if (*status == SAI__OK && !bolo2map) continue;
 
 /* Rebin this time slice */
       astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, boldata,
-                    bolovar, spread, params, rebinflags, 0.1, 1000000, 
+                    bolovar, spread, params, rebinflags, 0.1, 1000000,
                     VAL__BADD, 2, ldim, udim, lbnd_in, ubnd_in,
                     map, variance, weights, nused );
 

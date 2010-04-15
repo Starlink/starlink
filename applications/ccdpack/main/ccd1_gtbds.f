@@ -133,7 +133,7 @@
       INTEGER  I                 ! Loop variable
       INTEGER  J                 ! Loop variable
       INTEGER IBUFF              ! Integer buffer
-      INTEGER LOWER( 2 )         ! Lower bounds     
+      INTEGER LOWER( 2 )         ! Lower bounds
       INTEGER UPPER( 2 )         ! Upper bounds
       LOGICAL OK                 ! Got value ok
 
@@ -164,7 +164,7 @@
                NBOUND = 4
                BOUNDS( 3 ) = UPPER( 1 )
                BOUNDS( 4 ) = UPPER( 2 )
-            ELSE 
+            ELSE
 
 *  Second lot not present, but first are, so that's OK.
                OK = .TRUE.
@@ -173,7 +173,7 @@
       END IF
 
 *  If we havn't gotten a set of bounds by now prompt the user.
-      IF ( .NOT. OK ) THEN 
+      IF ( .NOT. OK ) THEN
 
 *  Values not from extension.
          FRMEXT = .FALSE.

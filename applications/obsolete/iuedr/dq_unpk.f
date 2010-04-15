@@ -43,19 +43,19 @@
 
 *   Import:
       INTEGER DQ             ! coded data quality value
- 
+
 *   Export:
       INTEGER NBIT           ! number of bits to be coded
       INTEGER BITS(NBIT)     ! array containing bit values
- 
+
 *   Local variables:
       LOGICAL FIRST          ! switch for local initialisation
- 
+
       INTEGER BASE(MAXBIT)   ! array of binary bit masks
       INTEGER IBIT           ! bit index
       INTEGER Q              ! temporary residual data quality
       SAVE FIRST, BASE
- 
+
 *   Initialisations:
       DATA FIRST/ .TRUE./
 

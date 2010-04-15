@@ -1,6 +1,6 @@
 #!/bin/csh
 
-# The Starlink CONVERT package is setup for use,  so unalias the 
+# The Starlink CONVERT package is setup for use,  so unalias the
 # "convert" command
 
 unalias convert

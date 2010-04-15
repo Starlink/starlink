@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1988
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -126,13 +126,13 @@ C# IL>=a, OL>=0
 *     entirely outside the clipping rectangle are not sent.
 *---------------------------------------------------------------------
 *
- 
+
 * Extract total clip rectangle using W/S ID from Comms Area:
       RECT(1)=QWCLXL(KWKIX)
       RECT(2)=QWCLXR(KWKIX)
       RECT(3)=QWCLYB(KWKIX)
       RECT(4)=QWCLYT(KWKIX)
- 
+
 *   acquire space for Polygon Set
       CALL GKSTAL(KREALS,NRD+1,IETVXB)
       IF (KERROR.NE.0) GOTO 999
@@ -141,7 +141,7 @@ C# IL>=a, OL>=0
       MPOLY = NRD/3
       CALL GKSTAL(KINTGS,MPOLY+1,IPOLYB)
       IF(KERROR .NE. 0) GOTO 977
- 
+
 *   convert from WC
       CALL GKTWD (NRD,RX,RY,QSTACK(IETVXB),QSTACK(IETVYB))
 *
@@ -174,8 +174,8 @@ C# IL>=a, OL>=0
          NV = NRD
       ENDIF
       KWFAIS(KWKIX) = IFAIS
- 
- 
+
+
 *     Get stack space for rest of edge table
       CALL GKSTAL(KREALS,NV,IETTXB)
       IF (KERROR.NE.0) GOTO 966
@@ -185,23 +185,23 @@ C# IL>=a, OL>=0
       IF (KERROR.NE.0) GOTO 944
       CALL GKSTAL(KINTGS,NV+1,IETNXB)
       IF (KERROR.NE.0) GOTO 933
- 
+
 *     Convert Polygon Ends for use by GKTZME
       ISTART = KSTACK(IPOLYB)
       DO 20 I=0,NPOLY
          KSTACK(IPOLYB+I) = KSTACK(IPOLYB+I)-ISTART
   20  CONTINUE
- 
+
 *     Make Edge Table
       CALL GKTZME(NV,QSTACK(IETVXB+ISTART-1),QSTACK(IETVYB+ISTART-1),
      :            NPOLY,KSTACK(IPOLYB+1),
      :            IETLOW,QSTACK(IETTXB),KSTACK(IETTYB),
      :            KSTACK(IETBB),KSTACK(IETNXB))
- 
+
 *     Acquire space for the trapezoids
       CALL GKSTAL(KREALS,6*NTZ,ITZB)
       IF(KERROR.NE.0) GOTO 922
- 
+
 *     Set variables prior to do loop
       ITZ = 0
       TOLUSE = (YTOL .GT. QTOL)
@@ -232,7 +232,7 @@ C# IL>=a, OL>=0
                YLTZ = QSTACK(ITZB+6*ITZ+4)
             ENDIF
          ENDIF
- 
+
 *
          IF(FOUND)THEN
 *          A trapezoid was found in the edge table.
@@ -264,7 +264,7 @@ C# IL>=a, OL>=0
    41 CONTINUE
 *     Send any remaining trapezoids
       IF(ITZ .NE. 0) CALL TRASUB (ITZ,NTZ,QSTACK(ITZB))
- 
+
 * Release Workspace
   900 CALL GKSTDA(KREALS,ITZB)
   922 CALL GKSTDA(KINTGS,IETNXB)
@@ -275,5 +275,5 @@ C# IL>=a, OL>=0
   977 CALL GKSTDA(KREALS,IETVYB)
   988 CALL GKSTDA(KREALS,IETVXB)
   999 CONTINUE
- 
+
       END

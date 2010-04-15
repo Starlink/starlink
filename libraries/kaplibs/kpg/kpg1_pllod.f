@@ -13,19 +13,19 @@
 *     CALL KPG1_PLLOD( STATUS )
 
 *  Description:
-*     This routine loads the colour palette for the currently open graphics 
-*     device from an HDS container file in the users ADAM directory. The 
-*     file is called "kappa.palette.sdf" and contains a palette for 
+*     This routine loads the colour palette for the currently open graphics
+*     device from an HDS container file in the users ADAM directory. The
+*     file is called "kappa.palette.sdf" and contains a palette for
 *     different devices. The file should have been created by KPG1_PLSAV.
-*     If the file does not exist, the current colour table is left unchanged. 
+*     If the file does not exist, the current colour table is left unchanged.
 *
 *     Each palette in the file is a _REAL array of shape (3,n) where
 *     n is the number of colours in the palette. The first colour (index 1
-*     in the array) is the background colour and is usually refered to as 
+*     in the array) is the background colour and is usually refered to as
 *     colour index zero. Therefore the highest colour index in the array is
 *     (n-1). Each array has a name which identifies the graphics device
-*     to which it refers. Each array has a name which identifies the 
-*     graphics device to which it refers. 
+*     to which it refers. Each array has a name which identifies the
+*     graphics device to which it refers.
 *
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
 *  Local Variables:
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
-      CHARACTER PLOC*(DAT__SZLOC)! Locator to palette array 
+      CHARACTER PLOC*(DAT__SZLOC)! Locator to palette array
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER NC                 ! Number of characters in the buffer
@@ -98,10 +98,10 @@
       INTEGER CI1                ! Lowest available colour index
       INTEGER CI2                ! Lowest available colour index
       INTEGER PNTR               ! Pointer to mapped array
-  
+
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Construct the name of the HDS container file containing the palette
@@ -141,12 +141,12 @@
 *  ========================================================================
 
 *  Attempt to open the file assuming it exists.
-      CALL HDS_OPEN( PATH( : NC ), 'READ', LOC, STATUS ) 
+      CALL HDS_OPEN( PATH( : NC ), 'READ', LOC, STATUS )
 
 *  If the file was not found, annul the error. The current colour table
 *  is left unchanged.
       IF( STATUS .EQ. DAT__FILNF ) THEN
-         CALL ERR_ANNUL( STATUS )         
+         CALL ERR_ANNUL( STATUS )
 
 *  Otherwise, change the colour table to reflect the palette stored in
 *  the file.
@@ -213,11 +213,11 @@
 *  colour index (the background) is zero, not one.
             CI2 = MIN( CI2, MIN( DIMS( 2 ), CTM__RSVPN ) - 1 )
 
-*  Map the array. 
-            CALL DAT_MAPV( PLOC, '_REAL', 'READ', PNTR, EL, STATUS ) 
+*  Map the array.
+            CALL DAT_MAPV( PLOC, '_REAL', 'READ', PNTR, EL, STATUS )
 
 *  Load the palette into the colour table.
-            CALL KPG1_PLGET( CI1, CI2, %VAL( CNF_PVAL( PNTR ) ), 
+            CALL KPG1_PLGET( CI1, CI2, %VAL( CNF_PVAL( PNTR ) ),
      :                       STATUS )
 
 *  Release the component locator.
@@ -238,7 +238,7 @@
 *  failure to load the colour palette will not in general be fatal.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'KPG1_PLLOD_6', 'Failed to load the current '//
-     :                 'device colour palette. Continuing anyway...', 
+     :                 'device colour palette. Continuing anyway...',
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
       END IF

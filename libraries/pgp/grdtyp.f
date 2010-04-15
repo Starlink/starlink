@@ -11,7 +11,7 @@
 *
 *   Returned:
 *        Function value    i     Device type
-*        
+*
 *   D.L.Terrett  Starlink  Jul 1988
 *+
       IMPLICIT NONE

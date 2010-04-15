@@ -7,7 +7,7 @@ C     Calculates the wavelength limits of an element of the
 C     output wavelength array.
 C
 C     Parameters -   (">" input, "!" modified, "W" workspace, "<" output)
-C 
+C
 C     (>) XOUT      (Double precision array XOUT(NOUT)) The wavelength
 C                   values of the centres of the output elements.
 C                   This routine assumes that the values in XOUT are
@@ -51,7 +51,7 @@ C
             ENOUT=0.5*(3.0*XOUT(NOUT)-XOUT(NOUT-1))
             STOUT=0.5*(XOUT(NOUT)+XOUT(NOUT-1))
          END IF
-      ELSE 
+      ELSE
 C
 C        Normal case is just linear interpolation between
 C        adjacent values.

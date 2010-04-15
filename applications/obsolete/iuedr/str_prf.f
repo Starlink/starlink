@@ -26,23 +26,23 @@
 
 *   Import:
       LOGICAL RIGHT         ! whether right justified
- 
+
       INTEGER FIELD         ! field size
- 
+
       BYTE STR(100)         ! string to be scanned
- 
+
 *   Import/Export:
       BYTE FIRST            ! first character position containing float
- 
+
 *   Export:
       REAL*8 FVALUE           ! float value
- 
+
       INTEGER STATUS        ! status return
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
       INTEGER str_LEN       ! string length
- 
+
 *   Local variables:
       LOGICAL NOESGN        ! no exponent sign yet
       LOGICAL NOEVAL        ! no exponent value yet
@@ -53,7 +53,7 @@
       LOGICAL NOVSGN        ! no value sign yet
 
       BYTE VALUE(256)       ! local copy of the field
- 
+
       INTEGER DIG           ! character index
       INTEGER FUSED         ! position of first used character
       INTEGER LAST          ! last character position in string
@@ -62,10 +62,10 @@
 
 *   Length of string
       LAST = str_LEN(STR)
- 
+
 *   FIELD specified
       IF (FIELD.LE.0) THEN
- 
+
 *      FIELD unspecified means must search for valid format
          NOUSED = .TRUE.
          NOVAL = .TRUE.
@@ -189,7 +189,7 @@
             GO TO 50
 
          END IF
- 
+
 *   Right justified means grab next FIELD characters
       ELSE IF (RIGHT) THEN
 
@@ -205,7 +205,7 @@
             STATUS = -3
 
          END IF
- 
+
 *   Left justified means find first valid character
       ELSE
 
@@ -240,7 +240,7 @@
       END IF
 
  200  CONTINUE
- 
+
 *   Update FIRST based of number of characters used, field size and
 *   justification
       IF (STATUS.EQ.0) THEN

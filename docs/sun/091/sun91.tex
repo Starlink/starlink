@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -27,16 +27,16 @@
 % For file name, explanation of file name, and comments
 \def\tfile#1/#2/#3/.{
 \par\noindent
-\vtop{\hsize=1.2truein \noindent 
-{\tt #1}\hfill \break 
+\vtop{\hsize=1.2truein \noindent
+{\tt #1}\hfill \break
  \vfill}
 \hfill
-\vtop{\hsize=1.8truein \noindent 
-{\em #2} \hfill \break 
+\vtop{\hsize=1.8truein \noindent
+{\em #2} \hfill \break
  \vfill}
 \hfill
-\vtop{\hsize=2.3truein \noindent 
-{#3} \hfill \break 
+\vtop{\hsize=2.3truein \noindent
+{#3} \hfill \break
  \vfill}
 }
 %
@@ -72,7 +72,7 @@ This guide describes the IRAS Calibrated Raw Detector Data, how to access the
 data, and the programs available to process it and examine the results.
 
 The results from the IRAS mission have been processed in several ways to give
-for example the point source catalogue (PSS) and the sky flux plates. In 
+for example the point source catalogue (PSS) and the sky flux plates. In
 general, the processing used to derive these products was somewhat conservative
 in order to achieve a high reliability for the PSS sources and a uniform
 resolution among the bands for sky flux plates. However, if a lower reliability
@@ -89,7 +89,7 @@ of the sampling procedure and the inherent reliability considerations.
 
 However, processing CRDD is not a task to be undertaken lightly. The data is
 voluminous and processing it takes a lot of both the users and the computers'
-time. It is always worthwhile looking at the processed data available to see 
+time. It is always worthwhile looking at the processed data available to see
 whether it is suitable before embarking on CRDD processing.
 
 \section{CRDD data}
@@ -97,9 +97,9 @@ whether it is suitable before embarking on CRDD processing.
 The following provides only a brief introduction to CRDD data, notes on the raw
 data processing can be found in the Explanatory Supplement.
 
-The IRAS mission observations were scheduled in 12 hour periods called 
+The IRAS mission observations were scheduled in 12 hour periods called
 Satellite Operations Plans (SOP's). A SOP consisted of a number of survey scans
-and Additional Observations (AOs). The CRDD data archive consists of the 
+and Additional Observations (AOs). The CRDD data archive consists of the
 results of the survey scans and is the subject of this SUN.
 
 The survey scans covered any particular position on the sky up to 6 times. The
@@ -110,32 +110,32 @@ observations would be made between several weeks to 6 months later.
 
 The data in each scan consists of the samples taken from each detector at each
 waveband. The detectors in a single waveband partly overlap, the processing
-programs enable you to combine overlapping samples correctly. 
+programs enable you to combine overlapping samples correctly.
 
 The CRDD data archive is held as files called plates. Each plate contains all
 the sections of sample scans which cross a region of sky corresponding to the
 region covered by a Palomar Sky Plate. Although the plates overlap by about a
 degree at each edge, some of the big regions of interest will fall over the
-boundaries of a plate. Data can be supplied from two plates but normal 
+boundaries of a plate. Data can be supplied from two plates but normal
 processing may lead to a different background being subtracted from each half.
 
 In estimating whether there is a source at a given position you should bear in
-mind that each point on the sky is crossed typically by 12 detectors in each 
-band. Individual traces may not show any obvious signal but the expected 
-improvement arising from COADDing the individual detector data may give a 
-significant signal. 
+mind that each point on the sky is crossed typically by 12 detectors in each
+band. Individual traces may not show any obvious signal but the expected
+improvement arising from COADDing the individual detector data may give a
+significant signal.
 
 \section {CRDD data availability}
 
 CRDD data archive is held on 6250 bpi tapes at RAL. IPMAF staff at RAL will
-extract this data for you, either to tape, or for a small quantity of data to 
-disk for you to copy. A mail message should be sent to IRASMAIL at RLVAD 
-stating the coordinates of the center of the source, its extent and scan 
-length, and the wavebands required (see details of the I\_SNIP\_CRDD program 
-for the explanation of the data required). At the moment data will be supplied 
-as the output from the I\_SNIP\_CRDD program, but users requiring large areas 
+extract this data for you, either to tape, or for a small quantity of data to
+disk for you to copy. A mail message should be sent to IRASMAIL at RLVAD
+stating the coordinates of the center of the source, its extent and scan
+length, and the wavebands required (see details of the I\_SNIP\_CRDD program
+for the explanation of the data required). At the moment data will be supplied
+as the output from the I\_SNIP\_CRDD program, but users requiring large areas
 may be sent copies of the relevant plates that they can process themselves.
-Please note that supplying CRDD data is a VERY time consuming 
+Please note that supplying CRDD data is a VERY time consuming
 process, an area 2 degrees square will take a morning to process, 5 small
 sources will take a day, and obviously these times will be much increased if
 there is a backlog of work to be done. So please use the system with
@@ -143,7 +143,7 @@ consideration.
 
 \section {Processing CRDD data}
 
-There are two types of processing you may wish to use on CRDD data, either to 
+There are two types of processing you may wish to use on CRDD data, either to
 prepare an image, or to see if there is a significant source at a particular
 position, and measure its flux.
 
@@ -151,7 +151,7 @@ You should be careful to process each waveband separately.
 
 \subsection{CRDD Images}
 
-The processing of CRDD data to make images falls into three stages:- 
+The processing of CRDD data to make images falls into three stages:-
 \begin{itemize}
 \item The extraction of data for the region of interest from the data archive
 tapes.
@@ -162,7 +162,7 @@ tapes.
 \subsubsection{Extracting an image}
 
 Data is extracted from the archive tapes using the I\_SNIP\_CRDD program.
-The output from the program consists of a series of files each of which 
+The output from the program consists of a series of files each of which
 contains the sample data for one scan in one waveband only.
 
 \subsubsection{Forming an image}
@@ -188,7 +188,7 @@ There are five programs to carry out this processing
 I\_DESTRIPE carries out the first stage of the process. The program has to be
 run for each scan file needing destriping.
 
-I\_CRDIMAGE carries out the second stage of the process. The program has to be 
+I\_CRDIMAGE carries out the second stage of the process. The program has to be
 run for each scan file to be made into a subimage.
 
 I\_COMBINE carries out the third stage of the process. The program has to be
@@ -196,7 +196,7 @@ run for each image you want to prepare.
 
 I\_EASYIMAGE is an easier way of carrying out the first two stages. You supply
 it with a list of scan files you want destriped and made into a subimage, and
-the program prepares a complete set of subimage files which you then have to 
+the program prepares a complete set of subimage files which you then have to
 combine into the required images using I\_COMBINE.
 
 I\_CRDD\_COMBINE provides a more refined combination of the
@@ -206,14 +206,14 @@ and I\_COMBINE to produce an image.
 
 \subsubsection{Examining an image}
 
-There are two ways of examining an image. 
+There are two ways of examining an image.
 
-I\_CONTOUR gives you a contour plot, and enables you to measure flux levels 
+I\_CONTOUR gives you a contour plot, and enables you to measure flux levels
 within boxes and at points. You should not use this to obtain point source flux
-measurements because the program does not take into account the effect of edge 
+measurements because the program does not take into account the effect of edge
 detection etc.\ (see Photometry below).
 
-The KAPPA suite of programs gives you the capability of manipulating images, 
+The KAPPA suite of programs gives you the capability of manipulating images,
 but, as yet, it has no facilities to enable you to determine the coordinates of
 a pixel in RA and Dec. It will enable you to display images colored according
 to the intensity of the flux, but it will not enable you to add a 60 micron
@@ -221,20 +221,20 @@ image in red to a 12 micron image in blue as in skyflux plates.
 
 \subsection  {Photometry}
 
-The CRDD data values on tape have to be multiplied by a constant factor to  
-reproduce the published IRAS calibration, the appropriate factor for each band 
-is incorporated in the I\_CRDIMAGE, I\_CRDD\_COMBINE and  I\_COADD programs.   
+The CRDD data values on tape have to be multiplied by a constant factor to
+reproduce the published IRAS calibration, the appropriate factor for each band
+is incorporated in the I\_CRDIMAGE, I\_CRDD\_COMBINE and  I\_COADD programs.
 Total flux densities for sources bigger than 5 arcmins taken from images
-produced by I\_CRDIMAGE (e.g.\ by using the flux integration facilities in 
-I\_CONTOUR) have uncertainties of approx 30\%. For sources smaller than 5 
-arcmins, fluxes estimated by integration are likely to be in error by as much 
-as 50\%, due to undersampling in the cross-scan direction, and the effects of 
-missing or noisy detectors. Point source fluxes should be obtained either from 
+produced by I\_CRDIMAGE (e.g.\ by using the flux integration facilities in
+I\_CONTOUR) have uncertainties of approx 30\%. For sources smaller than 5
+arcmins, fluxes estimated by integration are likely to be in error by as much
+as 50\%, due to undersampling in the cross-scan direction, and the effects of
+missing or noisy detectors. Point source fluxes should be obtained either from
 the point source catalogue, or by using I\_COADD.
 
 \subsection{Evaluating point source fluxes}
 
-There is a program (I\_COADD) developed to determine the fluxes at an assumed 
+There is a program (I\_COADD) developed to determine the fluxes at an assumed
 point source, and to evaluate its statistical significance. The data must
 first be extracted using I\_SNIP\_CRDD.
 
@@ -243,18 +243,18 @@ first be extracted using I\_SNIP\_CRDD.
 \subsection {Image of Cometary Globule CG22}
 
 Figure 1 in the appendix shows 60 micron maps of cometary globule CG22, derived
-from a SKY Plate image. The corresponding one from COMBINE'd CRDD data is shown 
+from a SKY Plate image. The corresponding one from COMBINE'd CRDD data is shown
 in Figure 2. The latter clearly shows superior spatial resolution and the
 effect of removing a local, sloping background.
 
 \subsection {Beware of Spurious Features}
 
-Users should always examine each HCON individually before COMBINEing them  
-together. This procedure will help avoid wrongly interpreting moving sources, 
-glitches and/or detector artifacts as infrared structure. The set of 12 micron  
-maps in figures 3 to 6 show how the asymmetric point spread function apparent  
-on brighter sources, the change in scan direction in HCON3 and the odd moving 
-or variable source can combine into what looks like ``interesting structure" to 
+Users should always examine each HCON individually before COMBINEing them
+together. This procedure will help avoid wrongly interpreting moving sources,
+glitches and/or detector artifacts as infrared structure. The set of 12 micron
+maps in figures 3 to 6 show how the asymmetric point spread function apparent
+on brighter sources, the change in scan direction in HCON3 and the odd moving
+or variable source can combine into what looks like ``interesting structure" to
 the uninitiated.
 
 \section {EDRSX Package}
@@ -266,11 +266,11 @@ converted to EDRS format before using EDRSX programs. Please refer to SUN/23 for
 brief descriptions.
 
 \section {Detailed descriptions of programs}
-                                                                       
+
 
 Detailed descriptions of all the programs except KAPPA follow. The section on
 KAPPA merely describes the type of processing you could do with KAPPA, and how
-to obtain a file which will interface with KAPPA, the full documentation of 
+to obtain a file which will interface with KAPPA, the full documentation of
 KAPPA is in SUN/95.
 
 All programs run in the Starlink Interim environment. Plans are in hand to
@@ -290,9 +290,9 @@ The symbol IRASTART is defined in the Starlink login file SSC:LOGIN.
 
 \subsection {Introduction}
 
-I\_SNIP\_CRDD is a program which retrieves data from IRAS Calibrated Raw 
-Detector Data tapes, and produces .BDF files which may be used by other IRAS 
-programs (e.g.\ EASYIMAGE and I\_COMBINE, I\_DESTRIPE and I\_CRDD\_COMBINE or 
+I\_SNIP\_CRDD is a program which retrieves data from IRAS Calibrated Raw
+Detector Data tapes, and produces .BDF files which may be used by other IRAS
+programs (e.g.\ EASYIMAGE and I\_COMBINE, I\_DESTRIPE and I\_CRDD\_COMBINE or
 I\_COADD) to produce images, or estimated fluxes of IRAS sources.
 
 
@@ -309,19 +309,19 @@ region.
 
 \item The extent and scan length required (in arcmins) for the area required.
 The direction of the survey scans is skewed with respect to the RA and Dec
-axes, and with respect to each other. I\_SNIP\_CRDD refers to the coordinate 
+axes, and with respect to each other. I\_SNIP\_CRDD refers to the coordinate
 system related to the detector array in terms of scan length and extent.
 Unfortunately there is no easy relationship between extent and scan length, and
-R.A. and Dec. Extent and scan length are measured across or along the 
-direction of scan of the detectors and this direction may be at an angle to 
+R.A. and Dec. Extent and scan length are measured across or along the
+direction of scan of the detectors and this direction may be at an angle to
 parallels of R.A. and Dec. The best you can do is to estimate extent as size
 of region in R.A. times a suitable factor (say 1.2). Scan length will have to
-be larger than the extent (usually a minimum of 120 arcmin or 2 x extent, 
+be larger than the extent (usually a minimum of 120 arcmin or 2 x extent,
 whichever is the greater) to find some background level for destriping. A map
 is produced by I\_SNIP\_CRDD so that you can check that the area you require is
 covered.
 
-\item Select the bands that you want. You may select any combination of bands 
+\item Select the bands that you want. You may select any combination of bands
 1,2,3,4. They are entered separated by commas.
 
 
@@ -339,8 +339,8 @@ long time if there are a lot of crossings. Alternatively you can opt to choose
 the crossings you require. The program will print a multicolumn list of
 crossings (with more than one page if necessary) and invite you to choose those
 you require. Crossings from the same HCON are identified by having the same or
-consecutive SOP numbers. You may choose any selection of crossings as long as 
-you obey the format rules: ','  between individual choices, '-'  between a 
+consecutive SOP numbers. You may choose any selection of crossings as long as
+you obey the format rules: ','  between individual choices, '-'  between a
 range of choices.
 
 \end{itemize}
@@ -348,7 +348,7 @@ range of choices.
 \subsection {An example of using I\_SNIP\_CRDD:}
 \begin{verbatim}
     $ I_SNIP_CRDD
-    Input source name - up to 16 characters       
+    Input source name - up to 16 characters
     NAME:=LMC1
     Input source RA in hrsminsecs (eg HHMMSS.S)
     RA:=5000.0
@@ -358,10 +358,10 @@ range of choices.
     EXTENT:=30.0
     Input scan length in arcmins (120.0-300.0)
     SCANLEN:=120.0
-    Input Bands that you want 
+    Input Bands that you want
     BANDS:=2,3
 
-        Name              RA             DEC         Extent    Scan Len.       
+        Name              RA             DEC         Extent    Scan Len.
                      hr  min  sec   deg  min   sec   A/Mins     A/Mins    Bands
     LMC1              0   50  0.0   -73   22   0.0    30.0      120.0      2,3
 
@@ -377,9 +377,9 @@ range of choices.
 If the answer is N the computer will then ask
 
 \begin{verbatim}
-    Which position is plate on tape (eg 1= first plate on tape) 
+    Which position is plate on tape (eg 1= first plate on tape)
     1
-    Which tape drive [XXXX]? 
+    Which tape drive [XXXX]?
     MUA0
 
     Please load tape < tape number > on drive < drive name >
@@ -392,20 +392,20 @@ the device online, and press $<$~RETURN~$>$
 \begin{verbatim}
     %MOUNT-I-MOUNTED, mounted on _ <drive name>
 \end{verbatim}
-If you have selected the choose crossings option they will all be listed 
+If you have selected the choose crossings option they will all be listed
 on the screen, and written to a file XXXXCROSS.LIS (where XXXX is the source
-name).  There may be more than one screen full, in which case you have 
+name).  There may be more than one screen full, in which case you have
 the option of stopping the program and looking at the list of crossings.
 
 \begin{verbatim}
-    There are more crossings - do you want to stop and study 
+    There are more crossings - do you want to stop and study
     the crossings or continue and make a choice.
     CONTINUE? (Y/N):
     ANS:= Y
 \end{verbatim}
 N will stop the program at this point.
-  
-The computer now lists other pages of crossings 
+
+The computer now lists other pages of crossings
 
 \begin{verbatim}
     Enter your choices (default none) for example 1,4,6-9
@@ -423,22 +423,22 @@ output as it processes the data.
 \begin{verbatim}
                I_SNIP_CRDD Version 1.2 released  1-APR-1989
              run on  6-APR-1989    11:00:11.73
-                                                      
-      Source:       LMC1                                           
-      RA:            0 50  0.0      
-      DEC:         -73 22  0.0                                        
+
+      Source:       LMC1
+      RA:            0 50  0.0
+      DEC:         -73 22  0.0
       Extent:        30.0
-      Scan length:  120.0                                             
-      CRDD files generated:                                           
-                          
-        LMC1_         X SCAN POS      UTCS TIME    SOP NO     LENGTH 
+      Scan length:  120.0
+      CRDD files generated:
+
+        LMC1_         X SCAN POS      UTCS TIME    SOP NO     LENGTH
 \end{verbatim}
 \hrule
 \begin{verbatim}
-       B2S2  B3S2        16.2      89299711.857     557        258.0 
-       B2S3  B3S3        21.8      89349168.647     558        258.0 
-       B2S4  B3S4        10.0      89355351.011     559        258.0 
-       B2S5  B3S5        -1.8      89361534.357     559        258.0 
+       B2S2  B3S2        16.2      89299711.857     557        258.0
+       B2S3  B3S3        21.8      89349168.647     558        258.0
+       B2S4  B3S4        10.0      89355351.011     559        258.0
+       B2S5  B3S5        -1.8      89361534.357     559        258.0
          .     .           .              .           .           .
          .     .           .              .           .           .
         etc   etc         etc            etc         etc         etc
@@ -456,25 +456,25 @@ is shorter than the scan length.
 \tfile XXXXXX.LIS/where XXXXXX is the source name/A log of the files
 produced, and source details/.
 
-\tfile XXXX\_BnSm.BDF/where XXXX are the first 4 chars of source name, 
+\tfile XXXX\_BnSm.BDF/where XXXX are the first 4 chars of source name,
 n is the band no, and m is the crossing number/BDF file containing
 CRDD data for a crossing/.
 
-The number of bands and crossings you chose will determine the number of BDF 
+The number of bands and crossings you chose will determine the number of BDF
 files  produced by I\_SNIP\_CRDD. The filenames correspond to the crossings
-chosen and are produced automatically.                
-               
-\tfile XXXXCROSS.LIS/where XXXX are the first 4 chars of the
-source name/Crossing details/. 
+chosen and are produced automatically.
 
-\tfile XXXXMAP.LIS/where XXXX are the first 4 chars of the source name/A crude 
+\tfile XXXXCROSS.LIS/where XXXX are the first 4 chars of the
+source name/Crossing details/.
+
+\tfile XXXXMAP.LIS/where XXXX are the first 4 chars of the source name/A crude
 map of the plate area.\hfill\break
 Shows asterixes for each 5 secs of data found and places them on the plate
 area\hfill\break
 /.
 
 \tfile DUMMYn.BDF/where n is the band no of any bands NOT chosen by you/Empty;
-needed for certain INTERIM routines, not needed by the user and may be 
+needed for certain INTERIM routines, not needed by the user and may be
 deleted when the program ends/.
 
 
@@ -496,13 +496,13 @@ The destriping removes the effects of the detector calibration by calculating,
 for each detector, a suitable constant to be removed from all its data samples.
 The program calculates the median value for each detector scan, and the mean of
 these medians, and thence the constants required for each detector to bring all
-detectors to the same median value. For this to work correctly it is necessary 
-that you give the program a scan in which there is at least as much background 
+detectors to the same median value. For this to work correctly it is necessary
+that you give the program a scan in which there is at least as much background
 as source.
 
-The destriping program also gives you the option of removing either a constant 
-or a constant plus a sloping background. The constant is calculated as the 
-median value of all the data in the scan. If you require the removal of a 
+The destriping program also gives you the option of removing either a constant
+or a constant plus a sloping background. The constant is calculated as the
+median value of all the data in the scan. If you require the removal of a
 sloping background the program will calculate the median for each eighth of the
 scan and calculate the slope and constant from that.
 
@@ -519,7 +519,7 @@ number, and m is the crossing number).
 removed or both constant and slope.
 
 \item A suitable file name for the output data file --- usually this is chosen
-as the input name with the characters \_DS added to it (indicating 
+as the input name with the characters \_DS added to it (indicating
 destriped data).
 \end {itemize}
 
@@ -548,11 +548,11 @@ but we strongly recommend that you should destripe it.
 
 \subsection{The conversion process}
 
-The raw detector data is presented to the program as a series of detector flux 
+The raw detector data is presented to the program as a series of detector flux
 samples. I\_CRDIMAGE takes into account how the detectors
 overlap and, by assuming that flux was gathered evenly over the detector area,
 distributes the flux from each sample over the area of smaller pixels
-corresponding to the detector aperture. Thus I\_CRDIMAGE forms an image by 
+corresponding to the detector aperture. Thus I\_CRDIMAGE forms an image by
 adding together the contributions from each sample of each detector, on a pixel
 grid which is still oriented along the direction of the scan.
 
@@ -561,15 +561,15 @@ grid which is still oriented along the direction of the scan.
 \begin{itemize}
 
 \item The name of the destriped CRDD file from which the image is to be made.
-These will usually have been extracted with I\_SNIP\_CRDD, and destriped with 
-I\_DESTRIPE, and will be of the form XXXX\_BnSm\_DS.BDF (where XXXX 
-is the first 4 characters of the source name, n is the band number, and m is 
+These will usually have been extracted with I\_SNIP\_CRDD, and destriped with
+I\_DESTRIPE, and will be of the form XXXX\_BnSm\_DS.BDF (where XXXX
+is the first 4 characters of the source name, n is the band number, and m is
 the crossing number, and \_DS indicates a destriped file).
 
 \item Select the size of the pixels you require depending
 on the wavelength band you are processing. The recommended minimum pixel sizes
 are :- 12 micron  0.25 arcmin, 25 micron  0.25 arcmin, 60 micron   0.5 arcmin,
-100 micron  1.0 arcmin. These are selected as default.                                 
+100 micron  1.0 arcmin. These are selected as default.
 
 \item Determine whether you wish to process the whole scan length, to reduce
 the scan length will reduce the computing time considerably and the extra
@@ -584,17 +584,17 @@ could be used to indicate an image produced by I\_CRDIMAGE.
 
 \begin {verbatim}
     $ I_CRDIMAGE
-    Name of file containing CRDD data 
-    CRDDF:=     GCAS_B1S1_DS         
-    Size of pixels in output image(arc mins) 
+    Name of file containing CRDD data
+    CRDDF:=     GCAS_B1S1_DS
+    Size of pixels in output image(arc mins)
     PIXSIZE/0.2500000/:= <RETURN>
     Pixel size(arc mins):  0.25 x 0.25
 
-    Length of scan to be processed(arcmin) 
+    Length of scan to be processed(arcmin)
 
-    SCANLEN/120.00000/:=   120                   
-    Name of file to contain output image 
-    IMAGE:=     GCAS_B1S1_IM        
+    SCANLEN/120.00000/:=   120
+    Name of file to contain output image
+    IMAGE:=     GCAS_B1S1_IM
 \end{verbatim}
 \pagebreak
 
@@ -603,23 +603,23 @@ could be used to indicate an image produced by I\_CRDIMAGE.
 \subsection {Introduction}
 
 I\_COMBINE is a program used to combine the sub images from single scans into a
-complete image. The direction of the survey scans is skewed with respect to the 
-RA and Dec axes, and with respect to each other. I\_COMBINE takes images whose 
-pixels are not oriented along the RA and Dec parallels and converts them to a 
-tangential plane centered at the center of the image with Dec on the y axis, 
-and combines them. Near the equator this gives almost RA and Dec oriented 
+complete image. The direction of the survey scans is skewed with respect to the
+RA and Dec axes, and with respect to each other. I\_COMBINE takes images whose
+pixels are not oriented along the RA and Dec parallels and converts them to a
+tangential plane centered at the center of the image with Dec on the y axis,
+and combines them. Near the equator this gives almost RA and Dec oriented
 pixels.
 
-CRDD data is normally first destriped and turned into image format. The result 
+CRDD data is normally first destriped and turned into image format. The result
 of this processing, on a single scan, will be an image oriented along the scan
-direction which is about half a degree wide and a few degrees long. For a 
-typical region of sky there will be 2 or 3 sets of scans (HCONSs). Each HCON 
+direction which is about half a degree wide and a few degrees long. For a
+typical region of sky there will be 2 or 3 sets of scans (HCONSs). Each HCON
 will consist of several half overlapping scans. Usually  I\_COMBINE will be run
 to combine the scans for each HCON into an HCON image.
-These can be compared to assess the reality 
-of a feature. Finally I\_COMBINE may be used to assemble a complete image from 
-these sub images.To obtain the correct weights of the images in producing the 
-overall image, all the desired separate scans should be combined in a single 
+These can be compared to assess the reality
+of a feature. Finally I\_COMBINE may be used to assemble a complete image from
+these sub images.To obtain the correct weights of the images in producing the
+overall image, all the desired separate scans should be combined in a single
 run of the program.
 
 
@@ -628,36 +628,36 @@ run of the program.
 \begin{itemize}
 \item The names of the files containing the data. These will usually have been
 extracted with I\_SNIP\_CRDD, destriped with I\_DESTRIPE, and made into an
-image with I\_CRDIMAGE and will be of the form XXXX\_BnSm\_IM.BDF (where XXXX 
-is the first 4 characters of the source name, n is the band number, and m is 
+image with I\_CRDIMAGE and will be of the form XXXX\_BnSm\_IM.BDF (where XXXX
+is the first 4 characters of the source name, n is the band number, and m is
 the crossing number).
 
 \item You will need to decide whether you want the image to be the maximum size
 available from the size of scans chosen, or whether you want the option of
 choosing the size of the image and its centre.
-     
+
 \item You will need to decide the size of the pixels you require depending
 on the wavelength band you are processing. The recommended pixel sizes are :-
 12 micron  0.25 arcmin, 25 micron  0.25 arcmin, 60 micron   0.5 arcmin,
-100 micron  1.0 arcmin.                                  
+100 micron  1.0 arcmin.
 
-\item A suitable file name for the output data file --- for example 
-XXXX\_Bn\_Hp\_IM1.BDF (where XXXX is the first 4 characters of the source 
+\item A suitable file name for the output data file --- for example
+XXXX\_Bn\_Hp\_IM1.BDF (where XXXX is the first 4 characters of the source
 name, n is the band number, and p is the HCON number).
-     
+
 \end {itemize}
 
 \subsection {An example of using I\_COMBINE}
 
 \begin {verbatim}
-     $ I_COMBINE 
+     $ I_COMBINE
 
      Version 3.0 (3_AUG_1987)
 
      IMAGE:=GCAS_B1S1_IM
-     IMAGE:=GCAS_B1S2_IM 
+     IMAGE:=GCAS_B1S2_IM
      IMAGE:=GCAS_B1S3_IM
-     IMAGE:=  etc. etc. 
+     IMAGE:=  etc. etc.
      IMAGE:= <RETURN>
 
      Create the whole image or some other area?
@@ -675,7 +675,7 @@ name, n is the band number, and p is the HCON number).
 
 \subsection {Processing time}
 
-I\_COMBINE is CPU intensive and for more than 4 or 5 images should be run 
+I\_COMBINE is CPU intensive and for more than 4 or 5 images should be run
 during off-peak hours. Timing tests showed that combining 4 scan images
 took 5mins and 100 CPU secs on a MicroVAX 3500.
 
@@ -693,7 +693,7 @@ problems. Normally these manifest themselves as an error message :-
 \subsection {Introduction}
 
 I\_EASYIMAGE is a program which is used to destripe and to form images from one
-or more .BDF data files, containing the data for a scan in one wavelength band, 
+or more .BDF data files, containing the data for a scan in one wavelength band,
 but it does not combine these images.
 
 \subsection {The I\_EASYIMAGE process}
@@ -701,14 +701,14 @@ but it does not combine these images.
 A list of files to be processed is passed to I\_EASYIMAGE each of which are
 processed separately.
 
-The destriping part of the program enables you to remove differences in 
-calibration, and registration of background intensities between detectors, 
-by subtracting a uniform or sloping background. The detector background value 
+The destriping part of the program enables you to remove differences in
+calibration, and registration of background intensities between detectors,
+by subtracting a uniform or sloping background. The detector background value
 is calculated as the median value of the data over the whole scan. For this to
-work correctly it is necessary that you give the program a scan in which there 
-is at least as much background as source. If you require the removal of both 
-background and slope, the program will calculate the median for each eighth of 
-the scan and calculate a slope and constant from that. 
+work correctly it is necessary that you give the program a scan in which there
+is at least as much background as source. If you require the removal of both
+background and slope, the program will calculate the median for each eighth of
+the scan and calculate a slope and constant from that.
 
 The imaging part of the program takes into account how the detectors
 overlap and, by assuming that flux was gathered evenly over the detector area,
@@ -727,7 +727,7 @@ extracted with I\_SNIP\_CRDD and will be of the form XXXX\_BnSm.BDF
 number, and m is the crossing number).
 
 \item A file called PREP.DAT should be set up containing a list of filenames to
-be processed 
+be processed
 
 **** \hfill ONLY FILES CONTAINING DATA FOR ONE WAVELENGTH BAND \hfill****
 \linebreak
@@ -749,7 +749,7 @@ A suitable format for the file is :-
 \item You will need to decide the size of the pixels you require depending
 on the wavelength band you are processing. The recommended pixel sizes are :-
 12 micron  0.25 arcmin, 25 micron  0.25 arcmin, 60 micron   0.5 arcmin,
-100 micron  1.0 arcmin.                                  
+100 micron  1.0 arcmin.
 
 \item You will need to decide whether you want just a constant background
 removed or both constant and slope.
@@ -764,25 +764,25 @@ removed or both constant and slope.
     $ I_EASYIMAGE
 
     Remove background (Y/N)? :=
-    Y                  
+    Y
     Remove slope in background (Y/N) ? :=
     Y
     Size of square pixel in output image (arcmin)? :=
     0.25
     Length of scan (arcmin) ? :-
     120
-    PROCESSING IMAGE  1  :  GCAS_B1S1 
-    DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 1 
-    PROCESSING IMAGE  2  :  GCAS_B1S2 
-    DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 2 
+    PROCESSING IMAGE  1  :  GCAS_B1S1
+    DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 1
+    PROCESSING IMAGE  2  :  GCAS_B1S2
+    DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 2
         .       .      .        .      .    .   .
         .       .      .        .      .    .   .
         .       .      .        .      .    .   .
         .       .      .        .      .    .   .
 
-    ********************************* 
-    **ALL FILES DESTRIPED & GRIDDED** 
-    ********************************* 
+    *********************************
+    **ALL FILES DESTRIPED & GRIDDED**
+    *********************************
 \end{verbatim}
 N.B.\ This procedure is CPU intensive.
 If more than 4 or 5 scans are to be processed, the user is advised to run the
@@ -793,13 +793,13 @@ job during off-peak hours, ie lunch times or after 6.00 pm.
 
 \subsection {Introduction}
 
-I\_CRDD\_COMBINE takes a set of destriped CRDD scan data files and forms a 
+I\_CRDD\_COMBINE takes a set of destriped CRDD scan data files and forms a
 combined image from them. It combines the features of I\_CRDIMAGE and I\_COMBINE
 in a single rebinning step thereby improving the resolution.
 
 \subsection {The I\_CRDD\_COMBINE process}
 
-    I\_CRDD\_COMBINE combines the functions of I\_CRDIMAGE and I\_COMBINE and 
+    I\_CRDD\_COMBINE combines the functions of I\_CRDIMAGE and I\_COMBINE and
 thus minimizes the smoothing on the output image due to rebinning by reducing
 the number of stages from two to one. It provides the best
 resolution available using rebinning techniques. To obtain
@@ -821,7 +821,7 @@ improvement in resolution over images produced with smaller values of SFACT.
 To allow some flexibility, but to avoid inordinate computation time, SFACT is
 restricted to a range 2.0 to 4.0 (the default is 2.0). Note also that the size
 of a sector is limited to less than the half-width of a detector which is
-0.38, 0.38, 0.755 and 1.515 arc mins. at 12, 25, 60 and 100 microns 
+0.38, 0.38, 0.755 and 1.515 arc mins. at 12, 25, 60 and 100 microns
 respectively.
 
 
@@ -835,19 +835,19 @@ the shape of the Gaussian weighting function. They represent the amplitudes
 relative to the centre at the in-scan and cross-scan edges of the sample
 respectively. The definitions of the terms in-scan and cross-scan are given in
 chapter V of the IRAS explanatory supplement. This method of defining the shape
-of the Gaussian was chosen rather than specifying a width because it indicates 
-directly the degree of weighting at the edges. 
+of the Gaussian was chosen rather than specifying a width because it indicates
+directly the degree of weighting at the edges.
 
 \subsection{The information you will need to run I\_CRDD\_COMBINE}
 
 \begin{itemize}
 
 \item The names of the destriped CRDD files from which the image is to be
-assembled. Usually I\_CRDD\_COMBINE will be run to combine the scans for each 
-HCON into an HCON image. These can be compared to assess the reality of a 
-feature. Finally I\_CRDD\_COMBINE may be used to assemble a complete image from 
-these sub images.To obtain the correct weights of the images in producing the 
-overall image, all the desired separate scans should be combined in a single 
+assembled. Usually I\_CRDD\_COMBINE will be run to combine the scans for each
+HCON into an HCON image. These can be compared to assess the reality of a
+feature. Finally I\_CRDD\_COMBINE may be used to assemble a complete image from
+these sub images.To obtain the correct weights of the images in producing the
+overall image, all the desired separate scans should be combined in a single
 run of the program.
 
 \item You will need to decide whether you want the image to be the maximum size
@@ -860,7 +860,7 @@ are :- 12 micron  0.25 arcmin, 25 micron  0.25 arcmin, 60 micron   0.5 arcmin,
 100 micron  1.0 arcmin. These are selected as default.
 
 \item You will need to decide the value for the Sector factor. The sector factor
-determines the number of sectors into which a detector sample is split for 
+determines the number of sectors into which a detector sample is split for
 rebinning onto the image grid (see note above). The value that can be selected
 is restricted to between 2.0 and 4.0.
 
@@ -869,7 +869,7 @@ the scan length will reduce the computing time considerably and the extra
 length may be unnecessary after destriping. The shortened scan length will be
 centered on the target position input to I\_SNIP\_CRDD.
 
-\item Decide whether you want the detector data to be weighted, and if so what 
+\item Decide whether you want the detector data to be weighted, and if so what
 ratio of center to edge weighting you require in both the in-scan and the
 cross-scan directions. These can take any value between 0.01 and 0.999, the
 suggested default value is 0.5.
@@ -884,30 +884,30 @@ could be used to indicate an image produced by I\_CRDD\_COMBINE.
 \begin{verbatim}
     $ I_CRDD_COMBINE
 
-    CRDDF:= GCAS_B1S1_DS 
-    CRDDF:= GCAS_B1S2_DS 
-    CRDDF:= GCAS_B1S3_DS 
+    CRDDF:= GCAS_B1S1_DS
+    CRDDF:= GCAS_B1S2_DS
+    CRDDF:= GCAS_B1S3_DS
     CRDDF:=  etc. etc.
     CRDDF:=  <RETURN>
 
-    Whole image to be produced (T/F)? 
+    Whole image to be produced (T/F)?
     WHOLE/T/:= <RETURN>
-    Size of pixels in output image (arc mins) 
+    Size of pixels in output image (arc mins)
     PIXSIZE/0.25000x0.25000/:= <RETURN>
     Pixel size (arc mins): 0.25000x0.25000
-    Sector factor 
-    SFACT/2.000000/:= <RETURN>          
-    Length of scan to be processed (arc mins) 
-    SCANLEN/120.0000/:= <RETURN>        
-    Weighting of detector samples required (T/F)? 
-    WEIGHT/F/:= T                                      
-    AYEDGE/0.5000000/:= <RETURN>       
-    Amplitude at in-scan edge: 0.50 
-    AZEDGE/0.5000000/:= <RETURN>      
-    Amplitude at X-scan edge: 0.50 
+    Sector factor
+    SFACT/2.000000/:= <RETURN>
+    Length of scan to be processed (arc mins)
+    SCANLEN/120.0000/:= <RETURN>
+    Weighting of detector samples required (T/F)?
+    WEIGHT/F/:= T
+    AYEDGE/0.5000000/:= <RETURN>
+    Amplitude at in-scan edge: 0.50
+    AZEDGE/0.5000000/:= <RETURN>
+    Amplitude at X-scan edge: 0.50
     Processing image 1...      =(o-o\                                         |
 
-    OUTPUT:= GCAS_B1_H1_CC     
+    OUTPUT:= GCAS_B1_H1_CC
 \end{verbatim}
 
 \subsection{Examples of output from I\_CRDD\_COMBINE}
@@ -917,12 +917,12 @@ are given in the Appendix at the end of this document.
 
 Comparison of images produced by I\_CRDIMAGE and I\_CRDD\_COMBINE:
 
-Figures 7 to 10 show various 60 micron maps of the spiral galaxy M81. 
+Figures 7 to 10 show various 60 micron maps of the spiral galaxy M81.
 Figure 7 shows the I\_CRDIMAGE / I\_COMBINE combined image from four survey
-scans comprising a single HCON. 
+scans comprising a single HCON.
 Figure 8 is the I\_CRDD\_COMBINE image produced from the same data without
-weighting. 
-Figure 9 shows the image obtained by applying Gaussian weighting with an 
+weighting.
+Figure 9 shows the image obtained by applying Gaussian weighting with an
 amplitude of 0.1 at both the in-scan and cross-scan edges.
 This compares favourably with the map from a pointed observation of M81 shown in
 Figure 10.
@@ -933,14 +933,14 @@ Figure 10.
 
 \subsection {Introduction}
 
-I\_CONTOUR draws contour maps of IRAS images and allows source positions and 
-fluxes to be measured. 
+I\_CONTOUR draws contour maps of IRAS images and allows source positions and
+fluxes to be measured.
 
-CRDD data is normally prepared by extracting it with I\_SNIP\_CRDD, destriping 
-it, forming images of the scans, and combining the scan images. 
+CRDD data is normally prepared by extracting it with I\_SNIP\_CRDD, destriping
+it, forming images of the scans, and combining the scan images.
 
 
-There are many optional facilities in I\_CONTOUR which are described in detail 
+There are many optional facilities in I\_CONTOUR which are described in detail
 below.
 
 \subsection{The type of processing you can do with I\_CONTOUR}
@@ -973,18 +973,18 @@ data.
 \item [Part 1:] Prepare a contour map of the whole image
 \begin{verbatim}
     $ I_CONTOUR
-    Version 3.0  (3-AUG-1987)     
+    Version 3.0  (3-AUG-1987)
     IMAGE:=GCAS_B4_HC3_IM3.BDF
     Processing image  1...                                                   :
     Special plot or use defaults?
     SPECIAL/F/:= <RETURN>
-    Min and Max values are:-      -24.09       93.90                             
-    Enter up to 20 contour levels,                                               
+    Min and Max values are:-      -24.09       93.90
+    Enter up to 20 contour levels,
     OR just the base level,
     OR the base level and further qualifiers,
     OR just press return for default levels
     LEVELS:= <RETURN>
-    Base contour is 5.00 and subsequent ones *1.50                                
+    Base contour is 5.00 and subsequent ones *1.50
     Enter a title:-
     TITLE//:=GCAS_B4_HC3_IM3
 \end{verbatim}
@@ -993,23 +993,23 @@ data.
 
       name        description
 
-      7800        Pericom 7800                                              
-      ARGS1                                                                 
-      ARGSOV1                                                               
-      BBC         BBC micro                                                 
-      CANON       Canon Laser printer - bit map file is CANON.DAT           
-      CANON_L     Canon Laser (Landscape) - bit map file is CANON.DAT       
-      CANON_P     Canon Laser (Portrait) - bit map file is CANON.DAT        
-      CIFER_2634  Cifer 2634G                                               
-      CIFER_T5    Cifer T5                                                  
-      GRAPHPACK   Pericom Graph Pack                                        
-      IKON        Digisolve Ikon                                            
-      IKONOV      Ikon overlay                                              
-      MG100       Pericom Graph Pack                                        
-      PRINTRONIX  Printronix printer - bit map file is PRINTRONIX.BIT       
-      TEK         Tektronix 4010                                            
-      ZETA        Zeta 8 pen plotter - plot file is ZETA.DAT                
- 
+      7800        Pericom 7800
+      ARGS1
+      ARGSOV1
+      BBC         BBC micro
+      CANON       Canon Laser printer - bit map file is CANON.DAT
+      CANON_L     Canon Laser (Landscape) - bit map file is CANON.DAT
+      CANON_P     Canon Laser (Portrait) - bit map file is CANON.DAT
+      CIFER_2634  Cifer 2634G
+      CIFER_T5    Cifer T5
+      GRAPHPACK   Pericom Graph Pack
+      IKON        Digisolve Ikon
+      IKONOV      Ikon overlay
+      MG100       Pericom Graph Pack
+      PRINTRONIX  Printronix printer - bit map file is PRINTRONIX.BIT
+      TEK         Tektronix 4010
+      ZETA        Zeta 8 pen plotter - plot file is ZETA.DAT
+
     Which do you want to use?
     DEVICE/7800/:= <RETURN>
 \end{verbatim}
@@ -1026,7 +1026,7 @@ In the small graphics type face it prints at the top of the screen
     FLUXES/F/:=
 \end{verbatim}
 Press $<$shift$>$$<$VDU$>$ to obtain the subsequent output in standard typeface
-\item [Part 2:] To determine a suitable size of area for a subimage. 
+\item [Part 2:] To determine a suitable size of area for a subimage.
 
 To map a sub image you need to know both the coordinates of the centre of the
 image, and the size of the required area in x (i.e.\ RA) and y (i.e.\ Dec)
@@ -1059,8 +1059,8 @@ also type:-
 Press the VDU key to type in standard typeface and type {\tt Q}
 
 \pagebreak
-\item [Part 3:] To draw a contour map of a subimage, and to plot with a lower 
-base contour level.                              
+\item [Part 3:] To draw a contour map of a subimage, and to plot with a lower
+base contour level.
 
 After your preceding runs the program will type:-
 
@@ -1075,9 +1075,9 @@ After your preceding runs the program will type:-
     SPECIAL/F/:=T
     Plot the whole image or some other area?
     WHOLE/T/:=F
-    Current centre:  RA =   0 54 59.3                                             
-                    DEC =  60 38 10                                              
-        size is  125.0 x  121.0 arcmins                                          
+    Current centre:  RA =   0 54 59.3
+                    DEC =  60 38 10
+        size is  125.0 x  121.0 arcmins
     Enter centre RA and DEC and size of the area you want to use as:-
     raH,raM,raS, decD,decM,decS, Xsize,Ysize
     AREA:=0,55,30,60,46,00,20,20
@@ -1092,13 +1092,13 @@ After your preceding runs the program will type:-
     SPACINGS/15.00000, 5.000000/:= <RETURN>
     Plot particular objects on the map?
     OBJECTS/F/:= <RETURN>
-    Min and Max values are:-       -5.25       93.90                             
-    Enter up to 20 contour levels,                                               
+    Min and Max values are:-       -5.25       93.90
+    Enter up to 20 contour levels,
     OR just the base level,
     OR the base level and further qualifiers,
     OR just press return for default levels
     LEVELS:=0.5,2.0
-    Base contour is 0.500 and subsequent ones *2.00                               
+    Base contour is 0.500 and subsequent ones *2.00
     Enter a title:-
     TITLE/GCAS_B4_HC3_IM3/:= <RETURN>
 \end{verbatim}
@@ -1135,13 +1135,13 @@ Press graph only key to get a graphic screen
 
 A cross wire cursor should be present on the screen if not press $<$RETURN$>$ to
 obtain one. The cross wire is first moved to the bottom left hand side of the
-region of interest by using $<$SHIFT$>$ and arrow keys for coarse movement and 
-arrow keys alone for fine movement. When you are satisfied with the position 
+region of interest by using $<$SHIFT$>$ and arrow keys for coarse movement and
+arrow keys alone for fine movement. When you are satisfied with the position
 push any key once (this needs a sharp tap as the keys are repeating). Using the
 up and down arrows move to the top left and press any key once. Move back to
 the bottom left (part of the mark and the crosswire disappear) and then using
 sideways arrows move to the bottom right, and press any key once. Finally move
-up to just above the left top mark and press any key once or twice. The program 
+up to just above the left top mark and press any key once or twice. The program
 will display the flux in graphics text, but it is easier to read from the
 FLUXES.LIS file. It will also mark the position of the maximum flux within the
 box, and give the value of the flux at this point.
@@ -1153,15 +1153,15 @@ It will also type:-
     FILE:= GCAS_B4_HC3_CENTERBOX.LIS
 
     Manual,file or quit
-    MODE/M/:= 
+    MODE/M/:=
 \end{verbatim}
 
-To continue with any other boxes, or to obtain fluxes at a point press 
+To continue with any other boxes, or to obtain fluxes at a point press
 $<$RETURN$>$.
 
 To obtain the fluxes at any point follow the method outlined in finding the
 center of the subregion above.
-              
+
 To quit from the cycle of finding fluxes type Q in reply to the mode prompt.
 
 After finishing the run you can examine the results of the flux measurements
@@ -1221,13 +1221,13 @@ The program will then print out a list of available devices
     AGAIN/F/:= <RETURN>
     $
 \end{verbatim}
-                   
+
 \item [Part 6:] To plot the points and boxes used on this image on the image of
-the same source at another wavelength, and determine corresponding flux 
+the same source at another wavelength, and determine corresponding flux
 measurements.
 
-The replotting of boxes and measurements of the flux within them can be done 
-automatically. The position of points can be entered automatically but the 
+The replotting of boxes and measurements of the flux within them can be done
+automatically. The position of points can be entered automatically but the
 flux must be measured by repositioning the cross wire cursor over the object
 on the map.
 
@@ -1250,7 +1250,7 @@ follows:-
 
 \begin{verbatim}
     $ I_CONTOUR
-    Version 3.0  (3-AUG-1987)     
+    Version 3.0  (3-AUG-1987)
     IMAGE:=GCAS_B2_HC3_IM3.BDF
     Special plot or use defaults?
     SPECIAL/F/:=T
@@ -1272,7 +1272,7 @@ follows:-
     Which file contains their positions?
     FILE/TT/:= gcas_b4_hc3_positions.lis
 \end{verbatim}
-Continue answering the prompts as in part 3 above. The contour map will be 
+Continue answering the prompts as in part 3 above. The contour map will be
 drawn with numbered stars at the points. Because of graphics overtyping it is
 easiest first to display any boxes. You can do this by entering:-
 \begin{verbatim}
@@ -1307,7 +1307,7 @@ be found in a file OBJECTS.LIS.
 \begin{description}
 \item[IMAGE]\hspace{-1.5mm}:
 
-This can be any .BDF file containing an IRAS image. 
+This can be any .BDF file containing an IRAS image.
 
 \item[LABELS]\hspace{-1.5mm}:
 
@@ -1345,8 +1345,8 @@ A file name of TT represents your terminal.
 
 Here you specify the contour levels to be plotted.
 
-If you press $<$RETURN$>$ default levels are used, a single value is taken to 
-represent the lowest contour level and subsequent ones formed by multiplying the 
+If you press $<$RETURN$>$ default levels are used, a single value is taken to
+represent the lowest contour level and subsequent ones formed by multiplying the
 previous one by a constant.
 
 If you enter two values, the first is taken as the lowest contour level and the
@@ -1415,7 +1415,7 @@ obtain the source region alone.
 \item Unfortunately KAPPA does not provide any good facilities for measuring
 position or for performing operations based on position. For instance you
 cannot inquire the RA and Dec of a particular pixel, you cannot cut out a
-subimage determined by RA and Dec coordinates. 
+subimage determined by RA and Dec coordinates.
 \item Theoretically it should be possible to take a .BDF image from the CRDD
 system, change it into a .HDF file for KAPPA while copying the descriptors,
 perform algebraic manipulation in KAPPA, change the KAPPA output into a .BDF
@@ -1440,11 +1440,11 @@ that relating to the definition of work space.
 
 \subsection{Introduction}
 
-I\_COADD is a program which estimates the fluxes seen by IRAS at the position 
+I\_COADD is a program which estimates the fluxes seen by IRAS at the position
 of a known point source (e.g.\ single star (not binary), distant galaxy, QSO
-etc.). 
+etc.).
 
-Details of all the bright reliable point sources found in the IRAS survey can 
+Details of all the bright reliable point sources found in the IRAS survey can
 be found in the Point Source Catalogue. However you may have an optical source
 for example for which there is no corresponding entry in the Point Source
 Catalogue, and wish to ask what IRAS saw at this point.
@@ -1461,17 +1461,17 @@ derived from IRAS crossings of asteroids and the calibration source NGC 6543.
 
 The main processing of the I\_COADD program consists of the following stages
 \begin{itemize}
-\item The first stage is to determine the detectors to be used and to extract 
-the detector sample data from the files of scan data extracted with 
-I\_SNIP\_CRDD. 
+\item The first stage is to determine the detectors to be used and to extract
+the detector sample data from the files of scan data extracted with
+I\_SNIP\_CRDD.
 
 It uses the RA and Dec coordinates given to I\_SNIP\_CRDD to find each detector
-which could see the region. The normal detector scan width is 4 arcmin and if 
+which could see the region. The normal detector scan width is 4 arcmin and if
 the source position falls within that field of view the detector data is used by
 the program, but you have the option of modifying the criterion by selecting a
 non zero detector width extension DZ. This means that if the source falls
-within DZ/2 of the cross-scan edge of the detector field of view that detector 
-is used.It is recommended that if you want to alter this you set it to a 
+within DZ/2 of the cross-scan edge of the detector field of view that detector
+is used.It is recommended that if you want to alter this you set it to a
 value between $0.0$ and $-1.0$ as this will mean that detectors which see the
 source at the edge of their field of view will not be selected .
 
@@ -1487,33 +1487,33 @@ from the associated samples.
 
 The detector samples are then weighted and corresponding samples added.
 The default weights the samples so that the most noisy detectors have the
-lowest weighting (actually the detector weight is the reciprocal of its R.M.S. 
-noise measured in the checkout phase of the IRAS mission). However you have the 
+lowest weighting (actually the detector weight is the reciprocal of its R.M.S.
+noise measured in the checkout phase of the IRAS mission). However you have the
 option of adding the detector samples with equal weighting.
 
 \item The program then determines the median of the composite data and
 subtracts it from the coadded samples.
 
 \item The program calculates the noise level of the composite data. The data
-are convolved with an eight pixel wide, zero sum, square wave filter. 
+are convolved with an eight pixel wide, zero sum, square wave filter.
 This is equivalent to performing a four pixel wide integration
-with the local background level and slope removed. It scans the resultant 
+with the local background level and slope removed. It scans the resultant
 values for signals above a given signal to noise threshold.
 The default threshold value is 1.0, but you may change it if you wish for a more
-stringent or more relaxed criterion. The program will report on and process a 
+stringent or more relaxed criterion. The program will report on and process a
 region surrounding any sample meeting this criterion.
 
-\item For each region satisfying the threshold criterion the program 
-calculates the correlation between the samples and the detection profile of an 
+\item For each region satisfying the threshold criterion the program
+calculates the correlation between the samples and the detection profile of an
 ideal point source. It uses
 this to estimate source flux and background, the raison d'etre of the program.
-It reports if the correlation found exceeds a chosen level. The default 
+It reports if the correlation found exceeds a chosen level. The default
 level is 0.7 but you can change it if you wish.
 
 \item The program has an option for removing fractional sample offsets, this
 means that if the detectors do not have samples which correspond to identical
 fields of view, the data can be adjusted to simulate identical fields of view.
-A cubic spline interpolation is used. However the telescope pointing probably 
+A cubic spline interpolation is used. However the telescope pointing probably
 is not known well enough to justify this procedure.
 
 \item There are also options for printing out the raw data values and a
@@ -1531,7 +1531,7 @@ following sections
 For each scan the listing gives the source name, coordinates, band, SOP number,
 crossing time for the first sample selected, the difference in  crossing time
 between the first sample selected and the sample corresponding to the source
-coordinates, the position of the source across the scan, and the 
+coordinates, the position of the source across the scan, and the
 identifier numbers of the detectors which should see the source.
 
 \item A list of the detector sample data.
@@ -1554,7 +1554,7 @@ a useful indicator of whether the source is of the type expected, a binary
 source with an abnormally wide profile will give an anomalous slope value.
 
 It also gives the following statistics, the band number, the signal in
-Jansky's, the signal in Watts per meter squared (times E-15), the signal to 
+Jansky's, the signal in Watts per meter squared (times E-15), the signal to
 noise ratio, the baseline signal in Watts per meter squared (times E-15),
 the correlation coefficient between the signal and the ideal detection profile,
 and the conversion factor between Jansky's and Watts.
@@ -1584,39 +1584,39 @@ If you decide to alter the defaults and answer {\tt Y} to the question above
 you will get the following prompts:-
 
 \begin{verbatim}
-    ANS:= Y                     
-    SNR/1.0/:= <RETURN>                
+    ANS:= Y
+    SNR/1.0/:= <RETURN>
     CORL/0.7/:= <RETURN>
     DZ/0.0/:=   <RETURN>
-    Is data interpolation required(y/n)? 
-    ANS:= N                     
-    Is noise weighting required(y/n)?  
+    Is data interpolation required(y/n)?
+    ANS:= N
+    Is noise weighting required(y/n)?
     ANS:= Y
-    Are raw data values to be printed(y/n)? 
+    Are raw data values to be printed(y/n)?
     ANS:= Y
-    Is a noise histogram required(y/n)? 
+    Is a noise histogram required(y/n)?
     ANS:= N
 \end{verbatim}
 Whether you accept or change the default values the following prompts will be
 printed
 \begin{verbatim}
-    Name of CRDD file? 
-    CRDDF:= N6543_B1S1            
-    N6543       BAND 1 SOP: 546 UTC1ST: 12345678.123  
+    Name of CRDD file?
+    CRDDF:= N6543_B1S1
+    N6543       BAND 1 SOP: 546 UTC1ST: 12345678.123
 
-    Is another CRDD file to be input(y/n)? 
+    Is another CRDD file to be input(y/n)?
     ANS:= N
 \end{verbatim}
 N terminates requests for CRDD files for this source.
 
 \begin{verbatim}
-    Is another source to be processed(y/n)? 
+    Is another source to be processed(y/n)?
     ANS:= N
 \end{verbatim}
 N  terminates  program  run. Y causes requests for CRDD files for another source.
 
 \begin{verbatim}
-     Output is in file COADOP.LIS 
+     Output is in file COADOP.LIS
 \end{verbatim}
 
 \pagebreak

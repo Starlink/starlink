@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_PLTLN( N, ILO, IHI, X, Y, XERROR, YERROR, XBAR, 
-     :                       YBAR, XSTEP,PARAM, IPLOT, MODE, MTYPE, 
+      SUBROUTINE KPG1_PLTLN( N, ILO, IHI, X, Y, XERROR, YERROR, XBAR,
+     :                       YBAR, XSTEP,PARAM, IPLOT, MODE, MTYPE,
      :                       ERSHAP, FREQ, APP, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_PLTLN( N, ILO, IHI, X, Y, XERROR, YERROR, XBAR, YBAR, 
-*                      XSTEP, PARAM, IPLOT, MODE, MTYPE, ERSHAP, FREQ, 
+*     CALL KPG1_PLTLN( N, ILO, IHI, X, Y, XERROR, YERROR, XBAR, YBAR,
+*                      XSTEP, PARAM, IPLOT, MODE, MTYPE, ERSHAP, FREQ,
 *                      APP, STATUS )
 
 *  Description:
@@ -23,14 +23,14 @@
 *     annotated asxes are drawn. The calling routine should do this if
 *     required by passing the supplied Plot (IPLOT) to routine KPG1_ASGRD.
 *
-*     PGPLOT should be active, and the viewport should correspond to the 
+*     PGPLOT should be active, and the viewport should correspond to the
 *     DATA picture in which the plot is to be drawn. PGPLOT world co-ordinates
 *     within the viewport should be GRAPHICS co-ordinates (millimetres from the
 *     bottom left corner of the view surface).
 *
 *     The Plotting style is accessed using one or more environment parameters
 *     specified by PARAM, and may include the following synonyms for graphical
-*     elements: 
+*     elements:
 *        "Err(Bars)" - Specifies colour, etc for error bars. Size(errbars)
 *                      scales the size of the serifs used if ERSHAP=1 (i.e.
 *                      a size value of 1.0 produces a default size).
@@ -46,41 +46,41 @@
 *        The index of the first grid point to be used.
 *     IHI = INTEGER (Given)
 *        The index of the last grid point to be used.
-*     X( N ) = DOUBLE PRECISION (Given) 
+*     X( N ) = DOUBLE PRECISION (Given)
 *        The X value at each point, in PGPLOT world co-ordinate (i.e.
 *        millimetres from the bottom left corner of the view surface).
-*     Y( N ) = DOUBLE PRECISION (Given) 
+*     Y( N ) = DOUBLE PRECISION (Given)
 *        The Y value at each point, in PGPLOT world co-ordinate (i.e.
 *        millimetres from the bottom left corner of the view surface).
 *     XERROR = LOGICAL (Given)
 *        Display X error bars?
 *     YERROR = LOGICAL (Given)
 *        Display Y error bars?
-*     XBAR( N, 2 ) = DOUBLE PRECISION (Given) 
-*        Row 1 contains the lower limit and row 2 contains the upper limit 
-*        for each horizontal error bar, in PGPLOT world co-ordinate (i.e. 
-*        millimetres from the bottom left corner of the view surface). Only 
+*     XBAR( N, 2 ) = DOUBLE PRECISION (Given)
+*        Row 1 contains the lower limit and row 2 contains the upper limit
+*        for each horizontal error bar, in PGPLOT world co-ordinate (i.e.
+*        millimetres from the bottom left corner of the view surface). Only
 *        accessed if XERROR is .TRUE.
-*     YBAR( N, 2 ) = DOUBLE PRECISION (Given) 
-*        Row 1 contains the lower limit and row 2 contains the upper limit 
-*        for each vertical error bar, in PGPLOT world co-ordinate (i.e. 
-*        millimetres from the bottom left corner of the view surface). Only 
+*     YBAR( N, 2 ) = DOUBLE PRECISION (Given)
+*        Row 1 contains the lower limit and row 2 contains the upper limit
+*        for each vertical error bar, in PGPLOT world co-ordinate (i.e.
+*        millimetres from the bottom left corner of the view surface). Only
 *        accessed if YERROR is .TRUE.
-*     XSTEP( N, 2 ) = DOUBLE PRECISION (Given) 
-*        Row 1 contains the lower limit and row 2 contains the upper limit 
-*        for each horizontal step, in PGPLOT world co-ordinate (i.e. 
-*        millimetres from the bottom left corner of the view surface). Only 
+*     XSTEP( N, 2 ) = DOUBLE PRECISION (Given)
+*        Row 1 contains the lower limit and row 2 contains the upper limit
+*        for each horizontal step, in PGPLOT world co-ordinate (i.e.
+*        millimetres from the bottom left corner of the view surface). Only
 *        accessed if MODE is 4.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The names of one or more style parameters to be used when obtaining 
+*        The names of one or more style parameters to be used when obtaining
 *        the plotting style. If more than one parameter is supplied, the
-*        list should be separated by commas. The supplied parameters will 
+*        list should be separated by commas. The supplied parameters will
 *        be used in the order supplied, with later parameters allowing
 *        attributes obtained via earlier parameters to be assigned new values.
 *     IPLOT = INTEGER (Given)
 *        An AST Plot which can be used to do the drawing. The Base Frame
 *        should be GRAPHICS co-ordinates (millimetres from the bottom
-*        left corner of the PGPLOT view surface). The Current Frame should 
+*        left corner of the PGPLOT view surface). The Current Frame should
 *        be the Frame in which annotation is required.
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented:
@@ -90,7 +90,7 @@
 *           3 - A marker is placed at each point (see MTYPE).
 *           4 - Mark each point with a horizontal line of width given by
 *               XW.
-*           5 - A "chain" in which each point is marker by a marker and also 
+*           5 - A "chain" in which each point is marker by a marker and also
 *               join by straight lines to its neighbouring points.
 *     MTYPE = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is 3 or 5.
@@ -106,12 +106,12 @@
 *               vertical error bars which would have been drawn if ERSHAP
 *               had been 1.
 *        These will all produce the same result (i.e. a single straight
-*        line) if errors are available only on one axis (see XERROR and 
+*        line) if errors are available only on one axis (see XERROR and
 *        YERROR). Not accessed if XERROR and YERROR are both .FALSE.
 *     FREQ = INTEGER (Given)
 *        The frequency at which errors are to be plotted. A value of 1
 *        means "plot errors for every point", 2 means "plot errors for
-*        every second point", etc. Not accessed if XERROR and YERROR are 
+*        every second point", etc. Not accessed if XERROR and YERROR are
 *        both .FALSE.
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the calling application in the form
@@ -129,12 +129,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -172,7 +172,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -225,7 +225,7 @@
       LOGICAL MIDX               ! Is middle X value good?
       LOGICAL MORE               ! Continue looping?
       LOGICAL OK                 ! Are there any points within the window?
-      REAL AXWID0                ! Original Axis line width 
+      REAL AXWID0                ! Original Axis line width
       REAL CVWID0                ! Original Curve line width
       REAL MKWID0                ! Original Marker line width
       REAL RVAL                  ! General REAL variable
@@ -245,7 +245,7 @@
       REAL YLO                   ! Lower Y limit of error box
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the bounds of the current PGPLOT window.
@@ -264,7 +264,7 @@
          WY2 = RVAL
       END IF
 
-*  Check there is at least one supplied position within the 
+*  Check there is at least one supplied position within the
 *  PGPLOT window.
       OK = .FALSE.
       DO I = ILO, IHI
@@ -312,9 +312,9 @@
 
 *  Establish synonyms for AST graphical element names to be recognised
 *  during the following call to KPG1_ASSET. The symbols marking each position
-*  are drawn as AST "markers" using AST_MARK. The lines joining the given 
-*  positions are drawn as AST "Curves" using AST_CURVE. The error bars are 
-*  also drawn using AST_CURVE and therefore we need to use a different 
+*  are drawn as AST "markers" using AST_MARK. The lines joining the given
+*  positions are drawn as AST "Curves" using AST_CURVE. The error bars are
+*  also drawn using AST_CURVE and therefore we need to use a different
 *  element (i.e. not "Curves") to represent them, since "Curves" is
 *  already being used to represent the lines joining positions. We
 *  arbitrarily use "Axes" to represent error bars. The Axes attributes
@@ -325,8 +325,8 @@
 
 *  Set the attributes of the supplied Plot using each supplied parameter
 *  in turn to access a plotting style. Values obtained using earlier
-*  parameters in the list can be over-ridden using later parameters. The 
-*  above synonyms are recognised and translated into the corresponding 
+*  parameters in the list can be over-ridden using later parameters. The
+*  above synonyms are recognised and translated into the corresponding
 *  AST attribute names. Colour names are also translated into colour indices.
       START = 1
       MORE = .TRUE.
@@ -336,7 +336,7 @@
          COMMA = INDEX( PARAM( START : ), ',' )
 
 *  If no comma was found, assume the next parameter name ends at the end
-*  of the PARAM string, and indicate that we will leave the DO loop after 
+*  of the PARAM string, and indicate that we will leave the DO loop after
 *  processing the current parameter name.
          IF( COMMA .EQ. 0 ) THEN
             MORE = .FALSE.
@@ -366,7 +366,7 @@
 *  =====================================================================
       IF( ( XERROR .OR. YERROR ) .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Save the size of the serif for error bars. This is scaled by the 
+*  Save the size of the serif for error bars. This is scaled by the
 *  "size(errbars)" attribute which is a synonym for "size(axes)".
          SERIF = AST_GETR( IPLOT, 'SIZE(AXES)', STATUS )*0.02*
      :                     MIN( ABS( WX2 - WX1 ), ABS( WY2 - WY1 ) )
@@ -374,20 +374,20 @@
 *  The plotting attributes to use for the error bars are currently
 *  assigned to the "Axes" element in the Plot. We need to transfer these
 *  to the "Curves" elements.
-         CALL AST_SETI( IPLOT, 'COLOUR(CURVES)', 
-     :                  AST_GETI( IPLOT, 'COLOUR(AXES)', STATUS ), 
+         CALL AST_SETI( IPLOT, 'COLOUR(CURVES)',
+     :                  AST_GETI( IPLOT, 'COLOUR(AXES)', STATUS ),
      :                  STATUS )
 
-         CALL AST_SETR( IPLOT, 'WIDTH(CURVES)', 
-     :                  AST_GETR( IPLOT, 'WIDTH(AXES)', STATUS ), 
+         CALL AST_SETR( IPLOT, 'WIDTH(CURVES)',
+     :                  AST_GETR( IPLOT, 'WIDTH(AXES)', STATUS ),
      :                  STATUS )
 
-         CALL AST_SETI( IPLOT, 'STYLE(CURVES)', 
-     :                  AST_GETI( IPLOT, 'STYLE(AXES)', STATUS ), 
+         CALL AST_SETI( IPLOT, 'STYLE(CURVES)',
+     :                  AST_GETI( IPLOT, 'STYLE(AXES)', STATUS ),
      :                  STATUS )
 
 
-*  Set PGPLOT attributes to match the plotting style used by the Plot for 
+*  Set PGPLOT attributes to match the plotting style used by the Plot for
 *  drawing Curves. Save the current PGPLOT attribute values in ATTR.
          CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
@@ -442,9 +442,9 @@
 
                END IF
 
-*  If ERSHAP specifies a diagonal cross, draw a poly line from bottom left 
+*  If ERSHAP specifies a diagonal cross, draw a poly line from bottom left
 *  to centre, to top right corner of the error box,
-               IF( ERSHAP .EQ. 2 ) THEN 
+               IF( ERSHAP .EQ. 2 ) THEN
                   IF( XERROR ) THEN
                      CALL PGMOVE( XLO, YLO )
                      CALL PGDRAW(  RX,  RY )
@@ -477,7 +477,7 @@
                   IF( YERROR ) THEN
                      CALL PGMOVE( RX, YLO )
                      CALL PGDRAW( RX, YHI )
-   
+
                      IF( YLO .NE. WY1 ) THEN
                         CALL PGMOVE( RX - SERIF, YLO )
                         CALL PGDRAW( RX + SERIF, YLO )
@@ -502,7 +502,7 @@
                   CALL MSG_SETI( 'SHAP', ERSHAP )
                   CALL ERR_REP( 'KPG1_PLTLN_ERR2', 'KPG1_PLTLN: '//
      :                          'Illegal ERSHAP value (^SHAP) '//
-     :                          'supplied (programming error).', 
+     :                          'supplied (programming error).',
      :                          STATUS )
                   GO TO 999
 
@@ -528,7 +528,7 @@
 *  =======================================
       IF( MODE .EQ. 1 ) THEN
 
-*  Set PGPLOT attributes to match the plotting style used by the Plot for 
+*  Set PGPLOT attributes to match the plotting style used by the Plot for
 *  drawing Curves. Save the current PGPLOT attribute values in ATTR.
          CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
@@ -559,18 +559,18 @@
             MIDX = GOODX .AND. GOODX0
             IF( MIDX ) RXC = 0.5*( RX + RX0 )
 
-*  On each pass through this loop three lines may be drawn; A) a horizontal 
+*  On each pass through this loop three lines may be drawn; A) a horizontal
 *  line from the previous position (I-1), half way towards the current
 *  position (I); B) a vertical line from the end of A) to the Y value of
 *  the current position; C) a horizontal line from the end of B) to the
-*  current position. 
+*  current position.
 
-*  To draw C) the mid X position must be good and the current position must 
+*  To draw C) the mid X position must be good and the current position must
 *  have a good Y value.
             DRAWC = ( MIDX .AND. GOODY )
 
-*  If possible draw line A). To draw A), the mid X position must be 
-*  defined and the previous position must have a good Y value. 
+*  If possible draw line A). To draw A), the mid X position must be
+*  defined and the previous position must have a good Y value.
             IF( MIDX .AND. GOODY0 ) THEN
 
 *  If the pen is now down, put it down at the previous position.
@@ -586,7 +586,7 @@
 
 *  Draw line B) so long as the mid X position is know. Bad Y values are
 *  considered to be coincident with the bottom axis.
-            IF( MIDX ) THEN 
+            IF( MIDX ) THEN
 
 *  If the pen is now down, put it down at the mid x position.
                IF( .NOT. DOWN ) THEN
@@ -631,7 +631,7 @@
 *  ==============================================
       ELSE IF( MODE .EQ. 2 ) THEN
 
-*  Set PGPLOT attributes to match the plotting style used by the Plot for 
+*  Set PGPLOT attributes to match the plotting style used by the Plot for
 *  drawing Curves. Save the current PGPLOT attribute values in ATTR.
          CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
@@ -646,7 +646,7 @@
 
 *  If both X and Y are good at the current position, draw a line to the
 *  current position.
-               IF( X( I ) .NE. AST__BAD .AND. 
+               IF( X( I ) .NE. AST__BAD .AND.
      :             Y( I ) .NE. AST__BAD ) THEN
                   CALL PGDRAW( REAL( X( I ) ), REAL( Y( I ) ) )
 
@@ -656,9 +656,9 @@
 
                END IF
 
-*  If the pen was originally up, and both X and Y are good at the current 
+*  If the pen was originally up, and both X and Y are good at the current
 *  position, put the pen down.
-            ELSE IF( X( I ) .NE. AST__BAD .AND. 
+            ELSE IF( X( I ) .NE. AST__BAD .AND.
      :               Y( I ) .NE. AST__BAD ) THEN
                CALL PGMOVE( REAL( X( I ) ), REAL( Y( I ) ) )
                DOWN= .TRUE.
@@ -674,7 +674,7 @@
 *  ============================================
       ELSE IF( MODE .EQ. 3 ) THEN
 
-*  Set PGPLOT attributes to match the plotting style used by the Plot for 
+*  Set PGPLOT attributes to match the plotting style used by the Plot for
 *  drawing markers. Save the current PGPLOT attribute values in ATTR.
          CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, STATUS )
 
@@ -692,16 +692,16 @@
 *  ==============================================
       ELSE IF( MODE .EQ. 4 ) THEN
 
-*  Set PGPLOT attributes to match the plotting style 
-*  used by the Plot for drawing curves. Save the current PGPLOT attribute 
+*  Set PGPLOT attributes to match the plotting style
+*  used by the Plot for drawing curves. Save the current PGPLOT attribute
 *  values in ATTR.
          CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
-*  Draw a line at each position which has good values for the upper and 
+*  Draw a line at each position which has good values for the upper and
 *  lower X limits, and a good Y value, and is in the given range.
          DO I = ILO, IHI
-            IF( XSTEP( I, 1 ) .NE. AST__BAD .AND. 
-     :          XSTEP( I, 2 ) .NE. AST__BAD .AND. 
+            IF( XSTEP( I, 1 ) .NE. AST__BAD .AND.
+     :          XSTEP( I, 2 ) .NE. AST__BAD .AND.
      :          Y( I ) .NE. AST__BAD ) THEN
                RY = REAL( Y( I ) )
                CALL PGMOVE( REAL( XSTEP( I, 1 ) ), RY )
@@ -716,8 +716,8 @@
 *  =================================================================
       ELSE IF( MODE .EQ. 5 ) THEN
 
-*  First, draw the lines. Set PGPLOT attributes to match the plotting 
-*  style used by the Plot for drawing Curves. Save the current PGPLOT 
+*  First, draw the lines. Set PGPLOT attributes to match the plotting
+*  style used by the Plot for drawing Curves. Save the current PGPLOT
 *  attribute values in ATTR.
          CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
@@ -732,7 +732,7 @@
 
 *  If both X and Y are good at the current position, draw a line to the
 *  current position.
-               IF( X( I ) .NE. AST__BAD .AND. 
+               IF( X( I ) .NE. AST__BAD .AND.
      :             Y( I ) .NE. AST__BAD ) THEN
                   CALL PGDRAW( REAL( X( I ) ), REAL( Y( I ) ) )
 
@@ -742,9 +742,9 @@
 
                END IF
 
-*  If the pen was originally up, and both X and Y are good at the current 
+*  If the pen was originally up, and both X and Y are good at the current
 *  position, put the pen down.
-            ELSE IF( X( I ) .NE. AST__BAD .AND. 
+            ELSE IF( X( I ) .NE. AST__BAD .AND.
      :               Y( I ) .NE. AST__BAD ) THEN
                CALL PGMOVE( REAL( X( I ) ), REAL( Y( I ) ) )
                DOWN = .TRUE.
@@ -756,8 +756,8 @@
 *  Re-instate the original PGPLOT attributes.
          CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, STATUS )
 
-*  Now draw the markers. Set PGPLOT attributes to match the plotting style 
-*  used by the Plot for drawing markers. Save the current PGPLOT attribute 
+*  Now draw the markers. Set PGPLOT attributes to match the plotting style
+*  used by the Plot for drawing markers. Save the current PGPLOT attribute
 *  values in ATTR.
          CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, STATUS )
 
@@ -788,7 +788,7 @@
 *  Ensure that any previous synonyms for AST attributes are cleared.
       CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
-*  Re-instate the original plotting attributes for the AST graphical elements 
+*  Re-instate the original plotting attributes for the AST graphical elements
 *  which may have been changed by this routine.
       CALL AST_SETI( IPLOT, 'COLOUR(AXES)', AXCOL0, STATUS )
       CALL AST_SETR( IPLOT, 'WIDTH(AXES)', AXWID0, STATUS )

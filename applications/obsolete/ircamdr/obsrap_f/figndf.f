@@ -41,8 +41,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'             ! SSE global definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'PRM_PAR'             ! PRIMDAT constants
 
 *    Status :
@@ -51,7 +51,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                     ! image dimensionality
 
       PARAMETER ( NDIMS  =  2 )     ! 2-d images only
@@ -64,7 +64,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI,                     ! locator for input data structure
      :    LOCT,                     ! locator for input template structure
      :    LOCO,                     ! locator for output data structure
@@ -101,12 +101,12 @@
            CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                    PNTRI, NELEMENTS, STATUS )
            CALL NDF_DIM( LOCI, NDIMS, IDIMS, ACTDIM, STATUS )
-      
+
 *         check for error so far
 
            IF ( STATUS .EQ. SAI__OK ) THEN
 
-*            create output image type data structure 
+*            create output image type data structure
 
               CALL NDF_PROP( LOCT, 'AXIS,QUALITY', 'OUTPIC',LOCO,STATUS)
 
@@ -122,9 +122,9 @@
 *               if there have been no errors then perform the thresholding
 
                  IF ( STATUS .EQ. SAI__OK ) THEN
-  
-                    CALL FIGNDFSUB( %VAL( PNTRI ), %VAL( PNTRO ), 
-     :	                            IDIMS(1), IDIMS(2), 
+
+                    CALL FIGNDFSUB( %VAL( PNTRI ), %VAL( PNTRO ),
+     :	                            IDIMS(1), IDIMS(2),
      :	                            STATUS )
 
                  END IF

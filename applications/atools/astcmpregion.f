@@ -20,31 +20,31 @@
 *        The global status.
 
 *  Description:
-*     This application creates a new CmpMap and optionally initialises 
+*     This application creates a new CmpMap and optionally initialises
 *     its attributes. A CmpRegion is a Region which allows two component
-*     Regions (of any class) to be combined to form a more complex 
-*     Region. This combination may be performed a boolean AND, OR 
-*     or XOR (exclusive OR) operator. If the AND operator is 
-*     used, then a position is inside the CmpRegion only if it is 
-*     inside both of its two component Regions. If the OR operator is 
-*     used, then a position is inside the CmpRegion if it is inside 
-*     either (or both) of its two component Regions. If the XOR operator 
-*     is used, then a position is inside the CmpRegion if it is inside 
+*     Regions (of any class) to be combined to form a more complex
+*     Region. This combination may be performed a boolean AND, OR
+*     or XOR (exclusive OR) operator. If the AND operator is
+*     used, then a position is inside the CmpRegion only if it is
+*     inside both of its two component Regions. If the OR operator is
+*     used, then a position is inside the CmpRegion if it is inside
+*     either (or both) of its two component Regions. If the XOR operator
+*     is used, then a position is inside the CmpRegion if it is inside
 *     one but not both of its two component Regions. Other operators can
-*     be formed by negating one or both component Regions before using 
+*     be formed by negating one or both component Regions before using
 *     them to construct a new CmpRegion.
 *
 *     The two component Region need not refer to the same coordinate
-*     Frame, but it must be possible for the AST_CONVERT 
+*     Frame, but it must be possible for the AST_CONVERT
 *     function to determine a Mapping between them (an error will be
 *     reported otherwise when the CmpRegion is created). For instance,
 *     a CmpRegion may combine a Region defined within an ICRS SkyFrame
 *     with a Region defined within a Galactic SkyFrame. This is
 *     acceptable because the SkyFrame class knows how to convert between
-*     these two systems, and consequently the AST_CONVERT 
+*     these two systems, and consequently the AST_CONVERT
 *     function will also be able to convert between them. In such cases,
 *     the second component Region will be mapped into the coordinate Frame
-*     of the first component Region, and the Frame represented by the 
+*     of the first component Region, and the Frame represented by the
 *     CmpRegion as a whole will be the Frame of the first component Region.
 *
 *     Since a CmpRegion is itself a Region, it can be used as a
@@ -60,11 +60,11 @@
 *        The boolean operator with which to combine the two Regions. This
 *        must be one of "AND", "OR" or "XOR".
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new CmpMap. 
-*     REGION1 = LITERAL (Read) 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new CmpMap.
+*     REGION1 = LITERAL (Read)
 *        A text file holding the first component Region.
-*     REGION2 = LITERAL (Read) 
+*     REGION2 = LITERAL (Read)
 *        A text file holding the second component Region.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new CmpMap.
@@ -125,22 +125,22 @@
       INTEGER OPER
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the first Region.
-      CALL KPG1_GTOBJ( 'REGION1', 'Region', AST_ISAREGION, REGION1, 
+      CALL KPG1_GTOBJ( 'REGION1', 'Region', AST_ISAREGION, REGION1,
      :                 STATUS )
 
 *  Get the second Region.
-      CALL KPG1_GTOBJ( 'REGION2', 'Region', AST_ISAREGION, REGION2, 
+      CALL KPG1_GTOBJ( 'REGION2', 'Region', AST_ISAREGION, REGION2,
      :                 STATUS )
 
 *  Get the boolean operator to use.
-      CALL PAR_CHOIC( 'OPER', 'OR', 'AND,OR,XOR', .FALSE., TEXT, 
+      CALL PAR_CHOIC( 'OPER', 'OR', 'AND,OR,XOR', .FALSE., TEXT,
      :                STATUS )
       IF( TEXT .EQ. 'AND' ) THEN
          OPER = AST__AND

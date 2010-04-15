@@ -59,7 +59,7 @@
 *        array of the NDF called cubein and stores the result in the
 *        NDF called cubeout.  In other respects cubeout is a copy of
 *        cubeout.
-*     rift in=aa scalar=2 out=bb section="-10:5,200~9" 
+*     rift in=aa scalar=2 out=bb section="-10:5,200~9"
 *        This adds 2 to the rectangular section between columns -10 to
 *        5 and lines 196 to 204 of the data array of the NDF called aa
 *        and stores the result in the NDF called bb.  In other respects
@@ -79,7 +79,7 @@
 *     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
-*     supported. 
+*     supported.
 *     -  The bad-pixel flag is set to TRUE if undefined values are
 *     created during the arithmetic.
 *     -  All non-complex numeric data types can be handled.
@@ -125,7 +125,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -178,7 +178,7 @@
 
 *  Create a new output NDF based on the input NDF. Propagate the data,
 *  axis, quality, units, WCS and variance components.
-      CALL LPG_PROP( NDFI, 'Data,Axis,Quality,Units,Variance,WCS', 
+      CALL LPG_PROP( NDFI, 'Data,Axis,Quality,Units,Variance,WCS',
      :               'OUT', NDFO, STATUS )
 
 *  Determine which data type to use to process the input data array.
@@ -214,40 +214,40 @@
 *  Select the appropriate routine for the data type being processed and
 *  add the constant to the data array.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_CADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_CADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                     CONST,
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_CADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_CADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_CADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                     CONST,
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     NERR, STATUS )
       END IF
 
@@ -263,7 +263,7 @@
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
-      
+
 *  End the NDF context.
       CALL NDF_END( STATUS )
 

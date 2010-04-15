@@ -2,7 +2,7 @@
 #include "ast.h"
 #include "cupid.h"
 
-CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3], 
+CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
                                 int ubnd[3], int gap, int *status ){
 /*
 *+
@@ -17,25 +17,25 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
 *     Starlink C
 
 *  Synopsis:
-*     CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], 
-*                                     int lbnd[3], int ubnd[3], int gap, 
+*     CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3],
+*                                     int lbnd[3], int ubnd[3], int gap,
 *                                     int *status )
 
 *  Description:
 *     This function returns a pointer to a structure that can be passed
 *     to cupidNextIt in order to determine the next pixel to process in a
 *     rectangular section of a 3D array. The pixels are processed in
-*     natural fortran order. The structure behaves rather like a Java 
+*     natural fortran order. The structure behaves rather like a Java
 *     "Iterator".
 *
 *     If the supplied region overlaps the edge of the array, then the
-*     iterator will skip over pixels that fall outside the bounds of the 
+*     iterator will skip over pixels that fall outside the bounds of the
 *     array.
 
 *  Parameters:
 *     iter
 *        A pointer to an existing CupidBoxIter structure, or NULL. If
-*        supplied, the contents of this structure will be reset to describe 
+*        supplied, the contents of this structure will be reset to describe
 *        the required set of pixels, and the supplied pointer will be
 *        returned as the function value. If a NULL pointer is supplied,
 *        memory will be allocated to hold a new CupidBoxIter structure to
@@ -61,7 +61,7 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
 *  Returned Value:
 *     A pointer to a structure describing the next pixel to be processed
 *     in the rectangular section (this will initially be the pixel
-*     specified by "lbnd"). This can be passed to cupidNextIt in order to 
+*     specified by "lbnd"). This can be passed to cupidNextIt in order to
 *     get a pointer to the array data value, and the explicit (x,y,z)
 *     grid indices of the pixel. It should be freed using astFree when no
 *     longer needed.
@@ -111,7 +111,7 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return NULL;
 
-/* Get a pointer for the returned CupidBoxIter structure, allocating memory 
+/* Get a pointer for the returned CupidBoxIter structure, allocating memory
    for a new structure if none was supplied. */
    if( iter ) {
       result = iter;
@@ -124,14 +124,14 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
 
 /* Get the bounds of the overlap between the supplied subsection and
    the array, and note if there is no overlap. */
-      overlap = 1;      
+      overlap = 1;
       for( i = 0; i < 3; i++ ) {
          if( lbnd[ i ] >= 1 ) {
             ovlbnd[ i ] = lbnd[ i ];
          } else {
             ovlbnd[ i ] = 1;
          }
-          
+
          if( ubnd[ i ] <= dim[ i ] ) {
             ovubnd[ i ] = ubnd[ i ];
          } else {
@@ -141,7 +141,7 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
          if( ovubnd[ i ] < ovlbnd[ i ] ) {
             overlap = 0;
             break;
-         }          
+         }
       }
 
 /* If there is no overlap, set a flag indicating that no pixels remain to
@@ -177,13 +177,13 @@ CupidBoxIter *cupidBoxIterator( CupidBoxIter *iter, int dim[3], int lbnd[3],
 
 /* Store the 1D vector index within the array of the first pixel to be
    visited. */
-         result->i = ( ovlbnd[ 0 ] - 1 ) + 
-                     dim[ 0 ]*( ( ovlbnd[ 1 ] - 1 ) + 
+         result->i = ( ovlbnd[ 0 ] - 1 ) +
+                     dim[ 0 ]*( ( ovlbnd[ 1 ] - 1 ) +
                        dim[ 1 ]*( ovlbnd[ 2 ] - 1 ) );
 
 /* Store the index of the first pixel in the first xy plane in the overlap. */
          result->i2 = result->i;
- 
+
 /* Store the index of the first pixel in the first x row in the overlap. */
          result->i3 = result->i;
 

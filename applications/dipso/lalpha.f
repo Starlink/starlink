@@ -21,7 +21,7 @@
           ENDIF
   100  CONTINUE
        GOTO 400
- 
+
   200  CONTINUE
        DO 300 I = J, NX
           Y(I) = 1.0

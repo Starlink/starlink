@@ -126,7 +126,7 @@
 
 *      Obtain the current UT date.
          CALL RED4_GET_UTDATE( DATE_STRING, STATUS )
-         CALL CHR_CTOI( DATE_STRING(3:ICH_LEN(DATE_STRING)), UTDATE, STATUS ) 
+         CALL CHR_CTOI( DATE_STRING(3:ICH_LEN(DATE_STRING)), UTDATE, STATUS )
       END IF
 
       INTEGRATION = ' '
@@ -144,7 +144,7 @@
      :   S1(:L1)//'_'//S2(:L2)
 
       CALL PAR_DEF0C ('INTFILE', INTEGRATION, STATUS)
-      CALL PAR_GET0C ('INTFILE', INTEGRATION, STATUS)      
+      CALL PAR_GET0C ('INTFILE', INTEGRATION, STATUS)
 
 *    Construct the name of the parent observation file
       L1 = INDEX (INTEGRATION,':')
@@ -162,7 +162,7 @@
       CALL DSA_GET_FITS_C( 'OBSERVATION', 'INTTYPE', 0, INT_TYPE,
      :  COMMENT, STATUS )
 
-      CALL DSA_GET_FITS_I( 'OBSERVATION', 'DCOLUMNS', 0, DIMS(1), 
+      CALL DSA_GET_FITS_I( 'OBSERVATION', 'DCOLUMNS', 0, DIMS(1),
      :  COMMENT, STATUS )
 
       CALL DSA_GET_FITS_I( 'OBSERVATION', 'DROWS', 0, DIMS(2),
@@ -204,7 +204,7 @@
 *    The name of the observation file (without the prefix)
       CLEN = MAX( 1, ICH_LEN( OBSFILE ) )
 
-      CALL DSA_PUT_FITS_C( 'INTEGRATION', 'OBSFILE', OBSFILE(6:CLEN), 
+      CALL DSA_PUT_FITS_C( 'INTEGRATION', 'OBSFILE', OBSFILE(6:CLEN),
      :   ' ', STATUS)
 
       CALL DSA_PUT_FITS_I( 'INTEGRATION', 'INTNUM', INT_NUM,
@@ -245,7 +245,7 @@
       END IF
 
 *    map in the data array
-      CALL DSA_MAP_DATA ('INTEGRATION', 'WRITE', 'FLOAT', ADDRESS, 
+      CALL DSA_MAP_DATA ('INTEGRATION', 'WRITE', 'FLOAT', ADDRESS,
      :   DATA_SLOT, STATUS)
       DATA_PTR = ADDRESS
 

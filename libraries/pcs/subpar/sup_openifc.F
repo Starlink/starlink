@@ -64,7 +64,7 @@
 *     16-JUL-1991 (AJC):
 *        Assume full file name given
 *     27-SEP-1991 (AJC):
-*        Prefix messages with 'SUBPAR:' 
+*        Prefix messages with 'SUBPAR:'
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,7 +112,7 @@
             ISTAT = 0
             OPEN ( UNIT = LUCON, FILE = IFCNAM, STATUS = 'OLD',
 #if HAVE_FC_OPEN_READONLY
-     :           READONLY, 
+     :           READONLY,
 #endif
      :           FORM = 'UNFORMATTED', IOSTAT = ISTAT )
 

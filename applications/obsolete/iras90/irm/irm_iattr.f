@@ -24,7 +24,7 @@
 *     without also changing the applications.  Also, IRM is usually
 *     distributed in a sharable form, which makes it difficult for
 *     applications to access its internal common blocks.
-*     
+*
 *     This routine gets round these problems by providing a subroutine
 *     interface for accessing these common values.
 
@@ -53,7 +53,7 @@
 *     -  NCURV: The no. of curves with defined attributes. The
 *     argument CURVE must be supplied with a value no greater than
 *     NCURV.
-*     -  CRPN: Pen number for each curve. (_INTEGER)   
+*     -  CRPN: Pen number for each curve. (_INTEGER)
 *     -  INCL: Colour indices of the in-line labels for each curve. (_INTEGER)
 *     -  AXPN: Pen number of axis lines (_INTEGER)
 *     -  TKPN: Pen number of tick marks (_INTEGER)
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,9 +86,9 @@
 *  Global Variables:
       INCLUDE 'IRM_COM'          ! IRM internal common blocks.
 *        MCM_OLDPX = INTEGER (Read)
-*           The original GKS polyline colour index 
+*           The original GKS polyline colour index
 *        MCM_OLDTX = INTEGER (Read)
-*           The original GKS text colour index 
+*           The original GKS text colour index
 *        MCM_SOCUR = LOGICAL (Read)
 *           The flag to show whether the curves are drawn in solid
 *           lines.
@@ -99,13 +99,13 @@
 *        MCM_INCL( MXCURV )  = INTEGER (Read)
 *           Colour indices of the in-line labels.
 *        MCM_AXPN = INTEGER (Read)
-*           Pen number of axis lines 
+*           Pen number of axis lines
 *        MCM_TKPN = INTEGER (Read)
 *           Pen number of tick marks
 *        MCM_NLBCL = INTEGER (Read)
 *           Colour index of numeric labels.
 *        MCM_TITCL = INTEGER (Read)
-*           Colour indices of title 
+*           Colour indices of title
 *        MCM_ALBCL = INTEGER (Read)
 *           Colour indices of axes labels.
 *        MCM_STDAT = LOGICAL (Read)

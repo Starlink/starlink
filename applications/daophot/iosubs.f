@@ -25,7 +25,7 @@ C   TBLANK  types a blank line on the terminal.
 C   SWITCH  removes the filename extension from an input filename and
 C           attaches another character string in its place.
 C   EXTEND  checks to see whether an input filename contains a filename
-C           extension and, if not, attaches a default filename 
+C           extension and, if not, attaches a default filename
 C           extension.
 C
 C***********************************************************************
@@ -34,7 +34,7 @@ C
 C
 C=======================================================================
 C
-C Simply type a prompting character string on the terminal, 
+C Simply type a prompting character string on the terminal,
 C right-justified to column N and followed by a single blank, and
 C suppress the carriage return.
 C
@@ -44,7 +44,7 @@ C PROMPT  (INPUT) is the character string.
 C      N  (INPUT) is the column number to contain the last character.
 C
 C=======================================================================
-C 
+C
       IMPLICIT NONE
       INTEGER MIN0
       CHARACTER PROMPT*(*), P*132, LINE*132
@@ -66,7 +66,7 @@ C
 C K is the position of the last valid character in the
 C prompt.  If K is greater than M, the prompt won't fit in one
 C line. Find the last blank before position M; this
-C will serve as a line break.  
+C will serve as a line break.
 C
       IF (K .GT. M) THEN
          DO J=M,1,-1
@@ -105,7 +105,7 @@ C Prompt the user neatly to type in a filename.
 C
 C Arguments
 C
-C PROMPT  (INPUT) the character string to be typed on the terminal 
+C PROMPT  (INPUT) the character string to be typed on the terminal
 C         (right-justified to column 50).
 C
 C   FILE  (INPUT/OUTPUT) the filename.  On input, it is the default
@@ -205,9 +205,9 @@ C
          RETURN
       END IF
 C
-C Otherwise, if IFILE contains a period other than in the first 
+C Otherwise, if IFILE contains a period other than in the first
 C position, it is to be adopted verbatim.
-C 
+C
       DO I=1,30
          J = ICHAR(IFILE(I:I))
          IF (J .EQ. 46) THEN
@@ -219,7 +219,7 @@ C
 C Now we are left with the trickiest possibility.  The input file name
 C contains no period, so the extension from the input file is to be
 C transferred (if any).
-C 
+C
 C Extract the filename extension from the default.  The extension is
 C is any text after the last period.
 C
@@ -289,10 +289,10 @@ C
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers (-1E38) with VAL__MINR.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
       CHARACTER PROMPT*(*), LINE*80
       INTEGER N
       REAL DATA(N)
@@ -329,7 +329,7 @@ C
 C=======================================================================
 C
 C A subroutine to get the user's response to a yes/no question.
-C 
+C
 C Arguments
 C
 C PROMPT  (INPUT) is the prompting character string, to be typed out
@@ -381,7 +381,7 @@ C
 C A subroutine to get a character string from the user.
 C
 C Arguments
-C 
+C
 C PROMPT  (INPUT) is the prompting character string, to be typed out
 C         right-justified to column 50.
 C
@@ -437,7 +437,7 @@ C
 C
 C=======================================================================
 C
-C Subroutine to chop off a filename extension from an input filename 
+C Subroutine to chop off a filename extension from an input filename
 C character string, and append a new character string to the end.
 C
 C Arguments
@@ -446,7 +446,7 @@ C   FILE (INPUT) is a character string containing a filename.
 C
 C ADDEND (INPUT) is the character string to be pasted onto the end
 C        of the character string obtained by removing a directory
-C        name and the period and all that follows from the input 
+C        name and the period and all that follows from the input
 C        filename.
 C
 C SWITCH is the filename part of NAFILE, with any directory name
@@ -546,7 +546,7 @@ C
          IF (I .LT. L) GO TO 1000
       END IF
 C
-C No period was found, so append "." and EXT to the end of the 
+C No period was found, so append "." and EXT to the end of the
 C character string.
 C
       EXTEND=FILE(1:J)//'.'//EXT
@@ -602,7 +602,7 @@ C
          READ (LINE(2:N),*,ERR=1000) ID, X, Y, AMAG, SKY
       END IF
       RETURN                                             ! Normal return
- 1000 CALL STUPID 
+ 1000 CALL STUPID
      .     ('WARNING:  Corrupt star data encountered in input.')
       GO TO 900
 C
@@ -617,7 +617,7 @@ C
 C
 C#######################################################################
 C
-      SUBROUTINE  RDHEAD (LUN, NL, NCOL, NROW, LOBAD, HIBAD, 
+      SUBROUTINE  RDHEAD (LUN, NL, NCOL, NROW, LOBAD, HIBAD,
      .     THRESH, AP1, PHPADU, READNS, FRAD)
 C
 C=======================================================================
@@ -629,11 +629,11 @@ C Input argument
 C
 C    LUN  is the logical unit number of the disk file.
 C
-C     NL  if NL is greater than zero on input, then in the event that 
+C     NL  if NL is greater than zero on input, then in the event that
 C         the header is missing from the input file, the missing
 C         header information will be requested via the keyboard.
 C         If NL is equal to zero on input, only NCOL and NROW
-C         will be requrested.  If NL is a negative number on input, 
+C         will be requrested.  If NL is a negative number on input,
 C         missing information will NOT be requested of the user.
 C
 C Output arguments
@@ -660,20 +660,20 @@ C   LOBAD  is the low bad pixel limit that was used (from FIND)
 C
 C   HIBAD  is the high bad pixel limit that was used (from FIND)
 C
-C    FRAD  is the fitting radius (from OPTION, used by PSF, PEAK, 
+C    FRAD  is the fitting radius (from OPTION, used by PSF, PEAK,
 C          and NSTAR)
 C
 C=======================================================================
 C
       IMPLICIT NONE
- 
+
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers (-1E38) with VAL__MINR.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
       CHARACTER*133 LINE
       CHARACTER*4 FIRST4, TEST
       REAL LOBAD, HIBAD, THRESH, AP1, PHPADU, READNS, FRAD, X
@@ -689,13 +689,13 @@ C
          CALL RDCHAR (LUN, LINE, N, ISTAT)
          N = N+1
          LINE(N:N) = '/'
-         READ (LINE,*) NL, NCOL, NROW, LOBAD, HIBAD, THRESH, 
+         READ (LINE,*) NL, NCOL, NROW, LOBAD, HIBAD, THRESH,
      .        AP1, PHPADU, READNS, FRAD
       ELSE IF ((TEST .NE. 'LOWB') .AND. (TEST .NE. 'OWBA')) THEN
 C
 C Obsolete file header.
 C
-         READ (LUN,901) NLIN, NCOL, NROW, THRESH, AP1, PHPADU, READNS, 
+         READ (LUN,901) NLIN, NCOL, NROW, THRESH, AP1, PHPADU, READNS,
      .        LOBAD, FRAD
   901    FORMAT (1X, I2, 2I4, 7F8.1)
          IF (NL .GE. 0) THEN
@@ -708,7 +708,7 @@ C
          END IF
          NL=NLIN
       ELSE
-         READ (LUN,901) NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1, 
+         READ (LUN,901) NL, NCOL, NROW, LOBAD, HIBAD, THRESH, AP1,
      .        PHPADU, READNS, FRAD
       END IF
       READ (LUN,900)
@@ -760,7 +760,7 @@ C
 C
       REAL LOBAD, HIBAD, THRESH, AP1, PHPADU, READNS, FRAD
       INTEGER LUN, NL, NCOL, NROW, ITEMS, I
-      DATA HEAD /'  LOWBAD', ' HIGHBAD', '  THRESH', '     AP1', 
+      DATA HEAD /'  LOWBAD', ' HIGHBAD', '  THRESH', '     AP1',
      .     '  PH/ADU', '  RNOISE', '    FRAD'/
 C
 C-----------------------------------------------------------------------
@@ -811,14 +811,14 @@ C#######################################################################
 C
       FUNCTION EXTRCT (STRING, IFLAG)
       IMPLICIT NONE
- 
+
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers (-1E38) with VAL__MINR.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
       INTEGER LEN
       CHARACTER*(*) STRING
       REAL EXTRCT
@@ -852,7 +852,7 @@ C
 C=======================================================================
 C
 C This little function is supposed to take two ASCII characters and
-C express them as an integer in the range 0-(32**2-1) without 
+C express them as an integer in the range 0-(32**2-1) without
 C distinguishing upper and lower case:
 C
 C AA = Aa = aA = aa = 0, AB = Ab = aB = ab = 1, BA = Ba = bA = ba = 32,
@@ -889,14 +889,14 @@ C              OFFICIAL DAO VERSION:  1985 October 25
 C
 C Arguments
 C
-C OPTFIL (INPUT) a character string containing either (a) the name of 
+C OPTFIL (INPUT) a character string containing either (a) the name of
 C         a disk file which will be offered as the default file from
-C         which the parameter definitions are to be read (if OPTFIL = 
-C         ' ', no default file name will be offered; if OPTFIL = 
-C         'daophot.opt' and this file does not exist, no error message 
-C         is to be produced and the current contents of OPT are to be 
-C         left alone), or (b) the string 'KEYBOARD INPUT', in which 
-C         case the user is to be prompted to define parameter values 
+C         which the parameter definitions are to be read (if OPTFIL =
+C         ' ', no default file name will be offered; if OPTFIL =
+C         'daophot.opt' and this file does not exist, no error message
+C         is to be produced and the current contents of OPT are to be
+C         left alone), or (b) the string 'KEYBOARD INPUT', in which
+C         case the user is to be prompted to define parameter values
 C         via the terminal.
 C
 C     OPT (INPUT/OUTPUT) numerical values for the NOPT user-definable
@@ -938,8 +938,8 @@ C
  1010 IDOPT(I)=ICNVRT(LBL(I)(J:J+1))
 C
 C If OPTFIL equals anything but 'KEYBOARD INPUT', then treat it as a
-C filename and try to open it and read the commands from it, then 
-C display the results; if it happens to be daophot.opt, return quietly 
+C filename and try to open it and read the commands from it, then
+C display the results; if it happens to be daophot.opt, return quietly
 C afterwards; otherwise, after displaying what you've read, go back
 C and prompt for new keyboard input.
 C
@@ -997,7 +997,7 @@ C value.  Then go back and obtain the next command line.
 C
  2040 OPT(I) = EXTRCT (OLINE(J+1:N), ISTAT)
       IF (ISTAT .NE. 0) THEN
-         CALL STUPID 
+         CALL STUPID
      .        ('Invalid numeric constant: '//OLINE(J+1:N))
          ELSE
             CHANGE = .TRUE.
@@ -1043,7 +1043,7 @@ C
 C SECTION 4
 C
 C There was some problem with one of the parameters.  Type it out and
-C ask for the problem to be corrected.  
+C ask for the problem to be corrected.
 C
  4000 CALL STUPID ('Value unacceptable --- please re-enter')
       CALL INQUIR (LBL(I)//' =', 50)
@@ -1062,8 +1062,8 @@ C-----------------------------------------------------------------------
 C
 C ERROR:  unable to open the disk file.
 C
-C If the file name is 'daophot.opt', no problem-- just check the 
-C default values for validity and return to the main program.  
+C If the file name is 'daophot.opt', no problem-- just check the
+C default values for validity and return to the main program.
 C Otherwise, type an error message and ask for a new file name.
 C
  9000 IF (OPTFIL .EQ. CASE('daophot.opt')) GO TO 3000

@@ -3,7 +3,7 @@
 #include "sae_par.h"
 void atlSink1( const char * );
 
-void atlShow( AstObject *this, const char *fname, const char *options, 
+void atlShow( AstObject *this, const char *fname, const char *options,
               int *status ) {
 /*
 *+
@@ -17,7 +17,7 @@ void atlShow( AstObject *this, const char *fname, const char *options,
 *     C.
 
 *  Invocation:
-*     void atlShow( AstObject *this, const char *fname, const hcar *options, 
+*     void atlShow( AstObject *this, const char *fname, const hcar *options,
 *                   int *status )
 
 *  Description:
@@ -30,7 +30,7 @@ void atlShow( AstObject *this, const char *fname, const char *options,
 *     fname
 *        The file name.
 *     options
-*        Optional attribute settings for the Channel used to create the 
+*        Optional attribute settings for the Channel used to create the
 *        dump.
 *     status
 *        Pointer to the global status variable.
@@ -44,12 +44,12 @@ void atlShow( AstObject *this, const char *fname, const char *options,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@ void atlShow( AstObject *this, const char *fname, const char *options,
 *+
 */
 
-/* Local Variables: */ 
+/* Local Variables: */
    AstChannel *ch;        /* Pointer to the Channel */
    int *old_status;       /* Pointer to original status variable */
    FILE *fd;              /* File descriptor for output file */
@@ -88,7 +88,7 @@ void atlShow( AstObject *this, const char *fname, const char *options,
    if( !fd ) {
       *status = SAI__ERROR;
       msgSetc( "F", fname );
-      errRep( "", "atlShow: Failed to open output text file: \"^F\".", 
+      errRep( "", "atlShow: Failed to open output text file: \"^F\".",
               status );
 
 /* Otherwise, create a Channel. */
@@ -117,8 +117,8 @@ void atlShow( AstObject *this, const char *fname, const char *options,
 void atlSink1( const char *text ){
    FILE *fd;
 
-/* Get the file descriptor from the Channel. Do not use a static 
-   global variable to pass the file descriptor since that would not be 
+/* Get the file descriptor from the Channel. Do not use a static
+   global variable to pass the file descriptor since that would not be
    thread-safe. */
    fd = astChannelData;
 

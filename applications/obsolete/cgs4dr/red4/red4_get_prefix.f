@@ -2,10 +2,10 @@
       SUBROUTINE RED4_GET_PREFIX( TYPE, OUTPUT, STATUS )
 *    Description :
 *     Given a file type (I, O, RI, RO, RG, ST, CA, MASK, INDEX, TEMPLATE,
-*     NDF_TEMPLATE, DST_TEMPLATE, CONFIG) in TYPE return in OUTPUT the 
-*     directory this file type should be in, as a logical name terminated by a 
-*     colon (VMS) or as an environment varible started with a "$" and 
-*     terminated by a "/". 
+*     NDF_TEMPLATE, DST_TEMPLATE, CONFIG) in TYPE return in OUTPUT the
+*     directory this file type should be in, as a logical name terminated by a
+*     colon (VMS) or as an environment varible started with a "$" and
+*     terminated by a "/".
 *    Invocation :
 *     CALL RED4_GET_PREFIX( TYPE, OUTPUT, STATUS )
 *    Parameters :
@@ -42,7 +42,7 @@
       IF ( STATUS.NE.SAI__OK ) RETURN
 
 *    Determine the prefix according to the type of file
-      IF ( TYPE.EQ.'I' ) THEN 
+      IF ( TYPE.EQ.'I' ) THEN
         OUTPUT = PREFIX // 'IDIR' // SEPARATOR
       ELSE IF ( TYPE.EQ.'O' ) THEN
         OUTPUT = PREFIX // 'ODIR' // SEPARATOR

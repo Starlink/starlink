@@ -16,7 +16,7 @@
 * History :
 * 1) CAA, 01st-Jan-90 : added getting of image start and end points from IF
 *    SKL  26th-Jul-94   changed error reporting so removed VALUE
-*    SKL  26thOct1994   changed MAGNIF from INT to REAL, changed IFIX to INT  
+*    SKL  26thOct1994   changed MAGNIF from INT to REAL, changed IFIX to INT
 * Endhistory
 
 * Type Definitions
@@ -110,7 +110,7 @@
 
 	ELSE
 
-* calculate real position of pixel 
+* calculate real position of pixel
 
 	  XRPOS = ( X_PIXEL - 0.5)*MAGNIF + IM_XST
 	  YRPOS = ( Y_PIXEL - 0.5)*MAGNIF + IM_YST

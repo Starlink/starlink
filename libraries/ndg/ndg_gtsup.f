@@ -14,11 +14,11 @@
 
 *  Description:
 *     Returns the supplemental information associated with a given entry
-*     in an NDG group. 
+*     in an NDG group.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
-*        The NDG group as returned by NDG_ASSOC, etc. This should be the last 
+*        The NDG group as returned by NDG_ASSOC, etc. This should be the last
 *        group in a GRP owner-slave chain.
 *     I = INTEGER (Given)
 *        The index of the required entry.
@@ -31,13 +31,13 @@
 *           3 - File type
 *           4 - Base file name
 *           5 - Directory path
-*           6 - Full NDF specification 
+*           6 - Full NDF specification
 *
-*        This information is obtained from a set of groups associated with 
+*        This information is obtained from a set of groups associated with
 *        the supplied group IGRP by means of a chain of GRP "owner-slave"
 *        relationships. If any of these groups do not exist, the corresponding
 *        elements of the above array are returned blank. Note, Element 6,
-*        the full NDF specification, is obtained directly from the supplied 
+*        the full NDF specification, is obtained directly from the supplied
 *        group IGRP.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     6-SEP-1999 (DSB):
 *        Original version.
 *     22-FEB-2001 (DSB):
-*        Changed ".EQ. GRP__NOID" to ".NE. GRP__NOID" through out. 
+*        Changed ".EQ. GRP__NOID" to ".NE. GRP__NOID" through out.
 *     {enter_further_changes_here}
 
 *-
@@ -84,8 +84,8 @@
 
 *  Arguments Given:
       INTEGER IGRP
-      INTEGER I 
-      
+      INTEGER I
+
 *  Arguments Returned:
       CHARACTER FIELDS( 6 )*(*)
 

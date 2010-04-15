@@ -20,7 +20,7 @@
 
 #  Public Variables (Configuration Options):
 #     ndf = ndf/ndfset object
-#        The ndf object or ndfset object with which the widget is 
+#        The ndf object or ndfset object with which the widget is
 #        associated.
 
 #  Copyright:
@@ -114,7 +114,7 @@
             $omenu configure -state disabled
          }
       }
- 
+
 
 #-----------------------------------------------------------------------
       public variable value "" {
@@ -156,7 +156,7 @@
 ########################################################################
 
    itk::usual Wcsframecontrol {
-      keep -background -cursor -foreground 
+      keep -background -cursor -foreground
    }
 
 
@@ -167,6 +167,6 @@
    proc wcsframecontrol { pathname args } {
       uplevel Wcsframecontrol $pathname $args
    }
-   
+
 
 # $Id$

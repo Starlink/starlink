@@ -92,11 +92,11 @@ void smf_convert_bad( smfData *data, int *status ) {
     errRep( "", FUNC_NAME ": smfData pointer is NULL", status );
     return;
   }
-  
+
   /* Check for double-precision data */
   if( data->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Data is not double precision.", 
+    errRep( "", FUNC_NAME ": Data is not double precision.",
             status );
     return;
   }

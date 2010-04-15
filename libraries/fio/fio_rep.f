@@ -36,7 +36,7 @@
 *     CALL FIO_REP( UNIT, ' ', IOSTAT, 'Failed to open ^FNAME', STATUS )
 *        This example provides an explicit error message containing the
 *        token FNAME.
-      
+
 *  Notes:
 *     -  This routine sets the message tokens UNIT, FNAME and IOSTAT.
 *        They can be given in the text of the error message.
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,7 +88,7 @@
 
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -154,7 +154,7 @@
       ELSE
          CALL EMS_REP( 'FIO_REP_IOSTAT', MESS, STATUS )
       END IF
-         
+
   999 CONTINUE
 
       END

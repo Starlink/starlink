@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,11 +92,11 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
       INCLUDE 'AST_PAR'          ! AST_ public interface
-      
+
 *  Arguments Given:
       INTEGER IACB
       INTEGER IWCS
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -155,7 +155,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Obtain the number of input coordinates and number of current Frame
 *  axes for the FrameSet supplied.
       NIN = AST_GETI( IWCS, 'Nin', STATUS )
@@ -203,7 +203,7 @@
          ELSE
             CALL AST_SETC( IWCS, 'Title',
      :           'Data grid indices; first pixel at ' //
-     :           COSTR( : NC ), STATUS ) 
+     :           COSTR( : NC ), STATUS )
          END IF
 
 *  For each axis, set up a format, label, symbol and unit value.
@@ -228,11 +228,11 @@
          IF ( NAXES .EQ. 1 ) THEN
             CALL AST_SETC( IWCS, 'Title',
      :                     'Pixel coordinate; first pixel at ' //
-     :                     COSTR( : NC ), STATUS ) 
+     :                     COSTR( : NC ), STATUS )
          ELSE
             CALL AST_SETC( IWCS, 'Title',
      :                     'Pixel coordinates; first pixel at ' //
-     :                     COSTR( : NC ), STATUS ) 
+     :                     COSTR( : NC ), STATUS )
          END IF
 
 *  For each axis, set up a format, label, symbol and unit value.
@@ -258,11 +258,11 @@
          IF ( NAXES .EQ. 1 ) THEN
             CALL AST_SETC( IWCS, 'Title',
      :                     'Axis coordinate; first pixel at ' //
-     :                     COSTR( : NC ), STATUS ) 
+     :                     COSTR( : NC ), STATUS )
          ELSE
             CALL AST_SETC( IWCS, 'Title',
      :                     'Axis coordinates; first pixel at ' //
-     :                     COSTR( : NC ), STATUS ) 
+     :                     COSTR( : NC ), STATUS )
          END IF
 
 *  To obtain label and unit strings, we must access the NDF's AXIS
@@ -355,10 +355,10 @@
      :                              'Unit(' // AXIS( : NC ) // ')',
      :                              'pixel', STATUS )
                   ELSE
-                     CALL AST_CLEAR( IWCS, 
+                     CALL AST_CLEAR( IWCS,
      :                               'Format(' // AXIS( : NC ) // ')',
      :                               STATUS )
-                     CALL AST_CLEAR( IWCS, 
+                     CALL AST_CLEAR( IWCS,
      :                               'Unit(' // AXIS( : NC ) // ')',
      :                               STATUS )
                   ENDIF
@@ -396,11 +396,11 @@
          IF ( NAXES .EQ. 1 ) THEN
             CALL AST_SETC( IWCS, 'Title',
      :                     'Normalised pixel coordinate; first pixel'//
-     :                     ' at '//COSTR( : NC ), STATUS ) 
+     :                     ' at '//COSTR( : NC ), STATUS )
          ELSE
             CALL AST_SETC( IWCS, 'Title',
      :                     'Normalised pixel coordinates; first pixel'//
-     :                     ' at '//COSTR( : NC ), STATUS ) 
+     :                     ' at '//COSTR( : NC ), STATUS )
          END IF
 
 *  For each axis, set up a format, label, symbol and unit value.
@@ -410,7 +410,7 @@
             CALL AST_SETC( IWCS, 'Format(' // AXIS( : NC ) // ')',
      :                     FRAFMT, STATUS )
             CALL AST_SETC( IWCS, 'Label(' // AXIS( : NC ) // ')',
-     :                     'Normalised pixel coordinate ' // 
+     :                     'Normalised pixel coordinate ' //
      :                     AXIS( : NC ), STATUS )
             CALL AST_SETC( IWCS, 'Symbol(' // AXIS( : NC ) // ')',
      :                     'f' // AXIS( : NC ), STATUS )
@@ -419,7 +419,7 @@
  5       CONTINUE
 
       END IF
-      
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_INIFR', STATUS )
 

@@ -27,7 +27,7 @@
 
 *   Local variables:
       INTEGER IORD     ! order index
- 
+
 *   Find any existing slot
       CALL FNCUT(ORD, IORD)
 

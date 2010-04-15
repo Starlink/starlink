@@ -1,4 +1,4 @@
-	SUBROUTINE POL_ERRCAL( INT_1, INT_2, INT_3, INT_4, POL, ELDN, 
+	SUBROUTINE POL_ERRCAL( INT_1, INT_2, INT_3, INT_4, POL, ELDN,
      :	                       POL_ERROR, THETA_ERROR)
 
 *      Subroutine to calculate the polarization error from the 4 intensities
@@ -7,9 +7,9 @@
 
 *      Define local variables
 
-	REAL 
+	REAL
      :       ELDN,		! electrons/data number
-     :       INT_1,		! The intensity at 0 degrees 
+     :       INT_1,		! The intensity at 0 degrees
      :	     INT_2,		! The intensity at 22.5 degrees
      :	     INT_3,		! The intensity at 45 degrees
      :	     INT_4,		! The intensity at 67.5 degrees

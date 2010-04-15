@@ -15,9 +15,9 @@
 *  Description:
 *     The routine returns a logical flag indicating if the first supplied
 *     NDF is contained within an extension of the second supplied NDF.
-*     The search is recursive, so for instance a true value will be 
-*     returned if the second supplied NDF is contained within an extension 
-*     of an intermediate NDF that is contained within an extension of the 
+*     The search is recursive, so for instance a true value will be
+*     returned if the second supplied NDF is contained within an extension
+*     of an intermediate NDF that is contained within an extension of the
 *     first supplied NDF.
 
 *  Arguments:
@@ -38,8 +38,8 @@
 *     routine, then the search will be applied to the associated
 *     base NDF.
 *     -  If this routine is called with STATUS set, then a value of
-*     .FALSE. will be returned for the ISIN argument, although no 
-*     further processing will occur. The same value will also be 
+*     .FALSE. will be returned for the ISIN argument, although no
+*     further processing will occur. The same value will also be
 *     returned if the routine should fail for any reason.
 
 *  Copyright:
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,16 +129,16 @@
       CALL NDF1_IMPID( INDF1, IACB1, STATUS )
       CALL NDF1_IMPID( INDF2, IACB2, STATUS )
 
-*  For each NDF, obtain an index to the data object entry in the DCB 
+*  For each NDF, obtain an index to the data object entry in the DCB
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Obtain HDS locators for the two data object entries in the DCB, and
 *  get the paths to the container files, and the paths to the objects
 *  within the container files.
-         CALL HDS_TRACE( DCB_LOC( ACB_IDCB( IACB1 ) ), NLEV1, PATH1, 
-     :                   FILE1, STATUS ) 
-         CALL HDS_TRACE( DCB_LOC( ACB_IDCB( IACB2 ) ), NLEV2, PATH2, 
-     :                   FILE2, STATUS ) 
+         CALL HDS_TRACE( DCB_LOC( ACB_IDCB( IACB1 ) ), NLEV1, PATH1,
+     :                   FILE1, STATUS )
+         CALL HDS_TRACE( DCB_LOC( ACB_IDCB( IACB2 ) ), NLEV2, PATH2,
+     :                   FILE2, STATUS )
 
 *  Check that the container files are the same, and that the depth of the
 *  second NDF is less than or equal to the depth of the first NDF.
@@ -148,7 +148,7 @@
 *  the second NDF. If so, the NDFs are equal or the first is a child of
 *  the second.
             PLEN2 = CHR_LEN( PATH2 )
-            ISIN = ( PATH1( : PLEN2 ) .EQ. PATH2( : PLEN2 ) ) 
+            ISIN = ( PATH1( : PLEN2 ) .EQ. PATH2( : PLEN2 ) )
 
          END IF
       END IF
@@ -156,10 +156,10 @@
 *  If an error occurred, then return .FALSE.
       IF ( STATUS .NE. SAI__OK ) THEN
          ISIN = .FALSE.
-       
+
 *  Report context information and call the error tracing routine.
          CALL ERR_REP( 'NDF_ISIN_ERR', 'NDF_ISIN: Error checking if '//
-     :                 'an NDF is contained within another NDF.', 
+     :                 'an NDF is contained within another NDF.',
      :                 STATUS )
          CALL NDF1_TRACE( 'NDF_ISIN', STATUS )
       END IF

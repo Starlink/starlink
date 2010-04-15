@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -95,7 +95,7 @@
 *        Internal routines renamed from GKS_ to GKS1_.
 *        par_par included
 *        GKs 7.4 version of "No clear open" escape added
-*        Use of GNS_GMESS eliminated 
+*        Use of GNS_GMESS eliminated
 *        Declare GKS1_BLK as EXTERNAL to force loading on block data subprogam
 *     {enter_further_changes_here}
 
@@ -234,9 +234,9 @@
 
                            IA(1) = WSN
                            IA(2) = GYES
-                           CALL GPREC(2, IA, 1, RA, 1, 1, STR, 1, IER, 
+                           CALL GPREC(2, IA, 1, RA, 1, 1, STR, 1, IER,
      :                               LIESC, IESCDR)
-                           CALL GESC(-3, LIESC, IESCDR, 1, LOESC, 
+                           CALL GESC(-3, LIESC, IESCDR, 1, LOESC,
      :                               OESCDR)
                         END IF
                       END IF

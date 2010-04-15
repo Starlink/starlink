@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_UNPACK_CHOPSCAN (RESNBS, N_POINTS, ISTART,
-     :   NPIX, POINTER, RESDATA_450, RESWT_450, RESDATA_850, RESWT_850, 
+     :   NPIX, POINTER, RESDATA_450, RESWT_450, RESDATA_850, RESWT_850,
      :   RESDIM1, RESDIM2, BAD)
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL SCULIB_UNPACK_CHOPSCAN (RESNBS, N_POINTS, ISTART,
-*    :   NPIX, POINTER, RESDATA_450, RESWT_450, RESDATA_850, RESWT_850, 
+*    :   NPIX, POINTER, RESDATA_450, RESWT_450, RESDATA_850, RESWT_850,
 *    :   RESDIM1, RESDIM2, BAD)
 
 *  Arguments:
@@ -132,7 +132,7 @@
 
                IF (RESNBS(1, POINTER(J)+I-ISTART(J)) .NE. BAD) THEN
                   RESDATA_450 (I, J) = RESNBS (1,POINTER(J)+I-ISTART(J))
-               ELSE 
+               ELSE
                   RESDATA_450 (I, J) = 0.0
                END IF
 
@@ -158,6 +158,6 @@
 
          END IF
 
-      END DO      
+      END DO
 
       END

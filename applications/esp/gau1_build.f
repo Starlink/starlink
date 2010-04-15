@@ -19,8 +19,8 @@
 
 *  Description:
 *     Create an image from the Gaussians defined and then subtract
-*     it from the source image. The value RESID contains a 
-*     weighted residual which is used to minimise the actual 
+*     it from the source image. The value RESID contains a
+*     weighted residual which is used to minimise the actual
 *     residuals.
 
 *  Arguments:
@@ -54,7 +54,7 @@
 *        The global status.
 *
 *     [NG] The parameters pass(i,j) seem to be as follows:
-*     pass(i,1): x-coord of gaussian 
+*     pass(i,1): x-coord of gaussian
 *     pass(i,2): y-coord
 *     pass(i,3): ?
 *     pass(i,4): peak height/pixels
@@ -139,21 +139,21 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
 
 *   For each Gaussian.
       DO 10 I=1,NSOUR
-         
+
 *      Define a converted angle (ie, convert pass(i,7) to radians [NG])
          PIC=PASS(I,7)*PI2360
 
 *      Scaling factor for pixel brightness.
          V1=PASS(I,4)
 
-*      Look at all pixels within a square about the origin.     
+*      Look at all pixels within a square about the origin.
 *      (within a square? - I see no limit! [NG])
          DO 30 J=1,UPIX
 
 *         Determine angle and distance from origin.
             D1=REAL(ARRAY6(J))-PASS(I,2)
             D2=REAL(ARRAY5(J))-PASS(I,1)
-            IF (ABS(D2).GT.1E-10) THEN 
+            IF (ABS(D2).GT.1E-10) THEN
                ANGLE=ATAN(D1/D2)-PIC
                RD=SQRT(D1**2+D2**2)
             ELSE
@@ -162,13 +162,13 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
             END IF
 *         Angle is the position of this point rel. major axis
 *         (given by pass(i,7)), anticlockwise in radians [NG]
-               
-*         Find value of X and Y relative to unrotated Gaussian.  
+
+*         Find value of X and Y relative to unrotated Gaussian.
             XV=(RD*COS(ANGLE)/PASS(I,5))**2
             YV=(RD*SIN(ANGLE)/PASS(I,6))**2
 
 *         Calculate pixel brightness and add it to the current value.
-            ADD=ARRAY4(J)            
+            ADD=ARRAY4(J)
 *         These ABS() aren't necessary!  Should it be dividing by 4?
 *            ARRAY3(ADD)=ARRAY3(ADD)+V1*EXP(-(ABS(YV)+ABS(XV))/4.)
             ARRAY3(ADD)=ARRAY3(ADD)+V1*EXP(-(YV+XV)/4.)
@@ -177,7 +177,7 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
 
  10   CONTINUE
 
-*   Look through all the pixels subtracting the value in the created array 
+*   Look through all the pixels subtracting the value in the created array
 *   from the source image.
       RESID=0.0
       DO 100 I=1,UPIX
@@ -187,15 +187,15 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
 
 *      Calculate the residuals.
          RESID=RESID+ABS(ARRAY2(J)-ARRAY3(J))*ABS(ARRAY2(J))
-         
-*      Assign the output image value. 
+
+*      Assign the output image value.
          ARRAY3(J)=ARRAY2(J)-ARRAY3(J)
 
  100  CONTINUE
 
 *   Normalise the result.
       RESID=SQRT(RESID/REAL(UPIX))
-      
+
  9999 CONTINUE
 
       END

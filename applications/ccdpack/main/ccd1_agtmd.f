@@ -26,8 +26,8 @@
 *     ignored.
 *
 *     The routine reads until it finds a blank line (without even a
-*     comment) or the end of file.  If it reads any line which is not 
-*     blank or a comment and does not start 'USE' it will exit with 
+*     comment) or the end of file.  If it reads any line which is not
+*     blank or a comment and does not start 'USE' it will exit with
 *     error status.  Unrecognised modifier words are skipped harmlessly.
 *
 *     Currently, only a single modifier is recognised:
@@ -86,14 +86,14 @@
 
 *  Local Constants:
       INTEGER MXWRD              ! Maximum words in a line
-      PARAMETER ( MXWRD = 4 )  
-      
+      PARAMETER ( MXWRD = 4 )
+
 *  Arguments Given:
       INTEGER FD
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) FITROT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -106,7 +106,7 @@
       INTEGER NWRD               ! Number of words in line
       INTEGER START( MXWRD )     ! Start positions of words in line
       INTEGER STOP( MXWRD )      ! End positions of words in line
-      
+
 *.
 
 *  Check inherited global status.
@@ -151,7 +151,7 @@
 *  Deal with words.
       IF ( WORDS( 2 ) .EQ. 'FITSROT' ) THEN
          IF ( NWRD .NE. 3 ) THEN
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      :      '    Warning: wrong number of words in line:', STATUS )
             CALL MSG_SETC( 'LINE', LINE )
             CALL CCD1_MSG( ' ', '      "^LINE"', STATUS )
@@ -159,10 +159,10 @@
          FITROT = WORDS( 3 )
          CALL CHR_UCASE( FITROT )
          CALL MSG_SETC( 'FITROT', FITROT )
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      :   '    FITS header "^FITROT" used for rotation', STATUS )
       ELSE
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      :      '    Warning: unknown modifier line:', STATUS )
          CALL MSG_SETC( 'LINE', LINE )
          CALL CCD1_MSG( ' ', '      "^LINE"', STATUS )

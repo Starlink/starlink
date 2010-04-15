@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine creates a new GRP group which is a copy of an old one
-*     but with the names sorted.  The case sensitivity attribute of 
+*     but with the names sorted.  The case sensitivity attribute of
 *     the group is respected.
 *
 *     The algorithm currently used is an insertion sort, which is not
@@ -68,13 +68,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
-      
+
 *  Arguments Given:
       INTEGER IGRP
-      
+
 *  Arguments Returned:
       INTEGER OGRP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 

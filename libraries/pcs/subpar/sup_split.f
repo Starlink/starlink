@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL SUBPAR_SPLIT ( NAMESTRING, MAXLEVS, NUMLEVS, COMPONENT,
-*    :      FILENAME, STATUS )    
+*    :      FILENAME, STATUS )
 
 *  Description:
 *     Split a string specifying an HDS structure into the name of the
@@ -204,7 +204,7 @@
             IF ( FINISH .GT. START ) THEN
                J = J + 1
                COMPONENT(J) = NAMESTRING(START:FINISH-1)
-               START = FINISH + 1               
+               START = FINISH + 1
             ELSE IF ( FINISH .LT. START ) THEN
                J = J + 1
                COMPONENT(J) = NAMESTRING(START:NAMLEN)
@@ -244,7 +244,7 @@
 
 *           Look first for a logical name terminator
 *           Only look as far as the first '(' - any after that is slice
-*           If none, set START to 1               
+*           If none, set START to 1
                FINISH = INDEX ( FILENAME(1:NAMLEN), '(' )
                IF ( FINISH .EQ. 0 ) FINISH = NAMLEN
                START = MAX ( INDEX ( FILENAME(1:FINISH), ':' ), 1 )

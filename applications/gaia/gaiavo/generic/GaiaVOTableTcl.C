@@ -311,7 +311,7 @@ static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
 
 /**
  *  Get an INFO value from a VOTable. The INFO is identified by it's name.
- *  (e.q. "QUERY_STATUS" for <INFO name="QUERY_STATUS">). Returns the 
+ *  (e.q. "QUERY_STATUS" for <INFO name="QUERY_STATUS">). Returns the
  *  value attribute and any text content.
  */
 static int GaiaVOTableTclInfo( ClientData clientData, Tcl_Interp *interp,
@@ -333,14 +333,14 @@ static int GaiaVOTableTclInfo( ClientData clientData, Tcl_Interp *interp,
 
         /*  Get the values. */
         if ( table->infoValue( Tcl_GetString( objv[2] ), value, content ) ) {
-            Tcl_AppendElement( interp, 
+            Tcl_AppendElement( interp,
                                const_cast<char *>( value.c_str() ) );
-            Tcl_AppendElement( interp, 
+            Tcl_AppendElement( interp,
                                const_cast<char *>( content.c_str() ) );
             return TCL_OK;
         }
         else {
-            Tcl_SetResult( interp, 
+            Tcl_SetResult( interp,
                            const_cast<char *>( "Failed to locate INFO value" ),
                            TCL_VOLATILE );
         }

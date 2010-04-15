@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SPD_CZEE( DIALOG, MAXGAU, NCOMP, FITPAR, FITDIM, CONT, 
+*     CALL SPD_CZEE( DIALOG, MAXGAU, NCOMP, FITPAR, FITDIM, CONT,
 *        CFLAGS, PFLAGS, SFLAGS, CENTRE, PEAK, SIGMA, COVAR, STATUS )
 
 *  Description:
@@ -103,7 +103,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

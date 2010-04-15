@@ -21,7 +21,7 @@
 *     expression.  The prefix is any string occuring between index
 *     START and KSTART.  The suffix is any string occuring between
 *     index KEND and NEXT.
-     
+
 *  Arguments:
 *     SLOT2 = INTEGER (Given)
 *        The slot number for the group containing the elements to be
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,7 +81,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
          END = NEXT - 1
       ELSE
          END = CHR_LEN( GRPEXP )
-      END IF      
+      END IF
 
 *  Loop round the specified elements of the group.
       DO II = FIRST, LAST
@@ -155,8 +155,8 @@
          IF( ELEN .GT. 0 ) CALL CHR_APPND( ELEM( : ELEN ), TEXT, TLEN )
 
 *  Append the suffix (if there is one).
-         IF( KEND .LT. END .AND. KEND .GE. 0 ) 
-     :                        CALL CHR_APPND( GRPEXP( KEND + 1 : END ), 
+         IF( KEND .LT. END .AND. KEND .GE. 0 )
+     :                        CALL CHR_APPND( GRPEXP( KEND + 1 : END ),
      :                                        TEXT, TLEN )
 
 *  Store the modified element (or a blank if the modified element has
@@ -164,7 +164,7 @@
          IF( TLEN .GT. 0 ) THEN
             CALL GRP1_PTELM( SLOT2, II, TEXT( : TLEN ), DEP, IFILE,
      :                       MODGP, MODIN, STATUS )
-         ELSE 
+         ELSE
             CALL GRP1_PTELM( SLOT2, II, ' ', DEP, IFILE, MODGP,
      :                       MODIN, STATUS )
          END IF

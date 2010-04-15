@@ -19,33 +19,33 @@
 *
 * Arguments:
 *    AA(MORD,LINE_COUNT) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    MORD = INTEGER (Given)
-*       
+*
 *    YLIM(2,LINE_COUNT) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    KP1 = INTEGER (Given)
-*       
+*
 *    W(SPDIM1,LINE_COUNT) = DOUBLE PRECISION ARRAY (Given)
-*       
+*
 *    NPTS(LINE_COUNT) = INTEGER ARRAY (Given)
-*       
+*
 *    USED(LINE_COUNT) = LOGICAL ARRAY (Given)
-*       
+*
 *    RESULTS(MXPARS,NYP,NXP) = REAL ARRAY (Returned)
-*       
+*
 *    RESVAR(MXPARS,NYP,NXP) = REAL ARRAY (Returned)
-*       
+*
 *    ARC(NSLCT,LINE_COUNT) = INTEGER*2 ARRAY (Returned)
-*       
+*
 *    POLYDATA = LOGICAL (Returned)
-*       
+*
 *    X(SPDIM1,LINE_COUNT) = DOUBLE PRECISION ARRAY (Workspace)
-*       
+*
 *    WORK(SPDIM1*4) = DOUBLE PRECISION ARRAY (Workspace)
-*       
+*
 *    WAV(LINE_COUNT) = DOUBLE PRECISION ARRAY (Workspace)
-*       
+*
 *    MAXNPTS = INTEGER (Given)
 *        Max number of data points
 *    ATHREE(3*MAXNPTS+3*MAX_KPLUS1) = DOUBLE PRECISION ARRAY

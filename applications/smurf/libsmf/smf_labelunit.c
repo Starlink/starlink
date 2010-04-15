@@ -119,11 +119,11 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
    output NDF, and save them for later use. */
        if( ifile == 1 ) {
          if( strlen( label ) ) {
-            ndfCput( label, odata->file->ndfid, "Label", status ); 
+            ndfCput( label, odata->file->ndfid, "Label", status );
          }
 
          if( strlen( unit ) ) {
-            ndfCput( unit, odata->file->ndfid, "Unit", status ); 
+            ndfCput( unit, odata->file->ndfid, "Unit", status );
          }
 
          one_strlcpy( label1, label, sizeof(label1), status );

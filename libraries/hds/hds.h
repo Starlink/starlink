@@ -264,8 +264,8 @@ datGet0L( const HDSLoc * loc, int * value, int * status );
 /*==================================*/
 
 int
-datGet1C( const HDSLoc * locator, 
-	  size_t maxval, 
+datGet1C( const HDSLoc * locator,
+	  size_t maxval,
 	  size_t bufsize,
 	  char *buffer,
 	  char *pntrs[],
@@ -321,8 +321,8 @@ datGet1L( const HDSLoc * locator,
 /*==================================*/
 
 int
-datGetVC( const HDSLoc * locator, 
-	  size_t maxval, 
+datGetVC( const HDSLoc * locator,
+	  size_t maxval,
 	  size_t bufsize,
 	  char *buffer,
 	  char *pntrs[],
@@ -454,7 +454,7 @@ datMapL(const HDSLoc *locator,
         const hdsdim dims[],
         int       **pntr,
         int       *status );
-        
+
 /*==================================*/
 /* datMapR - Map _REAL primitive(s) */
 /*==================================*/
@@ -493,7 +493,7 @@ datMapV(const HDSLoc    *locator,
         size_t    *actval,
         int       *status );
 
-        
+
 /*==================================*/
 /* datMould - Alter shape of object */
 /*==================================*/
@@ -519,7 +519,7 @@ datMove(HDSLoc **locator1,
 /*======================================*/
 
 void
-datMsg( const char * token, 
+datMsg( const char * token,
         const HDSLoc * loc );
 
 /*===============================*/
@@ -840,8 +840,8 @@ datPut1C( const HDSLoc * locator,
 /*========================================*/
 
 int
-datPut1D( const HDSLoc * loc, 
-	  size_t nval, 
+datPut1D( const HDSLoc * loc,
+	  size_t nval,
 	  const double values[],
 	  int * status );
 
@@ -850,8 +850,8 @@ datPut1D( const HDSLoc * loc,
 /*========================================*/
 
 int
-datPut1I( const HDSLoc * loc, 
-	  size_t nval, 
+datPut1I( const HDSLoc * loc,
+	  size_t nval,
 	  const int values[],
 	  int * status );
 
@@ -860,8 +860,8 @@ datPut1I( const HDSLoc * loc,
 /*========================================*/
 
 int
-datPut1R( const HDSLoc * loc, 
-	  size_t nval, 
+datPut1R( const HDSLoc * loc,
+	  size_t nval,
 	  const float values[],
 	  int * status );
 
@@ -870,8 +870,8 @@ datPut1R( const HDSLoc * loc,
 /*========================================*/
 
 int
-datPut1L( const HDSLoc * loc, 
-	  size_t nval, 
+datPut1L( const HDSLoc * loc,
+	  size_t nval,
 	  const int values[],
 	  int * status );
 
@@ -880,8 +880,8 @@ datPut1L( const HDSLoc * loc,
 /*================================================*/
 
 int
-datPutVD( const HDSLoc * loc, 
-	  size_t nval, 
+datPutVD( const HDSLoc * loc,
+	  size_t nval,
 	  const double values[],
 	  int * status );
 
@@ -890,8 +890,8 @@ datPutVD( const HDSLoc * loc,
 /*================================================*/
 
 int
-datPutVI( const HDSLoc * loc, 
-	  size_t nval, 
+datPutVI( const HDSLoc * loc,
+	  size_t nval,
 	  const int values[],
 	  int * status );
 
@@ -900,8 +900,8 @@ datPutVI( const HDSLoc * loc,
 /*================================================*/
 
 int
-datPutVR( const HDSLoc * loc, 
-	  size_t nval, 
+datPutVR( const HDSLoc * loc,
+	  size_t nval,
 	  const float values[],
 	  int * status );
 
@@ -910,8 +910,8 @@ datPutVR( const HDSLoc * loc,
 /*================================================*/
 
 int
-datPutVL( const HDSLoc * loc, 
-	  size_t nval, 
+datPutVL( const HDSLoc * loc,
+	  size_t nval,
 	  const int values[],
 	  int * status );
 
@@ -920,7 +920,7 @@ datPutVL( const HDSLoc * loc,
 /*================================================*/
 
 int
-datPutVC( const HDSLoc * locator, 
+datPutVC( const HDSLoc * locator,
 	  size_t nval,
 	  const char *values[],
 	  int * status );
@@ -955,7 +955,7 @@ datRenam(const HDSLoc *locator,
 /* datReset - Reset object state */
 /*================================*/
 
-int 
+int
 datReset(const HDSLoc *locator,
           int *status);
 
@@ -1004,7 +1004,7 @@ datSlice(const HDSLoc  *locator1,
 /* datState - Enquire object state */
 /*=================================*/
 
-int   
+int
 datState(const HDSLoc *locator,
          int *state,
          int *status);
@@ -1240,7 +1240,7 @@ hdsTune(const char *param_str,
 /* hdsWild - Perform a wild-card search for HDS container files   */
 /*=================================================================*/
 
-int 
+int
 hdsWild(const char *fspec,
         const char *mode,
         int *iwld,
@@ -1248,7 +1248,7 @@ hdsWild(const char *fspec,
         int *status);
 
 /*=================================================================*/
-/*  Deprecated routines!                                           */   
+/*  Deprecated routines!                                           */
 /*=================================================================*/
 
 /*========================================*/
@@ -1273,8 +1273,8 @@ hdsClose(HDSLoc **locator,
 /*===================================================================*/
 /* hdsFind - Find an object (Fortran routine, requires hdsf library) */
 /*===================================================================*/
-void 
-hdsFind( const HDSLoc *loc1, const char *name, const char *mode, 
+void
+hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
          HDSLoc **loc2, int *status );
 
 

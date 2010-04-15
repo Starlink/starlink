@@ -28,7 +28,7 @@
        NUVAL = 0.0
        TEMP = ' '
        IF (MODE.EQ.0) THEN
-          CALL RDSTR( 'NEBCONT', STRING(:20), TEXT(:LLENT), TEMP, 
+          CALL RDSTR( 'NEBCONT', STRING(:20), TEXT(:LLENT), TEMP,
      :                STATUS )
           IF( STATUS .NE. SAI__OK ) THEN
              OK = .FALSE.

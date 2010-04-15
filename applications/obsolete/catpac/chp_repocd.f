@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHP_REPOCD( INPUT, CNAME, CFORMAT,  
+     : CHP_REPOCD( INPUT, CNAME, CFORMAT,
      : CUNIT, CCOMMENT, CPREFDIS, CASSERT, CASSEXP, CDOMCHK, STATUS)
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHP_REPOCD( INPUT, CNAME, CFORMAT,  
+*     CALL CHP_REPOCD( INPUT, CNAME, CFORMAT,
 *      CUNIT, CCOMMENT, CPREFDIS, CASSERT, CASSEXP, CDOMCHK, STATUS)
 *
 *  Description:
 *     Replace a columns details. A column can be given a new format (consistent
-*     with the type), units, comment, preferred display flag, assert flag and 
+*     with the type), units, comment, preferred display flag, assert flag and
 *     assert expression or domain checking flag.
 
 *  Arguments:
@@ -46,7 +46,7 @@
 *     If the new column format is inconsistent with the column type a invalid
 *     column format error will be reported.
 *
-*     If the column details can not be replaced an insufficient privilege to 
+*     If the column details can not be replaced an insufficient privilege to
 *     update error will be reported.
 *
 *  Anticipated Errors:
@@ -67,7 +67,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,7 +86,7 @@
       LOGICAL CASSERT
       CHARACTER * ( * ) CASSEXP
       LOGICAL CDOMCHK
-    
+
 *  Arguments Returned:
 
 *  Status:

@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -195,13 +195,13 @@
      :      'in Specdre Extension.', STATUS )
          GO TO 500
       END IF
-      
+
 *  .RESULTS.MORE.LINENAME is a _CHAR*32 vector. There is one element for
 *  each spectral component.
       CALL NDF_XNEW( XNDF, XC9C1, XT9C1, 1, NCOMP, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-      CALL SPD_FDAAC( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), 
-     :                'unidentified component', STATUS, 
+      CALL SPD_FDAAC( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                'unidentified component', STATUS,
      :                %VAL(CNF_CVAL(CSIZE)) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
@@ -224,7 +224,7 @@
       CALL NDF_XNEW( XNDF, XC9C3, XT9C3, 1, NCOMP, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
       CALL SPD_FDAAC( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ),
-     :                'unknown function', STATUS, 
+     :                'unknown function', STATUS,
      :                %VAL(CNF_CVAL(CSIZE)) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
@@ -270,7 +270,7 @@
       CALL NDF_XNEW( XNDF, XC9P1, XT9P1, 1, TNPAR, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, TNPAR, PNTR(1), STATUS )
       CALL SPD_FDAAC( 1, TNPAR, %VAL( CNF_PVAL(PNTR(1)) ),
-     :                'unknown parameter', STATUS, 
+     :                'unknown parameter', STATUS,
      :                %VAL(CNF_CVAL(CSIZE)) )
       CALL DAT_ANNUL( RLOC, STATUS )
 

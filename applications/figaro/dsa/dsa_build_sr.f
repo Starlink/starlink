@@ -10,7 +10,7 @@ C
 C  Description:
 C     This is a utility routine for DSA_ internal use, that takes an
 C     existing - probably newly created - structure object, and builds
-C     in it a structure of a type defined through a structure definition 
+C     in it a structure of a type defined through a structure definition
 C     file and whose description is in the structure common tables.
 C     Structuring the routines in this way allows the top level object
 C     for this structure to be either a file or an object in a file.
@@ -57,7 +57,7 @@ C     1st Sept 1987   Original version.  KS / AAO.
 C     15th Jan 1990   Crude modification to allow structured arrays
 C                     added, and REF_SLOT argument added to help support
 C                     multiple file types.  KS/AAO.
-C     3rd  Mar 1991   Now allows variable names to be used in element 
+C     3rd  Mar 1991   Now allows variable names to be used in element
 C                     types. KS/AAO.
 C     21st Aug 1992   Automatic portability modifications
 C                     ("INCLUDE" syntax etc) made. KS/AAO
@@ -130,7 +130,7 @@ C
          GO TO 500    ! Error exit
       END IF
 C
-C     Make sure that the passed data object a) exists, b) is of the correct 
+C     Make sure that the passed data object a) exists, b) is of the correct
 C     type, c) is a structure, and d) is empty.
 C
       CALL DTA_TYVAR (OBJECT_NAME,TYPE,DTA_STATUS)
@@ -176,16 +176,16 @@ C
       END IF
 C
 C     Creating a hierarchial structure is really a recursive operation.
-C     We tackle this here by using stacks to hold our current position 
+C     We tackle this here by using stacks to hold our current position
 C     in the structure definition, the position of the last element
-C     of the structure we're building, and the name of the structure 
-C     being built.  Once we create an object, we check to see if it's a 
-C     structure, and if it is we push our three values and start on the 
+C     of the structure we're building, and the name of the structure
+C     being built.  Once we create an object, we check to see if it's a
+C     structure, and if it is we push our three values and start on the
 C     new structure.  I wish I could have written this in C.  (The name
 C     of the structure being built is saved just as a pointer to the
 C     end of the name, since the name just expands and contracts - eg
 C     STRUCT, STRUCT.SUB1, STRUCT.SUB1.SUB2, STRUCT.SUB1, etc.)
-C     
+C
       STACK_POINTER=0
       CURR_POSN=STRUCT_START(STRUCT_NO)
       END_POSN=STRUCT_END(STRUCT_NO)
@@ -253,7 +253,7 @@ C
                   END IF
                END IF
 C
-C              See if that element was a structure. 
+C              See if that element was a structure.
 C
                CALL DTA_STRUC (NAME(:LENAME)//ELEMENT,STRUCT,
      :                                                     DTA_STATUS)

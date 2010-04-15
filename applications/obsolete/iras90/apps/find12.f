@@ -6,7 +6,7 @@
 
 *  Purpose:
 *     To transform ecliptic coordinates from epoch EPOCY1 to
-*     epoch EPOCY2. 
+*     epoch EPOCY2.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,7 +17,7 @@
 
 *  Description:
 *     To transform ecliptic coordinates from epoch EPOCY1 to
-*     epoch EPOCY2. 
+*     epoch EPOCY2.
 
 *  Arguments:
 *     ECLAT1 = REAL (Given)
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,12 +118,12 @@
 *  In the following variables describing the sides and angles of a
 *  sperical triangle, P is the pole, E1 is the given ecliptic posn. and
 *  E2 is the required ecliptic posn.
-      REAL E1E2                  ! The side E1E2 
-      REAL E1E2P                 ! The angle E1E2P 
-      REAL E1P                   ! The side E1P 
+      REAL E1E2                  ! The side E1E2
+      REAL E1E2P                 ! The angle E1E2P
+      REAL E1P                   ! The side E1P
       REAL E1PE2                 ! The angle E1PE2
       REAL E2P                   ! The side E2P
-      REAL PE1E2                 ! The angle PE1E2 
+      REAL PE1E2                 ! The angle PE1E2
 *.
 
 *  Check inherited global status.
@@ -137,7 +137,7 @@
       AVEEPO = ( EPOCY1 + EPOCY2 - 2.0*EPOCY0 ) / 200.0
 
 *  Calculate variables that are average time dependant, to be used later
-*  in calculating the sides/angles for the spherical triangle. 
+*  in calculating the sides/angles for the spherical triangle.
       CPI = CPI0 + AVEEPO*CPI1
       AA = A0 + AVEEPO*A1
       BB = B0 + AVEEPO*B1
@@ -147,7 +147,7 @@
 *  +ve or -ve
       EEN = PIBY2
       IF ( DIFEPO .LT. 0.0 ) EEN = -PIBY2
-      
+
 
 *  Calculate the known sides of the spherical triangle
       PE1E2 = EEN - CPI + ECLNG1
@@ -166,9 +166,9 @@
 *  Use IRA_NORM to normalise ecliptic coordinates
       ECLATD = DBLE( ECLAT2 )
       ECLNGD = DBLE( ECLNG2 )
-      
+
       CALL IRA_NORM( ECLNGD, ECLATD, STATUS)
-      
+
       ECLAT2 = REAL( ECLATD )
       ECLNG2 = REAL( ECLNGD )
 

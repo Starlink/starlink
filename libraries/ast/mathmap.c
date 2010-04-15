@@ -56,12 +56,12 @@ f     The MathMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -138,9 +138,9 @@ f     The MathMap class does not define any new routines beyond those
 
 /* SizeOf pointer array. */
 /* --------------------- */
-/* This macro increments "result" by the number of bytes allocated for an 
-   array of pointers, each of whose elements may point at a further 
-   dynamically allocated array (which is also to be included). It also 
+/* This macro increments "result" by the number of bytes allocated for an
+   array of pointers, each of whose elements may point at a further
+   dynamically allocated array (which is also to be included). It also
    allows for the possibility of any of the pointers being NULL. */
 #define SIZEOF_POINTER_ARRAY(array_name,array_size) \
 \
@@ -507,7 +507,7 @@ static const int symbol_ldvar = 1; /* Load a variable */
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0;
@@ -523,31 +523,31 @@ astMAKE_INITGLOBALS(MathMap)
 
 
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
-#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 );
 
 static pthread_mutex_t mutex3 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX3 pthread_mutex_lock( &mutex3 ); 
-#define UNLOCK_MUTEX3 pthread_mutex_unlock( &mutex3 ); 
+#define LOCK_MUTEX3 pthread_mutex_lock( &mutex3 );
+#define UNLOCK_MUTEX3 pthread_mutex_unlock( &mutex3 );
 
 static pthread_mutex_t mutex4 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX4 pthread_mutex_lock( &mutex4 ); 
-#define UNLOCK_MUTEX4 pthread_mutex_unlock( &mutex4 ); 
+#define LOCK_MUTEX4 pthread_mutex_lock( &mutex4 );
+#define UNLOCK_MUTEX4 pthread_mutex_unlock( &mutex4 );
 
 static pthread_mutex_t mutex5 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX5 pthread_mutex_lock( &mutex5 ); 
-#define UNLOCK_MUTEX5 pthread_mutex_unlock( &mutex5 ); 
+#define LOCK_MUTEX5 pthread_mutex_lock( &mutex5 );
+#define UNLOCK_MUTEX5 pthread_mutex_unlock( &mutex5 );
 
 static pthread_mutex_t mutex6 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX6 pthread_mutex_lock( &mutex6 ); 
-#define UNLOCK_MUTEX6 pthread_mutex_unlock( &mutex6 ); 
+#define LOCK_MUTEX6 pthread_mutex_lock( &mutex6 );
+#define UNLOCK_MUTEX6 pthread_mutex_unlock( &mutex6 );
 
 static pthread_mutex_t mutex7 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX7 pthread_mutex_lock( &mutex7 ); 
-#define UNLOCK_MUTEX7 pthread_mutex_unlock( &mutex7 ); 
+#define LOCK_MUTEX7 pthread_mutex_lock( &mutex7 );
+#define UNLOCK_MUTEX7 pthread_mutex_unlock( &mutex7 );
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 static char getattrib_buff[ 51 ];
@@ -682,7 +682,7 @@ static void CleanFunctions( int nfun, const char *fun[], char ***clean, int *sta
    int i;                        /* Loop counter for characters */
    int ifun;                     /* Loop counter for functions */
    int nc;                       /* Count of non-blank characters */
-   
+
 /* Initialise. */
    *clean = NULL;
 
@@ -786,7 +786,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* ------- */
    } else if ( !strcmp( attrib, "simpif" ) ) {
       astClearSimpIF( this );
-   
+
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
@@ -927,7 +927,7 @@ static void CompileExpression( const char *method, const char *class,
    *code = NULL;
    *con = NULL;
    *stacksize = 0;
-   
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -1292,7 +1292,7 @@ static void CompileMapping( const char *method, const char *class,
    var = NULL;
 
 /* Compile the forward transformation. */
-/* ----------------------------------- */   
+/* ----------------------------------- */
 /* Allocate space for an array of pointers to the functions from which
    we will extract variable names. */
    strings = astMalloc( sizeof( char * ) * (size_t) ( nin + nfwd ) );
@@ -1365,7 +1365,7 @@ static void CompileMapping( const char *method, const char *class,
    FREE_POINTER_ARRAY( var, nvar )
 
 /* Compile the inverse transformation. */
-/* ----------------------------------- */   
+/* ----------------------------------- */
 /* Allocate space for an array of pointers to the functions from which
    we will extract variable names. */
    strings = astMalloc( sizeof( char * ) * (size_t) ( nout + ninv ) );
@@ -1572,7 +1572,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     MathMap member function (over-rides the astEqual protected
@@ -1641,14 +1641,14 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNout( that ) == nout && astGetNin( that ) == nin ) {
 
-/* Assume equality. */ 
+/* Assume equality. */
          result = 1;
 
 /* The first pass through this next loop compares forward functions, and
    the second pass compares inverse functions. */
          for( pass = 0; pass < 2 && result; pass++ ) {
 
-/* On the first pass, get pointers to the lists of opcodes and constants for 
+/* On the first pass, get pointers to the lists of opcodes and constants for
    the effective forward transformations (taking into account the value
    of the Invert attribute), together with the number of such functions. */
             if( pass == 0 ) {
@@ -1660,7 +1660,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                   this_code = this->invcode;
                   this_con = this->invcon;
                   this_nfun = this->ninv;
-               } 
+               }
 
                if( !astGetInvert( that ) ) {
                   that_code = that->fwdcode;
@@ -1670,10 +1670,10 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                   that_code = that->invcode;
                   that_con = that->invcon;
                   that_nfun = that->ninv;
-               } 
+               }
 
-/* On the second pass, get pointers to the lists of opcodes and constants for 
-   the effective inverse transformations, together with the number of such 
+/* On the second pass, get pointers to the lists of opcodes and constants for
+   the effective inverse transformations, together with the number of such
    functions. */
             } else {
 
@@ -1685,7 +1685,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                   this_code = this->invcode;
                   this_con = this->invcon;
                   this_nfun = this->ninv;
-               } 
+               }
 
                if( astGetInvert( that ) ) {
                   that_code = that->fwdcode;
@@ -1695,7 +1695,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                   that_code = that->invcode;
                   that_con = that->invcon;
                   that_nfun = that->ninv;
-               } 
+               }
             }
 
 /* Check that "this" and "that" have the same number of functions */
@@ -1710,11 +1710,11 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                ncode_that = that_code ? that_code[ ifun ][ 0 ] : 0;
                if( ncode != ncode_that ) result = 0;
 
-/* Compare the following opcodes. Some opcodes consume constants from the 
+/* Compare the following opcodes. Some opcodes consume constants from the
    list of constants associated with the MathMap. Compare the constants
    for such opcodes. */
                icon = 0;
-               for( icode = 0; icode < ncode && result; icode++ ){     
+               for( icode = 0; icode < ncode && result; icode++ ){
                   code = this_code[ ifun ][ icode ];
                   if( that_code[ ifun ][ icode ] != code ) {
                      result = 0;
@@ -1724,7 +1724,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                              code == OP_MAX ||
                              code == OP_MIN ) {
 
-                     if( this_con[ ifun ][ icon ] != 
+                     if( this_con[ ifun ][ icon ] !=
                          that_con[ ifun ][ icon ] ) {
                         result = 0;
                      } else {
@@ -3052,7 +3052,7 @@ static void ExtractExpressions( const char *method, const char *class,
 /* Further initialisation. */
    nud = 0;
    iud = 0;
-      
+
 /* Allocate and initialise memory for the returned array of pointers. */
    MALLOC_POINTER_ARRAY( *exprs, char *, nfun )
 
@@ -3216,7 +3216,7 @@ static void ExtractVariables( const char *method, const char *class,
    int nc;                       /* Character count */
    int nextra;                   /* Number of intermediate functions */
    int nprimary;                 /* Number of primary input/output variables */
-   
+
 /* Initialise. */
    *var = NULL;
 
@@ -3265,7 +3265,7 @@ static void ExtractVariables( const char *method, const char *class,
    errors. */
          ( *var )[ ifun ] = astMalloc( sizeof( char ) * (size_t) ( nc + 1 ) ) ;
          if ( !astOK ) break;
-         
+
 /* If OK, copy the characters before the "=" sign to the new
    string. */
          nc = 0;
@@ -3477,7 +3477,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     MathMap member function (over-rides the astGetObjSize protected
@@ -3591,7 +3591,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -3673,7 +3673,7 @@ void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -4026,7 +4026,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* MathMaps are only worth simplifying if they occur in series. */
    simplify = series;
-   
+
 /* If simplification appears possible, then obtain the indices of the
    nominated mapping and of the one which follows it. Check that a
    mapping exists for the second index. */
@@ -4044,7 +4044,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    if ( astOK && simplify ) {
       simplify = !strcmp( astGetClass( ( *map_list )[ imap2 ] ), "MathMap" );
    }
-      
+
 /* If still OK, obtain pointers to the two MathMaps and the associated
    invert flag values. */
    if ( astOK && simplify ) {
@@ -4331,7 +4331,7 @@ static void ParseConstant( const char *method, const char *class,
                str[ i - istart ] = ( exprs[ i ] == 'd' ) ? 'e' : exprs[ i ];
             }
             str[ *iend - istart + 1 ] = '\0';
-            
+
 /* Attempt to read the constant as a double, noting how many values
    are read and how many characters consumed. */
             n = astSscanf( str, "%lf%n", con, &nc );
@@ -5017,7 +5017,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         ( 1 == astSscanf( setting, "seed= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetSeed( this, ival );
-      
+
 /* SimpFI. */
 /* ------- */
    } else if ( nc = 0,
@@ -5215,7 +5215,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    ncoord_in = astGetNcoord( in );
    ncoord_out = astGetNcoord( result );
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse transformation, according
@@ -6001,7 +6001,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    values are for information only and will not be read back. */
 
 /* Number of forward transformation functions. */
-/* ------------------------------------------- */   
+/* ------------------------------------------- */
 /* We regard this value as set if it differs from the number of output
    coordinates for the MathMap. */
    set = ( this->nfwd != nout );
@@ -6019,7 +6019,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    }
 
 /* Number of inverse transformation functions. */
-/* ------------------------------------------- */   
+/* ------------------------------------------- */
 /* We regard this value as set if it differs from the number of input
    coordinates for the MathMap. */
    set = ( this->ninv != nin );

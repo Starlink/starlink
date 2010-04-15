@@ -7,8 +7,8 @@
 *     ELF1_GENER
 
 *  Purpose:
-*     Generates the positions of the points making up an ellipse of the 
-*     radius and ellipticity required. The angles generated are relative 
+*     Generates the positions of the points making up an ellipse of the
+*     radius and ellipticity required. The angles generated are relative
 *     to an origin of 0,0.
 *
 *     The number of points generated is proportional to the radius of the
@@ -23,8 +23,8 @@
 
 *  Description:
 *     A number (N) is generated determining how many ellipse points will
-*     be in the output ellipse. Points are then generated at 
-*     different angles within the quadrant, the difference in angle between 
+*     be in the output ellipse. Points are then generated at
+*     different angles within the quadrant, the difference in angle between
 *     adjacent points being defined linearly by the number of ellipse
 *     points required.
 
@@ -98,9 +98,9 @@
       ZERO=0.0
 
 *   Calculate the approximate perimeter circumference for the
-*   ellipse. Assumed to be a circle for simplicity. 
+*   ellipse. Assumed to be a circle for simplicity.
       N=2.*ELF__PIVAL*RADIUS
- 
+
 *   Impose some upper and lower limits on the number of points to be
 *   generated.
       IF (N.LT.40) N=50
@@ -109,37 +109,37 @@
 *   Determine the angular increment required for an even distribution
 *   of points around a circle.
       JUMP=360./REAL(N)*ELF__PI2360
-                                     
+
 *   Set the points generated COUNTR to zero.
       COUNT=0
 
 *   Look at each angle in turn.
       SEMRAD=ELLIP*RADIUS
       DO 10 I=1,N
-  
+
 *      Generate the current angle in radians.
          ANGLE=JUMP*I
-   
+
 *      Calculate the x co-ordinates relative to 0,0.
          X=SEMRAD*SIN(ANGLE)
          Y=RADIUS*COS(ANGLE)
-   
+
 *      Determine the final angle (in degrees).
          CALL ELF1_ANGLES(X,Y,ZERO,ZERO,ANGLE,STATUS)
          ANGLE=ANGLE*ELF__PI2360
 
-*      Store the results.   
+*      Store the results.
          COUNT=COUNT+1
          RAD(COUNT)=SQRT(X*X+Y*Y)
          ANG(COUNT)=ANGLE
-   
+
  10   CONTINUE
- 
+
  9999 CONTINUE
 
-      END 
-       
-  
+      END
+
+
 
       SUBROUTINE ELP1_GENER(ELLIP,SEMIMAJOR,NUMPOI,ANGL,DIS,STATUS)
 *+
@@ -147,7 +147,7 @@
 *     ELP1_GENER
 *
 *  Purpose:
-*     Generates the positions of the points making up an ellipse of the 
+*     Generates the positions of the points making up an ellipse of the
 *     semi-major axis and ellipticity required. The angles generated are
 *     relative to an origin of 0,0.
 *

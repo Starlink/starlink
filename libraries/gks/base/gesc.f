@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -73,7 +73,7 @@ C# IL>=a, OL>=0
 *     2001  output parameter size insufficient
 *
 *---------------------------------------------------------------------
- 
+
       CALL GKPRLG(EESC,GGKOP,GSGOP)
       IF (KERROR.NE.0)  GOTO 9999
       IF (MLOESC.LE.0) KERROR = 2001
@@ -81,8 +81,8 @@ C# IL>=a, OL>=0
       IF (KESCID.LT.-3 .OR. KESCID.GT.0) KERROR = 180
       IF (KESCID.EQ.0) KERROR = 181
       IF (KERROR.NE.0)  GOTO 9999
- 
- 
+
+
 *     Escapes -1 and -2: associate/disassociate input devices
 *     The data record contains:
 *     IA(1) = workstation identifier
@@ -102,7 +102,7 @@ C# IL>=a, OL>=0
 *        Check that input device number is legal
          IF (IA(3).LT.1 .OR. IA(5).LT.1) KERROR = 182
          IF (KERROR.NE.0) GOTO 9999
- 
+
          KWI1 = KESCID
          KWI2 = IA(2)
          KWI3 = IA(3)
@@ -117,7 +117,7 @@ C# IL>=a, OL>=0
          ENDIF
 *        Output data record isn't used
          LOESC = 0
- 
+
 *     Escape -3: Suppress clearing of workstation on open
 *     The data record contains:
 *     IA(1) = workstation type
@@ -130,7 +130,7 @@ C# IL>=a, OL>=0
 *        Check that flag value is legal
          IF (IA(2).NE.GNO .AND. IA(2).NE.GYES) KERROR = 182
          IF (KERROR.NE.0) GOTO 9999
- 
+
          KWI1 = KESCID
          KWI2 = IA(2)
 *        Send escape to the specified workstation type.
@@ -142,7 +142,7 @@ C# IL>=a, OL>=0
          ENDIF
 *        Output data record isn't used
          LOESC = 0
- 
+
       ENDIF
 *
 *     -- valid parameter list, but no escapes yet via this route
@@ -154,7 +154,7 @@ C        CALL GKSONW(ID,KESC,1,KDAT,NPTS,RX,RY,LDR,IESCDR)
 C     ELSEIF (sopw function)
 C        CALL GKSOPW(KESC,1,KDAT,NPTS,RX,RY,LDR,IESCDR)
 C     ENDIF
- 
+
  9999 CONTINUE
       IF (KERROR.NE.0) CALL GKERR(KERROR)
       END

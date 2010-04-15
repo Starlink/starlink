@@ -2,19 +2,19 @@
 *+
 *  Name:
 *     MIO_WRITE
- 
+
 *  Purpose:
 *     write magnetic tape record.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MIO_WRITE(TD, NVAL, VALUES, ACTVAL, STATUS)
- 
+
 *  Description:
 *     Write a buffer to a tape.
- 
+
 *  Arguments:
 *     TD=INTEGER (Given)
 *        A variable containing the tape descriptor.
@@ -31,12 +31,12 @@
 *        the routine fails to complete, this variable will be set to an
 *        appropriate error number.
 *        N.B. This routine does not report its own errors.
- 
+
 *  Algorithm:
 *     Check for a valid tape descriptor and that the tape is open.   If the
 *     current block is not full the record is added to it.   Otherwise the
 *     block is flushed and a new one started.
- 
+
 *  Copyright:
 *     Copyright (C) 1980, 1983, 1984, 1991, 1992, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,7 +62,7 @@
 *     Sid Wright (UCL::SLW)
 *     Jon Fairclogh (RAL::IPMAF)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     06-Aug-1980: Original. (UCL::SLW)
 *     10-May-1983: Tidy up for Starlink version. (UCL::SLW)
@@ -78,33 +78,33 @@
 *     12-NOV-1996: Remove redundant definitions
 *                  Use ICHAR to set character into byte (RAL::AJC)
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     This is a completely portable version (but is probably
 *     less efficient than the VMS version).
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'MIO_SYS'         ! MIO Internal Constants
       INCLUDE 'MIO_ERR'         ! MIO Errors
- 
+
 *  Arguments Given:
       INTEGER TD                ! tape descriptor
       INTEGER BUFSIZ            ! number of bytes to be written
       BYTE BUF(*)               ! Buffer containing data
       INTEGER NCHAR             ! number of bytes actually written
- 
+
 *  Status:
       INTEGER STATUS            ! status return
- 
+
 *  External References:
       LOGICAL CHR_SIMLR
       EXTERNAL MIO1_BLK          ! Block data subprogram that
@@ -112,7 +112,7 @@
 *  Global Variables:
       INCLUDE 'MIOBUF_CMN'
       INCLUDE 'MIOFIL_CMN'
- 
+
 *  Local Variables:
       INTEGER MAGCN             ! channel number
       INTEGER NWRIT             ! number of bytes written
@@ -120,8 +120,8 @@
       INTEGER K                 ! Loop index
       INTEGER BSP               ! space left in record buffer
 *.
- 
- 
+
+
 C     print *,'mio_write:status,td,bufsiz',status,td,bufsiz
       NCHAR = 0
       IF ( STATUS.EQ.SAI__OK ) THEN
@@ -142,7 +142,7 @@ C     print *,'mio_write:status,td,bufsiz',status,td,bufsiz
                MNBYTE(TD) = MNBYTE(TD) + I
 *             If the buffer is full, write it out and initialise it with spaces
                IF ( MNBYTE(TD).GE.MBLKSZ(TD) ) THEN
-                  CALL MIO_BWRIT(TD, MBLKSZ(TD), MBLOCK(1,TD), NWRIT, 
+                  CALL MIO_BWRIT(TD, MBLKSZ(TD), MBLOCK(1,TD), NWRIT,
      :                           STATUS)
                   MNBYTE(TD) = 0
                   I = MRECSZ(TD) - BSP
@@ -159,6 +159,6 @@ C     print *,'mio_write:status,td,bufsiz',status,td,bufsiz
             END IF
          END IF
       END IF
- 
+
 C      print *,'mio_write:status,nchar',status,nchar
       END

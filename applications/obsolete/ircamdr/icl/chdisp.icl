@@ -1,5 +1,5 @@
 { PROCEDURE CHDISP : plots CHOP phases difference on workstation
-proc chdisp value1 
+proc chdisp value1
   get plt2d image_workstn (image_workstn)
   if image_workstn <> 1
     print "CHDISP is not available from this terminal!"
@@ -34,7 +34,7 @@ proc chdisp value1
   else
     formname2 (junk1) (name_image)
   end if
-  print "Forming Phase A-B from obs. " (junk1) 
+  print "Forming Phase A-B from obs. " (junk1)
   name_image2 = name_image&"a"
   name_out = name_image&"b"
   name_image = name_image2

@@ -13,7 +13,7 @@
 *     CALL ARD1_TWWCS( AWCS, PAR, UWCS, STATUS )
 
 *  Description:
-*     This routine creates a new user FrameSet (UWCS) from the 
+*     This routine creates a new user FrameSet (UWCS) from the
 *     supplied parameters.
 
 *  Arguments:
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
       INTEGER NDIM               ! No. of axes in user coords
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the Curent Frame in the application FrameSet has domain ARDAPP.
@@ -114,7 +114,7 @@
       IFRM = AST__NOFRAME
       DO I = 1, AST_GETI( UWCS, 'NFRAME', STATUS )
          FR = AST_GETFRAME( UWCS, I, STATUS )
-         DOM = AST_GETC( FR, 'DOMAIN', STATUS ) 
+         DOM = AST_GETC( FR, 'DOMAIN', STATUS )
          CALL AST_ANNUL( FR, STATUS )
          IF( DOM .EQ. 'ARDAPP' ) THEN
             IFRM = I
@@ -130,14 +130,14 @@
          CALL AST_ANNUL( UWCS, STATUS )
          CALL ARD1_COWCS( AWCS, AST__BAD, UWCS, STATUS )
          IFRM = AST_GETI( UWCS, 'BASE', STATUS )
-      END IF 
+      END IF
 
 *  Initialize the elements of the matrix to hold a unit matrix.
-      DO I = 1, NDIM 
+      DO I = 1, NDIM
          MAT( I ) = 0.0
       END DO
 
-      DO I = 1, NDIM 
+      DO I = 1, NDIM
          MAT( I + ( I - 1 )*NDIM ) = 1.
       END DO
 
@@ -151,9 +151,9 @@
       MAT( NDIM + 2 ) = COST
 
 *  Create a MatrixMap from these matrix elements.
-      M1 = AST_MATRIXMAP( NDIM, NDIM, 0, MAT, ' ', STATUS ) 
+      M1 = AST_MATRIXMAP( NDIM, NDIM, 0, MAT, ' ', STATUS )
 
-*  Remap the application coords Frame 
+*  Remap the application coords Frame
       CALL AST_REMAPFRAME( UWCS, IFRM, M1, STATUS )
 
 *  Arrive here if an error occurs.

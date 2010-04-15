@@ -1,4 +1,4 @@
-      SUBROUTINE IRM_GKCMT( NCARD, BUFFER, STCARD, NAME, CMTBGN, 
+      SUBROUTINE IRM_GKCMT( NCARD, BUFFER, STCARD, NAME, CMTBGN,
      :                      CMTCRD, THERE, COMNT, CARDNO, STATUS )
 *+
 *  Name:
@@ -22,8 +22,8 @@
 *     header block, marked by the END keyword, is encountered or the
 *     buffer is exhausted.
 *
-*     The comment string of a keyword begins with a comment indicator 
-*     character, specified by the argument CMTBGN, in the same card as 
+*     The comment string of a keyword begins with a comment indicator
+*     character, specified by the argument CMTBGN, in the same card as
 *     the keyword and may extend several cards with the continuation
 *     cards having the keyword COMMENT or being blank at its keyword
 *     position and preceded by a comment indicator. The argument
@@ -42,7 +42,7 @@
 *     STCARD = INTEGER (Given)
 *        The number of the card from which to start the search.
 *     NAME = CHARACTER * ( * ) (Given)
-*        The name of the keyword whose comment is required. This may be 
+*        The name of the keyword whose comment is required. This may be
 *        a compound name to handle hierarchical keywords, and it has the
 *        form keyword1.keyword2.keyword3 etc. The maximum number of
 *        keywords per FITS card is 20. Comparisons are performed in
@@ -61,7 +61,7 @@
 *     THERE = LOGICAL (Returned)
 *        If true the specified keyword is present.
 *     COMNT = CHARACTER * ( * ) (Returned)
-*        The comment string of the specified keyword. It should have 
+*        The comment string of the specified keyword. It should have
 *        length not less than 72 + 72*CMTCRD characters.
 *     CARDNO = INTEGER ( Returned)
 *        The number of the last continuation comment card whose contents
@@ -85,13 +85,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER NCARD
       CHARACTER BUFFER( NCARD )*80
@@ -118,7 +118,7 @@
 
 *  Local Variables:
       INTEGER CARD               ! Number of the card to be examined
-      INTEGER CDKYLN             ! Length of the keyword of a card 
+      INTEGER CDKYLN             ! Length of the keyword of a card
       CHARACTER CMPKEY*80        ! Compound name
       INTEGER CMPLN              ! Length of compound name
       INTEGER CMTLN              ! Length of comment string
@@ -144,7 +144,7 @@
       CHARACTER WORDS( MXWORD )*8! Keywords in a card image
       INTEGER WORDLN             ! Length of each word
 
-*. 
+*.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -159,7 +159,7 @@
 *  Initialise the card number to be examined, and the found flag.
       CARD = MAX( 1, STCARD )
       THERE = .FALSE.
-      
+
 *  To see whether it is a compound name.
       COMPND = INDEX( KEYWRD, '.' ) .NE. 0
 
@@ -175,13 +175,13 @@
             CRDKEY = BUFFER( CARD )( :8 )
             CDKYLN = CHR_LEN( CRDKEY )
 
-*  If the current card is the required keyword, ... 
+*  If the current card is the required keyword, ...
             IF ( CRDKEY( :CDKYLN ) .EQ. KEYWRD( :KEYLN ) ) THEN
 
 *  Set the found flag and note down the card number.
                THERE = .TRUE.
                CARDNO = CARD
-                
+
 *  Otherwise go to the next card in the buffer.
             ELSE
                CARD = CARD + 1
@@ -190,7 +190,7 @@
 
 *  If the keyword to be searched for is compound, ...
       ELSE
-          
+
 *  Get the keywords on the card and compare with given one, untill the
 *  required card is found, or 'END' card is met, or no card left.
          DO WHILE ( ( .NOT. THERE ) .AND. ( CARD .LE. NCARD ) .AND.
@@ -222,11 +222,11 @@
                IF ( CMPKEY( :CMPLN ) .EQ. KEYWRD( :KEYLN ) ) THEN
                   THERE = .TRUE.
                   CARDNO = CARD
-      
+
 *  Otherwise, go to the next card in the buffer.
                ELSE
                   CARD = CARD + 1
-               END IF      
+               END IF
 
 *  If this card does not contain the equal sign, go to the next card.
             ELSE
@@ -247,9 +247,9 @@
 *  Get the absolute position of first quote mark and the indicator.
          IF ( FQTPSN .NE. 0 ) FQTPSN = FQTPSN + KEYLN
          IF ( INDPSN .NE. 0 ) INDPSN = INDPSN + KEYLN
-      
+
 *  If the first quote mark exists and is before the indicator, find
-*  the trailing quote mark. 
+*  the trailing quote mark.
          IF ( (FQTPSN .NE. 0 ) .AND. ( FQTPSN .LT. INDPSN ) ) THEN
             LQTPSN = INDEX( BUFFER( CARDNO )( FQTPSN + 1: ), '''' )
             IF ( LQTPSN .NE. 0 ) LQTPSN = LQTPSN + FQTPSN
@@ -270,7 +270,7 @@
 *  Extract the continuation of the comment if there is any and the
 *  number of the extracted continuation cards less than the specified
 *  number of continuation cards.
-            EXTCMT = 0 
+            EXTCMT = 0
 
 *  There will be continuation if the next card has keyword COMMENT.
             IF ( ( EXTCMT .LT. CMTCRD ) .AND.
@@ -278,7 +278,7 @@
                CNTCMT = .TRUE.
                CNTPSN = 9
                CARDNO = CARDNO + 1
-      
+
 *  Or if the next card is blank at it keyword position.
             ELSE IF ( ( EXTCMT .LT. CMTCRD ) .AND.
      :                ( BUFFER( CARDNO + 1 )( :8 ) .EQ. ' ' ) ) THEN
@@ -289,7 +289,7 @@
                   CNTCMT = .TRUE.
                   CNTPSN = CNTPSN + 9
                   CARDNO = CARDNO + 1
-      
+
 *  Otherwise, this line is not a continuation.
                ELSE
                   CNTCMT = .FALSE.
@@ -303,7 +303,7 @@
 *  Extract the contents of the continuation cards until all continuation
 *  cards has been extracted or the number of the extracted cards exceeds
 *  the specified max, number of continuation cards to be extracted.
-            DO WHILE ( CNTCMT ) 
+            DO WHILE ( CNTCMT )
                CONTIN = BUFFER( CARDNO )( CNTPSN: )
 
 *  Remove the leading blank of the continuation comment and append it to
@@ -315,14 +315,14 @@
 
 *  Check if the next card is the continuation.
                EXTCMT = EXTCMT + 1
-                           
+
 *  There will be continuation if the next card has keyword COMMENT.
                IF ( ( EXTCMT .LT. CMTCRD ) .AND.
      :              ( BUFFER( CARDNO + 1 )( :7 ) .EQ. 'COMMENT' ) ) THEN
                   CNTCMT = .TRUE.
                   CNTPSN = 9
                   CARDNO = CARDNO + 1
-      
+
 *  Or if the next card is blank at it keyword position.
                ELSE IF ( ( EXTCMT .LT. CMTCRD ) .AND.
      :                   ( BUFFER( CARDNO + 1 )( :8 ) .EQ. ' ' ) ) THEN
@@ -334,7 +334,7 @@
                      CNTCMT = .TRUE.
                      CNTPSN = CNTPSN + 9
                      CARDNO = CARDNO + 1
-      
+
 *  Otherwise this line is not a continuation.
                   ELSE
                      CNTCMT = .FALSE.

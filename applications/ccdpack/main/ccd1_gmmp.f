@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL CCD1_GMMP( GRAPH, NEDGES, HINODE, IPX1, IPY1, IPRAN1, IPX2,
-*                     IPY2, IPRAN, NIN, TOLS, OFFS, IPX, IPY, IPRANK, 
+*                     IPY2, IPRAN, NIN, TOLS, OFFS, IPX, IPY, IPRANK,
 *                     IPIDS, NOUT, STATUS )
 
 *  Description:
@@ -28,7 +28,7 @@
 *     NEDGES = INTEGER (Given)
 *        The number of edges in the spanning graph.
 *     HINODE = INTEGER (Given)
-*        The index of the highest-indexed node which may be in the 
+*        The index of the highest-indexed node which may be in the
 *        input graph.  The lowest is assumed to be 1.
 *     IPX1( * ) = INTEGER (Given)
 *        Pointer to X positions related to edge. These are indexed
@@ -56,13 +56,13 @@
 *        Number of X and Y positions in IPX1, IPY1, IPX2, IPY2.
 *     TOLS( * ) = DOUBLE PRECISION (Given)
 *        Tolerances for deduplicating centroided points indexed by node.
-*        If two points in an image points are within this distance of 
-*        each other in both X and Y directions they should be considered 
-*        to refer to the same feature.  This might normally be a value 
-*        equivalent to about a pixel, but may be larger to accomodate 
-*        objects which are multi-peaked (for instance if they are only 
+*        If two points in an image points are within this distance of
+*        each other in both X and Y directions they should be considered
+*        to refer to the same feature.  This might normally be a value
+*        equivalent to about a pixel, but may be larger to accomodate
+*        objects which are multi-peaked (for instance if they are only
 *        faintly apparent above the background noise).  If equivalent
-*        points are known to have the same value every time the 
+*        points are known to have the same value every time the
 *        elements may be set to zero.
 *     OFFS( NEDGES + 1 ) = INTEGER (Given and Returned)
 *        Workspace for offsets into vectorised lists.
@@ -77,7 +77,7 @@
 *     IPRANK( * ) = INTEGER (Returned)
 *        Pointers to the rank identifiers for each node.  The mapping
 *        from the points in the input arrays to the ones in the output
-*        arrays can be kept track of using these values.  The index 
+*        arrays can be kept track of using these values.  The index
 *        to this array and IPX, IPY, IPIDS and NOUT are the node numbers.
 *     IPIDS( * ) = INTEGER (Returned)
 *        Pointers to the identifiers of the positions for each node. The
@@ -86,7 +86,7 @@
 *     NOUT( * ) = INTEGER (Returned)
 *        The numbers of positions matched at each node. The index to
 *        this array and IPX, IPY, IPIDS and IPRANK are the node numbers.
-*        The first HINODE elements of this array will be returned 
+*        The first HINODE elements of this array will be returned
 *        correctly.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -133,7 +133,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -220,14 +220,14 @@
      :                    %VAL( CNF_PVAL( IPAX2 ) ), STATUS )
          CALL CCG1_LAPND( %VAL( CNF_PVAL( IPY2( J ) ) ), NIN( J ), IIN,
      :                    %VAL( CNF_PVAL( IPAY2 ) ), STATUS )
-         CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPRAN1( J ) ) ), 
+         CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPRAN1( J ) ) ),
      :                    NIN( J ), IIN,
      :                    %VAL( CNF_PVAL( IPAR1 ) ), STATUS )
-         CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPRAN2( J ) ) ), 
+         CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPRAN2( J ) ) ),
      :                    NIN( J ), IIN,
      :                    %VAL( CNF_PVAL( IPAR2 ) ), STATUS )
          OFFS( I ) = IIN
-         IIN = IIN + NIN( J ) 
+         IIN = IIN + NIN( J )
  2    CONTINUE
 
 *  Add final bound for offsets.
@@ -235,12 +235,12 @@
       IIN = IIN - 1
 
 *  Now do the work of generating the matched identifiers.
-      CALL CCD1_GMID( GRAPH, NEDGES, HINODE, %VAL( CNF_PVAL( IP ) ), 
+      CALL CCD1_GMID( GRAPH, NEDGES, HINODE, %VAL( CNF_PVAL( IP ) ),
      :                %VAL( CNF_PVAL( IL ) ),
-     :                %VAL( CNF_PVAL( IPAX1 ) ), 
-     :                %VAL( CNF_PVAL( IPAY1 ) ), 
+     :                %VAL( CNF_PVAL( IPAX1 ) ),
+     :                %VAL( CNF_PVAL( IPAY1 ) ),
      :                %VAL( CNF_PVAL( IPAX2 ) ),
-     :                %VAL( CNF_PVAL( IPAY2 ) ), IIN, TOLS, OFFS, 
+     :                %VAL( CNF_PVAL( IPAY2 ) ), IIN, TOLS, OFFS,
      :                %VAL( CNF_PVAL( IPI1 ) ),
      :                %VAL( CNF_PVAL( IPI2 ) ), STATUS )
 
@@ -267,16 +267,16 @@
 
 *  Now generate the final positions and identifiers removing multiple
 *  identifications of the same positions.
-            CALL CCD1_GEFP( GRAPH, NEDGES, %VAL( CNF_PVAL( IPAX1 ) ), 
+            CALL CCD1_GEFP( GRAPH, NEDGES, %VAL( CNF_PVAL( IPAX1 ) ),
      :                      %VAL( CNF_PVAL( IPAY1 ) ),
-     :                      %VAL( CNF_PVAL( IPAR1 ) ), 
-     :                      %VAL( CNF_PVAL( IPAX2 ) ), 
+     :                      %VAL( CNF_PVAL( IPAR1 ) ),
+     :                      %VAL( CNF_PVAL( IPAX2 ) ),
      :                      %VAL( CNF_PVAL( IPAY2 ) ),
-     :                      %VAL( CNF_PVAL( IPAR2 ) ), 
+     :                      %VAL( CNF_PVAL( IPAR2 ) ),
      :                      %VAL( CNF_PVAL( IPI1 ) ), IIN, OFFS, I,
-     :                      %VAL( CNF_PVAL( IPX( I ) ) ), 
+     :                      %VAL( CNF_PVAL( IPX( I ) ) ),
      :                      %VAL( CNF_PVAL( IPY( I ) ) ),
-     :                      %VAL( CNF_PVAL( IPRANK( I ) ) ), 
+     :                      %VAL( CNF_PVAL( IPRANK( I ) ) ),
      :                      %VAL( CNF_PVAL( IPIDS( I ) ) ),
      :                      NOUT( I ), STATUS )
          END IF

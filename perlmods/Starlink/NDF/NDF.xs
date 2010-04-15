@@ -8,7 +8,7 @@
                                Particle Physics and Astronomy Research
                                Council. All Rights Reserved.
 
-    perl-NDF glue 
+    perl-NDF glue
 
     NDF, ERR, MSG, DAT, CMP, HDS complete
 
@@ -68,7 +68,7 @@ extern "C" {
  *
  * #include <float.h>
  * #include <limits.h>
- * 
+ *
  * #define VAL__BADF    -FLT_MAX
  * #define VAL__BADD    -DBL_MAX
  * #define VAL__BADI    INT_MIN
@@ -80,7 +80,7 @@ extern "C" {
  */
 
 /* These are extra include files that are supported by the NDF
- * extension but may not be in a standard Starlink distribution 
+ * extension but may not be in a standard Starlink distribution
  */
 
 
@@ -142,7 +142,7 @@ typedef char locator;
 
 
 
-/* Need to define variables for these CPP parameters 
+/* Need to define variables for these CPP parameters
    as they are used in the typemaps */
 static STRLEN  datszloc = DAT__SZLOC;
 static locator datroot[DAT__SZLOC]  = DAT__ROOT;
@@ -161,7 +161,7 @@ int  arg_status = SAI__OK;
 
 /* Internally convert an f77 string to C - must be at least 1 byte long */
 /* Could use cnf here */
- 
+
 stringf77toC (char*c, int len) {
    int i;
 
@@ -184,25 +184,25 @@ stringf77toC (char*c, int len) {
    if (i<0)       {i=0;}
    if (i==len) {i--;}
    /* And NULL it */;
-   *(c+i) = '\0';   
+   *(c+i) = '\0';
 }
- 
+
 /* Internally convert an C string to f77 - must be at least 1 byte long */
 /* Could use cnf here */
- 
+
 stringCtof77 (char*c, int len) {
- 
+
    int i;
- 
+
    i = (int) strlen(c);     /* Position of NULL character */
- 
+
    if (i>=len) {return;} /* Catch the impossible */
- 
+
    while(i<len){         /* Change to spaces to end of string */
       *(c+i)=' ';
       i++;
    }
- 
+
 }
 
 /* Source function to deliver the text lines to AST */
@@ -329,7 +329,7 @@ DAT__ROOT()
   RETVAL = (locator *)DAT__ROOT;
  OUTPUT:
   RETVAL
- 
+
 locator *
 DAT__NOLOC()
  PROTOTYPE:
@@ -426,7 +426,7 @@ ndf_aclen(indf, comp, iaxis, length, status)
   ndfint &iaxis
   ndfint length = NO_INIT
   ndfint &status
- PROTOTYPE: $$$$$ 
+ PROTOTYPE: $$$$$
  CODE:
    ndf_aclen_(&indf, comp, &iaxis, &length, &status, strlen(comp));
  OUTPUT:
@@ -440,7 +440,7 @@ ndf_acmsg(token, indf, comp, iaxis, status)
   char * comp
   ndfint &iaxis
   ndfint &status
- PROTOTYPE: $$$$$ 
+ PROTOTYPE: $$$$$
  CODE:
   ndf_acmsg_(token, &indf, comp, &iaxis, &status, strlen(token), strlen(comp));
  OUTPUT:
@@ -545,7 +545,7 @@ ndf_asnrm(norm, indf, iaxis, status)
  CODE:
   ndf_asnrm_(&norm, &indf, &iaxis, &status);
  OUTPUT:
-  status  
+  status
 
 #void
 #ndf_assoc(param, mode, indf, status)
@@ -857,7 +857,7 @@ ndf_form(indf, comp, form, status)
   ndfint &indf
   char * comp
   char * form = NO_INIT
-  ndfint &status 
+  ndfint &status
  PROTOTYPE: $$$$
  PREINIT:
    char str1[FCHAR];
@@ -934,7 +934,7 @@ ndf_loc(indf, mode, loc, status)
   locator floc[DAT__SZLOC];
  CODE:
   loc = floc;
-  ndf_loc_(&indf, mode, loc, &status, strlen(mode), DAT__SZLOC); 
+  ndf_loc_(&indf, mode, loc, &status, strlen(mode), DAT__SZLOC);
  OUTPUT:
   loc
   status
@@ -951,8 +951,8 @@ ndf_mapql(indf, ivpntr, el, bad, status)
   int * pntr;
  CODE:
   ndfMapql(indf, &pntr, &el, &bad, &status);
-  ivpntr = PTR2IV( pntr ); 
- OUTPUT: 
+  ivpntr = PTR2IV( pntr );
+ OUTPUT:
   ivpntr
   el
   bad
@@ -963,7 +963,7 @@ ndf_mapql(indf, ivpntr, el, bad, status)
 void
 ndf_mapz(indf, comp, type, mmod, ivrpntr, ivipntr, el ,status)
   ndfint indf
-  char * comp 
+  char * comp
   char * type
   char * mmod
   IV ivrpntr = NO_INIT
@@ -1063,7 +1063,7 @@ ndf_mtype(typlst, indf1, indf2, comp, itype, dtype, status)
   stringf77toC(itype, sizeof(str1));
   stringf77toC(dtype, sizeof(str2));
  OUTPUT:
-  itype  
+  itype
   dtype
   status
 
@@ -1087,7 +1087,7 @@ ndf_mtypn(typlst, n, ndfs, comp, itype, dtype, status)
   stringf77toC(itype, sizeof(str1));
   stringf77toC(dtype, sizeof(str2));
  OUTPUT:
-  itype  
+  itype
   dtype
   status
 
@@ -1163,7 +1163,7 @@ void
 ndf_qmf(indf, qmf, status)
   ndfint &indf
   Logical &qmf = NO_INIT
-  ndfint &status 
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_qmf_(&indf, &qmf, &status);
@@ -1175,7 +1175,7 @@ void
 ndf_reset(indf, comp, status)
   ndfint &indf
   char * comp
-  ndfint &status 
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_reset_(&indf, comp, &status, strlen(comp));
@@ -1262,7 +1262,7 @@ ndf_sect(indf1, ndim, lbnd, ubnd, indf2, status)
   ndf_sect_(&indf1, &ndim, lbnd, ubnd, &indf2, &status);
  OUTPUT:
   indf2
-  status  
+  status
 
 
 void
@@ -1275,7 +1275,7 @@ ndf_shift(nshift, shift, indf, status)
  CODE:
   ndf_shift_(&nshift, shift, &indf, &status);
  OUTPUT:
-  status  
+  status
 
 void
 ndf_size(indf, size, status)
@@ -1299,7 +1299,7 @@ ndf_sqmf(qmf, indf, status)
  CODE:
   ndf_sqmf_(&qmf, &indf, &status);
  OUTPUT:
-  status  
+  status
 
 void
 ndf_ssary(iary1, indf, iary2, status)
@@ -1313,7 +1313,7 @@ ndf_ssary(iary1, indf, iary2, status)
  OUTPUT:
   iary2
   status
- 
+
 void
 ndf_state(indf, comp, state, status)
   ndfint &indf
@@ -1386,7 +1386,7 @@ ndf_open(loc, name, mode, stat, indf, place, status)
  PROTOTYPE: $$$$$$$
  CODE:
   ndf_open_(loc, name, mode, stat, &indf, &place, &status, DAT__SZLOC, strlen(name), strlen(mode), strlen(stat));
- OUTPUT: 
+ OUTPUT:
   indf
   place
   status
@@ -1395,7 +1395,7 @@ ndf_open(loc, name, mode, stat, indf, place, status)
 
 # C7 - Access to component values
 
-# Note that 
+# Note that
 #  1 - we use ndfMap rather than ndf_map because we want a real pointer
 #      and not a CNF pointer.
 #  2 - we did not match the API so this can only return a single
@@ -2000,7 +2000,7 @@ ndf_tune(tpar, value, status)
 # The complication here is that any AST object created by
 # this routine is not necessarily an AST object that Starlink::AST
 # will understand because of shared library issues (and libast
-# static space linked into AST.so will not be the same as that 
+# static space linked into AST.so will not be the same as that
 # loaded by NDF.so). We use a char* gateway to act as intermediary
 # since we know that AST framesets can be stringified without loss
 
@@ -2131,7 +2131,7 @@ dat_clen(loc, clen, status)
   ndfint &status
  PROTOTYPE: $$$
  CODE:
-  dat_clen_(loc, &clen, &status, DAT__SZLOC); 
+  dat_clen_(loc, &clen, &status, DAT__SZLOC);
  OUTPUT:
   clen
   status
@@ -2146,7 +2146,7 @@ dat_clone(loc1, loc2, status)
   locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
-  dat_clone_(loc1, loc2, &status, DAT__SZLOC, DAT__SZLOC); 
+  dat_clone_(loc1, loc2, &status, DAT__SZLOC, DAT__SZLOC);
  OUTPUT:
   loc2
   status
@@ -2162,7 +2162,7 @@ dat_coerc(loc1, ndim, loc2, status)
   locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
-  dat_coerc_(loc1, &ndim, loc2, &status, DAT__SZLOC, DAT__SZLOC); 
+  dat_coerc_(loc1, &ndim, loc2, &status, DAT__SZLOC, DAT__SZLOC);
  OUTPUT:
   loc2
   status
@@ -2175,7 +2175,7 @@ dat_copy(loc1, loc2, name, status)
   ndfint &status
  PROTOTYPE: $$$$
  CODE:
-  dat_copy_(loc1, loc2, name, &status, DAT__SZLOC, DAT__SZLOC, strlen(name)); 
+  dat_copy_(loc1, loc2, name, &status, DAT__SZLOC, DAT__SZLOC, strlen(name));
  OUTPUT:
   status
 
@@ -2192,7 +2192,7 @@ dat_drep(loc, format, order, status)
  CODE:
   format = str1;
   order = str2;
-  dat_drep_(loc, format, order, &status, DAT__SZLOC, sizeof(str1), sizeof(str2)); 
+  dat_drep_(loc, format, order, &status, DAT__SZLOC, sizeof(str1), sizeof(str2));
   stringf77toC(format, sizeof(str1));
   stringf77toC(order, sizeof(str2));
  OUTPUT:
@@ -2660,7 +2660,7 @@ dat_move(loc1, loc2, name, status)
   status
 
 void
-dat_msg(token, loc) 
+dat_msg(token, loc)
   char * token
   locator * loc
  PROTOTYPE: $$
@@ -4145,7 +4145,7 @@ ary_annul(iary, status)
  PROTOTYPE: $$
  CODE:
   ary_annul_(&iary, &status);
-  
+
 void
 ary_dim(iary, ndimx, dim, ndim, status)
   ndfint &iary
@@ -4210,7 +4210,7 @@ void
 ary_size(iary, npix, status)
   ndfint &iary
   ndfint &npix = NO_INIT
-  ndfint &status 
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ary_size_(&iary, &npix, &status);
@@ -4463,7 +4463,7 @@ void
 errFlbel(status)
   ndfint &status = NO_INIT
  ALIAS:
-  NDF::err_flbel = 2 
+  NDF::err_flbel = 2
  PROTOTYPE: $
  CODE:
   errFlbel(&status);
@@ -4474,7 +4474,7 @@ void
 errFlush(status)
   ndfint &status = NO_INIT
  ALIAS:
-  NDF::err_flush = 2 
+  NDF::err_flush = 2
  PROTOTYPE: $
  CODE:
   errFlush(&status);
@@ -4485,7 +4485,7 @@ void
 errLevel(level)
   ndfint &level = NO_INIT
  ALIAS:
-  NDF::err_level = 2 
+  NDF::err_level = 2
  PROTOTYPE: $
  CODE:
   errLevel(&level);
@@ -4500,7 +4500,7 @@ errLoad(param, parlen, opstr, oplen, status)
   ndfint &oplen   = NO_INIT
   ndfint &status  = NO_INIT
  ALIAS:
-  NDF::err_load = 2 
+  NDF::err_load = 2
  PROTOTYPE: $$$$$
  PREINIT:
    char str1[ERR__SZPAR+1];
@@ -4527,7 +4527,7 @@ errMark()
 
 void
 errRep(param, text, status)
-  char * param 
+  char * param
   char * text
   ndfint &status
  ALIAS:
@@ -4624,7 +4624,7 @@ mem2string(address,nbytes,dest_string)
   ptr = INT2PTR(char*, address);
   sv_setpvn(dest_string, ptr, nbytes);
 
-# This routine copies a (usually packed) perl string into a 
+# This routine copies a (usually packed) perl string into a
 # memory location
 
 void
@@ -4661,10 +4661,10 @@ string2mem(input_string, nbytes, address)
 #  ndfint nbytes;
 # CODE:
 
-#  switch (*type) { 
-#    
+#  switch (*type) {
+#
 #  case 'u':
-#   puchar = (unsigned char *)pack1D((SV*)array, 'u'); 
+#   puchar = (unsigned char *)pack1D((SV*)array, 'u');
 #    memmove((void *) address, (void *) puchar, nbytes);
 #    break;
 

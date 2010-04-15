@@ -5,11 +5,11 @@
 **************************************************************************
       CHARACTER*1 FUNCTION CON_CHECK_ERR(MESID,MESSAGE)
       IMPLICIT NONE
- 
+
 *  Input
       INTEGER MESID
       CHARACTER*(*) MESSAGE
- 
+
 *  Global Variables
       LOGICAL SMG
       COMMON /SMG_KEEP/ SMG
@@ -22,17 +22,17 @@
 *  Functions
       CHARACTER*1 MDH_GETC
       INTEGER MDH_ENDWORD
- 
+
 *  Local Variables
       CHARACTER*9 M1/'Error in '/
       CHARACTER*29 MESE2/'R(eturn) to form, else E(xit)'/
       CHARACTER*80 MESE3
       INTEGER NCHAR
- 
+
 * _____________________________ Executable Code _______________________________
-  
+
       NCHAR = MDH_ENDWORD(MESSAGE)
- 
+
       MESE3=M1//MESSAGE(:NCHAR)//', R(eturn) to form, else E(xit)'
       CON_CHECK_ERR = MDH_GETC(MESE3,'R')
 

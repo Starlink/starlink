@@ -371,7 +371,7 @@ PRIVATE void ipsetscreen(win,flag)window *win;{
 PUBLIC void ipxset(wp,flag) window *wp;int flag;{
 	if(!(jwin(wp)->jw_flags&JWWINDOW)){/* screen */
 		ipsetscreen(wp,flag);
-		return;	
+		return;
 	}
 	switch(flag){
 	case IPON:

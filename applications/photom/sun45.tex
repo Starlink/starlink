@@ -547,16 +547,16 @@
 
 \section{\xlabel{introduction}Introduction}
 
-PHOTOM is a package for performing photometry of digitized images.  
-It has two basic modes of operation: using an interactive display 
-to specify the positions for the measurements, or obtaining those 
-positions from a file. In both modes of operation PHOTOM allows you 
+PHOTOM is a package for performing photometry of digitized images.
+It has two basic modes of operation: using an interactive display
+to specify the positions for the measurements, or obtaining those
+positions from a file. In both modes of operation PHOTOM allows you
 to perform photometry using either the traditional aperture method
 or via optimal extraction. When using the traditional aperture extraction
-method the target aperture can be circular or elliptical and its size 
-and shape can be varied interactively on the display, or by entering 
-values from the keyboard. Both methods allow the background sky level 
-to be either sampled interactively by the manual positioning of an 
+method the target aperture can be circular or elliptical and its size
+and shape can be varied interactively on the display, or by entering
+values from the keyboard. Both methods allow the background sky level
+to be either sampled interactively by the manual positioning of an
 aperture, or automatically from an annulus surrounding the target object.
 
 PHOTOM is also used by the Graphical Astronomy and Image Analysis tool
@@ -676,11 +676,11 @@ prompt should be a single character. To see a menu of the possible
 commands return a \st{h} (or \st{H}).
 
 The first time one of the interactive graphical options: I --
-interactive shape (aperture photometry only); or M -- interactive 
-measurement is selected the name of the display device is requested. 
-If you are using an image display with overlay capabilities then 
-remember that the overlay device is not the same as the device you 
-displayed your image in, e.g. if you displayed on an X-windows device  
+interactive shape (aperture photometry only); or M -- interactive
+measurement is selected the name of the display device is requested.
+If you are using an image display with overlay capabilities then
+remember that the overlay device is not the same as the device you
+displayed your image in, e.g. if you displayed on an X-windows device
 \st{xw}, then the overlay device is called \st{xov}.
 
 Typically the cursor position is controlled by the mouse and the mouse
@@ -713,8 +713,8 @@ automatically every time a measurement is made. The message
 \st{Concentric aperture in use} signifies this choice. The size of the
 sky aperture is specified by the INNER and OUTER parameters. These are
 defined as multiplying factors of the object aperture size, or in optimal
-extraction mode of the clipping radius, e.g. if INNER were 2 and OUTER 3 
-then the sky aperture would start at two radii from the centre and end at 
+extraction mode of the clipping radius, e.g. if INNER were 2 and OUTER 3
+then the sky aperture would start at two radii from the centre and end at
 three radii.
 
 When starting PHOTOM one of these modes will be chosen as the default.
@@ -796,7 +796,7 @@ information refer to this manual or the on-line help.
 
 This allows the size and shape of the aperture to be adjusted
 interactively on the screen to best suit the objects. When using
-optimal extraction this command is disabled, the clipping radius 
+optimal extraction this command is disabled, the clipping radius
 can be changed using the O menu option.
 
 The size and shape of the aperture is governed by the three ellipse
@@ -846,7 +846,7 @@ parameter.
 \subsubsection{M --- measure}
 
 This performs interactive measurements of objects individually selected
-from the displayed frame. If using aperture extraction the size and shape 
+from the displayed frame. If using aperture extraction the size and shape
 of the cursor should be set-up in advance using the I or N commands, while
 the clipping radius should be set (using the 0 command) when using optimal
 extraction.
@@ -858,7 +858,7 @@ distinguished at this stage from the on-screen display.
 
 In the case of the manual sky measurement the middle box is
 labelled with \texttt{SKY}, while for automatic sky measurement it
-will remain empty. The left-hand box with either be labelled \texttt{STAR}, 
+will remain empty. The left-hand box with either be labelled \texttt{STAR},
 in the case of  aperture extraction, or \texttt{PSF} when optimal extraction is
 selected. The remaining right-hand box will be annotated \texttt{RETURN~TO~KEYBOARD}.
 
@@ -867,13 +867,13 @@ the cursor is positioned over the chosen object and the left-hand
 mouse button (or key 1) is pressed. If optimal extraction is selected
 the first measurement will define the point spread function (PSF) for
 the technique. It is important to pick a bright star which is unsaturated
-for this task. After this measurement has been taken, if you are using a terminal capable of erasable line graphics such as an \texttt{xoverlay}, 
+for this task. After this measurement has been taken, if you are using a terminal capable of erasable line graphics such as an \texttt{xoverlay},
 then the left-hand box  label will change to read \texttt{STAR} to denote that
 further measurements will be photometric.
 
-For further measurements using optimal extraction, or all measurements 
+For further measurements using optimal extraction, or all measurements
 using the older aperture method an aperture is displayed where the measurement was made. For optimal extraction this ``aperture'' will be the size of
-the clipping radius (the CLIP parameter). If centroiding is being done 
+the clipping radius (the CLIP parameter). If centroiding is being done
 (command C), automatic enabled for optimal extraction, then the displayed aperture may not be centered on the cursor position. The results of the measurement are printed on the terminal and recorded in the results file. Measurements can be continued until the third mouse button (key 0) is pressed.
 
 When using manual selection of the background the middle mouse button
@@ -905,7 +905,7 @@ to the file accessed by the RESFILE parameter.
 The size and shape of the aperture can be specified from the keyboard
 by entering values for the semi-major axis (in pixels), the
 eccentricity and the orientation of the ellipse defining the aperture.
-When using optimal extraction this command is disabled, the clipping radius 
+When using optimal extraction this command is disabled, the clipping radius
 can be changed using the V menu option.
 
 An eccentricity of 0 gives a circular aperture with a radius equal
@@ -1012,11 +1012,11 @@ method is selected.
 
 The fourth method of calculating the errors is like the second and uses the
 measured variance in the sky aperture. This method assumes that the measured
-variance is due to some gaussian source and doesn't require any knowledge of 
+variance is due to some gaussian source and doesn't require any knowledge of
 the PADU and BIASLE values (which are unknown when dealing with data that has
 been combined using a mean, say from a CCD Mosiac dithered on the sky), but
 clearly this can only measure an upper limit as the actual noise in the
-object will be (fractionally) less than in the sky. The best way to avoid 
+object will be (fractionally) less than in the sky. The best way to avoid
 such uncertainty is by propagating data variances through all the stages that
 produced the combined data and using method three.
 
@@ -1345,11 +1345,11 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
        This program performs photometry of a list of objects. It is
        designed to be used non-interactively (i.e. by the GAIA -
        SUN/214- photometry tool or script). It provides more flexibility
-       than the automated mode of the PHOTOM program by allowing the 
-       specification of sky regions other than in annular regions. The 
-       results of the measurements are recorded in another file which has 
-       the same format as the input file (and can therefore be passed back 
-       to this routine and the same measurements can be repeated on a new 
+       than the automated mode of the PHOTOM program by allowing the
+       specification of sky regions other than in annular regions. The
+       results of the measurements are recorded in another file which has
+       the same format as the input file (and can therefore be passed back
+       to this routine and the same measurements can be repeated on a new
        frame). The format of this file is different for aperture and optimal
        extraction and is described in the relevant sections.
    }
@@ -1369,7 +1369,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          CENTRO = \_LOGICAL (Read)
       }{
          Centre the object before measurement or accept the given
-         position as the centre of the aperture. This parameter is 
+         position as the centre of the aperture. This parameter is
          forced to be true for optimal extraction.
 
          If this is TRUE the aperture is centered around the object of
@@ -1386,7 +1386,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          The clipping radius used for the weight mask if optimal photometry
          is selected. Not to be confused with the mask used to exclude
          regions from the background estimate (USEMASK parameter)
-      }    
+      }
       \sstsubsection{
          EXSOURCE = LITERAL (Read)
       }{
@@ -1490,7 +1490,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          If this is TRUE then optimal rather than aperture extraction
          is used for photometric measurement. The default, for backward
          compatibility reasons, is FALSE.
-      }      
+      }
       \sstsubsection{
          OUTFILE = FILENAME (Read)
       }{
@@ -1558,7 +1558,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
       }{
          Approximate seeing in pixels, used to estimate the FWHM of the
          point spread function (PSF) by the optimal extraction algorithm.
-      }                      
+      }
       \sstsubsection{
          SKY = \_REAL (Read)
       }{
@@ -1625,7 +1625,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
       \sstitemlist{
 
         \sstitem
-        {\em Aperture Extraction} -- The input/output file must contain 
+        {\em Aperture Extraction} -- The input/output file must contain
         one line per-object that has the following information:
         \begin{description}
            \item  \texttt{INDEX XPOS YPOS MAG MAGERR SKY SIGNAL CODE MAJOR
@@ -1681,7 +1681,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
        The other fields are the same as for an object aperture.\\
 
         \sstitem
-        {\em Optimal Extraction} -- Then the first star in the file must be 
+        {\em Optimal Extraction} -- Then the first star in the file must be
         the PSF. In this case the following information must be provided:
         \begin{description}
            \item  \texttt{INDEX XPOS YPOS FWHM1 FWHM2 ROT CODE CLIP SEE
@@ -1707,7 +1707,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
       \ft{annulus} or \ft{regions}, to indicate how the sky regions are
       determined (this is ignored if SKYEST is 4). Aperture must be
       circular for optimal extraction so no \texttt{SHAPE} field is provided.\\
-      
+
       Further stars should be entered with the following information:
         \begin{description}
            \item  \texttt{INDEX XPOS YPOS MAG MAGERR SKY SIGNAL CODE POSITIONS }
@@ -1762,8 +1762,8 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
 
       It is VERY heavily recommended that annuli are used for sky measurement
       when using the optimal extraction algorithm unless there are obvious
-      reasons for not doing so.          
-        
+      reasons for not doing so.
+
     }
    }
    \sstdiytopic{
@@ -1834,19 +1834,19 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
    Perform aperture photometry
 }{
    \sstdescription{
-      PHOTOM performs photometry. It has two basic modes of operation; 
+      PHOTOM performs photometry. It has two basic modes of operation;
       using an interactive display to specify the positions for the
       measurements, or obtaining those positions from a file. In both
       modes the user may perform photometry using either the traditional
       aperture method or using optimal extraction.
-   
+
       During aperture photometry the aperture can either be circular
-      or elliptical and the size and shape can be varied interactively 
-      on the display, or by entering values from the keyboard or parameter 
+      or elliptical and the size and shape can be varied interactively
+      on the display, or by entering values from the keyboard or parameter
       system. During optimal extraction the mask clipping radius can also
-      be varied from the keyboard or via the parameter system. The 
-      background sky level can be sampled interactively by manual 
-      positioning of the aperture, or automatically from an annulus 
+      be varied from the keyboard or via the parameter system. The
+      background sky level can be sampled interactively by manual
+      positioning of the aperture, or automatically from an annulus
       surrounding the object.
 
       PHOTOM is a menu driven application. The menu has been designed
@@ -1893,7 +1893,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          The clipping radius used for the weight mask if optimal photometry
          is selected. Not to be confused with the mask used to exclude
          regions from the background estimate (USEMASK parameter)
-      }  
+      }
       \sstsubsection{
          COMMAND = \_CHAR (Read)
       }{
@@ -1926,8 +1926,8 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
               estimating the background level in the sky aperture.
          \item \textbf{V}(alues) --- This summarizes the current settings of the
               programs parameters.
-         \item (e)\textbf{X}(traction) --- Toggle between doing optimal and aperture 
-        photometry.   
+         \item (e)\textbf{X}(traction) --- Toggle between doing optimal and aperture
+        photometry.
          \end{description}
       }
       \sstsubsection{
@@ -2053,7 +2053,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          If this is TRUE then optimal rather than aperture extraction
          is used for photometric measurement. The default, for backward
          compatibility reasons, is FALSE.
-      }      
+      }
       \sstsubsection{
          OUTER = \_REAL (Read)
       }{
@@ -2134,7 +2134,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
       }{
          Approximate seeing in pixels, used to estimate the FWHM of the
          point spread function (PSF) by the optimal extraction algorithm.
-      }                 
+      }
       \sstsubsection{
          SEMIM = \_REAL (Read)
       }{
@@ -2216,7 +2216,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          aperture. Contaminating objects, such as bright stars, can thus
          be removed from the background estimate.
       }
-    
+
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -2318,13 +2318,13 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
    \sstsubsection{
       Optimal  Extraction -- Format of Associated Files:
     } {
-    
+
    As for aperture extraction the file containing the position of objects
-   to be measured (command F) is read in free format as above. However in 
+   to be measured (command F) is read in free format as above. However in
    the case of optimal extraction the first line of the file must have an
    index number (INTEGER) of 0 along with the x and y position of the PSF
-   candidate star. 
-    
+   candidate star.
+
    The output on the screen contains column headers to indicate the content of
    each column of the results. These column headers do not appear in the
    output file given by the RESFILE parameter in order that this file can be
@@ -2338,7 +2338,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
    Column \> Name  \> Description \\
     1 \> INDEX \> Index number of star.\\
     2 \> XPOS \> X position of centre of aperture in pixels.\\
-    3 \> YPOS \> Y position of centre of aperture in pixels.\\   
+    3 \> YPOS \> Y position of centre of aperture in pixels.\\
     4 \> FWHM1 \> 1st FWHM of the point spread function.\\
     5 \> FWHM2 \> 2nd FWHM of the point spread function.\\
     6 \> ROT \> Rotation from perpendicular.\\
@@ -2358,9 +2358,9 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
     5 \> MAGERR \> Error in MAG.\\
     6 \> SKY \> Sky value in photons per pixel.\\
     7 \> SIGNAL \> Total number of photons in aperture due to star.\\
-    8 \> CODE \> Error code flag.\\ 
+    8 \> CODE \> Error code flag.\\
    \end{tabbing}
-    
+
       }
 }
 \newpage
@@ -2448,7 +2448,7 @@ others.
 
 \section{\xlabel{Explaining_optimal_photometry}Explaining \xlabel{explaining}\label{explaining}optimal photometry}
 
-Optimal extraction offers serveral advantages over the normal aperture 
+Optimal extraction offers serveral advantages over the normal aperture
 method of photometry. Formally optimal extraction is equivalent to profile
 fitting, however it offers more robust error estimation and a freedom of
 the bias introduced by mis-estimating the point spread function (PSF). It has been found to offer a gain of around 10 per cent in signal-to-noise over normal aperture photometry.
@@ -2583,7 +2583,7 @@ thus:
 The fourth method is like method two, but the sky variations are
 interpreted by a gaussian error source, so PADU and BIASLE are not
 required. With guassian errors the source signal is effectively zero
-(since it has the same noise per pixel as the sky), so 
+(since it has the same noise per pixel as the sky), so
 \begin{equation}\underline{
 \varepsilon( S_o ) = PADU * \sigma_s * \sqrt( a_o )
 }\end{equation}

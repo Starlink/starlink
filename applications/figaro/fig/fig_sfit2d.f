@@ -3,7 +3,7 @@ C+
 C
 C     F I G _ S F I T 2 D
 C
-C     Fits a 2D parabola to a set of X,Y,Z points. 
+C     Fits a 2D parabola to a set of X,Y,Z points.
 C
 C     Parameters -  (">" input, "<" output, "!" modified)
 C
@@ -13,7 +13,7 @@ C     (>) ZV     (Real array Z(N)) The Z values for the points.
 C     (>) N      (Integer) The number of X,Y,Z points to be
 C                fitted.
 C     (>) SAME   (Logical) If true, indicates that the X and Y
-C                values have been used in a previous fit, and 
+C                values have been used in a previous fit, and
 C                that MATINV represents the inverse matrix
 C                obtained as a result of that fit.  If only the
 C                Z values have changed, the matrix inversion can

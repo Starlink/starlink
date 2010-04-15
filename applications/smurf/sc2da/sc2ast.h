@@ -65,10 +65,10 @@
 */
 
 #ifndef HEADGEN___src_sc2ast_sc2ast_h
-#define HEADGEN___src_sc2ast_sc2ast_h 
+#define HEADGEN___src_sc2ast_sc2ast_h
 
 #define SC2AST_SPD 86400.0  /* Seconds per day */
- 
+
 /* Following include is for JCMTState definition */
 #include "jcmt/state.h"
 
@@ -76,14 +76,14 @@
 #include "ast.h"
 
 /* Define a structure used to hold information cached by sc2ast_createwcs. */
-typedef struct sc2astCache { 
+typedef struct sc2astCache {
 
-/* A cache containing, for each sub-array, a FrameSet and a Mapping. The 
-   FrameSet will contai a single Frame representing GRID coords in the 
-   sub-array. The result of applying the Mapping to this Frame will be 
-   Cartesian (i.e. in the tangent plane) Nasmyth coords in rads. The 
+/* A cache containing, for each sub-array, a FrameSet and a Mapping. The
+   FrameSet will contai a single Frame representing GRID coords in the
+   sub-array. The result of applying the Mapping to this Frame will be
+   Cartesian (i.e. in the tangent plane) Nasmyth coords in rads. The
    AST pointers in this cache are exempted from AST context handling, and
-   so need to be released explicitly using astAnnul. This is done by 
+   so need to be released explicitly using astAnnul. This is done by
    calling this function with the sub-frame number set to -1. */
    AstMapping *map[ 8 ];
    AstFrameSet *frameset[ 8 ];

@@ -12,7 +12,7 @@
 *   -------
 *      NNINT - Integer value of type described above
 *-
- 
+
       IF (X.NE.0.0) THEN
          NNINT=INT(X + SIGN(0.5,X))
       ELSE

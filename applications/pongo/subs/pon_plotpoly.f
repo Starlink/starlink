@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
       DOUBLE PRECISION XSTEP     ! X increment
 
 *.
- 
+
       CALL PGMOVE( XMINP, PON_EVALPOLY( DBLE( XMINP ), NPOLY, COEFF ) )
       XSTEP = DBLE( XMAXP-XMINP )/500.0D0
       X = DBLE( XMINP )

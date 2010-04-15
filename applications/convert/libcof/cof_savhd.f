@@ -91,15 +91,15 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'CNF_PAR'         ! CNF definitions
-      
+
 *  Arguments Given:
       INTEGER FUNIT
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
-      
+
 *  Local Constants:
       INTEGER   FITSOK           ! Value of good FITSIO status
       PARAMETER( FITSOK = 0 )
@@ -109,7 +109,7 @@
 
 *  Global Variables:
       INCLUDE 'F2NDF2_CMN'
-      
+
 *  Local Variables:
       INTEGER IHD                 ! Header card number
       INTEGER ISV                 ! Saved card number
@@ -117,9 +117,9 @@
       INTEGER FSTAT               ! FITS status
       CHARACTER*(HEDLEN) HEADER   ! Individual header card
       LOGICAL MEMGOT              ! Whether memory got
-      
+
 *  Local Data:
-      
+
 *.
 
 *  Check inherited global status.
@@ -161,7 +161,7 @@
 
                   ELSE
                      ISV = ISV + 1
-                     CALL COF_COPHD( 
+                     CALL COF_COPHD(
      :                 HEADER, ISV, %VAL(CNF_PVAL(H0_PTR)),
      :                 STATUS )
                   END IF  ! Required header
@@ -180,7 +180,7 @@
          STATUS = SAI__ERROR
          CALL ERR_REP( 'COF_SAVHD_MEM',
      :    'Failed to get memory for primary headers', STATUS )
-         
+
       END IF  ! Got number of headers OK
 
 999   CONTINUE
@@ -192,7 +192,7 @@
 * In the event of an error, clear the saved data
          NPHEAD = 0
          IF ( MEMGOT ) CALL PSX_FREE( H0_PTR, STATUS )
-         
+
       END IF
-         
+
       END

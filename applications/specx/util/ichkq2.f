@@ -27,7 +27,7 @@ C   Find highest unmasked quadrant
       ELSE
         IF(NQUAD2.LT.NQ.AND.NQUAD2.LT.NMAX)  ICHKQ2=2
       END IF
-     
+
       RETURN
       END
 

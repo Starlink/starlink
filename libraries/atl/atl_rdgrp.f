@@ -14,7 +14,7 @@
 
 *  Description:
 *     Read an AST Object from a GRP group. The text in the group can be
-*     either an AST Object dump, a set of FITS headers, or an STC-S 
+*     either an AST Object dump, a set of FITS headers, or an STC-S
 *     description.
 
 *  Arguments:
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,7 +105,7 @@
       DUMP = .FALSE.
       FITSWCS = .FALSE.
       DO I = 1, SIZE
-         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
+         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
          CALL CHR_LDBLK( TEXT )
          IF( TEXT( : 6 ) .EQ. 'Begin ' ) THEN
             DUMP = .TRUE.
@@ -124,8 +124,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If the file probably contains a dump of an AST object, try to read it
-*  first as a set of FITS headers, then as an STC-S description, then as 
-*  a object dump. This means that any errors produced while reading it as 
+*  first as a set of FITS headers, then as an STC-S description, then as
+*  a object dump. This means that any errors produced while reading it as
 *  an object dump will be reported to the user.
       IF( DUMP ) THEN
          CALL ATL_RDFCH( IGRP, IAST, STATUS )
@@ -135,10 +135,10 @@
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDCH( IGRP, IAST, STATUS )
-         
+
 *  If the file probably contains FITS headers, try to read it
-*  first as an Object dump, then as an STC-S description, then as a set 
-*  of FITS headers. This means that any errors produced while reading it as 
+*  first as an Object dump, then as an STC-S description, then as a set
+*  of FITS headers. This means that any errors produced while reading it as
 *  a FITS file will be reported to the user.
       ELSE IF( FITSWCS ) THEN
          CALL ATL_RDCH( IGRP, IAST, STATUS )
@@ -149,12 +149,12 @@
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          IF( IAST .EQ. AST__NULL ) CALL ATL_RDFCH( IGRP, IAST, STATUS )
 
-*  If not an AST dump or a set of FITS-WCS headers, the file may contains 
-*  an STC-S description. Try to read it first as an Object dump, then as a 
-*  set of FITS headers, then as an STC-S description. This means that any 
-*  errors produced while reading it as a FITS file will be reported to the 
+*  If not an AST dump or a set of FITS-WCS headers, the file may contains
+*  an STC-S description. Try to read it first as an Object dump, then as a
+*  set of FITS headers, then as an STC-S description. This means that any
+*  errors produced while reading it as a FITS file will be reported to the
 *  user.
-      ELSE 
+      ELSE
          CALL ATL_RDCH( IGRP, IAST, STATUS )
 
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )

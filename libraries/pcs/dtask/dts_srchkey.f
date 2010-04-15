@@ -17,9 +17,9 @@
 
 *  Description:
 *     Searches action list for the ACTIVE with the given keyword. If found,
-*     returns pointer and sets status DTASK__ACTACTIVE. If not found or 
+*     returns pointer and sets status DTASK__ACTACTIVE. If not found or
 *     action not active returns ACTPTR=0 and status DTASK__NOTFOUND.
-*     returns error status. 
+*     returns error status.
 
 *  Arguments:
 *     NAME=CHARACTER*(*) (given)
@@ -106,7 +106,7 @@
       FOUND = .FALSE.
       DONE = .FALSE.
 
-      DO WHILE ( ( .NOT. FOUND ) .AND. ( .NOT. DONE ) .AND. 
+      DO WHILE ( ( .NOT. FOUND ) .AND. ( .NOT. DONE ) .AND.
      :  ( NACTS .GT. 0 ) )
          IF ( ACTKEY(N) .EQ. NAME ) THEN
             FOUND = .TRUE.

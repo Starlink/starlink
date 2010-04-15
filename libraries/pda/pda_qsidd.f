@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,7 +145,7 @@
                I2 = I3
                I3 = ITMP
             END IF
-            
+
 *  Store the partition value.
             XPART = X( IP( I2 ) )
 
@@ -162,13 +162,13 @@
             IF ( X( IP( I ) ) .GT. XPART ) THEN
                I = I + 1
                GO TO 3
-            END IF           
+            END IF
 
  4          CONTINUE             ! Start of 'DO WHILE' loop
             IF ( X( IP( J ) ) .LT. XPART ) THEN
                J = J - 1
                GO TO 4
-            END IF           
+            END IF
 
 *  Exchange pairs of values when necessary by interchanging their
 *  pointers.

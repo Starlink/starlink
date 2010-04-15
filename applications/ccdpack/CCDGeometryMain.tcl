@@ -108,7 +108,7 @@
 #  Set the help browser. This is either set by the HTX_BROWSER variable,
 #  or by checking that a known one exists on the PATH. This will
 #  be overidden by a ~/.ccdpack assignment.
-   if { [info exists env(HTX_BROWSER)] } { 
+   if { [info exists env(HTX_BROWSER)] } {
       set CCDbrowser $env(HTX_BROWSER)
    } else {
       set CCDbrowser {}
@@ -132,17 +132,17 @@
 #  Global options. Also re-reads ~/.ccdpack.
    source $CCDdir/CCDOptions.tcl
 
-#  Find and store all the NDF foreign formats being used. These are 
-#  used as part of the file filtering mechanisms (note this isn't 
+#  Find and store all the NDF foreign formats being used. These are
+#  used as part of the file filtering mechanisms (note this isn't
 #  therefore set by any values in .ccdpack, it's important that
 #  the conversion filters are actually setup).
    set CCDimagefilters "*.sdf"
-   if { [info exists env(NDF_FORMATS_IN)] } { 
+   if { [info exists env(NDF_FORMATS_IN)] } {
       set CCDimagefilters {{NDF(.sdf) *.sdf}}
       set new_types [split $env(NDF_FORMATS_IN) ","]
-      foreach pair $new_types { 
+      foreach pair $new_types {
          regexp {([^\(]*).([^\)]*)} $pair dummy name type
-         if { $name != "NDF" } { 
+         if { $name != "NDF" } {
             lappend CCDimagefilters [list $name\(${type}\) *${type}]
          }
       }
@@ -165,7 +165,7 @@
    } else {
       set KAPdir /star/bin/kappa
    }
-   
+
 #  Initialise the application register.
    if { ! [CCDTaskRegistry] } {
 
@@ -177,7 +177,7 @@
 #  Start the geometry application.
    set MAIN(window) .geometry
    CCDGeometry .geometry 0
- 
+
 
 #  Wait for interaction to end... and then write out results.
 #  CCD extent.

@@ -245,7 +245,7 @@ proc stred
       print "AUTOMOS SKY CORRECTION SECTION"
       print "=============================="
       fclose_b
-      delfile images.list 
+      delfile images.list
       delfile images.list2
       create bfile "images.list"
       loop for dummy = (value2) to (value3)

@@ -1,6 +1,6 @@
-void perl2argv( int * argc, char **outargv[]) 
+void perl2argv( int * argc, char **outargv[])
 {
-/* 
+/*
  *+
 
    Purpose:
@@ -19,7 +19,7 @@ void perl2argv( int * argc, char **outargv[])
         Number of command line arguments.
      outargv   = Pointer to Char*[] (Returned)
         Pointer to array of pointers to strings. Contains $0 and
-        @ARGV. The pointer array is NULL-terminated. The memory 
+        @ARGV. The pointer array is NULL-terminated. The memory
         associated with this array must be freed after it is used.
 
    Notes:
@@ -28,7 +28,7 @@ void perl2argv( int * argc, char **outargv[])
 
    Authors:
      Tim Jenness (TimJ)
-   
+
    History:
      20-SEP-2005 (TimJ):
        Original version
@@ -60,7 +60,7 @@ void perl2argv( int * argc, char **outargv[])
   /* Actual size of argv is $0+scalar(@ARGV) */
   *argc = nargs + 1;
 
-  /* some memory for the array of pointers 
+  /* some memory for the array of pointers
      Need nargs + space for $0 + space for trailing null
   */
   New( 0, args, (1+ *argc), char*);

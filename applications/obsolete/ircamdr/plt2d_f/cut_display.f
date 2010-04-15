@@ -60,7 +60,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :	  CUT_NUMXTIC,
      :	  CUT_NUMYTIC,
      :	  J,
@@ -90,7 +90,7 @@
 	PARAMETER ( MAX_POINTS = 10000)
 	PARAMETER ( TEXT_PREC = 2)
 
-	REAL 
+	REAL
      :    CUT_MAGNIF,
      :	  CUT_AXISRAT,
      :	  CUT_DEFSIZE,
@@ -235,7 +235,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	CALL NDF_ASSOC( 'CUT_IMAGE', 'READ', LOC_IMAGE, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :         'Error : Cannot locate specified image, sorry ...',
      :                 STATUS )
  	  RETURN
@@ -270,7 +270,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	  CALL PAR_GET0I( 'SUBIM_YEN', SUBIM_EN( 2), STATUS)
 
 	  IF( STATUS .NE. SAI__OK) THEN
-            CALL ERR_REP('ERR', 
+            CALL ERR_REP('ERR',
      :                   'CUT_DISPLAY : after PAR_GETS subim_st,en',
      :                   STATUS )
    	    RETURN
@@ -284,13 +284,13 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 * map data in 'DATA_ARRAY' to obtain memory pointer POINTER_IMAGE
 * and size of 2D image in NAXIS
 
-	  CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ', 
+	  CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ',
      :	                POINTER_IMAGE, NELEMENTS, STATUS)
 
 	  IF( STATUS. NE. SAI__OK)THEN
  	    CALL NDF_ANNUL( LOC_IMAGE,  STATUS)
 	    CALL NDF_ANNUL( LOC_SUBIM,  STATUS)
-            CALL ERR_REP('ERR', 
+            CALL ERR_REP('ERR',
      :                   'CUT_DISPLAY : During NDF_MAP sub-image',
      :                   STATUS )
 	    RETURN
@@ -316,29 +316,29 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 	IF( X1 .EQ. X2) THEN       ! cut down a column of the image
 
-	  CALL CUT_LINSETC( X1, X2, Y1, Y2, MAX_POINTS, LINE_DATA, 
+	  CALL CUT_LINSETC( X1, X2, Y1, Y2, MAX_POINTS, LINE_DATA,
      :	                    NUMBER_POINTS, STATUS)
 
-	  CALL CUT_INTERPOLATEC( NUMBER_POINTS, MAX_POINTS, LINE_DATA, 
-     :	                         CUT_VALUES, NAXIS( 1), NAXIS( 2), 
+	  CALL CUT_INTERPOLATEC( NUMBER_POINTS, MAX_POINTS, LINE_DATA,
+     :	                         CUT_VALUES, NAXIS( 1), NAXIS( 2),
      :	                         %VAL( POINTER_IMAGE), STATUS)
 
 	ELSE IF( Y1 .EQ. Y2) THEN  ! cut across a row of the image
 
-	  CALL CUT_LINSETR( X1, X2, Y1, Y2, MAX_POINTS, LINE_DATA, 
+	  CALL CUT_LINSETR( X1, X2, Y1, Y2, MAX_POINTS, LINE_DATA,
      :	                    NUMBER_POINTS, STATUS)
 
-	  CALL CUT_INTERPOLATER( NUMBER_POINTS, MAX_POINTS, LINE_DATA, 
-     :	                         CUT_VALUES, NAXIS( 1), NAXIS( 2), 
+	  CALL CUT_INTERPOLATER( NUMBER_POINTS, MAX_POINTS, LINE_DATA,
+     :	                         CUT_VALUES, NAXIS( 1), NAXIS( 2),
      :	                         %VAL( POINTER_IMAGE), STATUS)
 
 	ELSE                       ! cut arbitrary orientation
 
-	  CALL CUT_LINSET( X1, X2, Y1, Y2, MAX_POINTS, LINE_DATA, 
+	  CALL CUT_LINSET( X1, X2, Y1, Y2, MAX_POINTS, LINE_DATA,
      :	                   NUMBER_POINTS, STATUS)
 
-	  CALL CUT_INTERPOLATE( NUMBER_POINTS, MAX_POINTS, LINE_DATA, 
-     :	                        CUT_VALUES, NAXIS( 1), NAXIS( 2), 
+	  CALL CUT_INTERPOLATE( NUMBER_POINTS, MAX_POINTS, LINE_DATA,
+     :	                        CUT_VALUES, NAXIS( 1), NAXIS( 2),
      :	                        %VAL( POINTER_IMAGE), STATUS)
 
 	END IF
@@ -353,7 +353,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	  CALL NDF_ANNUL( LOC_IMAGE, STATUS)
 
 	  IF( STATUS .NE. SAI__OK) THEN
-            CALL ERR_REP('ERR', 
+            CALL ERR_REP('ERR',
      :                   'CUT_DISPLAY : after NDF_ANNUL sub-image',
      :                   STATUS )
 	    RETURN
@@ -366,7 +366,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	  CALL NDF_ANNUL( LOC_IMAGE,   STATUS)
 
 	  IF( STATUS .NE. SAI__OK) THEN
-            CALL ERR_REP('ERR', 
+            CALL ERR_REP('ERR',
      :                   'CUT_DISPLAY : after NDF_ANNULs',
      :                   STATUS )
 	    RETURN
@@ -388,7 +388,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 * get max,min in data and in largest range position values
 
-	CALL CUT_MAXMIN( CUT_SCALING, NUMBER_POINTS, MAX_POINTS, LINE_DATA, 
+	CALL CUT_MAXMIN( CUT_SCALING, NUMBER_POINTS, MAX_POINTS, LINE_DATA,
      :	                 CUT_VALUES, X_LO, X_HI, Y_LO, Y_HI, CUT_POINTER)
 
 * set cut scaling parameters
@@ -486,7 +486,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	  CALL PAR_GET0R( 'X_CUR_REAL', CUT_XCEN, STATUS)
 	  CALL PAR_GET0R( 'Y_CUR_REAL', CUT_YCEN, STATUS)
 
-* reset the cursor marking option 
+* reset the cursor marking option
 
 	  CALL PAR_PUT0C( 'CURSOR_CROSS', CURSOR_MARK, STATUS)
 
@@ -594,8 +594,8 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 * draw cut after all this messing about ...
 
-	CALL CUT_LINEPLOT( NUMBER_POINTS, X_VALUES, CUT_VALUES, X_LO, 
-     :                     X_HI, Y_LO, Y_HI, XST, XEN, YST, YEN, 
+	CALL CUT_LINEPLOT( NUMBER_POINTS, X_VALUES, CUT_VALUES, X_LO,
+     :                     X_HI, Y_LO, Y_HI, XST, XEN, YST, YEN,
      :                     CUT_MAGNIF, STATUS)
 
 	CALL SGS_FLUSH
@@ -680,12 +680,12 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	IF( Y_LO .LE. 0.0 .AND. Y_HI .GT. 0.0) THEN
 
 	  CALL SGS_LINE( XST,
-     :	                 ( YST + 
-     :                     ( 0.0 - Y_LO)/( Y_HI - Y_LO)*( YEN - YST) 
+     :	                 ( YST +
+     :                     ( 0.0 - Y_LO)/( Y_HI - Y_LO)*( YEN - YST)
      :                          ),
      :	                 XEN,
-     :	                 ( YST + 
-     :                     ( 0.0 - Y_LO)/( Y_HI - Y_LO)*( YEN - YST) 
+     :	                 ( YST +
+     :                     ( 0.0 - Y_LO)/( Y_HI - Y_LO)*( YEN - YST)
      :                          )         )
 
 	END IF
@@ -722,11 +722,11 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 * draw tick marks on plot
 
 	  CALL CUT_TICKS( X_LO, X_HI, Y_LO, Y_HI, XST, XEN, YST, YEN,
-     :	                  CUT_MAGNIF, XTICK_START, XTICK_INTERVAL, 
+     :	                  CUT_MAGNIF, XTICK_START, XTICK_INTERVAL,
      :	                  CUT_NUMYTIC, CUT_NUMXTIC, STATUS)
 
 	  IF( STATUS .NE. SAI__OK) THEN
-            CALL ERR_REP('ERR', 
+            CALL ERR_REP('ERR',
      :                   'CUT_DISPLAY : after CUT_TICKS',
      :                   STATUS )
 	    RETURN
@@ -735,12 +735,12 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 * draw NUMBERS on plot
 
 	  CALL CUT_NUMBERS( X_LO, X_HI, Y_LO, Y_HI, XST, XEN, YST, YEN,
-     :	                    CUT_MAGNIF, CUT_AXISRAT, XTICK_START, 
-     :	                    XTICK_INTERVAL, CUT_NUMYTIC, CUT_NUMXTIC, 
+     :	                    CUT_MAGNIF, CUT_AXISRAT, XTICK_START,
+     :	                    XTICK_INTERVAL, CUT_NUMYTIC, CUT_NUMXTIC,
      :	                    STATUS)
 
 	  IF( STATUS .NE. SAI__OK) THEN
-            CALL ERR_REP('ERR', 
+            CALL ERR_REP('ERR',
      :                   'CUT_DISPLAY : after CUT_NUMBERS',
      :                   STATUS )
 	    RETURN

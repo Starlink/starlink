@@ -12,7 +12,7 @@
 	\n	cursor down
 	\b	cursor left (wraps at start of line)
 	ESC C	cursor right (cif2634) (wraps)
-	\t	tab	
+	\t	tab
 	ESC 9	back tab (cif2634)
 	\r	cursor to start of line
 	ESC K	erase to end of line
@@ -160,7 +160,7 @@ PUBLIC void gk0xemurecreate(ep, b)emupane *ep; box b;{
  * print the given chars, interpreting control chars.
  * If screen is in invertedmode do the inversion last (and undo it on entry each time).
  * Remove cursor on entry each time.
- */	
+ */
 PUBLIC void gk0xemuprint(ep,cp,len)emupane *ep; char *cp;int len;{
 	jemupane *jpp;
 	char ch;
@@ -409,7 +409,7 @@ PRIVATE void gk0xredraw(){
 	}
 	pp->p_x = x, pp->p_y = y;
 	gk0xoutflush();
-}	
+}
 /*
  * step y posn on 1 (down) or -1 (up) and
  * if were at edge of screen scroll text up or down

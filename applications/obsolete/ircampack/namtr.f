@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
             BEGIN = START + 1
             SEP = INDEX( INSTR, '/' )
 
-*  If a / was found, store the environment variable name.            
+*  If a / was found, store the environment variable name.
             IF( SEP .GT. 0 ) VARNAM = INSTR( BEGIN : SEP - 1 )
 
          END IF
@@ -122,15 +122,15 @@
          ELSE
             TLEN = CHR_LEN( TRANS )
             OUTSTR = TRANS( : TLEN )//INSTR( SEP + 1 : )
-         END IF         
+         END IF
 
 *  If no variables was found in the supplied string, return the supplied
 *  string unaltered.
       ELSE
-         OUTSTR = INSTR      
+         OUTSTR = INSTR
       END IF
 
-*  Set returned status.      
+*  Set returned status.
       J = 0
 
       END

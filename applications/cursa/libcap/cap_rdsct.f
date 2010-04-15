@@ -70,7 +70,7 @@
      :  ROWS
 *  Arguments Returned:
       INTEGER
-     :  PTS, 
+     :  PTS,
      :  NUMNUL
       REAL
      :  XVAL(ROWS),

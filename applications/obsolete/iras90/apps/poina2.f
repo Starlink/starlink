@@ -1,23 +1,23 @@
-      SUBROUTINE  POINA2( PSCANN, PSCANS, PLAT, PLON, AUTO, GROUID, 
-     :                    ICRDD, LOGFID, LOGREQ, SCS, BAND, DETLBD, 
-     :                    DETUBD, EXPSRC, EXPRA, EXPDEC, IDC, NDFID, 
-     :                    PDATA, SCLENN, SCLENS, SMPLBD, SMPUBD, WHLSCN, 
+      SUBROUTINE  POINA2( PSCANN, PSCANS, PLAT, PLON, AUTO, GROUID,
+     :                    ICRDD, LOGFID, LOGREQ, SCS, BAND, DETLBD,
+     :                    DETUBD, EXPSRC, EXPRA, EXPDEC, IDC, NDFID,
+     :                    PDATA, SCLENN, SCLENS, SMPLBD, SMPUBD, WHLSCN,
      :                    STATUS )
 *+
 *  Name:
 *     POINA2
 
 *  Purpose:
-*     To obtain parameters relating to the input NDF 
+*     To obtain parameters relating to the input NDF
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA2( PSCANN, PSCANS, PLAT, PLON, AUTO, GROUID, 
-*                  ICRDD, LOGFID, LOGREQ, SCS, BAND, DETLBD, 
-*                  DETUBD, EXPSRC, EXPRA, EXPDEC, IDC, NDFID, 
-*                  PDATA, SCLENN, SCLENS, SMPLBD, SMPUBD, WHLSCN, 
+*     CALL POINA2( PSCANN, PSCANS, PLAT, PLON, AUTO, GROUID,
+*                  ICRDD, LOGFID, LOGREQ, SCS, BAND, DETLBD,
+*                  DETUBD, EXPSRC, EXPRA, EXPDEC, IDC, NDFID,
+*                  PDATA, SCLENN, SCLENS, SMPLBD, SMPUBD, WHLSCN,
 *                  STATUS )
 
 *  Description:
@@ -29,12 +29,12 @@
 *        north of the expected source position
 *     PSCANS = CHARACTER (Given)
 *        The name of the parameter used to get the length of scan required
-*        south of the expected source position 
+*        south of the expected source position
 *     PLAT = CHARACTER (Given)
-*        The name of the parameter used to get the latitude of the expected 
+*        The name of the parameter used to get the latitude of the expected
 *        source position
 *     PLON = CHARACTER (Given)
-*        The name of the parameter used to get the longitude of the expected 
+*        The name of the parameter used to get the longitude of the expected
 *        source position
 *     AUTO = LOGICAL (Given)
 *        TRUE when application is required to run in automatic mode.
@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,9 +113,9 @@
       CHARACTER*( * ) PSCANS
       CHARACTER*( * ) PLAT
       CHARACTER*( * ) PLON
-      LOGICAL AUTO 
+      LOGICAL AUTO
       INTEGER GROUID
-      INTEGER ICRDD 
+      INTEGER ICRDD
       INTEGER LOGFID
       LOGICAL LOGREQ
       CHARACTER*( * ) SCS
@@ -127,14 +127,14 @@
       LOGICAL EXPSRC
       DOUBLE PRECISION EXPRA
       DOUBLE PRECISION EXPDEC
-      INTEGER IDC                
-      INTEGER NDFID              
-      INTEGER PDATA 
-      REAL SCLENN 
-      REAL SCLENS 
+      INTEGER IDC
+      INTEGER NDFID
+      INTEGER PDATA
+      REAL SCLENN
+      REAL SCLENS
       INTEGER SMPLBD
       INTEGER SMPUBD
-      LOGICAL WHLSCN 
+      LOGICAL WHLSCN
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -170,7 +170,7 @@
 * *************************************************************************
 * Import the NDF from the group
 * *************************************************************************
-*  Get the NDF id for the current CRDD NDF file 
+*  Get the NDF id for the current CRDD NDF file
       CALL NDG_NDFAS( GROUID, ICRDD, 'READ', NDFID, STATUS )
 
 *  Import the NDF into the IRC system.
@@ -187,19 +187,19 @@
             CALL MSG_LOAD( ' ', '^NDF', FULNAM, NAMELN, STATUS )
 
 *  Use IRM_FILNM to get name without directory path
-            CALL IRM_FILNM( FULNAM( : NAMELN ), NAME, STATUS ) 
+            CALL IRM_FILNM( FULNAM( : NAMELN ), NAME, STATUS )
             NAMELN = CHR_LEN( NAME )
 
-            CALL FIO_WRITE( LOGFID, ' ', STATUS ) 
-            CALL FIO_WRITE( LOGFID, 
+            CALL FIO_WRITE( LOGFID, ' ', STATUS )
+            CALL FIO_WRITE( LOGFID,
      :                  ' Contains information about detected '/
      :                 /'point source(s) along the trace(s) from',
      :                   STATUS )
-            CALL FIO_WRITE( LOGFID, 
+            CALL FIO_WRITE( LOGFID,
      :                      ' CRDD (or CRDD-like) file:', STATUS )
-            CALL FIO_WRITE( LOGFID, 
+            CALL FIO_WRITE( LOGFID,
      :                      '      '//NAME( : NAMELN ),  STATUS )
-            CALL FIO_WRITE( LOGFID, ' ', STATUS ) 
+            CALL FIO_WRITE( LOGFID, ' ', STATUS )
          END IF
 
 
@@ -207,7 +207,7 @@
 * Obtain Expected source position if any
 * *************************************************************************
 *  Get the reference position of the CRDD file.
-         CALL IRC_INFO( IDC, BAND, REFRA, REFDEC, NOMSPD, 
+         CALL IRC_INFO( IDC, BAND, REFRA, REFDEC, NOMSPD,
      :                  SOP, OBS, STATUS )
 
 *  Check whether the application is being run in automatic mode
@@ -236,17 +236,17 @@
 
 *  Convert the coordinate for the reference position to the one in the
 *  specified sky coordinate system.
-               CALL IRA_CONVT( 1, EXPRA, EXPDEC, 
-     :                         'EQUATORIAL(B1950.0)', SCS, 
+               CALL IRA_CONVT( 1, EXPRA, EXPDEC,
+     :                         'EQUATORIAL(B1950.0)', SCS,
      :                         IRA__IRJEP, LON, LAT, STATUS )
 
 *  Convert the sky coordinate to string form.
                SCSLN = CHR_LEN( SCS )
                TEMPSTR = SCS( : SCSLN )
-               CALL FIO_WRITE( LOGFID, 
+               CALL FIO_WRITE( LOGFID,
      :         ' Reference position taken as expected source '/
      :         /'position ('//TEMPSTR//' ): ', STATUS )
-               CALL IRA_DTOC( LON( 1 ), LAT( 1 ), SCS, 1, 
+               CALL IRA_DTOC( LON( 1 ), LAT( 1 ), SCS, 1,
      :                        LONST, LATST, STATUS )
                CALL FIO_WRITE( LOGFID, '      '//LONST, STATUS )
                CALL FIO_WRITE( LOGFID, '      '//LATST, STATUS )
@@ -260,20 +260,20 @@
 * *************************************************************************
 *  Convert the coordinate for the reference position to the one in the
 *  specified sky coordinate system.
-            CALL IRA_CONVT( 1, REFRA, REFDEC, 'EQUATORIAL(B1950.0)', 
+            CALL IRA_CONVT( 1, REFRA, REFDEC, 'EQUATORIAL(B1950.0)',
      :                      SCS, IRA__IRJEP, LON, LAT, STATUS )
 
 *  Get the expected source position, using the reference position of the
 *  as prompt suggestion.
-            CALL IRA_GETCO( PLON, PLAT, 
+            CALL IRA_GETCO( PLON, PLAT,
      :                      ' of the expected source position:',
      :                      SCS, .TRUE., LON( 1 ), LAT( 1 ), STATUS )
 
 *  Annull parameters
             CALL PAR_CANCL( PLON, STATUS )
             CALL PAR_CANCL( PLAT, STATUS )
-            
-*  Check Status 
+
+*  Check Status
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Set expected source flag true
@@ -287,7 +287,7 @@
                   TEMPSTR = SCS( : SCSLN )
                   CALL FIO_WRITE( LOGFID, ' Expected source position ('/
      :                     /TEMPSTR//' ): ', STATUS )
-                  CALL IRA_DTOC( LON( 1 ), LAT( 1 ), SCS, 1, 
+                  CALL IRA_DTOC( LON( 1 ), LAT( 1 ), SCS, 1,
      :                           LONST, LATST, STATUS )
                   CALL FIO_WRITE( LOGFID, '      '//LONST, STATUS )
                   CALL FIO_WRITE( LOGFID, '      '//LATST, STATUS )
@@ -332,11 +332,11 @@
 
 *  If the logfile is required write whole scan being used
        	       IF ( LOGREQ ) THEN
-                  CALL FIO_WRITE( LOGFID, 
+                  CALL FIO_WRITE( LOGFID,
      :                        ' No expected source position, '/
      :                        /'therefore whole scan used', STATUS )
                END IF
-        
+
 *  Or if the status is bad goto the end of the subroutine
             ELSE
                RETURN
@@ -360,9 +360,9 @@
          DETUBD = UBND( 2 )
 
 *  Map the CRDD data array.
-         CALL NDF_MAP( NDFID, 'DATA', '_REAL', 'READ', PDATA, 
+         CALL NDF_MAP( NDFID, 'DATA', '_REAL', 'READ', PDATA,
      :                 EL, STATUS )
-      
+
 
 * End if for if an error occured importing that file
       END IF

@@ -28,22 +28,22 @@ adam_rmnull (char *c, int len) {
   if (len<=0) return;  /* Do nothing */
 
   /* Remove all spurious \0  */
-  /* and replace them with a new line */  
+  /* and replace them with a new line */
   i = 0;
   while (i<len-1) {
    if(*(c+i) == '\0') { *(c+i) = '\n';}
    i++;
   }
-  
+
   /* Find end of string */
   i = len + 0;
- 
+
   while ((*(c+i-1)==' '||*(c+i-1)=='\0') && i>=0) {
     i--;
   }
 
   if (i<0) {i=0;}
- 
+
   /* Null it */
   *(c+i) = '\0';
 }
@@ -100,7 +100,7 @@ char *name;
 
     case 'O':
       if (strEQ(name, "OBEY"))  return ((int)OBEY);
-      
+
       break;
 
     case 'S':
@@ -122,7 +122,7 @@ not_there:
 }
 
 
-MODULE = Starlink::ADAM		PACKAGE = Starlink::ADAM		
+MODULE = Starlink::ADAM		PACKAGE = Starlink::ADAM
 
 
 # Supply a real function for SAI__OK since this is the routine
@@ -156,10 +156,10 @@ ams_astint(status)
 
 void
 ams_astmsg(name, length, value, status)
-	char * name  
-	int length	
-	char * value	
-	int  status	
+	char * name
+	int length
+	char * value
+	int  status
  PROTOTYPE: $$$$
  CODE:
   ams_astmsg(name, length, value, &status);
@@ -181,9 +181,9 @@ ams_extint(status)
 
 void
 ams_getreply(timeout, path, messid, message_status, message_context, message_name, message_length, message_value, status)
-	int timeout	
-	int path	
-	int messid	
+	int timeout
+	int path
+	int messid
 	int message_status = NO_INIT
 	int message_context = NO_INIT
 	char * message_name = NO_INIT
@@ -201,7 +201,7 @@ ams_getreply(timeout, path, messid, message_status, message_context, message_nam
   message_name = name_len;
   message_value = msg_len;
   ams_getreply(timeout, path, messid, MSG_NAME_LEN, MSG_VAL_LEN,
-	       &message_status, &message_context, message_name, 
+	       &message_status, &message_context, message_name,
 	       &message_length, message_value, &status);
   if ( status == SAI__OK ) {
     adam_rmnull(message_value, message_length);
@@ -217,8 +217,8 @@ ams_getreply(timeout, path, messid, message_status, message_context, message_nam
 
 void
 ams_init(own_name, status)
-	char * own_name	
-	int status	
+	char * own_name
+	int status
  PROTOTYPE: $$
  CODE:
   ams_init(own_name, &status);
@@ -236,7 +236,7 @@ void
 ams_path(other_task_name, path, status)
 	char * other_task_name
 	int path     = NO_INIT
-	int status	
+	int status
  PROTOTYPE: $$$
  CODE:
   ams_path(other_task_name, &path, &status);
@@ -246,9 +246,9 @@ ams_path(other_task_name, path, status)
 
 void
 ams_plookup(path, name, status)
-	int path 
-	char * name = NO_INIT	
-	int status	
+	int path
+	char * name = NO_INIT
+	int status
  PROTOTYPE: $$$
  PREINIT:
   char str1[512]; /* Not sure how big to make this so over do it */
@@ -261,7 +261,7 @@ ams_plookup(path, name, status)
 
 void
 ams_receive(timeout, message_status, message_context, message_name, message_length, message_value, path, messid, status)
-	int timeout	
+	int timeout
 	int message_status = NO_INIT
 	int message_context = NO_INIT
 	char * message_name = NO_INIT
@@ -299,8 +299,8 @@ ams_receive(timeout, message_status, message_context, message_name, message_leng
 
 void
 ams_reply(path, messid, message_function, message_status, message_context, message_name, message_length, message_value, status)
-	int path	
-	int messid	
+	int path
+	int messid
 	int message_function
 	int message_status
 	int message_context
@@ -323,15 +323,15 @@ ams_reply(path, messid, message_function, message_status, message_context, messa
 
 void
 ams_send(path, message_function, message_status, message_context, message_name, message_length, message_value, messid, status)
-	int path	
+	int path
 	int message_function
-	int message_status  
-	int message_context 
-	char * message_name 
-	int message_length  
+	int message_status
+	int message_context
+	char * message_name
+	int message_length
 	char * message_value
 	int messid	= NO_INIT
-	int status	
+	int status
  PROTOTYPE: $$$$$$$$$
  CODE:
   ams_send(path, message_function, message_status, message_context, message_name, message_length, message_value, &messid, &status);

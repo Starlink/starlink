@@ -63,7 +63,7 @@
 *        The maximum pixel value found in the NDF array.
 *     MAXPOS( ) = _INTEGER (Write)
 *        A one-dimensional array of pixel indices identifying the
-*        (first) maximum-valued pixel found in the NDF array.  The 
+*        (first) maximum-valued pixel found in the NDF array.  The
 *        number of indices is equal to the number of NDF dimensions.
 *     MAXWCS = LITERAL (Write)
 *        The formatted WCS co-ordinates at the maximum pixel value. The
@@ -76,24 +76,24 @@
 *        The method used to evaluate the mode.  The choices are as
 *        follows.
 *
-*        - "Histogram" -- This finds the peak of an optimally binned 
-*        histogram, the mode being the central value of that bin.  The 
+*        - "Histogram" -- This finds the peak of an optimally binned
+*        histogram, the mode being the central value of that bin.  The
 *        number of bins may be altered given through Parameter NUMBIN,
-*        however it is recommended to use the optimal binsize derived 
+*        however it is recommended to use the optimal binsize derived
 *        from the prescription of Freedman & Diatonis.
 *
-*        - "Moments" -- As "Histogram" but the mode is the weighted 
-*        centroid from the moments of the peak bin and its neighbours.  
-*        The neighbours are those bins either side of the peak in a 
+*        - "Moments" -- As "Histogram" but the mode is the weighted
+*        centroid from the moments of the peak bin and its neighbours.
+*        The neighbours are those bins either side of the peak in a
 *        continuous sequence whose membership exceeds the peak value
 *        less three times the Poisson error of the peak bin.  Thus it
-*        gives an interpolated mode and does reduce the effect of 
+*        gives an interpolated mode and does reduce the effect of
 *        noise.
 *
 *        - "Pearson" -- This uses the 3 * median $-$ 2 * mean formula
-*        devised by Pearson.  See the first two References.  This 
-*        assumes that the median is bracketed by the mode and mean and 
-*        only a mildly skew unimodal distribution.  This often applies 
+*        devised by Pearson.  See the first two References.  This
+*        assumes that the median is bracketed by the mode and mean and
+*        only a mildly skew unimodal distribution.  This often applies
 *        to an image of the sky.
 *
 *        ["Moments"]
@@ -105,15 +105,15 @@
 *     MINIMUM = _DOUBLE (Write)
 *        The minimum pixel value found in the NDF array.
 *     MINPOS( ) = _INTEGER (Write)
-*        A one-dimensional array of pixel indices identifying the 
-*        (first) minimum-valued pixel found in the NDF array.  The 
+*        A one-dimensional array of pixel indices identifying the
+*        (first) minimum-valued pixel found in the NDF array.  The
 *        number of indices is equal to the number of NDF dimensions.
 *     MINWCS = LITERAL (Write)
 *        The formatted WCS co-ordinates at the minimum pixel value. The
 *        individual axis values are comma separated.
 *     MODE = _DOUBLE (Write)
 *        The modal value of all the valid pixels in the NDF array.
-*        The method used to obtain the mode is governed by Parameter 
+*        The method used to obtain the mode is governed by Parameter
 *        METHOD.
 *     NDF = NDF (Read)
 *        The NDF data structure to be analysed.
@@ -123,12 +123,12 @@
 *        clipping.
 *     NUMBIN = _INTEGER (Read)
 *        The number of histogram bins to be used for the coarse
-*        histogram to evaluate the mode.  It is only accessed when 
-*        METHOD="Histogram" or "Moments".  This must lie in the range 
-*        10 to 10000.  The suggested default is calculated dynamically 
-*        depending on the data spread and number of values (using the 
+*        histogram to evaluate the mode.  It is only accessed when
+*        METHOD="Histogram" or "Moments".  This must lie in the range
+*        10 to 10000.  The suggested default is calculated dynamically
+*        depending on the data spread and number of values (using the
 *        prescription of Freedman & Diaconis).  For integer data it is
-*        advisble to use the dynamic default or an integer multiple 
+*        advisble to use the dynamic default or an integer multiple
 *        thereof to avoid creating non-integer wide bins.  []
 *     NUMGOOD = _INTEGER (Write)
 *        The number of NDF pixels which actually contributed to the
@@ -151,8 +151,8 @@
 *        Computes and displays simple ordered statistics for the data
 *        array in the NDF called image.
 *     histat image method=his
-*        As above but the mode is the centre of peak bin in the 
-*        optimally distributed histogram rather than sub-bin 
+*        As above but the mode is the centre of peak bin in the
+*        optimally distributed histogram rather than sub-bin
 *        interpolated using neighbouring bins.
 *     histat ndf=spectrum variance
 *        Computes and displays simple ordered statistics for the
@@ -191,10 +191,10 @@
 *  References:
 *     Moroney, M.J., 1957, "Facts from Figures" (Pelican)
 *     Goad, L.E. 1980, "Statistical Filtering of Cosmic-Ray Events
-*       from Astronomical CCD Images in "Applications of Digital Image 
+*       from Astronomical CCD Images in "Applications of Digital Image
 *       Processing to Astronomy", SPIE 264, 136.
 *     Freedman, D. & Diaconis, P. 1981, "On the histogram as a density
-*        estimator: L2 theory", Zeitschrift fur 
+*        estimator: L2 theory", Zeitschrift fur
 *        Wahrscheinlichkeitstheorie und verwandte Gebiete 57, 453.
 
 *  Related Applications:
@@ -214,7 +214,7 @@
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2004 Central Laboratory of the Research
-*     Councils. 
+*     Councils.
 *     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -251,14 +251,14 @@
 *        for the histogram.  Uses improved algorithm for calculating
 *        the median and percentiles.
 *     6-AUG-2004 (DSB):
-*        Display current Frame WCS coords at max and min pixel 
+*        Display current Frame WCS coords at max and min pixel
 *        positions.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     18-MAY-2007 (DSB):
 *        Added parameters MINWCS and MAXWCS.
 *     2007 June 29 (MJC):
-*        Extend to calculate the mode from an optimally binned 
+*        Extend to calculate the mode from an optimally binned
 *        histogram through new parameters METHOD and NUMBIN.  Added
 *        References.
 *     2009 June 25 (MJC):
@@ -269,7 +269,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -381,14 +381,14 @@
 *  ===========
 
 *  Inquire the method used to calculate the mode.
-      CALL PAR_CHOIC( 'METHOD', 'Moments', 'Histogram,Moments,Pearson', 
+      CALL PAR_CHOIC( 'METHOD', 'Moments', 'Histogram,Moments,Pearson',
      :                .TRUE., METHOD, STATUS )
       USEHIS = METHOD .EQ. 'HISTOGRAM' .OR. METHOD .EQ. 'MOMENTS'
 
 *  If required, ensure we leave two slots spare in the PERCNT array.
       IF( USEHIS ) THEN
          MAXPER = NPRCTL - 2
-      ELSE 
+      ELSE
          MAXPER = NPRCTL
       END IF
 
@@ -415,14 +415,14 @@
                PERCNT( 1 ) = VAL__BADR
             END IF
          END IF
-         
+
       ELSE
          DOPRCT = .TRUE.
       END IF
       CALL ERR_RLSE
 
 *  We need extra percentiles to derive the inter-quartile range for
-*  the histogram method to derive the mode. We know there will be room 
+*  the histogram method to derive the mode. We know there will be room
 *  in PERCNT for these extra values, so no need to check.
       IF ( USEHIS ) THEN
          PERCNT( NUMPER + 1 ) = 25.0
@@ -453,43 +453,43 @@
 *  Call the appropriate routine to compute the histogram and hence the
 *  statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_HSTAB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_HSTAB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_HSTAUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_HSTAUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     NUMPER, PERCNT,
      :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                     SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_HSTAD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_HSTAD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_HSTAI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_HSTAI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_HSTAR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_HSTAR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_HSTAW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_HSTAW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_HSTAUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_HSTAUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     NUMPER, PERCNT,
      :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                     SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
@@ -504,42 +504,42 @@
 *  that through Parameter NUMBIN.
          IF ( TYPE .EQ. '_BYTE' ) THEN
              CALL KPS1_HSMOB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_HSMOUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_HSMOD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
- 
+
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_HSMOI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             CALL KPS1_HSMOR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
              CALL KPS1_HSMOW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_HSMOUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
          END IF
 
-*  Shuffle the percentile values down to remove the bad values introduced 
+*  Shuffle the percentile values down to remove the bad values introduced
 *  by KPS1_HSMO<x>
          J = 1
          DO I = 1, NUMPER
@@ -548,7 +548,7 @@
                PERCNT( J ) = PERCNT ( I )
                J = J + 1
             END IF
-         END DO               
+         END DO
          NUMPER = J - 1
 
       END IF
@@ -699,7 +699,7 @@
       CALL PAR_PUT0C( 'MINWCS', MINWCS, STATUS )
 
 *  Only write percentiles values if any percentiles are left.
-      IF( NUMPER .GT. 0 ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, 
+      IF( NUMPER .GT. 0 ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL,
      :                                    STATUS )
 
 *  Arrive here if an error occurs.

@@ -1,4 +1,4 @@
-      SUBROUTINE GK3CLN(N,X,Y)         
+      SUBROUTINE GK3CLN(N,X,Y)
 *
 *--------------------------------------------------------------------------
 *
@@ -12,7 +12,7 @@
 *
 *  PURPOSE OF THE ROUTINE
 *  ----------------------
-*     Plot polyline 
+*     Plot polyline
 *
 *  ARGUMENTS
 *  ---------
@@ -55,7 +55,7 @@
         CALL GK3CEI( NINT(Y(I)*FY) - NINT(Y(I-1)*FY), C, NC)
         CALL GKFOCO(KIOPB,C(:NC),NLEFT)
   100 CONTINUE
-      
+
       CALL GKFOCO(KIOPB,IS2,NLEFT)
 
       END

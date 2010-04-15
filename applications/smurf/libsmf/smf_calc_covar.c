@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     covar = smf_calc_covar ( const smfData *data, const int i, const int j,
-*                      int lo, int hi, int *status ) 
+*                      int lo, int hi, int *status )
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -38,7 +38,7 @@
 *     and hi are zero then the entire range is used. On error a value
 *     of VAL__BADD is returned.
 
-*  Notes: 
+*  Notes:
 
 *  Authors:
 *     Andy Gibb (UBC)

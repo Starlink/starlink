@@ -3,7 +3,7 @@ C History:  Original version J. Tonry.
 C Modified: TDCA 18-FEB-1999. Minor style changes.
 
       IMPLICIT NONE
-      
+
       COMPLEX*8 CFN(1), FACTOR
       REAL PHASE, ARG
       INTEGER J, N

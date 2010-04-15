@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -79,7 +79,7 @@
 *.
 
 *  Set the generator seed if not already done.
-      IF ( SEED .EQ. 0  ) THEN 
+      IF ( SEED .EQ. 0  ) THEN
 *         CALL PSX_TIME( SEED, STATUS )
 *  Use PID rather than some tick measurement as ticks are seconds, which
 *  isn't always enough resolution to get a unique values, machines are

@@ -29,7 +29,7 @@
 *  Anticipated Errors:
 *     CHP__CATNOTFND
 *     CHP__PARNOTFND
- 
+
 *  Authors:
 *     ARW: Alan R Wood (STARLINK)
 *     {enter_new_authors_here}
@@ -88,7 +88,7 @@
 *  and reduce the number of parameters by 1
 *
         parnotfnd = .TRUE.
-        parcount = 1 
+        parcount = 1
         do while (parnotfnd .AND. parcount.LE. CPnumpars(cd))
           if (PPname(cd,parcount).EQ. pname) then
             parnotfnd = .FALSE.

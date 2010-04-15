@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
                IF( I .LT. NCOMP ) then
                   I = I + 1
                ELSE
-                  AGAIN = .FALSE.      
+                  AGAIN = .FALSE.
                END IF
 
             END IF
@@ -136,6 +136,6 @@
       END IF
 
 *  Annul the locator to the MORE structure.
-      CALL DAT_ANNUL( MLOC, STATUS )      
+      CALL DAT_ANNUL( MLOC, STATUS )
 
       END

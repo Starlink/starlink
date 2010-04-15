@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,7 +80,7 @@
 
 *  Loop until a good time/date string is obtained.
       MORE = .TRUE.
-      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
 *  Get a string from the environment.
          CALL PAR_GET0C( PARAM, TIMDAT, STATUS )
@@ -102,7 +102,7 @@
 
             END IF
 
-         END IF      
+         END IF
 
       END DO
 

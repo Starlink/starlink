@@ -13,17 +13,17 @@ f     AST_RATEMAP
 *  Description:
 *     A RateMap is a Mapping which represents a single element of the
 *     Jacobian matrix of another Mapping. The Mapping for which the
-*     Jacobian is required is specified when the new RateMap is created, 
+*     Jacobian is required is specified when the new RateMap is created,
 *     and is referred to as the "encapsulated Mapping" below.
 *
-*     The number of inputs to a RateMap is the same as the number of inputs 
+*     The number of inputs to a RateMap is the same as the number of inputs
 *     to its encapsulated Mapping. The number of outputs from a RateMap
 *     is always one. This one output equals the rate of change of a
 *     specified output of the encapsulated Mapping with respect to a
-*     specified input of the encapsulated Mapping (the input and output 
+*     specified input of the encapsulated Mapping (the input and output
 *     to use are specified when the RateMap is created).
 *
-*     A RateMap which has not been inverted does not define an inverse 
+*     A RateMap which has not been inverted does not define an inverse
 *     transformation. If a RateMap has been inverted then it will define
 *     an inverse transformation but not a forward transformation.
 
@@ -48,12 +48,12 @@ f     The RateMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -123,9 +123,9 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(RateMap)
@@ -186,7 +186,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "ratemap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     RateMap member function (over-rides the astEqual protected
@@ -213,8 +213,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstRateMap *that;        
-   AstRateMap *this;        
+   AstRateMap *that;
+   AstRateMap *this;
    int nin;
    int nout;
    int result;
@@ -241,9 +241,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
 
-/* If the Invert flags for the two RateMaps differ, it may still be possible 
-   for them to be equivalent. First compare the RateMaps if their Invert 
-   flags are the same. In this case all the attributes of the two RateMaps 
+/* If the Invert flags for the two RateMaps differ, it may still be possible
+   for them to be equivalent. First compare the RateMaps if their Invert
+   flags are the same. In this case all the attributes of the two RateMaps
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
 
@@ -263,7 +263,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
             astSetInvert( this->map, this_inv );
             astSetInvert( that->map, that_inv );
 
-/* If the Invert flags for the two RateMaps differ, the attributes of the two 
+/* If the Invert flags for the two RateMaps differ, the attributes of the two
    RateMaps must be inversely related to each other. */
          } else {
 
@@ -273,7 +273,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -294,7 +294,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "ratemap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     RateMap member function (over-rides the astGetObjSize protected
@@ -374,7 +374,7 @@ void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -449,7 +449,7 @@ void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name, int *status )
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, 
+static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
 /*
 *  Name:
@@ -463,8 +463,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
-*                            AstObject **fail, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
 
 *  Class Membership:
 *     RateMap member function (over-rides the astManageLock protected
@@ -472,7 +472,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Description:
 *     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
+*     lock can be locked, unlocked or checked by this function as
 *     deteremined by parameter "mode". See astLock for details of the way
 *     these locks are used.
 
@@ -491,21 +491,21 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *        AST__CHECKLOCK: Check that the object is locked for use by the
 *        calling thread (report an error if not).
 *     extra
-*        Extra mode-specific information. 
+*        Extra mode-specific information.
 *     fail
 *        If a non-zero function value is returned, a pointer to the
 *        Object that caused the failure is returned at "*fail". This may
 *        be "this" or it may be an Object contained within "this". Note,
 *        the Object's reference count is not incremented, and so the
-*        returned pointer should not be annulled. A NULL pointer is 
+*        returned pointer should not be annulled. A NULL pointer is
 *        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*    A local status value: 
+*    A local status value:
 *        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
+*        1 - Could not lock or unlock the object because it was already
 *            locked by another thread.
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
@@ -680,16 +680,16 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstMapping *emap2;
    AstMapping *emap;
    AstMapping *smap;
-   AstRateMap *map;  
-   AstRateMap *rmap1;  
-   AstRateMap *rmap2;  
+   AstRateMap *map;
+   AstRateMap *rmap1;
+   AstRateMap *rmap2;
    int cancel;
-   int map_inv;      
-   int nax;           
-   int old_inv2;     
-   int old_inv;     
-   int old_winv;     
-   int result;       
+   int map_inv;
+   int nax;
+   int old_inv2;
+   int old_inv;
+   int old_winv;
+   int result;
 
 /* Initialise. */
    result = -1;
@@ -707,8 +707,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    map_inv = astGetInvert( map );
    astSetInvert( map, ( *invert_list )[ where ] );
 
-/* Get the encapsulated Mapping, and temporarily set its Invert attribute 
-   back to the value it had when the RateMap was created, saving the current 
+/* Get the encapsulated Mapping, and temporarily set its Invert attribute
+   back to the value it had when the RateMap was created, saving the current
    Invert value so that it can be re-instated later. */
    emap = map->map;
    old_inv = astGetInvert( emap );
@@ -724,7 +724,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       (void) astAnnul( ( *map_list )[ where ] );
       ( *map_list )[ where ] = (AstMapping *) astRateMap( smap, map->iout, map->iin, "", status );
       result = where;
-    
+
 /* The only other simplication which can be performed is to cancel a RateMap
    with its own inverse in series. */
    } else if( series ) {
@@ -738,7 +738,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Check the Invert flags are opposite */
          if( ( *invert_list )[ where ] != ( *invert_list )[ where - 1 ] ) {
             rmap1 = map;
-            rmap2 = (AstRateMap *) ( *map_list )[ where - 1 ];             
+            rmap2 = (AstRateMap *) ( *map_list )[ where - 1 ];
 
 /* Check the input and output indices are equal. */
             if( rmap1->iin == rmap2->iin &&
@@ -751,7 +751,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                astSetInvert( rmap2, ( *invert_list )[ where - 1 ] );
                old_inv2 = astGetInvert( emap2 );
                astSetInvert( emap2,  rmap2->invert );
-   
+
                if( astEqual( emap1, emap2 ) ) cancel = where - 1;
 
                astSetInvert( emap2,  old_inv2 );
@@ -763,7 +763,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       }
 
 /* Likewise consider the upper neighbour. */
-      if( cancel == -1 && where + 1 < *nmap && 
+      if( cancel == -1 && where + 1 < *nmap &&
           astIsARateMap( ( *map_list )[ where + 1 ] ) ) {
 
          if( ( *invert_list )[ where ] != ( *invert_list )[ where + 1 ] ) {
@@ -777,12 +777,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                astSetInvert( rmap2, ( *invert_list )[ where + 1 ] );
                old_inv2 = astGetInvert( emap2 );
                astSetInvert( emap2,  rmap2->invert );
-   
+
                if( astEqual( emap1, emap2 ) ) cancel = where + 1;
-   
+
                astSetInvert( emap2,  old_inv2 );
                astSetInvert( rmap2, old_winv );
-   
+
                nax = astGetNin( rmap1 );
             }
          }
@@ -837,7 +837,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 *     inherited from the Mapping class).
 
 *  Description:
-*     This function creates a new Mapping by picking specified inputs from 
+*     This function creates a new Mapping by picking specified inputs from
 *     an existing RateMap. This is only possible if the specified inputs
 *     correspond to some subset of the RateMap outputs. That is, there
 *     must exist a subset of the RateMap outputs for which each output
@@ -847,27 +847,27 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 
 *  Parameters:
 *     this
-*        Pointer to the RateMap to be split (the RateMap is not actually 
+*        Pointer to the RateMap to be split (the RateMap is not actually
 *        modified by this function).
 *     nin
 *        The number of inputs to pick from "this".
 *     in
 *        Pointer to an array of indices (zero based) for the inputs which
 *        are to be picked. This array should have "nin" elements. If "Nin"
-*        is the number of inputs of the supplied RateMap, then each element 
+*        is the number of inputs of the supplied RateMap, then each element
 *        should have a value in the range zero to Nin-1.
 *     map
 *        Address of a location at which to return a pointer to the new
 *        Mapping. This Mapping will have "nin" inputs (the number of
 *        outputs may be different to "nin"). A NULL pointer will be
-*        returned if the supplied RateMap has no subset of outputs which 
+*        returned if the supplied RateMap has no subset of outputs which
 *        depend only on the selected inputs.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
-*     elements in this array will equal the number of outputs for the 
+*     elements in this array will equal the number of outputs for the
 *     returned Mapping. Each element will hold the index of the
 *     corresponding output in the supplied RateMap. The array should be
 *     freed using astFree when no longer needed. A NULL pointer will
@@ -889,7 +889,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
    int ax2;                   /* New index of output being varied */
    int i;                     /* Loop count */
    int nout;                  /* No. of outputs in the split Mapping */
-   int old_inv;               /* Original Invert flag for emap */ 
+   int old_inv;               /* Original Invert flag for emap */
 
 /* Initialise */
    result = NULL;
@@ -930,7 +930,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
             }
          }
 
-/* Check that the output which the RateMap differentiates is one of the 
+/* Check that the output which the RateMap differentiates is one of the
    outputs of the "remap" Mapping. */
          ax1 = -1;
          nout = astGetNout( remap );
@@ -988,12 +988,12 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
 *     from the Mapping class).
 
 *  Description:
-*     This function searches the supplied Mapping (which may be a 
-*     compound Mapping such as a CmpMap) for any component Mappings 
+*     This function searches the supplied Mapping (which may be a
+*     compound Mapping such as a CmpMap) for any component Mappings
 *     that are instances of the AST Region class. It then creates a new
 *     Mapping from which all Regions have been removed. If a Region
 *     cannot simply be removed (for instance, if it is a component of a
-*     parallel CmpMap), then it is replaced with an equivalent UnitMap 
+*     parallel CmpMap), then it is replaced with an equivalent UnitMap
 *     in the returned Mapping.
 *
 *     The implementation provided by the RateMap class invokes the
@@ -1123,9 +1123,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 */
 
 /* Local Variables: */
-   AstMapping *emap;             
-   AstPointSet *result;          
-   AstRateMap *map;              
+   AstMapping *emap;
+   AstPointSet *result;
+   AstRateMap *map;
    double **ptr2;
    double **ptr;
    double *pout;
@@ -1136,7 +1136,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int ipoint;
    int ncoord;
    int npoint;
-   int old_inv;                  
+   int old_inv;
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -1197,7 +1197,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             for( ic = 0; ic < ncoord; ic++ ) work[ ic ] = ptr[ ic ][ ipoint ];
 
 /* Find the rate of change of the specified output of the encapsulated
-   Mapping with respect to the specified input. */                  
+   Mapping with respect to the specified input. */
             *(pout++) = astRate( emap, work, iout, iin );
          }
       }
@@ -1400,9 +1400,9 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
                 ival ? "Mapping used in inverse direction" :
                        "Mapping used in forward direction" );
 
-/* Mapping. */ 
+/* Mapping. */
 /* -------- */
-   astWriteObject( channel, "Map", 1, 1, this->map, 
+   astWriteObject( channel, "Map", 1, 1, this->map,
                    "Mapping to be differentiated" );
 
 }
@@ -1476,7 +1476,7 @@ AstRateMap *astRateMap_( void *map_void, int ax1, int ax2, const char *options, 
 *     invoked by a macro that evaluates to a function pointer (not a
 *     function invocation) and no checking or casting of arguments is
 *     performed before the function is invoked. Because of this, the
-*     "map" parameter is of type (void *) and is converted and validated 
+*     "map" parameter is of type (void *) and is converted and validated
 *     within the function itself.
 */
 
@@ -1525,7 +1525,7 @@ AstRateMap *astRateMap_( void *map_void, int ax1, int ax2, const char *options, 
    return new;
 }
 
-AstRateMap *astRateMapId_( void *map_void, int ax1, int ax2, 
+AstRateMap *astRateMapId_( void *map_void, int ax1, int ax2,
                            const char *options, ... ) {
 /*
 *++
@@ -1554,17 +1554,17 @@ f     RESULT = AST_RATEMAP( MAP, AX1, AX2, OPTIONS, STATUS )
 *
 *     A RateMap is a Mapping which represents a single element of the
 *     Jacobian matrix of another Mapping. The Mapping for which the
-*     Jacobian is required is specified when the new RateMap is created, 
+*     Jacobian is required is specified when the new RateMap is created,
 *     and is referred to as the "encapsulated Mapping" below.
 *
-*     The number of inputs to a RateMap is the same as the number of inputs 
+*     The number of inputs to a RateMap is the same as the number of inputs
 *     to its encapsulated Mapping. The number of outputs from a RateMap
 *     is always one. This one output equals the rate of change of a
 *     specified output of the encapsulated Mapping with respect to a
-*     specified input of the encapsulated Mapping (the input and output 
+*     specified input of the encapsulated Mapping (the input and output
 *     to use are specified when the RateMap is created).
 *
-*     A RateMap which has not been inverted does not define an inverse 
+*     A RateMap which has not been inverted does not define an inverse
 *     transformation. If a RateMap has been inverted then it will define
 *     an inverse transformation but not a forward transformation.
 
@@ -1574,14 +1574,14 @@ f     MAP = INTEGER (Given)
 *        Pointer to the encapsulated Mapping.
 c     ax1
 f     AX1 = INTEGER (Given)
-*        Index of the output from the encapsulated Mapping for which the 
+*        Index of the output from the encapsulated Mapping for which the
 *        rate of change is required. This corresponds to the delta
-*        quantity forming the numerator of the required element of the 
+*        quantity forming the numerator of the required element of the
 *        Jacobian matrix. The first axis has index 1.
 c     ax2
 f     AX2 = INTEGER (Given)
 *        Index of the input to the encapsulated Mapping which is to be
-*        varied. This corresponds to the delta quantity forming the 
+*        varied. This corresponds to the delta quantity forming the
 *        denominator of the required element of the Jacobian matrix.
 *        The first axis has index 1.
 c     options
@@ -1612,7 +1612,7 @@ f     AST_RATEMAP = INTEGER
 
 *  Notes:
 *     - The forward transformation of the encapsulated Mapping must be
-*     defined. 
+*     defined.
 c     - Note that the component Mappings supplied are not copied by
 c     astRateMap (the new RateMap simply retains a reference to
 c     them). They may continue to be used for other purposes, but
@@ -1639,8 +1639,8 @@ f     function is invoked with STATUS set to an error value, or if it
 *     cannot be encapsulated in a macro (where this conversion would
 *     otherwise occur).
 *     - Because no checking or casting of arguments is performed
-*     before the function is invoked, the "map" parameter is of type 
-*     (void *) and is converted from an ID value to a pointer and 
+*     before the function is invoked, the "map" parameter is of type
+*     (void *) and is converted from an ID value to a pointer and
 *     validated within the function itself.
 *     - The variable argument list also prevents this function from
 *     invoking astRateMap_ directly, so it must be a re-implementation
@@ -1655,7 +1655,7 @@ f     function is invoked with STATUS set to an error value, or if it
    va_list args;                 /* Variable argument list */
 
 /* Pointer to inherited status value */
-   int *status;                  
+   int *status;
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
@@ -1798,12 +1798,12 @@ AstRateMap *astInitRateMap_( void *mem, size_t size, int init,
    nout = astGetNout( map );
    if( ( ax1 < 0 || ax1 >= nout ) && astOK ) {
       astError( AST__INNCO, "astInitRateMap(%s): The output axis %d is out "
-                "of range - it should be in the range 1 to %d.", status, name, 
+                "of range - it should be in the range 1 to %d.", status, name,
                 ax1 + 1, nout );
    }
    if( ( ax2 < 0 || ax2 >= nin ) && astOK ) {
       astError( AST__INNCO, "astInitRateMap(%s): The input axis %d is out "
-                "of range - it should be in the range 1 to %d.", status, name, 
+                "of range - it should be in the range 1 to %d.", status, name,
                 ax2 + 1, nin );
    }
 

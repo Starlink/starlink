@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -142,9 +142,9 @@
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__CHAR ) THEN
             CALL CHR_CTOR( CHARLIST(PARDYN(1,NAMECODE)),
      :        PARREAL(NAMECODE), STATUS )
-            
+
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__DOUBLE ) THEN
-            PARREAL(NAMECODE) = 
+            PARREAL(NAMECODE) =
      :        REAL( DOUBLELIST( PARDYN(1,NAMECODE) ) )
 
          ELSE IF ( PARDYN(3,NAMECODE) .EQ. SUBPAR__INTEGER ) THEN

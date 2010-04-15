@@ -28,7 +28,7 @@
 *     to convert coordinates to and from it.
 *
 *     The index of the closest matching Frame in the target FrameSet
-*     is displayed on the screen and returned in output parameter 
+*     is displayed on the screen and returned in output parameter
 *     IFRAME.
 
 *  Usage:
@@ -36,9 +36,9 @@
 
 *  ADAM Parameters:
 *     DOMAINLIST = LITERAL (Read)
-*        A string containing a comma-separated list of Frame domains. 
-*        This may be used to establish a priority order for the different 
-*        types of coordinate system that might be found. 
+*        A string containing a comma-separated list of Frame domains.
+*        This may be used to establish a priority order for the different
+*        types of coordinate system that might be found.
 *
 *        The function will first try to find a suitable coordinate
 *        system whose Domain attribute equals the first domain in this
@@ -52,27 +52,27 @@
 *        If you do not wish to restrict the domain in this way,
 *        you should supply a blank string or null (!) value.
 *     IFRAME = INTEGER (Write)
-*        On exit, this holds the index of the closest matching Frame in the 
+*        On exit, this holds the index of the closest matching Frame in the
 *        target FrameSet, or zero if no matching Frame was found. If the
 *        Target is a Frame instead of a FrameSet, then a value of 1 is
 *        returned if a match is found, and zero otherwise.
 *     RESULT = LITERAL (Read)
-*        If the search is successful, a FrameSet is written to the specified 
-*        text file or NDF. Otherwise, a warning message is displayed. If 
-*        created, the FrameSet will contain two Frames. Frame number 1 (its 
-*        base Frame) represents the target coordinate system and will be the 
-*        same as the (base Frame of the) target. Frame number 2 (its current 
-*        Frame) will be a Frame representing the coordinate system which 
-*        the function found. The Mapping which inter-relates these two Frames 
+*        If the search is successful, a FrameSet is written to the specified
+*        text file or NDF. Otherwise, a warning message is displayed. If
+*        created, the FrameSet will contain two Frames. Frame number 1 (its
+*        base Frame) represents the target coordinate system and will be the
+*        same as the (base Frame of the) target. Frame number 2 (its current
+*        Frame) will be a Frame representing the coordinate system which
+*        the function found. The Mapping which inter-relates these two Frames
 *        will describe how to convert between their respective coordinate
 *        systems.
 *     TARGET = LITERAL (Read)
-*        An NDF or text file holding a Frame or FrameSet. If an NDF is 
-*        supplied, the WCS FrameSet will be used. 
+*        An NDF or text file holding a Frame or FrameSet. If an NDF is
+*        supplied, the WCS FrameSet will be used.
 *     TEMPLATE = LITERAL (Read)
-*        An NDF or text file holding a Frame. If an NDF is supplied, the 
+*        An NDF or text file holding a Frame. If an NDF is supplied, the
 *        current Frame of the WCS FrameSet will be used. The Frame should
-*        be an instance of the type of Frame you wish to find. If you wanted 
+*        be an instance of the type of Frame you wish to find. If you wanted
 *        to find a Frame describing a celestial coordinate system, for example,
 *        then you might use a SkyFrame here.
 
@@ -129,21 +129,21 @@
       INTEGER CFI
       INTEGER RESULT
       INTEGER TARGET
-      INTEGER TEMPLT   
+      INTEGER TEMPLT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the target Frame.
-      CALL KPG1_GTOBJ( 'TARGET', 'Frame or FrameSet', AST_ISAFRAME, 
+      CALL KPG1_GTOBJ( 'TARGET', 'Frame or FrameSet', AST_ISAFRAME,
      :                 TARGET, STATUS )
 
 *  Get the template Frame.
-      CALL KPG1_GTOBJ( 'TEMPLATE', 'Frame', AST_ISAFRAME, TEMPLT, 
+      CALL KPG1_GTOBJ( 'TEMPLATE', 'Frame', AST_ISAFRAME, TEMPLT,
      :                 STATUS )
 
 *  Abort if an error has occurred.
@@ -154,7 +154,7 @@
 
 *  IF a null value was supplied, annul the error and use a blank domain
 *  list.
-      IF( STATUS .EQ. PAR__NULL ) THEN 
+      IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          DOMLST = ' '
       END IF
@@ -163,12 +163,12 @@
       RESULT = AST_FINDFRAME( TARGET, TEMPLT, DOMLST, STATUS )
 
 *  Issue a warning if no Frame was found
-      IF( RESULT .EQ. AST__NULL ) THEN 
+      IF( RESULT .EQ. AST__NULL ) THEN
          CALL MSG_OUT( 'ASTFINDFRAME_MSG1', 'No Frame matching the '//
      :                 'supplied template could be found in the '//
      :                 'supplied target.', STATUS )
          CALL PAR_PUT0I( 'IFRAME', 0, STATUS )
-      
+
 *  Otherwise, tell the user which Frame was used.
       ELSE
 
@@ -176,21 +176,21 @@
          CALL MSG_OUT( 'ASTFINDFRAME_MSG2', 'The closest matching '//
      :                 'Frame was:', STATUS )
 
-         IF( AST_ISAFRAMESET( TARGET, STATUS ) ) THEN 
+         IF( AST_ISAFRAMESET( TARGET, STATUS ) ) THEN
             CFI = AST_GETI( TARGET, 'CURRENT', STATUS )
-            CFD = AST_GETC( AST_GETFRAME( TARGET, AST__CURRENT, 
-     :                                    STATUS ), 
+            CFD = AST_GETC( AST_GETFRAME( TARGET, AST__CURRENT,
+     :                                    STATUS ),
      :                     'Domain', STATUS )
 
             CALL MSG_SETI( 'CFI', CFI )
-            IF( CFD .NE. ' ' ) THEN 
+            IF( CFD .NE. ' ' ) THEN
                CALL MSG_SETC( 'CFD', '(' )
                CALL MSG_SETC( 'CFD', CFD )
                CALL MSG_SETC( 'CFD', ')' )
             ELSE
                CALL MSG_SETC( 'CFD', ' ' )
             ENDIF
-   
+
             CALL MSG_OUT( 'ASTFINDFRAME_MSG3', '   Frame ^CFI ^CFD in'//
      :                    ' the ''TARGET'' FrameSet.', STATUS )
             CALL PAR_PUT0I( 'IFRAME', CFI, STATUS )

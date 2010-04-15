@@ -51,7 +51,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DTASK_ERR'
 *    Import :
-      CHARACTER*(*) INTEGRATION     ! The name of the integration 
+      CHARACTER*(*) INTEGRATION     ! The name of the integration
       LOGICAL ASK                   ! T if should ask user before proceeding
       LOGICAL WAIT                  ! T if should wait for reduction action
 *    Status :
@@ -76,13 +76,13 @@
 *    Get task alias required by this routine
       CALL PAR_GET0C( 'RED4_ALIAS', RED4_ALIAS, STATUS )
 
-*    Check that the REDUCTION_OK flag is good, if not return. 
+*    Check that the REDUCTION_OK flag is good, if not return.
       IF ( .NOT. REDUCTION_OK ) RETURN
 
 *    Issue a message
       IF ( VERBOSE ) THEN
          CALL MSG_SETC( 'INTEGRATION', INTEGRATION )
-         CALL MSG_OUT (' ', 'Adding integration ^INTEGRATION', STATUS) 
+         CALL MSG_OUT (' ', 'Adding integration ^INTEGRATION', STATUS)
       END IF
 
 *    If necessary ask user if they wish to proceed
@@ -100,13 +100,13 @@
 
             CALL TASK_DONE( -1, RED4_PATH, RED4_MESSID, OUTVAL, STATUS )
 
-            RED4_ACTIVE = .FALSE. 
+            RED4_ACTIVE = .FALSE.
 
             IF ( STATUS .NE. DTASK__ACTCOMPLETE ) THEN
                IF ( STATUS .EQ. DTASK__ACTINFORM ) THEN
                   ERR_STATUS = STATUS
                   STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'ES', ERR_STATUS ) 
+                  CALL MSG_SETI( 'ES', ERR_STATUS )
                   CALL ERR_REP (' ', 'CRED4_ADD_INTEGRATION: '/
      :              /'First failure reported by RED4 '/
      :              /'(Status = ^ES< message follows)', STATUS )
@@ -120,9 +120,9 @@
                ELSE
                   ERR_STATUS = STATUS
                   STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'ES', ERR_STATUS ) 
+                  CALL MSG_SETI( 'ES', ERR_STATUS )
                   CALL ERR_REP( ' ', 'CRED4_ADD_INTEGRATION: '/
-     :               /'Failed to finish previous action (Status = ^ES)', STATUS ) 
+     :               /'Failed to finish previous action (Status = ^ES)', STATUS )
                ENDIF
             ELSE
                CALL ERR_ANNUL( STATUS )
@@ -165,7 +165,7 @@
          IF ( STATUS .NE. DTASK__ACTSTART ) THEN
             ERR_STATUS = STATUS
             STATUS = SAI__ERROR
-            CALL MSG_SETI( 'ES', ERR_STATUS ) 
+            CALL MSG_SETI( 'ES', ERR_STATUS )
             CALL ERR_REP( ' ', 'CRED4_ADD_INTEGRATION: '/
      :         /'Failed to start ADD_INT action (Status = ^ES)', STATUS )
             IF ( WAIT ) REDUCTION_OK = .FALSE.
@@ -180,7 +180,7 @@
 
                CALL TASK_DONE( -1, RED4_PATH, RED4_MESSID, OUTVAL, STATUS )
 
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF ( STATUS .NE. DTASK__ACTCOMPLETE ) THEN
 
@@ -189,7 +189,7 @@
                   IF ( STATUS .EQ. DTASK__ACTINFORM ) THEN
                      ERR_STATUS = STATUS
                      STATUS = SAI__ERROR
-                     CALL MSG_SETI( 'ES', ERR_STATUS ) 
+                     CALL MSG_SETI( 'ES', ERR_STATUS )
                      CALL ERR_REP( ' ', 'CRED4_ADD_INTEGRATION: '/
      :                 /'Second failure reported by RED4 task '/
      :                 /'(Status = ^ES, message follows)', STATUS )
@@ -203,7 +203,7 @@
                   ELSE
                      ERR_STATUS = STATUS
                      STATUS = SAI__ERROR
-                     CALL MSG_SETI( 'ES', ERR_STATUS ) 
+                     CALL MSG_SETI( 'ES', ERR_STATUS )
                      CALL ERR_REP( ' ', 'CRED4_ADD_INTEGRATION: '/
      :                  /'Failed to add integration (Status = ^ES)', STATUS )
                   ENDIF

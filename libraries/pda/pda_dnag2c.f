@@ -4,7 +4,7 @@
 *     PDA_DNAG2C
 
 *  Purpose:
-*     Converts a NAG complex Fourier transform array into an array 
+*     Converts a NAG complex Fourier transform array into an array
 *     usable by FFTPACK routine PDA_DCFFTB.
 
 *  Language:
@@ -14,10 +14,10 @@
 *     CALL PDA_DNAG2C( NP, X, Y, R )
 
 *  Description:
-*     This subroutine returns a modified version of the supplied Fourier 
-*     co-efficients (as produced by NAG subroutine C06FCF). An inverse FFT 
-*     can be performed on the returned array using FFTPACK routine PDA_DCFFTB, 
-*     and the resulting inverse will have the same normalisation as the 
+*     This subroutine returns a modified version of the supplied Fourier
+*     co-efficients (as produced by NAG subroutine C06FCF). An inverse FFT
+*     can be performed on the returned array using FFTPACK routine PDA_DCFFTB,
+*     and the resulting inverse will have the same normalisation as the
 *     original data transformed using PDA_DCFFTF. See PDA_DC2NAG for more details.
 
 *  Arguments:
@@ -31,7 +31,7 @@
 *        The output co-efficients, in FFTPACK format.
 
 *  Notes:
-*     -  A call to PDA_DC2NAG followed by a call to PDA_DNAG2C will result in 
+*     -  A call to PDA_DC2NAG followed by a call to PDA_DNAG2C will result in
 *     the original data being divided by NP.
 
 *  Authors:
@@ -58,11 +58,11 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION R( 2, NP )
-      
+
 *  Local Variables:
       DOUBLE PRECISION FAC       ! Normalisation factor
       INTEGER J                  ! Loop count
-   
+
 *.
 
 *  Store the normalisation factor

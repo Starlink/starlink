@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getSampleMode ( const gsdVars *gsdVars, 
-*                           char *samMode, char *obsType, 
+*     gsdac_getSampleMode ( const gsdVars *gsdVars,
+*                           char *samMode, char *obsType,
 *                           int *status )
 
 *  Arguments:
@@ -25,10 +25,10 @@
 *     obsType = char* (Given and Returned)
 *        Observation type
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
-*     Determines the sampling mode and observation type in ACSIS format 
+*     Determines the sampling mode and observation type in ACSIS format
 *     from the GSD headers.
 
 *  Authors:
@@ -78,7 +78,7 @@
 
 #define FUNC_NAME "gsdac_getSampleMode"
 
-void gsdac_getSampleMode ( const gsdVars *gsdVars, 
+void gsdac_getSampleMode ( const gsdVars *gsdVars,
                            char *samMode, char *obsType,
                            int *status )
 
@@ -88,7 +88,7 @@ void gsdac_getSampleMode ( const gsdVars *gsdVars,
   if ( *status != SAI__OK ) return;
 
   /* Get the observation type (science, pointing, or focus). */
-  if ( strncmp ( gsdVars->obsType, "FIVEPOINT", 9 ) == 0 ) 
+  if ( strncmp ( gsdVars->obsType, "FIVEPOINT", 9 ) == 0 )
     strcpy ( obsType, "pointing" );
   else if ( strncmp ( gsdVars->obsType, "FOCUS", 5 ) == 0 )
     strcpy ( obsType, "focus" );

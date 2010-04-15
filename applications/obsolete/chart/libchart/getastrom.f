@@ -55,7 +55,7 @@
 *     5-MAR-1993 (Andrew Broderick (AJJB)):
 *        STATUS argument added to all calls to routines within Chart
 *        which did'nt already have one.
-*        
+*
 *     11-MAR-1993 (AJJB):
 *        Changed I, ISIGN1 and JSIGN (used as 4th argument in calls to
 *        CONV) to type Character, as CONV has been changed.
@@ -66,7 +66,7 @@
 *        as it was declared integer, yet used as a logical, and never
 *        set ! We assumed this was the right condition to set the flag,
 *        as it's the only condition which sets this flag in the rest of
-*        the package.        
+*        the package.
 *     22-MAR-1993 (AJJB):
 *        Commented out declarations of local variables which are never
 *        used.
@@ -93,7 +93,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -262,7 +262,7 @@
       CALL CONV( 1, DCEN, 2, ISIGN1, IDEG, IMIND, J, DSECS , STATUS )
 
 *  and write them in a format acceptable to ASTROM
- 
+
       WRITE ( RADEC, 915 ) IHR, IMIN, RSECS, ISIGN1, IDEG, IMIND, DSECS
   915 FORMAT( 2I3, F7.3, 3X, A1, 2I3, F6.2 )
       CALL CONST( ACEN, DCEN , STATUS )
@@ -352,8 +352,8 @@
       END IF
 
 *  Now obtain the RA and DEC of this entry.
-      RAO =  STAR( 1, IP( N ) ) 
-      DECO = STAR( 2, IP( N ) ) 
+      RAO =  STAR( 1, IP( N ) )
+      DECO = STAR( 2, IP( N ) )
       CALL CONV( 2, RAO, 4, I, MHAO, MINSAO, NO, SECSAO , STATUS )
       CALL CONV( 1, DECO, 3, JSIGN, MDEGD, MINSD, NO, SECSD , STATUS )
       WRITE ( RADEC, 950 ) MHAO, MINSAO, SECSAO, JSIGN, MDEGD, MINSD,

@@ -11,11 +11,11 @@
 #     C-shell script.
 #
 #  Usage:
-#     squash  [-i filename] [-l number] [-o filename] [-p] [-u number] 
+#     squash  [-i filename] [-l number] [-o filename] [-p] [-u number]
 #
 #  Description:
-#     This shell script reads a three-dimensional IFU NDF as input and allows 
-#     you to extract a specific spectral range from the cube to form a 
+#     This shell script reads a three-dimensional IFU NDF as input and allows
+#     you to extract a specific spectral range from the cube to form a
 #     white-light image.
 #
 #  Parameters:
@@ -28,11 +28,11 @@
 #     -o filename
 #       The filename for the output white-light or passband image.  By default
 #       the script will prompt for the name of the output file.
-#     -p 
-#       The script will plot the extracted image to the current display 
+#     -p
+#       The script will plot the extracted image to the current display
 #       as well as saving it to an NDF file.  [FALSE]
 #     -u number
-#       Upper spectral-axis bound of the region of interest.  
+#       Upper spectral-axis bound of the region of interest.
 #
 #  Implementation Status:
 #     This script invokes a collection of A-tasks from the KAPPA package.
@@ -59,17 +59,17 @@
 #       parameters FLBND/FUBND.
 #     2005 September  2 (MJC):
 #       Replaced PUTAXIS with KAPPA:SETAXIS in WCS mode.  Some tidying:
-#       remove tabs, spelling & punctuation corrections, sorted parameters in 
+#       remove tabs, spelling & punctuation corrections, sorted parameters in
 #       alphabetical order.  Added section headings in the code.  Replace
 #       explicit wavelength in prompts with the current WCS Frame's label for
-#       the spectral axis, and also used the corresponding units in the 
+#       the spectral axis, and also used the corresponding units in the
 #       output commentary.
 #     2005 November 3 (MJC):
 #       Add options waste disposal.
 #     2006 March 2 (MJC):
 #       Allow for NDF sections to be supplied with the input filename.
 #     2006 March 9 (MJC):
-#       Corrected the NDF name extraction when both the file extension and 
+#       Corrected the NDF name extraction when both the file extension and
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.
 #     {enter_further_changes_here}
@@ -119,7 +119,7 @@ while ( $#args > 0 )
       set gotlower = "TRUE"
       set lower = $args[1]
       shift args
-      breaksw            
+      breaksw
    case -o:    # output white-light file
       shift args
       set gotoutfile = "TRUE"
@@ -135,11 +135,11 @@ while ( $#args > 0 )
       set gotupper = "TRUE"
       set upper = $args[1]
       shift args
-      breaksw  
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw   
+   endsw
 end
 
 # Do package setup.
@@ -188,7 +188,7 @@ echo " "
 
 # Collapse the white-light image.
 collapse "in=${infile}${ndf_section} out=${colfile} " \
-         "axis=3 low=${lower} high=${upper}" >& /dev/null 
+         "axis=3 low=${lower} high=${upper}" >& /dev/null
 settitle "ndf=${colfile} title='${lower} - ${upper}'"
 
 # Display the collapsed image, if required.
@@ -212,7 +212,7 @@ endif
 
 # Output the chunk.
 echo "      Output NDF:"
-echo "        File: ${outfile}.sdf" 
+echo "        File: ${outfile}.sdf"
 ndfcopy "in=${colfile} out=${outfile}"
 
 # Test for an AXIS structure.  If one does not exist, create an array of
@@ -222,7 +222,7 @@ if ( ${axis} == "FALSE" ) then
    setaxis "ndf=${outfile} dim=1 mode=wcs comp=Centre" >& /dev/null
    setaxis "ndf=${outfile} dim=2 mode=wcs comp=Centre" >& /dev/null
    echo "        Axes: Adding AXIS centres."
-endif      
+endif
 
 # Clean up.
 # =========

@@ -172,28 +172,28 @@ error).",
             {
                dtype = DAT__D;
             }
- 
+
 /* _REAL                                                                    */
             else if ( ( n == 5 ) &&
                       ( strncmp( ptype, "_REAL", 5 ) == 0 ) )
             {
                dtype = DAT__R;
             }
- 
+
 /* _INTEGER                                                                 */
             else if ( ( n == 8 ) &&
                       ( strncmp( ptype, "_INTEGER", 8 ) == 0 ) )
             {
                dtype = DAT__I;
             }
- 
+
 /* _WORD                                                                    */
             else if ( ( n == 5 ) &&
                       ( strncmp( ptype, "_WORD", 5 ) == 0 ) )
             {
                dtype = DAT__W;
             }
- 
+
 /* _UWORD                                                                   */
             else if ( ( n == 6 ) &&
                       ( strncmp( ptype, "_UWORD", 6 ) == 0 ) )
@@ -207,21 +207,21 @@ error).",
             {
                dtype = DAT__B;
             }
- 
+
 /* _UBYTE                                                                   */
             else if ( ( n == 6 ) &&
                       ( strncmp( ptype, "_UBYTE", 6 ) == 0 ) )
             {
                dtype = DAT__UB;
             }
- 
+
 /* _LOGICAL                                                                 */
             else if ( ( n == 8 ) &&
                       ( strncmp( ptype, "_LOGICAL", 8 ) == 0 ) )
             {
                dtype = DAT__L;
             }
- 
+
 /* _CHAR                                                                    */
             else if ( ( n >= 5 ) &&
                       ( strncmp( ptype, "_CHAR", 5 ) == 0 ) )

@@ -8,14 +8,14 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INTEGER STATUS  
+      INTEGER STATUS
       INTEGER DIM1, DIM2	! size of data array
       REAL DATA (DIM1,DIM2)	! data from file, range 0.0 to 255.0
-      REAL RED (256)		! data scaled 0.0 to 1.0 
+      REAL RED (256)		! data scaled 0.0 to 1.0
       REAL GREEN(256)		!          "
       REAL BLUE(256)		!          "
       INTEGER J
- 
+
 *    Return if status on entry is bad
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -25,5 +25,5 @@
         GREEN(J) = DATA(2,J) / 255.0
         BLUE(J) = DATA(3,J) / 255.0
       ENDDO
- 
+
       END

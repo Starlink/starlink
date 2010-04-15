@@ -2,7 +2,7 @@
       subroutine chi_apush (value, stack, pointer, stacksize,
      :                              errstatus, status)
 *    Description :
-*     Push an integer item onto the named stack.   The stack 
+*     Push an integer item onto the named stack.   The stack
 *     pointer is first checked then incremented.
 *    Parameters :
 *     VALUE = INTEGER(INPUT)

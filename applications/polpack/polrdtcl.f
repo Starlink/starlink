@@ -4,7 +4,7 @@
 *     POLRDTCL
 
 *  Purpose:
-*     Reads a text file holding the contents of a specified catalogue in 
+*     Reads a text file holding the contents of a specified catalogue in
 *     the form of a Tcl code frament and produces an output catalogue.
 
 *  Language:
@@ -22,12 +22,12 @@
 
 *  Description:
 *     This application reads a description of a POLPACK catalogue supplied
-*     in the form created by POLWRTCL, and creates an output catalogue. 
-*     Other information (e.g. WCS etc) is copied from a second specified 
+*     in the form created by POLWRTCL, and creates an output catalogue.
+*     Other information (e.g. WCS etc) is copied from a second specified
 *     catalogue.
 
 *  Usage:
-*     polrdtcl in ref out 
+*     polrdtcl in ref out
 
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
@@ -41,7 +41,7 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -93,7 +93,7 @@
 *  Open the reference catalogue.
       CALL CTG_ASSO1( 'REF', VERB, 'READ', CIREF, FIELDS, STATUS )
 
-*  Create the output catalogue, propagating all meta data from the 
+*  Create the output catalogue, propagating all meta data from the
 *  reference catalogue.
       CALL POL1_CTPRP( 'OUT', CIREF, CIOUT, STATUS )
 
@@ -110,9 +110,9 @@
 *  Read Objects from the rference catalogue and write them to the output
 *  catalogue.
       DONE = .FALSE.
-      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
          CALL KPG1_RCATW( CIREF, IWCS, STATUS )
-         IF( IWCS .NE. AST__NULL ) THEN 
+         IF( IWCS .NE. AST__NULL ) THEN
             CALL KPG1_WCATW( IWCS, CIOUT, STATUS )
             CALL AST_ANNUL( IWCS, STATUS )
          ELSE
@@ -120,12 +120,12 @@
          END IF
       END DO
 
-*  Copy other textual information from reference catalogue to output 
-*  catalogue. 
+*  Copy other textual information from reference catalogue to output
+*  catalogue.
       CALL CAT_GETXT( CIREF, DONE, CLASS, TEXT, STATUS )
       DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
-         CALL CAT_PUTXT( CIOUT, CLASS, TEXT( : MAX( 0, 
-     :                   CHR_LEN( TEXT ) ) ), STATUS ) 
+         CALL CAT_PUTXT( CIOUT, CLASS, TEXT( : MAX( 0,
+     :                   CHR_LEN( TEXT ) ) ), STATUS )
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL CAT_GETXT( CIREF, DONE, CLASS, TEXT, STATUS )
       END DO

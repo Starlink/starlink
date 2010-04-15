@@ -1,11 +1,11 @@
       PROGRAM TEXTEX
 *                      GKS Example Program 2.8
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GINDIV, GACHXP, GACHSP, GSTRKP, GACENT, GABASE
       INCLUDE 'GKS_PAR'
- 
+
 *                      Set up parameters with names for the AFSs
       INTEGER    GALN,      GALWSC,    GAPLCI,   GAMK,     GAMKSC
       PARAMETER (GALN=1,    GALWSC=2,  GAPLCI=3, GAMK=4,   GAMKSC=5)
@@ -15,22 +15,22 @@
       PARAMETER (GAFAIS=11, GAFASI=12, GAFACI=13)
 *                      JASF is an array that holds the ASFS
       INTEGER JASF(13)
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Set ASPECT SOURCE FLAG for CHARACTER EXPANSION
 *                      FACTOR and CHARACTER SPACING to INDIVIDUAL
       CALL GQASF (KERROR, JASF)
@@ -59,7 +59,7 @@
       CALL GSCHH (0.09)
       CALL GSTXI (3)
       CALL GTX (0.5, 0.2, 'EMPHASIS')
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing

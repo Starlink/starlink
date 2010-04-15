@@ -99,8 +99,8 @@ proc cred4Flat {taskname} {
 
     set Cred4Widgets(ORDER) [scale $lbase.order -label "Polynomial Order" -from 1 -to 7  -orient h -length 8c -width 0.5c -tickinterval 1]
     set Cred4Widgets(BOXSIZE) [scale $lbase.boxsize -label "Smooth Boxsize"   -from 1 -to 15 -orient h -length 8c -width 0.5c -tickinterval 2]
-    pack $Cred4Widgets(ORDER) -side left 
-    pack $Cred4Widgets(BOXSIZE) -side right 
+    pack $Cred4Widgets(ORDER) -side left
+    pack $Cred4Widgets(BOXSIZE) -side right
     bind $Cred4Widgets(ORDER) <Button-2> "cred4Update cred4Flat ORDER"
     bind $Cred4Widgets(ORDER) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4FlatBox1.html"
     bind $Cred4Widgets(BOXSIZE) <Button-2> "cred4Update cred4Flat BOXSIZE"
@@ -119,7 +119,7 @@ proc cred4Flat {taskname} {
       nbs put ${Cred4NoticeBoard}.reduction.normalise_ff.execute $Cred4Widgets(NORMALISE_FF)
       nbs put ${Cred4NoticeBoard}.reduction.normalise_ff.order [string trim [$Cred4Widgets(ORDER) get]]
       set bnum [$Cred4Widgets(BOXSIZE) get]
-      if {$Cred4Widgets(FF_METHOD) == "SMOOTH" && [expr $bnum % 2] != 1} { 
+      if {$Cred4Widgets(FF_METHOD) == "SMOOTH" && [expr $bnum % 2] != 1} {
         set message "cred4Flat warning : Smoothing box value ($bnum) is even, using [expr $bnum - 1]"
         cgs4drInform $taskname $message
         set bnum [expr $bnum - 1]

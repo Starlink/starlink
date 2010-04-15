@@ -78,7 +78,7 @@
 *                 Set the selection identifier to the null identifier.
 *                 Set the number of rows selected to zero.
 *                 If a list of rejected rows is to be created then
-*                   Set the selection identifier for the list of rejects 
+*                   Set the selection identifier for the list of rejects
 *                   to the null identifier.
 *                   Set the number of rows rejected to zero.
 *                 end if
@@ -96,7 +96,7 @@
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given expression identifier does not correspond 
+*         Report error; the given expression identifier does not correspond
 *         to an expression.
 *       end if
 *     else
@@ -114,12 +114,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -156,7 +156,7 @@
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
@@ -198,7 +198,7 @@
             END IF
 
 *
-*          Check that the expression identifier actually corresponds to 
+*          Check that the expression identifier actually corresponds to
 *          an expression.
 
             CALL CAT_TIDTP (EI, EIDTYP, STATUS)
@@ -246,7 +246,7 @@
 *                      Select the rows which satisfy the criterion.
 
                         CALL CAT1_SELCT (EI, REJFLG, CI, ROWS, NUMSEL,
-     :                    %VAL(CNF_PVAL(WSPTR)), NUMREJ, 
+     :                    %VAL(CNF_PVAL(WSPTR)), NUMREJ,
      :                    %VAL(CNF_PVAL(WRPTR)), STATUS)
 
 *
@@ -257,15 +257,15 @@
 *
 *                         Create space to hold the list of selected
 *                         rows, copy the selected rows to this space and
-*                         finally create a selection identifier for the 
-*                         selected rows.  
+*                         finally create a selection identifier for the
+*                         selected rows.
 *
 *                         Repeat the process for the list of rejected rows,
 *                         if required and there were any.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
-                           CALL CAT1_CPYAR (NUMSEL, 
+                           CALL CAT1_CPYAR (NUMSEL,
      :                                      %VAL(CNF_PVAL(WSPTR)),
      :                       %VAL(CNF_PVAL(SELPTR)), STATUS)
                            CALL CAT_TIQAC (EI, 'EXPR', EXPR, STATUS)
@@ -276,7 +276,7 @@
                               IF (NUMREJ .GT. 0) THEN
                                  CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
-                                 CALL CAT1_CPYAR (NUMREJ, 
+                                 CALL CAT1_CPYAR (NUMREJ,
      :                                            %VAL(CNF_PVAL(WRPTR)),
      :                             %VAL(CNF_PVAL(REJPTR)), STATUS)
                                  CALL CAT1_CRTSL (CIC, EXPR, .FALSE.,

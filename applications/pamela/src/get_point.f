@@ -2,14 +2,14 @@
 *
 * Get a point X,Y between limits XLO,XHI,YLO,YHI
 *
-* CHARACTER*2 REPLY --- First character = 'C' cursor is used, 
+* CHARACTER*2 REPLY --- First character = 'C' cursor is used,
 *                       = 'T' terminal is used. Second character
 *                       = 'X' only X value prompted, ='Y' only
 *                       Y value prompted, ='B' for both.
 *                       In either 'X' or 'Y' modes.
 *
 * REAL X,Y the returned point
-* REAL XLO, XHI  -- Range of allowed X 
+* REAL XLO, XHI  -- Range of allowed X
 * REAL YLO, YHI  -- Range of allowed Y
 *
 *
@@ -37,10 +37,10 @@
         IFAIL = 1
         DO WHILE(IFAIL.NE.0)
           IF(RANGE.EQ.'X') THEN
-            WRITE(*,'(A,F8.2,A,F8.2,A,$)') 
+            WRITE(*,'(A,F8.2,A,F8.2,A,$)')
      &      'Enter X value (between ',XLO,' and ',XHI,'):'
           ELSE IF(RANGE.EQ.'Y') THEN
-            WRITE(*,'(A,F8.2,A,F8.2,A,$)') 
+            WRITE(*,'(A,F8.2,A,F8.2,A,$)')
      &      'Enter Y value (between ',YLO,' and ',YHI,'):'
           ELSE IF(RANGE.EQ.'B') THEN
             WRITE(*,'(A,F8.2,A,F8.2,A,F8.2,A,F8.2,A,$)')
@@ -56,7 +56,7 @@
             IF(Y.LT.YLO .OR. Y.GT.YHI) IFAIL = 1
           ELSE IF(RANGE.EQ.'B') THEN
             READ(STRING, *, IOSTAT=IFAIL) X, Y
-            IF(X.LT.XLO .OR. X.GT.XHI .OR. Y.LT.YLO 
+            IF(X.LT.XLO .OR. X.GT.XHI .OR. Y.LT.YLO
      &      .OR. Y.GT.YHI) IFAIL = 1
           END IF
         END DO

@@ -168,7 +168,7 @@ itcl::class gaia::GaiaPolarimetry {
          {Close window} {Close this window}
 
 #  Add a separator to the File menu.
-      $File_ add separator 
+      $File_ add separator
 
 #  Add the Edit menu to the menu bar.
       set Edit_ [add_menubutton "Edit" "Edit menu..."]
@@ -210,27 +210,27 @@ itcl::class gaia::GaiaPolarimetry {
       $short_help_win_ add_menu_short_help $Options \
          {Forget Recent} {Reset the list of recently accessed catalogues in the File menu}
 
-#  Add a menu item to the Options menu to restore start-up values for all 
+#  Add a menu item to the Options menu to restore start-up values for all
 #  notebook pages.
       $Options add command -label {Restore} \
-                           -command [code $this setControls 1] 
+                           -command [code $this setControls 1]
       $short_help_win_ add_menu_short_help $Options \
          {Restore} {Restore the current start-up settings for all controls}
 
-#  Add a menu item to the Options menu to reset default values for all 
+#  Add a menu item to the Options menu to reset default values for all
 #  notebook pages.
       $Options add command -label {Reset} \
-                           -command [code $this setControls 0] 
+                           -command [code $this setControls 0]
       $short_help_win_ add_menu_short_help $Options \
          {Reset} {Reset built-in default settings for all controls}
 
-#  Add a menu item to the Options menu to allow/prevent the saving of 
+#  Add a menu item to the Options menu to allow/prevent the saving of
 #  current control settings when the toolbox is deleted.
       $Options add checkbutton -label {Save Settings} \
                            -variable [scope values_($this,saveopt)] \
                            -onvalue 1 \
                            -offvalue 0 \
-                           -command [code $this saveOpt] 
+                           -command [code $this saveOpt]
       $short_help_win_ add_menu_short_help $Options \
          {Save Settings} {Save any changes made to control settings upon exit?}
 
@@ -240,7 +240,7 @@ itcl::class gaia::GaiaPolarimetry {
                            -variable [scope values_($this,usetab)] \
                            -onvalue 1 \
                            -offvalue 0 \
-                           -command [code $this useTab] 
+                           -command [code $this useTab]
       $short_help_win_ add_menu_short_help $Options \
          {Enable Table} {Data will be displayed in the table only if this button is checked}
 
@@ -265,8 +265,8 @@ itcl::class gaia::GaiaPolarimetry {
       pack $itk_component(notebook) -side top -fill both -expand 1 \
          -ipadx 1m -ipady 1m
 
-#  Add a page for the rendering options. A GaiaPolUStyle object is a 
-#  FrameWidget, but is also a GaiaPolStyle. The FrameWidget contains 
+#  Add a page for the rendering options. A GaiaPolUStyle object is a
+#  FrameWidget, but is also a GaiaPolStyle. The FrameWidget contains
 #  controls for setting and getting style parameters in the GaiaPolStyle.
       itk_component add newsty {
           ::gaia::GaiaPolUStyle $w_.newsty -changecmd "[code $this redraw 1 0]" \
@@ -326,7 +326,7 @@ itcl::class gaia::GaiaPolarimetry {
       itk_component add cols {
           ::gaia::GaiaPolUCols $w_.cols -optdir $optdir_ \
                                         -actioncmd "[code $this addAction]" \
-                                        -changecmd "[code $this newCols]" 
+                                        -changecmd "[code $this newCols]"
       }
       $itk_component(notebook) add -label "Column Names" \
                                    -command [code $this selectPage cols]
@@ -349,7 +349,7 @@ itcl::class gaia::GaiaPolarimetry {
           ::gaia::GaiaPolUInteg $w_.integ -optdir $optdir_ \
                                         -pbar [code $pbar_] \
                                         -actioncmd "[code $this addAction]" \
-                                        -changecmd "[code $this newInteg]" 
+                                        -changecmd "[code $this newInteg]"
       }
       $itk_component(notebook) add -label "Integrate" \
                                    -command [code $this selectPage integ]
@@ -360,7 +360,7 @@ itcl::class gaia::GaiaPolarimetry {
       itk_component add spec {
           ::gaia::GaiaPolUSpec $w_.spec -optdir $optdir_ \
                                         -pbar [code $pbar_] \
-                                        -changecmd "[code $this newSpec]" 
+                                        -changecmd "[code $this newSpec]"
       }
       $itk_component(notebook) add -label "SpecPol" \
                                    -command [code $this selectPage spec]
@@ -372,7 +372,7 @@ itcl::class gaia::GaiaPolarimetry {
       itk_component add cattab {
          ::util::TableList $tablelist_ -hscroll 1 -height 8 \
                                     -selectmode extended \
-                                    -exportselection 0 
+                                    -exportselection 0
       }
       add_short_help $tablelist_ \
             {Catalogue values: {bitmap b1} = select row, \
@@ -453,7 +453,7 @@ itcl::class gaia::GaiaPolarimetry {
       $display_ setKbdWid [$itk_component(key) getBdWidth]
       $display_ setKPad [$itk_component(key) getBgPad]
       $display_ setKvVal [$itk_component(key) getVValue]
- 
+
       $display_ setHgEnabled [$itk_component(highlight) getEnabled]
       $display_ setHgColour [$itk_component(highlight) getColour]
       $display_ setHgFormat [$itk_component(highlight) getFormat]
@@ -467,14 +467,14 @@ itcl::class gaia::GaiaPolarimetry {
                                [code $pbar_] \
                                "$this newsel" ]
 
-#  Initalize the state and shorthelp for the undo and redo entries 
+#  Initalize the state and shorthelp for the undo and redo entries
 #  in the Edit menu.
       setUndoRedo
 
 #  Add binding for the table.
       bind $tablelist_.listbox <ButtonRelease-1> +[code $table_ tabSel]
 
-#  Override these values with values read from the options file created when 
+#  Override these values with values read from the options file created when
 #  the last used instance of this class was destroyed.
       set optfile "$optdir_/GaiaPolarimetry.opt"
       if { [file readable $optfile] } {
@@ -520,11 +520,11 @@ itcl::class gaia::GaiaPolarimetry {
       catch {close_cat}
 
 #  Delete all currently active PolObjects created by this toolbox.
-      ::gaia::GaiaPolObject::annullAll $this 
-      
-#  If no polarimetry toolboxes are currently in existence, ensure the 
+      ::gaia::GaiaPolObject::annullAll $this
+
+#  If no polarimetry toolboxes are currently in existence, ensure the
 #  directory used to store temporary objects is deleted.
-      if { $these_ == "" } { 
+      if { $these_ == "" } {
          ::gaia::GaiaPolObject::rmDir
       }
    }
@@ -540,7 +540,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Remove any commands for recently accessed files from the File menu.
       if { $recentFile_ != "" } {
          $File_ delete $recentFile_ end
-      } 
+      }
 
 #  If there are any recently acessed files to add...
       if { [llength $recent_] > 0 } {
@@ -554,10 +554,10 @@ itcl::class gaia::GaiaPolarimetry {
             set file [lindex $desc 1]
 
             $File_ add command -label "  $label" \
-               -command [code $this opener $file] 
+               -command [code $this opener $file]
             $short_help_win_ add_menu_short_help $File_ \
                "  $label" "Open $file"
-   
+
          }
       }
    }
@@ -577,7 +577,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Otherwise...
       } else {
 
-#  Mark all selected vectors as deleted. 
+#  Mark all selected vectors as deleted.
          $newcat_ cut
 
 #  Make sure the display reflects the new catalogue.
@@ -591,7 +591,7 @@ itcl::class gaia::GaiaPolarimetry {
       set ret 0
 
 #  Indicate what is happening.
-      setHold "Opening $file" 
+      setHold "Opening $file"
 
 #  Check a file name was supplied.
       if { [string trim "$file"] == "" } {
@@ -670,8 +670,8 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Save the current options values to the options file, over-writing any
 #  existing options file. Include the list of recently accessed catalogues.
-#  If required, unset the variables so that other toolboxes wont pick them 
-#  up. 
+#  If required, unset the variables so that other toolboxes wont pick them
+#  up.
 #  ------------------------------------------------------------------------
    public method saveOpts {remove} {
       set values_($this,recent) $recent_
@@ -712,12 +712,12 @@ itcl::class gaia::GaiaPolarimetry {
    }
 
 #  Called when the currently displayed spectral channel is changed
-#  in the SpecPol control panel. It tells the currently displayed 
+#  in the SpecPol control panel. It tells the currently displayed
 #  catalogue to hide all but the specified spectral channel. It then does
 #  a redraw to display the new channel.
 #  ---------------------------------------------------------------
    public method newSpec {} {
-      set oldval [$newcat_ getZvals] 
+      set oldval [$newcat_ getZvals]
       set newval [$itk_component(spec) getZvals]
       if { $oldval != $newval } {
          $newcat_ setZvals $newval
@@ -758,7 +758,7 @@ itcl::class gaia::GaiaPolarimetry {
          $stylelist_ add $sty
          $sty annull
 
-#  If the catalogue has changed, save a copy of the new catalogue on the 
+#  If the catalogue has changed, save a copy of the new catalogue on the
 #  catalogue list.
       } else {
          set cat [$obj copy]
@@ -789,11 +789,11 @@ itcl::class gaia::GaiaPolarimetry {
             set minval [$itk_component(bin) getMinVal]
             set sigmas [$itk_component(bin) getSigmas]
 
-#  Create a new PolCat which is a binned copy of the currently displayed 
+#  Create a new PolCat which is a binned copy of the currently displayed
 #  PolCat.
             set cat [$newcat_ bin $box $method $debias $minval $sigmas]
 
-#  If succsful, replace the original with the new, and display the new 
+#  If succsful, replace the original with the new, and display the new
 #  catalogue.
             if { $cat != "" } {
                $newcat_ annull
@@ -811,7 +811,7 @@ itcl::class gaia::GaiaPolarimetry {
 #     1 if the choice was made by using table.
 #     2 if the choice was made by using the "Select" control panel.
 #
-#  $type indicates how the selection is specified: 
+#  $type indicates how the selection is specified:
 #     "rows" - an explicit list of row indices have been chosen (indices
 #              in $data)
 #     "circle" - choose all vectors within a circle (bounding box in $data)
@@ -819,7 +819,7 @@ itcl::class gaia::GaiaPolarimetry {
 #     "expr" - choose all vectors satisfying an algebraic expression (in
 #              $data).
 #     "all" - choose all vectors.
-#     "invert" - invert the selection 
+#     "invert" - invert the selection
 
 #  -------------------------------------------------------------------
    public method newsel { reset origin type data } {
@@ -835,7 +835,7 @@ itcl::class gaia::GaiaPolarimetry {
       }
 
 #  Indicate what is happening.
-      setHold "Updating vector selection" 
+      setHold "Updating vector selection"
 
 #  Unless, the vectors were chosen within the table, see if they are
 #  to be selected, or deselected. If the choice was made within the table
@@ -852,7 +852,7 @@ itcl::class gaia::GaiaPolarimetry {
             $newcat_ selectAll
          } else {
             $newcat_ deselectAll
-         }            
+         }
 
 #  If the selection is to be inverted, do it.
       } elseif { $type == "invert" } {
@@ -869,7 +869,7 @@ itcl::class gaia::GaiaPolarimetry {
                $newcat_ deselectAll
             } else {
                $newcat_ selectAll
-            }            
+            }
          }
 
 #  Now modify the selection by selecting or deselecting the chosen rows.
@@ -890,8 +890,8 @@ itcl::class gaia::GaiaPolarimetry {
 
    }
 
-#  If readopt is 0, set all control settings back to their hard-wired 
-#  defaults. If readopt is 1, set all current settings back to the current 
+#  If readopt is 0, set all control settings back to their hard-wired
+#  defaults. If readopt is 1, set all current settings back to the current
 #  start-up values.
 #  ---------------------------------------------------------------------
    public method setControls {readopt} {
@@ -962,12 +962,12 @@ itcl::class gaia::GaiaPolarimetry {
       }
    }
 
-#  Reset the list of recently accessed catalogues in the File menus of 
+#  Reset the list of recently accessed catalogues in the File menus of
 #  all polarimetry toolboxes.
 #  -----------------------------------------------------------------
    public proc resetAllRecent {} {
       foreach toolbox $these_ {
-         $toolbox resetRecent 
+         $toolbox resetRecent
       }
    }
 
@@ -1017,7 +1017,7 @@ itcl::class gaia::GaiaPolarimetry {
          set inhibit_single_ $state
       }
    }
-   
+
 #  Change the highlighting settings in the GaiaPolDisp.
 #  ----------------------------------------------------
    protected method newHigh {} {
@@ -1039,7 +1039,7 @@ itcl::class gaia::GaiaPolarimetry {
 
    }
 
-#  Called when new column names are chosen. Get the name of the changed 
+#  Called when new column names are chosen. Get the name of the changed
 #  column and set its value in the GaiaPolCat.
 #  --------------------------------------------------------------------
    protected method newCols {q} {
@@ -1083,12 +1083,12 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Get the current selection expression.
          set sexp [$itk_component(sel) getSexp]
-      
+
 #  Initialise the expression to store back in the recently used
 #  expressions menu.
          set newexp ""
 
-#  If not blank... 
+#  If not blank...
          if { $sexp != "" } {
 
 #  If no catalogue is displayed, warn the user and reset the expression.
@@ -1096,7 +1096,7 @@ itcl::class gaia::GaiaPolarimetry {
                error_dialog "No catalogue is currently displayed"
 
 #  Otherwise, find the corresponding vectors and select them. If
-#  succesful, re-instate the original selection expression. 
+#  succesful, re-instate the original selection expression.
             } else {
                if { [newsel $reset 2 "expr" $sexp] } {
                   set newexp $sexp
@@ -1130,14 +1130,14 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Display the key.
 	 $display_ Key
-	 
+
       }
    }
 
-#  Display the current catalogue using the current style. $addact indicates 
-#  if a new action should be added to the action list as a result of the 
-#  update. $force indicates if the display should be updated even if it 
-#  seems that the update would produce no changes. 
+#  Display the current catalogue using the current style. $addact indicates
+#  if a new action should be added to the action list as a result of the
+#  update. $force indicates if the display should be updated even if it
+#  seems that the update would produce no changes.
 #  -------------------------------------------------------------------
    protected method redraw { addact force } {
 
@@ -1257,7 +1257,7 @@ itcl::class gaia::GaiaPolarimetry {
    protected method close_cat {} {
 
 #  Indicate what is happening.
-      setHold "Closing current catalogue" 
+      setHold "Closing current catalogue"
 
 #  Check that any changes have been saved to disk.
       if { $newcat_ != "" } {
@@ -1338,7 +1338,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Get the name of the file to open.
       set file [get_file [pwd] {*.FIT} $types_]
 
-#  Attempt to open it. 
+#  Attempt to open it.
       opener $file
    }
 
@@ -1357,7 +1357,7 @@ itcl::class gaia::GaiaPolarimetry {
    set label [lindex [file split $file] end]
 
 #  See if the supplied file is already on the recently accessed list.
-#  If so, use its label instead of the basename found above, and remove 
+#  If so, use its label instead of the basename found above, and remove
 #  the existing entry for this file.
    set i -1
    foreach desc $recent_ {
@@ -1380,7 +1380,7 @@ itcl::class gaia::GaiaPolarimetry {
             set used($oldseq) 1
          }
       }
-   }            
+   }
 
    set seq 1
    while { [info exists used($seq)] } {incr seq}
@@ -1396,7 +1396,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  If the list is now longer than 10, retain only the first ten items.
       if { [llength $recent_] > 10 } {
          set recent_ [lrange $recent_ 0 9]
-      } 
+      }
 
 #  Update the list of recently accessed files in the File menu.
       updateRecent
@@ -1407,7 +1407,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  -----------------------------------------
    protected method save_cat {} {
 
-# Check we have a catalogue. 
+# Check we have a catalogue.
       if { $newcat_ != "" } {
 
 #  Get a new file name in which to store the current catalogue.
@@ -1456,21 +1456,21 @@ itcl::class gaia::GaiaPolarimetry {
             set canredo_ 1
             setUndoRedo
             set type [$action getType]
-   
+
             if { $type == "cat" } {
                doCat 1
-   
+
             } elseif { $type == "style" } {
                doStyle 1
 
             } else {
                $action undo
             }
-   
+
             $action annull
 
          }
-      } 
+      }
    }
 
 #  Redo the previous undone operation.
@@ -1488,21 +1488,21 @@ itcl::class gaia::GaiaPolarimetry {
             set canundo_ 1
             setUndoRedo
             set type [$action getType]
-   
+
             if { $type == "cat" } {
                doCat 0
-   
+
             } elseif { $type == "style" } {
                doStyle 0
 
             } else {
                $action redo
             }
-   
+
             $action annull
 
          }
-      } 
+      }
    }
 
 #  Add a new operation (action) to the list of undo-able operations.
@@ -1513,7 +1513,7 @@ itcl::class gaia::GaiaPolarimetry {
       $actionlist_ add [code $action]
       set canundo_ 1
       set canredo_ 0
-      setUndoRedo      
+      setUndoRedo
       $action annull
    }
 
@@ -1560,14 +1560,14 @@ itcl::class gaia::GaiaPolarimetry {
       }
    }
 
-#  Establish the name of the options directory, creating it if it does 
+#  Establish the name of the options directory, creating it if it does
 #  not already exists.
 #  ------------------------------------------------------------------------
    protected method set_optdir {} {
       global ::env
       set optdir_ $env(HOME)/.skycat/GaiaPolarimetry
       if {! [file isdirectory $optdir_]} {
-         if { [catch {file mkdir $optdir_} mess] } { 
+         if { [catch {file mkdir $optdir_} mess] } {
             puts "Error making $optdir_: $mess"
          }
       }
@@ -1583,7 +1583,7 @@ itcl::class gaia::GaiaPolarimetry {
       if { [info exists env(POLPACK_DIR)] } {
          set polversion [::gaia::GaiaApp \#auto  \
                    -application $env(POLPACK_DIR)/polversion ]
-         
+
       } else {
          if { [file isdirectory "/star/bin/polpack"] }  {
             set polversion [::gaia::GaiaApp \#auto \
@@ -1730,7 +1730,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Common variables: (shared by all instances)
 #  -----------------
 
-#  Name of fileselection dialog window. 
+#  Name of fileselection dialog window.
    common fileselect_ .polarimetryfs
 
 #  File types recognized by CURSA.

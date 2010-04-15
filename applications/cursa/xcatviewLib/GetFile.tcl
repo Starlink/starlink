@@ -5,7 +5,7 @@ proc GetFile { } {
 #  Get the details to specify a text file.  The details are the name of
 #  the file and the various options for the items to be included in the
 #  file.
-#  
+#
 #  Given
 #    none.
 #
@@ -66,7 +66,7 @@ proc GetFile { } {
      global textfileName
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 
@@ -281,7 +281,7 @@ proc GetFile { } {
           .getfile.button.opt.columns.value  delete 0 end
           .getfile.button.opt.columns.value  insert 0 "Summary"
           .getfile.button.opt.columns.value  configure  -state disabled
- 
+
           global localColumns
           set    localColumns "S"
          }
@@ -293,7 +293,7 @@ proc GetFile { } {
           .getfile.button.opt.columns.value  delete 0 end
           .getfile.button.opt.columns.value  insert 0 "Full"
           .getfile.button.opt.columns.value  configure  -state disabled
- 
+
           global localColumns
           set    localColumns "F"
          }
@@ -447,7 +447,7 @@ proc GetFile { } {
        -command {HelpText GetFile_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .getfile.button.ctrl.default -relief sunken -bd 1
@@ -529,14 +529,14 @@ proc GetFile { } {
         .getfile.button.opt.columns.value  delete 0 end
         .getfile.button.opt.columns.value  insert 0 "Summary"
         .getfile.button.opt.columns.value  configure  -state disabled
- 
+
         set localColumns "S"
      } else {
         .getfile.button.opt.columns.value  configure  -state normal
         .getfile.button.opt.columns.value  delete 0 end
         .getfile.button.opt.columns.value  insert 0 "Full"
         .getfile.button.opt.columns.value  configure  -state disabled
- 
+
         set localColumns "F"
      }
 

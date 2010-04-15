@@ -32,7 +32,7 @@
 *     If ok then
 *       Attempt to get a free Fortran unit number.
 *       Attempt to open the FITS file.
-*       If ok then 
+*       If ok then
 *         Copy the FITS unit number to the common block.
 *       else
 *         Report an error.
@@ -48,12 +48,12 @@
 *           For every column in the FITS table
 *             Generate the default set of attributes for a column.
 *             Read the details of the column from the FITS extension
-*             header and replace the default values with the values 
+*             header and replace the default values with the values
 *             read.
 *             If the table is sorted on the current column then
 *               Set the sort order attribute for the column.
 *             end if
-*             Set the 'type of null value' attribute to indicate that 
+*             Set the 'type of null value' attribute to indicate that
 *             null values are explictly defined in the catalogue.
 *             Add the column to the list of columns (that is, add its
 *             attributes to the list of attributes).
@@ -77,12 +77,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -339,7 +339,7 @@ C3001          format(1x, 'FTMRHD: hdutyp, fitstt: ', i5, i5)
 
                IF (FITSTT .NE. FITOK) THEN
                   STATUS = CAT__NOCAT
-                  CALL CAT3_FITER ('CAT3_OPNEX_ASE', 
+                  CALL CAT3_FITER ('CAT3_OPNEX_ASE',
      :              'Failed to access specified FITS extension.',
      :              FITSTT, STATUS)
                END IF
@@ -357,7 +357,7 @@ C3001          format(1x, 'FTMRHD: hdutyp, fitstt: ', i5, i5)
                   EXTN__CAT3(CIELM) = EXTN
 
 *
-*                Extract the keywords from the extension header and 
+*                Extract the keywords from the extension header and
 *                save them as CAT Parameters.
 
 C                 print3499, status
@@ -393,8 +393,8 @@ C    :              3x, 'status: ', i20 / )
 *                   Generate the default attributes for a column.
 
                      CALL CAT1_DFATT (FNAME, FGENUS, FEXP, FDTYPE,
-     :                 FCSIZE, FDIM, FSIZE, FNULL, FXCEPT, FSCALE, 
-     :                 FZERO, FORDER, FDATE, FUNIT, FXFMT, FPDISP, 
+     :                 FCSIZE, FDIM, FSIZE, FNULL, FXCEPT, FSCALE,
+     :                 FZERO, FORDER, FDATE, FUNIT, FXFMT, FPDISP,
      :                 FCOMM, STATUS)
 
 *
@@ -428,7 +428,7 @@ C                       print7000, 'after', nxcol, fname, status
 *
 *                      The table is binary.
 
-                        CALL CAT3_GTCLB (FITUNT, NXCOL, SKIP, FNAME, 
+                        CALL CAT3_GTCLB (FITUNT, NXCOL, SKIP, FNAME,
      :                    FDTYPE, FCSIZE, FDIM, FSIZE, FUNIT, FSCALE,
      :                    FZERO, FXCEPT, FXFMT, FPDISP, FCOMM,
      :                    FITYPE, SFLAG, STATUS)
@@ -465,8 +465,8 @@ C    :                    3x, 'oname: ', a / )
                         END IF
 
 *
-*                      Set the 'type of null value' attribute to 
-*                      indicate that null values are explictly defined 
+*                      Set the 'type of null value' attribute to
+*                      indicate that null values are explictly defined
 *                      in the catalogue.
 
                         FNULL = CAT__NULLS
@@ -475,9 +475,9 @@ C    :                    3x, 'oname: ', a / )
 *                      Add this column to the list of columns and get an
 *                      identifier for it.
 
-                        CALL CAT1_ADDCL (CI, FNAME, FGENUS, FEXP, 
-     :                    FDTYPE, FCSIZE, FDIM, FSIZE, FNULL, FXCEPT, 
-     :                    FSCALE, FZERO, FORDER, FDATE, FUNIT, FXFMT, 
+                        CALL CAT1_ADDCL (CI, FNAME, FGENUS, FEXP,
+     :                    FDTYPE, FCSIZE, FDIM, FSIZE, FNULL, FXCEPT,
+     :                    FSCALE, FZERO, FORDER, FDATE, FUNIT, FXFMT,
      :                    FPDISP, FCOMM, FI, STATUS)
 
 
@@ -567,7 +567,7 @@ C    :                    i3, a15, i4, i4)
                   IF (STATUS .EQ. CAT__OK) THEN
 
 *
-*                   The extension is not a table: set the status and report 
+*                   The extension is not a table: set the status and report
 *                   an error.
 
                      STATUS = CAT__NOCAT

@@ -20,8 +20,8 @@
 *        The global status.
 
 *  Description:
-*     This application modifies the provenance information stored in 
-*     the PROVENANCE extension of an NDF. 
+*     This application modifies the provenance information stored in
+*     the PROVENANCE extension of an NDF.
 
 *  Usage:
 *     provmod ndf ancestor path
@@ -30,9 +30,9 @@
 *     ANCESTOR = LITERAL (Read)
 *        Specifies the indices of one or more ancestors that are to be
 *        modified.  An index of zero refers to the supplied NDF itself.
-*        A positive index refers to one of the NDFs listed in the 
-*        ANCESTORS table in the PROVENANCE extension of the NDF.  The 
-*        maximum number of ancestors is limited to 100 unless "ALL" or 
+*        A positive index refers to one of the NDFs listed in the
+*        ANCESTORS table in the PROVENANCE extension of the NDF.  The
+*        maximum number of ancestors is limited to 100 unless "ALL" or
 *        "*" is specified.  The supplied parameter value can take any of
 *        the following forms.
 *
@@ -41,64 +41,64 @@
 *        - "xx,yy,zz" -- A list of ancestor indices.
 *
 *        - "xx:yy" --  Ancestor indices between xx and yy inclusively.
-*        When xx is omitted, the range begins from 0; when yy is 
-*        omitted, the range ends with the maximum value it can take, 
-*        that is the number of ancestors described in the PROVENANCE 
+*        When xx is omitted, the range begins from 0; when yy is
+*        omitted, the range ends with the maximum value it can take,
+*        that is the number of ancestors described in the PROVENANCE
 *        extension.
 *
-*        - Any reasonable combination of above values separated by 
+*        - Any reasonable combination of above values separated by
 *        commas.  ["ALL"]
 *     CREATOR = LITERAL (Read)
 *        If the supplied string includes no equals signs, then it is a
-*        new value for the "CREATOR" string read from each of the 
-*        ancestors being modified. If the supplied string includes one 
-*        or more equals signs, then it specifies one or more 
+*        new value for the "CREATOR" string read from each of the
+*        ancestors being modified. If the supplied string includes one
+*        or more equals signs, then it specifies one or more
 *        substitutions to be performed on the "CREATOR" string read from
 *        each of the ancestors being modified. See "Substitution Syntax"
-*        below.  If null (!) is supplied, the CREATOR item is left 
+*        below.  If null (!) is supplied, the CREATOR item is left
 *        unchanged.  [!]
 *     DATE = LITERAL (Read)
 *        If the supplied string includes no equals signs, then it is a
 *        new value for the "DATE" string read from each of the ancestors
-*        being modified. If the supplied string includes one or more 
+*        being modified. If the supplied string includes one or more
 *        equals signs, then it specifies one or more substitutions to be
-*        performed on the "DATE" string read from each of the ancestors 
-*        being modified.  See "Substitution Syntax" below.  If null (!) 
+*        performed on the "DATE" string read from each of the ancestors
+*        being modified.  See "Substitution Syntax" below.  If null (!)
 *        is supplied, the DATE item is left unchanged.  [!]
 *     MORETEXT = GROUP (Read)
 *        This parameter is accessed only if a single ancestor is being
-*        modified (see parameter ANCESTORS). It gives information to 
+*        modified (see parameter ANCESTORS). It gives information to
 *        store in the MORE component of the ancestor (any existing
 *        information is first removed). If a null (!) value is supplied,
 *        then existing MORE component is left unchanged.
 *
 *        The supplied value should be either a comma-separated list of
-*        strings or the name of a text file preceded by an up-arrow 
-*        character "^", containing one or more comma-separated list of 
-*        strings. Each string is either a "keyword=value" setting, or 
-*        the name of a text file preceded by an up-arrow character "^". 
-*        Such text files should contain further comma-separated lists 
-*        which will be read and interpreted in the same manner (any 
-*        blank lines or lines beginning with "#" are ignored). Within a 
-*        text file, newlines can be used as delimiters as well as 
-*        commas. 
+*        strings or the name of a text file preceded by an up-arrow
+*        character "^", containing one or more comma-separated list of
+*        strings. Each string is either a "keyword=value" setting, or
+*        the name of a text file preceded by an up-arrow character "^".
+*        Such text files should contain further comma-separated lists
+*        which will be read and interpreted in the same manner (any
+*        blank lines or lines beginning with "#" are ignored). Within a
+*        text file, newlines can be used as delimiters as well as
+*        commas.
 *
 *        Each individual setting should be of the form:
 *
 *           <keyword>=<value>
 *
 *        where <keyword> is either a simple name, or a dot-delimited
-*        hierarchy of names (e.g. "camera.settings.exp=1.0"). The 
+*        hierarchy of names (e.g. "camera.settings.exp=1.0"). The
 *        <value> string should not contain any commas.  [!]
 *     NDF = NDF (Update)
 *        The NDF data structure.
 *     PATH = LITERAL (Read)
 *        If the supplied string includes no equals signs, then it is a
 *        new value for the "PATH" string read from each of the ancestors
-*        being modified. If the supplied string includes one or more 
+*        being modified. If the supplied string includes one or more
 *        equals signs, then it specifies one or more substitutions to be
-*        performed on the "PATH" string read from each of the ancestors 
-*        being modified.  See "Substitution Syntax" below.  If null (!) 
+*        performed on the "PATH" string read from each of the ancestors
+*        being modified.  See "Substitution Syntax" below.  If null (!)
 *        is supplied, the PATH item is left unchanged.  [!]
 
 *  Examples:
@@ -107,7 +107,7 @@
 *        its PATH to "/home/dsb/real-file.sdf".
 *     provmod ff ancestor=3 moretext="obsidss=acsis_00026_20080322T055855_1"
 *        This modifies ancestor Number 3 by storing a value of
-*        "acsis_00026_20080322T055855_1" for key "obsidss" within the 
+*        "acsis_00026_20080322T055855_1" for key "obsidss" within the
 *        additonal information for the ancestor. Any existing additional
 *        information is removed.
 *     provmod ff path='(_x)$=_y'
@@ -120,7 +120,7 @@
 *        This modifies any ancestor within the NDF called ff that has a
 *        path consisting of two parts separated by an underscore by
 *        swapping the parts.  If there is more than one underscore in
-*        the ancestor path, then the final underscore is used (because 
+*        the ancestor path, then the final underscore is used (because
 *        the initial quantifier ".*" is greedy).
 *     provmod ff path='(.*?)_(.*)=$2=$1'
 *        This modifies any ancestor within the NDF called ff that has a
@@ -130,12 +130,12 @@
 *        the initial quantifier ".*?" is not greedy).
 
 *  Substitution Syntax:
-*     The syntax for the CREATOR, DATE and PATH parameter values is a 
-*     minimal form of regular expression.  The following atoms are 
+*     The syntax for the CREATOR, DATE and PATH parameter values is a
+*     minimal form of regular expression.  The following atoms are
 *     allowed.
 *
 *     "[chars]" -- Matches any of the characters within the brackets.
-*     "[^chars]" -- Matches any character that is not within the 
+*     "[^chars]" -- Matches any character that is not within the
 *                   brackets (ignoring the initial "^" character).
 *     "." -- Matches any single character.
 *     "\d" -- Matches a single digit.
@@ -148,11 +148,11 @@
 *     Any other character that has no special significance within a
 *     regular expression matches itself.  Characters that have special
 *     significance can be matched by preceeding them with a backslash
-*     (\) in which case their special significance is ignored (note, 
+*     (\) in which case their special significance is ignored (note,
 *     this does not apply to the characters in the set dDsSwW).
 *
-*     Note, minus signs ("-") within brackets have no special 
-*     significance, so ranges of characters must be specified 
+*     Note, minus signs ("-") within brackets have no special
+*     significance, so ranges of characters must be specified
 *     explicitly.
 *
 *     The following quantifiers are allowed.
@@ -172,24 +172,24 @@
 *
 *     "^" -- Matches the start of the test string.
 *     "$" -- Matches the end of the test string.
-* 
-*     Multiple templates can be concatenated, using the "|" character to
-*     separate them.  The test string is compared against each one in 
-*     turn until a match is found. 
 *
-*     A template should use parentheses to enclose the sub-strings that 
-*     are to be replaced, and the set of corresponding replacement 
-*     values should be appended to the end of the string, separated by 
-*     "=" characters.  The section of the test string that matches the 
-*     first parenthesised section in the template string will be 
+*     Multiple templates can be concatenated, using the "|" character to
+*     separate them.  The test string is compared against each one in
+*     turn until a match is found.
+*
+*     A template should use parentheses to enclose the sub-strings that
+*     are to be replaced, and the set of corresponding replacement
+*     values should be appended to the end of the string, separated by
+*     "=" characters.  The section of the test string that matches the
+*     first parenthesised section in the template string will be
 *     replaced by the first replacement string.  The section of the test
-*     string that matches the second parenthesised section in the 
+*     string that matches the second parenthesised section in the
 *     template string will be replaced by the second replacement string,
 *     and so on.
 *
 *     The replacement strings can include the tokens "$1", "$2", etc.
-*     The section of the test string that matched the corresponding 
-*     parenthesised section in the template is used in place of the 
+*     The section of the test string that matched the corresponding
+*     parenthesised section in the template is used in place of the
 *     token.
 *
 *     See the "Examples" section above for how to use these facilities.
@@ -240,10 +240,10 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! CNF constants and functions
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'DAT_PAR'          ! HDS constants 
-      INCLUDE 'NDG_PAR'          ! NDG constants 
+      INCLUDE 'DAT_PAR'          ! HDS constants
+      INCLUDE 'NDG_PAR'          ! NDG constants
 
 *  Status:
       INTEGER STATUS
@@ -293,11 +293,11 @@
 *  Read provenance information from the NDF.
       CALL NDG_READPROV( INDF, ' ', IPROV, STATUS )
 
-*  Get the number of ancestors described in the NDFs PROVENANCE 
+*  Get the number of ancestors described in the NDFs PROVENANCE
 *  extension.
       CALL NDG_COUNTPROV( IPROV, NANC, STATUS )
 
-*  Get the indices of the ancestors to be modified.  Since KPG1_GILST 
+*  Get the indices of the ancestors to be modified.  Since KPG1_GILST
 *  limits the number of values that can be supplied, first check the
 *  parameter value directly to see if it set to "ALL".  If so, we bypass
 *  KPG1_GILST, setting a flag instead to show that all ancestors should
@@ -309,7 +309,7 @@
       ELSE
          DOALL = .FALSE.
          CALL PSX_CALLOC( NANC + 1, '_INTEGER', IPW1, STATUS )
-         CALL KPG1_GILST( 0, NANC, MXANC, 'ANCESTOR', 
+         CALL KPG1_GILST( 0, NANC, MXANC, 'ANCESTOR',
      :                    %VAL( CNF_PVAL( IPW1 ) ), IANC, MANC,
      :                    STATUS )
          CALL PSX_FREE( IPW1, STATUS )
@@ -318,32 +318,32 @@
 *  If an error occurred, exit.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the substitutions. 
+*  Get the substitutions.
       CALL PAR_GET0C( 'CREATOR', CRESUB, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         CRESUB = ' ' 
+         CRESUB = ' '
       END IF
 
       CALL PAR_GET0C( 'DATE', DATSUB, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         DATSUB = ' ' 
+         DATSUB = ' '
       END IF
 
       CALL PAR_GET0C( 'PATH', PTHSUB, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         PTHSUB = ' ' 
+         PTHSUB = ' '
       END IF
 
-*  If only a single ancestor is being modified, get additional 
+*  If only a single ancestor is being modified, get additional
 *  information as a set of text strings using the MORETEXT parameter.
       IF( MANC .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN
          CALL KPG1_GTMOR( 'MORETEXT', MORE, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-            MORE = DAT__NOLOC 
+            MORE = DAT__NOLOC
          END IF
       ELSE
          MORE = DAT__NOLOC
@@ -356,22 +356,22 @@
          IF( DOALL ) THEN
             I = J - 1
          ELSE
-            I = IANC( J )        
+            I = IANC( J )
          END IF
 
-*  Get an AST KeyMap holding the existing provenance information for 
+*  Get an AST KeyMap holding the existing provenance information for
 *  the specified ancestor.
          CALL NDG_GETPROV( IPROV, I, KM, AMORE, STATUS )
 
 *  If a new MORE structure has been specified, use its locator in place
 *  of the old one.
-         IF( MORE .NE. DAT__NOLOC ) THEN     
+         IF( MORE .NE. DAT__NOLOC ) THEN
             IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
             AMORE = MORE
             MORE = DAT__NOLOC
          END IF
 
-*  Is the CREATOR string to be modified? 
+*  Is the CREATOR string to be modified?
          IF( CRESUB .NE. ' ' ) THEN
 
 *  Assume for now the CREATOR value will not change.
@@ -385,24 +385,24 @@
 
 *  Otherwise it specifies modifications to be applied to the existing
 *  CREATOR string (if any). Get any such string from the KeyMap, skipping
-*  over this bit if the KeyMap does not contain a CREATOR value. 
-            ELSE IF( AST_MAPGET0C( KM, 'CREATOR', TEST, L, 
+*  over this bit if the KeyMap does not contain a CREATOR value.
+            ELSE IF( AST_MAPGET0C( KM, 'CREATOR', TEST, L,
      :                             STATUS ) ) THEN
 
-*  If the specifier matches the CREATOR string, perform the substitutions 
+*  If the specifier matches the CREATOR string, perform the substitutions
 *  and use the resulting string in place of the current CREATOR string.
-               IF( AST_CHRSUB( TEST( : L ), CRESUB, RESULT, 
+               IF( AST_CHRSUB( TEST( : L ), CRESUB, RESULT,
      :                         STATUS ) ) THEN
                   TEST = RESULT
                   CHANGED = .TRUE.
                END IF
             END IF
 
-*  If the CREATOR string has changed, put the new value in the KeyMap. 
+*  If the CREATOR string has changed, put the new value in the KeyMap.
             IF( CHANGED ) THEN
                L = MAX( 1, CHR_LEN( TEST ) )
-               CALL AST_MAPPUT0C( KM, 'CREATOR', TEST( : L ), ' ', 
-     :                            STATUS ) 
+               CALL AST_MAPPUT0C( KM, 'CREATOR', TEST( : L ), ' ',
+     :                            STATUS )
             END IF
          END IF
 
@@ -414,10 +414,10 @@
                TEST = DATSUB
                CHANGED = .TRUE.
 
-            ELSE IF( AST_MAPGET0C( KM, 'DATE', TEST, L, 
+            ELSE IF( AST_MAPGET0C( KM, 'DATE', TEST, L,
      :                             STATUS ) ) THEN
 
-               IF( AST_CHRSUB( TEST( : L ), DATSUB, RESULT, 
+               IF( AST_CHRSUB( TEST( : L ), DATSUB, RESULT,
      :                         STATUS ) ) THEN
                   TEST = RESULT
                   CHANGED = .TRUE.
@@ -426,8 +426,8 @@
 
             IF( CHANGED ) THEN
                L = MAX( 1, CHR_LEN( TEST ) )
-               CALL AST_MAPPUT0C( KM, 'DATE', TEST( : L ), ' ', 
-     :                            STATUS ) 
+               CALL AST_MAPPUT0C( KM, 'DATE', TEST( : L ), ' ',
+     :                            STATUS )
             END IF
          END IF
 
@@ -439,10 +439,10 @@
                TEST = PTHSUB
                CHANGED = .TRUE.
 
-            ELSE IF( AST_MAPGET0C( KM, 'PATH', TEST, L, 
+            ELSE IF( AST_MAPGET0C( KM, 'PATH', TEST, L,
      :                             STATUS ) ) THEN
 
-               IF( AST_CHRSUB( TEST( : L ), PTHSUB, RESULT, 
+               IF( AST_CHRSUB( TEST( : L ), PTHSUB, RESULT,
      :                         STATUS ) ) THEN
                   TEST = RESULT
                   CHANGED = .TRUE.
@@ -451,8 +451,8 @@
 
             IF( CHANGED ) THEN
                L = MAX( 1, CHR_LEN( TEST ) )
-               CALL AST_MAPPUT0C( KM, 'PATH', TEST( : L ), ' ', 
-     :                            STATUS ) 
+               CALL AST_MAPPUT0C( KM, 'PATH', TEST( : L ), ' ',
+     :                            STATUS )
             END IF
          END IF
 
@@ -467,7 +467,7 @@
 
       END DO
 
-*  Store the modified provenance information back in the NDF. 
+*  Store the modified provenance information back in the NDF.
       CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
 
 *  Arrive here if an error occurs.

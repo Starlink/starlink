@@ -18,12 +18,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -49,8 +49,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDG_PAR'          ! NDG constants and functions 
-      INCLUDE 'DAT_PAR'          ! HDS constants 
+      INCLUDE 'NDG_PAR'          ! NDG constants and functions
+      INCLUDE 'DAT_PAR'          ! HDS constants
 
 * Local Variables:
       INTEGER STATUS, INDF, IPROV, KEYMAP, N, I, KM, L, INDF2, PLACE,
@@ -71,41 +71,41 @@
      :           '6', '7', '8', '9' /
 
       CHARACTER PATHS( 14 )*60
-      DATA PATHS / 
-     :  'PROVTEST', 
-     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0008_ave_ave', 
-     :  'TEMP', 
-     :  '/home/dsb/work/smurf/d', 
-     :  '/home/dsb/work/smurf/b', 
-     :  '/home/dsb/work/smurf/c', 
-     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0001_ave_ave', 
-     :  '60', 
-     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0002_ave_ave', 
-     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0003_ave_ave', 
-     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0004_ave_ave', 
-     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0005_ave_ave', 
-     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0006_ave_ave', 
+      DATA PATHS /
+     :  'PROVTEST',
+     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0008_ave_ave',
+     :  'TEMP',
+     :  '/home/dsb/work/smurf/d',
+     :  '/home/dsb/work/smurf/b',
+     :  '/home/dsb/work/smurf/c',
+     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0001_ave_ave',
+     :  '60',
+     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0002_ave_ave',
+     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0003_ave_ave',
+     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0004_ave_ave',
+     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0005_ave_ave',
+     :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0006_ave_ave',
      :  '/tiny/makecube-tests/1226_15/a20061226_00015_00_0007_ave_ave' /
 
       CHARACTER DATES( 14 )*24
       DATA DATES / 'Mon Jan  7 18:46:28 2008', ' ',
      :             'Mon Jan  7 18:46:28 2008',
      :             'Mon Jan  7 18:46:18 2008',
-     :             'Tue Dec 18 12:49:59 2007', 
-     :             'Mon Jan  7 18:46:06 2008', 
+     :             'Tue Dec 18 12:49:59 2007',
+     :             'Mon Jan  7 18:46:06 2008',
      :             ' ', '24', ' ', ' ', ' ', ' ', ' ', ' ' /
 
       CHARACTER CREATORS( 14 )*14
       DATA CREATORS / 'KAPPA:ADD', ' ', 'KAPPA:ADD', 'KAPPA:CMULT',
-     :                'SMURF:MAKECUBE', 'KAPPA:MATHS', ' ', '14', ' ', 
+     :                'SMURF:MAKECUBE', 'KAPPA:MATHS', ' ', '14', ' ',
      :                ' ', ' ', ' ', ' ', ' ' /
 
       CHARACTER PARENTSS( 14 )*23
-      DATA PARENTSS / '1,2,11', ' ', '2,11', '12', '3,4,5,6,7,8,9,10', 
+      DATA PARENTSS / '1,2,11', ' ', '2,11', '12', '3,4,5,6,7,8,9,10',
      :                '2', ' ', '16', ' ', ' ', ' ', ' ', ' ', ' ' /
 
       CHARACTER MORES( 14 )*60
-      DATA MORES / ' ', ' ', 
+      DATA MORES / ' ', ' ',
      :         'DATA_ARRAY=<ARRAY>, LABEL=T%s60+%v30+A%^5',
      :         ' ', ' ', ' ', ' ', '211', ' ', ' ', ' ', ' ', ' ', ' ' /
 
@@ -121,7 +121,7 @@ c      call ast_watchmemory( 1 )
 
 * Test NDG_READPROV
 * -----------------
-      CALL NDF_FIND( DAT__ROOT, './provtest.sdf', INDF, STATUS )  
+      CALL NDF_FIND( DAT__ROOT, './provtest.sdf', INDF, STATUS )
       CALL NDG_READPROV( INDF, 'UNKNOWN', IPROV, STATUS )
 
 
@@ -139,13 +139,13 @@ c      call ast_watchmemory( 1 )
       CALL AST_MAPPUT0I( KEYMAP, 'KEY1', 2, ' ', STATUS )
       CALL AST_MAPPUT0R( KEYMAP, 'KEY2', 2.0, ' ', STATUS )
       CALL AST_MAPPUT0C( KEYMAP, 'KEY3', 'Two point zero', ' ', STATUS )
-      CALL AST_MAPPUT1I( KEYMAP, 'KEY4', 2, IVEC, 'Hello', STATUS ) 
-      CALL AST_MAPPUT1D( KEYMAP, 'KEY5', 1, DVEC, 'Hello', STATUS ) 
-      CALL AST_MAPPUT1C( KEYMAP, 'KEY6', 3, CVEC, 'Hello', STATUS ) 
+      CALL AST_MAPPUT1I( KEYMAP, 'KEY4', 2, IVEC, 'Hello', STATUS )
+      CALL AST_MAPPUT1D( KEYMAP, 'KEY5', 1, DVEC, 'Hello', STATUS )
+      CALL AST_MAPPUT1C( KEYMAP, 'KEY6', 3, CVEC, 'Hello', STATUS )
 
-      CALL NDF_PLACE( DAT__ROOT, 'fred.sdf', PLACE, STATUS )  
-      CALL NDF_COPY( INDF, PLACE, INDF2, STATUS )  
-      CALL NDF_LOC( INDF2, 'READ', LOC, STATUS )  
+      CALL NDF_PLACE( DAT__ROOT, 'fred.sdf', PLACE, STATUS )
+      CALL NDF_COPY( INDF, PLACE, INDF2, STATUS )
+      CALL NDF_LOC( INDF2, 'READ', LOC, STATUS )
 
       CALL NDG_PUTPROV( IPROV, INDF2, LOC, KEYMAP, .FALSE., STATUS )
 
@@ -182,14 +182,14 @@ c      call ast_watchmemory( 1 )
                   IF( INDEX( TEXT( : L ), 'TEMP_1.NDF_1' ) .EQ. 0 .AND.
      :                INDEX( TEXT( : L ), 'fred' ) .EQ. 0 ) THEN
                      CALL STOPIT( 7, STATUS)
-                  END IF                
+                  END IF
 
                ELSE IF( PATHS( I ) .EQ. 'PROVTEST' ) THEN
                   IF( INDEX( TEXT( : L ), 'provtest' ) .EQ. 0 ) THEN
                      CALL STOPIT( 8, STATUS)
-                  END IF                
+                  END IF
 
-               ELSE IF( CHR_LEN( TEXT ) .NE. L .OR. 
+               ELSE IF( CHR_LEN( TEXT ) .NE. L .OR.
      :                  TEXT( : L ) .NE. PATHS( I )( : L ) ) THEN
                   CALL STOPIT( 9, STATUS)
                ENDIF
@@ -200,7 +200,7 @@ c      call ast_watchmemory( 1 )
 
 
             IF( AST_MAPGET0C( KM, 'DATE', TEXT, L, STATUS ) ) THEN
-               IF( CHR_LEN( TEXT ) .NE. L .OR. 
+               IF( CHR_LEN( TEXT ) .NE. L .OR.
      :             TEXT( : L ) .NE. DATES( I )( : L ) ) THEN
                   CALL STOPIT( 11, STATUS)
                ENDIF
@@ -226,7 +226,7 @@ c      call ast_watchmemory( 1 )
             END IF
 
             IF( AST_MAPGET0C( KM, 'MORE', TEXT, L, STATUS ) ) THEN
-               L = MIN( L, CHR_LEN( MORES( I ) ) )         
+               L = MIN( L, CHR_LEN( MORES( I ) ) )
                IF( TEXT( : L ) .NE. MORES( I )( : L ) ) THEN
                   CALL STOPIT( 17, STATUS)
                ENDIF
@@ -260,8 +260,8 @@ c      call ast_watchmemory( 1 )
             IF( INDEX( TEXT( : L ), 'TEMP_1.NDF_1' ) .EQ. 0 .AND.
      :          INDEX( TEXT( : L ), 'fred' ) .EQ. 0 ) THEN
                CALL STOPIT( 21, STATUS)
-            END IF                
-         ELSE IF( CHR_LEN( TEXT ) .NE. L .OR. 
+            END IF
+         ELSE IF( CHR_LEN( TEXT ) .NE. L .OR.
      :            TEXT( : L ) .NE. PATHS( I )( : L ) ) THEN
             CALL STOPIT( 22, STATUS)
          ENDIF
@@ -271,7 +271,7 @@ c      call ast_watchmemory( 1 )
 
 
       IF( AST_MAPGET0C( KM, 'DATE', TEXT, L, STATUS ) ) THEN
-         IF( CHR_LEN( TEXT ) .NE. L .OR. 
+         IF( CHR_LEN( TEXT ) .NE. L .OR.
      :       TEXT( : L ) .NE. DATES( I )( : L ) ) THEN
             CALL STOPIT( 24, STATUS)
          ENDIF
@@ -288,11 +288,11 @@ c      call ast_watchmemory( 1 )
          CALL STOPIT( 27, STATUS)
       END IF
 
-      
+
       IF( AST_MAPLENGTH( KM, 'PARENTS', STATUS ) .NE. 2 ) THEN
          CALL STOPIT( 28, STATUS)
 
-      ELSE IF( AST_MAPTYPE( KM, 'PARENTS', STATUS ) .NE. 
+      ELSE IF( AST_MAPTYPE( KM, 'PARENTS', STATUS ) .NE.
      :         AST__INTTYPE ) THEN
          CALL STOPIT( 29, STATUS)
 
@@ -324,14 +324,14 @@ c      call ast_watchmemory( 1 )
       ELSE IF( RVAL .NE. 2.0 ) THEN
          CALL STOPIT( 38, STATUS)
 
-      ELSE IF( .NOT. AST_MAPGET0C( KEYMAP, 'KEY3', CVAL, L, 
+      ELSE IF( .NOT. AST_MAPGET0C( KEYMAP, 'KEY3', CVAL, L,
      :                             STATUS ) ) THEN
          CALL STOPIT( 39, STATUS)
 
       ELSE IF( CVAL( : L ) .NE. 'Two point zero' ) THEN
          CALL STOPIT( 40, STATUS)
 
-      ELSE IF( .NOT. AST_MAPGET1I( KEYMAP, 'KEY4', 20, NVAL, IVALS, 
+      ELSE IF( .NOT. AST_MAPGET1I( KEYMAP, 'KEY4', 20, NVAL, IVALS,
      :                             STATUS ) ) THEN
          CALL STOPIT( 41, STATUS)
 
@@ -344,7 +344,7 @@ c      call ast_watchmemory( 1 )
       ELSE IF( IVALS(2) .NE. IVEC(2) ) THEN
          CALL STOPIT( 44, STATUS)
 
-      ELSE IF( .NOT. AST_MAPGET1D( KEYMAP, 'KEY5', 20, NVAL, DVALS, 
+      ELSE IF( .NOT. AST_MAPGET1D( KEYMAP, 'KEY5', 20, NVAL, DVALS,
      :                             STATUS ) ) THEN
          CALL STOPIT( 45, STATUS)
 
@@ -354,7 +354,7 @@ c      call ast_watchmemory( 1 )
       ELSE IF( DVALS(1) .NE. DVEC(1) ) THEN
          CALL STOPIT( 47, STATUS)
 
-      ELSE IF( .NOT. AST_MAPGET1C( KEYMAP, 'KEY6', 20, NVAL, CVALS, 
+      ELSE IF( .NOT. AST_MAPGET1C( KEYMAP, 'KEY6', 20, NVAL, CVALS,
      :                             STATUS ) ) THEN
          CALL STOPIT( 48, STATUS)
 
@@ -421,44 +421,44 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'KEY1', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_INTEGER' ) CALL STOPIT( 67, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 68, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 69, STATUS )
-      CALL DAT_GET0I( LOC, IVAL, STATUS ) 
+      CALL DAT_GET0I( LOC, IVAL, STATUS )
       IF( IVAL .NE. 2 ) CALL STOPIT( 70, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
       CALL DAT_FIND( MORE, 'KEY2', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_REAL' ) CALL STOPIT( 71, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 72, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 73, STATUS )
-      CALL DAT_GET0R( LOC, RVAL, STATUS ) 
+      CALL DAT_GET0R( LOC, RVAL, STATUS )
       IF( RVAL .NE. 2.0 ) CALL STOPIT( 74, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
       CALL DAT_FIND( MORE, 'KEY3', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_CHAR*14' ) CALL STOPIT( 75, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 76, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 77, STATUS )
-      CALL DAT_GET0C( LOC, CVAL, STATUS ) 
+      CALL DAT_GET0C( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'Two point zero' ) CALL STOPIT( 78, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
       CALL DAT_FIND( MORE, 'KEY4', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_INTEGER' ) CALL STOPIT( 79, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 2 ) CALL STOPIT( 80, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 81, STATUS )
-      CALL DAT_GET1I( LOC, 20, IVALS, NVAL, STATUS ) 
+      CALL DAT_GET1I( LOC, 20, IVALS, NVAL, STATUS )
       IF( IVALS(1) .NE. IVEC(1) ) CALL STOPIT( 82, STATUS )
       IF( IVALS(2) .NE. IVEC(2) ) CALL STOPIT( 83, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
@@ -466,22 +466,22 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'KEY5', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_DOUBLE' ) CALL STOPIT( 84, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 85, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 86, STATUS )
-      CALL DAT_GET0D( LOC, DVAL, STATUS ) 
+      CALL DAT_GET0D( LOC, DVAL, STATUS )
       IF( DVAL .NE. DVEC(1) ) CALL STOPIT( 87, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
       CALL DAT_FIND( MORE, 'KEY6', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_CHAR*10' ) CALL STOPIT( 88, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 3 ) CALL STOPIT( 89, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 90, STATUS )
-      CALL DAT_GET1C( LOC, 20, CVALS, NVAL, STATUS ) 
+      CALL DAT_GET1C( LOC, 20, CVALS, NVAL, STATUS )
       IF( CVALS(1) .NE. CVEC(1) ) CALL STOPIT( 91, STATUS )
       IF( CVALS(2) .NE. CVEC(2) ) CALL STOPIT( 92, STATUS )
       IF( CVALS(3) .NE. CVEC(3) ) CALL STOPIT( 93, STATUS )
@@ -490,9 +490,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'DATA_ARRAY', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'ARRAY' ) CALL STOPIT( 94, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 95, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 96, STATUS )
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
       IF( NCOMP .NE. 2 ) CALL STOPIT( 97, STATUS )
@@ -501,11 +501,11 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'LABEL', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_CHAR*49' ) CALL STOPIT( 98, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 99, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 100, STATUS )
-      CALL DAT_GET0C( LOC, CVAL, STATUS ) 
+      CALL DAT_GET0C( LOC, CVAL, STATUS )
       IF( CVAL( : 45 ) .NE. 'T%s60+%v30+A%^50+%<20+*%+   '//
      :         'corrected antenna' ) CALL STOPIT( 101, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
@@ -514,9 +514,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'WCS', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'WCS' ) CALL STOPIT( 102, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 103, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 104, STATUS )
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
       IF( NCOMP .NE. 1 ) CALL STOPIT( 105, STATUS )
@@ -525,9 +525,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'HISTORY', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'HISTORY' ) CALL STOPIT( 106, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 107, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 108, STATUS )
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
       IF( NCOMP .NE. 3 ) CALL STOPIT( 109, STATUS )
@@ -536,9 +536,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'MORE', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'EXT' ) CALL STOPIT( 110, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 111, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 112, STATUS )
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
       IF( NCOMP .NE. 3 ) CALL STOPIT( 113, STATUS )
@@ -565,9 +565,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_PUT0C( LOC, 'HDS label', STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
-      CALL DAT_ERASE( MORE, 'WCS', STATUS ) 
-      CALL DAT_ERASE( MORE, 'KEY2', STATUS ) 
-      CALL DAT_ERASE( MORE, 'KEY3', STATUS ) 
+      CALL DAT_ERASE( MORE, 'WCS', STATUS )
+      CALL DAT_ERASE( MORE, 'KEY2', STATUS )
+      CALL DAT_ERASE( MORE, 'KEY3', STATUS )
 
       CALL NDG_MODIFYPROV( IPROV, 1, KM, MORE, STATUS )
 
@@ -584,8 +584,8 @@ c      call ast_watchmemory( 1 )
             IF( INDEX( TEXT( : L ), 'TEMP_1.NDF_1' ) .EQ. 0 .AND.
      :          INDEX( TEXT( : L ), 'fred' ) .EQ. 0 ) THEN
                CALL STOPIT( 114, STATUS)
-            END IF                
-         ELSE IF( CHR_LEN( TEXT ) .NE. L .OR. 
+            END IF
+         ELSE IF( CHR_LEN( TEXT ) .NE. L .OR.
      :            TEXT( : L ) .NE. PATHS( I )( : L ) ) THEN
             CALL STOPIT( 115, STATUS)
          ENDIF
@@ -608,7 +608,7 @@ c      call ast_watchmemory( 1 )
       IF( AST_MAPLENGTH( KM, 'PARENTS', STATUS ) .NE. 2 ) THEN
          CALL STOPIT( 120, STATUS)
 
-      ELSE IF( AST_MAPTYPE( KM, 'PARENTS', STATUS ) .NE. 
+      ELSE IF( AST_MAPTYPE( KM, 'PARENTS', STATUS ) .NE.
      :         AST__INTTYPE ) THEN
          CALL STOPIT( 121, STATUS)
 
@@ -643,7 +643,7 @@ c      call ast_watchmemory( 1 )
       ELSE IF( AST_MAPHASKEY( KEYMAP, 'KEY3', STATUS ) ) THEN
          CALL STOPIT( 131, STATUS)
 
-      ELSE IF( .NOT. AST_MAPGET1I( KEYMAP, 'KEY4', 20, NVAL, IVALS, 
+      ELSE IF( .NOT. AST_MAPGET1I( KEYMAP, 'KEY4', 20, NVAL, IVALS,
      :                             STATUS ) ) THEN
          CALL STOPIT( 132, STATUS)
 
@@ -656,7 +656,7 @@ c      call ast_watchmemory( 1 )
       ELSE IF( IVALS(2) .NE. IVEC(2) ) THEN
          CALL STOPIT( 135, STATUS)
 
-      ELSE IF( .NOT. AST_MAPGET1D( KEYMAP, 'KEY5', 20, NVAL, DVALS, 
+      ELSE IF( .NOT. AST_MAPGET1D( KEYMAP, 'KEY5', 20, NVAL, DVALS,
      :                             STATUS ) ) THEN
          CALL STOPIT( 136, STATUS)
 
@@ -666,7 +666,7 @@ c      call ast_watchmemory( 1 )
       ELSE IF( DVALS(1) .NE. DVEC(1) ) THEN
          CALL STOPIT( 138, STATUS)
 
-      ELSE IF( .NOT. AST_MAPGET1C( KEYMAP, 'KEY6', 20, NVAL, CVALS, 
+      ELSE IF( .NOT. AST_MAPGET1C( KEYMAP, 'KEY6', 20, NVAL, CVALS,
      :                             STATUS ) ) THEN
          CALL STOPIT( 139, STATUS)
 
@@ -735,22 +735,22 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'KEY7', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_INTEGER' ) CALL STOPIT( 159, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 160, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 161, STATUS )
-      CALL DAT_GET0I( LOC, IVAL, STATUS ) 
+      CALL DAT_GET0I( LOC, IVAL, STATUS )
       IF( IVAL .NE. 999 ) CALL STOPIT( 162, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
       CALL DAT_FIND( MORE, 'KEY4', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_INTEGER' ) CALL STOPIT( 163, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 2 ) CALL STOPIT( 164, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 165, STATUS )
-      CALL DAT_GET1I( LOC, 20, IVALS, NVAL, STATUS ) 
+      CALL DAT_GET1I( LOC, 20, IVALS, NVAL, STATUS )
       IF( IVALS(1) .NE. IVEC(1) ) CALL STOPIT( 166, STATUS )
       IF( IVALS(2) .NE. IVEC(2) ) CALL STOPIT( 167, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
@@ -758,22 +758,22 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'KEY5', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_DOUBLE' ) CALL STOPIT( 168, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 169, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 170, STATUS )
-      CALL DAT_GET0D( LOC, DVAL, STATUS ) 
+      CALL DAT_GET0D( LOC, DVAL, STATUS )
       IF( DVAL .NE. DVEC(1) ) CALL STOPIT( 171, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
       CALL DAT_FIND( MORE, 'KEY6', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_CHAR*10' ) CALL STOPIT( 172, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 3 ) CALL STOPIT( 173, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 174, STATUS )
-      CALL DAT_GET1C( LOC, 20, CVALS, NVAL, STATUS ) 
+      CALL DAT_GET1C( LOC, 20, CVALS, NVAL, STATUS )
       IF( CVALS(1) .NE. CVEC(1) ) CALL STOPIT( 175, STATUS )
       IF( CVALS(2) .NE. CVEC(2) ) CALL STOPIT( 176, STATUS )
       IF( CVALS(3) .NE. CVEC(3) ) CALL STOPIT( 177, STATUS )
@@ -782,9 +782,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'DATA_ARRAY', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'ARRAY' ) CALL STOPIT( 178, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 179, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 180, STATUS )
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
       IF( NCOMP .NE. 2 ) CALL STOPIT( 181, STATUS )
@@ -793,11 +793,11 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'LABEL', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. '_CHAR*12' ) CALL STOPIT( 182, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 183, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 184, STATUS )
-      CALL DAT_GET0C( LOC, CVAL, STATUS ) 
+      CALL DAT_GET0C( LOC, CVAL, STATUS )
       IF( CVAL( : 12 ) .NE. 'KeyMap label') CALL STOPIT( 185, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
@@ -805,9 +805,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'HISTORY', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'HISTORY' ) CALL STOPIT( 186, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 187, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 188, STATUS )
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
       IF( NCOMP .NE. 3 ) CALL STOPIT( 189, STATUS )
@@ -816,9 +816,9 @@ c      call ast_watchmemory( 1 )
       CALL DAT_FIND( MORE, 'MORE', LOC, STATUS )
       CALL DAT_TYPE( LOC, CVAL, STATUS )
       IF( CVAL .NE. 'EXT' ) CALL STOPIT( 190, STATUS )
-      CALL DAT_SIZE( LOC, IVAL, STATUS ) 
+      CALL DAT_SIZE( LOC, IVAL, STATUS )
       IF( IVAL .NE. 1 ) CALL STOPIT( 191, STATUS )
-      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS ) 
+      CALL DAT_SHAPE( LOC, 20, IVALS, IVAL, STATUS )
       IF( IVAL .NE. 0 ) CALL STOPIT( 192, STATUS )
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
       IF( NCOMP .NE. 3 ) CALL STOPIT( 193, STATUS )
@@ -872,7 +872,7 @@ c      call ast_watchmemory( 1 )
          CALL STOPIT( 199, STATUS )
       END IF
 
-      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS, 
+      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS,
      :                        STATUS ) ) THEN
          CALL STOPIT( 200, STATUS )
 
@@ -893,7 +893,7 @@ c      call ast_watchmemory( 1 )
          CALL STOPIT( 203, STATUS )
       END IF
 
-      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS, 
+      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS,
      :                        STATUS ) ) THEN
          CALL STOPIT( 204, STATUS )
 
@@ -934,7 +934,7 @@ c      call ast_watchmemory( 1 )
          CALL STOPIT( 210, STATUS )
       END IF
 
-      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS, 
+      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS,
      :                        STATUS ) ) THEN
          CALL STOPIT( 211, STATUS )
 
@@ -955,7 +955,7 @@ c      call ast_watchmemory( 1 )
          CALL STOPIT( 214, STATUS )
       END IF
 
-      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS, 
+      IF( .NOT. AST_MAPGET1I( KM, 'PARENTS', 20, NVAL, IVALS,
      :                        STATUS ) ) THEN
          CALL STOPIT( 215, STATUS )
 
@@ -987,7 +987,7 @@ c      call ast_watchmemory( 1 )
       CALL NDF_ANNUL( INDF, STATUS )
       CALL NDF_ANNUL( INDF2, STATUS )
 
-      IF( STATUS .EQ. SAI__OK) THEN     
+      IF( STATUS .EQ. SAI__OK) THEN
          CALL MSG_BLANK( STATUS )
          CALL MSG_OUT( ' ', 'All provenance tests passed.', STATUS )
       ELSE
@@ -1012,12 +1012,12 @@ c      CALL AST_ACTIVEMEMORY( ' ' )
       INTEGER IERR, STATUS
 
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_SETI( 'I', IERR )         
+         CALL MSG_SETI( 'I', IERR )
          STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'Error ^I', STATUS )      
+         CALL ERR_REP( ' ', 'Error ^I', STATUS )
       END IF
 
-      END 
+      END
 
 
 
@@ -1032,7 +1032,7 @@ c      CALL AST_ACTIVEMEMORY( ' ' )
 
       if( status .ne. sai__ok ) return
 
-      write(*,*) ' ' 
+      write(*,*) ' '
       write(*,*) label,' anc ',ianc
 
       CALL NDG_GETPROV( IPROV, ianc, KM, MORE, STATUS )

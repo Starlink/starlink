@@ -60,7 +60,7 @@
 *  Convert position back to DC (metres)
       X(1) = X(1) / QWKDAT(XSCALE,KWKIX)
       Y(1) = Y(1) / QWKDAT(YSCALE,KWKIX)
-      
+
 *  Convert mouse button presses to keyboard codes
       IF (ICODE.LT.0) THEN
          IF (ICODE.EQ.-3) THEN

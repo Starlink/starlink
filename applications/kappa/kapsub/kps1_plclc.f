@@ -1,8 +1,8 @@
-      SUBROUTINE KPS1_PLCLC( NEL, DIN1, DIN2, DIN3, DIN4, VIN1, VIN2, 
-     :                       VIN3, VIN4, DEBIAS, VAR, MAKEI, MAKEQ, 
-     :                       MAKEU, MAKEP, MAKET, MAKEIP, MAKEIA, 
-     :                       MAKEIB, AI, AQ, AU, AP, AT, AIP, AIA, AIB, 
-     :                       AIV, AQV, AUV, APV, ATV, AIPV, AIAV, AIBV, 
+      SUBROUTINE KPS1_PLCLC( NEL, DIN1, DIN2, DIN3, DIN4, VIN1, VIN2,
+     :                       VIN3, VIN4, DEBIAS, VAR, MAKEI, MAKEQ,
+     :                       MAKEU, MAKEP, MAKET, MAKEIP, MAKEIA,
+     :                       MAKEIB, AI, AQ, AU, AP, AT, AIP, AIA, AIB,
+     :                       AIV, AQV, AUV, APV, ATV, AIPV, AIAV, AIBV,
      :                       STATUS )
 *+
 *  Name:
@@ -15,15 +15,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_PLCLC( NEL, DIN1, DIN2, DIN3, DIN4, VIN1, VIN2, VIN3, 
-*                      VIN4, DEBIAS, VAR, MAKEI, MAKEQ, MAKEU, MAKEP, 
-*                      MAKET, MAKEIP, MAKEIA, MAKEIB, AI, AQ, AU, AP, 
-*                      AT, AIP, AIA, AIB, AIV, AQV, AUV, APV, ATV, 
+*     CALL KPS1_PLCLC( NEL, DIN1, DIN2, DIN3, DIN4, VIN1, VIN2, VIN3,
+*                      VIN4, DEBIAS, VAR, MAKEI, MAKEQ, MAKEU, MAKEP,
+*                      MAKET, MAKEIP, MAKEIA, MAKEIB, AI, AQ, AU, AP,
+*                      AT, AIP, AIA, AIB, AIV, AQV, AUV, APV, ATV,
 *                      AIPV, AIAV, AIBV, STATUS )
 
 *  Description:
 *     This routine calculates the polarisation parameters and (if
-*     requested) variances for each pixel in the four input arrays.  
+*     requested) variances for each pixel in the four input arrays.
 *     A bad value will appear in the output data and variance arrays
 *     when any of the four input data values is bad, or if the total
 *     intensity in the pixel is not positive.  The output variance
@@ -150,7 +150,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -210,7 +210,7 @@
       REAL I90                   ! Input 90 degrees intensity
       REAL IA                    ! Total intensity from 0 and 90 degs
       REAL IB                    ! Total. intensity from 45 and 135 degs
-      REAL IP                    ! Polarised intensity 
+      REAL IP                    ! Polarised intensity
       REAL P                     ! Percentage polarisation
       REAL P2                    ! Fractional polarisation squared
       REAL Q                     ! Normalised Q Stokes parameter
@@ -226,7 +226,7 @@
       REAL VI                    ! Variance on tot. int. from all inputs
       REAL VIA                   ! Variance on tot. int. from 0 and 90
       REAL VIB                   ! Variance on tot. int. from 45 and 135
-      REAL VIP                   ! Variance on polarised intensity 
+      REAL VIP                   ! Variance on polarised intensity
       REAL VP                    ! Variance on percentage polarisation
       REAL VQ                    ! Variance on normalised Q Stokes par.
       REAL VT                    ! Variance on Polarisation angle

@@ -1,8 +1,8 @@
 *+  CENTROID_LOCATE - locates the centroid of a star like image feature
 
-      SUBROUTINE CENTROID_LOCATE ( INARRAY, DIMS1, DIMS2, XINIT, 
-     :                             YINIT, SEARCH, POSITIVE, MAXSHIFT, 
-     :                             MAXITER, TOLER, INVALID, XFINAL, 
+      SUBROUTINE CENTROID_LOCATE ( INARRAY, DIMS1, DIMS2, XINIT,
+     :                             YINIT, SEARCH, POSITIVE, MAXSHIFT,
+     :                             MAXITER, TOLER, INVALID, XFINAL,
      :                             YFINAL, ERROR, STATUS )
 
 *    Description :
@@ -13,8 +13,8 @@
 *
 *    Invocation :
 *
-*     CALL CENTROID_LOCATE( INARRAY, DIMS, XINIT, YINIT, SEARCH, POSITIVE, 
-*                           MAXSHIFT, MAXITER, TOLER, INVALID, XFINAL, YFINAL, 
+*     CALL CENTROID_LOCATE( INARRAY, DIMS, XINIT, YINIT, SEARCH, POSITIVE,
+*                           MAXSHIFT, MAXITER, TOLER, INVALID, XFINAL, YFINAL,
 *                           ERROR, STATUS )
 *
 *    Method :
@@ -100,9 +100,9 @@
      :    JPOSN,              ! y   "    "    "       "     "     "
      :    NXAV( SEARCHMAX ),  ! used to count additions to x profile
      :    NYAV( SEARCHMAX ),  !   "   "   "       "      " y    "
-     :    NTH,                ! value used to determine background 
+     :    NTH,                ! value used to determine background
                               ! level - Nth smallest number taken
-     :    I, J, K, L, M       ! counters 
+     :    I, J, K, L, M       ! counters
 
       REAL
      :    XLAST,              ! x coord worked out in last iteration
@@ -133,13 +133,13 @@
       ENDIF
 
 
-*    start by initialising the error variable to 0 - the 
+*    start by initialising the error variable to 0 - the
 *    no-error condition. Also initialise the FINISHED
 *    logical to FALSE
       ERROR  =  0
       FINISHED  =  .FALSE.
 
-*    initialise the square centre to be at the initial 
+*    initialise the square centre to be at the initial
 *    estimated position
       XFINAL  =  XINIT
       YFINAL  =  YINIT
@@ -201,7 +201,7 @@
                         YAV( J )  = YAV( J ) + INARRAY( IPOSN,JPOSN )
                         NXAV( I ) = NXAV( I ) + 1
                         NYAV( J ) = NYAV( J ) + 1
-                  
+
                      END IF
 
                   END IF
@@ -311,8 +311,8 @@
             ERROR   =  1
             FINISHED  =  .TRUE.
 
-         ELSE 
-   
+         ELSE
+
             IF( XDENOM .LT. 1.0E-10 ) THEN
 
 *             no data in the x profile - set the x position to be the
@@ -337,7 +337,7 @@
             END IF
 
 *          now work out the shift of the current position from the
-*          starting position 
+*          starting position
             SHIFT  =  SQRT( (XFINAL-XINIT)**2 + (YFINAL-YINIT)**2 )
 
 *          test to see if the maximum allowable shift has been exceeded
@@ -379,7 +379,7 @@
          END IF
 
 *    bottom of iteration do-loop
-      END DO               
+      END DO
 
 
 *    that's it - return

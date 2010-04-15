@@ -7,7 +7,7 @@
 *     Interpret shell metacharacters in a string, without file globbing.
 
 *  Description:
-*     This routine is intended to expand shell metacharacters within 
+*     This routine is intended to expand shell metacharacters within
 *     a supplied file name, in the case where the file may not already
 *     exist. Any wild card characters within the string are ignored (i.e.
 *     there is no file globbing).
@@ -20,7 +20,7 @@
 
 *  Arguments:
 *     FILESPEC = CHARACTER (Given)
-*        The file specification to be echoed.  
+*        The file specification to be echoed.
 *     FILENAME = CHARACTER (Returned)
 *        The result of expanding any shell metacharacters (except wild
 *        cards) within FILESPEC.
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,8 +117,8 @@
 #include "sae_par.h"
 #include "star/mem.h"
 
-F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName), 
-                                INTEGER(Status) 
+F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
+                                INTEGER(Status)
                                 TRAIL(FileSpec) TRAIL(FileName) )
 {
    GENPTR_CHARACTER(FileSpec) /* Pointer to file specification. Length is   */
@@ -158,8 +158,8 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
    } else {
       Command = (char *) starMalloc( SpecLength + 20 );
 
-/* Fdptr[0] can now be used as the reading end of the pipe, and Fdptr[1] as 
-   the writing end.  Having that, we now fork off a new process to do the 
+/* Fdptr[0] can now be used as the reading end of the pipe, and Fdptr[1] as
+   the writing end.  Having that, we now fork off a new process to do the
    'echo' command that we will use to give us the filename we want. */
       STATUS = fork();
       if( STATUS < 0 ) {
@@ -167,43 +167,43 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
 	 emsRep( "one_shell_echo", "Unable to fork", Status );
 
 /* This is the child process in which we will exec `echo'.  Copy t
-   the filespec from the FileSpec pointer that we have been passed, 
-   remembering that this is a string from a Fortran program, and so 
+   the filespec from the FileSpec pointer that we have been passed,
+   remembering that this is a string from a Fortran program, and so
    is blank padded rather than null terminated. */
       } else if( STATUS == 0 ) {
          (void) strcpy( Command, "set -f ; echo " );
 	 (void) strncat( Command, FileSpec, SpecLength );
 
-/* Now we arrange things so that the 'echo' command will send its output back 
-   down our pipe.  We want to redirect our current standard output to the 
+/* Now we arrange things so that the 'echo' command will send its output back
+   down our pipe.  We want to redirect our current standard output to the
    writing end of the pipe.  This is a standard UNIX technique. */
          (void) close( Fdptr[0] );  /* Don't need to read from pipe */
          if( Fdptr[ 1 ] != STDOUT_FILENO ) {
 
 /* Close stdout (not generally necessary, but required by Single Unix spec) */
-            close( STDOUT_FILENO ); 
+            close( STDOUT_FILENO );
             dup2( Fdptr[ 1 ], STDOUT_FILENO );
             close( Fdptr[ 1 ] );  /* Pipe write fd no longer needed */
          }
-               
-/* We're going to ignore any error messages from 'echo', so we do the same 
-   trick for standard error, this time using a file descriptor opened on the 
+
+/* We're going to ignore any error messages from 'echo', so we do the same
+   trick for standard error, this time using a file descriptor opened on the
    null device. This has the effect of nulling any error messages. */
          NullFd = open( "/dev/null", O_WRONLY, 0 );
          (void) close( STDERR_FILENO );
          (void) dup2( NullFd, STDERR_FILENO );
          (void) close( NullFd );
 
-/* And now we exec the "set -f ; echo filespec" command.  This will write the 
-   echoed string to our pipe, and the process will close down when this is 
+/* And now we exec the "set -f ; echo filespec" command.  This will write the
+   echoed string to our pipe, and the process will close down when this is
    completed. */
          execl( "/bin/sh", "sh", "-c", Command, NULL );
 
-/* We shouldn't get here -- exit without calling exit handlers or flushing 
+/* We shouldn't get here -- exit without calling exit handlers or flushing
    and closing output */
          _exit( errno );
 
-/* This is the parent process, continuing after forking off the 'echo' 
+/* This is the parent process, continuing after forking off the 'echo'
    command. We don't need the output fd for the pipe, so we close that. */
       } else {
          (void) close( Fdptr[1] );
@@ -211,9 +211,9 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
       }
    }
 
-/* At this point, if status still indicates OK, we have two file descriptors, 
-   the first of which is that of the reading end of the pipe to which our 
-   forked 'echo' process is writing the echoed string. A read of zero bytes 
+/* At this point, if status still indicates OK, we have two file descriptors,
+   the first of which is that of the reading end of the pipe to which our
+   forked 'echo' process is writing the echoed string. A read of zero bytes
    indicates that the entire string has been read. Do nothing if status
    is bad. */
    if( *Status != SAI__OK ) {

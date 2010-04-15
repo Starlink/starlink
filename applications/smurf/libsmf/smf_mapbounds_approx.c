@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize, 
+*     smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 *                           int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
 *                           int *moving, int *status );
 
@@ -27,9 +27,9 @@
 *     system = char* (Given)
 *        String indicating the type of projection (e.g. "icrs")
 *     lbnd_out = double* (Returned)
-*        2-element array pixel coord. for the lower bounds of the output map 
+*        2-element array pixel coord. for the lower bounds of the output map
 *     ubnd_out = double* (Returned)
-*        2-element array pixel coord. for the upper bounds of the output map 
+*        2-element array pixel coord. for the upper bounds of the output map
 *     outframeset = AstFrameSet** (Returned)
 *        Frameset containing the sky->output map mapping
 *     moving = int* (Returned)
@@ -117,7 +117,7 @@
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Faciltiies Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2008 University of British Columbia. 
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -192,8 +192,8 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   int temp;                    /* Temporary variable  */
   double wdthbox;              /* Map width in arcsec */
   int wdthpix;                 /* RA-Dec map width in pixels */
-  double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
-  double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
+  double x_array_corners[4];   /* X-Indices for corner bolos in array */
+  double y_array_corners[4];   /* Y-Indices for corner pixels in array */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -224,7 +224,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   pname =  file->name;
   if( *status == SAI__OK ) {
     msgSetc("FILE", pname);
-    msgOutif(MSG__VERB, " ", 
+    msgOutif(MSG__VERB, " ",
 	     "SMF_MAPBOUNDS_APPROX: Processing ^FILE",
 	     status);
   } else {
@@ -238,15 +238,15 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
       msgSetc("FILE", pname);
       msgSeti("THEDIMS", data->ndims);
       *status = SAI__ERROR;
-      errRep("smf_mapbounds_approx", 
-	     "^FILE data has ^THEDIMS dimensions, should be 3.", 
+      errRep("smf_mapbounds_approx",
+	     "^FILE data has ^THEDIMS dimensions, should be 3.",
 	     status);
     }
   }
 
   /* Construct the WCS for the first time slice in this file */
   smf_tslice_ast( data, 1, 1, status);
-    
+
   /* Retrieve header for later constructing output WCS */
   if( *status == SAI__OK) {
     hdr = data->hdr;
@@ -265,7 +265,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
     /* Retrieve input SkyFrame */
     skyin = astGetFrame( swcsin, AST__CURRENT );
 
-    /* Retrieve map height and width from header - will be undef for 
+    /* Retrieve map height and width from header - will be undef for
        non-scan so set up defaults first. */
     mapwdth = 0.0;
     maphght = 0.0;
@@ -280,7 +280,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
         errRep(" ", "MAP_WDTH and MAP_HGHT must be > 0", status);
         goto CLEANUP;
       }
-    }    
+    }
 
     mapx = 0.0;   /* Used if the FITS keyword values are undefed */
     mapy = 0.0;
@@ -307,7 +307,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
     x_array_corners[1] = dxpix - temp;
     x_array_corners[2] = dxpix + temp;
     x_array_corners[3] = dxpix + temp;
-    
+
     temp = (hghtpix - 1) / 2;
     y_array_corners[0] = dypix - temp;
     y_array_corners[1] = dypix + temp;
@@ -332,14 +332,14 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   }
 
   /* Now create the output FrameSet. */
-  smf_calc_skyframe( skyin, system, hdr, 0, &skyframe, skyref, moving, 
+  smf_calc_skyframe( skyin, system, hdr, 0, &skyframe, skyref, moving,
                      status );
 
   /* Get the orientation of the map vertical within the output celestial
      coordinate system. This is derived form the MAP_PA FITS header, which
      gives the orientation of the map vertical within the tracking system. */
   mappa = smf_calc_mappa( hdr, system, skyin, status );
-  
+
   /* Calculate the projection parameters. We do not enable autogrid determination
      for SCUBA-2 so we do not need to obtain all the data before calculating
      projection parameters. */
@@ -367,13 +367,13 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
 
   /* Now add the SkyFrame to it */
   astAddFrame( *outframeset, AST__BASE, sky2map, skyframe );
-  
+
   /* Apply a ShiftMap to the output FrameSet to re-align the GRID
      coordinates */
   shift[0] = -lbnd_out[0];
   shift[1] = -lbnd_out[1];
   astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, " " ) );
- 
+
   astExport( *outframeset );
 
 /* Report the pixel bounds of the cube. */
@@ -383,7 +383,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
       msgSeti( "YL", lbnd_out[ 1 ] );
       msgSeti( "XU", ubnd_out[ 0 ] );
       msgSeti( "YU", ubnd_out[ 1 ] );
-      msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )", 
+      msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )",
                 status );
    }
 
@@ -395,7 +395,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   ubnd_out[1] -= lbnd_out[1]-1;
   lbnd_out[1] = 1;
 
-  /* Clean Up */ 
+  /* Clean Up */
  CLEANUP:
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);

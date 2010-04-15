@@ -39,5 +39,5 @@
       INDX(I)=INDXT
       GO TO 10
       END
-      
+
 * $Id$

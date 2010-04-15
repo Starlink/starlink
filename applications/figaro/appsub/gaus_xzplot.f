@@ -4,16 +4,16 @@ C
      :    ICST,IGST,HIGH,LOW,HIGHR,LOWR,XLAB,ZLAB,PLAB,ERASE,DEVICES,
      :    HARD,DEVICEH,ERRUSE,LCON,CRES,GRES,GTOT,GALL,XVST,XVEN,
      :    STATUS)
-C 
+C
 C     G A U S _ X Z P L O T
 C
 C     Plots an array (ZVALS) against another array (XVALS) in a lower
 C     plot ( occupying 0.75 of vertical plotting area ). The continuum
 C     fit, sum of fitting Gaussians and individual fiting Gaussians
-C     can also be ploted in the lower plot. The errors on the Z values 
-C     ( if available ) are plotted on the upper plot ( occupying 0.25 
-C     of vertical plotting space ) as well as residuals on the line and 
-C     continuum fit. The XVALS represent the coordinates at the centre 
+C     can also be ploted in the lower plot. The errors on the Z values
+C     ( if available ) are plotted on the upper plot ( occupying 0.25
+C     of vertical plotting space ) as well as residuals on the line and
+C     continuum fit. The XVALS represent the coordinates at the centre
 C     of each 'bin'.
 C
 C     Parameters -   (">" input, "<" output)
@@ -26,13 +26,13 @@ C     (>) ZRESID   (Real array) The observed -fitted residuals on the
 C                  continuum fit ( values over the line not plotted )
 C     (>) CONVALS  (Real array) The Y values of the fitted continuum
 C     (>) ICONO    (Integer array) A value of 1 indicates a continuum point
-C     (>) GAUSUM   (Real array) The Y values of the sum of the fitting 
+C     (>) GAUSUM   (Real array) The Y values of the sum of the fitting
 C                  Gaussians
-C     (>) GAUFS    (Real array) The Y values of the individual fitting 
+C     (>) GAUFS    (Real array) The Y values of the individual fitting
 C     (>) GZRESID  (Real array) The residuals on the line fit
 C     (>) NX       (Integer) Number of elements in XVALS and ZVALS.
-C     (>) CX       (Integer) Number of points in fitted continuum 
-C     (>) GX       (Integer) Number of elements in GXVALS 
+C     (>) CX       (Integer) Number of points in fitted continuum
+C     (>) GX       (Integer) Number of elements in GXVALS
 C     (>) NG       (Integer) Number of Gaussians in fit
 C     (>) ICST     (Integer) The first element of fitted continuum to be plotted
 C     (>) IGST     (Integer) The first element of GXVALS to be plotted
@@ -60,11 +60,11 @@ C     (>) XVEN     (Real) The actual x-end value for the plot.
 C     (<) STATUS   (Integer) Returns plot status.
 C                  0 => OK, non zero => some error opening the plot.
 C
-C                                       JRW / AAO February 1987 
+C                                       JRW / AAO February 1987
 C
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL HARD,ERASE,ERRUSE,LCON,CRES,GRES,GTOT,GALL
       INTEGER ICST,IGST,NX,CX,GX,NG,ICONO(NX),STATUS
@@ -137,17 +137,17 @@ C
 
          IF (GTOT) THEN
 C
-C        Sum of fitting Gaussians in RED as a line plot over the extent 
+C        Sum of fitting Gaussians in RED as a line plot over the extent
 C        of the line
 C
-           CALL PGSCI(RED) 
+           CALL PGSCI(RED)
            CALL PGLINE(GX,GXVALS,GAUSUM)
            CALL PGSCI(WHITE)
          END IF
 
          IF (GALL) THEN
 C
-C          Individual fitting Gaussians in increasing pen order ( above 3 ) 
+C          Individual fitting Gaussians in increasing pen order ( above 3 )
 C          over the extent of the line
 C
            CKEY=3
@@ -166,12 +166,12 @@ C
          END IF
 C
 C  Next the upper residual spectrum plot over the extent of the continuum
-C 
+C
          CALL PGSLW(THIN)
          CALL PGVPORT(0.08,0.97,0.75,0.92)
 C
 C        Set up the scaling factor for the residuals plot in terms
-C        of the lower spectrum plot and write to the label for the 
+C        of the lower spectrum plot and write to the label for the
 C        upper plot ( if this is non-blank )
 C
          RFAC=REAL(NINT(ABS((HIGH-LOW)/(HIGHR-LOWR))))
@@ -231,7 +231,7 @@ C
          GO TO 600
       ELSE
 C
-C        A 'hard' plot.  Close down the soft plot and re-open 
+C        A 'hard' plot.  Close down the soft plot and re-open
 C        PGPLOT on the HARD device
 C
          CALL PGEND
@@ -264,12 +264,12 @@ C
          END DO
          CALL PGLINE(CX,XP,ZP)
 C
-C        Sum of fitting Gaussians in RED as a line plot over the extent 
+C        Sum of fitting Gaussians in RED as a line plot over the extent
 C        of the line
 C
          CALL PGLINE(GX,GXVALS,GAUSUM)
 C
-C        Individual fitting Gaussians in increasing symbol number order 
+C        Individual fitting Gaussians in increasing symbol number order
 C        over the extent of the line
 C
          SYM=1
@@ -282,12 +282,12 @@ C
          END DO
 C
 C  Next the upper residual spectrum plot over the extent of the continuum
-C 
+C
          CALL PGSLW(THIN)
          CALL PGVPORT(0.08,0.97,0.75,0.92)
 C
 C        Set up the scaling factor for the residuals plot in terms
-C        of the lower spectrum plot and write to the label for the 
+C        of the lower spectrum plot and write to the label for the
 C        upper plot ( if this is non-blank )
 C
          RFAC=REAL(NINT(ABS((HIGH-LOW)/(HIGHR-LOWR))))
@@ -319,7 +319,7 @@ C        Plot residuals on continuum over extent of continuum but
 C        excluding lines
 C
          DO I=ICST,ICST+CX-1,1
-           IF (ICONO(I).EQ.1) THEN 
+           IF (ICONO(I).EQ.1) THEN
              CALL PGPOINT(1,XVALS(I),RFAC*ZRESID(I),5)
            END IF
          END DO

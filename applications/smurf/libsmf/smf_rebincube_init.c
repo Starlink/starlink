@@ -15,8 +15,8 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar, 
-*                         float *data_array, float *var_array, 
+*     smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar,
+*                         float *data_array, float *var_array,
 *                         double *wgt_array, float *texp_array,
 *                         float *teff_array, int *nused, int *status );
 
@@ -28,7 +28,7 @@
 *     nout = dim_t (Given)
 *        Total number of elements in the output cube.
 *     genvar = int (Given)
-*        Indicates how the output variances should be calculated: 
+*        Indicates how the output variances should be calculated:
 *           0 = do not calculate any output variances
 *           1 = use spread of input data values
 *           2 = use system noise temperatures
@@ -36,19 +36,19 @@
 *        The data array for the output cube.
 *     var_array = float * (Returned)
 *        An array in which to store the variances for the output cube if
-*        "genvar" is not zero (the supplied pointer is ignored if "genvar" 
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar"
 *        is zero). If "is2d" is non-zero, this array should have "nxy"
 *        elements. Otherwise it should have "nout" elements.
 *     wgt_array = double * (Returned)
-*        An array in which to store the relative weighting for each pixel in 
-*        the output cube. This array should be the length of "var_array", 
-*        unless "genvar" is 1, in which case it should be twice the length 
+*        An array in which to store the relative weighting for each pixel in
+*        the output cube. This array should be the length of "var_array",
+*        unless "genvar" is 1, in which case it should be twice the length
 *        of "var_array".
 *     texp_array = float * (Returned)
-*        A work array, which holds the total exposure time for each output 
+*        A work array, which holds the total exposure time for each output
 *        spectrum. It should have "nxy" elements.
 *     teff_array = float * (Given and Returned)
-*        A work array, which holds the effective integration time for each 
+*        A work array, which holds the effective integration time for each
 *        output spectrum, scaled by a factor of 4. It should have "nxy"
 *        elements.
 *     nused = int * (Returned)
@@ -103,8 +103,8 @@
 
 #define FUNC_NAME "smf_rebincube_init"
 
-void smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar, 
-                         float *data_array, float *var_array, 
+void smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar,
+                         float *data_array, float *var_array,
                          double *wgt_array, float *texp_array,
                          float *teff_array, int *nused, int *status ) {
 

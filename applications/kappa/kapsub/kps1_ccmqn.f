@@ -1,32 +1,32 @@
       SUBROUTINE KPS1_CCMQN( NLUT, NDATA, RDATA, RHI, RLO, GDATA, GHI,
-     :                       GLO, BDATA, BHI, BLO, BAD, RSVPN, NHIST, 
-     :                       RHIST, GHIST, BHIST, PHIST, LUT, CI, 
+     :                       GLO, BDATA, BHI, BLO, BAD, RSVPN, NHIST,
+     :                       RHIST, GHIST, BHIST, PHIST, LUT, CI,
      :                       STATUS )
-      
+
 *+
 *  Name:
 *     KPS1_CCMQN
 
 *  Purpose:
-*     Creates an array of colour indices and a colour look up table to 
+*     Creates an array of colour indices and a colour look up table to
 *     describe the supplied red, green and blue images.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CCMQN( NLUT, NDATA, RDATA, RHI, RLO, GDATA, GHI, GLO, 
-*                      BDATA, BHI, BLO, BAD, RSVPN, NHIST, RHIST, GHIST, 
+*     CALL KPS1_CCMQN( NLUT, NDATA, RDATA, RHI, RLO, GDATA, GHI, GLO,
+*                      BDATA, BHI, BLO, BAD, RSVPN, NHIST, RHIST, GHIST,
 *                      BHIST, PHIST, LUT, CI, STATUS )
 
 *  Description:
-*     The rgb intensities at each point are supplied in three separate 
+*     The rgb intensities at each point are supplied in three separate
 *     arrays. A 3-dimensional histogram is formed of these RGB values, in
 *     which the three axes represent red, green and blue intensity. The
 *     number of cells in this histogram which contain any points is then
-*     found. If the number of non-empty cells is larger than the number of 
+*     found. If the number of non-empty cells is larger than the number of
 *     elements in the colour table, then a new histogram is formed in which
-*     there are fewer (but bigger) cells. This process is repeated until 
+*     there are fewer (but bigger) cells. This process is repeated until
 *     the number of non-empty cells is less than or equal to the size of
 *     the colour table. The RGB intensities at the centre of each non-empty
 *     cell is then stored in the returned colour table. The cell in which
@@ -80,7 +80,7 @@
 *       Work space which is used to hold blue intensity (in the range 0.0
 *       to 1.0) at the centre of each 3D histogram cell.
 *     PHIST( NHIST ) = INTEGER (Returned)
-*       Work space which is used to hold the population in each 3D 
+*       Work space which is used to hold the population in each 3D
 *       histogram cell.
 *     LUT( 3, NLUT ) = REAL (Returned)
 *       The returned colour table.
@@ -144,10 +144,10 @@
       INTEGER NHIST
 
 *  Arguments Returned:
-      REAL RHIST( NHIST )      
-      REAL GHIST( NHIST )      
-      REAL BHIST( NHIST )      
-      REAL PHIST( NHIST )      
+      REAL RHIST( NHIST )
+      REAL GHIST( NHIST )
+      REAL BHIST( NHIST )
+      REAL PHIST( NHIST )
       REAL LUT( 3, NLUT )
       INTEGER CI( NDATA )
 
@@ -188,34 +188,34 @@
       END IF
 
 *  Form a 3D histogram of the supplied colours at each of the supplied data
-*  points. RHIST holds the RED value 
+*  points. RHIST holds the RED value
 *  ========================================================================
 *  Form factors for scaling data values into RGB intensity.
       IF( RLO .NE. VAL__BADR ) THEN
-         IF( RLO .NE. RHI ) THEN 
+         IF( RLO .NE. RHI ) THEN
             FR = 1.0/( RHI - RLO )
          ELSE
-            FR = 1.0E6   
+            FR = 1.0E6
          END IF
       ELSE
          FR = 0.0
       END IF
 
       IF( GLO .NE. VAL__BADR ) THEN
-         IF( GLO .NE. GHI ) THEN 
+         IF( GLO .NE. GHI ) THEN
             FG = 1.0/( GHI - GLO )
          ELSE
-            FG = 1.0E6   
+            FG = 1.0E6
          END IF
       ELSE
          FG = 0.0
       END IF
 
       IF( BLO .NE. VAL__BADR ) THEN
-         IF( BLO .NE. BHI ) THEN 
+         IF( BLO .NE. BHI ) THEN
             FB = 1.0/( BHI - BLO )
          ELSE
-            FB = 1.0E6   
+            FB = 1.0E6
          END IF
       ELSE
          FB = 0.0
@@ -282,9 +282,9 @@
             IF( FR .NE. 0.0 ) R = RDATA( I )
             IF( FG .NE. 0.0 ) G = GDATA( I )
             IF( FB .NE. 0.0 ) B = BDATA( I )
-   
-            IF( R .NE. VAL__BADR .AND. B .NE. VAL__BADR .AND. 
-     :          B .NE. VAL__BADR ) THEN         
+
+            IF( R .NE. VAL__BADR .AND. B .NE. VAL__BADR .AND.
+     :          B .NE. VAL__BADR ) THEN
 
 *  Convert pixel values to RGB intensities in the range 0.0 to 1.0
                R = MAX( 0.0, MIN( 1.0, ( R - RLO )*FR ) )
@@ -313,9 +313,9 @@
          END DO
 
 *  If too many colours are used, increase the size of each bin in the
-*  histogram, and try again. 
+*  histogram, and try again.
          IF( NONZ .GT. NLUT ) THEN
-            NEWUSE = INT( REAL( NUSE* NLUT )/REAL( NONZ ) ) 
+            NEWUSE = INT( REAL( NUSE* NLUT )/REAL( NONZ ) )
             IF( NEWUSE .GE. NUSE ) NEWUSE = NUSE - 1
             NUSE = NEWUSE
          ELSE
@@ -324,15 +324,15 @@
 
       END DO
 
-*  Set up the returned colour table values. Replace the bin populations 
+*  Set up the returned colour table values. Replace the bin populations
 *  in PHIST with the corresponding bin colour index.
       J = 0
       DO I = 1, NUSE
          IF( PHIST( I ) .GT. 0 ) THEN
             J = J + 1
-            LUT( 1, J ) = RHIST( I )            
-            LUT( 2, J ) = GHIST( I )            
-            LUT( 3, J ) = BHIST( I )            
+            LUT( 1, J ) = RHIST( I )
+            LUT( 2, J ) = GHIST( I )
+            LUT( 3, J ) = BHIST( I )
             PHIST( I ) = J
          END IF
       END DO
@@ -347,9 +347,9 @@
          IF( FR .NE. 0.0 ) R = RDATA( I )
          IF( FG .NE. 0.0 ) G = GDATA( I )
          IF( FB .NE. 0.0 ) B = BDATA( I )
-   
-         IF( R .NE. VAL__BADR .AND. B .NE. VAL__BADR .AND. 
-     :       B .NE. VAL__BADR ) THEN         
+
+         IF( R .NE. VAL__BADR .AND. B .NE. VAL__BADR .AND.
+     :       B .NE. VAL__BADR ) THEN
 
 *  Convert pixel values to RGB intensities in the range 0.0 to 1.0
             R = MAX( 0.0, MIN( 1.0, ( R - RLO )*FR ) )
@@ -361,8 +361,8 @@
             GI = MIN( NHM1, MAX( 0, INT( NH*G ) ) )
             BI = MIN( NHM1, MAX( 0, INT( NH*B ) ) )
 
-*  Form the vector index, in the range 1 to NUSE. 
-            VI = RI + NH*( GI + BI*NH ) + 1 
+*  Form the vector index, in the range 1 to NUSE.
+            VI = RI + NH*( GI + BI*NH ) + 1
 
 *  The value stored in PHIST at this index is the returned colour index. Make
 *  the first entry in the table equal to the number of reserved pens.

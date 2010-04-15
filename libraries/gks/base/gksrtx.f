@@ -28,8 +28,8 @@ C# IL>=a, OL>=0
 *                     GKSRxx routines.
 *     21/01/87  ARG   IS conversion. Error numbers changed.
 *     23/01/91  PLP   Precision check changed so that precisions lower
-*                     than those stored are accepted (S438). Do not use 
-*                     this fix unless C27 is fixed so that RAL GKS and 
+*                     than those stored are accepted (S438). Do not use
+*                     this fix unless C27 is fixed so that RAL GKS and
 *                     not NCC philosophy of font precision pairs is
 *                     accepted.
 *
@@ -84,7 +84,7 @@ C# IL>=a, OL>=0
 
    20 CONTINUE
 * Check if text font and precision valid. Note the .LE. This is
-* so that for each font the drivers can store only the highest 
+* so that for each font the drivers can store only the highest
 * precision supported.
       DO 40 J=1,N
         IF (KWI2.EQ.LFONTS(J) .AND. KWI3.LE.LPRECS(J)) GOTO 50

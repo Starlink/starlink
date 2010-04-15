@@ -1,6 +1,6 @@
       SUBROUTINE GRBPIC
 *+
-*     - - - - - - - - 
+*     - - - - - - - -
 *       G R B P I C    (GKS emulation of GRPCKG)
 *     - - - - - - - -
 *

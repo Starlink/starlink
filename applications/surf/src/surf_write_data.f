@@ -7,25 +7,25 @@
 *  Purpose:
 *     Write bolometer positions and values to text file
 
-*  RealName: 
+*  RealName:
 *     SURF_WRITE_DATA
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURF_WRITE_DATA( FD, NPTS, IN_DATA, IN_VARIANCE,
 *    : BOL_RA, BOL_DEC, STATUS )
- 
+
 *  Description:
 *     This routine writes the value, variance and position of each
 *     data point to a ASCII file. It is called as part of the EXTRACT_DATA
 *     task.
 *     The interface is the same as that used in the REBIN task.
 *     The data and variance are in volts. The positions are in radians.
-*     The data are written out as columns (RA DEC DATA VAR) and subsets 
+*     The data are written out as columns (RA DEC DATA VAR) and subsets
 *     can be extracted by using SCUBA sections.
- 
+
 *  Arguments:
 *     FD = INTEGER (Given)
 *        Output file descriptor
@@ -54,7 +54,7 @@
 *        The latitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
 *     LONG_OUT = CHAR (Read)
-*        The longitude of the output map centre. The supplied default value 
+*        The longitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
 *     LOOP = LOGICAL (Read)
 *        Task will ask for multiple input files if true. Only REF is read
@@ -64,7 +64,7 @@
 *     OUT_COORDS = CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are:
-*        - AZ:  Azimuth/elevation offsets 
+*        - AZ:  Azimuth/elevation offsets
 *        - NA:  Nasmyth offsets
 *        - PL:  RA/Dec Offsets from moving centre (eg Planets)
 *        - RB:  RA/Dec (B1950)
@@ -87,7 +87,7 @@
 *  Notes:
 *     For each file name that is entered, values for the parameters
 *     SELECT_INTS, WEIGHT, SHIFT_DX and SHIFT_DY are requested.
-*     - The application can read in up to 100 separate input datasets. 
+*     - The application can read in up to 100 separate input datasets.
 *     - No data is returned if the DATA or positions are bad.
 *     Data is still returned if Variance is bad.
 
@@ -129,10 +129,10 @@
 *       Initial version
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -165,7 +165,7 @@
                WRITE(LINE,*) BOL_RA(I), BOL_DEC(I), IN_DATA(I),
      :              ' --BAD--'
             ELSE
-               WRITE(LINE,*) BOL_RA(I), BOL_DEC(I), IN_DATA(I), 
+               WRITE(LINE,*) BOL_RA(I), BOL_DEC(I), IN_DATA(I),
      :              IN_VARIANCE(I)
             END IF
 

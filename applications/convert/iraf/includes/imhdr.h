@@ -1,5 +1,5 @@
 # IMHDR.H -- Image Header Definitions.  The structure definitions in this file
-# assume two or less chars per struct unit (e.g., a one or two byte char). 
+# assume two or less chars per struct unit (e.g., a one or two byte char).
 
 define	IM_MAXDIM	7			# maximum dimension of image
 define	SZ_IMMAGIC	5			# used to verify structure

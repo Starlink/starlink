@@ -153,7 +153,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       LOGICAL VAR
       INTEGER NX
@@ -168,7 +168,7 @@
       INTEGER NPIX
       INTEGER NLIN
       REAL WLIM
-      
+
 *  Arguments Returned:
       DOUBLE PRECISION DATOUT( NX, NY )
       DOUBLE PRECISION VAROUT( NX, NY )
@@ -194,7 +194,7 @@
       DOUBLE PRECISION W         ! Weight for current output pixel
       INTEGER WLIN               ! Row counter for internal (work) arrays
       INTEGER WPIX               ! Column counter for internal (work) arrays
-      
+
 *.
 
 *  Check the inherited global status.
@@ -208,7 +208,7 @@
       CALL KPS1_CNVFP( .FALSE., NXP, NYP, PSFIN, NPIX, NLIN, XC,
      :                 YC, W1, STATUS )
       CALL KPG1_FFTFD( NPIX, NLIN, W1, W4, W1, STATUS )
-      
+
 *  Set a flag indicating that no good pixels have yet been found in the
 *  input arrays.
       ALLBAD = .TRUE.
@@ -231,10 +231,10 @@
 
             INVAL = DATIN( PIX, LIN )
 
-            USE = INVAL .NE. VAL__BADD 
+            USE = INVAL .NE. VAL__BADD
             IF ( VAR ) USE = USE .AND.
      :                       ( VARIN( PIX, LIN ) .NE. VAL__BADD )
-               
+
             IF ( USE ) THEN
                W2( WPIX, WLIN ) = INVAL
                W3( WPIX, WLIN ) = 1.0D0
@@ -248,11 +248,11 @@
 
       END DO
 
-*  Fill the output arrays with bad values and return with ISTAT set to 
+*  Fill the output arrays with bad values and return with ISTAT set to
 *  1 if all input pixels are bad.
       IF ( ALLBAD .AND. STATUS .EQ. SAI__OK ) THEN
-         CALL KPG1_FILLD( VAL__BADD, NX*NY, DATOUT, STATUS )  
-         IF( VAR ) CALL KPG1_FILLD( VAL__BADD, NX*NY, VAROUT, STATUS )  
+         CALL KPG1_FILLD( VAL__BADD, NX*NY, DATOUT, STATUS )
+         IF( VAR ) CALL KPG1_FILLD( VAL__BADD, NX*NY, VAROUT, STATUS )
          ISTAT = 1
          GO TO 999
       END IF
@@ -327,15 +327,15 @@
                END IF
 
             END IF
-               
+
          END DO
 
       END DO
 
-*  Fill any output variance array with bad values and return with ISTAT set 
+*  Fill any output variance array with bad values and return with ISTAT set
 *  to 2 if all the output pixel values are bad.
       IF ( ALLBAD ) THEN
-         IF( VAR ) CALL KPG1_FILLD( VAL__BADD, NX*NY, VAROUT, STATUS )  
+         IF( VAR ) CALL KPG1_FILLD( VAL__BADD, NX*NY, VAROUT, STATUS )
          ISTAT = 2
          GO TO 999
       END IF
@@ -373,7 +373,7 @@
          END DO
 
 *  Replicate the edge pixel values into the margins.
-         CALL KPS1_CNVRP( 1 + SHIFTX, NX + SHIFTX, 1 + SHIFTY, 
+         CALL KPS1_CNVRP( 1 + SHIFTX, NX + SHIFTX, 1 + SHIFTY,
      :                    NY + SHIFTY, NPIX, NLIN, W2, STATUS )
 
 *  Smooth the VARIANCE array, storing the results back in W2.
@@ -419,8 +419,8 @@
 
          END DO
 
-      END IF      
-      
+      END IF
+
  999  CONTINUE
 
       END

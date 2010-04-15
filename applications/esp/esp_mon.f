@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -64,7 +64,7 @@
 *   Check inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Get the requested action the name against each valid value in turn, 
+*   Get the requested action the name against each valid value in turn,
 *   calling the appropriate routine...
       ACTION=' '
       CALL TASK_GET_NAME(ACTION,STATUS)
@@ -77,7 +77,7 @@
          CALL ELLFOU( STATUS )
       ELSE IF ( ACTION.EQ. 'ELLPRO' ) THEN
          CALL ELLPRO( STATUS )
-      ELSE IF ( ACTION .EQ. 'FASTMED' ) THEN 
+      ELSE IF ( ACTION .EQ. 'FASTMED' ) THEN
          CALL FASTMED( STATUS )
       ELSE IF ( ACTION.EQ. 'GAUFIT' ) THEN
          CALL GAUFIT( STATUS )

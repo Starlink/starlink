@@ -23,7 +23,7 @@
 *     parKeymap = AstKeyMap* (Given)
 *        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *

@@ -7,11 +7,11 @@
 ###
 ### Copyright (C) 1997 by Ross Moore <ross@mpce.mq.edu.au>
 ###
-### Version 0.2,  December 12, 1997 
+### Version 0.2,  December 12, 1997
 ###    added lower --> upper-case conversions
 ###
 ### Version 0.1,  October 15, 1997
-###    information extracted from  i18n.pl 
+###    information extracted from  i18n.pl
 ###    contains...
 ###
 ### Language definitions for HTML 2.1 (I18N, Internationalization)
@@ -61,7 +61,7 @@ sub make_unicode_map {
 	$unicode_table{$key} = $iso_10646_character_map{$ent}
             if ($key =~ /\#\d+;/);
     print "\n$key : $ent : ".$unicode_table{$key} if ($VERBOSITY > 2);
-    }    
+    }
 }
 
 sub convert_to_unicode {
@@ -431,7 +431,7 @@ sub do_cmd_ng { join('', &iso_map("eng", ""), $_[0]);}
 	'trade', '&#8482;',   # trademark  # NS4(Mac)
 	'alefsym', '&#8501;',   # aleph   # NS4(Mac)
 	'aleph', '&#8501;',   # aleph   # NS4(Mac)
-        
+
 #<!-- Arrows -->
 	'larr', '&#8592;',
 	'uarr', '&#8593;',
@@ -644,10 +644,10 @@ sub do_cmd_ng { join('', &iso_map("eng", ""), $_[0]);}
 	'&#913;', '\\Alpha ',
 	'&#914;', '\\Beta ',
 	'&#915;', '\\Gamma ',
-	'&#916;', '\\Delta ', 
-	'&#917;', '\\Epsilon ', 
-	'&#918;', '\\Zeta ', 
-	'&#919;', '\\Eta ', 
+	'&#916;', '\\Delta ',
+	'&#917;', '\\Epsilon ',
+	'&#918;', '\\Zeta ',
+	'&#919;', '\\Eta ',
 	'&#920;', '\\Theta ',
 	'&#921;', '\\Iota ',
 	'&#922;', '\\Kappa ',
@@ -692,7 +692,7 @@ sub do_cmd_ng { join('', &iso_map("eng", ""), $_[0]);}
 	'&#968;', '\\psi ',
 	'&#969;', '\\omega ',
 
-	'&#977;', '\\vartheta ', 
+	'&#977;', '\\vartheta ',
 	'&#978;', '\\upsilon ',    # this is wrong, but close
 	'&#982;', '\\varpi ',
 
@@ -728,7 +728,7 @@ sub do_cmd_ng { join('', &iso_map("eng", ""), $_[0]);}
 	'&#8501;', '\\ensuremath{\\aleph}',
 
 	'larr', '&#8592;', '\\leftarrow ',
-	'uarr', '&#8593;', '\\uparrow ', 
+	'uarr', '&#8593;', '\\uparrow ',
 	'rarr', '&#8594;', '\\rightarrow ',
 	'darr', '&#8595;', '\\downarrow ',
 	'harr', '&#8596;', '\\leftrightarrow ',

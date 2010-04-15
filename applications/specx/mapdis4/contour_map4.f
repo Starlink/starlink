@@ -63,7 +63,7 @@ C-----------------------------------------------------------------------
       REAL      GRLIMITS(2)
       CHARACTER OPTIONS*64
 
-      REAL       XMARGIN 
+      REAL       XMARGIN
       PARAMETER (XMARGIN = 25.)
       REAL       YMARGIN
       PARAMETER (YMARGIN = 40.)
@@ -165,7 +165,7 @@ C  Work out contour levels
             CALL SXGTIDLE
             WRITE (ILOUT, *) '----------------------------------------'
             WRITE (ILOUT, *) 'Contour levels used:'
-            WRITE (ILOUT, '((8(1X,F9.2)))', IOSTAT=IERR) 
+            WRITE (ILOUT, '((8(1X,F9.2)))', IOSTAT=IERR)
      &                    (ZC(NC),NC=NCONT1,NCONT2)
             WRITE (ILOUT, *) '----------------------------------------'
             CALL SXGTTGRAPH

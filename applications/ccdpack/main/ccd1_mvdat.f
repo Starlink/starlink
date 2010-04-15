@@ -136,7 +136,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -181,17 +181,17 @@
 *  version of the routine to perform the work.
       IF ( TYPE .EQ. '_REAL' ) THEN
          CALL CCD1_MVDTR( ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
-     :                    %VAL( CNF_PVAL( DATIN ) ), 
+     :                    %VAL( CNF_PVAL( DATIN ) ),
      :                    %VAL( CNF_PVAL( VARIN ) ), I1, I2, IZ,
      :                    SCALE, DSCALE, ZERO, DZERO, ORIG,
-     :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ), 
+     :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ),
      :                    NBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL CCD1_MVDTD( ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
-     :                    %VAL( CNF_PVAL( DATIN ) ), 
+     :                    %VAL( CNF_PVAL( DATIN ) ),
      :                    %VAL( CNF_PVAL( VARIN ) ), I1, I2, IZ,
      :                    SCALE, DSCALE, ZERO, DZERO, ORIG,
-     :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ), 
+     :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ),
      :                    NBAD, STATUS )
       END IF
 

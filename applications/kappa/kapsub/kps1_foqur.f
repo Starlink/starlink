@@ -93,10 +93,10 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER MO
       INTEGER NO
@@ -104,13 +104,13 @@
       INTEGER NI
       INTEGER SWAP
       REAL IN( MO, NO )
- 
+
 *  Arguments Returned:
       REAL OUT( MO, NO )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local variables:
       INTEGER C1                 ! Number of columns to right of forward
                                  ! swap centre
@@ -122,64 +122,64 @@
                                  ! centre
       INTEGER NIH                ! Y (lines) co-ord of forward swap
                                  ! centre
- 
+
 *.
- 
+
 *  Check THE inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set up constants.
       NIH = NI / 2
       MIH = MI / 2
       C1 = MO - MIH
       C2 = NO - NIH
- 
+
 *  If required forward swap the quadrants.
       IF ( SWAP .EQ. 1 ) THEN
- 
+
          DO K = 1, NIH
             DO J = 1, MIH
                OUT( J + C1, K + C2 ) = IN( J, K )
             END DO
- 
+
             DO J = MIH + 1, MO
                OUT( J - MIH, K + C2 ) = IN( J, K )
             END DO
          END DO
- 
+
          DO K = NIH + 1, NO
             DO J = 1, MIH
                OUT( J + C1, K - NIH ) = IN( J, K )
             END DO
- 
+
             DO J = MIH + 1, MO
                OUT( J - MIH, K - NIH ) = IN( J, K )
             END DO
          END DO
- 
+
 *  Alternatively, reverse swap the quadrants.
       ELSE IF ( SWAP .EQ.  -1 ) THEN
- 
+
          DO K = 1, NIH
             DO J = 1, MIH
                OUT( J, K ) = IN( J + C1, K + C2 )
             END DO
- 
+
             DO J = MIH + 1, MO
                OUT( J, K ) = IN( J - MIH, K + C2 )
             END DO
          END DO
- 
+
          DO K = NIH + 1, NO
             DO J = 1, MIH
                OUT( J, K ) = IN( J + C1, K - NIH )
             END DO
- 
+
             DO J = MIH + 1, MO
                OUT( J, K ) = IN( J - MIH, K - NIH )
             END DO
          END DO
- 
+
 *  Otherwise just copy input to output.
       ELSE
          DO K = 1, NO
@@ -188,5 +188,5 @@
             END DO
          END DO
       END IF
- 
+
       END

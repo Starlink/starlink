@@ -30,10 +30,10 @@
 #
 #     value
 #        A two-element list {lo hi} giving the low and high percentile
-#        values.  0 <= lo <= hi <= 100.  This can be accessed under a 
+#        values.  0 <= lo <= hi <= 100.  This can be accessed under a
 #        different name using the -valuevar option.
 #
-#     Percentilecontrol also inherits all the public variables of the 
+#     Percentilecontrol also inherits all the public variables of the
 #     Control widget.
 
 #  Copyright:
@@ -112,7 +112,7 @@
                      -from { 0 0 } \
                      -to { 100 100 } \
                      -label { "Lower percentile" "Upper percentile" }
-                     
+
                }
                $itk_component(percentiledialog) buttonconfigure Apply \
                    -command [ code "$this configure -value \
@@ -164,17 +164,17 @@
             $omenu configure -state disabled
          }
       }
- 
+
 
 #-----------------------------------------------------------------------
       public variable value { 0 100 } {
 #-----------------------------------------------------------------------
          set lo [ lindex $value 0 ]
          set hi [ lindex $value 1 ]
-         if { $lo < 0 || $lo >= $hi || $hi > 100 } { 
-            set lo 0 
+         if { $lo < 0 || $lo >= $hi || $hi > 100 } {
+            set lo 0
             set hi 100
-            configure -value [ list $lo $hi ] 
+            configure -value [ list $lo $hi ]
          }
          set text [ list2text $lo $hi ]
          if { [ catch { $omenu select $text } ] } {
@@ -233,7 +233,7 @@
          }
          $omenubut configure -text "[ lindex $value 1 ]%"
       }
-   
+
 
 
 
@@ -275,7 +275,7 @@
 ########################################################################
 
    itk::usual Percentilecontrol {
-      keep -background -cursor -foreground 
+      keep -background -cursor -foreground
    }
 
 
@@ -286,6 +286,6 @@
    proc percentilecontrol { pathname args } {
       uplevel Percentilecontrol $pathname $args
    }
-   
+
 
 # $Id$

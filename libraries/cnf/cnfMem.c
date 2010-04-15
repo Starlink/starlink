@@ -76,7 +76,7 @@
 /* Static variables for this module. */
 /* ================================= */
 /* Mask for extracting the lower bits from C pointers so that they fit
-   into the Fortran POINTER type. 
+   into the Fortran POINTER type.
    The shift is split into two to avoid a compiler warning if the shift is
    = the number of bits in unsigned long. */
 static const unsigned long int mask =
@@ -90,7 +90,7 @@ static unsigned int pointer_count = 0;
 
 /* Number of registered pointers. */
 static unsigned int registered_pointers = 0;
-   
+
 /* Pointer to list of C pointers. */
 static void **pointer_list = NULL;
 
@@ -110,7 +110,7 @@ F77_SUBROUTINE(cnf_unregp)( POINTER(FPTR) );
 
 /* Define how to convert a C pointer to a fortran INTEGER. This does
    not have to be reversible */
-/* If pointers are not the same size as 32bit fortran integers 
+/* If pointers are not the same size as 32bit fortran integers
    we attempt to mask */
 #if SIZEOF_VOIDP != SIZEOF_UINT32_T
 #define CTOFORTRAN(p)  ( mask & (unsigned long int) p )
@@ -517,7 +517,7 @@ void *cnfRealloc( void * pntr, size_t size ) {
 
 /* If a pointer to new memory was returned, attempt to register the new     */
 /* pointer (if not NULL).                                                   */
-       
+
    if ( ( temp != pntr ) && ( temp != NULL ) )
    {
       reg = cnfRegp( temp );
@@ -622,7 +622,7 @@ TRAIL_TYPE F77_EXTERNAL_NAME(cnf_cval)( INTEGER(FINT) ) {
 *     argument after the visible ones (see TRAIL). With some compilers this
 *     length is a 64bit long (INTEGER*8), whereas for others it is more
 *     typically a 32bit int (INTEGER*4). Using this function avoids the need
-*     to know which size is used for the configured compiler. 
+*     to know which size is used for the configured compiler.
 
 *  Arguments:
 *     FINT = INTEGER (Given)

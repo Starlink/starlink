@@ -1,4 +1,4 @@
- 
+
 *+  AIF_SORT1L - sort a 1-D array of type LOGICAL
       SUBROUTINE AIF_SORT1L( DIM, ARRAY, STATUS )
 *    Description :
@@ -64,47 +64,47 @@
       LOGICAL
      :  CURVAL       ! current smallest value during sorting
 *-
- 
+
 *   check for error on entry
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *   make FALSE come before TRUE
          CURVAL = .TRUE.
 
 *      loop through the array
          DO TEST = 1,DIM
- 
+
 *         initialise index to current element and current value
             CURR   = TEST
- 
+
 *         compare all ARRAY elements after test element
 *         against current value
- 
+
             DO INDEX = TEST+1, DIM
 
 *         Sorting LOGICAL array makes no sense
 *         Just put FALSE before TRUE
                IF( .NOT. ARRAY( INDEX ) ) THEN
- 
+
 *               have found a value in list which is less than current
 *               smallest value, this element becomes new current element
                   CURR   = INDEX
- 
+
                ENDIF
- 
+
             ENDDO
- 
+
             IF( CURR .NE. TEST ) THEN
- 
+
 *            a smaller value than the test value was found
 *            so swap the values round
                ARRAY( CURR ) = ARRAY( TEST )
                ARRAY( TEST ) = CURVAL
- 
+
             ENDIF
- 
+
          ENDDO
- 
+
       ENDIF
- 
+
       END

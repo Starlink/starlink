@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
-*                          int *status ) 
+*                          int *status )
 
 *  Arguments:
 *     array = smfArray* (Given and Returned)
@@ -42,7 +42,7 @@
 *     step. The gradient is calculated using the GSL multifit method
 *     and subtracted from the data values.
 
-*  Notes: 
+*  Notes:
 *     - There is a lot of duplicated code between this routine and
 *       smf_correct_extinction as they both work in the AzEl coordinate
 *       system
@@ -116,7 +116,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_plane2"
 
-void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky, 
+void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
 			  int *status ) {
 
   /* Local variables */
@@ -199,8 +199,8 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
            to continue to next set of related data files */
         if ( smf_history_check( data, FUNC_NAME, status) ) {
           msgSetc("F", FUNC_NAME);
-          msgOutif(MSG__VERB," ", 
-                   "^F has already been run on these data, returning to caller", 
+          msgOutif(MSG__VERB," ",
+                   "^F has already been run on these data, returning to caller",
                    status);
           return;
         }
@@ -222,7 +222,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
         /* Retrieve data array */
         indata = (data->pntr)[0];
         /* Offset into 3d data array */
-        base = nptsdat * k; 
+        base = nptsdat * k;
         /* Calculate sum of all pixels in current timeslice */
         for (i=0; i < nptsdat; i++ ) {
           index = base + i;
@@ -241,7 +241,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
         data = (array->sdata)[kk];
         indata = (data->pntr)[0];
         /* Subtract fit from timeslice */
-        base = nptsdat * k; 
+        base = nptsdat * k;
         for (i=0; i < nptsdat; i++ ) {
           index = i + base;
           if (indata[index] != VAL__BADD) {
@@ -255,10 +255,10 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       if (msgFlevok( MSG__DEBUG, status )) {
         msgSeti("K",k+1);
         msgSetc("F",fittype);
-        msgOutif(MSG__DEBUG," ", 
+        msgOutif(MSG__DEBUG," ",
                  " Fit results for timeslice ^K (fit type = ^F)", status );
         msgSetd("DS",sky0);
-        msgOutif(MSG__DEBUG," ", 
+        msgOutif(MSG__DEBUG," ",
                  "              Sky0   = ^DS, ", status );
       }
     }
@@ -274,7 +274,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
     /* Free resources if status is bad after trying to allocate
        memory */
     if ( *status != SAI__OK ) goto CLEANUP;
-   
+
     /* Calculate the indices into the data arrays. Note that this
        assumes that all of the related files have exactly the
        same-sized data arrays - but the input smfArray will only
@@ -315,14 +315,14 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
         wcs = hdr->wcs;
         if (wcs != NULL) {
           origsystem = astGetC( wcs, "SYSTEM");
-          if (strcmp(origsystem, "AZEL") != 0) {	  
+          if (strcmp(origsystem, "AZEL") != 0) {
             astSet( wcs, "SYSTEM=AZEL" );
           }
         } else {
           if ( *status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep( FUNC_NAME, 
-                    "Plane removal method requires WCS but input is NULL", 
+            errRep( FUNC_NAME,
+                    "Plane removal method requires WCS but input is NULL",
                     status);
           }
         }
@@ -331,7 +331,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
         /* Retrieve data array */
         indata = (data->pntr)[0];
         /* Offset into 3d data array */
-        base = nptsdat * k; 
+        base = nptsdat * k;
         /* Offset into azelmatx array */
         offset = kk*nptsdat;
         /* Copy new AzEl elements into GSL arrays */
@@ -378,7 +378,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
         data = (array->sdata)[kk];
         indata = (data->pntr)[0];
         /* Subtract fit from timeslice */
-        base = nptsdat * k; 
+        base = nptsdat * k;
         for (i=0; i < nptsdat; i++ ) {
           index = i + base;
           if (indata[index] != VAL__BADD) {
@@ -396,24 +396,24 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       if (msgFlevok( MSG__DEBUG, status )) {
         msgSeti("K",k+1);
         msgSetc("F",fittype);
-        msgOutif(MSG__DEBUG," ", 
+        msgOutif(MSG__DEBUG," ",
                  " Fit results for timeslice ^K (fit type = ^F)", status );
         msgSetd("DS",sky0);
-        msgOutif(MSG__DEBUG," ", 
+        msgOutif(MSG__DEBUG," ",
                  "              Sky0   = ^DS, ", status );
         msgSetd("DE",dskyel);
-        msgOutif(MSG__DEBUG," ", 
+        msgOutif(MSG__DEBUG," ",
                  "              Dskyel = ^DE, ", status );
         if ( dskyaz != 0 ) {
           msgSetd("DA",dskyaz);
-          msgOutif(MSG__DEBUG," ", 
+          msgOutif(MSG__DEBUG," ",
                    "              Dskyaz = ^DA", status );
         }
         msgSetd("X",chisq);
-        msgOutif(MSG__DEBUG," ", 
+        msgOutif(MSG__DEBUG," ",
                  "              X^2 = ^X", status );
       }
-      
+
     } /* End of loop over timeslice frame */
 
     /* Free up GSL workspace */

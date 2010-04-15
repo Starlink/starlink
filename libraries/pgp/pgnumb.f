@@ -12,7 +12,7 @@ C representation. To avoid problems of floating-point roundoff, the
 C number must be provided as an integer (MM) multiplied by a power of 10
 C (10**PP).  The output string retains only significant digits of MM,
 C and will be in either integer format (123), decimal format (0.0123),
-C or exponential format (1.23x10**5). Standard escape sequences \u, \d 
+C or exponential format (1.23x10**5). Standard escape sequences \u, \d
 C raise the exponent and \x is used for the multiplication sign.
 C This routine is used by PGBOX to create numeric labels for a plot.
 C

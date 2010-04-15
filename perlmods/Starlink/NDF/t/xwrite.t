@@ -82,7 +82,7 @@ ok($there, "Extension is present");
 ndf_open( $loca, "MAPCOORD", "WRITE", "UNKNOWN", my $cndf, $place, $status);
 is($cndf, 0, "No NDF ID");
 isnt($place, 0, "Place holder");
- 
+
 my @lbnd = (1);
 my @ubnd = (2);
 ndf_new( "_INTEGER", 1, @lbnd, @ubnd, $place, $cndf, $status );

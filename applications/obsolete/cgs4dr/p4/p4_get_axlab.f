@@ -101,9 +101,9 @@
       CALL CHR_PUTC( ']', SUBTITLE(PORT), CLEN1 )
 
 *    Get axis info
-      CALL DSA_GET_AXIS_INFO( 'DATA', 1, NINFO, AXIS1_INFO, 
+      CALL DSA_GET_AXIS_INFO( 'DATA', 1, NINFO, AXIS1_INFO,
      :  0, DIGNORE, STATUS )
-      CALL DSA_GET_AXIS_INFO( 'DATA', 2, NINFO, AXIS2_INFO, 
+      CALL DSA_GET_AXIS_INFO( 'DATA', 2, NINFO, AXIS2_INFO,
      :  0, DIGNORE, STATUS )
       IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
       IF ( AXIS1_INFO(1) .EQ. AXIS2_INFO(1) ) SAME = .TRUE.
@@ -118,7 +118,7 @@
       YLABEL( PORT ) = AXIS2_INFO(2)(1:CLEN2) // ' (' /
      :   / AXIS2_INFO(1)(1:CLEN1) // ')'
 
-*    Change labels for IMAGE plots      
+*    Change labels for IMAGE plots
       IF ( DISPLAY_TYPE( PORT ) .EQ. 'IMAGE' ) THEN
          IF ( DISPLAY_PLANE( PORT ) .NE. 'QUALITY' ) THEN
            CPOS = CHR_LEN( XLABEL(PORT) )
@@ -150,7 +150,7 @@
          CALL CHR_PUTC( '<Low; ', YLABEL(PORT), CPOS )
          CALL CHR_PUTI( TOOLARGE(PORT), YLABEL(PORT), CPOS )
          CALL CHR_PUTC( '>High]', YLABEL(PORT), CPOS )
-                              
+
          CPOS = 0
          CALL CHR_PUTC( 'X Range: ', RH1LABEL(PORT), CPOS )
          CALL CHR_PUTI( ISTART( PORT ), RH1LABEL(PORT), CPOS )

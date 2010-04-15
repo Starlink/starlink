@@ -1,9 +1,9 @@
 /*
  * gk0xrt_.c --- Module for handling a string tool on the Xlib workstation for
- * RAL GKS. 
+ * RAL GKS.
  *
  * Written by: A C Arnold, University of Manchester Computer Graphics Unit,
- * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405 
+ * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405
  *
  * 18/03/87 TAW Changed name to gk9srt_
  * 06/05/87  PJWR  Corrected to use GKS drawing area of bitmap rather than
@@ -40,7 +40,7 @@ extern char *sprintf();
  *   2001 Output parameter size insufficient.
  */
 
-f77_integer 
+f77_integer
 gk0xrt_(buff_len, string_ptr, length_ptr, string_len)
   char string_ptr[];
 f77_integer *buff_len, *length_ptr;

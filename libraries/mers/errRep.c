@@ -13,20 +13,20 @@
 *     errRep( const char * param, const char * text, int * status );
 
 *  Description:
-*     Report an error message. According to the error context, the 
-*     error message is either sent to the user or retained in the 
+*     Report an error message. According to the error context, the
+*     error message is either sent to the user or retained in the
 *     error table. The latter case allows the application to take
-*     further action before deciding if the user should receive the 
-*     message. On exit the values associated with any existing message 
-*     tokens are left undefined. On successful completion, the global 
-*     status is returned unchanged; if the status argument is set to 
-*     SAI__OK on entry, an error report to this effect is made on behalf 
-*     of the application and the status argument is returned set to 
+*     further action before deciding if the user should receive the
+*     message. On exit the values associated with any existing message
+*     tokens are left undefined. On successful completion, the global
+*     status is returned unchanged; if the status argument is set to
+*     SAI__OK on entry, an error report to this effect is made on behalf
+*     of the application and the status argument is returned set to
 *     ERR__BADOK; the given message is still reported with an associated
 *     status of ERR__UNSET.
 *     If an output error occurs, the status argument is
 *     returned set to ERR__OPTER. The status argument may also be returned
-*     set to an EMS_ fault error value, indicating an error occuring 
+*     set to an EMS_ fault error value, indicating an error occuring
 *     within the error reporting software.
 
 *  Arguments:
@@ -36,7 +36,7 @@
 *        The error message text.
 *     status = int * (Given & Returned)
 *        The global status: it is left unchanged on successful completion,
-*        or is set an appropriate error value if an internal error has 
+*        or is set an appropriate error value if an internal error has
 *        occurred.
 
 *  Algorithm:
@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

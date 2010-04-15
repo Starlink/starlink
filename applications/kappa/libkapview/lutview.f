@@ -22,22 +22,22 @@
 *  Description:
 *     This application displays a key to the current colour table on the
 *     specified image display device using the whole of the current
-*     colour table (excluding the low 16 pens which are reserved for 
+*     colour table (excluding the low 16 pens which are reserved for
 *     axis annotation, etc.).  The key can either be a simple
-*     rectangular block of colour which ramps through the colour table, 
+*     rectangular block of colour which ramps through the colour table,
 *     a histogram-style key in which the width of the block reflects the
 *     number of pixels allocated to each colour index, or a set of RGB
 *     intensity curves.  The choice is made using the STYLE parameter.
 *
-*     By default, numerical data values are displayed along the long 
+*     By default, numerical data values are displayed along the long
 *     edge of the key.  The values corresponding to the maximum and
-*     minimum colour index are supplied using parameters HIGH and LOW. 
-*     Intermediate colour indices are labelled with values which are 
+*     minimum colour index are supplied using parameters HIGH and LOW.
+*     Intermediate colour indices are labelled with values which are
 *     linearly interpolated between these two extreme values.
 *
 *     The rectangular area in which the key (plus annotations) is drawn
-*     may be specified either using a graphics cursor, or by specifying 
-*     the co-ordinates of two corners using parameters LBOUND and 
+*     may be specified either using a graphics cursor, or by specifying
+*     the co-ordinates of two corners using parameters LBOUND and
 *     UBOUND.  Additionally, there is an option to make the key fill the
 *     current picture.  See parameter MODE.  The key may be constrained
 *     to the current picture using parameter CURPIC.
@@ -46,17 +46,17 @@
 *     the STYLE parameter.
 
 *  Usage:
-*     lutview [mode] [low] [high] [curpic] [device] 
+*     lutview [mode] [low] [high] [curpic] [device]
 
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
 *        The component (within the NDF given by parameter NDF) which is
-*        currently displayed.  It may be "Data", "Quality", "Variance", 
-*        or "Error" (where "Error" is an alternative to "Variance" and 
-*        causes the square root of the variance values to be used).  If 
+*        currently displayed.  It may be "Data", "Quality", "Variance",
+*        or "Error" (where "Error" is an alternative to "Variance" and
+*        causes the square root of the variance values to be used).  If
 *        "Quality" is specified, then the quality values are treated as
-*        numerical values (in the range 0 to 255).  The dynamic default 
-*        is obtained from global parameter COMP which is set by 
+*        numerical values (in the range 0 to 255).  The dynamic default
+*        is obtained from global parameter COMP which is set by
 *        applications such as KAPPA:DISPLAY. []
 *     CURPIC = _LOGICAL (Read)
 *        If CURPIC is TRUE, the colour table key is to lie within the
@@ -76,25 +76,25 @@
 *        parameters LBOUND and UBOUND.  The following Frames will always
 *        be available.
 *
-*        - "GRAPHICS" -- gives positions in millimetres from the 
+*        - "GRAPHICS" -- gives positions in millimetres from the
 *        bottom-left corner of the plotting surface.
 *
-*        - "BASEPIC" -- gives positions in a normalised system in which 
+*        - "BASEPIC" -- gives positions in a normalised system in which
 *        the bottom-left corner of the plotting surface is (0,0) and the
 *        shortest dimension of the plotting surface has length 1.0.  The
 *        scales on the two axes are equal.
 *
 *        - "CURPIC" -- gives positions in a normalised system in which
-*        the bottom-left corner of the current picture is (0,0) and the 
+*        the bottom-left corner of the current picture is (0,0) and the
 *        shortest dimension of the current picture has length 1.0.  The
 *        scales on the two axes are equal.
 *
-*        - "NDC" -- gives positions in a normalised system in which the 
-*        bottom-left corner of the plotting surface is (0,0) and the 
+*        - "NDC" -- gives positions in a normalised system in which the
+*        bottom-left corner of the plotting surface is (0,0) and the
 *        top-right corner is (1,1).
 *
 *        - "CURNDC" -- gives positions in a normalised system in which
-*        the bottom-left corner of the current picture is (0,0) and the 
+*        the bottom-left corner of the current picture is (0,0) and the
 *        top-right corner is (1,1).
 *
 *        There may be additional Frames available, describing previously
@@ -110,12 +110,12 @@
 *        [Current display linear-scaling maximum]
 *     LBOUND = LITERAL (Read)
 *        Co-ordinates of the lower-left corner of the rectangular region
-*        containing the colour ramp and annotation, in the co-ordinate 
-*        Frame specified by parameter FRAME (supplying a colon ":" will 
+*        containing the colour ramp and annotation, in the co-ordinate
+*        Frame specified by parameter FRAME (supplying a colon ":" will
 *        display details of the selected co-ordinate Frame).  The
 *        position should be supplied as a list of formatted axis values
-*        separated by spaces or commas.  A null (!) value causes the 
-*        lower-left corner of the BASE or (if CURPIC is TRUE) current 
+*        separated by spaces or commas.  A null (!) value causes the
+*        lower-left corner of the BASE or (if CURPIC is TRUE) current
 *        picture to be used.
 *     LOW = _REAL (Read)
 *        The value corresponding to the minimum colour index.  It is
@@ -139,7 +139,7 @@
 *        being 3, and the second being arbitrary.  The method used to
 *        compress or expand the colour table if the second dimension is
 *        different from the number of unreserved colour indices is
-*        controlled by parameter NN.  Also the LUT's values must lie in 
+*        controlled by parameter NN.  Also the LUT's values must lie in
 *        the range 0.0--1.0. [!]
 *     MODE = LITERAL (Read)
 *        Method for defining the position, size and shape of the
@@ -152,20 +152,20 @@
 *        - "XY" -- The parameters LBOUND and UBOUND are used to get the
 *        limits.
 *
-*        - "Picture" -- The whole of the current picture is used.  
-*        Additional positioning options are available by using other 
-*        KAPPA applications to create new pictures and then specifying 
-*        the picture mode. 
+*        - "Picture" -- The whole of the current picture is used.
+*        Additional positioning options are available by using other
+*        KAPPA applications to create new pictures and then specifying
+*        the picture mode.
 *
 *        ["Cursor"]
 *     NDF = NDF (Read)
 *        The NDF defining the image values to be used if a
 *        histogram-style key is requested. This should normally be the
-*        NDF currently displayed in the most recently created DATA 
-*        picture.  If a value is supplied on the command line for this 
+*        NDF currently displayed in the most recently created DATA
+*        picture.  If a value is supplied on the command line for this
 *        parameter it will be used.  Otherwise, the NDF to used is found
-*        by interrogating the graphics database (which contains 
-*        references to displayed images).  If no reference NDF can be 
+*        by interrogating the graphics database (which contains
+*        references to displayed images).  If no reference NDF can be
 *        obtained from the graphics database, the user will be prompted
 *        for a value.
 *     NN = _LOGICAL (Read)
@@ -176,12 +176,12 @@
 *        this is suitable for smoothly varying colour tables.  NN is
 *        ignored unless LUT is not null.  [FALSE]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to 
+*        A group of attribute settings describing the plotting style to
 *        use for the annotation.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
-*        file preceded by an up-arrow character "^".  Such text files 
+*        file preceded by an up-arrow character "^".  Such text files
 *        should contain further comma-separated lists which will be read
 *        and interpreted in the same manner.  Attribute settings are
 *        applied in the order in which they occur within the list, with
@@ -192,28 +192,28 @@
 *
 *           <name>=<value>
 *
-*        where <name> is the name of a plotting attribute, and <value> 
+*        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied.  See section 
+*        defaulted if a null value (!) is supplied.  See section
 *        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored 
-*        (no error is reported). 
+*        available attributes.  Any unrecognised attributes are ignored
+*        (no error is reported).
 *
 *        Axis 1 is always the "data value" axis, whether it is displayed
 *        horizontally or vertically.  So for instance, to set the label
-*        for the data value axis, assign a value to "Label(1)" in the 
-*        supplied style. 
+*        for the data value axis, assign a value to "Label(1)" in the
+*        supplied style.
 *
 *        To get a ramp key (the default), specify "form=ramp".  To
-*        get a histogram key (a coloured histogram of pen indices), 
+*        get a histogram key (a coloured histogram of pen indices),
 *        specify "form=histogram".  To get a graph key (three curves of
-*        RGB intensities), specify "form=graph".  If a histogram key 
-*        is produced, the population axis can be either logarithmic or 
+*        RGB intensities), specify "form=graph".  If a histogram key
+*        is produced, the population axis can be either logarithmic or
 *        linear. To get a logarithmic population axis, specify
 *        "logpop=1".  To get a linear population axis, specify
 *        "logpop=0" (the default).  To annotate the long axis with pen
-*        numbers instead of pixel value, specify "pennums=1" (the 
+*        numbers instead of pixel value, specify "pennums=1" (the
 *        default, "pennums=0", shows pixel values).  [current value]
 *     UBOUND = LITERAL (Read)
 *        Co-ordinates of the upper-right corner of the rectangular
@@ -221,19 +221,19 @@
 *        co-ordinate Frame specified by parameter FRAME (supplying a
 *        colon ":" will display details of the selected co-ordinate
 *        Frame).  The position should be supplied as a list of formatted
-*        axis values separated by spaces or commas.  A null (!) value 
+*        axis values separated by spaces or commas.  A null (!) value
 *        causes the lower-left corner of the BASE or (if CURPIC is TRUE)
 *        the current picture to be used.
 
 *  Examples:
-*     lutview 
+*     lutview
 *        Draws an annotated colour table at a position selected via
 *        the cursor on the current image-display device.
 *     lutview style='form=hist,logpop=1'
 *        As above, but the key has the form of a coloured histogram of
 *        the pen numbers in the most recently displayed image.  The
-*        second axis displays the logarithm (base 10) of the bin 
-*        population. 
+*        second axis displays the logarithm (base 10) of the bin
+*        population.
 *     lutview style='form=graph,pennums=1'
 *        The key is drawn as a set of three (or one if a monochrome
 *        colour table is in use) curves indicating the red, green and
@@ -353,8 +353,8 @@
       INTEGER IPICB            ! AGI id. for Base picture
       INTEGER IPICD            ! AGI id. for most recent DATA picture
       INTEGER IPICK            ! AGI id. for new KEY picture
-      INTEGER IPIN             ! Pointer to input pixel array 
-      INTEGER IPLOT            ! Pointer to AST Plot 
+      INTEGER IPIN             ! Pointer to input pixel array
+      INTEGER IPLOT            ! Pointer to AST Plot
       INTEGER IPLUT            ! Pointer to LUT array
       INTEGER LDIMS( 2 )       ! Dimensions of input LUT array
       INTEGER LP               ! Lowest pen with which to display the image
@@ -390,13 +390,13 @@
       CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC, STATUS )
 
 *  Check whether the chosen device is an 'image display' with a suitable
-*  minimum number of colour indices, and obtain the number of colour 
+*  minimum number of colour indices, and obtain the number of colour
 *  indices.
       CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'//
-     :                 'WINDOW,MATRIX_PRINTER', ' ', MINCOL, UP, 
+     :                 'WINDOW,MATRIX_PRINTER', ' ', MINCOL, UP,
      :                 STATUS )
 
-*  Define the lowest pen number for the image.  0 is reserved for the 
+*  Define the lowest pen number for the image.  0 is reserved for the
 *  background.  Others are reserved for annotations.
       LP = CTM__RSVPN
 
@@ -415,31 +415,31 @@
          GOTLIM = ( STATUS .EQ. SAI__OK )
 
          IF( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )      
+            CALL ERR_ANNUL( STATUS )
             HIGH = REAL( UP ) + 0.5
             LOW = REAL( LP ) - 0.5
             LABEL = 'Pen Number'
-         END IF         
+         END IF
       END IF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Indicate that we have no colour index data for the currently displayed 
+*  Indicate that we have no colour index data for the currently displayed
 *  image.
       NCOL = 0
 
 *  We can only produce a histogram if low and high data values were
 *  supplied.
-      IF( GOTLIM ) THEN 
+      IF( GOTLIM ) THEN
 
 *  Find the most recent DATA picture.
          CALL KPG1_AGFND( 'DATA', IPICD, STATUS )
 
 *  If a DATA picture was found...
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Re-instate the original current picture. 
+*  Re-instate the original current picture.
             CALL AGI_SELP( IPIC, STATUS )
 
 *  Obtain a reference to the NDF.
@@ -462,7 +462,7 @@
             CALL ERR_ANNUL( STATUS )
          ELSE
 
-*  Find which component of the NDF to use. MCOMP is for use with NDF_MAP and 
+*  Find which component of the NDF to use. MCOMP is for use with NDF_MAP and
 *  may be set to 'Error'. COMP is for use with all other NDF routines (which
 *  do not accept 'Error' as an NDF component name), and has 'Variance' in
 *  place of 'Error'.
@@ -476,21 +476,21 @@
             CALL PSX_CALLOC( NCOL, '_INTEGER', IPCOL, STATUS )
 
 *  Produce the colour index corresponding to each data value.
-            CALL KPG1_ISCLR( .TRUE., NCOL, 1, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL KPG1_ISCLR( .TRUE., NCOL, 1, %VAL( CNF_PVAL( IPIN ) ),
      :                       .FALSE.,
-     :                       LOW, HIGH, LP, UP, 0, 
+     :                       LOW, HIGH, LP, UP, 0,
      :                       %VAL( CNF_PVAL( IPCOL ) ),
      :                       STATUS )
 
 * Annul the NDF identifier.
             CALL NDF_ANNUL( INDF1, STATUS )
- 
+
          END IF
 
       END IF
 
 *  Get an AGI identifier for the Base picture.
-      CALL AGI_IBASE( IPICB, STATUS ) 
+      CALL AGI_IBASE( IPICB, STATUS )
 
 *  See how the area to use for the LUT key is to be specified.
       CALL PAR_CHOIC( 'MODE', 'Cursor', 'Cursor,XY,Picture', .FALSE.,
@@ -514,7 +514,7 @@
 *  view surface.
       CALL KPG1_GDGET( -1, AST__NULL, .FALSE., IPLOT, STATUS )
 
-*  Get the bounds of the current picture. The values will be returned in 
+*  Get the bounds of the current picture. The values will be returned in
 *  millimetres from the bottom left corner of the view surface.
       CALL PGQWIN( X1, X2, Y1, Y2 )
 
@@ -525,19 +525,19 @@
          AMES( 1 ) = 'Select a corner position'
          AMES( 2 ) = 'Exit'
 
-*  Get two corner positions using the cursor, in PGPLOT world co-ordinates. 
-*  This corresponds to the Base (i.e. GRAPHICS) Frame of the Plot (millimetres 
-*  from the bottom left corner of the view surface). The positions which 
+*  Get two corner positions using the cursor, in PGPLOT world co-ordinates.
+*  This corresponds to the Base (i.e. GRAPHICS) Frame of the Plot (millimetres
+*  from the bottom left corner of the view surface). The positions which
 *  may be selected are restricted to the current picture.
-         CALL KPG1_PGCUR( .TRUE., 'select two opposite corners', 2, 
-     :                   AMES, 'A.', X1, X2, Y1, Y2, 0, 0.5*( X1 + X2 ), 
+         CALL KPG1_PGCUR( .TRUE., 'select two opposite corners', 2,
+     :                   AMES, 'A.', X1, X2, Y1, Y2, 0, 0.5*( X1 + X2 ),
      :                   0.5*( Y1 + Y2 ), 2, 2, 0, 0, -32, AST__NULL,
      :                   RXC, RYC, ACT, NP, STATUS )
 
 *  Abort if less than two positions were supplied.
          IF( NP .LT. 2 .OR. STATUS .NE. SAI__OK ) GO TO 999
 
-*  Copy the corners to double precision variables. These values are in the 
+*  Copy the corners to double precision variables. These values are in the
 *  GRAPHICS Frame (millimetres from bottom left corner of view surface).
          C1( 1 ) = DBLE( RXC( 1 ) )
          C1( 2 ) = DBLE( RYC( 1 ) )
@@ -557,7 +557,7 @@
 *  If the CURPIC Frame was selected, and the current picture is the BASE
 *  picture, change the Current Frame to BASEPIC for clarity.
          IF( AST_GETC( IPLOT, 'DOMAIN', STATUS ) .EQ. 'CURPIC' ) THEN
-            CALL AGI_ISAMP( IPICB, SAME, STATUS ) 
+            CALL AGI_ISAMP( IPICB, SAME, STATUS )
             IF( SAME ) THEN
                CALL KPG1_ASFFR( IPLOT, 'BASEPIC', IFRM, STATUS )
                IF( IFRM .NE. AST__NOFRAME ) THEN
@@ -569,7 +569,7 @@
 *  If the CURNDC Frame was selected, and the current picture is the BASE
 *  picture, change the Current Frame to NDC for clarity.
          IF( AST_GETC( IPLOT, 'DOMAIN', STATUS ) .EQ. 'CURNDC' ) THEN
-            CALL AGI_ISAMP( IPICB, SAME, STATUS ) 
+            CALL AGI_ISAMP( IPICB, SAME, STATUS )
             IF( SAME ) THEN
                CALL KPG1_ASFFR( IPLOT, 'NDC', IFRM, STATUS )
                IF( IFRM .NE. AST__NOFRAME ) THEN
@@ -587,19 +587,19 @@
          IN( 1, 2 ) = Y1
          IN( 2, 1 ) = X2
          IN( 2, 2 ) = Y2
-         CALL AST_TRANN( IPLOT, 2, 2, 2, IN, .TRUE., NAX, 2, OUT, 
+         CALL AST_TRANN( IPLOT, 2, 2, 2, IN, .TRUE., NAX, 2, OUT,
      :                   STATUS )
 
 *  Get the position of a corner, using a corner of the current picture as
-*  the default. C1 is returned holding the corresponding GRAPHICS (Base 
+*  the default. C1 is returned holding the corresponding GRAPHICS (Base
 *  Frame) position.
          DO I = 1, NAX
             CC( I ) = OUT( 1, I )
          END DO
          CALL KPG1_GTPOS( 'LBOUND', IPLOT, .TRUE., CC, C1, STATUS )
 
-*  Get the position of a second corner, using the other corner of the 
-*  current picture as the default. C2 is returned holding the corresponding 
+*  Get the position of a second corner, using the other corner of the
+*  current picture as the default. C2 is returned holding the corresponding
 *  GRAPHICS (Base Frame) position.
          DO I = 1, NAX
             CC( I ) = OUT( 2, I )
@@ -632,7 +632,7 @@
       END IF
 
 *  Set the PGPLOT viewport to these bounds.
-      CALL  KPG1_PGCUT( REAL( C1( 1 ) ), REAL( C2( 1 ) ), 
+      CALL  KPG1_PGCUT( REAL( C1( 1 ) ), REAL( C2( 1 ) ),
      :                  REAL( C1( 2 ) ), REAL( C2( 2 ) ), STATUS )
 
 *  Save the current viewport as a new KEY picture in the graphics database.
@@ -663,14 +663,14 @@
          CALL PAR_GTD0L( 'NN', .FALSE., .TRUE., NN, STATUS )
 
 *  Install the lookup table into image-display colour table.
-         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( CNF_PVAL( IPLUT ) ), 
+         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( CNF_PVAL( IPLUT ) ),
      :                    LP, UP, NN,
      :                    STATUS )
 
       END IF
 
 *  Create the LUT key within the KEY Picture.
-      CALL KPG1_LUTKY( IPICK, 'STYLE', HIGH, LOW, LABEL, 
+      CALL KPG1_LUTKY( IPICK, 'STYLE', HIGH, LOW, LABEL,
      :                 'KAPPA_LUTVIEW', LP, UP, 0.0, 0.0, 0.0, 'CC',
      :                 NCOL, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
 
@@ -678,7 +678,7 @@
  999  CONTINUE
 
 *  Deallocate any colour index array.
-      IF( NCOL .GT. 0 ) CALL PSX_CALLOC( NCOL, '_INTEGER', IPCOL, 
+      IF( NCOL .GT. 0 ) CALL PSX_CALLOC( NCOL, '_INTEGER', IPCOL,
      :                                   STATUS )
 
 *  Shutdown PGPLOT and the graphics database.

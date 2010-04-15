@@ -18,7 +18,7 @@
 *     This subroutine is used to draw great circle sections specified by
 *     their start positions, their position angle and their lengths. If
 *     the given length of a great circle section is 0, a longest great
-*     circle section will be drawn over the image. 
+*     circle section will be drawn over the image.
 
 *  Arguments:
 *     IRA = INTEGER (Given)
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -61,7 +61,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
-                   
+
 *  Arguments Given:
       INTEGER IRA
       CHARACTER*( * ) SCS

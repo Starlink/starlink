@@ -23,7 +23,7 @@
 *     parKeymap = AstKeyMap* (Given)
 *        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *
@@ -67,7 +67,7 @@
 #include "ast.h"
 #include "star/grp.h"
 
-void sc2fts_groupcoadd 
+void sc2fts_groupcoadd
 (
 Grp *igrp,
 Grp* ogrp,

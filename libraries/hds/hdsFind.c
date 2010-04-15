@@ -62,7 +62,7 @@ F77_SUBROUTINE( hds_find )( CHARACTER( floc1 ),
  *     hdsFind
  *
  *  Purpose:
- *     Obtain a locator to a named component, the component name may be a 
+ *     Obtain a locator to a named component, the component name may be a
  *     structure (name.component1.component2 etc.).
  *
  *  Params:
@@ -73,7 +73,7 @@ F77_SUBROUTINE( hds_find )( CHARACTER( floc1 ),
  *     status = global status
  *
  */
-void hdsFind( const HDSLoc *loc1, const char *name, const char *mode, 
+void hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
               HDSLoc **loc2, int *status )
 {
     DECLARE_CHARACTER(floc1,DAT__SZLOC);
@@ -98,7 +98,7 @@ void hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
                           TRAIL_ARG( fname )
                           TRAIL_ARG( fmode )
                           TRAIL_ARG( floc2 ) );
-    
+
     F77_FREE_CHARACTER( fname );
     F77_FREE_CHARACTER( fmode );
     HDS_IMPORT_FLOCATOR( floc2, loc2, status );

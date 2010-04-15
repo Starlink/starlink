@@ -161,7 +161,7 @@
 /* Initialise the Header Control Block stamp, version and end-of-file	    */
 /* fields.								    */
 	    hcb->stamp = REC__STAMP;
-            if( hds_gl_64bit ) 
+            if( hds_gl_64bit )
                hcb->version = REC__VERSION4;
             else
                hcb->version = REC__VERSION3;
@@ -176,7 +176,7 @@
 	    }
 	    hcb->stk[ REC__MXSTK - 1 ].bloc = 2;
 	    hcb->stk[ REC__MXSTK - 1 ].spare = inalq - 1;
-	 
+
 /* Set up the parent handle for the top level record and create this	    */
 /* record.								    */
             par.slot = slot;
@@ -191,7 +191,7 @@
       else
       {
          rec1_open_file( expand, file, file_len, mode, &slot, &newslot );
-         if ( _ok( hds_gl_status ) ) 
+         if ( _ok( hds_gl_status ) )
          {
              han->slot = slot;
              han->read = ( mode == 'R' );
@@ -245,7 +245,7 @@ file.",
                  {
                     rec_close_file( han );
                  }
-             } 
+             }
              else        /* !newslot */
              {
                  hds_gl_64bit = ( rec_ga_fcv[ slot ].hds_version > REC__VERSION3 );

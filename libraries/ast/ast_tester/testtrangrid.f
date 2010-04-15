@@ -5,7 +5,7 @@
       include 'PRM_PAR'
 
       integer status, i, m, outp(4), inp(4), c1, c2, c3, c4, fc, fs
-      double precision at(4), r, mat(4), b1(2), b2(2), a1(2), 
+      double precision at(4), r, mat(4), b1(2), b2(2), a1(2),
      :                 a2(4)
       character cards(9)*80
 
@@ -14,19 +14,19 @@
       at(1) = 10.0D0
       at(2) = 1.2D6
 
-*  UnitMap 
+*  UnitMap
       m = ast_unitmap( 2, ' ', status )
       call testmap( m, 1, 0.5D0, status )
 
-*  ZoomMap 
+*  ZoomMap
       m = ast_zoommap( 2, 2.0D0, ' ', status )
       call testmap( m, 2, 0.5D0, status )
 
-*  MatrixMap 
+*  MatrixMap
       m = ast_matrixmap( 2, 2, 2, mat, ' ', status )
       call testmap( m, 3, 0.5D0, status )
 
-*  PermMap 
+*  PermMap
       outp(1)=2
       outp(2)=1
       inp(1)=2
@@ -34,7 +34,7 @@
       m = ast_permmap( 2, inp, 2, outp, 0.0D0, ' ', status )
       call testmap( m, 4, 0.5D0, status )
 
-*  TranMap 
+*  TranMap
       a1( 1 ) = 0.0D0
       a1( 2 ) = 0.0D0
       a2( 1 ) = 1.0D0
@@ -49,7 +49,7 @@
       m = ast_tranmap( c1, c2, ' ', status )
       call testmap( m, 5, 0.5D0, status )
 
-*  3D CmpMap 
+*  3D CmpMap
       mat(1) = -1.0D0
       c1 = ast_shiftmap( 1, mat, ' ', status )
       mat(1)= 1.0D0
@@ -78,7 +78,7 @@
 
 
 * 1D non-linear Mapping
-      m = ast_mathmap( 1, 1, 1, 'y=x**3', 1, 
+      m = ast_mathmap( 1, 1, 1, 'y=x**3', 1,
      :                 'x=sign((abs(y)**(1/3)),y)', ' ', status )
       call testmap( m, 7, 0.0001D0, status )
 
@@ -151,10 +151,10 @@
       include 'SAE_PAR'
       include 'AST_PAR'
 
-      integer status, lbnd( 3 ), ubnd( 3 ), nin, nout, i, outdim, 
+      integer status, lbnd( 3 ), ubnd( 3 ), nin, nout, i, outdim,
      :         maxpix, itest, size, pos(3), j, map, lbndi(3), ubndi(3)
       logical fwd
-      double precision tol, xl(3), xu(3), dlbndi(3), dubndi(3), 
+      double precision tol, xl(3), xu(3), dlbndi(3), dubndi(3),
      :                 dlbnd(3), dubnd(3)
 
       data lbnd / -6, 0, 10 /
@@ -173,19 +173,19 @@
          dubnd( i ) = ubnd( i )
       end do
 
-      call testgrid( map, nin, lbnd, ubnd, tol, maxpix, .true., nout, 
+      call testgrid( map, nin, lbnd, ubnd, tol, maxpix, .true., nout,
      :               outdim, itest, status )
 
       outdim = 1
       do i = 1, nout
-         call ast_mapbox( map, dlbnd, dubnd, .true., i, dlbndi(i), 
+         call ast_mapbox( map, dlbnd, dubnd, .true., i, dlbndi(i),
      :                    dubndi(i), xl, xu, status )
-         lbndi( i ) = dlbndi( i ) 
-         ubndi( i ) = dubndi( i ) 
+         lbndi( i ) = dlbndi( i )
+         ubndi( i ) = dubndi( i )
          outdim = outdim*( ubndi( i ) - lbndi( i ) + 1 )
       end do
 
-      call testgrid( map, nout, lbndi, ubndi, tol, maxpix, .false., nin, 
+      call testgrid( map, nout, lbndi, ubndi, tol, maxpix, .false., nin,
      :               outdim, itest + 1, status )
 
 
@@ -195,7 +195,7 @@
 
 
 
-      subroutine testgrid( map, nin, lbnd, ubnd, tol, maxpix, fwd, nout, 
+      subroutine testgrid( map, nin, lbnd, ubnd, tol, maxpix, fwd, nout,
      :                     outdim, itest, status )
       implicit none
       include 'SAE_PAR'
@@ -203,7 +203,7 @@
       integer MAXPNT
       parameter( MAXPNT = 50000 )
 
-      integer status, lbnd( 3 ), ubnd( 3 ), nin, nout, i, outdim, 
+      integer status, lbnd( 3 ), ubnd( 3 ), nin, nout, i, outdim,
      :         maxpix, itest, pos(3), j, map
       logical fwd
       double precision tol, out( MAXPNT, 3 ), in( MAXPNT, 3 )
@@ -219,18 +219,18 @@
 
 *  Create a regular grid of positions within the input space of the
 *  Mapping, and transform it to the output space of the Mapping.
-      call ast_trangrid( map, nin, lbnd, ubnd, tol, maxpix, fwd, 
+      call ast_trangrid( map, nin, lbnd, ubnd, tol, maxpix, fwd,
      :                   nout, MAXPNT, out, status )
 
 *  Convert the transformed output positions back into the input space.
-      call ast_trann( map, outdim, nout, MAXPNT, out, .not. fwd, nin, 
+      call ast_trann( map, outdim, nout, MAXPNT, out, .not. fwd, nin,
      :                MAXPNT, in, status )
 
 *  Check the input space positions are close to a regular grid.
-      if( status .eq. sai__ok ) then 
+      if( status .eq. sai__ok ) then
 
          do i = 1, nin
-            pos( i ) = lbnd( i ) 
+            pos( i ) = lbnd( i )
          end do
 
          do j = 1, outdim
@@ -238,7 +238,7 @@
             do i = 1, nin
 
                if( pos( i ) .ne. 0 ) then
-                  if( abs( in( j, i ) - pos( i ) ) .gt. 
+                  if( abs( in( j, i ) - pos( i ) ) .gt.
      :                1.0E-6*abs( 0.5*( in( j, i ) + pos( i ) ) ) ) then
                      status = sai__error
                      write(*,*) 'Test ',itest,' failed at point ',j,
@@ -259,16 +259,16 @@
 
             pos( 1 ) = pos( 1 ) + 1
             if( pos( 1 ) .gt. ubnd( 1 ) ) then
-               pos( 1 ) = lbnd( 1 ) 
+               pos( 1 ) = lbnd( 1 )
                if( nin .gt. 1 ) then
                   pos( 2 ) = pos( 2 ) + 1
                   if( pos( 2 ) .gt. ubnd( 2 ) ) then
-                     pos( 2 ) = lbnd( 2 ) 
+                     pos( 2 ) = lbnd( 2 )
                      if( nin .gt. 2 ) then
                         pos( 3 ) = pos( 3 ) + 1
                      end if
                   end if
-               end if               
+               end if
             end if
          end do
       end if

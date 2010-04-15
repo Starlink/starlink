@@ -47,7 +47,7 @@
 *        Initial version
 *     2007-07-10 (EC):
 *        Changed smfArray.sdata to static array and altered behaviour
-*        so that smfArray.ndat reflects true number of allocated smfData. 
+*        so that smfArray.ndat reflects true number of allocated smfData.
 *     2008-07-14 (TIMJ):
 *        Use dynamically resizing buffer.
 *     2008-08-27 (TIMJ):

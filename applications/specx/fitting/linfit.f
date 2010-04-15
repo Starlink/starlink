@@ -160,7 +160,7 @@ C         get residuals, so *NCH instead of *N
         IFAIL = 51
         GO TO 999
       END IF
-      
+
       NBW = 4*NPARAM*(NPARAM+5)
       ISTAT = IGETVM (NBW, .TRUE., 'LINFIT', IWPTR)
       IF (ISTAT .ne. 0) THEN
@@ -186,7 +186,7 @@ C   Output parameters of least-squares baseline
       WRITE (ILOUT,1070) ITS,ASUMSQ
       CALL DISPLAY_GAUSS (IFAIL)
 
-C   Calculate least square baseline 
+C   Calculate least square baseline
 
       N = NCH
       DO I = 1, NCH

@@ -84,7 +84,7 @@
       INTEGER FRM                ! WCS Frame
       INTEGER SIZE               ! Size of group.
 
-*. 
+*.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -95,18 +95,18 @@
 *  Get the current Frame in the Plot.
       FRM = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
 
-*  If the current Frame is a simple Frame, add a simple COFRAME statement 
+*  If the current Frame is a simple Frame, add a simple COFRAME statement
 *  containing just the domain name.
       IF( CHR_SIMLR( AST_GETC( FRM, 'CLASS', STATUS ), 'FRAME' ) ) THEN
          TEXT = 'COFRAME('
          IAT = 8
          CALL CHR_APPND( AST_GETC( FRM, 'DOMAIN', STATUS ), TEXT, IAT )
          CALL CHR_APPND( ')', TEXT, IAT )
-         CALL GRP_PUT( IGRP2, 1, TEXT( : IAT ), 0, STATUS ) 
- 
-*  If the current Frame in Plot is a SkyFrame, add a COFRAME statement 
+         CALL GRP_PUT( IGRP2, 1, TEXT( : IAT ), 0, STATUS )
+
+*  If the current Frame in Plot is a SkyFrame, add a COFRAME statement
 *  containing the major extra SkyFrame attributes (if set).
-      ELSE IF( CHR_SIMLR( AST_GETC( FRM, 'CLASS', STATUS ), 
+      ELSE IF( CHR_SIMLR( AST_GETC( FRM, 'CLASS', STATUS ),
      :                    'SKYFRAME' ) ) THEN
          TEXT = 'COFRAME(SKY,SYSTEM='
          IAT = 19
@@ -114,36 +114,36 @@
 
          IF( AST_TEST( FRM, 'EQUINOX', STATUS ) ) THEN
             CALL CHR_APPND( ',EQUINOX=', TEXT, IAT )
-            CALL CHR_APPND( AST_GETC( FRM, 'EQUINOX', STATUS ), TEXT, 
+            CALL CHR_APPND( AST_GETC( FRM, 'EQUINOX', STATUS ), TEXT,
      :                      IAT )
          END IF
 
          IF( AST_TEST( FRM, 'EPOCH', STATUS ) ) THEN
             CALL CHR_APPND( ',EPOCH=', TEXT, IAT )
-            CALL CHR_APPND( AST_GETC( FRM, 'EPOCH', STATUS ), TEXT, 
+            CALL CHR_APPND( AST_GETC( FRM, 'EPOCH', STATUS ), TEXT,
      :                      IAT )
          END IF
 
          CALL CHR_APPND( ')', TEXT, IAT )
-         CALL GRP_PUT( IGRP2, 1, TEXT( : IAT ), 0, STATUS ) 
+         CALL GRP_PUT( IGRP2, 1, TEXT( : IAT ), 0, STATUS )
 
 *  For other classes of Frame, write out the full Frame description using
 *  a WCS statement.
-      ELSE 
+      ELSE
 
-*  Create a FrameSet holding just the current Frame of the Plot, and 
+*  Create a FrameSet holding just the current Frame of the Plot, and
 *  put it into the new group.
-         CALL ARD_PTWCS( AST_FRAMESET( FRM, ' ', STATUS ), IGRP2, 
+         CALL ARD_PTWCS( AST_FRAMESET( FRM, ' ', STATUS ), IGRP2,
      :                   STATUS )
 
       END IF
 
-*  Now append the contents of the supplied group to the end of the new 
-*  group. 
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )      
+*  Now append the contents of the supplied group to the end of the new
+*  group.
+      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
       DO I = 1, SIZE
          CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
-         CALL GRP_PUT( IGRP2, 1, TEXT, 0, STATUS ) 
+         CALL GRP_PUT( IGRP2, 1, TEXT, 0, STATUS )
       END DO
 
 *  Delete the original group.

@@ -108,7 +108,7 @@
 
 *.
 
-*  Handle different quality methods separately.  
+*  Handle different quality methods separately.
 
       IF (QUALITY) THEN
 

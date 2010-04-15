@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -66,7 +66,7 @@
 #include "img1.h"
 
 /*  Define the various names of the subroutines. Note we use two
-    macros that join the parts to the type because of use of ## 
+    macros that join the parts to the type because of use of ##
     needs to be deferred a while!
     */
 
@@ -84,7 +84,7 @@
     modules. */
 
 /*  Default type information */
-#define IMG_F77_TYPE 
+#define IMG_F77_TYPE
 #define IMG_SHORT_C_TYPE
 #define IMG_FULL_C_TYPE float
 #include "imgNew1Gen.h"
@@ -126,7 +126,7 @@
 
 #define IMG_F77_TYPE uw
 #define IMG_SHORT_C_TYPE US
-#define IMG_FULL_C_TYPE unsigned short 
+#define IMG_FULL_C_TYPE unsigned short
 #include "imgNew1Gen.h"
 
 /*  Integer */
@@ -156,7 +156,7 @@
 
 #define IMG_F77_TYPE d
 #define IMG_SHORT_C_TYPE D
-#define IMG_FULL_C_TYPE double 
+#define IMG_FULL_C_TYPE double
 #include "imgNew1Gen.h"
 
 /* $Id$ */

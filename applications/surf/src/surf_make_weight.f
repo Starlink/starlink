@@ -4,21 +4,21 @@
 *     SCUMAKEWT
 
 *  Purpose:
-*     Create weights array for dual beam deconvolution 
+*     Create weights array for dual beam deconvolution
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_MAKE_WEIGHT( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     Construct an NDF holding the weights array for a particular
 *     chop throw and the Fourier Transform (FT) of the chop function
@@ -90,7 +90,7 @@
 *  History:
 *     $Id$
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -159,7 +159,7 @@
       CALL NDF_BEGIN
 
 *     Ask for template NDF from LIKE parameter
-      
+
       CALL NDF_ASSOC('LIKE', 'READ', INDF, STATUS)
 
 *     If we received NULL status, read from SIZE
@@ -198,7 +198,7 @@
      :              'least 2 dimensions (has ^ND)', STATUS)
 
             ELSE IF (NDIM .GT. 2) THEN
-               
+
                CALL MSG_OUTIF(MSG__QUIET, 'Warning: Template NDF '//
      :              'has greater than 2 dimensions - only using'//
      :              ' first two', STATUS)
@@ -303,7 +303,7 @@
 *  calculate the required F.T.
 
          CALL SURFLIB_2DFT_CHOP (CHOP_THROW, CHOP_PA, PIXSIZE, IDIMS(1),
-     :        IDIMS(2), %VAL(CNF_PVAL(FT_D_PTR)), 
+     :        IDIMS(2), %VAL(CNF_PVAL(FT_D_PTR)),
      :        %VAL(CNF_PVAL(FT_V_PTR)), %VAL(CNF_PVAL(WT_D_PTR)),
      :        %VAL(CNF_PVAL(WT_V_PTR)), STATUS)
 

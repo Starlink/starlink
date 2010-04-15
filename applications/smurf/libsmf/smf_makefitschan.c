@@ -13,21 +13,21 @@
 *     C function
 
 *  Invocation:
-*     smf_makefitschan( const char *system, double crpix[2], double crval[2], 
-*                       double cdelt[2], double crota2, AstFitsChan *fc, 
+*     smf_makefitschan( const char *system, double crpix[2], double crval[2],
+*                       double cdelt[2], double crota2, AstFitsChan *fc,
 *                       int *status );
 
 *  Arguments:
 *     system = char * (Given)
-*        Specifies the celestial coordinate system. It should be a 
+*        Specifies the celestial coordinate system. It should be a
 *        valid value for the System attribute of an AST SkyFrame.
 *     crpix = double[ 2 ] (Given)
 *        Reference pixel associated with position crval[].
 *     crval = double[ 2 ] (Given)
-*        The longitude and latitude to use as the tangent point in the output 
-*        cube, in radians in the system specified by "system". 
+*        The longitude and latitude to use as the tangent point in the output
+*        cube, in radians in the system specified by "system".
 *     cdelt = double[ 2 ] (Given)
-*        Spatial pixel sizes for the output cube at the tangent point, in 
+*        Spatial pixel sizes for the output cube at the tangent point, in
 *        radians. The correct sign will be applied automatically basedon
 *        on "system".
 *     crota2 = double (Given)

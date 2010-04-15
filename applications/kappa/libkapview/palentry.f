@@ -47,10 +47,10 @@
 *          commas or spaces.  Each value must lie in the range 0.0--1.0.
 *          For example, "0.7,0.7,1.0" would give a pale blue.
 *
-*          o  An HTML colour code such as #ff002d.  
+*          o  An HTML colour code such as #ff002d.
 *
 *     DEVICE = DEVICE (Read)
-*        Name of the image display to be used. 
+*        Name of the image display to be used.
 *        [Current image-display device]
 *     PALNUM = _INTEGER (Read)
 *        The number of the palette entry whose colour is to be
@@ -69,9 +69,9 @@
 
 *  Notes:
 *     - The effects of this command will only be immediately apparent
-*     when run on X windows which have 256 colours (or other similar 
+*     when run on X windows which have 256 colours (or other similar
 *     pseudocolour devices).  On other devices (for instance, X windows
-*     with more than 256 colours) the effects will only become apparent 
+*     with more than 256 colours) the effects will only become apparent
 *     when subsequent graphics applications are run.
 
 *  Related Applications:
@@ -127,7 +127,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,7 +143,7 @@
       PARAMETER ( NPRICL = 3 )
 
 *  Local Variables:
-      INTEGER PALNUM             ! Palette entry number to have its 
+      INTEGER PALNUM             ! Palette entry number to have its
                                  ! colour changed
       INTEGER IPIC               ! AGI identifier for current picture
       INTEGER UP                 ! Highest available colour index
@@ -171,14 +171,14 @@
       CALL KPG1_GPCOL( 'COLOUR', RGBINT, STATUS )
 
 *  Install the palette into image-display colour table.
-      IF ( STATUS .EQ. SAI__OK ) CALL PGSCR( PALNUM, RGBINT( 1 ), 
+      IF ( STATUS .EQ. SAI__OK ) CALL PGSCR( PALNUM, RGBINT( 1 ),
      :                                       RGBINT( 2 ), RGBINT( 3 ) )
 
-*  Save the modified palette entry in the parameter-file directory so 
-*  that it can be read back again by subsequent applications (PGPLOT 
+*  Save the modified palette entry in the parameter-file directory so
+*  that it can be read back again by subsequent applications (PGPLOT
 *  resets the colour palette when it opens a device, so the palette then
-*  needs to be re-instated).  Other elements in the saved palette are 
-*  left unchanged. 
+*  needs to be re-instated).  Other elements in the saved palette are
+*  left unchanged.
       CALL KPG1_PLSAV( PALNUM, PALNUM, .FALSE., STATUS )
 
 *  Shut down the graphics system.

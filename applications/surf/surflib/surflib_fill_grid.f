@@ -11,7 +11,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *      CALL SURFLIB_FILL_GRID (N_PTS, NX, NY, NMAX, OFFSET,
 *     :     IN_DATA, IN_QUALITY, BADBIT, IJ, GRID, BINS, BIN_POS,
@@ -105,7 +105,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -138,11 +138,11 @@
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
- 
+
 *.
       IF (STATUS .NE. SAI__OK) RETURN
 
-*     Set IFAIL to keep track of problems 
+*     Set IFAIL to keep track of problems
       IFAIL = 0
 
 *     Loop through all points in the input data
@@ -178,7 +178,7 @@
 
                   IFAIL = 1
                   NMAX_EXCEED = GRID(IJ(1,I), IJ(2,I))
-              
+
                END IF
 
             ELSE

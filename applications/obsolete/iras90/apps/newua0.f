@@ -16,7 +16,7 @@
 *  Description:
 *     This routine uses the specified parameter to obtain a string
 *     identifying one of the standard system of image or CRDD file
-*     units. 
+*     units.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -39,7 +39,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

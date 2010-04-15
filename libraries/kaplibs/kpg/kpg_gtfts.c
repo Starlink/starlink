@@ -20,8 +20,8 @@ F77_SUBROUTINE(kpg_gtfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
 
 *  Description:
 *     The routine reads the FITS extension from an NDF and returns an
-*     AST pointer to a FitsChan which contains this information. The 
-*     information may then be accessed using routines from the AST 
+*     AST pointer to a FitsChan which contains this information. The
+*     information may then be accessed using routines from the AST
 *     library (SUN/211).
 
 *  Arguments:
@@ -52,12 +52,12 @@ F77_SUBROUTINE(kpg_gtfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

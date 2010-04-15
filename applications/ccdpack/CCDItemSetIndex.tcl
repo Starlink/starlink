@@ -10,11 +10,11 @@
 #     TCL
 
 #  Description:
-#     This routine operates on one entry in the setted or unsetted NDFs 
+#     This routine operates on one entry in the setted or unsetted NDFs
 #     Ccd::scrollbox widget; it reads the name and its annotation and
 #     optionally writes a new annotation.
 #
-#     The annotation can assume one of three values: it may be the 
+#     The annotation can assume one of three values: it may be the
 #     empty string to indicate that no Set Index has been yet selected
 #     for the NDF in question; it may be an integer giving the Set Index
 #     to be assigned; or it may take the literal value "SET" to indicate
@@ -28,8 +28,8 @@
 #     index = string
 #        The index within Listbox of the item to be modified.
 #     value = string
-#        Should be an integer, the empty string, or "SET" if present; 
-#        gives the Set Index value with which the name will be annotated.  
+#        Should be an integer, the empty string, or "SET" if present;
+#        gives the Set Index value with which the name will be annotated.
 #        If absent, the value will not be modified.
 
 #  Return Value:

@@ -25,12 +25,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -54,16 +54,16 @@
 
 *-
       IMPLICIT NONE
-      
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'FIO_ERR'
       INCLUDE 'FIO_PAR'
-      
+
       INTEGER STATUS
       INTEGER FDN,FDC
       INTEGER UNIT, RECSZ
       CHARACTER*50 BUFF3,BUFF4
-      CHARACTER*(FIO__SZFNM) FILE    
+      CHARACTER*(FIO__SZFNM) FILE
       CHARACTER*12 FORM
       DATA BUFF3/'123456789012345'/, BUFF4/' '/
 
@@ -150,7 +150,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 100
 
 *    Now open for reading
-*    Use invalid recsz to check no effect      
+*    Use invalid recsz to check no effect
       CALL FIO_ASSOC( 'NEWFILE', 'READ', 'none', 10, FDN, STATUS )
 *    Require ACMODE conversion to upper case
       CALL FIO_ASSOC( 'CREATEFILE', 'Read', 'none', 0, FDC, STATUS )
@@ -168,7 +168,7 @@
       ENDIF
 *    Skip out if the above section failed
       IF ( STATUS .NE. SAI__OK ) GOTO 100
-      
+
 *    Compare the records
       CALL COMPARE( FDN, FDC, 5, STATUS )
       CALL STATWRITE( 'COMPARING:', STATUS )
@@ -246,13 +246,13 @@
       CALL FIO_FNAME( FDN, FILE, STATUS )
       CALL FIO_CANCL( 'NEWFILE', STATUS )
       CALL STATWRITE( 'CANCELLING NEWFILE:', STATUS )
-      CALL FIO_ERASE( FILE, STATUS )      
+      CALL FIO_ERASE( FILE, STATUS )
       CALL STATWRITE( 'ERASING NEWFILE:', STATUS )
 *    Skip out if the above section failed
       IF ( STATUS .NE. SAI__OK ) GOTO 100
 
 *    Force an error by deleting the file just deleted
-      CALL FIO_ERASE( FILE, STATUS )      
+      CALL FIO_ERASE( FILE, STATUS )
       CALL STATWRITE( 'ERASING NON-EXISTENT FILE:', STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
          STATUS = SAI__ERROR
@@ -303,7 +303,7 @@
       ENDIF
 *    Skip out if the above section failed
       IF ( STATUS .NE. SAI__OK ) GOTO 100
-      
+
 *    Write a 20 byte record with trailing spaces
       CALL FIO_WRITE( FDC, BUFF3(1:20), STATUS )
       CALL STATWRITE( 'WRITING RECORD, LENGTH 20:', STATUS )
@@ -311,7 +311,7 @@
 *    Unless RECL is 0 (assume this means platform doesn't check),
 *    write 50 byte record (TOO BIG) Expect FIO__OUTOV
       IF ( RECSZ .NE. 0 ) THEN
-         CALL FIO_WRITE( FDC, FILE(1:50), STATUS )    
+         CALL FIO_WRITE( FDC, FILE(1:50), STATUS )
          CALL STATWRITE( 'WRITING RECORD, LENGTH 50:', STATUS )
          IF (STATUS .EQ. SAI__OK) THEN
 C    Not an error for gfortran, so push on.
@@ -338,12 +338,12 @@ C    Not an error for gfortran, so push on.
       IF (RECSZ .NE. 15) THEN
          STATUS = SAI__ERROR
       ENDIF
-      
+
       CALL MSG_OUT( ' ', BUFF4, STATUS )
       CALL STATWRITE( 'CHECKING DATA:', STATUS )
 *    Skip out if the above section failed
       IF ( STATUS .NE. SAI__OK ) GOTO 100
-      
+
 *    Now check out opening UNFORMATTED
       CALL FIO_ASSOC(
      :   'NEWFILE', 'READ', 'UNFORMATTED', 10, FDN, STATUS )
@@ -410,8 +410,8 @@ C    Not an error for gfortran, so push on.
       DOWHILE ((STATUS.EQ.SAI__OK) .AND. (I.LE.N))
          WRITE(BUFF1,10) RECHD,I
 10       FORMAT(' ',A3,I3)
-         CALL FIO_WRITE( FDN, BUFF1, STATUS )    
-         CALL FIO_WRITE( FDC, BUFF1, STATUS )    
+         CALL FIO_WRITE( FDN, BUFF1, STATUS )
+         CALL FIO_WRITE( FDC, BUFF1, STATUS )
          I=I+1
       ENDDO
       END

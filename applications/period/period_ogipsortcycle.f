@@ -1,7 +1,7 @@
 
       SUBROUTINE PERIOD_OGIPSORTCYCLE(IPARRAY, NUMROWS, MXCOL,
      :                                JUNK2, JUNK1, KEY, IFAIL)
- 
+
 C=============================================================================
 C Creates a data array ready for input to PLT, and optionally sorts data.
 C
@@ -13,15 +13,15 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C=============================================================================
 
       IMPLICIT NONE
- 
+
       INTEGER NUMROWS, MXCOL
       DOUBLE PRECISION IPARRAY(NUMROWS, MXCOL)
       DOUBLE PRECISION JUNK1(NUMROWS), JUNK2(NUMROWS, MXCOL)
       INTEGER KEY(NUMROWS)
       INTEGER IFAIL, I, K
       CHARACTER*1 SORT
- 
- 
+
+
 *     Store the data in case sort is not needed.
       DO 10 I = 1,NUMROWS
          IPARRAY(I, 1) = JUNK2(I, 1)
@@ -35,11 +35,11 @@ C=============================================================================
       DO 40 I = 2, NUMROWS
          IF ( IPARRAY(I, 1).LT.IPARRAY(I-1, 1) ) THEN
             CALL PERIOD_WRITEBELL()
-            WRITE(*,*) '** WARNING: x-axis data is not in ' // 
+            WRITE(*,*) '** WARNING: x-axis data is not in ' //
      :                 'ascending order!'
             WRITE(*,*) ' '
   15        CONTINUE
-            WRITE(*,'(X,A,$)') 'Would you like to sort ' // 
+            WRITE(*,'(X,A,$)') 'Would you like to sort ' //
      :                                    'the data ? [N]  : '
             READ (*,'(A)', ERR=15) SORT
 

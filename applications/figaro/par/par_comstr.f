@@ -9,7 +9,7 @@ C  Description:
 C     A Figaro application routine may call this subroutine to
 C     obtain the whole of the command string - excluding the
 C     actual command name.  Since Figaro applications are all
-C     supposed to use the PAR_ routines to parse the command 
+C     supposed to use the PAR_ routines to parse the command
 C     string, this is not a routine intended for general use.
 C     It was originally written specially for the LET command.
 C     This version has been modified for use in an ADAM environment
@@ -20,12 +20,12 @@ C  Language:
 C     FORTRAN
 C
 C  Parameters:      ("<" output)
-C     (<) STRING    (Fixed string, descr) The command string, as 
+C     (<) STRING    (Fixed string, descr) The command string, as
 C                   described above.
 C
 C  External variables used -  None
 C
-C  External subroutines / functions used - 
+C  External subroutines / functions used -
 C
 C     PAR_DEF0C   (ADAM PAR_ routine) Set character parameter default
 C     PAR_GET0C   ( "    "      "   ) Get character parameter

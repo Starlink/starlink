@@ -14,7 +14,7 @@
       CHARACTER LIST*80
       DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
-      DOUBLE PRECISION X,Y       ! 
+      DOUBLE PRECISION X,Y       !
       INTEGER IPICD              ! AGI identifier for the DATA picture
       INTEGER IPICF              ! AGI identifier for the frame picture
       INTEGER IPICK              ! AGI identifier for the KEY picture
@@ -60,11 +60,11 @@
       BOX( 2 ) = 0.0
       BOX( 3 ) = 100.0
       BOX( 4 ) = 100.0
-      CALL KPG1_PLOT( AST__NULL, 'NEW', 'KAPLIBS_TEST', ' ', MARGIN, 0, 
-     :                ' ', ' ', 0.0, 0.0, ' ', BOX, IPICD, IPICF, IPICK, 
+      CALL KPG1_PLOT( AST__NULL, 'NEW', 'KAPLIBS_TEST', ' ', MARGIN, 0,
+     :                ' ', ' ', 0.0, 0.0, ' ', BOX, IPICD, IPICF, IPICK,
      :                IPLOT, NFRM, ALIGN, STATUS )
 
-*  Set the appearance of lines drawn using PGPLOT so that they mimic 
+*  Set the appearance of lines drawn using PGPLOT so that they mimic
 *  curves produced using astCurves.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
 

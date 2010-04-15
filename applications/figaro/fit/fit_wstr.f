@@ -1,9 +1,9 @@
 C+
       SUBROUTINE FIT_WSTR (NAME,STRING,COMMENT,STATUS)
 C
-C     F I T _ W S T R 
+C     F I T _ W S T R
 C
-C     Writes a string keyword into a FITS header.  Assumes 
+C     Writes a string keyword into a FITS header.  Assumes
 C     FIT_INIT has been called to initialise the header routines.
 C
 C     Parameters -  (">" input, "<" output)
@@ -22,7 +22,7 @@ C                   values will be error codes caused by a tape
 C                   I/O error.  These can be decoded by FIT_ERROR.
 C
 C     Note: The FITS standard says keyword names and values must be
-C     output in upper case.  NAME & STRING can be passed in lower case, 
+C     output in upper case.  NAME & STRING can be passed in lower case,
 C     but will be output in upper.  COMMENT will be output as passed.
 C
 C     Common variables used -

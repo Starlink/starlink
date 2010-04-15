@@ -1,7 +1,7 @@
       SUBROUTINE CAT_TIQAB (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TIQAB 
+*     CAT_TIQAB
 *  Purpose:
 *     Inquire the value of a single attribute for a component.
 *  Language:
@@ -10,7 +10,7 @@
 *     CALL CAT_TIQAB (GI, ATTRIB; VALUEB; STATUS)
 *  Description:
 *     Inquire the value of a single attribute for a component.  If the
-*     value of an array is inquired, the value of the first element is 
+*     value of an array is inquired, the value of the first element is
 *     returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@
 *
 *    The following variables hold the value obtained for the named
 *    attribute in the data type of the attribute.  In a given invocation
-*    only the variable corresponding to the data type of the attribute 
+*    only the variable corresponding to the data type of the attribute
 *    is used.
 
       BYTE             VALUB ! Unsigned byte value.
@@ -117,8 +117,8 @@
 
 *
 *    The following variables hold a local of the returned value,
-*    converted to data type B.  In the instantiation of the routine 
-*    of type B only the variable LVALB is used.  The purpose of 
+*    converted to data type B.  In the instantiation of the routine
+*    of type B only the variable LVALB is used.  The purpose of
 *    having the variables at all is to convert the local fixed length
 *    string to the returned fixed length string.
 
@@ -209,8 +209,8 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *             Perform the type conversion.
 
-               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI, 
-     :           VALR, VALD, VALL, VALC, 
+               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI,
+     :           VALR, VALD, VALL, VALC,
      :           CAT__TYPEB, LVALUB, LVALB, LVALUW, LVALW, LVALI, LVALR,
      :           LVALD, LVALL, LVALC, CONVOK, STATUS)
 
@@ -242,7 +242,7 @@ C    :     i5, 1x, a, 1x, i10 )
       SUBROUTINE CAT_TIQAC (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TIQAC 
+*     CAT_TIQAC
 *  Purpose:
 *     Inquire the value of a single attribute for a component.
 *  Language:
@@ -251,7 +251,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *     CALL CAT_TIQAC (GI, ATTRIB; VALUEC; STATUS)
 *  Description:
 *     Inquire the value of a single attribute for a component.  If the
-*     value of an array is inquired, the value of the first element is 
+*     value of an array is inquired, the value of the first element is
 *     returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -327,7 +327,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *    The following variables hold the value obtained for the named
 *    attribute in the data type of the attribute.  In a given invocation
-*    only the variable corresponding to the data type of the attribute 
+*    only the variable corresponding to the data type of the attribute
 *    is used.
 
       BYTE             VALUB ! Unsigned byte value.
@@ -342,8 +342,8 @@ C    :     i5, 1x, a, 1x, i10 )
 
 *
 *    The following variables hold a local of the returned value,
-*    converted to data type C.  In the instantiation of the routine 
-*    of type C only the variable LVALC is used.  The purpose of 
+*    converted to data type C.  In the instantiation of the routine
+*    of type C only the variable LVALC is used.  The purpose of
 *    having the variables at all is to convert the local fixed length
 *    string to the returned fixed length string.
 
@@ -434,8 +434,8 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *             Perform the type conversion.
 
-               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI, 
-     :           VALR, VALD, VALL, VALC, 
+               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI,
+     :           VALR, VALD, VALL, VALC,
      :           CAT__TYPEC, LVALUB, LVALB, LVALUW, LVALW, LVALI, LVALR,
      :           LVALD, LVALL, LVALC, CONVOK, STATUS)
 
@@ -467,7 +467,7 @@ C    :     i5, 1x, a, 1x, i10 )
       SUBROUTINE CAT_TIQAD (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TIQAD 
+*     CAT_TIQAD
 *  Purpose:
 *     Inquire the value of a single attribute for a component.
 *  Language:
@@ -476,7 +476,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *     CALL CAT_TIQAD (GI, ATTRIB; VALUED; STATUS)
 *  Description:
 *     Inquire the value of a single attribute for a component.  If the
-*     value of an array is inquired, the value of the first element is 
+*     value of an array is inquired, the value of the first element is
 *     returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -552,7 +552,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *    The following variables hold the value obtained for the named
 *    attribute in the data type of the attribute.  In a given invocation
-*    only the variable corresponding to the data type of the attribute 
+*    only the variable corresponding to the data type of the attribute
 *    is used.
 
       BYTE             VALUB ! Unsigned byte value.
@@ -567,8 +567,8 @@ C    :     i5, 1x, a, 1x, i10 )
 
 *
 *    The following variables hold a local of the returned value,
-*    converted to data type D.  In the instantiation of the routine 
-*    of type D only the variable LVALD is used.  The purpose of 
+*    converted to data type D.  In the instantiation of the routine
+*    of type D only the variable LVALD is used.  The purpose of
 *    having the variables at all is to convert the local fixed length
 *    string to the returned fixed length string.
 
@@ -659,8 +659,8 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *             Perform the type conversion.
 
-               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI, 
-     :           VALR, VALD, VALL, VALC, 
+               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI,
+     :           VALR, VALD, VALL, VALC,
      :           CAT__TYPED, LVALUB, LVALB, LVALUW, LVALW, LVALI, LVALR,
      :           LVALD, LVALL, LVALC, CONVOK, STATUS)
 
@@ -692,7 +692,7 @@ C    :     i5, 1x, a, 1x, i10 )
       SUBROUTINE CAT_TIQAI (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TIQAI 
+*     CAT_TIQAI
 *  Purpose:
 *     Inquire the value of a single attribute for a component.
 *  Language:
@@ -701,7 +701,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *     CALL CAT_TIQAI (GI, ATTRIB; VALUEI; STATUS)
 *  Description:
 *     Inquire the value of a single attribute for a component.  If the
-*     value of an array is inquired, the value of the first element is 
+*     value of an array is inquired, the value of the first element is
 *     returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -777,7 +777,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *    The following variables hold the value obtained for the named
 *    attribute in the data type of the attribute.  In a given invocation
-*    only the variable corresponding to the data type of the attribute 
+*    only the variable corresponding to the data type of the attribute
 *    is used.
 
       BYTE             VALUB ! Unsigned byte value.
@@ -792,8 +792,8 @@ C    :     i5, 1x, a, 1x, i10 )
 
 *
 *    The following variables hold a local of the returned value,
-*    converted to data type I.  In the instantiation of the routine 
-*    of type I only the variable LVALI is used.  The purpose of 
+*    converted to data type I.  In the instantiation of the routine
+*    of type I only the variable LVALI is used.  The purpose of
 *    having the variables at all is to convert the local fixed length
 *    string to the returned fixed length string.
 
@@ -884,8 +884,8 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *             Perform the type conversion.
 
-               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI, 
-     :           VALR, VALD, VALL, VALC, 
+               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI,
+     :           VALR, VALD, VALL, VALC,
      :           CAT__TYPEI, LVALUB, LVALB, LVALUW, LVALW, LVALI, LVALR,
      :           LVALD, LVALL, LVALC, CONVOK, STATUS)
 
@@ -917,7 +917,7 @@ C    :     i5, 1x, a, 1x, i10 )
       SUBROUTINE CAT_TIQAL (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TIQAL 
+*     CAT_TIQAL
 *  Purpose:
 *     Inquire the value of a single attribute for a component.
 *  Language:
@@ -926,7 +926,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *     CALL CAT_TIQAL (GI, ATTRIB; VALUEL; STATUS)
 *  Description:
 *     Inquire the value of a single attribute for a component.  If the
-*     value of an array is inquired, the value of the first element is 
+*     value of an array is inquired, the value of the first element is
 *     returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1002,7 +1002,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *    The following variables hold the value obtained for the named
 *    attribute in the data type of the attribute.  In a given invocation
-*    only the variable corresponding to the data type of the attribute 
+*    only the variable corresponding to the data type of the attribute
 *    is used.
 
       BYTE             VALUB ! Unsigned byte value.
@@ -1017,8 +1017,8 @@ C    :     i5, 1x, a, 1x, i10 )
 
 *
 *    The following variables hold a local of the returned value,
-*    converted to data type L.  In the instantiation of the routine 
-*    of type L only the variable LVALL is used.  The purpose of 
+*    converted to data type L.  In the instantiation of the routine
+*    of type L only the variable LVALL is used.  The purpose of
 *    having the variables at all is to convert the local fixed length
 *    string to the returned fixed length string.
 
@@ -1109,8 +1109,8 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *             Perform the type conversion.
 
-               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI, 
-     :           VALR, VALD, VALL, VALC, 
+               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI,
+     :           VALR, VALD, VALL, VALC,
      :           CAT__TYPEL, LVALUB, LVALB, LVALUW, LVALW, LVALI, LVALR,
      :           LVALD, LVALL, LVALC, CONVOK, STATUS)
 
@@ -1142,7 +1142,7 @@ C    :     i5, 1x, a, 1x, i10 )
       SUBROUTINE CAT_TIQAR (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TIQAR 
+*     CAT_TIQAR
 *  Purpose:
 *     Inquire the value of a single attribute for a component.
 *  Language:
@@ -1151,7 +1151,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *     CALL CAT_TIQAR (GI, ATTRIB; VALUER; STATUS)
 *  Description:
 *     Inquire the value of a single attribute for a component.  If the
-*     value of an array is inquired, the value of the first element is 
+*     value of an array is inquired, the value of the first element is
 *     returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1227,7 +1227,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *    The following variables hold the value obtained for the named
 *    attribute in the data type of the attribute.  In a given invocation
-*    only the variable corresponding to the data type of the attribute 
+*    only the variable corresponding to the data type of the attribute
 *    is used.
 
       BYTE             VALUB ! Unsigned byte value.
@@ -1242,8 +1242,8 @@ C    :     i5, 1x, a, 1x, i10 )
 
 *
 *    The following variables hold a local of the returned value,
-*    converted to data type R.  In the instantiation of the routine 
-*    of type R only the variable LVALR is used.  The purpose of 
+*    converted to data type R.  In the instantiation of the routine
+*    of type R only the variable LVALR is used.  The purpose of
 *    having the variables at all is to convert the local fixed length
 *    string to the returned fixed length string.
 
@@ -1334,8 +1334,8 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *             Perform the type conversion.
 
-               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI, 
-     :           VALR, VALD, VALL, VALC, 
+               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI,
+     :           VALR, VALD, VALL, VALC,
      :           CAT__TYPER, LVALUB, LVALB, LVALUW, LVALW, LVALI, LVALR,
      :           LVALD, LVALL, LVALC, CONVOK, STATUS)
 
@@ -1367,7 +1367,7 @@ C    :     i5, 1x, a, 1x, i10 )
       SUBROUTINE CAT_TIQAW (GI, ATTRIB, VALUE, STATUS)
 *+
 *  Name:
-*     CAT_TIQAW 
+*     CAT_TIQAW
 *  Purpose:
 *     Inquire the value of a single attribute for a component.
 *  Language:
@@ -1376,7 +1376,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *     CALL CAT_TIQAW (GI, ATTRIB; VALUEW; STATUS)
 *  Description:
 *     Inquire the value of a single attribute for a component.  If the
-*     value of an array is inquired, the value of the first element is 
+*     value of an array is inquired, the value of the first element is
 *     returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -1452,7 +1452,7 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *    The following variables hold the value obtained for the named
 *    attribute in the data type of the attribute.  In a given invocation
-*    only the variable corresponding to the data type of the attribute 
+*    only the variable corresponding to the data type of the attribute
 *    is used.
 
       BYTE             VALUB ! Unsigned byte value.
@@ -1467,8 +1467,8 @@ C    :     i5, 1x, a, 1x, i10 )
 
 *
 *    The following variables hold a local of the returned value,
-*    converted to data type W.  In the instantiation of the routine 
-*    of type W only the variable LVALW is used.  The purpose of 
+*    converted to data type W.  In the instantiation of the routine
+*    of type W only the variable LVALW is used.  The purpose of
 *    having the variables at all is to convert the local fixed length
 *    string to the returned fixed length string.
 
@@ -1559,8 +1559,8 @@ C    :     i5, 1x, a, 1x, i10 )
 *
 *             Perform the type conversion.
 
-               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI, 
-     :           VALR, VALD, VALL, VALC, 
+               CALL CAT1_TCNVT (ATYPE, VALUB, VALB, VALUW, VALW, VALI,
+     :           VALR, VALD, VALL, VALC,
      :           CAT__TYPEW, LVALUB, LVALB, LVALUW, LVALW, LVALI, LVALR,
      :           LVALD, LVALL, LVALC, CONVOK, STATUS)
 

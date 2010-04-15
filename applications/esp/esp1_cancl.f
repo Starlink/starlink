@@ -1,6 +1,6 @@
 
 
-      SUBROUTINE ELF1_CANCL(MODE,STATUS)    
+      SUBROUTINE ELF1_CANCL(MODE,STATUS)
 *+
 *  Name:
 *     ELF1_CANCL
@@ -8,25 +8,25 @@
 *  Purpose:
 *     Cancels a number of input parameters so that they are then in a
 *     state where the user is again prompted for an input.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL ELF1_CANCL(MODE,STATUS)    
+*      CALL ELF1_CANCL(MODE,STATUS)
 
 *  Description:
 *      Cancels the values of a number of input parameters so that they are
-*      changed from active state to Ground state. This means that the next 
+*      changed from active state to Ground state. This means that the next
 *      time values for them are required the user will be reprompted.
 *
 *      The MODE variable defines which parameters must be cancelled.
 *
 
-*  Arguments:               
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        Defines which parameters must be cancelled. MODE=0 those required
-*        for the cursor input or (MODE=1) those for keyboard input. 
+*        for the cursor input or (MODE=1) those for keyboard input.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -44,15 +44,15 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines which parameters are to be
                                       ! cancelled
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -60,7 +60,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Cancel those parameters required for cursor input.
       IF (MODE.EQ.0) THEN
@@ -100,7 +100,7 @@
 
 
 
-      SUBROUTINE ELP1_CANCL(MODE,STATUS)    
+      SUBROUTINE ELP1_CANCL(MODE,STATUS)
 *+
 *  Name:
 *     ELP1_CANCL
@@ -108,25 +108,25 @@
 *  Purpose:
 *     Cancels a number of input parameters so that they are then in a
 *     state where the user is again prompted for an input.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL ELP1_CANCL(MODE,STATUS)    
+*      CALL ELP1_CANCL(MODE,STATUS)
 
 *  Description:
 *      Cancels the values of a number of input parameters so that they are
-*      changed from active state to Ground state. This means that the next 
+*      changed from active state to Ground state. This means that the next
 *      time values for them are required the user will be reprompted.
 *
 *      The MODE variable defines which parameters must be cancelled.
 *
 
-*  Arguments:               
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        Defines which parameters must be cancelled. MODE=0 those required
-*        for the cursor input or (MODE=1) those for keyboard input. 
+*        for the cursor input or (MODE=1) those for keyboard input.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -144,15 +144,15 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines which parameters are to be
                                       ! cancelled
-         
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -160,7 +160,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Cancel those parameters required for cursor input.
       IF (MODE.EQ.0) THEN
@@ -199,7 +199,7 @@
       END
 
 
-      SUBROUTINE GRA1_CANCL(MODE,STATUS)    
+      SUBROUTINE GRA1_CANCL(MODE,STATUS)
 *+
 *  Name:
 *     GRA1_CANCL
@@ -207,25 +207,25 @@
 *  Purpose:
 *     Cancels a number of input parameters so that they are then in a
 *     state where the user is again prompted for an input.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL GRA1_CANCL(MODE,STATUS)    
+*      CALL GRA1_CANCL(MODE,STATUS)
 
 *  Description:
 *      Cancels the values of a number of input parameters so that they are
-*      changed from active state to Ground state. This means that the next 
+*      changed from active state to Ground state. This means that the next
 *      time values for them are required the user will be reprompted.
 *
 *      The MODE variable defines which parameters must be cancelled.
 *
 
-*  Arguments:               
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        Defines which parameters must be cancelled. MODE=0 those required
-*        for the cursor input or (MODE=1) those for keyboard input. 
+*        for the cursor input or (MODE=1) those for keyboard input.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -243,15 +243,15 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines which parameters are to be
                                       ! cancelled
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -259,7 +259,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Cancel those parameters required for keyboard input.
       IF (MODE.EQ.0) THEN
@@ -275,7 +275,7 @@
          CALL PAR_CANCL('OUT',STATUS)
 *      Automatic selection of radii range.
          CALL PAR_CANCL('RRANGE',STATUS)
-*      Range of radius over which the scale length calculations 
+*      Range of radius over which the scale length calculations
 *      are performed.
          CALL PAR_CANCL('FITLIM',STATUS)
       END IF
@@ -299,7 +299,7 @@
       END
 
 
-      SUBROUTINE SEC1_CANCL(MODE,STATUS)    
+      SUBROUTINE SEC1_CANCL(MODE,STATUS)
 *+
 *  Name:
 *     SEC1_CANCL
@@ -307,25 +307,25 @@
 *  Purpose:
 *     Cancels a number of input parameters so that they are then in a
 *     state where the user is again prompted for an input.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL SEC1_CANCL(MODE,STATUS)    
+*      CALL SEC1_CANCL(MODE,STATUS)
 
 *  Description:
 *      Cancels the values of a number of input parameters so that they are
-*      changed from active state to Ground state. This means that the next 
+*      changed from active state to Ground state. This means that the next
 *      time values for them are required the user will be reprompted.
 *
 *      The MODE variable defines which paramters must be cancelled.
 *
 
-*  Arguments:               
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        Defines which parameters must be cancelled. MODE=0 those required
-*        for the cursor input or (MODE=1) those for keyboard input. 
+*        for the cursor input or (MODE=1) those for keyboard input.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -343,15 +343,15 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines which parameters are to be
                                       ! cancelled
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -359,7 +359,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Cancel those parameters required for cursor input.
       IF (MODE.EQ.0) THEN
@@ -403,7 +403,7 @@
          CALL PAR_CANCL('RADISP',STATUS)
 *      Auto-locate better galaxy origin.
          CALL PAR_CANCL('AUTOL',STATUS)
-*      Range of radius over which the scale length calculations 
+*      Range of radius over which the scale length calculations
 *      are performed.
          CALL PAR_CANCL('FITLIM',STATUS)
 *      Output text file name.

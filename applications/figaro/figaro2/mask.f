@@ -25,7 +25,7 @@ C     User variables used - None
 C
 C                                          KS / CIT 4th April 1984
 C     Modified:
-C   
+C
 C     Summer 1987    DJA/AAO.  Rewritten to use DSA routines.
 C     7th  Sep 1988  KS/AAO. Comments about search path for table
 C                    modified.
@@ -45,7 +45,7 @@ C     Maximum number of masked areas
 C
       INTEGER MAXWAVES
       PARAMETER (MAXWAVES=100)
-C     
+C
 C     Functions
 C
       INTEGER ICH_LEN
@@ -189,7 +189,7 @@ C
 C     (>) TABLU    (Integer) Logical unit the tale file is open on.
 C     (>) MAXWAVES (Integer) Maximum number of sections allowed.
 C     (<) WAVES    (Real array WAVES(2,MAXWAVES)) Limits for each
-C                  section.  WAVES(1,n) holds the starting and 
+C                  section.  WAVES(1,n) holds the starting and
 C                  WAVES(2,n) the ending wavelengths for the masked
 C                  sections.
 C     (<) NWAVES   (Integer) The number of masked sections.
@@ -314,7 +314,7 @@ C                of the pixels of DATA.  (Normally, these will be the
 C                wavelength values.)
 C     (>) NWAVES (Integer) The number of sections to be masked.
 C     (>) WAVES  (Real array WAVES(2,MAXWAVES)) Limits for each
-C                section.  WAVES(1,n) holds the starting and 
+C                section.  WAVES(1,n) holds the starting and
 C                WAVES(2,n) the ending wavelengths for the masked
 C                sections.
 C     (W) WORK   (Real array WORK(NX)) Workspace.

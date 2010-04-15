@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 # include    "kwm.h"
 # include    "idi.h"
 # include    "idi_err.h"
-# include    "idistruct_e.h" 
+# include    "idistruct_e.h"
 # include    "idifuncs.h"
 
 
@@ -274,7 +274,7 @@ if (curs->vis == lvis)
 
 /* convert coordinates from associated memory to display */
 
-mem_dis_conv (display , curs->cur_memid , curs->x_pos , curs->y_pos , 
+mem_dis_conv (display , curs->cur_memid , curs->x_pos , curs->y_pos ,
                  &xcur , &ycur);
 
 /* undefine hardware cursor if visibility = 0 */
@@ -440,7 +440,7 @@ if (inmemid == -1)
                  &xc, &yc);
    *xcur = xc;
    *ycur = yc;
-   
+
 /* search current memory for cursor */
 
    for (i = 0; i < conf->n_mem; i++)
@@ -448,8 +448,8 @@ if (inmemid == -1)
       mem = conf->memory[i];
       if ((mem->mem_free != -1) && (mem->visibility == 1) &&
           (*xcur >= (int)mem->x_scroll / mem->zoom) &&
-          (*ycur >= (int)mem->y_scroll / mem->zoom) && 
-          (*xcur <= ((int)mem->x_scroll + mem->x_v_size) / mem->zoom) && 
+          (*ycur >= (int)mem->y_scroll / mem->zoom) &&
+          (*xcur <= ((int)mem->x_scroll + mem->x_v_size) / mem->zoom) &&
           (*ycur <= ((int)mem->y_scroll + mem->y_v_size) / mem->zoom))
 
          {
@@ -606,7 +606,7 @@ else
 
 /* check if memory has been allocated */
 
-   dis_mem_conv (display , memid , xcurd , ycurd , 
+   dis_mem_conv (display , memid , xcurd , ycurd ,
                  &curs->x_pos , &curs->y_pos);
    }
 

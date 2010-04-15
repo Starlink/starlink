@@ -212,13 +212,13 @@ sub do_cmd_micron { join('', &iso_map("micro", ""), $_[0]);}
        'pound', '&#163;',      # pound sign
        'curren', '&#164;',     # currency sign
        'yen', '&#165;',        # Yen sign
-       'brvbar', '&#166;',  
+       'brvbar', '&#166;',
        'sect', '&#167;',       # section mark
        'copy', '&#169;',       # copyright mark
        'ordm', '&#170;',
        'ordf', '&#186;',
-       'laquo', '&#171;', 
-       'raquo', '&#187;', 
+       'laquo', '&#171;',
+       'raquo', '&#187;',
        'not', '&#172;',
        'shy', '&#173;',
        'reg', '&#174;',

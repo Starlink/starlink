@@ -20,7 +20,7 @@
 
 2003-03-19  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* NDF.pm: Forgot to export dat_put0i 
+	* NDF.pm: Forgot to export dat_put0i
 
 2003-03-07  Tim Jenness  <timj@jach.hawaii.edu>
 
@@ -39,12 +39,12 @@
 
 2000-07-12  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* NDF.pm: Remove @EXPORT. Add msg_tune and err_tune 
+	* NDF.pm: Remove @EXPORT. Add msg_tune and err_tune
 
 	* t/msg.t: Improve test suite
-	
+
 	* t/err.t: Improve test suite
-	
+
 	* NDF.xs: Use PREINIT blocks and include missing Starlink include
 	files. Add msg_tune and err_tune.
 	Begin changing some routines to use the C wrappers
@@ -70,7 +70,7 @@
 	fits_get_nth_item to fix -w warning.
 
 	--- RELEASE V1.41 to Starlink ---
-	
+
 1999-05-20  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Makefile.PL: Use Starlink::Config
@@ -90,7 +90,7 @@
 
 1998-09-21  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* NDF.pm (fits_extract_key_val): Modify so that an undefined value 
+	* NDF.pm (fits_extract_key_val): Modify so that an undefined value
 	is returned if the key is there but the value is a blank string.
 
 1998-09-14  Tim Jenness  <timj@jach.hawaii.edu>

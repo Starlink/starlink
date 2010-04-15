@@ -6,10 +6,10 @@ C     D T A _ P R E T R
 C
 C     Performs perliminary transfer processing for the WRVARn,
 C     RDVARn and MUVARn routines.  Analyses the object name,
-C     and locates it in the data structure.  If necessary, 
+C     and locates it in the data structure.  If necessary,
 C     this routine will convert the object to a vector and slice
-C     it to enable it to return an HDS locator that can be used to 
-C     access whatever subset (if any) of the object is required.  
+C     it to enable it to return an HDS locator that can be used to
+C     access whatever subset (if any) of the object is required.
 C
 C     Parameters -    (">" input, "!" modified, "<" output)
 C
@@ -23,7 +23,7 @@ C                  This is checked against the number of elements
 C                  in the data structure definition for the object.
 C     (>) ITYPE    (Integer) The type code for the data to be
 C                  transfered from the user's buffer.  This is
-C                  checked for validity by this routine.  
+C                  checked for validity by this routine.
 C     (<) LOC      (Character*(DAT__SZLOC)) The HDS locator to be used for the
 C                  data transfer.  If possible, the 'normal' locator
 C                  to the data object will be used.  If the transfer
@@ -36,7 +36,7 @@ C                  explicitly once the transfer is completed.
 C     (<) HDSTYPE  (Character) The HDS type code for the user's data
 C                  type (ie the HDS type corresponding to ITYPE).
 C     (<) NLDIM    (Integer) The number of dimensions of the
-C                  data object associated with the locator LOC.  
+C                  data object associated with the locator LOC.
 C     (<) LDIMS    (Integer array LDIMS(DST_MAXDIM)) The dimensions
 C                  of the data object associated with the locator LOC.
 C                  NLDIM and LDIMS should be used in the subsequent
@@ -46,7 +46,7 @@ C                  otherwise.
 C     (<) TEMPLOC  (Logical) True if LOC is a temporary locator generated
 C                  for this transfer, false if it is the 'normal' locator
 C                  for the object.  The main distinction is that normal
-C                  locators are found in the name cache and annuled 
+C                  locators are found in the name cache and annuled
 C                  automatically, temporary ones need to be annuled
 C                  explicitly.
 C     (<) STATUS   (Integer) Returns a status code.
@@ -63,7 +63,7 @@ C                  Lower level routines may return other error codes
 C
 C     Subroutines / functions used -
 C
-C     DTA_SPLITN  (DTA_ package) Analyse object name 
+C     DTA_SPLITN  (DTA_ package) Analyse object name
 C     DTA_LOCATE  ( "     "    ) Locate object in data structure
 C     DTA_HDSERC  ( "     "    ) Convert HDS error code to DTA code
 C     DTA_DTATYP  ( "     "    ) Get DTA type given HDS type
@@ -100,8 +100,8 @@ C                    with character string transfers.  Now allows transfers to
 C                    span strings.
 C     16th Feb 1990 KS / AAO.  If character string is scalar (ie just one
 C                    string), don't let transfer try to span strings.  KS/AAO.
-C     10th Jan 1992  KS / AAO.  Syntax of include statements changed to 
-C                    remove VMS logical names and to use lower case, to 
+C     10th Jan 1992  KS / AAO.  Syntax of include statements changed to
+C                    remove VMS logical names and to use lower case, to
 C                    enable compilation on a SUN.
 C     14th Oct 1992  HME / UoE, Starlink.  Append 'G' to top level name
 C                    to construct HDS group name.
@@ -129,7 +129,7 @@ C
 C     Data type definitions & parameters - used are
 C
 C     NTYPES   Number of possible data types
-C     HTYPE    The HDS types (character) 
+C     HTYPE    The HDS types (character)
 C
       INCLUDE 'DTATCON'
       INCLUDE 'DAT_PAR'
@@ -143,7 +143,7 @@ C
       INTEGER OBJDIM, OBJDIMS(DST_MAXDIM), OBJELM
       CHARACTER FNAME*80, GNAME*17
       CHARACTER*(DAT__SZLOC) OBJLOC, ENVLOC, LOC2
-      CHARACTER TYPE*16, OBJTYPE*16      
+      CHARACTER TYPE*16, OBJTYPE*16
 C
 C     Include file containing DATA statements
 C
@@ -318,7 +318,7 @@ C
             CALL DAT_SLICE(LOC2,1,ELEMNT,ELEMNT+NTRANS-1,LOC,STATUS)
 C
 C           The call to DAT_SHAPE makes sure that we treat the new
-C           vector the way the HDS version treats it - this differs 
+C           vector the way the HDS version treats it - this differs
 C           between the C and BLISS versions.
 C
             CALL DAT_SHAPE(LOC,1,LDIMS,NLDIM,STATUS)

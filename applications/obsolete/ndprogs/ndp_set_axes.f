@@ -9,10 +9,10 @@ C   Description
 C   -----------
 C   Assigns data values to one or more of the axis arrays in an image
 C   structure. An array parameter consisting of a flag for each axis is
-C   prompted for, where 1 = modify axis and 0 = leave axis alone. Start 
-C   and end values for the axes to be modified are then prompted for. Flags 
+C   prompted for, where 1 = modify axis and 0 = leave axis alone. Start
+C   and end values for the axes to be modified are then prompted for. Flags
 C   for the type of scale are obtained, where 0 = linear and 1 = logarithmic.
-C   The required scale is then computed over the whole range of each axis. 
+C   The required scale is then computed over the whole range of each axis.
 C   The logarithmic flag in the axis structure is set or unset as appropriate.
 C
 C
@@ -60,7 +60,7 @@ C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'DYN_SOURCE:DYNAMIC_MEMORY.INC'
 C   INCLUDE 'NDP_SOURCE:NDP_NUMERIC_RANGES.INC'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -117,7 +117,7 @@ C
       REAL          VMIN(6)
 C
       DATA          AXNAMES/'X','Y','T','U','V','W'/
-C                                      
+C
       INCLUDE  'DYNAMIC_MEMORY'
       INCLUDE  'NUMERIC_RANGES'
 C
@@ -183,7 +183,7 @@ C
      &      (AXSTART(I),AXEND(I),LOG,DIMS(I),DYNAMIC_MEM(AXPTR(I)))
 C
 C  - create and/or set .LOG flag as required.
-C              
+C
           CALL DSA_SET_AXIS_INFO(REF_NAME,I,0,AXCHARS,1,DLOG,STATUS)
           IF (STATUS .NE. 0) GO TO 500
         END IF

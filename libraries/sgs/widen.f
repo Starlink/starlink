@@ -70,7 +70,7 @@
 
 
       JSTAT = 0
-      
+
       CALL gns_TNG( CIDENT, WS, CONID, JSTAT)
 
       END

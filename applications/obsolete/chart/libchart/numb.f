@@ -1,5 +1,5 @@
       SUBROUTINE NUMB(X,Y,R,N, STATUS )
- 
+
 *+
 *   NUMB Plots the Star Number
 *   Below the Symbol on the Chart
@@ -29,11 +29,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       IF ( ( SIZEMM / 80.0 .GT. 1.0 ) .AND. KEYNUMB ) THEN
- 
+
 *   Numbers only Drawn on if the size of the numbers is greater than
 *   One Eightyeth of the size of the chart
 *   Clipping (of the Chart) is disenabled whilst number is being drawn
- 
+
          CALL SGS_SELZ (IZAREA,ISTAT)
          IF (PLOTTER) THEN
             CHARSIZ=AMIN1(SIZEMM/80.0,3.0)
@@ -57,7 +57,7 @@
          CALL SGS_TXI (X+5.0+DISP,Y-R-(SIZEMM/100.0),N,0)
          CALL SGS_OTEXT
          CALL SGS_SELZ (IZCHART,ISTAT)
- 
+
       END IF
- 
+
       END

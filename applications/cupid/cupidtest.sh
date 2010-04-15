@@ -2,4 +2,4 @@
 
 echo "Running CUPID test, should say TRUE"
 
-./cupidhelp cupidhelp par 
+./cupidhelp cupidhelp par

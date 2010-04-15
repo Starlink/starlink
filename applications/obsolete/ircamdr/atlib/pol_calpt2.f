@@ -1,8 +1,8 @@
 	SUBROUTINE POL_CALPT2( IDIMS1, IDIMS2, IMAGE_1, IMAGE_2, IMAGE_3,
      :	                      IMAGE_4, IMAGE_5, IMAGE_6, IMAGE_7,
-     :	                      IMAGE_8, ELDN, ODIMS1, ODIMS2, Q_IMAGE, 
-     :	                      U_IMAGE, P_IMAGE, T_IMAGE, I_IMAGE, 
-     :	                      PI_IMAGE, UPI_IMAGE, PE_IMAGE, TE_IMAGE, 
+     :	                      IMAGE_8, ELDN, ODIMS1, ODIMS2, Q_IMAGE,
+     :	                      U_IMAGE, P_IMAGE, T_IMAGE, I_IMAGE,
+     :	                      PI_IMAGE, UPI_IMAGE, PE_IMAGE, TE_IMAGE,
      :                        STATUS)
 
 * Subroutine to calculate the polarization and position angle image from the
@@ -49,20 +49,20 @@
 *          pass each pixel value to the subroutine that calculates Q, U, P,
 *         THETA, TOTAL INTENSITY POLARIZED INTENSITY and ERROR IMAGES
 
- 
+
 * FROM POLLY2...
 *        CALL POL2_STOKESCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45, Q)
 *        CALL POL2_STOKESCAL( OINTEN22, EINTEN45, OINTEN67, EINTEN67, U)
 *        CALL POL2_POLCAL( Q, U, P)
 *        CALL POL2_THETACAL( Q, U, T)
-*        CALL POL2_ERRCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45, 
-*     :                    OINTEN22, EINTEN22, OINTEN67, EINTEN67, 
+*        CALL POL2_ERRCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45,
+*     :                    OINTEN22, EINTEN22, OINTEN67, EINTEN67,
 *     :                    P, ELDN, PE, TE)
-*        CALL POL2_INTCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45, 
-*     :                    OINTEN22, EINTEN22, OINTEN67, EINTEN67, 
+*        CALL POL2_INTCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45,
+*     :                    OINTEN22, EINTEN22, OINTEN67, EINTEN67,
 *     :                    I)
 
-	    CALL POL2_STOKESCAL( IMAGE_1( K, J), IMAGE_2( K, J), 
+	    CALL POL2_STOKESCAL( IMAGE_1( K, J), IMAGE_2( K, J),
      :	                         IMAGE_3( K, J), IMAGE_4( K, J),
      :	                         Q_IMAGE( K, J))
 
@@ -82,10 +82,10 @@
 	    CALL POL2_THETACAL( Q_IMAGE( K, J), U_IMAGE( K, J),
      :	                        T_IMAGE( K, J))
 
-	    CALL POL2_PICAL( P_IMAGE( K, J), I_IMAGE( K, J), 
+	    CALL POL2_PICAL( P_IMAGE( K, J), I_IMAGE( K, J),
      :	                     PI_IMAGE( K, J))
 
-	    CALL POL2_UPICAL( P_IMAGE( K, J), I_IMAGE( K, J), 
+	    CALL POL2_UPICAL( P_IMAGE( K, J), I_IMAGE( K, J),
      :	                      UPI_IMAGE( K, J))
 
 	    CALL POL2_ERRCAL( IMAGE_1( K, J), IMAGE_2( K, J),

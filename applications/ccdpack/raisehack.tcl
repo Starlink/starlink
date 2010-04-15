@@ -12,8 +12,8 @@
 #     source raisehack.tcl
 
 #  Description:
-#     Several window managers have a bug in their ICCCM compliance 
-#     (or something) which causes them to wait for a timeout when 
+#     Several window managers have a bug in their ICCCM compliance
+#     (or something) which causes them to wait for a timeout when
 #     performing a raise operation under certain circumstances.
 #     For instance, fvwm2 on Linux will wait two seconds every time it
 #     tries to raise an initially unobscured toplevel window (sometimes).
@@ -64,7 +64,7 @@
       rename raise raise_orig
 
 #  Set a binding to record the visibility state of all windows.
-#  The <Map> binding assumes that when a window is mapped it comes up 
+#  The <Map> binding assumes that when a window is mapped it comes up
 #  fully visible.  This seems reasonable, but perhaps there are window
 #  managers which do not guarantee this?
       bind all <Visibility> { set ::visibilityState(%W) %s }

@@ -172,7 +172,7 @@ c iv(parprt)... iv(20) = 1 means print any nondefault v values on a
 c             fresh start or any changed v values on a restart.
 c             iv(parprt) = 0 means skip this printing.  default = 1.
 c iv(prunit)... iv(21) is the output unit number on which all printing
-c             is done.  iv(prunit) = 0 (the default) means suppress all 
+c             is done.  iv(prunit) = 0 (the default) means suppress all
 c             printing.
 c iv(solprt)... iv(22) = 1 means print out the value of x returned (as
 c             well as the gradient and the scale vector d).

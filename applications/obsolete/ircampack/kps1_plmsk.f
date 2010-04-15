@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_PLMSK( NPOLY, LBND1, UBND1, LBND2, UBND2, NVERT, 
+      SUBROUTINE KPS1_PLMSK( NPOLY, LBND1, UBND1, LBND2, UBND2, NVERT,
      :                       XVERT, YVERT, LOGPOS, FD, MASK, STATUS )
 *+
 *  Name:
@@ -12,14 +12,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_PLMSK( NPOLY, LBND1, UBND1, LBND2, UBND2, NVERT, XVERT, 
+*     CALL KPS1_PLMSK( NPOLY, LBND1, UBND1, LBND2, UBND2, NVERT, XVERT,
 *                      YVERT, LOGPOS, FD, MASK, STATUS )
 
 *  Description:
 *     A polygonal region of the mask array is defined by the
 *     coordinates supplied in arguments XVERT and YVERT. Mask pixels
 *     which have centres within the polygon are returned set to .TRUE.
-*     and others are returned unchanged. If NPOLY is supplied equal to 
+*     and others are returned unchanged. If NPOLY is supplied equal to
 *     zero, then all mask pixels are initially set to .FALSE.
 *
 *     The co-ordinates of the vertices are written out to a log file if
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -131,7 +131,7 @@
      :  N1, N2,                ! Vertex numbers
      :  NCROSS,                ! Number of intersections
      :  NTOP                   ! Sorting index
-  
+
       LOGICAL                  ! True if:
      :  EXIT                   ! Sorting complete
 
@@ -150,12 +150,12 @@
       END IF
 
 *  If this is the first polygon to be put into the mask, initialise the
-*  mask to hold .FALSE. at every pixel (i.e. all pixels are initially 
+*  mask to hold .FALSE. at every pixel (i.e. all pixels are initially
 *  considered to be outside the polygon).
       IF( NPOLY .EQ. 0 ) THEN
 
          DO J = LBND2, UBND2
-            DO I = LBND1, UBND1 
+            DO I = LBND1, UBND1
                MASK( I, J ) = .FALSE.
             END DO
          END DO
@@ -169,7 +169,7 @@
       XMAX = VAL__MINR
       YMIN = VAL__MAXR
       YMAX = VAL__MINR
- 
+
       DO N = 1, NVERT
          XMIN = MIN( XVERT( N ), XMIN )
          XMAX = MAX( XVERT( N ), XMAX )
@@ -184,7 +184,7 @@
          END IF
 
       END DO
- 
+
 *  Convert the ranges to integer pixel index limits restricted to the
 *  mask array size. Note, the value 1.0E8 is used to avoid integer
 *  overflow where possible one could have used REAL( VAL__MAXI ). The
@@ -248,16 +248,16 @@
 *  coordinate) and store it.
             ELSE IF( TEST .GT. 0.0 ) THEN
                NCROSS = NCROSS + 1
- 
+
                IF( NCROSS .LE. MXCRS ) THEN
                   DY = YVERT( N2 ) - YVERT( N1 )
- 
+
                   IF( ABS( DY ) .LT. VAL__SMLR ) DY = SIGN( VAL__SMLR,
      :                                                      DY )
                   XCROSS( NCROSS ) = XVERT( N1 ) +
      :                               ( YL - YVERT( N1 ) ) *
      :                               ( XVERT( N2 ) - XVERT( N1 ) ) / DY
- 
+
 *  If the storage for intersections is exceeded, return with a bad
 *  status and report an error.
                ELSE
@@ -268,7 +268,7 @@
      :                           'array lines.', STATUS )
                   GO TO 999
                END IF
- 
+
 *  End of the check for line-polygon intersections.
             END IF
 
@@ -279,12 +279,12 @@
          IF( NCROSS .GT. 1 ) THEN
             EXIT = .FALSE.
             NTOP = NCROSS
- 
+
 *  Loop when an interchange was necessary.
             DO WHILE ( .NOT. EXIT )
                EXIT = .TRUE.
                NTOP = NTOP - 1
- 
+
                DO N = 1, NTOP
 
 *  Swap adjacent values if they are in the wrong order.
@@ -296,7 +296,7 @@
                   END IF
                END DO
             END DO
- 
+
 *  Scan through the ordered intersections in pairs.
             DO N = 2, NCROSS, 2
 
@@ -321,11 +321,11 @@
             END DO
 
          END IF
- 
+
 *  Do the next mask line.
       END DO
- 
+
 *  Arrive here if an error occurs.
  999  CONTINUE
- 
+
       END

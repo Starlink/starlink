@@ -1,7 +1,7 @@
       SUBROUTINE CAP_GLFMT (EXFMT, LXFMT, STATUS)
 *+
 *  Name:
-*     CAP_GLFMT 
+*     CAP_GLFMT
 *  Purpose:
 *     Determine the width of an external format.
 *  Language:
@@ -12,7 +12,7 @@
 *     Determine the width (that is the number of characters required by)
 *     of a StarBase external format.
 *
-*     Note that this version on handles 'Fortran like' specifiers, not 
+*     Note that this version on handles 'Fortran like' specifiers, not
 *     the angular ones.
 *  Arguments:
 *     EXFMT  =  CHARACTER*(*) (Given)
@@ -27,7 +27,7 @@
 *       Take a local copy of the specifier
 *       Check whether the specifier contains a full stop.
 *       If so then
-*         Replace the full stop and all following characters with 
+*         Replace the full stop and all following characters with
 *         spaces.
 *       end if
 *       Replace any alphabetic characters with spaces.
@@ -40,7 +40,7 @@
 *       set the length to one.
 *     end if
 *  Implementation Deficiencies:
-*     Note that this version on handles 'Fortran like' specifiers, not 
+*     Note that this version on handles 'Fortran like' specifiers, not
 *     the angular ones.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -115,7 +115,7 @@ C3000       format(1x, 'LXFMT on entry, exfmt: ', a / )
             END DO
 
 *
-*          If a full stop was found then replace it and all the 
+*          If a full stop was found then replace it and all the
 *          characters which follow it with spaces.
 
             IF (FOUND) THEN

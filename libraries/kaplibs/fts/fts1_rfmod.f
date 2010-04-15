@@ -98,7 +98,7 @@
 *     relocated at the same time.  Update requires that the keyword
 *     exists.  Amend behaves as Write if the keyword in Field 2 is
 *     not already present, or as Update if the keyword exists.  Null
-*     replaces the value of a named keyword with blanks. 
+*     replaces the value of a named keyword with blanks.
 
 *     Field 2:  This specifies the keyword to edit, and optionally the
 *     position of that keyword in the header after the edit (for Move,
@@ -133,10 +133,10 @@
 
 *     Field 3:
 *     This specifies the value to assign to the edited keyword in the
-*     the Amend, Write, and Update operations, or the name of the new 
-*     keyword in the Rename modification.  If the keyword exists, the 
-*     existing value or keyword is replaced, as appropriate.  The data 
-*     type used to store the value is inferred from the value itself.  
+*     the Amend, Write, and Update operations, or the name of the new
+*     keyword in the Rename modification.  If the keyword exists, the
+*     existing value or keyword is replaced, as appropriate.  The data
+*     type used to store the value is inferred from the value itself.
 *     See topic "Value Data Types".
 *
 *     For the Update and Write modifications there is a special value,
@@ -183,7 +183,7 @@
 *  Examples of the File Format:
 *     The best way to illustrate the options is by listing some example
 *     lines.
-*     
+*
 *         P AIRMASS
 *     This reports the value of keyword AIRMASS to standard output.
 *
@@ -207,7 +207,7 @@
 *
 *         A AIRMASS 1.379
 *     This writes a real value to keyword AIRMASS if it exists,
-*     otherwise it writes a real value to new keyword AIRMASS located 
+*     otherwise it writes a real value to new keyword AIRMASS located
 *     at the end of the FITS extension.
 *
 *         N AIRMASS
@@ -232,7 +232,7 @@
 *
 *         W (AIRMASS) '' Following values apply to mid-observation
 *     As the preceding example but this writes to a blank-keyword
-*     comment.  
+*     comment.
 *
 *         U OBSERVER "Dr. Peter O'Leary" Name of principal observer
 *     This updates the OBSERVER keyword with the string value
@@ -260,12 +260,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -291,7 +291,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -480,7 +480,7 @@
 
 *  Values and/or comments are only relevant to the U(pdate), W(rite),
 *  and A(mend) options.  A new keyword is required for R(ename).
-         NEEDVC = EDIT .EQ. 'W' .OR. EDIT .EQ. 'U' .OR. 
+         NEEDVC = EDIT .EQ. 'W' .OR. EDIT .EQ. 'U' .OR.
      :            EDIT .EQ. 'A' .OR. EDIT .EQ. 'R'
 
 *  Initialise null default values (for other edit commands and null
@@ -550,7 +550,7 @@
 *  placed.  Assume initally that there is no positional keyword, except
 *  for writing or moving where a positional keyword must be specified,
 *  and so default it to the END card.  For Amend this is a provisional
-*  position, if in fact the keyword already exists.  The default 
+*  position, if in fact the keyword already exists.  The default
 *  occurrence is the first one.
          IF ( EDIT .EQ. 'W' .OR. EDIT .EQ. 'A' .OR. EDIT .EQ. 'M' ) THEN
             KEYIND = 'END'
@@ -574,7 +574,7 @@
             IF ( LPOSK .EQ. 0 ) THEN
                KEYIND = 'END'
             ELSE
-      
+
 *  Extract the uppercase positional keyword and any occurrence, and
 *  find the length of the keyword.  Also validate the keyword.
                CALL FTS1_EVKEY( KEYS( KLPPOS + 1:CDELIM - 1 ), KEYIND,
@@ -618,7 +618,7 @@
 *  Exclude the special case when the length is 0 (already defaults to
 *  current editing keyword).
                   IF ( LREFVK .GT. 0 ) THEN
-      
+
 *  Extract the uppercase positional keyword and any occurrence, and
 *  find the length of the keyword.  Also validate the keyword.
                      CALL FTS1_EVKEY( VALUE( VLPPOS + 1:CDELIM - 1 ),
@@ -746,7 +746,7 @@
 *  Give more context of the error and then go to the next line of the
 *  file.
             IF ( STATUS .NE. SAI__OK ) GOTO 50
-         END IF   
+         END IF
 
 *  Interpret special characters in the comment.
 *  ============================================
@@ -778,7 +778,7 @@
 *  Exclude the special case when the length is 0 (already defaults to
 *  current editing keyword).
                   IF ( LREFCK .GT. 0 ) THEN
-      
+
 *  Extract the uppercase positional keyword and any occurrence, and
 *  find the length of the keyword.  Also validate the keyword.
                      CALL FTS1_EVKEY( COMENT( CLPPOS + 1:CDELIM - 1 ),

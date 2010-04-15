@@ -1,4 +1,4 @@
-      SUBROUTINE ATL_CUTPL( IPLOT1, IFRM, DLBND, DUBND, IPLOT2, 
+      SUBROUTINE ATL_CUTPL( IPLOT1, IFRM, DLBND, DUBND, IPLOT2,
      :                      STATUS )
 *+
 *  Name:
@@ -24,12 +24,12 @@
 *     IFRM = INTEGER (Given)
 *        Index of the Frame within IPLOT1 in which the bounds are supplied.
 *     DLBND( * ) = DOUBLE PRECISION (Given)
-*        The axis values at the lower left corner of the region to be 
-*        covered by the new Plot. The number of axis values supplied should 
+*        The axis values at the lower left corner of the region to be
+*        covered by the new Plot. The number of axis values supplied should
 *        equal the number of axes in the Frame identified by IFRM.
 *     DUBND( * ) = DOUBLE PRECISION (Given)
-*        The axis values at the upper right corner of the region to be 
-*        covered by the new Plot. The number of axis values supplied should 
+*        The axis values at the upper right corner of the region to be
+*        covered by the new Plot. The number of axis values supplied should
 *        equal the number of axes in the Frame identified by IFRM.
 *     IPLOT2 = INTEGER (Returned)
 *        The new Plot.
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -71,14 +71,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ATL_PAR'          ! ATL constants 
+      INCLUDE 'ATL_PAR'          ! ATL constants
 
 *  Arguments Given:
       INTEGER IPLOT1
@@ -100,21 +100,21 @@
       DOUBLE PRECISION XU( ATL__MXDIM )
       INTEGER MAP
       INTEGER NIN
-      REAL GBOX( 4 )          
+      REAL GBOX( 4 )
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Transform the supplied bounds into the base (GRAPHICS) Frame of the 
+*  Transform the supplied bounds into the base (GRAPHICS) Frame of the
 *  supplied Plot.
       MAP = AST_GETMAPPING( IPLOT1, IFRM, AST__BASE, STATUS )
-      CALL AST_MAPBOX( MAP, DLBND, DUBND, .TRUE., 1, BBOX( 1 ), 
+      CALL AST_MAPBOX( MAP, DLBND, DUBND, .TRUE., 1, BBOX( 1 ),
      :                 BBOX( 3 ), XL, XU, STATUS )
-      CALL AST_MAPBOX( MAP, DLBND, DUBND, .TRUE., 2, BBOX( 2 ), 
+      CALL AST_MAPBOX( MAP, DLBND, DUBND, .TRUE., 2, BBOX( 2 ),
      :                 BBOX( 4 ), XL, XU, STATUS )
 
 *  Ensure the Mapped limits are the same way round as the supplied
-*  limits. To do this, we transform the supplied points explicitly using 
+*  limits. To do this, we transform the supplied points explicitly using
 *  AST_TRANN.
       NIN = AST_GETI( AST_GETFRAME( IPLOT1, IFRM, STATUS ), 'Naxes',
      :                STATUS )
@@ -122,7 +122,7 @@
       CALL AST_TRANN( MAP, 1, NIN, 1, DUBND, .TRUE., 2, 1, XU, STATUS )
       CALL AST_ANNUL( MAP, STATUS )
 
-*  Ensure that the bounds of the base Frame box found by AST_MAPBOX are 
+*  Ensure that the bounds of the base Frame box found by AST_MAPBOX are
 *  the same way round as the bounds found by transforming the supplied
 *  positions.
       IF( XL( 1 ) .LT. XU( 1 ) .AND. BBOX( 1 ) .GT. BBOX( 3 ) .OR.
@@ -149,15 +149,15 @@
       BBOX( 4 ) = BBOX( 4 ) - D
 
 *  Create a new Plot covering this area of GRAPHICS coords.
-      GBOX( 1 ) = REAL( BBOX( 1 ) )      
-      GBOX( 2 ) = REAL( BBOX( 2 ) )      
-      GBOX( 3 ) = REAL( BBOX( 3 ) )      
-      GBOX( 4 ) = REAL( BBOX( 4 ) )      
+      GBOX( 1 ) = REAL( BBOX( 1 ) )
+      GBOX( 2 ) = REAL( BBOX( 2 ) )
+      GBOX( 3 ) = REAL( BBOX( 3 ) )
+      GBOX( 4 ) = REAL( BBOX( 4 ) )
       IPLOT2 = AST_PLOT( IPLOT1, GBOX, BBOX, ' ', STATUS )
 
 *  Remove the unnecessary GRAPHICS Frame inherited from IPLOT1. It's index
 *  number within IPLOT2 will be one more than its index number in IPLOT1.
-      CALL AST_REMOVEFRAME( IPLOT2, 
+      CALL AST_REMOVEFRAME( IPLOT2,
      :                      AST_GETI( IPLOT1, 'Base', STATUS ) + 1,
      :                      STATUS )
 

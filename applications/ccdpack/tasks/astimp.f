@@ -30,7 +30,7 @@
 *     If a coordinate system with the same Domain (name) already
 *     exists it will be overwritten, and a warning message issued.
 *
-*     AST files for use by this program will normally be those 
+*     AST files for use by this program will normally be those
 *     written by the ASTEXP program, and may either be standard
 *     ones designed for use with a particular instrument, or prepared
 *     by the user.
@@ -40,10 +40,10 @@
 
 *  ADAM Parameters:
 *     ASTFILE = LITERAL (Read)
-*        A file containing a sequence of framesets describing the 
-*        relative coordinate systems of NDFs from different sources.  
+*        A file containing a sequence of framesets describing the
+*        relative coordinate systems of NDFs from different sources.
 *
-*        It is intended that this file should be one written by the 
+*        It is intended that this file should be one written by the
 *        ASTEXP application when a successful registration is made,
 *        and the user need not be aware of its internal structure.
 *        The files are readable text however, and can in principle be
@@ -65,25 +65,25 @@
 *        supplied however, it overrides any value given there.
 *        [!]
 *     IN = LITERAL (Read)
-*        A list of NDF names whose WCS components are to be modified 
-*        according to ASTFILE.  The NDF names may be specified using 
-*        wildcards, or may be specified using an indirection file 
+*        A list of NDF names whose WCS components are to be modified
+*        according to ASTFILE.  The NDF names may be specified using
+*        wildcards, or may be specified using an indirection file
 *        (the indirection character is "^").
 *     INDICES( * ) = _INTEGER (Read)
 *        This parameter is a list of integers with as many elements as
 *        there are NDFs accessed by the IN parameter.  If the frameset
-*        identifiers are of the type 'INDEX' then it indicates, for 
+*        identifiers are of the type 'INDEX' then it indicates, for
 *        each NDF, what its index number is.  Thus if only one NDF is
 *        given in the IN list, and the value of INDICES is [3], then
-*        the frameset with the identifier 'INDEX 3' will be chosen. 
+*        the frameset with the identifier 'INDEX 3' will be chosen.
 *        If set null (!) the NDFs will be considered in the order
-*        1,2,3,... which will be appropriate unless the NDFs are being 
-*        presented in a different order from that in which they were 
+*        1,2,3,... which will be appropriate unless the NDFs are being
+*        presented in a different order from that in which they were
 *        presented to ASTEXP when generating the AST file.
 *        [!]
 *     INDOMAIN = LITERAL (Read)
-*        The Domain name to be used for the Current frames of the 
-*        framesets which are imported.  If a null (!) value is given, 
+*        The Domain name to be used for the Current frames of the
+*        framesets which are imported.  If a null (!) value is given,
 *        the frames will assume the same name as in the AST file.
 *        [!]
 *     LOGFILE = FILENAME (Read)
@@ -120,7 +120,7 @@
 *  Examples:
 *     astimp data* camera.ast
 *        This will apply the AST file "camera.ast" to all the NDFs in
-*        the current directory with names beginning "data".  The file 
+*        the current directory with names beginning "data".  The file
 *        "camera.ast" has previously been written using ASTEXP with
 *        the parameter ASTFILE=camera.ast.  A new coordinate system,
 *        with a name that was determined when the AST file was written,
@@ -136,7 +136,7 @@
 *
 *     astimp astfile=instrum.ast in=! logto=terminal accept
 *        This will simply report on the framesets contained within
-*        the AST file "instrum.ast", writing the ID of each to the 
+*        the AST file "instrum.ast", writing the ID of each to the
 *        terminal only.
 
 *  Notes:
@@ -144,10 +144,10 @@
 *        The AST file is designed to be written by ASTEXP and read by
 *        ASTIMP or MAKESET, and the user does not need to understand
 *        its format.  It is however a text file, and if care is taken
-*        it may be edited by hand.  Removing entire framesets and 
+*        it may be edited by hand.  Removing entire framesets and
 *        modifying ID values or domain names may be done fairly easily,
-*        but care should be taken (see SUN/210) if any more involved 
-*        changes are to be undertaken.  The format of the file is 
+*        but care should be taken (see SUN/210) if any more involved
+*        changes are to be undertaken.  The format of the file is
 *        explained here.
 *
 *        The AST file consists of the following, in order:
@@ -239,8 +239,8 @@
 *     RESET keyword on the command line.
 *
 *     Certain parameters (LOGTO and LOGFILE) have global values.
-*     These global values will always take precedence, except when an 
-*     assignment is made on the command line.  Global values may be set 
+*     These global values will always take precedence, except when an
+*     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 
 *  Copyright:
@@ -274,7 +274,7 @@
 *     27-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
 *     21-NOV-2001 (MBT):
-*        Fixed array overrun bug - now check for a maximum number of 
+*        Fixed array overrun bug - now check for a maximum number of
 *        input NDFs.
 *     {enter_changes_here}
 
@@ -318,7 +318,7 @@
       CHARACTER * ( GRP__SZNAM ) SNAME ! Set Name attribute
       DOUBLE PRECISION DEGRA     ! Degrees - Radians conversion factor
       DOUBLE PRECISION ROT       ! Additional fixed angle to rotate frames
-      INTEGER FSET( MXFSET )     ! AST pointers to import framesets 
+      INTEGER FSET( MXFSET )     ! AST pointers to import framesets
       INTEGER FSMAT              ! AST pointer to matched frameset
       INTEGER I                  ! Loop variable
       INTEGER INDF               ! NDF identifier
@@ -403,7 +403,7 @@
          CALL ERR_ANNUL( STATUS )
       END IF
       CALL CHR_UCASE( FITRTP )
-      
+
 *  Loop over NDFs
       DO 12 I = 1, NNDF
          CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF, STATUS )
@@ -412,7 +412,7 @@
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL NDF_MSG( 'NDF', INDF )
          CALL CCD1_MSG( ' ', '  Processing NDF ^NDF', STATUS )
-         
+
 *  Map FITS extension if it can be found.
          NCARD = 0
          CALL NDF_XSTAT( INDF, 'FITS', FITSEX, STATUS )
@@ -442,11 +442,11 @@
 
 *  No matching frameset in file; inform user.
          IF ( .NOT. MATCH ) THEN
-            CALL CCD1_MSG( ' ',  
-     :                     '    No matching frameset in AST file.', 
+            CALL CCD1_MSG( ' ',
+     :                     '    No matching frameset in AST file.',
      :                     STATUS )
-            
-*  Matching frameset was found; incorporate the new frame information 
+
+*  Matching frameset was found; incorporate the new frame information
 *  into the WCS component of the NDF.
          ELSE
 
@@ -458,8 +458,8 @@
 *  Get WCS component from NDF.
             CALL CCD1_GTWCS( INDF, IWCS, STATUS )
 
-*  Work out what to call the domain once it has been imported.  This 
-*  will be the name of the INDOMAIN parameter if that was not null, 
+*  Work out what to call the domain once it has been imported.  This
+*  will be the name of the INDOMAIN parameter if that was not null,
 *  otherwise the value of the frame in the AST file.
             IF ( INDOM .EQ. ' ' ) THEN
                DMCUR = AST_GETC( FSMAT, 'Domain', STATUS )
@@ -484,11 +484,11 @@
      :                       ROT, FITROT, NCARD, IPFITS, STATUS )
 
 *  Make the newly added frame the Current frame.
-            CALL AST_SETI( IWCS, 'Current', 
+            CALL AST_SETI( IWCS, 'Current',
      :                     AST_GETI( IWCS, 'Nframe', STATUS ), STATUS )
 
 *  Write the WCS component back to the NDF and inform the user.
-            CALL NDF_PTWCS( IWCS, INDF, STATUS ) 
+            CALL NDF_PTWCS( IWCS, INDF, STATUS )
             CALL MSG_SETC( 'DOM', DMCUR )
             CALL CCD1_MSG( ' ',
      :         '    New frame in domain "^DOM" added', STATUS )
@@ -523,7 +523,7 @@
       END IF
 
 *  Close down logging system.
-      CALL CCD1_END( STATUS ) 
+      CALL CCD1_END( STATUS )
 
       END
 * $Id$

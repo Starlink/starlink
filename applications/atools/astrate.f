@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application evaluates the rate of change of a specified output
-*     of the supplied Mapping with respect to a specified input, at a 
+*     of the supplied Mapping with respect to a specified input, at a
 *     specified input position.
 *
 *     The result is estimated by interpolating the function using a fourth
@@ -36,7 +36,7 @@
 
 *  ADAM Parameters:
 *     RATE = _DOUBLE (Write)
-*        A scale in which to store the rate of change of Mapping output 
+*        A scale in which to store the rate of change of Mapping output
 *        AX1 with respect to input AX2, evaluated at AT.
 *     THIS = LITERAL (Read)
 *        An NDF or text file holding the Mapping. If an NDF is supplied,
@@ -48,11 +48,11 @@
 *	 this array should equal the number of inputs to the Mapping.
 *     AX1 = _INTEGER (Read)
 *        The index of the Mapping output for which the rate of change is
-*        to be found (output numbering starts at 1 for the first output). 
+*        to be found (output numbering starts at 1 for the first output).
 *     AX2 = _INTEGER (Read)
 *        The index of the Mapping input which is to be varied in order to
-*        find the rate of change (input numbering starts at 1 for the first 
-*        input). 
+*        find the rate of change (input numbering starts at 1 for the first
+*        input).
 
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council
@@ -138,16 +138,16 @@
 *  Get the position at which the rate is to be evaluated.
       CALL PAR_EXACD( 'AT', NIN, AT, STATUS )
 
-*  Get the index of the Mapping output for which the rate of change is to 
+*  Get the index of the Mapping output for which the rate of change is to
 *  be found.
-      CALL PAR_GDR0I( 'AX1', 1, 1, NOUT, .FALSE., AX1, STATUS )  
+      CALL PAR_GDR0I( 'AX1', 1, 1, NOUT, .FALSE., AX1, STATUS )
 
 *  Get the index of the Mapping input which is to be varied in order to
 *  find the rate of change.
-      CALL PAR_GDR0I( 'AX2', 1, 1, NIN, .FALSE., AX2, STATUS )  
+      CALL PAR_GDR0I( 'AX2', 1, 1, NIN, .FALSE., AX2, STATUS )
 
 *  Find the required rate of change.
-      RATE = AST_RATE( THIS, AT, AX1, AX2, STATUS )      
+      RATE = AST_RATE( THIS, AT, AX1, AX2, STATUS )
 
 *  Display it an write it to the output parameter.
       CALL MSG_SETI( 'AX1', AX1 )
@@ -161,15 +161,15 @@
       IF( RATE .NE. AST__BAD ) THEN
          CALL MSG_SETD( 'R', RATE )
          CALL MSG_OUT( ' ', 'Rate of change of output ^AX1 with '//
-     :                 'respect to input ^AX2 at (^AT) is ^R.', 
+     :                 'respect to input ^AX2 at (^AT) is ^R.',
      :                 STATUS )
       ELSE
          CALL MSG_OUT( ' ', 'Rate of change of output ^AX1 with '//
-     :                 'respect to input ^AX2 at (^AT) is undefined.', 
+     :                 'respect to input ^AX2 at (^AT) is undefined.',
      :                 STATUS )
       END IF
 
-      CALL PAR_PUT0D( 'RATE', RATE, STATUS ) 
+      CALL PAR_PUT0D( 'RATE', RATE, STATUS )
 
 *  Tidy up.
  999  CONTINUE
@@ -179,7 +179,7 @@
 
 *  Give a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ASTRATE_ERR', 'Error finding the rate of '// 
+         CALL ERR_REP( 'ASTRATE_ERR', 'Error finding the rate of '//
      :                 'change of a Mapping output.', STATUS )
       END IF
 

@@ -67,7 +67,7 @@ itcl::class ::gaia3d::Gaia3dVtkCirclePrism {
    #  -----------------------
 
    #  Create the polygon for the circle locus. Note -1 correction to VTK grid
-   #  coordinates 
+   #  coordinates
    protected method create_polygon_ {} {
 
       #  Clear any existing positions.

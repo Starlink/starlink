@@ -270,7 +270,7 @@ t_zd ( &status );
 /* the CPU usage. t_aop does a lot of refractive index corrections and    */
 /* t_wait does a CPU bound loop for 5 seconds to implement a 'wait'.      */
 
-   t_aop ( &status ); 
+   t_aop ( &status );
    t_ref ( &status );
 
 

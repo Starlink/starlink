@@ -33,7 +33,7 @@ C     (>) STRUCT_ID     (Fixed string,descr) A string identifying the
 C                       sub-structure in question.
 C     (>) MODE          (Fixed string,descr) One of blank, 'READ', 'WRITE' or
 C                       'UPDATE' (only the first character is significant).
-C                       If the mode is 'READ' or 'UPDATE', the sub-structure 
+C                       If the mode is 'READ' or 'UPDATE', the sub-structure
 C                       must already exist, and it will be considered an
 C                       error if it does not.  If it is 'WRITE', the
 C                       sub-structure will be created if it does not exist.
@@ -50,7 +50,7 @@ C  External variables used:  None.
 C
 C  External subroutines / functions used:
 C     ICH_LEN, ICH_FOLD, DSA_REF_SLOT, DSA_WRUSER, DSA_GET_ACTUAL_NAME
-C     DSA__TOP_ITEM_TYPE, DSA__CREATE_EXTRA, DSA__EXTRA_NAME, DTA_TYVAR, 
+C     DSA__TOP_ITEM_TYPE, DSA__CREATE_EXTRA, DSA__EXTRA_NAME, DTA_TYVAR,
 C     DTA_CRVAR, DTA_ERROR
 C
 C  Prior requirements:
@@ -67,7 +67,7 @@ C     ICH_FOLD     Convert string to upper case
 C     DSA_REF_SLOT Look up reference name in common tables
 C     DSA_WRUSER   Output message to user
 C     DSA_GET_ACTUAL_NAME  Get full structure name from ref name
-C     DSA__TOP_ITEM_TYPE   Classify a top level item 
+C     DSA__TOP_ITEM_TYPE   Classify a top level item
 C     DSA__CREATE_EXTRA    Make sure the main extra information structure exists
 C     DSA__EXTRA_NAME      Get the name of the main extra information structure
 C     DTA_TYVAR    Get type of data object
@@ -123,7 +123,7 @@ C     Return immediately if bad status passed
 C
       IF (STATUS.NE.0) RETURN
 C
-C     Look up the reference name in the tables 
+C     Look up the reference name in the tables
 C
       CALL DSA_REF_SLOT (REF_NAME,REF_SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500      ! Error exit

@@ -1,6 +1,6 @@
 *+  RED4_SUBTRACT_PAIR - Subtract OBJECT/SKY pair of observations from current group
       SUBROUTINE RED4_SUBTRACT_PAIR( DIM1, DIM2, SKYWT,
-     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY, 
+     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY,
      :  COADDS, STATUS )
 *    Description :
 *     This subroutine subtracts a pair of OBJECT and SKY observations from
@@ -9,7 +9,7 @@
 *     weighted by the factor supplied in SKYWT.
 *    Invocation :
 *      CALL RED4_SUBTRACT_PAIR( DIM1, DIM2, SKYWT,
-*     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY, 
+*     :  OBJDATA, OBJQUAL, SKYDATA, SKYQUAL, DATA, VARIANCE, QUALITY,
 *     :  COADDS, STATUS )
 *    Parameters :
 *     DIM1                             = INTEGER( READ )
@@ -174,7 +174,7 @@
 
 *               Use this value to obtain the current "sum of squares"
 *               (using the Kerry and Keeping formula rearranged).
-                  SUM_SQ = VAR * DBLE( NUM - 1 ) + 
+                  SUM_SQ = VAR * DBLE( NUM - 1 ) +
      :              SUM * SUM / DBLE( NUM )
 
 *               Decrement the number of pairs in the co-add

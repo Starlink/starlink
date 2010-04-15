@@ -24,8 +24,8 @@
 *        The IRA identifier for the astrometry information.
 *     ROUTNE = EXTERNAL (Given)
 *        A routine to which is passed each line of text for display.
-*        It should have the same argument list as MSG__OUTIF (see 
-*        SUN/104), and should be declared EXTERNAL in the calling 
+*        It should have the same argument list as MSG__OUTIF (see
+*        SUN/104), and should be declared EXTERNAL in the calling
 *        routine. All calls to this routine are made with a priority
 *        of MSG__NORM.
 *     STATUS = INTEGER (Given and Returned)
@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -74,7 +74,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER 
+      CHARACTER
      :          ABBREV*(IRA__SZSCA), ! Abbreviation of sky long/lat.
      :          ADESCR*(IRA__SZSCD + 1), ! Description of sky long.
      :          ATEXT*(IRA__SZFSC),  ! Formatted longitude value.
@@ -85,10 +85,10 @@
      :          SCSNAM*(IRA__SZSCS), ! The full SCS name.
      :          TEXT*80              ! Temporary text storage.
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :          EQU                  ! Epoch of reference equinox.
 
-      INTEGER 
+      INTEGER
      :          BUFLEN,              ! Length of text in BUFFER.
      :          LA,                  ! Used length of ABBREV.
      :          LD,                  ! Position of colon.
@@ -110,31 +110,31 @@
       IF( ACM_PROJN( IDA ) .NE. ' ' ) THEN
          TEXT = ACM_PROJN( IDA )
          CALL CHR_LCASE( TEXT( 2: ) )
-      ELSE         
+      ELSE
          TEXT = '(bad projection name found)'
       END IF
 
       CALL MSG_SETC( 'P', TEXT )
-      CALL MSG_LOAD( 'IRA_TRACE_MSG1', 'Projection            : ^P', 
+      CALL MSG_LOAD( 'IRA_TRACE_MSG1', 'Projection            : ^P',
      :               BUF, BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG1', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG1', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Display the nominal pixel size.
       CALL MSG_SETR( 'PX', REAL( ACM_PROJP( 5, IDA )*IRA__R2AM ) )
       CALL MSG_SETR( 'PY', REAL( ACM_PROJP( 6, IDA )*IRA__R2AM ) )
-      CALL MSG_LOAD( 'IRA_TRACE_MSG2', 
+      CALL MSG_LOAD( 'IRA_TRACE_MSG2',
      :               'Nominal pixel size    : ^PX x ^PY arc-mins ',
      :                BUF, BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG2', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG2', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Display the position angle of the Y axis.
       CALL MSG_SETR( 'PA', REAL( ACM_PROJP( 7, IDA )*IRA__RTOD ) )
-      CALL MSG_LOAD( 'IRA_TRACE_MSG3', 
+      CALL MSG_LOAD( 'IRA_TRACE_MSG3',
      :               'Y axis position angle : ^PA degrees',
      :               BUF, BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG3', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG3', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Display the projection twist if it is not zero.
@@ -143,7 +143,7 @@
          CALL MSG_LOAD( 'IRA_TRACE_MSG4',
      :                  'Projection twist angle: ^T degrees',
      :                  BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG4', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG4', BUF( : BUFLEN ),
      :                STATUS )
       END IF
 
@@ -158,7 +158,7 @@
          CALL MSG_LOAD( 'IRA_TRACE_MSG5',
      :                  'Sky coordinates system: ^SCSNAM',
      :                  BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG5', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG5', BUF( : BUFLEN ),
      :                STATUS )
 
 *  Display Sky Coordinate System which need an equinox specifier.
@@ -172,7 +172,7 @@
          CALL MSG_LOAD( 'IRA_TRACE_MSG7',
      :                  '   Sky coordinates system: ^SCSNAM',
      :                  BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG7', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG7', BUF( : BUFLEN ),
      :                STATUS )
 
          IF( BJ .EQ. 'B' ) THEN
@@ -185,7 +185,7 @@
          CALL MSG_LOAD( 'IRA_TRACE_MSG8',
      :                  '   Reference equinox     : ^EP (^BJ)',
      :                  BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG8', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG8', BUF( : BUFLEN ),
      :                STATUS )
 
       END IF
@@ -195,9 +195,9 @@
       CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG9',
      :               'Reference position', STATUS )
 
-      CALL IRA1_ISCNM( ACM_SCS(IDA), 1, ADESCR, LDA, ABBREV, LA, 
+      CALL IRA1_ISCNM( ACM_SCS(IDA), 1, ADESCR, LDA, ABBREV, LA,
      :                 STATUS )
-      CALL IRA1_ISCNM( ACM_SCS(IDA), 2, BDESCR, LDB, ABBREV, LA, 
+      CALL IRA1_ISCNM( ACM_SCS(IDA), 2, BDESCR, LDB, ABBREV, LA,
      :                 STATUS )
       LD = MAX( 17, MAX( LDA, LDB ) )
       ADESCR( LD + 1 : LD + 1 ) = ':'
@@ -208,17 +208,17 @@
      :                 STATUS )
 
       CALL MSG_SETC( 'AD', ADESCR )
-      CALL MSG_SETC( 'A', ATEXT )      
-      CALL MSG_LOAD( 'IRA_TRACE_MSG10', '   ^AD ^A', BUF, BUFLEN, 
+      CALL MSG_SETC( 'A', ATEXT )
+      CALL MSG_LOAD( 'IRA_TRACE_MSG10', '   ^AD ^A', BUF, BUFLEN,
      :               STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG10', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG10', BUF( : BUFLEN ),
      :             STATUS )
 
       CALL MSG_SETC( 'BD', BDESCR )
-      CALL MSG_SETC( 'B', BTEXT )      
-      CALL MSG_LOAD( 'IRA_TRACE_MSG11', '   ^BD ^B', BUF, BUFLEN, 
+      CALL MSG_SETC( 'B', BTEXT )
+      CALL MSG_LOAD( 'IRA_TRACE_MSG11', '   ^BD ^B', BUF, BUFLEN,
      :               STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG11', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG11', BUF( : BUFLEN ),
      :             STATUS )
 
       TEXT = 'Pixel coordinates'
@@ -229,7 +229,7 @@
       CALL MSG_SETR( 'Y', REAL( ACM_PROJP( 4, IDA ) ) )
       CALL MSG_LOAD( 'IRA_TRACE_MSG12', '   ^T ( ^X, ^Y )', BUF, BUFLEN,
      :               STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG12', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRA_TRACE_MSG12', BUF( : BUFLEN ),
      :             STATUS )
 
 *  If an error has occurred, give a context message.

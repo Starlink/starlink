@@ -23,12 +23,12 @@ C  Call:
 C     GIVEN=PAR_GIVEN(NAME)
 C
 C  Parameters:      (">" input, "<" output)
-C     (>) NAME      (Fixed string, descr) The name of the parameter.  
+C     (>) NAME      (Fixed string, descr) The name of the parameter.
 C                   Case insignificant, must end either with spaces
 C                   or with the end of the string.
 C  Returns:
-C     (<) GIVEN     (Logical, function value) True if the parameter was 
-C                   specified explicitly in the invoking command, false 
+C     (<) GIVEN     (Logical, function value) True if the parameter was
+C                   specified explicitly in the invoking command, false
 C                   if not.
 C
 C  External subroutines / functions used -

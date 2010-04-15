@@ -182,7 +182,7 @@
 *  Release the temporary array.
       CALL PSX_FREE( IPW, STATUS )
 
-*  Unmap the vectors UTCS_OFFSET, LAMBDA_SUN and PSI. 
+*  Unmap the vectors UTCS_OFFSET, LAMBDA_SUN and PSI.
       CALL CMP_UNMAP( DLOC, 'UTCS_OFFSET', STATUS )
       CALL CMP_UNMAP( DLOC, 'LAMBDA_SUN', STATUS )
       CALL CMP_UNMAP( DLOC, 'PSI', STATUS )

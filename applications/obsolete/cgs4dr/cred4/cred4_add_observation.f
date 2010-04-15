@@ -1,5 +1,5 @@
 *+  CRED4_ADD_OBSERVATION - Add observation to reduced group
-      SUBROUTINE CRED4_ADD_OBSERVATION( OBSERVATION, ASK, WAIT, STATUS ) 
+      SUBROUTINE CRED4_ADD_OBSERVATION( OBSERVATION, ASK, WAIT, STATUS )
 *    Description :
 *     This routine instructs the RED4 task to add the specified
 *     reduced observation to its corresponding reduced group file.
@@ -19,7 +19,7 @@
 *    Deficiencies :
 *     The GROUP_AVAILABLE flag is only set if this routine waits for
 *     the addition to complete. Otherwise it does not know if the task
-*     has been completed successfully. 
+*     has been completed successfully.
 *    Authors :
 *     S.M.Beard (REVAD::SMB)
 *     P.N.Daly (JACH::PND)
@@ -60,7 +60,7 @@
       INCLUDE 'CRED4COM.INC'        ! CRED4 common block
 *    Local Constants :
       INTEGER DSA__OK
-      PARAMETER ( DSA__OK = 0 ) 
+      PARAMETER ( DSA__OK = 0 )
 *    Local variables :
       LOGICAL OK                    ! T if the observation is ok
       LOGICAL PROCEED               ! T if reduction step is to proceed
@@ -89,7 +89,7 @@
       CALL DSA_OPEN( DSA_STATUS )
 
 *    Open the observation file
-      CALL DSA_NAMED_INPUT( 'OBS_IN', OBSERVATION, DSA_STATUS ) 
+      CALL DSA_NAMED_INPUT( 'OBS_IN', OBSERVATION, DSA_STATUS )
 
 *   Read the group number from the GRPNUM element within the .FITS structure.
       CALL DSA_GET_FITS_I( 'OBS_IN', 'GRPNUM', 0, GRPNUM, COMMENT, DSA_STATUS )
@@ -113,20 +113,20 @@
             OK = .TRUE.
          END IF
       ELSE
- 
+
          STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'CRED4_ADD_OBSERVATION: '/ 
+         CALL ERR_REP( ' ', 'CRED4_ADD_OBSERVATION: '/
      :     /'Error accessing observation file '/
      :     /'(DSA status follows)', STATUS )
          CALL MSG_SETI( 'DSA_STATUS', DSA_STATUS )
-         CALL ERR_REP( ' ', 'CRED4_ADD_OBSERVATION: '/ 
+         CALL ERR_REP( ' ', 'CRED4_ADD_OBSERVATION: '/
      :     /'DSA status = ^DSA_STATUS', STATUS )
       END IF
 
 *   Close DSA, regardless of the current status.
       CALL DSA_CLOSE( DSA_STATUS )
 
-*   Only proceed if everything has been successful and the 
+*   Only proceed if everything has been successful and the
 *   observation is suitable.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. OK ) THEN
 
@@ -157,10 +157,10 @@
 *          so if it has failed don't worry beyond printing a warning.
             IF ( RED4_ACTIVE ) THEN
 
-               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL, 
+               CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL,
      :           STATUS)
 
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                   IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -212,7 +212,7 @@
                CALL CHR_PUTC( OBSERVATION(1:CLEN), INVAL, CPOS )
             ENDIF
 
-*         Tell the RED4 task to add this observation     
+*         Tell the RED4 task to add this observation
             IF ( ADD_IN_PAIRS)  THEN
 
                CALL CHR_PUTC( '" ERRORS=', INVAL, CPOS )
@@ -241,7 +241,7 @@
 
             CALL CHR_PUTC( ' PF_NREJECT=', INVAL, CPOS )
             CALL CHR_PUTI( PF_NREJECT, INVAL, CPOS )
- 
+
             CALL CHR_PUTC( ' PF_SAYS1=', INVAL, CPOS )
             CALL CHR_PUTI( PF_SAYS1, INVAL, CPOS )
 
@@ -278,7 +278,7 @@
      :           OUTVAL, RED4_PATH, RED4_MESSID, STATUS )
             END IF
 
-*         Check that the action started OK, 
+*         Check that the action started OK,
             IF (STATUS .NE. DTASK__ACTSTART) THEN
 
                IF (WAIT) REDUCTION_OK = .FALSE.
@@ -300,7 +300,7 @@
                   CALL TASK_DONE( -1, RED4_PATH, RED4_MESSID,
      :               OUTVAL, STATUS )
 
-                  RED4_ACTIVE = .FALSE. 
+                  RED4_ACTIVE = .FALSE.
 
                   IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                      IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -334,7 +334,7 @@
 
 *                  The observation has been added successfully. Set a
 *                  good status and set the GROUP_AVAILABLE flag.
-                     CALL ERR_ANNUL( STATUS ) 
+                     CALL ERR_ANNUL( STATUS )
                      GROUP_AVAILABLE = .TRUE.
                      REDUCTION_OK = .TRUE.
                   END IF

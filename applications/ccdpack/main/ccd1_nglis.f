@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine gets a list of NDF names from the user via the ADAM
-*     parameter system and writes their names to a text file, and 
+*     parameter system and writes their names to a text file, and
 *     optionally through the CCDPACK logging system.  The NDG routines
-*     are used so that the user may specify NDFs with the normal 
+*     are used so that the user may specify NDFs with the normal
 *     wildcarding conventions.
 
 *  Arguments:
@@ -74,34 +74,34 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'PAR_ERR'          ! Standard PAR system constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       CHARACTER * ( * ) FILNAM
       INTEGER MAXNDF
       LOGICAL ECHO
-      
+
 *  Arguments Returned:
       INTEGER NNDF
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Used length of a string
-      
+
 *  Local Variables:
       INTEGER FD                 ! FIO descriptor for the output file
       INTEGER GID                ! Group identifier for group of NDFs
       INTEGER I                  ! Loop variable
       CHARACTER * ( GRP__SZNAM ) NAME ! Buffer for NDF names
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get a list of NDFs from the user.
       NNDF = 0
       CALL CCD1_NDFGL( PARAM, 1, MAXNDF, GID, NNDF, STATUS )
@@ -125,7 +125,7 @@
                CALL MSG_SETC( 'NAME', NAME )
                CALL MSG_SETI( 'I', I )
                CALL CCD1_MSG( ' ', '  ^I)  ^NAME', STATUS )
-            END IF 
+            END IF
          END DO
          IF ( ECHO ) CALL CCD1_MSG( ' ', ' ', STATUS )
 

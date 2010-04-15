@@ -23,13 +23,13 @@ f     AST_PCDMAP
 *
 *        RD = R * ( 1 + C * R * R )
 *
-*     where R is the undistorted radial distance from the distortion 
-*     centre (specified by attribute PcdCen), RD is the radial distance 
-*     from the same centre in the presence of distortion, and C is the 
+*     where R is the undistorted radial distance from the distortion
+*     centre (specified by attribute PcdCen), RD is the radial distance
+*     from the same centre in the presence of distortion, and C is the
 *     distortion coefficient (given by attribute Disco).
 *
 *     The inverse transformation of a PcdMap removes the distortion
-*     produced by the forward transformation. The expression used to derive 
+*     produced by the forward transformation. The expression used to derive
 *     R from RD is an approximate inverse of the expression above.
 
 *  Inheritance:
@@ -56,12 +56,12 @@ f     The PcdMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -138,7 +138,7 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0;
@@ -153,8 +153,8 @@ astMAKE_INITGLOBALS(PcdMap)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 static char getattrib_buff[ 101 ];
@@ -238,7 +238,7 @@ exceptions, so bad values are dealt with explicitly. */
 *
 *        void astClear<Attribute>_( AstPcdMap *this, int axis )
 *
-*     which implement a method for clearing a single value in a specified 
+*     which implement a method for clearing a single value in a specified
 *     multi-valued attribute for an axis of a PcdMap.
 
 *  Parameters:
@@ -294,7 +294,7 @@ void astClear##attr##_( AstPcdMap *this, int axis, int *status ) { \
 \
 /* Invoke the required method via the virtual function table. */ \
    (**astMEMBER(this,PcdMap,Clear##attr))( this, axis, status ); \
-}   
+}
 
 
 /*
@@ -325,7 +325,7 @@ void astClear##attr##_( AstPcdMap *this, int axis, int *status ) { \
 *
 *        <Type> astGet<Attribute>_( AstPcdMap *this, int axis )
 *
-*     which implement a method for getting a single value from a specified 
+*     which implement a method for getting a single value from a specified
 *     multi-valued attribute for an axis of a PcdMap.
 
 *  Parameters:
@@ -488,7 +488,7 @@ void astSet##attr##_( AstPcdMap *this, int axis, type value, int *status ) { \
 *     MAKE_TEST
 
 *  Purpose:
-*     Implement a method to test if a single value has been set in a 
+*     Implement a method to test if a single value has been set in a
 *     multi-valued attribute.
 
 *  Type:
@@ -511,7 +511,7 @@ void astSet##attr##_( AstPcdMap *this, int axis, type value, int *status ) { \
 *
 *        int astTest<Attribute>_( AstPcdMap *this, int axis )
 *
-*     which implement a method for testing if a single value in a specified 
+*     which implement a method for testing if a single value in a specified
 *     multi-valued attribute has been set for a class.
 
 *  Parameters:
@@ -599,8 +599,8 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int
 *     PcdMap internal utility function.
 
 *  Description:
-*     This function checks the two supplied Mappings to see if they 
-*     can be merged into a single Mapping. One of the pair must be a PcdMap. 
+*     This function checks the two supplied Mappings to see if they
+*     can be merged into a single Mapping. One of the pair must be a PcdMap.
 
 *  Parameters:
 *     map1
@@ -636,14 +636,14 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int
    pcd = NULL;
    nopcd = NULL;
 
-/* Temporarily set the Invert attributes of both Mappings to the supplied 
+/* Temporarily set the Invert attributes of both Mappings to the supplied
    values. */
    invert[ 0 ] = astGetInvert( map1 );
    astSetInvert( map1, inv1 );
 
    invert[ 1 ] = astGetInvert( map2 );
    astSetInvert( map2, inv2 );
-   
+
 /* Get the classes of the two mappings. */
    class1 = astGetClass( map1 );
    class2 = astGetClass( map2 );
@@ -696,7 +696,7 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int
    supplied Mappings. */
    astSetInvert( map1, invert[ 0 ] );
    astSetInvert( map2, invert[ 1 ] );
-   
+
 /* Return the answer. */
    return astOK ? ret : 0;
 }
@@ -717,13 +717,13 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int 
 *     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int *status )
 
 *  Class Membership:
-*     PcdMap member function 
+*     PcdMap member function
 
 *  Description:
 *     This function returns a flag indicating if the pair of supplied
-*     Mappings could be replaced by an equivalent pair of Mappings from the 
+*     Mappings could be replaced by an equivalent pair of Mappings from the
 *     same classes as the supplied pair, but in reversed order. Each pair
-*     of Mappings is considered to be compounded in series. The supplied 
+*     of Mappings is considered to be compounded in series. The supplied
 *     Mappings are not changed in any way.
 
 *  Parameters:
@@ -736,7 +736,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int 
 *        mapping to be used, and a non-zero value causes the inverse
 *        mapping to be used.
 *     inv2
-*        The invert flag to use with map2. 
+*        The invert flag to use with map2.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -771,14 +771,14 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int 
 /* Initialise */
    ret = 0;
 
-/* Temporarily set the Invert attributes of both Mappings to the supplied 
+/* Temporarily set the Invert attributes of both Mappings to the supplied
    values. */
    invert[ 0 ] = astGetInvert( map1 );
    astSetInvert( map1, inv1 );
 
    invert[ 1 ] = astGetInvert( map2 );
    astSetInvert( map2, inv2 );
-   
+
 /* Get the classes of the two mappings. */
    class1 = astGetClass( map1 );
    class2 = astGetClass( map2 );
@@ -832,7 +832,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int 
    supplied Mappings. */
    astSetInvert( map1, invert[ 0 ] );
    astSetInvert( map2, invert[ 1 ] );
-   
+
 /* Return the answer. */
    return astOK ? ret : 0;
 }
@@ -926,7 +926,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     PcdMap member function (over-rides the astEqual protected
@@ -953,8 +953,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstPcdMap *that;        
-   AstPcdMap *this;        
+   AstPcdMap *that;
+   AstPcdMap *this;
    int result;
 
 /* Initialise. */
@@ -983,7 +983,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -1012,7 +1012,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 *  Description:
 *     This function returns a pointer to the value of a specified
-*     attribute for a PcdMap, formatted as a character string. 
+*     attribute for a PcdMap, formatted as a character string.
 
 *  Parameters:
 *     this
@@ -1052,7 +1052,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -1138,7 +1138,7 @@ void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name, int *status ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1402,7 +1402,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Return the index of the first modified element. */
       result = where;
-         
+
 /* If the PcdMap itself could not be simplified, see if it can be merged
    with the Mappings on either side of it in the list. */
    } else {
@@ -1419,17 +1419,17 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    neighbours, resulting in a reduction of one in the number of Mappings
    in the list. A PcdMap can only merge directly with its own inverse, or
    a UnitMap. */
-         if( class1 && CanMerge(  ( *map_list )[ where - 1 ], 
+         if( class1 && CanMerge(  ( *map_list )[ where - 1 ],
                                   ( *map_list )[ where ],
-                                  ( *invert_list )[ where - 1 ], 
+                                  ( *invert_list )[ where - 1 ],
                                   ( *invert_list )[ where ], status ) ){
             nclass = class1;
             i1 = where - 1;
             i2 = where;
 
-         } else if( class2 && CanMerge(  ( *map_list )[ where ], 
+         } else if( class2 && CanMerge(  ( *map_list )[ where ],
                                   ( *map_list )[ where + 1 ],
-                                  ( *invert_list )[ where ], 
+                                  ( *invert_list )[ where ],
                                   ( *invert_list )[ where + 1 ], status ) ){
             nclass = class2;
             i1 = where;
@@ -1459,13 +1459,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If succesfull... */
             if( astOK ){
 
-/* Annul the first of the two Mappings, and replace it with the merged 
-   Mapping. Also set the invert flag. */ 
+/* Annul the first of the two Mappings, and replace it with the merged
+   Mapping. Also set the invert flag. */
                (void) astAnnul( ( *map_list )[ i1 ] );
                ( *map_list )[ i1 ] = newmap;
                ( *invert_list )[ i1 ] = invert;
 
-/* Annul the second of the two Mappings, and shuffle down the rest of the 
+/* Annul the second of the two Mappings, and shuffle down the rest of the
    list to fill the gap. */
                (void) astAnnul( ( *map_list )[ i2 ] );
                for ( i = i2 + 1; i < *nmap; i++ ) {
@@ -1487,9 +1487,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the PcdMap could not merge directly with either of its neighbours,
    we consider whether it would be worthwhile to swap the PcdMap with
    either of its neighbours. This can only be done for certain classes
-   of Mapping (ZoomMaps & some PermMaps), and will usually require both 
-   Mappings to be modified (unless they are commutative). The advantage of 
-   swapping the order of the Mappings is that it may result in the PcdMap 
+   of Mapping (ZoomMaps & some PermMaps), and will usually require both
+   Mappings to be modified (unless they are commutative). The advantage of
+   swapping the order of the Mappings is that it may result in the PcdMap
    being adjacent to a Mapping with which it can merge directly on the next
    invocation of this function, thus reducing the number of Mappings
    in the list. */
@@ -1497,25 +1497,25 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Set a flag if we could swap the PcdMap with its higher neighbour. */
             if( where + 1 < *nmap ){
-               swaphi = CanSwap(  ( *map_list )[ where ], 
+               swaphi = CanSwap(  ( *map_list )[ where ],
                                   ( *map_list )[ where + 1 ],
-                                  ( *invert_list )[ where ], 
+                                  ( *invert_list )[ where ],
                                   ( *invert_list )[ where + 1 ], status );
             } else {
                swaphi = 0;
             }
 
-/* If so, step through each of the Mappings which follow the PcdMap, 
-   looking for a Mapping with which the PcdMap could merge directly. Stop 
+/* If so, step through each of the Mappings which follow the PcdMap,
+   looking for a Mapping with which the PcdMap could merge directly. Stop
    when such a Mapping is found, or if a Mapping is found with which the
-   PcdMap could definitely not swap. Note the number of Mappings which 
-   separate the PcdMap from the Mapping with which it could merge (if 
+   PcdMap could definitely not swap. Note the number of Mappings which
+   separate the PcdMap from the Mapping with which it could merge (if
    any). */
             nstep2 = -1;
             if( swaphi ){
                for( i2 = where + 1; i2 < *nmap; i2++ ){
 
-/* See if we may be able to merge with this Mapping. If so, note the number 
+/* See if we may be able to merge with this Mapping. If so, note the number
    of steps between the two Mappings and leave the loop. */
                   nclass = astGetClass( ( *map_list )[ i2 ] );
 
@@ -1525,8 +1525,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      break;
                   }
 
-/* If there is no chance that we can swap with this Mapping, leave the loop 
-   with -1 for the number of steps to indicate that no merging is possible. 
+/* If there is no chance that we can swap with this Mapping, leave the loop
+   with -1 for the number of steps to indicate that no merging is possible.
    PcdMaps can swap with ZoomMaps and some PermMaps. */
                   if( strcmp( nclass, "ZoomMap" ) &&
                       strcmp( nclass, "PermMap" ) ) {
@@ -1540,9 +1540,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Do the same working forward from the PcdMap towards the start of the map
    list. */
             if( where > 0 ){
-               swaplo = CanSwap(  ( *map_list )[ where - 1 ], 
+               swaplo = CanSwap(  ( *map_list )[ where - 1 ],
                                   ( *map_list )[ where ],
-                                  ( *invert_list )[ where - 1 ], 
+                                  ( *invert_list )[ where - 1 ],
                                   ( *invert_list )[ where ], status );
             } else {
                swaplo = 0;
@@ -1585,16 +1585,16 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                nclass = NULL;
             }
 
-/* If there is a target Mapping in the list with which the PcdMap could 
+/* If there is a target Mapping in the list with which the PcdMap could
    merge, replace the supplied Mappings with swapped Mappings to bring a
    PcdMap closer to the target Mapping. */
             if( nclass ){
 
-/* It is possible that the neighbouring Mapping with which we are about to 
+/* It is possible that the neighbouring Mapping with which we are about to
    swap could also merge with the target Mapping. When the neighbouring
-   Mapping is reconsidered it may well swap the pair back to put itself nearer 
-   the target Mapping. We need to be careful not to end up in an infinite loop 
-   in which the pair of neighbouring Mappings are constantly swapped backwards 
+   Mapping is reconsidered it may well swap the pair back to put itself nearer
+   the target Mapping. We need to be careful not to end up in an infinite loop
+   in which the pair of neighbouring Mappings are constantly swapped backwards
    and forwards as each attempts to put itself closer to the target Mapping.
    To prevent this, we only swap the pair of Mappings if the neighbouring
    Mapping could not itself merge with the target Mapping. Check to see
@@ -1654,7 +1654,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If we have a Mapping to swap with... */
                   if( nclass ) {
 
-/* Take copies of the Mapping and Invert flag arrays so we do not change 
+/* Take copies of the Mapping and Invert flag arrays so we do not change
    the supplied values. */
                      mc[ 0 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[0] );
                      mc[ 1 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[1] );
@@ -1675,23 +1675,23 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
                      if( astGetClass( smc0 ) == astGetClass( mc[0] ) &&
                          astGetClass( smc1 ) == astGetClass( mc[1] ) ) {
-      
+
                         mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
                         mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
 
 /* If one or both of the swapped Mappings could be simplified, then annul
-   the supplied Mappings and return the swapped mappings, storing the index 
+   the supplied Mappings and return the swapped mappings, storing the index
    of the first modified Mapping. */
                      } else {
                         (void ) astAnnul( ( (*map_list) + i1 )[0] );
                         (void ) astAnnul( ( (*map_list) + i1 )[1] );
-      
+
                         ( (*map_list) + i1 )[0] = mc[ 0 ];
                         ( (*map_list) + i1 )[1] = mc[ 1 ];
-      
+
                         ( (*invert_list) + i1 )[0] = ic[ 0 ];
                         ( (*invert_list) + i1 )[1] = ic[ 1 ];
-      
+
                         result = i1;
                         break;
                      }
@@ -1708,14 +1708,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* In parallel. */
 /* ============ */
 /* PcdMaps cannot combine in parallel with any other Mappings. */
-      } 
+      }
    }
 
 /* Return the result. */
    return result;
 }
 
-static void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+static void PermGet( AstPermMap *map, int **outperm, int **inperm,
                      double **consts, int *status ){
 /*
 *  Name:
@@ -1729,11 +1729,11 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+*     void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *                   double **const, int *status )
 
 *  Class Membership:
-*     PcdMap member function 
+*     PcdMap member function
 
 *  Description:
 *     This function returns axis permutation and constants arrays which can
@@ -1752,7 +1752,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *        released using astFree when no longer needed.
 *     consts
 *        An address at which to return a popinter to an array of doubles
-*        holding the constants array. The array should be released using 
+*        holding the constants array. The array should be released using
 *        astFree when no longer needed.
 *     status
 *        Pointer to the inherited status variable.
@@ -1810,7 +1810,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
    pset2 = astPointSet( 2, nout, "", status );
 
 /* Set up the two input positions to be [0,1,2...] and [-1,-1,-1,...]. The
-   first position is used to enumerate the axes, and the second is used to 
+   first position is used to enumerate the axes, and the second is used to
    check for constant axis values. */
    ptr1 = astGetPoints( pset1 );
    if( astOK ){
@@ -1838,7 +1838,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
    of the appropriate input axis will be in the mapped first position. */
          op = ptr2[ i ][ 0 ];
 
-/* If the output axis value is assigned a constant value, the result of 
+/* If the output axis value is assigned a constant value, the result of
    mapping the two different input axis values will be the same. */
          cn = ptr2[ i ][ 1 ];
          if( op == cn ) {
@@ -1849,14 +1849,14 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
             outprm[ i ] = -( nc + 1 );
             nc++;
 
-/* If the output axis values are different, then the output axis value 
+/* If the output axis values are different, then the output axis value
    must be copied from the input axis value. */
          } else {
             outprm[ i ] = (int) ( op + 0.5 );
          }
       }
    }
-    
+
 /* Now do the same thing to determine the input permutation array. */
    if( astOK ){
       for( i = 0; i < nout; i++ ){
@@ -2108,7 +2108,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 *  Description:
 *     This function takes a PcdMap and a set of points encapsulated in a
-*     PointSet and transforms the points so as to map them into the 
+*     PointSet and transforms the points so as to map them into the
 *     required window.
 
 *  Parameters:
@@ -2182,7 +2182,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    PointSet and obtain pointers for accessing the input and output coordinate
    values. */
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse mapping, according to the
@@ -2241,9 +2241,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                dx = dxp*f;
                dy = dyp*f;
 
-/* The above approximate inverse is taken from SLA_UNPCD. If more accuracy 
+/* The above approximate inverse is taken from SLA_UNPCD. If more accuracy
 c   is needed, the following code can be uncommented to iterate to a better
-c   solution. 
+c   solution.
 c
 c               fl = 1.0 + disco*( dx*dx + dy*dy );
 c               dx = dxp/fl;
@@ -2281,7 +2281,7 @@ c               }
 static void PcdZoom( AstMapping **maps, int *inverts, int ipc, int *status ){
 /*
 *  Name:
-*     PcdZoom 
+*     PcdZoom
 
 *  Purpose:
 *     Swap a PcdMap and a ZoomMap.
@@ -2294,14 +2294,14 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc, int *status ){
 *     void PcdZoom( AstMapping **maps, int *inverts, int ipc, int *status )
 
 *  Class Membership:
-*     PcdMap member function 
+*     PcdMap member function
 
 *  Description:
 *     A list of two Mappings is supplied containing a PcdMap and a
-*     ZoomMap. These Mappings are annulled, and replaced with 
+*     ZoomMap. These Mappings are annulled, and replaced with
 *     another pair of Mappings consisting of a PcdMap and a ZoomMap
 *     in the opposite order. These Mappings are chosen so that their
-*     combined effect is the same as the original pair of Mappings. 
+*     combined effect is the same as the original pair of Mappings.
 
 *  Parameters:
 *     maps
@@ -2354,7 +2354,7 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc, int *status ){
    xcen = astGetPcdCen( pm, 0 );
    ycen = astGetPcdCen( pm, 1 );
 
-/* Re-instate the original value of the Invert attributes of the supplied 
+/* Re-instate the original value of the Invert attributes of the supplied
    Mappings. */
    astSetInvert( pm, old_pinv );
    astSetInvert( zm, old_zinv );
@@ -2362,7 +2362,7 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc, int *status ){
 /* Create the returned ZoomMap. */
    zm2 = astZoomMap( 2, zoom, "", status );
 
-/* Find the attributes of the returned PcdMap. If the PCD map is applied 
+/* Find the attributes of the returned PcdMap. If the PCD map is applied
    first... */
    if( ipc == 0 ) {
       cen[ 0 ] = xcen*zoom;
@@ -2414,14 +2414,14 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status ){
 *     void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status )
 
 *  Class Membership:
-*     PcdMap member function 
+*     PcdMap member function
 
 *  Description:
 *     A list of two Mappings is supplied containing a PcdMap and a
-*     PermMap. These Mappings are annulled, and replaced with 
+*     PermMap. These Mappings are annulled, and replaced with
 *     another pair of Mappings consisting of a PcdMap and a PermMap
 *     in the opposite order. These Mappings are chosen so that their
-*     combined effect is the same as the original pair of Mappings. 
+*     combined effect is the same as the original pair of Mappings.
 
 *  Parameters:
 *     maps
@@ -2473,7 +2473,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status ){
    xcen = astGetPcdCen( pm, 0 );
    ycen = astGetPcdCen( pm, 1 );
 
-/* Re-instate the original value of the Invert attributes of the supplied 
+/* Re-instate the original value of the Invert attributes of the supplied
    Mappings. */
    astSetInvert( pm, old_pinv );
    astSetInvert( rm, old_rinv );
@@ -2499,7 +2499,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status ){
       inverts[ ipc ] = inverts[ 1 - ipc ];
 
       maps[ 1 - ipc ] = (AstMapping *) pm2;
-      inverts[ 1 - ipc  ] = old_pinv; 
+      inverts[ 1 - ipc  ] = old_pinv;
    }
 
 /* Return. */
@@ -2518,7 +2518,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status ){
 *     Disco
 
 *  Purpose:
-*     PcdMap pincushion/barrel distortion coefficient. 
+*     PcdMap pincushion/barrel distortion coefficient.
 
 *  Type:
 *     Public attribute.
@@ -2534,11 +2534,11 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status ){
 *     the value should be positive. For barrel distortion, it should be
 *     negative.
 *
-*     Note that the forward transformation of a PcdMap applies the 
-*     distortion specified by this attribute and the inverse 
-*     transformation removes this distortion. If the PcdMap is inverted 
-c     (e.g. using astInvert), then the forward transformation will 
-f     (e.g. using AST_INVERT), then the forward transformation will 
+*     Note that the forward transformation of a PcdMap applies the
+*     distortion specified by this attribute and the inverse
+*     transformation removes this distortion. If the PcdMap is inverted
+c     (e.g. using astInvert), then the forward transformation will
+f     (e.g. using AST_INVERT), then the forward transformation will
 *     remove the distortion and the inverse transformation will apply
 *     it. The distortion itself will still be given by the same value of
 *     Disco.
@@ -2587,18 +2587,18 @@ astMAKE_TEST(PcdMap,Disco,( this->disco != AST__BAD ))
 *        All PcdMaps have this attribute.
 
 *  Notes:
-*     - If no axis is specified, (e.g. "PcdCen" instead of 
-*     "PcdCen(2)"), then a "set" or "clear" operation will affect 
-*     the attribute value of both axes, while a "get" or "test" 
+*     - If no axis is specified, (e.g. "PcdCen" instead of
+*     "PcdCen(2)"), then a "set" or "clear" operation will affect
+*     the attribute value of both axes, while a "get" or "test"
 *     operation will use just the PcdCen(1) value.
 *att--
 */
-/* The centre of the distortion. AST__BAD is stored if no value has been 
+/* The centre of the distortion. AST__BAD is stored if no value has been
    supplied, resulting in default values of zero being used. */
 MAKE_CLEAR(PcdCen,pcdcen,AST__BAD,2)
 MAKE_SET(PcdCen,double,pcdcen,value,2)
 MAKE_TEST(PcdCen,( this->pcdcen[axis] != AST__BAD ),2)
-MAKE_GET(PcdCen,double,0.0,(( this->pcdcen[axis] == AST__BAD ) ? 
+MAKE_GET(PcdCen,double,0.0,(( this->pcdcen[axis] == AST__BAD ) ?
                               0.0 : this->pcdcen[axis] ),2)
 
 /* Copy constructor. */
@@ -2731,13 +2731,13 @@ f     RESULT = AST_PCDMAP( DISCO, PCDCEN, OPTIONS, STATUS )
 *
 *        RD = R * ( 1 + C * R * R )
 *
-*     where R is the undistorted radial distance from the distortion 
-*     centre (specified by attribute PcdCen), RD is the radial distance 
-*     from the same centre in the presence of distortion, and C is the 
+*     where R is the undistorted radial distance from the distortion
+*     centre (specified by attribute PcdCen), RD is the radial distance
+*     from the same centre in the presence of distortion, and C is the
 *     distortion coefficient (given by attribute Disco).
 *
 *     The inverse transformation of a PcdMap removes the distortion
-*     produced by the forward transformation. The expression used to derive 
+*     produced by the forward transformation. The expression used to derive
 *     R from RD is an approximate inverse of the expression above, obtained
 *     from two iterations of the Newton-Raphson method. The mismatch between
 *     the forward and inverse expressions is negligible for astrometric
@@ -2755,7 +2755,7 @@ f     If a PcdMap is inverted (e.g. using AST_INVERT) then the roles of the
 c     disco
 f     DISCO = DOUBLE PRECISION (Given)
 *        The distortion coefficient. Negative values give barrel
-*        distortion, positive values give pincushion distortion, and 
+*        distortion, positive values give pincushion distortion, and
 *        zero gives no distortion.
 c     pcdcen
 f     PCDCEN( 2 ) = DOUBLE PRECISION (Given)
@@ -2853,7 +2853,7 @@ AstPcdMap *astPcdMapId_( double disco, const double pcdcen[2],
 *  Synopsis:
 *     #include "pcdmap.h"
 *     AstPcdMap *astPcdMapId_( double disco, const double pcdcen[2],
-*                              const char *options, ... ) 
+*                              const char *options, ... )
 
 *  Class Membership:
 *     PcdMap constructor.
@@ -3016,7 +3016,7 @@ AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
       new->pcdcen[0] = pcdcen[0];
       new->pcdcen[1] = pcdcen[1];
       new->disco = disco;
-  
+
 /* If an error occurred, clean up by deleting the new PcdMap. */
       if ( !astOK ) new = astDelete( new );
    }

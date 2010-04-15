@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,7 +72,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First set up the text of the history record for the output
-*  temperature map. 
+*  temperature map.
       CALL NDF_MSG( 'OUT', INDF3 )
       CALL MSG_SETI( 'W', I90__WAVEL( BAND ) )
       CALL MSG_LOAD( ' ',

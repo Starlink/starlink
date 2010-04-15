@@ -37,7 +37,7 @@
 *     dependent. If the specified cursor shape or cursor colour is not
 *     available then the shape and colour will be implementation
 *     dependent.
-*     
+*
 *     See the IDI specification for a full description of the routine.
 *     Terrett et al., 1988,
 *     Astron.Astrophys.Suppl.Ser., vol 76, pp 263-304.
@@ -73,12 +73,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,7 +93,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -200,7 +200,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -298,7 +298,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -397,7 +397,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -498,7 +498,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -592,7 +592,7 @@
 *     December 1990 (NE):
 *        Reformatted and added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -680,7 +680,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -722,7 +722,7 @@
   99  CONTINUE
 
       END
-      
+
 ************************************************************************
 
       SUBROUTINE IIDERR( STATUS, MESSAG, MESLEN )
@@ -766,7 +766,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -833,7 +833,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -876,7 +876,7 @@
   99  CONTINUE
 
       END
-      
+
 ************************************************************************
 
       SUBROUTINE IIDOPN( DEVNAM, DISPID, STATUS )
@@ -932,7 +932,7 @@
 *     December 1990 (NE):
 *        Reformatted routine and added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1083,7 +1083,7 @@
 *     April 1991 (NE):
 *        Initialise the number of return values
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1191,7 +1191,7 @@
 *     April 1991 (NE):
 *        Initialise the number of return values
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1347,7 +1347,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1470,7 +1470,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1569,7 +1569,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1660,7 +1660,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1767,7 +1767,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1861,7 +1861,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -1976,7 +1976,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2029,7 +2029,7 @@
   99  CONTINUE
 
       END
-      
+
 ************************************************************************
 
       SUBROUTINE IIDSSS( DISPID, MEMID, XOFF, YOFF, SPLIT, XSPLIT,
@@ -2100,7 +2100,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2150,7 +2150,7 @@
   99  CONTINUE
 
       END
-      
+
 ************************************************************************
 
       SUBROUTINE IIDSTC( DISPID, NCONF, STATUS )
@@ -2198,7 +2198,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2286,7 +2286,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2371,7 +2371,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2444,7 +2444,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2551,7 +2551,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2695,7 +2695,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2810,7 +2810,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -2958,7 +2958,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3052,7 +3052,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3148,7 +3148,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3239,7 +3239,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3329,7 +3329,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3425,7 +3425,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3533,7 +3533,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3625,7 +3625,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3718,7 +3718,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3820,7 +3820,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3917,7 +3917,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -3961,7 +3961,7 @@
   99  CONTINUE
 
       END
-      
+
 ************************************************************************
 
       SUBROUTINE IILWIT( DISPID, MEMID, ITTNUM, START, NENT, ITT,
@@ -4022,7 +4022,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4133,7 +4133,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4228,7 +4228,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4323,7 +4323,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4414,7 +4414,7 @@
 *     December 1990 (NE):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4534,7 +4534,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4638,7 +4638,7 @@
 *     December 1990 *NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4683,7 +4683,7 @@
   99  CONTINUE
 
       END
-      
+
 ************************************************************************
 
       SUBROUTINE IIMSMV( DISPID, MEMID, NMEM, LVIS, STATUS )
@@ -4737,7 +4737,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4851,7 +4851,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -4989,7 +4989,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5099,7 +5099,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5215,10 +5215,10 @@
       IMPLICIT NONE
 
 *  Global constants:
-      INCLUDE 'IDI_ERR'      
+      INCLUDE 'IDI_ERR'
 
 *  Global variables:
-      INCLUDE 'idi_did'      
+      INCLUDE 'idi_did'
 
 *  Arguments Given:
       INTEGER DISPID
@@ -5309,7 +5309,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5408,7 +5408,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5511,7 +5511,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5614,7 +5614,7 @@
 *     December 1990 (NE):
 *        Call device specific routines
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5722,7 +5722,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5827,7 +5827,7 @@
 *     December 1990 (NE):
 *        Added X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -5931,7 +5931,7 @@
 *     December 1990 (NE):
 *        Add X-windows interface
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 

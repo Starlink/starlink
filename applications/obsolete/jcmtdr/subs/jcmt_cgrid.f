@@ -16,9 +16,9 @@
 *    :  NX, YMIN, YMAX, YSPACE, NY, STATUS)
 
 *  Description:
-*   This routine takes the x,y coords of the mapped points and attempts to 
+*   This routine takes the x,y coords of the mapped points and attempts to
 *   fit them onto a rectangular grid. The grid contains the minimum number
-*   of points required to hold the measured positions. 
+*   of points required to hold the measured positions.
 
 *  Arguments:
 *     N       = INTEGER (Given)
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -170,7 +170,7 @@
                IPOS = NINT (RPOS)
                IF (ABS(REAL(IPOS)-RPOS) .GT. 0.01) THEN
                   OK = .FALSE.
-               END IF 
+               END IF
             END IF
             IF (YMAX .NE. YMIN) THEN
                RPOS = (Y(I) - YMIN) / YSPACE

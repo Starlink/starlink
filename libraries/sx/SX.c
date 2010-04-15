@@ -4,10 +4,10 @@ Fpair *head=NULL;
 
 /*------------------------------------------------------------------------*/
 
-Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos, 
+Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                  double *indata[], int noutpos, float *outpos, double
-                 *outdata[], float *lbout, float *ubout, int nclose, 
-                 float maxrad, float *rscale, int nscale, float power, 
+                 *outdata[], float *lbout, float *ubout, int nclose,
+                 float maxrad, float *rscale, int nscale, float power,
                  float coexp, char type, int *outbad ){
 /*
 *+
@@ -22,23 +22,23 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *     ANSI C
 
 *  Prototype:
-*     Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, 
-*                      float *inpos, double *indata[], int noutpos, 
-*                      float *outpos, double *outdata[], float *lbout, 
-*                      float *ubout, int nclose, float maxrad, float *rscale, 
-*                      int nscale, float power, float coexp, char type, 
+*     Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos,
+*                      float *inpos, double *indata[], int noutpos,
+*                      float *outpos, double *outdata[], float *lbout,
+*                      float *ubout, int nclose, float maxrad, float *rscale,
+*                      int nscale, float power, float coexp, char type,
 *                      int *outbad );
 
 *  Description:
-*     The supplied input data arrays are sampled at the supplied output 
+*     The supplied input data arrays are sampled at the supplied output
 *     positions and returned in the output data arrays. The input data
 *     must be either scalar or vector (i.e. not tensor for instance). All
-*     invalid positions must be removed (culled) from the input 
-*     positions array before calling this function. Invalid output positions 
-*     (i.e. positions at which no valid output data values could be created) 
+*     invalid positions must be removed (culled) from the input
+*     positions array before calling this function. Invalid output positions
+*     (i.e. positions at which no valid output data values could be created)
 *     are flagged by the maximum floating point value (i.e. FLT_MAX defined
 *     in float.h) being returned for their output data values. Argument
-*     "outbad" is returned holding the number of invalid output positions 
+*     "outbad" is returned holding the number of invalid output positions
 *     encountered in each field.
 *
 *     Each output data value is created by first identifying a set of
@@ -51,13 +51,13 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *     or
 *
 *        ( d/scale )**power                    : if coexp is zero
-*     
-*     The squared reciprocal of the scale values are supplied in array 
-*     "rscale". "rscale[0] is used for the closest point, "rscale[1]" is used 
-*     for the next closest, etc. If insufficient scale values are supplied, 
-*     the last scale value (i.e. "rscale[nscale-1]") is used for all remaining 
-*     positions. The output data value can then be either the weighted mean 
-*     of the input data values, the weighted sum of the input values, or just 
+*
+*     The squared reciprocal of the scale values are supplied in array
+*     "rscale". "rscale[0] is used for the closest point, "rscale[1]" is used
+*     for the next closest, etc. If insufficient scale values are supplied,
+*     the last scale value (i.e. "rscale[nscale-1]") is used for all remaining
+*     positions. The output data value can then be either the weighted mean
+*     of the input data values, the weighted sum of the input values, or just
 *     the sum of the input wieghts (see argument type).
 
 *  Arguments:
@@ -68,26 +68,26 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        The number of dimensions describing each position. This should
 *        be in the range 1 to 3.
 *     veclen[] = int (Given)
-*        An array holding the length of the data vectors for each of the 
+*        An array holding the length of the data vectors for each of the
 *        "nfld" data arrays.
 *     ninpos = int (Given)
 *        The number of input positions.
 *     inpos = float * (Given)
-*        A pointer to the start of the array holding the input positions. 
-*        This array should hold "ninpos" vectors of dimension "ndim". 
+*        A pointer to the start of the array holding the input positions.
+*        This array should hold "ninpos" vectors of dimension "ndim".
 *     indata[] = double * (Given)
-*        An array of pointers to the start of the "nfld" input data arrays. 
-*        Each of these input data arrays should hold "ninpos" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" input data arrays.
+*        Each of these input data arrays should hold "ninpos" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     noutpos = int (Given)
 *        The number of output positions.
 *     outpos = float * (Given)
-*        A pointer to the start of the array holding the output positions. 
-*        This array should hold "noutpos" vectors of dimension "ndim". 
+*        A pointer to the start of the array holding the output positions.
+*        This array should hold "noutpos" vectors of dimension "ndim".
 *     outdata[] = double * (Given)
-*        An array of pointers to the start of the "nfld" output data arrays. 
-*        Each of these output data arrays should hold "noutpos" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" output data arrays.
+*        Each of these output data arrays should hold "noutpos" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     lbout = float * (Given)
 *        A pointer to the start of an array in which are stored the
 *        lower bounds of the volume of interest. Output positions outside
@@ -95,7 +95,7 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        positions outside this volume are ignored.
 *     ubout = float * (Given)
 *        A pointer to the start of an array in which are stored the
-*        upper bounds of the volume of interest. 
+*        upper bounds of the volume of interest.
 *     nclose = int (Given)
 *        The maximum number of input positions to consider when finding
 *        each output data value. If this is set to INT_MAX (defined in
@@ -107,8 +107,8 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        If this is set to FLT_MAX (defined in float.h), then no limit is
 *        placed on distance.
 *     rscale = float * (Given)
-*        Pointer to an array holding the squares of the reciprocal of the 
-*        scale lengths to use when calculating the weight of each input 
+*        Pointer to an array holding the squares of the reciprocal of the
+*        scale lengths to use when calculating the weight of each input
 *        position for a particular output position.
 *     nscale = int (Given)
 *        The number of scale values supplied. If "nscale" is less than
@@ -123,10 +123,10 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        "Description:" section above).
 *     type = char (Given)
 *        If 0, then the returned output data values are weighted means
-*        of the input data values. If 1, then the returned output data 
-*        values are weighted sums of the input data values. If 2, then 
-*        the returned output data values are the sum of the weights of 
-*        the input data values. 
+*        of the input data values. If 1, then the returned output data
+*        values are weighted sums of the input data values. If 2, then
+*        the returned output data values are the sum of the weights of
+*        the input data values.
 *     outbad = int * (Returned)
 *        Pointer to an array returned holding the number of invalid
 *        positions in each output field.
@@ -144,12 +144,12 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -208,7 +208,7 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
       }
 
 
-/*  If needed, store half the exponent for the weights. The exponnent is 
+/*  If needed, store half the exponent for the weights. The exponnent is
  *  halved to take account of the fact that the weights are calcualted from the SQUARED distances. */
 
       if( power != 0.0 ){
@@ -316,16 +316,16 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 
             if( !SXFindClose( ndim, ninpos, inpos, outpos+i*ndim, nclose,
                               rdcell, lbndl, gdim, poslut, posres, disres ) ){
-               DXFree( (Pointer) poslut );               
+               DXFree( (Pointer) poslut );
                DXFree( (Pointer) posres );
                DXFree( (Pointer) disres );
                return( ERROR );
             }
 
 
-/*  Count the number of usable input positions (i.e. ones which were found, 
- *  and which are not further than the specified maximum distance from the 
- *  output position. ) */        
+/*  Count the number of usable input positions (i.e. ones which were found,
+ *  and which are not further than the specified maximum distance from the
+ *  output position. ) */
 
             j = nclose - 1;
             while( j>= 0 && ( posres[j] < 0 || disres[j] > maxd2 ) ) j--;
@@ -338,9 +338,9 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
          } else {
 
             if( !SXFindRadius( ndim, ninpos, inpos, outpos+i*ndim, maxrad,
-                               rdcell, lbndl, gdim, poslut, &nres, &posres, 
+                               rdcell, lbndl, gdim, poslut, &nres, &posres,
                                &disres ) ){
-               DXFree( (Pointer) poslut );               
+               DXFree( (Pointer) poslut );
                return( ERROR );
             }
 
@@ -349,7 +349,7 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
  *  if "nscale" was supplied greater than 1), then we need to sort the
  *  positions returned by SXFindRadius into order of increasing distance
  *  from the current sample position so that the correct scale factor is
- *  used for each position. (SXFindClose returns positions already sorted but 
+ *  used for each position. (SXFindClose returns positions already sorted but
  *  SXFindRadius doesn't). */
 
             if( nscale > 1 ) SXSort( nres, disres, posres );
@@ -388,15 +388,15 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                   temp = (double) (disres[j]*rscale[j]);
                } else {
                   temp = (double) (disres[j]*lastrscale);
-               }   
+               }
 
                if( temp > 0.0 ){
                   temp = log( (double) temp );
-   
+
                   if( ( k1 > 0.0 && temp < k1 ) ||
                       ( k1 < 0.0 && temp > k1 ) ){
                      wgt = exp( (double) hpower*temp );
-   
+
                      if( coexp != 0.0 ) {
                         if( ( k2 > 0.0 && wgt < k2 ) ||
                             ( k2 < 0.0 && wgt > k2 ) ){
@@ -404,13 +404,13 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                         } else {
                            badwgt = 1;
                         }
-                     } 
-   
+                     }
+
                   } else {
                      badwgt = 1;
                   }
-   
-               } else { 
+
+               } else {
 
                   if( coexp != 0.0 ) {
                      wgt = 1.0;
@@ -420,8 +420,8 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                }
 
             }
-   
-   
+
+
 /*  If the weight overflowed, ignore the remaining input positions. */
 
             if( badwgt ) break;
@@ -460,13 +460,13 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 
                   if( wsum != 0.0 ){
                      for( k=0; k<veclen[fld]; k++ ) *(outfld++) /= wsum;
-  
+
                   } else {
                      for( k=0; k<veclen[fld]; k++ ) *(outfld++) = DBL_MAX;
                      outbad[fld]++;
                   }
 
-   
+
                } else if( type == 1 ){        /* Weighted sum */
 
                   for( k=0; k<veclen[fld]; k++ ) *(outfld++);
@@ -475,11 +475,11 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                } else if( type == 2 ){         /*  Sum of weights */
 
                   *(outfld++) = wsum;
-     
+
                }
 
 
-/*  If the output value is undefined, store "bad" data values (the maximum 
+/*  If the output value is undefined, store "bad" data values (the maximum
  *  floating point value). */
 
             } else {
@@ -495,7 +495,7 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
          }
 
 
-/*  Free the storage used to hold the list of contributing input positions 
+/*  Free the storage used to hold the list of contributing input positions
  *  if storage is allocated inside SXFindRadius (SXFindClose does not
  *  allocate its own results arrays). */
 
@@ -512,7 +512,7 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
       if( noutpos >= 2000 ) DXMessage("SXRegrid: Done all %d positions",noutpos );
 
 
-/*  Free the storage used to hold the list of contributing input positions 
+/*  Free the storage used to hold the list of contributing input positions
  *  if storag ewas allocated by this function (i.e. if SXFindClose was
  *  used instead of SXFindRadius). */
 
@@ -530,10 +530,10 @@ Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 
 /*------------------------------------------------------------------------*/
 
-Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos, 
+Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                  float *indata[], int noutpos, float *outpos, float
-                 *outdata[], float *lbout, float *ubout, int nclose, 
-                 float maxrad, float *rscale, int nscale, float power, 
+                 *outdata[], float *lbout, float *ubout, int nclose,
+                 float maxrad, float *rscale, int nscale, float power,
                  float coexp, char type, int *outbad ){
 /*
 *+
@@ -548,23 +548,23 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *     ANSI C
 
 *  Prototype:
-*     Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, 
-*                      float *inpos, float *indata[], int noutpos, 
-*                      float *outpos, float *outdata[], float *lbout, 
-*                      float *ubout, int nclose, float maxrad, float *rscale, 
-*                      int nscale, float power, float coexp, char type, 
+*     Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos,
+*                      float *inpos, float *indata[], int noutpos,
+*                      float *outpos, float *outdata[], float *lbout,
+*                      float *ubout, int nclose, float maxrad, float *rscale,
+*                      int nscale, float power, float coexp, char type,
 *                      int *outbad );
 
 *  Description:
-*     The supplied input data arrays are sampled at the supplied output 
+*     The supplied input data arrays are sampled at the supplied output
 *     positions and returned in the output data arrays. The input data
 *     must be either scalar or vector (i.e. not tensor for instance). All
-*     invalid positions must be removed (culled) from the input 
-*     positions array before calling this function. Invalid output positions 
-*     (i.e. positions at which no valid output data values could be created) 
+*     invalid positions must be removed (culled) from the input
+*     positions array before calling this function. Invalid output positions
+*     (i.e. positions at which no valid output data values could be created)
 *     are flagged by the maximum floating point value (i.e. FLT_MAX defined
 *     in float.h) being returned for their output data values. Argument
-*     "outbad" is returned holding the number of invalid output positions 
+*     "outbad" is returned holding the number of invalid output positions
 *     encountered in each field.
 *
 *     Each output data value is created by first identifying a set of
@@ -577,13 +577,13 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *     or
 *
 *        ( d/scale )**power                    : if coexp is zero
-*     
-*     The squared reciprocal of the scale values are supplied in array 
-*     "rscale". "rscale[0] is used for the closest point, "rscale[1]" is used 
-*     for the next closest, etc. If insufficient scale values are supplied, 
-*     the last scale value (i.e. "rscale[nscale-1]") is used for all remaining 
-*     positions. The output data value can then be either the weighted mean 
-*     of the input data values, the weighted sum of the input values, or just 
+*
+*     The squared reciprocal of the scale values are supplied in array
+*     "rscale". "rscale[0] is used for the closest point, "rscale[1]" is used
+*     for the next closest, etc. If insufficient scale values are supplied,
+*     the last scale value (i.e. "rscale[nscale-1]") is used for all remaining
+*     positions. The output data value can then be either the weighted mean
+*     of the input data values, the weighted sum of the input values, or just
 *     the sum of the input wieghts (see argument type).
 
 *  Arguments:
@@ -594,26 +594,26 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        The number of dimensions describing each position. This should
 *        be in the range 1 to 3.
 *     veclen[] = int (Given)
-*        An array holding the length of the data vectors for each of the 
+*        An array holding the length of the data vectors for each of the
 *        "nfld" data arrays.
 *     ninpos = int (Given)
 *        The number of input positions.
 *     inpos = float * (Given)
-*        A pointer to the start of the array holding the input positions. 
-*        This array should hold "ninpos" vectors of dimension "ndim". 
+*        A pointer to the start of the array holding the input positions.
+*        This array should hold "ninpos" vectors of dimension "ndim".
 *     indata[] = float * (Given)
-*        An array of pointers to the start of the "nfld" input data arrays. 
-*        Each of these input data arrays should hold "ninpos" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" input data arrays.
+*        Each of these input data arrays should hold "ninpos" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     noutpos = int (Given)
 *        The number of output positions.
 *     outpos = float * (Given)
-*        A pointer to the start of the array holding the output positions. 
-*        This array should hold "noutpos" vectors of dimension "ndim". 
+*        A pointer to the start of the array holding the output positions.
+*        This array should hold "noutpos" vectors of dimension "ndim".
 *     outdata[] = float * (Given)
-*        An array of pointers to the start of the "nfld" output data arrays. 
-*        Each of these output data arrays should hold "noutpos" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" output data arrays.
+*        Each of these output data arrays should hold "noutpos" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     lbout = float * (Given)
 *        A pointer to the start of an array in which are stored the
 *        lower bounds of the volume of interest. Output positions outside
@@ -621,7 +621,7 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        positions outside this volume are ignored.
 *     ubout = float * (Given)
 *        A pointer to the start of an array in which are stored the
-*        upper bounds of the volume of interest. 
+*        upper bounds of the volume of interest.
 *     nclose = int (Given)
 *        The maximum number of input positions to consider when finding
 *        each output data value. If this is set to INT_MAX (defined in
@@ -633,8 +633,8 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        If this is set to FLT_MAX (defined in float.h), then no limit is
 *        placed on distance.
 *     rscale = float * (Given)
-*        Pointer to an array holding the squares of the reciprocal of the 
-*        scale lengths to use when calculating the weight of each input 
+*        Pointer to an array holding the squares of the reciprocal of the
+*        scale lengths to use when calculating the weight of each input
 *        position for a particular output position.
 *     nscale = int (Given)
 *        The number of scale values supplied. If "nscale" is less than
@@ -649,10 +649,10 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 *        "Description:" section above).
 *     type = char (Given)
 *        If 0, then the returned output data values are weighted means
-*        of the input data values. If 1, then the returned output data 
-*        values are weighted sums of the input data values. If 2, then 
-*        the returned output data values are the sum of the weights of 
-*        the input data values. 
+*        of the input data values. If 1, then the returned output data
+*        values are weighted sums of the input data values. If 2, then
+*        the returned output data values are the sum of the weights of
+*        the input data values.
 *     outbad = int * (Returned)
 *        Pointer to an array returned holding the number of invalid
 *        positions in each output field.
@@ -713,7 +713,7 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
       }
 
 
-/*  If needed, store half the exponent for the weights. The exponnent is 
+/*  If needed, store half the exponent for the weights. The exponnent is
  *  halved to take account of the fact that the weights are calcualted from the SQUARED distances. */
 
       if( power != 0.0 ){
@@ -821,16 +821,16 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 
             if( !SXFindClose( ndim, ninpos, inpos, outpos+i*ndim, nclose,
                               rdcell, lbndl, gdim, poslut, posres, disres ) ){
-               DXFree( (Pointer) poslut );               
+               DXFree( (Pointer) poslut );
                DXFree( (Pointer) posres );
                DXFree( (Pointer) disres );
                return( ERROR );
             }
 
 
-/*  Count the number of usable input positions (i.e. ones which were found, 
- *  and which are not further than the specified maximum distance from the 
- *  output position. ) */        
+/*  Count the number of usable input positions (i.e. ones which were found,
+ *  and which are not further than the specified maximum distance from the
+ *  output position. ) */
 
             j = nclose - 1;
             while( j>= 0 && ( posres[j] < 0 || disres[j] > maxd2 ) ) j--;
@@ -843,9 +843,9 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
          } else {
 
             if( !SXFindRadius( ndim, ninpos, inpos, outpos+i*ndim, maxrad,
-                               rdcell, lbndl, gdim, poslut, &nres, &posres, 
+                               rdcell, lbndl, gdim, poslut, &nres, &posres,
                                &disres ) ){
-               DXFree( (Pointer) poslut );               
+               DXFree( (Pointer) poslut );
                return( ERROR );
             }
 
@@ -854,7 +854,7 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
  *  if "nscale" was supplied greater than 1), then we need to sort the
  *  positions returned by SXFindRadius into order of increasing distance
  *  from the current sample position so that the correct scale factor is
- *  used for each position. (SXFindClose returns positions already sorted but 
+ *  used for each position. (SXFindClose returns positions already sorted but
  *  SXFindRadius doesn't). */
 
             if( nscale > 1 ) SXSort( nres, disres, posres );
@@ -893,15 +893,15 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                   temp = disres[j]*rscale[j];
                } else {
                   temp = disres[j]*lastrscale;
-               }   
+               }
 
                if( temp > 0.0 ){
                   temp = (float) log( (double) temp );
-   
+
                   if( ( k1 > 0.0 && temp < k1 ) ||
                       ( k1 < 0.0 && temp > k1 ) ){
                      wgt = (float) exp( (double) hpower*temp );
-   
+
                      if( coexp != 0.0 ) {
                         if( ( k2 > 0.0 && wgt < k2 ) ||
                             ( k2 < 0.0 && wgt > k2 ) ){
@@ -909,13 +909,13 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                         } else {
                            badwgt = 1;
                         }
-                     } 
-   
+                     }
+
                   } else {
                      badwgt = 1;
                   }
-   
-               } else { 
+
+               } else {
 
                   if( coexp != 0.0 ) {
                      wgt = 1.0;
@@ -925,8 +925,8 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                }
 
             }
-   
-   
+
+
 /*  If the weight overflowed, ignore the remaining input positions. */
 
             if( badwgt ) break;
@@ -965,13 +965,13 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 
                   if( wsum != 0.0 ){
                      for( k=0; k<veclen[fld]; k++ ) *(outfld++) /= wsum;
-  
+
                   } else {
                      for( k=0; k<veclen[fld]; k++ ) *(outfld++) = FLT_MAX;
                      outbad[fld]++;
                   }
 
-   
+
                } else if( type == 1 ){        /* Weighted sum */
 
                   for( k=0; k<veclen[fld]; k++ ) *(outfld++);
@@ -980,11 +980,11 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                } else if( type == 2 ){         /*  Sum of weights */
 
                   *(outfld++) = wsum;
-     
+
                }
 
 
-/*  If the output value is undefined, store "bad" data values (the maximum 
+/*  If the output value is undefined, store "bad" data values (the maximum
  *  floating point value). */
 
             } else {
@@ -1000,7 +1000,7 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
          }
 
 
-/*  Free the storage used to hold the list of contributing input positions 
+/*  Free the storage used to hold the list of contributing input positions
  *  if storage is allocated inside SXFindRadius (SXFindClose does not
  *  allocate its own results arrays). */
 
@@ -1017,7 +1017,7 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
       if( noutpos >= 2000 ) DXMessage("SXRegrid: Done all %d positions",noutpos );
 
 
-/*  Free the storage used to hold the list of contributing input positions 
+/*  Free the storage used to hold the list of contributing input positions
  *  if storag ewas allocated by this function (i.e. if SXFindClose was
  *  used instead of SXFindRadius). */
 
@@ -1035,7 +1035,7 @@ Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
 
 /*------------------------------------------------------------------------*/
 
-int *SXInitClose( int ndim, int npos, float *pos, float *lbnd, 
+int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
                   float *ubnd, float *lbndl, int *gdim, float *rdcell ){
 /*
 *+
@@ -1049,38 +1049,38 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
 *     ANSI C
 
 *  Prototype:
-*     int *SXInitClose( int ndim, int npos, float *pos, 
-*                         float *lbnd, float *ubnd, float *lbndl, int *gdim, 
+*     int *SXInitClose( int ndim, int npos, float *pos,
+*                         float *lbnd, float *ubnd, float *lbndl, int *gdim,
 *                         float *rdcell );
 
 *  Description:
 *     This function establishes values needed for subsequent use by
-*     SXFindClose and SXFindRadius. It reserves storage for a "work array", 
-*     fills it with the required values, and returns a pointer to it as the 
-*     function value. A null pointer is returned and the DX error code is set 
+*     SXFindClose and SXFindRadius. It reserves storage for a "work array",
+*     fills it with the required values, and returns a pointer to it as the
+*     function value. A null pointer is returned and the DX error code is set
 *     if an error occurs. Values are also returned in arguments "lbndl", "gdim"
 *     and "rdcell". These values should be passed unchanged to
 *     SXFindClose or SXFindRadius.
 *
 *     The volume enclosed by the supplied bounds (arguments "ubnd" and
 *     lbnd") is divided up into a regular grid of identical cubic cells.
-*     Each cell in this grid is identified by a unique index (in the style 
+*     Each cell in this grid is identified by a unique index (in the style
 *     of a C array). The number of cells used is such that there is an
-*     average of four positions in each cell. The supplied positions are 
-*     then located within this grid. In elements 0 to npos-1, the returned 
-*     work array holds the indices of the cells in which each position is 
-*     located (i.e. element 23 of the work array holds the index of the cell 
-*     in which position number 23 is located). Positions which are outside 
+*     average of four positions in each cell. The supplied positions are
+*     then located within this grid. In elements 0 to npos-1, the returned
+*     work array holds the indices of the cells in which each position is
+*     located (i.e. element 23 of the work array holds the index of the cell
+*     in which position number 23 is located). Positions which are outside
 *     the supplied bounds have -1 stored in this part of the work array.
 *
 *     Elements npos to 2*npos-1 of the returned work array contains the
 *     indices of the positions which fall in each cell, while elements
 *     2*npos to 2*npos+ngrid-1 (where ngrid is the number of cells in the
-*     grid) contain the offset (from element npos) to the start of each 
-*     cell's position list. Thus element 2*npos+5 gives you the offset to 
-*     the start of the position list for cell 5. If this offset is "n", the 
-*     indices of all the supplied positions which fall within cell 5 are 
-*     listed starting at element npos+n. The last element of the work array 
+*     grid) contain the offset (from element npos) to the start of each
+*     cell's position list. Thus element 2*npos+5 gives you the offset to
+*     the start of the position list for cell 5. If this offset is "n", the
+*     indices of all the supplied positions which fall within cell 5 are
+*     listed starting at element npos+n. The last element of the work array
 *     holds the offset (from element npos) of the first unused element of
 *     the work array.
 *
@@ -1093,34 +1093,34 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
 *     npos = int (Given)
 *        The number of positions.
 *     pos = float * (Given)
-*        A pointer to the start of the array holding the positions. 
+*        A pointer to the start of the array holding the positions.
 *        This array should hold "npos" vectors of dimension "ndim".
 *     lbnd = float * (Given)
-*        A pointer to the start of the array holding the lower bounds of 
+*        A pointer to the start of the array holding the lower bounds of
 *        the volume to be covered by the grid. This array should have
 *        ndim elements.
 *     ubnd = float * (Given)
-*        A pointer to the start of the array holding the upper bounds of 
+*        A pointer to the start of the array holding the upper bounds of
 *        the volume to be covered by the grid. This array should have
 *        ndim elements.
 *     lbndl = float * (Returned)
 *        A pointer to the start of an array in which are returned the
 *        actual lower bounds used for the grid.  This array should have
-*        ndim elements. It may be necessary to extend the supplied lower 
-*        bounds to fit a whole number of cells along each axis. The upper 
-*        bounds actually used can be determined from "lbndl", "gdim" and 
-*        "rdcell". 
+*        ndim elements. It may be necessary to extend the supplied lower
+*        bounds to fit a whole number of cells along each axis. The upper
+*        bounds actually used can be determined from "lbndl", "gdim" and
+*        "rdcell".
 *     gdim = int * (Returned)
 *        A pointer to the start of an array in which are returned the
 *        number of cells on each axis of the grid. This array should have
 *        ndim elements.
 *     rdcell = float * (Returned)
-*        The reciprocal of the length of one side of a grid cell is stored at 
-*        the location specified by this pointer. 
+*        The reciprocal of the length of one side of a grid cell is stored at
+*        the location specified by this pointer.
 
 *  Returned Value:
 *     A pointer to the start of the work array is returned, or NULL if an
-*     error occurs (in which case the DX error code is also set). This 
+*     error occurs (in which case the DX error code is also set). This
 *     array should be freed when it is no longer needed by calling DXFree.
 
 *  Authors:
@@ -1162,7 +1162,7 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
 
 
 /*  Check that the supplied value for "ndim" is OK. */
-    
+
       if( ndim < 1 || ndim > 3 ) {
          DXSetError( ERROR_INTERNAL, "Bad number of dimensions (%d) supplied to SXInitClosest.", ndim );
          return( NULL );
@@ -1170,7 +1170,7 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
 
 
 /*  Check that the supplied grid bounds are OK. */
-    
+
       for( i=0; i<ndim; i++ ){
          if( lbnd[i] >= ubnd[i] ) {
             DXSetError( ERROR_INTERNAL, "Bad bounds for dimensions %d (%f:%f) supplied to DXInitClosest.", i, lbnd[i], ubnd[i] );
@@ -1184,7 +1184,7 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
       nin = 0;
 
       for( j=0; j<npos; j++ ){
-         next = pos + j*ndim;      
+         next = pos + j*ndim;
 
          for( i=0; i<ndim; i++ ){
             if( bad = ( (*next) < lbnd[i] || (*next) > ubnd[i] ) ) continue;
@@ -1224,7 +1224,7 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
       for( i=0; i<ndim; i++) ngrid = ngrid*gdim[i];
 
 
-/*  Obtain integer work space. Two elements for every supplied position, plus 
+/*  Obtain integer work space. Two elements for every supplied position, plus
  *  one element for every grid cell (plus 1), is needed. */
 
       work = (int *) DXAllocate( sizeof( int )*( 2*npos + ngrid + 1 ) );
@@ -1251,7 +1251,7 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
       for( j=0; j<npos; j++ ){
 
 
-/*  Find the 3D cartesian indices of the grid cell in which this position is 
+/*  Find the 3D cartesian indices of the grid cell in which this position is
  *  located. Un-used dimensions are given index zero. If any positions are
  *  outside the supplied bounds, dont use them. */
 
@@ -1265,11 +1265,11 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
 
 
 /*  Convert these Cartesian indices to an offset into the 1D cell index
- *  and store this index in the first work array. X ("pos" index 0) varies 
- *  fastest in the 1D vector, then Y ("pos" index 1), then Z ("pos" index 2). 
+ *  and store this index in the first work array. X ("pos" index 0) varies
+ *  fastest in the 1D vector, then Y ("pos" index 1), then Z ("pos" index 2).
  */
          if( ok ) {
-            index = ii[0] + gdim[0]*( ii[1] + gdim[1]*ii[2] );        
+            index = ii[0] + gdim[0]*( ii[1] + gdim[1]*ii[2] );
             work1[j] = index;
 
 
@@ -1288,11 +1288,11 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
       }
 
 
-/*  Convert the grid cell populations in work3 into indices in work2 at 
+/*  Convert the grid cell populations in work3 into indices in work2 at
  *  which to start the list of position located within each grid cell. */
 
       index = 0;
-      for( j=0; j<ngrid; j++ ){ 
+      for( j=0; j<ngrid; j++ ){
          temp = work3[j];
          work3[j] = index;
          index += temp;
@@ -1316,7 +1316,7 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
  *  holding the index of the first free element in work2. */
 
       for( j=ngrid; j>0; j-- ) work3[j] = work3[j-1];
-      work3[0] = 0;     
+      work3[0] = 0;
 
 
 /*  Return the initialised work array. */
@@ -1329,7 +1329,7 @@ int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
 /*------------------------------------------------------------------------*/
 
 Error SXFindClose( int ndim, int npos, float *pos, float *samp,
-                     int nclose, float rdcell, float *lbndl, int *gdim, 
+                     int nclose, float rdcell, float *lbndl, int *gdim,
                      int *work, int *posres, float *disres ){
 /*
 *+
@@ -1344,21 +1344,21 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
 
 *  Prototype:
 *     Error SXFindClose( int ndim, int npos, float *pos, float *samp,
-*                          int nclose, float rdcell, float *lbndl, int *gdim, 
+*                          int nclose, float rdcell, float *lbndl, int *gdim,
 *                          int *work, int *posres, float *disres );
 
 *  Description:
 *     This function finds the "nclose" closest positions (within the list
 *     supplied in "pos") to the supplied sample position (supplied in
-*     "samp"). It does it much more quickly than the obvious "sledgehammer" 
-*     approach of sorting the distances to every position. 
+*     "samp"). It does it much more quickly than the obvious "sledgehammer"
+*     approach of sorting the distances to every position.
 *
 *     Before using this function, the function SXInitClose should be
 *     called to initialise the required arrays, etc. These arrays define
 *     a grid of cubic cells, and contain look-up-tables which provide a
 *     fast method for finding all the positions which fall within any
 *     given cell. With this information it is possible to restrict the
-*     positions which are checked to those in the neighbourhood of the 
+*     positions which are checked to those in the neighbourhood of the
 *     supplied sample position.
 *
 *     The search for close positions starts in the cell containing the
@@ -1368,26 +1368,26 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
 *     checked (i.e. all the cells which are adjacent to the central cell).
 *     This goes on until sufficient neighbours have been found. Extra
 *     layers are then checked just in case any of the located neighbours
-*     were in the far corners of the previous layer. 
+*     were in the far corners of the previous layer.
 
 *  Arguments:
 *     ndim = int (Given)
 *        The number of dimensions describing each position. This should
 *        be the same as supplied to the previous call of SXInitClose.
 *     npos = int (Given)
-*        The number of positions. This should be the same as supplied to 
+*        The number of positions. This should be the same as supplied to
 *        the previous call of SXInitClose.
 *     pos = float * (Given)
-*        A pointer to the start of the array holding the positions. 
+*        A pointer to the start of the array holding the positions.
 *        This array should hold "npos" vectors of dimension "ndim". They
 *        should be the same as supplied to the previous call of SXInitClose.
 *     samp = float * (Given)
-*        A pointer to the sample position. This array should hold 1 vector of 
-*        dimension "ndim". 
+*        A pointer to the sample position. This array should hold 1 vector of
+*        dimension "ndim".
 *     nclose = int (Given)
 *        The number of nearest neighbours required.
 *     rdcell = float (Given)
-*        The reciprocal of the length of one side of a grid cell, as returned 
+*        The reciprocal of the length of one side of a grid cell, as returned
 *        by SXInitClose.
 *     lbndl = float * (Given)
 *        A pointer to the start of an array in which are stored the
@@ -1402,10 +1402,10 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
 *     posres = int * (Returned)
 *        A pointer to the start of an array in which are returned the indices
 *        of the "nclose" closest positions, in order of increasing
-*        distance from the sample position. It should contain "nclose" 
-*        elements. The array is padded with the value -1 if insufficient 
+*        distance from the sample position. It should contain "nclose"
+*        elements. The array is padded with the value -1 if insufficient
 *        neighbours (i.e. less than "nclose") can be found, and is filled
-*        entirely with the value -1 if the supplied sample position is outside 
+*        entirely with the value -1 if the supplied sample position is outside
 *        the bounds of the grid created by SXInitClose.
 *     disres = float * (Returned)
 *        A pointer to the start of an array in which are returned the
@@ -1516,15 +1516,15 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
          while( boxsize < maxbox && ndone > 0 ){
 
 
-/*  Once sufficient neighbours have been found, it is necessary to do 
+/*  Once sufficient neighbours have been found, it is necessary to do
  *  more boxes, because positions in the corners of the current box may
- *  actually be further away than mid-face positions in the next 
+ *  actually be further away than mid-face positions in the next
  *  larger boxes. */
 
             if( nfound == nclose ) {
                maxbox = 1 + (int) sqrt( (double) disres[nclose-1] )*rdcell;
             }
-               
+
 
 /*  Go through all the grid cells within a box of the current size, centred
  *  on the cell containing the current sample. First find the Cartesian
@@ -1534,7 +1534,7 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
                il[i] = 0;
                ul[i] = 0;
             }
-               
+
             for( i=0; i<ndim; i++ ) {
                il[i] = ii0[i] - boxsize;
                ul[i] = ii0[i] + boxsize;
@@ -1542,7 +1542,7 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
 
 
 /*  Now loop through each cell, ignoring ones that are outside the bounds
- *  of the cell array. A cell is checked only if it is new this time (i.e. 
+ *  of the cell array. A cell is checked only if it is new this time (i.e.
  *  if it is on one of the edges of the box). */
 
             ndone = 0;
@@ -1550,7 +1550,7 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
             for( ix=il[0]; ix<=ul[0]; ix++){
                if( ix >= 0 && ix < gdim[0] ){
                   doit[0] = ( ix == il[0] || ix == ul[0] );
-                  
+
                   for( iy=il[1]; iy<=ul[1]; iy++){
                      if( iy >= 0 && iy < gdim[1] ){
                         doit[1] = (ndim>1) && ( iy == il[1] || iy == ul[1] );
@@ -1558,7 +1558,7 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
                         for( iz=il[2]; iz<=ul[2]; iz++){
                            if( iz >= 0 && iz < gdim[2] ){
                               doit[2] = (ndim>2) && ( iz == il[2] || iz == ul[2] );
- 
+
                               if( doit[0] || doit[1] || doit[2] ) {
                                  ndone++;
 
@@ -1593,8 +1593,8 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
 
 /*  If there is room for it, add this position into the returned array at
  *  the correct positions. */
- 
-                                    if( i < nclose ){ 
+
+                                    if( i < nclose ){
 
                                        if( i < nfound ){
 
@@ -1644,7 +1644,7 @@ Error SXFindClose( int ndim, int npos, float *pos, float *samp,
 /*------------------------------------------------------------------------*/
 
 Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
-                      float maxrad, float rdcell, float *lbndl, int *gdim, 
+                      float maxrad, float rdcell, float *lbndl, int *gdim,
                       int *work, int *nres, int **posres, float **disres ){
 /*
 *+
@@ -1652,7 +1652,7 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
 *     SXFindRadius
 
 *  Purpose:
-*     Find all positions within a given distance of the supplied sample 
+*     Find all positions within a given distance of the supplied sample
 *     position.
 
 *  Language:
@@ -1660,23 +1660,23 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
 
 *  Prototype:
 *     Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
-*                           float maxrad, float rdcell, float *lbndl, 
-*                           int *gdim, int *work, int *nres, int **posres, 
+*                           float maxrad, float rdcell, float *lbndl,
+*                           int *gdim, int *work, int *nres, int **posres,
 *                           float **disres );
 
 *  Description:
-*     This function finds all positions (within the list supplied in "pos") 
-*     within a sphere of radius "maxrad" centred on the supplied sample 
-*     position (supplied in "samp"). It does it much more quickly than the 
-*     obvious "sledgehammer" approach of checking the distances to every 
-*     position. 
+*     This function finds all positions (within the list supplied in "pos")
+*     within a sphere of radius "maxrad" centred on the supplied sample
+*     position (supplied in "samp"). It does it much more quickly than the
+*     obvious "sledgehammer" approach of checking the distances to every
+*     position.
 *
 *     Before using this function, the function SXInitClose should be
 *     called to initialise the required arrays, etc. These arrays define
 *     a grid of cubic cells, and contain look-up-tables which provide a
 *     fast method for finding all the positions which fall within any
 *     given cell. With this information it is possible to restrict the
-*     positions which are checked to those in the neighbourhood of the 
+*     positions which are checked to those in the neighbourhood of the
 *     supplied sample position.
 *
 *     The those cells are searched which could concievably hold positions
@@ -1690,19 +1690,19 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
 *        The number of dimensions describing each position. This should
 *        be the same as supplied to the previous call of SXInitClose.
 *     npos = int (Given)
-*        The number of positions. This should be the same as supplied to 
+*        The number of positions. This should be the same as supplied to
 *        the previous call of SXInitClose.
 *     pos = float * (Given)
-*        A pointer to the start of the array holding the positions. 
+*        A pointer to the start of the array holding the positions.
 *        This array should hold "npos" vectors of dimension "ndim". They
 *        should be the same as supplied to the previous call of SXInitClose.
 *     samp = float * (Given)
-*        A pointer to the sample position. This array should hold 1 vector of 
-*        dimension "ndim". 
+*        A pointer to the sample position. This array should hold 1 vector of
+*        dimension "ndim".
 *     maxrad = float (Given)
 *        The radius of the sphere in which to look for positions.
 *     rdcell = float (Given)
-*        The reciprocal of the length of one side of a grid cell, as returned 
+*        The reciprocal of the length of one side of a grid cell, as returned
 *        by SXInitClose.
 *     lbndl = float * (Given)
 *        A pointer to the start of an array in which are stored the
@@ -1718,21 +1718,21 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
 *        The number of positions found within the given distance.
 *     posres = int ** (Returned)
 *        A pointer to a location at which this function can store a
-*        pointer to the start of an array of integers. Storage for this 
+*        pointer to the start of an array of integers. Storage for this
 *        array is allocated by this function, and it should be freed when
 *        no longer needed by calling DXFree. The array is returned holding
-*        the indices of all the positions found within a sphere of radius 
+*        the indices of all the positions found within a sphere of radius
 *        "maxrad" centred on the supplied smaple position. These indices
 *        occupy elements 0 to ("nres"-1), and are stored in no particular
 *        order.
 *     disres = float ** (Returned)
 *        A pointer to a location at which this function can store a
-*        pointer to the start of an array of floats. Storage for this 
+*        pointer to the start of an array of floats. Storage for this
 *        array is allocated by this function, and it should be freed when
 *        no longer needed by calling DXFree. The array is returned holding
 *        the SQUARED distances of the sample position from each position
-*        found within a sphere of radius "maxrad" centred on the supplied 
-*        sample position. These indices occupy elements 0 to ("nres"-1), and 
+*        found within a sphere of radius "maxrad" centred on the supplied
+*        sample position. These indices occupy elements 0 to ("nres"-1), and
 *        are stored in the same order as the position indices returned in
 *        "posres".
 
@@ -1828,9 +1828,9 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
       *posres = (int *) DXAllocate( sizeof( int )*cursize );
       *disres = (float *) DXAllocate( sizeof( float )*cursize );
 
-      if( *disres == NULL || *posres == NULL ){                                       
-         DXFree( (Pointer) *posres ); 
-         DXFree( (Pointer) *disres ); 
+      if( *disres == NULL || *posres == NULL ){
+         DXFree( (Pointer) *posres );
+         DXFree( (Pointer) *disres );
          *posres = NULL;
          *disres = NULL;
           return( ERROR );
@@ -1879,7 +1879,7 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
             il[i] = 0;
             ul[i] = 0;
          }
-               
+
          for( i=0; i<ndim; i++ ) {
             il[i] = ii0[i] - maxbox;
             ul[i] = ii0[i] + maxbox;
@@ -1889,7 +1889,7 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
 /*  Now loop through each cell, ignoring ones that are outside the bounds
  *  of the cell array. */
 
-         
+
          for( ix=il[0]; ix<=ul[0]; ix++){
             if( ix >= 0 && ix < gdim[0] ){
 
@@ -1935,14 +1935,14 @@ Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
                                        *disres = (float *) DXReAllocate( (Pointer)
                                                       *disres, sizeof( float )*cursize );
 
-                                       if( *disres == NULL || *posres == NULL ){                                       
-                                          DXFree( (Pointer) *posres ); 
-                                          DXFree( (Pointer) *disres ); 
+                                       if( *disres == NULL || *posres == NULL ){
+                                          DXFree( (Pointer) *posres );
+                                          DXFree( (Pointer) *disres );
 
                                           *nres = 0;
                                           *posres = NULL;
                                           *disres = NULL;
-   
+
                                           return( ERROR );
                                        }
                                     }
@@ -1994,7 +1994,7 @@ void SXSort( int n, float *d, int *m ){
 *  Description:
 *     A simple bubblesort is used to order the values in the "d" array
 *     into increasing order. The values in the "m" array are shuffled to
-*     maintain the correspondance between values in the two arrays. 
+*     maintain the correspondance between values in the two arrays.
 
 *  Arguments:
 *     n = int (Given)
@@ -2084,7 +2084,7 @@ float *SXGet1r( char *name, Object in, int *n ){
 
 *  Arguments:
 *     name = char * (Given)
-*        The name of the parameter to refer to in the text of any error 
+*        The name of the parameter to refer to in the text of any error
 *        messages which are generated by this function.
 *     in= Object (Given)
 *        The DX object associated with the parameter.
@@ -2122,7 +2122,7 @@ float *SXGet1r( char *name, Object in, int *n ){
 /*  Abort if the supplied object is not an array. */
 
       if( DXGetObjectClass( in ) != CLASS_ARRAY ){
-         DXSetError( ERROR_BAD_CLASS, 
+         DXSetError( ERROR_BAD_CLASS,
                      "parameter \"%s\" should be a list of scalar values.",
                      name );
          return( NULL );
@@ -2132,7 +2132,7 @@ float *SXGet1r( char *name, Object in, int *n ){
 /*  Get information about the array. */
 
       if( !DXGetArrayInfo( (Array) in, n, NULL, &categ, &rank, shape ) ){
-         DXSetError( ERROR_UNEXPECTED, 
+         DXSetError( ERROR_UNEXPECTED,
                      "Unable to get information about parameter \"%s\".",
                      name );
          return( NULL );
@@ -2142,7 +2142,7 @@ float *SXGet1r( char *name, Object in, int *n ){
 /*  Check that it holds REAL values */
 
       if( categ != CATEGORY_REAL ) {
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "REAL values required for parameter \"%s\".",
                      name );
          return( NULL );
@@ -2166,7 +2166,7 @@ float *SXGet1r( char *name, Object in, int *n ){
 /*  Check that it is now a scalar list */
 
       if( rank > 0 ) {
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "parameter \"%s\" should be a 1-D list of scalar values.",
                      name );
          return( NULL );
@@ -2205,7 +2205,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 
 *  Arguments:
 *     name = char * (Given)
-*        The name of the parameter to refer to in the text of any error 
+*        The name of the parameter to refer to in the text of any error
 *        messages which are generated by this function.
 *     in= Object (Given)
 *        The DX object associated with the parameter.
@@ -2243,7 +2243,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 /*  Abort if the supplied object is not an array. */
 
       if( DXGetObjectClass( in ) != CLASS_ARRAY ){
-         DXSetError( ERROR_BAD_CLASS, 
+         DXSetError( ERROR_BAD_CLASS,
                      "parameter \"%s\" should be a list of scalar values.",
                      name );
          return( NULL );
@@ -2253,7 +2253,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 /*  Get information about the array. */
 
       if( !DXGetArrayInfo( (Array) in, n, NULL, &categ, &rank, shape ) ){
-         DXSetError( ERROR_UNEXPECTED, 
+         DXSetError( ERROR_UNEXPECTED,
                      "Unable to get information about parameter \"%s\".",
                      name );
          return( NULL );
@@ -2263,7 +2263,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 /*  Check that it holds REAL values */
 
       if( categ != CATEGORY_REAL ) {
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "REAL values required for parameter \"%s\".",
                      name );
          return( NULL );
@@ -2287,7 +2287,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 /*  Check that it is now a scalar list */
 
       if( rank > 0 ) {
-         DXSetError( ERROR_DATA_INVALID, 
+         DXSetError( ERROR_DATA_INVALID,
                      "parameter \"%s\" should be a 1-D list of scalar values.",
                      name );
          return( NULL );
@@ -2305,7 +2305,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 
 /*------------------------------------------------------------------------*/
 
-Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt, 
+Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
                  char *opt[], float *rval, int *sval ){
 /*
 *+
@@ -2319,7 +2319,7 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
 *     ANSI C
 
 *  Prototype:
-*     Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt, 
+*     Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
 *                      char *opt[], float *rval, int *sval );
 
 *  Description:
@@ -2338,25 +2338,25 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
 
 *  Arguments:
 *     name = char * (Given)
-*        The name of the parameter to refer to in the text of any error 
+*        The name of the parameter to refer to in the text of any error
 *        messages which are generated by this function.
 *     in= Object (Given)
 *        The DX object associated with the parameter.
 *     hi = float (Given)
-*        The highest acceptable float value. 
+*        The highest acceptable float value.
 *     lo = float (Given)
-*        The lowest acceptable float value. 
+*        The lowest acceptable float value.
 *     nopt = int (Given)
 *        The number of textual options supplied in "opt".
 *     opt[] = char * (Given)
-*        An array of pointers to a set of character strings. These are the 
+*        An array of pointers to a set of character strings. These are the
 *        allowed textual values for the parameter.
 *     rval = float * (Returned)
 *        A pointer to the place at which any supplied float value will
-*        be stored. Supplied value is unchanged if a textual option was 
+*        be stored. Supplied value is unchanged if a textual option was
 *        supplied.
 *     sval = int * (Returned)
-*        A pointer to the place at which the index (within "opt") of the any 
+*        A pointer to the place at which the index (within "opt") of the any
 *        supplied textual value will be stored. Returned equal to -1 if a
 *        numeric value was supplied. No value is returned if NULL is
 *        supplied.
@@ -2394,7 +2394,7 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
       case CLASS_ARRAY:
 
          if( !DXExtractFloat( in, rval ) ){
-            DXSetError( ERROR_BAD_PARAMETER, "cannot get numeric value for parameter \"%s\".", param ); 
+            DXSetError( ERROR_BAD_PARAMETER, "cannot get numeric value for parameter \"%s\".", param );
             return( ERROR );
          }
 
@@ -2403,13 +2403,13 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
 
          if( hi > lo ){
             if( (*rval) < lo || (*rval) > hi ){
-               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%f) is outside allowed range [%f,%f].", param, *rval, lo, hi ); 
+               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%f) is outside allowed range [%f,%f].", param, *rval, lo, hi );
                return( ERROR );
             }
 
          } else {
             if( (*rval) < lo && (*rval) > hi ){
-               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%f) is inside disallowed range [%f,%f].", param, *rval, hi, lo ); 
+               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%f) is inside disallowed range [%f,%f].", param, *rval, hi, lo );
                return( ERROR );
             }
 
@@ -2428,7 +2428,7 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
       case CLASS_STRING:
 
          if( !DXExtractString( in, &text ) ){
-            DXSetError( ERROR_BAD_PARAMETER, "cannot get string value for parameter \"%s\".", param ); 
+            DXSetError( ERROR_BAD_PARAMETER, "cannot get string value for parameter \"%s\".", param );
             return( ERROR );
          }
 
@@ -2442,12 +2442,12 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
             }
 
             if( (*sval) >= nopt ){
-               DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param ); 
+               DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param );
                return( ERROR );
             }
 
          } else {
-            DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param ); 
+            DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param );
             return( ERROR );
          }
 
@@ -2457,7 +2457,7 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
 /*  Report an error if an unexpected object type has been supplied. */
 
       default:
-         DXSetError( ERROR_UNEXPECTED, "bad object type supplied for parameter \"%s\".", param ); 
+         DXSetError( ERROR_UNEXPECTED, "bad object type supplied for parameter \"%s\".", param );
          return( ERROR );
 
       }
@@ -2470,7 +2470,7 @@ Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
 
 /*------------------------------------------------------------------------*/
 
-Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt, 
+Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
                  char *opt[], int *ival, int *sval ){
 /*
 *+
@@ -2484,7 +2484,7 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
 *     ANSI C
 
 *  Prototype:
-*     Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt, 
+*     Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
 *                      char *opt[], int *ival, int *sval );
 
 *  Description:
@@ -2503,25 +2503,25 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
 
 *  Arguments:
 *     name = char * (Given)
-*        The name of the parameter to refer to in the text of any error 
+*        The name of the parameter to refer to in the text of any error
 *        messages which are generated by this function.
 *     in= Object (Given)
 *        The DX object associated with the parameter.
 *     hi = int (Given)
-*        The highest acceptable integer value. 
+*        The highest acceptable integer value.
 *     lo = int (Given)
-*        The lowest acceptable integer value. 
+*        The lowest acceptable integer value.
 *     nopt = int (Given)
 *        The number of textual options supplied in "opt".
 *     opt[] = char * (Given)
-*        An array of pointers to a set of character strings. These are the 
+*        An array of pointers to a set of character strings. These are the
 *        allowed textual values for the parameter.
 *     ival = int * (Returned)
 *        A pointer to the place at which any supplied integer value will
-*        be stored. Supplied value is unchanged if a textual option was 
+*        be stored. Supplied value is unchanged if a textual option was
 *        supplied.
 *     sval = int * (Returned)
-*        A pointer to the place at which the index (within "opt") of the any 
+*        A pointer to the place at which the index (within "opt") of the any
 *        supplied textual value will be stored. Returned equal to -1 if a
 *        numeric value was supplied. No value is returned if supplied
 *        equal to NULL.
@@ -2559,7 +2559,7 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
       case CLASS_ARRAY:
 
          if( !DXExtractInteger( in, ival ) ){
-            DXSetError( ERROR_BAD_PARAMETER, "cannot get numeric value for parameter \"%s\".", param ); 
+            DXSetError( ERROR_BAD_PARAMETER, "cannot get numeric value for parameter \"%s\".", param );
             return( ERROR );
          }
 
@@ -2568,13 +2568,13 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
 
          if( hi > lo ){
             if( (*ival) < lo || (*ival) > hi ){
-               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%d) is outside allowed range [%d,%d].", param, *ival, lo, hi ); 
+               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%d) is outside allowed range [%d,%d].", param, *ival, lo, hi );
                return( ERROR );
             }
 
          } else {
             if( (*ival) < lo && (*ival) > hi ){
-               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%d) is inside disallowed range [%d,%d].", param, *ival, hi, lo ); 
+               DXSetError( ERROR_BAD_PARAMETER, "value given for parameter \"%s\" (%d) is inside disallowed range [%d,%d].", param, *ival, hi, lo );
                return( ERROR );
             }
 
@@ -2593,7 +2593,7 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
       case CLASS_STRING:
 
          if( !DXExtractString( in, &text ) ){
-            DXSetError( ERROR_BAD_PARAMETER, "cannot get string value for parameter \"%s\".", param ); 
+            DXSetError( ERROR_BAD_PARAMETER, "cannot get string value for parameter \"%s\".", param );
             return( ERROR );
          }
 
@@ -2606,12 +2606,12 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
             }
 
             if( (*sval) >= nopt ){
-               DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param ); 
+               DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param );
                return( ERROR );
             }
 
          } else {
-            DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param ); 
+            DXSetError( ERROR_BAD_PARAMETER, "bad value (\"%s\") obtained for parameter \"%s\".", text, param );
             return( ERROR );
          }
 
@@ -2621,7 +2621,7 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
 /*  Report an error if an unexpected object type has been supplied. */
 
       default:
-         DXSetError( ERROR_UNEXPECTED, "bad object type supplied for parameter \"%s\".", param ); 
+         DXSetError( ERROR_UNEXPECTED, "bad object type supplied for parameter \"%s\".", param );
          return( ERROR );
 
       }
@@ -2634,7 +2634,7 @@ Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
 
 /*------------------------------------------------------------------------*/
 
-Object SXMakeOut( Object in, Field template, int typecheck, int maxrank, 
+Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
                   int maxshape, char *dep ){
 /*
 *+
@@ -2649,21 +2649,21 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
 *     ANSI C
 
 *  Prototype:
-*     Object SXMakeOut( Object in, Field template, int typecheck, int maxrank, 
+*     Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
 *                       int maxshape, char *dep );
 
 *  Description:
 *     A new object is created which has the structure of the supplied "in"
-*     object, but in which each field is replaced by a copy of the "template" 
+*     object, but in which each field is replaced by a copy of the "template"
 *     field. The output fields retain their input names, but all other
-*     attributes and components are inherited from "template". 
+*     attributes and components are inherited from "template".
 *
 *     If any input field component does not satisfy the requirements
-*     specified by the arguments (or if a non-REAL input data component is 
-*     found), then an error is reported. 
+*     specified by the arguments (or if a non-REAL input data component is
+*     found), then an error is reported.
 *
-*     Information describing each input/output field pair is stored in a 
-*     linked list of "Fpair" structures (each structure describes a single 
+*     Information describing each input/output field pair is stored in a
+*     linked list of "Fpair" structures (each structure describes a single
 *     field pair), which should be freed when no longer needed. The external
 *     variable "head" points to the most recently created "Fpair"
 *     structure. The "next" item within each structure points to the
@@ -2676,7 +2676,7 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
 *        int    postag   =  The "object tag" (a unique integer identifer) for
 *                           the input "positions" component.
 *        Object data     =  The "data" component of the input field.
-*        Type   datatype =  The data type of the input "data" component. 
+*        Type   datatype =  The data type of the input "data" component.
 *        int    datalen  =  The length of each input data vector
 *        Fpair *next     =  Pointer to the previous Fpair structure.
 
@@ -2686,7 +2686,7 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
 *     template = Field (Given)
 *        The template field for the output object.
 *     typecheck = int (Given)
-*        If 1, then all input field data components must have type 
+*        If 1, then all input field data components must have type
 *        TYPE_FLOAT or TYPE_DOUBLE. If 0, no check on data type is performed.
 *     maxrank = int (Given)
 *        The maximum rank allowed for an input field data component.
@@ -2745,7 +2745,7 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
          name = DXGetAttribute( in, "name" );
          DXSetAttribute( out, "name", name );
 
-      
+
 /*  If the supplied input object is a field, create an "Fpair" structure
  *  describing the field, and put a pointer to this new Fpair structure
  *  into the previous Fpair structure. */
@@ -2792,19 +2792,19 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
 /*  Get information about the input data array and check it can be used. */
 
          if( !DXGetArrayInfo( (Array) fp->data, NULL, &(fp->datatype), &cat, &rank, &(fp->datalen) ) ) goto error;
-                     
+
          if( typecheck == 1 ){
             if( fp->datatype != TYPE_FLOAT && fp->datatype != TYPE_DOUBLE ){
                DXSetError( ERROR_DATA_INVALID, "non-floating point data component found in \"input\"." );
                goto error;
             }
          }
-                     
+
          if( cat != CATEGORY_REAL ){
             DXSetError( ERROR_DATA_INVALID, "data component in \"input\" is not of category REAL." );
             goto error;
          }
-                     
+
          if( rank == 0 ){   /* Scalar data is equivalent to 1-d vector data */
             fp->datalen = 1;
 
@@ -2812,7 +2812,7 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
             rank = 0;
 
          }
-                     
+
          if( rank > maxrank ){
             DXSetError( ERROR_DATA_INVALID, "rank %d data component found in \"input\".", rank );
             goto error;
@@ -2838,10 +2838,10 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
             }
 
          }
- 
+
 /*  Return the new output field */
 
-         return( out );         
+         return( out );
 
 
 error:
@@ -2863,7 +2863,7 @@ error:
 
          for( i=0; in_mem=DXGetEnumeratedMember( (Group) in, i, &mname ); i++ ){
 
-            out_mem = SXMakeOut( in_mem, template, typecheck, maxrank, maxshape, 
+            out_mem = SXMakeOut( in_mem, template, typecheck, maxrank, maxshape,
                                  dep );
             if( !out_mem ){
                DXDelete( out );
@@ -2910,17 +2910,17 @@ Error SXGetInvPos( Object field, int nel, int ndim, float *data, char *dep ){
 *     ANSI C
 
 *  Prototype:
-*     Error SXGetInvPos( Object field, int nel, int ndim, float *data, 
+*     Error SXGetInvPos( Object field, int nel, int ndim, float *data,
 *                        char *dep );
 
 *  Description:
 *     For each invalid connection or position (as selected by "dep") in
-*     the supplied field, the corresponding "ndim" values supplied in array 
+*     the supplied field, the corresponding "ndim" values supplied in array
 *     data[] are replaced by the value FLT_MAX (defined in float.h).
 
 *  Arguments:
 *     field = Object (Given)
-*        The field from which the "invalid connections/positions" component 
+*        The field from which the "invalid connections/positions" component
 *        is to be obtained.
 *     nel = int (Given)
 *        The number of vector elements in the "data[]" array.
@@ -2928,8 +2928,8 @@ Error SXGetInvPos( Object field, int nel, int ndim, float *data, char *dep ){
 *        The length of each vector element in the "data[]" array.
 *     data = float * (Given and Returned)
 *        A pointer to an array of "nel" elements, each having "ndim"
-*        components. All components of the elements corresponding to 
-*        invalid positions or connection in "field" are returned set to 
+*        components. All components of the elements corresponding to
+*        invalid positions or connection in "field" are returned set to
 *        FLT_MAX.
 *     dep = char * (Given)
 *        The required invalid component; "positions" or "connections".
@@ -2959,7 +2959,7 @@ Error SXGetInvPos( Object field, int nel, int ndim, float *data, char *dep ){
       int i;
 
 
-/*  Return if there is no "invalid positions/connections" component in the 
+/*  Return if there is no "invalid positions/connections" component in the
  *  given field. */
 
       if( !strcmp( dep, "positions" ) ){
@@ -3000,7 +3000,7 @@ Error SXGetInvPos( Object field, int nel, int ndim, float *data, char *dep ){
 
 /*------------------------------------------------------------------------*/
 
-Error SXSetInvPosD( Object field, int nel, int veclen, double *data, 
+Error SXSetInvPosD( Object field, int nel, int veclen, double *data,
                     char *dep ){
 /*
 *+
@@ -3008,27 +3008,27 @@ Error SXSetInvPosD( Object field, int nel, int veclen, double *data,
 *     SXSetInvPosD
 
 *  Purpose:
-*     Sets invalid those positions or connections specified in a supplied 
+*     Sets invalid those positions or connections specified in a supplied
 *     DOUBLE array
 
 *  Language:
 *     ANSI C
 
 *  Prototype:
-*     Error SXSetInvPosD( Object field, int nel, int veclen, double *data, 
+*     Error SXSetInvPosD( Object field, int nel, int veclen, double *data,
 *                         char *dep );
 
 *  Description:
-*     The first component of each element of the supplied "data[]" array is 
+*     The first component of each element of the supplied "data[]" array is
 *     compared with the constant DBL_MAX (defined in float.h). Any
 *     matching elements are set invalid in the positions or connections
 *     component (specified by "dep") of the supplied field. Any
-*     connections or positions which are already invalid in the supplied 
+*     connections or positions which are already invalid in the supplied
 *     field, remain invalid.
 
 *  Arguments:
 *     field = Object (Given)
-*        The field in which the "invalid connections/positions" component 
+*        The field in which the "invalid connections/positions" component
 *        is to be stored.
 *     nel = int (Given)
 *        The number of vector elements in the "data[]" array.
@@ -3036,7 +3036,7 @@ Error SXSetInvPosD( Object field, int nel, int veclen, double *data,
 *        The length of each vector element in the "data[]" array.
 *     data = double * (Given)
 *        A pointer to an array of "nel" elements, each having "veclen"
-*        components. 
+*        components.
 *     dep = char * (Given)
 *        The required invalid component; "positions" or "connections".
 
@@ -3075,7 +3075,7 @@ Error SXSetInvPosD( Object field, int nel, int veclen, double *data,
 
       for( i=0; i<nel; i++ ){
          if( *(data+i*veclen) == DBL_MAX ) {
-            for( j=0; j<veclen; j++) *(data+i*veclen+j) = 0.0; 
+            for( j=0; j<veclen; j++) *(data+i*veclen+j) = 0.0;
             DXSetElementInvalid( handle, i );
          }
       }
@@ -3104,7 +3104,7 @@ Error SXSetInvPosD( Object field, int nel, int veclen, double *data,
 
 /*------------------------------------------------------------------------*/
 
-Error SXSetInvPosF( Object field, int nel, int veclen, float *data, 
+Error SXSetInvPosF( Object field, int nel, int veclen, float *data,
                     char *dep ){
 /*
 *+
@@ -3112,27 +3112,27 @@ Error SXSetInvPosF( Object field, int nel, int veclen, float *data,
 *     SXSetInvPosF
 
 *  Purpose:
-*     Sets invalid those positions or connections specified in a supplied 
+*     Sets invalid those positions or connections specified in a supplied
 *     FLOAT array
 
 *  Language:
 *     ANSI C
 
 *  Prototype:
-*     Error SXSetInvPosF( Object field, int nel, int veclen, float *data, 
+*     Error SXSetInvPosF( Object field, int nel, int veclen, float *data,
 *                         char *dep );
 
 *  Description:
-*     The first component of each element of the supplied "data[]" array is 
+*     The first component of each element of the supplied "data[]" array is
 *     compared with the constant FLT_MAX (defined in float.h). Any
 *     matching elements are set invalid in the positions or connections
 *     component (specified by "dep") of the supplied field. Any
-*     connections or positions which are already invalid in the supplied 
+*     connections or positions which are already invalid in the supplied
 *     field, remain invalid.
 
 *  Arguments:
 *     field = Object (Given)
-*        The field in which the "invalid connections/positions" component 
+*        The field in which the "invalid connections/positions" component
 *        is to be stored.
 *     nel = int (Given)
 *        The number of vector elements in the "data[]" array.
@@ -3140,7 +3140,7 @@ Error SXSetInvPosF( Object field, int nel, int veclen, float *data,
 *        The length of each vector element in the "data[]" array.
 *     data = float * (Given)
 *        A pointer to an array of "nel" elements, each having "veclen"
-*        components. 
+*        components.
 *     dep = char * (Given)
 *        The required invalid component; "positions" or "connections".
 
@@ -3179,7 +3179,7 @@ Error SXSetInvPosF( Object field, int nel, int veclen, float *data,
 
       for( i=0; i<nel; i++ ){
          if( *(data+i*veclen) == FLT_MAX ) {
-            for( j=0; j<veclen; j++) *(data+i*veclen+j) = 0.0; 
+            for( j=0; j<veclen; j++) *(data+i*veclen+j) = 0.0;
             DXSetElementInvalid( handle, i );
          }
       }
@@ -3216,21 +3216,21 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
 *     SXGetGrid
 
 *  Purpose:
-*     Get the positions, size and shape from a field, and flag any 
+*     Get the positions, size and shape from a field, and flag any
 *     invalid positions.
 
 *  Language:
 *     ANSI C
 
 *  Prototype:
-*     float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, 
+*     float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd,
 *                       float *ubnd, Object *grid );
 
 *  Description:
 *     An error is reported if the supplied object ("in") is not a field.
 *     Otherwise, a copy of the field is made and returned in "*grid". The
-*     positions component of the field is checked to make sure that it is 
-*     of type FLOAT and category REAL, and that each positions is a 1-d 
+*     positions component of the field is checked to make sure that it is
+*     of type FLOAT and category REAL, and that each positions is a 1-d
 *     vector of length less than 4. An error is reported if any of these
 *     conditions are not met. The number of positions, dimensionality of
 *     each position and the bounding box of the supplied field are returned.
@@ -3242,21 +3242,21 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
 *     in= Object (Given)
 *        The DX object.
 *     nsamp = int * (Returned)
-*        A pointer to the location at which to returned the number of 
+*        A pointer to the location at which to returned the number of
 *        positions in the positions component.
 *     ndim = int * (Returned)
 *        A pointer to the location at which to returned the dimensionality
 *        of each position.
 *     lbnd = float * (Returned)
 *        A pointer to an array of at least "ndim" elements. The first
-*        "ndim" elements are returned holding the lower bounds of the 
+*        "ndim" elements are returned holding the lower bounds of the
 *        field.
 *     ubnd = float * (Returned)
 *        A pointer to an array of at least "ndim" elements. The first
-*        "ndim" elements are returned holding the upper bounds of the 
+*        "ndim" elements are returned holding the upper bounds of the
 *        field.
 *     grid = Object * (Returned)
-*        A Pointer to a location at which to return the copy of the 
+*        A Pointer to a location at which to return the copy of the
 *        supplied field.
 
 *  Returned Value:
@@ -3315,7 +3315,7 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
          DXSetError( ERROR_MISSING_DATA, "the \"grid\" field has no positions." );
          return( NULL );
       }
-         
+
 
 /*  Get its shape, size and type. Check it is usable. */
 
@@ -3325,12 +3325,12 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
          DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of type FLOAT." );
          return( NULL );
       }
-                     
+
       if( cat != CATEGORY_REAL ){
          DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of category REAL." );
          return( NULL );
       }
-                     
+
       if( rank > 1 ){
          DXSetError( ERROR_DATA_INVALID, "rank %d positions component found in \"grid\".", rank );
          return( NULL );
@@ -3340,7 +3340,7 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
          rank = 1;
          *ndim = 1;
       }
-                     
+
       if( *ndim > 3 ){
          DXSetError( ERROR_DATA_INVALID, "%d-dimensional positions component found in \"grid\".", *ndim );
          return( NULL );
@@ -3366,8 +3366,8 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
 /*  Get a pointer to the bounding box array and the number of items in
  *  the array. */
 
-      gridbox = (float *) DXGetArrayData( gridbox_array ); 
-      DXGetArrayInfo( gridbox_array, &ncorn, NULL, NULL, NULL, NULL );      
+      gridbox = (float *) DXGetArrayData( gridbox_array );
+      DXGetArrayInfo( gridbox_array, &ncorn, NULL, NULL, NULL, NULL );
 
 
 /*  Store the bounds for each dimension. */
@@ -3383,20 +3383,20 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
             if( bnd < lbnd[j] ) lbnd[j]=bnd;
             if( bnd > ubnd[j] ) ubnd[j]=bnd;
          }
-      }            
+      }
 
 
 
 /*  Get a pointer to the positions values. */
-         
-      gridpos = (float *) DXGetArrayData( gridpos_array ); 
+
+      gridpos = (float *) DXGetArrayData( gridpos_array );
 
 
 /*  Replace any invalid positions with the value FLT_MAX (defined in
  *  float.h). */
 
       if( !SXGetInvPos( *grid, *nsamp, *ndim, gridpos, "positions" ) ) return( NULL );
-      
+
 
 /*  Return the pointer */
 
@@ -3416,7 +3416,7 @@ float *SXPut1r( char *name, int n, Object *out ){
 *     SXPut1r
 
 *  Purpose:
-*     Creates an object to hold a list of floating point values 
+*     Creates an object to hold a list of floating point values
 
 *  Language:
 *     ANSI C
@@ -3431,7 +3431,7 @@ float *SXPut1r( char *name, int n, Object *out ){
 
 *  Arguments:
 *     name = char * (Given)
-*        The name of the parameter to refer to in the text of any error 
+*        The name of the parameter to refer to in the text of any error
 *        messages which are generated by this function.
 *     n = int (Given)
 *        The number of scalar values associated with the output parameter.
@@ -3439,7 +3439,7 @@ float *SXPut1r( char *name, int n, Object *out ){
 *        A pointer to the DX object to associate with the parameter.
 
 *  Returned Value:
-*     A pointer to an un-initialised array of the requested size, or NULL 
+*     A pointer to an un-initialised array of the requested size, or NULL
 *     if an error occurs.
 
 *  Authors:
@@ -3464,7 +3464,7 @@ float *SXPut1r( char *name, int n, Object *out ){
 
 
 /*  Make a new scalar array structure to hold the output data values. This
- *  call just describes the structure of the array, it doesn't actually 
+ *  call just describes the structure of the array, it doesn't actually
  *  allocate any space for the array. */
 
       array = DXNewArray( TYPE_FLOAT, CATEGORY_REAL, 0 );
@@ -3489,9 +3489,9 @@ float *SXPut1r( char *name, int n, Object *out ){
 
 
 /*  Arrive here if an error occurred. Report a message and return a NULL. */
- 
+
 error:
-      DXSetError( ERROR_UNEXPECTED, 
+      DXSetError( ERROR_UNEXPECTED,
                   "Unable to create output parameter \"%s\".",
                   name );
       *out = NULL;
@@ -3502,8 +3502,8 @@ error:
 
 /*------------------------------------------------------------------------*/
 
-Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin, 
-              float *outdata[], int *map, int *counts, char type, 
+Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin,
+              float *outdata[], int *map, int *counts, char type,
               int *outbad ){
 /*
 *+
@@ -3511,15 +3511,15 @@ Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin,
 *     SXBinF
 
 *  Purpose:
-*     Bin scattered fields into a grid of connections using data of type 
+*     Bin scattered fields into a grid of connections using data of type
 *     float.
 
 *  Language:
 *     ANSI C
 
 *  Prototype:
-*     Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], 
-*                   int nbin, float *outdata[], int *map, int *counts, 
+*     Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[],
+*                   int nbin, float *outdata[], int *map, int *counts,
 *                   char type, int *outbad );
 
 *  Description:
@@ -3532,22 +3532,22 @@ Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin,
 *        The number of matching pairs of input and output data arrays to
 *        be processed simultaneously.
 *     veclen[] = int (Given)
-*        An array holding the length of the output data vectors for each of 
+*        An array holding the length of the output data vectors for each of
 *        the "nfld" data arrays. If type is 2 (i.e. counts are to be
-*        returned), then veclen should be supplied equal to 1 (the input 
+*        returned), then veclen should be supplied equal to 1 (the input
 *        data values are ignored).
 *     ninpos = int (Given)
 *        The number of input positions.
 *     indata[] = float * (Given)
-*        An array of pointers to the start of the "nfld" input data arrays. 
-*        Each of these input data arrays should hold "ninpos" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" input data arrays.
+*        Each of these input data arrays should hold "ninpos" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     nbin = int (Given)
 *        The number of output bins.
 *     outdata[] = float * (Given)
-*        An array of pointers to the start of the "nfld" output data arrays. 
-*        Each of these output data arrays should hold "nbin" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" output data arrays.
+*        Each of these output data arrays should hold "nbin" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     map = int * (Given)
 *        A pointer to the start of an array holding the bin number (plus 1)
 *        for each input position. It shouyld contain ninpos elements. A
@@ -3557,10 +3557,10 @@ Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin,
 *        A pointer to an integer work array containing nbin elements.
 *     type = char (Given)
 *        If 0, then the returned output data values are weighted means
-*        of the input data values. If 1, then the returned output data 
-*        values are weighted sums of the input data values. If 2, then 
-*        the returned output data values are the sum of the weights of 
-*        the input data values. 
+*        of the input data values. If 1, then the returned output data
+*        values are weighted sums of the input data values. If 2, then
+*        the returned output data values are the sum of the weights of
+*        the input data values.
 *     outbad = int * (Returned)
 *        Pointer to an array returned holding the number of invalid
 *        positions in each output field.
@@ -3626,7 +3626,7 @@ Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin,
 
             if( type == 0 ) {          /*  output = mean */
                counts[ibin]++;
- 
+
                for( fld=0; fld<nfld; fld++ ){
                   infld = indata[fld] + i*veclen[fld];
                   outfld = outdata[fld] + ibin*veclen[fld];
@@ -3643,7 +3643,7 @@ Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin,
             } else {                      /*  output = count */
                counts[ibin]++;
 
-            } 
+            }
 
          }
 
@@ -3706,8 +3706,8 @@ Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], int nbin,
 
 
 /*------------------------------------------------------------------------*/
-Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], int nbin, 
-              double *outdata[], int *map, int *counts, char type, 
+Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], int nbin,
+              double *outdata[], int *map, int *counts, char type,
               int *outbad ){
 /*
 *+
@@ -3715,15 +3715,15 @@ Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], int nbin,
 *     SXBinD
 
 *  Purpose:
-*     Bin scattered fields into a grid of connections using data of type 
+*     Bin scattered fields into a grid of connections using data of type
 *     DOUBLE.
 
 *  Language:
 *     ANSI C
 
 *  Prototype:
-*     Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], 
-*                   int nbin, double *outdata[], int *map, int *counts, 
+*     Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[],
+*                   int nbin, double *outdata[], int *map, int *counts,
 *                   char type, int *outbad );
 
 *  Description:
@@ -3736,22 +3736,22 @@ Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], int nbin,
 *        The number of matching pairs of input and output data arrays to
 *        be processed simultaneously.
 *     veclen[] = int (Given)
-*        An array holding the length of the output data vectors for each of 
+*        An array holding the length of the output data vectors for each of
 *        the "nfld" data arrays. If type is 2 (i.e. counts are to be
-*        returned), then veclen should be supplied equal to 1 (the input 
+*        returned), then veclen should be supplied equal to 1 (the input
 *        data values are ignored).
 *     ninpos = int (Given)
 *        The number of input positions.
 *     indata[] = double * (Given)
-*        An array of pointers to the start of the "nfld" input data arrays. 
-*        Each of these input data arrays should hold "ninpos" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" input data arrays.
+*        Each of these input data arrays should hold "ninpos" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     nbin = int (Given)
 *        The number of output bins.
 *     outdata[] = double * (Given)
-*        An array of pointers to the start of the "nfld" output data arrays. 
-*        Each of these output data arrays should hold "nbin" vectors with 
-*        dimensions given by the corresponding element of array "veclen". 
+*        An array of pointers to the start of the "nfld" output data arrays.
+*        Each of these output data arrays should hold "nbin" vectors with
+*        dimensions given by the corresponding element of array "veclen".
 *     map = int * (Given)
 *        A pointer to the start of an array holding the bin number (plus 1)
 *        for each input position. It shouyld contain ninpos elements. A
@@ -3761,10 +3761,10 @@ Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], int nbin,
 *        A pointer to an integer work array containing nbin elements.
 *     type = char (Given)
 *        If 0, then the returned output data values are weighted means
-*        of the input data values. If 1, then the returned output data 
-*        values are weighted sums of the input data values. If 2, then 
-*        the returned output data values are the sum of the weights of 
-*        the input data values. 
+*        of the input data values. If 1, then the returned output data
+*        values are weighted sums of the input data values. If 2, then
+*        the returned output data values are the sum of the weights of
+*        the input data values.
 *     outbad = int * (Returned)
 *        Pointer to an array returned holding the number of invalid
 *        positions in each output field.
@@ -3829,7 +3829,7 @@ Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], int nbin,
 
             if( type == 0 ) {          /*  output = mean */
                counts[ibin]++;
- 
+
                for( fld=0; fld<nfld; fld++ ){
                   infld = indata[fld] + i*veclen[fld];
                   outfld = outdata[fld] + ibin*veclen[fld];
@@ -3846,7 +3846,7 @@ Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], int nbin,
             } else {                      /*  output = count */
                counts[ibin]++;
 
-            } 
+            }
 
          }
 
@@ -3927,26 +3927,26 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
 *  Description:
 *     An error is reported if the supplied object ("in") is not a field.
 *     Otherwise, a copy of the field is made and returned in "*grid". The
-*     positions component of the field is checked to make sure that it is 
-*     of type FLOAT and category REAL, and that each positions is a 1-d 
+*     positions component of the field is checked to make sure that it is
+*     of type FLOAT and category REAL, and that each positions is a 1-d
 *     vector of length less than 4. An error is reported if any of these
-*     conditions are not met. The dimensionality of each position and the 
+*     conditions are not met. The dimensionality of each position and the
 *     number of connections of the supplied field are returned. A new
-*     connection-dependant integer "data" component is added to grid 
+*     connection-dependant integer "data" component is added to grid
 *     containing the index of the corresponding connection (starting at 1).
-*     An interpolator for the modified grid is obtained and returned. 
+*     An interpolator for the modified grid is obtained and returned.
 
 *  Arguments:
 *     in= Object (Given)
 *        The DX object.
 *     ncon = int * (Returned)
-*        A pointer to the location at which to returned the number of 
+*        A pointer to the location at which to returned the number of
 *        connections in the connections component.
 *     ndim = int * (Returned)
 *        A pointer to the location at which to returned the dimensionality
 *        of each position.
 *     grid = Object * (Returned)
-*        A Pointer to a location at which to return the copy of the 
+*        A Pointer to a location at which to return the copy of the
 *        supplied field.
 
 *  Returned Value:
@@ -4001,7 +4001,7 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
          DXSetError( ERROR_MISSING_DATA, "the \"grid\" field has no positions" );
          return( NULL );
       }
-         
+
 
 /*  Get its shape, size and type. Check it is usable. */
 
@@ -4011,12 +4011,12 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
          DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of type FLOAT." );
          return( NULL );
       }
-                     
+
       if( cat != CATEGORY_REAL ){
          DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of category REAL." );
          return( NULL );
       }
-                     
+
       if( rank > 1 ){
          DXSetError( ERROR_DATA_INVALID, "rank %d positions component found in \"grid\".", rank );
          return( NULL );
@@ -4026,7 +4026,7 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
          rank = 1;
          *ndim = 1;
       }
-                     
+
       if( *ndim > 3 ){
          DXSetError( ERROR_DATA_INVALID, "%d-dimensional positions component found in \"grid\".", *ndim );
          return( NULL );
@@ -4067,10 +4067,10 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
          DXDelete( (Object) data_array );
          return( NULL );
       }
- 
+
       if( !DXChangedComponentValues( (Field) *grid, "data" ) ) return( NULL );
 
-         
+
 /*  Create and return the interpolator. */
 
       interp = DXNewInterpolator( *grid, INTERP_INIT_IMMEDIATE, -1.0 );

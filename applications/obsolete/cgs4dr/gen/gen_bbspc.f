@@ -1,10 +1,10 @@
 C+
-      SUBROUTINE GEN_BBSPC (REFWAVE, TEMPERATURE, AXIS, 
+      SUBROUTINE GEN_BBSPC (REFWAVE, TEMPERATURE, AXIS,
      :   NPTS, DATA)
 C
 C     G E N _ B B S P C
 C
-C     Calculate a black-body of TEMPERATURE, at wavelength points 
+C     Calculate a black-body of TEMPERATURE, at wavelength points
 C     defined by the AXIS array, normalised to the value at REFWAVE.
 C     Axis wavelengths are in microns, temperature in Kelvin.
 C     The units are assumed to be flux per unit wavelength (F-lambda).
@@ -38,7 +38,7 @@ C+
 *    set values in DATA
 
       DO I = 1, NPTS
-         DATA (I) = 1.0 / 
+         DATA (I) = 1.0 /
      :      (AXIS(I)**5*(EXP(CONST/(AXIS(I)*TEMPERATURE))-1.0))
          DATA (I) = DATA(I) / NORM
       END DO

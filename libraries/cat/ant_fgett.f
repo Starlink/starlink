@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -114,13 +114,13 @@
 
 *
 *          The identifier is a vector column element.  Determine the
-*          identifier of the base column and the array element to which 
+*          identifier of the base column and the array element to which
 *          it corresponds, and then get the value.
 
             CALL CAT_TIQAI (CID, 'BASEID', CIB, STATUS)
             CALL CAT_TIQAI (CID, 'ELEM', ELEM, STATUS)
 
-            CALL CAT1_FIOB (.TRUE., CIB, ELEM, NROW, VALUE, NULL, 
+            CALL CAT1_FIOB (.TRUE., CIB, ELEM, NROW, VALUE, NULL,
      :        STATUS)
 
          ELSE IF (IDTYPE .EQ. CAT__QITYP) THEN
@@ -244,13 +244,13 @@
 
 *
 *          The identifier is a vector column element.  Determine the
-*          identifier of the base column and the array element to which 
+*          identifier of the base column and the array element to which
 *          it corresponds, and then get the value.
 
             CALL CAT_TIQAI (CID, 'BASEID', CIB, STATUS)
             CALL CAT_TIQAI (CID, 'ELEM', ELEM, STATUS)
 
-            CALL CAT1_FIOC (.TRUE., CIB, ELEM, NROW, VALUE, NULL, 
+            CALL CAT1_FIOC (.TRUE., CIB, ELEM, NROW, VALUE, NULL,
      :        STATUS)
 
          ELSE IF (IDTYPE .EQ. CAT__QITYP) THEN
@@ -374,13 +374,13 @@
 
 *
 *          The identifier is a vector column element.  Determine the
-*          identifier of the base column and the array element to which 
+*          identifier of the base column and the array element to which
 *          it corresponds, and then get the value.
 
             CALL CAT_TIQAI (CID, 'BASEID', CIB, STATUS)
             CALL CAT_TIQAI (CID, 'ELEM', ELEM, STATUS)
 
-            CALL CAT1_FIOD (.TRUE., CIB, ELEM, NROW, VALUE, NULL, 
+            CALL CAT1_FIOD (.TRUE., CIB, ELEM, NROW, VALUE, NULL,
      :        STATUS)
 
          ELSE IF (IDTYPE .EQ. CAT__QITYP) THEN
@@ -504,13 +504,13 @@
 
 *
 *          The identifier is a vector column element.  Determine the
-*          identifier of the base column and the array element to which 
+*          identifier of the base column and the array element to which
 *          it corresponds, and then get the value.
 
             CALL CAT_TIQAI (CID, 'BASEID', CIB, STATUS)
             CALL CAT_TIQAI (CID, 'ELEM', ELEM, STATUS)
 
-            CALL CAT1_FIOI (.TRUE., CIB, ELEM, NROW, VALUE, NULL, 
+            CALL CAT1_FIOI (.TRUE., CIB, ELEM, NROW, VALUE, NULL,
      :        STATUS)
 
          ELSE IF (IDTYPE .EQ. CAT__QITYP) THEN
@@ -634,13 +634,13 @@
 
 *
 *          The identifier is a vector column element.  Determine the
-*          identifier of the base column and the array element to which 
+*          identifier of the base column and the array element to which
 *          it corresponds, and then get the value.
 
             CALL CAT_TIQAI (CID, 'BASEID', CIB, STATUS)
             CALL CAT_TIQAI (CID, 'ELEM', ELEM, STATUS)
 
-            CALL CAT1_FIOL (.TRUE., CIB, ELEM, NROW, VALUE, NULL, 
+            CALL CAT1_FIOL (.TRUE., CIB, ELEM, NROW, VALUE, NULL,
      :        STATUS)
 
          ELSE IF (IDTYPE .EQ. CAT__QITYP) THEN
@@ -764,13 +764,13 @@
 
 *
 *          The identifier is a vector column element.  Determine the
-*          identifier of the base column and the array element to which 
+*          identifier of the base column and the array element to which
 *          it corresponds, and then get the value.
 
             CALL CAT_TIQAI (CID, 'BASEID', CIB, STATUS)
             CALL CAT_TIQAI (CID, 'ELEM', ELEM, STATUS)
 
-            CALL CAT1_FIOR (.TRUE., CIB, ELEM, NROW, VALUE, NULL, 
+            CALL CAT1_FIOR (.TRUE., CIB, ELEM, NROW, VALUE, NULL,
      :        STATUS)
 
          ELSE IF (IDTYPE .EQ. CAT__QITYP) THEN
@@ -894,13 +894,13 @@
 
 *
 *          The identifier is a vector column element.  Determine the
-*          identifier of the base column and the array element to which 
+*          identifier of the base column and the array element to which
 *          it corresponds, and then get the value.
 
             CALL CAT_TIQAI (CID, 'BASEID', CIB, STATUS)
             CALL CAT_TIQAI (CID, 'ELEM', ELEM, STATUS)
 
-            CALL CAT1_FIOW (.TRUE., CIB, ELEM, NROW, VALUE, NULL, 
+            CALL CAT1_FIOW (.TRUE., CIB, ELEM, NROW, VALUE, NULL,
      :        STATUS)
 
          ELSE IF (IDTYPE .EQ. CAT__QITYP) THEN

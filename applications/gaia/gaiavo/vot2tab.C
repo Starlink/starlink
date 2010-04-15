@@ -22,10 +22,10 @@
  *     vot2tab in ntab out
 
  *  Parameters:
- *     in = string 
+ *     in = string
  *        Filename of the VOTable.
  *     ntab = integer
- *        Index of the table to extract from the VOTable. Starts from 
+ *        Index of the table to extract from the VOTable. Starts from
  *        0.
  *     out = string
  *        Filename for the extracted table in "tab table" format.
@@ -33,7 +33,7 @@
  *  Implementation Deficiencies:
  *     - The transformation process doesn't record all the information
  *       available in the input catalogue.
- 
+
  *  Authors:
  *     PWD: Peter Draper (JAC, Durham University)
  *     {enter_new_authors_here}
@@ -57,7 +57,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     24-JUN-2008 (PWD):
  *        Original version.
@@ -95,10 +95,10 @@ int main( int argc, char* argv[] )
                 return 0;
             }
             cerr << "Failed to extract table to file " << argv[3] << endl;
-            
+
         }
         else {
-            cerr << "Failed to extract table no. " << argv[2] 
+            cerr << "Failed to extract table no. " << argv[2]
                  << " from VOTable" << endl;
         }
     }

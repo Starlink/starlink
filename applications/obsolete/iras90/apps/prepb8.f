@@ -49,13 +49,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-                                 
+
 *  Arguments Given:
       INTEGER NCARD
       CHARACTER FITS( NCARD )*(*)
@@ -78,7 +78,7 @@
       CALL PREPC6( NCARD, FITS, SUBTYP, STATUS )
 
 *  Write it into the YORTYPE component of the IMAGE_INFO structure.
-      CALL CMP_PUT0C( LOC, 'YORTYPE', SUBTYP, STATUS )     
-      
+      CALL CMP_PUT0C( LOC, 'YORTYPE', SUBTYP, STATUS )
+
       END
 

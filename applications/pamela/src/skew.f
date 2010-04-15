@@ -4,9 +4,9 @@
 *          a fit file dumped by track. i.e. skew can straigten a spectrum or
 *          do the reverse.
 *
-* The shifting is accomplished by rebinning which smooths somewhat and 
+* The shifting is accomplished by rebinning which smooths somewhat and
 * therefore skew is not a reversible operation. It should not be used say in
-* combination with extopt to extract spectra. Use profit and optext 
+* combination with extopt to extract spectra. Use profit and optext
 * instead.
 *
 * Parameters:
@@ -42,11 +42,11 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open data file 
+C     Open data file
 C
       CALL NDF_ASSOC('IMAGE', 'READ',IMAGE, STATUS)
 C
-C     Open track file 
+C     Open track file
 C
       CALL GET_TRACK(YPOS, TOFF, STATUS)
 C
@@ -93,20 +93,20 @@ C
       CALL NDF_SBND(2,LBND,UBND,SKEWED,STATUS)
       CALL NDF_STYPE('_REAL',SKEWED,'Data',STATUS)
 C
-C     Map 
+C     Map
 C
       CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
       CALL NDF_MAP(SKEWED,'Data','_REAL','WRITE',OPTR,EL,STATUS)
 C
-C     Skew frame 
+C     Skew frame
 C
-      CALL PIC_SKEW(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(OPTR)), 
+      CALL PIC_SKEW(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(OPTR)),
      &     NXS, NYS, YLO, REMOVE, REBIN, STATUS)
       CALL NDF_END(STATUS)
       RETURN
-      END      
-      
-      SUBROUTINE PIC_SKEW(INPUT, OUTPUT, NXS, NYS, YLO, 
+      END
+
+      SUBROUTINE PIC_SKEW(INPUT, OUTPUT, NXS, NYS, YLO,
      &     REMOVE, METHOD, STATUS)
 C
 C Written by T.R. Marsh August 1988

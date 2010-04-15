@@ -1,4 +1,4 @@
-      SUBROUTINE MAGIC 
+      SUBROUTINE MAGIC
 C+
 C
 C   ---------
@@ -7,7 +7,7 @@ C   ---------
 C
 C   Description
 C   -----------
-C   Replaces all pixels in an image or an image subset, whose values lie 
+C   Replaces all pixels in an image or an image subset, whose values lie
 C   outside a specified range, with the magic value or if a quality
 C   array is present, flags bad quality.
 C
@@ -45,7 +45,7 @@ C
 C   HIGH    Highest value of range outside which pixel values will be
 C           replaced with the magic value (real)(prompted for).
 C
-C   OUTPUT  Name of the structure containing the output image. May be the 
+C   OUTPUT  Name of the structure containing the output image. May be the
 C           same as IMAGE (character)(prompted for).
 C
 C   Keywords
@@ -63,12 +63,12 @@ C
 C   Method
 C   ------
 C   - The IMAGE structure is tested for the bad data flag. If it is found
-C     and non-zero, magic values are assumed to be present and are left in 
+C     and non-zero, magic values are assumed to be present and are left in
 C     the data.
 C   - The IMAGE structure is copied to OUTPUT.
 C   - A subroutine appropriate to the data type and the presence or absence
 C     of magic values is called to edit the OUTPUT data array.
-C   - The OUTPUT bad data flag is set if any pixels were changed to the 
+C   - The OUTPUT bad data flag is set if any pixels were changed to the
 C     magic value.
 C
 C
@@ -115,7 +115,7 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
-C                                             
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -154,7 +154,7 @@ C
 C
 C   Local variables
 C
-      INTEGER   ADDRESS            ! Address of dynamic memory element   
+      INTEGER   ADDRESS            ! Address of dynamic memory element
       LOGICAL   BADPIX             ! Value of bad pixel flag
       INTEGER   DIMS(10)           ! Dimensions of IMAGE
       INTEGER   DUMINT             ! INTEGER dummy variable
@@ -176,7 +176,7 @@ C
       INTEGER   OQPTR              ! Dynamic pointer to o/p quality array
       INTEGER   IQSLOT             ! Map slot number for i/p quality array
       INTEGER   OQSLOT             ! Map slot number for o/p quality array
-      INTEGER   OUTPTR             ! Dynamic pointer to output data   
+      INTEGER   OUTPTR             ! Dynamic pointer to output data
       INTEGER   STAPIX(6)          ! Start pixel of subset
       REAL      START(6)           ! Start coordinate of subset
       INTEGER   STATUS             ! Status code
@@ -208,7 +208,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Get information about IMAGE
-C                                   
+C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.FALSE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
@@ -218,7 +218,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C   Get IMAGE axis range
-C                           
+C
       CALL NDP_AXIS_RANGE
      &  ('IMAGE',DIMS,NDIM,START,END,STAPIX,ENDPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -286,7 +286,7 @@ C
         CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,ISLOT,STATUS)
       END IF
       IF(STATUS.NE.0)GO TO 500
-      IMPTR=DYN_ELEMENT(ADDRESS)                 
+      IMPTR=DYN_ELEMENT(ADDRESS)
 C
 C   Map OUTPUT data array
 C
@@ -310,9 +310,9 @@ C
       END IF
 C
 C   Perform edit
-C                                       
+C
       CALL DSA_WRUSER('Editing data array...\\N')
-      IF(TYPE.EQ.'SHORT')THEN 
+      IF(TYPE.EQ.'SHORT')THEN
         IF(.NOT.BADPIX)THEN
           CALL MAGIC_DATA_W
      &      (DYNAMIC_MEM(IMPTR),DYNAMIC_MEM(OUTPTR),

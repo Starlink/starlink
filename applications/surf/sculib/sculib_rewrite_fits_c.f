@@ -15,9 +15,9 @@
 *    :  VALUE, STATUS)
 
 *  Description:
-*     This routine will overwrite the value of a specified FITS character 
+*     This routine will overwrite the value of a specified FITS character
 *     keyword held in the FITS extension of an NDF file. The FITS extension
-*     must have been read into the input array FITS before this routine is 
+*     must have been read into the input array FITS before this routine is
 *     called and be written out again afterwards for the change to take effect.
 *
 *        The routine assumes that each line in the FITS array will contain
@@ -43,7 +43,7 @@
 *     VALUE                = CHARACTER*(*) (Given)
 *           the value that the FITS keyword is to have
 *     STATUS               = INTEGER (Given and returned)
-*           global status 
+*           global status
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -56,7 +56,7 @@
 
 *  History:
 *     $Id$
-*     26-JUL-1995 (jfl): 
+*     26-JUL-1995 (jfl):
 *       original version.
 *-
 
@@ -108,7 +108,7 @@
          DO WHILE (LOOPING)
             I = I + 1
 
-*  the FITS keyword name should be in first part of the string, immediately 
+*  the FITS keyword name should be in first part of the string, immediately
 *  in front of the =
 
             IPOS = INDEX (FITS(I),'=')
@@ -151,16 +151,16 @@
                   END IF
                END IF
             END IF
-                              
+
 *  break out of loop if we've found the keyword, reached the end of the FITS
 *  array, or if an error has occured
-   
-            IF (FOUND                 .OR. 
+
+            IF (FOUND                 .OR.
      :          (STATUS .NE. SAI__OK) .OR.
      :          (I .EQ. N_FITS))      THEN
                LOOPING = .FALSE.
             END IF
-                      
+
          END DO
 
          IF (STATUS .NE. SAI__OK) THEN
@@ -170,7 +170,7 @@
             CALL ERR_REP (' ', '^LINE', STATUS)
          END IF
       END IF
- 
+
 *  check that the keyword was found
 
       IF (.NOT. FOUND) THEN
@@ -181,5 +181,5 @@
      :        'find FITS item ^NAME', STATUS)
          END IF
       END IF
-     
+
       END

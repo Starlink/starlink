@@ -13,7 +13,7 @@
 #     fluxes.csh
 #
 #  Description:
-#     This procedure starts the FLUXES system for use from Unix by 
+#     This procedure starts the FLUXES system for use from Unix by
 #     defining some environmental variables appropriately.
 #
 #  Notes:
@@ -70,7 +70,7 @@ endif
 
 # Define a link to the jpleph.dat file in the current directory.
 if ( -f JPLEPH ) then
-  if ( silent == 0) then 
+  if ( silent == 0) then
      echo \
 "File JPLEPH already exists - assuming it is, or points to, the JPL ephemeris."
    endif

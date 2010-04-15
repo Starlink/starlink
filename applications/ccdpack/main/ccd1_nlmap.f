@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
      :                    STATUS )
 
 *  Decode line to find out how many values it has.
-         IF ( STATUS .EQ. SAI__OK .AND. .NOT. EOF ) THEN 
+         IF ( STATUS .EQ. SAI__OK .AND. .NOT. EOF ) THEN
             CALL CCD1_DECL2( LINE, LINNUM, HAVIND, NUMVAL, STATUS )
 
 *  Correct for removal of index value from count.
@@ -154,10 +154,10 @@
             NLINES = NLINES + 1
 
 *  Check that the number of values is invariant.
-            IF ( NLINES .NE. 1 ) THEN 
+            IF ( NLINES .NE. 1 ) THEN
                IF ( .NOT. ( NUMVAL .EQ. NACT ) ) THEN
 
-*  Number of values has changed. Set STATUS and issue error. 
+*  Number of values has changed. Set STATUS and issue error.
                   STATUS = SAI__ERROR
                   CALL ERR_REP( 'CCD1_LMAPERR1',
      :            '  File has illegal record structure', STATUS )
@@ -215,7 +215,7 @@
      :                    STATUS )
 
 *  Decode line into its values.
-         IF ( STATUS .EQ. SAI__OK .AND. .NOT. EOF ) THEN 
+         IF ( STATUS .EQ. SAI__OK .AND. .NOT. EOF ) THEN
 
 *  Increment the record count.
             NLINES = NLINES + 1

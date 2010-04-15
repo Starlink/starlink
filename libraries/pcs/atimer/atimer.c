@@ -38,7 +38,7 @@ int *status     /* global status (given and returned) */
 *     ATIMER_CANTIM
 
 *  Purpose:
-*     Remove an event from the timer queue 
+*     Remove an event from the timer queue
 
 *  Language:
 *     Starlink C
@@ -108,7 +108,7 @@ int *status     /* global status (given and returned) */
 
       cur_entry = timer_queue;
 
-      do 
+      do
       {
          if ( cur_entry->timerid == timerid )
          {
@@ -119,29 +119,29 @@ int *status     /* global status (given and returned) */
       }
       while ( cur_entry != NULL );
 
-      if (cur_entry != NULL) 
+      if (cur_entry != NULL)
       {
          if ( cur_entry == timer_queue )
          {
             timer_queue = timer_queue->next;
-            if ( timer_queue != NULL) 
+            if ( timer_queue != NULL)
             {
                timer_queue->delta_t.tv_sec += cur_entry->delta_t.tv_sec;
                if( (timer_queue->delta_t.tv_usec += cur_entry->delta_t.tv_usec)
-                 >= 1000000 ) 
+                 >= 1000000 )
                {
                   timer_queue->delta_t.tv_usec -= 1000000;
                   ++(timer_queue->delta_t.tv_sec);
                }
             }
          }
-         else 
+         else
          {
-            if( (prev_entry->next = cur_entry->next) != NULL ) 
+            if( (prev_entry->next = cur_entry->next) != NULL )
             {
                cur_entry->next->delta_t.tv_sec += cur_entry->delta_t.tv_sec;
-               if ( ( cur_entry->next->delta_t.tv_usec += 
-                 cur_entry->delta_t.tv_usec ) >= 1000000 ) 
+               if ( ( cur_entry->next->delta_t.tv_usec +=
+                 cur_entry->delta_t.tv_usec ) >= 1000000 )
                {
                   cur_entry->next->delta_t.tv_usec -= 1000000;
                   ++(cur_entry->next->delta_t.tv_sec);
@@ -149,7 +149,7 @@ int *status     /* global status (given and returned) */
             }
          }
          free((char *) cur_entry);
-      } 
+      }
       else
       {
          *status = ATIMER__NOTFOUND;
@@ -187,7 +187,7 @@ int signo                   /* signal number (given) */
 *     ATIMER_HANDLER
 
 *  Purpose:
-*     Signal handler for timer system 
+*     Signal handler for timer system
 
 *  Language:
 *     Starlink C
@@ -195,7 +195,7 @@ int signo                   /* signal number (given) */
 *  Algorithm:
 *     This is called as a result of SIGALRM.
 *     Remove the entry from the front of the timer queue and invoke the
-*     associated function. If there are still entries on the queue, restart 
+*     associated function. If there are still entries on the queue, restart
 *     the timer.
 
 *  Copyright:
@@ -261,19 +261,19 @@ int signo                   /* signal number (given) */
          timer.it_value = timer_queue->delta_t;
          timerclear(&timer.it_interval);
          istat = setitimer ( ITIMER_REAL, &timer, (struct itimerval *)0 );
-         if ( istat == -1) 
+         if ( istat == -1)
          {
             perror ( "atimer_handler - setitimer call failed" );
          }
       }
    }
-   signal ( SIGALRM, atimer_handler ); 
+   signal ( SIGALRM, atimer_handler );
 
 }
 
 
 
-static void atimer_insert 
+static void atimer_insert
 (
 struct timer_q *new_entry,  /* pointer to item to be added (given) */
 int *status                 /* global status (given and returned) */
@@ -285,16 +285,16 @@ int *status                 /* global status (given and returned) */
 *     ATIMER_INSERT
 
 *  Purpose:
-*     Insert an entry in the event list 
+*     Insert an entry in the event list
 
 *  Language:
 *     Starlink C
 
 *  Algorithm:
 *     Add a time value to the timer queue.
-*     The interval timer queue is implemented as an ordered in increasing 
-*     time order linked list of (struct timer_q *) entries with a list_head 
-*     pointed to by 'timer_queue'. Each entry is constructed to contain the 
+*     The interval timer queue is implemented as an ordered in increasing
+*     time order linked list of (struct timer_q *) entries with a list_head
+*     pointed to by 'timer_queue'. Each entry is constructed to contain the
 *     time interval (in setitimer format) required from completion of the
 *     previous entry.
 *     Note - The macros timercmp, timerisset and timerclear are included from
@@ -412,7 +412,7 @@ int *status            /* global status (given and returned) */
 *     ATIMER_SETTIMR
 
 *  Purpose:
-*     Add an event to the timer queue 
+*     Add an event to the timer queue
 
 *  Language:
 *     Starlink C
@@ -491,14 +491,14 @@ int *status            /* global status (given and returned) */
       new_entry->func = func;
       new_entry->delta_t = value;
 
-      if ( timer_queue == 0 ) 
+      if ( timer_queue == 0 )
       {
 
 /*   The queue is currently empty, put the new entry at the front */
 
          timer_queue = new_entry;
          new_entry->next = 0;
-      } 
+      }
       else
       {
 
@@ -521,10 +521,10 @@ int *status            /* global status (given and returned) */
       timer.it_value = timer_queue->delta_t;
       timerclear(&timer.it_interval);
       istat = setitimer ( ITIMER_REAL, &timer, (struct itimerval *) 0 );
-      if ( istat == -1) 
+      if ( istat == -1)
       {
          perror ( "atimer_settimr - setitimer call failed" );
-         printf ( "sec = %ld, usec = %ld\n", new_entry->delta_t.tv_sec, 
+         printf ( "sec = %ld, usec = %ld\n", new_entry->delta_t.tv_sec,
           new_entry->delta_t.tv_usec );
       }
    }

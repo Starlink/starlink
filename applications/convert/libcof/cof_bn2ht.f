@@ -65,7 +65,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
 *  Check for each case.
       IF ( TCODE .EQ. 'B' ) THEN
          TYPE = '_UBYTE'
-         
+
       ELSE IF ( TCODE .EQ. 'I' ) THEN
          TYPE = '_WORD'
 

@@ -141,27 +141,27 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER FUNIT
       CHARACTER*(*) FILNAM
       LOGICAL SAVEP
-      
+
 *  Arguments Given and Returned:
-      
+
 *  Arguments Returned:
       INTEGER BLOCSZ
       INTEGER EXTN
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
-      
+
 *  Local Constants:
       INTEGER   FITSOK           ! Value of good FITSIO status
       PARAMETER( FITSOK = 0 )
-      
+
 *  Local Variables:
       INTEGER FLEN              ! Length of filename part of FILNAM
       INTEGER EXTLEN            ! Length of Extension in FILNAM
@@ -172,9 +172,9 @@
       CHARACTER*6 FTSUB         ! Current FITS subroutine name
       CHARACTER*(80) XTSPEC     ! Extension specifier
       CHARACTER*200 EBUFF      ! Buffer for Error messages
-      
+
 *  Local Data:
-      
+
 *.
 
 *  Check inherited global status.
@@ -192,8 +192,8 @@
          XTSPEC = FILNAM(FLEN+2:FLEN+EXTLEN-1)
       ELSE
          XTSPEC = ' '
-      END IF        
-      IF ( STATUS .EQ. SAI__OK ) THEN       
+      END IF
+      IF ( STATUS .EQ. SAI__OK ) THEN
 *  Open the FITS file with read access.
          CALL FTOPEN( FUNIT, FILNAM(1:FLEN), 0, BLOCSZ, FSTAT )
 
@@ -250,7 +250,7 @@
                               CALL FTCMSG
                            END IF  ! failed moving to next HDU
 
-                        END IF  ! loop continues                 
+                        END IF  ! loop continues
 
                      END IF  ! CHKXT OK
 
@@ -260,7 +260,7 @@
 
             END IF  ! Primary header saved OK
 
-         END IF  ! file open and 
+         END IF  ! file open and
 
       END IF ! FITS specifier parsed OK
 

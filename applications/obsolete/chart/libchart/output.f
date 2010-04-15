@@ -43,7 +43,7 @@
       CHARACTER*70 PARAMS(25),VALUE*50
 
       COMMON/CONVF/TWOPI,HALFPI,RDSA,RDST,RDDG
- 
+
       DATA IDNAM/'HD','AGK','HZ','CPC','YZ','CCFS','Boss',' ','SAO'
      : ,'ADS','IDS','GCRV','YBS','N30','FK4','JSK','A+B','KDY',
      : 'uvby','Bay','USNP','GCTP','GCVS','UBV','NGC','IC','CLA','CLB'
@@ -56,7 +56,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *+
 *   Now Print the Co-ords
 *   They are Derived from the Projected
@@ -82,7 +82,7 @@
 *   Find out the length of a page
 *
       PAGEL = 38
-      
+
       LNUM = 24
       IF (SUPP) LNUM = LNUM+9+NUMSUPP
       IF (CATRUN) THEN
@@ -146,9 +146,9 @@
 *    and its' RA & Dec.
 *
       IF (CATRUN) THEN
- 
+
 *   Convert Precessed Positions
- 
+
          CALL CONV(2,RAO,4,I,MHAO,MINSAO,N,SECSAO, STATUS )
          CALL CONV(1,DECO,3,JSIGN,MDEGD,MINSD,N,SECSD, STATUS )
          RMAG = FLOAT(NSTAR(1,IP(J)))/10.0
@@ -318,4 +318,4 @@
       ENDIF
 200   CONTINUE
       END
- 
+

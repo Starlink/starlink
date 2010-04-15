@@ -1,8 +1,8 @@
-	SUBROUTINE LINIMAG_NDR_LIN( DIMS_IMAGEX, DIMS_IMAGEY, IMAGE_ARRAY, 
-     :	                        IMAGE2_ARRAY, OIMAGE, NCIMAGE, 
+	SUBROUTINE LINIMAG_NDR_LIN( DIMS_IMAGEX, DIMS_IMAGEY, IMAGE_ARRAY,
+     :	                        IMAGE2_ARRAY, OIMAGE, NCIMAGE,
      :	                        NUMCOEFFS, COEFFS, BASE, RANGE, RAT)
 
-* Description : 
+* Description :
 
 	IMPLICIT NONE
 
@@ -20,13 +20,13 @@
 	REAL
      :	  IMAGE_ARRAY( DIMS_IMAGEX, DIMS_IMAGEY),        ! data image
      :	  IMAGE2_ARRAY( DIMS_IMAGEX, DIMS_IMAGEY),       ! data image KTC
-     :	  OIMAGE( DIMS_IMAGEX, DIMS_IMAGEY),             ! output data image 
+     :	  OIMAGE( DIMS_IMAGEX, DIMS_IMAGEY),             ! output data image
      :	  COEFFS( NUMCOEFFS),                            ! coefficients
      :	  BASE,                                          ! base value
      :	  RANGE,                                         ! range value
      :	  READ2M1,                                       ! value phase-ktc
      :	  READ2,                                         ! value phase+ktc
-     :	  READ2M1_LIN,                                   ! corrected data 
+     :	  READ2M1_LIN,                                   ! corrected data
      :	  RAT                                            ! ratio rr/exp
 
 *      Initialize adam status
@@ -37,8 +37,8 @@
 	  DO K = 1, DIMS_IMAGEX
 	    IF( NCIMAGE .GT. 0) THEN
 	      READ2M1 = IMAGE_ARRAY( K, J)
-	      READ2 = 
-     :	       ( IMAGE_ARRAY( K, J)+IMAGE2_ARRAY( K, J))/REAL( NCIMAGE) 
+	      READ2 =
+     :	       ( IMAGE_ARRAY( K, J)+IMAGE2_ARRAY( K, J))/REAL( NCIMAGE)
 	    ELSE
 	      CALL MSG_SETI( 'NCI', NCIMAGE)
 	      CALL MSG_OUT( 'MESSAGE',
@@ -50,7 +50,7 @@
 *          apply polynomial linearization correction
 	    IF( NCIMAGE .GT. 0) THEN
 	      READ2M1 = READ2M1/REAL( NCIMAGE)
-	      CALL LINCONT_NDR_POLY( NUMCOEFFS, COEFFS, RAT, READ2M1, 
+	      CALL LINCONT_NDR_POLY( NUMCOEFFS, COEFFS, RAT, READ2M1,
      :	                             READ2M1_LIN)
 	      IF( READ2 .LT. ( BASE+RANGE) .AND. READ2M1_LIN .LT. RANGE) THEN
 	        READ2M1_LIN = READ2M1_LIN*REAL( NCIMAGE)
@@ -60,7 +60,7 @@
 	    ELSE
 	      READ2M1_LIN = RANGE
 	    END IF
-	    OIMAGE( K, J) = READ2M1_LIN 
+	    OIMAGE( K, J) = READ2M1_LIN
 	  END DO
 	END DO
 

@@ -1,5 +1,5 @@
 *+  MA1TO3 - Subroutine to grow a 1-D array into a 3-D array
-      SUBROUTINE MA1TO3( MODE, IDIMS, ARRIN, ODIMS1, ODIMS2, ODIMS3, 
+      SUBROUTINE MA1TO3( MODE, IDIMS, ARRIN, ODIMS1, ODIMS2, ODIMS3,
      :                   ARROUT, STATUS )
 *    Description :
 *     The 1-dimensional input array, ARRIN, is "grown" into the 3-dimensional

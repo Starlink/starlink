@@ -197,7 +197,7 @@
 
 *  Get the next free IRA identifier value.
       CALL IRA1_GETID( IDA, STATUS )
-      
+
 *  Identify the requested sky coordinate system.
       TSCS = SCS
       CALL IRA_GETEQ( TSCS, EQU, BJ, NAME, STATUS )

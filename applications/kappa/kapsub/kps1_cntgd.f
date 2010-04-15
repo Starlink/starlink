@@ -1,19 +1,19 @@
-      SUBROUTINE KPS1_CNTGD( OUTLIN, IPLOT, IGRP, DIM1, DIM2, ARRAY, 
-     :                       XLL, YLL, XSIZE, YSIZE, FAST, 
+      SUBROUTINE KPS1_CNTGD( OUTLIN, IPLOT, IGRP, DIM1, DIM2, ARRAY,
+     :                       XLL, YLL, XSIZE, YSIZE, FAST,
      :                       CNTUSD, CNTLEN, CNTCLS, STATUS )
 *+
 *  Name:
 *     KPS1_CNTGD
 
 *  Purpose:
-*     Draws a boundary around the good data 
+*     Draws a boundary around the good data
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CNTGD( OUTLIN, IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, 
-*                      XSIZE, YSIZE, FAST, CNTUSD, CNTLEN, CNTCLS, 
+*     CALL KPS1_CNTGD( OUTLIN, IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL,
+*                      XSIZE, YSIZE, FAST, CNTUSD, CNTLEN, CNTCLS,
 *                      STATUS )
 
 *  Description:
@@ -30,13 +30,13 @@
 *        of the array to be contoured.
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group containing descriptions of the pens
-*        to be used (only the first one is actually used). If this is supplied 
-*        as GRP__NOID then the contour is drawn using the "Curves" attributes 
+*        to be used (only the first one is actually used). If this is supplied
+*        as GRP__NOID then the contour is drawn using the "Curves" attributes
 *        (eg Colour(Curves), Width(Curves), etc ) in the supplied Plot. If a
 *        group is supplied, then each element in the group should be a
 *        comma separated list of AST attribute settings to be established
 *        prior to drawing a contour. Element 1 in the group is used for
-*        the contour (any other elements are ignored). Any attributes not 
+*        the contour (any other elements are ignored). Any attributes not
 *        specified default to their values in the Plot.
 *     DIM1 = INTEGER (Given)
 *        The first dimension of the two-dimensional array.
@@ -55,11 +55,11 @@
 *     YSIZE = INTEGER (Given)
 *        The y size of the sub-array to be contoured.
 *     FAST = LOGICAL (Given)
-*        If .TRUE., then contours are drawn using straight lines as the 
+*        If .TRUE., then contours are drawn using straight lines as the
 *        basic drawing element. Otherwise, the basic drawing element are
 *        geodesic curves in the Current coordinate system of the supplied
 *        Plot. This is much slower to draw, but may be useful when a
-*        severly non-linear or discontinuous mapping exists between grid 
+*        severly non-linear or discontinuous mapping exists between grid
 *        coordinates in the array, and graphics coordinates.
 *     CNTUSD = LOGICAL (Returned)
 *        If an element is .TRUE., the contour was drawn (this will always
@@ -105,11 +105,11 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'GRP_PAR'          ! GRP constants
 
@@ -176,7 +176,7 @@
 
       END IF
 
-*  Simplify the Plot. This adds a new Current Frame into the Plot, so note 
+*  Simplify the Plot. This adds a new Current Frame into the Plot, so note
 *  the index of the original Current Frame so that it can be re-instated later.
 *  This can help to speed up the drawing, and also avoids the possibility
 *  of the Mapping going via a Frame in which the positions are undefined.
@@ -190,8 +190,8 @@
          NPEN = 0
       END IF
 
-*  If different pens are being used, produce a modified Plot which draws 
-*  curves with the pen style supplied for this contour. 
+*  If different pens are being used, produce a modified Plot which draws
+*  curves with the pen style supplied for this contour.
       IF( NPEN .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Take a deep copy of the supplied Plot. This Plot will be modify using the
@@ -221,10 +221,10 @@
       CNTCLS = 1
 
 *  Buffer all PGPLOT output produced while drawing this contour.
-      CALL PGBBUF 
+      CALL PGBBUF
 
 *  If using FAST drawing mode, establish the new PGPLOT attributes,
-*  saving the old in ATTRS. If not using fast drawing mode, AST will 
+*  saving the old in ATTRS. If not using fast drawing mode, AST will
 *  establish them when AST_CURVE is called to draw the contour.
       IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .TRUE., ATTRS,
      :                            STATUS )
@@ -309,7 +309,7 @@
                   CNTLEN = CNTLEN + NPTS
                   CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, STATUS )
                   NPTS = 0
-               END IF                                    
+               END IF
 
 *  Save the bad pixel flag for use on the next iteration.
                PBAD = .TRUE.
@@ -406,7 +406,7 @@
                   CNTLEN = CNTLEN + NPTS
                   CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, STATUS )
                   NPTS = 0
-               END IF                                    
+               END IF
 
 *  Save the bad pixel flag for use on the next iteration.
                PBAD = .TRUE.
@@ -444,7 +444,7 @@
 
 *  Now check the left hand edge pixels...
 *  ======================================
-         IX = XLL 
+         IX = XLL
 
 *  If the bottom left pixel is good, start a polyline at its bottom left
 *  corner (in a bit to avoid clipping).
@@ -503,7 +503,7 @@
                   CNTLEN = CNTLEN + NPTS
                   CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, STATUS )
                   NPTS = 0
-               END IF                                    
+               END IF
 
 *  Save the bad pixel flag for use on the next iteration.
                PBAD = .TRUE.
@@ -600,7 +600,7 @@
                   CNTLEN = CNTLEN + NPTS
                   CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, STATUS )
                   NPTS = 0
-               END IF                                    
+               END IF
 
 *  Save the bad pixel flag for use on the next iteration.
                PBAD = .TRUE.
@@ -644,7 +644,7 @@
             DO IX = XLL + 1, XLL + XSIZE - 1
 
 *  The bottom edge of this pixel will be drawn if its bad/good status
-*  is different to the pixel below it. The left hand edge will be drawn 
+*  is different to the pixel below it. The left hand edge will be drawn
 *  this pixels bad/good status is different to the pixel to the left of it.
                IF( ARRAY( IX, IY ) .NE. VAL__BADR ) THEN
                   DRAWL = ( ARRAY( IX - 1, IY ) .EQ. VAL__BADR )
@@ -697,11 +697,11 @@
       CALL KPG1_ASCRV( IPLOTT, FAST, 0, 0.0, 0.0, STATUS )
 
 *  If using FAST drawing mode, re-establish the old PGPLOT plotting attributes.
-      IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .FALSE., ATTRS, 
+      IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .FALSE., ATTRS,
      :                            STATUS )
 
 *  Flush the buffer holding PGPLOT output produced while drawing this contour.
-      CALL PGEBUF 
+      CALL PGEBUF
 
 *  Annul the temporary copy of the supplied Plot which was used to do the
 *  drawing.
@@ -709,7 +709,7 @@
 
  999  CONTINUE
 
-*  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
+*  Remove the Current Frame added by KPG1_ASSIM and re-instate the original
 *  Current Frame.
       CALL AST_REMOVEFRAME( IPLOT, AST__CURRENT, STATUS )
       CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )

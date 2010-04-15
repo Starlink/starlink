@@ -88,7 +88,7 @@
 C
 C     Functions
 C
-      INTEGER   DSA_TYPESIZE     ! Number of bytes in element of given 
+      INTEGER   DSA_TYPESIZE     ! Number of bytes in element of given
                                  ! type
       LOGICAL   FIG_SCRCHK       ! Data array is linearly spaced?
       LOGICAL   GEN_CHKNSF       ! Array is values 1..N?
@@ -97,7 +97,7 @@ C
                                  ! appropriate to N
       CHARACTER ICH_CI*12        ! Convert integer to character string
       INTEGER   ICH_ENCODE       ! Encodes a value into a string
-      INTEGER   ICH_LEN          ! Position of last non-blank char in 
+      INTEGER   ICH_LEN          ! Position of last non-blank char in
                                  ! string
 C
 C     Local variables
@@ -130,7 +130,7 @@ C
       INTEGER   NPTR             ! Next character to use in string
       INTEGER   PREV             ! Lower acceptable dimension for NAG
                                  ! routines
-      INTEGER   RPTR             ! Dynamic-memory pointer for real 
+      INTEGER   RPTR             ! Dynamic-memory pointer for real
                                  ! output data
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       INTEGER   SLOT1            ! Slot number for mapped data - ignored
@@ -150,7 +150,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE
       PARAMETER (NEW_FILE=1)
-C     
+C
 C     Initial values
 C
       CHANGE=.FALSE.
@@ -160,7 +160,7 @@ C     Open DSA routines
 C
       CALL DSA_OPEN(STATUS)
 C
-C     Get name of real data and open the file.  
+C     Get name of real data and open the file.
 C
       CALL DSA_INPUT ('RDATA','RDATA',STATUS)
 C
@@ -214,10 +214,10 @@ C
       END IF
       CALL DSA_OUTPUT('CDATA','CDATA','RDATA',COPYDATA,NEW_FILE,STATUS)
 C
-C     In the case where the array shape has been changed the data 
-C     structure is not copied from the input file. The call 
-C     to DSA_RESHAPE_DATA is necessary to copy the 
-C     information in this structure and reshape objects such as 
+C     In the case where the array shape has been changed the data
+C     structure is not copied from the input file. The call
+C     to DSA_RESHAPE_DATA is necessary to copy the
+C     information in this structure and reshape objects such as
 C     the data quality array.
 C
       IF(CHANGE)THEN
@@ -274,7 +274,7 @@ C
       IF(STATUS.NE.0) GOTO 500
       CALL GEN_FILL(NELM*BDOUBP,0,%VAL(CNF_PVAL(IPTR)))
 C
-C     Any axis structures may need to be extrapolated, if this is 
+C     Any axis structures may need to be extrapolated, if this is
 C     possible.
 C
       IF (CHANGE) THEN
@@ -287,7 +287,7 @@ C
             IF(STATUS.NE.0) GOTO 500
             IF(EXIST)THEN
 C
-C           Map the existing data array.  
+C           Map the existing data array.
 C
                CALL DSA_MAP_AXIS_DATA('RDATA',I,'READ','FLOAT',APTR,
      :                                 SLOT1,STATUS)
@@ -303,15 +303,15 @@ C
                XY1=GEN_ELEMF(%VAL(CNF_PVAL(APTR)),1)
                XYLST=GEN_ELEMF(%VAL(CNF_PVAL(APTR)),DIMS0(I))
 C
-C              Unmap array 
+C              Unmap array
 C
                CALL DSA_UNMAP(SLOT1,STATUS)
-      
+
 C              What happens now depends on whether the array was linear
 C
                IF (.NOT.LINEAR) THEN
 C
-C                 If it wasn't linear, inform the user that this axis 
+C                 If it wasn't linear, inform the user that this axis
 C                 structure will be omitted from the output structure.
 C
                   IF (.NOT.SPACED) THEN
@@ -332,14 +332,14 @@ C                 we create a new array of the right size and map it.
 C
                   CALL DSA_RESHAPE_AXIS('CDATA',I,'RDATA',I,1,DIMS(I),
      :                                   STATUS)
-                  
+
                   CALL DSA_MAP_AXIS_DATA('CDATA',I,'UPDATE','FLOAT',
      :                                    APTR,SLOT,STATUS)
                   IF(STATUS.NE.0) GOTO 500
 C
 C                 Now fill the new array.  Treat the case of the numbers
 C                 1..N separately, for accuracy.
-                  
+
                   IF (JUSTNS) THEN
                      CALL GEN_NFILLF(DIMS(I),%VAL(CNF_PVAL(APTR)))
                   ELSE

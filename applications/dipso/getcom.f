@@ -1,7 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++!
 !
 !
-!   SUBROUTINE GETCOM 
+!   SUBROUTINE GETCOM
 !
 !      PARSE COMMAND CHARACTER STRING TO GET COMMAND
 !

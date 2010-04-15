@@ -15,7 +15,7 @@
 *                      STATUS )
 
 *  Description:
-*     This routine gets the lower and upper horizontal axis limits for 
+*     This routine gets the lower and upper horizontal axis limits for
 *     a linear or logarithmic line plot.
 *
 *     If the limits are specified to be in data co-ordinates the
@@ -94,7 +94,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -166,11 +166,11 @@
          XLMT( 2 ) = AXIS( UBND )
 
 *       If the axis is logarithmic and there is a negative axis section,
-*       exclude the negative axis section. 
+*       exclude the negative axis section.
 
          IF ( XLOG ) THEN
             IF ( XLMT( 1 ) .LT. VAL__SMLD ) THEN
-      
+
 *             If no positive axis value exists at all, set status and
 *             report the error.
 
@@ -201,7 +201,7 @@
 
                CALL KPG1_AXLVD( EL, AXIS, VAL__SMLD, FSTPOS, FSTVAL,
      :                          STATUS )
-               
+
 *             Set the previous value as the smallest selectable value
 *             and default upper value of the horizontal axis.  The
 *             pixel index returned is has a lower bound of 1 so allow
@@ -234,7 +234,7 @@
 *             =======================
 
 *             Extract the maximum possible section by making the lower
-*             bound set to 1. 
+*             bound set to 1.
 
                XLMT( 1 ) = 1.0D0
                BOUND( 1 ) = 1

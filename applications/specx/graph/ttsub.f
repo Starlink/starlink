@@ -59,7 +59,7 @@ C   Disconnect the terminal from the channel
 *      INTEGER*4 SYS$DASSGN, TTCHN, RETCOD
 *      INTEGER*2 IOSB(4)
 *      COMMON /TT/ TTCHN, RETCOD, IOSB
-	
+
 *      CALL TIDLE
 *      CALL SYS$DASSGN(%VAL(TTCHN))
 **     WRITE (6,*) 'Channel ',TTCHN,' deassigned'
@@ -85,7 +85,7 @@ C----------------------------------------------------------------------------
 *
 *      IF(NCHAR.EQ.0) RETURN
 *
-*C  Do the write 
+*C  Do the write
 *
 *      RETCOD = SYS$QIOW(,%VAL(TTCHN),
 *     &                   %VAL(IO$_WRITEVBLK.OR.IO$M_NOFORMAT),
@@ -297,7 +297,7 @@ C--------------------
         CALL TTWRITE (3,RETRO_IDLE)
         CALL TTFLUSH
       ELSE IF (IDEV .EQ. 3) THEN
-        CALL TTWRITE (6,CIFERT5_IDLE)        
+        CALL TTWRITE (6,CIFERT5_IDLE)
         CALL TTFLUSH
       ELSE IF (IDEV .EQ. 4) THEN
         CALL TTWRITE (1,GRAPHON_IDLE)

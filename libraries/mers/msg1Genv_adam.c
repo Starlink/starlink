@@ -5,8 +5,8 @@
 *    msg1Genv
 
 *  Purpose:
-*     Get the message text for a specified message parameter from the 
-*     interface module. 
+*     Get the message text for a specified message parameter from the
+*     interface module.
 
 *  Language:
 *     Starlink ANSI C
@@ -15,8 +15,8 @@
 *     result = msg1Genv( const char * param, char *msgstr, size_t msglen );
 
 *  Description:
-*     This routine makes an enquiry of the parameter system to get the 
-*     message text from the interface module for the specified message 
+*     This routine makes an enquiry of the parameter system to get the
+*     message text from the interface module for the specified message
 *     parameter.
 
 *  Arguments:
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -106,7 +106,7 @@ int msg1Genv(  const char * param, char *msgstr, size_t msglen ) {
 
   size_t pd;   /* Parameter system ID */
   int status = SAI__OK;   /* Local status */
-  int retval = 0;  
+  int retval = 0;
 
   /*  Initialise the returned string. */
   msgstr[0] = '\0';

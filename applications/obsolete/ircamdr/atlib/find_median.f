@@ -1,4 +1,4 @@
-	SUBROUTINE FIND_MEDIAN( HIST_BINS, NUM, NUMBER, ARRIN, MEDIAN, 
+	SUBROUTINE FIND_MEDIAN( HIST_BINS, NUM, NUMBER, ARRIN, MEDIAN,
      :	                        HDIMS1, HDIMS2, ARRH)
 
 * Description :
@@ -24,7 +24,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :    NUM,         ! number of sample
      :    NUMBER,      ! number in sample
      :	  HDIMS1, HDIMS2,   ! dimensions of histogram image
@@ -34,10 +34,10 @@
      :	  J	     ! counter for array element number
 
 	REAL
-     :	  ARRIN( NUMBER),			    ! input data 
+     :	  ARRIN( NUMBER),			    ! input data
      :	  ARRH( HDIMS1, HDIMS2),		    ! output data histogram
      :	  MEAN,
-     :	  MEDIAN,				    ! median 
+     :	  MEDIAN,				    ! median
      :	  MODE,
      :	  SUGGESTED_MAX,
      :	  SUGGESTED_MIN,
@@ -45,9 +45,9 @@
 
 *-
 *
-* calculate maximum and minimum in data 
+* calculate maximum and minimum in data
 *
-	CALL HIST_MAXMIN( NUMBER, 1, ARRIN, 1, 1, NUMBER, 1, 
+	CALL HIST_MAXMIN( NUMBER, 1, ARRIN, 1, 1, NUMBER, 1,
      :	                  SUGGESTED_MAX, SUGGESTED_MIN)
 *
 * call subroutine to generate the histogram of the requested section of the
@@ -56,8 +56,8 @@
 	IDIMS( 1) = NUMBER
 	IDIMS( 2) = 1
 
-	CALL GENHIS( IDIMS(1), IDIMS(2), ARRIN, 1, 1, NUMBER, 1, 
-     :	             SUGGESTED_MAX, SUGGESTED_MIN, HIST_BINS, 
+	CALL GENHIS( IDIMS(1), IDIMS(2), ARRIN, 1, 1, NUMBER, 1,
+     :	             SUGGESTED_MAX, SUGGESTED_MIN, HIST_BINS,
      :               HISTOGRAM, STATUS)
 *
 * put the histogram into the histogram image
@@ -75,7 +75,7 @@
 *
 * call subroutine to take histogram and calculate median
 *
-	CALL HISTPROP( HISTOGRAM, HIST_BINS, SUGGESTED_MAX, SUGGESTED_MIN, 
+	CALL HISTPROP( HISTOGRAM, HIST_BINS, SUGGESTED_MAX, SUGGESTED_MIN,
      :	               SUM, MEAN, MEDIAN, MODE, STATUS)
 
 	END

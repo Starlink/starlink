@@ -26,7 +26,7 @@ C
 C   Contains:-
 C
 C T_STARFIND   Find stars in an image (Main s/r)
-C FI_GCL       Get CL input and input image 
+C FI_GCL       Get CL input and input image
 C FI_GWSA      Open work space for tables
 C FI_GWSB      Open work space for tables
 C FI_ARRSET    Load BS and BZ into array and remove minimum
@@ -67,7 +67,7 @@ Cbegin
 
       if ( ST_FAILED ) return						!Check for failure
 
-      call fi_gcl 							!Get CL input and input image 
+      call fi_gcl 							!Get CL input and input image
 
       call fi_gwsa 							!Open tables work space
 
@@ -75,7 +75,7 @@ Cbegin
 
       if ( ST_FAILED ) return						!Check for failure
 
-      call gtwrkr ( 'WORKIMA', NX*NY, ipima, istat )			!Make real working image 
+      call gtwrkr ( 'WORKIMA', NX*NY, ipima, istat )			!Make real working image
       if ( IMTYPE.eq.'SHORT' ) then					! and release input image
          call azchtsr ( %val(IPIM), INVAL, %val(ipima), RINVAL, NX*NY)
          RINVAL = INVAL
@@ -88,7 +88,7 @@ Cbegin
 
       call coprrr ( %val(ipima), NX, NY, 1.0, 0.0,RINVAL,%val(IPIMU))	!Make uninvalided image
 
-      call fi_statim ( %val(IPIMU), %val(IPWB), 1 )			!Make the U-test image 
+      call fi_statim ( %val(IPIMU), %val(IPWB), 1 )			!Make the U-test image
 
       call fi_sky ( %val(ipima), %val(IPWD), %val(IPWE) )		!Make the sky and (sky+noise)
 
@@ -112,7 +112,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C FI_GCL -- Get CL input and input image 
+C FI_GCL -- Get CL input and input image
 C
 C       a j penny                  stsci          1988-05-02
 
@@ -129,7 +129,7 @@ Cbegin
 
       if ( ST_FAILED ) return						!Check for failure
 
-      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., istat )	!Get the image 
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., istat )	!Get the image
       if ( istat.ne.0 ) then
          ST_FAILED = .true.
          return
@@ -153,9 +153,9 @@ Cbegin
 
       call get1b ( 'SMEAR', SMEAR, .true. )				!do de-smearing?
 
-      NXSKY = 1								!Get number and size of sky 
+      NXSKY = 1								!Get number and size of sky
       NYSKY = 1								! estimating boxes
-      call get_option ( 'SKYTYPE', 'local:mean:minimum', 1, ktopt, 
+      call get_option ( 'SKYTYPE', 'local:mean:minimum', 1, ktopt,
      +                  'local', ' ', 0 )
       DOSKY = 1
       if ( ktopt.eq.'mean' ) DOSKY = 2
@@ -165,13 +165,13 @@ Cbegin
          call get1i ( 'XSKYBOX', NXSD, NXSD, 10, NX/2 )
          NYSD = min(64,(NY/2))
          call get1i ( 'YSKYBOX', NYSD, NYSD, 10, NY/2 )
-         NXSKY = NX/NXSD						!Size of image holding estimates of mean 
+         NXSKY = NX/NXSD						!Size of image holding estimates of mean
          NYSKY = NY/NYSD						! and std dev of sky values
       endif								! in the boxes
 
       call get1i ( 'MAXNUM', NUMTOT, 10000, 1, 1000000 )		!Get max poss no of stars (hidden from user )
 
-      call get_option ( 'INFORM', 'none:some:lots', 1, ktopt, 'some', 
+      call get_option ( 'INFORM', 'none:some:lots', 1, ktopt, 'some',
      +                  ' ', 0 )
       INFORM = 0
       if ( ktopt.eq.'some' ) INFORM = 1
@@ -205,7 +205,7 @@ C--
       integer istat
 Cbegin
 
-     
+
       if ( ST_FAILED ) return						!Check failure
 
       call gtwrkr ( 'WXY', NUMXY*NUMTOT, IPXY, istat )			!Open space
@@ -335,9 +335,9 @@ C    it.
 C
 C    A box of size NBOX is compared (one-tailed Mann-Whitney) with a
 C    square annulus starting one pixel away from box, and width to give
-C    roughly equal no of pixels. Also with an annulus immeadiately 
-C    adjacent to the box. The comparision that gives the most striking 
-C    discord is taken, unless either has a prob of less than 0.025 when 
+C    roughly equal no of pixels. Also with an annulus immeadiately
+C    adjacent to the box. The comparision that gives the most striking
+C    discord is taken, unless either has a prob of less than 0.025 when
 C    that level is taken.
 C
 C    Optionally, a further test against the areas in strips:-
@@ -345,7 +345,7 @@ C        1) above and below the star
 C        2) to the left and right of the star
 C    is made.
 C
-C    Output pixel has probability (*100 000, limited to 10 000) that 
+C    Output pixel has probability (*100 000, limited to 10 000) that
 C    inside box median is NOT higher than outside median. Thus 0 means
 C    almost certainly a bump, 10000 means only 90% chance that it is a
 C    real bump.
@@ -364,9 +364,9 @@ C   a j penny               ral                    1988-07-06
       integer*2	map(NX,NY)	!o: Output Mann-Whitney image
       integer   kopt		!i: 1=test only vs annulli; 2=also against strips
 C--
-      integer nbox, j, ii, jj, ii1, ii2, jj1, jj2, nbox2, idelta, 
+      integer nbox, j, ii, jj, ii1, ii2, jj1, jj2, nbox2, idelta,
      +        igap, icol, kl, npts, npts1, npts2, npts3, npts4,
-     +        is, ie, js, je, igs, ige, jgs, jge, irs, ire, jrs, jre, 
+     +        is, ie, js, je, igs, ige, jgs, jge, irs, ire, jrs, jre,
      +        ics, ice, jcs, jce, ist, iv, i
       real usig, delta, usig1, usig2, usig3, usig4
       logical tbig1, tbig2, tbig3, tbig4
@@ -432,7 +432,7 @@ Cbegin
      +                 ii.ge.i-nbox2.and.ii.le.i+nbox2)then
                      npts = npts+1
                      x(npts) = imu(ii,jj)
-                  else 
+                  else
                      if ( ii.le.igs .or. ii.ge.ige .or. jj.le.jgs
      +                    .or. jj.ge.jge ) then
                         npts1 = npts1 + 1
@@ -463,17 +463,17 @@ Cbegin
             call mannwhitr ( xcom1, npts1, x, npts, usig1, tbig1, ist )
             if ( tbig1 ) usig = usig1
             if ( usig.gt.0.025 ) then
-               call mannwhitr ( xcom2, npts2, x, npts, usig2, tbig2, 
+               call mannwhitr ( xcom2, npts2, x, npts, usig2, tbig2,
      +                          ist )
                if ( tbig2 ) usig = min(usig,usig2)
             endif
             if ( kopt.eq.2 .and. usig.gt.0.025 ) then
-               call mannwhitr ( xcom3, npts3, x, npts, usig3, tbig3, 
+               call mannwhitr ( xcom3, npts3, x, npts, usig3, tbig3,
      +                          ist )
                if ( tbig3 ) usig = min(usig,usig3)
             endif
             if ( kopt.eq.2 .and. usig.gt.0.025 ) then
-               call mannwhitr ( xcom4, npts4, x, npts, usig4, tbig4, 
+               call mannwhitr ( xcom4, npts4, x, npts, usig4, tbig4,
      +                          ist )
                if ( tbig4 ) usig = min(usig,usig4)
             endif
@@ -535,8 +535,8 @@ Cbegin
 
       if ( INFORM.gt.0 ) call printo ( 'Started making sky image' )
 
-      if ( DOSKY.eq.1 ) then						
-         call sky_1r ( im, NX, NY, RINVAL, msky, asky, NXSKY, NYSKY, 
+      if ( DOSKY.eq.1 ) then
+         call sky_1r ( im, NX, NY, RINVAL, msky, asky, NXSKY, NYSKY,
      +                 %val(IPWF), %val(IPWG), NXSD, NYSD, ST_FAILED )
       elseif ( DOSKY.eq.2 ) then
          print*,'B1  ', INVAL, RINVAL
@@ -580,8 +580,8 @@ C     a j penny                stsci                  86-10-27
       real      imu(NX,NY)		!i: Un-invalid image
       integer*2	map(NX,NY)		!i: U-test image
       integer	wc(NX,NY)		!o: peak locations image
-      real	xp(NUMTOT)		!o: X posns 
-      real	yp(NUMTOT)		!o: Y posns 
+      real	xp(NUMTOT)		!o: X posns
+      real	yp(NUMTOT)		!o: Y posns
       real	fp(NELLI,NUMTOT)	!o: Elliptical stars info
       real      msky(NX,NY)		!i: (sky) image
       real      asky(NX,NY)		!i: (sky+std) image
@@ -626,10 +626,10 @@ Cbegin
                if ( LCHECK(kj).eq.0 ) doit = .false.
             endif
             if ( doit ) then
-               call fi_flag ( imu, map, wc, asky, NX, NY, lev, kklev,	!Look for points not previously flagged 
+               call fi_flag ( imu, map, wc, asky, NX, NY, lev, kklev,	!Look for points not previously flagged
      +                        new, INFORM )				! as now above level threshold
                if ( new ) then
-                  call fi_star ( imu, map, wc, xp, yp, msky, asky,	!Calculate mean position of all isolated  
+                  call fi_star ( imu, map, wc, xp, yp, msky, asky,	!Calculate mean position of all isolated
      +                           lev, kklev )				! new groups (all '1' points) in 'peak locataion'
 									! image and set as old ('1')
                   call fi_ellipse ( imu, map, wc, xp, yp, fp, msky ) 	!Search for elliptical images
@@ -652,7 +652,7 @@ Cbegin
 
 
       end
-        
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C FI_LCHECK -- See what levels are present
@@ -693,7 +693,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C FI_FLAG -- Flag all pixels above threshold not already marked
-C   Put 1 or 2 in them (1 if isolated pixel or set of pixels, 
+C   Put 1 or 2 in them (1 if isolated pixel or set of pixels,
 C   2 if touching another previously flagged pixel).
 C
 C   Any pixel flags set at 1 on entry, which are touching new
@@ -703,9 +703,9 @@ C   There are two cases for the threshold level use:-
 C    (case 1) when it is above a set limit, when the pixel
 C             flag is set if the probability image is above the
 C             the probability threshold.
-C    (case 2) when it is below that limit, when a pixel is only 
-C             flagged if it is not only above the threshold (as 
-C             for case 1) but also the image pixel value is some 
+C    (case 2) when it is below that limit, when a pixel is only
+C             flagged if it is not only above the threshold (as
+C             for case 1) but also the image pixel value is some
 C             distance above the sky level.
 C
 C   a j penny                     dao                 1988-05-02
@@ -734,7 +734,7 @@ Cbegin
 
       if ( ST_FAILED ) return 						!Check failure
 
-      knum = 0								!Look for points not previously 
+      knum = 0								!Look for points not previously
       if ( lev.le.kklev ) then						! flagged as now above level threshold
          do k = 1, ny
             do j = 1, nx
@@ -757,9 +757,9 @@ Cbegin
          enddo
       endif
 
-      if ( knum.eq.0 ) then						!Flag as old (with a 2) all 
-         new = .false.							! new points touching old 
-      else								! points. Flag as 1, any new 
+      if ( knum.eq.0 ) then						!Flag as old (with a 2) all
+         new = .false.							! new points touching old
+      else								! points. Flag as 1, any new
          new = .false.							! isolated ones
          done = .false.
          do while ( .not.done )
@@ -806,12 +806,12 @@ C FI_STAR -- Calc position of all new isolated groups
 C  Calculate the mean position of all isolated new groups, that is
 C  all groups of '1' pixels in the 'peak location' image. Then put
 C  these pixels to 'old', that is to '3'.
-C  
+C
 C  Only 'significant' groups are stored.
 C
 C    alan penny                    ral              1990 dec
 
-      subroutine fi_star ( imu, map, wc, xp, yp, msky, asky, 
+      subroutine fi_star ( imu, map, wc, xp, yp, msky, asky,
      +                     lev, kklev )
 
       implicit none
@@ -822,14 +822,14 @@ C    alan penny                    ral              1990 dec
       real      imu(NX,NY)		!i: Image (un INVALID ed)
       integer*2 map(NX,NY)		!i: U-test image
       integer   wc(NX,NY)		!i/o: Peak location image
-      real      xp(NUMTOT)		! X posns 
-      real      yp(NUMTOT)		! Y posns 
+      real      xp(NUMTOT)		! X posns
+      real      yp(NUMTOT)		! Y posns
       real      msky(NX,NY)		!i: (sky) image
       real      asky(NX,NY)		!i: (sky+std) image
-      integer   lev			!i: Present test level of U-test image 
+      integer   lev			!i: Present test level of U-test image
       integer   kklev			!i: Level of U-test image below which the level is very significant
 C--
-      integer j, k, jj, kk, kl, nxy, jb, kb, kxp, kyp, jba, jbb, kba, 
+      integer j, k, jj, kk, kl, nxy, jb, kb, kxp, kyp, jba, jbb, kba,
      +        kbb, numold, ierr, jbc, jbd, kbd
       real px, py, pnum, axp, ayp
       logical more, amore, bmore, got
@@ -857,7 +857,7 @@ Cbegin
             more = .false.
          else
 
-            wc(jb,kb) = 3						!Flag with a 3 all points 
+            wc(jb,kb) = 3						!Flag with a 3 all points
             kba = kb							! in contact with that one
             kbb = kb
             jba = jb
@@ -920,7 +920,7 @@ Cbegin
      +           ( (imu(kxp,kyp)-msky(kxp,kyp)).gt.
      +           (1.5*(asky(kxp,kyp)-msky(kxp,kyp))) ) )then
                  got = .true.
-                 call fi_tstore ( axp, ayp, 0, imu, map, msky, 
+                 call fi_tstore ( axp, ayp, 0, imu, map, msky,
      +                %val(IPXP), %val(IPYP),
      +                %val(IPWP), %val(IPZP), %val(IPVP), ierr )
                 if ( ierr.ne.0 ) return
@@ -937,16 +937,16 @@ Cbegin
             call pargi ( lev )
             call pargi ( NUMF )
             if ( k.eq.1 ) then
-               call printd ( 
+               call printd (
      +   '    - %d new star found at level %d - total %d' )
             else
-               call printd ( 
+               call printd (
      +   '    - %d new stars found at level %d - total %d' )
             endif
          else
             call pargi ( lev )
             call pargi ( NUMF )
-            call printd ( 
+            call printd (
      +   '    - no new stars found at level %d - total %d' )
          endif
       endif
@@ -1009,8 +1009,8 @@ Cbegin
       vp(NUMF) = real(kopt)
 
       if ( INFORM.gt.1 ) then
-         if ( NUMF.eq.(20*(NUMF/20)) ) call printo ( 
-     +                                 '  Star       X       Y    '//	
+         if ( NUMF.eq.(20*(NUMF/20)) ) call printo (
+     +                                 '  Star       X       Y    '//
      +                                 '  Height   U-map  Type Elli' )
          rv = imu(kxp,kyp) - msky(kxp,kyp)
          write ( text,
@@ -1027,15 +1027,15 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C FI_ELLIPSE -- Find elliptical images
 C  This looks at stars and sees if the U-test image shape of the
 C  star is elliptical. For a star to qualify as elliptical, the
-C  group of flagged pixels that make up the star (that is the number 
-C  of contiguous pixels flagged as being below the present 
+C  group of flagged pixels that make up the star (that is the number
+C  of contiguous pixels flagged as being below the present
 C  significance level) have to satisfy certain criteria:-
 C
 C     - the ellipticity has to be greater than a given limit
-C     - the semi-major axis has to be larger than a given limit 
+C     - the semi-major axis has to be larger than a given limit
 C         (in terms of the star image profile radius)
 C     - the area of the star has to be more than seven pixels
-C     - the area of the star must not touch the image edge 
+C     - the area of the star must not touch the image edge
 C     - the area of the star does not contain other stars
 C
 C  This s/r is only called when new stars are found in the main
@@ -1069,7 +1069,7 @@ C--
       integer j, k, kk, kb, jb, jj, km, kma, jbo, kbo, kbt,
      +        nn, numap, jdx, jdy, kba, jba, jbt, nsixr,
      +        js, je, ks, ke, numnew, numold
-      real px, py, pxx, pyy, pxy, pnum, axp, ayp, axx, ayy, axy, 
+      real px, py, pxx, pyy, pxy, pnum, axp, ayp, axx, ayy, axy,
      +     rr, sma, ell, xr, yr
       logical amore, got
 Cbegin
@@ -1082,7 +1082,7 @@ Cbegin
       numnew = 0							!New star counter
       numold = 0							!Old star counter
 
-      do kk = 1, NUMF							!Mark posns of all 
+      do kk = 1, NUMF							!Mark posns of all
          j = max(1,min(NX,nint(xp(kk))))				! found stars
          k = max(1,min(NY,nint(yp(kk))))
          if ( wc(j,k).ne.0 ) wc(j,k) = 4
@@ -1093,12 +1093,12 @@ Cbegin
          if ( fp(10,nn).lt.4.5 ) then					!Only do if not done at least 5
 									! times before and not (=6) at edge
 
-            nsixr = 6.0*RADIUS						!Flag with a 3 all points 
+            nsixr = 6.0*RADIUS						!Flag with a 3 all points
             kma = 0							! in contact with that one
             kb = NY							!Search area within +/- 6
             kba = 1							! star radius
             jb = NX
-            jba = 1 
+            jba = 1
             jbo = max(1,min(NX,nint(xp(nn))))
             kbo = max(1,min(NY,nint(yp(nn))))
             wc(jbo,kbo) = 3
@@ -1116,7 +1116,7 @@ Cbegin
                            do jj = max(1,j-1), min(NX,j+1)
                               if ( (jj.ne.j.or.kk.ne.k) .and.
      +                           wc(jj,kk).eq.3 ) then
-    
+
                                  if ( wc(j,k).eq.4 ) then		!Image contains another star
                                     fp(10,nn) = 6.0			! so quit, note location of
                                     do km = 1, NUMF			! other star. get its number
@@ -1156,7 +1156,7 @@ Cbegin
             if ( fp(10,nn).lt.4.5 ) then				!Only do if not done at least 5
 									! times before and not (=6) at edge
 
-               numap = 0						!Is star image larger than 
+               numap = 0						!Is star image larger than
                do k = kb, kba						! last time and larger than 7 ?
                   do j = jb, jba
                      if ( wc(j,k).eq.3 ) numap = numap + 1
@@ -1200,7 +1200,7 @@ Cbegin
                         numold = numold + 1
                      endif
                      call fi_ellnote ( ell, sma, rr, axy, ayy, axp,
-     +                                 ayp, jb, kb, numap, nn, fp, 
+     +                                 ayp, jb, kb, numap, nn, fp,
      +                                 imu, map, msky )
                   endif
 
@@ -1215,7 +1215,7 @@ Cbegin
             enddo
 
             wc(jbo,kbo) = 4						!If found another star
-            if ( kma.ne.0 ) then					! in area, note for other 
+            if ( kma.ne.0 ) then					! in area, note for other
                fp(10,kma) = 6.0						! that it in turn has a star
                wc(jdx,jdy) = 4						! in it
             endif
@@ -1347,10 +1347,10 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C FI_NIPPLE -- Find faint companions to bright stars 
+C FI_NIPPLE -- Find faint companions to bright stars
 C  Look for stars which do not show up as isolated peaks in U-test image, by
-C  looking for long projections at the edges of stars in the U-test image. 
-C  Only look at edges of very certain (v low U-test value) stars or stars 
+C  looking for long projections at the edges of stars in the U-test image.
+C  Only look at edges of very certain (v low U-test value) stars or stars
 C  which are reasonably certain and also bright.
 C  (Takes a 100x100 box round each of these stars)
 C
@@ -1376,7 +1376,7 @@ C--
       integer   klevb			!Look at all stars with U-test values below this
       parameter ( klevb=9500)		! as long as real star is above (sky+std) value
 
-      integer j, k, kk, l, jj, jb, kb, numin, kxa, kxb, 
+      integer j, k, kk, l, jj, jb, kb, numin, kxa, kxb,
      +        kya, kyb, nx1, nx2, ny1, ny2, ierr
       logical amore
 
@@ -1409,15 +1409,15 @@ Cbegin
             kya = max(1,(kb-50))
             kyb = min(NY,(kb+50))
 
-            amore = .true.						!Flag with a 3, all points 
+            amore = .true.						!Flag with a 3, all points
             do while ( amore )						! in contact with star
                amore = .false.
                do k = kya, kyb
                   do j = kxa, kxb
-                     if ( 
+                     if (
      +                   (wc(j,k).ne.3)  .and.
      +                   ((map(j,k).le.kleva).or.
-     +                   (map(j,k).le.klevb.and.imu(j,k).gt.asky(j,k))) 
+     +                   (map(j,k).le.klevb.and.imu(j,k).gt.asky(j,k)))
      +                                        )then
                         do kk = max(1,k-1),min(ny,k+1)
                            do jj = max(1,j-1),min(nx,j+1)
@@ -1483,8 +1483,8 @@ C FI_XNIPPLE -- Find faint companions of a star
 C  Take the 100x100 box in the U-map, and look at the marked image round star, that is
 C  pixels marked by a '3', and not at edge of box.
 C
-C  Then look for long extensions at edge of marked area. These extensions 
-C  are sort of inverse shoulders. These have to be 4 pixels long. The 
+C  Then look for long extensions at edge of marked area. These extensions
+C  are sort of inverse shoulders. These have to be 4 pixels long. The
 C  shoulder is traced along as it twists and turns.
 C
 C    a j penny                   ral             91-1-10
@@ -1496,7 +1496,7 @@ C    a j penny                   ral             91-1-10
       include 'starfind.inc'
       include 'STARMAN_INC'
       include 'ST_IMAGE_INC'
-   
+
       integer   nx1		!i: X start of area to cover
       integer   nx2		!i: X   end of area to cover
       integer   ny1		!i: Y start of area to cover
@@ -1530,8 +1530,8 @@ Cbegin
 
       do k = ny1, ny2							!Look at each 'good' pixel in area
          do j = nx1, nx2						! Does this pixel lead to the end of a nipple?
-            if ( wc(j,k).eq.3 .and. j.ne.1 .and. j.ne.NX .and.		
-     +                k.ne.1 .and. k.ne.NY ) then			
+            if ( wc(j,k).eq.3 .and. j.ne.1 .and. j.ne.NX .and.
+     +                k.ne.1 .and. k.ne.NY ) then
 
                knum = 0
                jxn = j
@@ -1554,7 +1554,7 @@ Cbegin
                   if ( map(jxn,jyn).le.500 ) loop = .false.		!Pixel not definitely a star
 
                   if ( loop ) then					!Along a nipple?
-                     call fi_iscol ( jxn, jyn, wc, map, jxl, jyl, jxd, 	
+                     call fi_iscol ( jxn, jyn, wc, map, jxl, jyl, jxd,
      +                               jyd, numpath, iscol )
                      if ( .not.iscol ) loop = .false.
                   endif
@@ -1640,7 +1640,7 @@ C  be adjacent.
 C
 C  a j penny                          stsci              1986 nov
 
-      subroutine fi_iscol ( jxn, jyn, wc, map, jxl, jyl, jxd, jyd, 
+      subroutine fi_iscol ( jxn, jyn, wc, map, jxl, jyl, jxd, jyd,
      +                      numpath, iscol )
 
       implicit none
@@ -1655,7 +1655,7 @@ C  a j penny                          stsci              1986 nov
       integer   jxl(2)		!i: X positions of pixels of 'col' path come from
       integer   jyl(2)		!i: Y positions of pixels of 'col' path come from
       integer   jxd(2)		!o: X positions of new pixels of 'col' path found
-      integer   jyd(2)		!o: Y positions of new pixels of 'col' path found 
+      integer   jyd(2)		!o: Y positions of new pixels of 'col' path found
       integer   numpath		!o: Number of pixels of new 'col' path found
       logical   iscol		!o: Is a 'col', that is part of a nipple?
 C--
@@ -1674,7 +1674,7 @@ Cbegin
       kb = min(ny,jyn+1)
 
       numpath = 0							!Find number of 'good' adjacent
-      do k = ka, kb							! pixels 
+      do k = ka, kb							! pixels
          do j = ja, jb
 
             if ( (j.ne.jxn.or.k.ne.jyn)       .and.			!Not central pixel
@@ -1721,7 +1721,7 @@ C  alan penny                   ral                       1990-07-27
       include 'ST_IMAGE_INC'
 
       real	xy(NUMXY,NUMTOT)	!i/o: Results table
-      real	fp(NELLI,NUMTOT)	!i/o: Elliptical stars info 
+      real	fp(NELLI,NUMTOT)	!i/o: Elliptical stars info
       real      msky(NX,NY)		!i:   Sky image
       real      im(NX,NY)		!i:   Image
       real	xp(NUMTOT)		!i: X posns results
@@ -1737,7 +1737,7 @@ Cbegin
 
       if ( ST_FAILED ) return						!Check failure
 
-      call azlimr ( im, NX*NY, RINVAL, amin, amax, ierr )		!Find maximum of image, to set 
+      call azlimr ( im, NX*NY, RINVAL, amin, amax, ierr )		!Find maximum of image, to set
       									! stars with invalid central points
       									! to this value
 
@@ -1767,7 +1767,7 @@ Cbegin
                xy(3,ja) = BS*(amax-msky(kxa,kya))
                xy(5,ja) = 13.0
             else
-               xy(3,ja) = BS*(fp(5,j)-msky(kxa,kya)) 
+               xy(3,ja) = BS*(fp(5,j)-msky(kxa,kya))
                xy(5,ja) = 3.0
             endif
             xy(6,ja) = min(NUMTOT,(ja+1))
@@ -1790,10 +1790,10 @@ Cbegin
             kxa = max(1,min(kxa,NX))
             kya = max(1,min(kya,NY))
             if ( fp(9,j).eq.RINVAL ) then
-               xy(3,ja) = BS*(amax-msky(kxa,kya)) 
+               xy(3,ja) = BS*(amax-msky(kxa,kya))
                xy(5,ja) = 13.0
             else
-               xy(3,ja) = BS*(fp(9,j)-msky(kxa,kya)) 
+               xy(3,ja) = BS*(fp(9,j)-msky(kxa,kya))
                xy(5,ja) = 3.0
             endif
             xy(6,ja) = ja - 1
@@ -1807,10 +1807,10 @@ Cbegin
             kxa = max(1,min(kxa,NX))
             kya = max(1,min(kya,NY))
             if ( wp(j).eq.RINVAL ) then
-               xy(3,ja) = BS*(amax-msky(kxa,kya)) 
+               xy(3,ja) = BS*(amax-msky(kxa,kya))
                xy(5,ja) = 10.0 + xy(5,ja)
             else
-               xy(3,ja) = BS*(wp(j)-msky(kxa,kya)) 
+               xy(3,ja) = BS*(wp(j)-msky(kxa,kya))
             endif
             xy(6,ja) = 0.0
          endif
@@ -1879,7 +1879,7 @@ Cbegin
             enddo
          enddo
       enddo
-          
+
       NUMFP = 0								!See how many left
       do j = 1, NUMFG
          if ( xy(5,j).gt.-0.5 ) NUMFP = NUMFP + 1
@@ -1895,7 +1895,7 @@ Cbegin
                endif
             enddo
             if ( .not.first ) then
-              jd = ja - j 
+              jd = ja - j
               do k = j, NUMFG-jd
                   do kk = 1, NUMXY
                      xy(kk,k) = xy(kk,k+jd)
@@ -1908,7 +1908,7 @@ Cbegin
       if ( INFORM.gt.0 ) call printo ( 					!Inform
      +                            'Finished weeding out close pairs' )
 
-         
+
       end
 
 
@@ -1929,7 +1929,7 @@ C  a j penny                         stsci             86-12-03
       integer	wd(NX,NY)		!o: Temorary workspace
 C--
       logical more, first, amore
-      integer nxy, kl, jb, kb, j, k, jj, kk, ja, jd, nump, joa, job, 
+      integer nxy, kl, jb, kb, j, k, jj, kk, ja, jd, nump, joa, job,
      +        jp, kp, kcount
 CX    integer jba, jbb, kba, kbb
       real ax, ay, an, dx, dy, d, fact
@@ -1945,7 +1945,7 @@ Cbegin
      +             'Started weeding out multiple invalid peaks' )
 
       call azeroi ( wd, NX*NY )						!Map all invalid areas
-      do k = 1, NY		
+      do k = 1, NY
          do j = 1, NX
             if ( im(j,k).eq.RINVAL ) wd(j,k) = 1
          enddo
@@ -1968,7 +1968,7 @@ Cbegin
             more = .false.
          else
 
-            kcount = kcount + 1						!Flag with a 3 all points 
+            kcount = kcount + 1						!Flag with a 3 all points
             wd(jb,kb) = 3						! in contact with that one
 CX            kba = kb
 CX            kbb = kb
@@ -2059,8 +2059,8 @@ CX                                 jbb = max(j,jbb)
 
          endif
       enddo
-           
-          
+
+
       NUMOUT = 0							!See how many left
       do j = 1, NUMFP
          if ( xy(5,j).gt.-0.5 ) NUMOUT = NUMOUT + 1
@@ -2076,7 +2076,7 @@ CX                                 jbb = max(j,jbb)
                endif
             enddo
             if ( .not.first ) then
-              jd = ja - j 
+              jd = ja - j
               do k = j, NUMFP-jd
                   do kk = 1, NUMXY
                      xy(kk,k) = xy(kk,k+jd)
@@ -2089,13 +2089,13 @@ CX                                 jbb = max(j,jbb)
       if ( INFORM.gt.0 ) call printo ( 					!Inform
      +                   'Finished weeding out multiple invalid peaks' )
 
-         
+
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCc
 C FI_OSTORE -- Open the output list and store results table into it
-C 
+C
 C    a j penny             stsci             1988-05-02
 
       subroutine fi_ostore ( xy )
@@ -2127,7 +2127,7 @@ Cbegin
       call optabw ( 'OUT', ipout, numcol, NUMOUT, .false., istat )
       if ( istat.ne.0 ) then
          ST_FAILED = .true.
-         return 
+         return
       endif
 
       call get1c ( 'TITLE', text, IMTITLE, .true. )
@@ -2150,14 +2150,14 @@ C   Looks for a significant number of doubles with the same orientation
 C   and separation. If it finds them, assumes they are caused by image
 C   smearing and replaces each double by one star in the centre.
 C
-C   The test for significance is to make an array of bins, of 10 in X 
+C   The test for significance is to make an array of bins, of 10 in X
 C   and +/- 10 in Y (where the bins have sides of 0.5*star radius). Then
 C   for each star look at all the other stars and see if their separation
 C   from the first star would land them in one of the bins. If so, add one
 C   to the appropriate bin. When this is done for all stars, look at the
 C   contrast between the mean count per bin and the bin with the maximum
 C   number of counts. Is there a Poissonly significant (prob>0.999) chance
-C   that that bin has too many counts for chance? If so, then there is 
+C   that that bin has too many counts for chance? If so, then there is
 C   smearing.
 C
 C    a j penny                  ral                           1988-07-09
@@ -2169,7 +2169,7 @@ C    a j penny                  ral                           1988-07-09
       include 'STARMAN_INC'
 
       real	xy(NUMXY,NUMTOT)	!i/o: Results table
-      integer	kp(NUMTOT)		!o: Work space 
+      integer	kp(NUMTOT)		!o: Work space
 C--
       integer j, k, jj, jx, jy, jxm, jym, nweed
       real	ratm, ratio, ox, oy, oxm, oym, ax, ay, axms, axme,
@@ -2200,7 +2200,7 @@ Cbegin
          enddo
       enddo
 
-      if ( ratm.gt.0.0 ) then						!If significant peak 
+      if ( ratm.gt.0.0 ) then						!If significant peak
          call azeroi ( kp, NUMOUT ) 					! found, mark those there
          axms = real(jxm) - 0.5		        			! and average posns
          axme = real(jxm) + 1.5
@@ -2323,7 +2323,7 @@ Cbegin
 
       found = .false.							!Is max significant?
       if ( nmax.ne.0 ) then						! If so, make 'found' true
-         am = real(nsum)/200.0	
+         am = real(nsum)/200.0
          if ( am.lt.1.0 ) then
             kam = am*10.0 + 1.0
          elseif ( am.ge.15 ) then
@@ -2351,6 +2351,6 @@ Cbegin
          ratio = 1000.0
          if ( nmaxl.ne.0 ) ratio = real(nmax)/real(nmaxl)
       endif
-            
+
 
       end

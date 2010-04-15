@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASPTP( FRAME, NAX, POS, SYMBLS, SEP, TEXT, IAT, 
+      SUBROUTINE KPG1_ASPTP( FRAME, NAX, POS, SYMBLS, SEP, TEXT, IAT,
      :                       STATUS )
 *+
 *  Name:
@@ -31,7 +31,7 @@
 *     SEP = CHARACTER * ( * ) (Given)
 *        The separator for axis values. Trailing spaces are significant.
 *     TEXT = CHARACTER * ( * ) (Given and Returned)
-*        The text to hold the formatted values. 
+*        The text to hold the formatted values.
 *     IAT = INTEGER (Given and Returned)
 *        On entry, the index of the last character before the point at
 *        which the text is to be placed. On exit, the index of the last
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
 
 *  Arguments Given and Returned:
       CHARACTER TEXT*(*)
-      INTEGER IAT 
+      INTEGER IAT
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -118,11 +118,11 @@
 
 *  Ensure the remainder of the string is blank.
       IF( IAT .LT. TLEN ) TEXT( IAT + 1 : ) = ' '
-      
+
 *  Loop round each axis.
       DO I = 1, NAX
 
-*  If required, append the axis symbol to the string followed by an equals, 
+*  If required, append the axis symbol to the string followed by an equals,
 *  but only if the symbol is not blank.
          IF( SYMBLS ) THEN
             ATTR = 'SYMBOL('

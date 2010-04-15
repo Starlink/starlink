@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -74,7 +74,7 @@
       INCLUDE 'MAIN'             ! CHART control common blocks
 *
 *  Globals used from MAIN.FOR:
-*    
+*
 *        NUMSUPP = INTEGER (Read)
 *           NUMBER OF USER SUPPLIED OBJECTS
 *        IDFLD = CHARACTER * ( 10 ) (Read)
@@ -113,7 +113,7 @@
 
 *  Argument returned:
       LOGICAL RESPONSE
-      
+
 *  Local Variables:
 *     LOGICAL A06E
       INTEGER IHA, IMA, ISA, IDD, IMD, ISD, K
@@ -126,7 +126,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       RESPONSE = .TRUE.  ! Default value
-                         
+
       CALL MSG_OUT(' ', ' ', STATUS)
       WIDE = 2.0 * SIZE
       IF (ABS(SCALE).LT.1E-5) THEN
@@ -204,8 +204,8 @@ C
       CALL TTYPALP( AP, DP, STATUS )
 
  500  CONTINUE
-      
+
       END
 
- 
+
 C

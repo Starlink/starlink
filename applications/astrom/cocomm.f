@@ -87,7 +87,7 @@
 *
 *        Position and results both FK5
 *        -----------------------------
- 
+
 *        FK5 precession from given to results equinox
             CALL sla_PRECES('FK5',EQ0,EQ1,RA,DC)
          ELSE

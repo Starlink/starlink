@@ -14,7 +14,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'          ! SAI error and status codes
       INCLUDE 'NBS_ERR'          ! NBS error codes
-      INCLUDE 'PRM_PAR'          ! Defines machine precision codes 
+      INCLUDE 'PRM_PAR'          ! Defines machine precision codes
 *    Status :
       INTEGER STATUS             ! Global status
 *    External references :

@@ -42,7 +42,7 @@
 *        Initial version.
 
 *  Notes:
-*     - This is for use from C only. 
+*     - This is for use from C only.
 *     - If available the system strlcpy routine will be used. The entire
 *       purpose of this routine is to provide a version of strlcpy if
 *       the operating system does not provide one (e.g. on Linux)

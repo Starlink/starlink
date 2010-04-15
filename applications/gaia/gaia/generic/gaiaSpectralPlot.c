@@ -148,8 +148,8 @@ static int CanvasTagsParseProc( ClientData clientData, Tcl_Interp *interp,
                                 Tk_Window tkwin, CONST char *value,
                                 char *widgRec, int offset );
 static Tk_CustomOption tagsOption = {
-    (Tk_OptionParseProc *) CanvasTagsParseProc, 
-    (Tk_OptionPrintProc *) Tk_CanvasTagsPrintProc, 
+    (Tk_OptionParseProc *) CanvasTagsParseProc,
+    (Tk_OptionPrintProc *) Tk_CanvasTagsPrintProc,
     (ClientData) NULL
 };
 
@@ -161,8 +161,8 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
                                 char *widgRec, int offset,
                                 Tcl_FreeProc **freeProcPtr );
 static Tk_CustomOption framesetOption = {
-    (Tk_OptionParseProc *) FrameSetParseProc, 
-    (Tk_OptionPrintProc *) FrameSetPrintProc, 
+    (Tk_OptionParseProc *) FrameSetParseProc,
+    (Tk_OptionPrintProc *) FrameSetPrintProc,
     (ClientData) NULL
 };
 
@@ -173,8 +173,8 @@ static char *MappingPrintProc( ClientData clientData, Tk_Window tkwin,
                                char *widgRec, int offset,
                                Tcl_FreeProc **freeProcPtr );
 static Tk_CustomOption mappingOption = {
-    (Tk_OptionParseProc *) MappingParseProc, 
-    (Tk_OptionPrintProc *) MappingPrintProc, 
+    (Tk_OptionParseProc *) MappingParseProc,
+    (Tk_OptionPrintProc *) MappingPrintProc,
     (ClientData) NULL
 };
 
@@ -811,7 +811,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
             /* Ignore negative values, if requested. */
             if ( spPtr->ypositive ) {
-                if ( spPtr->dataPtr[i] != spPtr->badvalue && 
+                if ( spPtr->dataPtr[i] != spPtr->badvalue &&
                      spPtr->dataPtr[i] > 0.0 ) {
                     spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
                     spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
@@ -847,12 +847,12 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
                 /* Ignore negative values, if requested. */
                 if ( spPtr->ypositive ) {
-                    if ( *dataPtr != spPtr->badvalue && 
+                    if ( *dataPtr != spPtr->badvalue &&
                          *dataPtr > 0.0 ) {
                         spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
                         spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
                     }
-                } 
+                }
                 else {
                     if ( *dataPtr != spPtr->badvalue ) {
                         spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
@@ -1764,7 +1764,7 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
     /* Set the axis range, pick first non-BAD values and possibly only
      * positive values from ends (spectrum must be monotonic, so this is OK
      * and keeps the natural order which can be actually be min to max or max
-     * to min). Then apply the xminmax preference. 
+     * to min). Then apply the xminmax preference.
      */
     spPtr->xleft = DBL_MAX;
     spPtr->xright = -DBL_MAX;

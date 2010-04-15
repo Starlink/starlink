@@ -8,10 +8,10 @@
 
 *  Calling Arguments
       CHARACTER*(*) FORM_PART	! 'COVER', 'GEN', 'TARGET', or 'CONSTR'
- 
+
       INCLUDE 'com_form_data.inc'
       INCLUDE 'com_form_points.inc'
- 
+
 
 *   Functions
       CHARACTER*60 DBS_INFOC	! Gets character information.
@@ -52,7 +52,7 @@
          KFILE = 4
          IDB = 2
       END IF
- 
+
       I = 0
       DO J = LIMIT1 , LIMIT2							! Do for each field.
 
@@ -74,9 +74,9 @@
         FRMT( DEC_POS, KFILE ) = 'See help'
         HRIFLD = DBS_FIELDNO( IDB , 'HRI.CODE' ) + OFFSET			!  Get instrument field numbers.
         WFCFLD = DBS_FIELDNO( IDB , 'WFC.CODE' ) + OFFSET
-                                                           
+
       ELSE IF ( KFILE .EQ. 4 ) THEN						! Else if fourth form then.
-                                                       
+
         OFFSET = 1 - LIMIT1							!  Calculate correction value.
         CONTG = DBS_FIELDNO( IDB, 'CONTIGUOUS.OBS' ) + OFFSET			!  Get constraint mode field numbers.
         MONIT = DBS_FIELDNO( IDB, 'MONITOR' ) + OFFSET

@@ -23,7 +23,7 @@
 *     Delete a field from a catalogue.
 
 *  Usage:
-*     DELFIELD INPUT NAME 
+*     DELFIELD INPUT NAME
 
 *  ADAM Parameters:
 *     INPUT = _CHAR (Read)
@@ -32,7 +32,7 @@
 *        Name of the field to be deleted.
 
 *  Example:
-*     DELFIELD TEST CLASS 
+*     DELFIELD TEST CLASS
 
 *  Authors:
 *     ARW: Alan Wood (STARLINK)
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,7 +89,7 @@
      : from the ^catname catalogue', status)
        elseif (status .eq. CHP__CATNOTFND) then
            call msg_setc('catname',incat)
-           call err_rep('message 2','The catalogue ^catname could not 
+           call err_rep('message 2','The catalogue ^catname could not
      : be found.', status)
        elseif (status .eq. CHP__PARNOTFND) then
            call msg_setc('parname',cnames(1))
@@ -102,6 +102,6 @@
          endif
        endif
 *
-*   
+*
        call chp_close(status)
       end

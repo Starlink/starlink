@@ -52,7 +52,7 @@
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statement, with a call to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the READONLY specifier is used which is 
+*        porting, as the READONLY specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,7 +89,7 @@
 
 *  Arguments Given & Returned:
       INTEGER STATUS
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) FILENAME
 
@@ -109,11 +109,11 @@
       INTEGER L
       REAL EQ
       REAL WIDTH
-                                
+
 *.
 *  Status check:
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 C
 C   Read all the current parameters into the array PARAMS;
 C   NPAR parameters were found.
@@ -191,7 +191,7 @@ C
 C
 C   Now handle any selection of catalogues within the Astrometric mode
 C
-      DO I = 0,10    
+      DO I = 0,10
           ICAT1(I)=-1
       ENDDO
       IF (CATRUN) THEN
@@ -329,7 +329,7 @@ C
          TEXT=VALUE(1:L)
 
 * This statement :
-* 
+*
 *        OPEN (UNIT=11,FILE=TEXT,STATUS='OLD',READONLY,ERR=400)
 *
 * is now replaced by this call (see History):

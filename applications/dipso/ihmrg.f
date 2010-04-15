@@ -508,7 +508,7 @@
        TSTWV2 = XSTACK(PTL)
        TSTVAL = -321.654
        IERR = 0
- 
+
        DO 2400 I = 1, NPOINT
           WVX = WAVE(I)
           IF (WVX.GE.TSTWV2 .AND. WVX.LE.TSTWV1) THEN
@@ -530,7 +530,7 @@
  2320        CONTINUE
           ENDIF
  2400  CONTINUE
- 
+
        IF (IERR.NE.0) THEN
           CALL SRTBRK
      :    (ASIZE1,WAVE,FLUX,NPOINT,MAXBRK,BREAK,NBREAK,TSTVAL,OK)

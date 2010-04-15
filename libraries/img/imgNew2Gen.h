@@ -19,7 +19,7 @@
  *
  *     This version is the generic form for the float, double, int,
  *     short, unsigned short, char and unsigned char versions. Just
- *     include this in the appropriate stub after setting the 
+ *     include this in the appropriate stub after setting the
  *     values of the macros:
  *
  *        IMG_F77_TYPE   = (r|d|l|i|w|uw|b|ub)
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
  *        Original version
  *     28-May-1996 (PDRAPER):
  *        Added code to handle pointer arrays correctly. Made into
- *        generic include file. 
+ *        generic include file.
  *     10-JUN-1996 (PDRAPER):
  *        Converted to use more C-like names.
  *     21-APR-1999 (PDRAPER):
@@ -95,28 +95,28 @@ IMGNEW2( IMG_SHORT_C_TYPE ) ( char *param,
                               int nx,
                               int ny,
                               IMG_FULL_C_TYPE **ip,
-                              int *status ) 
+                              int *status )
 {
   DECLARE_CHARACTER_DYN( fparam );
   DECLARE_POINTER_ARRAY_DYN( fip );
   int nparam;
-  
+
   F77_CREATE_CHARACTER( fparam, strlen( param ) );
   F77_EXPORT_CHARACTER( param, fparam, fparam_length );
-  
+
   /*  Count the number of input parameters and create enough space for
       the corresponding Fortran pointers */
   nparam = img1CountParams( param, status );
   F77_CREATE_POINTER_ARRAY( fip, nparam );
   F77_ASSOC_POINTER_ARRAY( fip, ip );
-  
+
   IMGNEW2_CALL( IMG_F77_TYPE ) ( CHARACTER_ARG(fparam),
                                  INTEGER_ARG(&nx),
                                  INTEGER_ARG(&ny),
                                  POINTER_ARRAY_ARG(fip),
                                  INTEGER_ARG(status)
                                  TRAIL_ARG(fparam) );
-  
+
   /*  Now copy the addresses back to to C pointers */
   F77_IMPORT_POINTER_ARRAY( fip, ip, nparam );
 

@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,7 +97,7 @@
 *  Loop looking for the extension item "DEBIAS"
       DO 1 I = 1, NNDF
          CALL NDF_XSTAT( IDS( I ), 'CCDPACK', THERE, STATUS )
-         IF ( THERE ) THEN 
+         IF ( THERE ) THEN
             CALL CCG1_FCH0C( IDS( I ), 'DEBIAS', DEBIAS, OK, STATUS )
             IF ( .NOT. OK ) THEN
 

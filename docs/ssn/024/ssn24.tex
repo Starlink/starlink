@@ -10,8 +10,8 @@
 \newcommand{\stardocauthors}   {Anne Charles}
 \newcommand{\stardocdate}      {30 July 1997}
 \newcommand{\stardoctitle}     {Notes for Site Managers about \TeX\ and \LaTeX}
-\newcommand{\stardocabstract}  {This document gives some information for Site 
-Managers about the Starlink release of the \TeX\ system, 
+\newcommand{\stardocabstract}  {This document gives some information for Site
+Managers about the Starlink release of the \TeX\ system,
 which includes \LaTeX 2e.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ which includes \LaTeX 2e.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -192,12 +192,12 @@ which includes \LaTeX 2e.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -244,7 +244,7 @@ mentioned in \emph{The \LaTeX\ Companion}.
 \texttt{kpathsea} file-searching is used by \TeX, \texttt{xdvik},
 \texttt{dvipsk}, and \texttt{gsftopk}.  It uses a database (file
 \texttt{/usr/local/teTeX/texmf/ls-R}) of all the files in the directory
-tree.  
+tree.
 
 The automatic font generating system adds an entry for each font it generates
 to the database, but it is most efficient if the database is regenerated
@@ -288,11 +288,11 @@ it to display the current configuration. I have used it to:
 
 \begin{itemize}
   \item set the default printer \texttt{MODE} to \texttt{cx}
-  \item remove the print command from \texttt{dvips}, so that the output of 
+  \item remove the print command from \texttt{dvips}, so that the output of
         \texttt{dvips} is a \texttt{.ps} file.
 \end{itemize}
 
-Note that \texttt{texconfig} defaults both \texttt{xdvi} and \texttt{dvips} 
+Note that \texttt{texconfig} defaults both \texttt{xdvi} and \texttt{dvips}
 to A4 paper.
 
 To run \texttt{texconfig} interactively, type the following:
@@ -319,7 +319,7 @@ top of this file is the following section:
 % even more local texmf trees. Just make sure to list them in the TEXMFS
 % variable.
 TEXMFL          = /usr/local/tex.local
- 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % List all your texmf trees in TEXMFS. So far, only TEXMF can be protected
 % by !!, since ls-R only supports one texmf tree so far.
@@ -330,12 +330,12 @@ TEXMFS          = !!$TEXMF
 %TEXMFS         = {!!$TEXMF,$TEXMFL}
 % Search local tree *before* the standard tree:
 %TEXMFS         = {$TEXMFL,!!$TEXMF}
-... 
+...
 \end{verbatim}
 \end{small}
 \end{quote}
 
-The environment variable \texttt{TEXMFL} should be modified to define the 
+The environment variable \texttt{TEXMFL} should be modified to define the
 location of the root directory of your local \TeX /\LaTeX\ tree.
 
 The environment variable \texttt{TEXMFS} should then be set to define

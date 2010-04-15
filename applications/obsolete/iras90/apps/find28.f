@@ -15,16 +15,16 @@
 
 *  Description:
 *     To display a list of source details.
-*     
+*
 *     The program determines whether the display is to be made to the
 *     terminal or written to a file. This is done by looking at DISFIL.
 *
 *     The current setting of DISFIL is first stored to be restored at
 *     the end of the subroutine.
-*     
+*
 *     If DISFIL is A (ask) the user is asked to supply a value of
 *     B (both), D (display only) or F (file only).
-*     
+*
 *     If DISFIL is B (both) or D (display only) then the program calls
 *     the subroutine FIND39 to display each page. In calling FIND39 the
 *     display mode is set to terminal. It waits for the user to respond
@@ -42,7 +42,7 @@
 *     MAXLEN = INTEGER
 *        Number of lines per page on display
 *     PDISFI = CHARACTER * ( * ) (Given)
-*        Parameter DISPLAYORFILE 
+*        Parameter DISPLAYORFILE
 *     PNEXTP = CHARACTER * ( * ) (Given)
 *        Parameter NEXTPAGE to trigger next page of display
 *     PSLFIL = CHARACTER * ( * ) (Given)
@@ -81,7 +81,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,13 +100,13 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-      
+
 
 *  Arguments Given:
-      CHARACTER * ( * )  DISFIL 
+      CHARACTER * ( * )  DISFIL
       INTEGER MAXLEN
       CHARACTER * ( * )  PDISFI
-      CHARACTER * ( * )  PNEXTP 
+      CHARACTER * ( * )  PNEXTP
       CHARACTER * ( * )  PSLFIL
       LOGICAL SURVEY
 
@@ -156,10 +156,10 @@
      :            ' File(F), Both(B), Neither(!)', STATUS )
                   CALL PAR_CHOIC( PDISFI, 'D', 'D,F,B', .FALSE.,
      :            DISFIL, STATUS )
-      
+
 *  Cancel the parameter for next time through
                   CALL PAR_CANCL( PDISFI, STATUS )
-      
+
 *  If the user enters abort !! return from the subroutine
                   IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
@@ -174,13 +174,13 @@
 *  End if for if not B,D or F (or null)
                END IF
             END IF
-         END IF     
+         END IF
 
 *  *********************************************************************
 *  If DISFIL is B ( both) or D ( display) display output to terminal
 *  ********************************************************************
          IF ( ( DISFIL .EQ. 'B' ) .OR. ( DISFIL .EQ. 'D' ) ) THEN
-         
+
 *  *********************************************************************
 *  List all the sources by pages
 *  *********************************************************************
@@ -227,7 +227,7 @@
 
 *  End of status check
                   END IF
-      
+
                END IF
 
 *  *********************************************************************
@@ -239,7 +239,7 @@
 *  display further pages and jumps out to here
  300        CONTINUE
          END IF
-      
+
 
 *  *********************************************************************
 *  If DISFIL is B ( both) or F ( file ) put output to file
@@ -269,7 +269,7 @@
                CALL ERR_ANNUL( STATUS )
                CALL MSG_OUT( ' ', ' The source positions will not be '//
      :        'saved, but you can continue processing', STATUS )
-      
+
 *  If a file is supplied by the user then write the source details to it
             ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -278,22 +278,22 @@
 *  *********************************************************************
                CALL FIND39( .FALSE., FD, NOFSO, MAXLEN, NOFSO,
      :         SURVEY, STATUS )
-      
+
 *  *********************************************************************
 *  Check whether an error has occured
 *  *********************************************************************
                IF ( STATUS .NE. SAI__OK ) THEN
 
-*  Annul any error message , which sets the status to SAI__OK. 
+*  Annul any error message , which sets the status to SAI__OK.
                   CALL ERR_ANNUL( STATUS )
                 END IF
-      
+
 *  Close the file and cancel the parameter
                 CALL FIO_CANCL( PSLFIL, STATUS )
 
 *  Deactivate FIO
                 CALL FIO_DEACT( STATUS )
-      
+
             END IF
          END IF
       END IF
@@ -301,13 +301,13 @@
 *  If the DISPLAYORFILE parameter is entered as null, indicating that
 *  no displays are to be produced the subroutine go to this point
  400  CONTINUE
-      
+
 *  Check for PAR__NULL and if it is annul any error which sets
 *  the STATUS back to SAI__OK.
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
       END IF
-      
+
 *  Restore the correct value of DISFIL
       DISFIL = TEMPDF
 

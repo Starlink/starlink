@@ -25,23 +25,23 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
 *     and fills the volume contained within those edges with a given integer
 *     index value.
 *
-*     The filling process is done in steps in which a new layer of surface 
-*     pixels is added on to the existing filled volume. Initially, the 
-*     filled volume consists of just the nominated pixel, and the surface 
+*     The filling process is done in steps in which a new layer of surface
+*     pixels is added on to the existing filled volume. Initially, the
+*     filled volume consists of just the nominated pixel, and the surface
 *     layer consists of those pixel which touch the nominated pixel. Each
 *     pixel in the surface layer is then checked in turn. If it is marked
-*     as an edge pixel, it is ignored. If it has already been assigned to 
+*     as an edge pixel, it is ignored. If it has already been assigned to
 *     another clump, or if it is marked as a pixel at the edge of the
-*     entire data array, then the filling of the current clump is aborted as 
-*     it is unusable (see below for why). Otherwise, the given integer 
-*     index value is stored at the pixel, and the positions of the immediate 
-*     neighbours of the pixel are added to a list which will form the next 
+*     entire data array, then the filling of the current clump is aborted as
+*     it is unusable (see below for why). Otherwise, the given integer
+*     index value is stored at the pixel, and the positions of the immediate
+*     neighbours of the pixel are added to a list which will form the next
 *     surface layer (so long as they are not already on the list). Once
-*     all pixels in the current surface layer have been checked in this way, 
+*     all pixels in the current surface layer have been checked in this way,
 *     checking recommences with the next surface layer (if it contains
-*     any pixels). Thus the volume surrounding the specified pixel is 
+*     any pixels). Thus the volume surrounding the specified pixel is
 *     extended, layer by layer, in the style of a set of onion skins.
-*     Pixels  which are flagged as edge pixels block this expansion, forcing 
+*     Pixels  which are flagged as edge pixels block this expansion, forcing
 *     the new layers to find a way round which avoids such edge pixels.
 *
 *     If there are "holes" in the edges surrounding the nominated pixel,
@@ -63,18 +63,18 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
 *        Pointer to an array which is the same shape and size as the data
 *        array, and which holds a flag for every pixel. If the pixel is
 *        an edge pixel this flag will be zero. If the pixel has been
-*        assigned to a clump, this flag will equal the index of the clump 
-*        (all clump indices are integers greater than zero). If the pixel 
-*        has been added to the list of pixel forming the current or next 
+*        assigned to a clump, this flag will equal the index of the clump
+*        (all clump indices are integers greater than zero). If the pixel
+*        has been added to the list of pixel forming the current or next
 *        layer surrounding a clump, then the flag will be negative with
 *        an absolute value equal to the index of the relevant clump. Note,
 *        it is assumed that all pixels which touch the edge of the data
-*        array (except for those which are are flagged as clump edges) are 
+*        array (except for those which are are flagged as clump edges) are
 *        flagged using INT_MAX.
 *     nel
 *        The total number of elements in "ipa".
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if there are less than 3 pixel
@@ -84,7 +84,7 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
 
 *  Returned Value:
 *     The number of pixels added to the clump. This will be zero if the
-*     filling process was aborted due to the clump encountering another 
+*     filling process was aborted due to the clump encountering another
 *     clump or the edges of the array. It will also be zero if an error
 *     occurs.
 
@@ -150,24 +150,24 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
-/* Allocate memory to hold the indices of the pixels on the current surface 
+/* Allocate memory to hold the indices of the pixels on the current surface
    layer, and initialise the list to hold just the nominated central pixel. */
    surface = astMalloc( sizeof(int)*30 );
    if( surface ) {
       surface[ 0 ] = i0;
       surface_len = 1;
-   
+
 /* Indicate that the list holding the indices of the pixels on the next
    surface layer is empty. */
       new_surface_len = 0;
       new_surface = NULL;
 
-/* Indicate that we are about to check the first pixel (element zero) in 
+/* Indicate that we are about to check the first pixel (element zero) in
    the current surface layer. */
       next_surface_el = 0;
 
 /* Loop round adding sucesive layers of pixels into the clump until the
-   current surface layer is empty. This loop will exit early if the clump 
+   current surface layer is empty. This loop will exit early if the clump
    encounters another clump or the edge of the array. */
       while( surface_len > 0 ) {
 
@@ -181,8 +181,8 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
 /* If this pixel is a clump edge pixel, skip it, */
          if( flag != 0 ) {
 
-/* If this pixel is an array border pixel (i.e. is on the border of the 
-   entire data array), or has been assigned to a different clump, abort the 
+/* If this pixel is an array border pixel (i.e. is on the border of the
+   entire data array), or has been assigned to a different clump, abort the
    current clump, erasing it from "ipa". */
             if( flag > 0 && flag != index ) {
                ret = 0;
@@ -203,7 +203,7 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
    vector index of the first pixel in a 3x3x3 cube centred on the current
    pixel. Since the "ipa" array flags all pixels at the edge of the array
    as border pixels, we know that the central pixel in this cube cannot be
-   at the border of the data array. This means we do not need to check the 
+   at the border of the data array. This means we do not need to check the
    3D GRID indices against the bounds of the array. */
                ivz = iv - skip[ 2 ] - skip[ 1 ] - skip[ 0 ];
 
@@ -224,14 +224,14 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
                         if( abs( ipa[ ivx ] ) != index ) {
                            inext = new_surface_len++;
                            new_surface = astGrow( new_surface,
-                                                  new_surface_len, 
+                                                  new_surface_len,
                                                   sizeof( int ) );
                            if( new_surface ) new_surface[ inext ] = ivx;
 
 /* Flag that this pixel has been added to the list by setting its flag
    value to -(clump index). But never over-write a flag value indicating
-   that the pixel is an edge pixel (zero flag) or border pixel or that the 
-   pixel has been added to a clump (+ve flags). This means that occasionally 
+   that the pixel is an edge pixel (zero flag) or border pixel or that the
+   pixel has been added to a clump (+ve flags). This means that occasionally
    pixels will be included more than once in the list of surface pixels. */
                            if( ipa[ ivx ] < 0 ) ipa[ ivx ] = -index;
                         }

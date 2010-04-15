@@ -27,13 +27,13 @@
 *  Returned Value:
 *     A pointer to a 1D array with length equal to the maximum number of
 *     detectors found in any one input NDF. Each element will be non-zero
-*     if, and only if, one or more good data values were found for the 
+*     if, and only if, one or more good data values were found for the
 *     detector within the input NDFs. The array should be freed using
 *     astFree when no longer needed.
 
 *  Description:
 *     This function checks the DATA components of all the input NDF. Any
-*     detectors for which no good values are found are flagged by a zero 
+*     detectors for which no good values are found are flagged by a zero
 *     in the returned array.
 
 *  Authors:
@@ -96,7 +96,7 @@ int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
    *nbaddet = 0;
    result = NULL;
    outlen = 0;
-   
+
 /* Check inherited status */
    if( *status != SAI__OK ) return result;
 
@@ -109,7 +109,7 @@ int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
 /* Get the dimensions of the NDF. */
       ndfDim( indf, 3, dims, &ndim, status );
 
-/* If the returned array is shorter than the number of detectors in this 
+/* If the returned array is shorter than the number of detectors in this
    NDF, extend the returned array and initialise the new elements to
    zero. */
       if( outlen < dims[ 1 ] ) {
@@ -117,7 +117,7 @@ int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
          if( astOK ) {
             for( i = outlen; i < dims[ 1 ]; i++ ) result[ i ] = 0;
             outlen = dims[ 1 ];
-         } 
+         }
       }
 
 /* Map the data array of the NDF. */
@@ -143,7 +143,7 @@ int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
 
 /* Annul the input NDF identifier. */
       ndfAnnul( &indf, status );
-   }     
+   }
 
 /* Count the number of bad detectors. */
    for( i = 0; i < outlen; i++ ) {

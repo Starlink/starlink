@@ -6,7 +6,7 @@
  of coordinate frames, mappings, etc, in the form of AST Objects (see
  SUN/210). Each application within the ATOOLS package corresponds closely
  to one of the functions within the AST library. ATOOLS thus provides a
- high-level interface to the AST library. 
+ high-level interface to the AST library.
 
 
   Changes in V1.9-7
@@ -107,6 +107,6 @@
 
   Changes in V1.6:
 
-  - New commands added: astshiftmap. These are straight analogues of the 
+  - New commands added: astshiftmap. These are straight analogues of the
   corresponding AST routines.
 

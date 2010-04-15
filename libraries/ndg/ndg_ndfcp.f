@@ -1,4 +1,4 @@
-      SUBROUTINE NDG_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF, 
+      SUBROUTINE NDG_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF,
      :                      STATUS )
 *+
 *  Name:
@@ -14,14 +14,14 @@
 *     CALL NDG_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF, STATUS )
 
 *  Description:
-*     The routine returns an NDF identifier for a new primitive NDF created 
+*     The routine returns an NDF identifier for a new primitive NDF created
 *     with the specified attributes. The name of the new NDF is held
 *     at a given index within a given group. It is equivalent to NDF_CREP.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the names of NDFs. This
-*        will often be created using NDG_CREAT, but groups created "by 
+*        will often be created using NDG_CREAT, but groups created "by
 *        hand" using GRP directly can also be used.
 *     INDEX = INTEGER (Given)
 *        The index within the group at which the name of the NDF to be
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -89,7 +89,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'NDG_CONST'          ! NDG constants.
-                                  
+
 *  Arguments Given:
       INTEGER IGRP
       INTEGER INDEX
@@ -124,7 +124,7 @@
 *  Get the required name.
       CALL GRP_GET( IGRP, INDEX, 1, NAME, STATUS )
 
-*  If the name could not be obtained, set the name blank and abort.     
+*  If the name could not be obtained, set the name blank and abort.
       IF ( STATUS .NE. SAI__OK ) THEN
          NAME = ' '
          GO TO 999
@@ -141,9 +141,9 @@
      :      'from shell expansion', STATUS )
       END IF
 
-      CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )         
-      CALL HDS_TUNE( 'SHELL', -1, STATUS )         
-      
+      CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )
+      CALL HDS_TUNE( 'SHELL', -1, STATUS )
+
 *  Create the NDF place holder.
       CALL NDG1_OPEN( ENAME, PLACE, STATUS )
 
@@ -152,7 +152,7 @@
 
 *  Re-instate the original HDS SHELL value.
       CALL ERR_BEGIN( STATUS )
-      CALL HDS_TUNE( 'SHELL', SHELL, STATUS )         
+      CALL HDS_TUNE( 'SHELL', SHELL, STATUS )
       CALL ERR_END( STATUS )
 
 *  If an error occured, add context information.

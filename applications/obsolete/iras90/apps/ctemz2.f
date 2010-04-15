@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -189,7 +189,7 @@
 *  Store the temperature in single precision.
                TEMP( I ) = REAL( T )
 
-*  If an optical depth image is required, evaluate the observed 
+*  If an optical depth image is required, evaluate the observed
 *  surface brightness in BAND1 at this temperature.
                IF( CC .GT. 0.0D0 ) THEN
                   IFAIL = -1

@@ -35,7 +35,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -47,7 +47,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-                                    
+
 *  Local Variables:
       INTEGER PLPOS              ! Plate do loop variable
       INTEGER SOPOS              ! Source do loop variable
@@ -73,18 +73,18 @@
             PLLODE( PLPOS ) = 0.0
             PLHIDE( PLPOS ) = 0.0
             PLFSCP( PLPOS ) = 0
-      
+
 *  For each source associated with that plate
             DO 100 SOPOS = 1, PLNOSO( PLPOS )
 
 *  Clear the pointer from the plate to the source
                PLSOI( PLPOS,SOPOS) = 0
-      
+
  100        CONTINUE
 
 *  Zeroise the number of sources associated with the plate
             PLNOSO( PLPOS ) = 0
-      
+
  200     CONTINUE
 
 *  Zeroise the number of plates used in plate common
@@ -92,10 +92,10 @@
 
 *  For each source in source common
          DO 300 SOPOS = 1, NOFSO
-      
-*  Clear the pointer from the source to the plate 
+
+*  Clear the pointer from the source to the plate
             SOBPLI( SOPOS ) = 0
-      
+
  300     CONTINUE
       END IF
 

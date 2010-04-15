@@ -1,7 +1,7 @@
 
 *+  CREFRAMESUB - fills an array with different types of test data
 
-      SUBROUTINE CREFRAMESUB( DIMS1, DIMS2, ARRAY, TYPED, MEAN, SIGMA, 
+      SUBROUTINE CREFRAMESUB( DIMS1, DIMS2, ARRAY, TYPED, MEAN, SIGMA,
      :                        HIGH, LOW, DIRN, STATUS )
 
 *    Description :
@@ -80,9 +80,9 @@
       EXTERNAL PDA_RAND
 
 *    Local variables :
- 
+
       REAL
-     :    X,                    ! dummy argument for NAG routine      
+     :    X,                    ! dummy argument for NAG routine
      :    INTER,                ! intensity interval per row/col in ramp
      :    VALUE,                ! value given by RANDOM subroutine
      :    DATA                  ! dummy variable for temporary data storage
@@ -103,7 +103,7 @@
       CALL PDA_RNSED( SEED )
 
 *    check for TYPED and fill array accordingly
-      IF( TYPED .EQ. 'RR' ) THEN            
+      IF( TYPED .EQ. 'RR' ) THEN
                                           ! random between 1 and 0
          DO  J  =  1, DIMS2
             DO  I  =  1, DIMS1
@@ -112,10 +112,10 @@
             END DO
          END DO
 
-      ELSE IF( TYPED .EQ. 'RL' ) THEN       
+      ELSE IF( TYPED .EQ. 'RL' ) THEN
                                           ! random between limits
-         DO  J  =  1, DIMS2 
-            DO  I  =  1, DIMS1 
+         DO  J  =  1, DIMS2
+            DO  I  =  1, DIMS1
                VALUE = PDA_RAND( X )
                VALUE  =  ( VALUE * ( HIGH - LOW ) ) + LOW
                ARRAY( I, J ) = VALUE
@@ -126,70 +126,70 @@
                                           ! noise of a defined sigma about
                                           ! a defined mean
          DO  J  =  1, DIMS2
-            DO  I  =  1, DIMS1 
+            DO  I  =  1, DIMS1
                CALL NORMAL( MEAN, DATA, SIGMA, STATUS )
                ARRAY( I, J )  =  DATA
             END DO
          END DO
 
-      ELSE IF( TYPED .EQ. 'RP' ) THEN 
-                                          ! Poisson noise on mean  
-         DO  J  =  1, DIMS2 
+      ELSE IF( TYPED .EQ. 'RP' ) THEN
+                                          ! Poisson noise on mean
+         DO  J  =  1, DIMS2
             DO  I  =  1, DIMS1
                CALL POISSON( MEAN, DATA, STATUS )
                ARRAY( I, J ) = DATA
             END DO
          END DO
 
-      ELSE IF( TYPED .EQ. 'RA' ) THEN     
+      ELSE IF( TYPED .EQ. 'RA' ) THEN
                                            ! ramp between limits
 
          IF( DIRN .EQ. 1 ) THEN            ! ramp L - R
             INTER  = ( HIGH - LOW ) / ( DIMS1  - 1 )
-            DO  I  =  1, DIMS1 
-               DO  J  =  1, DIMS2 
+            DO  I  =  1, DIMS1
+               DO  J  =  1, DIMS2
                   ARRAY( I, J ) = LOW + ( INTER *  ( I - 1 ) )
                END DO
             END DO
 
          ELSE IF( DIRN .EQ. 2 ) THEN       ! ramp R - L
             INTER = ( HIGH - LOW ) / ( DIMS1 - 1 )
-            DO  I  =  1, DIMS1 
-               DO  J  =  1, DIMS2 
+            DO  I  =  1, DIMS1
+               DO  J  =  1, DIMS2
                   ARRAY( I, J ) = HIGH - ( INTER * ( I - 1 ) )
                END DO
             END DO
 
          ELSE IF( DIRN .EQ. 3 ) THEN       ! ramp B - T
             INTER = ( HIGH - LOW ) / ( DIMS2  - 1 )
-            DO  J  =  1, DIMS2 
-               DO  I  =  1, DIMS1 
+            DO  J  =  1, DIMS2
+               DO  I  =  1, DIMS1
                   ARRAY( I, J ) = LOW + ( INTER * ( J - 1 ) )
                END DO
             END DO
 
          ELSE IF( DIRN .EQ. 4 ) THEN       ! ramp T - B
             INTER = ( HIGH - LOW ) / ( DIMS2  - 1 )
-            DO  J  =  1, DIMS2 
-               DO  I  =  1, DIMS1 
+            DO  J  =  1, DIMS2
+               DO  I  =  1, DIMS1
                   ARRAY( I, J ) = HIGH - ( INTER * ( J - 1 ) )
                END DO
             END DO
 
          END IF
 
-      ELSE IF( TYPED .EQ. 'FL' ) THEN     
+      ELSE IF( TYPED .EQ. 'FL' ) THEN
                                            ! flat all over array
-         DO  J  =  1, DIMS2 
-            DO  I  =  1, DIMS1 
+         DO  J  =  1, DIMS2
+            DO  I  =  1, DIMS1
                ARRAY( I, J ) = MEAN
             END DO
          END DO
 
       ELSE IF( TYPED .EQ. 'BL' ) THEN
                                            ! blank array - all zeroes
-         DO  J  =  1, DIMS2 
-            DO  I  =  1, DIMS1 
+         DO  J  =  1, DIMS2
+            DO  I  =  1, DIMS1
                ARRAY( I, J ) = 0.0
             END DO
          END DO

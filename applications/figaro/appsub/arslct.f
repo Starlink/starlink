@@ -6,7 +6,7 @@ C+
 C
 C     A R S L C T
 C
-C     ARC utility routine.  This is the routine that does the tricky 
+C     ARC utility routine.  This is the routine that does the tricky
 C     user interaction, getting the user to move the cursor across
 C     the plot produced by ARPLOT to select lines and identify them.
 C
@@ -35,13 +35,13 @@ C     (>) ARCS      (Character) The command parameter ARCTYPE, ie
 C                   the arc types represented by ARC1 etc, separated
 C                   by commas.
 C     (!) IXST      (Integer) Passed as the first data element currently
-C                   displayed.  Returns as the first element to be 
+C                   displayed.  Returns as the first element to be
 C                   displayed in the next display.
 C     (!) IXEN      (Integer) Like IXST, but the last element.
 C     (!) NCHAN     (Integer) Number of channels to be displayed as a
 C                   section.
 C     (!) COEFFS    (Double precision array COEFFS(ORDER)) The
-C                   current wavelength coefficients. 
+C                   current wavelength coefficients.
 C     (!) ORDER     (Integer) The number of coefficients used.
 C     (!) FITTED    (Logical) True if a wavelength fit has been obtained.
 C     (!) SHOWRMS   (Logical) True if an RMS is to be shown the first time
@@ -52,7 +52,7 @@ C     (!) CHANS     (Real array CHANS(NLMAX)) The channel numbers for
 C                   the identified arc lines.
 C     (!) WAVES     (Real array WAVES(NLMAX)) The wavelengths for the
 C                   identified arc lines.
-C     (!) WEIGHTS   (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (!) WEIGHTS   (Real array WEIGHTS(NLMAX)) The weights for the
 C                   identified arc lines.
 C     (!) CLASS     (Integer array CLASS(NLMAX)) The class codes for
 C                   the identified arc lines.
@@ -61,7 +61,7 @@ C     (<) COMPLETE  (Logical) Returned as true if there are to be
 C                   no more displays.
 C
 C                                       KS / CIT 13th June 1984
-C     Modified: 
+C     Modified:
 C
 C     5th Sept 1985  KS / AAO  SHOWRMS now a parameter.  RMS value wasn't
 C                    being displayed following a 'C(og)' because of the
@@ -125,7 +125,7 @@ C     are obtained, we essentially have a 'case' structure to handle
 C     the various possibilities.  If program changes the display, it
 C     can set DONE (but not COMPLETE) and this routine will exit in
 C     such a way that the calling program redisplays the original
-C     arc portion and re-calls this routine. WANTED is used to 
+C     arc portion and re-calls this routine. WANTED is used to
 C     indicate that a line is required (which is not true, for example,
 C     if 'H' for Help was used.)  CHANGE indicates that the number of
 C     identified lines has changed and a fit should be recalculated.

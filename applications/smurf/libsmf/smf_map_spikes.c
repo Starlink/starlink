@@ -13,8 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_map_spikes( smfData *data, smfData *variance, int *lut, 
-*                     unsigned char *qual, unsigned char mask, 
+*     smf_map_spikes( smfData *data, smfData *variance, int *lut,
+*                     unsigned char *qual, unsigned char mask,
 *                     double *map, int *hitsmap, double *mapvar,
 *                     dim_t msize, double thresh, size_t *nflagged,
 *                     int *status )
@@ -36,11 +36,11 @@
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
 *     map = double* (Given)
-*        The current map estimate 
+*        The current map estimate
 *     hitsmap = int* (Given)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Given)
-*        Variance of each pixel in map 
+*        Variance of each pixel in map
 *     msize = dim_t (Given)
 *        Number of pixels in map
 *     thresh = doublge (Given)
@@ -53,7 +53,7 @@
 *  Description:
 *     This routine flags data points that are thresh-sigma away from the value
 *     of the map in each pixel.
-*     
+*
 *  Authors:
 *     Edward Chapin (UBC)
 *     {enter_new_authors_here}
@@ -105,7 +105,7 @@
 #define FUNC_NAME "smf_map_spikes"
 
 void smf_map_spikes( smfData *data, smfData *variance, int *lut,
-                     unsigned char *qual, unsigned char mask, double *map, 
+                     unsigned char *qual, unsigned char mask, double *map,
                      int *hitsmap, double *mapvar,
                      dim_t msize __attribute__((unused)), double thresh,
                      size_t *nflagged, int *status ) {
@@ -128,7 +128,7 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
   size_t vtstride;           /* tstride of variance */
-  
+
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -136,27 +136,27 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   /* Check inputs */
   if( !data || !variance || !lut || !qual || !map || !mapvar || !hitsmap ) {
     *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": Null inputs", status ); 
+    errRep(" ", FUNC_NAME ": Null inputs", status );
     return;
   }
 
   if( (!data->pntr[0]) || (!variance->pntr[0]) ) {
     *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": supplied data or variance is empty", status ); 
+    errRep(" ", FUNC_NAME ": supplied data or variance is empty", status );
     return;
-  } 
+  }
 
   dat = data->pntr[0];
-  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &dbstride, 
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &dbstride,
                 &dtstride, status );
 
   var = variance->pntr[0];
-  smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride, 
+  smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride,
                 &vtstride, status );
 
   if( thresh <= 0 ) {
     *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": thresh must be > 0!", status ); 
+    errRep(" ", FUNC_NAME ": thresh must be > 0!", status );
     return;
   }
 
@@ -165,8 +165,8 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   /* Check that the variance dimensions are compatible with data */
   if( (vnbolo != nbolo) || ( (vntslice>1) && (vntslice!=ntslice) ) ) {
     *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": variance dimensions incompatible with data", 
-           status ); 
+    errRep(" ", FUNC_NAME ": variance dimensions incompatible with data",
+           status );
     return;
   }
 
@@ -184,7 +184,7 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
           qual[di] |= SMF__Q_SPIKE;
           nflag++;
         }
-      }    
+      }
     }
   }
 

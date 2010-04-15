@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -49,7 +49,7 @@
 \makeatletter
 \settowidth{\labelwidth}{\tt another\_bibitem}
 \addtolength{\labelwidth}{\labelsep}
-\def\description{\list{}{\leftmargin\labelwidth \advance\leftmargin\labelsep 
+\def\description{\list{}{\leftmargin\labelwidth \advance\leftmargin\labelsep
   \itemindent\z@ \let\makelabel\descriptionlabel}}
 \makeatother
 
@@ -93,9 +93,9 @@ Manager.}
 
 This guide presents information about the Language-Sensitive Editor ({\sl
 LSEDIT\/}) and the environment defined for \LaTeX.  It is a supplement to the
-{\em ``VAX Language-Sensitive Editor User's Guide''\/} \cite{lse}, the 
+{\em ``VAX Language-Sensitive Editor User's Guide''\/} \cite{lse}, the
 {\em ``\/\LaTeX\, A Document Preparation System, User's Guide \& Reference
-Manual''\/} \cite{latex} and 
+Manual''\/} \cite{latex} and
 {\em ``\/\LaTeX\ ---A Document Preparation System'' \/} \cite{sun9}.
 
 \bigskip
@@ -103,7 +103,7 @@ Manual''\/} \cite{latex} and
 This guide acts as a summary and memory refresher for the commands and
 functions covered in the manuals mentioned above. It is {\em not\/} intended to
 replace either of these manuals.  It should supplement these documents and
-provide information that is specific to this environment. 
+provide information that is specific to this environment.
 
 \section*{Conventions}
 
@@ -145,7 +145,7 @@ editing and expanded to provide a template for a corresponding construct.
 
 For a complete list of the placeholders and tokens that are defined in the
 \LaTeX\ environment, see Appendices~\ref{place} and~\ref{token},
-respectively. 
+respectively.
 
 \section{{\sl LSEDIT\/} Commands}
 
@@ -155,7 +155,7 @@ The following key commands are the most commonly used. They include:
 \begin{tabular}{l@{\hspace{.5in}}l}
 \multicolumn{1}{c}{\bf Command} & \multicolumn{1}{c}{\bf Meaning} \\
 \hline
-\ & \  \\ 
+\ & \  \\
 \ctrl{e} & Expand the current placeholder or token \\ [5pt]
 \gold + \ctrl{e} & Un-expand the current placeholder or token \\ [5pt]
 \ctrl{k} & Delete the current placeholder \\ [5pt]
@@ -185,8 +185,8 @@ optional\/}.  They are denoted within the \LaTeX\ environment as follows:
 
 \section{Invoking {\sl LSEDIT\/}}
 
-\subsection{Accessing the \LaTeX\ Environment} 
- 
+\subsection{Accessing the \LaTeX\ Environment}
+
 You can invoke LSEDIT and access the \LaTeX\ environment in one of two ways:
 
 \begin{enumerate}
@@ -196,7 +196,7 @@ example,
 \tt
 \prompt{} LSEDIT/ENVIRONMENT=LTEX\_LSE:LATEX.ENV {\it filename\/}.TEX \hfil
 \end{quote}
-where {\it filename\/} is the name of your input file.  The file type {\bf 
+where {\it filename\/} is the name of your input file.  The file type {\bf
 must} be {\tt .TEX} or {\tt .STY}.
 
 \item You can define a logical name {\tt LSE\$ENVIRONMENT} in your LOGIN.COM:
@@ -214,7 +214,7 @@ qualifier when you enter LSEDIT.
 
 \subsection{Accessing the LSEKEYS Section File}
 
-In the \verb|LTEX_LSE| directory, there is a file called \verb|LSEKEYS.GBL|. 
+In the \verb|LTEX_LSE| directory, there is a file called \verb|LSEKEYS.GBL|.
 This is an LSEDIT section file. It contains a number a very useful key
 definitions that will make the task of editing files much simpler.
 
@@ -234,15 +234,15 @@ example,
 \prompt{} DEFINE LSE\$SECTION LTEX\_LSE:LSEKEYS.GBL \hfil
 \end{quote}
 Then you may omit the {\tt /SECTION} qualifier from the command line when
-you invoke LSEDIT. 
+you invoke LSEDIT.
 \end{enumerate}
 
 The two examples above assume that the logical name \verb|LSE$ENVIRONMENT| has
-been defined.  
+been defined.
 
 \subsection{Easier Access to the \LaTeX\ Environment}
 
-To invoke {\sl LSEDIT\/} for use with \LaTeX\ source files, use the 
+To invoke {\sl LSEDIT\/} for use with \LaTeX\ source files, use the
 following command:
 \begin{quote}
 \tt
@@ -251,7 +251,7 @@ following command:
 
 where {\it file\/} is the name of your input file.  The file type {\bf must} be
 {\tt .TEX} or {\tt .STY}. The command defines the correct environment and
-editing keys for operation with \LaTeX\ source files. 
+editing keys for operation with \LaTeX\ source files.
 The {\tt EDLATEX} command is a {\sl DCL\/} symbol defined as
 
 \begin{quote}
@@ -260,18 +260,18 @@ LSEDIT/ENVIRONMENT=LTEX\_LSE:LATEX.ENV/SECTION=LTEX\_LSE:LSEKEYS.GBL \hfill
 \end{quote}
 
 The editing keys for use with {\sl LSEDIT\/} are defined in the
-section file {\tt LTEX\_LSE:LSEKEYS.GBL}. 
+section file {\tt LTEX\_LSE:LSEKEYS.GBL}.
 
 \section{Supported \LaTeX\ Document Styles}
 
 When you invoke {\sl LSEDIT\/} to create a new \LaTeX\ file, the screen will
 have the intial placeholder \verb"<Latex>" on the first line of the buffer.
 When you expand this placeholder by pressing \ctrl{e}, a menu will be displayed
-listing the different \LaTeX\ styles that are supported by the environment. 
-The document styles supported are: 
+listing the different \LaTeX\ styles that are supported by the environment.
+The document styles supported are:
 
 \begin{itemize}
-\item {\tt article} -- standard style 
+\item {\tt article} -- standard style
 \item {\tt report} -- standard style
 \item {\tt letter} -- standard style
 \item {\tt memo} -- Inter-Office Correspondence
@@ -284,10 +284,10 @@ The document styles supported are:
 \end{itemize}
 
 The style is chosen by using the arrow keys to select the desired style and
-pressing \mbox{ \return.} See Appendix~\ref{templates} for the style templates 
+pressing \mbox{ \return.} See Appendix~\ref{templates} for the style templates
 created when the desired style is selected. Further styles may be added in the
 future.
- 
+
 \section{Running \LaTeX\ from within {\sl LSEDIT\/}}
 
 Your \LaTeX\ source file can be processed through \LaTeX\ {\em without\/}
@@ -298,7 +298,7 @@ you are not using the {\tt LTEX\_LSE:LSEKEYS.GBL} section  file, press \gold +
 You needn't wait for that subprocess to complete. You may continue editing the
 file if there is more to do, or you may choose to bring in another file and
 edit it while you wait. You will receive a completion message when the
-subprocess finishes. 
+subprocess finishes.
 
 
 If \LaTeX\ detects errors, the subprocess will tell you it completed with
@@ -310,7 +310,7 @@ section file, press \gold + \kp{7} In response to the  \verb"LSE Command>"
 prompt, enter {\tt GOTO FILE/READONLY FILENAME.LIS}).   This file can then be
 examined to determine the cause of the error. To return to the main buffer,
 press \gold {\tt M}  (or press \gold + \kp{7} and enter {\tt GOTO BUFFER
-FILENAME.TEX}). Correct the problem, and repeat the process. 
+FILENAME.TEX}). Correct the problem, and repeat the process.
 
 If no errors occur, the subprocess will report that the ``compilation'' is
 complete. At this point, you can exit {\sl LSEDIT\/} and process the {\tt
@@ -319,9 +319,9 @@ FILE.DVI} file produced by \LaTeX.
 \section{Accessing Help for Placeholders and Tokens}
 
 On-line help is available for most of the placeholders and tokens defined
-within the \LaTeX\ environment. 
+within the \LaTeX\ environment.
 
-For placeholders, position the cursor at the next placeholder by pressing 
+For placeholders, position the cursor at the next placeholder by pressing
 \ctrl{n}\nolinebreak. Then press \gold + \help. If there is no help for this
 placeholder, a message will be given stating that fact.
 
@@ -329,16 +329,16 @@ For tokens, type the token and press \gold + \help.
 
 If the placeholder or token is a menu, you can access help for items in the
 menu by pointing at the menu item with the arrow keys and then pressing \gold +
-\help. 
+\help.
 
 \begin{thebibliography}{99}
 \addcontentsline{toc}{section}{References}
 
-\bibitem{lse} Digital Equipment Corporation, 
+\bibitem{lse} Digital Equipment Corporation,
 {\em VAX Languase-Sensitive Editor and VAX Source Code Analyser}
 Order \#AA-PAJLA-TK, December 1989.
 
-\bibitem{latex} Leslie Lamport {\em \LaTeX\ A Document Preparation System, 
+\bibitem{latex} Leslie Lamport {\em \LaTeX\ A Document Preparation System,
 User's Guide \& Reference Manual \/} Addison-Wesley Publishing Company,
 ISBN~0-202-15790-X
 
@@ -354,7 +354,7 @@ Starlink User Note 9, Starlink Project.
 
 The following placeholders are defined within the \LaTeX\ environment. A
 placeholder is delimited by a single ``\verb"< >"'' pair (required) or a double
-``\verb"<< >>"'' (optional) pair. 
+``\verb"<< >>"'' (optional) pair.
 \begin{small}
 \begin{description}
 \item[\bf Placeholder] {\bf Description}
@@ -377,7 +377,7 @@ thebibliography \verb|\bibitem| command
 \item[arrow\us symbols] Arrow symbols, see Table 3.6 of \LaTeX\ manual
 \item[article]       \LaTeX\ article document style
 \item[article\vbar report\vbar memo\vbar letter\vbar slides\vbar %
-milstd\vbar bookform\vbar laa\vbar laamt\vbar thesis] \mbox{} \\ 
+milstd\vbar bookform\vbar laa\vbar laamt\vbar thesis] \mbox{} \\
   Valid arguments for the \verb|\documentstyle| command
 \item[b2]            Critical Item Development Spec
 \item[b5]            Computer Program Development Spec
@@ -397,11 +397,11 @@ milstd\vbar bookform\vbar laa\vbar laamt\vbar thesis] \mbox{} \\
 \item[col\us pos]       Menu of valid arguments in the tabular preamble
 \item[col\us range]     Column range specifier for the \verb|\cline| command
 \item[commands]      \LaTeX\ command categories
-\item[command\us definition]  \mbox{} \\ 
+\item[command\us definition]  \mbox{} \\
   \verb|\newcommand| and \verb|\renewcommand| new command definition
-\item[copies\us list\us one\us column] \mbox{} \\ 
+\item[copies\us list\us one\us column] \mbox{} \\
                     Convert memo `Copies' list to one column
-\item[counter\us name]  Used by \verb|\setcounter|, \verb|\addtocounter|, and 
+\item[counter\us name]  Used by \verb|\setcounter|, \verb|\addtocounter|, and
   \verb|\newcounter| commands
 \item[dash\us size]     Size of the dashes in the \verb|\dashbox| command
 \item[dedication]    Produce a dedication string in thesis document style
@@ -487,7 +487,7 @@ Math mode accents, see table 3.11 of \LaTeX\ manual
 \item[offset\us width]  Picture environment optional offset width
 \item[onlyslides]    \SLiTeX{} command to produce a subset of your slides
 \item[optional]      Optional parameter for sectioning commands
-\item[optional\us width] \verb|\makebox|, \verb|\framebox|, and 
+\item[optional\us width] \verb|\makebox|, \verb|\framebox|, and
   \verb|\savebox| optional width argument
 \item[optionlist]    Optional \LaTeX\ document substyles
 \item[options]       Valid substyle options, 10pt is the default for all styles
@@ -517,7 +517,7 @@ Math mode accents, see table 3.11 of \LaTeX\ manual
 \item[r]             Right justify
 \item[raise\us height]  Height a \verb|\rule| will be raised above the line
 \item[recipient]     Name and address of letter recipient
-\item[referee]		Typeset document for referee in Astronomy \& 
+\item[referee]		Typeset document for referee in Astronomy \&
 Astrophysics style
 \item[relation\us symbols]  \mbox{} \\
 Relation symbols, see Table 3.5 of \LaTeX\ manual
@@ -545,7 +545,7 @@ Relation symbols, see Table 3.5 of \LaTeX\ manual
 \item[tabbing\us entry] Tabbing entry
 \item[table\us entry]   Tabular entry
 \item[tabular\us width]  \mbox{} \\
-Width of a table made with {\tt tabular*} 
+Width of a table made with {\tt tabular*}
 \item[tab\us set]       Set the tabs for the {\tt tabbing} environment
 \item[text]          General text entry
 \item[thesis]        Typeset document in thesis style
@@ -564,7 +564,7 @@ Width of a table made with {\tt tabular*}
 \item[user\us defined]  User defined slide title
 \item[varsize\us symbols] Variable-sized symbols, see Table 3.8 of \LaTeX\ manual
 \item[widest\us label]  Widest text for \verb|\bibitem| label
-\item[width]         \verb|\parbox|, \verb|\rule|, \verb|\minipage| required 
+\item[width]         \verb|\parbox|, \verb|\rule|, \verb|\minipage| required
   width parameter
 \item[within]        Optional counter name, e.g. chapter, section
 \item[x\us coord]       X coordinate for picture command
@@ -577,11 +577,11 @@ Width of a table made with {\tt tabular*}
 \section{\LaTeX\ Tokens}\label{token}
 
 The following tokens are defined within the \LaTeX\ environment. Any token can
-be typed on a blank line within the buffer and expanded with 
+be typed on a blank line within the buffer and expanded with
 \ctrl{e}\nolinebreak. You need not type in the complete token name. For
 example, you can type {\tt \bs set}, press \ctrl{e} and a menu of all tokens
 that begin with {\tt \bs set} will be displayed. Simply select the proper
-command using the arrow keys and press \return.  
+command using the arrow keys and press \return.
 
 \begin{small}
 \begin{description}
@@ -647,7 +647,7 @@ Relation symbols, see Table 3.5 of \LaTeX\ manual
 \item[theorem]         Mathematical theorem environment
 \item[thesis]          Thesis document style
 \item[titlepage]       Titlepage environment
-\item[to\us list\us two\us columns] \mbox{} \\ 
+\item[to\us list\us two\us columns] \mbox{} \\
    Convert memo `To' list to two columns
 \item[two\us signatures]  Double signature for memo
 \item[type\us sizes]      Valid \LaTeX\ type size declaration
@@ -660,7 +660,7 @@ Relation symbols, see Table 3.5 of \LaTeX\ manual
 Adds an entry to the specified list or table
 \item[\bs address]        Return address. If null, business letter is made.
 \item[\bs addtocontents]  Adds text directly to the file that generates the
-table of contents and lists of figures and tables. 
+table of contents and lists of figures and tables.
 \item[\bs addtocounter]   Add a specified amount to an existing counter
 \item[\bs addtolength]    Add a specified amount to an existing length command
 \item[\bs addvspace]      Add vertical space between paragraphs
@@ -708,15 +708,15 @@ Break the current page here and output any floats
 \item[\bs flushbottom]    Make all text pages the same height
 \item[\bs fnsymbol]       Produce footnote symbols, math mode, counter $\leq$ 9
 \item[\bs footnote]       Footnote generating command
-\item[\bs footnotemark]   Mark a footnote, used in conjunction with 
+\item[\bs footnotemark]   Mark a footnote, used in conjunction with
   \verb|\footnotetext|
 \item[\bs footnotesize]   2 sizes smaller than \verb|\normalsize|
-\item[\bs footnotetext]   Footnote generating command, used with 
+\item[\bs footnotetext]   Footnote generating command, used with
   \verb|\footnotemark|
 \item[\bs frac]           Generate a fraction, math mode ONLY
 \item[\bs framebox]       Frame a box as specified containing the text specified
 \item[\bs framebox\us p]     Picture environment \verb|\framebox| command
-\item[\bs frame\us p]        Picture environment framing command, similar to 
+\item[\bs frame\us p]        Picture environment framing command, similar to
   \verb|\fbox|
 \item[\bs gamma\us l]        Greek letter gamma, lowercase
 \item[\bs gamma\us u]        Greek letter gamma, uppercase
@@ -792,7 +792,7 @@ Break the current page here and output any floats
 \item[\bs overline]       Generate formula with line above it, math mode ONLY
 \item[\bs pagebreak]      Break the current page
 \item[\bs pagenumbering]  Set the style of the page numbers
-\item[\bs pageref]        Reference the page number of a label created with a 
+\item[\bs pageref]        Reference the page number of a label created with a
   \verb|\label| command
 \item[\bs pagestyle]      Set the page style for the entire document
 \item[\bs paragraph]      \LaTeX\ sectioning command
@@ -847,7 +847,7 @@ Generate a table of contents
 \item[\bs tau]            Greek letter tau, lowercase
 \item[\bs telephone]      Letter telephone, only used if \verb|\address| is null
 \item[\bs TeX]            Produce \TeX\ logo
-\item[\bs thanks]         Produce a footnote to the title made by 
+\item[\bs thanks]         Produce a footnote to the title made by
   \verb|\maketitle|
 \item[\bs theta\us l]        Greek letter theta, lowercase
 \item[\bs theta\us u]        Greek letter theta, uppercase
@@ -891,7 +891,7 @@ Generate a table of contents
 \section{Pre-defined Keys} \label{keydefs}
 
 The following keys are defined within the {\tt LSEKEYS.GBL}
-section file. 
+section file.
 \def\descriptionlabel#1{\rm #1\ \hfil}
 \renewcommand{\thefootnote}[0]{\fnsymbol{footnote}}
 \begin{small}
@@ -908,7 +908,7 @@ section file.
 Compile and review the current buffer for
 debug\footnotemark[1]
 \footnotetext[1]{Do NOT use these with \LaTeX ; our system does not understand
-{\tt LATEX/DEBUG}. } 
+{\tt LATEX/DEBUG}. }
 \item[\gold {\tt B}] Go to the specified buffer
 \item[\gold {\tt E}] End review mode
 \item[\gold {\tt F}] Do a GOTO FILE command
@@ -918,7 +918,7 @@ debug\footnotemark[1]
 \item[\gold + \ctrl{r}]  \mbox{} \\ Set the specified buffer to WRITE status
 \item[\gold {\tt S}] Do a SUBSTITUTE command
 \item[\gold {\tt X}] Leave the editor with the EXIT command (save new file)
-\item[\gold {\tt BKSP}] Toggle the last two characters 
+\item[\gold {\tt BKSP}] Toggle the last two characters
 \item[\gold {\tt M}] Go to LSE main buffer
 \item[\gold {\tt I}] Read in a temporary file
 \item[\gold {\tt P}] Find the next occurence of a paragraph
@@ -932,7 +932,7 @@ debug\footnotemark[1]
 \end{small}
 
 \newpage
-\section{\LaTeX\ Style Templates} 
+\section{\LaTeX\ Style Templates}
 \label{templates}
 
 \begin{itemize}
@@ -1021,7 +1021,7 @@ Subject:{<<subject>>}
 %
 \begin{slide}{<<slide_colors>>...}
 <<slide_title>>
- 
+
 <<environments>>...
 <<slide_fill>>
 \end{slide}
@@ -1098,10 +1098,10 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \thesaurus{<thesaurus_code>
 \title{<title>}
 \subtitle{<subtitle>}
-\{author{<author_name>\inst{<institute_number>\thanks{<text>}} 
+\{author{<author_name>\inst{<institute_number>\thanks{<text>}}
 \and <author_name>\inst{<institute_number>}}
 \offprints{<name>}
-\institute{<institute> 
+\institute{<institute>
 \and <institute>...}
 \date{Received date: <date>; Accepted date: <date>}
 \maketitle
@@ -1127,7 +1127,7 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \end{verbatim}
 \end{small}
 
-\item laamt---Astronomy and Astophysics with Monotype Times fonts 
+\item laamt---Astronomy and Astophysics with Monotype Times fonts
 
 \begin{small}
 \begin{verbatim}
@@ -1137,10 +1137,10 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \thesaurus{<thesaurus_code>
 \title{<title>}
 \subtitle{<subtitle>}
-\{author{<author_name>\inst{<institute_number>\thanks{<text>}} 
+\{author{<author_name>\inst{<institute_number>\thanks{<text>}}
 \and <author_name>\inst{<institute_number>}}
 \offprints{<name>}
-\institute{<institute> 
+\institute{<institute>
 \and <institute>}
 \date{Received date: <date>; Accepted date: <date>}
 \maketitle
@@ -1170,44 +1170,44 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \begin{small}
 \begin{verbatim}
-\documentstyle[<<optionlist>>,thesis]{report} 
-  
-\setlength{\textwidth}{150mm} 
-\setlength{\textheight}{223mm} 
-\setlength{\oddsidemargin}{15mm} 
-\setlength{\evensidemargin}{15mm} 
-\setlength{\topmargin}{0mm} 
-\setlength{\headheight}{0mm} 
-\setcounter{secnumdepth}{10} 
-\setcounter{tocdepth}{10} 
- 
-<<pre_commands>>... 
-  
-\title{<text>} 
-\author{<name>} 
-\department{<department>} 
-\submissiondate{<date>} 
-\degree{<degree>} 
-\faculty{<faculty>} 
-\institution{<institution>} 
-\thesis{<thesis>} 
-\ded{<dedication>} 
-  
-\begin{document} 
+\documentstyle[<<optionlist>>,thesis]{report}
 
-\maketitle{y}{y}{\input{abstract}}  
-% 
-%You must have the abstract in a file called ABSTRACT.TEX 
-% 
-\chapter{<text>} 
-<text> 
-\section{<text>} 
-<text> 
-\subsection{<text>} 
-<text> 
-\subsubsection{<text>} 
-<text> 
-\end{document} 
+\setlength{\textwidth}{150mm}
+\setlength{\textheight}{223mm}
+\setlength{\oddsidemargin}{15mm}
+\setlength{\evensidemargin}{15mm}
+\setlength{\topmargin}{0mm}
+\setlength{\headheight}{0mm}
+\setcounter{secnumdepth}{10}
+\setcounter{tocdepth}{10}
+
+<<pre_commands>>...
+
+\title{<text>}
+\author{<name>}
+\department{<department>}
+\submissiondate{<date>}
+\degree{<degree>}
+\faculty{<faculty>}
+\institution{<institution>}
+\thesis{<thesis>}
+\ded{<dedication>}
+
+\begin{document}
+
+\maketitle{y}{y}{\input{abstract}}
+%
+%You must have the abstract in a file called ABSTRACT.TEX
+%
+\chapter{<text>}
+<text>
+\section{<text>}
+<text>
+\subsection{<text>}
+<text>
+\subsubsection{<text>}
+<text>
+\end{document}
 \end{verbatim}
 \end{small}
 
@@ -1242,9 +1242,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 
@@ -1346,7 +1346,7 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \end{verbatim}
 \end{small}
 
-\item milstd---Critical Item Development Specification 
+\item milstd---Critical Item Development Specification
 
 \begin{small}
 \begin{verbatim}
@@ -1376,9 +1376,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 
@@ -1450,7 +1450,7 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \end{verbatim}
 \end{small}
 
-\item milstd---Computer Program Development Specification 
+\item milstd---Computer Program Development Specification
 
 \begin{small}
 \begin{verbatim}
@@ -1484,9 +1484,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 
@@ -1534,7 +1534,7 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \end{verbatim}
 \end{small}
 
-\item milstd---Computer Program Product Specification 
+\item milstd---Computer Program Product Specification
 
 \begin{small}
 \begin{verbatim}
@@ -1564,9 +1564,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 
@@ -1633,9 +1633,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 
@@ -1737,7 +1737,7 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \end{verbatim}
 \end{small}
 
-\item milstd---Critical Item Development Specification 
+\item milstd---Critical Item Development Specification
 
 \begin{small}
 \begin{verbatim}
@@ -1767,9 +1767,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 
@@ -1841,7 +1841,7 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \end{verbatim}
 \end{small}
 
-\item milstd---Computer Program Development Specification 
+\item milstd---Computer Program Development Specification
 
 \begin{small}
 \begin{verbatim}
@@ -1875,9 +1875,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 
@@ -1925,7 +1925,7 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 \end{verbatim}
 \end{small}
 
-\item milstd---Computer Program Product Specification 
+\item milstd---Computer Program Product Specification
 
 \begin{small}
 \begin{verbatim}
@@ -1955,9 +1955,9 @@ Data Item No. XXX  \\ % The data item number must be filled in.
 
 \section{APPLICABLE DOCUMENTS}
 .
-. \subsection's, \subsubsection's, etc. 
+. \subsection's, \subsubsection's, etc.
 . have been omitted for brevity
-.  
+.
 
 \section{REQUIREMENTS}
 

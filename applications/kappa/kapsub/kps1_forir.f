@@ -87,21 +87,21 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
- 
+
 *  Arguments Given and Returned:
       REAL A( M, N )
       REAL B( M, N )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local variables:
       REAL IM                 ! Imaginary part of complex vector
       INTEGER J                  ! Pixel count
@@ -109,26 +109,26 @@
       REAL MODUL              ! Modulus of complex vector
       REAL PHASE              ! Phase value
       REAL RL                 ! Real part of complex vector
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Just do it a pixel at a time.
       DO K = 1, N
          DO J = 1, M
- 
+
             MODUL = A( J, K )
             PHASE = B( J, K )
- 
+
             RL = MODUL * COS( PHASE )
             IM = MODUL * SIN( PHASE )
- 
+
             A( J, K ) = RL
             B( J, K ) = IM
- 
+
          END DO
       END DO
- 
+
       END

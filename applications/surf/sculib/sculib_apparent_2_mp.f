@@ -89,7 +89,7 @@
       DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION LST
       DOUBLE PRECISION MJD
-      
+
 *  Arguments Returned:
       DOUBLE PRECISION LAT
       DOUBLE PRECISION LONG
@@ -116,7 +116,7 @@
       CALL CHR_UCASE (OUT_COORDS)
 
 *     Handle each coord type in turn
-      
+
       IF ((OUT_COORDS .EQ. 'RB') .OR.
      :     (OUT_COORDS .EQ. 'RJ') .OR.
      :     (OUT_COORDS .EQ. 'GA') .OR.
@@ -133,10 +133,10 @@
 
 *     RJ->RB
          ELSE IF (OUT_COORDS .EQ. 'RB') THEN
-       
-            CALL SLA_FK54Z(RA_2000, DEC_2000, 1950.0D0, LONG, LAT, 
+
+            CALL SLA_FK54Z(RA_2000, DEC_2000, 1950.0D0, LONG, LAT,
      :           PM1, PM2)
-     
+
 *     RJ->GA
          ELSE IF (OUT_COORDS .EQ. 'GA') THEN
 
@@ -148,7 +148,7 @@
             CALL SLA_EQECL(RA_2000, DEC_2000, MJD, LONG, LAT)
 
          END IF
-         
+
       ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
 
          HA = LST - RA_APP

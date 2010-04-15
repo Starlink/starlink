@@ -1,8 +1,8 @@
 *+ POLTHRESHSUB - sets pixels in array to defined new values outside limits
 
 	SUBROUTINE POLTHRESHSUB( INARRAY1, INARRAY2, INARRAY3, INARRAY4,
-     :	                         OUTARRAY1, OUTARRAY2, OUTARRAY3, 
-     :                           OUTARRAY4, DIMS1, DIMS2, THRLO, NUMPTY, 
+     :	                         OUTARRAY1, OUTARRAY2, OUTARRAY3,
+     :                           OUTARRAY4, DIMS1, DIMS2, THRLO, NUMPTY,
      :                           STATUS )
 
 *    Description :
@@ -15,8 +15,8 @@
 *
 *    Invocation :
 *
-*     CALL POLTHRESHSUB( INARRAY1, INARRAY2, INARRAY3, INARRAY4, 
-*                        OUTARRAY1, OUTARRAY2, OUTARRAY3, OUTARRAY4, 
+*     CALL POLTHRESHSUB( INARRAY1, INARRAY2, INARRAY3, INARRAY4,
+*                        OUTARRAY1, OUTARRAY2, OUTARRAY3, OUTARRAY4,
 *                        DIMS, THRLO, NUMPTY, STATUS )
 *
 *    Parameters :
@@ -44,7 +44,7 @@
 *
 *    Method :
 *
-*     Check for error on entry - return if not o.k. 
+*     Check for error on entry - return if not o.k.
 *     For all pixels of input arrays
 *        If one is value less than lower threshold THRLO
 *           Set new value to0.0
@@ -68,7 +68,7 @@
 *
 *     29-01-1982 : First implementation (ROE::BDK)
 *     04-06-1985 : Revised to take status parameter, to take different
-*                : new values for upper and lower thresholds, and 
+*                : new values for upper and lower thresholds, and
 *                : redocumented SSE / ADAM style (REVA::MJM)
 *                : (Also changed last section - seemed crazy)
 *     02-09-1985 : Renamed THRESHSUB (REVA::MJM)
@@ -99,7 +99,7 @@
 
 *    Export :
 
-      INTEGER 
+      INTEGER
      :	  NUMPTY
 
       REAL
@@ -133,7 +133,7 @@
 
             IF ( INARRAY1( I, J ) .LT. THRLO .OR.
      :	         INARRAY2( I, J ) .LT. THRLO .OR.
-     :	         INARRAY3( I, J ) .LT. THRLO .OR. 
+     :	         INARRAY3( I, J ) .LT. THRLO .OR.
      :	         INARRAY4( I, J ) .LT. THRLO ) THEN
 
 *             one of input pixel values is less than lower threshold - set

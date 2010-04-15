@@ -24,7 +24,7 @@
 *
 *     Creating a temporary file which is displayed and then deleted
 *     seems a rather clumsy way of doing things. Perhaps with a little
-*     more time and thought a better way of displaying the latest 
+*     more time and thought a better way of displaying the latest
 *     standard-divided frame could be divised.
 *    Bugs :
 *    Authors :
@@ -39,7 +39,7 @@
 *     21-Feb-1991: NOBJ and NSKY included in CRED4_SHOW_GRP.(SMB)
 *     01-Jul-1991: Add POLYFIT option                       (PND)
 *     16-Aug-1991: Minor cosmetic change to PF_POLYFIT      (PND)
-*     18-Oct-1991: If polysky worked, pass the fitted 
+*     18-Oct-1991: If polysky worked, pass the fitted
 *                  group onto divide by standard            (PND)
 *      9-Jul-1992: Comment out some VERBOSE debugging code  (PND)
 *     12-Feb-1993: Conform to error strategy                (PND)
@@ -126,10 +126,10 @@
 *      Convert the observation file name, together with the
 *      group number obtained above, into the name of the
 *      reduced group file.
-*      (Development note: This utility routine was copied from the 
+*      (Development note: This utility routine was copied from the
 *      RED4_LIB library. Perhaps it should be moved to a central
 *      utility library ?)
-         CALL CRED4_ROBSTOGRP( OBSRED, GRPNUM, GROUP, DSA_STATUS ) 
+         CALL CRED4_ROBSTOGRP( OBSRED, GRPNUM, GROUP, DSA_STATUS )
       ELSE
 
          TYPEOK = .FALSE.
@@ -142,11 +142,11 @@
 *   is acceptable.
       IF ( ( DSA_STATUS .EQ. SAI__OK ) .AND. (TYPEOK) )THEN
 
-*      Check that the group is composed of a sensible mixture of 
-*      OBJECT and SKY observations (i.e. it either has no SKY 
+*      Check that the group is composed of a sensible mixture of
+*      OBJECT and SKY observations (i.e. it either has no SKY
 *      contribution, or the SKY and OBJECT exposures are the same).
          CALL CRED4_CHECK_GRP( GROUP, NOBJ, NSKY, EXPOSED, SKYEXP,
-     :     SKYOK, STATUS ) 
+     :     SKYOK, STATUS )
 
 *      Check this has worked.
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -174,7 +174,7 @@
                   ELSE
 
                      POLYFITTED = .FALSE.
-                  ENDIF 
+                  ENDIF
 
 *               If POLYFITTED, alter group name
                   IF ( POLYFITTED ) THEN
@@ -222,13 +222,13 @@
                      IF ( DISPLAY_GRP(I).EQ.'ASK' .OR. DISPLAY_GRP(I).EQ.'ask' ) THEN
                         ASK = .TRUE.
                         CALL CHR_ITOC( I, CPORT, CPOS )
-                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                         CALL CRED4_DISPLAY( INVAL, 'GROUP', ASK, WAIT, STATUS )
 
                      ELSE IF ( DISPLAY_GRP(I).EQ.'YES' .OR. DISPLAY_GRP(I).EQ.'yes' ) THEN
                         ASK = .FALSE.
                         CALL CHR_ITOC( I, CPORT, CPOS )
-                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                         CALL CRED4_DISPLAY( INVAL, 'GROUP', ASK, WAIT, STATUS )
 
                      ELSE IF ( DISPLAY_GRP(I).EQ.'NO' .OR. DISPLAY_GRP(I).EQ.'no' ) THEN
@@ -259,7 +259,7 @@
                      CLEN = MAX( 1, CHR_LEN( GROUP ) )
                      TEMP = GROUP(1:CLEN) // '_spc'
                      TEMP2 = GROUP(1:CLEN) // '_imspc'
-                     CALL CRED4_EXTRACT_SPC( GROUP, TEMP, TEMP2, 
+                     CALL CRED4_EXTRACT_SPC( GROUP, TEMP, TEMP2,
      :                 ASK, WAIT, EXTRACTED, STATUS )
                   ELSE
 
@@ -285,13 +285,13 @@
                      IF ( DISPLAY_SPC(I).EQ.'ASK' .OR. DISPLAY_SPC(I).EQ.'ask' ) THEN
                         ASK = .TRUE.
                         CALL CHR_ITOC( I, CPORT, CPOS )
-                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                         CALL CRED4_DISPLAY( INVAL, 'SPECTRUM', ASK, WAIT, STATUS )
 
                      ELSE IF ( DISPLAY_SPC(I).EQ.'YES' .OR. DISPLAY_SPC(I).EQ.'yes' ) THEN
                         ASK = .FALSE.
                         CALL CHR_ITOC( I, CPORT, CPOS )
-                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS) 
+                        INVAL =  'DISPLAY DATA=' // GROUP(1:CHR_LEN(GROUP)) // ' PORT=' // CPORT(1:CPOS)
                         CALL CRED4_DISPLAY( INVAL, 'SPECTRUM', ASK, WAIT, STATUS )
 
                      ELSE IF ( DISPLAY_SPC(I).EQ.'NO' .OR. DISPLAY_SPC(I).EQ.'no' ) THEN

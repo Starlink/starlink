@@ -27,7 +27,7 @@
 *
 * History:
 *  Altered to set descriptor, TNW 23/8/88
-*  Altered to use MAPCHR, TNW 11/10/88, also use of dta_tyvar 
+*  Altered to use MAPCHR, TNW 11/10/88, also use of dta_tyvar
 *  eliminated.
 *  Altered to use ACCRES TNW 18/10/88
 *  Spurious call to fig_dtaerr removed, TNW 27/1/89
@@ -184,7 +184,7 @@ C     print *,'map_str5'
 
 *             call dat_state(nloc,defined,status)
 *             if (defined) then
-*             call dat_get0c(nloc, parval, status)	               
+*             call dat_get0c(nloc, parval, status)
 *             else
 *	     print *,'Not defined'
 *             endif
@@ -204,7 +204,7 @@ C     print *,'params'
 *      idsend = idsptr + nyp*10 - 1
 
 *16/6 changed work ' ' to 0
-      
+
        call accres(' ','more.ids','rc',10*nyp,0,idstring(:10*nyp),
      :            status)
 
@@ -241,7 +241,7 @@ C     print *,'map_str'
 *     Copy over contents of old results and control arrays
 
       if(resnam.ne.'   ') then
-      
+
 *  Map data, this may be done twice (but that shouldn't matter). copy_res
 *  calls init_res which needs the wavelength axis (or 2nd axis for comb),
 *  and may need the main data array (3-d data only).

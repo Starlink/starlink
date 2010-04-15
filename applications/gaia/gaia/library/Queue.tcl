@@ -23,7 +23,7 @@
 #     Performs the given method on this object.
 
 #  Methods:
-#     
+#
 #     push string
 #
 #   Push a string onto the queue.
@@ -90,7 +90,7 @@ itcl::class gaia::Queue {
       incr high_
    }
    public method pop {} {
-      if { $high_ > $low_ } { 
+      if { $high_ > $low_ } {
          set value $queue_($low_)
          unset queue_($low_)
          incr low_

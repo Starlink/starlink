@@ -9,12 +9,12 @@ F77_INTEGER_FUNCTION(con_cwrit)( CHARACTER(data) TRAIL(data) ){
 /*
  *  Name:
  *    con_cwrit
- 
+
  *  Purpose:
  *    Provides access to the C "fwrite" function from Fortran
  *    for CHARACTER data.
 
- *  Notes: 
+ *  Notes:
  *    This routine forces the length of any string printed to be a
  *    multiple of 4.
 
@@ -29,7 +29,7 @@ F77_INTEGER_FUNCTION(con_cwrit)( CHARACTER(data) TRAIL(data) ){
  *    ISTAT = INTEGER (Returned)
  *        Status: 0 = failure, 1 = success
 
- */   
+ */
       GENPTR_CHARACTER(data)
 
       unsigned int n=0;
@@ -57,7 +57,7 @@ F77_INTEGER_FUNCTION(con_cwrit)( CHARACTER(data) TRAIL(data) ){
 
 /*     Write out the appropriate C string terminator. */
          switch (n)
-           {        
+           {
            case (1):
              fprintf( fd, "\n");
              break;

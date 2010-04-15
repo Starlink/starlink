@@ -1,6 +1,6 @@
        SUBROUTINE DASHIT
      : (CMD,IXS,NV,PARAMS,VSIZE,MAXSTK,NONSTK,VARRAY,OK)
- 
+
 *
 *  decodes strings of form " n1 - n2 " into array
 *  of real numbers
@@ -13,11 +13,11 @@
 *  IXS - integer containing number of invalid entries
 *  OK - TRUE on success
 *
- 
+
        IMPLICIT NONE
- 
+
 *
- 
+
        INTEGER NV, VSIZE, MAXSTK, NONSTK
        REAL VARRAY(VSIZE)
        LOGICAL OK
@@ -25,37 +25,37 @@
        CHARACTER*(*) CMD
        CHARACTER*1 BLEEP
        COMMON /BLEEP / BLEEP
- 
+
        INTEGER IDASH, IX, I1, I2, INCR, SL, SLEN
        INTEGER II, IXS, IXD, IMIN
        REAL TVARS(2)
        LOGICAL NODASH
        CHARACTER*20 SUBSTR
- 
+
 *
 *  Initialise
 *
- 
+
        NV = 0
        IXS = 0
        IXD = 0
        OK = .TRUE.
        NODASH = .FALSE.
- 
+
 *
 *  Look for "-"
 *
- 
+
        DO 200 WHILE (.NOT.NODASH)
- 
+
           IDASH = INDEX(PARAMS,'-')
- 
+
           IF (IDASH.EQ.0) THEN
              NODASH = .TRUE.
           ELSE
- 
+
 *  Find length of string associated with dash (I1-I2)
- 
+
              DO 20 IX = IDASH - 1, 1, -1
                 IF (PARAMS(IX:IX).NE.' ') THEN
                    DO 5 II = IX, 1, -1
@@ -75,7 +75,7 @@
      :       CMD
              GOTO 300
 *  Start of string found
- 
+
    40        CONTINUE
              SL = SLEN(PARAMS)
              DO 60 IX = IDASH + 1, SL, 1
@@ -97,21 +97,21 @@
      :       CMD
              GOTO 300
 *  End of string found
- 
+
 *
 *  Decode substring to obtain limits
 *
- 
+
    80        CONTINUE
              PARAMS(IDASH:IDASH) = ' '
              SUBSTR = PARAMS(I1:I2)
              PARAMS(I1:I2) = ' '
- 
+
              CALL DECODE(CMD,SUBSTR,2,2,TVARS,' ',OK)
              IF (.NOT.OK) GOTO 300
- 
+
 *  Load VARRAY
- 
+
              I1 = NINT(MIN(TVARS(1),TVARS(2)))
              I2 = NINT(MAX(TVARS(1),TVARS(2)))
              INCR = 1
@@ -148,13 +148,13 @@
   100        CONTINUE
 *             IF (IXD.NE.0) THEN
 *                WRITE (*,
-*     :          '(''   DEL: '',I<(NINT(LOG10(REAL(IXD)))+1.0)>,         
-*     :          '' specified entries already empty'',A)') 
+*     :          '(''   DEL: '',I<(NINT(LOG10(REAL(IXD)))+1.0)>,
+*     :          '' specified entries already empty'',A)')
 *     :          IXD, BLEEP
 *             ENDIF
- 
+
           ENDIF
- 
+
   200  CONTINUE
 
   300  CONTINUE

@@ -26,7 +26,7 @@ C     ..
 C     .. Local Arrays ..
       REAL*8 L(IMNUM+1,IMNUM+1),Y(IMNUM+1)
 C     ..
-      
+
  10   CONTINUE
 C     ..
       L(1,1) = DSQRT(A(1,1))
@@ -39,7 +39,7 @@ C     ..
  40            CONTINUE
                L(K,J) = SUM/L(J,J)
             ENDIF
-            
+
  30      CONTINUE
          SUM = A(K,K)
          DO 50 I = 1,K - 1
@@ -47,15 +47,15 @@ C     ..
  50      CONTINUE
          IF (SUM.LE.0.d0) THEN
             GOTO 60
-            
+
          ELSE
-            
+
             L(K,K) = DSQRT(SUM)
          ENDIF
-         
+
  20   CONTINUE
       GOTO 70
-      
+
  60   WRITE (*,FMT='(a)') ' **** warning matrix ill-conditioned ****'
       AVEIGV = A(1,1)
       DO 80 I = 2,N

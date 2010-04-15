@@ -1,9 +1,9 @@
       INTEGER FUNCTION GRCURS(IDENT,IX,IY,IXREF,IYREF,MODE,POSN,CH)
 *+
 *
-*     - - - - - - - -  
+*     - - - - - - - -
 *       G R C U R S
-*     - - - - - - - -  
+*     - - - - - - - -
 *
 *   Returns cursor position and key selected by the user
 *
@@ -111,9 +111,9 @@
          CALL GRQREP('GRCURS', 'GQNT', IERR)
          GO TO 9000
       END IF
-      XNDC = VIEWP(1) + (REAL(IX) - WINDO(1)) * 
+      XNDC = VIEWP(1) + (REAL(IX) - WINDO(1)) *
      :          (VIEWP(2) - VIEWP(1)) / (WINDO(2) - WINDO(1))
-      YNDC = VIEWP(3) + (REAL(IY) - WINDO(3)) * 
+      YNDC = VIEWP(3) + (REAL(IY) - WINDO(3)) *
      :          (VIEWP(4) - VIEWP(3)) / (WINDO(4) - WINDO(3))
 
 *   Check that it is inside the workstation window
@@ -139,7 +139,7 @@
       CALL GPREC(5, IA, 0, RA, 0, 1, " ", 1, IER, LIESC, IESCDR)
       CALL GESC(-1, LIESC, IESCDR, 1, LOESC, OESCDR)
 
-*   Request the cursor position 
+*   Request the cursor position
       CALL GRQLC(GRWKID(GRCIDE),1,ISTAT,ITR,X,Y)
       IF (ISTAT.EQ.GNONE) THEN
 
@@ -156,7 +156,7 @@
       CALL GESC(-2, LIESC, IESCDR, 1, LOESC, OESCDR)
 
 *   Convert key hit as returned by RAL-GKS to an ASCII code. GKS returns the
-*   character position in the ASCII order with space = 1. NOCHOICE for 
+*   character position in the ASCII order with space = 1. NOCHOICE for
 *   carriage return and NONE for other non-printing characters. NONE is
 *   mapped to delete.
 
@@ -174,9 +174,9 @@
          CALL GRQREP('GRCURS', 'GQNT', IERR)
          GO TO 9000
       END IF
-      XNDC = VIEWP1(1) + (X - WINDO1(1)) * 
+      XNDC = VIEWP1(1) + (X - WINDO1(1)) *
      :          (VIEWP1(2) - VIEWP1(1)) / (WINDO1(2) - WINDO1(1))
-      YNDC = VIEWP1(3) + (Y - WINDO1(3)) * 
+      YNDC = VIEWP1(3) + (Y - WINDO1(3)) *
      :          (VIEWP1(4) - VIEWP1(3)) / (WINDO1(4) - WINDO1(3))
 
 *   Convert to absolute coordinates

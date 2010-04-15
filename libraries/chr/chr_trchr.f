@@ -15,9 +15,9 @@
 *  Description:
 *     Translate a specified set of characters within a string. The
 *     character translation is controlled by the translation table
-*     given by the character strings FROM and TO. Any characters 
+*     given by the character strings FROM and TO. Any characters
 *     not appearing in the translation table are left unchanged.
-*     If the status is set on entry, no action is taken. If the 
+*     If the status is set on entry, no action is taken. If the
 *     strings FROM and TO are unequal in length, STATUS is returned
 *     set to SAI__ERROR.
 
@@ -34,7 +34,7 @@
 *        corresponding character specified in the TO argument. All
 *        other characters are left unchanged.
 *     STATUS = INTEGER (Given and Returned)
-*        The global status: returned set to SAI__ERROR if FROM and TO 
+*        The global status: returned set to SAI__ERROR if FROM and TO
 *        have unequal lengths.
 
 *  Copyright:
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

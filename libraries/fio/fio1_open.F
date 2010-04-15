@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,7 +121,7 @@
 *  Local Variables:
       INTEGER SYSERR             ! The Fortran I/O status value
       LOGICAL LREC               ! Internal copy of RECLEN
-      CHARACTER * ( 6 ) POSITION ! POSITION= value when used 
+      CHARACTER * ( 6 ) POSITION ! POSITION= value when used
 *.
 
 *  Check inherited global status.
@@ -143,7 +143,7 @@
       LREC = RECLEN
 #else
 *  RECLEN with sequential files is not supported so bypass code path
-      LREC = .FALSE.      
+      LREC = .FALSE.
 #endif
 
 *  Check for correct method to append. Prefer POSITION='APPEND' to keep
@@ -172,10 +172,10 @@
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
-     :               CARRIAGECONTROL=CC, 
+     :               CARRIAGECONTROL=CC,
 #endif
 #if HAVE_FC_OPEN_READONLY
-     :               READONLY, 
+     :               READONLY,
 #endif
 #if HAVE_FC_OPEN_POSITIONAPPEND
      :               POSITION=POSITION,
@@ -185,7 +185,7 @@
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
-     :               CARRIAGECONTROL=CC, 
+     :               CARRIAGECONTROL=CC,
 #endif
 #if HAVE_FC_OPEN_POSITIONAPPEND
      :               POSITION=POSITION,
@@ -217,7 +217,7 @@
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
-     :               CARRIAGECONTROL=CC, 
+     :               CARRIAGECONTROL=CC,
 #endif
 #if HAVE_FC_OPEN_READONLY
      :               READONLY,
@@ -229,7 +229,7 @@
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
-     :                  CARRIAGECONTROL=CC, 
+     :                  CARRIAGECONTROL=CC,
 #endif
 #if HAVE_FC_OPEN_POSITIONAPPEND
      :                  POSITION=POSITION,
@@ -248,7 +248,7 @@
      :                  ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
-     :                  ACCESS=ACCESS, ERR=10, 
+     :                  ACCESS=ACCESS, ERR=10,
 #if HAVE_FC_OPEN_POSITIONAPPEND
      :                  POSITION=POSITION,
 #endif

@@ -84,7 +84,7 @@
                                  ! trailing blanks
      :  GTHLPI,                  ! Routine for reading help command
      :  HLP_HELP,                ! Interactive help
-     :  PTHLPO                   ! Routine for outputting help 
+     :  PTHLPO                   ! Routine for outputting help
 
       EXTERNAL
      :  GTHLPI,                  ! Gets the help information

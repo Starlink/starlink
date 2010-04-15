@@ -2,8 +2,8 @@
       stcschan-demo2.c
 
    Purpose:
-      A demonstration of the facilities provided by the AST library 
-      for reading STC metadata encoded using the STC-S linear string 
+      A demonstration of the facilities provided by the AST library
+      for reading STC metadata encoded using the STC-S linear string
       format.
 
    Description:
@@ -17,7 +17,7 @@
       invalid WCS axis values (such as most all sky maps, for instance).
 
    Usage:
-      % stcschan-demo2 <header-file> 
+      % stcschan-demo2 <header-file>
 
       <header-file>: The path to a text file containing a set of FITS-WCS
       headers.
@@ -94,39 +94,39 @@ int main( int argc, char **argv ){
 /* If a disk file was opened successfully... */
    if( !status ) {
 
-/* Start an AST object context. This means we do not need to annull 
-   each AST Object individually. Instead, all Objects created within 
+/* Start an AST object context. This means we do not need to annull
+   each AST Object individually. Instead, all Objects created within
    this context will be annulled automatically by the corresponding
    invocation of astEnd. */
       astBegin;
 
 /* Create a FitsChan. This is the object that converts external FITS
-   headers into corresponding AST Objects. Tell it to use the "source" 
+   headers into corresponding AST Objects. Tell it to use the "source"
    function for obtaining lines of text from the disk file. */
       fchan = astFitsChan( source, NULL, " " );
 
 /* Associate the descriptor for the input disk file with the StcsChan.
    This makes it available to the "source" function. Since this
-   application is single threaded, we could instead have made "fd" a 
-   global variable, but the ChannelData facility is used here to illustrate 
-   how to pass data to a source or sink function safely in a multi-threaded 
+   application is single threaded, we could instead have made "fd" a
+   global variable, but the ChannelData facility is used here to illustrate
+   how to pass data to a source or sink function safely in a multi-threaded
    application. */
       astPutChannelData( fchan, fd );
 
 /* Attempt to read the FITS heades and convert them into an AST FrameSet. */
       object = astRead( fchan );
-      
+
 /* The astRead function is a generic function and so returns a generic
    AstObject pointer. Check an Object was created successfully. */
       if( !object ) {
-         printf( "Failed to read an AST Object from file '%s'.\n", 
+         printf( "Failed to read an AST Object from file '%s'.\n",
                  argv[ 1 ] );
          status = 1;
 
 /* Now check that the object read is actually an AST FrameSet, rather than
    some other class of AST Object. */
-      } else if( !astIsAFrameSet( object ) ) {      
-         printf( "Expected a FrameSet but read a %s from file '%s'.\n", 
+      } else if( !astIsAFrameSet( object ) ) {
+         printf( "Expected a FrameSet but read a %s from file '%s'.\n",
                  astGetC( object, "Class" ), argv[ 1 ] );
          status = 1;
 
@@ -134,20 +134,20 @@ int main( int argc, char **argv ){
    returned by astRead as a FrameSet pointer. Do the cast now to avoid
    repeated casting in future. */
       } else {
-         frameset = (AstFrameSet *) object;      
+         frameset = (AstFrameSet *) object;
 
-/* Get a pointer to the Frame that describes the attributes of the FITS 
+/* Get a pointer to the Frame that describes the attributes of the FITS
    world coordinate system. This is the current Frame in the FrameSet
    read from the FITS headers. */
          wcsfrm = astGetFrame( frameset, AST__CURRENT );
 
-/* Get a pointer to the Frame that describes the attributes of the FITS 
+/* Get a pointer to the Frame that describes the attributes of the FITS
    pixel coordinate system. This is the base Frame in the FrameSet
    read from the FITS headers. */
          pixfrm = astGetFrame( frameset, AST__BASE );
 
 /* Get the Mapping that transforms pixel positions into WCS positions.
-   The is the Mapping from base to current Frame in the  FrameSet read 
+   The is the Mapping from base to current Frame in the  FrameSet read
    from the FITS headers. */
          pix2wcs = astGetMapping( frameset, AST__BASE, AST__CURRENT );
 
@@ -156,10 +156,10 @@ int main( int argc, char **argv ){
 
 /* For each pixel axis, form the name of the corresponding NAXISi
    keyword. */
-         for( axis = 0; axis < naxis; axis++ ) { 
+         for( axis = 0; axis < naxis; axis++ ) {
             sprintf( keyword, "NAXIS%d", axis + 1 );
 
-/* Store the pixel coordinate on the current axis at the lower left corner 
+/* Store the pixel coordinate on the current axis at the lower left corner
    of the first pixel. */
             p1[ axis ] = 0.5;
 
@@ -189,14 +189,14 @@ int main( int argc, char **argv ){
          wcsbox = astMapRegion( pixbox, pix2wcs, wcsfrm );
 
 /* Create an StcsChan. This is the object that converts (either way)
-   between external STC-S descriptions and their corresponding AST Objects. 
-   Tell it to use the "source" function for obtaining lines of text from 
-   the disk file. Also tell it to store all warnings generated by the 
-   conversion for later use. Other attributes of the StcsChan class retain 
+   between external STC-S descriptions and their corresponding AST Objects.
+   Tell it to use the "source" function for obtaining lines of text from
+   the disk file. Also tell it to store all warnings generated by the
+   conversion for later use. Other attributes of the StcsChan class retain
    their default values. */
          schan = astStcsChan( NULL, NULL, "ReportLevel=3" );
 
-/* Attempt to write out the Region describing the pixel array (in WCS) 
+/* Attempt to write out the Region describing the pixel array (in WCS)
    as an STC-S description. Report an error if this fails. */
          if( ! astWrite( schan, wcsbox ) && astOK ) {
             printf( "Failed to convert the Region into an STC-S "
@@ -206,7 +206,7 @@ int main( int argc, char **argv ){
 
 /* We asked the StcsChan to record any warnings that were generated
    whilst converting the AST Region into a corresponding STC-S description.
-   We now see if any such warnings were generated by the earlier call to 
+   We now see if any such warnings were generated by the earlier call to
    astWrite. */
       warnings = astWarnings( schan );
 
@@ -227,7 +227,7 @@ int main( int argc, char **argv ){
             } else {
                break;
             }
-         }             
+         }
       }
 
 /* End the AST Object context. All Objects created since the

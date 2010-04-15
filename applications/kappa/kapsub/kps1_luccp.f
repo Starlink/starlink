@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_LUCCP( XMARG, YMARG, DIM1, DIM2, IN, NPIX, NLIN, 
+      SUBROUTINE KPS1_LUCCP( XMARG, YMARG, DIM1, DIM2, IN, NPIX, NLIN,
      :                       OUT, MEAN, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LUCCP( XMARG, YMARG, DIM1, DIM2, IN, NPIX, NLIN, OUT, 
+*     CALL KPS1_LUCCP( XMARG, YMARG, DIM1, DIM2, IN, NPIX, NLIN, OUT,
 *                      MEAN, STATUS )
 
 *  Description:
@@ -92,7 +92,7 @@
       REAL     IN( DIM1, DIM2 )
       INTEGER  NPIX
       INTEGER  NLIN
-      
+
 *  Arguments Returned:
       REAL     OUT( NPIX, NLIN )
       REAL     MEAN
@@ -127,7 +127,7 @@
                MEAN = MEAN + IN( PIX, LIN )
                NGOOD = NGOOD + 1
             END IF
-            
+
          END DO
       END DO
 

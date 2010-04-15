@@ -22,7 +22,7 @@
 *        The x component of the vectors reference position, in the
 *        current PGPLOT window.
 *     Y = REAL (Given)
-*        The y component of the vectors reference position, in the 
+*        The y component of the vectors reference position, in the
 *         current PGPLOT window.
 *     JUST = CHARACTER * ( * ) (Given)
 *        Specifies the disposition of the vector with respect to the
@@ -49,7 +49,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,17 +102,17 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Store the COS and SIN of the vector orientation.
-      SINANG = SIN( VECANG ) 
-      COSANG = COS( VECANG ) 
+      SINANG = SIN( VECANG )
+      COSANG = COS( VECANG )
 
 *  Find the x and y components of the vector.
       VECX = -VECLEN * SINANG
-      VECY = VECLEN * COSANG 
+      VECY = VECLEN * COSANG
 
 *  Note the position of the point of the arrowhead.
       IF ( JUST .EQ. 'CENTRE' ) THEN
          AX = X + 0.5 * VECX
-         AY = Y + 0.5 * VECY 
+         AY = Y + 0.5 * VECY
       ELSE IF ( JUST .EQ. 'START' ) THEN
          AX = X + VECX
          AY = Y + VECY
@@ -131,7 +131,7 @@
 *  Calculate the co-ordinates of the end of the first arrow stroke by
 *  multiplying by the rotation matrix.
          FINISH( 1 ) = AX + AHSIZE * ( SINANG * COSA - COSANG * SINA )
-         FINISH( 2 ) = AY - AHSIZE * ( SINANG * SINA + COSANG * COSA ) 
+         FINISH( 2 ) = AY - AHSIZE * ( SINANG * SINA + COSANG * COSA )
 
 *  Draw the first arrow stroke.
          CALL PGMOVE( AX, AY )
@@ -139,8 +139,8 @@
 
 *  Calculate the co-ordinates of the end of the second arrow stroke by
 *  multiplying by the rotation matrix.
-         FINISH( 1 ) = AX + AHSIZE * ( SINANG * COSA + COSANG * SINA ) 
-         FINISH( 2 ) = AY - AHSIZE * ( -SINANG * SINA + COSANG * COSA ) 
+         FINISH( 1 ) = AX + AHSIZE * ( SINANG * COSA + COSANG * SINA )
+         FINISH( 2 ) = AY - AHSIZE * ( -SINANG * SINA + COSANG * COSA )
 
 *  Draw the second arrow stroke.
          CALL PGMOVE( AX, AY )

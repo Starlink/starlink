@@ -95,7 +95,7 @@
 *        [TRUE]
 *     CORRECT = LITERAL (Read)
 *        The name of the file used to output the scale and zero-point
-*        corrections (see SCALE and ZERO parameters). This file can be 
+*        corrections (see SCALE and ZERO parameters). This file can be
 *        read by the DRIZZLE task.  If the file already exists, it is
 *        overwritten.  If a null (!) value is supplied, or if SCALE and
 *        ZERO are both set to FALSE, no file is written.
@@ -705,7 +705,7 @@
 *     26-NOV-1998 (PDRAPER):
 *        Now propagates NDF WCS components.
 *     15-JAN-1999 (PDRAPER):
-*        Added changed to support estimation of output variances from 
+*        Added changed to support estimation of output variances from
 *        input data.
 *     13-SEP-1999 (AALLAN):
 *        Added WRITESZ and CORRECT parameters and associated chaanges
@@ -1228,7 +1228,7 @@
             NCMP0 = NCMP
             CALL PSX_CALLOC( NCMP0, '_INTEGER', WRK2, STATUS )
             CALL CCD1_PRUNE( OPTOV, NCMP0, CCD1_IPAIR, NPIX, NNDF,
-     :                       %VAL( CNF_PVAL( WRK1 ) ), NCMP, 
+     :                       %VAL( CNF_PVAL( WRK1 ) ), NCMP,
      :                       %VAL( CNF_PVAL( WRK2 ) ), STATUS )
             CALL PSX_FREE( WRK2, STATUS )
          END IF
@@ -1451,8 +1451,8 @@
 *  additional reference NDF, if provided.
          CALL CCD1_SZSLV( GETS, GETZ, NNDF, NCMP, NMAX, SCALE, DSCALE,
      :                    ZERO, DZERO, ORIGIN, %VAL( CNF_PVAL( WRK1 ) ),
-     :                    %VAL( CNF_PVAL( WRK2 ) ), 
-     :                    %VAL( CNF_PVAL( WRK3 ) ), 
+     :                    %VAL( CNF_PVAL( WRK2 ) ),
+     :                    %VAL( CNF_PVAL( WRK3 ) ),
      :                    %VAL( CNF_PVAL( WRK4 ) ),
      :                    %VAL( CNF_PVAL( WRK5 ) ), STATUS )
 
@@ -1513,7 +1513,7 @@
          END IF
          IF ( STATUS .NE. SAI__OK ) GO TO 99
       END IF
-      
+
 *  If we want the SCALE and ZERO point information to be written to a
 *  file then we do so here -- this file can be input into the DRIZZLE
 *  program via the CORRECT parameter.
@@ -1545,20 +1545,20 @@
             WRITE( UNIT, '(A)' ) '#'
             DO I = 1, NIN
                IF ( GETS .AND. GETZ ) THEN
-                  WRITE( UNIT, * ) I, SCALE( I ), 
+                  WRITE( UNIT, * ) I, SCALE( I ),
      :                             ZERO( I ) - SCALE( I ) * ORIGIN( I )
                ELSE IF ( .NOT. GETS ) THEN
-                  WRITE( UNIT, * ) I, 1.0D0, 
-     :                             ZERO( I ) - SCALE( I ) * ORIGIN( I ) 
+                  WRITE( UNIT, * ) I, 1.0D0,
+     :                             ZERO( I ) - SCALE( I ) * ORIGIN( I )
                ELSE IF( .NOT. GETZ ) THEN
                   WRITE( UNIT, * ) I, SCALE( I ), 0.0D0
-               ENDIF                           
+               ENDIF
             END DO
             CALL FIO_CLOSE( FDSZ, STATUS )
          END IF
 
       ENDIF
-     
+
 *  Display information about the output mosaic.
 *  ===========================================
 *  If an output mosaic is being generated, then display a heading.
@@ -1681,13 +1681,13 @@
       CALL CCD1_DOMOS( NIN, NDF, LBND, UBND, ADJUST, SCALE, DSCALE,
      :                 ZERO, DZERO, ORIGIN, MODIFY, DOOUT, USEVAR,
      :                 GENVAR, USEWT, WEIGHT, IMETH, ALPHA, NSIGMA,
-     :                 NITER, RMIN, RMAX, NDFOUT, 
+     :                 NITER, RMIN, RMAX, NDFOUT,
      :                 %VAL( CNF_PVAL( WRK1 ) ),
-     :                 %VAL( CNF_PVAL( WRK2 ) ), 
-     :                 %VAL( CNF_PVAL( WRK3 ) ), 
+     :                 %VAL( CNF_PVAL( WRK2 ) ),
+     :                 %VAL( CNF_PVAL( WRK3 ) ),
      :                 %VAL( CNF_PVAL( WRK4 ) ),
-     :                 %VAL( CNF_PVAL( WRK5 ) ), 
-     :                 %VAL( CNF_PVAL( WRK6 ) ), 
+     :                 %VAL( CNF_PVAL( WRK5 ) ),
+     :                 %VAL( CNF_PVAL( WRK6 ) ),
      :                 %VAL( CNF_PVAL( WRK7 ) ),
      :                 STATUS )
 

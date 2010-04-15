@@ -132,7 +132,7 @@
 
 /* Release the Logical Record Block.                                        */
       if ( lrb != NULL ) rec_release_block( han->slot, han->rid.bloc );
-   
+
 /* Return the current global status value.                                  */
       return hds_gl_status;
    }

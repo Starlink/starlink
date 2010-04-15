@@ -16,7 +16,7 @@
 
 *  Description:
 *     Given all of the relevant map parameters and data this routine
-*     produces the equivalent single beam map and errors from dual beam 
+*     produces the equivalent single beam map and errors from dual beam
 *     data
 
 *  Arguments:
@@ -39,7 +39,7 @@
 *        UNBAL = amp(lhb) / abs(amp(rhb))
 *     CFUNC( * ) = REAL (Given)
 *        workspace for the convolution array it should be at least
-*        NX*2+1 
+*        NX*2+1
 *     ZOUT( NX, NY ) = REAL (Returned)
 *        The restored map
 *     ERROUT( NX, NY) = REAL (Returned)
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -79,7 +79,7 @@
       REAL ERRIN (NX, NY)
       REAL FBAD
       REAL CFUNC (*)             ! work array to contain correlation
-                                 ! function 
+                                 ! function
 
 *  Arguments Returned:
       REAL ZOUT (NX, NY)
@@ -117,10 +117,10 @@
 *  If the beams are equal then the data should contain NO information
 *  at the spatial frequency of the beam-throw or its harmonics. Any
 *  signal that is there must be noise. This can be removed in the Fourier
-*  domain by multiplying the signal by a function with zeroes at the 
-*  frequencies of zero sensitivity and 1 everywhere else. The same 
-*  effect is achieved by convolving the inverse FT of this with the map 
-*  data. This is NOD2's `symmetric function'. JCMT_GENSYCONFN generates the 
+*  domain by multiplying the signal by a function with zeroes at the
+*  frequencies of zero sensitivity and 1 everywhere else. The same
+*  effect is achieved by convolving the inverse FT of this with the map
+*  data. This is NOD2's `symmetric function'. JCMT_GENSYCONFN generates the
 *  required function.
 
       IF (ABS(ABS(UNBAL) - 1.0) .LT. 0.005) THEN
@@ -132,7 +132,7 @@
 
          DO IY = 1, NY
 
-            CALL JCMT_CONVOLVE_ERRORS (ZIN(1,IY), ERRIN(1,IY), CFUNC, 
+            CALL JCMT_CONVOLVE_ERRORS (ZIN(1,IY), ERRIN(1,IY), CFUNC,
      :         NX, NCFN, NX, FBAD, RNORM, BUFF, BUFERR, STATUS)
             DO IX = 1, NX
                ZOUT(IX,IY) = BUFF(IX)
@@ -168,7 +168,7 @@
 
       DO IY = 1, NY
 
-         CALL JCMT_CONVOLVE_ERRORS (ZOUT(1,IY), ERROUT(1,IY), CFUNC, 
+         CALL JCMT_CONVOLVE_ERRORS (ZOUT(1,IY), ERROUT(1,IY), CFUNC,
      :      NX, NCFN, NX, FBAD, RNORM, BUFF, BUFERR, STATUS)
          DO IX = 1, NX
             ZOUT(IX,IY) = BUFF(IX)

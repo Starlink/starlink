@@ -36,24 +36,24 @@
 *
        NPTS = STKNPT(INDEX)
        NBRKS = BSTNPT(INDEX)
- 
+
        I1 = POINTR(INDEX)
        DO 100 I = 1, NPTS
           XVALS(I) = XSTACK(I1)
           YVALS(I) = YSTACK(I1)
           I1 = I1 + 1
   100  CONTINUE
- 
+
        I1 = BPOINT(INDEX)
        DO 200 I = 1, NBRKS
           IBRKS(I) = BSTACK(I1)
           I1 = I1 + 1
   200  CONTINUE
- 
+
        TITLE = ' '
        TLEN = LEN( TITLE )
        TITLE = STITLE(INDEX)(1:MIN(80,TLEN))
- 
+
        WORV = WORVST(INDEX)
        IF (WORV.EQ.0.0) WORV = 1.0
 *

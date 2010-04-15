@@ -4,7 +4,7 @@
      :                     BSCALE, BZERO, DARRAY, NONSDA, GCOUNT,
      :                     PCOUNT, MXPARM, PTYPE, PSCALE, PZERO, FILROO,
      :                     LOGHDR, FD, CFN, SUBFIL, GEXTND, NCARD,
-     :                     SCARD, NENCOD, ENCODS, BLKSIZ, ACTSIZ, 
+     :                     SCARD, NENCOD, ENCODS, BLKSIZ, ACTSIZ,
      :                     OFFSET, CURREC, NEXT, PARAMS, STATUS )
 *+
 *  Name:
@@ -22,7 +22,7 @@
 *                    FMTOUT, IEEE, BADPIX, BLANK, BSCALE, BZERO, DARRAY,
 *                    NONSDA, GCOUNT, PCOUNT, MXPARM, PTYPE, PSCALE,
 *                    PZERO, FILROO, LOGHDR, FD, CFN, SUBFIL, GEXTND,
-*                    NCARD, HEADER, SCARD, NENCOD, ENCODS, BLKSIZ, 
+*                    NCARD, HEADER, SCARD, NENCOD, ENCODS, BLKSIZ,
 *                    ACTSIZ, OFFSET, CURREC, NEXT, PARAMS, STATUS )
 
 *  Description:
@@ -32,22 +32,22 @@
 *     and name an NDF; copy the FITS data to the NDF's data array,
 *     performing a data conversion if requested and flagging blank data
 *     with the standard bad-pixel values; generate the other
-*     components: title, units, WCS, axis structure and the FITS 
-*     extension.  For group-format FITS data, a series of NDFs are 
-*     created, one per group, each with a generated filename.  A null 
-*     NDF may be given and this routine will exit, but permit the 
+*     components: title, units, WCS, axis structure and the FITS
+*     extension.  For group-format FITS data, a series of NDFs are
+*     created, one per group, each with a generated filename.  A null
+*     NDF may be given and this routine will exit, but permit the
 *     calling routine to continue to the next FITS file.
 
 *  Arguments:
 *     HEADER( * ) = CHARACTER * 80 (Given)
 *        The FITS headers in 80-character records.
 *     BFPNTR = INTEGER (Given)
-*        Pointer to BUFFER( BLKSIZ ) = CHARACTER * ( 1 ) (Given and 
-*        Returned).  The buffer containing the block of data.  This is 
-*        only read when %OFFSET does not equal %ACTSIZ, i.e. there are 
+*        Pointer to BUFFER( BLKSIZ ) = CHARACTER * ( 1 ) (Given and
+*        Returned).  The buffer containing the block of data.  This is
+*        only read when %OFFSET does not equal %ACTSIZ, i.e. there are
 *        some non-header data within it.
 *     RCPNTR = INTEGER (Given)
-*        Pointer to RECORD( 36 ) = CHARACTER * ( 80 ) (Given and 
+*        Pointer to RECORD( 36 ) = CHARACTER * ( 80 ) (Given and
 *        Returned).  The buffer to hold the current FITS record.
 *     AUTO = LOGICAL (Given)
 *        If true the processing should be done in automatic mode, where
@@ -154,9 +154,9 @@
 *     NENCOD = INTEGER (Given)
 *        The number of AST encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
-*        The user's preferred AST encodings.  If NENCOD is zero, then 
+*        The user's preferred AST encodings.  If NENCOD is zero, then
 *        this is ignored, and an intelligent guess is made as to which
-*        encoding to use.  The encoding determines which FITS headers 
+*        encoding to use.  The encoding determines which FITS headers
 *        are used to create the NDF WCS component.
 *     BLKSIZ = INTEGER (Given)
 *        The maximum blocksize and dimension of the tape/disk buffer.
@@ -193,12 +193,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -235,7 +235,7 @@
 *     9-JUN-1998 (DSB):
 *        Added support for NDF WCS component.
 *     8-OCT-1998 (DSB):
-*        KPG1_CHVAx changed to FTS1_CHVAx so that they can be in 
+*        KPG1_CHVAx changed to FTS1_CHVAx so that they can be in
 *         libfits.a.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL.
@@ -461,9 +461,9 @@
 
             IF ( GEXTND ) THEN
                CALL FTS1_SKIP( MEDIUM, MD, SIZE, BPV, GCOUNT, PCOUNT,
-     :                         BLKSIZ, ACTSIZ, 
+     :                         BLKSIZ, ACTSIZ,
      :                         %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
-     :                         %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                         %VAL( CNF_PVAL( RCPNTR ) ),
      :                         RDISP, STATUS )
             END IF
 
@@ -579,9 +579,9 @@
 *             parameters.  Only byte swap on VMS integer data.
 
                CALL FTS1_RGRDA( MEDIUM, MD, SIZE, BPV, SWAPBY, PCOUNT,
-     :                          BLKSIZ, ACTSIZ, 
+     :                          BLKSIZ, ACTSIZ,
      :                          %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
-     :                          %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                          %VAL( CNF_PVAL( RCPNTR ) ),
      :                          RDISP, PARAMS,
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
@@ -621,7 +621,7 @@
 *             integer data.
 
                CALL FTS1_RDATA( MEDIUM, MD, SIZE, BPV, SWAPBY, BLKSIZ,
-     :                          ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                          ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ),
      :                          OFFSET,
      :                          %VAL( CNF_PVAL( RCPNTR ) ), RDISP,
      :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
@@ -644,23 +644,23 @@
 *             the FITS array.
 
                IF ( FMTIN .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOR( .FALSE., SIZE, 
+                  CALL VEC_ITOR( .FALSE., SIZE,
      :                           %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
-     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                           IERR, NBAD,
      :                           STATUS )
 
                ELSE IF ( FMTIN .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOR( .FALSE., SIZE, 
+                  CALL VEC_WTOR( .FALSE., SIZE,
      :                           %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
-     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                           IERR, NBAD,
      :                           STATUS )
 
                ELSE IF ( FMTIN .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOR( .FALSE., SIZE, 
+                  CALL VEC_UBTOR( .FALSE., SIZE,
      :                            %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
-     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                           IERR, NBAD,
      :                           STATUS )
                END IF
@@ -673,7 +673,7 @@
 *             pixels to the standard bad value.
 
                CALL FTS1_SCOFB( BSCALE, BZERO, BADPIX, BLANK, SIZE,
-     :                          %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                          STATUS )
 
 *          Process data blank.
@@ -691,19 +691,19 @@
                IF ( BPV .EQ. 1 ) THEN
                   CALL FTS1_CHVAUB( EL, %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
      :                              VAL_ITOUB( .FALSE., BLANK, STATUS ),
-     :                              VAL__BADUB, 
+     :                              VAL__BADUB,
      :                              %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                              NBAD, STATUS )
                ELSE IF ( BPV .EQ. 2 ) THEN
                   CALL FTS1_CHVAW( EL, %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
      :                             VAL_ITOW( .FALSE., BLANK, STATUS ),
-     :                             VAL__BADW, 
+     :                             VAL__BADW,
      :                             %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                             NBAD, STATUS )
                ELSE IF ( BPV .EQ. 4 ) THEN
-                  CALL FTS1_CHVAI( EL, %VAL( CNF_PVAL( WKPNTR( 1 ) ) ), 
+                  CALL FTS1_CHVAI( EL, %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
      :                             BLANK,
-     :                             VAL__BADI, 
+     :                             VAL__BADI,
      :                             %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                             NBAD, STATUS )
                END IF
@@ -755,7 +755,7 @@
 *          32-bit reals.
 
             IF ( BPV .EQ. 4 ) THEN
-               CALL FTS1_I2VXR( BSWAP, WSWAP, EL, 
+               CALL FTS1_I2VXR( BSWAP, WSWAP, EL,
      :                          %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                          STATUS )
 
@@ -763,7 +763,7 @@
 *          longwords, so in effect all the bytes are reversed.
 
             ELSE IF ( BPV .EQ. 8 ) THEN
-               CALL FTS1_I2VXD( .TRUE., EL, 
+               CALL FTS1_I2VXD( .TRUE., EL,
      :                          %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                          STATUS )
             END IF
@@ -779,13 +779,13 @@
 *          32-bit reals.
 
             IF ( BPV .EQ. 4 ) THEN
-               CALL FTS1_RNANR( EL, %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+               CALL FTS1_RNANR( EL, %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                          STATUS )
 
 *          64-bit reals.
 
             ELSE IF ( BPV .EQ. 8 ) THEN
-               CALL FTS1_RNAND( EL, %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+               CALL FTS1_RNAND( EL, %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                          STATUS )
 
             END IF

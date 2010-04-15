@@ -15,8 +15,8 @@ proc flat2 f1 f2 no
   else
     flat2 = f2
   end if
-  flat1n = flat1&"_norm"  
-  flat2n = flat2&"_norm"  
+  flat1n = flat1&"_norm"
+  flat2n = flat2&"_norm"
   if yn3
     print "Do you want the flatfield image normalized to unity ?"
     asklog (normy) "Normalize Flatfield (Yes or No) \Y\ ? "
@@ -43,7 +43,7 @@ proc flat2 f1 f2 no
     flat2n = flat2
   end if
   print "Flatfielding image " (flat1) " with " (flat2n)
-  out = flat1 & "f" 
+  out = flat1 & "f"
   obeyw rapi2d DIV (flat1) (flat2n) (out)
   print "Flatfielded image output to : " (out)
   print "Flatfielding image " (flat2) " with " (flat1n)

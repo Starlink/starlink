@@ -35,7 +35,7 @@
 
 *  History:
 *     14-SEP-1992 (DSB):
-*        Original version, modified from KAPPA routine PTHLPO written 
+*        Original version, modified from KAPPA routine PTHLPO written
 *        by PTW and MJC.
 *     {enter_further_changes_here}
 
@@ -123,7 +123,7 @@
       IF ( MCM_TXTON ) THEN
 
 *  Check if the scrolling region is full or there is scrolling.
-         IF ( MCM_LTEXT .GE. MCM_LBOT - MCM_LTOP - 2 .AND. 
+         IF ( MCM_LTEXT .GE. MCM_LBOT - MCM_LTOP - 2 .AND.
      :        MCM_LBOT .GT. MCM_LTOP ) THEN
 
 *  It is:  therefore issue a prompt.  **Note the Vax specific $ format
@@ -134,8 +134,8 @@
 *  Get a line of uppercase input.
             CALL IRM1_SREAD ( MCM_LUCMD, BUFA, BUFB, MCM_CMD, J )
 
-*  Reset the height and width of the screen in case they have been 
-*  changed.  
+*  Reset the height and width of the screen in case they have been
+*  changed.
             CALL ONE_SCRSZ( WIDTH, MCM_LBOT, STATUS )
 
 *  Treat a comment or EOF as blank input.

@@ -1,7 +1,7 @@
       SUBROUTINE CAP_GINIT (STATUS)
 *+
 *  Name:
-*     CAP_GINIT 
+*     CAP_GINIT
 *  Purpose:
 *     Initialise the catview common blocks on startup.
 *  Language:

@@ -77,7 +77,7 @@
 *
 *        Note that for this option to work well you should have many
 *        images and that any output pixels that only have one input
-*        image contributing to their value will have their variances 
+*        image contributing to their value will have their variances
 *        set bad.
 *        [FALSE]
 *     IN = LITERAL (Read)
@@ -161,10 +161,10 @@
 *        The number of refining iterations performed if METHOD = "MODE".
 *        [7]
 *     OUT = LITERAL (Write)
-*        Name of an output file to contain the output flatfield data. 
-*        Note that output NDFs have a precision of at least _REAL. 
+*        Name of an output file to contain the output flatfield data.
+*        Note that output NDFs have a precision of at least _REAL.
 *        If USESET is true and multiple Sets are represented in the IN
-*        list then this name will be used as the name of an HDS 
+*        list then this name will be used as the name of an HDS
 *        container file containing one NDF for each Set Index value.
 *        This name may be specified using indirection through a file.
 *        [TRUE]
@@ -180,15 +180,15 @@
 *        false then any Set header information will be ignored.
 *        If USESET is true, then input files will be considered in
 *        groups; a separate flatfield will be constructed for each
-*        group of corresponding input frames (i.e. those sharing 
+*        group of corresponding input frames (i.e. those sharing
 *        the same Set Index attribute).  If this results in multiple
 *        output flatfields, they will be written as separate NDFs into
-*        a single HDS container file.  If no Set header information 
-*        is present in the input files, then flatfielding is done 
-*        on all the input files together, so USESET can usually be 
+*        a single HDS container file.  If no Set header information
+*        is present in the input files, then flatfielding is done
+*        on all the input files together, so USESET can usually be
 *        safely set to TRUE.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 *     USEVAR = _LOGICAL (Read)
@@ -639,7 +639,7 @@
 
 *  Create the output NDF to contain the result. Propagating axis,
 *  label, and history but no units from the first NDF. Do NOT
-*  propagate the CCDPACK extension (most of the information in this 
+*  propagate the CCDPACK extension (most of the information in this
 *  only applies to the input NDF) or the QUALITY.
          CALL NDF_SCOPY( STACK( 1 ), 'Axis,Nounits,WCS,Noext(CCDPACK)',
      :                   OPLACE( ISUB ), NDFOUT, STATUS )
@@ -806,11 +806,11 @@
                   CALL CCG1_CM1RR( %VAL( CNF_PVAL( IPSTK ) ), EL, NNDF,
      :                             %VAL( CNF_PVAL( IPVSTK )),
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, 
+     :                             RMIN, RMAX,
      :                             %VAL( CNF_PVAL( IPOINT ) ),
-     :                             %VAL( CNF_PVAL( IPVAR ) ), 
+     :                             %VAL( CNF_PVAL( IPVAR ) ),
      :                             WRK1, WRK2, WRK3,
-     :                             %VAL( CNF_PVAL( IPWRK4 ) ), 
+     :                             %VAL( CNF_PVAL( IPWRK4 ) ),
      :                             NWRK4, NCON,
      :                             POINT, USED, STATUS )
 
@@ -819,11 +819,11 @@
                   CALL CCG1_CM1DD( %VAL( CNF_PVAL( IPSTK ) ), EL, NNDF,
      :                             %VAL( CNF_PVAL( IPVSTK ) ),
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, 
+     :                             RMIN, RMAX,
      :                             %VAL( CNF_PVAL( IPOINT ) ),
-     :                             %VAL( CNF_PVAL( IPVAR ) ), 
+     :                             %VAL( CNF_PVAL( IPVAR ) ),
      :                             WRK1, WRK2, WRK3,
-     :                             %VAL( CNF_PVAL( IPWRK4 ) ), 
+     :                             %VAL( CNF_PVAL( IPWRK4 ) ),
      :                             NWRK4, NCON,
      :                             POINT, USED, STATUS )
                END IF
@@ -832,20 +832,20 @@
 *  No variance to propagate, use inverse exposure factors.
 *  Process at real versions.
                IF ( PTYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_CM3RR( %VAL( CNF_PVAL( IPSTK ) ), 
+                  CALL CCG1_CM3RR( %VAL( CNF_PVAL( IPSTK ) ),
      :                             EL, NNDF, INVAVE,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, 
+     :                             RMIN, RMAX,
      :                             %VAL( CNF_PVAL( IPOINT ) ),
      :                             WRK1, WRK2, NCON, POINT, USED,
      :                             STATUS )
 
 *  Double precision version.
                ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-                  CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPSTK ) ), 
+                  CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPSTK ) ),
      :                             EL, NNDF, INVAVE,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, 
+     :                             RMIN, RMAX,
      :                             %VAL( CNF_PVAL( IPOINT ) ),
      :                             WRK1, WRK2, NCON, POINT, USED,
      :                             STATUS )
@@ -856,14 +856,14 @@
                   IF ( PTYPE .EQ. '_REAL' ) THEN
                      CALL CCG1_EVARR( %VAL( CNF_PVAL( IPOINT ) ),
      :                                %VAL( CNF_PVAL( IPSTK ) ),
-     :                                EL, NNDF, 
-     :                                %VAL( CNF_PVAL( IPVAR ) ), 
+     :                                EL, NNDF,
+     :                                %VAL( CNF_PVAL( IPVAR ) ),
      :                                STATUS )
                   ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
                      CALL CCG1_EVARD( %VAL( CNF_PVAL( IPOINT ) ),
      :                                %VAL( CNF_PVAL( IPSTK ) ),
-     :                                EL, NNDF, 
-     :                                %VAL( CNF_PVAL( IPVAR ) ), 
+     :                                EL, NNDF,
+     :                                %VAL( CNF_PVAL( IPVAR ) ),
      :                                STATUS )
                   END IF
                END IF

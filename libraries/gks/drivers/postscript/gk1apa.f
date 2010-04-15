@@ -54,15 +54,15 @@
 *  SINA    - Sinus for pattern transformation.
 *  SINB    - Sinus for pattern transformation.
 *
- 
+
 *     Offsets in KWKDAT
       INTEGER    ICOLR
       PARAMETER (ICOLR=17)
- 
+
 *     small real
       REAL       SMALL
       PARAMETER (SMALL=1.0E-4)
- 
+
 *     Chunk Length
       INTEGER    ICHUNK
       PARAMETER (ICHUNK=79)
@@ -82,7 +82,7 @@
 *     hold the number of columns and INTA(2) number of rows in
 *     pattern definition.
       CALL GKDRGE(KPABPT(KWKIX),KWFASI(KWKIX),3,0,INTA,REALA)
- 
+
 *
 *     Send down all that is necessary for initialization.
 *
@@ -125,7 +125,7 @@
      :             MODUA, MODUB
   210 FORMAT(2I5, 4F11.3, ' fapi')
       CALL GKFOCO(KIOPB,S(1:59),IREM)
- 
+
 *     These loops send pattern data in hexadecimal to the
 *     Postscript (current) file, where fapi expects to find
 *     it. INTA(3) holds a heap pointer to pattern data.
@@ -146,8 +146,8 @@
   360    CONTINUE
          CALL GKFOCO(KIOPB,S(1:JH-1),IREM)
   350 CONTINUE
- 
+
 *  fapdo does the actual output, using the image or colorimage operator.
       CALL GKFOCO(KIOPB,' fapdo', IREM)
- 
+
       END

@@ -7,7 +7,7 @@
 *     Pastes a series of NDFs upon each other.
 
 *  Language:
-*     Starlink Fortran 77  
+*     Starlink Fortran 77
 
 *  Type of Module:
 *     ADAM A-task
@@ -34,7 +34,7 @@
 *     that all the input NDFs are accommodated in full.
 *
 *     Bad values in the pasted NDFs are by default transparent, so the
-*     underlying data are not replaced during the copying.  
+*     underlying data are not replaced during the copying.
 
 *  Usage:
 *     paste in p1 [p2] ... [p25] out=?
@@ -53,11 +53,11 @@
 *        the input NDFs, of which the first is deemed to be the base
 *        NDF, and the remainder are to be pasted in the order supplied.
 *
-*        The group should be given as a comma-separated list, in which 
+*        The group should be given as a comma-separated list, in which
 *        each list element can be:
 *
-*        - an NDF name, optionally containing wild-cards and/or regular 
-*        expressions ("*", "?", "[a-z]" etc.). 
+*        - an NDF name, optionally containing wild-cards and/or regular
+*        expressions ("*", "?", "[a-z]" etc.).
 *
 *        - the name of a text file, preceded by an up-arrow character
 *        "^".  Each line in the text file should contain a
@@ -127,8 +127,8 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an 
-*     NDF data structure and propagates all extensions.  Propagation is 
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an
+*     NDF data structure and propagates all extensions.  Propagation is
 *     from the base NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -178,7 +178,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -203,12 +203,12 @@
       LOGICAL BADVAR             ! Input NDFs' variance may have bad
                                  ! values
       CHARACTER * ( 2 ) CIN      ! The number of the input NDF
-      LOGICAL CONFIN             ! Output NDF is confined to bounds of 
+      LOGICAL CONFIN             ! Output NDF is confined to bounds of
                                  ! the principal input NDF
       INTEGER DIMSI( NDF__MXDIM, NDFMAX ) ! Dimensions of input NDFs
-      CHARACTER * ( NDF__SZFTP ) DTYPE ! Processing type of the data 
+      CHARACTER * ( NDF__SZFTP ) DTYPE ! Processing type of the data
                                  ! array
-      CHARACTER * ( NDF__SZFTP ) DTYPEV ! Processing type of the 
+      CHARACTER * ( NDF__SZFTP ) DTYPEV ! Processing type of the
                                  ! variance array
       INTEGER ELI                ! Number of elements in an input array
       INTEGER ELO                ! Number of elements in an output array
@@ -272,7 +272,7 @@
 *  ======================
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL KPG1_RGNDF( 'IN', NDFMAX, 1, '  Give more NDFs to paste...', 
+      CALL KPG1_RGNDF( 'IN', NDFMAX, 1, '  Give more NDFs to paste...',
      :                 GRPIN, NUMNDF, STATUS )
 
 *  The options are a) classic method where one principal NDF is supplied
@@ -307,7 +307,7 @@
             CALL ERR_ANNUL( STATUS )
          END IF
          CALL ERR_RLSE
-       
+
 *  Record the number of input NDFs.  Make it at least one to prevent
 *  problems exiting.  The number is I, not I-1 because the subtraction
 *  for the extra loop is counteracted by plus one for the principal
@@ -335,7 +335,7 @@
 *  Match the bounds of the input NDFs.  If the output NDF's bounds are
 *  confined to be within the principal NDF's, we first match bounds by
 *  trimming the second and later NDFs with those of the principal NDF.
-*  The principal NDF identifier must be cloned each time because the 
+*  The principal NDF identifier must be cloned each time because the
 *  call to NDF_MBND will modify its bounds.
       IF ( CONFIN ) THEN
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -436,10 +436,10 @@
 *  have the bounds of the output pasted NDF.  Want to propagate from
 *  the principal array.
       IF ( CONFIN ) THEN
-         CALL LPG_PROP( NDFI( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
+         CALL LPG_PROP( NDFI( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO,
      :                  STATUS )
       ELSE
-         CALL LPG_PROP( NDFIC( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
+         CALL LPG_PROP( NDFIC( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO,
      :                  STATUS )
       END IF
 
@@ -459,7 +459,7 @@
       IF ( .NOT. CONFIN ) THEN
          CALL NDF_ANNUL( NDFIC( 1 ), STATUS )
       END IF
- 
+
 *  Obtain a title and assign it to the output NDF.
 *  ===============================================
 
@@ -471,7 +471,7 @@
 *  ====================================
       CALL KPG1_MAP( NDFO, 'Data', ITYPE, 'WRITE/BAD', PNTRO, ELO,
      :              STATUS )
-      IF ( VARPRS ) CALL KPG1_MAP( NDFO, 'Variance', ITYPEV, 
+      IF ( VARPRS ) CALL KPG1_MAP( NDFO, 'Variance', ITYPEV,
      :                            'WRITE/BAD', PNTROV, ELO, STATUS )
       IF ( QUAPRS ) CALL KPG1_MAP( NDFO, 'Quality', '_UBYTE',
      :                            'WRITE/ZERO', PNTROQ, ELO, STATUS )
@@ -490,7 +490,7 @@
 *  origin of the output NDF.  Also extract the dimensions of the
 *  current NDF.
             DO J = 1, NDF__MXDIM
-               OFFSET( J ) = LBNDI( J, I ) - LBNDO( J ) 
+               OFFSET( J ) = LBNDI( J, I ) - LBNDO( J )
                IDIMS( J ) = DIMSI( J, I )
             END DO
 
@@ -505,45 +505,45 @@
 *  array.
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_PASTR( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ODIMS, ELO,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                CALL KPG1_PASTB( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ODIMS, ELO,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_PASTD( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ODIMS, ELO,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPG1_PASTI( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ODIMS, ELO,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                CALL KPG1_PASTUB( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           ODIMS, ELO,
-     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                CALL KPG1_PASTUW( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           ODIMS, ELO,
-     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                CALL KPG1_PASTW( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ODIMS, ELO,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
@@ -566,54 +566,54 @@
 *  array.
                IF ( ITYPEV .EQ. '_REAL' ) THEN
                   CALL KPG1_PASTR( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ODIMS, ELO,
-     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPEV .EQ. '_BYTE' ) THEN
                   CALL KPG1_PASTB( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ODIMS, ELO,
-     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPEV .EQ. '_DOUBLE' ) THEN
                   CALL KPG1_PASTD( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ODIMS, ELO,
-     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPEV .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PASTI( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ODIMS, ELO,
-     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPEV .EQ. '_UBYTE' ) THEN
                   CALL KPG1_PASTUB( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              ODIMS, ELO,
-     :                              %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
      :                              STATUS )
 
                ELSE IF ( ITYPEV .EQ. '_UWORD' ) THEN
                   CALL KPG1_PASTUW( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              ODIMS, ELO,
-     :                              %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                              %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
      :                              STATUS )
 
                ELSE IF ( ITYPEV .EQ. '_WORD' ) THEN
                   CALL KPG1_PASTW( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ODIMS, ELO,
-     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
      :                             STATUS )
                END IF
-     
+
 *  Unmap the variance array, as we may already have three other arrays
 *  mapped.
                CALL NDF_UNMAP( NDFI( I ), 'Variance', STATUS )
@@ -630,11 +630,11 @@
 
 *  Call the routine that performs the pasting.
                CALL KPG1_PASTUB( TRANSP, BADQUA, OFFSET, IDIMS, ELI,
-     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           ODIMS, ELO,
-     :                          %VAL( CNF_PVAL( PNTROQ( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTROQ( 1 ) ) ),
      :                          STATUS )
-     
+
 *  Unmap the quality array, as we may already have three other arrays
 *  mapped.
                CALL NDF_UNMAP( NDFI( I ), 'Quality', STATUS )

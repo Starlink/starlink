@@ -40,7 +40,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     Fills the ACSISSpecHdr with values retrieved from the 
+*     Fills the ACSISSpecHdr with values retrieved from the
 *     GSD file.
 
 *  Authors:
@@ -61,7 +61,7 @@
 *     2008-03-28 (JB):
 *        Check which receptors were used.
 *     2008-04-03 (JB):
-*        Convert acs_feedx and acs_feedy to degrees. 
+*        Convert acs_feedx and acs_feedy to degrees.
 
 
 *  Copyright:
@@ -104,7 +104,7 @@
 #define FUNC_NAME "gsdac_putSpecHdr"
 
 #define SZ_RECNAME 80
-#define MAXRECEP 8  
+#define MAXRECEP 8
 
 void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
                         const unsigned int stepNum, const int subBandNum,
@@ -133,7 +133,7 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
   specHdr->acs_feedy = record->tcs_tr_ac2 / AST__DD2R;
 
   /* Check to see if only the "second" receptor was used. */
-  if ( recepFlags[0] == 0 && recepFlags[1] == 1 ) 
+  if ( recepFlags[0] == 0 && recepFlags[1] == 1 )
     specHdr->acs_feed = gsdVars->mixNums[subBandNum] - 2;
   else
     specHdr->acs_feed = gsdVars->mixNums[subBandNum] - 1;

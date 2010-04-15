@@ -6,10 +6,10 @@ C
 C     Generates a 'spiketrum' from a table of X and Z values, given a
 C     spectrum to use as a template for the X range to be used.  The
 C     resulting spiketrum will be a spectrum with the same .X structure
-C     as the template spectrum, and a .Z structure that has zeros 
+C     as the template spectrum, and a .Z structure that has zeros
 C     everywhere except at the points given in the table.  The table
-C     file can include SET commands that set individual item values in 
-C     the resulting file, but the item names need to have been defined 
+C     file can include SET commands that set individual item values in
+C     the resulting file, but the item names need to have been defined
 C     in the file SPIKETRUM.DEF.
 C
 C     Command parameters -
@@ -17,7 +17,7 @@ C
 C     SPECTRUM    (Character) The name of the template spectrum.
 C     TABLE       (Character) The name of the file containing the
 C                 table of X and Z values.  If TABLE contains no
-C                 extension then '.TAB' will be assumed. 
+C                 extension then '.TAB' will be assumed.
 C     SPIKETRUM   (Character) The name of the spiketrum to be creeated.
 C                 Note that this will always be a new file.
 C
@@ -38,8 +38,8 @@ C     13th Oct 1988  KS / AAO. Processing order for object specs changed
 C                    to bypass bug if .TABLE specified.  Now sets X axis
 C                    units and label properly.
 C     25th Mar 1991  KS / AAO. Modify to use FIGX_SETOBJ so that now SET
-C                    commands in the file have to be supported by 
-C                    EQUATES in the SPIKETRUM.DEF file (but can now be 
+C                    commands in the file have to be supported by
+C                    EQUATES in the SPIKETRUM.DEF file (but can now be
 C                    used for any file format that the .DEF file
 C                    supports).  More testing for '!!' abort requests
 C                    added.
@@ -237,7 +237,7 @@ C     of X-value, although that is usually convenient.  Comments may
 C     follow the data value, separated from it by spaces, a comma, or
 C     a '*'.  The file may also contain 'SET' records, which allow
 C     data objects in the file being generated to be set.  These
-C     have the form 
+C     have the form
 C
 C            SET  data object = value
 C
@@ -247,20 +247,20 @@ C     SPIKETRUM.DEF file (note that the name can have a structured form
 C     and can even be ".Z.UNITS", for example AND that .Z.UNITS can
 C     even be EQUATEd to, say, either of ".Z.UNITS" or just ".UNITS"
 C     depending on the file format. 'Value' should either be a single
-C     numeric quantity or a character string enclosed in double 
+C     numeric quantity or a character string enclosed in double
 C     quotes (").  For example
 C
 C            SET UNITS = "AB magnitudes"
 C
 C                                         KS / CIT 7th May 1984
 C     Modified:
-C    
+C
 C     29th Aug 1988.  JM/RAL. Converted to use DSA routines.
 C     13th Oct 1988.  KS/AAO. Problem with object specifications
 C                     bypassed - now deferred until after table structure
 C                     is created.
 C     25th Mar 1991.  KS/AAO. Now uses FIGX_SETOBJ instead of FIG_SETOBJ;
-C                     this means values to be set must be supported in 
+C                     this means values to be set must be supported in
 C                     SPIKETRUM.DEF, but also means other file formats can
 C                     be supported.
 C+
@@ -384,7 +384,7 @@ C
                   END IF
                ELSE
 C
-C                 Record is an object spec.  Remember it and service 
+C                 Record is an object spec.  Remember it and service
 C                 it later.  This needs to be looked at again.  The problem
 C                 is that some of these may explicitly specify a structure
 C                 (.TABLE for example) that isn't created until the call
@@ -416,7 +416,7 @@ C
          STATUS=-1
          GO TO 500    ! Error exit
       END IF
-C 
+C
 C     Define the number of elements in the DATA array in the TABLE structure.
 C
       CALL DSA_SET_STRUCT_VAR('NTAB',ICH_CI(IWPT),STATUS)

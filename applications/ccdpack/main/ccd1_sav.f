@@ -14,8 +14,8 @@
 *         CALL CCD1_SAV( FD, BUFFER, STATUS )
 
 *  Description:
-*     The routine writes out the CCDPACK global parameters as set up 
-*     by CCDSETUP. The values are written to a formatted file which 
+*     The routine writes out the CCDPACK global parameters as set up
+*     by CCDSETUP. The values are written to a formatted file which
 *     can be used to restore them.
 
 *  Arguments:
@@ -81,7 +81,7 @@
       INTEGER MAXDIM             ! Maximum number of dimensions in a global
       PARAMETER ( MAXDIM = 1 )
       INTEGER NPARAM             ! Number of globals
-      PARAMETER ( NPARAM = 16 ) 
+      PARAMETER ( NPARAM = 16 )
 
 *  Local variables:
       CHARACTER * ( CCD1__BLEN ) BUFFER ! Line buffer
@@ -106,7 +106,7 @@
 
 *  Local Data:
       DATA PNAMES /
-     :   'ADC', 
+     :   'ADC',
      :   'RNOISE',
      :   'EXTENT',
      :   'BOUNDS',
@@ -181,7 +181,7 @@
 *  Loop over all known parameters.
       DO IP = 1, NPARAM
 
-*  Get locators for the keyed and unkeyed values for the parameter from 
+*  Get locators for the keyed and unkeyed values for the parameter from
 *  the globals file.
          CALL CCD1_KPGT( PNAMES( IP ), CCD1__MXSI, QUNKEY, ULOC, NK,
      :                   KEYS, KLOCS, STATUS )
@@ -197,7 +197,7 @@
                VALSTR = ' '
                IF ( NDIM .EQ. 0 ) THEN
                   CALL DAT_GET0C( KLOCS( IK ), VALSTR, STATUS )
-               ELSE 
+               ELSE
                   CALL DAT_GET1C( KLOCS( IK ), MAXEL, VALARR, NEL,
      :                            STATUS )
                   IAT = 0
@@ -251,7 +251,7 @@
             CALL MSG_SETC( 'PNAME', PNAMES( IP ) )
             CALL MSG_SETC( 'VALUE', VALSTR )
             CALL MSG_SETC( 'COMMENT', COMENT( IP ) )
-            CALL MSG_LOAD( ' ', '^PNAME = ^VALUE  ! ^COMMENT', 
+            CALL MSG_LOAD( ' ', '^PNAME = ^VALUE  ! ^COMMENT',
      :                     BUFFER, LENG, STATUS )
 
 *  Write the name to the output file.

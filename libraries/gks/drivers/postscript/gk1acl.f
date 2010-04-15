@@ -51,7 +51,7 @@
 *  S       - Character variable, via which chunks of PostScript are sent for
 *            buffering.
 *
- 
+
 *     Integer workspace offset parameters
       INTEGER    ILNTYP,   IMKTYP,   IFASTY,   ICLIND
       PARAMETER (ILNTYP=1, IMKTYP=2, IFASTY=4, ICLIND=5)
@@ -89,22 +89,22 @@
 *
 * --------------------------------------------------------------
 *
- 
+
 *
 *     Increment the page counter
 *
       KWKDAT(IPAGES,KWKIX) = KWKDAT(IPAGES,KWKIX)+1
- 
+
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
- 
+
+
 *     Send the page, supply the matching restore.
       CALL GKFOCO(KIOPB,'showpage restore',IREM)
       CALL GKFOCO(KIOSN, ' ', IREM)
- 
+
 *
 *     Find out whether this is a closing (wholefile)
 *                         or a new frame (page) action.
@@ -190,6 +190,6 @@
 *     Closing Workstation - Final PageTrailer  for non-EPSF
          CALL GK1ATR (IPAGE)
       ENDIF
- 
- 
+
+
       END

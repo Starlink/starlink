@@ -36,8 +36,8 @@ export TMP
 OLD=$1
 if test $# -eq 1
 then   NEW="-"; 	# arg is old file, take new from stdin
-else   NEW=$2 ; 
-fi  
+else   NEW=$2 ;
+fi
 #
 #	sed commands to edit ed commands to edit old file
 cat <<\xEOF > $TMP

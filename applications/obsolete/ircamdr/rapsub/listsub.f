@@ -156,7 +156,7 @@
       CALL FIO_GUNIT( LUN, STATUS )
 
 *    open the requested named file as the unit specified above
-      OPEN( UNIT = LUN, FILE = FILENAME, STATUS = 'NEW', 
+      OPEN( UNIT = LUN, FILE = FILENAME, STATUS = 'NEW',
      :      IOSTAT=STAT, ERR = 999 )
 
 *    initialise the strip counter
@@ -216,7 +216,7 @@
 200      FORMAT( A/ )
 
 *       now we want to loop round all the selected rows in the
-*       current strip 
+*       current strip
          DO  J  =  YLOW, YUPP
 
 *          we really want to come from the top down, so work out
@@ -253,7 +253,7 @@
 
                ELSE
 
-*                get the value held in the array at the current pixel 
+*                get the value held in the array at the current pixel
 *                location
                   VALUE  =  ARRAY( I, JJ )
 

@@ -23,7 +23,7 @@ C     CALL DSA_SQRT_{x} (NELM,INPUT,OUTPUT,ERRORS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) NELM          (Integer,ref) The number of elements in the 
+C     (>) NELM          (Integer,ref) The number of elements in the
 C                       array.
 C     (>) INPUT         (Array of appropriate type, ref) The array to
 C                       be rooted.  The type varies with the routine.

@@ -71,7 +71,7 @@
 *        Global status value.
 
 *  Copyright:
-*     Copyright (C) 1988, 1989, 1990, 1991, 1992, 1994 Science & 
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992, 1994 Science &
 *                   Engineering Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -81,12 +81,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -263,7 +263,7 @@
 *  Check that this is the required occurrence.
                NF = NF + 1
                IF ( NF .GE. NOCCUR ) THEN
-                  
+
 *  The keyword is present.
                   THERE = .TRUE.
 
@@ -273,7 +273,7 @@
 *  skip over it; otherwise just set character position to be one after
 *  the end of the keyword, except when the keyword denotes a comment.
 *  This means that the '=' may only be in column 9, so check for this.
-                  IF ( .NOT. COMCAR ) THEN 
+                  IF ( .NOT. COMCAR ) THEN
                      EQUALS = INDEX( BUFFER( CARD ), '=' ) + 1
                      IF ( EQUALS .EQ. 1 ) EQUALS = CHR_LEN( CRDKEY ) + 1
                   ELSE
@@ -294,7 +294,7 @@
 *  start of the string; the final position is the presumed location of
 *  the start of the comment (or the end of the string).  The comment
 *  keywords are an exception and are returned unchanged.
-                  IF ( .NOT. COMCAR ) THEN 
+                  IF ( .NOT. COMCAR ) THEN
                      CALL CHR_FANDL( BUFFER( CARD ) ( EQUALS: ), LQCOL,
      :                               TQCOL )
                      LQCOL = LQCOL + EQUALS - 1
@@ -342,7 +342,7 @@
                      COMPRE = .TRUE.
                      IF ( TQCOL .EQ. 0 ) THEN
                         IF ( COMCOL .EQ. 0 ) THEN
-                           
+
 *  No comment is present.  Set the end of string to its length.
                            TQCOL = LEN( BUFFER( CARD ) )
                            COMPRE = .FALSE.
@@ -350,7 +350,7 @@
 
 *  A comment was found so adjust location of the end of the string.
                            TQCOL = LQCOL + COMCOL - 2
-        
+
                         END IF
                      END IF
 

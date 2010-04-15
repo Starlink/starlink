@@ -7,7 +7,7 @@
 *   skip blanks in character string
 *
 *   Increment I so that it points to the next non-blank
-*   character in string S.  'Blank' characters are space and tab (ASCII 
+*   character in string S.  'Blank' characters are space and tab (ASCII
 *   character value 9).
 *
 * Arguments:
@@ -15,7 +15,7 @@
 *  I      (in/out) : on input, I is the index of the first character
 *                    in S to be examined; on output, either it points
 *                    to the next non-blank character, or it is equal
-*                    to LEN(S)+1 (if all the rest of the string is 
+*                    to LEN(S)+1 (if all the rest of the string is
 *                    blank).
 *
 *   D.L.Terrett  Starlink  Sep 1993

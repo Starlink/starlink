@@ -1,8 +1,8 @@
 C+
       SUBROUTINE DTA_CLIST
 C
-C     This is a debug routine.  It lists the contents of the data 
-C     structure name cache.  It does not include the hit statistics output by 
+C     This is a debug routine.  It lists the contents of the data
+C     structure name cache.  It does not include the hit statistics output by
 C     DTA_CACHES.
 C
 C     Parameters - None
@@ -22,7 +22,7 @@ C     (>) CACHEI   Cache initialisation flag
 C
 C     All in common blocks CACHEC and CACHEN
 C
-C     Subroutines / functions used -  
+C     Subroutines / functions used -
 C
 C     HDS_TRACE    (HDS_ routine) Provide locator details
 C     EMS_BEGIN    (EMS_  "     ) Start a new reporting environment.
@@ -30,11 +30,11 @@ C     EMS_ANNUL    ( "    "     ) Clear current EMS error status.
 C     EMS_END      ( "    "     ) End current reporting environment.
 C
 C                                       KS / CIT 1982
-C     Modified: 
-C 
-C     31st May 1988.  KS/AAO.  Tidied up and commented a little.  
-C     10th Jan 1992.  KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     Modified:
+C
+C     31st May 1988.  KS/AAO.  Tidied up and commented a little.
+C     10th Jan 1992.  KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN.
 C     20th Jan 1992.  KS / AAO. HDS_TRACE calls added.
 C     24th Jan 1992.  KS / AAO. Calls to EMS added to control error reporting.
@@ -77,7 +77,7 @@ C
                   PRINT *,'        File: ',FILE(:IEND)
                END IF
                CALL EMS_END(EMSTAT)
-            END IF 
+            END IF
          END DO
          PRINT *,'There are ',NCACH2,' 2nd level entries'
          PRINT *,'Those in use are:'
@@ -100,7 +100,7 @@ C
                   PRINT *,'        File: ',FILE(:IEND)
                END IF
                CALL EMS_END(EMSTAT)
-            END IF 
+            END IF
          END DO
          PRINT *,'There are ',NCACH3,' 3rd level entries'
          PRINT *,'Those in use are:'
@@ -123,7 +123,7 @@ C
                   PRINT *,'        File: ',FILE(:IEND)
                END IF
                CALL EMS_END(EMSTAT)
-            END IF 
+            END IF
          END DO
          PRINT *,'There are ',NCACHB,' Bottom level entries'
          PRINT *,'Those in use are:'
@@ -148,7 +148,7 @@ C
                   PRINT *,'        File: ',FILE(:IEND)
                END IF
                CALL EMS_END(EMSTAT)
-            END IF 
+            END IF
          END DO
          PRINT *,'The slot pointers are:'
          PRINT '(3(A,I3,2X))','CNEXT2: ',CNEXT2,'CNEXT3: ',CNEXT3,

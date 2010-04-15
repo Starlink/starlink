@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE line_WRITF
 *
-*   Description: 
+*   Description:
 *      Encode float value into internal buffer under format control.
 *
 *   Authors:

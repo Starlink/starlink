@@ -112,7 +112,7 @@ C
 C
 C     Get the type of the object and see if it is a structure.  Note
 C     that this implementation just returns the object type and doesn't
-C     attempt to process it even for a structure. 
+C     attempt to process it even for a structure.
 C
       CALL DTA_STRUC (NAME,STRUCT,DTA_STATUS)
       CALL DTA_TYVAR (NAME,TYPE,DTA_STATUS)
@@ -134,7 +134,7 @@ C
          END IF
       END IF
 C
-C     Exit.  On way out, if STATUS or DTA_STATUS is bad, put out an 
+C     Exit.  On way out, if STATUS or DTA_STATUS is bad, put out an
 C     error message.  (STATUS is only bad for an unknown structured type.
 C
   500 CONTINUE

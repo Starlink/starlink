@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -178,6 +178,6 @@
 *  By definition the first and START weights are bad.
       WEIGHT( 1 ) = VAL__BADR
       WEIGHT( DIM1 ) = VAL__BADR
-      
+
 *  Normalise the weights.
       END

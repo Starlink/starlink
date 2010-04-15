@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_PLOTP( IPICD, APP, MARGIN, NP, PNAME, PSIDE, 
-     :                       PSIZE, ASPECT, BOX, IPICD0, IPICF, IPIC, 
+      SUBROUTINE KPG1_PLOTP( IPICD, APP, MARGIN, NP, PNAME, PSIDE,
+     :                       PSIZE, ASPECT, BOX, IPICD0, IPICF, IPIC,
      :                       STATUS )
 *+
 *  Name:
@@ -12,38 +12,38 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_PLOTP( IPICD, APP, MARGIN, NP, PNAME, PSIDE, PSIZE, 
+*     CALL KPG1_PLOTP( IPICD, APP, MARGIN, NP, PNAME, PSIDE, PSIZE,
 *                      ASPECT, BOX, IPICD0, IPICF, IPIC, STATUS )
 
 *  Description:
-*     This routine createa a new DATA picture, together with optional 
-*     ancillary pictures around the DATA picture. The new DATA picture 
-*     can be aligned with an existing DATA picture. A FRAME picture 
-*     enclosing the DATA picture and any ancillary pictures is created 
+*     This routine createa a new DATA picture, together with optional
+*     ancillary pictures around the DATA picture. The new DATA picture
+*     can be aligned with an existing DATA picture. A FRAME picture
+*     enclosing the DATA picture and any ancillary pictures is created
 *     if any ancillary pictures or non-zero margins were requested.
 *
-*     On exit, the current PGPLOT viewport corresponds to area occupied 
-*     by the new DATA picture. The bounds of the PGPLOT window produce a 
-*     world co-ordinate system within the viewport corresponding to 
-*     millimetres from the bottom-left corner of the view surface. Note, 
-*     this is different to the world co-ordinate system stored in the AGI 
+*     On exit, the current PGPLOT viewport corresponds to area occupied
+*     by the new DATA picture. The bounds of the PGPLOT window produce a
+*     world co-ordinate system within the viewport corresponding to
+*     millimetres from the bottom-left corner of the view surface. Note,
+*     this is different to the world co-ordinate system stored in the AGI
 *     database with the new DATA picture.
 *
 *     Various environment parameters are used to obtain options, etc. The
 *     names of these parameters are hard-wired into this subroutine in
-*     order to ensure conformity between applications. 
+*     order to ensure conformity between applications.
 
 *  Environment Parameters:
 *     FILL = _LOGICAL (Read)
-*        TRUE if the supplied aspect ratio is to be ignored, creating the 
-*        largest possible DATA picture within the current picture.  When 
+*        TRUE if the supplied aspect ratio is to be ignored, creating the
+*        largest possible DATA picture within the current picture.  When
 *        FILL is FALSE, the DATA picture is created with the supplied
 *        aspect ratio. Only used when creating a new DATA picture.
 
 *  Arguments:
 *     IPICD = INTEGER (Given)
 *        The AGI identifier for an existing DATA picture. If this is
-*        supplied equal to -1, the size and extent of the new DATA picture 
+*        supplied equal to -1, the size and extent of the new DATA picture
 *        are determined by BOX. Otherwise, the size and extent of the new
 *        DATA picture are set equal to the existing DATA picture.
 *     APP = CHARACTER * ( * ) (Given)
@@ -51,46 +51,46 @@
 *        <package>_<application> (eg "KAPPA_DISPLAY").
 *     MARGIN( 4 ) = REAL (Given)
 *        The width of the borders to leave round the new DATA picture, given
-*        as fractions of the corresponding dimension of the DATA picture. 
+*        as fractions of the corresponding dimension of the DATA picture.
 *        These should be supplied in the order bottom, right, top, left.
 *     NP = INTEGER (Given)
 *        The number of extra pictures to be included in the FRAME pictures
 *        (the DATA picture itself is not included in this list). Margins are
-*        left round the DATA picture with widths given by MARGIN. Any extra 
-*        pictures are placed outside these margins, in positions described by 
-*        PSIDE and PSIZE. 
+*        left round the DATA picture with widths given by MARGIN. Any extra
+*        pictures are placed outside these margins, in positions described by
+*        PSIDE and PSIZE.
 *     PNAME( NP ) = CHARACTER * ( * ) (Given)
 *        The names to store in the AGI database with the NP extra pictures.
 *     PSIDE( NP ) = CHARACTER * 1 (Given)
 *        Each element of this array should be one of L, R, T or B. It
 *        indicates which side of the FRAME picture an extra picture is to be
 *        placed. For Left and Right, the extra picture occupies the full
-*        height of the DATA picture, margins, and any previously created 
-*        extra pictures. The picture is placed at the far Left or Right of 
-*        all previously created pictures. For Top or Bottom, the extra picture 
-*        occupies the full width of the DATA picture, margins, and any 
+*        height of the DATA picture, margins, and any previously created
+*        extra pictures. The picture is placed at the far Left or Right of
+*        all previously created pictures. For Top or Bottom, the extra picture
+*        occupies the full width of the DATA picture, margins, and any
 *        previously created extra pictures. The picture is placed at the top or
 *        bottom of all previously created pictures. Ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
 *        The size of each extra picture. For Left and Right pictures, this is
 *        the width of the picture, and the value is given as a fraction
-*        of the width of the DATA picture. For Top and Bottom pictures, it is 
+*        of the width of the DATA picture. For Top and Bottom pictures, it is
 *        the height of the picture, and it is given as a fraction of the
 *        height of the DATA picture. Ignored if NP is zero.
 *     ASPECT = REAL (Given)
 *        The aspect ratio for the DATA picture. This is the height of the
 *        DATA picture (in millimetres)  divided by the width of the DATA
-*        picture (also in millimetres). The new DATA picture is created with 
-*        this aspect ratio unless the FILL parameter is given a TRUE value, 
-*        in which case the aspect ratio is adjusted to get the largest DATA 
-*        picture which can be created within the current picture. If a value 
-*        of zero is supplied, then the largest DATA picture is used 
+*        picture (also in millimetres). The new DATA picture is created with
+*        this aspect ratio unless the FILL parameter is given a TRUE value,
+*        in which case the aspect ratio is adjusted to get the largest DATA
+*        picture which can be created within the current picture. If a value
+*        of zero is supplied, then the largest DATA picture is used
 *        irrespective of FILL (which is then not accessed).
 *     BOX( 4 ) = DOUBLE PRECISION (Given)
-*        The co-ordinates to be assigned to the bottom-left, and top-right 
-*        corners of the DATA picture in the AGI database (the co-ordinate 
-*        system in defined by argument DOMAIN). Only used if the new DATA 
-*        picture is NOT being aligned with an existing DATA picture. Supplied 
+*        The co-ordinates to be assigned to the bottom-left, and top-right
+*        corners of the DATA picture in the AGI database (the co-ordinate
+*        system in defined by argument DOMAIN). Only used if the new DATA
+*        picture is NOT being aligned with an existing DATA picture. Supplied
 *        in the order XLEFT, YBOTTOM, XRIGHT, YTOP. Note, the supplied
 *        bounds are stored in the AGI database, but do not effect the PGPLOT
 *        window on exit, which always has a world co-ordinate system of
@@ -102,23 +102,23 @@
 *        An AGI identifier for the new DATA picture.
 *     IPICF = INTEGER (Returned)
 *        An AGI identifier for the new FRAME picture. World co-ordinate system
-*        is inherited from the current picture on entry. If no FRAME picture 
+*        is inherited from the current picture on entry. If no FRAME picture
 *        is created then an identifier for the current picture on entry is
 *        returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
 *        requested in ZSIDE and PSIZE. The world co-ordinate system for each
-*        picture is inherited from the FRAME picture. The actual size of a 
-*        picture may be less than the requested size if there is insufficient 
-*        room left in the FRAME picture to give it its requested size. 
-*        Identifiers for pictures which would have zero size (i.e. fall 
-*        completely outside the FRAME picture) are returned equal to -1, but 
+*        picture is inherited from the FRAME picture. The actual size of a
+*        picture may be less than the requested size if there is insufficient
+*        room left in the FRAME picture to give it its requested size.
+*        Identifiers for pictures which would have zero size (i.e. fall
+*        completely outside the FRAME picture) are returned equal to -1, but
 *        no error is reported.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     -  Picture identifiers are returned equal to -1 if the picture cannot 
+*     -  Picture identifiers are returned equal to -1 if the picture cannot
 *     be created (eg due to lack of room within the current picture).
 
 *  Copyright:
@@ -130,12 +130,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -154,7 +154,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -200,7 +200,7 @@
          IPIC( I ) = -1
       END DO
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First deal with cases where the new DATA picture is to be aligned with
@@ -209,7 +209,7 @@
 
 *  Create the required AGI pictures (DATA, FRAME and any requested
 *  ancillary pictures), aligning the new DATA picture with an existing
-*  DATA picture. On exit, the PGPLOT viewport matches the DATA picture, 
+*  DATA picture. On exit, the PGPLOT viewport matches the DATA picture,
 *  and has the same (AGI) world co-ordinates.
          CALL KPG1_GDOLD( MARGIN, APP, NP, PNAME, PSIDE, PSIZE,
      :                    IPICD, IPICD0, IPICF, IPIC, STATUS )
@@ -219,8 +219,8 @@
       ELSE
 
 *  Create the required AGI pictures (DATA, FRAME and any requested
-*  ancillary pictures). The DATA picture has the AGI world co-ordinate 
-*  bounds specified by BOX. On exit, the PGPLOT viewport matches the DATA 
+*  ancillary pictures). The DATA picture has the AGI world co-ordinate
+*  bounds specified by BOX. On exit, the PGPLOT viewport matches the DATA
 *  picture, and has the same (AGI) world co-ordinates.
          CALL KPG1_GDNEW( APP, MARGIN, NP, PNAME, PSIDE, PSIZE,
      :                    ASPECT, BOX, IPICD0, IPICF, IPIC, STATUS )
@@ -230,14 +230,14 @@
 *  Skip the rest if an error has occurred.
       IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Set the PGPLOT world co-ordinate system so that it corresponds to 
+*  Set the PGPLOT world co-ordinate system so that it corresponds to
 *  millimetres from the bottom-left corner of the view surface.
          CALL PGQVP( 2, DX1, DX2, DY1, DY2 )
          CALL PGSWIN( DX1, DX2, DY1, DY2 )
 
 *  Set the PGPLOT character size so that small text will be used in small
 *  pictures by default. This can be overridden by the user setting
-*  values for the AST "Size" attributes. Base the text size on the size 
+*  values for the AST "Size" attributes. Base the text size on the size
 *  of the FRAME picture...
 
 *  Make the FRAME Picture the current picture and set up the corresponding

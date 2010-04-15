@@ -5,8 +5,8 @@ C     I G C O N V
 C
 C     This is a general-purpose convolution program, able to convolve
 C     the main data array in a Figaro file with a rectangular array of
-C     any dimensions. This is a more flexible routine than ICONV3, where 
-C     the convolution is with a 3x3 array specified only by a center and 
+C     any dimensions. This is a more flexible routine than ICONV3, where
+C     the convolution is with a 3x3 array specified only by a center and
 C     an edge value, but the additional flexibility probably makes it
 C     noticeably slower, particularly for very large convolution arrays.
 C
@@ -26,13 +26,13 @@ C
 C     File format:
 C        The text file defining the convolution array should simply
 C     contain the values for the array in a free format, one line at a
-C     time. Lines beginning with a '*' are ignored, as are blank lines. 
+C     time. Lines beginning with a '*' are ignored, as are blank lines.
 C     If the data for a line of the array has to be continued onto
 C     another line, a '\' should appear at the end of the line to be
 C     continued.
 C-
 C     History:
-C    
+C
 C     11th Mar 1994  Original version.  KS / AAO
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage
 C                    of file names to 132 chars.
@@ -216,7 +216,7 @@ C     way avoids that problem, at the expense of assuming an ASCII character
 C     set.
 C
       BACKSLASH=CHAR(92)
-C  
+C
 C     Rewind the file and start to read through it.
 C
       IBX=1
@@ -242,7 +242,7 @@ C
             IF (IST.GT.0) THEN
                IF (LINE(IST:IST).NE.'*') THEN
 C
-C                 This is a data line - not a comment or a blank line. 
+C                 This is a data line - not a comment or a blank line.
 C                 Work through it looking for numbers.
 C
                   MORE=.TRUE.
@@ -258,13 +258,13 @@ C
                            CALL PAR_WRUSER('(contains a null value)',
      :                                                           IGNORE)
                         END IF
-                        GO TO 500            ! Error exit                
+                        GO TO 500            ! Error exit
                      ELSE
                         IF (READIN) BOX(IBX,IBY)=VALUE
                         NEWLINE=.TRUE.
                         IF (NEXT.EQ.0) THEN
                            MORE=.FALSE.
-                        ELSE 
+                        ELSE
                            IST=ICH_VERIF(LINE,NEXT,' ')
                            IF (IST.EQ.0) THEN
                               MORE=.FALSE.
@@ -303,5 +303,5 @@ C
 C
   500 CONTINUE
 C
-      END                       
-                           
+      END
+

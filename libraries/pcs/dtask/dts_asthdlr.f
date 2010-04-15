@@ -17,7 +17,7 @@
 *     interrupts.
 
 *  Description:
-*     Signals that a timer has completed indicating that an action is 
+*     Signals that a timer has completed indicating that an action is
 *     due for rescheduling.
 
 *  Arguments:
@@ -25,8 +25,8 @@
 *           packed action number plus action counter passed by value
 
 *  Algorithm:
-*     Interpret the AST parameter. This has been passed by VALUE, which 
-*     is necessary to ensure it is unique to this timer event. The 
+*     Interpret the AST parameter. This has been passed by VALUE, which
+*     is necessary to ensure it is unique to this timer event. The
 *     parameter contains two two-byte integers.
 
 *  Copyright:

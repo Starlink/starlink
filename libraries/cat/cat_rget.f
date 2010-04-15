@@ -9,7 +9,7 @@
 *  Invocation:
 *     CALL CAT_RGET (CI, ROWNO; STATUS)
 *  Description:
-*     Read a specified row from a catalogue, selection or index into 
+*     Read a specified row from a catalogue, selection or index into
 *     the current row buffer for that catalogue.
 *  Arguments:
 *     CI  =  INTEGER (Given)
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -103,7 +103,7 @@ C1000 format(1x, 'RGET on entry - rowno, status: ', I5, i10 )
          CALL CAT1_CATRW (CI, ROWNO, CATROW, STATUS)
 
 C        print2000, rowno, catrow, status
-C2000    format(1x, 'After CAT1_CATRW, rowno, catrow, status: ', 
+C2000    format(1x, 'After CAT1_CATRW, rowno, catrow, status: ',
 C    :     i10, i10, i20)
 
 *
@@ -138,9 +138,9 @@ C1002          format(1x, 'cielm, nrow__cat1(cielm): ', I6, I6 )
 
 *
 *       Report any error.
-*       Note that if the status returned corresponds to an attempt to 
+*       Note that if the status returned corresponds to an attempt to
 *       access an invalid row no error is reported.
-       
+
          IF ((STATUS .NE. CAT__OK) .AND. (STATUS .NE. CAT__INVRW)) THEN
             ERRLEN = 0
             ERRMSG = ' '

@@ -63,7 +63,7 @@
 *                          are replicated into the padded area.  For
 *                          example, with STEP=2 one corner of the
 *                          original and padded arrays would appear
-*                          as follows: 
+*                          as follows:
 *                                                        1 1 1 1 1 1 1
 *                                                        1 1 1 1 1 1 1
 *               corner of     1 1 1 1 1   corresponding  1 1 1 1 1 1 1
@@ -76,7 +76,7 @@
 *                          are reflected about the array's edge pixels.
 *                          For example, with STEP=2 one corner of the
 *                          original and padded arrays would appear as
-*                          follows: 
+*                          follows:
 *                                                        3 2 1 2 3 3 3
 *                                                        2 2 1 2 2 2 2
 *                  corner of  1 1 1 1 1   corresponding  1 1 1 1 1 1 1
@@ -169,7 +169,7 @@
 *        the default settings, which are a single step size of one
 *        pixel, and a difference threshold of 0.0.  The task pads the
 *        array by replication to deals with the edge pixels, and runs
-*        the filter once only. 
+*        the filter once only.
 *     median a100 a100med bound=ref
 *        As in the previous example except that it uses reflection
 *        rather than replication when padding the array.
@@ -316,12 +316,12 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     16-SEP-1998 (DSB):
-*        Correction to component list passed to LPG_PROP; ">WCS" replaced 
+*        Correction to component list passed to LPG_PROP; ">WCS" replaced
 *        by ",WCS".
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     7-SEP-2006 (DSB):
-*        Initialise NSTEP before getting parameter STEP, in order to avoid 
+*        Initialise NSTEP before getting parameter STEP, in order to avoid
 *        seg faults in the event of an earlier error.
 *     {enter_further_changes_here}
 
@@ -582,57 +582,57 @@
 *  type.
                   IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_MDRFR( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
                      CALL KPS1_MDRFB( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPS1_MDRFD( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_MDRFI( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                      CALL KPS1_MDRFUB( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO ) ),
      :                                 WDIMS( 1 ),
-     :                                 WDIMS( 2 ), 
+     :                                 WDIMS( 2 ),
      :                                 %VAL( CNF_PVAL( WPNTR ) ),
      :                                 STATUS )
 
                   ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                      CALL KPS1_MDRFUW( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO ) ),
      :                                 WDIMS( 1 ),
-     :                                 WDIMS( 2 ), 
+     :                                 WDIMS( 2 ),
      :                                 %VAL( CNF_PVAL( WPNTR ) ),
      :                                 STATUS )
 
                   ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                      CALL KPS1_MDRFW( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
@@ -643,57 +643,57 @@
 *  type.
                   IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_MDRPR( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
                      CALL KPS1_MDRPB( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPS1_MDRPD( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_MDRPI( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                      CALL KPS1_MDRPUB( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO ) ),
      :                                 WDIMS( 1 ),
-     :                                 WDIMS( 2 ), 
+     :                                 WDIMS( 2 ),
      :                                 %VAL( CNF_PVAL( WPNTR ) ),
      :                                 STATUS )
 
                   ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                      CALL KPS1_MDRPUW( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                 %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO ) ),
      :                                 WDIMS( 1 ),
-     :                                 WDIMS( 2 ), 
+     :                                 WDIMS( 2 ),
      :                                 %VAL( CNF_PVAL( WPNTR ) ),
      :                                 STATUS )
 
                   ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                      CALL KPS1_MDRPW( ST, DIMS( 1 ), DIMS( 2 ),
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
-     :                                WDIMS( 2 ), 
+     :                                WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
@@ -716,70 +716,70 @@
                      CALL KPS1_MDWTR( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                MEDTHR, SAMSIZ, SAMINF,
      :                                WDIMS( 1 ), WDIMS( 2 ),
-     :                                %VAL( CNF_PVAL( WPNTR ) ), 
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                DIMS( 1 ),
      :                                DIMS( 2 ), SAMPLE, SAMWT,
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                CHANGE, STATUS )
 
                   ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
                      CALL KPS1_MDWTB( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                MEDTHR, SAMSIZ, SAMINF,
      :                                WDIMS( 1 ), WDIMS( 2 ),
-     :                                %VAL( CNF_PVAL( WPNTR ) ), 
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                DIMS( 1 ),
      :                                DIMS( 2 ), SAMPLE, SAMWT,
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                CHANGE, STATUS )
 
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPS1_MDWTD( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                MEDTHR, SAMSIZ, SAMINF,
      :                                WDIMS( 1 ), WDIMS( 2 ),
-     :                                %VAL( CNF_PVAL( WPNTR ) ), 
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                DIMS( 1 ),
      :                                DIMS( 2 ), SAMPLE, SAMWT,
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                CHANGE, STATUS )
 
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_MDWTI( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                MEDTHR, SAMSIZ, SAMINF,
      :                                WDIMS( 1 ), WDIMS( 2 ),
-     :                                %VAL( CNF_PVAL( WPNTR ) ), 
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                DIMS( 1 ),
      :                                DIMS( 2 ), SAMPLE, SAMWT,
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                CHANGE, STATUS )
 
                   ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                      CALL KPS1_MDWTUB( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                 MEDTHR, SAMSIZ, SAMINF,
      :                                 WDIMS( 1 ), WDIMS( 2 ),
-     :                                 %VAL( CNF_PVAL( WPNTR ) ), 
+     :                                 %VAL( CNF_PVAL( WPNTR ) ),
      :                                 DIMS( 1 ),
      :                                 DIMS( 2 ), SAMPLE, SAMWT,
-     :                                 %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO ) ),
      :                                 CHANGE, STATUS )
 
                   ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                      CALL KPS1_MDWTUW( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                 MEDTHR, SAMSIZ, SAMINF,
      :                                 WDIMS( 1 ), WDIMS( 2 ),
-     :                                 %VAL( CNF_PVAL( WPNTR ) ), 
+     :                                 %VAL( CNF_PVAL( WPNTR ) ),
      :                                 DIMS( 1 ),
      :                                 DIMS( 2 ), SAMPLE, SAMWT,
-     :                                 %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO ) ),
      :                                 CHANGE, STATUS )
 
                   ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                      CALL KPS1_MDWTW( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                MEDTHR, SAMSIZ, SAMINF,
      :                                WDIMS( 1 ), WDIMS( 2 ),
-     :                                %VAL( CNF_PVAL( WPNTR ) ), 
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                DIMS( 1 ),
      :                                DIMS( 2 ), SAMPLE, SAMWT,
-     :                                %VAL( CNF_PVAL( PNTRO ) ), 
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                CHANGE, STATUS )
 
                   END IF

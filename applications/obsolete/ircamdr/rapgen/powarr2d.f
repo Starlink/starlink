@@ -1,7 +1,7 @@
 
 *+  POWARR2D - raise a 2-d array pixel by pixel to a given power
 
-      SUBROUTINE POWARR2D ( INARRAY, DIMS1, DIMS2, POWER, OUTARRAY, 
+      SUBROUTINE POWARR2D ( INARRAY, DIMS1, DIMS2, POWER, OUTARRAY,
      :                      STATUS )
 
 *    Description :
@@ -37,13 +37,13 @@
 *     If input power is negative then
 *        Very small pixel values may cause us to overflow - work out
 *         minimum limit and set large checking flag false
-*     Else input power is greater than zero 
+*     Else input power is greater than zero
 *        Large positive pixels may cause us to overflow - work out
 *         maximum limit and set large checking flag true
 *     Endif
 *     If large checking then
 *        For all pixels of the output array
-*           If Inarray pixel is negative or has value greater 
+*           If Inarray pixel is negative or has value greater
 *            than specified maximum then
 *              Outarray pixel = Bad value
 *           Else
@@ -52,7 +52,7 @@
 *        Endfor
 *     Else small checking required
 *        For all pixels of the output array
-*           If Inarray pixel is negative or has value less than 
+*           If Inarray pixel is negative or has value less than
 *            specified minimum then
 *              Outarray pixel = Bad value
 *           Else
@@ -107,20 +107,20 @@
       INTEGER  STATUS             ! global status parameter
 
 *    Local constants :
- 
+
       REAL
      :    VAXMAX,                 ! maximum valid real
-     :    BADVAL                  ! 'bad pixel' value to be used 
+     :    BADVAL                  ! 'bad pixel' value to be used
       PARAMETER( VAXMAX  =  NUM__MAXR ) ! no longer VAX specific
       PARAMETER( BADVAL  =  0.0 )      ! temporary usage
 
 *    Local variables :
 
       INTEGER
-     :    I, J                    ! counter variables 
-   
+     :    I, J                    ! counter variables
+
       REAL
-     :    MAXVAL,                 ! maximum valid pixel value allowed 
+     :    MAXVAL,                 ! maximum valid pixel value allowed
      :    MINVAL                  ! minimum   "     "     "      "
 
       LOGICAL                     ! true if :
@@ -139,7 +139,7 @@
 *    work out pixel value checking limits according to input value of power
       IF ( POWER .LT. 0.0 ) THEN
 
-*       when the power is negative, the danger pixel values are small 
+*       when the power is negative, the danger pixel values are small
 *       positive ones - work out the limit
          MINVAL  =  EXP( LOG( VAXMAX ) / POWER )
 
@@ -185,7 +185,7 @@
                IF ( INARRAY( I, J ) .GE. MAXVAL .OR.
      :              INARRAY( I, J ) .LE. 0.0 ) THEN
 
-*               check if input is negative 
+*               check if input is negative
 	         IF( INARRAY( I, J) .LE. 0.0) THEN
 
 *                 check if power is even
@@ -193,7 +193,7 @@
 
 *                   value and power ok so raise to power
 	             OUTARRAY( I, J) = ABS( INARRAY( I, J))**POWER
-	            
+
 	           ELSE
 
 *                   stick the 'bad pixel' value into the output pixel
@@ -235,7 +235,7 @@
                IF ( INARRAY( I, J ) .LE. MINVAL .OR.
      :              INARRAY( I, J ) .LE. 0.0 ) THEN
 
-*               check if input is negative 
+*               check if input is negative
 	         IF( INARRAY( I, J) .LE. 0.0) THEN
 
 *                 check if power is even
@@ -243,7 +243,7 @@
 
 *                   value and power ok so raise to power
 	             OUTARRAY( I, J) = ABS( INARRAY( I, J))**POWER
-	            
+
 	           ELSE
 
 *                   stick the 'bad pixel' value into the output pixel

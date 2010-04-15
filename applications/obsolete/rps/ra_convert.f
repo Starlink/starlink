@@ -1,9 +1,9 @@
 *+RA_CONVERT       Converts a character RA angle to radians, makes 'standard'
       SUBROUTINE RA_CONVERT(CVALRA, RA, LSTATUS)
- 
+
 *  Type Declaration
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       CHARACTER*(*) CVALRA		! will be changed if degrees or separator not a space
       DOUBLE PRECISION    RA
@@ -11,7 +11,7 @@
       INTEGER  FIND_FIRST
 *  Pi data
       INCLUDE 'zpidata.inc'
-  
+
 ********************************************************************************
 *  Method
 *     Reads input as text.  A valid separator indicates not degrees.
@@ -26,7 +26,7 @@
 *-******************************************************************************
 
 *  Functions
- 
+
 *   Local variables:
 
       CHARACTER*1 SEP(4)/':', '/', ',', ' '/
@@ -42,30 +42,30 @@
       LOGICAL REFORMAT
 
 *  Executable Code
- 
+
       LSTATUS = .TRUE.
       NCHAR = MDH_ENDWORD(CVALRA)
       START = 1									! find first non-space character
       DO WHILE (CVALRA(START:START) .EQ. ' ' .AND. START .LT. NCHAR)
          START = START + 1
       END DO
- 
+
       ISTAT = FIND_FIRST (CVALRA(START:NCHAR), ':/, ', SUBINDEX)	!See if separator, ie hms
       INDEX = ISTAT + START - 1
- 
+
          IF (ISTAT.EQ.0) THEN		! Assume its degrees
- 
+
             READ(CVALRA,*,IOSTAT=ISTAT) DEGREES
             IF (ISTAT.NE.0) GOTO 20
             IF (DEGREES .LT. 0.D0  .OR. DEGREES .GT. 360.0D0 )GOTO 20
             RA = DEGREES * DDTOR
             REFORMAT = .TRUE.
- 
+
          ELSE				! Its hour / minute / second in some form
- 
+
             N1 = INDEX - 1
 	    READ(CVALRA(START:N1),'(I)')HOUR
- 
+
             CHARSEP = SEP(SUBINDEX)
 C            IF (CHARSEP .NE. ' ' ) THEN
                REFORMAT = .TRUE.
@@ -76,9 +76,9 @@ C            END IF
 	    INDEX2 = FIND_FIRST (CVALRA(START:),CHARSEP,SUBINDEX)
             IF (INDEX2.EQ.0) GOTO 20
             N2 = START + INDEX2 - 2
- 
+
 	    READ(CVALRA(START:N2),*)MINUTE
- 
+
             N3 = N2 + 2
             IF (N3.GT.NCHAR) THEN
               SECOND = 0.0
@@ -91,7 +91,7 @@ C            END IF
 
          END IF
       GOTO 30
-  
+
 20    CONTINUE
       REFORMAT = .FALSE.
       LSTATUS = .FALSE.
@@ -102,5 +102,5 @@ C            END IF
          WRITE(CVALNEW, '(I2.2,1X,I2.2,1X,I2.2,A,I1)' ) IHMSF(1), IHMSF(2), IHMSF(3), '.', IHMSF(4)
          CVALRA = CVALNEW
       END IF
- 
+
       END

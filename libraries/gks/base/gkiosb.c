@@ -160,7 +160,7 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 
       if(*action == KON)
 	{
-      
+
 	  /* Get the terminal parameters. */
 #if HAVE_TERMIOS_H
           (void)tcgetattr(fd, &parms);
@@ -181,7 +181,7 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 #endif
 		break;
 	      }
-      
+
 	}
       else if(*action == KOFF)
 	{
@@ -255,7 +255,7 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 	    }
 	  else if(tch.t_startc == GKS_BRK)
 	    {
-   
+
 	      /* Check for use of GKS_BRK as XON/XOFF toggle */
 
 	      if(tch.t_stopc == GKS_BRK)
@@ -276,7 +276,7 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 	    }
 	  else
 	    {
-   
+
 	      /* Get line discipline and check BSD characters if appropriate */
 
 	      (void)ioctl(fd, TIOCGETD, &ldisc);
@@ -324,9 +324,9 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 	}
       else if(*action == KOFF)
 	{
-   
+
 	  /* Get the set of special characters modified */
-   
+
 	  switch(modified[index])
 	    {
 	    case NONE:
@@ -344,9 +344,9 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 	      gkyerr_.kerror = -2006;
 	      break;
 	    }
-   
+
 	  /* Restore whichever character(s) changed */
-   
+
 	  switch(was_break[index])
 	    {
 	    case NONE:
@@ -423,9 +423,9 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 	  gkyerr_.kerror = -2006;
 	  break;
 	}
-   
+
       /* If a restore,  reset change flag  and character log */
-   
+
       if(*action == KOFF)
 	{
 	  modified[index] = NONE;

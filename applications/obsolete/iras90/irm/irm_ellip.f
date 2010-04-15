@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,7 +89,7 @@
 *  Output the poly-line.
          CALL SGS_OPOLY
 
-*  See if an error has been reported by GKS or SGS 
+*  See if an error has been reported by GKS or SGS
          CALL GKS_GSTAT( STATUS )
 
       END IF

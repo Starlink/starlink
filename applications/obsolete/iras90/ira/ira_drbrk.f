@@ -143,10 +143,10 @@
       NBREAK = ACM_NBRK
 
       DO I = 1, NBREAK
-         BREAK( 1, I ) = ACM_BRK( 1, I )      
-         BREAK( 2, I ) = ACM_BRK( 2, I )      
-         VBREAK( 1, I ) = ACM_VBRK( 1, I )      
-         VBREAK( 2, I ) = ACM_VBRK( 2, I )      
+         BREAK( 1, I ) = ACM_BRK( 1, I )
+         BREAK( 2, I ) = ACM_BRK( 2, I )
+         VBREAK( 1, I ) = ACM_VBRK( 1, I )
+         VBREAK( 2, I ) = ACM_VBRK( 2, I )
       END DO
 
 *  If an error occurred, give a context message.

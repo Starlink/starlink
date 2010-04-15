@@ -1,4 +1,4 @@
-      SUBROUTINE CHR1_WILD2( WILDS, WLEN, NWILDA, NWILDN, FIRSTN, 
+      SUBROUTINE CHR1_WILD2( WILDS, WLEN, NWILDA, NWILDN, FIRSTN,
      :                       LASTN )
 *+
 *  Name:
@@ -21,26 +21,26 @@
 *        % a single character wild-card;
 *        * an arbitrary length string wild-card, including zero length.
 *
-*     There is also a literal escape character '\' for use when the 
-*     characters '*' and '%' are to be interpreted literally within 
+*     There is also a literal escape character '\' for use when the
+*     characters '*' and '%' are to be interpreted literally within
 *     the wild-card pattern.
 
-*  Arguments: 
-*     WILDS = CHARACTER * ( * ) (Given) 
-*        The wild-card pattern to be used in the match. 
+*  Arguments:
+*     WILDS = CHARACTER * ( * ) (Given)
+*        The wild-card pattern to be used in the match.
 *     WLEN = INTEGER (Given)
-*       The declared length of WILDS. 
+*       The declared length of WILDS.
 *     NWILDA = INTEGER  (Returned)
 *        The number of single character wild characters (WILDA) in
 *        the wild card pattern (WILDS).
 *     NWILDN = INTEGER (Returned)
-*        The number of arbitrary length string wild characters (WILDN) 
+*        The number of arbitrary length string wild characters (WILDN)
 *        in the wild card pattern (WILDS).
 *     FIRSTN = INTEGER (Returned)
-*        The index of the left-hand arbitrary length string wild 
+*        The index of the left-hand arbitrary length string wild
 *        character (WILDN).
 *     LASTN = INTEGER (Returned)
-*        The index of the right-hand arbitrary length string wild 
+*        The index of the right-hand arbitrary length string wild
 *        character (WILDN).
 
 *  Algorithm:
@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     8-OCT-1991 (PCTR):
 *        Final (working) version with changes prompted by P.T. Wallace.
 *     8-MAR-1993 (PCTR):
-*        Cure bug which leads to a WILDN chracter being present 
+*        Cure bug which leads to a WILDN chracter being present
 *        at the beginning of the WILDS string.
 *     28-SEP-1993 (ACC):
 *        Subroutine created during modlarisation.
@@ -121,7 +121,7 @@
  10      CONTINUE
          IF ( ICHW .LE. WLEN ) THEN
 
-*        Check for escaped characters and increment the wild character 
+*        Check for escaped characters and increment the wild character
 *        when appropriate.
             IF ( WILDS( ICHW : ICHW ) .EQ. ESCAPE ) THEN
                ICHW = ICHW + 1

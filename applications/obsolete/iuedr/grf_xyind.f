@@ -1,4 +1,4 @@
-      SUBROUTINE grf_XYIND(MASK, NPOINT, X, Y, DQ, XLIM, YLIM, FIRST, 
+      SUBROUTINE grf_XYIND(MASK, NPOINT, X, Y, DQ, XLIM, YLIM, FIRST,
      :                     LAST)
 *+
 *
@@ -21,7 +21,7 @@
 *         Some restructuring and final conversion to SGP/16 style.
 *
 *   Method:
-*      
+*
 *-
 
 *   Implicit:

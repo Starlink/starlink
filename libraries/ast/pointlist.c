@@ -40,12 +40,12 @@ f     The PointList class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@ f     The PointList class does not define any new routines beyond those
 *     20-JAN-2009 (DSB):
 *        Over-ride astRegBasePick.
 *     21-JAN-2009 (DSB):
-*        - Add methods astGetEnclosure, astSetEnclosure and astPoints, and 
+*        - Add methods astGetEnclosure, astSetEnclosure and astPoints, and
 *        attribute ListSize.
 *        - Override astGetObjSize and astEqual.
 *     26-JAN-2009 (DSB):
@@ -79,7 +79,7 @@ f     The PointList class does not define any new routines beyond those
 *     efficient for large numbers of points. For instance, use of k-tree
 *     structures instead of arrays could result in a much  more efficient
 *     implementation of the Transform function. Maybe the PointSet class
-*     should be extended to provide a k-tree representation as well as a 
+*     should be extended to provide a k-tree representation as well as a
 *     simple array.
 
 */
@@ -142,7 +142,7 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0;
@@ -218,7 +218,7 @@ static void SetAttrib( AstObject *, const char *, int * );
 /* Member functions. */
 /* ================= */
 
-static void ClearAttrib( AstObject *this_object, const char *attrib, 
+static void ClearAttrib( AstObject *this_object, const char *attrib,
                          int *status ) {
 /*
 *  Name:
@@ -278,7 +278,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib,
    }
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib, 
+static const char *GetAttrib( AstObject *this_object, const char *attrib,
                               int *status ) {
 /*
 *  Name:
@@ -337,7 +337,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib,
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -348,7 +348,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib,
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "getattrib_buff" as a null-terminated string in an 
+   the value into "getattrib_buff" as a null-terminated string in an
    appropriate format.  Set "result" to point at the result string. */
 
 /* ListSize. */
@@ -476,7 +476,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     PointList member function (over-rides the astGetObjSize protected
@@ -528,7 +528,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    return result;
 }
 
-void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name, 
+void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
                              int *status ) {
 /*
 *+
@@ -559,7 +559,7 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -672,8 +672,8 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     int Mask<X>( AstRegion *this, AstMapping *map, int inside, int ndim, 
-*                  const int lbnd[], const int ubnd[], <Xtype> in[], 
+*     int Mask<X>( AstRegion *this, AstMapping *map, int inside, int ndim,
+*                  const int lbnd[], const int ubnd[], <Xtype> in[],
 *                  <Xtype> val )
 
 *  Class Membership:
@@ -681,9 +681,9 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
 *     inherited from the parent Region class).
 
 *  Description:
-*     This is a set of functions for masking out regions within gridded data 
+*     This is a set of functions for masking out regions within gridded data
 *     (e.g. an image). The functions modifies a given data grid by
-*     assigning a specified value to all samples which are inside (or outside 
+*     assigning a specified value to all samples which are inside (or outside
 *     if "inside" is zero) the specified Region.
 *
 *     You should use a masking function which matches the numerical
@@ -696,30 +696,30 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
 
 *  Parameters:
 *     this
-*        Pointer to a Region. 
+*        Pointer to a Region.
 *     map
 *        Pointer to a Mapping. The forward transformation should map
 *        positions in the coordinate system of the supplied Region
-*        into pixel coordinates as defined by the "lbnd" and "ubnd" 
-*        parameters. A NULL pointer can be supplied if the coordinate 
-*        system of the supplied Region corresponds to pixel coordinates. 
+*        into pixel coordinates as defined by the "lbnd" and "ubnd"
+*        parameters. A NULL pointer can be supplied if the coordinate
+*        system of the supplied Region corresponds to pixel coordinates.
 *        This is equivalent to supplying a UnitMap.
 *
-*        The number of inputs for this Mapping (as given by its Nin attribute) 
+*        The number of inputs for this Mapping (as given by its Nin attribute)
 *        should match the number of axes in the supplied Region (as given
-*        by the Naxes attribute of the Region). The number of outputs for the 
+*        by the Naxes attribute of the Region). The number of outputs for the
 *        Mapping (as given by its Nout attribute) should match the number of
-*        grid dimensions given by the value of "ndim" below. 
+*        grid dimensions given by the value of "ndim" below.
 *     inside
-*        A boolean value which indicates which pixel are to be masked. If 
-*        a non-zero value is supplied, then all grid pixels which are inside 
+*        A boolean value which indicates which pixel are to be masked. If
+*        a non-zero value is supplied, then all grid pixels which are inside
 *        the supplied Region are assigned the value given by "val",
-*        and all other pixels are left unchanged. If zero is supplied, then 
-*        all grid pixels which are not inside the supplied Region are 
-*        assigned the value given by "val", and all other pixels are left 
-*        unchanged. Note, the Negated attribute of the Region is used to 
-*        determine which pixel are inside the Region and which are outside. 
-*        So the inside of a Region which has not been negated is the same as 
+*        and all other pixels are left unchanged. If zero is supplied, then
+*        all grid pixels which are not inside the supplied Region are
+*        assigned the value given by "val", and all other pixels are left
+*        unchanged. Note, the Negated attribute of the Region is used to
+*        determine which pixel are inside the Region and which are outside.
+*        So the inside of a Region which has not been negated is the same as
 *        the outside of the corresponding negated Region.
 *     ndim
 *        The number of dimensions in the input grid. This should be at
@@ -753,7 +753,7 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
 *        rapidly and that of the final dimension least rapidly
 *        (i.e. Fortran array indexing is used).
 *
-*        On exit, the samples specified by "inside" are set to the value 
+*        On exit, the samples specified by "inside" are set to the value
 *        of "val". All other samples are left unchanged.
 *     val
 *        This argument should have the same type as the elements of
@@ -1153,7 +1153,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          }
       }
 
-/* If this did not produced a merged Region, attempt to merge the PointList 
+/* If this did not produced a merged Region, attempt to merge the PointList
    with its upper neighbour (if any). */
       if( !new && where < *nmap - 1 ) {
          i1 = where;
@@ -1167,13 +1167,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If succesfull... */
       if( new ){
 
-/* Annul the first of the two Mappings, and replace it with the merged 
-   Region. Also clear the invert flag. */ 
+/* Annul the first of the two Mappings, and replace it with the merged
+   Region. Also clear the invert flag. */
          (void) astAnnul( ( *map_list )[ i1 ] );
          ( *map_list )[ i1 ] = new;
          ( *invert_list )[ i1 ] = 0;
 
-/* Annul the second of the two Mappings, and shuffle down the rest of the 
+/* Annul the second of the two Mappings, and shuffle down the rest of the
    list to fill the gap. */
          (void) astAnnul( ( *map_list )[ i1 + 1 ] );
          for ( i = i1 + 2; i < *nmap; i++ ) {
@@ -1199,14 +1199,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static AstRegion *MergePointList( AstPointList *this, AstRegion *reg, 
+static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
                                    int plsfirst, int *status ) {
 /*
 *  Name:
 *     MergePointList
 
 *  Purpose:
-*     Attempt to merge a PointList with another Region to form a Region of 
+*     Attempt to merge a PointList with another Region to form a Region of
 *     higher dimensionality.
 
 *  Type:
@@ -1214,15 +1214,15 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     AstRegion *MergePointList( AstPointList *this, AstRegion *reg, 
-*                                 int plsfirst, int *status ) 
+*     AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
+*                                 int plsfirst, int *status )
 
 *  Class Membership:
 *     PointList member function.
 
 *  Description:
 *     This function attempts to combine the supplied Regions together
-*     into a Region of higher dimensionality. 
+*     into a Region of higher dimensionality.
 
 *  Parameters:
 *     this
@@ -1279,9 +1279,9 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
 /* Check the local error status. */
    if ( !astOK ) return result;
 
-/* Get the Closed attributes of the two Regions. They must be the same in 
-   each Region if we are to merge the Regions. In addition, in order to 
-   merge, either both Regions must have a defined uncertainty, or neither 
+/* Get the Closed attributes of the two Regions. They must be the same in
+   each Region if we are to merge the Regions. In addition, in order to
+   merge, either both Regions must have a defined uncertainty, or neither
    Region must have a defined Uncertainty. */
    if( astGetClosed( this ) == astGetClosed( reg ) &&
        astTestUnc( this ) == astTestUnc( reg ) ) {
@@ -1291,31 +1291,31 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
       neg_reg = astGetNegated( reg );
 
 /* We only check for merging with another PointList (other classes such
-   as Box and Interval check for merging of PointLists with other classes). 
-   The result will be an PointList. Both Regions must have the same value 
+   as Box and Interval check for merging of PointLists with other classes).
+   The result will be an PointList. Both Regions must have the same value
    for the Negated flag, and can contain only a single point. */
       if( astIsAPointList( reg ) && neg_this == neg_reg &&
-          astGetListSize( this ) == 1 && 
+          astGetListSize( this ) == 1 &&
           astGetListSize( (AstPointList *) reg ) == 1 ) {
 
 /* Get the number of axes in the two supplied Regions. */
          nax_reg = astGetNaxes( reg );
          nax_this = astGetNaxes( this );
-   
+
 /* Get the number of axes the combination will have. */
          nax = nax_reg + nax_this;
-   
+
 /* Get the base Frames from the two Region FrameSets, and combine them
    into a single CmpFrame that will be used to create the new Region. */
          frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
          frm_reg = astGetFrame( reg->frameset, AST__BASE );
-   
+
          if( plsfirst ) {
             bfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
          } else {
             bfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
          }
-      
+
          frm_this = astAnnul( frm_this );
          frm_reg = astAnnul( frm_reg );
 
@@ -1334,27 +1334,27 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
 /* Check pointers can be used safely. */
          if( astOK ) {
 
-/* Copy the point positions fon the selected axes into the arrays allocated 
+/* Copy the point positions fon the selected axes into the arrays allocated
    above, in the requested order. */
             if( plsfirst ) {
                for( i = 0; i < nax_this; i++ ) {
-                  ptr_new[ i ][ 0 ] = ptr_this[ i ][ 0 ];   
+                  ptr_new[ i ][ 0 ] = ptr_this[ i ][ 0 ];
                }
                for( ; i < nax; i++ ) {
-                  ptr_new[ i ][ 0 ] = ptr_reg[ i - nax_this ][ 0 ];   
+                  ptr_new[ i ][ 0 ] = ptr_reg[ i - nax_this ][ 0 ];
                }
-   
+
             } else {
                for( i = 0; i < nax_reg; i++ ) {
-                  ptr_new[ i ][ 0 ] = ptr_reg[ i ][ 0 ];   
+                  ptr_new[ i ][ 0 ] = ptr_reg[ i ][ 0 ];
                }
                for( ; i < nax; i++ ) {
-                  ptr_new[ i ][ 0 ] = ptr_this[ i - nax_reg ][ 0 ];   
+                  ptr_new[ i ][ 0 ] = ptr_this[ i - nax_reg ][ 0 ];
                }
             }
 
 /* Create the new PointList. */
-            new = (AstRegion *) astPointList( bfrm, pset_new, NULL, "", 
+            new = (AstRegion *) astPointList( bfrm, pset_new, NULL, "",
                                               status );
 
 /* Propagate remaining attributes of the supplied Region to it. */
@@ -1367,7 +1367,7 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
                astClearNegated( new );
             }
 
-/* If both the supplied Regions have uncertainty, assign the new Region an 
+/* If both the supplied Regions have uncertainty, assign the new Region an
    uncertainty. */
             if( astTestUnc( this ) && astTestUnc( reg ) ) {
 
@@ -1394,42 +1394,42 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
                unc_reg = astAnnul( unc_reg );
                unc_this = astAnnul( unc_this );
             }
-   
+
 /* Get the current Frames from the two Region FrameSets, and combine them
    into a single CmpFrame. */
             frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__CURRENT );
             frm_reg = astGetFrame( reg->frameset, AST__CURRENT );
-         
+
             if( plsfirst ) {
                cfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
             } else {
                cfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
             }
-         
-/* Get the base -> current Mappings from the two Region FrameSets, and 
+
+/* Get the base -> current Mappings from the two Region FrameSets, and
    combine them into a single parallel CmpMap that connects bfrm and cfrm. */
-            map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE, 
+            map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE,
                                       AST__CURRENT );
             map_reg = astGetMapping( reg->frameset, AST__BASE, AST__CURRENT );
-         
+
             if( plsfirst ) {
-               bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "", 
+               bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "",
                                                  status );
             } else {
-               bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "", 
+               bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "",
                                                  status );
             }
-         
+
 /* Map the new Region into the new current Frame. */
             result = astMapRegion( new, bcmap, cfrm );
-   
+
 /* The filling factor in the returned is the product of the filling
    factors for the two supplied Regions. */
             if( astTestFillFactor( reg ) || astTestFillFactor( this ) ) {
                astSetFillFactor( result, astGetFillFactor( reg )*
                                          astGetFillFactor( this ) );
             }
-   
+
 /* If the MeshSize value is set in either supplied Region, set a value
    for the returned Region which scales the default value by the
    product of the scaling factors for the two supplied Regions. First see
@@ -1437,7 +1437,7 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
             msz_this_set = astTestMeshSize( this );
             msz_reg_set = astTestMeshSize( reg );
             if( msz_this_set || msz_reg_set ) {
-   
+
 /* If so, get the two MeshSize values (one of which may be a default
    value), and then clear them so that the default value will be returned
    in future. */
@@ -1445,22 +1445,22 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
                msz_reg = astGetMeshSize( reg );
                astClearMeshSize( this );
                astClearMeshSize( reg );
-   
+
 /* Get the ratio of the used MeshSize to the default MeshSize for both
    Regions. */
                fac_this = (double)msz_this/(double)astGetMeshSize( this );
                fac_reg = (double)msz_reg/(double)astGetMeshSize( reg );
-   
+
 /* The MeshSize of the returned Returned is the default value scaled by
    the product of the two ratios found above. */
                astSetMeshSize( result, fac_this*fac_reg*astGetMeshSize( result ) );
-   
+
 /* Re-instate the original MeshSize values for the supplied Regions (if
    set) */
                if( msz_this_set ) astSetMeshSize( this, msz_this );
                if( msz_reg_set ) astSetMeshSize( reg, msz_reg );
             }
-   
+
 /* Free remaining resources */
             frm_this = astAnnul( frm_this );
             frm_reg = astAnnul( frm_reg );
@@ -1511,7 +1511,7 @@ void PointListPoints( AstPointList *this, AstPointSet **pset, int *status) {
 *        Pointer to the PointList.
 *     pset
 *        Address of a location at which to return a pointer to a PointSet
-*        holding the points in the PointList, in the base Frame of the 
+*        holding the points in the PointList, in the base Frame of the
 *        encapsulated FrameSet. The returned Pointer should be annulled
 *        when no longer needed.
 
@@ -1532,7 +1532,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     RegBaseBox
 
 *  Purpose:
-*     Returns the bounding box of an un-negated Region in the base Frame of 
+*     Returns the bounding box of an un-negated Region in the base Frame of
 *     the encapsulated FrameSet.
 
 *  Type:
@@ -1547,7 +1547,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     method inherited from the Region class).
 
 *  Description:
-*     This function returns the upper and lower axis bounds of a Region in 
+*     This function returns the upper and lower axis bounds of a Region in
 *     the base Frame of the encapsulated FrameSet, assuming the Region
 *     has not been negated. That is, the value of the Negated attribute
 *     is ignored.
@@ -1558,12 +1558,12 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     lbnd
 *        Pointer to an array in which to return the lower axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     ubnd
 *        Pointer to an array in which to return the upper axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     status
 *        Pointer to the inherited status variable.
@@ -1616,7 +1616,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 /* Check pointers can be used safely. */
       if( astOK ) {
 
-/* Find the bounds on each axis in turn. */ 
+/* Find the bounds on each axis in turn. */
          for( ic = 0; ic < nc; ic++ ) {
 
 /* We first find the max and min axis offsets from the first point. We
@@ -1627,7 +1627,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
             lb[ ic ] = 0.0;
             ub[ ic ] = 0.0;
             for( ip = 1; ip < np; ip++, p++ ) {
-               d = astAxDistance( frm, ic + 1, p0, *p );        
+               d = astAxDistance( frm, ic + 1, p0, *p );
                if( d < lb[ ic ] ) lb[ ic ] = d;
                if( d > ub[ ic ] ) ub[ ic ] = d;
             }
@@ -1640,7 +1640,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
       }
 
 /* Free resources */
-      frm = astAnnul( frm );   
+      frm = astAnnul( frm );
 
 /* Store the pointers in the PointList structure. */
       if( astOK ) {
@@ -1658,7 +1658,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
       memcpy( lbnd, this->lbnd, nb );
       memcpy( ubnd, this->ubnd, nb );
    }
-   
+
 }
 
 static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
@@ -1667,7 +1667,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *     RegBaseMesh
 
 *  Purpose:
-*     Return a PointSet containing a mesh of points on the boundary of a 
+*     Return a PointSet containing a mesh of points on the boundary of a
 *     Region in its base Frame.
 
 *  Type:
@@ -1693,7 +1693,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to the PointSet. The axis values in this PointSet will have 
+*     Pointer to the PointSet. The axis values in this PointSet will have
 *     associated accuracies derived from the accuracies which were
 *     supplied when the Region was created.
 
@@ -1709,7 +1709,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
-/* If the Region structure contains a pointer to a PointSet holding 
+/* If the Region structure contains a pointer to a PointSet holding
    a previously created mesh, return it. */
    if( this->basemesh ) {
       result = astClone( this->basemesh );
@@ -1732,7 +1732,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
    return result;
 }
 
-static AstRegion *RegBasePick( AstRegion *this_region, int naxes, 
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
                                const int *axes, int *status ){
 /*
 *  Name:
@@ -1747,7 +1747,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes,
 *                             int *status )
 
 *  Class Membership:
@@ -1755,8 +1755,8 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 *     method inherited from the Region class).
 
 *  Description:
-*     This function attempts to return a Region that is spanned by selected 
-*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     This function attempts to return a Region that is spanned by selected
+*     axes from the base Frame of the encapsulated FrameSet of the supplied
 *     Region. This may or may not be possible, depending on the class of
 *     Region. If it is not possible a NULL pointer is returned.
 
@@ -1810,7 +1810,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 
 /* Get the uncertainty Region (if any) within the base Frame of the supplied
    Region, and select the required axes from it. If the resulting Object
-   is not a Region, annul it so that the returned Region will have no 
+   is not a Region, annul it so that the returned Region will have no
    uncertainty. */
    if( astTestUnc( this_region ) ) {
       bunc = astGetUncFrm( this_region, AST__BASE );
@@ -1837,7 +1837,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
 /* Check pointers can be used safely. */
    if( astOK ) {
 
-/* Copy the point positions on the selected axes into the arrays allocated 
+/* Copy the point positions on the selected axes into the arrays allocated
    above. */
       for( i = 0; i < naxes; i++ ) {
          p = ptr[ axes[ i ] ];
@@ -1850,8 +1850,8 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
    }
 
 /* Free resources */
-   frm = astAnnul( frm );      
-   bfrm = astAnnul( bfrm );      
+   frm = astAnnul( frm );
+   bfrm = astAnnul( bfrm );
    if( unc ) unc = astAnnul( unc );
    pset_new = astAnnul( pset_new );
 
@@ -1885,7 +1885,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 *  Description:
 *     This function returns a flag indicating if the supplied set of
-*     points all fall on the boundary of the given PointList. 
+*     points all fall on the boundary of the given PointList.
 *
 *     Some tolerance is allowed, as specified by the uncertainty Region
 *     stored in the supplied PointList "this", and the supplied uncertainty
@@ -1895,12 +1895,12 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *     this
 *        Pointer to the PointList.
 *     pset
-*        Pointer to the PointSet. The points are assumed to refer to the 
+*        Pointer to the PointSet. The points are assumed to refer to the
 *        base Frame of the FrameSet encapsulated by "this".
 *     unc
 *        Pointer to a Region representing the uncertainties in the points
-*        given by "pset". The Region is assumed to represent the base Frame 
-*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed 
+*        given by "pset". The Region is assumed to represent the base Frame
+*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed
 *        if NULL is supplied.
 *     mask
 *        Pointer to location at which to return a pointer to a newly
@@ -1956,7 +1956,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Get pointer to the supplied axis values, the number of points and the
    number of axis values per point. */
-   ptr = astGetPoints( pset );   
+   ptr = astGetPoints( pset );
    np = astGetNpoint( pset );
    nc = astGetNcoord( pset );
 
@@ -2010,12 +2010,12 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* If no output mask is to be made, we can break out of the check as soon
    as the first bad value is found. */
       } else {
-         for( ic = 0; ic < nc && result; ic++ ){ 
+         for( ic = 0; ic < nc && result; ic++ ){
             p = ptr2[ ic ];
-            for( ip = 0; ip < np; ip++,p++ ){ 
+            for( ip = 0; ip < np; ip++,p++ ){
                if( *p == AST__BAD ) {
                   result = 0;
-                  break;      
+                  break;
                }
             }
          }
@@ -2023,9 +2023,9 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* If this check was passed, we perform a similar check in the opposite
    direction: we create a new PointList from the supplied list of points,
-   and then we transform the points associated with the supplied PointList 
+   and then we transform the points associated with the supplied PointList
    using the new PointList. This checks that all the points in the
-   supplied PointList are close to the supplied points. Create the new 
+   supplied PointList are close to the supplied points. Create the new
    PointList holding the supplied points. */
       if( result ) {
          pl = astPointList( unc, pset, unc, "", status );
@@ -2036,13 +2036,13 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
          ptr3 = astGetPoints( pset3 );
 
 /* Check pointers can be used. */
-         if( astOK ) { 
-            for( ic = 0; ic < nc && result; ic++ ){ 
+         if( astOK ) {
+            for( ic = 0; ic < nc && result; ic++ ){
                p = ptr3[ ic ];
-               for( ip = 0; ip < np; ip++,p++ ){ 
+               for( ip = 0; ip < np; ip++,p++ ){
                   if( *p == AST__BAD ) {
                      result = 0;
-                     break;      
+                     break;
                   }
                }
             }
@@ -2073,7 +2073,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting, 
+static void SetAttrib( AstObject *this_object, const char *setting,
                        int *status ) {
 /*
 *  Name:
@@ -2144,7 +2144,7 @@ static void SetAttrib( AstObject *this_object, const char *setting,
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
    if ( MATCH( "listsize" ) ) {
-      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", 
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
                 status, setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status );
 
@@ -2233,9 +2233,9 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    pointer. */
    simpler = ( new != this );
 
-/* Get the Mapping from base to current Frame. We can modify the PointList so 
-   that a UnitMap can be used. This is good because it means that the 
-   serialised PointList is simpler since the Dump function only needs to 
+/* Get the Mapping from base to current Frame. We can modify the PointList so
+   that a UnitMap can be used. This is good because it means that the
+   serialised PointList is simpler since the Dump function only needs to
    record one Frame instead of the whole FrameSet. */
    map = astGetMapping( new->frameset, AST__BASE, AST__CURRENT );
    if( !astIsAUnitMap( map ) ){
@@ -2270,7 +2270,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Free resources. */
    map = astAnnul( map );
 
-/* If any simplification could be performed, copy Region attributes from 
+/* If any simplification could be performed, copy Region attributes from
    the supplied Region to the returned Region, and return a pointer to it.
    If the supplied Region had no uncertainty, ensure the returned Region
    has no uncertainty. Otherwise, return a clone of the supplied pointer. */
@@ -2290,7 +2290,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    return result;
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib, 
+static int TestAttrib( AstObject *this_object, const char *attrib,
                        int *status ) {
 /*
 *  Name:
@@ -2387,7 +2387,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *     This function takes a PointList and a set of points encapsulated in a
 *     PointSet and transforms the points by setting axis values to
 *     AST__BAD for all points which are outside the region covered by the
-*     PointList. PointList inside the region are copied unchanged from input 
+*     PointList. PointList inside the region are copied unchanged from input
 *     to output.
 
 *  Parameters:
@@ -2447,8 +2447,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    if ( !astOK ) return NULL;
 
 /* Avoid -Wall compiler warnings. */
-   ps1 = NULL;   
-   ps2 = NULL;   
+   ps1 = NULL;
+   ps2 = NULL;
 
 /* Obtain a pointer to the Region structure. */
    this = (AstRegion *) this_mapping;
@@ -2478,7 +2478,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    }
 
 /* Determine the numbers of points and coordinates per point from the base
-   Frame PointSet and obtain pointers for accessing the base Frame and output 
+   Frame PointSet and obtain pointers for accessing the base Frame and output
    coordinate values. */
    npoint = astGetNpoint( in_base );
    ncoord_base = astGetNcoord( in_base );
@@ -2548,12 +2548,12 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 /* The ps1 PointSet will now be a copy of the supplied PointSet but with
    positions set to bad if they are inside any of the re-centred uncertainty
    Regions.  If this PointList has been negated, this is what we want so
-   we just transfer this bad position mask to the result PointSet. If this 
+   we just transfer this bad position mask to the result PointSet. If this
    PointList has not been negated we need to invert the bad position
    mask. Get a pointer to the first axis of the resulting PointSet. */
       ptr1 = astGetPoints( ps1 );
       if( astOK ) {
-         mask = ptr1[ 0 ];      
+         mask = ptr1[ 0 ];
 
 /* Apply the mask to the returned PointSet, inverted if necessary. */
          if( astGetNegated( this ) ) {
@@ -2563,7 +2563,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                      ptr_out[ coord ][ point ] = AST__BAD;
                   }
                }
-            }                 
+            }
 
          } else {
             for ( point = 0; point < npoint; point++, mask++ ) {
@@ -2572,7 +2572,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                      ptr_out[ coord ][ point ] = AST__BAD;
                   }
                }
-            }                 
+            }
          }
       }
    }
@@ -2788,7 +2788,7 @@ astMAKE_ISA(PointList,Region)
 astMAKE_CHECK(PointList)
 
 AstPointList *astPointList_( void *frame_void, AstPointSet *points,
-                             AstRegion *unc, const char *options, 
+                             AstRegion *unc, const char *options,
                              int *status, ...) {
 /*
 *+
@@ -2804,15 +2804,15 @@ AstPointList *astPointList_( void *frame_void, AstPointSet *points,
 *  Synopsis:
 *     #include "pointlist.h"
 *     AstPointList *astPointList( AstFrame *frame, AstPointSet *points,
-*                                 AstRegion *unc, const char *options, 
+*                                 AstRegion *unc, const char *options,
 *                                 int *status, ...) {
 
 *  Class Membership:
 *     PointList constructor.
 
 *  Description:
-*     This function implements the protected interface to the astPointList 
-*     constructor function, returning a true C pointer. The parameter list 
+*     This function implements the protected interface to the astPointList
+*     constructor function, returning a true C pointer. The parameter list
 *     differs from the public constructor, in that the positions are
 *     defined by a PointSet rather than an array of doubles.
 
@@ -2823,32 +2823,32 @@ AstPointList *astPointList_( void *frame_void, AstPointSet *points,
 *        subsequent changes made to the Frame using the supplied pointer
 *        will have no effect the Region.
 *     points
-*        A PointSet holding the physical coordinates of the points. 
+*        A PointSet holding the physical coordinates of the points.
 *     unc
-*        An optional pointer to an existing Region which specifies the 
-*        uncertainties associated with each point in the PointList being 
-*        created. The uncertainty at any point in the PointList is found by 
-*        shifting the supplied "uncertainty" Region so that it is centred at 
-*        the point being considered. The area covered by the shifted 
-*        uncertainty Region then represents the uncertainty in the position. 
+*        An optional pointer to an existing Region which specifies the
+*        uncertainties associated with each point in the PointList being
+*        created. The uncertainty at any point in the PointList is found by
+*        shifting the supplied "uncertainty" Region so that it is centred at
+*        the point being considered. The area covered by the shifted
+*        uncertainty Region then represents the uncertainty in the position.
 *        The uncertainty is assumed to be the same for all points.
 *
-*        If supplied, the uncertainty Region must be of a class for which 
-*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
-*        or be a Prism containing centro-symetric component Regions. A deep 
-*        copy of the supplied Region will be taken, so subsequent changes to 
-*        the uncertainty Region using the supplied pointer will have no 
-*        effect on the created Box. Alternatively, a NULL Object pointer 
-*        may be supplied, in which case a default uncertainty is used 
-*        equivalent to a box 1.0E-6 of the size of the bounding box of the 
+*        If supplied, the uncertainty Region must be of a class for which
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.)
+*        or be a Prism containing centro-symetric component Regions. A deep
+*        copy of the supplied Region will be taken, so subsequent changes to
+*        the uncertainty Region using the supplied pointer will have no
+*        effect on the created Box. Alternatively, a NULL Object pointer
+*        may be supplied, in which case a default uncertainty is used
+*        equivalent to a box 1.0E-6 of the size of the bounding box of the
 *        PointList being created.
-*        
+*
 *        The uncertainty Region has two uses: 1) when the astOverlap
-*        function compares two Regions for equality the uncertainty Region 
+*        function compares two Regions for equality the uncertainty Region
 *        is used to determine the tolerance on the comparison, and 2)
 *        when a Region is mapped into a different coordinate system and
-*        subsequently simplified (using astSimplify), the uncertainties are 
-*        used to determine if the transformed boundary can be accurately 
+*        subsequently simplified (using astSimplify), the uncertainties are
+*        used to determine if the transformed boundary can be accurately
 *        represented by a specific shape of Region.
 *     options
 *        Pointer to a null-terminated string containing an optional
@@ -2856,7 +2856,7 @@ AstPointList *astPointList_( void *frame_void, AstPointSet *points,
 *        initialising the new PointList. The syntax used is identical to
 *        that for the astSet function and may include "printf" format
 *        specifiers identified by "%" symbols in the normal way.
-*     status 
+*     status
 *        Pointer to the inherited status value.
 *     ...
 *        If the "options" string contains "%" format specifiers, then
@@ -2887,7 +2887,7 @@ AstPointList *astPointList_( void *frame_void, AstPointSet *points,
 
 /* Initialise the PointList, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitPointList( NULL, sizeof( AstPointList ), !class_init, 
+   new = astInitPointList( NULL, sizeof( AstPointList ), !class_init,
                            &class_vtab, "PointList", frame, points, unc );
 
 /* If successful, note that the virtual function table has been
@@ -2910,7 +2910,7 @@ AstPointList *astPointList_( void *frame_void, AstPointSet *points,
 }
 
 AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
-                               const double *points, void *unc_void, 
+                               const double *points, void *unc_void,
                                const char *options, ... ) {
 /*
 *++
@@ -2926,7 +2926,7 @@ f     AST_POINTLIST
 
 *  Synopsis:
 c     #include "pointlist.h"
-c     AstPointList *astPointList( AstFrame *frame, int npnt, int ncoord, int dim, 
+c     AstPointList *astPointList( AstFrame *frame, int npnt, int ncoord, int dim,
 c                                 const double *points, AstRegion *unc,
 c                                 const char *options, ... )
 f     RESULT = AST_POINTLIST( FRAME, NPNT, COORD, DIM, POINTS, UNC, OPTIONS, STATUS )
@@ -2935,10 +2935,10 @@ f     RESULT = AST_POINTLIST( FRAME, NPNT, COORD, DIM, POINTS, UNC, OPTIONS, STA
 *     PointList constructor.
 
 *  Description:
-*     This function creates a new PointList object and optionally initialises 
+*     This function creates a new PointList object and optionally initialises
 *     its attributes.
 *
-*     A PointList object is a specialised type of Region which represents a 
+*     A PointList object is a specialised type of Region which represents a
 *     collection of points in a coordinate Frame.
 
 *  Parameters:
@@ -2950,11 +2950,11 @@ f     FRAME = INTEGER (Given)
 *        will have no effect the Region.
 c     npnt
 f     NPNT = INTEGER (Given)
-*        The number of points in the Region. 
+*        The number of points in the Region.
 c     ncoord
 f     NCOORD = INTEGER (Given)
 *        The number of coordinates being supplied for each point. This
-*        must equal the number of axes in the supplied Frame, given by 
+*        must equal the number of axes in the supplied Frame, given by
 *        its Naxes attribute.
 c     dim
 f     DIM = INTEGER (Given)
@@ -2967,46 +2967,46 @@ c        given should not be less than "npnt".
 f        given should not be less than NPNT.
 c     points
 f     POINTS( DIM, NCOORD ) = DOUBLE PRECISION (Given)
-c        The address of the first element of a 2-dimensional array of 
-c        shape "[ncoord][dim]" giving the physical coordinates of the 
-c        points. These should be stored such that the value of coordinate 
-c        number "coord" for point number "pnt" is found in element 
+c        The address of the first element of a 2-dimensional array of
+c        shape "[ncoord][dim]" giving the physical coordinates of the
+c        points. These should be stored such that the value of coordinate
+c        number "coord" for point number "pnt" is found in element
 c        "in[coord][pnt]".
 f        A 2-dimensional array giving the physical coordinates of the
-f        points. These should be stored such that the value of coordinate 
+f        points. These should be stored such that the value of coordinate
 f        number COORD for point number PNT is found in element IN(PNT,COORD).
 c     unc
 f     UNC = INTEGER (Given)
-*        An optional pointer to an existing Region which specifies the uncertainties 
-*        associated with each point in the PointList being created. The 
-*        uncertainty at any point in the PointList is found by shifting the 
-*        supplied "uncertainty" Region so that it is centred at the point 
-*        being considered. The area covered by the shifted uncertainty Region 
-*        then represents the uncertainty in the position. The uncertainty is 
+*        An optional pointer to an existing Region which specifies the uncertainties
+*        associated with each point in the PointList being created. The
+*        uncertainty at any point in the PointList is found by shifting the
+*        supplied "uncertainty" Region so that it is centred at the point
+*        being considered. The area covered by the shifted uncertainty Region
+*        then represents the uncertainty in the position. The uncertainty is
 *        assumed to be the same for all points.
 *
-*        If supplied, the uncertainty Region must be of a class for which 
-*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
-*        or be a Prism containing centro-symetric component Regions. A deep 
-*        copy of the supplied Region will be taken, so subsequent changes to 
-*        the uncertainty Region using the supplied pointer will have no 
-*        effect on the created Box. Alternatively, 
-f        a null Object pointer (AST__NULL) 
-c        a NULL Object pointer 
-*        may be supplied, in which case a default uncertainty is used 
-*        equivalent to a box 1.0E-6 of the size of the bounding box of the 
+*        If supplied, the uncertainty Region must be of a class for which
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.)
+*        or be a Prism containing centro-symetric component Regions. A deep
+*        copy of the supplied Region will be taken, so subsequent changes to
+*        the uncertainty Region using the supplied pointer will have no
+*        effect on the created Box. Alternatively,
+f        a null Object pointer (AST__NULL)
+c        a NULL Object pointer
+*        may be supplied, in which case a default uncertainty is used
+*        equivalent to a box 1.0E-6 of the size of the bounding box of the
 *        PointList being created.
-*        
-*        The uncertainty Region has two uses: 1) when the 
+*
+*        The uncertainty Region has two uses: 1) when the
 c        astOverlap
-f        AST_OVERLAP 
+f        AST_OVERLAP
 *        function compares two Regions for equality the uncertainty
 *        Region is used to determine the tolerance on the comparison, and 2)
 *        when a Region is mapped into a different coordinate system and
-*        subsequently simplified (using 
+*        subsequently simplified (using
 c        astSimplify),
 f        AST_SIMPLIFY),
-*        the uncertainties are used to determine if the transformed boundary 
+*        the uncertainties are used to determine if the transformed boundary
 *        can be accurately represented by a specific shape of Region.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
@@ -3093,7 +3093,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the PointList, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitPointList( NULL, sizeof( AstPointList ), !class_init, 
+   new = astInitPointList( NULL, sizeof( AstPointList ), !class_init,
                            &class_vtab, "PointList", frame, pset, unc );
 
 /* If successful, note that the virtual function table has been
@@ -3118,9 +3118,9 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 }
 
-AstPointList *astInitPointList_( void *mem, size_t size, int init, 
-                                 AstPointListVtab *vtab, const char *name, 
-                                 AstFrame *frame, AstPointSet *points, 
+AstPointList *astInitPointList_( void *mem, size_t size, int init,
+                                 AstPointListVtab *vtab, const char *name,
+                                 AstFrame *frame, AstPointSet *points,
                                  AstRegion *unc, int *status ) {
 /*
 *+
@@ -3135,9 +3135,9 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     AstPointList *astInitPointList( void *mem, size_t size, int init, 
+*     AstPointList *astInitPointList( void *mem, size_t size, int init,
 *                                     AstPointListVtab *vtab, const char *name,
-*                                     AstFrame *frame, AstPointSet *points, 
+*                                     AstFrame *frame, AstPointSet *points,
 *                                     AstRegion *unc, int *status )
 
 *  Class Membership:
@@ -3183,18 +3183,18 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init,
 *        A PointSet containing the Points for the PointList.
 *     unc
 *        A pointer to a Region which specifies the uncertainty in the
-*        supplied positions (all points in the new PointList being 
-*        initialised are assumed to have the same uncertainty). A NULL 
-*        pointer can be supplied, in which case default uncertainties equal 
-*        to 1.0E-6 of the dimensions of the new PointList's bounding box are 
-*        used. If an uncertainty Region is supplied, it must be either a Box, 
+*        supplied positions (all points in the new PointList being
+*        initialised are assumed to have the same uncertainty). A NULL
+*        pointer can be supplied, in which case default uncertainties equal
+*        to 1.0E-6 of the dimensions of the new PointList's bounding box are
+*        used. If an uncertainty Region is supplied, it must be either a Box,
 *        a Circle or an Ellipse, and its encapsulated Frame must be related
 *        to the Frame supplied for parameter "frame" (i.e. astConvert
-*        should be able to find a Mapping between them). Two positions 
-*        the "frame" Frame are considered to be co-incident if their 
+*        should be able to find a Mapping between them). Two positions
+*        the "frame" Frame are considered to be co-incident if their
 *        uncertainty Regions overlap. The centre of the supplied
-*        uncertainty Region is immaterial since it will be re-centred on the 
-*        point being tested before use. A deep copy is taken of the supplied 
+*        uncertainty Region is immaterial since it will be re-centred on the
+*        point being tested before use. A deep copy is taken of the supplied
 *        Region.
 
 *  Returned Value:
@@ -3251,7 +3251,7 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init,
    return new;
 }
 
-AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab, 
+AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
                                  const char *name, AstChannel *channel, int *status ) {
 /*
 *+
@@ -3266,7 +3266,7 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     AstPointList *astLoadPointList( void *mem, size_t size, AstPointListVtab *vtab, 
+*     AstPointList *astLoadPointList( void *mem, size_t size, AstPointListVtab *vtab,
 *                                     const char *name, AstChannel *channel )
 
 *  Class Membership:

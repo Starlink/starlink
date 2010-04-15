@@ -19,7 +19,7 @@
 *               char *pntrs[], size_t * actval, int * status );
 
 *  Description :
-*     Retrieves the values from a _CHAR*n vectorized primitive array object into a 
+*     Retrieves the values from a _CHAR*n vectorized primitive array object into a
 *     character buffer and optionally an array of pointers. The C implementation
 *     will populate the buffer with nul terminated strings one after the other.
 *     Sufficient space must be made available to include the nul terminators.

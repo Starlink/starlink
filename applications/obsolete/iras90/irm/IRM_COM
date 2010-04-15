@@ -39,9 +39,9 @@
       LOGICAL MCM_SOCUR
       COMMON / IRM_NPEN / MCM_SOCUR
 
-*  The number of curves which have been set pen number, 
+*  The number of curves which have been set pen number,
 *  and pen number of each curve.
-      INTEGER MCM_NCURV       
+      INTEGER MCM_NCURV
       INTEGER MCM_CRPN( MXCURV )
       COMMON / IRM_NPEN / MCM_NCURV, MCM_CRPN
 
@@ -51,7 +51,7 @@
 
 *  Pen number of axis lines and tick marks, and colour index
 *  of numeric labels.
-      INTEGER MCM_AXPN 
+      INTEGER MCM_AXPN
       INTEGER MCM_TKPN
       INTEGER MCM_NLBCL
       COMMON / IRM_NPEN /MCM_AXPN, MCM_TKPN, MCM_NLBCL

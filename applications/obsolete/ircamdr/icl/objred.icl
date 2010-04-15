@@ -77,7 +77,7 @@ proc objred var1 var2 var3 var4
     fclose_c
     st = getenv("LIRCAMDIR")
     st1 = st & "/fs.dat"
-    open cfile (st1) 
+    open cfile (st1)
     read cfile (dline)
     read cfile (dline)
     actmag2 = -99.99
@@ -560,7 +560,7 @@ proc objred var1 var2 var3 var4
       out2 = out & ".sdf"
       final2 = final & ".sdf"
       obeyw rapi2d CMULT (out2) 1.0 (final2)
-      delfile (out2) 
+      delfile (out2)
     end if
   else
     yn1 = undefined(var1)
@@ -726,7 +726,7 @@ proc objred var1 var2 var3 var4
             xobj00 = xobj0
             yobj00 = yobj0
             xst0 = xst
-            yst0 = yst            
+            yst0 = yst
             fclose_b
             open bfile (toff)
             iflago = 1
@@ -778,7 +778,7 @@ proc objred var1 var2 var3 var4
         ori = real(ori)
         gam = real(gam)
         print "PSF FWHM        = " (afwhm) "arcsec"
-        print "Mean axis ratio = " (rat) 
+        print "Mean axis ratio = " (rat)
         print "Orientation     = " (ori)
         print "Gamma           = " (gam)
         nc = len(diffim)

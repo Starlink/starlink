@@ -1,8 +1,8 @@
-	SUBROUTINE LINCONT_NDR_LIN( DIMS_IMAGEX, DIMS_IMAGEY, IMAGE_ARRAY, 
-     :	                            IMAGE2_ARRAY, NCIMAGE, NUMCOEFFS, 
+	SUBROUTINE LINCONT_NDR_LIN( DIMS_IMAGEX, DIMS_IMAGEY, IMAGE_ARRAY,
+     :	                            IMAGE2_ARRAY, NCIMAGE, NUMCOEFFS,
      :	                            COEFFS, BASE, RANGE, RAT)
 
-* Description : 
+* Description :
 
 	IMPLICIT NONE
 
@@ -25,7 +25,7 @@
      :	  RANGE,                                         ! range value
      :	  READ2M1,                                       ! value phase-ktc
      :	  READ2,                                         ! value phase+ktc
-     :	  READ2M1_LIN,                                   ! corrected data 
+     :	  READ2M1_LIN,                                   ! corrected data
      :	  RAT                                            ! ratio rr/exp
 
 *       Initialize adam status
@@ -42,8 +42,8 @@
 
 	      READ2M1 = IMAGE_ARRAY( K, J)
 
-	      READ2 = 
-     :	       ( IMAGE_ARRAY( K, J)+IMAGE2_ARRAY( K, J))/REAL( NCIMAGE) 
+	      READ2 =
+     :	       ( IMAGE_ARRAY( K, J)+IMAGE2_ARRAY( K, J))/REAL( NCIMAGE)
 
 	    ELSE
 
@@ -62,7 +62,7 @@
 
 	      READ2M1 = READ2M1/REAL( NCIMAGE)
 
-	      CALL LINCONT_NDR_POLY( NUMCOEFFS, COEFFS, RAT, READ2M1, 
+	      CALL LINCONT_NDR_POLY( NUMCOEFFS, COEFFS, RAT, READ2M1,
      :	                             READ2M1_LIN)
 
 	      IF( READ2 .LT. ( BASE+RANGE) .AND. READ2M1_LIN .LT. RANGE) THEN
@@ -81,7 +81,7 @@
 
 	    END IF
 
-	    IMAGE_ARRAY( K, J) = READ2M1_LIN 
+	    IMAGE_ARRAY( K, J) = READ2M1_LIN
 
 	  END DO
 

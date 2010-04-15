@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,7 +77,7 @@
 *  Save the STATUS value and mark the error stack.
       TSTAT = STATUS
       CALL ERR_MARK
-       
+
 *  Find the temporary object's name.
       STATUS = SAI__OK
       CALL DAT_NAME( LOC, NAME, STATUS )
@@ -96,7 +96,7 @@
 *  Annul the parent's locator.
       CALL DAT_ANNUL( LOCP, STATUS )
       LOCP = ' '
-       
+
 *  Annul any error if STATUS was previously bad, otherwise let the new
 *  error report stand.
       IF ( STATUS .NE. SAI__OK ) THEN

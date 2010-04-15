@@ -517,7 +517,7 @@ character substrings, or subprogram names.")
 
 (new-token "IO_STMT"
 	   '(("IO_STMT" nil place)))
-    
+
 (new-place "IO_STMT"
 	   '(("OPEN" "OPEN statement" token)
 	     ("READ_STMT" "READ statement" token)
@@ -1053,7 +1053,7 @@ name to 6 characters")
 	      "Specify a variable to receive any I/O error code"
 	      token)
 	     ("END"
-	      "Specify a statement to branch to on end-of-file condition" 
+	      "Specify a statement to branch to on end-of-file condition"
 	      token)
 	     ("ERR"
 	      "Specify a statement to branch to if an error occurs"
@@ -1076,7 +1076,7 @@ name to 6 characters")
 	      "Specify a variable to receive any I/O error code"
 	      token)
 	     ("END"
-	      "Specify a statement to branch to on end-of-file condition" 
+	      "Specify a statement to branch to on end-of-file condition"
 	      token)
 	     ("ERR"
 	      "Specify a statement to branch to if an error occurs"
@@ -1102,7 +1102,7 @@ name to 6 characters")
 	      "Specify a variable to receive any I/O error code"
 	      token)
 	     ("END"
-	      "Specify a statement to branch to on end-of-file condition" 
+	      "Specify a statement to branch to on end-of-file condition"
 	      token)
 	     ("ERR"
 	      "Specify a statement to branch to if an error occurs"

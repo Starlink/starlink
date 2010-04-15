@@ -1,8 +1,8 @@
 
 *+  MOFFXYSUB - calculates best fit x,y offset for a mosaic image pair
 
-      SUBROUTINE MOFFXYSUB ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1, 
-     :                       DIMSB2, NXOFF, NYOFF, BOXSIZE, BESTXOFF, 
+      SUBROUTINE MOFFXYSUB ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1,
+     :                       DIMSB2, NXOFF, NYOFF, BOXSIZE, BESTXOFF,
      :                       BESTYOFF, STATUS )
 
 *    Description :
@@ -73,7 +73,7 @@
      :    DIMSB1, DIMSB2,             !      "      " second  "     "
      :    NXOFF,                  ! nominal x offset from first to second
      :    NYOFF,                  !    "    y    "     "    "    "    "
-     :    BOXSIZE                 ! size of offset box to be searched 
+     :    BOXSIZE                 ! size of offset box to be searched
 
       REAL
      :    ARRAYA( DIMSA1, DIMSA2 ), ! first input image
@@ -121,7 +121,7 @@
       BESTYOFF =  NYOFF
       MINMSQ   =  1.0E30
 
-*    loop round all possible combinations of the likely offset 
+*    loop round all possible combinations of the likely offset
       DO  J  =  MINYOFF, MAXYOFF
          DO  I  =  MINXOFF, MAXXOFF
 
@@ -139,7 +139,7 @@
                   DO  II  =  1, DIMSA1 - I
 
 *                   add current square deviation to running total
-                     CURMSQ  =  CURMSQ + 
+                     CURMSQ  =  CURMSQ +
      :                      ((ARRAYB(II,JJ) - ARRAYA(II+I,JJ+J))**2)
 
 *                   increment valid pixel counter
@@ -160,7 +160,7 @@
                   DO  II  =  1, DIMSA1 - IP
 
 *                   add current square deviation to running total
-                     CURMSQ  =  CURMSQ + 
+                     CURMSQ  =  CURMSQ +
      :                    ((ARRAYB(II+IP,JJ+JP) - ARRAYA(II,JJ))**2)
 
 *                   increment valid pixel counter
@@ -180,7 +180,7 @@
                   DO  II  =  1, DIMSA1 - I
 
 *                   add current square deviation to running total
-                     CURMSQ  =  CURMSQ + 
+                     CURMSQ  =  CURMSQ +
      :                     ((ARRAYB(II,JJ+JP) - ARRAYA(II+I,JJ))**2)
 
 *                   increment valid pixel counter
@@ -200,7 +200,7 @@
                   DO  II  =  1, DIMSA1 - IP
 
 *                   add current square deviation to running total
-                     CURMSQ  =  CURMSQ + 
+                     CURMSQ  =  CURMSQ +
      :                     ((ARRAYB(II+IP,JJ) - ARRAYA(II,JJ+J))**2)
 
 *                   increment valid pixel counter

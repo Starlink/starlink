@@ -53,12 +53,12 @@
 *        LBOUND and UBOUND).  At least one non-zero value must appear
 *        in the list, and no input axis may be used more than once.
 *     IN = NDF (Read)
-*        The input NDF. 
+*        The input NDF.
 *     LBOUND( ) = _INTEGER (Read)
 *        An array holding the lower pixel bounds of any new axes in the
 *        output NDF (that is, output axes which have a zero value in the
 *        corresponding element of the AXES parameter).  One element must
-*        be given for each zero-valued element within AXES, in order of 
+*        be given for each zero-valued element within AXES, in order of
 *        appearance within AXES.  The dynamic default is to use 1 for
 *        every element.  []
 *     OUT = NDF (Write)
@@ -70,7 +70,7 @@
 *        An array holding the upper pixel bounds of any new axes in the
 *        output NDF (that is, output axes which have a zero value in the
 *        corresponding element of the AXES parameter).  One element must
-*        be given for each zero-valued element within AXES, in order of 
+*        be given for each zero-valued element within AXES, in order of
 *        appearance within AXES.  The dynamic default is to use 1 for
 *        every element.  []
 
@@ -100,7 +100,7 @@
 *     manic line plane [1,0] lbound=1 ubound=25
 *        This does the same as the last example except that the output
 *        NDF is transposed.  That is, the input NDF is copied into the
-*        output NDF so that it is parallel to pixel axis 1 (X) in the 
+*        output NDF so that it is parallel to pixel axis 1 (X) in the
 *        output NDF, instead of pixel axis 2 (Y) as before.
 *     manic cube hyper [1,0,0,0,0,0,3] ubound=[2,4,2,2,1] accept
 *        This manic example projects the second dimension of an input
@@ -113,7 +113,7 @@
 *     AXIS structures.  It does not change the axes of the current WCS
 *     co-ordinate Frame, either by permuting, adding or deleting, unless
 *     that frame has Domain "PIXEL" or "AXES".  See the first example
-*     in the "Examples" section. 
+*     in the "Examples" section.
 
 *  Related Applications:
 *     KAPPA: COLLAPSE, PERMAXES.
@@ -278,8 +278,8 @@
 *  Get the bounds of the NDF.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBNDI, UBNDI, NDIMI, STATUS )
 
-*  Get the list of axes which is to form the output NDF.  Make sure 
-*  the parameter system will only return values in a meaningful range 
+*  Get the list of axes which is to form the output NDF.  Make sure
+*  the parameter system will only return values in a meaningful range
 *  (1..NDIMI).
       CALL KPG1_FILLI( 0, NDF__MXDIM, MINS, STATUS )
       CALL KPG1_FILLI( NDIMI, NDF__MXDIM, MAXS, STATUS )
@@ -330,7 +330,7 @@
 *  Get the values from the environment.
          CALL PAR_EXACI( 'LBOUND', NEXPAN, NEWLB, STATUS )
          CALL PAR_GRM1I( 'UBOUND', NEXPAN, NEWLB, NEWLB, MAXUB, .FALSE.,
-     :                   NEWUB, STATUS ) 
+     :                   NEWUB, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -348,7 +348,7 @@
       END DO
 
 *  Create the output NDF by propagation from the input NDF.  This
-*  results in history, etc. being passed on.  The shape and 
+*  results in history, etc. being passed on.  The shape and
 *  dimensionality will be wrong but this will be corrected later.
       CALL LPG_PROP( INDF1, 'Axis,Units', 'OUT', INDF2, STATUS )
 
@@ -357,8 +357,8 @@
 
 *  The shape and size of the output NDF created above will be wrong, so
 *  we need to correct it by removing the collapse axis.  This is easy if
-*  it is the final axis (we would just use NDF_SBND with specifying 
-*  NDIM-1 axes), but is not so easy if the collapse axis is not the 
+*  it is the final axis (we would just use NDF_SBND with specifying
+*  NDIM-1 axes), but is not so easy if the collapse axis is not the
 *  final axis.  In this case, we do the following:
 *    1) - Save copies of an AXIS structures in the output NDF (because
 *         the following step will change their lengths to match the new
@@ -399,7 +399,7 @@
 *  We now reinstate any AXIS structures, in their new order.
       IF ( GOTAX ) THEN
 
-*  First erase the axis structures inherited from the input NDF, and 
+*  First erase the axis structures inherited from the input NDF, and
 *  then create default axis components for each dimension of the new
 *  NDF.  Some of these will be overwritten with new values, but without
 *  this step the ones corresponding to new dimensions would be missing.
@@ -415,7 +415,7 @@
 *  Get a locator for the OLDAXIS component added above.
          CALL DAT_FIND( LOC1, 'OLDAXIS', LOC3, STATUS )
 
-*  Promote the NDF locator to a primary locator so that the HDS 
+*  Promote the NDF locator to a primary locator so that the HDS
 *  container file is not closed when the NDF identifier is annulled.
          CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS )
 
@@ -457,7 +457,7 @@
                CALL DAT_CELL( LOC3, 1, AXES( I ), LOC5, STATUS )
 
 *  Now copy all the components of the OLDAXIS cell into the AXIS cell.
-*  Find the number of components, and loop round them.   
+*  Find the number of components, and loop round them.
                CALL DAT_NCOMP( LOC5, NCOMP, STATUS )
                DO J = NCOMP, 1, -1
 
@@ -514,10 +514,10 @@
 
 *  Create a new base frame by picking axes from the original base frame.
 *  The format of the AXES array required for AST_PICKAXES is, happily,
-*  the same as used by this program.  This also creates a new PermMap 
+*  the same as used by this program.  This also creates a new PermMap
 *  which goes from the original Base frame to the new one.  However,
-*  this PermMap assigns bad values to new axes, which will cause many 
-*  WCS applications to fail.  We really want a PermMap which assigns 
+*  this PermMap assigns bad values to new axes, which will cause many
+*  WCS applications to fail.  We really want a PermMap which assigns
 *  suitable contant pixel values to any new axes.
       NBFRM = AST_PICKAXES( BFRM, NDIMO, AXES, PMAP, STATUS )
 
@@ -565,7 +565,7 @@
 *  Save the modified WCS FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCS, INDF2, STATUS )
 
-*  Now do the main part of the work: reshape and transfer the data 
+*  Now do the main part of the work: reshape and transfer the data
 *  array from the input NDF to the output one.
 
 *  Get the dimensions of the input and output NDFs in a convenient form.
@@ -582,7 +582,7 @@
          END IF
       END DO
 
-*  Find out how many pixels in the output array correspond to each 
+*  Find out how many pixels in the output array correspond to each
 *  unique one.
       NWKE = 1
       DO I = 1, NDIMO
@@ -604,51 +604,51 @@
 
 *  Do the data pixel copying.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+         CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                     NDIMO, DIMO,
-     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                     %VAL( CNF_PVAL( IPWKE ) ),
      :                     %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+         CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+         CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                     NDIMO, DIMO,
-     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                     %VAL( CNF_PVAL( IPWKE ) ),
      :                     %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+         CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+         CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+         CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
       END IF
@@ -672,51 +672,51 @@
 
 *  Do the variance pixel copying.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+            CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+            CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                        NDIMO, DIMO,
-     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                        %VAL( CNF_PVAL( IPWKE ) ),
      :                        %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+            CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+            CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                        NDIMO, DIMO,
-     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                        %VAL( CNF_PVAL( IPWKE ) ),
      :                        %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+            CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+            CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+            CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
          END IF
@@ -725,8 +725,8 @@
          CALL NDF_UNMAP( INDF1, 'VARIANCE', STATUS )
          CALL NDF_UNMAP( INDF2, 'VARIANCE', STATUS )
       END IF
-         
-*  If necessary do the same for the quality array.  This is only 
+
+*  If necessary do the same for the quality array.  This is only
 *  possible if no axes are being collapsed.
       CALL NDF_STATE( INDF1, 'QUALITY', GOTQUL, STATUS )
       IF ( GOTQUL .AND. NUSED .EQ. NDIMI ) THEN
@@ -739,9 +739,9 @@
      :                 STATUS )
 
 *  Do the quality pixel copying.
-         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPQI ) ), 
+         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPQI ) ),
      :                     NDIMO, DIMO,
-     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ),
      :                     %VAL( CNF_PVAL( IPWKE ) ),
      :                     %VAL( CNF_PVAL( IPQO ) ), STATUS )
 
@@ -749,7 +749,7 @@
          CALL NDF_UNMAP( INDF1, 'QUALITY', STATUS )
          CALL NDF_UNMAP( INDF2, 'QUALITY', STATUS )
       END IF
-         
+
 *  Release the workspace.
       CALL PSX_FREE( IPWKC, STATUS )
       CALL PSX_FREE( IPWKE, STATUS )

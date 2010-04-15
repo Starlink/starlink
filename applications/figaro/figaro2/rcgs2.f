@@ -9,7 +9,7 @@ C
 C     Command parameters -
 C
 C     FILE    (Character) The name of the container file
-C     OBS     (Numeric) The observation number to be read from 
+C     OBS     (Numeric) The observation number to be read from
 C             the container file.
 C     SCAN    (Numeric) The scan number to be read from the observation
 C             (Only used if TWOD is not set) use zero to read the
@@ -102,9 +102,9 @@ C
       END IF
 C
 C     Get observation number
-C     
+C
       CALL PAR_RDVAL('OBS',0.0,200.0,1.0,' ',VALUE)
-      OBS = NINT(VALUE)    
+      OBS = NINT(VALUE)
       CALL DAT_FIND(FLOC,'OBS_'//ICH_CI(OBS),OLOC,STATUS)
       IF (STATUS .NE. 0) THEN
           CALL PAR_WRUSER('No observation number '//ICH_CI(OBS),

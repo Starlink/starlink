@@ -15,7 +15,7 @@
 *
 *  Description:
 *     Opens the CHP system and performs house keeping tasks.
-*     CHP_OPEN should be the first CHP call in your application 
+*     CHP_OPEN should be the first CHP call in your application
 *     and CHP_CLOSE the last.
 
 *  Arguments:
@@ -38,7 +38,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
 *      IMPLICIT NONE              ! No implicit typing
 
@@ -64,7 +64,7 @@
       do count = 1, CHP__MXASS
         opcatnames(count) = '9999'
       enddo
-* 
+*
       call chi_open(status)
 *
       END

@@ -133,7 +133,7 @@ datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * statu
     bufpos = buffer;
 
     for (i = 0; i < nval; i++ ) {
-      
+
       thislen = strlen( values[i] );
       if (thislen > lenstr) trunc = 1;
 

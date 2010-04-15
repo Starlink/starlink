@@ -23,7 +23,7 @@ hdsTrace(const HDSLoc *locator,
          int  *status,
          size_t  path_length,
          size_t  file_length)
-{                  
+{
 /*==================================*/
 /* HDS_TRACE - Trace path of object */
 /*==================================*/
@@ -214,14 +214,14 @@ hdsTrace(const HDSLoc *locator,
       _call(DAT__TRUNC)
    else
       path.body[ pathlen ] = 0;
-      
+
    return hds_gl_status;
 }
 
 int
 hdsShow(const char *topic_str,
         int  *status)
-{        
+{
 /*===============================*/
 /* HDS_SHOW - Show HDS statistic */
 /*===============================*/
@@ -232,7 +232,7 @@ hdsShow(const char *topic_str,
 #define context_message\
         "HDS_SHOW: Error displaying HDS statistics."
 
-   struct DSC      topic; 
+   struct DSC      topic;
 
    struct LCP      *lcp;
    struct LCP_DATA *data;
@@ -385,7 +385,7 @@ hds1_encode_subs(int nlim, int nsub, HDS_PTYPE *subs, char *buf, int *nchar)
       for (m=0; m<nlim; m++)
       {
          ++i;
-         (void) sprintf( buf + i, "%"HDS_PTYPE_FORMAT"%n", 
+         (void) sprintf( buf + i, "%"HDS_PTYPE_FORMAT"%n",
 			 subs[ n * nlim + m ], &nc );
          i += nc;
          buf[i]   = ':';

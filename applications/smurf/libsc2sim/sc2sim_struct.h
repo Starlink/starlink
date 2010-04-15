@@ -4,13 +4,13 @@
  *     sc2sim_struct.h
 
  *  Purpose:
- *     structure definitions for simulator 
+ *     structure definitions for simulator
 
  *  Language:
  *     Starlink ANSI C
 
  *  Type of Module:
- *     C include file 
+ *     C include file
 
  *  Authors:
  *     B.D.Kelly (bdk@roe.ac.uk)
@@ -143,12 +143,12 @@ struct bolpix             /* pixel location of bolometer */
        };
 
 /* Enumerated type for observing modes */
-typedef enum {MODE__STARE, MODE__DSTARE, MODE__DREAM, MODE__PONG, 
+typedef enum {MODE__STARE, MODE__DSTARE, MODE__DREAM, MODE__PONG,
 	      MODE__POLSPIN, MODE__HEATRUN, MODE__NOISE,
               MODE__BOUS, MODE__SINGLESCAN, MODE__LISS, MODE__NONE} obsMode;
 
 /* Enumerated type for map coordinate frame */
-typedef enum {FRAME__NASMYTH, FRAME__AZEL, FRAME__RADEC, FRAME__NOCOORD} 
+typedef enum {FRAME__NASMYTH, FRAME__AZEL, FRAME__RADEC, FRAME__NOCOORD}
   mapCoordframe;
 
 struct sc2sim_obs_struct      /* parameters read from obs input file */
@@ -277,5 +277,5 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double xpoint;              /* X pointing offset on sky (arcsec) */
   double ypoint;              /* Y pointing offset on sky (arcsec) */
 };
-   
+
 #endif /* SC2SIM_STRUCT_DEFINED */

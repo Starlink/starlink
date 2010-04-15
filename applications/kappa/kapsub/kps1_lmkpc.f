@@ -60,7 +60,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -96,14 +96,14 @@
 
 *  Store the required GRID co-ordinates.
          DO K = 1, NDIM
-            PIXCEN( I, K ) = DBLE( J( K ) ) 
+            PIXCEN( I, K ) = DBLE( J( K ) )
          END DO
 
-*  Increment the pixel indices.   
+*  Increment the pixel indices.
          J( 1 ) = J( 1 ) + 1
 
          K = 1
-         DO WHILE( K .LE. NDIM .AND. J( K ) .GT. DIM( K ) ) 
+         DO WHILE( K .LE. NDIM .AND. J( K ) .GT. DIM( K ) )
             J( K ) = 1
             K = K + 1
             J( K ) = J( K ) + 1

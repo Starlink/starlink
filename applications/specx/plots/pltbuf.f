@@ -202,7 +202,7 @@ C   Write the plot description and first set of XY pairs to the file
       INCLUDE 'STACKCOMM'
       INCLUDE 'FLAGCOMM'
 
-*     Functions 
+*     Functions
 
       INTEGER*4 NTOT
 
@@ -229,7 +229,7 @@ C   Write the plot description and first set of XY pairs to the file
       WRITE  (PLOT_HEADER, 10) LSCAN, ITITLE, IDATE, ITIME, IUT
    10 FORMAT ('Scan ',I4,'  ',A26, '      Obs''d ',A9,' at ',A8,A4)
       WRITE  (PLOT_UNIT) PLOT_HEADER
-      
+
       CALL DEG_TO_STRING (RA/15.0, RASTRING)
       CALL DEG_TO_STRING (DEC,     DECSTRING)
       WRITE  (PLOT_HEADER, 15, IOSTAT=IERR) RASTRING, DECSTRING,
@@ -266,7 +266,7 @@ C      IF (JFCEN(1)/1E+06 .LT. LOFREQ(1)) SB = 'LSB'
       DFCEN  = DFLOAT (JFCEN(NQ))/1.E6
       DFINC  = DFLOAT (JFINC(NQ))/1.E6
 
-      WRITE (PLOT_HEADER, 40, IOSTAT=IERR) NQ, NPTS(NQ), XCEN, 
+      WRITE (PLOT_HEADER, 40, IOSTAT=IERR) NQ, NPTS(NQ), XCEN,
      &                            DFREST, DFCEN, DFINC, TSYS(NQ)
    40 FORMAT (3X,I2,1X,I5,2X,F6.1,3X,F10.4,3X,F10.4,4X,G12.5,2X,G12.5)
 

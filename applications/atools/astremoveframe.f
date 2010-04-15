@@ -21,8 +21,8 @@
 
 *  Description:
 *     This application  removes a Frame from a FrameSet. All other Frames
-*     in the FrameSet have their indices re-numbered from one (if necessary), 
-*     but are otherwise unchanged. 
+*     in the FrameSet have their indices re-numbered from one (if necessary),
+*     but are otherwise unchanged.
 
 *  Usage:
 *     astremoveframe this iframe result
@@ -30,15 +30,15 @@
 *  ADAM Parameters:
 *     IFRAME = LITERAL (Read)
 *        The integer index or Domain name of the Frame within the
-*        FrameSet which is to be removed (the strings AST__BASE and 
+*        FrameSet which is to be removed (the strings AST__BASE and
 *        AST__CURRENT may also be supplied).
 *     RESULT = LITERAL (Read)
 *        An NDF or text file to receive the modified FrameSet. If an NDF
-*        is supplied, the WCS FrameSet within the NDF will be replaced by 
+*        is supplied, the WCS FrameSet within the NDF will be replaced by
 *        the new FrameSet, if possible.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the original FrameSet from which a 
-*        Frame is to be removed. If an NDF is supplied, the WCS 
+*        An NDF or text file holding the original FrameSet from which a
+*        Frame is to be removed. If an NDF is supplied, the WCS
 *        FrameSet will be used.
 
 *  Copyright:
@@ -92,21 +92,21 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a FrameSet.
-      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS, 
+      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS,
      :                 STATUS )
 
 *  Get the index of the Frame.
       CALL ATL1_GTFRM( 'IFRAME', THIS, IFRAME, STATUS )
 
 *  Remove the Frame from the FrameSet.
-      CALL AST_REMOVEFRAME( THIS, IFRAME, STATUS ) 
+      CALL AST_REMOVEFRAME( THIS, IFRAME, STATUS )
 
 *  Write the modified FrameSet out.
       CALL ATL1_PTOBJ( 'RESULT', 'THIS', THIS, STATUS )

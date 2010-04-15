@@ -1,5 +1,5 @@
 C  History:
-C      8-May-2000 
+C      8-May-2000
 C        Replace 'Type *' with 'PRINT *'
 C        Unused in EXTRNL10: IPOS
 C        Unused in GET_NEWSPEC PDIFFS, MCEN, I, NBYTES, APDEC, STATUS
@@ -60,7 +60,7 @@ C-
         X2OFF = OFFSET(1)*SP + OFFSET(2)*CP
         PRINT *,'Offsets in map coordinates: ',X1OFF, X2OFF
       END IF
-        
+
       CALL GET_NEWSPEC (X1OFF, X2OFF, IFAIL)
 
       RETURN
@@ -138,7 +138,7 @@ C     Both coordinates run + to - (i.e. map starts at top left = NE)
       FRAC  = SIGN (1.0,XOFF) * MOD(MSTEP+1,2)
       IFRAC = NINT (FRAC)
       XOFF2 = 2 * NINT (XOFF+FRAC*0.5) - IFRAC
-      
+
       N     = NINT (0.5 * FLOAT (NSTEP+1) - YOFF)
       FRAC  = SIGN (1.0,YOFF) * MOD(NSTEP+1,2)
       IFRAC = NINT (FRAC)

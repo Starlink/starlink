@@ -1,17 +1,17 @@
 #!/usr/bin/perl -w
 #
-# !!begin 
+# !!begin
 # !!title  Header fixing script
 # !!author T.R.Marsh
 # !!created  14 January  2001
 # !!revised  08 December 2005
-# !!root   fixhead 
-# !!index  fixhead.pl 
-# !!descr  Perl script for fixing headers into standardised form for pamela and molly 
+# !!root   fixhead
+# !!index  fixhead.pl
+# !!descr  Perl script for fixing headers into standardised form for pamela and molly
 # !!head1 Header fixing perl script
 #
 # !!emph{fixhead} gathers headers items into a standardised format and
-# is required before running pamela and for final input into molly. 
+# is required before running pamela and for final input into molly.
 # You should use it before running the automatic reduce script. It is
 # an attempt to place all the header dependent stuff into a single location.
 # The automated reduce script for example will look for the object position,
@@ -26,13 +26,13 @@
 #
 # !!table
 # !!arg{ night}{  is an integer saying number of night of run.}
-# !!arg{ format}{ is an integer to say which format the data has 
+# !!arg{ format}{ is an integer to say which format the data has
 # (see below for supported formats).}
 # !!arg{file1, file2}{ are individual files.}
 # !!arg{list1, list2}{ are ascii lists of files (flagged by @).}
 # !!table
 #
-# !!head2 Suppoerted Formats 
+# !!head2 Suppoerted Formats
 #
 # Here are the supported formats. Try to choose the one nearest in
 # time to your data on the same instrument.
@@ -55,14 +55,14 @@
 # OK, so you have tried all available formats but none of them work:
 # you need to add your own. You will need to know perl to do so, and
 # in particular be happy with regular expressions.
-# 
+#
 # To add a new format, look below for every place where the variable
 # !!emph{$format} occurs. You need to add a line describing the format and
 # change the range check on $format. Then you may need to change the
 # way the headers are listed. To do this you need to play with 'hdstrace'
 # to see how you can list your headers in such a way as to make it
 # easy to grab the necessary items (see below for what items are required).
-# 
+#
 # An example is:
 #
 # hdstrace $file.more.fits nlines=all eachline
@@ -74,17 +74,17 @@
 # This is best done using Perl regular expression matches. The main thing
 # to watch for is that the matches are unique. e.g. there may be an item
 # called RA and one called CAT-RA and if you match to RA you could get
-# either depending which comes second.  
+# either depending which comes second.
 #
 # Places to edit are delimited by START EDITING! and END EDITING!
 #
 # !!head2 Files produced
 #
 # The script will generate files called 'zzz_fixhead' and 'zzz_fixhead.log'
-# 
+#
 # !!end
 
-use strict; 
+use strict;
 
 # Directories where various commands required are to be found
 # Check existence of commands
@@ -108,8 +108,8 @@ my $night = shift or die "No night number supplied.\n";
 ($night > 0) or die "Night number must be > 0\n";
 
 my $format = shift;
-($format >= 1 && $format <= 12)  or die 
-    "No format number supplied.\n" 
+($format >= 1 && $format <= 12)  or die
+    "No format number supplied.\n"
     . "Formats available are:\n\n"
     . " 1) WHT July 1998, normal and LSD\n"
     . " 2) AAT December 1998\n"
@@ -150,7 +150,7 @@ if($nfiles == 1){
     print "\n$nfiles file names loaded.\n\n";
 }
 
-# Strip off trailing .sdf, check that files exist, 
+# Strip off trailing .sdf, check that files exist,
 # are not directories, and are readable
 
 my $file;
@@ -166,7 +166,7 @@ my @mdays = (31,28,31,30,31,30,31,31,30,31,30,31);
 
 # Generate a script to list header info. This part would have
 # to be altered if the header was not in .MORE.FITS. By printing out
-# the whole of the FITS header, the routine should be less sensitive 
+# the whole of the FITS header, the routine should be less sensitive
 # to the exact posistion of items, but still may need varying according
 # to the data format.
 
@@ -181,10 +181,10 @@ foreach $file (@files){
 # .MORE.FITS structure with all the headers. Thus in all probability
 # you just need to add another entry into the 'if' statement.
     if($format == 1 || $format == 2 || $format == 3 || $format == 4 ||
-       $format == 5 || $format == 6 || $format == 7 || $format == 8 || 
+       $format == 5 || $format == 6 || $format == 7 || $format == 8 ||
        $format == 9 || $format == 10 || $format == 11 || $format == 12 ){
 	print SCRIPT "echo File name = $file\n";
-	print SCRIPT "$STAR/bin/hdstrace $file.more.fits nlines=all eachline\n"; 
+	print SCRIPT "$STAR/bin/hdstrace $file.more.fits nlines=all eachline\n";
     }else{
 	die "Format number = $format has no header listing section defined!\n";
     }
@@ -202,34 +202,34 @@ system("chmod +x $script; ./$script > $log");
 # $object  = Object name. String of up to 32 characters.
 # $date    = Date. String with format "dd/mm/yyyy"
 # $night   = Night number. Integer, set above as second input.
-# $numrun  = Run number. 
+# $numrun  = Run number.
 # $time    = Exposure time (seconds)
 # $utc     = Coordinated UT at mid-exposure, decimal hours.
 # $ra      = right ascension in hours
 # $dec     = declination in degrees
 # $equinox = equinox in years.
 # $slitpa  = angle of the slit on the sky
-# 
-# and for format 8 (spectropol) the waveplate and wollaston prism 
+#
+# and for format 8 (spectropol) the waveplate and wollaston prism
 # angles are needed too.
 #
 # $jd, the JD at mid-exposure can substitute for $date and
 # $utc since 'hfix' in molly can work with either.
 #
-# Other optional extras which can be added are 
+# Other optional extras which can be added are
 #
 # $detector   the detector, e.g. name of the CCD
 # $instrument description of the instrument
 # $source     the source which should be set to one of ARC, FLAT, DATA, BIAS, DARK, SKY
 #
-# First open the log file and extract info. This part may well 
+# First open the log file and extract info. This part may well
 # need altering depending upon the items available. The technique
 # here is to use perl regular expression matching with particular
 # parts isolated in brackets and then stored as $1, $2 etc. One
 # has to be a little careful to get unique matches. A check is made
 # for each item as we go.
 #
-# Note that the UT date can either be obtained by setting 
+# Note that the UT date can either be obtained by setting
 # $date to a string of the form "21/03/1998" and $utc to
 # a decimal time in hours OR by setting $jd to the julian day
 # number.
@@ -259,10 +259,10 @@ while(<LOG>){
         }elsif(/\'RUN *= *(\d*) .*Run number/){
 	    $numrun{$file} = $1;
 	}elsif(/\'CAT-RA *=.* (\d\d):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;        
+	    $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
 	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;        
+	    $dec{$file}  = $2+$3/60.+$4/3600.;
 	    if($sign eq "-"){
 		$dec{$file} *= -1.;
 	    }elsif($sign eq " "){
@@ -276,7 +276,7 @@ while(<LOG>){
 	    $utc{$file} = $1 + $2/60. + $3/3600.;
         }elsif(/\'DATE[-\_]OBS= .*(\d\d)\/(\d\d)\/(\d\d)[^\d]/){
             $date{$file} = "$1/$2/19$3";
-        }elsif(/\'EXPOSED\s*=\s*([\.\d]*)/ && !defined $time{$file}){       
+        }elsif(/\'EXPOSED\s*=\s*([\.\d]*)/ && !defined $time{$file}){
            $time{$file} = $1;
 	   print "found time = [",$1,"]\n";
 	}elsif(/\'ROTSKYPA\s*=\s*$float\s*\//){
@@ -295,16 +295,16 @@ while(<LOG>){
 
     }elsif($format == 2){
 
-# AAT Dec 1998 
+# AAT Dec 1998
 
 	if(/\'OBJECT *= \'(.*)\' *\//){
-            $object{$file} = $1; 
+            $object{$file} = $1;
         }elsif(/\'RUN *= *(\d*) .*Run number/){
 	    $numrun{$file} = $1;
 	}elsif(/\'MEANRA *= *(\d*\.\d*)/){
-	    $ra{$file} = $1/15.;        
+	    $ra{$file} = $1/15.;
         }elsif(/\'MEANDEC *= *([-+]?\d*\.\d*)/){
-	    $dec{$file}  = $1; 
+	    $dec{$file}  = $1;
 	}elsif(/\'EQUINOX *= *(\d\d\d\d)/){
             $equinox{$file} = $1;
         }elsif(/\'UTSTART *= .*(\d\d):(\d\d):(\d\d\.\d\d)/){
@@ -324,10 +324,10 @@ while(<LOG>){
         }elsif(/\'RUN *= *(\d*) .*Run number/){
 	    $numrun{$file} = $1;
 	}elsif(/\'CAT-RA *=.* ([ \d]\d):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;        
+	    $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
 	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;        
+	    $dec{$file}  = $2+$3/60.+$4/3600.;
 	    if($sign eq "-"){
 		$dec{$file} *= -1.;
 	    }elsif($sign eq " "){
@@ -362,10 +362,10 @@ while(<LOG>){
         }elsif(/\'RUN *= *(\d*) .*Run number/){
 	    $numrun{$file} = $1;
 	}elsif(/\'CAT-RA *=.* (\d\d):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;        
+	    $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
 	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;        
+	    $dec{$file}  = $2+$3/60.+$4/3600.;
 	    if($sign eq "-"){
 		$dec{$file} *= -1.;
 	    }elsif($sign eq " "){
@@ -405,15 +405,15 @@ while(<LOG>){
 
     }elsif($format == 6){
 
-# SAAO 
+# SAAO
 
 	if(/\'OBJECT *= \'(.*)\' *\//){
-            $object{$file} = $1; 
+            $object{$file} = $1;
 	}elsif(/\'RA\s*=\s'(\d\d):(\d\d):(\d\d)'/){
-	    $ra{$file} = $1/15.;        
+	    $ra{$file} = $1/15.;
         }elsif(/\'DEC\s*=\s*'(.)(\d\d):(\d\d):(\d\d)'/){
 	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;        
+	    $dec{$file}  = $2+$3/60.+$4/3600.;
 	    if($sign eq "-"){
 		$dec{$file} *= -1.;
 	    }elsif($sign eq " "){
@@ -440,10 +440,10 @@ while(<LOG>){
         }elsif(/\'RUN *= *(\d*) .*Run number/){
 	    $numrun{$file} = $1;
 	}elsif(/\'CAT-RA *=.* (\d+):(\d\d):(\d\d\.\d*)/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;        
+	    $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'CAT-DEC *=.*(.)(\d\d):(\d\d):(\d\d\.\d*)/){
 	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;        
+	    $dec{$file}  = $2+$3/60.+$4/3600.;
 	    if($sign eq "-"){
 		$dec{$file} *= -1.;
 	    }elsif($sign eq " "){
@@ -499,14 +499,14 @@ while(<LOG>){
             $obstype{$file} = $1;
 	    my $source = $1;
 	    if($source =~ /sky/i){
-		$source{$file} = "data"; 
+		$source{$file} = "data";
 	    }elsif($source =~ /flat/i){
 		$source{$file} = "flat";
 	    }elsif($source =~ /wave/i){
 		$source{$file} = "arc";
 	    }elsif($source =~ /bias/i){
 		$source{$file} = "bias";
-	    } 
+	    }
         }elsif(/\'HIERARCH ESO DET EXP NO *= *(\d*)/){
 	    $numrun{$file} = $1;
 	}elsif(/\'RA *=.* (\d*\.\d*)/){
@@ -562,9 +562,9 @@ while(<LOG>){
         }elsif(/\'INSTRUME\s*=\s*\'\s*([^\']*?)\s*\'/){
 	    $instrument{$file} = $1;
         }
-	
+
 # Magellan IMACS, September 2007 (JKT)
-	
+
     }elsif($format == 11){
 
 	if(/\'OBJECT *= \'(.*)\' *\//){
@@ -606,12 +606,12 @@ while(<LOG>){
         $slitpa{$file} = 0.0 ;
         $numrun{$file} = int(substr($file,-1,4));
 	if(/\'OBJECT *= \'(.*)\' *\//){
-            $object{$file} = $1; 
+            $object{$file} = $1;
 	}elsif(/\'RA\s*=\s'\s*(\d\d):(\d\d):(\d\d)'/){
-	    $ra{$file} = $1+$2/60.+$3/3600.;        
+	    $ra{$file} = $1+$2/60.+$3/3600.;
         }elsif(/\'DEC\s*=\s*'(.)(\d\d):(\d\d):(\d\d)'/){
 	    $sign = $1;
-	    $dec{$file}  = $2+$3/60.+$4/3600.;        
+	    $dec{$file}  = $2+$3/60.+$4/3600.;
 	    if($sign eq "-"){
 		$dec{$file} *= -1.;
 	    }elsif($sign eq " "){
@@ -679,7 +679,7 @@ foreach $file (@files){
 
 # START EDITING!
     if($format == 1  || $format == 2  || $format == 3 || $format == 5 ||
-       $format == 6  || $format == 7  || $format == 8 || $format == 9 || 
+       $format == 6  || $format == 7  || $format == 8 || $format == 9 ||
        $format == 10 || $format == 11 || $format == 12) {
 	if(defined $jd{$file}){
 	    if(defined $time{$file}) {
@@ -693,7 +693,7 @@ foreach $file (@files){
 	}elsif(defined $utc{$file}){
 	    if(defined $time{$file}){
 		$utc{$file} += $time{$file}/7200.;
-		if($utc{$file} >= 24.0){		    
+		if($utc{$file} >= 24.0){
 		    if($date{$file} =~ /(\d\d)\/(\d\d)\/(\d\d\d\d)/){
 			$utc{$file} -= 24.;
 			my ($day, $month, $year, $nday);
@@ -718,7 +718,7 @@ foreach $file (@files){
 			die "UTC > 24 but date cannot be corrected.\n";
 		    }
 		}
-			
+
 		print "Assuming that UT grabbed represents the START of exposure of file = $file\n";
 	    }else{
 		print "UTC found in $file, but not exposure time, so UTC cannot be corrected\n";
@@ -736,7 +736,7 @@ foreach $file (@files){
 	die "No correction to the centre of the exposure specified for format = $format!\n";
     }
 # END EDITING!
- 
+
     if(defined $jd{$file}){
 	print SCRIPT "$STAR/bin/figaro/creobj '_DOUBLE' 0 $file.more.pamela.jd\n";
 	print SCRIPT "$STAR/bin/figaro/setobj $jd{$file} $file.more.pamela.jd\n";
@@ -752,8 +752,8 @@ foreach $file (@files){
 	print "ERROR: no time found in file = $file\n";
     }
 
-# Night number must be defined 
-   
+# Night number must be defined
+
     print SCRIPT "$STAR/bin/figaro/creobj '_INTEGER' 0 $file.more.pamela.night\n";
     print SCRIPT "$STAR/bin/figaro/setobj $night   $file.more.pamela.night\n";
 

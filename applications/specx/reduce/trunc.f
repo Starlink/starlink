@@ -8,7 +8,7 @@ C  End NPTS of array are dropped symmetrically and centre channel reset
 C  History:
 C     6-JUN-2000 (AJC):
 C       Replace 'Type *' with 'PRINT *'
- 
+
       IMPLICIT  NONE
 
 *     Formal parameters:

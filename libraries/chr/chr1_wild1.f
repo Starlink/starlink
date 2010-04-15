@@ -15,9 +15,9 @@
 *  Description:
 *     Ensure that the match pattern string (MATCH) is long enough, at
 *     least as long as the candidate string (STRING).
-*     Ensure that if the candidate string (STRING) is of finite length, 
+*     Ensure that if the candidate string (STRING) is of finite length,
 *     the wild card pattern (WILDS) is also of finite length.
-*     
+*
 
 *  Arguments:
 *     MLEN = INTEGER (Given)
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,7 +64,7 @@
 *     8-OCT-1991 (PCTR):
 *        Final (working) version with changes prompted by P.T. Wallace.
 *     8-MAR-1993 (PCTR):
-*        Cure bug which leads to a WILDN chracter being present 
+*        Cure bug which leads to a WILDN chracter being present
 *        at the beginning of the WILDS string.
 *     27-SEP-1993 (ACC):
 *        Modularise: this routine created.
@@ -100,7 +100,7 @@
 
       IF ( SLEN .GT. MLEN ) THEN
 
-*     The match pattern string is too short to contain the complete 
+*     The match pattern string is too short to contain the complete
 *     match pattern (i.e. the length of the candidate string), so return.
          CHR1_WILD1 = .FALSE.
 

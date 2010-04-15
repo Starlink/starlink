@@ -140,7 +140,7 @@ itcl::class ::gaia3d::Gaia3dVtkAxes {
       lassign [gaiautils::astlinearapprox $wcs {0 0 0} {1 1 1} 1] \
          X0 Y0 Z0 X1 Y1 Z1 X2 Y2 Z2 X3 Y3 Z3
 
-      #  Look for a longtude axis. If that is formatted in time we 
+      #  Look for a longtude axis. If that is formatted in time we
       #  need to correct all its scale factors for a term cos(dec)
       #  where dec is the associated latitude axis.
       catch {
@@ -151,7 +151,7 @@ itcl::class ::gaia3d::Gaia3dVtkAxes {
          set astime [gaiautils::astget $wcs "astime($lonaxis)"]
          if { $astime } {
 
-            #  Project a position into world coordinates. Needed to 
+            #  Project a position into world coordinates. Needed to
             #  establish a cos(dec).
             lassign [gaiautils::asttrann $wcs 1 "0 0 0"] dec(1) dec(2) dec(3)
             set cosdec [expr cos($dec($lataxis))]

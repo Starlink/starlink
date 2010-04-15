@@ -13,8 +13,8 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType, 
-*                      const char *desc, void *value, int arrayFlag, long arraySize, 
+*     gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType,
+*                      const char *desc, void *value, int arrayFlag, long arraySize,
 *                      int descFlag, int *status );
 
 *  Arguments:
@@ -90,8 +90,8 @@
 #define FUNC_NAME "gsdac_wrtData"
 
 
-void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType, 
-                      const char *desc, void *value, int arrayFlag, long arraySize, 
+void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType,
+                      const char *desc, void *value, int arrayFlag, long arraySize,
                       int descFlag, int *status )
 {
 
@@ -112,13 +112,13 @@ void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType,
     if ( dType == GSD_INT )
       printf ( "%-20s%-20s%-20d", nrao, jcmt, *((int*)value) );
     else if ( dType == GSD_DOUBLE )
-      printf ( "%-20s%-20s%-20.4f", nrao, jcmt, *((double*)value) );  
+      printf ( "%-20s%-20s%-20.4f", nrao, jcmt, *((double*)value) );
     else if ( dType == GSD_FLOAT )
-      printf ( "%-20s%-20s%-20.4f", nrao, jcmt, *((float*)value) ); 
+      printf ( "%-20s%-20s%-20.4f", nrao, jcmt, *((float*)value) );
     else if ( dType == GSD_CHAR )
-      printf ( "%-20s%-20s%-20c", nrao, jcmt, *((char*)value) ); 
+      printf ( "%-20s%-20s%-20c", nrao, jcmt, *((char*)value) );
     else if ( dType == GSD_CHARPTR )
-      printf ( "%-20s%-20s%-20s", nrao, jcmt, (char*)value ); 
+      printf ( "%-20s%-20s%-20s", nrao, jcmt, (char*)value );
 
     if ( descFlag ) {
 
@@ -127,7 +127,7 @@ void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType,
 
     }
 
-  } 
+  }
 
   /* If this is an array, print out the details and then the contents. */
   else {
@@ -147,20 +147,20 @@ void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType,
     /* Print out the array data. */
     for ( i = 0; i < arraySize; i++ ) {
 
-      if ( dType == GSD_INT )   
+      if ( dType == GSD_INT )
 	printf ( "   %-20d", ((int*)value)[i] );
-      else if ( dType == GSD_DOUBLE )   
+      else if ( dType == GSD_DOUBLE )
 	printf ( "   %-20.4f", ((double*)value)[i] );
-      else if ( dType == GSD_FLOAT )   
+      else if ( dType == GSD_FLOAT )
 	printf ( "   %-20.4f", ((float*)value)[i] );
-      else if ( dType == GSD_CHAR )   
+      else if ( dType == GSD_CHAR )
 	printf ( "   %-20c", ((char*)value)[i] );
       else if ( dType == GSD_CHARPTR ) {
         strncpy ( tempString, &(((char*)value)[i*16]), 16 );
 	printf ( "   %-20s", tempString );
       }
 
-      if ( i % 4 == 3 ) 
+      if ( i % 4 == 3 )
         printf ( "\n" );
 
     }

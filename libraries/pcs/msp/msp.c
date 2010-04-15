@@ -5,7 +5,7 @@
 *     MSP
 
 *  Purpose:
-*     Message system protocol 
+*     Message system protocol
 
 *  Language:
 *     Starlink C
@@ -71,12 +71,12 @@
 #endif
 
 #include <sys/time.h>
-#include <sys/types.h> 
-#include <sys/stat.h> 
+#include <sys/types.h>
+#include <sys/stat.h>
 #if HAVE_SYS_SOCKET_H
-# include <sys/socket.h> 
+# include <sys/socket.h>
 #endif
-#include <netinet/in.h> 
+#include <netinet/in.h>
 #include <sys/un.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
@@ -174,7 +174,7 @@ static char my_name[32];                    /* name of this task */
 *     Creates the required directory if possible. No error is reported if
 *     the directory exists already. Any intermediate directories which are
 *     created have permission u+wx regardless of the user's umask value.
-*     If succesful 0 is returned; in the event of a failure error messages 
+*     If succesful 0 is returned; in the event of a failure error messages
 *     are reported using EMS and non-zero returned.
 
 *  Arguments:
@@ -218,7 +218,7 @@ static char my_name[32];                    /* name of this task */
 *     non-zero on failure
 
 *-
-*/      
+*/
 
 int msp1_mkdir( char *dir )
 {
@@ -238,7 +238,7 @@ struct stat statb;
 
 /* If buff begins with / copy it to path as strtok will ignore it */
       if ( *buff == '/' ) {
-         strcpy( path, "/" ); 
+         strcpy( path, "/" );
       } else {
          *path = '\0';
       }
@@ -246,7 +246,7 @@ struct stat statb;
       for ( s = buff;
           ( ( ( tmpdir = strtok( s, "/" ) ) != NULL ) && !status );
           s = NULL ) {
-             
+
           strcat( path, tmpdir );
           if ( !stat( path, &statb ) ) {
 /* File exists check it's a directory */
@@ -275,7 +275,7 @@ struct stat statb;
    } else {
 /* malloc failed */
       status = errno;
-   }          
+   }
 
    return status;
 
@@ -290,7 +290,7 @@ struct stat statb;
 *     To obtain a string defining the ADAM_USER directory
 
 *  Language:
-*     C 
+*     C
 
 *  Invocation:
 *     status =  msp1_admus( admusr, aulen )
@@ -415,10 +415,10 @@ struct stat statb;
 
 *  Description:
 *     Creates the given file which should be the name of a rendezvous
-*     file that advertizes the relationship between a task and the 
+*     file that advertizes the relationship between a task and the
 *     port number that should be used to communicate with it. Normally
 *     a rendezvous file is created as a FIFO using mknod or mkfifo, but
-*     a plain file will also do. The file is created and its permissions 
+*     a plain file will also do. The file is created and its permissions
 *     are set as if a FIFO (for consistency, no other reason I know).
 *     If succesful 0 is returned, otherwise a -1 is returned.
 
@@ -494,7 +494,7 @@ int *status          /* global status (given and returned) */
 *     MSP_ACCEPT
 
 *  Purpose:
-*     Accept an incoming connection request 
+*     Accept an incoming connection request
 
 *  Language:
 *     Starlink C
@@ -588,7 +588,7 @@ int *status          /* global status (given and returned) */
 
 
 
-void msp_checksock 
+void msp_checksock
 (
 int sock,            /* a socket number (given) */
 int *status          /* global status (given and returned) */
@@ -600,7 +600,7 @@ int *status          /* global status (given and returned) */
 *     MSP_CHECKSOCK
 
 *  Purpose:
-*     Check a socket number is in use 
+*     Check a socket number is in use
 
 *  Language:
 *     Starlink C
@@ -684,7 +684,7 @@ int *status          /* global status (given and returned) */
 *     MSP_CLOSE_TASK_QUEUE
 
 *  Purpose:
-*     Close communications with another task 
+*     Close communications with another task
 
 *  Language:
 *     Starlink C
@@ -763,7 +763,7 @@ int *status          /* global status (given and returned) */
 *     MSP_CREATE_LOCALQ
 
 *  Purpose:
-*     Create a queue for local messages 
+*     Create a queue for local messages
 
 *  Language:
 *     Starlink C
@@ -913,7 +913,7 @@ int *status          /* global status (given and returned) */
 *     MSP_CREATE_RECEIVEQ
 
 *  Purpose:
-*     Create a queue for receiving messages 
+*     Create a queue for receiving messages
 
 *  Language:
 *     Starlink C
@@ -1005,7 +1005,7 @@ int *status         /* global status (given and returned) */
 *     MSP_DELETE_QUEUE
 
 *  Purpose:
-*     Delete a queue 
+*     Delete a queue
 
 *  Language:
 *     Starlink C
@@ -1107,7 +1107,7 @@ int *status              /* global status (given and returned) */
 *     MSP_ENTER_TASK
 
 *  Purpose:
-*     Register this task with MSP 
+*     Register this task with MSP
 
 *  Language:
 *     Starlink C
@@ -1211,7 +1211,7 @@ int *status              /* global status (given and returned) */
 
    mysockets[0] = socket ( AF_INET, SOCK_STREAM, 0);
 
-   if ( mysockets[0] < 0 ) 
+   if ( mysockets[0] < 0 )
    {
       sprintf ( string, "%s aborting, failed in opening listen socket",
         my_name );
@@ -1259,7 +1259,7 @@ int *status              /* global status (given and returned) */
       exit(1);
    }
 
-/*   create task rendezvous file with a name of the form 
+/*   create task rendezvous file with a name of the form
      ADAM_USER/<taskname>_<portnumber> */
 
    sprintf ( rendezvous, "%s/%s_%d", adam_user, task_name, portno );
@@ -1276,7 +1276,7 @@ int *status              /* global status (given and returned) */
    istat = msp1_mkrvous( rendezvous );
 #endif
 
-   if ( istat < 0 ) 
+   if ( istat < 0 )
    {
       sprintf ( string, "%s aborting, failed creating task rendezvous file",
         my_name );
@@ -1295,7 +1295,7 @@ int *status              /* global status (given and returned) */
 
 
 void msp_exit
-( 
+(
 void
 )
 
@@ -1305,7 +1305,7 @@ void
 *     MSP_EXIT
 
 *  Purpose:
-*     Exit handler 
+*     Exit handler
 
 *  Language:
 *     Starlink C
@@ -1380,7 +1380,7 @@ int *status           /* global status (given and returned) */
 *     MSP_GET_TASKPORT
 
 *  Purpose:
-*     Get task identifier 
+*     Get task identifier
 
 *  Language:
 *     Starlink C
@@ -1440,14 +1440,14 @@ int *status           /* global status (given and returned) */
 
    dirp = opendir ( filedir );
 
-   for ( dp=readdir(dirp); dp!=NULL; dp=readdir(dirp) ) 
+   for ( dp=readdir(dirp); dp!=NULL; dp=readdir(dirp) )
    {
       strcpy ( filename, dp->d_name );
       cptr = strrchr(filename, '_');
-      if ( cptr != NULL ) 
+      if ( cptr != NULL )
       {
          *cptr = '\0';
-         if ( strcmp ( filename, taskname ) == 0 ) 
+         if ( strcmp ( filename, taskname ) == 0 )
          {
             cptr++;
             if ( isdigit ( *cptr ) != 0 )
@@ -1483,7 +1483,7 @@ int *status         /* global status (given and returned) */
 *     MSP_GET_TASK_QUEUE
 
 *  Purpose:
-*     Get the command queue of a named task 
+*     Get the command queue of a named task
 
 *  Language:
 *     Starlink C
@@ -1634,7 +1634,7 @@ int *status           /* global status (given and returned) */
 *     MSP_INPUT
 
 *  Purpose:
-*     Get a message from any of the input sockets 
+*     Get a message from any of the input sockets
 
 *  Language:
 *     Starlink C
@@ -1704,7 +1704,7 @@ int *status           /* global status (given and returned) */
 
    msp_select ( waitflag, &nready, &q, status );
 
-   if ( nready > 0 ) 
+   if ( nready > 0 )
    {
 
 /*   at least one message present, get it and return */
@@ -1729,12 +1729,12 @@ int *status           /* global status (given and returned) */
          else
          {
 
-            new_entry = (struct msp_msg *) 
+            new_entry = (struct msp_msg *)
               malloc ( sizeof (struct msp_msg) );
 
             if ( new_entry == 0 )
             {
-               sprintf ( string, 
+               sprintf ( string,
                  "%s aborting, failed malloc", my_name );
                perror ( string );
                exit(1);
@@ -1742,7 +1742,7 @@ int *status           /* global status (given and returned) */
          }
 
 /*   Read the message */
-         sock_read ( mysockets[q], sizeof(struct msp_msg), 
+         sock_read ( mysockets[q], sizeof(struct msp_msg),
            (char *)new_entry, status );
 
          if ( *status == SAI__OK )
@@ -1802,7 +1802,7 @@ int *status           /* global status (given and returned) */
    printf ( "%s - closing socket no. %d\n", my_name, q );
          }
       }
-   } 
+   }
 }
 
 
@@ -1820,7 +1820,7 @@ int *status           /* global status (given and returned) */
 *     MSP_MKCOMQ
 
 *  Purpose:
-*     Return a task's command q given any send q 
+*     Return a task's command q given any send q
 
 *  Language:
 *     Starlink C
@@ -1894,7 +1894,7 @@ int *status           /* global status (given and returned) */
 *     MSP_MKNUMQ
 
 *  Purpose:
-*     Return a numbered send q given any send q 
+*     Return a numbered send q given any send q
 
 *  Language:
 *     Starlink C
@@ -1973,7 +1973,7 @@ int *status           /* global status (given and returned) */
 *     MSP_RECEIVE_MESSAGE
 
 *  Purpose:
-*     Receive a message on one of a list of queues 
+*     Receive a message on one of a list of queues
 
 *  Language:
 *     Starlink C
@@ -2141,7 +2141,7 @@ int *status           /* global status (given and returned) */
 *     MSP_SELECT
 
 *  Purpose:
-*     Look for a message on any of the input sockets 
+*     Look for a message on any of the input sockets
 
 *  Language:
 *     Starlink C
@@ -2204,7 +2204,7 @@ int *status           /* global status (given and returned) */
    FD_ZERO ( &read_mask );
    valid = 0;
 
-   for ( q = 0; q<MSP__MXSOCKETS; q++ ) 
+   for ( q = 0; q<MSP__MXSOCKETS; q++ )
    {
       if ( socket_used[q] == 1 )
       {
@@ -2238,7 +2238,7 @@ int *status           /* global status (given and returned) */
            (fd_set *) 0, &wait);
       }
 
-      if ( *nready >= 0 ) 
+      if ( *nready >= 0 )
       {
          break;
       }
@@ -2258,28 +2258,28 @@ int *status           /* global status (given and returned) */
       }
    }
 
-   if ( *nready > 0 ) 
+   if ( *nready > 0 )
    {
 
 /*   at least one message present, identify the queue */
 
-      for ( q=0; q<MSP__MXSOCKETS; q++ ) 
+      for ( q=0; q<MSP__MXSOCKETS; q++ )
       {
-         if ( FD_ISSET ( mysockets[q], &read_mask ) ) 
+         if ( FD_ISSET ( mysockets[q], &read_mask ) )
          {
             *q_number = q;
             break;
          }
       }
-   } 
-   else if ( *nready == 0 ) 
+   }
+   else if ( *nready == 0 )
    {
 
 /*   no messages, set status and return */
 
       *status = MSP__NONE;
 
-   } 
+   }
 }
 
 
@@ -2289,7 +2289,7 @@ void msp_send_message
 char msgbody[],        /* message to be sent (given) */
 int msglen,            /* length of message to be sent (given) */
 sendq_type sendq,      /* queue identifer to be used (given) */
-receiveq_type replyq,  /* reply queue to be associated with the message 
+receiveq_type replyq,  /* reply queue to be associated with the message
                           (given) */
 int *status            /* global status (given and returned) */
 )
@@ -2300,7 +2300,7 @@ int *status            /* global status (given and returned) */
 *     MSP_SEND_MESSAGE
 
 *  Purpose:
-*     Send a message on a queue 
+*     Send a message on a queue
 
 *  Language:
 *     Starlink C
@@ -2364,7 +2364,7 @@ int *status            /* global status (given and returned) */
 
       sendskt = sendq.connection;
 
-      sock_write ( sendskt, sizeof(struct msp_msg), 
+      sock_write ( sendskt, sizeof(struct msp_msg),
         (char*)&message, status );
       if ( *status != SAI__OK )
       {

@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_WTFN_REGRID_2 (RES, IN_DATA,
-     :     IN_VARIANCE, WEIGHT, USEVARWT, VARWT, X, Y, NPIX, 
-     :     PIXSPACE, NI, NJ, ICEN, JCEN, 
-     :     TOTAL_WEIGHT, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
+     :     IN_VARIANCE, WEIGHT, USEVARWT, VARWT, X, Y, NPIX,
+     :     PIXSPACE, NI, NJ, ICEN, JCEN,
+     :     TOTAL_WEIGHT, CONV_DATA_SUM, CONV_VARIANCE_SUM,
      :     CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 *+
 *  Name:
@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     CALL SCULIB_WTFN_REGRID_2 (RES, IN_DATA, IN_VARIANCE,
-*    :  WEIGHT, USEVARWT, VARWT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
+*    :  WEIGHT, USEVARWT, VARWT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN,
 *    :  TOTAL_WEIGHT, CONV_DATA_SUM, CONV_VARIANCE_SUM,
 *    :  CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 
@@ -33,8 +33,8 @@
 *     is a repeating pattern made up of copies of the transform of
 *     the map as a continuous function, each copied displaced from its
 *     neighbours by 1/dx, where dx is the sample spacing of the input points
-*     (assumed equal in x and y). Different copies of the 'continuous map' 
-*     transforms will overlap ('alias') if there is any power in the 
+*     (assumed equal in x and y). Different copies of the 'continuous map'
+*     transforms will overlap ('alias') if there is any power in the
 *     map at frequencies greater than 1/(2dx). It is not possible to unravel
 *     aliased spectra and this constraint leads to the Nyquist sampling
 *     criterion.
@@ -72,13 +72,13 @@
 *     computing time. However, a truncated Bessel function should work well on
 *     a large map, except near the edges. Edge effects can be removed by
 *     pretending that the map extends further - of course, this only works if
-*     you know what data the pretend map area should contain, i.e. zeros. 
+*     you know what data the pretend map area should contain, i.e. zeros.
 *     Another problem with a Bessel function arises from the fact that it does
-*     truncate the FT of the map sharply. If the data are good then there 
-*     should be nothing but noise power at the truncation radius and the 
+*     truncate the FT of the map sharply. If the data are good then there
+*     should be nothing but noise power at the truncation radius and the
 *     truncation of the FT should have no serious effect. However, if the data
-*     has spikes (power at all frequencies in the FT) or suffers from seeing 
-*     effects such that the data as measured DO have power beyond the 
+*     has spikes (power at all frequencies in the FT) or suffers from seeing
+*     effects such that the data as measured DO have power beyond the
 *     truncation radius, then this will cause ringing in the rebinned map.
 *     -[Gaussian]
 *     In fact, any function that is finite in frequency space will have
@@ -166,7 +166,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -201,14 +201,14 @@
       REAL    CONV_WEIGHT (NI, NJ)
 
 *  Status:
-      INTEGER STATUS  
+      INTEGER STATUS
 
 *  Local Constants:
 
 *  Local Variables:
       INTEGER ICPIX                              ! index in convolution function
                                                  ! corresponding to RPIX
-      INTEGER INEAR                              ! I index of output pixel 
+      INTEGER INEAR                              ! I index of output pixel
                                                  ! nearest to input
       INTEGER IOUT                               ! I pixel index in output array
       INTEGER JNEAR                              ! J index of output pixel
@@ -223,13 +223,13 @@
       REAL    RPIX                               ! distance between input and
                                                  ! output pixel
       REAL    RTEMP                              ! scratch real
-      REAL    WT                                 ! value of convolution 
+      REAL    WT                                 ! value of convolution
                                                  ! function at output pixel
       REAL    XINC                               ! x-axis pixel increment
       REAL    XPIX                               ! x offset of output pixel
       REAL    YINC                               ! y-axis pixel increment
       REAL    YPIX                               ! y offset of output pixel
-      
+
       INTEGER FILTER1_SQ
       INTEGER  FILTER_RAD_SQ
       REAL    SCALE
@@ -261,7 +261,7 @@
       SCALE = 1.0 / SCLSZ
 
       SCALESQ = SCALE * SCALE
-      
+
       RAD_OV_SCAL = REAL(FILTER_RAD_SQ) / SCALESQ
       RES_SCAL = REAL(FILTER1_SQ) * SCALESQ
 
@@ -276,7 +276,7 @@
          IF (IN_DATA(PIX) .NE. VAL__BADR) THEN
 
 *  find the coords (INEAR, JNEAR) of the output pixel nearest to the current
-*  input pixel. 
+*  input pixel.
 
             INEAR = NINT (REAL(X(PIX))/XINC) + ICEN
             JNEAR = NINT (REAL(Y(PIX))/YINC) + JCEN
@@ -287,16 +287,16 @@
             IF ((INEAR .GT. 0) .AND. (INEAR .LE. NI) .AND.
      :           (JNEAR .GT. 0) .AND. (JNEAR .LE. NJ)) THEN
 
-*  loop over x's and y's in output array that are covered by the convolution 
+*  loop over x's and y's in output array that are covered by the convolution
 *  function centred at (INEAR, JNEAR)
-         
+
                DO JOUT = MAX(1,JNEAR-PIX_RANGE), MIN(NJ,JNEAR+PIX_RANGE)
-                  DO IOUT = MAX(1,INEAR-PIX_RANGE), 
+                  DO IOUT = MAX(1,INEAR-PIX_RANGE),
      :                 MIN(NI,INEAR+PIX_RANGE)
 
 *  add into the convolution result and weight arrays unless TOTAL_WEIGHT
 *  of output is zero, signifying output pixel is beyond limits of
-*  mapped area. The coaddition is normalised by the `total weight' 
+*  mapped area. The coaddition is normalised by the `total weight'
 *  associated with this input pixel.
 
                      IF (TOTAL_WEIGHT (IOUT,JOUT) .GT. SMALL) THEN
@@ -307,8 +307,8 @@
                         XPIX = REAL (IOUT-ICEN) * XINC
 
 *  distance between output and input pixels, in arcsec**2 units
- 
-                        RPIX = (YPIX-REAL(Y(PIX)))**2 + 
+
+                        RPIX = (YPIX-REAL(Y(PIX)))**2 +
      :                       (XPIX-REAL(X(PIX)))**2
 
 * Now work out which part of the weight function to use
@@ -326,28 +326,28 @@
                            WT = WTFN(ICPIX+1)
 
 * Change INEAR,JNEAR to IOUT,JOUT for TOTAL_WEIGHT?
-                           WWEIGHT = WT * WEIGHT / 
+                           WWEIGHT = WT * WEIGHT /
      :                          TOTAL_WEIGHT (INEAR,JNEAR)
 
                            IF (USEVARWT) WWEIGHT = WWEIGHT * VARWT(PIX)
 
-                           CONV_WEIGHT (IOUT,JOUT) = 
+                           CONV_WEIGHT (IOUT,JOUT) =
      :                          CONV_WEIGHT(IOUT,JOUT)
      :                          + WWEIGHT
-                           CONV_DATA_SUM (IOUT,JOUT) = 
-     :                          CONV_DATA_SUM (IOUT,JOUT) + 
+                           CONV_DATA_SUM (IOUT,JOUT) =
+     :                          CONV_DATA_SUM (IOUT,JOUT) +
      :                          WWEIGHT * IN_DATA(PIX)
                            CONV_VARIANCE_SUM (IOUT,JOUT) =
      :                          CONV_VARIANCE_SUM (IOUT,JOUT) +
      :                          (WWEIGHT)**2 * IN_VARIANCE (PIX)
 
                         END IF
-                        
+
                      END IF
 
                   END DO
                END DO
-            
+
             END IF
 
          END IF

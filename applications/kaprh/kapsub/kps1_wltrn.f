@@ -51,7 +51,7 @@
 *        Classification type       IFIT value
 *
 *           Linear:
-*                                     all 
+*                                     all
 *
 *           Independent:
 *                                     1
@@ -110,7 +110,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

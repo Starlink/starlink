@@ -94,7 +94,7 @@
       CALL IRQ_NEW( INDF, 'TEST', LOCS, STATUS )
 
 *  Add a new quality name FRED.
-      CALL IRQ_ADDQN( LOCS, 'FRED', .FALSE., 'A TEST', STATUS )      
+      CALL IRQ_ADDQN( LOCS, 'FRED', .FALSE., 'A TEST', STATUS )
 
 *  Assign the quality FRED to the mid pixel of the NDF.
       CALL IRQ_SETQL( LOCS, .TRUE., 'FRED', 1, 1, ( LBND + UBND )/2,

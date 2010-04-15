@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -6,7 +6,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocnumber}    {76.5}
-\newcommand{\stardocauthors}   {James Tappin\footnote{School of Physics and 
+\newcommand{\stardocauthors}   {James Tappin\footnote{School of Physics and
 Space Research, University of Birmingham}}
 % STAR STAR STAR
 \newcommand{\stardocdate}      {18 December 1992}
@@ -26,7 +26,7 @@ Space Research, University of Birmingham}}
 \setlength{\parindent}{0mm}
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
-
+
 \begin{document}
 \thispagestyle{empty}
 % STAR STAR STAR
@@ -65,11 +65,11 @@ carried on the Solar Maximum Mission (SMM). There are also facilities
 for displaying time series and for editing bad data. Programs are also
 provided for accessing and archiving the data files to and from tapes.
 
-\subsection{Programs}      
+\subsection{Programs}
 
 The following programs make up the software package.
 
-\begin{description} 
+\begin{description}
 \item[\verb!hxdisp!: ] (Page \pageref{HXDISP}) This is the primary
 image display and manipulation program. Also contains options for
 time-series plots and some rudimentary analysis of spectral data.
@@ -153,7 +153,7 @@ always be retrieved using the binary \verb!-b! option.
 followed by \verb!FIXATR! should be O.K. for moving files to VMS.
 \end{itemize}
 
-
+
 \section{HXDISP}
 \label{HXDISP}
 
@@ -193,7 +193,7 @@ DISK$WORK1:[SOLAR.DATA_DIRECTORY.IMAGES.HXIS-SMM.NEW_VERSIONS]24_SEPTEMBER_1980.
 then you could use:
 \begin{verbatim}
 DEFINE IMDIR DISK$WORK1:[SOLAR.DATA_DIRECTORY.IMAGES.HXIS-SMM.NEW_VERSIONS]
-\end{verbatim} 
+\end{verbatim}
 and then give the filename as \verb!IMDIR:24_SEPTEMBER_1980!
 
 There is a limit of 2200 images per file, but as it is not possible to
@@ -227,32 +227,32 @@ commands with the data display commands in {\tt hxdisp}.} {\small
 AVERA & & & & & & & & Y & Y & Y & Y & & \\
 BACKG & & & & P & P & & & Y & Y & Y & Y & Y & \\
 BANDS & O & Y & O & O & O & & Y & Y & & O & Y & & Y \\
-COARS & & Y & Y & Y & Y & Y & Y & O & O & O & O & O & \\ 
-DEADT & & & & & & & & Y & Y & & Y & Y & \\ 
-FINE & & Y & Y & Y & Y & Y & Y & O & O & O & O & O & \\ 
-IMAGE & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y \\ 
+COARS & & Y & Y & Y & Y & Y & Y & O & O & O & O & O & \\
+DEADT & & & & & & & & Y & Y & & Y & Y & \\
+FINE & & Y & Y & Y & Y & Y & Y & O & O & O & O & O & \\
+IMAGE & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y \\
 MASTE & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y \\
-SETPI & & & & & & & & Y & Y & Y & & Y & \\ 
+SETPI & & & & & & & & Y & Y & Y & & Y & \\
 SLAVE & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y \\
 \hline
-ERRBA & & & & & & & & Y & Y & Y & Y & & \\ 
-FSD & & & & & & & & & & & Y & & \\ 
-LOGAR & & & & & & & & Y & Y & Y & Y & & \\ 
-MINRA & & & & & & & & Y & Y & Y & Y & & \\ 
-SCALE & & Y & & & & Y & Y & & & & & & \\ 
-SETLE & Y & & & & & & & & & & & & \\ 
+ERRBA & & & & & & & & Y & Y & Y & Y & & \\
+FSD & & & & & & & & & & & Y & & \\
+LOGAR & & & & & & & & Y & Y & Y & Y & & \\
+MINRA & & & & & & & & Y & Y & Y & Y & & \\
+SCALE & & Y & & & & Y & Y & & & & & & \\
+SETLE & Y & & & & & & & & & & & & \\
 THRES & & & & Y & Y & & & & & & & & \\
 \hline
-AUTOP & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\ 
-COLOU & & Y & & & O & Y & Y & & & & & & \\ 
-DELAY & & & & & & & Y & & & & & & \\ 
-DEVIC & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\ 
-DXDY & & Y & & & & & Y & & & & & & \\ 
-FONT & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & P & & \\ 
-INTER & Y & & & & & & & Y & & Y & & & \\ 
-LAYOU & & & & & & & & & Y & & & & \\ 
-PAPER & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\ 
-SIZE & & Y & Y & Y & Y & & Y & Y & & Y & & & \\ 
+AUTOP & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\
+COLOU & & Y & & & O & Y & Y & & & & & & \\
+DELAY & & & & & & & Y & & & & & & \\
+DEVIC & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\
+DXDY & & Y & & & & & Y & & & & & & \\
+FONT & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & P & & \\
+INTER & Y & & & & & & & Y & & Y & & & \\
+LAYOU & & & & & & & & & Y & & & & \\
+PAPER & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\
+SIZE & & Y & Y & Y & Y & & Y & Y & & Y & & & \\
 WRPIX & & & & & & & & Y & Y & Y & & & \\
 \hline
 \end{tabular}
@@ -292,7 +292,7 @@ been supplied in an argument to the command. The following features
 apply to most prompts.
 \begin{enumerate}
 \item If a real number is requested, an integer is acceptable.
-\item Any improper input will result in 
+\item Any improper input will result in
 the request being re-issued.
 \item Where a range is requested but that range could
 be of length 1 (e.g. a single image or pixel) then only a single number
@@ -312,51 +312,51 @@ always a synonym for {\tt ON} and {\tt NO} for {\tt OFF}. Any other
 synonyms will be listed with the appropriate commands.
 
 \subsection{Display Commands}
- 	     
+
 The commands listed in this section are those which actually output
 graphical display of image data, or write data to disk files.
 
 \begin{tabbing}
 {\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
 {\bf ALLBANDS} \> p.~\pageref{al} \> Display images for all bands
-together.\\ 
+together.\\
 {\bf CONTOUR} \> p.~\pageref{con} \> Contour raw image.\\
 {\bf DECONVOLVE} \> p.~\pageref{dec} \> Contour deconvolved image
-(simple default options only).\\ 
-{\bf DUMP} \> p.~\pageref{du} \> Print Image.\\ 
-{\bf ITCON} \> p.~\pageref{it} \> Display deconvolved image (many options).\\ 
-{\bf FRATIO} \> p.~\pageref{fr} \> Ratio time series to file.\\ 
-{\bf FSIXTSER} \> p.~\pageref{fsi} \> 6 band time series to file.\\ 
+(simple default options only).\\
+{\bf DUMP} \> p.~\pageref{du} \> Print Image.\\
+{\bf ITCON} \> p.~\pageref{it} \> Display deconvolved image (many options).\\
+{\bf FRATIO} \> p.~\pageref{fr} \> Ratio time series to file.\\
+{\bf FSIXTSER} \> p.~\pageref{fsi} \> 6 band time series to file.\\
 {\bf FTSER} \> p.~\pageref{ft} \> Write time series to file.\\
-{\bf MOVIE} \> p.~\pageref{mo} \> ``Movie'' of images.\\ 
-{\bf PXTSER} \> p.~\pageref{px} \> Time series for separate pixels.\\ 
-{\bf RATIO} \> p.~\pageref{ra} \> Plot time series of band ratios.\\ 
-{\bf SAVE} \> p.~\pageref{sa} \> Save image to disk.\\ 
-{\bf SIXTSER} \> p.~\pageref{six} \> Time series of all six bands.\\ 
-{\bf SPECTRA} \> p.~\pageref{sp} \> Simple spectral analysis.\\ 
-{\bf TSER} \> p.~\pageref{ts} \> Plot time series.\\ 
+{\bf MOVIE} \> p.~\pageref{mo} \> ``Movie'' of images.\\
+{\bf PXTSER} \> p.~\pageref{px} \> Time series for separate pixels.\\
+{\bf RATIO} \> p.~\pageref{ra} \> Plot time series of band ratios.\\
+{\bf SAVE} \> p.~\pageref{sa} \> Save image to disk.\\
+{\bf SIXTSER} \> p.~\pageref{six} \> Time series of all six bands.\\
+{\bf SPECTRA} \> p.~\pageref{sp} \> Simple spectral analysis.\\
+{\bf TSER} \> p.~\pageref{ts} \> Plot time series.\\
 {\bf VIEW} \> p.~\pageref{vi} \> Display image on screen.\\
 \end{tabbing}
 
 \subsection{Selection Commands}
-	 
+
 These commands select which part of the data will be displayed by the
 display commands.
 
 \begin{tabbing}
 {\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
-{\bf AVERAGE} \> p.~\pageref{av} \> Set averaging time.\\ 
-{\bf BACKGROUND} \> p.~\pageref{bac} \> Set background subtraction.\\ 
-{\bf BANDS} \> p.~\pageref{ban} \> Select band range.\\ 
-{\bf COARSE} \> p.~\pageref{coa} \> Select coarse field.\\ 
-{\bf DEADTIME} \> p.~\pageref{dea} \> Set deadtime correction.\\ 
-{\bf FINE} \> p.~\pageref{fin} \> Select fine field.\\ 
-{\bf IMAGE} \> p.~\pageref{im} \> Select image range.\\ 
-{\bf MASTER} \> p.~\pageref{mas} \> Select ``Master'' images.\\ 
-{\bf SELECT} \> p.~\pageref{sel} \> Select pixels above level.\\ 
-{\bf SETLEVEL} \> p.~\pageref{setl} \> Select selection level.\\ 
-{\bf SETPIXEL} \> p.~\pageref{setp} \> Select pixels.\\ 
-{\bf SLAVE} \> p.~\pageref{sl} \> Select ``Slave'' images.\\ 
+{\bf AVERAGE} \> p.~\pageref{av} \> Set averaging time.\\
+{\bf BACKGROUND} \> p.~\pageref{bac} \> Set background subtraction.\\
+{\bf BANDS} \> p.~\pageref{ban} \> Select band range.\\
+{\bf COARSE} \> p.~\pageref{coa} \> Select coarse field.\\
+{\bf DEADTIME} \> p.~\pageref{dea} \> Set deadtime correction.\\
+{\bf FINE} \> p.~\pageref{fin} \> Select fine field.\\
+{\bf IMAGE} \> p.~\pageref{im} \> Select image range.\\
+{\bf MASTER} \> p.~\pageref{mas} \> Select ``Master'' images.\\
+{\bf SELECT} \> p.~\pageref{sel} \> Select pixels above level.\\
+{\bf SETLEVEL} \> p.~\pageref{setl} \> Select selection level.\\
+{\bf SETPIXEL} \> p.~\pageref{setp} \> Select pixels.\\
+{\bf SLAVE} \> p.~\pageref{sl} \> Select ``Slave'' images.\\
 {\bf TIME} \> p.~\pageref{ti} \> Select image range by times.\\
 \end{tabbing}
 
@@ -367,13 +367,13 @@ error bars, scaling etc.).
 
 \begin{tabbing}
 {\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
-{\bf ERRBAR} \> p.~\pageref{er} \> Select error bars.\\ 
-{\bf FSD} \> p.~\pageref{fsd} \> Set pixel plot scaling.\\ 
-{\bf INTER} \> p.~\pageref{int} \> Select interactive graphics.\\ 
-{\bf LOGARITHMIC} \> p.~\pageref{lo} \> Select logarithmic plots.\\ 
+{\bf ERRBAR} \> p.~\pageref{er} \> Select error bars.\\
+{\bf FSD} \> p.~\pageref{fsd} \> Set pixel plot scaling.\\
+{\bf INTER} \> p.~\pageref{int} \> Select interactive graphics.\\
+{\bf LOGARITHMIC} \> p.~\pageref{lo} \> Select logarithmic plots.\\
 {\bf MINRATE} \> p.~\pageref{mi} \> Lower cut-off in logarithmic
-plots.\\ 
-{\bf SCALE} \> p.~\pageref{sc} \> Set image saturation level.\\ 
+plots.\\
+{\bf SCALE} \> p.~\pageref{sc} \> Set image saturation level.\\
 {\bf THRESHOLD} \> p.~\pageref{th} \> Contouring threshold.\\
 \end{tabbing}
 
@@ -384,15 +384,15 @@ These commands control how the data will be displayed on the device
 
 \begin{tabbing}
 {\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
-{\bf AUTOPLOT} \> p.~\pageref{au} \> Select automatic plot spooling\\ 
-{\bf COLOUR} \> p.~\pageref{col} \> Select colour table.\\ 
-{\bf DELAY} \> p.~\pageref{del} \> Set delay time.\\ 
-{\bf DEVICE} \> p.~\pageref{dev} \> Select graphics device.\\ 
-{\bf DXDY} \> p.~\pageref{dx} \> Set plot offset.\\ 
-{\bf FONT} \> p.~\pageref{fo} \> Set graphics font.\\ 
-{\bf LAYOUT} \> p.~\pageref{la} \> Arrangement of 6-band plots.\\ 
-{\bf PAPER} \> p.~\pageref{pa} \> Paper size for plots.\\ 
-{\bf SIZE} \> p.~\pageref{siz} \> Set plot size.\\ 
+{\bf AUTOPLOT} \> p.~\pageref{au} \> Select automatic plot spooling\\
+{\bf COLOUR} \> p.~\pageref{col} \> Select colour table.\\
+{\bf DELAY} \> p.~\pageref{del} \> Set delay time.\\
+{\bf DEVICE} \> p.~\pageref{dev} \> Select graphics device.\\
+{\bf DXDY} \> p.~\pageref{dx} \> Set plot offset.\\
+{\bf FONT} \> p.~\pageref{fo} \> Set graphics font.\\
+{\bf LAYOUT} \> p.~\pageref{la} \> Arrangement of 6-band plots.\\
+{\bf PAPER} \> p.~\pageref{pa} \> Paper size for plots.\\
+{\bf SIZE} \> p.~\pageref{siz} \> Set plot size.\\
 {\bf WRPIXEL} \> p.~\pageref{wr} \> Set time series output file.\\
 \end{tabbing}
 
@@ -404,10 +404,10 @@ disc file with the image, however not all are irreversible.
 
 \begin{tabbing}
 {\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
-{\bf FLAG} \> p.~\pageref{fl} \> Flag bad images.\\ 
-{\bf LFLAG} \> p.~\pageref{lf} \> List flagged images.\\ 
-{\bf PIXEL} \> p.~\pageref{pi} \> Set pixel values.\\ 
-{\bf SUBTRACT} \> p.~\pageref{sub} \> Subtract background image.\\ 
+{\bf FLAG} \> p.~\pageref{fl} \> Flag bad images.\\
+{\bf LFLAG} \> p.~\pageref{lf} \> List flagged images.\\
+{\bf PIXEL} \> p.~\pageref{pi} \> Set pixel values.\\
+{\bf SUBTRACT} \> p.~\pageref{sub} \> Subtract background image.\\
 {\bf UNFLAG} \> p.~\pageref{un} \> Restore flagged images.\\
 \end{tabbing}
 
@@ -417,12 +417,12 @@ Exiting, changing input file etc.
 
 \begin{tabbing}
 {\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
-{\bf CTRL-D} \> p.~\pageref{eof} \> Return to command level (UNIX).\\ 
-{\bf EXIT} \> p.~\pageref{ex} \> Exit from program.\\ 
-{\bf FILE} \> p.~\pageref{fil} \> New image file.\\ 
+{\bf CTRL-D} \> p.~\pageref{eof} \> Return to command level (UNIX).\\
+{\bf EXIT} \> p.~\pageref{ex} \> Exit from program.\\
+{\bf FILE} \> p.~\pageref{fil} \> New image file.\\
 {\bf CTRL-Z} \> p.~\pageref{eof} \> Return to command level (VMS). \\
 \> p.~\pageref{dcl} \>  Suspend \verb!hxdisp! and start a
-new shell (UNIX).\\ 
+new shell (UNIX).\\
 {\bf \$} \> p.~\pageref{dcl} \> Execute a system command.\\
 \end{tabbing}
 
@@ -432,16 +432,16 @@ Give information about the image etc.
 
 \begin{tabbing}
 {\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
-{\bf CHECK} \> p.~\pageref{ch} \> Check for bad images.\\ 
-{\bf DOY} \> p.~\pageref{do} \> Convert date format.\\ 
+{\bf CHECK} \> p.~\pageref{ch} \> Check for bad images.\\
+{\bf DOY} \> p.~\pageref{do} \> Convert date format.\\
 {\bf INFO} \> p.~\pageref{inf} \> Image and option setting
-information.\\ 
-{\bf HELP} \> p.~\pageref{he} \> HXDISP help.\\ 
-{\bf HMS} \> p.~\pageref{hm} \> Convert time format.\\ 
-{\bf LPIXELS} \> p.~\pageref{lp} \> List selected pixels.\\ 
-{\bf MAXIMUM} \> p.~\pageref{max} \> Find maximum in images.\\ 
-{\bf POINTING} \> p.~\pageref{po} \> List pointing information.\\ 
-{\bf SURVEY} \> p.~\pageref{sur} \> Image times and durations.\\ 
+information.\\
+{\bf HELP} \> p.~\pageref{he} \> HXDISP help.\\
+{\bf HMS} \> p.~\pageref{hm} \> Convert time format.\\
+{\bf LPIXELS} \> p.~\pageref{lp} \> List selected pixels.\\
+{\bf MAXIMUM} \> p.~\pageref{max} \> Find maximum in images.\\
+{\bf POINTING} \> p.~\pageref{po} \> List pointing information.\\
+{\bf SURVEY} \> p.~\pageref{sur} \> Image times and durations.\\
 {\bf VERIFY} \> p.~\pageref{ve} \> Check image numbers.\\
 \end{tabbing}
 
@@ -479,22 +479,22 @@ commands for
 
 \begin{verbatim}
 /work2/d234_1341
-COARSE 
-IMAGE 30,70 
-AVERAGE 30 
-MASTER ON 
-DEVICE POSTSCRIPT_L 
+COARSE
+IMAGE 30,70
+AVERAGE 30
+MASTER ON
+DEVICE POSTSCRIPT_L
 AUTOPLOT OFF
-PXTSER 
-BAND 4,6 
-IMAGE ALL 
-SETPIXEL 
-23,25 
-42,44 
--1 
+PXTSER
+BAND 4,6
+IMAGE ALL
+SETPIXEL
+23,25
+42,44
+-1
 ERRBAR ON
-DEVICE POSTSCRIPT_P 
-TSER 
+DEVICE POSTSCRIPT_P
+TSER
 EXIT
 \end{verbatim}
 
@@ -613,13 +613,13 @@ line printer.
 
 \item[\underline{COA}RSE: ] \label{coa}
 Selects the coarse field of view image data.
-      
+
 If the current field is fine and the pixel selection is for the entire
 fine field, then the pixel selection will be changed to the coarse
 field, if however any other pixel selections have been made with {\tt
 SETPIXEL} then no changes will be made.
 
-\item[\underline{COL}OUR: ] \label{col} 
+\item[\underline{COL}OUR: ] \label{col}
 Specify desired colour table. Enter a number between 1 and 10.
 
 At present only tables 1 through 5 exist. If a non-existent table is
@@ -934,16 +934,16 @@ Otherwise the program will prompt for a choice with current as the
 default.
 
 The routine will then prompt for the following information:
-\begin{enumerate} 
+\begin{enumerate}
 \item Contoured output (reply {\tt C}), greyscales (reply {\tt G}), colour
 plots (reply {\tt F} [for Fancy]) or none of these (reply {\tt N}). The
 initial default is contours, but the previous selection is subsequently
 remembered.
-\item Whether to produce DUMP format output (see the {\tt DUMP} command for a 
+\item Whether to produce DUMP format output (see the {\tt DUMP} command for a
 description (p.~\pageref{du})). If none was selected at the previous
 level then the default is to produce DUMP output, else the default is no
 DUMP output.
-\item Number of iterations for deconvolution. 
+\item Number of iterations for deconvolution.
 \begin{itemize}
 \item Zero (the default) means continue until $\chi^2 < $ degrees of freedom.
 \item A positive value means continue for that number of iterations unless the
@@ -978,7 +978,7 @@ If no plot device has been selected you will also be prompted for it.
 
 Note that not all devices produce satisfactory greyscales.
 \begin{itemize}
-\item Devices with 255 available colour indices produce good greyscales by 
+\item Devices with 255 available colour indices produce good greyscales by
 using 128 of the colour indices as different shades of grey.
 ``Saturated'' is white.  These are the \underline{only} devices able to
 produce colour plots.
@@ -1071,7 +1071,7 @@ This command is used if you wish to display images on the screen in
 movie form.
 
 The output from this command is controlled by the following commands:
-\begin{quote}      
+\begin{quote}
 {\tt IMAGE}: To set first and last image.\\ {\tt FINE/COARSE}: To
 choose fine or coarse image.\\ {\tt BANDS}: To set low and high band.\\
 {\tt SIZE}: To set the size of the plot.\\ {\tt DELAY}: To specify wait
@@ -1111,7 +1111,7 @@ This command is entirely independent of the {\tt SIZE} command.
 \item[\underline{PI}XEL: ] \label{pi}
 This command allows the user to change the value of individual pixels
 in a HXIS image. The user is prompted for the following information:
-\begin{quote}\tt      
+\begin{quote}\tt
 ENTER IMAGE NUMBER: {\rm Hitting RETURN will bring you back to the
 command level of \verb!hxdisp!.}\\ LOW,HIGH BAND: {\rm The band or
 bands in which you want to change pixel values.}\\ PIXEL NO., NEW
@@ -1128,7 +1128,7 @@ numbers will be requested.
 and only the pixel numbers and values are requested.
 \item If 5 values are given then all values are taken from the argument and no
 prompts are issued.
-\item Specifying 4 values is an error. 
+\item Specifying 4 values is an error.
 \item Anything after the fifth value will be ignored.
 \end{itemize}
 
@@ -1391,7 +1391,7 @@ If no argument is given the command will prompt for the destination.
 This command allows the user to form a background image and a series of
 accumulated images from which the background can be subtracted. The
 user is prompted for the following information:
-\begin{quote}\tt      
+\begin{quote}\tt
 ENTER LOW AND HIGH BAND\\ FORM A BACKGROUND IMAGE?\\ FIRST AND LAST
 IMAGE TO ACCUMULATE FOR BACKGROUND\\ FIRST AND LAST IMAGE TO ACCUMULATE
 {\rm - This prompt will repeat until you enter 0 or CR.}
@@ -1503,7 +1503,7 @@ Control whether time-series generated by {\tt TSER}, {\tt RATIO} and
 {\tt SIXTSER} are written to disk as well as being plotted.
 
 The file name will be:
-\begin{quote} 
+\begin{quote}
 {\tt Ndddhhffffeeeelh.NUM} for a count rate file from {\tt TSER},\\
 {\tt Sdddhhffffeeee.NUM} for a six-band count rate file from {\tt
 SIXTSER} and \\ {\tt Rdddhhffffeeeelh.RAT} for a ratio file from {\tt
@@ -1562,9 +1562,9 @@ allows you to run normal Unix commands. To return to \verb!hxdisp! use
 the \verb!fg!  command to recall the \verb!hxdisp! process to the
 foreground.
 \end{description}
-
+
 \section{Data access programs}
-      
+
 \subsection{HXLIB}
 \label{HXLIB}
 
@@ -1575,7 +1575,7 @@ following commands are available:
 
 \subsubsection{Search and display commands}
 
-\begin{description}      
+\begin{description}
 \item[LIST: ]    To list at the user's terminal the HIMSEL tapes and file
 numbers for one day, (and optionally hour). If the hour is omitted a
 list of all the data for that day will be produced, if neither day nor
@@ -1608,13 +1608,13 @@ any of these commands.
 Obtains HIMSEL tape number to be added from the header if it is
 present, otherwise this is prompted for.
 
-\item[DELETE: ] Deletes all records for a given HIMSEL tape from the file. 
+\item[DELETE: ] Deletes all records for a given HIMSEL tape from the file.
 Prompts for HIMSEL tape number to be deleted.
 
 \item[SORT: ]  To sort the entire file in order of increasing day of
 year. Note: This is very slow when the file contains many tapes,
 therefore if possible it should be run as a batch job.
-\end{description}       
+\end{description}
 
 To access a database other than the standard one use the command
 sequence:
@@ -1649,13 +1649,13 @@ the images on disk. To execute just type RDHIM.
 
 The user will be prompted for the following information:
 \begin{quote} \tt
-Tape drive with HIMSEL tape? :\_\\ 
+Tape drive with HIMSEL tape? :\_\\
 Re-read on read error? (Y/N) :\_
 \end{quote}
 and then for each file to be read
 \begin{quote} \tt
-File number? (EOF to end) :\_\\ 
-First and last image :\_ \\ 
+File number? (EOF to end) :\_\\
+First and last image :\_ \\
 Output filename :\_
 \end{quote}
 
@@ -1678,7 +1678,7 @@ parity errors.
 When several files are requested, the file numbers need not be in
 sequence as the program is able to skip backwards on a tape (but
 repeated long moves on a tape will take time).
-      
+
 \subsection{HAXIM}
 \label{HAXIM}
 
@@ -1848,7 +1848,7 @@ will give more information.
 
 The following aliases have been created in the HXIS initialization:
 \begin{verbatim}
-fixipd :== fixatr /rfm=var:6660 /rat=none 
+fixipd :== fixatr /rfm=var:6660 /rat=none
 fixdta :== fixatr /rfm=fix:7680 /rat=none
 \end{verbatim}
 these will fix the processed data files (input to \verb!HAXIM!) and the
@@ -1857,7 +1857,7 @@ HXIS image files (input to \verb!HXDISP! etc) respectively.
 {\large \bf NOTE: processed data files transferred from VMS to UNIX in
 ascii mode or written to a tar file using {\tt vms2tar} will be irreparably
 damaged!}
-
+
 \appendix
 \section{Deconvolution algorithm}
 \label{ALGO}
@@ -1885,7 +1885,7 @@ The basic computation of $\chi^2$ is:
 $$ \chi^2 = \sum {{\rm (Observed - Model)}^2\over {\rm Model}} $$
 over all the pixels for which there exist observations.
 
-But it is recommended (e.g. Seigel --- Non-parametric statistics 
+But it is recommended (e.g. Seigel --- Non-parametric statistics
 for the behavioural
 sciences) that when computing $\chi^2$ no more than 20\% of the categories
 should have expected counts $< 5$. If each pixel is treated independently
@@ -1893,7 +1893,7 @@ then this condition is unlikely to be met for most normal HXIS images. Also
 if any category has zero expectation and finite observation $\chi^2$ will
 diverge. Therefore all pixels with expectation 1 or 0
 are treated as a single category (if the expectation is still zero
-it is treated as 1). 
+it is treated as 1).
 
 If the maximum pixel in a model image is less than
 5 then the image is treated as a series of strips, with summing being
@@ -1913,7 +1913,7 @@ of edges and data holes.
 
 If all four surrounding data are missing then the sky is {\em assumed}
 to be zero. This is justified on the grounds that the telemetry system
-preferentially omitted low regions of the image when in the fast 
+preferentially omitted low regions of the image when in the fast
 sampling modes.
 
 If a region of the model sky is a true zero in one iteration then ratios are
@@ -1938,7 +1938,7 @@ If this happens then unless you are very sure that everything is in order it is
 probably a good idea to go back and take a close look at your data for
 defective images which are inconsistent with any physically realizable sky.
 
-
+
 \section{Files written and/or read by {\tt hxdisp}}
 \label{FILES}
 
@@ -1970,7 +1970,7 @@ represent values as:
 \item[\tt l] low energy band (I1)
 \item[\tt h] high energy band (I1)
 \end{description}
-
+
 \begin{table}
 \begin{center}
 \caption{\label{data} The format of the data in an individual HXIS image.}
@@ -1991,11 +1991,11 @@ original GSFC HIMSEL tapes.\\
 15 & Bad image flag. \hfill(A) & 0 if image is O.K., 1 if bad.\\
 16 & Nminor \hfill(S/H) & Number of telemetry minor frames in image.\\
 17 & Spare & Reserved for encoding detruncation of telemetry.\\
-18 & Data quality \hfill(H) & 100 $\times$ quality as a percentage. (usually 
+18 & Data quality \hfill(H) & 100 $\times$ quality as a percentage. (usually
 = 10000)\\
-19--20 & Image index \hfill(S) & R*4, sequence\#, separate series for each 
+19--20 & Image index \hfill(S) & R*4, sequence\#, separate series for each
 microprocessor.
-Increases by 2 each image for a given processor. Even values for master, 
+Increases by 2 each image for a given processor. Even values for master,
 odd for slave.\\
 21 & Version\# \hfill(S) & 0 means ROM. (Always 0). \\
 22 & Duration of image \hfill(S) & in units of 0.128s.\\
@@ -2009,7 +2009,7 @@ odd for slave.\\
 31 & coarse+fine+slits counts \hfill(S) & Modes 1 and 2 only.\\
 32--71 & Housekeeping data \hfill(S) & I*2 values.\\
 72--77 & EBS words. \hfill(S/H) & Indicate energy ranges of the bands, each word
-(2 bytes) has 2 1-byte values which refer to the table which follows 
+(2 bytes) has 2 1-byte values which refer to the table which follows
 with the first element treated as number zero.\\
 78--91 & KeV table. \hfill(H) & 100 $\times$ energies in KeV.\\
 92 & NO \hfill(S) & Number of overflows.\\
@@ -2042,11 +2042,11 @@ contain the information as listed in Table~\ref{data}.
 
 The source of the values is indicated at the end of the contents field as:
 (S) --- Value set by spacecraft, (H) --- Value set by HAXIM, (A) --- Value set
-by analysis software. There are two cases given as (S/H) 
+by analysis software. There are two cases given as (S/H)
 these
 are: the number of minor frames, which is a count generated by HAXIM from the
 spacecraft data, and the EBS words, which have default values set by HAXIM and
-the spacecraft setting substituted if they are found. 
+the spacecraft setting substituted if they are found.
 
 The ``platform'' flag indicates the format of the numbers contained in
 the remainder of the image, the values are chosen to be numbers

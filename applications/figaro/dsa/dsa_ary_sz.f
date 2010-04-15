@@ -9,7 +9,7 @@ C     Returns the dimensions of a named data array.
 C
 C  Description:
 C     Given the DTA_ system name of a data array, this routine
-C     returns its dimensions.  At present, it can only handle 
+C     returns its dimensions.  At present, it can only handle
 C     a limited number of structured array types. This routine
 C     outputs no error messages, but does return an error string
 C     if an error occurs.
@@ -23,8 +23,8 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) NAME       (Fixed string,descr) The DTA_ system name of the
-C                    array in question.  
-C     (>) MAXDIM     (Integer,ref) The maximum number of dimensions 
+C                    array in question.
+C     (>) MAXDIM     (Integer,ref) The maximum number of dimensions
 C                    for the data.
 C     (<) NDIM       (Integer,ref) The actual number of dimensions in the
 C                    array.
@@ -153,7 +153,7 @@ C
                   DIMS(IDIM)=DIMS(IDIM)+ORIGIN(IDIM)
                END IF
             END DO
-         ELSE 
+         ELSE
             STATUS=DSA__NOARRY
             ERROR='Structure type '//TYPE(:ICH_LEN(TYPE))//
      :                             ' not recognised as an array'

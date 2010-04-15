@@ -2,7 +2,7 @@
 *      1 Aug 2000 (ajc):
 *        Change TYPE * to PRINT *
 *-----------------------------------------------------------------------
-        
+
       SUBROUTINE REFRESH_CLI(STRING)
 
 C   Routine to fill an empty command line with the contents of STRING

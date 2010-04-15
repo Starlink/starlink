@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHP_AINIT2PAR( CD1, INPUT1, CD2, INPUT2, FNAMES, 
+     : CHP_AINIT2PAR( CD1, INPUT1, CD2, INPUT2, FNAMES,
      : FTYPES, STATUS )
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHP_AINIT2PAR( CD1, INPUT1, CD2, INPUT2, FNAMES, 
+*     CALL CHP_AINIT2PAR( CD1, INPUT1, CD2, INPUT2, FNAMES,
 *     FTYPES, STATUS )
 
 *  Description:
 *     Initialize common variables for a parse.
-* 
+*
 
 *  Arguments:
 *     CD1 = INTEGER (Given)
@@ -49,7 +49,7 @@
 *     None
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,7 +106,7 @@
 *
 *   Get all the information about the first catalogues fields.
 *
-      CALL CHP_GALLCDB(CD1, NUMFLDS1, F1NAMES, FFORMATS, 
+      CALL CHP_GALLCDB(CD1, NUMFLDS1, F1NAMES, FFORMATS,
      :  FXUNITS, FCOMMENTS, FPREFDIS, F1TYPES, FCOLDES,
      :  FARRSHP, FARRDIM, FASSERT, FASSEXP, FDOMCHK, FDATELM,
      :  FVCFLAG, FVCEXP, FDELIND, FFMATFLAG, STATUS)
@@ -132,12 +132,12 @@
         EUNIT(I) = FXUNITS(I)
 *        ENULL(I) = FNULLS(I)
         ECOMNT(I) = FCOMMENTS(I)
-       
+
       ENDDO
 *
 *   Get all the information about the first catalogues fields.
 *
-      CALL CHP_GALLCDB(CD2, NUMFLDS2, F2NAMES, FFORMATS, 
+      CALL CHP_GALLCDB(CD2, NUMFLDS2, F2NAMES, FFORMATS,
      :  FXUNITS, FCOMMENTS, FPREFDIS, F2TYPES, FCOLDES,
      :  FARRSHP, FARRDIM, FASSERT, FASSEXP, FDOMCHK, FDATELM,
      :  FVCFLAG, FVCEXP, FDELIND, FFMATFLAG, STATUS)
@@ -165,7 +165,7 @@
         EUNIT(I) = FXUNITS(J)
 *        ENULL(I) = FNULLS(J)
         ECOMNT(I) = FCOMMENTS(J)
-       
+
       ENDDO
       ENITEMS = NUMFLDS
 *

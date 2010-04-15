@@ -1,11 +1,11 @@
-C 
+C
       SUBROUTINE ERASER(N,X,Y,XVST,XVEN,HIGH,LOW,HIGHR,LOWR,TYP)
 C
 C     E R A S E R
 C
-C     Plots an array of points in PEN 0. The effect is to erase 
+C     Plots an array of points in PEN 0. The effect is to erase
 C     a previous plot. The type of plot is given by TYP: TYP=1 -
-C     a histo plot; TYP=2 a line plot; TYP=3 - a point plot. 
+C     a histo plot; TYP=2 a line plot; TYP=3 - a point plot.
 C
 C     Parameters - (">" input, "<" output )
 C
@@ -27,10 +27,10 @@ C                                          JRW / AAO February 1987
 C     Modified:
 C       Original
 C
-      IMPLICIT NONE 
+      IMPLICIT NONE
 C
-C     Parameters 
-C   
+C     Parameters
+C
       INTEGER N,TYP
       REAL X(N),Y(N),XVST,XVEN,LOW,HIGH,LOWR,HIGHR
 C
@@ -40,7 +40,7 @@ C
       PARAMETER (THICK=2,THIN=1)
 
       CALL PGSCI(0)
-      
+
       IF (TYP.EQ.1) THEN
 C
 C  Plot histo in pen 0 on lower plot

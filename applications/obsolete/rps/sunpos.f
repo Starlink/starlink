@@ -129,7 +129,7 @@ c subroutine ANOMALY ends
 
 	LSN = NU + (LS-MS+DL)
 	RSN = 1.0000002*(1-S*cos(EA))+DR
-	
+
 	do while (LSN.lt.0)
 		LSN = LSN + 3.6D+2
 	end do
@@ -137,6 +137,6 @@ c subroutine ANOMALY ends
 	do while (LSN.gt.3.6D+2)
 		LSN = LSN - 3.6D+2
 	end do
-	
+
 	return
 	end

@@ -43,7 +43,7 @@
 {        Added DA2NDF, FITS2NDF, and NDF2DA tasks and help.  Added
 {        automatic conversions for STREAM and GZIP.  Added FITS synonym
 {        file extensions.  Some reordering of NDF_FORMATS_IN/OUT; also
-{        write one format per line for clarity.  Due to limited length 
+{        write one format per line for clarity.  Due to limited length
 {        of SETENV token, there are no aliases for FITS in NDF_FORMATS_IN.
 {     1998 January 13 (AJC):
 {        Added AST2NDF and SPECX2NDF
@@ -54,7 +54,7 @@
 {        Added FITS synonyms to NDF_FORMATS_IN.
 {     2006 February 17 (MJC):
 {        Add FITS(.fits) to NDF_FORMATS_OUT.  Add FITSGZ with three
-{        allowed file extensions.  Use distinct name for GZIP temporary 
+{        allowed file extensions.  Use distinct name for GZIP temporary
 {        file.  Replace pwd directories with tokens.
 {     {enter_further_changes_here}
 {
@@ -110,28 +110,28 @@ defstring CONHELP  SH $CONVERT_DIR/conhelp
 
 { Define CONVERT's help from ICL.
 defhelp CONVERT    $CONVERT_HELP 0
-defhelp ASCII2NDF  $CONVERT_HELP ASCII2NDF 
-defhelp AST2NDF    $CONVERT_HELP AST2NDF 
-defhelp DA2NDF     $CONVERT_HELP DA2NDF 
-defhelp DST2NDF    $CONVERT_HELP DST2NDF 
-defhelp FITS2NDF   $CONVERT_HELP FITS2NDF 
-defhelp GASP2NDF   $CONVERT_HELP GASP2NDF 
-defhelp GIF2NDF    $CONVERT_HELP GIF2NDF 
-defhelp IRAF2NDF   $CONVERT_HELP IRAF2NDF 
-defhelp IRCAM2NDF  $CONVERT_HELP IRCAM2NDF 
-defhelp NDF2ASCII  $CONVERT_HELP NDF2ASCII 
+defhelp ASCII2NDF  $CONVERT_HELP ASCII2NDF
+defhelp AST2NDF    $CONVERT_HELP AST2NDF
+defhelp DA2NDF     $CONVERT_HELP DA2NDF
+defhelp DST2NDF    $CONVERT_HELP DST2NDF
+defhelp FITS2NDF   $CONVERT_HELP FITS2NDF
+defhelp GASP2NDF   $CONVERT_HELP GASP2NDF
+defhelp GIF2NDF    $CONVERT_HELP GIF2NDF
+defhelp IRAF2NDF   $CONVERT_HELP IRAF2NDF
+defhelp IRCAM2NDF  $CONVERT_HELP IRCAM2NDF
+defhelp NDF2ASCII  $CONVERT_HELP NDF2ASCII
 defhelp NDF2DA     $CONVERT_HELP NDF2DA
-defhelp NDF2DST    $CONVERT_HELP NDF2DST 
-defhelp NDF2FITS   $CONVERT_HELP NDF2FITS 
-defhelp NDF2GASP   $CONVERT_HELP NDF2GASP 
+defhelp NDF2DST    $CONVERT_HELP NDF2DST
+defhelp NDF2FITS   $CONVERT_HELP NDF2FITS
+defhelp NDF2GASP   $CONVERT_HELP NDF2GASP
 defhelp NDF2GIF    $CONVERT_HELP NDF2GIF
-defhelp NDF2IRAF   $CONVERT_HELP NDF2IRAF 
+defhelp NDF2IRAF   $CONVERT_HELP NDF2IRAF
 defhelp NDF2PGM    $CONVERT_HELP NDF2PGM
 defhelp NDF2TIFF   $CONVERT_HELP NDF2TIFF
-defhelp NDF2UNF    $CONVERT_HELP NDF2UNF 
-defhelp SPECX2NDF  $CONVERT_HELP SPECX2NDF 
-defhelp TIFF2NDF   $CONVERT_HELP TIFF2NDF 
-defhelp UNF2NDF    $CONVERT_HELP UNF2NDF 
+defhelp NDF2UNF    $CONVERT_HELP NDF2UNF
+defhelp SPECX2NDF  $CONVERT_HELP SPECX2NDF
+defhelp TIFF2NDF   $CONVERT_HELP TIFF2NDF
+defhelp UNF2NDF    $CONVERT_HELP UNF2NDF
 
 { Now define the full-name commands.
 define    CON_ASCII2NDF   $CONVERT_DIR/convert_mon ascii2ndf
@@ -160,28 +160,28 @@ define    CON_UNF2NDF     $CONVERT_DIR/convert_mon unf2ndf
 { Define the full-name commands for help.
 {
 defhelp CON_CONVERT    $CONVERT_HELP 0
-defhelp CON_ASCII2NDF  $CONVERT_HELP ASCII2NDF 
-defhelp CON_AST2NDF    $CONVERT_HELP AST2NDF 
-defhelp CON_DA2NDF     $CONVERT_HELP DA2NDF 
-defhelp CON_DST2NDF    $CONVERT_HELP DST2NDF 
-defhelp CON_FITS2NDF   $CONVERT_HELP FITS2NDF 
-defhelp CON_GASP2NDF   $CONVERT_HELP GASP2NDF 
-defhelp CON_GIF2NDF    $CONVERT_HELP GIF2NDF 
-defhelp CON_IRAF2NDF   $CONVERT_HELP IRAF2NDF 
-defhelp CON_IRCAM2NDF  $CONVERT_HELP IRCAM2NDF 
-defhelp CON_NDF2ASCII  $CONVERT_HELP NDF2ASCII 
+defhelp CON_ASCII2NDF  $CONVERT_HELP ASCII2NDF
+defhelp CON_AST2NDF    $CONVERT_HELP AST2NDF
+defhelp CON_DA2NDF     $CONVERT_HELP DA2NDF
+defhelp CON_DST2NDF    $CONVERT_HELP DST2NDF
+defhelp CON_FITS2NDF   $CONVERT_HELP FITS2NDF
+defhelp CON_GASP2NDF   $CONVERT_HELP GASP2NDF
+defhelp CON_GIF2NDF    $CONVERT_HELP GIF2NDF
+defhelp CON_IRAF2NDF   $CONVERT_HELP IRAF2NDF
+defhelp CON_IRCAM2NDF  $CONVERT_HELP IRCAM2NDF
+defhelp CON_NDF2ASCII  $CONVERT_HELP NDF2ASCII
 defhelp CON_NDF2DA     $CONVERT_HELP NDF2DA
-defhelp CON_NDF2DST    $CONVERT_HELP NDF2DST 
-defhelp CON_NDF2FITS   $CONVERT_HELP NDF2FITS 
-defhelp CON_NDF2GASP   $CONVERT_HELP NDF2GASP 
+defhelp CON_NDF2DST    $CONVERT_HELP NDF2DST
+defhelp CON_NDF2FITS   $CONVERT_HELP NDF2FITS
+defhelp CON_NDF2GASP   $CONVERT_HELP NDF2GASP
 defhelp CON_NDF2GIF    $CONVERT_HELP NDF2GIF
-defhelp CON_NDF2IRAF   $CONVERT_HELP NDF2IRAF 
+defhelp CON_NDF2IRAF   $CONVERT_HELP NDF2IRAF
 defhelp CON_NDF2PGM    $CONVERT_HELP NDF2PGM
 defhelp CON_NDF2TIFF   $CONVERT_HELP NDF2TIFF
-defhelp CON_NDF2UNF    $CONVERT_HELP NDF2UNF 
-defhelp CON_SPECX2NDF  $CONVERT_HELP SPECX2NDF 
-defhelp CON_TIFF2NDF   $CONVERT_HELP TIFF2NDF 
-defhelp CON_UNF2NDF    $CONVERT_HELP UNF2NDF 
+defhelp CON_NDF2UNF    $CONVERT_HELP NDF2UNF
+defhelp CON_SPECX2NDF  $CONVERT_HELP SPECX2NDF
+defhelp CON_TIFF2NDF   $CONVERT_HELP TIFF2NDF
+defhelp CON_UNF2NDF    $CONVERT_HELP UNF2NDF
 
 {  Now set the environment variables for NDF automatic conversion.
 
@@ -248,7 +248,7 @@ FITSGZ(.fits.gz)'
 {  FITS conversions:
 {  -----------------
 {
-{  Because NDF2FITS uses HDS_WILD which will only accept container files 
+{  Because NDF2FITS uses HDS_WILD which will only accept container files
 {  as input, NDF_TEMP_FITS must specify an alternative to the default
 {  HDS scratch file.
 hidden proc converttemp1

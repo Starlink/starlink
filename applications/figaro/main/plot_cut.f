@@ -16,21 +16,21 @@
 
 * Arguments:
 *    XPLOT(IN) = REAL ARRAY (Given)
-*       
+*
 *    YPLOT(IN) = REAL ARRAY (Given)
-*       
+*
 *    YPREF(IN) = REAL ARRAY (Given)
-*       
+*
 *    YPLT2(IN) = REAL ARRAY (Given)
-*       
+*
 *    IN = INTEGER (Given)
-*       
+*
 *    NCUT = INTEGER (Given)
-*       
+*
 *    DIRECTION = CHARACTER*(*) (Given)
-*       
+*
 *    XLABEL = CHARACTER*(*) (Given)
-*       
+*
 *
 *-
       implicit none

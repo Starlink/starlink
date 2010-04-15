@@ -9,7 +9,7 @@ C     necessarily continuous, and may overlap.  It can scrunch
 C     either into a linear wavelength scale, where the wavelength
 C     increment from bin to bin is constant across the spectrum, or
 C     into a logarithmic scale, where the increment of the log of
-C     the wavelength from bin to bin is constant.  
+C     the wavelength from bin to bin is constant.
 C
 C     If the input file is 2D data, then it is treated as a set of
 C     1D spectra and each is scrunched individually.   If the wavelength
@@ -20,7 +20,7 @@ C     array.
 C
 C     The routine can either conserve flux or the mean value
 C     of the data.  Conserving flux is appropriate where the data is
-C     actually in flux units (photons/sec, for example), but not when 
+C     actually in flux units (photons/sec, for example), but not when
 C     the data is in units of flux per unit wavelength (AB magnitudes,
 C     Janskys, etc). Consider the case where each input bin maps to two
 C     output bins; if the data is in flux units - photon counts, for
@@ -35,23 +35,23 @@ C     Command parameters -
 C
 C     SPECTRUM     (Character) The name of the spectrum to be scrunched.
 C     WSTART       (Numeric) The wavelength of the CENTER of the first
-C                  bin of the resulting scrunched spectrum.  
+C                  bin of the resulting scrunched spectrum.
 C     WEND         (Numeric) The wavelength of the CENTER of the final
 C                  bin of the resulting scrunched spectrum.  If WEND is
 C                  less than WSTART, then FSCRUNCH assumes that it is
 C                  the increment rather than the final value that is
-C                  being specified.  If the scrunch is logarithmic and 
-C                  WSTART is greater than WEND, FSCRUNCH assumes that 
+C                  being specified.  If the scrunch is logarithmic and
+C                  WSTART is greater than WEND, FSCRUNCH assumes that
 C                  the WEND value represents a velocity in km/sec. These
-C                  assumptions can be controlled directly by the 
-C                  keywords INCREMENT and FINAL, if they will not give 
+C                  assumptions can be controlled directly by the
+C                  keywords INCREMENT and FINAL, if they will not give
 C                  the desired effect.
-C     BINS         (Numeric) The number of bins for the resulting 
+C     BINS         (Numeric) The number of bins for the resulting
 C                  spectrum.
 C     INORDER      (Numeric) The order of local fit to be used for the
 C                  input data.   Can be 0,1 or 2.
 C     OUTPUT       (Character) The name of the resulting spectrum.
-C                  Note that FSCRUNCH cannot rebin a spectrum into 
+C                  Note that FSCRUNCH cannot rebin a spectrum into
 C                  itself and so will always create a new output file.
 C
 C     Command keywords -
@@ -59,11 +59,11 @@ C
 C     LOG          Bin into logarithmic wavelength bins.
 C     DENSITY      Treat input data as being in units of flux per unit
 C                  wavelength.
-C     INCREMENT    WEND is an increment value, even though it is > 
+C     INCREMENT    WEND is an increment value, even though it is >
 C                  WSTART.
 C     FINAL        WEND is a final value, even though it is < WSTART.
 C
-C     User variables - 
+C     User variables -
 C
 C     SCRUNCH_INC  Is set to the wavelength increment if linear
 C                  rebinning is used, and to the velocity increment if
@@ -114,7 +114,7 @@ C     Local variables
 C
       DOUBLE PRECISION C         ! Speed of light
       LOGICAL   DEFDEN           ! True if default is flux density units
-      DOUBLE PRECISION DELTA     ! Wavelength increment 
+      DOUBLE PRECISION DELTA     ! Wavelength increment
       INTEGER   DIMS(5)          ! Data array dimensions
       INTEGER   DSA_STATUS       ! Inherited status used by DSA routines
       DOUBLE PRECISION DWEND     ! WEND in double precision
@@ -123,8 +123,8 @@ C
       INTEGER   EPTR             ! Dynamic mem pointer for input error array
       LOGICAL   ERRORS           ! True if spectrum has error information
       LOGICAL   EXIST            ! True if width values exist in data
-      LOGICAL   FAULT            ! Indicates non-DSA fault encountered 
-      LOGICAL   FINAL            ! Value of FINAL keyword   
+      LOGICAL   FAULT            ! Indicates non-DSA fault encountered
+      LOGICAL   FINAL            ! Value of FINAL keyword
       LOGICAL   FLUXDEN          ! Value of DENSITY keyword
       LOGICAL   INCREM           ! Value of INCREMENT keyword
       INTEGER   INTERP           ! Value of INORDER keyword
@@ -136,10 +136,10 @@ C
       LOGICAL   ISNRE            ! Is address REPTR new to CNF?
       LOGICAL   ISNRZ            ! Is address RZPTR new to CNF?
       INTEGER   ISPECT           ! Loop index through spectra
-      LOGICAL   LOGW             ! Input data are logarithmically 
+      LOGICAL   LOGW             ! Input data are logarithmically
                                  ! binned?
       LOGICAL   LOGWR            ! Value of LOG keyword
-      INTEGER   NBINR            ! Number of elements in scrunched 
+      INTEGER   NBINR            ! Number of elements in scrunched
                                  ! spectra
       INTEGER   NCHXU            ! Number of characters in X-units
                                  ! string
@@ -160,19 +160,19 @@ C
                                  ! new?
       LOGICAL   PISNW            ! Previous CNF pointer widths new?
       LOGICAL   PISNX            ! Previous CNF pointer wavelengths new?
-      INTEGER   REPTR            ! Dynamic mem pointer for rebinned 
+      INTEGER   REPTR            ! Dynamic mem pointer for rebinned
                                  ! error array
       REAL      RESET            ! Used for default wavelength values
-      INTEGER   RXPTR            ! Dynamic mem pointer for output 
+      INTEGER   RXPTR            ! Dynamic mem pointer for output
                                  ! X-data array
-      INTEGER   RZPTR            ! Dynamic mem pointer for output data 
+      INTEGER   RZPTR            ! Dynamic mem pointer for output data
                                  ! array
       LOGICAL   SINGLE           ! True if width info is a single value
       INTEGER   SLOT             ! Slot number for mapped arrays-ignored
       INTEGER   STATUS           ! General status variable
       CHARACTER STRING*72        ! General character variable
       INTEGER   TPTR             ! Temporary dynamic mem pointer
-      REAL      VALUE            ! General single-precision real 
+      REAL      VALUE            ! General single-precision real
                                  ! variable
       INTEGER   WPTR             ! Dynamic mem pointer for width array
       INTEGER   WKPTR            ! Dynamic mem pointer for work array
@@ -298,7 +298,7 @@ C
      :         XUNITS(:NCHXU)//
      :         '", which is not an expected unit. However, '//
      :         'the scrunching can still be performed OK.',STATUS)
-         END IF  
+         END IF
       END IF
 C
 C     Get scrunch parameters - start & end wavelength, # bins.
@@ -338,7 +338,7 @@ C
       IF (PAR_ABORT()) GO TO 500     ! User requested abort
 C
 C     If it is an incremental value, calculate the final wavelength
-C    
+C
       IF (INCREM) THEN
          DELTA=DWEND
          IF (.NOT.LOGWR) THEN
@@ -544,7 +544,7 @@ C
          CALL PAR_WRUSER(' ',STATUS)
       END IF
 C
-C     And something about the output data and set the SCRUNCH_INC and 
+C     And something about the output data and set the SCRUNCH_INC and
 C     SCRUNCH_END variables.
 C
       STRING='Data rebinned into '

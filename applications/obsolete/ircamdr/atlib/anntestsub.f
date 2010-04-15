@@ -1,14 +1,14 @@
 	SUBROUTINE ANNTESTSUB( NX, NY, INARR, OUTARR, X, Y, WIDTH, PLATSCAL,
      :	                       ECC, ANG, USEBAD, BADVAL, WHAT)
 
-	IMPLICIT NONE           
+	IMPLICIT NONE
 
-*    HISTORY 
+*    HISTORY
 *    14-JUL-1994  Changed LIB$ to FIO_ (SKL@JACH)
 *      9-AUG-2004  Use COS/SIN rather than COSD/SIND (TIMJ@JACH)
 *                  Use FIO for open and close
 
-	INCLUDE 'SAE_PAR'       
+	INCLUDE 'SAE_PAR'
         INCLUDE 'FIO_PAR'
 
 	INTEGER
@@ -46,11 +46,11 @@
      :	  MAXYR,
      :	  MAXR,
      :	  MAXRA,
-     :	  VALMAX, 
-     :	  VALMIN, 
-     :	  SUM, 
-     :	  MEAN, 
-     :	  MEDIAN, 
+     :	  VALMAX,
+     :	  VALMIN,
+     :	  SUM,
+     :	  MEAN,
+     :	  MEDIAN,
      :	  MODE,
      :	  BADVAL,
      :	  ECC,
@@ -62,7 +62,7 @@
 	REAL*8
      :	  DATARR( MAXDATA)
 
-	CHARACTER*( *) 
+	CHARACTER*( *)
      :	  WHAT
 
 	LOGICAL
@@ -115,7 +115,7 @@
 
 	      IF( R .GE. R1 .AND. R .LT. R2) THEN
 
-	        IF( USEBAD .AND. 
+	        IF( USEBAD .AND.
      :	            INARR( J, K) .NE. BADVAL) THEN
 
 	          NPTS = NPTS + 1
@@ -128,7 +128,7 @@
 	            OUTARR( J, K) = 0
 	          END IF
 
-	        ELSE IF( USEBAD .AND. 
+	        ELSE IF( USEBAD .AND.
      :	                 INARR( J, K) .EQ. BADVAL) THEN
 
 	          BNPTS = BNPTS + 1
@@ -161,9 +161,9 @@
 	  IF( NPTS .GT. 0) THEN
 	    IFAIL = 0
 	    CALL M01ANF( DATARR, 1, NPTS, IFAIL)
- 
+
 *          call subroutine to find median for the input DATARR
-	    CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN, 
+	    CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN,
      :	                          MEDIAN, MODE)
 
 	  ELSE
@@ -181,8 +181,8 @@
 	  CALL MSG_SETR( 'MEA', MEAN)
 	  CALL MSG_SETR( 'MED', MEDIAN)
 	  CALL MSG_SETR( 'MOD', MODE)
-	  CALL MSG_OUT( 'MESS', 
-     :	    ' Annulus ^N, Mean = ^MEA, Median = ^MED, Mode = ^MOD', 
+	  CALL MSG_OUT( 'MESS',
+     :	    ' Annulus ^N, Mean = ^MEA, Median = ^MED, Mode = ^MOD',
      :	                STATUS)
 
 	  R1 = R1*PLATSCAL

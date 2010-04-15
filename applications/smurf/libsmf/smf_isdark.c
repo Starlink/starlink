@@ -113,7 +113,7 @@ int smf_isdark( const smfData * indata, int * status ) {
     return 0;
   }
 
-  /* if we have no fitshdr assume we are not a dark. This allows Ed's 
+  /* if we have no fitshdr assume we are not a dark. This allows Ed's
      model components to be processed. */
   if (!indata->hdr) return 0;
   if (!indata->hdr->fitshdr) return 0;

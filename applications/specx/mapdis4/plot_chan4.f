@@ -53,7 +53,7 @@
       REAL      ZMIN,   ZMAX
       REAL      ZC(32)
 
-      REAL       XMARGIN 
+      REAL       XMARGIN
       PARAMETER (XMARGIN = 25.)
       REAL       YMARGIN
       PARAMETER (YMARGIN = 40.)
@@ -98,7 +98,7 @@
       CALL GEN_GETI4 ('How many maps across page? (0=auto)',
      &                 IXCMAP, 'I2', IXCMAP, ISTAT)
 
-*     Use plot parameters set up by most recent CONTOUR-PLOT unless 
+*     Use plot parameters set up by most recent CONTOUR-PLOT unless
 *     there has been a DEFINE-MAP or SET-MAP-SCALES in the meantime
 
       IF (.NOT.CHANGE_PLOT) THEN
@@ -130,7 +130,7 @@
 
       DO I = 1, NMAP_CM
         LOCATION = IPTR_MAP + 4*(I-1)*NAXX*NAXY
-        CALL MAP_MAXMIN (%VAL(LOCATION), NAXX, NAXY, 
+        CALL MAP_MAXMIN (%VAL(LOCATION), NAXX, NAXY,
      &                    XLIM, YLIM, BADPIX_VAL, ZMIN, ZMAX)
         ARRMIN = MIN (ARRMIN, ZMIN)
         ARRMAX = MAX (ARRMAX, ZMAX)
@@ -223,7 +223,7 @@ C  Work out contour levels and greyscale levels
         CALL SETGSCAL (ARRMIN, ARRMAX, GRLIMITS)
 
 C  Put a label to the screen
-      
+
         CALL SXGLTYPE      (0)
         CALL SXGLWEIGHT    (LWEIGHT)
         CALL SXGEXPAND     (CHARHT/3.)
@@ -351,7 +351,7 @@ C   Close the map file
 
 *  Subroutine to tesselate arbitrary display surface into *at least*
 *  n panels, when size of display surface and aspect ratio of panels
-*  are already defined. Search for nice tesselation that maximizes 
+*  are already defined. Search for nice tesselation that maximizes
 *  the area of the display surface used.
 
       implicit none

@@ -16,7 +16,7 @@
 {
 {  Copyright:
 {     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-{     Copyright (C) 2008 Science & Technology Facilities Council. 
+{     Copyright (C) 2008 Science & Technology Facilities Council.
 {     All Rights Reserved.
 
 {  Licence:
@@ -44,7 +44,7 @@
 {     2000 (AALLAN):
 {        Original incompleteversion.
 {     2008 June 30 (MJC):
-{        Add the prolgoue, and all the defintions (except ripper that was 
+{        Add the prolgoue, and all the defintions (except ripper that was
 {        already present).
 {     {enter_further_changes_here}
 
@@ -91,16 +91,16 @@ defstring datacube_test  ${DATACUBE_DIR}/datacube_demo.csh
 define add            ${KAPPA_DIR}/add
 define calc           ${KAPPA_DIR}/calc
 define cadd           ${KAPPA_DIR}/cadd
-define cdiv           ${KAPPA_DIR}/cdiv 
+define cdiv           ${KAPPA_DIR}/cdiv
 define chpix          ${KAPPA_DIR}/chpix
 define collapse       ${KAPPA_DIR}/collapse
 define clinplot       ${KAPPA_DIR}/clinplot
 define compave        ${KAPPA_DIR}/compave
 define contour        ${KAPPA_DIR}/contour
 define cursor         ${KAPPA_DIR}/cursor
-define display        ${KAPPA_DIR}/display 
+define display        ${KAPPA_DIR}/display
 define gdclear        ${KAPPA_DIR}/gdclear
-define linplot        ${KAPPA_DIR}/linplot 
+define linplot        ${KAPPA_DIR}/linplot
 defstring lutcol      ${KAPPA_DIR}/lutable mapping=linear coltab=colour
 defstring lutgrey     ${KAPPA_DIR}/lutable mapping=linear coltab=grey
 defstring lutspec     ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut

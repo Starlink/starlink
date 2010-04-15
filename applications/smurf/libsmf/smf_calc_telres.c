@@ -22,11 +22,11 @@
 *        Pointer to inherited status.
 
 *  Returned Value:
-*     An estimate of the angular resolution of the telescope, in 
+*     An estimate of the angular resolution of the telescope, in
 *     arc-seconds, rounded up to the nearest half arc-second.
 
 *  Description:
-*     This function returns an estimate of the angular resolution of the 
+*     This function returns an estimate of the angular resolution of the
 *     telescope, in arc-seconds. This is one quarter of the Airy disk
 *     radius at the wavelength of the local oscillator, rounded up to the
 *     nearest half arc-second.
@@ -37,7 +37,7 @@
 
 *  History:
 *     28-MAR-2008 (DSB)
-*        Initial version. 
+*        Initial version.
 *     2009-10-29 (TIMJ):
 *        Add support for SCUBA-2
 *     {enter_further_changes_here}
@@ -84,7 +84,7 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
    double loe;
    float diam;
    float lambda = 0;
-   float result;            
+   float result;
    int nc;
 
 /* Initialise the returned value to a safe non-zero value. */
@@ -96,7 +96,7 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
 /* Get the name of the telescope. */
    if( astGetFitsS( hdr, "TELESCOP", &value ) ) {
 
-/* Get the used length of the telescope name, excluding any trailing 
+/* Get the used length of the telescope name, excluding any trailing
    spaces. */
       nc = astChrLen( value );
 
@@ -111,12 +111,12 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
 /* we have a wavelength directly */
            lambda = dlambda;
 
-/* Find the local oscillator frequencies (GHz, topocentric) at the start 
+/* Find the local oscillator frequencies (GHz, topocentric) at the start
    and end of the observation. */
          } else if( ! astGetFitsF( hdr, "LOFREQS", &los ) ) {
             if( *status == SAI__OK ) {
                *status = SAI__ERROR;
-               errRep( "", "The \"LOFREQS\" FITS header was not found.", 
+               errRep( "", "The \"LOFREQS\" FITS header was not found.",
                        status );
             }
 
@@ -124,11 +124,11 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
          } else if( ! astGetFitsF( hdr, "LOFREQE", &loe ) ) {
             if( *status == SAI__OK ) {
                *status = SAI__ERROR;
-               errRep( "", "The \"LOFREQE\" FITS header was not found.", 
+               errRep( "", "The \"LOFREQE\" FITS header was not found.",
                        status );
             }
 
-/* Get the middle LO frequency and convert to a topocentric wavelength in  
+/* Get the middle LO frequency and convert to a topocentric wavelength in
    metres. */
          } else {
             lambda = 2.0E-9*AST__C/( los + loe );
@@ -138,7 +138,7 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
       } else {
          msgSetc( "T", value );
          *status = SAI__ERROR;
-         errRep( "", "The properties of telescope \"^T\" are not known.", 
+         errRep( "", "The properties of telescope \"^T\" are not known.",
                  status );
       }
 

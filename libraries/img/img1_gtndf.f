@@ -1,4 +1,4 @@
-      SUBROUTINE IMG1_GTNDF( PARAM, TYPE, RONLY, MXDIM, DIM, PNTR, 
+      SUBROUTINE IMG1_GTNDF( PARAM, TYPE, RONLY, MXDIM, DIM, PNTR,
      :                       STATUS )
 *+
 *  Name:
@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -147,8 +147,8 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks 
-      
+      EXTERNAL IMG1_INIT         ! Initialise common blocks
+
 *  Local Variables:
       CHARACTER * ( IMG__SZPAR ) VPAR ! Validated parameter name
       INTEGER EL                 ! Number of array elements mapped
@@ -262,7 +262,7 @@
                               CALL ERR_ANNUL( STATUS )
                            END IF
                            CALL ERR_RLSE
-                        
+
 *  Remember which PCB slot it is associated with. Also note it was a
 *  new NDF and count the number of new NDFs acquired.
                            IF ( STATUS .EQ. SAI__OK ) THEN
@@ -270,7 +270,7 @@
                               OLD( NPAR ) = .FALSE.
                               INDF( NPAR ) = PCB_INDF( SLOT )
                               NNEW = NNEW + 1
-                           
+
 *  If an error occurred need to free the PCB slot.
                            ELSE
                               CALL IMG1_FRSLT( SLOT, .TRUE., STATUS )
@@ -315,9 +315,9 @@
                         CALL ERR_MARK
  1                      CONTINUE ! Start of 'DO WHILE' loop
                         IF ( RONLY ) THEN
-                           CALL NDF_ASSOC( VPAR, 'READ', INDF( NPAR ), 
+                           CALL NDF_ASSOC( VPAR, 'READ', INDF( NPAR ),
      :                                     STATUS )
-                        ELSE 
+                        ELSE
                            CALL NDF_ASSOC( VPAR, 'UPDATE', INDF( NPAR ),
      :                                     STATUS )
                         END IF
@@ -426,7 +426,7 @@
 
 *  Map each NDF's data array. If RONLY then map with READ/ZERO,
 *  otherwise use UPDATE/ZERO.
-               IF ( RONLY ) THEN 
+               IF ( RONLY ) THEN
                   CALL NDF_MAP( PCB_INDF( ISLOT( I ) ), 'Data', TYPE,
      :                          'READ/ZERO', TPNTR, EL, STATUS )
                ELSE
@@ -435,7 +435,7 @@
                END IF
 
 *  Check to see if the mapped data array contains "bad" pixels.
-               IF ( CHKBAD( I ) ) THEN 
+               IF ( CHKBAD( I ) ) THEN
                   CALL NDF_BAD( PCB_INDF( ISLOT( I ) ), 'Data', .TRUE.,
      :                          BAD, STATUS )
 
@@ -461,7 +461,7 @@
                   PNTR( I ) = TPNTR( 1 )
 
 *  Also store the type used to map the data.
-                  PCB_TYPE( ISLOT( I ) ) = TYPE 
+                  PCB_TYPE( ISLOT( I ) ) = TYPE
                END IF
             END IF
  3       CONTINUE

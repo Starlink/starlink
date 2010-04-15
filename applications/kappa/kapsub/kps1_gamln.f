@@ -14,7 +14,7 @@
 *     RESULT = KPS1_GAMLN( X )
 
 *  Description:
-*     This routine calculates the ln(gamma) function for a positive 
+*     This routine calculates the ln(gamma) function for a positive
 *     argument X.  Computation is based on an algorithm outlined in
 *     References 1 and 2.  The routine uses rational functions that
 *     theoretically approximate LN(gamma) to at least 18 significant
@@ -32,12 +32,12 @@
 
 *  Result:
 *     The logarithmic gamma function.  If X is not positive, or when an
-*     overflow would occur the returned value is standard PRIMDAT bad 
+*     overflow would occur the returned value is standard PRIMDAT bad
 *     value.
 
 *  Notes:
 *     The limiting range is set for IEEE 754 floating point.  The
-*     original code had tabulation of various machine-dependent 
+*     original code had tabulation of various machine-dependent
 *     constants.
 
 *  References:
@@ -52,7 +52,7 @@
 *        York, 1968.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council. 
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,9 +78,9 @@
 
 *  History:
 *     2007 August 9 (MJC):
-*        Original version adapted to Starlink conventinos and style from 
-*        the public-domain ALGAMA code by Cody & Stoltz,revision 
-*        1988 June 16.  Restricted to double precision and removed 
+*        Original version adapted to Starlink conventinos and style from
+*        the public-domain ALGAMA code by Cody & Stoltz,revision
+*        1988 June 16.  Restricted to double precision and removed
 *        type-conditional comments.
 *     {enter_changes_here}
 
@@ -140,7 +140,7 @@
 
 *  Machine dependent parameters
 *  ----------------------------
-      DOUBLE PRECISION XBIG      ! largest argument for which 
+      DOUBLE PRECISION XBIG      ! largest argument for which
                                  ! LN(GAMMA(X)) is representable in the
                                  ! machine
       DATA XBIG/2.55D305/        ! IEEE 754 floating point
@@ -259,9 +259,9 @@
                XNUM = XNUM * XM4 + P4( I )
                XDEN = XDEN * XM4 + Q4( I )
             END DO
-            
+
             RES = D4 + XM4 * ( XNUM / XDEN )
-         ELSE 
+         ELSE
 
 *  Evaluate for the argument being greater than 12.0.
             RES = ZERO

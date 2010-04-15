@@ -285,7 +285,7 @@
 *  when finding the column that last contains part of the value.
                   COMMNT = INDEX( BUFFER( CARD )( EQUALS + 1: ), '/' )
                   IF ( COMMNT .EQ. 0 ) THEN
-                     COMMNT = LEN( BUFFER( CARD ) ) 
+                     COMMNT = LEN( BUFFER( CARD ) )
                   ELSE
                      COMMNT = COMMNT + EQUALS - 1
                   END IF

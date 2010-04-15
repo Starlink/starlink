@@ -2,10 +2,10 @@
 	SUBROUTINE GAUSS_JORDAN( MATRIX, DIM, ORDER, VECTOR, FLAG )
 *+
 *  Name :
-*     GAUSS_JORDAN   
-* 
+*     GAUSS_JORDAN
+*
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -21,7 +21,7 @@
 *
 *  Arguments :
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -73,12 +73,12 @@
 	END DO
 
 *    Main loop over the columns to be reduced
-	
+
 	DO I = 1, ORDER
 	  BIG = 0.0
 
 *    Outer loop to search for a pivot element
-	
+
 	  DO J = 1, ORDER
 	    IF( PIVOT( J ) .NE. 1 ) THEN
 	      DO K = 1, ORDER
@@ -96,7 +96,7 @@
 	    END IF
 	  END DO
 	  PIVOT( COL ) = PIVOT( COL ) + 1
-	  
+
 
 *    We now have the pivot element, so exchange rows to put the
 *    pivot element on the diagonal.  Changes are labeled using

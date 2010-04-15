@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_MRQMIN (X, Y, SIG, NDATA, A, IA, MA, COVAR, 
+      SUBROUTINE SCULIB_MRQMIN (X, Y, SIG, NDATA, A, IA, MA, COVAR,
      :  ALPHA, NCA, CHISQ, FUNCS, ALAMDA, STATUS)
 *+
 *  Name:
@@ -19,14 +19,14 @@
 *     A(1:MA), and chi-squared = CHISQ. The arrays COVAR (1:NCA,1:NCA),
 *     ALPHA (1:NCA,1:NCA) with physical dimension NCA (>= the number of
 *     fitted parameters) are used as working space during most iterations.
-*     Supply a subroutine FUNCS (X, A, YFIT, DYDA, MA) that evaluates 
+*     Supply a subroutine FUNCS (X, A, YFIT, DYDA, MA) that evaluates
 *     the fitting function YFIT, and its derivatives DYDA with respect to the
 *     the fitting paramters A at X. On the first call provide an initial
 *     guess for the parameters A, and set ALAMDA < 0 for initialisation
 *     (which then sets ALAMDA = 0.001). If a step succeeds CHISQ becomes
 *     smaller and ALAMDA decreases by a factor of 10. If a step fails
 *     ALAMDA grows by a factor of 10. You must call this routine repeatedly
-*     until convergence is achieved. Then, make one final call with 
+*     until convergence is achieved. Then, make one final call with
 *     ALAMDA = 0, so that COVAR (1:MA,1:MA) returns the covariance matrix,
 *     and ALPHA the curvature matrix. Parameters held fixed will return
 *     zero covariance.
@@ -34,7 +34,7 @@
 *     STATUS added.
 
 *  Invocation:
-*     CALL SCULIB_MRQMIN (X, Y, SIG, NDATA, A, IA, MA, COVAR, 
+*     CALL SCULIB_MRQMIN (X, Y, SIG, NDATA, A, IA, MA, COVAR,
 *    :  ALPHA, NCA, CHISQ, FUNCS, ALAMDA, STATUS)
 
 *  Arguments:
@@ -68,7 +68,7 @@
 *       DYDA and MA, where YFIT is the fitting function and DYDA the
 *       the derivatives with respect to parameters A at X.
 *     ALAMDA = REAL (Given & Returned)
-*       The stepping factor for the iteration. Should be set to <0 
+*       The stepping factor for the iteration. Should be set to <0
 *       initially.
 *     STATUS = INTEGER (Given & Returned)
 *       Global Status
@@ -118,7 +118,7 @@
 
 *  Arguments Returned:
       REAL    CHISQ
-      REAL    ALPHA ( NCA,NCA ) 
+      REAL    ALPHA ( NCA,NCA )
       REAL    COVAR ( NCA,NCA )
 
 *  Status:
@@ -162,7 +162,7 @@
             IF (IA(J) .NE. 0) MFIT = MFIT + 1
          END DO
          ALAMDA = 0.001
-         CALL SCULIB_MRQCOF (X, Y, SIG, NDATA, A, IA, MA, ALPHA, BETA, 
+         CALL SCULIB_MRQCOF (X, Y, SIG, NDATA, A, IA, MA, ALPHA, BETA,
      :     NCA, CHISQ, FUNCS, STATUS)
          IF (STATUS .NE. SAI__OK) RETURN
          OCHISQ = CHISQ
@@ -243,7 +243,7 @@
 
          ALAMDA = 10.0 * ALAMDA
          CHISQ = OCHISQ
-   
+
       END IF
 
       END

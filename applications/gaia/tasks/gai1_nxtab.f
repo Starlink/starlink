@@ -27,7 +27,7 @@
 *     ISTART = INTEGER (Given)
 *        The starting point from which elements of STR are searched.
 *     IFOUND = CHARACTER * ( * ) (Given and Returned)
-*        The position of the <TAB> character, or the end of the 
+*        The position of the <TAB> character, or the end of the
 *        string + 1 if no <TAB>'s are located and the remaining string isn't
 *        blank. Otherwise it will be set to 0.
 *     STATUS = INTEGER (Given and Returned)
@@ -102,11 +102,11 @@
 
 *  Scan for the next <TAB> character.
       IAT = INDEX( STR( ISTART : ), TAB )
-      IF ( IAT .EQ. 0 ) THEN 
+      IF ( IAT .EQ. 0 ) THEN
 
 *  See if line is blank.
          IAT = CHR_LEN( STR( ISTART : ) )
-         IF ( IAT .EQ. 0 ) THEN 
+         IF ( IAT .EQ. 0 ) THEN
 
 *  Yes.
             IFOUND = 0

@@ -62,7 +62,7 @@ static Tk_ConfigSpec configSpecs[] = {
         (char *) NULL, 0, 0, (Tk_CustomOption *)NULL},
     {TK_CONFIG_INT, "-jpegquality", "jpegQuality", "JpegQuality",
         "75", Tk_Offset(Gwm, quality), 0, (Tk_CustomOption *)NULL},
-    {TK_CONFIG_BOOLEAN, "-jpegprogressive", "jpegProgressive", 
+    {TK_CONFIG_BOOLEAN, "-jpegprogressive", "jpegProgressive",
         "JpegProgressive",
         "0", Tk_Offset(Gwm, progressive), 0, (Tk_CustomOption *)NULL},
     {TK_CONFIG_PIXELS, "-height", "height", "Height",
@@ -84,7 +84,7 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_STRING, "-printformat", "printFormat", "PrintFormat",
         "postscript", Tk_Offset(Gwm, printformat), 0, (Tk_CustomOption *)NULL},
     {TK_CONFIG_STRING, "-takefocus", "takeFocus", "TakeFocus",
-	(char *) NULL, Tk_Offset(Gwm, takeFocus), TK_CONFIG_NULL_OK, 
+	(char *) NULL, Tk_Offset(Gwm, takeFocus), TK_CONFIG_NULL_OK,
 	(Tk_CustomOption *)NULL},
     {TK_CONFIG_PIXELS, "-width", "width", "Width",
         "768", Tk_Offset(Gwm, width), 0, (Tk_CustomOption *)NULL},
@@ -155,7 +155,7 @@ static void Clear(Gwm*);
 static void OvClear(Gwm*);
 static int SendKeypress(Tcl_Interp*, Gwm*, int, int, char*);
 
-
+
 int Tkgwm_Init
 (
 Tcl_Interp *interp
@@ -170,8 +170,8 @@ Tcl_Interp *interp
 /*
  * Create the gwm command for creating gwm widgets.
 */
-   Tcl_CreateCommand(interp, "gwm", 
-                     (Tcl_CmdProc *)GwmCmd, 
+   Tcl_CreateCommand(interp, "gwm",
+                     (Tcl_CmdProc *)GwmCmd,
                      (ClientData)Tk_MainWindow(interp),
                      (void (*)()) NULL);
 
@@ -211,7 +211,7 @@ Tcl_Interp *interp
 }
 
 
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -299,20 +299,20 @@ GwmCmd(clientData, interp, argc, argv)
 /*
  *  Make the window into a gwm window
  */
-    status = GWM_MakeIntoWindow(gwmPtr->display, 
-	Tk_WindowId(gwmPtr->tkwin), gwmPtr->name, 
-	gwmPtr->width, gwmPtr->height, gwmPtr->cols, gwmPtr->mincols, 
-	gwmPtr->fg->pixel, gwmPtr->bg->pixel, gwmPtr->overlay, 
+    status = GWM_MakeIntoWindow(gwmPtr->display,
+	Tk_WindowId(gwmPtr->tkwin), gwmPtr->name,
+	gwmPtr->width, gwmPtr->height, gwmPtr->cols, gwmPtr->mincols,
+	gwmPtr->fg->pixel, gwmPtr->bg->pixel, gwmPtr->overlay,
 	gwmPtr->ovcolour->pixel);
 
 /*
- *  Fill in the window info structure and create a gc for copying the 
+ *  Fill in the window info structure and create a gc for copying the
  *  pixmap to the window
  */
     if (status == GWM_SUCCESS) {
-	status = GWM_GetWinInfo(gwmPtr->display, 
+	status = GWM_GetWinInfo(gwmPtr->display,
 		Tk_WindowId(gwmPtr->tkwin), &(gwmPtr->info));
-	gwmPtr->info->gc = XCreateGC( gwmPtr->display, 
+	gwmPtr->info->gc = XCreateGC( gwmPtr->display,
 		Tk_WindowId(gwmPtr->tkwin), 0, &gcvalues);
 	gwmPtr->cols = gwmPtr->info->ctsize;
 
@@ -338,7 +338,7 @@ GwmCmd(clientData, interp, argc, argv)
         XGetWindowAttributes( gwmPtr->display, Tk_WindowId(gwmPtr->tkwin),
                 &winatt);
         vinfo_template.visualid = XVisualIDFromVisual( winatt.visual );
-        gwmPtr->vinfo = XGetVisualInfo( gwmPtr->display, VisualIDMask, 
+        gwmPtr->vinfo = XGetVisualInfo( gwmPtr->display, VisualIDMask,
                 &vinfo_template, &nitems);
 
 
@@ -359,15 +359,15 @@ GwmCmd(clientData, interp, argc, argv)
 /*
  *  Create the command for this widget.
  */
-    gwmPtr->widgetCmd = Tcl_CreateCommand(interp, Tk_PathName(gwmPtr->tkwin), 
-                                          (Tcl_CmdProc *)GwmWidgetCmd, 
-                                          (ClientData) gwmPtr, 
+    gwmPtr->widgetCmd = Tcl_CreateCommand(interp, Tk_PathName(gwmPtr->tkwin),
+                                          (Tcl_CmdProc *)GwmWidgetCmd,
+                                          (ClientData) gwmPtr,
                                           (void (*)()) NULL);
 
     interp->result = Tk_PathName(gwmPtr->tkwin);
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -469,13 +469,13 @@ GwmWidgetCmd(clientData, interp, argc, argv)
  */
     	if ((c == 'c') && (strncmp(argv[2], "colour", length) == 0)) {
 	    if (Tcl_GetInt(interp, argv[3], &ctentry) != TCL_OK) {
-		Tcl_AppendResult(interp, 
+		Tcl_AppendResult(interp,
 			"invalid colour table entry specification \"", argv[3],
 			"\"", (char *) NULL);
 		goto error;
 	    }
 	    if ( ctentry < -1 || ctentry >= (int)gwmPtr->info->ctsize ) {
-		Tcl_AppendResult(interp, "colour table entry \"",  argv[3], 
+		Tcl_AppendResult(interp, "colour table entry \"",  argv[3],
 			"\" out of range", (char *) NULL);
 		goto error;
 	    }
@@ -485,7 +485,7 @@ GwmWidgetCmd(clientData, interp, argc, argv)
 		if (gwmPtr->overlay) {
 		    color.pixel = gwmPtr->info->ctable[0] | ~gwmPtr->info->mask;
 		} else {
-		    Tcl_AppendResult(interp, "widget \"", argv[0], 
+		    Tcl_AppendResult(interp, "widget \"", argv[0],
 			"\" does not have an overlay", (char *) NULL);
 	    	    goto error;
 		}
@@ -568,20 +568,20 @@ GwmWidgetCmd(clientData, interp, argc, argv)
  */
     	if ((c == 'c') && (strncmp(argv[2], "colour", length) == 0)) {
 	    if (Tcl_GetInt(interp, argv[3], &ctentry) != TCL_OK) {
-		Tcl_AppendResult(interp, 
+		Tcl_AppendResult(interp,
 			"invalid colour table entry specification \"", argv[3],
 			"\"", (char *) NULL);
 		goto error;
 	    }
-	    if ( gwmPtr->info->visclass != PseudoColor && 
+	    if ( gwmPtr->info->visclass != PseudoColor &&
 		gwmPtr->info->visclass != DirectColor &&
 		gwmPtr->info->visclass != GrayScale ) {
-		Tcl_AppendResult(interp, "colour table is read only", 
+		Tcl_AppendResult(interp, "colour table is read only",
 			(char *) NULL);
 		goto error;
 	    }
 	    if ( ctentry < -1 || ctentry >= (int)gwmPtr->info->ctsize ) {
-		Tcl_AppendResult(interp, "colour table entry \"",  argv[3], 
+		Tcl_AppendResult(interp, "colour table entry \"",  argv[3],
 			"\" out of range", (char *) NULL);
 		goto error;
 	    }
@@ -599,13 +599,13 @@ GwmWidgetCmd(clientData, interp, argc, argv)
 	    } else {
 		if (gwmPtr->overlay) {
 	    	    for ( i = 0; i < gwmPtr->info->ctsize; i++ ) {
-		    	color.pixel = (gwmPtr->info->ctable)[i] | 
+		    	color.pixel = (gwmPtr->info->ctable)[i] |
 			    ~gwmPtr->info->mask;
-		        XStoreColor( gwmPtr->display, gwmPtr->info->cmap, 
+		        XStoreColor( gwmPtr->display, gwmPtr->info->cmap,
 			    &color);
 		    }
 		} else {
-		    Tcl_AppendResult(interp, "widget \"", argv[0], 
+		    Tcl_AppendResult(interp, "widget \"", argv[0],
 			"\" does not have an overlay", (char *) NULL);
 		    goto error;
 	    	}
@@ -615,13 +615,13 @@ GwmWidgetCmd(clientData, interp, argc, argv)
  *  "set crosshair"
  */
 	    if (Tk_GetPixels(interp, gwmPtr->tkwin, argv[3], &cx) != TCL_OK) {
-		Tcl_AppendResult(interp, 
+		Tcl_AppendResult(interp,
 			" invalid crosshair position specification \"", argv[3],
 			"\"", (char *) NULL);
 		goto error;
 	    }
 	    if (Tk_GetPixels(interp, gwmPtr->tkwin, argv[4], &cy) != TCL_OK) {
-		Tcl_AppendResult(interp, 
+		Tcl_AppendResult(interp,
 			" invalid crosshair position specification \"", argv[4],
 			"\"", (char *) NULL);
 		goto error;
@@ -645,7 +645,7 @@ GwmWidgetCmd(clientData, interp, argc, argv)
  */
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
-		"\":  must be configure, clear, get, ovclear, print or set", 
+		"\":  must be configure, clear, get, ovclear, print or set",
 		(char *) NULL);
 	goto error;
     }
@@ -657,7 +657,7 @@ GwmWidgetCmd(clientData, interp, argc, argv)
     Tcl_Release((ClientData) gwmPtr);
     return TCL_ERROR;
 }
-
+
 /*
  *----------------------------------------------------------------------
  *
@@ -697,7 +697,7 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
     int status;
 
     if (Tk_ConfigureWidget(interp, gwmPtr->tkwin, configSpecs,
-                           argc, (const char **)argv, 
+                           argc, (const char **)argv,
                            (char *) gwmPtr, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
@@ -728,11 +728,11 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
 
 	    colname = Tk_NameOfColor(&color);
 	    atom = XInternAtom( gwmPtr->display, "GWM_foreground", False );
-	    XChangeProperty( gwmPtr->display, gwmPtr->info->win_id, atom, 
-        	XA_STRING, 8, PropModeReplace, 
+	    XChangeProperty( gwmPtr->display, gwmPtr->info->win_id, atom,
+        	XA_STRING, 8, PropModeReplace,
 		(unsigned char*)colname, strlen(colname) );
 
-	    if (gwmPtr->info->visclass == PseudoColor || 
+	    if (gwmPtr->info->visclass == PseudoColor ||
 		gwmPtr->info->visclass == DirectColor ||
 		gwmPtr->info->visclass == GrayScale ) {
 		XStoreColor(gwmPtr->display, gwmPtr->info->cmap, &color);
@@ -748,17 +748,17 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
 
 	    colname = Tk_NameOfColor(&color);
 	    atom = XInternAtom( gwmPtr->display, "GWM_background", False );
-	    XChangeProperty( gwmPtr->display, gwmPtr->info->win_id, atom, 
-        	XA_STRING, 8, PropModeReplace, (unsigned char*)colname, 
+	    XChangeProperty( gwmPtr->display, gwmPtr->info->win_id, atom,
+        	XA_STRING, 8, PropModeReplace, (unsigned char*)colname,
 		strlen(colname) );
 
-	    if (gwmPtr->info->visclass == PseudoColor || 
+	    if (gwmPtr->info->visclass == PseudoColor ||
 		gwmPtr->info->visclass == DirectColor ||
 		gwmPtr->info->visclass == GrayScale ) {
 		XStoreColor(gwmPtr->display, gwmPtr->info->cmap, &color);
 	    }
 	}
-	if (gwmPtr->info->visclass == PseudoColor || 
+	if (gwmPtr->info->visclass == PseudoColor ||
 	    gwmPtr->info->visclass == DirectColor ||
 	    gwmPtr->info->visclass == GrayScale ) {
 	    if (gwmPtr->overlay) {
@@ -768,7 +768,7 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
         	    color.blue = gwmPtr->ovcolour->blue;
 		    color.flags =  DoRed | DoGreen | DoBlue;
 		    for ( i = 0; i < gwmPtr->info->ctsize; i++ ) {
-        		color.pixel = gwmPtr->info->ctable[i] | 
+        		color.pixel = gwmPtr->info->ctable[i] |
 			    ~gwmPtr->info->mask;
         		XStoreColor( gwmPtr->display, gwmPtr->info->cmap,
 			    &color);
@@ -786,8 +786,8 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
 		configSpecs[6].specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
 	    status = GWM_SetScroll( gwmPtr->display, Tk_WindowId(gwmPtr->tkwin),
 		    gwmPtr->xoffset, gwmPtr->yoffset);
-	    status = GWM_SetOvScroll( gwmPtr->display, 
-		    Tk_WindowId(gwmPtr->tkwin), gwmPtr->xovoffset, 
+	    status = GWM_SetOvScroll( gwmPtr->display,
+		    Tk_WindowId(gwmPtr->tkwin), gwmPtr->xovoffset,
 		    gwmPtr->yovoffset);
 
 	     gwmPtr->info->x_offset = gwmPtr->xoffset;
@@ -821,7 +821,7 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
 	    if (gwmPtr->crosshair) {
 		DrawCursor( gwmPtr, gwmPtr->crossx, gwmPtr->crossy);
 	    } else {
-		
+
 		event.type = Expose;
 		event.xexpose.x = 0;
 		event.xexpose.y = gwmPtr->crossy;
@@ -847,7 +847,7 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
     Tcl_DoWhenIdle(GwmDisplay, (ClientData) gwmPtr);
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -886,7 +886,7 @@ GwmEventProc(clientData, eventPtr)
     status = GWM_ProcessEvent( gwmPtr->info, eventPtr);
 
     if (eventPtr->type == Expose) {
-	if (gwmPtr->crosshair) DrawCursor( gwmPtr, gwmPtr->crossx, 
+	if (gwmPtr->crosshair) DrawCursor( gwmPtr, gwmPtr->crossx,
 		gwmPtr->crossy);
     }
 
@@ -894,13 +894,13 @@ GwmEventProc(clientData, eventPtr)
 	if (gwmPtr->tkwin != NULL)
 	{
 	    gwmPtr->tkwin = NULL;
-	    Tcl_DeleteCommand(gwmPtr->interp, 
+	    Tcl_DeleteCommand(gwmPtr->interp,
 		Tcl_GetCommandName(gwmPtr->interp, gwmPtr->widgetCmd));
 	    Tcl_EventuallyFree((ClientData) gwmPtr, GwmDestroy);
 	}
     }
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -959,11 +959,11 @@ GwmDestroy(clientData)
 /*
  * Free the colour table entries allocated by gwm
  */
-    if (gwmPtr->info->visclass == PseudoColor || 
+    if (gwmPtr->info->visclass == PseudoColor ||
 	gwmPtr->info->visclass == DirectColor ||
 	gwmPtr->info->visclass == GrayScale ) {
     	XFreeColors( gwmPtr->display, gwmPtr->info->cmap,
-	    gwmPtr->info->ctable, gwmPtr->info->ctsize, 0); 
+	    gwmPtr->info->ctable, gwmPtr->info->ctsize, 0);
     }
 
 /*
@@ -1029,14 +1029,14 @@ static void Clear(Gwm *gwmPtr)
 /*
 **  Erase the contents of the pixmap
 */
-    XFillRectangle( gwmPtr->display, gwmPtr->info->pix_id, gc, 0, 0, 
+    XFillRectangle( gwmPtr->display, gwmPtr->info->pix_id, gc, 0, 0,
 	gwmPtr->info->pix_width, gwmPtr->info->pix_height);
 
 /*
 **  Erase the area of the window occupied by the pixmap
 */
-    XFillRectangle( gwmPtr->display, gwmPtr->info->win_id, gc, 
-	gwmPtr->info->x_offset, gwmPtr->info->y_offset, 
+    XFillRectangle( gwmPtr->display, gwmPtr->info->win_id, gc,
+	gwmPtr->info->x_offset, gwmPtr->info->y_offset,
 	gwmPtr->info->pix_width, gwmPtr->info->pix_height);
 
 /*
@@ -1044,7 +1044,7 @@ static void Clear(Gwm *gwmPtr)
 */
     Tk_FreeGC( gwmPtr->display, gc );
 
-    if (gwmPtr->crosshair) DrawCursor( gwmPtr, gwmPtr->crossx, 
+    if (gwmPtr->crosshair) DrawCursor( gwmPtr, gwmPtr->crossx,
 	gwmPtr->crossy);
 }
 
@@ -1053,7 +1053,7 @@ static void Clear(Gwm *gwmPtr)
  *
  * OvClear --
  *
- *	This procedure clears the gwm window overlay plane. It is 
+ *	This procedure clears the gwm window overlay plane. It is
  *      called by the widget ovclear command
  *
  * Results:
@@ -1081,15 +1081,15 @@ static void OvClear(Gwm *gwmPtr)
 /*
 **  Erase the contents of the pixmap
 */
-    XFillRectangle( gwmPtr->display, gwmPtr->info->pix_id, gc, 0, 0, 
+    XFillRectangle( gwmPtr->display, gwmPtr->info->pix_id, gc, 0, 0,
 	gwmPtr->info->pix_width, gwmPtr->info->pix_height);
 
 /*
 **  Erase the area of the window occupied by the pixmap
 */
 
-    XFillRectangle( gwmPtr->display, gwmPtr->info->win_id, gc, 
-	gwmPtr->info->x_ov_offset, gwmPtr->info->y_ov_offset, 
+    XFillRectangle( gwmPtr->display, gwmPtr->info->win_id, gc,
+	gwmPtr->info->x_ov_offset, gwmPtr->info->y_ov_offset,
 	gwmPtr->info->pix_width, gwmPtr->info->pix_height);
 
 /*
@@ -1097,7 +1097,7 @@ static void OvClear(Gwm *gwmPtr)
 */
     Tk_FreeGC( gwmPtr->display, gc );
 
-    if (gwmPtr->crosshair) DrawCursor( gwmPtr, gwmPtr->crossx, 
+    if (gwmPtr->crosshair) DrawCursor( gwmPtr, gwmPtr->crossx,
 	gwmPtr->crossy);
 }
 
@@ -1135,7 +1135,7 @@ static void DrawCursor(Gwm *gwmPtr, int cx, int cy)
 	0, cy, gwmPtr->info->pix_width, cy);
     XDrawLine( gwmPtr->display, Tk_WindowId(gwmPtr->tkwin), gc,
 	cx, 0, cx, gwmPtr->info->pix_height);
-	
+
     Tk_FreeGC( gwmPtr->display, gc);
 }
 

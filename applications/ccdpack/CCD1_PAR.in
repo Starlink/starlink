@@ -134,7 +134,7 @@
       PARAMETER ( VERS = '(CCDPACK version @PACKAGE_VERSION@)' )
 
 *  Printable backslash: some compilers need '\\' to get '\', which
-*  isn't a problem as Fortran will truncate the string '\\' to '\' 
+*  isn't a problem as Fortran will truncate the string '\\' to '\'
 *  on the occasions when that isn't needed.
       CHARACTER * ( 1 ) CCD1__BKSLH
       PARAMETER ( CCD1__BKSLH = '\\' )

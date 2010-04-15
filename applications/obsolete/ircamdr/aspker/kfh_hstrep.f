@@ -17,7 +17,7 @@
 *     NUMBIN = INTEGER
 *           The number of bins in the histogram.
 *     STATUS = INTEGER
-*           The status value on entry to this 
+*           The status value on entry to this
 *           subroutine.
 *    Method :
 *     The size of the report bins is first calculated
@@ -29,7 +29,7 @@
 *     S.Chan (RGVAD::KFH)
 *    History :
 *     10 September 1983: Original (RGVAD::KFH)
-*    Type Definitions :      
+*    Type Definitions :
       IMPLICIT NONE
 *    Global constants:
       INCLUDE 'SAE_PAR'
@@ -48,7 +48,7 @@
       INTEGER K                          ! General variable.
       REAL NBINWD                        ! Width of the report bins.
       INTEGER NHIST(16)                  ! Array holding the histogram
-*                                        ! summary. 
+*                                        ! summary.
       REAL RANGE                         ! The difference between the
 *                                        ! maximum and the minimum values.
       REAL SIZBIN                        ! Size of summary bins.
@@ -68,7 +68,7 @@
          RETURN
 
       ELSE
-      
+
 *
 *       Calculate the size of the bins for the report.
 *

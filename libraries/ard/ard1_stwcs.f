@@ -13,7 +13,7 @@
 *     CALL ARD1_STWCS( NDIM, PAR, UWCS, STATUS )
 
 *  Description:
-*     This routine creates a new user FrameSet (UWCS) from the 
+*     This routine creates a new user FrameSet (UWCS) from the
 *     supplied parameters.
 
 *  Arguments:
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,11 +83,11 @@
 
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create a matrixmap from old user coords to new user coords.
-      M1 = AST_MATRIXMAP( NDIM, NDIM, 1, PAR, ' ', STATUS ) 
+      M1 = AST_MATRIXMAP( NDIM, NDIM, 1, PAR, ' ', STATUS )
 
 *  Remap the user coords Frame (i.e. the current Frame).
       CALL AST_REMAPFRAME( UWCS, AST__CURRENT, M1, STATUS )

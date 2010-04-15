@@ -30,7 +30,7 @@
 
 *  Global constants:
 
-*  The maximum size of the results arrays. 
+*  The maximum size of the results arrays.
       INTEGER GRA__RESUL
       PARAMETER ( GRA__RESUL = 4096 )
 

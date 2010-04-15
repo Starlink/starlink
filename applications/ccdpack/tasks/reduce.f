@@ -345,8 +345,8 @@ C      END IF
          CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
          CALL MSG_BLANK( STATUS )
          CALL CCD1_SETPA( 'BYNAME', 'TRUE', STATUS )
-         CALL CCD1_SETPA( 'NAMES', 
-     :        'extent,direction,bounds,adc,rnoise,deferred,saturation', 
+         CALL CCD1_SETPA( 'NAMES',
+     :        'extent,direction,bounds,adc,rnoise,deferred,saturation',
      :        STATUS )
          CALL CCDCLEAR( STATUS )
 C         CMD = 'byname=true names=''extent,direction,bounds,adc,'//
@@ -561,7 +561,7 @@ C         CALL SLV_OBEYW( CCDRES, 'import', CMD, 'IN<IN', STATUS )
          CALL CCD1_SETPA( 'NAMELIST', 'REDUCE.NDFS', STATUS )
          CALL PRESENT( STATUS )
 C         CMD = 'simple=false modify=true namelist=REDUCE.NDFS reset'
-C         CALL SLV_OBEYW( CCDRES, 'present', CMD, 
+C         CALL SLV_OBEYW( CCDRES, 'present', CMD,
 C     :        'BIAS<BIAS,TARGET<TARGET,FLAT<FLAT,DARK<DARK,FLASH<FLASH',
 C     :                   STATUS )
       END IF

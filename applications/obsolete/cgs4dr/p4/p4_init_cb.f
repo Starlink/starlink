@@ -48,7 +48,7 @@
 
         IF ( VERBOSE ) THEN
            CALL MSG_SETI( 'I', I )
-           CALL MSG_OUT( ' ', 
+           CALL MSG_OUT( ' ',
      :       'Initialising common block for port ^I', STATUS )
         ENDIF
 

@@ -43,7 +43,7 @@ C
       REAL FUNCTION PGRNRM (ISEED)
       INTEGER ISEED
 C-----------------------------------------------------------------------
-C Returns a normally distributed deviate with zero mean and unit 
+C Returns a normally distributed deviate with zero mean and unit
 C variance. The routine uses the Box-Muller transformation of uniform
 C deviates. For a more efficient implementation of this algorithm,
 C see Press et al., Numerical Recipes, Sec. 7.2.

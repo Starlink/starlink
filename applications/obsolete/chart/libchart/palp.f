@@ -58,7 +58,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       WRITE (7,995)
 995   FORMAT(/,35X,'***************************************',
      : '***************',
@@ -79,7 +79,7 @@
       SURVEY(1) = DL.GT.(-45.0)*RDDG
       SURVEY(2) = DP.LT.(18.0*RDDG)
       SURVEY(3) = DP.LT.(-17.5*RDDG)
- 
+
       DO 100 K=1,3
          IF (SURVEY(K)) THEN
 *
@@ -177,7 +177,7 @@ C
 	       NCRAM=0
 	    END IF
             PCA = NRAC * 60.0 * RDST
- 
+
             CALL CONST(PCA,PCR, STATUS )
             CALL PROJ(1,AL,DL,X,Y, STATUS )
 *
@@ -210,4 +210,4 @@ C
 902   FORMAT(/,' ',10X,'(Co-ordinates are in mm., Relative ',
      : 'to South Eastern Corner of actual plate (not emulsion))')
       END
- 
+

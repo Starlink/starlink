@@ -25,7 +25,7 @@ C
       REAL CHFACT, SIGFACT
       PARAMETER (CHFACT=3.0, SIGFACT=3.0)
 C
-C     Set both CHFACT and SIGFACT 
+C     Set both CHFACT and SIGFACT
 C
       PARMS(1)=CHFACT
       PARMS(2)=SIGFACT

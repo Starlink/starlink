@@ -1,13 +1,13 @@
 
 *+  EXPARR2D - take the exponential of a 2-d array pixel by pixel
 
-      SUBROUTINE EXPARR2D ( INARRAY, DIMS1, DIMS2, BASE, OUTARRAY, 
+      SUBROUTINE EXPARR2D ( INARRAY, DIMS1, DIMS2, BASE, OUTARRAY,
      :                      STATUS )
 
 *    Description :
 *
 *     This routine fills the output array pixels with the results
-*     of taking the exponential of the pixels of the input array 
+*     of taking the exponential of the pixels of the input array
 *     to the base specified, i.e. New value = Base ** Old value.
 *     If the result is bigger than the maximum allowed Vax real,
 *     then a bad pixel value is used.
@@ -106,18 +106,18 @@
       INTEGER  STATUS             ! global status parameter
 
 *    Local constants :
- 
+
       REAL
      :    VAXMAX,                 ! maximum valid real
-     :    BADVAL                  ! 'bad pixel' value to be used 
+     :    BADVAL                  ! 'bad pixel' value to be used
       PARAMETER( VAXMAX  =  NUM__MAXR )  ! No longer Vax specific
       PARAMETER( BADVAL  =  0.0 )      ! temporary usage
 
 *    Local variables :
 
       INTEGER
-     :    I, J                    ! counter variables 
-   
+     :    I, J                    ! counter variables
+
       REAL
      :    MAXVAL,                 ! maximum valid pixel value allowed for
                                   ! exponentiation
@@ -181,7 +181,7 @@
 *             specified maximum
                IF ( INARRAY( I, J ) .GE. MAXVAL ) THEN
 
-*                too large a pixel value - stick the 'bad pixel' value 
+*                too large a pixel value - stick the 'bad pixel' value
 *                into the output pixel
                   OUTARRAY( I, J )  =  BADVAL
 
@@ -202,7 +202,7 @@
       ELSE
 
 *       now loop round all rows of the output array
-         DO  J  =  1, DIMS2 
+         DO  J  =  1, DIMS2
 
 *          loop round all pixels of the current row
             DO  I  =  1, DIMS1
@@ -211,7 +211,7 @@
 *             specified minimum
                IF ( INARRAY( I, J ) .LE. MINVAL ) THEN
 
-*                too negative a pixel value - stick the 'bad pixel' value 
+*                too negative a pixel value - stick the 'bad pixel' value
 *                into the output pixel
                   OUTARRAY( I, J )  =  BADVAL
 

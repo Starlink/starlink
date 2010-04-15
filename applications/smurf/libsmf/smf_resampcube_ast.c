@@ -14,11 +14,11 @@
 
 *  Invocation:
 *     void smf_resampcube_ast( smfData *data, dim_t nchan,
-*                              dim_t ndet, dim_t nslice, dim_t nel, 
+*                              dim_t ndet, dim_t nslice, dim_t nel,
 *                              dim_t dim[3], AstMapping *ssmap,
-*                              AstSkyFrame *abskyfrm, AstMapping *iskymap, 
-*                              Grp *detgrp, int moving, int interp, 
-*                              const double params[], float *in_data, 
+*                              AstSkyFrame *abskyfrm, AstMapping *iskymap,
+*                              Grp *detgrp, int moving, int interp,
+*                              const double params[], float *in_data,
 *                              float *out_data, int *status );
 
 *  Arguments:
@@ -46,9 +46,9 @@
 *        A Mapping that goes from template spectral grid axis (pixel axis 1)
 *        to the sky cube spectral grid axis (pixel axis 3).
 *     abskyfrm = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe 
+*        A SkyFrame that specifies the coordinate system used to describe
 *        the spatial axes of the sky cube. This should represent
-*        absolute sky coordinates rather than offsets even if "moving" is 
+*        absolute sky coordinates rather than offsets even if "moving" is
 *        non-zero.
 *     iskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the sky cube to 2D
@@ -57,20 +57,20 @@
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
 *     moving = int (Given)
-*        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted so that the position specified by 
+*        A flag indicating if the telescope is tracking a moving object. If
+*        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        sky cube.
 *     interp = int (Given)
 *        Specifies the scheme to be used for interpolating the sky cube data
-*        array to find each output detector sample value. See docs for 
+*        array to find each output detector sample value. See docs for
 *        astResample (SUN/211) for the allowed values.
 *     params = const double[] (Given)
 *        An optional pointer to an array of double which should contain any
-*        additional parameter values required by the interpolation scheme. 
-*        See docs for astResample (SUN/211) for further information. If no 
+*        additional parameter values required by the interpolation scheme.
+*        See docs for astResample (SUN/211) for further information. If no
 *        additional parameters are required, this array is not used and a
-*        NULL pointer may be given. 
+*        NULL pointer may be given.
 *     in_data = float * (Given)
 *        The 3D data array for the input sky cube.
 *     out_data = float * (Returned)
@@ -80,7 +80,7 @@
 
 *  Description:
 *     The data array of the supplied sky cube is resampled at the
-*     detector sample positions specified by the input template. The 
+*     detector sample positions specified by the input template. The
 *     resampled values are stored in the output time series cube.
 
 *  Authors:
@@ -134,11 +134,11 @@
 #define FUNC_NAME "smf_resampcube_ast"
 
 void smf_resampcube_ast( smfData *data, dim_t nchan,
-                         dim_t ndet, dim_t nslice, dim_t nel, 
+                         dim_t ndet, dim_t nslice, dim_t nel,
                          dim_t dim[3], AstMapping *ssmap,
-                         AstSkyFrame *abskyfrm, AstMapping *iskymap, 
-                         Grp *detgrp, int moving, int interp, 
-                         const double params[], float *in_data, 
+                         AstSkyFrame *abskyfrm, AstMapping *iskymap,
+                         Grp *detgrp, int moving, int interp,
+                         const double params[], float *in_data,
                          float *out_data, int *status ){
 
 /* Local Variables */
@@ -190,14 +190,14 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
 /* Store the size of an template time slice. */
    timeslice_size = nel/nslice;
 
-/* Create a LutMap that holds the sky cube spectral axis GRID value at 
+/* Create a LutMap that holds the sky cube spectral axis GRID value at
    the centre of each template spectral axis pixel. LutMaps are faster to
    evaluate, and so astResample will go faster. We can use LutMaps without
    loosing accuracy since astResample only ever transforms the GRID
    values at input pixel centres (i.e. integer GRID values), and so the
    LutMap will always return a tabulated value rather than an
    interpolated value. */
-   atlTolut( (AstMapping *) ssmap, 1.0, (double) nchan, 1.0, "LutInterp=1", 
+   atlTolut( (AstMapping *) ssmap, 1.0, (double) nchan, 1.0, "LutInterp=1",
               &sslut, status );
 
 /* Set the flags for astResample. This function will be invoked once for
@@ -209,14 +209,14 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    that recieve no contribution from the final sky cube. */
    ast_flags = AST__USEBAD | AST__NOBAD;
 
-/* If we are dealing with more than 1 detector, create a LutMap that holds 
-   the template GRID index of every detector to be included in the output, and 
-   AST__BAD for every detector that is not to be included in the output cube. 
+/* If we are dealing with more than 1 detector, create a LutMap that holds
+   the template GRID index of every detector to be included in the output, and
+   AST__BAD for every detector that is not to be included in the output cube.
    First allocate the work space for the LUT. */
    if( ndet > 1 ) {
       detlut = astMalloc( ndet*sizeof( double ) );
 
-/* Initialise a string to point to the name of the first detector for which 
+/* Initialise a string to point to the name of the first detector for which
    data is available */
       name = hdr->detname;
 
@@ -228,9 +228,9 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
          detlut[ idet ] = idet + 1.0;
 
 /* If a group of detectors to be used was supplied, search the group for
-   the name of the current detector. If not found, set the GRID coord bad. 
+   the name of the current detector. If not found, set the GRID coord bad.
    This will cause astResample to ignore data from the detector. */
-         if( detgrp ) {    
+         if( detgrp ) {
             found = grpIndex( name, detgrp, 1, status );
             if( !found ) detlut[ idet ] = AST__BAD;
          }
@@ -246,12 +246,12 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
 /* If we only have 1 detector, use a UnitMap instead of a LutMap (lutMaps
    must have 2 or more table entries). */
    } else {
-      lutmap = (AstMapping *) astUnitMap( 1, " " );    
+      lutmap = (AstMapping *) astUnitMap( 1, " " );
    }
 
-/* Combine the above LutMap with a 1-input, 2-output PermMap that copies its 
-   input to create its first output, and assigns a constant value of 1.0 to 
-   its second output. We need to do this because smf_tslice returns a 2D 
+/* Combine the above LutMap with a 1-input, 2-output PermMap that copies its
+   input to create its first output, and assigns a constant value of 1.0 to
+   its second output. We need to do this because smf_tslice returns a 2D
    GRID system (even though the second GRID axis is not actually used). */
    tsperm[ 0 ] = 1;
    skyperm[ 0 ] = 1;
@@ -266,7 +266,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    lbnd_out[ 1 ] = 1;
    ubnd_out[ 1 ] = ndet;
 
-/* Create a PermMap that can be used to re-order the output axes so that 
+/* Create a PermMap that can be used to re-order the output axes so that
    channel number is axis 3. */
    skyperm[ 0 ] = 2;
    skyperm[ 1 ] = 3;
@@ -286,37 +286,37 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    helps keep the number of AST objects in use to a minimum. */
       astBegin;
 
-/* Get a Mapping from the spatial GRID axes in the template to the spatial 
-   GRID axes in the sky cube for the current time slice. Note this has 
-   to be done first since it stores details of the current time slice 
+/* Get a Mapping from the spatial GRID axes in the template to the spatial
+   GRID axes in the sky cube for the current time slice. Note this has
+   to be done first since it stores details of the current time slice
    in the "smfHead" structure inside "data", and this is needed by
    subsequent functions. */
-      totmap = smf_rebin_totmap( data, itime, abskyfrm, iskymap, moving, 
+      totmap = smf_rebin_totmap( data, itime, abskyfrm, iskymap, moving,
 				 status );
       if( !totmap ) break;
 
 /* So "totmap" is a 2-input, 2-output Mapping that transforms the template
    spatial GRID coords into sky cube spatial GRID coords. In order to speed
    up astResample we represent this by a pair of parallel LutMaps. To do
-   this (using atlTolut) we need a Mapping which only has 1 input, so we 
-   preceed "totmap" with "detmap" (which also has the effect of exluding 
-   data from unrequired detectors). We then combine this Mapping in 
-   parallel with the spectral LutMap to get a 2-input (channel number, 
+   this (using atlTolut) we need a Mapping which only has 1 input, so we
+   preceed "totmap" with "detmap" (which also has the effect of exluding
+   data from unrequired detectors). We then combine this Mapping in
+   parallel with the spectral LutMap to get a 2-input (channel number,
    detector index) and 3-output (output grid coords) Mapping. We finally
    add a PermMap to re-arrange the output axes so that channel number is
    axis 3 in the output. */
       dtotmap = (AstMapping *) astCmpMap( detmap, totmap, 1, " " );
       if( ndet > 1 ) {
-         atlTolut( dtotmap, 1.0, (double) ndet, 1.0, "LutInterp=1", &splut, 
+         atlTolut( dtotmap, 1.0, (double) ndet, 1.0, "LutInterp=1", &splut,
                    status );
       } else {
          splut = astClone( dtotmap );
       }
 
-      fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, " " ), 
+      fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, " " ),
                                         pmap, 1, " " ) );
 
-/* Invert this Mapping to get the mapping from sky cube grid coords to time 
+/* Invert this Mapping to get the mapping from sky cube grid coords to time
    series grid coords. */
       astInvert( fullmap );
 

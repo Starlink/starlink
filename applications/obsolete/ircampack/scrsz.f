@@ -15,8 +15,8 @@
 
 *  Description:
 *     This routine interrogates the system to find the width and height
-*     of the screen on which it is running.  Should an error occur or 
-*     the width is not positive, set to the default of 80 characters by 
+*     of the screen on which it is running.  Should an error occur or
+*     the width is not positive, set to the default of 80 characters by
 *     0 lines (thus suppresses paging).
 
 *  Arguments:
@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -70,7 +70,7 @@
 #  Run the job, use the related cocomain binary, otherwise anything on PATH.
       if ( -e $STARLINK_DIR/bin/cocomain ) then
          $STARLINK_DIR/bin/cocomain $_tty $_output $_echo $_report $_input $_prompts $_errors
-      else 
+      else
          cocomain $_tty $_output $_echo $_report $_input $_prompts $_errors
       endif
 

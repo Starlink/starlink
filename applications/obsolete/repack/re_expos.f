@@ -74,7 +74,7 @@
 
 * Efficency correct?
       call par_put0l('EFFCOR', .TRUE., status)
-      CALL PAR_GET0l ('EFFCOR correct for detector degredation', 
+      CALL PAR_GET0l ('EFFCOR correct for detector degredation',
      &                                              effcor, STATUS)
 
       call getenv("RECAL", re_res)
@@ -99,7 +99,7 @@
 	goto 999
       endif
 * Read in exposure image
-      call ftg2de(lunit, 1, -1, idim1, idim1, idim2, 
+      call ftg2de(lunit, 1, -1, idim1, idim1, idim2,
      &                                   expmap, anyf, status)
       IF (STATUS .NE. 0) THEN
 	STOP '   Error in RE_EXPOS - Opening the exposure image'
@@ -120,17 +120,17 @@
 * Point to correct FITS extension and read in exposure image.
         if (index(filt,'1') .gt. 0) then
           call ftmahd(lun2, 2, hdutyp, status)	  ! S1a with no det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   rgw_u, anyf, status)
           call ftmahd(lun2, 4, hdutyp, status)	  ! S1a with det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   rgw_c, anyf, status)
         else
           call ftmahd(lun2, 3, hdutyp, status)	  ! S2a with no det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   rgw_u, anyf, status)
           call ftmahd(lun2, 5, hdutyp, status)	  ! S2a with det. effic.
-          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2, 
+          call ftg2de(lun2, 1, -1, rdim1, rdim1, rdim2,
      &                                   rgw_c, anyf, status)
 	endif
 
@@ -209,7 +209,7 @@
      :						   NS,EXF,STATUS)
         endif
 
-	
+
 * write the corrected fluxes to the SSDS file
         DO N = 1, NS
 	  CFLUX(N) = SCOUNT(N)*EXF(N)
@@ -229,7 +229,7 @@
 999   IF (STATUS .NE. 0) THEN
 	 WRITE(*,*) '   Error in RE_EXPOS'
       END IF
-      
+
       call ftclos(lunit, status)
       if (effcor) call ftclos(lun2, status)
       CALL SSO_CLOSE(STATUS)

@@ -1,11 +1,11 @@
 *+  CRED4_PARSREC - Read data from an ASCII configuration file
       SUBROUTINE CRED4_PARSREC( RECORD, ITEM, VALUE, TYPE, STATUS )
 *    Description :
-*     This routine reads data from a configuration file and 
+*     This routine reads data from a configuration file and
 *     returns an item name, a character encoded value and a data-type.
-*     Similarly, if it cannot determine 
-*     the structure of the input file (i.e. not NBS or ASCII) it returns 
-*     an error. In both cases, the routine puts a single space (' ') into 
+*     Similarly, if it cannot determine
+*     the structure of the input file (i.e. not NBS or ASCII) it returns
+*     an error. In both cases, the routine puts a single space (' ') into
 *     ITEM, VALUE and TYPE.
 *    Invocation :
 *     CALL CRED4_PARSREC( RECORD, ITEM, VALUE, TYPE, STATUS )
@@ -127,7 +127,7 @@
          VALUE = ' '
          TYPE  = ' '
          STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 
+         CALL ERR_REP( ' ',
      :     'Error reading configuration file (unknown format)', STATUS )
       ELSE
 
@@ -148,7 +148,7 @@
             CALL CHR_RMBLK( VALUE )
 
 *      If VALUE contains a 'TRUE'  or 'FALSE' it has LOGICAL data-type else REAL
-         ELSE IF ( ( INDEX( VALUE, 'TRUE' ) .GT. 0 )   .OR. 
+         ELSE IF ( ( INDEX( VALUE, 'TRUE' ) .GT. 0 )   .OR.
      :           ( INDEX( VALUE, 'true' ) .GT. 0 )  .OR.
      :           ( INDEX( VALUE, 'FALSE' ) .GT. 0 )   .OR.
      :           ( INDEX( VALUE, 'false' ) .GT. 0 ) ) THEN
@@ -174,7 +174,7 @@
             END IF
          END IF
 
-*      Set the correct lengths 
+*      Set the correct lengths
          ITEM = ITEM( 1:CHR_LEN( ITEM ) )
          VALUE = VALUE( 1:CHR_LEN( VALUE ) )
          TYPE = TYPE( 1:CHR_LEN( TYPE ) )

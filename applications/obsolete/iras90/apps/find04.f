@@ -53,7 +53,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-                                 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'I90_PAR'          ! IRAS 90 General constants
@@ -67,7 +67,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-      
+
 *  Arguments Given:
       CHARACTER * ( * )  PCROSS
       CHARACTER * ( * )  PINSCA
@@ -135,16 +135,16 @@
 
 *  Store cross scan value in SOCRSZ
             SOCRSZ( II ) = ALCROR
-      
+
  100     CONTINUE
-      
+
       END IF
 
 *  Display a message if either parameter was entered as !
       IF ( STATUS .EQ. PAR__NULL ) THEN
 
 *  If any of the parameters was entered as !, annul the error message,
-*  which sets the status to SAI__OK. 
+*  which sets the status to SAI__OK.
          CALL ERR_ANNUL( STATUS )
          CALL MSG_OUT( ' ',
      :   ' The cross scan or in scan size has been entered as a !',
@@ -152,7 +152,7 @@
          CALL MSG_OUT( ' ',
      :   ' Therefore no change has been made to any source size ',
      :   STATUS )
-         
+
       END IF
 
 *  Change the menu parameter back to 'M' to get menu in FIND26

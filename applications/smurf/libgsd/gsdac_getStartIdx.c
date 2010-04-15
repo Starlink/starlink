@@ -4,7 +4,7 @@
 *     gsdac_getStartIdx.c
 
 *  Purpose:
-*     Get the index into the pattern at the start of the 
+*     Get the index into the pattern at the start of the
 *     observation.
 
 *  Language:
@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getStartIdx ( const gsdVars *gsdVars, 
+*     gsdac_getStartIdx ( const gsdVars *gsdVars,
 *                         const char *samMode, int *startIdx, int *status )
 
 *  Arguments:
@@ -25,7 +25,7 @@
 *     startIdx = int* (Given and Returned)
 *        Index into start of pattern
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *    This routine simply returns 1 for the time being...
@@ -44,7 +44,7 @@
 *     2008-03-21 (JB):
 *        Calculate startIdx for grids/rasters.
 *     2008-04-03 (JB):
-*        startidx = 1 for rasters. 
+*        startidx = 1 for rasters.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -83,7 +83,7 @@
 
 #define FUNC_NAME "gsdac_getStartIdx"
 
-void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode, 
+void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
                          int *startIdx, int *status )
 
 {
@@ -92,7 +92,7 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
   double currentCol;          /* current column map coord */
   double currentRow;          /* current row map coord */
   double expStartCol;         /* expected start column coord */
-  double expStartRow;         /* expected start row coord */ 
+  double expStartRow;         /* expected start row coord */
   int found;                  /* found index? */
   int i;                      /* loop counter */
   int j;                      /* row increment */
@@ -101,8 +101,8 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
   int nRows;                  /* number of rows */
   int posCol;                 /* columns moving in positive direction? */
   int posRow;                 /* rows moving in positive direction? */
-  double startCol;            /* start column index */ 
-  double startRow;            /* start row index */       
+  double startCol;            /* start column index */
+  double startRow;            /* start row index */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -146,9 +146,9 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
      that the index begins at 1, not 0. */
   /*if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
 
-    if ( posCol ) 
+    if ( posCol )
       *startIdx = startCol + ( nRows - 1.0 ) / 2.0 + 1.0;
-    else 
+    else
       *startIdx = ( nRows - 1.0 ) / 2.0 - startCol + 1.0;
     return;
 
@@ -160,26 +160,26 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
   if ( strncmp ( samMode, "grid", 4 ) == 0 ) {
     if ( posRow  )
       expStartCol = ( nCols - 1.0 ) / -2.0;
-    else 
+    else
       expStartCol = ( nCols - 1.0 ) / 2.0;
 
     if ( posCol )
       expStartRow = ( nRows - 1.0 ) / -2.0;
-    else 
+    else
       expStartRow = ( nRows - 1.0 ) / 2.0;
 
     for ( j = 0; j < nRows; j++ ) {
 
       for ( k = 0; k < nCols; k++ ) {
 
-        /* Check to see if we are moving in a positive or 
+        /* Check to see if we are moving in a positive or
            negative direction and get the coordinates of our
-           current position in the map.   Also check for 
+           current position in the map.   Also check for
            scan reversal on the column. */
         if ( posCol ) currentRow = expStartRow + j;
         else currentRow = expStartRow - j;
 
-        if ( gsdVars->scanRev && j % 2 == 1 ) {      
+        if ( gsdVars->scanRev && j % 2 == 1 ) {
           if ( posRow ) currentCol = ( -1.0 * expStartCol ) - k;
           else currentCol = ( -1.0 * expStartCol ) + k;
         } else {

@@ -26,12 +26,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -140,7 +140,7 @@
         CALL DAT_FIND( LOCTM, 'COMMENT', LOCC, STATUS )
         CALL DAT_MAP( LOCC, '_CHAR', 'UPDATE', 0, 0, IPC, STATUS )
         CALL DAT_CLEN( LOCC, LENC, STATUS )
-        CALL TRN1_INVCM( %VAL( CNF_PVAL( IPC ) ), STATUS, 
+        CALL TRN1_INVCM( %VAL( CNF_PVAL( IPC ) ), STATUS,
      :                   %VAL( CNF_CVAL( LENC ) ) )
         CALL DAT_UNMAP( LOCC, STATUS )
         CALL DAT_ANNUL( LOCC, STATUS )

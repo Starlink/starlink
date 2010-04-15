@@ -84,7 +84,7 @@
 * Old dta call
 *         call dta_tyvar(curnam,type,status)
 
-         call dta_loc(curnam,mloc,status)         
+         call dta_loc(curnam,mloc,status)
          call dat_type(mloc,type,status)
          call dta_annul(mloc,status)
 
@@ -102,7 +102,7 @@
 
          if(type.eq.'CHAR') then
             size = min(size,80)
-* Switch dta for HDS call 
+* Switch dta for HDS call
 *            call dta_rdvarc(curnam,size,string,status)
 
             call dta_loc(curnam,nloc,status)

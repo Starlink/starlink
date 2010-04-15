@@ -42,23 +42,23 @@ c   See method.
 c
 c   Method
 c   ------
-c   
+c
 c   - The program obtains USEAXES to determine how to join the cubes. If
 c     this is true, the data will be placed in the output image according
 c     to axis information. Otherwise, the cubes are simply butted together.
 c   - The parameter FILES is obtained. This is an ASCII file containing the
-c     names of the images to be stacked. 
+c     names of the images to be stacked.
 c   - The axis to join the images along is obtained.
 c   - A value to pad arrays out with is obtained.
 c   - Each image is read in in turn, and the output file's properties are
 c     determined from the information gathered in this first pass. The rules
 c     are as follows:
-c     
+c
 c     o Only 2 or 3 dimensions allowed.
 c
 c     o The output file size depends upon USEAXES: if we first consider the
 c       dimension cubes are to be joined along -
-c       
+c
 c       if (USEAXES) then
 c         output_dimension = (max_axis-min_axis) / axis_scale  + 1
 c       else
@@ -81,15 +81,15 @@ c       applies to axis units and scale.
 c
 c     o If USEAXES is true, ALL axes must be present in ALL the images.
 c       Further, logarithmic axes are disallowed and axes with units other
-c       than that of the base file also cause program abortion. 
+c       than that of the base file also cause program abortion.
 c
-c     o All axis data must increase monotonically with index (if it doesn't, 
+c     o All axis data must increase monotonically with index (if it doesn't,
 c       use AXFLIP or SETAXES to make it so).
 c
 c     o All axis data must be on the same scale as the base file (ie the ratio
 c
 c                        (end - start + 1) / no.of pixels
-c                              
+c
 c       must be the same for each respective axis.)
 c
 c     o Quality or error arrays will appear in the output iff each input
@@ -98,12 +98,12 @@ c       the bad pixel flag will only be set in the output structure iff
 c       all the input files have it set. This avoids conflicts with magic
 c       values and quality arrays.
 c
-c     o The output file CANNOT be in the input list as well, because 
+c     o The output file CANNOT be in the input list as well, because
 c       this could lead to the program obtaining the wrong data from the
 c       wrong version of the file (or an i/o error).
 c
 c   - The output file is mapped and filled with the padding value.
-c   - Each image is then opened, and the appropriate arrays mapped. The arrays 
+c   - Each image is then opened, and the appropriate arrays mapped. The arrays
 c     are then copied to the appropriate locations in the output.
 c
 c   - If USEAXES is true, the output axes are scaled accordingly.
@@ -135,8 +135,8 @@ c     DSA_UNMAP
 c     DSA_WRUSER
 c
 c   GEN Library:
-c     GEN_FILL  
-c   
+c     GEN_FILL
+c
 c   ICH Library:
 c     ICH_CI
 c     ICH_FOLD
@@ -362,7 +362,7 @@ c
           go to 999
 c
         else
-c 
+c
           call dsa_named_input('image',image(nfiles),status)
           if (status.ne.0) go to 999
           call dsa_data_size('image',10,ndim(nfiles),tempdims,
@@ -397,7 +397,7 @@ c
 c
           else ! nfiles > 1
 c
-c   Update output file size 
+c   Update output file size
 c
             do i = 1,3
               if (i .ne. jdim) then
@@ -409,7 +409,7 @@ c
               end if
             end do
 c
-          end if ! (nfiles...)            
+          end if ! (nfiles...)
 c
 c    Get axis data if required for stacking
 c
@@ -421,7 +421,7 @@ c
                 call dsa_wruser('Dimension #'//ich_ci(i))
                 call dsa_wruser(' has no axis data.\\n')
                 go to 999
-              else 
+              else
                 call dsa_get_axis_info('image',i,1,units,1,
      &                                  logaxis,status)
                 call ich_fold(units)
@@ -435,8 +435,8 @@ c
                     call dsa_wruser(ich_ci(i)//'.\\n')
                     go to 999
                   end if ! (units...)
-                end if ! (nfiles...) 
-c             
+                end if ! (nfiles...)
+c
                 if (logaxis.ne.0.0D0) then
                   call dsa_wruser('%STACK-E-LOGAXIS  ')
                   call dsa_wruser('No logarithmic axes allowed!\\n')
@@ -501,7 +501,7 @@ c
           else
             call dsa_seek_flagged_values('image',bad,status)
             if (bad) nbad = nbad + 1
-          end if 
+          end if
           call dsa_seek_errors('image',err,status)
           if (err) nerr = nerr + 1
 c
@@ -510,13 +510,13 @@ c
           call dsa_close_structure('image',status)
           if (status.ne.0) go to 999
 c
-        end if 
+        end if
 c
       end do ! while
       close(unit=file_lu,iostat=status)
-c     
+c
 c   Process the quality and error information
-c 
+c
       quality = (nqual .eq. nfiles)
       if (quality.and.verbose) then
         call dsa_wruser('Output file will have a quality array\\n')
@@ -546,7 +546,7 @@ c
         call dsa_wruser(btype(:ich_len(btype))//'\\n')
       end if
 c
-c   Process the information for the common dimension into an output size 
+c   Process the information for the common dimension into an output size
 c   and start indices.
 c
       if (useaxes) then
@@ -557,12 +557,12 @@ c
         end do
 c
       else
-c       
+c
         start(1) = 1
         do i = 2,nfiles
-          start(i) = start(i-1) + dims(i-1,jdim) 
-        end do 
-      end if  
+          start(i) = start(i-1) + dims(i-1,jdim)
+        end do
+      end if
 c
       if (verbose) then
         call dsa_wruser('Output file will have dimensions: ')
@@ -612,7 +612,7 @@ c
       do i = 1,3
         noelm = noelm * odims(i)
       end do
-      obytes = noelm * dsa_typesize(btype,status) 
+      obytes = noelm * dsa_typesize(btype,status)
 c
 c   - map output array and fill with padding values
 c
@@ -631,7 +631,7 @@ c
       if (error) then
         call dsa_map_errors('output','write',btype,address,
      &                       oeslot,status)
-        if (status .ne. 0) go to 999 
+        if (status .ne. 0) go to 999
         oeptr = dyn_element(address)
         call gen_fill(obytes,0,dynamic_mem(oeptr))
       end if
@@ -666,7 +666,7 @@ c
         if (status .ne. 0) go to 999
         inptr = dyn_element(address)
 c
-c   Map errors and quality if needed 
+c   Map errors and quality if needed
 c
         if (error) then
           call dsa_map_errors('image','read',btype,address,
@@ -683,7 +683,7 @@ c
         end if
 c
 c   Add the cube to the stack
-c       
+c
         if (btype .eq. 'SHORT') then
           call stack_w(
      &         dynamic_mem(inptr),dims(i,1),dims(i,2),dims(i,3),
@@ -728,11 +728,11 @@ c
       end if
 c
 999   continue
-      call dsa_close(status)   
+      call dsa_close(status)
       end
 
 *******************************************************************************
-      
+
       subroutine stack_info(name,dims,type)
       integer    dims(10)
       character  type*(*)
@@ -802,12 +802,12 @@ c
       real    axstart(maxfiles,10),axend(maxfiles,10)
 c
       integer file
-      real    s1,e1,s2,e2             
+      real    s1,e1,s2,e2
 c
       stack_overlap = .false.
 c
       s1 = axstart(nfiles,join)
-      e1 = axend(nfiles,join)        
+      e1 = axend(nfiles,join)
       do file = 1,nfiles-1
         s2 = axstart(file,join)
         e2 = axend(file,join)

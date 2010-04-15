@@ -5,8 +5,8 @@ C+
       INTEGER  FS
 C
 C Set the Fill-Area Style attribute for subsequent area-fill by
-C PGPOLY, PGRECT, or PGCIRC.  Four different styles are available: 
-C solid (fill polygon with solid color of the current color-index), 
+C PGPOLY, PGRECT, or PGCIRC.  Four different styles are available:
+C solid (fill polygon with solid color of the current color-index),
 C outline (draw outline of polygon only, using current line attributes),
 C hatched (shade interior of polygon with parallel lines, using
 C current line attributes), or cross-hatched. The orientation and

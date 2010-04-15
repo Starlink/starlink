@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, QUALITY, 
+      SUBROUTINE SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, QUALITY,
      :  START_BOL, END_BOL, START_POS, END_POS, START_BEAM, END_BEAM,
      :  BIT_POS, BIT_VALUE, STATUS)
 *+
@@ -12,7 +12,7 @@
 *     set quality bits in a subset of a quality array
 
 *  Invocation:
-*      CALL  SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, QUALITY, 
+*      CALL  SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, QUALITY,
 *    :  START_BOL, END_BOL, START_POS, END_POS, START_BEAM, END_BEAM,
 *    :  BIT_POS, BIT_VALUE, STATUS)
 
@@ -188,7 +188,7 @@
             DO BEAM = START_BEAM, END_BEAM
                DO POS = START_POS, END_POS
                   DO BOL = START_BOL, END_BOL
-                     QUALITY (BOL,POS,BEAM) = 
+                     QUALITY (BOL,POS,BEAM) =
      :                 SCULIB_BITON (QUALITY(BOL,POS,BEAM), BIT_POS)
                   END DO
                END DO
@@ -199,7 +199,7 @@
             DO BEAM = START_BEAM, END_BEAM
                DO POS = START_POS, END_POS
                   DO BOL = START_BOL, END_BOL
-                     QUALITY (BOL,POS,BEAM) = 
+                     QUALITY (BOL,POS,BEAM) =
      :                 SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), BIT_POS)
                   END DO
                END DO
@@ -207,5 +207,5 @@
 
          END IF
       END IF
-    
+
       END

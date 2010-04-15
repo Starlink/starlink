@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_CLPKY( IPLOT, YTOP, YMIN, SPBND, SPFRM,           
-     :                       LABEL, UNIT, FRMOFF, KEYX, STATUS )             
+      SUBROUTINE KPS1_CLPKY( IPLOT, YTOP, YMIN, SPBND, SPFRM,
+     :                       LABEL, UNIT, FRMOFF, KEYX, STATUS )
 *+
 *  Name:
 *     KPS1_CLPKY
@@ -15,13 +15,13 @@
 *                      FRMOFF, KEYX, STATUS )
 
 *  Description:
-*     This routine plots the range of data value and spectral axis 
-*     value covered by a single cell in a CLINPLOT plot. It also 
+*     This routine plots the range of data value and spectral axis
+*     value covered by a single cell in a CLINPLOT plot. It also
 *     displays details of the data value axis and spectral axis.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
-*        Pointer to the AST Plot.  
+*        Pointer to the AST Plot.
 *     YTOP = REAL (Given)
 *        The largest data value.
 *     YMIN = REAL (Given)
@@ -29,7 +29,7 @@
 *     SPBND( 2 ) = DOUBLE PRECISION (Given)
 *        The bounds of the WCS spectral axis.
 *     SPFRM = INTEGER (Given)
-*        A pointer to the AST Frame that describes the spectral WCS 
+*        A pointer to the AST Frame that describes the spectral WCS
 *        axis.
 *     LABEL = CHARACTER * ( * ) (Given)
 *        The Label component from the displayed NDF.
@@ -39,7 +39,7 @@
 *        The fractional position in the y direction of the top of the
 *        key within the viewport.  Zero is the bottom, 1.0 is the top.
 *     KEYX = DOUBLE PRECISION (Given)
-*        The horizontal offset (in mm to the right) to apply to the 
+*        The horizontal offset (in mm to the right) to apply to the
 *        key.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -76,7 +76,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
       REAL YM                    ! Y extent of key picture, in metres
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the PGPLOT viewport and window to match the current AGI picture,
@@ -143,18 +143,18 @@
 *  Get the current PGPLOT character heights in world coordinates.
       CALL PGQCS( 4, XCH, HGT )
 
-*  Set the default character height.  This will be overridden if an 
+*  Set the default character height.  This will be overridden if an
 *  explicit character height has been set in the supplied Plot. HGT
-*  is a value in world coordinates.  If the current pgplot value would 
-*  result in LINELN characters being wider than the available space 
-*  (i.e. X2-X1) - assuming an aspect ratio of ARAT for each character 
-*  - then the character height is reduced so that 20 characters would 
+*  is a value in world coordinates.  If the current pgplot value would
+*  result in LINELN characters being wider than the available space
+*  (i.e. X2-X1) - assuming an aspect ratio of ARAT for each character
+*  - then the character height is reduced so that 20 characters would
 *  just fit in.
       HGT = MIN( HGT, ARAT*ABS( X2 - X1 )/LINELN )
       CALL KPG1_PGSHT( HGT, STATUS )
 
 *  Establish the plotting style used by the supplied Plot for drawing
-*  strings drawn with AST_TEXT. Save the current PGPLOT attribute 
+*  strings drawn with AST_TEXT. Save the current PGPLOT attribute
 *  values in ATTR.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTR, STATUS )
 
@@ -167,8 +167,8 @@
      :               STATUS )
 
 *  Ensure AST escape sequences are retained within attribute values
-*  returned by AST_GETC. We do this since we will be plotting the 
-*  strings using AST_TEXT which is able to interpret such escape 
+*  returned by AST_GETC. We do this since we will be plotting the
+*  strings using AST_TEXT which is able to interpret such escape
 *  sequences.
       OLDESC = AST_ESCAPES( 1, STATUS )
 
@@ -184,7 +184,7 @@
       POS( 1 ) = X1
       POS( 2 ) = YC
 
-*  Display each line of the key.  
+*  Display each line of the key.
       CALL AST_TEXT( IPLOT, 'Data value axis:', POS, UP, 'BL', STATUS )
       POS( 2 ) = POS( 2 ) - 1.3 * HGT
 
@@ -211,7 +211,7 @@
 
 
 
-      IF( UNIT .NE. ' ' ) THEN 
+      IF( UNIT .NE. ' ' ) THEN
          LINE = ' '
          IAT = 0
          CALL CHR_APPND( '  Unit:', LINE, IAT )
@@ -224,14 +224,14 @@
 
 
 
-      IF( LABEL .NE. ' ' ) THEN 
+      IF( LABEL .NE. ' ' ) THEN
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( '  Label:', TEXT, IAT )
          IAT = IAT + 1
          CALL CHR_APPND( LABEL, TEXT, IAT )
 
-*  Since Label is potentially long, split it up into lines of no more 
+*  Since Label is potentially long, split it up into lines of no more
 *  than LINELN characters. Add an appropriate number of spaces to the
 *  start of each line. We do not do this if the string contains any
 *  escape sequences since the CHR_LINBR does not know to exclude escape
@@ -246,17 +246,17 @@
             IAT = 0
             MORE = .TRUE.
             FIRST = .TRUE.
-            DO WHILE( MORE ) 
-               CALL CHR_LINBR( TEXT, IAT, LINE ) 
+            DO WHILE( MORE )
+               CALL CHR_LINBR( TEXT, IAT, LINE )
                IF( IAT .EQ. 0 ) THEN
                   MORE = .FALSE.
-               ELSE 
-                  XL = X1 
+               ELSE
+                  XL = X1
                   IF( FIRST ) THEN
-                     CALL AST_TEXT( IPLOT, '  '//LINE, POS, UP, 'BL', 
+                     CALL AST_TEXT( IPLOT, '  '//LINE, POS, UP, 'BL',
      :                              STATUS )
                      FIRST = .FALSE.
-                  ELSE 
+                  ELSE
                      CALL AST_TEXT( IPLOT, '    '//LINE, POS, UP, 'BL',
      :                              STATUS )
                   END IF
@@ -298,7 +298,7 @@
 
 
       SUNIT = AST_GETC( SPFRM, 'Unit', STATUS )
-      IF( SUNIT .NE. ' ' ) THEN 
+      IF( SUNIT .NE. ' ' ) THEN
          LINE = ' '
          IAT = 0
          CALL CHR_APPND( '  Unit:', LINE, IAT )
@@ -312,14 +312,14 @@
 
 
       SLABEL = AST_GETC( SPFRM, 'Label', STATUS )
-      IF( SLABEL .NE. ' ' ) THEN 
+      IF( SLABEL .NE. ' ' ) THEN
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( '  Label:', TEXT, IAT )
          IAT = IAT + 1
          CALL CHR_APPND( SLABEL, TEXT, IAT )
 
-*  Since Label is potentially long, split it up into lines of no more 
+*  Since Label is potentially long, split it up into lines of no more
 *  than LINELN characters (unless it contains any escape sequences).
          IF( INDEX( TEXT, '%' ) .NE. 0 .AND.
      :       INDEX( TEXT, '+' ) .NE. 0 ) THEN
@@ -331,17 +331,17 @@
             IAT = 0
             MORE = .TRUE.
             FIRST = .TRUE.
-            DO WHILE( MORE ) 
-               CALL CHR_LINBR( TEXT, IAT, LINE ) 
+            DO WHILE( MORE )
+               CALL CHR_LINBR( TEXT, IAT, LINE )
                IF( IAT .EQ. 0 ) THEN
                   MORE = .FALSE.
-               ELSE 
-                  XL = X1 
+               ELSE
+                  XL = X1
                   IF( FIRST ) THEN
-                     CALL AST_TEXT( IPLOT, '  '//LINE, POS, UP, 'BL', 
+                     CALL AST_TEXT( IPLOT, '  '//LINE, POS, UP, 'BL',
      :                              STATUS )
                      FIRST = .FALSE.
-                  ELSE 
+                  ELSE
                      CALL AST_TEXT( IPLOT, '    '//LINE, POS, UP, 'BL',
      :                              STATUS )
                   END IF
@@ -359,10 +359,10 @@
          IAT = 0
          CALL CHR_APPND( '  Rest frame:', LINE, IAT )
          IAT = IAT + 1
-         CALL CHR_APPND( AST_GETC( SPFRM, 'StdOfRest', STATUS ), LINE, 
+         CALL CHR_APPND( AST_GETC( SPFRM, 'StdOfRest', STATUS ), LINE,
      :                   IAT )
 
-         CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL', 
+         CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL',
      :                  STATUS )
          POS( 2 ) = POS( 2 ) - 1.3 * HGT
 
@@ -377,7 +377,7 @@
      :                     LINE, IAT )
 
 
-            CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL', 
+            CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL',
      :                     STATUS )
             POS( 2 ) = POS( 2 ) - 1.3 * HGT
             CALL AST_TEXT( IPLOT, '                 (GHz)', POS, UP,

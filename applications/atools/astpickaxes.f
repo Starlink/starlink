@@ -26,34 +26,34 @@
 *     may be copied, in any order, and additional axes with default
 *     attributes may also be included in the new Frame.
 *
-*     A Mapping that converts between the coordinate systems described 
+*     A Mapping that converts between the coordinate systems described
 *     by the two Frames may also be created.
 
 *  Usage:
 *     astpickaxes this axes map result
 
 *  ADAM Parameters:
-*     AXES() = _INTEGER (Read) 
-*        A vector of integers which lists the axes to be copied. These 
-*        should be given in the order required in the new Frame, using 
-*        the axis numbering in the original Frame (which starts at 1 
-*        for the first axis). Axes may be selected in any order, but 
-*        each may only be used once.  If additional (default) axes are 
-*        also to be included, the corresponding elements of this array 
+*     AXES() = _INTEGER (Read)
+*        A vector of integers which lists the axes to be copied. These
+*        should be given in the order required in the new Frame, using
+*        the axis numbering in the original Frame (which starts at 1
+*        for the first axis). Axes may be selected in any order, but
+*        each may only be used once.  If additional (default) axes are
+*        also to be included, the corresponding elements of this array
 *        should be set to zero.
 *     MAP = LITERAL (Read)
-*        A text file to receive a new Mapping. This will be a PermMap 
-*        (or a UnitMap as a special case) that describes the axis 
-*        permutation that has taken place between the original and new 
-*        Frames. The Mapping's forward transformation will convert 
-*        coordinates from the original Frame into the new one, and vice 
-*        versa. If this Mapping is not required, a null (!) value may be 
+*        A text file to receive a new Mapping. This will be a PermMap
+*        (or a UnitMap as a special case) that describes the axis
+*        permutation that has taken place between the original and new
+*        Frames. The Mapping's forward transformation will convert
+*        coordinates from the original Frame into the new one, and vice
+*        versa. If this Mapping is not required, a null (!) value may be
 *        supplied for this parameter. [!]
 *     RESULT = LITERAL (Read)
-*        A text file to receive the new Frame. 
+*        A text file to receive the new Frame.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the original FrameSet to which a 
-*        new Frame is to be added. If an NDF is supplied, the current 
+*        An NDF or text file holding the original FrameSet to which a
+*        new Frame is to be added. If an NDF is supplied, the current
 *        Frame of the WCS FrameSet will be used.
 
 *  Copyright:
@@ -95,8 +95,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Status:
       INTEGER STATUS
@@ -112,27 +112,27 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL KPG1_GTOBJ( 'THIS', 'Frame or FrameSet', AST_ISAFRAME, THIS, 
+      CALL KPG1_GTOBJ( 'THIS', 'Frame or FrameSet', AST_ISAFRAME, THIS,
      :                 STATUS )
 
 *  Get the axis indices for the new frame
-      CALL PAR_GET1I( 'AXES', NDF__MXDIM, AXES, NAXES, STATUS ) 
+      CALL PAR_GET1I( 'AXES', NDF__MXDIM, AXES, NAXES, STATUS )
 
 *  Create the new Frame.
       RESULT = AST_PICKAXES( THIS, NAXES, AXES, MAP, STATUS )
 
 *  If succesful, write the Mapping out if required.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          CALL ATL1_PTOBJ( 'MAP', ' ', MAP, STATUS )
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-      END IF       
+      END IF
 
 *  Write the new Frame out.
       CALL ATL1_PTOBJ( 'RESULT', 'THIS', RESULT, STATUS )

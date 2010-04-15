@@ -1,4 +1,4 @@
-      SUBROUTINE CAP_GIDS (CIIN, CIOUT, NAMIN, NAMOUT, MAXCOL, TCOLS, 
+      SUBROUTINE CAP_GIDS (CIIN, CIOUT, NAMIN, NAMOUT, MAXCOL, TCOLS,
      :  COLNAM, COLIDS, NCOLS, FIIN, FIOUT, STATUS)
 *+
 *  Name:
@@ -190,9 +190,9 @@
 *                Inquire the values of all the attributes of the
 *                corresponding column in the input catalogue.
 
-                  CALL CAT_CINQ (FIINC, 10, FCI, FNAME, FGENUS, FEXPR, 
+                  CALL CAT_CINQ (FIINC, 10, FCI, FNAME, FGENUS, FEXPR,
      :              FDTYPE, FCSIZE,FDIMS, FSIZEA, FNULL, FXCEPT, FSCALE,
-     :              FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM, 
+     :              FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM,
      :              FDATE, STATUS)
 
 *
@@ -205,7 +205,7 @@
      :              FIOUTC, STATUS)
 
 *
-*                Set the mutable attributes of this column to correspond 
+*                Set the mutable attributes of this column to correspond
 *                to the input column.  Note that the 'ORDER' attribute is
 *                forced to be unordered.
 

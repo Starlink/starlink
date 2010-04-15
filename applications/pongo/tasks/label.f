@@ -39,7 +39,7 @@
 *        value " " is used.
 *     TITLE = _CHAR (Read and Write)
 *        The plot title.
-*        
+*
 *        [The value of the global parameter PONGO_TITLE is used. If
 *        PONGO_TITLE is not defined, the value " " is used.]
 *     COLUMNS = _LOGICAL (Read)
@@ -65,7 +65,7 @@
 *     20-JUN-1994 (PDRAPER):
 *        Added check for device open.
 *     9-MAY-1997 (PDRAPER):
-*        Modified so that ! for XLABEL or YLABEL when 
+*        Modified so that ! for XLABEL or YLABEL when
 *        COLUMNS is TRUE also uses stored labels (IRAF).
 *     {enter_further_changes_here}
 
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +91,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       LOGICAL COLS               ! COLUMNS parameter value
 
@@ -105,7 +105,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  See if the device is open....
-      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN 
+      IF ( PON_DEVOP( .TRUE., STATUS ) ) THEN
          CALL PAR_GET0L( 'COLUMNS', COLS, STATUS )
 
          IF ( COLS ) THEN
@@ -114,19 +114,19 @@
             CALL PAR_DEF0C( 'XLABEL', COLLAB( XCOL ), STATUS )
             CALL PAR_DEF0C( 'YLABEL', COLLAB( YCOL ), STATUS )
          END IF
-         IF ( STATUS .EQ. SAI__OK ) THEN 
+         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Otherwise use the labels specified.
             CALL ERR_MARK
             CALL PAR_GET0C( 'XLABEL', XLABEL, STATUS )
-            IF ( STATUS .EQ. PAR__NULL .AND. COLS ) THEN 
+            IF ( STATUS .EQ. PAR__NULL .AND. COLS ) THEN
                CALL ERR_ANNUL( STATUS )
-               XLABEL = COLLAB( XCOL ) 
+               XLABEL = COLLAB( XCOL )
             END IF
             CALL PAR_GET0C( 'YLABEL', YLABEL, STATUS )
-            IF ( STATUS .EQ. PAR__NULL .AND. COLS ) THEN 
+            IF ( STATUS .EQ. PAR__NULL .AND. COLS ) THEN
                CALL ERR_ANNUL( STATUS )
-               YLABEL = COLLAB( YCOL ) 
+               YLABEL = COLLAB( YCOL )
             END IF
             CALL ERR_RLSE
             CALL PAR_GET0C( 'TITLE', TITLE, STATUS )
@@ -139,7 +139,7 @@
       END IF
 
 *  Issue error report on failure of routine.
-      IF ( STATUS .NE. SAI__OK ) THEN 
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'LABEL_END',
      :        'LABEL: Unable to plot the labels.', STATUS )
       END IF

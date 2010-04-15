@@ -84,14 +84,14 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check if we are running from TCL. This is assumed to be if the 
+*  Check if we are running from TCL. This is assumed to be if the
 *  ADAM_TASK_TYPE environment variable is set to I.
       CALL PSX_GETENV( 'ADAM_TASK_TYPE', MODE, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
          MODE = ' '
       END IF
-      IF ( MODE .EQ. 'I' ) THEN 
+      IF ( MODE .EQ. 'I' ) THEN
          CCD1_HVUSR = .FALSE.
       ELSE
 

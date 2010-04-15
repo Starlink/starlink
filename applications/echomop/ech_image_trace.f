@@ -119,7 +119,7 @@
      :           POLYNOMIALS( 1, IORD ), X_TRACE_COORD, Y_TRACE_COORD,
      :           STATUS )
             IF ( STATUS .EQ. 0 ) THEN
-              
+
 *        "Hilight" the trace path in the image.
                DO I = 1, NX
                   IY = INT( Y_TRACE_COORD( I ) + 0.5 )

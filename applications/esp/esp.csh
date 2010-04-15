@@ -13,11 +13,11 @@
 #     esp
 #
 #  Description:
-#     This procedure defining the links needed to execute 
+#     This procedure defining the links needed to execute
 #     each application from the current directory.
 #
 #  Notes:
-#     The installation target is set outside of this script. 
+#     The installation target is set outside of this script.
 #     A test is made to see if the environment variable INSTALL
 #     has been set.
 #

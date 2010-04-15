@@ -459,7 +459,7 @@ itcl::class gaia3d::Gaia3dTool {
 
       #  Apply the CUPID pixelmask. Note the stencil of the Gaia3dVtkCubeData
       #  should be used as the input connection for subclasses when this is
-      #  active. 
+      #  active.
       itk_component add applymask {
          gaia::StarLabelCheck $itk_component(controls).applymask \
             -text "Apply mask:" \

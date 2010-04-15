@@ -32,7 +32,7 @@
 *     AST_PICKAXES
 *     AST_RESOLVE
 *     AST_SETACTIVEUNIT
-*     AST_UNFORMAT         
+*     AST_UNFORMAT
 
 *  Copyright:
 *     Copyright (C) 1997-2009 Council for the Central Laboratory of the
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -333,7 +333,7 @@ F77_SUBROUTINE(ast_setactiveunit)( INTEGER(THIS),
 
    astAt( "AST_SETACTIVEUNIT", NULL, 0 );
    astWatchSTATUS(
-      astSetActiveUnit( astI2P( *THIS ), F77_ISTRUE( *VALUE ) ? 1 : 0 );   
+      astSetActiveUnit( astI2P( *THIS ), F77_ISTRUE( *VALUE ) ? 1 : 0 );
    )
 }
 
@@ -345,7 +345,7 @@ F77_SUBROUTINE(ast_norm)( INTEGER(THIS),
 
    astAt( "AST_NORM", NULL, 0 );
    astWatchSTATUS(
-      astNorm( astI2P( *THIS ), VALUE );   
+      astNorm( astI2P( *THIS ), VALUE );
    )
 }
 
@@ -479,7 +479,7 @@ F77_INTEGER_FUNCTION(ast_unformat)( INTEGER(THIS),
    astAt( "AST_UNFORMAT", NULL, 0 );
    astWatchSTATUS(
       string = astString( STRING, STRING_length );
-      
+
       RESULT = astUnformat( astI2P( *THIS ), *AXIS, string, &value );
       *VALUE = value;
       (void) astFree( string );

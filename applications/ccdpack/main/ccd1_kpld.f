@@ -13,12 +13,12 @@
 *     CALL CCD1_KPLD( PARAM, KEY, STATUS )
 
 *  Description:
-*     This routine loads the version of a globally associated 
-*     parameter keyed by an integer value into the GLOBAL ADAM 
-*     parameter file.  It should be called before a key-senstive 
+*     This routine loads the version of a globally associated
+*     parameter keyed by an integer value into the GLOBAL ADAM
+*     parameter file.  It should be called before a key-senstive
 *     parameter with a READ global association is accessed for reading.
 *     If no value exists for the requested key (because it has not
-*     been stored using a previous corresponding invocation of 
+*     been stored using a previous corresponding invocation of
 *     CCD1_KPSV), then no action is taken.  The routine should not
 *     be called more than once with the same value of PARAM and KEY
 *     during the same task, or it may result in asking the user
@@ -26,8 +26,8 @@
 *
 *     The routine is essentially abusing the ADAM parameter system in
 *     order to do what it has to, and does a number of not-entirely-
-*     recommended things.  It first ensures that the parameter 
-*     system believes it has not solicited the value of the 
+*     recommended things.  It first ensures that the parameter
+*     system believes it has not solicited the value of the
 *     variable in question, and secondly inserts the appropriate
 *     keyed parameter value into the GLOBAL parameter file, so
 *     that a subsequent PAR_GET will retrieve a value as if that's
@@ -46,8 +46,8 @@
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        Name of the parameter in question.  If the value ' ' is 
-*        supplied, then instead of the routine's normal behaviour 
+*        Name of the parameter in question.  If the value ' ' is
+*        supplied, then instead of the routine's normal behaviour
 *        the info blocks will be initialised and no other action
 *        will be taken.
 *     KEY = INTEGER (Given)
@@ -59,7 +59,7 @@
 
 *  Notes:
 *     The keyed values are stored in the same ADAM parameter file
-*     as the variables which PAR looks for them in, within a 
+*     as the variables which PAR looks for them in, within a
 *     structure called CCDPACK_KEYPARS.
 *
 *     Meticulous explicit error processing is not undertaken in this
@@ -110,7 +110,7 @@
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER KEY
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -176,7 +176,7 @@
 *  Check we have enough space to expand the info block.
          IF ( NPARAM .GE. MAXPAR ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'CCD1_KPLD_TOOMANY', 
+            CALL ERR_REP( 'CCD1_KPLD_TOOMANY',
      :      'CCD1_KPLD: Maximum number of keyed variables exceeded' //
      :      '(programming error)', STATUS )
             GO TO 99
@@ -200,7 +200,7 @@
          CALL SUBPAR_STATE( PCODE( IPARAM ), ISTATE( IPARAM ), STATUS )
 
 *  We have encountered this parameter before (presumably for a different
-*  KEY value), so the chances are it has already been solicited by 
+*  KEY value), so the chances are it has already been solicited by
 *  the parameter system and needs restoring to its initial SUBPAR state.
       ELSE
          CALL SUBPAR_INIT( PCODE( IPARAM ), ISTATE( IPARAM ), STATUS )

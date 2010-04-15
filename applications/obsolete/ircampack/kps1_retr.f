@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -64,7 +64,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the required value from the supplied data array at the supplied 
+*  Get the required value from the supplied data array at the supplied
 *  index.
       VALUE = DATA( INDEX )
 

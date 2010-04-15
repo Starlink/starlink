@@ -11,24 +11,24 @@
 #     C-shell script.
 #
 #  Usage:
-#     velmoment [-b string] [-c number] [-ci index] [-i filename] 
-#               [-o filename] [-p] [-r number] [-s system] [-z/+z] 
+#     velmoment [-b string] [-c number] [-ci index] [-i filename]
+#               [-o filename] [-p] [-r number] [-s system] [-z/+z]
 #
 #  Description:
 #     This shell script processes a three-dimensional IFU NDF to form
-#     a velocity map.  
+#     a velocity map.
 #
-#     If you request zooming the script first presents you with a 
-#     white-light image of the cube.  You can then select the lower 
+#     If you request zooming the script first presents you with a
+#     white-light image of the cube.  You can then select the lower
 #     and upper spatial limits to plot using the cursor.  You can
-#     instead supply an NDF section with the filename to define both 
+#     instead supply an NDF section with the filename to define both
 #     spatial and spectral limits to analyse, and from which to create
 #     the output velocity map.  You may average spectra in the chosen
 #     region by specifying compression factors in the spatial domain.
 
 #     The script then derives the intensity weighted co-ordinate of
-#     each spatially averaged spectrum, and converts the data units 
-#     into a velocity.  You may view this image drawn with a key 
+#     each spatially averaged spectrum, and converts the data units
+#     into a velocity.  You may view this image drawn with a key
 #     (option -d), and overlay a contour plot of the white-light image
 #     (option -c).
 #
@@ -42,23 +42,23 @@
 #       Number of contours in the white-light image.  Set to fewer
 #       than 1 means no contours are overlaid.  [15]
 #     -ci index
-#       The palette colour index of the contours.  It should be an 
+#       The palette colour index of the contours.  It should be an
 #       integer in the range 0 to 15.  It is best to choose an index
 #       corresponding to white, or black or another dark colour to make
 #       the contours stand out from other elements of the plot.  0 is
 #       the background colour.  KAPPA:GDSTATE will list the current
 #       palette colours.  [0]
 #     -i filename
-#       The script will use this as its input file, the specified file 
-#       should be a three-dimensional NDF.  By default the script will 
+#       The script will use this as its input file, the specified file
+#       should be a three-dimensional NDF.  By default the script will
 #       prompt for the input file.  If there are multiple spectral lines
 #       present, you should supply an NDF section after the name to
-#       restrict the spectral range analysed to a specific line and 
+#       restrict the spectral range analysed to a specific line and
 #       its environs.
 #     -o filename
 #       The filename for the output NDF of the velocity map.
 #     -p
-#       The script will plot the final image map to the current display 
+#       The script will plot the final image map to the current display
 #       as well as saving it to an NDF file.  Additionally it will over-
 #       plot the white-light image as a contour map for comparison.  [FALSE]
 #     -r number
@@ -70,31 +70,31 @@
 #          "ZOPT" -- redshift; and
 #          "VELO" -- relativistic velocity.
 #       If you supply any other value, the default is used.  ["VOPT"]
-#     -z 
+#     -z
 #       The script will automatically prompt to select a region to zoom
 #       before prompting for the region of interest.  [TRUE]
-#     +z 
+#     +z
 #       The program will not prompt for a zoom before requesting the region
 #       of interest. [FALSE]
 #
 #  Notes:
 #     -  The compression is trimmed, so that only compression-factor
-#     multiples of original pixels are included in the plot. 
+#     multiples of original pixels are included in the plot.
 #     -  The spatial averaging is aligned to obtain the expected number
 #     of pixels irrespective of the pixel origin of the input cube.
 #     Note that this may not be suitable if you wish to preserve alignment
-#     with another compressed dataset.  See KAPPA:COMPAVE parameter ALIGN 
+#     with another compressed dataset.  See KAPPA:COMPAVE parameter ALIGN
 #     for more details.
 #     -  The velocity map display scales between the 2 and 98 percentiles.
 #     The map uses a false-colour spectrum-like colour table so that
-#     low-velocity regions appear in blue and high-velocity regions 
+#     low-velocity regions appear in blue and high-velocity regions
 #     appear in red.
 #     -  If the cube is compressed spatially, so is the contour map.
 #     -  For NDFs in the UK data-cube format, where there is no SPECTRUM
-#     or DSBSPECTRUM Domain in the WCS Frames, the data are first 
-#     collapsed in their native wavelengths in Angstrom, then the pixel 
-#     values are converted to VOPT using the simple formula 
-#     c * (w -R) / R, where w is the intensity-weighted wavelength, R is 
+#     or DSBSPECTRUM Domain in the WCS Frames, the data are first
+#     collapsed in their native wavelengths in Angstrom, then the pixel
+#     values are converted to VOPT using the simple formula
+#     c * (w -R) / R, where w is the intensity-weighted wavelength, R is
 #     the rest-frame wavelength for the chosen spectral line, and c is the
 #     velocity of light in km/s.
 #
@@ -110,7 +110,7 @@
 #       Original version.
 #     2006 March 9 (MJC):
 #       Added -ci option.  Corrected the NDF name extraction when both
-#       the file extension and an NDF section are supplied; this is via 
+#       the file extension and an NDF section are supplied; this is via
 #       the new checkndf script that also checks for a degenerate third
 #       axis.
 #     2006 March 16 (MJC):
@@ -119,7 +119,7 @@
 #       for the contour plot so that its co-ordinate system matches
 #       the velocity map.  Retain any supplied spectral-axis section
 #       if a spatial region is selected by cursor.  Corrected the logic
-#       when deciding whether or not to create a new SpecFrame. 
+#       when deciding whether or not to create a new SpecFrame.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -171,7 +171,7 @@ while ( $#args > 0 )
       set gotcmp = "TRUE"
       set cmpstring = $args[1]
       shift args
-      breaksw      
+      breaksw
    case -c:    # Number of contours
       shift args
       set numcont = $args[1]
@@ -220,15 +220,15 @@ while ( $#args > 0 )
    case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
-      breaksw 
+      breaksw
    case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
-      breaksw                            
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
-   endsw  
+   endsw
 end
 
 # Do the package setup.
@@ -245,7 +245,7 @@ if ( $gotcmp == "FALSE" ) then
 endif
 
 # Extract the compression factors.
-set cmpfactors = `echo $cmpstring | awk 'BEGIN {FS=","}{print $1, $2}'` 
+set cmpfactors = `echo $cmpstring | awk 'BEGIN {FS=","}{print $1, $2}'`
 if ( $#cmpfactors == 1 ) then
    set cmpfactors = ( $cmpfactors[1] $cmpfactors[1] )
 endif
@@ -257,7 +257,7 @@ endif
 
 # See if we actually need to compress.
 set blockave = "FALSE"
-if ( $cmpfactors[1] > 1 ||  $cmpfactors[1] > 1 ) then 
+if ( $cmpfactors[1] > 1 ||  $cmpfactors[1] > 1 ) then
    set blockave = "TRUE"
    set cmpfac = "${cmpfactors[1]},${cmpfactors[2]},1"
 endif
@@ -326,7 +326,7 @@ if ( $change_frame == "TRUE" ) then
          echo "WCS Domain, or it is not in the UK data-cube format.  There"
          echo "is insufficient information to convert the current WCS Frame"
          echo "to one of these and hence transform the spectral axis"
-         echo "co-ordinates to type wavelength to calculate velocities."      
+         echo "co-ordinates to type wavelength to calculate velocities."
          echo " "
 
          if ( "$slabel" == "" ) then
@@ -374,7 +374,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" || \
    echo " "
    echo "      Collapsing:"
    echo "        White-light image: ${dims[1]} x ${dims[2]}"
-   collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
+   collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 endif
 
 if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
@@ -383,7 +383,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    gdclear device=${plotdev}
    paldef device=${plotdev}
    lutgrey device=${plotdev}
-   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
+   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null
 
 # Get the lower limit.
 # --------------------
@@ -413,7 +413,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    set yl = `calc exp="min($y1,$y2)" prec=_REAL`
    set xu = `calc exp="max($x1,$x2)" prec=_REAL`
    set yu = `calc exp="max($y1,$y2)" prec=_REAL`
-   
+
    echo " "
    echo "      Zooming:"
    echo "      Extracting:"
@@ -501,7 +501,7 @@ if ( ${create_specframe} == "FALSE" ) then
                 "newval='${rest_coord} ${sunits}'" >& /dev/null
    endif
 
-# Reset the System of the current WCS Frame to velocities in the desired 
+# Reset the System of the current WCS Frame to velocities in the desired
 # system.
    wcsattrib "ndf=${cmpfile} mode=set name=System(3) newval=${velsys}"
 endif
@@ -521,23 +521,23 @@ set cdims = `parget dims ndftrace`
 
 echo "      Collapsing:"
 echo "        Intensity-weighted co-ordinate image: ${cdims[1]} x ${cdims[2]}"
-collapse "in=${cmpfile} out=${outfile} axis=3 estimator=iwc" >& /dev/null 
+collapse "in=${cmpfile} out=${outfile} axis=3 estimator=iwc" >& /dev/null
 settitle "ndf=${outfile} title='Intensity-weighted spectral co-ordinate Image'"
 
 # If the supplied NDF was in UK data-cube format and there was no
 # SPECTRUM Domain, the collapsed data will be in the Wavelength system.
 # There are two ways to handle this state.
 #
-# The first is to create a new SpecFrame.  As we have a cube, it would 
+# The first is to create a new SpecFrame.  As we have a cube, it would
 # require ATOOLS  to form a new Compound Frame with some arbitrary spatial
-# co-ordinates and a SpecFrame, both unit mapped from the AXIS Domain 
+# co-ordinates and a SpecFrame, both unit mapped from the AXIS Domain
 # before collapsing.
 #
 # The alternative is to modify the values and units post collapse.
 # This is more restrictive in that it's practicable to offer only
-# a limited selection of velocity systems.  At present the 
-# earlier test for a missing SpecFrame only occurs for a UK data-cube 
-# format with LAMBDA as the label, with Angstrom units so the 
+# a limited selection of velocity systems.  At present the
+# earlier test for a missing SpecFrame only occurs for a UK data-cube
+# format with LAMBDA as the label, with Angstrom units so the
 # converted system is VOPT.
 if ( $create_specframe == "TRUE" ) then
     setenv KAPPA_REPLACE 1
@@ -564,20 +564,20 @@ if ( $plotmap == "TRUE" ) then
 
 # A wild stab at a value.  This may need revision in practice with
 # larger velocities.  Ideally we'd like to place the label to the right
-# of the key, but it's not obvious how to obtain the length of the 
-# velocity-axis numerical annotations including any decimal places. 
+# of the key, but it's not obvious how to obtain the length of the
+# velocity-axis numerical annotations including any decimal places.
 # The limiting values are insufficient.
    set gap = 0.4
 
 # Use a spectral colour table terminating with blue and red.
    lutspec device=${plotdev}
    echo "      Plotting:"
-   echo "        Display: Velocity map using percentile scaling." 
+   echo "        Display: Velocity map using percentile scaling."
    display "${outfile} device=${plotdev} mode=per percentiles=[2,98]"\
            "axes=yes margin=! key keypos=${keyoff} " \
            keystyle="'TextLab(1)=1,TextLabGap(1)=${gap},Label(1)=Velocity in ${vunits}'" >& /dev/null
    if ( $drawcontours == "TRUE" ) then
-      echo "        Contour: White-light image with equally spaced contours." 
+      echo "        Contour: White-light image with equally spaced contours."
       contour "ndf=${colfile} device=${plotdev} clear=no mode=equa"\
               "keypos=[0.015,1] keystyle='Digits(2)=4,Size=1.2' "\
               "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
@@ -588,5 +588,5 @@ endif
 # =========
 cleanup:
 
-rm -f ${tmpdir}/${user}/velmom* >& /dev/null     
+rm -f ${tmpdir}/${user}/velmom* >& /dev/null
 rmdir ${tmpdir}/${user} >& /dev/null

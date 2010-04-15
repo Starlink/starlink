@@ -22,11 +22,11 @@ C     CALL DSA_ADD_STRUCTURE (REF_NAME,ELEMENT_ID,TYPE_ID,STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) REF_NAME      (Fixed string,descr) The reference name 
+C     (>) REF_NAME      (Fixed string,descr) The reference name
 C                       associated with the structure.
 C     (>) ELEMENT_ID    (Fixed string,descr) The element identifier
 C                       for the sub-structure to be created.
-C     (>) TYPE_ID       (Fixed string,descr) The type of structure to 
+C     (>) TYPE_ID       (Fixed string,descr) The type of structure to
 C                       be created.  This is a type identifier as
 C                       defined in the structure definition file,
 C                       not the specific data system type (although

@@ -1,10 +1,10 @@
 /*+
  *  Name:
  *     hdrCopy
- 
+
  *  Purpose:
  *    Copy header information from one image to another.
- 
+
  *  Language:
  *     ANSI C
 
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,7 +88,7 @@ void hdrCopy( char *param1,
     DECLARE_CHARACTER_DYN(fparam2);
     DECLARE_CHARACTER_DYN(fxname2);
     DECLARE_INTEGER(fstatus);
-    
+
     F77_CREATE_CHARACTER(fparam1,strlen( param1 ));
     F77_EXPORT_CHARACTER(param1,fparam1,fparam1_length);
     F77_CREATE_CHARACTER(fxname1,strlen( xname1 ));
@@ -98,7 +98,7 @@ void hdrCopy( char *param1,
     F77_CREATE_CHARACTER(fxname2,strlen( xname2 ));
     F77_EXPORT_CHARACTER(xname2,fxname2,fxname2_length);
     F77_EXPORT_INTEGER(*status,fstatus);
-    
+
     F77_CALL(hdr_copy)( CHARACTER_ARG(fparam1),
                         CHARACTER_ARG(fxname1),
                         CHARACTER_ARG(fparam2),
@@ -108,13 +108,13 @@ void hdrCopy( char *param1,
                         TRAIL_ARG(fxname1)
                         TRAIL_ARG(fparam2)
                         TRAIL_ARG(fxname2) );
-    
+
     F77_FREE_CHARACTER(fparam1);
     F77_FREE_CHARACTER(fxname1);
     F77_FREE_CHARACTER(fparam2);
     F77_FREE_CHARACTER(fxname2);
     F77_IMPORT_INTEGER(fstatus,*status);
-    
+
     return;
 }
 /* $Id$ */

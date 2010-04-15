@@ -1,4 +1,4 @@
-/* 
+/*
  * tkAppInit.c --
  *
  *	Provides a default version of the Tcl_AppInit procedure for
@@ -37,7 +37,7 @@ EXTERN int		Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 /*
  *----------------------------------------------------------------------
  * Declare functions defining new Tcl commands which we will define in
- * Tcl_AppInit.  Doing this ensures that they have the correct 
+ * Tcl_AppInit.  Doing this ensures that they have the correct
  * declaration where defined.
  *----------------------------------------------------------------------
  */
@@ -137,7 +137,7 @@ Tcl_AppInit(interp)
     Tcl_StaticPackage(interp, "Tcladam", Tcladam_Init, (Tcl_PackageInitProc *) NULL);
 #if HAVE_BLT
     Tcl_StaticPackage(interp, "Blt", Blt_Init, (Tcl_PackageInitProc *) NULL);
-#else 
+#else
 /* Only one routine in BLT is actually used (blt::busy), replace with a dummy */
     if ( Tcl_Eval( interp, "namespace eval blt { proc busy { args } { } }" )
          == TCL_ERROR ) {
@@ -196,7 +196,7 @@ Tcl_AppInit(interp)
 
     if ( ( ccdpackdir = getenv( "CCDPACK_DIR" ) ) != NULL ) {
        Tcl_SetVar( interp, "tcl_rcFileName", ccdpackdir, TCL_GLOBAL_ONLY );
-       Tcl_SetVar( interp, "tcl_rcFileName", "/ccdwishrc", TCL_GLOBAL_ONLY | 
+       Tcl_SetVar( interp, "tcl_rcFileName", "/ccdwishrc", TCL_GLOBAL_ONLY |
                                                            TCL_APPEND_VALUE );
     }
     return TCL_OK;

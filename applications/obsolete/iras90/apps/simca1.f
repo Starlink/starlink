@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,7 +97,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
-      INCLUDE 'I90_DAT'          ! IRAS90 data 
+      INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'IRC_PAR'          ! IRC_ constants
 
@@ -118,7 +118,7 @@
       INTEGER NY
       INTEGER IPPWG( NX, NY )
       INTEGER IPPWG2
-      
+
 *  Arguments Returned:
       INTEGER DGOOD
       INTEGER DUSED( I90__DETS )
@@ -151,7 +151,7 @@
 
       LOGICAL NEW                ! True if a new CRDD file is being
                                  ! processed.
-                                 
+
 
       REAL C2( 6 )               ! Coefficients of the linear
                                  ! transformation from PSF pixel indices

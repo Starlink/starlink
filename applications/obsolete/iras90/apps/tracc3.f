@@ -38,7 +38,7 @@
 *  Arguments:
 *     NDFIN = INTEGER (Given)
 *        The NDF identifier for the input CRDD file. This should have
-*        UPDATE access. 
+*        UPDATE access.
 *     BSMP = INTEGER (Given)
 *        Begin index of the samples of the input CRDD data array.
 *     ESMP = INTEGER (Given)
@@ -46,7 +46,7 @@
 *     BDET = INTEGER (Given)
 *        Begin index of the detector of the input CRDD data array.
 *     EDET = INTEGER (Given)
-*        End index of the detector of the input CRDD data array.  
+*        End index of the detector of the input CRDD data array.
 *     INSCN( BSMP : ESMP, BDET : EDET ) = REAL (Given)
 *        The in-scan distance of each sample of each CRDD data trace.
 *     DATA( BSMP : ESMP, BDET : EDET ) = REAL (Given)
@@ -104,7 +104,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -131,11 +131,11 @@
       REAL XLMT( 2 )
       REAL YLMT( 2 )
       INTEGER IDC
-      CHARACTER PQNAME*(*) 
-      CHARACTER PXNAME*(*) 
-      CHARACTER PXTYPE*(*) 
-      CHARACTER PQCOMM*(*) 
-      CHARACTER PHIST*(*) 
+      CHARACTER PQNAME*(*)
+      CHARACTER PXNAME*(*)
+      CHARACTER PXTYPE*(*)
+      CHARACTER PQCOMM*(*)
+      CHARACTER PHIST*(*)
       LOGICAL COLOUR
       LOGICAL CURSOR
       LOGICAL CLRBLK
@@ -185,7 +185,7 @@
 
 *  Allow the user to select the samples which are to be assigned a
 *  quality. The mask is returned holding VAL__BADR at all selected
-*  samples, and zero for all other samples. The selected samples are 
+*  samples, and zero for all other samples. The selected samples are
 *  hightlighted on the display by being re-drawn in pen 2.
       CALL TRACC4( BSMP, ESMP, BDET, EDET, INSCN, DATA, NDISP, OFFSET,
      :             DTINDX, SCALE, XLMT, YLMT, IDC, COLOUR, CURSOR,
@@ -208,16 +208,16 @@
 *  information is found, then an error is reported.
       CALL IRQ_FIND( NDFIN, LOCS, XNAME, STATUS )
 
-*  If existing quality information was found, tell the user which 
+*  If existing quality information was found, tell the user which
 *  extension it came from.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL MSG_SETC( 'X', XNAME )
-         CALL MSG_OUTIF( MSG__VERB, 'TRACC3_MSG1', 
+         CALL MSG_OUTIF( MSG__VERB, 'TRACC3_MSG1',
      :            '  Using quality names defined in NDF extension "^X"',
      :                   STATUS )
-   
-*  If no quality name information was found, annul the error and 
-*  determine the name of the NDF extension which is to hold such 
+
+*  If no quality name information was found, annul the error and
+*  determine the name of the NDF extension which is to hold such
 *  information.
       ELSE
          CALL ERR_ANNUL( STATUS )
@@ -243,7 +243,7 @@
 
       END IF
 
-*  Attempt to find the quality name within the NDF. 
+*  Attempt to find the quality name within the NDF.
       CALL IRQ_GETQN( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT, STATUS )
 
 *  If the name does not exist, annul the error, get an associated
@@ -261,7 +261,7 @@
 
          CALL MSG_SETC( 'QN', QNAME )
          CALL NDF_MSG( 'NDF', NDFIN )
-         CALL MSG_OUTIF( MSG__NORM, 'TRACC3_MSG2', 
+         CALL MSG_OUTIF( MSG__NORM, 'TRACC3_MSG2',
      :               '  Definition of quality name "^QN" added to ^NDF',
      :                   STATUS )
 
@@ -270,7 +270,7 @@
 
          CALL MSG_SETC( 'QN', QNAME )
          CALL MSG_SETC( 'COM', COMMNT )
-         CALL MSG_OUTIF( MSG__NORM, 'TRACC3_MSG3', 
+         CALL MSG_OUTIF( MSG__NORM, 'TRACC3_MSG3',
      :        '  Using pre-existing definition of quality "^QN" - ^COM',
      :                  STATUS )
 
@@ -287,12 +287,12 @@
 
       IF( QADDED ) THEN
          CALL MSG_OUTIF( MSG__NORM, 'TRACC3_MSG4',
-     :                   '  ^SET pixels hold the quality "^QN"', 
+     :                   '  ^SET pixels hold the quality "^QN"',
      :                   STATUS )
 
       ELSE
          CALL MSG_OUTIF( MSG__NORM, 'TRACC3_MSG5',
-     :                   '  ^SET pixels now hold the quality "^QN"', 
+     :                   '  ^SET pixels now hold the quality "^QN"',
      :                   STATUS )
 
       END IF
@@ -306,7 +306,7 @@
 
 *  If an error has occured, attempt to remove the quality name if it
 *  has been created by this application.
-      IF( QADDED .AND. STATUS .NE. SAI__OK ) THEN      
+      IF( QADDED .AND. STATUS .NE. SAI__OK ) THEN
          CALL ERR_BEGIN( STATUS )
          CALL IRQ_REMQN( LOCS, QNAME, STATUS )
          CALL ERR_END( STATUS )

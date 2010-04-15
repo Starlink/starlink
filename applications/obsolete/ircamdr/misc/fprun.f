@@ -16,7 +16,7 @@
 
 	do jj = fps, fpe, fpi
 	  call chr_itoc( jj, fpj, nc)
-	  l1 = chr_len( fpj) 
+	  l1 = chr_len( fpj)
 	  fpstring = 'fpz '//fpj( 1:l1)
 	  write( 142, '(a)') fpstring
 	  fpstring = 'object'
@@ -25,4 +25,4 @@
 
 	close( 142)
 
-	end 
+	end

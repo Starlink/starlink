@@ -6,10 +6,10 @@ C+
       LOGICAL UNUSED
 C
 C Return the digitization coordinates of a character. Each character is
-C defined on a grid with X and Y coordinates in the range (-49,49), 
+C defined on a grid with X and Y coordinates in the range (-49,49),
 C with the origin (0,0) at the center of the character.  The coordinate
 C system is right-handed, with X positive to the right, and Y positive
-C upward.  
+C upward.
 C
 C Arguments:
 C  SYMBOL (input)  : symbol number in range (1..3000).
@@ -19,9 +19,9 @@ C                    XYGRID(3)).  Width range = (XYGRID(4),XYGRID(5)).
 C                    (X,Y) = (XYGRID(K),XYGRID(K+1)) (K=6,8,...).
 C  UNUSED (output) : receives .TRUE. if SYMBOL is an unused symbol
 C                    number. A character of normal height and zero width
-C                    is returned. Receives .FALSE. if SYMBOL is a 
+C                    is returned. Receives .FALSE. if SYMBOL is a
 C                    valid symbol number.
-C 
+C
 C The height range consists of 3 values: (minimum Y, baseline Y,
 C maximum Y).  The first is reached by descenders on lower-case g, p,
 C q, and y.  The second is the bottom of upper-case letters.  The third
@@ -29,7 +29,7 @@ C is the top of upper-case letters.  A coordinate pair (-64,0) requests
 C a pen raise, and a pair (-64,-64) terminates the coordinate list. It
 C is assumed that movement to the first coordinate position will be
 C done with the pen raised - no raise command is explicitly included to
-C do this. 
+C do this.
 C--
 C  7-Mar-1983.
 C 15-Dec-1988 - standardize.

@@ -1,7 +1,7 @@
 *+HRI_SENS         Gives estimated sensitivity for given exposure
       REAL FUNCTION HRI_SENS(SIGMA, BCELL,TSEC)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       REAL SIGMA
       REAL BCELL

@@ -34,7 +34,7 @@
 *     rpt: Remo Tilanus (JACH)
 *     timj:Tim Jenness  (JACH)
 *     {enter_new_authors_here}
- 
+
 * History:
 *     Ages ago (rpt):
 *          dasmerge.spx script written
@@ -50,13 +50,13 @@
 *          an identical variable can be supplied as an argument for
 *          ADJQUAD and WIDEBAND.
 *     {enter_further_changes_here}
- 
+
 *
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -65,7 +65,7 @@
       LOGICAL ADJQUAD           ! Adjust quadrant offsets?
       LOGICAL WIDEBAND          ! Wideband mode?
 
- 
+
 * Local variables:
       INTEGER FINC               ! Frequency increment (Hz)
       INTEGER FI                 ! DUMMY
@@ -100,16 +100,16 @@
          ELSE
             FI = NQUAD / 2
          END IF
-         
-         FEDGE(1) = ( 1000.0 * REAL( JFCEN(FI-1) ) ) + 
+
+         FEDGE(1) = ( 1000.0 * REAL( JFCEN(FI-1) ) ) +
      +        ( REAL(FINC) * REAL( NPTS(FI-1) - 1 ) / 2.0 )
-         FEDGE(2) = ( 1000.0 * REAL(JFCEN(FI)) ) - 
+         FEDGE(2) = ( 1000.0 * REAL(JFCEN(FI)) ) -
      +        ( REAL(FINC) * REAL( NPTS(FI) - 1 ) / 2.0 )
 
          NOVER = INT((ABS( FEDGE(2) - FEDGE(1) ) / REAL(FINC)) + 0.5 )
 
          write(ilout, 10) int(nover)
- 10      format('There are ',i4,' overlapping channels') 
+ 10      format('There are ',i4,' overlapping channels')
 
          NUSE = INT(0.5 * NOVER)
          CALL GEN_GETI4('Number of overlap channels to use? ',

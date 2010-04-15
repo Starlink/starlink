@@ -9,7 +9,7 @@ C     Determines whether or not an imaginary data array exists.
 C
 C  Description:
 C     This routine looks to see if a data structure contains a data
-C     array - or other information that could generate a data array - 
+C     array - or other information that could generate a data array -
 C     forming the imaginary part of a complex main data array.
 C     Although it is quite indifferent as to the existence or non-existence
 C     of such an array, it will output a warning message if it finds
@@ -77,14 +77,14 @@ C
       INTEGER STATUS
 C
 C     Functions
-C  
+C
       INTEGER ICH_LEN
 C
 C     Local variables
 C
       INTEGER   DIMS(10)                    ! Dimensions of imaginary array
       INTEGER   DIMS2(10)                   ! Dimensions of main data array
-      CHARACTER ERROR*64                    ! Error string 
+      CHARACTER ERROR*64                    ! Error string
       INTEGER   I                           ! Loop index through dimensions
       INTEGER   IGNORE                      ! Dummy status argument
       INTEGER   LENGTH                      ! Object name length
@@ -92,7 +92,7 @@ C
       INTEGER   NDIM                        ! # of dimensions in imaginary array
       INTEGER   NDIM2                       ! # of dimensions in main array
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Full name of structure
 C
 C     Return immediately on bad status

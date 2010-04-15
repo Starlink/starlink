@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
  *     10-JUN-1996 (PDRAPER):
  *        Converted to OutF from Outr.
  *     {enter_changes_here}
- 
+
  *-
  */
 #include "cnf.h"
@@ -87,12 +87,12 @@ void hdrOutF( char *param,
               char *commen,
               float *value,
               int *status ) {
-  
+
   DECLARE_CHARACTER_DYN(fparam);
   DECLARE_CHARACTER_DYN(fxname);
   DECLARE_CHARACTER_DYN(fitem);
   DECLARE_CHARACTER_DYN(fcommen);
-  
+
   F77_CREATE_CHARACTER(fparam,strlen( param ));
   cnf_exprt( param, fparam, fparam_length );
   F77_CREATE_CHARACTER(fxname,strlen( xname ));
@@ -101,7 +101,7 @@ void hdrOutF( char *param,
   cnf_exprt( item, fitem, fitem_length );
   F77_CREATE_CHARACTER(fcommen,strlen( commen ));
   cnf_exprt( commen, fcommen, fcommen_length );
-  
+
   F77_CALL(hdr_outr)( CHARACTER_ARG(fparam),
                       CHARACTER_ARG(fxname),
                       CHARACTER_ARG(fitem),
@@ -112,12 +112,12 @@ void hdrOutF( char *param,
                       TRAIL_ARG(fxname)
                       TRAIL_ARG(fitem)
                       TRAIL_ARG(fcommen) );
-  
+
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);
   F77_FREE_CHARACTER(fitem);
   F77_FREE_CHARACTER(fcommen);
-  
+
   return;
 }
 

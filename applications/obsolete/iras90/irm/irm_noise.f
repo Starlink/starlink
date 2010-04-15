@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRM_NOISE( NSMP, DATA, WINDSZ, THRD, VAL, AVG, VAR, 
+*     CALL IRM_NOISE( NSMP, DATA, WINDSZ, THRD, VAL, AVG, VAR,
 *                     RMS, STATUS )
 
 *  Description:
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
       REAL AVGVAR                ! Average of the local variances
       REAL TEMP1, TEMP2, TEMP3, TEMP4
                                  ! temporary buffers
-      INTEGER NVAL               ! Number of valid samples 
+      INTEGER NVAL               ! Number of valid samples
 
 *.
 
@@ -111,7 +111,7 @@
      :               /' in the input data series', STATUS )
          GOTO 999
       END IF
-      
+
 *  Calculate the local average and variance of the samples in the first
 *  window.
       AVG( 1 ) = 0.0
@@ -124,14 +124,14 @@
       VAR( 1 ) = VAR( 1 ) / REAL( WINDSZ ) - AVG( 1 ) * AVG( 1 )
 
 *  Sliding the window along the data series and calculate the local
-*  average and variance recursively. 
+*  average and variance recursively.
       DO I = 2, NVAL - WINDSZ
-         TEMP1 = VAL( I + WINDSZ - 1 ) - VAL( I - 1 ) 
-         TEMP2 = VAL( I + WINDSZ - 1 ) + VAL( I - 1 ) 
+         TEMP1 = VAL( I + WINDSZ - 1 ) - VAL( I - 1 )
+         TEMP2 = VAL( I + WINDSZ - 1 ) + VAL( I - 1 )
          AVG( I ) = AVG( I - 1 ) + TEMP1 / REAL( WINDSZ )
          TEMP3 = AVG( I - 1 ) - AVG( I )
          TEMP4 = AVG( I - 1 ) + AVG( I )
-         VAR( I ) = VAR( I - 1 ) + TEMP3 * TEMP4 
+         VAR( I ) = VAR( I - 1 ) + TEMP3 * TEMP4
      :                           + TEMP1 * TEMP2 / REAL( WINDSZ )
       END DO
 
@@ -141,7 +141,7 @@
 
 *  Take the square root of the averaged variance as the RMS noise.
       RMS = SQRT( AVGVAR )
-      
+
  999  CONTINUE
-      
+
       END

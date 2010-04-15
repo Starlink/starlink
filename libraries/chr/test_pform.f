@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The status of the tests. 
+*        The status of the tests.
 
 *  Copyright:
 *     Copyright (C) 1989, 1993, 1994 Science & Engineering Research Council.
@@ -30,12 +30,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -50,17 +50,17 @@
 *     17-AUG-1989 (RLVAD::AJC):
 *        Original version.
 *     14-SEP-1993 (ACC)
-*        Modularised version: broken into one routine for each of 5 main 
+*        Modularised version: broken into one routine for each of 5 main
 *        categories of tests.
 *     02-MAR-1994 (ACC)
-*        Second modularised version: broken further into one routine for 
+*        Second modularised version: broken further into one routine for
 *        each of subroutine tested.  This subroutine created.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:   
+*  Subprograms called:
 *     CHR_PFORM
 
 *-
@@ -111,10 +111,10 @@
 *    Test CHR_PFORM
 
       ISTAT = SAI__OK
-      
+
 *    Test ragged right
 
-      IPOSN = 0      
+      IPOSN = 0
       I = 1
 *    DO WHILE loop
 30    CONTINUE
@@ -130,15 +130,15 @@
       DO 40 I = 1, MXPAR
          IF ( LINE(I) .NE. RAGPAR(I) ) THEN
             PRINT *, 'CHR_PFORM ragged FAILS'
-            PRINT *, 'Output string =',LINE(I)            
-            PRINT *, 'Should be     =',RAGPAR(I)            
+            PRINT *, 'Output string =',LINE(I)
+            PRINT *, 'Should be     =',RAGPAR(I)
             ISTAT = SAI__ERROR
          END IF
 40    CONTINUE
-      
+
 *    Test right justify
-            
-      IPOSN = 0      
+
+      IPOSN = 0
       I = 1
 *    DO WHILE loop
 50    CONTINUE
@@ -154,12 +154,12 @@
       DO 60 I = 1,MXPAR
          IF ( LINE(I) .NE. JUSPAR(I) ) THEN
             PRINT *, 'CHR_PFORM justify FAILS'
-            PRINT *, 'Output string =',LINE(I)            
-            PRINT *, 'Should be     =',JUSPAR(I)            
+            PRINT *, 'Output string =',LINE(I)
+            PRINT *, 'Should be     =',JUSPAR(I)
             ISTAT = SAI__ERROR
          END IF
 60    CONTINUE
-      
+
       IF (ISTAT .EQ. SAI__ERROR) THEN
          STATUS = SAI__ERROR
       ELSE

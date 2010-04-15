@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -127,7 +127,7 @@
 *  Find the next non-blank character in ELEM. This should be the opening
 *  parenthesis which marks the start of the argument list.
          CC = ELEM( I : I )
-         DO WHILE( CC .EQ. ' ' .AND. I .LT. L ) 
+         DO WHILE( CC .EQ. ' ' .AND. I .LT. L )
             I = I + 1
             CC = ELEM( I : I )
          END DO
@@ -148,7 +148,7 @@
                CALL ERR_REP( 'ARD1_ARGS_ERR1', 'Unnecessary argument '//
      :                       'list found.', STATUS )
             END IF
-  
+
 *  Report an error for any other non-blank character. CC will be blank
 *  if no non-blank characters could be found in ELEM. In this case NEW
 *  will be returned unchanged (i.e. .TRUE.) and this routine will be
@@ -165,7 +165,7 @@
 *  ...but not completed, attempt to read argument value from the
 *  current element until the end of the element, or the end of the
 *  argument list is encountered.
-         DO WHILE( I .LE. L .AND. MORE .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( I .LE. L .AND. MORE .AND. STATUS .EQ. SAI__OK )
 
 *  Read the next argument.
             CALL ARD1_GTARG( 0, 0, ELEM, L, I, OK, MORE, VALUE, STATUS )
@@ -182,12 +182,12 @@
                   CALL MSG_SETI( 'MX', MXARG )
                   CALL ERR_REP( 'ARD1_ARGS_ERR3', 'Argument list '//
      :                         'contains too many values.', STATUS )
-               END IF               
+               END IF
 
 *  If the end of the argument list has been reached, report an error if
 *  the number of arguments obtained is incorrect.
             ELSE IF( .NOT. MORE ) THEN
- 
+
                IF( NARG .NE. ARGREQ .AND. STATUS .EQ. SAI__OK ) THEN
                   STATUS = ARD__ARGS
                   CALL MSG_SETI( 'NARG', NARG )

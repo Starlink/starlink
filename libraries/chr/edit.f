@@ -13,14 +13,14 @@
 *     CALL TEST_EDIT(STATUS)
 
 *  Description:
-*     Test each of the string editting routines listed in Appendix A.3 
+*     Test each of the string editting routines listed in Appendix A.3
 *     of SUN/40.3.
 *     If any failure occurs, return STATUS = SAI__ERROR.
 *     Otherwise, STATUS is unchanged.
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The status of the tests. 
+*        The status of the tests.
 
 *  Copyright:
 *     Copyright (C) 1993, 1994 Science & Engineering Research Council.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -56,10 +56,10 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:    
+*  Subprograms called:
 *     TEST_APPND, TEST_CLEAN, TEST_COPY, TEST_DCWRD, TEST_FILL,
-*     TEST_LDBLK, TEST_LINBR, TEST_MOVE, TEST_PFORM, TEST_PREFX, 
-*     TEST_RJUST, TEST_RMBLK, TEST_RMCHR, TEST_SORT, TEST_SWAP, 
+*     TEST_LDBLK, TEST_LINBR, TEST_MOVE, TEST_PFORM, TEST_PREFX,
+*     TEST_RJUST, TEST_RMBLK, TEST_RMCHR, TEST_SORT, TEST_SWAP,
 *     TEST_TERM, TEST_TRCHR, TEST_TRUNC
 
 *-
@@ -152,13 +152,13 @@
       END IF
 
 *    Test CHR_PFORM
- 
+
       ISTAT = SAI__OK
       CALL TEST_PFORM(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF
- 
+
 *    Test CHR_PREFX
 
       ISTAT = SAI__OK
@@ -233,7 +233,7 @@
 
 *    Write summary message
 
-      IF (STATUS .EQ. SAI__OK) THEN 
+      IF (STATUS .EQ. SAI__OK) THEN
          PRINT *,'*** All edit string routines OK ***'
       ELSE
          PRINT *,'*** Error(s) in edit string routines ***'

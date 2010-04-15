@@ -18,7 +18,7 @@ C     (>) ARCS     (Character) Defines the arcs to be used.  Can
 C                  contain up to 3 arc names separated by commas,
 C                  eg 'HELIUM,NEON,ARGON'.  In this case, the file
 C                  HELIUM.ARC will be read into ARC1, NEON.ARC will
-C                  be read into ARC2, and ARGON.ARC will be read 
+C                  be read into ARC2, and ARGON.ARC will be read
 C                  into ARC3.  ARCS can also be blank, or 'NONE'.
 C     (>) NLARCS   (Integer) The dimension of the ARCn arrays.
 C     (>) LU       (Integer) A logical unit number that can be used
@@ -33,7 +33,7 @@ C     (<) ARC3     (Real array ARC3(NLARCS)). Like ARC1, but for the
 C                  third arc file.
 C     (<) N        (Integer)  The total sum of all lines in the three
 C                  ARCn files.
-C     (<) STATUS   Returns a status code.  0 => OK, 
+C     (<) STATUS   Returns a status code.  0 => OK,
 C                  non-zero => a serious error.  Error messages will
 C                  be output via calls to PAR_WRUSER.
 C
@@ -45,7 +45,7 @@ C     ICH_NUMBR    ( "     "    ) Decode a free format number.
 C     PAR_WRUSER                      Write message to user.
 C
 C                       -- originally AREAD:  KS / CIT 13th June 1984
-C                       -- parameter N added JKM / ESO 20th Nov. 1987 
+C                       -- parameter N added JKM / ESO 20th Nov. 1987
 C                       -- add binary arc file handling (extension ARCBIN)
 C                                            WFL / AAO 30th May  1988
 C+
@@ -100,7 +100,7 @@ C
             CALL FIG_OPFILE(ARCS(IPTR:LPTR),'arc',LU,STATUS)
             IF (STATUS.NE.0)  GO TO 520
 C
-C           ASCII file. Any blank lines and lines beginning with "*" are 
+C           ASCII file. Any blank lines and lines beginning with "*" are
 C           comments. All others must begin with valid numbers.
 C
                IPTR=1
@@ -113,9 +113,9 @@ C
                   IF (CARD(1:1).NE.'*') THEN
                      ISTAT=ICH_NUMBR(CARD,1,' ;,',VALUE,NEXT)
                      IF (ISTAT.EQ.0) THEN
-C   
+C
 C                       Valid number.  Put in the correct array.
-C   
+C
                         IF (NARC.EQ.1) THEN
                            ARC1(IPTR)=VALUE
                         ELSE IF (NARC.EQ.2) THEN
@@ -123,9 +123,9 @@ C
                         ELSE IF (NARC.EQ.3) THEN
                            ARC3(IPTR)=VALUE
                         END IF
-C   
+C
 C                       Bump array ponter, total line counter
-C   
+C
                         IF (IPTR.LT.NLARCS) THEN
                            N=N+1
                            IPTR=IPTR+1
@@ -138,9 +138,9 @@ C
                            ENDFILE=.TRUE.
                         END IF
                      ELSE IF (ISTAT.GT.0) THEN
-C   
+C
 C                       Not a valid number
-C   
+C
                         CALL PAR_WRUSER('Bad record in line list file',
      :                                                          STATUS)
                         CALL PAR_WRUSER(CARD(1:64),STATUS)
@@ -154,7 +154,7 @@ C
   320          CONTINUE
                CLOSE (UNIT=LU)
          END IF
-C   
+C
 C        Position on next file name in ARCS
 C
          IF (LPTR.GE.LEN(ARCS)) THEN

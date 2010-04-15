@@ -65,7 +65,7 @@
 *     ODENSC = REAL (Returned)
 *        Old value of density scaling factor
 *     STATUS = INTEGER (Returned)
-*        Error status-to abort program, rather than just a fitting 
+*        Error status-to abort program, rather than just a fitting
 *        error. 0=ok
 *
 * Global variables:

@@ -1,4 +1,4 @@
-      SUBROUTINE TRIFLD(FWHM, NP1, X1, Y1, DQ1, NP2, X2, Y2, DQ2, 
+      SUBROUTINE TRIFLD(FWHM, NP1, X1, Y1, DQ1, NP2, X2, Y2, DQ2,
      :                  STATUS)
 
 *+
@@ -29,21 +29,21 @@
       REAL*8 FWHM            ! FWHM of triangle function
 
       INTEGER NP1          ! number of points
- 
+
       REAL*8 X1(NP1)         ! x-values
       REAL*8 Y1(NP1)         ! y-values
- 
+
       BYTE DQ1(NP1)     ! data quality
       INTEGER NP2          ! number of points
- 
+
       REAL*8 X2(NP2)         ! x-values
- 
+
 *   Export:
       REAL*8 Y2(NP2)         ! y-values
- 
+
       INTEGER DQ2(NP2)     ! data quality
       INTEGER STATUS       ! status return
- 
+
 *   Local variables:
       LOGICAL LOST         ! switch to say when lower is updated
 
@@ -57,7 +57,7 @@
       INTEGER LAST2        ! index of highest x2 value
       INTEGER LOWER1       ! index of window start
       INTEGER LOWER        ! floating index of window start
- 
+
       REAL*8 BOT             ! folding normalisation
       REAL*8 TOP             ! folding sum
       REAL*8 WEIGHT          ! folding weight
@@ -78,7 +78,7 @@
          RETURN
 
       END IF
- 
+
 *   Check profile width and define window size
       IF (FWHM.LE.0.0) THEN
 
@@ -88,7 +88,7 @@
       END IF
 
       XWIND = FWHM
- 
+
 *   Check that x1 is monotonic and determine its direction
       CALL MSC_XMONOT(NP1, X1, DIR1, STATUS)
 
@@ -112,7 +112,7 @@
          RETURN
 
       END IF
- 
+
 *   Check that x2 is monotinc and determine its direction
       CALL MSC_XMONOT(NP2, X2, DIR2, STATUS)
 
@@ -131,7 +131,7 @@
          LAST2 = NP2
 
       END IF
- 
+
 *   Loop over x2
       LOWER1 = FIRST1
 

@@ -21,12 +21,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -40,7 +40,7 @@
 *         Original Version
 
 *  Notes:
-*     As this handles the special FITS header items 'COMMENT', 'HISTORY' 
+*     As this handles the special FITS header items 'COMMENT', 'HISTORY'
 *     and ' ', it is a little more complex than the documentation in
 *     SUN/160 suggests.
 *
@@ -94,7 +94,7 @@
 *  This special needs all its components listing.
                   CALL HDR_NUMB( 'IN', SOURCE, ITEM, NCOMP, ISTAT )
                   DO 2 J = 1, NCOMP
-                     CALL HDR_INC( 'IN', SOURCE, ITEM, J, VALUE, 
+                     CALL HDR_INC( 'IN', SOURCE, ITEM, J, VALUE,
      :                             ISTAT )
                      CALL MSG_SETC( 'ITEM', ITEM )
                      CALL MSG_SETC( 'VALUE', VALUE )

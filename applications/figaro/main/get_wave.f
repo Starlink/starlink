@@ -97,7 +97,7 @@ C      double precision fit_coeffs(MAX_KPLUS1)
 
             kp1 = min(kp1,4)
 
-* Not needed with PDA version 
+* Not needed with PDA version
 *            do i=1,kp1
 *               fit_coeffs(i)=a(kp1,i)
 *            end do
@@ -108,7 +108,7 @@ C      double precision fit_coeffs(MAX_KPLUS1)
 
 * Convert to "normal" polynomial coefficients
 
-*NAG vers 
+*NAG vers
 *            call gen_chb2no(kp1-1,lim1,lim2,fit_coeffs,xc)
 *            call gen_revr8(xc,kp1,1,.true.,xc)
 

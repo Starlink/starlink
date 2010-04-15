@@ -18,14 +18,14 @@
 
 #  Arguments:
 #     Top = string
-#        The command name of the top-level window controlling this 
+#        The command name of the top-level window controlling this
 #        procedure.  On completion, that window is destroyed.
 #     Unsetbox = string
 #        The command name of the listbox which contains all the NDF
 #        names.
 #     Setbox = string
 #        The command name of the listbox which contains the NDF names
-#        to have Set headers written.  This is assumed to contain lines 
+#        to have Set headers written.  This is assumed to contain lines
 #        in the format prepared by CCDAddSetHeaders which can be parsed
 #        using CCDItemSetIndex.
 #     args = list of strings
@@ -122,7 +122,7 @@
             set line [CCDItemSetIndex $Setbox $i]
             set value [lindex $line 0]
             set name [lindex $line 1]
-            if { $value == "SET" } { 
+            if { $value == "SET" } {
                incr nset
             } else {
                lappend ndflist($nset) $name
@@ -192,7 +192,7 @@
          CCDIssueInfo "No NDFs have been assigned a Set"
       }
 
-#  If we have been given a command to execute on successful completion, 
+#  If we have been given a command to execute on successful completion,
 #  do it here.
       if { "$args" != "" && $TASK(makeset,error) == "" } {
          eval $args

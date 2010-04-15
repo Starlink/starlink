@@ -19,7 +19,7 @@
 *     corresponds closely to the AXIS Frame (i.e. if the Mapping from the
 *     Current Frame to the AXIS Frame is nearly a UnitMap).
 *
-*     When using non-Native encoding, the AXIS Frame written by NDF2FITS 
+*     When using non-Native encoding, the AXIS Frame written by NDF2FITS
 *     will not have any associated Domain value, and so will not be
 *     recognised by the NDF library as an AXIS Frame when it is read back
 *     in by FITS2NDF. The Frame will therefore be left in the WCS
@@ -95,7 +95,7 @@
       DOUBLE PRECISION OUTB( 2, NDF__MXDIM )! First and last Current coordinates
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER I                  ! Loop count
-      INTEGER ICURR              ! Index of Current Frame 
+      INTEGER ICURR              ! Index of Current Frame
       INTEGER IWCS               ! AST identifier for NDF's WCS information
       INTEGER NAXC               ! No. of axes in WCS current Frame
       INTEGER NDIM               ! Dimensionality of the NDF
@@ -105,8 +105,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the WCS component. The NDF library will ensure that the returned 
-*  FrameSet has a single AXIS Frame which is consistent with the NDF's 
+*  Get the WCS component. The NDF library will ensure that the returned
+*  FrameSet has a single AXIS Frame which is consistent with the NDF's
 *  AXIS structures.
       CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
@@ -117,8 +117,8 @@
 *  Get the number of axes in the current Frame.
          NAXC = AST_GETI( IWCS, 'NAXES', STATUS )
 
-*  Get the dimensions of the NDF. 
-         CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS ) 
+*  Get the dimensions of the NDF.
+         CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
 
 *  The current Frame can only be a copy of the AXES Frame if the number of
 *  axes in the current Frame equals the number of pixel axes in the NDF.
@@ -129,22 +129,22 @@
 
 *  Look for the AXIS Frame in the FrameSet. If found, it becomes the
 *  Current Frame.
-            IF( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, ' ', STATUS ), 
+            IF( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, ' ', STATUS ),
      :                        'AXIS', STATUS ) .NE. AST__NULL ) THEN
 
 *  We now need to check to see if the original Current Frame and the AXIS
 *  Frame (the new Current Frame) are equivalent. This is assumed to be
-*  the case if the mapping between them is a unit mapping. Because of 
+*  the case if the mapping between them is a unit mapping. Because of
 *  rounding errors, etc, we cannot just get the Mapping, simplify it and
 *  see if it is a UnitMap. Instead, we transform points in GRID
-*  coordinates into each of the two Frames, and see if the resulting values 
+*  coordinates into each of the two Frames, and see if the resulting values
 *  are nearly equal. The two points used are the first and last pixel.
 
 *  Store the GRID coordinates of the first and last pixels.
                DO I = 1, NDIM
                   IN( 1, I ) = 1.0
                   IN( 2, I ) = DIM( I )
-               END DO               
+               END DO
 
 *  Transform the GRID coordinates into AXIS coordinates.
                CALL AST_TRANN( IWCS, 2, NDIM, 2, IN, .TRUE., NDIM, 2,
@@ -161,26 +161,26 @@
 *  See if the results are nearly equal on all axes.
                ISAXIS = .TRUE.
                DO I = 1, NDIM
-   
+
                   A1 = OUTA( 1, I )
                   A2 = OUTA( 2, I )
                   B1 = OUTB( 1, I )
                   B2 = OUTB( 2, I )
- 
+
                   IF( A1 .EQ. AST__BAD .OR.
      :                A2 .EQ. AST__BAD .OR.
      :                B1 .EQ. AST__BAD .OR.
      :                B2 .EQ. AST__BAD ) THEN
                      ISAXIS = .FALSE.
 
-                  ELSE IF( ABS( ( A1 - B1 ) ) .GT. 
+                  ELSE IF( ABS( ( A1 - B1 ) ) .GT.
      :                     EPS*MAX( ABS( A1 ), ABS( B1 ) ) ) THEN
                      ISAXIS = .FALSE.
 
-                  ELSE IF( ABS( ( A2 - B2 ) ) .GT. 
+                  ELSE IF( ABS( ( A2 - B2 ) ) .GT.
      :                     EPS*MAX( ABS( A2 ), ABS( B2 ) ) ) THEN
                      ISAXIS = .FALSE.
-                
+
                   END IF
 
                END DO

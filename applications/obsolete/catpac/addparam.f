@@ -57,7 +57,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -75,7 +75,7 @@
       CHARACTER * ( CHP__SZPFMT ) PFORMAT ! Format of the new parameter
       CHARACTER * ( CHP__SZPVAL ) PVALUE ! Value of the new parameter.
       CHARACTER * ( CHP__SZPCMT ) PCOMMENT ! Comment for the new parameter
-      INTEGER PARRDIM( 7 ) 
+      INTEGER PARRDIM( 7 )
 
 *.
 

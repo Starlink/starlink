@@ -14,13 +14,13 @@
 
 *  Description:
 *     The given string is searched from index IPOSN+1 for the next name.
-*     A name is defined as a contiguous string of alphanumeric and 
-*     underscore characters. The end of the string is given by the next 
+*     A name is defined as a contiguous string of alphanumeric and
+*     underscore characters. The end of the string is given by the next
 *     character which is not alphanumeric or an underscore (normally white
 *     space). if the name string overflows the declared length of the
-*     returned name argument, NAME, { the name string is returned 
-*     truncated to the length of the NAME argument and the status 
-*     argument is returned set. The character pointer IPOSN is returned 
+*     returned name argument, NAME, { the name string is returned
+*     truncated to the length of the NAME argument and the status
+*     argument is returned set. The character pointer IPOSN is returned
 *     pointing to the last character of the name in the given string.
 
 *  Arguments:
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,7 +86,7 @@
 #include "ems_par.h"
 #include "ems_sys.h"
 #include "ems1.h"
-#include "ems.h"              
+#include "ems.h"
 
 void ems1Gnam( const char *string, int *iposn,
                 char *name, int *namlen, int *status ) {
@@ -157,6 +157,6 @@ void ems1Gnam( const char *string, int *iposn,
 
 /* Terminate name string */
    name[*namlen] = '\0';
-     
+
    return;
 }

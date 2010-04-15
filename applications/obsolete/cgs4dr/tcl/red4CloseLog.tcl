@@ -1,6 +1,6 @@
 proc red4CloseLog {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
 

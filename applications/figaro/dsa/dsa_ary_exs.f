@@ -11,14 +11,14 @@ C  Description:
 C     Given the DTA_ system name of a data array, this routine
 C     determines whether or not such a named object exists in a
 C     form that can supply a data array.  That is, that the object
-C     is either itself a data array or a structure defining such 
-C     an array.  At present, it can only handle a primitive data 
+C     is either itself a data array or a structure defining such
+C     an array.  At present, it can only handle a primitive data
 C     array and a limited variety of structured arrays.  This routine
 C     outputs no error messages if the array does not exist, but if
 C     it exists but not in a form we can handle, then it complains.
 C     Most routines that access arrays call this pretty early in the
 C     processing, so this is a good place to locate the structures
-C     that are going to cause trouble.  
+C     that are going to cause trouble.
 C
 C  Language:
 C     FORTRAN
@@ -29,7 +29,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) NAME       (Fixed string,descr) The DTA_ system name of the
-C                    array in question.  
+C                    array in question.
 C     (<) EXIST      (Logical,ref) True if a suitable data array does
 C                    in fact exist.
 C     (!) STATUS     (Integer,ref) Returned status value.  If a non-zero
@@ -89,13 +89,13 @@ C
 C
 C     Local variables
 C
-      CHARACTER ARRAY_NAME*80              ! Actual array name 
+      CHARACTER ARRAY_NAME*80              ! Actual array name
       INTEGER   DTA_STATUS                 ! Status returned by DTA_ routines
       LOGICAL   KNOWN                      ! True if this is a known structure
       INTEGER   LENAME                     ! Length of ARRAY_NAME
       LOGICAL   STRUCT                     ! True if named object a structure
       CHARACTER TYPE*16                    ! Type of named object
-      CHARACTER VARIANT*16                 ! Structure variant 
+      CHARACTER VARIANT*16                 ! Structure variant
 C
 C     If bad status passed, return now.
 C
@@ -106,7 +106,7 @@ C
       CALL DTA_STRUC (NAME,STRUCT,DTA_STATUS)
       IF (DTA_STATUS.NE.0) THEN
          EXIST=.FALSE.
-      ELSE 
+      ELSE
          IF (.NOT.STRUCT) THEN
             EXIST=.TRUE.
          ELSE
@@ -118,7 +118,7 @@ C
                CALL DSA_WRUSER ('The structure ')
                CALL DSA_WRNAME (NAME)
                CALL DSA_WRUSER (' is of a type ("')
-               CALL DSA_WRUSER (TYPE(:ICH_LEN(TYPE))) 
+               CALL DSA_WRUSER (TYPE(:ICH_LEN(TYPE)))
                CALL DSA_WRUSER ('") that this routine cannot handle.')
                CALL DSA_WRFLUSH
                STATUS=DSA__INVTYP
@@ -143,7 +143,7 @@ C
                   CALL DSA_WRUSER (TYPE(:ICH_LEN(TYPE)))
                   CALL DSA_WRUSER (
      :                         '"), but is a variant of that type ("')
-                  CALL DSA_WRUSER (VARIANT(:ICH_LEN(VARIANT))) 
+                  CALL DSA_WRUSER (VARIANT(:ICH_LEN(VARIANT)))
                   CALL DSA_WRUSER (
      :                       '") that this routine cannot handle.')
                   CALL DSA_WRFLUSH

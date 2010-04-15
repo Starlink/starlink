@@ -16,7 +16,7 @@ C     (>) ARCS     (Character) Defines the arcs to be used.  Can
 C                  contain up to 3 arc names separated by commas,
 C                  eg 'HELIUM,NEON,ARGON'.  In this case, the file
 C                  HELIUM.ARC will be read into ARC1, NEON.ARC will
-C                  be read into ARC2, and ARGON.ARC will be read 
+C                  be read into ARC2, and ARGON.ARC will be read
 C                  into ARC3.  ARCS can also be blank, or 'NONE'.
 C     (>) NLARCS   (Integer) The dimension of the ARCn arrays.
 C     (<) ARC1     (Real array ARC1(NLARCS)) The wavelengths held
@@ -27,7 +27,7 @@ C     (<) ARC2     (Real array ARC2(NLARCS)). Like ARC1, but for the
 C                  second arc file.
 C     (<) ARC3     (Real array ARC3(NLARCS)). Like ARC1, but for the
 C                  third arc file.
-C     (<) STATUS   Returns a status code.  0 => OK, 
+C     (<) STATUS   Returns a status code.  0 => OK,
 C                  non-zero => a serious error.  Error messages will
 C                  be output via calls to PAR_WRUSER.
 C
@@ -43,7 +43,7 @@ C     DSA_FREE_LU          Release a logical unit and close the file.
 C
 C                                             KS / CIT  13th June 1984
 C     Modified:
-C   
+C
 C     7th Sept 1988   KS/AAO.  Now uses DSA_ routines to search for
 C                     and open Arc files.  LU no longer a parameter.
 C     15th Sept 1988  KS/AAO.  Better error reporting on I/O errors

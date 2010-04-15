@@ -69,7 +69,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      
+
 *  Local Constants:
       INTEGER HEDLEN             ! FITS header length
       PARAMETER( HEDLEN = 80 )
@@ -77,28 +77,28 @@
 *  Arguments Given:
       CHARACTER*(*) STRING
       INTEGER IEL
-      
+
 *  Arguments Given and Returned:
-      
+
 *  Arguments Returned:
       CHARACTER*(HEDLEN) ARRAY(*)
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
-      
+
 *  Local Constants:
 
 *  Global Variables:
-      
+
 *  Local Variables:
-      
-      
+
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-        ARRAY( IEL ) = STRING         
+        ARRAY( IEL ) = STRING
       END
 

@@ -2,17 +2,17 @@
 *+
 *  Name:
 *     SUBPAR_RANGER
- 
+
 *  Purpose:
 *     To test the given VALUE against any minimum or maximum values
 *     for the parameter.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_RANGER( NAMECODE, VALUE, MNMX, OK, STATUS )
- 
+
 *  Description:
 *     STATUS has the normal effect on entry but cannot be set by
 *     this routine.
@@ -29,7 +29,7 @@
 *     These definitions permit minimum > maximum. The effect of this
 *     is to exclude values between the limits. The limits themselves
 *     are always permitted.
- 
+
 *  Arguments:
 *     NAMECODE = INTEGER (Given)
 *        The parameter index of the parameter
@@ -42,10 +42,10 @@
 *        otherwise TRUE.
 *     STATUS = INTEGER (Given)
 *        The global status.
- 
+
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
- 
+
 *  Copyright:
 *     Copyright (C) 1990, 1992, 1993, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *      9-OCT-1990 (AJC):
 *        Original version.
@@ -88,21 +88,21 @@
 *     17-JUL-1995 (AJC):
 *        Correct SETC to SETR prior to message SUP_RANGE4
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
       INCLUDE 'SUBPAR_PAR'       ! Parameter system constants
       INCLUDE 'SUBPAR_ERR'       ! Parameter system status values
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'       ! SUBPAR common blocks
 *        PARMIN( 2, SUBPAR__MAXPAR ) = INTEGER (Read)
@@ -115,38 +115,38 @@
 *           Whether constraint is RANGE or IN.
 *        REALLIST( SUBPAR__MAXLIMS ) = REAL (Read)
 *           The actual limiting values.
- 
+
 *  Arguments Given:
       INTEGER NAMECODE
       REAL VALUE
       LOGICAL MNMX
- 
+
 *  Arguments Returned:
       LOGICAL OK
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       REAL MINVAL                ! Lower value in RANGE
       REAL MAXVAL                ! Upper value in RANGE
       LOGICAL EXCLUSIVE          ! TRUE if range is exclusive
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set default of acceptance
       OK = .TRUE.
- 
+
 *  First check value is within interface file RANGE
 *  If there is a range, both values must be set although they can
 *  (probably illegally) point to the same value
       IF ( ( PARLIMS(3,NAMECODE) .EQ. SUBPAR__REAL )
      :.AND. PARCONT(NAMECODE) ) THEN
- 
+
 *     Check against any RANGE values
- 
+
 *     Get min and max in right order
          IF ( REALLIST(PARLIMS(1,NAMECODE))
      :   .LE. REALLIST(PARLIMS(2,NAMECODE)) ) THEN
@@ -155,7 +155,7 @@
             MAXVAL = REALLIST(PARLIMS(2,NAMECODE))
             IF ( ( VALUE .LT. MINVAL )
      :      .OR. ( VALUE .GT. MAXVAL ) ) OK = .FALSE.
- 
+
          ELSE
             EXCLUSIVE = .TRUE.
             MINVAL = REALLIST(PARLIMS(2,NAMECODE))
@@ -163,7 +163,7 @@
             IF ( ( VALUE .GT. MINVAL )
      :      .AND.( VALUE .LT. MAXVAL ) ) OK = .FALSE.
          END IF
- 
+
          IF ( .NOT. OK ) THEN
             STATUS = SUBPAR__OUTRANGE
             CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
@@ -179,15 +179,15 @@
      :         '^VAL is outside the permitted RANGE, ^L1 to '//
      :         '^L2, for parameter ^NAME.', STATUS )
             END IF
- 
+
          END IF
- 
+
       END IF
- 
+
 *  If there was no Interface File RANGE or the value was within RANGE
 *  and MNMX is TRUE, check against any MIN/MAX values
       IF ( OK .AND. MNMX ) THEN
- 
+
 *     Find if it is an exclusive range
          EXCLUSIVE = .FALSE.
          IF ( ( PARMIN(2,NAMECODE) .EQ. SUBPAR__REAL )
@@ -201,13 +201,13 @@
      :              REALLIST(PARMIN(1,NAMECODE)) ) EXCLUSIVE = .TRUE.
             END IF
          END IF
- 
+
 *     Check against MIN value if any
          IF ( ( PARMIN(2,NAMECODE) .EQ. SUBPAR__REAL )
      :   .AND. ( PARMIN(1,NAMECODE) .GT. 0 ) ) THEN
- 
+
             IF ( VALUE .LT. REALLIST(PARMIN(1,NAMECODE)) ) THEN
- 
+
 *           Unless exclusive and value also < or = MAX
                IF ( EXCLUSIVE ) THEN
                   IF ( VALUE .GT. REALLIST(PARMAX(1,NAMECODE)) ) THEN
@@ -225,7 +225,7 @@
      :               'between ^L2 and ^L1, ' //
      :               'for parameter ^NAME.', STATUS )
                   END IF
- 
+
                ELSE
                   OK = .FALSE.
                   STATUS = SUBPAR__OUTRANGE
@@ -238,13 +238,13 @@
                END IF
             END IF
          END IF
- 
+
 *     If still OK, check against MAX value if any
          IF ( OK .AND. ( PARMAX(2,NAMECODE) .EQ. SUBPAR__REAL )
      :   .AND. ( PARMAX(1,NAMECODE) .GT. 0 ) ) THEN
- 
+
             IF ( VALUE .GT. REALLIST(PARMAX(1,NAMECODE)) ) THEN
- 
+
 *           It's an error unless exclusive and value also > or = MIN
                IF ( EXCLUSIVE ) THEN
                   IF ( VALUE .LT. REALLIST(PARMIN(1,NAMECODE)) ) THEN
@@ -262,9 +262,9 @@
      :               'between ^L2 and ^L1, ' //
      :               'for parameter ^NAME.', STATUS )
                    END IF
- 
+
                ELSE
- 
+
                   OK = .FALSE.
                   STATUS = SUBPAR__OUTRANGE
                   CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
@@ -277,5 +277,5 @@
             END IF
          END IF
       ENDIF
- 
+
       END

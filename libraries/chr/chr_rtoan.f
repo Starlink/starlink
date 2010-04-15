@@ -13,7 +13,7 @@
 *     CALL CHR_RTOAN( RVALUE, UNITS, STRING, IPOSN )
 
 *  Description:
-*     Format a REAL value as hours/degrees:minutes:seconds and write 
+*     Format a REAL value as hours/degrees:minutes:seconds and write
 *     it into a character string. This routine is for writing
 *     angular measures into a character string in a format suitable
 *     for presentation to an astronomer.
@@ -27,23 +27,23 @@
 *     value for the conversion to be carried out.
 *
 *     The value is written into the part of the string beginning
-*     at position IPOSN+1 and IPOSN is returned updated to the 
+*     at position IPOSN+1 and IPOSN is returned updated to the
 *     position of the end of the encoded angle in STRING.
 
 *  Arguments:
 *     RVALUE = REAL (Given)
-*        The value to be encoded into the string. This value should 
+*        The value to be encoded into the string. This value should
 *        represent an angular measure.
 *     UNITS = CHARACTER * ( * ) (Given)
 *        This string controls the maximum value which will be formatted
-*        as hr/deg:min:sec: if UNITS = 'HOURS', the maximum permitted 
-*        value is 24.0; if UNITS = 'DEGREES', the  maximum permitted is 
+*        as hr/deg:min:sec: if UNITS = 'HOURS', the maximum permitted
+*        value is 24.0; if UNITS = 'DEGREES', the  maximum permitted is
 *        360.0. In all other cases the maximum is 1000.0.
 *     STRING = CHARACTER * ( * ) (Given and Returned)
 *        The string into which RVALUE is written.
 *     IPOSN = INTEGER (Given and Returned)
 *        Given as the last element in STRING before the beginning of the
-*        encoded angle. Returned as the element in STRING corresponding 
+*        encoded angle. Returned as the element in STRING corresponding
 *        to the end of the encoded angle.
 
 *  Algorithm:
@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

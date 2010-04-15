@@ -5,7 +5,7 @@
     added to the docfind results display, to bring alternative methods
     of finding information to user's notice.
 
- Version 1.2.  
+ Version 1.2.
     This version fixes a problem which caused docfind not to search the
     documents index, after the format of the index had changed.
 

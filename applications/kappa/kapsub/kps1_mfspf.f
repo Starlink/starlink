@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_MFSPF( INTERP, MXKNOT, NKNOT, FKNOT, CMIN, CMAX, 
-     :                       SCALE, NWS, EL, MAXVAL, X, Z, W, PERM, 
+      SUBROUTINE KPS1_MFSPF( INTERP, MXKNOT, NKNOT, FKNOT, CMIN, CMAX,
+     :                       SCALE, NWS, EL, MAXVAL, X, Z, W, PERM,
      :                       KNOT, COEFF, NCOEF, FACTOR, WS, IWS,
      :                       STATUS )
 
@@ -14,33 +14,33 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFSPF( INTERP, MXKNOT, NKNOT, FKNOT, CMIN, CMAX, SCALE, 
-*                      NWS, EL, MAXVAL, X, Z, W, PERM, KNOT, COEFF, 
+*     CALL KPS1_MFSPF( INTERP, MXKNOT, NKNOT, FKNOT, CMIN, CMAX, SCALE,
+*                      NWS, EL, MAXVAL, X, Z, W, PERM, KNOT, COEFF,
 *                      NCOEF, FACTOR, WS, IWS, STATUS )
 
 *  Description:
-*     This routine fits a cubic B-spline curve for the given vectors of 
-*     values and weights at the specified co-ordinates, and returns the 
+*     This routine fits a cubic B-spline curve for the given vectors of
+*     values and weights at the specified co-ordinates, and returns the
 *     coefficients of the fit.  There is a choice of interpolating or
-*     smmothing spline (see INTERP).  The interpolation fit passes 
-*     through the supplied knots.  The smoothing spline fit is more 
-*     complex, but it generates knots automatically when the weighted 
+*     smmothing spline (see INTERP).  The interpolation fit passes
+*     through the supplied knots.  The smoothing spline fit is more
+*     complex, but it generates knots automatically when the weighted
 *     sum of squares of the residuals exceeds a smoothing factor.
 *     See the Notes for more details.
 
 *  Arguments:
 *     INTERP = LOGICAL (Given)
 *        If set to true an interpolating least-squares spline is found
-*        and the NKNOT interior knots are equally spaced.  Otherwise a 
-*        smoothing spline is fit using a smoothing factor equal to the 
+*        and the NKNOT interior knots are equally spaced.  Otherwise a
+*        smoothing spline is fit using a smoothing factor equal to the
 *        number of data points; and the spline fit sets the knots.
 *     MXKNOT = INTEGER (Given)
 *        The maximum number of knots including exterior knots.  This
 *        is for the case when INTERP is false where the fitting routine
 *        can only assign up to MXKNOT knots automatically.  When
-*        INTERP is true, this should be set to NKNOT+8.  For INTERP 
+*        INTERP is true, this should be set to NKNOT+8.  For INTERP
 *        set false, the maximum numvber of knots should be at least
-*        the lesser of EL / 2 or 200, although only up to 28 will 
+*        the lesser of EL / 2 or 200, although only up to 28 will
 *        actually be used in the final fit, the others are needed for
 *        iteration to a reasonable smoothing factor than minimises the
 *        residuals whilst not fitting to small-scale features and noise.
@@ -84,23 +84,23 @@
 *        There will be NCOEF=NKNOT+8 coefficients for an interpolating
 *        spline.
 *     NCOEF = INTEGER (Returned)
-*        The number of spline coefficients. 
+*        The number of spline coefficients.
 *     WS( NWS ) = REAL (Returned)
 *        Work space.
 *     IWS( MXKNOT ) = INTEGER (Returned)
 *        Work space.
 *     FACTOR = REAL (Returned)
 *        The scale factor applied to the data values before calculating
-*        the spline. 
+*        the spline.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     -  The smoothing spline fit uses a smoothing factor S that must be 
+*     -  The smoothing spline fit uses a smoothing factor S that must be
 *     determined.  The routine first determines upper and lower limits
-*     of S.  The upper is the weighted sum of the squares of the 
-*     residuals of the least-squares cubic polynomial fit.  The lower 
-*     limit comes from an estimation of the overall noise from averaging 
+*     of S.  The upper is the weighted sum of the squares of the
+*     residuals of the least-squares cubic polynomial fit.  The lower
+*     limit comes from an estimation of the overall noise from averaging
 *     the standard deviations in typically 50 segments and then combined
 *     with a 3-sigma clip to exclude line features.  The purpose of the
 *     segments is to exclude the trend from the calculation.
@@ -110,15 +110,15 @@
 *     knots are used.
 *     -  A final fit is made with the chosen S, but now finding the
 *     knots afresh.
-*     -  In some cases, the noise in the trend vector is much greater 
+*     -  In some cases, the noise in the trend vector is much greater
 *     than suggested by the weights supplied.  These are identified
 *     from their upper limit being less than their lower limit for S.
 *     An experimental fudge smooths the data and recalculates the lower
 *     limit.  If the minimum still exceeds the upper limit, the lower
 *     limits is set arbitrarily to 40% of the upper limit in order to
-*     create some knots.  The smoothing appears not to work on data 
-*     tested thus far, and may need reworking, or simply removed, 
-*     leaving the user to fit these by another method or mask them 
+*     create some knots.  The smoothing appears not to work on data
+*     tested thus far, and may need reworking, or simply removed,
+*     leaving the user to fit these by another method or mask them
 *     before fitting.  It may just be that the spline fitting
 *     algorithm breaks down for data where the noise dominates any
 *     trend.
@@ -204,7 +204,7 @@
 *  Local Variables:
       LOGICAL BADOUT             ! Bad values present in smoothed data?
       LOGICAL BETTER             ! Better fit than the previous?
-      REAL BSFACT                ! First smoothing factor in sequence of 
+      REAL BSFACT                ! First smoothing factor in sequence of
                                  ! constant sum of squares of residuals
       INTEGER CONSEQ             ! Number of consecutive s giving
                                  ! constant sum of squares of residuals
@@ -311,7 +311,7 @@
             FACTOR = -1.0
          ELSE
             FACTOR = 1. / REAL( MAXV - MINV )
-      
+
 *  Scale data values to lie in the range -1 to +1 to improve
 *  performance of the fitting routines.
              DO I = 1, NDAT
@@ -343,7 +343,7 @@
 *  Obtain the cubic spline coefficients of the least-squares fit.
 *  The -1 means that we supply the interior knots and a least-squares
 *  fit is performed.  The 3 is the order.
-         CALL PDA_CURFIT( -1, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3, 
+         CALL PDA_CURFIT( -1, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
      :                    SFACT, MXKNOT, NCOEF, KNOT, COEFF, SIGMA, WS,
      :                    NWS, IWS, IFAIL )
 
@@ -366,13 +366,13 @@
 
 *  Find the smoothing factor upper limit.
 *  --------------------------------------
-*  Obtain the least-squares cubic polynomial fit and the upper limit 
+*  Obtain the least-squares cubic polynomial fit and the upper limit
 *  for the smoothing factor as given by SMAX.  This is achievde by
 *  supplying a very large smoothing factor.
          SIGMA = 0.0
          NCOEF = 0
-         CALL PDA_CURFIT( 0, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3, 
-     :                    VAL__MAXR, MXKNOT, NCOEF, KNOT, COEFF, SMAX, 
+         CALL PDA_CURFIT( 0, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
+     :                    VAL__MAXR, MXKNOT, NCOEF, KNOT, COEFF, SMAX,
      :                    WS, NWS, IWS, IFAIL )
 
 *  We want to apply at least some smoothing.
@@ -380,7 +380,7 @@
 
 *  Find the smoothing factor lower limit.
 *  --------------------------------------
-*  Determine the approximate detrended noise in segments, removing 
+*  Determine the approximate detrended noise in segments, removing
 *  3-sigma outlier segments.  The number of segments to choose is
 *  somewhat of a guess.  Looking at the more extreme curved ones,
 *  about 50 looks right.  Constrain to have at least five elements
@@ -393,7 +393,7 @@
          CALL PSX_CALLOC( NSEG, '_INTEGER', WPTR, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-         CALL KPS1_MFNOR( NDAT, Z, X, NSEG, %VAL( CNF_PVAL( SPTR ) ), 
+         CALL KPS1_MFNOR( NDAT, Z, X, NSEG, %VAL( CNF_PVAL( SPTR ) ),
      :                    %VAL( CNF_PVAL( WPTR ) ), NOISE, STATUS )
 
          CALL PSX_FREE( SPTR, STATUS )
@@ -419,7 +419,7 @@
 *  fit with a polynomial, or flagged to be excluded from the analysis.
          SMOOTH = SFACT .LT. SMIN
          IF ( SMOOTH ) THEN
- 
+
 *  Get workspace for the smoothing and smoothed data.
             CALL PSX_CALLOC( NDAT, '_REAL', SMPTR, STATUS )
             CALL PSX_CALLOC( NDAT, '_REAL', SUMPTR, STATUS )
@@ -431,9 +431,9 @@
 *  and this approximation should not matter across the broad fit.
 *  We also assume that the smoothed trend does not have any bad
 *  pixels, since the original data will not contain any.
-            CALL KPG1_BLOCR( .FALSE., .FALSE., .FALSE., NDAT, 1, Z, 
+            CALL KPG1_BLOCR( .FALSE., .FALSE., .FALSE., NDAT, 1, Z,
      :                       5, 1, 1, %VAL( CNF_PVAL( SMPTR ) ),
-     :                       BADOUT, %VAL( CNF_PVAL( SUMPTR ) ), 
+     :                       BADOUT, %VAL( CNF_PVAL( SUMPTR ) ),
      :                       %VAL( CNF_PVAL( WPTR ) ), STATUS )
             CALL PSX_FREE( SUMPTR, STATUS )
             CALL PSX_FREE( WPTR, STATUS )
@@ -443,8 +443,8 @@
             CALL PSX_CALLOC( NSEG, '_INTEGER', WPTR, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-            CALL KPS1_MFNOR( NDAT, %VAL( CNF_PVAL( SMPTR ) ), X, NSEG, 
-     :                       %VAL( CNF_PVAL( SPTR ) ), 
+            CALL KPS1_MFNOR( NDAT, %VAL( CNF_PVAL( SMPTR ) ), X, NSEG,
+     :                       %VAL( CNF_PVAL( SPTR ) ),
      :                       %VAL( CNF_PVAL( WPTR ) ), NOISE, STATUS )
 
             CALL PSX_FREE( SPTR, STATUS )
@@ -455,8 +455,8 @@
          END IF
 
 *  Determine a decent approximation for the smoothing factor by
-*  a rough minimisation subject to constrains.  
-*  a) We do not want to fit to the noise hence the SMIN lower limit 
+*  a rough minimisation subject to constrains.
+*  a) We do not want to fit to the noise hence the SMIN lower limit
 *  for the smoothing factor.
 *  b) The maximum number of knots in the calling routine is high to
 *  avoid PDA_CURFIT complaining that it does not have the workspace
@@ -466,7 +466,7 @@
 *  c) The maximum number of iterations.  In practice this should not
 *  be reached.
 *  d) PDA_CURFIT does not return the error indiciating that the
-*  smoothing factor is too low or the maximum number of knots is too 
+*  smoothing factor is too low or the maximum number of knots is too
 *  few.
          TKNOT = NKNOT + 8
          DO WHILE ( BETTER .AND. NITER .LT. 10 .AND. SFACT .GT. SMIN )
@@ -486,12 +486,12 @@
             SIGMA = 0.0
             NCOEF = 0
             IF ( SMOOTH ) THEN
-               CALL PDA_CURFIT( IOPT, NDAT, X, 
+               CALL PDA_CURFIT( IOPT, NDAT, X,
      :                          %VAL( CNF_PVAL( SMPTR ) ), W, ECR( 1 ),
-     :                          ECR( 2 ), 3, SFACT, MXKNOT, NCOEF, KNOT, 
+     :                          ECR( 2 ), 3, SFACT, MXKNOT, NCOEF, KNOT,
      :                          COEFF, SIGMA, WS, NWS, IWS, IFAIL )
             ELSE
-               CALL PDA_CURFIT( IOPT, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 
+               CALL PDA_CURFIT( IOPT, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ),
      :                          3, SFACT, MXKNOT, NCOEF, KNOT, COEFF,
      :                          SIGMA, WS, NWS, IWS, IFAIL )
             END IF
@@ -508,7 +508,7 @@
                IF ( CONSEQ .EQ. 1 ) BSFACT = PSFACT
                PSFACT = SFACT
                PSIGMA = SIGMA
-               
+
             ELSE IF ( SIGMA .GT. PSIGMA ) THEN
                BETTER = .FALSE.
                SFACT = PSFACT
@@ -529,7 +529,7 @@
 *  some smoothing before fitting.
          IF ( IFAIL .EQ. 1 .OR. NCOEF .GT. TKNOT .OR.
      :        SFACT .LT. SMIN ) THEN
-            IF ( NITER .GT. 1 ) 
+            IF ( NITER .GT. 1 )
      :         SFACT = SFACT / FPFACT ** ( 1.0 / REAL( NITER ) )
             IF ( CONSEQ .GT. 0 ) SFACT = BSFACT
          END IF
@@ -540,15 +540,15 @@
 *  Final fit with new knots.
 *  -------------------------
 *  Now use the roughly determined smoothing factor with recalculated
-*  knot positions. 
+*  knot positions.
          IF ( SMOOTH ) THEN
             CALL PDA_CURFIT( 0, NDAT, X, %VAL( CNF_PVAL( SMPTR ) ), W,
-     :                       ECR( 1 ), ECR( 2 ), 3, SFACT, TKNOT, 
+     :                       ECR( 1 ), ECR( 2 ), 3, SFACT, TKNOT,
      :                       NCOEF, KNOT, COEFF, SIGMA, WS, NWS, IWS,
      :                       IFAIL )
          ELSE
             CALL PDA_CURFIT( 0, NDAT, X, Z, W, ECR( 1 ), ECR( 2 ), 3,
-     :                       SFACT, TKNOT, NCOEF, KNOT, COEFF, SIGMA, 
+     :                       SFACT, TKNOT, NCOEF, KNOT, COEFF, SIGMA,
      :                       WS, NWS, IWS, IFAIL )
          END IF
 
@@ -566,5 +566,5 @@
   999 CONTINUE
       IF ( SMOOTH ) CALL PSX_FREE( SMPTR, STATUS )
 
- 
+
       END

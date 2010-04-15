@@ -1,23 +1,23 @@
 1 Starman image/table and photometry software
                                                   Expires: 95.**.**
 
- Starman has extensive general purpose programs for image display and 
+ Starman has extensive general purpose programs for image display and
  image handling, and for handling tabular data.
 
  Its main aim is stellar photometry, and is especially suited for stars
- in crowded fields. 
+ in crowded fields.
 
  A Unix version of the Starman photometry package has now been released,
  with a number of upgrades.
 
- It has some advantages over packages such as DAOPHOT, DoPHOT, and 
+ It has some advantages over packages such as DAOPHOT, DoPHOT, and
  SAOIMAGE.
 
  To start it, type "starman". A hypertext help is available with
  "starmanhyperhelp", an ordinary help with "starmanhelp". A demo can
- be seen with "starmandemo". 
+ be seen with "starmandemo".
 
- Alan Penny                   RAL                    1995 June 
+ Alan Penny                   RAL                    1995 June
 
 2 Changes_in_V2.0-1
 

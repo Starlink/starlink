@@ -318,7 +318,7 @@ if ( ! -x $LATEX2HTML ) {
 }
 
 #  Pick up HCSERVER for hardcopy downloads from environment, overridden by
-#  command-line. 
+#  command-line.
 my $HCSERVER = $ENV{'HTX_HCSERVER'} || "0";
 
 #  Substring to match HCSERVER line and pattern for actual replacement.

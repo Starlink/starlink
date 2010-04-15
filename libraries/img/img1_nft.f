@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -124,9 +124,9 @@
 *  Note that the %VAL( 80 ) appended after the last genuine argument is
 *  the length of the mapped character strings. This is the usual method
 *  that UNIX compilers use to pass this information.
-         CALL IMG1_RKEY( ECB_FTSN( SLOT ), 
+         CALL IMG1_RKEY( ECB_FTSN( SLOT ),
      :                   %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
-     :                   .FALSE., N, ITEM, INRANG, STATUS, 
+     :                   .FALSE., N, ITEM, INRANG, STATUS,
      :                   %VAL( CNF_CVAL( 80 ) ) )
          IF ( STATUS .NE. SAI__OK ) THEN
 

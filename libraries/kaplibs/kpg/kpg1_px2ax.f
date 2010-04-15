@@ -16,7 +16,7 @@
 *     This routine converts the pixel indices of an NDF pixel into the
 *     WCS coordinate values of the pixel's centre. If a WCS FrameSet is
 *     not available, then the pixel indices are converted into the axis
-*     coordinate system. If an axis coordinate system is not defined for 
+*     coordinate system. If an axis coordinate system is not defined for
 *     the NDF, then the pixel coordinate system will be used instead.
 
 *  Arguments:
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,8 +134,8 @@
          DO I = 1, NDIM
             IN( I ) = DBLE( PX( I ) ) - 0.5D0
          END DO
-         CALL AST_TRANN( IWCS, 1, NDIM, 1, IN, .TRUE., 
-     :                   AST_GETI( IWCS, 'Nout', STATUS ), 1, AX, 
+         CALL AST_TRANN( IWCS, 1, NDIM, 1, IN, .TRUE.,
+     :                   AST_GETI( IWCS, 'Nout', STATUS ), 1, AX,
      :                   STATUS )
 
 *  Free resources
@@ -163,7 +163,7 @@
      :                     EL, STATUS )
 
 *  Extract the element's value and unmap the array.
-            CALL VEC_DTOD( .FALSE., 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL VEC_DTOD( .FALSE., 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     AX( I ), IERR,
      :                     NERR, STATUS )
             CALL NDF_AUNMP( INDFS, 'Centre', I, STATUS )

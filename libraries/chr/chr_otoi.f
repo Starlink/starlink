@@ -21,19 +21,19 @@
 *     IVALUE = INTEGER (Returned)
 *        Value decoded from the given string.
 *     STATUS = INTEGER (Given and Returned)
-*        The status value. If this value is not SAI__OK on input, the 
-*        routine returns without action. If the routine fails to 
+*        The status value. If this value is not SAI__OK on input, the
+*        routine returns without action. If the routine fails to
 *        complete successfully, STATUS is returned set to SAI__ERROR.
 
-*  Note: 
-*     This subroutine assumes a 32-bit, twos-complement representation 
-*     of an INTEGER. 
+*  Note:
+*     This subroutine assumes a 32-bit, twos-complement representation
+*     of an INTEGER.
 
 *  Algorithm:
 *     Portable Version:
 *        Decode the given string explicitly.
 *     VAX-specific Version:
-*        Construct an O-format and decode using a Fortran 77 internal 
+*        Construct an O-format and decode using a Fortran 77 internal
 *        READ into the integer argument.
 
 *  Copyright:
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -158,7 +158,7 @@
 
                      IF ( IVAL .GT. 1 ) THEN
 
-*                    Octal string has an integer value greater than 
+*                    Octal string has an integer value greater than
 *                    4 bytes.
                         STATUS = SAI__ERROR
                         GO TO 999

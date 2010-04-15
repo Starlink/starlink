@@ -148,7 +148,7 @@
 *
 *    The landscape TeX workstation produces file for inserting into
 *    portrait orientation documents not for inserting into landscape
-*    documents. 
+*    documents.
 *
 *---------------------------------------------------------------------
 
@@ -174,7 +174,7 @@
      :      1700,1111,1720,1111,1111,1750,1111,1770,1111,1790,
      :      1111,1111,1111,1111,1111,1850,1111,1870,1880,1111,
      :      1111,1111,7777,7777,7777,7777,7777,7777,7777) IENT-119
-                             
+
       GOTO 9999
 
 
@@ -189,7 +189,7 @@
       KWIO(KWKIX) = GNO
       KIMRGM(KWKIX) = GSUPPD
 
-      IF (KWKTYP.EQ.2600) THEN 
+      IF (KWKTYP.EQ.2600) THEN
 *   landscape mode normal file
          KWKDAT(ROTATE,KWKIX) = 1
          KWKDAT(TEX,KWKIX) = 0
@@ -197,7 +197,7 @@
 *   portrait mode normal file
          KWKDAT(ROTATE,KWKIX) = 0
          KWKDAT(TEX,KWKIX) = 0
-      ELSEIF (KWKTYP.EQ.2610) THEN 
+      ELSEIF (KWKTYP.EQ.2610) THEN
 *   landscape mode TeX file
          KWKDAT(ROTATE,KWKIX) = 1
          KWKDAT(TEX,KWKIX) = 1
@@ -222,7 +222,7 @@
         QWR3 = QHP(KHPXR(KCTBPT(3,KWKIX))+I)
         KHP(KHPXI(KWKDAT(CT,KWKIX))+I) =
      :   NINT( (0.30*QWR1 + 0.59*QWR2 + 0.11*QWR3) * 255.0)
-   14 CONTINUE              
+   14 CONTINUE
 
 *   Ask operating system to make a connection
       CALL GKIOOP(KFWKFW,KCID(KWKIX),KWCID(KWKIX))
@@ -235,10 +235,10 @@
       QCWVYT(KWKIX) = QDSDY(KWKIX)
 
 *  initialize buffering
-      CALL GKFOCO(KIOIT,' ',NLEFT)                              
+      CALL GKFOCO(KIOIT,' ',NLEFT)
 *  initialise device
       CALL GK3CID
-      KWI1 = GOUTPT         
+      KWI1 = GOUTPT
       GOTO 9999
 
 * Close workstation
@@ -366,11 +366,11 @@
   122   CONTINUE
 *   Restore line type and width
       IF (KWLNTY(KWKIX).GT.1) CALL GKFOCO(KIOPB, 'E10'//IS2,NLEFT)
-      IF (NINT(QWLNWD(KWKIX)).GT.1) 
+      IF (NINT(QWLNWD(KWKIX)).GT.1)
      :                         CALL GKFOCO(KIOPB, 'F1!'//IS2,NLEFT)
-             
+
         CALL GKSTDA(KREALS,IOFF)
-      ENDIF                        
+      ENDIF
       GOTO 8888
 
 
@@ -381,7 +381,7 @@
       IF (KWPMCI(KWKIX).EQ.0) THEN
          CALL GKFOCO(KIOPB, VDM//'G2'//IS2,NLEFT)
       ELSE
-         CALL GKFOCO(KIOPB, VDM//'G0'//IS2,NLEFT)    
+         CALL GKFOCO(KIOPB, VDM//'G0'//IS2,NLEFT)
       END IF
       CALL GKSTAL(KREALS,ICHUNK*2,IOFF)
       IF (KERROR.EQ.0) THEN
@@ -464,7 +464,7 @@
          CALL GKCRCS(KWI1,NRD,RX,RY,1,.FALSE.,1.0,GK3CLN,GK3CRO)
 *      Restore line type and width
          IF (KWLNTY(KWKIX).GT.1) CALL GKFOCO(KIOPB, 'E10'//IS2,NLEFT)
-         IF (NINT(QWLNWD(KWKIX)).GT.1) 
+         IF (NINT(QWLNWD(KWKIX)).GT.1)
      :                            CALL GKFOCO(KIOPB, 'F1!'//IS2,NLEFT)
       ELSE
 * Filled chord, pie, circle
@@ -489,7 +489,7 @@
 
 
 
-* Set polymarker attributes               
+* Set polymarker attributes
   190 CONTINUE
       CALL GKDPMB
 * Need to check because individual settings won't have been checked.
@@ -582,7 +582,7 @@
 * Set pattern representation
   270 CONTINUE
       CALL GKSRPA(NID,IDAT)
-      GOTO 9999                              
+      GOTO 9999
 
 
 
@@ -594,7 +594,7 @@
         QHP(KHPXR(KCTBPT(2,KWKIX))+KWI1) = QWR2
         QHP(KHPXR(KCTBPT(3,KWKIX))+KWI1) = QWR3
         IF(KWI1.GT.0) THEN
-            KHP(KHPXI(KWKDAT(CT,KWKIX))+KWI1) = 
+            KHP(KHPXI(KWKDAT(CT,KWKIX))+KWI1) =
      :          NINT( (0.30*QWR1 + 0.59*QWR2 + 0.11*QWR3) * 255.0)
         END IF
       ELSE
@@ -652,7 +652,7 @@
             QWCLXR(KWKIX) = QWCLXR(KWKIX) + QCWVXR(KWKIX) * SCALE
          END IF
       END IF
-      GOTO 9999      
+      GOTO 9999
 
 
 
@@ -675,7 +675,7 @@
       CALL GKSGWK(IENT,.FALSE.)
       GOTO 9999
 
- 
+
 * Write item to GKSM
   910 CONTINUE
       KERROR = 32
@@ -758,7 +758,7 @@
 *     Data returned:
 *     KERROR : error indicator
 *     KWI1   : no of segment names
-*     KWI2   : Nth member of set of stored segments for this 
+*     KWI2   : Nth member of set of stored segments for this
 *                workstation
 *
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)

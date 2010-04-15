@@ -117,7 +117,7 @@
 
          END DO
 
-*    End of loop round all lines of input data array 
+*    End of loop round all lines of input data array
 
       END DO
 

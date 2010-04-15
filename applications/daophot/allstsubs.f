@@ -63,16 +63,16 @@ C
 C
 C#######################################################################
 C
-      SUBROUTINE  REGRP (ID, X, Y, MAG, SKY, CHI, DXOLD, DYOLD, 
+      SUBROUTINE  REGRP (ID, X, Y, MAG, SKY, CHI, DXOLD, DYOLD,
      .     XCLAMP, YCLAMP, MAXSTR, NSTAR, FITRAD, LAST, INDEX, HOLD)
 C
 C=======================================================================
 C
 C This subroutine accepts a list of stellar coordinates, and
-C associates the stars into natural groups based on a critical 
-C separation:  stars within one critical separation of each other are 
-C put into the same group; no star is within one critical separation of 
-C any star outside its group.  
+C associates the stars into natural groups based on a critical
+C separation:  stars within one critical separation of each other are
+C put into the same group; no star is within one critical separation of
+C any star outside its group.
 C
 C             OFFICIAL DAO VERSION:  1985 August 15
 C
@@ -109,24 +109,24 @@ C
       ITEST=0
       ITOP=2
 C
-C The stars are currently in a stack NSTAR stars long.  The variable 
-C ITEST will point to the position in the stack occupied by the star 
-C which is currently the center of a circle of the critical radius, 
-C within which we are looking for other stars; this also starts out 
-C with a value of 1.  ITOP points to the top position in the stack of 
-C the stars which have not yet been assigned to groups; this starts 
-C out with the value 2.  Each time through, the 
-C program goes down through the stack from ITOP and looks for stars 
-C within the critical distance from the star at stack position 
-C ITEST.  When such a star is found, it changes places in the stack 
-C with the star at ITOP and ITOP is incremented by one.  When the 
+C The stars are currently in a stack NSTAR stars long.  The variable
+C ITEST will point to the position in the stack occupied by the star
+C which is currently the center of a circle of the critical radius,
+C within which we are looking for other stars; this also starts out
+C with a value of 1.  ITOP points to the top position in the stack of
+C the stars which have not yet been assigned to groups; this starts
+C out with the value 2.  Each time through, the
+C program goes down through the stack from ITOP and looks for stars
+C within the critical distance from the star at stack position
+C ITEST.  When such a star is found, it changes places in the stack
+C with the star at ITOP and ITOP is incremented by one.  When the
 C search reaches a star J such that Y(J)-Y(ITEST) > CRIT it is known
 C that no further stars will be found within the critical distance, the
-C pointer ITEST is incremented by one, and the search proceeds again 
-C from the new value of ITOP.  If the pointer ITEST catches up 
-C with the pointer ITOP, that means that the group currently being 
-C built up is complete.  Then a new group is started beginning with 
-C the star at the current position ITEST, ( = the instantaneous 
+C pointer ITEST is incremented by one, and the search proceeds again
+C from the new value of ITOP.  If the pointer ITEST catches up
+C with the pointer ITOP, that means that the group currently being
+C built up is complete.  Then a new group is started beginning with
+C the star at the current position ITEST, ( = the instantaneous
 C value of ITOP), ITOP is incremented by 1, and the next group is built
 C up as before.
 C
@@ -134,17 +134,17 @@ C
       LAST(ITEST)=.FALSE.
       IF (ITEST .EQ. ITOP) THEN
 C
-C ITEST has reached ITOP; no other unassigned stars are within a 
-C critical separation of any member of the current group.  The group is 
+C ITEST has reached ITOP; no other unassigned stars are within a
+C critical separation of any member of the current group.  The group is
 C therefore complete.  Signify this by setting LAST(ITEST-1)=.TRUE.
-C (ITEST = the current value of ITOP), and then increment the value of 
+C (ITEST = the current value of ITOP), and then increment the value of
 C ITOP by one.
 C
          J=ITEST-1
          IF (J .GT. 0) LAST(J)=.TRUE.
          ITOP=ITOP+1                              ! Increment ITOP
 C
-C If ITOP is greater than NSTAR at this point, then we are finished 
+C If ITOP is greater than NSTAR at this point, then we are finished
 C (the last group contains one star).  Otherwise, on with the search.
 C
          IF (ITOP .GT. NSTAR) THEN
@@ -154,10 +154,10 @@ C
       END IF
 C
 C Now go through the list of unassigned stars, occupying positions ITOP
-C through NSTAR in the stack, to look for stars within the critical 
+C through NSTAR in the stack, to look for stars within the critical
 C distance of the star at position ITEST in the stack.  If one is found,
 C move it up to stack position ITOP and increment ITOP by one.
-C 
+C
       XTEST=X(ITEST)
       YTEST=Y(ITEST)
       J=ITOP
@@ -168,9 +168,9 @@ C
          IF (ABS(DX) .GT. CRIT) GO TO 2120
          IF (DX**2+DY**2 .GT. CRITSQ) GO TO 2120
 C
-C This star is within the critical distance of the star at stack 
+C This star is within the critical distance of the star at stack
 C position ITEST.  Therefore it should be added to the current group by
-C moving it up to position ITOP in the stack, where the pointer ITEST 
+C moving it up to position ITOP in the stack, where the pointer ITEST
 C may eventually reach it.
 C
          CALL ASWAP (MAXSTR, ITOP, I, X, Y, INDEX)
@@ -181,7 +181,7 @@ C
          ITOP=ITOP+1
 C
 C If ITOP is greater than NSTAR, then all stars have been assigned to
-C groups, and we are finished.  
+C groups, and we are finished.
 C
          IF (ITOP .GT. NSTAR) THEN
             DO K=ITEST,NSTAR-1
@@ -216,7 +216,7 @@ C
 C=======================================================================
 C
 C Make the I-th and J-th stars in the stack change places (J > I),
-C without otherwise altering the order of the stars.  The other 
+C without otherwise altering the order of the stars.  The other
 C arguments are self-evident.
 C
 C=======================================================================

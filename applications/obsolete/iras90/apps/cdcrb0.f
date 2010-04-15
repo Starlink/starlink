@@ -51,7 +51,7 @@
 *        variance array.
 *     CRSSMP( NCROS ) = REAL (Given)
 *        Crossing position in fractional sample number of each crossing.
-*        This position of each extracted trace section should be put at 
+*        This position of each extracted trace section should be put at
 *        the middle of the output trace.
 *     CRSFLG( NCROS ) = INTEGER (Given and Returned)
 *        On entry, flagging out, with value 3,  those crossing traces
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
 
 *  Get the half length of the output section.
       HLFLEN = SCNLEN / 2
-      
+
 *  Go through all crossings.
       DO I = 1, NCROS
 
@@ -135,7 +135,7 @@
 
 *  Get the detector index of this crossing trace.
             DTX = CRSDTX( I )
-      
+
 *  If this is the first crossing, neither reversing nor alignment is
 *  required. extract it from the input array.
             IF ( I .EQ. 1 ) THEN
@@ -159,7 +159,7 @@
                   END IF
                END DO
 
-*  Otherwise the alignment and reversing have to be considered.    
+*  Otherwise the alignment and reversing have to be considered.
 *  Find the position of the crossing sample of the first crossing with
 *  repect to present trace after alignning the crossing positions of
 *  these two traces.
@@ -170,7 +170,7 @@
                ELSE
                   POS = CRSSMP( I ) + FRSMP
                END IF
-      
+
 *  If 'NEAREST' neighborehood interploating is to be used, put the
 *  nearest sample to this position to the middle of the output section.
                IF ( INTER( : 7 ) .EQ. 'NEAREST' ) THEN
@@ -181,12 +181,12 @@
                   ELSE
                      OUTDAT( HLFLEN + 1, I ) = VAL__BADR
                   END IF
-      
+
 *  Extract samples on both side of this sample.
                   DO J = 1,  HLFLEN
 
 *  Go forward along the input trace.
-                     IF ( SMP + J .GT. ESMP .OR. 
+                     IF ( SMP + J .GT. ESMP .OR.
      :                    INDAT( SMP + J, DTX ) .EQ. VAL__BADR ) THEN
                         OVAL = VAL__BADR
                      ELSE
@@ -194,15 +194,15 @@
                      END IF
 
 *  Write to the output trace forward or backward according to revers
-*  requirement.      
+*  requirement.
                      IF ( .NOT.REVS ) THEN
                         OUTDAT( HLFLEN + 1 + J, I ) = OVAL
-                     ELSE      
+                     ELSE
                         OUTDAT( HLFLEN + 1 - J, I ) = OVAL
                      END IF
 
-*  Go backward along the input trace.            
-                     IF ( SMP - J .LT. BSMP .OR. 
+*  Go backward along the input trace.
+                     IF ( SMP - J .LT. BSMP .OR.
      :                    INDAT( SMP + J, DTX ) .EQ. VAL__BADR ) THEN
                         OVAL = VAL__BADR
                      ELSE
@@ -210,14 +210,14 @@
                      END IF
 
 *  Write to the output trace backward or forward according to revers
-*  requirement.      
+*  requirement.
                      IF ( .NOT.REVS ) THEN
                         OUTDAT( HLFLEN + 1 - J, I ) = OVAL
                      ELSE
                         OUTDAT( HLFLEN + 1 + J, I ) = OVAL
                      END IF
                   END DO
-      
+
 *  If 'LINEAR' interpolation is to be used, get the distances from the
 *  interpolated point to is adjacent samples.
                ELSE IF ( INTER( : 6 ) .EQ. 'LINEAR' ) THEN
@@ -228,28 +228,28 @@
                   IF ( INDAT( INT( POS ), DTX ) .NE. VAL__BADR ) THEN
                      VAL1 = INDAT( INT( POS ), DTX ) * SCALE( DTX )
                   ELSE
-                     VAL1 = VAL__BADR 
+                     VAL1 = VAL__BADR
                   END IF
-                  IF ( INDAT( INT( POS ) + 1, DTX ) .NE. 
+                  IF ( INDAT( INT( POS ) + 1, DTX ) .NE.
      :                 VAL__BADR ) THEN
-                     VAL2 = INDAT( INT( POS ) + 1, DTX ) * SCALE( DTX )        
+                     VAL2 = INDAT( INT( POS ) + 1, DTX ) * SCALE( DTX )
                   ELSE
                      VAL2 = VAL__BADR
                   END IF
 
 *  Find the value at POS by linear interpolating and put at the middle
 *  of the output array.
-                  CALL IRM_LINR( DIST1, DIST2, VAL1, VAL2, OVAL, 
-     :                           STATUS )      
+                  CALL IRM_LINR( DIST1, DIST2, VAL1, VAL2, OVAL,
+     :                           STATUS )
                   OUTDAT( HLFLEN + 1, I ) = OVAL
-      
+
 *  Extract samples from both sides of POS.
                   DO J = 1, HLFLEN
 
-*  Go forward along the input trace.      
+*  Go forward along the input trace.
                      SMP1 = INT( POS ) + J
                      SMP2 = SMP1 + 1
-                     IF ( SMP1 .GT. ESMP .OR. 
+                     IF ( SMP1 .GT. ESMP .OR.
      :                    INDAT( SMP1, DTX ) .EQ. VAL__BADR ) THEN
                         VAL1 = VAL__BADR
                      ELSE
@@ -273,11 +273,11 @@
                      ELSE
                         OUTDAT( HLFLEN + 1 - J, I ) = OVAL
                      END IF
-      
+
 *  Go backward along the input trace.
                      SMP1 = INT( POS ) - J
-                     SMP2 = SMP1 + 1      
-                     IF ( SMP1 .LT. BSMP .OR. 
+                     SMP2 = SMP1 + 1
+                     IF ( SMP1 .LT. BSMP .OR.
      :                    INDAT( SMP1, DTX ) .EQ. VAL__BADR ) THEN
                         VAL1 = VAL__BADR
                      ELSE
@@ -299,9 +299,9 @@
                      IF ( .NOT.REVS ) THEN
                         OUTDAT( HLFLEN + 1 - J, I ) = OVAL
                      ELSE
-                        OUTDAT( HLFLEN + 1 + J, I ) = OVAL 
+                        OUTDAT( HLFLEN + 1 + J, I ) = OVAL
                      END IF
-                  END DO   
+                  END DO
                END IF
             END IF
 

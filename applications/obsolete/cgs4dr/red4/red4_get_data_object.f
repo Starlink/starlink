@@ -27,7 +27,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Import:
-      CHARACTER*(*) REF_NAME    !The reference name used to identify the 
+      CHARACTER*(*) REF_NAME    !The reference name used to identify the
 *                               !structure.
       CHARACTER*(*) OBJECT_NAME !The name of the object in the structure,
 *                               !it is assumed to alrerady exist.
@@ -47,12 +47,12 @@
       INTEGER ICH_LEN, ICH_FOLD
 *    Global variables:
 *    Local variables :
-      CHARACTER*80 OBJ_NAME                 ! DTA_ name for structure 
+      CHARACTER*80 OBJ_NAME                 ! DTA_ name for structure
       CHARACTER*32 REF_NAME_UC              ! Upper case version of REF_NAME
       CHARACTER*80 NAME
       CHARACTER*80 ERROR
       CHARACTER*80 STRUCTURE
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       INTEGER INVOKE
       INTEGER DTA_STATUS
       INTEGER DTA_CODE
@@ -68,7 +68,7 @@
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
       IF (STATUS.NE.0) GO TO 500          ! Error exit
 *
-*     Generate the name of the object string 
+*     Generate the name of the object string
       NAME=OBJ_NAME(:LENGTH)//OBJECT_NAME(:ICH_LEN(OBJECT_NAME))
 *
 *     Read it

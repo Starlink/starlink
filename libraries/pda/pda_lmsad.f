@@ -78,10 +78,10 @@
       DOUBLE PRECISION ARRAY( 0 : NEL + 1 )
 
       INTEGER IP( 0: NEL + 1 )
-      
+
 *  Arguments Returned:
       INTEGER LINK( 0 : NEL + 1 )
-      
+
 *  Local Variables:
       INTEGER T
       INTEGER P
@@ -197,7 +197,7 @@
       END DO
 
 *  And permute these ranks into straight-forward indices and copy into
-*  IP. 
+*  IP.
       CALL PDA_IPERM( NEL, LINK( 1 ) )
       DO I = 1, NEL
          IP( I ) = LINK( I )

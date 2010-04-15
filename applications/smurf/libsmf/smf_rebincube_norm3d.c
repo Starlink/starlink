@@ -14,31 +14,31 @@
 *     C function
 
 *  Invocation:
-*     void smf_rebincube_norm3d( dim_t nout, int genvar, 
-*                                int nused, float *data_array, 
-*                                float *var_array, double *wgt_array, 
+*     void smf_rebincube_norm3d( dim_t nout, int genvar,
+*                                int nused, float *data_array,
+*                                float *var_array, double *wgt_array,
 *                                int *status );
 
 *  Arguments:
 *     nout = dim_t (Given)
 *        Number of elements in output cube.
 *     genvar = int (Given)
-*        Indicates how the output variances should be calculated: 
+*        Indicates how the output variances should be calculated:
 *           0 = do not calculate any output variances
 *           1 = use spread of input data values
 *           2 = use system noise temperatures
 *     nused = dim_t (Given)
 *        Number of input elements pasted into the output cube.
 *     data_array = float * (Given and Returned)
-*        The 3D data array for the output cube. 
+*        The 3D data array for the output cube.
 *     var_array = float * (Given and Returned)
 *        The 3D array in which to store the variances for the output cube if
-*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
-*        zero). 
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is
+*        zero).
 *     wgt_array = double * (Given and Returned)
-*        The 3D array in which to store the relative weighting for each pixel 
+*        The 3D array in which to store the relative weighting for each pixel
 *        in the output cube. If "genvar" is 2, this array should be the
-*        same size as "var_array". If "genvar" is 2, this array should be 
+*        same size as "var_array". If "genvar" is 2, this array should be
 *        twice the size of "var_array".
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
@@ -134,7 +134,7 @@ void smf_rebincube_norm3d( dim_t nout, int genvar, int nused, float *data_array,
          for( iv = 0; iv < nout; iv++ ) var_array[ iv ] = VAL__BADR;
       }
 
-/* Now handle cases where the output variance is calculated on the basis 
+/* Now handle cases where the output variance is calculated on the basis
    of the spread of input values. */
    } else if( genvar == 1 ) {
 
@@ -145,7 +145,7 @@ void smf_rebincube_norm3d( dim_t nout, int genvar, int nused, float *data_array,
    and the weighted mean data value as an estimate of the variance of the
    input data. We need to correct this by a factor of n/(n-1) (where "n"
    is the number of input values) to take account of the reduced number
-   of degrees of freedom when calculating this weighted mean squared 
+   of degrees of freedom when calculating this weighted mean squared
    residual (this is important when not many input values are being
    combined). We estimate "n" for each output pixel as the weight for the
    output pixel divided by the mean weight per input pixel. */
@@ -166,7 +166,7 @@ void smf_rebincube_norm3d( dim_t nout, int genvar, int nused, float *data_array,
          }
       }
 
-/* Now handle cases where the output variance is calculated on the basis 
+/* Now handle cases where the output variance is calculated on the basis
    of the input Tsys values. */
    } else if( genvar == 2 ) {
 

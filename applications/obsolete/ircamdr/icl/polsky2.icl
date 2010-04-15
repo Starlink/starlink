@@ -17,10 +17,10 @@ proc polsky2
   out4o = polly4o&"s"
   out4e = polly4e&"s"
   print "Output images will be called : "
-  print (out1o) "," (out1e) 
-  print (out2o) "," (out2e) 
-  print (out3o) "," (out3e) 
-  print (out4o) "," (out4e) 
+  print (out1o) "," (out1e)
+  print (out2o) "," (out2e)
+  print (out3o) "," (out3e)
+  print (out4o) "," (out4e)
   print "Plotting image " (polly1o)
   obeyw plt2d clear
   send plt2d set cursor_image (polly1o)
@@ -83,10 +83,10 @@ proc polsky2
   obeyw rapi2d CSUB (polly4o) (med4o) (out4o)
   obeyw rapi2d CSUB (polly4e) (med4e) (out4e)
   print " "
-  print "Output sky-subtracted image are :    0 deg. - " (out1o) (out1e) 
-  print "                                :   45 deg. - " (out2o) (out2e) 
-  print "                                : 22.5 deg. - " (out3o) (out3e) 
-  print "                                : 67.5 deg. - " (out4o) (out4e) 
+  print "Output sky-subtracted image are :    0 deg. - " (out1o) (out1e)
+  print "                                :   45 deg. - " (out2o) (out2e)
+  print "                                : 22.5 deg. - " (out3o) (out3e)
+  print "                                : 67.5 deg. - " (out4o) (out4e)
   print " "
 end proc
 

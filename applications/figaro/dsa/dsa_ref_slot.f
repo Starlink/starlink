@@ -96,7 +96,7 @@ C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     We look through the tables backwards, since they generally 
+C     We look through the tables backwards, since they generally
 C     fill up from the top down.
 C
       FOUND=.FALSE.

@@ -1,4 +1,4 @@
-                                                                               
+
 *+  KFH_STATS - Calculates the statistics of an image.
       SUBROUTINE KFH_STATS(IMAGE,XDIM,YDIM,X1,Y1,X2,Y2,STATUS)
 *    Description :
@@ -10,7 +10,7 @@
 *     sigma away from the mean and mode are calculated.
 *     Also , a histogram is calculated for the determination
 *     of the mode if one has not already been calculated (in
-*     the option HIST). All these values are displayed to 
+*     the option HIST). All these values are displayed to
 *     the user.
 *    Invocation :
 *     CALL KFH_STATS(IMAGE,XDIM,YDIM,X1,Y1,X2,Y2,STATUS)
@@ -44,7 +44,7 @@
 *     odd , then the median will be the middle value
 *     of the sorted array. If even , the median is the
 *     arithmetic mean of the two centre values.
-*     The mode is found by searching through the 
+*     The mode is found by searching through the
 *     histogram for the value with the highest frequency.
 *     The mean and standard deviation are calculated
 *     from :
@@ -92,7 +92,7 @@
       REAL MEANP                         ! The mean plus 3 sigma.
       REAL MEANM                         ! The mean minus 3 sigma.
       REAL MEDIAN                        ! The median of the image.
-      REAL MINVAL                        ! The minimum value of the 
+      REAL MINVAL                        ! The minimum value of the
 *                                        ! image.
       REAL MODE                          ! The mode of the image.
       REAL MODEP                         ! The mode plus 3 sigma.
@@ -123,7 +123,7 @@
 *                                        ! about the mode.
       REAL SIGMOD                        ! Standard deviation about the
 *                                        ! mode of the image data.
-      REAL SUM                           ! Sum of the image data 
+      REAL SUM                           ! Sum of the image data
 *                                        ! elements.
       REAL SUMSQ                         ! Sum of the squares of the
 *                                        ! image data elements.
@@ -209,7 +209,7 @@
 
 *
 *       Display the maximum value of the image.
-*       
+*
 
          CALL MSG_SETR('MAXV',MAXVAL)
          CALL MSG_OUT('HIVAL','   MAXIMUM .............. ^MAXV',
@@ -395,7 +395,7 @@
 
             DO J = X1,X2,1
 
-               IF (IMAGE(J,I).GE.MEANM.AND.IMAGE(J,I).LE.MEANP) 
+               IF (IMAGE(J,I).GE.MEANM.AND.IMAGE(J,I).LE.MEANP)
      :            THEN
 
                   NWSUM = NWSUM + IMAGE(J,I)
@@ -404,14 +404,14 @@
 
                ENDIF
 
-               IF (IMAGE(J,I).GE.MODEM.AND.IMAGE(J,I).LE.MODEP) 
+               IF (IMAGE(J,I).GE.MODEM.AND.IMAGE(J,I).LE.MODEP)
      :            THEN
 
                   MODSUM = MODSUM + IMAGE(J,I)
                   MSUMSQ = MSUMSQ + (IMAGE(J,I)*IMAGE(J,I))
                   NUMB = NUMB + 1
 
-               ENDIF 
+               ENDIF
 
             END DO
 

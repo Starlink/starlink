@@ -25,7 +25,7 @@
 *        coords to pixel coords, supplied to ARD_WORK. Ignored if a call
 *        to ARD_WCS has already been made.
 *     AWCS = INTEGER (Returned)
-*        An AST pointer to the returned Object. AST__NULL is returned if 
+*        An AST pointer to the returned Object. AST__NULL is returned if
 *        an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,16 +63,16 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'ARD_CONST'        ! ARD provate constants 
+      INCLUDE 'ARD_ERR'          ! ARD error constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'ARD_CONST'        ! ARD provate constants
 
 *  Global Constants:
       INCLUDE 'ARD_COM'          ! ARD common blocks
@@ -118,7 +118,7 @@
 *  Initialise returned pointer.
       AWCS = AST__NULL
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If ARD_WCS has been called, take a copy of the FrameSet supplied to
@@ -128,18 +128,18 @@
 
 *  Check each Frame until one is found with Domain stored in CMN_ADOM.
 *  This is the frame that describes pixel coordinates in the mask array.
-         IPIX = AST__NOFRAME       
+         IPIX = AST__NOFRAME
          DO I = 1, AST_GETI( AWCS, 'NFRAME', STATUS )
             FR = AST_GETFRAME( AWCS, I, STATUS )
-   
+
             IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ. CMN_ADOM ) THEN
                CALL AST_ANNUL( FR, STATUS )
                IPIX = I
                GO TO 10
             END IF
-   
+
             CALL AST_ANNUL( FR, STATUS )
-   
+
          END DO
 
  10      CONTINUE
@@ -151,7 +151,7 @@
 *  Check it has the required number of axes.
             IF( AST_GETI( AWCS, 'Nin', STATUS ) .NE. NDIM ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARD__NOPIX 
+                  STATUS = ARD__NOPIX
                   CALL MSG_SETC( 'D', CMN_ADOM )
                   CALL MSG_SETI( 'N', AST_GETI( AWCS, 'Nin', STATUS ) )
                   CALL MSG_SETI( 'M', NDIM )
@@ -160,42 +160,42 @@
      :                          'but ^M are required.', STATUS )
                END IF
             END IF
-         
-*  Application coordinates are given by the current Frame of the WCS 
-*  FrameSet. Therefore, the Mapping from the current Frame to Application 
+
+*  Application coordinates are given by the current Frame of the WCS
+*  FrameSet. Therefore, the Mapping from the current Frame to Application
 *  Coordinates Frame is a UnitMap.
             M3 = AST_UNITMAP( AST_GETI( AWCS, 'NAXES', STATUS ), ' ',
-     :                        STATUS )  
+     :                        STATUS )
 
 *  Report an error if no pixel frame was found.
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
-            STATUS = ARD__NOPIX 
+            STATUS = ARD__NOPIX
             CALL MSG_SETC( 'D', CMN_ADOM )
             CALL ERR_REP( 'ARD1_APWCS_ERR1', 'The FrameSet specified '//
      :                  'using ARD_WCS has no Frame with Domain '//
      :                  '''^D'' (possible programming error).', STATUS )
          END IF
 
-*  If no WCS FrameSet was supplied, create a new FrameSet containing just 
+*  If no WCS FrameSet was supplied, create a new FrameSet containing just
 *  a PIXEL Frame.
       ELSE
          F2 = AST_FRAME( NDIM, 'DOMAIN=PIXEL,Title=Pixel coordinates',
      :                   STATUS )
-         AWCS = AST_FRAMESET( F2, ' ', STATUS ) 
+         AWCS = AST_FRAMESET( F2, ' ', STATUS )
          CALL AST_ANNUL( F2, STATUS )
 
-*  The Mapping from PIXEL to application coords is given by argument TR. If 
-*  the first element of the supplied  transformation is bad, use a UnitMap to 
+*  The Mapping from PIXEL to application coords is given by argument TR. If
+*  the first element of the supplied  transformation is bad, use a UnitMap to
 *  connect this Frame to the PIXEL Frame.
-         IF( TR( 1 ) .EQ. VAL__BADR ) THEN      
+         IF( TR( 1 ) .EQ. VAL__BADR ) THEN
             M3 = AST_UNITMAP( NDIM, ' ', STATUS )
 
 *  Otherwise, create a CmpMap representing the Mapping from this
 *  Frame to the PIXEL Frame.
-         ELSE     
+         ELSE
 
-*  First create a MatrixMap representing the matrix part of the mapping 
-*  (i.e. skipping over the elements of TR which represent the constant 
+*  First create a MatrixMap representing the matrix part of the mapping
+*  (i.e. skipping over the elements of TR which represent the constant
 *  offset vector).
             K = 1
             L = 1
@@ -206,9 +206,9 @@
                   K = K + 1
                   L = L + 1
                END DO
-            END DO         
-      
-            M1 = AST_MATRIXMAP( NDIM, NDIM, 0, M, ' ', STATUS ) 
+            END DO
+
+            M1 = AST_MATRIXMAP( NDIM, NDIM, 0, M, ' ', STATUS )
 
 *  Now create a WinMap representing the vector offset elements.
             DO I = 1, NDIM
@@ -218,8 +218,8 @@
                OUTA( I ) = OFFV
                OUTB( I ) = 2*OFFV
             END DO
-      
-            M2 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+
+            M2 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Combine the MatrixMap and the WinMap. This is the Mapping from
 *  application coords to pixel coords.
@@ -238,14 +238,14 @@
 
 *  Create a Frame representing ARD application coords. Base this on a
 *  copy of the current Frame in order to inherit the correct class of Frame.
-      F1 = AST_COPY( AST_GETFRAME( AWCS, AST__CURRENT, STATUS ), 
+      F1 = AST_COPY( AST_GETFRAME( AWCS, AST__CURRENT, STATUS ),
      :               STATUS )
       CALL AST_SETC( F1, 'DOMAIN', 'ARDAPP', STATUS )
-      CALL AST_SETC( F1, 'TITLE', 'ARD application coordinates', 
+      CALL AST_SETC( F1, 'TITLE', 'ARD application coordinates',
      :               STATUS )
 
 *  Add this Frame into the returned FrameSet.
-      CALL AST_ADDFRAME( AWCS, AST__CURRENT, M3, F1, STATUS ) 
+      CALL AST_ADDFRAME( AWCS, AST__CURRENT, M3, F1, STATUS )
 
 *  Annull AST objects.
       CALL AST_ANNUL( M3, STATUS )

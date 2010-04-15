@@ -124,16 +124,16 @@
 *     If the DOCUMENT=FALSE option is chosen, then the output file will
 *     contain none of the Latex command definitions needed to produce
 *     the final document. To define these commands, the contents of the
-*     file $STARLINK_DIR/share/sst.tex must be included in the Latex 
-*     input file in the preamble (in the standard SUN template). The 
-*     layout definitions in this file are designed to operate correctly 
+*     file $STARLINK_DIR/share/sst.tex must be included in the Latex
+*     input file in the preamble (in the standard SUN template). The
+*     layout definitions in this file are designed to operate correctly
 *     within the Latex environment normally used in a Starlink User Note
 *     (see the file $STARLINK_DIR/share/sun.tex).
 *
 *     It is recommended that you include the contents of the file
-*     $STARLINK_DIR/share/sst.tex in your final document explicitly 
-*     rather than by using the Latex \include directive, otherwise it 
-*     may not be possible to process the document in future if changes 
+*     $STARLINK_DIR/share/sst.tex in your final document explicitly
+*     rather than by using the Latex \include directive, otherwise it
+*     may not be possible to process the document in future if changes
 *     have to be made to the Latex definitions in this file.
 
 *  Arguments:
@@ -150,11 +150,11 @@
 *     the terms of the GNU General Public License as published by the Free Software
 *     Foundation; either version 2 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,but WITHOUT ANY
 *     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 *     PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License along with
 *     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 *     Place,Suite 330, Boston, MA  02111-1307, USA
@@ -344,7 +344,7 @@
      :      STATUS )
             GO TO 99
          ELSE
-            INPOPN = .TRUE.   
+            INPOPN = .TRUE.
          END IF
 
 *  Loop to read prologues from the input file, stopping when no
@@ -357,7 +357,7 @@
             IF ( SCB_NLINE .GT. 0 ) THEN
 
 *  Start a new page for each prologue if required.
-               IF ( PAGE ) CALL SST_PUT( 0, SST__BKSLH // 'newpage', 
+               IF ( PAGE ) CALL SST_PUT( 0, SST__BKSLH // 'newpage',
      :                                   STATUS )
 
 *  Translate each prologue into part of the output Latex document and
@@ -398,14 +398,14 @@
          TOTPRO = TOTPRO + NPRO
 
 *  Close input file if opened.
-         IF ( INPOPN ) THEN 
+         IF ( INPOPN ) THEN
             CALL FIO_CLOSE( FDIN, STATUS )
             INPOPN = .FALSE.
          END IF
 2     CONTINUE
 
 *  If producing a full document, then end it.
-      IF ( DOC ) CALL SST_PUT( 0, SST__BKSLH // 'end{document}', 
+      IF ( DOC ) CALL SST_PUT( 0, SST__BKSLH // 'end{document}',
      :                         STATUS )
 
 *  Arrive here when all the input files have been processed, or earlier

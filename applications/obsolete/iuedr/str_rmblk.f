@@ -1,5 +1,5 @@
       SUBROUTINE str_RMBLK(STR)
- 
+
 
 *+
 *
@@ -36,10 +36,10 @@
       INTEGER ARB         ! arbitrary string length
 
       PARAMETER (ARB=100)
- 
+
 *   Import/Export:
       BYTE STR(ARB)       ! string
- 
+
 *   External references:
       INTEGER str_LEN     ! string length
 

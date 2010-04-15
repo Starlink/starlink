@@ -98,7 +98,7 @@ C# IL>= a, OL>= 0
      :        NP, IOFF, MFRAC, MXCONT, MXNP, NCONT
 
       REAL HT, RNYJ, TH, TW, WD1, WDC, WDN, WDP, X, Y,
-     :     XCBOX(4), YCBOX(4), XD(2), YD(2), XS, YS, 
+     :     XCBOX(4), YCBOX(4), XD(2), YD(2), XS, YS,
      :     XTRN, YTRN, XTX(4),YTX(4), XW(2), YW(2), XI, YI
 
 *

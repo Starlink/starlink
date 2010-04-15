@@ -93,7 +93,7 @@ piclabel device=${plotdev} label="right_plot"
 echo "  Plotting white-light image (LEFT)."
 
 picsel label="left_plot" device=${plotdev}
-display ${wlifile} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null 
+display ${wlifile} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null
 
 echo "  Collapsing datacube in spectral direction."
 collapse in=${cubfile} out=${colfile} axis=3 >& /dev/null
@@ -102,8 +102,8 @@ collapse in=${cubfile} out=${colfile} axis=3 >& /dev/null
 echo "  Plotting collapsed cube (RIGHT)."
 
 picsel label="right_plot" device=${plotdev}
-display ${colfile} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null 
-        
+display ${colfile} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null
+
 echo " "
 echo "  LEFT and RIGHT images should be identical"
 
@@ -126,7 +126,7 @@ piclabel device=${plotdev} label="right_plot"
 # Plot spectrum.
 echo "  Plotting spectrum from pixel (9,19)."
 picsel label="left_plot" device=${plotdev}
-linplot "${rspfile} device=xwin" 
+linplot "${rspfile} device=xwin"
 
 # Rip single spectrum from pixel (9,19).
 echo "  Extracting spectra from datacube."
@@ -136,11 +136,11 @@ settitle "ndf=${ripfile} title='Pixel (9,19) EXTRACTED'"
 # Display the extracted spectrum.
 picsel label="right_plot" device=${plotdev}
 linplot "${ripfile} device=xwin"
-        
-echo " "
-echo "  LEFT and RIGHT spectra should be identical" 
 
-echo " " 
+echo " "
+echo "  LEFT and RIGHT spectra should be identical"
+
+echo " "
 echo "END"
 
 # Clean up.

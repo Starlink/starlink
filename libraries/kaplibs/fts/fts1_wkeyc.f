@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -208,7 +208,7 @@
       CALL CHR_APPND( KEYWRD, HEADER, CARDLN )
 
 *  Make a copy of the supplied value so that any quotes present can be
-*  doubled. Find the length of the value.  
+*  doubled. Find the length of the value.
       VAL = VALUE
       NCHAR = CHR_LEN( VAL )
       IF ( .NOT. COMCRD .AND. VAL .NE. ' ' ) THEN
@@ -262,7 +262,7 @@
          CALL CHR_APPND( VAL( : VALN ), HEADER, CARDLN )
          CARDLN = ENDPOS + VALN
          CALL CHR_APPND( '''', HEADER, CARDLN )
-         
+
 *  If there is a comment string following keyword value, ...
          IF ( CMTBGN .NE. ' ' .AND. COMNT .NE. ' ' ) THEN
 
@@ -294,5 +294,5 @@
          HEADER( CARDLN:CARDLN ) = ' '
          CALL CHR_APPND( COMNT, HEADER, CARDLN )
       END IF
-      
+
       END

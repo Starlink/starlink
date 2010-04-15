@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SPD_CZGE( DIALOG, MAXBBS, NCOMP, FITPAR, FITDIM, 
+*     CALL SPD_CZGE( DIALOG, MAXBBS, NCOMP, FITPAR, FITDIM,
 *        CFLAGS, PFLAGS, SFLAGS, THETA, ALPHA, TEMPE, COVAR, STATUS )
 
 *  Description:
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

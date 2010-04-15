@@ -5,7 +5,7 @@ C     F I G _ C L O S E S T Q
 C
 C     Returns the value of the closest pixel in DATA to IX,IY
 C     that is not indicated as invalid by the corresponding quality
-C     array.  The algorithm spirals out looking for good pixels, and 
+C     array.  The algorithm spirals out looking for good pixels, and
 C     eventually gives up when the spiral has got ridiculously large.
 C
 C     Parameters -  (">" input, "<" output)

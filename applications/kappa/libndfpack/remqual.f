@@ -22,7 +22,7 @@
 *  Description:
 *     This routine removes selected quality name definitions from an
 *     NDF (see task SETQUAL).  All quality names information may
-*     be removed by specifying a quality name of "ANY". 
+*     be removed by specifying a quality name of "ANY".
 *
 *     An error will be reported if an attempt is made to remove a quality
 *     name that has been flagged as "read-only" (e.g. using the READONLY
@@ -89,7 +89,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -137,7 +137,7 @@
       CALL GRP_SETCS( IGRP, .FALSE., STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999 
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain the quality names to be removed, storing them in the group
 *  just created. Loop until the group expression obtained from the
@@ -158,7 +158,7 @@
             FLAG = .FALSE.
             CALL MSG_SETI( 'MX', MAXQNM )
             CALL MSG_OUT( 'REMQUAL_MSG1', 'WARNING: Only ^MX quality '//
-     :                    'names can be removed in a single run', 
+     :                    'names can be removed in a single run',
      :                    STATUS )
 
 *  If too many quality names have been supplied, delete the surplus
@@ -199,12 +199,12 @@
       CALL IRQ_FIND( NDFIN, LOCS, XNAME, STATUS )
 
 *  Annul any error, and indicate no names should be deleted.
-      IF( STATUS .NE. SAI__OK ) THEN 
+      IF( STATUS .NE. SAI__OK ) THEN
          CALL IRQ_RLSE( LOCS, STATUS )
          CALL ERR_ANNUL( STATUS )
          LOCS( 1 ) = ' '
          NNAMES = 0
-      END IF      
+      END IF
 
 *  Loop round to remove each specified quality name.
       DO INAME = 1, NNAMES
@@ -212,7 +212,7 @@
 *  Get the next quality name.
          CALL GRP_GET( IGRP, INAME, 1, QNAME, STATUS )
 
-*  Remove the quality name. 
+*  Remove the quality name.
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL IRQ_REMQN( LOCS, QNAME, STATUS )
 
@@ -244,9 +244,9 @@
 
       END DO
 
-*  If any quality information was found in the NDF, note the number of 
+*  If any quality information was found in the NDF, note the number of
 *  remaining quality names, and release the quality name information.
-      IF( LOCS( 1 ) .NE. ' ' ) THEN 
+      IF( LOCS( 1 ) .NE. ' ' ) THEN
          CALL IRQ_NUMQN( LOCS, NNAMES, STATUS )
          CALL IRQ_RLSE( LOCS, STATUS )
 
@@ -259,7 +259,7 @@
  999  CONTINUE
       CALL GRP_DELET( IGRP, STATUS )
 
-*  End the NDF context. 
+*  End the NDF context.
       CALL NDF_END( STATUS )
 
 *  If an error occurred, report a contextual message.

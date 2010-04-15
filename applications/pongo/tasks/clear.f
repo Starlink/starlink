@@ -60,7 +60,7 @@
 *     ERSCALE = _REAL (Read)
 *        The scale factor by which the errors are to be multiplied.
 *        (Can only be set when LIMITS are cleared.)
-*        
+*
 *        The value of the global parameter PONGO_ERSCALE is used. If
 *        PONGO_ERSCALE is not defined, the default value 1.0 is used.
 
@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT is active
-      
+
 *  Local Variables:
       LOGICAL ACTION             ! Action to be taken
       LOGICAL DONE               ! Flag to show that something has been done
@@ -133,7 +133,7 @@
       CALL PAR_GET0L( 'SCREEN', ACTION, STATUS )
       IF ( ACTION ) THEN
          DONE = .TRUE.
-         IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN 
+         IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN
             CALL PGADVANCE
          ELSE
             IF ( STATUS .EQ. SAI__OK ) THEN
@@ -166,7 +166,7 @@
 
 *  Reset the limits.
       CALL PAR_GET0L( 'LIMITS', ACTION, STATUS )
-      IF ( ACTION ) THEN 
+      IF ( ACTION ) THEN
          DONE = .TRUE.
          CALL PAR_GET0R( 'ERSCALE', SCALE, STATUS )
          SSS = SQRT( SCALE )
@@ -175,13 +175,13 @@
          YMIN = VAL__MAXR
          YMAX = VAL__MINR
          DO IDAT = 1, NDAT
-            XMAX = MAX( XMAX, 
+            XMAX = MAX( XMAX,
      :                  REAL( XDATA( IDAT ) ) + SSS * ERRX( IDAT ) )
-            XMIN = MIN( XMIN, 
+            XMIN = MIN( XMIN,
      :                  REAL( XDATA( IDAT ) ) - SSS * ERRX( IDAT ) )
-            YMAX = MAX( YMAX, 
+            YMAX = MAX( YMAX,
      :                  REAL( YDATA( IDAT ) ) + SSS * ERRY( IDAT ) )
-            YMIN = MIN( YMIN, 
+            YMIN = MIN( YMIN,
      :                  REAL( YDATA( IDAT ) ) - SSS * ERRY( IDAT ) )
          END DO
       END IF
@@ -197,7 +197,7 @@
       CALL PAR_GET0L( 'AGI', ACTION, STATUS )
       IF ( ACTION ) THEN
          DONE = .TRUE.
-         IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN 
+         IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN
 
 *  Finish previous AGI context.
             CALL AGI_END( -1, STATUS )

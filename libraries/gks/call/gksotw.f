@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -70,30 +70,30 @@ C# IL>=a, OL>=0
 *     23   Specified workstation type does not exist
 *
 *---------------------------------------------------------------------
- 
- 
+
+
       IF (IWK.LE.0) THEN
- 
+
         KERROR = 22
         GOTO 999
- 
+
       ELSE
- 
+
 * Determine, if workstation type exists
- 
+
         DO 30 I=1,KMXWKT
           IF (KLAWKT(I).EQ.IWK) GOTO 40
    30   CONTINUE
- 
+
         KERROR = 23
         GOTO 999
- 
+
    40   CONTINUE
         KWKTYP = IWK
         IWKTYP = I
- 
+
 * Set workstation index
- 
+
         DO 50 I=1,KNOPWK
           IF (KWTYIX(I).EQ.IWKTYP) THEN
             KWKIX = I
@@ -102,12 +102,12 @@ C# IL>=a, OL>=0
    50   CONTINUE
           KWKIX = KNIL
    60   CONTINUE
- 
+
       ENDIF
- 
+
 * Call workstation
- 
+
       INCLUDE 'cdrive.inc'
- 
+
   999 CONTINUE
       END

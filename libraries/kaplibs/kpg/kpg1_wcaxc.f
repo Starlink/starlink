@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -94,9 +94,9 @@
 *  Local Variables:
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of the NDF
       INTEGER IAX                ! Axes loop counter
-      INTEGER ICURR              ! Index of Current Frame 
+      INTEGER ICURR              ! Index of Current Frame
       INTEGER IP                 ! Pointer to mapped AXIS Centre array
-      INTEGER IPIXEL             ! Index of the PIXEL Frame 
+      INTEGER IPIXEL             ! Index of the PIXEL Frame
       INTEGER MAP1               ! n-D PIXEL to n-D AXIS mapping
       INTEGER MAP2               ! 1-D PIXEL to n-D PIXEL mapping
       INTEGER MAP3               ! n-D AXIS to 1-D AXIS mapping
@@ -126,13 +126,13 @@
 *  Set default axis length.
       EL = DIMS( AXIS )
 
-*  Save the index of the original current Frame in the FrameSet, so 
+*  Save the index of the original current Frame in the FrameSet, so
 *  that it can be re-instated later.
       ICURR = AST_GETI( FS, 'CURRENT', STATUS )
 
 *  Search for a PIXEL Frame in the FrameSet.  If one is found, it
 *  becomes the current Frame. If one is not found, do nothing.
-      IF ( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ), 
+      IF ( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ),
      :                        'PIXEL', STATUS ) .NE. AST__NULL ) THEN
 
 *  If found, get the index of the PIXEL Frame.
@@ -141,8 +141,8 @@
 *  Get the mapping from the PIXEL Frame to the Current Frame.
          MAP1 = AST_GETMAPPING( FS, IPIXEL, ICURR, STATUS )
 
-*  The AXIS co-ordinates associated with each axis in an NDF are 
-*  independent of other axes.  Therefore, each axis can be treated 
+*  The AXIS co-ordinates associated with each axis in an NDF are
+*  independent of other axes.  Therefore, each axis can be treated
 *  separately as one-dimensional co-ordinate system.  We use AST
 *  PermMaps to pick the axis to process.
 
@@ -159,18 +159,18 @@
 *  Process the axis in a separate AST context.
          CALL AST_BEGIN( STATUS )
 
-*  MAP1 goes from n-dimensional PIXEL co-ordimnates to n-dimensional 
+*  MAP1 goes from n-dimensional PIXEL co-ordimnates to n-dimensional
 *  AXIS co-ordinates.  The NDF AXIS structures require each axis to be
-*  independent of all others, so we can process the required axis 
+*  independent of all others, so we can process the required axis
 *  without worrying about the others.  So we want to modify MAP1 such
-*  that it maps only a single axis.  To do this we add a PermMap to the 
-*  input and output of MAP1, that selects only the required axis. 
+*  that it maps only a single axis.  To do this we add a PermMap to the
+*  input and output of MAP1, that selects only the required axis.
 *  Create two PermMaps to extract axis AXIS from an n-dimensional Frame;
 *  MAP2 goes from one-dimensional to n-dimensional, MAP3 goes in the
 *  opposite sense.
          MAP2 = AST_PERMMAP( 1, AXIS, NDIM, OUTPRM, 0.0D0, ' ',
      :                       STATUS )
-         MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, AXIS, 0.0D0, ' ', 
+         MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, AXIS, 0.0D0, ' ',
      :                       STATUS )
 
 *  Concatenate the Mappings together, to get a mapping between axis
@@ -181,11 +181,11 @@
 *  Map the NDF's Axis Centre array.  The NDF library will fill this
 *  array with the pixel co-ordinates at the centre of each pixel (the
 *  default Axis co-ordinate system).
-         CALL NDF_AMAP( INDF, 'CENTRE', AXIS, '_DOUBLE', 
+         CALL NDF_AMAP( INDF, 'CENTRE', AXIS, '_DOUBLE',
      :                  'READ', IP, EL, STATUS )
 
 *  Check we can safely use %VAL on the pointer returned by NDF_AMAP.
-         IF ( STATUS .EQ. SAI__OK ) THEN                  
+         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Map these pixel co-ordinates into AXIS co-ordinates.
              CALL AST_TRAN1( MAP5, EL, %VAL( CNF_PVAL( IP ) ), .TRUE.,

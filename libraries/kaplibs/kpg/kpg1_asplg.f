@@ -17,13 +17,13 @@
 *     that subsequent calls to KPG1_ASPLN can use it. If KPG1_ASPLN has
 *     been registered with a Plot using AST_GRFSET, then it will be
 *     called by AST whenever AST needs to draw a line. It will then draw
-*     the required line and store a description of the line in the AST 
+*     the required line and store a description of the line in the AST
 *     KeyMap supplied to this routine. Consequently, this routine should
 *     usually be called before calling AST_GRFSET.
 
 *  Arguments:
 *     KEYMAP = INTEGER (Given)
-*        The KeyMap in which to store descriptions of the lines drawn by 
+*        The KeyMap in which to store descriptions of the lines drawn by
 *        the AST Plot class.
 *     BLEDGE = LOGICAL (Given)
 *        If TRUE, then do not draw lines that touch an edge of the box
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

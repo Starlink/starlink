@@ -3,11 +3,11 @@ C+
 C
 C     N C S E T
 C
-C     Figaro function to set a selected region of a spectrum to a 
+C     Figaro function to set a selected region of a spectrum to a
 C     constant value.  This is a non-interactive version of CSET,
 C     and has the possible advantage of allowing the region to be
 C     specified precisely in terms of the X values of the data.
-C       
+C
 C     Command parameters -
 C
 C     SPECTRUM    (Character) The spectrum to be modified.
@@ -26,7 +26,7 @@ C                                              KS / CIT 27th March 1985
 C
 C     Modified:
 C
-C     31st Jul 1987  DJA/AAO. Revised DSA_ routines - some specs 
+C     31st Jul 1987  DJA/AAO. Revised DSA_ routines - some specs
 C                    changed. Dynamic memory handling now though DYN_
 C                    routines.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
@@ -51,7 +51,7 @@ C
       INTEGER      IXST         ! First  "   "  "   "      "
       INTEGER      NDIM         ! Number of dimensions in data
       INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data 
+      INTEGER      OPTR         ! Dynamic-memory pointer to output data
                                 ! array
       INTEGER      OSLOT        ! Map slot number outputdata array
       INTEGER      STATUS       ! Running status for DSA_ routines

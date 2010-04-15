@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
-*                       int usedetpos, Grp *detgrp, int lbnd[ 3 ], 
-*                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp, 
+*     smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
+*                       int usedetpos, Grp *detgrp, int lbnd[ 3 ],
+*                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
 *                       int *polobs, int *status )
 
 *  Arguments:
@@ -24,11 +24,11 @@
 *     size = int (Given)
 *        Number of elements in igrp
 *     oskyframe = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe the 
-*        spatial axes of the output cube. 
+*        A SkyFrame that specifies the coordinate system used to describe the
+*        spatial axes of the output cube.
 *     usedetpos = int (Given)
 *        If a non-zero value is supplied, then the detector positions for
-*        a given time slice are read directly from the input NDF. Otherwise 
+*        a given time slice are read directly from the input NDF. Otherwise
 *        the detector positions are calculated on the basis of the focal
 *        plane detector positions and the telescope pointing information.
 *     detgrp = Grp * (Given)
@@ -39,7 +39,7 @@
 *     ubnd = int [ 3 ] (Returned)
 *        The upper pixel index bounds of the output cube.
 *     wcsout = AstFrameSet ** (Returned)
-*        A pointer to a location at which to return a pointer to an AST 
+*        A pointer to a location at which to return a pointer to an AST
 *        Frameset describing the WCS to be associated with the output cube.
 *     hasoffexp = int * (Returned)
 *        Address of an int in which to return a flag indicating if any of
@@ -51,15 +51,15 @@
 *        Pointer to inherited status.
 
 *  Description:
-*     This function finds the pixel index bounds of the 3D output cube that 
+*     This function finds the pixel index bounds of the 3D output cube that
 *     will just encompass all the data in the supplied group of input
 *     NDFs, storing the spectra in a sparse list of spatial positions
-*     rather than a regularly gridded tangent plane projection. Each input 
-*     NDF should be an ACSIS archive file. A WCS FrameSet is also returned 
-*     for the output cube. The base Frame in this FrameSet is 3D GRID coords 
-*     in the cube, and the current Frame is a CmpFrame holding (lon,lat,freq) 
-*     axes, where "lon,lat" are celestial longitude and latitude in the 
-*     system specified by "system". The spectral WCS axis is inherited from 
+*     rather than a regularly gridded tangent plane projection. Each input
+*     NDF should be an ACSIS archive file. A WCS FrameSet is also returned
+*     for the output cube. The base Frame in this FrameSet is 3D GRID coords
+*     in the cube, and the current Frame is a CmpFrame holding (lon,lat,freq)
+*     axes, where "lon,lat" are celestial longitude and latitude in the
+*     system specified by "system". The spectral WCS axis is inherited from
 *     the first supplied input data file.
 
 *  Authors:
@@ -132,9 +132,9 @@
 
 #define FUNC_NAME "smf_sparsebounds"
 
-void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
-                       int usedetpos, Grp *detgrp, int lbnd[ 3 ], 
-                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp, 
+void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
+                       int usedetpos, Grp *detgrp, int lbnd[ 3 ],
+                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
                        int *polobs, int *status ){
 
 /* Local Variables */
@@ -198,13 +198,13 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    if( *status != SAI__OK ) return;
 
 /* Tell the user what is happening. */
-   msgOutif( MSG__VERB, " ", "SMURF_MAKECUBE: Determine sparse cube bounds", 
+   msgOutif( MSG__VERB, " ", "SMURF_MAKECUBE: Determine sparse cube bounds",
              status );
 
 /* Begin an AST context. */
    astBegin;
 
-/* Initialise the bounds of the spectral axis in the output cube in 
+/* Initialise the bounds of the spectral axis in the output cube in
    floating point PIXEL coords. */
    slbnd = VAL__MAXD;
    subnd = VAL__MIND;
@@ -212,7 +212,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Initialise the lut pointers and size. */
    lonlut = NULL;
    latlut = NULL;
-   lutsize = 0;     
+   lutsize = 0;
 
 /* Assume for the moment that all data is polarisation data. */
    *polobs = 1;
@@ -232,23 +232,23 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       } else {
          if( data->file == NULL ) {
             *status = SAI__ERROR;
-            errRep( FUNC_NAME, "No smfFile associated with smfData.", 
+            errRep( FUNC_NAME, "No smfFile associated with smfData.",
                     status );
             break;
 
          } else if( data->hdr == NULL ) {
             *status = SAI__ERROR;
-            errRep( FUNC_NAME, "No smfHead associated with smfData.", 
+            errRep( FUNC_NAME, "No smfHead associated with smfData.",
                     status );
             break;
 
          } else if( data->hdr->fitshdr == NULL ) {
             *status = SAI__ERROR;
-            errRep( FUNC_NAME, "No FITS header associated with smfHead.", 
+            errRep( FUNC_NAME, "No FITS header associated with smfHead.",
                     status );
             break;
 
-         } 
+         }
       }
 
 /* Get some convenient pointers. */
@@ -260,14 +260,14 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       msgSetc( "FILE", pname );
       msgSeti( "I", ifile );
       msgSeti( "N", size );
-      msgOutif( MSG__VERB, " ", "SMF_SPARSEBOUNDS: Processing ^I/^N ^FILE", 
+      msgOutif( MSG__VERB, " ", "SMF_SPARSEBOUNDS: Processing ^I/^N ^FILE",
                 status );
 
 /* Make sure the input file is a suitable ACSIS cube. */
       if( hdr->instrument != INST__ACSIS ) {
          msgSetc( "FILE", pname );
          *status = SAI__ERROR;
-         errRep( FUNC_NAME, "^FILE does not contain ACSIS instrument data.", 
+         errRep( FUNC_NAME, "^FILE does not contain ACSIS instrument data.",
                  status );
          break;
       }
@@ -277,7 +277,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          msgSetc( "FILE", pname );
          msgSeti( "NDIMS", data->ndims );
          *status = SAI__ERROR;
-         errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.", 
+         errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",
                  status );
          break;
       }
@@ -286,36 +286,36 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    rather than RECEPPOS, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
       if( !usedetpos && hdr->detpos ) {
-         hdr->detpos = smf_free( (double *) hdr->detpos, status );      
+         hdr->detpos = smf_free( (double *) hdr->detpos, status );
       }
 
-/* We want a description of the spectral WCS axis in the input file. If 
+/* We want a description of the spectral WCS axis in the input file. If
    the input file has a WCS FrameSet containing a SpecFrame, use it,
-   otherwise we will obtain it from the FITS header later. NOTE, if we knew 
-   that all the input NDFs would have the same spectral axis calibration, 
-   then the spectral WCS need only be obtained from the first NDF. However, 
-   in the general case, I presume that data files may be combined that use 
-   different spectral axis calibrations, and so these differences need to 
+   otherwise we will obtain it from the FITS header later. NOTE, if we knew
+   that all the input NDFs would have the same spectral axis calibration,
+   then the spectral WCS need only be obtained from the first NDF. However,
+   in the general case, I presume that data files may be combined that use
+   different spectral axis calibrations, and so these differences need to
    be taken into account. */
-      if( hdr->tswcs ) {   
+      if( hdr->tswcs ) {
          fs = astClone( hdr->tswcs );
-   
+
 /* The first axis should be a SpecFrame. See if this is so. If not annul
    the specframe pointer. */
          specax = 1;
          specframe = astPickAxes( fs, 1, &specax, NULL );
          if( !astIsASpecFrame( specframe ) ) specframe = astAnnul( specframe );
-      } 
+      }
 
-/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the 
-   FITS extension of the input NDF. Take a copy of the FITS header (so that 
-   the contents of the header are not changed), and then read a FrameSet 
+/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the
+   FITS extension of the input NDF. Take a copy of the FITS header (so that
+   the contents of the header are not changed), and then read a FrameSet
    out of it. */
       if( !specframe ) {
          fc = astCopy( hdr->fitshdr );
          astClear( fc, "Card" );
          fs = astRead( fc );
-   
+
          if( !fs ) {
             if( *status == SAI__OK ) {
                msgSetc( "FILE", pname );
@@ -324,9 +324,9 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                        "the FITS header in ^FILE.", status );
             }
             break;
-         } 
+         }
 
-/* Extract the SpecFrame that describes the spectral axis from the current 
+/* Extract the SpecFrame that describes the spectral axis from the current
    Frame of this FrameSet. This is assumed to be the third WCS axis (NB
    the different axis number). */
          specax = 3;
@@ -343,7 +343,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       }
 
 /* Split off the 1D Mapping for this single axis from the 3D Mapping for
-   the whole WCS. This results in "specmap" holding the Mapping from 
+   the whole WCS. This results in "specmap" holding the Mapping from
    SpecFrame value to GRID value. */
       fsmap = astGetMapping( fs, AST__CURRENT, AST__BASE );
       astMapSplit( fsmap, 1, &specax, pixax, &specmap );
@@ -357,7 +357,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          break;
       }
 
-/* If this is the first input file, save a copy of this mapping for use as 
+/* If this is the first input file, save a copy of this mapping for use as
    the spectral Mapping in the output WCS FrameSet. */
       if( !ospecmap ) ospecmap = astCopy( specmap );
 
@@ -366,7 +366,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       astInvert( specmap );
 
 /* The spectral axis of the output cube is inherited from the spectral axis
-   of the first input file. So, if this is the first input file, initialise 
+   of the first input file. So, if this is the first input file, initialise
    the bounds of the spectral GRID axis in the output cube. */
       if( !ospecframe ) {
          ospecframe = astCopy( specframe );
@@ -380,7 +380,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       } else {
          fs = astConvert( specframe, ospecframe, " " );
 
-/* Report an error and abort if no conversion could be found between the two 
+/* Report an error and abort if no conversion could be found between the two
    spectral axes. */
          if( !fs ) {
             if( *status == SAI__OK ) {
@@ -392,15 +392,15 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             }
             break;
 
-/* Otherwise, combine these Mappings to get the Mapping from the input 
+/* Otherwise, combine these Mappings to get the Mapping from the input
    spectral GRID axis to the output spectral PIXEL axis. Note, "ospecmap"
    represents the Mapping from the output spectral WCS axis to the
    corresponding output PIXEL axis. */
          } else {
-            ssmap = astCmpMap( astCmpMap( specmap, 
+            ssmap = astCmpMap( astCmpMap( specmap,
                                           astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                          1, " " ), 
+                                          1, " " ),
                                ospecmap, 1, " " );
 
          }
@@ -426,11 +426,11 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
-/* Initialise a string to point to the name of the first detector for which 
+/* Initialise a string to point to the name of the first detector for which
    data is available */
       name = hdr->detname;
 
-/* Store input coords for the detectors. Axis 1 is the detector index, and 
+/* Store input coords for the detectors. Axis 1 is the detector index, and
    axis 2 is a dummy axis that always has the value 1. */
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
          xin[ irec ] = irec + 1.0;
@@ -438,7 +438,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coords bad. */
-         if( detgrp ) {    
+         if( detgrp ) {
             found = grpIndex( name, detgrp, 1, status );
             if( !found ) {
                xin[ irec ] = AST__BAD;
@@ -456,18 +456,18 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Extend the arrays holding the longitude and latitude associated with
    each spectrum to be stored in the output NDF. */
-      lonlut = astGrow( lonlut, lutsize + (data->dims)[ 1 ]*(data->dims)[ 2 ], 
+      lonlut = astGrow( lonlut, lutsize + (data->dims)[ 1 ]*(data->dims)[ 2 ],
                         sizeof( double ) );
-      latlut = astGrow( latlut, lutsize + (data->dims)[ 1 ]*(data->dims)[ 2 ], 
+      latlut = astGrow( latlut, lutsize + (data->dims)[ 1 ]*(data->dims)[ 2 ],
                         sizeof( double ) );
 
 /* Loop round all the time slices in the input file. */
       for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
 
-/* Get a FrameSet describing the spatial coordinate systems associated with 
-   the current time slice of the current input data file. The base frame in 
-   the FrameSet will be a 2D Frame in which axis 1 is detector number and 
-   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame 
+/* Get a FrameSet describing the spatial coordinate systems associated with
+   the current time slice of the current input data file. The base frame in
+   the FrameSet will be a 2D Frame in which axis 1 is detector number and
+   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
          smf_tslice_ast( data, itime, 1, status );
@@ -515,7 +515,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      pdata += (data->dims)[ 0 ] - ispec - 1;
                      break;
                   }
-               }         
+               }
 
 /* If it did, add the position of the detector to the two look-up-tables. */
                if( good ) {
@@ -534,7 +534,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* For efficiency, explicitly annul the AST Objects created in this tight
    loop. */
          fs = astAnnul( fs );
-      }   
+      }
 
 /* Close the current input data file. */
       smf_close_file( &data, status);
@@ -577,9 +577,9 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       temp = ispecbounds[ 0 ] ;
       ispecbounds[ 0 ] = ispecbounds[ 1 ];
       ispecbounds[ 1 ] = temp;
-   } 
+   }
 
-/* Check the specified spectral bounds have some overlap with the available 
+/* Check the specified spectral bounds have some overlap with the available
    spectral range. */
    if( ispecbounds[ 0 ] >= subnd ||
        ispecbounds[ 1 ] <= slbnd ){
@@ -615,7 +615,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Combine the two LutMaps in parallel. */
    cmpmap1 = astCmpMap( lutmap1, lutmap2, 0, " " );
 
-/* Create a PermMap with a forward transformation that duplicates axis 1 
+/* Create a PermMap with a forward transformation that duplicates axis 1
    and discards axis 2. */
    inperm[ 0 ] = 1;
    inperm[ 1 ] = 0;
@@ -655,10 +655,10 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Combine the spectral and spatial Mappings in parallel. */
    cmpmap4 = astCmpMap( cmpmap2, cmpmap3, 0, " " );
-  
+
 /* Create the required FrameSet. */
    *wcsout = astFrameSet( astFrame( 3, "Domain=GRID" ), " " );
-   astAddFrame( *wcsout, AST__BASE, cmpmap4, 
+   astAddFrame( *wcsout, AST__BASE, cmpmap4,
                 astCmpFrame( oskyframe, ospecframe, " " ) );
 
 /* Report the coordinate systems in use in the output cube, and the pixel
@@ -672,19 +672,19 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       msgSeti( "XU", ubnd[ 0 ] );
       msgSeti( "YU", ubnd[ 1 ] );
       msgSeti( "ZU", ubnd[ 2 ] );
-      msgOutif( MSG__NORM, " ", "   Output cube bounds: ( ^XL:^XU, ^YL:^YU, ^ZL:^ZU )", 
+      msgOutif( MSG__NORM, " ", "   Output cube bounds: ( ^XL:^XU, ^YL:^YU, ^ZL:^ZU )",
                 status );
-      
+
       msgSetc( "X", astGetC( *wcsout, "Label(1)" ) );
       msgSetc( "Y", astGetC( *wcsout, "Label(2)" ) );
       msgSetc( "Z", astGetC( *wcsout, "Label(3)" ) );
-      msgOutif( MSG__NORM, " ", "   Output WCS axes: ( ^X, ^Y, ^Z )", 
+      msgOutif( MSG__NORM, " ", "   Output WCS axes: ( ^X, ^Y, ^Z )",
                 status );
-      
+
       msgOutif( MSG__NORM, " ", " ", status );
    }
 
-/* If no error has occurred, export the returned FrameSet pointer from the 
+/* If no error has occurred, export the returned FrameSet pointer from the
    current AST context so that it will not be annulled when the AST
    context is ended. Otherwise, ensure a null pointer is returned. */
    if( *status == SAI__OK ) {

@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_CREMG( IDIM1, IDIM2, MAX, MIN, BCKGRD, NGAUSS, 
-     :                       FWHM, DISTRB, BADPIX, FRACTN, BADCOL, 
-     :                       BADROW, SCREEN, PARAM1, PARAM2, VARS, 
+      SUBROUTINE KPS1_CREMG( IDIM1, IDIM2, MAX, MIN, BCKGRD, NGAUSS,
+     :                       FWHM, DISTRB, BADPIX, FRACTN, BADCOL,
+     :                       BADROW, SCREEN, PARAM1, PARAM2, VARS,
      :                       IMAGE, ERROR, WORK, STATUS )
 *+
 *  Name:
@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     CALL KPS1_CREMG( IDIM1, IDIM2, MAX, MIN, BCKGRD, NGAUSS, FWHM,
-*                      DISTRB, BADPIX, FRACTN, BADCOL, BADROW, SCREEN, 
-*                      PARAM1, PARAM2, VARS, IMAGE, ERROR, WORK, STATUS )     
+*                      DISTRB, BADPIX, FRACTN, BADCOL, BADROW, SCREEN,
+*                      PARAM1, PARAM2, VARS, IMAGE, ERROR, WORK, STATUS )
 
 *  Description:
 *     This routine generates a specified number of 2-D Gaussian images
@@ -92,50 +92,50 @@
 *     02111-1307, USA
 
 *  Authors:
-*     MJM: Mark McCaughrean 
+*     MJM: Mark McCaughrean
 *     MJC: Malcolm Currie (Starlink, RAL)
 *     AALLAN: Alasdair Allan (Starlink, University of Exeter)
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     14-OCT-1985 (MJM): 
+*     14-OCT-1985 (MJM):
 *        First Adam implementation (from Aspic MANYG)
-*     09-DEC-1985 (MJM): 
+*     09-DEC-1985 (MJM):
 *        Changed to call POISSON noise subroutine
-*     14-JAN-1986 (MJM): 
-*        Added display options 
+*     14-JAN-1986 (MJM):
+*        Added display options
 *     14-AUG-1986 (MJC): C
 *        Changed argument order, renamed POISSON and reordered its argument,
 *        completed the prologue, nearly conformed to Starlink programming
 *        standards, open IOSTAT added.
-*     04-SEP-1986 (MJC): 
+*     04-SEP-1986 (MJC):
 *        Renamed parameters section to arguments, applied bad-pixel handling.
-*     30-NOV-1987 (MJC): 
-*        Bug fix - now uses SIGMA for Gaussian, and E format used for output 
+*     30-NOV-1987 (MJC):
+*        Bug fix - now uses SIGMA for Gaussian, and E format used for output
 *        of peak values.
-*     27-JUN-1988 (MJC): 
-*        Converted to FIO, added error reporting and restructured. 
-*     05-AUG-1988 (MJC): 
+*     27-JUN-1988 (MJC):
+*        Converted to FIO, added error reporting and restructured.
+*     05-AUG-1988 (MJC):
 *        Removed lingering astronomical references and SCALE argument.
-*     25-JUL-1989 (MJC): 
+*     25-JUL-1989 (MJC):
 *        Removed DSPLAY argument --- output can now be to both, either, or
-*        neither the screen and/or the file; passed array dimensions as 
+*        neither the screen and/or the file; passed array dimensions as
 *        separate variables
 *     27-JUL-1989 (MJC):
 *        Used packaged access for obtaining the log file
-*     20-FEB-1990 (MJC): 
-*        AIF_OPFIO renamed AIF_ASFIO 
-*     03-AUG-1990 (MJC): 
+*     20-FEB-1990 (MJC):
+*        AIF_OPFIO renamed AIF_ASFIO
+*     03-AUG-1990 (MJC):
 *        Converted to use Starlink standard co-ordinates rather than pixel
 *        indices; output file will now work with PHOTOM.
-*     17-MAR-1992 (MJC): 
+*     17-MAR-1992 (MJC):
 *        Used portable random-number generation.
-*     09-FEB-1993 (MJC): 
+*     09-FEB-1993 (MJC):
 *        Used the improved FIO_ASSOC and the new FIO_ANNUL.
 *     26-AUG-2001 (AALLAN):
 *        Renamed subroutine to confirm to KAPPA standard
-*     01-SEP-2001 (AALLAN): 
+*     01-SEP-2001 (AALLAN):
 *        Changed BADCOL to an integer, added BADROW and handling of varainces
 *     02-SEP-2001 (AALLAN):
 *        Changed prologue to conform to Starlink standards
@@ -147,7 +147,7 @@
 *-
 
 *  Type definitions:
-      IMPLICIT  NONE           
+      IMPLICIT  NONE
 
 *  Global constants :
       INCLUDE 'SAE_PAR'        ! SSE global definitionsffssdaw
@@ -177,7 +177,7 @@
       REAL IMAGE( IDIM1, IDIM2 )
       REAL ERROR( IDIM1, IDIM2 )
       DOUBLE PRECISION WORK( NGAUSS, 2 )
-     
+
 *  Global Status :
       INTEGER  STATUS
 
@@ -191,7 +191,7 @@
 
 *  Local variables :
       CHARACTER BUFFER*(NCHLIN)! buffer to store output string
-      INTEGER BOX              ! half size of box round each star 
+      INTEGER BOX              ! half size of box round each star
       INTEGER COLPOS           ! random bad column position
       INTEGER CURBAD           ! number of pixels currently set bad
       INTEGER FD               ! file description
@@ -222,7 +222,7 @@
       REAL YPOS                !     "        "     y    "    "    "
 
 *.
- 
+
 *  Check the global inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
@@ -264,7 +264,7 @@
 *  Populate the variance component if required
             IF( VARS ) THEN
                ERROR( I, J ) = IMAGE( I, J )
-            ENDIF        
+            ENDIF
          END DO
       END DO
 
@@ -306,7 +306,7 @@
 *  ! Warning - ASTRONOMICAL content !
 *  The requested distribution is one over r-squared - thus we
 *  have one factor of r-squared from the fact that we see more
-*  stars the further away we look, and another factor of 
+*  stars the further away we look, and another factor of
 *  r-squared as the brightness of a star dims as the square of
 *  its distance.
             VALUE  =  VALUE ** 4
@@ -320,7 +320,7 @@
          XFINSH  =  NINT( XPOS +( BOX * FWHM ) + 0.5 )
          YSTART  =  NINT( YPOS -( BOX * FWHM ) + 0.5 )
          YFINSH  =  NINT( YPOS +( BOX * FWHM ) + 0.5 )
-       
+
 *  Loop round the y dimension of the calculated box
          DO  L  =  YSTART, YFINSH
 
@@ -340,7 +340,7 @@
                      CURRX  =  ABS( REAL( K ) - 0.5 - XPOS )
 
 *  Work out intensity at this point from Gaussian profile formula
-                     INTENS  =  PEAK * 
+                     INTENS  =  PEAK *
      :                          EXP( -( CURRX*CURRX + CURRY*CURRY ) /
      :                         ( 2.0 * SIGMA * SIGMA ) )
 
@@ -354,7 +354,7 @@
                END DO
             END IF
          END DO
-      
+
 *  Write out the Gaussian parameters if so requested
          IF( SCREEN .OR. LOGGP ) THEN
             WRITE( BUFFER, '( I6,2X,2F10.3,E15.6 )' ) N, XPOS, YPOS,
@@ -373,7 +373,7 @@
       IWCS = AST_FRAMESET( AST_FRAME( 2, 'DOMAIN=PIXEL', STATUS ),
      :                     ' ', STATUS )
       CALL KPG1_WRLST( PARAM2, NGAUSS, NGAUSS, 2, WORK, 1, IWCS,
-     :                 'Centres of Gaussians created by CREFRAME', 1, 
+     :                 'Centres of Gaussians created by CREFRAME', 1,
      :                 0, .TRUE., STATUS )
       CALL AST_END( STATUS )
 
@@ -405,7 +405,7 @@
             YBAD   =  NINT( VALUE * REAL( IDIM2 ) )
             IF( YBAD .EQ. 0 ) YBAD = 1
 
-*  If this pixel is non-zero, set it to zero, and increment the 
+*  If this pixel is non-zero, set it to zero, and increment the
 *  counter by one - else continue
             IF( IMAGE( XBAD, YBAD ) .NE. VAL__BADR ) THEN
                IMAGE( XBAD, YBAD )  =  VAL__BADR
@@ -432,15 +432,15 @@
                IMAGE( COLPOS, J ) = VAL__BADR
               IF( VARS ) THEN
                  ERROR( COLPOS, J ) = VAL__BADR
-              ENDIF        
+              ENDIF
             END DO
          END DO
 
 *  End of IF( BADCOL .NE. 0 ) condition
 
       END IF
-      
-*  Add a bad row if required      
+
+*  Add a bad row if required
       IF( BADROW .NE. 0 ) THEN
 
 *  Get a random column that is in the image
@@ -455,14 +455,14 @@
               IMAGE( J, ROWPOS ) = VAL__BADR
               IF( VARS ) THEN
                  ERROR( J, ROWPOS ) = VAL__BADR
-              ENDIF        
+              ENDIF
             END DO
          END DO
-         
+
 *  End of IF( BADROW ) condition
 
       END IF
-      
+
  999  CONTINUE
 
       END

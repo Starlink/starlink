@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
       RMIN = VAL__MAXR
       RMAX = VAL__MINR
       DO 1 I = 2, NPIX
-         IF ( ARRAY( I ) .NE. VAL__BADR ) THEN 
+         IF ( ARRAY( I ) .NE. VAL__BADR ) THEN
             RMIN = MIN( ARRAY( I ) , RMIN )
             RMAX = MAX( ARRAY( I ) , RMAX )
          END IF

@@ -1,7 +1,7 @@
       SUBROUTINE
      : CHP_GONEPD(INPUT, PNAME, PFORMAT, PUNITS, PCOMMENT,
      : PPREFDIS, PPARTYPE, PARDES, PARRSHP, PARRDIM, PMDATAACC,
-     : PDATAACC, 
+     : PDATAACC,
      : PDATELM, PDELIND, PNSFLAG, STATUS)
 *+
 *  Name:
@@ -15,13 +15,13 @@
 
 *  Invocation:
 *     CALL  CHP_GONEPD(INPUT, PNAME, PFORMAT, PUNITS, PCOMMENT,
-*     PPREFDIS, PPARTYPE, PARDES, PARRSHP, PARRDIM, PMDATAACC, PDATAACC, 
+*     PPREFDIS, PPARTYPE, PARDES, PARRSHP, PARRDIM, PMDATAACC, PDATAACC,
 *     PDATELM, PDELIND, PFMATFLAG, STATUS)
 *
 *  Description :
-*     Get the information about a parameter. A parameter has 
+*     Get the information about a parameter. A parameter has
 *     associated with it a name, format, units, comment,
-*     preferred dislay flag, parameter designation, access information, date 
+*     preferred dislay flag, parameter designation, access information, date
 *     last modified, delete indicator and format flag.
 
 *  Arguments:
@@ -73,7 +73,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,23 +130,23 @@
       numpars = CPnumpars(cd)
       do cc = 1, numpars
         if(PPname(cd,cc) .EQ. pname) then
-          pformat = PPformat(cd,cc) 
-          punits = PPunit(cd,cc) 
+          pformat = PPformat(cd,cc)
+          punits = PPunit(cd,cc)
           pcomment = PPcomment(cd,cc)
-          pprefdis = PPprefdis(cd,cc) 
-          ppartype = PPtype(cd,cc) 
-          pardes = PPpardes(cd,cc) 
+          pprefdis = PPprefdis(cd,cc)
+          ppartype = PPtype(cd,cc)
+          pardes = PPpardes(cd,cc)
           pmdataacc = PPmdataacc(cd,cc)
-          pdataacc = PPdataacc(cd,cc) 
+          pdataacc = PPdataacc(cd,cc)
           pdatelm = PPdatelm(cd,cc)
-          pdelind = PPdelind(cd,cc) 
-          parrshp = PParrshp(cd,cc) 
+          pdelind = PPdelind(cd,cc)
+          parrshp = PParrshp(cd,cc)
           if (parrshp .ge. 1) then
             do asc = 1, parrshp
               parrdim(asc) = PParrdim(cd,cc,asc)
             enddo
           endif
-          pnsflag = PPnsflag(cd,cc) 
+          pnsflag = PPnsflag(cd,cc)
         endif
       enddo
 *

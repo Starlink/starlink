@@ -21,13 +21,13 @@
 
 *  Description:
 *     This application produces intensity data (either 2D images or 3D
-*     cubes) corresponding to given Stokes vectors. A set of template input 
-*     intensity images or cubes are supplied which define the pixel positions, 
-*     analyser angles, efficiencies, transmissions, etc. The pixel values 
-*     supplied in these templates are ignored. A set of corresponding output 
-*     intensity images or cubes are created which inherit the properties of 
-*     the input NDFs. The pixel values in these images are calculated using 
-*     the supplied Stokes vectors, using the analyser properties defined in 
+*     cubes) corresponding to given Stokes vectors. A set of template input
+*     intensity images or cubes are supplied which define the pixel positions,
+*     analyser angles, efficiencies, transmissions, etc. The pixel values
+*     supplied in these templates are ignored. A set of corresponding output
+*     intensity images or cubes are created which inherit the properties of
+*     the input NDFs. The pixel values in these images are calculated using
+*     the supplied Stokes vectors, using the analyser properties defined in
 *     the input images.
 
 *  Usage:
@@ -35,23 +35,23 @@
 
 *  ADAM Parameters:
 *     CUBE = NDF (Read)
-*        The name of the input NDF holding the Stokes parameters, such as 
+*        The name of the input NDF holding the Stokes parameters, such as
 *        produced by POLCAL.
 *     IN = NDF (Read)
 *        A group specifying the names of the input intensity NDFs. This
-*        may take the form of a comma separated list, or any of the other 
+*        may take the form of a comma separated list, or any of the other
 *        forms described in the help on "Group Expressions". These images
 *        must be aligned pixel-for-pixel with the Stokes vectors given by
 *        CUBE.
 *     OUT = NDF (Read)
-*        A group specifying the names of the output intensity NDFs. 
+*        A group specifying the names of the output intensity NDFs.
 
 *  Examples:
 *     polsim cube "*_A" "*_sim"
 *        A set of intensity images is created holding analysed intensities
 *        derived from the Stokes vectors in file "cube". Each output image
 *        inherits the pixel positions and analyser properties from a
-*        specified input intensity image. All images in the current 
+*        specified input intensity image. All images in the current
 *        directory which have file names ending with "_A" are used as the
 *        input template images, and the output images containing
 *        simulated intensity values have the same names, but with "_sim"
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP parameters
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -101,13 +101,13 @@
       PARAMETER ( DTOR = 0.0174532925)
 
 *  Local Variables:
-      CHARACTER RAY*1            ! Dual beam ray identification 
+      CHARACTER RAY*1            ! Dual beam ray identification
       CHARACTER STOKES*3         ! Identifiers for each plane of the input cube
       CHARACTER XLOC*(DAT__SZLOC)! Locator to POLPACK extension
       CHARACTER NDFNAM*(GRP__SZNAM)! Name of the NDF being processed
       INTEGER EL                 ! No. of mapped elements
-      INTEGER IGRP1              ! GRP identifier for input images group      
-      INTEGER IGRP2              ! GRP identifier for output images group      
+      INTEGER IGRP1              ! GRP identifier for input images group
+      INTEGER IGRP2              ! GRP identifier for output images group
       INTEGER INDEX              ! Index of current input intensity image
       INTEGER INDF1              ! NDF identifier for input Stokes cube
       INTEGER INDFS              ! NDF identifier for output image section
@@ -120,7 +120,7 @@
       INTEGER NDFIN              ! NDF identifier for input intensity image
       INTEGER NDFOUT             ! NDF identifier for output intensity image
       INTEGER NDIM               ! No. of axes in input NDF
-      INTEGER NNDF               ! No. of input images to process      
+      INTEGER NNDF               ! No. of input images to process
       INTEGER SIZEO              ! No. of output NDFs ( = NNDF )
       INTEGER UBND( 4 )          ! Upper bounds of input cube
       LOGICAL THERE              ! Does item exists?
@@ -144,14 +144,14 @@
       CALL NDF_ASSOC( 'CUBE', 'READ', INDF1, STATUS )
 
 *  Get its bounds and dimensions.
-      CALL NDF_BOUND( INDF1, 4, LBND, UBND, NDIM, STATUS ) 
+      CALL NDF_BOUND( INDF1, 4, LBND, UBND, NDIM, STATUS )
 
-*  Get the value of the STOKES component in the POLPACK extension. 
+*  Get the value of the STOKES component in the POLPACK extension.
 *  This is a string in which each character identifies the corresponding
 *  plane in the DATA array.
       STOKES = ' '
-      CALL NDF_XGT0C( INDF1, 'POLPACK', 'STOKES', STOKES, STATUS ) 
-      IF( ( ( NDIM .NE. 3 .AND. NDIM .NE. 4 ) .OR. STOKES .EQ. ' ' ) 
+      CALL NDF_XGT0C( INDF1, 'POLPACK', 'STOKES', STOKES, STATUS )
+      IF( ( ( NDIM .NE. 3 .AND. NDIM .NE. 4 ) .OR. STOKES .EQ. ' ' )
      :     .AND. STATUS .EQ. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', INDF1 )
          STATUS = SAI__ERROR
@@ -172,7 +172,7 @@
       END IF
 
 *  Get the NDFs WCS FrameSet.
-      CALL KPG1_GTWCS( INDF1, IWCS, STATUS )      
+      CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
 
 *  Get the anti-clockwise angle from the first axis of the image to
 *  the reference direction in degrees.
@@ -188,20 +188,20 @@
 *  If a variance component is available, map it.
       CALL NDF_STATE( INDF1, 'VARIANCE', VAR, STATUS )
       IF( VAR ) THEN
-         CALL NDF_MAP( INDF1, 'VARIANCE', '_REAL', 'READ', IPVIN, EL, 
+         CALL NDF_MAP( INDF1, 'VARIANCE', '_REAL', 'READ', IPVIN, EL,
      :                 STATUS )
       END IF
 
-*  Get a group containing the names of the template intensity frames to be 
+*  Get a group containing the names of the template intensity frames to be
 *  used.
-      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...',
      :            IGRP1, NNDF, STATUS )
 
 *  In single beam mode, we just get a single set of output images, using
 *  parameter OUT. The second group identifier is set equal to the first
 *  to indicate this.
-      CALL KPG1_WGNDF( 'OUT', IGRP1, NNDF, NNDF, 
-     :            '  Give more image names...', IGRP2, SIZEO, 
+      CALL KPG1_WGNDF( 'OUT', IGRP1, NNDF, NNDF,
+     :            '  Give more image names...', IGRP2, SIZEO,
      :            STATUS )
 
 *  Abort if an error has occurred.
@@ -266,7 +266,7 @@
 *  Get the half-wave plate position in degrees (if it exists).
          CALL DAT_THERE( XLOC, 'WPLATE', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'WPLATE', H, STATUS ) 
+            CALL CMP_GET0R( XLOC, 'WPLATE', H, STATUS )
 
 *  Store the effective analyser angle for this NDF. This is the angle
 *  between the X axis and a pretend analyser (with no half-wave plate),
@@ -288,7 +288,7 @@
             END IF
 
 *  Get the analyser angle, in degrees.
-            CALL CMP_GET0R( XLOC, 'ANLANG', ALPHA, STATUS ) 
+            CALL CMP_GET0R( XLOC, 'ANLANG', ALPHA, STATUS )
 
 *  Store the effective analyser angle for this NDF (angle from the X axis
 *  to the analyser).
@@ -300,37 +300,37 @@
 *  effective analyser angle.
          CALL DAT_THERE( XLOC, 'RAY', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0C( XLOC, 'RAY', RAY, STATUS ) 
+            CALL CMP_GET0C( XLOC, 'RAY', RAY, STATUS )
             IF( RAY .EQ. 'E' ) PHI = PHI + 90.0
-         END IF           
+         END IF
 
 *  Convert PHI to be the ACW angle from the reference direction in the
-*  supplied Stokes cube to the effective analyser position, and convert to 
+*  supplied Stokes cube to the effective analyser position, and convert to
 *  radians.
          PHI = ( PHI - ANGRTC )*DTOR
 
 *  Get the T (analyser transmission factor) value. Use a defualt of 1.0.
          CALL DAT_THERE( XLOC, 'T', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'T', T, STATUS ) 
-         ELSE 
+            CALL CMP_GET0R( XLOC, 'T', T, STATUS )
+         ELSE
             T = 1.0
-         END IF         
+         END IF
 
 *  Get the EPS (analyser efficiency factor) value. Use a defualt of 1.0.
          CALL DAT_THERE( XLOC, 'EPS', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'EPS', EPS, STATUS ) 
-         ELSE 
+            CALL CMP_GET0R( XLOC, 'EPS', EPS, STATUS )
+         ELSE
             EPS = 1.0
-         END IF         
+         END IF
 
 *  Annul the HDS locator for the POLPACK extension.
          CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Create the output as a copy of the input (minus DATA, VARIANCE and
 *  QUALITY arrays).
-         CALL NDG_NDFPR( NDFIN, 'UNITS,AXIS,WCS', IGRP2, INDEX, NDFOUT, 
+         CALL NDG_NDFPR( NDFIN, 'UNITS,AXIS,WCS', IGRP2, INDEX, NDFOUT,
      :                   STATUS )
 
 *  Obtain a section from the output NDF with bounds equal to the input
@@ -338,17 +338,17 @@
          CALL NDF_SECT( NDFOUT, NDIM - 1, LBND, UBND, INDFS, STATUS )
 
 *  Map the DATA and (if required) VARIANCE components of the output section.
-         CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'WRITE', IPDOUT, EL, 
+         CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'WRITE', IPDOUT, EL,
      :                 STATUS )
          IF( VAR ) THEN
-            CALL NDF_MAP( INDFS, 'VARIANCE', '_REAL', 'WRITE', IPVOUT, 
+            CALL NDF_MAP( INDFS, 'VARIANCE', '_REAL', 'WRITE', IPVOUT,
      :                    EL, STATUS )
          END IF
 
 *  Generate the simulated intensity values for the current NDF.
-         CALL POL1_SIMCL( VAR, EL, %VAL( CNF_PVAL( IPDIN ) ), 
+         CALL POL1_SIMCL( VAR, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                    %VAL( CNF_PVAL( IPVIN ) ), T, EPS,
-     :                    PHI, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                    PHI, %VAL( CNF_PVAL( IPDOUT ) ),
      :                    %VAL( CNF_PVAL( IPVOUT ) ), STATUS )
 
 *  End the NDF context.
@@ -360,11 +360,11 @@
 *  Space the screen output.
          CALL MSG_BLANK( STATUS )
 
-      END DO     
+      END DO
 
 * Tidy up.
  999  CONTINUE
-      
+
 *  Delete the groups holding the NDF names.
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )

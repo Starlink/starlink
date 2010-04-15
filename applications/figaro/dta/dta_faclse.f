@@ -12,7 +12,7 @@ C     Parameters -   (">" input, "<" output)
 C
 C     (>) LOC      (Character) The HDS locator for the top
 C                  level entry of the data structure held
-C                  in the file.  
+C                  in the file.
 C     (<) STATUS   (Integer) Returns a status code
 C                  0 => OK
 C                  DTA_HDSERR => an HDS error occurred

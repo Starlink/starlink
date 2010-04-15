@@ -6,7 +6,7 @@
 *     CYC_PAR
 *
 *  Purpose :
-*     {routine_purpose}...    
+*     {routine_purpose}...
 *
 *  Language :
 *     FORTRAN
@@ -25,7 +25,7 @@
 *     HI = REAL (Given)
 *         Upper Boundary
 *     {arguement_description}...
-* 
+*
 *  Algorithm :
 *     {algorithm_description}...
 *
@@ -78,36 +78,36 @@
         INTEGER STATUS
 
 	STATUS = SAI__OK
-	
+
 	IF( HI .LE. LO ) THEN
 	  TEXT = 'ERROR > Range of cyclic behaviour is not positive'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 	    	
+	  CALL MSG_OUT(' ', TEXT, STATUS)
 	  CYC_PAR = -1
 	ELSE IF( N .LE. 0 .OR. N .GT. M_PAR ) THEN
  	  TEXT = 'ERROR > A non-existant parameter has been specified'
-	  CALL MSG_OUT(' ', TEXT, STATUS) 		
+	  CALL MSG_OUT(' ', TEXT, STATUS)
           CYC_PAR = -1
         ELSE IF( LIST_CYCLIC( N ) .NE. 0 ) THEN
- 	  WRITE(TEXT,'(''ERROR > Parameter'', I2, 
+ 	  WRITE(TEXT,'(''ERROR > Parameter'', I2,
      1	        ''  is already declared cyclic'')') N
-	  CALL MSG_OUT(' ', TEXT, STATUS) 			
+	  CALL MSG_OUT(' ', TEXT, STATUS)
 	  CYC_PAR = -1
 	ELSE IF( L_INDEX( N ) .NE. N ) THEN
  	  WRITE(TEXT,'(''ERROR > Parameter'', I2,''  is linked'')') N
-	  CALL MSG_OUT(' ', TEXT, STATUS) 	
+	  CALL MSG_OUT(' ', TEXT, STATUS)
 	  CYC_PAR = -1
-	ELSE IF( LO_A( N ) .NE. N_LARGE .OR. HI_A( N ) .NE. P_LARGE ) 
+	ELSE IF( LO_A( N ) .NE. N_LARGE .OR. HI_A( N ) .NE. P_LARGE )
      1  THEN
 	  IF( HI_A( N ) - LO_A( N ) .GE. HI - LO ) THEN
 	    TEXT = 'ERROR > Conflict between LIMIT_PAR and CYC_PAR'
-	    CALL MSG_OUT(' ', TEXT, STATUS) 		  
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 	    CYC_PAR = -1
 	  ELSE
 	    DO K = 1, M_Par
 	      IF( L_INDEX( K ) .eq. -N ) Then
  	        TEXT = 'ERROR > Illegal attempt to use CYC_PAR'
      1              // ' on a LINKed parameter'
-	        CALL MSG_OUT(' ', TEXT, STATUS) 	      
+	        CALL MSG_OUT(' ', TEXT, STATUS)
 		CYC_PAR = -1
 		RETURN
 	      ELSE IF( L_INDEX( K ) .EQ. N .AND. K .NE. N ) THEN
@@ -117,7 +117,7 @@
 	      END IF
 	    END DO
  	    TEXT = 'ERROR > This parameter has already been LIMITed'
-	    CALL MSG_OUT(' ', TEXT, STATUS) 	    
+	    CALL MSG_OUT(' ', TEXT, STATUS)
 	    LIST_CYCLIC( N ) = -1
 	    TAB_BOTTOM( N ) = LO
 	    TAB_PERIOD( N ) = HI - LO
@@ -127,7 +127,7 @@
 	  DO K = 1, M_PAR
 	    IF( L_INDEX( K ) .EQ. -N ) THEN
  	      TEXT = 'ERROR > This parameter has already been LIMITed'
-	      CALL MSG_OUT(' ', TEXT, STATUS) 	    
+	      CALL MSG_OUT(' ', TEXT, STATUS)
 	      CYC_PAR = -1
 	      RETURN
 	    ELSE IF( L_INDEX( K ) .EQ. N .AND. K .NE. N ) THEN

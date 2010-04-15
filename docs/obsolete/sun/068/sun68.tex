@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ It will then prompt for the OUTPUT tape (if the system has more than one deck)
 and then the density at which it is to be written.
 A carriage return instead of a tape name means that there will be no output
 tape.
-From this point on the tapes will be referred to as INPUT and OUTPUT and never 
+From this point on the tapes will be referred to as INPUT and OUTPUT and never
 by their physical names.
 TPU then prompts for the first command, responding with a `?' will cause all the
 TPU commands to be listed.
@@ -141,7 +141,7 @@ The DUPLICATION commands are:
 \item[COPY~~~~]	Copy tape-to-tape until logical end-of-tape.
 \item[C2T2~~~~]	Copy specified records/files tape-to-tape.
 \item[CTD~~~~~]	Copy designated files tape-to-disk.
-\item[IBM~~~~~]	Reads or creates an IBM EBCDIC tape. Some understanding of IBM 
+\item[IBM~~~~~]	Reads or creates an IBM EBCDIC tape. Some understanding of IBM
 tape formats helpful.
 \end{description}
 \end{description}
@@ -261,7 +261,7 @@ There are four modes in which the copy may be done.
 They are:
 
 \begin{itemize}
-\item 
+\item
 Mode 1 - The specified number of records/files are copied to a named file in the
 current user directory.
 If there are existing copies of the named file already in the directory, the
@@ -288,7 +288,7 @@ This mode allows records/files to be copied from tape to individual disk files
 without the user specifying each disk file name.
 Sort of a `wild-card' tape-to-disk copy.
 
-\item 
+\item
 Mode 3 - Same as Mode 1 except no file name is specified and TPU uses the
 default of FOR001.DAT.
 
@@ -337,7 +337,7 @@ front panel of the tape drive. If there is a difference between the
 operating density as indicated by the tape drive and either
 TPU or VMS itself, then the tape drive will be correct.
 Note that if the first operation performed on the tape is a read, it will
-switch back to density at which it was last written. 
+switch back to density at which it was last written.
 
 The RED command `swaps' the designation of the INPUT and OUTPUT tapes.
 The INPUT becomes the OUTPUT and the OUTPUT becomes the INPUT.

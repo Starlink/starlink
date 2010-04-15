@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
 
 *  Change search to new position for next time around.
          IAT = LAST + 1
-         IF ( STATUS .EQ. SAI__OK .AND. .NOT. NOTFND ) THEN 
+         IF ( STATUS .EQ. SAI__OK .AND. .NOT. NOTFND ) THEN
 
 *  Translate the values.
             CALL CHR_CTOD( LINE( FIRST: LAST ), TRNVAL, STATUS )
@@ -156,13 +156,13 @@
 
 *  Translation ok.
                NTRAN = NTRAN + 1
-               IF ( NTRAN .LE. NVAL ) THEN 
+               IF ( NTRAN .LE. NVAL ) THEN
                   VALUES( NROW, NTRAN ) = TRNVAL
                END IF
             END IF
          END IF
          GO TO 1
-      END IF        
+      END IF
 
 *  How many values have we translated.
       IF ( NTRAN .GT. NVAL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -176,8 +176,8 @@
          CALL ERR_REP( 'CCD1_DECL4ERR4',
      :   '  File contains too few values - line ^LINNUM' ,STATUS )
       END IF
-      
+
  99   CONTINUE
       END
- 
+
 * $Id$

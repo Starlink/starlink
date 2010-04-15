@@ -9,7 +9,7 @@ C
 C     Function:
 C        Add frames of time series image correcting for image motion
 C
-C     Description:   
+C     Description:
 C        Obtain an output image by summing the framesof a time series
 C        image after shifting each frame to correct for image motion.
 C        The image motion information is obtained from a time series
@@ -21,10 +21,10 @@ C    (1) INPUT     (TSP, 3D)   The time series image dataset.
 C    (2) MOTION    (TSP, 2D)   The image motion time series.
 C    (3) OUTPUT    (TSP, 2D)   The output image.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         1/3/1992
 C
 C-
@@ -127,7 +127,7 @@ C
       UBND(1)=DIMS(1)*INTERP
       UBND(2)=DIMS(2)*INTERP
       CALL NDF_NEW('_REAL',2,LBND,UBND,PLACE,IDTEMP,STATUS)
-  
+
 *  Create workspace array for summed image
       CALL NDF_TEMP(PLACE,STATUS)
       CALL NDF_NEW('_REAL',2,LBND,UBND,PLACE,IDSUM,STATUS)
@@ -147,7 +147,7 @@ C
           IF (IZ/100*100 .EQ. IZ) THEN
               PRINT *,IZ
           ENDIF
-       
+
 *  Interpolate input frame into temporary frame
           NX2=DIMS(1)*INTERP
           NY2=DIMS(2)*INTERP
@@ -155,7 +155,7 @@ C
 *     :          NX2,NY2,%VAL(PTR1),STATUS)
           CALL TSP_BILINT(DIMS(1),DIMS(2),NZ,IZ,%VAL(PTR),INTERP,
      :          NX2,NY2,%VAL(PTR1),STATUS)
-          
+
 *  Shift temporary frame
           CALL TSP_GETSHIFT(NZ,IZ,%VAL(PPTR),INTERP,SHIFT,STATUS)
           CALL TSP_SHIFTADD(NX2,NY2,SHIFT,%VAL(PTR1),%VAL(PTR2),
@@ -176,8 +176,8 @@ C
       CALL DAT_ANNUL(OLOC,STATUS)
       END
 
-      
-      
+
+
       SUBROUTINE TSP_BILINT(NX,NY,NZ,IZ,IN,INTERP,NX2,NY2,OUT,STATUS)
 *+
 *
@@ -246,7 +246,7 @@ C
 *     :                T*(1.0-U)*IN(JX+1,JY,IZ) + T*U*IN(JX+1,JY+1,IZ)
 *     :                + (1.0-T)*U*IN(JX,JY+1,IZ)
 *          ENDDO
-*      ENDDO    
+*      ENDDO
       END
 
       SUBROUTINE TSP_BICUBIC(NX,NY,NZ,IZ,IN,INTERP,NX2,NY2,OUT,STATUS)
@@ -295,7 +295,7 @@ C
           ENDDO
           RETURN
       ENDIF
- 
+
       DO IY=1,NY
           X2A(IY)=IY
           DO IX=1,NX
@@ -315,7 +315,7 @@ C
           DO JX=1,NX2-INTERP
               OUT(JX,JY)=Y(JX)
           ENDDO
-      ENDDO      
+      ENDDO
       END
 
 
@@ -397,7 +397,7 @@ C
                   COUNT(JX,JY) = COUNT(JX,JY)+1
               ENDIF
           ENDDO
-      ENDDO              
+      ENDDO
       END
 
 
@@ -436,7 +436,7 @@ C
 *  Local variables
       INTEGER IX,IY,JX,JY
       INTEGER IXST,IXEN,IYST,IYEN,PCOUNT
-   
+
 *  Divide summed image by count
       DO IY=1,NY2
           DO IX=1,NX2
@@ -464,7 +464,7 @@ C
               IF (IYST .LT. 1) IYST=1
               IF (IYEN .GT. NY2) IYEN=NY2
               PCOUNT=0.0
-              OUT(IX,IY)=0.0    
+              OUT(IX,IY)=0.0
               DO JY=IYST,IYEN
                   DO JX=IXST,IXEN
                       OUT(IX,IY)=OUT(IX,IY)+SUM(JX,JY)
@@ -495,7 +495,7 @@ C
       ENDDO
       END
 
-      
+
       SUBROUTINE SPLIE2(X1A,X2A,YA,M,N,Y2A)
       PARAMETER(NN=100)
       REAL X1A(M),X2A(N),YA(M,N),Y2A(M,N),YTMP	(NN),Y2TMP(NN)
@@ -534,7 +534,7 @@ C
       KHI=N
 1     IF(KHI-KLO.GT.1) THEN
           K=(KHI+KLO)/2
-          IF (XA(K) .GT. X) THEN 
+          IF (XA(K) .GT. X) THEN
               KHI=K
           ELSE
               KLO=K
@@ -546,4 +546,4 @@ C
       B=(X-XA(KLO))/H
       Y=A*YA(KLO)+B*YA(KHI)+
      :    ((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
-      END      
+      END

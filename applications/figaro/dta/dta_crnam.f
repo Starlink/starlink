@@ -34,7 +34,7 @@ C                    DTA_INVDIM => Invalid dimensions specified
 C                    DTA_INVNAM => Invalid name - either ENAME
 C                                  or ONAME.
 C     Example -
-C     
+C
 C     DIMS(1)=62
 C     DIMS(2)=1524
 C     CALL DTA_CRNAM('OUTPUT.X','DATA',2,DIMS,NAME,STATUS)
@@ -46,8 +46,8 @@ C
 C                                           KS / CIT  26th April 1984
 C     Modified:
 C
-C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C     20th Jul  1993.  HME / UoE, Starlink.  After setting STATUS=DTA_INVDIM
 C                      this routine would proceed by setting it to a

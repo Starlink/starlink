@@ -31,7 +31,7 @@
 *        The name of a component of the NDF extension holding the
 *        astrometry information. Blank if none found.
 *     LOC = CHARACTER * ( * ) (Returned)
-*        A locator to the extension identified by XNAME. DAT__NOLOC if 
+*        A locator to the extension identified by XNAME. DAT__NOLOC if
 *        no astrometry structure is found.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -67,7 +67,7 @@
       CHARACTER XNAME*(*)
       CHARACTER ASNAME*(*)
       CHARACTER LOC*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -122,7 +122,7 @@
          IF( STRUC ) THEN
             CALL DAT_NCOMP( XLOC, NCOMP, STATUS )
 
-*  If the extension is a primative, set the number of components to 
+*  If the extension is a primative, set the number of components to
 *  zero.
          ELSE
             NCOMP = 0
@@ -173,7 +173,7 @@
 *  Check the next component in this extension.
          END DO
 
-*  Annul the locator to the current extension, so long as it is not the 
+*  Annul the locator to the current extension, so long as it is not the
 *  returned locator.
          IF( LOC .NE. XLOC ) CALL DAT_ANNUL( XLOC, STATUS )
 
@@ -192,7 +192,7 @@
      :                 STATUS )
       END IF
 
-*  If anything went wrong, ensure locators are annulled and add a 
+*  If anything went wrong, ensure locators are annulled and add a
 *  context report.
  999  CONTINUE
       IF( STATUS .NE. SAI__OK ) THEN

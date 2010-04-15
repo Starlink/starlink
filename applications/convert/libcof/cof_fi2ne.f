@@ -15,13 +15,13 @@
 
 *  Description:
 *     The routine recreates an NDF extension from a FITS IMAGE written
-*     by NDF2FITS.  The extension can be a structure, sub-structure, 
-*     or structure-array element component.  It uses the EXTNAME and 
-*     EXTTYPE keywords to determine the extension's path and data type. 
-*     EXTNAME also has the element indices if the extension or 
-*     sub-structure is an array; the dimensions of such a structure or 
-*     a primitive array are taken from the EXTSHAPE keyword.  The 
-*     routine creates the extension or structure only if it does not 
+*     by NDF2FITS.  The extension can be a structure, sub-structure,
+*     or structure-array element component.  It uses the EXTNAME and
+*     EXTTYPE keywords to determine the extension's path and data type.
+*     EXTNAME also has the element indices if the extension or
+*     sub-structure is an array; the dimensions of such a structure or
+*     a primitive array are taken from the EXTSHAPE keyword.  The
+*     routine creates the extension or structure only if it does not
 *     exist.
 
 *  Arguments:
@@ -31,7 +31,7 @@
 *        The identifier for the NDF to contain the extension in the
 *        current HDU.
 *     NDFEXT = INTEGER (Returned)
-*        The identifier for the skeletal extension NDF to contain the 
+*        The identifier for the skeletal extension NDF to contain the
 *        FITS IMAGE extension in the current HDU.  Skeletal means it
 *        has a dummy data type and dimensions, and has to be filled
 *        components other than the data array.  This extension NDF
@@ -76,7 +76,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -167,7 +167,7 @@
       IF ( EXTYPE .EQ. ' ' ) EXTYPE = 'STRUCT'
 
 *  See if the data type is an NDF.
-      NDFEX = CHR_SIMLR( EXTYPE, 'NDF' ) 
+      NDFEX = CHR_SIMLR( EXTYPE, 'NDF' )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -175,7 +175,7 @@
       CALL CHR_TRCHR( '.', ' ', EXPATH, STATUS )
 
 *  Break the path into words.  Extension must be at least the second
-*  item because the first is the top-level NDF name.  The extensions 
+*  item because the first is the top-level NDF name.  The extensions
 *  normally begin at level 3 in an NDF, but allow for on-the-fly
 *  conversion where the path is longer.  Find only the first MORE
 *  component in case there extensions within the extensions.  Since
@@ -184,7 +184,7 @@
       CALL CHR_DCWRD( EXPATH, MAXWRD, NWORD, START, END, WORDS, STATUS )
       GOMORE = .TRUE.
       DO LEVEL = 2, NWORD
-         IF ( WORDS( LEVEL ) .EQ. 'MORE' .AND. GOMORE ) THEN 
+         IF ( WORDS( LEVEL ) .EQ. 'MORE' .AND. GOMORE ) THEN
             ELEVEL = LEVEL + 1
             GOMORE =.FALSE.
          END IF
@@ -192,7 +192,7 @@
 
 *  Extract the extension's name, number of dimensions and their values,
 *  dimensions, and indices to a structure element.
-      CALL COF_EXDIM( FUNIT, WORDS( ELEVEL ), DAT__MXDIM, NAME, NDIM, 
+      CALL COF_EXDIM( FUNIT, WORDS( ELEVEL ), DAT__MXDIM, NAME, NDIM,
      :                DIMS, INDICE, STATUS )
 
       NAME = WORDS( ELEVEL )
@@ -205,7 +205,7 @@
       IF ( THERE ) THEN
          IF ( NDIM .EQ. 0 ) THEN
             CALL NDF_XLOC( NDF, NAME, 'UPDATE', SXLOC( 1 ), STATUS )
-                    
+
          ELSE
             CALL NDF_XLOC( NDF, NAME, 'UPDATE', LOC, STATUS )
             CALL DAT_CELL( LOC, NDIM, INDICE, SXLOC( 1 ), STATUS )
@@ -216,11 +216,11 @@
 *  locator to the current array element for an array of extensions.
       ELSE
          IF ( NDIM .EQ. 0 ) THEN
-            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0, 
+            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0,
      :                     SXLOC( ELEVEL - 2 ), STATUS )
          ELSE
             CALL NDF_XNEW( NDF, NAME, EXTYPE, NDIM, DIMS, LOC, STATUS )
-            CALL DAT_CELL( LOC, NDIM, INDICE, 
+            CALL DAT_CELL( LOC, NDIM, INDICE,
      :                     SXLOC( ELEVEL - 2 ), STATUS )
             CALL DAT_ANNUL( LOC, STATUS )
          END IF
@@ -237,7 +237,7 @@
             IF ( STATUS .NE. SAI__OK ) THEN
                print *, WORDS( LEVEL + 2 )
             END IF
-                     
+
 *  Determine whether or not the structure exists.
             CALL DAT_THERE( SXLOC( LEVEL - 1 ), NAME, THERE, STATUS )
 

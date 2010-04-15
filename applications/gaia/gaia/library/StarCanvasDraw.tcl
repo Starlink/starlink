@@ -180,7 +180,7 @@ itcl::class gaia::StarCanvasDraw {
 
    method set_drawing_mode {type {create_cmd ""}} {
       #  XXX need this as interaction with cube bindings is weird (out of
-      #  order, see <B1-Motion> first!). 
+      #  order, see <B1-Motion> first!).
       if { ! [info exists obj_id_] } {
          set obj_id_ {}
       }

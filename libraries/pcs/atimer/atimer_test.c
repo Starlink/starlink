@@ -35,7 +35,7 @@
 *     {note_any_bugs_here}
 
 *-
-*/    
+*/
 
 #include <stdio.h>
 #include <string.h>

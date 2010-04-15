@@ -1,5 +1,5 @@
-      SUBROUTINE DTASK_ADDLST ( ANAME, AKEY, PATH, MESSID, SEQ, ACODE,      
-     :  ACTPTR, STATUS ) 
+      SUBROUTINE DTASK_ADDLST ( ANAME, AKEY, PATH, MESSID, SEQ, ACODE,
+     :  ACTPTR, STATUS )
 *+
 *  Name:
 *     DTASK_ADDLST
@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     CALL DTASK_ADDLST ( ANAME, AKEY, PATH, MESSID, SEQ, ACTPTR,
-*     :  ACODE, STATUS ) 
+*     :  ACODE, STATUS )
 
 *  Description:
 *     Adds item to the list of current actions. If an entry
@@ -42,8 +42,8 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Search through the common-block arrays. When the slot has been 
-*     found (or allocated) for the action, store the details and 
+*     Search through the common-block arrays. When the slot has been
+*     found (or allocated) for the action, store the details and
 *     increment the action counter.
 
 *  Copyright:
@@ -88,7 +88,7 @@
 *     30-APR-1991 (REVAD::BDK):
 *        Revise INCLUDE files, remove ACTVALUE
 *     01-MAY-1991: remove the COUNT and VALUE import arguments
-*                  (REVAD::BDK) 
+*                  (REVAD::BDK)
 *     03-MAY-1991: only set ACTCOUNT for new action, initialise ACTTIM
 *                  (REVAD::BDK)
 *     09-MAY-1991 (REVAD::BDK):
@@ -144,7 +144,7 @@
       FOUND = .FALSE.
       DONE = .FALSE.
 
-      DO WHILE ( ( .NOT. FOUND ) .AND. ( .NOT. DONE ) .AND. 
+      DO WHILE ( ( .NOT. FOUND ) .AND. ( .NOT. DONE ) .AND.
      :  ( NACTS .GT. 0 ) )
          IF ( ACTNAME(N) .EQ. ANAME ) THEN
             FOUND = .TRUE.

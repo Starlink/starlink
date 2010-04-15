@@ -48,11 +48,11 @@
 *    % hmodify 'ds.axis(1).units' '"Counts/s"'
 *       Writes the value "Counts/s" into the UNITS component of first element
 *       of the AXIS array of structures in container file ds.sdf.
-*   
+*
 *    % hmodify 'ds.data_array(1:5)' '[1 2 3 4 5]'
 *       Writes the given values into the specified slice of component
 *       DATA_ARRAY in container file ds.sdf.
-*   
+*
 *    % hmodify ds.data_array  ds2.data_array
 *       Replace the values of the first DATA_ARRAY with those in the second.
 *       They must be the same size.
@@ -67,16 +67,16 @@
 *    ??-???-19?? (RJV):
 *       V1.0-0  Original
 *     7-JAN-1993 (DJA):
-*       V1.7-0  Move data with MAP_ routines 
+*       V1.7-0  Move data with MAP_ routines
 *     6-AUG-1993 (DJA):
 *       V1.7-1  Change to ARR_COP routines.
 *    14-JAN-1994 (DJA):
 *       V1.7-2  Use COP1B for character strings as ARR_COP1C
-*       doesn't work this way on UNIX 
+*       doesn't work this way on UNIX
 *    24-NOV-1994 (DJA):
-*       V1.8-0 Now use USI for user interface 
+*       V1.8-0 Now use USI for user interface
 *     6-SEP-2001 (AJC):
-*       V3.0-0 Remove Asterix stuff 
+*       V3.0-0 Remove Asterix stuff
 *       Get it working for _CHAR values
 *       Switch order of mapping to minimise chance of corrupting object
 *        due to having mapped WRITE.

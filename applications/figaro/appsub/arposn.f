@@ -33,7 +33,7 @@ C     11th March 1988  KS / AAO.  Now uses GKD_ routines
 C+
       IMPLICIT NONE
 C
-C     Parameters - 
+C     Parameters -
 C
       INTEGER NX,IX
       REAL XVALS(NX),ZVALS(NX),CENT,XCENT

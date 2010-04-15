@@ -5,29 +5,29 @@
      &   STOKES_QV,STOKES_U,STOKES_UV,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C
 C    T R I _ C O N S T _ B I N
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C
 C BIN_ERR (<), OLD_LAMBDA (<),
 C OLD_STOKES_I (<), OLD_STOKES_Q (<), OLD_STOKES_QV (<),
-C OLD_STOKES_U (<), OLD_STOKES_UV (<), OLD_NPTS (<), 
+C OLD_STOKES_U (<), OLD_STOKES_UV (<), OLD_NPTS (<),
 C STOKES_I (>), TMP_I (>), STOKES_Q (>),
 C STOKES_QV (>), STOKES_U (>), STOKES_UV (>), LAMBDA (>), NPTS (>),
 C OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Bins a polariztion spectrum to constant error bins.
 C
@@ -104,7 +104,7 @@ C
          IF (SPEC_BIN_NO.EQ.OLD_NPTS) THEN
          BIG_ENOUGH = .TRUE.
          ELSE
-         BIG_ENOUGH = (SQRT(ABS(BIN_VAR)) .LT. 
+         BIG_ENOUGH = (SQRT(ABS(BIN_VAR)) .LT.
      &                         BIN_ERR*STOKES_I(BIN_NO)/100.)
          ENDIF
         ENDDO
@@ -119,4 +119,4 @@ C
        ENDDO
        NPTS = BIN_NO-1
 666    CONTINUE
-       END 
+       END

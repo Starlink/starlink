@@ -1,7 +1,7 @@
 
 C-----------------------------------------------------------------------
 
-      LOGICAL*4 FUNCTION GEN_GETI4A 
+      LOGICAL*4 FUNCTION GEN_GETI4A
      &                   (PROMPT, DEF, NSIZ, FDEF, I4ARR, JDEF)
 
 C   Routine to put a prompt message to the terminal and receive an

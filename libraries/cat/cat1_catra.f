@@ -13,7 +13,7 @@
 *     an index into an array of the corresponding absoluate catalogue row
 *     numbers.  If the array already contains absolute catalogue row
 *     numbers then the contents are copied unchanged.  However, if it
-*     contains entries in a a selection or index then the corresponding 
+*     contains entries in a a selection or index then the corresponding
 *     absolute catalogue row numbers are returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,7 +94,7 @@
       IF (STATUS .EQ. CAT__OK) THEN
 
 *
-*       Attempt to determine the type of the identifier and proceed if 
+*       Attempt to determine the type of the identifier and proceed if
 *       ok.
 
          CALL CAT_TIDTP (GI, IDTYP, STATUS)
@@ -120,7 +120,7 @@
                CALL CAT_TIQAI (GI, 'NUMSEL', NUMSEL, STATUS)
                CALL CAT_TIQAI (GI, 'PTR', PTR, STATUS)
 
-               CALL CAT1_GTSRA (NUMSEL, %VAL(CNF_PVAL(PTR)), 
+               CALL CAT1_GTSRA (NUMSEL, %VAL(CNF_PVAL(PTR)),
      :                          NUMROW, ROWNO,
      :           CATROW, STATUS)
 

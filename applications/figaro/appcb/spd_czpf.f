@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -379,7 +379,7 @@
 *        Generate the output NDF and propagate auxiliaries.
 *        This includes setting the output pixel positions.
             IF ( MTYPE .EQ. '_DOUBLE' ) THEN
-               CALL SPD_CZPED( INFO, PROPCO, KMAX, 
+               CALL SPD_CZPED( INFO, PROPCO, KMAX,
      :                         %VAL( CNF_PVAL( XNK ) ), DTYPE,
      :                         ATYPE, NDF1, AXIS, LMAX, XL, NDF2,
      :                         NDFX, MESSAG, STATUS )
@@ -623,7 +623,7 @@
 
 *     Next input?
          GO TO 1                 ! End of 'DO WHILE' loop
-      END IF     
+      END IF
 
 *  Now all input NDFs have been processed. Have to do final processing
 *  of output NDF.

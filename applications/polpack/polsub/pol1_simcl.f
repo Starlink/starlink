@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SIMCL( VAR, EL, STOKES, VSTOK, T, EPS, PHI, 
+      SUBROUTINE POL1_SIMCL( VAR, EL, STOKES, VSTOK, T, EPS, PHI,
      :                       DOUT, VOUT, STATUS )
 *+
 *  Name:
@@ -11,11 +11,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SIMCL( VAR, EL, STOKES, VSTOK, T, EPS, PHI, DOUT, VOUT, 
+*     CALL POL1_SIMCL( VAR, EL, STOKES, VSTOK, T, EPS, PHI, DOUT, VOUT,
 *                      STATUS )
 
 *  Description:
-*     This routine returns the simulated intensity data from a set of 
+*     This routine returns the simulated intensity data from a set of
 *     Stokes vectors.
 
 *  Arguments:
@@ -36,14 +36,14 @@
 *     DOUT( EL ) = REAL (Returned)
 *        The simulated intensity values.
 *     VOUT( EL ) = REAL (Returned)
-*        The variances on the simulated intensity values. Only accessed 
+*        The variances on the simulated intensity values. Only accessed
 *        if VAR is TRUE.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,9 +108,9 @@
 
 *  Calculate the expected intensity value on the basis of the supplied
 *  Stokes vector.
-            DOUT( I ) = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 ) 
+            DOUT( I ) = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 )
      :                                      + K3*STOKES( I, 3 ) )
-             
+
 *  Store a bad value if any of the input values were bad.
          ELSE
             DOUT( I ) = VAL__BADR

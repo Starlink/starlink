@@ -17,7 +17,7 @@
 *     None
 
 *  Returned Value:
-*     SCULIB_DAY = DOUBLE PRECISION 
+*     SCULIB_DAY = DOUBLE PRECISION
 *           date and time as a day number since 1st Jan
 
 *  Authors:
@@ -90,7 +90,7 @@
 
 *  calculate day number
 
-      SCULIB_DAY = DBLE (YDAY) + (((DBLE(HOURS) * 60.0D0) + 
+      SCULIB_DAY = DBLE (YDAY) + (((DBLE(HOURS) * 60.0D0) +
      :  DBLE(MINS)) * 60.0D0 + DBLE(SECS)) / (24.0D0 * 60.0D0 * 60.0D0)
 
       END

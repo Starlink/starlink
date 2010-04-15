@@ -11,14 +11,14 @@ C        Apply Light Time corrections to the time axis of a data set.
 C
 C     Description:
 C        LTCORR applies light time corrections to the time axis of a data
-C        set, converting observed times to heliocentric or barycentric 
+C        set, converting observed times to heliocentric or barycentric
 C        times. If the parameter SINGLE is true a single correction is
 C        calculated for the mid point time of the dataset, and applied to
 C        all points in the dataset. If SINGLE is false the correction is
 C        recalculated for each data point.
 C
 C     Parameters:
-C    (1) INPUT      (TSP, 2D)  The input time series dataset with 
+C    (1) INPUT      (TSP, 2D)  The input time series dataset with
 C                               observed times.
 C    (2) OUTPUT     (TSP, 2D)  The output corrected dataset with heliocentric
 C                               or barycentric times.
@@ -43,14 +43,14 @@ C
 C-
 C
 C  History:
-C    30/11/1987   Original Version.   JAB/AAO 
+C    30/11/1987   Original Version.   JAB/AAO
 C    27/2/1988   TSP Monolith version.  JAB/AAO
 C
 
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'                          
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'USER_ERR'  
+      INCLUDE 'USER_ERR'
 
 *  Status argument
       INTEGER STATUS
@@ -64,12 +64,12 @@ C
       INTEGER DIMS(7),NDIMS
 
 *  Pointer to time axis
-      INTEGER PTR   
+      INTEGER PTR
       CHARACTER*80 RASTRING,DECSTRING
       INTEGER IH,ID,IM
       DOUBLE PRECISION SEC,RM,DM
       INTEGER J,SIGN
-      INTEGER NSTRT                        
+      INTEGER NSTRT
       LOGICAL SINGLE,BARY,REVERSE
       CHARACTER*64 LABEL,UNITS
 
@@ -143,7 +143,7 @@ C
 
          CALL SLA_INTIN(DECSTRING,NSTRT,ID,J)
          IF (J .EQ. -1) THEN
-             ID = -ID                     
+             ID = -ID
              SIGN = -1
          ELSE
              SIGN = 1
@@ -153,7 +153,7 @@ C
 
          CALL SLA_INTIN(DECSTRING,NSTRT,IM,J)
          CALL SLA_DFLTIN(DECSTRING,NSTRT,SEC,J)
-         CALL SLA_DAF2R(ID,IM,SEC,DM,J)     
+         CALL SLA_DAF2R(ID,IM,SEC,DM,J)
          IF (SIGN .EQ. -1) THEN
              DM = -DM
          ENDIF
@@ -162,9 +162,9 @@ C
              RETURN
          ENDIF
          PRINT *,RM,DM
-               
+
 *  Get SINGLE flag
-          
+
          CALL PAR_GET0L('SINGLE',SINGLE,STATUS)
 
 *  Get Barycentric flag
@@ -179,42 +179,42 @@ C
 
          IF (STATUS .EQ. SAI__OK) THEN
              CALL TSP_LTCORR(RM,DM,SINGLE,BARY,REVERSE,SIZE,
-     :           %VAL(PTR),STATUS)         
-         ENDIF                    
+     :           %VAL(PTR),STATUS)
+         ENDIF
 
 *  Update Axis label by appending 'Barycentric' or 'Heliocentric'
 
-         IF (LABEL .EQ. 'MJD(UTC)') THEN              
-             IF (BARY) THEN                           
-                 LABEL = 'MJD(UTC) Barycentric'       
-             ELSE                                     
-                 LABEL = 'MJD(UTC) Heliocentric'      
-             ENDIF                                    
-         ELSE IF (LABEL .EQ. 'MJD(TDT)') THEN         
-             IF (BARY) THEN                           
-                 LABEL = 'MJD(TDT) Barycentric'       
-             ELSE                                     
-                 LABEL = 'MJD(TDT) Heliocentric'      
-             ENDIF                                    
-         ELSE IF (LABEL .EQ. 'MJD(TAI)') THEN         
-             IF (BARY) THEN                           
-                 LABEL = 'MJD(TAI) Barycentric'       
-             ELSE                                     
-                 LABEL = 'MJD(TAI) Heliocentric'      
-             ENDIF                                    
-         ENDIF                   
+         IF (LABEL .EQ. 'MJD(UTC)') THEN
+             IF (BARY) THEN
+                 LABEL = 'MJD(UTC) Barycentric'
+             ELSE
+                 LABEL = 'MJD(UTC) Heliocentric'
+             ENDIF
+         ELSE IF (LABEL .EQ. 'MJD(TDT)') THEN
+             IF (BARY) THEN
+                 LABEL = 'MJD(TDT) Barycentric'
+             ELSE
+                 LABEL = 'MJD(TDT) Heliocentric'
+             ENDIF
+         ELSE IF (LABEL .EQ. 'MJD(TAI)') THEN
+             IF (BARY) THEN
+                 LABEL = 'MJD(TAI) Barycentric'
+             ELSE
+                 LABEL = 'MJD(TAI) Heliocentric'
+             ENDIF
+         ENDIF
 
 *  If correction is reverse just take first eight characters of label
 
          IF (REVERSE) THEN
              LABEL = LABEL(1:8)
-         ENDIF              
+         ENDIF
          CALL TSP_WLU_TIME(OLOC,LABEL,UNITS,STATUS)
-      ENDIF            
+      ENDIF
 
 *  Unmap data and annul locators
 
-      CALL TSP_UNMAP(LOC,STATUS)                                      
+      CALL TSP_UNMAP(LOC,STATUS)
       CALL DAT_ANNUL(ILOC,STATUS)
       CALL DAT_ANNUL(OLOC,STATUS)
       IF (STATUS .EQ. USER__001) STATUS = SAI__OK
@@ -223,7 +223,7 @@ C
 
 
       SUBROUTINE TSP_LTCORR(RM,DM,SINGLE,BARY,REVERSE,SIZE,TIMES,
-     :     STATUS) 
+     :     STATUS)
 *+
 *
 *   T S P _ L T C O R R
@@ -231,7 +231,7 @@ C
 *   TSP_LTCORR applies light time corrections to the data in the TIMES
 *   array (A double precision array of MJDs). The corrections are those
 *   needed to convert an observed MJD of an object at B1950 FK4 position
-*   (RM,DM) to a heliocentric or barycentric MJD for the same 
+*   (RM,DM) to a heliocentric or barycentric MJD for the same
 *   observation.
 *
 *   The SINGLE flag, if specified causes a single correction to be calculated
@@ -252,7 +252,7 @@ C
 *
 *   Jeremy Bailey    27/2/1988
 *
-*+  
+*+
       IMPLICIT NONE
 
 *  Parameters
@@ -273,9 +273,9 @@ C
 *  Convert to cartesian vector
 
       CALL SLA_DCS2C(R2000,D2000,V)
-                         
+
 *   Light Time corrections - single correction for mean time
-    
+
       IF (SINGLE) THEN
 
 *   Calculate mid point MJD
@@ -284,19 +284,19 @@ C
 
 *   Calculate Earth position
 
-          CALL SLA_EVP(MJD,2000.0D0,DVB,DPB,DVH,DPH) 
+          CALL SLA_EVP(MJD,2000.0D0,DVB,DPB,DVH,DPH)
 
 *   Light time correction is scalar product of star position and
 *   earth position times light time for one a.u.
-        
+
           IF (BARY) THEN
               TL = 499.0047837D0 * SLA_DVDV(DPB,V)
           ELSE
               TL = 499.0047837D0 * SLA_DVDV(DPH,V)
-          ENDIF                                 
+          ENDIF
 
 *  Output correction
-               
+
           CALL MSG_SETD('TL',TL)
           CALL MSG_OUT('MSG','Correction = ^TL seconds',STATUS)
 
@@ -311,7 +311,7 @@ C
               TIMES(I) = TIMES(I) + TL/86400.0D0
             ENDDO
           ENDIF
-      ELSE                                                  
+      ELSE
 
 *   Correct each point individually
 
@@ -320,11 +320,11 @@ C
 
 *  Get earth position
 
-              CALL SLA_EVP(MJD,2000.0D0,DVB,DPB,DVH,DPH)         
+              CALL SLA_EVP(MJD,2000.0D0,DVB,DPB,DVH,DPH)
 
 *   Light time correction is scalar product of star position and
 *   earth position times light time for one a.u.
-        
+
               IF (BARY) THEN
                   TL = 499.0047837D0 * SLA_DVDV(DPB,V)
               ELSE
@@ -333,9 +333,9 @@ C
 
 *  Output correction for first point
 
-              IF (I .EQ. 1) THEN                                                
+              IF (I .EQ. 1) THEN
                   CALL MSG_SETD('TL',TL)
-                  CALL MSG_OUT('MSG','Correction = ^TL seconds',STATUS)       
+                  CALL MSG_OUT('MSG','Correction = ^TL seconds',STATUS)
               ENDIF
 
 *  Correct MJD in array
@@ -343,7 +343,7 @@ C
               IF (REVERSE) THEN
                   TIMES(I) = TIMES(I) - TL/86400.0D0
               ELSE
-                  TIMES(I) = TIMES(I) + TL/86400.0D0 
+                  TIMES(I) = TIMES(I) + TL/86400.0D0
               ENDIF
           ENDDO
       ENDIF

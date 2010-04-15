@@ -1,7 +1,7 @@
 C+
       SUBROUTINE ERRCON
 C
-C     E R R C O N 
+C     E R R C O N
 C
 C     Converts a Figaro file that has an error array containing
 C     percentage errors into one that has absolute values in the
@@ -14,15 +14,15 @@ C     SPECTRUM  (Character) The name of the file to be converted.
 C               This will usually be a spectrum, but data of any
 C               dimension will be accepted.
 C
-C     OUTPUT    (Character) The name of the resulting file. This 
-C               can be the same as for SPECTRUM. If not, a new 
+C     OUTPUT    (Character) The name of the resulting file. This
+C               can be the same as for SPECTRUM. If not, a new
 C               structure is created, with everything but the error
 C               array a direct copy of the input.
 C
 C                                      KS / AAO. 21st July 1986
 C     Modified:
 C
-C     30th Jul 1987  DJA / AAO. New DSA_ routines. Also now uses the 
+C     30th Jul 1987  DJA / AAO. New DSA_ routines. Also now uses the
 C                    DYN_ set of dynamic memory routines
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.

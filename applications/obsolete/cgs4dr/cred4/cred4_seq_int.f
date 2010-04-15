@@ -75,13 +75,13 @@
          IF ( DISPLAY_INT(I).EQ.'ASK' .OR. DISPLAY_INT(I).EQ.'ask' ) THEN
             ASK = .TRUE.
             CALL CHR_ITOC( I, CPORT, CPOS )
-            INVAL =  'DISPLAY DATA=' // RINTEGRATION(1:CHR_LEN(RINTEGRATION)) // ' PORT=' // CPORT(1:CPOS) 
+            INVAL =  'DISPLAY DATA=' // RINTEGRATION(1:CHR_LEN(RINTEGRATION)) // ' PORT=' // CPORT(1:CPOS)
             CALL CRED4_DISPLAY( INVAL, 'INTEGRATION', ASK, WAIT, STATUS )
 
          ELSE IF ( DISPLAY_INT(I).EQ.'YES' .OR. DISPLAY_INT(I).EQ.'yes' ) THEN
             ASK = .FALSE.
             CALL CHR_ITOC( I, CPORT, CPOS )
-            INVAL =  'DISPLAY DATA=' // RINTEGRATION(1:CHR_LEN(RINTEGRATION)) // ' PORT=' // CPORT(1:CPOS) 
+            INVAL =  'DISPLAY DATA=' // RINTEGRATION(1:CHR_LEN(RINTEGRATION)) // ' PORT=' // CPORT(1:CPOS)
             CALL CRED4_DISPLAY( INVAL, 'INTEGRATION', ASK, WAIT, STATUS )
 
          ELSE IF ( DISPLAY_OBS(I).EQ.'NO' .OR. DISPLAY_OBS(I).EQ.'no' ) THEN
@@ -115,7 +115,7 @@
 *      You only need to wait for these displays to complete if the autofit
 *      or adding of the observation is to be prompted for, otherwise the
 *      DISPLAY_OBS and AUTOFIT/ADD_OBS can proceed simultaneously.
-         IF ( (AUTOFIT .EQ. 'ASK') .OR. (ADD_OBS .EQ. 'ASK') ) THEN 
+         IF ( (AUTOFIT .EQ. 'ASK') .OR. (ADD_OBS .EQ. 'ASK') ) THEN
             WAIT = .TRUE.
          ELSE
             WAIT = .FALSE.
@@ -127,13 +127,13 @@
          IF ( DISPLAY_OBS(I).EQ.'ASK' .OR. DISPLAY_OBS(I).EQ.'ask' ) THEN
             ASK = .TRUE.
             CALL CHR_ITOC( I, CPORT, CPOS )
-            INVAL =  'DISPLAY DATA=' // ROBSERVATION(1:CHR_LEN(ROBSERVATION)) // ' PORT=' // CPORT(1:CPOS) 
+            INVAL =  'DISPLAY DATA=' // ROBSERVATION(1:CHR_LEN(ROBSERVATION)) // ' PORT=' // CPORT(1:CPOS)
             CALL CRED4_DISPLAY( INVAL, 'OBSERVATION', ASK, WAIT, STATUS )
 
          ELSE IF ( DISPLAY_OBS(I).EQ.'YES' .OR. DISPLAY_OBS(I).EQ.'yes' ) THEN
             ASK = .FALSE.
             CALL CHR_ITOC( I, CPORT, CPOS )
-            INVAL =  'DISPLAY DATA=' // ROBSERVATION(1:CHR_LEN(ROBSERVATION)) // ' PORT=' // CPORT(1:CPOS) 
+            INVAL =  'DISPLAY DATA=' // ROBSERVATION(1:CHR_LEN(ROBSERVATION)) // ' PORT=' // CPORT(1:CPOS)
             CALL CRED4_DISPLAY( INVAL, 'OBSERVATION', ASK, WAIT, STATUS )
 
          ELSE IF ( DISPLAY_OBS(I).EQ.'NO' .OR. DISPLAY_OBS(I).EQ.'no' ) THEN

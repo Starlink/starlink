@@ -29,33 +29,33 @@
 *=============================================================================
 *
 *  This version of proj.c is based on the version in wcslib-2.9, but has
-*  been modified in the following ways by the Starlink project (e-mail: 
+*  been modified in the following ways by the Starlink project (e-mail:
 *  ussc@star.rl.ac.uk):
 *     -  The copysign macro is now always defined within this file
-*        instead of only being defined if the COPYSIGN macro has previously 
+*        instead of only being defined if the COPYSIGN macro has previously
 *        been defined.
-*     -  Sine values which are slightly larger than 1.0 are now treated 
+*     -  Sine values which are slightly larger than 1.0 are now treated
 *        as 1.0 in function astCYPrev.
-*     -  The maximum number of projection parameters has been changed from 
+*     -  The maximum number of projection parameters has been changed from
 *        10 to 100.
-*     -  The maximum number of projection parameters is given by the 
+*     -  The maximum number of projection parameters is given by the
 *        WCSLIB_MXPAR macro (defined in proj.h) instead of being hard-wired.
-*     -  The names of all functions and structures have been chanegd to avoid 
+*     -  The names of all functions and structures have been chanegd to avoid
 *        clashes with wcslib. This involves adding "Ast" or "ast" at the
 *        front and changing the capitalisation.
 *     -  Include string.h (for strcpy and strcmp prototypes).
 *     -  Include stdlib.h (for abs prototype).
 *     -  Comment out declarations of npcode and pcodes variables (they
 *        are not needed by AST) in order to avoid clash with similar names
-*        in other modules imported as part of other software systems (e.g. 
+*        in other modules imported as part of other software systems (e.g.
 *        SkyCat).
 *     -  astZPNfwd: Loop from prj->n to zero, not from MAXPAR to zero.
 *     -  astZPNfwd: Only return "2" if prj->n is larger than 2.
 *     -  Lots of variables are initialised to null values in order to
-*        avoid "use of uninitialised variable" messages from compilers which 
-*        are not clever enough to work out that the uninitialised variable is 
-*        not in fact ever used. 
-*     -  Use dynamic rather than static memory for the parameter arrays in 
+*        avoid "use of uninitialised variable" messages from compilers which
+*        are not clever enough to work out that the uninitialised variable is
+*        not in fact ever used.
+*     -  Use dynamic rather than static memory for the parameter arrays in
 *        the AstPrjPrm structure.Override astGetObjSize. This is to
 *        reduce the in-memory size of a WcsMap.
 *     -  Healpix projection added.
@@ -268,7 +268,7 @@
 
 /* Set the name of the module we are implementing. This indicates to
    the header files that define class interfaces that they should make
-   "protected" symbols available. NB, this module is not a proper AST 
+   "protected" symbols available. NB, this module is not a proper AST
    class, but it defines this macro sanyway in order to get the protected
    symbols defined in memory.h */
 
@@ -4419,8 +4419,8 @@ double *phi, *theta;
 *
 *   Given and/or returned:
 *      prj->r0      Reset to 180/pi if 0.
-*      prj->phi0    Reset to 0.0 
-*      prj->theta0  Reset to 0.0 
+*      prj->phi0    Reset to 0.0
+*      prj->theta0  Reset to 0.0
 *
 *   Returned:
 *      prj->flag     HPX
@@ -4488,7 +4488,7 @@ double *x, *y;
 
 {
    double abssin, sigma, sinthe, phic;
- 
+
    if( prj->flag != WCS__HPX ) {
       if( astHPXset( prj ) ) return 1;
    }
@@ -4516,7 +4516,7 @@ double *x, *y;
 
       *y = prj->w[9] * ( prj->w[4] - sigma );
       if( theta < 0 ) *y = -*y;
-      
+
    }
 
    return 0;
@@ -4557,7 +4557,7 @@ double *phi, *theta;
          xc = -180.0 + ( 2.0*floor( ( x + 180.0 )*prj->w[7]  ) + 1.0 )*prj->w[6];
       } else {
          xc = -180.0 + 2.0*floor( ( x + 180.0 )*prj->w[7] + 1/2 )*prj->w[6];
-      }       
+      }
 
       sigma = prj->w[4] - absy / prj->w[6];
 

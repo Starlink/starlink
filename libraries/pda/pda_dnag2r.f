@@ -4,7 +4,7 @@
 *     PDA_DNAG2R
 
 *  Purpose:
-*     Converts an NAG Hermitian Fourier transform array into an array 
+*     Converts an NAG Hermitian Fourier transform array into an array
 *     usable by FFTPACK routine PDA_DRFFTB.
 
 *  Language:
@@ -14,9 +14,9 @@
 *     CALL PDA_DNAG2R( NP, R )
 
 *  Description:
-*     This subroutine modifies the supplied array of Fourier co-efficients 
-*     (as produced by NAG subroutine C06FAF) so that an inverse FFT can be 
-*     performed on them using FFTPACK routine PDA_DRFFTB. The resulting inverse 
+*     This subroutine modifies the supplied array of Fourier co-efficients
+*     (as produced by NAG subroutine C06FAF) so that an inverse FFT can be
+*     performed on them using FFTPACK routine PDA_DRFFTB. The resulting inverse
 *     will have the same normalisation as the original data transformed
 *     using PDA_DRFFTF.
 
@@ -28,7 +28,7 @@
 *        format and returned in FFTPACK format.
 
 *  Notes:
-*     -  A call to PDA_DR2NAG followed by a call to PDA_DNAG2R will result in 
+*     -  A call to PDA_DR2NAG followed by a call to PDA_DNAG2R will result in
 *     the original data being divided by NP.
 *     -  Some speed is sacrificed in order to perform the conversion
 *     in-situ.
@@ -55,16 +55,16 @@
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION R( NP )
-      
+
 *  Local Variables:
       DOUBLE PRECISION
      :        FAC,               ! Normalisation factor
      :        TMP                ! Temporary storage for imaginary term
 
-      INTEGER 
+      INTEGER
      :        IB,                ! Index of current imaginary term.
      :        J                  ! Loop count
-   
+
 *.
 
 *  Store the normalisation factor
@@ -75,7 +75,7 @@
          R( J ) = R( J )*FAC
       END DO
 
-*  Loop round each of the elements where FFTPACK wants the imaginary 
+*  Loop round each of the elements where FFTPACK wants the imaginary
 *  terms to be placed.
       DO IB = 3, 2*( ( NP + 1 )/2 ) - 1, 2
 

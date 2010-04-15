@@ -22,7 +22,7 @@
 *        is an array containing NCENT contiguous
 *                        channels of data from an arc spectrum.
 *    NCENT = INTEGER (Given)
-*       
+*
 *    LEVEL = REAL (Given)
 *        is the discrimination level in counts.
 *    VALUE = REAL (Returned)

@@ -25,19 +25,19 @@
 *     position (a detector acrossing the source at its centre will have
 *     distance weighting 1.0 ). If distance weighting is selected, the
 *     user will be prompted for the value of the Gaussian function at
-*     the edge of the detector. 
+*     the edge of the detector.
 
 *  Arguments:
 *     PWGHT = CHARACTER*( * ) (Given)
 *        The name of the parameter used to get the method to weight the
-*        traces to be coadded.     
+*        traces to be coadded.
 *     PDIST = CHARACTER*( * ) (Given)
 *        The name of the parameter used to see if the distance weighting
 *        will be combined with the other weighting methods.
 *     PGV = CHARACTER*( * ) (Given)
 *        The name of the parameter used when the distance weighting will
 *        be used to get the value of the Guassian function at the edge
-*        of a detector. 
+*        of a detector.
 *     NCRDD = INTEGER (Given)
 *        Number of input CRDD NDFs.
 *     NDFID( NCRDD ) = INTEGER (Given)
@@ -65,7 +65,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,7 +117,7 @@
       CALL PAR_GET0L( PDIST, DIST, STATUS )
 
 *  If distance weighting will be used, get the value of the Guassian
-*  function at the edge of a detector. 
+*  function at the edge of a detector.
       IF ( DIST ) CALL PAR_GET0R( PGV, GVDTEG, STATUS )
 
       END

@@ -14,13 +14,13 @@
 
 *  Description:
 *     This routine prints the six coefficients submitted in the TR array
-*     in a suitable form given that they represent the coefficients of 
+*     in a suitable form given that they represent the coefficients of
 *     a linear transformation:
 *
 *        X' = TR( 1 ) + TR( 2 ) * X + TR( 3 ) * Y
 *        Y' = TR( 4 ) + TR( 5 ) * X + TR( 6 ) * Y
 *
-*     If USEFRM is .TRUE. then the format of output is as determined 
+*     If USEFRM is .TRUE. then the format of output is as determined
 *     by the AST Frame object contained in the FRAME argument.  Otherwise
 *     formatting is in some default format.  This only applies to TR( 1 )
 *     and TR( 4 ), since the other elements are dimensionless.
@@ -33,7 +33,7 @@
 *     FRAME = INTEGER (Given)
 *        AST pointer to a frame to be used for formatting A and D values.
 *     USEFRM = LOGICAL (Given)
-*        If .TRUE. use the FRAME value for formatting, otherwise format 
+*        If .TRUE. use the FRAME value for formatting, otherwise format
 *        in a default style.
 *     STATUS = INTEGER (Given)
 *        The global status.
@@ -80,12 +80,12 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Standard MSG/ERR constants
       INCLUDE 'AST_PAR'          ! Standard AST system constants
-      
+
 *  Arguments Given:
       DOUBLE PRECISION TR( 6 )
       INTEGER FRAME
       LOGICAL USEFRM
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -109,7 +109,7 @@
          FRM = AST__NULL
       END IF
       CALL CCD1_XYFMT( TR( 1 ), TR( 4 ), FRM, XSTR, YSTR, STATUS )
-      
+
 *  Output the coefficients.
       BUFFER = ' '
       IAT = 4

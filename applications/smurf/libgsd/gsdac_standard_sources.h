@@ -4,7 +4,7 @@
  *     gsdac_standards.h
 
  *  Purpose:
- *     Standard source table for gsd2acsis 
+ *     Standard source table for gsd2acsis
 
  *  Language:
  *     Starlink ANSI C
@@ -14,7 +14,7 @@
 
  *  Description:
  *     Lookup table of standard source objects.
- 
+
 
  *  Authors:
  *     J. Balfour (j.balfour@jach.hawaii.edu)

@@ -80,7 +80,7 @@
       INTEGER SIZE               ! Size of group.
       REAL GBOX( 4 )             ! The bounds of the plotting area
 
-*. 
+*.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -91,8 +91,8 @@
 *  Create the empty group.
       CALL GRP_NEW( ' ', IGRP2, STATUS )
 
-*  Get the group size.  
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )      
+*  Get the group size.
+      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
 
 *  Go through the group.
       REG = 0
@@ -108,12 +108,12 @@
 *  If this element belongs to the required region, copy it into the new
 *  group.
          IF( REG .EQ. IREG ) THEN
-            CALL GRP_PUT( IGRP2, 1, TEXT, 0, STATUS ) 
+            CALL GRP_PUT( IGRP2, 1, TEXT, 0, STATUS )
 
 *  If we have passed onto another region, break out of the loop.
          ELSE IF( REG .GT. IREG ) THEN
             GO TO 10
-         END IF         
+         END IF
 
       END DO
 

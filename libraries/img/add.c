@@ -6,10 +6,10 @@
 /*+
  * Name:
  *    add
- 
+
  *  Purpose:
  *     Adds a constant value to all the elements of an image.
- 
+
  *  Description:
  *     This is a demonstration routine for IMG. It creates a copy of an
  *     existing image and then adds a specified constant to all the
@@ -20,12 +20,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -41,14 +41,14 @@
  *  History:
  *     03-JUN-1998 (PWD):
  *         Original Version
- 
+
  *  Notes:
  *     This routine could also be implemented to just modify the input
  *     image, rather than creating a new copy.
  *
  *     The PAR routines should be used to access the data value when
  *     they are available with a C interface.
- 
+
  *-
  */
 
@@ -58,7 +58,7 @@ F77_SUBROUTINE(add)(INTEGER(status))
   float *ptrIn, *ptrOut;
   float value;
   int i;
- 
+
   /*  Access an existing image */
   imgIn( "IN", &nx, &ny, &ptrIn, status );
 
@@ -71,7 +71,7 @@ F77_SUBROUTINE(add)(INTEGER(status))
   scanf( "%e", &value );
 
   /*  And do the work. */
-  for( i=0; i <nx*ny; i++ ) { 
+  for( i=0; i <nx*ny; i++ ) {
     ptrOut[i] = value + ptrIn[i];
   }
 

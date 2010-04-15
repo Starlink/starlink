@@ -67,7 +67,7 @@
 
 *  Notes:
 *     - A value of zero will be returned for LNAME if an error has
-*     occurred prior to calling this routine, or if an error occurs 
+*     occurred prior to calling this routine, or if an error occurs
 *     during this routine.
 *     - A blank value may be returned if the file name cannot be
 *     determined.
@@ -81,12 +81,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -356,7 +356,7 @@ bytes of memory - ^MESSAGE",
                                       (void) strcpy( file, dir );
                                       (void) strcat( file, "/" );
                                       (void) strcat( file, name );
-                                      
+
 /* If the resulting path name starts with ~ (because this appeared in the   */
 /* search path), then expand it into the name of the appropriate user's	    */
 /* initial working directory and free the original string.		    */
@@ -385,7 +385,7 @@ bytes of memory - ^MESSAGE",
                                               file = NULL;
                                             }
                                         }
-                                      
+
 /* Free the full file name string before returning to search the next	    */
 /* directory on the search path.					    */
                                       free( (void *) file );
@@ -431,7 +431,7 @@ current working directory - ^MESSAGE",
                                       ( name[ 1 ] == '/' );
                                     szname -= (size_t) 2 )
                                 {
-                                  (void) memmove( (void *) name, 
+                                  (void) memmove( (void *) name,
                                                   (void *) ( name + 2 ),
                                                   szname - (size_t) 1 );
                                 }
@@ -477,7 +477,7 @@ bytes of memory - ^MESSAGE",
             {
               NAME[ i ] = (F77_CHARACTER_TYPE) result[ i ];
             }
-          
+
 /* Return the length of the returned path name.				    */
           *LNAME = (F77_INTEGER_TYPE) i;
 

@@ -1,6 +1,6 @@
 #!/stardev/bin/tclsh8.2
 
-#+ 
+#+
 #  querycat.tcl
 #
 #  Example script to perform a selection on a remote catalogue.
@@ -51,7 +51,7 @@
 #     If the query succeeded a single line will be returned which includes
 #     the name of the catalogue of retrieved objects, whereas a failed
 #     query will return a different message.  A typical application might
-#     parse the line to check for success or failure and obtain the catalogue 
+#     parse the line to check for success or failure and obtain the catalogue
 #     name in the case of success, eg. so that the catalogue can be opened.
 #     In this example the line is parsed and simple messages written.
 

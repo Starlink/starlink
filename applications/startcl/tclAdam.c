@@ -51,9 +51,9 @@
 /*
     Prototypes for static functions defined in this file.
 */
-static int Tcladam_Getreply ( ClientData clientData, Tcl_Interp *interp, 
+static int Tcladam_Getreply ( ClientData clientData, Tcl_Interp *interp,
     int argc, char *argv[]);
-static int Tcladam_Receive ( ClientData clientData, Tcl_Interp *interp, 
+static int Tcladam_Receive ( ClientData clientData, Tcl_Interp *interp,
     int argc, char *argv[]);
 static int Tcladam_Reply ( ClientData clientData, Tcl_Interp *interp, int argc,
     char *argv[]);
@@ -66,8 +66,8 @@ static int Tcladam_Path ( ClientData clientData, Tcl_Interp *interp, int argc,
 static void Tcladam_Strtocont ( char *contextname, int *context, int *status);
 static void Tcladam_Strtostatus ( char *msg_status_name, int *msg_status,
     int *status);
-static int Tcladam_ProcessMessage ( Tcl_Interp *interp, int path, int messid, 
-    int inmsg_status, int inmsg_context, char *inmsg_name, int inmsg_length, 
+static int Tcladam_ProcessMessage ( Tcl_Interp *interp, int path, int messid,
+    int inmsg_status, int inmsg_context, char *inmsg_name, int inmsg_length,
     char *inmsg_value);
 static void Tcladam_AppendStatus(Tcl_Interp *interp, int status);
 
@@ -116,9 +116,9 @@ char *inmsg_value
 
 /*  Look up the task name for this path */
    ams_plookup ( path, task, &status );
-   if ( status != SAI__OK ) 
+   if ( status != SAI__OK )
    {
-      Tcl_AppendResult ( interp, "error looking up path name\n    ", 
+      Tcl_AppendResult ( interp, "error looking up path name\n    ",
           (char *) NULL );
       Tcladam_AppendStatus( interp, status);
       tcl_status = TCL_ERROR;
@@ -156,7 +156,7 @@ char *inmsg_value
          {
             strcpy ( command, "startmsg" );
          }
-         else 
+         else
          {
             strcpy ( command, "endmsg" );
          }
@@ -241,9 +241,9 @@ char *inmsg_value
             }
 
 /* Note, the hashtable only stores a pointer to the string, not a copy of
-   the string. Therefore take a copy of the string so that we can free the 
-   DString. This copy is never freed and so constitutes an acceptable 
-   one-off memory leak (i.e. the amount of leaked memory will be limited to 
+   the string. Therefore take a copy of the string so that we can free the
+   DString. This copy is never freed and so constitutes an acceptable
+   one-off memory leak (i.e. the amount of leaked memory will be limited to
    a small amount and will not increase indefinitely. */
             strPtr = malloc(Tcl_DStringLength(&ds)+1);
             strcpy(strPtr, Tcl_DStringValue(&ds));
@@ -295,8 +295,8 @@ char *inmsg_value
       }
       else
       {
-          Tcl_AppendResult ( interp, 
-              "bad message context: message name was \"", inmsg_name, 
+          Tcl_AppendResult ( interp,
+              "bad message context: message name was \"", inmsg_name,
                "\", message value was \"", inmsg_value, "\"", (char *) NULL );
           tcl_status = TCL_ERROR;
       }
@@ -315,7 +315,7 @@ char *argv[]
 )
 
 /*   Method :
-      Wait for an adam message to arrive on the give path and messid. 
+      Wait for an adam message to arrive on the give path and messid.
 
         adam_getreply timeout path messid
 
@@ -351,11 +351,11 @@ char *argv[]
 /*   receive an adam message */
 
       ams_getreply ( timeout, path, messid, MSG_NAME_LEN, MSG_VAL_LEN,
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
 
       if ( status != SAI__OK ) {
-         Tcl_AppendResult ( interp, "error reading adam message\n    ", 
+         Tcl_AppendResult ( interp, "error reading adam message\n    ",
             (char *) NULL );
          Tcladam_AppendStatus( interp, status);
          tcl_status = TCL_ERROR;
@@ -364,7 +364,7 @@ char *argv[]
       {
 
 /*     Extract the message contents into the tcl result. */
-         tcl_status = Tcladam_ProcessMessage(interp, path, messid, 
+         tcl_status = Tcladam_ProcessMessage(interp, path, messid,
             inmsg_status, inmsg_context, inmsg_name, inmsg_length,
             inmsg_value);
       }
@@ -395,9 +395,9 @@ Tcl_Interp *interp   /* tcl interpreter pointer */
    const char *libDir;
    if ( Tcl_InitStubs( interp, "8.0", 0 ) == NULL ) return TCL_ERROR;
 
-   Tcl_CreateCommand ( interp, "adam_start", 
+   Tcl_CreateCommand ( interp, "adam_start",
                        (Tcl_CmdProc *)Tcladam_Start,
-                       (ClientData)NULL, 
+                       (ClientData)NULL,
                        (Tcl_CmdDeleteProc *)NULL );
 
    /* Locate the init.tcl script and arrange for scripts be autoloaded */
@@ -418,7 +418,7 @@ char *argv[]
 )
 
 /*   Method :
-      Wait for any adam message to arrive. 
+      Wait for any adam message to arrive.
 
         command task inmsg_name path messid inmsg_status inmsg_value
 */
@@ -440,10 +440,10 @@ char *argv[]
 /*   receive an adam message and lookup the name of the task it came from */
 
    ams_receive ( MESSYS__INFINITE, MSG_NAME_LEN, MSG_VAL_LEN,
-     &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+     &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
      inmsg_value, &path, &messid, &status );
    if ( status != SAI__OK ) {
-      Tcl_AppendResult ( interp, "error reading adam message\n    ", 
+      Tcl_AppendResult ( interp, "error reading adam message\n    ",
          (char *) NULL );
       Tcladam_AppendStatus( interp, status);
       tcl_status = TCL_ERROR;
@@ -453,7 +453,7 @@ char *argv[]
    {
 
 /*  Copy the message contents to the tcl result. */
-      tcl_status = Tcladam_ProcessMessage(interp, path, messid, 
+      tcl_status = Tcladam_ProcessMessage(interp, path, messid,
          inmsg_status, inmsg_context, inmsg_name, inmsg_length,
          inmsg_value);
    }
@@ -497,7 +497,7 @@ char *argv[]
         argv[4], strlen(argv[5]), argv[5], &status );
       if ( status != SAI__OK )
       {
-         Tcl_AppendResult ( interp, "failed to send adam message\n    ", 
+         Tcl_AppendResult ( interp, "failed to send adam message\n    ",
              (char *) NULL );
          Tcladam_AppendStatus( interp, status);
          tcl_status = TCL_ERROR;
@@ -574,8 +574,8 @@ char *argv[]
             }
             else
             {
-               Tcl_AppendResult ( interp, 
-                   "failed to send adam message to \"", argv[1], 
+               Tcl_AppendResult ( interp,
+                   "failed to send adam message to \"", argv[1],
                    "\"\n      ", (char *) NULL );
                Tcladam_AppendStatus(interp, status);
                tcl_status = TCL_ERROR;
@@ -583,15 +583,15 @@ char *argv[]
          }
          else
          {
-            Tcl_AppendResult ( interp, "bad context \"", argv[3], 
-               "\": should be get, set, obey, or cancel", 
+            Tcl_AppendResult ( interp, "bad context \"", argv[3],
+               "\": should be get, set, obey, or cancel",
                 (char *) NULL );
             tcl_status = TCL_ERROR;
          }
       }
       else
       {
-         Tcl_AppendResult ( interp, 
+         Tcl_AppendResult ( interp,
             "failed to  get path to task \"", argv[1], "\"\n    ",
             (char *) NULL );
          Tcladam_AppendStatus( interp, status);
@@ -643,7 +643,7 @@ char *argv[]
       }
       else
       {
-         Tcl_AppendResult ( interp, 
+         Tcl_AppendResult ( interp,
             "failed to open Adam message system\n    ", (char *) NULL );
          Tcladam_AppendStatus( interp, status);
          tcl_status = TCL_ERROR;
@@ -656,29 +656,29 @@ char *argv[]
       tcl_status = TCL_ERROR;
    }
 
-   Tcl_CreateCommand ( interp, "adam_receive", 
+   Tcl_CreateCommand ( interp, "adam_receive",
                        (Tcl_CmdProc *)Tcladam_Receive,
-                       (ClientData)NULL, 
+                       (ClientData)NULL,
                        (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_getreply", 
+   Tcl_CreateCommand ( interp, "adam_getreply",
                        (Tcl_CmdProc *)Tcladam_Getreply,
-                       (ClientData)NULL, 
+                       (ClientData)NULL,
                        (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_reply", 
+   Tcl_CreateCommand ( interp, "adam_reply",
                        (Tcl_CmdProc *)Tcladam_Reply,
-                       (ClientData)NULL, 
+                       (ClientData)NULL,
                        (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_send", 
+   Tcl_CreateCommand ( interp, "adam_send",
                        (Tcl_CmdProc *)Tcladam_Send,
-                       (ClientData)NULL, 
+                       (ClientData)NULL,
                        (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_path", 
+   Tcl_CreateCommand ( interp, "adam_path",
                        (Tcl_CmdProc *)Tcladam_Path,
-                       (ClientData)NULL, 
+                       (ClientData)NULL,
                        (Tcl_CmdDeleteProc *)NULL );
 
    Tcl_InitHashTable( &codeTable, TCL_ONE_WORD_KEYS);

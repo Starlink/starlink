@@ -22,12 +22,12 @@
 #        indicating how markers should be plotted on the second image
 #        in the aligner.
 #     MATPTS = list of lists of quads (Returned)
-#        This gives a list of the centroided points for each of the 
-#        pairs of NDF Sets which the user matched up.  It contains one 
+#        This gives a list of the centroided points for each of the
+#        pairs of NDF Sets which the user matched up.  It contains one
 #        element for each element of the PAIRS list.  Each element of
 #        the list contains an entry for each of the points which was
 #        successfully centroided in both NDF Sets, and each of those
-#        entries is a quad giving coordinates in each NDF Set, of the 
+#        entries is a quad giving coordinates in each NDF Set, of the
 #        form {X1 Y1 X2 Y2}.
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
@@ -39,25 +39,25 @@
 #        The setname is a text name of each set which is to be presented
 #        to the user, and each ndfname is the name of one of the NDFs
 #        which is to be a member of that set.  If only one ndfname
-#        appears in each list, the program will effectively work 
+#        appears in each list, the program will effectively work
 #        on single NDFs.
 #     PAIRS = list of lists (Returned)
 #        The script returns a list with one element for each pair of NDF
 #        Sets which the user managed to match.  Each element of the list
-#        is of the form {I J NMAT XOFF YOFF}, where I and J are the 
+#        is of the form {I J NMAT XOFF YOFF}, where I and J are the
 #        indices in the list NDFSETS of the matched pair, NMAT is the
 #        number of centroided points which were used to achieve the
 #        exact offsets, and XOFF and YOFF are the position of the pixel
-#        index origin of NDF Set J in pixel index coordinates of 
+#        index origin of NDF Set J in pixel index coordinates of
 #        NDF Set I.
 #     PERCHI = real (Given)
-#        The percentile of the data above which all values should be 
+#        The percentile of the data above which all values should be
 #        plotted as the same colour.  Must be between 0 and 100.
 #     PERCLO = real (Given)
-#        The percentile of the data below which all values should be 
+#        The percentile of the data below which all values should be
 #        plotted as the same colour.  Must be between 0 and 100.
 #     PREVX = integer (Given and Returned)
-#        X dimension of the preview window for each NDF Set in the chooser 
+#        X dimension of the preview window for each NDF Set in the chooser
 #        widget.
 #     PREVY = integer (Given and Returned)
 #        Y dimension of the preview window for each NDF Set in the chooser
@@ -126,7 +126,7 @@
 #  Initialise screen.
       wm withdraw .
 
-#  Generate ndfset objects for all of the NDFs in the input list.  At the 
+#  Generate ndfset objects for all of the NDFs in the input list.  At the
 #  same time, check whether they all share the same Current WCS frame.
       set nndfset 0
       set ndfsetlist {}
@@ -148,7 +148,7 @@
          set lastcurrent [ $ndfset frameatt domain CURRENT ]
       }
 
-#  If not all the NDF Sets have the same Current frame, check that the 
+#  If not all the NDF Sets have the same Current frame, check that the
 #  user is aware of the fact.
      if { $diffcurrent } {
         catch { unset warnlines }
@@ -261,8 +261,8 @@
                 [ array names Done $a ] != "" || \
                 [ array names Done $b ] != "" ) \
            && ( [ array names Pairs "$a,$b" ] == "" && \
-                [ array names Pairs "$b,$a" ] == "" ) } { 
-            return 1 
+                [ array names Pairs "$b,$a" ] == "" ) } {
+            return 1
          } else {
             return 0
          }
@@ -293,7 +293,7 @@
                          -skip2 $SKIP2 \
                          -validpair [ code pairok %A %B ] \
                          -viewport [ list $PREVX $PREVY ] \
-                         -percentiles [ list $PERCLO $PERCHI ] 
+                         -percentiles [ list $PERCLO $PERCHI ]
 
 #  Create some dialog boxes which may or may not be used.  Since they
 #  may be used more than once, it may be more efficient to construct
@@ -386,7 +386,7 @@
             set pair [ $chooser getpair ]
          } else {
 
-#  The user is being asked to interact with the chooser.  Ensure that 
+#  The user is being asked to interact with the chooser.  Ensure that
 #  it is visible.
             wm deiconify $chooser
             raise $chooser
@@ -426,7 +426,7 @@
          ccdputs -log "  "
          ccdputs -log "  Aligning images $iA and $iB"
 
-#  Load the NDF Set pair into the aligner widget and wait for the user to 
+#  Load the NDF Set pair into the aligner widget and wait for the user to
 #  select some positions in common.
          wm deiconify $aligner
          raise $aligner
@@ -533,7 +533,7 @@
                $chooser highlight $iA 1
                $chooser highlight $iB 1
 
-#  There was an overlap, but the user failed to indicate any points to 
+#  There was an overlap, but the user failed to indicate any points to
 #  be centroided.
             } elseif { [ $aligner overlapping ] } {
                set text [ join {"No points were selected."
@@ -571,7 +571,7 @@
          lappend MATPTS $matpts
       }
 
-#  Retrieve characteristics of the windows which may have been 
+#  Retrieve characteristics of the windows which may have been
 #  changed by the user.
       set vp [ $chooser cget -viewport ]
       if { [ llength $vp ] == 2 } {

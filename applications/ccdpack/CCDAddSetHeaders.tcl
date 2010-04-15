@@ -124,7 +124,7 @@
 
 #  Create panel for automatic Setting method buttons.
       CCDCcdWidget Autoset autoset \
-         Ccd::choice $Centre.autoset -standard 0 
+         Ccd::choice $Centre.autoset -standard 0
 
 #  Create panel for widget control.
       CCDCcdWidget Control control \
@@ -201,8 +201,8 @@
          close $fileid
 
 #  If we fail to open the file which SHOWSET has just written, it means
-#  information about existing Set headers will not be used.  This 
-#  shouldn't happen, but if it does it's not too harmful - take no 
+#  information about existing Set headers will not be used.  This
+#  shouldn't happen, but if it does it's not too harmful - take no
 #  action.
       } else {
       }
@@ -253,8 +253,8 @@
 
 #  Bind button for moving NDFs out of Setted list; this erases all the
 #  elements in the current selection of the box except for Sett headling
-#  lines, then goes through the list removing any Set heading lines 
-#  which now have no members. 
+#  lines, then goes through the list removing any Set heading lines
+#  which now have no members.
       $Transfer addcommand $unsetbutton \
          "foreach sel \[lsort -integer -decreasing \[$Setbox curselection\]\] {
              if {\[lindex \[CCDItemSetIndex $Setbox \$sel\] 0\] != \"SET\"} {
@@ -272,7 +272,7 @@
          "
 
 #  Bind a double-click on the setted list to de-set the selected item.
-      $Setbox bind list <Double-Button-1> "+ 
+      $Setbox bind list <Double-Button-1> "+
          $Transfer invoke \"$unsetbutton\"
       "
 

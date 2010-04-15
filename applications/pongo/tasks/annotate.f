@@ -172,8 +172,8 @@
      :                          0.0, JUST, CLABELS( IDAT ) )
                ELSE
                   IFAIL = 0
-                  CALL PROJ_CONVPTLM( PROJECTION-1, RA0, DEC0, 
-     :                                XDATA( IDAT ), YDATA( IDAT ), 
+                  CALL PROJ_CONVPTLM( PROJECTION-1, RA0, DEC0,
+     :                                XDATA( IDAT ), YDATA( IDAT ),
      :                                L, M, IFAIL )
 
                   IF ( IFAIL .EQ. 0 ) CALL PGPTEXT( REAL( L )+XOFF,

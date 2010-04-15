@@ -1,5 +1,5 @@
       SUBROUTINE POL1_SNGCT( INDF, ITER, NEL, DIN, VIN, T, PHI,
-     :                       EPS, ZERO, DIMST, STOKES, NSIGMA, TVAR, 
+     :                       EPS, ZERO, DIMST, STOKES, NSIGMA, TVAR,
      :                       TOL, DEZERO, CONV, NREJ, DOUT, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGCT( INDF, ITER, NEL, DIN, VIN, T, PHI, EPS, 
-*                      ZERO, DIMST, STOKES, NSIGMA, TVAR, TOL, DEZERO, 
+*     CALL POL1_SNGCT( INDF, ITER, NEL, DIN, VIN, T, PHI, EPS,
+*                      ZERO, DIMST, STOKES, NSIGMA, TVAR, TOL, DEZERO,
 *                      CONV, NREJ, DOUT, STATUS )
 
 *  Description:
@@ -41,8 +41,8 @@
 *     EPS = REAL (Given)
 *        The analyser efficiency factor for the current NDF.
 *     ZERO = REAL (Given)
-*        The zero point correction for the input NDF. This value should 
-*        be addedonto the data values read from the NDF before using the 
+*        The zero point correction for the input NDF. This value should
+*        be addedonto the data values read from the NDF before using the
 *        data values.
 *     DIMST = INTEGER (Given)
 *        No. of planes in STOKES.
@@ -56,7 +56,7 @@
 *        Not displayed if it is VAL_BADR.
 *     TOL = INTEGER (Given)
 *        If the difference between the number of pixels rejected during
-*        this iteration, and the number rejected during the previous 
+*        this iteration, and the number rejected during the previous
 *        iteration (as supplied in NREJ) is less than TOL, then the NDF
 *        is presumed to have converged.
 *     DEZERO = LOGICAL (Given)
@@ -66,10 +66,10 @@
 *        otherwise. Supplied value is ignored if ITER is zero.
 *     NREJ = INTEGER (Given and Returned)
 *        On entry, the number of pixel rejected from this NDF on the
-*        previous iteration. On exit, the number of pixel rejected during 
+*        previous iteration. On exit, the number of pixel rejected during
 *        this iteration. Supplied value is ignored if ITER is zero.
 *     DOUT( NEL ) = REAL (Returned)
-*        The output intensity values. Each pixel value is either a copy 
+*        The output intensity values. Each pixel value is either a copy
 *        of the corresponding input pixel value, or VAL__BADR (if it
 *        deviates by more than NSIGMA standard deviations form the model).
 *     STATUS = INTEGER (Given and Returned)
@@ -115,7 +115,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -197,17 +197,17 @@
             IF( STOKES( I, 1 ) .NE. VAL__BADR .AND.
      :          STOKES( I, 2 ) .NE. VAL__BADR .AND.
      :          STOKES( I, 3 ) .NE. VAL__BADR .AND.
-     :          DIN( I ) .NE. VAL__BADR .AND. 
+     :          DIN( I ) .NE. VAL__BADR .AND.
      :          VIN( I ) .NE. VAL__BADR ) THEN
 
 *  Calculate the expected intensity value on the basis of the supplied
 *  Stokes vector.
-               EXPECT = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 ) 
+               EXPECT = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 )
      :                                      + K3*STOKES( I, 3 ) )
 
 *  Store bad value if the squared residual is too large. Otherwise, copy
 *  the supplied input data value.
-               IF( ( DIN( I ) + ZERO - EXPECT )**2 .GT. 
+               IF( ( DIN( I ) + ZERO - EXPECT )**2 .GT.
      :               VIN( I )*VARFAC ) THEN
                   DOUT( I ) = VAL__BADR
                ELSE
@@ -220,7 +220,7 @@
             END IF
 
 *  Update the number of remaining good pixels, and the number of rejcetd
-*  pixels.   
+*  pixels.
             IF( DOUT( I ) .NE. VAL__BADR ) THEN
                NGOOD = NGOOD + 1
 
@@ -234,12 +234,12 @@
 *  Get the ndf name, and find the end of the directory path (i.e. the
 *  final "\" ).
          CALL KPG1_NDFNM( INDF, PATH, LPATH, STATUS )
-             
+
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
          IF( MSG_FLEVOK( MSG__DEBUG, STATUS ) ) THEN
             CALL MSG_BLANKIF( MSG__DEBUG, STATUS )
-   
+
             CALL MSG_SETC( 'NDF', PATH( : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_OUTIF( MSG__DEBUG,'POL1_SNGCT_MSG1', '   ''^NDF''',

@@ -1,29 +1,29 @@
 *+SORT_S_D_DOIT - converts mapped data into arrays, and continues sort.
       SUBROUTINE SORT_S_D_DOIT (SMF, SRT, NXP, NYP, DAT, STATUS)
       IMPLICIT NONE
- 
+
 *   Include statements:
       INCLUDE 'SMAPDEF.INC'		! Small map linked list info
       INCLUDE 'SLIST.INC'
       INCLUDE 'SORT_DEF.INC'
- 
+
 * Input
       RECORD /SORT_DEF/	      	SRT
       INTEGER			SMF	! Unit for small map file
       INTEGER			NXP, NYP
- 
+
 * Output
       REAL              DAT(NXP, NYP)
       INTEGER           STATUS          ! Status flag
- 
+
 * M. Denby
 * P McGale May 95 - UNIX mods
 *-
- 
+
 *   Local
       CHARACTER*10      TEXT            ! Work text
       CHARACTER*11	TMODE
- 
+
       INTEGER		NP
       INTEGER           IEV             ! Event loop counter
       INTEGER		NS, NE
@@ -41,28 +41,28 @@
       INTEGER		ISEED
       integer		hdutyp
       integer		itmp
- 
+
       LOGICAL		MOONF
       logical		anynull
- 
+
       double precision 	XLIN, YLIN      ! Map local coords (rads)
       double precision	evmjd
 
       REAL		DXPIX, DYPIX
       REAL		SIZ
       PARAMETER		(SIZ = 3.*DTOR)
- 
+
       RECORD 		/EBLOCK/ EBUF
- 
+
 *   External Functions
       double precision 	ev2mjd
       real              ran
       LOGICAL 		BGD_GOOD
- 
+
       DATA		ISEED/1768953/
- 
+
       IF (STATUS .NE. 0) RETURN
- 
+
 *   Initialize array
       DO NY = 1, NYP
          DO NX = 1, NXP
@@ -70,11 +70,11 @@
          END DO
       END DO
       NTOTAL = 0
- 
+
 * Set pixel size
       DXPIX = ABS(SRT.XPIXEL)
       DYPIX = ABS(SRT.YPIXEL)
- 
+
 * Get correct FITS extension.
       call ftmahd(smf, 2, hdutyp, status)
       if (hdutyp .ne. 2) then
@@ -90,7 +90,7 @@
 	call ftgcvj(smf, 2, i, 1, 1, 0, itmp, anynull, status)
         aspf  = ibits(itmp, 0, 3)
 	moonf = btest(itmp, 3)
-        ebuf.filt = ibits(itmp, 4, 1)        
+        ebuf.filt = ibits(itmp, 4, 1)
         if (ebuf.filt .eq. 0) ebuf.filt = 8
         if (ebuf.filt .eq. 1) ebuf.filt = 6
 
@@ -106,9 +106,9 @@
  	    IF (ASPF .EQ. 0) THEN
 	      IF (SRT.IGBGD.OR.BGD_GOOD(SRT.FILT,EVT)) THEN
 	        IF (SRT.IGMOON.OR..NOT.MOONF) THEN
- 
+
 *  Get linearized detector coords of this event
-                  call ftgcvb(smf, 6, i, 1, 1, 0, 
+                  call ftgcvb(smf, 6, i, 1, 1, 0,
      &                    EBUF.EV(IEV).LINX, anynull, status)
                   call ftgcvb(smf, 7, i, 1, 1, 0,
      &                    EBUF.EV(IEV).LINY, anynull, status)
@@ -118,7 +118,7 @@
 	          if (liny .gt. 128) linx  = liny - 256
                   XLIN=dble((LINX+RAN(ISEED)-0.5))/R2LINP
                   YLIN=dble((LINY+RAN(ISEED)-0.5))/R2LINP
- 
+
 		  IF (ABS(XLIN) .LT. SIZ .AND.
      :					ABS(YLIN) .LT. SIZ) THEN
 		    NX = 1 + INT((SIZ-XLIN)/DXPIX)
@@ -132,11 +132,11 @@
 	  endif					! Time
 	ENDIF					! Filter
       ENDDO
- 
+
       WRITE(*,*) '   Events in image : ',NTOTAL
- 
+
 999   IF (STATUS .NE. 0) THEN
 	WRITE(*,*) '   Error in SORT_S_D_DOIT'
       ENDIF
- 
+
       END

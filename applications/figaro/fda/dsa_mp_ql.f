@@ -73,7 +73,7 @@
 *        Uses DSA__QUAL_NAME to remove assumptions about
 *        file format details.
 *     22 Apr 1991 (ks):
-*        Now uses DSA__CREATE_QUAL_ENV to create the 
+*        Now uses DSA__CREATE_QUAL_ENV to create the
 *        environment for the quality array - allows support
 *        of structured arrays including BADBITS values.
 *     01 May 1991 (ks):
@@ -117,7 +117,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

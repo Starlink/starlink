@@ -1,4 +1,4 @@
-\documentstyle[11pt,twoside]{article} 
+\documentstyle[11pt,twoside]{article}
 \pagestyle{myheadings}
 
 %+                              M A N . S T Y
@@ -55,19 +55,19 @@
 \lccode`_=`_\lccode`$=`$
 
 %\renewcommand{\_}{{\tt\char'137}}
-
+
 %+                      M A N _ I N T R O
 %
 %  Section name:
 %    MAN_INTRO
-%                                 
+%
 %  Function:
 %    Macros used in the .TEX_INTRO file
 %
 %  Description:
 %    There are no such special macros.
 %-
-
+
 %+                      M A N _ S U M M A R Y
 %
 %  Section name:
@@ -93,7 +93,7 @@
 % This form (which wflman V2.0 generates) passes an un-processed version of the
 % section item name, useful for cross-references
 \newcommand{\mansectionitemA}[2]{\item[#1:]\mbox{}}
-
+
 %+                      M A N _ D E S C R
 %
 %  Section name:
@@ -282,7 +282,7 @@
 \newcommand{\stardoctitle}     {TSP --- A Time Series/Polarimetry Package
                                 \\[2ex] Version 2.3}
 %------------------------------------------------------------------------------
- 
+
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-5mm}
@@ -335,7 +335,7 @@ TSP is currently used to process data from the following instruments:
 
 \begin{itemize}
 
-\item Spectropolarimetry data obtained with the AAO 
+\item Spectropolarimetry data obtained with the AAO
 spectropolarimeters using wave-plate or Pockels cell modulators
 in conjunction with either IPCS or CCD detectors.
 
@@ -356,7 +356,7 @@ UBVRI polarimeter.
 
 \item Five channel time series photometry obtained with the Hatfield
 polarimeter at the AAT in its high speed photometry mode.
-                              
+
 \item Time series infrared photometry obtained with the AAO Infrared
 Photometer Spectrometer (IRPS).
 
@@ -364,7 +364,7 @@ Photometer Spectrometer (IRPS).
 photometry package at the AAT.
 
 \end{itemize}
-                                                                   
+
 TSP is an ADAM application package and can be run from the UNIX shell or
 from the ICL command language.
 It uses the HDS data system for data storage and the NCAR/SGS/GKS packages
@@ -414,7 +414,7 @@ is working.
 \subsection{TSP Commands}
 
 TSP programs will prompt for all the parameters they need. Parameters may
-also be specified on the command line.   
+also be specified on the command line.
 
 The individual TSP commands are listed in appendix A and described in appendix
 B. Some information on using TSP to reduce various types of data is given in
@@ -422,7 +422,7 @@ subsequent sections.
 
 \section{TSP Data Format}
 
-The essence of the system is a common data format in which time series 
+The essence of the system is a common data format in which time series
 polarimetry data can be represented. This format is based on the Starlink
 standard data format described in SGP/38. In particular
 the polarimetry example given in that document is the basis for the TSP
@@ -437,11 +437,11 @@ DATA\_ARRAY(N,M) & \_REAL & Stokes I array\\
 VARIANCE(N,M) & \_REAL & Variance on I array\\
 LABEL & \_CHAR & Label for data\\
 UNITS & \_CHAR & Units for data\\
-AXIS(2) & Structure Array & Axis information\\ 
+AXIS(2) & Structure Array & Axis information\\
 \hspace*{1cm}AXIS(1) & AXIS & Wavelength Axis\\
 \hspace*{2cm}.DATA\_ARRAY(N) & \_REAL & Wavelength Axis Data\\
 \hspace*{2cm}.LABEL & \_CHAR & Wavelength Axis Label\\
-\hspace*{2cm}.UNITS & \_CHAR & Wavelength Axis Units\\ 
+\hspace*{2cm}.UNITS & \_CHAR & Wavelength Axis Units\\
 \hspace*{1cm}AXIS(2) & AXIS & Time Axis\\
 \hspace*{2cm}.DATA\_ARRAY(M) & \_DOUBLE & Time Axis Data\\
 \hspace*{2cm}.LABEL & \_CHAR & Time Axis Label\\
@@ -454,7 +454,7 @@ MORE & EXT & Extension structure \\
 \hspace*{2cm}.STOKES\_U & NDF & U Stokes parameter structure\\
 \hspace*{3cm}.DATA\_ARRAY(N,M) & \_REAL & Stokes U array \\
 \hspace*{3cm}.VARIANCE(N,M) & \_REAL & Variance on U array \\
-\end{tabular}                                        
+\end{tabular}
 
 The DATA\_ARRAY component shown here may actually be replaced by a structure
 which holds the data array and other components.
@@ -475,8 +475,8 @@ parameters is that in the main structure.
 
 All the data arrays used in TSP are simple or primitive arrays. Other types
 of data arrays such as SCALED arrays, SPACED arrays etc. described in SGP/38
-are not supported at present.                                   
-                                                         
+are not supported at present.
+
 The TITLE, QUALITY and HISTORY components described in SGP/38 are not
 currently used by TSP. If present they will be propagated from input to
 output files.
@@ -492,8 +492,8 @@ is the wavelength axis, and the second axis is the time axis. The time is
 represented in the form of the Modified Julian Date (MJD = JD - 2400000.5)
 in a double precision array. Note that special cases of the time series
 dataset are those with a wavelength axis of size 1, and with no additional
-Stokes parameters. Thus simple time series photometry can be represented   
-in this way. 
+Stokes parameters. Thus simple time series photometry can be represented
+in this way.
 
 3D datasets represent time series imaging (or imaging polarimetry) data.
 
@@ -614,7 +614,7 @@ arc fitting, and reducing flux standards. TSP is used for the polarimetric
 parts of the reduction. The basic sequence of reductions is shown in figure 1.
 
 \begin{figure}
-   \Large                
+   \Large
    \caption{Procedure for Reduction of Pockels Cell Spectropolarimetry}
    \large
    \begin{picture}(500,490)(0,0)
@@ -648,7 +648,7 @@ parts of the reduction. The basic sequence of reductions is shown in figure 1.
       \put(230,180){\framebox(80,20){CALFIT}}
       \put(270,180){\line(0,-1){30}}
       \put(270,150){\vector(-1,0){70}}
-      \put(120,140){\framebox(80,20){CALIB}} 
+      \put(120,140){\framebox(80,20){CALIB}}
       \put(160,140){\vector(0,-1){20}}
 
       \put(340,395){\makebox(80,10){Arc}}
@@ -669,7 +669,7 @@ parts of the reduction. The basic sequence of reductions is shown in figure 1.
       \put(120,36){\makebox(80,60){PPLOT}}
       \put(120,20){\makebox(80,60){FPLOT}}
       \put(120,4){\makebox(80,60){QUPLOT}}
-                  
+
       \put(1,405){Select Regions}
       \put(1,395){Containing data}
 
@@ -680,7 +680,7 @@ parts of the reduction. The basic sequence of reductions is shown in figure 1.
       \put(1,280){Each Stokes}
       \put(1,270){Parameter}
 
-      \put(1,230){Merge Q and U} 
+      \put(1,230){Merge Q and U}
 
       \put(1,193){Fit Curve to}
       \put(1,183){Calibration data}
@@ -744,7 +744,7 @@ wavelength, particularly if a large wavelength range is being observed.
 Calibration observations with a 100\% polarizer inserted can be used to
 calibrate this effect. Such observations are reduced using the CCD2STOKES
 or IPCS2STOKES commands, and then a Chebyshev polynomial is fitted to the
-data using the CALFIT command. This calibration curve can then be used to 
+data using the CALFIT command. This calibration curve can then be used to
 correct other data using the CALIB command.
 
 \subsection{Wavelength Calibration}
@@ -762,7 +762,7 @@ Observations of standard stars can be used to derive a flux calibration
 curve using the methods described in the Figaro documentation. This calibration
 curve can then be applied to a TSP polarization spectrum to give a flux
 calibrated polarization spectrum. Note that TSP does not keep track of the
-total exposure time as spectra are combined, so the total value must be 
+total exposure time as spectra are combined, so the total value must be
 supplied as a parameter to SPFLUX.
 
 \subsection{Plotting Data}
@@ -770,7 +770,7 @@ supplied as a parameter to SPFLUX.
 There are a number of commands to plot polarization spectra. SPLOT plots
 a single Stokes parameter, as percentage polarization, together with the
 intensity spectrum. PPLOT plots percentage polarization, position angle,
-and intensity. Both these programs use a variable binning technique, to 
+and intensity. Both these programs use a variable binning technique, to
 give a constant polarization error per bin.
 
 FPLOT plots data in the form of polarized intensity (or flux). QUPLOT
@@ -785,7 +785,7 @@ detectors. The normal mode of operation is to use a two hole decker above
 the slit defining star and sky apertures, together with a calcite beam
 splitter. This gives images containing four spectra, star and sky for each
 of the O and E modes of the calcite. Images of this type are recorded for
-four positions of the half-wave plate at angles 0.0, 45.0, 22.5, 67.5 degrees. 
+four positions of the half-wave plate at angles 0.0, 45.0, 22.5, 67.5 degrees.
 
 Calibration observations can be made by inserting calibration polarizers into
 the beam. Rotation of the instrument to different position angles is not
@@ -799,7 +799,7 @@ arc fitting, and reducing flux standards. TSP is used for the polarimetric
 parts of the reduction. The basic sequence of reductions is shown in figure 2.
 
 \begin{figure}
-   \Large                
+   \Large
    \caption{Procedure for Reduction of Wave-Plate Spectropolarimetry}
    \large
    \begin{picture}(500,490)(0,0)
@@ -828,7 +828,7 @@ parts of the reduction. The basic sequence of reductions is shown in figure 2.
       \put(230,180){\framebox(80,20){CALFITPA}}
       \put(270,180){\line(0,-1){30}}
       \put(270,150){\vector(-1,0){70}}
-      \put(120,140){\framebox(80,20){CALPA}} 
+      \put(120,140){\framebox(80,20){CALPA}}
       \put(160,140){\vector(0,-1){20}}
 
       \put(340,395){\makebox(80,10){Arc}}
@@ -849,7 +849,7 @@ parts of the reduction. The basic sequence of reductions is shown in figure 2.
       \put(120,36){\makebox(80,60){PPLOT}}
       \put(120,20){\makebox(80,60){FPLOT}}
       \put(120,4){\makebox(80,60){QUPLOT}}
-                  
+
       \put(1,405){Select Regions}
       \put(1,395){Containing data}
 
@@ -884,7 +884,7 @@ The first step in the reduction is to identify the regions of the image
 containing the four spectra. Having done this the command
 CCD2POL can be used to reduce the raw images for the four plate positions
 to TSP format polarization spectra.
-Different observations can then be combined using the COMBINE command. 
+Different observations can then be combined using the COMBINE command.
 
 The polarization data can be plotted using the PPLOT command to check the
 progress of the reduction, and the consistency of different observations,
@@ -892,7 +892,7 @@ before combining them.
 
 \subsection{Efficiency Calibration}
 
-The efficiency of the wave-plate polarimeter system is very close to 100\%, 
+The efficiency of the wave-plate polarimeter system is very close to 100\%,
 and thus efficiency correction is hardly necessary. If required it can be done
 with the CALFIT and CALIB commands as described for the Pockels cell
 polarimeter.
@@ -923,7 +923,7 @@ Observations of standard stars can be used to derive a flux calibration
 curve using the methods described in the Figaro documentation. This calibration
 curve can then be applied to a TSP polarization spectrum to give a flux
 calibrated polarization spectrum. Note that TSP does not keep track of the
-total exposure time as spectra are combined, so the total value must be 
+total exposure time as spectra are combined, so the total value must be
 supplied as a parameter to SPFLUX.
 
 \subsection{Plotting Data}
@@ -931,7 +931,7 @@ supplied as a parameter to SPFLUX.
 There are a number of commands to plot polarization spectra. SPLOT plots
 a single Stokes parameter, as percentage polarization, together with the
 intensity spectrum. PPLOT plots percentage polarization, position angle,
-and intensity. Both these programs use a variable binning technique, to 
+and intensity. Both these programs use a variable binning technique, to
 give a constant polarization error per bin.
 
 FPLOT plots data in the form of polarized intensity (or flux). QUPLOT
@@ -948,12 +948,12 @@ figure 3. Note that the order of the various calibration steps is generally not
 critical (e.g. flux calibration may be done before PA and efficiency
 calibration).
 
-The same procedure should be applicable to CVF spectropolarimetry data obtained 
+The same procedure should be applicable to CVF spectropolarimetry data obtained
 with the UKT6 and UKT9 instruments.
 
 
 \begin{figure}
-   \Large                
+   \Large
    \caption{Procedure for Reduction of CGS4 Spectropolarimetry}
    \large
    \begin{picture}(500,490)(0,0)
@@ -977,7 +977,7 @@ with the UKT6 and UKT9 instruments.
       \put(230,180){\framebox(80,20){CALFIT}}
       \put(270,180){\line(0,-1){30}}
       \put(270,150){\vector(-1,0){70}}
-      \put(120,140){\framebox(80,20){CALIB}} 
+      \put(120,140){\framebox(80,20){CALIB}}
       \put(160,140){\vector(0,-1){20}}
 
       \put(340,395){\makebox(80,10){Standard}}
@@ -993,7 +993,7 @@ with the UKT6 and UKT9 instruments.
       \put(120,36){\makebox(80,60){EPLOT}}
       \put(120,20){\makebox(80,60){PPLOT}}
       \put(120,4){\makebox(80,60){QUPLOT}}
-                  
+
       \put(1,340){Reduce to}
       \put(1,330){Stokes Spectrum}
 
@@ -1019,7 +1019,7 @@ with the UKT6 and UKT9 instruments.
 
 \subsection{Reducing CGS4 data}
 
-The program CGS4POL takes four CGS4 reduced group files containing observations at waveplate angles of 0, 45, 22.5 and 67.5 degrees and extracts the spectra to 
+The program CGS4POL takes four CGS4 reduced group files containing observations at waveplate angles of 0, 45, 22.5 and 67.5 degrees and extracts the spectra to
 obtain a polarization spectrum. The data files should contain positive and negative spectra, obtained by sliding between two slit positions for the star.
 Parameters of CGS4POL are the positions of the two apretures to extract the
 star data from, and the name (A or B) of the aperture containing the star.
@@ -1032,7 +1032,7 @@ Any points which deviate from the mean by more than this cutoff times the sigma
 for the wavelength are removed.
 
 At this stage the data can be plotted using the EPLOT command to judge the
-quality of the data. 
+quality of the data.
 
 \subsection{Position angle calibration}
 
@@ -1046,7 +1046,7 @@ section of the spectrum of a standard.
 \subsection{Efficiency calibration}
 
 The half-wave plates and wire grid polarizers used will not give 100\%
-efficiency, and the efficiency will normally be wavelength dependent. To 
+efficiency, and the efficiency will normally be wavelength dependent. To
 calibrate for this effect an observation of a 100\% polarized source should be
 made using the calibration wire grid polarizer. This observation can be reduced
 using CGS4POL or RCGS2. It should then be rotated using ROTPA so that the position angle
@@ -1068,7 +1068,7 @@ FLCONV command if desired.
 IR spectropolarimetry may be plotted using any of the commands described for
 optical spectropolarimetry (PPLOT, FPLOT, QUPLOT). However with the smaller
 number of spectral points the EPLOT command, which plots flux, P and Theta with
-error bars, will often be found more appropriate than the constant error 
+error bars, will often be found more appropriate than the constant error
 binning approach used by PPLOT. Data may be plotted at any stage in the
 reduction after RCGS2 or CGS4POL.
 
@@ -1171,7 +1171,7 @@ are two commands which enable such data to be read into TSP.
 from a number of individual Figaro frames.
 
 \item[RCCDTS] --- Reads times series data obtained with the time series mode
-of the AAO CCD systems. 
+of the AAO CCD systems.
 
 \end{description}
 
@@ -1204,12 +1204,12 @@ order polynomial fitted through the dataset.
 
 \subsection{Image motion and software tip/tilt correction}
 
-This pair of commands enable the image motion in a time series image to be 
+This pair of commands enable the image motion in a time series image to be
 studied and allow the software analogue of `tip-tilt' correction to be applied
 to the data. When applied to a time series which consists of very short
 exposure images, the translational component of seeing can be removed enabling
 significant reduction in image sizes. This has enabled
-a FWHM for star images of 0.37 arc seconds to be achieved on data taken with 
+a FWHM for star images of 0.37 arc seconds to be achieved on data taken with
 infrared camera IRIS on the AAT.
 
 
@@ -1247,7 +1247,7 @@ TSP\_COPY
       CALL DAT_ANNUL(LOC,STATUS)
       CALL DAT_ANNUL(LOC2,STATUS)
 
-      END       
+      END
 
 \end{verbatim}
 
@@ -1259,11 +1259,11 @@ Such a program could be linked with the command
 \end{verbatim}
 on UNIX systems, and
 
-                                        
+
 \begin{verbatim}
 
  $ ALINK COPY,TSP_DIR:TSPSUBS
-                
+
 \end{verbatim}
 on VAX/VMS systems.
 
@@ -1271,7 +1271,7 @@ on VAX/VMS systems.
 
 \subsection{New Command}
 
-The command IRISPOLC to reduce imaging circular polarization data taken with 
+The command IRISPOLC to reduce imaging circular polarization data taken with
 IRIS has been added.
 
 \subsection{Bug fixes}
@@ -1287,7 +1287,7 @@ with the PDA library. The code now compiles under linux.
 
 \subsection{New Commands}
 
-The command SLIST can be used to list in the form of an ASCII file the data from a 
+The command SLIST can be used to list in the form of an ASCII file the data from a
 polarization spectrum. The IRISAPC command is similar to the IRISAP command but used for circular
 polarization data.
 
@@ -1420,7 +1420,7 @@ well, which is particularly convenient when working on old data.
 
 \subsection{Bad Pixel Handling}
 
-Most TSP commands now support the handling and propagation of bad pixels. 
+Most TSP commands now support the handling and propagation of bad pixels.
 
 
 
@@ -4175,7 +4175,7 @@ Output dataset.
 
 
 \newpage
-                                       
+
 \section{TSPSUBS routines}
 
 \mansection{{\mantt{TSPSUBS}}}{Routines to Create New Structures}
@@ -4287,7 +4287,7 @@ Output dataset.
 
 
 \newpage
-                          
+
 \section{Detailed description of TSPSUBS routines}
 
 \manroutine{{\mantt{TSP\_{}ADD\_{}STOKES}}}{Add a new Stokes component to a %

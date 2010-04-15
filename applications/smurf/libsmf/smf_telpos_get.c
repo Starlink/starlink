@@ -14,7 +14,7 @@
 *     ANSI C
 
 *  Description:
-*     Uses the header information to determine the position of the telescope. 
+*     Uses the header information to determine the position of the telescope.
 
 *  Arguments:
 *     hdr = smfHead* (Given & Returned)

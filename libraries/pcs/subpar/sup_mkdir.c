@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -89,7 +89,7 @@ struct stat statb;
 
 /* If buff begins with / copy it to path as strtok will ignore it */
       if ( *buff == '/' ) {
-         strcpy( path, "/" ); 
+         strcpy( path, "/" );
       } else {
          *path = '\0';
       }
@@ -97,7 +97,7 @@ struct stat statb;
       for ( s = buff;
           ( ( ( tmpdir = strtok( s, "/" ) ) != NULL ) && !status );
           s = NULL ) {
-             
+
           strcat( path, tmpdir );
           if ( !stat( path, &statb ) ) {
 /* File exists check it's a directory */
@@ -106,7 +106,7 @@ struct stat statb;
                 status = SAI__ERROR;
                 emsSetnc("PATH", path, EMS__SZTOK);
                 emsRep("MKDIR1",
-                          "mkdir error: ^PATH exists and is not a directory", 
+                          "mkdir error: ^PATH exists and is not a directory",
                            &status );
              }
           } else {
@@ -139,7 +139,7 @@ struct stat statb;
       emsSyser("ERRNO", errno );
       emsRep("MKDIR4",
                 "^ERRNO", &status );
-   }          
+   }
 
    return status;
 

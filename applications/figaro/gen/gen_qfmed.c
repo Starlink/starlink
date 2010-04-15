@@ -15,11 +15,11 @@
  *    RESULT = GEN_QFMED( DATA, N )
 
  * Description:
- *    Finds the median value of the NELM elements of the array DATA.  
- *    DATA is conceptually sorted into ascending order and the median 
- *    value is then either the value in the central element (if NELM 
- *    is odd) or the average of the two central elements (if NELM is 
- *    even). DATA is not in fact fully sorted, but its elements are 
+ *    Finds the median value of the NELM elements of the array DATA.
+ *    DATA is conceptually sorted into ascending order and the median
+ *    value is then either the value in the central element (if NELM
+ *    is odd) or the average of the two central elements (if NELM is
+ *    even). DATA is not in fact fully sorted, but its elements are
  *    re-aranged as far as is needed to determine the median.
  *
  *    For the method see any book on sorting (eg Knuth, The Art of Computer
@@ -137,7 +137,7 @@ void qqfmed( int first, int last, float data[], int cent )
 ;       was coded in Macro.  PASCAL was used rather than FORTRAN
 ;       because you can't use Fortran recursively.  It may make the
 ;       operation  of the Macro a little clearer..
-;       
+;
 ;       MODULE QFMED(OUTPUT);
 ;
 ;       [GLOBAL] FUNCTION QFMED
@@ -158,17 +158,17 @@ void qqfmed( int first, int last, float data[], int cent )
 ;               partition DATA[FIRST..LAST] into two partitions, one
 ;               with all values above the initial central value, one with
 ;               all values below it, and then calling itself to repeat the
-;               operation on the partition that contains the central 
+;               operation on the partition that contains the central
 ;               element }
-; 
+;
 ;            VAR
 ;               I,J       : INTEGER;
 ;               TEMP,VMID : REAL;
-;     
+;
 ;            BEGIN
 ;               I:=FIRST;
 ;               J:=LAST;
-;               VMID:=DATA[(I+J) DIV 2];        
+;               VMID:=DATA[(I+J) DIV 2];
 ;               REPEAT
 ;                  WHILE DATA[I]<VMID DO I:=I+1;
 ;                  WHILE VMID<DATA[J] DO J:=J-1;
@@ -179,7 +179,7 @@ void qqfmed( int first, int last, float data[], int cent )
 ;               UNTIL I>J;
 ;               IF (FIRST<J) AND (CENT<=J) THEN QQFMED(FIRST,J);
 ;               IF (I<=CENT) AND (I<LAST)  THEN QQFMED(I,LAST);
-;             END;  
+;             END;
 ;
 ;         { End of QQFMED }
 ;

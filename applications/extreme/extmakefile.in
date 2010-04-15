@@ -12,7 +12,7 @@
 #
 #  Description:
 #     This is a simple filter which takes a Starlink makefile as input
-#     and writes as output a file which provides some of the changes 
+#     and writes as output a file which provides some of the changes
 #     required for EXTREME use.  Not all the requisite changes can be
 #     made however, and the resulting file will need some edits to be
 #     made by hand.
@@ -23,20 +23,20 @@
 #        - Add definition of the REPLACE_INTEGER8 macro
 #        - Add a rule for extracting Fortran source files from source archive
 #        - Add code for recording the INTEGER8 macro in the datestamp file
-#   
+#
 #     If it is unable to make any of the modifications it would like to,
 #     it will print an explanatory message saying what it could not do.
 #
 #     Various changes will still need to be made by hand after generating
-#     a new makefile by running this script.  The principal one is 
+#     a new makefile by running this script.  The principal one is
 #     splitting files between Fortran and non-Fortran ones, so that the
 #     non-Fortran files can be extracted using the old rule, but the
 #     Fortran files can be extracted using the new rule inserted by this
-#     script (the dummy target '$(FORTRAN_FILES)' is written as a 
-#     placeholder for such files).  This may require splitting up 
-#     existing macros, for instance splitting PRIVATE_INCLUDES into 
+#     script (the dummy target '$(FORTRAN_FILES)' is written as a
+#     placeholder for such files).  This may require splitting up
+#     existing macros, for instance splitting PRIVATE_INCLUDES into
 #     PRIVATE_C_INCLUDES and PRIVATE_F_INCLUDES.
-#   
+#
 #     This script is not extremely intelligent - unless the makefile
 #     follows the usual pattern quite closely, the output may be in
 #     error.  It is strongly advised that the input and output are
@@ -61,7 +61,7 @@
       }
       if ( @ARGV ) {
          my( $infile ) = shift( @ARGV );
-         open( IN, $infile ) 
+         open( IN, $infile )
             or die( "Failed to open $infile for reading.\n" );
       }
       else {
@@ -69,7 +69,7 @@
       }
       if ( @ARGV ) {
          my( $outfile ) = shift( @ARGV );
-         open( OUT, ">$outfile" ) 
+         open( OUT, ">$outfile" )
             or die( "Failed to open $outfile for writing.\n" );
          select( OUT );
       }
@@ -83,7 +83,7 @@
 
 #  Perform some rudimentary checks on the input.
       if ( $makefile =~ /INTEGER8/i ) {
-         print( STDERR 
+         print( STDERR
                 "Warning: makefile already contains 64-bit adaptations.\n",
                 "         Proceeding anyway.\n" );
       }
@@ -98,7 +98,7 @@
 
 #  Add the command line macro definition for C compilation.
       $done{ "Add -DINT_BIG=int to default CFLAGS value" } =
-      $makefile =~ 
+      $makefile =~
          s{
             ( \n   \ *  CFLAGS  [\t\ ]*  =  .*  )
          }{
@@ -107,9 +107,9 @@
 
 #  Add the replacement text for Fortran INTEGER * 8 type.
       $done{ "Add default definition 'INTEGER8 = INTEGER'" } =
-      $makefile =~ 
-         s{ 
-            ( \n FFLAGS  [\t\ ]* = .*?  \n )  ( \# ) 
+      $makefile =~
+         s{
+            ( \n FFLAGS  [\t\ ]* = .*?  \n )  ( \# )
          }{
             $1 .
             "\#  Default replacement text for Fortran INTEGER * 8 type.\n\n" .
@@ -132,9 +132,9 @@
                $comm_f = $comm;
                $comm_f =~ s/^\n//;
                $comm_f =~ s/source files/Fortran source files/;
-               $extract_f = 
+               $extract_f =
                   $extract .
-                  "\tif test \$(INTEGER8); then \\\n" . 
+                  "\tif test \$(INTEGER8); then \\\n" .
                   "           \$(REPLACE_INTEGER8) < \$\@ > \$\@_tmp; \\\n" .
                   "           mv \$\@_tmp \$\@; \\\n" .
                   "        else :; fi\n\n";
@@ -156,7 +156,7 @@
             $comm_f . $extract_f
             ;
          }sex;
- 
+
 
 #  Add the code for recording INTEGER8 macro in datestamp file.
       $done{ "Add @ echo '   INTEGER8: \$(INTEGER8)  >>\$(DATE_STAMP)" } =
@@ -179,7 +179,7 @@
       }
       if ( @undone ) {
          print( STDERR "\n" );
-         print( STDERR join( "\n      ", 
+         print( STDERR join( "\n      ",
                              "The following edits could not be made:",
                              @undone ),
                        "\n" );
@@ -195,6 +195,6 @@
             "Check private archive-building type targets which may be broken",
          ), "\n" );
       print( STDERR "\n" );
-        
+
 
 # $Id$

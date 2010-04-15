@@ -1,17 +1,17 @@
-      SUBROUTINE SCULIB_FIT_D2XISQ_DAJ2 (XISQ_ROUTINE, N, A, J, 
+      SUBROUTINE SCULIB_FIT_D2XISQ_DAJ2 (XISQ_ROUTINE, N, A, J,
      :  D2XISQ_DAJ2, STATUS)
 *+
 *  Name:
 *     SCULIB_FIT_D2XISQ_DAJ2
 
 *  Purpose:
-*     calculate second differential of chi-squared 
+*     calculate second differential of chi-squared
 *     with respect to a fit parameter
 
 *  Description:
 *     If status is good on entry this routine will calculate the 2nd order
-*     differential of chi-squared with respect to A(J). It does this 
-*     numerically by calling the supplied routine XISQ_ROUTINE to calculate 
+*     differential of chi-squared with respect to A(J). It does this
+*     numerically by calling the supplied routine XISQ_ROUTINE to calculate
 *     chi-squared at the current parameter values, then again at A(J)+DELTA_AJ
 *     and A(J)-DELTA_AJ, then using the formula:-
 *
@@ -19,11 +19,11 @@
 *                     .-------------------------------------------------------
 *                                         DELTA_AJ ** 2
 *
-*     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is 
-*     zero, 0.001. 
+*     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is
+*     zero, 0.001.
 
 *  Invocation:
-*     CALL SCULIB_FIT_D2XISQ_DAJ2 (XISQ_ROUTINE, N, A, J, 
+*     CALL SCULIB_FIT_D2XISQ_DAJ2 (XISQ_ROUTINE, N, A, J,
 *    :  D2XISQ_DAJ2, STATUS)
 
 *  Arguments:
@@ -112,7 +112,7 @@
 *  apply it and calculate function at 2 positions either side of A(J)
 
       CALL XISQ_ROUTINE (XISQ0, N, A, STATUS)
-   
+
       A(J) = A(J) + DELTA_AJ
       CALL XISQ_ROUTINE (XISQPLUS, N, A, STATUS)
 

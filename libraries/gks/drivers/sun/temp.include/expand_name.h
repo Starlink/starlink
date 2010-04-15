@@ -1,5 +1,5 @@
 /*	@(#)expand_name.h 10.6 88/02/08 SMI	*/
- 
+
 /*
  * Copyright (c) 1984 by Sun Microsystems, Inc.
  */
@@ -17,7 +17,7 @@
  *	If str contains no shell metacharacters, the shell is never
  *	consulted, and the argument string is simply returned
  *	in a singleton namelist.
- * 
+ *
  *	In case of errors, expand_name() writes an error message to
  *	stderr, and returns NONAMES.
  *

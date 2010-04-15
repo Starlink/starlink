@@ -23,7 +23,7 @@
       INTEGER*4 NBYTES
       INTEGER*4 ADDRESS
       CHARACTER*4  TYPE
-      
+
 *     Functions
 
       INTEGER*4 GEN_ILEN

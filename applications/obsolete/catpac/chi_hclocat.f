@@ -1,13 +1,13 @@
       SUBROUTINE CHI_HCLOCAT( CATNO, STATUS )
 
 *     3-9-93 DLG  Set CHI_LASTRECACC to zero on close
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR' 
+      INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
       INCLUDE 'CMP_ERR'
       INCLUDE 'CHI_PAR'          ! CHI constants
@@ -54,9 +54,9 @@
       DO I = 1, CHIH_NUMASSOC( CATNO)
           IF ( CHIH_MODE( I, CATNO) .EQ. CHIH__WRITE .OR.
      :             CHIH_MODE( I, CATNO) .EQ. CHIH__UPDATE    ) THEN
-              CALL TBL_SETNROWSW( CHIH_LOC(I, CATNO), 
+              CALL TBL_SETNROWSW( CHIH_LOC(I, CATNO),
      :                     CHIH_TOTUSED( I, CATNO), STATUS)
-              CALL TBL_SETNROWS(  CHIH_LOC(I, CATNO), 
+              CALL TBL_SETNROWS(  CHIH_LOC(I, CATNO),
      :                     CHIH_TOTSIZE( I, CATNO), STATUS)
           ENDIF
 ***              IF ( CHIH_INDLOC(CATNO) .NE. ' ')
@@ -79,5 +79,5 @@
 
 
 9999  RETURN
-          
+
       END

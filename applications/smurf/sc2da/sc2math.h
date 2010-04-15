@@ -56,9 +56,9 @@
 */
 
 #ifndef HEADGEN___src_sc2math_sc2math_h
-#define HEADGEN___src_sc2math_sc2math_h 
+#define HEADGEN___src_sc2math_sc2math_h
 
- 
+
 /* Library constants */
 #include "sc2math_par.h"
 

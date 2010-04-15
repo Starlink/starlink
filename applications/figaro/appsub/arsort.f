@@ -12,7 +12,7 @@ C     (!) CHANS    (Real array CHANS(NLID)) The channel numbers
 C                  of the identified arc lines
 C     (!) WAVES    (Real array WAVES(NLID)) The wavelengths of the
 C                  identified arc lines
-C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (!) CLASS    (Integer array CLASS(NLMAX)) The class codes for
 C                  the identified arc lines.

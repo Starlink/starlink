@@ -86,11 +86,11 @@
 pthread_t ems_thread_initial_id = 0;
 
 /*  The thread specific data key, this should also be established prior to any
- *  thread creation. 
+ *  thread creation.
  */
 pthread_key_t ems_thread_data_key = 0;
 
-/*  Initialiser, so we know the above have been set (0 may not be an invalid 
+/*  Initialiser, so we know the above have been set (0 may not be an invalid
  *  thread identifier). */
 int ems_thread_initial_set = 0;
 
@@ -104,7 +104,7 @@ void ems1Emark( void )
     int istat;                   /* Local status */
     int mlen;                    /* Length of MSTR */
     int plen;                    /* Length of PSTR */
-    char mstr[] = "Context stack overflow (EMS fault)."; 
+    char mstr[] = "Context stack overflow (EMS fault).";
                                       /* Local error message text */
     char pstr[] = "EMS_EMARK_CXOVF";  /* Local message name text */
 

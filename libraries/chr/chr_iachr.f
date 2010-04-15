@@ -14,12 +14,12 @@
 
 *  Description:
 *     The given character, encoded using the machine's character set,
-*     is converted to an integer indicating its position in the ASCII 
-*     character set. If no such character exists, zero is returned. 
+*     is converted to an integer indicating its position in the ASCII
+*     character set. If no such character exists, zero is returned.
 
 *  Arguments:
 *     CVALUE = CHARACTER * 1 (Given)
-*        The character to be converted to its position within the 
+*        The character to be converted to its position within the
 *        ASCII character set.
 
 *  Returned Value:
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,7 +62,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
 *.
 
 *  Check that the given character value is within the correct range.
-      IF ( LGT( CVALUE, CHR_ATOK( 'NUL' ) ) 
+      IF ( LGT( CVALUE, CHR_ATOK( 'NUL' ) )
      :    .AND. LLE( CVALUE, CHR_ATOK( 'DEL' ) ) ) THEN
          CHR_IACHR = ICHAR( CVALUE )
       ELSE
@@ -108,17 +108,17 @@
 
 *  Local Data:
 *     DATA TOKVAL /  'NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK',
-*    : 'BEL', 'BS',  'HT',  'LF',  'VT',  'FF',  'CR',  'SO',  'SI',  
-*    : 'DLE', 'DC1', 'DC2', 'DC3', 'DC4', 'NAK', 'SYN', 'ETB', 'CAN', 
-*    : 'EM',  'SUB', 'ESC', 'FS',  'GS',  'RS',  'US',  ' ',   '!', 
-*    : '"',   '#',   '$',   '%',   '&',   '''',  '(',   ')',   '*', 
-*    : '+',   ',',   '-',   '.',   '/',   '0',   '1',   '2',   '3', 
-*    : '4',   '5',   '6',   '7',   '8',   '9',   ':',   ';',   '<', 
+*    : 'BEL', 'BS',  'HT',  'LF',  'VT',  'FF',  'CR',  'SO',  'SI',
+*    : 'DLE', 'DC1', 'DC2', 'DC3', 'DC4', 'NAK', 'SYN', 'ETB', 'CAN',
+*    : 'EM',  'SUB', 'ESC', 'FS',  'GS',  'RS',  'US',  ' ',   '!',
+*    : '"',   '#',   '$',   '%',   '&',   '''',  '(',   ')',   '*',
+*    : '+',   ',',   '-',   '.',   '/',   '0',   '1',   '2',   '3',
+*    : '4',   '5',   '6',   '7',   '8',   '9',   ':',   ';',   '<',
 *    : '=',   '>',   '?',   '@',   'A',   'B',   'C',   'D',   'E',
-*    : 'F',   'G',   'H',   'I',   'J',   'K',   'L',   'M',   'N', 
-*    : 'O',   'P',   'Q',   'R',   'S',   'T',   'U',   'V',   'W', 
-*    : 'X',   'Y',   'Z',   '[',   '\',   ']',   '^',   '_',   '`', 
-*    : 'a',   'b',   'c',   'd',   'e',   'f',   'g',   'h',   'i', 
+*    : 'F',   'G',   'H',   'I',   'J',   'K',   'L',   'M',   'N',
+*    : 'O',   'P',   'Q',   'R',   'S',   'T',   'U',   'V',   'W',
+*    : 'X',   'Y',   'Z',   '[',   '\',   ']',   '^',   '_',   '`',
+*    : 'a',   'b',   'c',   'd',   'e',   'f',   'g',   'h',   'i',
 *    : 'j',   'k',   'l',   'm',   'n',   'o',   'p',   'q',   'r',
 *    : 's',   't',   'u',   'v',   'w',   'x',   'y',   'z',   '{',
 *    : '|',   '}',   '~',   'DEL' /
@@ -126,7 +126,7 @@
 *.
 
 *  Check that the given character value is within the correct range.
-*     IF ( LGT( CVALUE, CHR_ATOK( 'NUL' ) ) 
+*     IF ( LGT( CVALUE, CHR_ATOK( 'NUL' ) )
 *    :    .AND. LLE( CVALUE, CHR_ATOK( 'DEL' ) ) ) THEN
 
 *     Loop to search the ASCII character set for the given character.

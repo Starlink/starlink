@@ -23,7 +23,7 @@
 *        The history update mode required: 'DISABLED', 'QUIET',
 *        'NORMAL' or 'VERBOSE'. This value may be abbreviated, to no
 *        less than three characters. In addition, 'SKIP' may be supplied.
-*        This is similar to 'DISABLED', in that no history record will 
+*        This is similar to 'DISABLED', in that no history record will
 *        be added to the NDF when the NDF is closed. However, 'SKIP' makes
 *        no permanent change to the update mode - the next time the NDF
 *        is accessed it will have its original update mode.
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,16 +69,16 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
@@ -86,7 +86,7 @@
 *           Locator for NDF history component.
 *        DCB_HUMOD( NDF__MXDCB ) = INTEGER (Write)
 *           History recording update mode.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
@@ -102,7 +102,7 @@
       LOGICAL NDF1_SIMLR         ! String comparison with abbreviation
 
 *  Local Variables:
-      CHARACTER * ( NDF__SZHUM ) MODE ! Required mode 
+      CHARACTER * ( NDF__SZHUM ) MODE ! Required mode
       CHARACTER * ( NDF__SZHUM ) TEXT ! UPDATE_MODE value
       INTEGER DIM( 1 )           ! Dummy dimension size array
       INTEGER HUM                ! History update mode code
@@ -125,7 +125,7 @@
             MODE = 'DISABLED'
          ELSE
             MODE = HMODE
-         END IF             
+         END IF
 
 *  Check that WRITE access to the NDF is available and validate the
 *  history update mode string.
@@ -192,7 +192,7 @@
             END IF
          END IF
       END IF
- 
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

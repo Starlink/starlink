@@ -2,20 +2,20 @@
 *+
 *  Name:
 *     PAR_GET0x
- 
+
 *  Purpose:
 *     Obtains a scalar value from a parameter.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PAR_GET0x( PARAM, VALUE, STATUS )
- 
+
 *  Description:
 *     This routine obtains a scalar value from a parameter.  If it is
 *     necessary, the value is converted to the required type.
- 
+
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter name.
@@ -23,7 +23,7 @@
 *        The parameter value.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each of the data types character,
 *     double precision, integer, logical, and real: replace "x" in the
@@ -31,10 +31,10 @@
 *     VALUE argument must have the corresponding data type.
 *     -  Note that a scalar (0-dimensional) parameter is different from
 *     a vector (1-dimensional) parameter containing a single value.
- 
+
 *  Algorithm:
 *     Call the underlying parameter-system primitives.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1988, 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -62,7 +62,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     26-OCT-1984 (BDK):
 *        Original version.
@@ -78,30 +78,30 @@
 *     03-MAY-2006 (TIMJ):
 *        Initialise the return value.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
- 
+
 *  Arguments Returned:
       LOGICAL VALUE
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER NAMCOD             ! Code number for the parameter
- 
+
 *.
 
 *  Make sure that we return an initialised value
@@ -109,12 +109,12 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Find the parameter-system pointer to the internal parameter space
 *  associated with the parameter.
       CALL SUBPAR_FINDPAR( PARAM, NAMCOD, STATUS )
- 
+
 *  Use the pointer to get the value.
       CALL SUBPAR_GET0L( NAMCOD, VALUE, STATUS )
- 
+
       END

@@ -7,7 +7,7 @@
 *    Description :
 *
 *     This routine divides one image by another, pixel by pixel,
-*     placing the result in a new output image. The two input images 
+*     placing the result in a new output image. The two input images
 *     must have the same dimensions.
 *
 *    Invocation :
@@ -77,7 +77,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'          
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'
 
 *    Status :
@@ -120,11 +120,11 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the data array component of the first structure
-         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI1, 'DATA', '_REAL', 'READ',
      :                  PNTRI1, NELEMENTS, STATUS )
 
 *       get dimensions of array
-         CALL NDF_DIM( LOCI1, NDIMS, DIMS1, NDIM, STATUS)      
+         CALL NDF_DIM( LOCI1, NDIMS, DIMS1, NDIM, STATUS)
 
 *       if no error then continue
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -140,7 +140,7 @@
      :                        PNTRI2, NELEMENTS, STATUS )
 
 *             get dimensions of array
-               CALL NDF_DIM( LOCI2, NDIMS, DIMS2, NDIM, STATUS)      
+               CALL NDF_DIM( LOCI2, NDIMS, DIMS2, NDIM, STATUS)
 
 *             if no error then continue
                IF ( STATUS .EQ. SAI__OK ) THEN
@@ -156,7 +156,7 @@
 
 *                   if no error then continue
                      IF ( STATUS .EQ. SAI__OK ) THEN
-     
+
 *                      map a data array component
                         CALL NDF_MAP( LOCO, 'DATA', '_REAL',
      :                        'WRITE', PNTRO, NELEMENTS, STATUS )
@@ -167,7 +167,7 @@
 *                         call working subroutine to divide first data
 *                         array by second, result going into output
                            CALL DIVARR2D( %VAL(PNTRI1), %VAL(PNTRI2),
-     :                            %VAL(PNTRO), DIMS1(1), DIMS1(2), 
+     :                            %VAL(PNTRO), DIMS1(1), DIMS1(2),
      :                            STATUS )
 
 *                      end of if-no-error-before-accessing-pointers check

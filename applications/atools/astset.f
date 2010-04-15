@@ -30,11 +30,11 @@
 *        A string containing the name of the attribute.
 *     RESULT = LITERAL (Read)
 *        An NDF or text file to receive the modified Object. If an NDF
-*        is supplied, the WCS FrameSet within the NDF will be replaced by 
-*        the new Object if possible (if it is a FrameSet in which the base 
+*        is supplied, the WCS FrameSet within the NDF will be replaced by
+*        the new Object if possible (if it is a FrameSet in which the base
 *        Frame has Domain GRID and has 1 axis for each NDF dimension).
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the original Object. If an NDF is 
+*        An NDF or text file holding the original Object. If an NDF is
 *        supplied, the WCS FrameSet will be used.
 *     VALUE = LITERAL (Read)
 *        The formatted value to assign to the attribute.
@@ -91,7 +91,7 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -107,7 +107,7 @@
       CALL PAR_GET0C( 'VALUE', VAL, STATUS )
 
 *  Store the new attribute value.
-      CALL AST_SETC( THIS, ATTRIB, VAL( : MAX( 1, CHR_LEN( VAL ) ) ), 
+      CALL AST_SETC( THIS, ATTRIB, VAL( : MAX( 1, CHR_LEN( VAL ) ) ),
      :               STATUS )
 
 *  Write the modified Object out to a text file.

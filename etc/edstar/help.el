@@ -34,7 +34,7 @@
 (defun edstar-find-helpkey (&optional name)
   (interactive)
   (let (helpkey found)
-    
+
 ;;; If a helpkey name was given, initialise an alist to contain the name
 ;;; string.
     (if name

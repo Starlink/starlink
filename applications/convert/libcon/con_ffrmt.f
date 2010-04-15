@@ -63,7 +63,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -104,7 +104,7 @@
          ELSE
             STATUS = SAI__ERROR
             CALL ERR_REP( 'INVTYP',
-     :        'The FITS object has an invalid value for BITPIX.', 
+     :        'The FITS object has an invalid value for BITPIX.',
      :        STATUS )
          END IF
       ELSE
@@ -123,7 +123,7 @@
           ELSE
             STATUS = SAI__ERROR
             CALL ERR_REP( 'INVTYP',
-     :        'The FITS object has an invalid value for BITPIX.', 
+     :        'The FITS object has an invalid value for BITPIX.',
      :        STATUS )
          END IF
       END IF

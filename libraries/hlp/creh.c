@@ -194,17 +194,17 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
 /* Buffers. */
    char iobuf [ LIN ], outbuf [ LOUT ];
- 
+
 /* Character counts for each chapter (=level) of the index. */
    int ncxlev [ LEVMAX + 1 ];
- 
+
 /* Start address for each chapter. */
    long icxlev [ LEVMAX + 1 ];
- 
+
 /* Most recent index entries at the given level and their addresses. */
    static char jumpob [ LEVMAX + 1 ] [ LOUT ] ;
    long jumpad [ LEVMAX + 1 ];
- 
+
 /* Last aindex entry, its level and its address (0=none). */
    char lastob [ LOUT ];
    int lastlv;
@@ -215,7 +215,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 /*         2 = expecting new batch of HELP text */
 /*         3 = processing HELP text             */
    int kstate;
- 
+
    int jstat, more, need, ipass, levold, level, i, c1, nfp,
        levtop, npbl, ifrom, ito, l, nd, nx, k;
 
@@ -230,7 +230,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
    levtop = 0;
    npbl = 0;
    lastlv = 0;
- 
+
 /* Open the input file for the first pass. */
    if ( hlpFopr ( nametr, source, &fps ) ) goto soperr;
 
@@ -239,14 +239,14 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
    /* Which pass? */
       if ( ipass == 1 ) {
- 
+
       /* Pass 1: initialize the current level number. */
          levold = -1;
       } else {
 
       /* Pass 2: save size of index plus header plus terminators. */
          nhind = nindex + (long) ( NHEAD + 2 );
- 
+
       /* Reopen input. */
          rewind ( fps );
 
@@ -257,10 +257,10 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
       /* Write the end-of-index record. */
          iadr = nhind - 1l;
          if ( ( jstat = hlpHdwrit( "\0", &iadr ) ) ) goto loperr;
- 
+
       /* Flag no buffer waiting to be output. */
          lastad = 0l;
- 
+
       /* Reset the deferred index entry addresses. */
          for ( level = 0; level <= LEVMAX; jumpad [ level++ ] = 0l );
       }
@@ -269,10 +269,10 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
       nindex = 0l;
       nhelp = 0l;
       for ( level = 0; level <= LEVMAX; ncxlev [ level++ ] = 0l );
- 
+
    /* State = expecting first keyword. */
       kstate = 0;
- 
+
    /* Read the input records. */
       more = TRUE;
       while ( more ) {
@@ -283,7 +283,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
             if ( fgets ( iobuf, LIN, fps ) == NULL ) goto iend;
             if (iobuf [ 0 ] != (char) '!') need = FALSE;
          }
- 
+
       /* Replace anything funny with spaces. */
          l = (int) strlen ( iobuf );
          for ( i = 0; i < l; i++ ) {
@@ -296,7 +296,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
               toupper ( (int) iobuf [ 0 ] ) == 'E' &&
               toupper ( (int) iobuf [ 1 ] ) == 'N' &&
               toupper ( (int) iobuf [ 2 ] ) == 'D' ) goto iend;
- 
+
       /* Keyword or file pointer? */
          c1 = (int) iobuf [ 0 ];
          if ( ( isdigit ( c1 ) && (int) iobuf [ 1 ] == (char) ' ' ) ||
@@ -321,19 +321,19 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
          /* Get the level number. */
             level = c1 - '0';
- 
+
          /* If the first keyword, note its level. */
             if ( kstate == 0 ) levtop = level;
- 
+
          /* State = current record is keyword. */
             kstate = 1;
- 
+
          /* Reset pending blank lines count. */
             npbl = 0;
- 
+
          /* Correct the level number so that the top level is zero. */
             level -= levtop;
- 
+
          /* If pass 1, validate level. */
             if ( ipass == 1 ) {
                if ( level - levold > 1 ) goto nokeyw;
@@ -352,11 +352,11 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
          /* Length of data record including overheads. */
             nd = ito - ifrom + 4;
- 
+
          /* Length of index record including overheads. */
             nx = NOVERH + nd;
             if ( nfp > 0 ) nx += nfp + 1;
- 
+
          /* Pass 2? */
             if ( ipass == 2 ) {
 
@@ -366,7 +366,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
             /* Format the effective level number. */
                c1 = '0' + level;
- 
+
             /* Copy the file pointer, level and keyword into the */
             /* index record.                                     */
                i = NOVERH;
@@ -389,10 +389,10 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
             /* Format the "data" address for the current record. */
                sprintf ( outbuf, "%9.9ld", nhind + nhelp );
                outbuf [ 9 ] = (char) ' ';
- 
+
             /* Compute the file address for the current index record. */
                iadr = icxlev [ level ] + ncxlev [ level ];
- 
+
             /*
             ** The previous and current index records are as follows:
             **
@@ -410,7 +410,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
             /* Is there a previous record? */
                if ( lastad > 0l ) {
- 
+
                /* Yes: the address of the current record is the "down"   */
                /* address for the previous record: complete that record. */
                   sprintf ( lastob + 10, "%9.9ld", iadr );
@@ -419,11 +419,11 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                /* Look at the list of deferred records for the current */
                /* level downwards.                                     */
                   for ( l = lastlv; l <= LEVMAX; l++ ) {
- 
+
                   /* Is there a record waiting to be completed and */
                   /* output?                                       */
                      if ( jumpad [ l ] > 0 ) {
- 
+
                      /* Yes: insert the "along" pointer, write the */
                      /* record and reset the list entry.           */
                         sprintf ( jumpob [ l ] + 20, "%9.9ld", lastad );
@@ -434,21 +434,21 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                         jumpad [ l ] = 0l;
                      }
                   }
- 
+
                /* Store the current partially-completed record and its   */
                /* future disc address, to be completed and output when   */
                /* the next entry at this or a higher level is available. */
                   strncpy ( jumpob [ lastlv ], lastob, LOUT );
                   jumpad [ lastlv ] = lastad;
                }
- 
+
             /* Store the current record, level and address for next */
             /* time.                                                */
                strncpy ( lastob, outbuf, LOUT );
                lastlv = level;
                lastad = iadr;
             }
- 
+
          /* Advance the characters-in-index counters. */
             nindex += nx;
             ncxlev [ level ] += nx;
@@ -466,7 +466,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
             /* Not a blank record: keyword? */
                if ( kstate != 1 ) {
- 
+
               /* Not a keyword: output any pending blank lines. */
                   for ( i = 1; i <= npbl; i++ ) {
                      if ( ipass == 2 ) {
@@ -476,14 +476,14 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                      }
                      nhelp += 2l;
                   }
- 
+
                /* Reset the pending blank lines count. */
                   npbl = 0;
- 
+
                /* Update the status. */
                   kstate = 3;
                }
- 
+
             /* Strip trailing blanks from current record and, if */
             /* pass 2, output it.                                */
                k = hlpLength ( iobuf );
@@ -495,19 +495,19 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                }
                nhelp += (long) ( k + 1 );
             }
- 
+
          /* If we have just processed a keyword, update the status. */
             if ( kstate == 1 ) kstate = 2;
          }
          goto nextip;
- 
+
       /* End of input file: stop the loop. */
 iend:
          more = FALSE;
- 
+
       /* Which pass? */
          if ( ipass == 1 ) {
- 
+
          /* Pass 1: work out the index chapter start addresses. */
             il = (long) NHEAD + 1;
             for ( level = 0; level <= LEVMAX; level++ ) {
@@ -515,12 +515,12 @@ iend:
                il += ncxlev [ level ];
             }
          } else {
- 
+
          /* Pass 2: output deferred index entries. */
- 
+
          /* Is there a previous record? */
             if ( lastad > 0l ) {
- 
+
             /* Yes: the address of the end of index is the "down"     */
             /* address for the previous record: complete that record. */
                iadr = nhind - 1;
@@ -530,10 +530,10 @@ iend:
             /* Look at the list of deferred records for the current */
             /* level downwards.                                     */
                for ( l = lastlv; l <= LEVMAX; l++ ) {
- 
+
                /* Is there a record waiting to be completed and output? */
                   if ( jumpad [ l ] > 0l ) {
- 
+
                   /* Yes: insert the "along" pointer, write the record */
                   /* and reset the list entry.                         */
                      sprintf ( jumpob [ l ] + 20, "%9.9ld", lastad );
@@ -543,7 +543,7 @@ iend:
                      jumpad [ l ] = 0l;
                   }
                }
- 
+
             /* Store the current partially-completed record and its     */
             /* future disc address, to be completed and output when the */
             /* next entry at this or a higher level is available.       */
@@ -552,7 +552,7 @@ iend:
 
             /* Look again at the list of deferred records. */
                for ( l = 0; l <= lastlv; l++ ) {
- 
+
                /* Is there a record waiting to be completed and output? */
                   if ( jumpad [ l ] > 0l ) {
 
@@ -566,7 +566,7 @@ iend:
                }
             }
          }
- 
+
       /* Next input record if any. */
 nextip:
          ;
@@ -604,23 +604,23 @@ badlev:
       strcpy ( iobuf+40, "....." );
    printf ( "Invalid level: %s\n", iobuf );
    goto abort;
- 
+
 /* No keyword. */
 nokeyw:
    printf ( "Keyword absent at level %d\n", level );
    goto abort;
- 
+
 /* HELP system error status. */
 syserr:
    puts ( hlpErrmes ( jstat ) );
    goto abort;
- 
+
 /* Run aborted. */
 abort:
    puts ( "Abort!" );
    jstat = hlp_CREATION_FAILURE;
    goto wrapup;
- 
+
 /* Wrap up. */
 wrapup:
    fclose ( fps );

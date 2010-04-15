@@ -1,6 +1,6 @@
       PROGRAM SEGPRI
 *                      GKS Example Program 6.3
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GPOSTP, GPATTR, GWC
@@ -21,22 +21,22 @@
       DATA STARY/0.7, 0.65, 0.92, 0.68, 0.84, 0.77, 0.86, 0.95,
      :           0.62, 0.66/
       DATA JASF/0,0,0,1,0,0,0,0,0,0,1,1,0/
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Set ASFs for individual patterns and markers
       CALL GSASF (JASF)
 *                      Set fill area style patterned
@@ -68,7 +68,7 @@
       CALL GUWK (1, GPOSTP)
 *                      Redraw all segments in priority order (stars go)
       CALL GRSGWK (1)
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing

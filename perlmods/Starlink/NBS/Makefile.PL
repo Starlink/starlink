@@ -16,12 +16,12 @@ if ($@) {
 
 $osname = $Config{osname};
 
- 
+
 # ---- LIBS -------
- 
+
 # This is the list of libraries required to use NBS
 $nbslibs = qx/nbs_link/;
- 
+
 die "No NDF libraries were found.\n This may imply that the
 nbs_link command is not in your path." if $nbslibs !~ /./;
 
@@ -48,14 +48,14 @@ if ($osname eq 'dec_osf') {
 }
 
 # This is a kludge but I need to pass the linker options through
-# to the compiler. The only way I can see to do this is via the 
+# to the compiler. The only way I can see to do this is via the
 # Optimize flag. Just append the link options to the optimize
 
 $optimize = $Config{optimize} . " $linkopts";
 
 # This is the location of the Starlink NDF libraries
 $starlibs = "-L$StarConfig{Star_Lib}";
- 
+
 $libs = "$starlibs $nbslibs ";
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -65,9 +65,9 @@ WriteMakefile(
     'PREREQ_PM' => { 'Starlink::EMS' => 0 },
     'OPTIMIZE'  => $optimize,
     'VERSION_FROM' => 'NBS.pm', # finds $VERSION
-    'LIBS'      => [ "$libs"],   # e.g., '-lm' 
-    'DEFINE'    => '',     # e.g., '-DHAVE_SOMETHING' 
-    'INC'       => "-I$StarConfig{Star_Inc}",  # e.g., '-I/usr/include/other' 
+    'LIBS'      => [ "$libs"],   # e.g., '-lm'
+    'DEFINE'    => '',     # e.g., '-DHAVE_SOMETHING'
+    'INC'       => "-I$StarConfig{Star_Inc}",  # e.g., '-I/usr/include/other'
     'dist'      => { COMPRESS => "gzip -9f" },
   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
      (ABSTRACT_FROM => 'NBS.pm',

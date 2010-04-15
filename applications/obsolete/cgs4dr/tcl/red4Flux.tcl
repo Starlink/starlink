@@ -1,6 +1,6 @@
 proc red4Flux {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global Red4Widgets
     global cgs4drBitmaps
@@ -45,12 +45,12 @@ proc red4Flux {taskname} {
     bind $Red4Widgets(FC_LAB02) <Button-2> "red4Update red4Flux ALL"
     bind $Red4Widgets(FC_ENT02) <Button-2> "red4Update red4Flux FC_ENT02"
     bind $Red4Widgets(FC_ENT02) <Double-Button-2> "$Red4Widgets(FC_ENT02) delete 0 end"
-    bind $ijm <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $ihm <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $ikm <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $ilm <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $ilpm <Button-2> "red4Update red4Flux FC_FIN"    
- 
+    bind $ijm <Button-2> "red4Update red4Flux FC_FIN"
+    bind $ihm <Button-2> "red4Update red4Flux FC_FIN"
+    bind $ikm <Button-2> "red4Update red4Flux FC_FIN"
+    bind $ilm <Button-2> "red4Update red4Flux FC_FIN"
+    bind $ilpm <Button-2> "red4Update red4Flux FC_FIN"
+
     set imm [radiobutton $bmid.mm -width 28m -height 5m -bitmap @$cgs4drBitmaps/mmag.xbm \
       -variable Red4Widgets(FC_FIN) -value "M"]
     set inm [radiobutton $bmid.nm -width 28m -height 5m -bitmap @$cgs4drBitmaps/nmag.xbm \
@@ -64,12 +64,12 @@ proc red4Flux {taskname} {
     set imj [radiobutton $bmid.mj -width 28m -height 5m -bitmap @$cgs4drBitmaps/mjy.xbm \
       -variable Red4Widgets(FC_FIN) -value "mJy"]
     pack $imm $inm $iwu $iwh $ier $imj -in $bmid -side left -padx 1
-    bind $imm <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $inm <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $iwu <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $iwh <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $ier <Button-2> "red4Update red4Flux FC_FIN"    
-    bind $imj <Button-2> "red4Update red4Flux FC_FIN"    
+    bind $imm <Button-2> "red4Update red4Flux FC_FIN"
+    bind $inm <Button-2> "red4Update red4Flux FC_FIN"
+    bind $iwu <Button-2> "red4Update red4Flux FC_FIN"
+    bind $iwh <Button-2> "red4Update red4Flux FC_FIN"
+    bind $ier <Button-2> "red4Update red4Flux FC_FIN"
+    bind $imj <Button-2> "red4Update red4Flux FC_FIN"
 
     set Red4Widgets(FC_LAB03) [label $bot.l2 -text "Output Units"]
     set owu [radiobutton $bot.wu -width 28m -height 5m -bitmap @$cgs4drBitmaps/wmu.xbm \
@@ -82,10 +82,10 @@ proc red4Flux {taskname} {
       -variable Red4Widgets(FC_FOUT) -value "mJy"]
     pack $Red4Widgets(FC_LAB03) $owu $owh $oer $omj -in $bot -side left -padx 1 -expand yes -fill x
     bind $Red4Widgets(FC_LAB03) <Button-2> "red4Update red4Flux ALL"
-    bind $owu <Button-2> "red4Update red4Flux FC_FOUT"    
-    bind $owh <Button-2> "red4Update red4Flux FC_FOUT"    
-    bind $oer <Button-2> "red4Update red4Flux FC_FOUT"    
-    bind $omj <Button-2> "red4Update red4Flux FC_FOUT"    
+    bind $owu <Button-2> "red4Update red4Flux FC_FOUT"
+    bind $owh <Button-2> "red4Update red4Flux FC_FOUT"
+    bind $oer <Button-2> "red4Update red4Flux FC_FOUT"
+    bind $omj <Button-2> "red4Update red4Flux FC_FOUT"
 
 # Show the dialog box
     set bv [dialogShow .red4Dialogue .red4Dialogue]

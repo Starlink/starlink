@@ -3,7 +3,7 @@ C                   D S A _ _ D E L E T E _ I M A G I N A R Y
 C
 C  Routine name:
 C     DSA__DELETE_IMAGINARY
-C     
+C
 C  Function:
 C     Structure-specific conversion of a complex main array into a real one.
 C
@@ -39,8 +39,8 @@ C  Support: Keith Shortridge, AAO
 C
 C  Version date: 29th August 1992
 C
-C  Note: 
-C     This version supports both the original Figaro data format and 
+C  Note:
+C     This version supports both the original Figaro data format and
 C     Starlink's NDF format.
 C-
 C  Subroutine / function details:
@@ -53,7 +53,7 @@ C     DSA__IMAGINARY_NAME  Get name of imaginary array in a structure.
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -119,7 +119,7 @@ C
          IF (DTA_STATUS.NE.0) GO TO 500     ! Error exit
          IPOS=1
          NM_STATUS=0
-         DO WHILE (NM_STATUS.EQ.0) 
+         DO WHILE (NM_STATUS.EQ.0)
 C
 C           Note that in the call to DTA_NMVAR to get the IPOSth item
 C           in the structure, we always specify IPOS as 1 - as we go
@@ -128,7 +128,7 @@ C           (the imaginary array) or rename it into the temporary structure
 C           (everything else).  So each time we will get a new item
 C           even though we always specify the same number.  Note that the
 C           REAL array has to have its name changed to DATA.
-C           
+C
             CALL DTA_NMVAR(INPUT,IPOS,NAME,NM_STATUS)
             IF (NM_STATUS.EQ.0) THEN
                IF (NAME.EQ.'IMAGINARY') THEN

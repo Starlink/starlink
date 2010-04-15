@@ -20,11 +20,11 @@
 *        The global status.
 
 *  Description:
-*     This application is not for general use. It is a version of POLIMP 
-*     which is used within the polimp.csh script to import POLPACK 
-*     information during on-thr-fly data conversion. In this context, it 
-*     is known that only a single input file will be specified, and that 
-*     it will be a native NDF. We can therefore make big speed gains by 
+*     This application is not for general use. It is a version of POLIMP
+*     which is used within the polimp.csh script to import POLPACK
+*     information during on-thr-fly data conversion. In this context, it
+*     is known that only a single input file will be specified, and that
+*     it will be a native NDF. We can therefore make big speed gains by
 *     using NDF directtly instead of indirectly through the NDG library.
 *
 *     The default import table described in POLIMP is used. Nothing is
@@ -38,20 +38,20 @@
 *        The input (native) NDF.
 
 *  Notes:
-*     -  Any existing values in the POLPACK extension are deleted before 
+*     -  Any existing values in the POLPACK extension are deleted before
 *     processing the supplied control table.
 *     -  A new Frame is added to the WCS component of each NDF and is given the
 *     Domain "POLANAL". This Frame is formed by rotating the grid co-ordinate
 *     Frame so that the first axis is parallel to the analyser axis. The
-*     angle of rotation is given by the ANGROT value and defaults to zero 
+*     angle of rotation is given by the ANGROT value and defaults to zero
 *     if ANGROT is not specified in the control table. As of POLPACK V2.0,
-*     the ANGROT value is no longer stored explicitly in the POLPACK 
+*     the ANGROT value is no longer stored explicitly in the POLPACK
 *     extension; its value is deduced from the POLANAL Frame in the WCS
 *     component.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -97,7 +97,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an NDF context.
-      CALL NDF_BEGIN 
+      CALL NDF_BEGIN
 
 *  Get the input NDF, ensuring no data conversion takes place.
       CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS )
@@ -107,8 +107,8 @@
 *  Ensure that the NDF does not already have a POLPACK extension, and
 *  then create one.
       CALL NDF_XDEL( INDF, 'POLPACK', STATUS )
-      CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC, 
-     :               STATUS )            
+      CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC,
+     :               STATUS )
 
 *  Look for a FITS extension in the NDF. Create one if there isn't one
 *  already, containing a single END card.
@@ -116,8 +116,8 @@
       IF( THERE ) THEN
          CALL NDF_XLOC( INDF, 'FITS', 'READ', FITLOC, STATUS )
       ELSE
-         CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, 1, FITLOC, 
-     :                  STATUS ) 
+         CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, 1, FITLOC,
+     :                  STATUS )
          CALL DAT_CELL( FITLOC, 1, 1, CELLOC, STATUS )
          CALL DAT_PUT0C( CELLOC, 'END', STATUS )
          CALL DAT_ANNUL( CELLOC, STATUS )
@@ -126,7 +126,7 @@
 *  Map in the fits block of the NDF, if it exists
       CALL DAT_MAPV( FITLOC, '_CHAR*80', 'READ', IPFIT, FITLEN,
      :               STATUS )
-            
+
 *  Now interpret and import the FITS information into the NDF. Note
 *  that the lengths of the FITS block character strings are appended
 *  after the last genuine argument. This is the usual method in UNIX
@@ -134,7 +134,7 @@
 *  no difference.
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )), 0, ' ',
-     :                     POLLOC, .TRUE., STATUS, 
+     :                     POLLOC, .TRUE., STATUS,
      :                     %VAL( CNF_CVAL( 80 ) ) )
       END IF
 
@@ -150,7 +150,7 @@
       CALL DAT_ANNUL( FITLOC, STATUS )
 
 *  If an error occurred, delete any POLPACK extension.
-      IF ( STATUS .NE. SAI__OK ) CALL NDF_XDEL( INDF, 'POLPACK', 
+      IF ( STATUS .NE. SAI__OK ) CALL NDF_XDEL( INDF, 'POLPACK',
      :                                          STATUS )
 
 *  Free GRP groups.

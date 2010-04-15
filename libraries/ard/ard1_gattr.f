@@ -14,18 +14,18 @@
 
 *  Description:
 *     This is a dummy routine to allow ARD to use the graphics
-*     facilities of the AST Plot class for "drawing" curves into integer 
+*     facilities of the AST Plot class for "drawing" curves into integer
 *     pixel arrays.
 
 *  Arguments:
 *     GRFCON = INTEGER (Given)
 *        An AST Object stored using astSetGrfContext, or AST__NULL.
 *     ATT = INTEGER (Given)
-*        An integer identifying the required attribute. 
-*     VAL = DOUBLE PRECISION (Given) 
+*        An integer identifying the required attribute.
+*     VAL = DOUBLE PRECISION (Given)
 *        A new value to store for the attribute. If this is AST__BAD
 *        no value is stored.
-*     OLDVAL = DOUBLE PRECISION (Returned) 
+*     OLDVAL = DOUBLE PRECISION (Returned)
 *       Returned holding the attribute value.
 *     PRIM = INTEGER (Given)
 *       The sort of graphics primitive to be drawn with the new attribute.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,15 +69,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Arguments Given:
       INTEGER GRFCON
-      INTEGER ATT 
+      INTEGER ATT
       DOUBLE PRECISION VAL
-      INTEGER PRIM 
+      INTEGER PRIM
 
 *  Arguments Returned:
       DOUBLE PRECISION OLDVAL

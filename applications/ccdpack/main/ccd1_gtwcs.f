@@ -65,13 +65,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      
+
 *  Arguments Given:
       INTEGER INDF
-      
+
 *  Arguments Returned:
       INTEGER IWCS
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 

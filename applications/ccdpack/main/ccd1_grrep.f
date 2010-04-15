@@ -15,16 +15,16 @@
 *                      EVERBN, COMPL, STATUS )
 
 *  Description:
-*     This routine assesses the completeness of a graph, returning a 
+*     This routine assesses the completeness of a graph, returning a
 *     logical value if all nodes can be visited starting from any other.
 *     If it is complete, no further action is taken.  If it is not
-*     complete however, more detailed information about the connected 
+*     complete however, more detailed information about the connected
 *     subgraphs which comprise it is output to the user via the CCDPACK
 *     messaging system.
 
 *  Arguments:
 *     GRAPH( 4, NEDGE ) = INTEGER (Given)
-*        The edges of the graph.  The node numbers are held in elements 
+*        The edges of the graph.  The node numbers are held in elements
 *        1 and 2.
 *     NEDGE = INTEGER (Given)
 *        The number of edges in the graph.
@@ -34,16 +34,16 @@
 *        nodes which appear in all the edges, which may be less than
 *        this value if some nodes are not linked at all.
 *     REF = INTEGER (Given)
-*        The index of the reference node.  The value of this will not 
+*        The index of the reference node.  The value of this will not
 *        influence the completeness of the graph, but the subgraph of
-*        which this node forms part may be given additional prominence 
+*        which this node forms part may be given additional prominence
 *        in the report to the user.
 *     SGRAPH( 4, NEDGE ) = INTEGER (Given and Returned)
 *        Workspace.  Used for storing subgraphs.
 *     WORK( NNODE ) = INTEGER (Given and Returned)
 *        Workspace.
 *     BEEN( NNODE ) = LOGICAL (Given and Returned)
-*        Workspace.  Array of flags indicating which nodes have been 
+*        Workspace.  Array of flags indicating which nodes have been
 *        visited per subgraph.
 *     EVERBN( NNODE ) = LOGICAL (Given and Returned)
 *        Workspace.  Array of flags indicating which nodes have been
@@ -104,10 +104,10 @@
       INTEGER WORK( NNODE )
       LOGICAL BEEN( NNODE )
       LOGICAL EVERBN( NNODE )
-      
+
 *  Arguments Returned:
       LOGICAL COMPL
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -123,13 +123,13 @@
       LOGICAL CYCLIC             ! Is subgraph cyclic
       LOGICAL DONE               ! Have all nodes been visited
       LOGICAL PCOMPL             ! Is graph complete w.r.t all represented nodes
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Validate REF.  Supplying it outside these bounds would really 
+*  Validate REF.  Supplying it outside these bounds would really
 *  constitute a programming error.
       REF = MIN( MAX( 1, REF ), NNODE )
 
@@ -151,7 +151,7 @@
 *  Identify an edge which contains the next node.
       IED = 0
       DO 2 I = 1, NEDGE
-         IF ( GRAPH( 1, I ) .EQ. NEXT .OR. GRAPH( 2, I ) .EQ. NEXT ) 
+         IF ( GRAPH( 1, I ) .EQ. NEXT .OR. GRAPH( 2, I ) .EQ. NEXT )
      :      THEN
             IED = I
             GO TO 3
@@ -193,12 +193,12 @@
       IF ( IGR .EQ. 0 ) THEN
          COMPL = DONE
          IF ( COMPL ) THEN
-            CALL CCD1_MSG( ' ', '  The graph is fully connected.', 
+            CALL CCD1_MSG( ' ', '  The graph is fully connected.',
      :                     STATUS )
             CALL CCD1_MSG( ' ' , ' ', STATUS )
             GO TO 99
          ELSE
-            CALL CCD1_MSG( ' ', '  The graph is not fully connected.', 
+            CALL CCD1_MSG( ' ', '  The graph is not fully connected.',
      :                     STATUS )
             CALL CCD1_MSG( ' ', '  Identifying connected subgraphs, '//
      :                     'starting with the reference node.', STATUS )
@@ -227,9 +227,9 @@
  6    CONTINUE
       CALL CCD1_MSG( ' ', BUFFER, STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
-            
+
 *  If there are still unvisited nodes, go find the next subgraph.
-      IF ( .NOT. DONE ) GO TO 10 
+      IF ( .NOT. DONE ) GO TO 10
 
 *  Exit label.
  99   CONTINUE

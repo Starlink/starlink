@@ -15,7 +15,7 @@
 *  Description:
 *     This routine implements a sink routine which has to be passed to
 *     the AST Channel construction routines (AST_CHANNEL, AST_FITSCHAN)
-*     in order to do input/output on AST objects to a file.  It uses 
+*     in order to do input/output on AST objects to a file.  It uses
 *     FIO to do the output, via a file descriptor held in a common block.
 
 *  Arguments:
@@ -64,27 +64,27 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
-      
+
 *  Global Variables:
       INCLUDE 'CCD1_FDCM'        ! File descriptor for AST channel CCD1_ASTFD
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for output
       INTEGER NCHAR              ! Number of characters to write
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Allow AST system to fill buffer.
       CALL AST_GETLINE( LINE, NCHAR, STATUS )
 
 *  Write to output file using FIO system.
-      IF ( NCHAR .GT. 0 ) 
+      IF ( NCHAR .GT. 0 )
      :   CALL FIO_WRITE( CCD1_ASTFD, LINE( :NCHAR ), STATUS )
 
       END

@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -89,7 +89,7 @@
 void msgOutf( const char * param, const char * text, int *status, ... ) {
   va_list args;
   va_start( args, status );
-  /* duplicated msgOutiff since we do not have a va_list version as 
+  /* duplicated msgOutiff since we do not have a va_list version as
      intermediary (msgOutifv) - not currently warranted. */
   msg1Outif( MSG__NORM, param, text, 1, args, status );
   va_end( args );

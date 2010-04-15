@@ -4,7 +4,7 @@
     Maintenance release to include the old kps1_cuxyr routine
     which has been retired from KAPPA.
 
- Version 1.0-1 of IRCAMPACK has been released.  This version fixes a 
+ Version 1.0-1 of IRCAMPACK has been released.  This version fixes a
  bug in the VECPLOT application in which orientations supplied by
  parameter NDF2 were assumed to be in radians instead of degrees.
 

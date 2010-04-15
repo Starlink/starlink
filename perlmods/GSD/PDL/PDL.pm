@@ -18,7 +18,7 @@ This is a simple subclass of the standard GSD module. It
 overrides one of the internal routines in order to return
 PDL objects rather than perl arrays whenever a GSD array item
 is to be returned. This is far more efficient than using perl arrays.
-(although it should be implemented at the XS level for maximum 
+(although it should be implemented at the XS level for maximum
 performance).
 
 =cut
@@ -94,7 +94,7 @@ sub Get1i ($$$$$) {
 #
 #   $gsd->_topdl($type, \@start, \@end, $packed)
 #
-# where type is the standard PDL type as returned by 
+# where type is the standard PDL type as returned by
 # float or double
 
 # @start and @end can be scalars rather than array refs

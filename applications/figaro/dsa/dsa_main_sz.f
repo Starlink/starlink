@@ -14,7 +14,7 @@ C     routine calls, especially if some complicated structure is in
 C     use, the main array dimensions are held in common and can be
 C     accessed either directly or by this routine.  The advantage of this
 C     routine is that if the dimensions have not yet been recorded in
-C     common, it will determine them and set the common variables 
+C     common, it will determine them and set the common variables
 C     accordingly, ready for next time.  This routine may also be used
 C     to set the common variables to a passed set of values.
 C
@@ -31,14 +31,14 @@ C                         data structure.
 C     (>) SET             (Logical,ref) If true, this routine sets the
 C                         common dimension variables to the values passed
 C                         in NDIM and DIMS.
-C     (>) MAXDIM          (Integer,ref) The number of elements in DIMS. 
+C     (>) MAXDIM          (Integer,ref) The number of elements in DIMS.
 C     (!) NDIM            (Integer,ref) The number of dimensions in the
 C                         main data array.  NDIM=0 indicates that no such
 C                         array exists.
 C     (!) DIMS            (Integer array,ref) The dimensions of the main
 C                         data array.
 C     (<) ERROR           (Fixed string,descr) An error string describing
-C                         any error that may have occurred.  
+C                         any error that may have occurred.
 C     (!) STATUS          (Integer,ref) Status code value.  If bad status
 C                         is passed, this routine returns immediately.
 C                         Note that if no main array exists, this is
@@ -48,7 +48,7 @@ C
 C  External variables used:
 C     Only common variables used internally by the DSA_ package.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DSA_ARRAY_SIZE, DSA__ARRAY, DSA__DATA_NAME
 C
 C  Prior requirements:
@@ -61,7 +61,7 @@ C-
 C  Common variable details:
 C     (>) MAX_REFS    (Integer parameter) Maximum number of reference names.
 C     (>) OBJ_LEN     (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data
 C                     object corresponding to reference name.
 C     (!) DATA_NDIM   (Integer array) Number of dimensions of main data array.
 C     (!) DATA_DIMS   (Integer array) Dimensions of main data array. (2D array)
@@ -73,7 +73,7 @@ C     DSA__ARRAY      Indicates if an object can be treated as an array.
 C
 C  History:
 C     23rd June 1987    Original version.  KS / AAO.
-C     16th Jan  1990    Modified to use DSA__ routines to handle the 
+C     16th Jan  1990    Modified to use DSA__ routines to handle the
 C                       structure details, rather than assuming the original
 C                       Figaro format.  KS/AAO.
 C     26th Apr  1990    Declaration of DIMS modified to avoid crash if
@@ -150,7 +150,7 @@ C
             END IF
 C
 C           Now get the array dimensions.
-C 
+C
             CALL DSA_ARRAY_SIZE (NAME(:LENGTH),
      :                               MAXDIM,NDIM,DIMS,ERROR,STATUS)
 C

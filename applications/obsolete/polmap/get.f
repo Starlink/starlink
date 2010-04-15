@@ -5,27 +5,27 @@
      &             STK_NPTS,TOP_STK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C          G E T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C TITLE (>), LAMBDA (>), STOKES_I (>), STOKES_Q (>), STOKES_QV (>),
 C STOKES_U (>), STOKES_UV (>), NPTS (>), NPARAMS (<), PARAMS (<),
-C STK_TITLE (<), STK_LAMBDA (<), STK_STOKES_I (<), STK_STOKES_Q (<), 
+C STK_TITLE (<), STK_LAMBDA (<), STK_STOKES_I (<), STK_STOKES_Q (<),
 C STK_STOKES_QV (<), STK_STOKES_U (<), STK_STOKES_UV (<),
 C STK_NPTS (<), TOP_STK (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C This routine gets a polarization spectrum from the stack.
 C
@@ -58,7 +58,7 @@ C
       INTEGER STK_NPTS(MAXSPEC)
       CHARACTER*80 STK_TITLE(MAXSPEC)
       INTEGER TOP_STK
-C 
+C
 C The command parameters
 C
       INTEGER NPARAMS

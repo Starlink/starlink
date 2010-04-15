@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -57,7 +57,7 @@
       CHARACTER PARAM*(*)
       LOGICAL LOG
       INTEGER FD
-    
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -80,7 +80,7 @@
 *  If an error occurrred (other than a parameter abort), annul the error.
       IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT ) THEN
          CALL ERR_ANNUL( STATUS )
-      END IF                              
+      END IF
 
 *  If no NDF has been obtained, report an undefined NDF.
       IF( INDF .EQ. NDF__NOID ) THEN

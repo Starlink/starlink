@@ -41,14 +41,14 @@
 *  S       - Character variable, via which chunks of PostScript are sent for
 *            buffering.
 *
- 
+
 *     Integer workspace offset parameters
       INTEGER    IORIEN,   IWIDTH,   IFORMT,   ICOLR
       PARAMETER (IORIEN=14,IWIDTH=15,IFORMT=16,ICOLR=17)
 *     Real  workspace offset parameters
       INTEGER    IMARGN
       PARAMETER (IMARGN=10)
- 
+
 *     Parameter indicating action for Page (not whole file)
       INTEGER    IPAGE
       PARAMETER (IPAGE=1)
@@ -96,11 +96,11 @@
 *     (must end it before trailer)
       CALL GKFOCO(KIOPB,'200 dict begin',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Define all necessary procedures (in alphabetical order).
 *
- 
+
 *     Procedure align: Reduces Rnum1 so that it becomes Rnum2 - N*Rnum3
 *                      (where N is an integer). Called by fapdo to adjust
 *                      pattern bounding box left corner, so that pattern
@@ -112,22 +112,22 @@
 *     Algorithm: Subtract Rnum1 from Rnum2 and adjust the result so that it
 *                becomes N*Rnum3. Use this to work out new Rnum1.
 *
- 
+
       CALL GKFOCO(KIOPB,'/align{2 copy exch 5 -1 roll sub'//
      : ' exch div ceiling mul sub}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure ca: reads a row of hexadecimal raster data from current file.
 *                   Called from GK1ACA; fapi; GK1ARO.
 *
 *     Algorithm: Uses current file as the input stream and reads one hex
 *                string into buffer line (defined elsewhere).
- 
+
       CALL GKFOCO(KIOPB,
      : '/ca{currentfile line readhexstring pop}def',
      : IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure clnstat: sets colour, linewidth and linestyle.
 *                        Called from GK1AST.
 *
@@ -140,7 +140,7 @@
 *                Resulting pattern is used as an argument to setdash. The
 *                remaining three reals are fed to setrgbcolor operator for
 *                grey level setting.
- 
+
       CALL GKFOCO(KIOPB,'/clnstat{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'         setlinewidth plsty exch get',IREM)
@@ -168,7 +168,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'        }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure fagen: forms but doesn't close the path. Called from GK1AFL
 *
 *     [RX_coordinates] [RY_coordinates] fagen => -
@@ -182,7 +182,7 @@
 *                points and sets up a loop where for each point plseg
 *                is called. Note that path is formed but not filled.
 *
- 
+
       CALL GKFOCO(KIOPB,'/fagen{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'       dup length 1 sub',IREM)
@@ -197,7 +197,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'      }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure fapdo: outputs the required pattern to fill the
 *                      generated path. Called from GK1AFL.
 *
@@ -225,7 +225,7 @@
 *                prepare the ground for the im procedure. At this stage faput
 *                is called to fill the path.
 *
- 
+
       CALL GKFOCO(KIOPB,'/fapdo{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'       closepath pathbbox',IREM)
@@ -315,14 +315,14 @@
       CALL GKFOCO(KIOPB,'                nxpix psizex mul nx div'//
      : ' nypix psizey mul ny div scale',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
       CALL GKFOCO(KIOPB,'                faput',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'       grestore',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM )
       CALL GKFOCO(KIOPB,'      }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure fapi: Reads in and defines the reference point coordinates.
 *                     and number of columns and rows in pattern definition.
 *                     Called from GK1AFL.
@@ -335,7 +335,7 @@
 *                calling the ca procedure.
 *
 *
- 
+
       CALL GKFOCO(KIOPB,'/fapi{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'      /psizey exch def /psizex exch def',IREM)
@@ -349,7 +349,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'      /line nxb string def /patdef ny array '//
      : ' def',IREM)
- 
+
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'         0 1 ny 1 sub ',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
@@ -360,7 +360,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'     }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure faput: using the image operator, outputs scan lines
 *                      until the bounding box is filled. Called by fapdo.
 *
@@ -376,7 +376,7 @@
 *                way in which PostScript and GKS define the pattern) are pushed
 *                on to stack. Procedure for image to get the correct scan line
 *                is then defined and image operator invoked.
- 
+
 *                If the workstation is colour the colorimage operator is used
 *                instead of the image operator. It has the multiproc argument
 *                set to false and 3 values per colour.
@@ -414,7 +414,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'      }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure fasoldo: deals with solid interior style. Called from GK1AFL
 *
 *     - fasoldo => -
@@ -425,19 +425,19 @@
 *                is redundant since eofill does it implicitly. Also, eoclip
 *                has a bug!). *Temporarily put eoclip back*.
 *
- 
+
       CALL GKFOCO(KIOPB,'/fasoldo{eoclip eofill}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure fastat: defines fill area style attribute fsi.
 *                       Called from GK1AFL
 *
 *     Ifa_style_index fat => -
 *
- 
+
       CALL GKFOCO(KIOPB,'/fastat{/fsi exch def}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure hitdot: in a device independent way, aligns pair of user
 *                       coordinates to the nearest device dot. Used to be
 *                       called by fapi, but (since pattern size introduced)
@@ -454,9 +454,9 @@
       CALL GKFOCO(KIOPB,'/hitdot{transform round exch round exch'//
      : ' itransform}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure im:  (colour)image operator. Called from GK1ACA & GK1ARO
- 
+
 *     Algorithm: if monochrome = image
 *                if colour     = colorimage with multiproc set to false and
 *                                3 values per colour
@@ -467,7 +467,7 @@
          CALL GKFOCO(KIOPB,'/im{image}def',IREM)
       ENDIF
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure init: initializes the device and graphics state.
 *                     Called from GK1AID.
 *
@@ -545,7 +545,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'     }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure pln: forms the path for a long polyline. Does not stroke it.
 *                    Called from plong.
 *
@@ -556,7 +556,7 @@
 *                points and set up a loop where for each point plseg is called.
 *                Note that path is formed but not stroked.
 *
- 
+
       CALL GKFOCO(KIOPB,'/pln{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'     2 copy 0 get exch 0 get exch moveto dup'//
@@ -572,7 +572,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'    }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure plong: polyline command for long polylines (i.e. those with
 *                      >CUTOFF points, c.f. GK1ALN). Matching save is
 *                      supplied in GK1ALN. Called from GK1ALN.
@@ -581,10 +581,10 @@
 *
 *     Algorithm: Call pln to form the path and then stroke it.
 *
- 
+
       CALL GKFOCO(KIOPB,'/plong{pln stroke restore}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure pls: outputs short polylines (i.e. those with <CUTOFF points,
 *                    c.f. GK1ALN). Called from GK1ALN.
 *
@@ -592,11 +592,11 @@
 *
 *     Algorithm: Moveto to first coordinate pair. Then lineto in a loop.
 *
- 
+
       CALL GKFOCO(KIOPB,'/pls{1 sub 3 1 roll moveto {lineto} repeat'//
      : ' stroke}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure plseg: draws a segment for the pln procedure. Called by
 *                      (who else?!) pln.
 *
@@ -605,19 +605,19 @@
 *     Algorithm: copies the loop index and coordinate arrays and uses these
 *                to access Iloop_index-th coordinate pair. Then linesto.
 *
- 
+
       CALL GKFOCO(KIOPB,'/plseg{3 copy get 3 1 roll exch get exch'//
      : ' lineto}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Array plsty: holds dash patterns for various linestyles (in PS points!).
 *                  Used by the clnstat procedure.
- 
+
       CALL GKFOCO(KIOPB,
      : '/plsty[ [] [] [12 5.5] [0.5 2] [10 2 0.5 2]'//
      : ' [ 8 2 0.5 2 0.5 2] ]def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure pm: outputs polymarker. Called from GK1APM.
 *
 *     [RX_coordinates] [RY_coordinates] pm => -
@@ -625,12 +625,12 @@
 *     Algorithm: Set up a loop and at each coordinate pair output a marker
 *                by calling the pmdomk procedure.
 *
- 
+
       CALL GKFOCO(KIOPB,
      : '/pm{dup length 1 sub 0 1 3 -1 roll {pmdomk} for pop pop}def',
      : IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure pmdomk: draws one marker. Called by the pm procedure
 *
 *     [RX_coord] [RY_coord] Iloop_index pmdomk => [RX_coord] [RY_coord]
@@ -642,7 +642,7 @@
 *                adjusted (must scale down, since scaled up for the size) and
 *                marker drawn using array of procedures pmx.
 *
- 
+
       CALL GKFOCO(KIOPB,'/pmdomk{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'        3 copy get 3 1 roll exch get'//
@@ -667,20 +667,20 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'       }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure pmstat: defines marker size and type. Called from GK1APM.
 *
 *     Imarker_type Imarker_size_scale_factor pmstat =>
 *
       CALL GKFOCO(KIOPB, '/pmstat{/msz exch def/mt exch def}def', IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Array pmx: for each markertype holds a procedure to draw it's outline.
 *                Used by pmdomk.
 *
 *     Algorithm: pmdomk has translated and scaled. Depending on the shape
 *                desired, after moving to 0 0 we lineto around the origin.
- 
+
       CALL GKFOCO(KIOPB,'/pmx[{}',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
 *        1 -> smallest displayable dot
@@ -702,25 +702,25 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'    ]def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure s: replaces PostScript's save with a shorter command.
 *                  Used in GK1ALN.
- 
+
       CALL GKFOCO(KIOPB,'/s{save}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
- 
+
+
 *     Procedure setclipbox: sets the clipping rectangle. Called from GK1ACB.
 *
 *     RXL RYB RXL RYT RXR RYT RXR RYB setclipbox => -
 *
 *     Algorithm: form a path using clipping rectangle coordinates, close it and
 *                clip.
- 
+
       CALL GKFOCO(KIOPB,'/setclipbox{newpath moveto lineto lineto'//
      : ' lineto closepath clip newpath}def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure txchar: outputs CHAR precision text. Called from GK1AXS.
 *
 *     Hex_String [RX_coord] [RY_coord] txchar => -
@@ -728,7 +728,7 @@
 *     Algorithm: A loop is set up and for each coordinate pair the txdoch
 *                procedure is called.
 *
- 
+
       CALL GKFOCO(KIOPB, '/txchar{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB, '        dup length 1 sub',IREM)
@@ -743,7 +743,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB, '       }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure txdoch: outputs one CHAR precision character. Called by the
 *                       txchar procedure.
 *     Hex_String [RX_coord] [RY_coord] Iloop_index txdoch =>  Hex_String
@@ -777,9 +777,9 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'       }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
- 
- 
+
+
+
 *     Procedure txstat: sets up text attributes and the font. Called from
 *                       GK1AXS.
 *
@@ -798,7 +798,7 @@
 *                width and use this value to scale the font. Finally, reset
 *                ft.
 *
- 
+
       CALL GKFOCO(KIOPB,'/txstat{',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'        /texp exch def /tng exch def',IREM)
@@ -819,7 +819,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'       }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure txstr: outputs a STRING precision string. Called from
 *                      GK1AXS.
 *     Hex_String RX_coord RY_coord txstr => -
@@ -848,7 +848,7 @@
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'      }def',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *     Procedure tz: Add a trapezoid to the current path as a subpath.
 *                   It is used to provide a compact way of putting
 *                   trapezoids into a file when trapezoid decomposition
@@ -886,7 +886,7 @@
  1000 FORMAT(I1, I5, F9.3, I3, ' init')
       CALL GKFOCO(KIOPB, S(1:23), IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Mark end of the prologue and beginning of Page 1
 *
@@ -898,12 +898,12 @@
 *     Send Page Header, if not EPSF
 *
       IF(KWKDAT(IFORMT,KWKIX) .EQ. NOEPSF) CALL GK1AHD (IPAGE)
- 
+
 *
 *     Do the first save - matching restore will be supplied at the
 *     end of each frame.
 *
       CALL GKFOCO(KIOPB,'save',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
       END

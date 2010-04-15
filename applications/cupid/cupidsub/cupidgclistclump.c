@@ -10,18 +10,18 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *     cupidGCListClump
 
 *  Purpose:
-*     Add a clump to the output list. 
+*     Add a clump to the output list.
 
 *  Language:
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCListClump( int iclump, int ndim, double *par, double chisq, 
+*     void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *                            int *lbnd, double rms,
 *                            int *status )
 
 *  Description:
-*     This function adds a clump to the output list. 
+*     This function adds a clump to the output list.
 
 *  Parameters:
 *     iclump

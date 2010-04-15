@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_TRDRI( FD, DIM1, DIM2, POSCOD, COUNT, CODATA,
      :                        VADATA, LBND, UBND, CMPLET, STATUS )
- 
+
 *+
 *  Name:
 *     KPS1_TRDRx
@@ -123,52 +123,52 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'FIO_ERR'          ! Fortran-I/O-system errors
       INCLUDE 'CHR_ERR'          ! CHR error codes
- 
+
 *  Arguments Given:
       INTEGER
      :  FD,
      :  DIM1,
      :  DIM2,
      :  POSCOD( DIM1 + 1 )
- 
+
 *  Arguments Given and Returned:
       INTEGER
      :  COUNT
- 
+
       REAL
      :  CODATA( DIM1, DIM2 ),
      :  LBND( DIM1 ),
      :  UBND( DIM1 )
- 
+
       INTEGER
      :  VADATA( DIM2 )
- 
+
 *  Arguments Returned:
       LOGICAL
      :  CMPLET
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
       INTEGER
      :  CHR_LEN                  ! Length of the string less trailing
                                  ! blanks
- 
+
 *  Local Constants:
       INTEGER NCHLIN             ! Maximum number of characters in an
                                  ! input record
       PARAMETER ( NCHLIN = 256 )
- 
+
 *  Local Variables:
       INTEGER
      :  HASH,                    ! Column where a hash is found in the
@@ -188,136 +188,136 @@
      :  SHRIEK,                  ! Column where a shriek is found in the
                                  ! input buffer
      :  WSKIP                    ! Number of words (columns to skip)
- 
+
       CHARACTER*( NCHLIN )
      :  BUFFER                   ! Buffer to store input and output
                                  ! strings
- 
+
 *.
- 
+
 *    Check inherited global status.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Assume for the moment that the array will not be big enough to
 *    store all the points.
- 
+
       CMPLET = .FALSE.
- 
+
 *    Initialise counter.
- 
+
       IF ( COUNT .LT. 1 )  COUNT  =  1
- 
+
 *    Sort the columns positions.
 *    ===========================
- 
+
 *    Copy the columns.
- 
+
       DO  I = 1, DIM1 + 1
          ORDPOS( I ) = POSCOD( I )
       END DO
- 
+
 *    Sort the columns to be able to read them in sequence and
 *    obtain an index to old positions.
- 
+
       CALL PDA_QSIAI( DIM1 + 1, ORDPOS, INDPOS )
- 
+
 *    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 *    Start a new error context.
- 
+
       CALL ERR_MARK
- 
- 
+
+
 *    Now run through free-format file picking up the required
 *    co-ordinate and data values (up to the maximum allowed within the
 *    array bounds).
- 
+
       DO WHILE ( COUNT .LE. DIM2 .AND. STATUS .EQ. SAI__OK )
- 
+
 *       Read from the free-format file.
- 
+
          CALL FIO_READ( FD, BUFFER, NCHAR, STATUS )
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *          Extract the data from the character buffer.
 *          ===========================================
- 
+
 *          Look for a comment.
- 
+
             SHRIEK = INDEX( BUFFER, '!' )
             HASH = INDEX( BUFFER, '#' )
- 
+
 *          Get the length of the string, watching for blank lines
 *          or comment lines. A hash or shriek in the first column
 *          indicates a comment line.  In such cases the line can be
 *          ignored.
- 
+
             IF ( SHRIEK .EQ. 1 .OR. HASH .EQ. 1 .OR.
      :           BUFFER .EQ. ' ' ) THEN
                NCOM = -1
             ELSE
                NCOM = CHR_LEN( BUFFER )
             END IF
- 
+
 *          Initialise to the start of the string, and the number of
 *          values stored.
- 
+
             NVAL = 0
             INDEXE = -1
- 
+
 *          Find the number of words to skip at the start.
- 
+
             WSKIP = ORDPOS( NVAL + 1 ) - 1
- 
+
 *          Loop until the end of the buffer. The number of values gets
 *          updated in the loop so the test must be less than its maximum
 *          value.
- 
+
             DO WHILE ( INDEXE .LT. NCOM .AND. NVAL .LT. DIM1 + 1 .AND.
      :                 STATUS .EQ. SAI__OK )
- 
+
 *             Skip to the correct word.
- 
+
                IF ( WSKIP .GT. 0 ) THEN
- 
+
                   DO  I = 1, WSKIP
- 
+
 *                   Shift the search to the next value.
- 
+
                      INDEXS = INDEXE + 1
- 
+
 *                   Find the start and end indices of the value.
- 
+
                      CALL CHR_FIWS( BUFFER, INDEXS, STATUS )
                      INDEXE = INDEXS
                      CALL CHR_FIWE( BUFFER, INDEXE, STATUS )
                   END DO
                END IF
- 
+
 *             Shift the search to the next value actually required.
- 
+
                INDEXS = INDEXE + 1
- 
+
 *             Find the start and end indices of the value.
- 
+
                CALL CHR_FIWS( BUFFER, INDEXS, STATUS )
                INDEXE = INDEXS
                CALL CHR_FIWE( BUFFER, INDEXE, STATUS )
- 
+
 *             Watch for the case where the word terminates the line.
 *             Since this is quite normal for the last word (value) in
 *             the buffer, the error should be annulled.
- 
+
                IF ( NVAL .EQ. DIM1 ) THEN
                   IF ( STATUS .EQ. CHR__ENDOFSENT )
      :              CALL ERR_ANNUL( STATUS )
                END IF
- 
+
 *             Extract the value required and convert to INTEGER type for
 *             the data value, or to real for the co-ordinates.
- 
+
                NVAL = NVAL + 1
                IF ( INDPOS( NVAL ) .EQ. DIM1 + 1 ) THEN
                   CALL CHR_CTOI( BUFFER( INDEXS:INDEXE ),
@@ -326,30 +326,30 @@
                   J = INDPOS( NVAL )
                   CALL CHR_CTOR( BUFFER( INDEXS:INDEXE ),
      :                           CODATA( J, COUNT ), STATUS )
- 
+
 *                Find the bounds of the array.
- 
+
                   UBND( J )  =  MAX( UBND( J ), CODATA( J, COUNT ) )
                   LBND( J )  =  MIN( LBND( J ), CODATA( J, COUNT ) )
                END IF
- 
+
 *             Find the number of words to skip, unless the last word
 *             required has been extracted.
- 
+
                IF ( NVAL .LT. DIM1 + 1 )
      :            WSKIP = ORDPOS( NVAL + 1 ) - ORDPOS( NVAL ) - 1
- 
+
             END DO
- 
+
 *          Increment the count of pixels by one if it is not a comment
 *          line in the file.
- 
+
             IF ( NCOM .NE. -1 ) COUNT = COUNT + 1
- 
+
 *          Something may have gone wrong interpreting the file, either
 *          a typographical error, or it is not arranged in columns, e.g.
 *          perhaps with no co-ordinate data.
- 
+
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETC( 'BUFFER', BUFFER )
                CALL ERR_REP( 'KPS1_TRDRx_FORMAT',
@@ -357,48 +357,48 @@
      :           /'format.  For example, it must contain co-ordinate '/
      :           /'data.  The last buffer was "^BUFFER".', STATUS )
             END IF
- 
+
          ELSE IF ( STATUS .NE. FIO__EOF ) THEN
- 
+
             CALL MSG_SETC( 'BUFFER', BUFFER )
- 
+
 *          Report an error and abort
- 
+
             CALL ERR_REP( 'KPS1_TRDRx_RDATA',
      :        'KPS1_TRDRx: Error reading data file : ^STATUS.  Line '/
      :        /'was ^BUFFER', STATUS )
             GOTO 980
- 
+
 *       End of no-error-reading-record-in-file check.
- 
+
          END IF
- 
+
       END DO
- 
+
 *    Last record in the file has been read successfully.  If has not
 *    the CMPLET logical will still be false, and so a larger array will
 *    be created.
- 
+
       IF ( STATUS .EQ. FIO__EOF ) THEN
- 
+
 *       Record that no more points are to be read.
- 
+
          CMPLET = .TRUE.
- 
+
 *       Correct the actual number of points.
- 
+
          COUNT = COUNT - 1
- 
+
          CALL ERR_ANNUL( STATUS )
- 
+
       END IF
- 
+
  980  CONTINUE
- 
+
 *    Release the error context.
- 
+
       CALL ERR_RLSE
- 
+
   999 CONTINUE
- 
+
       END

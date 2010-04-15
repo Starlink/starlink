@@ -1,28 +1,28 @@
- 
+
       SUBROUTINE PERIOD_PLTXYERR(XR, YR, ER1, ER2,
      :                           IPARRAY, NPTS, MXCOL, YERROR,
      :                           DMIX, DMIY, DMXX, DMXY)
- 
+
 C=============================================================================
 C Sets-up single-precision data arrays for PLT
 C
 C Written by Kevin P Duffey @RAL, October 2001
 C=============================================================================
- 
+
       IMPLICIT NONE
 
 C-----------------------------------------------------------------------------
 C PLT declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER MXCOL, NPTS
 
       REAL XR(NPTS), YR(NPTS), ER1(NPTS), ER2(NPTS)
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_PLT declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER K
       DOUBLE PRECISION IPARRAY(NPTS, MXCOL)
       LOGICAL YERROR
@@ -39,7 +39,7 @@ C-----------------------------------------------------------------------------
          YR(K) = SNGL(IPARRAY(K, 2))
          IF( IPARRAY(K, 2) .GE. DMXY) DMXY = IPARRAY(K, 2)
          IF( IPARRAY(K, 2) .LE. DMIY) DMIY = IPARRAY(K, 2)
- 
+
 *      Y error.
          IF (YERROR) THEN
             ER1(K) = YR(K)+SNGL(IPARRAY(K, 3))

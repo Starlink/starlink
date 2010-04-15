@@ -14,9 +14,9 @@
 *                   displayed.  Set by IGREY or similar.
 *     (>) PGENVARG  (Numeric array) The argument list for PGENV that was
 *                   used in displaying the image.
-*     (<) XPIXELS   (Numeric) The pixel numbers in X for the 
+*     (<) XPIXELS   (Numeric) The pixel numbers in X for the
 *                   points indicated by the cursor.
-*     (<) YPIXELS   (Numeric) The pixel numbers in Y for the 
+*     (<) YPIXELS   (Numeric) The pixel numbers in Y for the
 *                   points indicated by the cursor.
 *     (<) NPIXELS   (Numeric) The number of points selected by
 *                   the cursor.  Note: if no points are selected,
@@ -33,8 +33,8 @@
 *                  TVPCKG that supports these), so no longer assumes
 *                  display is 512 by 512. KS/AAO.
 *     05 Feb 1991  Now handles the display parameters as set in IMARRAY
-*                  by the latest version of IMAGE, which is not as 
-*                  limited in the stretching it can apply to an image 
+*                  by the latest version of IMAGE, which is not as
+*                  limited in the stretching it can apply to an image
 *                  to fit it onto the display. KS/AAO.
 *     16 Nov 1992  HME / UoE, Starlink.  Adapted and simplified from
 *                  ICUR: Use PGCURSE for input and terminal for output.
@@ -70,7 +70,7 @@
       INTEGER   IYEN             !
       INTEGER   IYST             !
       INTEGER   NDELM            ! Total number of elements in the data
-      INTEGER   NDIM             ! Dimensionality of input data 
+      INTEGER   NDIM             ! Dimensionality of input data
                                  ! structure
       INTEGER   NPIX             !
       INTEGER   STAT1            !

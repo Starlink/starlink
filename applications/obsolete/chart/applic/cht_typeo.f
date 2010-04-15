@@ -24,7 +24,7 @@
 *     formatted listing to the terminal.
 
 *  Usage:
-*     TYPEO 
+*     TYPEO
 
 *  [ADAM_parameters]
 *  [examples]
@@ -65,14 +65,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CHT_ERR'          ! Chart error constants
-                                
+
 *  Global Variables:
       INCLUDE 'MAIN'             ! Main CHART common block
 *        {descriptions_of_global_variables_referenced}...
@@ -115,7 +115,7 @@
          CALL TTYHDNG( RESPONSE, STATUS )
          IF ( .NOT. RESPONSE ) GOTO 501 ! Fall thru if user responds NO
          CALL CONST( AO, DO , STATUS )
-         CALL TTYOUT( RESPONSE, STATUS ) 
+         CALL TTYOUT( RESPONSE, STATUS )
          IF ( .NOT. RESPONSE ) GOTO 501 ! Fall thru if user responds NO
          GO TO 100
   800 CONTINUE
@@ -132,7 +132,7 @@
       END IF
 
  501  CONTINUE
-      
+
       END
 
 

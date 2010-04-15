@@ -18,7 +18,7 @@
 *  Description:
 *     Obtains the value of the named d-task parameter.  If the parameter
 *     does not exist, an appropriate status is returned.
-*     Sends acknowledgment containing the parameter value to the 
+*     Sends acknowledgment containing the parameter value to the
 *     requesting task.
 
 *  Arguments:
@@ -31,14 +31,14 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Stop the parameter system prompting by disabling its 
-*     communications. Ask the parameter system for the value as a 
-*     character string scalar, then re-enable the communications. 
+*     Stop the parameter system prompting by disabling its
+*     communications. Ask the parameter system for the value as a
+*     character string scalar, then re-enable the communications.
 *     Finally, close the transaction.
 
 *  Implementation Deficiencies:
-*     Disabling and enabling communications is a frig to allow PAR_GET0C 
-*     to be used. The parameter system does not provide a call to carry 
+*     Disabling and enabling communications is a frig to allow PAR_GET0C
+*     to be used. The parameter system does not provide a call to carry
 *     out the GET context properly.
 
 *  Copyright:
@@ -78,7 +78,7 @@
 *     17-JAN-1990 (RLVAD::AJC):
 *        Increase VALUE 80 -> 132 characters
 *     15-JAN-1991: handle monoliths - checking if task is
-*                  monolith 
+*                  monolith
 *                  Also clear value initially (RLVAD::AJC)
 *     25-APR-1991 (REVAD::BDK):
 *        Revise INCLUDE files
@@ -129,7 +129,7 @@
       INTEGER CHR_LEN
 *  Local Variables:
       INTEGER COLPOS                ! position of ':' in NAME
-      INTEGER ACODE                 ! action pointer (returned by FINDACT 
+      INTEGER ACODE                 ! action pointer (returned by FINDACT
                                     ! but not used)
       LOGICAL MONO                  ! if the task is a monolith
       CHARACTER*(MESSYS__VAL_LEN) VALUE ! value obtained
@@ -140,7 +140,7 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-*   If this is a monolith, the name must include the keyword of the 
+*   If this is a monolith, the name must include the keyword of the
 *   relevant action within the monolith in the form KEY:PARNAME.
 *   If not a monolith this form is optional, any KEY part will be ignored.
 *

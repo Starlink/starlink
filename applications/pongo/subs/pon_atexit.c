@@ -26,7 +26,7 @@
 
 extern F77_SUBROUTINE(pon_exit)();
 
-void ponExit() 
+void ponExit()
 {
   F77_CALL(pon_exit)();
 }

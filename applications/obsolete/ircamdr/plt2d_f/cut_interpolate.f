@@ -1,21 +1,21 @@
-	SUBROUTINE CUT_INTERPOLATE( NPTS, MAXP, LINDAT, LINE, NX, NY, 
+	SUBROUTINE CUT_INTERPOLATE( NPTS, MAXP, LINDAT, LINE, NX, NY,
      :	                            DATAARRAY, STATUS)
 
 	IMPLICIT NONE
 
-	INTEGER 
-     :	  NPTS, 
-     :	  NX, 
-     :	  NY, 
-     :	  IX1, 
-     :	  IY1, 
-     :	  IX2, 
-     :	  IY2, 
+	INTEGER
+     :	  NPTS,
+     :	  NX,
+     :	  NY,
+     :	  IX1,
+     :	  IY1,
+     :	  IX2,
+     :	  IY2,
      :	  MAXP,
      :	  STATUS,
      :	  I
 
-	REAL 
+	REAL
      :	  LINDAT( MAXP, 2),
      :	  LINE( MAXP),
      :	  DATAARRAY( NX, NY),

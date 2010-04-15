@@ -16,7 +16,7 @@
 
       INCLUDE 'SAE_PAR'
 
-      
+
       INTEGER ISTAT
       LOGICAL TERM
 

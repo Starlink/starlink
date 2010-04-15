@@ -27,10 +27,10 @@
 *     PARAM = CHARACTER*(*) (Given)
 *        The parameter with which to associate the group expression.
 *     VERB = LOGICAL (Given)
-*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        If TRUE then errors which occur whilst accessing supplied catalogues
 *        are flushed so that the user can see them before re-prompting for
-*        a new catalogue (`verbose' mode). Otherwise, they are annulled and 
-*        a general "Cannot access file xyz" message is displayed before 
+*        a new catalogue (`verbose' mode). Otherwise, they are annulled and
+*        a general "Cannot access file xyz" message is displayed before
 *        re-prompting.
 *     IGRP = INTEGER (Given and Returned)
 *        The identifier of the group in which the catalogue names are to be
@@ -54,12 +54,12 @@
 *     escaped using a backslash "\" to avoid them being interpreted as
 *     GRP editing characters).
 *
-*     - Only the highest priority file with any give file name is included 
-*     in the returned group. The priority of a file is determined by its 
-*     file type. Priority decreases along the following list of file 
+*     - Only the highest priority file with any give file name is included
+*     in the returned group. The priority of a file is determined by its
+*     file type. Priority decreases along the following list of file
 *     types: .FIT, .fit, .FITS, .fits, .GSC, .gsc, .TXT, .txt, .Txt, .sdf.
-*     If no file type is given by the user, the highest priority available 
-*     file type is used. If an explicit file type is given, then that file 
+*     If no file type is given by the user, the highest priority available
+*     file type is used. If an explicit file type is given, then that file
 *     type is used.
 *
 *     - Names of catalogues stored in FITS format may include an FITS
@@ -114,12 +114,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -157,7 +157,7 @@
 
 *  Arguments Given and Returned:
       INTEGER   IGRP
-      
+
 *  Arguments Returned:
       INTEGER   SIZE
       LOGICAL   FLAG
@@ -219,12 +219,12 @@
          GRPEXP( LAST : LAST ) = ' '
       END IF
 
-*  If the last character is a colon remove it and set a flag 
-*  indicating that the names are to be listed but not included in the 
+*  If the last character is a colon remove it and set a flag
+*  indicating that the names are to be listed but not included in the
 *  returned group.
       CALL CHR_FANDL( GRPEXP, FIRST, LAST )
       IF( GRPEXP( LAST : LAST ) .EQ. ':' ) THEN
-         LIST = .TRUE.      
+         LIST = .TRUE.
          GRPEXP( LAST : LAST ) = ' '
       ELSE
          LIST = .FALSE.
@@ -234,7 +234,7 @@
 *  them to the end of the specified group.
       CALL CTG1_ASEXP( GRPEXP, VERB, IGRP2, IGRP, SIZE, FLAG, STATUS )
 
-*  If some of the files were not valid catalogues, FLUSH OR annul the error 
+*  If some of the files were not valid catalogues, FLUSH OR annul the error
 *  and then re-report a more friendly message for each bad catalogue.
       IF( STATUS .EQ. CTG__NOFIL ) THEN
          IF( VERB ) THEN
@@ -243,7 +243,7 @@
             CALL ERR_ANNUL( STATUS )
          END IF
 
-*  Set up a temporary bad inherited status which can be passed to 
+*  Set up a temporary bad inherited status which can be passed to
 *  ERR_REP.
          ISTAT = SAI__ERROR
 
@@ -261,7 +261,7 @@
 
 *  Report it, using the temporary (bad) inherited status.
             CALL MSG_SETC( 'CAT', STRING )
-            CALL ERR_REP( 'CTG_ASSOC_ERR1', '  Cannot access ^CAT', 
+            CALL ERR_REP( 'CTG_ASSOC_ERR1', '  Cannot access ^CAT',
      :                    ISTAT )
 
          END DO
@@ -280,7 +280,7 @@
 *  Indicate that the user should be re-prompted.
          AGAIN = .TRUE.
 
-*  If there was something wrong with the format of the supplied group 
+*  If there was something wrong with the format of the supplied group
 *  expression, indicate that the user is to re-prompted.
       ELSE IF( STATUS .EQ. GRP__BADME .OR.
      :         STATUS .EQ. GRP__DEEP .OR.
@@ -289,8 +289,8 @@
          AGAIN = .TRUE.
 
 *  If all went well, but the group expression ended in a colon,
-*  list the new names added to the group, and indicate that a new 
-*  group is required. Flush each report individually to avoid the 
+*  list the new names added to the group, and indicate that a new
+*  group is required. Flush each report individually to avoid the
 *  possibilioty of the EMS stack overflowing if many catalogues have
 *  been specified.
       ELSE IF( LIST .AND. STATUS .EQ. SAI__OK ) THEN
@@ -324,7 +324,7 @@
       END IF
 
 *  If the user is to be re-prompted...
-      IF( AGAIN ) THEN      
+      IF( AGAIN ) THEN
 
 *  Ask the user to give a new parameter value.
          CALL MSG_SETC( 'P', PARAM )
@@ -355,7 +355,7 @@
       CALL GRP_DELET( IGRP2, STATUS )
 
 *  If a null parameter value was given, annul the error. If no catalogues
-*  have been added to the group re-report it with a more friendly 
+*  have been added to the group re-report it with a more friendly
 *  message.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -363,9 +363,9 @@
             STATUS = PAR__NULL
             CALL MSG_SETC( 'P', PARAM )
             CALL ERR_REP( 'CTG_ASSOC_ERR3', 'A null group of '//
-     :                    'catalogues was given for parameter %^P.', 
+     :                    'catalogues was given for parameter %^P.',
      :                    STATUS )
-         END IF         
+         END IF
 
 *  If the parameter request was aborted, annul the error and re-report
 *  it with a more friendly message.

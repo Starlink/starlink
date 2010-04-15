@@ -1,5 +1,5 @@
 *+  SQSHX - squashes the input array into the output array in the X-direction
-      SUBROUTINE SQSHX( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+      SUBROUTINE SQSHX( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :                  XPIX, XWT, STATUS )
 *    Description :
 *     The input array, ARRIN, is squashed in the X ( first dimension )

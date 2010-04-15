@@ -1,13 +1,13 @@
- 
+
 
       SUBROUTINE ELF1_SOLVE(NP,XV,YV,S,C,STATUS)
 *+
-*  Name: 
+*  Name:
 *     ELF1_SOLVE
- 
+
 *  Purpose:
 *     To look at the variation in brightness around the ellipse
-*     chosen and see what SIN and COS factors are present.     
+*     chosen and see what SIN and COS factors are present.
 *
 *     The method used is a crude matrix inversion.
 *
@@ -15,15 +15,15 @@
 *     The current (JAN 1997) version of PDA_DBOLS falls over in some
 *     instances if no compiled with an FFLAG of -check nobounds
 *
-*     This method is slow but stable so it is necessary to cut down the 
+*     This method is slow but stable so it is necessary to cut down the
 *     number of points used when it exceeds 90.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL ELF1_SOLVE(NP,XV,YV,S,C,STATUS)
- 
+
 *  Arguments:
 *     NP = INTEGER (Given)
 *        The number of pixels that have an associated brightness.
@@ -35,18 +35,18 @@
 *        The SINE function amplitude.
 *     C = DOUBLE PRECISION (Returned)
 *        The COSINE function amplitude.
-*     STATUS = INTEGER (Given and Returned) 
-*        The global status.     
- 
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+
 *  History:
 *     2-May-1996
 *     (Original version)
 *     26-Jan-1997
-*     Modified to improve speed and robustness. 
- 
+*     Modified to improve speed and robustness.
+
 *  Notes:
 *     This routine is not documented and is only to be used until
 *     the PDA library has been modified or recompiled so that
@@ -54,33 +54,33 @@
 *     bounds error.
 *
 *     This routine was required quickly for an emergency bug fix.
- 
+
 *  Bugs:
 *     None known.
- 
+
 *-
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
+
 *  Arguments Given:
       INTEGER NP                      ! Number of data points
       DOUBLE PRECISION XV(500)        ! Angle values
       DOUBLE PRECISION YV(500)        ! Brightness values
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION C              ! Cosine function amplitude
       DOUBLE PRECISION S              ! Sine function amplitude
- 
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
- 
-*  Local variables:                 
+
+*  Local variables:
       DOUBLE PRECISION CO
-      DOUBLE PRECISION D     
+      DOUBLE PRECISION D
       DOUBLE PRECISION H(500)
       DOUBLE PRECISION K2
       DOUBLE PRECISION P(3)
@@ -105,14 +105,14 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-  
+
 *   Number of variables (ie sine and cosine and a constant).
       M=2
- 
+
       N=NP
-      DO WHILE (N.GT.90) 
- 
-*      Average two points (done in sets of 4 since data is organised 
+      DO WHILE (N.GT.90)
+
+*      Average two points (done in sets of 4 since data is organised
 *      so that sets of 4 points are all from different quadrants).
          J=1
          DO 10 I=1,N-6,8
@@ -121,36 +121,36 @@
                YV2(J)=(YV(I+K)+YV(I+K+4))/2.
                J=J+1
  12         CONTINUE
- 10      CONTINUE         
- 
+ 10      CONTINUE
+
 *      Modify the number of points available.
          N=J
- 
+
 *      Put results back into the source array.
          DO 11 I=1,N
             XV(I)=XV2(I)
             YV(I)=YV2(I)
- 11      CONTINUE         
-       
+ 11      CONTINUE
+
       END DO
-     
+
 *   Set double precision zero.
       ZERO=0.D0
- 
+
 *   Preparing the input arrays.,
       DO 200 I = 1,N
          H(I) =   YV(I)
          X(I,1) = SIN(XV(I))
          X(I,2) = COS(XV(I))
  200  CONTINUE
- 
+
 *   Starting to process.
       DO 300 J = 1,M
         DO 400 I = 1,N
           W(J, I) = X(I, J)
  400    CONTINUE
  300  CONTINUE
- 
+
       K2 = ZERO
       DO 500 J = 1,N
         DO 600 I = 1,N
@@ -162,20 +162,20 @@
  600    CONTINUE
  500  CONTINUE
       K2 = 1.0D0 / K2
- 
+
 *   Threshold value.
       D =1.D-3
-     
+
       DO 800 J = 1,N
         DO 900 I = 1,M
           Y(I, J) = K2 * W(I, J)
  900    CONTINUE
  800  CONTINUE
- 
-*   Cycle around until we get the right threshold.      
+
+*   Cycle around until we get the right threshold.
       X1=D*2.
       DO WHILE (X1.GT.D)
-         
+
          DO 1000 I = 1,N
            DO 1100 J = 1,N
              Z(I, J) = ZERO
@@ -184,7 +184,7 @@
  1200        CONTINUE
  1100      CONTINUE
  1000    CONTINUE
- 
+
 *      Reset the array trace.
          TRACE = ZERO
          CO = 2.0D0
@@ -192,7 +192,7 @@
            Z(I, I) = Z(I, I) - CO
            TRACE = TRACE + Z(I, I)
  1300    CONTINUE
-     
+
          DO 1400 J = 1,N
            DO 1500 I = 1,M
              W(I, J) = ZERO
@@ -201,27 +201,27 @@
  1600        CONTINUE
  1500      CONTINUE
  1400    CONTINUE
- 
+
          DO 1700 J = 1,N
            DO 1800 I = 1,M
              Y(I, J) = -W(I, J)
  1800      CONTINUE
  1700    CONTINUE
- 
+
 *      Consider the residuals.
          X1 = ABS(TRACE - INT(TRACE) - 1)
          X2 = ABS(TRACE - INT(TRACE))
-         IF (X2.LT.X1) THEN 
+         IF (X2.LT.X1) THEN
             TEMP=X1
             X1=X2
             X2=TEMP
          END IF
- 
+
 *      Increment threshold to avoid getting stuck.
          D=D+1.D-4
-     
+
       END DO
- 
+
 *   Generate the output parameters.
       DO 1900 I = 1,M
         P(I) = ZERO
@@ -229,25 +229,25 @@
           P(I) = P(I) + Y(I, J) * H(J)
  2000   CONTINUE
  1900 CONTINUE
- 
+
 *   Assign the parameters.
       S=P(1)
       C=P(2)
- 
+
  9999 CONTINUE
- 
-      END 
- 
+
+      END
+
 
 
       SUBROUTINE ELP1_SOLVE(NP,XV,YV,S,C,STATUS)
 *+
-*  Name: 
+*  Name:
 *     ELP1_SOLVE
- 
+
 *  Purpose:
 *     To look at the variation in brightness around the ellipse
-*     chosen and see what SIN and COS factors are present.     
+*     chosen and see what SIN and COS factors are present.
 *
 *     The method used is a crude matrix inversion.
 *
@@ -255,15 +255,15 @@
 *     The current (JAN 1997) version of PDA_DBOLS falls over in some
 *     instances if no compiled with an FFLAG of -check nobounds
 *
-*     This method is slow but stable so it is necessary to cut down the 
+*     This method is slow but stable so it is necessary to cut down the
 *     number of points used when it exceeds 90.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL ELP1_SOLVE(NP,XV,YV,S,C,STATUS)
- 
+
 *  Arguments:
 *     NP = INTEGER (Given)
 *        The number of pixels that have an associated brightness.
@@ -275,17 +275,17 @@
 *        The SINE function amplitude.
 *     C = DOUBLE PRECISION (Returned)
 *        The COSINE function amplitude.
-*     STATUS = INTEGER (Given and Returned) 
-*        The global status.     
- 
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+
 *  History:
 *     2-May-1996
 *     (Original version)
 *     26-Jan-1997
-*     Modified to improve speed and robustness. 
+*     Modified to improve speed and robustness.
 
 *  Notes:
 *     This routine is not documented and is only to be used until
@@ -294,32 +294,32 @@
 *     bounds error.
 *
 *     This routine was required quickly for an emergency bug fix.
- 
+
 *  Bugs:
 *     None known.
- 
+
 *-
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-                     
+
 *  Arguments Given:
       INTEGER NP                      ! Number of data points
       DOUBLE PRECISION XV(500)        ! Angle values
       DOUBLE PRECISION YV(500)        ! Brightness values
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION C              ! Cosine function amplitude
       DOUBLE PRECISION S              ! Sine function amplitude
- 
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
- 
-*  Local variables:                 
+
+*  Local variables:
       DOUBLE PRECISION CO
-      DOUBLE PRECISION D     
+      DOUBLE PRECISION D
       DOUBLE PRECISION H(500)
       DOUBLE PRECISION K2
       DOUBLE PRECISION P(3)
@@ -341,17 +341,17 @@
       INTEGER M                       ! Number of variables
       INTEGER N                       ! Number of points used
 *.
- 
+
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-  
+
 *   Number of variables (ie sine and cosine and a constant).
       M=2
 
       N=NP
-      DO WHILE (N.GT.90) 
+      DO WHILE (N.GT.90)
 
-*      Average two points (done in sets of 4 since data is organised 
+*      Average two points (done in sets of 4 since data is organised
 *      so that sets of 4 points are all from different quadrants).
          J=1
          DO 10 I=1,N-6,8
@@ -360,7 +360,7 @@
                YV2(J)=(YV(I+K)+YV(I+K+4))/2.
                J=J+1
  12         CONTINUE
- 10      CONTINUE         
+ 10      CONTINUE
 
 *      Modify the number of points available.
          N=J
@@ -369,27 +369,27 @@
          DO 11 I=1,N
             XV(I)=XV2(I)
             YV(I)=YV2(I)
- 11      CONTINUE         
-       
+ 11      CONTINUE
+
       END DO
-     
+
 *   Set double precision zero.
       ZERO=0.D0
- 
+
 *   Preparing the input arrays.,
       DO 200 I = 1,N
          H(I) =   YV(I)
          X(I,1) = SIN(XV(I))
          X(I,2) = COS(XV(I))
  200  CONTINUE
- 
+
 *   Starting to process.
       DO 300 J = 1,M
         DO 400 I = 1,N
           W(J, I) = X(I, J)
  400    CONTINUE
  300  CONTINUE
- 
+
       K2 = ZERO
       DO 500 J = 1,N
         DO 600 I = 1,N
@@ -401,20 +401,20 @@
  600    CONTINUE
  500  CONTINUE
       K2 = 1.0D0 / K2
- 
+
 *   Threshold value.
       D =1.D-3
-     
+
       DO 800 J = 1,N
         DO 900 I = 1,M
           Y(I, J) = K2 * W(I, J)
  900    CONTINUE
  800  CONTINUE
- 
-*   Cycle around until we get the right threshold.      
+
+*   Cycle around until we get the right threshold.
       X1=D*2.
       DO WHILE (X1.GT.D)
-         
+
          DO 1000 I = 1,N
            DO 1100 J = 1,N
              Z(I, J) = ZERO
@@ -423,7 +423,7 @@
  1200        CONTINUE
  1100      CONTINUE
  1000    CONTINUE
- 
+
 *      Reset the array trace.
          TRACE = ZERO
          CO = 2.0D0
@@ -431,7 +431,7 @@
            Z(I, I) = Z(I, I) - CO
            TRACE = TRACE + Z(I, I)
  1300    CONTINUE
-     
+
          DO 1400 J = 1,N
            DO 1500 I = 1,M
              W(I, J) = ZERO
@@ -440,27 +440,27 @@
  1600        CONTINUE
  1500      CONTINUE
  1400    CONTINUE
- 
+
          DO 1700 J = 1,N
            DO 1800 I = 1,M
              Y(I, J) = -W(I, J)
  1800      CONTINUE
  1700    CONTINUE
- 
+
 *      Consider the residuals.
          X1 = ABS(TRACE - INT(TRACE) - 1)
          X2 = ABS(TRACE - INT(TRACE))
-         IF (X2.LT.X1) THEN 
+         IF (X2.LT.X1) THEN
             TEMP=X1
             X1=X2
             X2=TEMP
          END IF
- 
+
 *      Increment threshold to avoid getting stuck.
          D=D+1.D-4
-     
+
       END DO
- 
+
 *   Generate the output parameters.
       DO 1900 I = 1,M
         P(I) = ZERO
@@ -468,11 +468,11 @@
           P(I) = P(I) + Y(I, J) * H(J)
  2000   CONTINUE
  1900 CONTINUE
- 
+
 *   Assign the parameters.
       S=P(1)
       C=P(2)
- 
+
  9999 CONTINUE
- 
-      END 
+
+      END

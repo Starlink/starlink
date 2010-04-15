@@ -1,6 +1,6 @@
-       SUBROUTINE RESSTK( COMM, INDF, STKSZE, BSTSZE, MAXSTK, NONSTK, 
-     :                    XSTACK, YSTACK, BSTACK, BSTNPT, POINTR, 
-     :                    STKNPT, BPOINT, STITLE, WORVST, STKLST, 
+       SUBROUTINE RESSTK( COMM, INDF, STKSZE, BSTSZE, MAXSTK, NONSTK,
+     :                    XSTACK, YSTACK, BSTACK, BSTNPT, POINTR,
+     :                    STKNPT, BPOINT, STITLE, WORVST, STKLST,
      :                    BSTLST, STATUS )
 *+
 *  Name:
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL RESSTK( COMM, INDF, STKSZE, BSTSZE, MAXSTK, NONSTK, XSTACK, 
-*                  YSTACK, BSTACK, BSTNPT, POINTR, STKNPT, BPOINT, 
+*     CALL RESSTK( COMM, INDF, STKSZE, BSTSZE, MAXSTK, NONSTK, XSTACK,
+*                  YSTACK, BSTACK, BSTNPT, POINTR, STKNPT, BPOINT,
 *                  STITLE, WORVST, STKLST, BSTLST, STATUS )
 
 *  Description:
@@ -26,12 +26,12 @@
 *     entries have been restored, but no error is flagged.
 *
 *     The arrays in common can be divided into two types; those which
-*     hold information describing the properties of each stack entry, and 
+*     hold information describing the properties of each stack entry, and
 *     those which hold the data which constitutes the stack entry. The
 *     former type have a size of MAXSTK and are indexed using the stack
 *     entry number. Each element holds a scalar value descring some
 *     property of the corresponding stack entry (such as the number of
-*     data elements). The data for each stack entry (X, Y and break data) 
+*     data elements). The data for each stack entry (X, Y and break data)
 *     is stored sequentially in very long, one dimensional arrays (one
 *     for X, one for Y and one for break data). Data for each new stack
 *     entry is stored at the end of these 1-d arrays, and pointers to the first
@@ -42,27 +42,27 @@
 *        The command name.
 *     INDF = INTEGER (Given)
 *        NDF identifier.
-*     STKSZE = INTEGER (Given)  
+*     STKSZE = INTEGER (Given)
 *        The size of the XSTACK and YSTACK arrays.
-*     BSTSZE = INTEGER (Given)  
+*     BSTSZE = INTEGER (Given)
 *        The size of the BSTACK array.
 *     MAXSTK = INTEGER (Given)
 *        The maximum number of stack entries.
-*     NONSTK = INTEGER (Given and Returned)  
+*     NONSTK = INTEGER (Given and Returned)
 *        The current number of stack entries.
-*     XSTACK( STKSZE ) = REAL (Given and Returned) 
+*     XSTACK( STKSZE ) = REAL (Given and Returned)
 *        An array holding the X values for all the stack entries.
-*     YSTACK( STKSZE ) = REAL (Given and Returned) 
+*     YSTACK( STKSZE ) = REAL (Given and Returned)
 *        An array holding the Y values for all the stack entries.
-*     BSTACK( BSTSZE ) = REAL (Given and Returned) 
+*     BSTACK( BSTSZE ) = REAL (Given and Returned)
 *        An array holding the break points for all the stack entries.
 *     BSTNPT( MAXSTK ) = INTEGER (Given and Returned)
 *        The number of breaks in each stack entry.
-*     POINTR( MAXSTK ) = INTEGER (Given and Returned)  
+*     POINTR( MAXSTK ) = INTEGER (Given and Returned)
 *        The XSTACK indices corresponding to the start of each stack entry.
-*     STKNPT( MAXSTK ) = INTEGER (Given and Returned)  
+*     STKNPT( MAXSTK ) = INTEGER (Given and Returned)
 *        The numbers of points in each stack entry.
-*     BPOINT( MAXSTK ) = INTEGER (Given and Returned)  
+*     BPOINT( MAXSTK ) = INTEGER (Given and Returned)
 *        The BSTACK indices corresponding to the first break for each
 *        stack entry.
 *     STITLE( MAXSTK ) = CHARACTER* ( * ) (Given and Returned)
@@ -71,12 +71,12 @@
 *        The WORV value for each stack entry.
 *     STKLST = INTEGER (Given and Returned)
 *        The index of the last used element in XSTACK.
-*     BSTLST = INTEGER (Given and Returned) 
+*     BSTLST = INTEGER (Given and Returned)
 *        The index of the last used element in BSTACK.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status.
 
-*  Authors: 
+*  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
 
@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -108,31 +108,31 @@
       INTEGER MAXSTK
 
 *  Arguments Given and Returned:
-      INTEGER NONSTK 
-      REAL XSTACK( STKSZE ) 
-      REAL YSTACK( STKSZE ) 
-      INTEGER BSTACK( BSTSZE ) 
-      INTEGER BSTNPT( MAXSTK ) 
-      INTEGER POINTR( MAXSTK ) 
-      INTEGER STKNPT( MAXSTK ) 
-      INTEGER BPOINT( MAXSTK ) 
+      INTEGER NONSTK
+      REAL XSTACK( STKSZE )
+      REAL YSTACK( STKSZE )
+      INTEGER BSTACK( BSTSZE )
+      INTEGER BSTNPT( MAXSTK )
+      INTEGER POINTR( MAXSTK )
+      INTEGER STKNPT( MAXSTK )
+      INTEGER BPOINT( MAXSTK )
       CHARACTER STITLE( MAXSTK )*(*)
-      REAL WORVST( MAXSTK ) 
-      INTEGER STKLST 
-      INTEGER BSTLST 
+      REAL WORVST( MAXSTK )
+      INTEGER STKLST
+      INTEGER BSTLST
 
 *  Status Argument:
-      INTEGER STATUS 
+      INTEGER STATUS
 
 *  Local Variables:
-      CHARACTER 
+      CHARACTER
      :        LOC*(DAT__SZLOC),         ! Locator to a single cell
      :        ROOT*9,                   ! Root of stack array names
      :        TLOC*(DAT__SZLOC),        ! Locator to TITLES array
      :        WLOC*(DAT__SZLOC),        ! Locator to WORVST array
      :        XLOC*(DAT__SZLOC)         ! Locator to DIPSO_EXTRA extension
 
-      INTEGER 
+      INTEGER
      :        IERR,                     ! Index of first conversion error
      :        IPB,                      ! Pointer to mapped break array
      :        IPX,                      ! Pointer to mapped X array
@@ -233,7 +233,7 @@
 
             GO TO 999
 
-         END IF            
+         END IF
 
 *  Map the array containing the Y values for the stack entry.
          CALL CMP_MAPN( XLOC, ROOT//'_Y', '_REAL', 'READ', 1, IPY,
@@ -259,17 +259,17 @@
 
             GO TO 999
 
-         END IF            
+         END IF
 
 *  Copy them to the returned arrays.
          IF( STATUS .EQ. SAI__OK ) THEN
-            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ), 
+            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ),
      :                     %VAL( CNF_PVAL( IPX ) ),
      :                     XSTACK( STKLST + 1 ), IERR, NERR, STATUS )
-            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ), 
+            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ),
      :                     %VAL( CNF_PVAL( IPY ) ),
      :                     YSTACK( STKLST + 1 ), IERR, NERR, STATUS )
-            CALL VEC_ITOI( .FALSE., BSTNPT( NONSTK ), 
+            CALL VEC_ITOI( .FALSE., BSTNPT( NONSTK ),
      :                     %VAL( CNF_PVAL( IPB ) ),
      :                     BSTACK( BSTLST + 1 ), IERR, NERR, STATUS )
 
@@ -283,7 +283,7 @@
 
          END IF
 
-*  Unmap the mapped arrays.                                     
+*  Unmap the mapped arrays.
          CALL CMP_UNMAP( XLOC, ROOT//'_X', STATUS )
          CALL CMP_UNMAP( XLOC, ROOT//'_Y', STATUS )
          CALL CMP_UNMAP( XLOC, ROOT//'_B', STATUS )

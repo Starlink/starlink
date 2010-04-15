@@ -2,13 +2,13 @@
  *+
  *  Name:
  *     hdrInL
- 
+
  *  Purpose:
  *     Reads "logical" header items.
- 
+
  *  Language:
  *     ANSI C
- 
+
  *  Invocation:
  *     hdrInL( param,
  *             xname,
@@ -16,12 +16,12 @@
  *             comp,
  *             value,
  *             status )
- 
+
  *  Description:
  *     This C function sets up the required arguments and calls the
  *     Fortran subroutine hdr_inl.
  *     On return, values are converted back to C form if necessary.
- 
+
  *  Arguments:
  *     param = char * (Given)
  *        Parameter name of the image (case insensitive).
@@ -37,7 +37,7 @@
  *        The values. These are  unmodified if the item doesn't exist.
  *     status = int * (Given and Returned)
  *        The global status.
- 
+
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,14 +63,14 @@
  *     Fortran source of hdr_inl by the Perl script fcwrap.
  *     PDRAPER: Peter W. Draper (STARLINK - Durham University)
  *     {enter_new_authors_here}
- 
+
  *  History:
  *     17-May-1996 (fcwrap):
  *        Original version
  *     22-May-1996 (PDRAPER):
  *        Converted to return an array of values.
  *     {enter_changes_here}
- 
+
  *-
  */
 #include <string.h>
@@ -96,7 +96,7 @@ void hdrInL( char *param,
              int comp,
              int *value,
              int *status ) {
-  
+
   DECLARE_CHARACTER_DYN(fparam);
   DECLARE_CHARACTER_DYN(fxname);
   DECLARE_CHARACTER_DYN(fitem);
@@ -109,7 +109,7 @@ void hdrInL( char *param,
       array of the correct size */
   nparam = img1CountParams( param, status );
   fvalue = (F77_LOGICAL_TYPE *) malloc( nparam * sizeof(F77_LOGICAL_TYPE) );
-  
+
   F77_CREATE_CHARACTER(fparam,strlen( param ));
   cnf_exprt( param, fparam, fparam_length );
   F77_CREATE_CHARACTER(fxname,strlen( xname ));
@@ -126,15 +126,15 @@ void hdrInL( char *param,
                      TRAIL_ARG(fparam)
                      TRAIL_ARG(fxname)
                      TRAIL_ARG(fitem) );
-  
+
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);
   F77_FREE_CHARACTER(fitem);
-  
+
   /*  Convert the return values into C logical values */
   if ( *status == SAI__OK ) {
     for ( i = 0; i < nparam; i++ ) {
-        if ( F77_ISFALSE( fvalue[i] ) ) { 
+        if ( F77_ISFALSE( fvalue[i] ) ) {
         value[i] = 0;
       } else {
         value[i] = 1;
@@ -142,7 +142,7 @@ void hdrInL( char *param,
     }
   }
   free( fvalue );
-  
+
   return;
 }
 

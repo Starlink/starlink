@@ -30,7 +30,7 @@
 *     WORK2( NCRDDF, NITEM ) = DOUBLE PRECISION (Given and Returned)
 *        Extra work space.
 *     NUSED = INTEGER (Returned)
-*        The number of entries in the work array holding usable 
+*        The number of entries in the work array holding usable
 *        information.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
 
       START = 0
 
-*  Sort the data so that SOP numbers monotonically from low indices to 
+*  Sort the data so that SOP numbers monotonically from low indices to
 *  high indices.
       CALL IRM_SORTD( .TRUE., 7, NCRDDF, NITEM, WORK1, NUSED, STATUS )
 
@@ -96,11 +96,11 @@
 
 *  Loop round each NDF, looking for blocks of NDFs with the same SOP
 *  number. Such blocks are internally sorted by cross scan distance. The
-*  information for all NDFs in each of these blocks is stored in the 
+*  information for all NDFs in each of these blocks is stored in the
 *  second work array, WORK2.
       DO INDEX = 1, NUSED
 
-*  If the SOP for this NDF is different to the previous NDF, then the 
+*  If the SOP for this NDF is different to the previous NDF, then the
 *  block is complete.
          IF( NINT( WORK1( INDEX, 7 ) ) .NE. LSOP ) THEN
 
@@ -114,7 +114,7 @@
                END DO
 
 *  Now sort them.
-               CALL IRM_SORTD( .TRUE., 2, NCRDDF, NITEM, WORK2, NSCANS, 
+               CALL IRM_SORTD( .TRUE., 2, NCRDDF, NITEM, WORK2, NSCANS,
      :                         STATUS )
 
 *  Copy the sorted values back to WORK1.
@@ -130,7 +130,7 @@
 *  of the first NDF to the current index.
             NSCANS = 0
             START = INDEX
-   
+
 *  Save the current SOP number.
             LSOP = NINT( WORK1( INDEX, 7 ) )
 
@@ -140,12 +140,12 @@
          NSCANS = NSCANS + 1
 
 *  Record the data for this NDF in WORK2.
-         DO ITEM = 1, NITEM 
+         DO ITEM = 1, NITEM
             WORK2( NSCANS, ITEM ) = WORK1( INDEX, ITEM )
          END DO
 
       END DO
 
 *  Finish
-      
+
       END

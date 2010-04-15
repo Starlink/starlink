@@ -318,7 +318,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       set renderer_ [::vtkRenderer New]
       $renwindow_ AddRenderer $renderer_
 
-      #  Lights for the scene, do this early so we don't get the default 
+      #  Lights for the scene, do this early so we don't get the default
       #  lighting as well.
       add_lightkit_
 

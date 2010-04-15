@@ -12,18 +12,18 @@ C
 C     SCROSS uses the Fourier cross-correlation technique, which is
 C     described in, for example:
 C
-C       R. W. Hunstead, 1980, Proc. Astron. Soc. Australia, vol. 4, 
+C       R. W. Hunstead, 1980, Proc. Astron. Soc. Australia, vol. 4,
 C       no. 1, pp. 77-80.
 C
 C       J. Tonry and M. Davis, 1979, Astron. J, vol. 84, pp.1511-1525.
 C
-C     Command parameters - 
+C     Command parameters -
 C
 C     SPECTRUM    (Character) The spectrum to be compared with
-C                 a template spectrum.  
+C                 a template spectrum.
 C     TEMPLATE    (Character) The template spectrum to be used.
 C                 The two spectra should be the same length.
-C     XSTART      (Numeric) Data with an axis data value less than 
+C     XSTART      (Numeric) Data with an axis data value less than
 C                 XSTART will be ignored in the cross-correlation.
 C     XEND        (Numeric) Data with an axis centre value greater than
 C                 XEND will also be ignored.  Note that these values are
@@ -59,16 +59,16 @@ C     21st Nov 1988   JM / RAL. Modified to use DSA_ routines.
 C                     Dynamic memory handling changed to use
 C                     DYN_ routines
 C     23rd Aug 1990   KS / AAO. Minor tidying. Changed STATUS in
-C                     PAR_WRUSER calls to IGNORE, modified calculation 
+C                     PAR_WRUSER calls to IGNORE, modified calculation
 C                     of workspace pointers.
-C     16th Jan 1991   JMS / AAO. Included PAR_ABORT and STATUS checks 
+C     16th Jan 1991   JMS / AAO. Included PAR_ABORT and STATUS checks
 C                     for user-requested aborts.
-C     21st Jan 1991   JMS / AAO. Restricted maximum allowed dimensions 
+C     21st Jan 1991   JMS / AAO. Restricted maximum allowed dimensions
 C                     of data arrays to 1D.
-C     12th Feb. 1991  JMS / AAO. Included check to test that the data 
+C     12th Feb. 1991  JMS / AAO. Included check to test that the data
 C                     arrays of the two spectra match in size.
 C     13th Feb. 1991  JMS / AAO. Added an extra check to test that the
-C                     X-axes match. Now aborts if specified range is of 
+C                     X-axes match. Now aborts if specified range is of
 C                     zero length.
 C     14th Feb. 1991  JMS / AAO. Changed minimum range length to two
 C                     pixels.
@@ -78,7 +78,7 @@ C     23rd Sep. 1992  HME / UoE, Starlink.  INCLUDE changed. Call
 C                     PAR_WRUSER rather than DSA_WRUSER.
 C     21st Dec. 2000  ACD / UoE, Starlink.  Removed unused variable.
 C     21st Feb. 2001  ACD / UoE, Starlink.  Added an information/warning
-C                     message when fewer than 20 points are being 
+C                     message when fewer than 20 points are being
 C                     correlated.
 C     28th Sep. 2001  ACD / UoE, Starlink.  Changed the mapping of work
 C                     arrays from the `Figaro style' to the `Starlink
@@ -90,7 +90,7 @@ C     12th Sep. 2002  ACD / UoE, Starlink.  Added references to the
 C                     prologue comments.
 C     2005 May 31     MJC / Starlink Use CNF_PVAL for pointers to mapped
 C                     data.
-C     2005 June 10    MJC / Starlink Use %VAL(CNF_PVAL()) for pointers 
+C     2005 June 10    MJC / Starlink Use %VAL(CNF_PVAL()) for pointers
 C                     instead of DYNAMIC_MEM().
 C+
       IMPLICIT NONE
@@ -110,16 +110,16 @@ C
       INTEGER   BFLOAT           ! Number of bytes per floating-point
                                  ! number
       CHARACTER BUFFER*75        ! Output buffer for message
-      INTEGER   BUFLEN           ! Length of BUFFER (excl. trail. 
+      INTEGER   BUFLEN           ! Length of BUFFER (excl. trail.
                                  ! blanks)
       INTEGER   BYTES            ! Number of bytes
       REAL      CBPC             ! Cosine bell percentage coverage
-      LOGICAL   CFIT             ! If false, disables the usual 
+      LOGICAL   CFIT             ! If false, disables the usual
                                  ! continuum fit
       INTEGER   CFNPTR           ! Pointer to the correlation function
       INTEGER   CPTR             ! Dynamic memory pointer to CORRL data
       INTEGER   DIMS(1)          ! Accommodates data dimensions
-      INTEGER   FT0PTR           ! Pointer to the transform of first 
+      INTEGER   FT0PTR           ! Pointer to the transform of first
                                  ! data array
       INTEGER   FT1PTR           ! Pointer to the transform of
                                  ! second data array
@@ -130,16 +130,16 @@ C
       LOGICAL   ISNEW            ! Is address new to CNF?
       INTEGER   IXST             ! Pixel number associated with XSTART
       INTEGER   IXEN             ! Pixel number associated with XEND
-      INTEGER   KZ(4)            ! Defines the cosine bell used to 
+      INTEGER   KZ(4)            ! Defines the cosine bell used to
                                  ! filter the FTs
       INTEGER   NDIM             ! Number of dimensions in data
       INTEGER   NELM             ! Number of data elements in object
-      INTEGER   NEXT             ! Used in encoding STRING to report 
+      INTEGER   NEXT             ! Used in encoding STRING to report
                                  ! answer
-      LOGICAL   NORM             ! Cross-correlation fn. to be 
+      LOGICAL   NORM             ! Cross-correlation fn. to be
                                  ! normalised?
       INTEGER   NX0              ! Number of elements in the two spectra
-      INTEGER   NX               ! Either equal to NX or next highest 
+      INTEGER   NX               ! Either equal to NX or next highest
                                  ! power of 2
       INTEGER   NXCMP            ! No. of REAL elements in a COMPLEX
                                  ! array
@@ -155,8 +155,8 @@ C
       REAL      WIDTH            ! The width of the correlation function
       INTEGER   WPTR             ! Temporary pointer
       REAL      XEND             ! Last axis data value used
-      REAL      XSTART           ! First axis data value used 
-      REAL      ZPC              ! Percentage of spectrum covered at 
+      REAL      XSTART           ! First axis data value used
+      REAL      ZPC              ! Percentage of spectrum covered at
                                  ! each end by a cosine bell prior to
                                  ! fourier transformation
       INTEGER   XVPTR            ! Pointer to the work array
@@ -168,7 +168,7 @@ C
 C     Open DSA
 C
       CALL DSA_OPEN(STATUS)
-      IF(STATUS.NE.0)GOTO 500     
+      IF(STATUS.NE.0)GOTO 500
 C
 C     Get byte size for float and double precision numbers
 C
@@ -176,7 +176,7 @@ C
       BDOUB=DSA_TYPESIZE('DOUBLE',STATUS)
 C
 C     Get the name of SPECTRUM and open the file
-C    
+C
       CALL DSA_INPUT('SPECT','SPECTRUM',STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
@@ -184,7 +184,7 @@ C     Ditto TEMPLATE
 C
       CALL DSA_INPUT('TEMPL','TEMPLATE',STATUS)
       IF(STATUS.NE.0)GOTO 500
-C     
+C
 C     Get sizes of both data arrays
 C
       CALL DSA_DATA_SIZE ('SPECT',1,NDIM,DIMS,NELM,STATUS)
@@ -201,7 +201,7 @@ C
 C
 C     Use the utility routine DSA_AXIS_RANGE to get XSTART and XEND, then reset
 C     NX0 to reflect the length of the spectrum to be actually used
-C       
+C
       CALL DSA_AXIS_RANGE('SPECT',1,' ',.FALSE.,XSTART,XEND,
      :                     IXST,IXEN,STATUS)
 C
@@ -277,7 +277,7 @@ C
       BYTES=BFLOAT*NX0
       CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(AR0PTR)))
       IF (ISNEW) CALL CNF_UNREGP(SPTR)
-C      
+C
       CALL DSA_MAP_DATA('TEMPL','READ','FLOAT',WPTR,SLOT,STATUS)
       CALL DYN_INCAD(WPTR,'FLOAT',IXST-1,TPTR,ISNEW,STATUS)
       IF(STATUS.NE.0)GOTO 500
@@ -329,7 +329,7 @@ C     Set the user variable SHIFT
 C
       CALL VAR_SETNUM('SHIFT',0,0,SHIFT,IGNORE)
 C
-C     Now, if required, create the output structure for the 
+C     Now, if required, create the output structure for the
 C     cross-correlation.
 C
       IF (RECORD) THEN
@@ -338,7 +338,7 @@ C
          IF(STATUS.NE.0)GOTO 500
 
          BYTES=NX*BFLOAT
-         CALL GEN_MOVE(BYTES, %VAL(CNF_PVAL(CFNPTR)), 
+         CALL GEN_MOVE(BYTES, %VAL(CNF_PVAL(CFNPTR)),
      :                 %VAL(CNF_PVAL(CPTR)))
       END IF
       CALL PSX_FREE (CFNPTR, STATUS)

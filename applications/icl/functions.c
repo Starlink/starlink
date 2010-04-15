@@ -55,7 +55,7 @@ extern char *version;					/* main.c   */
  *
  ******************************************************************************
  */
-static value 
+static value
 func_substr(void)
 {
     int from, width, length;
@@ -102,7 +102,7 @@ func_substr(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_sname(void)
 {
     char buf[ICL_BUFSIZE], *w;
@@ -147,7 +147,7 @@ func_sname(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_index(char *s1, char *pattern)
 {
     char *where, startpattern;
@@ -173,7 +173,7 @@ func_index(char *s1, char *pattern)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_element(void)
 {
     value val;
@@ -299,7 +299,7 @@ func_syserr(node *n)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_ra(char *s)
 {
     int hour, min;
@@ -321,7 +321,7 @@ func_ra(char *s)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_ra2s(void)
 {
     double secs, tol=0.5;
@@ -389,7 +389,7 @@ func_ra2s(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_decl(char *s)
 {
     int deg, min;
@@ -411,7 +411,7 @@ func_decl(char *s)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_dec2s(void)
 {
     double secs, tol=0.5;
@@ -488,7 +488,7 @@ func_dec2s(void)
  *
  ******************************************************************************
  */
-static int 
+static int
 func_iand(int left, int right)
 {
     return left & right;
@@ -500,7 +500,7 @@ func_iand(int left, int right)
  *
  ******************************************************************************
  */
-static int 
+static int
 func_ior(int left, int right)
 {
     return left | right;
@@ -512,7 +512,7 @@ func_ior(int left, int right)
  *
  ******************************************************************************
  */
-static int 
+static int
 func_ieor(int left, int right)
 {
     return left ^ right;
@@ -524,7 +524,7 @@ func_ieor(int left, int right)
  *
  ******************************************************************************
  */
-static int 
+static int
 func_inot(int arg)
 {
     return ~arg;
@@ -543,7 +543,7 @@ func_inot(int arg)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_lge(char *lf, char *rt)
 {
     return value_logical(strcmp(lf, rt) >= 0);
@@ -555,7 +555,7 @@ func_lge(char *lf, char *rt)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_lgt(char *lf, char *rt)
 {
     return value_logical(strcmp(lf, rt) > 0);
@@ -567,7 +567,7 @@ func_lgt(char *lf, char *rt)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_lle(char *lf, char *rt)
 {
     return value_logical(strcmp(lf, rt) <= 0);
@@ -579,7 +579,7 @@ func_lle(char *lf, char *rt)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_llt(char *lf, char *rt)
 {
     return value_logical(strcmp(lf, rt) < 0);
@@ -591,7 +591,7 @@ func_llt(char *lf, char *rt)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_leq(char *lf, char *rt)
 {
     return value_logical(strcmp(lf, rt) == 0);
@@ -603,7 +603,7 @@ func_leq(char *lf, char *rt)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_lne(char *lf, char *rt)
 {
     return value_logical(strcmp(lf, rt) != 0);
@@ -617,7 +617,7 @@ func_lne(char *lf, char *rt)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_len(char *s)
 {
     return value_integer((int) strlen(s));
@@ -631,7 +631,7 @@ func_len(char *s)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_keyval(char *s)
 {
     return exception("UNIMPL  KEYVAL() function not yet implemented");
@@ -646,7 +646,7 @@ func_keyval(char *s)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_inkey(void)
 {
     value val;
@@ -664,7 +664,7 @@ func_inkey(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_ichar(char *s)
 {
     return value_integer(*s);
@@ -679,7 +679,7 @@ func_ichar(char *s)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_upcase(char *s)
 {
     char *t;
@@ -699,7 +699,7 @@ func_upcase(char *s)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_logical(void)
 {
     value val;
@@ -726,7 +726,7 @@ func_logical(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_string(void)
 {
     value val;
@@ -748,7 +748,7 @@ func_string(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_version(void)
 {
     value val;
@@ -766,7 +766,7 @@ func_version(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_os(void)
 {
     extern char *os;
@@ -785,7 +785,7 @@ func_os(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_char(void)
 {
     static char s[2] = {'\0', '\0'};
@@ -814,7 +814,7 @@ func_char(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_type(void)
 {
     value val;
@@ -840,7 +840,7 @@ func_type(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_undefined(void)
 {
     value val;
@@ -864,11 +864,11 @@ func_undefined(void)
  *
  *	F U N C _ V A R I A B L E (void)
  *
- * VARIABLE(proc,x) a functions which returns the value of variable 'x' of 
+ * VARIABLE(proc,x) a functions which returns the value of variable 'x' of
  * procedure 'proc' or, with only one parameter (VARIABLE(x)) returns the
  * variable value from the global symbol table.
  *
- * The parameters (accessed via arglist[]) are name_interpret() nodes whose 
+ * The parameters (accessed via arglist[]) are name_interpret() nodes whose
  * string_part() contain the relevant parameter.
  *
  * A procedure entry (in symtab world) has a value member that points to a
@@ -888,7 +888,7 @@ func_undefined(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_variable(void)
 {
     value val;
@@ -932,7 +932,7 @@ func_variable(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_random(void)
 {
     unsigned seed;
@@ -982,7 +982,7 @@ func_random(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 min_max(int func)
 {
     int i;
@@ -1022,7 +1022,7 @@ min_max(int func)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_min(void)
 {
     return min_max(FUNC_MIN);
@@ -1036,7 +1036,7 @@ func_min(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_max(void)
 {
     return min_max(FUNC_MAX);
@@ -1051,7 +1051,7 @@ func_max(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_bin(void)
 {
     value val, arg, arg1, arg2;
@@ -1108,7 +1108,7 @@ func_bin(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 hexdecoct(int func)
 {
     value val, arg, arg1, arg2;
@@ -1225,7 +1225,7 @@ hexdecoct(int func)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_hex(void)
 {
     return hexdecoct(FUNC_HEX);
@@ -1237,7 +1237,7 @@ func_hex(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_dec(void)
 {
     return hexdecoct(FUNC_DEC);
@@ -1249,7 +1249,7 @@ func_dec(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_oct(void)
 {
     return hexdecoct(FUNC_OCT);
@@ -1264,7 +1264,7 @@ func_oct(void)
  *
  ******************************************************************************
  */
-value 
+value
 init_functions(void)
 {
 #include "node.h"
@@ -1376,7 +1376,7 @@ init_functions(void)
 				node_func(func_oct))))			||
 	(isexc(val = store_symbol("HEX", SYM_FUNCTION,
 				node_func(func_hex))))			||
-	(isexc(val = store_symbol("VARIABLE", SYM_FUNCTION, 
+	(isexc(val = store_symbol("VARIABLE", SYM_FUNCTION,
 				node_func(func_variable))))		||
 	(isexc(val = store_symbol("SUBSTR", SYM_FUNCTION,
 				node_func(func_substr))))		||

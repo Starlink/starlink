@@ -19,8 +19,8 @@
 *     This routine smoothes each spatial plane (i.e. plane spanned by
 *     the first two pixel axes) of the supplied 3 or 4D cube. A quadratic
 *     surface is fitted to the data in a box centred on each pixel in
-*     turn. The size of the box is specified by HW. The central pixel value 
-*     is replaced by the value of the fitted surface at the central pixel. 
+*     turn. The size of the box is specified by HW. The central pixel value
+*     is replaced by the value of the fitted surface at the central pixel.
 
 *  Notes:
 *     The level of information to display on the screen uses MSG_FILTER.
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,13 +110,13 @@
       REAL WGT( NPIX, NROW )
 
 *  Arguments Returned:
-      DOUBLE PRECISION X4( -HW:HW, -HW:HW ) 
+      DOUBLE PRECISION X4( -HW:HW, -HW:HW )
       DOUBLE PRECISION X3Y( -HW:HW, -HW:HW )
       DOUBLE PRECISION X2Y2( -HW:HW, -HW:HW )
       DOUBLE PRECISION XY3( -HW:HW, -HW:HW )
-      DOUBLE PRECISION X3( -HW:HW, -HW:HW ) 
+      DOUBLE PRECISION X3( -HW:HW, -HW:HW )
       DOUBLE PRECISION X2Y( -HW:HW, -HW:HW )
-      DOUBLE PRECISION XY2( -HW:HW, -HW:HW ) 
+      DOUBLE PRECISION XY2( -HW:HW, -HW:HW )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -182,15 +182,15 @@
 *  Store the smallest variance which can be used.
       VLIM = 1.0D0/SQRT( WLIM )
 
-*  Create the arrays holding the high (3 and 4) powers of X and Y at the 
-*  centre of each pixel in a fitting box. 
-      DO JJ = -HW, HW      
-         DO II = -HW, HW      
+*  Create the arrays holding the high (3 and 4) powers of X and Y at the
+*  centre of each pixel in a fitting box.
+      DO JJ = -HW, HW
+         DO II = -HW, HW
             X4( II, JJ ) = II**4
             X3Y( II, JJ ) = ( II**3 )*( JJ )
             X2Y2( II, JJ ) = ( II**2 )*( JJ**2 )
             XY3( II, JJ ) = ( II )*( JJ**3 )
-            X3( II, JJ ) = II**3 
+            X3( II, JJ ) = II**3
             X2Y( II, JJ ) = ( II**2 )*( JJ )
             XY2( II, JJ ) = ( II )*( JJ**2 )
          END DO
@@ -217,18 +217,18 @@
          DO IZ = 1, NZ
 
 *  Create the weights image for this plane.
-            DO IY = 1, NROW     
+            DO IY = 1, NROW
                DO IX = 1, NPIX
                   IF( DATA( IX, IY, IZ, ISTOKE ) .NE. VAL__BADR .AND.
      :                VAR( IX, IY, IZ, ISTOKE ) .NE. VAL__BADR ) THEN
-                  
+
                      IF( VAR( IX, IY, IZ, ISTOKE ) .GT. VLIM ) THEN
                         WGT( IX, IY ) = 1.0/
      :                                  ( VAR( IX, IY, IZ, ISTOKE )**2 )
                      ELSE
                         WGT( IX, IY ) = WLIM
                      END IF
-   
+
                   ELSE
                      WGT( IX, IY ) = 0.0
                   END IF
@@ -236,9 +236,9 @@
             END DO
 
 *  Smooth every pixel in this spatial plane.
-            DO IY = 1, NROW     
+            DO IY = 1, NROW
                DO IX = 1, NPIX
-                
+
 *  Smooth the current pixel.
 *  --------------------------
 
@@ -280,7 +280,7 @@
 
 *  Scan the rows in the box.
                      DO J = JLO, JHI
-                        JJ = J - IY 
+                        JJ = J - IY
                         Y = DBLE( JJ )
                         Y2 = DBLE( JJ**2 )
                         Y3 = DBLE( JJ**3 )
@@ -288,7 +288,7 @@
 
 *  Scan the pixels in this row.
                         DO I = ILO, IHI
-                           II = I - IX 
+                           II = I - IX
                            X = DBLE( II )
                            XY = DBLE( JJ * II )
                            X2 = DBLE( II * II )
@@ -328,11 +328,11 @@
                               SDY = SDY + DVAL*Y
                               SD = SD + DVAL
                               SW = SW + W
-                     
+
                            END IF
-                  
+
                         END DO
-   
+
                      END DO
 
 *  If no good data was found in the box, return a bad value.
@@ -360,12 +360,12 @@
                         SDX2 = SDX2/SW
                         SDY2 = SDY2/SW
                         SDXY = SDXY/SW
-                        SDX = SDX/SW  
-                        SDY = SDY/SW  
-                        SD = SD/SW   
+                        SDX = SDX/SW
+                        SDY = SDY/SW
+                        SD = SD/SW
                         SW = 1.0
-   
-*  Set up the matrix representing the normal equations. The matrix is 
+
+*  Set up the matrix representing the normal equations. The matrix is
 *  symetric and so only the elements on or above the diagonal need
 *  to be set (the other elements will not be referenced).
                         MAT(1,1) = SX4
@@ -374,27 +374,27 @@
                         MAT(4,1) = SX3
                         MAT(5,1) = SX2Y
                         MAT(6,1) = SX2
-                        
+
                         MAT(2,2) = SY4
                         MAT(3,2) = SXY3
                         MAT(4,2) = SXY2
                         MAT(5,2) = SY3
                         MAT(6,2) = SY2
-                        
+
                         MAT(3,3) = SX2Y2
                         MAT(4,3) = SX2Y
                         MAT(5,3) = SXY2
                         MAT(6,3) = SXY
-                        
+
                         MAT(4,4) = SX2
                         MAT(5,4) = SXY
                         MAT(6,4) = SX
-                        
+
                         MAT(5,5) = SY2
                         MAT(6,5) = SY
-                        
+
                         MAT(6,6) = 1.0
-   
+
 *  Set up the offset vector.
                         C( 1 ) = SDX2
                         C( 2 ) = SDY2
@@ -402,8 +402,8 @@
                         C( 4 ) = SDX
                         C( 5 ) = SDY
                         C( 6 ) = SD
-   
-*  Find the constant term in the solution by inverting the matrix equation set 
+
+*  Find the constant term in the solution by inverting the matrix equation set
 *  up above. We only need the last (constant) term ( C(6) ) and so we do
 *  not need to do a full matrix inversion. Also, the matrix is symetric
 *  and so we only need to look at the elements above the diagonal.
@@ -413,22 +413,22 @@
                                  MAT( J, I ) = MAT( I, K )*MAT( J, K ) -
      :                                         MAT( J, I )*MAT( K, K )
                               END DO
-                              C( I ) = C( K )*MAT( I, K ) - 
+                              C( I ) = C( K )*MAT( I, K ) -
      :                                 C( I )*MAT( K, K )
                            END DO
                         END DO
 
-*  If the matrix was singular, return the original value. Otherwise, return 
+*  If the matrix was singular, return the original value. Otherwise, return
 *  the central value.
                         IF( MAT( 6, 6 ) .EQ. 0.0 ) THEN
                            WORK( IX, IY ) = DATA( IX, IY, IZ, ISTOKE )
-   
+
                         ELSE
                            WORK( IX, IY ) = REAL( C( 6 )/ MAT( 6, 6 ) )
                         END IF
-                  
+
                      END IF
-                  
+
                   END IF
 
 *  -------------------------------------
@@ -437,8 +437,8 @@
                END DO
             END DO
 
-*  Copy the smoothed data for this plane from the work array back to the 
-*  input array. 
+*  Copy the smoothed data for this plane from the work array back to the
+*  input array.
             DO IY = 1, NROW
                DO IX = 1, NPIX
 

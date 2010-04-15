@@ -116,11 +116,11 @@ itcl::class gaia::StarArdAnnPoly {
 
    #  Create the annulus.
    private method create_annulus_ {args} {
-      if { $show_annulus } { 
+      if { $show_annulus } {
          set annulus_id_ [eval $canvas create polygon $coords \
                              -outline $deselected_colour \
                              -fill {""} ]
-         $canvas lower $annulus_id_ $canvas_id_			  
+         $canvas lower $annulus_id_ $canvas_id_
          $canvas addtag $annulus_tag withtag $annulus_id_
          redraw_annulus_
       }
@@ -133,7 +133,7 @@ itcl::class gaia::StarArdAnnPoly {
          set xsum 0.0
          set ysum 0.0
          set l [llength $coords]
-         for {set i 0} {$i < $l} {incr i} { 
+         for {set i 0} {$i < $l} {incr i} {
             set xsum [expr $xsum+[lindex $coords $i]]
             set ysum [expr $ysum+[lindex $coords [incr i]]]
          }
@@ -147,7 +147,7 @@ itcl::class gaia::StarArdAnnPoly {
    #  Return ARD description of annulus. Uses the getard method with
    #  falsified coords.
    public method getann {} {
-      if { $annulus_id_ != {} } { 
+      if { $annulus_id_ != {} } {
          set oldcoords $coords
          set coords [$canvas coords $annulus_id_]
          set ard [getard 0]

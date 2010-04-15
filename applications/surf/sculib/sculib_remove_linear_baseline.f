@@ -63,7 +63,7 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL: John Lightfoot (RoE)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -76,7 +76,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -123,7 +123,7 @@
 
 *  Local Variables:
       INTEGER A_END                  ! End of A_PTR
-      INTEGER A_PTR                  ! Coefficients from fit      
+      INTEGER A_PTR                  ! Coefficients from fit
       INTEGER BOL                    ! Loop counter
       INTEGER CHUNK                  ! Loop counter
       INTEGER COUNT                  ! Number of good points for fit
@@ -191,7 +191,7 @@
      :     STATUS)
       CALL SCULIB_MALLOC(NSCRATCH * VAL__NBD, R_PTR, R_END,
      :     STATUS)
-      CALL SCULIB_MALLOC((3 * (NSCRATCH + MAXDEG + 1)) * VAL__NBD, 
+      CALL SCULIB_MALLOC((3 * (NSCRATCH + MAXDEG + 1)) * VAL__NBD,
      :     A_PTR, A_END, STATUS)
 
 
@@ -200,7 +200,7 @@
 *     good and a basline can not be fitted
 *     Its open to debate whether we should initially fill the output
 *     arrays with BAD.
-      
+
       DO BOL = 1, N_BOL
          DO POS = 1, N_POS
             OUT_DATA(BOL,POS) = IN_DATA(BOL,POS)
@@ -214,30 +214,30 @@
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
             DO EXPOSURE = 1, N_EXPOSURES
-               
+
                CALL SCULIB_FIND_SWITCH (DEMOD_POINTER, 1,
      :           N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
      :           1, EXPOSURE, INTEGRATION, MEASUREMENT, SCAN_START,
      :           SCAN_END, STATUS)
- 
+
                IF ((SCAN_START .EQ. VAL__BADI) .OR.
      :             (SCAN_START .EQ. 0) ) THEN
                   CALL MSG_SETI ('E', EXPOSURE)
                   CALL MSG_SETI ('I', INTEGRATION)
                   CALL MSG_SETI ('M', MEASUREMENT)
-                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+                  CALL MSG_OUTIF (MSG__NORM, ' ',
      :                 'REMOVE_LINEAR_BASELINE: no data '//
      :                 'for exp ^E in int ^I, meas ^M', STATUS)
                ELSE
 *  OK, there is some data for the scan
- 
+
                   CALL MSG_SETI('NI', INTEGRATION)
                   CALL MSG_SETI('NE', EXPOSURE)
                   CALL MSG_OUTIF(MSG__NORM,' ',
      :                 'REMOVE_LINEAR_BASELINE: Processing exposure'//
      :                 ' ^NE  of integration ^NI', STATUS)
- 
- 
+
+
                   N_SCAN = SCAN_END - SCAN_START + 1
 
                   DO BOL = 1, N_BOL
@@ -270,40 +270,40 @@
                               START = SCAN_END - NEND + 1
                               ENDSC = SCAN_END
                            END IF
-                           
+
                            DO POS = START, ENDSC
-                              IF ((NDF_QMASK(IN_QUALITY(BOL, POS), 
+                              IF ((NDF_QMASK(IN_QUALITY(BOL, POS),
      :                             BADBIT)) .AND.
-     :                             IN_DATA(BOL, POS) .NE. VAL__BADR) 
+     :                             IN_DATA(BOL, POS) .NE. VAL__BADR)
      :                             THEN
-                                 
+
 *     Can use FALSE for bad pixel checking since we already know
 *     the point is good from above check.
-                                 CALL VEC_RTOD(.FALSE., 1, 
-     :                                IN_DATA(BOL,POS), 
+                                 CALL VEC_RTOD(.FALSE., 1,
+     :                                IN_DATA(BOL,POS),
      :                                %VAL(CNF_PVAL(FITDATA_PTR) +
      :                                COUNT * VAL__NBD),
      :                                IERR, NERR, STATUS)
 
 *       Check that variance is okay
-                                 IF (IN_VARIANCE(BOL, POS) .LT. 
+                                 IF (IN_VARIANCE(BOL, POS) .LT.
      :                                MIN_VAR) THEN
                                     WEIGHT = 1.0 / MIN_VAR
                                  ELSE
                                     WEIGHT = 1.0 / IN_VARIANCE(BOL, POS)
                                  END IF
-                                    
 
-                                 CALL VEC_RTOD(.FALSE., 1, 
+
+                                 CALL VEC_RTOD(.FALSE., 1,
      :                                WEIGHT,
      :                                %VAL(CNF_PVAL(WEIGHT_PTR) +
      :                                COUNT * VAL__NBD),
      :                                IERR, NERR, STATUS)
 
 
-                                 CALL VEC_ITOD(.FALSE., 1, 
-     :                                POS - SCAN_START + 1, 
-     :                                
+                                 CALL VEC_ITOD(.FALSE., 1,
+     :                                POS - SCAN_START + 1,
+     :
      :   %VAL(CNF_PVAL(X_PTR) + COUNT * VAL__NBD),
      :                                IERR, NERR, STATUS)
 
@@ -318,37 +318,37 @@
 *     containing pixel distance (X pixel values relative to start of scan)
 *     Simply need to fit this with a least squares polynomial fit.
 *     Use first order polynomial.
-*     If we have no data then skip this bolometer. 
+*     If we have no data then skip this bolometer.
 *     Cant have more than NSCRATCH points - if we do then we will have been
-*     in trouble anyway as the VEC_ITOD lines (above) would cause 
+*     in trouble anyway as the VEC_ITOD lines (above) would cause
 *     a segmentation fault.
 *     Probably should make sure we have at least 2 points over which to
 *     calculate the baseline.
 
-                        IF (COUNT .GT. 1 .AND. COUNT .LE. NSCRATCH) THEN 
+                        IF (COUNT .GT. 1 .AND. COUNT .LE. NSCRATCH) THEN
 
                            EPS = 0.0D0
                            IFAIL = 0
 
-                           CALL PDA_DPOLFT (COUNT, 
+                           CALL PDA_DPOLFT (COUNT,
      :                                      %VAL(CNF_PVAL(X_PTR)),
-     :                          %VAL(CNF_PVAL(FITDATA_PTR)), 
+     :                          %VAL(CNF_PVAL(FITDATA_PTR)),
      :                          %VAL(CNF_PVAL(WEIGHT_PTR)),
-     :                          MAXDEG, NDEG, EPS, 
-     :                          %VAL(CNF_PVAL(R_PTR)), IFAIL, 
+     :                          MAXDEG, NDEG, EPS,
+     :                          %VAL(CNF_PVAL(R_PTR)), IFAIL,
      :                          %VAL(CNF_PVAL(A_PTR)), STATUS)
-                           
+
                            IF (IFAIL .EQ. 1) THEN
 
 *     Now use the coefficients to remove the baseline from the data
 
                               IF (STATUS .EQ. SAI__OK) THEN
                                  DO POS = SCAN_START, SCAN_END
-                                    
+
                                     XPOS = DBLE(POS - SCAN_START + 1)
-                                 
+
                                     CALL PDA_DP1VLU(NDEG, NDER, XPOS,
-     :                                   YFIT, YP, 
+     :                                   YFIT, YP,
      :                                   %VAL(CNF_PVAL(A_PTR)), STATUS)
 
 *     Simply remove this value (write out even if quality is bad)
@@ -356,23 +356,23 @@
 
                                     IF (DORLB) THEN
 
-                                       IF (IN_DATA(BOL,POS) .NE. 
+                                       IF (IN_DATA(BOL,POS) .NE.
      :                                      VAL__BADR) THEN
-                                       
-                                          OUT_DATA(BOL,POS) = 
-     :                                         IN_DATA(BOL,POS) - 
+
+                                          OUT_DATA(BOL,POS) =
+     :                                         IN_DATA(BOL,POS) -
      :                                         REAL(YFIT)
-                                       
+
                                        ELSE
-                                          OUT_DATA(BOL,POS) = 
+                                          OUT_DATA(BOL,POS) =
      :                                         IN_DATA(BOL,POS)
                                        END IF
-                                    
-                                       OUT_QUALITY(BOL, POS) = 
+
+                                       OUT_QUALITY(BOL, POS) =
      :                                      IN_QUALITY(BOL, POS)
-                                       OUT_VARIANCE(BOL, POS) = 
+                                       OUT_VARIANCE(BOL, POS) =
      :                                      IN_VARIANCE(BOL,POS)
-                                    
+
 *     Store the fit
                                     ELSE
 
@@ -385,7 +385,7 @@
 
                                  END DO
                               END IF
-                           
+
                            ELSE IF (STATUS .NE. SAI__OK) THEN
 
                               CALL MSG_SETI('IFAIL', IFAIL)
@@ -394,7 +394,7 @@
      :                             'INE: Error whilst removing '//
      :                             'baseline (Bol=^BOL, IFAIL=^IFAIL)',
      :                             STATUS)
-                              
+
                            ELSE
 
                               CALL MSG_SETI('IFAIL', IFAIL)
@@ -406,7 +406,7 @@
      :                             STATUS)
 
                            END IF
-                           
+
                         END IF
 
 
@@ -428,5 +428,5 @@
       CALL SCULIB_FREE('X_DATA', A_PTR, A_END, STATUS)
       CALL SCULIB_FREE('WEIGHT', WEIGHT_PTR, WEIGHT_END, STATUS)
 
-      END 
+      END
 

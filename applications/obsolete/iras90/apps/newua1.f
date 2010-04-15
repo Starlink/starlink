@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NEWUA1( VAR, IDC, UNITS, OLDUN, SLOW, SHIGH, DLOW, 
+*     CALL NEWUA1( VAR, IDC, UNITS, OLDUN, SLOW, SHIGH, DLOW,
 *                  DHIGH, DATIN, VARIN, DATOUT, VAROUT, DBAD,
 *                  VBAD, STATUS )
 
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
 *  External References:
       INTEGER IRC_DETNO          ! Return the detector number stored at
                                  ! a given index.
-  
+
 *  Local Variables:
       INTEGER DETIND             ! The current detector index.
       INTEGER DETNO              ! The current detector number.
@@ -141,7 +141,7 @@
 
 *  If valid, write the input value to the output in the new units.
                VAL = DATIN( SAMP, DETIND )
-               IF( VAL .NE. VAL__BADR ) then 
+               IF( VAL .NE. VAL__BADR ) then
                   DATOUT( SAMP, DETIND ) = VAL*SCALE
 
 *  Store a bad value in the output if the input is bad, and set the bad
@@ -149,19 +149,19 @@
                ELSE
                   DATOUT( SAMP, DETIND ) = VAL__BADR
                   DBAD = .TRUE.
-               END IF               
+               END IF
 
 *  If required, do the same with the variance value.
                IF( VAR ) THEN
 
                   VAL = VARIN( SAMP, DETIND )
-                  IF( VAL .NE. VAL__BADR ) then 
+                  IF( VAL .NE. VAL__BADR ) then
                      VAROUT( SAMP, DETIND ) = VAL*SCALE*SCALE
                   ELSE
                      VAROUT( SAMP, DETIND ) = VAL__BADR
                      VBAD = .TRUE.
-                  END IF               
-   
+                  END IF
+
                END IF
 
 * Do the next sample from the currrent detector.
@@ -171,5 +171,5 @@
 
 *  Do the next detector.
       END DO
-      
+
       END

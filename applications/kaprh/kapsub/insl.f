@@ -147,7 +147,7 @@
 *                 Mark the chosen point with a green cross
 *                 Switch off first-point repeat
 *              Else
-*                 Display next functions of the choice device and 
+*                 Display next functions of the choice device and
 *                   locator on frame zone
 *                 Mark the provisional point with a white cross
 *              Endif
@@ -230,7 +230,7 @@
 *              Report error context, tidy and exit
 *           Endif
 *           Plot the slice on the graphics device
-*           If status is not ok annul the error and report the 
+*           If status is not ok annul the error and report the
 *              reason (invalid pixels)
 *           Tidy the workspace
 *        Endif
@@ -456,7 +456,7 @@
 *    If an image display is available, then use the cursor to define
 *    the two ends of the slice
 
-      IF ( CURSOR ) THEN 
+      IF ( CURSOR ) THEN
 
          REPEAT = .TRUE.
          AGAIN1 = .TRUE.
@@ -523,7 +523,7 @@
                      IF ( BUTTN1 .GT. 0 ) THEN
                         CALL MSG_OUT( 'INSL_MSG1', 'First point lies '/
      :                                /'outside the array.', STATUS )
-   
+
 *                      Reset the trackerball/mouse.
 
                         BUTTN1 = 0
@@ -703,7 +703,7 @@
 
                      CALL MSG_OUT( 'INSL_DPR', 'Two distinct'/
      :                              /' points required.', STATUS )
-          
+
                      AGAIN1 = .TRUE.
                      AGAIN2 = .TRUE.
                   END IF
@@ -1087,7 +1087,7 @@
 
          CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', SLCPTR, NPTS,
      :                 STATUS )
-      
+
 *       Get the title for the NDF.
 
          CALL NDF_CINP( PNTITL, NDFO, 'TITLE', STATUS )

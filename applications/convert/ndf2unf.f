@@ -82,15 +82,15 @@
 *
 *        - When a header is to be made, it is composed of FITS-like card
 *        images as follows:
-*           -  The number of dimensions of the data array is written 
+*           -  The number of dimensions of the data array is written
 *           to the keyword NAXIS, and the actual dimensions to NAXIS1,
 *           NAXIS2 etc. as appropriate.
-*           -  If the NDF contains any linear axis structures the 
-*           information necessary to generate these structures is 
-*           written to the FITS-like headers. For example, if a linear 
-*           AXIS(1) structure exists in the input NDF the value of the 
+*           -  If the NDF contains any linear axis structures the
+*           information necessary to generate these structures is
+*           written to the FITS-like headers. For example, if a linear
+*           AXIS(1) structure exists in the input NDF the value of the
 *           first data point is stored with the keyword CRVAL1,
-*           and the incremental value between successive axis data is 
+*           and the incremental value between successive axis data is
 *           stored in keyword CDELT1.  By definition the reference
 *           pixel is 1.0 and is stored in keyword CRPIX1.  If there is
 *           an axis label it is written to keyword CTYPE1, and axis
@@ -183,7 +183,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -240,7 +240,7 @@
       INTEGER LUN                ! Logical-unit number
       CHARACTER MACHIN * ( 24 )  ! Machine name
       INTEGER NCARD              ! Number of cards in FITS extension
-      INTEGER NDIM               ! Number of dimensions 
+      INTEGER NDIM               ! Number of dimensions
       INTEGER NUMMAX             ! Maximum number of values per record
       INTEGER NDF                ! Identifier for NDF
       CHARACTER NODE * ( 20 )    ! Node name
@@ -281,7 +281,7 @@
 *  exist for the file to be an NDF.
       COMLIS = 'Data'
       COMLN = 4
-      
+
 *  If the Quality component exists, append it to component list.
       CALL NDF_STATE( NDF, 'Quality', THERE, STATUS )
       IF ( THERE ) THEN
@@ -294,7 +294,7 @@
          CALL CHR_APPND( ','//'Variance', COMLIS, COMLN )
       END IF
 
-*  Find which component to copy. 
+*  Find which component to copy.
       CALL PAR_CHOIC( 'COMP', 'Data', COMLIS( :COMLN ), .FALSE., COMP,
      :                 STATUS )
 
@@ -341,7 +341,7 @@
          NUMMAX = VAL__MAXI
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         NUMMAX = 32764 / VAL__NBD 
+         NUMMAX = 32764 / VAL__NBD
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          NUMMAX = 32764 / VAL__NBR
@@ -584,7 +584,7 @@
          CALL FIO_REP( LUN, ' ', FIOSTA, 'Error writing a header '/
      :     /'record to file ^FNAME.  Reason was ^IOSTAT.', STATUS )
 
-*  Insert NAXIS, AXISn, and optional keywords to the header. 
+*  Insert NAXIS, AXISn, and optional keywords to the header.
          CALL CON_SPHEA( NDF, FD, TYPE, 'UNFORMATTED', NFLAGS, CMPFND,
      :                   STATUS )
 
@@ -608,31 +608,31 @@
 *  Call a routine to write the data to the unformatted Fortran file;
 *  the selected routine depending on the data type of the array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CON_OFUFB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OFUFB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_OFUFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OFUFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_OFUFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OFUFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CON_OFUFR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OFUFR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CON_OFUFUB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OFUFUB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CON_OFUFUW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OFUFUW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CON_OFUFW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OFUFW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       END IF

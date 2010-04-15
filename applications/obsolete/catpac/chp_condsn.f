@@ -15,7 +15,7 @@
 *     CALL CHP_CONDSN( INVALUE, OUTFORMAT, OUTVALUE, STATUS )
 *
 *  Description:
-*     Convert a double precision standard format value into a non standard 
+*     Convert a double precision standard format value into a non standard
 *     format
 *     value.
 
@@ -42,7 +42,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -60,7 +60,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References: 
+*  External References:
       logical chr_simlr
 
 
@@ -98,7 +98,7 @@
 *  Local Data:
 *
 *  PI, 2PI, PI/2
-      REAL*8 DPI 
+      REAL*8 DPI
       PARAMETER (DPI=3.141592653589793238462643D0)
       REAL*8 D2PI
       PARAMETER (D2PI=6.283185307179586476925287D0)
@@ -166,34 +166,34 @@
          write(cval, '(F11.4)', err=1) rval
 *
       elseif (chr_simlr(outformat(:12), 'HH MM SS.SSS')) then
-         call sla_dr2tf(3, dval, sign, ihmsf) 
+         call sla_dr2tf(3, dval, sign, ihmsf)
          rsec = ihmsf(3) + real(ihmsf(4))/1000
-         write (cval, '(I2,1X,I2,1X,F6.3)', err=1) 
+         write (cval, '(I2,1X,I2,1X,F6.3)', err=1)
      -     ihmsf(1), ihmsf(2) , rsec
 *
       elseif (chr_simlr(outformat(:11), 'HH MM SS.SS')) then
-         call sla_dr2tf(2, dval, sign, ihmsf) 
+         call sla_dr2tf(2, dval, sign, ihmsf)
          rsec = ihmsf(3) + real(ihmsf(4))/100
-         write (cval, '(I2,1X,I2,1X,F5.2)', err=1) 
+         write (cval, '(I2,1X,I2,1X,F5.2)', err=1)
      -     ihmsf(1), ihmsf(2) , rsec
 *
       elseif ((chr_simlr(outformat(:10), 'HH MM SS.S')) .or.
      -          (chr_simlr(outformat(:10), 'HH:MM:SS.S'))) then
-         call sla_dr2tf(1, dval, sign, ihmsf) 
+         call sla_dr2tf(1, dval, sign, ihmsf)
          rsec = ihmsf(3) + real(ihmsf(4))/10
-         write (cval, '(I2,1X,I2,1X,F4.1)', err=1) 
+         write (cval, '(I2,1X,I2,1X,F4.1)', err=1)
      -           ihmsf(1), ihmsf(2) , rsec
 *
       elseif (chr_simlr(outformat(:10), 'HHMMSS.SSS')) then
-        call sla_dr2tf(3, dval, sign, ihmsf) 
+        call sla_dr2tf(3, dval, sign, ihmsf)
         rsec = ihmsf(3) + real(ihmsf(4))/1000
-        write (cval, '(I2,I2,F6.3)', err=1) 
+        write (cval, '(I2,I2,F6.3)', err=1)
      -        ihmsf(1), ihmsf(2) , rsec
 *
       elseif (chr_simlr(outformat(:9), 'HHMMSS.SS')) then
-        call sla_dr2tf(2, dval, sign, ihmsf) 
+        call sla_dr2tf(2, dval, sign, ihmsf)
         rsec = ihmsf(3) + real(ihmsf(4))/100
-        write (cval, '(I2,I2,F5.2)', err=1) 
+        write (cval, '(I2,I2,F5.2)', err=1)
      -        ihmsf(1), ihmsf(2) , rsec
 *
       elseif (chr_simlr(outformat(:9), 'HH MM SSS')) then
@@ -205,7 +205,7 @@
       elseif (chr_simlr(outformat(:8), 'HHMMSS.S')) then
         call sla_dr2tf(1, dval, sign, ihmsf)
         rsec = ihmsf(3) + real(ihmsf(4))/10
-        write (cval, '(2I2,F4.1)', err=1) 
+        write (cval, '(2I2,F4.1)', err=1)
      -       ihmsf(1), ihmsf(2) , rsec
 *
       elseif ((chr_simlr(outformat(:8), 'HH MM SS')) .or.
@@ -234,18 +234,18 @@
 *
       elseif (chr_simlr(outformat(:6), 'HHMMSS')) then
         call sla_dr2tf(0, dval, sign, ihmsf)
-        write (cval, '(3I2)', err=1) 
+        write (cval, '(3I2)', err=1)
      -      ihmsf(1), ihmsf(2), ihmsf(3)
 *
       elseif (chr_simlr(outformat(:4), 'HHMM')) then
         call sla_dr2tf(0, dval, sign, ihmsf)
-        write (cval, '(2I2)', err=1) 
+        write (cval, '(2I2)', err=1)
      -       ihmsf(1), nint(ihmsf(2)+ihmsf(3)/60.0)
 *
       elseif ((chr_simlr(outformat(:5), 'HH MM')) .or.
      -      (chr_simlr(outformat(:5), 'HH:MM'))) then
         call sla_dr2tf(0, dval, sign, ihmsf)
-        write (cval, '(I2,1X,I2)', err=1) 
+        write (cval, '(I2,1X,I2)', err=1)
      -        ihmsf(1), nint(ihmsf(2)+ihmsf(3)/60.0)
 *
       elseif (chr_simlr(outformat(:6), 'DEGREE')) then
@@ -327,7 +327,7 @@
 *
       elseif (chr_simlr(outformat(:7), 'SDDMMSS')) then
         call sla_dr2af(0, dval, sign, idmsf)
-        write (cval, '(A1,3I2)', err=1) 
+        write (cval, '(A1,3I2)', err=1)
      -            sign, idmsf(1), idmsf(2), idmsf(3)
 *
       elseif (chr_simlr(outformat(:6), 'SDDMMT')) then

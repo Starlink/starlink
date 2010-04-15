@@ -72,7 +72,7 @@
 *     and minimum co-ordinate values for each dimension.  There is no
 *     limit imposed by the application on the number of points or the
 *     maximum output array size, though there may be external
-*     constraints.  The derived array size is reported in case you have 
+*     constraints.  The derived array size is reported in case you have
 *     made a typing error in the text file.  If you realise that this
 *     has indeed occurred just abort (!!) when prompted for the output
 *     NDF.
@@ -118,7 +118,7 @@
 *     LBOUND( ) = _INTEGER (Read)
 *        The lower bounds of the NDF to be created.  The number of
 *        values must match the number supplied to parameter SHAPE.  It
-*        is only accessed in automatic mode.  If a null (!) value is 
+*        is only accessed in automatic mode.  If a null (!) value is
 *        supplied, the value used is 1 along each axis. [!]
 *     POSCOLS() = _INTEGER (Read)
 *        Column positions of the co-ordinates in an input record
@@ -133,7 +133,7 @@
 *        dimension.  It is only used in co-ordinate mode.  Its purpose
 *        is to permit linear scaling from some arbitrary units to
 *        pixels. If a null (!) value is supplied, the value used is
-*        1.0 for each co-ordinate dimension. [!] 
+*        1.0 for each co-ordinate dimension. [!]
 *     QUANTUM = _INTEGER (Read)
 *        You can safely ignore this parameter.  It is used for fine-
 *        tuning performance in the co-ordinate mode.
@@ -184,7 +184,7 @@
 *     trandat freename=simdata out=model auto shape=[50,40,9] dtype=_i
 *        As the previous example except an _INTEGER NDF is created, and
 *        the text file must contain integer data.
-*     trandat simdata.dat model [6,3,4] 2 
+*     trandat simdata.dat model [6,3,4] 2
 *        Reads the text file simdata.dat and stores the data into the
 *        data array of a three-dimensional, _REAL NDF called model.  The
 *        input file should have the co-ordinates and real values
@@ -213,9 +213,9 @@
 *     Fortran order, this can have disastrous performance consequences
 *     for you and other users.
 *     -  In non-automatic mode, the co-ordinates for each dimension are
-*     stored in the NDF axis structure.  The first centre is at the 
-*     minimum value found in the list of positions for the dimension 
-*     plus half of the scale factor.  Subsequent centres are 
+*     stored in the NDF axis structure.  The first centre is at the
+*     minimum value found in the list of positions for the dimension
+*     plus half of the scale factor.  Subsequent centres are
 *     incremented by the scale factor.
 *     -  The output NDF may have between one and seven dimensions.
 *     -  In automatic mode, an error is reported if the shape does not
@@ -232,12 +232,12 @@
 *     -  Get the initialisation value.
 *     -  For a co-ordinate file:
 *        o  Obtain workspace for the co-ordinates and data values.
-*        o  Read in the data in the requested type until complete. 
+*        o  Read in the data in the requested type until complete.
 *        Increase the work space if there are further data to read.
 *        Continue to read the data file.  Repeat the process until
 *        the input file is read completely or an error has occurred.
 *        o  Report the number of points read, and the upper and lower
-*        bounds. Derive and report the array dimensions. 
+*        bounds. Derive and report the array dimensions.
 *     -  Create an output NDF of the requested or computed dimensions.
 *     Initialise and map its data array.
 *     -  For an auto file, read the data directly from the input file
@@ -576,21 +576,21 @@
             IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_TRDRD( FD, WDIMSC( 1 ), WDIMSC( 2 ), POSCOD,
      :                          COUNT, %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                          LBND, UBND, CMPLET,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPS1_TRDRI( FD, WDIMSC( 1 ), WDIMSC( 2 ), POSCOD,
      :                          COUNT, %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                          LBND, UBND, CMPLET,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPS1_TRDRR( FD, WDIMSC( 1 ), WDIMSC( 2 ), POSCOD,
      :                          COUNT, %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
-     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                          LBND, UBND, CMPLET,
      :                          STATUS )
             END IF
@@ -693,23 +693,23 @@
 *  the input data, given co-ordinate information.  Choose the
 *  appropriate one for the data type.
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_TRNVD( NDIMS, ODIMS, COUNT, 
+            CALL KPS1_TRNVD( NDIMS, ODIMS, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                       PSCALE, LBND,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_TRNVI( NDIMS, ODIMS, COUNT, 
+            CALL KPS1_TRNVI( NDIMS, ODIMS, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                       PSCALE, LBND,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_TRNVR( NDIMS, ODIMS, COUNT, 
+            CALL KPS1_TRNVR( NDIMS, ODIMS, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                       PSCALE, LBND,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
@@ -738,15 +738,15 @@
 *  Append sequentially each value to the vector.  Choose the
 *  appropriate subroutine for the data type.
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_TRNDD( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+            CALL KPS1_TRNDD( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_TRNDI( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+            CALL KPS1_TRNDI( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_TRNDR( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+            CALL KPS1_TRNDR( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       STATUS )
 
          END IF

@@ -83,7 +83,7 @@ CD    Print *, '-- gen_factor --'
 
     1 CONTINUE
 
-*     Find the start of the first factor - stacking if ( found and 
+*     Find the start of the first factor - stacking if ( found and
 *     ignoring space
       DO WHILE (string(st:st).eq.'(' .AND. st.le.ils)
 CD      Print *,'   "(" found = pushing stack...'
@@ -133,7 +133,7 @@ CD      Print *, '     Unary minus flag set - pushing operator stack...'
 
 *     Either get the value directly (numeric string) or translate symbol.
 *     If result not delayed then value is returned into workspace array
-*     at next available location. Otherwise - if for example we need to 
+*     at next available location. Otherwise - if for example we need to
 *     evaluate the array index for the symbol first - enter symbol on the
 *     stack, and the "evaluate array index" operator (@) on the operator stack.
 
@@ -146,7 +146,7 @@ CD      Print *, '     Unary minus flag set - pushing operator stack...'
           form   = 'I'
           WRITE (form(2:lf), '(I2.2)') idig
           ierr = gen_readnum (string(ist:iend), type, form, ivalue)
-          address = 
+          address =
 #if HAVE_PERCENTLOC
      :   %loc(ivalue)
 #elif HAVE_INTRINSIC_LOC
@@ -158,10 +158,10 @@ CD        Print *,'     integer value read'
         ELSE IF (gen_floating (string(ist:iend), idig, fdig)) THEN
           type   = 'R4'
           form   = 'F'
-          WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+1, 
+          WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+1,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
-          address = 
+          address =
 #if HAVE_PERCENTLOC
      :   %loc(rvalue)
 #elif HAVE_INTRINSIC_LOC
@@ -176,7 +176,7 @@ CD        Print *,'     real*4 value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
-          address = 
+          address =
 #if HAVE_PERCENTLOC
      :   %loc(rvalue)
 #elif HAVE_INTRINSIC_LOC
@@ -191,7 +191,7 @@ CD        Print *,'     real*4 value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, dvalue)
-          address = 
+          address =
 #if HAVE_PERCENTLOC
      :   %loc(dvalue)
 #elif HAVE_INTRINSIC_LOC
@@ -205,7 +205,7 @@ CD        Print *,'     real*8 value read'
       ELSE IF (strconst) THEN
         CALL gen_hdnorm (string(ist:iend), string(ist:iend), ls, ierr)
         WRITE (type, '(''C'',I3.3)') ls
-        address = 
+        address =
 #if HAVE_PERCENTLOC
      :   %loc(string(ist:ist))
 #elif HAVE_INTRINSIC_LOC
@@ -269,7 +269,7 @@ CD        Print *,'    symbol -- has an argument -- pushing all stacks'
       ntopnd            = ntopnd + 1
       nopnd(lev)        = nopnd(lev) + 1
       opnd_type(ntopnd) = type
-      opnd_addr(ntopnd) = 
+      opnd_addr(ntopnd) =
 #if HAVE_PERCENTLOC
      :   %LOC(wksp(next_ws))
 #elif HAVE_INTRINSIC_LOC

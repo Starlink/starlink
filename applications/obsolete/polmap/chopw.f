@@ -2,7 +2,7 @@
      &                 STOKES_U,STOKES_UV,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     C H O P W
 C
@@ -10,17 +10,17 @@ C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), STOKES_I (><), STOKES_Q(><), STOKES_QV(><),
 C STOKES_U (><), STOKES_UV(><), LAMBDA (><), NPTS (<) ,OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C Restricts the current spectrum to a wavelength region.
 C
 C

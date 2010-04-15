@@ -68,7 +68,7 @@
          WRITE (MSGLU,*) 'SGS_OPNWK - status',ISTAT
          GOTO 9999
       END IF
-      
+
       CALL SGS_CLSWK(IBASET,ISTAT)
       IF (ISTAT.NE.0) THEN
          WRITE (MSGLU,*) 'SGS_CLSWK - status',ISTAT
@@ -82,7 +82,7 @@
       END IF
 
       CALL SGS_ICURZ(I)
-      IF (I.NE.IBASE) 
+      IF (I.NE.IBASE)
      :   WRITE (MSGLU,*) 'SGS_ICURZ returns', I, ' should be',IBASE
 
 *   Clear zone (workstation is empty so should have no effect)
@@ -110,7 +110,7 @@
          CALL SGS_IZONE(X1,X2,Y1,Y2,XM,YM)
          CALL SGS_BOX(X1,X2,Y1,Y2)
       END DO
-     
+
 *   Plot reference picture
       CALL SGS_SELZ(IZ,ISTAT)
       CALL REF(MSGLU)
@@ -185,7 +185,7 @@
       DO 10 I = 1,4
         CALL SGS_SPEN(I)
         CALL SGS_IPEN(N)
-        IF (I.NE.N)       
+        IF (I.NE.N)
      :   WRITE (MSGLU,*) 'SGS_IPEN returns', N, ' should be',I
         YPOS = Y2-YSTEP*(8+I*2)
         CALL SGS_TX(XPOS,YPOS,'Pen')
@@ -196,13 +196,13 @@
         IF (XT.NE.XPOS.OR.YT.NE.YPOS.OR.NT.NE.15) THEN
            WRITE (MSGLU,*) 'SGS_TXB returns',XT,YT,NT,' should be',
      :                               XPOS,YPOS,15
-        END IF      
+        END IF
         CALL SGS_ITXA(NF,NPR,HT,AR,XU,YU,SP,TXJ)
         CALL SGS_MARK(XPOS+DX+(AR*HT),YPOS,I)
         CALL SGS_BOX(X1+XSTEP*I,X2-XSTEP*I,Y1+YSTEP*I,Y2-YSTEP*I)
-   10 CONTINUE      
+   10 CONTINUE
 
-*  Display device resolution + angled text              
+*  Display device resolution + angled text
       CALL SGS_SPEN(1)
       XPOS = X1+XSTEP*12.0
       YPOS = Y2-YSTEP*20.0
@@ -299,7 +299,7 @@
       IF (ISTAT.NE.0) THEN
          WRITE (MSGLU,*) 'SGS_SELZ - status',ISTAT
          GOTO 9999
-      END IF      
+      END IF
 
 *  Test size
       CALL SGS_ZSIZE(0.02,0.02,'CC',IZT,ISTAT)
@@ -365,7 +365,7 @@
         DO 40 J = 1,3
            CALL SGS_APOLY(XSTART(I)+XINC*(J-1),YSTART(I))
            CALL SGS_MARKL(I)
-   40   CONTINUE 
+   40   CONTINUE
         CALL SGS_OPOLY
    30 CONTINUE
 

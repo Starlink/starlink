@@ -1,4 +1,4 @@
-      SUBROUTINE JCMT_CONVOLVE (A, B, N1, N2, NMID, ABAD, RNORM, 
+      SUBROUTINE JCMT_CONVOLVE (A, B, N1, N2, NMID, ABAD, RNORM,
      :   R, STATUS)
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL JCMT_CONVOLVE (A, B, N1, N2, NMID, ABAD, RNORM, R, 
+*     CALL JCMT_CONVOLVE (A, B, N1, N2, NMID, ABAD, RNORM, R,
 *    :   STATUS)
 
 *  Description:
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -1,7 +1,7 @@
       SUBROUTINE CAP_CLCNT (N, X, Y, X0, Y0, XP, YP, NCROSS, STATUS)
 *+
 *  Name:
-*     CAP_CLCNT 
+*     CAP_CLCNT
 *  Purpose:
 *     No. of times a line segment crosses a polygon boundary.
 *  Language:
@@ -51,7 +51,7 @@
 *       if it does cross then
 *         increment the no. of crossings.
 *       end if
-*     end if 
+*     end if
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *  Authors:
@@ -129,7 +129,7 @@
 
          IF (ABS(DXN1) .GE. MINVAL .OR. ABS(DYN1) .GE. MINVAL)
      :     THEN
-            CALL CAP_CLINT (X(N), Y(N), X(1), Y(1), X0, Y0, XP, YP, 
+            CALL CAP_CLINT (X(N), Y(N), X(1), Y(1), X0, Y0, XP, YP,
      :        INT, STATUS)
             IF (INT .EQ. 1) THEN
                NCROSS = NCROSS + 1

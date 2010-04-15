@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ The mini-release requires about 13200 blocks and allows the system to be run
 and tasks to be developed.
 
 \section{INSTALLATION}
-Full installation instructions are given in SSN/44 and the Starlink Software 
+Full installation instructions are given in SSN/44 and the Starlink Software
 Change Notice.
 
 \section{NEW FEATURES IN THIS RELEASE}
@@ -76,7 +76,7 @@ Change Notice.
 \subsection{MAG and MIO}
 \label{mag}
 \begin{itemize}
-\item The subroutines MAG\_ALOC, MAG\_DEAL, MAG\_MOUNT and MAG\_DISM have been 
+\item The subroutines MAG\_ALOC, MAG\_DEAL, MAG\_MOUNT and MAG\_DISM have been
 re-written to exit with status set in the case of most errors.
 Errors which will result in another attempt to obtain a value are:
 \begin{itemize}
@@ -90,7 +90,7 @@ Errors which will result in another attempt to obtain a value are:
 \item The error messages associated with status values have been improved.
 (MAGERR)
 
-\item The severity bits are ignored in converting VMS to ADAM codes. 
+\item The severity bits are ignored in converting VMS to ADAM codes.
 (MIO\_\$CODE)
 
 \item Logical names for MIO system development are now defined after obeying
@@ -108,8 +108,8 @@ The following documents have been re-issued:
 the changes described in Section \ref{mag}.
 \end{description}
 
-The summaries, ADAM\_DOCS:CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have been 
-updated. 
+The summaries, ADAM\_DOCS:CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have been
+updated.
 
 \subsection{ADAMSTART}
 ADAMSTART.COM is modified to display the latest ADAM version number.
@@ -143,7 +143,7 @@ Previously DTASK\_GET limited the length to 80 characters and ICL to 60.
 value was obtained via vpath global, has been fixed. (SUBPAR\-\_HDSASS)
 
 \item A bug, which caused endless prompting if a task run directly from DCL
-in batch prompted without a prompt value and was provided with insufficient 
+in batch prompted without a prompt value and was provided with insufficient
 input, has been fixed. A maximum of five prompts will now occur before
 returning with PAR\_\_NULL status. (SUBPAR\-\_PROMPT)
 
@@ -156,7 +156,7 @@ locators' problem which has been the cause of several obscure bug reports.
 SUBPAR\-\_CREAT,
 SUBPAR\-\_CRINT,
 SUBPAR\-\_CUR\-LOC,
-SUBPAR\-\_CUR\-NAME, 
+SUBPAR\-\_CUR\-NAME,
 SUBPAR\-\_CUR\-SAV,
 SUBPAR\-\_DAT\-FIND,
 SUBPAR\-\_GET\-HDS,
@@ -177,8 +177,8 @@ SUBPAR\-\_VAL\-ASS)
 \end{itemize}
 
 \subsection{LINKNOSHR}
-LINKNOSHR.OPT, used by the `noshareable' linking procedures has been 
-corrected to remove MSP\_SHR which will not be required until the Version 2 
+LINKNOSHR.OPT, used by the `noshareable' linking procedures has been
+corrected to remove MSP\_SHR which will not be required until the Version 2
 message system is in use.
 
 \subsection{ADAMNET}
@@ -190,7 +190,7 @@ C\-\_MAXMSG\-\_LEN. (ADAMNET.FOR)
 Since release 1.6, there have been strong representations from JAC to retain
 ADAMCL and other associated items as part of the standard release until
 they have time to convert their systems to use ICL.
-In view of this, it is no longer proposed to withdraw ADAMCL in the near 
+In view of this, it is no longer proposed to withdraw ADAMCL in the near
 future.
 However, the level of support for it is likely to be minimal.
 

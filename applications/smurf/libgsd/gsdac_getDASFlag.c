@@ -25,7 +25,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     Checks the GSD file contents to determine the file 
+*     Checks the GSD file contents to determine the file
 *     structure and returns the correct flag.
 
 *  Authors:
@@ -83,7 +83,7 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
 
   /* Local variables. */
   int actDims;                 /* actual number of dimensions */
-  char array;                  /* array flag (should always be false) */ 
+  char array;                  /* array flag (should always be false) */
   char dimMem[MAXDIMS][16];    /* actual memory for dimension names */
   char *dimNames[MAXDIMS];     /* pointers to dimension names */
   int dimVals[MAXDIMS];        /* array dimensions */
@@ -100,7 +100,7 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Check for the presence of C55NCYC for DAS_CROSS_CORR. */
-  statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NCYC", &itemno, 
+  statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NCYC", &itemno,
                        unit, &type, &array );
 
   if ( statFlag == 0 ) {
@@ -109,44 +109,44 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
   }
 
   /* Check for the presence of C55NCYC for DAS_TP. */
-  statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NPH", &itemno, 
+  statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NPH", &itemno,
                        unit, &type, &array );
 
   if ( statFlag == 0 ) {
     *dasFlag = DAS_TP;
     return;
   }
-  
+
   /* Check the dimensionality of the C12SST array.  Continuous calibrations
      (DAS_CONT_CAL) have two dimensions. */
 
   /* Set up pointers for the dimension names (see NOTES in gsdInqSize for
      explanation). */
-  for ( i = 0; i < MAXDIMS; i++ ) 
+  for ( i = 0; i < MAXDIMS; i++ )
     dimNames[i] = dimMem[i];
 
   /* Set up pointers for the unit names (see NOTES in gsdInqSize for
      explanation). */
-  for ( i = 0; i < MAXDIMS; i++ ) 
+  for ( i = 0; i < MAXDIMS; i++ )
     unitNames[i] = unitMem[i];
 
-  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, "C12SST", &itemno, 
-		     unit, &type, &array ), 
-           status, 
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, "C12SST", &itemno,
+		     unit, &type, &array ),
+           status,
            errRep ( "gsdac_getDASFlag", "gsdFind : Could not find element C12SST in file", status ); );
 
   if ( *status != SAI__OK ) return;
 
   /* Get the dimensionality. */
-  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                        itemno, MAXDIMS, dimNames, unitNames, 
-                        dimVals, &actDims, &size ), 
-           status, 
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr,
+                        itemno, MAXDIMS, dimNames, unitNames,
+                        dimVals, &actDims, &size ),
+           status,
            errRep ( "gsdac_getDASFlag", "gsdInqSize : Error retrieving array dimensionality for C12SST", status ); );
 
   if ( *status != SAI__OK ) return;
 
   if ( actDims > 1 ) *dasFlag = DAS_CONT_CAL;
-  else *dasFlag = DAS_NONE;      
+  else *dasFlag = DAS_NONE;
 
 }

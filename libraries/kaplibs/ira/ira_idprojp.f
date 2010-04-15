@@ -13,7 +13,7 @@
 *     CALL IRA_IDPROJP( IDA, IPAR, PROJP, STATUS )
 
 *  Description:
-*     This routine returns the value of a projection parameter 
+*     This routine returns the value of a projection parameter
 *     associated with an IRA identifier.
 
 *  Arguments:
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -53,7 +53,7 @@
 
 *  History:
 *     4-OCT-2004 (DSB):
-*        Original version. 
+*        Original version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,7 +94,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Store the required projection parameter.
-         PROJP = ACM_PROJP( IPAR, IDA ) 
+         PROJP = ACM_PROJP( IPAR, IDA )
 
 *  If an error occurred, give a context message.
       ELSE

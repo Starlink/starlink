@@ -125,14 +125,14 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Bad-pixel definitions
- 
+
 *  Arguments Given:
       INTEGER DIM1               ! First dimension of the data array
       INTEGER DIM2               ! Second dimension of the data array
@@ -144,35 +144,35 @@
       INTEGER NYPAR              ! Y degree of the polynomial plus 1
       INTEGER MCHOEF             ! Dimension of Chebyshev coeff. array
       DOUBLE PRECISION CHCOEF( MCHOEF ) ! Chebyshev coefficients
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION WORK( DIM1 ) ! Workspace to store intermediate
                                  ! fitted values
       BYTE OUTARR( DIM1, DIM2 ) ! Fitted data
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Constants:
       INTEGER MXPAR              ! Maximum number of parameters which
                                  ! can be handled in each direction
       PARAMETER ( MXPAR = 15 )
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
       INTEGER J                  ! Loop counter
       INTEGER MFIRST             ! Lower limit of of valid columns
       INTEGER MLAST              ! Upper limit of valid columns
       DOUBLE PRECISION PX( MXPAR ) ! Work array
- 
+
 *  Internal References:
       BYTE VAL_DTOB         ! Conversion from double precision
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Determine the range of x-axis values which are within the valid
 *  range.  It is assumed there is one contiguous run of good x-axis
 *  values, with any out of range values occurring at the beginning or
@@ -184,61 +184,61 @@
          I = I + 1
       END DO
       MFIRST = I
- 
+
       I = DIM1
       DO WHILE ( ( ( XAXIS( I ) .LT. XMIN ) .OR.
      :             ( XAXIS( I ) .GT. XMAX ) ) .AND. ( I .GE. 1 ) )
          I = I - 1
       END DO
       MLAST = I
- 
+
 *  Check there is a least one good value.
       IF ( MLAST .GE. MFIRST ) THEN
- 
+
 *  Scan through the bins a line at a time. Note for efficiency reasons
 *  the fitting for a whole line is made in a single call.
          DO J = 1, DIM2
- 
+
 *  Check that the Y co-ordinate for this line is within the valid range.
             IF ( ( YAXIS( J ) .GE. YMIN ) .AND.
      :           ( YAXIS( J ) .LE. YMAX ) ) THEN
- 
+
 *  Evaluate the fitted surface for all pixels in the line between
 *  columns MFIRST and MLAST.
                CALL KPG1_CHE2D( MLAST - MFIRST + 1, XMIN, XMAX,
      :                          XAXIS( MFIRST ), YMIN, YMAX, YAXIS( J ),
      :                          NXPAR - 1, NYPAR - 1, MCHOEF, CHCOEF,
      :                          MXPAR, PX, WORK, STATUS )
- 
+
 *  Return the polynomial values, setting the regions outside the run of
 *  good pixels to bad values.  (Note that the first and third loops may
 *  execute zero times if there are no bad pixels).
                DO I = 1, MFIRST - 1
                   OUTARR( I, J ) = VAL__BADB
                END DO
- 
+
                DO I = MFIRST, MLAST
                   OUTARR( I, J ) = VAL_DTOB( .TRUE., WORK( I ),
      :                                         STATUS )
                END DO
- 
+
                DO I = MLAST + 1, DIM1
                   OUTARR( I, J ) = VAL__BADB
                END DO
             ELSE
- 
+
 *  All x co-ordinates lie outside the range.  Fill the line with bad
 *  values.
                DO I = 1, DIM1
                   OUTARR( I, J ) = VAL__BADB
                END DO
             END IF
- 
+
 *  End of the loops through the line of pixels.
          END DO
- 
+
       ELSE
- 
+
 *  Y co-ordinate is the outside range.  Fill the line with bad values.
          DO J = 1, DIM2
             DO I = 1, DIM1
@@ -246,7 +246,7 @@
             END DO
          END DO
       END IF
- 
+
   999 CONTINUE
- 
+
       END

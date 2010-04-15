@@ -7,7 +7,7 @@
 *     decode a bolometer ID into ADC and channel number
 
 *  Description:
-*     Given a character string containing a bolometer ID, put ADC and 
+*     Given a character string containing a bolometer ID, put ADC and
 *     CHANNEL number into output variables. The syntax of the bolometer
 *     ID is a3, A3 or 3. Allowed ADCs run from a-i. Channels
 *     must be in range 1-16. Bolometer IDs outside these ranges will cause
@@ -58,7 +58,7 @@
       CHARACTER*(*) BOLCODE
 
 *  Arguments Returned:
-      INTEGER ADC                
+      INTEGER ADC
       INTEGER CHANNEL
 
 *  Status:
@@ -100,7 +100,7 @@
       ELSE IF (BOLCODE(1:1) .EQ. 'I') THEN
          ADC = 9
       ELSE
-         
+
 *  unless the first character is a number, an error has occured
 
          I = ICHAR (BOLCODE)
@@ -128,7 +128,7 @@
             CALL ERR_REP (' ', 'SCULIB: bad bolometer ID - ^STRING',
      :        STATUS)
          ELSE
-         
+
             CALL CHR_CTOI (BOLCODE(I:), CHANNEL, STATUS)
             IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_SETC ('STRING', BOLCODE)

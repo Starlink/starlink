@@ -2,9 +2,9 @@
        LOGICAL OK
        CHARACTER*1 BLEEP
        COMMON /BLEEP / BLEEP
- 
+
        PARAMETER (ITMAX=100,EPS=3.E-7)
- 
+
        GLN = GAMMLN(A)
        GOLD = 0.
        A0 = 1.

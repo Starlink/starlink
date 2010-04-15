@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -62,8 +62,8 @@ However, first you must set up your personal Print Screen settings.
 \item Select the {\tt Print Screen...} option from the Session Manager's
 {\tt Customize} menu.
 
-\item Select {\tt Sixel} as the {\tt Output Format} and {\tt Color} as the 
-{\tt Output Color}. Note that colour PostScript output is not currently 
+\item Select {\tt Sixel} as the {\tt Output Format} and {\tt Color} as the
+{\tt Output Color}. Note that colour PostScript output is not currently
 supported.
 
 \item Select other options as required, e.g. {\tt Output File name, Prompt for
@@ -71,7 +71,7 @@ File Name}, {\it etc.}
 
 \item Click on {\tt Apply} and {\tt OK} to complete selection of print settings.
 
-\item Select {\tt Save Current Settings} from the Session Manager's 
+\item Select {\tt Save Current Settings} from the Session Manager's
 {\tt Customize }
 menu.
 
@@ -85,12 +85,12 @@ In order to print part of your screen:
 {\tt Print Screen} menu. This option is recommended over the other three options
 because:
 
-\begin{enumerate} 
+\begin{enumerate}
 
 \item The screen is frozen while the screen is being captured to file. Hence it
 is quicker to capture just that part of the screen that you require.
 
-\item Capturing the image to a file rather than sending it directly to the 
+\item Capturing the image to a file rather than sending it directly to the
 inkjet printer has the advantage that you can print further copies later
 if you are happy with the dump.
 
@@ -101,15 +101,15 @@ will not occur if you have de-selected the {\tt Prompt for File Name} option on
 the Customize Print Screen dialog box.
 
 \item When the pointer changes to a `+' cursor, move the cursor to the upper
-left corner of the area that you wish to capture. 
+left corner of the area that you wish to capture.
 
 \item Press and hold down the left-hand mouse button. A box will appear. Drag
-the cursor until the box surrounds the area that you want to capture and 
+the cursor until the box surrounds the area that you want to capture and
 then release the mouse button.
 
 \end{itemize}
 
-The captured Sixel image can be printed on your DEC LJ250 Inkjet printer with 
+The captured Sixel image can be printed on your DEC LJ250 Inkjet printer with
 a normal {\tt PRINT} command. For example:
 
 \begin{quote}
@@ -122,7 +122,7 @@ You should first check that the inkjet printer is in DEC mode, i.e. the orange
 light on the control panel should be lit. Your system manager may have set your
 inkjet print queue up so this occurs automatically when you print a job. The
 printer can be placed in DEC mode by pressing the DEC/PCL button until the
-orange light appears. Consult your Site Manager if you are unsure which 
+orange light appears. Consult your Site Manager if you are unsure which
 queue to send your print job to.
 
 \section{DECstation running DECwindows (UWS 4.0 and after)}
@@ -142,7 +142,7 @@ follows:
 
 \begin{itemize}
 
-\item Start up the {\tt snapshot} X-windows-based tool, either via 
+\item Start up the {\tt snapshot} X-windows-based tool, either via
 the default OpenWindows
 program menu or via the command line:
 
@@ -157,22 +157,22 @@ single window or a user defined region. {\tt Snapshot} also has an option to vie
 after capture. The {\tt snapshot} tool is self-explanatory but a full
 description of it can be found in the OpenWindows documentation (DeskSet
 Environment Reference Guide).
-    
+
 \item {\tt Snapshot} produces a SUN
-rasterfile. Convert the SUN rasterfile into a PostScript file using the 
+rasterfile. Convert the SUN rasterfile into a PostScript file using the
 undocumented command {\tt ras2ps}:
-    
+
 \begin{quote}
 
     {\tt \# \$OPENWINHOME/bin/xview/ras2ps -C input-file output-file}
 
 \end{quote}
-    
-the {\tt -C} option donates colour. There are a number of other 
-command line qualifiers available. 
-    
+
+the {\tt -C} option donates colour. There are a number of other
+command line qualifiers available.
+
 \begin{quote}
-{\tt 
+{\tt
 
 -x\# -y\#   origin in inches from lower left corner
 
@@ -200,20 +200,20 @@ command line qualifiers available.
 \item Copy the PostScript file to a VAX disk either via NFS  or using FTP. You
 can give {\tt ras2ps} an NFS served VMS file system filename as the output file
 name so that the output goes directly to a VAX disk. In this case you can skip
-this copying stage. Your Site Manager will know the best method at your site 
+this copying stage. Your Site Manager will know the best method at your site
 of transferring the file to the VAX disks.
-    
+
 \item Log onto the VAXcluster and print the PostScript file on your inkjet
 printer with the command
 
 \begin{quote}
-    
+
     {\tt \$ PSPRINT/QUE=inkjet-queue-name filename}
-    
+
 \end{quote}
 
 Note that you must use the command {\tt PSPRINT} and not {\tt PRINT} because
-you are printing a PostScript file. Consult your Site Manager if you are unsure 
+you are printing a PostScript file. Consult your Site Manager if you are unsure
 which queue to send the print job to.
 
 
@@ -221,10 +221,10 @@ which queue to send the print job to.
 
 This procedure may seem complicated but the quality of the final print is very
 good -- far better than that of the VAXstation Sixel dumps.
-The image capture and {\tt ras2ps} stages 
+The image capture and {\tt ras2ps} stages
 are quick and the whole process is dominated by the time taken for {\tt
 PSPRINT} to convert the PostScript file to Sixel format. Temporary disk space
-usage can be high, up to 5000 blocks for single large window and 13000 blocks 
-if you capture the whole screen. 
-    
+usage can be high, up to 5000 blocks for single large window and 13000 blocks
+if you capture the whole screen.
+
 \end{document}

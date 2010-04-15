@@ -74,7 +74,7 @@ void starFree( void * ptr ) {
 #endif
 
   switch ( STARMEM_MALLOC ) {
-    
+
   case STARMEM__SYSTEM:
     free( ptr );
     break;

@@ -4,5 +4,5 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-double sbmgst(double qfoo,double qbar,double qbaz){return 
+double sbmgst(double qfoo,double qbar,double qbaz){return
 sbmdranrm(sbmera(qbar,qbaz)-sbmeo(qfoo));}

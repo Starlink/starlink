@@ -10,9 +10,9 @@
 
 *  Description:
 *     If status is good on entry this routine will calculate the differential
-*     of chi-squared with respect to A(J) and A(K). It does this numerically 
+*     of chi-squared with respect to A(J) and A(K). It does this numerically
 *     by calling the supplied routine XISQ_ROUTINE to calculate chi-squared at
-*     [A(J)+DELTA_AJ,A(K)+DELTA_AK], [A(J)-DELTA_AJ,A(K)+DELTA_AK], 
+*     [A(J)+DELTA_AJ,A(K)+DELTA_AK], [A(J)-DELTA_AJ,A(K)+DELTA_AK],
 *     [A(J)+DELTA_AJ,A(K)-DELTA_AK] and [A(J)-DELTA_AJ,A(K)-DELTA_AK]. The
 *     result is then calculated using the formula:-
 *
@@ -21,7 +21,7 @@
 *                .---------------------------------------------------------------
 *                                    4 * DELTA_AJ * DELTA_AK
 *
-*     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is 
+*     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is
 *     zero, 0.001. DELTA_AK is calculated in a similar way.
 
 *  Invocation:
@@ -142,7 +142,7 @@
 
 *  calculate result and go back to original A(J),A(K)
 
-      D2XISQ_DAJK = (XISQPP - XISQMP - XISQPM + XISQMM) / 
+      D2XISQ_DAJK = (XISQPP - XISQMP - XISQPM + XISQMM) /
      :  (4.0D0 * DELTA_AJ * DELTA_AK)
       A(J) = A(J) + DELTA_AJ
       A(K) = A(K) - DELTA_AK

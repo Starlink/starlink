@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -83,27 +83,27 @@ Obviously it is not possible to try the examples in that document until
 after installation is completed.
 
 Sections of this guide marked with *** should be checked on each new release.
-Other sections can usually be omitted, and existing modified files re-used, if 
-ADAM has already been installed. 
+Other sections can usually be omitted, and existing modified files re-used, if
+ADAM has already been installed.
 To facilitate the re-use of modified files, it is recommended that they be
 saved outside the ADAM directory tree.
 
 {\em Where existing directories are used, ensure that they are empty before
 performing backups.}
 
-Release notes \cite{ssn45} will give details of changes for each release and 
+Release notes \cite{ssn45} will give details of changes for each release and
 specify the disk space required.
 They will also indicate if changes have been made to the released versions
 of the files which may be modified locally.
 
 \subsection{Full and Mini-Systems}
 ADAM may be installed as a {\em full} system, which includes all system source
-and object libraries {\em etc.}, or as a {\em mini} system consisting only of 
+and object libraries {\em etc.}, or as a {\em mini} system consisting only of
 the files necessary for running the system and developing application programs.
 
 The full system will be distributed as a backup save set on magnetic tape and
-the mini-system may be easily selected from it. 
-Initially upon release, the mini-system will be available as a disk save set 
+the mini-system may be easily selected from it.
+Initially upon release, the mini-system will be available as a disk save set
 obtainable over the network.
 It is expected that most sites will only install the mini-system as it requires
 a quarter of the disk space of the full system.
@@ -122,8 +122,8 @@ Each release, whether complete or partial, will have an {\em ADAM version
 number}.
 The ADAM version number is tied to a Starlink Software Change and can therefore
 be used to check that changes are up to date.
-Releases which contain new functionality will have a version number like `2.1' 
-and subsequent releases containing only bug fixes or other minor changes will 
+Releases which contain new functionality will have a version number like `2.1'
+and subsequent releases containing only bug fixes or other minor changes will
 be numbered `2.1-1', `2.1-2' {\em etc.}
 A version number of the form 2.1 does not imply a complete release. This is a
 change from earlier practice.
@@ -149,7 +149,7 @@ Appropriate logical names and symbols must be defined as specified for each
 item.
 If the releases are not up to date, problems may arise.
 
-Other Starlink software items, PAR, NDF, SGS, GKS {\em etc.}, need only be 
+Other Starlink software items, PAR, NDF, SGS, GKS {\em etc.}, need only be
 installed if the applications to be run require them.
 
 The following additional items of Starlink software must be installed in order
@@ -183,7 +183,7 @@ These are given logical names LADAM\_DIR and LADAM\_APPLIC.\\
 At Starlink sites the directories should be:
 \small \begin{quote}
 \begin{verbatim}
-LSTARDISK:[STARLOCAL.ADAM] and 
+LSTARDISK:[STARLOCAL.ADAM] and
 LSTARDISK:[STARLOCAL.PACK.ADAMAPP].
 \end{verbatim}
 \end{quote} \normalsize
@@ -195,7 +195,7 @@ This will normally be done by obeying the instructions in the applicable
 Starlink Software Change notice after copying a disk save set.
 
 To install the mini-release from tape, create subdirectory [.RELEASE]
-of the ADAM top level directory created above and assign logical name ADAM\_DIR 
+of the ADAM top level directory created above and assign logical name ADAM\_DIR
 to it. If an existing directory is used, ensure that it is empty. Then obey:
 \small \begin{quote}
 \begin{verbatim}
@@ -203,7 +203,7 @@ $ SET DEF ADAM_DIR
 $ BACKUP mt:save_set/SELECT=([ADAM.RELEASE...]*.*;*) [...]*.*;*
 \end{verbatim}
 \end{quote} \normalsize
-where \verb+mt:save_set+ is the appropriate unit and save set name. 
+where \verb+mt:save_set+ is the appropriate unit and save set name.
 
 \subsubsection{Full Release}
 To install the full system from tape, ensure that directory ADAM\_SYS is empty
@@ -214,7 +214,7 @@ $ SET DEF ADAM_SYS
 $ BACKUP mt:save_set/SELECT=([ADAM...])*.*;* [...]*.*;*
 \end{verbatim}
 \end{quote} \normalsize
-where: \verb+mt:save_set+ is the appropriate unit and save set name. 
+where: \verb+mt:save_set+ is the appropriate unit and save set name.
 
 \subsubsection{Partial Release}
 This will be done by obeying the instructions in the applicable Starlink
@@ -230,16 +230,16 @@ This is done by obeying the DCL procedure ADAM\_DIR:\-SYS\-LOGNAM.\-COM.
 The version supplied is suitable for a standard Starlink site
 with the full release installed; it may be modified, as described below,
 for particular site requirements.
-Release notes will indicate if SYS\-LOG\-NAM\-.COM has changed since the last 
+Release notes will indicate if SYS\-LOG\-NAM\-.COM has changed since the last
 release and the installation should proceed accordingly.
 \subsection{*** Selecting SYSLOGNAM.COM}
 \subsubsection{If SYSLOGNAM.COM has not changed}
 \label{nomodsys}
-If the release notes do not indicate that the supplied version of 
+If the release notes do not indicate that the supplied version of
 SYS\-LOGNAM\-.COM has changed, do the first one of the following which applies:
 \begin{enumerate}
 \item For a partial release, take no action.
-\item If a customized version of SYSLOGNAM.COM has been saved from the previous 
+\item If a customized version of SYSLOGNAM.COM has been saved from the previous
 installation, substitute that version.
 \item If the full release is installed, take no action.
 \item If the mini-release is installed, obey:
@@ -250,13 +250,13 @@ $ COPY ADAM_DIR:SYSLOGNAM.MINI ADAM_DIR:SYSLOGNAM.COM
 \end{quote} \normalsize
 Note that the difference between SYSLOGNAM.COM and SYSLOGNAM.MINI is that
 in the former, system logical name ADAM\_SYS is defined.
-ADAM\_SYS should not be defined unless the full release is installed as it may 
-be used to flag that the full system is installed if partial updates are 
+ADAM\_SYS should not be defined unless the full release is installed as it may
+be used to flag that the full system is installed if partial updates are
 released later.
 \end{enumerate}
 Now, if you are happy that the version of SYS\-LOGNAM\-.COM that you have is
 suitable for your site, continue with the installation; otherwise, particularly
-if this is the first time you have installed ADAM, proceed to Section 
+if this is the first time you have installed ADAM, proceed to Section
 \ref{modsys}.
 
 \subsubsection{If SYSLOGNAM.COM has changed}
@@ -273,11 +273,11 @@ These two logical names are commented out of the released version.
 \item The definitions of ADAM\_EXE and ADAM\_HELP may be altered for example
 to include LADAM\-\_APP\-LIC. They are the search lists used to locate
 executable images and ADAMCL help files respectively.
-\item The definitions of STAR\_LINK\_ADAM and/or STAR\_DEV\_ADAM (see Section 
+\item The definitions of STAR\_LINK\_ADAM and/or STAR\_DEV\_ADAM (see Section
 \ref{starlibs}).
 \item The definition of logical names MSP\_SHR or AZUSS.
 \item The /SYSTEM qualifiers --
-It is recommended that the logical names are set up as SYSTEM logical names 
+It is recommended that the logical names are set up as SYSTEM logical names
 but they could be GROUP or even JOB logical names if necessary.
 \item The definition of ICL global login command files ICL\-\_LOGIN\-\_SYS
 {\em etc.} (see Section \ref{adampacks}).
@@ -289,7 +289,7 @@ images need not be INSTALLed.
 \item The definition of DEVDATASET (see Section \ref{devdataset}).
 \end{itemize}
 
-If changes are required, modify ADAM\_DIR:SYSLOGNAM.COM and ensure that 
+If changes are required, modify ADAM\_DIR:SYSLOGNAM.COM and ensure that
 changes are noted in the prologue.
 
 Arrange that ADAMDISK:[ADAM.RELEASE]SYSLOGNAM.COM, or the equivalent at your
@@ -307,7 +307,7 @@ possible use with subsequent releases of ADAM.
 \subsection{ICL}
 \label{adampacks}
 A complete description of the way in which Starlink uses the login command
-files feature of the Interactive Command Language (see \cite{icl}) is given in 
+files feature of the Interactive Command Language (see \cite{icl}) is given in
 \cite{ssn64}.
 This section summarizes the role played by SYS\-LOGNAM\-.COM and indicates
 the ways in which it might be modified at non-Starlink sites.
@@ -317,31 +317,31 @@ login command file automatically obeyed by ICL when it is activated.
 They are:
 \begin{description}
 \item[ICL\_LOGIN\_SYS] This defines the ICL `system' login command file.
-The standard equivalence name of the {\em system} logical name is 
+The standard equivalence name of the {\em system} logical name is
 ICLDIR:\-LOGIN\-.ICL.
 This command file will warn users that ADAM tasks cannot be run because
-the DCL procedure ADAM\_DIR:\-ADAM\-START\-.COM has not been obeyed. 
+the DCL procedure ADAM\_DIR:\-ADAM\-START\-.COM has not been obeyed.
 
 When ADAM\_DIR:\-ADAM\-START\-.COM is obeyed, it defines a {\em process}
 logical name ICL\-\_LOGIN\-\_SYS (with equivalence name ADAMLOGIN) to override
 the {\em system} logical name and result in an ADAM specific ICL login command
 file being obeyed.
 \item[ADAMLOGIN] is the equivalence name of the {\em process} logical name
-ICL\_LOGIN\_SYS {\em after} ADAM\-START has been obeyed; its standard 
+ICL\_LOGIN\_SYS {\em after} ADAM\-START has been obeyed; its standard
 equivalence name is ICL\-DIR:\-ADAM\-LOGIN\-.ICL.
-This command file will attempt to `LOAD' a command file with the logical name 
+This command file will attempt to `LOAD' a command file with the logical name
 ADAM\-\_PACKAGES.
 \item[ADAM\_PACKAGES] This defines an ICL command file to be `LOADed' by
-ICL\-DIR:\-ADAM\-LOGIN\-.ICL; its standard equivalence name will be 
+ICL\-DIR:\-ADAM\-LOGIN\-.ICL; its standard equivalence name will be
 SSC:\-ADAM\-\_PACK\-AGES\-.ICL.
 Note that this is a command file which is not part of the ADAM
-release; it will define the initial commands and messages associated with 
+release; it will define the initial commands and messages associated with
 Starlink {\em standard}\/ and {\em option}\/ ADAM application  packages.
 It will also attempt to `LOAD' a command file specified by the logical name
 LADAM\-\_PACKAGES.
 \item[LADAM\_PACKAGES] This specifies a command file which will be `LOADed'
-if SSC:\-ADAM\-\_PACK\-AGES\-.ICL is `LOADed'; its standard equivalence name 
-will be LSSC:\-ADAM\-\_PACK\-AGES\-.ICL which defines the initial commands and 
+if SSC:\-ADAM\-\_PACK\-AGES\-.ICL is `LOADed'; its standard equivalence name
+will be LSSC:\-ADAM\-\_PACK\-AGES\-.ICL which defines the initial commands and
 messages associated with {\em local}\/ ADAM application packages.
 \end{description}
 
@@ -349,12 +349,12 @@ If this arrangement is not appropriate at your site, a number of options are
 available.
 \begin{enumerate}
 \item If you wish to use a different ICL login command file {\em before}
-ADAMSTART is obeyed, alter SYSLOGNAM\-.COM to define ICL\-\_LOGIN\-\_SYS 
+ADAMSTART is obeyed, alter SYSLOGNAM\-.COM to define ICL\-\_LOGIN\-\_SYS
 appropriately.
 \item If you wish to use a different ICL login command file {\em after}
 ADAM\-START is obeyed, alter SYS\-LOGNAM\-.COM to define ADAM\-LOGIN
 appropriately.
-\item If you do not want the Starlink ADAM\-\_PACK\-AGES command file to be 
+\item If you do not want the Starlink ADAM\-\_PACK\-AGES command file to be
 obeyed, alter SYS\-LOG\-NAM.COM to define ADAM\-\_PACK\-AGES appropriately for
 your site.
 A dummy command file DUMMY\-.ICL, provided in ICLDIR, may be of use here.
@@ -368,23 +368,23 @@ They should include at least the version heading of the released versions.
 \item For instructions on modifying SYSLOGNAM.COM, see Section \ref{modsys}.
 \end{enumerate}
 
-ICL will also obey a command file pointed at by the logical name 
+ICL will also obey a command file pointed at by the logical name
 ICL\_LOGIN\_LOCAL.
 This is intended for local site use and can also be set in SYSLOGNAM.COM.
 It is commented out of the supplied version.
 
 \section{STARLINK SUBROUTINE LIBRARIES}
 \label{starlibs}
-SYSLOGNAM.COM defines two logical names required to make important Starlink 
+SYSLOGNAM.COM defines two logical names required to make important Starlink
 subroutine libraries available automatically for application development.
 \begin{description}
 \item[STAR\_LINK\_ADAM] This defines a link options file which will be used
 with the task link commands, ALINK, ILINK {\em etc.}
-The released version of SYSLOGNAM.COM points to a standard Starlink options 
-file which in turn searches a shareable image library defined by the same 
+The released version of SYSLOGNAM.COM points to a standard Starlink options
+file which in turn searches a shareable image library defined by the same
 logical name. The shareable images themselves need only be available if routines within
 them are required by the task being linked.
-\item[STAR\_DEV\_ADAM] This defines a procedure to be obeyed by 
+\item[STAR\_DEV\_ADAM] This defines a procedure to be obeyed by
 the ADAM application development startup procedure, ADAM\_DEV.
 The released version points to the standard Starlink procedure which will
 define logical names required for application development using the selected
@@ -397,9 +397,9 @@ Those sites which are not interested in having this facility, or want
 alternative libraries available, may wish to modify SYSLOGNAM.COM to re-define
 STAR\_LINK\_ADAM and/or STAR\-\_DEV\-\_ADAM.
 The STAR\-\_LINK\-\_ADAM options file should pick up the PAR library as a
-minimum. 
+minimum.
 A minimal options file is provided in ADAM\_EXE:\-STAR\_LINK\_ADAM0\-.OPT
-and a null version of STAR\-\_DEV\-\_ADAM is provided in 
+and a null version of STAR\-\_DEV\-\_ADAM is provided in
 ADAM\-\_DIR:\-STAR\-\_DEV\-\_ADAM0\-.OPT. These may be used instead of the
 standard.
 
@@ -457,7 +457,7 @@ Then type :
 $ ADAMSTART
 \end{verbatim}
 \end{quote} \normalsize
-to set up the required directory, files and symbols, and to display the ADAM 
+to set up the required directory, files and symbols, and to display the ADAM
 version number.
 
 Now type:
@@ -483,10 +483,10 @@ DEFINE all the ICL tasks before they can be used.
 It is also assumed that the Starlink software item TRACE is installed.
 
 xxxxxxxxx is a subprocess name invented by ADAM (different in each case) and
-yyyy is the suggested value (again different in each case and usually the last 
+yyyy is the suggested value (again different in each case and usually the last
 value used by this user.)
 
-If nothing is shown after the prompt for a parameter, it indicates that 
+If nothing is shown after the prompt for a parameter, it indicates that
 \verb%<return>% was typed and the suggested value used.
 \small \begin{quote}
 \begin{verbatim}
@@ -514,7 +514,7 @@ TAPEDRIVE   /@yyyy/ > mua0
 %MOUNT-I-MOUNTED, mounted on _xxxxx$MUA0
 ICL> TAPEDISM
 Loading TAPEDISM into xxxxxxxxx
-TAPEDRIVE   /@mua0/ > 
+TAPEDRIVE   /@mua0/ >
 ICL>
 \end{verbatim}
 \end{quote} \normalsize
@@ -530,7 +530,7 @@ CANCL - Do you wish to cancel the device parameter? > Y
 \end{verbatim}
 \end{quote} \normalsize
 
-The word STARLINK will be drawn in box on the device whose GNS \cite{sun57} 
+The word STARLINK will be drawn in box on the device whose GNS \cite{sun57}
 name is specified, and ICL will prompt for the next command.
 
 To terminate the ICL session, type EXIT in response to the prompt.
@@ -542,9 +542,9 @@ $
 \end{quote} \normalsize
 
 \subsection{Verification - Program Development}
-A reasonably complete test that program development is possible can be 
+A reasonably complete test that program development is possible can be
 carried out by building a monolith.
-After ADAMSTART, execute the DCL command ADAM\_DEV. Then copy the source 
+After ADAMSTART, execute the DCL command ADAM\_DEV. Then copy the source
 of the test monolith into your working directory as follows:
 \small \begin{quote}
 \begin{verbatim}
@@ -553,7 +553,7 @@ $ ADAM_DEV
 $ COPY ADAM_TEST:TESTADAM.* *
 \end{verbatim}
 \end{quote} \normalsize
-This will have copied the source and interface file for a monolith 
+This will have copied the source and interface file for a monolith
 called TESTADAM containing the single A-task TESTRUN.
 \small \begin{quote}
 \begin{verbatim}
@@ -570,8 +570,8 @@ ICL> EXIT
 \section{ADAM DEVICE DATA STRUCTURES}
 \label{devdataset}
 \subsection{Introduction}
-ADAM obtains information about the tape drives on your VAX system from data 
-structures contained in an HDS container file which has the logical name 
+ADAM obtains information about the tape drives on your VAX system from data
+structures contained in an HDS container file which has the logical name
 DEVDATASET assigned to it.
 A SYSTEM DEVDATASET is set up at each site but users can create
 and use their own versions if required, by defining a GROUP or JOB logical
@@ -582,8 +582,8 @@ as shown above.
 
 \subsection{Creating ADAM Device Dataset Structures}
 The version of DEVDATASET provided in ADAM\_DIR:DEVICE7.SDF may suffice for
-your installation. If it does not, create a suitable one as described 
-below, copy it to LADAM\_DIR and alter the definition of DEVDATASET in 
+your installation. If it does not, create a suitable one as described
+below, copy it to LADAM\_DIR and alter the definition of DEVDATASET in
 SYSLOGNAM.COM to point to the new file.
 
 Note that the following procedure will create a sub-directory [.ADAM] of the
@@ -612,7 +612,7 @@ The second argument must be the full VAX device name. This can be a logical
 name if so desired.
 
 The procedure is usually carried out using an ICL command file.
-The command file used to create the supplied DEVDATASET is 
+The command file used to create the supplied DEVDATASET is
 supplied in ADAM\-\_DIR:\-DEV\-ICE7.ICL.
 Copy this to your working directory and edit it as required.
 
@@ -638,7 +638,7 @@ ICL> LOAD DEVICES
 \end{verbatim}
 \end{quote} \normalsize
 
-You should save DEVICES.ICL to enable DEVDATASET to be rapidly re-created 
+You should save DEVICES.ICL to enable DEVDATASET to be rapidly re-created
 in the event of problems or if it is required by a new release.
 
 \begin{thebibliography}{9}
@@ -660,11 +660,11 @@ Starlink User Note 57.
 \label{changes}
 The changes made to this document since the previous version are as follows:
 \begin{description}
-\item[Section \ref{vers}] There is no longer a connection between version 
+\item[Section \ref{vers}] There is no longer a connection between version
 numbering and the type of release (complete or partial).
 \item[Section \ref{reqs}] The list of required separate Starlink software items
 has been modified to include HELP, PSX and PAR.
-\item[Section \ref{starlibs}] The STAR\_LINK\_ADAM options file must now pick 
+\item[Section \ref{starlibs}] The STAR\_LINK\_ADAM options file must now pick
 up the PAR library as a minimum.
 \end{description}
 \end{document}

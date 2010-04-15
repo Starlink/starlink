@@ -7,7 +7,7 @@
 *     matrix vector multiplication routine
 
 *  Description:
-*     If status is good on entry, this routine will multiply the N-vector 
+*     If status is good on entry, this routine will multiply the N-vector
 *     BETA by the NxN matrix ALPHA to give the N-vector GAMMA. GAMMA should
 *     not be the same as BETA as this would mean BETA being overwritten
 *     during the multiplication process giving an incorrect answer.

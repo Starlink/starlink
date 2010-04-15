@@ -3,17 +3,17 @@
      :  TYPE_REQUIRED, SEARCH_MODE, OBS_MATCH, AMTOLER, OBS_NAME,
      :  STATUS)
 *    Description :
-*     This subroutine searches the observation cache and index for a reduced 
+*     This subroutine searches the observation cache and index for a reduced
 *     observation that will be of use in the reduction sequence of the
 *     current integration/observation. For example the observation of
 *     a star will need the results of BIAS, DARK, and FLAT
 *     observations in its reduction sequence, each of these will be
-*     selected using this routine. 
+*     selected using this routine.
 *
-*     Currently the routine selects the suitable observation of the 
+*     Currently the routine selects the suitable observation of the
 *     desired type that was taken closest in time to the observation
-*     being reduced. The SEARCH_MODE argument controls whether 
-*     this search is made to cover observations taken before the current 
+*     being reduced. The SEARCH_MODE argument controls whether
+*     this search is made to cover observations taken before the current
 *     observation (backwards search), after the current observation
 *     (forwards search), or both. 'Suitability' depends on the type of the
 *     desired observation, it may require many of the array exposure and
@@ -306,10 +306,10 @@
       CHARACTER*(*) SEARCH_MODE        ! The search mode required:
 *                                      !   'BACKWARDS' - backwards in time
 *                                      !   'FORWARDS'  - forwards in time
-*                                      !   'BOTH'      - backwards and forwards 
+*                                      !   'BOTH'      - backwards and forwards
       CHARACTER*(*) OBS_MATCH          ! String containing the names of the
 *                                      !   items which must match for the
-*                                      !   observation to be considered 
+*                                      !   observation to be considered
 *                                      !   suitable. This string will have
 *                                      !   come from either the FLAT_MATCH,
 *                                      !   CALIB_MATCH or STANDARD_MATCH
@@ -331,7 +331,7 @@
 *    Local variables :
 *
 *           --- general variables ---
-      LOGICAL LOOPING                  ! T if looping through entries in index 
+      LOGICAL LOOPING                  ! T if looping through entries in index
 *                                           file
       LOGICAL FOUND                    ! T if a suitable entry is found
       LOGICAL FLAT_OK                  ! Flag indicating if a FLAT is suitable
@@ -348,13 +348,13 @@
       CHARACTER*20 LPREFIX             ! To hold directory prefix
       CHARACTER*4 COMMENT              ! Dummy comment
 *                                           I/O error that occurs
-      CHARACTER*132 DIFFERENCES        ! The differences between the 
+      CHARACTER*132 DIFFERENCES        ! The differences between the
 *                                      !    required and the actual
 *                                      !    configuration of an observation.
 *
 *           --- variables holding description of observation being reduced ---
       CHARACTER*20 INTTYPE             ! Observation mode.
-      INTEGER GRATING_ORDER            ! The order in which the grating is 
+      INTEGER GRATING_ORDER            ! The order in which the grating is
 *                                            working
       INTEGER OBSNUM                   ! Observation number
       CHARACTER*20 INSTRUMENT         ! The instrument
@@ -364,25 +364,25 @@
       INTEGER DET_ENC_BASE             ! The base position of the detector
 *                                           translation mechanism for this
 *                                           observation
-      INTEGER DET_NINCR                ! The number of detector positions 
+      INTEGER DET_NINCR                ! The number of detector positions
 *                                           measured in this observation
       INTEGER CNFINDEX                 ! The instrument configuration index.
       REAL TIME                        ! The time at which this observation
 *                                           ended, e.g. 23.4856 (hh.mmss)
       REAL DIFF                        ! The difference in hours between
 *                                           this observation ending and the
-*                                           end of a particular observation of 
+*                                           end of a particular observation of
 *                                           the desired type
       REAL ADIFF                       ! The absolute value of DIFF.
       REAL MIN_ADIFF                   ! The minimum value of ADIFF
       REAL EXPOSURE                    ! The on-chip exposure time used
 *                                           during the observation currently
 *                                           being examined on the index
-      REAL GRATING_WVLNGTH             ! The wavelength to which the grating 
+      REAL GRATING_WVLNGTH             ! The wavelength to which the grating
 *                                           set during the observation
       REAL GRATING_ANGLE               ! The angle of incidence of the input
 *                                           beam on the grating
-      REAL SLIT_ANGLE                  ! The angle of the slit during the 
+      REAL SLIT_ANGLE                  ! The angle of the slit during the
 *                                           observation
       REAL CVF_WAVELENGTH              ! The wavelength to which the CVF was set
 *                                           during the observation
@@ -393,10 +393,10 @@
 *                                           observation to be reduced
       CHARACTER*80 CVF_NAME            ! The name of the CVF used during the
 *                                           observation to be reduced
-      CHARACTER*80 FILTERS             ! The filter combination used during 
+      CHARACTER*80 FILTERS             ! The filter combination used during
 *                                           the observation to be reduced
 *
-      RECORD /OBSREC/ OBSREC           ! An observation record 
+      RECORD /OBSREC/ OBSREC           ! An observation record
 *                                      ! (structure defined in RED4_COMMON.INC)
 *
 *    Local data :
@@ -444,7 +444,7 @@
       END IF
 
 *    All observation types require a match with the detector size,
-*    so obtain the size of the detector in the observation being 
+*    so obtain the size of the detector in the observation being
 *    reduced.
       CALL DSA_GET_FITS_I( OBSREF, 'DCOLUMNS', 0, DET_NCOLUMNS,
      :  COMMENT, DSA_STATUS )
@@ -550,7 +550,7 @@
 *   If the type required is a FLAT, CALIBRATION or STANDARD, there must be a match
 *   in the oversampling parameters, so obtain these.
       IF ( ( TYPE_REQUIRED .EQ. 'FLAT' ) .OR.
-     :     ( TYPE_REQUIRED .EQ. 'CALIBRATION' ) .OR. 
+     :     ( TYPE_REQUIRED .EQ. 'CALIBRATION' ) .OR.
      :     ( TYPE_REQUIRED .EQ. 'STANDARD' ) ) THEN
 
          CALL DSA_GET_FITS_I( OBSREF, 'DENCBASE', 0, DET_ENC_BASE,
@@ -559,7 +559,7 @@
      :     COMMENT, DSA_STATUS )
       ENDIF
 
-*   If the type required is a STANDARD, then the mean air mass may also be 
+*   If the type required is a STANDARD, then the mean air mass may also be
 *   checked. Assume the mean air mass is mid way between the air mass at
 *   the start and at the end.
       IF ( TYPE_REQUIRED .EQ. 'STANDARD' ) THEN
@@ -598,7 +598,7 @@
          CALL ERR_OUT( ' ', 'Unable to open index file ^INDEX', STATUS )
       ELSE
 
-*       Arbitrarily set the minimum time different to 24000 hours (1000 
+*       Arbitrarily set the minimum time different to 24000 hours (1000
 *       days), as it is unlikely that any data reduction session will last
 *       this long (unless the VAX is very very busy??).
          MIN_ADIFF = 24000.0
@@ -657,7 +657,7 @@
                END IF
             ELSE
 
-*             Convert the character items just read to upper case, so they 
+*             Convert the character items just read to upper case, so they
 *             may be tested more easily.
                CALL CHR_UCASE( OBSREC.QUALITY )
                CALL CHR_UCASE( OBSREC.TYPE )
@@ -667,13 +667,13 @@
                CALL CHR_UCASE( OBSREC.CVF_NAME )
                CALL CHR_UCASE( OBSREC.FILTERS )
 
-*             check that this observation is good quality and the type is 
+*             check that this observation is good quality and the type is
 *             correct
                IF (OBSREC.QUALITY .EQ. 'GOOD' .AND. OBSREC.TYPE .EQ.
      :          TYPE_REQUIRED) THEN
 
 *                The checks used to determine whether an observation is
-*                suitable depends on the type of observation required 
+*                suitable depends on the type of observation required
                   IF (TYPE_REQUIRED .EQ. 'BIAS') THEN
 
 *                   BIAS required. A BIAS must have been taken with the same
@@ -688,10 +688,10 @@
 *                      A suitable BIAS has been found.
 *                      If searching in only one direction then just assume it
 *                      is the closest in time   in that direction. Logically it
-*                      must be. If searching in both directions then if this 
+*                      must be. If searching in both directions then if this
 *                      is the first direction (backwards) accept this obs. and
-*                      start searching forwards. If searching forwards then 
-*                      compare time differences to get the best one and then 
+*                      start searching forwards. If searching forwards then
+*                      compare time differences to get the best one and then
 *                      quit the loop.
 
                         IF ( SEARCH_MODE .EQ. 'BOTH' ) THEN
@@ -710,7 +710,7 @@
 *                         start) if +ve direction then finished.
                            IF (INC .LT. 0) THEN
                               INC = 1
-                              RECNUM = OBSNUM 
+                              RECNUM = OBSNUM
                            ELSE
                               LOOPING = .FALSE.
                            END IF
@@ -736,7 +736,7 @@
 
                            CALL MSG_SETC( 'NAME', OBSREC.OBSERVATION )
                            CALL MSG_OUT( ' ', '(BIAS observation '/
-     :                      /'r^NAME has a different detector size)', 
+     :                      /'r^NAME has a different detector size)',
      :                      STATUS )
                         END IF
                      END IF
@@ -775,15 +775,15 @@
                                  ADIFF = ABS( DIFF )
 
                                  IF ( ADIFF .LT. MIN_ADIFF ) THEN
-                                    CALL RED4_OBSTOROBS( 
-     :                               OBSREC.OBSERVATION, OBS_NAME, 
+                                    CALL RED4_OBSTOROBS(
+     :                               OBSREC.OBSERVATION, OBS_NAME,
      :                               STATUS )
                                     MIN_ADIFF = ADIFF
                                  END IF
 
                                  IF (INC .LT. 0) THEN
                                     INC = 1
-                                    RECNUM = OBSNUM 
+                                    RECNUM = OBSNUM
                                  ELSE
                                    LOOPING = .FALSE.
                                  END IF
@@ -803,8 +803,8 @@
                               ENDIF
 
                            ELSE
-                  
-*                            If required, issue a message indicating why this 
+
+*                            If required, issue a message indicating why this
 *                            DARK is being rejected.
                               IF ( VERBOSE ) THEN
 
@@ -812,7 +812,7 @@
      :                            OBSREC.OBSERVATION )
                                  CALL MSG_OUT( ' ', '(DARK observation '/
      :                            /'r^NAME has a different observing mode)',
-     :                            STATUS ) 
+     :                            STATUS )
                               END IF
                            END IF
                         ELSE
@@ -824,7 +824,7 @@
                               CALL MSG_SETC( 'NAME', OBSREC.OBSERVATION )
                               CALL MSG_OUT( ' ', '(DARK observation '/
      :                         /'r^NAME has a different on-chip '/
-     :                         /'exposure time)', STATUS ) 
+     :                         /'exposure time)', STATUS )
                            END IF
                         END IF
                      ELSE
@@ -834,7 +834,7 @@
                         IF ( VERBOSE ) THEN
 
                            CALL MSG_SETC( 'NAME', OBSREC.OBSERVATION )
-                           CALL MSG_OUT( ' ', '(DARK observation r^NAME '/ 
+                           CALL MSG_OUT( ' ', '(DARK observation r^NAME '/
      :                      /'has a different detector size)', STATUS )
                         END IF
                      ENDIF
@@ -858,7 +858,7 @@
 
 
 *                      Now check the optional parameters, included in OBS_MATCH
-*                      Initialise the OK flag and the differences list and 
+*                      Initialise the OK flag and the differences list and
 *                      check the parameters one by one.
                         FLAT_OK = .TRUE.
                         DIFFERENCES = ' '
@@ -871,14 +871,14 @@
                               FLAT_OK = .FALSE.
                               CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                               DIFFERENCES = DIFFERENCES(1:CLEN)
-     :                         // 'GRATING ' 
+     :                         // 'GRATING '
                            END IF
                         END IF
 
 *                      Grating angle ?
                         IF ( INDEX(OBS_MATCH, 'GANGLE') .NE. 0 ) THEN
 
-                           IF ( ABS ( OBSREC.GRATING_ANGLE - 
+                           IF ( ABS ( OBSREC.GRATING_ANGLE -
      :                      GRATING_ANGLE ) .GT. TOLER ) THEN
 
                               FLAT_OK = .FALSE.
@@ -966,7 +966,7 @@
                         IF ( INDEX(OBS_MATCH, 'FILTERS') .NE. 0 ) THEN
 
                            IF ( OBSREC.FILTERS .NE. FILTERS ) THEN
-   
+
                               FLAT_OK = .FALSE.
                               CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                               DIFFERENCES = DIFFERENCES(1:CLEN+1) //
@@ -1003,12 +1003,12 @@
                                  MIN_ADIFF = ADIFF
                               END IF
 
-*                            if that was -ve direction then reverse direction 
-*                            and start from obsnum+1 (the +1 gets done at 
+*                            if that was -ve direction then reverse direction
+*                            and start from obsnum+1 (the +1 gets done at
 *                            the loop start) if +ve direction then finished.
                               IF (INC .LT. 0) THEN
                                  INC = 1
-                                 RECNUM = OBSNUM 
+                                 RECNUM = OBSNUM
                               ELSE
                                  LOOPING = .FALSE.
                               END IF
@@ -1048,15 +1048,15 @@
                               CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
 
                               CALL MSG_SETC( 'DIFFERENCES',
-     :                         DIFFERENCES(1:72) ) 
-                              CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS ) 
+     :                         DIFFERENCES(1:72) )
+                              CALL MSG_OUT( ' ', ' - ^DIFFERENCES', STATUS )
 
                               IF ( CLEN .GT. 72 ) THEN
 
                                  CALL MSG_SETC( 'DIFFERENCES2',
      :                            DIFFERENCES(73:) )
                                  CALL MSG_OUT( ' ', ' - ^DIFFERENCES2',
-     :                            STATUS ) 
+     :                            STATUS )
                               END IF
                            END IF
                         END IF
@@ -1076,7 +1076,7 @@
                         IF ( VERBOSE ) THEN
 
                            CALL MSG_SETC( 'NAME', OBSREC.OBSERVATION )
-                           CALL MSG_OUT( ' ', '(FLAT observation r^NAME '/ 
+                           CALL MSG_OUT( ' ', '(FLAT observation r^NAME '/
      :                      /'has a different detector size)', STATUS )
                         END IF
                      ENDIF
@@ -1086,22 +1086,22 @@
 *                   CALIBRATION required. The CALIBRATION must have been taken
 *                   with the same detector columns and oversampling parameters.
 *                   A match is also checked between the instrument
-*                   configuration parameters specified in the CALIB_MATCH 
+*                   configuration parameters specified in the CALIB_MATCH
 *                   parameter (OBS_MATCH argument).
-*                   A suitable CALIBRATION taken most closely in time to the 
+*                   A suitable CALIBRATION taken most closely in time to the
 *                   current observation is used.
 *                   First check the CALIBRATION has the same number of detector
 *                   columns. (The number of rows doesn't matter, as only the
 *                   X axis is used). This check is compulsory.
                      IF ( OBSREC.DET_NCOLUMNS .EQ. DET_NCOLUMNS ) THEN
 
-*                      Now check the CALIBRATION has the same oversampling 
+*                      Now check the CALIBRATION has the same oversampling
 *                      parameters. This check is also compulsory.
                         IF ( (OBSREC.DET_ENC_BASE .EQ. DET_ENC_BASE) .AND.
      :                   (OBSREC.DET_NINCR .EQ. DET_NINCR) ) THEN
 
-*                         Now check the optional parameters, included in 
-*                         OBS_MATCH. Initialise the OK flag and the 
+*                         Now check the optional parameters, included in
+*                         OBS_MATCH. Initialise the OK flag and the
 *                         differences list, check the parameters one by one.
                            CALIB_OK = .TRUE.
                            DIFFERENCES = ' '
@@ -1115,7 +1115,7 @@
                                  CALIB_OK = .FALSE.
                                  CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                                  DIFFERENCES = DIFFERENCES(1:CLEN)
-     :                            // 'GRATING ' 
+     :                            // 'GRATING '
                               END IF
                            END IF
 
@@ -1254,7 +1254,7 @@
 
                                  IF (INC .LT. 0) THEN
                                     INC = 1
-                                    RECNUM = OBSNUM 
+                                    RECNUM = OBSNUM
                                  ELSE
                                     LOOPING = .FALSE.
                                  END IF
@@ -1291,16 +1291,16 @@
                                  CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
 
                                  CALL MSG_SETC( 'DIFFERENCES',
-     :                            DIFFERENCES(1:72) ) 
+     :                            DIFFERENCES(1:72) )
                                  CALL MSG_OUT( ' ', ' - ^DIFFERENCES',
-     :                            STATUS ) 
+     :                            STATUS )
 
                                  IF ( CLEN .GT. 72 ) THEN
 
                                     CALL MSG_SETC( 'DIFFERENCES2',
      :                               DIFFERENCES(73:) )
                                     CALL MSG_OUT( ' ', ' - ^DIFFERENCES2',
-     :                               STATUS ) 
+     :                               STATUS )
                                  END IF
                               END IF
                            END IF
@@ -1329,23 +1329,23 @@
 
 *                   STANDARD required. The STANDARD must have been taken
 *                   with the same detector size and oversampling parameters.
-*                   A match is also checked between the instrument 
-*                   configuration parameters specified in the STANDARD_MATCH 
+*                   A match is also checked between the instrument
+*                   configuration parameters specified in the STANDARD_MATCH
 *                   parameter (OBS_MATCH argument).
-*                   A suitable STANDARD taken most closely in time to the 
+*                   A suitable STANDARD taken most closely in time to the
 *                   current observation is used.
 *                   First check the STANDARD has the same detector size.
 *                   This check is compulsory.
                      IF ( (OBSREC.DET_NROWS .EQ. DET_NROWS) .AND.
      :                (OBSREC.DET_NCOLUMNS .EQ. DET_NCOLUMNS) ) THEN
 
-*                      Now check the STANDARD has the same oversampling 
+*                      Now check the STANDARD has the same oversampling
 *                      parameters. This check is also compulsory.
                         IF ( (OBSREC.DET_ENC_BASE .EQ. DET_ENC_BASE) .AND.
      :                   (OBSREC.DET_NINCR .EQ. DET_NINCR) ) THEN
 
-*                         Now check the optional parameters, included in 
-*                         OBS_MATCH. Initialise the OK flag and the 
+*                         Now check the optional parameters, included in
+*                         OBS_MATCH. Initialise the OK flag and the
 *                         differences list and check the parameters one by one.
                            STANDARD_OK = .TRUE.
                            DIFFERENCES = ' '
@@ -1359,7 +1359,7 @@
                                  STANDARD_OK = .FALSE.
                                  CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                                  DIFFERENCES = DIFFERENCES(1:CLEN)
-     :                            // 'GRATING ' 
+     :                            // 'GRATING '
                               END IF
                            END IF
 
@@ -1458,7 +1458,7 @@
                            IF ( INDEX(OBS_MATCH, 'FILTERS') .NE. 0 ) THEN
 
                               IF ( OBSREC.FILTERS .NE. FILTERS ) THEN
-   
+
                                  STANDARD_OK = .FALSE.
                                  CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
                                  DIFFERENCES = DIFFERENCES(1:CLEN+1) //
@@ -1483,12 +1483,12 @@
                            IF ( INDEX(OBS_MATCH, 'AIRMASS') .NE. 0 ) THEN
 
 *                            Use a percentage difference for air masses greater
-*                            than AMTHRESH, and a fixed absolute difference 
+*                            than AMTHRESH, and a fixed absolute difference
 *                            below this level.
                               IF ( AIRMASS .GT. AMTHRESH ) THEN
 
                                  AMDIFF = 100.0 * ABS( OBSREC.AIRMASS -
-     :                            AIRMASS ) 
+     :                            AIRMASS )
      :                            / AIRMASS
 
                                  IF ( AMDIFF .GT. AMTOLER ) THEN
@@ -1503,7 +1503,7 @@
                                  AMDIFF = ABS( OBSREC.AIRMASS - AIRMASS )
 
                                  IF ( AMDIFF .GT.
-     :                            (AMTOLER*AMTHRESH/100.0) ) THEN 
+     :                            (AMTOLER*AMTHRESH/100.0) ) THEN
 
                                     STANDARD_OK = .FALSE.
                                     CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
@@ -1536,7 +1536,7 @@
 
                                  IF (INC .LT. 0) THEN
                                     INC = 1
-                                    RECNUM = OBSNUM 
+                                    RECNUM = OBSNUM
                                  ELSE
                                     LOOPING = .FALSE.
                                  END IF
@@ -1548,7 +1548,7 @@
                                  LOOPING = .FALSE.
 
                               ELSE IF (SEARCH_MODE .EQ. 'FORWARDS' ) THEN
- 
+
                                  OBS_NAME = LPREFIX(:CHR_LEN(LPREFIX))/
      :                            /OBSREC.OBSERVATION
                                  LOOPING = .FALSE.
@@ -1572,16 +1572,16 @@
                                  CLEN = MAX( 1, CHR_LEN( DIFFERENCES ) )
 
                                  CALL MSG_SETC( 'DIFFERENCES',
-     :                            DIFFERENCES(1:72) ) 
+     :                            DIFFERENCES(1:72) )
                                  CALL MSG_OUT( ' ', ' - ^DIFFERENCES',
-     :                            STATUS ) 
+     :                            STATUS )
 
                                  IF ( CLEN .GT. 72 ) THEN
 
                                     CALL MSG_SETC( 'DIFFERENCES2',
      :                               DIFFERENCES(73:) )
                                     CALL MSG_OUT( ' ', ' - ^DIFFERENCES2',
-     :                               STATUS ) 
+     :                               STATUS )
                                  END IF
                               END IF
                            END IF

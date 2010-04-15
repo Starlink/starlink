@@ -3,25 +3,25 @@
 *+
 *  Name:
 *     MIO_ALOC
- 
+
 *  Purpose:
 *     Allocate tape device - but a dummy routine in Unix.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MIO_ALOC(DEVICE, STATUS)
- 
+
 *  Description:
 *     Allocate a tape drive for continued use.
- 
+
 *  Arguments:
 *     DEVICE=CHARACTER*(*) (Given)
 *        A character string containing the name of the tape to be allocated.
 *     STATUS=INTEGER (Given and Returned)
 *        Variable holding the status value.
- 
+
 *  Copyright:
 *     Copyright (C) 1983, 1991, 1992, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -45,7 +45,7 @@
 *  Authors:
 *     Sid Wright (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     15-Jul-1983:  Original.  (UCL::SLW)
 *     15-Nov-1991:  Changed to new style prologue (RAL::KFH)
@@ -56,25 +56,25 @@
 *     22-Jan-1993:  Change include file names
 *           Convert code to uppercase using SPAG (RAL::BKM)
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     This is the Unix version.
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Arguments Given:
       CHARACTER*(*) DEVICE      ! Name of tape drive
- 
+
 *  Arguments Returned:
       INTEGER STATUS            ! status return
- 
- 
+
+
 *.
- 
+
       END

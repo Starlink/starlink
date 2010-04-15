@@ -13,12 +13,12 @@
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation; either version 2 of the License, or
 ##  (at your option) any later version.
-## 
+##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##  GNU General Public License for more details.
-##  
+##
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program; if not, write to the Free Software
 ##  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -70,7 +70,7 @@ $VERSION = "0.02";
 ##	print_tree		=> Output content tree for an element
 ##	read_dtd 		=> Parse a SGML dtd
 ##	reset   		=> Reset all internal data for DTD
-## 
+##
 ##  Class methods
 ##  -------------
 ##	set_comment_callback    => Set SGML comment callback
@@ -1038,7 +1038,7 @@ sub do_element {
     } else {
 	$tagm = "- -";
     }
- 
+
     $elcont = &get_next_group($line);	 # Get content
 
     if ($elcont ne $EMPTY) {		 # Get inclusion/exclusion groups
@@ -1608,7 +1608,7 @@ sub errMsg {
 sub notin_lit {
     my($str) = ($_[0]);
     my($q, $after);
- 
+
     while ($str =~ /([${lit}${lita}])/o) {
         $q = $1;
         $after = $';
@@ -1828,9 +1828,9 @@ sub print_elem {
 	    $indent .= " " x $padlen[$i-1];
 	}
 	if ($iselem) {
-	    $indent .= $elem ? " |_" : " | "; 
+	    $indent .= $elem ? " |_" : " | ";
 	} elsif ($elem ne "") {
-	    $indent .= " | "; 
+	    $indent .= " | ";
 	}
 	print $TreeFile
 	      sprintf("%s", &$PrTreeEntry($iselem, "$indent$elem\n"));

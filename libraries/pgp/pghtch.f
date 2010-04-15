@@ -26,7 +26,7 @@ C
 C 18-Feb-1995 [TJP].
 C-----------------------------------------------------------------------
 C
-C MAXP is the maximum number of intersections any hatch line may make 
+C MAXP is the maximum number of intersections any hatch line may make
 C with the sides of the polygon.
 C
       INTEGER MAXP
@@ -141,7 +141,7 @@ C                 -- lines intersect in (XI,YI)
             END IF
             NI = I
  20      CONTINUE
-C     
+C
 C The RMU array now contains the intersections. Sort them into order.
 C
          DO 40 II=1,NX-1

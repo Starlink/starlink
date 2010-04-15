@@ -86,7 +86,7 @@
 	CALL PAR_GET0I( 'LINE_YEN', YLE, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 'Error : PLOT_LINE : after PAR_GETS', 
+          CALL ERR_REP('ERR', 'Error : PLOT_LINE : after PAR_GETS',
      :                  STATUS )
 	  RETURN
 	END IF

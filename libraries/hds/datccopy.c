@@ -30,7 +30,7 @@ datCcopy(const HDSLoc *locator1,
  * See that file for all comments about the function of this routine!
  * C version - BKM 20020821 - NOT YET TESTED!
  */
- 
+
 /* Local variables */
    int structure;                             /* Structure flag */
    int state;                                 /* State flag     */
@@ -41,7 +41,7 @@ datCcopy(const HDSLoc *locator1,
 /* Routine entry */
    if( !_ok(*status) )
       return *status;
-     
+
    datStruc( locator1, &structure, status );
    if( !_ok(*status) )
       return *status;
@@ -63,4 +63,4 @@ datCcopy(const HDSLoc *locator1,
 
    return *status;
 }
-       
+

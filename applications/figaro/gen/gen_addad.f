@@ -12,7 +12,7 @@ C
 C     (>) NELM     (Integer) Number of elements in each array
 C     (>) ARRAY1   (Double precision array) Input array
 C     (>) ARRAY2   (Double precision array) Second input array.
-C     (<) ARRAY3   (Double precision array) Result array.  
+C     (<) ARRAY3   (Double precision array) Result array.
 C                  ARRAY3=ARRAY1+ARRAY2
 C
 C     Note that any of the arrays may be the same.

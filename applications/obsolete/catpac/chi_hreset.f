@@ -22,7 +22,7 @@
 
 *  Local Variables:
 *.
-      
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 

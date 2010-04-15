@@ -215,7 +215,7 @@ sub extract_objects ($$$$) {
 	# The specified file is a re-used output of this subroutine.
 	# It starts with a log of the keywords which are to be
 	# returned in the hash.  Extract these, fill the hash, and
-	# return. 
+	# return.
 	my $openok = open (OLDCAT, '<'.$opts->{fromdump});
 	my $line;
 	my @l;
@@ -827,7 +827,7 @@ sub ndf_info ($$$$) {
 		       'V' => '575',
 		       'R' => '675',
 		       'I' => '800');
-	
+
 	$returnhash{astromcol} = $bandmap{$t} if (defined($bandmap{$t}));
 	$returnhash{astromcolcomment} = "FITS WFFBAND";
     }
@@ -894,7 +894,7 @@ sub get_dates ($$$) {
 	    print STDERR "NDF has $nhist history records\n"
 	      if $verbose;
 	    ndf_hinfo ($indf, 'DATE', $nhist, $hrec, $status);
-	
+
 	    my @dates = split ('[-: ]+', $hrec);
 	    my @months = ('',
 			  'jan','feb','mar','apr','may','jun',
@@ -1387,13 +1387,13 @@ sub match_positions_findoff ($$$$$) {
     # in fact have the same ID numbers.
     ($#cat1results == $#cat2results)
       || wmessage ('fatal',
-		   sprintf ("match_positions_findoff: results lists are different lengths (%d!=%d)",	
+		   sprintf ("match_positions_findoff: results lists are different lengths (%d!=%d)",
 			    $#cat1results, $#cat2results));
     for (my $i=0; $i<=$#cat1results; $i++) {
 	($cat1results[$i]->{foffid} == $cat2results[$i]->{foffid})
 	  || wmessage ('fatal',
 		       sprintf ("match_positions_findoff: results lists don't match: line %d: %d!=%d",
-				$i, 
+				$i,
 				$cat1results[$i]->{foffid},
 				$cat2results[$i]->{foffid}));
     }
@@ -1551,7 +1551,7 @@ sub generate_astrom ($) {
     # systematic errors dominate the random ones.
     # We do as well as we can by simply scaling $samplesd....
 
-	
+
 
     my $astromofile = "$tempfn-astromin";
     open (ASTROMOUT, ">$astromofile")
@@ -1568,7 +1568,7 @@ sub generate_astrom ($) {
     # Write plate distortion record
     my $astrom = $par->{astrom};
     my $plateq = (defined($astrom) && defined($astrom->{q}))
-		  ? $astrom->{q} 
+		  ? $astrom->{q}
 		  : 0.0;
     if ($nterms == 7 || $nterms == 9) {
 	# Fit plate distortion
@@ -1600,7 +1600,7 @@ sub generate_astrom ($) {
 	# in pixels, and converting this to SKY
 	# coordinates.  par->{NDFinfo}->{[xy][01]} points to coordinates
 	# (lower-x, lower-y, upper-x, upper-y) for the NDF, and we take
-	# the plate centre as the average of these.  
+	# the plate centre as the average of these.
 	my @projpole;	# Centre of plate, sky coordinates, dec.deg.
 	# Plate centre: These are in the GRID domain (centre of first
 	# pixel at (1,1)), so to get the plate centre, we need to add
@@ -1975,7 +1975,7 @@ sub canonicalise_ndfname ($) {
 # and the name of an NDF.  The output array in the NDF has dimensions
 # (m,n).  Note that the dimensions are swapped, turning what is
 # efficient for Perl into what is efficient for (fortran-style) NDF
-# arrays. 
+# arrays.
 #
 # Note that there are restrictions on what characters can be used in
 # NDF names (specifically `.' is forbidden).  The routine will

@@ -41,7 +41,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -190,12 +190,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -233,7 +233,7 @@
 Starlink FORUM is a conferencing facility accessed via Web Browsers
 including Mosiac and Netscape. Starlink FORUM has a look and feel similar
 to the VAXnotes product from DEC (now called DECnotes). Starlink FORUM is
-run from an HTTP server as a CGI script and is written in Perl. 
+run from an HTTP server as a CGI script and is written in Perl.
 
 \subsection{History}
 
@@ -245,23 +245,23 @@ unseen notes (to do this, records of which user has seen which notes must
 be maintained).  However it did mimic to some extent the structure of a
 VAXnotes conference, although the names of the levels were different to
 VAXnotes and there was an additional level (Riposte) that has been
-retained in FORUM. 
+retained in FORUM.
 
 At the Starlink SMM in June 1995 it was agreed that Adrian Fish and Dave
 Rawlinson should develop FORUM further, with the aim of adopting a
 VAXnotes look and feel. Adrian Fish took Richard West's FORUM (with a few
 DJR mods) and added the VAXnotes look and feel plus the mechanics for
-updating and accessing unseen notes. The current version is 0.9-16. 
- 
+updating and accessing unseen notes. The current version is 0.9-16.
+
 \subsection{Use of FORUM by Starlink}
- 
+
 It is intended that FORUM is available to both Starlink staff and Starlink
 users.  Access to some Conferences will be restricted to, for example,
 Site Managers, while all users will be able to access others.  To deter
 abuse, records of all access to the system will be retained.  This and the
 unseen notes mechanism requires that an identity checking daemon is
-running on client machines. 
- 
+running on client machines.
+
 There is one substantial difference between FORUM and VAXnotes --- whereas
 VAXnotes could maintain an index of all Conferences, even when these
 Conferences were located on seperate systems at several Starlink sites,
@@ -272,8 +272,8 @@ Alphas at RAL.  This does not rule out copies of FORUM at Starlink sites
 for purely local purposes, but such local use is not expected to be
 widespread. Most Starlink Site Managers therefore need read no further!
 The FORUM code is available to Starlink sites and to other
-astronomy-related groups or organizations besides Starlink, on request. 
- 
+astronomy-related groups or organizations besides Starlink, on request.
+
 \section{Pre-requisites}
 
 \subsection{Authentication Daemon}
@@ -281,13 +281,13 @@ astronomy-related groups or organizations besides Starlink, on request.
 Starlink FORUM requires an authentication daemon (e.g. {\tt pidentd}) in
 order to use the updating and accessing of unseen notes. Otherwise the
 user cannot tell where or when new notes have been added and cannot access
-private conferences. 
+private conferences.
 
 There is a kit for the {\tt pidentd} daemon available via anonymous FTP
-from UCL. The details are: 
+from UCL. The details are:
 
 \begin{verbatim}
-   Site:  ftp.star.ucl.ac.uk   
+   Site:  ftp.star.ucl.ac.uk
    File:  pub/system/pidentd.tar.Z
 \end{verbatim}
 
@@ -315,12 +315,12 @@ The current version of the kit is available via anonymous FTP from UCL. The
 details are:
 
 \begin{verbatim}
-   Site:  ftp.star.ucl.ac.uk   
+   Site:  ftp.star.ucl.ac.uk
    File:  pub/system/forum.tar.Z
 \end{verbatim}
 
 Log on as {\tt root} and create a directory to hold the kit. Note that this
-directory will also contain your site's FORUM Notes directory structure, so 
+directory will also contain your site's FORUM Notes directory structure, so
 potentially this could require alot of disk space. Ideally this directory
 should be on a disk local to the machine selected to run the HTTP daemon for
 FORUM. Create and move to this directory:
@@ -353,7 +353,7 @@ Unpack the kit:
 \subsection{Kit contents}
 
 Once unpacked, you will find several directories (some of which
-contain support files) and some empty files that will be used by FORUM 
+contain support files) and some empty files that will be used by FORUM
 for logging access and error messages, plus the FORUM Perl script and this
 document. Here's a list:
 
@@ -375,7 +375,7 @@ document. Here's a list:
 
 \section{FORUM and HTTP}
 
-FORUM takes advantage of the Common Gateway Interface (CGI) capabilities of the 
+FORUM takes advantage of the Common Gateway Interface (CGI) capabilities of the
 HTTP server. For further details, see the comments in the {\tt forum.pl}
 script.
 
@@ -422,7 +422,7 @@ line so that the CGI system recognises {\tt .pl} scripts.
 \section{Things to modify inside {\tt forum.pl}}
 
 Before firing up FORUM for the first time, you must customise certain variables
-within the FORUM Perl script to reflect your site. Here is a list of the 
+within the FORUM Perl script to reflect your site. Here is a list of the
 variables that require modification, and Appendix \ref{perlmods} shows an
 example.
 
@@ -430,7 +430,7 @@ example.
     $ForumRootDir      --  Same as $INSTALL (remember to add trailing /)
     $ForumServerRoot   --  e.g. http://<your_FORUM_server_hostname>/
     $AdminName         --  FORUM administrators real name
-    $AdminMail         --  E-mail address of FORUM administrator (don't 
+    $AdminMail         --  E-mail address of FORUM administrator (don't
                            forget to \-escape the @)
     $LocalDomain       --  Local DNS domain; used internally to identify an
                            individual user
@@ -446,7 +446,7 @@ above, then please read this document and the source comments carefully.
 
 \subsection{Adding FORUM managers}
 
-FORUM provides certain management facilities for authorised users. Only a 
+FORUM provides certain management facilities for authorised users. Only a
 manager is able to create new conferences, for instance.
 
 To authorise a user to be a manager, you will need to edit the file {\tt
@@ -514,7 +514,7 @@ still get the chance:
 
 \begin{itemize}
 \item Improve individual note security. Currently anyone who has access to a
-      particular note can delete it (but not Topics or Conferences; only a 
+      particular note can delete it (but not Topics or Conferences; only a
       manager can do that). I need to check that the writer of the note is the
       one that is trying to delete it.
 \item The {\tt identd} daemon interaction adds a significant delay to the

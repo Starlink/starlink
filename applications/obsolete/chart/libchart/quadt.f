@@ -34,7 +34,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       CENX=0.0
       CENY=0.0
       CALL SQU (CENX,CENY,R, STATUS )

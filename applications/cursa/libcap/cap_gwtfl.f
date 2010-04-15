@@ -56,7 +56,7 @@
 *     end if
 *     If the file is not a print file and column headings are required then
 *       Write the column headings.
-*     end if 
+*     end if
 *     If the table is required then
 *       If the specified range contains any rows then
 *         For every row in the selection
@@ -306,7 +306,7 @@
             FTITL__SGZ(2) = BUFFER
 
 *
-*          Load the units of the components in the first line of the 
+*          Load the units of the components in the first line of the
 *          title.
 
             BUFFER = ' '
@@ -350,7 +350,7 @@
                LTITL3 = 1
             END IF
 
-            WRITE(FUNIT, 2001, IOSTAT=LSTAT) 
+            WRITE(FUNIT, 2001, IOSTAT=LSTAT)
      :        FTITL__SGZ(2)(1 : LTITL2), FTITL__SGZ(3)(1 : LTITL3)
  2001       FORMAT(1X, A / 1X, A)
             IF (STATUS .EQ. SAI__OK) THEN
@@ -421,7 +421,7 @@ C                    WRITE (BUFFER(1 : RUN__SGZ), '(I<RUN__SGZ>)' ) ROW
                   ELSE
                      BUFPOS = 1
                   END IF
-                     
+
 *
 *                Output the line.
 

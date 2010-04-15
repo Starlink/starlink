@@ -1,4 +1,4 @@
-      SUBROUTINE FTS1_PHEAD( BFPNTR, RCPNTR, RECORD, MEDIUM, MD, LOC, 
+      SUBROUTINE FTS1_PHEAD( BFPNTR, RCPNTR, RECORD, MEDIUM, MD, LOC,
      :                       BLKSIZ, MAXHDR, REPORT, ACTSIZ, OFFSET,
      :                       CURREC, HSTART, HDNUM, EXTEND, NHEADS,
      :                       STATUS )
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS1_PHEAD( BFPNTR, RCPNTR, RECORD, MEDIUM, MD, LOC, BLKSIZ, 
+*     CALL FTS1_PHEAD( BFPNTR, RCPNTR, RECORD, MEDIUM, MD, LOC, BLKSIZ,
 *    :                 MAXHDR, REPORT, ACTSIZ, OFFSET, CURREC, HSTART,
 *    :                 HDNUM, EXTEND, NHEADS, STATUS )
 
@@ -160,7 +160,7 @@
 *  Copyright:
 *     Copyright (C) 1987, 1988, 1989, 1990, 1992 Science & Engineering
 *                   Research Council.
-*     Copyright (C) 1996, 2004 Central Laboratory of the Research 
+*     Copyright (C) 1996, 2004 Central Laboratory of the Research
 *                   Councils.
 *     All Rights Reserved.
 
@@ -169,12 +169,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -226,7 +226,7 @@
 *        of passing BUFFER in as a character array it now just gets the
 *        pointer to the data. RECORD is still passed in a character
 *        array but the pointer to the RECORD array is also passed in.
-*        The first call to the Disc-FITS reading subroutine initialises 
+*        The first call to the Disc-FITS reading subroutine initialises
 *        the record number in direct-access reads.
 *     1996 July 25 (MJC):
 *        Obtain the value of EXTEND correctly, i.e. not assume that it
@@ -236,7 +236,7 @@
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-*     
+*
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -270,7 +270,7 @@
       INTEGER OFFSET             ! The number of bytes of the last data
                                  ! block that contains header
                                  ! information
-                                 ! Equal to ACTSIZ means the current 
+                                 ! Equal to ACTSIZ means the current
                                  ! block is wholly header
       LOGICAL CURREC             ! Use the current FITS record
                                  ! immediately?
@@ -361,15 +361,15 @@
 
 *  Read the tape.
          IF ( TAPE ) THEN
-            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, 
+            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
      :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
      :                       %VAL( CNF_PVAL( RCPNTR ) ), STATUS )
 
 *  Read the disk file.
          ELSE
-            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .TRUE., 
+            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .TRUE.,
      :                       %VAL( CNF_PVAL( BFPNTR ) ),
-     :                       OFFSET, %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                       OFFSET, %VAL( CNF_PVAL( RCPNTR ) ),
      :                       STATUS )
          END IF
 
@@ -450,15 +450,15 @@
 
 *  Read the tape.
             IF ( TAPE ) THEN
-               CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, 
+               CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
      :                          %VAL( CNF_PVAL( BFPNTR ) ),
-     :                          OFFSET, %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                          OFFSET, %VAL( CNF_PVAL( RCPNTR ) ),
      :                          STATUS )
 
 *  Read the disk file.
             ELSE
-               CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., 
-     :                          %VAL( CNF_PVAL( BFPNTR ) ), OFFSET, 
+               CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
+     :                          %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
      :                          %VAL( CNF_PVAL( RCPNTR ) ),
      :                          STATUS )
             END IF
@@ -485,14 +485,14 @@
 
 *  Read the tape.
          IF ( TAPE ) THEN
-            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, 
+            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
      :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
      :                       %VAL( CNF_PVAL( RCPNTR ) ), STATUS )
 
 *  Read the disk file.
          ELSE
             CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
-     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET, 
+     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
      :                       %VAL( CNF_PVAL( RCPNTR ) ),
      :                       STATUS )
          END IF
@@ -527,7 +527,7 @@
 
             MORE = .TRUE.
             DO WHILE ( MORE )
- 
+
 *  Have we reached the end of the header section?
                IF ( RECORD( CARD )(1:4) .EQ. 'END ' ) MORE = .FALSE.
 
@@ -576,17 +576,17 @@
 *  Read the tape.
                   IF ( TAPE ) THEN
                      CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
-     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                                %VAL( CNF_PVAL( BFPNTR ) ),
      :                                OFFSET,
-     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                %VAL( CNF_PVAL( RCPNTR ) ),
      :                                STATUS )
 
 *  Read the disk file.
                   ELSE
-                     CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., 
-     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+                     CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
+     :                                %VAL( CNF_PVAL( BFPNTR ) ),
      :                                OFFSET,
-     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                %VAL( CNF_PVAL( RCPNTR ) ),
      :                                STATUS )
                   END IF
 

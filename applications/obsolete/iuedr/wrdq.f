@@ -1,5 +1,5 @@
       SUBROUTINE WRDQ(STATUS)
- 
+
 *+
 *
 *   Name:
@@ -39,7 +39,7 @@
 
 *   Local variables:
       INTEGER IORDER     ! order index
- 
+
       INTEGER I          ! wavelength index
 
 *   Find existing order, or allocate a new one

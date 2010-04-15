@@ -113,10 +113,10 @@ C     Local variables
 C
       CHARACTER CHARS(2)*16      ! Units and label for axis
       INTEGER   CODE             ! Status returned by file I/O routines
-      INTEGER   CPTR             ! Dynamic-memory pointer for collapsed 
+      INTEGER   CPTR             ! Dynamic-memory pointer for collapsed
                                  ! data
       CHARACTER DEVICE*32        ! Plot device specification
-      INTEGER   DIMS(2)          ! Image, then collapsed echellogram 
+      INTEGER   DIMS(2)          ! Image, then collapsed echellogram
                                  ! dimensions
       DOUBLE    PRECISION DUMMY  ! Numeric array for DSA-SET_AXIS_INFO
       LOGICAL   FAULT            ! Flags a non-DSA system fault
@@ -139,7 +139,7 @@ C
       INTEGER   PG_STATUS        ! Status from PGBEGIN call
       LOGICAL   PREV             ! Value of PREVIOUS keyword
       LOGICAL   SKY              ! Indicates SKY orders were selected
-      INTEGER   SLOT             ! Used for all DSA system slots - 
+      INTEGER   SLOT             ! Used for all DSA system slots -
                                  ! ignored
       INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
                                  ! data
@@ -204,7 +204,7 @@ C
          IF (CODE.GT.2) PREV=.FALSE.
       END IF
 C
-C     Initialise the graphics device 
+C     Initialise the graphics device
 C
       PG_STATUS = PGBEGIN(0,DEVICE,1,1)
       IF (PG_STATUS.NE.1) THEN

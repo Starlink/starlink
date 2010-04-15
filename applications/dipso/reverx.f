@@ -26,7 +26,7 @@ C
       SPX = 0.5D+00/NCF
       PERIOD = 1.0D+00/FRES
 C
-C  Evaluate even and odd parts of recovered function at X values ranging over 
+C  Evaluate even and odd parts of recovered function at X values ranging over
 C one period starting from first X value in interpolated data.
 C
       JMAX = INT(PERIOD/SPX) + 1

@@ -34,7 +34,7 @@
 *        It is .TRUE. if there are any bad pixels in file 6.
 *     FILE_6( EL ) = REAL (Given and Returned)
 *        On input it is the mode image; on return it is the 2-d power
-*        spectrum for the model image. 
+*        spectrum for the model image.
 *     FILE_2( EL ) = REAL (Returned)
 *        Work space.
 *     FILE_5( EL ) = REAL (Returned)
@@ -82,21 +82,21 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       INTEGER EL
       INTEGER M
       INTEGER N
       REAL FILL
       LOGICAL BAD
-      
+
 *  Arguments Given and Returned:
       REAL FILE_6( EL )
-      
+
 *  Arguments Returned:
       REAL FILE_2( EL )
       REAL FILE_5( EL )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -134,5 +134,5 @@
 *  of the FT of the input image (file 5), to get the 2-d power spectrum
 *  for the input image (in file 6).
       CALL KPG1_HMLTR( M, N, FILE_6, FILE_5, FILE_6, STATUS )
-      
+
       END

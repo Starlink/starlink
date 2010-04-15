@@ -9,10 +9,10 @@ C
 C     Function:
 C        Read IRPS Photometry Data
 C
-C     Description:   
+C     Description:
 C        RIRPS reads photometry data files in Figaro format as produced
 C        by the IRPS (AAO Infrared Photometer Spectrometer) ADAM system.
-C        A time series dataset is created. Either P1 or P4 data may be 
+C        A time series dataset is created. Either P1 or P4 data may be
 C        read.
 C
 C     Parameters:
@@ -22,16 +22,16 @@ C                               data point (1,2 or 4).
 C    (3) OUTPUT     (TSP, 2D)  The output time series dataset.
 C        ZEROPT     (Real)     Magnitude zero point.
 C
-C     Support: 
+C     Support:
 C          Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C          27/2/1988
 C
 C-
 C
 C  History:
-C    Nov/1987   Original Version.   JAB/AAO 
+C    Nov/1987   Original Version.   JAB/AAO
 C    27/2/1988   TSP Monolith version.  JAB/AAO
 C
 
@@ -69,9 +69,9 @@ C
       INTEGER NSTRT
 
 *  Time conversion variables
-      INTEGER IH,IM,IY,ID   
+      INTEGER IH,IM,IY,ID
 
-*  IRPS parameters                       
+*  IRPS parameters
       REAL FL,AG,IT,ZPT
 
 *  MJD calculation variables
@@ -108,7 +108,7 @@ C
       LENNAME = ICH_LEN(FNAME)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME(:LENNAME),STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -120,7 +120,7 @@ C
             CALL MSG_OUT(' ','Dimensions of Input File Invalid',
      :          STATUS)
             STATUS = USER__001
-         ELSE                        
+         ELSE
 
 *  Copy dimensions
             NPOINTS = DIMS(1)
@@ -142,7 +142,7 @@ C
             CALL DSA_GET_FITS_C('INPUT','UTDATE',0,UTDATE,COM,STATUS)
             CALL DSA_GET_FITS_C('INPUT','UTSTART',0,UTSTART,COM,
      :             STATUS)
-            CALL DSA_GET_FITS_C('INPUT','UTEND',0,UTEND,COM,STATUS) 
+            CALL DSA_GET_FITS_C('INPUT','UTEND',0,UTEND,COM,STATUS)
 
 *  Get filter wavelength
             CALL DSA_GET_FITS_F('INPUT','IRPS_FW',0,FL,COM,STATUS)
@@ -159,7 +159,7 @@ C
                 IF (UTSTART(I:I) .EQ. ':') UTSTART(I:I)=' '
                 IF (UTEND(I:I) .EQ. ':') UTEND(I:I)=' '
                 IF (UTDATE(I:I) .EQ. '/') UTDATE(I:I)=' '
-            ENDDO   
+            ENDDO
 
 *  Decode UT start time string
             NSTRT = 1
@@ -177,9 +177,9 @@ C
             CALL SLA_DTF2D(IH,IM,SEC,DJ1,J)
 
 *  Decode UT end time string
-            NSTRT = 1       
+            NSTRT = 1
 
-*  Hours       
+*  Hours
             CALL SLA_INTIN(UTEND,NSTRT,IH,J)
 
 *  Minutes
@@ -192,9 +192,9 @@ C
             CALL SLA_DTF2D(IH,IM,SEC,DJ2,J)
 
 *  Decode UT date string
-            NSTRT = 1   
+            NSTRT = 1
 
-*  Year           
+*  Year
             CALL SLA_INTIN(UTDATE,NSTRT,IY,J)
 
 *  Month
@@ -211,8 +211,8 @@ C
 
 *  End MJD
             DJ2 = DJM+DJ2
-          
-*  Get number of dwells per points                   
+
+*  Get number of dwells per points
             CALL PAR_GET0I('NDWELLS',NDWELLS,STATUS)
 
 *  Get the output file
@@ -225,7 +225,7 @@ C
              CALL PAR_GET0R('ZEROPT',ZPT,STATUS)
 
 *  Create the output structure
-                                                          
+
              DIMS(1) = 1
              DIMS(2) = (4/NDWELLS)*NCYCLES
              CALL TSP_CREATE_2D(OLOC,1,DIMS(2),' ',.FALSE.,.FALSE.,
@@ -250,7 +250,7 @@ C
 
 *  Set the label and units of the time axis
              CALL TSP_WLU_TIME(OLOC,'MJD(UTC)','Days',STATUS)
-   
+
 *  Copy the data
 
              IF (STATUS .EQ. SAI__OK) THEN
@@ -270,7 +270,7 @@ C
       ENDIF
       END
 
-      
+
 
 
       SUBROUTINE TSP_RIRPS_COPY(NCYCLES,NPOINTS,NDWELLS,AG,IT,ZPT,
@@ -311,16 +311,16 @@ C
 *  Parameters
       INTEGER NCYCLES,NPOINTS,NDWELLS
       DOUBLE PRECISION JD1,JD2,TIMES(NCYCLES*(4/NDWELLS))
-      REAL IN(NPOINTS,4,NCYCLES),OUT(NCYCLES*(4/NDWELLS)) 
+      REAL IN(NPOINTS,4,NCYCLES),OUT(NCYCLES*(4/NDWELLS))
       REAL AG,IT,ZPT,FW
 
 *  Local variables
-      INTEGER I,J,K,ND    
-      REAL SX(4)        
-      REAL FACTOR               
+      INTEGER I,J,K,ND
+      REAL SX(4)
+      REAL FACTOR
       DOUBLE PRECISION JD,JDS
-                  
-*  Calculate number of points per cycle                        
+
+*  Calculate number of points per cycle
       ND = 4/NDWELLS
 
 *  Calculate duration per point
@@ -328,8 +328,8 @@ C
 
 *  Calculate gain factor
       FACTOR = 2*IT*AG
-                        
-*  Start MJD                
+
+*  Start MJD
       JD = JD1-JDS/2.0
 
 *  Loop over cycles
@@ -373,7 +373,7 @@ C
               OUT(I*ND-1) = SX(1)-SX(2)
               TIMES(I*ND-1) = JD
               JD = JD+JDS
-              OUT(I*ND) = SX(4)-SX(3)  
+              OUT(I*ND) = SX(4)-SX(3)
               TIMES(I*ND) = JD
               JD = JD+JDS
 
@@ -382,7 +382,7 @@ C
               TIMES(I) = JD
               JD = JD+JDS
               OUT(I) = 0.5*(SX(1)-SX(2)-SX(3)+SX(4))
-          ENDIF       
+          ENDIF
       ENDDO
 
 *  Scale data and convert to magnitude
@@ -401,4 +401,4 @@ C
           ENDIF
       ENDDO
       END
-      
+

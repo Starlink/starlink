@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,7 +80,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  See if we can write in the background colour on the current device.
-      CALL PGQCOL( CI1, CI2 ) 
+      CALL PGQCOL( CI1, CI2 )
 
 *  Do nothing if we can't.
       IF( CI1 .EQ. 0 ) THEN
@@ -104,7 +104,7 @@
          CALL PGQWIN( X1, X2, Y1, Y2 )
          CALL PGQVP( 0, NX1, NX2, NY1, NY2 )
 
-*  Set the viewport to the whole view surface. Set the window to the 
+*  Set the viewport to the whole view surface. Set the window to the
 *  same bounds.
          CALL PGSVP( 0.0, 1.0, 0.0, 1.0 )
          CALL PGSWIN( 0.0, 1.0, 0.0, 1.0 )

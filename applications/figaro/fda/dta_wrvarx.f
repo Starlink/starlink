@@ -56,7 +56,7 @@
 
 *     SUBROUTINE DTA_WRVAR<T>( PATH, NITEM, ARRAY, STATUS )
       SUBROUTINE DTA_WRVARF( PATH, NITEM, ARRAY, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -163,7 +163,7 @@
 
 *     SUBROUTINE DTA_WRVAR<T>( PATH, NITEM, ARRAY, STATUS )
       SUBROUTINE DTA_WRVARD( PATH, NITEM, ARRAY, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -249,7 +249,7 @@
 
 *     SUBROUTINE DTA_WRVAR<T>( PATH, NITEM, ARRAY, STATUS )
       SUBROUTINE DTA_WRVARI( PATH, NITEM, ARRAY, STATUS )
-      
+
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants

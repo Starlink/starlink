@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,7 +89,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER MAXFIB             ! Maximum number of fibres
       PARAMETER( MAXFIB = 92 )
 

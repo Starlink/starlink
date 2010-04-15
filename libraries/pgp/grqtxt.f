@@ -8,7 +8,7 @@
 *     GRPCKG: get the bounding box of a string drawn by GRTEXT.
 *
 *   Given
-*      ORIENT   r     
+*      ORIENT   r
 *      X0       r     X coordinate of lower left corner
 *      Y0       r     Y     "       "   "     "    "
 *      STRING   c
@@ -21,7 +21,7 @@
 
       REAL ORIENT, X0, Y0, XBOX(4), YBOX(4)
       CHARACTER*(*) STRING
-      
+
       INCLUDE 'grecom.inc'
 
       LOGICAL UNUSED, VISBLE, PLOT

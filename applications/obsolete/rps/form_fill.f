@@ -20,7 +20,7 @@
 *  Calling Arguments
       INTEGER WIDTH		! In	Screen Width
       INTEGER STATUS		! 	Exit status, 0 = OK
- 
+
 *-
 *  Global Variables
       INCLUDE 'com_form_files.inc'
@@ -29,7 +29,7 @@
       INCLUDE 'com_form_mtext.inc'
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_iof.inc'
-  
+
       INTEGER NCHAR_DEF
       CHARACTER*128 DEFAULT_FILE
       CHARACTER*3  FILL_TYPE
@@ -39,14 +39,14 @@
       COMMON /KEEPCHECK/ CHECKSUM
       CHARACTER*8 HELPLIB
       COMMON / HELP_LIB_NAME / HELPLIB
- 
+
 *  Functions
       INTEGER MDH_ENDWORD
       CHARACTER*17 DBS_INFOC	! Gets character information about the record.
 	CHARACTER*80 form_getc	! Gets default file info.
       LOGICAL      DBS_GETL	! Gets a logical value from the record.
      & ,           MDH_GETL	! Gets logical input.
- 
+
 * Local Variables
       CHARACTER*3  CNUM		! Character version of target number.
       CHARACTER*1  RMFILE
@@ -122,7 +122,7 @@ c
 10    CONTINUE									! Return here if more forms
       CALL FORM_VALS( 'COVER' , FILL_TYPE , MESID , HDID , TITLE(1), XTYPE )	!   Get 'Cover' page' data
       CALL FORM_VALS( 'GEN'   , FILL_TYPE , MESID , HDID , TITLE(2), XTYPE )	!   Get 'General Page' data
- 
+
       NTARG = 0
       MESID = -99
       MORE_TARGETS = .TRUE.
@@ -136,7 +136,7 @@ c
 15       CONTINUE								! Do again if 2 failures on constraints form
 C 	 IF (NTARG.EQ.1) THEN
 C	    MESID = -99
-C         ELSE 
+C         ELSE
 C         END IF
          CALL FORM_VALS( 'TARGET', FILL_TYPE, MESID, HDID, TITLE(3)(:15)//CNUM, XTYPE)	!    Get target form values.
          IF (MESID .EQ. -99) THEN
@@ -161,7 +161,7 @@ C         END IF
          END IF
          CALL FORM_WRITE( REF_TARGET, NTARG , IERR )				!   Write the record
          MORE_TARGETS = MDH_GETL(' Another Target', .FALSE.)
- 
+
 20       CONTINUE
       END DO									! End inputting targets
 

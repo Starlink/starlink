@@ -111,7 +111,7 @@
             END IF
          END DO
 *
-*      If ALL the pixels are invalid, then set the min and max 
+*      If ALL the pixels are invalid, then set the min and max
 *      to the invalid value!
 *
          IF (.NOT.SET) THEN

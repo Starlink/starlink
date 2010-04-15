@@ -148,7 +148,7 @@ c *** global convergence statistic
 	chisqu=0.0
 	icc=0
 	do 590 i=ill,ihh
-c *** miss out saturated pixels 
+c *** miss out saturated pixels
  	if(klist(i).ge.iupp)goto 590
 	icc=icc+1
 	chisqu=chisqu+(xmodel(i-ill+1)-klist(i)+skycor)**2
@@ -278,7 +278,7 @@ c *** check for convergence
 c      write(lt,7500) nter,parm(1,i),tdel,erri(i),sint(i)
   770 continue
       if(iflag.eq.1.and.nter.lt.10)goto 450
-c *** check if any features left in diff map if doing full surface modelling 
+c *** check if any features left in diff map if doing full surface modelling
       if(iextra.eq.0.and.ifsm.eq.1)then
         call featur(xmodel,ims,jcount,minpix,sigma,range,iextra,edge)
 c	if(iextra.gt.0)type *,' No. of extra images =',iextra

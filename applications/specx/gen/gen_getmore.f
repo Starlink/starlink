@@ -27,7 +27,7 @@ C   Routine to interrogate a file for some more input
            JDEF = -1
            RETURN
          END IF
-      END IF 
+      END IF
 
       CALL GEN_GETLINE (STRING, SPROMPT, JDEF)
       IF (JDEF.lt.0)   THEN
@@ -44,5 +44,5 @@ C   Search for tabs and replace with blanks
         IF (STRING(I:I).eq.TAB)   STRING(I:I) = ' '
       END DO
 
-      RETURN      
+      RETURN
       END

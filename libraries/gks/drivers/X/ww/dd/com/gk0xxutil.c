@@ -2,7 +2,7 @@
 #include "dd.h"
 #include <signal.h>
 /*
- * do a malloc and clear the space 
+ * do a malloc and clear the space
  */
 LOCALPUBLIC char *gk0xclrmalloc(u)unsigned int u;{
 	char *calloc();
@@ -139,7 +139,7 @@ DDPUBLIC void gk0xparsewwoptions(argstring)char *argstring;{
 			wwpanic(msg);
 		}
 	}
-}	
+}
 LOCALPUBLIC void gk0xworry(s)char *s;{
 	if(dd->d_flags & PRINTERR)
 		gk0xwwpanic(s);

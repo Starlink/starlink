@@ -1,5 +1,5 @@
 /*	@(#)icon_load.h 10.4 88/02/08 SMI	*/
- 
+
 /*
  * Copyright (c) 1984 by Sun Microsystems, Inc.
  */
@@ -10,8 +10,8 @@ The format of an ASCII representation of an icon file is defined by:
 	<header>	::= <header_start> <header_body> <header_end>
 	<header_start>	::= /* Format_version=1
 	<header_end>	::= */
-	<header_body>	::= <header_options> <header_misc> 
-	<header_options>::= | <header_option> <header_options> 
+	<header_body>	::= <header_options> <header_misc>
+	<header_options>::= | <header_option> <header_options>
 	<header_option> ::= Depth=1
 			  | Height=<Number>
 			  | Width=<Multiple_of_16>

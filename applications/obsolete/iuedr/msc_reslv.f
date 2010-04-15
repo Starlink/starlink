@@ -1,5 +1,5 @@
       SUBROUTINE MSC_RESLV(M, N, A, B)
- 
+
 *+
 *
 *   Name:
@@ -22,12 +22,12 @@
 *   Import:
       INTEGER M                    ! declared size of A-matrix and B-vector
       INTEGER N                    ! used size of A-matrix and B-vector
- 
+
       DOUBLE PRECISION A(M, M)     ! matrix operator
- 
+
 *   Import-Export:
       DOUBLE PRECISION B(M)        ! rhs and result
- 
+
 *   Local variables:
       INTEGER IP1                  ! loop start
       INTEGER I                    ! block index

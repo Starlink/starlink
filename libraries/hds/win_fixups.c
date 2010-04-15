@@ -29,7 +29,7 @@ void win_get_inodes( const char *fns, ino_t *st_ino, dev_t *st_rdev ){}
  * identify a file. Taken together these values create the windows
  * equivalent of UNIX inodes. If this fails for any reason a 0 is
  * returned, otherwise a 1 is returned. On failure only the st_rdev
- * value is set to zero, normally the st_ino (if this is the result 
+ * value is set to zero, normally the st_ino (if this is the result
  * of a call to stat(), may have a sensible value).
  */
 int win_get_inodes( const char *fns, ino_t *st_ino, dev_t *st_rdev )

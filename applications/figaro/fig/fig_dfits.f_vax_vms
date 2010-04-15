@@ -84,7 +84,7 @@ C
 C     Global variables
 C
       INTEGER   BUFF_MAX             ! Bytes in internal record buffer
-      PARAMETER (BUFF_MAX=4096)      ! (Change format in FIG_DFITS_READ 
+      PARAMETER (BUFF_MAX=4096)      ! (Change format in FIG_DFITS_READ
                                      ! as well if this is changed.)
 C
       INTEGER   LU                   ! Logical unit for file. 0 if not open.
@@ -170,8 +170,8 @@ C
 C
       ELSE IF (RECTYP.EQ.'VARIABLE') THEN
 C
-C        If the records genuinely are going to be of varying length then we 
-C        will have to determine the length of each record as we read it, 
+C        If the records genuinely are going to be of varying length then we
+C        will have to determine the length of each record as we read it,
 C        which means opening the file for formatted I/O and using Q format.
 C        (Reading it as fixed and knowing that the first two bytes are the
 C        byte count is possible, but somehow seems a little non-kosher.)
@@ -180,7 +180,7 @@ C        possibility that they might actually be segmented -  and you can
 C        only tell by opening the file, reading a record, and seeing if you
 C        like what you get!  (Fortunately, we know exactly how a FITS file
 C        should start.)
-C 
+C
          OPEN (UNIT=LUN,FILE=FILENAME,STATUS='OLD',FORM='FORMATTED',
      :                             ACCESS='SEQUENTIAL',READONLY,SHARED,
      :                             RECORDTYPE='VARIABLE',IOSTAT=STATUS)
@@ -310,7 +310,7 @@ C
 C
 C     Local variables
 C
-      INTEGER I                      
+      INTEGER I
       INTEGER IGNORE
 C
 C     Check validity of buffer and check that file is open.
@@ -448,7 +448,7 @@ C
             IF (FIXED) THEN
                READ (LU,IOSTAT=STATUS) (RECBUF(IB),IB=1,RLEN)
             ELSE
-               READ (LU,'(Q,4096A1)',IOSTAT=STATUS) 
+               READ (LU,'(Q,4096A1)',IOSTAT=STATUS)
      :                               RLEN,(RECBUF(IB),IB=1,RLEN)
             END IF
             IF (STATUS.NE.0) THEN
@@ -474,7 +474,7 @@ C
      :                                                          IGNORE)
          CALL PAR_WRUSER (ERROR(:ICH_LEN(ERROR)),IGNORE)
       END IF
-C            
+C
       END
 C+
 C                      F I G _ D F I T S _ C L O S E
@@ -486,7 +486,7 @@ C  Function:
 C     Closes a disk FITS file opened by FIG_DFITS_OPEN.
 C
 C  Description:
-C     This routine closes any file opened by FIG_DFITS_OPEN. 
+C     This routine closes any file opened by FIG_DFITS_OPEN.
 C     If no file was open, this routine does nothing.
 C
 C  Language:
@@ -546,7 +546,7 @@ C
 C     If file is open, close it.  Always return good status.
 C
       IF (LU.NE.0) THEN
-         CLOSE (LU,IOSTAT=IGNORE) 
+         CLOSE (LU,IOSTAT=IGNORE)
          LU = 0
       END IF
       STATUS = 0

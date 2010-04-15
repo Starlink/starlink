@@ -27,7 +27,7 @@
 \newcommand{
 \jref}[5]{
  \item[#5] { #1}. \mbox{{\it#2}}, \mbox{{\bf#3}},
-\mbox{{ #4.}}  } 
+\mbox{{ #4.}}  }
 \newcommand{\cref}[4]{
      {\item{#4} { #1}. {\it#2},{ #3.} }}
 %------------------------------------------------------------------------------
@@ -214,7 +214,7 @@ MEDSP defined
 $ TWODSPEC
 $ LONGSLIT ....
 This version of LONGSLIT is from $1$DRB3:[FIGPACK.TWODSPEC.TWODSPEC]
-(IMage) Name of image for input [2063] - 
+(IMage) Name of image for input [2063] -
 \end{verbatim}\end{quote}
 The examples in this document are for the DCL version, and the prompting
 will be different for the ICL version.
@@ -369,13 +369,13 @@ line selection, we will only describe this part once, noting the
 differences when they occur.
 
 \begin{quote}\begin{verbatim}
-$ LONGSLIT 
+$ LONGSLIT
 This version of LONGSLIT is from $1$DRB3:[FIGPACK.TWODSPEC.TWODSPEC]
 (IMage) Name of image for input [1052-5VIG] -
 1052-5VIG[2040,171] HH 1-2 HALPHA/[N II]
 
 =========< A r c _ O p t s >=========
- 
+
 New    : Set up line identifications from scratch
 Repeat : Use existing line identifications
 Clone  : Use line identifications from another file
@@ -422,7 +422,7 @@ with a cursor.
 Be sure to include some base to either side, so that the optimisation
 routines can determine the base level precisely.
 \begin{quote}\begin{verbatim}
- 
+
 
 Locate Line :   1
 2nd tram line
@@ -461,9 +461,9 @@ used, in which a wavelength and name are used as given.
 Since ARCSDI only aims to straighten the lines, you would leave ARCSDI
 here.
 \begin{quote}\begin{verbatim}
- 
+
 =========< L i n e   L i s t   M e n u >=========
- 
+
 Emission   : Emission lines
 Absorption : Absorption lines
 Neon       : Neon arc
@@ -474,7 +474,7 @@ SKy        : Sky lines
 STored     : User supplied list in file
 Ok         : All tables read in
 Line List Menu - e
- 
+
  Emission line list.
  Current version August 1990
   78 lines read from EMISSION
@@ -533,9 +533,9 @@ relationship in ARC2D can be used to help line identification).
 You can keep looping around the line list, identifying the lines in any
 order.
 \begin{quote}\begin{verbatim}
- 
+
 =========< I d e n t i f i c a t i o n   M e n u >=========
- 
+
 [number]               : Line wavelength
 Width         [number] : Redraw with different width
 Next                   : Go to next line
@@ -545,9 +545,9 @@ Quit                   : Exit leaving lines unidentified
 Identification Menu [ 6548.4] -
 6548.1001 [NII]6548 ok? [YES]
 Identify line number  2
- 
+
 =========< I d e n t i f i c a t i o n   M e n u >=========
- 
+
 [number]               : Line wavelength
 Width         [number] : Redraw with different width
 Next                   : Go to next line
@@ -574,9 +574,9 @@ Identify line number  3
 Warning, line outside Cheby limits
 Fit (order=1) : 6583.45
 Interpolated : 6583.45
- 
+
 =========< I d e n t i f i c a t i o n   M e n u >=========
- 
+
 [number]               : Line wavelength
 Width         [number] : Redraw with different width
 Next                   : Go to next line
@@ -589,9 +589,9 @@ Identify line number  4
 Warning, line outside Cheby limits
 Fit (order=2) : 6721.03
 Interpolated : 6719.23
- 
+
 =========< I d e n t i f i c a t i o n   M e n u >=========
- 
+
 [number]               : Line wavelength
 Width         [number] : Redraw with different width
 Next                   : Go to next line
@@ -604,9 +604,9 @@ Identify line number  5
 Warning, line outside Cheby limits
 Fit (order=3) : 6730.11
 Interpolated : 6730.57
- 
+
 =========< I d e n t i f i c a t i o n   M e n u >=========
- 
+
 [number]               : Line wavelength
 Width         [number] : Redraw with different width
 Next                   : Go to next line
@@ -615,7 +615,7 @@ Id [wavelength] [name] : Give line ID/wavelength (just taken as given)
 Quit                   : Exit leaving lines unidentified
 Identification Menu [ 6730.5752] -
 6730.8501 [SII]6731 ok? [YES]
- 
+
  C U R R E N T   L I N E   L I S T
  _________________________________
 line No     identification      wavelength
@@ -631,9 +631,9 @@ The user now reaches the {\it Main Menu}:
 
 \begin{quote}\begin{verbatim}
 Current value of iteration is   1
- 
+
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -689,7 +689,7 @@ The options are:
 \item[ADD] Add more lines
 \item[IT] Change iteration.
 This allows reduction of iteration, in order to allow previous fits to
-be over-ridden (they can also be over-ridden in MANUAL mode fitting). 
+be over-ridden (they can also be over-ridden in MANUAL mode fitting).
 \item[AUTO] In this mode one defines fits beforehand, and then goes
 though the lines and cross-sections in order performing the fits.
 This is the mode of fitting in batch, and ideally should not be carried
@@ -834,9 +834,9 @@ Gaussians (``untied'' means that the two Gaussians are independent of
 each other).
 
 \begin{quote}\begin{verbatim}
- 
+
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -890,11 +890,11 @@ The ADD option puts you back into the line selection as above, but
 without the option of automatic line location.
 The option is given to edit the line list again.
 \begin{quote}\begin{verbatim}
- 
- 
+
+
 Lines identified:
 [NII]6584 (6583.6)       [NII]6548 (6548.1)       HALPHA (6562.817)
- 
+
 Enter starting line number [1] - 2
 (YBlock) Analysis x-sect width [5] - 90
 Number of blocks = 2
@@ -906,9 +906,9 @@ If a previous fit has been made on the same data, this is displayed
 at this stage (but this can be suppressed).
 \begin{quote}\begin{verbatim}
 No previous fit
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -925,9 +925,9 @@ Delete  : Delete fits in this range
 Hard    : Produce hardcopy of data with fit
 Exit    : Return to main menu
 Manual Mode [FIT] -
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -951,9 +951,9 @@ Pcygni      : P Cygni profile
 TRansfer    : Start from fit to another line
 Exit        : Exit menu and perform any fitting
 Fit Menu [EXIT] - D
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -977,9 +977,9 @@ Pcygni      : P Cygni profile
 TRansfer    : Start from fit to another line
 Exit        : Exit menu and perform any fitting
 Fit Menu [EXIT] -
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -1000,9 +1000,9 @@ Manual Mode [FIT] - ADVANCE
 The line is displayed.
 \begin{quote}\begin{verbatim}
 No previous fit
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -1029,9 +1029,9 @@ Fit Menu [EXIT] - SK
 \end{verbatim}\end{quote}
 Just reply with ``EXIT'' from now on to leave the program.
 \begin{quote}\begin{verbatim}
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -1050,9 +1050,9 @@ Exit    : Return to main menu
 Manual Mode [FIT] - EXIT
  Fits defined =    2
 Current value of iteration is   1
- 
+
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -1164,7 +1164,7 @@ N.B. To refit a cube which has already been fitted, but the values
 changed, e.g.\ flux-calibrated, use the keyword COPY, which will use
 scaled existing values as first guesses, repeating all the fits in the
 ``cube''.
-If used with CLONE, it enables similar spectra to be easily fitted. 
+If used with CLONE, it enables similar spectra to be easily fitted.
 
 \paragraph{Tolerances in Batch}
 
@@ -1200,9 +1200,9 @@ the lines can be copied straight over).
 The main method of fitting these is the WINDOW option of MANUAL mode.
 First select MANUAL at the main menu.
 \begin{quote}\begin{verbatim}
- 
+
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -1221,10 +1221,10 @@ Say which line you wish to start working on, give the required blocking
 (number of cross-sections added together) and the starting
 cross-section.
 \begin{quote}\begin{verbatim}
- 
+
 Lines identified:
 [NII]6584 (6583.6)       [NII]6548 (6548.1)       HALPHA (6562.817)
- 
+
 Enter starting line number [1] - 3
 (YBlock) Analysis x-sect width [5] - 10
 Number of blocks = 2
@@ -1242,9 +1242,9 @@ between a true Cauchy function and a Gaussian
 (equation~\ref{eq.varcauchy}).
 \begin{quote}\begin{verbatim}
 No previous fit
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -1261,9 +1261,9 @@ Delete  : Delete fits in this range
 Hard    : Produce hardcopy of data with fit
 Exit    : Return to main menu
 Manual Mode [FIT] -
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -1287,9 +1287,9 @@ Pcygni      : P Cygni profile
 TRansfer    : Start from fit to another line
 Exit        : Exit menu and perform any fitting
 Fit Menu [EXIT] - MG
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -1336,7 +1336,7 @@ E04KDF (N2 in the menus), then you have the option of a constrained fit:
 \begin{quote}\begin{verbatim}
 
 =========< B o u n d s   M e n u >=========
- 
+
 None     : No Bounds (unconstrained)
 Equal    : All L_bounds/U_bounds same
 Positive : all bounds >= 0
@@ -1355,9 +1355,9 @@ Component     Centre        fwhm       Height    Base
           6.6107502E-03   1.4509E-02    3.816       0.6862
    2       6562.003        1.781        65.55
           3.7648823E-02   7.1038E-02    2.682
- 
+
 =========< F i t   O k >=========
- 
+
 Store  : Store the fit in the cube
 Repeat : Repeat fit
 Quit   : Abandon this fit
@@ -1436,9 +1436,9 @@ enter the options required e.g.\
 Output   : Create output plots, etc.
 Exit     : Leave program
 Main menu [MANUAL] - OUTPUT
- 
+
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ F
 SHape    : Profile shape analysis............. F
@@ -1459,9 +1459,9 @@ The selection of options here is to ``toggle'' the option on or off,
 so entering an option once will select it, twice will cancel the
 selection. The options are performed when this menu is left.
 \begin{quote}\begin{verbatim}
- 
+
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ T
 SHape    : Profile shape analysis............. F
@@ -1477,9 +1477,9 @@ SOft     : Plot in softcopy (* above) ...... = T
 Velocity : Use velocity scale (+ above) .... = T
 Exit     : Exit menu
 Output Options [TABLE] - PLOT
- 
+
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ T
 SHape    : Profile shape analysis............. F
@@ -1495,9 +1495,9 @@ SOft     : Plot in softcopy (* above) ...... = T
 Velocity : Use velocity scale (+ above) .... = T
 Exit     : Exit menu
 Output Options [PLOT] - PRINT
- 
+
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ T
 SHape    : Profile shape analysis............. F
@@ -1551,9 +1551,9 @@ STARLINK program RV (Wallace 1987).
 Is longitude ok, taking longitude as +ve west [YES] n
  V_HEL=-4.16896E+00 V_LSR= 1.40857E+01
  V_GAL= 1.33324E+02 V_LGROUP= 1.38917E+02
- 
+
 =========< V e l o c i t y   C o r r e c t i o n >=========
- 
+
 Hel     : Suns ref frame
 Lsr     : Local standard of rest
 GAl     : Galaxy ref frame
@@ -1565,9 +1565,9 @@ Show fits which had NAG errors [NO]
 Is data flux calibrated? [NO]
 Printing fits
 Indicate presence of failed fits [NO]
- 
+
 =========< F l u x   M a r k i n g >=========
- 
+
 No           : Don't mark points according to flux
 Continuous   : Mark using a continuous scale
 Three        : Mark by grading into 3 divisions
@@ -1606,7 +1606,7 @@ This will cause the program to run though the fitting part of the
 program, by default it is true, so may be ignored. It is, however,
 possible to specify NOFIT in a command line, to run LONGSLIT in batch
 without performing fits (or just to skip the middle part of the program
-when running interactively) e.g.\ 
+when running interactively) e.g.\
 \begin{quote}\begin{verbatim}
 $ FIGARO
 $ SET DEFAULT SCRATCH:[TNW]
@@ -1614,7 +1614,7 @@ $ LONGSLIT T1 REPEAT TABLE NOFIT
 $ EXIT
 \end{verbatim}\end{quote}
 This will produce a table of the fit results.
-It may be used for other output options (except RATIO), e.g.\ 
+It may be used for other output options (except RATIO), e.g.\
 \begin{quote}\begin{verbatim}
 $ LONGSLIT T1 REPEAT PRINT TABLE PLOT HARDCOPY NOFIT VCORR=10
 \end{verbatim}\end{quote}
@@ -1662,9 +1662,9 @@ and then tolerances are applied on height, centre and width.
 \begin{quote}\begin{verbatim}
 Main menu [MANUAL] - TOLS
 Tolerances on position are relative to the line's rest wavelength
- 
+
 =========< E d i t   T o l e r a n c e s >=========
- 
+
 V_Tol %F : Absolute error of line centre .... = 1.8994141E-02
 V_MAx %F : Max allowed line centre .......... = 3
 V_MIn %F : Min line centre .................. = -3
@@ -1681,9 +1681,9 @@ H_Tol %F : Absolute error of height ......... = 3
 Apply    : Apply tolerances now
 Exit     : Exit but don't apply tolerances now
 Edit Tolerances - H_MAX 1E7
- 
+
 =========< E d i t   T o l e r a n c e s >=========
- 
+
 V_Tol %F : Absolute error of line centre .... = 1.8994141E-02
 V_MAx %F : Max allowed line centre .......... = 3
 V_MIn %F : Min line centre .................. = -3
@@ -1700,9 +1700,9 @@ H_Tol %F : Absolute error of height ......... = 3
 Apply    : Apply tolerances now
 Exit     : Exit but don't apply tolerances now
 Edit Tolerances - APPLY
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = F
 Centre      : Test on CENTRE....... = F
 Width       : Test on WIDTH........ = F
@@ -1713,9 +1713,9 @@ SEparations : Test on SEPARATIONS.. = F
 Log         : Log failures ........ = F
 Apply       : Apply tolerances now
 Set Rejection Criteria - CENTRE
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = F
 Centre      : Test on CENTRE....... = T
 Width       : Test on WIDTH........ = F
@@ -1726,9 +1726,9 @@ SEparations : Test on SEPARATIONS.. = F
 Log         : Log failures ........ = F
 Apply       : Apply tolerances now
 Set Rejection Criteria - HEIGHT
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = T
 Centre      : Test on CENTRE....... = T
 Width       : Test on WIDTH........ = F
@@ -1739,9 +1739,9 @@ SEparations : Test on SEPARATIONS.. = F
 Log         : Log failures ........ = F
 Apply       : Apply tolerances now
 Set Rejection Criteria - WIDTH
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = T
 Centre      : Test on CENTRE....... = T
 Width       : Test on WIDTH........ = T
@@ -2017,7 +2017,7 @@ SHAPE is not yet implemented.
 Once the data has been corrected for distortions or has been
 ``cleaned'', it must be converted to a linear (calibrated) scale in
 wavelength, or at least the relationship must be defined.
-In practice it is much easier to handle a re-binned file. 
+In practice it is much easier to handle a re-binned file.
 
 The ``traditional'' way of doing this is to take one or more spectra
 of an arc lamp (which has lines of known wavelength), using the same
@@ -2073,7 +2073,7 @@ successfully be fitted. For this the data from successive
 cross-sections can be blocked together, to improve the signal to noise
 ratio. In our case we typically co-add ten successive cross-sections.
 This fitting is a least squares optimisation, including a flat base,
-and is the same as used for LONGSLIT. 
+and is the same as used for LONGSLIT.
 
 ARC2D creates a file for use with ISCRUNCH.
 Weighted fitting may be used for the
@@ -2126,9 +2126,9 @@ to data such as form fibre arrays where a smooth curve is not to be
 expected).
 Select the POLY option in the main menu:
 \begin{quote}\begin{verbatim}
- 
+
 =========< M a i n   M e n u >=========
- 
+
 Look   : Look at values of data cube
 Gaus   : Fit Gaussians to line profiles
 Soft   : Produce soft-copy plots of diagnostics
@@ -2170,9 +2170,9 @@ Performing weighted fit
 Go onto next plot? [YES] NO
 Performing weighted fit
 Produce hardcopies of line centre & residual plots [NO]
- 
+
 =========< C o n t i n u i t y   F i t s >=========
- 
+
 Accept   : Accept fits
 Retry    : Try again
 Quit     : Give up
@@ -2184,9 +2184,9 @@ The results are now stored and the user returned to the main menu.
 
 Select the DISP option at the main menu:
 \begin{quote}\begin{verbatim}
- 
+
 =========< M a i n   M e n u >=========
- 
+
 Look   : Look at values of data cube
 Soft   : Produce soft-copy plots of diagnostics
 Hard   : Produce hard-copy plots of diagnostics
@@ -2215,9 +2215,9 @@ option to include fits with NAG errors (this may be satisfactory,
 depending upon the cause of the error, you should examine the log file
 before using such fits).
 \begin{quote}\begin{verbatim}
- 
+
  ARCFIT :   Order = 3,  cross-section 85
- 
+
 Coefficients of fit are -
 
   8.27062E-16 -3.97077E-12  3.86509E-09
@@ -2251,20 +2251,20 @@ treated separately, otherwise each block is treated as one fit.
 Minimum start wavelength = 4824.331, maximum end wavelength = 5153.783
 Copy any coefficients from one line to another? [NO]
 Fits OK? [YES]
- 
+
 Summary of Image Arc Fit Results -
 -----------------------------------
- 
+
 Image dimensions  2040 by   171
 Number of rows that could not be fitted =     0
 Maximum chi-Squared error =       0.00
 Maximum degree polynomial used =   3
- 
+
 Fit results written to file DISK$USER3:[SCRATCH.TNW]EXAMPLE.IAR;1
- 
- 
+
+
 =========< M a i n   M e n u >=========
- 
+
 Look   : Look at values of data cube
 Gaus   : Fit Gaussians to line profiles
 Soft   : Produce soft-copy plots of diagnostics
@@ -2316,7 +2316,7 @@ This program takes a long-slit spectrum with one or more continua, and
 creates a file which allows it to apply a correction to further files,
 such that the continua are made straight.
 This performs a similar function to the FIGARO function SDIST, but is
-more automatic (it may be run completely in batch if required). 
+more automatic (it may be run completely in batch if required).
 
 Since the philosophy of all the software we have written is to be as
 automatic as possible, COMB will automatically find the ``teeth'' of
@@ -2402,7 +2402,7 @@ Gaussians. The points so obtained are fitted with Chebyshev polynomials
 (for each tooth). The intermediate positions are interpolated from
 these, which are then used to evaluate the required movement for each
 data point. The coefficients are written to a file which may then be
-read by the program to apply correction to the actual data. 
+read by the program to apply correction to the actual data.
 
 Alternatively, if QUICK is specified, centroids are used rather than
 the fitting of Gaussians.
@@ -2563,19 +2563,19 @@ program takes a fair time to scale the image, so will ``sit there''
 for a minute or so before anything appears on the screen (this does, of
 course, depend upon the image size). The parameters are as follows:
 \begin{description}
-\item[IMage] (file) Name of image to be displayed 
-\item[YStart] (int) First Y value to be displayed 
-\item[YEnd] (Int) Last Y value to be displayed 
-\item[XStart] (int) First X value to be displayed 
-\item[XEnd] (int) Last X value to be displayed 
-\item[Low] (int) Minimum count level for display 
-\item[High] (int) Maximum count level for display 
+\item[IMage] (file) Name of image to be displayed
+\item[YStart] (int) First Y value to be displayed
+\item[YEnd] (Int) Last Y value to be displayed
+\item[XStart] (int) First X value to be displayed
+\item[XEnd] (int) Last X value to be displayed
+\item[Low] (int) Minimum count level for display
+\item[High] (int) Maximum count level for display
 \item[PLOTdev] The device to plot on (translated using GNS, so
 should be ``xwindows'' etc.).
 \item[ASPect] This is the aspect ratio (X/Y) of the plot (excluding
 any key). The default is set to the value which gives square pixels.
 \item[SHRINK] This gives a wide margin to the plot.
-\item[LOG] (key) Display using logarithmic scaling 
+\item[LOG] (key) Display using logarithmic scaling
 \item[KEY] This plots a key giving the data values corresponding to
 given greyscale values.
 \end{description}
@@ -2681,18 +2681,18 @@ velocities this should be adequate.
 \subsubsection{Summary of Parameters}
 
 \begin{description}
-\item[IMage] (file) Name of image to be displayed 
+\item[IMage] (file) Name of image to be displayed
 \item[OUTput] (file) Name of image to create
 \item[FILE] (char) Name of file for positions of fibres
-\item[YStart] (int) First Y value to be displayed 
-\item[YEnd] (int) Last Y value to be displayed 
-\item[XStart] (int) First X value to be displayed 
-\item[XEnd] (int) Last X value to be displayed 
-\item[Low] (int) Minimum count level for display 
-\item[High] (int) Maximum count level for display 
+\item[YStart] (int) First Y value to be displayed
+\item[YEnd] (int) Last Y value to be displayed
+\item[XStart] (int) First X value to be displayed
+\item[XEnd] (int) Last X value to be displayed
+\item[Low] (int) Minimum count level for display
+\item[High] (int) Maximum count level for display
 \item[DEVICE] (char) Plotting device (normally something like ``xwindows'')
 \item[NFIB] (int) Approximate number of fibres expected
-\item[LOG] (key) Display using logarithmic scaling 
+\item[LOG] (key) Display using logarithmic scaling
 \item[OLD] (key) Use previous results to extract data
 \end{description}
 
@@ -2822,7 +2822,7 @@ this is run it will give a list of the parameters of the function to
 remind the user of the order/parameters required. The option is given to
 edit the file before submission. BATCH creates a command file, and will
 submit it if required. It will set the default directory to the
-directory the file is created in. 
+directory the file is created in.
 
 Note that, as with DCL, a dash may be used to continue a command on
 another line.
@@ -2885,11 +2885,11 @@ On reaching an array or scaler element, you have the option to set its
 value(s).
 The example shows how to set the element OPT\_STEP to 0.9.
 \begin{quote}\begin{verbatim}
-$ ALTDEF 
+$ ALTDEF
 (INFILE) Input file [ ] - TWODSPEC_DEFAULTS
- 
+
 =========< E d i t   M e n u >=========
- 
+
 Fit_handler
 Opt_step
 Tols
@@ -2903,24 +2903,24 @@ DEFAULTS.OPT_STEP FLOAT 1
 \end{verbatim}\end{quote}
 (the data type and current value of the element is displayed)
 \begin{quote}\begin{verbatim}
- 
+
 =========< A l t e r   E l e m e n t >=========
- 
+
 Set     : Set value
 Range   : Set range (if array)
 Exit    : Exit
 Alter Element - SET
 Value [0] - 0.9
- 
+
 =========< A l t e r   E l e m e n t >=========
- 
+
 Set     : Set value
 Range   : Set range (if array)
 Exit    : Exit
 Alter Element - EXIT
- 
+
 =========< E d i t   M e n u >=========
- 
+
 Fit_handler
 Opt_step
 Tols
@@ -2975,14 +2975,14 @@ output will have the same format as the input.
 
 \begin{description}
 \cref{Akaike, H., 1973}{in 2nd int. Symp. Information Theory}
-{P.267, Eds. Petrov, B. N. \& Csaki, K., Akademai Kiado, Budapest}{} 
+{P.267, Eds. Petrov, B. N. \& Csaki, K., Akademai Kiado, Budapest}{}
 \igref{Bailey, J., 1989}{ICL --- The New ADAM Command Language}
 \igref{Bland, J., 1986}{Ph. D. Thesis, Univ. of Sussex}
 \igref{Chipperfield, A. J., 1989}{SUN/35.2, ICL --- Interactive Command
 Language: An Introduction}
 \jref{Frazer, R. D. B. \& Suzuki, E., 1969}{Anal. Chem.}{41}{37}{}
 \jref{Heckman, T. M., Miley, G. K., van Breugel, W. J. M. \& Butcher,
-H. R., 1981}{Astrophys. J.}{247}{403}{} 
+H. R., 1981}{Astrophys. J.}{247}{403}{}
 \igref{Lawden, M. D., 1989}{SG/4.1 ADAM --- The Starlink Software
 Environment}
 \igref{Shortridge, K., 1988}{FIGARO 2.4}
@@ -3683,7 +3683,7 @@ ambiguous way of determining where the block starts and ends. Therefore
 the starting cross-section of the fit is now stored (it is possible to
 change the blocking and only alter a small number of fits).
 
-The fit is performed on data extracted from ``nwindow'' cross-sections 
+The fit is performed on data extracted from ``nwindow'' cross-sections
 starting at ``first cross-section''.
 
 \begin{table}[ht]
@@ -3694,10 +3694,10 @@ starting at ``first cross-section''.
 Element & Digit & Number & Name & Refer to as &Meaning\\ \hline
 1 & 1 & 1 & Absorption flag & FIT\_ABS & 0 - Emission\\
   &   &   &                 & & 1 - Absorption\\ \cline{2-6}
-  & 2 & 2 & Profile Model & FIT\_MODEL & 0 - none\\            
-  & 3 &   &               &            & 1 - Gaussian\\        
-  &   &   &               &            & 2 - Skew Gaussian\\   
-  &   &   &               &            & 3 - Cauchy/Gaussian\\ 
+  & 2 & 2 & Profile Model & FIT\_MODEL & 0 - none\\
+  & 3 &   &               &            & 1 - Gaussian\\
+  &   &   &               &            & 2 - Skew Gaussian\\
+  &   &   &               &            & 3 - Cauchy/Gaussian\\
   &   &   &               &            & 4 - Centroid\\
   &   &   &               &            & 5 - Lorentzian\\ \cline{2-6}
   & 4 & 3 & Fit type      & FIT\_TYPE & 0 - none \\

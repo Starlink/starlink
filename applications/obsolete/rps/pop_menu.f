@@ -22,13 +22,13 @@
 
 * Local Variables
       INTEGER  I, NUMOPTS, STATUS, START, END_TEXT, LOC, NLINES, LEN
- 
+
 *  Functions
       INTEGER MDH_ENDWORD
 
 *  Executable Code
- 
-                        
+
+
         NUMOPTS = NUM + 1
         WRITE( * , '( / 5X,A)' ) HEADING
 

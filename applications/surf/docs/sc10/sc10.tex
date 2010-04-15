@@ -1,4 +1,4 @@
-\documentclass[twoside,11pt,fleqn]{article} 
+\documentclass[twoside,11pt,fleqn]{article}
 \pagestyle{myheadings}
 
 \usepackage{epsfig}
@@ -22,11 +22,11 @@
 \newcommand{\stardocmanual}    {\ }
 \newcommand{\stardocabstract}  {[Text of abstract]}
 % ? End of document identification
- 
+
 % A new environment for quoting verbatim
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
- 
+
 \newcommand{\text}[1]{{\small \tt #1}}
 
 
@@ -43,13 +43,13 @@
 \newcommand{\ndf}{\xref{NDF}{sun33}{}}
 \newcommand{\agi}{\xref{AGI}{sun48}{}}
 \newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
- 
+
 % Application tasks
 \newcommand{\task}[1]{{\sf #1}}
- 
+
 % ADAM parameters
 \newcommand{\param}[1]{{\tt #1}}
- 
+
 % SURF tasks
 \newcommand{\rebin}{\xref{\task{rebin}}{sun216}{REBIN}}
 \newcommand{\bolrebin}{\xref{\task{bolrebin}}{sun216}{BOLREBIN}}
@@ -81,7 +81,7 @@
 \newcommand{\obssum}{\xref{\task{obssum}}{sun216}{OBSSUM}}
 
 % Non surf tasks
- 
+
 \newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
 \newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
 \newcommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
@@ -108,7 +108,7 @@
 \newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
 
 % -----------------------------------------------------------------------------
- 
+
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
@@ -119,12 +119,12 @@
 \setlength{\parindent}{0mm}
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
- 
+
 % -----------------------------------------------------------------------------
 %  Hypertext definitions.
 %  ======================
 %  These are used by the LaTeX2HTML translator in conjunction with star2html.
- 
+
 %  Comment.sty: version 2.0, 19 June 1992
 %  Selectively in/exclude pieces of text.
 %
@@ -135,14 +135,14 @@
 %    104 Ayres Hall
 %    Knoxville, TN 37996
 %    USA
- 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
- 
+
 \def\ThrowAwayComment#1{\begingroup
     \def\CurrentComment{#1}%
     \let\do\makeinnocent \dospecials
@@ -158,7 +158,7 @@
       \fi \fi \html@next}
 }
 \makeatother
- 
+
 \def\includecomment
  #1{\expandafter\def\csname#1\endcsname{}%
     \expandafter\def\csname end#1\endcsname{}}
@@ -168,18 +168,18 @@
      \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
      \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
     }}
- 
+
 %  Define environments that ignore their contents.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
- 
+
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
 %  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
 %  should be consulted about all commands (and the environments defined above)
 %  except \xref and \xlabel which are Starlink specific.
- 
+
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
@@ -190,31 +190,31 @@
 \newcommand{\htmladdtonavigation}[1]{}
 \newcommand{\latexhtml}[2]{#1}
 \newcommand{\html}[1]{}
- 
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
- 
+
 %  LaTeX2HTML symbol.
 \newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
- 
+
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
 \newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
- 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
- 
+
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
 %  Remove % on the following to debug links in the HTML version using Latex.
- 
+
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnote
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
 % \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
@@ -231,7 +231,7 @@
 \renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
- 
+
 %  Latex document header.
 %  ======================
 \begin{latexonly}
@@ -254,7 +254,7 @@
    {\Huge\bf  \stardocmanual}
    \end{center}
    \vspace{5mm}
- 
+
 % ? Heading for abstract if used.
 %   \vspace{10mm}
 %   \begin{center}
@@ -262,7 +262,7 @@
 %   \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
- 
+
 %  HTML documentation header.
 %  ==========================
 \begin{htmlonly}
@@ -272,11 +272,11 @@
 %      \stardocversion\\
 %      \stardocmanual
    \begin{rawhtml} </H1> \end{rawhtml}
- 
+
 % ? Add picture here if required.
    \epsfig{width=2.0in,file=sc10_logo.eps}
 % ? End of picture
- 
+
    \begin{rawhtml} <P> <I> \end{rawhtml}
    \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
@@ -292,25 +292,25 @@
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
- 
-%  HTML document table of contents. 
+
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
   \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
- 
+
 % ? New section for abstract if used.
 %  \section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
 \end{htmlonly}
- 
+
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %  ==================
@@ -355,23 +355,23 @@ three bolometers on the arrays and the reduction of these data is
 discussed briefly.  In the future more elaborate methods, such as two
 and three position chopping, will be available and the document will
 evolve accordingly.  For a more detailed discussion of photometric
-observing modes with SCUBA see, for example, the 
+observing modes with SCUBA see, for example, the
 \htmladdnormallink{SCUBA Observing
-Manual}{http://www.jach.hawaii.edu/jcmt_sw/scuba/} 
+Manual}{http://www.jach.hawaii.edu/jcmt_sw/scuba/}
 \cite{obsguide}.
 
 Our basic philosophy was to style the SCUBA photometry reduction
 graphical interface in a manner similar to that used for UKT14 \cite{ukt14}
 (i.e. {\tt COADD}) but the observing modes and hence steps in the
-reduction process are particular to SCUBA. 
+reduction process are particular to SCUBA.
 
 This cookbook requires access to the Scuba User Reduction Facility (\surf) software
 \cite{surf} (for processing demodulated SCUBA data), \Kappa \cite{kappa}\footnote{This
 document assumes access to at least version 0.10 of Kappa.} (for data display
 and post-processing) and \convert\cite{convert} (for exporting data to ASCII or FITS).
 \surf\ is available from the \surf\
-\htmladdnormallinkfoot{homepage}{http://www.jach.hawaii.edu/jcmt\_sw/scuba/surf/} 
-and additionally all these packages are available from the 
+\htmladdnormallinkfoot{homepage}{http://www.jach.hawaii.edu/jcmt\_sw/scuba/surf/}
+and additionally all these packages are available from the
 \htmladdnormallinkfoot{Starlink software store}{http://www.starlink.ac.uk/cgi-store/storetop}
 or on the \htmladdnormallink{Starlink}{http://www.starlink.ac.uk} CD-ROM distribution.
 
@@ -383,15 +383,15 @@ by simply typing:
 \begin{myquote}
 \begin{verbatim}
 % surf
- 
+
    SURF - SCUBA User Reduction Facility
      Commands are now available -- (Version 1.0-0)
- 
+
      Type scuhelp for help on SURF commands.
      Type "showme sun216" to browse the hypertext documentation.
 
-% 
-\end{verbatim} 
+%
+\end{verbatim}
 \end{myquote}
 
 \section{The {\tt SURF} commands}
@@ -434,8 +434,8 @@ can be accessed with the {\tt -h} option:
 \begin{myquote}
 \begin{verbatim}
 % sculog -h
- 
-Usage: 
+
+Usage:
   sculog [-h] [-all]
 Options:
   -h[elp]        This message
@@ -446,12 +446,12 @@ Options:
   -demod         Only look at raw demodulated data files (ie _dem_)
   -reduced       Only look at files reduced on-line (ie _red_)
   -mode obs      Select observation modes
- 
+
 also
   --begin=nn     First scan number (note the -- prefix)
   --end=nn       Final scan number
   --mode=obs     Select observation modes
- 
+
   Where nn is an integer and 'obs' is a comma delimited list of obsmodes.
   Use 'perldoc sculog' for more information.
 Author:
@@ -461,7 +461,7 @@ Author:
 
 The \photsum\ command uses \sculog\ to produce a brief description
 of each observation (like {\tt usum} for UKT14). If the reduced data
-files are present then this summary will include signal and 
+files are present then this summary will include signal and
 \xref{skydip}{sun216}{skydips} tau values, e.g.,
 \begin{myquote}
 \begin{verbatim}
@@ -645,7 +645,7 @@ the data set after clipping at the 3$\sigma$ level. The \qdraw\
 routine will accept the same options as \linplot\ so refer to the
 documentation if you wish to change the display parameters.
 
-Further clipping can then be performed with the \Kappa\ command 
+Further clipping can then be performed with the \Kappa\ command
 \drawsig. For example,
 
 \begin{myquote}
@@ -695,23 +695,23 @@ The first observation is \#70:
 \begin{verbatim}
 % reduce_switch
 IN - Name of input file containing demodulated data > 19970807_0070
-USE_CALIBRATOR - Should the data be divided by the internal calibrator /NO/ > 
+USE_CALIBRATOR - Should the data be divided by the internal calibrator /NO/ >
 SURF: run 70 was a PHOTOM observation of object 3C31
 SURF: file contains data for 2 switch(es) in 1 exposure(s) in 20 integration(s)
 in 1 measurement(s)
-SPIKE_LEVEL - De-spike level /5/ > 
+SPIKE_LEVEL - De-spike level /5/ >
 OUT - Name of output file to contain reduced switch data > red70
 % change_flat
-IN - Name of input file containing demodulated map data /@red70/ > 
+IN - Name of input file containing demodulated map data /@red70/ >
 SURF: run 70 was a PHOTOM observation of 3C31
 NEW_FLAT - The name of the file containing the new flat-field > noiseflat.dat
 % flatfield
-IN - Name of input file /@red70/ > 
+IN - Name of input file /@red70/ >
 SURF: run 70 was a PHOTOM observation of 3C31
 OUT - Name of output file > red70_flat
 SURF: applying flatfield from noiseflat.dat
 % extinction
-IN - Name of NDF containing demodulated data /@red70_flat/ > 
+IN - Name of NDF containing demodulated data /@red70_flat/ >
 SURF: run 70 was a PHOTOM observation with JIGGLE sampling of object 3C31
 SURF: file contains data for 1 exposure(s) in 20 integration(s) in 1
 measurement(s)
@@ -725,11 +725,11 @@ SECOND_TAU - Second zenith sky opacity measured > 0.1
 SECOND_LST - Sidereal time of second opacity measurement; hh mm ss.ss > 0
 OUT - Name of output NDF > red70_ext
 % scuphot
-IN - Name of input file containing demodulated data /@red70_ext/ > 
+IN - Name of input file containing demodulated data /@red70_ext/ >
 SURF: run 70 was a PHOTOM observation of 3C31
 SURF: file contains data for 1 exposure(s) in 20 integrations(s) in 1
 measurement(s)
-ANALYSIS - Which reduction method /'AVERAGE'/ > 
+ANALYSIS - Which reduction method /'AVERAGE'/ >
 OUT - Name of container file to hold map and time-sequence data > red70_phot
 FILE - Name of ASCII file to contain results summary // > red70_phot.dat
 \end{verbatim}
@@ -738,58 +738,58 @@ FILE - Name of ASCII file to contain results summary // > red70_phot.dat
 The ASCII file, red70\_phot.dat, contains the following:
 
 \begin{myquote}
-\begin{verbatim} 
+\begin{verbatim}
 % cat red70_phot.dat
-Output from REDS reduction of a PHOTOM observation           
-Reduction date        : Mon May 19 12:04:08 1997             
-Observation definition: 3c31.obs                             
-Date of observation   : 1996:8:7                             
-Time of observation   : 15:52:07.659988                      
-Run number            : 70                                   
-Object                : 3C31                                 
-Sub-instrument        : P2000                                
-Filter                : 2000                                 
-Centre coords         : RB                                   
-Latitude              : +32:08:43.3                          
-Longitude             : 01:04:39.10                          
-Offset coords         : UNKNOWN                              
-x offset              : 0                                    
-y offset              : 0                                    
-Sample coords         : NA                                   
-Sky error removal     : FALSE                                
- 							     
-Photometric analysis  : AVERAGE                              
- 							     
-Bolometer: G6                                                
-Weight:    1                                                 
- 							     
-Integration  Peak    Error       S/N      Peak_x     Peak_y  
-   1    0.294E-04  0.461E-02    0.006  0.000E+00  0.000E+00  
-   2    0.146E-03  0.461E-02    0.032  0.000E+00  0.000E+00  
-   3    0.168E-03  0.460E-02    0.036  0.000E+00  0.000E+00  
-   4    0.174E-03  0.461E-02    0.038  0.000E+00  0.000E+00  
-   5    0.103E-03  0.459E-02    0.023  0.000E+00  0.000E+00  
-   6    0.116E-03  0.460E-02    0.025  0.000E+00  0.000E+00  
-   7    0.182E-03  0.461E-02    0.039  0.000E+00  0.000E+00  
-   8    0.321E-04  0.462E-02    0.007  0.000E+00  0.000E+00  
-   9    0.959E-04  0.462E-02    0.021  0.000E+00  0.000E+00  
-  10   -0.481E-03  0.466E-02   -0.103  0.000E+00  0.000E+00  
-  11    0.705E-04  0.466E-02    0.015  0.000E+00  0.000E+00  
-  12    0.445E-04  0.496E-02    0.009  0.000E+00  0.000E+00  
-  13    0.640E-04  0.468E-02    0.014  0.000E+00  0.000E+00  
-  14    0.490E-04  0.470E-02    0.010  0.000E+00  0.000E+00  
-  15    0.272E-03  0.469E-02    0.058  0.000E+00  0.000E+00  
-  16    0.170E-03  0.471E-02    0.036  0.000E+00  0.000E+00  
-  17    0.174E-03  0.471E-02    0.037  0.000E+00  0.000E+00  
-  18    0.149E-03  0.473E-02    0.032  0.000E+00  0.000E+00  
-  19   -0.609E-04  0.474E-02   -0.013  0.000E+00  0.000E+00  
-  20   -0.874E-03  0.480E-02   -0.182  0.000E+00  0.000E+00  
- 							     
-Measurement results:                                         
- Parabolic fit to coadded jiggle:                            
-        0.105E-03  0.385E-04    2.713 -0.170E+01  0.299E+00  
-  Coadded result of individual integrations:                 
-        0.312E-04  0.584E-04    0.534                         
+Output from REDS reduction of a PHOTOM observation
+Reduction date        : Mon May 19 12:04:08 1997
+Observation definition: 3c31.obs
+Date of observation   : 1996:8:7
+Time of observation   : 15:52:07.659988
+Run number            : 70
+Object                : 3C31
+Sub-instrument        : P2000
+Filter                : 2000
+Centre coords         : RB
+Latitude              : +32:08:43.3
+Longitude             : 01:04:39.10
+Offset coords         : UNKNOWN
+x offset              : 0
+y offset              : 0
+Sample coords         : NA
+Sky error removal     : FALSE
+
+Photometric analysis  : AVERAGE
+
+Bolometer: G6
+Weight:    1
+
+Integration  Peak    Error       S/N      Peak_x     Peak_y
+   1    0.294E-04  0.461E-02    0.006  0.000E+00  0.000E+00
+   2    0.146E-03  0.461E-02    0.032  0.000E+00  0.000E+00
+   3    0.168E-03  0.460E-02    0.036  0.000E+00  0.000E+00
+   4    0.174E-03  0.461E-02    0.038  0.000E+00  0.000E+00
+   5    0.103E-03  0.459E-02    0.023  0.000E+00  0.000E+00
+   6    0.116E-03  0.460E-02    0.025  0.000E+00  0.000E+00
+   7    0.182E-03  0.461E-02    0.039  0.000E+00  0.000E+00
+   8    0.321E-04  0.462E-02    0.007  0.000E+00  0.000E+00
+   9    0.959E-04  0.462E-02    0.021  0.000E+00  0.000E+00
+  10   -0.481E-03  0.466E-02   -0.103  0.000E+00  0.000E+00
+  11    0.705E-04  0.466E-02    0.015  0.000E+00  0.000E+00
+  12    0.445E-04  0.496E-02    0.009  0.000E+00  0.000E+00
+  13    0.640E-04  0.468E-02    0.014  0.000E+00  0.000E+00
+  14    0.490E-04  0.470E-02    0.010  0.000E+00  0.000E+00
+  15    0.272E-03  0.469E-02    0.058  0.000E+00  0.000E+00
+  16    0.170E-03  0.471E-02    0.036  0.000E+00  0.000E+00
+  17    0.174E-03  0.471E-02    0.037  0.000E+00  0.000E+00
+  18    0.149E-03  0.473E-02    0.032  0.000E+00  0.000E+00
+  19   -0.609E-04  0.474E-02   -0.013  0.000E+00  0.000E+00
+  20   -0.874E-03  0.480E-02   -0.182  0.000E+00  0.000E+00
+
+Measurement results:
+ Parabolic fit to coadded jiggle:
+        0.105E-03  0.385E-04    2.713 -0.170E+01  0.299E+00
+  Coadded result of individual integrations:
+        0.312E-04  0.584E-04    0.534
 \end{verbatim}
 \end{myquote}
 
@@ -807,7 +807,7 @@ SURF: This is a PHOTOM observation of 3C31. There are 20 integrations
 IN - Name of input file containing photometry data /!/ > red71_phot
 SURF: Found data for the following bolometers: g6
 SURF: This is a PHOTOM observation of 3C31. There are 20 integrations
-IN - Name of input file containing photometry data /!/ >  
+IN - Name of input file containing photometry data /!/ >
 \end{verbatim}
 \end{myquote}
 
@@ -822,16 +822,16 @@ NDF is 3C31_2000_g6
 The default values have been adopted for parameter ABSLIM.
 Current picture has name: DATA, comment: KAPPA_LINPLOT.
 Using /home/jas/scuba/test/3C31_2000_g6 as the input NDF.
- 
+
       Clip (+/-)         mean          std. deviation    Error in mean
       ----------         ----          --------------    -------------
                       0.800321E-04      0.276960E-03      0.437913E-04
-         3.000        0.740715E-04      0.136353E-03      0.221194E-04 
+         3.000        0.740715E-04      0.136353E-03      0.221194E-04
 \end{verbatim}
 \end{myquote}
 
 Clearly, this data set contains large spikes and the best despiking
-strategy is to remove the two biggest spikes that fall outside the 
+strategy is to remove the two biggest spikes that fall outside the
 3$\sigma$ levels and then replot the data. For this we use the
 \sigclip\ command.
 
@@ -862,16 +862,16 @@ NDF is 3C31_2000_g6_clip
 The default values have been adopted for parameter ABSLIM.
 Current picture has name: DATA, comment: KAPPA_LINPLOT.
 Using /home/jas/scuba/test/3C31_2000_g6_clip as the input NDF.
- 
+
       Clip (+/-)         mean          std. deviation    Error in mean
       ----------         ----          --------------    -------------
                       0.740715E-04      0.136353E-03      0.221194E-04
          3.000        0.890766E-04      0.101563E-03      0.166969E-04
-% 
+%
 %  drawsig nsigma=2.5 device=xwindows
 Current picture has name: DATA, comment: KAPPA_LINPLOT.
 Using /home/jas/scuba/test/3C31_2000_g6_clip as the input NDF.
- 
+
       Clip (+/-)         mean          std. deviation    Error in mean
       ----------         ----          --------------    -------------
                       0.740715E-04      0.136353E-03      0.221194E-04
@@ -889,7 +889,7 @@ The PERL script \scuquick\ can be used to save time by automating
 the reduction process up to and including the \scuphot\ stage.
 Note that if many repetitive operations are to be performed then
 \scuquick\ (or any other \surf\ command) will take options.
-For example, 
+For example,
 \begin{myquote}
 \begin{verbatim}
 % scuquick -remsky
@@ -900,13 +900,13 @@ the reduction process. A list of avialable options can be accessed by typing
 \begin{myquote}
 \begin{verbatim}
 % scuquick -h
- 
+
 Usage:
    scuquick [-h] [-change_flat] [-remsky] [-rebin] [-notau|tau f] [-sub s]
 Options:
    -h[elp]       This message
    -quick        Run all tasks with the 'accept' flag (ie take defaults)
-   -quiet        Hide all messages generated by the script (note this is 
+   -quiet        Hide all messages generated by the script (note this is
                  not the same as using MSG_FILTER=quiet which hides messages
                  from the tasks)
    -change_flat  Run the change_flatfield task
@@ -921,12 +921,12 @@ Options:
 Notes:
    Parameters for any task can be specified on the command line
    as param=value. All other command line arguments are assumed to be
-   input NDFs. 
+   input NDFs.
 \end{verbatim}
 \end{myquote}
 
-The second example uses \scuquick\ to reduce a long integration on 
-the radio galaxy 8C1435+635 at 450 and 850$\mu$m. Note that 
+The second example uses \scuquick\ to reduce a long integration on
+the radio galaxy 8C1435+635 at 450 and 850$\mu$m. Note that
 \scuquick\ will reduce data from both arrays unless instructed
 otherwise by use of the {\tt -sub} option.
 
@@ -939,16 +939,16 @@ variations. I'll just reduce the first demodulated data file here.
 % scuquick -remsky
 IN - Name of input file containing demodulated data > 19970502_dem_0052
 SURF: run 52 was a PHOTOM observation of object 8C1435+635
-USE_CALIBRATOR - Should the data be divided by the internal calibrator /NO/ > 
+USE_CALIBRATOR - Should the data be divided by the internal calibrator /NO/ >
 SURF: file contains data for 2 switch(es) in 1 exposure(s) in 40 integration(s)
 in 1 measurement(s)
-SPIKE_LEVEL - De-spike level /5/ > 
+SPIKE_LEVEL - De-spike level /5/ >
 OUT - Name of output file to contain reduced switch data > r52
 SURF: run 52 was a PHOTOM observation of 8C1435+635
 SURF: applying flatfield from photflat1.dat
- 
+
 Processing the LONG sub instrument
- 
+
 SURF: run 52 was a PHOTOM observation with JIGGLE sampling of object 8C1435+635
 SURF: file contains data for 1 exposure(s) in 40 integration(s) in 1
 measurement(s)
@@ -965,16 +965,16 @@ Extinction corrected data has been written to file r52_ext_long.sdf
 SURF: run 52 was a PHOTOM observation with JIGGLE sampling of object 8C1435+635
 BOLOMETERS - The Sky bolometers, [a1,a2] for an array /['d10','c16','c12',
 'c2','b9','b10','b11','c5','c16','d10','e2','e3']/ > [h6,h8,h13,h14,g15,g16]
-MODE - Sky removal mode /'MEAN'/ > 
+MODE - Sky removal mode /'MEAN'/ >
 ITER_SIGMA - Sigma level to drop points from mean iteratively /-1/ > 3.
-CLIP - Do you wish to clip the bolometers? /NO/ > 
+CLIP - Do you wish to clip the bolometers? /NO/ >
 Sky corrected data has been written to file r52_sky_long.sdf
 SURF: run 52 was a PHOTOM observation of 8C1435+635
 SURF: file contains data for 1 exposure(s) in 40 integrations(s) in 1
 measurement(s)
-ANALYSIS - Which reduction method /'AVERAGE'/ > 
+ANALYSIS - Which reduction method /'AVERAGE'/ >
 Processed photometry data written to r52_phot_long.sdf and r52_phot_long.dat
- 
+
 Processing the SHORT sub instrument
 
 SURF: run 52 was a PHOTOM observation with JIGGLE sampling of object 8C1435+635
@@ -993,14 +993,14 @@ Extinction corrected data has been written to file r52_ext_short.sdf
 SURF: run 52 was a PHOTOM observation with JIGGLE sampling of object 8C1435+635
 BOLOMETERS - The Sky bolometers, [a1,a2] for an array /['h6','h8','h13','h14',
 'g15','g16']/ > [d10,c16,c12,c2,b9,b10,b11,c5,c16,d10,e2,e3]
-MODE - Sky removal mode /'MEAN'/ > 
+MODE - Sky removal mode /'MEAN'/ >
 ITER_SIGMA - Sigma level to drop points from mean iteratively /-1/ > 3.
-CLIP - Do you wish to clip the bolometers? /NO/ > 
+CLIP - Do you wish to clip the bolometers? /NO/ >
 Sky corrected data has been written to file r52_sky_short.sdf
 SURF: run 52 was a PHOTOM observation of 8C1435+635
 SURF: file contains data for 1 exposure(s) in 40 integrations(s) in 1
 measurement(s)
-ANALYSIS - Which reduction method /'AVERAGE'/ > 
+ANALYSIS - Which reduction method /'AVERAGE'/ >
 Processed photometry data written to r52_phot_short.sdf and r52_phot_short.dat
 \end{verbatim}
 \end{myquote}
@@ -1028,7 +1028,7 @@ IN - Name of input file containing demodulated data // > r52_ext_long
 SURF: run 52 was a PHOTOM observation of 8C1435+635
 SURF: file contains data for 1 exposure(s) in 40 integrations(s) in 1
 measurement(s)
-ANALYSIS - Which reduction method /'AVERAGE'/ > 
+ANALYSIS - Which reduction method /'AVERAGE'/ >
 OUT - Name of container file to hold map and time-sequence data > r52_all
 SCUPHOT: All bolometers selected
 FILE - Name of ASCII file to contain results summary /!/ > r52_all.dat
@@ -1039,7 +1039,7 @@ SURF: Found data for the following bolometers:
 g1,g2,g3,g4,g7,g8,g9,g10,g11,g13,g14,g15,g16,h1,h2,h4,h5,h6,h7,h8,h9,h10,h11,h1
 2,h13,h14,h15,h16,i1,i2,i3,i4,i5,i6,i7,i8,i9
 SURF: This is a PHOTOM observation of 8C1435+635. There are 40 integrations
-IN - Name of input file containing photometry data /!/ > 
+IN - Name of input file containing photometry data /!/ >
 \end{verbatim}
 \end{myquote}
 
@@ -1070,7 +1070,7 @@ IN1 - First input NDF /@sum1/ > sum1
 IN2 - Second input NDF > r52_h14
 OUT - Output NDF > sum2
 % add
-IN1 - First input NDF /@sum2/ > 
+IN1 - First input NDF /@sum2/ >
 IN2 - Second input NDF > r52_g15
 OUT - Output NDF > sum3
 % add
@@ -1078,10 +1078,10 @@ IN1 - First input NDF /sum3/ >
 IN2 - Second input NDF > r52_g16
 OUT - Output NDF > sum4
 % cdiv
-IN - Input NDF data structure /@sum4/ > 
-SCALAR - Division constant /6/ > 
+IN - Input NDF data structure /@sum4/ >
+SCALAR - Division constant /6/ >
 OUT - Output NDF > inner_ring
-% 
+%
 \end{verbatim}
 \end{myquote}
 
@@ -1113,7 +1113,7 @@ source1\_h7.sdf} and {\tt source1\_h9.sdf} will result.
 The most robust method of reducing these data is to observe a planet,
 such as Mars, in exactly the same way and then to calibrate each
 bolometer separately into flux units. The coadded result and its
-statistical uncertainty can then be calculated with standard formulae.  
+statistical uncertainty can then be calculated with standard formulae.
 
 \section{Is it correct to coadd the data sets? The K-S test}
 
@@ -1125,7 +1125,7 @@ sunrise and sunset, for example. The consistency of the entire data
 set can be investigated with the use of a two sample
 Kolmogorov-Smirnov (KS) test. Again, the method adopted for the SCUBA
 data reduction package is analogous to that used previously by COADD
-for UKT14 \cite{dhh}. 
+for UKT14 \cite{dhh}.
 
 The data set is split into subsamples that are specified by the
 user. The size of these subsamples clearly depends on the total number
@@ -1145,9 +1145,9 @@ repeat the process but this time select a different subsample against
 which the others are to be compared. In general, it is good practice
 to change the order and repeat the test.
 
-The best way to illustrate the whole process is with an example using 
+The best way to illustrate the whole process is with an example using
 real data.
- 
+
 \subsection{An example}
 
 For the example I'll use the 8C1435+635 measurement at 850$\mu$m that was
@@ -1191,7 +1191,7 @@ Data for "8C1435+635" contain 20 points, of which 20 are good.
 Data for "8C1435+635" contain 20 points, of which 20 are good.
 Data for "8C1435+635" contain 20 points, of which 20 are good.
 Data for "8C1435+635" contain 20 points, of which 20 are good.
- 
+
                   Probability        Max. Sep.
 --------------------------------------------------------------
  cf. with   2 :   0.288655E+00       0.300000E+00  (Accepted)
@@ -1201,7 +1201,7 @@ Data for "8C1435+635" contain 20 points, of which 20 are good.
  cf. with   6 :   0.288812E-01       0.344444E+00  (Rejected)
  cf. with   7 :   0.380108E+00       0.215151E+00  (Accepted)
  cf. with   8 :   0.583820E+00       0.181092E+00  (Accepted)
- 
+
 Number of subsamples rejected: 1
 Coadded result is 4.8022197E-5 +/- 8.0190266E-6
 \end{verbatim}
@@ -1221,8 +1221,8 @@ original dataset, 8c\_clip;
 % flip 8c_clip 8c_flip
 \end{verbatim}
 \end{myquote}
-More generally, any subsample can be specified with a 
-\xref{NDF section}{sun33}{ndf_sections} \cite{ndf}. In the above 
+More generally, any subsample can be specified with a
+\xref{NDF section}{sun33}{ndf_sections} \cite{ndf}. In the above
 example, subsample 7 is 8c\_clip(121:140). The \kstest\ command can then
 read in an ascii file containing a list of NDF sections, such as,
 
@@ -1237,7 +1237,7 @@ read in an ascii file containing a list of NDF sections, such as,
 8c_clip(101:120)
 8c_clip(141:160)
 8c_clip(41:60)
-% 
+%
 \end{verbatim}
 \end{myquote}
 
@@ -1254,7 +1254,7 @@ Data for "8C1435+635" contain 20 points, of which 19 are good.
 Data for "8C1435+635" contain 20 points, of which 20 are good.
 Data for "8C1435+635" contain 20 points, of which 20 are good.
 Data for "8C1435+635" contain 20 points, of which 20 are good.
- 
+
                   Probability        Max. Sep.
 --------------------------------------------------------------
  cf. with   2 :   0.497342E+00       0.250000E+00  (Accepted)
@@ -1264,11 +1264,11 @@ Data for "8C1435+635" contain 20 points, of which 20 are good.
  cf. with   6 :   0.100815E-01       0.384849E+00  (Rejected)
  cf. with   7 :   0.835178E+00       0.146970E+00  (Accepted)
  cf. with   8 :   0.189298E+00       0.253361E+00  (Accepted)
- 
+
 Number of subsamples rejected: 1
 Coadded result is 4.8022197E-5 +/- 8.0190266E-6
- 
-% 
+
+%
 \end{verbatim}
 \end{myquote}
 Note that the \param{NSAMPLE} parameter is now redundant and also that single
@@ -1300,21 +1300,21 @@ to compare the bolometer signals then the flatfielded or extinction corrected
 data must be used. Here's observation \#52 of 8C1435+635 again,
 
 \begin{myquote}
-\begin{verbatim}  
+\begin{verbatim}
 % convert
- 
+
    CONVERT commands are now available -- (Version 0.6-2, 1996 September)
- 
+
    Defaults for automatic NDF conversion are set.
- 
+
    Type conhelp for help on CONVERT commands.
- 
+
 % ndf2ascii prompt
 IN - Input NDF data structure /@red52_phot/ > red52_ext(19,,2)
-COMP - Array component to copy to the ASCII file /'Data'/ > 
-FITS - Write a FITS header in the ASCII file? /NO/ > 
+COMP - Array component to copy to the ASCII file /'Data'/ >
+FITS - Write a FITS header in the ASCII file? /NO/ >
 FIXED - Fixed format of the array values? /NO/ > y
-NOPEREC - Number of data values per ASCII record /1/ > 
+NOPEREC - Number of data values per ASCII record /1/ >
 OUT - ASCII file /@h14_52/ > h7_52
 %
 \end{verbatim}
@@ -1364,7 +1364,7 @@ Currie~M.~J., Privett~G.~J., Chipperfield~A.~J., 1995 {\it CONVERT --
 A format-conversion package}, \xref{Starlink User Note 55}{sun55}{}
 
 \bibitem{perl}
-Wall~L., Christiansen~T., Schwartz~R.~L., 1996, 
+Wall~L., Christiansen~T., Schwartz~R.~L., 1996,
 \htmladdnormallink{\textit{Programming Perl}}{http://www.perl.org/}, 2nd
 edn., \htmladdnormallink{O'Reilly \& Associates, Inc.}{http://www.ora.com/}
 
@@ -1377,7 +1377,7 @@ N-Dimensional Data Format}, \xref{Starlink User Note 33}{sun33}{}
 
 \bibitem{fluxes}
 Privett~G.~J., Jenness~T., Matthews~H.~E., 1997, {\it FLUXES --
-JCMT Position and Flux Density Calibration}, 
+JCMT Position and Flux Density Calibration},
 \xref{Starlink User Note 213}{sun213}{}
 
 \bibitem{uktphot}

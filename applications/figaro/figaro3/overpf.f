@@ -75,7 +75,7 @@
 *     22 Jan 1991 (jms):
 *        Added PAR_ABORTS to support user requested aborts. Modified to
 *        trap errors when reading the coefficient file. Added check to
-*        close SGS at the end of OVERPF_WORK. 
+*        close SGS at the end of OVERPF_WORK.
 *     01 Jul 1991 (hme):
 *        Increase string lengths for IMAGEDEV, OVERDEV in OVERPF_WORK to
 *        32.
@@ -109,7 +109,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -539,7 +539,7 @@
                YY = DPCOEF(NORDER+1)
                DO 8 J = NORDER, 1, -1
                   YY = YY * X(I)
-                  YY = YY + DPCOEF(J)      
+                  YY = YY + DPCOEF(J)
  8             CONTINUE
                YLEVEL(I) = SNGL(YY)
  9          CONTINUE
@@ -568,7 +568,7 @@
                   YY = DPCOEF(NORDER+1)
                   DO 10 J = NORDER, 1, -1
                      YY = YY * DBLE(IX)
-                     YY = YY + DPCOEF(J)      
+                     YY = YY + DPCOEF(J)
  10               CONTINUE
                   YRUN(IX) = SNGL(YY)
  11            CONTINUE

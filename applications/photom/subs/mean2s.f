@@ -46,7 +46,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -195,7 +195,7 @@
       IF ( ( OLDMIN .NE. SMIN ) .OR. ( OLDMAX .NE. SMAX ) ) THEN
          GOTO 20
       ENDIF
- 
+
   99  CONTINUE
 
       END

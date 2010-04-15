@@ -17,7 +17,7 @@
 *    :     STATUS)
 
 *  Description:
-*     This routine obtains the dem_pntr array and returns the 
+*     This routine obtains the dem_pntr array and returns the
 *     dimensions in terms of switches, exposures, inegrations and
 *     measurements.
 
@@ -61,9 +61,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
 *  Local constants:
       INTEGER   MAX_DIM          ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
- 
+
 *  Local Variables:
       INTEGER DIM (0:MAX_DIM)    ! array dimensions
       INTEGER ITEMP              ! Dummy variable
@@ -165,7 +165,7 @@
 
 *     Setup values for return
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (ACTDIM .EQ. 4) N_SWITCHES  = DIM (0) 
+         IF (ACTDIM .EQ. 4) N_SWITCHES  = DIM (0)
          N_EXPOSURES = DIM (1)
          N_INTEGRATIONS = DIM (2)
          N_MEASUREMENTS = DIM (3)

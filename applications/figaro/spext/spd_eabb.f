@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -115,5 +115,5 @@
       END IF
 
 *  Return.
- 500  CONTINUE     
+ 500  CONTINUE
       END

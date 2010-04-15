@@ -1,4 +1,4 @@
-1 HLP - Portable help system 
+1 HLP - Portable help system
 
 HLP version 4.0-3
 
@@ -30,7 +30,7 @@ HLP version 3.3-4
 *  Update to hlib script to force it to delete its temporary fort.1 file.
    Add checks to hlib for presence of fort.1 and fort.2 before attempting
    to use them.
-   
+
 HLP version 3.3-3
 
 *  Maintenance release to add hypertext documentation.  No changes to

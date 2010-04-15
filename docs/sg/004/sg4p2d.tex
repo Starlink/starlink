@@ -83,7 +83,7 @@ and for specifying values for parameters that would otherwise be defaulted.
 Normally, command-line specification will prevent prompting for a parameter's
 value unless there is an error in the given value, say giving a character
 string for a parameter of type \_REAL.
- 
+
 There are two ways in which parameter values may be specified on the command
 line:
 \begin{itemize}
@@ -236,7 +236,7 @@ to `flat field' a series of CCD frames:
         TITLE = 'Flat field of ' & (IMAGE)
         IMAGE = '@' & (IMAGE)
         IMAGEOUT = (IMAGE) & 'F'
-        PRINT Writing to (IMAGEOUT) 
+        PRINT Writing to (IMAGEOUT)
         DIV IN1=(IMAGE) IN2=(FF) OUT=(IMAGEOUT) TITLE=(TITLE)
       END LOOP
     END PROC
@@ -581,7 +581,7 @@ parameters:
 \begin{verbatim}
     ICL> X=2
     ICL> PRINT The Square Root of (X) is (SQRT(X))
-    The Square Root of          2 is 1.414214    
+    The Square Root of          2 is 1.414214
 \end{verbatim}
 \end{small}
 

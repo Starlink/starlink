@@ -43,7 +43,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -111,7 +111,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -200,12 +200,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -274,7 +274,7 @@ REPACK is supported under UNIX (Digital Unix, Solaris 2).
 
 \section{\label{se_retrieving_images}\xlabel{retrieving_images}Retrieving Images and Photon Event Files}
 
-The recommended  way of retrieving [\ro WFC survey] images and photon event 
+The recommended  way of retrieving [\ro WFC survey] images and photon event
 files is to first go to the LEDAS page on the World Wide Web via the URL:
 
 \begin{quote}{\tt
@@ -295,7 +295,7 @@ form {\tt im{\it nnnnnn}\_f{\it n}.sdf} and/or {\tt x{\it nnn}y{\it
 nn}.fit}, in their current directory.
 
 The LEDAS also provides easy-to-use access to the WFC survey image
-database via the WFC Survey Image Browser: 
+database via the WFC Survey Image Browser:
 
 \begin{quote}{\tt
 \htmladdnormallink{http://ledas-www.star.le.ac.uk/WFCimage}%
@@ -340,11 +340,11 @@ executed:
 \end{verbatim}
 
 All programs are started by simply typing their name on the command line.
-On-line parameters can also be specified, \emph{e.g.}: 
+On-line parameters can also be specified, \emph{e.g.}:
 
-\begin{verbatim} 
+\begin{verbatim}
     % re_sort evefil=mrgd_ev \\
-\end{verbatim}  
+\end{verbatim}
 
 Where possible some of the program parameters supply the user with a
 sensible default value.  The next section describes each of the
@@ -370,10 +370,10 @@ image can be retrieved.
 Yes if RA and DEC co-ordinates are to be input from a file.
 No if from the command line.
 \item[FILENAME  ] file containing one or more co-ordinate pairs.
-\item[SRA  ] 
+\item[SRA  ]
 The RA co-ordinate to be searched.  It may be specified in
 decimal or sexagesimal degrees.
-\item[SDEC  ] 
+\item[SDEC  ]
 The Dec co-ordinate to be searched.  It may be specified in
 decimal or sexagesimal degrees.
 \item[WRITE (Y/N)  ]
@@ -391,26 +391,26 @@ convenience these names are written to the file {\tt re\_evmrg.list}
 which can be used as input to the event file merging program
 \htmlref{{\tt re\_fitmrg}}{ss_re_fitmrg} (see Section~\ref{ss_re_fitmrg}).
 
-A similar feature is also available in BROWSE using the ROSWFCSE table.  
+A similar feature is also available in BROWSE using the ROSWFCSE table.
 Further, the appropriate event files can be retrieved.
 
 \subsubsection{Parameters}
 
 \begin{description}
 
-\item[SRA  ] 
+\item[SRA  ]
 The RA of the search cone.  It may be specified in
 decimal or sexagesimal degrees.
-\item[SDEC  ] 
+\item[SDEC  ]
 The Dec of the search cone.  It may be specified in
 decimal or sexagesimal degrees.
-\item[RAD  ] 
+\item[RAD  ]
 The radius of the search cone.  It may be specified in only decimal
 degrees. A typical radius, if a time-series is to be the sorted product
 for example, may be $1^{\circ}$.
 \end{description}
 
-\subsection{\label{ss_re_fitmrg}\xlabel{re_fitmrg}re\_fitmrg}	
+\subsection{\label{ss_re_fitmrg}\xlabel{re_fitmrg}re\_fitmrg}
 
 Event files need to merged before they can be sorted into images
 \emph{etc.}, if it is shown by \htmlref{{\tt re\_evsrch}}{ss_re_evsrch}
@@ -427,16 +427,16 @@ makes merging even easier --- see Section~\ref{se_shell_scripts}.
 
 \begin{description}
 
-\item[LIST  ] 
+\item[LIST  ]
 The list of event files to be merged.  A text file containing file
 names can be used as input.  If {\tt TERMINAL} is the supplied response
 then the names can be entered from the keyboard and the list terminated
 with a {\tt Ctrl-D}.  The default file extension is {\tt .fit} and need
 not be supplied by the user.
-\item[OUT  ] 
-The name to be given to the new merged event file.  The default extension is 
+\item[OUT  ]
+The name to be given to the new merged event file.  The default extension is
 {\tt .fit}.
-\item[DELFIL ] 
+\item[DELFIL ]
 If an output file of the same name already exists the option is given of
 either overwriting it or aborting the program.
 \end{description}
@@ -453,21 +453,21 @@ user. Both instrument vignetting and dead-time are accounted for.
 
 \begin{description}
 
-\item[FILT  ] 
-Survey filter, S1a or S2a, for which exposure is required.  Each passband has 
+\item[FILT  ]
+Survey filter, S1a or S2a, for which exposure is required.  Each passband has
 its own exposure map ({\tt reskyexp\_f1.fit} for S1 and {\tt reskyexp\_f2.fit}
 for S2).
 \item[EFFCOR  ]
  Allows a correction for degradation of detector efficiency.  Can be used
 to give `at launch' values.  Count rates given in the 2RE catalogue have
 had this correction applied.
-\item[SLIST  ]    
-Name of the PSS SSDS file (default extension {\tt .sdf}).  A text file of 
-decimal RAs and Decs, comma   separated, can also be supplied.  If this input 
-file has the name {\tt posns.dat} for example, the exposure information will 
+\item[SLIST  ]
+Name of the PSS SSDS file (default extension {\tt .sdf}).  A text file of
+decimal RAs and Decs, comma   separated, can also be supplied.  If this input
+file has the name {\tt posns.dat} for example, the exposure information will
 be placed  in a file called {\tt posns.exp}.  If {\tt TERMINAL} is the supplied
-response then RAs and Decs, in decimals, can be input directly from the 
-keyboard. The program then returns exposure times when it receives 
+response then RAs and Decs, in decimals, can be input directly from the
+keyboard. The program then returns exposure times when it receives
 a {\tt Ctrl-D}.
 \item[CLIST   ]
  If a SSDS file is being processed, then an output file containing the
@@ -475,7 +475,7 @@ a {\tt Ctrl-D}.
 the program.  The default extension is {\tt .sdf}.
 \end{description}
 
-\subsection{\label{ss_re_imexp}\xlabel{re_imexp}re\_imexp}	
+\subsection{\label{ss_re_imexp}\xlabel{re_imexp}re\_imexp}
 
 Using the sky survey exposure maps {\tt reskyexp\_f1.fit} and {\tt
 reskyexp\_f2.fit}, and WFC configuration file {\tt re\_slots.fit},
@@ -498,7 +498,7 @@ Name of (HDS) corrected image.  An output name is suggested by the
 program. The default file extension is {\tt .sdf}.
 \end{description}
 
-\subsection{\label{ss_re_sort}\xlabel{re_sort}re\_sort}	
+\subsection{\label{ss_re_sort}\xlabel{re_sort}re\_sort}
 
 This program `sorts' (FITS) survey event files into ASTERIX (HDS)
 datasets such as images and time-series.  If events from a range of
@@ -510,7 +510,7 @@ Section~\ref{ss_re_fitmrg}).
 
 \begin{description}
 \item[EVEFIL   ]
-Name of (FITS) event file to be sorted.  The default file extension is 
+Name of (FITS) event file to be sorted.  The default file extension is
 {\tt .fit} and need not be supplied by the user.
 \item[SHOW   ]
 If {\tt Y} is the reply to the prompt, then some summary information on the
@@ -535,16 +535,16 @@ decimal or sexagesimal degrees.
 The Declination of the sort field centre. This can be entered as
 decimal or sexagesimal degrees.
 \item[DAZ]
-The half azimuthal extent of the field to be sorted (degs).  For example the 
-survey images in the BROWSE table ROSWFCSI were created with DAZ \& DEL set to 
-80/60 and NXPIX \& NYPIX set to 160.  These values give images of dimension 
+The half azimuthal extent of the field to be sorted (degs).  For example the
+survey images in the BROWSE table ROSWFCSI were created with DAZ \& DEL set to
+80/60 and NXPIX \& NYPIX set to 160.  These values give images of dimension
 $160 \times 160$ arcminutes with a resolution of 1 pixel per arcmin$^{2}$.
 \item[DEL]
 The half elevation extent of the field to be sorted (degs).
 \item[NXPIX]
-The number of pixels along azimuthal side of the image. 
+The number of pixels along azimuthal side of the image.
 \item[NYPIX]
-The number of pixels along elevation side of the image. 
+The number of pixels along elevation side of the image.
 \item[INRAD]
 In time series mode INRAD specifies the inner radius of an annulus
 from which to select events. The radius should be specified in arcminutes
@@ -570,7 +570,7 @@ the second column of the following table
 
       6             S2A          Le/Be
       8             S1A          Le/C/B4C
- 
+
       (MCF = Master Calibration File)
 \end{verbatim}
 
@@ -584,7 +584,7 @@ Section~\ref{se_shell_scripts}, to perform this task).
 \item[THI ]
 The time to end event sorting.   The units are absolute MJD.
 \item[NBINS]
-The number of bins into which the time extent of the sort 
+The number of bins into which the time extent of the sort
 is to be divided. If a value '0' is given the program prompts for the
 time duration for each bin (see TBIN).
 \item[TBIN]
@@ -597,11 +597,11 @@ This gives the option of `stopping down' the radius of the WFC
 field-of-view.  The units are degrees, the default is the full field
 ($\approx 5^{\circ}$ in diameter).
 \item[OUTPUT]
-The name of the output dataset. The default extension for the file is 
+The name of the output dataset. The default extension for the file is
 {\tt .sdf } and need not be supplied by the user.
 \end{description}
 
-\subsection{\label{ss_re_timexp}\xlabel{re_timexp}re\_timexp}  
+\subsection{\label{ss_re_timexp}\xlabel{re_timexp}re\_timexp}
 
 This program exposure corrects a survey (HDS) time-series for
 vignetting, dead-time, and point spread function as well as raw
@@ -614,7 +614,7 @@ re\_hkrres.fit} respectively).
 
 \begin{description}
 \item[INP   ]
-Name of (HDS) time-series to be exposure corrected. The default extension is 
+Name of (HDS) time-series to be exposure corrected. The default extension is
 {\tt .sdf } and need not be supplied by the user.
 \item[SRC   ]
 If the input time-series is for a source, rather than a background
@@ -634,7 +634,7 @@ McGale \etal, MNRAS, in press).
 \section{\label{se_shell_scripts}\xlabel{shell_scripts}{\tt csh} Scripts}
 
 Some of the REPACK programs have been incorporated into {\tt csh}
-scripts to perform some typical procedures and so minimise user interaction. 
+scripts to perform some typical procedures and so minimise user interaction.
 These scripts are listed in the table below.
 
 \begin{verbatim}
@@ -718,20 +718,20 @@ RAD  radius (deg) <REAL>=2.5
 
 List also stored in file re_evmrg.list.
 
-% re_fitmrgsh                                      ! Merge present event files 
- 
+% re_fitmrgsh                                      ! Merge present event files
+
   RE_FITMRGSH -- Version 010595
- 
+
     Merging all x*y*.fit files in current directory.
- 
+
 ls: No match.
- 
- RE_FITMRG Version 010595 
+
+ RE_FITMRG Version 010595
 
     Merging            9 event files.
- 
+
     Merged file is mrgd_ev.fit.
- 
+
 % ls                                                         ! See what we have
 mrgd_ev.fit     x174y16.fit     x175y16.fit     x176y16.fit
 re_evmrg.list   x174y17.fit     x175y17.fit     x176y17.fit
@@ -739,28 +739,28 @@ x174y18.fit     x175y18.fit     x176y18.fit
 
 % re_sort                                                    ! Sort to an image
 
- RE_SORT Version 110595   
+ RE_SORT Version 110595
 
 EVEFIL Event File <CHAR>=mrgd_ev
 SHOW header records = No =y
 
  Mode                    : S
- MDR Sequence #          : mrgd_ev   
+ MDR Sequence #          : mrgd_ev
  # Azim maps             :   0
  # Elev maps             :  0
  Asc Node Ra             :    0.0
  Asc Node Dec            :    0.0
- Target                  : SURVEY                                  
- Observer                : ROS-UKSC                                
- Instrument              : WFC                                     
+ Target                  : SURVEY
+ Observer                : ROS-UKSC
+ Instrument              : WFC
  Ref MJD                 : 47892.0000
- Base date               : 
+ Base date               :
  Base MJD                : 48198.1993
  End MJD                 : 48212.3455
  Total Events            :    63722
  Active maps             :     9
- File Creation           : 27/04/95 
- File Revision           : 1   
+ File Creation           : 27/04/95
+ File Revision           : 1
 
 DTYPE I,T,E or L <CHAR>=i
 RA of Field centre (deg/hms) <REAL>=8.2
@@ -772,7 +772,7 @@ NYPIX Elevation Pixels <INTEGER>=160
 BREJ Background rejection = Yes =
 MREJ Moon in field rejection = Yes =
 FILTER eg S1A <CHAR>=s1
-    BASE_MJD is    48198.1993359375     
+    BASE_MJD is    48198.1993359375
 TLO Start MJD = 48198.199335937 =
 THI End MJD = 48212.345531322 =
 IRAD Iris Radius (degs) = 2.378898 =
@@ -787,14 +787,14 @@ ICL> asterix
 
 ----------------------------------------------------------------------
  ASTERIX Version 1.7-0           - type ASTHELP for more information
- 
+
 ICL> iload im_s1 xw GCB=no
 ILOAD Version 1.7-3
 ICL> idisp
 IDISPLAY Version 1.7-0
 ICL> exit
 
-	
+
 % bsub                                    ! Create a background model for image
 BSUB Version 1.3-18
 INP - Input file /@twd_2_sp/ > im_s1
@@ -821,9 +821,9 @@ Image is 160 x 160
 
 SURVEY image
 
-SOURCE_THRESH - Source detection threshold /4/ > 
+SOURCE_THRESH - Source detection threshold /4/ >
 
-BOX_DIM - Trial small box size /11/ > 
+BOX_DIM - Trial small box size /11/ >
 
  NON-ZERO image limits are    1 :  160 (in X) and    1 :  160 (in Y)
 SLOPING_EDGES - Identify sloping edges in data /NO/ > yes
@@ -832,7 +832,7 @@ SLOPING_EDGES - Identify sloping edges in data /NO/ > yes
  source at    99.71    43.78 : Approx cts =      428.1
 
 SM_FILT - Choose Gaussian (G) or top hat (H) smoothing function /'H'/ > g
-SM_FWHM - Enter FWHM (pixels) for smoothing function /15/ > 
+SM_FWHM - Enter FWHM (pixels) for smoothing function /15/ >
 
  For background subtracted image, minimum=    -0.45 : maximum=    38.65 cts
  Mean of image=     0.335  Mean of smoothed image =     0.327
@@ -851,8 +851,8 @@ ICL> exit
 
 % pss                                                     ! Source search image
 PSS Version 1.7-5
-INP - Dataset to be searched/tested for sources /@im_s1/ > 
-EXPERT - Expert mode /TRUE/ > 
+INP - Dataset to be searched/tested for sources /@im_s1/ >
+EXPERT - Expert mode /TRUE/ >
 PSF system options :
 
   ANAL           ASCA           EXOLE          PWFC           RADIAL
@@ -864,7 +864,7 @@ PSF system options :
 PSF - Choose PSF to use for source model /'WFC'/ > tabular
 MASK - Name of a 2D dataset containing psf >  $re_res/re_psf_f1
 PSF read in from file  $re_res/re_psf_f1
-PSFCON - Assume constant PSF across field /YES/ > 
+PSFCON - Assume constant PSF across field /YES/ >
 
 Energy fraction    Radius
 
@@ -877,11 +877,11 @@ PSFPIX - Radius of PSF box in pixels /3/ > 5
 X_CORR axis range is from 79.49998 to -79.49998 arcmin
 Y_CORR axis range is from -79.49998 to 79.49998 arcmin
 SLICE - Section of dataset to search /'*:*,*:*'/ > '65:-65,-65:65'
-SOPT - Statistic option (CASH,GAUSSIAN) /'CASH'/ > 
-BGND - Background model /@bg_s1/ > 
-RESCALE - Re-scale background estimate /NO/ > 
-EXTEN - Fit for extension measure /NO/ > 
-SAMPLE - Oversampling factor for first pass /1/ > 
+SOPT - Statistic option (CASH,GAUSSIAN) /'CASH'/ >
+BGND - Background model /@bg_s1/ >
+RESCALE - Re-scale background estimate /NO/ >
+EXTEN - Fit for extension measure /NO/ >
+SAMPLE - Oversampling factor for first pass /1/ >
 First pass - grid spacing 1 pixels
 MAP - Significance map /!/ > ims_s1
 Significance varies from 0 to 41.05927
@@ -902,16 +902,16 @@ SIGMIN - Significance threshold /5/ > 4
   12 -43.19    -1.87    3.315
   13 -39.94    -2.41    3.237
 Second pass
-ASYMMETRIC - Asymmetric source parameter errors /NO/ > 
-FERL - Flux error confidence level /'1 sigma'/ > 
-PERL - Positional error confidence levels /'90%'/ > 
+ASYMMETRIC - Asymmetric source parameter errors /NO/ >
+FERL - Flux error confidence level /'1 sigma'/ >
+PERL - Positional error confidence levels /'90%'/ >
  Src      RA         DEC         X        Y     Signif    Flux
 
    1  00 23 55.6  -63 43 12   -58.93   -56.22    4.662    18.954
    2  00 28 44.6  -61 57 16   -28.61    50.50    4.090    17.619
    3  00 29 55.3  -63 24 37   -19.33   -36.73   41.213   449.014
 OUT - Source search results file (! for none) /@srclist/ > s1_src
-SSUB - Source subtracted dataset /!/ > 
+SSUB - Source subtracted dataset /!/ >
 
 % re_expos                                 ! Exposure correct source raw fluxes
  RE_EXPOS version 230595
@@ -924,14 +924,14 @@ CLIST Corrected SSDS file = s1_srcc =
 % ssdump hms=no                                                  ! List sources
 SSDUMP Version 1.7-3
 INP - Source dataset /@s1_src/ > s1_srcc
-DEV - Output to /'TERMINAL'/ > 
+DEV - Output to /'TERMINAL'/ >
 -------------------------------------------------------------------------------
 -----------------------------------------------
 Results file /rosat/soft/scratch/s1_srcc.sdf contains data from one source sear
 ch
      N   Searched Dataset At 24-May-95 11:27:57
      1   /rosat/soft/scratch/im_s1.sdf
-          
+
    Dataset was searched by PSS Version 1.7-5
 
  Equatorial coordinates, equinox 2000.0, units DEGREES
@@ -955,7 +955,7 @@ F      Bgnd      Perr    Signif    Cor_Flux
 % pss mode=uplim                          ! Get an upper limit at some position
 PSS Version 1.7-5
 INP - Dataset to be searched/tested for sources /@mysrc_2_sp/ >im_s1
-EXPERT - Expert mode /TRUE/ > 
+EXPERT - Expert mode /TRUE/ >
 PSF system options :
 
   ANAL           ASCA           EXOLE          PWFC           RADIAL
@@ -967,7 +967,7 @@ PSF system options :
 PSF - Choose PSF to use for source model /'WFC'/ > tabular
 MASK - Name of a 2D dataset containing psf >  $re_res/re_psf_f1
 PSF read in from file  $re_res/re_psf_f1
-PSFCON - Assume constant PSF across field /YES/ > 
+PSFCON - Assume constant PSF across field /YES/ >
 
 Energy fraction    Radius
 
@@ -977,13 +977,13 @@ Energy fraction    Radius
       95%        14.9   pixels
 
 PSFPIX - Radius of PSF box in pixels /3/ > 5
-BGND - Background model /@bg_s1/ > 
-RESCALE - Re-scale background estimate /NO/ > 
+BGND - Background model /@bg_s1/ >
+RESCALE - Re-scale background estimate /NO/ >
 PLIST - Source of RA and DECs > TERMINAL
 Enter RA and DEC at prompts, ! to terminate
 RA - Right ascension /!/ > 8.2
 DEC - Declination > -62.8
-RA - Right ascension /!/ > 
+RA - Right ascension /!/ >
 1 positions read from TERMINAL
 FERL - Upper limit confidence level /'1 sigma'/ > 90
  Src      RA         DEC         X        Y      Flux
@@ -993,14 +993,14 @@ OUT - Source search results file (! for none) /@srclist/ > uplim_s1
 
 
 % re_light                                   ! Produce S1a and S2a light curves
- 
+
    RE_LIGHT -- Version 090595
- 
-Please note that this version does not work with 
+
+Please note that this version does not work with
 background derived from an annulus!   Background is got
-from a circle offset along s/c scan path.  Recommended 
-radii are 3am for source and 9am for background. 
-A typical offset value maybe 20am. 
+from a circle offset along s/c scan path.  Recommended
+radii are 3am for source and 9am for background.
+A typical offset value maybe 20am.
 Moon times rejected. High background times NOT rejected.
 
    Give event file (eg mrgd_ev.fit): mrgd_ev
@@ -1011,9 +1011,9 @@ Moon times rejected. High background times NOT rejected.
    Give bgnd offset (arcmin): 20
    Give bgnd box radius (arcmin): 9
    Give time bin width in secs (eg 5760): 5760
- 
+
 The following will be created in the default directory
- 
+
 mysrc_1     - Raw source time series in S1a
 mysrc_1_c   - Exp corrected source
 mysrc_1_b   - Raw background time series
@@ -1022,86 +1022,86 @@ mysrc_1_bcd - Exp corrected Background, area corrected
 mysrc_1_s   - Background subtracted source flux
 mysrc_1_x   - Exposure profile at the source
 mysrc_1_bx  - Exposure profile at background
- 
+
 Files as above but for the S2a filter
- 
+
    Sorting On source for S1A
 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :          279
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    2.000000     secs         2880 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
+
    Sorting Background for S1A
 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :           90
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    2.000000     secs         2880 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
-   Subtracting Background from source 
- 
+
+   Subtracting Background from source
+
 ARITHMETIC Version 1.7-1
 WARNING : 191 points ignored due to bad quality
           Data copied from first input object for these points
 ARITHMETIC Version 1.7-1
 WARNING : 191 points ignored due to bad quality
           Data copied from first input object for these points
- 
+
    Produce exposure Profile for S1a
- 
+
     RE_EXPROF Version 090595
     RE_EXPROF Version 090595
- 
+
    Sorting On source for S2A
 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :          587
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    2.000000     secs         2880 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
+
    Sorting Background for S2A
 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :          132
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    2.000000     secs         2880 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
-   Subtracting Background from source 
- 
+
+   Subtracting Background from source
+
 ARITHMETIC Version 1.7-1
 WARNING : 193 points ignored due to bad quality
           Data copied from first input object for these points
 ARITHMETIC Version 1.7-1
 WARNING : 196 points ignored due to bad quality
           Data copied from first input object for these points
- 
+
    Produce exposure Profile for S2a
- 
+
     RE_EXPROF Version 090595
     RE_EXPROF Version 090595
 
@@ -1111,17 +1111,17 @@ GDRAW Version 1.7-5
 Dataset: /rosat/soft/scratch/mysrc_1_s
 
 % re_spec                                         ! Produce S1a and S2a spectra
- 
+
    RE_SPEC -- Version 110595
- 
-Please note that this version does not work with 
+
+Please note that this version does not work with
 background derived from an annulus!   Background is got
-from a circle offset along s/c scan path.  Recommended 
-radii are 3am for source and 9am for background. 
-A typical offset value maybe 20am. 
+from a circle offset along s/c scan path.  Recommended
+radii are 3am for source and 9am for background.
+A typical offset value maybe 20am.
 Moon times rejected. High background times NOT rejected.
- 
- 
+
+
    Give event file (eg mrgd_ev.fit): mrgd_ev
    Give source RA (deg\hms): 7.48
    Give source Dec (deg\hms): -63.41
@@ -1129,87 +1129,87 @@ Moon times rejected. High background times NOT rejected.
    Give source box radius (arcmin): 3
    Give bgnd offset (arcmin): 20
    Give bgnd box radius (arcmin): 9
- 
+
 The following will be created in the default directory
- 
+
    mysrc_1_sp     - Background subtracted source spectrum
    mysrc_1_sp.pha - XSPEC (sf format) pha file
    mysrc_1_sp.rsp - XSPEC (sf format) rsp file
- 
+
 Files as above but for the S2A filter
- 
+
    Sorting On source for S1A
 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :          279
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    1.999999     secs       611116 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
+
    Sorting Background for S1A
- 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :           90
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    1.999999     secs       611116 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
-   Subtracting Background from source 
- 
+
+   Subtracting Background from source
+
 ARITHMETIC Version 1.7-1
 ARITHMETIC Version 1.7-1
- 
+
    Producing spectrum for S1A
- 
+
 WFCSPEC Version 1.7-0
 
 Filter: Lexan/C/B4C
         Response centred at 124 eV
 AST2XSP version 1.6-3
- 
+
    Sorting On source for S2A
 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :          587
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    1.999999     secs       611116 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
+
    Sorting Background for S2A
 
- RE_SORT Version 110595   
-    BASE_MJD is    48198.1993359375     
+ RE_SORT Version 110595
+    BASE_MJD is    48198.1993359375
     Events in time-series :          132
 
- RE_TIMEXP Version 090595      
+ RE_TIMEXP Version 090595
     Tstep set to    1.999999     secs       611116 steps/bin
     Using /rosat/soft/re_hkrres.fit
     Using /rosat/soft/re_ateres.fit
     Calculating the exposure array
     Correcting raw data array
- 
-   Subtracting Background from source 
- 
+
+   Subtracting Background from source
+
 ARITHMETIC Version 1.7-1
 ARITHMETIC Version 1.7-1
- 
+
    Producing spectrum for S2A
- 
+
 WFCSPEC Version 1.7-0
 
 Filter: Lexan/Be
@@ -1220,9 +1220,9 @@ AST2XSP version 1.6-3
 \end{small}
 
 The above shows one way of tackling \ro WFC survey data.  Another
-approach, to cut down the number of processing steps, could have been to check 
-the ROSWFCSI database for the image that surveyed the sky region of interest.  
-This could then be retrieved instead of recreating it from the event files.  
+approach, to cut down the number of processing steps, could have been to check
+the ROSWFCSI database for the image that surveyed the sky region of interest.
+This could then be retrieved instead of recreating it from the event files.
 Further, the 2RE catalogue could also have been searched to see if the desired
 source had already been detected and if its light-curve existed.
 

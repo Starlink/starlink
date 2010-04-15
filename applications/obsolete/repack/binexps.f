@@ -7,21 +7,21 @@
       REAL      CC(NB)				! Corrected counts
       REAL      CV(NB)				! Variance of corrected counts
       INTEGER   CQ(NB)				! Quality of corrected counts
- 
+
 * Output:
       REAL      BEXPS(NB)			! Time bin exposure.
       REAL      BVAR(NB)			! Time bin variance of exposure
       INTEGER   BQUAL(NB)			! Time bin quality.
       INTEGER   STATUS
- 
+
 * P. McGale - Aug 94.
 *-
- 
+
 *    Local variables :
       INTEGER	I
- 
+
       IF (STATUS .NE. 0) RETURN
- 
+
 *   Loop over the data
       DO I = 1, NB
 	IF (CQ(I) .EQ. 0) THEN
@@ -38,5 +38,5 @@
 	  BVAR(I)  = 0.0
         ENDIF
       ENDDO
- 
+
       END

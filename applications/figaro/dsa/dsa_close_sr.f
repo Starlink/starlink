@@ -11,7 +11,7 @@ C  Description:
 C     DSA_CLOSE closes down all structures opened by the DSA_ system,
 C     but sometimes there may be a need to close one down explicitly.
 C     DSA_CLOSE_STRUCTURE will close down the structure associated with
-C     a specific reference name.  The structure must have been opened 
+C     a specific reference name.  The structure must have been opened
 C     by a routine like DSA_INPUT or DSA_OUTPUT.  This routine does not
 C     automatically unmap any arrays in the structure, so they must have
 C     been explicitly unmapped by calls to DSA_UNMAP.  Nor does it
@@ -38,7 +38,7 @@ C     Only common variables internal to the DSA_ routines.
 C
 C  External subroutines / functions used:
 C     ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_WRUSER, DSA_GET_ACTUAL_NAME,
-C     DSA_CHECK_STRUCTURE, DSA__FLUSH_FITS, DSA_FREE_WORKSPACE, DSA_WRNAME, 
+C     DSA_CHECK_STRUCTURE, DSA__FLUSH_FITS, DSA_FREE_WORKSPACE, DSA_WRNAME,
 C     DSA_RENAME_TEMP, DTA_FRVAR, DTA_FCLOSE, DTA_ERROR
 C
 C  Prior requirements:
@@ -110,11 +110,11 @@ C
       INTEGER ICH_FOLD, ICH_LEN
 C
 C     DSA_ system error codes
-C   
+C
       INCLUDE 'DSA_ERRORS'
 C
 C     DSA_ system common definition
-C   
+C
       INCLUDE 'DSA_COMMON'
 C
 C     Local variables
@@ -127,7 +127,7 @@ C
       INTEGER   LENGTH                      ! Object name length
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Full structure name from ref_name
       INTEGER   WORK_SLOT                   ! Work array associated with data
 C
@@ -135,12 +135,12 @@ C     Return immediately on bad status
 C
       IF (STATUS.NE.0) RETURN
 C
-C     We need an upper case version of REF_NAME 
+C     We need an upper case version of REF_NAME
 C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     Look up the reference name in the tables and get the data 
+C     Look up the reference name in the tables and get the data
 C     array dimensions.
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
@@ -239,8 +239,8 @@ C
       CALL DSA_CHECK_STRUCTURE(REF_SLOT,STATUS)
 C
 C     Now we can actually do the close. First we flag it as closed, then
-C     go on to close it at the file level.  We decrement the file 
-C     reference count and if it goes to zero we can actually close 
+C     go on to close it at the file level.  We decrement the file
+C     reference count and if it goes to zero we can actually close
 C     the file.
 C
       REF_USED(REF_SLOT)=.FALSE.
@@ -269,7 +269,7 @@ C     finished with before being renamed to the same name, check the
 C     various temporary files.
 C
       CALL DSA_RENAME_TEMP(STATUS)
-C     
+C
 C     Exit
 C
   500 CONTINUE

@@ -374,7 +374,7 @@ access in file ^FILE - ^MESSAGE.",
 /* End deferral of error messages.					    */
 	       emsRlse( );
 	    }
-            
+
 /* If the file has been mapped successfully to a range of addresses not	    */
 /* previously used for file mapping, then we must ensure we also have a	    */
 /* "guard page" allocated at a higher address. This page is kept mapped to  */
@@ -463,7 +463,7 @@ protect address space while mapping the file ^FILE - ^MESSAGE.",
 /* file.								    */
 	    else if ( mode != 'W' )
 	    {
-	    
+
 /* Calculate the amount by which the required data segment extends past the */
 /* last complete block which must be read.				    */
 	       tail = ( offset + length ) % REC__SZBLK;
@@ -472,7 +472,7 @@ protect address space while mapping the file ^FILE - ^MESSAGE.",
 /* entire contents are not required).					    */
 	       brf = ( offset != 0 );
 	       brl = ( tail != 0 );
-	    
+
 /* If a subset of only a single block is required, then read that block and */
 /* extract the region required.						    */
 	       if ( ( nbloc == 1 ) && brf && brl )
@@ -548,7 +548,7 @@ protect address space while mapping the file ^FILE - ^MESSAGE.",
 	 offs = ( bloc - 1 ) * REC__SZBLK + offset;
 	 off = offs - ( offs % pagesize );
 	 len = length + ( offs - off );
-	 
+
 /* Obtain a file descriptor for the file, checking for errors.		    */
          fd = fileno( iochan );
 	 if ( fd == -1 )
@@ -661,7 +661,7 @@ file ^FILE - ^MESSAGE",
 		     }*/
 	 }
 
-	 
+
 
 /* If an error occurred during file mapping, then return a null pointer	    */
 /* value.								    */

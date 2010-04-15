@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_ZOPIC( PNXSIZ, PNYSIZ, COMMNT, ASPKEY, XLO, XHI, 
-     :                       YLO, YHI, KEY, AXES, ZONEF, ZONED, ZONEK, 
+      SUBROUTINE KPG1_ZOPIC( PNXSIZ, PNYSIZ, COMMNT, ASPKEY, XLO, XHI,
+     :                       YLO, YHI, KEY, AXES, ZONEF, ZONED, ZONEK,
      :                       ZONEG, PICIDF, XM, YM, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ZOPIC( PNXSIZ, PNYSIZ, COMMNT, ASPKEY, XLO, XHI, YLO, 
-*                      YHI, KEY, AXES, ZONEF, ZONED, ZONEK, ZONEG, 
+*     CALL KPG1_ZOPIC( PNXSIZ, PNYSIZ, COMMNT, ASPKEY, XLO, XHI, YLO,
+*                      YHI, KEY, AXES, ZONEF, ZONED, ZONEK, ZONEG,
 *                      PICIDF, XM, YM, STATUS )
 
 *  Description:
@@ -38,7 +38,7 @@
 *        a FRAME picture.  Only used if the current picture does not
 *        contain a DATA picture.
 *     COMMNT = CHARACTER * ( * ) (Given)
-*        A comment to store with the new FRAME picture. 
+*        A comment to store with the new FRAME picture.
 *     ASPKEY = REAL (Given)
 *        The aspect ratio required for the KEY zone.
 *     XLO = REAL (Given and Returned)
@@ -96,12 +96,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -124,7 +124,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -179,9 +179,9 @@
       REAL KY                    ! Y of point on top edge of DATA zone
       INTEGER PICID0             ! Current picture on entry
       INTEGER PICIDD             ! Identifier for existing DATA picture
-      REAL X1                    ! X lower bound of zone in w.c. 
+      REAL X1                    ! X lower bound of zone in w.c.
       REAL X2                    ! X upper bound of zone in w.c.
-      REAL Y1                    ! Y lower bound of zone in w.c. 
+      REAL Y1                    ! Y lower bound of zone in w.c.
       REAL Y2                    ! Y upper bound of zone in w.c.
       INTEGER ZONE0              ! Current zone on entry
       INTEGER ZONEK2             ! New key zone identifier
@@ -200,7 +200,7 @@
       CALL ERR_MARK
 
 *  See if the current picture is a DATA picture or contains a DATA
-*  picture. 
+*  picture.
       CALL KPG1_AGFND( 'DATA', PICIDD, STATUS )
 
 *  If a DATA picture was found...
@@ -327,7 +327,7 @@
 
 * Create the DATA zone.
          CALL SGS_ZONE( DX1, DX2, DY1, DY2, ZONED, STATUS )
-            
+
 *  Set the world co-ordinates of the DATA zone to be pixel co-ordinates.
          CALL SGS_SW( XLO, XHI, YLO, YHI, STATUS )
 
@@ -342,7 +342,7 @@
 *  the data zone.
             CALL SGS_TPZ( ZONED, XLO, YHI, ZONEK, KX, KY, STATUS )
 
-*  If the KEY zone extends above the top of the DATA zone, truncate it 
+*  If the KEY zone extends above the top of the DATA zone, truncate it
 *  (preserving its aspect ratio).
             IF ( KY .LT. Y2 ) THEN
                X2 = X1 + ( X2 - X1 ) * ( KY - Y1 ) / ( Y2 - Y1 )
@@ -370,7 +370,7 @@
 *  Obtain and return the world co-ordinate bounds of the DATA zone.
       CALL SGS_SELZ( ZONED, STATUS )
       CALL SGS_IZONE( XLO, XHI, YLO, YHI, XM, YM )
-                  
+
 *  Re-select the original picture and zone.
       CALL AGI_SELP( PICID0, STATUS )
       CALL SGS_SELZ( ZONE0, STATUS )

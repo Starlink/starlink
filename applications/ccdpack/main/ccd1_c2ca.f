@@ -73,10 +73,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) DATA( * )
-      
+
 *  Arguments Given:
       INTEGER ILINE
       CHARACTER * ( * ) LINE
@@ -88,7 +88,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Copy the line of text.
       DATA( ILINE ) = LINE
 

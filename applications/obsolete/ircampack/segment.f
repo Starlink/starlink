@@ -88,7 +88,7 @@
 *                           display of the image.
 *          An integer     - The actual colour index. It is constrained
 *                           between 0 and the maximum colour index
-*                           available on the device. 
+*                           available on the device.
 *          A named colour - Uses the named colour from the palette, and
 *                           if it is not present, the nearest colour
 *                           from the palette is selected.
@@ -173,7 +173,7 @@
 *        do not have defined QUALITY components, then no quality is
 *        copied. Note, if a null input NDF is given then the
 *        corresponding output QUALITY values are set to zero. [YES]
-*     VARIANCE = _LOGICAL (Read) 
+*     VARIANCE = _LOGICAL (Read)
 *        If a true value is supplied for parameter VARIANCE then
 *        variance information is copied from the input NDFs to the
 *        output NDFs.  Otherwise, the variance information is not
@@ -230,7 +230,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -263,7 +263,7 @@
      :      MODE*9,              ! Source of input co-ordinates
      :      PLOT*5,              ! Nature of required graphics
      :      PNAME*6              ! Current polygon file parameter name
-      
+
       DOUBLE PRECISION
      :      OFFSET( 2 ),         ! Axis co-ords at pixel co-ords (0,0)
      :      SCALE( 2 )           ! Dimensions of a pixel in axis units
@@ -351,7 +351,7 @@
       IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Set a flag indicating if an NDF was obtained.
-      GOT1 = INDF1 .NE. NDF__NOID .AND. STATUS .EQ. SAI__OK 
+      GOT1 = INDF1 .NE. NDF__NOID .AND. STATUS .EQ. SAI__OK
 
 *  If an NDF was obtained, get the state of the VARIANCE and QUALITY
 *  components.
@@ -413,11 +413,11 @@
 *  Get the bounds of the output NDF.
       CALL NDF_BOUND( INDF3, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
-*  Set up the indices of the axes which span the plane within which the 
-*  supplied polygon lies. 
+*  Set up the indices of the axes which span the plane within which the
+*  supplied polygon lies.
       DEFAX( 1 ) = 1
       DEFAX( 2 ) = 2
-      CALL PAR_GDR1I( 'AXES', 2, DEFAX, 1, NDIM, .FALSE., AXES, 
+      CALL PAR_GDR1I( 'AXES', 2, DEFAX, 1, NDIM, .FALSE., AXES,
      :                 STATUS )
 
 *  Abort if an error has occurred.
@@ -546,18 +546,18 @@
          CALL KPG1_AGATC( STATUS )
 
 *  See what type of graphics are required.
-         CALL PAR_CHOIC( 'PLOT', 'Poly', 'Poly,Cross,None', .TRUE., 
+         CALL PAR_CHOIC( 'PLOT', 'Poly', 'Poly,Cross,None', .TRUE.,
      :                   PLOT, STATUS )
 
 *  If graphics are requried...
          IF( PLOT .NE. 'NONE' ) THEN
 
 *  Obtain the maximum number of colour indices.
-            CALL KPG1_QIDAT( 'DEVICE', 'SGS', NINTS, IPIXX, IPIXY, 
+            CALL KPG1_QIDAT( 'DEVICE', 'SGS', NINTS, IPIXX, IPIXY,
      :                       STATUS )
-      
+
 *  See what pen is to be used to draw the graphics.
-            CALL KPG1_MACOL( 'COLOUR', CTM__RSVPN, NINTS - 1, CI, 
+            CALL KPG1_MACOL( 'COLOUR', CTM__RSVPN, NINTS - 1, CI,
      :                        STATUS )
 
 *  Inquire the current SGS pen, and then select the pen used to draw
@@ -587,9 +587,9 @@
 *  exists, then AGI uses a unit transformation instead. A test for a
 *  unit transformation can thus give a warning that there may be no
 *  data co-ordinates available (but of course the unit transformation
-*  may actually have been specified as the world-to-data 
-*  transformation). To do the test, transform some arbitrary world 
-*  co-ordinates to data co-ordinates. 
+*  may actually have been specified as the world-to-data
+*  transformation). To do the test, transform some arbitrary world
+*  co-ordinates to data co-ordinates.
             WX( 1 ) = -100.0
             WX( 2 ) = +100.0
             WX( 3 ) = +100.0
@@ -604,11 +604,11 @@
             UNIT = .TRUE.
             DO I = 1, 4
                IF( ABS( WX( I ) - DX( I ) ) .GT. VAL__SMLR .OR.
-     :             ABS( WY( I ) - DY( I ) ) .GT. VAL__SMLR ) 
+     :             ABS( WY( I ) - DY( I ) ) .GT. VAL__SMLR )
      :            UNIT = .FALSE.
             END DO
 
-*  If there appears to be no world-to-data transformation stored with 
+*  If there appears to be no world-to-data transformation stored with
 *  the picture, tell the user and use world co-ordinates instead of data
 *  co-ordinates to define the polygonal region in the output NDF.
             IF( UNIT ) THEN
@@ -649,7 +649,7 @@
      :                    STATUS )
             GO TO 999
          END IF
-   
+
       END IF
 
 *  If file mode has been selected, see if a command line value has
@@ -662,8 +662,8 @@
          LOOP = .TRUE.
       END IF
 
-*  The polygons defined by the user are initially stored in a 2d mask 
-*  image which indicates which pixels are inside a polygon and which 
+*  The polygons defined by the user are initially stored in a 2d mask
+*  image which indicates which pixels are inside a polygon and which
 *  are not. Get workspace to hold the mask.
       CALL PSX_CALLOC( ( SUBND( 1 ) - SLBND( 1 ) + 1 ) *
      :                 ( SUBND( 2 ) - SLBND( 2 ) + 1 ), '_LOGICAL',
@@ -704,11 +704,11 @@
 
 *  Get the maximum number of polygons which may be given. There are only
 *  a limited number of parameters for accessing input text files, so if
-*  MODE=FILE, an absolute limit of MXPOLY has to be imposed. If a null 
-*  value is supplied, annul the error and use the maximum value (it is 
-*  done this way instead of by setting the PAR_GDR0I argument NULL to 
+*  MODE=FILE, an absolute limit of MXPOLY has to be imposed. If a null
+*  value is supplied, annul the error and use the maximum value (it is
+*  done this way instead of by setting the PAR_GDR0I argument NULL to
 *  .TRUE. to avoid the message produced by PAR_GDR0I).
-      IF( MODE .EQ. 'FILE' ) THEN 
+      IF( MODE .EQ. 'FILE' ) THEN
          CALL PAR_GDR0I( 'MAXPOLY', MXPOLY, 1, MXPOLY, .FALSE., MAXPOL,
      :                    STATUS )
 
@@ -726,7 +726,7 @@
             MAXPOL = VAL__MAXI
          END IF
 
-      END IF      
+      END IF
 
 *  Now get the minimum number of polygons which must be processed.
       CALL PAR_GDR0I( 'MINPOLY', 1, 1, MAXPOL, .FALSE., MINPOL, STATUS )
@@ -744,7 +744,7 @@
 *  polygon. First deal with file mode.
       IF( MODE .EQ. 'FILE' ) THEN
 
-*  Construct the name of the parameter used to access the next polygon 
+*  Construct the name of the parameter used to access the next polygon
 *  file
          PNAME = 'POLY  '
          LPNAME = 4
@@ -758,12 +758,12 @@
 *  Now deal with cursor mode. The returned co-ordinates are world
 *  co-ordinates if COSYS is WORLD. If COSYS is DATA then the returned
 *  co-ordinates are in the data co-ordinate system of the displayed
-*  picture. 
+*  picture.
       ELSE IF( MODE .EQ. 'CURSOR' ) THEN
          CALL KPS1_CUXYR( COSYS, PLOT, NVERT, IPX, IPY, STATUS )
 
 *  Now deal with interface mode...
-      ELSE 
+      ELSE
          CALL KPS1_INXYR( 'XY', NVERT, IPX, IPY, STATUS )
 
       END IF
@@ -826,7 +826,7 @@
 *  If the maximum no. of polygons has not yet been reached loop back to
 *   process another polygon.
             IF( NPOLY .LT. MAXPOL ) GO TO 10
-      
+
          END IF
 
       END IF
@@ -837,10 +837,10 @@
          CALL ERR_REP( 'SEGMENT_ERR3','No polygons have been '//
      :                 'processed.', STATUS )
 
-*  Otherwise, copy the input DATA values to the output, filling missing 
+*  Otherwise, copy the input DATA values to the output, filling missing
 *  values with bad values. The mask just created is used to define which
-*  pixels are inside a polygon and which are not. If the NDF has 
-*  more than 2 dimensions, the mask is projected through the other 
+*  pixels are inside a polygon and which are not. If the NDF has
+*  more than 2 dimensions, the mask is projected through the other
 *  dimensions.
       ELSE
          CALL KPS1_PLCPY( INDF1, INDF2, INDF3, 'DATA', IDTYPE, GOT1,

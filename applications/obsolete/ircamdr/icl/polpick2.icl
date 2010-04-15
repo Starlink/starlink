@@ -1,6 +1,6 @@
 { PROCEDURE POLPICK2 : procedure to run PICKIM rapi2d action with cursor on
 { 8 polarization intensity images.
-proc polpick2 
+proc polpick2
   askname (pol0o)  "o-ray    0 deg. image  \pol0or\ ? "
   askname (pol0e)  "e-ray    0 deg. image  \pol0er\ ? "
   askname (pol45o) "o-ray   45 deg. image \pol45or\ ? "

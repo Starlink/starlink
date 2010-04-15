@@ -132,7 +132,7 @@ C
       INTEGER   LENAME         ! Characters in FITS_NAME
       INTEGER   LENGTH         ! Characters in OBJ_NAME
       INTEGER   NDIM           ! Number of dimensions of object
-      INTEGER   NSTR           ! Number of string in NDF FITS common array 
+      INTEGER   NSTR           ! Number of string in NDF FITS common array
       CHARACTER OBJECT*80      ! Name of data object (comment) to be read
       CHARACTER OBJ_NAME*80    ! DTA_ name for structure
       CHARACTER REF_NAME_UC*32 ! Upper case version of REF_NAME
@@ -229,9 +229,9 @@ C
          CALL DTA_RDVARC (OBJECT,LEN(COMMENT),COMMENT,DTA_STATUS)
          IF (DTA_STATUS.NE.0) COMMENT=' '
 C
-C        Now for the object itself.  If an element of the object is 
+C        Now for the object itself.  If an element of the object is
 C        required, then we need to put dimension information in the
-C        name string.  This has to be handled differently for 
+C        name string.  This has to be handled differently for
 C        character strings.  Note that if the object is structured, we
 C        got its type a while back, as a test to see if it existed.
 C

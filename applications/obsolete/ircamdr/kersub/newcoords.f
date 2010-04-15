@@ -51,7 +51,7 @@
      :    X,          ! x distance of point from origin 0.0
      :    Y,          ! y     "     "   "     "     "    "
      :    CANGLE,     ! cosine of the rotation angle to be applied
-     :    SANGLE      ! sine of the rotation angle to be applied    
+     :    SANGLE      ! sine of the rotation angle to be applied
 
 *    Export :
 

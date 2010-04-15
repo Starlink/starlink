@@ -94,31 +94,31 @@
 
 *  Call the appropriate routine.
       IF ( PTYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_SUBCB( BAD, %VAL( CNF_PVAL( IPSTK ) ), 
+         CALL CCG1_SUBCB( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                    NPIX, NLINES, CONST,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_SUBCUB( BAD, %VAL( CNF_PVAL( IPSTK ) ), 
+         CALL CCG1_SUBCUB( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                     NPIX, NLINES, CONST,
      :                     STATUS )
       ELSE IF ( PTYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_SUBCW( BAD, %VAL( CNF_PVAL( IPSTK ) ), 
+         CALL CCG1_SUBCW( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                    NPIX, NLINES, CONST,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_SUBCUW( BAD, %VAL( CNF_PVAL( IPSTK ) ), 
+         CALL CCG1_SUBCUW( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                     NPIX, NLINES, CONST,
      :                     STATUS )
       ELSE IF ( PTYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_SUBCI( BAD, %VAL( CNF_PVAL( IPSTK ) ), 
+         CALL CCG1_SUBCI( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                    NPIX, NLINES, CONST,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_SUBCR( BAD, %VAL( CNF_PVAL( IPSTK ) ), 
+         CALL CCG1_SUBCR( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                    NPIX, NLINES, CONST,
      :                    STATUS )
       ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_SUBCD( BAD, %VAL( CNF_PVAL( IPSTK ) ), 
+         CALL CCG1_SUBCD( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                    NPIX, NLINES, CONST,
      :                    STATUS )
       END IF

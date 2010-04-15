@@ -1,4 +1,4 @@
-      SUBROUTINE GET0R( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, VALUE, 
+      SUBROUTINE GET0R( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, VALUE,
      :                  STATUS )
 *+
 *  Name:
@@ -18,22 +18,22 @@
 *     values or from the user. This value is converted into a real value.
 *     If this fails the user is reprompted. The string 'BAD' is used to
 *     represent the Starlink bad value VAL__BADR.
-      
+
 *  Arguments:
 *     PARAMS = CHARACTER * ( * ) (Given)
 *        A string containing the list of command parameters.
 *     POS = INTEGER (Given)
 *        The index of the required parameter within the list of all
-*        possible parameters. 
+*        possible parameters.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
-*        supplied default value will be returned if no value has 
+*        supplied default value will be returned if no value has
 *        been supplied. Otherwise, the user is prompted if no value
 *        has been supplied.
 *     COMM = CHARACTER * ( * ) (Given)
 *        The command name.
 *     PROMPT = CHARACTER * ( * ) (Given)
-*        The prompt string. 
+*        The prompt string.
 *     DEFVAL = REAL (Given)
 *        The default value.
 *     VALUE = REAL (Returned)
@@ -55,14 +55,14 @@
 
 *-
 
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
       INTEGER POS
@@ -71,10 +71,10 @@
       CHARACTER * ( * ) PROMPT
       LOGICAL DEF
       REAL DEFVAL
-      
+
 *  Arguments Returned:
       REAL VALUE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -105,7 +105,7 @@
 *  Get the text string.
       CALL GET0C( PARAMS, POS, OPT, COMM, PROMPT, DEFSTR( : NC ), STR,
      :            STATUS )
- 
+
 *  Jump to here when a string value has been obtained.
  10   CONTINUE
 
@@ -119,7 +119,7 @@
 *  Otherwise, attempt to convert the string to a real value.
       ELSE
          CALL CHR_CTOR( STR, VALUE, STATUS )
-      
+
 *  If any error occurred, annul the error, report another error and flush
 *  it. Then re-prompt the user.
          IF( STATUS .NE. SAI__OK ) THEN
@@ -131,7 +131,7 @@
      :                    '''^STR'' to a real value.', STATUS )
             CALL ERR_FLUSH( STATUS )
 
-            CALL RDSTR( COMM, PROMPT, DEFSTR( : NC ), STR, STATUS )             
+            CALL RDSTR( COMM, PROMPT, DEFSTR( : NC ), STR, STATUS )
             GO TO 10
 
          END IF
@@ -140,5 +140,5 @@
 
 *  Jump to here if an error occurs.
  999  CONTINUE
-      
+
       END

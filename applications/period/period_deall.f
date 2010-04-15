@@ -11,7 +11,7 @@
 *
 *  Description :
 *     This routine deallocates temporary storage which has previously
-*     been allocated using PERIOD_ALLOC.  
+*     been allocated using PERIOD_ALLOC.
 *     In the event of an error it will print a warning message in the
 *     usual PERIOD way and return normally.
 *
@@ -31,16 +31,16 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Arguments Given:
       INTEGER PNTR
- 
+
 *  Local variables :
       INTEGER STATUS
 
 
 *.
- 
+
 *  Initialise the status variable.
       STATUS = 0
 

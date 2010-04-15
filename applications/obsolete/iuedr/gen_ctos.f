@@ -37,12 +37,12 @@
 
 *   Import:
       CHARACTER CHR*(*)     ! Fortran 77 character string
- 
+
       INTEGER MAXC          ! maximum size of terminated string
- 
+
 *   Export:
       BYTE STR(MAXC)        ! SWT string
- 
+
       INTEGER NCHAR         ! number of characters before terminator
 
       NCHAR = 0

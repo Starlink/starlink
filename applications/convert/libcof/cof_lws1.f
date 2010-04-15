@@ -73,7 +73,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -151,6 +151,6 @@
                END IF
             END DO
          END IF
-      END IF 
+      END IF
 
       END

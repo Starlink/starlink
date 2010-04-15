@@ -79,7 +79,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,7 +145,7 @@
 *  Assimilate the information to make the binary-table header.
 *  ===========================================================
 
-*  Assign its name and record that as the label for the column.  Note 
+*  Assign its name and record that as the label for the column.  Note
 *  the FITS type is equivalent to HDS name just to confuse matters.
 *  There is only one column for the primitive object.
       TTYPE( 1 ) = 'DUMMY_FOR_STRUC'
@@ -162,7 +162,7 @@
 
 *  Obtain the shape of the component.
       SHAPE = '0'
-      
+
       NCEXT = 1
 
 *  Don't create a new extension if there was something wrong with the
@@ -194,7 +194,7 @@
 *  Some structures can generate long names, for which the CONTINUE
 *  convention is in use by writing the LONGSTRN keyword containing the
 *  version number of the convention.
-      IF ( NC .GT. FITSCH ) THEN 
+      IF ( NC .GT. FITSCH ) THEN
 
 *  Write the NDF's component name.  This writes a dummy EXTNAME,
 *  a unique EXTVER, and the full component name in keyword EXTNAMEF.
@@ -206,14 +206,14 @@
 *  Write the TNULL1 card for an integer object (column).
 *  =====================================================
 
-*  FITSIO does not permit cards to be placed after a named card; 
+*  FITSIO does not permit cards to be placed after a named card;
 *  it requires that we read that named card first.  So choose the
 *  the TFORM1 card.  Note that by definition the table only has one
 *  column.
       CDUMMY = ' '              ! Valgrind warning
       CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
 
-*  Insert the TNULL1 card whose value is the bad/null value the integer 
+*  Insert the TNULL1 card whose value is the bad/null value the integer
 *  data type.
       CALL FTIKYJ( FUNIT, 'TNULL1', VAL__BADI,
      :             'Starlink bad value', FSTAT )
@@ -288,7 +288,7 @@
 *  =================================
 
 *  Obtain each value using the appropriate type and write it to the
-*  binary table. 
+*  binary table.
 
 *  Set the current null value for undefined values.
       CALL FTTNUL( FUNIT, 1, VAL__BADI, FSTAT )
@@ -308,7 +308,7 @@
 *  Copy the integer value to the FITS binary table.
       CALL FTPCLI( FUNIT, 1, 1, 1, 1, IVALUE, FSTAT )
       ROUTIN = 'FTPCLI'
-      
+
 *  Record that the extension was written satisfactorily.
       WRITTN = .TRUE.
 

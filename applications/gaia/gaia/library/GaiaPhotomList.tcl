@@ -398,7 +398,7 @@ itcl::class gaia::GaiaPhotomList {
       }
 
       #  And simulate a notification of an initial change.
-      if { $allow_resize } { 
+      if { $allow_resize } {
          changed_ $index
       }
    }
@@ -721,7 +721,7 @@ itcl::class gaia::GaiaPhotomList {
          }
          return
       }
-      if { ! $coupled } { 
+      if { ! $coupled } {
          set ids [$canvasdraw selected_items]
          if { $ids != {} } {
             foreach id "$ids" {

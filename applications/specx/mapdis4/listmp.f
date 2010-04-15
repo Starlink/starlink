@@ -17,7 +17,7 @@ C-----------------------------------------------------------------------
 
       SUBROUTINE LISTMP (IFAIL)
 
-C    Routine to list spectra in a .MAP file, with their positions on 
+C    Routine to list spectra in a .MAP file, with their positions on
 C    the sky and in the file.
 
       IMPLICIT  NONE
@@ -130,15 +130,15 @@ C   Search INDEX area and output relevant data if scan present
         RPOS(4)  =  99999.0
 
         IF ( MAPSIZ .GT. MXSCAN ) THEN
-           CALL GEN_GETI4A( 'Scan range (low,high)? (All)', 
+           CALL GEN_GETI4A( 'Scan range (low,high)? (All)',
      :                      RSCAN, 2, ' ', RSCAN, JDEF)
            IF ( RSCAN(1) .GT. RSCAN(2) ) THEN
               IDUM = RSCAN(1)
               RSCAN(1) = RSCAN(2)
               RSCAN(2) = IDUM
            ENDIF
-      
-           CALL GEN_GETR4A( 'Offset limits (xlo xhi ylo yhi)? (None)', 
+
+           CALL GEN_GETR4A( 'Offset limits (xlo xhi ylo yhi)? (None)',
      :                      RPOS, 4, ' ', RPOS, JDEF)
            IF ( RPOS(1) .GT. RPOS(2) ) THEN
               RDUM = RPOS(1)

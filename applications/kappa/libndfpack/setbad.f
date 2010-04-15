@@ -179,7 +179,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -330,7 +330,7 @@
      :                       '            ...bad-pixel flag updated',
      :                                     STATUS )
             END IF
- 1       CONTINUE     
+ 1       CONTINUE
 
 *  Set an explicit bad-pixel flag value:
 *  ====================================
@@ -359,7 +359,7 @@
                CALL MSG_OUT( 'SET',
      :         '      Bad-pixel flag for the ^COMP array set to ' //
      :         '^VALUE.', STATUS )
-            
+
             END IF
  2       CONTINUE
       END IF
@@ -383,7 +383,7 @@
       END IF
 
 *  Arrive here if an error occurs.
- 99   CONTINUE     
+ 99   CONTINUE
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

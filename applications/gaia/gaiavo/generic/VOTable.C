@@ -190,7 +190,7 @@ namespace gaia {
         in->seekg( 0, ios::beg );
 
         //   Now look for namespace signifier.
-        if ( strstr( line, VOTABLE_NS11 ) == NULL && 
+        if ( strstr( line, VOTABLE_NS11 ) == NULL &&
              strstr( line, VOTABLE_NS12 ) == NULL ) {
 
             //  No namespace.

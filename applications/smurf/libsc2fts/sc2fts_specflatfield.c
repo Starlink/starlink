@@ -22,11 +22,11 @@
 *     ogrp = Grp* (Given)
 *        the group of output files
 *     parKeymap = AstKeyMap* (Given)
-*        the parameter Keymap for this operation. Currently, there is one 
+*        the parameter Keymap for this operation. Currently, there is one
 *        parameter in parKeymap:
 *        RESP:  the responsivity data file name.
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *
@@ -89,7 +89,7 @@ End of Trace.
 
 #include "libsc2sim/sc2sim.h"   /* for constants: BOLCOL, BOLROW */
 
-void sc2fts_specflatfield 
+void sc2fts_specflatfield
 (
 Grp *igrp,
 Grp* ogrp,
@@ -101,10 +101,10 @@ int *status          /* global status (given and returned) */
    HDSLoc *loc_resp = NULL;          /* root HDSLoc */
    HDSLoc *loc_da = NULL;            /* HDSLoc to DATA_ARRAY */
    HDSLoc *loc_data = NULL;          /* HDSLoc to DATA of DATA_ARRAY */
-   float *resp_vals = NULL;          /* RESPONSIVITY values */ 
+   float *resp_vals = NULL;          /* RESPONSIVITY values */
    HDSLoc *loc_more = NULL;          /* HDSLoc to RESPONSIVITY More */
    HDSLoc *loc_wn_factor = NULL;     /* HDSLoc to RESPONSIVITY More.FACTOR */
-   double resp_wnfactor;             /* wavenumber factor of RESPONSIVITY */  
+   double resp_wnfactor;             /* wavenumber factor of RESPONSIVITY */
    size_t resp_size;                    /* size of RESPONSIVITY */
 
    /* get the Theta file name */

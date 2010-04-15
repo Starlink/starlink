@@ -1,5 +1,5 @@
 *+  MFNEXT - gets next data array and offsets in sequence for mosaic
-*            from file 
+*            from file
 
       SUBROUTINE MFNEXT ( FD, PNINPI, LOC, OFFSET, STATUS )
 
@@ -119,7 +119,7 @@
 
 *    Local Constants :
 
-      INTEGER  
+      INTEGER
      :  NCHLIN                 ! maximum number of characters in a
                                ! an input record
       PARAMETER ( NCHLIN = 132 )
@@ -165,7 +165,7 @@
       ELSE
          NCV = SHRIEK - 1
       END IF
-      
+
 *    Read the next record - should be the offsets
 
       CALL FIO_READ( FD, BUFFER, NCHAR, STATUS )

@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -28,7 +28,7 @@ This document describes the use of the Starlink Software Environment, ADAM,
 on Unix. It is primarily of use to programmers but the early sections contain
 information useful to any user.
 \par
-It is assumed that the reader is familiar with the concepts of ADAM 
+It is assumed that the reader is familiar with the concepts of ADAM
 programming and that the Starlink software is installed in the standard way.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ programming and that the Starlink software is installed in the standard way.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -244,12 +244,12 @@ programming and that the Starlink software is installed in the standard way.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -298,38 +298,38 @@ programming and that the Starlink software is installed in the standard way.}
 
 \section{\xlabel{introduction}\label{introduction}Introduction}
 
-The Starlink Software Collection provides an infrastructure of facilities 
-likely to be required by any astronomical application package. 
-The Starlink Software Environment (ADAM) is a particular way of combining the 
-elements of the collection to provide an integrated system with a common look 
-and feel across various packages. 
-Originally developed for VMS at 
-\htmladdnormallink{ROE}{\ROEURL}, 
-the system is now supported by Starlink and has been ported to Unix. 
+The Starlink Software Collection provides an infrastructure of facilities
+likely to be required by any astronomical application package.
+The Starlink Software Environment (ADAM) is a particular way of combining the
+elements of the collection to provide an integrated system with a common look
+and feel across various packages.
+Originally developed for VMS at
+\htmladdnormallink{ROE}{\ROEURL},
+the system is now supported by Starlink and has been ported to Unix.
 
-Normal data analysis programs for the Starlink Environment are known as A-tasks 
+Normal data analysis programs for the Starlink Environment are known as A-tasks
 and it is possible to combine many A-tasks into a single monolithic executable
-file (an A-task monolith) for efficiency -- the tasks may still be invoked 
+file (an A-task monolith) for efficiency -- the tasks may still be invoked
 separately.
-The Environment also supports programs for instrumentation control. These need 
-to behave differently from A-tasks and are known as I-tasks, 
+The Environment also supports programs for instrumentation control. These need
+to behave differently from A-tasks and are known as I-tasks,
 
-Programs written for the Starlink Software Environment may be run directly 
-from a Unix shell or from a variety of other user-interfaces including 
-the original ADAM user-interface, 
+Programs written for the Starlink Software Environment may be run directly
+from a Unix shell or from a variety of other user-interfaces including
+the original ADAM user-interface,
 \xref{ICL}{sg5}{abstract}\latex{ (see SG/5)},
 and
-\htmladdnormallink{IRAF}{\IRAFURL} 
+\htmladdnormallink{IRAF}{\IRAFURL}
 cl (see
 \xref{SUN/217}{sun217}{}).
 
 The first five sections of this document are relevant for any user but the
 remaining sections will only be of interest to people writing software to run
 in the environment.
-For an introduction to these topics and details of how to write ADAM 
-programs, see 
-\xref{SG/4}{sg4}{} 
-for A-tasks and 
+For an introduction to these topics and details of how to write ADAM
+programs, see
+\xref{SG/4}{sg4}{}
+for A-tasks and
 \xref{SUN/134}{sun134}{}
 for I-tasks.
 
@@ -344,76 +344,76 @@ for the package will tell you how to start it up and run its applications.
 Stand-alone ADAM programs are run from the shell in the same way as any Unix
 program by typing:
 \small
-\begin{quote} 
+\begin{quote}
 \texttt{\% \textit{program\_name}}
 \end{quote}
 \normalsize
 where \texttt{\% \textit{program\_name}} may be a full pathname.
 
-The Interface File, which defines the program's parameters, is usually in the 
-same directory as the executable but an alternative search path for Interface 
+The Interface File, which defines the program's parameters, is usually in the
+same directory as the executable but an alternative search path for Interface
 Files may be specified in environment variable \texttt{ADAM\_IFL}.
 If the variable is undefined, or the search is unsuccessful, the directory in
 which the executable was found is assumed.
-A file with the same name as the executable and with extension 
+A file with the same name as the executable and with extension
 \texttt{.ifc} or, failing that, \texttt{.ifl} is sought.
 
 If the task is built into a monolith, a link with the name of the task must be
 made to the monolithic executable and an individual Interface File for the task
 provided. The link can then be executed as if it were a simple program.
-(This is all usually set up by 
+(This is all usually set up by
 \xref{package startup
 scripts}{ssn64}{shell_package_startup_scripts}\latex{-- see SSN/46}.)
 
-When running tasks directly from a shell, the normal Unix rules for the 
+When running tasks directly from a shell, the normal Unix rules for the
 use of meta-characters on the command line will apply -- these sometimes
 conflict with the ADAM parameter definition syntax.
-Characters to be particularly wary of are `{\texttt{"}}', 
+Characters to be particularly wary of are `{\texttt{"}}',
 `{\texttt{$\backslash$}}' and `{\texttt{\$}}'.
 
 \section{\xlabel{icl_for_unix}ICL for Unix}
-ICL for Unix behaves very like the VMS version described in 
+ICL for Unix behaves very like the VMS version described in
 \xref{SG/5}{sg5}{},
-however there are differences. 
-The ICL HELP command will give more up-to-date and Unix 
+however there are differences.
+The ICL HELP command will give more up-to-date and Unix
 oriented information than SG/5.
 
 ICL is started from a Unix shell by a command of the form:
-\begin{quote} 
+\begin{quote}
 \texttt{\% icl} [\textit{ICL\_options}\/] [\textit{command\_filenames...}]
 \end{quote}
 Where:
 \begin{description}
-\item[\textit{ICL\_options}] (optional) have not yet been fully developed 
+\item[\textit{ICL\_options}] (optional) have not yet been fully developed
 and should not be used without advice. ICL options start
 with `{\texttt{-}}' and must appear before any command-file names.
-\item[\textit{command\_filenames...}] (optional) are the names of any files 
-containing ICL commands which are to be obeyed by ICL before the ICL prompt 
+\item[\textit{command\_filenames...}] (optional) are the names of any files
+containing ICL commands which are to be obeyed by ICL before the ICL prompt
 appears.
 They are loaded \emph{after} any ICL login files (see Appendix \ref{iclvars}).
-A file extension of \texttt{.icl} is assumed if no extension is specified. 
+A file extension of \texttt{.icl} is assumed if no extension is specified.
 All filenames must appear after any ICL options.
 \end{description}
 Examples:
 \begin{quote} \begin{verbatim}
-% icl 
+% icl
 \end{verbatim} \end{quote}
-This will be the normal invocation. Only defined ICL login files 
+This will be the normal invocation. Only defined ICL login files
 will be loaded before the ICL prompt is output.
 
 \begin{quote} \begin{verbatim}
 % icl -io test_io comfile1 comfile2
 \end{verbatim} \end{quote}
 which would set the value of the ICL option \texttt{-io} to \texttt{test\_io}
-and the ICL command files \texttt{comfile1.icl} and \texttt{comfile2.icl} 
-would be automatically loaded into ICL (after any defined ICL login files) 
+and the ICL command files \texttt{comfile1.icl} and \texttt{comfile2.icl}
+would be automatically loaded into ICL (after any defined ICL login files)
 before the ICL prompt was output.
 
 \section{\xlabel{input_line_editing}\label{input_line_editing}Input-line Editing}
 When you reply to prompts from either an ADAM program or ICL, previous input can
-be recalled and edited -- automatic filename completion is also possible in 
-much the same way as it would be on the shell command line. 
-At prompts for ADAM program parameters, you can also paste the suggested value 
+be recalled and edited -- automatic filename completion is also possible in
+much the same way as it would be on the shell command line.
+At prompts for ADAM program parameters, you can also paste the suggested value
 into the input buffer and edit it. The maximum length of an input line is 256
 characters -- the terminal will beep if you attempt to input more.
 
@@ -421,19 +421,19 @@ Line recall and editing for ADAM uses virtually the same keys as \texttt{tcsh}
 with the \texttt{emacs} key bindings.
 
 \subsection{Input-line Recall}
-This is achieved using the up and down arrow keys -- the recalled line can 
+This is achieved using the up and down arrow keys -- the recalled line can
 then be edited in the normal way.
 Up to a maximum of 100 input lines will be remembered but in the case of
-programs run from the shell, only responses to prompts in the current 
+programs run from the shell, only responses to prompts in the current
 invocation of the program can be recalled.
 
 \subsection{Suggested Value Recall}
-If there are no characters on the input line, the \texttt{TAB} key (or 
-\texttt{ESC},\texttt{ESC}) will cause the suggested value (if any) to be 
+If there are no characters on the input line, the \texttt{TAB} key (or
+\texttt{ESC},\texttt{ESC}) will cause the suggested value (if any) to be
 inserted as the  input line. It can then be edited in the normal way.
 (There will be no suggested value at the \texttt{ICL>} prompt.)
 
-See 
+See
 \htmlref{Filename Completion}{filename_completion}
 \latex{ (Section \ref{filename_completion})} for the effect of these
 characters if there is already some input on the line.
@@ -442,29 +442,29 @@ characters if there is already some input on the line.
 If there are currently characters on the input line, the \texttt{TAB} key (or
 \texttt{ESC},\texttt{ESC}) will cause filename completion to be attempted on
 the word preceding the cursor.
-If no match is found, ``No match.'' will be printed and the terminal will beep; 
-if more than one match is found, ``Multiple matches.'' will be printed and the 
-terminal will beep -- the input line will be set to the longest common 
-prefix.  
-A list of all possible matches can be displayed by typing 
+If no match is found, ``No match.'' will be printed and the terminal will beep;
+if more than one match is found, ``Multiple matches.'' will be printed and the
+terminal will beep -- the input line will be set to the longest common
+prefix.
+A list of all possible matches can be displayed by typing
 \texttt{ESC},\texttt{CNTL/D}. (At the end of line, just \texttt{CNTL/D} is
-sufficient -- elsewhere \texttt{CNTL/D} will delete the character at the 
+sufficient -- elsewhere \texttt{CNTL/D} will delete the character at the
 cursor.)
 
-To overcome the problem of Starlink NDF and HDS filenames usually being 
-required without the \texttt{.sdf} extension, \texttt{.sdf} will be omitted 
+To overcome the problem of Starlink NDF and HDS filenames usually being
+required without the \texttt{.sdf} extension, \texttt{.sdf} will be omitted
 from the end of any completed filename.
-This behaviour may be altered by setting environment variable 
-ADAM\_EXTN to a comma-separated list of extensions (in fact any strings) 
+This behaviour may be altered by setting environment variable
+ADAM\_EXTN to a comma-separated list of extensions (in fact any strings)
 which are to be omitted from the end of completed filenames.
-If no truncation of filenames is required, ADAM\_EXTN should be set to a null 
+If no truncation of filenames is required, ADAM\_EXTN should be set to a null
 string.
 
-When a single match is found, the filename is truncated if required and copied 
+When a single match is found, the filename is truncated if required and copied
 to the input line followed by a single space.
 
 For example, suppose the default for filename truncation (\texttt{.sdf}) is in
-use and the  current directory contains two files \texttt{file.dat} and 
+use and the  current directory contains two files \texttt{file.dat} and
 \texttt{file.sdf}.
 The dialogue might go as follows (\verb!<>! indicates typing by the user):
 \small
@@ -495,30 +495,30 @@ Key sequences for more complex line editing are given in Appendix
 \begin{description}
 \item[\texttt{CNTL/Z}] This will suspend the program in the normal way. It may
 be re-started with the \texttt{fg} command.
-\item[\texttt{CNTL/C}] 
+\item[\texttt{CNTL/C}]
 This will abort a task running from the shell.
 If running ICL, the effect depends on what is happening at the time.
-Generally, ICL itself will keep running but the current activity will be 
-aborted (see 
+Generally, ICL itself will keep running but the current activity will be
+aborted (see
 \xref{SG/5}{sg5}{errors_and_exceptions}
 for information on ICL exception handling).
 \end{description}
 
 \section{\xlabel{the_adam_user_directory}\xlabel{ADAM_USER_directory}
 \label{adam_user}The ADAM\_USER Directory}
-When any ADAM application, or 
+When any ADAM application, or
 \xref{ICL}{sg5}{},
 is run, a directory known as the
 {\bf ADAM\_USER} directory is used to hold various automatically-created files.
-These are: program parameter files, the global parameter file (GLOBAL.sdf) 
+These are: program parameter files, the global parameter file (GLOBAL.sdf)
 and task identifying files (used by the ADAM inter-task message system).
-The directory is also used by the 
-\xref{MAG}{sun171}{} library as the default to contain 
+The directory is also used by the
+\xref{MAG}{sun171}{} library as the default to contain
 information about the user's tape devices.
 
 By default, subdirectory \texttt{adam} in the user's HOME directory
 is used. If you want to use some other directory, set its name in
-environment variable ADAM\_USER. 
+environment variable ADAM\_USER.
 
 Whichever directory is used, it will be created if necessary (and possible).
 The directory and/or its contents can be deleted when not in use, but this
@@ -528,7 +528,7 @@ may remove memory of parameter values last used.
 Originally ADAM programs were always written in Fortran, the top-level module
 being written as a subroutine with a single \texttt{INTEGER} argument, the
 ADAM status.
-The 
+The
 \htmlref{link scripts}{link_scripts}
 now also accept C functions. If the top-level function is a C function, it
 must have a single argument of type \texttt{int *}. If it is not written as a
@@ -536,31 +536,31 @@ Fortran-callable routine, the source file must be presented to the link script.
 
 Note that the complete set of C interfaces for the Starlink libraries
 is not yet available so it may not be possible to write your program entirely
-in C without the aid of something like the 
+in C without the aid of something like the
 \xref{CNF package}{sun209}{}\latex{ (see SUN/209)}.
 
-To compile and link ADAM programs, it is necessary to add \texttt{/star/bin} to 
+To compile and link ADAM programs, it is necessary to add \texttt{/star/bin} to
 your PATH environment variable. This is done if you have `sourced'
-\texttt{/star/etc/login} to set up for Starlink software generally. 
+\texttt{/star/etc/login} to set up for Starlink software generally.
 
 \subsection{\xlabel{include_files}\label{incs}Include Files}
 All public include files, such as \texttt{\textit{pkg}\_par} and
 \texttt{\textit{pkg}\_err} files, will be found in \texttt{/star/include}.
 
-The filenames of the Fortran include files are in lower case but they should 
+The filenames of the Fortran include files are in lower case but they should
 be specified in the program in the standard Starlink way. That is, for example:
 \begin{quote} \begin{verbatim}
 INCLUDE 'SAE_PAR'
 INCLUDE 'PAR_ERR'
 \end{verbatim} \end{quote}
 Links are then set up to the public include files in \texttt{/star/include}
-using the appropriate \textit{pkg}\_dev script. 
+using the appropriate \textit{pkg}\_dev script.
 For example:
 \begin{quote} \begin{verbatim}
 % par_dev
 \end{verbatim} \end{quote}
-creates links \texttt{PAR\_PAR} and \texttt{PAR\_ERR} to 
-\texttt{/star/include/par\_par} and \texttt{/star/include/par\_err} 
+creates links \texttt{PAR\_PAR} and \texttt{PAR\_ERR} to
+\texttt{/star/include/par\_par} and \texttt{/star/include/par\_err}
 respectively.
 (\texttt{SAE\_PAR} is defined by \texttt{star\_dev}.)
 
@@ -568,38 +568,38 @@ For C programs, includes take the normal form:
 \begin{quote} \begin{verbatim}
 #include "par_err.h"
 \end{verbatim} \end{quote}
-(\texttt{-I/star/include} is included in the 
+(\texttt{-I/star/include} is included in the
 \htmlref{link scripts}{link_scripts}).
 
 \subsection{\xlabel{ADAM_link_scripts}\xlabel{adam_link_scripts}
 \label{link_scripts}ADAM Link Scripts}
 Two shell scripts are provided to link ADAM programs.
-\texttt{alink} is used to link A-tasks and A-task monoliths, and 
+\texttt{alink} is used to link A-tasks and A-task monoliths, and
 \texttt{ilink} to link I-tasks.
 The executable images produced may be run either from a suitable user-interface
-such as 
+such as
 \xref{ICL}{sg5}{abstract},
-or directly from the shell. 
+or directly from the shell.
 
-The following description uses \texttt{alink} in examples; \texttt{ilink} is 
+The following description uses \texttt{alink} in examples; \texttt{ilink} is
 used in the same way.
 
-To link an ADAM program, ensure that \texttt{/star/bin} is added to your 
+To link an ADAM program, ensure that \texttt{/star/bin} is added to your
 environment variable PATH, then type:
-\begin{quote} 
+\begin{quote}
 \texttt{\% alink} [{\texttt{-xdbx}}] {\textit{file}} [{\textit{arguments}}]
 \end{quote}
 Where:
 \begin{description}
-\item[{\texttt{-xdbx}}] optional (but must be the first argument if used), 
-overcomes some problems with debugging ADAM tasks, notably with \texttt{xdbx} 
-and \texttt{ups} on SunOS, by supplying dummy source files for required ADAM 
-system routines. It also has the effect of inserting a \texttt{-g} option into 
+\item[{\texttt{-xdbx}}] optional (but must be the first argument if used),
+overcomes some problems with debugging ADAM tasks, notably with \texttt{xdbx}
+and \texttt{ups} on SunOS, by supplying dummy source files for required ADAM
+system routines. It also has the effect of inserting a \texttt{-g} option into
 the argument list. For more details, see Appendix \ref{link_det}.
 \item[\textit{prog\_module}] specifies a file containing the task's main
-subroutine. The filename should be of the form 
-{\textit{path}/\textit{name}\bf{.f}}, {\textit{path}/\textit{name}\bf{.c}}, 
-{\textit{path}/\textit{name}\bf{.o}} or  {\textit{path}/\textit{name}}. 
+subroutine. The filename should be of the form
+{\textit{path}/\textit{name}\bf{.f}}, {\textit{path}/\textit{name}\bf{.c}},
+{\textit{path}/\textit{name}\bf{.o}} or  {\textit{path}/\textit{name}}.
 The \textit{path}/ component is optional but
 \textit{name} must be the name of the program's main subroutine and will
 be the name of the executable file produced in the current working directory.
@@ -607,15 +607,15 @@ If the file extension is \texttt{.f} or \texttt{.c}, the file will be compiled
 appropriately; if none of the permitted extensions is given,
 \texttt{.o} is appended.
 
-Note that after a \texttt{.f} file has been compiled, on some platforms the 
-\texttt{.o} file will be retained in the current working directory so that 
-subsequent \texttt{alink}s with an unchanged \texttt{.f} file may specify the 
+Note that after a \texttt{.f} file has been compiled, on some platforms the
+\texttt{.o} file will be retained in the current working directory so that
+subsequent \texttt{alink}s with an unchanged \texttt{.f} file may specify the
 name with no extension ( or \texttt{.o}).
 The object files for any compiled C files will always be retained.
-\item[\textit{arguments}] optional, is any additional arguments (library 
-specifications, compiler options \textit{etc.}) legal for the Fortran 
+\item[\textit{arguments}] optional, is any additional arguments (library
+specifications, compiler options \textit{etc.}) legal for the Fortran
 compiler, or any C files to be compiled separately and linked in.
-The list of Starlink libraries automatically included in the link is given in 
+The list of Starlink libraries automatically included in the link is given in
 Appendix~\ref{libs}; the method of including other Starlink libraries in ADAM
 programs will be specified in the relevant Starlink User Note.
 
@@ -623,24 +623,24 @@ In most cases it will be:
 \begin{quote}
 \texttt{\% alink} {\textit{prog\_module} \texttt{`}\textit{pkg}\texttt{\_link\_adam`}}
 \end{quote}
-where \texttt{\textit{pkg}} is the specific software item name \textit{e.g.} 
+where \texttt{\textit{pkg}} is the specific software item name \textit{e.g.}
 \texttt{ndf}.
 \end{description}
 
-Appendix \ref{link_det} gives details of the command used within 
-\texttt{alink/ilink} to compile and/or link the tasks. 
+Appendix \ref{link_det} gives details of the command used within
+\texttt{alink/ilink} to compile and/or link the tasks.
 This may assist users who wish to alter the standard behaviour.
 
-By default, programs are statically linked with the Starlink libraries. 
-On platforms where shared libraries are installed, programs may be linked with 
+By default, programs are statically linked with the Starlink libraries.
+On platforms where shared libraries are installed, programs may be linked with
 them by setting the environment variable ALINK\_FLAGS1 appropriately.
 On currently supported systems it should be set to \texttt{-L/star/share}.
 (See Appendix \ref{link_det} for more details.)
 
 \subsection{\xlabel{interface_files}Interface Files}
-Interface Files may be compiled by the \texttt{compifl} program which is 
-available in \texttt{/star/bin}. 
-Compiled Interface Files (\texttt{.ifc}s) must be produced on the platform on 
+Interface Files may be compiled by the \texttt{compifl} program which is
+available in \texttt{/star/bin}.
+Compiled Interface Files (\texttt{.ifc}s) must be produced on the platform on
 which they are to be used.
 
 Generally, the only things which will need changing when porting Interface
@@ -685,60 +685,60 @@ monolith, then execute the linkname (possibly via an alias). For example:
 % add
 \end{verbatim} \end{quote}
 
-Separate Interface Files are required for each action run from the shell 
+Separate Interface Files are required for each action run from the shell
 -- a monolithic Interface File is required for monoliths run from ICL.
 
 \section{\xlabel{help_files}Help Files}
-The Starlink portable help system (HLP) is used to provide help if ? or ?? is 
+The Starlink portable help system (HLP) is used to provide help if ? or ?? is
 typed in response to a parameter prompt.
-Instructions for creating help libraries and navigating through them may be 
-found in 
+Instructions for creating help libraries and navigating through them may be
+found in
 \xref{SUN/124}{sun124}{}.
 
 Interface File entries specifying help libraries may be given as standard
 pathnames \textit{e.g.}:
-\begin{quote} 
+\begin{quote}
 \begin{verbatim}
 helplib /star/help/kappa/kappa.shl
 \end{verbatim}
 or
 \begin{verbatim}
 help %/star/help/kappa/kappa ADD Parameters IN1
-\end{verbatim} 
+\end{verbatim}
 \end{quote}
 Note that the file extension \texttt{.shl} is optional.
 
-The system will also accept environment variables and \~{} in the help 
+The system will also accept environment variables and \~{} in the help
 library name, \textit{e.g.}:
-\begin{quote} 
+\begin{quote}
 \texttt{\$KAPPA\_DIR/kappahelp.shl} or \texttt{\$KAPPA\_HELP} or
 \texttt{\~{}/help/myprog}
 \end{quote}
 
 For historical reasons, so that the same Interface File entry will work with
 both Unix and VMS, the VMS form:
-\begin{quote} 
+\begin{quote}
 \texttt{KAPPA\_DIR:kappahelp.shl} or \texttt{KAPPA\_HELP:}
 \end{quote}
 will be accepted.
 
 If the VMS form is used, the environment variable name will be forced to upper
-case, and the filename to lower case for interpretation. 
+case, and the filename to lower case for interpretation.
 Unix-style specifications will be interpreted as given.
 
 \section{\xlabel{miscellaneous_points}Miscellaneous Points}
 \begin{itemize}
 \item For Unix ADAM applications linked since ADAM V3.1, the ADAM\_USER
-directory and global parameter file, \texttt{GLOBAL.sdf}, are created 
-automatically. 
+directory and global parameter file, \texttt{GLOBAL.sdf}, are created
+automatically.
 \item Compiled Interface Files (\texttt{.ifc}s) will only work for the platform
 type on which they were created.
 \item Monolith top-level routines must be written in the style described
-in Section \ref{ADAM_monoliths} for use on Unix. 
+in Section \ref{ADAM_monoliths} for use on Unix.
 Monoliths are linked using \texttt{alink}.
 \item ADAM tasks will usually default to interpreting environment variables
-and `\~{}' in filenames used with HDS. This is not necessarily true of 
-names used with other ADAM facilities such as FIO and may be overridden by 
+and `\~{}' in filenames used with HDS. This is not necessarily true of
+names used with other ADAM facilities such as FIO and may be overridden by
 user or programmer action for HDS filenames.
 \end{itemize}
 
@@ -767,9 +767,9 @@ J.A.Bailey : \xref{SG/5}{sg4}{}
 -- ICL - The Interactive Command Language for ADAM.\\
 Jo Murray : \xref{SUN/101}{sun101}{}
 -- Introduction to ADAM Programming.\\
-P.T.Wallace : \xref{SUN/124}{sun124}{} 
+P.T.Wallace : \xref{SUN/124}{sun124}{}
 -- HELP - Interactive Help System.\\
-B.D.Kelly : \xref{SUN/134}{sun134}{} 
+B.D.Kelly : \xref{SUN/134}{sun134}{}
 -- ADAM - Guide to Writing Instrumentation Tasks.\\
 P.M.Allan : \xref{SUN/171}{sun171}{}
 -- MAG - Access to Magnetic Tapes.\\
@@ -792,12 +792,12 @@ SUN & Starlink User Note.
 
 \section{\xlabel{document_changes}Document Changes}
 \subsection{SUN/144.13}
-The sections on the 
-\htmlref{use}{link_scripts}\latex{ (Section \ref{link_scripts})} 
+The sections on the
+\htmlref{use}{link_scripts}\latex{ (Section \ref{link_scripts})}
 and
-\htmlref{details}{link_det}\latex{ (Appendix \ref{link_det})} 
+\htmlref{details}{link_det}\latex{ (Appendix \ref{link_det})}
 of the ADAM link scripts, \texttt{alink} and \texttt{ilink}, have been modified
-to reflect some changes designed to allow easy switching between static and 
+to reflect some changes designed to allow easy switching between static and
 dynamic linking with the Starlink libraries.
 
 \subsection{SUN/144.14}
@@ -814,7 +814,7 @@ Environment variable ADAM\_NOPROMPT is added to the list of
 \appendix
 \section{\xlabel{example_session}Example Session}
 The following session shows the process of compiling, linking and running an
-example program, derived from 
+example program, derived from
 \xref{SUN/101}{sun101}{},
 on the Sun.
 
@@ -829,22 +829,22 @@ repdim2.f       repdim2.ifl     example.sdf
 *   The CHR package is used to produce a nice output message.
 *   See SUN/101, section 11.
 
-      SUBROUTINE REPDIM2 (STATUS)                                
+      SUBROUTINE REPDIM2 (STATUS)
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'                                       
+      INCLUDE 'SAE_PAR'
       INTEGER DIM(10), I, NCHAR, NDF1, NDIM, STATUS
       CHARACTER*100 STRING
 
 *   Check inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Begin an NDF context.    
-      CALL NDF_BEGIN                                          
-                                                              
-*   Get the name of the input NDF file and associate an NDF 
+*   Begin an NDF context.
+      CALL NDF_BEGIN
+
+*   Get the name of the input NDF file and associate an NDF
 *   identifier with it.
       CALL NDF_ASSOC ('INPUT', 'READ', NDF1, STATUS)
-                                                              
+
 *   Enquire the dimension sizes of the NDF.
       CALL NDF_DIM (NDF1, 10, DIM, NDIM, STATUS)
 
@@ -852,7 +852,7 @@ repdim2.f       repdim2.ifl     example.sdf
       CALL MSG_SETI ('NDIM', NDIM)
 
 *   Report the message.
-      CALL MSG_OUT (' ', 'No. of dimensions is ^NDIM', STATUS) 
+      CALL MSG_OUT (' ', 'No. of dimensions is ^NDIM', STATUS)
 
 *   Report the dimensions.
       NCHAR = 0
@@ -863,16 +863,16 @@ repdim2.f       repdim2.ifl     example.sdf
 *      Add the next dimension to the string.
          CALL CHR_PUTI (DIM(I), STRING, NCHAR)
       ENDDO
-      CALL MSG_OUT ('  ', STRING(1:NCHAR), STATUS) 
+      CALL MSG_OUT ('  ', STRING(1:NCHAR), STATUS)
 
-*   End the NDF context.                                       
-      CALL NDF_END (STATUS)                                  
-      END                 
+*   End the NDF context.
+      CALL NDF_END (STATUS)
+      END
 %
 % cat repdim2.ifl
 interface REPDIM2
    parameter      INPUT
-      position    1 
+      position    1
       prompt      'Input NDF structure'
       default     example
       association '->global.ndf'
@@ -894,7 +894,7 @@ Array dimensions are 856
 %
 % ls ~/adam
 repdim2.sdf     GLOBAL.sdf
-%  
+%
 % compifl repdim2
 !! COMPIFL: Successful completion
 %
@@ -912,9 +912,9 @@ compiler used.
 The link scripts firstly have to create a subroutine, DTASK\_APPLIC, which is
 called by the ADAM fixed part and in turn calls the user's top-level
 routine.
-The difference between \texttt{alink} and \texttt{ilink} is just that the 
-template DTASK\_APPLIC for \texttt{alink} contains a call to close down the 
-parameter system after each invocation of the task unless the environment 
+The difference between \texttt{alink} and \texttt{ilink} is just that the
+template DTASK\_APPLIC for \texttt{alink} contains a call to close down the
+parameter system after each invocation of the task unless the environment
 variable ADAM\_TASK\_TYPE is set to `I'.
 
 If the user's main routine is written in C, a temporary routine,
@@ -922,7 +922,7 @@ DTASK\_WRAP is created as a Fortran-callable wrapper for the user's
 routine. DTASK\_APPLIC will call DTASK\_WRAP, which in turn calls the user's
 routine.
 
-During installation (as part of the DTASK library in the 
+During installation (as part of the DTASK library in the
 \xref{PCS}{ssn29}{}
 package), the actual compile/link command within \texttt{alink/ilink} is edited
 depending upon the platform and setting of various environment variables.
@@ -943,7 +943,7 @@ Additional system libraries
 \end{verbatim} \end{quote}
 Notes:
 \begin{itemize}
-\item F77 is replaced by whatever the FC environment variable is when 
+\item F77 is replaced by whatever the FC environment variable is when
 \texttt{alink/ilink} is installed.
 \item Any C source files specified will be compiled separately and linked in
 the above Fortran command.  The C compiler command used will be of the form:
@@ -952,64 +952,64 @@ the above Fortran command.  The C compiler command used will be of the form:
 \end{verbatim} \end{quote}
 where:
 \begin{description}
-\item[\texttt{CC}] is replaced by the CC environment variable when 
+\item[\texttt{CC}] is replaced by the CC environment variable when
 \texttt{alink/ilink} script is installed.
-\item[\texttt{\$CFLAGS}] is the value of the CFLAGS environment variable when 
+\item[\texttt{\$CFLAGS}] is the value of the CFLAGS environment variable when
 \texttt{alink/ilink} is invoked.
 \item[\texttt{\$CARGS}] is any C files or \texttt{-I} or \texttt{-D} arguments
 on the \texttt{alink/ilink} command line, plus, if the main routine is C,
 \texttt{dtask\_wrap.c}\end{description}
 \item \texttt{\$EXENAME} is the basename of the \textit{prog\_module}
-argument of \texttt{alink/ilink} with any \texttt{.f}, \texttt{.c} or 
-\texttt{.o} suffix removed. 
+argument of \texttt{alink/ilink} with any \texttt{.f}, \texttt{.c} or
+\texttt{.o} suffix removed.
 \item Environment variable FFLAGS may be used to specify any options which
 must be included at the start of the command line.
-\item \texttt{\$XDBX} is set to \texttt{-g} if the \texttt{-xdbx} argument 
+\item \texttt{\$XDBX} is set to \texttt{-g} if the \texttt{-xdbx} argument
 is given.
 \item \texttt{\$ALINK\_FLAGS1} may be set to determine the type of linking
 required. For instance:
 \begin{quote} \begin{verbatim}
-% setenv ALINK_FLAGS1 -L/star/share 
+% setenv ALINK_FLAGS1 -L/star/share
 \end{verbatim} \end{quote}
 would cause the linker to find the Starlink
 shared libraries (on platforms where they are installed), thus producing a
 dynamically linked executable.
-\item \texttt{\$ARGS} is the \textit{prog\_module} argument (with \texttt{.o} 
-appended if the original extension was not \texttt{.f}, \texttt{.c} or 
+\item \texttt{\$ARGS} is the \textit{prog\_module} argument (with \texttt{.o}
+appended if the original extension was not \texttt{.f}, \texttt{.c} or
 \texttt{.o})
-or \texttt{\$EXENAME.o dtask\_wrap.o} if the main routine was in C, followed 
-by the remaining arguments unchanged except that any \texttt{.c} file 
+or \texttt{\$EXENAME.o dtask\_wrap.o} if the main routine was in C, followed
+by the remaining arguments unchanged except that any \texttt{.c} file
 extensions are replaced by \texttt{.o}.
 \item To speed up the link, \textit{pkg}\_link\_adam scripts are only used
-selectively. 
+selectively.
 \texttt{dtask\_link\_adam} refers to DTASK, TASK and ERR libraries directly then
 invokes \texttt{subpar\_link\_adam} which references the necessary
 libraries directly, apart from HDS, HLP and PSX whose link\_adam scripts are
 invoked.
 \item \texttt{ALINK\_FLAGS2} may be useful in controlling the way system
 libraries are accessed.
-\item \texttt{Additional system libraries} A platform-dependent list of 
-required system libraries which are not searched automatically is added to 
+\item \texttt{Additional system libraries} A platform-dependent list of
+required system libraries which are not searched automatically is added to
 \texttt{alink/ilink} at installation time.
 \item Other adjustments are made during installation if PCS is not being
-installed in \texttt{/star}. 
-In particular, a -L option is added to include the newly installed libraries 
+installed in \texttt{/star}.
+In particular, a -L option is added to include the newly installed libraries
 before those in \texttt{/star/lib}.
 Similarly with -I options in the C compilation.
 \end{itemize}
 The \texttt{-xdbx} argument is provided to overcome some awkward problems which
 can arise when debugging ADAM applications. Usually it is sufficient to
-include \texttt{-g} in the arguments of \texttt{alink/ilink} but sometimes, 
-notably when using \texttt{xdbx} and \texttt{ups} on SunOS, the debuggers do 
-not behave sensibly if required source files are missing so the \texttt{-xdbx} 
+include \texttt{-g} in the arguments of \texttt{alink/ilink} but sometimes,
+notably when using \texttt{xdbx} and \texttt{ups} on SunOS, the debuggers do
+not behave sensibly if required source files are missing so the \texttt{-xdbx}
 argument should be used instead.
 The effects of the argument are:
 \begin{itemize}
-\item A dummy source file for \texttt{dtask\_main}, the main routine of every 
-ADAM task, is created in the working directory. 
-The file contains an explanatory message to the user and the name of the 
+\item A dummy source file for \texttt{dtask\_main}, the main routine of every
+ADAM task, is created in the working directory.
+The file contains an explanatory message to the user and the name of the
 user's top-level subroutine (which may be helpful in selecting a breakpoint).
-\item The source file of DTASK\_APPLIC is not deleted from the working 
+\item The source file of DTASK\_APPLIC is not deleted from the working
 directory.
 \item \texttt{-g} is inserted in the compile/link command.
 \end{itemize}
@@ -1068,19 +1068,19 @@ For more complex operation of ADAM tasks, the user may make use of the following
 environment variables:
 \begin{description}
 \item[HOME] Is expected to specify the user's home directory.
-\item[ADAM\_USER] 
+\item[ADAM\_USER]
 ADAM\_USER may be set to define a directory other than \texttt{\$HOME/adam}
 to hold the program parameter files \textit{etc.} (see Section \ref{adam_user}).
-\item[ADAM\_IFL] Optionally specifies a search path of directories in 
-which the system is to look for Interface Files. 
-See the 
+\item[ADAM\_IFL] Optionally specifies a search path of directories in
+which the system is to look for Interface Files.
+See the
 \htmlref{Running from the Shell}{running_from_the_shell}
 section for details.
-\item[ADAM\_HELP] Specifies a search path of 
-directories in which the parameter system is to look for parameter help files 
-if a full pathname is not specified in the Interface File -- it is not 
+\item[ADAM\_HELP] Specifies a search path of
+directories in which the parameter system is to look for parameter help files
+if a full pathname is not specified in the Interface File -- it is not
 usually required.
-\item[ADAM\_ABBRV] 
+\item[ADAM\_ABBRV]
 If this environment variable is set, keywords used on the
 command line may be abbreviated to the minimum unambiguous length.
 Note that there could always be an undetectable ambiguity between logical or
@@ -1095,13 +1095,13 @@ keyword is given on the command line.
 Specifies a comma-separated list of extensions to be removed from the end
 of filenames after filename completion. By default \texttt{.sdf} will be
 removed.
-See the 
+See the
 \htmlref{Filename Completion}{filename_completion}
 section for details.
-\item[ADAM\_TASK\_TYPE] 
+\item[ADAM\_TASK\_TYPE]
 If set to `I', this will prevent A-tasks and A-task monoliths
-resetting active parameter values (and NULL states) after each invocation. 
-Most other aspects of parameter system closedown (such as updating associated 
+resetting active parameter values (and NULL states) after each invocation.
+Most other aspects of parameter system closedown (such as updating associated
 GLOBAL variables and unsetting dynamic defaults and MIN/MAX values) will still
 occur.
 This is of particular use for Graphical User Interfaces and is unlikely
@@ -1110,29 +1110,29 @@ to be set directly by users.
 terminates, the calling process will exit with system status set to 1 if
 the ADAM status was set, or 0 if the ADAM status was SAI\_\_OK.
 \item[EMS\_PATH] Unix ADAM will now use the EMS subroutines for obtaining the
-message associated with Starlink status values. EMS\_PATH may be used to 
-override the default search path for the message files 
-(see 
+message associated with Starlink status values. EMS\_PATH may be used to
+override the default search path for the message files
+(see
 \xref{SSN/4}{ssn4}{operating_system_specific_routines}
 for details).
 \item[PATH] In addition to its use by the system to find the required
 executable file, the environment variable PATH is used by the parameter
-system to find the pathname of the file being executed if it was invoked by 
+system to find the pathname of the file being executed if it was invoked by
 simply typing its name (not its pathname).
-This is needed to discover the directory in which to look for the Interface 
+This is needed to discover the directory in which to look for the Interface
 File if the ADAM\_IFL search is unsuccessful.
 This process means that the use of links may cause confusion -- the name
 and directory of the link will be used.
 \item[HDS\_SHELL] The interpretation of names given as values for parameters
 accessed via PAR or DAT routines will be handled by HDS.
-The environment variable HDS\_SHELL 
-(see 
-\xref{SUN/92}{sun92}{HDS_SHELL_tuning_parameter}) 
+The environment variable HDS\_SHELL
+(see
+\xref{SUN/92}{sun92}{HDS_SHELL_tuning_parameter})
 will be effective.
 If it is not set when the application starts, interpretation with SHELL=1
-(\texttt{csh} or failing that \texttt{sh}) is selected 
+(\texttt{csh} or failing that \texttt{sh}) is selected
 -- thus environment variables and `\~{}' are usually expanded.
-Note that parameter system syntax will usually prevent the use of more general 
+Note that parameter system syntax will usually prevent the use of more general
 shell expressions as names.
 \item[ICL Environment Variables] See Appendix \ref{iclvars} for details of the
 environment variables used by ICL.
@@ -1143,7 +1143,7 @@ ICL's operation can be controlled by several (optional) environment
 variables. The variables are:
 \begin{description}
 \item[ICL\_LOGIN\_SYS, ICL\_LOGIN\_LOCAL and ICL\_LOGIN]
-these may be set to specify ICL command files to be obeyed, 
+these may be set to specify ICL command files to be obeyed,
 in the above order, by ICL before the ICL prompt appears.
 A default file extension of \texttt{.icl} is assumed. For example:
 \begin{quote} \begin{verbatim}
@@ -1153,9 +1153,9 @@ will cause file \texttt{myprocs.icl} in the user's home directory to be loaded
 as ICL starts up.
 
 ICL\_LOGIN\_SYS and ICL\_LOGIN\_LOCAL should be reserved for system use.
-\xref{SSN/64}{ssn64}{} 
+\xref{SSN/64}{ssn64}{}
 describes how they are used at Starlink sites.
-\item[EDITOR] If set, this will override the ICL default editor (vi). 
+\item[EDITOR] If set, this will override the ICL default editor (vi).
 For example:
 \begin{quote} \begin{verbatim}
 % setenv EDITOR tpu
@@ -1168,7 +1168,7 @@ ICL helpfile. The default search path is:
 relative to each of the directories on the user's PATH.
 
 This process for finding the default helpfile only operates if the default
-helpfile is not defined -- \textit{i.e.}\ initially and after any 
+helpfile is not defined -- \textit{i.e.}\ initially and after any
 SET NOHELPFILE command.
 \item[SHELL] Defines the shell which ICL will use to run Unix commands.
 If SHELL is undefined, \texttt{csh} will be used.
@@ -1176,10 +1176,10 @@ If SHELL is undefined, \texttt{csh} will be used.
 by which it wants the task to register with the ADAM message system. Other
 user-interfaces controlling ADAM tasks via the ADAM message system will use the
 same mechanism. If the environment variable is not set, the task assumes it
-is being run directly from a shell and does not register with the message 
+is being run directly from a shell and does not register with the message
 system.
 \end{description}
-In addition to the above, ICL also makes use of some of the environment 
+In addition to the above, ICL also makes use of some of the environment
 variables listed in Section \ref{envars}, notably ADAM\_USER and ADAM\_EXTN.
 
 \newpage
@@ -1203,7 +1203,7 @@ Key & Function\\
 \texttt{CNTL/U} & Delete Line\\
 \texttt{CNTL/Z} & Suspend\\
 \\
-\texttt{ESC},\texttt{CNTL/D} & List choices\\ 
+\texttt{ESC},\texttt{CNTL/D} & List choices\\
 \texttt{ESC},\texttt{CNTL/H} & Backward delete word\\
 \texttt{ESC},\texttt{B} & Backward word\\
 \texttt{ESC},\texttt{D} & Forward Delete word\\

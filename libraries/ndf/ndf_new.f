@@ -1,5 +1,5 @@
       SUBROUTINE NDF_NEW( FTYPE, NDIM, LBND, UBND, PLACE, INDF,
-     :                    STATUS ) 
+     :                    STATUS )
 *+
 *  Name:
 *     NDF_NEW
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -97,7 +97,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,11 +132,11 @@
 
 *  Set an initial value for the INDF argument.
       INDF = NDF__NOID
-       
+
 *  Save the STATUS value and mark the error stack.
       TSTAT = STATUS
       CALL ERR_MARK
-       
+
 *  Import the NDF placeholder, converting it to a PCB index.
       STATUS = SAI__OK
       IPCB = 0
@@ -164,7 +164,7 @@
             END IF
          END IF
       END IF
-       
+
 *  Annul the placeholder, erasing the associated object if any error has
 *  occurred.
       IF ( IPCB .NE. 0 ) THEN

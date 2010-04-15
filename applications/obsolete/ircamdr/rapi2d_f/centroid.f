@@ -23,8 +23,8 @@
 *     YINIT  =  REAL( READ )
 *           y start coordinate of star to be centroided
 *     SEARCH  =  INTEGER( READ )
-*           Size of search box to be used 
-*     POSITIVE  =  LOGICAL( READ ) 
+*           Size of search box to be used
+*     POSITIVE  =  LOGICAL( READ )
 *           True if image features are positive above background
 *     MAXSHIFT  =  REAL( READ )
 *           Maximum shift allowed between guess and output positions
@@ -59,7 +59,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'NDF_PAR'          
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'
 
 *    Status :
@@ -75,7 +75,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI,           ! input data structure
      :    DIMS( NDIMS ),  ! dimensions of input DATA_ARRAY
      :    NDIM,           ! Number dimensions from NDF_DIM
@@ -133,26 +133,26 @@
 
 *          get the initial guess coordinates, setting up the dynamic
 *          defaults such that the point is actually on the array
-            CALL AIF_GET0R( 'XINIT', 1.0, 0.0, REAL( DIMS( 1 ) ), 
+            CALL AIF_GET0R( 'XINIT', 1.0, 0.0, REAL( DIMS( 1 ) ),
      :                       XINIT, STATUS )
-            CALL AIF_GET0R( 'YINIT', 1.0, 0.0, REAL( DIMS( 2 ) ), 
+            CALL AIF_GET0R( 'YINIT', 1.0, 0.0, REAL( DIMS( 2 ) ),
      :                       YINIT, STATUS )
 
 *          call the subroutine that does the actual work next
             CALL CENTROID_LOCATE( %VAL( PNTRI ), DIMS(1), DIMS(2),
-     :                            XINIT, YINIT, SEARCH, POSITIVE, 
-     :                            MAXSHIFT, MAXITER, TOLER, INVALID, 
+     :                            XINIT, YINIT, SEARCH, POSITIVE,
+     :                            MAXSHIFT, MAXITER, TOLER, INVALID,
      :                            XFINAL, YFINAL, ERROR, STATUS )
 
 *          on return, check the value of the error variable, and act
 *          accordingly
 
             IF (STATUS .EQ. SAI__OK) THEN
- 
+
                IF ( ERROR .EQ. 1 ) THEN
 
 *                there was no data in the given search area
-                  CALL MSG_OUT( 'NO_DATA', 
+                  CALL MSG_OUT( 'NO_DATA',
      :  'No data in given search area - please try again', STATUS )
 
                ELSE IF ( ERROR .EQ. 2 ) THEN

@@ -65,7 +65,7 @@ CD    Print *,  CLILINE(ICLIST:ICLIFIN)
 
       ICLIFIN = ICLIFIN - (IST-1) + LITEM + 1
 
-*  Update the stack information to reflect changes: note that 
+*  Update the stack information to reflect changes: note that
 *  the string preceding the inserted string has now been lost.
 
       ICLI(1,ISP) = 1

@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Zero out a DQ array.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -29,10 +29,10 @@
 
 *   Import:
       INTEGER NPOINT      ! number of points in array
- 
+
 *   Export:
       BYTE DQ(NPOINT)     ! data quality array
- 
+
 *   Local variables:
       INTEGER I           ! loop index
 

@@ -51,7 +51,7 @@ Version 5.2-3
 Version 5.2-2
 
 Version 5.2-2 of the NDG library (a library of fortran subroutines for
-accessing groups of NDFs) has been released. 
+accessing groups of NDFs) has been released.
 
    o Added NDG_NDFCO which allows an output NDF to be created by copying
      an input NDF.

@@ -20,7 +20,7 @@
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
-*        The CTG group as returned by CTG_ASSOC, etc. This should be the last 
+*        The CTG group as returned by CTG_ASSOC, etc. This should be the last
 *        group in a GRP owner-slave chain.
 *     SIZE = INTEGER (Given)
 *        The new group size. Must be less than or equal to the size of the
@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,14 +85,14 @@
 
 *  Loop round all groups in the chain.
       IGRP1 = IGRP
-      DO WHILE( IGRP1 .NE. GRP__NOID ) 
+      DO WHILE( IGRP1 .NE. GRP__NOID )
 
 *  Set the size of this group.
         CALL GRP_SETSZ( IGRP1, SIZE, STATUS )
 
 *  Find the owner of this group. GRP__NOID is returned if the group
 *  has no owner.
-        CALL GRP_OWN( IGRP1, IGRP2, STATUS ) 
+        CALL GRP_OWN( IGRP1, IGRP2, STATUS )
         IGRP1 = IGRP2
 
       END DO

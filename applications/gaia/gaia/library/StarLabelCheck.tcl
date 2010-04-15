@@ -37,7 +37,7 @@
 #  Methods:
 #
 #        invoke
-# 
+#
 #     Invokes the button as if pressed.
 #
 #        toggle
@@ -46,16 +46,16 @@
 #
 #        select
 #
-#     Selects the button and sets the associated variable to 
+#     Selects the button and sets the associated variable to
 #     the on value.
 #
 #        deselect
 #
-#     Deselects the button and sets the associated variable to 
+#     Deselects the button and sets the associated variable to
 #     the off value.
 #
 #        get
-#    
+#
 #     Returns the current value.
 
 #  Inheritance:
@@ -114,8 +114,8 @@ itcl::class gaia::StarLabelCheck {
       } {
          keep -command -variable -onvalue -offvalue -state -relief
       }
-      pack $itk_component(label) -side left -ipadx 1m 
-      pack $itk_component(button) -side left -padx 1m -ipadx 1m 
+      pack $itk_component(label) -side left -ipadx 1m
+      pack $itk_component(button) -side left -padx 1m -ipadx 1m
 
       #  Now handle unprocessed configurations.
       eval itk_initialize $args

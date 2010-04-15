@@ -38,7 +38,7 @@ C   Functions
       INTEGER*4 NTOT
 
       IFAIL  = 0
-      INTTM1 = INTT     
+      INTTM1 = INTT
 
 C   Weight data by integration time
 
@@ -73,12 +73,12 @@ C   Swap X and Y data arrays and weight the other also
             WRITE (ILOUT,*) 'New effective system temperature: ',
      &                      TSYS(NQ)
           END IF
-          DO I = NTOT(NQ-1)+1,NTOT(NQ) 
+          DO I = NTOT(NQ-1)+1,NTOT(NQ)
             IF (DATA(I).NE.BADPIX_VAL) THEN
               DATA(I) = -DATA(I)*INTTM2*WEIGHT2   ! -ve so I can use SU in a few lines
             END IF
           END DO
-          TEMP(NQ) = INTTM1+INTTM2*WEIGHT2 
+          TEMP(NQ) = INTTM1+INTTM2*WEIGHT2
         END IF
       END DO
 

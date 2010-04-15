@@ -25,7 +25,7 @@ C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C   This routine submits a request to the VAX/VMX operating system.
 C   In the VAX this spawns a sub-process and puts the master process
 C   or calling program into a wait state until the subprocess has been
-C   completed. LIB$SPAWN is described in the RUN-TIME library users 
+C   completed. LIB$SPAWN is described in the RUN-TIME library users
 C   reference manual
 
 C   Rachael Padman

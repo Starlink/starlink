@@ -42,12 +42,12 @@ Midas routines which are used for the image input and output.  I am
 solely responsible for bugs and algorithm-related problems.  If any
 such problems are found, please contact me; for major problems,
 hard-copy documentation of the circumstances and nature of the
-difficulty would be highly desirable. 
+difficulty would be highly desirable.
 
 \bigskip
 \bigskip
 
-\centerline{\bf ***** NOTE *****} 
+\centerline{\bf ***** NOTE *****}
 
 This manual has been modified to reflect the new VMS/Unix IRAF/Midas
 compatible version of DAOPHOT~II: The Next Generation.  If you are
@@ -55,19 +55,19 @@ still running DAOPHOT~Classic you will find many places where this
 manual is inappropriate.
 
 \vfill
-\indent \today 
+\indent \today
 \vfill
 \indent Peter B. Stetson
 \bigskip
 (604)363--0029$\qquad\qquad$stetson@dao.nrc.ca
 \medskip
-\indent Dominion Astrophysical Observatory 
+\indent Dominion Astrophysical Observatory
 
-\indent Herzberg Institute of Astrophysics 
+\indent Herzberg Institute of Astrophysics
 
 \indent 5071 West Saanich Road
 
-\indent Victoria, British Columbia V8X 4M6 
+\indent Victoria, British Columbia V8X 4M6
 \medskip
 \indent Canada
 \vfill
@@ -106,7 +106,7 @@ Appendix I - Optional Parameters ..................... 60
 Appendix II - The FIND Threshold ..................... 61
 Appendix III - Deriving a PSF in a Crowded Field ..... 65
 Appendix IV - Data Files ............................. 68
-}  
+}
 \vfill
 \eject
 \centerline{A.  Introduction}
@@ -124,7 +124,7 @@ visually. Picture-display operations and some other steps in the
 reduction procedure, such as editing intermediate data files or
 combining results from different frames to obtain instrumental colors,
 may be done outside of DAOPHOT~II using IRAF, Midas, or whatever
-software you have handy or feel like writing. 
+software you have handy or feel like writing.
 
 It is assumed that (1)~before running DAOPHOT~II, the user will have
 performed all necessary preparation of the images, such as
@@ -183,18 +183,18 @@ may want to decide just how many stars must be reduced in order to
 fulfill your basic mission.  For instance, if your goal is to locate
 the principal sequences of some remote cluster, it may not be necessary
 to reduce every last crowded star on the frame; instead, only a subset
-consisting of the less-crowded stars might be reduced. 
+consisting of the less-crowded stars might be reduced.
 
 \item{(2)} The derivation of the point-spread function can also be
-performed non-interactively with a reasonable degree of success, 
+performed non-interactively with a reasonable degree of success,
 but it may be to your advantage to check the quality of the profile
 fits visually on an image display before accepting the final product.
 
-\item{(3)} The shape of the point-spread function is assumed to 
-be spatially constant or to vary smoothly with position within the 
-frame; it is assumed {\it not\/} to depend at all on apparent 
-magnitude.  If these conditions are not met, systematic errors may 
-result. 
+\item{(3)} The shape of the point-spread function is assumed to
+be spatially constant or to vary smoothly with position within the
+frame; it is assumed {\it not\/} to depend at all on apparent
+magnitude.  If these conditions are not met, systematic errors may
+result.
 
 \item{(4)} Although the star-finding algorithm is by itself not
 sophisticated enough to separate badly blended images (two stars whose
@@ -316,7 +316,7 @@ the program stars.
 
 \vfill
 \eject
-\centerline{B.  A Typical Run of DAOPHOT~II} 
+\centerline{B.  A Typical Run of DAOPHOT~II}
 
 Before you run DAOPHOT~II: The Next Generation you must arrange for
 your pictures to exist on the computer's disk in a format acceptable to
@@ -339,7 +339,7 @@ quickly through this section and the following chapters on the major
 and minor routines in DAOPHOT~II, and then come back and reread this
 section more carefully.  Words written in boldface {\bf CAPITALS} will
 be DAOPHOT~II commands, which you may issue in response to a
-``Command:'' prompt. 
+``Command:'' prompt.
 
 \item{I.} From a system prompt run DAOPHOT~II. Either read or don't
 read the latest news (if it's even offered to you).  The values of
@@ -381,7 +381,7 @@ deviations below the mean sky value will be regarded as bad, and will
 be ignored by {\bf FIND} and by all subsequent reduction stages.
 
 \item{VI.} Use {\bf PHOTOMETRY} to obtain sky values and concentric
-aperture photometry for all objects found by the star-finding routine. 
+aperture photometry for all objects found by the star-finding routine.
 
 \item{VII.} Use {\bf PICK} to select a set of reasonable candidates for
 PSF stars.  {\bf PICK} first sorts the stars by magnitude, and then
@@ -500,7 +500,7 @@ using apertures with a range of sizes up to very large. These data will
 serve to establish the absolute photometric zero-point of your image.
 
 \bigskip
-\medskip 
+\medskip
 \centerline{***** NOTE *****}
 
 This has been the reduction procedure for a program field, assumed
@@ -515,12 +515,12 @@ coordinates of the stars you are interested in, and create your own
 coordinate file for input into {\bf PHOTOMETRY} (step VI).  In any
 case, for your standard fields it is possible that you won't bother
 with profile fits, but will just use the aperture photometry (employing
-a growth-curve analysis) to define the stars' instrumental magnitudes. 
+a growth-curve analysis) to define the stars' instrumental magnitudes.
 
 \vfill
 \eject
 \centerline{C.  Descriptions of Main Routines}
-\centerline{(In approximate order of use)} 
+\centerline{(In approximate order of use)}
 \noindent I.  DAOPHOT~II itself
 
 When you run DAOPHOT~II, the first thing that may occur is the typing
@@ -536,7 +536,7 @@ main part of the program, the current values of the optional reduction
 parameters will appear on your screen (see the Appendix on Optional
 Parameters, and the {\bf OPTIONS} command below).  When you see the
 ``Command:'' prompt, the program is ready to accept the commands
-described below. 
+described below.
 
 \vfill
 \eject
@@ -544,7 +544,7 @@ described below.
 
      If you want to work on a digital picture, the first thing you
 should do is specify the disk filename of that picture with the ATTACH
-command: 
+command:
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -579,7 +579,7 @@ NOMONITOR}) may be issued to DAOPHOT~II without a prior {\bf ATTACH}
 command having been given.  The program will refuse to let you tell it
 to perform tasks requiring a picture file (e.g., {\bf FIND}, {\bf
 PHOTOMETRY}, {\bf PSF}, {\bf GROUP}, {\bf NSTAR}) unless a picture has
-been {\bf ATTACH}ed. 
+been {\bf ATTACH}ed.
 
 In all implementations of DAOPHOT~II of which I am aware, if the
 extension part of your picture's filename is the standard one for that
@@ -608,7 +608,7 @@ if in your .cshrc file or some similar location, you have a statement
 like
 
 \medskip
-\noindent setenv ccd 
+\noindent setenv ccd
 /scr/nebuchadnezzar/mountstromloandsidingspring/1989/ccd-data
 \medskip
 
@@ -642,15 +642,15 @@ be simply enumerated, and the procedures available for changing the
 parameters will be described.
 
 At present the user is permitted to specify values for nineteen
-parameters: 
+parameters:
 
-\item{(1)}  ``READ NOISE'':  The readout noise, in data numbers, of a 
+\item{(1)}  ``READ NOISE'':  The readout noise, in data numbers, of a
 {\it single\/} exposure made with your detector.  Later on, the
 software will allow you to specify whether a given data frame is in
 fact the sum or the average of several individual exposures.  If you
 have a separate subdirectory for data from a given night or observing
 run, the readout noise needs to be specified only once (in the
-DAOPHOT.OPT file, see below). 
+DAOPHOT.OPT file, see below).
 
 \item{(2)}  ``GAIN'':  The gain factor of your detector, in photons or
 electrons per data number.  As with the readout noise, you want to
@@ -968,7 +968,7 @@ present purposes).  If you don't want to run the {\bf SKY} command,
 \eject
 \noindent V.  {\bf FIND}
 
-You are now ready to find stars. 
+You are now ready to find stars.
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -1133,7 +1133,7 @@ object is rejected.  If both turn out to be positive, then the ROUND
 parameter is computed:
 
 $$
-\hbox{\rm ROUND} = 
+\hbox{\rm ROUND} =
 {\hbox{\rm difference between the heights of the two one-dimensional Gaussians}
 \over
 \hbox{\rm average of the heights of the two one-dimensional Gaussians}}
@@ -1184,7 +1184,7 @@ be functions of magnitude if you so desired).
 
 Back in {\bf FIND}:  Once a brightness enhancement passes muster
 as a probable star, its centroid is computed (approximately).  When the
-FIND routine has gone through your entire picture, it will ask 
+FIND routine has gone through your entire picture, it will ask
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -1200,9 +1200,9 @@ FIND routine has gone through your entire picture, it will ask
 \noindent If you answer ``Y'', the program will exit from {\bf FIND}
 and return you to DAOPHOT ``Command:'' mode.  If you answer ``N'', it
 will ask for a new threshold and output filename, and will then search
-through the convolved picture again. 
+through the convolved picture again.
 
-A couple more comments on star-finding: 
+A couple more comments on star-finding:
 
 \item{(1)} Stars found in the outermost few rows and columns of the
 image, that is, where part of their profile hangs over the edge of the
@@ -1252,8 +1252,8 @@ floating-point numbers, this quantization will not occur.
 
 Before you can do concentric aperture photometry with DAOPHOT, you
 need to have an aperture photometry parameter file.  At the DAO, a
-prototype parameter file named DAO:PHOTO.OPT is available.  The 
-file looks something like this: 
+prototype parameter file named DAO:PHOTO.OPT is available.  The
+file looks something like this:
 
 \bigskip
 {\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -1271,7 +1271,7 @@ file looks something like this:
 }
 \bigskip
 
-\noindent When you give DAOPHOT the {\bf PHOTOMETRY} command to invoke the 
+\noindent When you give DAOPHOT the {\bf PHOTOMETRY} command to invoke the
 aperture photometry routine,
 
 \bigskip
@@ -1331,7 +1331,7 @@ message.  For instance, to change the radius of the first aperture to
 | PHO>                                             <CR>               |
 |                                                                     |
 =======================================================================
-} 
+}
 \bigskip
 
 \noindent and the modified table will appear on the screen:
@@ -1374,7 +1374,7 @@ each star.
 \vfill
 \eject
 
-Now you can proceed to do the photometry: 
+Now you can proceed to do the photometry:
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -1417,14 +1417,14 @@ program will complain and tell you the largest radius you can get away
 with.
 
 \item{(2)} If any of the following conditions is true, {\bf PHOTOMETRY}
-will assign an apparent magnitude of 99.999 $\pm$ 9.999 to your star: 
+will assign an apparent magnitude of 99.999 $\pm$ 9.999 to your star:
 
-\itemitem{(a)} if the star aperture extends outside the limits of the picture; 
+\itemitem{(a)} if the star aperture extends outside the limits of the picture;
 
 \itemitem{(b)} if there is a bad pixel (either above the ``High good
 datum'' or below the ``Low good datum'') inside the star aperture;
 
-\itemitem{(c)} if the star + sky is fainter than the sky; or 
+\itemitem{(c)} if the star + sky is fainter than the sky; or
 
 \itemitem{(d)} if for some reason the program couldn't determine a
 reasonable modal sky value (very rare; this latter case will be flagged
@@ -1450,10 +1450,10 @@ clever, you can set the threshold to something like 4.35 sigma below
 the mean sky brightness:  the one-sided tail of the cumulative normal
 distribution, $\hbox{\rm Prob}(X < -4.35 \sigma) = 7\times 10^{-6}$, or
 about one legitimate random pixel being spuriously identified as
-``bad'' in a $300 \times 500$ picture.  
+``bad'' in a $300 \times 500$ picture.
 
-\vfill 
-\eject 
+\vfill
+\eject
 \noindent VII.  {\bf PICK} and {\bf PSF}
 
 In my opinion, obtaining a point-spread function in a crowded field is
@@ -1661,8 +1661,8 @@ PSF.
 
 Unlike DAOPHOT~Classic, DAOPHOT~II: The Next Generation {\it is\/}
 able to use PSF stars that are within a PSF RADIUS of the edge of
-the frame, provided that they are at least a FITTING RADIUS from 
-the edge.  
+the frame, provided that they are at least a FITTING RADIUS from
+the edge.
 
 Finally, the analytic first approximations.  At this particular point
 in time (you like that verbose stuff?) there are six allowed options:
@@ -1790,7 +1790,7 @@ measured outside the atmosphere, in pixels).
 
 $$ \hbox{\rm SHARP}^2 \sim
 \sigma^2(\hbox{\rm observed}) - \sigma^2(\hbox{\rm point-spread
-function})$$ 
+function})$$
 
 \noindent (This equation is reasonably valid provided SHARP is not
 significantly larger than the square of the one-sigma Gaussian
@@ -1959,7 +1959,7 @@ non-existent and is eliminated from the starlist.
 
 \item{(3a)} After iterations 5, 6, 7, 8, and 9, if the faintest star in
 the group has a brightness less than one sigma above zero, it is
-eliminated; 
+eliminated;
 
 \item{(3b)} after iterations 10 -- 14, if the faintest star in the
 group has a brightness less than 1.5 sigma above zero, it is
@@ -2007,7 +2007,7 @@ point-spread function (see Appendix on constructing a PSF); and
 
 \item{(2)} decrowding bright stars for establishing the magnitude
 zero-point of the frame by means of aperture photometry through a
-series of apertures.  
+series of apertures.
 
 Here's how it goes.
 
@@ -2027,8 +2027,8 @@ Here's how it goes.
 |    Name for subtracted image (default ?s.DST):   <CR> or filename   |
 |                                                                     |
 =======================================================================
-} 
-\bigskip 
+}
+\bigskip
 
 \noindent This will subtract from the image that is currently {\bf
 ATTACH}ed all the stars in the ``File with photometry.''  The picture
@@ -2054,8 +2054,8 @@ will be acceptable as input to DAOPHOT, if you so desire.
 |    Name for subtracted image (default ?s.DST):   <CR> or filename   |
 |                                                                     |
 =======================================================================
-} 
-\bigskip 
+}
+\bigskip
 
 This time {\bf SUBSTAR} will subtract from the image all the stars
 in the ``File with photometry'' {\it except\/} those that appear
@@ -2067,9 +2067,9 @@ files.  If you use the renumber option of the {\bf SORT} command or
 if you {\bf APPEND} together files where ID numbers are duplicated,
 you may find yourself leaving the wrong stars in the image.
 
-\vfill 
-\eject 
-\centerline{D.  Additional Commands} 
+\vfill
+\eject
+\centerline{D.  Additional Commands}
 \noindent XIII.  {\bf MONITOR/NOMONITOR}
 
 If you want simply to turn off the sending of the results to your
@@ -2217,15 +2217,15 @@ minimum, maximum group size = 61,9999 (say).  This latter file would
 then be run through GROUP again, with a larger critical overlap.  (Note:
 You'd be better off using ALLSTAR.)
 
-\vfill 
-\eject 
+\vfill
+\eject
 \noindent XVI.  {\bf OFFSET}
 
 If you have a set of coordinates for objects found in one frame,
 and want to use these as centroids for aperture photometry in another
 frame, and if there is some arbitrary translational shift between the
 two frames, then {\bf OFFSET} can be used to add constants to all the
-$x$- and $y$-coordinates in a stellar data file: 
+$x$- and $y$-coordinates in a stellar data file:
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -2322,7 +2322,7 @@ values in a specified square subarray of your picture.  This is useful
 for figuring out why DAOPHOT isn't working with your data (maybe all
 the pixels have intensities of --32768?), or in deciding whether a
 particular star has a central intensity above the maximum value where
-your detector behaves linearly. 
+your detector behaves linearly.
 
 \bigskip
 \noindent Example:
@@ -2494,7 +2494,7 @@ random by the computer, or in accordance with positions and magnitudes
 specified by you, to your picture. They can then be found by {\bf
 FIND}, reduced by {\bf PHOTOMETRY} and the rest, and the star-finding
 efficiency and the photometric accuracy can be estimated by comparing
-the output data for these stars to what was put in. 
+the output data for these stars to what was put in.
 
 \bigskip
 
@@ -2575,7 +2575,7 @@ added to the picture.  This permits you to become just as sophisticated
 with your artificial-star tests as you want --- you can simulate any
 color-magnitude diagram, luminosity function, and spatial distribution
 in the frame that you want, just by writing yourself a program which
-creates the necessary input files.  
+creates the necessary input files.
 
 Note that in both examples the code asks for a number of photons per
 ADU.  It uses this to add the appropriate Poisson noise to the star
@@ -2590,7 +2590,7 @@ you should create a number of different frames, each containing only a
 few extra stars.  If you try to add too many stars at once your
 synthetic frames will be significantly more crowded than your original
 frame, making it difficult to apply the artificial-star conclusions to
-your program-star results. 
+your program-star results.
 
 \vfill
 \eject
@@ -2689,7 +2689,7 @@ routine is called.
 \noindent XXIII.  {\bf EXIT}
 
 This command allows you to exit cleanly from DAOPHOT, with all
-files properly closed and everything nice and neat. 
+files properly closed and everything nice and neat.
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -2715,10 +2715,10 @@ have done it this way because that makes it easier to conserve
 virtual memory, so that DAOPHOT and ALLSTAR can both operate
 on the largest possible images.
 
-In general, ALLSTAR works pretty much the same as the {\bf NSTAR} 
+In general, ALLSTAR works pretty much the same as the {\bf NSTAR}
 routine in DAOPHOT, fitting multiple, overlapping point-spread functions
-to star images in your CCD frames.  Input and output images and data 
-files are fully compatible with those produced by DAOPHOT.  Some of 
+to star images in your CCD frames.  Input and output images and data
+files are fully compatible with those produced by DAOPHOT.  Some of
 the noteworthy differences between ALLSTAR and {\bf NSTAR}:
 
 \item{1.} ALLSTAR reduces the entire starlist for a frame at once
@@ -2756,7 +2756,7 @@ radius.  If you have the ``WATCH PROGRESS'' option equal to 1, then in
 a densely-packed frame, you might notice ALLSTAR typing out messages
 like
 
-$$\hbox{\rm ``Group too large:  107 (2.50).''}$$ 
+$$\hbox{\rm ``Group too large:  107 (2.50).''}$$
 
 \item{} That means that a group of 107 stars resulted from use of the
 nominal critical separation (2.50 pixels, in this case).  ALLSTAR will
@@ -2835,7 +2835,7 @@ immediately gives you a chance to change any you don't like.
 \     PERCENT ERROR (in \%) =  0.75         PROFILE ERROR (in \%) =  5.00
 \    IS (INNER SKY RADIUS) =  0.00        OS (OUTER SKY RADIUS) =  0.00
 
-\ OPT> 
+\ OPT>
 ========================================================================
 }
 \bigskip
@@ -2845,7 +2845,7 @@ from DAOPHOT:  the fitting radius is the size of the region around each
 star which will actually be used in performing the profile fits.  The
 WATCH PROGRESS option determines just how much garbage will be typed
 onto your terminal screen or written into your batch job's logfile.  The
-MAXIMUM GROUP SIZE option has been explained above.  The REDETERMINE 
+MAXIMUM GROUP SIZE option has been explained above.  The REDETERMINE
 CENTROIDS, CLIPPING EXPONENT, and CLIPPING RANGE options are new.
 
 The REDETERMINE CENTROIDS option is how you tell the program whether
@@ -2854,7 +2854,7 @@ to improve the stars' positions in the profile fits.  RE = 0 means
 assume that the positions of the stars are known with absolute
 accuracy, and will redetermine only the stars' magnitudes (this is
 one way of imposing a star list from a good frame onto a poor frame
-of the same region); if ``yes,'' you will get the full-blown 
+of the same region); if ``yes,'' you will get the full-blown
 astrometric and photometric reduction you are used to from {\bf NSTAR}.
 
 The CLIPPING EXPONENT and CLIPPING RANGE options are explained in
@@ -2903,8 +2903,8 @@ The rest of it's pretty darn trivial.
 |    Name for subtracted image (default ?s.DST):   <CR> or filename   |
 |                                                                     |
 =======================================================================
-} 
-\bigskip 
+}
+\bigskip
 
 And away we go!  With each iteration, the program will keep you updated
 on how many stars remain to be reduced, how many have disappeared due
@@ -2937,7 +2937,7 @@ they may have misunderstood.
 
 =============================================================================
 \                                          Routines      Permitted     Default
-ID        Description (Note)              Affected        values       value 
+ID        Description (Note)              Affected        values       value
 -----------------------------------------------------------------------------
 RE  Readout noise, 1 exposure (ADU) (1)     FIND         positive        0
 
@@ -2949,31 +2949,31 @@ LO  Low good datum (standard deviations)    FIND       non-negative      7
 
 HI  High good datum (ADU) (1)               FIND       non-negative   32766.5
 
-FW  FWHM of objects for which FIND          FIND        0.2 - 15.0      2.5 
-\    is to be optimized (in pixels)                                      
+FW  FWHM of objects for which FIND          FIND        0.2 - 15.0      2.5
+\    is to be optimized (in pixels)
 
 TH  Significance threshold for detection    FIND       non-negative     4.0
 \    (standard deviations)
 
-LS  Low sharpness cutoff                    FIND         0.0 - 0.6      0.2  
+LS  Low sharpness cutoff                    FIND         0.0 - 0.6      0.2
 
-HS  High sharpness cutoff                   FIND         0.6 - 2.0      1.0  
+HS  High sharpness cutoff                   FIND         0.6 - 2.0      1.0
 
-LR  Low roundness cutoff                    FIND        -2.0 - 0.0     -1.0  
+LR  Low roundness cutoff                    FIND        -2.0 - 0.0     -1.0
 
-HR  High roundness cutoff                   FIND         0.0 - 2.0      1.0  
-\    for the profile fits.   
+HR  High roundness cutoff                   FIND         0.0 - 2.0      1.0
+\    for the profile fits.
 
 WA  Watch progress of reductions on    FIND,PHOT,PEAK,    -2 - 2         1
 \    terminal?                            PSF,NSTAR,
 \                                        SUBSTAR,SORT
 
-FI  The fitting radius (in pixels)        PSF,PEAK,      1.0 - 10.0     2.0 
+FI  The fitting radius (in pixels)        PSF,PEAK,      1.0 - 10.0     2.0
 \                                         GROUP,NSTAR
-  
-PS  PSF radius: radius (in pixels)          PSF          1.0 - 35.0    11.0 
-\    within which the point-spread      
-\    function is to be defined. (2)                                       
+
+PS  PSF radius: radius (in pixels)          PSF          1.0 - 35.0    11.0
+\    within which the point-spread
+\    function is to be defined. (2)
 
 VA  Degree of variation in the PSF (2)      PSF           -1 - 2         0
 
@@ -3034,7 +3034,7 @@ $$\eqalignno{
 \hbox{\rm Variance (readout)} &= \sigma^2(\hbox{\rm readout})\cr
 &= r^2 &\hbox{\rm (dimensionless units) [by definition]}\cr
 \noalign{\hbox{Total noise:}}
-\hbox{\rm Variance(total)} &= \hbox{\rm variance(sky)}\cr 
+\hbox{\rm Variance(total)} &= \hbox{\rm variance(sky)}\cr
 &\qquad + \hbox{\rm variance(readout)}&
 \hbox{\rm [propagation of error]}\cr
 &= p\times s + r^2 &\hbox{\rm (dimensionless units)}\cr
@@ -3054,16 +3054,16 @@ $$\eqalignno{
 \sigma(\hbox{\rm ADU}) &= {\sigma(\hbox{\rm photons})\over
 \hbox{\rm (photons per ADU)}} &\hbox{\rm [propagation of error]}\cr
 \noalign{\hbox{Let $R$ = readout noise in ADU $\equiv r/p$.  Then}}
-\sigma(\hbox{\rm total}) &= 
+\sigma(\hbox{\rm total}) &=
 \sqrt{s/p + R^2}&\hbox{\rm (units are ADU).}\cr
 }$$
 
 \eject
 
 Please note that if the frame you are working on is the average or the
-sum of several raw data frames, the values of the gain factor (in 
+sum of several raw data frames, the values of the gain factor (in
 photons per ADU) and the readout noise will have to be adjusted
-accordingly: 
+accordingly:
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
@@ -3071,11 +3071,11 @@ accordingly:
 \               If N frames were averaged       |  If N frames were summed
 \ ----------------------------------------------+------------------------------
 \                                               |
-\ photons/ADU   p(N) = N*p(1)                   |  p(N) = p(1) 
+\ photons/ADU   p(N) = N*p(1)                   |  p(N) = p(1)
 \                                               |
 \ r-o noise     R(N) = R(1)/SQRT(N)             |  R(N) = R(1)*SQRT(N)
 \                                               |
-\ total         std. dev. (N) =                 |  std. dev. (N) = 
+\ total         std. dev. (N) =                 |  std. dev. (N) =
 \                  SQRT(s/[N*p(1)] + [R**2]/N)  |   SQRT(s/p(1) + N*[R(1)]**2)
 \                                               |
 \ ----------------------------------------------+------------------------------
@@ -3083,14 +3083,14 @@ accordingly:
 \bigskip
 
 \noindent The value of $s$ which {\bf FIND} uses in these equations is
-the number you get when you issue the DAOPHOT command ``{\bf SKY}''. 
+the number you get when you issue the DAOPHOT command ``{\bf SKY}''.
 
-Note that the expectation value of $s$ scales as follows: 
+Note that the expectation value of $s$ scales as follows:
 
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
 \ ---------------------------------------+-------------------------------------
-\ If N frames were averaged              |  If N frames were summed        
+\ If N frames were averaged              |  If N frames were summed
 \ ---------------------------------------+-------------------------------------
 \                                        |
 \ s(N) = s(1)                            |  s(N) = N*s(1)
@@ -3137,7 +3137,7 @@ described above, multiplies it by the ``relative error'' factor, and
 sets the threshold at the multiple of this number which you have
 specified with the ``THRESHOLD'' option, say,
 
-$$\hbox{\rm Threshold} = 3.5 \times (\hbox{\rm relative error}) 
+$$\hbox{\rm Threshold} = 3.5 \times (\hbox{\rm relative error})
 \times (\hbox{\rm standard error in one pixel}) $$
 
 \noindent for 3.5-$\sigma$ detections.  (A +3.5-$\sigma$ excursion
@@ -3150,17 +3150,17 @@ was occupied by real stars, the false detections would be fewer.)
 \eject
 \noindent TO SUMMARIZE:
 
-\item{(1)} Ascertain the values of the readout noise (in electrons or 
-photons) and the number of photons per ADU for a {\it single frame} for the 
+\item{(1)} Ascertain the values of the readout noise (in electrons or
+photons) and the number of photons per ADU for a {\it single frame} for the
 detector you used.  Specify these as {\it options\/}.  {\bf FIND} will
 
-\item{(2)} compute the readout noise in ADU: 
+\item{(2)} compute the readout noise in ADU:
 
 $$
 R(\hbox{\rm 1 frame; ADU}) = {r(\hbox{\rm 1 frame; photons}) \over
 p(\hbox{\rm 1 frame; photons/ADU})};$$
 
-\item{(3)} correct the ratio of photons per ADU and the readout noise 
+\item{(3)} correct the ratio of photons per ADU and the readout noise
 (in ADU) for the number of frames that were averaged or summed:
 
 \bigskip
@@ -3169,7 +3169,7 @@ p(\hbox{\rm 1 frame; photons/ADU})};$$
 \               If N frames were averaged |  If N frames were summed
 \ ----------------------------------------+-----------------------------
 \                                         |
-\ photons/ADU   p(N) = N*p(1)             |  p(N) = p(1) 
+\ photons/ADU   p(N) = N*p(1)             |  p(N) = p(1)
 \                                         |
 \ r-o noise     R(N) = R(1)/SQRT(N)       |  R(N) = R(1)*SQRT(N)
 \                                         |
@@ -3178,15 +3178,15 @@ p(\hbox{\rm 1 frame; photons/ADU})};$$
 \bigskip
 
 \item{(4)} determine the typical sky brightness, $s$, in your data
-frame, by using the DAOPHOT command {\bf SKY}; 
+frame, by using the DAOPHOT command {\bf SKY};
 
-\item{(5)} compute the random error per pixel: 
-$$ \hbox{\rm random error in 1 pixel} = \sqrt{s/p_N + R_N^2};$$ 
+\item{(5)} compute the random error per pixel:
+$$ \hbox{\rm random error in 1 pixel} = \sqrt{s/p_N + R_N^2};$$
 
 \item{(6)} multiply by the relative error defined above to arrive at the
 random noise in the sky background of the {\it convolved\/} data frame:
 $$
-\hbox{\rm background noise} = (\hbox{\rm relative error}) \times 
+\hbox{\rm background noise} = (\hbox{\rm relative error}) \times
 (\hbox{\rm random error per pixel})
 $$
 
@@ -3244,7 +3244,7 @@ point-spread function stored in (the default should be fine).
 \itemitem{(a)} If you have the ``WATCH PROGRESS'' option equal to 1 or
 2, {\bf PSF} will produce on your terminal a gray-scale plot of each
 star and its environs, it will tell you the number of ADU in the
-brightest pixel within the area displayed, and then it will 
+brightest pixel within the area displayed, and then it will
 ask whether you wish to include this star in the point-spread
 function, to which you should answer ``Y'' or ``N'', as appropriate.
 
@@ -3273,14 +3273,14 @@ minutes of real time.  Please be patient (or submit it as a batch
 job and perform steps 1 -- 5 on your next frame while you wait).
 
 \item{(7)} After {\bf NSTAR} is finished, run {\bf SUBSTAR} to
-subtract the stars in the output file from your original picture.  
-This step is unnecessary if you used ALLSTAR. (And why didn't 
+subtract the stars in the output file from your original picture.
+This step is unnecessary if you used ALLSTAR. (And why didn't
 you?)
 
 \item{(8)} {\bf EXIT} from DAOPHOT and send this new picture to the
 image display. Examine each of the PSF stars and its environs.  Have
 all of the PSF stars subtracted out more or less cleanly, or should
-some of them be rejected from further use as PSF stars?  (If so, use 
+some of them be rejected from further use as PSF stars?  (If so, use
 a text editor to delete these stars from the .LST file.)  Have the
 neighbors mostly disappeared, or have they left behind big zits?  Have
 you uncovered any faint companions that {\bf FIND} missed?  If the
@@ -3311,7 +3311,7 @@ run {\bf SUBSTAR}, specifying the file created in step~6 or in step
 8(f) as the stars to subtract, and the stars in the .LST file as the
 stars to keep.  You have now created a new picture which has the PSF
 stars still in it, but from which the known neighbors of these PSF
-stars have been mostly removed.  If the PSF was made with 
+stars have been mostly removed.  If the PSF was made with
 ``VARIABLE PSF'' = --1, the neighbors are maybe only 90 or 95\%
 removed, but still that's a big gain.
 
@@ -3364,7 +3364,7 @@ which, in its most elaborate form, looks like this:
 ======================================================================
 \ NL   NX   NY  LOWBAD HIGHBAD  THRESH     AP1  PH/ADU  RNOISE    FRAD
 \  1  284  492   400.0 24000.0    20.0    3.00   20.00    6.50     2.0
-~~~~~~~~~~~~ 
+~~~~~~~~~~~~
 ======================================================================
 }
 \bigskip
@@ -3399,20 +3399,20 @@ optimizing parameter) which was in effect when the file was created.
 
 One other thing which the output data files have in common is the
 format of the first four numbers in the data for each star.  Always
-they are: 
+they are:
 
-\centerline{Star ID, X centroid, Y centroid, magnitude} 
+\centerline{Star ID, X centroid, Y centroid, magnitude}
 
-\noindent followed by other stuff, with format 
+\noindent followed by other stuff, with format
 
-\centerline{( 1X, I5, 3F9.3, nF9.? ) .} 
+\centerline{( 1X, I5, 3F9.3, nF9.? ) .}
 
 \noindent In the output from PHOTOMETRY, alone, this is followed by
-another data line per star. 
+another data line per star.
 
 In the pages that follow, a sample of each of the output formats is
 shown.  An example of the disk file that contains the numerical
-point-spread function is also provided. 
+point-spread function is also provided.
 \vfill
 \eject
 \centerline{Sample output from {\bf FIND} (a .COO file)}
@@ -3446,7 +3446,7 @@ point-spread function is also provided.
 \item{(2)} X coordinate of stellar centroid.
 \item{(3)} Y coordinate of stellar centroid.
 \item{(4)} Star's magnitude, measured in magnitudes relative to star-finding
-threshold (hence never positive, since stars fainter than the 
+threshold (hence never positive, since stars fainter than the
 threshold are rejected, obviously).
 \item{(5)} Sharpness index (see {\bf FIND} above).
 \item{(6)} Roundness index (see {\bf FIND} above).
@@ -3500,7 +3500,7 @@ threshold are rejected, obviously).
 \item{(1)} Star ID number.
 \item{(2)} X coordinate of stellar centroid, same as in .COO file.
 \item{(3)} Y coordinate of stellar centroid, same as in .COO file.
-\item{(4)} Star's magnitude in aperture 1, measured in magnitudes relative to 
+\item{(4)} Star's magnitude in aperture 1, measured in magnitudes relative to
 a zero-point of 1 star ADU = 25.0 mag.
 \item{(5)} Star's magnitude in aperture 2, ditto ditto.
 \item{(6)} Star's magnitude in aperture 3, ditto ditto.
@@ -3552,22 +3552,22 @@ aperture extends beyond the boundary of the frame.
 \item{(1)} Star ID number.
 \item{(2)} X coordinate of stellar centroid; a more accurate value than before.
 \item{(3)} Y coordinate of stellar centroid; a more accurate value than before.
-\item{(4)} Star's magnitude, measured in magnitudes relative to the magnitude 
+\item{(4)} Star's magnitude, measured in magnitudes relative to the magnitude
 of the PSF star (see discussion of .PSF file below).
 \item{(5)} Estimated standard error of the star's magnitude.
-\item{(6)} Estimated modal sky value for the star (from {\bf PHOTOMETRY}, 
+\item{(6)} Estimated modal sky value for the star (from {\bf PHOTOMETRY},
 see above).
 \item{(7)} Number of iterations required for the non-linear least-squares to
 converge.
-\item{(8)} CHI - a robust estimate of the ratio:  the observed pixel-to-pixel 
-scatter from the model image profile DIVIDED BY the expected 
+\item{(8)} CHI - a robust estimate of the ratio:  the observed pixel-to-pixel
+scatter from the model image profile DIVIDED BY the expected
 pixel-to-pixel scatter from the image profile.
-\item{(9)} SHARP:  another image quality diagnostic (see {\bf PEAK} 
-command above).  
-SHARP is most easily interpreted by plotting it as a function of apparent 
-magnitude.  Objects with SHARP significantly greater than zero are 
-probably galaxies or unrecognized doubles;  objects with SHARP 
-significantly less than zero are probably bad pixels or cosmic rays that 
+\item{(9)} SHARP:  another image quality diagnostic (see {\bf PEAK}
+command above).
+SHARP is most easily interpreted by plotting it as a function of apparent
+magnitude.  Objects with SHARP significantly greater than zero are
+probably galaxies or unrecognized doubles;  objects with SHARP
+significantly less than zero are probably bad pixels or cosmic rays that
 made it past {\bf FIND}.
 \vfill
 \eject
@@ -3575,12 +3575,12 @@ made it past {\bf FIND}.
 \bigskip
 {\noindent\obeylines\obeyspaces\frenchspacing\tt\baselineskip=0.3truecm
 
-\  (1)      (2)   (3)  (4)  (5)   (6)           (7)        (8)      (9)     
+\  (1)      (2)   (3)  (4)  (5)   (6)           (7)        (8)      (9)
        (10)         (11)         (12)          (13)
     (14)...
 ============================================================================
 \ PENNY1     51    4    3    0   12.033      33419.105    158.5    255.0
-\   1.02691E+00  1.06132E+00  7.23460E-01  1.44567E-01 
+\   1.02691E+00  1.06132E+00  7.23460E-01  1.44567E-01
 \  1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02
 \  1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02
 \  1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02 1.348391E-02
@@ -3607,9 +3607,9 @@ made it past {\bf FIND}.
 \item{(1)}  An alphanumeric string uniquely defining the module used to define
 the analytic first approximation to the PSF.
 
-\item{(2)} Size of the array containing the PSF look-up table.  Values are 
+\item{(2)} Size of the array containing the PSF look-up table.  Values are
 tabulated at half-pixel intervals in a square array which extends
-somewhat beyond the user-specified PSF radius:  
+somewhat beyond the user-specified PSF radius:
 $N = 2(2\cdot\hbox{\rm radius}+1)+1$. Here the PSF radius was 12.
 
 \item{(3)} The number of shape parameters in the analytic function.
@@ -3622,7 +3622,7 @@ varying PSF was used.
 \item{(6)} The instrumental magnitude corresponding to the point-spread
 function of unit normalization.
 
-\item{(7)} Central height, in ADU, of the analytic function which is used as 
+\item{(7)} Central height, in ADU, of the analytic function which is used as
 the first-order approximation to the point-spread function in the stellar core.
 
 \item{(8),(9)} X and Y coordinates of the center of the frame (used for

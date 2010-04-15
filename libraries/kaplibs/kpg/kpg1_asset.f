@@ -13,33 +13,33 @@
 *     CALL KPG1_ASSET( APP, PARAM, IOBJ, STATUS )
 
 *  Description:
-*     This routine allows the user to set attributes for an AST Object (see 
+*     This routine allows the user to set attributes for an AST Object (see
 *     SUN/210). The value to which an attribute is set in the returned
 *     Object is determined as follows:
 *
 *     -  If the user supplies a value for the attribute using the given
-*     parameter, then the Object is returned with the attribute set to the 
-*     supplied value. The user supplies the attribute values as a GRP 
+*     parameter, then the Object is returned with the attribute set to the
+*     supplied value. The user supplies the attribute values as a GRP
 *     group expression in which each element is an AST attribute setting.
 *
-*     -  Otherwise, if the Object already had an explicit value set for the 
+*     -  Otherwise, if the Object already had an explicit value set for the
 *     attribute on entry (i.e. if AST_TEST returns .TRUE. for the
 *     attribute), then the value is unchanged on exit.
 *
 *     -  Otherwise, a search is made for a default value for the attribute
 *     using the search path described below. If a default value is found
-*     for the attribute then the Object is returned with the attribute set 
+*     for the attribute then the Object is returned with the attribute set
 *     to the default value. The use of these defaults can be suppressed
 *     by including the string "CLEAR" as the first element in the group of
 *     attribute values supplied for the specified environment parameter.
 *
-*     Defaults are specified as a group of attribute setting strings within a 
-*     "defaults" text file. This file is found using the following search 
+*     Defaults are specified as a group of attribute setting strings within a
+*     "defaults" text file. This file is found using the following search
 *     path:
 *
-*     1) If the environment variable <APP>_<PARAM> is defined (<APP> and 
-*     <PARAM> in upper case), its value is taken to be the full path to 
-*     the defaults file. 
+*     1) If the environment variable <APP>_<PARAM> is defined (<APP> and
+*     <PARAM> in upper case), its value is taken to be the full path to
+*     the defaults file.
 *
 *     2) If <APP>_<PARAM> is not defined, the file $HOME/<app>_<param>.def
 *     is used (<app> and <param> in lower case).
@@ -48,8 +48,8 @@
 *     $KAPPA_DIR/<app>_<param>.def is used.
 *
 *     4) If the file $KAPPA_DIR/<app>_<param>.def cannot be accessed, the
-*     value of environment variable KAPPA_<PARAM> is taken to be the full 
-*     path to the defaults file. 
+*     value of environment variable KAPPA_<PARAM> is taken to be the full
+*     path to the defaults file.
 *
 *     5) If KAPPA_<PARAM> is not defined, the file $HOME/kappa_<param>.def
 *     is used.
@@ -57,16 +57,16 @@
 *     6) If the file $HOME/kappa_<param>.def cannot be accessed, the file
 *     $KAPPA_DIR/kappa_<param>.def is used.
 *
-*     Each attribute setting within a group of settings should be of the 
-*     form "<name>=<value>", where <name> is taken to be the name of a 
-*     Object attribute (or synonym set by KPG1_ASPSY), and <value> is taken 
-*     to be the value to assign to the attribute. These attributes are 
+*     Each attribute setting within a group of settings should be of the
+*     form "<name>=<value>", where <name> is taken to be the name of a
+*     Object attribute (or synonym set by KPG1_ASPSY), and <value> is taken
+*     to be the value to assign to the attribute. These attributes are
 *     described in SUN/210. No error is reported if unrecognised attribute
 *     names or illegal attribute values are specified.
 *
-*     Before being used, the attribute settings are edited to replace any 
-*     synonyms by their corresponding AST attribute names established by 
-*     earlier calls to KPG1_ASPSY. Colour names are also replaced by 
+*     Before being used, the attribute settings are edited to replace any
+*     synonyms by their corresponding AST attribute names established by
+*     earlier calls to KPG1_ASPSY. Colour names are also replaced by
 *     corresponding PGPLOT colour indices.
 *
 *  Arguments:
@@ -85,7 +85,7 @@
 *     -  Colour attribute values may be supplied in any form recognised
 *     by KPG1_PGCOL (eg colour name, MIN, MAX, integer index, etc), and
 *     the nearest colour in the current KAPPA pallette is used.
-*     -  If a null value is supplied for the parameter, the error is 
+*     -  If a null value is supplied for the parameter, the error is
 *     annulled and the Object is returned unchanged (except for any
 *     defaults obtained using the usual search path).
 
@@ -99,12 +99,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -118,7 +118,7 @@
 *     12-AUG-1998 (DSB):
 *        Original version.
 *     14-OCT-1999 (DSB):
-*        Added options for different defaults to be specified for each 
+*        Added options for different defaults to be specified for each
 *        application (items 1, 2 and 3 in the above defaults search path).
 *        Changed the final default from $KAPPA_DIR/<param>.def to
 *        $KAPPA_DIR/kappa_<param>/def to be consistent with the other
@@ -137,7 +137,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,8 +145,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
-      INCLUDE 'PSX_ERR'          ! PSX error constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Arguments Given:
       CHARACTER APP*(*)
@@ -180,7 +180,7 @@
       LOGICAL VERB               ! Issue warnings about bad attributes?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Save the class of the supplied Object. Use "AST Object" if an error
@@ -189,7 +189,7 @@
       IF( STATUS .NE. SAI__OK ) CLASS = 'AST Object'
 
 *  If the Object is a Plot, reset KAPPA pseudo-attributes to default
-*  values. Do not do this if overlaying a temporary style onto of a 
+*  values. Do not do this if overlaying a temporary style onto of a
 *  previously defined style.
       IF( CLASS .EQ. 'Plot' .AND. PARAM .NE. 'TEMPSTYLE' ) THEN
          CALL GRF_SETTBG( 0 )
@@ -228,7 +228,7 @@
          CALL GRP_GET( IGRP1, 1, 1, TEXT, STATUS )
          CALL CHR_RMBLK( TEXT )
          CALL CHR_UCASE( TEXT )
-         CLEAR = ( TEXT .EQ. 'CLEAR' ) 
+         CLEAR = ( TEXT .EQ. 'CLEAR' )
          IF( CLEAR ) ISTART = 2
       END IF
 
@@ -268,7 +268,7 @@
                LEXP = 1
                CALL CHR_APPND( DFILE, GRPEXP, LEXP )
                CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
-     :                         DSIZE, ADDED, FLAG, STATUS ) 
+     :                         DSIZE, ADDED, FLAG, STATUS )
 
 *  Annul or flush (if verbose) the error if the file could not be read.
                IF( STATUS .NE. SAI__OK ) THEN
@@ -282,7 +282,7 @@
 
             END IF
 
-*  If the environment variable <APP>_<PARAM> was not defined, annul the 
+*  If the environment variable <APP>_<PARAM> was not defined, annul the
 *  error, and attempt to read defaults from the file $HOME/<app>_<param>.def
          ELSE IF( STATUS .EQ. PSX__NOENV ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -292,7 +292,7 @@
             CALL CHR_APPND( '.def', TEXT, IAT )
 
 *  Get the full file path.
-            CALL KPG1_FLPTH( 'HOME', TEXT( : IAT ), DFILE, LEXP, 
+            CALL KPG1_FLPTH( 'HOME', TEXT( : IAT ), DFILE, LEXP,
      :                       STATUS )
 
 *  Attempt to read the contents of the file into the group.
@@ -300,7 +300,7 @@
             LEXP = 1
             CALL CHR_APPND( DFILE, GRPEXP, LEXP )
             CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
-     :                         DSIZE, ADDED, FLAG, STATUS ) 
+     :                         DSIZE, ADDED, FLAG, STATUS )
 
 *  Annul or flush (if verbose) the error if the file could not be read.
             IF( STATUS .NE. SAI__OK ) THEN
@@ -312,7 +312,7 @@
                DSIZE = 0
 
 *  Next, try to use $KAPPA_DIR/<app>_<param>.def. Get the full file path.
-               CALL KPG1_FLPTH( 'KAPPA_DIR', TEXT( : IAT ), DFILE, 
+               CALL KPG1_FLPTH( 'KAPPA_DIR', TEXT( : IAT ), DFILE,
      :                          LEXP, STATUS )
 
 *  Attempt to read the contents of the file into the group.
@@ -320,7 +320,7 @@
                LEXP = 1
                CALL CHR_APPND( DFILE, GRPEXP, LEXP )
                CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
-     :                         DSIZE, ADDED, FLAG, STATUS ) 
+     :                         DSIZE, ADDED, FLAG, STATUS )
 
 *  Annul or flush (if verbose) the error if the file could not be read.
                IF( STATUS .NE. SAI__OK ) THEN
@@ -345,8 +345,8 @@
                         GRPEXP = '^'
                         LEXP = 1
                         CALL CHR_APPND( DFILE, GRPEXP, LEXP )
-                        CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, 
-     :                               IGRP2, DSIZE, ADDED, FLAG, STATUS ) 
+                        CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID,
+     :                               IGRP2, DSIZE, ADDED, FLAG, STATUS )
 
 *  Annul or flush (if verbose) the error if the file could not be read.
                         IF( STATUS .NE. SAI__OK ) THEN
@@ -357,10 +357,10 @@
                            END IF
                            DSIZE = 0
                         END IF
-         
+
                      END IF
 
-*  If the environment variable KAPPA_<PARAM> was not defined, annul the 
+*  If the environment variable KAPPA_<PARAM> was not defined, annul the
 *  error, and attempt to read defaults from the file $HOME/kappa_<param>.def
                   ELSE IF( STATUS .EQ. PSX__NOENV ) THEN
                      CALL ERR_ANNUL( STATUS )
@@ -378,7 +378,7 @@
                      LEXP = 1
                      CALL CHR_APPND( DFILE, GRPEXP, LEXP )
                      CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
-     :                               DSIZE, ADDED, FLAG, STATUS ) 
+     :                               DSIZE, ADDED, FLAG, STATUS )
 
 *  Annul or flush (if verbose) the error if the file could not be read.
                      IF( STATUS .NE. SAI__OK ) THEN
@@ -390,15 +390,15 @@
                         DSIZE = 0
 
 *  Next, try to use $KAPPA_DIR/kappa_<param>.def. Get the full file path.
-                        CALL KPG1_FLPTH( 'KAPPA_DIR', TEXT( : IAT ), 
+                        CALL KPG1_FLPTH( 'KAPPA_DIR', TEXT( : IAT ),
      :                                   DFILE, LEXP, STATUS )
 
 *  Attempt to read the contents of the file into the group.
                         GRPEXP = '^'
                         LEXP = 1
                         CALL CHR_APPND( DFILE, GRPEXP, LEXP )
-                        CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, 
-     :                               IGRP2, DSIZE, ADDED, FLAG, STATUS ) 
+                        CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID,
+     :                               IGRP2, DSIZE, ADDED, FLAG, STATUS )
 
 *  Annul or flush (if verbose) the error if the file could not be read.
                         IF( STATUS .NE. SAI__OK ) THEN
@@ -410,14 +410,14 @@
                            DSIZE = 0
 
                         END IF
-         
-                     END IF                                    
-         
+
+                     END IF
+
                   END IF
 
                END IF
 
-            END IF                                    
+            END IF
 
          END IF
 
@@ -435,17 +435,17 @@
                   CALL MSG_OUT( 'KPG1_ASSET_MSG2', '  ^S', STATUS )
                END IF
 
-*  Apply it to the Object. Do not over-write any existing attribute values. 
-*  Do not report an error (unless in verbose mode) if the setting cannot be 
-*  used, since it may be a synonym used by another application. 
-               CALL KPG1_ASSTS( TEXT, VERB, .FALSE., IOBJ2, BADAT, 
+*  Apply it to the Object. Do not over-write any existing attribute values.
+*  Do not report an error (unless in verbose mode) if the setting cannot be
+*  used, since it may be a synonym used by another application.
+               CALL KPG1_ASSTS( TEXT, VERB, .FALSE., IOBJ2, BADAT,
      :                          STATUS )
 
 *  Flush any errors reported in verbose mode about bad attributes.
                IF( VERB .AND. BADAT .AND. STATUS .NE. SAI__OK ) THEN
                   CALL ERR_FLUSH( STATUS )
                END IF
-   
+
             END DO
 
          END IF
@@ -473,9 +473,9 @@
             END IF
 
 *  Apply it to the Object, over-writing any existing attribute value. Do not
-*  report an error (unless in verbose mode) if the setting cannot be used, 
-*  since it may be a synonym used by another application. 
-            CALL KPG1_ASSTS( TEXT, VERB, .TRUE., IOBJ2, BADAT, 
+*  report an error (unless in verbose mode) if the setting cannot be used,
+*  since it may be a synonym used by another application.
+            CALL KPG1_ASSTS( TEXT, VERB, .TRUE., IOBJ2, BADAT,
      :                       STATUS )
 
 *  Flush any errors reported in verbose mode about bad attributes.
@@ -491,7 +491,7 @@
 *  ========
  999  CONTINUE
 
-*  If all has gone well, and the Object has been changed, annul the supplied 
+*  If all has gone well, and the Object has been changed, annul the supplied
 *  Object and return the modified one.
       IF( STATUS .EQ. SAI__OK .AND. CHNGED ) THEN
          CALL AST_ANNUL( IOBJ, STATUS )
@@ -517,7 +517,7 @@
             CALL MSG_SETC( 'ART', 'an' )
          ELSE
             CALL MSG_SETC( 'ART', 'a' )
-         END IF         
+         END IF
 
          CALL ERR_REP( 'KPG1_ASSET_3', 'Aborted attempt to set the '//
      :                 'attributes of ^ART ^CLASS using parameter '//
@@ -532,7 +532,7 @@
             CALL MSG_SETC( 'ART', 'an' )
          ELSE
             CALL MSG_SETC( 'ART', 'a' )
-         END IF         
+         END IF
 
          CALL ERR_REP( 'KPG1_ASSET_3', 'Failed to set the '//
      :                 'attributes of ^ART ^CLASS using parameter '//

@@ -128,7 +128,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -296,37 +296,37 @@
 *  Call a routine to read the data from the direct-access unformatted
 *  file.  The selected routine depending on the data type of the array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CON_IUDAB( FD, EL, NUMPRE, 0, 
+         CALL CON_IUDAB( FD, EL, NUMPRE, 0,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_IUDAD( FD, EL, NUMPRE, 0, 
+         CALL CON_IUDAD( FD, EL, NUMPRE, 0,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_IUDAI( FD, EL, NUMPRE, 0, 
+         CALL CON_IUDAI( FD, EL, NUMPRE, 0,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CON_IUDAR( FD, EL, NUMPRE, 0, 
+         CALL CON_IUDAR( FD, EL, NUMPRE, 0,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CON_IUDAUB( FD, EL, NUMPRE, 0, 
+         CALL CON_IUDAUB( FD, EL, NUMPRE, 0,
      :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CON_IUDAUW( FD, EL, NUMPRE, 0, 
+         CALL CON_IUDAUW( FD, EL, NUMPRE, 0,
      :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CON_IUDAW( FD, EL, NUMPRE, 0, 
+         CALL CON_IUDAW( FD, EL, NUMPRE, 0,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
@@ -336,7 +336,7 @@
       CALL FIO_CLOSE( FD, STATUS )
 
 *  End the NDF context.
-  980 CONTINUE  
+  980 CONTINUE
       CALL NDF_END( STATUS )
 
   999 CONTINUE

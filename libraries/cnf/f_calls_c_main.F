@@ -129,7 +129,7 @@
 #else
       PTR = CNF_PREG( LOC( CA ), ISNEW )
 #endif
-      CALL TC2( %VAL( CNF_PVAL( PTR ) ), NC, LINE, 
+      CALL TC2( %VAL( CNF_PVAL( PTR ) ), NC, LINE,
      :          %VAL( CNF_CVAL( 10 ) ), %VAL( CNF_CVAL( 40 ) ) )
       PRINT '(A,A)',
      :   'The built up character string is: ', LINE

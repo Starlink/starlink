@@ -1,7 +1,7 @@
       SUBROUTINE SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
      :     OUT_UNITS, MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
      :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH,
-     :     FILTER, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
+     :     FILTER, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW,
      :     WPLATE, ANGROT, TELESCOPE, INSTRUMENT, FITSCHANM, OUTWCS,
      :     STATUS)
 *+
@@ -13,12 +13,12 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
 *    :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
 *    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH
-*    :     FILTER, WRITE_CHOP, CHOP_PA, CHOP_THROW, WPLATE, ANGROT, 
+*    :     FILTER, WRITE_CHOP, CHOP_PA, CHOP_THROW, WPLATE, ANGROT,
 *    :     TELESCOPE, INSTRUMENT, FITSCHAN, OUTWCS, STATUS )
 
 *  Description:
@@ -28,7 +28,7 @@
 *     Keywords CRVAL, CRPIX and CTYPE are used here to generate the
 *     WCS only.
 
- 
+
 *  Arguments:
 *     OUT_NDF = INTEGER (Given)
 *        NDF identifier of output file
@@ -86,7 +86,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
-*  
+*
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
@@ -142,7 +142,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -237,7 +237,7 @@
       CHARACTER*5      RADECSYS ! Type of coordinate system
       DOUBLE PRECISION RDEPOCH  ! Julian epoch of given MJD
       CHARACTER * (80) XLAB     ! X axis label
-      CHARACTER * (80) YLAB     ! Y axis label 
+      CHARACTER * (80) YLAB     ! Y axis label
 
 *  Local Data:
       DATA RETAINFITS / 'DATE-OBS', 'OBSGEO-X', 'OBSGEO-Y',
@@ -324,7 +324,7 @@
          ELSE IF (OUT_COORDS .EQ. 'RD') THEN
 
 *     Calculate current epoch
-            RDEPOCH = SLA_EPJ (MJD_STANDARD) 
+            RDEPOCH = SLA_EPJ (MJD_STANDARD)
             SCS = 'EQUATORIAL(J'
             CALL CHR_RTOC(REAL(RDEPOCH), STEMP, ITEMP)
             CALL CHR_APPND(STEMP, SCS, CHR_LEN(SCS))
@@ -361,7 +361,7 @@
       N_FITS = 0
 
 *     Dont store OBJECT - NDF Title takes priority
-*      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+*      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
 *     :     'OBJECT', OUT_TITLE, 'name of object', STATUS)
 
       DO I = 1, NFILE
@@ -381,17 +381,17 @@
       IF (USEWCS) THEN
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'SYSTEM', SCS, 'sky coordinate system', STATUS)
-         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :        'LONG', OUT_LONG, '[rad] centre longitude', 
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'LONG', OUT_LONG, '[rad] centre longitude',
      :        STATUS)
-         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'LAT', OUT_LAT, '[rad] centre latitude', STATUS)
-         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'EPOCH', OUT_EPOCH, 'epoch of map', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS,FITS,
-     :        'EQUINOX', OUT_EPOCH, 
+     :        'EQUINOX', OUT_EPOCH,
      :        'epoch of mean equator and equinox', STATUS)
-         
+
       END IF
 
 *     Position of the telescope in standard form. Hardwire location.
@@ -406,13 +406,13 @@
       END IF
 
 
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'MJD-OBS', MJD_STANDARD, 'MJD of first observation', 
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MJD-OBS', MJD_STANDARD, 'MJD of first observation',
      :     STATUS)
 
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'TELESCOP', TELESCOPE, 'name of telescope', STATUS)
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'INSTRUME', INSTRUMENT, 'name of instrument', STATUS)
 
 *     Store the wavelength (in metres) and frequency (in Hz)
@@ -440,12 +440,12 @@
 
       IF (ANGROT .NE. VAL__BADR) THEN
          CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'ANGROT', DBLE(ANGROT), 
+     :        'ANGROT', DBLE(ANGROT),
      :        '[deg] Angle between X-pixel axis and wplate 0', STATUS)
       END IF
       IF (WPLATE .NE. VAL__BADR) THEN
          CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'WPLATE', DBLE(WPLATE), 
+     :        'WPLATE', DBLE(WPLATE),
      :        '[deg] Wave-plate P.A. (anti-clockwise)',
      :        STATUS)
       END IF
@@ -453,7 +453,7 @@
 *     Store SCUBA projection name
 
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SCUPROJ',OUT_COORDS, 'SCUBA output coordinate system', 
+     :     'SCUPROJ',OUT_COORDS, 'SCUBA output coordinate system',
      :     STATUS)
 
 *     Pixel size as chosen in REBIN (arcsec)
@@ -461,20 +461,20 @@
       RTEMP = OUT_PIXEL * REAL(R2AS) ! Generate rounding errors
 
       CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SCUPIXSZ', DBLE(RTEMP), 
+     :     'SCUPIXSZ', DBLE(RTEMP),
      :     '[arcsec] Pixel size', STATUS)
 
 *     Store the chop information
 
       IF (WRITE_CHOP) THEN
          CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CHOP_CRD',CHOP_CRD, 'Coordinate system of chop', 
+     :        'CHOP_CRD',CHOP_CRD, 'Coordinate system of chop',
      :        STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CHOP_PA', DBLE(CHOP_PA), 
+     :        'CHOP_PA', DBLE(CHOP_PA),
      :        '[deg] Position angle of chop', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CHOP_THR', DBLE(CHOP_THROW), 
+     :        'CHOP_THR', DBLE(CHOP_THROW),
      :        '[arcsec] Size of chop throw', STATUS)
       END IF
 
@@ -482,8 +482,8 @@
 
       CALL SCULIB_MJD_TO_DATEOBS( MJD_STANDARD, DATEOBS, STATUS)
 
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'DATE-OBS', DATEOBS, 'Date of first observation', 
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'DATE-OBS', DATEOBS, 'Date of first observation',
      :     STATUS)
 
 *     Put in a DATE field (the date the file was written)
@@ -492,7 +492,7 @@
 *        post-1999 FITS format since we cant go back in time!
       CALL PSX_TIME( NTICKS, STATUS )   ! Time in seconds
       CALL PSX_GMTIME( NTICKS, TARRAY(1), TARRAY(2), TARRAY(3),
-     :     TARRAY(4), TARRAY(5), TARRAY(6), TARRAY(7), TARRAY(8), 
+     :     TARRAY(4), TARRAY(5), TARRAY(6), TARRAY(7), TARRAY(8),
      :     ITEMP, STATUS )
 
       TARRAY(6) = TARRAY(6) + 1900 ! 4 digit year
@@ -503,13 +503,13 @@
       DATEOBS = ' ' ! reset the string
       WRITE (DATEOBS, '(I4.4,''-'',I2.2,''-'',I2.2,''T'',
      :     I2.2,'':'',I2.2,'':'',I2.2)')
-     :     TARRAY(6), TARRAY(5), TARRAY(4), TARRAY(3), TARRAY(2), 
+     :     TARRAY(6), TARRAY(5), TARRAY(4), TARRAY(3), TARRAY(2),
      :     TARRAY(1)
 
 *     Write to the fits array
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'DATE', DATEOBS, 
-     :     'file creation date (YYYY-MM-DDThh:mm:ss UTC)', 
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'DATE', DATEOBS,
+     :     'file creation date (YYYY-MM-DDThh:mm:ss UTC)',
      :     STATUS)
 
 
@@ -527,13 +527,13 @@
          OBSRA = OUT_LONG * 180.0D0 / PI
          OBSDEC= OUT_LAT  * 180.0D0 / PI
          FITS_OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
-         
+
          IF (OUT_COORDS.NE.'GA') THEN
-            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :           'OBSRA',OBSRA,
      :           '[deg] RA of map centre (deprecated)', STATUS)
-            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 
-     :           'OBSDEC', OBSDEC, 
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS,
+     :           'OBSDEC', OBSDEC,
      :           '[deg] Dec. of map centre (deprecated)',
      :           STATUS)
          END IF
@@ -541,32 +541,32 @@
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CTYPE1', CTYPE1,'TAN projection used', STATUS)
          CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CRPIX1', I_CENTRE, 'I of centre (ref) pixel', 
+     :        'CRPIX1', I_CENTRE, 'I of centre (ref) pixel',
      :        STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CRVAL1', OBSRA, '[deg] Map centre', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CDELT1',DBLE(-FITS_OUT_PIXEL), 
+     :        'CDELT1',DBLE(-FITS_OUT_PIXEL),
      :        '[deg] increment per pixel',
      :        STATUS)
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CUNIT1', 'deg','physical units of axis 1', STATUS)
-         
+
 
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CTYPE2', CTYPE2,'TAN projection used', STATUS)
          CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CRPIX2', J_CENTRE, 'J of centre (ref) pixel', 
+     :        'CRPIX2', J_CENTRE, 'J of centre (ref) pixel',
      :        STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CRVAL2', OBSDEC, '[deg] Map centre', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CDELT2', DBLE(FITS_OUT_PIXEL), 
+     :        'CDELT2', DBLE(FITS_OUT_PIXEL),
      :        '[deg] increment per pixel',
      :        STATUS)
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CUNIT2','deg','physical units of axis 2', STATUS)
-         
+
       ELSE IF (OUT_COORDS .EQ. 'PL') THEN
 *     We should still write out tangent plane
 
@@ -583,7 +583,7 @@
 *     Create a new fitschan from the crruently modified FITS cards array
       FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS)
       DO ICARD = 1, N_FITS
-         CALL AST_PUTFITS( FITSCHAN, FITS( ICARD ), .FALSE., 
+         CALL AST_PUTFITS( FITSCHAN, FITS( ICARD ), .FALSE.,
      :        STATUS )
       END DO
 
@@ -605,7 +605,7 @@
                CALL AST_RETAINFITS( FITSCHAN, STATUS )
             END IF
          END DO
-         
+
 *     Rewind the FitsChan and read WCS information from it.
          CALL AST_CLEAR( FITSCHAN, 'Card', STATUS )
          OUTWCS = AST_READ( FITSCHAN, STATUS )
@@ -613,7 +613,7 @@
 *     Set the base frame to be GRID
          FRAME = AST_GETFRAME( OUTWCS, AST__BASE, STATUS )
          CALL AST_SETC( FRAME, 'Domain', 'GRID', STATUS )
-         
+
 *     Write the channel to the NDF
          CALL NDF_PTWCS( OUTWCS, OUT_NDF, STATUS )
 
@@ -642,8 +642,8 @@
 
 *     write out the FITS extension
 
-      NDIM =1 
-      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', NDIM, N_FITS, 
+      NDIM =1
+      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', NDIM, N_FITS,
      :     OUT_FITSX_LOC, STATUS)
       CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
       CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)

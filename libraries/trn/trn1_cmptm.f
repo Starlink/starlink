@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -308,11 +308,11 @@
 *   variable names and determines if the transformation is defined.
       CALL TRN1_CLVAR( NVIN, %VAL( CNF_PVAL( IPI ) ),
      :                 %VAL( CNF_PVAL( IPVAR ) ), STATUS,
-     :                 %VAL( CNF_CVAL( LENI ) ), 
+     :                 %VAL( CNF_CVAL( LENI ) ),
      :                 %VAL( CNF_CVAL( LENI ) ) )
       CALL TRN1_CLEXP( NVOUT, %VAL( CNF_PVAL( IPF ) ),
      :                 %VAL( CNF_PVAL( IPEXP ) ), DEF, STATUS,
-     :                 %VAL( CNF_CVAL( LENF ) ), 
+     :                 %VAL( CNF_CVAL( LENF ) ),
      :                 %VAL( CNF_CVAL( LENF ) ) )
 
 *   Annul (and unmap) the function definition arrays.
@@ -350,7 +350,7 @@
      :                   LENF, .FALSE., 1, 1,
      :                   DUMMYI, NCODE, DUMMYD, NCON,
      :                   MXWRK, IERR, %VAL( CNF_PVAL( IPWRK ) ), STATUS,
-     :                   %VAL( CNF_CVAL( LENF ) ), 
+     :                   %VAL( CNF_CVAL( LENF ) ),
      :                   %VAL( CNF_CVAL( LENI ) ) )
 
 *   If there was a compilation error, make a further error report citing
@@ -413,7 +413,7 @@
      :                 %VAL( CNF_PVAL( INDEX( TRN_IN_CODE ) ) ), ICODE,
      :                 %VAL( CNF_PVAL( INDEX( TRN_IN_CONST ) ) ), ICON,
      :                 MXWRK, IERR, %VAL( CNF_PVAL( IPWRK ) ), STATUS,
-     :                 %VAL( CNF_CVAL( LENF ) ), 
+     :                 %VAL( CNF_CVAL( LENF ) ),
      :                 %VAL( CNF_CVAL( LENI ) ) )
 
 *   If an error was detected, attempt to delete any parts of the

@@ -8,7 +8,7 @@ $RCSID = '$Id$';
 #
 # The DTD parsing is done by Earl Hood's perlSGML package
 # (http://www.oac.uci.edu/indiv/ehood/perlSGML.html).
-#    
+#
 # A _much_ nicer way to do this whole thing would be to root around in a
 # document's property set.  Unfortunately, Jade doesn't support the
 # modules which are necessary (module "prolog sgml document string"

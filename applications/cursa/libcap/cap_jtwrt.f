@@ -126,12 +126,12 @@
      :  FISOUT(SCOLS),
      :  SEPNI
       INTEGER
-     :  PMLTI, 
+     :  PMLTI,
      :  SMLTI,
      :  OPAIR,
      :  OPRMPR(OPAIR),
      :  OSECPR(OPAIR),
-     :  OPMULT(OPAIR),      
+     :  OPMULT(OPAIR),
      :  OSMULT(OPAIR)
       DOUBLE PRECISION
      :  OSEPN(OPAIR)
@@ -180,7 +180,7 @@
 
 *
 *             For the current paired row check if there is a
-*             corresponding secondary row.  If not then write null 
+*             corresponding secondary row.  If not then write null
 *             values to the fields in the output catalogue.  Note that
 *             this check is made first in order to avoid overwriting
 *             any values from the primary with nulls in the case where
@@ -194,7 +194,7 @@
 *
 *             For the current paired row in the list check if there is
 *             a corresponding primary row.  If so then read this row and
-*             copy the fields to the output catalogue.  Otherwise copy 
+*             copy the fields to the output catalogue.  Otherwise copy
 *             null values to the appropriate fields in the output
 *             catalogue.
 
@@ -210,7 +210,7 @@
 
 *
 *             Finally, check if there is a corresponding secondary
-*             row.  If so then read this row and copy the fields to the 
+*             row.  If so then read this row and copy the fields to the
 *             output catalogue.  Note that in the case where there are
 *             rows in both the primary and secondary and fields from the
 *             catalogues are being written to a single column in the

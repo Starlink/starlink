@@ -30,7 +30,7 @@
 *     and a suitable scale for the histogram is
 *     calculated. Each element of the image region
 *     is transformed to determine the appropriate
-*     bin that it belongs to. A bin is incremented 
+*     bin that it belongs to. A bin is incremented
 *     each time an element is found to belong to it.
 *    Authors :
 *     S.Chan (RGVAD::KFH)

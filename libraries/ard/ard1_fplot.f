@@ -13,7 +13,7 @@
 *     CALL ARD1_FPLOT( SZEXPR, EXPR, SZOPND, OPND, OK, STATUS )
 
 *  Description:
-*     This routine plots the ARD description described in the expression 
+*     This routine plots the ARD description described in the expression
 *     array EXPR, if and only if the ARD expression consists of a single
 *     "Load Keyword" instruction (i.e. a single region). A fast (ish)
 *     algorithm is used which does not involve evaluating a pixel mask.
@@ -31,20 +31,20 @@
 *        fields are represented by a "Load Keyword Region" (LKR)
 *        instruction which causes the expression evaluator to load a
 *        mask defined by the keyword. The parameters which describe
-*        such keywords are stored in the OPND array. The index within the 
-*        OPND array at which the keyword description starts is stored as an 
-*        argument for the LKR instruction. An "End Expression" instruction 
-*        is inserted at the end of the ARD description. 
+*        such keywords are stored in the OPND array. The index within the
+*        OPND array at which the keyword description starts is stored as an
+*        argument for the LKR instruction. An "End Expression" instruction
+*        is inserted at the end of the ARD description.
 *     SZOPND = INTEGER (Given)
 *        The size of the OPND array.
 *     OPND( SZPND ) = DOUBLE PRECISION (Given)
 *        Holds information about all the operands (i.e. keywords)
 *        used within the logical expression representing the ARD
-*        description. Each operand is defined by a variable length block 
-*        of values (see ARD1_FPLOT prologue for details). Checks are made on 
+*        description. Each operand is defined by a variable length block
+*        of values (see ARD1_FPLOT prologue for details). Checks are made on
 *        the validity of the keyword argument lists.
 *     OK = LOGICAL (Returned)
-*        Returned .TRUE if the ARD description was plotted, and .FALSE. 
+*        Returned .TRUE if the ARD description was plotted, and .FALSE.
 *        otherwise.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,13 +138,13 @@
       INTEGER IBASE              ! Index of original Base Frame
       INTEGER IMAP               ! AST IntraMap identifier
       INTEGER IOPND              ! Next free entry in operands array
-      INTEGER IPAR               ! Index of first region parameters 
+      INTEGER IPAR               ! Index of first region parameters
       INTEGER IPPAR              ! Pointer to memory holding parameters
       INTEGER LASTOP             ! Index of last used operand value
       INTEGER NPAR               ! No. of region parameters
       INTEGER OTYPE              ! Original region type
       INTEGER TYPE               ! Region type
-      
+
 *  Make DAST and IAST share the same memory so that we can interpret
 *  the real operand value as an integer identifier.
       EQUIVALENCE ( IAST, DAST )
@@ -153,11 +153,11 @@
 
 *  Initialise returned values.
       OK = .FALSE.
-     
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  To be usable, the EXPR array should have at least 3 elements. The first 
+*  To be usable, the EXPR array should have at least 3 elements. The first
 *  should be an LKR instruction. the second will then be an index into the OPND
 *  array, and the third should be an "End expression" instruction.
       IF( SZEXPR .GE. 3 .AND. EXPR( 1 ) .EQ. ARD__LKR .AND.
@@ -200,8 +200,8 @@
                IBASE = AST_GETI( IAST( 1 ), 'BASE', STATUS )
                DO I = 1, AST_GETI( IAST( 1 ), 'NFRAME', STATUS )
                   FR = AST_GETFRAME( IAST( 1 ), I, STATUS )
-                  IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ. 
-     :                'GRAPHICS' ) CALL AST_SETI( IAST( I ), 'BASE', I, 
+                  IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ.
+     :                'GRAPHICS' ) CALL AST_SETI( IAST( I ), 'BASE', I,
      :                                            STATUS )
                   CALL AST_ANNUL( FR, STATUS )
                END DO
@@ -235,7 +235,7 @@
      :                     STATUS )
 
             CALL MSG_SETI( 'OPSIZ', SZOPND )
-            CALL ERR_REP( 'ARD1_FPLOT_ERR6', 'Stack size: ^OPSIZ', 
+            CALL ERR_REP( 'ARD1_FPLOT_ERR6', 'Stack size: ^OPSIZ',
      :                     STATUS )
 
          END IF
@@ -249,40 +249,40 @@
 *  Convert RECT regions into BOX regions.
          IF( TYPE .EQ. ARD__REC ) THEN
             DO I = 1, 2
-               HW = 0.5*AST_AXDISTANCE( CFRM, I, OPND( IPAR + I - 1 ), 
+               HW = 0.5*AST_AXDISTANCE( CFRM, I, OPND( IPAR + I - 1 ),
      :                                  OPND( IPAR + I + 1 ), STATUS )
-               OPND( IPAR + I - 1 ) = AST_AXOFFSET( CFRM, I, 
-     :                                             OPND( IPAR + I - 1 ), 
+               OPND( IPAR + I - 1 ) = AST_AXOFFSET( CFRM, I,
+     :                                             OPND( IPAR + I - 1 ),
      :                                             HW, STATUS )
                OPND( IPAR + I + 1 ) = 2*ABS( HW )
             END DO
             TYPE = ARD__BOX
 
-*  Convert ROTBOX regions into POLYGON regions. A polygon vertex is put at 
-*  the middle of each side in case we are dealing with spherical coords, in 
-*  which case a polygon edge greater than 180 arc-degrees could cause 
+*  Convert ROTBOX regions into POLYGON regions. A polygon vertex is put at
+*  the middle of each side in case we are dealing with spherical coords, in
+*  which case a polygon edge greater than 180 arc-degrees could cause
 *  problems.
          ELSE IF( TYPE .EQ. ARD__ROT ) THEN
 
 *  Offset away from the centre point along the first edge, at the
-*  requested angle, going half the box length. Using AST caters for both 
-*  Cartesian and spherical user coords. Store points back in the PAR 
+*  requested angle, going half the box length. Using AST caters for both
+*  Cartesian and spherical user coords. Store points back in the PAR
 *  array, in a suitable order to make the points a continuous curve.
-            PA0 = ( 90.0 - OPND( IPAR + 4 ) )*ARD__DTOR 
+            PA0 = ( 90.0 - OPND( IPAR + 4 ) )*ARD__DTOR
             HL = 0.5*OPND( IPAR + 2 )
             HW = 0.5*OPND( IPAR + 3 )
             P0( 1 ) = OPND( IPAR )
             P0( 2 ) = OPND( IPAR + 1 )
-      
+
             PA1 = AST_OFFSET2( CFRM, P0, PA0, HL, RBPAR, STATUS )
 
-*  Now turn to the left by 90 degrees and offset up by half the box height. 
+*  Now turn to the left by 90 degrees and offset up by half the box height.
             PA1 = PA1 - ARD__PIBY2
-            PA2 = AST_OFFSET2( CFRM, RBPAR, PA1, HW, RBPAR( 3 ), 
+            PA2 = AST_OFFSET2( CFRM, RBPAR, PA1, HW, RBPAR( 3 ),
      :                         STATUS )
 
-*  Now offset down by half the box height. 
-            PA2 = AST_OFFSET2( CFRM, RBPAR, PA1, -HW, RBPAR( 15 ), 
+*  Now offset down by half the box height.
+            PA2 = AST_OFFSET2( CFRM, RBPAR, PA1, -HW, RBPAR( 15 ),
      :                         STATUS )
 
 *  Now offset up and down by half the box height, starting at the box
@@ -295,16 +295,16 @@
 *  requested angle, going half the box length.
             PA1 = AST_OFFSET2( CFRM, P0, PA0, -HL, RBPAR( 9 ), STATUS )
 
-*  Now turn to the left by 90 degrees and offset up by half the box height. 
+*  Now turn to the left by 90 degrees and offset up by half the box height.
             PA1 = PA1 - ARD__PIBY2
-            PA2 = AST_OFFSET2( CFRM, RBPAR( 9 ), PA1, HW, RBPAR( 7 ), 
+            PA2 = AST_OFFSET2( CFRM, RBPAR( 9 ), PA1, HW, RBPAR( 7 ),
      :                         STATUS )
 
-*  Now offset down by half the box height. 
-            PA2 = AST_OFFSET2( CFRM, RBPAR( 9 ), PA1, -HW, RBPAR( 11 ), 
+*  Now offset down by half the box height.
+            PA2 = AST_OFFSET2( CFRM, RBPAR( 9 ), PA1, -HW, RBPAR( 11 ),
      :                         STATUS )
 
-*  Reset the region type and the number of parameters.   
+*  Reset the region type and the number of parameters.
             TYPE = ARD__POL
             NPAR = 16
 
@@ -314,12 +314,12 @@
 *  curve to user coordinates. This IntrMap needs to know how all about
 *  the region being drawn. Allocate memory for a copy of the supplied
 *  region parameters, and copy them.
-         CALL PSX_CALLOC( NPAR, '_DOUBLE', IPPAR, STATUS ) 
+         CALL PSX_CALLOC( NPAR, '_DOUBLE', IPPAR, STATUS )
          IF( OTYPE .NE. ARD__ROT ) THEN
-            CALL ARD1_COPYD( NPAR, OPND( IPAR ), 
+            CALL ARD1_COPYD( NPAR, OPND( IPAR ),
      :                       %VAL( CNF_PVAL( IPPAR ) ), STATUS )
          ELSE
-            CALL ARD1_COPYD( NPAR, RBPAR, %VAL( CNF_PVAL( IPPAR ) ), 
+            CALL ARD1_COPYD( NPAR, RBPAR, %VAL( CNF_PVAL( IPPAR ) ),
      :                       STATUS )
          END IF
 
@@ -328,10 +328,10 @@
          CMN_TYPEC = TYPE
          CMN_NPARC = NPAR
          CMN_IPPAR = IPPAR
-         CMN_FRMC = CFRM 
+         CMN_FRMC = CFRM
 
 *  Register the IntraMap transformation routine.
-         CALL AST_INTRAREG( 'ARDDRAW', 1, 2, ARD1_INTRA, AST__NOINV, 
+         CALL AST_INTRAREG( 'ARDDRAW', 1, 2, ARD1_INTRA, AST__NOINV,
      :                      ' ', ' ', ' ', STATUS )
 
 *  Create the IntraMap.
@@ -340,7 +340,7 @@
 *  Now draw the curve. DO this within a new error reporting context, and
 *  annul any error that occurs (e.g. because ARD1_INTRA does not support the
 *  type of region being drawn).
-         IF( STATUS .EQ. SAI__OK ) THEN 
+         IF( STATUS .EQ. SAI__OK ) THEN
             CALL ERR_MARK
 
             CALL AST_GENCURVE( IAST( 1 ), IMAP, STATUS )

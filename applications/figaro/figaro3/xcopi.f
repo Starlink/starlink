@@ -9,8 +9,8 @@ C     two other files.  Typically, the first file will be a
 C     spectrum, the others will be arcs taken either side
 C     of the spectrum.  The whole axis structure from the first
 C     'arc' file replaces that from the original file, and then
-C     the axis data array is modified to give the required 
-C     intermediate result. 
+C     the axis data array is modified to give the required
+C     intermediate result.
 C
 C     Command parameters -
 C
@@ -33,7 +33,7 @@ C                 If .5, the output is the average of the two arcs.
 C                 Etc.
 C
 C     OUTPUT      (Character) The file name for the resulting data
-C                 structure.  If this is the same as SPECTRUM, the 
+C                 structure.  If this is the same as SPECTRUM, the
 C                 axis data in SPECTRUM will be changed in situ.
 C
 C     Command keywords - None
@@ -43,7 +43,7 @@ C
 C                                             KS / CIT 1st July 1983
 C     Modified:
 C
-C     12th Sept 1985  KS / AAO. Now works in double precision, so as 
+C     12th Sept 1985  KS / AAO. Now works in double precision, so as
 C                     to be able to cope with high resolution data.
 C     21st Oct  1988  JM / RAL. Modified to use DSA_ routines
 C                     Dynamic-memory handling changed to use
@@ -74,7 +74,7 @@ C
       INTEGER   APTR       ! Dynamic-memory pointer to ARC2 axis data
       INTEGER   DIMS(5)    ! Axis data dimensions
       LOGICAL   EXIST      ! Used to check for existence of axis data
-      REAL      FRAC       ! Fractional weight given to ARC2 
+      REAL      FRAC       ! Fractional weight given to ARC2
       INTEGER   NDIM       ! Number of dimensions in axis data
       INTEGER   NX         ! Number of elements in ARC axis data array
       INTEGER   NX2        ! Number of elements in ARC2 axis data array
@@ -92,7 +92,7 @@ C
 C     Open DSA
 C
       CALL DSA_OPEN(STATUS)
-      IF(STATUS.NE.0) GOTO 500     
+      IF(STATUS.NE.0) GOTO 500
 C
 C     Get value of SPECTRUM and open the file
 C
@@ -103,8 +103,8 @@ C
       CALL DSA_INPUT('ARC','ARC',STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Check ARC axis data-array exists and if so, get size. 
-C     
+C     Check ARC axis data-array exists and if so, get size.
+C
       CALL DSA_SEEK_AXIS('ARC',1,EXIST,STATUS)
       IF(.NOT.EXIST)THEN
          CALL PAR_WRUSER('Axis data array does not exist',STATUS)
@@ -113,7 +113,7 @@ C
       CALL DSA_AXIS_SIZE ('ARC',1,5,NDIM,DIMS,NX,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Likewise for ARC2 
+C     Likewise for ARC2
 C
       CALL DSA_INPUT('ARC2','ARC2',STATUS)
       IF (STATUS.NE.0) GOTO 500

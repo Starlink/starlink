@@ -1,10 +1,10 @@
 *+FORM_SUBMIT      Creates Proposal form submittable file, submits to UKDC.
       SUBROUTINE FORM_SUBMIT
- 
-*   Method : Codes the binary POP form file into ASCII characters. The 
+
+*   Method : Codes the binary POP form file into ASCII characters. The
 *            reformatted file is then transmitted to a directory at the
 *            UKDC across the JANET network.
- 
+
 *  History:
 *     1988 Oct	M Ricketts	1st version
 *          Dec	M.Bush 		Put in RPS
@@ -16,19 +16,19 @@
 *     1994 JAN		M RICKETTS	RAL VERSION
 *     1996 Mar          M Ricketts      Tidy Filenames
 *************************************************************************
- 
+
       IMPLICIT NONE
 
 *   Global Variables:
- 
+
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_rec.inc'
       INCLUDE 'com_dbs_iof.inc'
- 
+
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_mtext.inc'
       INCLUDE 'com_form_ao.inc'
- 
+
       INCLUDE 'com_form_points.inc'
       INCLUDE 'com_dbs_field.inc'
       INCLUDE 'com_dbs_bytes.inc'
@@ -40,14 +40,14 @@
       INTEGER DBS_FIELDNO
       INTEGER DBS_GETI, FIND_FIRST
       CHARACTER*60 DBS_GETC
-      CHARACTER*128 FORM_GETC        
+      CHARACTER*128 FORM_GETC
       INTEGER MDH_ENDWORD					! Gets length of string
       INTEGER POP_MENU
       INTEGER PROP_CHECK
 
 *   Local Variables :
       CHARACTER*128 FILE_NAME					!Full file name
-      INTEGER P							!Position of end character.                    
+      INTEGER P							!Position of end character.
       INTEGER NCHAR						!Maximum number of characters on a line of the submittable file.
       INTEGER NREC						!Number of record being read in.
       INTEGER LN1,LN2						!Logical unit numbers.
@@ -57,7 +57,7 @@
       DATA BLANK/'**                                                                            **'/
       DATA STARLINE/'********************************************************************************'/
 
-      CHARACTER*60 VALUE  
+      CHARACTER*60 VALUE
       CHARACTER*50 ADDRESS 					!Address for posting to.
       INTEGER LIMIT
       INTEGER LENGTH						!Length of address string.
@@ -84,7 +84,7 @@
       CHARACTER*12 PHEAD/' RPS submit '/
       CHARACTER*15 POPTION /'Submit proposal'/
       CHARACTER*60 TITLE, outext*100
- 
+
 * __________________________________________ Executable Code ________________________________________
 
       QUOTE = CHAR(39)
@@ -98,7 +98,7 @@
             GOTO 20						! Skip file access if Test
          END IF
       END IF
- 
+
       CALL FORM_OPEN('R', IERR)
       IF (IERR .NE. 0) GOTO 99
       CALL DBS_READ(REF_FORM,1,IERR)				! Read cover page
@@ -144,9 +144,9 @@
       END IF
 
       CALL GETLUN(LN1)
-      
+
       OPEN(UNIT=LN1,FILE=FILE_NAME,STATUS='NEW')
- 
+
       OUTREC = BLANK
       WRITE(OUTREC(18:62),'(A,I1)' ) 'Rosat (unix) Proposal Submission V'//RPS_VERSION//' for AO', AO_NUMBER
       WRITE(LN1,'(A/A/A)') STARLINE, BLANK,OUTREC
@@ -155,14 +155,14 @@
       OUTREC(3:3) = '!'
       write(OUTREC(17:62),'(A,I8)') 'Created '//CDATE//', Checksum =',CHECKSUM
       WRITE(LN1,'(A/A/A)') OUTREC, BLANK, STARLINE
- 
+
       IF (TESTSUBMIT) THEN		 			! Line to indicate Test submission
          OUTREC = BLANK
          OUTREC(21:61) = 'Test Submission File - Please acknowledge'
          WRITE(LN1,'(A/A)') OUTREC,BLANK
          GOTO 60
       END IF
- 
+
       FIELDNO = DBS_FIELDNO(REF_FORM,'NUMBER.OF.TARGETS')
       NO_TARGETS = DBS_GETI(REF_FORM,FIELDNO)
 
@@ -190,16 +190,16 @@
                MTEXT(LOC_MTEXT:) = 'Error in target rec '// CHARTARG// '                        '
                GOTO 200
             END IF
- 
+
          END IF
- 
+
          I=1
          IF (REF_NO.EQ.REF_FORM) THEN
            LIMIT = FLD_LIMS_GEN(2)
          ELSE
            LIMIT = FLD_LIMS_CONS(2)
          END IF
-    
+
          DO WHILE (I.LE.LIMIT)
            IF (INDEX(FIELD(I,REF_NO),'$').EQ.1) THEN
              J=2
@@ -250,7 +250,7 @@
                GOTO 200
          END IF
       END DO
- 
+
       WRITE(LN1,'(A)') STARLINE							       ! marks end records
       OUTREC = BLANK
       OUTREC(4:12) = 'Abstract:'
@@ -306,7 +306,7 @@
 *      CALL FORMAT_ABSTRACT (form_file(:p), .TRUE.)
 
       WRITE(LN1,'(A)') STARLINE
- 
+
       OUTREC = BLANK
       OUTREC(32:48) = 'RPS - End of File'
       WRITE(LN1,'(A)') OUTREC
@@ -317,7 +317,7 @@
       CLOSE(LN1)
       CALL FRELUN(LN1)
 
-      CALL GETLUN(ADDR)      
+      CALL GETLUN(ADDR)
       OPEN(UNIT=ADDR,FILE=DSCFRPS_DATA(:len_dscfrps)//
 	1	'address.dis',TYPE='OLD',IOSTAT=IERR)
       IF (IERR.NE.0) THEN
@@ -349,7 +349,7 @@
 
 	IF(SUBMIT_TYPE.EQ.'POST')THEN
 	  CALL MDH_COMM('mail '//ADDRESS(1:LENGTH)//' < '//FILE_NAME(1:P+5) ,'SL')
-        ELSE 
+        ELSE
   	  CALL MDH_COMM('mail/subject="'//TITLE(1:60)//'" '//FILE_NAME(1:P+5)
      c 		//' "@'//DSCFRPS_DATA(:len_dscfrps)//'address.dis"','SL')
  	END IF
@@ -357,7 +357,7 @@
          DUMMY = FORM_GETC(' Form has been sent. Press return to continue.',' ')
       END IF
       goto 100
- 
+
 99    CONTINUE
          CALL FORM_ERR('Error reading Form File')
         MTEXT(LOC_MTEXT:) = 'Error reading files in Submit                          '

@@ -17,8 +17,8 @@
 *     catalogue parameter called VERSION within the catalogue identified
 *     by CI.
 *
-*     Note, the version number is edited into this routine when the 
-*     POLPACK release is constructed. 
+*     Note, the version number is edited into this routine when the
+*     POLPACK release is constructed.
 
 *  Arguments:
 *     CI = INTEGER (Given)
@@ -28,7 +28,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

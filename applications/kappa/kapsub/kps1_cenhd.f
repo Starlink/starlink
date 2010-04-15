@@ -17,20 +17,20 @@
 *     This routine dislays an initial header for CENTROID.
 
 *  Arguments:
-*     CFRM = INTEGER (Given) 
-*        A pointer to the current Frame of the NDF. This must have NAXC 
+*     CFRM = INTEGER (Given)
+*        A pointer to the current Frame of the NDF. This must have NAXC
 *        axes.
-*     LOGPOS = LOGICAL (Given) 
+*     LOGPOS = LOGICAL (Given)
 *        Should the results be written to a log file?
-*     FDL = INTEGER (Given) 
+*     FDL = INTEGER (Given)
 *        The file descriptor for the log file. Ignored if LOGPOS is
 *        .FALSE.
-*     QUIET = INTEGER (Given) 
+*     QUIET = INTEGER (Given)
 *        If .FALSE., the results are written to standard output. If .TRUE.
 *        nothing is written to standard output.
-*     NAXC = INTEGER (Given) 
+*     NAXC = INTEGER (Given)
 *        The number of axes in CFRM.
-*     TITLE = CHARACTER * ( * ) (Given) 
+*     TITLE = CHARACTER * ( * ) (Given)
 *        A title to display before the first position.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -65,7 +65,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -74,11 +74,11 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Arguments Given:
-      INTEGER CFRM 
-      LOGICAL LOGPOS 
-      INTEGER FDL 
-      LOGICAL QUIET 
-      INTEGER NAXC 
+      INTEGER CFRM
+      LOGICAL LOGPOS
+      INTEGER FDL
+      LOGICAL QUIET
+      INTEGER NAXC
       CHARACTER TITLE*(*)
 
 *  Status:
@@ -102,7 +102,7 @@
       IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
       IF( LOGPOS ) CALL FIO_WRITE( FDL, ' ', STATUS )
 
-*  Any title.     
+*  Any title.
       IF( TITLE .NE. ' ' ) THEN
          LINE = 'Title: '
          IAT = 7
@@ -116,8 +116,8 @@
          IF( LOGPOS ) THEN
             CALL FIO_WRITE( FDL, LINE( : IAT ), STATUS )
             CALL FIO_WRITE( FDL, ' ', STATUS )
-         END IF            
-      END IF         
+         END IF
+      END IF
 
 *  We need a string holding a list of the axis symbols and units.
       STRING = ' '
@@ -136,7 +136,7 @@
 *  Get the Symbol value.
          ATTVAL = AST_GETC( CFRM, ATTR( : LATTR ), STATUS )
 
-*  If blank, use "??". 
+*  If blank, use "??".
          IF( ATTVAL .EQ. ' ' ) ATTVAL = '??'
 
 *  Append to the string.
@@ -172,7 +172,7 @@
       LINE = '     Centroid positions:'
       IAT = 26
 
-*  If any of the axis had non-blank units, append the list of symbols and 
+*  If any of the axis had non-blank units, append the list of symbols and
 *  units to the header.
       IF( NUN .GT. 0 ) CALL CHR_APPND( STRING, LINE, IAT )
 
@@ -185,6 +185,6 @@
       IF( LOGPOS ) THEN
          CALL FIO_WRITE( FDL, LINE( : IAT ), STATUS )
          CALL FIO_WRITE( FDL, ' ', STATUS )
-      END IF            
+      END IF
 
       END

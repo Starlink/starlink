@@ -78,7 +78,7 @@
 
 *        Write line to output file
           CALL CHR_CLEAN( STRING )
-          LEN = 0            
+          LEN = 0
 	  CALL CHR_APPND( STRING, STRING, LEN)
 	  WRITE( LUN, '(A)', ERR=998) STRING( 1:LEN)
 

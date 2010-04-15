@@ -2,7 +2,7 @@
 
       SUBROUTINE ENDPLOT (DEVICE, INTERACTIVE, SENDHARD)
 
-*  Routine to finish off a plot. 
+*  Routine to finish off a plot.
 
       IMPLICIT  NONE
 
@@ -21,7 +21,7 @@
 *     For VT240/VT330, do not clear without checking...
 
       IF (DEVICE.EQ.10 .AND. .NOT.INTERACTIVE) THEN
-        CALL SXGCLEAR 
+        CALL SXGCLEAR
       END IF
 
 *     Idle terminal or send hardcopy to device

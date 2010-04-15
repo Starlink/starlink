@@ -16,11 +16,11 @@
 
 *  Description:
 *     A linear estimate of the local background is made by finding the
-*     minimum data value in two segments of the displayed trace, one 
+*     minimum data value in two segments of the displayed trace, one
 *     on each side of the segment in which the point source profile is
 *     to be drawn.
-*        
-*     The line is Y = CONST + SLOPE*X where Y is a data value in the 
+*
+*     The line is Y = CONST + SLOPE*X where Y is a data value in the
 *     displayed units (not including the vertical offsets), and X is
 *     the in-scan offset in arc-mins from the centre of the source
 *     (i.e. the sample specified by SMP).
@@ -39,10 +39,10 @@
 *     SMP = INTEGER (Given)
 *        The position around which a peak is looked for.
 *     ED = INTEGER (Given)
-*        The index of the first non-zero value in the supplied point 
+*        The index of the first non-zero value in the supplied point
 *        source profile.
 *     BG = INTEGER (Given)
-*        The index of the last non-zero value in the supplied point 
+*        The index of the last non-zero value in the supplied point
 *        source profile.
 *     AEL = INTEGER (Given)
 *        No. of elements in the profile.
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -135,12 +135,12 @@
       IF( AXIS( ED ) .GT. AXIS( BG ) ) THEN
          START = X( SMP ) + 3.0*AXIS( BG )
          END = X( SMP ) +  3.0*AXIS( ED )
-      ELSE 
+      ELSE
          START = X( SMP ) + 3.0*AXIS( ED )
          END = X( SMP ) +  3.0*AXIS( BG )
       END IF
 
-*  Get the corresponding data sample numbers. 
+*  Get the corresponding data sample numbers.
       BSEG = ESMP
       DO WHILE( X( BSEG ) .GT. START .AND. BSEG .GT. BSMP )
          BSEG = BSEG - 1
@@ -155,7 +155,7 @@
       BSEG = MIN( BSEG, SMP )
       ESEG = MAX( ESEG, SMP )
 
-*  Find the minimum Y value (and corresponding X value) in a segment 
+*  Find the minimum Y value (and corresponding X value) in a segment
 *  on the low sample side of the source.
       YMIN = VAL__MAXR
 
@@ -170,7 +170,7 @@
 
       END DO
 
-*  Store the values, scaling and shifting them so that they can be 
+*  Store the values, scaling and shifting them so that they can be
 *  used directly in the calculation of the constant and slope.
       IF( YMIN .NE. VAL__MAXR ) THEN
          NSEG = 1
@@ -180,7 +180,7 @@
          NSEG = 0
       END IF
 
-*  Find the minimum Y value (and corresponding X value) in a segment 
+*  Find the minimum Y value (and corresponding X value) in a segment
 *  on the high sample side of the source.
       YMIN = VAL__MAXR
 
@@ -193,7 +193,7 @@
          END IF
       END DO
 
-*  Store the values, scaling and shifting them so that they can be 
+*  Store the values, scaling and shifting them so that they can be
 *  used directly in the calculation of the constant and slope.
       IF( YMIN .NE. VAL__MAXR ) THEN
          NSEG = NSEG + 1
@@ -201,7 +201,7 @@
          XX( NSEG ) = XMIN - X( SMP )
       END IF
 
-*  If both segments had valid minima, calculate the slope and offset of 
+*  If both segments had valid minima, calculate the slope and offset of
 *  the line which joins them.
       IF( NSEG .EQ. 2 ) THEN
          SLOPE = ( YY( 2 ) - YY( 1 ) )/( XX( 2 ) - XX( 1 ) )
@@ -220,7 +220,7 @@
      :       'TRACB6: Unable to fit a background to the displayed data',
      :                 STATUS )
       END IF
-      
+
  999  CONTINUE
-      
+
       END

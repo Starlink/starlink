@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,23 +94,23 @@
 
 *  Begin a provenance block. This causes event handlers to be registered
 *  with the NDF library so that a handler routine in NDG is called every
-*  time an NDF is opened. This handler routine keeps a record of all NDFs 
-*  that are opened for input or output, until the block is closed by 
+*  time an NDF is opened. This handler routine keeps a record of all NDFs
+*  that are opened for input or output, until the block is closed by
 *  calling NDG_ENDPV.
       CALL NDG_BEGPV( STATUS )
 
 *  Test the action name against each valid value in turn, calling the
-*  appropriate routine...  
+*  appropriate routine...
       IF ( ACTION .EQ. 'CCDCLEAR' ) THEN
          CALL CCDCLEAR( STATUS )
 
-      ELSE IF ( ACTION .EQ. 'CCDEXP' ) THEN 
+      ELSE IF ( ACTION .EQ. 'CCDEXP' ) THEN
          CALL CCDEXP( STATUS )
 
-      ELSE IF ( ACTION .EQ. 'CCDGENERATE' ) THEN 
+      ELSE IF ( ACTION .EQ. 'CCDGENERATE' ) THEN
          CALL CCDGENERATE( STATUS )
 
-      ELSE IF ( ACTION .EQ. 'CCDIMP' ) THEN 
+      ELSE IF ( ACTION .EQ. 'CCDIMP' ) THEN
          CALL CCDIMP( STATUS )
 
       ELSE IF ( ACTION.EQ. 'CCDNDFAC' ) THEN
@@ -134,7 +134,7 @@
       ELSE IF ( ACTION.EQ. 'PICINFO' ) THEN
          CALL PICINFO( STATUS )
 
-      ELSE IF ( ACTION .EQ. 'PRESENT' ) THEN 
+      ELSE IF ( ACTION .EQ. 'PRESENT' ) THEN
          CALL PRESENT( STATUS )
 
       ELSE IF ( ACTION .EQ. 'SCHEDULE' ) THEN
@@ -158,7 +158,7 @@
 *  that the application accessed in order to create the output NDF. Any
 *  output NDF that already contains a provenance extension is left
 *  unchanged (so individual application can over-ride this automatic
-*  provenance handling by adding a provenance extension to the output NDF 
+*  provenance handling by adding a provenance extension to the output NDF
 *  itself).
       CALL NDG_ENDPV( 'CCDPACK:'//ACTION, STATUS )
 

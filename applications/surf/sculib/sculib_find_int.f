@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_FIND_INT (DEMOD_POINTER, N_SWITCHES, 
+      SUBROUTINE SCULIB_FIND_INT (DEMOD_POINTER, N_SWITCHES,
      :     N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
      :     INTEG, MEAS, I_START, I_END, STATUS)
 *+
@@ -9,7 +9,7 @@
 *     Return the indices of the start and end of the specified integration
 
 *  Invocation:
-*     CALL SCULIB_FIND_INT(DEMOD_POINTER, N_SWITCHES, 
+*     CALL SCULIB_FIND_INT(DEMOD_POINTER, N_SWITCHES,
 *    :     N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
 *    :     INTEG, MEAS, I_START, I_END, STATUS)
 
@@ -96,7 +96,7 @@
 
 *    Global variables:
 
-*    Local Constants 
+*    Local Constants
 
 *    Local variables:
 
@@ -122,7 +122,7 @@
 
          I_END = DEMOD_POINTER(1, 1, INTEG + 1, MEAS) - 1
 
-      ELSE IF (INTEG .EQ. N_INTEGRATIONS .AND. 
+      ELSE IF (INTEG .EQ. N_INTEGRATIONS .AND.
      :        MEAS .LT. N_MEASUREMENTS) THEN
 *     Have to increment the measurement counter and revert to next int
 

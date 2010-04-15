@@ -14,7 +14,7 @@
 *     CALL ARD1_SCALE( FRM, P, DIST, AXIS, SDIST, STATUS )
 
 *  Description:
-*     Distances supplied as arguments within keywords are usually given as 
+*     Distances supplied as arguments within keywords are usually given as
 *     increments along axis 1 (unless the user coord Frame is a SkyFrame,
 *     in which case they are given as increments along the latitude axis).
 *     This routine converts a given increment to the equivalent increment
@@ -32,7 +32,7 @@
 *        An increment along the axis used to measure distances within FRM
 *        (as identified by ARD1_DSTAX).
 *     AXIS = INTEGER (Given)
-*        The index of the axis along which the equivalent increment is 
+*        The index of the axis along which the equivalent increment is
 *        required.
 *     SDIST = DOUBLE PRECISION (Given)
 *        The equivalent increment along axis AXIS.
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
       INTEGER FRM
       DOUBLE PRECISION P( * )
       DOUBLE PRECISION DIST
-      INTEGER AXIS     
+      INTEGER AXIS
 
 *  Arguments Returned:
       DOUBLE PRECISION SDIST
@@ -115,7 +115,7 @@
 *  Otherwise...
       ELSE
 
-*  Set up the coordinates of a position which is offset away from the given 
+*  Set up the coordinates of a position which is offset away from the given
 *  position along the requested axis, by a small amount.
          DO I = 1, AST_GETI( FRM, 'NAXES', STATUS )
             P2( I ) = P( I )

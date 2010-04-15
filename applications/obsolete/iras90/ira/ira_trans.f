@@ -43,7 +43,7 @@
 *        false). Any unambiguous abbreviation will do. This need not be
 *        the same as the SCS identified by IDA.  See ID2 section "Sky
 *        Coordinates" for more information on Sky Coordinate Systems.
-*        A blank value will cause the system associated with IDA to be 
+*        A blank value will cause the system associated with IDA to be
 *        used.
 *     IDA = INTEGER (Given)
 *        The IRA identifier for the astrometry information.
@@ -129,9 +129,9 @@
       CALL IRA1_CHECK( IDA, STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  If a blank SCS was given, use the value associated with IDA.      
+*  If a blank SCS was given, use the value associated with IDA.
       IF( SCS .EQ. ' ' ) THEN
-         LSCS = ACM_SCS( IDA ) 
+         LSCS = ACM_SCS( IDA )
       ELSE
          LSCS = SCS
       END IF

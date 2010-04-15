@@ -7,7 +7,7 @@ C   -------------
 C
 C   Description
 C   -----------
-C   Adds two REAL arrays together. If the bad data flag is set, a magic value 
+C   Adds two REAL arrays together. If the bad data flag is set, a magic value
 C   pixel is output when either input pixel has the magic value.
 C
 C
@@ -28,7 +28,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'MAGIC_VALUES'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -72,7 +72,7 @@ C
         END DO
       ELSE
         DO I=1,NELM
-          IF(ARRAY1(I).GT.MAGIC_FLOAT .AND. 
+          IF(ARRAY1(I).GT.MAGIC_FLOAT .AND.
      &       ARRAY2(I).GT.MAGIC_FLOAT)THEN
             ARRAY3(I)=ARRAY1(I)+ARRAY2(I)
           ELSE

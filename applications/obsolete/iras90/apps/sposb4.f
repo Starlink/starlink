@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -161,7 +161,7 @@
       IF( ANGLE .NE. VAL__BADR ) THEN
 
 *  Convert to degrees, in range 0 - 360.
-         ANGLE = SLA_RANORM( ANGLE )*IRA__RTOD 
+         ANGLE = SLA_RANORM( ANGLE )*IRA__RTOD
 
 *  Format the value rounding to 2 decimal places.
          CALL MSG_SETR( 'ANG', 0.01*REAL( NINT( ANGLE*100.0) ) )

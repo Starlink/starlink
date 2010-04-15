@@ -12,7 +12,7 @@
  *     Macro definitions header file.
 
  *  Description:
- *     This include file contains the machine-specific definitions 
+ *     This include file contains the machine-specific definitions
  *     used in the compilation of the EMS C TRAIL(erface routines.
 
  *  System-specific:
@@ -78,7 +78,7 @@ typedef short Logical;
     fflush(OP_STREAM);
 #else
 #   undef TRACE
-#   define TRACE(x) 
+#   define TRACE(x)
 #endif
 
 #define EMS__MXLEV 256            /* Maximum context level */

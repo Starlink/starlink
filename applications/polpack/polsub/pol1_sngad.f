@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2, 
-     :                       IE3, MAT11, MAT21, MAT31, MAT22, MAT32, 
+      SUBROUTINE POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2,
+     :                       IE3, MAT11, MAT21, MAT31, MAT22, MAT32,
      :                       MAT33, COUNT, STATUS )
 *+
 *  Name:
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2, IE3, 
-*                      MAT11, MAT21, MAT31, MAT22, MAT32, MAT33, 
+*     CALL POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2, IE3,
+*                      MAT11, MAT21, MAT31, MAT22, MAT32, MAT33,
 *                      COUNT, STATUS )
 
 *  Description:
-*     This routine updates a set of images holding different quanities by 
+*     This routine updates a set of images holding different quanities by
 *     adding a contribution to each based on the supplied intensity array.
 *     The returned quantities are needed to calculate the Stokes vectors,
 *     variances, and co-variances corresponding to the supplied set of
@@ -29,7 +29,7 @@
 *     DIN( EL ) = REAL (Given)
 *        The input intensity values.
 *     VIN( EL ) = REAL (Given)
-*        The input variance values. 
+*        The input variance values.
 *     PHI = REAL (Given)
 *        The analyser angle for the supplied array. In radians.
 *     T = REAL (Given)
@@ -46,15 +46,15 @@
 *        Column 1, row 1 of the matrix giving the effective intensities.
 *     MAT21( EL ) = REAL (Given and Returned)
 *        Column 2, row 1 of the matrix giving the effective intensities
-*        (equals column 1, row 2). 
+*        (equals column 1, row 2).
 *     MAT31( EL ) = REAL (Given and Returned)
 *        Column 3, row 1 of the matrix giving the effective intensities
-*        (equals column 1, row 3). 
+*        (equals column 1, row 3).
 *     MAT22( EL ) = REAL (Given and Returned)
 *        Column 2, row 2 of the matrix giving the effective intensities.
 *     MAT32( EL ) = REAL (Given and Returned)
 *        Column 3, row 2 of the matrix giving the effective intensities
-*        (equals column 2, row 3). 
+*        (equals column 2, row 3).
 *     MAT33( EL ) = REAL (Given and Returned)
 *        Column 3, row 3 of the matrix giving the effective intensities.
 *     COUNT( EL ) = REAL (Given and Returned)
@@ -64,7 +64,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +91,7 @@
       REAL DIN( EL )
       REAL VIN( EL )
       REAL PHI
-      REAL T 
+      REAL T
       REAL EPS
 
 *  Arguments Given and Returned:
@@ -129,7 +129,7 @@
       DO I = 1, EL
          VARVAL = VIN( I )
 
-*  Ignore this pixel if either the input variance or intensity is bad, or if 
+*  Ignore this pixel if either the input variance or intensity is bad, or if
 *  the variance is less than or equal to zero.
          IF( DIN( I ) .NE. VAL__BADR .AND. VARVAL .NE. VAL__BADR .AND.
      :       VARVAL .GT. 0.0 ) THEN
@@ -142,7 +142,7 @@
 
 *  Effective intensities...
             IE1( I ) = IE1( I ) + DIN( I )*R2
-            IE2( I ) = IE2( I ) + DIN( I )*R2*RCOS 
+            IE2( I ) = IE2( I ) + DIN( I )*R2*RCOS
             IE3( I ) = IE3( I ) + DIN( I )*R2*RSIN
 
 *  Matrix elements... Row 1:

@@ -14,7 +14,7 @@
 *     since it is needed by ndg_provenance.c.
 
 *  Functions Provides:
-*     This modules provides the following public functions. 
+*     This modules provides the following public functions.
 *
 *     - ndgHds2vot: Create a VOTABLE representation of an HDS object.
 *     - ndgPutGroup: Create a new GROUP element.
@@ -32,12 +32,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,10 +68,10 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *, HDSLoc *, int, int * );
 
 
 
-/* Public Functions: */ 
+/* Public Functions: */
 /* --------------------------------------------------------------------- */
 
-const char *ndgGetAttrib( AstXmlElement *elem, const char *name, 
+const char *ndgGetAttrib( AstXmlElement *elem, const char *name,
                           const char *method, int *status ){
 /*
 *+
@@ -82,7 +82,7 @@ const char *ndgGetAttrib( AstXmlElement *elem, const char *name,
 *     Get the value of an attribute as a string.
 
 *  Invocation:
-*     const char *ndgGetAttrib( AstXmlElement *elem, const char *name, 
+*     const char *ndgGetAttrib( AstXmlElement *elem, const char *name,
 *                               const char *method, int *status )
 
 *  Description:
@@ -129,7 +129,7 @@ const char *ndgGetAttrib( AstXmlElement *elem, const char *name,
    return result;
 }
 
-AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem, 
+AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
                            int *status ){
 /*
 *+
@@ -140,24 +140,24 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
 *     Create a VOTABLE representation of an HDS object.
 
 *  Invocation:
-*     AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem, 
+*     AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
 *                                int *status )
 
 *  Description:
 *     This function stores the supplied HDS object as a new child element
-*     within the supplied XmlElement. The HDS object can be re-constructed 
+*     within the supplied XmlElement. The HDS object can be re-constructed
 *     from the element using ndgVot2hds.
 *
 *     If the HDS object is a primitive, it is represented by a <PARAM>
 *     element. If it is a structure, it is represented by a <GROUP>
 *     element containing other GROUPS and/or PARAMS. In both cases the
-*     name of the HDS object is used as the "name" attribute for the 
+*     name of the HDS object is used as the "name" attribute for the
 *     PARAM or GROUP element, and the HDS type of the supplied object is
 *     used as the "utype" attribute (with a name-space prefix of
 *     "hds_type").
 *
-*     HDS multi-dimensional arrays are handled, but each element is 
-*     accessed individually using datCell. So storing large HDS arrays 
+*     HDS multi-dimensional arrays are handled, but each element is
+*     accessed individually using datCell. So storing large HDS arrays
 *     using this function will be very inefficient.
 
 *  Arguments:
@@ -166,7 +166,7 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
 *     elem
 *        A pointer to the XmlElement in which the HDS Object is to be
 *        stored. NULL should be supplied if the new element is not to be
-*        stored in an existing element (a pointer to the new element is 
+*        stored in an existing element (a pointer to the new element is
 *        still returned as the function value).
 *     status
 *        The inherited status.
@@ -194,7 +194,7 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
    int icomp;
    int is_char;
    int nc;
-   int ncomp;          
+   int ncomp;
    int ndim;
    int prim;
    int store_utype;
@@ -235,7 +235,7 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
       if( !strcmp( type, "_INTEGER" ) ) {
          votype = "int";
          store_utype = 1;
- 
+
       } else if( !strcmp( type, "_REAL" ) ) {
          votype = "float";
 
@@ -285,10 +285,10 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
 
 /* Turn the object into a one-dimensional vector of cells, and get the
    length of the vector. */
-         datVec( loc, &loc2, status );         
+         datVec( loc, &loc2, status );
          datSize( loc2, &ncell, status );
 
-/* Indicate we do not yet have a buffer for the vector of formatted 
+/* Indicate we do not yet have a buffer for the vector of formatted
    values. */
          vbuf = NULL;
          nc = 0;
@@ -311,21 +311,21 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
    extra space (unless we are dealing with an array of strings). */
             vbuf = astAppendString( vbuf, &nc, cbuf );
             if( !is_char ) vbuf = astAppendString( vbuf, &nc, " " );
-         }                  
+         }
 
 /* Remove any trailing separator. */
          if( !is_char ) vbuf[ nc - 1 ] = 0;
 
-/* If this is an array of (fixed-length) strings, store the length of each 
+/* If this is an array of (fixed-length) strings, store the length of each
    string as the first dimension, and shuffle all other dimensions down
    one space. */
          if( is_char ) {
             for( i = ndim; i > 0; i-- ) dim[ i ] = dim[ i - 1 ];
-            dim[ 0 ] = clen;              
+            dim[ 0 ] = clen;
             ndim++;
          }
 
-/* Add a multi-dimensional PARAM element into the parent element, using 
+/* Add a multi-dimensional PARAM element into the parent element, using
    the HDS name as the "name" attribute. The HDS type is stored in a
    ficticious utype value */
          result = ndgPutParam( elem, name, ndim, dim, votype, vbuf, status );
@@ -349,7 +349,7 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
          result = ndgPutGroup( elem, name, status );
          astXmlAddAttr( result, "utype", utype, NULL );
 
-/* Loop round each component. Call this function recirsively to add the 
+/* Loop round each component. Call this function recirsively to add the
    component into the group. */
          datNcomp( loc, &ncomp, status );
          for( icomp = 1; icomp <= ncomp; icomp++ ) {
@@ -376,7 +376,7 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
 
 /* Turn the object into a one-dimensional vector of cells, and get the
    length of the vector. */
-         datVec( loc, &loc2, status );         
+         datVec( loc, &loc2, status );
          datSize( loc2, &ncell, status );
 
 /* Loop round each cell. Call this function recirsively to add the cell
@@ -384,11 +384,11 @@ AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem,
          for( icell = 1; icell <= ncell; icell++ ) {
             datCell( loc2, 1, &icell, &loc3, status );
             (void) ndgHds2vot( loc3, result, status );
-            datAnnul( &loc3, status );        
+            datAnnul( &loc3, status );
          }
 
 /* Free resources. */
-         datAnnul( &loc2, status );        
+         datAnnul( &loc2, status );
       }
    }
 
@@ -406,11 +406,11 @@ AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name, int *status )
 *     Create a new GROUP element.
 
 *  Invocation:
-*     AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name, 
+*     AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name,
 *                                 int *status )
 
 *  Description:
-*     This function creates a new GROUP element, and stores it in the given 
+*     This function creates a new GROUP element, and stores it in the given
 *     parent element. It also returns a pointer to the new GROUP element.
 
 *  Arguments:
@@ -445,8 +445,8 @@ AstXmlElement *ndgPutGroup( AstXmlElement *elem, const char *name, int *status )
    return group;
 }
 
-AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name, 
-                            int ndim, int *dim, const char *datatype, 
+AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
+                            int ndim, int *dim, const char *datatype,
                             const char *values, int *status ){
 /*
 *+
@@ -457,13 +457,13 @@ AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
 *     Create a new multi-dimensional PARAM element.
 
 *  Invocation:
-*     AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name, 
-*                                 int ndim, int *dim, const char *datatype, 
+*     AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
+*                                 int ndim, int *dim, const char *datatype,
 *                                 const char *values, int *status )
 
 *  Description:
 *     This function creates a new multi-dimensional PARAM element, and
-*     stores it in the given parent element. It also returns a pointer 
+*     stores it in the given parent element. It also returns a pointer
 *     to the new PARAM element.
 
 *  Arguments:
@@ -477,12 +477,12 @@ AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
 *        The number of dimensions.
 *     dim
 *        Pointer to an array holding the "ndim" dimensions.
-*     datatype 
+*     datatype
 *        The string to be used as the "datatype" attribute for the new PARAM
 *        element.
 *     value
 *        The string to be used as the "value" attribute for the new PARAM
-*        element. Numerical values should be stored in Fortran order, and 
+*        element. Numerical values should be stored in Fortran order, and
 *        should be separated by spaces. For strings, all strings should
 *        be of fixed length (given by dim[0]), and there should be no
 *        spaces between strings.
@@ -499,7 +499,7 @@ AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
    AstXmlElement *param = NULL;
    char *arraysize;
    char buf[ 30 ];
-   int i;              
+   int i;
    int nc;
 
 /* Check inherited status */
@@ -537,8 +537,8 @@ AstXmlElement *ndgPutParam( AstXmlElement *elem, const char *name,
    return param;
 }
 
-AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name, 
-                             const char *datatype, const char *value, 
+AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name,
+                             const char *datatype, const char *value,
                              int *status ){
 /*
 *+
@@ -549,13 +549,13 @@ AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name,
 *     Create a new scalar PARAM element.
 
 *  Invocation:
-*     AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name, 
-*                                  const char *datatype, const char *value, 
+*     AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name,
+*                                  const char *datatype, const char *value,
 *                                  int *status )
 
 *  Description:
-*     This function creates a new PARAM element with a scalar value, and 
-*     stores it in the given parent element. It also returns a pointer to 
+*     This function creates a new PARAM element with a scalar value, and
+*     stores it in the given parent element. It also returns a pointer to
 *     the new PARAM element.
 
 *  Arguments:
@@ -565,7 +565,7 @@ AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name,
 *     name
 *        The string to be used as the "name" attribute for the new PARAM
 *        element.
-*     datatype 
+*     datatype
 *        The string to be used as the "datatype" attribute for the new PARAM
 *        element.
 *     value
@@ -597,7 +597,7 @@ AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name,
    if( !strcmp( datatype, "char" ) ) {
       sprintf( buf, "%d", (int) strlen( value ) );
       astXmlAddAttr( param, "arraysize", buf, NULL );
-   }      
+   }
 
 /* Finally set the value attribute. */
    astXmlAddAttr( param, "value", value, NULL );
@@ -621,7 +621,7 @@ HDSLoc *ndgVot2hds( AstXmlElement *elem, HDSLoc *ploc, int *status ){
 
 *  Description:
 *     This function re-creates an HDS object from the supplied XmlElement
-*     and stores it as a component in a given HDS structure. The XmlElement 
+*     and stores it as a component in a given HDS structure. The XmlElement
 *     should have been created using ndgHds2vot.
 
 *  Arguments:
@@ -650,10 +650,10 @@ HDSLoc *ndgVot2hds( AstXmlElement *elem, HDSLoc *ploc, int *status ){
 
 
 
-/* Private Functions: */ 
+/* Private Functions: */
 /* --------------------------------------------------------------------- */
 
-static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps, 
+static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
                             int *status ){
 /*
 *  Name:
@@ -678,7 +678,7 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
 *     comps
 *        If zero, the HDS object represented by "elem" is added as a single
 *        component into the "ploc" structure. If non-zero, the components
-*        of the HDS object represented by "elem" are added separately into 
+*        of the HDS object represented by "elem" are added separately into
 *        the "ploc" structure. Zero is assumed if "elem" does not
 *        represent a scalar structure.
 *     status
@@ -709,7 +709,7 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
    hdsdim dim[ NDF__MXDIM ];
    hdsdim icell;
    int clen;
-   int i;                   
+   int i;
    int is_char;
    int nc;
    int ndim;
@@ -744,20 +744,20 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
 /* Deal with HDS primitives (represented in XML by <PARAM> elements). */
    if( !strcmp( ename, "PARAM" ) ){
 
-/* Get the mandatory "name", "datatype" and "value" attributes from the PARAM 
+/* Get the mandatory "name", "datatype" and "value" attributes from the PARAM
    element, reporting an error if any are not present. */
       name = ndgGetAttrib( elem, "name", "ndgVot2hds", status );
       votype = ndgGetAttrib( elem, "datatype", "ndgVot2hds", status );
       value = ndgGetAttrib( elem, "value", "ndgVot2hds", status );
 
 /* Select the appropriate HDS data type. Set a flag indicating that the
-   date type should be extracted from the utype attribute if it is 
+   date type should be extracted from the utype attribute if it is
    ambiguous. */
       use_utype = 0;
       is_char = 0;
       if( !strcmp( votype, "int" ) ) {
          use_utype = 1;
- 
+
       } else if( !strcmp( votype, "float" ) ) {
          strcpy( type, "_REAL" );
 
@@ -785,11 +785,11 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
                  "datatype=\"^T\">.", status );
       }
 
-/* If the HDS data type was not determined uniquely by the "datatype" 
+/* If the HDS data type was not determined uniquely by the "datatype"
    attribute, get the HDS data type from the "utype" attribute. */
       if( use_utype ) {
          utype = ndgGetAttrib( elem, "utype", "ndgVot2hds", status );
-         if( utype && sscanf( utype, "hds_type:%s", type ) != 1 && 
+         if( utype && sscanf( utype, "hds_type:%s", type ) != 1 &&
              *status == SAI__OK ) {
             msgSetc( "T", utype );
             msgSetc( "N", name );
@@ -831,14 +831,14 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
          }
       }
 
-/* For a string array, the first XML dimension is the fixed string length. 
-   Extract the string length into "clen" and remove it from the list of 
+/* For a string array, the first XML dimension is the fixed string length.
+   Extract the string length into "clen" and remove it from the list of
    dimensions. Also append it to the end of the HDS data type. */
       if( is_char ) {
          clen = dim[ 0 ];
          for( i = 1; i < ndim; i++ ) dim[ i - 1 ] = dim[ i ];
          ndim--;
-         sprintf( type, "_CHAR*%d", clen );         
+         sprintf( type, "_CHAR*%d", clen );
       }
 
 /* Create the HDS component and get a locator to it. */
@@ -872,9 +872,9 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
 /* Get a locator to the cell. */
             datCell( vloc, 1, &icell, &cloc, status );
 
-/* Copy the string holding the next value into a null-terminated buffer. For 
-   fixed-length strings, just copy the next block of "clen" characters into 
-   the buffer, terminate it, and move "p" on to point to the start of the 
+/* Copy the string holding the next value into a null-terminated buffer. For
+   fixed-length strings, just copy the next block of "clen" characters into
+   the buffer, terminate it, and move "p" on to point to the start of the
    next block of "clen" characters. */
             if( is_char ) {
                vbuf = astStore( vbuf, p, clen + 1 );
@@ -903,7 +903,7 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
             datPut0C( cloc, vbuf, status );
 
 /* Free resources. */
-            datAnnul( &cloc, status );        
+            datAnnul( &cloc, status );
          }
 
          vbuf = astFree( vbuf );
@@ -913,7 +913,7 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
 /* Deal with HDS structures (represented in XML by <GROUP> elements). */
    } else if( !strcmp( ename, "GROUP" ) ){
 
-/* Get the mandatory "name" and "utype" attributes from the GROUP element, 
+/* Get the mandatory "name" and "utype" attributes from the GROUP element,
    reporting an error if either is not present. */
       name = ndgGetAttrib( elem, "name", "ndgVot2hds", status );
       utype = ndgGetAttrib( elem, "utype", "ndgVot2hds", status );
@@ -961,9 +961,9 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
          strings = astFree( strings );
       }
 
-/* If requied create an HDS structure to contain the components, and get a 
+/* If requied create an HDS structure to contain the components, and get a
    locator to it. */
-      if( ! comps ) {      
+      if( ! comps ) {
          datNew( ploc, name, type, ndim, dim, status );
          datFind( ploc, name, &result, status );
 
@@ -989,10 +989,10 @@ static HDSLoc *ndg1Vot2hds( AstXmlElement *elem, HDSLoc *ploc, int comps,
                newloc = ndg1Vot2hds( (AstXmlElement *) item, result, 0, status );
             }
             datAnnul( &newloc, status );
-         }      
+         }
       }
 
-/* Report an error if the name of the supplied element is not PARAM 
+/* Report an error if the name of the supplied element is not PARAM
    or GROUP. */
    } else if( *status == SAI__OK ) {
       msgSetc( "N", ename );

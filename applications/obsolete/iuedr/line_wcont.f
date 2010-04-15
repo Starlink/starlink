@@ -4,7 +4,7 @@
 *   Name:
 *      SUBROUTINE line_WCONT
 *
-*   Description: 
+*   Description:
 *      Write into internal line buffer using control format.
 *
 *   Authors:

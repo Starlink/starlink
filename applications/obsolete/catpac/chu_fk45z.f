@@ -17,9 +17,9 @@
 
 *  Description:
 *     Create a catalogue containing new fields for the Right Ascension
-*     and Declination after a conversion has been made from the FK4 system 
+*     and Declination after a conversion has been made from the FK4 system
 *     coordinates. The new fields are calculated using SLA_FK45Z. See SUN 67
-* 
+*
 
 *  Arguments:
 *     INPUT = CHARACTER * ( CHP__SZNAME ) (Given)
@@ -54,7 +54,7 @@
 *     None
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -185,7 +185,7 @@
 *  ARC SECONDS to RADIANS
       REAL*8 DAS2R
       PARAMETER (DAS2R=0.4848136811095359949D-05)
-*- 
+*-
 
 *  Check inherited global status.
 
@@ -206,7 +206,7 @@
 *
         R1FLG = .FALSE.
         D1FLG = .FALSE.
-    
+
         DO FLDCOUNT = 1, NUMFLDS
           IF (NAMES(FLDCOUNT) .EQ. R1950) THEN
             R1FLG = .TRUE.
@@ -220,7 +220,7 @@
 *   Continue only if the fields are in the catalogue.
 *
         IF (R1FLG .AND. D1FLG) THEN
-* 
+*
 *   Add the new fields and create an empty catalogue.
 *
           NUMFLDS = NUMFLDS + 1
@@ -254,7 +254,7 @@
           FIRSTPASS = .TRUE.
           CALL CHP_GNENTS(INPUT, NUMENTS, STATUS)
           DO ENTCOUNT = 1, NUMENTS
-            CALL CHP_GDNAC(INPUT, INPUTNFLDS, OLDFNAMES, FTYPES, 
+            CALL CHP_GDNAC(INPUT, INPUTNFLDS, OLDFNAMES, FTYPES,
      :  COLDES, CHARVALS, DOUBVALS, INTVALS, LOGVALS, REALVALS,
      :  PTRVALS, NULLS, STATUS)
 *
@@ -280,7 +280,7 @@
               NULLS(D2POS) = .TRUE.
 *
            ELSE
-* 
+*
 *    For all passes calculate new fields
 *
               NULLS(R2POS) = .FALSE.
@@ -301,8 +301,8 @@
 *
 *    Put the complete row into the table
 *
-          call chp_putent(output,1, numflds,names,ftypes, charvals, 
-     :  doubvals, intvals, logvals, realvals, ptrvals, nulls, 
+          call chp_putent(output,1, numflds,names,ftypes, charvals,
+     :  doubvals, intvals, logvals, realvals, ptrvals, nulls,
      :  status)
           ENDDO
 *

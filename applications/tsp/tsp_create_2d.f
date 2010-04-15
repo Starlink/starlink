@@ -22,13 +22,13 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) LOC		(Fixed string,descr) A locator to the
-C                       top level of the object to 
+C                       top level of the object to
 C                       be created (e.g. supplied by DAT_CREAT)
 C     (>) LSIZE		(Integer,ref) The size of the array to be created
 C                       in the wavelength axis.
 C     (>) TSIZE         (Integer,ref) The size of the array to be created
 C                       in the wavelength axis.
-C     (>) STOKES        (Fixed string,descr) A string specifying which 
+C     (>) STOKES        (Fixed string,descr) A string specifying which
 C                       Stokes parameters are to be included in the
 C                       structure. This must contain some combination
 C                       of the letters 'Q', 'U' and 'V'
@@ -50,7 +50,7 @@ C-
 C  Subroutine / function details:
 C
 C  History:
-C     26/2/1988   Original version.  JAB / AAO.                   
+C     26/2/1988   Original version.  JAB / AAO.
 C     28/2/1988   Fix bug in location of .POLARIMETRY   JAB/AAO.
 C     15/3/1991   NDF version   JAB/JAC.
 C
@@ -68,13 +68,13 @@ C
 C
 C     Local variables
 C
-      CHARACTER*(DAT__SZLOC) PLOC     
+      CHARACTER*(DAT__SZLOC) PLOC
       INTEGER HIGH(2),LOW(2)
       INTEGER ID,PLACE,IDQ,IDU,IDV
 C
       IF (STATUS .EQ. SAI__OK) THEN
 
-*     Create the top level components 
+*     Create the top level components
 
           CALL NDF_BEGIN
           CALL NDF_PLACE(LOC,' ',PLACE,STATUS)

@@ -71,19 +71,19 @@
 *  S       - Character variable, via which chunks of PostScript are sent for
 *            buffering.
 *
- 
+
 *     Offsets in KWKDAT
       INTEGER    IFASTY
       PARAMETER (IFASTY=4)
- 
+
 *     Chunksize,  Path Limit, Number of trapezoids
       INTEGER    ICHUNK,    NTZ,   MAXARB,   MAXSIM
       PARAMETER (ICHUNK=100,NTZ=49,MAXARB=13,MAXSIM=300)
- 
+
 *     small real
       REAL       SMALL
       PARAMETER (SMALL=1.0E-4)
- 
+
 *
       LOGICAL CHANGE
       CHARACTER S*100, DUMMY, FC*7
@@ -110,10 +110,10 @@
 *
 *---------------------------------------------------------------------
 *
- 
+
 *     Initialise the flag
       CHANGE = .FALSE.
- 
+
 *
 *     See if locally stored copy of the attributes needs updating.
 *
@@ -122,12 +122,12 @@
          KWKDAT(IFASTY,KWKIX) = KWFASI(KWKIX)
          CHANGE = .TRUE.
       ENDIF
- 
+
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Set up the fill area attributes (style index),
 *     if change has occurred.
@@ -138,7 +138,7 @@
          CALL GKFOCO(KIOPB, S(1:10), IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
       ENDIF
- 
+
 *     Determinine whether to let postscript process the whole Fill Area
 *     in one path or to decompose it into trapezoids.
       IALG = 1
@@ -152,18 +152,18 @@
             IALG = 2
          ENDIF
       ENDIF
- 
+
 *     Take a memory snapshot, so as not to clutter the memory with
 *     temporaries.
       CALL GKFOCO(KIOPB,'save',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
       IF(IALG .EQ. 1)THEN
 *       Send Whole Polygon to Postscript as one path
 *
 *       Prepare and send the fill area bounding coordinates.
 *
- 
+
 *       Get the stack for coordinates chunking.
         CALL GKSTAL(KREALS,ICHUNK*2,IOFF)
         IF (KERROR.EQ.0) THEN
@@ -237,11 +237,11 @@
           GOTO 990
         ENDIF
       ENDIF
- 
+
 *     Restore
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'restore',IREM)
- 
+
   990 CONTINUE
- 
+
       END

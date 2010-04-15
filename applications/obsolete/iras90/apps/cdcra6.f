@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL  CDCRA6( NCRDD, NDFID, IRCID, SCNDIR, INTER, WEIGHT, 
+*     CALL  CDCRA6( NCRDD, NDFID, IRCID, SCNDIR, INTER, WEIGHT,
 *                   SCNLEN, NCROS, CRSFLX, CRSDTX, CRSSMP, CRSFLG,
 *                   DATARY, WGTARY, STATUS )
 
@@ -32,7 +32,7 @@
 *     IRCID( NCRDD ) = INTEGER (Given)
 *        IRC id of the input CRDD NDFs
 *     SCNDIR( NCRDD ) = LOGICAL
-*        The direction of each scan. True means from north to south. 
+*        The direction of each scan. True means from north to south.
 *     INTER = CHARACTER*( * ) (Given)
 *        Specify the method used while alignning traces. It can be
 *        either 'LINEAR' or 'NEAREST'.
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,12 +97,12 @@
       CHARACTER*( * ) WEIGHT
       INTEGER CRSFLX( NCROS ), CRSDTX( NCROS )
       REAL CRSSMP( NCROS )
-      
+
 *  Arguments Returned:
       INTEGER CRSFLG( NCROS )
       REAL DATARY( SCNLEN, NCROS )
       REAL WGTARY( SCNLEN, NCROS )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -135,11 +135,11 @@
       DO I = 1, NCROS
          CRSFLG( I )  = 0
       END DO
-      
+
 *  Processing the crossings one by one.
       DO I = 1, NCROS
 
-*  Process this crossing only if it hasn't been extracted, 
+*  Process this crossing only if it hasn't been extracted,
          IF ( CRSFLG( I ) .EQ. 0 ) THEN
             CRSFLG( I ) = 3
 
@@ -149,7 +149,7 @@
             DO J = I + 1, NCROS
                IF ( CRSFLX( J ) .EQ. FLX ) CRSFLG( J ) = 3
             END DO
-                
+
 *  Find whether the reversing is required.
             IF ( SCNDIR( FLX ) .EQV. SCNDIR( CRSFLX( 1 ) ) ) THEN
                REVS = .FALSE.
@@ -166,7 +166,7 @@
             IF ( WEIGHT( : 8 ) .EQ. 'VARIANCE' ) THEN
                COMP = 'Data,Variance'
                COMPLN = 13
-      
+
 *  Otherwise only map the data array.
             ELSE
                COMP = 'Data'
@@ -187,7 +187,7 @@
                CALL NDF_CGET( NDFID( FLX ), 'Units', CRDUNT, STATUS )
                CALL NDF_CGET( NDFID( CRSFLX( 1 ) ), 'Units', FSTUNT,
      :                        STATUS )
-            
+
 *  Find the detector number of the traces contained in prsent CRDD NDF.
                DO DETX = LBND( 2 ), UBND( 2 )
                   DETNO( DETX - LBND( 2 ) + 1 ) =
@@ -198,9 +198,9 @@
 *  present CRDD NDF.
                CALL IRM_UNTCV( CRDUNT, FSTUNT,
      :                         UBND( 2 ) - LBND( 2 ) + 1, DETNO, SCALE,
-     :                         STATUS ) 
+     :                         STATUS )
             END IF
-      
+
 *  Extract the data of the crossing section from the CRDD NDF.
             CALL CDCRB0( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ),
      :                  %VAL( PNTR( 1 ) ), SCALE, REVS, INTER, SCNLEN,
@@ -238,7 +238,7 @@
          END DO
 
 *  If equal weighting is to be used, set all element of weight array
-*  as unit. 
+*  as unit.
       ELSE IF ( WEIGHT( : 5 ) .EQ. 'EQUAL' ) THEN
          DO I = 1, NCROS
             DO J = 1, SCNLEN
@@ -272,5 +272,5 @@
 *  as 1.
          IF ( 2 * NBAD .GE. SCNLEN ) CRSFLG( I ) = 1
       END DO
-         
+
       END

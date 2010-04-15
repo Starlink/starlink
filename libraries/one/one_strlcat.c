@@ -38,7 +38,7 @@
 *  Returned Value:
 *     size_t retval
 *        Length of the string after appending. Will either be
-*        the length of the source string plus destination string 
+*        the length of the source string plus destination string
 *        or one less than the size of the destination buffer if truncation
 *        was detected.
 
@@ -53,7 +53,7 @@
 *        Use starutil to get strlcat function.
 
 *  Notes:
-*     - This is for use from C only. 
+*     - This is for use from C only.
 *     - Use starutil's star_strlcat if you can not use the Starlink error
 *       system.
 
@@ -98,7 +98,7 @@
 size_t
 one_strlcat( char * dest, const char * src, size_t size, int * status ) {
   size_t retval = 0;
-  
+
   if (*status != SAI__OK) return retval;
 
   /* Trap null pointers - since strlcat won't */
@@ -127,6 +127,6 @@ one_strlcat( char * dest, const char * src, size_t size, int * status ) {
        so just return the size that is actually relevant */
     retval = size - 1;
   }
-  
+
   return retval;
 }

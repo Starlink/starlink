@@ -1,16 +1,16 @@
-      SUBROUTINE SCULIB_CALC_SUB_BOLS (N_BOL_IN, IN_BOL_ADC, 
-     :  IN_BOL_CHAN, NUM_CHAN, NUM_ADC, BOL_TYPE, SUB_INSTRUMENT, 
+      SUBROUTINE SCULIB_CALC_SUB_BOLS (N_BOL_IN, IN_BOL_ADC,
+     :  IN_BOL_CHAN, NUM_CHAN, NUM_ADC, BOL_TYPE, SUB_INSTRUMENT,
      :  N_BOL_OUT, OUT_BOL_ADC, OUT_BOL_CHAN, IN_POINTER, STATUS)
 *+
 *  Name:
 *     SCULIB_CALC_SUB_BOLS
 
 *  Purpose:
-*     find the positions of bolometers belonging to a 
+*     find the positions of bolometers belonging to a
 *     specified sub-instrument in a demodulated data array
 
 *  Description:
-*     This subroutine finds the location of data from bolometers belonging to 
+*     This subroutine finds the location of data from bolometers belonging to
 *     a specified sub-instrument in a demodulated data array that may contain
 *     data for several sub-instruments. The number of bolometers found, their
 *     indices in the data array, and their ADC,channel numbers are returned

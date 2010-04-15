@@ -9,7 +9,7 @@
 
 *  Description:
 *     This module defines the C interface to the functions of the ATL
-*     library. The file atl.c contains C wrappers for the Fortran 
+*     library. The file atl.c contains C wrappers for the Fortran
 *     ATL routines.
 
 *  Authors:
@@ -59,7 +59,7 @@
 /* Public Constants */
 /* ---------------- */
 
-/* Maximum number of axes to consider. This should be equal to 
+/* Maximum number of axes to consider. This should be equal to
    NDF__MXDIM. */
 enum { ATL__MXDIM  = 7 };
 

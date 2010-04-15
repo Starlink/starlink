@@ -18,9 +18,9 @@
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the parameter used to get the method of offset 
-*        from the user. They can take the value 'FREE', CONSTANT' and 
-*        'AVERAGE'. The input can be abbreviated to an unambigious 
+*        The name of the parameter used to get the method of offset
+*        from the user. They can take the value 'FREE', CONSTANT' and
+*        'AVERAGE'. The input can be abbreviated to an unambigious
 *        length and is case insensitive.
 *     OFMTHD = INTEGER (Returned)
 *        It specifies the method to offset the traces.
@@ -65,7 +65,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Remove the leading blank of METHOD.
-         CALL CHR_LDBLK( METHOD )      
+         CALL CHR_LDBLK( METHOD )
 
 *  Setting the returned offset code.
          IF ( METHOD( : 4 ) .EQ. 'FREE' ) THEN
@@ -111,5 +111,5 @@
       END IF
 
  999  CONTINUE
-      
+
       END

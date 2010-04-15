@@ -40,20 +40,20 @@
 
 *   Import:
       BYTE CNTRL(MAXTOK)   ! control string
- 
+
       INTEGER LAST         ! last character position
- 
+
 *   Import/Export:
       INTEGER FIRST        ! first character in CNTRL
- 
+
 *   Export:
       BYTE TOKEN(MAXTOK)   ! token string
- 
+
 *   External refernces:
       BYTE str_LOWER       ! lower case of character
 
       INTEGER str_TYPE     ! lexical type of character
- 
+
 *   Local variables:
       INTEGER CPOS         ! character position in TOKEN
 

@@ -38,13 +38,13 @@ C     (>) INCREMENT    (Integer,ref) The number of elements of the
 C                      dynamically allocated array by which the current
 C                      element number is to be incremented.
 C
-C  Returns:  
+C  Returns:
 C
 C     (<) ELEMENT     (Integer,function value) The element of DYNAMIC_MEM
 C                     corresponding to the required element of the
 C                     dynamically allocated array.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     ICH_FOLD
 C
 C  Prior requirements:  None.
@@ -74,7 +74,7 @@ C
       CHARACTER*(*) TYPE
 C
 C     Functions and local variables
-C  
+C
       INTEGER ICH_FOLD
       INTEGER I                              ! Loop index
       CHARACTER UPTYPE*6                     ! Upper case version of TYPE

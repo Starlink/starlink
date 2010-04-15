@@ -155,7 +155,7 @@ itcl::class ::gaia3d::Gaia3dArdPrismProxy {
       return [list $current_ [$collection_($current_) get_desc]]
    }
 
-   #  Set the position of the shape. If a point the ix,iy,iz values are used 
+   #  Set the position of the shape. If a point the ix,iy,iz values are used
    #  if a general shape then the delta shifts will be applied.
    public method set_position {ix iy iz dx dy dz} {
       if { $current_ != {} } {

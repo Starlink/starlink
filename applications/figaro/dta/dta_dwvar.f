@@ -54,7 +54,7 @@ C     EMS_END     ( "    "     ) End current reporting environment.
 C
 C                                     KS / AAO 8th Nov 1988
 C     Modified:
-C 
+C
 C     2nd Oct 1989.  Temporary (?) fix.  Now checks that the object's
 C                    value is defined, and if not, writes to it to
 C                    make sure that it is.  KS/AAO.
@@ -101,7 +101,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Convert NAME to upper case and analyse it
 C
@@ -139,7 +139,7 @@ C
 C     Try to make sure object is defined.  Actually doing a write is
 C     rather nasty - once HDS gains a call that will allow an object to
 C     have its defined flag set, that should be used instead.  (Whether
-C     just doing a DTA_DWVAR should define the object is moot, but 
+C     just doing a DTA_DWVAR should define the object is moot, but
 C     doing so is pragmatic.)
 C
       DEFSTAT=0

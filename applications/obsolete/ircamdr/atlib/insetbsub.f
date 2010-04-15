@@ -1,6 +1,6 @@
 *+  INSETBSUB - replaces all pixels inside box with specified value
 
-      SUBROUTINE INSETBSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2, XSTART, 
+      SUBROUTINE INSETBSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2, XSTART,
      :                       YSTART, XSIZE, YSIZE, NEWVAL, STATUS )
 
 *    Description :
@@ -11,7 +11,7 @@
 *
 *    Invocation :
 *
-*     CALL INSETBSUB( INARRAY, OUTARRAY, DIMS, XSTART, YSTART, 
+*     CALL INSETBSUB( INARRAY, OUTARRAY, DIMS, XSTART, YSTART,
 *                     XSIZE, YSIZE, NEWVAL, STATUS )
 *
 *    Method :
@@ -47,8 +47,8 @@
      :    DIMS2,      ! dimensions of input array
      :    XSTART,         ! x coord of box start
      :    YSTART,         ! y coord of box start
-     :    XSIZE,          ! x size of box 
-     :    YSIZE           ! y size of box 
+     :    XSIZE,          ! x size of box
+     :    YSIZE           ! y size of box
 
       REAL
      :    INARRAY( DIMS1, DIMS2 ),   ! input data
@@ -89,7 +89,7 @@
 
 	    IF( J .GE. YSTART .AND. J .LE. ( YSTART+YSIZE-1) .AND.
      :	        I .GE. XSTART .AND. I .LE. ( XSTART+XSIZE-1)) THEN
-     
+
                OUTARRAY( I, J )  =  NEWVAL
 
 *         set to old value if current pixel outside box

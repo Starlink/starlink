@@ -38,7 +38,7 @@
 #
 #     value
 #        The value which will be returned by the 'next' method.
-#        On the whole it is not a good idea to access this directly; 
+#        On the whole it is not a good idea to access this directly;
 #        the 'next' method should be used instead.
 #
 #     Marknumcontrol also inherits all the public variables of the Control

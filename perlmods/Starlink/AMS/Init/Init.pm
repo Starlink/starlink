@@ -57,14 +57,14 @@ use Starlink::ADAM;   # We do some communication
 # and errors can be turned on and off, so I am setting it up
 # so that the messaging system must still be initialised by
 # the user so that they get the object. This means that ::Task
-# becomes an OO interface to Core and that ::Init must access 
+# becomes an OO interface to Core and that ::Init must access
 # variables in the Core namespace.
-# I don't like it but I can't think of a way to allow both the user 
+# I don't like it but I can't think of a way to allow both the user
 # and the tasks to know about the Init object.
 # As an aside I have to have ::Init as an object so that it will
 # kill itself on destroy.
 
-use Starlink::AMS::Core; 
+use Starlink::AMS::Core;
 
 
 
@@ -212,7 +212,7 @@ Default is to print all messages.
 
 sub errors {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $arg = shift;
     # also need to set the flag in the Core module
     # This is the inverse to Messages since
@@ -242,7 +242,7 @@ Default is 30 seconds.
 
 sub timeout {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     # also need to set the flag in the Core module
     $Starlink::AMS::Core::TIMEOUT = shift();
   }
@@ -320,7 +320,7 @@ sub paramrep {
   if (@_) {
     my $coderef  = shift;
     my $ref = ref($coderef);
-    croak "Supplied argument is not a code reference (is $ref)" 
+    croak "Supplied argument is not a code reference (is $ref)"
       unless $ref eq "CODE";
 
     $Starlink::AMS::Core::PARAMREP_SUB = $coderef;
@@ -364,7 +364,7 @@ sub init {
 
     # Run the init routine
     $status = &Starlink::AMS::Core::adamtask_init;
-    
+
     # If Status is good; set up the running flags
     if ($status == &Starlink::ADAM::SAI__OK) {
 
@@ -374,16 +374,16 @@ sub init {
       # Set up default options
       # Messages on
       $self->messages(1);
-      
+
       # Errors on
       $self->errors(1);
-      
+
       # 30 second timeout
       $self->timeout(30);
 
     }
     return $status;
-  } 
+  }
   return &Starlink::ADAM::SAI__OK;
 }
 
@@ -398,7 +398,7 @@ Returns the status.
 
 sub shutdown {
   my $self = shift;
-  
+
   my $status = &Starlink::AMS::Core::adamtask_exit;
 
   # Reset adam_started
@@ -427,7 +427,7 @@ module.
 
 =head1 See Also
 
-L<perl>, 
+L<perl>,
 L<Starlink::AMS::Task>,
 L<Starlink::AMS::Core>,
 L<Starlink::ADAM>,

@@ -83,7 +83,7 @@
 
 *  Check global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Combine the transformations.
       TOUT( 1 ) = TB( 1 ) + TB( 2 ) * TA( 1 ) + TB( 3 ) * TA( 4 )
       TOUT( 2 ) = TA( 2 ) * TB( 2 ) + TB( 3 ) * TA( 5 )

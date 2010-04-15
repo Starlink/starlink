@@ -11,7 +11,7 @@
 
 #  Description:
 #     This class creates a labelled entry widget with an additional
-#     menubutton. A menu of known options are associated with the 
+#     menubutton. A menu of known options are associated with the
 #     menubutton and will be entered into the entry widget when
 #     selected, unless a special "other" option is chosen in which
 #     case any string can be typed.
@@ -67,48 +67,48 @@ itcl::class gaia::LabelEntryMenu {
          menubutton $w_.mb -menu $menu
       } {
          keep -indicatoron -borderwidth -state
-         rename -relief -buttonrelief buttonRelief ButtonRelief 
+         rename -relief -buttonrelief buttonRelief ButtonRelief
          rename -width -buttonwidth buttonWidth ButtonWidth
          rename -anchor -buttonanchor buttonAnchor ButtonAnchor
          ignore -disabledforeground -font
       }
-      
+
       itk_component add menu {
          menu $menu
       } {
          ignore -disabledforeground
       }
-      
+
       set default_bg_ [$itk_component(mb) cget -background]
-      
+
       #  Trace var for setting the entry field.
       global ::$w_.var
       set $w_.var ""
       trace variable $w_.var w [code $this update_entryfield]
-      
+
       eval itk_initialize $args
    }
-   
+
    #  Destructor.
    destructor {
       global ::$w_.var
       catch {unset $w_.var}
    }
 
-    
+
    #  Remove all of the items in the menu.
    method clear {} {
       $itk_component(menu) delete 0 end
    }
 
-    
+
    #  Add a separator item to the menu.
    method add_separator {} {
       $itk_component(menu) add separator
    }
 
    #  Add an item to the menu.
-   #  The args may be the options: 
+   #  The args may be the options:
    #     -label <label for menuitem>
    #     -bitmap <bitmap for menuitem>
    #     -command <cmd to execute when item is selected>
@@ -116,7 +116,7 @@ itcl::class gaia::LabelEntryMenu {
    #     -font <font of menu item and button when chosen>
    method add {args} {
       global ::$w_.var
-	
+
       # Command to add menu item.
       set cmd "$itk_component(menu) add radiobutton"
 
@@ -153,19 +153,19 @@ itcl::class gaia::LabelEntryMenu {
             }
          }
       }
-      if { ! [info exists value] } { 
+      if { ! [info exists value] } {
          set value [incr unique_]
       }
 
-      if { ! [info exists name] } { 
+      if { ! [info exists name] } {
          set name $value
       }
 
       set values_($name) $value
 
-      lappend cmd -variable $w_.var -value $value 
+      lappend cmd -variable $w_.var -value $value
       eval $cmd
-	
+
       #  Set default value to first item.
       if {"[set $w_.var]" == ""} {
          set $w_.var $value
@@ -189,9 +189,9 @@ itcl::class gaia::LabelEntryMenu {
       }
    }
 
-    
+
    #  Called when "$variable_" has changed, via trace, to update menu.
-    
+
    method variable_changed {args} {
       global $variable_
       config -value [set $variable_]

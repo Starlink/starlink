@@ -36,6 +36,6 @@
 *
 *     This routine is SYSTEM DEPENDENT.
 *-----------------------------------------------------------------------
- 
+
       GKAN1 = CHAR(IASC)
       END

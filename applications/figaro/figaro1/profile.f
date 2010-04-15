@@ -2,7 +2,7 @@ C+
       SUBROUTINE PROFILE
 C
 C     P R O F I L E
-C       
+C
 C     PROFILE determines a spatial profile image for subsequent use
 C     by the optimum extraction program OPTEXTRACT. PROFILE uses the
 C     technique described by Horne, 1986 (PASP 98, 609). An initial
@@ -17,13 +17,13 @@ C     allows the method to be insensitive to cosmic-ray hits or other
 C     bad data points.
 C
 C     Error and quality information may be present on the input image.
-C     Points with bad quality will be ignored in the fit, and the errors 
+C     Points with bad quality will be ignored in the fit, and the errors
 C     may be used to weight the fit.
 C
 C     An image containing the residuals of the fit to the profile is
 C     generated and may be used to judge the quality of the fit.
 C
-C     The Horne algorithm is appropriate for the case where there is 
+C     The Horne algorithm is appropriate for the case where there is
 C     only a slight tilt or distortion on the spectrum. Where the tilt
 C     or distortion is more extreme, such as in a cross-dispersed
 C     echelle spectrum, an algorithm such as that of Marsh, 1989
@@ -42,7 +42,7 @@ C     'RESIDUAL'  The name of the data file containing the residuals of
 C                    the fit.
 C
 C     Command keywords -
-C    
+C
 C     'WEIGHT'    Use the error or variance array to weight the
 C                 polynomial fit.
 C
@@ -50,9 +50,9 @@ C
 C                                     JAB / JAC 8th Feb 1991
 C
 C     Modified:
-C     10th Feb 1991  JAB / JAC  Add NREJECT parameter and RESIDUAL 
+C     10th Feb 1991  JAB / JAC  Add NREJECT parameter and RESIDUAL
 C                    output file
-C     8th  Mar 1991  JAB / JAC  Use Variance instead of error, add 
+C     8th  Mar 1991  JAB / JAC  Use Variance instead of error, add
 C                    WEIGHT keyword
 C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C     17th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
@@ -101,7 +101,7 @@ C
       INTEGER   W1PTR            ! Dynamic-memory pointer of W1 array
       INTEGER   XPTR             ! Dynamic-memory pointer of X array
       INTEGER   YPTR             ! Dynamic-memory pointer of Y array
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -336,7 +336,7 @@ C
       END DO
 C
 C     Do polynomial fits along each row to give more accurate profile image
-C              
+C
 C
 C     Set up parameters needed for E02ADF
 C
@@ -358,13 +358,13 @@ C
              IF (Q(IX,IY) .EQ. 0) THEN
                 NGOOD = NGOOD+1
                 IF (ERRORS) THEN
-                   IF (V(IX,IY) .LE. 0 .OR. 
+                   IF (V(IX,IY) .LE. 0 .OR.
      :                 V(IX,IY) .EQ. FUNKNOWN_IN) THEN
                       ERRORS = .FALSE.
                    END IF
                 END IF
              END IF
-          END DO 
+          END DO
 C
 C     Set up arrays for polynomial fit to curent row.
 C     Note that the weight required by E02ADF is 1/uncertainty,
@@ -379,7 +379,7 @@ C
                   Y(INDEX) = I(IX,IY)
                   IF (ERRORS) THEN
                      W(INDEX) = 1D0/V(IX,IY)
-                  ELSE  
+                  ELSE
                      W(INDEX) = 1D0
                   END IF
                   INDEX = INDEX+1
@@ -406,11 +406,11 @@ C
                   IFAIL2 = 0
                   CALL PDA_DP1VLU(KPLUS1-1,0,X(INDEX),VALUE,DUMMY,
      :               W1(NGOOD+1),IFAIL2)
-                  R = ABS(Y(INDEX)-VALUE)         
-                  IF (R .GT. RMAX) THEN          
-                      RMAX = R                   
-                      IMAX = INDEX               
-                  END IF                          
+                  R = ABS(Y(INDEX)-VALUE)
+                  IF (R .GT. RMAX) THEN
+                      RMAX = R
+                      IMAX = INDEX
+                  END IF
               END DO
               DO INDEX = IMAX,NGOOD-1
                  Y(INDEX)=Y(INDEX+1)
@@ -440,7 +440,7 @@ C
               IF (IFAIL2 .EQ. 0) THEN
                   IF (VALUE .LT. 0D0) VALUE=0D0
                   RES(IX,IY) = VALUE-I(IX,IY)
-                  I(IX,IY) = VALUE 
+                  I(IX,IY) = VALUE
                   Q(IX,IY) = 0
                   V(IX,IY) = 0.0
               ELSE

@@ -32,17 +32,17 @@
 *  History:
 *     06 Dec 1993 (hme):
 *        Original version.
-*     10 May 1995 (rpt): 
+*     10 May 1995 (rpt):
 *        Added support FILHD
 *     16 Aug 2004 (timj):
-*        Use CNF_PVAL for HDS mapped data arrays 
+*        Use CNF_PVAL for HDS mapped data arrays
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
       END IF
 
 *  Get some information from file header (fill FILHD)
-      CALL FV4_FILINF ( IFILE, IFAIL ) 
+      CALL FV4_FILINF ( IFILE, IFAIL )
       IF ( IFAIL .NE. 0 ) THEN
          IFAIL = 38
          GO TO 500

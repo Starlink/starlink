@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -7,7 +7,7 @@
 \newcommand{\stardocnumber}    {27.1}
 \newcommand{\stardocauthors}   {Adrian Fish}
 \newcommand{\stardocdate}      {13 October 1995}
-\newcommand{\stardoctitle}     {\staradmin\ --- Starlink User Database 
+\newcommand{\stardoctitle}     {\staradmin\ --- Starlink User Database
                                 Maintainer}
 %------------------------------------------------------------------------------
 
@@ -83,24 +83,24 @@ automatically generate user summary lists.
 When a new user is added to the system, \staradmin\ is used to create a
 new entry in the UDB directory. The user summary lists can be rebuilt
 immediately in a very short time. Entries in the UDB can be edited and
-manipulated with the \staradmin\ program. 
+manipulated with the \staradmin\ program.
 
 \staradmin\ also provides a facility for cross-checking the UDB with the
 {\tt passwd} database and displays any discrepancies \footnote{This
 doubles up as a useful tool for getting your {\tt usernames.lis} into
-shape prior to building your UDB.}. 
+shape prior to building your UDB.}.
 
 The actions of the \staradmin\ program are controlled by the configuration
 file {\tt staradmin.conf}. The system administrator has a wide range of
 options available in this file for customising the \staradmin\ environment
-to the needs of the local site. 
+to the needs of the local site.
 
 As well as the {\tt usernames.lis} file, \staradmin\ will generate several
 other files including a statistical summary of your users by category and
 site, mail lists, mail aliases based on real name, the RGO `astropersons'
 list for your site and an address list for sticky labels. Appendix
 \ref{summarylists} has a complete list of summary files \staradmin\ can
-generate. 
+generate.
 
 There are two levels to the UDB --- {\tt BASE} and {\tt EXTENDED}. The
 {\tt BASE} level UDB can be built from just a valid, up-to-date {\tt
@@ -111,20 +111,20 @@ users.lis} into the UDB.}. The advantage of the {\tt EXTENDED} UDB option
 is the ability to auto-generate a {\tt users.lis} and a local phone book.
 The system administrator may choose the {\tt EXTENDED} option even if they
 have no {\tt users.lis}, and they are then free to add the additional user
-data by hand at a later date. 
+data by hand at a later date.
 
 All fields in the {\tt BASE} and {\tt EXTENDED} UDB can be populated with
 the data that can be found on a correctly filled out Starlink Application
-Form. 
+Form.
 
 {\large\bf NOTE:} This document is mainly concerned with the initial
 customisation of the \staradmin\ enviroment and the building of a UDB. The
 majority of the text covers items that only need to be performed
 \underline{once} (so don't be put off). When the UDB has been built, then
 the administrator only need concern themself with the \staradmin\ program
-(and its {\tt man} pages for reference). 
+(and its {\tt man} pages for reference).
 
-\staradmin\ requires at least Perl Version 5.001m. 
+\staradmin\ requires at least Perl Version 5.001m.
 
 %\newpage
 
@@ -135,15 +135,15 @@ The current version of the kit is available via anonymous FTP from the Starlink
 FTP server at RAL:
 
 \begin{verbatim}
-      Site:  starlink-ftp.rl.ac.uk   
+      Site:  starlink-ftp.rl.ac.uk
       File:  pub/ussc/base/axp/staradmin-X.Y.tar.Z  (approx. 160KB)
 \end{verbatim}
 
-where {\tt X.Y} is the latest \staradmin\ version number. 
+where {\tt X.Y} is the latest \staradmin\ version number.
 
 On your local system, log on as {\tt star} and create a directory to hold
 the kit.  The recommended place is under the {\tt /star/local} tree in a
-directory called {\tt staradmin}.  Create and move to this directory: 
+directory called {\tt staradmin}.  Create and move to this directory:
 
 \begin{verbatim}
       % mkdir /star/local/staradmin
@@ -175,13 +175,13 @@ kit and then unpacking the source archive:
 
 Now you must follow the Pre-installation Tasks as described in Section
 \ref{preinstall}.  The distribution kit is no longer needed and may be
-deleted. 
+deleted.
 
 \section{Pre-installation Tasks}
 \label{preinstall}
 
-Before you actually install the kit, some decisions must be made and 
-certain files should be customised for your site. 
+Before you actually install the kit, some decisions must be made and
+certain files should be customised for your site.
 Follow the instructions in the following subsections.
 
 \subsection{{\tt BASE} or {\tt EXTENDED} UDB?}
@@ -190,7 +190,7 @@ At this point you should consider which level of UDB you want to implement
 at your site. If you have only a {\tt usernames.lis}, and you have a large
 number of users, you may want to stay with the {\tt BASE} UDB which only
 requires a {\tt usernames.lis}. Choosing the {\tt BASE} option however
-means that certain summary files cannot be generated. 
+means that certain summary files cannot be generated.
 
 If you have a {\tt users.lis} and would like to be able to build a {\tt
 users.lis} automatically, you should choose the {\tt EXTENDED} UDB. For
@@ -198,16 +198,16 @@ sites with existing {\tt users.lis} you should refer to Appendix
 \ref{ifusers} on how best to get your {\tt users.lis} data into the UDB.
 Sites that do not have a {\tt users.lis} but would like to take advantage
 of the additional fields in the {\tt EXTENDED} UDB can select this. The
-additional data must be added by hand. 
+additional data must be added by hand.
 
 An example {\tt users.lis} file is provided ({\tt users.eg.UCL}) in the
 kit so you can see what you would be getting. Use the format of this
-example file as a template if you are modifying your own {\tt users.lis}. 
+example file as a template if you are modifying your own {\tt users.lis}.
 
 {\large\bf ACTION:} Decide which level you are going to use. If you choose
 the {\tt EXTENDED} level and want to include the contents of an existing
 {\tt users.lis} in the UDB, follow the instructions in Appendix
-\ref{ifusers} \underline{carefully}. 
+\ref{ifusers} \underline{carefully}.
 
 \subsection{Saving your current user summary lists}
 
@@ -215,7 +215,7 @@ the {\tt EXTENDED} level and want to include the contents of an existing
 highly recommended} that you save copies of your existing user summary
 lists, especially {\tt usernames.lis} (also save {\tt users.lis} and {\tt
 people.adr} if you have them). Copy them to the \staradmin\ directory with
-the extension {\tt .SAV}. 
+the extension {\tt .SAV}.
 
 \begin{verbatim}
       % cd /star/local/staradmin
@@ -228,7 +228,7 @@ the extension {\tt .SAV}.
 {\tt usernames.lis} and point the environment variable {\tt
 ADMIN\_USERNAMES\_SRC} at it. This copy will be used to build your UDB and
 any changes that need to be made to update {\tt usernames.lis} should be
-done to this copy. 
+done to this copy.
 
 \begin{verbatim}
       % cp /star/local/admin/usernames.lis  usernames.SRC
@@ -240,11 +240,11 @@ also have to point another environment variable, {\tt ADMIN\_USERS\_SRC}
 at a copy of {\tt users.lis}. If you haven't already done so, this copy of
 {\tt users.lis} should have been edited to the UCL format as described in
 Appendix \ref{ifusers}. If you do not have a {\tt users.lis} (in any
-format), then point this environment variable to an empty file. 
+format), then point this environment variable to an empty file.
 
 \begin{verbatim}
       % cp <UCL format users.lis> users.SRC
-or:  
+or:
       % touch users.SRC
 
       % setenv ADMIN_USERS_SRC  /star/local/staradmin/users.SRC
@@ -256,14 +256,14 @@ or:
 The distribution copy of {\tt staradmin.conf} contains default entries for
 all keywords. By convention, all files and scripts are stored under the
 {\tt /star/local} tree. The default location for this file is {\tt
-/star/local/etc/staradmin.conf}. 
+/star/local/etc/staradmin.conf}.
 
 \begin{quote}
-  {\bf *** It is highly recommended that you use the defaults locations for 
+  {\bf *** It is highly recommended that you use the defaults locations for
            files referred to in {\tt staradmin.conf} *** }
 \end{quote}
 
-{\large\bf ACTION:} There are \underline{three} keywords you must edit at 
+{\large\bf ACTION:} There are \underline{three} keywords you must edit at
 this point:
 
 \begin{table}[ht]
@@ -278,7 +278,7 @@ this point:
 
 Read the comments in the {\tt staradmin.conf} file to get an idea of all
 the options available. Most sites will find that the default settings will
-be best. 
+be best.
 
 \staradmin\ looks for the configuration file in the default
 location. If you want \staradmin\ to read an alternative configuration file,
@@ -290,7 +290,7 @@ location.
 
 {\tt staradmin} provides an option for cross-checking the UDB (or under certain
 circumstances {\tt usernames.lis}) against the {\tt passwd} database, and
-displaying any discrepancies. 
+displaying any discrepancies.
 
 Invariably there will be many system accounts in your {\tt passwd} database
 (e.g. {\tt root, ftp, usenet} etc.), that do not (and should not) appear in
@@ -299,9 +299,9 @@ masking out such accounts, so that only `real' users are cross-checked.
 
 The {\tt killusers} file format is very simple. It can consist of a list of
 usernames to be ignored, one per line, and it can have special lines that
-include another file of the same format. 
+include another file of the same format.
 
-The distribution kit contains an example {\tt killusers} file that contains two 
+The distribution kit contains an example {\tt killusers} file that contains two
 entries that {\tt :include:} other files. These files are {\tt sysusers} and
 {\tt starusers}. The idea is that system accounts are placed in {\tt sysusers}
 and special Starlink accounts are placed in {\tt starusers}. The sort of
@@ -314,7 +314,7 @@ There are two versions of {\tt sysusers} provided in the kit. One contains
 typical system accounts for Digital Unix ({\tt sysusers.alpha\_OSF1}), the
 other for Solaris ({\tt sysusers.sun4\_Solaris}).  The build procedure in
 Section \ref{sec:unpack} will have extracted the appropriate version for
-your system.  
+your system.
 
 If you need to use or see the other version, extract it from the source
 archive:
@@ -335,32 +335,32 @@ example files provide a good starting point.
 
 The location of the {\tt killusers} file is defined in {\tt staradmin.conf}
 and will be moved there during the installation of \staradmin. The default
-location is {\tt /star/local/etc/killusers}. The example {\tt killusers} 
-expects both {\tt sysusers} and {\tt starusers} to be in the 
+location is {\tt /star/local/etc/killusers}. The example {\tt killusers}
+expects both {\tt sysusers} and {\tt starusers} to be in the
 {\tt /star/local/etc} directory also.
 
 \subsection{Editing {\tt location\_local}}
 
 The Starlink distributed file {\tt /star/admin/location} contains a long
 list of unique location codes followed by a location postal address. These
-location codes appear in the fifth field of your {\tt usernames.lis}. 
+location codes appear in the fifth field of your {\tt usernames.lis}.
 
 In order to automate the generation of postal address lists (and sticky
 labels) the optional file {\tt people.adr} can be produced. The postal
 address associated with the location code for each user is placed after
-each user's real name in {\tt people.adr}. 
+each user's real name in {\tt people.adr}.
 
 The file {\tt location\_local} is intended for system administrators to
 override a location code entry found in {\tt /star/admin/location}. This
 allows internal mail addresses to be substituted for full postal addresses
-for local users. 
+for local users.
 
 The contents of {\tt /star/admin/location} are read in first, followed by
 {\tt location\_local}. If a particular location code appears in both
 files, the one in {\tt location\_local} overrides the one in {\tt
 /star/admin/location}. If {\tt location\_local} contains more than one
 occurence of a particular location code, the last one read will be the one
-used. 
+used.
 
 {\large\bf ACTION:} The distribution example of this file contains the
 copy of {\tt location\_local} used at UCL. You should remove the UCL local
@@ -370,22 +370,22 @@ for your site at the end. Note that postal addresses in {\tt location} and
 separators when the file is processed\footnote{Unless there are no
 semi-colons at all in the address part, then the line is split at comma
 separators. This fallback method is included to provide compatibility with
-the old {\tt /star/admin/location} format.}. 
+the old {\tt /star/admin/location} format.}.
 
 For this first release of \staradmin, {\tt location\_local} contains a
 fair few addresses for other sites. This is because the file {\tt
 /star/admin/location} does not yet contain full postal addresses for any
-location codes. 
+location codes.
 
 The location of {\tt location\_local} is defined in {\tt staradmin.conf}.
-The default location is \newline {\tt /star/local/admin/location\_local}. 
+The default location is \newline {\tt /star/local/admin/location\_local}.
 
 \subsection{Editing {\tt Aliases.header}}
 
 The example {\tt Aliases.header} file shows how UCL manages its mailing
 lists. Other sites may already do this in a different way. For sites who
 have not centralised their local mailing lists this may be an appropriate
-opportunity to do this. 
+opportunity to do this.
 
 On Unix machines running {\tt sendmail} and NIS, there are two places that
 the mail system looks up mail aliases. There is the {\tt aliases} file in
@@ -393,58 +393,58 @@ the appropriate {\tt sendmail} directory, and there is the NIS distributed
 map {\tt aliases} (source file {\tt mail.aliases}; on Digital Unix this
 file is in {\tt /var/yp/src}). The \staradmin\ utility can be used to
 centralise the management of local mail lists and mail aliases that are
-distributed by NIS. 
+distributed by NIS.
 
 The example {\tt Aliases.header} file contains {\tt :include:} references
 to files containing mail lists. In the distribution example from UCL,
 there are {\tt :include:} references for lists specifically generated by
 \staradmin, plus local entries that are maintained manually. For
 convenience, all these lists are kept in a single directory ({\tt
-/star/local/mail} is the default). 
+/star/local/mail} is the default).
 
 When \staradmin\ is used to update user summary lists, two operations are
 performed that apply to the mail lists directory. First the
 auto-generation of mailing lists from the UDB is done, then aliases based
 on a users real name are generated. These real name aliases are appended
 to the file {\tt mail.aliases} which has a copy of {\tt Aliases.header}
-(minus comments) at the top. 
+(minus comments) at the top.
 
 The system administrator is free to name and specify which if any mail
 lists are generated by \staradmin. They are configured through the file
-{\tt starmail.conf}. See Section \ref{starmailconf} for details. 
+{\tt starmail.conf}. See Section \ref{starmailconf} for details.
 
 For convenience, at UCL we soft-link this file ({\tt
 /star/local/mail/mail.aliases}) to the NIS source directory (e.g. {\tt
 /var/yp/src}). It is then a simple matter to rebuild the NIS {\tt aliases}
 map. The NIS aliases map can be rebuilt automatically by an appropriate
-{\tt cron} entry (see Section \ref{cronalias}). 
+{\tt cron} entry (see Section \ref{cronalias}).
 
 {\large\bf ACTION:} If you wish to follow the UCL example, then the
 distribution examples will provide you with sufficient information to do
 this for you site. Otherwise you may tell \staradmin\ to place the
 auto-generated lists elsewhere via {\tt staradmin.conf}, or even switch
 off the generation of mail-associated lists altogether (by commenting out
-the relevant keywords in {\tt staradmin.conf}). 
+the relevant keywords in {\tt staradmin.conf}).
 
 The location of the {\tt Aliases.header} file is defined in {\tt
 staradmin.conf}. The default location is \newline {\tt
-/star/local/mail/Aliases.header}. 
+/star/local/mail/Aliases.header}.
 
 \subsection{Editing {\tt starmail.conf}}
 \label{starmailconf}
 
 The example {\tt starmail.conf} file shows the UCL mailing list files and
 the UDB information used to generate them. The format of the file is
-explained fully in the example file. 
+explained fully in the example file.
 
 {\large\bf ACTION:} You can configure as many mail lists as you like, and
 call them what you like. Don't forget to modify/add the appropriate
 entries in {\tt Aliases.header} so they are incorporated correctly in {\tt
-mail.aliases}. 
+mail.aliases}.
 
-The default location for this file is {\tt /star/local/mail/starmail.conf}. 
-This can be overridden by defining the environment variable {\tt 
-ADMIN\_MAILCONF} to point to an alternative location. 
+The default location for this file is {\tt /star/local/mail/starmail.conf}.
+This can be overridden by defining the environment variable {\tt
+ADMIN\_MAILCONF} to point to an alternative location.
 
 \subsection{Editing {\tt usernames.misc}}
 \label{usernames.misc}
@@ -456,14 +456,14 @@ including any blank lines) is included near the top of the auto-generated
 {\tt usernames.lis}. The sort of usernames that end up here are the {\tt
 star} account, visitor accounts, Mailclub accounts etc. Such accounts
 should probably appear in your local {\tt killusers} file (or included
-file, e.g. {\tt starusers}; see Section \ref{killusers}). 
+file, e.g. {\tt starusers}; see Section \ref{killusers}).
 
 {\large\bf ACTION:} The distribution example has the UCL data for this
 file. Edit this appropriately for your site by including the relevant
-chunk from your original {\tt usernames.lis} file. 
+chunk from your original {\tt usernames.lis} file.
 
 The location of {\tt usernames.misc} is defined in {\tt staradmin.conf}.
-The default location is \newline {\tt /star/local/admin/usernames.misc}. 
+The default location is \newline {\tt /star/local/admin/usernames.misc}.
 
 \subsection{Editing {\tt nextaccnum}}
 
@@ -471,7 +471,7 @@ This file is used to contain the number of the next Starlink Application
 Form for your site. It must contain a four-digit number {\em e.g.}, {\tt
 0348}. This number in {\tt nextaccnum} is read when adding a new user to
 the UDB. If the user is successfully added, the number in {\tt nextaccnum}
-is incremented by one. 
+is incremented by one.
 
 {\large\bf ACTION:} Edit the distribution example and add the appropriate
 number for your site.
@@ -487,7 +487,7 @@ distribution files, you can install the \staradmin\ kit.
 
 {\large\bf ACTION:} You should be logged in as {\tt star}. Ensure the
 environment variable {\tt INSTALL} is set to {\tt /star/local} ({\em not}
-{\tt /star}) and {\tt SYSTEM} is set for your OS. 
+{\tt /star}) and {\tt SYSTEM} is set for your OS.
 
 \begin{verbatim}
       % setenv SYSTEM <alpha_OSF1 OR sun4_Solaris>
@@ -498,7 +498,7 @@ environment variable {\tt INSTALL} is set to {\tt /star/local} ({\em not}
 
 Amongst the executable scripts and the configuration files and support
 files already discussed, two {\tt man} pages ({\tt staradmin(8)} and {\tt
-buildudb(8)}) are installed into {\tt /star/local/man/man8}). 
+buildudb(8)}) are installed into {\tt /star/local/man/man8}).
 
 \section{Building a UDB}
 
@@ -508,10 +508,10 @@ There are three stages to building a UDB:
 
 \item Ensuring your {\tt usernames.\-lis} is up-to-date (and confirming
 the format of {\tt users.lis} if you have selected the {\tt EXTENDED}
-UDB). 
+UDB).
 
 \item Running a check on the UDB source files at {\tt ADMIN\_USERNAMES\_SRC}
-and {\tt ADMIN\_USERS\_SRC}. 
+and {\tt ADMIN\_USERS\_SRC}.
 
 \item Building the UDB itself.
 
@@ -544,7 +544,7 @@ Typical output would look something like this:
 
       -----------------------------------------------------------
       + Usernames in user database, but not in passwd database
-    
+
       ug_jwm          "James Manfield"
       ug_gajh         "Gaitee Hussein"
       ug_sg           "Sakura Gooneratne"
@@ -552,20 +552,20 @@ Typical output would look something like this:
 \end{verbatim}
 \end{small}
 
-There may be users listed under other headings as there are additional 
+There may be users listed under other headings as there are additional
 {\tt passwd} health checks built into \staradmin.
 
 {\large\bf ACTION:} You may also see some usernames appearing in this list that
-are not appropriate to your {\tt usernames.lis} file. These should be placed in 
+are not appropriate to your {\tt usernames.lis} file. These should be placed in
 the {\tt killusers} file or the relevant {\tt :include:} files you have chosen.
 Section \ref{killusers} gives full details.
 
 By default, the {\tt passwd} database is checked for entries with empty
 password fields, whether the home directory specified exists (check can be
-switched off), whether the shell is valid i.e. in {\tt /etc/shells} 
+switched off), whether the shell is valid i.e. in {\tt /etc/shells}
 \footnote{You can point to an alternative list of shells by pointing the
 environment variable {\tt ETC\_SHELLS} at another file.}
-(check can be switched off) and if logins have been disabled for the user 
+(check can be switched off) and if logins have been disabled for the user
 (check can be switched off).
 
 {\large\bf ACTION:} There may also be a couple of users that appear in the {\tt
@@ -616,7 +616,7 @@ files and re-run the source file checker until the messages go away. Note that
 the checker program isn't foolproof and it could get confused if your formats
 are way, way out.
 
-Once you're happy that your source files are OK, it's time to build your UDB. 
+Once you're happy that your source files are OK, it's time to build your UDB.
 Go to Section \ref{buildudb}.
 
 \subsection{Building a UDB with {\tt buildudb}}
@@ -638,7 +638,7 @@ catch to stop you inadvertently overwriting your UDB.
 \end{verbatim}
 
 {\large\bf ACTION:} To build your UDB, type the following and answer the
-prompts with a `{\tt y}'. You are given two chances to bail out. If the target 
+prompts with a `{\tt y}'. You are given two chances to bail out. If the target
 UDB directory (defined in {\tt staradmin.conf}) does not exist you will be
 asked if you want it created.
 
@@ -647,7 +647,7 @@ asked if you want it created.
 \end{verbatim}
 
 The utility will now extract user information from your UDB source files
-{\tt ADMIN\_USERNAMES\_SRC} and {\tt ADMIN\_USERS\_SRC} 
+{\tt ADMIN\_USERNAMES\_SRC} and {\tt ADMIN\_USERS\_SRC}
 and populate your UDB directory.
 
 \subsection{Generating the user summary lists}
@@ -688,21 +688,21 @@ The syntax for adding a user to the UDB is:
 \end{verbatim}
 
 \staradmin\ checks whether the username specified already exists. If it does
-the program returns an error message. 
+the program returns an error message.
 
 Otherwise the administrator is prompted to  enter data for the user. Typing
 {\tt '?'} at any time provides brief help on the data item being prompted for.
 Some fields insist on some input and where possible a validity check is done on
 the input value. Other fields can be left blank. Where possible an appropriate
-default is displayed which can be entered by pressing {\tt <RETURN>}. 
+default is displayed which can be entered by pressing {\tt <RETURN>}.
 
 If a field has a default value, but you wish to enter an empty value to this
 field, then type a {\tt <SPACE>}.
 
-Once prompting has finished, all the fields are listed and the 
+Once prompting has finished, all the fields are listed and the
 administrator is asked whether anything needs to be modified. If the
 answer is yes, all data is prompted for again (with defaults being the data
-entered previously). If all data is correct, the administrator is prompted 
+entered previously). If all data is correct, the administrator is prompted
 to write the entry to the UDB.
 
 \subsection{Deleting a user from the UDB}
@@ -729,7 +729,7 @@ The syntax for modifying a user entry in the UDB is:
 \end{verbatim}
 
 If the given username does not exist, \staradmin\ returns an error message.
-Otherwise the administrator is prompted to enter data for the user. Use the 
+Otherwise the administrator is prompted to enter data for the user. Use the
 same procedure as that described for adding a user in Section \ref{addinguser}.
 
 \subsection{Viewing a user entry in the UDB}
@@ -775,7 +775,7 @@ to generate a printer ready file for spooling to a suitably stocked
 printer. Note that the copy of {\tt mklabels} is only an example, and you
 can specify an alternative program to be run at this point via {\tt
 staradmin.conf}. This alternative external program could be a {\sf
-FORTRAN} program. 
+FORTRAN} program.
 
 
 \section{Other helpful tips}
@@ -785,13 +785,13 @@ FORTRAN} program.
 Here's a useful way of automatically letting {\tt star} know of any
 discrepancies that may have crept into your UDB or {\tt passwd} database
 in plenty of time to fix it before your {\tt usernames.lis} is copied to
-RAL. 
+RAL.
 
 This works for a Digital Unix system and presumably for Solaris:
 
 \begin{verbatim}
 #
-# Check UDB against passwd three days before usernames.lis is copied to RAL 
+# Check UDB against passwd three days before usernames.lis is copied to RAL
 # (usually on 14th of every month) and email results to star
 #
 52 0 11 * * /star/local/bin/staradmin -x | mailx -s "Staradmin -x" star
@@ -802,7 +802,7 @@ This works for a Digital Unix system and presumably for Solaris:
 \label{cronalias}
 
 Here's a {\tt crontab} entry for updating a NIS aliases map once a day.
-It runs the example shell script {\tt mkpush\_aliases} (comes with the 
+It runs the example shell script {\tt mkpush\_aliases} (comes with the
 \staradmin\ kit).
 
 \begin{verbatim}
@@ -825,30 +825,30 @@ UDB by choosing the {\bf\tt EXTENDED} option, then read this section very
 carefully. The problem with {\tt users.lis} is that the sites that do have
 such a file use wildly differing formats. UCL's format is currently the
 only supported format for building an {\tt EXTENDED} UDB and regenerating
-a {\tt users.lis}. 
+a {\tt users.lis}.
 
 To use another site's {\tt users.lis} would require major hacking of the
 scripts. Experience in beta-testing has shown that such hacking would
 require much more time than a system administrator would spend manually
 reformatting an existing {\tt users.lis} to the UCL format. Remember that
-the building of the UDB need only be done once. 
+the building of the UDB need only be done once.
 
 So the recommended method is to edit your {\tt users.lis} to the UCL
-format.  The kit contains an example UCL format file ({\tt users.eg.UCL}). 
+format.  The kit contains an example UCL format file ({\tt users.eg.UCL}).
 
 Some sites may feel this is too much work. In that case, they should
-select the {\tt BASE} UDB. 
+select the {\tt BASE} UDB.
 
 If you have a small number of users and you intend to manually enter the
 {\tt EXTENDED} UDB information, then when selecting {\tt EXTENDED} in {\tt
 staradmin.conf}, also point the environment variable {\tt
-ADMIN\_USERS\_SRC} to an empty file. 
+ADMIN\_USERS\_SRC} to an empty file.
 
 The origin of a Starlink {\tt users.lis} is a common one, but over the
 years the format has `evolved' at those sites who maintained one (this
 tends to be the older sites). The information in these files also varies.
 But basically they are of the same general format. There are at least two
-sections of user data. 
+sections of user data.
 
 The first section occurs after a header containing summary information and
 starts immediately after a line starting with two spaces and three {\tt
@@ -857,33 +857,33 @@ in alphabetical order keyed on surname. Some of the information in these
 lines is also found in {\tt usernames.lis}. This section is relatively
 easy to format to the UCL style. The most important thing is to line up
 the {\bf columns} correctly. This section ends at a line consisting of all
-{\tt "*"}s. 
+{\tt "*"}s.
 
 The second section contains further information about a particular user
 and starts immediately after a line of {\tt "*"}s. The entries for each
 user are sorted by account number. Each entry is also three lines long.
-This section is usually the most difficult bit to maintain. 
+This section is usually the most difficult bit to maintain.
 
 There may be a third section that contains postal addresses and user
 breakdowns by site. The information in these sections, if they exist, has
-moved to other files under the \staradmin\ scheme and will be ignored. 
+moved to other files under the \staradmin\ scheme and will be ignored.
 
 To copy the UCL format of {\tt users.lis} then you must be precise, the
 first item in the following list being very, very important, and
-including: 
+including:
 
 \begin{itemize}
-\item !!!! Columns must line up {\bf exactly} in {\bf both} sections !!!! 
+\item !!!! Columns must line up {\bf exactly} in {\bf both} sections !!!!
       \newline {\tt buildudb} splits on columns, {\it not} whitespace.
 \item Strip all tabs
-\item First section starts after a line beginning {\tt "\hspace{2em}+++"} (note 
+\item First section starts after a line beginning {\tt "\hspace{2em}+++"} (note
       \underline{two} spaces before first {\tt +}).
 \item No blank lines between the first section and the line of {\tt"*"}s
 \item Second section entries are three lines long, and must be separated by
       a \underline{blank} line (i.e. no spaces or tabs)
 \item In the second section, firstnames and title must be separated by a
       comma
-\item In the second section, room number and telephone number must be 
+\item In the second section, room number and telephone number must be
       separated by a comma
 \item Remove any data in a third section or separate from second section
       with a long line of {\tt "*"}s.
@@ -892,7 +892,7 @@ including:
 
 Experience has shown that the second section of {\tt users.lis} can cause
 the most problems. Here's an example of a UCL {\tt users.lis} entry (80
-columns wide): 
+columns wide):
 
 \begin{small}
 \begin{verbatim}
@@ -954,23 +954,23 @@ Here is a list of all the files that \staradmin\ is able to generate
 automatically.
 
 \begin{itemize}
-\item {\Large\tt usernames.lis} 
+\item {\Large\tt usernames.lis}
 
 Required by Starlink. This file is the primary source of information for the
-Starlink wide user summaries. Contains six fields of information. 
+Starlink wide user summaries. Contains six fields of information.
 
-\item {\Large\tt users.lis} 
+\item {\Large\tt users.lis}
 
 This file supplements the information contained in {\tt usernames.lis}. It can
 be used as a source for an alternative {\tt finger} scheme.
 
-\item {\Large\tt people.adr}  
+\item {\Large\tt people.adr}
 
-This file contains users and their postal addresses. This file is used as 
+This file contains users and their postal addresses. This file is used as
 input for a labels processor. The reason this format is maintained is for
 compatibility with existing sticky label processing programs.
 
-\item {\Large\tt labels.lis}  
+\item {\Large\tt labels.lis}
 
 Output sticky labels formatted names and addresses. Produced by a program
 external to \staradmin\ that takes {\tt people.adr} as its input.
@@ -984,7 +984,7 @@ file.
 
 \item {\Large\tt summary.lis}
 
-Contains a breakdown of users based on category and location. 
+Contains a breakdown of users based on category and location.
 
 \item {\Large\tt phone.book}
 
@@ -999,11 +999,11 @@ non-empty {\tt Phone:} field in their UDB file.
 
 \item {\Large\tt mail.aliases}
 
-This file makes use of the results of two operations by \staradmin. The first 
+This file makes use of the results of two operations by \staradmin. The first
 action of \staradmin\ is to generate a set of mailing lists based on UDB data
-(as defined in {\tt starmail.conf}). Include instructions for these mailing 
+(as defined in {\tt starmail.conf}). Include instructions for these mailing
 lists are placed manually in
-the file {\tt Aliases.header}. The second action of \staradmin\ is to copy the 
+the file {\tt Aliases.header}. The second action of \staradmin\ is to copy the
 contents of {\tt Aliases.header} to {\tt mail.aliases} and append a list of
 mail aliases for each user in the UDB based on their real name.
 
@@ -1023,12 +1023,12 @@ Here is an example listing of the contents of a UDB file:
     Firstnames:  Adrian C
     Title:       Dr
     Status:      N
-    Funding:     
+    Funding:
     Account:     UCLL0185
     Added:       Jun 84
     Expiry:      Indef
     Plan:        Site Manager
-    Supervisor:  
+    Supervisor:
     Phone:       x7147
     Room:        E24
     Created:     24-Aug-1995 13:04
@@ -1037,18 +1037,18 @@ Here is an example listing of the contents of a UDB file:
 
 Each line consists of a keyword followed by some data.
 Note that there are some keywords that may not be used at your site.
-If {\tt UDBLEVEL} is set to {\tt BASE} in {\tt staradmin.conf} then 
-the administrator only ever sees the top {\bf six} entries when using 
+If {\tt UDBLEVEL} is set to {\tt BASE} in {\tt staradmin.conf} then
+the administrator only ever sees the top {\bf six} entries when using
 \staradmin.
 
 The other keywords are used if you select the {\tt EXTENDED} UDB.
-The reason for including all these extra keywords even if the {\tt BASE} 
-level is selected, is to protect any data that may have been entered 
-previously at the {\tt EXTENDED} level, but the administrator has for some 
+The reason for including all these extra keywords even if the {\tt BASE}
+level is selected, is to protect any data that may have been entered
+previously at the {\tt EXTENDED} level, but the administrator has for some
 reason gone back to the {\tt BASE} level.
 
 The file {\tt starudb.conf} contains a complete list of keywords used in the
-UDB and defines various properties for each keyword. This file should 
+UDB and defines various properties for each keyword. This file should
 {\bf not} be modified.
 
 \subsection{The keywords explained}

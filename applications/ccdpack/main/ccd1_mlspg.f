@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_MLSPG( GRAPH, WEIGHT, NEDGES, TOTNOD, QUEUE, BEEN, SPAN, 
+*     CALL CCD1_MLSPG( GRAPH, WEIGHT, NEDGES, TOTNOD, QUEUE, BEEN, SPAN,
 *                      SUBGRP, NEWED, NNODE, STATUS )
 
 *  Description:
@@ -33,8 +33,8 @@
 *        connected) on entry. On exit the graph will be sorted into
 *        decreasing weight order.
 *     WEIGHT( * ) = DOUBLE PRECISION (Given and Returned)
-*        The weights associated with each edge.  It is indexed by 
-*        GRAPH( 4, * ).  On exit this will be sorted to match the 
+*        The weights associated with each edge.  It is indexed by
+*        GRAPH( 4, * ).  On exit this will be sorted to match the
 *        positions in the graph.
 *     NEDGES = INTEGER (Given)
 *        The number of edges in the graph.
@@ -42,7 +42,7 @@
 *        The number of nodes in the input graph.
 *     QUEUE( * ) = INTEGER (Given and Returned)
 *        Workspace to hold the queue of nodes still be visited. This
-*        should 
+*        should
 *     BEEN( * ) = LOGICAL (Returned)
 *        Array of flags indicating which nodes have been visited. The
 *        index into this array are those of the node numbers, so this
@@ -51,7 +51,7 @@
 *     SPAN( 4, * ) = INTEGER (Given and Returned)
 *        Workspace graph, needs to be size of SUBGRP
 *     SUBGRP( 4, * ) = INTEGER (Returned)
-*        The maxiumum likelyhood spanning sub-graph. 
+*        The maxiumum likelyhood spanning sub-graph.
 *     NEWED = INTEGER (Returned)
 *        The number of edges in the output sub-graph (second dimension).
 *     NNODE = INTEGER (Returned)
@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -204,7 +204,7 @@
             NSPAN = NSPAN - 1
          END IF
          GO TO 4
-      END IF     
+      END IF
 
 *  Found maximum spanning tree, temporary report section.
       CALL CCD1_MSG( ' ',

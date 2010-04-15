@@ -82,8 +82,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'             ! SSE global definitions
-      INCLUDE 'NDF_PAR'             
-      INCLUDE 'NDF_ERR'             
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'PRM_PAR'             ! PRIMDAT constants
 
 *    Status :
@@ -92,7 +92,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                     ! image dimensionality
       PARAMETER ( NDIMS  =  2 )     ! 2-d images only
 
@@ -104,7 +104,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI,                     ! locator for input data structure
      :    LOCO,                     ! locator for output data structure
      :    NELEMENTS,                ! number elements mapped by NDF_MAP
@@ -113,11 +113,11 @@
      :    PNTRI,                    ! pointer to input data array component
      :    PNTRO                     !    "     " output  "    "       "
 
-      REAL 
+      REAL
      :    THRLO,                    ! lower threshold value
      :    THRHI,                    ! upper     "       "
      :    NEWLO,                    ! new value for pixels below THRLO
-     :    NEWHI                     ! new value for pixels above THRHI  
+     :    NEWHI                     ! new value for pixels above THRHI
 
 *-
 *    check status on entry - return if not o.k.
@@ -133,46 +133,46 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                 PNTRI, NELEMENTS, STATUS )
 
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS )
-      
+
 *       get the low threshold value
-         CALL AIF_GET0R( 'THRLO', 0.0, MINVAL, MAXVAL, 
+         CALL AIF_GET0R( 'THRLO', 0.0, MINVAL, MAXVAL,
      :                    THRLO, STATUS )
 
 *       get the value to which numbers below THRLO are set
-         CALL AIF_GET0R( 'NEWLO', THRLO, MINVAL, MAXVAL, 
+         CALL AIF_GET0R( 'NEWLO', THRLO, MINVAL, MAXVAL,
      :                    NEWLO, STATUS )
 
 *       get the high threshold value
-         CALL AIF_GET0R( 'THRHI', 0.0, MINVAL, MAXVAL, 
+         CALL AIF_GET0R( 'THRHI', 0.0, MINVAL, MAXVAL,
      :                    THRHI, STATUS )
 
 *       get the value to which numbers above THRHI are set
-         CALL AIF_GET0R( 'NEWHI', THRHI, MINVAL, MAXVAL, 
+         CALL AIF_GET0R( 'NEWHI', THRHI, MINVAL, MAXVAL,
      :                    NEWHI, STATUS )
 
 *       check for error so far
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*          create output image type data structure 
-            CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS, 
+*          create output image type data structure
+            CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS,
      :                    LOCO, STATUS )
 
 *          check for error
             IF( STATUS .EQ. SAI__OK ) THEN
 
 *             map output DATA_ARRAY component
-               CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+               CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                        PNTRO, NELEMENTS, STATUS )
 
 *             if there have been no errors then perform the thresholding
                IF ( STATUS .EQ. SAI__OK ) THEN
-  
-                  CALL THRESHSUB( %VAL( PNTRI ), %VAL( PNTRO ), 
-     :                    IDIMS(1), IDIMS(2), THRLO, THRHI, NEWLO, 
+
+                  CALL THRESHSUB( %VAL( PNTRI ), %VAL( PNTRO ),
+     :                    IDIMS(1), IDIMS(2), THRLO, THRHI, NEWLO,
      :                    NEWHI, STATUS )
 
                END IF

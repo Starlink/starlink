@@ -2,14 +2,14 @@
 *+  MOSAIC_ADDB - adds an image to a new array and records the overlap -
 *                 this version of the subroutine deals with bad pixels
 
-      SUBROUTINE MOSAIC_ADDB ( IN, BAD, IDIMSX, IDIMSY, XOFFSET,   
-     :                         YOFFSET, OUT, MASK, ODIMSX, ODIMSY, 
+      SUBROUTINE MOSAIC_ADDB ( IN, BAD, IDIMSX, IDIMSY, XOFFSET,
+     :                         YOFFSET, OUT, MASK, ODIMSX, ODIMSY,
      :                         STATUS )
 
 *    Description :
 *
 *     This routine adds an image into a (usually larger) ouput image,
-*     and is used in mosaicing arrays together. The offset of the 
+*     and is used in mosaicing arrays together. The offset of the
 *     small array relative to the large one is given. For each pixel
 *     of the small array, the value of that pixel is added to the
 *     input value of the corresponding pixel in the big array, but
@@ -25,8 +25,8 @@
 *     the current input pixel is bad or not. If it is, then the data
 *     is not included in the mosaic. If not, then the valid data is
 *     added accordingly, the mask being updated.
-*     Remembering that there will almost always be blank data positions 
-*     in a mosaic, where none of the input arrays actually lie, then 
+*     Remembering that there will almost always be blank data positions
+*     in a mosaic, where none of the input arrays actually lie, then
 *     if no good data is found for a pixel that SHOULD have data, then
 *     a bad pixel value is inserted in the output array at that position.
 *     This procedure uses the mask array to check whether valid data has
@@ -47,9 +47,9 @@
 *     IDIMS( 2 )  =  INTEGER( READ )
 *          Dimensions of input image
 *     XOFFSET  =  INTEGER( READ )
-*          x offset of image from bottom left 
+*          x offset of image from bottom left
 *     YOFFSET  =  INTEGER( READ )
-*          y offset of image from bottom left 
+*          y offset of image from bottom left
 *     OUT( ODIMS( 1 ), ODIMS( 2 ) )  =  REAL( UPDATE )
 *          Data array containing merged image
 *     MASK( ODIMS( 1 ), ODIMS( 2 ) )  =  REAL( UPDATE )
@@ -105,7 +105,7 @@
       INTEGER
      :    IDIMSX,             ! dimensions of input image
      :    IDIMSY,             ! dimensions of input image
-     :    XOFFSET,                ! x offset of image 
+     :    XOFFSET,                ! x offset of image
      :    YOFFSET,                ! y    "    "   "
      :    ODIMSX,              ! dimensions of output image
      :    ODIMSY              ! dimensions of output image
@@ -167,7 +167,7 @@
 *             yet been added to the current output point - as this point
 *             is actually a valid point in the input image (as we are
 *             looping round that image), then we don't want to leave it
-*             set to zero, as would be the case for edge data created 
+*             set to zero, as would be the case for edge data created
 *             when arrays overlap, in the spaces where no input arrays
 *             actually lie
                IF ( MASK( X, Y ) .EQ. 0.0 ) THEN
@@ -192,9 +192,9 @@
             ELSE IF ( MASK( X, Y ) .EQ. 0.0 ) THEN
 
 *             this is a valid input position (i.e. not edge data), but
-*             the input value is bad, and there has been no previous 
+*             the input value is bad, and there has been no previous
 *             data added to the point - thus set the output array
-*             value to the bad value. If good data is subsequently 
+*             value to the bad value. If good data is subsequently
 *             available for this output position, the code above will
 *             include it in the correct fashion, deleting the bad value
 *             inserted here

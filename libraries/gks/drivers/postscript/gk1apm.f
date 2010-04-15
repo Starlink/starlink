@@ -46,11 +46,11 @@
 *            buffering.
 *  SMALL   - Small real for equality comparisons
 *
- 
+
 *     small real
       REAL       SMALL
       PARAMETER (SMALL=1.0E-4)
- 
+
 *     Offsets in KWKDAT & QWKDAT
       INTEGER    IMKTYP,   IMKSZ
       PARAMETER (IMKTYP=2, IMKSZ=2)
@@ -67,10 +67,10 @@
 *
 *---------------------------------------------------------------------
 *
- 
+
 *     Initialise the flag
       CHANGE = .FALSE.
- 
+
 *
 *     See if locally stored copy of the attributes needs updating.
 *
@@ -79,7 +79,7 @@
          KWKDAT(IMKTYP,KWKIX) = KWMKTY(KWKIX)
          CHANGE = .TRUE.
       ENDIF
- 
+
 *     Marker size: validate, then check.
       RVS = AMAX1(QMNMKS(KWKIX),QWMKSZ(KWKIX))
       RVS = AMIN1(QMXMKS(KWKIX),RVS)
@@ -88,12 +88,12 @@
          QWKDAT(IMKSZ,KWKIX) = RVS
          CHANGE = .TRUE.
       ENDIF
- 
+
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     If change has occurred write the attributes out.
 *
@@ -103,7 +103,7 @@
          CALL GKFOCO(KIOPB, S(1:20), IREM)
          CALL GKFOCO(KIOSN,DUMMY,IREM)
       END IF
- 
+
 *
 *     Output the markers
 *
@@ -123,5 +123,5 @@
   200 CONTINUE
 *     Now call the pm procedure
       CALL GKFOCO(KIOPB, ']pm', IREM)
- 
+
       END

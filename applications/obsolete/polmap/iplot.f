@@ -3,29 +3,29 @@
      &                  IAUTO,IMAX,IMIN,WAUTO,WMAX,WMIN,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    I P L O T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C TITLE (<), LAMBDA (<), STOKES_I (<), NPTS (<), BOX (<),
 C IAUTO (<), IMAX (<), IMIN (<), WAUTO (<), WMAX (<), WMIN (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C Plots the intensity array of the current polarization spectrum
 C
-C 
+C
 C
 C
 C-
@@ -56,7 +56,7 @@ C
 C
 C Set the plotting ranges
 C
-      IF (WAUTO.AND.BOX) THEN 
+      IF (WAUTO.AND.BOX) THEN
        WMAX=LAMBDA(NPTS)
        WMIN=LAMBDA(1)
       ENDIF

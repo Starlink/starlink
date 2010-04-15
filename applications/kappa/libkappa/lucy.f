@@ -106,7 +106,7 @@
 *        value based on the current version of the restored array, V is
 *        the variance of the error associated with D, and CHIFAC is the
 *        value of parameter CHIFAC.  Using 0 for CHIFAC results in the
-*        standard expression for chi-squared.  However, the algorithm 
+*        standard expression for chi-squared.  However, the algorithm
 *        sometimes has difficulty fitting bright features and so may
 *        not reach the required normalised chi-squared value.  Setting
 *        CHIFAC to 1 (as is done by the LUCY program in the STSDAS
@@ -114,7 +114,7 @@
 *        less weight in the chi-squared calculation, and so encourages
 *        lower chi-squared values. [1.0]
 *     IN= NDF (Read)
-*        The input NDF containing the observed data. 
+*        The input NDF containing the observed data.
 *     NITER = _INTEGER (Read)
 *        The maximum number of iterations to perform. [50]
 *     OUT = NDF (Write)
@@ -136,7 +136,7 @@
 *        The standard deviation of the noise in the observed data.
 *        This is only used if parameter VARIANCE is given the value
 *        FALSE. If a null (!) value is supplied, the value used is
-*        an estimate of the noise based on the difference between 
+*        an estimate of the noise based on the difference between
 *        adjacent pixel values in the observed data. [!]
 *     START = NDF (Read)
 *        An NDF containing an initial guess at the restored array.
@@ -167,8 +167,8 @@
 *        error is reported if this option is selected and the NDF has
 *        no VARIANCE component.  If FALSE, then a constant variance
 *        equal to the square of the value given for parameter SIGMA is
-*        used for all data samples.  If a null (!) value is supplied, 
-*        the value used is TRUE if the input NDF has a VARIANCE 
+*        used for all data samples.  If a null (!) value is supplied,
+*        the value used is TRUE if the input NDF has a VARIANCE
 *        component, and FALSE otherwise. [!]
 *     WLIM = _REAL (Read)
 *        If the input array contains bad pixels, then this parameter
@@ -204,12 +204,12 @@
 *     XCENTRE = _INTEGER (Read)
 *        The x pixel index of the centre of the PSF within the supplied
 *        PSF array.  If a null (!) value is supplied, the value used is
-*        the middle pixel (rounded down if there are an even number of 
+*        the middle pixel (rounded down if there are an even number of
 *        pixels per line). [!]
 *     YCENTRE = _INTEGER (Read)
 *        The y pixel index of the centre of the PSF within the supplied
 *        PSF array. If a null (!) value is supplied, the value used is
-*        the middle line (rounded down if there are an even number of 
+*        the middle line (rounded down if there are an even number of
 *        lines). [!]
 
 *  Examples:
@@ -228,11 +228,11 @@
 *        noise-based structure.  The maximum number of iterations is
 *        increased to 60 to give the algorithm greater opportunity to
 *        reach the reduced chi-squared value.
-*     lucy m51 star m51_hires2 0.1 start=m51_hires 
+*     lucy m51 star m51_hires2 0.1 start=m51_hires
 *        This example continues the deconvolution started by the
 *        previous example in order to achieve a normalised chi-squared
 *        of 0.1.  The output array from the previous example is used to
-*        initialise the restored array. 
+*        initialise the restored array.
 
 *  Notes:
 *     - The convolutions required by the R-L algorithm are performed by
@@ -303,7 +303,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -318,7 +318,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER NDIM               ! Dimensionality required
       PARAMETER( NDIM = 2 )
 
@@ -327,7 +327,7 @@
       LOGICAL BAD2               ! Are any bad pixels present in NDF2?
       LOGICAL BAD5               ! Are any bad pixels present in NDF5?
       REAL BCKVAL                ! Constant background data value
-      REAL CHIFAC                ! Simulated data factor in chi-squared 
+      REAL CHIFAC                ! Simulated data factor in chi-squared
       INTEGER DIMS1( NDIM )      ! Dimensions sizes in NDF1
       INTEGER DIMS2( NDIM )      ! Dimensions sizes in NDF1
       INTEGER INDF1              ! NDF id. for input data array
@@ -372,10 +372,10 @@
       INTEGER SDIM2( NDIM )      ! Indices of significant axes in NDF2
       INTEGER SDIM3( NDIM )      ! Indices of significant axes in NDF3
       INTEGER SDIM4( NDIM )      ! Indices of significant axes in NDF4
-      INTEGER SLBND1( NDIM )     ! Low bounds of INDF1 significant axes 
-      INTEGER SLBND2( NDIM )     ! Low bounds of INDF2 significant axes 
-      INTEGER SLBND3( NDIM )     ! Low bounds of INDF3 significant axes 
-      INTEGER SLBND4( NDIM )     ! Low bounds of INDF4 significant axes 
+      INTEGER SLBND1( NDIM )     ! Low bounds of INDF1 significant axes
+      INTEGER SLBND2( NDIM )     ! Low bounds of INDF2 significant axes
+      INTEGER SLBND3( NDIM )     ! Low bounds of INDF3 significant axes
+      INTEGER SLBND4( NDIM )     ! Low bounds of INDF4 significant axes
       LOGICAL SNYDER             ! Use Snyder's modifed R-L algorithm?
       REAL STDEV                 ! Approximate noise level in input
       INTEGER SUBND1( NDIM )     ! High bounds of INDF1 significant axes
@@ -402,7 +402,7 @@
       CALL NDF_BEGIN
 
 *  Get the NDF containing the input data.
-      CALL KPG1_GTNDF( 'IN', NDIM, .FALSE., 'READ', INDF1, SDIM1, 
+      CALL KPG1_GTNDF( 'IN', NDIM, .FALSE., 'READ', INDF1, SDIM1,
      :                 SLBND1, SUBND1, STATUS )
 
 *  Find the dimensions of the input array.
@@ -410,7 +410,7 @@
       DIMS1( 2 ) = SUBND1( 2 ) - SLBND1( 2 ) + 1
 
 *  Get the NDF containing the PSF.
-      CALL KPG1_GTNDF( 'PSF', NDIM, .FALSE., 'READ', INDF2, SDIM2, 
+      CALL KPG1_GTNDF( 'PSF', NDIM, .FALSE., 'READ', INDF2, SDIM2,
      :                 SLBND2, SUBND2, STATUS )
 
 *  Map the PSF DATA array.
@@ -447,7 +447,7 @@
       WDIMS( 1 ) = MAX( DIMS2( 2 ), DIMS2( 1 ) )
       WDIMS( 2 ) = 2
       CALL PSX_CALLOC( WDIMS( 1 ) * WDIMS( 2 ), '_REAL', IPW0, STATUS )
-      
+
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -456,7 +456,7 @@
 *  reduce edge effects caused by wrap-around in the convolution
 *  routines.
       CALL KPG1_PSFSR( %VAL( CNF_PVAL( IPN2 ) ), DIMS2( 1 ), DIMS2( 2 ),
-     :                 %VAL( CNF_PVAL( IPW0 ) ), 
+     :                 %VAL( CNF_PVAL( IPW0 ) ),
      :                 WDIMS( 1 ), WDIMS( 2 ), THRESH,
      :                 4, PSFXSZ, PSFYSZ, STATUS )
 
@@ -473,12 +473,12 @@
 *  The 2-d Hermitian FFT routines (KPG1_FFTFR and KPG1_FFTBR) require
 *  a work array containing at least ( 3*MAX(M,N)+15 ) elements, where
 *  M and N are the dimensions of the array being FFTed.  Ensure that
-*  an internal file is large enough to provide at least this much work 
+*  an internal file is large enough to provide at least this much work
 *  space.
       NPIX = MAX( 6, NPIX )
       NLIN = MAX( 6, NLIN )
       N = NPIX * NLIN
-      
+
 *  Update the margin size accordingly.
       XMARG = ( NPIX - DIMS1( 1 ) ) / 2
       YMARG = ( NLIN - DIMS1( 2 ) ) / 2
@@ -489,17 +489,17 @@
       CALL PSX_CALLOC( N, '_REAL', IP3, STATUS )
 
 *  Store the FFT of the PSF in the internal array <3>.  Internal array
-*  <2> is used as work space. 
-      CALL KPS1_LUCFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( CNF_PVAL( IPN2 ) ), 
+*  <2> is used as work space.
+      CALL KPS1_LUCFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( CNF_PVAL( IPN2 ) ),
      :                 NPIX, NLIN,
      :                 XCEN - SLBND2( 1 ) + 1, YCEN - SLBND2( 2 ) + 1,
-     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ),
      :                 STATUS )
 
 *  Release the NDF holding the PSF array.
-      CALL NDF_ANNUL( INDF2, STATUS )      
-      
-*  Tell the user the size of the margins and the size of the internal 
+      CALL NDF_ANNUL( INDF2, STATUS )
+
+*  Tell the user the size of the margins and the size of the internal
 *  data files.
       CALL MSG_SETI( 'XMARG', XMARG )
       CALL MSG_OUTIF( MSG__NORM, 'LUCY_MSG1', '  X-axis margin is '/
@@ -523,7 +523,7 @@
 *  edge pixels.  The mean observed data value is returned.
       CALL PSX_CALLOC( N, '_REAL', IP4, STATUS )
       CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                 %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN, 
+     :                 %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN,
      :                 %VAL( CNF_PVAL( IP4 ) ), MEANO,
      :                 STATUS )
 
@@ -535,16 +535,16 @@
          GO TO 999
       END IF
 
-*  Find a rough estimate of the noise in the input array. 
-      CALL KPS1_LUCCS( DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN1 ) ), 
+*  Find a rough estimate of the noise in the input array.
+      CALL KPS1_LUCCS( DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN1 ) ),
      :                 STDEV,
      :                 STATUS )
 
 *  Unmap the DATA array.  This is done to keep the use of virtual memory
 *  to a minimum at any one time, in view of the large amount of VM
 *  needed for the internal files.
-      CALL NDF_UNMAP( INDF1, 'DATA', STATUS )      
-      
+      CALL NDF_UNMAP( INDF1, 'DATA', STATUS )
+
 *  Get space to hold the variance of each data value.
       CALL PSX_CALLOC( N, '_REAL', IP8, STATUS )
 
@@ -553,7 +553,7 @@
 
 *  See from where the observed data variances are to be obtained.  If
 *  the input NDF has a VARIANCE component, use it by default.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          CALL PAR_DEF0L( 'VARIANCE', VAR1, STATUS )
          CALL PAR_GET0L( 'VARIANCE', VARN, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
@@ -563,7 +563,7 @@
       END IF
 
 *  If variances are to be obtained from the NDF...
-      IF ( VARN ) THEN 
+      IF ( VARN ) THEN
 
 *  Report an error if there is no VARIANCE component in the NDF.
          IF ( .NOT. VAR1 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -586,7 +586,7 @@
 *  allowing for the calculated margin.  The margins are filled by
 *  replicating the edge values.  The mean variance value is returned.
          CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN,
      :                    %VAL( CNF_PVAL( IP8 ) ),
      :                    MEANV, STATUS )
 
@@ -599,15 +599,15 @@
          END IF
 
 *  Unmap the variance array.
-         CALL NDF_UNMAP( INDF1, 'VARIANCE', STATUS )         
+         CALL NDF_UNMAP( INDF1, 'VARIANCE', STATUS )
 
 *  Otherwise...
-      ELSE 
+      ELSE
 
 *  Get the constant noise value to use, using the rough estimate
 *  obtained earlier as the dynamic default.  Constrain it to be larger
 *  than zero.
-         CALL PAR_GDR0R( 'SIGMA', STDEV, 10.0 * VAL__SMLR, VAL__MAXR, 
+         CALL PAR_GDR0R( 'SIGMA', STDEV, 10.0 * VAL__SMLR, VAL__MAXR,
      :                   .TRUE., STDEV, STATUS )
 
 *  Warn the user.
@@ -616,20 +616,20 @@
      :                   /'noise value of ^SIGMA.', STATUS )
 
 *  Fill internal file 8 with the variance value.
-         CALL KPG1_FILLR( STDEV * STDEV, N, %VAL( CNF_PVAL( IP8 ) ), 
+         CALL KPG1_FILLR( STDEV * STDEV, N, %VAL( CNF_PVAL( IP8 ) ),
      :                    STATUS )
 
       END IF
 
 *  Obtain space for the internal file which holds the background data at
 *  every pixel.
-      CALL PSX_CALLOC( N, '_REAL', IP6, STATUS )      
-      
+      CALL PSX_CALLOC( N, '_REAL', IP6, STATUS )
+
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an NDF holding the background array to use.
-      CALL KPG1_GTNDF( 'BACK', NDIM, .FALSE., 'READ', INDF3, SDIM3, 
+      CALL KPG1_GTNDF( 'BACK', NDIM, .FALSE., 'READ', INDF3, SDIM3,
      :                 SLBND3, SUBND3, STATUS )
 
 *  If a null value was given, annul the error, and get a constant
@@ -646,7 +646,7 @@
 *  If an NDF background was supplied, get its bounds.
       ELSE
          CALL NDF_BOUND( INDF3, NDIM, LBND, UBND, NDIMS, STATUS )
-         
+
 *  Get a section of the background array which matches the bounds of the
 *  input data array, and map it.
          LBND( SDIM3( 1 ) ) = SLBND1( 1 )
@@ -655,16 +655,16 @@
          UBND( SDIM3( 2 ) ) = SUBND1( 2 )
 
          CALL NDF_SECT( INDF3, NDIM, LBND, UBND, INDF3S, STATUS )
-         CALL KPG1_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S, 
+         CALL KPG1_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S,
      :                 STATUS )
 
 *  Copy it to the centre of internal file 6.  The margins are filled by
 *  replicating the edge values.  The mean background value is returned.
          CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( CNF_PVAL( IPN3S ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IPN3S ) ), NPIX, NLIN,
      :                    %VAL( CNF_PVAL( IP6 ) ),
      :                    MEANB, STATUS )
-         
+
 *  Abort if there is no good data in the background array.
          IF ( MEANB .EQ. VAL__BADR .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -674,20 +674,20 @@
          END IF
 
 *  Release the background NDF.
-         CALL NDF_ANNUL( INDF3, STATUS )         
+         CALL NDF_ANNUL( INDF3, STATUS )
 
       END IF
 
 *  Obtain space for the internal file which holds the current
 *  reconstruction.
-      CALL PSX_CALLOC( N, '_REAL', IP1, STATUS )      
-      
+      CALL PSX_CALLOC( N, '_REAL', IP1, STATUS )
+
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an NDF holding the initial guess for the reconstructed
 *  array.
-      CALL KPG1_GTNDF( 'START', NDIM, .FALSE., 'READ', INDF4, SDIM4, 
+      CALL KPG1_GTNDF( 'START', NDIM, .FALSE., 'READ', INDF4, SDIM4,
      :                 SLBND4, SUBND4, STATUS )
 
 *  If a null value was given, annul the error, and store the difference
@@ -695,13 +695,13 @@
 *  in internal file 1.
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         CALL KPG1_FILLR( MEANO - MEANB, N, %VAL( CNF_PVAL( IP1 ) ), 
+         CALL KPG1_FILLR( MEANO - MEANB, N, %VAL( CNF_PVAL( IP1 ) ),
      :                    STATUS )
 
 *  If a starting NDF was supplied, get its bounds.
       ELSE
          CALL NDF_BOUND( INDF4, NDIM, LBND, UBND, NDIMS, STATUS )
-         
+
 *  Get a section of the array which matches the bounds of the input
 *  data array, and map it.
          LBND( SDIM4( 1 ) ) = SLBND1( 1 )
@@ -710,17 +710,17 @@
          UBND( SDIM4( 2 ) ) = SUBND1( 2 )
 
          CALL NDF_SECT( INDF4, NDIM, LBND, UBND, INDF4S, STATUS )
-         CALL KPG1_MAP( INDF4S, 'DATA', '_REAL', 'READ', IPN4S, NEL4S, 
+         CALL KPG1_MAP( INDF4S, 'DATA', '_REAL', 'READ', IPN4S, NEL4S,
      :                 STATUS )
 
 *  Copy it to the centre of internal file 1.  The margins are filled by
 *  replication the edge values.  The mean value in the supplied array
 *  is returned.
          CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( CNF_PVAL( IPN4S ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IPN4S ) ), NPIX, NLIN,
      :                    %VAL( CNF_PVAL( IP1 ) ),
      :                    MEANI, STATUS )
-         
+
 *  Abort if there are no good data in the input array.
          IF ( MEANI .EQ. VAL__BADR .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -730,14 +730,14 @@
          END IF
 
 *  Release the starting NDF.
-         CALL NDF_ANNUL( INDF4, STATUS )         
+         CALL NDF_ANNUL( INDF4, STATUS )
 
       END IF
 
 *  Obtain space for two more internal files.
-      CALL PSX_CALLOC( N, '_REAL', IP5, STATUS )      
-      CALL PSX_CALLOC( N, '_REAL', IP7, STATUS )      
-      
+      CALL PSX_CALLOC( N, '_REAL', IP5, STATUS )
+      CALL PSX_CALLOC( N, '_REAL', IP7, STATUS )
+
 *  Get the maximum number of iterations to perform.
       CALL PAR_GDR0I( 'NITER', 30, 0, VAL__MAXI, .TRUE., NITER, STATUS )
 
@@ -746,7 +746,7 @@
 
 *  Get the co-efficient for the simulated data in the denominator of the
 *  chi-squared sum.
-      CALL PAR_GDR0R( 'CHIFAC', 1.0, 0.0, VAL__MAXR, .TRUE., CHIFAC, 
+      CALL PAR_GDR0R( 'CHIFAC', 1.0, 0.0, VAL__MAXR, .TRUE., CHIFAC,
      :                 STATUS )
 
 *  See if the Snyder modification is to be used.
@@ -759,11 +759,11 @@
 
 *  Do the deconvolution.
       CALL KPS1_LUCY( N, NPIX, NLIN, XMARG, YMARG, AIM, NITER, CHIFAC,
-     :                WLIM, SNYDER, %VAL( CNF_PVAL( IP3 ) ), 
+     :                WLIM, SNYDER, %VAL( CNF_PVAL( IP3 ) ),
      :                %VAL( CNF_PVAL( IP4 ) ),
-     :                %VAL( CNF_PVAL( IP6 ) ), %VAL( CNF_PVAL( IP8 ) ), 
+     :                %VAL( CNF_PVAL( IP6 ) ), %VAL( CNF_PVAL( IP8 ) ),
      :                %VAL( CNF_PVAL( IP1 ) ),
-     :                %VAL( CNF_PVAL( IP2 ) ), %VAL( CNF_PVAL( IP5 ) ), 
+     :                %VAL( CNF_PVAL( IP2 ) ), %VAL( CNF_PVAL( IP5 ) ),
      :                %VAL( CNF_PVAL( IP7 ) ), STATUS )
 
 *  Create the output NDF, and map the DATA array.
@@ -773,9 +773,9 @@
      :              STATUS )
 
 *  Copy the reconstructed array to the output DATA array.
-      CALL KPS1_LUCOU( NPIX, NLIN, %VAL( CNF_PVAL( IP1 ) ), 
+      CALL KPS1_LUCOU( NPIX, NLIN, %VAL( CNF_PVAL( IP1 ) ),
      :                 XMARG, YMARG,
-     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN5 ) ), 
+     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN5 ) ),
      :                 BAD5,
      :                 STATUS )
 
@@ -785,7 +785,7 @@
 *  Obtain a new title for the output NDF, with the default value
 *  being the input array title.
       CALL KPG1_CCPRO( 'TITLE', 'Title', INDF1, INDF5, STATUS )
-      
+
  999  CONTINUE
 
 *  Free the dynamic work arrays.
@@ -797,8 +797,8 @@
       CALL PSX_FREE( IP6, STATUS )
       CALL PSX_FREE( IP7, STATUS )
       CALL PSX_FREE( IP8, STATUS )
-      
-*  If an error occurred, delete the output NDF.      
+
+*  If an error occurred, delete the output NDF.
       IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF5, STATUS )
 
 *  End the NDF context.
@@ -809,5 +809,5 @@
          CALL ERR_REP( 'LUCY_ERR7', 'Error deconvolving an array ' /
      :                 /'using the Richardson-Lucy algorithm.', STATUS )
       END IF
-      
+
       END

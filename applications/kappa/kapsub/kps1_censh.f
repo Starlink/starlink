@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_CENSH( CERROR, CFRM, NPOS, ID, LOGPOS, FDL, QUIET,
-     :                       NDIMS, NAXC, GUESS, OUTCO, FDO, NWAS, 
-     :                       ERROR, PIXPOS, CURPOS, CURWAS, I, STATUS ) 
+     :                       NDIMS, NAXC, GUESS, OUTCO, FDO, NWAS,
+     :                       ERROR, PIXPOS, CURPOS, CURWAS, I, STATUS )
 *+
 *  Name:
 *     KPS1_CENSH
@@ -12,61 +12,61 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CENSH( CERROR, CFRM, NPOS, ID, LOGPOS, FDL, QUIET, 
-*                      NDIMS, NAXC, GUESS, OUTCO, FDO, NWAS, ERROR, 
-*                      PIXPOS, CURPOS, CURWAS, I, STATUS ) 
+*     CALL KPS1_CENSH( CERROR, CFRM, NPOS, ID, LOGPOS, FDL, QUIET,
+*                      NDIMS, NAXC, GUESS, OUTCO, FDO, NWAS, ERROR,
+*                      PIXPOS, CURPOS, CURWAS, I, STATUS )
 
 *  Description:
 *     This routine displays the results fo a single centroiding
 *     operation to a log file and the screen.
 
 *  Arguments:
-*     CERROR = INTEGER (Given) 
-*        Should the error on the centroid positions be found and 
+*     CERROR = INTEGER (Given)
+*        Should the error on the centroid positions be found and
 *        displayed?  This requires the DNF to have a variance component.
-*     CFRM = INTEGER (Given) 
-*        A pointer to the current Frame of the NDF. 
-*     NPOS = INTEGER (Given) 
+*     CFRM = INTEGER (Given)
+*        A pointer to the current Frame of the NDF.
+*     NPOS = INTEGER (Given)
 *        The number of centroid positions to be found.
-*     ID = INTEGER (Given) 
+*     ID = INTEGER (Given)
 *        An integer identifier for the position to be displayed with the
 *        centroid position.
-*     LOGPOS = LOGICAL (Given) 
+*     LOGPOS = LOGICAL (Given)
 *        Should the results be written to a log file?
-*     FDL = INTEGER (Given) 
+*     FDL = INTEGER (Given)
 *        The file descriptor for the log file. Ignored if LOGPOS is
 *        .FALSE.
-*     QUIET = INTEGER (Given) 
-*        If .FALSE., the results are written to standard output.  If 
+*     QUIET = INTEGER (Given)
+*        If .FALSE., the results are written to standard output.  If
 *        .TRUE. nothing is written to standard output.
-*     NDIMS = INTEGER (Given) 
+*     NDIMS = INTEGER (Given)
 *        The number of significant axes in the NDF (i.e. axes spanning
 *        more than a single pixel).
-*     NAXC = INTEGER (Given) 
+*     NAXC = INTEGER (Given)
 *        The number of axes in CFRM.
 *     GUESS = LOGICAL (Given)
-*        Should the original guess positions be included in the 
-*        information displayed on the screen and/or written to the log 
+*        Should the original guess positions be included in the
+*        information displayed on the screen and/or written to the log
 *        file?
-*     OUTCO = LOGICAL (Given) 
+*     OUTCO = LOGICAL (Given)
 *        Should the pixel co-ordinates of the centroids be written to an
 *        output text file?
-*     FDO = INTEGER (Given) 
+*     FDO = INTEGER (Given)
 *        Teh file descriptor for the output text file. Ignored if OUTCO
 *        is .FALSE.
-*     NWAS = INTEGER (Given) 
-*        The first dimension of the CURWAS array. 
-*     ERROR( NPOS, NAXC ) = DOUBLE PRECISION (Given) 
-*        The errors on the centroid positions, given in the current 
+*     NWAS = INTEGER (Given)
+*        The first dimension of the CURWAS array.
+*     ERROR( NPOS, NAXC ) = DOUBLE PRECISION (Given)
+*        The errors on the centroid positions, given in the current
 *        Frame of the NDF.
-*     PIXPOS( NPOS, NDIMS ) = DOUBLE PRECISION (Given) 
+*     PIXPOS( NPOS, NDIMS ) = DOUBLE PRECISION (Given)
 *        The centroid positions, given in the PIXEL Frame of the NDF.
-*     CURPOS( NPOS, NAXC ) = DOUBLE PRECISION (Given) 
+*     CURPOS( NPOS, NAXC ) = DOUBLE PRECISION (Given)
 *        The centroid positions, given in the current Frame of the NDF.
 *        Normalized using AST_NORM on return.
-*     CURWAS( NWAS, NAXC ) = DOUBLE PRECISION (Given) 
-*        The initial guesses at the centroid positions, in the current 
-*        Frame.  Only accessed if GUESS is .TRUE.  Normalized using 
+*     CURWAS( NWAS, NAXC ) = DOUBLE PRECISION (Given)
+*        The initial guesses at the centroid positions, in the current
+*        Frame.  Only accessed if GUESS is .TRUE.  Normalized using
 *        AST_NORM on return.
 *     I = INTEGER (Given)
 *        The index of the position to be displayed (i.e. the first array
@@ -110,29 +110,29 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
-      LOGICAL CERROR 
-      INTEGER CFRM 
-      INTEGER NPOS 
+      LOGICAL CERROR
+      INTEGER CFRM
+      INTEGER NPOS
       INTEGER ID
-      LOGICAL LOGPOS 
-      INTEGER FDL 
-      LOGICAL QUIET 
-      INTEGER NDIMS 
+      LOGICAL LOGPOS
+      INTEGER FDL
+      LOGICAL QUIET
+      INTEGER NDIMS
       INTEGER NAXC
       LOGICAL GUESS
-      LOGICAL OUTCO 
-      INTEGER FDO 
-      INTEGER NWAS 
+      LOGICAL OUTCO
+      INTEGER FDO
+      INTEGER NWAS
       DOUBLE PRECISION ERROR( NPOS, NAXC )
       DOUBLE PRECISION PIXPOS( NPOS, NDIMS )
       DOUBLE PRECISION CURPOS( NPOS, NAXC )
@@ -142,7 +142,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER MXBUF              ! Length of screen buffer
       PARAMETER ( MXBUF = 80 )
 
@@ -161,7 +161,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Write the pixel co-ordinates at the centroid to the output 
+*  Write the pixel co-ordinates at the centroid to the output
 *  co-ordinate file if required, so long as all pixel axis values are
 *  good.
       IF( OUTCO ) THEN
@@ -171,7 +171,7 @@
             IF( PIXPOS( I, J ) .EQ. AST__BAD ) OK = .FALSE.
          END DO
 
-         IF( OK ) THEN         
+         IF( OK ) THEN
             IAT1 = 0
             LINE1 = ' '
             DO  J = 1, NDIMS
@@ -185,14 +185,14 @@
 
 
 
-*  Now do the screen and log file output. Normalize the supplied current 
+*  Now do the screen and log file output. Normalize the supplied current
 *  Frame position.
       DO J = 1, NAXC
          POS( J ) = CURPOS( I, J )
       END DO
       CALL AST_NORM( CFRM, POS, STATUS )
 
-*  Now do the screen and log file output. Format a line containing 
+*  Now do the screen and log file output. Format a line containing
 *  the position identifier, followed by a colon, and the centroid axis
 *  values.
       IAT1 = 0
@@ -202,8 +202,8 @@
 
       IAT1 = 5
 
-      DO J = 1, NAXC 
-         CALL CHR_APPND( AST_FORMAT( CFRM, J, POS( J ), 
+      DO J = 1, NAXC
+         CALL CHR_APPND( AST_FORMAT( CFRM, J, POS( J ),
      :                               STATUS ), LINE1, IAT1 )
          IF( J .NE. NAXC ) IAT1 = IAT1 + 1
       END DO
@@ -214,7 +214,7 @@
          IAT2 = 7
 
          DO J = 1, NAXC
-            CALL CHR_APPND( AST_FORMAT( CFRM, J, ERROR( I, J ), 
+            CALL CHR_APPND( AST_FORMAT( CFRM, J, ERROR( I, J ),
      :                                  STATUS ), LINE2, IAT2 )
             IF( J .NE. NAXC ) IAT2 = IAT2 + 1
          END DO
@@ -228,14 +228,14 @@
       IF( GUESS ) THEN
          LINE3 = '  (was '
          IAT3 = 7
-       
+
          DO J = 1, NAXC
             POS( J ) = CURWAS( I, J )
          END DO
          CALL AST_NORM( CFRM, POS, STATUS )
 
          DO J = 1, NAXC
-            CALL CHR_APPND( AST_FORMAT( CFRM, J, POS( J ), 
+            CALL CHR_APPND( AST_FORMAT( CFRM, J, POS( J ),
      :                                  STATUS ), LINE3, IAT3 )
             IF( J .NE. NAXC ) IAT3 = IAT3 + 1
          END DO

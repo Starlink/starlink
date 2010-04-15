@@ -18,7 +18,7 @@
 *     spectroscopic widths to the default values. The default values are
 *     derived from the main NDF's width array. For this routine it does
 *     not matter if the Extension exists or not, or if the SPECWIDS
-*     structure exists or not. However, the SPECVALS structure must not 
+*     structure exists or not. However, the SPECVALS structure must not
 *     exist in the Extension. The only information needed from the
 *     Extension is the number of the spectrocopic axis.
 
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

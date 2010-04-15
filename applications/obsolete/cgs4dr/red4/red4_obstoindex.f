@@ -12,7 +12,7 @@
 *     The routine was produced as an attempt to rationalise the
 *     conversion between one form of file name and another, so that
 *     making a change to the naming convention would not be such a
-*     major task in the future, and to allow error reports to be 
+*     major task in the future, and to allow error reports to be
 *     generated if an invalid file name is given.
 *    Invocation :
 *     CALL RED4_OBSTOINDEX( OBS_FILE, INDEX_FILE, STATUS )
@@ -99,7 +99,7 @@
       IF ( BUFFER(1:1) .EQ. 'O' .OR. BUFFER(1:1) .EQ. 'o') THEN
 
 *      Extract the "yymmdd" characters lying between this "O"
-*      and the "_". 
+*      and the "_".
          UNDER_POS = INDEX( BUFFER, '_' )
 
 *      Check that an underscore has been found in a sensible place,
@@ -124,7 +124,7 @@
       ELSE IF ( BUFFER(1:2) .EQ. 'CA' .OR. BUFFER(1:2) .EQ. 'ca') THEN
 
 *      Extract the "yymmdd" characters lying between this "CA"
-*      and the "_". 
+*      and the "_".
          UNDER_POS = INDEX( BUFFER, '_' )
 
 *      Check that an underscore has been found in a sensible place,

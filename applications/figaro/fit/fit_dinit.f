@@ -3,7 +3,7 @@ C+
 C
 C     F I T _ D I N I T
 C
-C     Initialises the FIT_ routines for output to a disk file.  
+C     Initialises the FIT_ routines for output to a disk file.
 C     This routine is an alternative to FIT_INIT, and only one of
 C     them should be used.
 C

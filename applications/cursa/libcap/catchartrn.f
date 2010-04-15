@@ -111,7 +111,7 @@
       CHARACTER
      :  GTFILE*75,  ! Graphics translation file.
      :  TEXT*10     ! Flag indicating header text to be copied.
-      INTEGER 
+      INTEGER
      :  CIIN,       ! Identifier for the input  catalogue.
      :  CIOUT,      !     "       "   "  output     "    .
      :  ROWS,       ! No. of rows in the input catalogue.

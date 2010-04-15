@@ -8,7 +8,7 @@
 
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
-                        int perspectrum, double beamcorr[ 3 ], 
+                        int perspectrum, double beamcorr[ 3 ],
                         int *backoff, int *status ){
 /*
 *+
@@ -23,24 +23,24 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
-*                             void *ipd, double *ipv, double rms, 
+*     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
+*                             void *ipd, double *ipv, double rms,
 *                             AstKeyMap *config, int velax,
-*                             int perspectrum, double beamcorr[ 3 ], 
+*                             int perspectrum, double beamcorr[ 3 ],
 *                             int *backoff, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
-*     array using the CLUMPFIND algorithm, described by Williams et al 
-*     (1994, ApJ 428, 693). This algorithm works by first contouring the 
-*     data at a multiple of the noise, then searches for peaks of emission 
-*     which locate the clumps, and then follows them down to lower 
-*     intensities. No a priori clump profile is assumed. In this algorithm, 
+*     array using the CLUMPFIND algorithm, described by Williams et al
+*     (1994, ApJ 428, 693). This algorithm works by first contouring the
+*     data at a multiple of the noise, then searches for peaks of emission
+*     which locate the clumps, and then follows them down to lower
+*     intensities. No a priori clump profile is assumed. In this algorithm,
 *     clumps never overlap.
 
 *  Parameters:
 *     type
-*        An integer identifying the data type of the array values pointed to 
+*        An integer identifying the data type of the array values pointed to
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
 *        cupid.h).
 *     ndim
@@ -56,7 +56,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Fortran order. The data type of this array is given by "itype".
 *     ipv
 *        Pointer to the input Variance array, or NULL if there is no Variance
-*        array. The elements should be stored in Fortran order. The data 
+*        array. The elements should be stored in Fortran order. The data
 *        type of this array is "double".
 *     rms
 *        The default value for the global RMS error in the data array.
@@ -64,10 +64,10 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        An AST KeyMap holding tuning parameters for the algorithm.
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
-*        used if "ndim" is 3. 
+*        used if "ndim" is 3.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
-*        neighbours. A clump that extends across several spectra will be 
+*        neighbours. A clump that extends across several spectra will be
 *        split into multiple clumps, each restricted to a single spectrum.
 *        Only used if "ndim" is 3.
 *     beamcorr
@@ -83,9 +83,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Returned Value:
 *     A locator for a new HDS object which is an array of NDF structures.
-*     Each NDF will hold the data values associated with a single clump 
-*     and will be the smallest possible NDF that completely contains the 
-*     corresponding clump. Pixels not in the clump will be set bad. The 
+*     Each NDF will hold the data values associated with a single clump
+*     and will be the smallest possible NDF that completely contains the
+*     corresponding clump. Pixels not in the clump will be set bad. The
 *     pixel origin is set to the same value as the supplied NDF.
 
 *  Copyright:
@@ -139,11 +139,11 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *levels;      /* Pointer to array of contour levels */
    double clevel;       /* Current data level */
-   double dd;           /* Data value */   
+   double dd;           /* Data value */
    double maxd;         /* Maximum value in data array */
    double maxrem;       /* Maximum of remaining unassigned pixel values */
    double mind;         /* Minimum value in data array */
-   float fd;            /* Data value */   
+   float fd;            /* Data value */
    int *ipa;            /* Pointer to pixel assignment array */
    int allow_edge;      /* Are clumps allowed to touch an edge of the data array? */
    int dims[3];         /* Pointer to array of array dimensions */
@@ -177,20 +177,20 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "CLUMPFIND", (AstObject *) &cfconfig ) ) {     
+   if( !astMapGet0A( config, "CLUMPFIND", (AstObject *) &cfconfig ) ) {
       cfconfig = astKeyMap( " " );
       astMapPut0A( config, "CLUMPFIND", cfconfig, " " );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this
    case the "config" KeyMap may contain values which should really be in
-   the "cfconfig" KeyMap. Add a copy of the "config" KeyMap into "cfconfig" 
+   the "cfconfig" KeyMap. Add a copy of the "config" KeyMap into "cfconfig"
    so that it can be searched for any value which cannot be found in the
    "cfconfig" KeyMap. */
    astMapPut0A( cfconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Return the instrumental smoothing FWHMs */
-   if( !perspectrum ) { 
+   if( !perspectrum ) {
       beamcorr[ 0 ] = cupidConfigD( cfconfig, "FWHMBEAM", 2.0, status );
       beamcorr[ 1 ] = beamcorr[ 0 ];
       if( ndim == 3 ) {
@@ -220,7 +220,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the RMS noise level to use. */
    rms = cupidConfigD( cfconfig, "RMS", rms, status );
 
-/* See if the IDL implementation of ClumpFind should be emulated rather than 
+/* See if the IDL implementation of ClumpFind should be emulated rather than
    the algorithm described in the original Williams et al ApJ paper. */
    idl = cupidConfigI( cfconfig, "IDLALG", 0, status );
 
@@ -229,8 +229,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
-   move by pixel along an axis. We use the memory management functions of the 
-   AST library since they provide greater security and functionality than 
+   move by pixel along an axis. We use the memory management functions of the
+   AST library since they provide greater security and functionality than
    direct use of malloc, etc. */
    el = 1;
    for( i = 0; i < ndim; i++ ) {
@@ -244,7 +244,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    }
 
 /* Allocate work array to hold an index value for each pixel in the
-   data array. Each different index value corresponds to one of the 
+   data array. Each different index value corresponds to one of the
    clumps returned by cupidCFScan. */
    ipa = astMalloc( sizeof( int )*el );
    if( ipa ) {
@@ -253,7 +253,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    yet been assigned to any PixelSet. */
       for( i = 0; i < el; i++ ) ipa[ i ] = CUPID__CFNULL;
 
-/* Initialise an array to hold the pointers to the PixelSet structures which 
+/* Initialise an array to hold the pointers to the PixelSet structures which
    describe the clumps. */
       clumps = astMalloc( sizeof( CupidPixelSet *) );
       if( clumps ) clumps[ 0 ] = NULL;
@@ -304,10 +304,10 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    at a higher contour level, and adds any new clumps found at this contour
    level. New clumps are stored at the end of the returned array. If the
    current contour level is higher than the maximum of the remaining
-   unassigned pixel values, there is no point in doing this scan since it 
+   unassigned pixel values, there is no point in doing this scan since it
    will find no pixels. */
          if( clevel <= maxrem ) {
-            clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, 
+            clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip,
                                   ( ndim == 3 && perspectrum ) ? ( velax + 1 ) : 0,
                                   clumps, idl, clevel, &index, naxis,
                                   idl || ilev < nlevels - 1, slbnd, &maxrem, status );
@@ -341,7 +341,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       for( ii = 0; ii < index; ii++ ) {
          ps = clumps[ ii ];
 
-/* Free and count clumps which contain less than MinPix pixels, or touch an 
+/* Free and count clumps which contain less than MinPix pixels, or touch an
    edge, or have any degenerate axes. */
          if( ps ){
             if( ps->pop < minpix ){
@@ -349,14 +349,14 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 
             } else if( ps->edge && !allow_edge ){
-               nedge++; 
+               nedge++;
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 
-            } else if( ( ndim < 3 || !perspectrum ) && ( 
-                         ps->lbnd[ 0 ] == ps->ubnd[ 0 ] || 
-                       ( ps->lbnd[ 1 ] == ps->ubnd[ 1 ] && ndim > 1 ) || 
+            } else if( ( ndim < 3 || !perspectrum ) && (
+                         ps->lbnd[ 0 ] == ps->ubnd[ 0 ] ||
+                       ( ps->lbnd[ 1 ] == ps->ubnd[ 1 ] && ndim > 1 ) ||
                        ( ps->lbnd[ 2 ] == ps->ubnd[ 2 ] && ndim > 2 ) ) ) {
-               nthin++;           
+               nthin++;
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 
             } else {
@@ -379,7 +379,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      "^N clumps rejected because they contain fewer "
                    "than MinPix (^M) pixels.", status );
          }
-   
+
          if( nedge == 1 ) {
            msgOutif( MSG__NORM, "",
                      "1 clump rejected because it touches an edge of "
@@ -439,7 +439,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          ps = clumps[ ii ];
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
                               skip, slbnd, ps->index, ps->lbnd,
-                              ps->ubnd, NULL, ret, 
+                              ps->ubnd, NULL, ret,
                               cupidConfigD( cfconfig, "MAXBAD", 0.05, status ),
                               status );
       }
@@ -454,9 +454,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
    }
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration 
-   parameters for this algorithm. This prevents the values in the secondary 
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is 
+/* Remove the secondary KeyMap added to the KeyMap containing configuration
+   parameters for this algorithm. This prevents the values in the secondary
+   KeyMap being written out to the CUPID extension when cupidStoreConfig is
    called. */
    astMapRemove( cfconfig, CUPID__CONFIG );
 

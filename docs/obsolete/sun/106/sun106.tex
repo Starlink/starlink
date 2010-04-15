@@ -1,5 +1,5 @@
 
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -42,10 +42,10 @@ RUTHERFORD APPLETON LABORATORY\\
 
 \section {Absolute Beginner}
 
-This document should be read by first time users of the SCAR system. Further 
-, more comprehensive, information can be found in the Starlink document 
+This document should be read by first time users of the SCAR system. Further
+, more comprehensive, information can be found in the Starlink document
 SUN70 and in SCAR\_DOC\_DIR.
- 
+
 New versions of SCAR will appear from time to time.
 All software changes are documented in SCARDOC1.TEX in SCAR\_DOC\_DIR.
 
@@ -65,7 +65,7 @@ to output data from the catalogue, and to assimilate new catalogues.
 
 First time users of SCAR start here!
 
-SCAR allows you to put a catalogue into the database, to SEARCH 
+SCAR allows you to put a catalogue into the database, to SEARCH
 catalogues in that database, and generate REPORTs on what you have found.
 The catalogues available in SCAR may be found using CAT\_HELP.
 You can employ the SEARCH and REPORT facilities to get the information you need
@@ -79,18 +79,18 @@ scatterplot and histogram, and to calculate new fields.
 
 It is recommended that users have a page file quota of about 20,000 in order
 to run the larger SCAR programs for plotting and analysis of the data.
-When SCAR and ADAM are installed at your site you should login to your own 
+When SCAR and ADAM are installed at your site you should login to your own
 username and type:
 \begin{verbatim}
     $ ADAMSTART
     $ SCARSTART
 \end{verbatim}
-If you get an error message then either SCAR  and/or ADAM has not been 
-installed or you may not have the necessary quotas; ask your site manager. 
+If you get an error message then either SCAR  and/or ADAM has not been
+installed or you may not have the necessary quotas; ask your site manager.
 
-You can run SCAR from either ICL or DCL. 
-For simple, quick jobs DCL is the more appropriate choice. 
-The whole of SCAR is loaded into the system with ICL, so that it is more 
+You can run SCAR from either ICL or DCL.
+For simple, quick jobs DCL is the more appropriate choice.
+The whole of SCAR is loaded into the system with ICL, so that it is more
 efficient when you are using many different CAR routines; this takes a
 noticeable amount of time when the first CAR routine is called, so
 be patient, and remember that subsequent tasks will start almost immediately.
@@ -104,8 +104,8 @@ you should exit from ICL and start again.
 
 
 \section {Getting Help}
-There are three main areas of help information: CAR\_HELP for information 
-about the CAR routines; CAT\_HELP for information about the catalogues and 
+There are three main areas of help information: CAR\_HELP for information
+about the CAR routines; CAT\_HELP for information about the catalogues and
 SCAR\_HELP for general information.
 \begin{verbatim}
     ICL> CAR_HELP
@@ -128,7 +128,7 @@ type:
 You would see that RA and DEC are the names of fields in the catalogue for right
 ascension and declination.
 In the IRAS catalogue, fluxes are given at four infrared wavelengths, so FLUX is
-stored as an array. 
+stored as an array.
 In the CAR system, such quantities are called GENERICs and you can find out
 about all the GENERICs in the IRPS by typing:
 \begin{verbatim}
@@ -143,26 +143,26 @@ In addition to these help facilities responding with a '?' to any parameter
 prompt will give help information about that parameter.
 
 If you have a problem running any of the CAR routines you should refer to the
-section describing that routine in the CAR Routines section of SUN70. The 
-routines are alphabetically ordered and provide complete information on all 
+section describing that routine in the CAR Routines section of SUN70. The
+routines are alphabetically ordered and provide complete information on all
 CAR routines.
- 
+
 \section {Some Examples}
 
 So let us start with a demonstration.
 
 In the directory SCAR\_DOC\_DIR there is a file SCAR\_TEST.ICL.
-This is the SCAR demonstration script which contains several detailed 
-examples of the use of SCAR programs. You may find it useful to read the 
+This is the SCAR demonstration script which contains several detailed
+examples of the use of SCAR programs. You may find it useful to read the
 rest of this document in conjunction with running the demonstration.
-Print the SCAR\_TEST.ICL file and then run it. 
-Note that, by default, SCAR creates new catalogues in the current directory so 
-run SCAR\_TEST.ICL from an empty directory so that you can easily identify the 
+Print the SCAR\_TEST.ICL file and then run it.
+Note that, by default, SCAR creates new catalogues in the current directory so
+run SCAR\_TEST.ICL from an empty directory so that you can easily identify the
 files produced by the system.
- 
+
 \begin{verbatim}
     ICL> LOAD SCAR_DOC_DIR:SCAR_SCRIPT
-\end{verbatim} 
+\end{verbatim}
 
 The same result could have been achieved by allowing the system to prompt for
 the parameter values.
@@ -183,7 +183,7 @@ the parameter values.
 
 The SCAR procedures are of three types:
 \begin{enumerate}
-\item Procedures that perform database management functions, {\em eg.} extract 
+\item Procedures that perform database management functions, {\em eg.} extract
 sources from the catalogue.
 \item Procedures that manipulate and display catalogue data.
 \item Procedures that create and convert description files, {\em eg.} to change
@@ -195,7 +195,7 @@ You run the program by prefixing the program name with the package name,
 eg.\ CAR\_SEARCH.
 Detailed specifications for all these programs are given below.
 \subsubsection {Database Management Functions}
-You can do the following to a data catalogue (omitting the CAR\_): 
+You can do the following to a data catalogue (omitting the CAR\_):
 \begin{description}
 \begin{description}
 \item [SEARCH] it to select subsets.
@@ -230,13 +230,13 @@ than 132 characters.
 In order to generate statistics on the contents of a catalogue you can use:
 \begin{description}
 \begin{description}
-\item [LITTLEBIG] to find either the largest or smallest numbers in the 
+\item [LITTLEBIG] to find either the largest or smallest numbers in the
   catalogue.
 \item [SAMPLE] to select every Nth object from the catalogue.
 \item [HISTOGRAM] to plot a histogram of a given field.
 \item [SCATTER] to plot two fields, and perform regression analysis.
 \item [CORRELATE] to correlate (non-parametrically) two fields.
-\item [LINCOR] to compute the Pearson product-moment linear correlation 
+\item [LINCOR] to compute the Pearson product-moment linear correlation
   coefficient.
 \end{description}
 \end{description}
@@ -250,7 +250,7 @@ In order to generate statistics on the contents of a catalogue you can use:
 \item [ASPIC] -- Creates a description file for an ASPIC/IAM catalogue.
 \item [ASCII] -- Converts a description file for BINARY data to one for ASCII
  data.
-\item [BINARY] -- Converts a description file for ASCII data to one for BINARY 
+\item [BINARY] -- Converts a description file for ASCII data to one for BINARY
  data.
 \item [POLYGON] -- Creates a description file of polygon vertices.
 \end{description}
@@ -263,7 +263,7 @@ In order to generate statistics on the contents of a catalogue you can use:
 \item [COUNTREC] -- Counts the number of objects in a sequential file.
 \item [COSMAGCAL] -- Calculates magnitudes from COSMOS magnitudes.
 \item [HARDCOPY] -- Produces hardcopy of output produced by graphics programs.
-\item [MOUNT] -- Allocates a deck, mounts a foreign tape and assigns it a 
+\item [MOUNT] -- Allocates a deck, mounts a foreign tape and assigns it a
 logical name.
 \item [DISMOUNT] -- Dismounts a tape, deallocates a deck and deassigns the
 logical name.
@@ -282,18 +282,18 @@ but what if we want to create our own catalogue. For example we may have the
 NAME, RA, DEC, VALUE1 and VALUE2 of several stars in a file TEST.DAT
 
 \begin{verbatim}
-STAR1  12 30 00   +44 30 00  1223.78000  1348.76000      
-STAR2  12 35 00   +43 45 00  1472.16000  1302.45000 
-STAR3  12 00 00   +45 00 00  1524.63000  1234.34000      
+STAR1  12 30 00   +44 30 00  1223.78000  1348.76000
+STAR2  12 35 00   +43 45 00  1472.16000  1302.45000
+STAR3  12 00 00   +45 00 00  1524.63000  1234.34000
 \end{verbatim}
 
 SCAR requires more information before it can interpret this file correctly.
 The user has to supply this information in the form of a DSCF or description
-file. The description file DSCFTEST.DAT for the above catalogue was produced 
-by CAR\_FORM1 and looks like. (\$ is used as a continuation character.) 
+file. The description file DSCFTEST.DAT for the above catalogue was produced
+by CAR\_FORM1 and looks like. (\$ is used as a continuation character.)
 
 
-\begin{verbatim} 
+\begin{verbatim}
  P TITLE                                               A17    TEST      $
         Title for test                                     X
  P FILENAME                                            A17    TEST      $
@@ -327,14 +327,14 @@ by CAR\_FORM1 and looks like. (\$ is used as a continuation character.)
 A copy of this description file and the associated catalogue can be found in
 SCAR\_DOC\_DIR.
 
-It is a useful exercise for users to try to produce this description file using 
+It is a useful exercise for users to try to produce this description file using
 CAR\_FORM1.
 
 Some explantion of this descriptor file is required. Consider the definition
 of a field in the above example, denoted by an 'F' as the first character then
 we have :-
 
-\begin{verbatim} 
+\begin{verbatim}
 
   FIELDNAME  (or NAME)    The name of the quantity
   START                   The position of the first character
@@ -351,7 +351,7 @@ we have :-
                           (optional)
 \end{verbatim}
 
-You can print a more detailed explanation of how to interpret a description 
+You can print a more detailed explanation of how to interpret a description
 file by typing:-
 
 \begin {verbatim}
@@ -362,20 +362,20 @@ file by typing:-
 
 This is the system description file.
 In SCAR a description
-file describes how to interpret the catalogue data in the same way the 
+file describes how to interpret the catalogue data in the same way the
 system description file describes how to interpret the description file.
 
-In this example RA is 
-expressed as a character string, the units TIME and the comment HH MM SS tell 
+In this example RA is
+expressed as a character string, the units TIME and the comment HH MM SS tell
 SCAR how to interpret the field. DEC is dealt with in a similar way. SUN70 gives
 further details about allowed units and the possible formats for RA and DEC.
 
 \section{Efficiency Considerations}
 
-It is inefficient to hold large catalogues as ASCII files so SCAR has the 
-facility to convert such catalogues to a binary form. The IRPS is an example 
+It is inefficient to hold large catalogues as ASCII files so SCAR has the
+facility to convert such catalogues to a binary form. The IRPS is an example
 of this. We can convert our test catalogue to binary using CAR\_CONVERT.
-  
+
 
 \begin{verbatim}
     ICL> CAR_CONVERT
@@ -385,18 +385,18 @@ of this. We can convert our test catalogue to binary using CAR\_CONVERT.
     ASCII - YES for ascii or NO for binary output /'no'/ > NO
     INDEX - Output an Index (Y) or a Master (N) catalogue? /'no'/ > NO
     TITLE - Title for file or plot /'test'/ > TESTB
-    
+
 \end{verbatim}
 
-Two new files DSCFTESTB.DAT and TESTB.DAT are produced. If we look at 
-DSCFTESTB.DAT the record size has been reduced from 51 to 28. Note also the 
+Two new files DSCFTESTB.DAT and TESTB.DAT are produced. If we look at
+DSCFTESTB.DAT the record size has been reduced from 51 to 28. Note also the
 other differences between this and DSCFTEST.DAT.
 
-Another way that SCAR optimises disc space is by using indexes. In general 
+Another way that SCAR optimises disc space is by using indexes. In general
 SCAR will take care of the indexing for you, but you should be aware of indexes
 and more advanced user will exploit the advantages of indexing.
-Instead of making a copy of the complete record 
-of a catalogue only a pointer or index to that record is stored. Consider 
+Instead of making a copy of the complete record
+of a catalogue only a pointer or index to that record is stored. Consider
 sorting the catalogue TESTB
 
 
@@ -411,23 +411,23 @@ sorting the catalogue TESTB
     ASCII - YES for ascii or NO for binary output /'no'/ > NO
     INDEX - Output an Index (Y) or a Master (N) catalogue? /'no'/ > YES
     TITLE - Title for file or plot /'test'/ > TESTBS
-    
+
 \end{verbatim}
 
 We have sorted on two fields descending DEC values and ascending RA values.
-CAR\_REPORTing TESTBS shows the sorted catalogue. If we look at the description 
+CAR\_REPORTing TESTBS shows the sorted catalogue. If we look at the description
 file DSCFTESTBS.DAT we see that the record size has been reduced to 21 by
 indexing, greater
-savings are made on catalogues with more fields. Note the differences between 
-this description file and those already seen. SCAR is able to deal with global 
-indexing where records in more than one catalogue are indexed. 
-We can convert from one type of catalogue 
-to another using CAR\_CONVERT. 
+savings are made on catalogues with more fields. Note the differences between
+this description file and those already seen. SCAR is able to deal with global
+indexing where records in more than one catalogue are indexed.
+We can convert from one type of catalogue
+to another using CAR\_CONVERT.
 
 In general catalogues are sorted on descending DEC and ascending RA in binary
-form. IRPS is a good example. Sorting catalogues in this way allows SCAR 
-procedures like CAR\_SEARCH and CAR\_JOIN to operate efficiently. It is a good 
-idea to adopt this form for your own catalogues unless you have a special 
+form. IRPS is a good example. Sorting catalogues in this way allows SCAR
+procedures like CAR\_SEARCH and CAR\_JOIN to operate efficiently. It is a good
+idea to adopt this form for your own catalogues unless you have a special
 reason to do otherwise.
 
 

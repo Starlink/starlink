@@ -25,12 +25,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -52,12 +52,12 @@
 *     25/11/96 (ACD): Incorporated a portable and standard declaration
 *        for CAT1__DNULC from the Linux port of CAT.
 *     28-FEB-2007 (PWD):
-*        Make a BOZ assignments when there's no typeless support. 
+*        Make a BOZ assignments when there's no typeless support.
 *        Better than nothing.
 *  Global Constants:
 C      INCLUDE 'PRM_PAR'
 *-
-      
+
 *
 *    Null values for the numeric data types.  These parameters are
 *    defined in terms of the equivalent Starlink null value.

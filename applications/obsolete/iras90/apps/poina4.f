@@ -1,4 +1,4 @@
-      SUBROUTINE POINA4( PPROFL, BAND, PRFWID, PPROF, 
+      SUBROUTINE POINA4( PPROFL, BAND, PRFWID, PPROF,
      :                   SPSQ, SIP, SP, SISQ, SI, S1, V,
      :                   STATUS )
 *+
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POINA4( PPROFL, BAND, PRFWID, PPROF, SPSQ, SIP, SP, SISQ, SI, 
+*     CALL POINA4( PPROFL, BAND, PRFWID, PPROF, SPSQ, SIP, SP, SISQ, SI,
 *                  S1, V, STATUS )
 
 *  Description:
@@ -26,7 +26,7 @@
 
 *  Arguments:
 *     PPROFL = CHARACTER (Given)
-*        The name of the parameter used for the name of the Point source 
+*        The name of the parameter used for the name of the Point source
 *        profiles NDF.
 *     BAND = INTEGER (Given)
 *        Waveband number with which the associated point source profile
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
       DOUBLE PRECISION SI
       DOUBLE PRECISION S1
       DOUBLE PRECISION V
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -110,7 +110,7 @@
 
 *  Get the ideal point source profile from the environment.
       CALL IRM_PROFL( PPROFL, NPSMP, NPROF, PPROFD, PPROFX, PFNDF,
-     :                 STATUS ) 
+     :                 STATUS )
 
 *  Re-sample the source profile at the rate of the IRAS scan and copy
 *  copy the non-zero segment of the profile associated with the input
@@ -122,7 +122,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Calculate pre-determined constants to be used when correlating data
-*  segment with the point source template.      
+*  segment with the point source template.
       CALL POINC1( PRFWID, %VAL( PPROF ), SPSQ, SIP, SP, SISQ, SI, S1,
      :             V, STATUS )
 
@@ -132,9 +132,9 @@
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POINTCRDD_ERR1', 'The supplied ideal point '/
      :                /'source profile does not contain proper values',
-     :                  STATUS ) 
-        
+     :                  STATUS )
+
       END IF
 
-      
+
       END

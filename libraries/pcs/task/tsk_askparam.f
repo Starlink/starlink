@@ -29,12 +29,12 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     The value string contains substrings separated by nulls. The 
-*     substrings are the parameter name, its prompt string, its default 
-*     value, its help information, and an error message if an 
-*     earlier attempt to get the parameter has failed. This information 
-*     is used by ASKPARAM to prompt the user. 
-*     The value obtained is then sent to the task which requested the 
+*     The value string contains substrings separated by nulls. The
+*     substrings are the parameter name, its prompt string, its default
+*     value, its help information, and an error message if an
+*     earlier attempt to get the parameter has failed. This information
+*     is used by ASKPARAM to prompt the user.
+*     The value obtained is then sent to the task which requested the
 *     parameter.
 
 *  Copyright:
@@ -124,19 +124,19 @@
 
 *  Local Variables:
       CHARACTER*(MESSYS__TNAME) TASKNAME ! name of task which requested
-                                         ! value 
+                                         ! value
       INTEGER TNAMELEN                   ! length of TASKNAME
       CHARACTER*(SUBPAR__NAMELEN) PARAM  ! parameter name
-      INTEGER PARLEN                     ! length of parameter name 
+      INTEGER PARLEN                     ! length of parameter name
       CHARACTER*80 PROMPT                ! parameter prompt string
       INTEGER PRMPLEN                    ! length of parameter prompt
-                                         ! string 
+                                         ! string
       CHARACTER*80 DEFAULT               ! default value string
       INTEGER DEFLEN                     ! length of default value
-                                         ! string 
+                                         ! string
       CHARACTER*132 PARHELP              ! one-line help specifier
       INTEGER HELPLEN                    ! length of one-line help
-                                         ! specifier 
+                                         ! specifier
       CHARACTER*132 HLPKEY               ! full-help specifier
       INTEGER HKYLEN                     ! length of full-help specifier
       CHARACTER*100 ERRMESS              ! error message
@@ -156,7 +156,7 @@
 *
       CALL SUBPAR_SPLITVAL( VALUE, PARAM, PARLEN, PROMPT, PRMPLEN,
      :  DEFAULT, DEFLEN, PARHELP, HELPLEN, HLPKEY, HKYLEN, ERRMESS,
-     :  ERRLEN, STATUS) 
+     :  ERRLEN, STATUS)
 
 *
 *   Send the prompt to the user interface.
@@ -165,8 +165,8 @@
      :  DEFAULT(1:DEFLEN), PARHELP(1:HELPLEN), HLPKEY(1:HKYLEN),
      :  ERRMESS(1:ERRLEN), INVAL, STATUS )
 *
-*   Trap non-ok conditions. These have to be translated into things 
-*   which the parameter system at the receiving task will interpret 
+*   Trap non-ok conditions. These have to be translated into things
+*   which the parameter system at the receiving task will interpret
 *   correctly. In particular, it will convert timeout into PAR__NOUSR.
 *
       MESSTATUS = MESSYS__PARAMREP

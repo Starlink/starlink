@@ -46,7 +46,7 @@
       DO WHILE (ISTYLE.GT.0)
 
          IF (str_SIMLR(STYLE, LINSTY(1, ISTYLE))) GO TO 100
- 
+
         ISTYLE = ISTYLE - 1
       END DO
 

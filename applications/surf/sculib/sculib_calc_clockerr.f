@@ -18,7 +18,7 @@
 *     Checks the self-consistency of the FITS headers by calculating
 *     the expected LST from the Azimuth and Elevation values stored
 *     in the header and comparing this with the supplied reference
-*     LST. Returns the difference between the two values and the 
+*     LST. Returns the difference between the two values and the
 *     LST calculated from the headers.
 
 *  Arguments:
@@ -35,7 +35,7 @@
 *     CLOCK_ERR = DOUBLE (Returned)
 *        The time difference (in radians) between the times stored
 *        in the data file (header items and LST_STRT) and the actual
-*        time of the observation derived from the azimuth and elevation 
+*        time of the observation derived from the azimuth and elevation
 *        of the observed source. The value is the number that must be
 *        added to the supplied LST_REF in order to correct it.
 *     LST_AZEL = DOUBLE (Returned)
@@ -77,7 +77,7 @@
 *
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -123,7 +123,7 @@
 
 *     Read the centre coordinate frame from the header and check that
 *     it is a tracking coordinate frame (not AZ or NA)
-      CALL SCULIB_GET_FITS_C ( N_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C ( N_FITS, N_FITS, FITS,
      :     'CENT_CRD', CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (CENTRE_COORDS)
 

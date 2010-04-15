@@ -126,7 +126,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,7 +145,7 @@
 *  Local Constants:
       INTEGER FILLEN             ! Length of output GASP image name
       PARAMETER ( FILLEN = 132 )
-      
+
       INTEGER NDIM               !
       PARAMETER ( NDIM=2 )       ! Only arrays of this dimensionality
                                  ! will be processed
@@ -156,7 +156,7 @@
       INTEGER EL                 ! Number of pixels in image
       INTEGER FILBAD             ! Value to replace bad pixels
       CHARACTER*( FILLEN ) GASPFI ! Output GASP image name
-      LOGICAL ISBAD              ! Mapped data array contains bad 
+      LOGICAL ISBAD              ! Mapped data array contains bad
                                  ! values?
       INTEGER LBND( NDIM )       ! Lower bounds array
       INTEGER MDIM               ! Number of dimensions of the NDF
@@ -181,7 +181,7 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Associate NDF identifier with IN, via the parameter system.      
+*  Associate NDF identifier with IN, via the parameter system.
       CALL NDF_ASSOC( 'IN', 'READ', NDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -209,7 +209,7 @@
 
 *  Derive the number of columns in the input NDF.
       DIMS( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
-      
+
 *  Derive the number of lines in the input NDF.
       DIMS( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
 
@@ -254,7 +254,7 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-         CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    VAL__BADW, WFILBA,
      :                    %VAL( CNF_PVAL( PNTRT( 1 ) ) ), NREP, STATUS )
 
@@ -280,7 +280,7 @@
 *  ======================
 
 *  Create the GASP pixel file.  Copy the data array to the GASP image.
-      CALL CON_WGASP( GASPFI, DIMS( 1 ), DIMS( 2 ), 
+      CALL CON_WGASP( GASPFI, DIMS( 1 ), DIMS( 2 ),
      :                %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                STATUS )
 

@@ -16,7 +16,7 @@
 *     This routine copies a 1D character array of a given size into
 *     another (which must be at least as big). The contents are assumed
 *     to be FITS cards, which have been created by GAIA. A check is made
-*     to ensure that the special NDFID, LBOUND1 and LBOUND2 cards are 
+*     to ensure that the special NDFID, LBOUND1 and LBOUND2 cards are
 *     not written out.
 
 *  Arguments:

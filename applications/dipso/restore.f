@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command RESTORE.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -35,7 +35,7 @@
 *        Original version.
 *     13-DEC-1995 (DSB):
 *        Remove LOC argument from GETNDF call. This argument returned a
-*        primary locator to keep the file open, but the NDF library now 
+*        primary locator to keep the file open, but the NDF library now
 *        looks after it all.
 *     {enter_changes_here}
 
@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -54,28 +54,28 @@
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! Common blocks holding the DIPSO stack
-*        STKSZE = INTEGER (Read)  
+*        STKSZE = INTEGER (Read)
 *           The size of the XSTACK and YSTACK arrays.
-*        BSTSZE = INTEGER (Read)  
+*        BSTSZE = INTEGER (Read)
 *           The size of the BSTACK array.
 *        MAXSTK = INTEGER (Read)
 *           The maximum number of stack entries.
-*        NONSTK = INTEGER (Read)  
+*        NONSTK = INTEGER (Read)
 *           The current number of stack entries.
-*        XSTACK( STKSZE ) = REAL (Read) 
+*        XSTACK( STKSZE ) = REAL (Read)
 *           An array holding the X values for all the stack entries.
-*        YSTACK( STKSZE ) = REAL (Read) 
+*        YSTACK( STKSZE ) = REAL (Read)
 *           An array holding the Y values for all the stack entries.
-*        BSTACK( BSTSZE ) = REAL (Read) 
+*        BSTACK( BSTSZE ) = REAL (Read)
 *           An array holding the break points for all the stack entries.
 *        BSTNPT( MAXSTK ) = INTEGER (Read)
 *           The number of breaks in each stack entry.
-*        POINTR( MAXSTK ) = INTEGER (Read)  
+*        POINTR( MAXSTK ) = INTEGER (Read)
 *           The XSTACK indices corresponding to the start of each stack
 *           entry.
-*        STKNPT( MAXSTK ) = INTEGER (Read)  
+*        STKNPT( MAXSTK ) = INTEGER (Read)
 *           The numbers of points in each stack entry.
-*        BPOINT( MAXSTK ) = INTEGER (Read)  
+*        BPOINT( MAXSTK ) = INTEGER (Read)
 *           The BSTACK indices corresponding to the first break for each
 *           stack entry.
 *        STITLE( MAXSTK ) = CHARACTER* ( * ) (Read)
@@ -84,7 +84,7 @@
 *           The WORV value for each stack entry.
 *        STKLST = INTEGER (Read)
 *           The index of the last used element in XSTACK.
-*        BSTLST = INTEGER (Read) 
+*        BSTLST = INTEGER (Read)
 *           The index of the last used element in BSTACK.
 
 *  Arguments Given:
@@ -116,9 +116,9 @@
 
 *  Get an identifier for the NDF. The string "_STK" is appended to the
 *  NDF name unless it already ends with "_STK". The default NDF name is
-*  "SAVE_STK". 
+*  "SAVE_STK".
       CALL GETNDF( PARAMS, 1, .TRUE., COMM, 'NDF holding saved '//
-     :             'stack data', 'SAVE', 'READ', '_STK', INDF, 
+     :             'stack data', 'SAVE', 'READ', '_STK', INDF,
      :             STATUS )
 
 *  Tell the user what is about to happen.

@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,13 +78,13 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER CCHARS*( GRP__NCHAR )! Control characters 
+      CHARACTER CCHARS*( GRP__NCHAR )! Control characters
       CHARACTER C                ! Current character
       CHARACTER ELEM*( GRP__SZNAM )! Current name
       CHARACTER ESC              ! The escape character
       INTEGER EDEP               ! Indirection depth of the element
       INTEGER EIFILE             ! Index of the indirection file name
-      INTEGER EMODGP             ! Identifier for basis group 
+      INTEGER EMODGP             ! Identifier for basis group
       INTEGER EMODIN             ! Index into the group given by EMODGP
       INTEGER IESC               ! Absolute index of next escape character
       INTEGER II                 ! Name index
@@ -107,7 +107,7 @@
 
 *  Get a string holding all the active control characters (except NULL).
          NCC = 0
-         DO II = 1, GRP__NCHAR 
+         DO II = 1, GRP__NCHAR
             IF( II .NE. GRP__PNULC ) THEN
                CALL GRP1_CONC( SLOT, II, C, OK, STATUS )
                IF( OK ) THEN
@@ -128,14 +128,14 @@
             IESC = INDEX( ELEM, ESC )
             START = 1
             MOD = .FALSE.
-            DO WHILE( IESC .NE. 0 ) 
+            DO WHILE( IESC .NE. 0 )
 
 *  Convert the index of the escape character from a value relative to
 *  START, to an absolute value.
                IESC = IESC + START - 1
 
 *  If this is the last character in the name, the following character
-*  cannot be a control character and so leave the loop, retaining the 
+*  cannot be a control character and so leave the loop, retaining the
 *  escape character in the name.
                IF( IESC .GE. GRP__SZNAM ) THEN
                   IESC = 0
@@ -146,8 +146,8 @@
                   P = IESC + 1
                   C = ELEM( P : P )
 
-*  If this character is contained within the list of active control 
-*  characters, remove the escape character from the name by shuffling 
+*  If this character is contained within the list of active control
+*  characters, remove the escape character from the name by shuffling
 *  all the remaining characters down one place.
                   IF( INDEX( CCHARS( : NCC ), C ) .NE. 0 ) THEN
 
@@ -157,7 +157,7 @@
                         ELEM( Q : Q ) = C
                         Q = Q + 1
                      END DO
-                        
+
                      ELEM( GRP__SZNAM : GRP__SZNAM ) = ' '
                      MOD = .TRUE.
 
@@ -177,7 +177,7 @@
 
 *  Save the modified name if anything changed.
             IF( MOD ) THEN
-               CALL GRP1_PTELM( SLOT, II, ELEM, EDEP, EIFILE, EMODGP, 
+               CALL GRP1_PTELM( SLOT, II, ELEM, EDEP, EIFILE, EMODGP,
      :                          EMODIN, STATUS )
             END IF
 

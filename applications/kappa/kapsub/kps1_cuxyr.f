@@ -88,7 +88,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,15 +125,15 @@
                                  ! cursor
       LOGICAL CURCHO             ! Cursor is available with suitable
                                  ! choices?
-      REAL DELTA                 ! Width of markers 
+      REAL DELTA                 ! Width of markers
       LOGICAL IMGDIS             ! Device is nominally an image display
       INTEGER IPXX               ! Pointer to workspace
       INTEGER IPYY               ! Pointer to workspace
-      LOGICAL MARK               ! Crosses required at cursor positions 
+      LOGICAL MARK               ! Crosses required at cursor positions
       LOGICAL POLY               ! Lines required joining cursor
                                  ! positions?
-      REAL X1, Y1                ! World co-ords of lower-left corner 
-      REAL X2, Y2                ! World co-ords of upper-right corner 
+      REAL X1, Y1                ! World co-ords of lower-left corner
+      REAL X2, Y2                ! World co-ords of upper-right corner
       REAL XIN, YIN              ! co-ords of the centre of the picture
       REAL XM, YM                ! Size of the image zone in metres
 
@@ -195,21 +195,21 @@
 *  Obtain the vertices.
       CALL CURPTS( MXVERT, .FALSE., MXCHO, MARK, .FALSE., DELTA,
      :             POLY, .TRUE., VAL__MINR, VAL__MAXR, VAL__MINR,
-     :             VAL__MAXR, XIN, YIN, NVERT, %VAL( CNF_PVAL( IPX ) ), 
+     :             VAL__MAXR, XIN, YIN, NVERT, %VAL( CNF_PVAL( IPX ) ),
      :             %VAL( CNF_PVAL( IPY ) ),
      :             STATUS )
 
-*  If the vertices have been joined by straight lines, complete the 
+*  If the vertices have been joined by straight lines, complete the
 *  polygon by joining the first vertex to the last vertex.  The
 *  co-ordinates are extracted from the work arrays.
       IF ( POLY .AND. NVERT .GT. 2 ) THEN
-         CALL KPG1_RETRR( NVERT, 1, %VAL( CNF_PVAL( IPX ) ), 
+         CALL KPG1_RETRR( NVERT, 1, %VAL( CNF_PVAL( IPX ) ),
      :                    X1, STATUS )
-         CALL KPG1_RETRR( NVERT, 1, %VAL( CNF_PVAL( IPY ) ), 
+         CALL KPG1_RETRR( NVERT, 1, %VAL( CNF_PVAL( IPY ) ),
      :                    Y1, STATUS )
-         CALL KPG1_RETRR( NVERT, NVERT, %VAL( CNF_PVAL( IPX ) ), 
+         CALL KPG1_RETRR( NVERT, NVERT, %VAL( CNF_PVAL( IPX ) ),
      :                    X2, STATUS )
-         CALL KPG1_RETRR( NVERT, NVERT, %VAL( CNF_PVAL( IPY ) ), 
+         CALL KPG1_RETRR( NVERT, NVERT, %VAL( CNF_PVAL( IPY ) ),
      :                    Y2, STATUS )
          CALL SGS_LINE( X1, Y1, X2, Y2 )
          CALL SGS_FLUSH
@@ -226,9 +226,9 @@
          IF ( COSYS .EQ. 'DATA' ) THEN
             CALL PSX_CALLOC( NVERT, '_REAL', IPXX, STATUS )
             CALL PSX_CALLOC( NVERT, '_REAL', IPYY, STATUS )
-            CALL AGI_TWTOD( -1, NVERT, %VAL( CNF_PVAL( IPX ) ), 
+            CALL AGI_TWTOD( -1, NVERT, %VAL( CNF_PVAL( IPX ) ),
      :                      %VAL( CNF_PVAL( IPY ) ),
-     :                      %VAL( CNF_PVAL( IPXX ) ), 
+     :                      %VAL( CNF_PVAL( IPXX ) ),
      :                      %VAL( CNF_PVAL( IPYY ) ), STATUS )
             CALL PSX_FREE( IPX, STATUS )
             CALL PSX_FREE( IPY, STATUS )

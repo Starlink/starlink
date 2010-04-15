@@ -2,7 +2,7 @@
      :                   PEAK, ELLIP, ANGLE, SXX, SYY, SXY, STATUS )
 *+
 *  Name:
-*     RDPIFD - READ PISA FIND DATA 
+*     RDPIFD - READ PISA FIND DATA
 
 *  Purpose:
 *     To read in a line of data from a PISAFIND type file, returning the
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,7 +73,7 @@
       INCLUDE 'FIO_ERR'          ! FIO system error codes
 
 *  Arguments Given:
-      INTEGER LI            
+      INTEGER LI
       CHARACTER*(*) BUF
 
 *  Arguments Returned:

@@ -132,7 +132,7 @@
      :  QUIET,       ! Flag; operate in quiet or verbose (normal) mode?
      :  MCENTR,      ! Flag; plot central cross?
      :  MULT,        ! Flag; plot multiple lists?
-     :  MORE         ! Flag; more graphics attributes lists to plot? 
+     :  MORE         ! Flag; more graphics attributes lists to plot?
       INTEGER
      :  GRPLCT       ! Number of graphics attributes lists plotted.
 *.

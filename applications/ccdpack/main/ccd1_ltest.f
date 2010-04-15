@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,7 +149,7 @@
                CALL ERR_REP( 'CCD1_LTEST2',
      :         '  The number of values is less than the minimum'//
      :         ' permitted (^MINVAL)', STATUS )
-            END IF         
+            END IF
          END IF
 
 *  If status is BAD issue filename with error message

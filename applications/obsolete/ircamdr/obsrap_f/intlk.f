@@ -43,8 +43,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	    ! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'       
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
 
 * Status :
 
@@ -57,11 +57,11 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  LOCI,           ! locator for input data structure
      :  DIMS( NDIMS ),  ! dimensions of input DATA_ARRAY
      :  ACTDIM,         ! actual dimensions from NDF_DIM
-     :  NELEMENTS,      ! number of elements mapped by NDF_MAP 
+     :  NELEMENTS,      ! number of elements mapped by NDF_MAP
      :  PNTRI,	    	! pointer to input DATA_ARRAY component
      :  LINESTART,	! start line number of sub-image
      :  LINENUMB,	! number of lines in sub-image
@@ -70,7 +70,7 @@
      :  ICOLNUMB,	! number of columns in sub-image
      :  ICOLINC		! increment of column scan in sub-image
 
-	REAL 
+	REAL
      :  SUBT,		! offset factor, subtracted from pixel value
      :  NORM		! normalization factor divided into (pixel_value-offset)
 
@@ -169,7 +169,7 @@
      :                       ICOLNUMB,
      :                       ICOLINC)
 *
-* call subroutine to process line of data and put integer representation into 
+* call subroutine to process line of data and put integer representation into
 * DATA array
 *
 	    CALL INTEGER_PICTURE( DIMS( 1),

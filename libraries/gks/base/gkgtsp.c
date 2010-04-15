@@ -79,7 +79,7 @@ f77_integer gkgtsp_(ichan, ittspd)
 #endif
 
   f77_integer  fd;             /* File descriptor associated with "*ichan" */
-  
+
   /* Need to get the FD associated with this fortran unit */
   gks_getfd_( ichan, &fd );
 

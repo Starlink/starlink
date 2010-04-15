@@ -3,16 +3,16 @@ C+
 C
 C   -----------
 C   H I L I T E
-C   ----------- 
+C   -----------
 C
 C   Description
 C   -----------
 C   Plots a 2-D image on an image display device, progressively highlighting
 C   pixels through a selected data range. This is accomplished with a
-C   rotating lookup table which is primarily black, but contains a small 
+C   rotating lookup table which is primarily black, but contains a small
 C   region of colour. As the program runs, all the image pixels of one
-C   particular value become visible at the same time and then disappear. 
-C   The intention is to show with one program the locations of data values 
+C   particular value become visible at the same time and then disappear.
+C   The intention is to show with one program the locations of data values
 C   which might be obscured if a large data range were mapped onto a static
 C   lookup table in a standard image display program.
 C
@@ -34,7 +34,7 @@ C
 C
 C   Parameters (read or written)
 C   ----------------------------
-C   IMAGE    Name of the structure containing the image to be displayed. 
+C   IMAGE    Name of the structure containing the image to be displayed.
 C            (character)(prompted for).
 C
 C   START    Coordinate in each dimension of IMAGE at which the display is
@@ -43,11 +43,11 @@ C
 C   END      Coordinate in each dimension of IMAGE at which the display is
 C            to end. (real, array)(prompted for).
 C
-C   LOW      Data value which is plotted in the lowest colour index or as 
-C            black. (real)(prompted for). 
+C   LOW      Data value which is plotted in the lowest colour index or as
+C            black. (real)(prompted for).
 C
 C   HIGH     Data value which is plotted in the highest colour index or as
-C            white. (real)(prompted for). 
+C            white. (real)(prompted for).
 C
 C   PLACE    Code for one of nine possible locations on the display surface,
 C            being a combination of T, C, or B, and L, C, or R. (character)
@@ -56,7 +56,7 @@ C
 C   MAG      Magnification of the plot. Magnification 1 fits the plot to the
 C            whole display surface. (real)(prompted for).
 C
-C   LABEL    Text placed centrally above the plot. (character)(prompted 
+C   LABEL    Text placed centrally above the plot. (character)(prompted
 C            for).
 C
 C   SHOWS    Number of cycles through the data. (integer)(prompted for).
@@ -66,18 +66,18 @@ C
 C
 C   Keywords
 C   --------
-C   WHOLE    Instruction to display the whole image. Otherwise, a subset of 
+C   WHOLE    Instruction to display the whole image. Otherwise, a subset of
 C            each dimension may be selected.
 C
 C   AXES     Instruction to plot calibrated axes. Otherwise, the image is
 C            framed with a plain box.
 C
-C   RAMP     Instruction to plot a calibrated bar of the colour or grey 
+C   RAMP     Instruction to plot a calibrated bar of the colour or grey
 C            scale to the right of the image. This actually produces an
 C            interesting thermometer-like pointer which moves up the ramp
 C            as the program runs.
 C
-C   DATA     Instruction to display the data value currently being 
+C   DATA     Instruction to display the data value currently being
 C            highlighted.
 C
 C   ERASE    Instruction to erase screen before plotting. Otherwise, a
@@ -107,23 +107,23 @@ C   - The mapped array is passed to NDP_IMAGE_INDEX, which processes the
 C     data values directly into integer color indices.
 C   - The index array is passed to NDP_IMAGE_PLOT, which calls PGPIXL to
 C     plot the image. At first nothing is seen because the GKS colour
-C     indices are all initialized with black. 
-C   - The small lookup table is progressively cycled through the colour 
-C     indices. As it moves to higher indices it is replaced by black. The 
+C     indices are all initialized with black.
+C   - The small lookup table is progressively cycled through the colour
+C     indices. As it moves to higher indices it is replaced by black. The
 C     effect on the image is to illuminate the pixels in a small part of the
-C     data range for a brief time, and then to move on slightly in the data 
+C     data range for a brief time, and then to move on slightly in the data
 C     range and repeat the process.
-C   - As the pixels are highlighted on the image device, their data values 
-C     are output to the alphanumeric device. This enables the display to be 
+C   - As the pixels are highlighted on the image device, their data values
+C     are output to the alphanumeric device. This enables the display to be
 C     paused and restarted with CTRL-S and CTRL-Q. The data value shown is
-C     approximate, being the middle of the data interval mapped on to the 
+C     approximate, being the middle of the data interval mapped on to the
 C     current colour index.
 C
 C
 C   External functions & subroutines called
 C   ---------------------------------------
 C   Library DSA:
-C     DSA_CLOSE                     
+C     DSA_CLOSE
 C     DSA_DATA_SIZE
 C     DSA_GET_WORKSPACE
 C     DSA_INPUT
@@ -158,7 +158,7 @@ C   Library PAR:
 C     PAR_RDCHAR
 C     PAR_RDKEY
 C     PAR_RDVAL
-C     
+C
 C   Library VAR:
 C     VAR_GETCHR
 C
@@ -179,14 +179,14 @@ C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE '$NDP_SOURCE/NDP_NUMERIC_RANGES.INC'
-C   INCLUDE '$NDP_SOURCE/NDP_MAGIC_VALUES.INC'                  
-C                                             
+C   INCLUDE '$NDP_SOURCE/NDP_MAGIC_VALUES.INC'
+C
 C
 C   Extensions to FORTRAN77
-C   -----------------------                           
+C   -----------------------
 C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
 C
-C                        
+C
 C   Possible future upgrades
 C   ------------------------
 C
@@ -202,34 +202,34 @@ C   History
 C   -------
 C   01-FEB-1989   - Original program
 C   14-JUN-1990   - Parameters in call to NDP_IMAGE_PLOT changed.  (JRL)
-C   17-SEP-1990   - No longer replaces magic values with zeros.  This assumes 
-C                   that the data is always going to be greater than zero which 
-C                   in certain cases (e.g. a velocity map) it may not be.  
+C   17-SEP-1990   - No longer replaces magic values with zeros.  This assumes
+C                   that the data is always going to be greater than zero which
+C                   in certain cases (e.g. a velocity map) it may not be.
 C                   They are now replaced by a value which is below the lower
-C                   threshold requested for the plot and/or the contour map.  
-C                   The magic values are now also replaced only in a direct 
-C                   copy of the original file.  This is because if the data 
+C                   threshold requested for the plot and/or the contour map.
+C                   The magic values are now also replaced only in a direct
+C                   copy of the original file.  This is because if the data
 C                   are mapped directly, then any changes will be copied to the
-C                   disk, even if it is mapped READ.  The data pointer for 
-C                   non-FLOAT data which has been mapped FLOAT (e.g. type 
-C                   converted) will be the pointer for a workspace anyway, 
-C                   so the copying only has to be done for FLOAT data which 
+C                   disk, even if it is mapped READ.  The data pointer for
+C                   non-FLOAT data which has been mapped FLOAT (e.g. type
+C                   converted) will be the pointer for a workspace anyway,
+C                   so the copying only has to be done for FLOAT data which
 C                   has been mapped FLOAT.  (JRL)
 C   15-OCT-1991   - Quality arrays implemented. (GOLDJIL)
-C   02-MAR-1992   - Removed GKS stuff and PGPLOT common block references. 
+C   02-MAR-1992   - Removed GKS stuff and PGPLOT common block references.
 C                   Added NDP_IMAGE_INDEX call.
 C                   (GOLDJIL)
 C   24-NOV-1992   - Unix version. (GOLDJIL)
-C   02-OCT-1994   - Removed variable c0 since it was being used before 
-C                   being defined. Have now defined the colour blue 
+C   02-OCT-1994   - Removed variable c0 since it was being used before
+C                   being defined. Have now defined the colour blue
 C                   to be red(i) - should generate shades of grey. (GJP)
 C   06-OCT-1994   - Removed unused variables. (GJP)
-CC                   
+CC
 C
 C+-----------------------------------------------------------------------------
-      implicit none    
+      implicit none
 c
-c   Functions. 
+c   Functions.
 c
       integer   dyn_element,ich_encode,ich_len,pgbegin,dsa_typesize
 c
@@ -248,7 +248,7 @@ c
       logical   data
       integer   dims(10)
       integer   dims2d(2)
-      integer   dumint    
+      integer   dumint
       real      dumreal
       real      end(2)
       integer   endpix2d(2)
@@ -267,7 +267,7 @@ c
       integer   maxind
       integer   minind
       integer   ndim
-      integer   nelm      
+      integer   nelm
       character newval*8
       integer   next
       character oldval*8
@@ -292,8 +292,8 @@ c
       real      vmin
       integer   wslot
       integer   wptr
-      real      ximv(2) 
-      real      yimv(2) 
+      real      ximv(2)
+      real      yimv(2)
 c
       include 'DYNAMIC_MEMORY'
       include 'NUMERIC_RANGES'
@@ -321,17 +321,17 @@ c
       end if
 c
 c   Get name of image.
-c                        
+c
       call dsa_input('image','image',status)
       if(status.ne.0)go to 500
       call ndp_get_image_info('image',.true.,.false.,type,badpix,status)
-      if(status.ne.0)go to 500  
-      call dsa_data_size('image',2,ndim,dims,nelm,status)      
+      if(status.ne.0)go to 500
+      call dsa_data_size('image',2,ndim,dims,nelm,status)
       if(status.ne.0)go to 500
       if(ndim.lt.2)then
         call dsa_wruser('This program handles 2-D images only.\\N')
         go to 500
-      end if                                       
+      end if
       do i=1,2
         dims2d(i)=dims(i)
         stapix2d(i)=1
@@ -355,15 +355,15 @@ c
       end if
       call par_rdval('low',vmin,vmax,0.0,' ',low)
       call par_rdval('high',vmin,vmax,0.0,' ',high)
-c                  
+c
 c   Get image viewport location.
 c
-      call par_rdchar('place',' ',place)    
+      call par_rdchar('place',' ',place)
 c
 c   Get magnification factor.
 c
       call par_rdval('mag',0.1,1.0,1.0,' ',mag)
-c                  
+c
 c   Get label for image.
 c
       call par_rdchar('label',' ',label)
@@ -413,7 +413,7 @@ c   array is present!
 c
       if (.not.qual) then
         call dsa_use_flagged_values('image',status)
-        if(status.ne.0)go to 500  
+        if(status.ne.0)go to 500
       end if
 c
 c   Map data array as FLOAT (this is required by PGPLOT).  If the data
@@ -421,7 +421,7 @@ c   are already FLOAT then we need to copy the original data over to
 c   a workspace.  This is because the pointer to such data will point
 c   to the actual disk file and thus when the magic values are changed,
 c   (temporarily) it will change them on disk.
-c              
+c
       if (type .ne. 'FLOAT') then
         call dsa_map_data('image','read','FLOAT',address,islot,status)
         if(status.ne.0)go to 500
@@ -430,7 +430,7 @@ c
         bytes = nelm*dsa_typesize('float',status)
         call dsa_get_workspace(bytes,address,islot,status)
         imptr = dyn_element(address)
-        call dsa_map_data('image','read','float',address,tslot,status) 
+        call dsa_map_data('image','read','float',address,tslot,status)
         if (status .ne. 0) go to 500
         tptr = dyn_element(address)
         call gen_move(bytes,dynamic_mem(tptr),dynamic_mem(imptr))
@@ -452,7 +452,7 @@ c
       else
         status=pgbegin(0,softdev(:ich_len(softdev))//'/APPEND',1,1)
       end if
-      if(status.ne.1)go to 500      
+      if(status.ne.1)go to 500
       status=0
 c
 c   Initialize all colour indices to black
@@ -464,7 +464,7 @@ c
       end do
 c
 c   Make viewport for image.
-c                        
+c
       call ndp_image_viewport
      &  (stapix2d,endpix2d,mag,place,ximv,yimv,sqvp)
 c
@@ -495,7 +495,7 @@ c
       call pgsch(1.5)
 c
 c   Run the display.
-c                    
+c
       do k=1,shows
         string='Starting show '
         dumint=ich_encode(string,real(k),15,0,next)
@@ -507,7 +507,7 @@ c
 c   - write data value to terminal so show can be paused with CTRL-S.
 c
           value=low+(real(j-minind)/real(maxind-minind+1))*(high-low)
-          dumint=ich_encode(newval,value,1,0,dumint) 
+          dumint=ich_encode(newval,value,1,0,dumint)
           call dsa_wruser('Data '//newval//'\\N')
 c
 c   - erase previously plotted data value.
@@ -534,7 +534,7 @@ c
 c
        end do
       end do
-c                            
+c
 c   Tidy and exit.
 c
   500 continue

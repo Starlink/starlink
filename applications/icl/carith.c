@@ -48,7 +48,7 @@ value radianstodegreesval, degreestoradiansval;
  *
  ******************************************************************************
  */
-static value 
+static value
 integer_multiply(int a, int b)
 {
     int k;
@@ -76,7 +76,7 @@ integer_multiply(int a, int b)
  *
  ******************************************************************************
  */
-static value 
+static value
 integer_divide(int a, int b)
 {
     if (b == 0)
@@ -115,7 +115,7 @@ integer_divide(int a, int b)
  *
  ******************************************************************************
  */
-static value 
+static value
 integer_add(int a, int b)
 {
     int k;
@@ -158,7 +158,7 @@ integer_add(int a, int b)
  *
  ******************************************************************************
  */
-static value 
+static value
 integer_subtract(int a, int b)
 {
     int k;
@@ -184,7 +184,7 @@ integer_subtract(int a, int b)
  *
  ******************************************************************************
  */
-static value 
+static value
 integer_negate(int a)
 {
     if (a == ICL_MIN_INT)
@@ -216,7 +216,7 @@ integer_negate(int a)
  *
  ******************************************************************************
  */
-static value 
+static value
 integer_power(int a, int b)
 {
     value val;
@@ -323,7 +323,7 @@ integer_power(int a, int b)
  *
  ******************************************************************************
  */
-static value 
+static value
 dorealop(int op, double l, double r)
 {
     value val;
@@ -411,7 +411,7 @@ dorealop(int op, double l, double r)
  *
  ******************************************************************************
  */
-value 
+value
 do_operator(value left, int op, value right)
 {
 
@@ -486,7 +486,7 @@ do_operator(value left, int op, value right)
  *
  ******************************************************************************
  */
-value 
+value
 do_reloperator(value val1, int op, value val2)
 {
     if (isstringtype(val1) && isstringtype(val2)) {
@@ -561,7 +561,7 @@ do_reloperator(value val1, int op, value val2)
  *
  ******************************************************************************
  */
-value 
+value
 call_unary_integer_func(value val, int (*fn) ())
 {
     return (value_integer((*fn) (integer_part(val))));
@@ -581,7 +581,7 @@ call_unary_integer_func(value val, int (*fn) ())
  *
  ******************************************************************************
  */
-value 
+value
 call_binary_integer_func(value val1, value val2, int (*fn) (int, int))
 {
     return (value_integer((*fn) (integer_part(val1), integer_part(val2))));
@@ -599,7 +599,7 @@ call_binary_integer_func(value val1, value val2, int (*fn) (int, int))
  *
  ******************************************************************************
  */
-value 
+value
 stringtointvalue(char *thestring)
 {
     value val;
@@ -636,7 +636,7 @@ stringtointvalue(char *thestring)
  *
  ******************************************************************************
  */
-value 
+value
 basedstringtointvalue(char *thestring)
 {
     char *scan;
@@ -706,7 +706,7 @@ basedstringtointvalue(char *thestring)
  *
  ******************************************************************************
  */
-value 
+value
 func_abs(value arg)
 {
     int iarg;
@@ -732,7 +732,7 @@ func_abs(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_nint(value arg)
 {
     int ival;
@@ -773,7 +773,7 @@ func_nint(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_int(value arg)
 {
     int ival;
@@ -796,7 +796,7 @@ func_int(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_ifix(value arg)
 {
     int ival;
@@ -820,7 +820,7 @@ func_ifix(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_asin(value arg)
 {
     int ival;
@@ -848,7 +848,7 @@ func_asin(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_acos(value arg)
 {
     int ival;
@@ -876,7 +876,7 @@ func_acos(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_asind(value arg)
 {
     value val;
@@ -896,7 +896,7 @@ func_asind(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_acosd(value arg)
 {
     value val;
@@ -915,7 +915,7 @@ func_acosd(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_atan2(value y, value x)
 {
     double dval, dval2;
@@ -943,7 +943,7 @@ func_atan2(value y, value x)
  *
  ******************************************************************************
  */
-value 
+value
 func_atan2d(value y, value x)
 {
     value val;
@@ -965,7 +965,7 @@ func_atan2d(value y, value x)
  *
  ******************************************************************************
  */
-value 
+value
 func_log(value arg)
 {
     double darg;
@@ -988,7 +988,7 @@ func_log(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_log10(value arg)
 {
     double darg;
@@ -1011,7 +1011,7 @@ func_log10(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_sqrt(value arg)
 {
     double darg;
@@ -1061,7 +1061,7 @@ func_real (value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_sin(value arg)
 {
     double res;
@@ -1083,7 +1083,7 @@ func_sin(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_cos(value arg)
 {
     double res;
@@ -1105,7 +1105,7 @@ func_cos(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_tan(value arg)
 {
     double res;
@@ -1127,7 +1127,7 @@ func_tan(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_atan(value arg)
 {
     double res;
@@ -1149,7 +1149,7 @@ func_atan(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_exp(value arg)
 {
     double res;
@@ -1171,7 +1171,7 @@ func_exp(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_sinh(value arg)
 {
     double res;
@@ -1193,7 +1193,7 @@ func_sinh(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_cosh(value arg)
 {
     double res;
@@ -1215,7 +1215,7 @@ func_cosh(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_tanh(value arg)
 {
     double res;
@@ -1237,7 +1237,7 @@ func_tanh(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_sind(value arg)
 {
     value val;
@@ -1264,7 +1264,7 @@ func_sind(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_cosd(value arg)
 {
     value val;
@@ -1291,7 +1291,7 @@ func_cosd(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_tand(value arg)
 {
     value val;
@@ -1318,7 +1318,7 @@ func_tand(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_atand(value arg)
 {
 
@@ -1339,7 +1339,7 @@ func_atand(value arg)
  *
  ******************************************************************************
  */
-value 
+value
 func_mod(value left, value right)
 {
     value val;
@@ -1364,7 +1364,7 @@ func_mod(value left, value right)
  *
  ******************************************************************************
  */
-value 
+value
 func_dim(value left, value right)
 {
     if (isintegertype(left) && isintegertype(right)) {
@@ -1400,7 +1400,7 @@ func_dim(value left, value right)
  *
  ******************************************************************************
  */
-value 
+value
 func_sign(value left, value right)
 {
     if (isintegertype(left))
@@ -1412,7 +1412,7 @@ func_sign(value left, value right)
 	else
 	    return (do_operator(intzeroval, SUBTRACT, left));
     else
-     /* x1 is real */ 
+     /* x1 is real */
 	if ((isintegertype(right) && integer_part(right) >= 0) ||
 		(isrealtype(right) && real_part(right) >= 0.0))
 	return (func_abs(left));
@@ -1434,7 +1434,7 @@ func_sign(value left, value right)
  *
  ******************************************************************************
  */
-value 
+value
 func_float(value arg)
 {
     if (isintegertype(arg))
@@ -1454,7 +1454,7 @@ func_float(value arg)
  * The format accepted is {+|-}dd+
  ******************************************************************************
  */
-static value 
+static value
 stringtoint(char **thestringptr)
 {
     value val;
@@ -1510,7 +1510,7 @@ stringtoint(char **thestringptr)
  *
  ******************************************************************************
  */
-static int 
+static int
 hexdigit(char ch)
 {
     if (ch >= '0' && ch <= '9')
@@ -1543,7 +1543,7 @@ hexdigit(char ch)
  *
  ******************************************************************************
  */
-value 
+value
 stringtoiclintvalue(char **thestringptr)
 {
     char *scan;
@@ -1602,7 +1602,7 @@ stringtoiclintvalue(char **thestringptr)
 		if (isexc(val = integer_multiply(integer_part(val), 2)) ||
 		  isexc(val = integer_add(integer_part(val), (ch - '0')))) {
 		    while ((ch = *scan) != '\0')	/* overflow so skip
-							 * remaining bin 
+							 * remaining bin
 						         * digits */
 			if (ch >= '0' && ch <= '1')
 			    scan = scan + 1;
@@ -1665,7 +1665,7 @@ stringtoiclintvalue(char **thestringptr)
  *
  ******************************************************************************
  */
-value 
+value
 stringtoicllogvalue(char **thestringptr)
 {
     char *scan;
@@ -1807,7 +1807,7 @@ static double tendd[] =
  *
  ******************************************************************************
  */
-static value 
+static value
 ftod(char **as, int *afc)
 {
     int dc, fcon, fc, ov;
@@ -1834,7 +1834,7 @@ ftod(char **as, int *afc)
 				 * before? */
 		if (dc % 10 != 0) {
 		/* d = d * tend[dc%10];  */
-		    if (isexc(vald = do_operator(vald, MULTIPLY, 
+		    if (isexc(vald = do_operator(vald, MULTIPLY,
 				value_real(tend[dc % 10])))) {
 		    /*
 		     * we have overflowed so skip remaining digits and any
@@ -1852,7 +1852,7 @@ ftod(char **as, int *afc)
 		    }
 		}
 		if (dc / 10 != 0) {	/* d = d * tendd[dc/10]; */
-		    if (isexc(vald = do_operator(vald, MULTIPLY, 
+		    if (isexc(vald = do_operator(vald, MULTIPLY,
 				value_real(tendd[dc / 10])))) {
 		    /*
 		     * we have overflowed so skip remaining digits and any
@@ -1869,7 +1869,7 @@ ftod(char **as, int *afc)
 			    "FLTOVF : floating overflow during input");
 		    }
 		}
-/* 
+/*
  * d = d + (double)k;
  */
 		if (isexc(vald = do_operator(vald, ADD,
@@ -1887,7 +1887,7 @@ ftod(char **as, int *afc)
 		    *as = s;
 		    return exception("FLTOVF : floating overflow during input");
 		}
-	    } /* end of integer - overflow already happened once */ 
+	    } /* end of integer - overflow already happened once */
 	    else { /* first time the integer vali has overflowed */
 		vald = value_real((double) (integer_part(valk)));
 		ov = 1;
@@ -1949,7 +1949,7 @@ ftod(char **as, int *afc)
  *
  ******************************************************************************
  */
-value 
+value
 stringtoiclrealvalue(char **thestringptr)
 {
     int fc;
@@ -2050,7 +2050,7 @@ stringtoiclrealvalue(char **thestringptr)
  *
  ******************************************************************************
  */
-void 
+void
 init_arith(void)
 {
     int i;
@@ -2059,7 +2059,7 @@ init_arith(void)
     while (i > 0)
 	i <<= 1;
     ICL_MIN_INT = i;
-    radianstodegreesval = do_operator(value_real((double) 180.0), DIVIDE, 
+    radianstodegreesval = do_operator(value_real((double) 180.0), DIVIDE,
 				value_real((double) M_PI));
     degreestoradiansval = do_operator(value_real((double) M_PI), DIVIDE,
 				value_real((double) 180.0));

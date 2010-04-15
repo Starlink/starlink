@@ -87,7 +87,7 @@
 #define C_LOC_GSOC_END_OUT 		C_LOC_GSOC_END_IN
 #define C_REM_GSOC_END_OUT 		C_REM_GSOC_END_IN
 
-#define C_MAXMSG_LEN C_REM_MSG_IN_LEN 
+#define C_MAXMSG_LEN C_REM_MSG_IN_LEN
 
 
 /*   Maximum number of queues waited on */

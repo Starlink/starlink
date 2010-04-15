@@ -16,15 +16,15 @@
 *     This routine splits the supplied AST attribute setting string up
 *     into a name and a value, replacing synonyms for AST attribute names
 *     or qualifiers with the corresponding AST names and qualifiers, and
-*     replacing colour names within the attribute value with corresponding 
+*     replacing colour names within the attribute value with corresponding
 *     PGPLOT colour indices. Synonyms for AST attribute names or
 *     qualifiers are set up using KPG1_ASPSY.
 *
-*     Matching of attribute names and attribute qualifiers are performed 
-*     separately. The names are matched first. An attempt to match any 
-*     supplied attribute qualifier against a synonym is only made if the 
-*     attribute names match, or if the synonym does not contain an 
-*     attribute name. Synonyms may specify minimum abbreviations for 
+*     Matching of attribute names and attribute qualifiers are performed
+*     separately. The names are matched first. An attempt to match any
+*     supplied attribute qualifier against a synonym is only made if the
+*     attribute names match, or if the synonym does not contain an
+*     attribute name. Synonyms may specify minimum abbreviations for
 *     attribute qualifiers by including an asterisk within the qualifier
 *     string. The asterisk marks the end of the minimum abbreviation.
 
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -179,13 +179,13 @@
 *  Replace synonyms in the attribute name/qualifier.
 *  =================================================
 
-*  See if any synonymns are available. This is the case if both group 
+*  See if any synonymns are available. This is the case if both group
 *  identifiers supplied in common (KPG_AST) are valid.
       CALL GRP_VALID( KPG1_GETASTING(), VALID1, STATUS )
       CALL GRP_VALID( KPG1_GETASTOUG(), VALID2, STATUS )
       IF( VALID1 .AND. VALID2 ) THEN
 
-*  Check for each synonym in turn. 
+*  Check for each synonym in turn.
          DO J = 1, KPG1_GETASTNPS()
 
 *  Get the synonym and its corresponding attribute name.
@@ -197,7 +197,7 @@
 
 *  Get the length of the attribute name (i.e. the string in front of
 *  any qualifier) in the synonym.
-            IF( OP .EQ. 0 ) THEN  
+            IF( OP .EQ. 0 ) THEN
                NPLEN = CHR_LEN( SY )
             ELSE
                NPLEN = OP - 1
@@ -207,7 +207,7 @@
             CALL KPG1_PRNTH( TRAN, OP1, CL1, STATUS )
 
 *  Get the length of the attribute name in the translation.
-            IF( OP1 .EQ. 0 ) THEN  
+            IF( OP1 .EQ. 0 ) THEN
                NRLEN = CHR_LEN( TRAN )
             ELSE
                NRLEN = OP1 - 1
@@ -217,7 +217,7 @@
             CALL KPG1_PRNTH( NAME, OP2, CL2, STATUS )
 
 *  Get the length of the attribute name in the supplied text.
-            IF( OP2 .EQ. 0 ) THEN  
+            IF( OP2 .EQ. 0 ) THEN
                NTLEN = CHR_LEN( NAME )
             ELSE
                NTLEN = OP2 - 1
@@ -237,7 +237,7 @@
 *  If the synonym contains an attribute name, see if it matches the
 *  supplied attribute name. If it does, use the translated name, or
 *  (if the translation contained no name) the supplied name.
-            ELSE 
+            ELSE
                IF( NTLEN .GT. 0 ) THEN
                   IF( SY( : NPLEN ) .EQ. NAME( : NTLEN ) ) THEN
                      NMATCH = .TRUE.
@@ -248,7 +248,7 @@
                   NMATCH = .FALSE.
                END IF
 
-*  If it does, and if the translation contains an attribute name, return the 
+*  If it does, and if the translation contains an attribute name, return the
 *  attribute name from the translation. Otherwise, use the supplied name.
                IF( NMATCH .AND. NRLEN .GT. 0 ) THEN
                   ANAME = TRAN( : NRLEN )
@@ -278,8 +278,8 @@
                QMATCH = .FALSE.
 
 *  If both the synonym and supplied string contain qualifiers, see if they
-*  match, allowing minimum abbreviations indicated by an asterisk in 
-*  the synonym. The comparison is case insensitive. If it does, use the 
+*  match, allowing minimum abbreviations indicated by an asterisk in
+*  the synonym. The comparison is case insensitive. If it does, use the
 *  qualifier from the synonym translation (if any).
             ELSE IF( KPG1_SHORT( SY( OP + 1 : CL - 1 ),
      :                           NAME( OP2 + 1 : CL2 - 1 ),
@@ -292,9 +292,9 @@
                QMATCH = .FALSE.
             END IF
 
-*  If both name and qualifier match, construct a new attribute name + 
+*  If both name and qualifier match, construct a new attribute name +
 *  qualifier string.
-            IF( QMATCH .AND. NMATCH ) THEN 
+            IF( QMATCH .AND. NMATCH ) THEN
                NAME = ' '
                IAT = 0
                CALL CHR_APPND( ANAME, NAME, IAT )
@@ -309,9 +309,9 @@
 *  ===========================================
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999    
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  This setting sets a colour attribute if the name/qualifier contains 
+*  This setting sets a colour attribute if the name/qualifier contains
 *  either of the strings COLOR or COLOUR.
       IF( INDEX( NAME, 'COLOR' ) .NE. 0 .OR.
      :    INDEX( NAME, 'COLOUR') .NE. 0 )  THEN
@@ -321,9 +321,9 @@
          IF( ID .LE. 0 ) THEN
             COLIND = 0
 
-*  Otherwise, get the number of colour indices available on the current 
-*  device, and find the colour index corresponding to the attribute value. 
-*  An error will be reported if the attribute value cannot be interpreted 
+*  Otherwise, get the number of colour indices available on the current
+*  device, and find the colour index corresponding to the attribute value.
+*  An error will be reported if the attribute value cannot be interpreted
 *  as a colour specification.
          ELSE
             CALL PGQCOL( DOWN, UP )
@@ -337,13 +337,13 @@
 *  attribute string.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
-   
+
 *  If the colour was found, replace its name with the colour index.
          ELSE
             VALUE = ' '
             CALL CHR_ITOC( COLIND, VALUE, NCH )
          END IF
-   
+
       END IF
 
  999  CONTINUE

@@ -2,8 +2,8 @@
 
        INTEGER i , n
        REAL    from ( n )
-       REAL    to  ( n ) 
- 
+       REAL    to  ( n )
+
        DO i = 1 , n
          to ( i ) = from ( i )
        END DO

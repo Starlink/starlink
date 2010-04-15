@@ -26,7 +26,7 @@ $install = $StarConfig{Star_Bin};
 # The Starlink libraries are picked up via the 'ndf_link' command
 
 # This is the list of libraries required to use NDFs
-# $ndflibs = -lndf -lpsx -lary -lhds -lcnf -lerr -lerr_standalone -lems -lchr -lprm -lprm_a 
+# $ndflibs = -lndf -lpsx -lary -lhds -lcnf -lerr -lerr_standalone -lems -lchr -lprm -lprm_a
 $ndflibs = qx/ndg_link/;
 $cnfrtllibs = qx/cnfrtl_link/;
 $ndflibs .= qx/ one_link/;
@@ -69,7 +69,7 @@ if ($osname eq 'dec_osf') {
 }
 
 # This is a kludge but I need to pass the linker options through
-# to the compiler. The only way I can see to do this is via the 
+# to the compiler. The only way I can see to do this is via the
 # Optimize flag. Just append the link options to the optimize
 
 $optimize = $Config{optimize} . " $linkopts";

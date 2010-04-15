@@ -1,23 +1,23 @@
       SUBROUTINE SETLINE(NPARAMS,PARAMS,LSTYLE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   S E T L I N E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), LSTYLE (>), OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
-C 
-C  
+C
+C
+C
 C Sets lstyle parameter
 C
 C

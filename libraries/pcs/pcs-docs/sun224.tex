@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -24,9 +24,9 @@
 \newcommand{\stardocversion}   {1.1}
 \newcommand{\stardocmanual}    {Programmers manual}
 \newcommand{\stardocabstract}  {HDSPAR is a library of subroutines which
-interface between the 
+interface between the
 \htmladdnormallink{Starlink}{\STARURL}
-\xref{Hierarchical Data System (HDS)}{sun92}{abstract} and the 
+\xref{Hierarchical Data System (HDS)}{sun92}{abstract} and the
 \xref{ADAM}{sg4}{} parameter system. HDS objects are handled by reference to a
 program parameter name rather than their object name.}
 % ? End of document identification
@@ -87,7 +87,7 @@ program parameter name rather than their object name.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -502,12 +502,12 @@ program parameter name rather than their object name.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -554,42 +554,42 @@ program parameter name rather than their object name.}
 
 \section{\xlabel{introduction}Introduction}
 HDSPAR is a library of subroutines which
-interface between the 
+interface between the
 \htmladdnormallink{Starlink}{\STARURL}
-\xref{Hierarchical Data System (HDS)}{sun92}{abstract} and the 
+\xref{Hierarchical Data System (HDS)}{sun92}{abstract} and the
 \xref{ADAM}{sg4}{} parameter system.
 
-The subroutines do things like opening, closing, creating and deleting 
-\xref{HDS objects}{sun92}{HDS_objects}\latexonly{ (see SUN/92)} 
-but instead of passing the 
-object name to the subroutine, the name of a program parameter is passed. 
-The parameter system then associates the parameter with the required object, 
-using the normal parameter system process, involving the 
+The subroutines do things like opening, closing, creating and deleting
+\xref{HDS objects}{sun92}{HDS_objects}\latexonly{ (see SUN/92)}
+but instead of passing the
+object name to the subroutine, the name of a program parameter is passed.
+The parameter system then associates the parameter with the required object,
+using the normal parameter system process, involving the
 \xref{Interface Module}{sun115}{abstract}\latexonly{ (see SUN/115)}
 and possibly prompting the user.
 
 Apart from
 \htmlref{\texttt{DAT\_CANCL}}{DAT_CANCL},
-all the routines obey the 
-\xref{Starlink error-handling 
-convention}{sun104}{err_error_reporting_system}\latexonly{ described in 
-SUN/104} 
--- if the \texttt{STATUS} argument is not \texttt{SAI\_\_OK} on entry, 
+all the routines obey the
+\xref{Starlink error-handling
+convention}{sun104}{err_error_reporting_system}\latexonly{ described in
+SUN/104}
+-- if the \texttt{STATUS} argument is not \texttt{SAI\_\_OK} on entry,
 they return without action;
-if they detect an error, they report an error message and return an 
+if they detect an error, they report an error message and return an
 appropriate \texttt{STATUS} value.
 \texttt{DAT\_CANCL} will attempt to operate regardless of the given status
 value.
 
 \section{\xlabel{associating_with_an_object}Associating with an Object}
-If you just want to perform some operations on an existing 
-\xref{HDS object}{sun92}{HDS_objects} 
-using basic HDS subroutines, you need an 
+If you just want to perform some operations on an existing
+\xref{HDS object}{sun92}{HDS_objects}
+using basic HDS subroutines, you need an
 \xref{HDS locator}{sun92}{using_locators}\latexonly{ (see SUN/92)}
-for the object and usually you will want to specify the name of the object as 
+for the object and usually you will want to specify the name of the object as
 a parameter of the program.
 
-The 
+The
 \htmlref{\texttt{DAT\_ASSOC}}{DAT_ASSOC}
 routine will associate an object with a program parameter and return a locator
 for it.
@@ -610,14 +610,14 @@ CALL DAT_CANCL( 'OBJECT', STATUS )
 \end{verbatim} \end{quote}
 
 If \texttt{DAT\_ASSOC} fails to associate the parameter with an object it
-will report the problem and prompt for a new value. 
-It will do this up to five times before giving up and returning status 
+will report the problem and prompt for a new value.
+It will do this up to five times before giving up and returning status
 \texttt{PAR\_\_NULL}.
 
 \htmlref{\texttt{DAT\_EXIST}}{DAT_EXIST} is similar to \texttt{DAT\_ASSOC}
 but it will return immediately if the association fails. It can therefore be
 used to test for the existence of an object. Status \texttt{PAR\_\_ERROR}
-(not \texttt{DAT\_EXIST}, for historical reasons) will be returned if the 
+(not \texttt{DAT\_EXIST}, for historical reasons) will be returned if the
 object does not exist, but the parameter value will not be cancelled so
 a subsequent HDSPAR subroutine call (such as
 \htmlref{\texttt{DAT\_CREAT}}{DAT\_CREAT})
@@ -626,36 +626,36 @@ See
 \htmlref{the example}{example}\latexonly{ in Section \ref{example}} for an
 illustration of this.
 
-The 
+The
 \xref{\texttt{ACCESS} Field}{sun115}{the_access_field}\latexonly{ (see SUN/115)}
 specified in the Interface Module for the program must be compatible with
-the access mode specified in the 
-\texttt{DAT\_ASSOC} or \texttt{DAT\_EXIST} call, otherwise status 
+the access mode specified in the
+\texttt{DAT\_ASSOC} or \texttt{DAT\_EXIST} call, otherwise status
 \texttt{SUBPAR\_ICACM} will be returned.
 
-Both routines may be called more than once for the same parameter but 
-\texttt{DAT\_CANCL} must be called to cancel an existing association if a 
-different object is required (see 
+Both routines may be called more than once for the same parameter but
+\texttt{DAT\_CANCL} must be called to cancel an existing association if a
+different object is required (see
 \htmlref{`Parameter States'}{parameter_states}\latexonly{, Section \ref{parameter_states}}).
 
 \section{\xlabel{parameter_states}Parameter States\label{parameter_states}}
 A parameter has a number of states.  Initially, a parameter has no
 value, and is said to be in the \textit{ground\/} state.  When the
-parameter has been given a value, the parameter moves to the \textit{active\/} 
+parameter has been given a value, the parameter moves to the \textit{active\/}
 state.  A parameter acquires a value in the first instance by
 looking for one supplied on the command line.  Failing that, when the program
-requests a parameter value, the parameter system will attempt to get a value 
+requests a parameter value, the parameter system will attempt to get a value
 from one of a number of sources specified by
 \xref{the VPATH Field}{sun115}{the_vpath_field}
 in the Interface Module\latexonly{ (see SUN/115)}.
-This may cause the user to be prompted and the prompt may contain a 
+This may cause the user to be prompted and the prompt may contain a
 \textit{suggested value} which can be accepted by just hitting the
 \texttt{RETURN} key.
 
-If a program requests a value for a parameter already in the active state, 
-the existing value is returned.  
-To obtain a new value the program must first \textit{cancel\/} the 
-parameter, moving it to the \textit{cancelled\/} state.  
+If a program requests a value for a parameter already in the active state,
+the existing value is returned.
+To obtain a new value the program must first \textit{cancel\/} the
+parameter, moving it to the \textit{cancelled\/} state.
 \htmlref{\texttt{DAT\_CANCL}}{DAT_CANCL} does this as well as annulling the
 associated locator.
 
@@ -674,19 +674,19 @@ must be cancelled before another value can be obtained.
 \section{\xlabel{creating_objects}Creating Objects}
 \htmlref{\texttt{DAT\_CREAT}}{DAT_CREAT} may be used to create an object but
 note that it does not return a locator -- a subsequent call to DAT\_ASSOC
-or DAT\_EXIST is required before the object can be used. 
-Only one object can be created, its parents, if any, must already exist. 
+or DAT\_EXIST is required before the object can be used.
+Only one object can be created, its parents, if any, must already exist.
 If the parameter specifies a top-level object, any existing container file will
-be overwritten but it is an error (\texttt{DAT\_\_COMEX}) to try to overwrite 
+be overwritten but it is an error (\texttt{DAT\_\_COMEX}) to try to overwrite
 an existing lower-level component.
 
-The 
+The
 \xref{\texttt{ACCESS} Field}{sun115}{the_access_field}\latexonly{ (see SUN/115)}
 specified in the Interface Module for the program must be `WRITE' or `UPDATE',
 otherwise status \texttt{SUBPAR\_ICACM} will be returned.
 
 \section{\xlabel{deleting_objects}Deleting Objects}
-An object associated with a parameter can be deleted with the 
+An object associated with a parameter can be deleted with the
 \htmlref{\texttt{DAT\_DELET}}{DAT_DELET}
 routine -- it calls
 \xref{\texttt{HDS\_ERASE}}{sun92}{HDS_ERASE}
@@ -698,7 +698,7 @@ The association is then cancelled.
 If an object has not already been associated with the specified parameter,
 an object name will be obtained from the parameter system.
 
-The 
+The
 \xref{\texttt{ACCESS} Field}{sun115}{the_access_field}\latexonly{ (see SUN/115)}
 specified in the Interface Module for the program must be `WRITE' or `UPDATE',
 otherwise status \texttt{SUBPAR\_ICACM} will be returned.
@@ -710,16 +710,16 @@ Subroutine
 \htmlref{\texttt{DAT\_UPDAT}}{DAT_UPDAT}
 may be used to do this. It calls subroutine
 \xref{\texttt{HDS\_FREE}}{sun92}{HDS_FREE}
-for the container file of an object associated with a parameter. 
-If there is no associated object, \texttt{DAT\_UPDAT} will just return 
+for the container file of an object associated with a parameter.
+If there is no associated object, \texttt{DAT\_UPDAT} will just return
 -- no error is reported.
 
 \section{\xlabel{setting_dynamic_defaults}Setting Dynamic Defaults}
 The ADAM parameter system has the concept of `dynamic defaults' for program
-parameters. These are values suggested by the program itself and the 
+parameters. These are values suggested by the program itself and the
 \xref{Interface Module}{sun115}{abstract}
 may be set up to cause the dynamic default to be used as the value for a
-parameter using the 
+parameter using the
 \xref{\texttt{VPATH} Field}{sun115}{the_vpath_field}\latexonly{ (see SUN/115)},
 or given as a suggested value in a prompt, using the
 \xref{\texttt{PPATH} Field}{sun115}{the_ppath_field}\latexonly{ (see SUN/115)}.
@@ -728,27 +728,27 @@ Subroutine
 \htmlref{\texttt{DAT\_DEF}}{DAT_DEF}
 can be used to set an HDS object as the dynamic default for a parameter but its
 usefulness is limited because it has to be given a locator to the object.
-The locator need only be valid when \texttt{DAT\_DEF} is called, the object 
-name is found then and stored as a character string. 
+The locator need only be valid when \texttt{DAT\_DEF} is called, the object
+name is found then and stored as a character string.
 The string is used when the dynamic default is required.
 
 \section{\xlabel{hdspar_and_par}HDSPAR and PAR}
 There is a very close relationship between
 HDSPAR, intended for bulk data parameters, and
 \xref{PAR}{sun114}{abstract},
-intended for parameters which are simple, 
+intended for parameters which are simple,
 \xref{primitive-type}{sun92}{HDS_objects}
 values.
 If a parameter is given a primitive value, The ADAM parameter system creates
 an HDS object in the program's private parameter file (usually
 \verb!~/adam/!\textit{program\_name}).
 The object has the name of the parameter and contains the given value.
-This object is then associated with the parameter in the same way as 
+This object is then associated with the parameter in the same way as
 \htmlref{\texttt{DAT\_ASSOC}}{DAT_ASSOC}
 associates any other object.
 
 This relationship allows primitive values and HDS object names to be used
-interchangeably for parameter values to be accessed by either HDSPAR or PAR 
+interchangeably for parameter values to be accessed by either HDSPAR or PAR
 subroutines (subject, of course, to suitable type and dimensionality).
 
 Try typing:
@@ -757,8 +757,8 @@ Try typing:
 \end{verbatim} \end{quote}
 
 \xref{HDSTRACE}{sun102}{abstract}\latexonly{ (see SUN/102)}
-would normally expect an HDS object (parameter OBJECT) as input and uses 
-\texttt{DAT\_ASSOC} to open it. 
+would normally expect an HDS object (parameter OBJECT) as input and uses
+\texttt{DAT\_ASSOC} to open it.
 In this case it opens the parameter file component and displays:
 \begin{quote} \begin{verbatim}
 HDSTRACE.OBJECT  <_REAL>
@@ -768,13 +768,13 @@ HDSTRACE.OBJECT  <_REAL>
 End of Trace.
 \end{verbatim} \end{quote}
 
-This feature also allows the program to handle parameters without knowing in 
+This feature also allows the program to handle parameters without knowing in
 advance the type of parameter which will be given.
 
 \section{\xlabel{compiling_and_linking}Compiling and Linking}
-HDSPAR does not itself have any Fortran 
+HDSPAR does not itself have any Fortran
 \xref{INCLUDE files}{sun144}{include_files}
-but use of the HDSPAR subroutines will almost certainly require the use of 
+but use of the HDSPAR subroutines will almost certainly require the use of
 the general Starlink Applications Environment INCLUDE file, \texttt{SAE\_PAR},
 and INCLUDE files from other libraries, in particular
 \xref{PAR}{sun114}{abort_and_null}
@@ -804,7 +804,7 @@ For example:
 \begin{quote}
 \texttt{\% alink \textit{program}.f}
 \end{quote}
-Will compile the Fortran program in file \texttt{\textit{program}.f} and link 
+Will compile the Fortran program in file \texttt{\textit{program}.f} and link
 it with the ADAM infrastructure libraries.
 
 \section{\xlabel{example}Example\label{example}}
@@ -814,9 +814,9 @@ The following contrived program shows how the HDSPAR routines can be used.
       SUBROUTINE THDSPAR( STATUS)
 *   Exercise the HDSPAR routines
 *
-*   The program creates a structure (parameter 'STRUCTURE') and an 
-*   INTEGER array component (parameter 'COMPONENT1') if they do not 
-*   already exist. (These would normally be a top-level structure and 
+*   The program creates a structure (parameter 'STRUCTURE') and an
+*   INTEGER array component (parameter 'COMPONENT1') if they do not
+*   already exist. (These would normally be a top-level structure and
 *   a component of it.)
 *   A REAL array is then written to the component and the component
 *   set as the dynamic default for the parameter 'INPUT'.
@@ -869,12 +869,12 @@ The following contrived program shows how the HDSPAR routines can be used.
 *   Get a locator for the specified component and write to it.
       CALL DAT_ASSOC( 'COMPONENT1', 'WRITE', LOC2, STATUS )
       CALL DAT_PUTNR( LOC2, NDIMS, DIMS, ARR, DIMS, STATUS )
-     
+
 *   Update the disk - we can't see the effect of this.
       CALL DAT_UPDAT( 'COMPONENT1', STATUS )
 
 *   Set the specified component as the dynamic default for 'INPUT'.
-      CALL DAT_DEF( 'INPUT', LOC2, STATUS )      
+      CALL DAT_DEF( 'INPUT', LOC2, STATUS )
 
 *   The above locator may now be annulled.
       CALL DAT_CANCL( 'COMPONENT1', STATUS )
@@ -890,7 +890,7 @@ The following contrived program shows how the HDSPAR routines can be used.
             CALL MSG_SETR( 'ROW', ARR(I,J) )
             CALL MSG_SETC( 'ROW', ' ' )
    10    CONTINUE
-         CALL MSG_OUT( ' ', '^ROW', STATUS )     
+         CALL MSG_OUT( ' ', '^ROW', STATUS )
    20 CONTINUE
 
 *   Set the 'INPUT' object as dynamic default for 'COMPONENT2',
@@ -915,7 +915,7 @@ The following contrived program shows how the HDSPAR routines can be used.
       END
 \end{verbatim} \end{quote}
 
-The following interface file could be used. This will cause prompts for 
+The following interface file could be used. This will cause prompts for
 parameters \texttt{STRUCTURE} and \texttt{COMPONENT1}, and take the dynamic
 defaults for \texttt{INPUT} and \texttt{COMPONENT2} (unless values are given
 on the command line).
@@ -955,8 +955,8 @@ endinterface
 The resultant session, accepting suggested values would look like this:
 \begin{quote} \begin{verbatim}
 % thdspar
-STRUCTURE /@created/ > 
-COMPONENT1 /@created.comp/ > 
+STRUCTURE /@created/ >
+COMPONENT1 /@created.comp/ >
 Input array is:
 1 2
 3 4

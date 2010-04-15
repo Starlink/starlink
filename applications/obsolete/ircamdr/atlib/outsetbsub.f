@@ -1,6 +1,6 @@
 *+  OUTSETBSUB - replaces all pixels outside box with specified value
 
-      SUBROUTINE OUTSETBSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2, XSTART, 
+      SUBROUTINE OUTSETBSUB ( INARRAY, OUTARRAY, DIMS1, DIMS2, XSTART,
      :                        YSTART, XSIZE, YSIZE, NEWVAL, STATUS )
 
 *    Description :
@@ -11,7 +11,7 @@
 *
 *    Invocation :
 *
-*     CALL OUTSETBSUB( INARRAY, OUTARRAY, DIMS, XSTART, YSTART, 
+*     CALL OUTSETBSUB( INARRAY, OUTARRAY, DIMS, XSTART, YSTART,
 *                      XSIZE, YSIZE, NEWVAL, STATUS )
 *
 *    Method :
@@ -47,8 +47,8 @@
      :    DIMS2,      ! dimensions of input array
      :    XSTART,         ! x coord of box start
      :    YSTART,         ! y coord of box start
-     :    XSIZE,          ! x size of box 
-     :    YSIZE           ! y size of box 
+     :    XSIZE,          ! x size of box
+     :    YSIZE           ! y size of box
 
       REAL
      :    INARRAY( DIMS1, DIMS2 ),   ! input data
@@ -89,7 +89,7 @@
 
 	    IF( J .GE. YSTART .AND. J .LE. ( YSTART+YSIZE-1) .AND.
      :	        I .GE. XSTART .AND. I .LE. ( XSTART+XSIZE-1)) THEN
-     
+
                OUTARRAY( I, J )  =  INARRAY( I, J )
 
 *         set to new value if current pixel outside box

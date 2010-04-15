@@ -158,7 +158,7 @@
 
 *  If we do not have any valid values by this stage then prompt
 *  the user.
-      IF ( .NOT. EXTSEC ) THEN 
+      IF ( .NOT. EXTSEC ) THEN
 
 *  Set the dynamic default for this value.
          CALL PAR_DEF1I( 'EXTENT', 4, EXTENT, STATUS )

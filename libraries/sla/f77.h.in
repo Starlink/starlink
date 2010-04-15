@@ -13,11 +13,11 @@
 *     C include file
 
 *  Description:
-*     Including this file in SLALIB allows SLALIB to remain free of any 
+*     Including this file in SLALIB allows SLALIB to remain free of any
 *     dependencies on the rest of the Starlink Software Collection.
 *
 *     For historical reasons two files, F77.h and cnf.h are required
-*     but the have now been combined and for new code, only one is 
+*     but the have now been combined and for new code, only one is
 *     necessary.
 *
 *     This file defines the macros needed to write C functions that are
@@ -38,7 +38,7 @@
 *        the FORTRAN variable to be set appropriately. The possibility that
 *        FORTRAN and C might use different ways of representing integer
 *        and floating point values is considered remote, the macros are
-*        really only there for completeness and to assist in the automatic 
+*        really only there for completeness and to assist in the automatic
 *        generation of C interfaces.
 *     -  For character variables the macros convert between
 *        the FORTRAN method of representing them (fixed length, blank
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -84,12 +84,12 @@
 *     13-JUN-2006 (DSB):
 *        Original version, copied from AST.
 *     22-JUN-2006 (PWD):
-*        Updated to include changes that handle the return type of 
+*        Updated to include changes that handle the return type of
 *        REAL functions (double, not float, on some platforms).
 *     13-JUL-2007 (PWD):
 *        Parameterise the type used for Fortran string lengths.
 *     {enter_further_changes_here}
-*        
+*
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -158,10 +158,10 @@
 /*  Define macros for all the Fortran data types (except COMPLEX, which is  */
 /*  not handled by this package).					    */
 
-#define F77_INTEGER_TYPE   int 
-#define F77_REAL_TYPE      float 
+#define F77_INTEGER_TYPE   int
+#define F77_REAL_TYPE      float
 #define F77_REAL_FUNCTION_TYPE      @REAL_FUNCTION_TYPE@
-#define F77_DOUBLE_TYPE    double 
+#define F77_DOUBLE_TYPE    double
 #define F77_LOGICAL_TYPE   int
 #define F77_CHARACTER_TYPE char
 #define F77_BYTE_TYPE      signed char
@@ -619,7 +619,7 @@
 
 /* The standard macros defined above are known to work with the following   */
 /* systems:								    */
- 
+
 /*--------
 |   Sun   |
 ---------*/
@@ -877,7 +877,7 @@ void cnfExpn( const char *source_c, int max, char *dest_f, int dest_len );
 void cnfExprt( const char *source_c, char *dest_f, int dest_len );
 void cnfExprta( const char *source_c, int source_len, char *dest_f,
                  int dest_len, int ndims, const int *dims );
-void cnfExprtap( char *const *source_c, char *dest_f, int dest_len, 
+void cnfExprtap( char *const *source_c, char *dest_f, int dest_len,
                   int ndims, const int *dims );
 F77_POINTER_TYPE cnfFptr( void *cpointer );
 void cnfFree( void * );

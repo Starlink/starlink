@@ -30,7 +30,7 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Establish the communication path to the named task and send it a 
+*     Establish the communication path to the named task and send it a
 *     message.
 
 *  Copyright:
@@ -81,7 +81,7 @@
 *  Arguments Given:
       CHARACTER*(*) TASK_NAME     ! the name of the task
       CHARACTER*(*) NAME          ! the name of the action
-      CHARACTER*(*) INVAL         ! the parameter list to be sent to the 
+      CHARACTER*(*) INVAL         ! the parameter list to be sent to the
                                   ! task
 *  Arguments Returned:
       CHARACTER*(*) OUTVAL        ! the string returned from the task

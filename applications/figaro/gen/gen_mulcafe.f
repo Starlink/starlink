@@ -99,7 +99,7 @@ C
 C
 C     Work out output error array if appropriate. The constatnt is squared
 C     because it is the variance used rather than the standard deviation.
-C     
+C
       IF(ERRORS)THEN
          DO I=1,NELM
             ERROUT(I)=ERRIN(I)*(CONST**2.)

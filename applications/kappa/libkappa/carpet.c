@@ -1,15 +1,15 @@
-#include "sae_par.h" 
-#include "mers.h" 
-#include "ndf.h" 
-#include "star/kaplibs.h" 
-#include "star/grp.h" 
-#include "star/ndg.h" 
-#include "star/atl.h" 
-#include "par.h" 
+#include "sae_par.h"
+#include "mers.h"
+#include "ndf.h"
+#include "star/kaplibs.h"
+#include "star/grp.h"
+#include "star/ndg.h"
+#include "star/atl.h"
+#include "par.h"
 #include "par_par.h"
 #include "prm_par.h"
-#include <math.h> 
-#include <string.h> 
+#include <math.h>
+#include <string.h>
 #include <stdio.h>
 
 F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
@@ -35,36 +35,36 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 *        The global status.
 
 *  Description:
-*     This application creates a new three-dimensional NDF from an 
-*     existing two-dimensional NDF. The resulting NDF can, for instance, 
-*     be viewed with the three-dimensional iso-surface facilities of the 
-*     GAIA image viewer, in order to create a display similar to a 
-*     "carpet plot" of the image (the iso-surface at value zero represents 
+*     This application creates a new three-dimensional NDF from an
+*     existing two-dimensional NDF. The resulting NDF can, for instance,
+*     be viewed with the three-dimensional iso-surface facilities of the
+*     GAIA image viewer, in order to create a display similar to a
+*     "carpet plot" of the image (the iso-surface at value zero represents
 *     the input image data values).
 *
-*     The first two pixel axes (X and Y) in the output cube correspond to the 
-*     pixel axes in the input image. The third pixel axis (Z) in the output 
+*     The first two pixel axes (X and Y) in the output cube correspond to the
+*     pixel axes in the input image. The third pixel axis (Z) in the output
 *     cube is proportional to data value in the input image. The value of
-*     a pixel in the output cube measures the difference between the data 
-*     value implied by its Z-axis position, and the data value of the 
+*     a pixel in the output cube measures the difference between the data
+*     value implied by its Z-axis position, and the data value of the
 *     corresponding pixel in the input image. Two schemes are available
 *     (see Parameter MODE): the output pixel values can be either simply
 *     the difference between these two data values, or the difference
-*     divided by the standard deviation at the corresponding pixel in the 
+*     divided by the standard deviation at the corresponding pixel in the
 *     input image (as determined either from the VARIANCE component in
 *     the input NDF or by Parameter SIGMA).
 
 *  Usage:
-*     carpet in out [ndatapix] [range] [mode] [sigma] 
+*     carpet in out [ndatapix] [range] [mode] [sigma]
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*        The input two-dimensional NDF. 
+*        The input two-dimensional NDF.
 *     MODE = LITERAL (Read)
 *        Determines how the pixel values in the output cube are calculated.
 *
 *        - "Data"  -- the value of each output pixel is equal to the difference
-*                     between the data value implied by its position along 
+*                     between the data value implied by its position along
 *                     the data value axis, and the value of the
 *                     corresponding pixel in the input image.
 *
@@ -77,81 +77,81 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 *     NDATAPIX = _INTEGER (Read)
 *        The number of pixels to use for the data value axis in the
 *        output cube. The pixel origin of this axis will be 1. The
-*        dynamic default is the square root of the number of pixels in 
+*        dynamic default is the square root of the number of pixels in
 *        the input image. This gives a fairly "cubic" output cube.  []
 *     OUT = NDF (Write)
-*        The output three-dimensional NDF. 
+*        The output three-dimensional NDF.
 *     RANGE = LITERAL (Read)
 *        RANGE specifies the range covered by the data value axis (i.e. the
-*        third pixel axis) in the output cube. The supplied string should 
-*        consist of up to three sub-strings, separated by commas.  For all 
-*        but the option where you give explicit numerical limits, the first 
-*        sub-string must specify the method to use.  If supplied, the other 
+*        third pixel axis) in the output cube. The supplied string should
+*        consist of up to three sub-strings, separated by commas.  For all
+*        but the option where you give explicit numerical limits, the first
+*        sub-string must specify the method to use.  If supplied, the other
 *        two sub-strings should be numerical values as described below
 *        (default values will be used if these sub-strings are not
 *        provided).  The following options are available.
 *
-*        - lower,upper -- You can supply explicit lower and upper limiting 
-*        values.  For example, "10,200" would set the lower limit on the 
+*        - lower,upper -- You can supply explicit lower and upper limiting
+*        values.  For example, "10,200" would set the lower limit on the
 *        output data axis to 10 and its upper limit to 200.  No method name
-*        prefixes the two values.  If only one value is supplied, the 
-*        "Range" method is adopted.  The limits must be within the dynamic 
+*        prefixes the two values.  If only one value is supplied, the
+*        "Range" method is adopted.  The limits must be within the dynamic
 *        range for the data type of the input NDF array component.
 *
 *        - "Percentiles" -- The default values for the output data axis
-*        range are set to the specified percentiles of the input data.  For 
+*        range are set to the specified percentiles of the input data.  For
 *        instance, if the value "Per,10,99" is supplied, then the lowest
 *        10% and highest 1% of the data values are beyond the bounds of
-*        the output data value axis.  If only one value, p1, is supplied, 
-*        the second value, p2, defaults to (100 - p1).  If no values are 
-*        supplied, the values default to "5,95".  Values must be in the 
+*        the output data value axis.  If only one value, p1, is supplied,
+*        the second value, p2, defaults to (100 - p1).  If no values are
+*        supplied, the values default to "5,95".  Values must be in the
 *        range 0 to 100.
 *
-*        - "Range" -- The minimum and maximum input data values are used.  
+*        - "Range" -- The minimum and maximum input data values are used.
 *        No other sub-strings are needed by this option.  Null (!) is a
 *        synonym for the "Range" method.
 *
-*        - "Sigmas" -- The limits on the output data value axis are set to 
+*        - "Sigmas" -- The limits on the output data value axis are set to
 *        the specified numbers of standard deviations below and above the
 *        mean of the input data.  For instance, if the supplied value is
-*        "sig,1.5,3.0", then the data value axis extends from the mean of 
-*        the input data minus 1.5 standard deviations to the mean plus 3 
-*        standard deviations.  If only one value is supplied, the second 
+*        "sig,1.5,3.0", then the data value axis extends from the mean of
+*        the input data minus 1.5 standard deviations to the mean plus 3
+*        standard deviations.  If only one value is supplied, the second
 *        value defaults to the supplied value.  If no values are supplied,
 *        both default to "3.0".
 *
-*        The limits adopted for the data value axis are reported unless 
-*        parameter RANGE is specified on the command line.  In this case 
+*        The limits adopted for the data value axis are reported unless
+*        parameter RANGE is specified on the command line.  In this case
 *        values are only calculated where necessary for the chosen method.
 *
 *        The method name can be abbreviated to a single character, and
-*        is case insensitive.  The initial default value is "Range".  The 
-*        suggested defaults are the current values, or ! if these do 
+*        is case insensitive.  The initial default value is "Range".  The
+*        suggested defaults are the current values, or ! if these do
 *        not exist.  [current value]
 *     SIGMA = _REAL (Read)
 *        The standard deviation to use if Parameter MODE is set to "Sigma".
 *        If a null (!) value is supplied, the standard deviations implied
 *        by the VARIANCE component in the input image are used (an error
-*        will be reported if the input image does not have a VARIANCE 
+*        will be reported if the input image does not have a VARIANCE
 *        component). If a SIGMA value is supplied, the same value is used
 *        to scale all output pixels.  [!]
 
 *  Examples:
 *     carpet m31 m31-cube mode=sigma
-*        Asssuming the two-dimensional NDF in file m31.sdf contains a 
-*        VARIANCE component, this will create a three-dimensional NDF called 
-*        m31-cube in which the third pixel axis corresponds to data value in 
-*        NDF m31, and each output pixel value is the number of standard 
-*        deviations of the pixel away from the corresponding input data value. 
-*        If you then use GAIA to view the cube, an iso-surface at value zero 
+*        Asssuming the two-dimensional NDF in file m31.sdf contains a
+*        VARIANCE component, this will create a three-dimensional NDF called
+*        m31-cube in which the third pixel axis corresponds to data value in
+*        NDF m31, and each output pixel value is the number of standard
+*        deviations of the pixel away from the corresponding input data value.
+*        If you then use GAIA to view the cube, an iso-surface at value zero
 *        will be a carpet plot of the data values in m31, an iso-surface at
 *        value -1.0 will be a carpet plot showing data values one standard
-*        deviation below the m31 data values, and an iso-surface at value +1.0 
-*        will be a carpet plot showing data values one sigma above the 
+*        deviation below the m31 data values, and an iso-surface at value +1.0
+*        will be a carpet plot showing data values one sigma above the
 *        m31 data values. This can help to visualise the errors in an image.
 
 *  Implementation Status:
-*     -  Any VARIANCE and QUALITY components in the input image are not 
+*     -  Any VARIANCE and QUALITY components in the input image are not
 *     propagated to the output cube.
 
 *  Copyright:
@@ -184,7 +184,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 *     {enter_further_changes_here}
 
 *-
-*/      
+*/
 
    GENPTR_INTEGER(STATUS)
 
@@ -225,7 +225,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
    int slbnd[ 3 ];           /* Lower pixel bounds of significant pixel axes */
    int subnd[ 3 ];           /* Upper pixel bounds of significant pixel axes */
    size_t size;              /* Size of GRP group */
-  
+
 /* Abort if an error has already occurred. */
    if( *STATUS != SAI__OK ) return;
 
@@ -244,7 +244,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
    grpDelet( &grp, STATUS );
 
 /* See if the NDF has a VARIANCE component. */
-   ndfState( indf1, "Variance", &hasvar, STATUS ); 
+   ndfState( indf1, "Variance", &hasvar, STATUS );
 
 /* Now get the WCS FrameSet and significant bounds from the NDF, ensuring
    there are two significant axis in the input NDF. */
@@ -266,17 +266,17 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
             errRep( " ", "The NDF '^NDF' has no VARIANCE component but a "
                     "null value was supplied for parameter SIGMA.", STATUS );
          }
-      } 
+      }
 
 /* Mode "Data" is equivalent to mode "Sigma" with a SIGMA value of 1.0. */
    } else {
       sigma = 1.0;
    }
 
-/* Map the input DATA and, if required, VARIANCE component of the input 
+/* Map the input DATA and, if required, VARIANCE component of the input
    image. */
    ndfMap( indf1, "Data", "_DOUBLE", "READ", (void *) &ipdin, &el, STATUS );
-   if( sigma == 0.0 ) ndfMap( indf1, "Variance", "_DOUBLE", "READ", 
+   if( sigma == 0.0 ) ndfMap( indf1, "Variance", "_DOUBLE", "READ",
                               (void *) &ipvin, &el, STATUS );
 
 /* Get the number of pixels on the output data-value axis. */
@@ -286,17 +286,17 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 
 /* Get the range for the output data-value axis. */
    bad = 1;
-   kpg1Darad( "RANGE", el, ipdin, "Limit,Percentiles,Range,Sigmas", 
+   kpg1Darad( "RANGE", el, ipdin, "Limit,Percentiles,Range,Sigmas",
               &bad, &dlo, &dhi, STATUS );
 
 /* Create the output NDF, initially a 2D NDF propagated from the input
    image. */
-   ndfProp( indf1, "Unit", "OUT", &indf2, STATUS ); 
+   ndfProp( indf1, "Unit", "OUT", &indf2, STATUS );
 
 /* Change its shape to the required 3D shape for the output NDF. */
    slbnd[ 2 ] = 1;
    subnd[ 2 ] = ndatapix;
-   ndfSbnd( 3, slbnd, subnd, indf2, STATUS ); 
+   ndfSbnd( 3, slbnd, subnd, indf2, STATUS );
 
 /* Create a 1D Frame to represent the data-value axis. */
    datafrm = astFrame( 1, "Domain=DATAVALUE" );
@@ -304,18 +304,18 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 /* If the input NDF has a LABEL component, assign it to the Label
    attribute of this Frame. */
    cval[ 0 ] = 0;
-   ndfCget( indf1, "Label", cval, 255, STATUS ); 
+   ndfCget( indf1, "Label", cval, 255, STATUS );
    if( astChrLen( cval ) == 0 ) strcpy( cval, "Data value" );
    astSetC( datafrm, "Label(1)", cval );
 
 /* If the input NDF has a UNIT component, assign it to the Unit
    attribute of this Frame. */
    cval[ 0 ] = 0;
-   ndfCget( indf1, "Unit", cval, 255, STATUS ); 
+   ndfCget( indf1, "Unit", cval, 255, STATUS );
    if( astChrLen( cval ) > 0 ) astSetC( datafrm, "Unit(1)", cval );
 
-/* Add this Frame into the WCS FrameSet as an extra "data value" axis. 
-   Map the the GRID coord range [1.0,ndatapix] onto the data value 
+/* Add this Frame into the WCS FrameSet as an extra "data value" axis.
+   Map the the GRID coord range [1.0,ndatapix] onto the data value
    range [dlo,dhi]. */
    ina[ 0 ] = 1.0;
    inb[ 0 ] = ndatapix;
@@ -386,7 +386,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
    ndfEnd( STATUS );
    astEnd;
 
-/* If an error has occurred, issue another error report identifying the 
+/* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
    if( *STATUS != SAI__OK ) {
       errRep( "CARPET_ERR", "CARPET: Failed to create a cube (representing "

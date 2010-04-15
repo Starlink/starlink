@@ -41,7 +41,7 @@
 *        Otherwise, it will be retuned equal to UNITS.
 *     FACTOR = REAL (Returned)
 *        The scale factor for converting between the input and output
-*        units. 
+*        units.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,26 +103,26 @@
 
 *  CPC images can not be scaled to different units.
          IF( TYPE .EQ. IRI__CPC ) THEN
-            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             CALL MSG_SETC( 'U1', UNITS )
             CALL MSG_SETC( 'U2', U )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPC0_MSG1',
      :   'WARNING:  CPC image cannot be produced in ^U1. Output will '//
      :   'be in ^U.', STATUS )
-            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             FACTOR = 1.0
             GO TO 999
          END IF
 
 *  Images with no input units can not be scaled to different units.
          IF( U .EQ. ' ' ) THEN
-            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             CALL MSG_SETC( 'U1', UNITS )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPC0_MSG2',
      :'WARNING:  No system of units is specified in the FITS header. '//
-     :'Therefore the output data cannot be scaled to units of ^U1. ', 
+     :'Therefore the output data cannot be scaled to units of ^U1. ',
      :                      STATUS )
-            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             FACTOR = 1.0
             GO TO 999
          END IF
@@ -134,9 +134,9 @@
          IF( STATUS .EQ. SAI__OK ) THEN
             U = UNITS
 
-*  Otherwise, annul the error and get the factor for converting from 
+*  Otherwise, annul the error and get the factor for converting from
 *  the input to output units from the environment.
-         ELSE 
+         ELSE
             CALL ERR_ANNUL( STATUS )
             CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             CALL MSG_SETC( 'U1', U )
@@ -150,10 +150,10 @@
 
 *  If a null value was supplied, leave the data in the original units.
             IF( STATUS .EQ. PAR__NULL ) THEN
-               CALL ERR_ANNUL( STATUS )               
+               CALL ERR_ANNUL( STATUS )
                FACTOR = 1.0
 
-*  If a value was supplied, use the new units.      
+*  If a value was supplied, use the new units.
             ELSE
                U = UNITS
             END IF

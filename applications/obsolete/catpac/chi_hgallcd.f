@@ -1,13 +1,13 @@
       SUBROUTINE CHI_HGALLCD( CATNO, NUMFLDS, FNAMES, FFORMATS,
-     +                FTYPES, FUNITS, FCOMMENTS, 
+     +                FTYPES, FUNITS, FCOMMENTS,
      :                MDATAACC, CDATAACC, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR' 
+      INCLUDE 'DAT_PAR'
       INCLUDE 'CHI_PAR'          ! CHI constants
       INCLUDE 'CHIH_PAR'        ! CHI_HDS constants
       INCLUDE 'DAT_ERR'

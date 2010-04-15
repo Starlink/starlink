@@ -36,7 +36,7 @@
 *     2006-09-08 (EC):
 *        Modified sc2sim_calctime to take Longitude as a parameter
 *     2006-10-03 (JB):
-*        Modified sc2sim_getpong to use width/height and removed 
+*        Modified sc2sim_getpong to use width/height and removed
 *        sc2sim_getpongends
 *     2006-10-17 (JB):
 *        Removed sc2sim_getpong, replaced with sc2sim_getpongvert,
@@ -53,7 +53,7 @@
 *        - update API for sc2sim_ndfwrdata to accept dateobs string
 *     2006-12-08 (JB):
 *        - removed sc2sim_simhits and added hitsonly flag to simulate.
-*        - modified dateobs to take per-chunk time 
+*        - modified dateobs to take per-chunk time
 *     2007-01-03 (AGG):
 *        Add sc2sim_instap_calc
 *     2007-01-26 (AGG):
@@ -74,7 +74,7 @@
 *     2007-08-15 (CV):
 *        Added sc2sim_getmicstp
 *     2007-08-27 (CV):
-*        Added mstp (current microstep) to sc2sim_instap_calc        
+*        Added mstp (current microstep) to sc2sim_instap_calc
 *     2007-10-05 (AGG):
 *        Add obsend flag
 *     2008-03-19 (AGG):
@@ -85,7 +85,7 @@
 *        - Add current focus position to & remove telemission from
 *          sc2sim_simframe API
 *     2008-04-28 (AGG):
-*        Change sc2sim_getsigma type to void 
+*        Change sc2sim_getsigma type to void
 *     2008-05-23 (AGG):
 *        Add focposn to sc2sim_ndfwrdata API
 *     2009-11-20 (DSB):
@@ -146,13 +146,13 @@
 void sc2sim_addpnoise( double flux_0, double sig_0, double integ_time,
 		       double *flux, int *status );
 
-void sc2sim_atmsky 
+void sc2sim_atmsky
 (
 double lambda,       /* wavelength in metres (given) */
 double trans,        /* % atmospheric transmission (given) */
 double *flux,        /* flux per bolometer in pW (returned) */
-int *status          /* global status (given and returned) */ 
-); 
+int *status          /* global status (given and returned) */
+);
 
 void sc2sim_atmtrans
 (
@@ -162,7 +162,7 @@ double *trans,       /* % atmospheric transmission (returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_bolcoords 
+void sc2sim_bolcoords
 (
 char *subname,       /* subarray name, s8a-s4d (given) */
 double ra,           /* RA of observation in radians (given) */
@@ -177,7 +177,7 @@ int *status          /* global status (given and returned) */
 );
 
 void sc2sim_calctime
-( 
+(
 double lon,          /* Geodetic W Lon (radians) */
 double mjdaystart,   /* UTC start time as modified juldate */
 double dut1,         /* DUT1 in seconds */
@@ -196,14 +196,14 @@ double tauCSO,        /* CSO optical depth (given) */
 int *status           /* global status (given and returned) */
 );
 
-void sc2sim_dateobs 
-( 
+void sc2sim_dateobs
+(
 double mjdaystart,    /* MJD corresponding to first sample in file */
 char *dateobs,        /* dateobs string */
 int *status           /* global status (given and returned) */
 );
 
-void sc2sim_digitise 
+void sc2sim_digitise
 (
 int nvals,            /* number of values (given) */
 double current[],     /* signal values in amps (given) */
@@ -219,7 +219,7 @@ double sc2sim_drand
 double sigma          /* sigma of distribution (given) */
 );
 
-void sc2sim_fft2d 
+void sc2sim_fft2d
 (
 int direction,       /* transform specification +1 or -1 (given) */
 int size,            /* square dimension of complex image array (given) */
@@ -227,7 +227,7 @@ double *array,       /* image array size*2 by size (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_fitheat 
+void sc2sim_fitheat
 (
 int nboll,             /* number of bolometers (given) */
 int nframes,           /* number of frames in scan (given) */
@@ -237,16 +237,16 @@ double *coptr,         /* coefficients of fit (returned) */
 int *status            /* global status (given and returned) */
 );
 
-void sc2sim_four1 
-( 
+void sc2sim_four1
+(
 int isign,         /* direction of transform (given) */
 int nn,            /* number of complex values (given) */
-double data[]      /* complex signal transformed in-place - even indices 
+double data[]      /* complex signal transformed in-place - even indices
                       real values, odd imaginary (given and returned) */
 );
 
-void sc2sim_getast_wcs 
-( 
+void sc2sim_getast_wcs
+(
 size_t colsize,              /* number of bolometers in column (given) */
 size_t rowsize,              /* number of bolometers in row (given) */
 const double *xbolo,         /* x-bolometer coordinates for array (given) */
@@ -260,8 +260,8 @@ double *dbuf,                /* pointer to bolo output (returned) */
 int *status                  /* global status (given and returned) */
 );
 
-void sc2sim_getbilinear 
-( 
+void sc2sim_getbilinear
+(
 double xpos,         /* X-coordinate of sample point in arcsec (given) */
 double ypos,         /* Y-coordinate of sample point in arcsec (given) */
 double scale,        /* scale of image in arcsec per pixel (given) */
@@ -287,7 +287,7 @@ int *status          /* global status (given and returned) */
 );
 
 mapCoordframe sc2sim_getcoordframe
-( 
+(
 char *name,         /* string containing name of coordinate frame */
 int *status         /* global status (given and returned) */
 );
@@ -308,9 +308,9 @@ double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_getinvf 
-( 
-double sigma,        /* dispersion of broad-band noise (given) */ 
+void sc2sim_getinvf
+(
+double sigma,        /* dispersion of broad-band noise (given) */
 double corner,       /* corner frequency, where 1/f dispersion=sigma (given)*/
 double samptime,     /* time per data sample (given) */
 int nterms,          /* number of frequencies calculated (given) */
@@ -343,13 +343,13 @@ int *status
 );
 
 obsMode sc2sim_getobsmode
-( 
+(
 char *name,         /* string containing name of observing mode */
 int *status         /* global status (given and returned) */
 );
 
-void sc2sim_getobspar 
-( 
+void sc2sim_getobspar
+(
 AstKeyMap *keymap,   /* Keymap containing obs parameters (given) */
 struct  sc2sim_obs_struct *inx, /* Structure for values from obs
 				   keymap file (given and returned */
@@ -368,20 +368,20 @@ int move_code,        /* SMU waveform choice (given) */
 double jig_stepx,     /* X interval in arcsec (given) */
 double jig_stepy,     /* Y interval in arcsec (given) */
 int jig_vert[][2],    /* Array with relative jiggle coordinates in units of
-                         jiggle steps in case jiggle positions are 
+                         jiggle steps in case jiggle positions are
                          visited (given) */
 
 size_t *cycle_samples,   /* The number of samples per cycle (returned) */
 
-double pattern[][2],  /* The array to hold the coordinates of the jiggle 
-                         offsets in arcsec. There are cycle_samples entries 
+double pattern[][2],  /* The array to hold the coordinates of the jiggle
+                         offsets in arcsec. There are cycle_samples entries
                          filled. (returned) */
 
 int *status           /* global status (given and returned) */
 );
 
 void sc2sim_getpongends
-( 
+(
 double width,          /* minimum width of scan (arcsec) */
 double height,         /* minimum height of scan (arcsec) */
 double spacing,        /* spacing of grid pattern (arcsec) */
@@ -391,7 +391,7 @@ int *status            /* pointer to global status */
 );
 
 void sc2sim_getpongvert
-( 
+(
 double width,          /* minimum width of scan (arcsec) */
 double height,         /* minimum height of scan (arcsec) */
 double spacing,        /* spacing of grid pattern (arcsec) */
@@ -402,7 +402,7 @@ int *status            /* pointer to global status */
 );
 
 void sc2sim_getscaling
-( 
+(
 int ncoeffs,          /* number of coefficients describing response curve
                          (given) */
 double coeffs[],      /* array to hold response curve coefficients (given) */
@@ -415,7 +415,7 @@ int *status           /* global status (given and returned) */
 );
 
 void sc2sim_getscanseg
-( 
+(
 double samptime,     /* sample time in sec (given) */
 double cstart[2],    /* starting coordinates in arcsec (given) */
 double cend[2],      /* ending coordinates in arcsec (given) */
@@ -428,7 +428,7 @@ int *status          /* global status (given and returned) */
 );
 
 void sc2sim_getscansegsize
-( 
+(
 double samptime,     /* sample time in sec (given) */
 double cstart[2],    /* starting coordinates in arcsec (given) */
 double cend[2],      /* ending coordinates in arcsec (given) */
@@ -441,8 +441,8 @@ int *status          /* global status (given and returned) */
 void sc2sim_getsigma( double flux_0, double sig_0, double flux, double *sig,
 			int *status );
 
-void sc2sim_getsimpar 
-( 
+void sc2sim_getsimpar
+(
 AstKeyMap *keymap,   /* Keymap containing sim parameters (given) */
 struct  sc2sim_sim_struct *inx, /* Structure for values from sim
 				   keymap file (given and returned */
@@ -463,17 +463,17 @@ int *status          /* global status (given and returned) */
 );
 
 void sc2sim_getspread
-( 
+(
 int numbols,             /* Number of bolometers (given) */
-double pzero[],          /* Array to hold response curve offsets 
+double pzero[],          /* Array to hold response curve offsets
                             of bolometers in pW (returned) */
 double heater[],         /* Array to hold heater factors of bolometers
                             (returned) */
 int *status              /* global status (given and returned) */
 );
 
-void sc2sim_getstraightpong 
-( 
+void sc2sim_getstraightpong
+(
 double angle,         /* angle of pattern relative to the telescope
 			 axes in radians (given) */
 double width,         /* minimum width of PONG pattern in arcsec (given) */
@@ -481,7 +481,7 @@ double height,        /* minimum height of PONG pattern in arcsec (given) */
 double spacing,       /* grid spacing in arcsec (given) */
 double accel[2],      /* telescope accelerations in arcsec/sec (given) */
 double vmax[2],       /* telescope maximum velocities in arcsec/sec (given) */
-double samptime,      /* sample interval in sec (given) */ 
+double samptime,      /* sample interval in sec (given) */
 int nmaps,            /* number of cycles of the pattern */
 int *pongcount,       /* number of positions in pattern (returned) */
 double **posptr,      /* list of positions (returned) */
@@ -489,7 +489,7 @@ int *status           /* pointer to global status (given and returned) */
 );
 
 void sc2sim_getweights
-( 
+(
 double decay,      /* time constant in millisec (given) */
 double samptime,   /* sampling time in millisec (given) */
 int nweights,      /* number of values to be returned (given) */
@@ -497,27 +497,27 @@ double weights[],  /* array to hold returned values (returned) */
 int *status        /* global status (given and returned) */
 );
 
-void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe, 
+void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
 			 size_t reclen, int *status );
 
-void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter, 
+void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter,
 			  const char *object, char *drgroup, int *status );
 
-void sc2sim_heatrun ( struct sc2sim_obs_struct *inx, 
-                      struct sc2sim_sim_struct *sinx, 
-                      double coeffs[], double digcurrent, double digmean, 
+void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
+                      struct sc2sim_sim_struct *sinx,
+                      double coeffs[], double digcurrent, double digmean,
                       double digscale, char filter[], double *heater, int nbol,
                       double *pzero, double samptime, int *status );
 
-void sc2sim_instap_calc ( 
-struct sc2sim_obs_struct *inx, 
+void sc2sim_instap_calc (
+struct sc2sim_obs_struct *inx,
 int mstp,              /* current microstep */
 double instap[2],      /* Returned focal plane offsets (radians) */
 int *status            /* global status (given and returned) */
 );
 
 void sc2sim_instrinit
-( 
+(
 struct sc2sim_obs_struct *inx, /* structure for values from XML file (returned) */
 struct sc2sim_sim_struct *sinx, /* structure for values from XML file(returned) */
 AstKeyMap *obskeymap,    /* keymap for obs parameters */
@@ -538,7 +538,7 @@ int *status              /* global status (given and returned) */
 );
 
 void sc2sim_invf
-( 
+(
 double sigma,     /* white noise level (given) */
 double corner,    /* corner frequency (given) */
 double samptime,  /* time in sec between samples (given) */
@@ -547,8 +547,8 @@ double *fnoise,   /* array to hold noise sequence (returned) */
 int *status       /* global status (given and returned) * */
 );
 
-void sc2sim_invf2d 
-( 
+void sc2sim_invf2d
+(
 double corner,    /* corner frequency in per arcsec (given) */
 double p,         /* power law to be used (given) */
 double pixsize,   /* pixel size in arcsec (given) */
@@ -559,7 +559,7 @@ int *status       /* global status (given and returned) */
 );
 
 void sc2sim_ndfwrdata
-( 
+(
 const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 int subindex,             /* index into sinx->subname of subarray being written */
@@ -580,21 +580,21 @@ const char obsid[],       /* Observation ID string */
 const double *posptr,     /* Pointing offsets from map centre */
 size_t jigsamples,        /* Number of jiggle samples (given) */
 double jigptr[][2], /* Array of X, Y jiggle positions (given) */
-const int obsnum,         /* Observation number (given) */		 
+const int obsnum,         /* Observation number (given) */
 const double focposn,    /* Focus position */
-const int nsubscan,       /* Sub-scan number (given) */			 
+const int nsubscan,       /* Sub-scan number (given) */
 const int obsend,        /* Flag to indicate whether this is the last file */
-const char utdate[],      /* UT date in YYYYMMDD form (given) */		 
-const double azstart,     /* Azimuth at start of sub-scan (given) */	 
-const double azend,       /* Azimuth at end of sub-scan (given) */	 
-const double elstart,     /* Elevation at start of sub-scan (given) */	 
-const double elend,       /* Elevation at end of sub-scan (given) */	 
-const char lststart[],    /* LST at start of sub-scan (given) */		 
-const char lstend[],      /* LST at end of sub-scan (given) */		 
-const char loclcrd[],     /* Coordinate frame (given) */			 
-const char scancrd[],     /* SCAN coordinate frame (given) */		 
+const char utdate[],      /* UT date in YYYYMMDD form (given) */
+const double azstart,     /* Azimuth at start of sub-scan (given) */
+const double azend,       /* Azimuth at end of sub-scan (given) */
+const double elstart,     /* Elevation at start of sub-scan (given) */
+const double elend,       /* Elevation at end of sub-scan (given) */
+const char lststart[],    /* LST at start of sub-scan (given) */
+const char lstend[],      /* LST at end of sub-scan (given) */
+const char loclcrd[],     /* Coordinate frame (given) */
+const char scancrd[],     /* SCAN coordinate frame (given) */
 const double totaltime,   /* Total integration time (given) */
-const double exptime,     /* Subimage exposure time (given) */		 
+const double exptime,     /* Subimage exposure time (given) */
 const int nimage,         /* Number of subimages within subscan (given) */
 const double wvmstart,    /* 225-GHz tau at beginning of subscan (given) */
 const double wvmend,      /* 225-GHz tau at end of subscan (given) */
@@ -602,7 +602,7 @@ int *status               /* Global status (given and returned) */
 );
 
 void sc2sim_ndfwrheat
-( 
+(
 const struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 int subindex,            /* index into sinx->subname of subarray being written */
@@ -620,14 +620,14 @@ int *status        /* global status (given and returned) */
 );
 
 void sc2sim_parcheck
-( 
+(
 struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
 struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 int *status        /* global status (given and returned) */
 );
 
 void sc2sim_ptoi
-( 
+(
 double flux,       /* input flux in pW (given) */
 int ncoeffs,       /* number of coefficients describing response curve
                       (given) */
@@ -638,7 +638,7 @@ int *status        /* global status (given and returned) */
 );
 
 void sc2sim_response
-( 
+(
 double lambda,     /* wavelength in metres (given) */
 int ncoeffs,       /* number of coefficients to be returned (given) */
 double coeffs[],   /* array to hold returned coefficients (returned) */
@@ -648,7 +648,7 @@ int *status        /* global status (given and returned) */
 void sc2sim_sex2double ( char *string, double *value, int *status );
 
 void sc2sim_simframe
-( 
+(
 struct sc2sim_obs_struct inx,      /* structure for values from XML (given) */
 struct sc2sim_sim_struct sinx, /* structure for sim values from XML (given)*/
 int astnaxes[2],             /* dimensions of simulated image (given) */
@@ -681,27 +681,27 @@ double *dbuf,                /* generated frame (returned) */
 int *status                  /* global status (given and returned) */
 );
 
-void sc2sim_simplescan ( struct sc2sim_obs_struct *inx, 
-                         struct sc2sim_sim_struct *sinx, 
-                         double digcurrent, double digmean, 
-                         double digscale, char filter[], 
-                         int maxwrite, obsMode mode, int nbol,  
-                         double pathlength, double *pzero, int rseed, 
-		         double samptime, double scanangle, 
-                         double weights[], double *xbc, double *xbolo, 
+void sc2sim_simplescan ( struct sc2sim_obs_struct *inx,
+                         struct sc2sim_sim_struct *sinx,
+                         double digcurrent, double digmean,
+                         double digscale, char filter[],
+                         int maxwrite, obsMode mode, int nbol,
+                         double pathlength, double *pzero, int rseed,
+		         double samptime, double scanangle,
+                         double weights[], double *xbc, double *xbolo,
                          double *ybc, double *ybolo,int *status );
 
-void sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
-                       struct sc2sim_sim_struct *sinx, 
-		       double coeffs[], double digcurrent, double digmean, 
-		       double digscale, char filter[], double *heater, 
+void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
+                       struct sc2sim_sim_struct *sinx,
+		       double coeffs[], double digcurrent, double digmean,
+		       double digscale, char filter[], double *heater,
 		       int maxwrite, obsMode mode, mapCoordframe coordframe,
-		       int nbol, double *pzero, int rseed, double samptime, 
-		       double weights[], double *xbc, double *xbolo, 
-		       double *ybc, double *ybolo, int hitsonly, 
+		       int nbol, double *pzero, int rseed, double samptime,
+		       double weights[], double *xbc, double *xbolo,
+		       double *ybc, double *ybolo, int hitsonly,
                        int overwrite, int simstats, int *status );
 
-void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol, 
+void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
 		       int narray, int nboly, int *status );
 
 void sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
@@ -709,8 +709,8 @@ void sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
                       int nppp, double steptime, double smu_offset,
                       int pathsz, double jigpath[][2], int *status );
 
-void sc2sim_smupos ( double t, double vertex_t, int movecode, 
-                     int nvert, double vertxy[][2], double *x, 
+void sc2sim_smupos ( double t, double vertex_t, int movecode,
+                     int nvert, double vertxy[][2], double *x,
                      double *y, int *status );
 
 #endif /* SC2SIM_DEFINED */

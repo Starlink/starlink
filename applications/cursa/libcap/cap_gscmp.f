@@ -1,7 +1,7 @@
       SUBROUTINE CAP_GSCMP (CMPLST, LTYPE, STATUS)
 *+
 *  Name:
-*     CAP_GSCMP 
+*     CAP_GSCMP
 *  Purpose:
 *     Set one of the catview lists of components.
 *  Language:

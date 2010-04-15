@@ -53,17 +53,17 @@
 #          AllowOverride None
 #          Options ExecCGI FollowSymLinks
 #          </Directory>
-#  
+#
 #      srm.conf:
 #          ScriptAlias /catalogue/ /local1/www/scripts/catalogue/
-#  
+#
 #      and with the link
-#  
-#          /local1/www/scripts/catalogue/public -> 
+#
+#          /local1/www/scripts/catalogue/public ->
 #             /home/norman/s/src/sgml/w/sgml/lib/catalogue_server.pl
 #
 #    You will need to edit the paths and the definition of
-#    SGML_CATALOG_FILES at the top of the script.  
+#    SGML_CATALOG_FILES at the top of the script.
 #
 #    Note that this script requires the `ospcat' application, which is
 #    present in the OpenSP-1.4 distribution, but not in openjade-1.3.
@@ -247,7 +247,7 @@ Server: $SERVER_SOFTWARE ($server_name)
 Content-type: text/html
 
 <title>$server_name: Error</title>
-<p>Error: The public identifier <code>$pubid</code> resolves to a 
+<p>Error: The public identifier <code>$pubid</code> resolves to a
 system identifier which could not be found.
 EOF
     exit 0

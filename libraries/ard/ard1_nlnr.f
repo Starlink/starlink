@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, 
-     :                      NPAR, PAR, IWCS, DPP, IPB, LBEXTB, 
+      SUBROUTINE ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ,
+     :                      NPAR, PAR, IWCS, DPP, IPB, LBEXTB,
      :                      UBEXTB, LBINTB, UBINTB, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
-*                     PAR, IWCS, DPP, IPB, LBEXTB, UBEXTB, LBINTB, 
+*                     PAR, IWCS, DPP, IPB, LBEXTB, UBEXTB, LBINTB,
 *                     UBINTB, STATUS )
 
 *  Description:
@@ -22,7 +22,7 @@
 *     supplied interior bounding box to the exterior value 0.
 *     All points outside this box already hold exterior values.
 *     Interior values are then assigned to the points specified by the
-*     supplied parameters. 
+*     supplied parameters.
 
 *  Arguments:
 *     RINDEX = INTEGER (Given)
@@ -59,7 +59,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBEXTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        exterior points in B. 
+*        exterior points in B.
 *     LBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The lower pixel bounds of the smallest box which contains all
 *        interior points in B. A value of VAL__MAXI for element 1 is
@@ -67,7 +67,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     LOADED = LOGICAL (Given and Returned)
 *        Have the contents of the supplied mask already been loaded onto
 *        the stack? Always returned .TRUE. if the keyword is an INPUT
@@ -87,12 +87,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -113,7 +113,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,11 +164,11 @@
       EXTERNAL ARD1_UINTERP
 
 *  Local Variables:
-      CHARACTER 
+      CHARACTER
      :        CLASS*30           ! User coords Frame class
 
-      DOUBLE PRECISION 
-     :      DP,                  ! A dummy argument 
+      DOUBLE PRECISION
+     :      DP,                  ! A dummy argument
      :      HL,                  ! Half the requested box length
      :      HW,                  ! Half the requested box width
      :      INA( ARD__MXDIM ),   ! Point A in grixel coords
@@ -214,12 +214,12 @@
       LBINTB( 1 ) = VAL__MINI
 
 *  Regions with zero volume/area are handled differently.
-      IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX .OR. 
-     :    TYPE .EQ. ARD__LIN .OR. TYPE .EQ. ARD__ROW .OR. 
+      IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX .OR.
+     :    TYPE .EQ. ARD__LIN .OR. TYPE .EQ. ARD__ROW .OR.
      :    TYPE .EQ. ARD__COL ) THEN
 
-         CALL ARD1_KDRAW( RINDEX, NDIM, LBND, UBND, MSKSIZ, TYPE, 
-     :                    IWCS, NPAR, PAR, IPB, LBEXTB, UBEXTB, 
+         CALL ARD1_KDRAW( RINDEX, NDIM, LBND, UBND, MSKSIZ, TYPE,
+     :                    IWCS, NPAR, PAR, IPB, LBEXTB, UBEXTB,
      :                    LBINTB, UBINTB, STATUS )
 
 *  Report an error for any regions not supported by this routine.
@@ -246,7 +246,7 @@
          CALL AST_BEGIN( STATUS )
 
 *  Get a pointer to the user coordinate Frame, and the number of WCS axes.
-         CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )  
+         CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
          NWCS = AST_GETI( CFRM, 'Naxes', STATUS )
 
 *  We can simplify some regions...
@@ -254,37 +254,37 @@
 *  Convert RECT regions into BOX regions.
          IF( TYPE .EQ. ARD__REC ) THEN
             DO I = 1, NWCS
-               HW = 0.5*AST_AXDISTANCE( CFRM, I, PAR( I ), 
+               HW = 0.5*AST_AXDISTANCE( CFRM, I, PAR( I ),
      :                                  PAR( I + NWCS ), STATUS )
                PAR( I ) = AST_AXOFFSET( CFRM, I, PAR( I ), HW, STATUS )
                PAR( I + NWCS ) = 2*ABS( HW )
             END DO
             TYPE = ARD__BOX
 
-*  Convert ROTBOX regions into POLYGON regions. A polygon vertex is put at 
-*  the middle of each side in case we are dealing with spherical coords, in 
-*  which case a polygon edge greater than 180 arc-degrees could cause 
+*  Convert ROTBOX regions into POLYGON regions. A polygon vertex is put at
+*  the middle of each side in case we are dealing with spherical coords, in
+*  which case a polygon edge greater than 180 arc-degrees could cause
 *  problems.
          ELSE IF( TYPE .EQ. ARD__ROT ) THEN
 
 *  Offset away from the centre point along the first edge, at the
-*  requested angle, going half the box length. Using AST caters for both 
-*  Cartesian and spherical user coords. Store points back in the PAR 
+*  requested angle, going half the box length. Using AST caters for both
+*  Cartesian and spherical user coords. Store points back in the PAR
 *  array, in a suitable order to make the points a continuous curve.
-            PA0 = ( 90.0 - PAR( 5 ) )*ARD__DTOR 
+            PA0 = ( 90.0 - PAR( 5 ) )*ARD__DTOR
             HL = 0.5*PAR( 3 )
             HW = 0.5*PAR( 4 )
             P0( 1 ) = PAR( 1 )
             P0( 2 ) = PAR( 2 )
-      
+
             PA1 = AST_OFFSET2( CFRM, P0, PA0, HL, PAR, STATUS )
 
-*  Now turn to the left by 90 degrees and offset up by half the box height. 
+*  Now turn to the left by 90 degrees and offset up by half the box height.
             PA1 = PA1 - ARD__PIBY2
             PA2 = AST_OFFSET2( CFRM, PAR, PA1, HW, PAR( 3 ), STATUS )
 
-*  Now offset down by half the box height. 
-            PA2 = AST_OFFSET2( CFRM, PAR, PA1, -HW, PAR( 15 ), 
+*  Now offset down by half the box height.
+            PA2 = AST_OFFSET2( CFRM, PAR, PA1, -HW, PAR( 15 ),
      :                         STATUS )
 
 *  Now offset up and down by half the box height, starting at the box
@@ -297,16 +297,16 @@
 *  requested angle, going half the box length.
             PA1 = AST_OFFSET2( CFRM, P0, PA0, -HL, PAR( 9 ), STATUS )
 
-*  Now turn to the left by 90 degrees and offset up by half the box height. 
+*  Now turn to the left by 90 degrees and offset up by half the box height.
             PA1 = PA1 - ARD__PIBY2
-            PA2 = AST_OFFSET2( CFRM, PAR( 9 ), PA1, HW, PAR( 7 ), 
+            PA2 = AST_OFFSET2( CFRM, PAR( 9 ), PA1, HW, PAR( 7 ),
      :                         STATUS )
 
-*  Now offset down by half the box height. 
-            PA2 = AST_OFFSET2( CFRM, PAR( 9 ), PA1, -HW, PAR( 11 ), 
+*  Now offset down by half the box height.
+            PA2 = AST_OFFSET2( CFRM, PAR( 9 ), PA1, -HW, PAR( 11 ),
      :                         STATUS )
 
-*  Reset the region type and the number of parameters.   
+*  Reset the region type and the number of parameters.
             TYPE = ARD__POL
             NPAR = 16
 
@@ -318,7 +318,7 @@
          CLASS = AST_GETC( CFRM, 'CLASS', STATUS )
 
 *  Extract and simplify the pixel->user Mapping.
-         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE, 
+         MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE,
      :                                       AST__CURRENT, STATUS ),
      :                       STATUS )
 
@@ -326,11 +326,11 @@
 *  AST_MAPBOX method.
          IF( CLASS .EQ. 'Frame' ) THEN
 
-*  Get a bounding box for the region in user coords. 
-            CALL ARD1_UBBOX( NDIM, CFRM, TYPE, NPAR, PAR, UBXLB, UBXUB, 
+*  Get a bounding box for the region in user coords.
+            CALL ARD1_UBBOX( NDIM, CFRM, TYPE, NPAR, PAR, UBXLB, UBXUB,
      :                       STATUS )
 
-*  Find the corresponding bounding box in pixel indices. 
+*  Find the corresponding bounding box in pixel indices.
             DO I = 1, NDIM
 
 *  Find the bounds in pixel coords on the current axis.
@@ -350,17 +350,17 @@
 
 *  Draw the region boundary into the B array. This returns a bounding
 *  box.
-            CALL ARD1_DRAW2( RINDEX, LBND, UBND, MSKSIZ, TYPE, 
-     :                       IWCS, NPAR, PAR, IPB, LBINTB, UBINTB, 
+            CALL ARD1_DRAW2( RINDEX, LBND, UBND, MSKSIZ, TYPE,
+     :                       IWCS, NPAR, PAR, IPB, LBINTB, UBINTB,
      :                       STATUS )
 
-*  Reset all pixels so that they hold exterior values. 
+*  Reset all pixels so that they hold exterior values.
             CALL ARD1_BXSET( NDIM, LBND, UBND, MSKSIZ, 0, LBINTB,
      :                       UBINTB, %VAL( CNF_PVAL( IPB ) ), STATUS )
 
 *  Extend the bounding box by a safety margin of 2 pixels.
-            IF( LBINTB( 1 ) .NE. VAL__MINI .AND. 
-     :          LBINTB( 1 ) .NE. VAL__MAXI ) THEN 
+            IF( LBINTB( 1 ) .NE. VAL__MINI .AND.
+     :          LBINTB( 1 ) .NE. VAL__MAXI ) THEN
                LBINTB( 1 ) = LBINTB( 1 ) - 2
                UBINTB( 1 ) = UBINTB( 1 ) + 2
                LBINTB( 2 ) = LBINTB( 2 ) - 2
@@ -391,7 +391,7 @@
 
 *  If the interior bounding box is now null, there are no interior points
 *  so return with the mask as it is (full of exterior values).
-         IF( LBINTB( 1 ) .NE. VAL__MINI ) THEN 
+         IF( LBINTB( 1 ) .NE. VAL__MINI ) THEN
 
 *  AST_RESAMPLE requires the mapping from user coords to "GRIXEL" coords
 *  (which are like PIXEL coords except that the centre of pixel index I
@@ -403,12 +403,12 @@
                OUTA( I ) = 0.0D0
                OUTB( I ) = 1.0D0
             END DO
-            WINMAP = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', 
+            WINMAP = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ',
      :                           STATUS )
 
-*  Combine this Mapping with the Mapping from pixel to user, to create a 
+*  Combine this Mapping with the Mapping from pixel to user, to create a
 *  compound mapping (CmpMap) from grixel to user. Simplify it.
-            GMAP = AST_SIMPLIFY( AST_CMPMAP( WINMAP, MAP, .TRUE., ' ', 
+            GMAP = AST_SIMPLIFY( AST_CMPMAP( WINMAP, MAP, .TRUE., ' ',
      :                                       STATUS ), STATUS )
 
 *  Invert it, since AST_RESAMPLE requires the Mapping from user to grixel.
@@ -419,7 +419,7 @@
             DO I = 1, NDIM
                MXPIX = MAX( MXPIX, UBND( I ) - LBND( I ) + 1 )
             END DO
-               
+
 *  Store the common values needed by ARD1_UINTERP.
             CMN_RNDXC = RINDEX
             CMN_TYPEC = TYPE
@@ -427,16 +427,16 @@
             CMN_NPARC = NPAR
             CMN_INIT = .TRUE.
 
-*  In order to identify which mask pixels are within the region, we 
-*  "resample" the mask array, transforming each mask pixel position into 
+*  In order to identify which mask pixels are within the region, we
+*  "resample" the mask array, transforming each mask pixel position into
 *  user coords, and storing an interior value in the mask if the transformed
 *  position is within the region defined in user coords. We use
-*  AST_RESAMPLE to do this, supplying routine ARD1_UINTERP to do the 
+*  AST_RESAMPLE to do this, supplying routine ARD1_UINTERP to do the
 *  specific form of pseudo-"resampling" required.
-            NBAD = AST_RESAMPLEI( GMAP, NWCS, LBIN, UBIN, DP, DP, 
-     :                            AST__UINTERP, ARD1_UINTERP, PAR, 0, 
-     :                            DPP*0.2, MXPIX, 0, NDIM, LBND, UBND, 
-     :                            LBINTB, UBINTB, 
+            NBAD = AST_RESAMPLEI( GMAP, NWCS, LBIN, UBIN, DP, DP,
+     :                            AST__UINTERP, ARD1_UINTERP, PAR, 0,
+     :                            DPP*0.2, MXPIX, 0, NDIM, LBND, UBND,
+     :                            LBINTB, UBINTB,
      :                            %VAL( CNF_PVAL( IPB ) ), DP,
      :                            STATUS )
 

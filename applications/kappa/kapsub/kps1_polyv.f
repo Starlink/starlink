@@ -65,7 +65,7 @@
       IMPLICIT NONE             ! No implicit typing
 
 *  Arguments Given:
-      INTEGER ORDER     
+      INTEGER ORDER
       DOUBLE PRECISION C( ORDER + 1 )
       DOUBLE PRECISION X
 

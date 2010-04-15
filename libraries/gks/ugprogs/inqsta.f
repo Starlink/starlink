@@ -1,6 +1,6 @@
       PROGRAM INQSTA
 *                      GKS Example Program 8.1
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GGKCL, GGKOP, GWSOP, GWSAC, GSGOP
@@ -21,7 +21,7 @@
       CALL GOPKS (0, -1)
       CALL GQOPS (JOPSTA)
       WRITE(*,*) STATE(JOPSTA)
- 
+
 *                      OPEN WORKSTATION.
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
@@ -29,7 +29,7 @@
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GQOPS (JOPSTA)
       WRITE(*,*) STATE(JOPSTA)

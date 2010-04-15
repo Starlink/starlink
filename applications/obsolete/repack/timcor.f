@@ -8,26 +8,26 @@
       INTEGER	NI
       INTEGER   NEXP(NI)
       REAL      ATC(NI)
- 
+
 * Output:
       INTEGER   QUAL(NI)
       REAL      DATA(NI)
       REAL	VAR(NI)
       INTEGER   STATUS
- 
+
 * M. Denby Sep 88
 * P McGale May 95 - UNIX mods
 *-
- 
+
 *    Local variables :
       INTEGER	IT
       REAL	CTS
       REAL	TOLER
- 
+
       IF (STATUS .NE. 0) RETURN
- 
+
       TOLER = 1. ! MIN(10.,BINSIZ/10.)
- 
+
 *   Loop over the data
       DO IT = 1, NI
 	IF (ATC(IT) .LT. TOLER) THEN
@@ -45,5 +45,5 @@
 	  ENDIF
         ENDIF
       ENDDO
- 
+
       END

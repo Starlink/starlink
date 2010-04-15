@@ -22,7 +22,7 @@
 *        If non-zero, then astLock is called. Otherwise, astUnlock is
 *        called.
 *     status = int * (Given and Returned)
-*        Inherited status value. 
+*        Inherited status value.
 
 *  Description:
 *     This function call astLock ot astUnlock on all AST objects within
@@ -91,6 +91,6 @@ void smf_lock_related( smfArray *data, int lock, int *status ){
   for( i=0; i<data->ndat; i++ ) {
     smf_lock_data( data->sdata[i], lock, status );
   }
-  
+
 }
 

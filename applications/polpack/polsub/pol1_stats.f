@@ -14,7 +14,7 @@
       SUM2 = 0.0
       N = 0
       MX = VAL__MINR
-      MN = VAL__MAXR      
+      MN = VAL__MAXR
 
       DO I = 1, NEL
          VAL = DATA( I )

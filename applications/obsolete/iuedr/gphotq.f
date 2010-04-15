@@ -39,13 +39,13 @@
       INTEGER TNMAX           ! maximum tape pixel value in ITF table
       INTEGER NX              ! number of x-pixels
       INTEGER NY              ! number of y-pixels
- 
+
 *  Import-Export:
       INTEGER*2 Z(NX, NY)     ! image array
- 
+
 *  Export:
       BYTE DQ(NX, NY)         ! data quality array
- 
+
       INTEGER STATUS
 
 *  Local variables:
@@ -60,11 +60,11 @@
 *  Form data quality value for saturation.
       QSAT = 0
       CALL DQ_WRPK(1, IUEPIXSAT, 1, QSAT)
- 
+
 *  Data quality value for ITF truncation.
       QTRUN = 0
       CALL DQ_WRPK(1, IUEPIXTRN, 1, QTRUN)
- 
+
 *  Data quality value for ITF extrapolation.
       QEXT = 0
       CALL DQ_WRPK(1, IUEPIXEXT, 1, QEXT)
@@ -72,7 +72,7 @@
       CALL LINE_WRITI('%p ITFMAX=%i used to detect ITF saturation.\\',
      :                TNMAX)
       CALL PRTBUF( STATUS )
- 
+
 *  Decode pixel array.
       DO IY = 1, NY
 

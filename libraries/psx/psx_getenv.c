@@ -39,7 +39,7 @@
 *  References:
 *     -  POSIX standard (1988), section 4.6.1
 *     -  ANSI C standard (1989), section 4.10.4.4
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -124,7 +124,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
    GENPTR_CHARACTER(name)
    GENPTR_CHARACTER(trans)
    GENPTR_INTEGER(status)
-   
+
 /* Local Variables:							    */
 
    char *temp_name;     	 /* Pointer to local copy of name 	    */
@@ -151,7 +151,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
 /* Import name into the C string temp_name.                                 */
 
    temp_name = cnfCreim( name, name_length );
-   
+
 /* Get a pointer to the environment variable.				    */
 
    ptr = getenv( temp_name );

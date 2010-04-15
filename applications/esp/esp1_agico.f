@@ -1,5 +1,5 @@
 
-      
+
       SUBROUTINE ELF1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
 *+
 *  Name:
@@ -7,12 +7,12 @@
 
 *  Purpose:
 *     Turns on/off the AGI/PGPLOT interface used for plotting the graphs.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ELF1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)    
+*     CALL ELF1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
@@ -21,10 +21,10 @@
 *     interface (ONOFF=1). The routine may be called to generate a display
 *     on the device currently used or on a new device to be specified.
 
-*  Arguments:                                     
+*  Arguments:
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     MODE = INTEGER (Given)
 *        Defines whether or not the ADAM parameter is the current
 *        graphics device or a new one to be specified. 0=current 1=new.
@@ -51,11 +51,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines whether the display will
                                       ! be on a new device or the current
                                       ! one 0=current 1=new
@@ -66,14 +66,14 @@
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       INTEGER AGIID                   ! An AGI picture identifier
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-      REAL CR                         ! RGB red index of current 
+      REAL CR                         ! RGB red index of current
                                       ! background colour
       REAL CG                         ! RGB green index of current
                                       ! background colour
@@ -91,13 +91,13 @@
       IF (ONOFF.EQ.0) THEN
 
 *      Open AGI on a device obtained from the parameter system.
-         IF (MODE.EQ.0) THEN 
+         IF (MODE.EQ.0) THEN
 
 *         Use a device to be specified by the user.
             IF (NEW.EQ.0) THEN
 
 *            Get the name of the new device.
-               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS)
                IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *            Ensure that the whole screen is used.
@@ -105,11 +105,11 @@
                CALL AGI_SELP(AGIID,STATUS)
 
             ELSE
-               CALL AGI_ASSOC('DEVICE','UPDATE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','UPDATE',AGIID,STATUS)
                IF (STATUS.NE.SAI__OK) GOTO 9999
             END IF
 
- 
+
          ELSE
 
 *         Associate the window in the correct mode.
@@ -153,17 +153,17 @@
 *   Closedown the AGI/PGPLOT interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
 
-*      Save the current viewport in the AGI database. 
+*      Save the current viewport in the AGI database.
         CALL AGP_SVIEW('ELLFOU','Galaxy Profile',AGIID,STATUS)
 
-*      Close down PGPLOT. 
+*      Close down PGPLOT.
          CALL AGP_DEACT(STATUS)
 
-*      Cancel the picture identifier or annul the parameter association 
+*      Cancel the picture identifier or annul the parameter association
 *      depending on the value of STATUS.
          IF (STATUS.NE.SAI__OK) THEN
 
-*         Cancel the AGI parameter association.       
+*         Cancel the AGI parameter association.
             IF (MODE.EQ.0) THEN
                CALL AGI_CANCL('DEVICE',STATUS)
             ELSE
@@ -172,7 +172,7 @@
 
          ELSE
 
-*         Annul the AGI parameter association.       
+*         Annul the AGI parameter association.
             CALL AGI_ANNUL(AGIID,STATUS)
 
          END IF
@@ -189,24 +189,24 @@
 
 *  Purpose:
 *     Turns on/off the AGI/PGPLOT interface used for plotting the graphs.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ELP1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)    
+*     CALL ELP1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
 
-*  Description:             
+*  Description:
 *     Depending on the value of ONOFF the subroutine either:-
 *     sets up the AGI/PGPLOT interface and enters new information into
 *     the AGI database (ONOFF=0) or closes down the database and
 *     interface (ONOFF=1). The routine may be called to generate a display
 *     on the device currently used or on a new device to be specified.
 
-*  Arguments:                                     
+*  Arguments:
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     MODE = INTEGER (Given)
 *        Defines whether or not the ADAM parameter is the current
 *        graphics device or a new one to be specified. 0=current 1=new.
@@ -233,11 +233,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines whether the display will
                                       ! be on a new device or the current
                                       ! one 0=current 1=new
@@ -248,14 +248,14 @@
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       INTEGER AGIID                   ! An AGI picture identifier
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-      REAL CR                         ! RGB red index of current 
+      REAL CR                         ! RGB red index of current
                                       ! background colour
       REAL CG                         ! RGB green index of current
                                       ! background colour
@@ -273,13 +273,13 @@
       IF (ONOFF.EQ.0) THEN
 
 *      Open AGI on a device obtained from the parameter system.
-         IF (MODE.EQ.0) THEN 
+         IF (MODE.EQ.0) THEN
 
 *         Use a device to be specified by the user.
             IF (NEW.EQ.0) THEN
 
 *            Get the name of the new device.
-               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS)
 
 *            Ensure that the whole screen is used.
                CALL AGI_IBASE(AGIID,STATUS)
@@ -287,10 +287,10 @@
 
             ELSE
 
-               CALL AGI_ASSOC('DEVICE','UPDATE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','UPDATE',AGIID,STATUS)
 
             END IF
-  
+
 
          ELSE
 
@@ -334,17 +334,17 @@
 *   Closedown the AGI/PGPLOT interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
 
-*      Save the current viewport in the AGI database. 
+*      Save the current viewport in the AGI database.
          CALL AGP_SVIEW('ELLPRO','Galaxy Profile',AGIID,STATUS)
 
-*      Close down PGPLOT. 
+*      Close down PGPLOT.
          CALL AGP_DEACT(STATUS)
 
-*      Cancel the picture identifier or annul the parameter association 
+*      Cancel the picture identifier or annul the parameter association
 *      depending on the value of STATUS.
          IF (STATUS.NE.SAI__OK) THEN
 
-*         Cancel the AGI parameter association.       
+*         Cancel the AGI parameter association.
             IF (MODE.EQ.0) THEN
                CALL AGI_CANCL('DEVICE',STATUS)
             ELSE
@@ -353,7 +353,7 @@
 
          ELSE
 
-*         Annul the AGI parameter association.       
+*         Annul the AGI parameter association.
             CALL AGI_ANNUL(AGIID,STATUS)
 
          END IF
@@ -362,7 +362,7 @@
 
       END
 
-      
+
       SUBROUTINE GAU1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
 *+
 *  Name:
@@ -370,24 +370,24 @@
 
 *  Purpose:
 *     Turns on/off the AGI/PGPLOT interface used for plotting the graphs.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GAU1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)    
+*     CALL GAU1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
 
-*  Description:             
+*  Description:
 *     Depending on the value of ONOFF the subroutine either:-
 *     sets up the AGI/PGPLOT interface and enters new information into
 *     the AGI database (ONOFF=0) or closes down the database and
 *     interface (ONOFF=1). The routine may be called to generate a display
 *     on the device currently used or on a new device to be specified.
 
-*  Arguments:                                     
+*  Arguments:
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     MODE = INTEGER (Given)
 *        Defines whether or not the ADAM parameter is the current
 *        graphics device or a new one to be specified. 0=current 1=new.
@@ -414,11 +414,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines whether the display will
                                       ! be on a new device or the current
                                       ! one 0=current 1=new
@@ -429,14 +429,14 @@
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       INTEGER AGIID                   ! An AGI picture identifier
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-      REAL CR                         ! RGB red index of current 
+      REAL CR                         ! RGB red index of current
                                       ! background colour
       REAL CG                         ! RGB green index of current
                                       ! background colour
@@ -454,13 +454,13 @@
       IF (ONOFF.EQ.0) THEN
 
 *      Open AGI on a device obtained from the parameter system.
-         IF (MODE.EQ.0) THEN 
+         IF (MODE.EQ.0) THEN
 
 *         Use a device to be specified by the user.
             IF (NEW.EQ.0) THEN
 
 *            Get the name of the new device.
-               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS)
 
 *            Ensure that the whole screen is used.
                CALL AGI_IBASE(AGIID,STATUS)
@@ -468,10 +468,10 @@
 
             ELSE
 
-               CALL AGI_ASSOC('DEVICE','UPDATE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','UPDATE',AGIID,STATUS)
 
             END IF
-  
+
 
          ELSE
 
@@ -515,14 +515,14 @@
 *   Closedown the AGI/PGPLOT interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
 
-*      Close down PGPLOT. 
+*      Close down PGPLOT.
          CALL AGP_DEACT(STATUS)
 
-*      Cancel the picture identifier or annul the parameter association 
+*      Cancel the picture identifier or annul the parameter association
 *      depending on the value of STATUS.
          IF (STATUS.NE.SAI__OK) THEN
 
-*         Cancel the AGI parameter association.       
+*         Cancel the AGI parameter association.
             IF (MODE.EQ.0) THEN
                CALL AGI_CANCL('DEVICE',STATUS)
             ELSE
@@ -531,7 +531,7 @@
 
          ELSE
 
-*         Annul the AGI parameter association.       
+*         Annul the AGI parameter association.
             CALL AGI_ANNUL(AGIID,STATUS)
 
          END IF
@@ -548,12 +548,12 @@
 
 *  Purpose:
 *     Turns on/off the AGI/PGPLOT interface used for plotting the graphs.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GRA1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)    
+*     CALL GRA1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
@@ -562,10 +562,10 @@
 *     interface (ONOFF=1). The routine may be called to generate a display
 *     on the device currently used or on a new device to be specified.
 
-*  Arguments:                                     
+*  Arguments:
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     MODE = INTEGER (Given)
 *        Defines whether or not the ADAM parameter is the current
 *        graphics device or a new one to be specified. 0=current 1=new.
@@ -592,11 +592,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines whether the display will
                                       ! be on a new device or the current
                                       ! one 0=current 1=new
@@ -607,14 +607,14 @@
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       INTEGER AGIID                   ! An AGI picture identifier
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-      REAL CR                         ! RGB red index of current 
+      REAL CR                         ! RGB red index of current
                                       ! background colour
       REAL CG                         ! RGB green index of current
                                       ! background colour
@@ -633,13 +633,13 @@
       IF (ONOFF.EQ.0) THEN
 
 *      Open AGI on a device obtained from the parameter system.
-         IF (MODE.EQ.0) THEN 
+         IF (MODE.EQ.0) THEN
 
 *         Use a device to be specified by the user.
             IF (NEW.EQ.0) THEN
 
 *            Get the name of the new device.
-               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS)
 
 *            Ensure that the whole screen is used.
                CALL AGI_IBASE(AGIID,STATUS)
@@ -694,34 +694,34 @@
 *   Closedown the AGI/PGPLOT interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
 
-*      Save the current viewport in the AGI database. 
+*      Save the current viewport in the AGI database.
          CALL AGP_SVIEW('GRAPHS','Galaxy Profile',AGIID,STATUS)
 
-*      Close down PGPLOT. 
+*      Close down PGPLOT.
          CALL AGP_DEACT(STATUS)
 
-*      Cancel the picture identifier or annul the parameter association 
+*      Cancel the picture identifier or annul the parameter association
 *      depending on the value of STATUS.
          IF (STATUS.NE.SAI__OK) THEN
 
-*         Cancel the AGI parameter association.       
+*         Cancel the AGI parameter association.
             IF (MODE.EQ.0) THEN
                CALL AGI_CANCL('DEVICE',STATUS)
             ELSE
                CALL AGI_CANCL('IMGDEV',STATUS)
             END IF
 
-         ELSE     
+         ELSE
 
-*         Annul the AGI parameter association.       
+*         Annul the AGI parameter association.
             CALL AGI_ANNUL(AGIID,STATUS)
 
          END IF
 
       END IF
-                          
+
       END
-      
+
 
       SUBROUTINE HIS1_AGICO(ONOFF,AGIID,STATUS)
 *+
@@ -730,12 +730,12 @@
 
 *  Purpose:
 *     Turns on/off the AGI/PGPLOT interface.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL HIS1_AGICO(ONOFF,AGIID,STATUS)    
+*     CALL HIS1_AGICO(ONOFF,AGIID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
@@ -743,10 +743,10 @@
 *     the AGI database (ONOFF=0) or closes down the database and
 *     interface (ONOFF=1).
 
-*  Arguments:                                     
+*  Arguments:
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     AGIID = INTEGER (Given and Returned)
 *        An AGI picture identifier used by AGI.
 *     STATUS = INTEGER (Given and Returned)
@@ -766,29 +766,29 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ONOFF                   ! Defines whether AGI/PGPLOT
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       INTEGER AGIID                   ! An AGI picture identifier
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-      REAL CR                         ! RGB red index of current 
+      REAL CR                         ! RGB red index of current
                                       ! background colour
       REAL CG                         ! RGB green index of current
                                       ! background colour
       REAL CB                         ! RGB blue index of current
                                       ! background colour
- 
+
 *.
 
 *   Check the inherited global status.
@@ -812,7 +812,7 @@
          CALL AGP_NVIEW(.TRUE.,STATUS)
          IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_REP(' ','Using PGPLOT+AGI has failed.',STATUS)
-            GOTO 9999 
+            GOTO 9999
          END IF
 
 *      Enquire details of the current background colour.
@@ -834,19 +834,19 @@
 *      Save the current viewport in the AGI database.
          CALL AGP_SVIEW('HISTPEAK','Histogram plot',AGIID,STATUS)
 
-*      Close down PGPLOT. 
+*      Close down PGPLOT.
          CALL AGP_DEACT(STATUS)
 
-*      Cancel the picture identifier or annul the parameter association 
+*      Cancel the picture identifier or annul the parameter association
 *      depending on the value of STATUS.
          IF (STATUS.NE.SAI__OK) THEN
 
-*         Cancel the AGI parameter association.       
+*         Cancel the AGI parameter association.
             CALL AGI_CANCL('DEVICE',STATUS)
-        
+
          ELSE
 
-*         Annul the AGI parameter association.       
+*         Annul the AGI parameter association.
             CALL AGI_ANNUL(AGIID,STATUS)
 
          END IF
@@ -863,12 +863,12 @@
 
 *  Purpose:
 *     Turns on/off the AGI/PGPLOT interface used for plotting the graphs.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SEC1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)    
+*     CALL SEC1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
 
 *  Description:
 *     Depending on the value of ONOFF the subroutine either:-
@@ -877,10 +877,10 @@
 *     interface (ONOFF=1). The routine may be called to generate a display
 *     on the device currently used or on a new device to be specified.
 
-*  Arguments:                                     
+*  Arguments:
 *     ONOFF = INTEGER (Given)
 *        Defines whether the routines controlling AGI/PGPLOT should
-*        be turned on or off. 0=on 1=off 
+*        be turned on or off. 0=on 1=off
 *     MODE = INTEGER (Given)
 *        Defines whether or not the ADAM parameter is the current
 *        graphics device or a new one to be specified. 0=current 1=new.
@@ -907,11 +907,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER MODE                    ! Defines whether the display will
                                       ! be on a new device or the current
                                       ! one 0=current 1=new
@@ -922,14 +922,14 @@
                                       ! must be turned on or off
                                       ! 0=on 1=off
 
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       INTEGER AGIID                   ! An AGI picture identifier
-                                           
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-      REAL CR                         ! RGB red index of current 
+      REAL CR                         ! RGB red index of current
                                       ! background colour
       REAL CG                         ! RGB green index of current
                                       ! background colour
@@ -947,13 +947,13 @@
       IF (ONOFF.EQ.0) THEN
 
 *      Open AGI on a device obtained from the parameter system.
-         IF (MODE.EQ.0) THEN 
+         IF (MODE.EQ.0) THEN
 
 *         Use a device to be specified by the user.
             IF (NEW.EQ.0) THEN
 
 *            Get the name of the new device.
-               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS) 
+               CALL AGI_ASSOC('DEVICE','WRITE',AGIID,STATUS)
 
 *            Ensure that the whole screen is used.
                CALL AGI_IBASE(AGIID,STATUS)
@@ -965,7 +965,7 @@
                CALL AGI_ASSOC('DEVICE','UPDATE',AGIID,STATUS)
 
             END IF
-    
+
          ELSE
 
 *         Associate the window in the correct mode.
@@ -1008,17 +1008,17 @@
 *   Closedown the AGI/PGPLOT interface.
       IF ((ONOFF.EQ.1).OR.(STATUS.NE.SAI__OK)) THEN
 
-*      Save the current viewport in the AGI database.  
+*      Save the current viewport in the AGI database.
          CALL AGP_SVIEW('SECTOR','Galaxy Profile',AGIID,STATUS)
 
-*      Close down PGPLOT. 
+*      Close down PGPLOT.
          CALL AGP_DEACT(STATUS)
 
-*      Cancel the picture identifier or annul the parameter association 
+*      Cancel the picture identifier or annul the parameter association
 *      depending on the value of STATUS.
          IF (STATUS.NE.SAI__OK) THEN
 
-*         Cancel the AGI parameter association.       
+*         Cancel the AGI parameter association.
             IF (MODE.EQ.0) THEN
                CALL AGI_CANCL('DEVICE',STATUS)
             ELSE
@@ -1027,7 +1027,7 @@
 
          ELSE
 
-*         Annul the AGI parameter association.       
+*         Annul the AGI parameter association.
             CALL AGI_ANNUL(AGIID,STATUS)
 
          END IF

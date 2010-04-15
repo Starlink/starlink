@@ -109,7 +109,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -201,7 +201,7 @@
             XAMAP( I, J ) = VAL__BADR
             YAMAP( I, J ) = VAL__BADR
          END DO
-      END DO      
+      END DO
 
 *  Initialise the bounds of the area which is to be filled with X and Y
 *  coordinate values, to be the area of the whole output image.
@@ -236,9 +236,9 @@
      :             IB2, JB1, JB2, XAMAP, YAMAP, XA, YA, XB, YB, NK,
      :             ICOL, JROW, NBAD, STATUS )
 
-*  If non of the test point positions were bad, find the linear 
-*  transformation from (X,Y) coordinates in the output image to (X,Y) 
-*  coordinates in the input image, which minimises the sum of squared 
+*  If non of the test point positions were bad, find the linear
+*  transformation from (X,Y) coordinates in the output image to (X,Y)
+*  coordinates in the input image, which minimises the sum of squared
 *  residuals at the test points.
       IF( NBAD .EQ. 0 ) THEN
          IFIT = 4
@@ -252,7 +252,7 @@
 *  are omitted so that they retain the values calculated from the full
 *  projection mappings (this is done because the corner values may be
 *  needed to define a linear fit in an adjacent area).
-            
+
          IF( MAXERR .LE. ERRLIM ) THEN
 
 *  Do the first row (omitting the first and last columns).
@@ -278,7 +278,7 @@
                   YAMAP( I, J ) = YTERM + C( 5 )*X
                END DO
 
-            END DO    
+            END DO
 
 *  Do the last row (omitting the first and last columns).
             Y = REAL( JB2 ) - 0.5
@@ -297,7 +297,7 @@
          END IF
 
 *  If all the test point positions were bad, fill the current section
-*  with bad values.            
+*  with bad values.
       ELSE IF( NBAD .EQ. NK ) THEN
 
          DO J = JB1, JB2
@@ -305,17 +305,17 @@
                XAMAP( I, J ) = VAL__BADR
                YAMAP( I, J ) = VAL__BADR
             END DO
-         END DO    
+         END DO
 
 *  Set a flag to indicate that the current section has been filled.
          FILLED = .TRUE.
 
       END IF
 
-*  If the current section has not yet been filled, it is divided into 
-*  four quarters and the recursive subroutine FILL re-entered to fill 
+*  If the current section has not yet been filled, it is divided into
+*  four quarters and the recursive subroutine FILL re-entered to fill
 *  each quarter in turn. Note, use of DO loops is avoided because jumps
-*  would need to be made out of and back into the DO loop, which may 
+*  would need to be made out of and back into the DO loop, which may
 *  cause problems with do loop termination criteria being lost. DO loops
 *  are therefore simulated using GO TO and CONTINUE statements.
       IF( .NOT. FILLED ) THEN
@@ -324,14 +324,14 @@
 *  and Y coordinates explicitly using the full projection mappings.
          IF( NENTRY .GT. MAXENT ) THEN
 
-            CALL SALIA5( IDAB, IDAA, SCS, LBNDX, UBNDX, LBNDY, UBNDY, 
+            CALL SALIA5( IDAB, IDAA, SCS, LBNDX, UBNDX, LBNDY, UBNDY,
      :                   IB1, IB2, JB1, JB2, XAMAP, YAMAP, STATUS )
 
-*  Otherwise, divided the current section into four quarters and fill 
+*  Otherwise, divided the current section into four quarters and fill
 *  each quarter in turn using the recursive subroutine FILL. Note, use
-*  of DO loops is avoided because jumps would need to be made out of 
-*  and back into the DO loop, which may cause problems with do loop 
-*  termination criteria being lost. DO loops are therefore simulated 
+*  of DO loops is avoided because jumps would need to be made out of
+*  and back into the DO loop, which may cause problems with do loop
+*  termination criteria being lost. DO loops are therefore simulated
 *  using GO TO and CONTINUE statements.
          ELSE
 
@@ -339,13 +339,13 @@
 *           DO QROW = 1, 2
 
             QROW = 1
- 20         CONTINUE                  
+ 20         CONTINUE
 
 *  Loop round each quarter in the current row. This is equivalent to...
 *              DO QCOL = 1, 2
 
                QCOL = 1
- 30            CONTINUE                  
+ 30            CONTINUE
 
 *  Store the upper and lower Y bound of each quarter in the current row.
 *  The bounds of each quarter are determined by the positions of the
@@ -399,13 +399,13 @@
 
 *  End the simulated do loop for the quarters in the current row...
 *              END DO
-               
+
                QCOL = QCOL + 1
                IF( QCOL .LE. 2 ) GO TO 30
 
 *  End the simulated do loop for the rows of quarters...
 *           END DO
-               
+
             QROW = QROW + 1
             IF( QROW .LE. 2 ) GO TO 20
 
@@ -419,7 +419,7 @@
 *     RETURN
 
 *----------------------------------------------------------------------
-*  Reduce the number of active entries by one. 
+*  Reduce the number of active entries by one.
       NENTRY = NENTRY - 1
 
 *  If any active entries remain, restore the saved variable values for

@@ -21,7 +21,7 @@
 *     input data array. The RMS residual of all samples in the box is
 *     obtained. Any sample which is away from the average more than CLIP
 *     time the RMS will be rejected, set as BAD. Such average-reject
-*     procedure will be performed NITER time.  
+*     procedure will be performed NITER time.
 
 *  Arguments:
 *     NSMP, NDET = INTEGER (Given)
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,7 +92,7 @@
       REAL INVAR( 1 ), OUTVAR( 1 ) ! Dummy input and output variance
       REAL LIMITS( 2 )           ! Data range limits
       INTEGER NVAR               ! Number of element in variance
-      INTEGER NLIM               ! Valid sample limit            
+      INTEGER NLIM               ! Valid sample limit
       INTEGER NGOOD              ! Number of valid samples after reject
       LOGICAL SAMBAD             ! BAD sample Propagating flag
       DOUBLE PRECISION SIGMA     ! RMS of the row after rejecting
@@ -111,7 +111,7 @@
       NVAR = 1
       INVAR( 1 ) = 1.0
       OUTVAR( 1 ) = 1.0
-      
+
 *  Doing smoothing row by row, the filter box is an one dimension box.
       BOX( 1 ) = BOXSZ
       BOX( 2 ) = 1
@@ -131,20 +131,20 @@
 
 *  Begin a error context.
       CALL ERR_MARK
-      
+
 *  Processing the input data array row by row.
       DO I = 1, NDET
          DETX = I
-         CALL IRM_CFF2R( NSMP, 1, DATA( 1, DETX ), VAR, NVAR, INVAR, 
-     :                    BOX, NITER, CLIP, LIMITS, ILEVEL, SAMBAD, 
-     :                    NLIM, WORK1( 1 ), OUT( 1, DETX ), OUTVAR, 
+         CALL IRM_CFF2R( NSMP, 1, DATA( 1, DETX ), VAR, NVAR, INVAR,
+     :                    BOX, NITER, CLIP, LIMITS, ILEVEL, SAMBAD,
+     :                    NLIM, WORK1( 1 ), OUT( 1, DETX ), OUTVAR,
      :                    NGOOD, SIGMA, WORK2, WORK3, STATUS )
 
 *  Ignor the error produced by IRM_CFF2R, and continue the processing.
          IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
       END DO
-      
+
 *  Release the error context
       CALL ERR_RLSE
 

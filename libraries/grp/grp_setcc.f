@@ -90,8 +90,8 @@
 *     those control characters. If this is changed, any other characters
 *     currently set to the null character are also changed to the new NULL
 *     character.
-*     - ESCAPE: (Default to the NULL character) The name given to the 
-*     character which can be used to escape control characters within 
+*     - ESCAPE: (Default to the NULL character) The name given to the
+*     character which can be used to escape control characters within
 *     a group expression.
 
 *  Copyright:
@@ -104,12 +104,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -222,7 +222,7 @@
       ELSE
          CHARS = CMN_CHARS( SLOT )
 
-*  Store the original value of the NULL control character in a local 
+*  Store the original value of the NULL control character in a local
 *  variable.
          NULL0 = CHARS( GRP__PNULC : GRP__PNULC )
 
@@ -333,7 +333,7 @@
 *  were previously set to the null character so that they are equal to
 *  the new NULL character. Do not update them if they have explicitly
 *  been assigned a new value.
-            IF( NULLCC .NE. NULL0 ) THEN         
+            IF( NULLCC .NE. NULL0 ) THEN
                DO I = 1, GRP__NCHAR - 1
                   TESTCC = CHARS( I : I )
                   IF( CMN_CHARS( SLOT )( I : I ) .EQ. TESTCC .AND.

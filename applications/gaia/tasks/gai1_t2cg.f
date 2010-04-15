@@ -163,12 +163,12 @@
 
 *  The 'symbol' parameter may be quite long so split this over several
 *     records.
-                  IF ( NAME( : 6 ) .EQ. 'symbol' ) THEN 
-                     VALLEN = CHR_LEN( VALUE ) 
+                  IF ( NAME( : 6 ) .EQ. 'symbol' ) THEN
+                     VALLEN = CHR_LEN( VALUE )
                      I = 1
                      DO 10 IAT = 1, VALLEN, 68
                         WRITE( NAME( 7:7 ), '(I1)' ) I
-                        CALL CAT_PPTSC( CI, NAME, VALUE( IAT:IAT+68 ), 
+                        CALL CAT_PPTSC( CI, NAME, VALUE( IAT:IAT+68 ),
      :                                  ' ',QI, STATUS )
                         CALL CAT_TATTI( QI, 'CSIZE', 68, STATUS )
                         I = I + 1
@@ -404,7 +404,7 @@
                ELSE
 
 *  Missing field or [EOD]?
-                  IF ( LINE( 1:5 ) .NE. '[EOD]' ) THEN 
+                  IF ( LINE( 1:5 ) .NE. '[EOD]' ) THEN
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'LINE', NLINE )
@@ -413,7 +413,7 @@
      :                              STATUS )
                      END IF
                      GO TO 99
-                  ELSE 
+                  ELSE
                      OK = .FALSE.
                      GO TO 8
                   END IF

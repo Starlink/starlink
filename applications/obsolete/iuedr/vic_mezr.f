@@ -24,9 +24,9 @@
 
 *   Import:
       INTEGER RECLEN             ! record size in short words
- 
+
       INTEGER*2 DATA(RECLEN)     ! data array
- 
+
 *   Export:
       INTEGER STATUS             ! status return
 
@@ -37,7 +37,7 @@
 *   Translate CMUEZ1 contents
       CALL VIC_MEZ1(RECLEN, DATA, STATUS)
       IF (STATUS.NE.0) RETURN
- 
+
 *   Read newly added parts of Record Zero
       IF (SWVER.EQ.2) THEN
          CALL VIC_MEZ2(RECLEN, DATA, STATUS)

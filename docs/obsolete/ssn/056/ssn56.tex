@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 \markright{SSN/56.1}
 \setlength{\textwidth}{160mm}
@@ -62,7 +62,7 @@ It will tell you what new documentation is available, and will include notes
 about the release (what has changed, verification tests, \ldots).
 It will also tell you which information summaries have been updated.
 It will be sent by electronic mail to the username and site you have specified.
-\item You must copy the backup save set mentioned in the SSC. 
+\item You must copy the backup save set mentioned in the SSC.
 This is stored at RAL in directory STARDISK:[STAR.TEMP].
 The file name will be SSCnnn.BCK where `nnn' is the release number.
 This save set will only be stored at RAL for one month before being deleted
@@ -93,7 +93,7 @@ to decompress it and recreate the directory structure holding the update.
 Do this as follows:
 \begin{verbatim}
     $ SET DEF [STAR.TEMP]
-    $ LZDCM SSCnnn.BCK	
+    $ LZDCM SSCnnn.BCK
     $ BACKUP SSCnnn.BCK/SAVE [*...]
 \end{verbatim}
 You can qualify the BACKUP command with /LOG if you want to see what is going
@@ -101,14 +101,14 @@ on, and with /VERIFY if you are a perfectionist; in practice, these qualifiers
 just slow you down.
 This will create a directory structure [STAR.TEMP.SSCnnn...] containing the
 files being released.
-\item Follow the instructions in the SSC note. 
+\item Follow the instructions in the SSC note.
 Normally, this will be a quick and simple operation; in most cases all you do is
 give the directory [STAR.TEMP.SSCnnn] the logical name SSCTEMP and execute the
 command procedure SSCTEMP:SSCnnn.COM.
 \end{itemize}
 You should also be aware of the following general notes:
 \begin{itemize}
-\item Most releases are less than 1000 blocks in size. 
+\item Most releases are less than 1000 blocks in size.
 It has proved possible to copy releases occupying many thousand blocks without
 difficulty at rates of up to 4000 blocks an hour.
 However, if you want a release to be sent to you on tape, send a message to

@@ -31,8 +31,8 @@
 
 *  Description:
 *     The routine reads the FITS extension from an NDF and returns an
-*     AST pointer to a FitsChan which contains this information. The 
-*     information may then be accessed using routines from the AST 
+*     AST pointer to a FitsChan which contains this information. The
+*     information may then be accessed using routines from the AST
 *     library (SUN/211).
 
 *  Arguments:
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -165,7 +165,7 @@ int kpgGtfts( int indf, AstFitsChan ** fchan, int * status ) {
      it 80 characters at a time until we have done all the cards.
      Note that there is no nul-terminator so we can not use
      astPutCards directly */
-    
+
   datMapV( fitsloc, "_CHAR*" FITSSTR, "READ", &fpntr, &nchars, status );
 
   if ( *status == SAI__OK ) {
@@ -188,7 +188,7 @@ int kpgGtfts( int indf, AstFitsChan ** fchan, int * status ) {
 
     /* store pointer to start of string in new variable for iteration */
     card = fpntr;
-  
+
     /* Extract headers 80 characters at a time. No nul-termination
        but astPutFits guarantees to only read 80 characters */
     for (i = 0; i < ncards; i++ ) {

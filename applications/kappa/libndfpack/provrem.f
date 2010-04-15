@@ -22,12 +22,12 @@
 *  Description:
 *     This application removes selected ancestors, either by hiding them,
 *     or deleting them from the provenance information stored in a given NDF.
-*     The `generation gap' caused by removing an ancestor is bridged by 
-*     assigning all the direct parents of the removed ancestor to each of 
+*     The `generation gap' caused by removing an ancestor is bridged by
+*     assigning all the direct parents of the removed ancestor to each of
 *     the direct children of the ancestor.
 *
-*     The ancestors to be removed can be specified either by giving 
-*     their indices (Parameter ANCESTOR), or by comparing each ancestor 
+*     The ancestors to be removed can be specified either by giving
+*     their indices (Parameter ANCESTOR), or by comparing each ancestor
 *     with a supplied pattern matching template (Parameter PATTERN).
 *
 *     If an ancestor is hidden rather than deleted (see Parameter HIDE),
@@ -42,50 +42,50 @@
 *     ANCESTOR = LITERAL (Read)
 *        Specifies the indices of one or more ancestors that are to be
 *        removed.  If a null (!) value is supplied, the ancestors to be
-*        removed are instead determined using the PATTERN parameter. 
-*        Each supplied index must be positive and refers to one of the 
+*        removed are instead determined using the PATTERN parameter.
+*        Each supplied index must be positive and refers to one of the
 *        NDFs listed in the ANCESTORS table in the PROVENANCE extension
-*        of the NDF (including any hidden ancestors).  Note, if ancestor 
+*        of the NDF (including any hidden ancestors).  Note, if ancestor
 *        indices are determined using the PROVSHOW command, then PROVSHOW
 *        should be run with the HIDE parameter set to FALSE - otherwise
 *        incorrect ancestor indices may be determined, resulting in the
 *        wrong ancestors being removed by PROVREM.
 *
-*        The maximum number of ancestors that can be removed is limited 
-*        to 100 unless "ALL", "*" or "!" is specified.  The supplied 
+*        The maximum number of ancestors that can be removed is limited
+*        to 100 unless "ALL", "*" or "!" is specified.  The supplied
 *        parameter value can take any of the following forms.
 *
 *        - "ALL" or "*" --  All ancestors.
 *
 *        - "xx,yy,zz" -- A list of ancestor indices.
 *
-*        - "xx:yy" --  Ancestor indices between xx and yy inclusively. 
-*        When xx is omitted, the range begins from 0; when yy is 
-*        omitted, the range ends with the maximum value it can take, 
-*        that is the number of ancestors described in the PROVENANCE 
+*        - "xx:yy" --  Ancestor indices between xx and yy inclusively.
+*        When xx is omitted, the range begins from 0; when yy is
+*        omitted, the range ends with the maximum value it can take,
+*        that is the number of ancestors described in the PROVENANCE
 *        extension.
 *
-*        - Any reasonable combination of above values separated by 
+*        - Any reasonable combination of above values separated by
 *        commas.  [!]
 *     HIDE = _LOGICAL (Read)
-*        If TRUE, then the ancestors are not deleted, but instead have a 
-*        flag set indicating that they have been hidden. All information 
+*        If TRUE, then the ancestors are not deleted, but instead have a
+*        flag set indicating that they have been hidden. All information
 *        about hidden ancestors is retained unchanged, and can be viewed
 *        using PROVSHOW if the HIDE parameter is set FALSE when running
 *        PROVSHOW. [FALSE]
 *     ITEM = LITERAL (Read)
-*        Specifies the item of provenance information that is checked 
-*        against the pattern matching template specified for parameter 
+*        Specifies the item of provenance information that is checked
+*        against the pattern matching template specified for parameter
 *        PATTERN.  It can be "PATH", "CREATOR" or "DATE".  ["PATH"]
 *     NDF = NDF (Update)
 *        The NDF data structure.
 *     PATTERN = LITERAL (Read)
-*        Specifies a pattern matching template using the syntax 
-*        described below in "Pattern Matching Syntax".  Each ancestor 
-*        listed in the PROVENANCE extension of the NDF is compared with 
-*        this template, and each ancestor that matches is removed.  The 
+*        Specifies a pattern matching template using the syntax
+*        described below in "Pattern Matching Syntax".  Each ancestor
+*        listed in the PROVENANCE extension of the NDF is compared with
+*        this template, and each ancestor that matches is removed.  The
 *        item of provenance information to be compared to the pattern is
-*        specified by Parameter ITEM. 
+*        specified by Parameter ITEM.
 *     REMOVE = _LOGICAL (Read)
 *        If TRUE, then the ancestors specified by Parameter PATTERN or
 *        ANCESTORS are removed.  Otherwise, these ancestors are retained
@@ -97,25 +97,25 @@
 *     provrem ff ancestor=all
 *        This erases all provenance information.
 *     provrem ff pattern='_xb$|_yb$' hide=yes
-*        This hides, but does not permanently delete, all ancestors that 
-*        have paths that end with "_xb" or "_yb".  Note, provenance paths 
+*        This hides, but does not permanently delete, all ancestors that
+*        have paths that end with "_xb" or "_yb".  Note, provenance paths
 *        do not include a trailing ".sdf" string.
 *     provrem ff pattern='_ave'
 *        This removes all ancestors that have paths that contain the
 *        string "_ave" anywhere.
 *     provrem ff pattern='_ave' remove=no
-*        This removes all ancestors that have paths that do not contain 
+*        This removes all ancestors that have paths that do not contain
 *        the string "_ave" anywhere.
 *     provrem ff pattern='_d[^/]*$'
 *        This removes all ancestors that have file base-names that begin
 *        with "_d" . The pattern matches "_d" followed by any number of
 *        characters that are not "/", followed by the end of the string.
 *     provrem ff pattern='^m51|^m31'
-*        This removes all ancestors that have paths that begin with 
+*        This removes all ancestors that have paths that begin with
 *        "m51" or "m31".
 
 *  Pattern Matching Syntax:
-*     The syntax for the PATTERN parameter value is a minimal form of 
+*     The syntax for the PATTERN parameter value is a minimal form of
 *     regular expression. The following atoms are allowed.
 *
 *     "[chars]" -- Matches any of the characters within the brackets.
@@ -132,11 +132,11 @@
 *     Any other character that has no special significance within a
 *     regular expression matches itself.  Characters that have special
 *     significance can be matched by preceeding them with a backslash
-*     (\) in which case their special significance is ignored (note, 
+*     (\) in which case their special significance is ignored (note,
 *     this does not apply to the characters in the set dDsSwW).
 *
-*     Note, minus signs ("-") within brackets have no special 
-*     significance, so ranges of characters must be specified 
+*     Note, minus signs ("-") within brackets have no special
+*     significance, so ranges of characters must be specified
 *     explicitly.
 *
 *     The following quantifiers are allowed.
@@ -156,10 +156,10 @@
 *
 *     "^" -- Matches the start of the test string.
 *     "$" -- Matches the end of the test string.
-* 
+*
 *     Multiple templates can be concatenated, using the "|" character to
-*     separate them.  The test string is compared against each one in 
-*     turn until a match is found. 
+*     separate them.  The test string is compared against each one in
+*     turn until a match is found.
 
 *  Related Applications:
 *     KAPPA: PROVADD, PROVMOD, PROVSHOW.
@@ -204,10 +204,10 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CNF_PAR'          ! CNF constants and functions
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDG_PAR'          ! NDG constants 
-      INCLUDE 'DAT_PAR'          ! HDS constants 
+      INCLUDE 'NDG_PAR'          ! NDG constants
+      INCLUDE 'DAT_PAR'          ! HDS constants
 
 *  Status:
       INTEGER STATUS
@@ -255,7 +255,7 @@
 *  Read provenance information from the NDF.
       CALL NDG_READPROV( INDF, ' ', IPROV, STATUS )
 
-*  Get the number of ancestors described in the NDFs PROVENANCE 
+*  Get the number of ancestors described in the NDFs PROVENANCE
 *  extension.
       CALL NDG_COUNTPROV( IPROV, NANC, STATUS )
 
@@ -269,7 +269,7 @@
       CALL PAR_GET0L( 'HIDE', HIDE, STATUS )
 
 *  Abort if an error has occurred or there is no provenance information.
-      IF( STATUS .NE. SAI__OK .OR. NANC .EQ. 0 ) GO TO 999   
+      IF( STATUS .NE. SAI__OK .OR. NANC .EQ. 0 ) GO TO 999
 
 *  See if a NULL value has been supplied for parameter ANCESTOR.  If so,
 *  annul the error, and get the PATTERN and ITEM parameters.
@@ -278,17 +278,17 @@
          CALL ERR_ANNUL( STATUS )
 
          CALL PAR_GET0C( 'PATTERN', PAT, STATUS )
-         CALL PAR_CHOIC( 'ITEM', 'PATH', 'PATH,DATE,CREATOR', .TRUE., 
+         CALL PAR_CHOIC( 'ITEM', 'PATH', 'PATH,DATE,CREATOR', .TRUE.,
      :                    ITEM, STATUS )
 
-*  Allocate work space to hold the largest possible number of ancestor 
+*  Allocate work space to hold the largest possible number of ancestor
 *  indices to be removed.
          CALL PSX_CALLOC( NANC, '_INTEGER', IPW1, STATUS )
 
 *  Loop round all ancestors.
          DO I = 1, NANC
 
-*  Get an AST KeyMap holding the existing provenance information for 
+*  Get an AST KeyMap holding the existing provenance information for
 *  the specified ancestor.
             CALL NDG_GETPROV( IPROV, I, KM, AMORE, STATUS )
 
@@ -303,7 +303,7 @@
 
 *  See if the pattern matches the item. If required, hide the ancestor, or
 *  add the ancestor index to the list to be deleted.
-            IF( REMOVE .EQV. 
+            IF( REMOVE .EQV.
      :          AST_CHRSUB( TEST, PAT, RESULT, STATUS ) ) THEN
 
                NREM = NREM + 1
@@ -311,7 +311,7 @@
                IF( HIDE ) THEN
                   CALL NDG_HIDEPROV( IPROV, I, STATUS )
                ELSE
-                  CALL KPG1_STORI( NANC, NREM, I, 
+                  CALL KPG1_STORI( NANC, NREM, I,
      :                             %VAL( CNF_PVAL( IPW1 ) ), STATUS )
                END IF
 
@@ -319,33 +319,33 @@
          END DO
 
 *  Remove the required ancestors.
-         IF( .NOT. HIDE ) CALL NDG_REMOVEPROV( IPROV, NREM, 
+         IF( .NOT. HIDE ) CALL NDG_REMOVEPROV( IPROV, NREM,
      :                                         %VAL( CNF_PVAL( IPW1 ) ),
      :                                         STATUS )
 
-*  write the modified provenance back to the NDF. 
+*  write the modified provenance back to the NDF.
          CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
-     
+
 *  Free the array holding the ancestor indices.
          CALL PSX_FREE( IPW1, STATUS )
 
 *  Otherwise, we remove the ancestors specified by parameter ANCESTOR.
       ELSE
 
-*  Get the indices of the ancestors to be modified.  Since KPG1_GILST 
+*  Get the indices of the ancestors to be modified.  Since KPG1_GILST
 *  limits the number of values that can be supplied, first check the
 *  parameter value directly to see if it set to "ALL".  If so, we just
 *  hide all ancestors, or erase the provenance extension.
          IF( CHR_SIMLR( ANC, 'ALL' ) .OR. ANC .EQ. '*' ) THEN
             IF( REMOVE ) THEN
-               IF( HIDE ) THEN 
+               IF( HIDE ) THEN
                   DO I = 1, NANC
                      CALL NDG_HIDEPROV( IPROV, I, STATUS )
                   END DO
                   CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
                ELSE
                   CALL NDF_XSTAT( INDF, 'PROVENANCE', THERE, STATUS )
-                  IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE', 
+                  IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE',
      :                                       STATUS )
                END IF
                NREM = NANC
@@ -354,7 +354,7 @@
 *  Otherwise, get the list of ancestors to remove.
          ELSE
             CALL PSX_CALLOC( NANC + 1, '_INTEGER', IPW1, STATUS )
-            CALL KPG1_GILST( 0, NANC, MXANC, 'ANCESTOR', 
+            CALL KPG1_GILST( 0, NANC, MXANC, 'ANCESTOR',
      :                       %VAL( CNF_PVAL( IPW1 ) ), IANC, NREM,
      :                       STATUS )
             CALL PSX_FREE( IPW1, STATUS )
@@ -374,7 +374,7 @@
                      IANC( IW ) = 0
                   END IF
                END DO
-         
+
                IW = 1
                DO IR = 1,NANC
                   IF( IANC( IR ) .EQ. 0 ) THEN
@@ -393,11 +393,11 @@
                   DO I = 1, NREM
                      CALL NDG_HIDEPROV( IPROV, IANC( I ), STATUS )
                   END DO
-               ELSE 
+               ELSE
                   CALL NDG_REMOVEPROV( IPROV, NREM, IANC, STATUS )
                END IF
 
-*  Write the modified provenance back to the NDF. 
+*  Write the modified provenance back to the NDF.
                CALL NDG_WRITEPROV( IPROV, INDF, .FALSE., STATUS )
             END IF
 

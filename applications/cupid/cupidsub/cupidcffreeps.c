@@ -97,11 +97,11 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
          msgSeti( "I", ps->index );
          if( n > 1 ) {
             msgSeti( "N", n );
-            errRep( "CUPIDCFFREEPS_ERR1", "Attempt made to free PixelSet ^I " 
+            errRep( "CUPIDCFFREEPS_ERR1", "Attempt made to free PixelSet ^I "
                     "whilst ^N pixels are still assigned to it (internal "
                     "CUPID programming error).", status );
          } else {
-            errRep( "CUPIDCFFREEPS_ERR1", "Attempt made to free PixelSet ^I " 
+            errRep( "CUPIDCFFREEPS_ERR1", "Attempt made to free PixelSet ^I "
                     "whilst 1 pixel is still assigned to it (internal "
                     "CUPID programming error).", status );
          }
@@ -120,7 +120,7 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
 
 /* Move the supplied PixelSet structure to the end of the cache so that
    it can be re-used. */
-   cupid_ps_cache = astGrow( cupid_ps_cache, cupid_ps_cache_size + 1, 
+   cupid_ps_cache = astGrow( cupid_ps_cache, cupid_ps_cache_size + 1,
                              sizeof( CupidPixelSet * ) );
    if( astOK ) cupid_ps_cache[ cupid_ps_cache_size++ ] = ps;
 

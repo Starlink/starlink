@@ -5,12 +5,12 @@ C     T I P P E X
 C
 C     Figaro function to modify a displayed spectrum using the
 C     cursor.
-C       
+C
 C     Command parameters -
 C
 C     OUTPUT      (Character) The name of the output file to
 C                 be created.  If this is the same as the displayed
-C                 spectrum, the data in the displayed spectrum will 
+C                 spectrum, the data in the displayed spectrum will
 C                 be modified.
 C
 C     Command keywords -
@@ -71,8 +71,8 @@ C
                                  ! edge
       INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data array
       INTEGER      XSLOT         ! Map slot number for x-axis data array
-      INTEGER      XST           ! Pixel number of the display's left 
-                                 ! edge 
+      INTEGER      XST           ! Pixel number of the display's left
+                                 ! edge
 C
 C     Initialisation of DSA_ routines
 C
@@ -221,7 +221,7 @@ C
       LOGICAL PAR_ABORT
       INTEGER ICH_LEN,ICH_FOLD,ICH_ENCODE,PGBEGIN,GEN_BSEARCH
 C
-C     PGPLOT code for white 
+C     PGPLOT code for white
 C
       INTEGER WHITE
       PARAMETER (WHITE=1)

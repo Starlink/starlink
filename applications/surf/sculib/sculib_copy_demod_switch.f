@@ -37,7 +37,7 @@
 *     SWITCH_DATA (NBOLS, NJIG)       = REAL (Returned)
 *           chop data for this switch of the exposure
 *     SWITCH_VARIANCE (NBOLS, NJIG)   = REAL (Returned)
-*           variance on the chop signal 
+*           variance on the chop signal
 *     SWITCH_CALIBRATOR (NBOLS, NJIG) = REAL (Returned)
 *           calibrator for this switch of the exposure
 *     SWITCH_CAL_VARIANCE (NBOLS, NJIG)= REAL (Returned)
@@ -101,7 +101,7 @@
 *  Local Constants:
 
 *  Local variables:
-      INTEGER J 
+      INTEGER J
       INTEGER BOL
       INTEGER NQUAL      ! Integer quality
 
@@ -139,12 +139,12 @@
 
             IF (NQUAL .GT. 0) THEN
                IF (MOD(NQUAL, 2) .EQ. 1)  THEN   ! ODD
-                  SWITCH_QUALITY(BOL,J) = 
+                  SWITCH_QUALITY(BOL,J) =
      :                 SCULIB_BITON(SWITCH_QUALITY(BOL,J), 1)
                   NQUAL = NQUAL - 1
                ENDIF
                IF (NQUAL .GT. LEVEL) THEN
-                  SWITCH_QUALITY(BOL,J) = 
+                  SWITCH_QUALITY(BOL,J) =
      :                 SCULIB_BITON(SWITCH_QUALITY(BOL,J), 2)
                ENDIF
             ENDIF

@@ -102,7 +102,7 @@
 *     29-JUL-2009 (TIMJ):
 *        MSG_IFGET now called in fixed part.
 *     19-OCT-2009 (DSB):
-*        Use NDG_BEGGH/NDG_ENDGH to record contents of group parameters in 
+*        Use NDG_BEGGH/NDG_ENDGH to record contents of group parameters in
 *        the history component of output NDFs.
 *     {enter_further_changes_here}
 
@@ -120,8 +120,8 @@
       INTEGER  STATUS
 
 *  External References:
-      EXTERNAL RESHAPE           ! To distinguish KAPPA RESHAPE from 
-                                 ! Fortran intrinsic function of the 
+      EXTERNAL RESHAPE           ! To distinguish KAPPA RESHAPE from
+                                 ! Fortran intrinsic function of the
                                  ! same name
       LOGICAL LPG_AGAIN          ! Invoke the application again?
       INTEGER CHR_LEN            ! Length of string
@@ -172,7 +172,7 @@
       CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
 *  Define the current application name for history.  The package version
-*  number gets substituted in here when the KAPPA release source tar 
+*  number gets substituted in here when the KAPPA release source tar
 *  file is contructed.
       CALL NDF_HAPPN( NAME // ' (KAPPA @PACKAGE_VERSION@)', STATUS )
 
@@ -180,7 +180,7 @@
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
 
 *  If not, see if verbose reporting is required.
-      IF ( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )      
+      IF ( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
 *  See if looping should be disabled.
       CALL KPG1_ENVDF( 'KAPPA_LOOP_DISABLE', DISAB, STATUS )
@@ -197,20 +197,20 @@
       CALL KPG1_ENVDF( 'KAPPA_REPLACE', REPL, STATUS )
       CALL LPG_REPLA( REPL, STATUS )
 
-*  Loop round invoking the task for each set of NDFs specified by the 
+*  Loop round invoking the task for each set of NDFs specified by the
 *  user.
       DO WHILE( LPG_AGAIN( STATUS ) )
 
 *  Begin a provenance block. This causes event handlers to be registered
 *  with the NDF library so that a handler routine in NDG is called every
-*  time an NDF is opened. This handler routine keeps a record of all 
-*  NDFs that are opened for input or output, until the block is closed 
+*  time an NDF is opened. This handler routine keeps a record of all
+*  NDFs that are opened for input or output, until the block is closed
 *  by calling NDG_ENDPV.
          CALL NDG_BEGPV( STATUS )
 
-*  Begin a GRP NDF history block. This causes the contents of GRP groups 
+*  Begin a GRP NDF history block. This causes the contents of GRP groups
 *  to be appended to default history text added to any NDFs during the
-*  block. 
+*  block.
          CALL NDG_BEGGH( STATUS )
 
 *  Check the string against valid A-task names---if matched then call
@@ -292,7 +292,7 @@
          ELSE IF ( NAME .EQ. 'NDFCOPY' ) THEN
             CALL NDFCOPY ( STATUS )
 
-*  Compresses an NDF 
+*  Compresses an NDF
          ELSE IF ( NAME .EQ. 'NDFCOMPRESS' ) THEN
             CALL NDFCOMPRESS ( STATUS )
 

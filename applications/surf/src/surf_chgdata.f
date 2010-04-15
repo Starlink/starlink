@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_CHGDATA( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This application is used to set SCUBA data to any value by using
 *     SCUBA sections to specify a subset of the full data. Data, Variance
@@ -44,7 +44,7 @@
 *         Name of data set and the specification of the data to be changed.
 *         Usually of the form `ndf{spec1}{spec2}' where ndf is the filename
 *         and spec1...n are the section specifications.
-*         The section can be read from the SECTION parameter if the 
+*         The section can be read from the SECTION parameter if the
 *         SCUBA section is omitted.
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
@@ -54,7 +54,7 @@
 *         This parameter can be used to specify SCUBA sections.
 *         Curly brackets must still be given. Since this is an array
 *         parameter square brackets must be used to specify more than
-*         one component: 
+*         one component:
 *
 *               SECTION > [ {b3} , {i2} ]
 *
@@ -67,8 +67,8 @@
 *               SECTION > [ "{b3,5}" , {i2} ]
 *
 *         If necessary the negation character should come after a
-*         section (ie after the closing curly bracket) and that 
-*         negation applies to the combined section and not just the string 
+*         section (ie after the closing curly bracket) and that
+*         negation applies to the combined section and not just the string
 *         containing the negation character:
 *
 *             SECTION > [ {b3}-, {i2} ]
@@ -101,18 +101,18 @@
 *         Set the error for this section to 0.2
 *     change_data 'phot{i2:6}{b3}' comp=quality value=8
 *         Explicitly set the quality array to 8 for integrations 2 through
-*         6 and bolometer 3. The task CHANGE_QUALITY is recommended in this 
+*         6 and bolometer 3. The task CHANGE_QUALITY is recommended in this
 *         case since then only bit 3 is affected.
-*     change_data 'map{i2,5}-' value=0.0 
+*     change_data 'map{i2,5}-' value=0.0
 *         Set everything except integrations 2 and 5 to zero.
 
 
 *  Notes:
 *     - This software sets the actual value in the specified component
-*       and so, unlike CHANGE_QUALITY, is not reversible. For this reason 
+*       and so, unlike CHANGE_QUALITY, is not reversible. For this reason
 *       a new output file is created.
 *     - This task does not attempt to create a component if the specified
-*       component is missing. A Variance array can be created using the 
+*       component is missing. A Variance array can be created using the
 *       KAPPA task SETVAR if necessary.
 *     - The SECTION parameter is not used if a SCUBA section was given
 *       via the IN parameter.
@@ -132,7 +132,7 @@
 *  History:
 *     $Id$
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -167,7 +167,7 @@
       INTEGER          MAX__DIM           ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)            ! array
       CHARACTER * 1    NEGCHAR            ! Character used to negate a section
-      PARAMETER (NEGCHAR = '-')           ! 
+      PARAMETER (NEGCHAR = '-')           !
       CHARACTER * 14   TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_DATA')
 
@@ -233,7 +233,7 @@
       LOGICAL          SWITCH_EXPECTED    ! .TRUE. if switch is to be
                                           ! specified in data-spec
       CHARACTER*80     SVALUE             ! String version of new value
-      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT 
+      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       CHARACTER*10     TYPE               ! Data type of component
       LOGICAL          USE_SECT           ! Use or not to use
       REAL             VALUE              ! New data value
@@ -310,7 +310,7 @@
                STATUS = SAI__ERROR
                CALL MSG_SETC('TASK',TSKNAME)
                CALL ERR_REP (' ', '^TASK: this file has not '//
-     :              'been through the REDUCE_SWITCH application', 
+     :              'been through the REDUCE_SWITCH application',
      :              STATUS)
             END IF
             IF (PHOTOM) THEN
@@ -333,7 +333,7 @@
       CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC, STATUS)
 
 *     and read in some parameters describing the observation
-      
+
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
@@ -359,7 +359,7 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
      :     STATUS)
 
@@ -412,13 +412,13 @@
 *     Generate a default name for the output file
       CALL SCULIB_CONSTRUCT_OUT(FILE, SUFFIX_ENV, SCUBA__N_SUFFIX,
      :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
- 
+
 *     set the default
       CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
 
 *     Now propogate the output file from the input and open it.
 
-      CALL NDF_PROP (IN_NDF, 'Data,Variance,Quality,Axis,Units', 'OUT', 
+      CALL NDF_PROP (IN_NDF, 'Data,Variance,Quality,Axis,Units', 'OUT',
      :     OUT_NDF, STATUS)
 
 *     close input file and tidy up
@@ -440,9 +440,9 @@
 
 *     Set up the choices
       COMPLIS = 'Data'   ! Always have data
-      IF (ISVAR) CALL CHR_APPND(',Variance,Error', COMPLIS, 
+      IF (ISVAR) CALL CHR_APPND(',Variance,Error', COMPLIS,
      :     CHR_LEN(COMPLIS))
-      
+
       IF (ISQUAL) CALL CHR_APPND(',Quality', COMPLIS, CHR_LEN(COMPLIS))
 
 *     Now ask for the component of choice
@@ -463,11 +463,11 @@
       CALL SCULIB_GET_DEM_PNTR (3, IN_SCUBAX_LOC, IN_DEM_PNTR_PTR,
      :  ITEMP, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, STATUS)
 
-      
+
 *     map the data array and check its dimensions
 
       CALL NDF_DIM (OUT_NDF, MAX__DIM, DIM, NDIM, STATUS)
-      CALL NDF_MAP (OUT_NDF, COMP, TYPE, 'UPDATE', 
+      CALL NDF_MAP (OUT_NDF, COMP, TYPE, 'UPDATE',
      :  OUT_DATA_PTR, ITEMP, STATUS)
 
       N_POS = DIM (2)
@@ -515,7 +515,7 @@
       CALL MSG_SETI ('NMEAS', N_MEASUREMENTS)
       CALL MSG_SETI ('NINT', N_INTEGRATIONS)
       CALL MSG_SETI ('NEXP', N_EXPOSURES)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     ' - there are data for ^NEXP exposure(s) '//
      :     'in ^NINT integration(s) in ^NMEAS measurements.', STATUS)
 
@@ -604,7 +604,7 @@
          SWITCH_EXPECTED = .FALSE.
 
          CALL SCULIB_MASK_DATA(USE_SECT, CHG_TYPE, N_SPEC, DATA_SPEC,
-     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :        1, N_EXPOSURES, N_INTEGRATIONS,
      :        N_MEASUREMENTS, N_POS, N_BOLS, N_BEAM, SWITCH_EXPECTED,
      :        VALUE, BVALUE, 0, .TRUE., OUT_DATA_PTR,

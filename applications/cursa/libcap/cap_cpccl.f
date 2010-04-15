@@ -248,9 +248,9 @@
 *
 *             Inquire the values of all the attributes for this column.
 
-               CALL CAT_CINQ (FIINC, 10, FCI, FNAME, FGENUS, FEXPR, 
+               CALL CAT_CINQ (FIINC, 10, FCI, FNAME, FGENUS, FEXPR,
      :           FDTYPE, FCSIZE,FDIMS, FSIZEA, FNULL, FXCEPT, FSCALE,
-     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM, 
+     :           FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM,
      :           FDATE, STATUS)
 
 *
@@ -274,7 +274,7 @@
      :              FIOUTC, STATUS)
 
 *
-*                Set the mutable attributes of this column to correspond 
+*                Set the mutable attributes of this column to correspond
 *                to the input column.
 
                   CALL CAT_TATTC (FIOUTC, 'EXPR', FEXPR, STATUS)

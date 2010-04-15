@@ -19,19 +19,19 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The SphMap class implements Mappings which maps positions from 
-*     3-dimensional Cartesian coordinates into 2-dimensional spherical 
-*     coordinates (i.e. longitude and latitude on a unit sphere). The 
+*     The SphMap class implements Mappings which maps positions from
+*     3-dimensional Cartesian coordinates into 2-dimensional spherical
+*     coordinates (i.e. longitude and latitude on a unit sphere). The
 *     inverse Mapping always produces vectors of unit length.
 *
-*     The spherical coordinates are longitude (positive anti-clockwise 
+*     The spherical coordinates are longitude (positive anti-clockwise
 *     looking from the positive latitude pole) and latitude. The
-*     Cartesian coordinates are right-handed, with the x-axis (axis 1) 
-*     at zero longitude and latitude, and the z-axis (axis 3) at the 
+*     Cartesian coordinates are right-handed, with the x-axis (axis 1)
+*     at zero longitude and latitude, and the z-axis (axis 3) at the
 *     positive latitude pole.
 *
 *     At either pole, the longitude is set to the value of the PolarLong
-*     attribute. If the Cartesian coordinates are all zero, then the 
+*     attribute. If the Cartesian coordinates are all zero, then the
 *     longitude and latitude values are set to AST__BAD.
 
 *  Inheritance:
@@ -152,12 +152,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -246,7 +246,7 @@ typedef struct AstSphMapVtab {
    void (* SetPolarLong)( AstSphMap *, double, int * );
 } AstSphMapVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -287,7 +287,7 @@ AstSphMap *astLoadSphMap_( void *, size_t, AstSphMapVtab *,
                            const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitSphMapGlobals_( AstSphMapGlobals * );
 #endif
 

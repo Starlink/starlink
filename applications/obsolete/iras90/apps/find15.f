@@ -53,7 +53,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,14 +120,14 @@
 
 *  Calculate ecliptic latitude
       ECLAT = PIBY2-EQ
-      
+
 *  Use IRA_NORM to normalise ecliptic coordinates
       ECLATD = DBLE( ECLAT )
       ECLNGD = DBLE( ECLONG )
-      
+
       CALL IRA_NORM( ECLNGD, ECLATD, STATUS)
-      
+
       ECLAT = REAL( ECLATD )
       ECLONG = REAL( ECLNGD )
-      
+
       END

@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER*10 NTYPE         ! noise type required 
+      CHARACTER*10 NTYPE         ! noise type required
       INTEGER IPOUT              ! pointer to output data comp
       INTEGER IPVAR              ! pointer to output variance comp
       INTEGER NDFIN              ! identifier for input NDF
@@ -123,7 +123,7 @@
 *  get the sigma for the noise
          CALL PAR_GET0R( 'SIGMA', SIGMA, STATUS )
       END IF
-      
+
 *  get the output image, remove any variances it may have, and copy the
 *  input data array into it.
       CALL NDF_PROP( NDFIN, 'DATA,QUALITY,NOVARIANCE', 'OUT', NDFOUT,
@@ -134,11 +134,11 @@
      :              STATUS )
 
 *  add a variance component to the output NDF
-      CALL NDF_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE', IPVAR, 
+      CALL NDF_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE', IPVAR,
      :              EL, STATUS )
 
 *  right do the processing
-      CALL ANOISE( %VAL( CNF_PVAL( IPOUT ) ), EL, POISON, SIGMA, ADU, 
+      CALL ANOISE( %VAL( CNF_PVAL( IPOUT ) ), EL, POISON, SIGMA, ADU,
      :             %VAL( CNF_PVAL( IPVAR ) ), STATUS )
 
 *  close down

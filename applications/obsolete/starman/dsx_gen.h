@@ -7,7 +7,7 @@
    that is the start is at [0,0] and at the top left hand of
    the picture.
 
-   The three coordinate systems used are 'image' 'virtual' and 
+   The three coordinate systems used are 'image' 'virtual' and
    'screen'. These all start at (1,1) from the bottom left hand.
 
   Thus in filling the virtual arrays and in any action writing
@@ -27,7 +27,7 @@ Colormap  CM_ID;			/* Default colour map identifier */
 unsigned long int  PC_ID[256];		/* Colour indexes pointers */
 XColor    COLOUR[256];			/* Colour index */
 Pixmap    PIXMAP;			/* Image display pixmap */
- 
+
 
 Visual    *D_VISUAL;			/* Visual type */
 char      BY_PC_ID[256];		/* Byte equivalents of PC_ID */

@@ -35,7 +35,7 @@
       include 'SAE_PAR'
       include 'DAT_PAR'
       include 'DAT_ERR'
-      include 'CMP_ERR'      
+      include 'CMP_ERR'
       CHARACTER*(DAT__SZLOC) NLOC
       character*(*) var,filnam,string*80
       character*8 name
@@ -68,8 +68,8 @@
         call dat_get0c(nloc,var,status)
         call dta_annul(nloc,status)
 
-*        CALL CMP_GET0C(NLOC, string(:len1), 
-*     :           var, STATUS)        
+*        CALL CMP_GET0C(NLOC, string(:len1),
+*     :           var, STATUS)
 
 
       end if

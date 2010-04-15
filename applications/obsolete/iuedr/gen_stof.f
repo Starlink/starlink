@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE gen_STOF
 *
-*   Description: 
+*   Description:
 *      Decode float value from string using Fortran Character File.
 *
 *   Authors:
@@ -40,16 +40,16 @@
 
 *   Import:
       BYTE SVALUE(ARB)            ! string to be scanned
- 
+
 *   Export:
       REAL*8 FVALUE                 ! decoded value
- 
+
       INTEGER STATUS              ! status return
- 
+
 *   Local variables:
       CHARACTER CVALUE*(MAXBUF)   ! Fortran 77 version of value string
       CHARACTER FORMAT*(8)        ! Fortran 77 format string
- 
+
       INTEGER NCHAR               ! character count
 
       CALL gen_STOC(SVALUE, LEN(CVALUE), CVALUE, NCHAR)

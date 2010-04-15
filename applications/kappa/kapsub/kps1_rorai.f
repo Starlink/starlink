@@ -145,26 +145,26 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing allowed
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SAE global constants
- 
+
 *  Arguments Given:
       INTEGER XSIZE
       INTEGER YSIZE
       INTEGER XEXT
       INTEGER YEXT
       INTEGER NUMRA
- 
+
 *  Arguments Given and Returned:
       INTEGER ARRAY( XSIZE, YSIZE )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER HRANGE             ! Half of MRANGE, i.e. half of max.
                                  ! extent to be rotated
@@ -178,22 +178,22 @@
       INTEGER YSWAP              ! Index to rotated element position,
                                  ! second dimension
 *.
- 
+
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF ( NUMRA .EQ. 1 ) THEN
- 
+
 *  Rotate 90 degrees clockwise.
 *  ============================
          MRANGE = MAX( XEXT, YEXT )
          HRANGE = MRANGE / 2
          DO X = 1 , HRANGE
             XSWAP = MRANGE + 1 - X
- 
+
             DO Y = X, MRANGE - X
                YSWAP = MRANGE + 1 - Y
- 
+
 *  Swap the values using an intermediate variable.
                SAVE = ARRAY( XSWAP, Y )
                ARRAY( XSWAP, Y ) = ARRAY( YSWAP, XSWAP )
@@ -202,52 +202,52 @@
                ARRAY( Y, X ) = SAVE
             END DO
          END DO
- 
+
       ELSE IF ( NUMRA .EQ. 2 ) THEN
- 
+
 *  Rotate through 180 degrees.
 *  ===========================
          HRANGE = YEXT / 2
          DO Y = 1, HRANGE
             YSWAP = YEXT + 1 - Y
- 
+
             DO X = 1, XEXT
                XSWAP = XEXT + 1 - X
- 
+
 *  Swap the values using an intermediate variable.
                SAVE = ARRAY( X, Y )
                ARRAY( X, Y ) = ARRAY( XSWAP, YSWAP )
                ARRAY( XSWAP, YSWAP ) = SAVE
             END DO
          END DO
- 
+
 *  Check for an odd Y dimension.  If there is one, there is an extra
 *  row to rotate.
          IF ( MOD( YEXT, 2 ) .NE. 0 ) THEN
- 
+
             Y = HRANGE + 1
             DO X = 1, XEXT / 2
                XSWAP = XEXT + 1 - X
- 
+
 *  Swap the values using an intermediate variable.
                SAVE = ARRAY( X, Y )
                ARRAY( X, Y ) = ARRAY( XSWAP, Y )
                ARRAY( XSWAP, Y ) = SAVE
             END DO
          END IF
- 
+
       ELSE IF ( NUMRA .EQ. 3 ) THEN
- 
+
 *  Rotate 90 degrees anticlockwise, equivalent to 270 degrees clockwise.
 *  =====================================================================
          MRANGE = MAX( XEXT, YEXT )
          HRANGE = MRANGE / 2
          DO  X = 1, HRANGE
             XSWAP = MRANGE + 1 - X
- 
+
             DO  Y = X, MRANGE - X
                YSWAP = MRANGE + 1 - Y
- 
+
 *  Swap the values using an intermediate variable.
                SAVE = ARRAY( Y, X )
                ARRAY( Y, X ) = ARRAY( X, YSWAP )
@@ -257,7 +257,7 @@
             END DO
          END DO
       ELSE
- 
+
 *  Number of clockwise right-angles to be rotated is wrong so report an
 *  error.
          STATUS = SAI__ERROR
@@ -266,5 +266,5 @@
      :     'KPS1_RORAx: The number of right-angle rotations cannot be '/
      :     /'^NUMRA (programming error).', STATUS )
       END IF
- 
+
       END

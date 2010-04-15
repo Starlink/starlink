@@ -1,12 +1,12 @@
-      SUBROUTINE KPS1_PLFIL( INDF, IWCS, MAP, NPOS, NAXIN, INPOS, GOTID, 
+      SUBROUTINE KPS1_PLFIL( INDF, IWCS, MAP, NPOS, NAXIN, INPOS, GOTID,
      :                       ID, PARAMS, CONTNR, NAXC, RETAX, INTERP,
-     :                       RSPARS, TOL, NDIMS, GRDPOS, STATUS ) 
+     :                       RSPARS, TOL, NDIMS, GRDPOS, STATUS )
 *+
 *  Name:
 *     KPS1_PLFIL
 
 *  Purpose:
-*     Extracts and saves to NDFs interpolated slices about given 
+*     Extracts and saves to NDFs interpolated slices about given
 *     co-ordinates supplied in a file.
 
 *  Language:
@@ -15,15 +15,15 @@
 *  Invocation:
 *      CALL KPS1_PLFIL( INDF, IWCS, MAP, NPOS, NAXIN, INPOS, GOTID, ID,
 *                       PARAMS, CONTNR, NAXC, RETAX, INTERP, RSPARS,
-*                       TOL, NDIMS, GRDPOS, STATUS ) 
+*                       TOL, NDIMS, GRDPOS, STATUS )
 
 *  Description:
-*     This routine extracts interpolated slices from an input NDF for 
+*     This routine extracts interpolated slices from an input NDF for
 *     one or more locations, and stores each slice in its own output NDF.
 *     Slices run parallel to pixel axes, but are not usually at pixel
 *     centres, hence the need to interpolate.  The slice's fixed
 *     co-ordinates Frame are passed through argument INPOS and the
-*     mapping between their system and GRID supplied through argument 
+*     mapping between their system and GRID supplied through argument
 *     MAP.  The axes of these fixed co-ordinates have single elements
 *     in each output NDF.  The axes to be retained are specified through
 *     argument RETAX.
@@ -59,7 +59,7 @@
 *     PARAMS( 2 ) = CHARACTER * ( * ) (Given)
 *        The names of environment parameters.  The elements are
 *        respectively for acquiring the name of the output NDF or
-*        container file, and the title of the output NDF.  Otherwise 
+*        container file, and the title of the output NDF.  Otherwise
 *        each NDF is written to its own file.
 *     CONTNR = LOGICAL (Given)
 *        If set to .TRUE., the output NDFs are written as components of
@@ -72,43 +72,43 @@
 *     INTERP = INTEGER (Given)
 *        The resampling-scheme identifier for AST_RESAMPLE<T>.
 *     RSPARS( 2 ) = DOUBLE PRECISION (Given)
-*        Qualifying parameters required by the Sinc, SincSinc, SincCos, 
+*        Qualifying parameters required by the Sinc, SincSinc, SincCos,
 *        SincGauss, Somb, SombCos, and Gauss interpolation methods in
 *        AST_RESAMPLE<T>.
 *
-*        RSPARS( 1 ) is required by all the above schemes.  It is used 
+*        RSPARS( 1 ) is required by all the above schemes.  It is used
 *        to specify how many pixels are to contribute to the interpolated
-*        result on either side of the interpolation in each dimension. 
-*        Typically, a value of 2 is appropriate and the minimum allowed 
-*        value is 1 (i.e. one pixel on each side).  A value of zero or 
-*        fewer indicates that a suitable number of pixels should be 
+*        result on either side of the interpolation in each dimension.
+*        Typically, a value of 2 is appropriate and the minimum allowed
+*        value is 1 (i.e. one pixel on each side).  A value of zero or
+*        fewer indicates that a suitable number of pixels should be
 *        calculated automatically.
 *
-*        RSPARS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
+*        RSPARS( 2 ) is required only by the SombCos, Gauss, SincSinc,
 *        SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
 *        SincCos schemes, it specifies the number of pixels at which the
 *        envelope of the function goes to zero.  The minimum value is
 *        1.0, and the run-time default value is 2.0.  For the Gauss and
 *        SincGauss scheme, it specifies the full-width at half-maximum
 *        (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
-*        the run-time default is 1.0.  On astronomical images and 
-*        spectra, good results are often obtained by approximately 
+*        the run-time default is 1.0.  On astronomical images and
+*        spectra, good results are often obtained by approximately
 *        matching the FWHM of the envelope function, given by RSPARS(2),
-*        to the point-spread function of the input data.  
+*        to the point-spread function of the input data.
 *     TOL = DOUBLE PRECISION (Given)
 *        The maximum tolerable geometrical distortion which may be
-*        introduced as a result of approximating non-linear Mappings 
+*        introduced as a result of approximating non-linear Mappings
 *        by a set of piece-wise linear transforms.  The resampling
-*        algorithm uses approximate non-linear co-ordinate 
-*        transformations in order to improve performance, and this 
+*        algorithm uses approximate non-linear co-ordinate
+*        transformations in order to improve performance, and this
 *        parameter controls how inaccurate the resulting approximation
-*        is allowed to be, as a displacement in pixels of the input NDF. 
+*        is allowed to be, as a displacement in pixels of the input NDF.
 *        A value of zero will ensure that no such approximation is done,
 *        at the expense of increasing execution time.
 *     NDIMS = INTEGER (Given)
 *        The number of pixel axes in the NDF.
-*     GRDPOS( NPOS, NDIMS ) = DOUBLE PRECISION (Returned) 
-*        Workspace to store the positions of the slices given in the 
+*     GRDPOS( NPOS, NDIMS ) = DOUBLE PRECISION (Returned)
+*        Workspace to store the positions of the slices given in the
 *        GRID Frame of the NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -143,7 +143,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -232,7 +232,7 @@
 
 *  Obtain the input NDF's bounds.
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
-      
+
       DO I = 1, NDIM
          IF ( RETAX( I ) ) THEN
             LBNDO( I ) = LBNDI( I )
@@ -244,8 +244,8 @@
       END DO
 
 *  Transform the supplied positions to the GRID Frame of the NDF.
-      CALL AST_TRANN( MAP, NPOS, NAXIN, NPOS, INPOS, .TRUE., NDIM, 
-     :                NPOS, GRDPOS, STATUS ) 
+      CALL AST_TRANN( MAP, NPOS, NAXIN, NPOS, INPOS, .TRUE., NDIM,
+     :                NPOS, GRDPOS, STATUS )
 
 *  Determine a data type which can be used for operations on the
 *  DATA and possibly VARIANCE components of the NDF.
@@ -261,7 +261,7 @@
       IF ( CONTNR ) THEN
 
 *  As we wish to use the multiple-input processing through LPG, we
-*  first make a dummy NDF of the required name,  Also modify the 
+*  first make a dummy NDF of the required name,  Also modify the
 *  prompt string for PARAMS(2) parameter.
          CALL PAR_PROMT( PARAMS( 1 ), 'Output HDS container file',
      :                   STATUS )
@@ -282,7 +282,7 @@
 *  automatically.
       ELSE
          CALL MSG_SETI( 'N', NPOS )
-         CALL MSG_OUTIF ( MSG__NORM, ' ', 
+         CALL MSG_OUTIF ( MSG__NORM, ' ',
      :                    'Catalogue has ^N positions.', STATUS )
          PATH = ' '
       END IF
@@ -324,37 +324,37 @@
 *  Interpolate and extract about the fixed co-ordinates.
 *  =====================================================
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_PLRSR( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSR( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
-         
+
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_PLRSB( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSB( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
-    
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_PLRSD( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSD( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_PLRSI( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSI( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_PLRSUB( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSUB( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
      :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_PLRSUW( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSUW( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
      :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_PLRSW( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSW( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
@@ -371,7 +371,7 @@
 
          ELSE IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If we are processing more than one position, cancel the error so that 
+*  If we are processing more than one position, cancel the error so that
 *  remaining positions can be processed.  For a single position, we retain
 *  the error status.
             IF ( NPOS .GT. 1 ) THEN
@@ -379,7 +379,7 @@
 *  If we are in verbose mode, add a context report and flush the message.
 *  Otherwise, just annul the message.
                IF ( VERB ) THEN
-                  IF ( GOTID ) THEN 
+                  IF ( GOTID ) THEN
                      CALL MSG_SETI( 'ID', ID( J ) )
                   ELSE
                      CALL MSG_SETI( 'ID', J )

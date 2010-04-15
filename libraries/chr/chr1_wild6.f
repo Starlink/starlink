@@ -1,4 +1,4 @@
-      LOGICAL FUNCTION CHR1_WILD6( STRING, WILDS, SLEN, WLEN, FIRSTN, 
+      LOGICAL FUNCTION CHR1_WILD6( STRING, WILDS, SLEN, WLEN, FIRSTN,
      :                      LASTN, MATCH, FIRSTS, FIRSTW, LASTS, LASTW )
 *+
 *  Name:
@@ -11,19 +11,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     RESULT = CHR1_WILD6( STRING, WILDS, SLEN, WLEN, FIRSTN, LASTN, 
+*     RESULT = CHR1_WILD6( STRING, WILDS, SLEN, WLEN, FIRSTN, LASTN,
 *    :                     MATCH, FIRSTS, FIRSTW, LASTS, LASTW )
 
 *  Description:
-*     Search in reverse through the candidate string (STRING) for a 
+*     Search in reverse through the candidate string (STRING) for a
 *     match to the last substring in the wild-card pattern.
 *     The wild-cards used are:
 *
 *        % a single character wild-card;
 *        * an arbitrary length string wild-card, including zero length.
 *
-*     There is also a literal escape character '\' for use when the 
-*     characters '*' and '%' are to be interpreted literally within 
+*     There is also a literal escape character '\' for use when the
+*     characters '*' and '%' are to be interpreted literally within
 *     the wild-card pattern.
 
 *  Arguments:
@@ -41,10 +41,10 @@
 *        The index of the right-hand WILDN character.
 *     MATCH = CHARACTER * ( * ) (Returned)
 *        The wild-card match: this string must be the same length as
-*        STRING. All characters matched individually are returned as 
+*        STRING. All characters matched individually are returned as
 *        blanks in MATCH, and all characters matched by wild-cards are
 *        returned assigned to the particular wild-cards they matched.
-*        If the length of MATCH is less than that of STRING, then 
+*        If the length of MATCH is less than that of STRING, then
 *        CHR1_WILD6 returns the value .FALSE.
 *     FIRSTS = INTEGER (Returned)
 *        The index of the left-hand STRING character.
@@ -61,7 +61,7 @@
 *        If no errors were encountered = .TRUE.
 
 *  Algorithm:
-*     Search in reverse through the candidate string (STRING) for a 
+*     Search in reverse through the candidate string (STRING) for a
 *     match to the last substring in the wild-card pattern.
 
 *  Copyright:
@@ -73,12 +73,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -95,7 +95,7 @@
 *     8-OCT-1991 (PCTR):
 *        Final (working) version with changes prompted by P.T. Wallace.
 *     8-MAR-1993 (PCTR):
-*        Cure bug which leads to a WILDN chracter being present 
+*        Cure bug which leads to a WILDN chracter being present
 *        at the beginning of the WILDS string.
 *     28-SEP-1993 (ACC):
 *        Subprogram created during modularisation.
@@ -150,7 +150,7 @@
 *  wild-card pattern does not begin with a WILDN character).
       IF ( FIRSTN .GT. FIRSTW ) THEN
 
-*     There is a substring before the first multi-character wild 
+*     There is a substring before the first multi-character wild
 *     character, so perform the string comparison.  Initialise
 *     the character loop indices.
          ICHW = FIRSTW
@@ -212,7 +212,7 @@
       IF ( LASTN .LT. WLEN ) THEN
 
 *     There is a substring after the last multi-character wild
-*     character, so perform the string comparison. 
+*     character, so perform the string comparison.
 *     Initialise the character loop indices.
          ICHW = LASTW
          ICHS = LASTS

@@ -47,12 +47,12 @@ int main( void ) {
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,8 +68,8 @@ int main( void ) {
 *        Original version.
 *     24-OCT-2000 (DSB):
 *        Ensure that the number of digits used is at least the minimum
-*        required by IEEE for a conversion from binary to string and back 
-*        to binary to be an identity. 
+*        required by IEEE for a conversion from binary to string and back
+*        to binary to be an identity.
 *     31-MAR-2009 (TIMJ):
 *        Does not take any arguments so don't try to read arguments.
 *-
@@ -77,8 +77,8 @@ int main( void ) {
 
 /* Local Constants: */
 #define BUFF_LEN ( 2 * DBL_DIG + 20 ) /* Buffer length */
-#define IEEE_DIG 17                   /* Minimum number of digits required by 
-                                         IEEE for conversion from binary to 
+#define IEEE_DIG 17                   /* Minimum number of digits required by
+                                         IEEE for conversion from binary to
                                          string and back again to be an
                                          identity. */
 
@@ -90,7 +90,7 @@ int main( void ) {
 /* Vary the precision over a reasonable range to see how many decimal
    digits are required. The initial number of digits is the larger of
    DBL_DIG and IEEE_DIG. */
-   for ( digits = ( DBL_DIG > IEEE_DIG )?DBL_DIG:IEEE_DIG; 
+   for ( digits = ( DBL_DIG > IEEE_DIG )?DBL_DIG:IEEE_DIG;
          digits <= ( 2 * DBL_DIG ); digits++ ) {
 
 /* Format the AST__BAD value using this precision and then read it

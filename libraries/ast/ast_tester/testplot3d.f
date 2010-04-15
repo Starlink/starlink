@@ -32,7 +32,7 @@ c      ok = ( pgbeg( 0, '/VCPS', 1, 1 ) .eq. 1 )
       call pgwnad( 0.0, 1.0, 0.0, 1.0 )
 
       ok = pg3d_autocamera( lbnd, ubnd )
-c     
+c
       gbox(1) = lbnd(1)
       gbox(2) = lbnd(2)
       gbox(3) = lbnd(3)
@@ -47,7 +47,7 @@ c
       bbox(5) = 1.0
       bbox(6) = 1.0
 
-      plot3d = ast_plot3d( AST__NULL, gbox, bbox, 'minticklen=0', 
+      plot3d = ast_plot3d( AST__NULL, gbox, bbox, 'minticklen=0',
      :                     status )
       call checkdump( plot3d, 'CheckDump test 1', status )
       call ast_annul( plot3d, status )
@@ -60,7 +60,7 @@ c
       plot3d = ast_plot3d( readtest( "plot3d-test1.ast", status ), gbox,
      :                      bbox, ' ' , status )
 c      call checkdump( plot3d, 'CheckDump test 2', status )
-c      call ast_set( plot3d, "System(1)=galactic,system(3)=freq", 
+c      call ast_set( plot3d, "System(1)=galactic,system(3)=freq",
 c     :              status )
 c      call ast_grid( plot3d, status )
       call explore( plot3d, status )
@@ -85,7 +85,7 @@ c      call ast_grid( plot3d, status )
       integer obj, status, next, end, ch, result, ll, overlap
       external mysource, mysink, mysink2
       character buf*400000,buf2*400000
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
       common /ss3/ buf2
       if( status .ne. sai__ok ) return
@@ -104,7 +104,7 @@ c      call ast_grid( plot3d, status )
          write(*,*) text
          call stopit( status, 'Cannot read object from channel' )
       end if
-     
+
       ll = 200
       next = 1
       ch = ast_channel( AST_NULL, mysink2, ' ', status )
@@ -120,14 +120,14 @@ c      call ast_grid( plot3d, status )
          call stopit( status, 'Object has changed' )
       end if
       call ast_end( status )
-      end  
+      end
       subroutine mysource( status )
       implicit none
       include 'SAE_PAR'
       include 'AST_PAR'
       integer status, next, end, ll
       character buf*400000
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
       if( status .ne. sai__ok ) return
       if( next .ge. end ) then
@@ -160,7 +160,7 @@ c      call ast_grid( plot3d, status )
          write(*,*) line( f : l )
          write(*,*) 'Line length ',l
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
       endif
@@ -189,7 +189,7 @@ c      call ast_grid( plot3d, status )
          write(*,*) buf2( next : next + l)
          write(*,*) 'Line length ',l
          call stopit( status, 'Line overflow in mysink2!!' )
-      else 
+      else
          end = next + l
          buf2( end : next + ll - 1 ) = ' '
       endif
@@ -228,7 +228,7 @@ c      call ast_grid( plot3d, status )
       read( 1, '(A)', end = 99 ) buffer
       call ast_putline( buffer, len( buffer ), status )
       return
- 99   call ast_putline( buffer, -1, status )      
+ 99   call ast_putline( buffer, -1, status )
 
       end
 
@@ -303,7 +303,7 @@ c      call ast_grid( plot3d, status )
          write(*,*) '  21 - Mark mapped position'
          write(*,'(A,$)' ) 'Option: '
          read(*,*) iopt
-  
+
          draw = .true.
          if( iopt .eq. 0 ) then
             draw = .false.
@@ -398,7 +398,7 @@ c      call ast_grid( plot3d, status )
             use_common = .false.
          else if( iopt .eq. 19 ) then
             diag = diag + 1
-            write(*,*) 'Drawing diag ',diag 
+            write(*,*) 'Drawing diag ',diag
 
          else if( iopt .eq. 20 ) then
             write(*,'(A,$)') 'Supply a 2-in, 2-out Mapping (outputs '//
@@ -412,7 +412,7 @@ c      call ast_grid( plot3d, status )
             read(*,*) common_x
             write(*,'(A,$)') 'Value for input 2: '
             read(*,*) common_y
-   
+
          else
             draw = .false.
             write(*,*) 'Bad option ',iopt
@@ -421,7 +421,7 @@ c      call ast_grid( plot3d, status )
          if( draw ) then
             call pgpage
 c            ok = pg3d_findnearest( 8, xc, yc, zc, iclose )
-c            call ast_setc( plot3d, 'RootCorner', corn( iclose + 1 ), 
+c            call ast_setc( plot3d, 'RootCorner', corn( iclose + 1 ),
 c     :                     status )
             call drawit( diag, plot3d, status )
          end if
@@ -474,32 +474,32 @@ c     :                     status )
          lon = pi*210.0/180.0
          if( use_common ) then
             lat = common_par
-         else 
+         else
             lat = pi*25.0/180.0
          endif
 
-         do while( lat .gt. pi ) 
+         do while( lat .gt. pi )
             lat = lat - 2*pi
          end do
 
-         do while( lat .lt. -pi ) 
+         do while( lat .lt. -pi )
             lat = lat + 2*pi
          end do
 
          if( lat .gt. pi/2 ) then
             lat = pi - lat
             lon = lon + pi
-         
+
          else if( lat .lt. -pi/2 ) then
             lat = -pi - lat
             lon = lon + pi
          end if
 
-         do while( lon .gt. 2*pi ) 
+         do while( lon .gt. 2*pi )
             lon = lon - 2*pi
          end do
 
-         do while( lon .lt. 0 ) 
+         do while( lon .lt. 0 )
             lon = lon + 2*pi
          end do
 
@@ -515,13 +515,13 @@ c+  Fig1  (part a)
              call pgsci( 10 )
              call pgscr( 10, 0.0, 0.0, 1.0 )
              call arc( cen, norm, start, -lat, -rd*0.1 )
- 
+
              u(1)=0
              u(2)=0
              u(3)=1
              call s2c( lon, lat/2.2, rd*0.7, r )
              call g3dtext( 'el', r, 'CL', u, norm )
- 
+
              norm(1)=0
              norm(2)=0
              norm(3)=-1
@@ -529,17 +529,17 @@ c+  Fig1  (part a)
              start(2)=0
              start(3)=0
              call arc( cen, norm, start, lon, rd*0.1 )
- 
+
              call s2c( 110.0/180.0*PI, 0.0, rd*0.7, r )
              call g3dtext( 'az', r, 'TC', r, norm )
- 
+
              call pgsci( 1 )
          endif
 
          origin(1) = 0.0
          origin(2) = 0.0
          origin(3) = 0.0
-         call axes( origin, axlen, '(north) u', '(east) v', 
+         call axes( origin, axlen, '(north) u', '(east) v',
      :              '(zenith) w', w1, w2, 'X', 0.0, 0.0, 0.0 )
 
 *  Quadrant from (0,0,1) to (-1,0,0)
@@ -609,7 +609,7 @@ c+ Fig1 - (part b)
          if( diag .eq. 2 ) then
             call pgscr( 10, 0.0, 0.6, 0.0 )
             call s2c( lon, lat, rd, origin )
-            call axes( origin, 0.2*axlen, 'daz', 'del', ' ', w1, w2, 
+            call axes( origin, 0.2*axlen, 'daz', 'del', ' ', w1, w2,
      :                 'ZYZ', lon, (pi/2 - lat), pi/2 )
          endif
 
@@ -618,7 +618,7 @@ c+ Fig2
          if( diag .eq. 3 ) then
             call pgscr( 10, 0.6, 0.6, 0.0 )
             call s2c( lon, lat, rd, origin )
-            call axes( origin, 0.4*axlen, 'UP', 'N', ' ', w1, w2, 
+            call axes( origin, 0.4*axlen, 'UP', 'N', ' ', w1, w2,
      :                 'ZYZ', lon, (pi/2 - lat), lat )
 
 
@@ -644,7 +644,7 @@ c+ Fig3
          if( diag .eq. 4 ) then
             call pgscr( 10, 0.0, 0.0, 1.0 )
             call s2c( lon, lat, rd, origin )
-            do i = 1, 4 
+            do i = 1, 4
                theta = i*5.0*pi/180.0
                cen(1) = cos(theta)*origin(1)
                cen(2) = cos(theta)*origin(2)
@@ -668,7 +668,7 @@ c+ Fig3
 
             call pgscr( 10, 0.0, 1.0, 1.0 )
             call s2c( lon, lat, rd, origin )
-            call axes( origin, 0.2*axlen, 'y', 'x', ' ', w1, w2, 
+            call axes( origin, 0.2*axlen, 'y', 'x', ' ', w1, w2,
      :                 'ZYZ', lon, (pi/2 - lat), lat )
          endif
 
@@ -677,7 +677,7 @@ c+ Fig4
          if( diag .eq. 5 ) then
             call pgscr( 10, 0.0, 0.0, 1.0 )
             call s2c( lon, lat, rd, origin )
-            do i = 1, 4 
+            do i = 1, 4
                theta = i*5.0*pi/180.0
                cen(1) = cos(theta)*origin(1)
                cen(2) = cos(theta)*origin(2)
@@ -701,7 +701,7 @@ c+ Fig4
 
             call pgscr( 10, 0.0, 1.0, 1.0 )
             call s2c( lon, lat, 0.0, origin )
-            call axes( origin, rd, 'b', 'a', 'c', w1, w2, 
+            call axes( origin, rd, 'b', 'a', 'c', w1, w2,
      :                 'ZYZ', lon, (pi/2 - lat), pi/2 + lat )
          endif
 
@@ -709,12 +709,12 @@ c+ Fig5
          if( diag .eq. 6 ) then
             call pgscr( 10, 0.0, 1.0, 1.0 )
             call s2c( lon, lat, 0.0, origin )
-            call axes( origin, rd, 'b', 'a', 'c', w1, w2, 
+            call axes( origin, rd, 'b', 'a', 'c', w1, w2,
      :                 'ZYZ', lon, (pi/2 - lat), pi/2 + lat )
 
 
             call pgscr( 10, 0.0, 0.0, 1.0 )
-            call axes( origin, rd, 'b''', 'a''', 'c''', w1, w2, 
+            call axes( origin, rd, 'b''', 'a''', 'c''', w1, w2,
      :                 'ZYZ', lon, (pi/2 - lat), pi/2 )
 
             call pgsci( 1 )
@@ -741,11 +741,11 @@ c+ Fig6
             call s2c( lon, lat, 0.0, origin )
 
             call pgscr( 10, 0.0, 0.0, 1.0 )
-            call axes( origin, rd, 'b''', 'a''', 'c''', w1, w2, 
+            call axes( origin, rd, 'b''', 'a''', 'c''', w1, w2,
      :                 'ZYZ', lon, (pi/2 - lat), pi )
 
             call pgscr( 10, 0.0, 1.0, 0.0 )
-            call axes( origin, rd, 'b''''', 'a''''', 'c''''', w1, w2, 
+            call axes( origin, rd, 'b''''', 'a''''', 'c''''', w1, w2,
      :                 'ZYZ', lon, 0.0, pi )
 
          endif
@@ -757,28 +757,28 @@ c+ Fig6
          if( diag .eq. 8 ) then
             call pgscr( 10, 0.0, 1.0, 1.0 )
             call s2c( lon, lat, 0.0, origin )
-            call axes( origin, rd, 'a', 'b', 'c', w1, w2, 
+            call axes( origin, rd, 'a', 'b', 'c', w1, w2,
      :                 'ZYZ', 0.0, 0.0, 0.0 )
          end if
 
          if( diag .eq. 9 ) then
             call pgscr( 10, 0.0, 1.0, 1.0 )
             call s2c( lon, lat, 0.0, origin )
-            call axes( origin, rd, 'a', 'b', 'c', w1, w2, 
+            call axes( origin, rd, 'a', 'b', 'c', w1, w2,
      :                 'ZYZ', lon, 0.0, 0.0 )
          end if
 
          if( diag .eq. 10 ) then
             call pgscr( 10, 0.0, 1.0, 1.0 )
             call s2c( lon, lat, 0.0, origin )
-            call axes( origin, rd, 'a', 'b', 'c', w1, w2, 
+            call axes( origin, rd, 'a', 'b', 'c', w1, w2,
      :                 'ZYZ', lon, pi/2-lat, 0.0 )
          end if
 
          if( diag .eq. 11 ) then
             call pgscr( 10, 0.0, 1.0, 1.0 )
             call s2c( lon, lat, 0.0, origin )
-            call axes( origin, rd, 'a', 'b', 'c', w1, w2, 
+            call axes( origin, rd, 'a', 'b', 'c', w1, w2,
      :                 'ZYZ', lon, pi/2-lat, lat )
          end if
 
@@ -795,7 +795,7 @@ c+ Fig6
 c         if( common_map .ne. AST__NULL .and.
 c     ;       common_x .ne. AST__BAD .and.
 c     :       common_y .ne. AST__BAD ) then
-c            call ast_tran2( common_map, 1, common_x, common_y, .true., 
+c            call ast_tran2( common_map, 1, common_x, common_y, .true.,
 c     :                      dlon, dlat, status )
 c            call s2c( real(dlon), real(dlat), rd, cen )
 c            call pgsci( 10 )
@@ -817,7 +817,7 @@ c         end if
       integer np
       parameter( NP = 50 )
       integer i
-      real v1(3), v2( 3 ), v1l, v2l, x(NP), y(NP), z(NP), a, ca, sa, 
+      real v1(3), v2( 3 ), v1l, v2l, x(NP), y(NP), z(NP), a, ca, sa,
      :     t1(3), t2(3), n(3)
       call copy( normal, n )
       call norm( n )
@@ -831,7 +831,7 @@ c         end if
          v1( i ) = v1(i)/v1l
          v2( i ) = v2(i)/v2l
       end do
- 
+
       do i = 1, NP
          a = ang*( i - 1 )/( NP - 1 )
          ca = cos(a)
@@ -851,9 +851,9 @@ c         end if
          x(1) = x(NP) + arrow*( ut(1) - 0.5*ur(1) )
          y(1) = y(NP) + arrow*( ut(2) - 0.5*ur(2) )
          z(1) = z(NP) + arrow*( ut(3) - 0.5*ur(3) )
-         x(2) = x(NP) 
-         y(2) = y(NP) 
-         z(2) = z(NP) 
+         x(2) = x(NP)
+         y(2) = y(NP)
+         z(2) = z(NP)
          x(3) = x(NP) + arrow*( ut(1) + 0.5*ur(1) )
          y(3) = y(NP) + arrow*( ut(2) + 0.5*ur(2) )
          z(3) = z(NP) + arrow*( ut(3) + 0.5*ur(3) )
@@ -867,9 +867,9 @@ c         end if
       k = r*cos(lat)
       p( 1 ) = k*cos(lon)
       p( 2 ) = k*sin(lon)
-      end 
+      end
 
-      subroutine axes( origin, axlen, tx, ty, tz, w1, w2, order, phi, 
+      subroutine axes( origin, axlen, tx, ty, tz, w1, w2, order, phi,
      :                 theta, psi )
       implicit none
       character order*(*),tx*(*), ty*(*), tz*(*)
@@ -922,7 +922,7 @@ cc* X axis with arrow and label
          n(1) = 0.0
          n(2) = sn
          n(3) = 0.0
-      
+
          call pgslw( w2 )
          call mxv2( mat, r, .true., origin )
          call g3dtext( tx, r, 'BR', u, n )
@@ -958,7 +958,7 @@ c* Y axis with arrow and label
          n(1) = sn
          n(2) = 0.0
          n(3) = 0.0
-      
+
          call pgslw( w2 )
          call mxv2( mat, r, .true., origin )
          call g3dtext( ty, r, 'BR', u, n )
@@ -994,7 +994,7 @@ c* Z axis with arrow and label
          n(1) = 0.0
          n(2) = 0.0
          n(3) = 0.0
-      
+
          call pgslw( w2 )
          call mxv2( mat, r, .true., origin )
          call g3dtext( tz, r, 'CR', u, n )
@@ -1014,7 +1014,7 @@ c* Z axis with arrow and label
          x(i) = vb(1) + origin(1)
          y(i) = vb(2) + origin(2)
          z(i) = vb(3) + origin(3)
-      end do       
+      end do
       end
 
       subroutine mxv2( mat, r, move, origin )
@@ -1037,7 +1037,7 @@ c* Z axis with arrow and label
       implicit none
       character order*(*)
       double precision phi, theta, psi, rmat(3,3), t(3), smat(3,3)
-      double precision ang, v(3), ux(3), uy(3), uz(3), tmat(3,3), 
+      double precision ang, v(3), ux(3), uy(3), uz(3), tmat(3,3),
      :                 axvec(3)
       integer n, i, j
       n = len( order )
@@ -1259,23 +1259,23 @@ c* Z axis with arrow and label
          mmt( 2 ) = -1.0
          tmap = ast_MatrixMap( 2, 2, 1, mmt, ' ', status )
 
-*  Note, sla_deuler groups columns in the returned matrix, but slaDeuler 
-*  groups rows. AST always expects rows to be grouped, so transpose the 
+*  Note, sla_deuler groups columns in the returned matrix, but slaDeuler
+*  groups rows. AST always expects rows to be grouped, so transpose the
 *  matrices returned by sla_deuler.
          call sla_Deuler( 'Z', -rot, 0.0D0, 0.0D0, mat1 )
          call trans( mat1 )
          m1 = ast_MatrixMap( 3, 3, 0, mat1, ' ', status )
 
-         call sla_Deuler( 'Y', (PIBY2-lat), 0.0D0, 0.0D0, mat1 ) 
+         call sla_Deuler( 'Y', (PIBY2-lat), 0.0D0, 0.0D0, mat1 )
          call trans( mat1 )
          m2 = ast_MatrixMap( 3, 3, 0, mat1, ' ', status )
 
-         call sla_Deuler( 'Z', (lon-PI), 0.0D0, 0.0D0, mat1 ) 
+         call sla_Deuler( 'Z', (lon-PI), 0.0D0, 0.0D0, mat1 )
          call trans( mat1 )
          m3 = ast_MatrixMap( 3, 3, 0, mat1, ' ', status )
 
-         matmap1 = ast_CmpMap( m1, ast_CmpMap( m2, m3, .true., ' ', 
-     :                                         status ), 
+         matmap1 = ast_CmpMap( m1, ast_CmpMap( m2, m3, .true., ' ',
+     :                                         status ),
      :                         .TRUE., ' ', status )
 
          mat2( 1 ) = 1.0
@@ -1290,24 +1290,24 @@ c* Z axis with arrow and label
 
       else
 
-*  Note, sla_deuler groups columns in the returned matrix, but slaDeuler 
-*  groups rows. AST always expects rows to be grouped, so transpose the 
+*  Note, sla_deuler groups columns in the returned matrix, but slaDeuler
+*  groups rows. AST always expects rows to be grouped, so transpose the
 *  matrices returned by sla_deuler.
          call sla_Deuler( 'Z', rot, 0.0D0, 0.0D0, mat1 )
          call trans( mat1 )
          m1 = ast_MatrixMap( 3, 3, 0, mat1, ' ', status )
 
-         call sla_Deuler( 'Y', -(PIBY2-lat), 0.0D0, 0.0D0, mat1 ) 
+         call sla_Deuler( 'Y', -(PIBY2-lat), 0.0D0, 0.0D0, mat1 )
          call trans( mat1 )
          m2 = ast_MatrixMap( 3, 3, 0, mat1, ' ', status )
 
-         call sla_Deuler( 'Z', -lon, 0.0D0, 0.0D0, mat1 ) 
+         call sla_Deuler( 'Z', -lon, 0.0D0, 0.0D0, mat1 )
          call trans( mat1 )
          m3 = ast_MatrixMap( 3, 3, 0, mat1, ' ', status )
 
 
-         matmap1 = ast_CmpMap( m1, ast_CmpMap( m2, m3, .true., ' ', 
-     :                                         status ), 
+         matmap1 = ast_CmpMap( m1, ast_CmpMap( m2, m3, .true., ' ',
+     :                                         status ),
      :                         .TRUE., ' ', status )
 
          m1 = ast_CmpMap( c1, matmap1, .true., ' ', status )
@@ -1335,7 +1335,7 @@ c* Z axis with arrow and label
 
       subroutine trans( mat )
       implicit none
-      double precision t, mat(9)     
+      double precision t, mat(9)
 
       t = mat(8)
       mat(8) = mat(6)

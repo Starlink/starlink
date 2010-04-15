@@ -1,6 +1,6 @@
 proc qmanCheckEntry {w description} {
 #+
-#  Checks that the contents of an entry widget are a valid 
+#  Checks that the contents of an entry widget are a valid
 #-
 
 # Get the contents of the widget.

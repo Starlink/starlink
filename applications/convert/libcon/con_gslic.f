@@ -128,7 +128,7 @@
                TAIL = NAME( STOP + 1 : )
             ELSE
                TAIL = ' '
-            END IF      
+            END IF
 
 *  Move it so that it starts where the slice specifier used to start.
             NAME( START : ) = TAIL

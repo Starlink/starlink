@@ -1,12 +1,12 @@
       SUBROUTINE JTY_POLYC(NC,SCALE,COEFF,PCOEFF)
-C Routine to convert coefficients of a 1-d Legendre polynomial to 
+C Routine to convert coefficients of a 1-d Legendre polynomial to
 C coefficients of a plain polynomial.
 C The NC coefficients are stored with the low order coefficient first.
 C
 C History:  Original version J. Tonry.
 C Modified: TDCA 18-FEB-1999. Size of COEFF and PCOEFF arrays changed
 C           from 1 to 3. Minor style changes.
-C Modified: TDCA 19-MAY-1999. Intermediate steps added to some 
+C Modified: TDCA 19-MAY-1999. Intermediate steps added to some
 C           calculations to avoid rounding errors.
 
       IMPLICIT NONE
@@ -36,7 +36,7 @@ C     Functions used
           TEMP = 0D0
           TEMP2 = 0.0
           DO I = K,NC-1
-              PRODUCT = PCOEFF(I+1) * SC(1)**I * 
+              PRODUCT = PCOEFF(I+1) * SC(1)**I *
      :        (-SC(2))**(I-K) * DFLOAT(JTY_IBC(K,I))
               TEMP3 = PCOEFF(I+1) * SC(1)**I * (-SC(2))**(I-K)
               TEMP3 = TEMP3 * DFLOAT(JTY_IBC(K,I))

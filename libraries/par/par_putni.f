@@ -3,21 +3,21 @@
 *+
 *  Name:
 *     PAR_PUTNx
- 
+
 *  Purpose:
 *     Puts an array of values into a parameter.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PAR_PUTNx ( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )
- 
+
 *  Description:
 *     This routine puts an n-dimensional array of values into a
 *     parameter.  If necessary, the specified array is converted to
 *     the type of the parameter.
- 
+
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter name.
@@ -36,7 +36,7 @@
 *        unlikely to be different from MAXD.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each of the data types character,
 *     double precision, integer, logical, and real: replace "x" in the
@@ -49,10 +49,10 @@
 *     behaviour, and how to avoid it, is discussed further in the
 *     Interface Module Reference Manual (SUN/115).
 *     -  Limit checks for IN, RANGE, MIN/MAX are not applied.
- 
+
 *  Algorithm:
 *     Call the underlying parameter-system primitives.
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1988, 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,7 +78,7 @@
 *     BDK: B D Kelly (REVAD::BDK)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     18-NOV-1984 (BDK):
 *        Original version.
@@ -93,43 +93,43 @@
 *      9-NOV-1998 (AJC):
 *        Correct description of ACTD
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER NDIM
       INTEGER MAXD( * )
       INTEGER VALUES( * )
- 
+
 *  Arguments Returned:
       INTEGER ACTD( * )
- 
+
 *  Status:
       INTEGER STATUS              ! Global status
- 
+
 *  Local Variables:
       INTEGER NAMCOD              ! Pointer to the parameter
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Find the parameter-system pointer to the internal parameter space
 *  associated with the parameter.
       CALL SUBPAR_FINDPAR( PARAM, NAMCOD, STATUS )
- 
+
 *  Use the pointer to put the array of values into the parameter.
       CALL SUBPAR_PUTNI( NAMCOD, NDIM, MAXD, VALUES, ACTD, STATUS )
- 
+
       END

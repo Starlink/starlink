@@ -16,11 +16,11 @@
 *     the catalogue file name, the back-end type and any extra
 *     information.
 *
-*     This routine parses a combined catalogue name in order to 
+*     This routine parses a combined catalogue name in order to
 *     determine the catalogue file name, the catalogue name,
-*     the type of the catalogue (that is, format of the catalogue and 
-*     hence the back-end to be used to access it: FITS, ADC, CHI etc.) 
-*     and any extra back-end specific information.  The full catalogue 
+*     the type of the catalogue (that is, format of the catalogue and
+*     hence the back-end to be used to access it: FITS, ADC, CHI etc.)
+*     and any extra back-end specific information.  The full catalogue
 *     name comprises four components:
 *
 *      *  the directory specification,
@@ -32,16 +32,16 @@
 *     The components occur in this order.  Of the four, only the
 *     actual name of the catalogue is mandatory.  The actual name of
 *     the catalogue is the same as the name of the file which
-*     instantiates it, without any file type.  The file type is used to 
-*     define the catalogue back-end type.  For example, FITS catalogue 
+*     instantiates it, without any file type.  The file type is used to
+*     define the catalogue back-end type.  For example, FITS catalogue
 *     MYCAT would be held as file MYCAT.FIT.
 *
 *     Both VMS and unix directory specifications are supported.  VMS
 *     directory specifications may be logical names as well as absolute
 *     specifications.
 *
-*     Every catalogue back-end type supported by CAT has an 
-*     identifying file type associated with it.  The file types for the 
+*     Every catalogue back-end type supported by CAT has an
+*     identifying file type associated with it.  The file types for the
 *     various back-ends are:
 *
 *        file type  back-end type
@@ -81,7 +81,7 @@
 *     BCKTYP  =  INTEGER (Returned)
 *         Code for the back-end type.
 *     EXTRA  =  CHARACTER*(*) (Returned)
-*         Optional extra information necessary to identify the 
+*         Optional extra information necessary to identify the
 *         catalogue.  This information is back-end specific.
 *     STATUS  =  INTEGER (Given and Returned)
 *        The global status.
@@ -109,12 +109,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -197,7 +197,7 @@
          IF (CNAME .NE. ' ') THEN
 
 *
-*          Take a copy of the combined name and remove any leading 
+*          Take a copy of the combined name and remove any leading
 *          blanks.
 
             CNAMEC = CNAME
@@ -341,7 +341,7 @@
                   STATUS = CAT__INVCN
 
                END IF
-   
+
             ELSE
                CATTYP = 'FIT'
                BCKTYP = CAT1__BKFIT
@@ -366,7 +366,7 @@
                EXTRA = ' '
 
             END IF
-               
+
 *
 *          If all is ok then assemble the full file specification.
 

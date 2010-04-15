@@ -1,7 +1,7 @@
       SUBROUTINE CCD1_TRAN( NDF, NNDF, NIN, INGRP, CFRAME, FRCUR,
-     :                      NVAR, GETS, GETZ, SCALE, ZERO, 
+     :                      NVAR, GETS, GETZ, SCALE, ZERO,
      :                      STATUS )
-      
+
 *+
 *  Name:
 *     CCD1_TRAN
@@ -18,7 +18,7 @@
 *  Description:
 *     Cut down version of TRANNDF (does nearest neighbour only). It produces
 *     a bunch of NDFs which are then run though the oberlap code, ripped
-*     directly from MAKEMOS, which calculates the SCALE and ZERo point 
+*     directly from MAKEMOS, which calculates the SCALE and ZERo point
 *     corrections for the input frames. The transformed frames are then
 *     deleted.
 
@@ -45,7 +45,7 @@
 *        Scale factor correction
 *     ZERO( CCD1__MXNDF + 1 ) =  DOUBLE PRECISION (Returned)
 *        Zero point correction
-*     STATUS =    INTEGER (Given & Returned) 
+*     STATUS =    INTEGER (Given & Returned)
 *        Global status
 
 *  Copyright:
@@ -103,20 +103,20 @@
 *  Global Variables
       INCLUDE 'CCD1_MOSCM'       ! Global variables for MAKEMOS & DRIZZLE
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       INTEGER INGRP             ! ID for group of input NDFs
       INTEGER NNDF              ! total number of NDFs
       INTEGER NIN               ! number of input NDFs
       INTEGER NVAR              ! number of NDFs with variances
-      
+
       INTEGER NDF( NNDF )       ! pointers to the NDFs
       INTEGER CFRAME( NNDF )    ! index of the current AST frame
       INTEGER FRCUR( NNDF )     ! pointer to the current AST frame
-      
+
       LOGICAL GETS              ! Do scaling?
       LOGICAL GETZ              ! Do zero-point correction?
-      
+
 *  Arguments Returned:
       DOUBLE PRECISION SCALE( CCD1__MXNDF + 1 )  ! Scale factor correction
       DOUBLE PRECISION ZERO( CCD1__MXNDF + 1 )   ! Zero point correction
@@ -127,7 +127,7 @@
 *  Local constants
       INTEGER NACOMP             ! Number NDF array components
       PARAMETER ( NACOMP = 3 )
-      
+
 *  Local Variables:
       CHARACTER * ( 8 ) COMP( NACOMP ) ! NDF array component names
       CHARACTER * ( AST__SZCHR ) DMN ! Domain of frame
@@ -159,7 +159,7 @@
       INTEGER IUBND( NDF__MXDIM )  ! upper bounds of the input NDF
       INTEGER IWCS                 ! pointer to the input NDF WCS component
       INTEGER J                    ! just another loop counter (output dim)
-      INTEGER JPIX                 ! pointer to the PIXEL frame      
+      INTEGER JPIX                 ! pointer to the PIXEL frame
       INTEGER K                    ! loop counter around the FrameSet
       INTEGER LBND( NDF__MXDIM , CCD1__MXNDF ) ! NDF lower bounds
       INTEGER LBNDX( NDF__MXDIM ) ! Minimum (overall) lower bound
@@ -180,14 +180,14 @@
       INTEGER NMAX                 ! Maximum possible dimension of workspace
       INTEGER NPIX( CCD1__MXCMP )  ! Number of intersecting pixels
       INTEGER NVIN                 ! number of input variables in the map
-      INTEGER NVOUT                ! number of output variables in the map 
+      INTEGER NVOUT                ! number of output variables in the map
       INTEGER ODIMS( NDF__MXDIM )  ! Dimensions of the output NDF
       INTEGER OPNTR( 2 )           ! Pointers to the output arrays
       INTEGER OPNTRW               ! Pointer to the workspace for flux conserv
       INTEGER OPTOV                ! Optimum number of NDF overlaps
       INTEGER OLBND( NDF__MXDIM )  ! Lower bounds of the output NDF
       INTEGER OUBND( NDF__MXDIM )  ! Upper bounds of the output NDF
-      INTEGER OUTGRP               ! ID for the output group   
+      INTEGER OUTGRP               ! ID for the output group
       INTEGER OUT( NNDF )          ! pointers to the temporary output NDFs
       INTEGER UBND( NDF__MXDIM, CCD1__MXNDF ) ! NDF upper bounds
       INTEGER UBNDX( NDF__MXDIM )  ! Maximum (overall) upper bound
@@ -200,9 +200,9 @@
       INTEGER WRK3                 ! Workspace pointer
       INTEGER WRK4                 ! Workspace pointer
       INTEGER WRK5                 ! Workspace pointer
-        
+
       DOUBLE PRECISION AEND( NDF__MXDIM )   ! End co-ord of each axis
-      DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start co-ord of each axis 
+      DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start co-ord of each axis
       DOUBLE PRECISION DDLBND( NDF__MXDIM ) ! Data coord lower bnds of out NDF
       DOUBLE PRECISION DDUBND( NDF__MXDIM ) ! Data coord upper bnds of out NDF
       DOUBLE PRECISION DDXL( NDF__MXDIM ) ! Co-ord of input pnt gives lower bnd
@@ -211,12 +211,12 @@
       DOUBLE PRECISION DZERO( CCD1__MXNDF + 1 ) ! Zero point error
       DOUBLE PRECISION FLUX               ! Flux conservation factor
       DOUBLE PRECISION ORIGIN( CCD1__MXNDF + 1 ) ! False origin value
-      
+
 
       REAL TOLS                  ! Fraction scale factor tolerance
       REAL TOLZ                  ! Zero point tolerance
       REAL SKYSUP                ! Sky noise suppression factor
-      
+
       LOGICAL CMPVAR      ! Use variance in inter-comparisons?
       LOGICAL CONSRV      ! If true, the flux will be altered
       LOGICAL THERE       ! If true, the array component is present in the NDF
@@ -225,12 +225,12 @@
 
 *  Local Data:
       DATA COMP / 'Data', 'Variance', 'Quality' /
-      
+
 *  External references
       EXTERNAL VAL_DTOI      ! INTEGER to DOUBLE with exception checking
       INTEGER VAL_DTOI       ! DBLE to nearest INTEGER with exception checking
       INTEGER CHR_LEN        ! Significant length of a string
-                 
+
 *.
 
 *  Check inherited global status.
@@ -238,15 +238,15 @@
 
 *  And get the names of the corresponding output NDFs.
       CALL CCD1_NDFPG( 'TMPFILE', INGRP, NNDF, OUTGRP, STATUS )
-      
-*  Start the routine      
-      CALL CCD1_MSG( ' ',  ' ', STATUS )          
+
+*  Start the routine
+      CALL CCD1_MSG( ' ',  ' ', STATUS )
       CALL CCD1_MSG( ' ',
      :   '    NDF remapping for intercomparison:', STATUS )
       CALL CCD1_MSG( ' ',
      :   '    ---------------------------------', STATUS )
       CALL CCD1_MSG( ' ',
-     :   '    Data resampling method: Nearest neighbour', STATUS )     
+     :   '    Data resampling method: Nearest neighbour', STATUS )
 
 *=======================================================================
 *  1st Main Code Block -- Transform the input NDFs
@@ -262,7 +262,7 @@
          CALL MSG_SETI( 'MAX_NUM', NIN )
          CALL CCD1_MSG( ' ', '    (Number ^CURRENT_NUM of ^MAX_NUM)',
      :                  STATUS )
-         CALL CCD1_MSG( ' ',  ' ', STATUS )          
+         CALL CCD1_MSG( ' ',  ' ', STATUS )
 
 *  Get pointer to the NDF
          CALL CCD1_GTWCS( NDF( I ), IWCS, STATUS )
@@ -272,10 +272,10 @@
          NFRM = AST_GETI( IWCS, 'Nframe', STATUS )
          DO K = 1, NFRM
             FRM = AST_GETFRAME( IWCS, K, STATUS )
-            IF( AST_GETC( FRM, 'Domain', STATUS ) 
+            IF( AST_GETC( FRM, 'Domain', STATUS )
      :          .EQ. 'PIXEL' ) JPIX = K
          END DO
-      
+
 *  Get the current mapping
          MAPCUR = AST_GETMAPPING( IWCS, JPIX, CFRAME( I ), STATUS )
          MAPCUR = AST_SIMPLIFY( MAPCUR, STATUS )
@@ -295,18 +295,18 @@
 
 *  Obtain the number of input and output co-ordinates for a Mapping
          NVIN = AST_GETI( MAPCUR, 'Nin', STATUS )
-         NVOUT = AST_GETI( MAPCUR, 'Nout', STATUS ) 
+         NVOUT = AST_GETI( MAPCUR, 'Nout', STATUS )
 
-         
+
 *  Get the properties of the NDF.
 *  ==============================
 *  Dimensions.
          CALL NDF_DIM( NDF( I ), NDF__MXDIM, IDIMS, NDIMI, STATUS )
 
 *  Bounds.
-         CALL NDF_BOUND( NDF( I ), NDF__MXDIM, ILBND, IUBND, NDIMI, 
+         CALL NDF_BOUND( NDF( I ), NDF__MXDIM, ILBND, IUBND, NDIMI,
      :                   STATUS )
-                     
+
          IF ( STATUS .NE. SAI__OK ) GO TO 940
 
 *  Validate dimensions and number of input coordinates.
@@ -339,7 +339,7 @@
             CALL CCD1_MALL( AEL( IAXIS ), '_DOUBLE', AXPNTR( IAXIS ),
      :                      STATUS )
             CALL CCG1_AXIND( ILBND( IAXIS ), IUBND( IAXIS ),
-     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ), 
+     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ),
      :                       STATUS )
          END DO
 
@@ -354,20 +354,20 @@
          DO IAXIS = 1, NVIN
             ASTART( IAXIS ) = DBLE( ILBND( IAXIS ) )
             AEND( IAXIS ) = DBLE( IUBND( IAXIS ) )
-         END DO         
-         
+         END DO
+
 *  Use test points at the extremes and midpoints of each axis to obtain
 *  an estimate of the extent of the output NDF's coordinates.  This
 *  assumes that the transformation does not move the innards of the
-*  input array to the outside of the output array.         
+*  input array to the outside of the output array.
          DO IAXIS = 1, NVIN
             CALL AST_MAPBOX( MAPCUR, ASTART, AEND, .TRUE., IAXIS,
-     :                       DDLBND(IAXIS), DDUBND(IAXIS), DDXL, 
+     :                       DDLBND(IAXIS), DDUBND(IAXIS), DDXL,
      :                       DDXU, STATUS )
-         END DO                
-         
+         END DO
+
 *  Set the bounds of the temporary output NDF
-*  ==========================================         
+*  ==========================================
 
 *  Autosize the output NDF.
          DO IAXIS = 1, NVOUT
@@ -375,14 +375,14 @@
      :                       DDLBND( IAXIS ) - 0.5D0, STATUS )
             OUBND( IAXIS ) = VAL_DTOI( .FALSE., DDUBND( IAXIS ),
      :                       STATUS )
-         END DO         
+         END DO
 
 *  Derive the output NDF's dimensions.
          DO IAXIS = 1, NVOUT
             ODIMS( IAXIS ) = OUBND( IAXIS ) - OLBND( IAXIS ) + 1
          END DO
-         IF ( STATUS .NE. SAI__OK ) GO TO 940         
-         
+         IF ( STATUS .NE. SAI__OK ) GO TO 940
+
 *  Create a concatenated input axis array.
 *  =======================================
 *
@@ -396,7 +396,7 @@
          CADIMS( 1 ) = 0
          DO IAXIS = 1, NVIN
            CADIMS( 1 ) = CADIMS( 1 ) + AEL( IAXIS )
-         END DO         
+         END DO
 
 *  Create some workspace for the concatenated array.
          CALL CCD1_MALL( CADIMS( 1 ), '_DOUBLE', CAXPTR, STATUS )
@@ -406,7 +406,7 @@
             ADIMS( IAXIS ) = 1
             CADIMS( IAXIS ) = 1
             AXOFFS( IAXIS ) = 0
-         END DO         
+         END DO
 
          AXOFFS( 1 ) = 0
 
@@ -414,19 +414,19 @@
          DO IAXIS = 1, NVIN
 
 *  Assign the axis dimension.
-            ADIMS( 1 ) = AEL( IAXIS ) 
-                    
+            ADIMS( 1 ) = AEL( IAXIS )
+
 *  Paste each axis into the work array.
             CALL KPG1_PASTD( .FALSE., .TRUE., AXOFFS, ADIMS, ADIMS( 1 ),
-     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ), 
+     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ),
      :                       CADIMS,
-     :                       CADIMS( 1 ), %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                       CADIMS( 1 ), %VAL( CNF_PVAL( CAXPTR ) ),
      :                       STATUS )
 
 *  Increment the offsets for the next axis.
             AXOFFS( 1 ) = AXOFFS( 1 ) + AEL( IAXIS )
-         END DO         
-         
+         END DO
+
 *  Tidy the axis centres.
 *  ======================
          DO IAXIS = 1, NVIN
@@ -437,11 +437,11 @@
 *  ======================
          CALL NDG_NDFPR( NDF( I ), 'Axis,Units', OUTGRP, I, OUT( I ),
      :                   STATUS )
-            
+
 *  Tell user the name of the output NDF.
          CALL NDF_MSG( 'TMPNDF', OUT( I ) )
          CALL CCD1_MSG( ' ', '    Temporary NDF: ^TMPNDF', STATUS )
-                 
+
 *  Format and display the pixel index bounds of the input NDF.
       DO  IAXIS = 1, NVIN
          IF ( IAXIS .NE. 1 ) CALL MSG_SETC( 'BOUNDS', ',' )
@@ -450,7 +450,7 @@
          CALL MSG_SETI( 'BOUNDS', IUBND( IAXIS ) )
       END DO
       CALL CCD1_MSG( ' ',
-     :   '    Pixel bounds of input file: (^BOUNDS)', STATUS )         
+     :   '    Pixel bounds of input file: (^BOUNDS)', STATUS )
 
 *  Format and display the pixel index bounds of the output NDF.
       DO  IAXIS = 1, NVOUT
@@ -460,17 +460,17 @@
          CALL MSG_SETI( 'BOUNDS', OUBND( IAXIS ) )
       END DO
       CALL CCD1_MSG( ' ',
-     :   '    Pixel bounds of output mosaic: (^BOUNDS)', STATUS )             
-         
+     :   '    Pixel bounds of output mosaic: (^BOUNDS)', STATUS )
+
 *  Change its shape to the required output shape.
       CALL NDF_SBND( NDIMI, OLBND, OUBND, OUT( I ), STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 940   
+      IF ( STATUS .NE. SAI__OK ) GO TO 940
 
 *  No flux conservation.
       FLUX = 1.0D0
       CONSRV = .FALSE.
-      CALL CCD1_MSG( ' ', '    Flux is not conserved', STATUS )      
-      
+      CALL CCD1_MSG( ' ', '    Flux is not conserved', STATUS )
+
 *  Resample using the nearest-neighbour technique.
 *  ===============================================
 
@@ -486,8 +486,8 @@
      :                      STATUS )
             WDIMS( 2 ) = NDIMI
             CALL CCD1_MALL( WDIMS( 1 ) * WDIMS( 2 ), '_DOUBLE', WPNTR3,
-     :                      STATUS )        
-                  
+     :                      STATUS )
+
 *  Get workspace to hold the indices of the nearest neighbours. There
 *  is one for each output array element.
             EL = 1
@@ -495,23 +495,23 @@
                EL = EL * ODIMS( J )
             END DO
             CALL CCD1_MKTMP( EL, '_INTEGER', INDID, STATUS )
-            CALL CCD1_MPTMP( INDID, 'WRITE', INPNTR, STATUS )      
-      
+            CALL CCD1_MPTMP( INDID, 'WRITE', INPNTR, STATUS )
+
 *  Generate the list of vector indices for the resampling.
-            CALL CCG1_ASPID( NDIMI, IDIMS, MAPCUR, 
+            CALL CCG1_ASPID( NDIMI, IDIMS, MAPCUR,
      :                       %VAL( CNF_PVAL( CAXPTR ) ),
      :                       WDIMS( 1 ), NVOUT, OLBND, ODIMS,
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ),
      :                       %VAL( CNF_PVAL( WPNTR3 ) ),
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ),
      :                       %VAL( CNF_PVAL( INPNTR ) ),
-     :                       STATUS )        
+     :                       STATUS )
 
 *  Free the workspace that is no longer needed.
             CALL CCD1_MFREE( WPNTR1, STATUS )
             CALL CCD1_MFREE( WPNTR2, STATUS )
-            CALL CCD1_MFREE( WPNTR3, STATUS )      
-      
+            CALL CCD1_MFREE( WPNTR3, STATUS )
+
 *  Apply the transformation with n-n resampling.
 *  =============================================
 *  Loop through all the components.
@@ -522,82 +522,82 @@
                   CALL NDF_STATE( NDF(I), COMP( ICOMP ), THERE, STATUS )
                ELSE
                   THERE = .TRUE.
-               END IF     
-            
+               END IF
+
 *  Can only process when the array component is present.
                IF ( THERE ) THEN
 
 *  Get the type of the array.
-                  CALL NDF_TYPE( NDF(I), COMP( ICOMP ), ITYPE, STATUS )      
+                  CALL NDF_TYPE( NDF(I), COMP( ICOMP ), ITYPE, STATUS )
 
 *  Map the input and output arrays.
                   CALL NDF_MAP( NDF(I), COMP( ICOMP ), ITYPE, 'READ',
      :                          IPNTR, ELIN, STATUS )
                   CALL NDF_MAP( OUT(I), COMP( ICOMP ), ITYPE,
-     :                          'WRITE/BAD', OPNTR, ELOUT, STATUS )      
+     :                          'WRITE/BAD', OPNTR, ELOUT, STATUS )
 
 *  No flux conservation (we don't care) so use the same pointer and
-*  save some workspace. See TRANNDF (line 1099) for details of what 
-*  happens when we do care about flux conservation.  
-                  OPNTRW = OPNTR( 1 )   
-                  
+*  save some workspace. See TRANNDF (line 1099) for details of what
+*  happens when we do care about flux conservation.
+                  OPNTRW = OPNTR( 1 )
+
 *  Perform the transformation on the data array for the numeric data
 *  type.  First for a byte array
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL KPG1_VASVB( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVB( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL KPG1_VASVD( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVD( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                     CALL KPG1_VASVI( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVI( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                     CALL KPG1_VASVR( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVR( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
 *  Transform an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL KPG1_VASVUB( ELOUT, 
+                     CALL KPG1_VASVUB( ELOUT,
      :                                 %VAL( CNF_PVAL( INPNTR ) ), ELIN,
      :                                 %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                 %VAL( CNF_PVAL( OPNTRW ) ),
      :                                 NBAD, STATUS )
 
 *  Transform an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL KPG1_VASVUW( ELOUT, 
+                     CALL KPG1_VASVUW( ELOUT,
      :                                 %VAL( CNF_PVAL( INPNTR ) ), ELIN,
      :                                 %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                 %VAL( CNF_PVAL( OPNTRW ) ),
      :                                 NBAD, STATUS )
 
 *  Transform a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                     CALL KPG1_VASVW( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+                     CALL KPG1_VASVW( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
      :                                ELIN,
      :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
-     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
-                  END IF                  
+                  END IF
 
 *  Unmap the output array.
                   CALL NDF_UNMAP( OUT( I ), COMP( ICOMP ), STATUS )
@@ -608,16 +608,16 @@
             END DO
 
 *  Free the workspace holding the resampled vector indices.
-            CALL CCD1_FRTMP( INDID, STATUS )                  
+            CALL CCD1_FRTMP( INDID, STATUS )
 
 *  Free concatenated axes workspace.
-         CALL CCD1_MFREE( CAXPTR, STATUS )             
-        
+         CALL CCD1_MFREE( CAXPTR, STATUS )
+
 *=======================================================================
 *  End of 1st Main Code Block
-*======================================================================= 
+*=======================================================================
 1     CONTINUE
-      CALL CCD1_MSG( ' ',  ' ', STATUS )          
+      CALL CCD1_MSG( ' ',  ' ', STATUS )
 
 *  We have now created a bunch of temporary NDFs, OUT(*), which have been
 *  rotated, or squashed, or whatever. We now need to calculate the overlaps
@@ -625,7 +625,7 @@
 
 *=======================================================================
 *  2nd Main Code Block  -- Calculate overlaps and SCALE and ZERO
-*======================================================================= 
+*=======================================================================
 
 *  Loop through the NDFs
       DO 3 I = 1, NIN
@@ -655,11 +655,11 @@
  2       CONTINUE
          IF ( STATUS .NE. SAI__OK ) GO TO 940
  3    CONTINUE
-      
+
       VAR = .FALSE.
       IF ( CCD1_IREF .NE. 0 ) CALL NDF_STATE( NDF( CCD1_IREF ),
-     :                                   'Variance', VAR, STATUS ) 
- 
+     :                                   'Variance', VAR, STATUS )
+
 *  If at least two of the NDFs supplied (including an additional
 *  reference NDF, if given) contain variance information, then see if
 *  variance values should be used when inter-comparing NDFs. Otherwise,
@@ -668,14 +668,14 @@
      :        ( ( NVAR .EQ. 1 ) .AND. VAR ) ) THEN
          CALL PAR_GET0L( 'CMPVAR', CMPVAR, STATUS )
       END IF
-      
-      IF ( STATUS .NE. SAI__OK ) GO TO 940 
- 
+
+      IF ( STATUS .NE. SAI__OK ) GO TO 940
+
 *  If inter-comparisons will be made, then obtain the optimum number of
 *  overlaps to be used per input NDF.
       CALL PAR_GDR0I( 'OPTOV', 3, 1, CCD1__MXNDF, .FALSE., OPTOV,
      :                   STATUS )
- 
+
 *  See if any inter-comparisons to be made between the input NDFs may
 *  involve iteration. If so, then obtain the required accuracy
 *  tolerances and the maximum number of iterations to allow.
@@ -703,8 +703,8 @@
          CALL PAR_GDR0R( 'SKYSUP', 10.0 ** ( 0.5 * NDIMS ), 0.0,
      :                   NUM__MAXR, .FALSE., SKYSUP, STATUS )
       END IF
-      IF ( STATUS .NE. SAI__OK ) GO TO 940 
- 
+      IF ( STATUS .NE. SAI__OK ) GO TO 940
+
 *  Determine which input NDFs to inter-compare.
 *  ===========================================
 *  If corrections are to be made, then allocate workspace and obtain a
@@ -720,7 +720,7 @@
          NCMP0 = NCMP
          CALL PSX_CALLOC( NCMP0, '_INTEGER', WRK2, STATUS )
          CALL CCD1_PRUNE( OPTOV, NCMP0, CCD1_IPAIR, NPIX, NNDF,
-     :                       %VAL( CNF_PVAL( WRK1 ) ), NCMP, 
+     :                       %VAL( CNF_PVAL( WRK1 ) ), NCMP,
      :                    %VAL( CNF_PVAL( WRK2 ) ), STATUS )
          CALL PSX_FREE( WRK2, STATUS )
       END IF
@@ -742,8 +742,8 @@
          GOTO 940
          END IF
       END IF
-      IF ( STATUS .NE. SAI__OK ) GO TO 940 
- 
+      IF ( STATUS .NE. SAI__OK ) GO TO 940
+
 *  Display general information about the inter-comparisons to be made.
 *  ==================================================================
 *  Display a heading.
@@ -847,8 +847,8 @@
          CALL CCD1_MSG( ' ',
      :'      Reference NDF: ^NDFREF (^STATE)', STATUS )
       END IF
-      IF ( STATUS .NE. SAI__OK ) GO TO 940 
- 
+      IF ( STATUS .NE. SAI__OK ) GO TO 940
+
 
 *  Inter-compare the NDFs in pairs to determine their zero point and/or
 *  scale factor differences. Update the number of inter-comparisons to
@@ -940,8 +940,8 @@
 *  additional reference NDF, if provided.
       CALL CCD1_SZSLV( GETS, GETZ, NNDF, NCMP, NMAX, SCALE, DSCALE,
      :                 ZERO, DZERO, ORIGIN, %VAL( CNF_PVAL( WRK1 ) ),
-     :                 %VAL( CNF_PVAL( WRK2 ) ), 
-     :                 %VAL( CNF_PVAL( WRK3 ) ), 
+     :                 %VAL( CNF_PVAL( WRK2 ) ),
+     :                 %VAL( CNF_PVAL( WRK3 ) ),
      :                 %VAL( CNF_PVAL( WRK4 ) ),
      :                 %VAL( CNF_PVAL( WRK5 ) ), STATUS )
 
@@ -1001,14 +1001,14 @@
      :'                              * = Reference NDF', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 940
-      
+
       DO I = 1, NIN
          ZERO( I ) = ZERO( I ) - SCALE( I ) * ORIGIN( I )
       END DO
- 
+
 *=======================================================================
 *  End of 2nd Main Code Block
-*======================================================================= 
+*=======================================================================
 
 * We've now generated the scaling and zero-point corrections, all that
 * remains is to delete the temporary NDFs
@@ -1020,8 +1020,8 @@
 *  Jump to here on error
 940   CONTINUE
       CALL CCD1_GRDEL( OUTGRP, STATUS )
-      
-*  Time at the bar please...      
+
+*  Time at the bar please...
 999   END
 
 

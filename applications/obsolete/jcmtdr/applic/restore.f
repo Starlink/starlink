@@ -15,11 +15,11 @@
 
 *  Description:
 *     This is the top level routine that extracts all of the relevant
-*     information which is passed to the routines JCMT_DECONV or 
+*     information which is passed to the routines JCMT_DECONV or
 *     JCMT_3POS_DECONV depending whether the chop is 2 or 3 position.
 *     Will take a chopped beam map in JCMT format and using the Emerson,
 *     Klein amd Haslam algorithm produce the equivalent single beam map
-*     
+*
 
 *  [optional_subroutine_items]...
 *  Authors:
@@ -51,20 +51,20 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ASTRO_PAR'        ! astronomical parameters
-                                 
+
 *  Dynamic memory include file - defines DYNAMIC_MEM
       INCLUDE 'DYNAMIC_MEMORY'
 
 *  Data structure error codes
       INCLUDE 'DTA_CODES'
-      
+
 *  functions:
       LOGICAL PAR_ABORT          ! check PAR abort flag
       INTEGER DYN_ELEMENT        ! DSA dynamic memory
@@ -82,19 +82,19 @@
 
 *  Local Variables:
       LOGICAL STRUC              ! logical for testing structure
-                                 ! existence 
+                                 ! existence
       LOGICAL FAULT              ! T if want to signal Figaro error
       LOGICAL ERRORS             ! T if error array present in input data
       INTEGER NDIM               ! number of dimensions of array
       INTEGER DIMS(MAX_DIM)      ! size of each dimension
       INTEGER NELM               ! total number of elements in array
       INTEGER ADDRESS            ! DSA VM address
-      INTEGER SLOT               ! DSA slot 
+      INTEGER SLOT               ! DSA slot
       INTEGER INPTR              !  "  VM pointer for input data
       INTEGER OUTPTR             !  "    "      "     output
       INTEGER INEPTR             !  "    "      "     input errors
       INTEGER OUTEPTR            !  "    "      "     output "
-      INTEGER CFNPTR             !  "    "      "     convolution function 
+      INTEGER CFNPTR             !  "    "      "     convolution function
       INTEGER SWAPPTR            !  "    "      "     work array holding
                                  ! data swapped in x,y
       INTEGER SWAPEPTR           !  "    "      "     work array holding
@@ -108,14 +108,14 @@
       REAL UNBAL                 ! relative amplitude of left/right beams
       REAL FBAD                  ! flag value for bad pixel
       DOUBLE PRECISION PIXSIZE   ! pixel spacing in the x direction in
-                                 ! arcseconds 
+                                 ! arcseconds
       DOUBLE PRECISION BSEP      ! dual beam separation in arcseconds
       CHARACTER*(64) JCMT_DTA_NAME ! DTA name of the structure
                                  ! containing the JCMT specific
                                  ! data
       CHARACTER*(128) DTA_NAME   ! temp variable for holding DTA names
       CHARACTER*(128) POS_STRUC_NAME ! DTA name of position
-                                 ! structure 
+                                 ! structure
       CHARACTER*(80) ERROR       ! DTA error description
       CHARACTER*80 MESSAGE       ! output message
       CHARACTER*20 SCAN_DIR      ! direction of scans that make up map;
@@ -134,7 +134,7 @@
       STATUS = 0
       CALL DSA_OPEN (STATUS)
 
-*  get the input file 
+*  get the input file
 
       CALL DSA_INPUT ('IN', 'INPUT', STATUS)
 
@@ -240,7 +240,7 @@
          END IF
 
 *  read the ratio of the beam amplitudes
-           
+
          IF (STATUS .EQ. SAI__OK) THEN
             CALL PAR_RDVAL ('UNBAL', 0.0, 2.0, 1.0, ' ', UNBAL)
             IF (PAR_ABORT()) THEN
@@ -291,7 +291,7 @@
       ELSE
          CFN_SIZE = 2 * NY
       END IF
-      CALL DSA_GET_WORK_ARRAY (CFN_SIZE, 'FLOAT', ADDRESS, SLOT, 
+      CALL DSA_GET_WORK_ARRAY (CFN_SIZE, 'FLOAT', ADDRESS, SLOT,
      :   STATUS)
       CFNPTR = DYN_ELEMENT(ADDRESS)
 
@@ -328,8 +328,8 @@
 
                IF (.NOT. ERRORS) THEN
 
-                  CALL JCMT_3POS_DECONV (DYNAMIC_MEM(INPTR), NX, NY, 
-     :              FBAD, PIXSIZE, BSEP, DYNAMIC_MEM(CFNPTR), 
+                  CALL JCMT_3POS_DECONV (DYNAMIC_MEM(INPTR), NX, NY,
+     :              FBAD, PIXSIZE, BSEP, DYNAMIC_MEM(CFNPTR),
      :              DYNAMIC_MEM(OUTPTR), STATUS)
 
                ELSE
@@ -346,8 +346,8 @@
 
                IF (.NOT. ERRORS) THEN
 
-                  CALL JCMT_DECONV (DYNAMIC_MEM(INPTR), NX, NY, FBAD, 
-     :              PIXSIZE, BSEP, UNBAL, DYNAMIC_MEM(CFNPTR), 
+                  CALL JCMT_DECONV (DYNAMIC_MEM(INPTR), NX, NY, FBAD,
+     :              PIXSIZE, BSEP, UNBAL, DYNAMIC_MEM(CFNPTR),
      :              DYNAMIC_MEM(OUTPTR), STATUS)
 
                ELSE
@@ -394,14 +394,14 @@
 
             IF (CHOP_FUN .EQ. 'TRIPOS') THEN
 
-               CALL JCMT_3POS_DECONV (DYNAMIC_MEM(SWAPPTR), NY, NX, 
-     :           FBAD, PIXSIZE, BSEP, DYNAMIC_MEM(CFNPTR), 
+               CALL JCMT_3POS_DECONV (DYNAMIC_MEM(SWAPPTR), NY, NX,
+     :           FBAD, PIXSIZE, BSEP, DYNAMIC_MEM(CFNPTR),
      :           DYNAMIC_MEM(OUTPTR), STATUS)
 
             ELSE
 
-               CALL JCMT_DECONV (DYNAMIC_MEM(SWAPPTR), NY, NX, FBAD, 
-     :           PIXSIZE, BSEP, UNBAL, DYNAMIC_MEM(CFNPTR), 
+               CALL JCMT_DECONV (DYNAMIC_MEM(SWAPPTR), NY, NX, FBAD,
+     :           PIXSIZE, BSEP, UNBAL, DYNAMIC_MEM(CFNPTR),
      :           DYNAMIC_MEM(OUTPTR), STATUS)
 
             END IF
@@ -424,14 +424,14 @@
                CALL JCMT_SWAPXY (DYNAMIC_MEM(INEPTR), NX, NY,
      :         DYNAMIC_MEM(SWAPEPTR), STATUS)
                IF (CHOP_FUN .EQ. 'TRIPOS') THEN
-                  CALL JCMT_3POS_DECONV_ERRORS (DYNAMIC_MEM(SWAPPTR), 
+                  CALL JCMT_3POS_DECONV_ERRORS (DYNAMIC_MEM(SWAPPTR),
      :              DYNAMIC_MEM(SWAPEPTR), NY, NX, FBAD, PIXSIZE, BSEP,
-     :              DYNAMIC_MEM(CFNPTR), DYNAMIC_MEM(OUTPTR), 
+     :              DYNAMIC_MEM(CFNPTR), DYNAMIC_MEM(OUTPTR),
      :              DYNAMIC_MEM(OUTEPTR), STATUS)
                ELSE
-                  CALL JCMT_DECONV_ERRORS (DYNAMIC_MEM(SWAPPTR), 
+                  CALL JCMT_DECONV_ERRORS (DYNAMIC_MEM(SWAPPTR),
      :              DYNAMIC_MEM(SWAPEPTR), NY, NX, FBAD, PIXSIZE, BSEP,
-     :              UNBAL, DYNAMIC_MEM(CFNPTR), DYNAMIC_MEM(OUTPTR), 
+     :              UNBAL, DYNAMIC_MEM(CFNPTR), DYNAMIC_MEM(OUTPTR),
      :              DYNAMIC_MEM(OUTEPTR), STATUS)
                END IF
                CALL GEN_MOVE (FSIZE*NX*NY, DYNAMIC_MEM(OUTPTR),
@@ -460,5 +460,5 @@
       IF (FAULT) CALL FIG_SETERR
 
       END
-      
+
 

@@ -15,7 +15,7 @@
  *  Invocation:
  *     sc2sim_getast_wcs ( size_t colsize, size_t rowsize, const double *xbolo,
  *                         const double *ybolo, AstCmpMap *bolo2map, const double *astsim,
- *                         const int astnaxes[2], int interp, const double *params, 
+ *                         const int astnaxes[2], int interp, const double *params,
  *                         double *dbuf, int *status )
 
  *  Arguments:
@@ -37,7 +37,7 @@
  *        Interpolation method. See docs for astResample for available
  *        options.
  *     params = const double * (Given)
- *        Parameters for the interpolation scheme specified by "interp". See docs for 
+ *        Parameters for the interpolation scheme specified by "interp". See docs for
  *        astResample.
  *     dbuf = double* (Returned)
  *        Pointer to bolo output
@@ -70,7 +70,7 @@
  *        neighbour.
  *     2009-11-24 (DSB):
  *        Put zeros ito the returned array instead of VAL__BADD values.
- *        Also correct the determination of nearest integer for negative 
+ *        Also correct the determination of nearest integer for negative
  *        values of "skycoord".
 
  *  Copyright:
@@ -142,26 +142,26 @@ void sc2sim_getast_wcs
   if( interp == AST__NEAREST ) {
 
      /* astTranGrid method ----------------------------------------- */
-   
+
      /* Allocate space for arrays */
-   
+
      nboll = colsize * rowsize;
      skycoord = smf_malloc( nboll*2, sizeof(*skycoord), 1, status );
-   
+
      lbnd_in[0] = 1;
      ubnd_in[SC2STORE__ROW_INDEX] = colsize;
      lbnd_in[1] = 1;
      ubnd_in[SC2STORE__COL_INDEX] = rowsize;
-   
+
      /* Transform bolo offsets into positions on the input sky image */
-   
+
      astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
                   2, nboll, skycoord );
-   
+
      /* Nearest-neighbour sampling of image
         Notes: -1 to account for FORTRAN array indices starting at 1, and
         +/-0.5 so that we round to the nearest pixel */
-   
+
      for ( i=0; i<nboll; i++ ) {
        /* Fortran 2d array so stored by column rather than row! */
        xnear = (int) (skycoord[i] + (skycoord[i]>0?0.5:-0.5)) - 1;
@@ -177,7 +177,7 @@ void sc2sim_getast_wcs
          dbuf[i] = 0.0;
        }
      }
-   
+
      skycoord = smf_free(skycoord, status);
 
   /* Now deal with all other interpolation methods... */
@@ -187,7 +187,7 @@ void sc2sim_getast_wcs
      /* astResample requires the inverse Mapping, so invert the supplied
         Mapping temporarily. */
 
-     astInvert( bolo2map );     
+     astInvert( bolo2map );
 
      /* We want to generate zeros rather than VAL__BADDs in the output
         array, so initialise the output array to hold zeros, and use the
@@ -218,13 +218,13 @@ void sc2sim_getast_wcs
         transformation since it won't gain us much in terms of speed (and
         may actually be slower). */
 
-     astResampleD( bolo2map, 2, lbnd_in, ubnd_in, astsim, NULL, interp, NULL, 
-                   params, AST__USEBAD | AST__NOBAD, 0, 0, VAL__BADD, 
-                   2, lbnd_out, ubnd_out, lbnd_out, ubnd_out, dbuf, NULL ); 
+     astResampleD( bolo2map, 2, lbnd_in, ubnd_in, astsim, NULL, interp, NULL,
+                   params, AST__USEBAD | AST__NOBAD, 0, 0, VAL__BADD,
+                   2, lbnd_out, ubnd_out, lbnd_out, ubnd_out, dbuf, NULL );
 
      /* Re-invert the supplied Mapping to bring it back to its original state. */
 
-     astInvert( bolo2map );     
+     astInvert( bolo2map );
   }
 }
 

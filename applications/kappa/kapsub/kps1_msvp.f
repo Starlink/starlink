@@ -14,7 +14,7 @@
 *     CALL KPS1_MSVP( IGRP, NNDF, VAR,STATUS )
 
 *  Description:
-*     This routine tests a supplied group of NDFs for the presence of a 
+*     This routine tests a supplied group of NDFs for the presence of a
 *     VARIANCE component in all of them.
 
 *  Arguments:

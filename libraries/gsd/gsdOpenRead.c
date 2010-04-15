@@ -81,12 +81,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -118,7 +118,7 @@
 *    01 Aug 1995 (rpt):
 *       Support for DATADIR variable and upper/lower case file suffix
 *    26 Jul 1996 (sec):
-*       Support for the actual given filename. 
+*       Support for the actual given filename.
 *    01 Apr 1997 (timj):
 *       Support for actual given filename in remote DATADIR
 *    03 Jul 2008 (TIMJ):
@@ -132,7 +132,7 @@
 * Copyright:
 *    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
-*    All Rights Reserved. 
+*    All Rights Reserved.
 *-
 */
 
@@ -170,7 +170,7 @@ int gsdOpenRead( const char *file, float *version, char *label, int *nitem,
  */
    datadir = getenv( "DATADIR" );
 
-/* Open the GSD file for read access. Check first the actual filename, 
+/* Open the GSD file for read access. Check first the actual filename,
  * then upper and lower case suffix and DATADIR
  */
    sprintf( dfile, "%s", file );
@@ -178,20 +178,20 @@ int gsdOpenRead( const char *file, float *version, char *label, int *nitem,
      *fptr = stdin;
    } else {
      *fptr = fopen( dfile, "r" );
-     if ( !*fptr ) { 
+     if ( !*fptr ) {
        sprintf( dfile, "%s.dat", file );
        *fptr = fopen( dfile, "r" );
-       if ( !*fptr ) { 
+       if ( !*fptr ) {
          sprintf( dfile, "%s.DAT", file );
          *fptr = fopen( dfile, "r" );
-         if ( !*fptr ) { 
+         if ( !*fptr ) {
            if ( datadir != NULL ) {
              sprintf( dfile, "%s/%s", datadir, file );
              *fptr = fopen( dfile, "r" );
-             if ( !*fptr ) { 
+             if ( !*fptr ) {
                sprintf( dfile, "%s/%s.dat", datadir, file );
                *fptr = fopen( dfile, "r" );
-               if ( !*fptr ) { 
+               if ( !*fptr ) {
                  sprintf( dfile, "%s/%s.DAT", datadir, file );
                  *fptr = fopen( dfile, "r" );
                }

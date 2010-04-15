@@ -9,8 +9,8 @@ C     Creates a Figaro output structure, giving it a reference name.
 C
 C  Description:
 C     DSA_CREATE_NAMED_STRUCTURE takes the name of a data structure file
-C     and creates in that file a structure as specified by a structure 
-C     definition file (as read by DSA_READ_STRUCT_DEF) and opens it for 
+C     and creates in that file a structure as specified by a structure
+C     definition file (as read by DSA_READ_STRUCT_DEF) and opens it for
 C     output, associating it with a specified reference name.   Note that
 C     at least in this implementation, the output structure specified
 C     can only be a file name and not a structure within that file, since
@@ -39,7 +39,7 @@ C  External variables used:
 C     Only common variables internal to the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     DTA_ERROR, DTA_ASFNAM, ICH_FOLD, ICH_LEN, DSA_WRUSER, DSA_FNAME, 
+C     DTA_ERROR, DTA_ASFNAM, ICH_FOLD, ICH_LEN, DSA_WRUSER, DSA_FNAME,
 C     DSA_WRNAME, DSA_INIT_REF_SLOT, DSA__SET_FILE_TYPE, DSA_REAL_NAME
 C
 C  Prior requirements:
@@ -76,7 +76,7 @@ C                     each file.
 C     (!) FILE_USED   (Logical array) Indicates file table slot in use..
 C     (>) MAX_REFS    (Integer parameter) Maximum number of reference names.
 C     (<) OBJ_LEN     (Integer array) Number of chars in each OBJ_NAME.
-C     (<) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data 
+C     (<) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data
 C                     object corresponding to reference name.
 C     (<) ACTUAL_NAMES(String array) Full ref name structure specification.
 C     (<) PARM_VALUE  (String array) Parameter value associated with ref name.
@@ -129,7 +129,7 @@ C
       INTEGER   FILE_SLOT                      ! Slot # for file name
       LOGICAL   FOUND                          ! Indicates name match in tables
       LOGICAL   FREE                           ! Indicates free slot in tables
-      INTEGER   I                              ! Loop variable 
+      INTEGER   I                              ! Loop variable
       INTEGER   INVOKE                         ! Dummy function reference
       LOGICAL   NEWFILE                        ! Flags new file to be created
       CHARACTER REALNAME*128                   ! Full real file name spec
@@ -145,7 +145,7 @@ C     Check for bad passed status
 C
       IF (STATUS.NE.0) RETURN
 C
-C     We need to work with an upper case version of REF_NAME 
+C     We need to work with an upper case version of REF_NAME
 C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
@@ -191,7 +191,7 @@ C
 C     Determine the file name, the extension, and any structure details.
 C     Notice that if structure details are specified, we can't handle them.
 C     Setting NEWFILE true will force the generation of a new file name
-C     - ie one we KNOW doesn't exist and so won't be in the list of files 
+C     - ie one we KNOW doesn't exist and so won't be in the list of files
 C     already open.
 C
       NEWFILE=.TRUE.
@@ -207,7 +207,7 @@ C
          GO TO 500            ! Error exit
       END IF
 C
-C     Pass through the list of files already open, looking for 
+C     Pass through the list of files already open, looking for
 C     a spare slot.
 C
       FREE=.FALSE.
@@ -264,7 +264,7 @@ C
      :                                          STRUCT_SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500       ! Error exit
 C
-C     Try to create the file.  
+C     Try to create the file.
 C
       CALL DTA_ASFNAM (REF_NAME_UC,FILENAME,'NEW',0,TYPE,DTA_STATUS)
       IF (DTA_STATUS.NE.0) THEN

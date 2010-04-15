@@ -13,16 +13,16 @@
 #     entry in the docs_lis file (which usually lives in /star/docs).
 #     The resulting summaries contain no information concerning the
 #     internal structure of the documents (i.e. the DOCBODY element is
-#     empty), but do conform to the Starlink 'Summary' DTD and therefore 
-#     are sufficient for use in defining SUBDOC entities within Starlink 
-#     documents which need to refer to them from a DOCXREF element.  
-#     Because there is no internal structure in the summaries, such 
+#     empty), but do conform to the Starlink 'Summary' DTD and therefore
+#     are sufficient for use in defining SUBDOC entities within Starlink
+#     documents which need to refer to them from a DOCXREF element.
+#     Because there is no internal structure in the summaries, such
 #     DOCXREF references can only refer to the document as a whole, i.e.
 #     will have to leave the LOC attribute #implied.
 #
 #     The program writes summary files into the the current directory,
 #     with filenames like 'sun123.summary'.
-#     By default it only writes summaries for documents which do not 
+#     By default it only writes summaries for documents which do not
 #     already have summary files in this directory.  If --overwrite
 #     is set however, it can be forced to write such files always.
 #
@@ -83,7 +83,7 @@
       $doc =~ /([a-z]*)(\d*)/i;
       my( $doctype ) = lc( $1 );
       my( $docnum ) = $2;
-      my( $version, $date, $authinit, $pages, $title ) 
+      my( $version, $date, $authinit, $pages, $title )
          = @docatts{ qw( version date authinit pages title ) };
       my( $docnumber ) = $docnum;
       $docnumber = "" if ( $doctype eq 'SUG' );
@@ -91,12 +91,12 @@
       my( $etal ) = $authkey ne $authinit;
       my( %authatts ) = %{$authors{ $authkey }};
       my( $authname, $authsite ) = @authatts{ qw( name site ) };
-      
+
 #  Open summary file and write the information to it.
       my( $summfile ) = "$doc.summary";
       next if ( -e $summfile && ! $overwrite );
       print( "   $doc\n" ) if ( $verbose );
-      open( SUMM, ">$summfile" ) 
+      open( SUMM, ">$summfile" )
          or die( "Failed to open $summfile for writing.\n" );
       print( SUMM join( "\n",
          "<!DOCTYPE documentsummary PUBLIC '$dtdname'>",

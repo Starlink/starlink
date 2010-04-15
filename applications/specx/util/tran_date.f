@@ -33,7 +33,7 @@
 *  History:
 *     Pre-history (rp):
 *        Original version
-*     27 Oct 1999 (rpt): 
+*     27 Oct 1999 (rpt):
 *        Fix Y2K problem by using MOD on year i.s.o. subtracting 1900
 *     30 Dec 1999 (timj):
 *        Use informative header

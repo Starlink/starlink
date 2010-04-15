@@ -174,7 +174,7 @@
 
 ;;; Check if the initial value of point lies inside the placeholder (taking
 ;;; account of the delimiters at either end). Ignore the placeholder if it does
-;;; not. 
+;;; not.
 	    (if (or (< opoint beginning) (>= opoint end))
 		(setq place nil)))))
 
@@ -215,7 +215,7 @@
 		(setq end (cdr (assq 'end place)))
 		(goto-char beginning)
 		(delete-region beginning end)
-		
+
 		(setq plist (cdr (assq 'plist place)))
 		(setq sep (cdr (assq 'sep plist)))
 		(setq head (cdr (assq 'head plist)))
@@ -254,7 +254,7 @@
 				  (forward-char (length tail))
 				  (if (not posttail) (skip-chars-forward " \t"))
 				  (delete-region opoint (point))))))))
-		  
+
 		(save-excursion
 		  (beginning-of-line)
 		  (setq empty
@@ -325,13 +325,13 @@
 	  (if
 	      (re-search-forward
 	       (concat "\\("
-		       (regexp-quote 
+		       (regexp-quote
 			(concat
 			 edstar-placeholder-begin
 			 edstar-auto-place-name
 			 edstar-placeholder-end))
 		       "\\)\\|\\("
-		       (regexp-quote 
+		       (regexp-quote
 			(concat
 			 edstar-placeholder-begin-opt
 			 edstar-auto-place-name

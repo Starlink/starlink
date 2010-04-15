@@ -339,7 +339,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       set list [get_image_center_radius]
       if { [llength $list] > 2 } {
          lassign $list ra_ dec_ size1_
-         
+
          #  Many servers don't like a width & height, so avoid that.
          set size2_ {}
       }

@@ -1,4 +1,4 @@
-      SUBROUTINE SURFLIB_FILL_POLPACK_ANGLES( MAX_FILE, MAX_INT, 
+      SUBROUTINE SURFLIB_FILL_POLPACK_ANGLES( MAX_FILE, MAX_INT,
      :     MAX_MEAS, N_FILE, N_INT, N_MEAS,
      :     WPLATE, ANGROT, FAST_AXIS, ANG_INT, ANG_MEAS, STATUS)
 *+
@@ -10,7 +10,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_FILL_POLPACK_ANGLES( MAX_FILE, MAX_INT,
 *    :     MAX_MEAS, N_FILE, N_INT, N_MEAS,
@@ -86,7 +86,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! Status
       INCLUDE 'PRM_PAR'         ! For VAL__BAD and VAL__NB
@@ -118,7 +118,7 @@
       REAL    WPLATE_REF        ! Reference waveplate angle for measurement
 
 *.
-      
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Check that N_INT and N_MEAS are in bounds
@@ -180,12 +180,12 @@
             NUM_INTS = NUM_INTS + 1
 
 *     Read the waveplate position and store it
-            ANG_INT(N_FILE, NUM_INTS, 1) = 
+            ANG_INT(N_FILE, NUM_INTS, 1) =
      :           WPLATE(INTEGRATION, MEASUREMENT)
      :           + FAST_AXIS
-            
+
 *     Read the rotation angle and store it
-            ANG_INT(N_FILE,NUM_INTS,2) = 
+            ANG_INT(N_FILE,NUM_INTS,2) =
      :           ANGROT(INTEGRATION, MEASUREMENT)
 
 *     Check to see whether WPLATE is the same as the reference

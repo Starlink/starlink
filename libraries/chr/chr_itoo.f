@@ -13,12 +13,12 @@
 *     CALL CHR_ITOO( IVALUE, STRING, STATUS )
 
 *  Description:
-*     Encode an INTEGER value into an octal string using the host 
+*     Encode an INTEGER value into an octal string using the host
 *     machine's character set. The result is right-justified in the
 *     returned string. In the event of an error, '*'s are written to
 *     the string.
 
- 
+
 *  Arguments:
 *     IVALUE = INTEGER (Given)
 *        Value to be encoded.
@@ -26,7 +26,7 @@
 *        Octal string encoded from the given value.
 
 *  Note:
-*     This subroutine assumes a 32-bit, twos complement representation 
+*     This subroutine assumes a 32-bit, twos complement representation
 *     of an INTEGER.
 
 *  Algorithm:
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -135,7 +135,7 @@
          ISNEG = .FALSE.
       ELSE IF ( IVALUE .LT. 0 ) THEN
 
-*  Value is negative, check that STRING will hold at least 
+*  Value is negative, check that STRING will hold at least
 *    11 octal digits (32 bits)
          IF ( STRLEN .LT. BUFLEN ) THEN
             CALL CHR_FILL( '*', STRING )
@@ -160,7 +160,7 @@
          IVAL = IVALUE
       END IF
 
-*  Encode the integer into a right-justified binary string: first 
+*  Encode the integer into a right-justified binary string: first
 *  initialise ITEST.
       ITEST = OCTDEC
 

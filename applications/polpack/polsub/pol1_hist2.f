@@ -11,23 +11,23 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_HIST2( EL, XDATA, YDATA, NBIN, XMIN, XMAX, HIST, 
+*     CALL POL1_HIST2( EL, XDATA, YDATA, NBIN, XMIN, XMAX, HIST,
 *                      WBIN, DELTA, WTOT, STATUS )
 
 *  Description:
 *     This routine returns a histogram containing NBIN bins, spread evenly
-*     between the X data values of XMAX and XMIN. Each bin contains the 
-*     weighted mean of the Y data values for which the corresponding X data 
-*     values fall within the X range covered by the bin. Bins which contain 
+*     between the X data values of XMAX and XMIN. Each bin contains the
+*     weighted mean of the Y data values for which the corresponding X data
+*     values fall within the X range covered by the bin. Bins which contain
 *     no data are returned holding VAL__BADR.
 
 *  Arguments:
 *     EL = INTEGER (Given)
 *        The number of data values.
 *     XDATA( EL ) = REAL (Given)
-*        The X data values. 
+*        The X data values.
 *     YDATA( EL ) = REAL (Given)
-*        The Y data values. 
+*        The Y data values.
 *     WGT( EL ) = REAL (Given)
 *        The Y weight values. This should contain no VAL__BADR values
 *        (use zero instead).
@@ -50,7 +50,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,9 +112,9 @@
 *  Bin each good data value.
       DO I = 1, EL
 
-         IF( XDATA( I ) .NE. VAL__BADR .AND. 
+         IF( XDATA( I ) .NE. VAL__BADR .AND.
      :       YDATA( I ) .NE. VAL__BADR .AND.
-     :       WGT( I ) .GT. 0.0 ) THEN        
+     :       WGT( I ) .GT. 0.0 ) THEN
 
             IBIN = INT( ( REAL( XDATA( I ) ) - XMIN )/DELTA ) + 1
             IF( IBIN .GE. 1 .AND. IBIN .LE. NBIN ) THEN

@@ -26,7 +26,7 @@
 *  Return Value:
 *     The elapsed time from tv1 to tv2 in seconds. Returns 0 on bad status.
 
-*  Description: 
+*  Description:
 *     Calculate elapsed times
 
 *  Notes:
@@ -94,6 +94,6 @@ double smf_difftime( struct timeval *tv1, struct timeval *tv2, int *status) {
     return 0;
   }
 
-  return (double)(tv2->tv_sec-tv1->tv_sec) + 
+  return (double)(tv2->tv_sec-tv1->tv_sec) +
     (1.0E-6*(double)(tv2->tv_usec-tv1->tv_usec));
 }

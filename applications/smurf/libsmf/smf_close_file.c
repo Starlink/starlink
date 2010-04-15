@@ -156,7 +156,7 @@ void smf_close_file( smfData ** data, int * status ) {
   smfFile * file;         /* pointer to smfFile in smfData */
   int       freedata = 0; /* should the data arrays be freed? */
   smfHead * hdr;          /* pointer to smfHead in smfData */
-  size_t headlen=0;       /* Size of header (mmap'd files) in bytes */ 
+  size_t headlen=0;       /* Size of header (mmap'd files) in bytes */
   size_t       i;         /* loop counter */
   int       isSc2store = 0; /* is this sc2Store data */
   smfDIMMHead *temphead=NULL; /* Pointer to DIMM header */
@@ -169,7 +169,7 @@ void smf_close_file( smfData ** data, int * status ) {
     if ( *status == SAI__OK ) {
       /* Status is good so we have a problem */
       *status = SAI__ERROR;
-      errRep( ERRFUNC, "Attempt to close file when smfData pointer is NULL (possible programming error)", 
+      errRep( ERRFUNC, "Attempt to close file when smfData pointer is NULL (possible programming error)",
               status );
     }
     /* null pointer so just return since there is nothing to free */
@@ -181,7 +181,7 @@ void smf_close_file( smfData ** data, int * status ) {
   (*data)->refcount--;
 
   if ((*data)->refcount > 0 ) return;
-  
+
   /* Get the header and file, since we need them for checking */
   hdr = (*data)->hdr;
 
@@ -192,7 +192,7 @@ void smf_close_file( smfData ** data, int * status ) {
   file = (*data)->file;
   if( hdr && hdr->fitshdr ) {
     fts1Astwn( hdr->fitshdr,
-               file ? file->ndfid : NDF__NOID, 
+               file ? file->ndfid : NDF__NOID,
                status );
   }
 
@@ -208,7 +208,7 @@ void smf_close_file( smfData ** data, int * status ) {
     } else if ( file->ndfid != NDF__NOID ) {
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
-      	
+
     } else if( file->fd ) {
       /* Array was mmap'd to a file, and must now be sync'd and unmapped,
          and the file descriptor closed */
@@ -259,11 +259,11 @@ void smf_close_file( smfData ** data, int * status ) {
     if (hdr->tswcs != NULL) hdr->tswcs = astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) hdr->fitshdr = astAnnul( hdr->fitshdr );
 
-    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( -1, NULL, 0.0, NULL, NULL, NULL, 
+    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( -1, NULL, 0.0, NULL, NULL, NULL,
                                                        hdr->cache1, status );
-    if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, 0.0, NULL, 
+    if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, 0.0, NULL,
                                                        NULL, NULL, hdr->cache2, status );
-    if( hdr->cache3 ) hdr->cache3 = smf_detpos_wcs( NULL, -1, 0.0, NULL, NULL, hdr->cache3, 
+    if( hdr->cache3 ) hdr->cache3 = smf_detpos_wcs( NULL, -1, 0.0, NULL, NULL, hdr->cache3,
                                                     status );
 
     if (!hdr->isCloned) {
@@ -301,9 +301,9 @@ void smf_close_file( smfData ** data, int * status ) {
   /* Free smfDream */
   if ( (*data)->dream != NULL ) {
     dream = (*data)->dream;
-    if ( dream->gridwts != NULL) 
+    if ( dream->gridwts != NULL)
       dream->gridwts = smf_free( dream->gridwts, status );
-    if ( dream->invmatx != NULL) 
+    if ( dream->invmatx != NULL)
       dream->invmatx = smf_free( dream->invmatx, status );
     dream= smf_free( dream, status );
   }

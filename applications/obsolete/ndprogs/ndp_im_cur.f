@@ -9,10 +9,10 @@ C   -------------------------------
 C
 C   Description
 C   -----------
-C   Displays the PGPLOT cursor on the current PGPLOT device and returns the 
+C   Displays the PGPLOT cursor on the current PGPLOT device and returns the
 C   coordinates of identified points.
 C
-C   The following options are available: 
+C   The following options are available:
 C     centre cursor when first displayed,
 C     display coordinates of identified points,
 C     close fence if any two points are within tolerance separation,
@@ -27,7 +27,7 @@ C   Parameters
 C   ----------
 C   XAXIS    (> real, array). X axis values.
 C   YAXIS    (> real, array). Y axis values.
-C   NX       (> integer) X dimension 
+C   NX       (> integer) X dimension
 C   NY       (> integer) Y dimension
 C   START    (> real, array). Start axis values being displayed.
 C   END      (> real, array). End axis values being displayed.
@@ -42,7 +42,7 @@ C   YID      (< real, array). Y coordinates of identified points.
 C   NID      (< integer). Number of identified points.
 C   XLAST    (< real, array). X coordinate of last identified point.
 C   YLAST    (< real, array). Y coordinate of last identified point.
-C   QUIT     (< logical). True if user quit rather than finishing 
+C   QUIT     (< logical). True if user quit rather than finishing
 C            identifications.
 C
 C
@@ -74,7 +74,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -115,7 +115,7 @@ c
       logical       quit
       real          xaxis(nx),yaxis(ny),start(2),end(2),
      &              ximv(2),yimv(2),xid(ncur),yid(ncur),xlast,ylast
-c                         
+c
 c   Local variables.
 c
       logical       centre
@@ -170,7 +170,7 @@ c
       call pgqvp(1,xmin,xmax,ymin,ymax)
 c
 c   Compute scales in axis units / pixel.
-c                            
+c
       scale(1)=(end(1)-start(1))/(endpix(1)-stapix(1))
       scale(2)=(end(2)-start(2))/(endpix(2)-stapix(2))
 c
@@ -207,7 +207,7 @@ c
    10   call pgcurse(xcur(i),ycur(i),ch)
 c
 c   Test for quit instruction or bad point.
-c                   
+c
         if(ch.eq.'q' .or. ch.eq.'Q')then
           quit=.true.
           go to 400
@@ -218,11 +218,11 @@ c
         end if
 c
 c   Increment point counter.
-c 
+c
         nid=nid+1
 c
 c   Snap to nearest pixel if required.
-c         
+c
         if(snap)then
           xpix=gen_bsearch(xaxis,nx,xcur(i))
           ypix=gen_bsearch(yaxis,ny,ycur(i))
@@ -240,7 +240,7 @@ c
 c
 c   - test whether point is within tolerances of first point.
 c
-            if(abs(xcur(i)-xcur(1)).lt.xtol .and. 
+            if(abs(xcur(i)-xcur(1)).lt.xtol .and.
      &         abs(ycur(i)-ycur(1)).lt.ytol)then
 c
 c   - if so, set point equal to first point.
@@ -251,7 +251,7 @@ c
             end if
           end if
         end if
-c             
+c
 c   Draw cross at final position.
 c
         if(ncur.gt.1)then
@@ -264,8 +264,8 @@ c
           if(i.gt.1)then
             call pgmove(xcur(i-1),ycur(i-1))
             call pgdraw(xcur(i),ycur(i))
-          end if                   
-        end if          
+          end if
+        end if
 c
 c   Return coordinates in pixels or axis units as required.
 c
@@ -276,7 +276,7 @@ c
           else
             xid(i)=real(stapix(1))+xcur(i)/scale(1)
             yid(i)=real(stapix(2))+ycur(i)/scale(2)
-          end if  
+          end if
         else
           if(snap)then
             xpix=gen_bsearch(xaxis,nx,xcur(i))
@@ -286,15 +286,15 @@ c
           else
             xid(i)=xcur(i)
             yid(i)=ycur(i)
-          end if      
+          end if
         end if
 c
 c   Display coordinates if required.
 c
-        if(display)then              
+        if(display)then
           if(pixout)then
             string='Pixel ('
-          else   
+          else
             string='Coord ('
           end if
           dumint=ich_encode(string,xid(i),8,0,next)
@@ -303,7 +303,7 @@ c
           string(next:)=')\\N'
           call dsa_wruser(string(:ich_len(string)))
         end if
-c                                        
+c
         if(closed)then
           call dsa_wruser('Fence closed\\N')
           go to 400
@@ -323,7 +323,7 @@ c
           call pgpoint(1,xcur(i),ycur(i),2)
         end do
       end if
-c                                         
+c
 c   Erase joining lines if drawn.
 c
       if(join)then
@@ -332,7 +332,7 @@ c
           if(i.gt.1)then
             call pgmove(xcur(i-1),ycur(i-1))
             call pgdraw(xcur(i),ycur(i))
-          end if                   
+          end if
         end do
       end if
 c

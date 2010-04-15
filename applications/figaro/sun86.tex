@@ -16,10 +16,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    { 86.21}
 \newcommand{\stardocauthors}   {Keith~Shortridge, Horst~Meyerdierks,
-                                Malcolm~Currie, Martin~Clayton, Jon~Lockley, 
+                                Malcolm~Currie, Martin~Clayton, Jon~Lockley,
                                 Anne~Charles, Clive~Davenhall,
                                 Mark~Taylor, Tim~Ash, Tim~Wilkins, Dave~Axon,
-                                John~Palmer, Anthony~Holloway and 
+                                John~Palmer, Anthony~Holloway and
                                 Vito~Graffagnino}
 \newcommand{\stardocdate}      {2004 February 17}
 \newcommand{\stardoctitle}     {FIGARO \\ [1ex] A general data reduction system}
@@ -445,9 +445,9 @@ of data formats.
 The current facilities are available in Portable Figaro version 5.1 and
 higher.
 
-From version 5.3, Portable Figaro incorporates the Specdre package, which 
-is used for spectroscopy data reduction and analysis. It includes cube 
-manipulation, arc line axis (wavelength) calibration, re-sampling, and 
+From version 5.3, Portable Figaro incorporates the Specdre package, which
+is used for spectroscopy data reduction and analysis. It includes cube
+manipulation, arc line axis (wavelength) calibration, re-sampling, and
 spectral fits.
 
 From version 5.5, Portable Figaro incorporates the Twodspec package, which
@@ -673,12 +673,12 @@ To start Figaro from the Unix shell simply type:
  ----------- Initialising for  Figaro ------------
               General data reduction
             Version 5.6-1 19 September 2002
- 
+
           Type "fighelp figaro" for help
       or "fighelp news" for news on changes
- 
+
  Type "showme sun86" to browse HTML documentation
- 
+
  Use "abbrev" and "noabbrev" to turn parameter name
  abbreviation on and off.
 \end{verbatim}
@@ -747,11 +747,11 @@ To start Figaro from the Unix shell simply type:
  ----------- Initialising for  Figaro ------------
               General data reduction
            Version 5.6-1 19 September 2002
- 
+
            Type  "help figaro" for help
- 
+
  Type "showme sun86" to browse HTML documentation
- 
+
  Use "abbrev" and "noabbrev" to turn parameter name
  abbreviation on and off.
 \end{verbatim}
@@ -759,11 +759,11 @@ To start Figaro from the Unix shell simply type:
    The 200-odd Figaro commands are now at your disposal. However, only
    the short names without the `fig\_' prefix are available.
 
-   There is a demonstration procedure, which is intended as a test of 
+   There is a demonstration procedure, which is intended as a test of
    the installation, but the
    script itself can give you hints about writing your own ICL
-   procedures and about the syntax for command line parameters. 
-   To execute it, you need an X windows display. 
+   procedures and about the syntax for command line parameters.
+   To execute it, you need an X windows display.
 
    To run the demo type:
 
@@ -771,7 +771,7 @@ To start Figaro from the Unix shell simply type:
    ICL> load $FIG_DIR/demo
 \end{verbatim}
 
-   To run the Specdre demo, which  
+   To run the Specdre demo, which
    demonstrates how the Specdre Extension is used to e.g.\ gather fit
    results and pass them on to other applications, type
 
@@ -2496,7 +2496,7 @@ DST & NDF \\ \hline
 
 \paragraph{\label{specdreextens}\xlabel{specdreextens}Using the Specdre Extension}
 
-   The demonstration script (\texttt{demo\_specdre}) shows the use of the 
+   The demonstration script (\texttt{demo\_specdre}) shows the use of the
    Specdre Extension.  There is a tool
 {\tt\htmlref{editext}{EDITEXT}} to look at or manipulate the
    Extension. {\tt resamp} will usually store some limited amount of
@@ -2510,7 +2510,7 @@ DST & NDF \\ \hline
 {\tt\htmlref{fitpoly}{FITPOLY}}
    will store their fit results in the Extension. In conjunction with
    the NDF sections
-(see Sections~\ref{filesndfsect} and \ref{specdreslice}) 
+(see Sections~\ref{filesndfsect} and \ref{specdreslice})
    you can work your way through the rows of a CCD long-slit spectrum,
    store each row's fit in the Extension and fill the result storage
    space. The collection of all fits is again an NDF (located in the
@@ -2669,7 +2669,7 @@ DST & NDF \\ \hline
    the interrelation {\it within any one} spectroscopic subset, not
    between different such subsets. That means we know only about
    interrelation along the spectroscopic axis (within a spectrum) but
-   not perpendicular to that axis (between spectra). 
+   not perpendicular to that axis (between spectra).
 
 \item{\tt .RESULTS} is an NDF-type structure with data and variance
    components and a number of extensions in the {\tt .MORE}
@@ -2937,7 +2937,7 @@ LVCHI  <NDF>
                DATA(32,37,150)  <_REAL>       -163.855,-163.855,-163.855,
                                               ... 28.35489,28.35489,28.35489
                ORIGIN(3)      <_INTEGER>      1,1,1
- 
+
             LABEL          <_CHAR*64>      'velocity'                       (6)
             UNITS          <_CHAR*64>      'km/s'                           (6)
          SPECWIDS       <NDF>           {structure}
@@ -3211,10 +3211,10 @@ starting at `first cross-section'.
 Element & Digit & Number & Name & Refer to as &Meaning\\ \hline
 1 & 1 & 1 & Absorption flag & FIT\_ABS & 0 - Emission\\
   &   &   &                 & & 1 - Absorption\\ \cline{2-6}
-  & 2 & 2 & Profile Model & FIT\_MODEL & 0 - none\\            
-  & 3 &   &               &            & 1 - Gaussian\\        
-  &   &   &               &            & 2 - Skew Gaussian\\   
-  &   &   &               &            & 3 - Cauchy/Gaussian\\ 
+  & 2 & 2 & Profile Model & FIT\_MODEL & 0 - none\\
+  & 3 &   &               &            & 1 - Gaussian\\
+  &   &   &               &            & 2 - Skew Gaussian\\
+  &   &   &               &            & 3 - Cauchy/Gaussian\\
   &   &   &               &            & 4 - Centroid\\
   &   &   &               &            & 5 - Lorentzian\\ \cline{2-6}
   & 4 & 3 & Fit type      & FIT\_TYPE & 0 - none \\
@@ -3306,10 +3306,10 @@ rotation curve)\\
 Element	Digit	Number	Name			Refer to as	Meaning
 1	1	1	Absorption flag		FIT_ABS	0 - Emission
 								1 - Absorption
-	2	2	Profile Model		FIT_MODEL	0 - none        
-	3							1 - Gaussian        
-								2 - Skew Gaussian 
-								3 - Cauchy/Gaussian 
+	2	2	Profile Model		FIT_MODEL	0 - none
+	3							1 - Gaussian
+								2 - Skew Gaussian
+								3 - Cauchy/Gaussian
 								4 - Centroid
 								5 - Lorentzian
 	4	3	Fit type		FIT_TYPE	0 - none
@@ -3363,7 +3363,7 @@ Element	Digit	Number	Name			Refer to as	Meaning
 	9
 3	1	1	Method of Removal	BACK_REMOV	0 - subtract
 								1 - divide
-	4	3	Background Order	BACK_ORDER 
+	4	3	Background Order	BACK_ORDER
 	5
 	6	4	Weight Func. to be used	BACK_WEIGH	as for entry 5 above
 	2	2	GLOBAL Backgrnd model	BACK_MODEL	0 - No base
@@ -3537,7 +3537,7 @@ packages such as KAPPA offer other error-propagating tasks.
 Raw data from the telescope probably don't contain a variance array.
 The recommended way of getting error information into a file is when the
 data are in its earliest stages of reduction, i.e., when de-biasing. The
-CCDPACK (see \xref{SUN/139}{sun139}{}) applications 
+CCDPACK (see \xref{SUN/139}{sun139}{}) applications
 `\xref{makebias}{sun139}{MAKEBIAS}' and `\xref{debias}{sun139}{DEBIAS}'
 will create a variance array in the de-biased data files which Figaro can
 use in the remaining stages of reduction.
@@ -3565,10 +3565,10 @@ on the World Wide Web) if you don't already have them.
 
 \subsubsection{Flat fielding}
 
-CCDPACK's `makeflat' is the recommended way of producing a master 
-flat-field frame. 
+CCDPACK's `makeflat' is the recommended way of producing a master
+flat-field frame.
 However, either CCDPACK or Figaro may be used to perform the
-flat-fielding operation. 
+flat-fielding operation.
 The recommended Figaro flat-fielding routine is `ff'.
 
 \subsubsection{Sky subtraction}
@@ -3587,7 +3587,7 @@ A normal extraction can be performed with `extract'.
 
 \subsubsection{My data are full of cosmic rays---how do I get rid of them?}
 
-The routines `bclean' and `sclean' 
+The routines `bclean' and `sclean'
 now {\it partially} support propagation of error
 information. More specifically, bad pixels are interpolated over as before
 and the associated variance values are set to zero to indicate the data are
@@ -3597,7 +3597,7 @@ and the associated variance values are set to zero to indicate the data are
 
 Some Figaro routines use the variance arrays to weight the data values
 during fitting. When a zero variance is found (e.g. because `bclean',
-`sclean' 
+`sclean'
 and/or `cset' were used),
 the data will not be given
 infinite weight! Instead, some routines (such as `polysky') will set the
@@ -3675,7 +3675,7 @@ following to your `.login' script:
 \end{quote}
 
 By default Figaro applications will search for data files in these
-directories in the following order: first your default directory, then 
+directories in the following order: first your default directory, then
 FIGARO\_PROG\_U, then FIGARO\_PROG\_L and finally FIGARO\_PROG\_S.
 
 
@@ -4124,17 +4124,17 @@ The individual Figaro commands to do this might be the following
 
    The main Figaro data directory (corresponding to environment variable
    FIGARO\_PROG\_S) contains a number of files giving the
-\htmlref{published flux densities}{standard1} 
-   of standard stars, all with a `.tab' 
+\htmlref{published flux densities}{standard1}
+   of standard stars, all with a `.tab'
 \begin{htmlonly}
    extension.
 \end{htmlonly}
 \begin{latexonly}
    extension (see Appendix~\ref{standard1}).
 \end{latexonly}
-   In addition  Jeremy Walsh has made available the 
+   In addition  Jeremy Walsh has made available the
 \htmlref{Oke and HST standards}{standard2} and copies can be
-   retrieved by anonymous ftp.  
+   retrieved by anonymous ftp.
 \begin{latexonly}
 See Appendix~\ref{standard2} for details.
 \end{latexonly}
@@ -5414,9 +5414,9 @@ time:
    Arc-fitting is also available with Specdre
    \latorhtm{(Section~\ref{specdreaxcalib})}
    {(\htmlref{arc spectrum axis calibration}{specdreaxcalib})}
-   which is now part of Figaro. 
-   It is reputed to be far superior to that described in this section. 
-   It is currently only useable with Specdre commands but not with other 
+   which is now part of Figaro.
+   It is reputed to be far superior to that described in this section.
+   It is currently only useable with Specdre commands but not with other
    Figaro commands.
 
    Another alternative for arc-fitting is
@@ -5778,7 +5778,7 @@ Hayes, D.S., Latham, D.W.: 1975, Ap.J. 197, 593
    Figaro program for arc wavelength calibration}
 \markboth{More complex things: FIGARO ARC}{\stardocname}
 
-   This section describes the use of the `arc' program in Figaro.  
+   This section describes the use of the `arc' program in Figaro.
    `arc'
    is an interactive arc fitter, which displays an arc spectrum on the
    current soft graphics device and gets the user to indicate arc lines
@@ -8345,7 +8345,7 @@ The mean fractional deviation is defined as:
 \htmlref{FIB2CUBE}{FIB2CUBE} --- Stack LONGSLIT results into a data cube.\\
 \htmlref{CUBE2LONG}{CUBE2LONG} --- Extract fits from a cube in LONGSLIT format.\\
 \htmlref{VIG}{VIG} --- Corrects a 2D array for vignetting.\\
-\htmlref{CRIGAUSS}{CRIGAUSS} --- Generates an NDF with a multiple gaussian profile.\\ 
+\htmlref{CRIGAUSS}{CRIGAUSS} --- Generates an NDF with a multiple gaussian profile.\\
 \htmlref{CHANGED}{CHANGED} --- Lists differences between fits in two files.
 
 \subsection{\label{classifmisc}Miscellany}
@@ -8542,7 +8542,7 @@ The mean fractional deviation is defined as:
    may be in a number of printer files and each printout starts on a new
    page.  If you have done overlay plots on the screen and want the same
    on the printer, then you can use as graphics device an Encapsulated
-   PostScript device like {\tt epsf\_l}.  You still get a number 
+   PostScript device like {\tt epsf\_l}.  You still get a number
    of files, but they can be merged into one (without form feed) using
 {\tt\xref{psmerge}{sun164}{}}
    (cf.\ SUN/164).  Usually the output is a complete PostScript file
@@ -8755,7 +8755,7 @@ The mean fractional deviation is defined as:
    original data.
 
    Here is an outline of a complex example showing how you might proceed
-   with a long-slit spectrum (but note that the example will not work 
+   with a long-slit spectrum (but note that the example will not work
    as presented since some parameters are omitted for brevity).  Also,
    the telluric correction may not be the correct way of doing
    things. The purpose of the example is to illustrate how you can
@@ -9020,14 +9020,14 @@ although this is primarily designed for fibre array data.  An
 extensive range of options is available, especially in terms of
 output.  ARC2D is a two-dimensional arc calibration program.  COMB and
 ARCSDI are for the correction of data for S-distortion and line
-curvature respectively.  
+curvature respectively.
 
 Note that these programs are designed to do as
 much as possible for the user, to assist quick reduction and analysis
 of data---LONGSLIT can fit multiple Gaussians to line profiles in
 batch for example, and will decide how many components to fit.  More
 information on the aims behind the package are given in Wilkins 1988
-and Wilkins \& Axon 1991.  
+and Wilkins \& Axon 1991.
 
 \begin{quote}
 {\bf Users of Twodspec are requested to acknowledge its original authors,
@@ -9171,7 +9171,7 @@ differences when they occur.
 1052-5VIG[2040,171] HH 1-2 HALPHA/[N II]
 
 =========< A r c _ O p t s >=========
- 
+
 New    : Set up line identifications from scratch
 Repeat : Use existing line identifications
 Clone  : Use line identifications from another file
@@ -9269,10 +9269,10 @@ Alternatively the ``ID'' option in the ``Identification Menu'' can be
 used, in which a wavelength and name are used as given.
 Since ARCSDI only aims to straighten the lines, you would leave ARCSDI
 here.
- 
+
 \begin{quote}\begin{verbatim}
 =========< L i n e   L i s t   M e n u >=========
- 
+
 Emission   : Emission lines
 Absorption : Absorption lines
 Neon       : Neon arc
@@ -9283,7 +9283,7 @@ SKy        : Sky lines
 STored     : User supplied list in file
 Ok         : All tables read in
 Line List Menu - e
- 
+
  Emission line list.
  Current version August 1990
   78 lines read from EMISSION
@@ -9345,10 +9345,10 @@ of the interpolation to help guessing (the fitting of the dispersion
 relationship in ARC2D can be used to help line identification).
 You can keep looping around the line list, identifying the lines in any
 order.
- 
+
 \begin{quote}\begin{verbatim}
 =========< I d e n t i f i c a t i o n   M e n u >=========
- 
+
 [number]               : Line wavelength
 Width         [number] : Redraw with different width
 Next                   : Go to next line
@@ -9358,9 +9358,9 @@ Quit                   : Exit leaving lines unidentified
 Identification Menu [ 6548.4] -
 6548.1001 [NII]6548 ok? [YES]
 Identify line number  2
- 
+
 =========< I d e n t i f i c a t i o n   M e n u >=========
- 
+
 [number]               : Line wavelength
 Width         [number] : Redraw with different width
 Next                   : Go to next line
@@ -9384,7 +9384,7 @@ Id [wavelength] [name] : Give line ID/wavelength (just taken as given)
 Quit                   : Exit leaving lines unidentified
 Identification Menu [ 6730.5752] -
 6730.8501 [SII]6731 ok? [YES]
- 
+
  C U R R E N T   L I N E   L I S T
  _________________________________
 line No     identification      wavelength
@@ -9401,9 +9401,9 @@ The user now reaches the {\it Main Menu}:
 
 \begin{quote}\begin{verbatim}
 Current value of iteration is   1
- 
+
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -9445,7 +9445,7 @@ The options are:
 \item[ADD] Add more lines
 \item[IT] Change iteration.
 This allows reduction of iteration, in order to allow previous fits to
-be over-ridden (they can also be over-ridden in MANUAL mode fitting). 
+be over-ridden (they can also be over-ridden in MANUAL mode fitting).
 \item[AUTO] In this mode one defines fits beforehand, and then goes
 though the lines and cross-sections in order performing the fits.
 This is the mode of fitting in batch, and ideally should not be carried
@@ -9578,7 +9578,7 @@ each other).
 
 \begin{quote}\begin{small}\begin{verbatim}
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -9632,7 +9632,7 @@ The option is given to edit the line list again:
 \begin{quote}\begin{verbatim}
 Lines identified:
 [NII]6584 (6583.6)       [NII]6548 (6548.1)       HALPHA (6562.817)
- 
+
 Enter starting line number [1] - 2
 (YBlock) Analysis x-sect width [5] - 90
 Number of blocks = 2
@@ -9646,9 +9646,9 @@ at this stage (but this can be suppressed).
 
 \begin{quote}\begin{small}\begin{verbatim}
 No previous fit
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -9665,9 +9665,9 @@ Delete  : Delete fits in this range
 Hard    : Produce hardcopy of data with fit
 Exit    : Return to main menu
 Manual Mode [FIT] -
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -9688,9 +9688,9 @@ AUto        : Automatic multiple Gaussian/Lorentzian
 TRansfer    : Start from fit to another line
 Exit        : Exit menu and perform any fitting
 Fit Menu [EXIT] - D
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -9711,9 +9711,9 @@ AUto        : Automatic multiple Gaussian/Lorentzian
 TRansfer    : Start from fit to another line
 Exit        : Exit menu and perform any fitting
 Fit Menu [EXIT] -
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -9736,9 +9736,9 @@ The line is displayed.
 
 \begin{quote}\begin{small}\begin{verbatim}
 No previous fit
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -9764,9 +9764,9 @@ Fit Menu [EXIT] - C
 Just reply with ``EXIT'' from now on to leave the program.
 
 \begin{quote}\begin{verbatim}
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -9785,9 +9785,9 @@ Exit    : Return to main menu
 Manual Mode [FIT] - EXIT
  Fits defined =    2
 Current value of iteration is   1
- 
+
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -9832,7 +9832,7 @@ then crash in the fitting).  Note that LONGSLIT outputs to the screen
 the reason why the next component was not accepted when it searches
 for components. The display also contain details of any re-fitting.
 Thus if the fits are not acceptable after the first attempt at using
-this the user can alter the tolerances accordingly.  
+this the user can alter the tolerances accordingly.
 
 The option AIC in the fit defining menu determines whether Akaike's
 information criterion (Akaike 1973) is used during multiple
@@ -9867,17 +9867,17 @@ N.B. To refit a cube which has already been fitted, but the values
 changed, e.g.\ flux-calibrated, use the keyword COPY, which will use
 scaled existing values as first guesses, repeating all the fits in the
 ``cube''.
-If used with CLONE, it enables similar spectra to be easily fitted. 
+If used with CLONE, it enables similar spectra to be easily fitted.
 
 
 \paragraph{Fitting Gaussians etc. Interactively}
 
 The main method of fitting these is the WINDOW option of MANUAL mode.
 First select MANUAL at the main menu.
- 
+
 \begin{quote}\begin{verbatim}
 =========< M a i n   m e n u >=========
- 
+
 ADd       : Add more lines
 It        : Change iteration
 TEmplates : Input data for template based fits
@@ -9897,15 +9897,15 @@ Say which line you wish to start working on, give the required blocking
 (number of cross-sections added together) and the starting
 cross-section.
 
-\begin{quote}\begin{verbatim} 
-Lines identified:  
+\begin{quote}\begin{verbatim}
+Lines identified:
 [NII]6584 (6583.6)       [NII]6548 (6548.1)       HALPHA (6562.817)
 
-Enter starting line number [1] - 3 
-(YBlock) Analysis x-sect width [5] - 10 
-Number of blocks = 2 
+Enter starting line number [1] - 3
+(YBlock) Analysis x-sect width [5] - 10
+Number of blocks = 2
 Enter starting cross-section number [1] - 110
-\end{verbatim}\end{quote} 
+\end{verbatim}\end{quote}
 
 The line is displayed.  This then puts you into MANUAL menu. Select FIT
 and then select the fit type required.  MG allows the user to set the
@@ -9918,9 +9918,9 @@ which varies smoothly between a true Cauchy function and a Gaussian
 
 \begin{quote}\begin{small}\begin{verbatim}
 No previous fit
- 
+
 =========< M a n u a l   M o d e >=========
- 
+
 [name]  : Line name to go to that line
 Last    : Move back to previous Line
 Next    : Move on to next line in list
@@ -9937,9 +9937,9 @@ Delete  : Delete fits in this range
 Hard    : Produce hardcopy of data with fit
 Exit    : Return to main menu
 Manual Mode [FIT] -
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -9960,9 +9960,9 @@ AUto        : Automatic multiple Gaussian/Lorentzian
 TRansfer    : Start from fit to another line
 Exit        : Exit menu and perform any fitting
 Fit Menu [EXIT] - MG
- 
+
 =========< F i t   M e n u >=========
- 
+
 GUess       : Alter guessing ........... Multiples - SCRATCH, Singles - MAXIMUM
 BAse        : Alter base model ....................................... CONSTANT
 BImodal     : Test for bimodality before fitting
@@ -10004,7 +10004,7 @@ Component     Centre        fwhm       Height    Base
 
 The user is free to alter the parameters and to add or delete
 components. When satisfactory, the parameters are optimised. Hit ``F''
-or click in the rectangle labelled ``FIT''. 
+or click in the rectangle labelled ``FIT''.
 
 \paragraph{Background Models}
 
@@ -10080,9 +10080,9 @@ enter the options required e.g.:
 Output   : Create output plots, etc.
 Exit     : Leave program
 Main menu [MANUAL] - OUTPUT
- 
+
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ F
 PLot     : Plot rotation curves............... F
@@ -10104,7 +10104,7 @@ selection. The options are performed when this menu is left.
 
 \begin{quote}\begin{verbatim}
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ T
 PLot     : Plot rotation curves............... F
@@ -10118,9 +10118,9 @@ SOft     : Plot in softcopy (* above) ...... = T
 Velocity : Use velocity scale (+ above) .... = T
 Exit     : Exit menu
 Output Options [TABLE] - PLOT
- 
+
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ T
 PLot     : Plot rotation curves............... T
@@ -10134,9 +10134,9 @@ SOft     : Plot in softcopy (* above) ...... = T
 Velocity : Use velocity scale (+ above) .... = T
 Exit     : Exit menu
 Output Options [PLOT] - PRINT
- 
+
 =========< O u t p u t   O p t i o n s >=========
- 
+
 Hardcopy : Plots of profile fits.............. F
 Table    : Table of profile parameters........ T
 PLot     : Plot rotation curves............... T
@@ -10188,9 +10188,9 @@ STARLINK program RV (Wallace 1987).
 Is longitude ok, taking longitude as +ve west [YES] n
  V_HEL=-4.16896E+00 V_LSR= 1.40857E+01
  V_GAL= 1.33324E+02 V_LGROUP= 1.38917E+02
- 
+
 =========< V e l o c i t y   C o r r e c t i o n >=========
- 
+
 Hel     : Suns ref frame
 Lsr     : Local standard of rest
 GAl     : Galaxy ref frame
@@ -10202,9 +10202,9 @@ Show fits which had NAG errors [NO]
 Is data flux calibrated? [NO]
 Printing fits
 Indicate presence of failed fits [NO]
- 
+
 =========< F l u x   M a r k i n g >=========
- 
+
 No           : Don't mark points according to flux
 Continuous   : Mark using a continuous scale
 Three        : Mark by grading into 3 divisions
@@ -10300,9 +10300,9 @@ and then tolerances are applied on height, centre and width.
 \begin{quote}\begin{verbatim}
 Main menu [MANUAL] - TOLS
 Tolerances on position are relative to the line's rest wavelength
- 
+
 =========< E d i t   T o l e r a n c e s >=========
- 
+
 V_Tol %F : Absolute error of line centre .... = 1.8994141E-02
 V_MAx %F : Max allowed line centre .......... = 3
 V_MIn %F : Min line centre .................. = -3
@@ -10319,9 +10319,9 @@ H_Tol %F : Absolute error of height ......... = 3
 Apply    : Apply tolerances now
 Exit     : Exit but don't apply tolerances now
 Edit Tolerances - H_MAX 1E7
- 
+
 =========< E d i t   T o l e r a n c e s >=========
- 
+
 V_Tol %F : Absolute error of line centre .... = 1.8994141E-02
 V_MAx %F : Max allowed line centre .......... = 3
 V_MIn %F : Min line centre .................. = -3
@@ -10338,9 +10338,9 @@ H_Tol %F : Absolute error of height ......... = 3
 Apply    : Apply tolerances now
 Exit     : Exit but don't apply tolerances now
 Edit Tolerances - APPLY
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = F
 Centre      : Test on CENTRE....... = F
 Width       : Test on WIDTH........ = F
@@ -10351,9 +10351,9 @@ SEparations : Test on SEPARATIONS.. = F
 Log         : Log failures ........ = F
 Apply       : Apply tolerances now
 Set Rejection Criteria - CENTRE
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = F
 Centre      : Test on CENTRE....... = T
 Width       : Test on WIDTH........ = F
@@ -10364,9 +10364,9 @@ SEparations : Test on SEPARATIONS.. = F
 Log         : Log failures ........ = F
 Apply       : Apply tolerances now
 Set Rejection Criteria - HEIGHT
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = T
 Centre      : Test on CENTRE....... = T
 Width       : Test on WIDTH........ = F
@@ -10377,9 +10377,9 @@ SEparations : Test on SEPARATIONS.. = F
 Log         : Log failures ........ = F
 Apply       : Apply tolerances now
 Set Rejection Criteria - WIDTH
- 
+
 =========< S e t   R e j e c t i o n   C r i t e r i a >=========
- 
+
 Height      : Test on HEIGHT....... = T
 Centre      : Test on CENTRE....... = T
 Width       : Test on WIDTH........ = T
@@ -10656,7 +10656,7 @@ SHAPE is not yet implemented.
 Once the data has been corrected for distortions or has been
 ``cleaned'', it must be converted to a linear (calibrated) scale in
 wavelength, or at least the relationship must be defined.
-In practice it is much easier to handle a re-binned file. 
+In practice it is much easier to handle a re-binned file.
 
 The ``traditional'' way of doing this is to take one or more spectra
 of an arc lamp (which has lines of known wavelength), using the same
@@ -10712,7 +10712,7 @@ successfully be fitted. For this the data from successive
 cross-sections can be blocked together, to improve the signal to noise
 ratio. In our case we typically co-add ten successive cross-sections.
 This fitting is a least squares optimisation, including a flat base,
-and is the same as used for LONGSLIT. 
+and is the same as used for LONGSLIT.
 
 ARC2D creates a file for use with ISCRUNCH.
 Weighted fitting may be used for the
@@ -10755,10 +10755,10 @@ use this option for long-slit spectra (of course this isn't applicable
 to data such as form fibre arrays where a smooth curve is not to be
 expected).
 Select the POLY option in the main menu:
- 
+
 \begin{quote}\begin{verbatim}
 =========< M a i n   M e n u >=========
- 
+
 Look   : Look at values of data cube
 Gaus   : Fit Gaussians to line profiles
 Soft   : Produce soft-copy plots of diagnostics
@@ -10804,9 +10804,9 @@ Performing weighted fit
 Go onto next plot? [YES] NO
 Performing weighted fit
 Produce hardcopies of line centre & residual plots [NO]
- 
+
 =========< C o n t i n u i t y   F i t s >=========
- 
+
 Accept   : Accept fits
 Retry    : Try again
 Quit     : Give up
@@ -10819,10 +10819,10 @@ The results are now stored and the user returned to the main menu.
 Evaluating the Dispersion Relation}
 
 Select the DISP option at the main menu:
- 
+
 \begin{quote}\begin{verbatim}
 =========< M a i n   M e n u >=========
- 
+
 Look   : Look at values of data cube
 Soft   : Produce soft-copy plots of diagnostics
 Hard   : Produce hard-copy plots of diagnostics
@@ -10849,7 +10849,7 @@ residuals etc. will refer to the old fit.
 
 \begin{quote}\begin{verbatim}
  ARCFIT :   Order = 3,  cross-section 85
- 
+
 Coefficients of fit are -
 
   8.27062E-16 -3.97077E-12  3.86509E-09
@@ -10887,20 +10887,20 @@ treated separately, otherwise each block is treated as one fit.
 Minimum start wavelength = 4824.331, maximum end wavelength = 5153.783
 Copy any coefficients from one line to another? [NO]
 Fits OK? [YES]
- 
+
 Summary of Image Arc Fit Results -
 -----------------------------------
- 
+
 Image dimensions  2040 by   171
 Number of rows that could not be fitted =     0
 Maximum chi-Squared error =       0.00
 Maximum degree polynomial used =   3
- 
+
 Fit results written to matching .iar file
- 
- 
+
+
 =========< M a i n   M e n u >=========
- 
+
 Look   : Look at values of data cube
 Gaus   : Fit Gaussians to line profiles
 Soft   : Produce soft-copy plots of diagnostics
@@ -11041,7 +11041,7 @@ Gaussians. The points so obtained are fitted with Chebyshev polynomials
 (for each tooth). The intermediate positions are interpolated from
 these, which are then used to evaluate the required movement for each
 data point. The coefficients are written to a file which may then be
-read by the program to apply correction to the actual data. 
+read by the program to apply correction to the actual data.
 
 Alternatively, if QUICK is specified, centroids are used rather than
 the fitting of Gaussians.
@@ -11209,19 +11209,19 @@ program takes a fair time to scale the image, so will ``sit there''
 for a minute or so before anything appears on the screen (this does, of
 course, depend upon the image size). The parameters are as follows:
 \begin{description}
-\item[IMage] (file) Name of image to be displayed 
-\item[YStart] (int) First Y value to be displayed 
-\item[YEnd] (Int) Last Y value to be displayed 
-\item[XStart] (int) First X value to be displayed 
-\item[XEnd] (int) Last X value to be displayed 
-\item[Low] (int) Minimum count level for display 
-\item[High] (int) Maximum count level for display 
+\item[IMage] (file) Name of image to be displayed
+\item[YStart] (int) First Y value to be displayed
+\item[YEnd] (Int) Last Y value to be displayed
+\item[XStart] (int) First X value to be displayed
+\item[XEnd] (int) Last X value to be displayed
+\item[Low] (int) Minimum count level for display
+\item[High] (int) Maximum count level for display
 \item[PLOTdev] The device to plot on (translated using GNS, so
 should be ``xwindows'' etc.).
 \item[ASPect] This is the aspect ratio (X/Y) of the plot (excluding
 any key). The default is set to the value which gives square pixels.
 \item[SHRINK] This gives a wide margin to the plot.
-\item[LOG] (key) Display using logarithmic scaling 
+\item[LOG] (key) Display using logarithmic scaling
 \item[KEY] This plots a key giving the data values corresponding to
 given greyscale values.
 \end{description}
@@ -11327,18 +11327,18 @@ velocities this should be adequate.
 \paragraph{Summary of Parameters}
 
 \begin{description}
-\item[IMage] (file) Name of image to be displayed 
+\item[IMage] (file) Name of image to be displayed
 \item[OUTput] (file) Name of image to create
 \item[FILE] (char) Name of file for positions of fibres
-\item[YStart] (int) First Y value to be displayed 
-\item[YEnd] (int) Last Y value to be displayed 
-\item[XStart] (int) First X value to be displayed 
-\item[XEnd] (int) Last X value to be displayed 
-\item[Low] (int) Minimum count level for display 
-\item[High] (int) Maximum count level for display 
+\item[YStart] (int) First Y value to be displayed
+\item[YEnd] (int) Last Y value to be displayed
+\item[XStart] (int) First X value to be displayed
+\item[XEnd] (int) Last X value to be displayed
+\item[Low] (int) Minimum count level for display
+\item[High] (int) Maximum count level for display
 \item[DEVICE] (char) Plotting device (normally something like ``xwindows'')
 \item[NFIB] (int) Approximate number of fibres expected
-\item[LOG] (key) Display using logarithmic scaling 
+\item[LOG] (key) Display using logarithmic scaling
 \item[OLD] (key) Use previous results to extract data
 \end{description}
 
@@ -11566,52 +11566,52 @@ act as a search list (at present up to 5 values).
 
 \begin{itemize}
 
-\item 
+\item
   Akaike, H., 1973, in 2nd int. Symp. Information Theory, P.267, Eds.
   Petrov, B. N. \& Csaki, K., Akademai Kiado, Budapest
 
-\item 
+\item
   Bailey, J., 1989, ICL --- The New ADAM Command Language
 
-\item 
+\item
   Bland, J., 1986, Ph. D. Thesis, Univ. of Sussex
 
-\item 
+\item
   Chipperfield, A. J., 1989, SUN/35.2, ICL --- Interactive Command Language:
   An Introduction
 
-\item 
+\item
   Frazer, R. D. B. \& Suzuki, E., 1969, Anal. Chem., 41,37
 
-\item 
+\item
   Heckman, T. M., Miley, G. K., van Breugel, W. J. M. \& Butcher, H. R.,
   1981, Astrophys. J., 247, 403
 
-\item 
+\item
   Lawden, M. D., 1989, SG/4 ADAM --- The Starlink Software Environment
 
-\item 
+\item
   Meaburn J., Blundell B., Carling R., Gregory D.F., Keir D. \& Wynne C.G.,
   1984, MNRAS, 210, 463
 
-\item 
+\item
   Wallace, P. T., 1987, \xref{SUN/78}{sun78}{} RV --- Radial Components of
   Observer's Velocity
 
-\item 
+\item
   Wallace, P. T., 1990, \xref{SUN/67}{sun67}{} SLALIB --- a Library of
   Subprograms
 
-\item 
+\item
   Whittle, M., 1982, Ph. D. Thesis, Univ. of Cambridge
 
-\item 
+\item
   Whittle, M., 1985, MNRAS, 213, 1
 
-\item 
+\item
   Wilkins, T. N., 1988, Ph. D. Thesis, Univ. of Manchester
 
-\item 
+\item
   Wilkins, T. N. \& Axon, D. J. 1991, Astronomical Data Analysis
   Software and Systems 1, Astronomical Society of the Pacific Conference
   Series, 25, 427
@@ -11633,7 +11633,7 @@ act as a search list (at present up to 5 values).
    Figaro includes a large number of standard files supplied by Roderick
    Johnstone, IoA Cambridge.  This section reproduces the document he
    supplied with those files and which dates from December 1987.  The
-   files are kept in the standard Figaro directory 
+   files are kept in the standard Figaro directory
 \latorhtm{FIGARO\_PROG\_S (see Section~\ref{figaro_directories}),}
 {\htmlref{FIGARO\_PROG\_S}{figaro_directories},}
    which on a normal Starlink system corresponds to directory:
@@ -11885,7 +11885,7 @@ BD+75 325   & 08 10 49.4903 & +74 57 57.929 &   9.50  & O5pvar & $\bullet$ \\
 BPM 16274   & 00 50.1       & -52 09        &  14.16  & DA...  &   \\
 Eta UMA     & 13 47 32.4377 & +49 18 47.754 &   1.852 & B3V    &   \\
 Feige 110   & 23 19 58.3977 & -05 09 56.207 &  11.4   & DA:    & $\bullet$ \\
-Feige 34    & 10 39 36.7400 & +43 06 09.252 &  11.0   & DA:    & $\bullet$ \\ 
+Feige 34    & 10 39 36.7400 & +43 06 09.252 &  11.0   & DA:    & $\bullet$ \\
 G 191-B2B   & 05 05 30.6119 & +52 49 51.945 &  11.79  & DAw... & $\bullet$ \\
 G 93-48     & 21 52 25.3835 & +02 23 19.556 &  12.73  & DA     &   \\
 Gamma UMa   & 11 53 49.8475 & +53 41 41.136 &   2.427 & A0V    &   \\
@@ -13966,7 +13966,7 @@ Some items described in previous release notes have been removed.
 
  Version 5.1-5 of Figaro was only made available on the Starlink Linux
  CD, Version 1.3.  Version 5.1-6 is identical to 5.1-5, except for
- the changes to the HELP text and the \verb+DSA_RESHAPE_DATA+ 
+ the changes to the HELP text and the \verb+DSA_RESHAPE_DATA+
  improvement (see below).
 
  This news item accompanies the latest release of Figaro: version
@@ -14312,12 +14312,12 @@ Some items described in previous release notes have been removed.
  The following notes are a slightly modified version of the news item
  which accompanied the release of Figaro version 5.5-0 (autumn 1999).
 
- The major change in version 5.5-0 is the incorporation of the Twodspec 
- package, which is used for 
+ The major change in version 5.5-0 is the incorporation of the Twodspec
+ package, which is used for
  longslit spectroscopy data reduction and analysis. It provides tools for
- calibration/correction of data and fitting of 2-D longslit arrays, 
- either automatically or as an interactive process. These tools also 
- offer a number of options for generating hard copy output of the 
+ calibration/correction of data and fitting of 2-D longslit arrays,
+ either automatically or as an interactive process. These tools also
+ offer a number of options for generating hard copy output of the
  resulting fits.
 
  The original stand-along Twodspec accessed data files using the DSA and

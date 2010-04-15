@@ -21,10 +21,10 @@
 
 *  Description:
 *     This application creates a new ShiftMap and optionally initialises
-*     its attributes. A Winmap is a linear Mapping which transforms a 
-*     rectangular window in one coordinate system into a similar window 
-*     in another coordinate system by shifting each axis (the window 
-*     edges being parallel to the coordinate axes). Thus, a ShiftMap is 
+*     its attributes. A Winmap is a linear Mapping which transforms a
+*     rectangular window in one coordinate system into a similar window
+*     in another coordinate system by shifting each axis (the window
+*     edges being parallel to the coordinate axes). Thus, a ShiftMap is
 *     equivalent to a WinMap with unit scaling on each axis.
 
 *  Usage:
@@ -32,14 +32,14 @@
 
 *  ADAM Parameters:
 *     SHIFT() = _DOUBLE (Read)
-*        The values to be added to each axis of the input coordinate system. 
+*        The values to be added to each axis of the input coordinate system.
 *        There should be one value for each coordinate axis.
 *     NCOORD = _INTEGER (Read)
 *        The number of coordinate values for the ShiftMap (the same value
 *        is used for both input and output axes).
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new ShiftMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new ShiftMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new ShiftMap.
 
@@ -82,7 +82,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Status:
       INTEGER STATUS
@@ -90,10 +90,10 @@
 *  Local Variables:
       DOUBLE PRECISION SHIFT( NDF__MXDIM )
       INTEGER NCOORD
-      INTEGER RESULT       
+      INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -101,7 +101,7 @@
 
 *  Get the required parameter values.
       CALL PAR_GET0I( 'NCOORD', NCOORD, STATUS )
-      CALL PAR_EXACD( 'SHIFT', NCOORD, SHIFT, STATUS ) 
+      CALL PAR_EXACD( 'SHIFT', NCOORD, SHIFT, STATUS )
 
 *  Create the required ShiftMap.
       RESULT = AST_SHIFTMAP( NCOORD, SHIFT, ' ', STATUS )

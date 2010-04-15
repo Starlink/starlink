@@ -8,8 +8,8 @@ C  Function:
 C     Returns default file extensions for the DSA_ routines
 C
 C  Description:
-C     This routine returns a set of possible default file extensions 
-C     for the DSA_ routines.  It should not necessarily be assumed that 
+C     This routine returns a set of possible default file extensions
+C     for the DSA_ routines.  It should not necessarily be assumed that
 C     these are three character strings.  In fact, this routine returns
 C     the extensions preceeded by a '.' in any case, so normally the
 C     argument should be at least four characters. This is an extended
@@ -29,11 +29,11 @@ C
 C     (>) MAX_EXTS    (Integer,ref) The number of elements in the array
 C                     DEFEXTS.  If this is less than the actual number of
 C                     extensions in use, then only the first MAX_EXTS will
-C                     be returned, but NUMBER will still be returned as 
+C                     be returned, but NUMBER will still be returned as
 C                     the actual number in use.
 C     (<) DEFEXTS     (Fixed string array,descr) The default extensions,
 C                     preceeded by a '.' - eg '.dat', in order of
-C                     preference.  
+C                     preference.
 C     (<) NUMBER      (Integer,ref) The actual number of extensions in
 C                     use.  Note that this may be larger than MAX_EXTS.
 C

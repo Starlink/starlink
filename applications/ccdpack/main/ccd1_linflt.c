@@ -10,7 +10,7 @@
 *     Starlink C
 
 *  Description:
-*     (From g77 info file, we're trying to avoid -ffloat-store) 
+*     (From g77 info file, we're trying to avoid -ffloat-store)
 *     If your program depends on exact IEEE 754 floating-point
 *     handling it may help on some systems--specifically x86 or m68k
 *     hardware--to use the `-ffloat-store' option or to reset the
@@ -21,13 +21,13 @@
 *     `-ffloat-store'.  On x86 and m68k GNU systems you can do this
 *     with a technique similar to that for turning on floating-point
 *     exceptions. The control word could be set to double precision
-*     by replacing the `__setfpucw' call with one like this: 
+*     by replacing the `__setfpucw' call with one like this:
 *
 *      __setfpucw ((_FPU_DEFAULT & ~_FPU_EXTENDED) | _FPU_DOUBLE);
 *
 *     (It is not clear whether this has any effect on the operation
 *     of the GNU maths library, but we have no evidence of it
-*     causing trouble.) 
+*     causing trouble.)
 *
 *     On systems other than GNU/linux, this routine is defined as a
 *     no-operation.
@@ -36,7 +36,7 @@
 *      none
 
 *  Notes:
-*     This routine is invoked on linux, since at RedHat 7, there 
+*     This routine is invoked on linux, since at RedHat 7, there
 *     appears to be a serious numerical bug which turns up when the
 *     -O and -ffloat-store flags are used together.  If only -O is
 *     used, numerics are still not very good (i.e. they diverge from
@@ -89,7 +89,7 @@
 
 #include <fpu_control.h>
 
-F77_SUBROUTINE(ccd1_linflt)() 
+F77_SUBROUTINE(ccd1_linflt)()
 {
    fpu_control_t cw = (_FPU_DEFAULT & ~_FPU_EXTENDED) | _FPU_DOUBLE;
    _FPU_SETCW(cw);

@@ -55,12 +55,12 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *     will do this work, otherwise you need to arrange this for yourself.
 *-
 */
-   
+
 /* Local Variables: */
    int iarg;                     /* Loop counter for arguments */
 
@@ -125,7 +125,7 @@ void ndfInit( int argc, char *const argv[], int *status ) {
       *status = NDF__ARGIN;
       emsRep( "ndfInit_arg1", "Invalid NULL pointer given for argument "
                  "list.", status );
-      
+
 /* Otherwise, check that each individual argument string pointer is
    valid (not NULL) and report an error if necessary. */
    } else {

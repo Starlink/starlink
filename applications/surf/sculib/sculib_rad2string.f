@@ -7,7 +7,7 @@
 *     Translate an angle or time in radians to a nicely formatted string
 
 *  Invocation:
-*     CALL SCULIB_RAD2STRING( ANGLE, NDP, ISTIME, RESLT, STATUS ) 
+*     CALL SCULIB_RAD2STRING( ANGLE, NDP, ISTIME, RESLT, STATUS )
 
 *  Description:
 *     Converts an angle or time in radians to a string that can be

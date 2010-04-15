@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, NYPAR, 
+      SUBROUTINE KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, NYPAR,
      :                       MCOEF, CHCOEF, VARIAN, RSMAX, RMS, COSYS,
      :                       STATUS )
 *+
@@ -6,23 +6,23 @@
 *     KPS1_FSWPE
 
 *  Purpose:
-*     Writes the SURFACEFIT.FIT NDF extension for storing Chebyshev fit 
+*     Writes the SURFACEFIT.FIT NDF extension for storing Chebyshev fit
 *     coefficients.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, NYPAR, 
-*                       MCOEF, CHCOEF, VARIAN, RSMAX, RMS, COSYS, 
+*      CALL KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, NYPAR,
+*                       MCOEF, CHCOEF, VARIAN, RSMAX, RMS, COSYS,
 *                       STATUS )
 
 *  Description:
 *     This routine creates a SURFACEFIT extension in a supplied NDF.
 *     Within in that in makes a FIT structure of type POLYNOMIAL,
-*     variant CHEBYSHEV, for storing the fit coefficients; plus RMS, 
+*     variant CHEBYSHEV, for storing the fit coefficients; plus RMS,
 *     RESIDMAX, and COSYS objects for the rms difference of the fit,
-*     the maximum residual, and the co-ordinate system respectively.  
+*     the maximum residual, and the co-ordinate system respectively.
 
 *  Arguments:
 *     NDFI = INTEGER (Given)
@@ -141,9 +141,9 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Write the results to an extension named SURFACEFIT.  The 
+*  Write the results to an extension named SURFACEFIT.  The
 *  coefficients will be stored in a structure within this called FIT.
-*  FIT has type POLYNOMIAL (see SGP/38 for a description of the 
+*  FIT has type POLYNOMIAL (see SGP/38 for a description of the
 *  contents of a POLYNOMIAL structure).
       CALL NDF_XNEW( NDFI, 'SURFACEFIT', 'EXT', 0, 0, XLOC, STATUS )
 

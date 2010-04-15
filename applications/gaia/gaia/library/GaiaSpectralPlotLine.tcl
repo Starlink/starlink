@@ -6,7 +6,7 @@
 #     [incr Tk] widget
 
 #  Purpose:
-#     A multi-featured control for displaying a spectral coordinate 
+#     A multi-featured control for displaying a spectral coordinate
 #     associated with a GaiaCube instance.
 
 #  Description:
@@ -195,8 +195,8 @@ itcl::class gaia::GaiaSpectralPlotLine {
       }
    }
 
-   #  Update the coordinates readout to show the coordinate type. 
-   #  This is expensive so should be handled by the caller when needed 
+   #  Update the coordinates readout to show the coordinate type.
+   #  This is expensive so should be handled by the caller when needed
    #  (change of cube axis, new dataset etc.).
    public method update_coords_type {plane} {
       if { $itk_option(-show_type) } {

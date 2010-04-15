@@ -20,17 +20,17 @@
 *        The global status.
 
 *  Description:
-*     This application displays the formatted value of a specified attribute 
+*     This application displays the formatted value of a specified attribute
 *     of an Object, and also writes it to an output parameter.
 
 *  Usage:
-*     astget this attrib 
+*     astget this attrib
 
 *  ADAM Parameters:
 *     ATTRIB = LITERAL (Read)
 *        A string containing the name of the required attribute.
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Object. If an NDF is supplied, 
+*        An NDF or text file holding the Object. If an NDF is supplied,
 *        the WCS FrameSet will be used.
 *     VALUE = LITERAL (Write)
 *        On exit, this holds the formatted value of the attribute.
@@ -87,7 +87,7 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -107,7 +107,7 @@
       CALL MSG_OUT( 'ASTGET_MSG1', '^V', STATUS )
 
 *  Store it in an output parameter.
-      CALL PAR_PUT0C( 'VALUE', VAL( : MAX( 1, CHR_LEN( VAL ) ) ), 
+      CALL PAR_PUT0C( 'VALUE', VAL( : MAX( 1, CHR_LEN( VAL ) ) ),
      :                STATUS )
 
 *  End the AST context.

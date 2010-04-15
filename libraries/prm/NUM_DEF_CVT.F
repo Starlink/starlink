@@ -50,7 +50,7 @@
 
 
 *  Machine-specific features used:
-*     None.  
+*     None.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
@@ -62,12 +62,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -112,8 +112,8 @@
       NUM1_UBTOW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
       NUM1_UWTOI( NUM_ARGUW ) = JZEXT( NUM_ARGUW )
       NUM1_WTOUB( NUM_ARGW )   =
-     :   IIEOR( NUM_ARGW, 
-     :      IIAND( - IIAND( NUM_ARGW, NUM1_ITOW( 128 ) ), 
+     :   IIEOR( NUM_ARGW,
+     :      IIAND( - IIAND( NUM_ARGW, NUM1_ITOW( 128 ) ),
      :             NUM1_ITOW( -256 ) ) )
       NUM1_ITOUW( NUM_ARGI )   =
      :  JIAND( 65535, NUM1_WTOI( NUM1_ITOW( NUM_ARGI - 32768 ) )
@@ -122,7 +122,7 @@
 *  VMS intrinsics IZEXT and co are not supported by this Fortran
 *  compiler.  Functions NUM1_UBTOI, NUM1_UBTOUW, NUM1_UBTOW, NUM1_UWTOI,
 *  NUM1_WTOUB, and NUM1_ITOUW must therefore be supplied by module num1_cvt.c.
-#endif 
+#endif
 
 *  Functions resulting in BYTE.
 *  ===========================
@@ -140,7 +140,7 @@
       NUM_WTOB( NUM_ARGW )    = NUM_ARGW
 
       NUM_UWTOB( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
- 
+
 
 *  Functions resulting in DOUBLE PRECISION.
 *  =======================================
@@ -158,7 +158,7 @@
       NUM_WTOD( NUM_ARGW )    = DBLE( NUM_ARGW )
 
       NUM_UWTOD( NUM_ARGUW )  = DBLE( NUM1_UWTOI( NUM_ARGUW ) )
- 
+
 
 *  Functions resulting in INTEGER.
 *  ==============================
@@ -176,7 +176,7 @@
       NUM_WTOI( NUM_ARGW )    = NUM_ARGW
 
       NUM_UWTOI( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
- 
+
 
 *  Functions resulting in REAL.
 *  ===========================
@@ -194,7 +194,7 @@
       NUM_WTOR( NUM_ARGW )    = REAL( NUM_ARGW )
 
       NUM_UWTOR( NUM_ARGUW )  = REAL( NUM1_UWTOI( NUM_ARGUW ) )
- 
+
 
 *  Functions resulting in WORD.
 *  ===========================
@@ -235,8 +235,8 @@
 
       NUM_UWTOUB( NUM_ARGUW ) =
      :                         NUM_WTOUB( NUM_UWTOW( NUM_ARGUW ) )
- 
- 
+
+
 *  Functions resulting in UNSIGNED WORD.
 *  ====================================
 

@@ -107,7 +107,7 @@
 
 *  Local Constants:
       INTEGER BOUNDARY                     ! Number of bytes used for
-      PARAMETER (BOUNDARY = VAL__NBD)      ! sentinel integers. Also the 
+      PARAMETER (BOUNDARY = VAL__NBD)      ! sentinel integers. Also the
                                            ! alignment size for data
       INTEGER SENTINEL                     ! Sentinel integer value
       PARAMETER (SENTINEL = 37 )

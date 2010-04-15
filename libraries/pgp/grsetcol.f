@@ -7,7 +7,7 @@
 *   Set the current colour. If ICOL is less than zero the
 *   colour is set to one. On devices that do not support colour
 *   the line and marker colours are only allowed to be set to 0
-*   or 1 to avoid drawing 'grey' (and therefore invisible) lines 
+*   or 1 to avoid drawing 'grey' (and therefore invisible) lines
 *   on printers.
 *
 *   Given

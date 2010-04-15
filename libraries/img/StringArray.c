@@ -24,12 +24,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@ typedef struct StringInfo {
   StringInfoPtr nextInfo;
 } StringInfo;
 
-static StringInfoPtr currentPtr = (StringInfoPtr) NULL; 
+static StringInfoPtr currentPtr = (StringInfoPtr) NULL;
 
 /*
  *  Name:
@@ -127,7 +127,7 @@ void img1StoreArrayString( const char *string, const char *id,
   strncpy( sptr->id, id, MAXID);
 
   /*  This is now the current string */
-  if ( currentPtr != (StringInfoPtr) NULL ) { 
+  if ( currentPtr != (StringInfoPtr) NULL ) {
     currentPtr->nextInfo = sptr;
   }
   currentPtr = sptr;
@@ -168,10 +168,10 @@ void img1FreeArrayString( const char *id, int *status )
   StringInfoPtr lastPtr;
   StringInfoPtr nextPtr;
   int i;
-  
+
   ptr = currentPtr;
   for(;;) {
-    if ( ptr != (StringInfoPtr) NULL ) { 
+    if ( ptr != (StringInfoPtr) NULL ) {
 
       /*  Check if this structure is related to the image id */
       if ( ! strcmp( ptr->id, id ) || id[0] == '*' ) {
@@ -180,9 +180,9 @@ void img1FreeArrayString( const char *id, int *status )
             actually the current end of chain then reassign it. */
         lastPtr = ptr->lastInfo;
         nextPtr = ptr->nextInfo;
-        if ( ptr == currentPtr ) { 
+        if ( ptr == currentPtr ) {
           currentPtr = lastPtr;
-          if ( lastPtr == (StringInfoPtr) NULL ) { 
+          if ( lastPtr == (StringInfoPtr) NULL ) {
             (void) free( (void *) ptr->addr );
             (void) free( (void *) ptr );
             break; /*  End of complete chain (whole). */
@@ -190,12 +190,12 @@ void img1FreeArrayString( const char *id, int *status )
           currentPtr->nextInfo = (StringInfoPtr) NULL;
         } else {
           nextPtr->lastInfo = lastPtr;
-          if ( lastPtr == (StringInfoPtr) NULL ) { 
+          if ( lastPtr == (StringInfoPtr) NULL ) {
             (void) free( (void *) ptr->addr );
             (void) free( (void *) ptr );
             break; /* End of partial chain (restructured). */
           }
-          lastPtr->nextInfo = nextPtr; 
+          lastPtr->nextInfo = nextPtr;
         }
         (void) free( (void *) ptr->addr );
         (void) free( (void *) ptr );
@@ -213,25 +213,25 @@ void img1FreeArrayString( const char *id, int *status )
   }
 }
 
-/*  
+/*
  *  Name:
  *     img1CountParams
  *
  *  Purpose:
  *     Counts the number of parameters in a string.
  *
- *  Return: 
+ *  Return:
  *     The number of parameters in a string.
  *
  *  Arguments:
  *     string = const char *
  *        The parameter string. Each separate parameter is comma
- *        separated. 
+ *        separated.
  *     status = int *
  *        Global status.
  */
 
-int img1CountParams( const char *string, int *status ) 
+int img1CountParams( const char *string, int *status )
 {
   char *position;
   int n = 0;
@@ -263,9 +263,9 @@ int img1CountParams( const char *string, int *status )
  *        The parameter string.
  *     n = const int
  *        The element to extract/
- *     value = char * 
+ *     value = char *
  *        The value of the nth element.
- *     status = int * 
+ *     status = int *
  *        The global status.
  *
  */
@@ -285,12 +285,12 @@ void img1ExtractParam( const char *string, const int n, char *value,
 
   /*  Count number of tokens until reach required position */
   first = strtok( stringc, "," );
-  for ( i = 1; i < n; i ++ ) { 
+  for ( i = 1; i < n; i ++ ) {
     first = strtok( (char *) NULL, "," );
   }
 
   /*  Check that the required number exist. If not complain. */
-  if ( first == (char *) NULL ) { 
+  if ( first == (char *) NULL ) {
     *status = IMG__FATIN;
     emsRep( " ","img1StringArray: too few parameters for request.",
                status );

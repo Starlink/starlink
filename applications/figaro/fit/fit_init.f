@@ -26,9 +26,9 @@ C     (<) LUFILE   (Integer) Logical unit number for disk file, if used.
 C     (<) NOSWAP   (Logical) Used to suppress byte swapping.
 C     (<) NOTERM   (Logical) Used to suppress proper termination of the tape.
 C     (<) DEVICE   (Character) Output device name.
-C     (<) TBLOCK   (Integer) Is the current blocking factor - number of 
+C     (<) TBLOCK   (Integer) Is the current blocking factor - number of
 C                  logical records in each actual tape record.
-C     (<) BCOUNT   (Integer) Is the number of logical records already 
+C     (<) BCOUNT   (Integer) Is the number of logical records already
 C                  held in TBUFF.
 C     (>) TDENS    (Integer) Is the tape density.
 C
@@ -92,10 +92,10 @@ C
 C
 C        Tape has opened OK.  Now for a messy bit to do with the density.
 C        If the density is already set, this is almost certainly because
-C        a tape has already been used but has been dismounted.  If so, 
+C        a tape has already been used but has been dismounted.  If so,
 C        (and if the tape is at the load point), assume that the same density
 C        should be used for the new tape - VMS sets drives back to a default
-C        density under these circumstances.  Note that the density value is 
+C        density under these circumstances.  Note that the density value is
 C        cleared when FIT_END is called, but is set by FIT_DISMT.
 C        Ignore the status here - not all tapes have densities (eg Exabytes)
 C        so as long as the tape opened, return OK status.

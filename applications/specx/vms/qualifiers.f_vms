@@ -1,4 +1,4 @@
-      subroutine qualifiers (use_dump, dumpname, 
+      subroutine qualifiers (use_dump, dumpname,
      &                       use_old_map, use_map, mapname)
 
 *  Routine to fetch dump and map qualifiers from SPECX command line.

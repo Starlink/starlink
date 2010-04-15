@@ -9,7 +9,7 @@
 *        initialised some string variables (to avoid garbage in defaults).
 *     6-JUN-2000 (MBT)
 *        Modified for dynamic array allocation.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
@@ -17,7 +17,7 @@
       INTEGER PSFMAX, NOPT
 
       PARAMETER (PSFMAX=35, NOPT=11)
-C 
+C
 C PSFMAX is the maximum PSF radius.  A value of 35 is consistent with
 C        DAOPHOT.
 C
@@ -70,7 +70,7 @@ C     CALL STECNT('PUT', 1, 0, 0)                    ! MIDAS
       CALL TBLANK
       IF (OPT(3) .GE. 0.5) THEN
          CENTER=.TRUE.
-      ELSE 
+      ELSE
          CENTER=.FALSE.
       END IF
       PERERR = 0.01*OPT(7)
@@ -79,7 +79,7 @@ C     CALL STECNT('PUT', 1, 0, 0)                    ! MIDAS
 C
       INPICT = 'END OF FILE'
  1900 CALL GETNAM ('Input image name:', INPICT)
-      IF ((INPICT .EQ. 'END OF FILE') .OR. (INPICT .EQ. 'EXIT')) 
+      IF ((INPICT .EQ. 'END OF FILE') .OR. (INPICT .EQ. 'EXIT'))
      .     CALL BYEBYE
       CALL ATTACH (INPICT, OPEN)
       IF (.NOT. OPEN) THEN
@@ -102,18 +102,18 @@ C
 C
 C Call the routine to do the work.
 C
-      CALL ALLSTR (%VAL(CNF_PVAL(IPDAT)), NCOL, NROW, 
+      CALL ALLSTR (%VAL(CNF_PVAL(IPDAT)), NCOL, NROW,
      :             %VAL(CNF_PVAL(IPSUB)), %VAL(CNF_PVAL(IPSIG)),
-     .     %VAL(CNF_PVAL(IPR(1))), %VAL(CNF_PVAL(IPR(2))), 
+     .     %VAL(CNF_PVAL(IPR(1))), %VAL(CNF_PVAL(IPR(2))),
      :     %VAL(CNF_PVAL(IPR(3))), %VAL(CNF_PVAL(IPR(4))),
-     .     %VAL(CNF_PVAL(IPR(5))), %VAL(CNF_PVAL(IPR(6))), 
+     .     %VAL(CNF_PVAL(IPR(5))), %VAL(CNF_PVAL(IPR(6))),
      :     %VAL(CNF_PVAL(IPR(7))), %VAL(CNF_PVAL(IPR(8))),
-     .     %VAL(CNF_PVAL(IPR(9))), %VAL(CNF_PVAL(IPR(10))), 
+     .     %VAL(CNF_PVAL(IPR(9))), %VAL(CNF_PVAL(IPR(10))),
      :     %VAL(CNF_PVAL(IPR(11))), %VAL(CNF_PVAL(IPR(12))),
      .     %VAL(CNF_PVAL(IPR(13))), %VAL(CNF_PVAL(IPR(14))),
-     .     %VAL(CNF_PVAL(IPID)), %VAL(CNF_PVAL(IPNP)), 
+     .     %VAL(CNF_PVAL(IPID)), %VAL(CNF_PVAL(IPNP)),
      :     %VAL(CNF_PVAL(IPSK)), %VAL(CNF_PVAL(IPLA)), MAXSTR,
-     .     OPT(1), OPT(5), OPT(4), NINT(OPT(2)), CENTER, 
+     .     OPT(1), OPT(5), OPT(4), NINT(OPT(2)), CENTER,
      .     NINT(OPT(6)), PERERR, PROERR, OPT(9), OPT(10))
 C
 C Deallocate the workspace.
@@ -137,10 +137,10 @@ C
 C
 C#######################################################################
 C
-      SUBROUTINE  ALLSTR  (DATA, NCOL, NROW, SUBT, SIGMA, 
-     .     XC, YC, MAG, SKY, RPIXSQ, CHI, SUMWT, NUMER, DENOM, MAGERR, 
+      SUBROUTINE  ALLSTR  (DATA, NCOL, NROW, SUBT, SIGMA,
+     .     XC, YC, MAG, SKY, RPIXSQ, CHI, SUMWT, NUMER, DENOM, MAGERR,
      .     DXOLD, DYOLD, XCLAMP, YCLAMP, ID, NPIX, SKIP, LAST, MAXSTR,
-     .     FITRAD, WATCH, HALF, IEXP, CENTER, 
+     .     FITRAD, WATCH, HALF, IEXP, CENTER,
      .     MAXGRP, PERERR, PROERR, SKYIN, SKYOUT)
 C
 C=======================================================================
@@ -152,7 +152,7 @@ C              OFFICIAL DAO VERSION:  1987 June 30
 C
 C Input arguments:
 C
-C       DATA is the input image, stored as a two-dimensional REAL 
+C       DATA is the input image, stored as a two-dimensional REAL
 C            array.
 C
 C NCOL, NROW are the dimensions of the input image.
@@ -164,16 +164,16 @@ C     SIGMA is the address of some working space where ALLSTAR can
 C            keep track of the standard errors of the individual pixels
 C
 C     FITRAD is the user-definable parameter "Fitting radius."  It
-C            governs how many pixels out from the centroid of the star 
+C            governs how many pixels out from the centroid of the star
 C            will actually be considered in computing the least-
 C            squares profile fits.
 C
-C      WATCH is the 'watch progress' parameter specified by the user.  
+C      WATCH is the 'watch progress' parameter specified by the user.
 C            If WATCH > 0, information relating to the progress of
-C            the reductions will be typed on the terminal during 
+C            the reductions will be typed on the terminal during
 C            execution.
 C
-C HALF, IEXP are the "Clipping radius" and "Clipping exponent" 
+C HALF, IEXP are the "Clipping radius" and "Clipping exponent"
 C            parameters which specify the degree to which discordant
 C            pixels are to be ignored.
 C
@@ -187,21 +187,21 @@ C=======================================================================
 C
       IMPLICIT NONE
 
- 
+
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers (-1E38) with VAL__MINR.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
       INTEGER MAXSTR, MAXPSF, MAXIT, MAXMAX, MAXPAR, MAXEXP
       PARAMETER (MAXPSF=145, MAXIT=200, MAXMAX=100,
      .     MAXPAR=6, MAXEXP=6)
 C
 C Parameters:
 C
-C MAXSTR The maximum number of stars in a frame.  
+C MAXSTR The maximum number of stars in a frame.
 C
 C MAXPSF the largest PSF look-up table that can be accomodated.  If
 C        PSFMAX is the largest acceptable PSF radius (see main-line
@@ -280,13 +280,13 @@ C
      .     (PSFFIL .EQ. 'GIVE UP')) RETURN
 C
       ISTAT = RDPSF (PSFFIL, IPSTYP, PAR, MAXPAR, NPAR,
-     .     PSF, MAXPSF, MAXEXP, NPSF, NEXP, NFRAC, 
+     .     PSF, MAXPSF, MAXEXP, NPSF, NEXP, NFRAC,
      .     PSFMAG, BRIGHT, XPSF, YPSF)
       IF (ISTAT .NE. 0) THEN
          PSFFIL = 'GIVE UP'
          GO TO 950
       END IF
-      PEAK = USEPSF(IPSTYP, 0., 0., BRIGHT, PAR, PSF, NPSF, 
+      PEAK = USEPSF(IPSTYP, 0., 0., BRIGHT, PAR, PSF, NPSF,
      .     NPAR, NEXP, NFRAC, 0., 0., DVDXC, DVDYC)
 C
 C Stars will be checked for merger if they are separated by less than
@@ -323,7 +323,7 @@ C
          GO TO 960
       END IF
 C
-      CALL RDHEAD (2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, AP1, 
+      CALL RDHEAD (2, NL, IDUM, IDUM, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, RONOIS, DUM)
       IF ((NL .LT. 1) .OR. (NL .GT. 3)) THEN
          CALL STUPID ('Not a valid input file.')
@@ -346,7 +346,7 @@ C
          PROFIL = 'GIVE UP'
          GO TO 970
       END IF
-      CALL WRHEAD (1, 1, NCOL, NROW, 7, LOBAD, HIBAD, THRESH, AP1, 
+      CALL WRHEAD (1, 1, NCOL, NROW, 7, LOBAD, HIBAD, THRESH, AP1,
      .     PHPADU, RONOIS, FITRAD)
 C
 C Name for the output image.
@@ -355,7 +355,7 @@ C
       CALL GETNAM ('Name for subtracted image:', SUBPIC)
       IF (SUBPIC(1:11) .EQ. 'END OF FILE') CALL TBLANK
 C
-C We need to keep track of the anticipated standard error of the 
+C We need to keep track of the anticipated standard error of the
 C brightness value in a given pixel as the reductions proceed.
 C
       RONOIS=RONOIS**2
@@ -371,7 +371,7 @@ C
          END IF
 C
          DO IX=1,NCOL
-            IF ((DATA(IX,IY) .GT. HIBAD) .OR. 
+            IF ((DATA(IX,IY) .GT. HIBAD) .OR.
      .           (DATA(IX,IY) .LT. LOBAD)) THEN
                SIGMA(IX,IY) = VAL__MINR
             ELSE
@@ -420,7 +420,7 @@ C
       WRITE (6,5552) NSTAR
  5552 FORMAT (/1X, I5, ' stars.  <<')
       WRITE (6,610)
-  610 FORMAT (//' I = iteration number', 
+  610 FORMAT (//' I = iteration number',
      .        //' R = number of stars that remain'
      .        //' D = number of stars that disappeared'
      .        //' C = number of stars that converged'
@@ -517,10 +517,10 @@ C
             SIGMA(IX,IY) = -ABS(SIGMA(IX,IY))
          END DO
 C
-C OK.  Now find all the points within one working radius of each 
-C star.  Set the sigmas of these pixels positive again and copy 
+C OK.  Now find all the points within one working radius of each
+C star.  Set the sigmas of these pixels positive again and copy
 C them from DATA to SUBT.
-C 
+C
 C N points at the last star that has such a low x-coordinate
 C that it can be omitted.
 C
@@ -550,8 +550,8 @@ C
             END IF
  2120    CONTINUE
 C
-C Subtract from the working copy of the image (SUBT) each star which 
-C has not yet converged by subtracting the shifted, scaled PSF 
+C Subtract from the working copy of the image (SUBT) each star which
+C has not yet converged by subtracting the shifted, scaled PSF
 C according to the current best parameter estimates; do this only
 C for pixels with positive SIGMAs, indicating that
 C they will actually be needed for this iteration.
@@ -578,8 +578,8 @@ C
                      DX=FLOAT(IX)-XC(I)
                      IF (DX**2+DYSQ .LT. PSFRSQ) THEN
                         SUBT(IX,IY)=SUBT(IX,IY)-
-     .                       MAG(I)*USEPSF(IPSTYP, DX, DY, BRIGHT, 
-     .                       PAR, PSF, NPSF, NPAR, NEXP, NFRAC, 
+     .                       MAG(I)*USEPSF(IPSTYP, DX, DY, BRIGHT,
+     .                       PAR, PSF, NPSF, NPAR, NEXP, NFRAC,
      .                       DELTAX, DELTAY, DVDXC, DVDYC)
                      ELSE
                         IF (DX .GT. 0.) GO TO 2170
@@ -588,7 +588,7 @@ C
  2160          CONTINUE
             END IF
  2170    CONTINUE
- 2180    IF ((WATCH .GT. 0.5) .AND. 
+ 2180    IF ((WATCH .GT. 0.5) .AND.
      .        (INTRVL*(IY/INTRVL) .EQ. IY)) THEN
             WRITE (LINE, 5551) IYMIN, IY, IYMAX
  5551       FORMAT (3I5)
@@ -647,8 +647,8 @@ C
 C
 C Create provisional star groups.
 C
-      CALL REGRP (ID, XC, YC, MAG, SKY, SUMWT, DXOLD, DYOLD, 
-     .     XCLAMP, YCLAMP, MAXSTR, NSTAR, FITRAD, LAST, NUMER, 
+      CALL REGRP (ID, XC, YC, MAG, SKY, SUMWT, DXOLD, DYOLD,
+     .     XCLAMP, YCLAMP, MAXSTR, NSTAR, FITRAD, LAST, NUMER,
      .     DENOM)
 C
 C Now get ready to do the next iteration, group by group.
@@ -709,7 +709,7 @@ C
                   END IF
                END DO
                IF (WATCH .GT. 1.5) THEN
-                  WRITE (6,63) ID(L), XC(L), YC(L), 
+                  WRITE (6,63) ID(L), XC(L), YC(L),
      .                 PSFMAG-1.085736*ALOG(MAG(L)), ' group too dense'
    63             FORMAT (1X, I5, 2F9.3, F9.3, 9X, A, F6.3)
                END IF
@@ -717,7 +717,7 @@ C
                NDISAP=NDISAP+1
                GO TO 3000
             END IF
-         ELSE 
+         ELSE
             IF (RADIUS .LT. 0.8) THEN
                IF (WATCH .GT. 1.5) THEN
                   WRITE (LINE,62)
@@ -733,7 +733,7 @@ C
                      L=I
                   END IF
                END DO
-               IF (WATCH .GT. 1.5) WRITE (6,63) ID(L), XC(L), YC(L), 
+               IF (WATCH .GT. 1.5) WRITE (6,63) ID(L), XC(L), YC(L),
      .              PSFMAG-1.085736*ALOG(MAG(L)), ' group too dense'
                SKIP(L)=.TRUE.                        ! Flag for deletion
                NDISAP=NDISAP+1
@@ -741,9 +741,9 @@ C
             END IF
          END IF
          L = NSTR
-         CALL REGRP (ID(ISTAR), XC(ISTAR), YC(ISTAR), MAG(ISTAR), 
-     .        SKY(ISTAR), SUMWT(ISTAR), DXOLD(ISTAR), DYOLD(ISTAR), 
-     .        XCLAMP(ISTAR), YCLAMP(ISTAR), L, NSTR, RADIUS, 
+         CALL REGRP (ID(ISTAR), XC(ISTAR), YC(ISTAR), MAG(ISTAR),
+     .        SKY(ISTAR), SUMWT(ISTAR), DXOLD(ISTAR), DYOLD(ISTAR),
+     .        XCLAMP(ISTAR), YCLAMP(ISTAR), L, NSTR, RADIUS,
      .        LAST(ISTAR), NUMER(ISTAR), DENOM(ISTAR))
          GO TO 2200
       END IF
@@ -756,7 +756,7 @@ C
 C
 C Get the extent of the rectangular area of the frame relevant to this
 C group.  At the same time, determine the average SKY and the average
-C CHI value for the group, and zero the various statistical 
+C CHI value for the group, and zero the various statistical
 C accumulators.  What we would REALLY like to do is to compute the
 C anticipated error for each pixel the same way as PEAK and NSTAR do.
 C We can't really do that, because stellar groups aren't defined the
@@ -804,8 +804,8 @@ C
       IYMIN=MIN0(NROW, MAX0(1, INT(YMIN-FITRAD)+1))
       IYMAX=MIN0(NROW, MAX0(1, INT(YMAX+FITRAD)))
 C
-C IXMIN, IXMAX, IYMIN, and IYMAX are now the limits of a rectangular 
-C array containing all pixels within one fitting radius of any star in 
+C IXMIN, IXMAX, IYMIN, and IYMAX are now the limits of a rectangular
+C array containing all pixels within one fitting radius of any star in
 C the group.
 C
 C Zero the normal matrix and the vector of residuals.
@@ -824,9 +824,9 @@ C
       IF (SIGMA(IX,IY) .LE. 0.) GO TO 2380
 C
 C If this pixel is within one fitting radius of at least one star in
-C the current group, include it in the calculation.  Otherwise, skip 
-C it.  While figuring this out, compute the squared distance of this 
-C pixel from the centroid of each star in the group.  
+C the current group, include it in the calculation.  Otherwise, skip
+C it.  While figuring this out, compute the squared distance of this
+C pixel from the centroid of each star in the group.
 C
       OMIT=.TRUE.
       DO I=ISTAR,LSTAR
@@ -848,14 +848,14 @@ C
 C The expected random error in the pixel is the quadratic sum of
 C the Poisson statistics, plus the readout noise, plus an estimated
 C error of 0.75% of the total brightness for the difficulty of flat-
-C fielding and bias-correcting the chip, plus an estimated error of 
+C fielding and bias-correcting the chip, plus an estimated error of
 C some fraction of the fourth derivative at the peak of the profile,
-C to account for the difficulty of accurately interpolating within the 
-C point-spread function.  The fourth derivative of the PSF is 
+C to account for the difficulty of accurately interpolating within the
+C point-spread function.  The fourth derivative of the PSF is
 C proportional to H/sigma**4 (sigma is the Gaussian width parameter for
-C the stellar core); using the geometric mean of sigma(x) and sigma(y), 
-C this becomes H/[sigma(x)*sigma(y)]**2.  The ratio of the fitting 
-C error to this quantity is estimated from a good-seeing CTIO frame to 
+C the stellar core); using the geometric mean of sigma(x) and sigma(y),
+C this becomes H/[sigma(x)*sigma(y)]**2.  The ratio of the fitting
+C error to this quantity is estimated from a good-seeing CTIO frame to
 C be approximately 0.027 (see definition of PKERR above.)
 C
       D=SUBT(IX,IY)-SKYBAR                      ! Residual of this pixel
@@ -878,10 +878,10 @@ C     (2) DPOS/PHPADU where DPOS = sum of the stellar profiles plus sky
 C     (3) constant x DPOS**2
 C     (4) constant x the sum of (stellar profile)**2
 C
-C Here's the thing:  at this point we don't have the 
-C sum of (stellar profile)**2 available to us.  All we have is 
+C Here's the thing:  at this point we don't have the
+C sum of (stellar profile)**2 available to us.  All we have is
 C (sum of stellar profile)**2, which isn't the same thing at all.
-C Nevertheless, we have to assume that 
+C Nevertheless, we have to assume that
 C
 C     sum of (stellar profile)**2 = (sum of stellar profile)**2;
 C
@@ -917,15 +917,15 @@ C                Summation{weight * residual**2}
 C
 C is minimized.  'weight' will be a function (1) of the distance of this
 C pixel from the center of the nearest star, (2) of the model-predicted
-C brightness of the pixel (taking into consideration the readout noise, 
-C the photons/ADU, and the interpolation error of the PSF), and (3) of 
+C brightness of the pixel (taking into consideration the readout noise,
+C the photons/ADU, and the interpolation error of the PSF), and (3) of
 C the size of the residual itself.  (1) is necessary to prevent the
 C non-linear least-squares solution from oscillating:  oft-times it will
 C come to pass that if you include a pixel in the solution, then the
-C predicted shift of the centroid will cause that pixel to be excluded 
+C predicted shift of the centroid will cause that pixel to be excluded
 C in the next iteration, and the new predicted shift of the centroid
 C will cause that pixel to be included again.  This could go on ad
-C infinitum.  The cure is to have the weight of a pixel go 
+C infinitum.  The cure is to have the weight of a pixel go
 C continuously to zero as its distance from the stellar centroid
 C approaches the fitting radius.  In a case like that just described,
 C the solution can then find a real minimum of the sum of the
@@ -934,8 +934,8 @@ C just inside the fitting radius.  (2) is just sensible weighting.
 C (3) is just a crude attempt at making the solution more robust against
 C bad pixels.
 C
-      VAL = USEPSF(IPSTYP, FLOAT(IX)-XC(I), FLOAT(IY)-YC(I), BRIGHT, 
-     .     PAR, PSF, NPSF, NPAR, NEXP, NFRAC, (XC(I)-1.)/XPSF-1., 
+      VAL = USEPSF(IPSTYP, FLOAT(IX)-XC(I), FLOAT(IY)-YC(I), BRIGHT,
+     .     PAR, PSF, NPSF, NPAR, NEXP, NFRAC, (XC(I)-1.)/XPSF-1.,
      .     (YC(I)-1.)/YPSF-1., DVDXC, DVDYC)
       IF (NTERM .GT. NSTR) THEN
          I3=(I-ISTAR+1)*3
@@ -960,18 +960,18 @@ C
 C
 C At this point, the vector X contains the first derivative of
 C the condition equation for pixel (IX,IY) with respect to each of
-C the fitting parameters for all of the stars. Now these derivatives 
+C the fitting parameters for all of the stars. Now these derivatives
 C will be added into the normal matrix and the vector of residuals.
 C
-C Add this residual into the weighted sum of the absolute relative 
+C Add this residual into the weighted sum of the absolute relative
 C residuals.
 C
       DWT=WT*RELERR
       SUMRES=SUMRES+DWT
       GRPWT=GRPWT+WT
 C
-C SUMRES is the weighted sum of [ABS(residual)/sigma] for all the 
-C pixels in the group.  Now also add the weighted value of 
+C SUMRES is the weighted sum of [ABS(residual)/sigma] for all the
+C pixels in the group.  Now also add the weighted value of
 C [ABS(residual)/sigma] into the accumulating sum for each of the
 C stars.
 C
@@ -1034,7 +1034,7 @@ C
  2410    C(K,L)=C(L,K)
       END IF
 C
-C Compute the estimate of the standard deviation of the residuals for 
+C Compute the estimate of the standard deviation of the residuals for
 C the group as a whole, and for each star.  This estimate starts out as
 C SQRT(PI/2)*{SUM[weight*ABS(residual/sigma)]/SUM(weight)} and then gets
 C corrected for bias by SQRT(no. of pixels/(no. of pixels - degrees of
@@ -1044,7 +1044,7 @@ C
          CHIGRP=1.2533141*SUMRES/SQRT(GRPWT*(GRPWT-NTERM))
 C
 C But then I drive the value toward unity, depending on exactly how
-C many pixels were involved:  if CHI is based on exactly a total 
+C many pixels were involved:  if CHI is based on exactly a total
 C weight of 3, then it is extremely poorly determined, and we just
 C want to keep CHI = 1.  The larger GRPWT is, the better determined
 C CHI is, and the less we want to force it toward unity.  So,
@@ -1056,20 +1056,20 @@ C
          CHIGRP=1.
       END IF
 C
-C CHIGRP has been pulled toward its expected value of unity to keep the 
-C statistics of a small number of pixels from compeletely dominating 
-C the error analysis.  Similarly, the photometric errors for the 
+C CHIGRP has been pulled toward its expected value of unity to keep the
+C statistics of a small number of pixels from compeletely dominating
+C the error analysis.  Similarly, the photometric errors for the
 C individual stars will be pulled toward unity now.  Later on, if the
-C number of stars in the group is greater than one, CHI(I) will be 
-C nudged toward the group average.  In order to work optimally, of 
-C course, this requires that PHPADU, RONOIS, and the other noise 
-C contributors which I have postulated properly represent the true 
+C number of stars in the group is greater than one, CHI(I) will be
+C nudged toward the group average.  In order to work optimally, of
+C course, this requires that PHPADU, RONOIS, and the other noise
+C contributors which I have postulated properly represent the true
 C errors expected in each pixel.
 C
-C At the same time, be sure that every star in the group contains at 
+C At the same time, be sure that every star in the group contains at
 C least 3 valid pixels if recentroiding is being performed, 1 valid
 C pixel if not.  If any star in the group fails to meet this criterion
-C mark that star for deletion, set REDO to true, and skip ahead to the 
+C mark that star for deletion, set REDO to true, and skip ahead to the
 C next group.
 C
       REDO=.FALSE.
@@ -1077,8 +1077,8 @@ C
          IF (CENTER .AND. (NITER .GE. 2)) THEN
             IF (NPIX(I) .LT. 3) THEN
                REDO=.TRUE.
-               IF (WATCH .GT. 1.5) WRITE (6,63) ID(I), XC(I), YC(I), 
-     .              PSFMAG-1.085736*ALOG(MAG(I)), 
+               IF (WATCH .GT. 1.5) WRITE (6,63) ID(I), XC(I), YC(I),
+     .              PSFMAG-1.085736*ALOG(MAG(I)),
      .              ' too few valid pixels'
                SKIP(I)=.TRUE.                    ! Flag for deletion
                NDISAP=NDISAP+1
@@ -1100,8 +1100,8 @@ C
                REDO=.TRUE.
                SKIP(I)=.TRUE.                    ! Flag for deletion
                NDISAP=NDISAP+1
-               IF (WATCH .GT. 1.5) WRITE (6,63) ID(I), XC(I), YC(I), 
-     .              PSFMAG-1.085736*ALOG(MAG(I)), 
+               IF (WATCH .GT. 1.5) WRITE (6,63) ID(I), XC(I), YC(I),
+     .              PSFMAG-1.085736*ALOG(MAG(I)),
      .              ' too few valid pixels'
             ELSE
                SKIP(I)=.FALSE.                   ! Flag for retention
@@ -1137,7 +1137,7 @@ C I now points at the (first, at least) star that caused the problem.
 C
             SKIP(I) = .TRUE.
             NDISAP=NDISAP+1
-            IF (WATCH .GT. 1.5) WRITE (6,63) ID(I), XC(I), YC(I), 
+            IF (WATCH .GT. 1.5) WRITE (6,63) ID(I), XC(I), YC(I),
      .           PSFMAG-1.085736*ALOG(MAG(I)), ' singular matrix'
             GO TO 3000
          END IF
@@ -1147,10 +1147,10 @@ C If sky is to be determined: SKYBAR=SKYBAR-X(NTERM)
 C If sky is to be determined: IF(ABS(X(NTERM)).GT.0.01)REDO=.TRUE.
 C
 C In the beginning, the brightness of each star will be permitted to
-C change by no more than two magnitudes per iteration, and the x,y 
-C coordinates of each centroid will be permitted to change by no more 
+C change by no more than two magnitudes per iteration, and the x,y
+C coordinates of each centroid will be permitted to change by no more
 C than 0.4 pixel per iteration.  Any time that the parameter
-C correction changes sign from one iteration to the next, the maximum 
+C correction changes sign from one iteration to the next, the maximum
 C permissible change will be reduced by a factor of two.  These
 C clamps are released any time a star in the group disappears.
 C
@@ -1163,8 +1163,8 @@ C
             K=L-1
             J=L-2
 C
-C Note that the sign of the correction is such that it must be 
-C SUBTRACTED from the current value of the parameter to get the 
+C Note that the sign of the correction is such that it must be
+C SUBTRACTED from the current value of the parameter to get the
 C improved parameter value.  This being the case, if the correction
 C to the brightness is negative (the least-squares thinks that the
 C star should be brighter) a change of 1 magnitude is a change of a
@@ -1256,11 +1256,11 @@ C
                   IF (SIGMA(K,J) .GT. VAL__MINR) THEN
                      DX=FLOAT(K)-XC(I)
                      IF (DX**2+DYSQ .GE. PSFRSQ) GO TO 2195
-                     DIFF=MAG(I)*USEPSF(IPSTYP, DX, DY, BRIGHT, PAR, 
-     .                    PSF, NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY, 
+                     DIFF=MAG(I)*USEPSF(IPSTYP, DX, DY, BRIGHT, PAR,
+     .                    PSF, NPSF, NPAR, NEXP, NFRAC, DELTAX, DELTAY,
      .                    DVDXC, DVDYC)
                      DATA(K,J)=DATA(K,J)-DIFF
-C 
+C
 C We must add this star's contribution to the pixel's noise into the
 C noise map SIGMA (which, of course, actually contains sigma**2).
 C Please note that of the four contributors to the variance
@@ -1279,7 +1279,7 @@ C (sum of sky and all OTHER stellar profiles + this stellar profile)**2
 C
 C = (sum of sky plus all OTHER stellar profiles)**2 +
 C  2 x (sum of sky plus OTHER stellar profiles) x (this stellar profile)
-C   + (this stellar profile)**2.  
+C   + (this stellar profile)**2.
 C
 C So we must add
 C
@@ -1311,14 +1311,14 @@ C
             SHARP=AMIN1( 99.999, AMAX1( SHARP, -99.999 ))
             ERR=1.085736*MAGERR(I)/MAG(I)
             MAG(I)=PSFMAG-1.085736*ALOG(MAG(I))
-            WRITE (1,321) ID(I), XC(I), YC(I), MAG(I), ERR, SKY(I), 
+            WRITE (1,321) ID(I), XC(I), YC(I), MAG(I), ERR, SKY(I),
      .                                    FLOAT(NITER), CHI(I), SHARP
   321       FORMAT (I6, 5F9.3, F9.0, F9.2, F9.3)
             SKIP(I)=.TRUE.                    ! Remove from star list
          END IF
  2520 CONTINUE
 C
-C If there is more than one star remaining in this group, check to see 
+C If there is more than one star remaining in this group, check to see
 C whether any two of them have merged.  This means, find the closest
 C pair and see whether they are TOO close.
 C
@@ -1373,9 +1373,9 @@ C Remove the K-th star from the group.
 C
          SKIP(K)=.TRUE.                       ! Remove from star list
          IF (WATCH .GT. 1.5) THEN
-            WRITE (6,63) ID(K), XC(K), YC(K), 
+            WRITE (6,63) ID(K), XC(K), YC(K),
      .           PSFMAG-1.085736*ALOG(MAG(K)), ' blended with'
-            WRITE (6,63) ID(L), XC(L), YC(L), 
+            WRITE (6,63) ID(L), XC(L), YC(L),
      .           PSFMAG-1.085736*ALOG(MAG(L))
          END IF
          NDISAP=NDISAP+1
@@ -1390,7 +1390,7 @@ C
          END DO
       END IF
 C
-C If the number of iterations completed is less than or equal to 3, 
+C If the number of iterations completed is less than or equal to 3,
 C perform another iteration no questions asked.
 C
  2260 IF (NITER .LE. 3) GO TO 3000
@@ -1423,8 +1423,8 @@ C
       IF (IFAINT .GT. 0) THEN
          SKIP(IFAINT)=.TRUE.                     ! Remove from star list
          NDISAP=NDISAP+1
-         IF (WATCH .GT. 1.5) WRITE (6,63) ID(IFAINT), XC(IFAINT), 
-     .           YC(IFAINT), PSFMAG-1.085736*ALOG(MAG(IFAINT)), 
+         IF (WATCH .GT. 1.5) WRITE (6,63) ID(IFAINT), XC(IFAINT),
+     .           YC(IFAINT), PSFMAG-1.085736*ALOG(MAG(IFAINT)),
      .           ' too faint'
 C
 C Loosen the clamps of every star in the group.
@@ -1437,11 +1437,11 @@ C
          END DO
       ELSE IF (NITER .GE. 5) THEN
 C
-C If no star in this group is more than 12.5 mag. fainter than the PSF, 
-C then after the fifth iteration delete the least certain star if it 
-C is less than a one-sigma detection; after the tenth iteration delete 
-C the least certain star if it is less than a 1.5-sigma detection; 
-C after the fifteenth iteration delete the least certain star if it is 
+C If no star in this group is more than 12.5 mag. fainter than the PSF,
+C then after the fifth iteration delete the least certain star if it
+C is less than a one-sigma detection; after the tenth iteration delete
+C the least certain star if it is less than a 1.5-sigma detection;
+C after the fifteenth iteration delete the least certain star if it is
 C less than a two-sigma detection.
 C
          FAINT=VAL__MAXR
@@ -1457,7 +1457,7 @@ C
 C
          IF (FAINT .LT. WCRIT) THEN
             SKIP(IFAINT)=.TRUE.                  ! Remove from star list
-            IF (WATCH .GT. 1.5) WRITE (6,63) ID(IFAINT), XC(IFAINT), 
+            IF (WATCH .GT. 1.5) WRITE (6,63) ID(IFAINT), XC(IFAINT),
      .              YC(IFAINT), PSFMAG-1.085736*ALOG(MAG(IFAINT)),
      .              ' error too big: ',
      .              1.085736*MAGERR(IFAINT)/MAG(IFAINT)
@@ -1476,7 +1476,7 @@ C
  3000 CONTINUE
       IF (WATCH .GT. 0.5) THEN
          IF (LSTAR/INTRVL .GT. (ISTAR-1)/INTRVL) THEN
-            WRITE (LINE,682) NITER, INTRVL*(LSTAR/INTRVL), 
+            WRITE (LINE,682) NITER, INTRVL*(LSTAR/INTRVL),
      .           NDISAP, NCONV
             CALL OVRWRT (LINE(1:24), 2)
          END IF
@@ -1486,7 +1486,7 @@ C
 C
 C We've gone through the entire star list for this iteration.
 C
-C Find the last star in the list that still needs more work 
+C Find the last star in the list that still needs more work
 C (SKIP=.FALSE.).  If there aren't any, then we're done!  If there is
 C one, point NSTAR at it.
 C

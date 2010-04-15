@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     2-OCT-1984 (ACD):
 *        Documentation improved.
 *     13-SEP-1988 (AJC):
-*        Add VAX VMS version in comments (slower unless the tail is 
+*        Add VAX VMS version in comments (slower unless the tail is
 *        very long).
 *     3-OCT-1988 (AJC):
 *        Improve documentation.
@@ -115,7 +115,7 @@
 *     PARAMETER ( MAXLEN = 65535 )
 
 *  Local Variables:
-*     CHARACTER * ( MAXLEN ) LOCAL ! To contain STRING with trailing 
+*     CHARACTER * ( MAXLEN ) LOCAL ! To contain STRING with trailing
 *                                  ! blanks and tabs removed
 *
 *     INTEGER TOTLEN             ! Declared length of the string

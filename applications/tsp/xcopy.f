@@ -22,16 +22,16 @@ C    (1) INPUT      (TSP, 1D)  The input spectrum to be calibrated.
 C    (2) ARC        (Char)     The Figaro file containing the wavelengths.
 C    (3) OUTPUT     (TSP, 1D)  The Output dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         17/03/2000
 C
 C-
 C
 C  History:
-C    29/4/1988   Original Version.   JAB/AAO 
+C    29/4/1988   Original Version.   JAB/AAO
 C    16/8/1990   Use DSA.            JAB/AAO
 C    17/03/2000  Added DOUBLE PRECISION dummy argument DDUMMY.   BLY/RAL
 C
@@ -59,7 +59,7 @@ C
       CHARACTER*64 STRINGS(2)
       INTEGER CHR_LEN
       DOUBLE PRECISION DDUMMY
-                         
+
 *  Get the Input data
 
       CALL DAT_ASSOC('INPUT','READ',ILOC,STATUS)
@@ -76,7 +76,7 @@ C
          STATUS = USER__001
          GOTO 100
       ENDIF
-      
+
 *  Get the data size
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -93,8 +93,8 @@ C
             XLABEL = ' '
             XUNITS = ' '
          ENDIF
-            
-*  Map wavelength axis data 
+
+*  Map wavelength axis data
 
          CALL DSA_MAP_AXIS_DATA('INPUT',1,'READ','FLOAT',IPTR,XSLOT,
      :       STATUS)
@@ -103,7 +103,7 @@ C
              STATUS = USER__001
              GOTO 100
          ENDIF
- 
+
 *  Get the output file
 
          CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
@@ -141,7 +141,7 @@ C
 
          CALL TSP_UNMAP(LLOC,STATUS)
          CALL DAT_ANNUL(OLOC,STATUS)
-         CALL DAT_ANNUL(ILOC,STATUS)         
+         CALL DAT_ANNUL(ILOC,STATUS)
 
 *  Unmap input arrays
 
@@ -150,7 +150,7 @@ C
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
       SUBROUTINE TSP_XCOPY(SIZE,X1,X2)
 *+
@@ -185,4 +185,4 @@ C
           X2(I) = X1(I)
       ENDDO
       END
-      
+

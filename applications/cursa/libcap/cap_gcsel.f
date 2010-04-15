@@ -59,7 +59,7 @@
          IF (COPEN__SGZ) THEN
 
 *
-*          Check that the given selection lies in the range of the 
+*          Check that the given selection lies in the range of the
 *          existing selections.  If so then adopt it and set the current
 *          row to the first row in the selection; otherwise report a
 *          message.

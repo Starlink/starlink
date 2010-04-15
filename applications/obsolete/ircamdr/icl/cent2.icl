@@ -35,7 +35,7 @@ proc cent2 imnam ibox
   print "Plotting image " (im)
   send plt2d set magnification (disp_mag)
   send plt2d set cursor_image (im)
-  obeyw plt2d nsigma (im) 
+  obeyw plt2d nsigma (im)
   obeyw plt2d line_width 2
   more = 1
   loop while more = 1

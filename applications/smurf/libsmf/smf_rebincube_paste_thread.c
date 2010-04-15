@@ -4,7 +4,7 @@
 *     smf_rebincube_paste_thread
 
 *  Purpose:
-*     Invoke smf_rebincube_paste2d or smf_rebincube_paste3d from within a 
+*     Invoke smf_rebincube_paste2d or smf_rebincube_paste3d from within a
 *     thread.
 
 *  Language:
@@ -18,16 +18,16 @@
 
 *  Arguments:
 *     data = void * (Given)
-*        A pointer to a data structure (a smfRebincubeNNArgs2) holding 
+*        A pointer to a data structure (a smfRebincubeNNArgs2) holding
 *        parameter values for smf_rebincube_paste2d/3d.
 *     status = int * (Given and Returned)
 *        A pointer to the inherited status value.
 
 *  Description:
-*     This function invokes smf_rebincube_paste2d or smf_rebincube_paste3d 
+*     This function invokes smf_rebincube_paste2d or smf_rebincube_paste3d
 *     from within a new thread. See smf_rebincube_nn. The API for this
-*     function is dictated by the smf_add_job function, so information 
-*     needed for smf_rebincube_paste2d/3d is passed into this function 
+*     function is dictated by the smf_add_job function, so information
+*     needed for smf_rebincube_paste2d/3d is passed into this function
 *     within a smfRebincubeNNArgs2 structure.
 
 *  Authors:
@@ -85,20 +85,20 @@ void smf_rebincube_paste_thread( void *data_ptr, int *status ){
 
 /* 2D algorithm... */
    if( cdata->is2d ) {
-      smf_rebincube_paste2d( cdata->badmask, cdata->nchan, cdata->nchanout, 
-                             cdata->spectab, cdata->specpop, data->iv0, 
-                             cdata->nxy, data->wgt, cdata->genvar, 
-                             data->invar, data->ddata, cdata->data_array, 
-                             cdata->var_array, cdata->wgt_array, 
-                             cdata->pop_array, &(data->nused), 
-                             &(data->nreject), &(data->naccept), data->work, 
+      smf_rebincube_paste2d( cdata->badmask, cdata->nchan, cdata->nchanout,
+                             cdata->spectab, cdata->specpop, data->iv0,
+                             cdata->nxy, data->wgt, cdata->genvar,
+                             data->invar, data->ddata, cdata->data_array,
+                             cdata->var_array, cdata->wgt_array,
+                             cdata->pop_array, &(data->nused),
+                             &(data->nreject), &(data->naccept), data->work,
                              status );
 
 /* 3D algorithm... */
    } else {
-      smf_rebincube_paste3d( cdata->nchan, cdata->nout, cdata->spectab, 
-                             data->iv0, cdata->nxy, data->wgt, 
-                             cdata->genvar, data->invar, data->ddata, 
+      smf_rebincube_paste3d( cdata->nchan, cdata->nout, cdata->spectab,
+                             data->iv0, cdata->nxy, data->wgt,
+                             cdata->genvar, data->invar, data->ddata,
                              cdata->data_array, cdata->var_array,
                              cdata->wgt_array, &(data->nused), status );
       data->naccept++;

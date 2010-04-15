@@ -6,7 +6,7 @@
 #include "star/grp.h"
 #include "kaplibs_private.h"
 
-void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix, 
+void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
                 int *status ){
 /*
 *+
@@ -14,7 +14,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *     kpg1Kygp1
 
 *  Purpose:
-*     Create a GRP group holding keyword/value pairs read from an AST KeyMap 
+*     Create a GRP group holding keyword/value pairs read from an AST KeyMap
 
 *  Language:
 *     C.
@@ -25,10 +25,10 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 
 *  Description:
 *     This function is the inverse of kpg1Kymp1. It extracts the values
-*     from the supplied AST KeyMap and creates a set of "name=value" strings 
+*     from the supplied AST KeyMap and creates a set of "name=value" strings
 *     which it appends to a supplied group (or creates a new group). If
 *     the KeyMap contains nested KeyMaps, then the "name" associated with
-*     each primitive value stored in the returned group is a hierarchical 
+*     each primitive value stored in the returned group is a hierarchical
 *     list of component names separated by dots.
 
 *  Arguments:
@@ -38,13 +38,13 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *        entries) are not copied into the group.
 *     igrp
 *        A location at which is stored a pointer to the Grp structure
-*        to which the name=value strings are to be appended. A new group is 
-*        created and a pointer to it is returned if the supplied Grp 
+*        to which the name=value strings are to be appended. A new group is
+*        created and a pointer to it is returned if the supplied Grp
 *        structure is not valid.
 *     prefix
 *        A string to append to the start of each key extracted from the
 *        supplied KeyMap. If NULL, no prefix is used.
-*     status 
+*     status
 *        Pointer to the inherited status value.
 
 *  Notes:
@@ -60,12 +60,12 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -89,7 +89,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *-
 */
 
-/* Local Variables: */ 
+/* Local Variables: */
    AstObject *obj;              /* Pointer to nested AST Object */
    char *text;                  /* Sum of concatenated strings */
    const char *key;             /* Key string for current entry in KeyMap */
@@ -112,7 +112,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 
 /* Create a new GRP group if required. */
    valid = grpValid( *igrp, status );
-   if( !valid ) *igrp = grpNew( "Created by kpg1_Kygp1", status );      
+   if( !valid ) *igrp = grpNew( "Created by kpg1_Kygp1", status );
 
 /* Get the number of entries in the KeyMap. */
    n = astMapSize( keymap );
@@ -147,7 +147,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
             if( ival == VAL__BADI ) bad = 1;
          } else if( type == AST__DOUBLETYPE && astMapGet0D( keymap, key, &dval ) ){
             if( dval == VAL__BADD ) bad = 1;
-         } 
+         }
 
 /* If it not bad, get its formatted value. */
          if( !bad && astMapGet0C( keymap, key, &value ) ) {

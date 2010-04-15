@@ -9,14 +9,14 @@ GSDItemDesc *                  T_PTROBJ
 GSDFileDesc *                  T_PTROBJ
 gsd_data * T_PTROBJ
 
-INPUT 
+INPUT
 
 
 T_INTP
         $var = ($type)pack1D($arg,'i')
 T_FLOATP
         $var = ($type)pack1D($arg,'f')
- 
+
 T_DOUBLEP
         $var = ($type)pack1D($arg,'d')
 
@@ -29,6 +29,6 @@ T_FLOATP
         sv_setpv((SV*)$arg, (char *)$var);
 T_DOUBLEP
         sv_setpv((SV*)$arg, (char *)$var);
- 
+
 
 

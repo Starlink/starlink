@@ -18,7 +18,7 @@
       INTEGER STATUS               ! Inherited status value
 *    Import-Export :
       CHARACTER*(*) UTDATE         ! String to write UTdate into
-*    Local variables : 
+*    Local variables :
       CHARACTER*8 CDATE            ! Temporary date string
       INTEGER CPOS                 ! String position
       INTEGER NTICKS               ! For PSX call

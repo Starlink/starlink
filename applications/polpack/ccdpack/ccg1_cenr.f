@@ -19,10 +19,10 @@
 *     The routine locates the centroid of image features by forming
 *     marginal profiles within a search square. A background estimate is
 *     made for each element of each profile by finding the lower quartile point
-*     in the pixel values contributing to the profile element. These values 
-*     are then used to form the centroid. This sequence is repeated until a 
-*     given number of iterations is exceeded or the centroid is located with 
-*     the given accuracy.  
+*     in the pixel values contributing to the profile element. These values
+*     are then used to form the centroid. This sequence is repeated until a
+*     given number of iterations is exceeded or the centroid is located with
+*     the given accuracy.
 
 *  Arguments:
 *     XINIT = DOUBLE PRECISION (Given)
@@ -61,7 +61,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     RFWS: Rodney Warren-Smith (Durham Polarimetry Group)
 *     PDRAPER: Peter Draper (STARLINK)
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
       INTEGER J                  ! Loop counter
       INTEGER JPOSN              ! Y position in search square
       INTEGER JSTART             ! Y starting point of search square
-      INTEGER NBIN               ! Loop counter 
+      INTEGER NBIN               ! Loop counter
       INTEGER NITER              ! Maximum number of interations
       INTEGER NSAMP              ! Number of bins in search side
       INTEGER NTH                ! Dummy
@@ -209,7 +209,7 @@
 
                DO J = 1, NSAMP
                   JPOSN = JSTART + J
-                  IF ( ( JPOSN .GE. 1 ) .AND. 
+                  IF ( ( JPOSN .GE. 1 ) .AND.
      :                 ( JPOSN .LE. NLINE ) ) THEN
 
                      IF ( IMAGE( IPOSN, JPOSN ) .NE.VAL__BADR ) THEN
@@ -242,7 +242,7 @@
 
                DO I = 1, NSAMP
                   IPOSN = ISTART + I
-                  IF ( ( IPOSN .GE. 1 ) .AND. 
+                  IF ( ( IPOSN .GE. 1 ) .AND.
      :                 ( IPOSN .LE. NCOL ) ) THEN
 
                      IF ( IMAGE( IPOSN, JPOSN ) .NE.VAL__BADR ) THEN
@@ -315,14 +315,14 @@
 
 *  Scan the profiles, using all data above the background to form
 *  sums for the centroids.
-         IF ( NVALX .GT. 0 ) THEN 
+         IF ( NVALX .GT. 0 ) THEN
             DO 110 NBIN = 1, NVALX
                VAL = MAX ( XAV( NBIN ), 0.0D0 )
                XNUMER = XNUMER + XPOSN( NBIN ) * VAL
                XDENOM = XDENOM + VAL
  110        CONTINUE
          END IF
-         IF ( NVALY .GT. 0 ) THEN 
+         IF ( NVALY .GT. 0 ) THEN
             DO 111 NBIN = 1, NVALY
                VAL = MAX ( YAV( NBIN ), 0.0D0 )
                YNUMER = YNUMER + YPOSN( NBIN ) * VAL
@@ -333,13 +333,13 @@
 *  If a profile contained no data then leave the current position at its
 *  last value. (This allows for linear features running directly along x
 *  or y to be centroided).
-         IF ( NVALX .EQ. 0 .AND. YDENOM .NE. 0.0D0 ) THEN 
+         IF ( NVALX .EQ. 0 .AND. YDENOM .NE. 0.0D0 ) THEN
             X = XLAST
             Y = YNUMER / YDENOM
          ELSE IF( NVALY .EQ. 0 .AND. XDENOM .NE. 0.0D0 )THEN
             X = XNUMER / XDENOM
             Y = YLAST
-         ELSE IF ( XDENOM .NE. 0.0D0 .AND. YDENOM .NE. 0.0D0 ) THEN 
+         ELSE IF ( XDENOM .NE. 0.0D0 .AND. YDENOM .NE. 0.0D0 ) THEN
 
 *  Otherwise form the x and y centroids and find the shift from
 *  the initial position

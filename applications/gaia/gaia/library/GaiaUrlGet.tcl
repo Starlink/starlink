@@ -313,11 +313,11 @@ itcl::class gaia::GaiaUrlGet {
 
    #  Check the temporary file to see if it is known to be compressed.
    protected method check_compressed_ {filename} {
-      
+
       set fid [::open $filename "r"]
       set magic0 [::read $fid 1]
       set magic1 [::read $fid 1]
-      
+
       if { $magic0 == "\037" } {
          if { $magic1 == "\213" } {
             #  GZIP.

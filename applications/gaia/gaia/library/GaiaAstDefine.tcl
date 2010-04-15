@@ -18,7 +18,7 @@
 #     happy the WCS object can be retained with the image.
 #
 #     Note that the system of FITS headers used is losely based on the
-#     AIPS system, so there is no direct control over PC term, just 
+#     AIPS system, so there is no direct control over PC term, just
 #     a single rotation (unless the user is "relaxed") with reference
 #     positions and scale factors. The projections allowed are most of
 #     those available in FITS-WCS (which may need PROJP values, and
@@ -685,12 +685,12 @@ itcl::class gaia::GaiaAstDefine {
       if { $value == {RA--} || $value == {DEC-} } {
          $itk_component(system) configure -state normal
          set text [[$itk_component(system) component mb] cget -text]
-         if { $text == "Ecliptic" || $text == "Galactic" } { 
+         if { $text == "Ecliptic" || $text == "Galactic" } {
             set_system_ FK5 1
          }
       } else {
          $itk_component(system) configure -state disabled
-	  if { $value == {ELON} || $value == {ELAT} } { 
+	  if { $value == {ELON} || $value == {ELAT} } {
 	      [$itk_component(system) component mb] configure -text Ecliptic
 	  } else {
 	      [$itk_component(system) component mb] configure -text Galactic
@@ -848,11 +848,11 @@ itcl::class gaia::GaiaAstDefine {
 
    #  Do the notify_cmd option if needed.
    protected method notify_ {} {
-      if { $itk_option(-notify_cmd) != {} } { 
+      if { $itk_option(-notify_cmd) != {} } {
          eval $itk_option(-notify_cmd)
       }
    }
-   
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -905,7 +905,7 @@ itcl::class gaia::GaiaAstDefine {
 
    #  Names of all the possible RA/DEC fundamental coordinate
    #  systems. The values following these are the need for an equinox.
-   protected variable systemattrib_ {FK5 1 FK4 1 FK4-NO-E 1 GAPPT 0 {} 0} 
+   protected variable systemattrib_ {FK5 1 FK4 1 FK4-NO-E 1 GAPPT 0 {} 0}
 
    #  Names of sensible some equinoxes.
    protected variable equinoxmap_ {2000.0 1950.0}

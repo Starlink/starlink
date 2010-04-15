@@ -11,11 +11,11 @@
 *     Linear equation solution by Gauss-Jordan elimination. A(1:N,1:N) is an
 *     input matrix stored in an array of physical dimensions NP by NP.
 *     B(1:N,1:M) is an input matrix containing the M right-hand side vectors,
-*     stored in an array of physical dimensions NP by MP. On output, 
+*     stored in an array of physical dimensions NP by MP. On output,
 *     A(1:N,1:N) is replaced by its matrix inverse and B(1:N,1:M) is replaced
 *     by the corresponding set of solution vectors. Parameter NMAX is the
 *     largest anticipated value of N.
-*     Copied from GAUSSJ on p.30 of Numerical Recipes in Fortran, with 
+*     Copied from GAUSSJ on p.30 of Numerical Recipes in Fortran, with
 *     STATUS added.
 
 *  Invocation:
@@ -94,9 +94,9 @@
       INTEGER ICOL
       INTEGER IROW
       INTEGER J
-      INTEGER K 
-      INTEGER L 
-      INTEGER LL 
+      INTEGER K
+      INTEGER L
+      INTEGER LL
       INTEGER INDXC(NMAX)
       INTEGER INDXR(NMAX)
       INTEGER IPIV(NMAX)
@@ -150,7 +150,7 @@
 
 *  we now have the pivot element, so we interchange rows if necessary to put
 *  the pivot element on the diagonal. The columns are not physically changed,
-*  only relabled: INDXC(I), the column of the Ith pivot element, is the Ith 
+*  only relabled: INDXC(I), the column of the Ith pivot element, is the Ith
 *  column that is reduced, while INDXR(I) is the row in which that pivot
 *  element was originally located. If INDXR(I)#INDXC(I) there is an implied
 *  column interchange. With this form of book-keeping the solution B's will
@@ -175,7 +175,7 @@
 
          INDXR (I) = IROW
          INDXC (I) = ICOL
-         
+
          IF (A(ICOL,ICOL) .EQ. 0.0) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_GAUSSJ: singular matrix', STATUS)
@@ -190,7 +190,7 @@
          DO L = 1, M
             B (ICOL,L) = B (ICOL,L) * PIVINV
          END DO
-         
+
 *  next we reduce the rows, except for the pivot one of course
 
          DO LL = 1, N

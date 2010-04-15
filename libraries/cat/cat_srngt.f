@@ -87,7 +87,7 @@
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -109,12 +109,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -193,7 +193,7 @@
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -250,7 +250,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
                         IF (MINROW .LE. ROWS  .OR.  MAXROW .GE. 1) THEN
 
 *
-*                         Select the first and last rows of the 
+*                         Select the first and last rows of the
 *                         selection and force them to lie in the
 *                         range of the catalogue.
 
@@ -271,7 +271,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -327,7 +327,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -463,7 +463,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -553,7 +553,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -610,7 +610,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
                         IF (MINROW .LE. ROWS  .OR.  MAXROW .GE. 1) THEN
 
 *
-*                         Select the first and last rows of the 
+*                         Select the first and last rows of the
 *                         selection and force them to lie in the
 *                         range of the catalogue.
 
@@ -631,7 +631,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -687,7 +687,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -823,7 +823,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -913,7 +913,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -970,7 +970,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
                         IF (MINROW .LE. ROWS  .OR.  MAXROW .GE. 1) THEN
 
 *
-*                         Select the first and last rows of the 
+*                         Select the first and last rows of the
 *                         selection and force them to lie in the
 *                         range of the catalogue.
 
@@ -991,7 +991,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -1047,7 +1047,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -1183,7 +1183,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -1273,7 +1273,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -1330,7 +1330,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
                         IF (MINROW .LE. ROWS  .OR.  MAXROW .GE. 1) THEN
 
 *
-*                         Select the first and last rows of the 
+*                         Select the first and last rows of the
 *                         selection and force them to lie in the
 *                         range of the catalogue.
 
@@ -1351,7 +1351,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -1407,7 +1407,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -1543,7 +1543,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -1633,7 +1633,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -1690,7 +1690,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
                         IF (MINROW .LE. ROWS  .OR.  MAXROW .GE. 1) THEN
 
 *
-*                         Select the first and last rows of the 
+*                         Select the first and last rows of the
 *                         selection and force them to lie in the
 *                         range of the catalogue.
 
@@ -1711,7 +1711,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -1767,7 +1767,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -1903,7 +1903,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -1993,7 +1993,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -2050,7 +2050,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
                         IF (MINROW .LE. ROWS  .OR.  MAXROW .GE. 1) THEN
 
 *
-*                         Select the first and last rows of the 
+*                         Select the first and last rows of the
 *                         selection and force them to lie in the
 *                         range of the catalogue.
 
@@ -2071,7 +2071,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -2127,7 +2127,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -2263,7 +2263,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -2353,7 +2353,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -2410,7 +2410,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
                         IF (MINROW .LE. ROWS  .OR.  MAXROW .GE. 1) THEN
 
 *
-*                         Select the first and last rows of the 
+*                         Select the first and last rows of the
 *                         selection and force them to lie in the
 *                         range of the catalogue.
 
@@ -2431,7 +2431,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -2487,7 +2487,7 @@ C4000                format(1x, 'minrow, maxrow: ', i6, i6 )
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID

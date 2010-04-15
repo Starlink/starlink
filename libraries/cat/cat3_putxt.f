@@ -47,7 +47,7 @@
 *       end if
 *     else
 *       Set the status.
-*       Report error: attempt to put an line of text with an illegal 
+*       Report error: attempt to put an line of text with an illegal
 *       class.
 *     end if
 *  Copyright:
@@ -57,12 +57,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -116,7 +116,7 @@
       IF (STATUS .EQ. CAT__OK) THEN
 
 *
-*       Check that the class for the line of text is one of the 
+*       Check that the class for the line of text is one of the
 *       permitted classes.
 
          IF (CLASS .EQ. 'COMMENT'  .OR.  CLASS .EQ. 'HISTORY') THEN
@@ -140,21 +140,21 @@
 
 *
 *             Attempt to move to the primary header and proceed if ok.
-*             This strategem is necessary in order to establish an 
+*             This strategem is necessary in order to establish an
 *             absolutely known position.
 
                CALL FTMAHD (FITUNT, 1, HDUTYP, FITSTT)
                IF (FITSTT .EQ. FITOK) THEN
 
 *
-*                Attempt to move to the extension header and proceed if 
+*                Attempt to move to the extension header and proceed if
 *                ok.
 
 C                 print2000, extn__cat3(cielm)
 C2000             format(1x, 'CAT3_PUTXT, extension header number: ',
 C    :              i5 )
 
-                  CALL FTMRHD (FITUNT, EXTN__CAT3(CIELM), HDUTYP, 
+                  CALL FTMRHD (FITUNT, EXTN__CAT3(CIELM), HDUTYP,
      :              FITSTT)
                   IF (FITSTT .EQ. FITOK) THEN
 

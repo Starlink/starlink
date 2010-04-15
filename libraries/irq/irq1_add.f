@@ -21,8 +21,8 @@
 *     none of the NDF pixels (as determined by DEFLT). Therefore FIXED
 *     is given a true value, and VALUE is set equal to DEFLT. The
 *     associated QUALITY bit is set to the illegal value of zero. The
-*     quality name is mad "read-write" (i.e. it can be deleted using 
-*     IRQ_REMQN). The number of free slots in QUAL is decremented, and 
+*     quality name is mad "read-write" (i.e. it can be deleted using
+*     IRQ_REMQN). The number of free slots in QUAL is decremented, and
 *     if necessary, the index of the last used slot in QUAL is modified.
 
 *  Arguments:
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

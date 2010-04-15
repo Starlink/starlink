@@ -23,7 +23,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_NORMALISE_FIT.FOR
 *    Invocation :
 *      CALL RED4_NORMALISE_SMOOTH( NPIX, NLINE, BOXSIZE, DATA,
 *     :  VARIANCE, QUALITY, SPECTRUM, SUM, SQUAL, SMOOTHED, SMQUAL,
-*    :   STATUS ) 
+*    :   STATUS )
 *    Parameters :
 *     NPIX                = INTEGER( READ )
 *           x-dimension of data
@@ -36,7 +36,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_NORMALISE_FIT.FOR
 *           2-D (flat field) data to be normalised.
 *           This array is overwritten in situ.
 *     VARIANCE( NPIX, NLINE ) = REAL( UPDATE )
-*           The variance of the 2-D data (to be processed 
+*           The variance of the 2-D data (to be processed
 *           simultateously).
 *     QUALITY( NPIX, NLINE )  = BYTE( UPDATE )
 *           The quality array associated with the input data.
@@ -55,7 +55,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_NORMALISE_FIT.FOR
 *           Global status
 *    Method :
 *    Deficiencies :
-*     The routine may return an array with an average value 
+*     The routine may return an array with an average value
 *     significantly greater than 1.0 if many if the data values
 *     end up being below <fracmin> of the smoothed spectrum.
 *    Bugs :
@@ -182,7 +182,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_NORMALISE_FIT.FOR
 *   to obtain normalised data corrected for wavelength variations.
 *   Process the variances to ensure they are scaled with the data.
 *   Only "good" data values which are greater than a fraction <fracmin>
-*   of the average value are used, the rest are set to zero and 
+*   of the average value are used, the rest are set to zero and
 *   their quality set to "bad"
       DO J = 1,NLINE
          DO I = 1,NPIX
@@ -190,7 +190,7 @@ C DEC/CMS REPLACEMENT HISTORY, Element RED4_NORMALISE_FIT.FOR
             IF ( QUALITY(I,J) .EQ. GOOD ) THEN
                IF ( ( SMQUAL(I) .EQ. GOOD ) .AND.
      :              ( SMOOTHED(I) .NE. 0.0 ) .AND.
-     :              ( DATA(I,J) .GE. (FRACMIN * SMOOTHED(I)) ) ) THEN 
+     :              ( DATA(I,J) .GE. (FRACMIN * SMOOTHED(I)) ) ) THEN
 
                   DATA(I,J) = DATA(I,J) / SMOOTHED(I)
 

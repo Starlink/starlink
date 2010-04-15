@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,13 +106,13 @@
 *  Save the STATUS value and mark the error stack.
       TSTAT = STATUS
       CALL ERR_MARK
-       
+
 *  Import the NDF identifier and unmap its component(s).
       STATUS = SAI__OK
       CALL NDF1_IMPID( INDF, IACB, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL NDF1_UMP( IACB, COMP, STATUS )
-      END IF       
+      END IF
 
 *  Annul any error if STATUS was previously bad, otherwise let the new
 *  error report stand.

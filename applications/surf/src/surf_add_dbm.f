@@ -8,28 +8,28 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_ADD_DBM( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     Create a chopped image from a single beam input map.
 *     Can be used to create a dual-beam map (eg a simulated
 *     scan map image) or a triple-beam map (eg a simulated
-*     jiggle map image). 
+*     jiggle map image).
 
-*     For dual-beam it simply finds the signal detected at each 
-*     pixel by looking at the difference between the pixels nearest 
-*     to each chop beam. This calculates a middle beam response. 
-*     (ie the response at each pixel is the difference between the 
-*     L and the R beams). 
+*     For dual-beam it simply finds the signal detected at each
+*     pixel by looking at the difference between the pixels nearest
+*     to each chop beam. This calculates a middle beam response.
+*     (ie the response at each pixel is the difference between the
+*     L and the R beams).
 *
 *     For the triple-beam response the signal is the difference
 *     between the middle pixel and half the values measured
@@ -53,11 +53,11 @@
 *        VERBOSE. Default is NORM.
 *     NBEAMS = INTEGER (Read)
 *        When NBEAMS=2 a dual-beam response is calculated. When
-*        NBEAMS=3 a triple-beam response is calculated. Default 
+*        NBEAMS=3 a triple-beam response is calculated. Default
 *        is 3.
 *     OUT = NDF (Write)
 *        Output Dual beam image. Default output name is input name
-*        plus _dbm_int(pa)_int(chop). 
+*        plus _dbm_int(pa)_int(chop).
 *     PA = REAL (Read)
 *        Position angle of chop throw. Positive is anti-clockwise starting
 *        from North. The angle should be specified in degrees.
@@ -148,7 +148,7 @@
 
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! SSE global definitions
-      INCLUDE 'SURF_PAR'        ! For SCUBA__N_SUFFIX              
+      INCLUDE 'SURF_PAR'        ! For SCUBA__N_SUFFIX
       INCLUDE 'NDF_ERR'         ! For NDF__DIMIN
       INCLUDE 'DAT_PAR'         ! For DAT__SZLOC
       INCLUDE 'PAR_ERR'         ! For PAR__NULL
@@ -163,7 +163,7 @@
 
 *  Local Constants:
       CHARACTER * 10   TSKNAME          ! Name of task
-      PARAMETER (TSKNAME = 'ADD_DBM') 
+      PARAMETER (TSKNAME = 'ADD_DBM')
 
 *  Local Variables:
       REAL    CHOP_PA           ! chop position angle in degrees
@@ -236,12 +236,12 @@
       ELSE
          DO I = 1, SCUBA__N_SUFFIX
             SUFFIX_STRINGS(I) = SUFFIX_STRINGS3(I)
-         END DO         
+         END DO
       END IF
 
 *     Get the chop throw and position angle
 *     Doing a sanity check on the chop throw
-      CALL PAR_GDR0R('CHOP', -1.0, 1.0, REAL(MAX(DIM(1),DIM(2))), 
+      CALL PAR_GDR0R('CHOP', -1.0, 1.0, REAL(MAX(DIM(1),DIM(2))),
      :     .FALSE., CHOP_THROW, STATUS)
       CALL PAR_GET0R('PA', CHOP_PA, STATUS)
 
@@ -249,7 +249,7 @@
 
 *     First thing we need to do is append the chop position
 *     angle and throw. We need to append INTEGER versions to make
-*     sure we don't have 
+*     sure we don't have
 
 *     Create the string to be appended
       IF (STATUS .EQ. SAI__OK) THEN
@@ -311,8 +311,8 @@
       END IF
 
 *     Call the dual beam subroutine
-      CALL SURFLIB_CALC_CHOPPED_IMAGE(NBEAMS, CHOP_THROW, CHOP_PA, 
-     :     DIM(1), DIM(2), %VAL(CNF_PVAL(IN_DATA_PTR)), 
+      CALL SURFLIB_CALC_CHOPPED_IMAGE(NBEAMS, CHOP_THROW, CHOP_PA,
+     :     DIM(1), DIM(2), %VAL(CNF_PVAL(IN_DATA_PTR)),
      :     %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :     STATE, %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
      :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
@@ -346,7 +346,7 @@
      :              'contains too many FITS items', STATUS)
             END IF
          END IF
-         CALL DAT_GET1C (OUT_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
+         CALL DAT_GET1C (OUT_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS,
      :        STATUS)
 
 *     ...and remove the FITS extension (will rewrite it when we are
@@ -380,7 +380,7 @@
 
 *     and store it in the FITS header
             CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'SCUPIXSZ', DBLE(PIXSIZE), 
+     :           'SCUPIXSZ', DBLE(PIXSIZE),
      :           'Pixel size (arcsec)', STATUS)
 
          END IF
@@ -404,7 +404,7 @@
 *     Annul the bad status and put the new value in
             CALL ERR_ANNUL(STATUS)
             CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'CHOP_PA', DBLE(CHOP_PA), 
+     :           'CHOP_PA', DBLE(CHOP_PA),
      :           'Position angle of chop', STATUS)
 
          END IF
@@ -424,7 +424,7 @@
 *     Annul the bad status and put the new value in
             CALL ERR_ANNUL(STATUS)
             CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'CHOP_THR', DBLE(CHOP_THROW * PIXSIZE), 
+     :           'CHOP_THR', DBLE(CHOP_THROW * PIXSIZE),
      :           'Size of chop throw (arcsec)', STATUS)
 
          END IF

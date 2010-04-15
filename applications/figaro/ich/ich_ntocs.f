@@ -21,7 +21,7 @@ C
 C     (<) ICH_NTOCS (Integer) The number of the last non-blank
 C                   character copied into the character string.
 C                   In some circumstances this is the logical
-C                   length of the string. The first character 
+C                   length of the string. The first character
 C                   is number 1, not 0.
 C
 C     Note -

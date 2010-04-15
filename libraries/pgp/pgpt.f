@@ -17,7 +17,7 @@ C Arguments:
 C  N      (input)  : number of points to mark.
 C  XPTS   (input)  : world x-coordinates of the points.
 C  YPTS   (input)  : world y-coordinates of the points.
-C  SYMBOL (input)  : code number of the symbol to be drawn at each 
+C  SYMBOL (input)  : code number of the symbol to be drawn at each
 C                    point:
 C                    -1, -2  : a single dot (diameter = current
 C                              line width).
@@ -26,7 +26,7 @@ C                              edges (style set by current fill style).
 C                    0..31   : standard marker symbols.
 C                    32..127 : ASCII characters (in current font).
 C                              e.g. to use letter F as a marker, let
-C                              SYMBOL = ICHAR('F'). 
+C                              SYMBOL = ICHAR('F').
 C                    > 127  :  a Hershey symbol number.
 C
 C Note: the dimension of arrays X and Y must be greater than or equal

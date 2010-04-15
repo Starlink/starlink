@@ -15,7 +15,7 @@ f     AST_STCSCHAN
 *     I/O operations. Writing an Object to an StcsChan (using
 c     astWrite) will, if the Object is suitable, generate an
 f     AST_WRITE) will, if the Object is suitable, generate an
-*     STC-S description of that Object, and reading from an StcsChan will 
+*     STC-S description of that Object, and reading from an StcsChan will
 *     create a new Object from its STC-S description.
 *
 *     When an STC-S description is read using
@@ -24,39 +24,39 @@ f     AST_READ,
 *     the returned AST Object may be 1) a PointList describing the STC
 *     AstroCoords (i.e. a single point of interest within the coordinate frame
 *     described by the STC-S description), or 2) a Region describing the STC
-*     AstrCoordsArea (i.e. an area or volume of interest within the coordinate 
+*     AstrCoordsArea (i.e. an area or volume of interest within the coordinate
 *     frame described by the STC-S description), or 3) a KeyMap
 *     containing the uninterpreted property values read form the STC-S
 *     description, or 4) a KeyMap containing any combination of the first
 *     3 options. The attributes StcsArea, StcsCoords and StcsProps
-*     control which of the above is returned by 
+*     control which of the above is returned by
 c     astRead.
 f     AST_READ.
 *
-*     When an STC-S description is created from an AST Object using 
+*     When an STC-S description is created from an AST Object using
 c     astWrite,
 f     AST_WRITE,
 *     the AST Object must be either a Region or a KeyMap. If it is a
 *     Region, it is assumed to define the AstroCoordsArea or (if the
 *     Region is a single point) the AstroCoords to write to the STC-S
-*     description. If the Object is a KeyMap, it may contain an entry 
+*     description. If the Object is a KeyMap, it may contain an entry
 *     with the key "AREA", holding a Region to be used to define the
 *     AstroCoordsArea. It may also contain an entry with the key "COORDS",
 *     holding a Region (a PointList) to be used to create the
 *     AstroCoords. It may also contain an entry with key "PROPS", holding
-*     a KeyMap that contains uninterpreted property values to be used as 
+*     a KeyMap that contains uninterpreted property values to be used as
 *     defaults for any STC-S properties that are not determined by the
 *     other supplied Regions. In addition, a KeyMap supplied to
 c     astWrite
 f     AST_WRITE
 *     may itself hold the default STC-S properties (rather than defaults
-*     being held in a secondary KeyMap, stored as the "PROPS" entry in the 
+*     being held in a secondary KeyMap, stored as the "PROPS" entry in the
 *     supplied KeyMap).
 *
-*     The 
+*     The
 c     astRead and astWrite
 f     AST_READ and AST_WRITE
-*     functions work together so that any Object returned by 
+*     functions work together so that any Object returned by
 c     astRead can immediately be re-written using astWrite.
 f     AST_READ can immediately be re-written using AST_WRITE.
 *
@@ -65,38 +65,38 @@ c     and "sink" functions which connect it to an external data store
 c     by reading and writing the resulting text. These functions
 f     and "sink" routines which connect it to an external data store
 f     by reading and writing the resulting text. These routines
-*     should perform any conversions needed between external character 
-c     encodings and the internal ASCII encoding. If no such functions 
+*     should perform any conversions needed between external character
+c     encodings and the internal ASCII encoding. If no such functions
 f     encodings and the internal ASCII encoding. If no such routines
-*     are supplied, a Channel will read from standard input and write 
+*     are supplied, a Channel will read from standard input and write
 *     to standard output.
 
-*     Support for STC-S is currently based on the IVOA document "STC-S: 
-*     Space-Time Coordinate (STC) Metadata Linear String Implementation", 
+*     Support for STC-S is currently based on the IVOA document "STC-S:
+*     Space-Time Coordinate (STC) Metadata Linear String Implementation",
 *     version 1.30 (dated 5th December 2007), available at
 *     http://www.ivoa.net/Documents/latest/STC-S.html. Note, this
-*     document is a recommednation only and does not constitute an accepted 
-*     IVOA standard. 
+*     document is a recommednation only and does not constitute an accepted
+*     IVOA standard.
 *
-*     The full text of version 1.30 is supported by the StcsChan class, 
+*     The full text of version 1.30 is supported by the StcsChan class,
 *     with the following exceptions and provisos:
 *
 *     - When reading an STC-S phrase, case is ignored except when reading
 *     units strings.
-*     - There is no support for multiple intervals specified within a 
+*     - There is no support for multiple intervals specified within a
 *     TimeInterval, PositionInterval, SpectralInterval or RedshiftInterval.
 *     - If the ET timescale is specified, TT is used instead.
 *     - If the TEB timescale is specified, TDB is used instead.
 *     - The LOCAL timescale is not supported.
-*     - The AST TimeFrame and SkyFrame classes do not currently allow a 
-*     reference position to be specified. Consequently, any <refpos> 
-*     specified within the Time or Space sub-phrase of an STC-S document 
+*     - The AST TimeFrame and SkyFrame classes do not currently allow a
+*     reference position to be specified. Consequently, any <refpos>
+*     specified within the Time or Space sub-phrase of an STC-S document
 *     is ignored.
 *     - The Convex identifier for the space sub-phrase is not supported.
 *     - The GEO_C and GEO_D space frames are not supported.
 *     - The UNITSPHERE and SPHER3 space flavours are not supported.
 *     - If any Error values are supplied in a space sub-phrase, then the
-*     number of values supplied should equal the number of spatial axes, 
+*     number of values supplied should equal the number of spatial axes,
 *     and the values are assumed to specify an error box (i.e. error
 *     circles, ellipses, etc, are not supported).
 *     - The spectral and redshift sub-phrases do not support the
@@ -133,12 +133,12 @@ f     The StcsChan class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -192,9 +192,9 @@ f     The StcsChan class does not define any new routines beyond those
 /* The number of words used to form an extract from an STC-S description
    for use in an error message. */
 #define NEWORD 10
- 
+
 /* Max length of string returned by GetAttrib */
-#define GETATTRIB_BUFF_LEN 50    
+#define GETATTRIB_BUFF_LEN 50
 
 /* Include files. */
 /* ============== */
@@ -272,7 +272,7 @@ static int class_check;
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->GetAttrib_Buff[ 0 ] = 0; \
    globals->Class_Init = 0;
@@ -286,8 +286,8 @@ astMAKE_INITGLOBALS(StcsChan)
 #define class_vtab astGLOBAL(StcsChan,Class_Vtab)
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 /* Define the class virtual function table and its initialisation flag
@@ -306,9 +306,9 @@ static char getattrib_buff[ GETATTRIB_BUFF_LEN + 1 ];
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstStcsChan *astStcsChanForId_( const char *(*)( void ), 
-                                char *(*)( const char *(*)( void ), int * ), 
-                                void (*)( const char * ), 
+AstStcsChan *astStcsChanForId_( const char *(*)( void ),
+                                char *(*)( const char *(*)( void ), int * ),
+                                void (*)( const char * ),
                                 void (*)( void (*)( const char * ), const char *, int * ),
                                 const char *, ... );
 AstStcsChan *astStcsChanId_( const char *(* source)( void ),
@@ -370,8 +370,8 @@ static int GetStcsLength( AstStcsChan *, int * );
 /* Member functions. */
 /* ================= */
 
-static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key, 
-                      const char *prefix, char *line, int *nc, int *crem, 
+static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
+                      const char *prefix, char *line, int *nc, int *crem,
                       int linelen, int *status ){
 /*
 *  Name:
@@ -385,18 +385,18 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key, 
-*                    const char *prefix, char *line, int *nc, int *crem, 
+*     char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
+*                    const char *prefix, char *line, int *nc, int *crem,
 *                    int linelen, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function creates a new Box with dimensions specified by the
 *     values in the "error" array, centred on a representative position
 *     within one of the supplied Regions, and then stores the Box as the
-*     uncertainty Region within both the supplied Regions. 
+*     uncertainty Region within both the supplied Regions.
 
 *  Parameters:
 *     this
@@ -414,8 +414,8 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
 *        Pointer to an int in which to store the number of characters in
 *        the buffer. Updated on exit.
 *     crem
-*        Pointer to an int in which to store the maximum number of 
-*        characters before a new line. Ignored if linelen is zero. Updated 
+*        Pointer to an int in which to store the maximum number of
+*        characters before a new line. Ignored if linelen is zero. Updated
 *        on exit.
 *     linelen
 *        The maximum number of character per line, or zero if all text is
@@ -425,8 +425,8 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
 
 *  Returned Value:
 *     A pointer to the buffer. This will usually be "line", but may be
-*     different to "line" if it was necessary to expand the memory to make 
-*     room for the new property. 
+*     different to "line" if it was necessary to expand the memory to make
+*     room for the new property.
 
 */
 
@@ -449,7 +449,7 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
       if( linelen ) {
          len = ( prefix ? strlen( prefix ) : 0 ) + strlen( word );
 
-/* If there is insufficient room left, write out the text through the 
+/* If there is insufficient room left, write out the text through the
    Channel sink function, and start a new line with three spaces. Then
    reset the number of character remaining in the line. */
          if( len > *crem && len < linelen ) {
@@ -457,7 +457,7 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
             *nc = 0;
             result = astAppendString( result, nc, "   " );
             *crem = linelen - 3;
-         } 
+         }
 
 /* Reduce crem to account for the text that is about to be added to the
    line. */
@@ -498,7 +498,7 @@ static double *BoxCorners( AstFrame *frm, const double centre[2],
 *                         const double bsize[2], int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function returns a pointer to a dynamically allocated array
@@ -519,7 +519,7 @@ static double *BoxCorners( AstFrame *frm, const double centre[2],
 *  Returned Value:
 *     A pointer to a dynamically allocated array holding the axis values
 *     at the four corners, in a form suitable for passing to the
-*     astPolygon constructor function. NULL is returned if an error has 
+*     astPolygon constructor function. NULL is returned if an error has
 *     already occurred, of if this function fails for any reason.
 */
 
@@ -554,33 +554,33 @@ static double *BoxCorners( AstFrame *frm, const double centre[2],
    }
 
 /* Offset away from the centre by half the Box width along a great circle
-   initially parallel to the positive first frame axis (i.e. position 
+   initially parallel to the positive first frame axis (i.e. position
    angle +pi/2). The end position goes in "rv1" and the position angle of
-   the great circle (or straight line) at that point is returned as the 
-   function value. NOTE, the use of the words "left" and "right" below is 
-   vague because it depends on whether we are using a SkyFrame (which has 
+   the great circle (or straight line) at that point is returned as the
+   function value. NOTE, the use of the words "left" and "right" below is
+   vague because it depends on whether we are using a SkyFrame (which has
    a reversed first axis) or a basic Frame. In general, the choice of "left"
    and "right" below is appropriate for a basic Frame. */
-   pa = astOffset2( frm, centre, AST__DPIBY2, bsize[ 0 ]/2, rv1 );  
+   pa = astOffset2( frm, centre, AST__DPIBY2, bsize[ 0 ]/2, rv1 );
 
-/* Turn by 90 degrees and offset away by half the box height. This is done 
-   so that we have a second point (rv2) to define the great circle (or 
-   straight line) that forms the first vertical edge of the Box (i.e. the 
-   great circle or straight line through rv1 and rv2). Note, for spherical 
+/* Turn by 90 degrees and offset away by half the box height. This is done
+   so that we have a second point (rv2) to define the great circle (or
+   straight line) that forms the first vertical edge of the Box (i.e. the
+   great circle or straight line through rv1 and rv2). Note, for spherical
    Frames (i.e. SkyFrames) "rv2" is not necessarily a corner of the box. */
-   (void) astOffset2( frm, rv1, pa + AST__DPIBY2, bsize[ 1 ]/2, rv2 );  
+   (void) astOffset2( frm, rv1, pa + AST__DPIBY2, bsize[ 1 ]/2, rv2 );
 
 /* In the same way, get two points on the second vertical Box edge. */
-   pa = astOffset2( frm, centre, -AST__DPIBY2, bsize[ 0 ]/2, lv1 );  
-   (void) astOffset2( frm, lv1, pa + AST__DPIBY2, bsize[ 1 ]/2, lv2 );  
+   pa = astOffset2( frm, centre, -AST__DPIBY2, bsize[ 0 ]/2, lv1 );
+   (void) astOffset2( frm, lv1, pa + AST__DPIBY2, bsize[ 1 ]/2, lv2 );
 
 /* In the same way, get two points on the top horizontal Box edge. */
-   pa = astOffset2( frm, centre, 0.0, bsize[ 1 ]/2, th1 );  
-   (void) astOffset2( frm, th1, pa + AST__DPIBY2, bsize[ 0 ]/2, th2 );  
+   pa = astOffset2( frm, centre, 0.0, bsize[ 1 ]/2, th1 );
+   (void) astOffset2( frm, th1, pa + AST__DPIBY2, bsize[ 0 ]/2, th2 );
 
 /* In the same way, get two points on the bottom horizontal Box edge. */
-   pa = astOffset2( frm, centre, AST__DPI, bsize[ 1 ]/2, bh1 );  
-   (void) astOffset2( frm, bh1, pa + AST__DPIBY2, bsize[ 0 ]/2, bh2 );  
+   pa = astOffset2( frm, centre, AST__DPI, bsize[ 1 ]/2, bh1 );
+   (void) astOffset2( frm, bh1, pa + AST__DPIBY2, bsize[ 0 ]/2, bh2 );
 
 /* The first corner of the Box is at the intersection of the first
    vertical and top horizontal edges. */
@@ -603,7 +603,7 @@ static double *BoxCorners( AstFrame *frm, const double centre[2],
    sense whether in a SkyFrame or a basic Frame. */
    result = astMalloc( 8*sizeof( *result ) );
    if( result ) {
-      if( astIsASkyFrame( frm ) ) {        
+      if( astIsASkyFrame( frm ) ) {
          result[ 0 ] = tlc[ 0 ];
          result[ 1 ] = trc[ 0 ];
          result[ 2 ] = brc[ 0 ];
@@ -709,20 +709,20 @@ static char *ContextFragment( WordContext *con, char **buf, int *status ){
 *     char *ContextFragment( WordContext *con, char **buf, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function returns a pointer to a string that holds a fragment
 *     of the STC-S document currently being read. The fragment ends at
 *     the last word read by function GetNextWord, and starts a certain
-*     number of words earlier in the document, as specified by the NEWORD 
+*     number of words earlier in the document, as specified by the NEWORD
 *     macro.
 
 *  Parameters:
 *     con
 *        Pointer to the context structure, managed by GetNextWord.
 *     buf
-*        Address of a pointer to a dynamically allocated buffer. This 
+*        Address of a pointer to a dynamically allocated buffer. This
 *        pointer should be NULL on the first call to this function, and
 *        will be updated by this function. The pointer should be freed
 *        using astFree when no longer needed.
@@ -742,7 +742,7 @@ static char *ContextFragment( WordContext *con, char **buf, int *status ){
    nc = 0;
 
 /* Get the index of the first word to add to the buffer. The "next"
-   component of the context structure holds the index at which the word 
+   component of the context structure holds the index at which the word
    returned by the next call to GetNextWord will be stored. So at the
    moment, this is the index of the oldest word in the cyclic list. */
    j = con->next;
@@ -787,20 +787,20 @@ static void FreeContext( WordContext *con, int *status ){
 *     voidFreeContext( WordContext *con, int *status );
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function frees the resources used by the supplied WordContext
 *     structure. This structure is used by GetNextWord to keep track of
 *     which word to return next.
 *
-*     This function frees the dynamic memory pointers stored within the 
+*     This function frees the dynamic memory pointers stored within the
 *     WordContext structure, but does not free the memory holding the
 *     WordContext structure itself.
 
 *  Parameters:
 *     con
-*        Pointer to a structure holding the context. 
+*        Pointer to a structure holding the context.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -879,10 +879,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the StcsChan structure. */
@@ -941,7 +941,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 }
 
-static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs, 
+static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
                     char *fmt, int *status ){
 /*
 *  Name:
@@ -956,11 +956,11 @@ static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     void GetFmt( const char *key, AstKeyMap *props, int i, 
+*     void GetFmt( const char *key, AstKeyMap *props, int i,
 *                  int defdigs, char *fmt, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function locates the named property in the supplied KeyMap. If
@@ -976,7 +976,7 @@ static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
 *     i
 *        For vector values, this is the index of the vector element to be
 *        checked. Should be zero for scalar values. If "i" is greater
-*        than the number of values in the vector, then the number of digits 
+*        than the number of values in the vector, then the number of digits
 *        in the first element is found and returned.
 *     defdigs
 *        The value to return if the KeyMap does not contain an entry with
@@ -1018,7 +1018,7 @@ static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
       p = word;
       for( j = 0; j <= i; j++ ) {
 
-/* Find the next space or terminating null at the end of the current word. 
+/* Find the next space or terminating null at the end of the current word.
    Also count the number of digits before and after the decimal point and
    see if the word includes an exponent. */
          exp = 0;
@@ -1037,7 +1037,7 @@ static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
 
                } else if( *p == '.' ) {
                   dot = p;
-                  
+
                } else if( *p == 'e' || *p == 'E' ) {
                   exp = 1;
                }
@@ -1052,7 +1052,7 @@ static void GetFmt( const char *key, AstKeyMap *props, int i, int defdigs,
             after0 = after;
          }
 
-/* Find the following non-space marking the start of the next word, 
+/* Find the following non-space marking the start of the next word,
    or the terminating null. */
          while( *p != 0 && *p == ' ' ) p++;
 
@@ -1113,7 +1113,7 @@ static int GetIndent( AstChannel *this, int *status ) {
    return astTestIndent( this ) ? (*parent_getindent)( this, status ) : 0;
 }
 
-static const char *GetNextWord( AstStcsChan *this, WordContext *con, 
+static const char *GetNextWord( AstStcsChan *this, WordContext *con,
                                 int *status ){
 /*
 *  Name:
@@ -1127,11 +1127,11 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     const char *GetNextWord( AstStcsChan *this, WordContext *con, 
-*                              int *status ) 
+*     const char *GetNextWord( AstStcsChan *this, WordContext *con,
+*                              int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function returns a pointer to the next word of an STC-S
@@ -1139,7 +1139,7 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
 
 *  Parameters:
 *     this
-*        Pointer to the StcsChan, or NULL (to initialise "con"). 
+*        Pointer to the StcsChan, or NULL (to initialise "con").
 *     con
 *        Pointer to a structure holding context. The structure should be
 *        initialised by calling this function with a NULL "this" pointer
@@ -1175,8 +1175,8 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
       con->open = 0;
       for( i = 0; i < NEWORD; i++ ) con->words[ i ] = NULL;
 
-/* Words that end with an opening parenthesis are treated as two words. If the 
-   previous word ended in an opening parenthesis, it will have been removed by 
+/* Words that end with an opening parenthesis are treated as two words. If the
+   previous word ended in an opening parenthesis, it will have been removed by
    the previous call to this function and the "con->open" flag set. In
    this case, we just return a pointer to the second of the two words - a
    single "(" character - and clear the "con->open" flag. */
@@ -1189,19 +1189,19 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
       con->close = 0;
       result = ")";
 
-/* Words that begin with an opening parenthesis are treated as two words. If 
+/* Words that begin with an opening parenthesis are treated as two words. If
    the previous word was such an opening parenthesis, the rest of the word
-   will have been removed by the previous call to this function and the 
+   will have been removed by the previous call to this function and the
    "con->wnext" pointer set to the start of the remaining word. In
    this case, re-instate the original character that was replaced by a
-   terminating null when the previous word was returned, return the 
+   terminating null when the previous word was returned, return the
    "con->wnext" pointer, and then clear the pointer. */
    } else if( con->wnext && ! con->done ) {
       *(con->wnext) = con->f;
       result = con->wnext;
       con->wnext = NULL;
 
-/* Otherwise... */   
+/* Otherwise... */
    } else {
 
 /* If the previous invocation of this function converted a space
@@ -1216,7 +1216,7 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
       }
 
 /* If we have exhausted the current line, get the next line by invoking
-   the source function. We loop until we read a line that is not entirely 
+   the source function. We loop until we read a line that is not entirely
    blank. */
       while( ( !result || ! *result ) && astOK ) {
 
@@ -1298,7 +1298,7 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
    return result;
 }
 
-static int GetRegionProps( AstStcsChan *this, AstRegion *spreg, 
+static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
                            AstKeyMap *spprops, int nspace, int defdigs,
                            double scale, int issky, int *status ) {
 /*
@@ -1314,11 +1314,11 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     int GetRegionProps( AstStcsChan *this, AstRegion *spreg, 
+*     int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
 *                         AstKeyMap *spprops, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function creates a set of STC-S properties to describe the
@@ -1335,7 +1335,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Returns the integer code for the spatial region, or NULL_ID if the 
+*     Returns the integer code for the spatial region, or NULL_ID if the
 *     properties could not be created for any reason.
 
 */
@@ -1378,7 +1378,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
    recursively. Then store the new KeyMap in the supplied KeyMap. */
    if( astGetNegated( spreg ) ) {
       spaceid = NOT_ID;
-      astNegate( spreg );   
+      astNegate( spreg );
       new_props = astKeyMap( " ", status );
 
       if( GetRegionProps( this, spreg, new_props, nspace, defdigs,
@@ -1387,7 +1387,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
       astMapPut0C( spprops, "ID", "Not", NULL );
       astMapPut0A( spprops, "REGION1", new_props, NULL );
       astMapPut0I( spprops, "NREG", 1, NULL );
-      astNegate( spreg );   
+      astNegate( spreg );
 
 /* Store properties that are specific to AllSky sub-phrases (i.e. none)... */
    } else if( astIsANullRegion( spreg ) && astGetNegated( spreg ) ) {
@@ -1403,7 +1403,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
       astCirclePars( spreg, centre, &a, NULL );
 
 /* Create a string holding the formatted centre axis values, scaling
-   to the required units. Use the Frame's Digits attribute to specify 
+   to the required units. Use the Frame's Digits attribute to specify
    how many digits to use when formatting the axis values. */
       nc = 0;
       for( i = 0; i < nspace; i++ ) {
@@ -1416,7 +1416,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
          } else {
             ok = 0;
             astAddWarning( this, 1, "The supplied Circle contains "
-                           "one or more bad centre axis values.", 
+                           "one or more bad centre axis values.",
                            "astWrite", status );
             break;
          }
@@ -1445,16 +1445,16 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
 /* Get the bounds of the Region. */
       astGetRegionBounds( spreg, lbnd, ubnd );
 
-/* Create a string holding the formatted low limits, scaling to the 
-   required units. Use the Frame's Digits attribute to specify how 
+/* Create a string holding the formatted low limits, scaling to the
+   required units. Use the Frame's Digits attribute to specify how
    many digits to use when formatting the axis values. */
       nc = 0;
       for( i = 0; i < nspace; i++ ) {
-         if( lbnd[ i ] == AST__BAD || lbnd[ i ] == DBL_MAX || 
+         if( lbnd[ i ] == AST__BAD || lbnd[ i ] == DBL_MAX ||
              lbnd[ i ] == -DBL_MAX ) {
             astAddWarning( this, 1, "Spatial axis %d has an undefined "
                            "lower limit.", "astWrite", status, i + 1 );
-            ok = 0; 
+            ok = 0;
             break;
          } else {
             GetFmt( "LOLIMIT", spprops, i, defdigs, fmt, status );
@@ -1467,15 +1467,15 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
 /* Remove the trailing space, and store the property value in the KeyMap. */
       prop[ nc - 1 ] = 0;
       astMapPut0C( spprops, "LOLIMIT", prop, NULL );
-         
+
 /* Do the same for the upper limits. */
       nc = 0;
       for( i = 0; i < nspace; i++ ) {
-         if( ubnd[ i ] == AST__BAD || ubnd[ i ] == DBL_MAX || 
+         if( ubnd[ i ] == AST__BAD || ubnd[ i ] == DBL_MAX ||
              ubnd[ i ] == -DBL_MAX ) {
             astAddWarning( this, 1, "Spatial axis %d has an undefined "
                            "upper limit.", "astWrite", status, i + 1 );
-            ok = 0; 
+            ok = 0;
             break;
          } else {
             GetFmt( "HILIMIT", spprops, i, defdigs, fmt, status );
@@ -1488,7 +1488,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
 /* Remove the trailing space, and store the property value in the KeyMap. */
       prop[ nc - 1 ] = 0;
       astMapPut0C( spprops, "HILIMIT", prop, NULL );
-         
+
 /* Store properties that are specific to Ellipse sub-phrases... */
    } else if( astIsAEllipse( spreg ) ) {
       spaceid = ELLIPSE_ID;
@@ -1498,7 +1498,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
       astEllipsePars( spreg, centre, &a, &b, &angle, NULL, NULL );
 
 /* Create a string holding the formatted centre axis values, scaling
-   to the required units. Use the Frame's Digits attribute to specify 
+   to the required units. Use the Frame's Digits attribute to specify
    how many digits to use when formatting the axis values. */
       nc = 0;
       for( i = 0; i < nspace; i++ ) {
@@ -1511,7 +1511,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
          } else {
             ok = 0;
             astAddWarning( this, 1, "The supplied Ellipse contains "
-                           "one or more bad centre axis values.", 
+                           "one or more bad centre axis values.",
                            "astWrite", status );
             break;
          }
@@ -1531,7 +1531,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
          (void) sprintf( buf, fmt, scale*b );
          astMapPut0C( spprops, "RADIUS2", buf, NULL );
 
-/* Convert the angle to degrees in the direction required by STC-S, 
+/* Convert the angle to degrees in the direction required by STC-S,
    format and store. */
          angle *= AST__DR2D;
          if( !issky )  angle = 90 - angle;
@@ -1560,7 +1560,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
       astGetRegionPoints( spreg, np, nspace, &np, points );
 
 /* Create a string holding the formatted vertex axis values, scaling
-   to the required units. Use the Frame's Digits attribute to specify 
+   to the required units. Use the Frame's Digits attribute to specify
    how many digits to use when formatting the axis values. */
       GetFmt( "VERTICES", spprops, 0, defdigs, fmt, status );
       nc = 0;
@@ -1574,7 +1574,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
                p += np;
             } else {
                astAddWarning( this, 1, "The supplied Polygon contains "
-                              "one or more bad axis values.", "astWrite", 
+                              "one or more bad axis values.", "astWrite",
                               status );
                ok = 0;
                break;
@@ -1599,14 +1599,14 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
       if( np > 1 ) {
          astAddWarning( this, 1, "The supplied PointList contains "
                         "more than one position.", "astWrite", status );
-         ok = 0; 
+         ok = 0;
 
 /* If so, get the axis values at the point. */
       } else {
          astGetRegionPoints( spreg, 1, nspace, &np, centre );
 
-/* Create a string holding the formatted axis values, scaling to the 
-   required units. Use the Frame's Digits attribute to specify how many 
+/* Create a string holding the formatted axis values, scaling to the
+   required units. Use the Frame's Digits attribute to specify how many
    digits to use when formatting the axis values. */
          nc = 0;
          for( i = 0; i < nspace; i++ ) {
@@ -1619,7 +1619,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
 
             } else {
                astAddWarning( this, 1, "The supplied PointList contains "
-                              "one or more bad axis values.", "astWrite", 
+                              "one or more bad axis values.", "astWrite",
                               status );
                ok = 0;
                break;
@@ -1642,8 +1642,8 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
          sreg = astClone( spreg );
       }
 
-/* If we now have a CmpRegion, write its properties into a new KeyMap by 
-   calling this function recursively. Then store the new KeyMap in the 
+/* If we now have a CmpRegion, write its properties into a new KeyMap by
+   calling this function recursively. Then store the new KeyMap in the
    supplied KeyMap. */
       if( astIsACmpRegion( sreg ) ) {
 
@@ -1672,8 +1672,8 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
    the properties of the i'th component Region in the new KeyMap. */
             if( ok ) {
                new_props = astKeyMap( " ", status );
-               if( GetRegionProps( this, reg_list[ i ], new_props, nspace, 
-                                   defdigs, scale, issky, status ) 
+               if( GetRegionProps( this, reg_list[ i ], new_props, nspace,
+                                   defdigs, scale, issky, status )
                    == NULL_ID ) ok = 0;
 
 /* Store the new KeyMap in the supplied KeyMap. */
@@ -1693,7 +1693,7 @@ static int GetRegionProps( AstStcsChan *this, AstRegion *spreg,
          astAddWarning( this, 1, "The supplied %s cannot be written "
                         "out since STC-S does not support %s regions.",
                         "astWrite", status, astGetClass( spreg ),
-                        astGetClass( spreg ) ); 
+                        astGetClass( spreg ) );
          ok = 0;
       }
 
@@ -1740,7 +1740,7 @@ void astInitStcsChanVtab_(  AstStcsChanVtab *vtab, const char *name, int *status
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1843,10 +1843,10 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
 *                                 double scale, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
-*     This function returns a pointer to a new Region that describes the 
+*     This function returns a pointer to a new Region that describes the
 *     spatial coverage of an STC-S description.
 
 *  Parameters:
@@ -1856,7 +1856,7 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
 *        The Frame in which the Region is to be defined.
 *     scale
 *        A factor that must be applied to the raw axis values read from the
-*        STC-S description in order to convert them into the units used by 
+*        STC-S description in order to convert them into the units used by
 *        the supplied Frame.
 *     status
 *        Pointer to the inherited status variable.
@@ -1912,7 +1912,7 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
    naxes = astGetNaxes( frm );
 
 /* Create a suitable Region to enclose the space positions. This
-   includes scaling the supplied axis values to the units used by 
+   includes scaling the supplied axis values to the units used by
    the Frame. */
    if( spaceid == POSITION_INTERVAL_ID ) {
       astMapGet1D( props, "DLOLIMIT", naxes, &nval, vec1 );
@@ -1921,19 +1921,19 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
       for( iaxis = 0; iaxis < naxes; iaxis++ ) {
          vec1[ iaxis ] *= scale;
          vec2[ iaxis ] *= scale;
-      }   
+      }
 
       result = (AstRegion *) astBox( frm, 1, vec1, vec2, NULL, " ", status );
 
    } else if( spaceid == ALLSKY_ID ) {
       result = (AstRegion *) astNullRegion( frm, NULL, "Negated=1", status );
-   
+
    } else if( spaceid == CIRCLE_ID ) {
       astMapGet1D( props, "DCENTRE", naxes, &nval, vec1 );
       astMapGet0D( props, "RADIUS", &val1 );
       for( iaxis = 0; iaxis < naxes; iaxis++ ) vec1[ iaxis ] *= scale;
       val1 *= scale;
-      result = (AstRegion *) astCircle( frm, 1, vec1, &val1, NULL, " ", 
+      result = (AstRegion *) astCircle( frm, 1, vec1, &val1, NULL, " ",
                                         status );
 
    } else if( spaceid == ELLIPSE_ID ) {
@@ -1956,10 +1956,10 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
       for( iaxis = 0; iaxis < naxes; iaxis++ ) {
          vec1[ iaxis ] *= scale;
          vec2[ iaxis ] *= scale;
-      }   
+      }
 
       vertices = BoxCorners( frm, vec1, vec2, status );
-      result = (AstRegion *) astPolygon( frm, 4, 4, vertices, NULL, " ", 
+      result = (AstRegion *) astPolygon( frm, 4, 4, vertices, NULL, " ",
                                          status );
       vertices = astFree( vertices );
 
@@ -1968,13 +1968,13 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
       temp = astMalloc( sizeof( double )*nval );
       astMapGet1D( props, "DVERTICES", nval, &nval, temp );
 
-/* An STC-S polygon description holds the vertex axis values in the wrong 
-   order for the AstPolygon constructor. Therefore, transpose the temp 
+/* An STC-S polygon description holds the vertex axis values in the wrong
+   order for the AstPolygon constructor. Therefore, transpose the temp
    array (scale them at the same time). */
       vertices = astMalloc( sizeof( double )*nval );
       if( astOK ) {
          nvert = nval/naxes;
-         p = temp;               
+         p = temp;
          for( ivert = 0; ivert < nvert; ivert++ ) {
             for( iaxis = 0; iaxis < naxes; iaxis++,p++ ) {
                vertices[ iaxis*nvert + ivert ] = *p*scale;
@@ -2008,9 +2008,9 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
       if( spaceid == UNION_ID ) {
          oper = AST__OR;
       } else if( spaceid == INTERSECTION_ID ) {
-         oper = AST__AND; 
+         oper = AST__AND;
       } else if( spaceid == DIFFERENCE_ID ) {
-         oper = AST__XOR; 
+         oper = AST__XOR;
       } else {
          oper = 0;  /* To avoid compiler warnings */
       }
@@ -2018,7 +2018,7 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
 /* Loop over all argument Regions. */
       for( ireg = 0; ireg < nreg; ireg++ ) {
 
-/* Get the KeyMap holding the STC-S properties of the current argument 
+/* Get the KeyMap holding the STC-S properties of the current argument
    region. */
          sprintf( key, "REGION%d", ireg + 1 );
          astMapGet0A( props, key, &reg_props );
@@ -2032,27 +2032,27 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
             astNegate( reg );
             result = astClone( reg );
 
-/* If we are creating a "Union", "Difference" or "Intersection" element, 
-   combine the first two arguments into a CmpRegion, and then add in each 
+/* If we are creating a "Union", "Difference" or "Intersection" element,
+   combine the first two arguments into a CmpRegion, and then add in each
    subsequent argument. */
          } else {
             if( ireg == 0 ) {
                result = astClone( reg );
             } else {
-               tmp = (AstRegion *) astCmpRegion( result, reg, oper, " ", 
+               tmp = (AstRegion *) astCmpRegion( result, reg, oper, " ",
                                                  status );
                (void) astAnnul( result );
-               result = tmp;            
+               result = tmp;
             }
          }
 
 /* Free resources */
          reg = astAnnul( reg );
-         reg_props = astAnnul( reg_props );         
+         reg_props = astAnnul( reg_props );
       }
    }
 
-/* Ensure that no error is reported if an attempt is made to access a 
+/* Ensure that no error is reported if an attempt is made to access a
    non-existent KeyMap entry. */
    astSetKeyError( props, 0 );
 
@@ -2060,7 +2060,7 @@ static AstRegion *MakeSpaceRegion( AstKeyMap *props, AstFrame *frm,
    return result;
 }
 
-static void MapPut0C( AstKeyMap *km, const char *key, const char *value, 
+static void MapPut0C( AstKeyMap *km, const char *key, const char *value,
                       const char *def, int defs, int *status ){
 /*
 *  Name:
@@ -2074,7 +2074,7 @@ static void MapPut0C( AstKeyMap *km, const char *key, const char *value,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     void MapPut0C( AstKeyMap *km, const char *key, const char *value, 
+*     void MapPut0C( AstKeyMap *km, const char *key, const char *value,
 *                    const char *def, int defs, int *status )
 
 *  Class Membership:
@@ -2085,7 +2085,7 @@ static void MapPut0C( AstKeyMap *km, const char *key, const char *value,
 *     handling default values.
 
 *  Parameters:
-*     km 
+*     km
 *        Pointer to the KeyMap in which to store the value.
 *     key
 *        Pointer to a string holding the property name associated with
@@ -2094,7 +2094,7 @@ static void MapPut0C( AstKeyMap *km, const char *key, const char *value,
 *        The property value. If this is NULL then the function
 *        returns without action.
 *     def
-*        The default property value. 
+*        The default property value.
 *     defs
 *        If zero, then the value is not stored in the KeyMap if the value
 *        is equal to the default value.
@@ -2146,7 +2146,7 @@ static void MapPut0D( AstKeyMap *km, const char *key, double value, double def,
 *     handling default values.
 
 *  Parameters:
-*     km 
+*     km
 *        Pointer to the KeyMap in which to store the value.
 *     key
 *        Pointer to a string holding the property name associated with
@@ -2155,7 +2155,7 @@ static void MapPut0D( AstKeyMap *km, const char *key, double value, double def,
 *        The property value. If this is AST__BAD then the function
 *        returns without action.
 *     def
-*        The default property value. 
+*        The default property value.
 *     defs
 *        If zero, then the value is not stored in the KeyMap if the value
 *        is equal to the default value.
@@ -2183,7 +2183,7 @@ static void MapPut0D( AstKeyMap *km, const char *key, double value, double def,
 }
 
 static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
-                             int indent, char *line, int *nc, int *crem, 
+                             int indent, char *line, int *nc, int *crem,
                              int linelen, int *status ){
 /*
 *  Name:
@@ -2198,14 +2198,14 @@ static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
 *  Synopsis:
 *     #include "stcschan.h"
 *     char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
-*                           int indent, char *line, int *nc, int *crem, 
+*                           int indent, char *line, int *nc, int *crem,
 *                           int linelen, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
-*     This function converts the STC-S properties for the space sub-phrase 
+*     This function converts the STC-S properties for the space sub-phrase
 *     supplied in a KeyMap into text, and appends them to the supplied
 *     line of text in the order required by STC-S.
 *
@@ -2216,13 +2216,13 @@ static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
 *     this
 *        The StcsChan.
 *     km
-*        Pointer to a KeyMap containing the STC-S properties. 
+*        Pointer to a KeyMap containing the STC-S properties.
 *     id
 *        Pointer to the sub-phrase identifier.
 *     indent
 *        If greater than or equal to zero, then it gives the number of
-*        spaces indentation to place before the first word (also indicates 
-*        that a new-line should follow the last word of the argument). If 
+*        spaces indentation to place before the first word (also indicates
+*        that a new-line should follow the last word of the argument). If
 *        negative, never use indentation.
 *     line
 *        Pointer to the buffer to receive the property values.
@@ -2230,7 +2230,7 @@ static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
 *        Pointer to an int in which to store the number of characaters in
 *        the buffer. Updated on exit.
 *     crem
-*        Pointer to an int in which to store the maximum number of 
+*        Pointer to an int in which to store the maximum number of
 *        characters before a new line. Ignored if zero. Updated on exit.
 *     linelen
 *        The maximum number of character per line, or zero if all text is
@@ -2240,19 +2240,19 @@ static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
 
 *  Returned Value:
 *     A pointer to the buffer. This will usually be "line", but may be
-*     different to "line" if it was necessary to expand the memory to make 
-*     room for new properties. 
+*     different to "line" if it was necessary to expand the memory to make
+*     room for new properties.
 
 */
 
 /* Local Variables: */
    AstKeyMap *reg_props;
-   char *result;          
+   char *result;
    char key[ 20 ];
    int i;
    int ireg;
    int nreg;
-   int spaceid;           
+   int spaceid;
 
 /* Initialise */
    result = line;
@@ -2309,7 +2309,7 @@ static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
 /* Append an opening parenthesis. */
       result = astAppendString( result, nc, "( " );
 
-/* If required, write out the text through the Channel sink function, 
+/* If required, write out the text through the Channel sink function,
    and start a new line. */
       if( indent >= 0 ) {
          astPutNextText( this, result );
@@ -2339,14 +2339,14 @@ static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
          }
 
 /* Append the identifier for the next argument to the string. */
-         result = AddItem( this, reg_props, "ID", NULL, result, nc, crem, 
+         result = AddItem( this, reg_props, "ID", NULL, result, nc, crem,
                            linelen, status );
 
 /* Append the arguments to the string. */
          astMapGet0C( reg_props, "ID", &id );
          result = PutRegionProps( this, reg_props, id, indent, result, nc,
                                   crem, linelen, status );
- 
+
 /* Write the text out to the sink function, and start a new line. */
          if( indent > 0 ) {
             astPutNextText( this, result );
@@ -2378,7 +2378,7 @@ static char *PutRegionProps( AstStcsChan *this, AstKeyMap *km, const char *id,
       }
    }
 
-/* Ensure that no error is reported if an attempt is made to access a 
+/* Ensure that no error is reported if an attempt is made to access a
    non-existent KeyMap entry. */
    astSetKeyError( km, 0 );
 
@@ -2399,7 +2399,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     AstObject *Read( AstChannel *this_channel, int *status ) 
+*     AstObject *Read( AstChannel *this_channel, int *status )
 
 *  Class Membership:
 *     StcsChan member function (over-rides the astRead method
@@ -2509,12 +2509,12 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    containing the proprties of the time sub-phrase, and then create AST
    Regions describing the time coordinate value and its enclosing Region. */
    if( astMapGet0A( full_props, "TIME_PROPS", &obj ) ) {
-      props = (AstKeyMap *) obj;   
+      props = (AstKeyMap *) obj;
 
 /* Create the default TimeFrame */
       timefrm = astTimeFrame( " ", status );
 
-/* Get the TIMESCALE property from the KeyMap, and identify the corresponding 
+/* Get the TIMESCALE property from the KeyMap, and identify the corresponding
    AST TimeScale. */
       ts = AST__BADTS;
       new_ts = NULL;
@@ -2565,7 +2565,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
                            "astRead", status );
 
          } else if( astOK ){
-            astError( AST__BADIN, "astRead(StcsChan): Unknown time scale '%s'.", 
+            astError( AST__BADIN, "astRead(StcsChan): Unknown time scale '%s'.",
                       status, cval );
          }
 
@@ -2574,11 +2574,11 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
                         "astRead", status );
       }
 
-/* Issue a warning if a different time-scale was substituted for the supplied 
+/* Issue a warning if a different time-scale was substituted for the supplied
    time-scale. */
       if( new_ts ) {
          astAddWarning( this, level, "AST does not support the '%s' time "
-                        "scale. The '%s' timescale is being used instead.", 
+                        "scale. The '%s' timescale is being used instead.",
                         "astRead", status, cval, new_ts );
       }
 
@@ -2586,13 +2586,13 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    to the same value. */
       if( ts != AST__BADTS ) astSetTimeScale( timefrm, ts );
 
-/* The AST TimeFrame class has no reference position, so allow any reference 
-   position but issue a warning for anything other than "TOPOCENTER" and 
+/* The AST TimeFrame class has no reference position, so allow any reference
+   position but issue a warning for anything other than "TOPOCENTER" and
    "UNKNOWNRefPos". */
       if( !astMapGet0C( props, "REFPOS", &cval ) ) cval = "UNKNOWNRefPos";
       if( !astChrMatch( cval, "TOPOCENTER" ) ) {
          astAddWarning( this, 1, "AST only supports topocentric time frames, "
-                        "so 'TOPOCENTER' will be used in place of '%s'.", 
+                        "so 'TOPOCENTER' will be used in place of '%s'.",
                         "astRead", status, cval );
       }
 
@@ -2609,14 +2609,14 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
       if( time_origin == AST__BAD ) time_origin = stop;
       epoch = time_origin;
 
-/* Store the TimeOrigin value in the TimeFrame, modifying the time values 
+/* Store the TimeOrigin value in the TimeFrame, modifying the time values
    accordingly. */
-      if( time_origin != AST__BAD ) { 
+      if( time_origin != AST__BAD ) {
          astSetTimeOrigin( timefrm, time_origin );
          if( start != AST__BAD ) start -= time_origin;
          if( stop != AST__BAD ) stop -= time_origin;
          if( time != AST__BAD ) time -= time_origin;
-      }               
+      }
 
 /* Convert the epoch to TDB. */
       if( epoch != AST__BAD && ts != AST__TDB ) {
@@ -2633,7 +2633,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* Create a suitable Region to describe the enclosure for the time coords */
       if( start != AST__BAD || stop != AST__BAD ) {
-         time_enc = (AstRegion *) astInterval( timefrm, &start, &stop, 
+         time_enc = (AstRegion *) astInterval( timefrm, &start, &stop,
                                                NULL, "", status );
          use_enc = 1;
       }
@@ -2641,7 +2641,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 /* Create a suitable Region to describe the time coords contained within
    the above enclosure. */
       if( time != AST__BAD ) {
-         time_co = (AstRegion *) SinglePointList( (AstFrame *) timefrm, 
+         time_co = (AstRegion *) SinglePointList( (AstFrame *) timefrm,
                                                    &time, NULL, status);
       } else {
          use_co = 0;
@@ -2649,7 +2649,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* If no enclosure Region was created for the time sub-phrase, use a
    copy of any coordinate region. This is because each sub-phrase needs
-   to have an enclosure of some sort if they are to be combined in parallel 
+   to have an enclosure of some sort if they are to be combined in parallel
    into an enclose for the whole CmpFrame. */
       if( ! time_enc && time_co ) time_enc = astCopy( time_co );
 
@@ -2661,19 +2661,19 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 /* Get the units in which the time error values are given, and get the
    scaling factor that converts them into days. */
       if( astMapGet0C( props, "UNIT", &cval ) ) {
-         if( !strcmp( cval, "s" ) ) {  
+         if( !strcmp( cval, "s" ) ) {
             scale = 1.0/86400.0;
 
-         } else if( !strcmp( cval, "d" ) ) {  
+         } else if( !strcmp( cval, "d" ) ) {
             scale = 1.0;
 
-         } else if( !strcmp( cval, "a" ) ) {  
+         } else if( !strcmp( cval, "a" ) ) {
             scale = 365.25;
 
-         } else if( !strcmp( cval, "yr" ) ) {  
+         } else if( !strcmp( cval, "yr" ) ) {
             scale = 365.25;
 
-         } else if( !strcmp( cval, "cy" ) ) {  
+         } else if( !strcmp( cval, "cy" ) ) {
             scale = 36525.0;
 
          } else if( astOK ) {
@@ -2696,7 +2696,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
             vals[ 0 ] = 0.5*( vals[ 0 ] + vals[ 1 ] );
          }
 
-         SetUnc( time_enc, time_co, (AstFrame *) timefrm, 0, scale, vals, 1, 
+         SetUnc( time_enc, time_co, (AstFrame *) timefrm, 0, scale, vals, 1,
                  status );
       }
 
@@ -2709,7 +2709,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    containing the proprties of the space sub-phrase, and then create AST
    Regions describing the spatial position and its enclosing Region. */
    if( astMapGet0A( full_props, "SPACE_PROPS", &obj ) ) {
-      props = (AstKeyMap *) obj;   
+      props = (AstKeyMap *) obj;
 
 /* The class of Frame (SkyFrame or basic Frame) is determined by the
    "FLAVOR". */
@@ -2719,19 +2719,19 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          if( astChrMatch( cval, "SPHER2" ) ) {
             spacefrm = (AstFrame *) astSkyFrame( "", status );
             is_skyframe = 1;
-   
+
          } else if( astChrMatch( cval, "CART1" ) ) {
             spacefrm = astFrame( 1, "", status );
-   
+
          } else if( astChrMatch( cval, "CART2" ) ) {
             spacefrm = astFrame( 2, "", status );
-   
+
          } else if( astChrMatch( cval, "CART3" ) ) {
             spacefrm = astFrame( 3, "", status );
-   
+
          } else {
             astError( AST__BADIN, "astRead(StcsChan): Unsupported "
-                      "space 'Flavor' (%s) found in STC-S description.", 
+                      "space 'Flavor' (%s) found in STC-S description.",
                       status, cval );
          }
 
@@ -2776,7 +2776,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          } else {
             sys = AST__UNKNOWN;
             astAddWarning( this, 1, "'UNKNOWNFrame' being used in place of "
-                           "unsupported frame '%s' in an STC-S description.", 
+                           "unsupported frame '%s' in an STC-S description.",
                            "astRead", status, cval );
          }
 
@@ -2799,16 +2799,16 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 /* Set the epoch of the space frame. */
       if( epoch != AST__BAD ) astSetEpoch( spacefrm, epoch );
 
-/* The AST Frame and SkyFrame class has no reference position, so for 
-   SkyFrames we consider "TOPOCENTER" and "UNKNOWN" acceptable and all 
+/* The AST Frame and SkyFrame class has no reference position, so for
+   SkyFrames we consider "TOPOCENTER" and "UNKNOWN" acceptable and all
    other unsupported. For other Frames we allow any reference position. */
       if( !astMapGet0C( props, "REFPOS", &cval ) ) cval = "UNKNOWNRefPos";
       if( is_skyframe && !astChrMatch( cval, "TOPOCENTER" ) ) {
          astAddWarning( this, 1, "AST only supports topocentric sky frames, "
-                        "so 'TOPOCENTER' will be used in place of '%s'.", 
+                        "so 'TOPOCENTER' will be used in place of '%s'.",
                         "astRead", status, cval );
       }
-        
+
 /* Get the number of spatial axes. */
       naxes = astGetNaxes( spacefrm );
 
@@ -2827,22 +2827,22 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
          if( !strcmp( cval, "deg" ) || !strcmp( cval, "deg deg" ) ) {
             scale = AST__DD2R;
-   
+
          } else if( !strcmp( cval, "arcmin" ) || !strcmp( cval, "arcmin arcmin" ) ) {
             scale = AST__DD2R/60.0;
-   
+
          } else if( !strcmp( cval, "arcsec" ) || !strcmp( cval, "arcsec arcsec" ) ) {
             scale = AST__DD2R/3600.0;
-   
+
          } else if( astOK ) {
             astError( AST__BADIN, "astRead(StcsChan): Unsupported "
                       "units (%s) for a spherical co-ordinate system "
-                      "within an STC-S description: '%s'.", status, 
+                      "within an STC-S description: '%s'.", status,
                       cval, ContextFragment( &con, &fbuf, status ) );
          }
 
-/* Basic Frames can use any of the allowed units, so use a scale factor of 
-   1.0. Also set the active unit flag in the space frame to enable intelligent 
+/* Basic Frames can use any of the allowed units, so use a scale factor of
+   1.0. Also set the active unit flag in the space frame to enable intelligent
    units conversion by astConvert etc. */
       } else {
          scale = 1.0;
@@ -2870,7 +2870,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
       }
 
 /* Create a suitable Region to enclose the space positions. This
-   includes scaling the supplied axis values to the units used by 
+   includes scaling the supplied axis values to the units used by
    the Frame. */
       space_enc = MakeSpaceRegion( props, spacefrm, scale, status );
       if( space_enc ) use_enc = 1;
@@ -2880,7 +2880,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    we cannot produce a PointList describing the complete coordinate set. */
       if( astMapGet1D( props, "DPOSITION", naxes, &nval, vals ) ) {
          for( iaxis = 0; iaxis < nval; iaxis++ ) vals[ iaxis ] *= scale;
-         space_co = (AstRegion *) SinglePointList( spacefrm, vals, NULL, 
+         space_co = (AstRegion *) SinglePointList( spacefrm, vals, NULL,
                                                    status);
       } else {
          use_co = 0;
@@ -2888,7 +2888,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* If no enclosure Region was created for the space sub-phrase, use a
    copy of any coordinate region. This is because each sub-phrase needs
-   to have an enclosure of some sort if they are to be combined in parallel 
+   to have an enclosure of some sort if they are to be combined in parallel
    into an enclose for the whole CmpFrame. */
       if( ! space_enc && space_co ) space_enc = astCopy( space_co );
 
@@ -2917,7 +2917,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          }
 
 /* Set the uncertainty in the two space regions. */
-         SetUnc( space_enc, space_co, (AstFrame *) spacefrm, is_skyframe, 
+         SetUnc( space_enc, space_co, (AstFrame *) spacefrm, is_skyframe,
                  scale, vals, naxes, status );
       }
 
@@ -2941,12 +2941,12 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    containing the proprties of the spectral sub-phrase, and then create AST
    Regions describing the spectral coordinate value and its enclosing Region. */
    if( astMapGet0A( full_props, "SPECTRAL_PROPS", &obj ) ) {
-      props = (AstKeyMap *) obj;   
+      props = (AstKeyMap *) obj;
 
 /* Create the default SpecFrame */
       specfrm = astSpecFrame( " ", status );
 
-/* Get the REFPOS property from the KeyMap, and identify the corresponding 
+/* Get the REFPOS property from the KeyMap, and identify the corresponding
    AST StdOfRest. */
       sor = AST__BADSOR;
       if( astMapGet0C( props, "REFPOS", &cval ) ) {
@@ -2976,34 +2976,34 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          } else {
             astAddWarning( this, 1, "Using 'HELIOCENTER' in place of "
                            "unsupported spectral reference position '%s' "
-                           "found in an STC-S description.", "astRead", 
+                           "found in an STC-S description.", "astRead",
                            status, cval );
          }
 
       } else {
          astAddWarning( this, 2, "Spectral reference position defaulting to "
-                        "'HELIOCENTER' in an STC-S description.", "astRead", 
+                        "'HELIOCENTER' in an STC-S description.", "astRead",
                         status );
-      } 
+      }
 
 /* If we got a ref pos, set the StdOfRest attribute in the SpecFrame. */
       if( sor != AST__BADSOR ) astSetStdOfRest( specfrm, sor );
 
 /* Get the units. */
       if( !astMapGet0C( props, "UNIT", &cval ) ) cval = "Hz";
-      
+
 
 /* Set the spectral system implied by the unit string. */
-      if( !cval || !strcmp( cval, "Hz" ) || !strcmp( cval, "MHz" ) || 
+      if( !cval || !strcmp( cval, "Hz" ) || !strcmp( cval, "MHz" ) ||
           !strcmp( cval, "GHz" ) ) {
          astSetSystem( specfrm, AST__FREQ );
 
-      } else if( !strcmp( cval, "m" ) || !strcmp( cval, "mm" ) || 
+      } else if( !strcmp( cval, "m" ) || !strcmp( cval, "mm" ) ||
                  !strcmp( cval, "um" ) || !strcmp( cval, "nm" ) ||
                  !strcmp( cval, "Angstrom" ) ) {
          astSetSystem( specfrm, AST__WAVELEN );
 
-      } else if( !strcmp( cval, "eV" ) || !strcmp( cval, "keV" ) || 
+      } else if( !strcmp( cval, "eV" ) || !strcmp( cval, "keV" ) ||
                  !strcmp( cval, "MeV" ) ) {
          astSetSystem( specfrm, AST__ENERGY );
 
@@ -3019,11 +3019,11 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 /* Set the epoch */
       if( epoch != AST__BAD ) astSetEpoch( specfrm, epoch );
 
-/* Create a suitable Region to describe the enclosure for the spectral 
+/* Create a suitable Region to describe the enclosure for the spectral
    coords */
       if( astMapGet0D( props, "LOLIMIT", &lolim ) ) {
          astMapGet0D( props, "HILIMIT", &hilim );
-         spec_enc = (AstRegion *) astInterval( specfrm, &lolim, &hilim, 
+         spec_enc = (AstRegion *) astInterval( specfrm, &lolim, &hilim,
                                                NULL, "", status );
          use_enc = 1;
       }
@@ -3032,7 +3032,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    the above enclosure. If any sub-phrase has no coordinate value, then
    we cannot produce a PointList describing the complete coordinate set. */
       if( astMapGet0D( props, "SPECTRAL", &value ) ) {
-         spec_co = (AstRegion *) SinglePointList( (AstFrame *) specfrm, 
+         spec_co = (AstRegion *) SinglePointList( (AstFrame *) specfrm,
                                                    &value, NULL, status);
       } else {
          use_co = 0;
@@ -3040,7 +3040,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* If no enclosure Region was created for the spectral sub-phrase, use a
    copy of any coordinate region. This is because each sub-phrase needs
-   to have an enclosure of some sort if they are to be combined in parallel 
+   to have an enclosure of some sort if they are to be combined in parallel
    into an enclose for the whole CmpFrame. */
       if( ! spec_enc && spec_co ) spec_enc = astCopy( spec_co );
 
@@ -3060,7 +3060,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
             vals[ 0 ] = 0.5*( vals[ 0 ] + vals[ 1 ] );
          }
 
-         SetUnc( spec_enc, spec_co, (AstFrame *) specfrm, 0, 1.0, vals, 1, 
+         SetUnc( spec_enc, spec_co, (AstFrame *) specfrm, 0, 1.0, vals, 1,
                  status );
       }
 
@@ -3076,12 +3076,12 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    containing the properties of the redshift sub-phrase, and then create AST
    Regions describing the redshift coordinate value and its enclosing Region. */
    if( astMapGet0A( full_props, "REDSHIFT_PROPS", &obj ) ) {
-      props = (AstKeyMap *) obj;   
+      props = (AstKeyMap *) obj;
 
 /* Create the default SpecFrame */
       redfrm = astSpecFrame( "Domain=REDSHIFT", status );
 
-/* Get the REFPOS property from the KeyMap, and identify the corresponding 
+/* Get the REFPOS property from the KeyMap, and identify the corresponding
    AST StdOfRest. */
       sor = AST__BADSOR;
       if( astMapGet0C( props, "REFPOS", &cval ) ) {
@@ -3111,15 +3111,15 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          } else {
             astAddWarning( this, 1, "Using 'HELIOCENTER' in place of "
                            "unsupported redshift reference position '%s' "
-                           "found in an STC-S description.", "astRead", 
+                           "found in an STC-S description.", "astRead",
                            status, cval );
          }
 
       } else {
          astAddWarning( this, 2, "Redshift reference position defaulting to "
-                        "'HELIOCENTER' in an STC-S description.", "astRead", 
+                        "'HELIOCENTER' in an STC-S description.", "astRead",
                         status );
-      } 
+      }
 
 /* If we got a ref pos, set the StdOfRest attribute in the SpecFrame. */
       if( sor != AST__BADSOR ) astSetStdOfRest( redfrm, sor );
@@ -3145,7 +3145,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
             } else {
                astSetSystem( redfrm, AST__REDSHIFT );
                astAddWarning( this, 1, "STC-S RADIO redshift not supported. "
-                              "Assuming OPTICAL redshift instead.", "astRead", 
+                              "Assuming OPTICAL redshift instead.", "astRead",
                               status );
             }
 
@@ -3155,7 +3155,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
             } else {
                astSetSystem( redfrm, AST__REDSHIFT );
                astAddWarning( this, 1, "STC-S RELATIVISTIC redshift not supported. "
-                              "Assuming OPTICAL redshift instead.", "astRead", 
+                              "Assuming OPTICAL redshift instead.", "astRead",
                               status );
             }
 
@@ -3163,7 +3163,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
             if( astChrMatch( type, "VELOCITY" ) ){
                astSetSystem( redfrm, AST__VOPTICAL );
                astAddWarning( this, 1, "Doppler velocity definition defaulting"
-                              " to 'OPTICAL' in an STC-S description.", 
+                              " to 'OPTICAL' in an STC-S description.",
                               "astRead", status );
 
             } else {
@@ -3192,7 +3192,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    coords */
       if( astMapGet0D( props, "LOLIMIT", &lolim ) ) {
          astMapGet0D( props, "HILIMIT", &hilim );
-         red_enc = (AstRegion *) astInterval( redfrm, &lolim, &hilim, 
+         red_enc = (AstRegion *) astInterval( redfrm, &lolim, &hilim,
                                                NULL, "", status );
          use_enc = 1;
       }
@@ -3201,7 +3201,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    the above enclosure. If any sub-phrase has no coordinate value, then
    we cannot produce a PointList describing the complete coordinate set. */
       if( astMapGet0D( props, "REDSHIFT", &value ) ) {
-         red_co = (AstRegion *) SinglePointList( (AstFrame *) redfrm, 
+         red_co = (AstRegion *) SinglePointList( (AstFrame *) redfrm,
                                                    &value, NULL, status);
       } else {
          use_co = 0;
@@ -3209,7 +3209,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 
 /* If no enclosure Region was created for the redshift sub-phrase, use a
    copy of any coordinate region. This is because each sub-phrase needs
-   to have an enclosure of some sort if they are to be combined in parallel 
+   to have an enclosure of some sort if they are to be combined in parallel
    into an enclose for the whole CmpFrame. */
       if( ! red_enc && red_co ) red_enc = astCopy( red_co );
 
@@ -3228,7 +3228,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
             vals[ 0 ] = 0.5*( vals[ 0 ] + vals[ 1 ] );
          }
 
-         SetUnc( red_enc, red_co, (AstFrame *) redfrm, 0, 1.0, vals, 1, 
+         SetUnc( red_enc, red_co, (AstFrame *) redfrm, 0, 1.0, vals, 1,
                  status );
       }
 
@@ -3330,7 +3330,7 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
    if( ( want_co = astGetStcsCoords( this ) ) ) nwant++;
    if( ( want_props = astGetStcsProps( this ) ) ) nwant++;
 
-/* If one, and only one, of the three items is to be returned, return it. */   
+/* If one, and only one, of the three items is to be returned, return it. */
    new = NULL;
    if( nwant == 1 ) {
       if( want_enc && full_enc ) {
@@ -3339,10 +3339,10 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
          new = astClone( full_co );
       } else if( want_props && full_props ){
          new = astClone( full_props );
-      } 
+      }
 
 /* If more than one item is to be returned, put them into a KeyMap and
-   return the KeyMap. */         
+   return the KeyMap. */
    } else if( nwant > 1 ) {
       new = (AstObject *) astKeyMap( " ", status );
       if( want_enc && full_enc ) astMapPut0A( new, "AREA", full_enc, NULL );
@@ -3393,11 +3393,11 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 *     AstKeyMap *ReadProps( AstStcsChan *this, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
-*     This function parses the list of space-separated words read from the 
-*     source function, identifies the purpose of each word within the STC-S 
+*     This function parses the list of space-separated words read from the
+*     source function, identifies the purpose of each word within the STC-S
 *     description, and stores the words in a returned KeyMap.
 
 *  Parameters:
@@ -3407,13 +3407,13 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the new KeyMap. This will contain up to five entries 
+*     A pointer to the new KeyMap. This will contain up to five entries
 *     with any or all of the following keys: TIME_PROPS, SPACE_PROPS,
-*     VELOCITY_PROPS, SPECTRAL_PROPS, REDSHIFT_PROPS. If an entry is absent, 
-*     it means the STC-S description did not contain the corresponding 
-*     sub-phrase. The value associated with each of these entries will be a 
-*     KeyMap. These will contain values for the sub-phrase proprties read 
-*     from the STC-S description. Properties that are not specified in 
+*     VELOCITY_PROPS, SPECTRAL_PROPS, REDSHIFT_PROPS. If an entry is absent,
+*     it means the STC-S description did not contain the corresponding
+*     sub-phrase. The value associated with each of these entries will be a
+*     KeyMap. These will contain values for the sub-phrase proprties read
+*     from the STC-S description. Properties that are not specified in
 *     the STC-S description will not be present in the KeyMap. The values
 *     stored in the KeyMap are the words read form the STC-S description
 *     without any conversion or other processing.
@@ -3510,17 +3510,17 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
    t = NULL;
    timeid = NULL_ID;
    velid = NULL_ID;
-   timefrm = NULL;    
+   timefrm = NULL;
 
-/* Loop until all words in the STC-S description have been interpreted or 
+/* Loop until all words in the STC-S description have been interpreted or
    an error has occurred. */
    while( word && astOK ) {
 
-/* Initialise a flag to indicate that we have interpreted the current word 
-   sucesfully and so will need to get a new word before the next pass through 
+/* Initialise a flag to indicate that we have interpreted the current word
+   sucesfully and so will need to get a new word before the next pass through
    this loop. If it turns out that we cannot interpret the current word
-   in this pass, then this flag will be set to zero at some point, thus 
-   preventing a new word from being acquired and causing another attempt to 
+   in this pass, then this flag will be set to zero at some point, thus
+   preventing a new word from being acquired and causing another attempt to
    re-interpret the current word in a different context. */
       new_word = 1;
 
@@ -3545,19 +3545,19 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             timeid = STOP_TIME_ID;
 
          } else if( astChrMatch( word, "Time" ) ) {
-            look_for = TIME_SCALE;  /* After "Time", we move on to find the 
+            look_for = TIME_SCALE;  /* After "Time", we move on to find the
             timeid = TIME_ID;          time-scale, not the fill factor */
 
 /* If the word is not a known time sub-phrase identifier, indicate that we
-   should attempt to re-interpret the current word as a space sub-phrase 
+   should attempt to re-interpret the current word as a space sub-phrase
    identifier, rather than getting a new word. */
          } else {
-            look_for = SPACE_IDENTIFIER;        
+            look_for = SPACE_IDENTIFIER;
             new_word = 0;
          }
 
 /* If we have found a time sub-phrase identifier, create a KeyMap to hold
-   the properties of the time sub-phrase, and store the time sub-phrase 
+   the properties of the time sub-phrase, and store the time sub-phrase
    identifier in the new KeyMap. */
          if( timeid != NULL_ID ) {
             subphrase = "time";
@@ -3576,7 +3576,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* ------------------------------------------------------------------ */
 
 /* Indicate we have finished any preceeding time sub-phrase. */
-         timeid = NULL_ID;         
+         timeid = NULL_ID;
 
 /* Now check the word to see if it a known space sub-phrase identifier. */
          spaceid = SpaceId( word, status );
@@ -3588,7 +3588,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          } else if( spaceid != NULL_ID ) {
             look_for = FILL_FACTOR;
 
-/* If the word is not a known space sub-phrase identifier, move on to 
+/* If the word is not a known space sub-phrase identifier, move on to
    re-interpret it as a Spectral sub-phrase identifier. */
          } else {
             look_for = SPECTRAL_IDENTIFIER;
@@ -3596,7 +3596,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          }
 
 /* If we have found a space sub-phrase identifier, create a KeyMap to hold
-   the properties of the space sub-phrase, and store the space sub-phrase 
+   the properties of the space sub-phrase, and store the space sub-phrase
    identifier in the new KeyMap. */
          if( spaceid != NULL_ID ) {
             subphrase = "space";
@@ -3615,7 +3615,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* ------------------------------------------------------------------ */
 
 /* Indicate we have finished any preceededing space sub-phrase. */
-         spaceid = NULL_ID;         
+         spaceid = NULL_ID;
 
 /* Now check the word to see if it a known velocity sub-phrase identifier. */
          if( astChrMatch( word, "VelocityInterval" ) ) {
@@ -3626,15 +3626,15 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             velid = VELOCITY_ID;
             look_for = VELOCITY;
 
-/* If the word is not a known velocity sub-phrase identifier, move on to 
+/* If the word is not a known velocity sub-phrase identifier, move on to
    re-interpret it as a Spectral sub-phrase identifier. */
          } else {
             look_for = SPECTRAL_IDENTIFIER;
             new_word = 0;
          }
 
-/* If we have found a velocity sub-phrase identifier, create a KeyMap to 
-   hold the properties of the velocity sub-phrase, and store the velocity 
+/* If we have found a velocity sub-phrase identifier, create a KeyMap to
+   hold the properties of the velocity sub-phrase, and store the velocity
    sub-phrase identifier in the new KeyMap. */
          if( velid != NULL_ID ) {
             subphrase = "velocity";
@@ -3647,7 +3647,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 
 /* If we are currently looking for the spectral sub-phrase, see if the
-   word is any of the known spectral sub-phrase identifiers. Is so, move 
+   word is any of the known spectral sub-phrase identifiers. Is so, move
    on to read the associated sub-phrase component. */
       } else if( look_for == SPECTRAL_IDENTIFIER ) {
 /* ------------------------------------------------------------------ */
@@ -3664,15 +3664,15 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             look_for = REFPOS;              /* Move on to find the refpos */
             specid = SPECTRAL_ID;
 
-/* If the word is not a known spectral sub-phrase identifier, move on to 
+/* If the word is not a known spectral sub-phrase identifier, move on to
    look for the Redshift sub-phrase. */
          } else {
             look_for = REDSHIFT_IDENTIFIER;
             new_word = 0;
          }
 
-/* If we have found a spectral sub-phrase identifier, create a KeyMap to 
-   hold the properties of the spectral sub-phrase, and store the spectral 
+/* If we have found a spectral sub-phrase identifier, create a KeyMap to
+   hold the properties of the spectral sub-phrase, and store the spectral
    sub-phrase identifier in the new KeyMap. */
          if( specid != NULL_ID ) {
             subphrase = "spectral";
@@ -3686,13 +3686,13 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 
 /* If we are currently looking for the redshift sub-phrase, see if the
-   word is any of the known redshift sub-phrase identifiers. Is so, move 
+   word is any of the known redshift sub-phrase identifiers. Is so, move
    on to read the associated sub-phrase component. */
       } else if( look_for == REDSHIFT_IDENTIFIER ) {
 /* ------------------------------------------------------------------ */
 
 /* Indicate we have finished any preceeding spectral sub-phrase. */
-         specid = NULL_ID;         
+         specid = NULL_ID;
 
 /* Now check the word to see if it a known spectral sub-phrase identifier. */
          if( astChrMatch( word, "RedshiftInterval" ) ) {
@@ -3708,13 +3708,13 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          } else if( word[ 0 ] && astOK ) {
             astError( AST__BADIN, "astRead(%s): Unsupported or irrelevant "
                       "word '%s' found in STC-S %s sub-phrase: '%s'.", status,
-                      astGetClass( this ), word, subphrase, 
+                      astGetClass( this ), word, subphrase,
                       ContextFragment( &con, &fbuf, status ) );
             new_word = 0;
          }
 
-/* If we have found a redshift sub-phrase identifier, create a KeyMap to 
-   hold the properties of the redshift sub-phrase, and store the redshift 
+/* If we have found a redshift sub-phrase identifier, create a KeyMap to
+   hold the properties of the redshift sub-phrase, and store the redshift
    sub-phrase identifier in the new KeyMap. */
          if( redid != NULL_ID ) {
             subphrase = "redshift";
@@ -3734,40 +3734,40 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == FILL_FACTOR ) {
 /* ------------------------------------------------------------------ */
 
-/* If the current word is "fillfactor" attempt to read the numerical filling 
+/* If the current word is "fillfactor" attempt to read the numerical filling
    factor from the next word. If this fails, or if the current word is
-   not "fillfactor", indicate that we will be re-interpreting the current 
+   not "fillfactor", indicate that we will be re-interpreting the current
    word in a new context and so do not need a new word. */
          if( astChrMatch( word, "fillfactor" ) ) {
             word = GetNextWord( this, &con, status );
             if( astChr2Double( word ) == AST__BAD ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected a numerical "
                          "filling factor, but found '%s' in the %s "
-                         "sub-phrase of STC-S description: '%s'.", status, 
-                          word, subphrase, ContextFragment( &con, &fbuf, 
+                         "sub-phrase of STC-S description: '%s'.", status,
+                          word, subphrase, ContextFragment( &con, &fbuf,
                                                             status ) );
                new_word = 0;
-            } 
+            }
          } else {
             new_word = 0;
          }
 
 /* If we are reading a time sub-phrase, move on to read the timescale. */
          if( timeid != NULL_ID ) {
-            look_for = TIME_SCALE;            
+            look_for = TIME_SCALE;
 
 /* If we are reading a space sub-phrase, move on to read the frame. */
          } else if( spaceid != NULL_ID ) {
-            look_for = FRAME;            
+            look_for = FRAME;
 
 /* If we are reading a velocity sub-phrase, move on to read the limits. */
          } else if( velid != NULL_ID ) {
             look_for = LIMITS;
 
-/* Otherwise (i.e. for spectral and redshift sub-phrases) move on to read 
+/* Otherwise (i.e. for spectral and redshift sub-phrases) move on to read
    the refpos. */
          } else {
-            look_for = REFPOS;            
+            look_for = REFPOS;
          }
 
 /* If the word was usable, record it as the fillfactor property. */
@@ -3780,7 +3780,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* ------------------------------------------------------------------ */
 
 /* If the current word is a recognised STC-S timescale, store it in the
-   props KeyMap. Otherwise, indicate that the word can be re-used in the 
+   props KeyMap. Otherwise, indicate that the word can be re-used in the
    next context. */
          if( astChrMatch( word, "TT" )  ||
              astChrMatch( word, "TDT" ) ||
@@ -3810,8 +3810,8 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == FRAME ) {
 /* ------------------------------------------------------------------ */
 
-/* If the current word is a recognised STC-S spatial frame, store it in 
-   the props KeyMap. Otherwise, indicate that the word can be re-used. */ 
+/* If the current word is a recognised STC-S spatial frame, store it in
+   the props KeyMap. Otherwise, indicate that the word can be re-used. */
          if( astChrMatch( word, "ICRS" ) ||
              astChrMatch( word, "FK5" ) ||
              astChrMatch( word, "FK4" ) ||
@@ -3826,7 +3826,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
              astChrMatch( word, "UNKNOWNFrame" ) ) {
 
             astMapPut0C( props, "FRAME", word, NULL );
-            
+
          } else {
             new_word = 0;
          }
@@ -3840,9 +3840,9 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == REFPOS ) {
 /* ------------------------------------------------------------------ */
 
-/* If the current word is a recognised STC-S reference position, store it in 
+/* If the current word is a recognised STC-S reference position, store it in
    the props KeyMap. Otherwise, indicate that the word can be re-used. The
-   first group of reference positions apply to all sub-phrases. */ 
+   first group of reference positions apply to all sub-phrases. */
          if( astChrMatch( word, "GEOCENTER" ) ||
              astChrMatch( word, "BARYCENTER" ) ||
              astChrMatch( word, "HELIOCENTER" ) ||
@@ -3862,8 +3862,8 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
             astMapPut0C( props, "REFPOS", word, NULL );
 
-/* This group of reference positions apply only to spectral and redshift 
-   sub-phrases. */ 
+/* This group of reference positions apply only to spectral and redshift
+   sub-phrases. */
          } else if( astChrMatch( word, "LSR" ) ||
                     astChrMatch( word, "LSRK" ) ||
                     astChrMatch( word, "LSRD" ) ||
@@ -3875,7 +3875,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             } else if( astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Illegal reference "
                          "position '%s' found in the %s sub-phrase of "
-                         "STC-S description: '%s'.", status, word, 
+                         "STC-S description: '%s'.", status, word,
                          subphrase, ContextFragment( &con, &fbuf, status ) );
                new_word = 0;
             }
@@ -3915,7 +3915,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
          } else if( astOK ) {  /* Should never happen */
              astError( AST__INTER, "astRead(StcsChan): Sanity check 1 fails in "
-                       "function ReadProps (AST internal programming error).", 
+                       "function ReadProps (AST internal programming error).",
                        status );
             new_word = 0;
          }
@@ -3932,7 +3932,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          nc = 0;
          prop = astAppendString( prop, &nc, word );
 
-/* If the current word is "JD" or "MJD", the following word should be 
+/* If the current word is "JD" or "MJD", the following word should be
    numerical. */
          is_jd = astChrMatch( word, "JD" );
          if( is_jd || astChrMatch( word, "MJD" ) ) {
@@ -3941,7 +3941,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             if( value == AST__BAD && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected numerical "
                          "value in Start time, but found '%s %s' in STC-S "
-                         "description: '%s'.", status, prop, word, 
+                         "description: '%s'.", status, prop, word,
                          ContextFragment( &con, &fbuf, status ) );
 
 /* Append the second word to the first word. */
@@ -3960,7 +3960,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             if( !astUnformat( timefrm, 0, word, &start ) && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected ISO date "
                          "string Start time, but found '%s' in an STC-S "
-                         "description: '%s'.", status, word, 
+                         "description: '%s'.", status, word,
                          ContextFragment( &con, &fbuf, status ) );
             }
          }
@@ -3976,7 +3976,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          } else if( timeid == START_TIME_ID ){
             look_for = TIME_LABEL;  /* Move on to find the "coord" time */
 
-         } 
+         }
 
 
 
@@ -3988,7 +3988,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          nc = 0;
          prop = astAppendString( prop, &nc, word );
 
-/* If the current word is "JD" or "MJD", the following word should be 
+/* If the current word is "JD" or "MJD", the following word should be
    numerical. */
          is_jd = astChrMatch( word, "JD" );
          if( is_jd || astChrMatch( word, "MJD" ) ) {
@@ -3997,7 +3997,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             if( value == AST__BAD && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected numerical "
                          "value in Stop time, but found '%s %s' in STC-S "
-                         "description: '%s'.", status, prop, word, 
+                         "description: '%s'.", status, prop, word,
                          ContextFragment( &con, &fbuf, status ) );
 
 /* Append the second word to the first word. */
@@ -4016,7 +4016,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             if( !astUnformat( timefrm, 0, word, &stop ) && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected ISO date "
                          "string Stop time, but found '%s' in an STC-S "
-                         "description: '%s'.", status, word, 
+                         "description: '%s'.", status, word,
                          ContextFragment( &con, &fbuf, status ) );
             }
          }
@@ -4026,7 +4026,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          astMapPut0D( props, "MJDSTOP", stop, NULL );
 
 /* Move on to find the "coord" time. */
-         look_for = TIME_LABEL; 
+         look_for = TIME_LABEL;
 
 
 
@@ -4050,7 +4050,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          nc = 0;
          prop = astAppendString( prop, &nc, word );
 
-/* If the current word is "JD" or "MJD", the following word should be 
+/* If the current word is "JD" or "MJD", the following word should be
    numerical. */
          is_jd = astChrMatch( word, "JD" );
          if( is_jd || astChrMatch( word, "MJD" ) ) {
@@ -4059,7 +4059,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             if( value == AST__BAD && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected numerical "
                          "value in Time value, but found '%s %s' in STC-S "
-                         "description: '%s'.", status, prop, word, 
+                         "description: '%s'.", status, prop, word,
                          ContextFragment( &con, &fbuf, status ) );
 
 /* Append the second word to the first word. */
@@ -4078,7 +4078,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             if( !astUnformat( timefrm, 0, word, &time ) && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Expected ISO date "
                          "string Time value, but found '%s' in an STC-S "
-                         "description: '%s'.", status, word, 
+                         "description: '%s'.", status, word,
                          ContextFragment( &con, &fbuf, status ) );
             }
          }
@@ -4097,8 +4097,8 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 /* ------------------------------------------------------------------ */
 
 /* If the current word is a recognised flavour value, note how many axis
-   values are required to specify a position. Otherwise, indicate that 
-   the word can be re-used. */ 
+   values are required to specify a position. Otherwise, indicate that
+   the word can be re-used. */
          if( astChrMatch( word, "SPHER2" ) ) {
             naxes = 2;
 
@@ -4128,13 +4128,13 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
             astMapPut0C( props, "FLAVOR", word, NULL );
             astMapPut0C( props, "FLAVOUR", word, NULL );
          }
-            
-/* The next set of words to be read from the source function will specify 
-   the arguments of the region enclosing the spatial positions. This may 
-   contain nested regions, so use a recursive function to read the 
+
+/* The next set of words to be read from the source function will specify
+   the arguments of the region enclosing the spatial positions. This may
+   contain nested regions, so use a recursive function to read the
    arguments and store them in the properties KeyMap. */
          if( new_word ) word = GetNextWord( this, &con, status );
-         word = ReadSpaceArgs( this, word, spaceid, naxes, &con, props, 
+         word = ReadSpaceArgs( this, word, spaceid, naxes, &con, props,
                                status );
          new_word = 0;
 
@@ -4168,7 +4168,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          if( astChr2Double( word ) == AST__BAD && astOK ) {
             astError( AST__BADIN, "astRead(StcsChan): Expected a numerical "
                       "value for a %s lolimit, but found '%s' in an STC-S "
-                      "description: '%s'.", status, t, word, 
+                      "description: '%s'.", status, t, word,
                       ContextFragment( &con, &fbuf, status ) );
          } else {
             astMapPut0C( props, "LOLIMIT", word, NULL );
@@ -4179,7 +4179,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          if( astChr2Double( word ) == AST__BAD && astOK ) {
             astError( AST__BADIN, "astRead(StcsChan): Expected a numerical "
                       "value for a %s hilimit, but found '%s' in an STC-S "
-                      "description: '%s'.", status, t, word, 
+                      "description: '%s'.", status, t, word,
                       ContextFragment( &con, &fbuf, status ) );
          } else {
             astMapPut0C( props, "HILIMIT", word, NULL );
@@ -4187,7 +4187,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 
 
-/* If we are currently looking for the label before a spectral or redshift 
+/* If we are currently looking for the label before a spectral or redshift
    value... */
       } else if( look_for == RED_SPEC_LABEL ) {
 /* ------------------------------------------------------------------ */
@@ -4212,10 +4212,10 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          if( astChr2Double( word ) == AST__BAD && astOK ) {
             astError( AST__BADIN, "astRead(StcsChan): Expected a numerical "
                       "%s value, but found '%s' in an STC-S "
-                      "description: '%s'.", status, t, word, 
+                      "description: '%s'.", status, t, word,
                       ContextFragment( &con, &fbuf, status ) );
          } else {
-            astMapPut0C( props, ( specid != NULL_ID ) ? "SPECTRAL" : "REDSHIFT", 
+            astMapPut0C( props, ( specid != NULL_ID ) ? "SPECTRAL" : "REDSHIFT",
                          word, NULL );
          }
 
@@ -4322,50 +4322,50 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
          if( new_word ) {
 
 /* Check that the unit string is one of the allowed values (different
-   values are allowed for different sub-phrases). Space frames can have 
-   multiple units strings (one for each axis) so loop round until a string 
+   values are allowed for different sub-phrases). Space frames can have
+   multiple units strings (one for each axis) so loop round until a string
    is found which is not a valid unit string. */
             nc = 0;
             nunit = 0;
-            while( ( timeid != NULL_ID && (  !strcmp( word, "s" ) ||  
-                                          !strcmp( word, "d" ) ||  
-                                          !strcmp( word, "a" ) ||  
-                                          !strcmp( word, "yr" ) ||  
+            while( ( timeid != NULL_ID && (  !strcmp( word, "s" ) ||
+                                          !strcmp( word, "d" ) ||
+                                          !strcmp( word, "a" ) ||
+                                          !strcmp( word, "yr" ) ||
                                           !strcmp( word, "cy" ) ) ) ||
 
-                ( spaceid != NULL_ID && ( !strcmp( word, "deg" ) ||  
-                                          !strcmp( word, "arcmin" ) ||  
-                                          !strcmp( word, "arcsec" ) ||  
-                                          !strcmp( word, "m" ) ||  
-                                          !strcmp( word, "mm" ) ||  
-                                          !strcmp( word, "m" ) ||  
-                                          !strcmp( word, "km" ) ||  
-                                          !strcmp( word, "AU" ) ||  
-                                          !strcmp( word, "pc" ) ||  
-                                          !strcmp( word, "kpc" ) ||  
+                ( spaceid != NULL_ID && ( !strcmp( word, "deg" ) ||
+                                          !strcmp( word, "arcmin" ) ||
+                                          !strcmp( word, "arcsec" ) ||
+                                          !strcmp( word, "m" ) ||
+                                          !strcmp( word, "mm" ) ||
+                                          !strcmp( word, "m" ) ||
+                                          !strcmp( word, "km" ) ||
+                                          !strcmp( word, "AU" ) ||
+                                          !strcmp( word, "pc" ) ||
+                                          !strcmp( word, "kpc" ) ||
                                           !strcmp( word, "Mpc" ) ) ) ||
 
-                ( velid != NULL_ID && (   !strcmp( word, "deg" ) ||  
-                                          !strcmp( word, "arcmin" ) ||  
-                                          !strcmp( word, "arcsec" ) ||  
-                                          !strcmp( word, "m" ) ||  
-                                          !strcmp( word, "mm" ) ||  
-                                          !strcmp( word, "km" ) ||  
-                                          !strcmp( word, "AU" ) ||  
-                                          !strcmp( word, "pc" ) ||  
-                                          !strcmp( word, "kpc" ) ||  
+                ( velid != NULL_ID && (   !strcmp( word, "deg" ) ||
+                                          !strcmp( word, "arcmin" ) ||
+                                          !strcmp( word, "arcsec" ) ||
+                                          !strcmp( word, "m" ) ||
+                                          !strcmp( word, "mm" ) ||
+                                          !strcmp( word, "km" ) ||
+                                          !strcmp( word, "AU" ) ||
+                                          !strcmp( word, "pc" ) ||
+                                          !strcmp( word, "kpc" ) ||
                                           !strcmp( word, "Mpc" ) ) ) ||
 
-                (                         !strcmp( word, "Hz" ) ||  
-                                          !strcmp( word, "MHz" ) ||  
-                                          !strcmp( word, "GHz" ) ||  
-                                          !strcmp( word, "m" ) ||  
-                                          !strcmp( word, "mm" ) ||  
-                                          !strcmp( word, "um" ) ||  
-                                          !strcmp( word, "nm" ) ||  
-                                          !strcmp( word, "Angstrom" ) ||  
-                                          !strcmp( word, "eV" ) ||  
-                                          !strcmp( word, "keV" ) ||  
+                (                         !strcmp( word, "Hz" ) ||
+                                          !strcmp( word, "MHz" ) ||
+                                          !strcmp( word, "GHz" ) ||
+                                          !strcmp( word, "m" ) ||
+                                          !strcmp( word, "mm" ) ||
+                                          !strcmp( word, "um" ) ||
+                                          !strcmp( word, "nm" ) ||
+                                          !strcmp( word, "Angstrom" ) ||
+                                          !strcmp( word, "eV" ) ||
+                                          !strcmp( word, "keV" ) ||
                                           !strcmp( word, "MeV" ) ) ) {
 
                prop = astAppendString( prop, &nc, word );
@@ -4376,7 +4376,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* Report an error if an inappropriate number of valid unit strings was
    found. */
-            if( nunit == 0 && astOK ) { 
+            if( nunit == 0 && astOK ) {
                astError( AST__BADIN, "astRead(StcsChan): Unsupported "
                          "units (%s) for the %s sub-phrase within an "
                          "STC-S description: '%s'.", status, word, subphrase,
@@ -4388,7 +4388,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
                          "STC-S description: '%s'.", status, nunit, subphrase,
                          ContextFragment( &con, &fbuf, status ) );
 
-/* Otherwise, remove the trailing space, and store the property value in the 
+/* Otherwise, remove the trailing space, and store the property value in the
    KeyMap. */
             } else {
                prop[ nc - 1 ] = 0;
@@ -4409,14 +4409,14 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == ERROR ) {
 /* ------------------------------------------------------------------ */
 
-/* If the current word is "Error" read all subsequent words until the first 
+/* If the current word is "Error" read all subsequent words until the first
    non-numerical value is encountered. */
          if( astChrMatch( word, "Error" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
             nc = 0;
-            nval = 0; 
+            nval = 0;
             while( value != AST__BAD ) {
                if( nval < MAXVAL ) {
                   val[ nval++ ] = value;
@@ -4442,7 +4442,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
                          "STC-S description: '%s'.", status, word, subphrase,
                          ContextFragment( &con, &fbuf, status ) );
 
-/* Otherwise, remove the trailing space and store the concatenated 
+/* Otherwise, remove the trailing space and store the concatenated
    string of formatted values in the properties KeyMap. Also store a
    corresponding vector of floating point values in the KeyMap. */
             } else {
@@ -4465,14 +4465,14 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == RESOLUTION ) {
 /* ------------------------------------------------------------------ */
 
-/* If the current word is "Resolution" read all subsequent words until the 
+/* If the current word is "Resolution" read all subsequent words until the
    first non-numerical value is encountered. */
          if( astChrMatch( word, "Resolution" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
             nc = 0;
-            nval = 0; 
+            nval = 0;
             while( value != AST__BAD ) {
                if( nval < MAXVAL ) {
                   val[ nval++ ] = value;
@@ -4498,7 +4498,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
                          " '%s'.", status, word, subphrase,
                          ContextFragment( &con, &fbuf, status ) );
 
-/* Otherwise, remove the trailing space and store the concatenated 
+/* Otherwise, remove the trailing space and store the concatenated
    string of formatted values in the properties KeyMap. Also store a
    corresponding vector of floating point values in the KeyMap. */
             } else {
@@ -4521,14 +4521,14 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == SIZE ) {
 /* ------------------------------------------------------------------ */
 
-/* If the current word is "Size" read all subsequent words until the 
+/* If the current word is "Size" read all subsequent words until the
    first non-numerical value is encountered. */
          if( astChrMatch( word, "Size" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
             nc = 0;
-            nval = 0; 
+            nval = 0;
             while( value != AST__BAD ) {
                if( nval < MAXVAL ) {
                   val[ nval++ ] = value;
@@ -4554,7 +4554,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
                          " '%s'.", status, word, subphrase,
                          ContextFragment( &con, &fbuf, status ) );
 
-/* Otherwise, remove the trailing space and store the concatenated 
+/* Otherwise, remove the trailing space and store the concatenated
    string of formatted values in the properties KeyMap. Also store a
    corresponding vector of floating point values in the KeyMap. */
             } else {
@@ -4577,14 +4577,14 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == PIX_SIZE ) {
 /* ------------------------------------------------------------------ */
 
-/* If the current word is "PixSize" read all subsequent words until the 
+/* If the current word is "PixSize" read all subsequent words until the
    first non-numerical value is encountered. */
          if( astChrMatch( word, "PixSize" ) ) {
             word = GetNextWord( this, &con, status );
             value = astChr2Double( word );
 
             nc = 0;
-            nval = 0; 
+            nval = 0;
             while( value != AST__BAD ) {
                if( nval < MAXVAL ) {
                   val[ nval++ ] = value;
@@ -4610,7 +4610,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
                          " '%s'.", status, word, subphrase,
                          ContextFragment( &con, &fbuf, status ) );
 
-/* Otherwise, remove the trailing space and store the concatenated 
+/* Otherwise, remove the trailing space and store the concatenated
    string of formatted values in the properties KeyMap. Also store a
    corresponding vector of floating point values in the KeyMap. */
             } else {
@@ -4646,7 +4646,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 
 /* Report an error for any unknown look_for. */
 /* ------------------------------------------------------------------ */
-      } else if( astOK ) { 
+      } else if( astOK ) {
          astError( AST__INTER, "astRead(StcsChan): Illegal look_for value "
                    "(%d) encountered (internal AST programming error).",
                    status, look_for );
@@ -4678,8 +4678,8 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
 #undef MAXVAL
 }
 
-static const char *ReadSpaceArgs( AstStcsChan *this, const char *word, 
-                                  int spaceid, int naxes, WordContext *con, 
+static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
+                                  int spaceid, int naxes, WordContext *con,
                                   AstKeyMap *props, int *status ){
 /*
 *  Name:
@@ -4693,16 +4693,16 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     const char *ReadSpaceArgs( AstStcsChan *this, const char *word, 
-*                                int spaceid, int naxes, WordContext *con, 
+*     const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
+*                                int spaceid, int naxes, WordContext *con,
 *                                AstKeyMap *props, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function parses the list of space-separated words that form
-*     the argument list of a spatial region. These words are read from the 
+*     the argument list of a spatial region. These words are read from the
 *     source function, and stored in the supplied KeyMap using keys that
 *     identify their purpose.
 *
@@ -4721,7 +4721,7 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
 *     con
 *        Pointer to a structure holding context for use with the
 *        GetNextWord function. On exit, the next word returned by the
-*        GetNextWord function will be the first word following the 
+*        GetNextWord function will be the first word following the
 *        argument list.
 *     props
 *        Pointer to the KeyMap in which the argument values should be
@@ -4780,7 +4780,7 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       prop[ nc - 1 ] = 0;
       astMapPut0C( props, "LOLIMIT", prop, NULL );
       astMapPut1D( props, "DLOLIMIT", naxes, vals, NULL );
-         
+
 /* Get a hilimit value for every space axis. */
       nc = 0;
       for( iaxis = 0; iaxis < naxes; iaxis++ ) {
@@ -4800,7 +4800,7 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       prop[ nc - 1 ] = 0;
       astMapPut0C( props, "HILIMIT", prop, NULL );
       astMapPut1D( props, "DLOLIMIT", naxes, vals, NULL );
-         
+
 
 
 /* If we are currently looking for information needed to create a spatial
@@ -4838,7 +4838,7 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       if( val == AST__BAD && astOK ) {
          astError( AST__BADIN, "astRead(StcsChan): Expected a radius "
                    "value for a Circle, but found '%s' in an STC-S "
-                   "description: '%s'.", status, word, 
+                   "description: '%s'.", status, word,
                    ContextFragment( con, &fbuf, status ) );
       }
 
@@ -5000,8 +5000,8 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
                   if( val == AST__BAD && astOK ) {
                      astError( AST__BADIN, "astRead(StcsChan): Expected "
                                "another vertex value for a Polygon, but "
-                               "found '%s' in an STC-S description: '%s'.", 
-                               status, word, ContextFragment( con, &fbuf, 
+                               "found '%s' in an STC-S description: '%s'.",
+                               status, word, ContextFragment( con, &fbuf,
                                                               status ) );
                   } else {
                      *p = val;
@@ -5065,11 +5065,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
    with an opening parenthesis. */
    } else if( *word != '(' && astOK ) {
       astError( AST__BADIN, "astRead(StcsChan): Expected an opening "
-                "parenthesis but found '%s' in an STC-S description: '%s'.", 
+                "parenthesis but found '%s' in an STC-S description: '%s'.",
                 status, word, ContextFragment( con, &fbuf, status ) );
 
-/* Skip over the opening parenthesis. If the first word consists of just the 
-   opening parenthesis, get the next word.  */      
+/* Skip over the opening parenthesis. If the first word consists of just the
+   opening parenthesis, get the next word.  */
    } else {
       if( *(++word) == 0 ) word = GetNextWord( this, con, status );
 
@@ -5081,8 +5081,8 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
    the end of the argument list. */
          if( *word == ')' ) {
 
-/* Skip over the closing parenthesis. If the word consists of just the 
-   closing parenthesis, get the next word.  */      
+/* Skip over the closing parenthesis. If the word consists of just the
+   closing parenthesis, get the next word.  */
             if( *(++word) == 0 ) word = GetNextWord( this, con, status );
 
 /* Leave the loop. */
@@ -5094,7 +5094,7 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
          if( new_spaceid == NULL_ID && astOK ) {
             astError( AST__BADIN, "astRead(StcsChan): Expected a "
                       "CoordinateArea or a closing parenthesis but found "
-                      "'%s' in an STC-S description: '%s'.", status, word, 
+                      "'%s' in an STC-S description: '%s'.", status, word,
                       ContextFragment( con, &fbuf, status ) );
          }
 
@@ -5106,12 +5106,12 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
          sprintf( key, "REGION%d", ++nreg );
          astMapPut0A( props, key, new_props, NULL );
 
-/* Get the next word (i.e. the first word of the argument list for the 
+/* Get the next word (i.e. the first word of the argument list for the
    region). */
          word = GetNextWord( this, con, status );
 
 /* Call this function recursively to read the argument list. */
-         word = ReadSpaceArgs( this, word, new_spaceid, naxes, con, 
+         word = ReadSpaceArgs( this, word, new_spaceid, naxes, con,
                                new_props, status );
 
 /* Free resources. */
@@ -5121,40 +5121,40 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
 /* Store the number of regions in the supplied KeyMap. */
       astMapPut0I( props, "NREG", nreg, NULL );
 
-/* Report an error if an in appropriate number of argument Regions were 
+/* Report an error if an in appropriate number of argument Regions were
    supplied. */
       if( spaceid == UNION_ID ) {
          if( nreg < 2 && astOK ){
             astError( AST__BADIN, "astRead(StcsChan): Less than two "
                       "CoordinateAreas found within a 'Union' element in an "
-                      "STC-S description: '%s'.", status, 
+                      "STC-S description: '%s'.", status,
                       ContextFragment( con, &fbuf, status ) );
-         } 
+         }
 
       } else if( spaceid == INTERSECTION_ID ) {
          if( nreg < 2 && astOK ){
             astError( AST__BADIN, "astRead(StcsChan): Less than two "
                       "CoordinateAreas found within an 'Intersection' element "
-                      "in an STC-S description: '%s'.", status, 
+                      "in an STC-S description: '%s'.", status,
                       ContextFragment( con, &fbuf, status ) );
-         } 
+         }
 
       } else if( spaceid == DIFFERENCE_ID ) {
          if( nreg != 2 && astOK ){
             astError( AST__BADIN, "astRead(StcsChan): %d CoordinateArea(s) "
                       "found within a 'Difference' element in an STC-S "
-                      "description: '%s'.", status, nreg, 
+                      "description: '%s'.", status, nreg,
                       ContextFragment( con, &fbuf, status ) );
-         } 
+         }
 
 
       } else if( spaceid == NOT_ID ) {
          if( nreg != 1 && astOK ){
             astError( AST__BADIN, "astRead(StcsChan): %d CoordinateAreas "
                       "found within a 'Not' element in an STC-S description: "
-                      "'%s'.", status, nreg, 
+                      "'%s'.", status, nreg,
                       ContextFragment( con, &fbuf, status ) );
-         } 
+         }
 
 /* Report an error for unknown spaceid values */
       } else if( astOK ) {
@@ -5268,8 +5268,8 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    }
 }
 
-static void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm, 
-                    int is_skyframe, double scale, double *error, int nax, 
+static void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm,
+                    int is_skyframe, double scale, double *error, int nax,
                     int *status ){
 /*
 *  Name:
@@ -5283,18 +5283,18 @@ static void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm, 
-*                  int is_skyframe, double scale, double *error, int nax, 
+*     void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm,
+*                  int is_skyframe, double scale, double *error, int nax,
 *                  int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function creates a new Box with dimensions specified by the
 *     values in the "error" array, centred on a representative position
 *     within one of the supplied Regions, and then stores the Box as the
-*     uncertainty Region within both the supplied Regions. 
+*     uncertainty Region within both the supplied Regions.
 
 *  Parameters:
 *     reg1
@@ -5308,14 +5308,14 @@ static void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm,
 *     scale
 *        A scale factor to apply to the error values before using them.
 *     error
-*        Pointer to an array of RMS error values, one for each axis in 
+*        Pointer to an array of RMS error values, one for each axis in
 *        "frm". These are modified on exit. For a SkyFrame, both values
-*        (including the longitude axis value) should be given as an 
+*        (including the longitude axis value) should be given as an
 *        arc-distance. This function will convert the arc-distance to
-*        a longitude increment using a representative latitude for the 
+*        a longitude increment using a representative latitude for the
 *        region.
 *     nax
-*        The numner of axes in "frm". 
+*        The numner of axes in "frm".
 *     status
 *        Pointer to the inherited status variable.
 
@@ -5349,23 +5349,23 @@ static void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm,
 /* Scale the error values */
    for( i = 0; i < nax; i++ ) error[ i ] *= scale;
 
-/* If the region is defined within a SkyFrame, the supplied longitude 
+/* If the region is defined within a SkyFrame, the supplied longitude
    error value will be an arc-distance value. But we need a longitude
    increment to create an uncertainty Region, so do the conversion. */
    if( is_skyframe ) {
 
-/* Offset away from the representative position found above along the 
-   first (i.e. longitude) axis by an arc-distance given by the Error 
+/* Offset away from the representative position found above along the
+   first (i.e. longitude) axis by an arc-distance given by the Error
    value. */
-      (void) astOffset2( frm, spos1, AST__DPIBY2, error[ 0 ], spos2 );   
+      (void) astOffset2( frm, spos1, AST__DPIBY2, error[ 0 ], spos2 );
 
 /* Find the positive axis increment along the first axis. */
       error[ 0 ] = astAxDistance( frm, 1, spos1[ 0 ], spos2[ 0 ] );
       if( error[ 0 ] != AST__BAD ) error[ 0 ] = fabs( error[ 0 ] );
    }
 
-/* The uncertainty Region will be a Box centred at the representative 
-   position found above. Modify the "error" array to hold the corner  
+/* The uncertainty Region will be a Box centred at the representative
+   position found above. Modify the "error" array to hold the corner
    axis values. */
    for( i = 0; i < nax; i++ ) error[ i ] += spos1[ i ];
 
@@ -5379,7 +5379,7 @@ static void SetUnc( AstRegion *reg1, AstRegion *reg2, AstFrame *frm,
    unc = astAnnul( unc );
 }
 
-static AstPointList *SinglePointList( AstFrame *frm, double *pos, 
+static AstPointList *SinglePointList( AstFrame *frm, double *pos,
                                       AstRegion *unc, int *status){
 /*
 *  Name:
@@ -5393,11 +5393,11 @@ static AstPointList *SinglePointList( AstFrame *frm, double *pos,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     AstPointList *SinglePointList( AstFrame *frm, double *pos, 
+*     AstPointList *SinglePointList( AstFrame *frm, double *pos,
 *                                    AstRegion *unc, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function creates a new PointList holding a single supplied
@@ -5405,8 +5405,8 @@ static AstPointList *SinglePointList( AstFrame *frm, double *pos,
 
 *  Parameters:
 *     frm
-*        Pointer to the Frame in which the PointList is defined. 
-*     pos 
+*        Pointer to the Frame in which the PointList is defined.
+*     pos
 *        Array holding the position. The length of this array must equal
 *        the number of axes in "frm".
 *     unc
@@ -5416,7 +5416,7 @@ static AstPointList *SinglePointList( AstFrame *frm, double *pos,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the new PointList. NULL is returned if an error has 
+*     A pointer to the new PointList. NULL is returned if an error has
 *     already occurred, of if this function fails for any reason.
 */
 
@@ -5583,7 +5583,7 @@ static int SpaceId( const char *word, int *status ){
 *     int SpaceId( const char *word, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function returns an integer identifier for the given space
@@ -5652,7 +5652,7 @@ static int SpaceId( const char *word, int *status ){
    return spaceid;
 }
 
-static void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm, 
+static void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm,
                            const char *key, double value, int *status ){
 /*
 *  Name:
@@ -5666,14 +5666,14 @@ static void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm, 
+*     void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm,
 *                         const char *key, double value, int *status )
 
 *  Class Membership:
 *     StcsChan member function.
 
 *  Description:
-*     This function formats the supplied time value and stores it in 
+*     This function formats the supplied time value and stores it in
 *     the "props" KeyMap, using the supplied key name. If the KeyMap
 *     already contains an entry for the given key, the new value is
 *     written using the same format. Otherwise, the new value is written
@@ -5706,20 +5706,20 @@ static void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm,
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* We want a TimeFrame (fmtfrm) that describes how to format the time 
-   value. If the Format attribute of the supplied TimeFrame has been 
-   set, use it (and the current System). So just take a clone of the 
+/* We want a TimeFrame (fmtfrm) that describes how to format the time
+   value. If the Format attribute of the supplied TimeFrame has been
+   set, use it (and the current System). So just take a clone of the
    supplied frame pointer. */
    if( astTestFormat( frm, 0 ) ) {
       fmtfrm = astClone( frm );
 
 /* If the Format attribute has not been set, we create a copy of the
-   supplied TimeFrame, and set its System and Format attributes to 
+   supplied TimeFrame, and set its System and Format attributes to
    produce the required format. */
    } else {
       fmtfrm = astCopy( frm );
 
-/* If the KeyMap contains an entry for the specified key, determine the 
+/* If the KeyMap contains an entry for the specified key, determine the
    format of the time string it contains. */
       if( astMapGet0C( props, key, &oldval ) && oldval ) {
 
@@ -5763,7 +5763,7 @@ static void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm,
          }
 
 /* If the KeyMap does not contain an entry for the specified key, an
-   ISO date/time string with 1 decimal place in the seconds field 
+   ISO date/time string with 1 decimal place in the seconds field
    is used. */
       } else {
          astSetFormat( fmtfrm, 0, "iso.1T" );
@@ -5774,7 +5774,7 @@ static void StoreTimeProp( AstKeyMap *props, AstTimeFrame *frm,
    astClearTimeOrigin( fmtfrm );
 
 /* Convert the supplied time value into the required system. */
-   fs = astConvert( frm, fmtfrm, "" );   
+   fs = astConvert( frm, fmtfrm, "" );
    astTran1( fs, 1, &value, 1, &fmtval );
 
 /* Format the value. */
@@ -5897,7 +5897,7 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The number of Objects written to the StcsChan by this invocation of 
+*     The number of Objects written to the StcsChan by this invocation of
 *     astWrite.
 
 *  Notes:
@@ -5930,7 +5930,7 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return ret;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this_channel);
 
 /* Obtain a pointer to the StcsChan structure. */
@@ -5956,10 +5956,10 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
       wantclass = NULL;
       errclass = NULL;
 
-/* If the supplied KeyMap contains an entry with key "AREA", and if it is 
+/* If the supplied KeyMap contains an entry with key "AREA", and if it is
    a Region, use it to define the AREA properties. */
       if( astMapGet0A( (AstKeyMap *) object, "AREA", &obj ) ) {
-         if( astIsARegion( obj ) ) {         
+         if( astIsARegion( obj ) ) {
             area = (AstRegion *) obj;
          } else {
             wantclass = "Region";
@@ -5969,10 +5969,10 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
          }
       }
 
-/* If the supplied KeyMap contains an entry with key "COORDS", and if it is 
+/* If the supplied KeyMap contains an entry with key "COORDS", and if it is
    a Region, use it to define the COORDS properties. */
       if( astMapGet0A( (AstKeyMap *) object, "COORDS", &obj ) ) {
-         if( astIsARegion( obj ) ) {         
+         if( astIsARegion( obj ) ) {
             coords = (AstRegion *) obj;
          } else {
             wantclass = "Region";
@@ -5982,11 +5982,11 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
          }
       }
 
-/* If the supplied KeyMap contains an entry with key "PROPS", and if it is 
+/* If the supplied KeyMap contains an entry with key "PROPS", and if it is
    a KeyMap, use it to define values for the properties that cannot be
    determined from the supplied Regions (Resolution, PixSize, etc). */
       if( astMapGet0A( (AstKeyMap *) object, "PROPS", &obj ) ) {
-         if( astIsAKeyMap( obj ) ) {         
+         if( astIsAKeyMap( obj ) ) {
             props = (AstKeyMap *) obj;
          } else {
             wantclass = "KeyMap";
@@ -6010,7 +6010,7 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
       if( errname && astOK ) {
          astAddWarning( this, 1, "The supplied KeyMap contains a %s "
                         "called '%s'. But '%s' should be a %s "
-                        "(programming error).", method, status, 
+                        "(programming error).", method, status,
                         errclass, errname, errname, wantclass );
       }
 
@@ -6049,12 +6049,12 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
    Region. */
    } else if( astOK ) {
       astAddWarning( this, 1, "Failed to write out a %s through a %s. "
-                     "The %s class cannot be used to write out a %s.", 
+                     "The %s class cannot be used to write out a %s.",
                      method, status, astGetClass( object ), class, class,
                      astGetClass( object ) );
    }
 
-   
+
 /* If we do not have a KeyMap in which to store the STC-S properties,
    create one now. */
    if( astOK ) {
@@ -6105,7 +6105,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
 *     void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function converts the STC-S properties supplied in a KeyMap
@@ -6160,7 +6160,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
 
       line = AddItem( this, spprops, "ID", NULL, line, &nc, &crem, linelen, status );
       astMapGet0C( spprops, "ID", &id );
-      
+
       line = AddItem( this, spprops, "FILLFACTOR", "fillfactor ", line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "TIMESCALE", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "REFPOS", NULL, line, &nc, &crem, linelen, status );
@@ -6192,13 +6192,13 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
 
       line = AddItem( this, spprops, "ID", NULL, line, &nc, &crem, linelen, status );
       astMapGet0C( spprops, "ID", &id );
-      
+
       line = AddItem( this, spprops, "FILLFACTOR", "fillfactor ", line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "FRAME", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "REFPOS", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "FLAVOUR", NULL, line, &nc, &crem, linelen, status );
 
-      line = PutRegionProps( this, spprops, id, (pretty ? 0 : -1), line, &nc, 
+      line = PutRegionProps( this, spprops, id, (pretty ? 0 : -1), line, &nc,
                              &crem, linelen, status );
 
       prefix = !astChrMatch( id, "Position" ) ? "Position " : NULL;
@@ -6226,7 +6226,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
 
       line = AddItem( this, spprops, "ID", NULL, line, &nc, &crem, linelen, status );
       astMapGet0C( spprops, "ID", &id );
-      
+
       line = AddItem( this, spprops, "FILLFACTOR", "fillfactor ", line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "REFPOS", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "LOLIMIT", NULL, line, &nc, &crem, linelen, status );
@@ -6257,7 +6257,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
 
       line = AddItem( this, spprops, "ID", NULL, line, &nc, &crem, linelen, status );
       astMapGet0C( spprops, "ID", &id );
-      
+
       line = AddItem( this, spprops, "FILLFACTOR", "fillfactor ", line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "REFPOS", NULL, line, &nc, &crem, linelen, status );
       line = AddItem( this, spprops, "TYPE", NULL, line, &nc, &crem, linelen, status );
@@ -6291,7 +6291,7 @@ static void WriteProps( AstStcsChan *this, AstKeyMap *props, int *status ){
 
 }
 
-static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props, 
+static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                         int *status ){
 /*
 *  Name:
@@ -6306,11 +6306,11 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 *  Synopsis:
 *     #include "stcschan.h"
-*     int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props, 
+*     int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 *                      int *status )
 
 *  Class Membership:
-*     StcsChan member function 
+*     StcsChan member function
 
 *  Description:
 *     This function attempts to convert the supplied Region nto a set of
@@ -6323,7 +6323,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 *        Pointer to the region to be converted.
 *     props
 *        Pointer to the KeyMap in which to store the STC-S properties.
-*        On exit, each STC-S sub-phrase has an entry in this KeyMap, 
+*        On exit, each STC-S sub-phrase has an entry in this KeyMap,
 *        and each of these entries has a value that is another KeyMap
 *        holding the properties for the sub-phrase.
 *     status
@@ -6364,7 +6364,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
    const char *unit;       /* Unit string */
    double *pcen;           /* Pointer to Circle or ellipse centre */
    double equinox;         /* The required equinox value */
-   double error;           /* Axis error value */  
+   double error;           /* Axis error value */
    double fill;            /* Fill factor */
    double lbnd[ 3 ];       /* Region lower bounds */
    double lim;             /* Unlimited bounds value */
@@ -6401,13 +6401,13 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 /* See if default values are to be included in the output. */
    defs = ( astGetFull( this ) > 0 );
 
-/* STC-S requires that the spatial shape (circle, box. etc) refers to 
-   the coordinate system described by the STC-S. This is not quite like 
+/* STC-S requires that the spatial shape (circle, box. etc) refers to
+   the coordinate system described by the STC-S. This is not quite like
    AST, in that the AST class type (Circle, Box, etc) defines the
    shape of the region in the base Frame, rather than the current Frame.
    So we can only write the Region out using STC-S if the shape in the
    current Frame is the same as the shape in the base Frame. This is the
-   case if the simplified Mapping connecting base and current Frames is 
+   case if the simplified Mapping connecting base and current Frames is
    a UnitMap. Get the base->current Mapping from the Region. */
    map = astRegMapping( reg );
 
@@ -6424,7 +6424,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                         "supported shape within its current coordinate "
                         "system.", "astWrite", status );
          ok = 0;
-      } 
+      }
 
    } else {
       sreg = astClone( reg );
@@ -6435,7 +6435,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
    lim = sqrt( DBL_MAX );
 
 /* First job is to identify the Time, Space, Spectral and Redshift axes
-   in the supplied Region. 
+   in the supplied Region.
    ------------------------------------------------------------------- */
 
 /* Initialise things. */
@@ -6532,7 +6532,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 /* Warn about unused axes. */
          } else {
             astAddWarning( this, 1, "Could not classify axis %d (class=%s "
-                           "domain=%s). It will be ignored.", "astWrite", status, 
+                           "domain=%s). It will be ignored.", "astWrite", status,
                            i + 1, class, dom );
          }
       }
@@ -6547,7 +6547,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 
 /* Now we have identified the axes, we convert each available STC-S
-   sub-phrase, starting with the time sub-phrase. 
+   sub-phrase, starting with the time sub-phrase.
    ---------------------------------------------------------------- */
    if( timeax != -1 ) {
 
@@ -6620,7 +6620,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
          } else {
             astMapPut0C( spprops, "ID", "StopTime", NULL );
             StoreTimeProp( spprops,  (AstTimeFrame *) spfrm, "STOP", ubnd[ 0 ], status );
-       
+
          }
 
 /* Store properties that are common to all time sub-phrase types. First the
@@ -6653,18 +6653,18 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
          } else {
             tts = "nil";
             astAddWarning( this, 1, "Timescale '%s' is unsupported by "
-                           "STC-S.", "astWrite", status, 
+                           "STC-S.", "astWrite", status,
                            astGetC( spfrm, "TimeScale" ) );
             ok = 0;
          }
 
          MapPut0C( spprops, "TIMESCALE", tts, "nil", defs, status );
 
-/* RefPos. The AST TimeFrame class has no reference position, we leave 
+/* RefPos. The AST TimeFrame class has no reference position, we leave
    unchanged any refpos already in the keymap. If there is no refpos in the
-   keymap, we use "TOPOCENTER". */ 
+   keymap, we use "TOPOCENTER". */
          if( !astMapHasKey( spprops, "REFPOS" ) ) {
-	    astMapPut0C( spprops, "REFPOS", "TOPOCENTER", NULL ); 
+	    astMapPut0C( spprops, "REFPOS", "TOPOCENTER", NULL );
          }
 
 /* That's it for the time sub-phrase, unless the supplied Region has an
@@ -6697,7 +6697,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                astSetUnit( unca, 0, unit );
             } else {
                unca = astClone( unc );
-            }            
+            }
 
 /* Get the bounds of the uncertainty. */
             astGetRegionBounds( unca, lbnd, ubnd );
@@ -6765,7 +6765,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                astSetAdaptive( spreg, 1 );
                astSetSystem( spreg, AST__ICRS );
             }
-         }               
+         }
 
 /* Get a pointer to the Region's encapsulated Frame. */
          spfrm = astRegFrame( spreg );
@@ -6773,7 +6773,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 /* If the supplied Region is defined in a SkyFrame, choose the units to
    use when storing radius, error, etc in the KeyMap. If the props KeyMap
    already contains a unit specification, we use it. Otherwise we use the
-   default (degrees). AST uses radians internally, so find the scaling 
+   default (degrees). AST uses radians internally, so find the scaling
    factor. */
          if( issky ) {
             if( astMapGet0C( spprops, "UNIT", &unit ) ) {
@@ -6794,7 +6794,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
             MapPut0C( spprops, "UNIT", unit, "deg", defs, status );
 
 /* If the supplied Region is not defined in a SkyFrame, we will arrange
-   that the Region and the KeyMap use the same units, so set a scale 
+   that the Region and the KeyMap use the same units, so set a scale
    factor of 1.0. */
          } else {
             scale = 1.0;
@@ -6807,8 +6807,8 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                              astMapHasKey( spprops, "PIXSIZE" ) ||
                              astMapHasKey( spprops, "SIZE" ) );
 
-/* If so, and if the properties KeyMap already contains a Unit 
-   specification, we convert the Region to the same units. Take a deep 
+/* If so, and if the properties KeyMap already contains a Unit
+   specification, we convert the Region to the same units. Take a deep
    copy of the Region first to avoid modifying the supplied Region. */
             if( retain_units ) {
                if( !astMapGet0C( spprops, "UNIT", &unit ) ) unit = "deg";
@@ -6827,7 +6827,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                   q = unit;
                   while( *q && !isspace( *q ) ) q++;
                   while( *q && isspace( *q ) ) q++;
-                  if( *q ) unit = q;                  
+                  if( *q ) unit = q;
                }
 
 /* If we are not retaining the units specified in the properties KeyMap, we
@@ -6859,11 +6859,11 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                       strcmp( unit, "pc" ) &&
                       strcmp( unit, "kpc" ) &&
                       strcmp( unit, "Mpc" ) ) {
-                     astAddWarning( this, 1, "Cannot use spatial units '%s'.", 
+                     astAddWarning( this, 1, "Cannot use spatial units '%s'.",
                                     "astWrite", status, unit );
-                     ok = 0; 
+                     ok = 0;
                      break;
-                  }                  
+                  }
                   prop = astAppendString( prop, &nc, unit );
                   prop = astAppendString( prop, &nc, " " );
                }
@@ -6938,7 +6938,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                } else {
                   tfrm = NULL;
                   astAddWarning( this, 1, "Sky system '%s' is "
-                                 "unsupported by STC-S.", "astWrite", 
+                                 "unsupported by STC-S.", "astWrite",
                                  status, astGetC( spfrm, "System" ) );
                   ok = 0;
                }
@@ -6947,9 +6947,9 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                   if( astGetD( spfrm, "Equinox" ) != equinox ) {
                      astAddWarning( this, 1, "STC-S requires an equinox "
                                     "of %g for the %s frame, but the "
-                                    "supplied %s equinox is %g.", "astWrite", 
-                                    status, equinox, tfrm, 
-                                    astGetClass( spfrm ), 
+                                    "supplied %s equinox is %g.", "astWrite",
+                                    status, equinox, tfrm,
+                                    astGetClass( spfrm ),
                                     astGetD( spfrm, "Equinox" ) );
                      ok = 0;
                      tfrm = NULL;
@@ -6985,7 +6985,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
             if( !tfrm ) tfrm = "UNKNOWNFrame";
             astMapPut0C( spprops, "FRAME", tfrm, NULL );
 
-/* RefPos. The AST SkyFrame and Frame classes have no reference position, so 
+/* RefPos. The AST SkyFrame and Frame classes have no reference position, so
    we leave unchanged any refpos already in the props keymap. If there is
    no refpos in the keymap, we use "TOPOCENTER". */
             if( !astMapHasKey( spprops, "REFPOS" ) ) {
@@ -7014,7 +7014,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 /* If its a sky frame, find the position of the centre of the uncertainty
    region. */
-               pcen = issky ? astRegCentre( unc, NULL, NULL, 0, 
+               pcen = issky ? astRegCentre( unc, NULL, NULL, 0,
                                             AST__CURRENT ) : NULL;
 
 /* Find the half-width of the bounding box for each space axis, and
@@ -7076,7 +7076,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 
 
-/* Convert the spectral sub-phrase. 
+/* Convert the spectral sub-phrase.
    ---------------------------------------------------------------- */
    if( specax != -1 ) {
 
@@ -7110,7 +7110,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                           astMapHasKey( spprops, "PIXSIZE" ) ||
                           astMapHasKey( spprops, "SIZE" ) );
 
-/* If so, and if the properties KeyMap already contains a Unit specification, 
+/* If so, and if the properties KeyMap already contains a Unit specification,
    we convert the Region to the same units and system. Determine the
    required system and units. */
          if( retain_units ) {
@@ -7138,9 +7138,9 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                               "supplied KeyMap", "astWrite", status, unit );
                ok = 0;
             }
-         
+
 /* If we do not need to retain the units implied by the supplied KeyMap,
-   use the Units and system in the supplied Region so long as they are  
+   use the Units and system in the supplied Region so long as they are
    supported by STC-S. If not, use a related supported system instead. */
          } else {
             sys = astGetSystem( spreg );
@@ -7284,7 +7284,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 
 
-/* Convert the redshift sub-phrase. 
+/* Convert the redshift sub-phrase.
    ---------------------------------------------------------------- */
    if( redax != -1 ) {
 
@@ -7333,7 +7333,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
                   sys = AST__VREL;
                } else {
                   astAddWarning( this, 1, "Illegal STC-S DopplerDef '%s' "
-                                 "found in supplied KeyMap", "astWrite", status, 
+                                 "found in supplied KeyMap", "astWrite", status,
                                  dopdef );
                   ok = 0;
                }
@@ -7351,12 +7351,12 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
             } else {
                astAddWarning( this, 1, "Illegal STC-S Redshift Type '%s' "
-                              "found in supplied KeyMap", "astWrite", status, 
+                              "found in supplied KeyMap", "astWrite", status,
                               type );
                ok = 0;
-            } 
+            }
 
-/* If the supplied KeyMap does not imply the required system, use the 
+/* If the supplied KeyMap does not imply the required system, use the
    system in the supplied Region. */
          } else {
             sys = astGetSystem( spreg );
@@ -7534,7 +7534,7 @@ c     astRead
 f     AST_READ
 *     function when it is used to read from an StcsChan.
 *     If StcsArea is set non-zero (the default), then a Region
-*     representing the STC CoordinateArea will be returned by 
+*     representing the STC CoordinateArea will be returned by
 c     astRead.
 f     AST_READ.
 *     If StcsArea is set to zero, then the STC CoordinateArea
@@ -7542,11 +7542,11 @@ f     AST_READ.
 
 *  Notes:
 *     - Other attributes such as StcsCoords and StcsProps can be used to
-*     specify other Objects to be returned by 
+*     specify other Objects to be returned by
 c     astRead.
 f     AST_READ.
 *     If more than one of these attributes is set non-zero, then the
-*     actual Object returned by 
+*     actual Object returned by
 c     astRead
 f     AST_READ
 *     will be a KeyMap, containing the requested Objects. In this
@@ -7569,7 +7569,7 @@ f     using AST_SIMPLIFY
 *     - The TimeFrame used to represent a time STC-S sub-phrase will have
 *     its TimeOrigin attribute set to the sub-phrase start time. If no
 *     start time is specified by the sub-phrase, then the stop time will be
-*     used instead. If no stop time is specified by the sub-phrase, then 
+*     used instead. If no stop time is specified by the sub-phrase, then
 *     the single time value specified in the sub-phrase will be used
 *     instead. Subsequently clearing the TimeOrigin attribute (or setting
 *     its value to zero) will cause the TimeFrame to reprsent absolute times.
@@ -7610,19 +7610,19 @@ c     astRead
 f     AST_READ
 *     function when it is used to read from an StcsChan.
 *     If StcsCoords is set non-zero, then a PointList
-*     representing the STC Coordinates will be returned by 
+*     representing the STC Coordinates will be returned by
 c     astRead.
 f     AST_READ.
-*     If StcsCoords is set to zero (the default), then the STC 
+*     If StcsCoords is set to zero (the default), then the STC
 *     Coordinates will not be returned.
 
 *  Notes:
 *     - Other attributes such as StcsArea and StcsProps can be used to
-*     specify other Objects to be returned by 
+*     specify other Objects to be returned by
 c     astRead.
 f     AST_READ.
 *     If more than one of these attributes is set non-zero, then the
-*     actual Object returned by 
+*     actual Object returned by
 c     astRead
 f     AST_READ
 *     will be a KeyMap, containing the requested Objects. In this
@@ -7634,24 +7634,24 @@ f     AST_READ
 *     will be the Coordinates PointList itself.
 *     - The Coordinates component is specified by the additional axis
 *     values embedded within the body of each STC-S sub-phrase that
-*     represents an extended area. Sub-phrases that represent a single 
-*     value ( that is, have identifiers "Time", "Position", "Spectral" 
+*     represents an extended area. Sub-phrases that represent a single
+*     value ( that is, have identifiers "Time", "Position", "Spectral"
 *     or "Redshift" ) are not considered to be be part of the STC
 *     Coordinates component.
 *     - If the STC-S documents does not contain a Coordinates component,
 *     then a NULL object pointer
 f     (AST__NULL)
-*     will be returned by 
+*     will be returned by
 c     astRead
 f     AST_READ
 *     if the Coordinates component is the only object being returned. If
-*     other objects are also being returned (see attributes StcsProps and 
+*     other objects are also being returned (see attributes StcsProps and
 *     StcsArea), then the returned KeyMap will contain a "COORDS" key
 *     only if the Coordinates component is read succesfully.
 *     - The TimeFrame used to represent a time STC-S sub-phrase will have
 *     its TimeOrigin attribute set to the sub-phrase start time. If no
 *     start time is specified by the sub-phrase, then the stop time will be
-*     used instead. If no stop time is specified by the sub-phrase, then 
+*     used instead. If no stop time is specified by the sub-phrase, then
 *     the single time value specified in the sub-phrase will be used
 *     instead. Subsequently clearing the TimeOrigin attribute (or setting
 *     its value to zero) will cause the TimeFrame to reprsent absolute times.
@@ -7692,7 +7692,7 @@ c     astRead
 f     AST_READ
 *     function when it is used to read from an StcsChan.
 *     If StcsProps is set non-zero, then a KeyMap containing all the
-*     properties read from the STC-S document will be returned by 
+*     properties read from the STC-S document will be returned by
 c     astRead.
 f     AST_READ.
 *     If StcsProps is set to zero (the default), then the properties
@@ -7700,22 +7700,22 @@ f     AST_READ.
 
 *  Notes:
 *     - Other attributes such as StcsCoords and StcsArea can be used to
-*     specify other Objects to be returned by 
+*     specify other Objects to be returned by
 c     astRead.
 f     AST_READ.
 *     If more than one of these attributes is set non-zero, then the
-*     actual Object returned by 
+*     actual Object returned by
 c     astRead
 f     AST_READ
 *     will be a KeyMap containing the requested Objects. In this
-*     case, the properties KeyMap will be stored in the returned KeyMap 
-*     using the key "PROPS". If StcsProps is the only attribute to be 
-*     set non-zero, then the Object returned by 
+*     case, the properties KeyMap will be stored in the returned KeyMap
+*     using the key "PROPS". If StcsProps is the only attribute to be
+*     set non-zero, then the Object returned by
 c     astRead
 f     AST_READ
 *     will be the properties KeyMap itself.
 *     - The KeyMap containing the properties will have entries for one or
-*     more of the following keys: "TIME_PROPS", "SPACE_PROPS", "SPECTRAL_PROPS" 
+*     more of the following keys: "TIME_PROPS", "SPACE_PROPS", "SPECTRAL_PROPS"
 *     and "REDSHIFT_PROPS". Each of these entries will be another KeyMap
 *     containing the properties of the corresponding STC-S sub-phrase.
 
@@ -7747,23 +7747,23 @@ astMAKE_TEST(StcsChan,StcsProps,( this->stcsprops != -INT_MAX ))
 *     Integer.
 
 *  Description:
-*     This attribute specifies the maximum length to use when writing out 
+*     This attribute specifies the maximum length to use when writing out
 *     text through the sink function supplied when the StcsChan was created.
-*     It is ignored if the Indent attribute is zero (in which case the text 
-*     supplied to the sink function can be of any length). The default value 
+*     It is ignored if the Indent attribute is zero (in which case the text
+*     supplied to the sink function can be of any length). The default value
 *     is 70.
 *
-*     The number of characters in each string written out through the sink 
-*     function will not usually be greater than the value of this attribute 
+*     The number of characters in each string written out through the sink
+*     function will not usually be greater than the value of this attribute
 *     (but may be less). However, if any single word in the STC-S
 *     description exceeds the specified length, then the word will be
 *     written out as a single line.
 *
 f     Note, the default value of zero is unlikely to be appropriate when
 f     an StcsChan is used within Fortran code. In this case, StcsLength
-f     should usually be set to the size of the CHARACTER variable used to 
+f     should usually be set to the size of the CHARACTER variable used to
 f     receive the text returned by AST_GETLINE within the sink function.
-f     In addition, the Indent attribute should be set non-zero. This 
+f     In addition, the Indent attribute should be set non-zero. This
 f     avoids the possibility of long lines being truncated invisibly
 f     within AST_GETLINE.
 
@@ -7912,7 +7912,7 @@ f     RESULT = AST_STCSCHAN( SOURCE, SINK, OPTIONS, STATUS )
 *     I/O operations. Writing an Object to an StcsChan (using
 c     astWrite) will, if the Object is suitable, generate an
 f     AST_WRITE) will, if the Object is suitable, generate an
-*     STC-S description of that Object, and reading from an StcsChan will 
+*     STC-S description of that Object, and reading from an StcsChan will
 *     create a new Object from its STC-S description.
 *
 *     Normally, when you use an StcsChan, you should provide "source"
@@ -7920,10 +7920,10 @@ c     and "sink" functions which connect it to an external data store
 c     by reading and writing the resulting text. These functions
 f     and "sink" routines which connect it to an external data store
 f     by reading and writing the resulting text. These routines
-*     should perform any conversions needed between external character 
-c     encodings and the internal ASCII encoding. If no such functions 
+*     should perform any conversions needed between external character
+c     encodings and the internal ASCII encoding. If no such functions
 f     encodings and the internal ASCII encoding. If no such routines
-*     are supplied, a Channel will read from standard input and write 
+*     are supplied, a Channel will read from standard input and write
 *     to standard output.
 
 *  Parameters:
@@ -8005,7 +8005,7 @@ f     necessary for the null routine AST_NULL (so long as the AST_PAR
 f     include file has been used).
 *     - If the external data source or sink uses a character encoding
 *     other than ASCII, the supplied source and sink functions should
-*     translate between the external character encoding and the internal 
+*     translate between the external character encoding and the internal
 *     ASCII encoding used by AST.
 *     - A null Object pointer (AST__NULL) will be returned if this
 *     function is invoked with the AST error status set, or if it
@@ -8031,7 +8031,7 @@ f     pointer.
    virtual function table as well if necessary. This interface is for
    use by other C functions within AST, and uses the standard "wrapper"
    functions included in this class. */
-   new = astInitStcsChan( NULL, sizeof( AstStcsChan ), !class_init, 
+   new = astInitStcsChan( NULL, sizeof( AstStcsChan ), !class_init,
                           &class_vtab, "StcsChan", source, SourceWrap,
                           sink, SinkWrap );
 
@@ -8081,8 +8081,8 @@ AstStcsChan *astStcsChanId_( const char *(* source)( void ),
 *     This function implements the external (public) C interface to the
 *     astStcsChan constructor function. Another function (astStcsChanForId)
 *     should be called to create an StcsChan for use within other languages.
-*     Both functions return an ID value (instead of a true C pointer) to 
-*     external users, and must be provided because astStcsChan_ has a variable 
+*     Both functions return an ID value (instead of a true C pointer) to
+*     external users, and must be provided because astStcsChan_ has a variable
 *     argument list which cannot be encapsulated in a macro (where this conversion would otherwise
 *     occur).
 *
@@ -8118,8 +8118,8 @@ AstStcsChan *astStcsChanId_( const char *(* source)( void ),
    virtual function table as well if necessary. This interface is for
    use by external C functions and uses the standard "wrapper"
    functions included in this class. */
-   new = astInitStcsChan( NULL, sizeof( AstStcsChan ), !class_init, 
-                          &class_vtab, "StcsChan", source, SourceWrap, 
+   new = astInitStcsChan( NULL, sizeof( AstStcsChan ), !class_init,
+                          &class_vtab, "StcsChan", source, SourceWrap,
                           sink, SinkWrap );
 
 /* If successful, note that the virtual function table has been
@@ -8180,7 +8180,7 @@ AstStcsChan *astStcsChanForId_( const char *(* source)( void ),
 *     I/O operations. Writing an Object to an StcsChan (using
 c     astWrite) will, if the Object is suitable, generate an
 f     AST_WRITE) will, if the Object is suitable, generate an
-*     STC-S description of that Object, and reading from an StcsChan will 
+*     STC-S description of that Object, and reading from an StcsChan will
 *     create a new Object from its STC-S description.
 *
 *     Normally, when you use an StcsChan, you should provide "source"
@@ -8188,10 +8188,10 @@ c     and "sink" functions which connect it to an external data store
 c     by reading and writing the resulting text. These functions
 f     and "sink" routines which connect it to an external data store
 f     by reading and writing the resulting text. These routines
-*     should perform any conversions needed between external character 
-c     encodings and the internal ASCII encoding. If no such functions 
+*     should perform any conversions needed between external character
+c     encodings and the internal ASCII encoding. If no such functions
 f     encodings and the internal ASCII encoding. If no such routines
-*     are supplied, a Channel will read from standard input and write 
+*     are supplied, a Channel will read from standard input and write
 *     to standard output.
 
 *  Parameters:
@@ -8305,7 +8305,7 @@ f     encodings and the internal ASCII encoding. If no such routines
 
 /* Initialise the StcsChan, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitStcsChan( NULL, sizeof( AstStcsChan ), !class_init, 
+   new = astInitStcsChan( NULL, sizeof( AstStcsChan ), !class_init,
                           &class_vtab, "StcsChan", source, source_wrap,
                           sink, sink_wrap );
 

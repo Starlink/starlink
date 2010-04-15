@@ -335,7 +335,7 @@
                CALL MSG_OUT( 'LINE', ' ', STATUS )
 
             END IF
-  
+
 *          Tidy up
 
             CALL PAR_CANCL( PNV, STATUS )

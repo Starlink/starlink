@@ -14,20 +14,20 @@
 
 *  Description:
 *     The supplied co-ordinates are converted to values corresponding
-*     to a set of two-dimensional Gaussian fit parameters defined by 
-*     the argument XC (together with other information passed from 
+*     to a set of two-dimensional Gaussian fit parameters defined by
+*     the argument XC (together with other information passed from
 *     KPS1_BFFT in common block BF_COM).  The resulting image
-*     intensities are compared with the supplied data values and the 
+*     intensities are compared with the supplied data values and the
 *     residuals in intensity at each position are returned in FVEC.
 
 *  Arguments:
 *     M = INTEGER (Given)
-*        The number of data values. 
+*        The number of data values.
 *     N = INTEGER (Given)
 *        The number of fit parameters supplied in XC.  The
 *        remaining ones are defined by values stored in common.
 *     XC( N ) = DOUBLE PRECISION (Given)
-*        The parameters of the two-dimensional Gaussian fit for which 
+*        The parameters of the two-dimensional Gaussian fit for which
 *        the residuals are required.  The full list of elements for
 *        each Gaussian is as follows.
 *           1  --  X pixel centre
@@ -38,7 +38,7 @@
 *           6  --  Amplitude
 *           7  --  Background (assumed to be a constant level)
 *
-*        Where each fit parameter has been fixed by the user, the 
+*        Where each fit parameter has been fixed by the user, the
 *        remaining elements in XC are shuffled down to occupy the
 *        location which otherwise would have been used by the fixed
 *        Gaussian-fit parameter.  Fixed parameter values are supplied
@@ -53,7 +53,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research 
+*     Copyright (C) 2007 Particle Physics and Astronomy Research
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -80,7 +80,7 @@
 *     2007 February 14 (MJC):
 *        Original version.
 *     2007 April 27 (MJC):
-*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of 
+*        Added FIXAMP and FIXRAT arguments, and concurrent fitting of
 *        multiple Gaussians,
 *     2007 May 14 (MJC):
 *        Support fixed separations.
@@ -108,7 +108,7 @@
 *           positions.
 *        PIXOFF( BF__MXPOS - 1, BF__NDIM ) = DOUBLE PRECISION (Read)
 *           The pixel offsets of the secondary beam positions with
-*           respect to the primary beam position.  
+*           respect to the primary beam position.
 *        USEVAR = LOGICAL (Read)
 *           Whether or not to use variance to weight the fit.
 *        AMPC = LOGICAL (Read)
@@ -124,7 +124,7 @@
 *        ORIC = LOGICAL (Read)
 *           Was the orientation fixed by the user?
 *        POSC = LOGICAL (Read)
-*           Were the centre co-ordinates of the Gaussian fixed by the 
+*           Were the centre co-ordinates of the Gaussian fixed by the
 *           user?
 *        RATIOC = LOGICAL (Read)
 *           Amplitude ratios fixed by the user?
@@ -207,7 +207,7 @@
 *  Use the same background for all beam positions.
          IF ( .NOT. BACKC .AND. IG .EQ. 1 ) THEN
             I = I + 1
-            PC( 7, IG ) = XC( I ) 
+            PC( 7, IG ) = XC( I )
          END IF
       END DO
 
@@ -231,13 +231,13 @@
                      CT = COS( PC( 5, IG ) )
                      ST = SIN( PC( 5, IG ) )
 
-*  Evaluate sum of Gaussians.  Recall PC( 1, IG ) and PC( 2, IG ) are 
+*  Evaluate sum of Gaussians.  Recall PC( 1, IG ) and PC( 2, IG ) are
 *  the x and y centre co-ordinates respectively for the IGth Gaussian.
-*  PC( 3, IG ) and PC( 4, IG ) are the major-and minor-axis standard 
-*  deviations respectively.  
+*  PC( 3, IG ) and PC( 4, IG ) are the major-and minor-axis standard
+*  deviations respectively.
                      E1 = ( XX - PC( 1, IG ) ) * CT +
      :                    ( YY - PC( 2, IG ) ) * ST
-                     E2 = ( YY - PC( 2, IG ) ) * CT - 
+                     E2 = ( YY - PC( 2, IG ) ) * CT -
      :                    ( XX - PC( 1, IG ) ) * ST
                      E3 = E1 * E1 / ( PC( 3, IG ) * PC( 3, IG ) )
                      E4 = E2 * E2 / ( PC( 4, IG ) * PC( 4, IG ) )
@@ -245,7 +245,7 @@
                      E6 = E5 * PC( 6, IG ) + PC( 7, IG )
                      GI = GI + E6
                   END DO
- 
+
 *  Weight the residuals.
                   FVEC( I ) = ( GI - DATA( I ) ) / VAR( I )
                ELSE
@@ -272,13 +272,13 @@
                      CT = COS( PC( 5, IG ) )
                      ST = SIN( PC( 5, IG ) )
 
-*  Evaluate sum of Gaussians.  Recall PC( 1, IG ) and PC( 2, IG ) are 
+*  Evaluate sum of Gaussians.  Recall PC( 1, IG ) and PC( 2, IG ) are
 *  the x and y centre co-ordinates respectively for the IGth Gaussian.
-*  PC( 3, IG ) and PC( 4, IG ) are the major-and minor-axis standard 
-*  deviations respectively.  
+*  PC( 3, IG ) and PC( 4, IG ) are the major-and minor-axis standard
+*  deviations respectively.
                      E1 = ( XX - PC( 1, IG ) ) * CT +
      :                    ( YY - PC( 2, IG ) ) * ST
-                     E2 = ( YY - PC( 2, IG ) ) * CT - 
+                     E2 = ( YY - PC( 2, IG ) ) * CT -
      :                    ( XX - PC( 1, IG ) ) * ST
                      E3 = E1 * E1 / ( PC( 3, IG ) * PC( 3, IG ) )
                      E4 = E2 * E2 / ( PC( 4, IG ) * PC( 4, IG ) )
@@ -286,7 +286,7 @@
                      E6 = E5 * PC( 6, IG ) + PC( 7, IG )
                      GI = GI + E6
                   END DO
- 
+
 *  Form the residuals.
                   FVEC( I ) = GI - DATA( I )
                ELSE

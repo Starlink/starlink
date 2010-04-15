@@ -21,8 +21,8 @@ void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
 *                       int len, int size, const char *comment, int *status );
 
 *  Description:
-*     This function splits up a supplied character array into a set of 
-*     equal length sub-strings, null terminates them, and stores them 
+*     This function splits up a supplied character array into a set of
+*     equal length sub-strings, null terminates them, and stores them
 *     as a character vector in a KeyMap. See also atlMapGet1S.
 
 *  Arguments:
@@ -31,7 +31,7 @@ void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
 *     key
 *        The key  for the new entry.
 *     value
-*        A character array containing the concatenated fixed length 
+*        A character array containing the concatenated fixed length
 *        strings. The length of this array should be at least "size*len".
 *     len
 *        The length of each fixed length string.
@@ -49,12 +49,12 @@ void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@ void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
 *+
 */
 
-/* Local Variables: */ 
+/* Local Variables: */
    char **ptr;            /* Array holding pointers to individual strings */
    const char *p;         /* Pointer to start of next fixed length string */
    char *q;               /* Pointer to start of next null terminated string */

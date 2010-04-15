@@ -17,13 +17,13 @@
 *     correspond to the values for a named graphics element stored in the
 *     supplied Plot (see SUN/210). Only attributes which have values
 *     explicitly set in the Plot are changed. If no value has been set
-*     for a Plot attribute, the corresponding PGPLOT attribute is left 
+*     for a Plot attribute, the corresponding PGPLOT attribute is left
 *     unchanged.
 *
-*     If SET is supplied .TRUE., then the PGPLOT attributes for the 
-*     specified graphics element are extracted from the supplied Plot and 
-*     made active. The previously active values are returned in ATTRS. If 
-*     SET is supplied .FALSE., the values supplied in ATTRS are made current 
+*     If SET is supplied .TRUE., then the PGPLOT attributes for the
+*     specified graphics element are extracted from the supplied Plot and
+*     made active. The previously active values are returned in ATTRS. If
+*     SET is supplied .FALSE., the values supplied in ATTRS are made current
 *     (in this case ATTRS is returned unchanged).
 
 *  Arguments:
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,11 +88,11 @@
 
 *  Arguments Given:
       INTEGER IPLOT
-      CHARACTER ELEM*(*) 
+      CHARACTER ELEM*(*)
       LOGICAL SET
 
 *  Arguments Given and Returned:
-      DOUBLE PRECISION ATTRS( * ) 
+      DOUBLE PRECISION ATTRS( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -101,21 +101,21 @@
       INTEGER GRF__TEXT          ! Values identifying graphics primatives
       PARAMETER ( GRF__TEXT = 0 )! (see grf.h)
 
-      INTEGER GRF__LINE 
+      INTEGER GRF__LINE
       PARAMETER ( GRF__LINE = 1 )
 
-      INTEGER GRF__MARK 
+      INTEGER GRF__MARK
       PARAMETER ( GRF__MARK = 2 )
 
 
-      INTEGER GRF__NATTR          ! The number of graphics attributes 
+      INTEGER GRF__NATTR          ! The number of graphics attributes
       PARAMETER ( GRF__NATTR = 5 )! (see grf.h)
 
 *  Local Variables:
       CHARACTER AT*30            ! Supplied graphics element name in parenthesise
       CHARACTER ATT*50           ! Complete attribute name
       CHARACTER ATTNAM( GRF__NATTR )*6 ! Plot attribute names
-      DOUBLE PRECISION ATTV      ! Plot attribute value 
+      DOUBLE PRECISION ATTV      ! Plot attribute value
       INTEGER ATTLEN( GRF__NATTR )     ! Length of Plot attribute names
       INTEGER I                  ! Attribute index (see AST include file grf.h)
       INTEGER IAT                ! Significant length of AT
@@ -185,15 +185,15 @@
 *  If the Plot values are being made current...
          IF( SET ) THEN
 
-*  If the Plot attribute has been set explicitly (i.e. not defaulted), use it. 
-            USE = AST_TEST( IPLOT, ATT, STATUS ) 
+*  If the Plot attribute has been set explicitly (i.e. not defaulted), use it.
+            USE = AST_TEST( IPLOT, ATT, STATUS )
             ATTV = AST_GETD( IPLOT, ATT, STATUS )
             CALL GRF_GATTR( I - 1, USE, ATTV, ATTRS( I ), PRIM, ISTAT )
 
 *  Otherwise, make the value supplied in ATTRS the current active PGPLOT value.
 *  Discard the old value.
          ELSE
-            USE = ( ATTRS( I ) .NE. AST__BAD ) 
+            USE = ( ATTRS( I ) .NE. AST__BAD )
             CALL GRF_GATTR( I - 1, USE, ATTRS( I ), ATTV, PRIM, ISTAT )
          END IF
 
@@ -207,7 +207,7 @@
      :                    'attribute to mimic the AST ^ELEM value.',
      :                    STATUS )
             GO TO 999
-         END IF          
+         END IF
 
       END DO
 

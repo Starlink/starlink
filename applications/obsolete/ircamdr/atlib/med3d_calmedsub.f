@@ -1,4 +1,4 @@
-	SUBROUTINE MED3D_CALMEDSUB( NUM, ACTDATA, VALMAX, VALMIN, SUM, MEAN, 
+	SUBROUTINE MED3D_CALMEDSUB( NUM, ACTDATA, VALMAX, VALMIN, SUM, MEAN,
      :	                            MEDIAN, MODE)
 
 	IMPLICIT  NONE
@@ -12,12 +12,12 @@
      :    ACTDATA( NUM)        ! data array
 
 	REAL
-     :    SUM,                 ! sum of values 
-     :    MEAN,                ! mean of values 
-     :    MEDIAN,              ! median of value 
+     :    SUM,                 ! sum of values
+     :    MEAN,                ! mean of values
+     :    MEDIAN,              ! median of value
      :    MODE,                ! mode of values
-     :    VALMAX,              ! maximum value 
-     :    VALMIN               ! minimum value 
+     :    VALMAX,              ! maximum value
+     :    VALMIN               ! minimum value
 
 	INTEGER
      :    I                    ! general array counters
@@ -54,7 +54,7 @@
 
 	ELSE
 
-	  MEDIAN = ACTDATA( NUM/2+1) 
+	  MEDIAN = ACTDATA( NUM/2+1)
 
 	END IF
 

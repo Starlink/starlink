@@ -4,7 +4,7 @@
 #     tkast
 
 #  Purpose:
-#     Browse an AST Object. 
+#     Browse an AST Object.
 
 #  Language:
 #     TCL
@@ -71,19 +71,19 @@ proc MakeData {top} {
 #     MakeData
 
 #  Purpose:
-#     Create a Tcl description of an AST data item. The AST description of 
-#     the data item is obtained by reading records sequentially from the 
-#     supplied file (opened with descriptor $FD), starting at the current 
+#     Create a Tcl description of an AST data item. The AST description of
+#     the data item is obtained by reading records sequentially from the
+#     supplied file (opened with descriptor $FD), starting at the current
 #     file position.
 #
-#     The returned Tcl description of a data item consists of a list of 5 
+#     The returned Tcl description of a data item consists of a list of 5
 #     elements, in the following order:
 #
 #     0 - The name of the data item.
 #     1 - The type of the data item. This will be either:
 #           - The Object class name if the data item is an Object.
 #           - "IsA" if the data item marks the end of a parent Object.
-#           - Blank if the data item is a primitive (i.e. integer, float, 
+#           - Blank if the data item is a primitive (i.e. integer, float,
 #             string). Note, all primitives are treated as string values.
 #     2 - A comment describing the item.
 #     3 - A list containing the values of all the components of the data item.
@@ -92,17 +92,17 @@ proc MakeData {top} {
 #         If the data item is a primitive, then the list will contain only
 #         one element, and that element will consist of a single item holding
 #         the string value.
-#     4 - A flag indicating if the item was commented out in the supplied 
+#     4 - A flag indicating if the item was commented out in the supplied
 #         file. A value of 1 is stored if it was not commented out (i.e. if
-#         it is "required"), and a value of zero is stored if it was 
+#         it is "required"), and a value of zero is stored if it was
 #         commented out.
 
 #  Language:
 #     TCL
 
 #  Arguments:
-#     top - Should be set to 1 by the calling procedure to indicate a 
-#           top-level entry. It will be set to zero when calling this 
+#     top - Should be set to 1 by the calling procedure to indicate a
+#           top-level entry. It will be set to zero when calling this
 #           procedure recursively.
 
 #  Returned Value:
@@ -112,8 +112,8 @@ proc MakeData {top} {
 #     error message is reported and the applications is aborted.
 
 #  Notes:
-#     -  "IsA" data items are stored with a blank name, and a value consisting 
-#     of a single string component holding the class name of the parent Object 
+#     -  "IsA" data items are stored with a blank name, and a value consisting
+#     of a single string component holding the class name of the parent Object
 #     just completed.
 
 #  Copyright:
@@ -155,7 +155,7 @@ proc MakeData {top} {
 
    set ret ""
 
-# If this is a top-levl entry, initialise the number of objects in the 
+# If this is a top-levl entry, initialise the number of objects in the
 # supplied file.
    if { $top } {
       set nobj 0
@@ -166,7 +166,7 @@ proc MakeData {top} {
 
 # If this is a top-level entry, decide on the name for the next Object.
       if { $top } {
-         incr nobj         
+         incr nobj
          set PNAME "Object_$nobj"
       }
 
@@ -182,7 +182,7 @@ proc MakeData {top} {
       if { [SplitLine $line name type comm value req] } {
 
 # Convert the data item type to lower case.
-         set lctype [string tolower $type] 
+         set lctype [string tolower $type]
 
 # The first line at the top level must be a "Begin" statement.
          if { $lctype != "begin" && $top } {
@@ -193,8 +193,8 @@ proc MakeData {top} {
 # Break out of the loop and return, when an Object description ends.
          } elseif { $lctype == "end" } {
             break
-   
-# If a new Object is begining, construct a description of it. Call this 
+
+# If a new Object is begining, construct a description of it. Call this
 # procedure recursively to a description of the Object value.
          } elseif { $lctype == "begin" } {
             set name $PNAME
@@ -224,17 +224,17 @@ proc MakeData {top} {
                puts "${mess}from file \"$FILE\"."
                close $FD
                exit 1
-            }               
-   
+            }
+
          } elseif { [lindex $value 0] == "" } {
             set PNAME $name
             set PCOMM $comm
             continue
-   
-         } { 
+
+         } {
             set value [list $value]
          }
-   
+
          lappend ret [list $name $type $comm $value $req]
 
       }
@@ -251,7 +251,7 @@ proc Save {object title} {
 #     Save
 
 #  Purpose:
-#     Write an object out to the text file with name ${title}.ast in 
+#     Write an object out to the text file with name ${title}.ast in
 #     a format which can be read by a standard AST Channel.
 
 #  Language:
@@ -300,7 +300,7 @@ proc Save {object title} {
    close $FD
 
    puts "Object $title saved in file $file"
-   
+
 }
 
 proc WriteObject {object indent top} {
@@ -309,7 +309,7 @@ proc WriteObject {object indent top} {
 #     WriteObject
 
 #  Purpose:
-#     Write an object out to the text file opened on unit $FD, in 
+#     Write an object out to the text file opened on unit $FD, in
 #     a format which can be read by a standard AST Channel.
 
 #  Language:
@@ -318,8 +318,8 @@ proc WriteObject {object indent top} {
 #  Arguments:
 #     object - the Tcl list defining the object to be dumped.
 #     indext - A string of spaces giving the current indentation.
-#     top - Should be set to 1 by the calling procedure to indicate a 
-#           top-level entry. It will be set to zero when calling this 
+#     top - Should be set to 1 by the calling procedure to indicate a
+#           top-level entry. It will be set to zero when calling this
 #           procedure recursively.
 
 #  Copyright:
@@ -377,7 +377,7 @@ proc WriteObject {object indent top} {
       set val [lindex $comp0 0]
       if { [scan $val "%g %s" fval sval] == 1 } {
          append line "   $name = $val	# $comm"
-      } {      
+      } {
          append line "   $name = \"$val\"	# $comm"
       }
       puts $FD $line
@@ -425,7 +425,7 @@ proc SplitLine {line namen typen commn valuen reqn } {
    upvar $reqn req
 
 # Initialise the returned items.
-   set comm "" 
+   set comm ""
    set name ""
    set type ""
    set value ""
@@ -443,7 +443,7 @@ proc SplitLine {line namen typen commn valuen reqn } {
 
 # If a leading "#" was found, check that there is another "#" in the
 # line. If so, indicate that the item is not a "required" item, and
-# remove any leading spaces. If not, the whole line is discarded as a 
+# remove any leading spaces. If not, the whole line is discarded as a
 # comment line. This is indicated by returning zero.
       if { [string first "#" $line] == -1 } {
          return 0
@@ -534,7 +534,7 @@ proc ShowObject {w object parent} {
    }
 
 # Ensure the window exists.
-   if { $w != "." } { 
+   if { $w != "." } {
       catch {destroy $w}
       toplevel $w -class TkAst
       wm transient $w [winfo toplevel [winfo parent $w]]
@@ -575,7 +575,7 @@ proc ShowObject {w object parent} {
 
 # Divide up the window into four parts.
    set menubar [frame $aw.menubar -relief raised -bd 2 -background $MENUBACK ]
-   pack $menubar -side top -anchor n -fill x 
+   pack $menubar -side top -anchor n -fill x
 
    set top [frame $aw.top]
    pack $top -side top -anchor n -fill x
@@ -593,7 +593,7 @@ proc ShowObject {w object parent} {
 
    set canvas [canvas $cframe.canvas -height $CH -width 0i -background $COMPBACK \
                     -yscrollcommand "$yscroll set"]
-   pack $canvas -side left -fill both -expand 1 
+   pack $canvas -side left -fill both -expand 1
 
    scrollbar $yscroll -command "$canvas yview"
    pack $yscroll -side left -fill y
@@ -610,13 +610,13 @@ proc ShowObject {w object parent} {
    set opts [menubutton $menubar.opts -text Options -menu $menubar.opts.menu \
                                       -background $MENUBACK -underline 0]
    set optsmenu [menu $opts.menu]
-   pack $file $opts -side left 
+   pack $file $opts -side left
 
 # Build the "File" menu.
    $filemenu add command -label "Close  " -command "Close $w" -underline 0 -accelerator "Ctrl+c"
    bind $w <Control-c> "Close $w"
    $filemenu add command -label "Exit   " -command Exit -underline 0 -accelerator "Ctrl+e"
-   bind $w <Control-e> Exit 
+   bind $w <Control-e> Exit
    $filemenu add command -label "Save   " -command "Save {$object} $ttl" -underline 0 -accelerator "Ctrl+s"
    bind $w <Control-s> "Save {$object} $ttl"
 
@@ -644,7 +644,7 @@ proc ShowObject {w object parent} {
    } {
       pack [label $headers.l1 -text "Name  :  $path"] \
            [label $headers.l2 -text "Class  :  $type"] \
-           [label $headers.l3 -text "Comment  :  $comm"] -side top -anchor w 
+           [label $headers.l3 -text "Comment  :  $comm"] -side top -anchor w
    }
 
 # Display the attributes of the Object in the component list panel.
@@ -682,7 +682,7 @@ proc ShowObject {w object parent} {
 
 # If creating a new TopLevel, set a grab and claim the focus too.
    if { $w != "." } {
-      tkwait visibility $w   
+      tkwait visibility $w
       grab $w
       focus $w
    }
@@ -743,15 +743,15 @@ proc ShowClass {canvas complist type value class path args} {
       if { $args != "" } {
          set class $CURCLASS($complist)
 
-# Otherwise, return without action if the requested class is already 
-# displayed. 
+# Otherwise, return without action if the requested class is already
+# displayed.
       } {
          if { $CURCLASS($complist) == $class } { return }
       }
    }
 
 # Save the new class type.
-   set CURCLASS($complist) $class 
+   set CURCLASS($complist) $class
 
 # Create 4 vertical columns in the components list panel. Destroy any
 # existing columns first.
@@ -817,8 +817,8 @@ proc ShowClass {canvas complist type value class path args} {
 # Ensure that the canvas is as high as the components list frame, unless this
 # is more than the original height of the canvas.
    update idletasks
-   set h1 [winfo height $complist] 
-   if { $h1 < [winfo pixels $canvas $CH] } { 
+   set h1 [winfo height $complist]
+   if { $h1 < [winfo pixels $canvas $CH] } {
       $canvas configure -height $h1
    } {
       $canvas configure -height $CH
@@ -830,7 +830,7 @@ proc ShowClass {canvas complist type value class path args} {
 proc ShowComp {comp c1 c2 c3 path count} {
    global FILE
    global XDEF
-   global COMPBACK 
+   global COMPBACK
 
 # Extract the items from the component description.
    set cname [lindex $comp 0]
@@ -855,7 +855,7 @@ proc ShowComp {comp c1 c2 c3 path count} {
 
 # Get the value text to display.
    if { $isaobject } {
-      set cvalue "<${ctype}>" 
+      set cvalue "<${ctype}>"
    } {
       set cvalue [lindex [lindex $cvalue 0] 0]
    }
@@ -863,14 +863,14 @@ proc ShowComp {comp c1 c2 c3 path count} {
 # Create the labels.
    set lab [string tolower $cname]
    append lab $count
-   set lname [label $c1.$lab -text $cname -background $COMPBACK ] 
-   set lvalue [label $c2.$lab -text $cvalue -background $COMPBACK ] 
-   set lcomm [label $c3.$lab -text $ccomm -background $COMPBACK ]   
+   set lname [label $c1.$lab -text $cname -background $COMPBACK ]
+   set lvalue [label $c2.$lab -text $cvalue -background $COMPBACK ]
+   set lcomm [label $c3.$lab -text $ccomm -background $COMPBACK ]
 
 # Pack them.
-   pack $lname -side top -fill x 
+   pack $lname -side top -fill x
    pack $lvalue -side top -fill x
-   pack $lcomm -side top -fill x 
+   pack $lcomm -side top -fill x
 
 # If the component is an object...
    if { $isaobject } {
@@ -883,8 +883,8 @@ proc ShowComp {comp c1 c2 c3 path count} {
       bindtags $lcomm $lab
 
       bind $lab <Enter> "if { !\$FREEZE($top) } {
-                            $lname configure -relief sunken 
-                            $lvalue configure -relief sunken 
+                            $lname configure -relief sunken
+                            $lvalue configure -relief sunken
                             $lcomm configure -relief sunken
                             set SEL($top) \[list $lname $lvalue $lcomm\]
                          }"
@@ -892,12 +892,12 @@ proc ShowComp {comp c1 c2 c3 path count} {
                             $lname configure -relief flat
                             $lvalue configure -relief flat
                             $lcomm configure -relief flat
-                            if { \[info exists SEL($top)\] } { 
-                               unset SEL($top) 
+                            if { \[info exists SEL($top)\] } {
+                               unset SEL($top)
                             }
                          }"
 
-# Create a binding to display the component if the cursor is clicked over 
+# Create a binding to display the component if the cursor is clicked over
 # any of the labels.
       if { $top == "." } {
          set w0 ".${lab}"
@@ -920,7 +920,7 @@ proc ShowComp {comp c1 c2 c3 path count} {
    if { ![info exists FILE] } {
       if { $argc != 1 } {
          puts "tkast: No input file supplied."
-         puts "tkast: usage - \"tkast <file>\""   
+         puts "tkast: usage - \"tkast <file>\""
          exit 1
       } {
          set FILE [lindex $argv 0]
@@ -951,22 +951,22 @@ proc ShowComp {comp c1 c2 c3 path count} {
    }
 
 # If the supplied data file contains more than 1 object, reverse the
-# order of the Objects (to get Object 1 first), and show the list of 
+# order of the Objects (to get Object 1 first), and show the list of
 # Objects in the data file.
    set comps [lindex $AST_DATA 3]
    set ncomps [llength $comps]
 
-   if { $ncomps > 1 } { 
+   if { $ncomps > 1 } {
       incr ncomps -1
       for {set i $ncomps} {$i >= 0} {incr i -1} {
          lappend new_comps [lindex $comps $i]
       }
 
       set AST_DATA [lreplace $AST_DATA 3 3 $new_comps]
-      ShowObject . $AST_DATA ""    
+      ShowObject . $AST_DATA ""
 
    } {
      ShowObject . [lindex $comps 0] ""
    }
 
-   
+

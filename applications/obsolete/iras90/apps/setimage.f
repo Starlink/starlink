@@ -31,7 +31,7 @@
 *     HISTORY = _LOGICAL (Read)
 *        Determines if history information is to be stored within the
 *        modified NDFs. See help on "History_in_IRAS90" for more
-*        information on history. 
+*        information on history.
 *                                              [current history setting]
 *     LIKE = NDF (Read)
 *        A group of IRAS90 images from which the new values are to be
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,12 +132,12 @@
       CALL MSG_IFGET( STATUS )
 
 *  Get a group containing the names of the NDFs to be modified.
-      CALL IRM_RDNDF( 'NDF', 0, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'NDF', 0, 1, '  Give more NDF names...',
      :                IGRP1, NIN, STATUS )
 
 *  Get a group containing the names of the NDFs from which to read new
 *  values.
-      CALL IRM_RDNDF( 'LIKE', NIN, NIN, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'LIKE', NIN, NIN, '  Give more NDF names...',
      :                IGRP2, NIN, STATUS )
 
 *  Create a group to hold the items which are to be modified.
@@ -147,7 +147,7 @@
       CALL GRP_SETCS( IGRP3, .FALSE., STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999 
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain the items to be modified, storing them in the group
 *  just created. Loop until the group expression obtained from the
@@ -211,7 +211,7 @@
 *  Get the next item, and remove leading blanks.
                CALL GRP_GET( IGRP4, INDEX, 1, ITEM, STATUS )
                CALL CHR_LDBLK( ITEM )
-   
+
 *  Store the selected item in the input NDF, create history text, and
 *  tell the user what has happened.
                IF( ITEM .EQ. 'UNITS' ) THEN
@@ -224,11 +224,11 @@
      :                          '    Units changed from "^U1" to "^U2"',
      :                           TEXT( INDEX ), TLEN, STATUS )
 
-                  CALL MSG_OUTIF( MSG__NORM, 'SETIMAGE_MSG2', 
+                  CALL MSG_OUTIF( MSG__NORM, 'SETIMAGE_MSG2',
      :                            TEXT( INDEX ), STATUS )
 
-               ELSE IF( ITEM .EQ. 'TYPE' ) THEN      
-            
+               ELSE IF( ITEM .EQ. 'TYPE' ) THEN
+
                   CALL CMP_PUT0C( LOC1, 'TYPE', TYPE2, STATUS )
 
                   CALL MSG_SETC( 'T1', TYPE1 )
@@ -237,11 +237,11 @@
      :                    '    Image type changed from "^T1" to "^T2"',
      :                           TEXT( INDEX ), TLEN, STATUS )
 
-                  CALL MSG_OUTIF( MSG__NORM, 'SETIMAGE_MSG3', 
+                  CALL MSG_OUTIF( MSG__NORM, 'SETIMAGE_MSG3',
      :                            TEXT( INDEX ), STATUS )
 
-               ELSE IF( ITEM .EQ. 'BAND' ) THEN      
-            
+               ELSE IF( ITEM .EQ. 'BAND' ) THEN
+
                   CALL CMP_PUT0I( LOC1, 'BAND', BAND2, STATUS )
 
                   CALL MSG_SETI( 'B1', I90__WAVEL( BAND1 ) )
@@ -250,7 +250,7 @@
      :            '    Image waveband changed from ^B1 um to ^B2 um',
      :                           TEXT( INDEX ), TLEN, STATUS )
 
-                  CALL MSG_OUTIF( MSG__NORM, 'SETIMAGE_MSG4', 
+                  CALL MSG_OUTIF( MSG__NORM, 'SETIMAGE_MSG4',
      :                            TEXT( INDEX ), STATUS )
 
                ELSE
@@ -266,7 +266,7 @@
 
 *  Update the history of the modified NDF.
             CALL IRM_HIST( 'HISTORY', INDF1, 'IRAS90:SETIMAGE', NITEM,
-     :                     TEXT, STATUS )            
+     :                     TEXT, STATUS )
 
          END IF
 
@@ -296,13 +296,13 @@
       CALL GRP_DELET( IGRP3, STATUS )
       CALL GRP_DELET( IGRP4, STATUS )
 
-*  End the NDF context. 
+*  End the NDF context.
       CALL NDF_END( STATUS )
 
 *  If an error occurred, clear up.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was equested, 
+*  If a null parameter was given or a parameter abort was equested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

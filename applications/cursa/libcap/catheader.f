@@ -78,7 +78,7 @@
 *     If ok then
 *       Obtain the flag indicating whether or not an output file is to
 *       be written.
-*       Convert this flag to the form required by the output 
+*       Convert this flag to the form required by the output
 *       subroutines.
 *       Obtain the name of the catalogue.
 *       If an output file is required then
@@ -130,7 +130,7 @@
 *  External References:
       INTEGER CHR_LEN
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CI,       ! Catalogue identifier.
      :  LCNAME,   ! Length of CNAME (excl. trail. blanks).
      :  LOFILE,   !   "    "  OFILE ( "  .   "  .   "   ).
@@ -185,7 +185,7 @@
             CALL PAR_CANCL ('FILE', STATUS)
 
 *
-*          Convert this flag to the form required by the output 
+*          Convert this flag to the form required by the output
 *          subroutines.
 
             IF (FILE) THEN
@@ -201,7 +201,7 @@
 
 *
 *          If an output file is required then: attempt to get a freed
-*          Fortran unit number, assemble the file name and attempt to 
+*          Fortran unit number, assemble the file name and attempt to
 *          open the file.
 
             IF (FILE) THEN
@@ -227,7 +227,7 @@
 *
 *          Determine the mode to be used and set the flags appropriately.
 
-            CALL PAR_CHOIC ('DETAIL', 'SUMMARY', 
+            CALL PAR_CHOIC ('DETAIL', 'SUMMARY',
      :        'SUMMARY,COLUMNS,PARAMETERS,TEXT,AST,FULL', .FALSE.,
      :        DETAIL, STATUS)
 

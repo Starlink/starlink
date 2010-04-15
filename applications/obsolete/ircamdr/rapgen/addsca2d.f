@@ -1,7 +1,7 @@
 
 *+  ADDSCA2D - add scalar to every pixel of a 2-d array
 
-      SUBROUTINE ADDSCA2D ( INARRAY, DIMS1, DIMS2, SCALAR, OUTARRAY, 
+      SUBROUTINE ADDSCA2D ( INARRAY, DIMS1, DIMS2, SCALAR, OUTARRAY,
      :                      STATUS )
 
 *    Description :
@@ -64,7 +64,7 @@
 *    Local variables :
 
       INTEGER
-     :   I, J             ! counter variables 
+     :   I, J             ! counter variables
 
 *-
 *    check status on entry - return if not o.k.

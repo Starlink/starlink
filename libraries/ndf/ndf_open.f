@@ -57,12 +57,12 @@
 *     be opened in a sub-component (or a sub-sub-component...) of the
 *     structure identified by the locator LOC.  Array subscripts may
 *     also be used in this component name.  Thus a string such as
-*     'MYSTRUC.ZONE(2).IMAGE' could be used as a valid NAME value. 
+*     'MYSTRUC.ZONE(2).IMAGE' could be used as a valid NAME value.
 *     -  An NDF can be opened within an explicitly named container file
 *     by supplying the symbolic value DAT__ROOT for the LOC argument
 *     and giving a full HDS object name (including a container file
 *     specification) for the NAME argument.
-*     -  If a blank value is given for the NAME argument, then the 
+*     -  If a blank value is given for the NAME argument, then the
 *     NDF will be the object identified directly by the locator LOC.
 *     -  If a placeholder is to be returned and the new NDF is to be a
 *     top-level object, then a new container file will be created.
@@ -91,12 +91,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -129,7 +129,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,7 +138,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
@@ -215,7 +215,7 @@
                END IF
 
 *  Report an error if READ access was requested.
-            ELSE 
+            ELSE
                STATUS = NDF__MODIN
                CALL ERR_REP( 'NDF_OPEN_RD1',
      :                       'READ access is not permitted when ' //
@@ -255,7 +255,7 @@
 
 *  Report an error if READ access was requested and the NDF didn't
 *  exist.
-               ELSE 
+               ELSE
                   STATUS = NDF__MODIN
                   CALL ERR_REP( 'NDF_OPEN_RD2',
      :                          'READ access is not permitted when ' //

@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,14 +92,14 @@ typedef struct AstGrismMap {
    AstMapping mapping;           /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   double nr;    
-   double nrp;   
-   double waver; 
-   double alpha; 
-   double g;     
-   double m;     
-   double eps;   
-   double theta; 
+   double nr;
+   double nrp;
+   double waver;
+   double alpha;
+   double g;
+   double m;
+   double eps;
+   double theta;
    double k1;
    double k2;
    double k3;
@@ -162,7 +162,7 @@ typedef struct AstGrismMapVtab {
 
 } AstGrismMapVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -203,7 +203,7 @@ AstGrismMap *astLoadGrismMap_( void *, size_t, AstGrismMapVtab *,
                              const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitGrismMapGlobals_( AstGrismMapGlobals * );
 #endif
 

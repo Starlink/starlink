@@ -12,13 +12,13 @@
 
 *  Invocation:
 *     CALL POINA8( SMPLBD, SMPUBD, DATA, OUTSMP,
-*                  DETER2, INTRDA, OUTWAV,  STATUS ) 
+*                  DETER2, INTRDA, OUTWAV,  STATUS )
 
 *  Description:
 *     The subroutine first examines the input data and creates an array
-*     in which any bad values within the range to be scanned are given 
+*     in which any bad values within the range to be scanned are given
 *     a value that is an interpolation of the adjoining values.
-*     The subroutine then filters the intermediate data series with an 
+*     The subroutine then filters the intermediate data series with an
 *     eight-point zero-sum square-wave filter which is defined as:
 *
 *     Y(i) = - X(i) - X(i+1) + X(i+2) + X(i+3)
@@ -27,7 +27,7 @@
 *     The subroutine writes bad values either at the begining and end of the
 *     scan where the data is not in the range over which the square wave filter
 *     is to be applied
-*     
+*
 *  Arguments:
 *     SMPLBD = INTEGER (Given)
 *        Lower limit of the sample index in the current NDF
@@ -64,7 +64,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
       INTEGER SMPLBD
       INTEGER SMPUBD
       REAL DATA( SMPLBD : SMPUBD )
-      INTEGER OUTSMP( 2 )  
+      INTEGER OUTSMP( 2 )
 
 *  Arguments Returned:
       LOGICAL DETER2
@@ -94,9 +94,9 @@
       LOGICAL FOUNDS             ! TRUE indicates first non bad value in range
 				 ! considered has been found
       INTEGER IDALBD             ! sample number of the first valid data value
-				 ! found 
+				 ! found
       INTEGER IDAUBD             ! The sample number of the last valid data
-				 ! value found 
+				 ! value found
       INTEGER ISAMP              ! Do loop index
       INTEGER IISAMP             ! Do loop index
       INTEGER IINTRD             ! Index to sample number in interpolated data
@@ -115,7 +115,7 @@
       IDALBD = 0
       IDAUBD = 0
 
-*  Search the input data for the first valid sample after the start of the 
+*  Search the input data for the first valid sample after the start of the
 *  range to be evaluated
       FOUNDS = .FALSE.
       ISAMP = OUTSMP( 1 )
@@ -127,8 +127,8 @@
             ISAMP = ISAMP + 1
          END IF
       END DO
-      
-*  Search the input data for the last valid sample before the end of the 
+
+*  Search the input data for the last valid sample before the end of the
 *  range to be evaluated
       FOUNDL = .FALSE.
       ISAMP = OUTSMP( 2 )
@@ -140,7 +140,7 @@
             ISAMP = ISAMP - 1
          END IF
       END DO
-      
+
 
 * Check that sufficient data has been found for at least one square wave
 * calculation
@@ -172,7 +172,7 @@
            IISAMP = ISAMP + 1
            DO WHILE ( ( .NOT. FOUNDN ) .AND. ( IISAMP .NE. IDAUBD ) )
               IF ( DATA( IISAMP ) .NE. VAL__BADR ) THEN
-      
+
 * Good value found interpolate between last good value and this value
                  WEIGHL = REAL( ( IISAMP - LASTG )
      :                          / ( IISAMP - LASTG + 1 ) )
@@ -184,9 +184,9 @@
 
 * Good value not found search for next
               ELSE
-                 IISAMP = IISAMP + 1     
+                 IISAMP = IISAMP + 1
               END IF
-* 
+*
            END DO
         END IF
       END DO
@@ -194,12 +194,12 @@
 *  Calculate the filtered data for each sample along the length from
 
       DO ISAMP = IDALBD, IDAUBD - 7
-      
+
 * Calculate the square wave filtered output
          OUTWAV( ISAMP ) = - INTRDA( ISAMP )     - INTRDA( ISAMP + 1 )
      :                     + INTRDA( ISAMP + 2 ) + INTRDA( ISAMP + 3 )
-     :                     + INTRDA( ISAMP + 4 ) + INTRDA( ISAMP + 5 ) 
-     :                     - INTRDA( ISAMP + 6 ) - INTRDA( ISAMP + 7 ) 
+     :                     + INTRDA( ISAMP + 4 ) + INTRDA( ISAMP + 5 )
+     :                     - INTRDA( ISAMP + 6 ) - INTRDA( ISAMP + 7 )
 
       END DO
 
@@ -208,7 +208,7 @@
       DO ISAMP = IDAUBD - 6, IDAUBD
          OUTWAV( ISAMP ) = VAL__BADR
       END DO
-      
+
 *  If the OUTSMP sample boundaries are outside the length of good data then
 *  alter the boundaries
       IF ( OUTSMP( 1 ) .LT. IDALBD ) OUTSMP( 1 ) = IDALBD

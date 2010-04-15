@@ -20,7 +20,7 @@
       INCLUDE 'QMAN_COMMON.BLK'       ! Task common block
 *    Local variables :
       INTEGER ICOUNT                  ! Counter
-      DOUBLE PRECISION MINDATE        ! Minimum date 
+      DOUBLE PRECISION MINDATE        ! Minimum date
 *-
 
 *   Return immediately if status bad.
@@ -29,7 +29,7 @@
 *   Search for smallest record
       MINDATE = VAL__MAXD
       DO ICOUNT = 0, MAX_QENTRIES, 1
-        IF ( ( DATEQ( ICOUNT ) .LT. MINDATE ) .AND. 
+        IF ( ( DATEQ( ICOUNT ) .LT. MINDATE ) .AND.
      :       ( DATEQ( ICOUNT ) .NE. 0.0 ) ) THEN
           MINDATE = DATEQ( ICOUNT )
           READREC_PTR = ICOUNT

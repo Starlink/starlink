@@ -73,7 +73,7 @@
           CALL P4_GRAPH( PORT, STATUS )
         ELSE IF ( DISPLAY_TYPE( PORT ) .EQ. 'HISTOGRAM' ) THEN
           CALL P4_HISTOGRAM( PORT, STATUS )
-        ENDIF 
+        ENDIF
       ELSE
         CALL P4_SELWINDOW( PORT, STATUS )
       ENDIF
@@ -93,7 +93,7 @@
         CALL ERR_REP( ' ', 'P4_GET_CURSOR: '/
      :    /'PGPLOT error while reading cursor, Status = ^ES', STATUS )
       ELSE
-  
+
 *      All OK, mark the point
         CALL ERR_ANNUL( STATUS )
         CALL PGPOINT( 1, X, Y, 5 )

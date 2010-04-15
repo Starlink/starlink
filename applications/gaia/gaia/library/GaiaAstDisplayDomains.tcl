@@ -239,7 +239,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
       $itk_option(-rtdimage) astset current $current
       start_trace_
    }
-   
+
    #  Called when new coordinates are to be shown.
    protected method update_readouts_ { args } {
 

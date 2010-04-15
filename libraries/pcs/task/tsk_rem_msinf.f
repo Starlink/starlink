@@ -128,8 +128,8 @@
      :    ( MESMESSID(I) .EQ. MESSID ) ) THEN
             IF ( I .EQ. TASK__MAXSUB ) THEN
 *
-*            Entry is at the very end of the arrays. Need to restart 
-*            high water mark. Decrement I to force going around the loop 
+*            Entry is at the very end of the arrays. Need to restart
+*            high water mark. Decrement I to force going around the loop
 *            again.
 *
                MESACTPTR(I) = 0

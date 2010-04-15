@@ -13,11 +13,11 @@
 #     start
 #
 #  Description:
-#     This procedure defining the links needed to execute 
+#     This procedure defining the links needed to execute
 #     each application from the current directory.
 #
 #  Notes:
-#     The installation target is set outside of this script. 
+#     The installation target is set outside of this script.
 #     A test is made to see if the environment variable INSTALL
 #     has been set.
 #
@@ -59,21 +59,21 @@ endif
 
 if !($?REBIN) then
    echo ""
-   echo "   Environment Variable REBIN is not set.  Setting" 
+   echo "   Environment Variable REBIN is not set.  Setting"
    echo "   REBIN to be INSTALL_BIN"
    echo ""
    setenv REBIN INSTALL_BIN
 endif
 if !($?RECAL) then
    echo ""
-   echo "   Environment Variable RECAL is not set.  Setting" 
+   echo "   Environment Variable RECAL is not set.  Setting"
    echo "   RECAL to be INSTALL_DATA"
    echo ""
    setenv RECAL INSTALL_DATA
 endif
 if !($?REDOCS) then
    echo ""
-   echo "   Environment Variable REDOCS is not set.  Setting" 
+   echo "   Environment Variable REDOCS is not set.  Setting"
    echo "   REDOCS to be INSTALL_BIN"
    echo ""
    setenv REDOCS INSTALL_BIN

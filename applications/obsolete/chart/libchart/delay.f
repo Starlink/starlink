@@ -11,7 +11,7 @@
 *
 *   History:
 *
-*     8-DEC-1988  
+*     8-DEC-1988
 *       Modified by Peter Allan (MAVAD::PMA) and Tim Wilkins (MAVAD::TNW)
 *       to use GKS 7.2 instead of GKS 6.2.
 *     25-FEB-1993
@@ -30,18 +30,18 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF (PIC) THEN
- 
+
 *   Read Response to  message from Terminal
 
          CALL PAR_GET0C( 'CONTINUE', TEXT, STATUS )
- 
+
 *   Clear the Workstation at the End of the Plot
- 
+
          CALL GCLRWK (IWKID,1)
- 
+
       ENDIF
- 
+
       END
 

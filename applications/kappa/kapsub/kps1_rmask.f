@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_RMASK( INDF, COMP, THIS, MAP, INSIDE, VAL, 
+      SUBROUTINE KPS1_RMASK( INDF, COMP, THIS, MAP, INSIDE, VAL,
      :                       STATUS )
 *+
 *  Name:
@@ -18,20 +18,20 @@
 *     to define the area to be masked.
 
 *  Arguments:
-*     INDF = INTEGER (Given) 
+*     INDF = INTEGER (Given)
 *        The NDF to be masked.
-*     COMP = CHARACTER * ( * ) (Given) 
+*     COMP = CHARACTER * ( * ) (Given)
 *        The name of the NDF component to be masked.
 *     THIS = INTEGER (Given)
-*        Pointer to a Region. 
+*        Pointer to a Region.
 *     MAP = INTEGER (Given)
 *        Pointer to a Mapping. The forward transformation should map
 *	 positions in the coordinate system of the supplied Region into
-*	 a coordinate system that is offset on each axis by half a pixel 
+*	 a coordinate system that is offset on each axis by half a pixel
 *        from pixel coordinates. So, if a 2D NDF has pixel origin [i,j],
 *        then the **centre** of the bottom left pixel should be
 *        [REAL(I),REAL(J)]. With the usual Starlink pixel coordinate
-*        system, these coordinates would be assigned to the **top left 
+*        system, these coordinates would be assigned to the **top left
 *        corner** of the bottom right pixel.
 *     INSIDE = INTEGER (Given)
 *        A boolean value which indicates which pixel are to be masked. If
@@ -88,7 +88,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,13 +110,13 @@
       INTEGER STATUS              ! Global status
 
 *  External references:
-      INTEGER VAL_DTOI 
-      REAL VAL_DTOR 
-      DOUBLE PRECISION VAL_DTOD 
-      INTEGER*2 VAL_DTOW 
-      INTEGER*2 VAL_DTOUW 
-      BYTE VAL_DTOB 
-      BYTE VAL_DTOUB 
+      INTEGER VAL_DTOI
+      REAL VAL_DTOR
+      DOUBLE PRECISION VAL_DTOD
+      INTEGER*2 VAL_DTOW
+      INTEGER*2 VAL_DTOUW
+      BYTE VAL_DTOB
+      BYTE VAL_DTOUB
 
 *  Local Variables:
       CHARACTER DTYPE*(NDF__SZFTP)! Data type for output components
@@ -144,38 +144,38 @@
 
 *  Call appropriate routines depending on the data type.
       IF( ITYPE .EQ. '_INTEGER' ) THEN
-         N = AST_MASKI( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
-     :                  %VAL( CNF_PVAL( IPD ) ), 
+         N = AST_MASKI( THIS, MAP, INSIDE, NDIM, LBND, UBND,
+     :                  %VAL( CNF_PVAL( IPD ) ),
      :                  VAL_DTOI( .TRUE., VAL, STATUS ), STATUS )
 
       ELSE IF( ITYPE .EQ. '_REAL' ) THEN
-         N = AST_MASKR( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
-     :                  %VAL( CNF_PVAL( IPD ) ),  
+         N = AST_MASKR( THIS, MAP, INSIDE, NDIM, LBND, UBND,
+     :                  %VAL( CNF_PVAL( IPD ) ),
      :                  VAL_DTOR( .TRUE., VAL, STATUS ), STATUS )
 
       ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-         N = AST_MASKD( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
-     :                  %VAL( CNF_PVAL( IPD ) ),  
+         N = AST_MASKD( THIS, MAP, INSIDE, NDIM, LBND, UBND,
+     :                  %VAL( CNF_PVAL( IPD ) ),
      :                  VAL_DTOD( .TRUE., VAL, STATUS ), STATUS )
-  
+
       ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-         N = AST_MASKW( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
-     :                  %VAL( CNF_PVAL( IPD ) ),  
+         N = AST_MASKW( THIS, MAP, INSIDE, NDIM, LBND, UBND,
+     :                  %VAL( CNF_PVAL( IPD ) ),
      :                  VAL_DTOW( .TRUE., VAL, STATUS ), STATUS )
-  
+
       ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
          N = AST_MASKUW( THIS, MAP, INSIDE, NDIM, LBND, UBND,
-     :                   %VAL( CNF_PVAL( IPD ) ),  
+     :                   %VAL( CNF_PVAL( IPD ) ),
      :                  VAL_DTOUW( .TRUE., VAL, STATUS ), STATUS )
-  
+
       ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
-         N = AST_MASKB( THIS, MAP, INSIDE, NDIM, LBND, UBND, 
-     :                  %VAL( CNF_PVAL( IPD ) ),  
+         N = AST_MASKB( THIS, MAP, INSIDE, NDIM, LBND, UBND,
+     :                  %VAL( CNF_PVAL( IPD ) ),
      :                  VAL_DTOB( .TRUE., VAL, STATUS ), STATUS )
-  
+
       ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
          N = AST_MASKUB( THIS, MAP, INSIDE, NDIM, LBND, UBND,
-     :                   %VAL( CNF_PVAL( IPD ) ),  
+     :                   %VAL( CNF_PVAL( IPD ) ),
      :                   VAL_DTOUB( .TRUE., VAL, STATUS ), STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN

@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     CFRM = INTEGER (Given)
-*        A pointer to the current Frame of the NDF.  This must have NAXC 
+*        A pointer to the current Frame of the NDF.  This must have NAXC
 *        axes.
 *     LOGF = LOGICAL (Given)
 *        Should the results be written to a log file?
@@ -98,7 +98,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Any title.     
+*  Any title.
       IF ( TITLE .NE. ' ' ) THEN
          LINE = 'Title: '
          IAT = 7
@@ -110,8 +110,8 @@
          IF ( LOGF ) THEN
             CALL FIO_WRITE( FDL, LINE( : IAT ), STATUS )
             CALL FIO_WRITE( FDL, ' ', STATUS )
-         END IF            
-      END IF         
+         END IF
+      END IF
 
 *  We need a string holding a list of the axis symbols and units.
       STRING = ' '
@@ -130,7 +130,7 @@
 *  Get the Symbol value.
          ATTVAL = AST_GETC( CFRM, ATTR( : LATTR ), STATUS )
 
-*  If blank, use "??". 
+*  If blank, use "??".
          IF ( ATTVAL .EQ. ' ' ) ATTVAL = '??'
 
 *  Append to the string.
@@ -166,7 +166,7 @@
       LINE = '    Co-ordinates    :'
       IAT = 22
 
-*  If any of the axis had non-blank units, append the list of symbols and 
+*  If any of the axis had non-blank units, append the list of symbols and
 *  units to the header.
       IF ( NUN .GT. 0 ) CALL CHR_APPND( STRING, LINE, IAT )
 
@@ -177,6 +177,6 @@
       IF ( LOGF ) THEN
          CALL FIO_WRITE( FDL, LINE( : IAT ), STATUS )
          CALL FIO_WRITE( FDL, ' ', STATUS )
-      END IF            
+      END IF
 
       END

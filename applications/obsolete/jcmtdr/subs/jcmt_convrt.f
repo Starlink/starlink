@@ -1,4 +1,4 @@
-      SUBROUTINE JCMT_CONVERT (NPIXEL, COORD, MJDSTART, B1950, RA, DEC, 
+      SUBROUTINE JCMT_CONVERT (NPIXEL, COORD, MJDSTART, B1950, RA, DEC,
      :   STATUS)
 *+
 *  Name:
@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  precess to 2000 then convert to FK4
 
             DO I = 1, NPIXEL
-               CALL SLA_PRECES ('FK5', JCURRENT, 2000.0D0, RA(I), 
+               CALL SLA_PRECES ('FK5', JCURRENT, 2000.0D0, RA(I),
      :            DEC(I))
                CALL SLA_FK54Z (RA(I), DEC(I), 1950D0, RA(I), DEC(I),
      :            DIGNORE, DIGNORE)
@@ -114,9 +114,9 @@
 *  precess to 1950 then convert
 
             DO I = 1, NPIXEL
-               CALL SLA_PRECES ('FK4', BCURRENT, 1950.0D0, RA(I), 
+               CALL SLA_PRECES ('FK4', BCURRENT, 1950.0D0, RA(I),
      :            DEC(I))
-               CALL SLA_FK45Z (RA(I), DEC(I), 1950.0D0, RA(I), 
+               CALL SLA_FK45Z (RA(I), DEC(I), 1950.0D0, RA(I),
      :            DEC(I))
             END DO
 
@@ -125,7 +125,7 @@
 *  precess to 2000
 
             DO I = 1, NPIXEL
-               CALL SLA_PRECES ('FK5', JCURRENT, 2000.0D0, RA(I), 
+               CALL SLA_PRECES ('FK5', JCURRENT, 2000.0D0, RA(I),
      :            DEC(I))
             END DO
          END IF

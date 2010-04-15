@@ -21,7 +21,7 @@
 *     function of the distance from the trace centre to the expected
 *     source position. The width of the Gaussian function are determined
 *     by the given value which specifies the value of the Gaussian
-*     function at the edge of the detector.  
+*     function at the edge of the detector.
 
 *  Arguments:
 *     NCRDD = INTEGER (Given)
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -94,7 +94,7 @@
       REAL EDGDIS                ! Distance from det. edge to it centre
       REAL GFPAR                 ! Gaussian function parameter
       INTEGER I, J               ! Do loop indices
-                 
+
 *.
 
 *  Check inherited global status.
@@ -136,6 +136,6 @@
          END DO
       END DO
 
- 999  CONTINUE      
+ 999  CONTINUE
 
       END

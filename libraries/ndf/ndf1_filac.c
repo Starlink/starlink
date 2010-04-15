@@ -205,8 +205,8 @@
 	       emsRep( "NDF1_FILAC_3",
 		          "Routine NDF1_FILAC called with an invalid file \
 access mode of \'^MODE\' (internal programming error).", STATUS );
-	    }	    
-	    
+	    }
+
 /* Enquire if the requested file access is available and set *OK	    */
 /* accordingly.								    */
 	    if ( *STATUS == SAI__OK )

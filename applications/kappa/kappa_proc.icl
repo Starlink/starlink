@@ -183,7 +183,7 @@ HIDDEN PROC LUTFC
 {
 {  Notes:
 {     This is a procedure that calls LUTABLE.  Therefore, the ADAM
-{     parameter cannot be specified on the command line.  You will 
+{     parameter cannot be specified on the command line.  You will
 {     only be prompted for the DEVICE parameter if the device current
 {     image display is not suitable or not available.
 
@@ -317,7 +317,7 @@ HIDDEN PROC LUTIKON
 
 {  Description:
 {     This procedure loads the default Ikon lookup table with linear
-{     scaling into the current image-display device.  
+{     scaling into the current image-display device.
 
 {  Usage:
 {     lutikon

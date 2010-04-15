@@ -27,7 +27,7 @@
 #     18 Aug 1992 (hme):
 #        Original Version
 #     30 Nov 1995 (mjc):
-#        Stole some parts of Horst's FIGARO setup.     
+#        Stole some parts of Horst's FIGARO setup.
 #     22-Sep-2000 (ng):
 #        Converted to sh script from csh.
 #     {enter_changes_here}
@@ -57,7 +57,7 @@ AAA_KEYWORDS=${ECHOMOP_BASE}/data/aaa_key.txt;	export AAA_KEYWORDS
 
 echmenu () { ${ECHOMOP_EXEC}/echmenu; }
 
-#  I don't understand what this command is for -- it can only be used if 
+#  I don't understand what this command is for -- it can only be used if
 #  ECHOMOP has already been set up...
 #echomopsetup () { "source ${ECHOMOP_EXEC}/echomop.csh"; }
 echomopsetup () { echo "ECHOMOP version @PACKAGE_VERSION@ is already set up"; }

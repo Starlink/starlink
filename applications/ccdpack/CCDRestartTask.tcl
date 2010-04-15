@@ -56,14 +56,14 @@ proc CCDRestartTask { task } {
 #.
 
 #  Check application is known.
-   if { [info exists TASK($task,monolith)] } { 
+   if { [info exists TASK($task,monolith)] } {
 
 #  Kill the associated monolith.
       $MONOLITH($TASK($task,monolith),taskname) kill
 
 #  And restart it.
       CCDTaskStart $task
-   } else { 
+   } else {
       CCDIssueError "Cannot restart unknown task ($task)"
    }
 

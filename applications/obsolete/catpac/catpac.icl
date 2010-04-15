@@ -68,30 +68,30 @@ define upp(aram)            $CATPAC_DIR/catpac_pm
 
 
 { Define CATPAC's help from ICL
-defhelp  addparam          $CATPAC_HELP 
-defhelp  asciitocat        $CATPAC_HELP 
-defhelp  catrename         $CATPAC_HELP 
-defhelp  catreport         $CATPAC_HELP 
-defhelp  catsearch         $CATPAC_HELP 
-defhelp  catsort           $CATPAC_HELP 
-defhelp  copycat           $CATPAC_HELP 
-defhelp  delcat            $CATPAC_HELP 
-defhelp  delparam          $CATPAC_HELP 
-defhelp  entries           $CATPAC_HELP 
-defhelp  fieldinfo         $CATPAC_HELP 
-defhelp  fields            $CATPAC_HELP 
-defhelp  fk425             $CATPAC_HELP 
-defhelp  fk524             $CATPAC_HELP 
-defhelp  fk45z             $CATPAC_HELP 
-defhelp  fk54z             $CATPAC_HELP 
-defhelp  globals           $CATPAC_HELP 
-defhelp  join              $CATPAC_HELP 
-defhelp  paraminfo         $CATPAC_HELP 
+defhelp  addparam          $CATPAC_HELP
+defhelp  asciitocat        $CATPAC_HELP
+defhelp  catrename         $CATPAC_HELP
+defhelp  catreport         $CATPAC_HELP
+defhelp  catsearch         $CATPAC_HELP
+defhelp  catsort           $CATPAC_HELP
+defhelp  copycat           $CATPAC_HELP
+defhelp  delcat            $CATPAC_HELP
+defhelp  delparam          $CATPAC_HELP
+defhelp  entries           $CATPAC_HELP
+defhelp  fieldinfo         $CATPAC_HELP
+defhelp  fields            $CATPAC_HELP
+defhelp  fk425             $CATPAC_HELP
+defhelp  fk524             $CATPAC_HELP
+defhelp  fk45z             $CATPAC_HELP
+defhelp  fk54z             $CATPAC_HELP
+defhelp  globals           $CATPAC_HELP
+defhelp  join              $CATPAC_HELP
+defhelp  paraminfo         $CATPAC_HELP
 defhelp  params            $CATPAC_HELP
-defhelp  properm           $CATPAC_HELP 
-defhelp  sample            $CATPAC_HELP 
-defhelp  upfield           $CATPAC_HELP 
-defhelp  upparam           $CATPAC_HELP 
+defhelp  properm           $CATPAC_HELP
+defhelp  sample            $CATPAC_HELP
+defhelp  upfield           $CATPAC_HELP
+defhelp  upparam           $CATPAC_HELP
 
 { Now repeat for the full names
 

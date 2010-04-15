@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,7 +102,7 @@
       INTEGER FTUNIT
       INTEGER I
       INTEGER IAT
-      INTEGER IDX      
+      INTEGER IDX
       INTEGER IPAR
       INTEGER SIZE
       LOGICAL FLAG
@@ -117,14 +117,14 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Create a new group. 
+*  Create a new group.
       CALL GRP_NEW( ' ', IGRP, STATUS )
 
 *  Get the value of the parameter using SUBPAR to avoid interpretation of
 *  the string by the parameter system.
       CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
       CALL SUBPAR_GETNAME( IPAR, FNAME, STATUS )
-      
+
 *  Work out if the file is a FITS file, by seeing if it has a
 *  .fit or .fits or .fits-and-anything extension
       ISFITS = .FALSE.
@@ -147,8 +147,8 @@
          FTBKSZ = 1
          FTSTAT = 0
          CALL FTGIOU( FTUNIT, FTSTAT )
-         CALL FTOPEN( FTUNIT, FNAME, 0, FTBKSZ, FTSTAT ) 
-      
+         CALL FTOPEN( FTUNIT, FNAME, 0, FTBKSZ, FTSTAT )
+
 *  There was an error opening the file -- perhaps it isn't a FITS
 *  file after all.  So set ISFITS to false, so we have another
 *  go with the other method.
@@ -188,29 +188,29 @@
 *  Switch off all control characters so that nothing gets interpreted by
 *  GRP.
          CALL GRP_SETCC( IGRP, 'COM,DEL,NAM,SEP,OPEN_N,CLOSE_N,FL,'//
-     :                   'OPEN_K,CLOSE_K', '%%%%%%%%%', STATUS ) 
+     :                   'OPEN_K,CLOSE_K', '%%%%%%%%%', STATUS )
 
 *  Read the file into the group.
          CALL GRP_GRPEX( GRPEXP( : IAT ), GRP__NOID, IGRP, SIZE, ADDED,
-     :                   FLAG, STATUS )     
+     :                   FLAG, STATUS )
 
       ENDIF
 
 *  Delete the group if an error occurred.
       IF( STATUS .NE. SAI__OK ) CALL GRP_DELET( IGRP, STATUS )
 
-*  Tell the user where the object came from. 
+*  Tell the user where the object came from.
       IF( IGRP .NE. GRP__NOID ) THEN
          CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
          IF( SIZE .GT. 0 ) THEN
-            CALL MSG_SETC( 'FILE', FNAME ) 
-   
+            CALL MSG_SETC( 'FILE', FNAME )
+
             IF( ISFITS ) THEN
                CALL MSG_SETC( 'TYP', 'FITS' )
-            ELSE 
+            ELSE
                CALL MSG_SETC( 'TYP', 'text' )
             END IF
-   
+
             CALL ATL_NOTIF( '   AST data read from ^TYP file '//
      :                       '''^FILE''.', STATUS )
          END IF

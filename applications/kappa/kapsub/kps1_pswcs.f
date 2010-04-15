@@ -13,13 +13,13 @@
 *     CALL KPS1_PSWCS( INDF, LBND, UBND, X, Y, STATUS )
 
 *  Description:
-*     This routine adds an OFFSET Frame into the WCS component in the NDF 
-*     holding the model PSF (INDF). It is assumed that the centre of the 
+*     This routine adds an OFFSET Frame into the WCS component in the NDF
+*     holding the model PSF (INDF). It is assumed that the centre of the
 *     model PSF is at the centre of the output image.
 *
 *     The Frame added has Domain OFFSET, and becomes the Current Frame.
-*     It measures geodesic distance from the centre of the PSF in the 
-*     direction of the two pixel axes. The output image scale is the 
+*     It measures geodesic distance from the centre of the PSF in the
+*     direction of the two pixel axes. The output image scale is the
 *     same as the input image scale at the supplied star position (PX,PY).
 
 *  Arguments:
@@ -30,10 +30,10 @@
 *     UBND( 2 ) = INTEGER (Given)
 *        Upper pixel index bounds in output NDF.
 *     X( * ) = DOUBLE PRECISION (Given and Returned)
-*        Work space. Must have at least 
+*        Work space. Must have at least
 *        MAX( LBND( 1 ) - LBND( 1 ) + 3, LBND( 2 ) - LBND( 2 ) + 3 ) elements.
 *     Y( * ) = DOUBLE PRECISION (Given and Returned)
-*        Work space. Must have at least 
+*        Work space. Must have at least
 *        MAX( LBND( 1 ) - LBND( 1 ) + 3, LBND( 2 ) - LBND( 2 ) + 3 ) elements.
 *     STATUS = INTEGER (Given)
 *        The global status.
@@ -71,13 +71,13 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -119,8 +119,8 @@
       INTEGER NEWFRM             ! Current Frame for output NDF
       INTEGER NP                 ! Number of points in each LutMap
       INTEGER SDIM( 2 )          ! Significant axis indices
-      INTEGER SLBND( 2 )         ! Significant lower bounds for output NDF 
-      INTEGER SUBND( 2 )         ! Significant upper bounds for output NDF 
+      INTEGER SLBND( 2 )         ! Significant lower bounds for output NDF
+      INTEGER SUBND( 2 )         ! Significant upper bounds for output NDF
       LOGICAL SKYFRM             ! Is input Current Frame a SkyFrame?
 *.
 
@@ -132,7 +132,7 @@
 
 *  Get the current WCS FrameSet from the output NDF. This will have been
 *  propagated from the input NDF.
-      CALL KPG1_ASGET( INDF, 2, .TRUE., .TRUE., .TRUE., SDIM, 
+      CALL KPG1_ASGET( INDF, 2, .TRUE., .TRUE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Get the mapping from Base (GRID) Frame to Current Frame.
@@ -148,31 +148,31 @@
       COUT( 2 ) = 0.5*DBLE( UBND( 2 ) - LBND( 2 ) + 1 ) + 0.5
 
 *  Find the corresponding Current Frame position.
-      CALL AST_TRAN2( MAP, 1, COUT( 1 ), COUT( 2 ), .TRUE., C( 1 ), 
-     :                C( 2 ), STATUS ) 
+      CALL AST_TRAN2( MAP, 1, COUT( 1 ), COUT( 2 ), .TRUE., C( 1 ),
+     :                C( 2 ), STATUS )
 
-*  Store the GRID co-ordinates along a uniformly spaced row of points 
+*  Store the GRID co-ordinates along a uniformly spaced row of points
 *  passing through the centre of the output NDF, and parallel to axis 1.
-*  The points are 1 pixel apart, and the row extends 1 pixel beyond the 
-*  edges of the output image. The central point is co-incident with the 
+*  The points are 1 pixel apart, and the row extends 1 pixel beyond the
+*  edges of the output image. The central point is co-incident with the
 *  centre of the output image.
       NP = UBND( 1 ) - LBND( 1 ) + 3
       DO I = 1, NP
-         X( I ) = DBLE( I ) - 1.0 
+         X( I ) = DBLE( I ) - 1.0
          Y( I ) = COUT( 2 )
       END DO
 
 *  Map these input GRID positions into the current Frame.
-      CALL AST_TRAN2( MAP, NP, X, Y, .TRUE., X, Y, STATUS ) 
+      CALL AST_TRAN2( MAP, NP, X, Y, .TRUE., X, Y, STATUS )
 
-*  Find the geodesic distance from the centre of the first output pixel in 
+*  Find the geodesic distance from the centre of the first output pixel in
 *  this row to the centre of the image.
       D( 1 ) = X( 1 )
       D( 2 ) = Y( 1 )
-      DIST0 = AST_DISTANCE( FRM, D, C, STATUS ) 
+      DIST0 = AST_DISTANCE( FRM, D, C, STATUS )
 
 *  Find the geodesic distance from the centre of the output image to each
-*  pixel in this row, and store it in array Y. 
+*  pixel in this row, and store it in array Y.
       DO I = 1, NP
          E( 1 ) = X( I )
          E( 2 ) = Y( I )
@@ -194,7 +194,7 @@
 
 *  Create a LutMap giving geodesic distance from the centre as a function of
 *  output Grid position for the first axis.
-      LMAP1 = AST_LUTMAP( NP, Y, 0.0D0, 1.0D0, ' ', STATUS ) 
+      LMAP1 = AST_LUTMAP( NP, Y, 0.0D0, 1.0D0, ' ', STATUS )
 
 *  Do the same for the second axis...
 
@@ -205,20 +205,20 @@
       NP = UBND( 2 ) - LBND( 2 ) + 3
       DO I = 1, NP
          X( I ) = COUT( 1 )
-         Y( I ) = DBLE( I ) - 1.0 
+         Y( I ) = DBLE( I ) - 1.0
       END DO
 
 *  Map these input GRID positions into the current Frame.
-      CALL AST_TRAN2( MAP, NP, X, Y, .TRUE., X, Y, STATUS ) 
+      CALL AST_TRAN2( MAP, NP, X, Y, .TRUE., X, Y, STATUS )
 
-*  Find the geodesic distance from the centre of the first output pixel in 
+*  Find the geodesic distance from the centre of the first output pixel in
 *  this column to the centre of the image.
       D( 1 ) = X( 1 )
       D( 2 ) = Y( 1 )
-      DIST0 = AST_DISTANCE( FRM, D, C, STATUS ) 
+      DIST0 = AST_DISTANCE( FRM, D, C, STATUS )
 
 *  Find the geodesic distance from the centre of the output image to each
-*  pixel in this column, and store it in array Y. 
+*  pixel in this column, and store it in array Y.
       DO I = 1, NP
          E( 1 ) = X( I )
          E( 2 ) = Y( I )
@@ -235,11 +235,11 @@
 
 *  Create a LutMap giving geodesic distance from the centre as a function of
 *  output Grid position for the second axis.
-      LMAP2 = AST_LUTMAP( NP, Y, 0.0D0, 1.0D0, ' ', STATUS ) 
+      LMAP2 = AST_LUTMAP( NP, Y, 0.0D0, 1.0D0, ' ', STATUS )
 
 *  Combine the two 1D LutMaps into a 2D Mapping, from output GRID Frame
 *  to geodesic offset from the image centre within the current Frame.
-      CMAP = AST_CMPMAP( LMAP1, LMAP2, .FALSE., ' ', STATUS )      
+      CMAP = AST_CMPMAP( LMAP1, LMAP2, .FALSE., ' ', STATUS )
 
 *  We now construct a suitable current Frame for the output NDF.
       NEWFRM = AST_FRAME( 2, ' ', STATUS )
@@ -272,7 +272,7 @@
 *  The NDF may contain more than 2 pixel axes (i.e. there may be some
 *  additional insignificant pixel axes that were ignored by KPG1_ASGET).
 *  If so we need to modify the Mapping created above to include the
-*  ignored pixel axes. 
+*  ignored pixel axes.
       IF( NDIM .GT. 2 ) THEN
 
 *  Create a PermMap that transforms NDIM-dimensional GRID coords within
@@ -285,7 +285,7 @@
          INPERM( SDIM( 1 ) ) = 1
          INPERM( SDIM( 2 ) ) = 2
 
-         CMAP = AST_CMPMAP( AST_PERMMAP( NDIM, INPERM, 2, SDIM, 1.0D0, 
+         CMAP = AST_CMPMAP( AST_PERMMAP( NDIM, INPERM, 2, SDIM, 1.0D0,
      :                                   ' ', STATUS ),
      :                      CMAP, .TRUE., ' ', STATUS )
 
@@ -295,7 +295,7 @@
       END IF
 
 *  Add the OFFSET Frame into the FrameSet using the Mapping found above.
-      CALL AST_ADDFRAME( IWCS, AST__BASE, CMAP, NEWFRM, STATUS ) 
+      CALL AST_ADDFRAME( IWCS, AST__BASE, CMAP, NEWFRM, STATUS )
 
 *  Save the modified FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCS, INDF, STATUS )

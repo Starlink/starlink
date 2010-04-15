@@ -16,13 +16,13 @@ Description:
 ;;; Loop to inspect each buffer.
     (save-excursion
       (while l
-	
+
 ;;; Check if the buffer is visiting a file. If so, save it.
 	(if (and (buffer-file-name (car l))
 		 (buffer-modified-p (car l)))
 	    (progn
 	      (set-buffer (car l))
 	      (save-buffer)))
-	
+
 ;;; Increment to inspect the next buffer.
 	(setq l (cdr l))))))

@@ -23,7 +23,7 @@
 *     The name of an NDF is obtained from the environment, using
 *     a parameter named "NDF". If the NDF does not exist then a
 *     field of six plus-signs is displayed. Otherwise, the full
-*     name of the NDF is displayed. 
+*     name of the NDF is displayed.
 
 *  Usage:
 *     CHECK_NDFNAME NDF
@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

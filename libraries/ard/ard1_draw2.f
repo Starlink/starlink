@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_DRAW2( RINDEX, LBND, UBND, MSKSIZ, TYPE, 
-     :                       IWCS, NPAR, PAR, IPB, LBINTB, UBINTB, 
+      SUBROUTINE ARD1_DRAW2( RINDEX, LBND, UBND, MSKSIZ, TYPE,
+     :                       IWCS, NPAR, PAR, IPB, LBINTB, UBINTB,
      :                       STATUS )
 *+
 *  Name:
@@ -7,14 +7,14 @@
 
 *  Purpose:
 *     Initialise a 2D array to hold an interior value at all pixels
-*     through which a specified curve passes, and the exterior value 
+*     through which a specified curve passes, and the exterior value
 *     at all other points.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_DRAW2( RINDEX, LBND, UBND, MSKSIZ, TYPE, IWCS, NPAR, 
+*     CALL ARD1_DRAW2( RINDEX, LBND, UBND, MSKSIZ, TYPE, IWCS, NPAR,
 *                      PAR, IPB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -45,8 +45,8 @@
 *     TYPE = INTEGER (Given)
 *        The symbolic value representing the region type.
 *     IWCS = INTEGER (Given)
-*        An identifer for an AST FrameSet. The Base Frame should be 
-*        PIXEL coordinates within the B array. The Current Frame should 
+*        An identifer for an AST FrameSet. The Base Frame should be
+*        PIXEL coordinates within the B array. The Current Frame should
 *        be user coordinates.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
@@ -62,7 +62,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( 2 ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -128,10 +128,10 @@
 *        CMN_IPBC = INTEGER (Write)
 *           Pointer to the B array passed to the ARD "drawing" routines.
 *        CMN_LBNDC( 2 ) = INTEGER (Write)
-*           The lower bounds of the B array passed to the ARD "drawing" 
+*           The lower bounds of the B array passed to the ARD "drawing"
 *           routines.
 *        CMN_UBNDC( 2 ) = INTEGER (Write)
-*           The upper bounds of the B array passed to the ARD "drawing" 
+*           The upper bounds of the B array passed to the ARD "drawing"
 *           routines.
 *        CMN_LBIBC( 2 ) = INTEGER (Write)
 *           The lower bounds of the interior bounding box passed to the
@@ -164,8 +164,8 @@
       EXTERNAL ARD1_GATTR
 
 *  Local Variables:
-      DOUBLE PRECISION 
-     :        BBOX( 4 )          ! The PIXEL bounds of B 
+      DOUBLE PRECISION
+     :        BBOX( 4 )          ! The PIXEL bounds of B
 
       INTEGER
      :        I,                 ! Loop count
@@ -174,7 +174,7 @@
      :        IPPAR              ! Pointer to memory holding parameters
 
       REAL
-     :        GBOX( 4 )          ! The PIXEL bounds of B 
+     :        GBOX( 4 )          ! The PIXEL bounds of B
 
 *.
 
@@ -186,7 +186,7 @@
 
 *  Reset all pixels within the interior bounding box so that they
 *  hold exterior values. The pixels outside the interior bounding box
-*  already hold exterior values. 
+*  already hold exterior values.
       CALL ARD1_BXSET( 2, LBND, UBND, MSKSIZ, 0, LBINTB,
      :                 UBINTB, %VAL( CNF_PVAL( IPB ) ), STATUS )
 
@@ -194,7 +194,7 @@
 *  curve to user coordinates. This IntrMap needs to know how all about
 *  the region being drawn. Allocate memory for a copy of the supplied
 *  region parameters, and copy them.
-      CALL PSX_CALLOC( NPAR, '_DOUBLE', IPPAR, STATUS ) 
+      CALL PSX_CALLOC( NPAR, '_DOUBLE', IPPAR, STATUS )
       CALL ARD1_COPYD( NPAR, PAR, %VAL( CNF_PVAL( IPPAR ) ), STATUS )
 
 *  Store information needed by the IntraMap transformation routine
@@ -211,7 +211,7 @@
 *  Create the IntraMap.
       IMAP = AST_INTRAMAP( 'ARDDRAW', 1, 2, ' ', STATUS )
 
-*  Initialize the interior bounding box passed in common to the "drawing" 
+*  Initialize the interior bounding box passed in common to the "drawing"
 *  routines.
       DO I = 1, 2
          CMN_LBIBC( I ) = VAL__MAXI
@@ -227,7 +227,7 @@
          CMN_UBNDC( I ) = UBND( I )
       END DO
 
-*  A straight line in user coords could conceivably correspond to a curve 
+*  A straight line in user coords could conceivably correspond to a curve
 *  in pixel coords, potentially with discontinuities. The AST Plot class
 *  has facilities for transforming curves from one Frame to another,
 *  taking account of any non-linearities and discontinuities. We create
@@ -237,21 +237,21 @@
 *  the grid. First store the bounds of the B array in PIXEL coords.
       GBOX( 1 ) = REAL( LBND( 1 ) ) - 1.0
       GBOX( 2 ) = REAL( LBND( 2 ) ) - 1.0
-      GBOX( 3 ) = REAL( UBND( 1 ) ) 
-      GBOX( 4 ) = REAL( UBND( 2 ) ) 
+      GBOX( 3 ) = REAL( UBND( 1 ) )
+      GBOX( 4 ) = REAL( UBND( 2 ) )
 
-      BBOX( 1 ) = DBLE( GBOX( 1 ) ) 
-      BBOX( 2 ) = DBLE( GBOX( 2 ) ) 
-      BBOX( 3 ) = DBLE( GBOX( 3 ) ) 
-      BBOX( 4 ) = DBLE( GBOX( 4 ) ) 
+      BBOX( 1 ) = DBLE( GBOX( 1 ) )
+      BBOX( 2 ) = DBLE( GBOX( 2 ) )
+      BBOX( 3 ) = DBLE( GBOX( 3 ) )
+      BBOX( 4 ) = DBLE( GBOX( 4 ) )
 
 *  Create the plot. indicating that graphics are to "drawn" using routines
 *  registered by AST_GRFSET.
       IPLOT = AST_PLOT( IWCS, GBOX, BBOX, 'GRF=1', STATUS )
 
-*  Indicate that curves should be drawn to an accuracy of about 0.2 of 
+*  Indicate that curves should be drawn to an accuracy of about 0.2 of
 *  a pixel.
-      CALL AST_SETD( IPLOT, 'TOL', 0.2D0/DBLE( 
+      CALL AST_SETD( IPLOT, 'TOL', 0.2D0/DBLE(
      :    MIN( UBND( 1 ) - LBND( 1 ) + 1, UBND( 2 ) - LBND( 2 ) + 1 ) ),
      :               STATUS )
 
@@ -280,6 +280,6 @@
       CALL AST_END( STATUS )
 
 *  Free memory holding the copy of the supplied region parameters.
-      CALL PSX_FREE( IPPAR, STATUS ) 
+      CALL PSX_FREE( IPPAR, STATUS )
 
       END

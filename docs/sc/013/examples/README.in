@@ -5,7 +5,7 @@ To build all the example programs, give the commands
     ./configure
     make
 
-Some of the programs in here require specific compiler options.  
+Some of the programs in here require specific compiler options.
 
 The configure script should sort these out, but if it fails you might need to
 specify them by hand as arguments to the configure script.  For example:

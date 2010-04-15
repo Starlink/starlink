@@ -13,7 +13,7 @@
  *     Library routine
 
  *  Invocation:
- *     smf_open_file( const Grp * ingrp, size_t index, const char * mode, 
+ *     smf_open_file( const Grp * ingrp, size_t index, const char * mode,
  *                    int flags, smfData ** data, int *status);
 
  *  Arguments:
@@ -384,8 +384,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   if (ndims == 2) {
     if (strncmp(dtype, "_REAL", 5) == 0) {
       /* Change _REAL to _DOUBLE */
-      msgOutif( MSG__DEBUG, "", 
-                "Input file is _REAL, will map as _DOUBLE for internal handling", 
+      msgOutif( MSG__DEBUG, "",
+                "Input file is _REAL, will map as _DOUBLE for internal handling",
                 status );
       one_strlcpy( dtype, "_DOUBLE", sizeof(dtype), status );
     }
@@ -407,12 +407,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     /* Report a warning due to non-standard dimensions for file */
     if ( *status == SAI__OK) {
       msgSeti( "NDIMS", ndims);
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                "Number of dimensions in output, ^NDIMS is not equal to 2 or 3",
                status);
       /* Data is neither flat-fielded nor standard time-series data. However
          in this context "flat" data is really just data that doesn't
-         need to be de-compressed using the sc2store library, so we set 
+         need to be de-compressed using the sc2store library, so we set
          isFlat to true */
       isTseries = 0;
       isFlat = 1;
@@ -453,7 +453,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                    "the SCANFIT coefficients", status);
           } else {
             /* Read and store the polynomial coefficients */
-            ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly, 
+            ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly,
                     status );
             poly = tpoly[0];
             ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
@@ -469,16 +469,16 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* If status is bad, then the SCANFIT extension does not
              exist. This is not fatal so annul the error */
           errAnnul(status);
-          msgOutif(MSG__DEBUG," ", 
-                   "SCU2RED exists, but not SCANFIT - continuing", 
+          msgOutif(MSG__DEBUG," ",
+                   "SCU2RED exists, but not SCANFIT - continuing",
                    status);
         }
         /* Annul the locator */
         datAnnul( &xloc, status );
 
       } else {
-        msgOutif(MSG__DEBUG," ", 
-                 "File has no SCU2RED extension: no DA-processed data present", 
+        msgOutif(MSG__DEBUG," ",
+                 "File has no SCU2RED extension: no DA-processed data present",
                  status);
       }
     }
@@ -492,11 +492,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* If access mode is READ, map the QUALITY array only if it
            already existed, and SMF__NOCREATE_QUALITY is not set. However,
-           if the access mode is not READ, create QUALITY by default. 
+           if the access mode is not READ, create QUALITY by default.
            Map first so that QUALITY can be used to mask DATA when it is
            map'd */
 
-        if ( !(flags & SMF__NOCREATE_QUALITY) && 
+        if ( !(flags & SMF__NOCREATE_QUALITY) &&
              ( qexists || strncmp(mode,"READ",4) ) ) {
 
           if ( qexists ) {
@@ -505,13 +505,13 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
               msgOutif(MSG__DEBUG, "", "Quality names defined in file", status);
             } else if (*status == IRQ__NOQNI) {
               errAnnul( status );
-              msgOutif( MSG__DEBUG, "", 
-                        "QUALITY present but no quality names extension in file", 
+              msgOutif( MSG__DEBUG, "",
+                        "QUALITY present but no quality names extension in file",
                         status );
               smf_create_qualname( mode, indf, &qlocs, status );
             }
             /* Last step, map quality */
-            ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, 
+            ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout,
                     status );
           } else {
             /* If no QUALITY, then first check for quality names and
@@ -521,8 +521,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
               errAnnul(status);
               smf_create_qualname( mode, indf, &qlocs, status );
             } else {
-              msgOutif(MSG__DEBUG, "", 
-                       "File has quality names extension but no QUALITY", 
+              msgOutif(MSG__DEBUG, "",
+                       "File has quality names extension but no QUALITY",
                        status);
             }
             /* Attempt to create QUALITY component - assume we have
@@ -577,7 +577,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
           /* Get the obsidss */
           if( hdr->fitshdr ) {
-            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss, 
+            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss,
                                    sizeof(hdr->obsidss), status );
           }
 
@@ -591,7 +591,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                a new temporary HDS object, and the old locator is annull. */
             sc2store_resize_head( indf, &tloc, &xloc, status );
 
-            /* And need to map the header making sure we have the right 
+            /* And need to map the header making sure we have the right
                components for this instrument. */
             nframes = ndfdims[2];
             sc2store_headrmap( xloc, nframes, hdr->instrument, status );
@@ -611,8 +611,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           } else if (*status==NDF__NOEXT) {
             /* If the header just wasn't there, annul status and continue */
             errAnnul( status );
-            msgOutif( MSG__DEBUG, "", 
-                      FUNC_NAME 
+            msgOutif( MSG__DEBUG, "",
+                      FUNC_NAME
                       ": File has not JCMTState information continuing anyways",
                       status );
           }
@@ -706,11 +706,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       /* Read time series data from file */
       sc2store_force_initialised( status );
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
-                          SC2STORE__MAXFITS, 
+                          SC2STORE__MAXFITS,
                           &nfits, fitsrec, units, dlabel, &colsize, &rowsize,
                           &nframes, &(da->nflat), flatname,
-                          &tmpState, ptdata, pdksquid, 
-                          &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
+                          &tmpState, ptdata, pdksquid,
+                          &flatcal, &flatpar, &jigvert, &nvert, &jigpath,
                           &nsampcycle, status);
       if (ptdata) outdata[0] = rawts;
 
@@ -730,7 +730,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
            This allows us to close the file immediately so that
            we do not need to worry about sc2store only allowing
            a single file at a time */
-        da->flatcal = smf_malloc( colsize * rowsize * da->nflat, 
+        da->flatcal = smf_malloc( colsize * rowsize * da->nflat,
                                   sizeof(*(da->flatcal)), 0, status );
         da->flatpar = smf_malloc( da->nflat, sizeof(*(da->flatpar)), 0, status);
 
@@ -744,17 +744,17 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         /* and dark squid */
         if (dksquid) {
 
-          da->dksquid = smf_malloc( rowsize * nframes, sizeof(*(da->dksquid)), 
+          da->dksquid = smf_malloc( rowsize * nframes, sizeof(*(da->dksquid)),
                                     0, status );
 
           if (da->dksquid) memcpy( da->dksquid, dksquid,
                                    sizeof(*(da->dksquid)) * rowsize * nframes );
-          
+
         }
 
         /* Create a FitsChan from the FITS headers */
         if ( !(flags & SMF__NOCREATE_HEAD) ) {
-          smf_fits_crchan( nfits, fitsrec, &(hdr->fitshdr), status); 
+          smf_fits_crchan( nfits, fitsrec, &(hdr->fitshdr), status);
 
           /* Instrument must be SCUBA-2 */
           /* hdr->instrument = INST__SCUBA2; */
@@ -763,7 +763,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* WARNING: This has been duplicated from the "isFlat" case to
              accomodate AzTEC data that was written using sc2sim_ndfwrdata.
              In principle AzTEC data should not be compressed, in which case
-             the above assertion "Instrument must be SCUBA-2" would be 
+             the above assertion "Instrument must be SCUBA-2" would be
              correct, and the following code is unnecessary. */
 
           /* Determine the instrument */
@@ -772,9 +772,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           if (hdr->fitshdr) {
             /* and work out the observing mode */
             smf_calc_mode( hdr, status );
-	  
+
             /* Get the obsidss */
-            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss, 
+            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss,
                                    sizeof(hdr->obsidss), status );
           }
 
@@ -852,7 +852,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* Store DREAM parameters */
         if ( !(flags & SMF__NOCREATE_HEAD) ) {
-          dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, 
+          dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert,
                                           jigpath, status );
           (*data)->dream = dream;
         }
@@ -883,29 +883,29 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     /* Store DREAM parameters for flatfielded data if they exist. This
        has to be done here as these methods rely on information in the
        main smfData struct. First retrieve jigvert and jigpath from
-       file */ 
+       file */
     if ( isTseries && isFlat && !(flags & SMF__NOCREATE_HEAD) ) {
       /* Obtain locator to DREAM extension if we have DREAM data */
       xloc = smf_get_xloc( *data, "DREAM", "DREAM_PAR", "READ", 0, 0, status );
       /* If it's NULL then we don't have dream data */
       if ( xloc != NULL ) {
-        jigvndf = smf_get_ndfid( xloc, "JIGVERT", "READ", "OLD", "", 0, NULL, 
+        jigvndf = smf_get_ndfid( xloc, "JIGVERT", "READ", "OLD", "", 0, NULL,
                                  NULL, status);
         if ( jigvndf == NDF__NOID) {
           if (*status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep("", FUNC_NAME ": Unable to obtain NDF ID for JIGVERT", 
+            errRep("", FUNC_NAME ": Unable to obtain NDF ID for JIGVERT",
                    status);
           }
         } else {
           smf_open_ndf( jigvndf, "READ", filename, SMF__INTEGER, &jigvdata, status);
         }
-        jigpndf = smf_get_ndfid( xloc, "JIGPATH", "READ", "OLD", "", 0, NULL, 
+        jigpndf = smf_get_ndfid( xloc, "JIGPATH", "READ", "OLD", "", 0, NULL,
                                  NULL, status);
         if ( jigpndf == NDF__NOID) {
           if (*status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep("", FUNC_NAME ": Unable to obtain NDF ID for JIGPATH", 
+            errRep("", FUNC_NAME ": Unable to obtain NDF ID for JIGPATH",
                    status);
           }
         } else {
@@ -917,7 +917,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         } else {
           if (*status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep("", FUNC_NAME ": smfData for jiggle vertices is NULL", 
+            errRep("", FUNC_NAME ": smfData for jiggle vertices is NULL",
                    status);
           }
         }
@@ -931,10 +931,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           }
         }
 
-        dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, 
+        dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert,
                                         jigpath, status );
         (*data)->dream = dream;
-    
+
         /* Free up the smfDatas for jigvert and jigpath */
         if ( jigvert != NULL ) {
           smf_close_file( &jigvdata, status );

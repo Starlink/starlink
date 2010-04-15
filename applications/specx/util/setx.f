@@ -61,13 +61,13 @@ C-----------------------------------------------------------------------
 C   Routine to calculate the X-axis in appropriate units ( velocity,
 C   frequency, points or user-defined ) at points corresponding to
 C   the data points, for all quadrants.
-C   
+C
 C   Updated Feb '92 to allow for other velocity reference frames and
 C   transformation laws:
 C
 C   Two-way transformations:
 C
-C   - For *input*, we are given the velocity frame, velocity law and 
+C   - For *input*, we are given the velocity frame, velocity law and
 C     a radial velocity. We assume that the first LO was corrected to
 C     bring a line at velocity VLSR and frequency JFCEN (in this frame)
 C     to the center of the passband. So the LO correction was clearly to
@@ -85,7 +85,7 @@ C     the display correction should be only back to the frame, and not to the
 C     the source. Thus velocities will be *radial velocities as measured by
 C     an observer in the nominated frame, applying the specified velocity law*.
 C     An unfortunate consequence is that frequencies also will be as measured
-C     with a frequency meter by an observer sitting in the reference frame. 
+C     with a frequency meter by an observer sitting in the reference frame.
 C     In order to measure line frequencies say in the source rest frame one
 C     has to correct to the source frame by setting the velocity in the
 C     reference frame equal to VLSR (or in general, VRAD).
@@ -117,12 +117,12 @@ C      INTEGER   I               ! General counter
       INTEGER   ISB             ! Sideband sign
       INTEGER   NOFF            ! Offset to first channel in XSCALE for sector
       INTEGER   NQ              ! Current sector
-      
+
       REAL      VRAD               ! Radial velocity for display
       CHARACTER VFRAME*4,VFRAME2*4 ! 'TELL', 'HELI', 'GEO' or 'LSR'
       CHARACTER VDEF*3,VDEF2*3     ! 'OPT', 'RAD', or 'REL'
 
-      DOUBLE PRECISION  FROBS   ! Rest freq. assumed used to correct obsn freq 
+      DOUBLE PRECISION  FROBS   ! Rest freq. assumed used to correct obsn freq
       DOUBLE PRECISION  FRDIS   ! Rest freq. to be used for display (GHz)
       DOUBLE PRECISION  FCEN_T  ! Telluric quadrant centre freq (GHz)
 
@@ -241,7 +241,7 @@ CD        PRINT *, 'Telluric center frequency = ', FCEN_T
 C         (This gives the actual observed frequencies in all channels
 C         by addition of FCEN_T(GHz) and current contents of XSCALE(MHz))
 
-C         Correct to offset frequency in reference frame using appropriate 
+C         Correct to offset frequency in reference frame using appropriate
 C         velocity scaling law (RADIO, OPTICAL or RELATIVISTIC). Rest freq
 C         is set equal to FRDIS for display, may or may not be equal to FROBS.
 
@@ -458,7 +458,7 @@ CD    PRINT *, '    XSCALE values - beg, middle and end...'
 CD    PRINT *, XSCALE(1), 0.5*(XSCALE(N/2)+XSCALE(N+1-N/2)), XSCALE(N)
 
       RETURN
-      END 
+      END
 
 *-----------------------------------------------------------------------
 
@@ -559,7 +559,7 @@ CD      PRINT *, '   obs freq from jfrest = ', FROBS
 CD      PRINT *, '   obs freq from jfcen  = ', FROBS
       END IF
 
-      
+
 *     Choose a rest frequency to use for display
 *     Default is that rest frequency of interest was arranged to
 *     come out at centre of a spectrum; this is over-ridden by a
@@ -634,7 +634,7 @@ CD    PRINT *, '    velocity definition =  ', VVDEF
         PRINT *, 'Unknown velocity frame: ', VVFRAME
         VEL = 0.0
       END IF
- 
+
 CD    PRINT *, '    velocity frame/tel  =  ', VEL
 
 *     Now apply appropriate doppler correction
@@ -652,7 +652,7 @@ CD    PRINT *, '    velocity frame/tel  =  ', VEL
 *     "Relativistic" correction (note, correct only if no transverse vel!)
 
       ELSE IF (VVDEF.EQ.'REL') THEN
-        FCEN_T = 1.D-6*DFLOAT(JFCEN) * 
+        FCEN_T = 1.D-6*DFLOAT(JFCEN) *
      +           SQRT((1.D0-DBLE(VEL)/VC)/(1.D0+DBLE(VEL)/VC))
 
 *     Missing or incorrect velocity definition...
@@ -675,7 +675,7 @@ CD    PRINT *, '    velocity frame/tel  =  ', VEL
 C     Correct to frequency in reference frame using appropriate velocity
 C     scaling law (RADIO, OPTICAL or RELATIVISTIC). Note that sector
 C     centre-freq and offsets (FCEN_T and XSCALE) are passed separately;
-C     this is because XSCALE used to be single precision so couldn't handle 
+C     this is because XSCALE used to be single precision so couldn't handle
 C     the sum in a recoverable way.
 
       IMPLICIT  NONE
@@ -733,7 +733,7 @@ CD     PRINT *, '    velocity definition = ', VVDEF
         PRINT *, 'Unknown velocity frame: ', VVFRAME
         VEL = 0.0
       END IF
- 
+
 CD     PRINT *, '    Velocity of frame = ', VEL
 
 *     Calculate appropriate doppler correction (depending on definitions)
@@ -771,11 +771,11 @@ CD     PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
 CD     PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
 
       RETURN
-      END 
+      END
 
 *-----------------------------------------------------------------------
 
-      SUBROUTINE SETXFREQ (XSCALE8, N, ABS_FREQ, REST_REL, FREST, 
+      SUBROUTINE SETXFREQ (XSCALE8, N, ABS_FREQ, REST_REL, FREST,
      &                     XFAC8, REF_FREQ, ISTAT)
 
 *  Routine to assign frequencies to individual elements of XSCALE.

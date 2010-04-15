@@ -10,8 +10,8 @@
 *     obtained from the integration's parent observation file in ODIR:Oyymmdd_o.
 *
 *     The integration structure has already been opened as 'INT_IN'
-*     and the parent observation file as 'OBSERVATION' before this 
-*     routine is called 
+*     and the parent observation file as 'OBSERVATION' before this
+*     routine is called
 *    Invocation :
 *     CALL RED4_REDUCE_BIAS_INT (INT_NAME, STATUS)
 *    Parameters :
@@ -136,7 +136,7 @@
 *    Local Constants :
 *    Local variables :
       INTEGER FLOATSIZE                  ! Bytes per element of 'FLOAT' array
-      INTEGER NDIM                       ! the dimensions of the integration 
+      INTEGER NDIM                       ! the dimensions of the integration
 *                                             array
       INTEGER DIMS( MAXDIM )             !                "
       INTEGER N_EXPOSURES                ! The number of exposures that were
@@ -186,8 +186,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    The integration structure has already been opened as 'INT_IN'
-*    and the parent observation file as 'OBSERVATION' before this 
-*    routine is called 
+*    and the parent observation file as 'OBSERVATION' before this
+*    routine is called
 *    first of all try to check that we have enough information for the
 *    reduction to proceed.
 *    Get the INT_TYPE (i.e. the observation mode; STARE, CHOP etc...)
@@ -246,7 +246,7 @@
 
       IF (DSA_STATUS .EQ. SAI__OK) THEN
          IF (N_EXPOSURES .LT. 1) THEN
-   
+
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_REDUCE_BIAS_INT: '/
      :        /'No exposures were made during the '/
@@ -291,7 +291,7 @@
 
 *    Find the size of the input data array
       CALL DSA_DATA_SIZE ('INT_IN', MAXDIM, NDIM, DIMS, NELM,
-     :  DSA_STATUS) 
+     :  DSA_STATUS)
 
 *    and the number of elements and bytes in a single plane of that array
       NPLANE = DIMS(1) * DIMS(2)
@@ -302,10 +302,10 @@
      :   DSA_STATUS )
 
 *    Now we're as sure as can be that everything's gonna be jus' fine.
-*    so open the reduced integration file. A new one will be created 
-*    specifically, according to the reduced integration template, and with 
+*    so open the reduced integration file. A new one will be created
+*    specifically, according to the reduced integration template, and with
 *    the correct filename  e.g. RI890801_1_1 from I890801_1_1
-      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE', 
+      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE',
      :   INTRED_TEMPLATE, DSA_STATUS)
 
       IF ( DSA_STATUS .NE. SAI__OK ) THEN
@@ -317,7 +317,7 @@
       CALL RED4_INTTORINT( INT_NAME, INT_RED, STATUS )
 
       DSA_STATUS = STATUS
-      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE', 
+      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE',
      :   0, 0, DSA_STATUS)
 
       CALL MSG_SETC( 'INT_RED', INT_RED )
@@ -327,7 +327,7 @@
 *    Copy the contents of the FITS structure from the raw integration file
 *    over to the reduced integration file (deleting the old structure first,
 *    if present)
-      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE, 
+      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE,
      :   'INT_RED.'//FITS_STRUCTURE, STATUS )
 
 *   Abort if an error has occurred. This is bad practise, but has been
@@ -361,12 +361,12 @@
          END IF
 
          DSA_STATUS = STATUS
-         CALL DSA_NAMED_INPUT ('MASK', MASK, DSA_STATUS) 
+         CALL DSA_NAMED_INPUT ('MASK', MASK, DSA_STATUS)
 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS ) 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS ) 
+         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS )
+         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS )
 
-         CALL DSA_MAP_DATA ('MASK', 'READ', 'BYTE', MASK_DATA, 
+         CALL DSA_MAP_DATA ('MASK', 'READ', 'BYTE', MASK_DATA,
      :      MASK_SLOT, DSA_STATUS)
          IF ( DSA_STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -379,7 +379,7 @@
 *    variance and quality arrays if they will be required.
       DSA_STATUS = STATUS
       CALL DSA_USE_QUALITY ('INT_RED', DSA_STATUS)
-      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA, 
+      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA,
      :   DATA_SLOT, DSA_STATUS)
       CALL DSA_MAP_QUALITY ('INT_RED', 'WRITE', 'BYTE', RED_QUAL,
      :   QUAL_SLOT, DSA_STATUS)
@@ -435,7 +435,7 @@
      :           N_EXPOSURES, %val(RED_VAR), STATUS )
             ELSE
 
-               CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA), 
+               CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA),
      :           NPLANE, N_EXPOSURES, %val(RED_VAR), STATUS)
             END IF
          ENDIF
@@ -477,13 +477,13 @@
       CALL DSA_SET_DATA_INFO ('INT_RED', 2, CHAR_ARRAY, 0, 0.0D0,
      :  DSA_STATUS)
 
-*    Obtain the name of the object and write it to the reduced 
+*    Obtain the name of the object and write it to the reduced
 *    integration structure in the standard Figaro way.
       CALL DSA_GET_FITS_C( 'OBSERVATION', 'OBJECT', 0,
      :  OBJECT_NAME, COMMENT, DSA_STATUS )
 
       CLEN = MAX( 1, CHR_LEN( OBJECT_NAME ) )
-      CALL DSA_SET_OBJECT( 'INT_RED', OBJECT_NAME(1:CLEN), DSA_STATUS ) 
+      CALL DSA_SET_OBJECT( 'INT_RED', OBJECT_NAME(1:CLEN), DSA_STATUS )
 
 *    End of reduction
 *    Record how the reduction went in the FITS structure.

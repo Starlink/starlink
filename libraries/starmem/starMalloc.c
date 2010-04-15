@@ -91,7 +91,7 @@ void * starMalloc( size_t size ) {
      is overhead is too high, remove it and force a call to
      starMemInit */
   if ( ! STARMEM_INITIALISED ) starMemInitPrivate(0);
-  
+
   /* Decide which to use */
   switch ( STARMEM_MALLOC ) {
 

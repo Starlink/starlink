@@ -21,7 +21,7 @@
 *     application's STYLE parameter is given top priority. If no Title
 *     was supplied then the Title component of the NDF is used. If this
 *     is blank, then the TItle attribute stored in the current Frame of
-*     the NDF's WCS FrameSet is used, if it has been set explicitly (i.e. 
+*     the NDF's WCS FrameSet is used, if it has been set explicitly (i.e.
 *     is not just a default value). Otherwise, the name of the NDF is used.
 
 *  Arguments:
@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,14 +99,14 @@
       LOGICAL PATH               ! Is the NDF path being used as the title?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Ensure graphical escape sequences are not removed from the strings
 *  returned by AST_GETC.
       OLDESC = AST_ESCAPES( 1, STATUS )
 
-*  Indicate the NDF path has not been used as the Title. 
+*  Indicate the NDF path has not been used as the Title.
       PATH = .FALSE.
 
 *  First priority is given to values explicitly supplied by the user via
@@ -120,8 +120,8 @@
 *  differ, then return with the Plot unchanged since we will then assume
 *  that the Plot's Title was supplied via the STYLE parameter (if the
 *  user has explicitly supplied a blank title, then we find a better value).
-      TTL = AST_GETC( IPLOT, 'TITLE', STATUS ) 
-      IF( TTL .EQ. ' ' .OR. 
+      TTL = AST_GETC( IPLOT, 'TITLE', STATUS )
+      IF( TTL .EQ. ' ' .OR.
      :    TTL .EQ. AST_GETC( IWCS, 'TITLE', STATUS ) .OR.
      :    .NOT. AST_TEST( IPLOT, 'TITLE', STATUS ) ) THEN
 
@@ -129,12 +129,12 @@
 *  supplied a blank title, then the next priority is to use the NDF's Title
 *  component, if set.
          TTL = ' '
-         CALL NDF_CGET( INDF, 'TITLE', TTL, STATUS ) 
+         CALL NDF_CGET( INDF, 'TITLE', TTL, STATUS )
 
-*  If the NDF has no Title component, use the WCS FrameSet Title if it has 
-*  been set explicitly (i.e. is not a default value). 
+*  If the NDF has no Title component, use the WCS FrameSet Title if it has
+*  been set explicitly (i.e. is not a default value).
          IF( TTL .EQ. ' ' .AND. AST_TEST( IWCS, 'TITLE', STATUS ) ) THEN
-            TTL = AST_GETC( IWCS, 'TITLE', STATUS ) 
+            TTL = AST_GETC( IWCS, 'TITLE', STATUS )
          END IF
 
 *  If we still have no title, use the NDF path. Ensure we know the length
@@ -152,8 +152,8 @@
       END IF
 
 *  If the NDF path has not been used as the title, see if the NDF path
-*  should be added to the title. The user can control this by including 
-*  the kappa pseudo-attribute FileInTitle within the value supplied for 
+*  should be added to the title. The user can control this by including
+*  the kappa pseudo-attribute FileInTitle within the value supplied for
 *  STYLE.
       IF( .NOT. PATH ) THEN
          IF( KPG1_GETASTFIT() ) THEN
@@ -162,7 +162,7 @@
             CALL KPG1_NDFNM( INDF, PTH, TTLLEN, STATUS )
 
 *  Construct a new title which includes the original title and the NDF
-*  path, with suitable AST graphical escape sequences to ensure the 
+*  path, with suitable AST graphical escape sequences to ensure the
 *  NDF path comes out as a second line in the title, left justified with
 *  the first line.
             NEWTTL = '%h+'
@@ -179,8 +179,8 @@
          END IF
       END IF
 
-*  Reinstate the original behaviour of AST with regard to graphical escape 
+*  Reinstate the original behaviour of AST with regard to graphical escape
 *  sequences in the strings returned by AST_GETC.
       OLDESC = AST_ESCAPES( OLDESC, STATUS )
 
-      END 
+      END

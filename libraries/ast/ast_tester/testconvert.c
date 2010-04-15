@@ -31,7 +31,7 @@ main(){
          astError( AST__INTER, "Error 2\n",  status );
       } else if( !astIsAUnitMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 3\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 4\n",  status );
    }
@@ -44,7 +44,7 @@ main(){
          astError( AST__INTER, "Error 6\n",  status );
       } else if( !astIsAUnitMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 7\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 8\n",  status );
    }
@@ -73,7 +73,7 @@ main(){
          astError( AST__INTER, "Error 12\n",  status );
       } else if( !astIsAUnitMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 13\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 14\n",  status );
    }
@@ -86,7 +86,7 @@ main(){
          astError( AST__INTER, "Error 16\n",  status );
       } else if( !astIsAUnitMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 17\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 18\n",  status );
    }
@@ -100,7 +100,7 @@ main(){
          astError( AST__INTER, "Error 20\n",  status );
       } else if( !astIsAPermMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 21\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 22\n",  status );
    }
@@ -113,7 +113,7 @@ main(){
          astError( AST__INTER, "Error 24\n",  status );
       } else if( !astIsAPermMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 25\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 26\n",  status );
    }
@@ -142,7 +142,7 @@ main(){
          astError( AST__INTER, "Error 30\n",  status );
       } else if( !astIsAPermMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 31\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 32\n",  status );
    }
@@ -155,7 +155,7 @@ main(){
          astError( AST__INTER, "Error 34\n",  status );
       } else if( !astIsAPermMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 35\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 36\n",  status );
    }
@@ -169,7 +169,7 @@ main(){
          astError( AST__INTER, "Error 38\n",  status );
       } else if( !astIsAPermMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 39\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 40\n",  status );
    }
@@ -182,7 +182,7 @@ main(){
          astError( AST__INTER, "Error 42\n",  status );
       } else if( !astIsAPermMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 43\n",  status );
-      } 
+      }
    } else {
       astError( AST__INTER, "Error 44\n",  status );
    }
@@ -211,7 +211,7 @@ main(){
          astError( AST__INTER, "Error 49\n",  status );
       } else if( !astIsAPermMap( astGetMapping( fs, AST__BASE, AST__CURRENT ) ) ) {
          astError( AST__INTER, "Error 50\n",  status );
-      } 
+      }
    }
 
    target = astFrame( 2, "Domain=ARDAPP", status );

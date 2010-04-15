@@ -13,10 +13,10 @@
 *     CALL ARD1_DSTAX( FRM, AXIS, STATUS )
 
 *  Description:
-*     Distances supplied as arguments within keywords must be given as 
-*     increments along one of the Frame axes (so that we can use 
+*     Distances supplied as arguments within keywords must be given as
+*     increments along one of the Frame axes (so that we can use
 *     AST_UNFORMAT to convert them to floating poiint). For normal Frames,
-*     both axes are assumed to be equivalent and so either axis will do, 
+*     both axes are assumed to be equivalent and so either axis will do,
 *     and we arbitrarily choose axis 1. For SkyFrames, distances are
 *     assumed to be arc-distances, and so are treated as an increment
 *     along the latitude axis. The index of the selected axis is returned.
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

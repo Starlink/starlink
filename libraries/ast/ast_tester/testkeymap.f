@@ -19,7 +19,7 @@
       call ast_MapPut0d( map, 'Fredd', 1999.9D0, 'com2 ', status )
       call ast_MapPut0r( map, 'Fredr', 1999.9, 'com2 ', status )
       call ast_MapPut0c( map, 'Fredc', 'Hello', ' ', status )
-      call ast_MapPut0A( map, 'Freda', ast_skyframe( ' ', status ), 
+      call ast_MapPut0A( map, 'Freda', ast_skyframe( ' ', status ),
      :                   ' ', status )
 
       if( ast_maplenc( map, 'Fredi', status ) .ne. 4 ) then
@@ -39,35 +39,35 @@
 
       if( ast_maptype( map, 'freda', status ) .ne. AST__BADTYPE) then
          call stopit( status, 'Error -8' )
-      end if  
+      end if
 
       if( ast_maptype( map, 'Freda', status ) .ne. AST__OBJECTTYPE) then
          call stopit( status, 'Error -7' )
-      end if  
+      end if
 
       if( ast_maptype( map, 'Fredc', status ) .ne. AST__STRINGTYPE) then
          call stopit( status, 'Error -6' )
-      end if  
+      end if
 
       if( ast_maptype( map, 'Fredd', status ) .ne. AST__DOUBLETYPE) then
          call stopit( status, 'Error -5' )
-      end if  
+      end if
 
       if( ast_maptype( map, 'Fredr', status ) .ne. AST__FLOATTYPE) then
          call stopit( status, 'Error -5b' )
-      end if  
+      end if
 
       if( ast_maptype( map, 'Fredi', status ) .ne. AST__INTTYPE ) then
          call stopit( status, 'Error -4' )
-      end if  
+      end if
 
       if( ast_maphaskey( map, 'fredi', status ) ) then
          call stopit( status, 'Error -3' )
-      end if  
+      end if
 
       if( .not. ast_maphaskey( map, 'Fredi', status ) ) then
          call stopit( status, 'Error -2' )
-      end if  
+      end if
 
       map2 = ast_copy( map, status )
 
@@ -75,7 +75,7 @@
       if( ast_mapsize( map2, status ) .ne. 5 ) then
          write(*,*) ast_mapsize( map2, status )
          call stopit( status, 'Error 0' )
-      end if  
+      end if
 
       goti = .false.
       gotd = .false.
@@ -100,7 +100,7 @@
          endif
       end do
 
-      if( .not. ( goti .AND. gotd .AND. gotc 
+      if( .not. ( goti .AND. gotd .AND. gotc
      :            .AND. gota .and. gotr) ) then
          call stopit( status, 'Error nokey' )
       endif
@@ -108,29 +108,29 @@
       if( ast_maplength( map2, 'Fredi', status ) .ne. 1 ) then
          write(*,*) ast_maplength( map2, 'Fredi', status )
          call stopit( status, 'Error -1' )
-      end if  
+      end if
 
       if( .not. ast_mapget0i( map2, 'Fredi', ival, status ) ) then
          call stopit( status, 'Error 1' )
       else if( ival .ne. 1999 ) then
          write(*,*) ival
          call stopit( status, 'Error 2' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0d( map2, 'Fredd', dval, status ) ) then
          call stopit( status, 'Error 3' )
       else if( dval .ne. 1999.9D0 ) then
          write(*,*) dval - 1999.9D0
          call stopit( status, 'Error 4' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0r( map2, 'Fredr', rval, status ) ) then
          call stopit( status, 'Error 3b' )
       else if( rval .ne. 1999.9 ) then
          write(*,*) rval - 1999.9
          call stopit( status, 'Error 4b' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0c( map2, 'Fredc', cval, l, status ) ) then
          call stopit( status, 'Error 5' )
       else if( l .ne. 5  ) then
@@ -139,27 +139,27 @@
       else if( cval( :l ) .ne. 'Hello'  ) then
          write(*,*) cval( :l )
          call stopit( status, 'Error 7' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0a( map2, 'Freda', aval, status ) ) then
          call stopit( status, 'Error 8' )
       else if( .not. ast_IsASkyFrame( aval, STATUS ) ) then
          call stopit( status, 'Error 9' )
-      end if  
+      end if
 
       if( .not. ast_mapget0d( map2, 'Fredi', dval, status ) ) then
          call stopit( status, 'Error 10' )
       else if( dval .ne. 1999 ) then
          write(*,*) dval
          call stopit( status, 'Error 11' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0r( map2, 'Fredi', rval, status ) ) then
          call stopit( status, 'Error 10b' )
       else if( rval .ne. 1999 ) then
          call stopit( status, 'Error 11b' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0c( map2, 'Fredi', cval, l, status ) ) then
          call stopit( status, 'Error 12' )
       else if( l .ne. 4 ) then
@@ -168,15 +168,15 @@
       else if( cval( :l ) .ne. '1999' ) then
          write(*,*) cval
          call stopit( status, 'Error 13' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0i( map2, 'Fredd', ival, status ) ) then
          call stopit( status, 'Error 14' )
       else if( ival .ne. 2000.0 ) then
-         write(*,*) ival 
+         write(*,*) ival
          call stopit( status, 'Error 15' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0c( map2, 'Fredd', cval, l, status ) ) then
          call stopit( status, 'Error 16' )
       else if( l .ne. 6 ) then
@@ -185,12 +185,12 @@
       else if( cval( :l ) .ne. '1999.9' ) then
          write(*,*) cval
          call stopit( status, 'Error 17' )
-      end if  
-      
+      end if
+
 
       ivec(1) = -10
       ivec(2) = -10
-      if( .not. ast_mapget1i( map2, 'Fredi', 2, nval, ivec, 
+      if( .not. ast_mapget1i( map2, 'Fredi', 2, nval, ivec,
      :                        status ) ) then
          call stopit( status, 'Error 18' )
       else if( nval .ne. 1 ) then
@@ -202,12 +202,12 @@
       else if( ivec( 2 ) .ne. -10 ) then
          write(*,*) ivec( 2 )
          call stopit( status, 'Error 21' )
-      end if  
-      
+      end if
+
 
       dvec(1) = -10.0D0
       dvec(2) = -10.0D0
-      if( .not. ast_mapget1d( map2, 'Fredd', 2, nval, dvec, 
+      if( .not. ast_mapget1d( map2, 'Fredd', 2, nval, dvec,
      :                        status ) ) then
          call stopit( status, 'Error 22' )
       else if( nval .ne. 1 ) then
@@ -219,11 +219,11 @@
       else if( dvec( 2 ) .ne. -10.0D0 ) then
          write(*,*) dvec( 2 )
          call stopit( status, 'Error 25' )
-      end if  
-      
+      end if
+
       avec(1) = AST__NULL
       avec(2) = AST__NULL
-      if( .not. ast_mapget1a( map2, 'Freda', 2, nval, avec, 
+      if( .not. ast_mapget1a( map2, 'Freda', 2, nval, avec,
      :                        status ) ) then
          call stopit( status, 'Error 26' )
       else if( nval .ne. 1 ) then
@@ -235,8 +235,8 @@
       else if( avec( 2 ) .ne. AST__NULL ) then
          write(*,*) ast_getc( avec( 2 ), 'class', status )
          call stopit( status, 'Error 29' )
-      end if  
-      
+      end if
+
 
       ivec(1)=1999
       ivec(2)=0
@@ -246,7 +246,7 @@
          write(*,*) ast_maplength( map, 'Fredi', status )
          call stopit( status, 'Error 29b' )
 
-      end if  
+      end if
 
       dvec(1)=1999.9D0
       dvec(2)=-0.01D0
@@ -275,15 +275,15 @@
       else if( ival .ne. 1999 ) then
          write(*,*) ival
          call stopit( status, 'Error A2' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0d( map2, 'Fredd', dval, status ) ) then
          call stopit( status, 'Error A3' )
       else if( dval .ne. 1999.9D0 ) then
          write(*,*) dval - 1999.9D0
          call stopit( status, 'Error A4' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0c( map2, 'Fredc', cval, l, status ) ) then
          call stopit( status, 'Error A5' )
       else if( l .ne. 10  ) then
@@ -292,21 +292,21 @@
       else if( cval( :l ) .ne. 'Hello               '  ) then
          write(*,*) cval( :l )
          call stopit( status, 'Error A7' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0a( map2, 'Freda', aval, status ) ) then
          call stopit( status, 'Error A8' )
       else if( .not. ast_IsASkyFrame( aval, STATUS ) ) then
          call stopit( status, 'Error A9' )
-      end if  
+      end if
 
       if( .not. ast_mapget0d( map2, 'Fredi', dval, status ) ) then
          call stopit( status, 'Error A10' )
       else if( dval .ne. 1999 ) then
          write(*,*) dval
          call stopit( status, 'Error A11' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0c( map2, 'Fredi', cval, l, status ) ) then
          call stopit( status, 'Error A12' )
       else if( l .ne. 4 ) then
@@ -315,15 +315,15 @@
       else if( cval( :l ) .ne. '1999' ) then
          write(*,*) cval
          call stopit( status, 'Error A13' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0i( map2, 'Fredd', ival, status ) ) then
          call stopit( status, 'Error A14' )
       else if( ival .ne. 2000.0 ) then
-         write(*,*) ival 
+         write(*,*) ival
          call stopit( status, 'Error A15' )
-      end if  
-      
+      end if
+
       if( .not. ast_mapget0c( map2, 'Fredd', cval, l, status ) ) then
          call stopit( status, 'Error A16' )
       else if( l .ne. 6 ) then
@@ -332,11 +332,11 @@
       else if( cval( :l ) .ne. '1999.9' ) then
          write(*,*) cval
          call stopit( status, 'Error A17' )
-      end if  
-      
+      end if
+
 
 c  Read vector entries as vectors.
-      if( .not. ast_mapget1i( map2, 'Fredi', 2, nval, ivec, 
+      if( .not. ast_mapget1i( map2, 'Fredi', 2, nval, ivec,
      :                        status ) ) then
          call stopit( status, 'Error B1' )
       else if( nval .ne. 2 ) then
@@ -348,9 +348,9 @@ c  Read vector entries as vectors.
       else if( ivec( 2 ) .ne. 0 ) then
          write(*,*) ivec( 2 )
          call stopit( status, 'Error B2c' )
-      end if  
-      
-      if( .not. ast_mapget1d( map2, 'Fredd', 2, nval, dvec, 
+      end if
+
+      if( .not. ast_mapget1d( map2, 'Fredd', 2, nval, dvec,
      :                        status ) ) then
          call stopit( status, 'Error B3' )
       else if( nval .ne. 2 ) then
@@ -362,9 +362,9 @@ c  Read vector entries as vectors.
       else if( dvec( 2 ) .ne. -0.01D0 ) then
          write(*,*) dvec( 2 )
          call stopit( status, 'Error B4c' )
-      end if  
+      end if
 
-      if( .not. ast_mapget1a( map2, 'Freda', 4, nval, avec, 
+      if( .not. ast_mapget1a( map2, 'Freda', 4, nval, avec,
      :                        status ) ) then
          call stopit( status, 'Error B5' )
       else if( nval .ne. 4 ) then
@@ -382,10 +382,10 @@ c  Read vector entries as vectors.
       else if( avec( 4 ) .ne. AST__NULL ) then
          write(*,*) ast_getc( avec( 4 ), 'class', status )
          call stopit( status, 'Error B6e' )
-      end if  
+      end if
 
 
-      if( .not. ast_mapget1c( map2, 'Fredc', 3, nval, cvec, 
+      if( .not. ast_mapget1c( map2, 'Fredc', 3, nval, cvec,
      :                        status ) ) then
          call stopit( status, 'Error B7' )
       else if( nval .ne. 3 ) then
@@ -401,41 +401,41 @@ c  Read vector entries as vectors.
          write(*,*) cvec( 2 )
          call stopit( status, 'Error B8d' )
       end if
- 
+
 c  Read single elements of vector entries as scalars.
-      if( .not. ast_mapgetelemi( map2, 'Fredi', 1, ivec, 
+      if( .not. ast_mapgetelemi( map2, 'Fredi', 1, ivec,
      :                           status ) ) then
          call stopit( status, 'Error B1z' )
       else if( ivec( 1 ) .ne. 1999 ) then
          write(*,*) ivec( 1 )
          call stopit( status, 'Error B2bz' )
-      end if  
-      
-      if( .not. ast_mapgetelemd( map2, 'Fredd', 2, dvec, 
+      end if
+
+      if( .not. ast_mapgetelemd( map2, 'Fredd', 2, dvec,
      :                           status ) ) then
          call stopit( status, 'Error B3z' )
       else if( dvec( 1 ) .ne. -0.01D0 ) then
          write(*,*) dvec( 1 )
          call stopit( status, 'Error B4cz' )
-      end if  
+      end if
 
-      if( .not. ast_mapgetelema( map2, 'Freda', 3, avec, 
+      if( .not. ast_mapgetelema( map2, 'Freda', 3, avec,
      :                           status ) ) then
          call stopit( status, 'Error B5z' )
       else if( .not. ast_isaspecframe( avec( 1 ), status ) ) then
          write(*,*) ast_getc( avec( 1 ), 'class', status )
          call stopit( status, 'Error B6dz' )
-      end if  
+      end if
 
 
-      if( .not. ast_mapgetelemc( map2, 'Fredc', 3, cval0, 
+      if( .not. ast_mapgetelemc( map2, 'Fredc', 3, cval0,
      :                           status ) ) then
          call stopit( status, 'Error B7z' )
       else if( cval0 .ne. '  Hello   ' ) then
          write(*,*) cval0
          call stopit( status, 'Error B8dz' )
       end if
- 
+
 
       call ast_mapremove( map2, 'Bert', status )
       call ast_mapremove( map2, 'Fredc', status )
@@ -445,7 +445,7 @@ c  Read single elements of vector entries as scalars.
 
 
       call checkDump( map2, 'checkDump 1 ', status )
-         
+
       call ast_Annul( map, status  )
       call ast_Annul( map2, status  )
 
@@ -485,60 +485,60 @@ c  Test putting single elements into vector entries.
       call ast_mapput1i( map, 'Fredi', 2, ivec, 'com 1', STATUS )
 
       call ast_mapputelemi( map, 'Fredi', 1, -1, STATUS )
-      if( .not. ast_mapgetelemi( map, 'Fredi', 1, ival, 
+      if( .not. ast_mapgetelemi( map, 'Fredi', 1, ival,
      :                           status ) ) then
          call stopit( status, 'Error GETELEM_1' )
       else if( ival .ne. -1 ) then
          write(*,*) ival
          call stopit( status, 'Error GETELEM_2' )
-      end if  
+      end if
 
       call ast_mapputelemi( map, 'Fredi', 10, -2, STATUS )
-      if( .not. ast_mapgetelemi( map, 'Fredi', 3, ival, 
+      if( .not. ast_mapgetelemi( map, 'Fredi', 3, ival,
      :                           status ) ) then
          call stopit( status, 'Error GETELEM_3' )
       else if( ival .ne. -2 ) then
          write(*,*) ival
          call stopit( status, 'Error GETELEM_4' )
-      end if  
+      end if
 
       call ast_mapputelemi( map, 'Fredi', 0, -3, STATUS )
-      if( .not. ast_mapgetelemi( map, 'Fredi', 4, ival, 
+      if( .not. ast_mapgetelemi( map, 'Fredi', 4, ival,
      :                           status ) ) then
          call stopit( status, 'Error GETELEM_5' )
       else if( ival .ne. -3 ) then
          write(*,*) ival
          call stopit( status, 'Error GETELEM_6' )
-      end if  
+      end if
 
       if( ast_maplength( map, 'Fredi', status ) .ne. 4 ) then
          write(*,*) ast_maplength( map, 'Fredi', status )
          call stopit( status, 'Error GETELEM_7' )
-      end if  
+      end if
 
       map2 = ast_keymap( ' ', status )
       call ast_mapputelema( map2, 'A A', 1, map, STATUS )
       if( ast_maplength( map2, 'A A', status ) .ne. 1 ) then
          write(*,*) ast_maplength( map, 'Fredi', status )
          call stopit( status, 'Error GETELEM_8' )
-      end if  
+      end if
 
-      if( .not. ast_mapgetelema( map2, 'A A', 1, map3, 
+      if( .not. ast_mapgetelema( map2, 'A A', 1, map3,
      :                           status ) ) then
          call stopit( status, 'Error GETELEM_9' )
-      else if( .not. ast_mapgetelemi( map3, 'Fredi', 4, ival, 
+      else if( .not. ast_mapgetelemi( map3, 'Fredi', 4, ival,
      :                           status ) ) then
          call stopit( status, 'Error GETELEM_10' )
       else if( ival .ne. -3 ) then
          write(*,*) ival
          call stopit( status, 'Error GETELEM_11' )
-      end if  
+      end if
 
       if( status .eq. sai__ok ) then
          call ast_mapputelema( map2, 'A A', 1, map2, STATUS )
          if( status .eq. ast__kycir ) then
             call err_annul( status )
-         else 
+         else
             call stopit( status, 'Error GETELEM_12' )
          end if
       end if
@@ -550,7 +550,7 @@ c  Test putting single elements into vector entries.
          write(*,*) ast_maplength( map, ' B', status )
          call stopit( status, 'Error GETELEM_13' )
 
-      else if( .not. ast_mapgetelemc( map, ' B ', 2, cval0, 
+      else if( .not. ast_mapgetelemc( map, ' B ', 2, cval0,
      :                                status ) ) then
          call stopit( status, 'Error GETELEM_14' )
 
@@ -601,7 +601,7 @@ c  Test putting single elements into vector entries.
       external mysource, mysink
       character buf*400000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll, nl
 
       if( status .ne. sai__ok ) return
@@ -639,21 +639,21 @@ c  Test putting single elements into vector entries.
                write(*,*) type,  ast_maptype( obj, key, status )
                call stopit( status, 'checkDump 4' )
             else
-               
+
                if( type .eq. AST__OBJECTTYPE ) then
 
-                  if( .not. ast_mapGet0A( result, key, obj1, 
+                  if( .not. ast_mapGet0A( result, key, obj1,
      :               status ) ) call stopit( status, 'checkDump 5' )
-                  if( .not. ast_mapGet0A( obj, key, obj2, 
+                  if( .not. ast_mapGet0A( obj, key, obj2,
      :               status ) ) call stopit( status, 'checkDump 6' )
-                  if( ast_GetC( obj1, 'class', status ) .ne. 
+                  if( ast_GetC( obj1, 'class', status ) .ne.
      :                ast_GetC( obj2, 'class', status ) ) then
                      call stopit( status, 'checkDump 7' )
                   end if
 
                else
 
-                  if( .not. ast_mapGet0C( result, key, txt1, l1, 
+                  if( .not. ast_mapGet0C( result, key, txt1, l1,
      :               status ) ) call stopit( status, 'checkDump 8' )
                   if( .not. ast_mapGet0C( obj, key, txt2, l2,
      :               status ) ) call stopit( status, 'checkDump 9' )
@@ -667,7 +667,7 @@ c  Test putting single elements into vector entries.
          end do
       end if
 
-      end  
+      end
 
       subroutine mysource( status )
       implicit none
@@ -676,7 +676,7 @@ c  Test putting single elements into vector entries.
       integer status, next, end, ll, nl
       character buf*400000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll,nl
 
       if( status .ne. sai__ok ) return
@@ -700,7 +700,7 @@ c  Test putting single elements into vector entries.
       character buf*400000
       character line*1000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll, nl
 
       if( status .ne. sai__ok ) return
@@ -719,14 +719,14 @@ c  Test putting single elements into vector entries.
          write(*,*) buf( next : next + l)
          write(*,*) 'Line length ',l
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
          nl = nl + 1
       endif
 
       next = next + ll
-      
+
       end
 
 

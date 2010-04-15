@@ -285,7 +285,7 @@
       IF ( .NOT. SET_SCALE ) THEN
          IF ( NO_OF_BINS .NE. NX_REBIN * N_ORDERS ) THEN
             REPORT_STRING = ' Cannot scrunch: please regenerate' //
-     :           ' wavelengths (Option 12.2).' 
+     :           ' wavelengths (Option 12.2).'
             CALL ECH_REPORT( 0, REPORT_STRING )
             RETURN
          ENDIF
@@ -337,7 +337,7 @@
 *  Issume a warning if no orders are wavelength-calibrated and exit.
       IF ( LOW_ORDER .LE. 0 .OR. HI_ORDER .LE. 0 ) THEN
          REPORT_STRING = ' Unable to scrunch because wavelength' //
-     :        ' scales not yet fitted.' 
+     :        ' scales not yet fitted.'
          CALL ECH_REPORT( 0, REPORT_STRING )
          GO TO 999
       END IF
@@ -348,7 +348,7 @@
          EORD = HI_ORDER
          IF ( HI_ORDER - LOW_ORDER + 1 .LT. N_ORDERS ) THEN
             REPORT_STRING = ' Unable to scrunch some orders' //
-     :           ' because they are not yet wavelength calibrated.' 
+     :           ' because they are not yet wavelength calibrated.'
             CALL ECH_REPORT( 0, REPORT_STRING )
          ENDIF
       ENDIF
@@ -553,11 +553,11 @@
 *        Merge scrunched order into 1d spectrum if enabled.
             IF ( SCR_MODE .NE. 'ARC' .AND. ORDER_NUMBER .EQ. 0 ) THEN
                CALL ECH_REPORT( 0, ' Merging order into 1-D spectrum.' )
-               IF ( MULTI_MERGE ) THEN 
+               IF ( MULTI_MERGE ) THEN
                   REPORT_STRING = ' Co-adding 1-D spectrum to' //
      :                  ' previously  merged spectrum.'
                   CALL ECH_REPORT( 0, REPORT_STRING )
-     :               
+     :
                END IF
                CALL ECH_MERGE_ORDERS( NO_OF_BINS, 1,
      :              REBIN_WORK( 1, 1 ), REBIN_WORK( 1, 2 ), 51, 10.0,

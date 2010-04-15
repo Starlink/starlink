@@ -108,10 +108,10 @@ proc CCDCheckReduce { Top } {
          close $fileid
 
 #  Catch snaphot of .tmp files in current directory.
-         foreach file [glob -nocomplain *.tmp] { 
+         foreach file [glob -nocomplain *.tmp] {
             set tmp($file) 1
          }
-         
+
 
 #  Now run the task on these files.
          set TASK(schedule,error) ""
@@ -123,8 +123,8 @@ proc CCDCheckReduce { Top } {
             "  Checking possible debiassing methods please wait "
 
 #  Remove any new .tmp files.
-         foreach file [glob -nocomplain *.tmp] { 
-            if { ! [info exists tmp($file)] } { 
+         foreach file [glob -nocomplain *.tmp] {
+            if { ! [info exists tmp($file)] } {
                catch {exec rm $file}
             }
          }
@@ -158,7 +158,7 @@ proc CCDCheckReduce { Top } {
                         if { $v != "" } {
                            catch {unset type}
                            scan $v "%d %s" type dummy
-                           if { [info exists type] } { 
+                           if { [info exists type] } {
                               set BIAS(debias,$type) 1
                               set modified 1
                            }
@@ -174,7 +174,7 @@ proc CCDCheckReduce { Top } {
                         if { $v != "" } {
                            catch {unset type}
                            scan $v "%d %s" type dummy
-                           if { [info exists type] } { 
+                           if { [info exists type] } {
                               set BIAS(interp,$type) 1
                               set modified 1
                            }
@@ -204,7 +204,7 @@ proc CCDCheckReduce { Top } {
             }
          }
       } else {
-         
+
 #  Failed to open file.
          CCDIssueError "Failed to open temporary file"
          set status 0

@@ -16,7 +16,7 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidDefMinPix( int ndim, double *fwhm, double thresh, 
+*     int cupidDefMinPix( int ndim, double *fwhm, double thresh,
 *                            double minhgt, int *status )
 
 *  Description:

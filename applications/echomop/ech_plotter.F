@@ -372,8 +372,8 @@
          ELSE
             CALL CHR_ITOC( INT( XM ), REF_STR1, NCHAR1 )
             CALL CHR_ITOC( INT( XH ), REF_STR2, NCHAR2 )
-            REPORT_STRING = ' X-axis limited from ' // 
-     :            REF_STR1( :NCHAR1 ) // ' to ' // 
+            REPORT_STRING = ' X-axis limited from ' //
+     :            REF_STR1( :NCHAR1 ) // ' to ' //
      :            REF_STR2( :NCHAR2 ) // '.'
             CALL ECH_REPORT( 0, REPORT_STRING )
             XLIMITS = .TRUE.
@@ -386,8 +386,8 @@
          ELSE
             CALL CHR_ITOC( INT( YM ), REF_STR1, NCHAR1 )
             CALL CHR_ITOC( INT( YH ), REF_STR2, NCHAR2 )
-            REPORT_STRING = ' Y-axis limited from ' // 
-     :            REF_STR1( :NCHAR1 ) // ' to ' // 
+            REPORT_STRING = ' Y-axis limited from ' //
+     :            REF_STR1( :NCHAR1 ) // ' to ' //
      :            REF_STR2( :NCHAR2 ) // '.'
             CALL ECH_REPORT( 0, REPORT_STRING )
             YLIMITS = .TRUE.
@@ -711,8 +711,8 @@
          ELSE
             CALL CHR_ITOC( INT( XM ), REF_STR1, NCHAR1 )
             CALL CHR_ITOC( INT( XH ), REF_STR2, NCHAR2 )
-            REPORT_STRING = ' X-axis limited from ' // 
-     :            REF_STR1( :NCHAR1 ) // ' to ' // 
+            REPORT_STRING = ' X-axis limited from ' //
+     :            REF_STR1( :NCHAR1 ) // ' to ' //
      :            REF_STR2( :NCHAR2 ) // '.'
             CALL ECH_REPORT( 0, REPORT_STRING )
             XLIMITS = .TRUE.
@@ -724,8 +724,8 @@
          ELSE
             CALL CHR_ITOC( INT( YM ), REF_STR1, NCHAR1 )
             CALL CHR_ITOC( INT( YH ), REF_STR2, NCHAR2 )
-            REPORT_STRING = ' Y-axis limited from ' // 
-     :            REF_STR1( :NCHAR1 ) // ' to ' // 
+            REPORT_STRING = ' Y-axis limited from ' //
+     :            REF_STR1( :NCHAR1 ) // ' to ' //
      :            REF_STR2( :NCHAR2 ) // '.'
             CALL ECH_REPORT( 0, REPORT_STRING )
             YLIMITS = .TRUE.

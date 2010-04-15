@@ -10,7 +10,7 @@ C
 C     IMAGE  The name of the structure containing the first image.
 C
 C     IMAGE1 The name of the structure containing the second
-C            image data.  
+C            image data.
 C
 C     OUTPUT The name of the result of the operation.  This can
 C            be the same as for IMAGE.  If not, a new structure
@@ -18,7 +18,7 @@ C            is created, with everything but the data (and any error
 C            or data quality information) a direct copy of the first
 C            image.
 C
-C     The command itself (IADD,IMULT,IDIV or ISUB) is used to 
+C     The command itself (IADD,IMULT,IDIV or ISUB) is used to
 C     differentiate between the two operations.
 C
 C                                      KS / CIT 26th Sept 1983
@@ -64,9 +64,9 @@ C
       INTEGER   D2PTR      ! Dynamic pointer to second image data.
       INTEGER   D3PTR      ! Dynamic pointer to output image data.
       INTEGER   DIMS(10)   ! Dimensions of first image.  Ignored.
-      INTEGER   E1PTR      ! Dynamic pointer to first image variance 
+      INTEGER   E1PTR      ! Dynamic pointer to first image variance
                            ! array
-      INTEGER   E2PTR      ! Dynamic pointer to second image variance 
+      INTEGER   E2PTR      ! Dynamic pointer to second image variance
                            ! array
       INTEGER   E3PTR      ! Dynamic pointer to output variance array
       LOGICAL   ERR        ! True if IMAGE1 has variance information
@@ -124,7 +124,7 @@ C
       CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',D3PTR,SLOT,STATUS)
 C
 C     If either image has variance information, map all three variance
-C     arrays. Note that MAP_VARIANCE returns a zero array if there is 
+C     arrays. Note that MAP_VARIANCE returns a zero array if there is
 C     no actual error array.
 C     Zero-initialise the output variance. (DSA should do that.)
 C

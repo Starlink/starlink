@@ -33,7 +33,7 @@
 
 *   Export:
       INTEGER STATUS      ! status return
- 
+
 *   Local variables:
       BYTE LINE(MAXREC)   ! copy of text line
 

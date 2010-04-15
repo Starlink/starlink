@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,11 +69,11 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-      
+
 *  Arguments Given:
       INTEGER MAXLEN
       CHARACTER * ( * )  PRETSW
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( 1 )  MENU
 
@@ -100,11 +100,11 @@
 *  Check each source in the source list
       DO 100 IJ = 1, NOFSO
 
-*  Set the source is incorrect flag to false 
+*  Set the source is incorrect flag to false
          SOERRF = .FALSE.
 
 *  Check that the in scan size is non zero and set source incorrect
-*  flag if it is 
+*  flag if it is
          IF ( SOINSZ( IJ ) .EQ. 0.0 ) SOERRF = .TRUE.
 
 *  Check that at least one of the wavebands is required (actually the
@@ -133,7 +133,7 @@
 
 *  Se source to be deleted flag to indicate that source is not to be
 *  used in subsequent processing
-            SOMADE( IJ ) = .TRUE.         
+            SOMADE( IJ ) = .TRUE.
          END IF
  100  CONTINUE
 
@@ -147,7 +147,7 @@
 
 *  Reset the status in case this is a retry and the status is PAR__NULL
             STATUS = SAI__OK
-      
+
 *  Ask user whether he wishes to proceed or to return to add region size
 *  and wavebands menu
             CALL PAR_GET0L( PRETSW, RETSW, STATUS )
@@ -173,8 +173,8 @@
                   SOMADE( IJ ) = .FALSE.
  300           CONTINUE
             END IF
-      
+
 *  Endif is end of if there are errors in any sources ALFOUN = FALSE
          END IF
-      
+
       END

@@ -97,10 +97,10 @@ INTEGER(status)
 
 F77_SUBROUTINE(fams_astmsg)
 (
-CHARACTER(name), 
+CHARACTER(name),
 INTEGER(length),
-CHARACTER(value), 
-INTEGER(status) 
+CHARACTER(value),
+INTEGER(status)
 TRAIL(name)
 TRAIL(value)
 )
@@ -146,15 +146,15 @@ INTEGER(status)
 
 F77_SUBROUTINE(fams_getreply)
 (
-INTEGER(timeout), 
+INTEGER(timeout),
 INTEGER(path),
-INTEGER(messid), 
+INTEGER(messid),
 INTEGER(message_status),
-INTEGER(message_context), 
+INTEGER(message_context),
 CHARACTER(message_name),
-INTEGER(message_length), 
+INTEGER(message_length),
 CHARACTER(message_value),
-INTEGER(status) 
+INTEGER(status)
 TRAIL(message_name)
 TRAIL(message_value)
 )
@@ -174,8 +174,8 @@ TRAIL(message_value)
 
    if ( *status != SAI__OK ) return;
 
-   ams_getreply ( *timeout, *path, *messid, message_name_length, 
-     message_value_length, message_status, message_context, cname, 
+   ams_getreply ( *timeout, *path, *messid, message_name_length,
+     message_value_length, message_status, message_context, cname,
      message_length, message_value, status );
    cnf_exprt ( cname, message_name, message_name_length );
 }
@@ -184,8 +184,8 @@ TRAIL(message_value)
 
 F77_SUBROUTINE(fams_init)
 (
-CHARACTER(own_name), 
-INTEGER(status) 
+CHARACTER(own_name),
+INTEGER(status)
 TRAIL(own_name)
 )
 
@@ -212,10 +212,10 @@ TRAIL(own_name)
 
 F77_SUBROUTINE(fams_kick)
 (
-CHARACTER(name), 
-INTEGER(length), 
-CHARACTER(value), 
-INTEGER(status) 
+CHARACTER(name),
+INTEGER(length),
+CHARACTER(value),
+INTEGER(status)
 TRAIL(name)
 TRAIL(value)
 )
@@ -244,13 +244,13 @@ TRAIL(value)
 
 F77_SUBROUTINE(fams_path)
 (
-CHARACTER(other_task_name), 
-INTEGER(path), 
-INTEGER(status) 
+CHARACTER(other_task_name),
+INTEGER(path),
+INTEGER(status)
 TRAIL(other_task_name)
 )
 {
-   GENPTR_CHARACTER(other_task_name) 
+   GENPTR_CHARACTER(other_task_name)
    GENPTR_INTEGER(path)
    GENPTR_INTEGER(status)
 
@@ -271,11 +271,11 @@ TRAIL(other_task_name)
 
 /*+  FAMS_PLOOKUP */
 
-F77_SUBROUTINE(fams_plookup) 
+F77_SUBROUTINE(fams_plookup)
 (
-INTEGER(path), 
-CHARACTER(name), 
-INTEGER(status) 
+INTEGER(path),
+CHARACTER(name),
+INTEGER(status)
 TRAIL(name)
 )
 {
@@ -302,17 +302,17 @@ TRAIL(name)
 
 /*+  FAMS_RECEIVE */
 
-F77_SUBROUTINE(fams_receive) 
+F77_SUBROUTINE(fams_receive)
 (
-INTEGER(timeout), 
+INTEGER(timeout),
 INTEGER(message_status),
 INTEGER(message_context),
 CHARACTER(message_name),
 INTEGER(message_length),
 CHARACTER(message_value),
-INTEGER(path), 
+INTEGER(path),
 INTEGER(messid),
-INTEGER(status) 
+INTEGER(status)
 TRAIL(message_name)
 TRAIL(message_value)
 )
@@ -332,7 +332,7 @@ TRAIL(message_value)
 
    if ( *status != SAI__OK ) return;
 
-   ams_receive ( *timeout, MSG_NAME_LEN, message_value_length, 
+   ams_receive ( *timeout, MSG_NAME_LEN, message_value_length,
      message_status, message_context, cname, message_length,
      message_value, path, messid, status );
    cnf_exprt ( cname, message_name, message_name_length );
@@ -343,7 +343,7 @@ TRAIL(message_value)
 
 F77_SUBROUTINE(fams_reply)
 (
-INTEGER(path), 
+INTEGER(path),
 INTEGER(messid),
 INTEGER(message_function),
 INTEGER(message_status),
@@ -351,7 +351,7 @@ INTEGER(message_context),
 CHARACTER(message_name),
 INTEGER(message_length),
 CHARACTER(message_value),
-INTEGER(status) 
+INTEGER(status)
 TRAIL(message_name)
 TRAIL(message_value)
 )
@@ -375,8 +375,8 @@ TRAIL(message_value)
    {
 
       cnf_imprt ( message_name, message_name_length, cname );
-      ams_reply ( *path, *messid, *message_function, *message_status, 
-        *message_context, cname, *message_length, message_value, 
+      ams_reply ( *path, *messid, *message_function, *message_status,
+        *message_context, cname, *message_length, message_value,
         status );
    }
    else
@@ -390,8 +390,8 @@ TRAIL(message_value)
 F77_SUBROUTINE(fams_resmsg)
 (
 INTEGER(length),
-CHARACTER(value), 
-INTEGER(status) 
+CHARACTER(value),
+INTEGER(status)
 TRAIL(value)
 )
 
@@ -409,7 +409,7 @@ TRAIL(value)
 /*+  FAMS_SEND */
 
 F77_SUBROUTINE(fams_send)
-(INTEGER(path), 
+(INTEGER(path),
 INTEGER(message_function),
 INTEGER(message_status),
 INTEGER(message_context),
@@ -417,7 +417,7 @@ CHARACTER(message_name),
 INTEGER(message_length),
 CHARACTER(message_value),
 INTEGER(messid),
-INTEGER(status) 
+INTEGER(status)
 TRAIL(message_name)
 TRAIL(message_value)
 )
@@ -440,7 +440,7 @@ TRAIL(message_value)
    {
 
       cnf_imprt ( message_name, message_name_length, cname );
-      ams_send ( *path, *message_function, *message_status, *message_context, 
+      ams_send ( *path, *message_function, *message_status, *message_context,
         cname, *message_length, message_value, messid, status );
    }
    else

@@ -7,16 +7,16 @@
 *     GRA1_CONV
 
 *  Purpose:
-*     Transforms the radius and pixel count value into the currently 
-*     required format. Returns an error flag if one of the values is 
+*     Transforms the radius and pixel count value into the currently
+*     required format. Returns an error flag if one of the values is
 *     unusable. Is employed when displaying data points or data
 *     fits.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GRA1_CONV(RADISP,WHATD,SIGMA,ZEROP,FLAG,RADIUS,BRIGHT,STATUS)    
+*     CALL GRA1_CONV(RADISP,WHATD,SIGMA,ZEROP,FLAG,RADIUS,BRIGHT,STATUS)
 
 *  Description:
 *     Depending on the value of RADISP the subroutine converts the values
@@ -24,13 +24,13 @@
 *     R, R**2, R**.5 or Log10(R) (in the case of R) and Log10(I)
 *     I/SIGMA in the case of pixel count value.
 
-*  Arguments:                                     
+*  Arguments:
 *     RADISP = CHAR (Given)
 *        Character variable denoting the format to be used for the radius
 *        value. R=Linear Q=Quarter power, L=Logarithmic and S=Squared.
 *     WHATD *(256) = CHARACTER  (Given)
-*        Describes what parameter is to be displayed against 
-*        radius on the graphs. 
+*        Describes what parameter is to be displayed against
+*        radius on the graphs.
 *     BACK = REAL (Given)
 *        The background count value for the image. Units counts.
 *     SIGMA = REAL (Given)
@@ -61,11 +61,11 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       CHARACTER RADISP *(256)         ! Defines the type of transformation
                                       ! to be applied to the radius value
       CHARACTER *(256) WHATD          ! What is to be displayed against
@@ -74,14 +74,14 @@
       REAL ZEROP                      ! The zero point of the magnitude scale
 
 *  Arguments Returned:
-      INTEGER FLAG                    ! Indicates whether or not the 
+      INTEGER FLAG                    ! Indicates whether or not the
                                       ! transformations were successful
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       REAL BRIGHT                     ! The pixel count value to be
                                       ! transformed
-      REAL RADIUS                     ! The radius value to be transformed    
+      REAL RADIUS                     ! The radius value to be transformed
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -95,14 +95,14 @@
 
 *   Perform pixel count transformations.
 
-*   Modify the incoming Y axis values if required. 
+*   Modify the incoming Y axis values if required.
 *   Not required when WHATD = E, P, C, X, Y or the Fourier descriptors..
 
 *   In terms of sigma compared to sky.
       IF (WHATD.EQ.'B') BRIGHT=BRIGHT/SIGMA
 
 *   In terms of surface brightness.
-      IF (WHATD.EQ.'S') THEN                       
+      IF (WHATD.EQ.'S') THEN
          IF (BRIGHT.GT.0.0) THEN
             BRIGHT=ZEROP-2.5*LOG10(BRIGHT)
          ELSE
@@ -144,16 +144,16 @@
 *     SEC1_CONV
 
 *  Purpose:
-*     Transforms the radius and pixel count value into the currently 
-*     required format. Returns an error flag if one of the values is 
+*     Transforms the radius and pixel count value into the currently
+*     required format. Returns an error flag if one of the values is
 *     unusable. Is employed when displaying data points or data
 *     fits.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SEC1_CONV(RADISP,SURF,BACK,SIGMA,ZEROP,FLAG,RADIUS,BRIGHT,STATUS)    
+*     CALL SEC1_CONV(RADISP,SURF,BACK,SIGMA,ZEROP,FLAG,RADIUS,BRIGHT,STATUS)
 
 *  Description:
 *     Depending on the value of RADISP the subroutine converts the values
@@ -161,7 +161,7 @@
 *     R, R**2, R**.5 or Log10(R) (in the case of R) and Log10(I-BACK)
 *     (I-BACK)/SIGMA in the case of pixel count value.
 
-*  Arguments:                                     
+*  Arguments:
 *     RADISP = CHAR (Given)
 *        Character variable denoting the format to be used for the radius
 *        value. R=Linear Q=Quarter power, L=Logarithmic and S=Squared.
@@ -198,14 +198,14 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       CHARACTER RADISP *(256)         ! Defines the type of transformation
                                       ! to be applied to the radius value
-      LOGICAL SURF                    ! Denotes how the pixel count is 
+      LOGICAL SURF                    ! Denotes how the pixel count is
                                       ! to be transformed i.e. surface brightness
                                       ! or in terms of sky
       REAL BACK                       ! Pixel count value for the background
@@ -214,14 +214,14 @@
       REAL ZEROP                      ! The zero point of the magnitude scale
 
 *  Arguments Returned:
-      INTEGER FLAG                    ! Indicates whether or not the 
+      INTEGER FLAG                    ! Indicates whether or not the
                                       ! transformations were successful
-*  Arguments Given and Returned:           
+*  Arguments Given and Returned:
       REAL BRIGHT                     ! The pixel count value to be
                                       ! transformed
-      REAL RADIUS                     ! The radius value to be transformed    
+      REAL RADIUS                     ! The radius value to be transformed
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -236,9 +236,9 @@
 *   Perform pixel count transformations.
 
 *   Convert the pixel values to sigma or surface brightness.
-      IF (.NOT.SURF) THEN        
+      IF (.NOT.SURF) THEN
          BRIGHT=(BRIGHT-BACK)/SIGMA
-      ELSE                       
+      ELSE
          BRIGHT=(BRIGHT-BACK)
          IF (BRIGHT.GT.0.0) THEN
             BRIGHT=ZEROP-2.5*LOG10(BRIGHT)

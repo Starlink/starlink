@@ -192,7 +192,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
                     "Invalid blank file name given.",
                     &hds_gl_status );
       }
-      
+
 /* Scan the file name, classifying the characters that appear in it.        */
       else
       {
@@ -256,7 +256,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
          extn = ( idot > islash );
          lbase  = fname_len - start - ( idot == fname_len );
       }
-         
+
 /* If special characters are present in the file name, then we must use a   */
 /* shell process to interpret them. We only do this if it is really         */
 /* necessary, since it is slower. Note that file extension information will */

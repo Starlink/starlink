@@ -13,7 +13,7 @@
 *     CALL TRACC1( A, B, X, Y, SCS, STATUS )
 
 *  Description:
-*     This routine uses IRA_DRVAL to plot sky longitude and latitude 
+*     This routine uses IRA_DRVAL to plot sky longitude and latitude
 *     values. Each value is preceeded with an abbreviation of the
 *     coordinate name such as "RA = ". The current text attributes are
 *     used.
@@ -24,10 +24,10 @@
 *     B = DOUBLE PRECISION (Given)
 *        The sky latitude value.
 *     X = REAL (Given)
-*        The world X coordinate of the top left corner of the box in 
+*        The world X coordinate of the top left corner of the box in
 *        which the value are to be written.
 *     Y = REAL (Given)
-*        The world Y coordinate of the top left corner of the box in 
+*        The world Y coordinate of the top left corner of the box in
 *        which the value are to be written.
 *     SCS = CHARACTER * ( * ) (Returned)
 *        The sky coordinate system.
@@ -47,7 +47,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -61,7 +61,7 @@
       DOUBLE PRECISION B
       REAL X
       REAL Y
-      CHARACTER SCS*(*) 
+      CHARACTER SCS*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status

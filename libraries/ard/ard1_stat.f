@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND, 
-     :                      NEEDIM, NARG, II, UWCS, MAP, STAT, IWCS, 
+      SUBROUTINE ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND,
+     :                      NEEDIM, NARG, II, UWCS, MAP, STAT, IWCS,
      :                      WCSDAT, STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND, NEEDIM, 
+*     CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND, NEEDIM,
 *                     NARG, II, UWCS, MAP, STAT, IWCS, WCSDAT, STATUS )
 
 *  Description:
@@ -33,8 +33,8 @@
 *        The number of axes in the user coord system.
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
-*        should have a Base Frame referring to pixel coords within the 
-*        pixel mask and another Frame with Domain ARDAPP referring to 
+*        should have a Base Frame referring to pixel coords within the
+*        pixel mask and another Frame with Domain ARDAPP referring to
 *        "Application co-ordinates" (i.e. default user coordinates).
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
@@ -51,15 +51,15 @@
 *        The index within ELEM of the next character to be checked.
 *     UWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the user. If not
-*        AST__NULL, this should at least have a Frame with Domain ARDAPP 
-*        referring to "Application co-ordinates". The current Frame in this 
-*        FrameSet should refer to "User co-ordinates" (i.e. the coord system 
+*        AST__NULL, this should at least have a Frame with Domain ARDAPP
+*        referring to "Application co-ordinates". The current Frame in this
+*        FrameSet should refer to "User co-ordinates" (i.e. the coord system
 *        in which positions are supplied in the ARD description).
 *     MAP = INTEGER (Returned)
 *        A pointer to an AST Mapping from the pixel coords in the mask,
-*        to the coordinate system in which positions are specified in the 
+*        to the coordinate system in which positions are specified in the
 *        ARD expression. This is obtained by merging UWCS and AWCS,
-*        aligning them in a suitable common Frame. 
+*        aligning them in a suitable common Frame.
 *     STAT = LOGICAL (Returned)
 *        Returned .TRUE. if more arguments are required for the current
 *        statement. Returned .FALSE. if the current statement has now
@@ -71,7 +71,7 @@
 *        current Frame is user coords.
 *     WCSDAT( * ) = DOUBLE PRECISION (Returned)
 *        Returned holding information which qualifies IWCS. If IWCS is
-*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping 
+*        AST__NULL, then WCSDAT holds the coefficiets of the linear mapping
 *        from pixel to user coords. Otherwise, wcsdat(1) holds a lower
 *        limit on the distance (within the user coords) per pixel, and
 *        the other elements in WCSDAT are not used. The supplied array
@@ -89,12 +89,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -122,7 +122,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -178,7 +178,7 @@
 
       DOUBLE PRECISION
      :  STARGS( ARD__MXSAR )     ! Statement argument values
- 
+
 *  Ensure that the number of arguments required, and the arguments
 *  values obtained so far are preserved.
       SAVE ARGREQ, STARGS, IGRP
@@ -188,9 +188,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  WCS and COFRAME statements do not have a simple list of numerical arguments 
+*  WCS and COFRAME statements do not have a simple list of numerical arguments
 *  and so are treated as special cases.
-      IF( TYPE .EQ. ARD__WCS .OR. TYPE .EQ. ARD__COF ) THEN 
+      IF( TYPE .EQ. ARD__WCS .OR. TYPE .EQ. ARD__COF ) THEN
 
 *  If a new argument list is being started...
          IF( NARG .EQ. -1 ) THEN
@@ -230,17 +230,17 @@
                END IF
 
 *  OFFSET - The number of arguments required for the OFFSET statement
-*  equals the dimensionality of the ARD description. 
+*  equals the dimensionality of the ARD description.
                IF( TYPE .EQ. ARD__OFF ) THEN
                   ARGREQ = NWCS
 
 *  STRETCH - The number of arguments required for the STRETCH statement
-*  equals the dimensionality of the ARD description. 
+*  equals the dimensionality of the ARD description.
                ELSE IF( TYPE .EQ. ARD__STR ) THEN
                   ARGREQ = NWCS
 
 *  COEFFS - The number of arguments required for the COEFFS statement
-*  depends on the dimensionality of the ARD description. 
+*  depends on the dimensionality of the ARD description.
                ELSE IF( TYPE .EQ. ARD__COE ) THEN
                   ARGREQ = NWCS*( NWCS + 1 )
 
@@ -250,13 +250,13 @@
                   CALL MSG_SETI( 'T', TYPE )
                   CALL ERR_REP( 'ARD1_STAT_ERR2', 'ARD1_STAT: '//
      :                    'Statement type ^T should not have '//
-     :                    'variable argument list (programming error).', 
+     :                    'variable argument list (programming error).',
      :                    STATUS )
                   GO TO 999
                END IF
-   
+
             END IF
-   
+
          END IF
 
 *  Copy the argument list from the ARD description into a local array.
@@ -266,9 +266,9 @@
 
 *  If the argument list is complete, update the appropriate ARD
 *  parameters.
-      IF( .NOT. STAT ) THEN 
+      IF( .NOT. STAT ) THEN
 
-*  If it is a DIMENSION statement, indicate that a DIMENSION statement has 
+*  If it is a DIMENSION statement, indicate that a DIMENSION statement has
 *  been found, and ensure that the current Frame in the UWCS FrameSet has
 *  the requested number of axes..
          IF( TYPE .EQ. ARD__DIM ) THEN
@@ -322,7 +322,7 @@
          END IF
 
 *  Merge the UWCS and AWCS to get the Mapping from PIXEL to user coords.
-         CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT, 
+         CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT,
      :                    STATUS )
 
       END IF
@@ -330,11 +330,11 @@
 *  Jump to here if an error occurs.
  999  CONTINUE
 
-*  Give a context message if an error has occurred.      
+*  Give a context message if an error has occurred.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'ELEM', ELEM )
          CALL MSG_SETC( 'ST', CMN_STSYM( TYPE ) )
-         IF( TYPE .NE. ARD__WCS ) THEN 
+         IF( TYPE .NE. ARD__WCS ) THEN
             CALL ERR_REP( 'ARD1_STAT_ERR6', 'Error processing ^ST '//
      :                    'statement in ARD description ''^ELEM''.',
      :                    STATUS )
@@ -343,5 +343,5 @@
      :                    'statement.', STATUS )
          END IF
       END IF
-      
+
       END

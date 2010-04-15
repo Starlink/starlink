@@ -1,4 +1,4 @@
- 
+
 *---------------------------------------------------------------------
       SUBROUTINE GK1ABG
 *---------------------------------------------------------------------
@@ -52,7 +52,7 @@
 *
 *---------------------------------------------------------------------
 *
- 
+
 *     Start from a new line in the external file
       CALL GKFOCO(KIOSN,DUMMY,IREM)
 *     Fill the whole of the clipping area in a background colour.
@@ -61,5 +61,5 @@
      :             QHP(KHPXR(KCTBPT(3,KWKIX))+0)
    50 FORMAT(3F8.5, ' setrgbcolor clippath fill newpath')
       CALL GKFOCO(KIOPB, S(1:58), IREM)
- 
+
       END

@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Form full NDF name from root and suffix
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -40,7 +40,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,7 +77,7 @@
 
 *  If the supplied NDF name ends with ".sdf" (case insensitive) remove
 *  it.
-      IF( NLEN .GT. 3 ) THEN 
+      IF( NLEN .GT. 3 ) THEN
 
          IF( CHR_SIMLR( NDFNM( NLEN - 3 : NLEN ), '.sdf' ) ) THEN
             NLEN = NLEN - 4
@@ -98,10 +98,10 @@
 
 *  Do nothing else if no suffix was supplied.
       SLEN = CHR_LEN( SUFFIX )
-      IF( SLEN .GT. 0 ) THEN 
+      IF( SLEN .GT. 0 ) THEN
 
 *  Append the suffix to the NDF name so long as it is not already there.
-         IF( .NOT. CHR_SIMLR( NDFNM( MAX( 1, NLEN - SLEN + 1 ) : ), 
+         IF( .NOT. CHR_SIMLR( NDFNM( MAX( 1, NLEN - SLEN + 1 ) : ),
      :                        SUFFIX( : SLEN ) ) ) THEN
             NDFNM( NLEN + 1 : ) = SUFFIX
          END IF

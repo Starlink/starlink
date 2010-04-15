@@ -98,7 +98,7 @@
 *  coordinates are expected.
       CALL IRA_SCNAM( SCS, 1, DESCR, LD, ABB, LA, STATUS )
       CALL PAR_PROMT( APARAM, DESCR( : LD )//
-     :                 ' of a reference position within the field', 
+     :                 ' of a reference position within the field',
      :                 STATUS )
 
 *  Get a group holding the field longitudes for the output NDFs. A
@@ -119,7 +119,7 @@
 *  new group.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'PREPA1_ERR1',
-     :            'PREPA1: Please give a new group of field positions', 
+     :            'PREPA1: Please give a new group of field positions',
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
          CALL GRP_DELET( IGRPA, STATUS )
@@ -131,7 +131,7 @@
 *  coordinates are expected.
       CALL IRA_SCNAM( SCS, 2, DESCR, LD, ABB, LA, STATUS )
       CALL PAR_PROMT( BPARAM, DESCR( : LD )//
-     :                 ' of a reference position within the field', 
+     :                 ' of a reference position within the field',
      :                 STATUS )
 
 *  Get a group holding the field latitudes for the output NDFs. A
@@ -156,7 +156,7 @@
 *  new group.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'PREPA1_ERR2',
-     :            'PREPA1: Please give a new group of field positions', 
+     :            'PREPA1: Please give a new group of field positions',
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
          CALL GRP_DELET( IGRPB, STATUS )
@@ -166,5 +166,5 @@
 
 *  Finish
  999  CONTINUE
-      
+
       END

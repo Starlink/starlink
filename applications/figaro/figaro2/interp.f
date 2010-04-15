@@ -3,7 +3,7 @@ C+
 C
 C     I N T E R P    /     S P I F I T    /   L I N T E R P
 C
-C     Interpolates between the points of a 'spiketrum' to 
+C     Interpolates between the points of a 'spiketrum' to
 C     generate a spectrum.   The INTERP command does this by
 C     spline interpolation, the SPIFIT command uses global polynomial
 C     fitting, and the LINTERP command uses linear interpolation.
@@ -20,9 +20,9 @@ C                be the same as for SPIKE.  If not, a new structure
 C                is created, with everything but the data a direct
 C                copy of the input.
 C
-C     Command keywords  - 
+C     Command keywords  -
 C
-C     LOG        (INTERP & SPIFIT only) Perform the interpolation on 
+C     LOG        (INTERP & SPIFIT only) Perform the interpolation on
 C                the log of the data
 C
 C     LINEND     (INTERP only) Use a linear interpolation for the
@@ -80,7 +80,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -122,7 +122,7 @@ C
          ORDER=-2
          LINEND=.TRUE.
       END IF
-      
+
 C
 C     Open output file and map data for update
 C
@@ -135,7 +135,7 @@ C
 C
 C     Look for any 'end' values. These are located with the aid of the
 C     structure definition file SPIKETRUM.DEF. Failure to find these
-C     end values in the input spiketrum file simply results in 
+C     end values in the input spiketrum file simply results in
 C     default values being used.
 C
       CALL DSA_READ_STRUCT_DEF('spiketrum',STATUS)

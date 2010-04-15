@@ -277,7 +277,7 @@
      :                      STATUS )
 
             END IF
-  
+
 *          Tidy up
 
             CALL PAR_CANCL( PNP, STATUS )

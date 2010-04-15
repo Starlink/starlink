@@ -4,7 +4,7 @@
 *     FIND01
 
 *  Purpose:
-*     To calculate the annual and orbital abberation error 
+*     To calculate the annual and orbital abberation error
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,9 +18,9 @@
 
 *  Arguments:
 *     SLPSI = REAL (Given)
-*        Source psi      
+*        Source psi
 *     SLTH = REAL (Given)
-*        Source theta      
+*        Source theta
 *     SPSPD = REAL (Given)
 *        Sign of psi dot for SOP
 *     SLDPSI = REAL (Returned)
@@ -48,7 +48,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

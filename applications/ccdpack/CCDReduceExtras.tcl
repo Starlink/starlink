@@ -23,12 +23,12 @@
 #        The name of the top-level window for this form.
 
 #  Notes:
-#     Choice of type of script to run removed as ICL will not run 
+#     Choice of type of script to run removed as ICL will not run
 #     run a non-tty.
 
 #  Global Parameters:
 #     CCDglobalpars = array (read and write)
-#        The values of the parameters to be set. 
+#        The values of the parameters to be set.
 
 #  Copyright:
 #     Copyright (C) 1994 Science & Engineering Research Council.
@@ -76,7 +76,7 @@
 #     {note_any_bugs_here}
 
 #-
-   
+
 #  Global parameters:
       global CCDglobalpars
 #.
@@ -84,7 +84,7 @@
 #----------------------------------------------------------------------------
 #  Widget creation.
 #----------------------------------------------------------------------------
-   
+
 #  Create a top-level window.
       CCDCcdWidget Top top \
          Ccd::toplevel $Topwin -title "Reduce additional parameters"
@@ -173,7 +173,7 @@
 
 #  Add an option to view the names of the NDFs to be processed.
       $Menu addcommand Options {View frames...} \
-         "global CCDallndfs 
+         "global CCDallndfs
           CCDViewLists $Top.view {All available frames} CCDallndfs
          "
 

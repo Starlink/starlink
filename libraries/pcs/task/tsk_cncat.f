@@ -18,7 +18,7 @@
 *  Description:
 *     Given an array of strings, concatenate them with separating single
 *     spaces, having removed leading and trailing spaces. This generates
-*     an argument list suitable for passing through the ADAM message 
+*     an argument list suitable for passing through the ADAM message
 *     system.
 
 *  Arguments:
@@ -31,8 +31,8 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     For each of the NVALS elements of STRINGS, use LIB$SKPC to skip 
-*     leading spaces and STR$TRIM to remove trailing spaces, then append 
+*     For each of the NVALS elements of STRINGS, use LIB$SKPC to skip
+*     leading spaces and STR$TRIM to remove trailing spaces, then append
 *     the result onto VALUE with a single trailing space.
 
 *  Copyright:

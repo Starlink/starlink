@@ -15,11 +15,11 @@
 # end result is digitised. !!emph{makebias} avoids this by
 # median combining small groups and then averaging the results.
 # The small group need to be large enough to ensure good removal
-# of cosmic rays. Another problem with combining bias frames is 
+# of cosmic rays. Another problem with combining bias frames is
 # that they may suffer overall offsets such that one frame hardly
 # contributes to the median (e.g. if it is 20 counts higher than the others
 # but readout noise is only 3 counts). This routine accounts for this using
-# the program 'picstat' to compute the mean level over a region 
+# the program 'picstat' to compute the mean level over a region
 # which it subtracts prior to combining the frames, but adds back to
 # the final result before averaging. The result is a mean bias with about the
 # the right level and little digitisation noise. NB the routine takes care
@@ -31,7 +31,7 @@
 # !!head2 Invocation
 #
 # makebias list nmedian bias_region output
-# 
+#
 # !!head2 Arguments
 #
 # !!table
@@ -66,7 +66,7 @@ if(! ( -e $list && -e $bias_region ) ) then
   echo "One or both of $list and $bias_region do not exist"
   exit
 endif
- 
+
 if ( ! $?ADAM_USER ) then
   setenv ADAM_USER ~/adam
 endif
@@ -76,7 +76,7 @@ endif
 set nfile = `cat $list | egrep -v '^[ \t]*$' | wc -l`
 
 @ ngroup = $nfile / $nmedian
- 
+
 if($ngroup == 0) then
   set ngroup = 1
 endif
@@ -103,7 +103,7 @@ while ($ng < $ngroup)
   @ ngp = $ng + 1
 
   set nf = $nf1
-  \rm -f zzz_makebias 
+  \rm -f zzz_makebias
   while($nf < $nf2)
     echo $flist[$nf] >> zzz_makebias
     @ nf++

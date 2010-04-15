@@ -24,7 +24,7 @@
 *     BINSP  =  LOGICAL (Given)
 *        Flag indicating how the details of the histogram bins are
 *        to be specified, coded as follows:
-*        .TRUE.  - by bin width, 
+*        .TRUE.  - by bin width,
 *        .FALSE. - by the number of bins.
 *     BINDET  =  REAL (Given)
 *        Detail defining the histogram bins: either the bin width or

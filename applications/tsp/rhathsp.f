@@ -9,13 +9,13 @@ C
 C     Function:
 C        Read Hatfield Polarimeter High Speed Photometry Data
 C
-C     Description:   
+C     Description:
 C        RHATHSP reads data files in Figaro format as produced
 C        by the Hatfield Polarimeter at the AAT running in its
 C        5 channel high speed photometry mode.
 C
 C        It outputs a 5 channel TSP time series dataset containing
-C        the light curves in each of the five channels. An accurate 
+C        the light curves in each of the five channels. An accurate
 C        time axis array is created using the approximate start time
 C        and the additional timing information written to the sixth
 C        channel of the data array.
@@ -24,16 +24,16 @@ C     Parameters:
 C    (1) FIGARO     (Char)     The Hatfield Figaro file to read.
 C    (2) OUTPUT     (TSP, 2D)  The output time series dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         2/12/1988
 C
 C-
 C
 C  History:
-C    Nov/1987   Original Version (RIRPS)   JAB/AAO 
+C    Nov/1987   Original Version (RIRPS)   JAB/AAO
 C    27/2/1988   TSP Monolith version.  JAB/AAO
 C    2/12/1988   Modified from RIRPS   JAB/AAO
 C    3/12/1988   Handle Timing Accurately  JAB/AAO
@@ -63,15 +63,15 @@ C
       INTEGER NPOINTS,NCYCLES,NPHASE
       INTEGER I
       INTEGER NSTRT
-      INTEGER IH,IM,IY,ID                          
+      INTEGER IH,IM,IY,ID
       REAL IT,RT
       DOUBLE PRECISION SEC,DJ1,DJ2,DJM
       INTEGER J
       CHARACTER*(DAT__SZLOC) OLOC,ILOC,XLOC,ALOC
       CHARACTER*80 FNAME,LABEL,UNITS,UTSTART,UTEND,UTDATE
-      LOGICAL OK                                
-      INTEGER APTR         
-      INTEGER SIZE                
+      LOGICAL OK
+      INTEGER APTR
+      INTEGER SIZE
       REAL WAVES(5)
       INTEGER SL
       CHARACTER*64 COM
@@ -83,7 +83,7 @@ C
       LENNAME = ICH_LEN(FNAME)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME(:LENNAME),STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -94,10 +94,10 @@ C
             CALL MSG_OUT('MSG','Dimensions of Input File Invalid',
      :          STATUS)
             STATUS = USER__001
-         ELSE                        
+         ELSE
 
 *  Copy the dimensions
-            NPOINTS = DIMS(1)          
+            NPOINTS = DIMS(1)
             NPHASE = DIMS(2)
             NCYCLES = DIMS(3)
 
@@ -115,7 +115,7 @@ C
             CALL DSA_GET_FITS_C('INPUT','UTDATE',0,UTDATE,COM,STATUS)
             CALL DSA_GET_FITS_C('INPUT','UTSTART',0,UTSTART,COM,
      :             STATUS)
-            CALL DSA_GET_FITS_C('INPUT','UTEND',0,UTEND,COM,STATUS) 
+            CALL DSA_GET_FITS_C('INPUT','UTEND',0,UTEND,COM,STATUS)
 
 *  Get integration and reset time
             CALL DSA_GET_FITS_F('INPUT','IRPS_IT',0,IT,COM,STATUS)
@@ -129,7 +129,7 @@ C
                 IF (UTSTART(I:I) .EQ. ':') UTSTART(I:I)=' '
                 IF (UTEND(I:I) .EQ. ':') UTEND(I:I)=' '
                 IF (UTDATE(I:I) .EQ. '/') UTDATE(I:I)=' '
-            ENDDO   
+            ENDDO
 
 *  Convert time strings
             NSTRT = 1
@@ -141,7 +141,7 @@ C
 
 *  Convert to fraction of a day
             CALL SLA_DTF2D(IH,IM,SEC,DJ1,J)
-            NSTRT = 1              
+            NSTRT = 1
 
 *  UT Date Years, Month and Day
             CALL SLA_INTIN(UTDATE,NSTRT,IY,J)
@@ -153,14 +153,14 @@ C
 
 *  Form start MJD
             DJ1 = DJM+DJ1
-                             
+
 *  Get the output file
 
              CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
              CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
 
 *  Create the structure
-                                                          
+
              DIMS(1) = 5
              DIMS(2) = NPOINTS/6*NPHASE*NCYCLES
              SIZE = DIMS(2)
@@ -175,7 +175,7 @@ C
 
 *  Fill the output array with the wavelengths of the optical channels
 *  of the Hatfield polarimeter
-             IF (STATUS .EQ. SAI__OK) THEN 
+             IF (STATUS .EQ. SAI__OK) THEN
                  WAVES(1) = 7900.0
                  WAVES(2) = 6400.0
                  WAVES(3) = 5500.0
@@ -192,7 +192,7 @@ C
 
 *  Set label and units of the time
              CALL TSP_WLU_TIME(OLOC,'MJD(UTC)','Days',STATUS)
-   
+
 *  Copy the data
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_RHATHSP_COPY(SIZE,
@@ -210,7 +210,7 @@ C
       ENDIF
       END
 
-      
+
 
 
       SUBROUTINE TSP_RHATHSP_COPY(SIZE,JD1,SEC,IT,IN,OUT,TIMES)
@@ -235,43 +235,43 @@ C
 *
 *   Jeremy Bailey   27/2/1988
 *
-*+   
+*+
       IMPLICIT NONE
 
 *  Parameters
       INTEGER SIZE
       DOUBLE PRECISION JD1,SEC,TIMES(SIZE)
-      REAL IN(6,SIZE),OUT(5,SIZE)                  
+      REAL IN(6,SIZE),OUT(5,SIZE)
       REAL IT
 
 *  Local variables
-      INTEGER I,J,K,ND    
+      INTEGER I,J,K,ND
       DOUBLE PRECISION JD,JDS
-                                                                 
+
 *  Time per bin  (convert IT from milliseconds to days)
 
       JDS = IT/(1000D0 * 3600D0 * 24D0)
-               
+
 *  Approximate start time from header is in JD1. There will actually
-*  be a few seconds delay between this and the actual start time.          
+*  be a few seconds delay between this and the actual start time.
 *  Correct start time using second markers in 1st channel of data.
-               
-      PRINT *,SEC,IN(1,1)                                         
+
+      PRINT *,SEC,IN(1,1)
       IF (IN(1,1) .LT. SEC) SEC = SEC - 60D0
 
 *  Whole seconds correction
 
       JD1 = JD1 + (IN(1,1) - SEC)/(3600D0 * 24D0)
-      PRINT *,'Correction = ',IN(1,1)-SEC                                 
+      PRINT *,'Correction = ',IN(1,1)-SEC
 
-*  Fractions of second correction - look for second transition       
-               
+*  Fractions of second correction - look for second transition
+
       J = 2
       DO WHILE (NINT(IN(1,J)) .EQ. NINT(IN(1,1)))
          J = J+1
       ENDDO
       JD1 = JD1 + (1D0 - (J-0.5D0)*(IT/1000D0))*JDS
-      PRINT *,'Correction = ',(1D0 - (J-0.5D0)*(IT/1000D0)) 
+      PRINT *,'Correction = ',(1D0 - (J-0.5D0)*(IT/1000D0))
 
 *  Copy data to output array and fill time array
       JD = JD1
@@ -283,4 +283,4 @@ C
           TIMES(I) = JD
       ENDDO
       END
-      
+

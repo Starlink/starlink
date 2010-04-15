@@ -68,7 +68,7 @@
  *  Notes:
  *    - Fortran locator string must be preallocted. The C locator can be freed
  *    at the discretion of the caller. This simplifies code in the Fortran
- *    interface wrapper. 
+ *    interface wrapper.
  *    - This routine is intended to be used solely for
  *    wrapping Fortran layers from C. "Export" means to export a native
  *    C locator to Fortran.

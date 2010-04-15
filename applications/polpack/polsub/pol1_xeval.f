@@ -16,7 +16,7 @@
 *                      IGRP1, IGRP2, STATUS )
 
 *  Description:
-*   This routine evaluates an import control table expression and stores 
+*   This routine evaluates an import control table expression and stores
 *   the value in the supplied HDS structure.
 
 *  Arguments:
@@ -54,7 +54,7 @@
 *        o  If the keyword is not included in IGRP2, then the keyword
 *        will be converted to _CHAR if it is used as an operand of a
 *        character operator within the expression.
-*        o  If it is not used with a character operator, then it will 
+*        o  If it is not used with a character operator, then it will
 *        be used in the form implied by its encoding in the FITS header:
 *          -  values enclosed in quotes are treated as _CHAR
 *          -  values including a dot treated as _DOUBLE
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,11 +109,11 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
-      CHARACTER CVAL*80          ! Buffer for character expression values      
+      CHARACTER CVAL*80          ! Buffer for character expression values
       CHARACTER FNAME*10         ! Declared keyword name
       CHARACTER FOR*255          ! Forward transformation function
       CHARACTER FTYPE*(DAT__SZTYP)! Declared data type
-      CHARACTER FVALUE*80        ! Keyword value 
+      CHARACTER FVALUE*80        ! Keyword value
       CHARACTER INV*1            ! Inverse transformation function
       CHARACTER LOCTR*(DAT__SZLOC)! Locator for temp. Transform structure
       CHARACTER NTYPE*(DAT__SZTYP)! Natural data type
@@ -138,7 +138,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the extension item ends with a question mark, set a flag to indicate
-*  the item is optional. Also store the index of the last character in the 
+*  the item is optional. Also store the index of the last character in the
 *  item name.
       CALL CHR_RMBLK( ITEM )
       CALL CHR_UCASE( ITEM )
@@ -165,40 +165,40 @@
                CALL CHR_CTOD( CVAL, DVAL, STATUS )
                OK = ( STATUS .EQ. SAI__OK )
                CALL DAT_NEW0D( XLOC, ITEM( : LITEM ), STATUS )
-               CALL CMP_PUT0D( XLOC, ITEM( : LITEM ), DVAL, STATUS ) 
+               CALL CMP_PUT0D( XLOC, ITEM( : LITEM ), DVAL, STATUS )
                CALL MSG_SETD( 'VALUE', DVAL )
-   
+
             ELSE IF( TYPE .EQ. '_REAL' ) THEN
                CALL CHR_CTOR( CVAL, RVAL, STATUS )
                OK = ( STATUS .EQ. SAI__OK )
                CALL DAT_NEW0R( XLOC, ITEM( : LITEM ), STATUS )
-               CALL CMP_PUT0R( XLOC, ITEM( : LITEM ), RVAL, STATUS ) 
+               CALL CMP_PUT0R( XLOC, ITEM( : LITEM ), RVAL, STATUS )
                CALL MSG_SETR( 'VALUE', RVAL )
-   
+
             ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
                CALL CHR_CTOI( CVAL, IVAL, STATUS )
                OK = ( STATUS .EQ. SAI__OK )
                CALL DAT_NEW0I( XLOC, ITEM( : LITEM ), STATUS )
-               CALL CMP_PUT0I( XLOC, ITEM( : LITEM ), IVAL, STATUS ) 
+               CALL CMP_PUT0I( XLOC, ITEM( : LITEM ), IVAL, STATUS )
                CALL MSG_SETI( 'VALUE', IVAL )
-   
+
             ELSE IF( TYPE .EQ. '_CHAR' ) THEN
-               CALL DAT_NEW0C( XLOC, ITEM( : LITEM ), CHR_LEN( CVAL ), 
+               CALL DAT_NEW0C( XLOC, ITEM( : LITEM ), CHR_LEN( CVAL ),
      :                         STATUS )
-               CALL CMP_PUT0C( XLOC, ITEM( : LITEM ), CVAL, STATUS ) 
+               CALL CMP_PUT0C( XLOC, ITEM( : LITEM ), CVAL, STATUS )
                IF( ITEM( : LITEM ) .NE. 'FILTER' ) THEN
                   CALL MSG_SETC( 'VALUE', '''' )
                   CALL MSG_SETC( 'VALUE', CVAL )
                   CALL MSG_SETC( 'VALUE', '''' )
                END IF
-   
+
             ELSE IF( TYPE .EQ. '_LOGICAL' ) THEN
                CALL CHR_CTOL( CVAL, LVAL, STATUS )
                OK = ( STATUS .EQ. SAI__OK )
                CALL DAT_NEW0L( XLOC, ITEM( : LITEM ), STATUS )
-               CALL CMP_PUT0L( XLOC, ITEM( : LITEM ), LVAL, STATUS ) 
+               CALL CMP_PUT0L( XLOC, ITEM( : LITEM ), LVAL, STATUS )
                CALL MSG_SETL( 'VALUE', LVAL )
-   
+
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'TYPE', TYPE )
@@ -207,7 +207,7 @@
      :                       'type ''^TYPE''.', STATUS )
             END IF
 
-*  Add a context message if the value could not be converted. 
+*  Add a context message if the value could not be converted.
             IF( .NOT. OK ) THEN
                CALL MSG_SETC( 'TYPE', TYPE )
                CALL MSG_SETC( 'CVAL', CVAL )
@@ -225,7 +225,7 @@
             END IF
 
 *  If the character function could not be evaluated because one or more
-*  FITS keywords were undefined, then annul the error if the item is 
+*  FITS keywords were undefined, then annul the error if the item is
 *  optional.
          ELSE IF( STATUS .EQ. SAI__WARN .AND. OPT ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -237,7 +237,7 @@
 *  expressions must be declared before the expression.
       ELSE
 
-*  Annul any error reported when attempting to interpret teh expression 
+*  Annul any error reported when attempting to interpret teh expression
 *  as a character function.
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
@@ -245,7 +245,7 @@
 *  supplied control table expression.
          FOR = 'Y='
          IAT = 6
-         CALL CHR_APPND( EXPR, FOR, IAT )      
+         CALL CHR_APPND( EXPR, FOR, IAT )
 
 *  Get the number of declared FITS keywords.
          IF( IGRP1 .NE. GRP__NOID .AND. IGRP2 .NE. GRP__NOID ) THEN
@@ -257,7 +257,7 @@
          END IF
 
 *  Substitute the numerical value of each declared FITS keyword into the
-*  forward transformation expression. 
+*  forward transformation expression.
          DO I = 1, NDEC
 
 *  Get the keyword name and its required data type.
@@ -271,7 +271,7 @@
             CALL CHR_UCASE( FTYPE )
 
 *  Get the formatted keyword value.
-            CALL POL1_GTFIT( FCHAN, FNAME, FVALUE, NTYPE, OK, 
+            CALL POL1_GTFIT( FCHAN, FNAME, FVALUE, NTYPE, OK,
      :                       STATUS )
             IF( .NOT. OK ) THEN
                IF( .NOT. OPT .AND. STATUS .EQ. SAI__OK ) THEN
@@ -279,7 +279,7 @@
                   CALL MSG_SETC( 'FNAME', FNAME )
                   CALL ERR_REP( 'POL1_XEVAL_ERR3', 'No value found '//
      :                          'for explicitly declared FITS '//
-     :                          'keyword ''^FNAME''.', STATUS )   
+     :                          'keyword ''^FNAME''.', STATUS )
                END IF
                GO TO 999
             END IF
@@ -289,30 +289,30 @@
             IF( FTYPE .EQ. '_DOUBLE' ) THEN
                CALL CHR_CTOD( FVALUE, DVAL, STATUS )
                OK = ( STATUS .EQ. SAI__OK )
-               CALL TRN_STOKD( FNAME, DVAL, FOR, NSUBS, STATUS ) 
-   
+               CALL TRN_STOKD( FNAME, DVAL, FOR, NSUBS, STATUS )
+
             ELSE IF( FTYPE .EQ. '_REAL' ) THEN
                CALL CHR_CTOR( FVALUE, RVAL, STATUS )
                OK = ( STATUS .EQ. SAI__OK )
-               CALL TRN_STOKR( FNAME, RVAL, FOR, NSUBS, STATUS ) 
-   
+               CALL TRN_STOKR( FNAME, RVAL, FOR, NSUBS, STATUS )
+
             ELSE IF( FTYPE .EQ. '_INTEGER' ) THEN
                CALL CHR_CTOI( FVALUE, IVAL, STATUS )
                OK = ( STATUS .EQ. SAI__OK )
-               CALL TRN_STOKI( FNAME, IVAL, FOR, NSUBS, STATUS ) 
-   
+               CALL TRN_STOKI( FNAME, IVAL, FOR, NSUBS, STATUS )
+
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'TYPE', FTYPE )
                CALL MSG_SETC( 'NAME', FNAME )
                CALL ERR_REP( 'POL1_XEVAL_ERR4', 'FITS keyword ^NAME '//
      :                       'declared with non-numeric or '//
-     :                       'unsupported HDS data type ''^TYPE''.', 
+     :                       'unsupported HDS data type ''^TYPE''.',
      :                       STATUS )
                GO TO 999
             END IF
 
-* Add a context message if the value could not be converted. 
+* Add a context message if the value could not be converted.
             IF( .NOT. OK ) THEN
                CALL MSG_SETC( 'NAME', FNAME )
                CALL MSG_SETC( 'TYPE', FTYPE )
@@ -324,13 +324,13 @@
 
          END DO
 
-*  The inverse transformation is only used to define the un-used input 
+*  The inverse transformation is only used to define the un-used input
 *  variable (X). */
          INV = 'X'
 
-*  Create a temporary new transformation. 
-         CALL TRN_NEW( 1, 1, FOR, INV, '_DOUBLE', ' ', ' ', ' ', 
-     :                 LOCTR, STATUS ) 
+*  Create a temporary new transformation.
+         CALL TRN_NEW( 1, 1, FOR, INV, '_DOUBLE', ' ', ' ', ' ',
+     :                 LOCTR, STATUS )
 
 *  Compile the forward transformation.
          CALL TRN_COMP( LOCTR, .TRUE., TRID, STATUS )
@@ -339,7 +339,7 @@
          IF( STATUS .EQ. TRN__VARUD ) THEN
             CALL ERR_ANNUL( STATUS )
 
-*  Unless the item is optional, re-report the TRN error with a more 
+*  Unless the item is optional, re-report the TRN error with a more
 *  friendly message.
             IF( .NOT. OPT ) THEN
                STATUS = SAI__ERROR
@@ -354,23 +354,23 @@
 *  Transform an arbitrary X value to get the expression value, then store
 *  it in the supplied HDS structure.
             IF( TYPE .EQ. '_REAL' ) THEN
-               CALL TRN_TR1R( .FALSE., 1, 0.0, TRID, RVAL, STATUS ) 
+               CALL TRN_TR1R( .FALSE., 1, 0.0, TRID, RVAL, STATUS )
                CALL DAT_NEW0R( XLOC, ITEM( : LITEM ), STATUS )
-               CALL CMP_PUT0R( XLOC, ITEM( : LITEM ), RVAL, STATUS ) 
+               CALL CMP_PUT0R( XLOC, ITEM( : LITEM ), RVAL, STATUS )
                CALL MSG_SETR( 'VALUE', RVAL )
-      
+
             ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL TRN_TR1D( .FALSE., 1, 0.0D0, TRID, DVAL, STATUS ) 
+               CALL TRN_TR1D( .FALSE., 1, 0.0D0, TRID, DVAL, STATUS )
                CALL DAT_NEW0D( XLOC, ITEM( : LITEM ), STATUS )
-               CALL CMP_PUT0D( XLOC, ITEM( : LITEM ), DVAL, STATUS ) 
+               CALL CMP_PUT0D( XLOC, ITEM( : LITEM ), DVAL, STATUS )
                CALL MSG_SETD( 'VALUE', DVAL )
-      
+
             ELSE IF( TYPE .EQ. '_INT' ) THEN
-               CALL TRN_TR1I( .FALSE., 1, 0, TRID, IVAL, STATUS ) 
+               CALL TRN_TR1I( .FALSE., 1, 0, TRID, IVAL, STATUS )
                CALL DAT_NEW0I( XLOC, ITEM( : LITEM ), STATUS )
-               CALL CMP_PUT0I( XLOC, ITEM( : LITEM ), IVAL, STATUS ) 
+               CALL CMP_PUT0I( XLOC, ITEM( : LITEM ), IVAL, STATUS )
                CALL MSG_SETI( 'VALUE', IVAL )
-      
+
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'TYPE', TYPE )

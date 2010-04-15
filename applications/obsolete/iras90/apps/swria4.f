@@ -18,7 +18,7 @@
 *  Description:
 *     This subroutine is used by application SKYWRITE to save the
 *     present writting into a text file. See note section of the
-*     prologue of SKYWRITE for the format of this output logging file. 
+*     prologue of SKYWRITE for the format of this output logging file.
 
 *  Arguments:
 *     PFILE = CHARACTER (Given)
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,10 +105,10 @@
 
 *  Get a output file from the user.
       CALL IRM_ASFIO( PFILE, 'WRITE', 'LIST', 80, FID, OPEN, STATUS )
-   
+
 *  Carry on only if the file is opened successfully.
       IF ( OPEN .AND. STATUS .EQ. SAI__OK ) THEN
-      
+
 *  Get the label of the displayed image and form the head comment.
          CMNT = ' '
          IAT = 0

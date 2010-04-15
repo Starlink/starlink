@@ -27,7 +27,7 @@ void atlGetParam( const char *param, AstKeyMap *keymap, int *status ){
 *  Description:
 *     This function obtains a value for a named environment parameter and
 *     stores it in the supplied KeyMap, using the parameter name as the
-*     key. 
+*     key.
 
 *  Arguments:
 *     param
@@ -40,7 +40,7 @@ void atlGetParam( const char *param, AstKeyMap *keymap, int *status ){
 *  Notes:
 *     - An error will be reported if the parameter value obtained from
 *     the environment is a vector with more than 100 elements.
-*     - An error will be reported if any individual element in the parameter 
+*     - An error will be reported if any individual element in the parameter
 *     value obtained from the environment requires more than 255 when
 *     represented as a string.
 
@@ -53,12 +53,12 @@ void atlGetParam( const char *param, AstKeyMap *keymap, int *status ){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

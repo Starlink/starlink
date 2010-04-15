@@ -22,7 +22,7 @@ proc Error error_text {
     .messages.output  configure  -state normal
 
     .messages.output insert end " "
-    .messages.output insert end $error_text 
+    .messages.output insert end $error_text
     .messages.output insert end "\n"
 
     .messages.output  configure  -state disabled

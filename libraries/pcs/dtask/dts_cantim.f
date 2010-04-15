@@ -24,10 +24,10 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Look-up the timer id for this action. If it is non-zero it has 
-*     been used to declare a timer, so cancel the timer (even though it 
-*     may have gone off), set the timer id to zero and increment the 
-*     action counter so that the next timer id generated will be 
+*     Look-up the timer id for this action. If it is non-zero it has
+*     been used to declare a timer, so cancel the timer (even though it
+*     may have gone off), set the timer id to zero and increment the
+*     action counter so that the next timer id generated will be
 *     different.
 
 *  Copyright:

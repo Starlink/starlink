@@ -1,4 +1,4 @@
-	SUBROUTINE OEFIXSUB( IDIMS1, IDIMS2, ARRAY_IN, ARRAY_OUT, 
+	SUBROUTINE OEFIXSUB( IDIMS1, IDIMS2, ARRAY_IN, ARRAY_OUT,
      :                       STATUS)
 
 * Description :
@@ -28,7 +28,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :    HDIMS( 2 ),  ! dimensions of output DATA_ARRAY for histogram
      :	  HIST_BINS,   ! number of bins in histogram
      :    IDIMS1,      ! dimensions of input DATA_ARRAY
@@ -51,7 +51,7 @@
      :	  WORK_ODD_1( 1000),		    ! work array for odd channel
      :	  WORK_ODD_2( 1000)		    ! work array for odd channel
 
-	CHARACTER*( DAT__SZLOC) 
+	CHARACTER*( DAT__SZLOC)
      :	  LOCH        			    ! locator for histogram image
 *-
 *      check status on entry - return if not o.k.
@@ -87,7 +87,7 @@
 
 
 *      open the output data list file
-	CALL FIO_OPEN( 'IMAGEDIR/oefix.lis', 'WRITE','LIST',0, LUN, 
+	CALL FIO_OPEN( 'IMAGEDIR/oefix.lis', 'WRITE','LIST',0, LUN,
      :        STATUS)
 
 	CALL FIO_WRITE( LUN,
@@ -115,12 +115,12 @@
 *          set the working array with column data
 
 	    WORK_ODD_1( I) = ARRAY_IN( J, I)
-	    IF( ( J+1) .LE. IDIMS1 ) THEN 
+	    IF( ( J+1) .LE. IDIMS1 ) THEN
 	      WORK_EVEN( I) = ARRAY_IN( J+1, I)
 	    ELSE
 	      WORK_EVEN( I) = ARRAY_IN( J, I)
 	    END IF
-	    IF( ( J+2) .LE. IDIMS1 ) THEN 
+	    IF( ( J+2) .LE. IDIMS1 ) THEN
 	      WORK_ODD_2( I) = ARRAY_IN( J+2, I)
 	    ELSE
 	      WORK_ODD_2( I) = WORK_ODD_1( I)
@@ -131,22 +131,22 @@
 *        find median value in odd and even columns
 
 	  CALL FIND_MEDIAN( HIST_BINS, J, IDIMS2, WORK_ODD_1,
-     :	                    MEDIAN_ODD_1, HDIMS(1), HDIMS(2), 
+     :	                    MEDIAN_ODD_1, HDIMS(1), HDIMS(2),
      :                      %VAL( PNTRH))
 
-	  IF( ( J+1) .LE. IDIMS1 ) THEN 
-	    CALL FIND_MEDIAN( HIST_BINS, J+1, IDIMS2, WORK_EVEN, 
+	  IF( ( J+1) .LE. IDIMS1 ) THEN
+	    CALL FIND_MEDIAN( HIST_BINS, J+1, IDIMS2, WORK_EVEN,
      :	                      MEDIAN_EVEN, HDIMS(1), HDIMS(2),
      :                        %VAL( PNTRH))
 	  END IF
 
-	  IF( ( J+2) .LE. IDIMS1 ) THEN 
+	  IF( ( J+2) .LE. IDIMS1 ) THEN
 	    CALL FIND_MEDIAN( HIST_BINS, J+2, IDIMS2, WORK_ODD_2,
      :	                      MEDIAN_ODD_2, HDIMS(1), HDIMS(2),
      :                        %VAL( PNTRH))
 	  ELSE
 	    CALL FIND_MEDIAN( HIST_BINS, J, IDIMS2, WORK_ODD_2,
-     :	                      MEDIAN_ODD_2, HDIMS(1), HDIMS(2), 
+     :	                      MEDIAN_ODD_2, HDIMS(1), HDIMS(2),
      :                        %VAL( PNTRH))
 	  END IF
 
@@ -169,15 +169,15 @@
 	  DO I = 1, IDIMS2
 
 	    ARRAY_OUT( J, I) = ARRAY_IN( J, I)
-	    IF( ( J+1) .LE. IDIMS1 ) THEN 
+	    IF( ( J+1) .LE. IDIMS1 ) THEN
 	      ARRAY_OUT( J+1, I) = ARRAY_IN( J+1, I)*SCALER
 	    END IF
 
 	  END DO
-	  
+
 *        write line in data list file
 
-	  WRITE( LUN, *) 
+	  WRITE( LUN, *)
      :          J, MEDIAN_ODD_1, MEDIAN_ODD_2, MEDIAN_EVEN, SCALER
 
 	END DO

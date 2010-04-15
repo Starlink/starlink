@@ -86,7 +86,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -159,7 +159,7 @@
      :          /'$DEVICE device.', STATUS )
             END IF
 
-         ELSE 
+         ELSE
 
 *  Increment the picture count.
             IF ( STATUS .EQ. SAI__OK ) PICNO = PICNO + 1
@@ -206,7 +206,7 @@
       CALL AGI_END( PICIDE, STATUS )
 
 *  Close the database.
-      CALL AGI_ANNUL( PICIDC, STATUS )     
+      CALL AGI_ANNUL( PICIDC, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

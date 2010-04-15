@@ -1,7 +1,7 @@
       SUBROUTINE TBL_SETNROWS( TBDSCR, NUMROWS, STATUS)
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
@@ -12,7 +12,7 @@
 
 
 *  Arguments Given and Returned:
-      CHARACTER*(*) TBDSCR 
+      CHARACTER*(*) TBDSCR
       INTEGER               NUMROWS
 
 

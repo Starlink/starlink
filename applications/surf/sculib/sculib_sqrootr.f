@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_SQROOTR (N, IN_DATA, IN_QUAL, ROOT, ROOT_QUAL, 
+      SUBROUTINE SCULIB_SQROOTR (N, IN_DATA, IN_QUAL, ROOT, ROOT_QUAL,
      :   QUALITY, FLAGGED)
 *+
 *  Name:
@@ -8,11 +8,11 @@
 *     take the square root of a real array
 
 *  Description:
-*     Puts square root of real input array into output array. If FLAGGED and 
-*     QUALITY are both false then negative input numbers give a zero output. 
-*     If FLAGGED is true then input bad values, or negative input numbers, 
-*     give a bad output. If QUALITY is true then input values with bad 
-*     quality, or negative input numbers, lead to zero output data and bad 
+*     Puts square root of real input array into output array. If FLAGGED and
+*     QUALITY are both false then negative input numbers give a zero output.
+*     If FLAGGED is true then input bad values, or negative input numbers,
+*     give a bad output. If QUALITY is true then input values with bad
+*     quality, or negative input numbers, lead to zero output data and bad
 *     output quality.
 
 *  Invocation:

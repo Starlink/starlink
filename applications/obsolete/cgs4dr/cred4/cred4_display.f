@@ -38,7 +38,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get the plotting task alias and initialise output string
-      CALL PAR_GET0C( 'P4_ALIAS', P4_ALIAS, STATUS ) 
+      CALL PAR_GET0C( 'P4_ALIAS', P4_ALIAS, STATUS )
       CALL CHR_FILL( ' ', OUTVAL )
 
 *    Make sure INVAL contains parameters only and not DISPLAY  or OVERGRAPH command
@@ -118,7 +118,7 @@
 
                CALL TASK_DONE( -1, P4_PATH, P4_MESSID, OUTVAL, STATUS )
 
-               P4_ACTIVE = .FALSE. 
+               P4_ACTIVE = .FALSE.
 
                IF ( STATUS.NE.DTASK__ACTCOMPLETE ) THEN
                   IF ( STATUS.EQ.DTASK__ACTINFORM ) THEN
@@ -127,7 +127,7 @@
                      CALL MSG_SETI( 'ES', ERR_STATUS )
                      CALL ERR_REP( ' ', 'CRED4_DISPLAY: '/
      :                  /'Failure reported from plot task '/
-     :                  /'(Status = ^ES, message follows)', STATUS ) 
+     :                  /'(Status = ^ES, message follows)', STATUS )
                      CALL MSG_SETC( 'OUTVAL', OUTVAL )
                      CALL ERR_REP( ' ', 'CRED4_DISPLAY: '/
      :                  /'^OUTVAL', STATUS )
@@ -148,7 +148,7 @@
             ENDIF
 
 *          Set the action going
-            CALL TASK_OBEY( P4_ALIAS(1:CHR_LEN(P4_ALIAS)), COMMAND(1:CHR_LEN(COMMAND)), 
+            CALL TASK_OBEY( P4_ALIAS(1:CHR_LEN(P4_ALIAS)), COMMAND(1:CHR_LEN(COMMAND)),
      :         INVAL(1:CHR_LEN(INVAL)), OUTVAL, P4_PATH, P4_MESSID, STATUS )
 
             IF (STATUS .NE. DTASK__ACTSTART) THEN
@@ -168,7 +168,7 @@
                IF ( WAIT ) THEN
 
                   CALL TASK_DONE( -1, P4_PATH, P4_MESSID, OUTVAL, STATUS )
-                  P4_ACTIVE = .FALSE. 
+                  P4_ACTIVE = .FALSE.
 
                   IF ( STATUS.NE.DTASK__ACTCOMPLETE ) THEN
                      REDUCTION_OK = .FALSE.

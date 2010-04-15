@@ -26,16 +26,16 @@
 *        The string to be searched.
 *     IPOSN = INTEGER (Given and Returned)
 *        The given value is the character position within the string
-*        at which searching is to start. If IPOSN is less than 1, the 
-*        search starts at position 1. The returned value is the 
-*        character position preceding the next word delimiter. If 
+*        at which searching is to start. If IPOSN is less than 1, the
+*        search starts at position 1. The returned value is the
+*        character position preceding the next word delimiter. If
 *        IPOSN already points to a character preceding a delimiter,
 *        it is returned unchanged. If no delimiter is found, IPOSN is
 *        returned pointing to the end of the string, and STATUS is
 *        returned set.
 *     STATUS = INTEGER (Given and Returned)
-*        The status value: if this value is not SAI__OK on entry, 
-*        the routine returns without action; if the next word delimiter 
+*        The status value: if this value is not SAI__OK on entry,
+*        the routine returns without action; if the next word delimiter
 *        is not found before the end of the string, STATUS is returned
 *        set to CHR__EOSNT.
 *        Note: The CHR__EOSNT symbolic constant is defined in the CHR_ERR
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -140,12 +140,12 @@
 
          DO 10 IPOSN = ISTART, LENGTH-1
             CVALUE = STRING( IPOSN+1 : IPOSN+1 )
-            IF ( ( CVALUE .EQ. ' ' ) .OR. 
-     :           ( CVALUE .EQ. TAB ) .OR. 
+            IF ( ( CVALUE .EQ. ' ' ) .OR.
+     :           ( CVALUE .EQ. TAB ) .OR.
      :           ( CVALUE .EQ. ',' ) ) GO TO 20
  10      CONTINUE
 
-*     No end-of-word found, so return the position to point to the end 
+*     No end-of-word found, so return the position to point to the end
 *     of the string and set the returned status.
          IPOSN = LENGTH
          STATUS = CHR__EOSNT

@@ -146,7 +146,7 @@
 *            Assign the value.
                VA(I)=(1.-FX)*(1.-FY)*VALUE1+(1.-FX)*FY*VALUE2+
      :                         FX*(1.-FY)*VALUE3+FX*FY*VALUE4
-          
+
                USED(I)=1
 
             END IF

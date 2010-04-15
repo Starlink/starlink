@@ -54,9 +54,9 @@
 
 *  Notes:
 *     - The effects of this command will only be immediately apparent
-*     when run on X windows which have 256 colours (or other similar 
+*     when run on X windows which have 256 colours (or other similar
 *     pseudocolour devices). On other devices (for instance, X windows
-*     with more than 256 colours) the effects will only become apparent 
+*     with more than 256 colours) the effects will only become apparent
 *     when subsequent graphics applications are run.
 
 *  Related Applications:
@@ -105,7 +105,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,28 +164,28 @@
 *  Obtain the array dimensions.
       CALL NDF_DIM( NDF, NDIM, DIMS, NDIMS, STATUS )
 
-*  Transfer the input data to the palette.  There will be no conversion 
+*  Transfer the input data to the palette.  There will be no conversion
 *  errors as we are merely copying data to the same type.
       CALL VEC_RTOR( .FALSE., 3 * MIN( DIMS( 2 ), CTM__RSVPN ),
-     :               %VAL( CNF_PVAL( PPNTR( 1 ) ) ), 
+     :               %VAL( CNF_PVAL( PPNTR( 1 ) ) ),
      :               PALETT, IERR, NERR, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
 
 *  Install the palette into image-display colour table.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF( STATUS .EQ. SAI__OK ) THEN
          DO  I = 0, MIN( DIMS( 2 ), CTM__RSVPN ) - 1, 1
             CALL PGSCR( I, PALETT( 1, I ), PALETT( 2, I ),
      :                  PALETT( 3, I ) )
          END DO
       END IF
 
-*  Save the supplied section of the palette in the adam directory so that 
-*  it can be read back again by subsequent applications (PGPLOT resets the 
-*  colour palette when it opens a device, so the palette then needs to be 
+*  Save the supplied section of the palette in the adam directory so that
+*  it can be read back again by subsequent applications (PGPLOT resets the
+*  colour palette when it opens a device, so the palette then needs to be
 *  re-instated).
-      CALL KPG1_PLSAV( 0, MIN( DIMS( 2 ), CTM__RSVPN ) - 1, .FALSE., 
+      CALL KPG1_PLSAV( 0, MIN( DIMS( 2 ), CTM__RSVPN ) - 1, .FALSE.,
      :                 STATUS )
 
 *  Shut down the graphics system.

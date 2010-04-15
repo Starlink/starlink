@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ RUTHERFORD APPLETON LABORATORY\\
 The program {\bf RNOTOTEX} will read a {\em DEC Standard Runoff} (DSR) format
 text file, translate the {\bf RUNOFF} commands to \LaTeX\ commands and write a
 corresponding TEX file.  The output file may then be processed by \LaTeX\ and
-printed on the local high quality printer.  
+printed on the local high quality printer.
 
 \section{Execution}
 
@@ -74,17 +74,17 @@ To set up {\bf RNOTOTEX}, type the command:
 \$ RNOTOTEX[/TEX] {\it input-filename}[.RNO] {\it output-filename}[.TEX]
 \end{quote}
 
-reads a {\em Digital Standard Runoff} format file and creates the \LaTeX\ 
+reads a {\em Digital Standard Runoff} format file and creates the \LaTeX\
 equivalent.
 
 \subsection{Parameters}
 
 \begin{itemize}
 
-\item{\tt input-filename} --- is the name of the input DSR format file.  
+\item{\tt input-filename} --- is the name of the input DSR format file.
 (The default type is {\tt .RNO}.)
 
-\item{\tt output-filename} --- is the name of the output \LaTeX\ format file.  
+\item{\tt output-filename} --- is the name of the output \LaTeX\ format file.
 (The default type is {\tt .TEX}.)
 
 \item{\tt /TEX} --- The {\tt /TEX} qualifier instructs {\bf RNOTOTEX} to
@@ -96,12 +96,12 @@ is {\tt /NOTEX}.)
 
 \subsection{Example}
 
-The following DCL commands convert the DSR file {\it filename}.{\tt RNO} to 
+The following DCL commands convert the DSR file {\it filename}.{\tt RNO} to
 {\it filename}.{\tt TEX} and  prints the {\tt .DVI-CAN} file on a Canon laser
 printer. The log of the conversion is also printed and deleted.
 
 \begin{quote}\tt
-\$ RNOTOTEX filename.RNO \\ 
+\$ RNOTOTEX filename.RNO \\
 \$ LATEX filename.TEX \\
 \$ DVICAN filename.DVI \\
 \$ PRCN filename.DVI-CAN \\
@@ -131,7 +131,7 @@ counters are to be adjusted.
 
 \subsection{Conversion of Sectioning Commands}
 
-{\bf RNOTOTEX} converts {\bf RUNOFF} sectioning commands to \LaTeX\ sectioning 
+{\bf RNOTOTEX} converts {\bf RUNOFF} sectioning commands to \LaTeX\ sectioning
 commands.  The output \LaTeX\ style is always {\tt report} in 10 point font.
 The sectioning commands are converted in Table \ref{section-commands}.
 
@@ -159,7 +159,7 @@ prettiest results (as one can use {\bf bold} and {\it italic} fonts in \LaTeX\
 ), but it is consistent.  Unfortunately, {\bf RNOTOTEX} does not have the
 esthetic sense to decide when a font is more appropriate than \index{esthetic
 sense} a converted {\bf RUNOFF} command.  The conversion process for {\bf
-RUNOFF} flags is Table \ref{flag-commands}. 
+RUNOFF} flags is Table \ref{flag-commands}.
 
 \begin{table}[h]
 \begin{center}
@@ -191,8 +191,8 @@ to the appropriate case during the translation process by {\bf RNOTOTEX},
 unless they are paired with other flags.  In these other cases, the flags in
 {\bf RUNOFF} lock another flag on, such as the {\bf bold}ing flag described
 in the DSR manual\cite{dsr-manual} on page 3-6.  {\bf RNOTOTEX} will lock the
-appropriate flag to the state it is in and produce the appropriate 
-\LaTeX\ commands.  
+appropriate flag to the state it is in and produce the appropriate
+\LaTeX\ commands.
 
 For example, {\bf RNOTOTEX} will convert:
 \begin{verbatim}
@@ -267,9 +267,9 @@ It is a record of each conversion used to generate the output \LaTeX\ commands.
 It is useful to users less familiar with \LaTeX\ and wish to learn by trial and
 error rather than by reading the manual.  It may also be useful to experienced
 \LaTeX\ users to quickly identify what \LaTeX\ will produce as output from the
-generated TEX file without going through a complete printing.  
+generated TEX file without going through a complete printing.
 
-It is recommended that the log file be printed and deleted for each execution. 
+It is recommended that the log file be printed and deleted for each execution.
 For example, the command sequence:
 
 \begin{quote}\tt
@@ -290,7 +290,7 @@ produce a ``nice'' \LaTeX\ output.
 Preparation  System} \\ Starlink User Note 9, Starlink Project
 
 
-\bibitem{dsr-manual} Digital Equipment Corporation {\em VAX Digital Standard 
+\bibitem{dsr-manual} Digital Equipment Corporation {\em VAX Digital Standard
 RUNOFF (DSR) Reference Manual } \\ Order \# AA-LA15A-TE, April 1988
 
 \end{thebibliography}

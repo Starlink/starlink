@@ -29,7 +29,7 @@
 *     MAXPTS = INTEGER( READ )
 *           Maximum number of points.
 *     LINDAT( MAXPTS, 2 ) = REAL( WRITE )
-*           The array which will contain the X, Y 
+*           The array which will contain the X, Y
 *           positions of points.
 *     NPTS = INTEGER( WRITE )
 *           The number of points in the array.
@@ -95,7 +95,7 @@
 
       INTEGER STATUS
 
-*    Local variables : 
+*    Local variables :
 
       REAL
      :    A,                    ! difference between the Y co-ordinates

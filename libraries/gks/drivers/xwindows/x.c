@@ -3,11 +3,11 @@
  *
  *	D L Terrett	Starlink    2-JUL-1990
  *
- *  Each X workstation is allocated a "window index" that is used to 
+ *  Each X workstation is allocated a "window index" that is used to
  *  access the appropriate element of the various static data structures
  *  that used by the support routines. Each GKS workstation is allocated a
  *  workstation index (in GKS) and this is used as an index into an array
- *  containing window indexes to find the window index for the specified 
+ *  containing window indexes to find the window index for the specified
  *  workstation.
  *
  *  Overlay workstations are assummed to have only one bitplane in
@@ -75,7 +75,7 @@
 #define gk0xcw gk0xcw_
 #endif
 
-static int driver_init = 0;		/* Flag to say whether driver has 
+static int driver_init = 0;		/* Flag to say whether driver has
 					   been initialised		*/
 static Display *display = NULL;		/* display id */
 static int indx[MAXWIN];		/* maps GKS workstation index   */
@@ -83,7 +83,7 @@ static int indx[MAXWIN];		/* maps GKS workstation index   */
 
 /*
  *  This structure hold all the information about each window; currently
- *  only one display is supported because there is no way of passing a 
+ *  only one display is supported because there is no way of passing a
  *  display name to the driver when a workstation is opened, however
  *  this structure allows for the possibility of multiple displays in
  *  the future
@@ -128,7 +128,7 @@ static char mask_bits[] =		    /* cursor mask bitmap */
    0xff, 0x7f, 0xff, 0x7f, 0xff, 0x7f, 0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01,
    0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01, 0x00, 0x00};
 
-
+
 int gk0xin(int wktype, int *winind)
 /*
    Initialises the X display for the specified workstation type and "attaches"
@@ -151,7 +151,7 @@ int gk0xin(int wktype, int *winind)
 /*
  *  Initialize the driver if required. This involves setting the wktype
  *  element of the wdt structure to zero and setting the flag to show that
- *  the initialization has been done and opening the display. 
+ *  the initialization has been done and opening the display.
  */
     if (!driver_init)
     {
@@ -175,7 +175,7 @@ int gk0xin(int wktype, int *winind)
  *  	Look to see if this workstation type has already been initialized. If
  *  	it has then just return the index for the workstation
  */
-    	for ( i = 0; i < MAXWIN; i++ ) 
+    	for ( i = 0; i < MAXWIN; i++ )
 	{
 	    if ( wdt[i].wktype == wktype )
 	    {
@@ -246,7 +246,7 @@ int gk0xin(int wktype, int *winind)
  */
     for ( j = 0; j < MAXWIN; j++ )
     {
-	if ( wdt[j].wktype != 0 && wdt[j].display == display && 
+	if ( wdt[j].wktype != 0 && wdt[j].display == display &&
 	     wdt[j].win == wdt[i].win && i != j )
         {
 	    wdt[i].pix = wdt[j].pix;
@@ -288,7 +288,7 @@ int gk0xin(int wktype, int *winind)
 
 	XGetWindowAttributes( display, wdt[i].win, &winatt);
         vinfo_template.visualid = XVisualIDFromVisual( winatt.visual );
-	vinfo = XGetVisualInfo( display, VisualIDMask, &vinfo_template, 
+	vinfo = XGetVisualInfo( display, VisualIDMask, &vinfo_template,
                 &nitems);
 	wdt[i].visualInfo = *vinfo;
         XFree( vinfo );
@@ -346,17 +346,17 @@ int gk0xin(int wktype, int *winind)
  */
         switch (wdt[i].visualInfo.class)
 	{
-	    case StaticGray:  wdt[i].mono = True;  wdt[i].ctwrite = False; 
+	    case StaticGray:  wdt[i].mono = True;  wdt[i].ctwrite = False;
 		break;
-	    case StaticColor: wdt[i].mono = False; wdt[i].ctwrite = False; 
+	    case StaticColor: wdt[i].mono = False; wdt[i].ctwrite = False;
 		break;
-	    case TrueColor:   wdt[i].mono = False; wdt[i].ctwrite = False; 
+	    case TrueColor:   wdt[i].mono = False; wdt[i].ctwrite = False;
 		break;
-	    case GrayScale:   wdt[i].mono = True;  wdt[i].ctwrite = True; 
+	    case GrayScale:   wdt[i].mono = True;  wdt[i].ctwrite = True;
 		break;
-	    case PseudoColor: wdt[i].mono = False; wdt[i].ctwrite = True; 
+	    case PseudoColor: wdt[i].mono = False; wdt[i].ctwrite = True;
 		break;
-	    case DirectColor: wdt[i].mono = False; wdt[i].ctwrite = True; 
+	    case DirectColor: wdt[i].mono = False; wdt[i].ctwrite = True;
 		break;
 	 }
 
@@ -365,17 +365,17 @@ int gk0xin(int wktype, int *winind)
  *  	so that the cursor background is transparent
  */
 	back_color.pixel = WhitePixelOfScreen(wdt[i].screen);
-	XQueryColor(display, DefaultColormapOfScreen(wdt[i].screen), 
+	XQueryColor(display, DefaultColormapOfScreen(wdt[i].screen),
             &back_color);
 	fore_color.pixel = BlackPixelOfScreen(wdt[i].screen);
-	XQueryColor(display, XDefaultColormapOfScreen(wdt[i].screen), 
+	XQueryColor(display, XDefaultColormapOfScreen(wdt[i].screen),
             &fore_color);
 
 	cursor_pixmap = XCreateBitmapFromData( display, root,
 	    cursor_bits, 16, 16);
 	cursor_mask = XCreateBitmapFromData( display, root,
 	    mask_bits, 16, 16);
-	wdt[i].cursor = XCreatePixmapCursor( display, cursor_pixmap, 
+	wdt[i].cursor = XCreatePixmapCursor( display, cursor_pixmap,
 	    cursor_mask, &fore_color, &back_color, 7, 8);
 	XFreePixmap( display, cursor_pixmap);
 
@@ -384,7 +384,7 @@ int gk0xin(int wktype, int *winind)
  *  	size. Use "variable" if available, otherwise use "fixed".
  */
 	fontlist = XListFonts( display, "variable", 1, &nfonts);
-        if (nfonts==1) 
+        if (nfonts==1)
 	    wdt[i].font = XLoadFont( display, "variable");
 	else
 	    wdt[i].font = XLoadFont( display, "fixed");
@@ -401,7 +401,7 @@ int gk0xin(int wktype, int *winind)
  *  Create a graphics context for this window (this has to be done after
  *  the font has been registered)
  */
-    if (wdt[i].overlay) 
+    if (wdt[i].overlay)
     {
 	xgcv.plane_mask = ~wdt[i].mask;
 	xgcv.foreground = 0;
@@ -417,13 +417,13 @@ int gk0xin(int wktype, int *winind)
     xgcv.fill_style = FillSolid;
     xgcv.fill_rule = EvenOddRule;
     xgcv.font = wdt[i].font;
-    wdt[i].gc = XCreateGC( display, wdt[i].pix, 
+    wdt[i].gc = XCreateGC( display, wdt[i].pix,
 		GCForeground | GCBackground | GCGraphicsExposures |
 		GCFillStyle | GCFillRule | GCFont | GCPlaneMask,
 		&xgcv );
 
 /*
- *  Set the workstation type and display in the wdt element and return the 
+ *  Set the workstation type and display in the wdt element and return the
  *  index into the wdt array for this workstation type
  */
     wdt[i].wktype = wktype;
@@ -431,9 +431,9 @@ int gk0xin(int wktype, int *winind)
     *winind = i;
     return 0;
 }
-
-int gk0xop(int *kwkix, int *wktyp, int *conid, int *xsize, int *ysize, 
-	   float *xsizm, float *ysizm, int *colours, int *dyn, 
+
+int gk0xop(int *kwkix, int *wktyp, int *conid, int *xsize, int *ysize,
+	   float *xsizm, float *ysizm, int *colours, int *dyn,
 	   int *colour, int *new)
 /*
     Associates a window with a workstation index and returns various
@@ -497,7 +497,7 @@ int gk0xop(int *kwkix, int *wktyp, int *conid, int *xsize, int *ysize,
     return 0;
 }
 
-
+
 void gk0xcw(int *kwkix)
 /*
     Close a workstation
@@ -517,14 +517,14 @@ void gk0xcw(int *kwkix)
     }
 
 /*
- *  If there are no other workstations using this colour table then free 
+ *  If there are no other workstations using this colour table then free
  *  the space used for the colour table and the other X resources allocated.
  */
     for ( j = 0; j < MAXWIN; j++ )
-	if ( wdt[j].pixels == wdt[indx[*kwkix-1]].pixels && 
+	if ( wdt[j].pixels == wdt[indx[*kwkix-1]].pixels &&
 	    wdt[j].wktype != 0 && indx[*kwkix-1] != j ) break;
-    
-    if ( j == MAXWIN) 
+
+    if ( j == MAXWIN)
     {
 	free((char*)wdt[indx[*kwkix-1]].pixels);
         wdt[indx[*kwkix-1]].pixels = NULL;
@@ -544,7 +544,7 @@ void gk0xcw(int *kwkix)
  */
     wdt[indx[*kwkix-1]].wktype = 0;
 }
-
+
 int gk0xfa(int *kwkix, int *n, float (*x)[], float (*y)[])
 /*
     Plots a filled area
@@ -567,17 +567,17 @@ int gk0xfa(int *kwkix, int *n, float (*x)[], float (*y)[])
     for ( i = 0; i < *n; i++ )
     {
 	point[i].x = (short) ((*x)[i] + 0.5);
-	point[i].y = (short) (wdt[indx[*kwkix-1]].height - 1 
+	point[i].y = (short) (wdt[indx[*kwkix-1]].height - 1
 	    - (int)((*y)[i] + 0.5));
     }
     point[*n].x = (short) ((*x)[0] + 0.5);
-    point[*n].y = (short) (wdt[indx[*kwkix-1]].height - 1 
+    point[*n].y = (short) (wdt[indx[*kwkix-1]].height - 1
 	- (int)((*y)[0] + 0.5));
 
 /*
  *  Plot in backing pixmap
  */
-    XFillPolygon( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix, 
+    XFillPolygon( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix,
 	wdt[indx[*kwkix-1]].gc, point,  (*n)+1, Complex, CoordModeOrigin);
 
 /*
@@ -588,14 +588,14 @@ int gk0xfa(int *kwkix, int *n, float (*x)[], float (*y)[])
 	point[i].x += wdt[indx[*kwkix-1]].xscroll;
 	point[i].y += wdt[indx[*kwkix-1]].yscroll;
     }
-    XFillPolygon( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+    XFillPolygon( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	wdt[indx[*kwkix-1]].gc, point,  (*n)+1, Complex, CoordModeOrigin);
 
     free( point );
     return 0;
 }
 
-
+
 int gk0xpl(int *kwkix, int *n, float (*x)[], float (*y)[])
 /*
     Plots a polyline
@@ -619,12 +619,12 @@ int gk0xpl(int *kwkix, int *n, float (*x)[], float (*y)[])
  *  Convert the points to X points eliminating redundant points
  */
     point[0].x = (short) ((*x)[0] + 0.5);
-    point[0].y = (short) (wdt[indx[*kwkix-1]].height - 1 
+    point[0].y = (short) (wdt[indx[*kwkix-1]].height - 1
 	    - (int)((*y)[0] + 0.5));
     for ( i = j = 1; i < *n; i++ )
     {
 	point[j].x = (short) ((*x)[i] + 0.5);
-	point[j].y = (short) (wdt[indx[*kwkix-1]].height - 1 
+	point[j].y = (short) (wdt[indx[*kwkix-1]].height - 1
 	    - (int)((*y)[i] + 0.5));
         if ( point[j].x != point[j-1].x || point[j].y != point[j-1].y ) j++;
     }
@@ -633,7 +633,7 @@ int gk0xpl(int *kwkix, int *n, float (*x)[], float (*y)[])
  *  Plot in backing pixmap
  */
     if (j > 1)
-    	XDrawLines( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix, 
+    	XDrawLines( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix,
 	    wdt[indx[*kwkix-1]].gc, point,  j, CoordModeOrigin);
     else
 	XDrawPoint( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix,
@@ -648,7 +648,7 @@ int gk0xpl(int *kwkix, int *n, float (*x)[], float (*y)[])
 	point[i].y += wdt[indx[*kwkix-1]].yscroll;
     }
     if (j > 1)
-    	XDrawLines( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+    	XDrawLines( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	    wdt[indx[*kwkix-1]].gc, point,  j, CoordModeOrigin);
     else
 	XDrawPoint( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
@@ -658,8 +658,8 @@ int gk0xpl(int *kwkix, int *n, float (*x)[], float (*y)[])
     return 0;
 }
 
-
-int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim, 
+
+int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim,
 	     int (*array)[] )
 /*
     Draws a cell array
@@ -667,11 +667,11 @@ int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim,
     Arguments: (given): kwkix; workstation index
 			x, y; location of top left corner
 			nx, ny; dimensions of cell array
-			nxdim; first dimension of cell array 
+			nxdim; first dimension of cell array
 			array; cell array
 
     The image is only written to the backing pixmap and not to the window; we
-    rely on someone else to copy the pixmap to the image because cell arrays 
+    rely on someone else to copy the pixmap to the image because cell arrays
     are typically passed to this routine in lots of small pieces.
 */
 {
@@ -718,17 +718,17 @@ int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim,
 	    abase = i * (*nxdim);
 	    if (nbytes == 1)
 	    {
-		for ( j = 0; j < *nx; j++) imageb[ibase + j] = 
+		for ( j = 0; j < *nx; j++) imageb[ibase + j] =
 		    (*array)[abase + j] ? ~0 : 0;
 	    }
 	    else
 	    {
 		if (nbytes == 2)
 		{
-	    	    for ( j = 0; j < *nx; j++) 
+	    	    for ( j = 0; j < *nx; j++)
                     {
-                        imageb[(ibase + j) * 2] = 
-                        imageb[(ibase + j) * 2 + 1] = 
+                        imageb[(ibase + j) * 2] =
+                        imageb[(ibase + j) * 2 + 1] =
                             (*array)[abase + j] ? ~0: 0;
                     }
 		}
@@ -736,10 +736,10 @@ int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim,
 		{
 	    	    for ( j = 0; j < *nx; j++)
                     {
-                        imageb[(ibase + j) * 4] = 
-                        imageb[(ibase + j) * 4 + 1] = 
-                        imageb[(ibase + j) * 4 + 2] = 
-                        imageb[(ibase + j) * 4 + 3] = 
+                        imageb[(ibase + j) * 4] =
+                        imageb[(ibase + j) * 4 + 1] =
+                        imageb[(ibase + j) * 4 + 2] =
+                        imageb[(ibase + j) * 4 + 3] =
                             (*array)[abase + j] ? ~0: 0;
                     }
 		}
@@ -758,7 +758,7 @@ int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim,
 	    abase = i * (*nxdim);
 	    if (nbytes == 1)
 	    {
-		for ( j = 0; j < *nx; j++) imageb[ibase + j] = 
+		for ( j = 0; j < *nx; j++) imageb[ibase + j] =
 		    (wdt[indx[*kwkix-1]].pixels)
                     [(*array)[abase + j] % wdt[indx[*kwkix-1]].npix];
 	    }
@@ -809,11 +809,11 @@ int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim,
 /*
  *  Draw the image
  */
-    XPutImage( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix, 
+    XPutImage( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix,
 	wdt[indx[*kwkix-1]].gc, ximage, 0, 0, x0, y0, *nx, *ny);
 
 /*
- *  Free the image structure and the data 
+ *  Free the image structure and the data
  */
     (void)XDestroyImage( ximage );
 
@@ -827,7 +827,7 @@ int gk0xdi( int *kwkix, float *x, float *y, int *nx, int *ny, int *nxdim,
     return 0;
 }
 
-
+
 void gk0xls(int *kwkix, int *style, int *width, int *colour)
 /*
     Sets the current line drawing style
@@ -854,7 +854,7 @@ void gk0xls(int *kwkix, int *style, int *width, int *colour)
 	    *colour ? ~0 : 0);
     }
     else
-	XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc, 
+	XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc,
 	    (wdt[indx[*kwkix-1]].pixels)[*colour] );
 
 /*
@@ -863,17 +863,17 @@ void gk0xls(int *kwkix, int *style, int *width, int *colour)
     if (*style==GLSOLI)
     {
 	if (*width == 1)
-	    XSetLineAttributes(wdt[indx[*kwkix-1]].display, 
+	    XSetLineAttributes(wdt[indx[*kwkix-1]].display,
 		wdt[indx[*kwkix-1]].gc, 0, LineSolid, CapRound, JoinRound);
 	else
-	    XSetLineAttributes(wdt[indx[*kwkix-1]].display, 
-		wdt[indx[*kwkix-1]].gc, *width, LineSolid, CapRound, 
+	    XSetLineAttributes(wdt[indx[*kwkix-1]].display,
+		wdt[indx[*kwkix-1]].gc, *width, LineSolid, CapRound,
 		JoinRound);
     }
     else
     {
-	XSetLineAttributes(wdt[indx[*kwkix-1]].display, 
-		wdt[indx[*kwkix-1]].gc, *width, LineOnOffDash, CapRound, 
+	XSetLineAttributes(wdt[indx[*kwkix-1]].display,
+		wdt[indx[*kwkix-1]].gc, *width, LineOnOffDash, CapRound,
 		JoinRound);
         switch (*style)
         {
@@ -912,12 +912,12 @@ void gk0xls(int *kwkix, int *style, int *width, int *colour)
 		break;		    /* 5 is disabled in the driver	    */
 	    }
         }
-	XSetDashes( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc, 1, 
+	XSetDashes( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc, 1,
 	    dash_list, n);
     }
 }
 
-
+
 void gk0xsc(int *kwkix, int *cind, float *r, float *g, float *b)
 /*
     Set colour of colour index
@@ -940,7 +940,7 @@ void gk0xsc(int *kwkix, int *cind, float *r, float *g, float *b)
     if ( wdt[indx[*kwkix-1]].ctwrite )
     {
 
-/* 
+/*
  *	colour table is dynamic so load the colour we want
  */
 	if (wdt[indx[*kwkix-1]].overlay)
@@ -959,7 +959,7 @@ void gk0xsc(int *kwkix, int *cind, float *r, float *g, float *b)
  */
 	        for ( i = 0; i < wdt[indx[*kwkix-1]].npix; i++ )
 	        {
-		    color.pixel = (wdt[indx[*kwkix-1]].pixels)[i] | 
+		    color.pixel = (wdt[indx[*kwkix-1]].pixels)[i] |
 		        ~wdt[indx[*kwkix-1]].mask;
 		    XStoreColor( wdt[indx[*kwkix-1]].display,
 		        wdt[indx[*kwkix-1]].colormap, &color);
@@ -980,7 +980,7 @@ void gk0xsc(int *kwkix, int *cind, float *r, float *g, float *b)
     else
     {
 
-/* 
+/*
  *	colour table is static so ask X for the nearest available colour
  */
 	if (!wdt[indx[*kwkix-1]].overlay)
@@ -993,32 +993,32 @@ void gk0xsc(int *kwkix, int *cind, float *r, float *g, float *b)
     }
 }
 
- 
+
 void gk0xcl(int *kwkix)
 /*
  *  Clear the window
  */
 {
-    XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc, 
+    XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc,
 	(wdt[indx[*kwkix-1]].pixels)[0] );
 
 /*
  *  Fill the pixmap
  */
-    XFillRectangle( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix, 
-	wdt[indx[*kwkix-1]].gc, 0, 0, wdt[indx[*kwkix-1]].width, 
+    XFillRectangle( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix,
+	wdt[indx[*kwkix-1]].gc, 0, 0, wdt[indx[*kwkix-1]].width,
 	wdt[indx[*kwkix-1]].height );
 
 /*
  *  Copy the pixmap to the window
  */
-    XCopyArea( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix, 
+    XCopyArea( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix,
 	wdt[indx[*kwkix-1]].win, wdt[indx[*kwkix-1]].gc, 0, 0,
 	wdt[indx[*kwkix-1]].width, wdt[indx[*kwkix-1]].height,
 	wdt[indx[*kwkix-1]].xscroll, wdt[indx[*kwkix-1]].yscroll);
 }
 
-
+
 void gk0xfl( int *kwkix)
 /*
     Flush the Xlib output buffer
@@ -1027,25 +1027,25 @@ void gk0xfl( int *kwkix)
     XSync( wdt[indx[*kwkix-1]].display, 0 );
 }
 
-
+
 void gk0xup( int *kwkix)
 /*
     Update the window by copying the pixmap to it (this is only used after
     a series of calls to gk0xdi when plotting a cell array).
 */
 {
-    XCopyArea( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix, 
-	wdt[indx[*kwkix-1]].win, wdt[indx[*kwkix-1]].gc, 0, 0, 
-	wdt[indx[*kwkix-1]].width, wdt[indx[*kwkix-1]].height, 
+    XCopyArea( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].pix,
+	wdt[indx[*kwkix-1]].win, wdt[indx[*kwkix-1]].gc, 0, 0,
+	wdt[indx[*kwkix-1]].width, wdt[indx[*kwkix-1]].height,
 	wdt[indx[*kwkix-1]].xscroll, wdt[indx[*kwkix-1]].yscroll);
 }
 
-
+
 void gk0xcr( int *kwkix, int *cind, float *r, float *g, float *b)
 /*
-    Return the r,g,b colours of the specified entry in the windows  
+    Return the r,g,b colours of the specified entry in the windows
     colour map.
- 
+
     Arguments: (given): kwkix; workstation index
 			cind; colour index
 	       (returned):r,g,b; colour
@@ -1063,11 +1063,11 @@ void gk0xcr( int *kwkix, int *cind, float *r, float *g, float *b)
 	    {
 	        color.pixel = (wdt[indx[*kwkix-1]].pixels)[1] |
 		        ~wdt[indx[*kwkix-1]].mask;
-	        XQueryColor( wdt[indx[*kwkix-1]].display, 
+	        XQueryColor( wdt[indx[*kwkix-1]].display,
 		        wdt[indx[*kwkix-1]].colormap, &color );
-	        *r = (float)color.red/65535.0; 
-	        *g = (float)color.green/65535.0; 
-	        *b = (float)color.blue/65535.0; 
+	        *r = (float)color.red/65535.0;
+	        *g = (float)color.green/65535.0;
+	        *b = (float)color.blue/65535.0;
 	    }
     }
     else  /* Non-Overlay */
@@ -1075,22 +1075,22 @@ void gk0xcr( int *kwkix, int *cind, float *r, float *g, float *b)
 	color.pixel = (wdt[indx[*kwkix-1]].pixels)[*cind];
 	XQueryColor( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].colormap,
                  &color );
-	    *r = (float)color.red/65535.0; 
-	    *g = (float)color.green/65535.0; 
-	    *b = (float)color.blue/65535.0; 
+	    *r = (float)color.red/65535.0;
+	    *g = (float)color.green/65535.0;
+	    *b = (float)color.blue/65535.0;
     }
 }
 
-
+
 int gk0xgd( int *wktyp, int *cind, float *r, float *g, float *b)
 /*
-    Return the r,g,b colours of the nearest available colour in the 
+    Return the r,g,b colours of the nearest available colour in the
     windows colour map, except for colour indexes 0 and 1 for which the
-    background and foreground colours of the window (as set when the 
+    background and foreground colours of the window (as set when the
     window was created are returned.
 
     Overlay planes have black (ie. transparent backgrounds).
- 
+
     Arguments: (given): wktyp; workstation type
 			 cind; colour index
 	       (returned):r,g,b; colour
@@ -1122,11 +1122,11 @@ int gk0xgd( int *wktyp, int *cind, float *r, float *g, float *b)
  *	    Overlay forgrounds are just whatever is currently set
  */
 	    screen_def.pixel = (wdt[winind].pixels)[1] | ~wdt[winind].mask;
-	    XQueryColor( wdt[winind].display, wdt[winind].colormap, 
+	    XQueryColor( wdt[winind].display, wdt[winind].colormap,
 		&screen_def );
-	    *r = (float)screen_def.red/65535.0; 
-	    *g = (float)screen_def.green/65535.0; 
-	    *b = (float)screen_def.blue/65535.0; 
+	    *r = (float)screen_def.red/65535.0;
+	    *g = (float)screen_def.green/65535.0;
+	    *b = (float)screen_def.blue/65535.0;
 	}
     }
     else
@@ -1196,14 +1196,14 @@ int gk0xgd( int *wktyp, int *cind, float *r, float *g, float *b)
 	}
 	else
 	{
-	    *r = (float)screen_def.red/65535.0; 
-	    *g = (float)screen_def.green/65535.0; 
-	    *b = (float)screen_def.blue/65535.0; 
+	    *r = (float)screen_def.red/65535.0;
+	    *g = (float)screen_def.green/65535.0;
+	    *b = (float)screen_def.blue/65535.0;
 	}
     }
     return 0;
 }
-
+
 void gk0xsi( int *kwkix, char *prompt, int *lprompt, char *reply, int *lreply,
              int *nout)
 /*
@@ -1216,10 +1216,10 @@ void gk0xsi( int *kwkix, char *prompt, int *lprompt, char *reply, int *lreply,
 			lreply; length of input buffer
 		(returned): nout; number of characters input
 
-On VMS the pointers to character strings are actually pointers to VMS string 
+On VMS the pointers to character strings are actually pointers to VMS string
 descriptors so the arguments are copied in a system dependent way to local
 copies of the pointers. The default code is right for UNIX.
-			
+
 */
 #define STRING_SIZE 2
 {
@@ -1252,41 +1252,41 @@ copies of the pointers. The default code is right for UNIX.
 /*
  *  Create the window
  */
-    win = XCreateSimpleWindow( wdt[indx[*kwkix-1]].display, 
-	wdt[indx[*kwkix-1]].win, (wdt[indx[*kwkix-1]].width - width_w)/2, 
+    win = XCreateSimpleWindow( wdt[indx[*kwkix-1]].display,
+	wdt[indx[*kwkix-1]].win, (wdt[indx[*kwkix-1]].width - width_w)/2,
 	(wdt[indx[*kwkix-1]].height - height_w)/2,
-	width_w, height_w,  2, 
+	width_w, height_w,  2,
 	wdt[indx[*kwkix-1]].pixels[1], wdt[indx[*kwkix-1]].pixels[0]);
 
 /*
  *  Set foreground colour
  */
     if ( wdt[indx[*kwkix-1]].overlay)
-	XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc, 
+	XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc,
 	    ~0);
     else
-	XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc, 
+	XSetForeground( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].gc,
 	    (wdt[indx[*kwkix-1]].pixels)[1] );
 /*
  *  Map the window
  */
     XSelectInput( wdt[indx[*kwkix-1]].display, win, StructureNotifyMask );
     XMapWindow( wdt[indx[*kwkix-1]].display, win );
-    XWindowEvent( wdt[indx[*kwkix-1]].display, win, StructureNotifyMask, 
+    XWindowEvent( wdt[indx[*kwkix-1]].display, win, StructureNotifyMask,
 	&event);
 
 /*
  *  Draw the prompt
  */
-    XDrawString( wdt[indx[*kwkix-1]].display, win, wdt[indx[*kwkix-1]].gc, 
-	wdt[indx[*kwkix-1]].font_w, (3*height_w)/4, 
+    XDrawString( wdt[indx[*kwkix-1]].display, win, wdt[indx[*kwkix-1]].gc,
+	wdt[indx[*kwkix-1]].font_w, (3*height_w)/4,
 	prompt_l, *lprompt);
     XFlush( wdt[indx[*kwkix-1]].display );
 
 /*
  *  Find the extent of the text string
  */
-    XQueryTextExtents(wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].font, 
+    XQueryTextExtents(wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].font,
 	prompt_l, *lprompt, &direction, &font_ascent, &font_descent, &overall);
 
 /*
@@ -1327,9 +1327,9 @@ copies of the pointers. The default code is right for UNIX.
 	    if ( nbytes >0 )
 	    {
 		reply_l[(*nout)++] = string[0];
-		XDrawString( wdt[indx[*kwkix-1]].display, win, 
-		    wdt[indx[*kwkix-1]].gc, 
-		    wdt[indx[*kwkix-1]].font_w + overall.width, 
+		XDrawString( wdt[indx[*kwkix-1]].display, win,
+		    wdt[indx[*kwkix-1]].gc,
+		    wdt[indx[*kwkix-1]].font_w + overall.width,
 		    (3*height_w)/4, reply_l, *nout);
 		XFlush( wdt[indx[*kwkix-1]].display );
 	    }
@@ -1342,11 +1342,11 @@ copies of the pointers. The default code is right for UNIX.
     XDestroyWindow(wdt[indx[*kwkix-1]].display, win);
     XSync( wdt[indx[*kwkix-1]].display, 0 );
 }
-
+
 int gk0xws( int *wktyp, int *xp, int *yp, float *xm, float *ym)
 /*
     Return the window size in pixels and metres
- 
+
     Arguments: (given): wktyp; workstation type
 	       (returned):xp, yp; window size in pixels
 			 :xm, ym; window size in metres
@@ -1364,12 +1364,12 @@ int gk0xws( int *wktyp, int *xp, int *yp, float *xm, float *ym)
 
     return 0;
 }
-
+
 int gk0xcf( int *wktyp, int *col, int *dyn, int *bpc, int *ncols)
 /*
-    Return various information about the colour facilites available to 
+    Return various information about the colour facilites available to
     a window
- 
+
     Arguments: (given): wktyp; workstation type
 	       (returned):col; whether colour is supported
 			  dyn; whether the colour table is dynamic
@@ -1397,8 +1397,8 @@ int gk0xcf( int *wktyp, int *col, int *dyn, int *bpc, int *ncols)
 
     return 0;
 }
-
-void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy, 
+
+void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
 		float *x, float *y, int *key)
 /*
     Return cursor position and key pressed
@@ -1423,10 +1423,10 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
     int xscroll, yscroll;
 
 /*
- *  Save window and position of cursor and the current keyboard owner so that 
+ *  Save window and position of cursor and the current keyboard owner so that
  *  we can put them back when we are done.
  */
-    XQueryPointer( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+    XQueryPointer( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	&root_window, &child_window, &rx, &ry, &wx, &wy, &button_mask);
     XGetInputFocus( wdt[indx[*kwkix-1]].display, &focus, &revert);
 
@@ -1437,19 +1437,19 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
  *  incorrect cursor positions.
  */
     if ( wdt[indx[*kwkix-1]].overlay )
-	GWM_GetOvScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+	GWM_GetOvScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	    &wdt[indx[*kwkix-1]].xscroll, &wdt[indx[*kwkix-1]].yscroll);
     else
-	GWM_GetScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+	GWM_GetScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	    &wdt[indx[*kwkix-1]].xscroll, &wdt[indx[*kwkix-1]].yscroll);
 
 /*
 **  Create and map an input only window on top of the drawing area window
 */
-    wind_attrib.event_mask = 
+    wind_attrib.event_mask =
 	ButtonPressMask | KeyPressMask | StructureNotifyMask;
-    inwin = XCreateWindow( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
-        wdt[indx[*kwkix-1]].xscroll, wdt[indx[*kwkix-1]].yscroll, 
+    inwin = XCreateWindow( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
+        wdt[indx[*kwkix-1]].xscroll, wdt[indx[*kwkix-1]].yscroll,
         wdt[indx[*kwkix-1]].width, wdt[indx[*kwkix-1]].height, 0, 0,
 	InputOnly, CopyFromParent, CWEventMask, &wind_attrib );
     XMapWindow( wdt[indx[*kwkix-1]].display, inwin);
@@ -1467,9 +1467,9 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
  *  Move the pointer to the specified initial position
  */
 	ix = (short) (*inix + 0.5);
-	iy = (short) (wdt[indx[*kwkix-1]].height - 1 
+	iy = (short) (wdt[indx[*kwkix-1]].height - 1
 	    - (int)(*iniy + 0.5));
-	XWarpPointer( wdt[indx[*kwkix-1]].display, None, inwin, 0, 0, 0, 0, 
+	XWarpPointer( wdt[indx[*kwkix-1]].display, None, inwin, 0, 0, 0, 0,
 	    ix, iy);
     }
 
@@ -1481,10 +1481,10 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
     XGrabServer( wdt[indx[*kwkix-1]].display);
     XGetWindowAttributes( wdt[indx[*kwkix-1]].display,
 	wdt[indx[*kwkix-1]].win, &attrib);
-    if ( attrib.map_state != IsViewable) 
+    if ( attrib.map_state != IsViewable)
     {
     	XUngrabServer( wdt[indx[*kwkix-1]].display);
-    	XSelectInput( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+    	XSelectInput( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	    attrib.your_event_mask | StructureNotifyMask);
 	XMapWindow( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win);
     	XWindowEvent( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
@@ -1495,15 +1495,15 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
  */
         XGetWindowAttributes( wdt[indx[*kwkix-1]].display,
 	    wdt[indx[*kwkix-1]].win, &attrib);
-        if ( attrib.map_state == IsViewable) 
+        if ( attrib.map_state == IsViewable)
         {
-    	    XSetInputFocus( wdt[indx[*kwkix-1]].display, inwin, 
+    	    XSetInputFocus( wdt[indx[*kwkix-1]].display, inwin,
 	        RevertToPointerRoot, CurrentTime);
         }
     }
     else
     {
-    	XSetInputFocus( wdt[indx[*kwkix-1]].display, inwin, 
+    	XSetInputFocus( wdt[indx[*kwkix-1]].display, inwin,
 	    RevertToPointerRoot, CurrentTime);
     	XUngrabServer( wdt[indx[*kwkix-1]].display);
     }
@@ -1513,7 +1513,7 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
  */
     for ( *key = 0; *key == 0;)
     {
-	XWindowEvent( wdt[indx[*kwkix-1]].display, inwin, 
+	XWindowEvent( wdt[indx[*kwkix-1]].display, inwin,
 	    ButtonPressMask | KeyPressMask, &event);
 
 /*
@@ -1521,7 +1521,7 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
  */
 	if (event.type == ButtonPress)
 	{
-	    switch (event.xbutton.button) 
+	    switch (event.xbutton.button)
 	    {
 		case Button1:
 		    *key = -1;
@@ -1563,28 +1563,28 @@ void gk0xrl( int *kwkix, int *prompt, float *inix, float *iniy,
         ix = event.xkey.x;
         iy = event.xkey.y;
     } else {
-        XQueryPointer( wdt[indx[*kwkix-1]].display, inwin, 
+        XQueryPointer( wdt[indx[*kwkix-1]].display, inwin,
 	    &root_window, &child_window, &dumx, &dumy, &ix, &iy, &button_mask);
     }
-    if (*prompt == GYES) 
+    if (*prompt == GYES)
     {
 
 /*
  *  Check the scrolls again.
  */
     if ( wdt[indx[*kwkix-1]].overlay )
-	GWM_GetOvScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+	GWM_GetOvScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	    &xscroll, &yscroll);
     else
-	GWM_GetScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win, 
+	GWM_GetScroll( wdt[indx[*kwkix-1]].display, wdt[indx[*kwkix-1]].win,
 	    &xscroll, &yscroll);
 
 /*
- *   Destroy the crosshair cursor and move the original cursor back to its 
+ *   Destroy the crosshair cursor and move the original cursor back to its
  *   original position
  */
 	XUndefineCursor( wdt[indx[*kwkix-1]].display, inwin);
-	XWarpPointer( wdt[indx[*kwkix-1]].display, None, root_window, 0, 0, 
+	XWarpPointer( wdt[indx[*kwkix-1]].display, None, root_window, 0, 0,
 	    0, 0, rx, ry);
     }
 

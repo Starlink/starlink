@@ -12,10 +12,10 @@
 *
 *
 * Description:
-*     None or more tables of possible lines are read in from disc and 
+*     None or more tables of possible lines are read in from disc and
 *     the user is asked to identify the lines in the data file, matching
 *     them to the lines is this list. The list can be displayed if
-*     required, and the user can force indentifcations to be of lines 
+*     required, and the user can force indentifcations to be of lines
 *     not in the list. The work tables will be increased in size as
 *     required.
 *
@@ -38,7 +38,7 @@
 *        Error status
 *
 * Authors:
-*   TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92, then 
+*   TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92, then
 *        Durham
 *
 * History:
@@ -48,12 +48,12 @@
 *    TNW: Altered to use FIG_OPFILE 5/7/88
 *    TNW: Altered to receive work tables as workspace from above 12/8/88
 *    TNW: DSA_OPEN_TEXT_FILE replaced FIG_OPFILE and DSA_GET_LU, 14/7/89
-*    TNW: Some tidying, change to argument list of identify_line 
+*    TNW: Some tidying, change to argument list of identify_line
 *         25/10/89
 *    TNW: Use of QMENU 1/11/89
 *    TNW: changes to file i/o etc. 17/7/90
 *    TNW: PAR_QUEST not used 15/8/91
-*    TNW: 28/7/93 Increase size of tables if required, rather than 
+*    TNW: 28/7/93 Increase size of tables if required, rather than
 *         editing out lines, etc.
 *- ---------------------------------------------------------------------
       implicit none

@@ -58,7 +58,7 @@
 *        than 1.5 are written into file GALS, those with selected
 *        variable value less than equal to 1.5 are written to file
 *        STARS.
-*        
+*
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,13 +89,13 @@
 *  External References:
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! length of string excluding trailing
-                                 ! blanks 
+                                 ! blanks
 
 *  Local Variables:
       CHARACTER * ( FIO__SZFNM ) FNAME ! File name
       CHARACTER * ( 256 ) LINE   ! Buffer to read file entries
       INTEGER I                  ! Loop variable
-      INTEGER ICOL               ! the column number of variable 
+      INTEGER ICOL               ! the column number of variable
       INTEGER IEND               ! variable
       INTEGER IFS1               !
       INTEGER IFS2               ! FIO file descriptors
@@ -105,7 +105,7 @@
       INTEGER ISTART             ! First and last characters in
       INTEGER NCHAR              ! number of characters in one line
       LOGICAL OPNF1              !
-      LOGICAL OPNF2              ! Set if files are open 
+      LOGICAL OPNF2              ! Set if files are open
       LOGICAL OPNF3              !
       REAL RVAL                  ! current value of the threshold variable
       REAL THRESH                ! the threshold value of variable
@@ -135,7 +135,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Loop while reading in data from the file.
-      ILOW = 0 
+      ILOW = 0
       IHIGH = 0
  4    CONTINUE                   ! Start of 'DO WHILE' loop
       IF ( .TRUE. ) THEN
@@ -168,7 +168,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'BADVAL',
      :      'Cannot read value in file', STATUS )
-            GO TO 99         
+            GO TO 99
          END IF
 
 *  Threshold and write to appropriate file.
@@ -182,7 +182,7 @@
 
 *  Next line.
          GO TO 4
-      END IF     
+      END IF
 6     CONTINUE
 
 *  Write out an informational message on the number of entrie in each

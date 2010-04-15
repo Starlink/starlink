@@ -23,24 +23,24 @@ C     CALL DSA_DECODE_DIMS (STRING, IST, MAXDIM, IEND, NDIM,
 C                                                   DIMS, STATUS)
 C
 C  Parameters:   (">" input, "<" output, "W" workspace, "!" modified)
-C     (>) STRING   (Fixed string,descr) An object name in which the 
-C                  dimension specification is embedded.   A space is 
+C     (>) STRING   (Fixed string,descr) An object name in which the
+C                  dimension specification is embedded.   A space is
 C                  treated as terminating the string.
 C     (>) IST      (Integer,ref) the start of the dimension specification
 C                  in the string - ie STRING(IST:IST) is the "[" that
 C                  begins the specification.
-C     (>) MAXDIM   (Integer,ref) The maximum number of dimensions 
+C     (>) MAXDIM   (Integer,ref) The maximum number of dimensions
 C                  expected - ie the dimension of the array DIMS.
 C     (<) IEND     (Integer,ref) the end of the dimension specification
 C                  in the string - ie STRING(IEND:IEND) is the "]" that
 C                  ends the specification.
-C     (<) NDIM     (Integer,ref) Returns the number of dimensions 
+C     (<) NDIM     (Integer,ref) Returns the number of dimensions
 C                  specified.
-C     (<) DIMS     (Integer array,ref) Returns the values of 
+C     (<) DIMS     (Integer array,ref) Returns the values of
 C                  the dimension specifiers in NAME.
 C     (!) STATUS   (Integer) Returns a status code. If bad status
 C                  is passed, this routine returns immediately.
-C                  
+C
 C  External variables used:  None
 C
 C  External routines used: None
@@ -78,7 +78,7 @@ C
       CHARACTER CHR
 C
 C     Start to decode the dimension information.  Must end with a ],
-C     and dimensions are delimited by commas.  Each dimension value in 
+C     and dimensions are delimited by commas.  Each dimension value in
 C     turn is summed up in N.
 C
 C     First setup the initial pointers etc
@@ -90,7 +90,7 @@ C
          NDIM=1
          N=0
          J=IST+1
-         ENDED=.FALSE.      
+         ENDED=.FALSE.
       END IF
 C
 C     This loop continues until 'ended' is signalled, either by the

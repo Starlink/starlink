@@ -14,7 +14,7 @@
 #     indices of the "standard" AST colours and allows this set to be
 #     globally extended (that is over the complete application) by
 #     adding new colours with specified indices (these may not
-#     overwrite the standard set). Note only for Grf3d/Vtk, 
+#     overwrite the standard set). Note only for Grf3d/Vtk,
 #     see gaia::AstColours for the Tk canvas version.
 
 #  Invocations:
@@ -89,7 +89,7 @@ itcl::class gaia3d::Grf3dColours {
    #  -----------
    private destructor  {
    }
-   
+
    #  Procs:
    #  ------
 
@@ -102,7 +102,7 @@ itcl::class gaia3d::Grf3dColours {
    #  colour is made. Set index to -1 for automatic chosing of index
    #  (this is returned). Maximum colour index is 63 (i.e. 64 colours).
    public proc add_custom_colour {index colour} {
-      if { $index == -1 } { 
+      if { $index == -1 } {
          set index $count_
       }
       if { $index > 63 } {
@@ -111,7 +111,7 @@ itcl::class gaia3d::Grf3dColours {
       if { $index >= $standard_count_ } {
          set colours_($index) $colour
          set indices_($colour) $index
-         
+
          #  Add colour to GRF interface. Note convert from Tcl to RGB.
          lassign [gaia3d::Gaia3dVtkWindow::get_rgb_colour $colour] r g b
          gvtk::grfaddcolour $index $r $g $b

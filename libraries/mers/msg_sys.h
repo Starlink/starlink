@@ -13,7 +13,7 @@
 *     Global constants include file.
 
 *  Description:
-*     This file contains definitions of the global constants used 
+*     This file contains definitions of the global constants used
 *     internally by the MSG_ system.
 
 *  Copyright:
@@ -26,12 +26,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -45,7 +45,7 @@
 
 *  History:
 *     3-NOV-1987 (BDK):
-*        Increase SZTOK and SZMSG. 
+*        Increase SZTOK and SZMSG.
 *     15-MAR-1990 (PCTR):
 *        Most definitions placed in EMS_SYS.
 *     05-SEP-2008 (TIMJ):

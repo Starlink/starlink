@@ -4,7 +4,7 @@ C
 C     F I T _ P O S N
 C
 C     Positions the FITS tape.  The routine FIT_INIT should have
-C     been called prior to this.  
+C     been called prior to this.
 C
 C     Parameters -  (">" input, "W" workspace, "<" output)
 C
@@ -19,7 +19,7 @@ C                        marks, and the tape will be left between them.
 C                  Other strings will be ignored, and the tape will be
 C                  left at its present position.
 C     (<) STATUS   (Integer) Returned status.  0 => OK, non-zero values
-C                  indicate tape I/O errors and can be decoded by 
+C                  indicate tape I/O errors and can be decoded by
 C                  FIT_ERROR.
 C
 C     Common variables used -
@@ -27,10 +27,10 @@ C
 C     (>) MTUNIT   (Integer) The I/O channel for the tape in use.
 C     (<) MTMESS   (Character) Descriptor for the last tape I/O error.
 C     (<) MTSTAT   (Integer) Last TIO_ error code.
-C     (W) TBUFF    (Byte array) Is the large buffer in which logical 
-C                  blocks (built up in FBUFF) are blocked up into actual 
+C     (W) TBUFF    (Byte array) Is the large buffer in which logical
+C                  blocks (built up in FBUFF) are blocked up into actual
 C                  tape records.
-C     (>) MAXTBL   (Integer) Is the maximum allowed value for TBLOCK (fixed 
+C     (>) MAXTBL   (Integer) Is the maximum allowed value for TBLOCK (fixed
 C                  parameter).
 C
 C     MTMESS is defined in the file COMB.INC, the others in COMF.INC
@@ -43,7 +43,7 @@ C     TIO_READ     ( "      "   ) Read a record from a tape
 C     TIO_SKIP     ( "      "   ) Skip over file marks on tape
 C     TIO_EOF      ( "      "   ) Check for end-of-file status
 C     TIO_ERR      ( "      "   ) See if status indicates an error
-C     
+C
 C     Note: This routine is not really of general application, since
 C     it assumes that all records on the tape can be read into the
 C     FITS buffer without error.  If any are longer than 28800 bytes,

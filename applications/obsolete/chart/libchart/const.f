@@ -1,7 +1,7 @@
       SUBROUTINE CONST(A,D, STATUS )
- 
+
       IMPLICIT DOUBLE PRECISION(A-H,O-Z)
- 
+
 *+
 *   Sets up Plate Constants for use by Routine
 *   PROJ.

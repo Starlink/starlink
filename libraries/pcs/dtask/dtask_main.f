@@ -15,7 +15,7 @@
 *  Description:
 *     Start the ERR system (switches on message deferral).
 *     Tune the MAXWPL parameter of HDS
-*     Tune the SHELL parameter of HDS - Allow environment variable to 
+*     Tune the SHELL parameter of HDS - Allow environment variable to
 *     override the ADAM default of C-shell (Note the HDS default is Bourne
 *     shell which will not translate ~)
 *     Determine if the task has been started from ICL (ie if the environment
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,10 +90,10 @@
 *  Local Constants:
       INTEGER PAGE_NUM           ! HDS working page limit
       PARAMETER ( PAGE_NUM = 100 )
-      
+
 *  Local Variables:
       INTEGER STATUS             ! Task status
-      CHARACTER*80 ICLID         ! If we were started by ICL this local 
+      CHARACTER*80 ICLID         ! If we were started by ICL this local
                                  ! environment variable will be inherited
 *.
 
@@ -118,7 +118,7 @@
          CALL HDS_TUNE( 'SHELL', 1, STATUS )
       ENDIF
       CALL EMS_RLSE
-      
+
 *  Attempt to get the ICL environment variable
 *  Be prepared for 'normal' situation of failure
       CALL ERR_MARK
@@ -144,7 +144,7 @@
 *   Close error reporting
       CALL ERR_STOP ( STATUS )
 
-*   Exit 
+*   Exit
 *   If STATUS and environment variable ADAM_EXIT are set,
 *   make an error exit. We have no further use for STATUS or error
 *   reporting.
@@ -156,7 +156,7 @@
 *      If ADAM_EXIT is set, exit with status 1
          IF ( STATUS .EQ. SAI__OK ) CALL EXIT( 1 )
       ENDIF
-          
+
 *   Otherwise exit normally
 
       END

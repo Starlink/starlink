@@ -98,7 +98,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Data type for processing
       INTEGER NDFI               ! Identifier for 1st NDF (input)
       INTEGER NDFO               ! Identifier for 2nd NDF (output)
-      INTEGER NERR               ! Number of errors generated 
+      INTEGER NERR               ! Number of errors generated
       INTEGER NERRV              ! Number of errors generated (var)
       INTEGER PNTRI( 2 )         ! Pointer to input NDF mapped array
       INTEGER PNTRO( 2 )         ! Pointer to output NDF mapped array
@@ -188,51 +188,51 @@
 *  add the constant to the data array.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPG1_EXPOB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPG1_EXPOUB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_EXPOD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_EXPOI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPG1_EXPOR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL KPG1_EXPOW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPG1_EXPOUW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
       END IF
 

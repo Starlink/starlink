@@ -22,7 +22,7 @@
 ;;       No other types are allowed.
 ;;
 ;;    ndf_name (Given)
-;;       A string expression specifying the name of the NDF to be created or 
+;;       A string expression specifying the name of the NDF to be created or
 ;;       updated.
 ;;
 ;;    [bad_value] (Given)
@@ -32,10 +32,10 @@
 ;;       is set FALSE.  The value must be the same type as the array.
 ;;
 ;;    [component=comp_name] (Given)
-;;       Optional - A string expression specifying the NDF component to be 
+;;       Optional - A string expression specifying the NDF component to be
 ;;       written - it defaults to 'DATA'. The case of the string does not
 ;;       matter and it may be abbreviated to one or more characters.
-;;       
+;;
 ;;       The following values are allowed:
 ;;          'DATA'  A new NDF is created with the same dimensions as the IDL
 ;;                  array, and the DATA component written.
@@ -83,9 +83,9 @@
 ;;         IDL> write_ndf, my_variances, 'my_ndf', comp='v'
 ;;
 ;;      Writes the IDL array 'my-variances' to the VARIANCES component of
-;;      the NDF created above. A check is made that the size of the array 
-;;      corresponds with the size of the NDF. (Note that the keyword 
-;;      'component' and the value 'VARIANCE' are case-independent and can 
+;;      the NDF created above. A check is made that the size of the array
+;;      corresponds with the size of the NDF. (Note that the keyword
+;;      'component' and the value 'VARIANCE' are case-independent and can
 ;;      be abbreviated.)
 ;;
 ;;-----------------------------------------------------------------------------
@@ -97,13 +97,13 @@
 
 ;;      Make sure we're not running under 64 bit Solaris.
 
-	IF ( !VERSION.ARCH EQ 'sparc' ) THEN BEGIN 
+	IF ( !VERSION.ARCH EQ 'sparc' ) THEN BEGIN
           IF (!VERSION.MEMORY_BITS eq 64) THEN BEGIN
             MESSAGE,"Starlink converters only run on 32-bit IDL (% idl -32)"
           ENDIF
 	ENDIF
 
-;;	Determine the entry point and library name to use in the 
+;;	Determine the entry point and library name to use in the
 ;;	CALL_EXTERNAL function. These are edited in when during make.
 
         ENTRY_PREFIX = '@ENTRY_PREFIX@'
@@ -115,14 +115,14 @@
 
 	IF(CNT eq 0)THEN BEGIN
 
-;;	  The library file has not been made. Write a message and 
+;;	  The library file has not been made. Write a message and
 ;; 	  exit.
 
 	  MESSAGE, "The library file: "+ LIB_NAME +" Does not exist."
 
 	  RETURN
 
-	END 
+	END
 
 	ENTRY_NAME = ENTRY_PREFIX+'write_ndf'
 

@@ -145,7 +145,7 @@ C  Error handling
 C  Remove the allocation from the LUN_table
 
         UNIT_NUMBER(J)     =  0
-        CALLING_ROUTINE(J) = ' ' 
+        CALLING_ROUTINE(J) = ' '
         LUN_TIDY(J)        = .FALSE.
 
       ELSE
@@ -154,7 +154,7 @@ C  Remove the allocation from the LUN_table
         PRINT *,'Unit number ',UNIT_NUMBER(J),' allocated from ',
      &         CALLING_ROUTINE(J)
       END IF
-  
+
    99 RETURN
       END
 
@@ -213,7 +213,7 @@ C  Ok, go...
       PRINT *,'Unit number, status, calling routine'
       DO J = 1, MAXENT
         IF (UNIT_NUMBER(J).NE.0) THEN
-          PRINT '(1X,I4,3X,L1,3X,A24)', 
+          PRINT '(1X,I4,3X,L1,3X,A24)',
      &            UNIT_NUMBER(J), LUN_TIDY(J), CALLING_ROUTINE(J)
         END IF
       END DO

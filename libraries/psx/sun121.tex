@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils, 2006 Particle Physics and Astronomy Research Council}
 
 % Variable part - replace [xxx] as appropriate.
@@ -22,7 +22,7 @@
                                 A J Chipperfield}
 \newcommand{\stardocdate}      {8th November 2007}
 \newcommand{\stardoctitle}     {PSX \\ [1ex]
-                                POSIX interface routines} 
+                                POSIX interface routines}
 \newcommand{\stardocversion}   {Version 0.5-4}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {%
@@ -88,7 +88,7 @@ machine independent way.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -539,12 +539,12 @@ machine independent way.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -650,7 +650,7 @@ However, to a reasonable approximation, POSIX (1003.1) is just the C run time
 library and indeed the POSIX standard makes reference to the ANSI C standard
 \cite{c:std}. Unfortunately, different computers have somewhat different C
 run time libraries. The point of POSIX is to define a common run time library
-that will be available on all computers. 
+that will be available on all computers.
 
 \section{\xlabel{the_psx_library}The PSX library}
 
@@ -744,7 +744,7 @@ for X/OPEN routines will also be provided.
 \section{\xlabel{compiling_and_linking}Compiling and Linking}
 
 To use the PSX routines, you first need to `log on' for development by using
-the \texttt{psx\_dev} command to create the necessary soft links in your 
+the \texttt{psx\_dev} command to create the necessary soft links in your
 directory so that you can use the short form of the include file names.
 
 \begin{quote}\begin{verbatim}
@@ -836,8 +836,8 @@ on VMS and Unix systems.
 
       END
 \end{verbatim}
-\end{small}      
-      
+\end{small}
+
 Although the PSX routines are designed to be used with other Starlink routines
 in the ADAM environment and use the concept of inherited status, they can just
 as easily be used in a stand alone program like the one above provided that the
@@ -925,9 +925,9 @@ deferred if required, as described in \xref{SUN/104}{sun104}{} and
 \xref{SSN/4}{ssn4}{}.
 
 If the code is required to work where pointers may be longer than INTEGERs,
-The construct \texttt{\%VAL(CNF\_PVAL(PNTR))}, rather than simply 
+The construct \texttt{\%VAL(CNF\_PVAL(PNTR))}, rather than simply
 \texttt{\%VAL(PNTR)}, should be used in passing the pointer to FILL and PRNT.
-Function CNF\_PVAL is defined in the CNF\_PAR include file and described in 
+Function CNF\_PVAL is defined in the CNF\_PAR include file and described in
 \xref{SUN/209}{sun209}{accessing_dynamic_memory_from_c_and_fortran}\latex{
 (section `Pointers')}.
 
@@ -1192,7 +1192,7 @@ PSX\_\_ERRNO & System error during POSIX call
 }{
    \sstdescription{
       Convert the information in the structure pointed to by TSTRCT to a
-      character string. TSTRCT should have been set by a call to 
+      character string. TSTRCT should have been set by a call to
       \htmlref{PSX\_LOCALTIME}{PSX_LOCALTIME}
       or
       \htmlref{PSX\_GMTIME}{PSX_GMTIME}.
@@ -1348,7 +1348,7 @@ PSX\_\_ERRNO & System error during POSIX call
             \xref{SUN/209}{sun209}{pointers},
             allowing its use where pointers are longer than INTEGERs.
             For portability, the construct
-            \%VAL(\xref{CNF\_PVAL}{sun209} 
+            \%VAL(\xref{CNF\_PVAL}{sun209}
             {accessing_dynamic_memory_from_c_and_fortran}(PNTR)),
             rather than simply \%VAL(PNTR),
             should be used to pass the pointer to the subroutine.
@@ -1446,7 +1446,7 @@ PSX\_\_ERRNO & System error during POSIX call
 }{
    \sstdescription{
       Convert the number of ticks since the beginning of the calendar
-      (the value returned by 
+      (the value returned by
       \htmlref{PSX\_TIME}{PSX_TIME})
       to a character string.
    }
@@ -1592,7 +1592,7 @@ PSX\_\_ERRNO & System error during POSIX call
 }{
    \sstdescription{
       The routine frees the virtual memory pointed to by PNTR that was
-      previously allocated by a call to 
+      previously allocated by a call to
       \htmlref{PSX\_CALLOC}{PSX_CALLOC}
       or
       \htmlref{PSX\_MALLOC}{PSX_MALLOC}.
@@ -2104,11 +2104,11 @@ PSX\_\_ERRNO & System error during POSIX call
          \sstitem
          The pointer TSTRCT points to the C structure that contains the
             information about the time. This pointer is needed as it may be
-            passed on to 
+            passed on to
             \htmlref{PSX\_ASCTIME}{PSX_ASCTIME}.
             The structure will be overwritten by any future call to
-            PSX\_GMTIME or 
-            \htmlref{PSX\_\-LOCALTIME}{PSX_LOCALTIME}. 
+            PSX\_GMTIME or
+            \htmlref{PSX\_\-LOCALTIME}{PSX_LOCALTIME}.
 
          \sstitem
          TSTRCT is declared to be of type POINTER. This is usually
@@ -2304,11 +2304,11 @@ PSX\_\_ERRNO & System error during POSIX call
          \sstitem
          The pointer TSTRCT points to the C structure that contains the
             information about the time. This pointer is needed as it may be
-            passed on to 
+            passed on to
             \htmlref{PSX\_ASCTIME}{PSX_ASCTIME}.
             The structure will be overwritten by any future call to
-            PSX\_LOCALTIME or 
-            \htmlref{PSX\_GMTIME}{PSX_GMTIME}. 
+            PSX\_LOCALTIME or
+            \htmlref{PSX\_GMTIME}{PSX_GMTIME}.
 
          \sstitem
          TSTRCT is declared to be of type POINTER. This is usually
@@ -2389,7 +2389,7 @@ PSX\_\_ERRNO & System error during POSIX call
 
          The call to PSX\_MALLOC allocates forty bytes of storage. The
          pointer to this storage is then passed to subroutine SUB1,
-         where it is accessed as an array of INTEGERs. 
+         where it is accessed as an array of INTEGERs.
          We assume SUB1 returns without action if STATUS is bad.
 
          Note that in
@@ -2463,7 +2463,7 @@ PSX\_\_ERRNO & System error during POSIX call
    Set a new environment variable value
 }{
    \sstdescription{
-      The routine sets the specified environment variable to the 
+      The routine sets the specified environment variable to the
       supplied value. If it fails it sets STATUS to PSX\_\_NOMEM.
    }
    \sstinvocation{
@@ -3202,7 +3202,7 @@ there is the potential for recursive error reports being generated.
 Also, if the PSX routines were needed on a non-Starlink system, then
 EMS would not necessarily be present. To try to take account of these
 situations, the PSX routines actually call the internal routine
-\texttt{psx1\_rep\_c} to report an error. This normally calls 
+\texttt{psx1\_rep\_c} to report an error. This normally calls
 \texttt{emsRep} (the C interface to
 \xref{\texttt{EMS\_REP}}{ssn4}{EMS_REP}),
 but could be re-coded where required.

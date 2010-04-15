@@ -1,23 +1,23 @@
       SUBROUTINE CWRANGE(WMIN,WMAX,WAUTOLIM,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C WMIN (>),WMAX (>), WAUTOLIM (><), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C This routine sets the wavelength range for the plots using the cursor.
@@ -32,7 +32,7 @@ C-
       REAL WMIN,WMAX,Y
       CHARACTER*1 CH
       LOGICAL WAUTOLIM
-     
+
       WAUTOLIM = .FALSE.
       WRITE(OUT_LU,*) 'Press a key to set the minimum wavelength'
       CALL PGCURSE(WMIN,Y,CH)

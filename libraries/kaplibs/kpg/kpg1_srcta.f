@@ -19,8 +19,8 @@
 *     the AST_ library for interpretation.
 *
 *     This routine has only a STATUS argument, so it communicates with
-*     other KPG routines via global variables stored in the KPG_AST common 
-*     blocks. These are described below under "Global Variables used as 
+*     other KPG routines via global variables stored in the KPG_AST common
+*     blocks. These are described below under "Global Variables used as
 *     Arguments".
 
 *  Arguments:
@@ -29,7 +29,7 @@
 
 *  Global Variables used as Arguments:
 *     ASTGRP = INTEGER (Given)
-*        A GRP identifier for the group which holds the data. 
+*        A GRP identifier for the group which holds the data.
 *     ASTLN = INTEGER (Given and Returned)
 *        This must initially be set to the value 1, to indicate that
 *        data will be read starting at the first element of the group
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,9 +85,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants (needed by KPG_AST)
       INCLUDE 'GRP_PAR'          ! GRP_ public constants
-      INCLUDE 'KPG_PAR'          ! KPG_ constants      
+      INCLUDE 'KPG_PAR'          ! KPG_ constants
       INCLUDE 'AST_PAR'          ! AST_ public interface
-      
+
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks.
 *        ASTGRP = INTEGER (Read)
@@ -116,7 +116,7 @@
       INTEGER L                   ! Number of characters in AST_ text
       LOGICAL AGAIN               ! Loop to read another line?
 
-      SAVE DIM      
+      SAVE DIM
 *.
 
 *  Check inherited global status.

@@ -6,7 +6,7 @@
 #include "sae_par.h"
 
 F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP), INTEGER_ARRAY(MAP), INTEGER(AXIS),
-                            INTEGER(MODE), CHARACTER(LOC), INTEGER(STATUS) 
+                            INTEGER(MODE), CHARACTER(LOC), INTEGER(STATUS)
                             TRAIL(LOC) ) {
 /*
 *+
@@ -24,13 +24,13 @@ F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP), INTEGER_ARRAY(MAP), INTEGER(AXIS),
 
 *  Description:
 *     This function fills a specified HDS object with primitive values
-*     read from a vector entry in an AST KeyMap. It is the inverse of 
-*     KPG1_HDSKY. The HDS object must already exist and must be a 
+*     read from a vector entry in an AST KeyMap. It is the inverse of
+*     KPG1_HDSKY. The HDS object must already exist and must be a
 *     primitive array or scalar. The values to store in the HDS object
-*     are read from the KeyMap entry that has a key equal to the name 
+*     are read from the KeyMap entry that has a key equal to the name
 *     of the HDS object. The vector read from the KeyMap is interpreted
 *     as an N-dimension array, where N is the number of dimensions in the
-*     HDS object. Array slices can be re-arranged as they are copied from 
+*     HDS object. Array slices can be re-arranged as they are copied from
 *     KeyMap to HDS object. The AXIS argument specifies which axis is
 *     being re-arranged. Each array slice is perpendicular to this axis.
 *     The KeyMap array and the HDS array are assumed to have the same
@@ -40,13 +40,13 @@ F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP), INTEGER_ARRAY(MAP), INTEGER(AXIS),
 *     KEYMAP = INTEGER (Given)
 *        An AST pointer to the KeyMap.
 *     MAP( * ) = INTEGER (Given)
-*        An array which indicates how to map slices in the KeyMap array 
-*        onto slices in the HDS array. The length of the supplied array 
-*        should be equal to the HDS array dimension specified by AXIS. 
+*        An array which indicates how to map slices in the KeyMap array
+*        onto slices in the HDS array. The length of the supplied array
+*        should be equal to the HDS array dimension specified by AXIS.
 *        Element J of this array says where the data for the J'th slice
-*        of the HDS array should come from, where J is the index along 
+*        of the HDS array should come from, where J is the index along
 *        the axis specified by AXIS. The value of element J is a
-*        zero-based index along axis AXIS of the array read from the 
+*        zero-based index along axis AXIS of the array read from the
 *        KeyMap.
 *     AXIS = INTEGER (Given)
 *        The index of the axis to be re-arranged. The first axis is axis 1.
@@ -74,12 +74,12 @@ F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP), INTEGER_ARRAY(MAP), INTEGER(AXIS),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

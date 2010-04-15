@@ -22,8 +22,8 @@ C  Call:
 C     CALL PAR_RDKEY (NAME,RESET,VALUE)
 C
 C  Parameters:      (">" input, "<" output )
-C     (>) NAME      (Fixed string, descr) The name of the parameter.  
-C                   Should be terminated by a blank or the end of the 
+C     (>) NAME      (Fixed string, descr) The name of the parameter.
+C                   Should be terminated by a blank or the end of the
 C                   string.  Case is not significant.
 C     (>) RESET     (Logical, ref) The reset value for the parameter.
 C     (<) VALUE     (Logical, ref) The value of the parameter as
@@ -49,7 +49,7 @@ C     13th May 1986   KS / AAO.  Now gets prompt string from common,
 C                     instead of directly from the parameter file.
 C     1st Sept 1988   KS / AAO.  Support for requested abort added.
 C     8th  Dec 1989   KS / AAO.  Comments reformatted.
-C     4th  Mar 1991   KS / AAO.  Added support for repeated values 
+C     4th  Mar 1991   KS / AAO.  Added support for repeated values
 C                     read from parameter value files.
 C     8th  Mar 1991   KS / AAO.  Bug fix in setting of common value.
 C     13th Aug 1992.  HME / UoE, Starlink.  Translate into calls to

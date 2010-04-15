@@ -4,7 +4,7 @@
 */
 #include "sbmlib.h"
 #include "sbmmac.h"
-void sbmpermut(int qfoo,int qbar[],int qbaz[],int*Q0){int 
+void sbmpermut(int qfoo,int qbar[],int qbaz[],int*Q0){int
 qfobar,q1,q2,qfoobar;if(qfoo<1){*Q0=-1;return;}else{*Q0=0;}
 if(qbar[0]<0){qbar[0]=-1;for(qfobar=1;qfobar<qfoo;qfobar++){
 qbar[qfobar]=0;}}qbar[0]++;for(qfobar=0;qfobar<qfoo;qfobar++

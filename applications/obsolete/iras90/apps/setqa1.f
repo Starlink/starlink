@@ -15,7 +15,7 @@
 *  Description:
 *     The input vector is copied to the output vector, with pixel
 *     values being transformed as follows: positive values in the input
-*     are transformed to bad values in the output, zero values in the 
+*     are transformed to bad values in the output, zero values in the
 *     input remain zero in the output.
 
 *  Arguments:
@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -61,7 +61,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop count.
-      
+
 *.
 
 *  Check inherited global status.

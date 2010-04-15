@@ -2,7 +2,7 @@
      :                     BIN, MARK, ERROR, WIDTH, FRAME, LABGVN,
      :                     CWGIVN, SWGIVN, LEGIVN, TEXT, BOTTOM, LEFT,
      :                     TOP, RIGHT, XLEGND, YLEGND, FILL, CWORLD,
-     :                     SWORLD, LEGEND, CELLSZ, LABSPC, ROMAN, 
+     :                     SWORLD, LEGEND, CELLSZ, LABSPC, ROMAN,
      :                     CHIGHT, COLOUR, THICK, AXES, TICK, NUML,
      :                     MAJOR, MINOR, DASH, STATUS )
 *+

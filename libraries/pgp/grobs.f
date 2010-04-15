@@ -8,7 +8,7 @@
       NAME = 'GRCHAR'
       GO TO 1
 
-      ENTRY GRESC 
+      ENTRY GRESC
       NAME = 'GRESC'
       GO TO 1
 

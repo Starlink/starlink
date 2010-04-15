@@ -67,7 +67,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -104,14 +104,14 @@
       INTEGER HX                 ! Highest number of tiles in x
       INTEGER HY                 ! Highest number of tiles in y
       INTEGER J                  ! Loop counter
-      INTEGER NC                 ! Number of tiles in current 
+      INTEGER NC                 ! Number of tiles in current
                                  ! configuration
       REAL TASP                  ! Aspect ratio of a tile
       REAL USED                  ! Fraction of current configuration
                                  ! that would be used
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain the tile's aspect ratio.
@@ -120,7 +120,7 @@
 *  Find the ratio of the target to tile aspect ratios.  The idea is
 *  to match the shape of the images best to the chosen map shape, and
 *  tile accordingly.  So if this ratio is near 1.0, the number of tiles
-*  in each axis should be the same, i.e. the next enclosing square. 
+*  in each axis should be the same, i.e. the next enclosing square.
 *  Smaller than 1.0 it means that more images will fit across the width
 *  of the base picture than will fit the height.
       ASPRAT = SQRT( ASP / TASP )
@@ -129,7 +129,7 @@
 *  accommodate all the channels.
       GM = NINT( SQRT( REAL( NTILE ) ) + 0.49999 )
 
-*  To determine the best ratio, create various ratios around the square 
+*  To determine the best ratio, create various ratios around the square
 *  +/- RANGE tiles.
 
 *  The image has larger aspect ratio than the target.  There will be
@@ -162,7 +162,7 @@
             NC = I * J
             IF ( NC .GE. NTILE ) THEN
 
-*  We need to determine the fraction of the plotting area that would 
+*  We need to determine the fraction of the plotting area that would
 *  contain the channel images.  This is the fraction of used frames
 *  in the grid, times the fraction of each frame displaying the image.
                USED = REAL( NTILE ) / REAL( NC )
@@ -180,7 +180,7 @@
 *  Determine the efficiency.
                EFFIC = AREA * USED
 
-*  Test whether this gets closer to the desired aspect ratio, while 
+*  Test whether this gets closer to the desired aspect ratio, while
 *  still offering sufficient slots for the number of images.
                IF ( EFFIC .GT. BEST ) THEN
                   BEST = EFFIC

@@ -60,7 +60,7 @@
 *        satisfied, the user is told of the error, and is presented
 *        with the list of options, before being prompted for a new
 *        value.
-*        If a nearest match is selected, the user is informed unless the 
+*        If a nearest match is selected, the user is informed unless the
 *        MSG filtering level (see SUN/104) is 'quiet'.
 
 *  Algorithm:
@@ -82,12 +82,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -171,7 +171,7 @@
 
 *  Obtain the value of the parameter.
 *  ==================================
-*    
+*
 *  Initialise NOTOK to start off the loop.
       NOTOK = .TRUE.
 

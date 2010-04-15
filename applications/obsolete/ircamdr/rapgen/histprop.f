@@ -2,12 +2,12 @@
 *+ HISTPROP - calculates statistics of image from its histogram
 
       SUBROUTINE HISTPROP( HIST, NUMBIN, VALMAX, VALMIN,
-     :                     SUM, MEAN, MEDIAN, MODE, STATUS )    
+     :                     SUM, MEAN, MEDIAN, MODE, STATUS )
 
 *    Description :
 *
 *       This routine calculates certain statistical parameters for
-*     an image, given its intensity histogram, which should have 
+*     an image, given its intensity histogram, which should have
 *     been previously calculated using GENHISSUB.
 *
 *    Parameters :
@@ -103,7 +103,7 @@
          NUMBER  =  NUMBER + REAL( HIST( I ) )
       END DO
 
-      SUM  =  ( NUMBER * VALMIN ) + 
+      SUM  =  ( NUMBER * VALMIN ) +
      :        ( SUM * ( VALMAX - VALMIN ) / NUMBIN )
 
       MEAN  =  SUM / NUMBER
@@ -111,7 +111,7 @@
 *    Now find median and estimate mode. It is assumed that the
 *    histogram bins are narrow enough that the error in calculating
 *    the sum of the pixel values directly from the histogram bins
-*    is negligible. 
+*    is negligible.
 *    Median is found by looking for the halfway numbered pixel, and
 *    calculating its intensity - i.e. if you have 101 pixels in the
 *    histogram, the median value is the value assigned to the bin
@@ -123,7 +123,7 @@
       HALFNUM  =  0.0
       J  =  1
 
-      DO WHILE( ( HALFNUM .LT. ( NUMBER / 2.0 ) ) .AND. 
+      DO WHILE( ( HALFNUM .LT. ( NUMBER / 2.0 ) ) .AND.
      :          ( J .LT. NUMBIN ) )
          HALFNUM  =  HALFNUM + HIST( J )
          J  =  J + 1

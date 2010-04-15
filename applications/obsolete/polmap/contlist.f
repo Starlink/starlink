@@ -1,23 +1,23 @@
       SUBROUTINE CONTLIST(CONT_ST,CONT_EN,NZONES,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     C O N T L I S T
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CONT_ST (<), CONT_EN (<), NZONES (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C

@@ -12,29 +12,29 @@
 *     ERR_ and MSG_ calls, so message reporting should be turned on.
 *
 *     EMLT.LIS is produced by the FIGARO EMLT function, which locates
-*     emission lines. Unfortunately, this function writes all its 
+*     emission lines. Unfortunately, this function writes all its
 *     results to a file and does not return any parameters. This routine
 *     is needed to correct that omission.
 *
 *     Here is a typical EMLT.LIS file :-
 *
 *Centre of      Centroid          Integrated
-*  moment                          Strength 
+*  moment                          Strength
 *
-*   169.6          169.9         0.6425E+05                      
-*   182.7          182.7         0.1464E+07                      
-*   194.5          194.5          8638.                          
-*   201.4          201.3          3787.                          
+*   169.6          169.9         0.6425E+05
+*   182.7          182.7         0.1464E+07
+*   194.5          194.5          8638.
+*   201.4          201.3          3787.
 *
-*    Bin                    Width      Integrated    Peak  
-*  Number               Bins            Strength    Height 
+*    Bin                    Width      Integrated    Peak
+*  Number               Bins            Strength    Height
 *
-*  170.33       42.33   3.75      0.94 1.606E+04 1.608E+04       
-*  182.78       45.44   4.32      1.08 3.661E+05 3.187E+05       
-*  199.17       49.54   2.32      0.58 9.468E+02 1.531E+03       
+*  170.33       42.33   3.75      0.94 1.606E+04 1.608E+04
+*  182.78       45.44   4.32      1.08 3.661E+05 3.187E+05
+*  199.17       49.54   2.32      0.58 9.468E+02 1.531E+03
 *
-*Mean fullwidth at half maximum =  4.280     bins                
-*                               =  1.070                         
+*Mean fullwidth at half maximum =  4.280     bins
+*                               =  1.070
 *
 *    Invocation :
 *      CALL RED4_READ_EMLT2( XMIN_D, XMAX_D, BCEN_D, XCEN_D,
@@ -249,7 +249,7 @@
 *          There must be a mistake in the file format.
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_READ_EMLT2: '/
-     :        /'Invalid $CGS4_ENG/emlt.lis file format', STATUS ) 
+     :        /'Invalid $CGS4_ENG/emlt.lis file format', STATUS )
             CALL ERR_REP( ' ', 'RED4_READ_EMLT2: '/
      :        /'Incorrect number of words in line fit records', STATUS )
          ENDIF

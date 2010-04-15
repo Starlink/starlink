@@ -42,7 +42,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -111,7 +111,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -204,12 +204,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -296,7 +296,7 @@ elaborate in the Starlink version: a keyword can consist
 of multiple words, separated by
 underscores, each of which can be individually abbreviated.
 For example, the keyword \fstring{ACTIVE\_GALACTIC\_NUCLEI} could
-be abbreviated \fstring{A\_G\_N} (or \fstring{A} {\it etc}).  
+be abbreviated \fstring{A\_G\_N} (or \fstring{A} {\it etc}).
 \item In both systems, \fstring{\%} and \fstring{*}
 wildcard characters can be used
 when specifying the keyword to be searched for.  In the VMS system
@@ -1221,7 +1221,7 @@ given later.
   276   000001324 000000152 000000152 2 C
   310   000001572 000000348 000000348 2 BASIC
   348   000001709 000000386 000000386 2 Forth
-  386   
+  386
   387   0 PROGRAMMING_LANGUAGES
   411   Programming via front-panel switches, or by plugboards, is no longer
   480   in fashion.  Even macho programmers now resort to describing what the
@@ -1256,7 +1256,7 @@ given later.
  1783   development turnaround.  Other benefits are really sensational
  1846   gibberish code which no-one can ever understand, and a propensity
  1912   to spectacular crashes.
- 1936    
+ 1936
 \end{verbatim}
 \end{small}
 
@@ -1276,7 +1276,7 @@ The files
 (on the Unix platforms -- {\tt HELPIC.FOR} and {\tt COMIC.FOR} on the VAX,
 {\tt HELPIC} and {\tt COMIC} on the PC) contain definitions and
 COMMON declarations.  They are included through \fstring{INCLUDE 'helpic'}
-and \fstring{INCLUDE 'comic'} statements, the 
+and \fstring{INCLUDE 'comic'} statements, the
 interpretation of which is machine-dependent.
 The {\tt comic} INCLUDE is used only by the \fstring{HLP\_COMSTR}
 routine and exists in different forms for different platforms.

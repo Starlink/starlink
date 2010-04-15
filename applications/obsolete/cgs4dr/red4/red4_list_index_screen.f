@@ -3,7 +3,7 @@
 *    Description :
 *     This subroutine reads the observation index file and displays
 *     its contents on the terminal screen using MSG_OUT. The display may
-*     be in one of two selected formats. 
+*     be in one of two selected formats.
 *     Format 1 gives:
 *      Observation, Quality, Type, Time, Exposure, Grating, Slit, CVF, Filters
 *     Format 2 gives:
@@ -89,7 +89,7 @@
       CHARACTER*80
      :  LINE                           ! Line for output.
 *
-      RECORD /OBSREC/ OBSREC           ! An observation record 
+      RECORD /OBSREC/ OBSREC           ! An observation record
 *                                      ! (structure defined in RED4_COMMON.INC)
 *
 *    Local data :
@@ -99,7 +99,7 @@
       IF ( STATUS .NE. ADAM__OK ) RETURN
 
 *    open the index file
-      CALL RIO_OPEN (INDEX_FILE, 'READ', 'UNFORMATTED', OBSRECSZ, 
+      CALL RIO_OPEN (INDEX_FILE, 'READ', 'UNFORMATTED', OBSRECSZ,
      : FD, STATUS)
 
 *    Check this has worked.
@@ -110,13 +110,13 @@
          CALL MSG_SETC( 'INDEX_FILE', INDEX_FILE )
          CALL MSG_SETI( 'OFORMAT', OFORMAT )
          CALL MSG_OUT( ' ', 'Contents of index file '/
-     :    /'^INDEX_FILE (format type ^OFORMAT) :-', STATUS ) 
+     :    /'^INDEX_FILE (format type ^OFORMAT) :-', STATUS )
          CALL MSG_OUT( ' ', ' ', STATUS )
 
 *      The heading displayed depends on the output format type.
          IF ( OFORMAT .EQ. 2 ) THEN
 
-            CALL MSG_OUT( ' ', 'Observation   Qly Type     '/ 
+            CALL MSG_OUT( ' ', 'Observation   Qly Type     '/
      :       /'Time  Mode      Grp Row,Col,Os '/
 *    :       /'Cfindx Airmass', STATUS )
      :       /'Cfindx', STATUS )
@@ -126,7 +126,7 @@
      :       /'------', STATUS )
          ELSE
 
-            CALL MSG_OUT( ' ', 'Observation   Qly Type     '/ 
+            CALL MSG_OUT( ' ', 'Observation   Qly Type     '/
      :       /'Time  Exposure Grating Slit    CVF     '/
      :       /'Filters', STATUS )
             CALL MSG_OUT( ' ', '-----------   --- ----     '/
@@ -221,7 +221,7 @@
 *          If the quality is neither good nor bad then skip the record.
 *          (NOTE - tried to test for a blank observation name but this
 *          doesn't seem to work at all?!)
-            IF (OBSREC.QUALITY(1:1) .EQ. 'G' .OR. 
+            IF (OBSREC.QUALITY(1:1) .EQ. 'G' .OR.
      :       OBSREC.QUALITY(1:1) .EQ. 'B') THEN
 
 *             Write out the contents of the record (ignoring
@@ -230,15 +230,15 @@
                CALL CHR_FILL( ' ', LINE )
                IF ( OFORMAT .EQ. 2 ) THEN
                   WRITE( LINE, 2)
-     :             OBSREC.OBSERVATION(1:14), 
-     :             OBSREC.QUALITY(1:1), 
-     :             OBSREC.TYPE(1:6), 
-     :             OBSREC.START_TIME, 
+     :             OBSREC.OBSERVATION(1:14),
+     :             OBSREC.QUALITY(1:1),
+     :             OBSREC.TYPE(1:6),
+     :             OBSREC.START_TIME,
      :             OBSREC.INTTYPE(1:9),
-     :             OBSREC.GRPNUM, 
-     :             OBSREC.DET_NROWS, 
-     :             OBSREC.DET_NCOLUMNS, 
-     :             OBSREC.DET_NINCR, 
+     :             OBSREC.GRPNUM,
+     :             OBSREC.DET_NROWS,
+     :             OBSREC.DET_NCOLUMNS,
+     :             OBSREC.DET_NINCR,
      :             OBSREC.CNFINDEX
 *    :             OBSREC.AIRMASS
  2                FORMAT( A14, A1, 3X, A6, 1X, F7.3, 1X,
@@ -248,14 +248,14 @@
                ELSE
 
                   WRITE( LINE, 1)
-     :             OBSREC.OBSERVATION(1:14), 
-     :             OBSREC.QUALITY(1:1), 
-     :             OBSREC.TYPE(1:6), 
-     :             OBSREC.START_TIME, 
-     :             OBSREC.EXPOSURE_TIME, 
-     :             OBSREC.GRATING_NAME(1:7), 
-     :             OBSREC.SLIT_NAME(1:7), 
-     :             OBSREC.CVF_NAME(1:7), 
+     :             OBSREC.OBSERVATION(1:14),
+     :             OBSREC.QUALITY(1:1),
+     :             OBSREC.TYPE(1:6),
+     :             OBSREC.START_TIME,
+     :             OBSREC.EXPOSURE_TIME,
+     :             OBSREC.GRATING_NAME(1:7),
+     :             OBSREC.SLIT_NAME(1:7),
+     :             OBSREC.CVF_NAME(1:7),
      :             OBSREC.FILTERS(1:7)
  1                FORMAT( A14, A1, 3X, A6, 1X, F7.3, 1X,
      :              F8.4, 4( 1X, A7 ) )

@@ -48,7 +48,7 @@
 *    History :
 *
 *     09-12-1985 : First implementation (UKTH::MARK)
-*     14-02-1986 : Much better normal distribution algorithm used (REVA::MJM)  
+*     14-02-1986 : Much better normal distribution algorithm used (REVA::MJM)
 *     20-Jul-1994 Changed VAX-specific RAN function to NAG routine,
 *                 changed arguments as SEED no longer required (SKL@JACH)
 *

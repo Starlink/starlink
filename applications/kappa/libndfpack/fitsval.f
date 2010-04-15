@@ -36,18 +36,18 @@
 *        hierarchical keywords, and it has the form
 *        keyword1.keyword2.keyword3 etc.  The maximum number of keywords
 *        per FITS card is 20.  Each keyword must be no longer than 8
-*        characters, and be a valid FITS keyword comprising only 
-*        alphanumeric characters, hyphen, and underscore.  Any 
+*        characters, and be a valid FITS keyword comprising only
+*        alphanumeric characters, hyphen, and underscore.  Any
 *        lowercase letters are converted to uppercase and blanks are
-*        removed before insertion, or comparison with the existing 
+*        removed before insertion, or comparison with the existing
 *        keywords.
 *
-*        KEYWORD may have an occurrence specified in brackets [] 
-*        following  the name.  This enables editing of a keyword that 
+*        KEYWORD may have an occurrence specified in brackets []
+*        following  the name.  This enables editing of a keyword that
 *        is not the first occurrence of that keyword, or locate a edited
 *        keyword not at the first occurrence of the positional keyword.
 *        Note that it is not normal to have multiple occurrences of a
-*        keyword in a FITS header, unless it is blank, COMMENT or 
+*        keyword in a FITS header, unless it is blank, COMMENT or
 *        HISTORY.  Any text between the brackets other than a positive
 *        integer is interpreted as the first occurrence.
 *     NDF = NDF (Read)
@@ -100,7 +100,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,7 +152,7 @@
 
 *  Obtain the NDF to be probed.
       CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
-      
+
 *  See whether or not there is a FITS extension.
       CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
       IF ( .NOT. THERE ) THEN
@@ -223,14 +223,14 @@
 
 *  Attempt to locate the keyword's occurrence in the array of FITS cards.
       CALL FTS1_LOKEY( EL, %VAL( CNF_PVAL( FTSPNT( 1 ) ) ), KEYWRD,
-     :                 KOCCUR, CARD, STATUS, 
+     :                 KOCCUR, CARD, STATUS,
      :                 %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Print the keyword's value.
       CALL FTS1_PRVAL( EL, %VAL( CNF_PVAL( FTSPNT( 1 ) ) ), KEYWRD,
-     :                 KOCCUR, CARD, SVALUE, COMENT, STATUS, 
+     :                 KOCCUR, CARD, SVALUE, COMENT, STATUS,
      :                 %VAL( CNF_CVAL( FITSLN ) ) )
-      
+
 * Store the value in an output parameter.
       CALL PAR_PUT0C( 'VALUE', SVALUE, STATUS )
 

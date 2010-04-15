@@ -3,7 +3,7 @@ C
 C
 C     M A P S P E C G
 C
-C     Maps the Z data for the continuum and gaussian fit into virtual memory 
+C     Maps the Z data for the continuum and gaussian fit into virtual memory
 C
 C     Parameters -  (">" input, "<" output )
 C

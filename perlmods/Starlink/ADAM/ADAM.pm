@@ -14,8 +14,8 @@ Starlink::ADAM - Perl extension for the ADAM messaging system
 
 =head1 DESCRIPTION
 
-This module provides an interface to the ADAM messaging system. 
-The AMS C library routines are accessible directly or they can be 
+This module provides an interface to the ADAM messaging system.
+The AMS C library routines are accessible directly or they can be
 accessed via wrapper routines that handle the most commonly used
 combinations.
 
@@ -127,7 +127,7 @@ bootstrap Starlink::ADAM $VERSION;
 
 Exit the adam messaging system. This simply calls C<ams_exit()>.
 
-=cut 
+=cut
 
 
 # adam_exit
@@ -166,10 +166,10 @@ sub adam_process_message {
   my ($task, $prompt, $facility, $text, $command, $ident, $facerr, $value);
 
   # Arguments
-  my ($path,$messid, $inmsg_status, $inmsg_context, $inmsg_name, 
+  my ($path,$messid, $inmsg_status, $inmsg_context, $inmsg_name,
       $inmsg_length, $inmsg_value, $status) = @_;
 
-  croak 'Usage: adam_process_message(path, messid, msg_status, msg_context, msg_name, msg_length, msg_value, status)' 
+  croak 'Usage: adam_process_message(path, messid, msg_status, msg_context, msg_name, msg_length, msg_value, status)'
     if (scalar(@_)!=8);
 
   # Return if bad status
@@ -203,7 +203,7 @@ sub adam_process_message {
       } else {
 	$command = "endmsg";
       }
-      
+
     } elsif ($inmsg_context == &GET) {
       $command = "getresponse";
 
@@ -218,7 +218,7 @@ sub adam_process_message {
       if ($inmsg_status == &MESSYS__PARAMREQ) {
 	$command = "paramreq";
 	$prompt  = $inmsg_value;
-	
+
       } elsif ($inmsg_status == &MESSYS__PARAMREP) {
 	$command = "paramrep";
 
@@ -252,7 +252,7 @@ sub adam_process_message {
 
 
     } else {
-      # Bad status from all that 
+      # Bad status from all that
       carp "adam_process_message: Bad message context: message name was ".
 	" $inmsg_name and message values was $inmsg_value\n";
 
@@ -330,12 +330,12 @@ sub adam_getreply {
           . $facility."__$ident: $text\n";
     my $facerr = $facility."__$ident: $text";
     return ("badstatus",undef,undef,undef,undef,$status,$inmsg_value,$status);
-  } 
+  }
 
   # Now examine this message to see what we can found out about it
 
-  ($command, $task, $facerr, $status) = 
-    adam_process_message($path, $messid, $inmsg_status, $inmsg_context, 
+  ($command, $task, $facerr, $status) =
+    adam_process_message($path, $messid, $inmsg_status, $inmsg_context,
 			 $inmsg_name, $inmsg_length, $inmsg_value, $status);
 
   # Strip trailing spaces from inmsg_value
@@ -552,7 +552,7 @@ Initialise the adam system and identify it in the messaging system by
 =cut
 
 # adam_start
-# 
+#
 #  initialise the adam system
 #
 #  Usage: adam_start my_name
@@ -587,7 +587,7 @@ sub adam_start {
 
 =item adam_path(name)
 
-Get a path to an adam task. Returns a 1 if the path exists and 0 if it 
+Get a path to an adam task. Returns a 1 if the path exists and 0 if it
 does not.
 
 =cut
@@ -634,7 +634,7 @@ Convert a string to a context number. The context is returned.
 
 =cut
 
-# adam_strtocont 
+# adam_strtocont
 #
 #  convert a string to a context number
 #
@@ -720,7 +720,7 @@ The adam status is converted to a text string and the message is
 returned. Three arguments are returned in an array context:
 
 $facility is the facility error name (eg NDF)
- 
+
 $ident is the error identifier.
 
 $text is the text of the error message.
@@ -738,7 +738,7 @@ sub adam_appendstatus {
   my ($facility, $ident, $text);
 
   croak 'Usage: adam_appendstatus istat'
-    if (scalar(@_)!=1); 
+    if (scalar(@_)!=1);
 
   my $istat = shift;
 
@@ -756,7 +756,7 @@ sub adam_appendstatus {
 
 1;
 __END__
-# Below is the documentation for the module 
+# Below is the documentation for the module
 
 =back
 

@@ -56,7 +56,7 @@
 *  S      - Character variable, via which chunks of PostScript are sent for
 *           buffering.
 *
- 
+
 *
       INTEGER    ICHUNK,    ICOLR
       PARAMETER (ICHUNK=50, ICOLR=17)
@@ -78,7 +78,7 @@
       ELSE
          NBC = 1
       ENDIF
- 
+
 *
 *     We shall treat the raster output as a special case of a Cell Array.
 *     So, get the Lower Left and Upper Right coordinates of the array first.
@@ -87,14 +87,14 @@
       RX(2)=X+NXPIX-1.0
       RY(1)=Y-NYPIX+1.0
       RY(2)=Y
- 
+
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'save',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Prepare PostScript string to hold one row's data
 *
@@ -102,7 +102,7 @@
   100 FORMAT('/line',I5,' string def')
       CALL GKFOCO(KIOPB,S(1:21),IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Now send out data in the format required by the ca procedure:
 *     integerised Lower Left coordinates of the array (to where we translate),
@@ -120,7 +120,7 @@
   111 FORMAT(2I6,' 8 [',I6,' 0 0 ',I6,' 0', I6, ']{ca}im')
       CALL GKFOCO(KIOPB,S(1:48),IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     This should be followed by the raster data. It is sent in hexadecimal.
 *
@@ -139,11 +139,11 @@
             CALL GKFOCO(KIOPB,S(1:JH-1),IREM)
 120      CONTINUE
 130   CONTINUE
- 
+
 *
 *     Restore here, ca doesn't do it.
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'restore',IREM)
- 
+
       END

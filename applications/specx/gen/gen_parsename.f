@@ -67,7 +67,7 @@ CD    PRINT *, '-- gen_parsename --'
     1 CONTINUE
       DO WHILE (STRING(NEXT:NEXT).EQ.' ' .AND. NEXT.LE.ILS)
         NEXT = NEXT + 1
-      END DO       
+      END DO
 
 CD    PRINT *, '    blanks suppressed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
 
@@ -114,7 +114,7 @@ CD    PRINT *, '    unary ops done, IST, NEXT, IFIN = ', IST,NEXT,IFIN
       STRCONST = (CHAR.EQ.'''')
       NUMERIC  = (CHAR.GE.'0' .AND. CHAR.LE.'9') .OR. (CHAR.EQ.'.')
       LBRACKET = (CHAR.EQ.'(')
-      
+
 CD    PRINT *, '    1st char parsed, IST, NEXT, IFIN = ', IST,NEXT,IFIN
 CD    PRINT *, '    STRCONST, NUMERIC, LBRACKET ',
 CD   &             strconst, numeric, lbracket

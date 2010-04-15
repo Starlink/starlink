@@ -23,7 +23,7 @@
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 #  Authors:
 #     DLT: D L Terrett (Starlink, RAL)
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -38,10 +38,10 @@
 #     22-MAR-1995 (PDRAPER):
 #        Added facility to use netscape (1.1) as well as Mosaic.
 #     29-JUN-1997 (DSB):
-#        Brought into POLPACK from CCDPACK. Calls to CCDIssueInfo changed 
+#        Brought into POLPACK from CCDPACK. Calls to CCDIssueInfo changed
 #        to Message. Check environment variable HTX_BROWSER instead of
 #        Tcl variable CCDbrowser to determine the browser to use.
-#        Supplied argument changed from a file name to a URL (and the 
+#        Supplied argument changed from a file name to a URL (and the
 #        netscape remote openFILE command changed to openURL).
 #     6-JUL-1998 (DSB):
 #        Modified to use HTX_BROWSER as supplied instead of only using
@@ -60,7 +60,7 @@
 
 #  Check the browser to use. If HTX_BROWSER doesn't exist use firefox.
 #  If it does, use it.
-      if { ! [info exists env(HTX_BROWSER)] } { 
+      if { ! [info exists env(HTX_BROWSER)] } {
          set CCDbrowser firefox
       } {
          set CCDbrowser $env(HTX_BROWSER)
@@ -84,7 +84,7 @@
 	       if { [catch {exec kill -USR1 $mosaicpid}] } {
 		  set mosaicpid 0
 	       }
-	    } 
+	    }
 	    if { $mosaicpid == 0 } {
 	       exec  $CCDbrowser $url &
 	    }
@@ -93,13 +93,13 @@
          [Nn]etscape|[Mm]ozilla|[Ff]irefox {
 
 #  Use Mozilla or variant. This uses the NCAPIs methods as of netscape 1.1b1.
-#  Attempt to make browser goto the required page. If this fails then the 
+#  Attempt to make browser goto the required page. If this fails then the
 #  browser has exited for some reason, so restart it.
             if { ! [info exists netscapepid] } { set netscapepid 1 }
 	    if { [catch {exec $CCDbrowser -remote openURL($url)} mess] } {
 	       set netscapepid 0
 	    }
-            if { $netscapepid == 0 } { 
+            if { $netscapepid == 0 } {
                if { [catch { set netscapepid [exec $CCDbrowser $url &]} mess] } {
                   Message "Failed to start $CCDbrowser - $mess"
                }

@@ -211,23 +211,23 @@
       REGVAL = 2
       TRCOEF( 1 ) = VAL__BADR
       CALL ARD_WORK( FITGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI,
      :               LBNDE, UBNDE, STATUS )
       CALL ARD_WORK( TMPGRP, 2, LBND, UBND, TRCOEF, .TRUE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI,
      :               LBNDE, UBNDE, STATUS )
 
 *  Now fit this region.
       NX = 0
       NY = 0
-      CALL RTD1_DOFIT( NFIT, %VAL( CNF_PVAL( IPMASK ) ), DIM1, DIM2, 
+      CALL RTD1_DOFIT( NFIT, %VAL( CNF_PVAL( IPMASK ) ), DIM1, DIM2,
      :                 TYPE, HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX, IPTY,
      :                 NY, SIGMA, STATUS )
 
 *  Generate image mask of region to replace.
       REGVAL = 2
       CALL ARD_WORK( NEWGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI,
      :               LBNDE, UBNDE, STATUS )
 
 *  Fill up an array with a sample of gaussian noise. Scale these
@@ -239,9 +239,9 @@
  2    CONTINUE
 
 *  And fill image part with surface plus noise.
-      CALL RTD1_REPL( NFIT, %VAL( CNF_PVAL( IPMASK ) ), DIM1, DIM2, 
-     :                TYPE, IPIMG, HAVVAR, IPVAR, HVQUAL, IPQUAL, 
-     :                BADBIT, IPC, IPTX, NX, IPTY, NY, ER, NERROR, 
+      CALL RTD1_REPL( NFIT, %VAL( CNF_PVAL( IPMASK ) ), DIM1, DIM2,
+     :                TYPE, IPIMG, HAVVAR, IPVAR, HVQUAL, IPQUAL,
+     :                BADBIT, IPC, IPTX, NX, IPTY, NY, ER, NERROR,
      :                STATUS )
 
 *  Free up dynamic memory.

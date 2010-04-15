@@ -1,6 +1,6 @@
 #!/stardev/bin/tclsh8.2
 
-#+ 
+#+
 #  listavaildb.tcl
 #
 #  Example script to list the remote databases which are currently

@@ -92,10 +92,10 @@
       INTEGER ARRAY( NDEC, 0 : NC + 1 )
       INTEGER IP( 0: NC + 1 )
       INTEGER IROW
-      
+
 *  Arguments Returned:
       INTEGER LINK( 0 : NC + 1 )
-      
+
 *  Local Variables:
       INTEGER T
       INTEGER P
@@ -121,7 +121,7 @@
       LINK( IP( 0 ) ) = 1
       T = NC + 1
       DO 1 P = 1, NC - 1
-         IF ( ARRAY( IROW, IP( P ) ) .LE. ARRAY( IROW, IP( P + 1 ) ) ) 
+         IF ( ARRAY( IROW, IP( P ) ) .LE. ARRAY( IROW, IP( P + 1 ) ) )
      :   THEN
             LINK( IP( P ) ) = P + 1
          ELSE
@@ -212,7 +212,7 @@
       END DO
 
 *  And permute these ranks into straight-forward indices and copy into
-*  IP. 
+*  IP.
       CALL PDA_IPERM( NC, LINK( 1 ) )
       DO I = 1, NC
          IP( I ) = LINK( I )

@@ -28,7 +28,7 @@
 *        A string containing the supplied command parameters.
 *     POS = INTEGER (Given)
 *        The index of the required parameter within the list of all
-*        possible parameters. 
+*        possible parameters.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
 *        supplied default value will be used if no value has
@@ -43,7 +43,7 @@
 *     MODE = CHARACTER * ( * ) (Given)
 *        The access mode required READ, WRITE or UPDATE.
 *     SUFFIX = CHARACTER * ( * ) (Given)
-*        A suffix for the NDF name. 
+*        A suffix for the NDF name.
 *     INDF = INTEGER (Returned)
 *        The NDF identifier.
 *     STATUS = INTEGER (Given and Returned)
@@ -51,7 +51,7 @@
 
 *  Notes:
 *     -  If an error occurs, a null value is returned for INDF.
-      
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -78,7 +78,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
       INTEGER POS
@@ -91,7 +91,7 @@
 
 *  Arguments Returned:
       INTEGER INDF
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -100,15 +100,15 @@
      :        NDFNM*255,         ! NDF name
      :        ROOT*255,          ! NDF root name
      :        TITLE*80           ! NDF title
-      
+
       INTEGER
-     :        PLACE              ! A dummy NDF place holder (NDF__NOPL)      
+     :        PLACE              ! A dummy NDF place holder (NDF__NOPL)
 
       LOGICAL
      :        ISVERB             ! Is VERBOSE or DEBUG
 *.
 
-*  Ensure a null NDF identifier get returned if an error has 
+*  Ensure a null NDF identifier get returned if an error has
 *  already occurred.
       INDF = NDF__NOID
 
@@ -121,7 +121,7 @@
 *  Check the MSG message filtering level.
       ISVERB = MSG_FLEVOK( MSG__VERB, STATUS )
 
-*  Establish the shell used to expand shell meta-characters within HDS. 
+*  Establish the shell used to expand shell meta-characters within HDS.
 *  This will be the first available in the list: tcsh,csh,sh.
       CALL HDS_TUNE( 'SHELL', 2, STATUS )
 
@@ -133,17 +133,17 @@
       CALL NDFNAM( ROOT, SUFFIX, NDFNM, STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999      
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Jump to here if a new NDF name has been obtained.
  10   CONTINUE
-      
+
 *  Open the NDF.
-      CALL NDF_OPEN( DAT__ROOT, NDFNM, MODE, 'OLD', INDF, PLACE, 
+      CALL NDF_OPEN( DAT__ROOT, NDFNM, MODE, 'OLD', INDF, PLACE,
      :               STATUS )
 
-*  If an error has occured, 
-      IF( STATUS .NE. SAI__OK ) THEN 
+*  If an error has occured,
+      IF( STATUS .NE. SAI__OK ) THEN
 
 *  If the MSG message filtering level is verbose flush all the error
 *  messages. Otherwise, annul them.
@@ -166,7 +166,7 @@
          CALL NDFNAM( ROOT, SUFFIX, NDFNM, STATUS )
 
 *  If a new name was supplied, go round to try to open the NDF.
-         IF( STATUS .EQ. SAI__OK ) GO TO 10         
+         IF( STATUS .EQ. SAI__OK ) GO TO 10
 
 *  If an NDF has been obtained succesfully, display its title (unless
 *  it is blank or undefined).
@@ -175,7 +175,7 @@
          CALL NDF_CGET( INDF, 'TITLE', TITLE, STATUS )
 
          IF( TITLE .NE. ' ' ) THEN
-            CALL MSG_SETC( 'TITLE', TITLE )         
+            CALL MSG_SETC( 'TITLE', TITLE )
             CALL MSGOUT( COMM, 'NDF title - ''^TITLE''', .FALSE.,
      :                   STATUS )
          END IF
@@ -205,6 +205,6 @@
       END IF
 
 *  Release the error stack.
-      CALL ERR_RLSE      
+      CALL ERR_RLSE
 
       END

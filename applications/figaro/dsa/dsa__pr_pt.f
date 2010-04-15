@@ -235,7 +235,7 @@ C
          CODE=DST_CODE
 C
 C        See if the FITS structure has been opened yet.  If not, try to
-C        create the two sub-structures used (if this fails, they probably 
+C        create the two sub-structures used (if this fails, they probably
 C        already exist)
 C
          IF (.NOT.FITS_OPEN(REF_SLOT)) THEN

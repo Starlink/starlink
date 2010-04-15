@@ -40,7 +40,7 @@
 *        Original version.
 *     28-FEB-1983 (MJV):
 *        New SGS version written by MJV
-*     8-DEC-1988 (PMA, TNW): 
+*     8-DEC-1988 (PMA, TNW):
 *       Modified to use GKS 7.2 instead of GKS 6.2.
 *     22-FEB-1993 (AJJB):
 *        Conversion to ADAM
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
       INCLUDE 'PLOTDAT'          ! /PLOTDAT/ common block
 
 *  Globals used from PLOTDAT.FOR:
-*  
+*
 *        PLOT = LOGICAL (Read)
 *           If '.TRUE.' the Workstation Opened Correctly and Plotting is
 *           Possible
@@ -92,7 +92,7 @@
 *           If '.TRUE.' then scales will be drawn upon the plot, if
 *           '.FALSE.' no
 *        LNAME = LOGICAL (Read)
-*           '.TRUE.' if a logical name translation is being used.                                              
+*           '.TRUE.' if a logical name translation is being used.
 *        PLOTTER = LOGICAL (Read)
 *           This is set to '.TRUE.' if the output device is a plotter
 *        IFLD = INTEGER (Read and Write)
@@ -136,7 +136,7 @@
          CALL PPARIN( STATUS )
 *
 
-*   
+*
 *   Check to see that GKS has opened O.K.
 *
 
@@ -164,7 +164,7 @@
 
 *
 *  Put bell in at end of plot on interactive devices'
-* 
+*
          IF ( .NOT. PLOTTER ) THEN
             WRITE (BELL,'(A3)') CHAR(7)
             CALL MSG_OUT (' ', BELL,  STATUS)
@@ -184,7 +184,7 @@
   950 CONTINUE
 *
 *   Put bell in to signify the end of field creation when using plotters
-*  
+*
       IF ( PLOTTER ) THEN
          WRITE (BELL,'(A3)') CHAR(7)
          CALL MSG_OUT(' ', BELL,  STATUS )

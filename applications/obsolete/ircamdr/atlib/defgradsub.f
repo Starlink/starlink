@@ -1,16 +1,16 @@
-	SUBROUTINE DEFGRADSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, 
-     :	                       ARROUT, COLROW, NUMCOL, MEDIAN1, 
+	SUBROUTINE DEFGRADSUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY,
+     :	                       ARROUT, COLROW, NUMCOL, MEDIAN1,
      :	                       MEDIAN2, STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
-     :	  ODIMSX, 
-     :	  ODIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
+     :	  ODIMSX,
+     :	  ODIMSY,
      :	  STATUS,
      :	  J,
      :	  K,
@@ -18,8 +18,8 @@
      :	  NUMPIX1,
      :	  NUMPIX2
 
-	REAL 
-     :	  ARROUT( ODIMSX, ODIMSY), 
+	REAL
+     :	  ARROUT( ODIMSX, ODIMSY),
      :	  ARRIN( DIMSX, DIMSY),
      :	  MEAN1,
      :	  MEDIAN1,
@@ -34,7 +34,7 @@
      :	  VALMIN2,
      :	  VALMAX2
 
-	REAL*8 
+	REAL*8
      :	  DATA( 3000)
 
 	CHARACTER*(*)
@@ -74,13 +74,13 @@
 
 	END IF
 
-*      call subroutine to order the column values 
+*      call subroutine to order the column values
 
 	CALL PDA_QSAD( NUMPIX1, DATA )
- 
+
 *      call subroutine to find median for the input data
 
-	CALL MED3D_CALMEDSUB( NUMPIX1, DATA, VALMAX1, VALMIN1, SUM1, MEAN1, 
+	CALL MED3D_CALMEDSUB( NUMPIX1, DATA, VALMAX1, VALMIN1, SUM1, MEAN1,
      :	                      MEDIAN1, MODE1)
 
 *      scan through all the input pixels at END of image ...
@@ -117,13 +117,13 @@
 
 	END IF
 
-*      call subroutine to order the column values 
+*      call subroutine to order the column values
 
 	CALL PDA_QSAD( NUMPIX2, DATA )
- 
+
 *      call subroutine to find median for the input data
 
-	CALL MED3D_CALMEDSUB( NUMPIX2, DATA, VALMAX2, VALMIN2, SUM2, MEAN2, 
+	CALL MED3D_CALMEDSUB( NUMPIX2, DATA, VALMAX2, VALMIN2, SUM2, MEAN2,
      :	                      MEDIAN2, MODE2)
 
 *      interpolate from start to end using median values found

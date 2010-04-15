@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_FBBOX( LBND1, UBND1, LBND2, UBND2, LBND3, 
+      SUBROUTINE POL1_FBBOX( LBND1, UBND1, LBND2, UBND2, LBND3,
      :                       UBND3, LBND4, UBND4, DAT, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_FBBOX( LBND1, UBND1, LBND2, UBND2, LBND3, UBND3, 
+*     CALL POL1_FBBOX( LBND1, UBND1, LBND2, UBND2, LBND3, UBND3,
 *                      LBND4, UBND4, DAT, STATUS )
 
 *  Description:
@@ -49,7 +49,7 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -65,7 +65,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,8 +122,8 @@
       ALLBAD = .TRUE.
 
 *  Loop round every pixel in the cube.
-      DO L = LBND4, UBND4 
-         DO K = LBND3, UBND3 
+      DO L = LBND4, UBND4
+         DO K = LBND3, UBND3
             DO J = LBND2, UBND2
                DO I = LBND1, UBND1
 

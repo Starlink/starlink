@@ -44,7 +44,7 @@
 
 #include <limits.h>
 
-/* Define new maximum and minimum constants INT_BIG_MAX, INT_BIG_MIN and 
+/* Define new maximum and minimum constants INT_BIG_MAX, INT_BIG_MIN and
    UINT_BIG_MAX as appropriate. */
 
 #define int 1

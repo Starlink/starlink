@@ -49,7 +49,7 @@ C   NCAR type plot
       Q(2)= YEND1
 
 C  Initialize characters (DATA statement doesn't work since in common /CURSOR/
- 
+
       ZCHAR(1) = 076  ! LEFT
       ZCHAR(2) = 082  ! RIGHT
       ZCHAR(3) = 013  ! <CR>
@@ -138,7 +138,7 @@ C  Then decode options
        ELSE IF (CHR.EQ.BOTTOM) THEN
          Q(1)=Y
        ELSE IF (CHR.EQ.TOP) THEN
-         Q(2)=Y 
+         Q(2)=Y
 
        ELSE IF (CHR.EQ.CLEAR) THEN
          CALL IERASE_PAGE(1,1)
@@ -173,7 +173,7 @@ C  Then decode options
          IVTOPT=5
        END IF
 
-      END DO         
+      END DO
 
       RETURN
       END

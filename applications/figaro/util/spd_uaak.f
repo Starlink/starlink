@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -95,7 +95,7 @@
 *  necessary to dimension the local buffer for all numbers.
       INTEGER COLLIM
       PARAMETER ( COLLIM = 50 )
-                            
+
 
 *  Local Variables:
       INTEGER I                  ! Loop index

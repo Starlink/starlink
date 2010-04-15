@@ -1,4 +1,4 @@
-      SUBROUTINE NDP_MATCH_SIZES       
+      SUBROUTINE NDP_MATCH_SIZES
      &  (IM2_REF,IM3_REF,XYAXES,STATUS)
 C+
 C
@@ -41,7 +41,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'DSA_ERRORS'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -64,13 +64,13 @@ C   01-FEB-1989   - Original program
 C   25-NOV-1992   - Unix (Sun4) version (GOLDJIL)
 C
 C+-----------------------------------------------------------------------------
-C                                        
+C
       IMPLICIT NONE
 C
 C     Functions used.
 C
       INTEGER       ICH_ENCODE,ICH_LEN
-C                        
+C
 C     Parameters.
 C
       CHARACTER*(*) IM2_REF         ! Reference name of 2-D image structure
@@ -96,19 +96,19 @@ C
       IF(STATUS.NE.0)RETURN
 C
 C     Get dimensions of the 2-D data array.
-C                    
+C
       CALL DSA_DATA_SIZE(IM2_REF,2,IM2_NDIM,IM2_DIMS,DUMINT,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
 C     Get dimensions of the 3-D data array.
-C                    
+C
       CALL DSA_DATA_SIZE(IM3_REF,3,IM3_NDIM,IM3_DIMS,DUMINT,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
 C     Check that the dimensions of the 2-D array match those of the 3-D array
 C     which have been designated X and Y.
 C
-      IF(IM2_DIMS(1).NE.IM3_DIMS(XYAXES(1)) .OR. 
+      IF(IM2_DIMS(1).NE.IM3_DIMS(XYAXES(1)) .OR.
      &   IM2_DIMS(2).NE.IM3_DIMS(XYAXES(2)))THEN
         CALL DSA_WRUSER('The data array in ')
         CALL DSA_GET_ACTUAL_NAME(IM2_REF,ACT_NAME,STATUS)
@@ -131,7 +131,7 @@ C
         CALL DSA_WRUSER('). The dimensions which have been designated ')
         CALL DSA_WRUSER('X and Y are incompatible.\N')
         STATUS=DSA__BADDIM
-        GO TO 500                   
+        GO TO 500
       END IF
 C
   500 CONTINUE

@@ -15,14 +15,14 @@
 *
 *  Description:
 *     Create a new catalogue that is sorted on given columns.
-*     The order of column names in the SORTCOLS array is significant. 
+*     The order of column names in the SORTCOLS array is significant.
 *     SORTCOLS(1) must contain the primary column of the sort.
 *     SORTCOLS(2) and SORTCOLS(3) contain the secondary and tertiary columns.
-*     Spaces in either the secondary or tertiary position simply indicates 
+*     Spaces in either the secondary or tertiary position simply indicates
 *     that there should be no secondary or tertiary ordering.
 *     The direction of the sort for each column is given in the corresponding
 *     element of the SORTDIR array. TRUE for ascending.
- 
+
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
 *        Name of the catalogue to be sorted.
@@ -55,7 +55,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,7 +73,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-  
+
       CHARACTER * ( CHI__SZNAME ) NAME1
       CHARACTER * ( CHI__SZNAME ) NAME2
       CHARACTER * ( CHI__SZCNAME ) CATCNAMES( CHI__NUMCOLS )
@@ -113,10 +113,10 @@
       INTEGER CCOUNT ! Field counter
       INTEGER ENTCOUNT ! Number of entries in the catalogue
       LOGICAL UNDECIDED !
-      LOGICAL ONEACTIVE ! Flag true if entry 1 to be kept 
+      LOGICAL ONEACTIVE ! Flag true if entry 1 to be kept
       LOGICAL CLEARPASS ! Flag marking a pass without bubbling
       INTEGER PASSCOUNT ! Count the number of passes
-      INTEGER NUMCOL ! The number of sort columns 
+      INTEGER NUMCOL ! The number of sort columns
       LOGICAL ONEISLOW ! Flag indicating that buffer one is low.
 
 *.
@@ -127,7 +127,7 @@
 *
 *   Get all the information about the fields.
 *
-      CALL CHI_GALLCD(INPUT, CATNUMCOLS, CATCNAMES, CATFFORMATS, 
+      CALL CHI_GALLCD(INPUT, CATNUMCOLS, CATCNAMES, CATFFORMATS,
      :   CATFTYPES, CATFUNITS, CATFCOMMENTS, CATMDATAACC, CATDATAACC,
      :   STATUS)
 *
@@ -167,7 +167,7 @@
 *
 *
 *   Get the number of entries in the catalogue.
-*   Loop through the input catalogue getting the data for the required 
+*   Loop through the input catalogue getting the data for the required
 *   columns and creating an entry in the new catalogue.
 *
       CALL CHI_GNENTS(INPUT, NUMENTS, STATUS)
@@ -185,7 +185,7 @@
           IF ( MOD(PASSCOUNT,2) .EQ. 0) THEN
             NAME1 = 'HDSTEMP1'
             NAME2 = 'HDSTEMP2'
-          ELSE 
+          ELSE
             NAME1 = 'HDSTEMP2'
             NAME2 = 'HDSTEMP1'
           ENDIF
@@ -202,7 +202,7 @@
         CALL CHI_GDNAC( NAME1,CNAMES1,NUMCOLS1,CHARVALS1,
      :   DOUBVALS1, INTVALS1, LOGVALS1, REALVALS1,
      :   COLTYPE1, NULLS1, STATUS )
-*  
+*
         ONEISLOW = .TRUE.
 
         CALL CHI_GDNAC( NAME1,CNAMES2,NUMCOLS2,CHARVALS2,
@@ -255,7 +255,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -287,7 +287,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -319,7 +319,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -351,7 +351,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -383,7 +383,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -437,7 +437,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -469,7 +469,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -501,7 +501,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -533,7 +533,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -565,7 +565,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -578,7 +578,7 @@
 *  If the secondary field was insufficient to sort these two entries go on
 *  to look at the tertiary field.
 *
- 
+
         IF ( UNDECIDED .AND. (NUMCOL.EQ.3)) THEN
           IF (NULLS1(POSINCAT3)) THEN
                IF ( SORTDIR(1) ) THEN
@@ -607,7 +607,7 @@
                  ONEACTIVE = .FALSE.
                ENDIF
                UNDECIDED = .FALSE.
- 
+
             ELSEIF (REALVALS1(POSINCAT3) .LT. REALVALS2(POSINCAT3)) THEN
 *
 *   If sort direction is true ie ascending then write the entry 1 and keep
@@ -620,13 +620,13 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
               UNDECIDED = .TRUE.
             ENDIF
-*         
+*
           ELSEIF ( POSTYPE3 .EQ. 'I' ) THEN
             IF (INTVALS1(POSINCAT3) .GT. INTVALS2(POSINCAT3)) THEN
 *
@@ -652,7 +652,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -684,7 +684,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -716,7 +716,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -748,7 +748,7 @@
                ENDIF
                UNDECIDED = .FALSE.
 *
-*  If we cann't decide on the primary field set the flag to go on to look 
+*  If we cann't decide on the primary field set the flag to go on to look
 *  at the secondary.
 *
             ELSE
@@ -772,13 +772,13 @@
             ENDIF
           ELSE
           IF ( ONEACTIVE ) THEN
-   
+
             CALL CHI_PUTENT(NAME2,CNAMES2,NUMCOLS2,1,CHARVALS2,
      :         DOUBVALS2,INTVALS2,LOGVALS2,REALVALS2,COLTYPE2,
      :         NULLS2,STATUS)
             IF ( ONEISLOW ) THEN
               CLEARPASS = .FALSE.
-            ENDIF             
+            ENDIF
             IF ( ENTCOUNT .LE. NUMENTS ) THEN
               CALL CHI_GDNAC(NAME1,CNAMES2,NUMCOLS2,CHARVALS2,
      :      DOUBVALS2, INTVALS2, LOGVALS2, REALVALS2,
@@ -793,7 +793,7 @@
      :         NULLS1, STATUS)
             IF ( .NOT. ONEISLOW ) THEN
               CLEARPASS = .FALSE.
-            ENDIF             
+            ENDIF
 
             IF ( ENTCOUNT .LE. NUMENTS ) THEN
               CALL CHI_GDNAC(NAME1,CNAMES1,NUMCOLS1,CHARVALS1,

@@ -76,28 +76,28 @@
 *  Local Constants:
       INTEGER HEDLEN             ! FITS header length
       PARAMETER( HEDLEN = 80 )
-      
+
 *  Arguments Given:
       CHARACTER*(*) KEYWORD
       CHARACTER*(HEDLEN) ARRAY(*)
       INTEGER NHEAD
-      
+
 *  Arguments Returned:
       LOGICAL PMASK(*)
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
-      INTEGER I                 ! Loop counter      
-      
+      INTEGER I                 ! Loop counter
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check through ARRAY looking for the given keyword
-*  Multiples will be 
+*  Multiples will be
       DO I = 1, NHEAD
          IF ( KEYWORD .EQ. ARRAY(I)(1:8) ) THEN
             PMASK(I) = .FALSE.

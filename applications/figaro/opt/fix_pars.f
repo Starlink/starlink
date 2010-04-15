@@ -24,11 +24,11 @@
 *    N_GAUSS = INTEGER (Given)
 *        current component number
 *    MAX_CMP = INTEGER (Given)
-*       
+*
 *    MAX_TIMES = INTEGER (Given)
-*       
+*
 *    STATUS = INTEGER (Given and returned)
-*       
+*
 *    BOUND(MAX_PARS,MAX_CMP,MAX_TIMES,2) = REAL ARRAY (Returned)
 *        the bounds store
 * History:

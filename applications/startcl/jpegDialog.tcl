@@ -5,9 +5,9 @@
 
 # gwm_jpegDialog:
 #
-# This procedure creates a modal dialog box with controls for printing a 
-# gwm widget to a JPEG format file. The control that activated the dialog 
-# is disabled until the printing operation is complete to prevent attempts 
+# This procedure creates a modal dialog box with controls for printing a
+# gwm widget to a JPEG format file. The control that activated the dialog
+# is disabled until the printing operation is complete to prevent attempts
 # to start a second print before the previous one has finished.
 #
 # Arguments:
@@ -29,7 +29,7 @@ proc gwm_jpegDialog {w gwm c} {
 
 # Create and pack three frames one above the other.
 	pack [frame $w.top] [frame $w.mid] [frame $w.bot] -fill x
-    
+
 # Create a label and a slider for setting the quality/compression.
 # format and pack them into the top left frame.
 	label $w.top.label -text Quality:
@@ -42,7 +42,7 @@ proc gwm_jpegDialog {w gwm c} {
 # JPEG.
 	set gwm_priv($w,jDprogressive) 0
 	checkbutton $w.top.progressive -text "Progressive" \
-	    -variable gwm_priv($w,jDprogressive) 
+	    -variable gwm_priv($w,jDprogressive)
 	pack $w.top.progressive -pady 2
 
 # Pack a label and an entry widget for entering a file name into the

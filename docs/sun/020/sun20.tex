@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -50,20 +50,20 @@ RUTHERFORD APPLETON LABORATORY\\
 
 The usefulness of the data collected by the IUE satellite
 has been enormously enhanced by the maintenance of a data archive
-from which interested astronomers can request any image (subject 
-to the six-month data retrieval rule). See SUN/58 for details.   
-Most UK astronomers now reduce their IUE data from the photometric 
-images available in the archive using IUEDR (SUN/37).   However, 
-%for quick-look or other non-critical purposes, 
-it is now possible to obtain reduced low-resolution spectra on-line.   
+from which interested astronomers can request any image (subject
+to the six-month data retrieval rule). See SUN/58 for details.
+Most UK astronomers now reduce their IUE data from the photometric
+images available in the archive using IUEDR (SUN/37).   However,
+%for quick-look or other non-critical purposes,
+it is now possible to obtain reduced low-resolution spectra on-line.
 These data have been reduced in a fairly
 homogenous way using the IUE Project's Spectral Image Processing System
-(IUESIPS), 
+(IUESIPS),
 %which gives an adequate product in most cases (and certainly
 %for data acquired since {!whenever SIPS2 was implemented!}).
 and have been made available in the form of a {\it Uniform Low-Dispersion
-Archive} (ULDA).  
-This comprises absolutely-calibrated,  extracted, low-dispersion 
+Archive} (ULDA).
+This comprises absolutely-calibrated,  extracted, low-dispersion
 spectra corrected for exposure times and with the appropriate  ITF correction
 (flux in ergs cm$^{-2}$  s$^{-1}$ {\AA}$^{-1}$).
 A full description of the data is given in the {\it ESA IUE Newsletter No.~30,}
@@ -71,19 +71,19 @@ July 1988,
 and a comparison of the ULDA with IUEDR products is featured in
 the {\it Starlink Bulletin, no.~4}.
 
-In order to facilitate access to the ULDA, the {\it ULDA Software Support 
-Package} (USSP) has been developed. 
-The USSP enables astronomers to select interactively 
+In order to facilitate access to the ULDA, the {\it ULDA Software Support
+Package} (USSP) has been developed.
+The USSP enables astronomers to select interactively
 any images contained in the ULDA and provides facilities for efficient
 intercomputer data transfer.
-The USSP enables the searching of the ULDA 
+The USSP enables the searching of the ULDA
 data base for various types of images.
 For example, images can be selected on object class, image number, camera,
 aperture,  homogeneous ID,
 sky position or any combination of these attributes.
 
 Users in the UK will use the USSP on the Starlink database
-Microvax (STADAT) which is described in section~2. 
+Microvax (STADAT) which is described in section~2.
 
 \subsection {Version 1}
 
@@ -93,11 +93,11 @@ low-dispersion spectra taken up to the beginning of 1984 -- around
 
 \subsection {Version 2}
 
-Version 2  contained 37,000 spectra and was virtually complete 
-up to the start of 1987. 
-This version included a correction made to the absolute calibration 
-of very short exposures 
-and the erroneous photometric calibration for some early 
+Version 2  contained 37,000 spectra and was virtually complete
+up to the start of 1987.
+This version included a correction made to the absolute calibration
+of very short exposures
+and the erroneous photometric calibration for some early
 LWP spectra was rectified.
 
 Information on who has selected spectra previously and for what purpose was
@@ -107,27 +107,27 @@ as described below.
 
 \subsection{Version 3}
 
-Version 3 is virtually complete up to January,  1989 and contains 
+Version 3 is virtually complete up to January,  1989 and contains
 over  44,000 spectra.
 LWP images obtained after December~21st, 1987 have been processed using
 a new  ITF  as  well  as  a  new  Absolute  Calibration;
 this  extends  the  calibrated  range  from 3200{\AA}
 to  3300{\AA}.
-Images processed with the  new  calibration have fluxes which are  
+Images processed with the  new  calibration have fluxes which are
 systematically lower (by about 7\%).
-LWP data taken before December 1987 have not been reprocessed in 
-accordance with the new calibration, as 
-such reprocessing was not considered worthwhile in view 
+LWP data taken before December 1987 have not been reprocessed in
+accordance with the new calibration, as
+such reprocessing was not considered worthwhile in view
 of the imminence of the IUE final archive.
-However, for various reasons, a number of pre-December~1987 LWP images 
+However, for various reasons, a number of pre-December~1987 LWP images
 {\sl have\/} been reprocessed with the new calibration.
-These are included in the ULDA and can be easily distinguished as the 
+These are included in the ULDA and can be easily distinguished as the
 wavelength range  in such data extends up to 3300{\AA}.
 
 Several minor changes have been made to the USSP software.
-The only one previous 
-users of the USSP will notice is that the unnecessary questions relating to 
-ASCII conversion of data have been eliminated. 
+The only one previous
+users of the USSP will notice is that the unnecessary questions relating to
+ASCII conversion of data have been eliminated.
 
 \subsection{Version 4}
 
@@ -141,7 +141,7 @@ version.
 
 This is not a general-purpose machine, but is primarily intended for the
 retrieval of data, and is available to any accredited Starlink user.
-Access is via a communal account, with one account 
+Access is via a communal account, with one account
 per Starlink area.
 Your local Site Manager will tell you the account name and password.
 
@@ -162,7 +162,7 @@ below.
 
 Retrieval of the spectra is a two-stage process.
 \begin{enumerate}
-\item Firstly you must run the program QUEST in order to 
+\item Firstly you must run the program QUEST in order to
 select the spectra you want.
 \item Subsequently you return to your own local computer (or your
 directory on the microvax) and copy the spectra
@@ -170,31 +170,31 @@ using the program UNSPL.
 This second step is not a simple copy, but involves `UNscrambling/SPLitting'
 the files output by QUEST.
 \end{enumerate}
-All user-files generated by QUEST are written to the 
+All user-files generated by QUEST are written to the
 directory  STADAT::ULDA\$HOST\_DIR,  a location assumed by
 the program UNSPL when copying.
 In order to distinguish users' files it is necessary that they each have
 a USSP identifier.
-Thus you must register yourself with an identifier the first time you 
+Thus you must register yourself with an identifier the first time you
 use the USSP and subsequently use the same identifier.
 Registration is a very simple interactive process (see below).
 Your identifier must be 3-8 letters long with the first two letters
-being the abbreviation of your country. 
-For example if your Starlink username is  ABC your first choice 
+being the abbreviation of your country.
+For example if your Starlink username is  ABC your first choice
 should be UKABC.
 Any files you generate with QUEST will be
 UKABC.{\it filetype} (where {\it filetype} may be SPE, AUX {\it etc.}).
 For convenience, the USSP identifier UKABC is assumed throughout this document.
 
-{\bf N.B.} EACH RUN OF THE PROGRAM  QUEST WILL AUTOMATICALLY DELETE 
+{\bf N.B.} EACH RUN OF THE PROGRAM  QUEST WILL AUTOMATICALLY DELETE
 ANY EXISTING FILES BELONGING TO THE IDENTIFIER USED.
-Thus after selecting spectra which you actually want,  you must downlink with 
-UNSPL before running QUEST again. 
+Thus after selecting spectra which you actually want,  you must downlink with
+UNSPL before running QUEST again.
 Obviously users must NOT share a USSP identifier as they may accidentally
 delete each others files.
 
 The files should be downlinked within a short space of time
-as QUEST will automatically delete files older than a defined 
+as QUEST will automatically delete files older than a defined
 period\footnote{Currently one day}.
 
 \subsection{QUEST --- Selecting spectra}
@@ -212,10 +212,10 @@ To begin a session with QUEST simply type:
 You will be invited to give your USSP identifier or register one for yourself.
 Registration simply involves typing {\tt R} in response to QUEST's initial
 question, and then replying with your chosen username to the second.
-You will be asked to confirm what you have typed, and in the event someone has 
-already chosen this name, or your choice is invalid you will be asked to think 
+You will be asked to confirm what you have typed, and in the event someone has
+already chosen this name, or your choice is invalid you will be asked to think
 of another one. Spaces are ignored and special characters should not be used.
-Your  name and address will also be requested at this point -- a computer 
+Your  name and address will also be requested at this point -- a computer
 address will suffice.
 You can choose to look at all the usernames already allocated to
 people in any country.
@@ -229,10 +229,10 @@ The only purpose of this is for an intended compilation of ULDA-usage data.
 
 The exception is the `Recovery' option which
 increases the lifetime of previously selected files.
-This is intended for the situation where the user is having problems copying 
-the selected files to a local computer. 
+This is intended for the situation where the user is having problems copying
+the selected files to a local computer.
 However this is not likely to be necessary in the UK.
- 
+
 The main menu is now displayed:
 \begin{verbatim}
        1      -      SEARCH FOR A SET OF SPECTRA
@@ -243,7 +243,7 @@ The main menu is now displayed:
        6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
        ? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
 \end{verbatim}
-A typical session would be a SEARCH (for a set of spectra) followed 
+A typical session would be a SEARCH (for a set of spectra) followed
 by a DISPLAY (what was found by search)
 followed by a SELECT (spectra $\ldots$ for downlink).
 Optionally a SAVE DESCRIPTORS and/or a DISPLAY \& SAVE DUBIOUS INFO.
@@ -257,8 +257,8 @@ and is therefore appropriate for the novice user.
 The selection criteria are divided into four classes as follows;
 \begin{enumerate}
 \item Camera, and/or image number and/or aperture details.
-\item Sky position. 
-\item IUE Object class. 
+\item Sky position.
+\item IUE Object class.
 \item Homogeneous ID.
 \end{enumerate}
 Whenever you request a search you will be prompted with each of these;
@@ -268,7 +268,7 @@ You may specify more than one item in any search class. For
 example you may want to search for several image numbers or object classes.
 QUEST will continue to prompt for such items until you indicate the end of your
 list by replying to the prompt just with a $<$CR$>$.
-QUEST will search for those spectra which satisfy the four sets of 
+QUEST will search for those spectra which satisfy the four sets of
 criteria and advise you of the number of spectra which have been found.
 
 The four classes are described in more detail below:
@@ -277,27 +277,27 @@ The four classes are described in more detail below:
 There is a choice from the four IUE cameras SWP, SWR, LWR and
 LWP; aperture can be L or S (corresponding to large and small respectively).
 Image numbers are integers greater than or equal to 1000.
-For example should you want to confine the search to images taken with the SWP 
+For example should you want to confine the search to images taken with the SWP
 camera you should type SWP.
 A single image can be chosen by completely specifying it at this point.
 {\it e.g.} SWP4276L.
 \item [Sky position.] If an RA, DEC, is specified QUEST will find
 those spectra whose RA, DEC fall within a window centered at the given position.
-The size of the window is determined from the accuracy to which the RA,DEC 
+The size of the window is determined from the accuracy to which the RA,DEC
 is given as shown in the table below.
 Co-ordinates for each must be entered as 1, 2, 4 or 6 digit numbers.
 For example you may specify an R.A. of 5 hours as 5, but if you want to
 enter minutes you must type 0500, or 050000.
 Should you wish to search only on RA or DEC the other co-ordinate can be
 given as `ALL' or `*'.
-For example 
-`ALL $-12$' specifies any RA, and a DEC between $-8^o$ and $-16^o$ (that is 
+For example
+`ALL $-12$' specifies any RA, and a DEC between $-8^o$ and $-16^o$ (that is
 $-12^o\pm4^o$).
 The search window sizes are:
 
 \begin{center}
 \begin{tabular}{|ll|ll|} \hline
-\multicolumn{2}{|c|}{\bf R.A.}&\multicolumn{2}{c|}{\bf DEC.} \\ 
+\multicolumn{2}{|c|}{\bf R.A.}&\multicolumn{2}{c|}{\bf DEC.} \\
 Accuracy used &Window size&Accuracy used &Window size\\ \hline
 Hours only&$\pm$30 mins&Degrees Only&$\pm$4 Degs\\
 Hours \& minutes&$\pm$10 mins&Degrees \& minutes &$\pm$25 mins\\
@@ -312,14 +312,14 @@ response to the object class prompt.
 way in which names of objects have been  entered in the IUE log.
 However this is not yet completely reliable.
 For example if you enter a HD number at this point you will find that
-set of spectra for which the object was specified in that way, but 
-you may fail to find those which may have been entered in 
+set of spectra for which the object was specified in that way, but
+you may fail to find those which may have been entered in
 an alternative way. Specifying an RA,DEC is usually a better way to find
 spectra of a particular object.
 \end{description}
 {\bf Examples:}
 
-In the session shown below the user is looking for images of HD52973 taken 
+In the session shown below the user is looking for images of HD52973 taken
 with the SWP camera with the large aperture. (The user's responses are the
 text following the `$>$' prompt.)
 \begin{footnotesize}
@@ -329,13 +329,13 @@ text following the `$>$' prompt.)
                  -    "R"    TO GET AN ID
                  -    "D"    TO DISPLAY A COUNTRY'S ID'S
                  -    "E"    TO END
-     
-                                        N O T E:-                                    
+
+                                        N O T E:-
           A) DO NOT USE SOMEONE ELSE'S ID, YOU WILL WIPE OUT HIS FILES, AND HE YOURS
           B) YOUR FILE NAMES WILL BE YOUR ID + STANDARD QUALIFIERS (E.G.'.SPE')
-     
+
      YOUR ID/?/R/D/E> UKABC
- 
+
       PLEASE SELECT WHICH OF THE FOLLOWING IS YOUR REASON GETTING SPECTRA
 
               1  - RECOVERY, SENDS YOU -> SELECT, USE IF DOWNLINK FAILED
@@ -344,11 +344,11 @@ text following the `$>$' prompt.)
               4  - PH.D. PROJECT
               5  - UNDERGRADUATE CLASS PROJECT
               6  - NORMAL RESEARCH
-      
+
      1 TO 6 OR E(STOP QUEST) OR ? > 2
-                       +++  OPENING UKABC.SPE     (STATUS=OLD)  +++                   
-                       +++  OPENING UKABC.SPE     (STATUS=NEW)  +++                   
-  
+                       +++  OPENING UKABC.SPE     (STATUS=OLD)  +++
+                       +++  OPENING UKABC.SPE     (STATUS=NEW)  +++
+
                                   M A I N     M E N U
               1      -      SEARCH FOR A SET OF SPECTRA
               2      -      SEARCH FOR SPECTRA - SHORT PROMPT
@@ -359,30 +359,30 @@ text following the `$>$' prompt.)
               ?      -      HELP ME, N = ONE OF ABOVE ANSWERS
 
       1 TO 6, ? (HELP) OR  E (END) > 2
-                                     E X A M P L E:-                                 
+                                     E X A M P L E:-
      "SWP4123L ,  3000"   = (SPECTRUM FOR SWP CAMERA, IMAGE NO.4123 & LARGE APERTURE)
-        P L U S    (ALL SPECTRA FOR IMAGE NUMBER 3000, FOR ANY CAMERA OR APERTURE)   
-     
+        P L U S    (ALL SPECTRA FOR IMAGE NUMBER 3000, FOR ANY CAMERA OR APERTURE)
+
      CAMERA,IM.NO.& AP'S/<CR>/?/R/X > SWPL
      CAMERA,IM.NO.& AP'S/<CR>/?/R/X >
 
-                                     E X A M P L E:-                                 
-                                     ----------                                  
-       "10 -12, ALL 2030"  =(10HRS+/-30MINS & -12DEGS+/-4DEGS) OR DEC=20.5+/-0.5DEG  
-     
+                                     E X A M P L E:-
+                                     ----------
+       "10 -12, ALL 2030"  =(10HRS+/-30MINS & -12DEGS+/-4DEGS) OR DEC=20.5+/-0.5DEG
+
      RA+DEC.PAIRS/<CR>/?/X >
-                                      E X A M P L E:                                 
-            "35 , 53"    =  ALL SPECTRA FOR OBJECTS WITH IUE CLASSES 35 OR 53        
+                                      E X A M P L E:
+            "35 , 53"    =  ALL SPECTRA FOR OBJECTS WITH IUE CLASSES 35 OR 53
 
      OBJECT CLASSES/<CR>/?/X >
-                                      E X A M P L E:                                 
-                     "NGC136, "    =   ALL SPECTRA FOR BOTH OBJECTS                 
+                                      E X A M P L E:
+                     "NGC136, "    =   ALL SPECTRA FOR BOTH OBJECTS
 
      HOMOGENEOUS ID'S/<CR>/?/X > HD52973
      HOMOGENEOUS ID'S/<CR>/?/X >
 
                                 10   R E C O R D S      F O U N D
- 
+
                                   M A I N     M E N U
               1      -      SEARCH FOR A SET OF SPECTRA
               2      -      SEARCH FOR SPECTRA - SHORT PROMPT
@@ -391,10 +391,10 @@ text following the `$>$' prompt.)
               5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
               6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
               ? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
- 
+
      1 TO 6, ? (HELP) OR  E (END) > 5
 
-              SPECTRAL DESCRIPTORS ARE BEING SAVED ON UKABC.DES - PLEASE WAIT         
+              SPECTRAL DESCRIPTORS ARE BEING SAVED ON UKABC.DES - PLEASE WAIT
 
                                   M A I N     M E N U
               1      -      SEARCH FOR A SET OF SPECTRA
@@ -419,13 +419,13 @@ text following the `$>$' prompt.)
        8>SWP17927L!HD52973         ! 7: 1 8! 20:3842!12SEP82! 8820.0!53!       !    !
        9>SWP17939L!HD52973         ! 7: 1 8! 20:3842!13SEP82!10800.0!53!       !    !
       10>SWP17915L!HD52973         ! 7: 1 8! 20:3842!11SEP82! 7800.0!53! U     !    !
-                           <<<<  E N D    O F    L I S T  >>>>                       
-        GIVE REF.NOS.(E.G. 3,8) AND/OR RANGES(E.G.3-8) TO SELECT/END/OR LAST PAGE    
+                           <<<<  E N D    O F    L I S T  >>>>
+        GIVE REF.NOS.(E.G. 3,8) AND/OR RANGES(E.G.3-8) TO SELECT/END/OR LAST PAGE
      PREV.PAGE (-)/E/SELECT LIST > 1-4,7,10
-     PREV.PAGE (-)/E/SELECT LIST > 
+     PREV.PAGE (-)/E/SELECT LIST >
       END ? (Y/N) Y
      WANT 'USAGE' DATA FOR SPECTRA SELECTED FILED (<CR>/N/?) > N
-  
+
                      THE END OF A QUEST
 \end{verbatim}
 \end{footnotesize}
@@ -443,15 +443,15 @@ Image SWP2347L &SWP2347L&&&\\
 SWP images of dwarf novae &SWP&&56&\\
 LWR large aperture images of HD52973&LWR L&&&HD52973\\
 Quasars in the Southern Hemisphere&&ALL 4,ALL 12,ALL 20&85&\\
-RA=9hrs$\pm$0.5hrs and DEC= 12$\pm$0.5&&9 12 &&\\ 
-RA=9hrs 20min$\pm$10mins &&0920 ALL &&\\ 
+RA=9hrs$\pm$0.5hrs and DEC= 12$\pm$0.5&&9 12 &&\\
+RA=9hrs 20min$\pm$10mins &&0920 ALL &&\\
 RA=9hrs 20min$\pm$30secs &&092000 ALL &&\\ \hline
 \end{tabular}
 \end{center}
 
 \normalsize
 \subsubsection{Display}
-Having found a set of spectra you may wish to inspect them before selecting 
+Having found a set of spectra you may wish to inspect them before selecting
 some or all for downlinking.
 The DISPLAY option displays the results of a search one screen-full at a time,
 up to a maximum of 400 spectra.
@@ -465,7 +465,7 @@ of the search request
 followed by the details of the search result -- as produced by a DISPLAY
 command -- are written to the file UKABC.DES.
 This file is useful if you prefer to examine the possibilities at length
-rather than make an immediate decision. 
+rather than make an immediate decision.
 
 \subsubsection {Display and Save Dubious Information}
 
@@ -482,12 +482,12 @@ only to the screen, but also to a file UKABC.AUX.
 
 \subsubsection{Select}
 
-When you choose to select spectra, 
+When you choose to select spectra,
 the list of the search results are displayed.
 To select all the spectra, you can reply 1--400 immediately.
-Alternatively a subset of spectra can be selected. For example the reply 
+Alternatively a subset of spectra can be selected. For example the reply
 2--5,9,37 will select only spectra number 2,3,4,5,9 and 37 in the list.
-If spectra are specified twice ({\it e.g.} 2--10, 7,8) they will 
+If spectra are specified twice ({\it e.g.} 2--10, 7,8) they will
 only be written once in the output file.
 
 QUEST terminates automatically after a SELECT.
@@ -495,10 +495,10 @@ QUEST terminates automatically after a SELECT.
 \subsubsection {Usage data}
 
 The USSP maintains a record of the users who select each spectrum.
-Should any of the spectra chosen in a session have been selected previously 
-the current user will be invited to inspect the usage information just before 
+Should any of the spectra chosen in a session have been selected previously
+the current user will be invited to inspect the usage information just before
 QUEST terminates.
-In the sample session above the user responded negatively to this 
+In the sample session above the user responded negatively to this
 invitation but a reply of Y or <CR> will result
 in a list of who has previously selected the chosen spectra.
 This information is also written to the file UKABC.AUX.
@@ -508,10 +508,10 @@ This information is also written to the file UKABC.AUX.
 
 The purpose of this program is two-fold:
 \begin{enumerate}
-\item To split up and reformat the  files written by QUEST into 
+\item To split up and reformat the  files written by QUEST into
 one file per spectrum.
 
-\item To copy the files from ULDA\$HOST\_DIR to your local 
+\item To copy the files from ULDA\$HOST\_DIR to your local
 computer\footnote{In the first instance you may of course wish to write the files output by UNSPL
 to your area on the database microvax.
 Obviously such files will be no longer be in the QUEST output format.
@@ -523,33 +523,33 @@ The program is invoked by typing `UNSPL' from your local computer whereupon
 you will be prompted to reply to three questions.
 
 Firstly, the user is invited to choose an output format.
-The range of options will be listed if the user replies with a ? 
+The range of options will be listed if the user replies with a ?
 Several options including MIDAS, ASCII and FITS format are provided as standard.
-(Selecting the ASCII format results in a text file which contains one  
-wavelength, 
+(Selecting the ASCII format results in a text file which contains one
+wavelength,
 flux pair and the associated epsilon on each line.)
 An additional format has been provided for UK users.
-Selecting `DIPSO' format will result in files which can be read with the DIPSO 
+Selecting `DIPSO' format will result in files which can be read with the DIPSO
 `USSPRD' command (see below).
 More output formats may be provided in the future.
 
-Next the user will be asked if the spectra should be downlinked to which an 
+Next the user will be asked if the spectra should be downlinked to which an
 affirmative reply should be given.
 
-Finally the user will be prompted for the USSP identifier used whilst 
+Finally the user will be prompted for the USSP identifier used whilst
 selecting the spectra -- UKABC in the example shown below.
 
 UNSPL will proceed to copy and unscramble/split all files .SPE, .DES, .AUX
-in the STADAT directory ULDA\$HOST\_DIR which have this identifier 
-as the filename. 
+in the STADAT directory ULDA\$HOST\_DIR which have this identifier
+as the filename.
 
-For example if your USSP identifier is UKABC and you want your output files in 
+For example if your USSP identifier is UKABC and you want your output files in
 DIPSO format an UNSPL session might proceed as follows
 \begin{verbatim}
       $ UNSPL
 
-        UNSPL> OUTPUT SPECTRAL FILES FORMAT : DIPSO 
-        UNSPL> DOWNLINK DATA FROM HOST SITE [Y/N] ?Y 
+        UNSPL> OUTPUT SPECTRAL FILES FORMAT : DIPSO
+        UNSPL> DOWNLINK DATA FROM HOST SITE [Y/N] ?Y
         UNSPL> USSP USER IDENTIFICATION : UKABC
         DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.SPE
                                END-OF-FILE - RECORDS COPIED :   1
@@ -557,10 +557,10 @@ DIPSO format an UNSPL session might proceed as follows
                                END-OF-FILE - RECORDS COPIED : 262
         DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.AUX
                                END-OF-FILE - RECORDS COPIED :   5
-                                   DIPSO FORMAT SWP17368L.ULD    
+                                   DIPSO FORMAT SWP17368L.ULD
                                END-OF-FILE - NUMBER OF SPECTRA :   1
 \end{verbatim}
-In this particular example only one spectrum SWP17368L had been selected 
+In this particular example only one spectrum SWP17368L had been selected
 from those found by the search with QUEST.
 UNSPL produced the file SWP17368L.ULD in the users directory.
 In this case both the list of the full results of the search and the
@@ -597,7 +597,7 @@ shown in capitals, with explanations following the exclamation marks.)}
      > PUSH                            ! push it on to DIPSO stack
      > DEV GRAPHPACK                   ! device assignment (GKS workstation name)
      > PM                              ! plot graph
-     > QUIT                            
+     > QUIT
 \end{verbatim}
 In the above example data with associated error flags more negative than $-250$
 were discarded on input.
@@ -607,7 +607,7 @@ The descriptions of the two relevant DIPSO commands are as follows:
 {\sl( Parameters enclosed in square brackets are optional.)}
 \begin{description}
 \item{\bf USSPRD filename$[$.typ$]$ $[${\it epsmin}$]$} --
-reads the file into DIPSO. The filename extension defaults to `.ULD'.   
+reads the file into DIPSO. The filename extension defaults to `.ULD'.
 DIPSO rejects points on input if they are flagged with an epsilon less than or
 equal to {\it epsmin} (which defaults to $-251$), leaving the spectrum in
 the current arrays.

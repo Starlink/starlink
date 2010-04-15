@@ -49,7 +49,7 @@ int main ( int argc, char *argv[] )
                         | ExposureMask );
       gc_id = XCreateGC ( vd_id, wd_id, None, &xgcvl );
       loop = True;
-      while ( loop ) 
+      while ( loop )
       {
 
          XNextEvent ( vd_id, &event );
@@ -58,7 +58,7 @@ int main ( int argc, char *argv[] )
          switch ( event.type ) {
             case Expose:
                if ( kx > 0 && ky > 0 && event.xexpose.window==wd_id ) {
-                XCopyArea ( vd_id, pixmap, wd_id, gc_id, 
+                XCopyArea ( vd_id, pixmap, wd_id, gc_id,
                       event.xexpose.x, event.xexpose.y, kx, ky,
                       event.xexpose.x, event.xexpose.y ) ;
                 XFlush (vd_id);

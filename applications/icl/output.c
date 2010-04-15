@@ -57,7 +57,7 @@ static int outfpstackcnt = 0;
  *
  ******************************************************************************
  */
-void 
+void
 sendtoiosubsystem(int command, int info, char *mess)
 {
     message.fcode = command;
@@ -77,7 +77,7 @@ sendtoiosubsystem(int command, int info, char *mess)
  *
  ******************************************************************************
  */
-int 
+int
 stackandsetoutfp(value vfp)
 {
     if (outfpstackcnt == OUTFPSTACK)
@@ -98,7 +98,7 @@ stackandsetoutfp(value vfp)
  *
  ******************************************************************************
  */
-int 
+int
 restoreoutfp(void)
 {
     if (outfpstackcnt <= 0)
@@ -125,7 +125,7 @@ restoreoutfp(void)
  *
  ******************************************************************************
  */
-value 
+value
 iclopenasoutfp(char *whofor, char *filename)
 {
     FILE *fp;
@@ -154,7 +154,7 @@ iclopenasoutfp(char *whofor, char *filename)
  *
  ******************************************************************************
  */
-value 
+value
 iclcloseasoutfp(char *whofor, char *filename)
 {
     FILE *fp;
@@ -180,7 +180,7 @@ iclcloseasoutfp(char *whofor, char *filename)
  *
  ******************************************************************************
  */
-void 
+void
 systemfail(char *mess)
 {
     fprintf(stderr, "\n System Fail : %s\n", mess);
@@ -188,7 +188,7 @@ systemfail(char *mess)
  * Reset signal handlers and terminate with core
  */
     signal(SIGCHLD, SIG_DFL);
-    
+
     abort();
     return; /* for lint */
 }
@@ -197,12 +197,12 @@ systemfail(char *mess)
  *
  *	O U T S T R I N G (char *mess)
  *
- * Output the string 'mess' to the terminal immediately using the ICL 
+ * Output the string 'mess' to the terminal immediately using the ICL
  * iosubsystem (or to stderr if not in terminal_output mode)
  *
  ******************************************************************************
  */
-int 
+int
 outstring(char *mess)
 {
     int istat;
@@ -228,7 +228,7 @@ outstring(char *mess)
  *
  ******************************************************************************
  */
-int 
+int
 bufstring(char *mess)
 {
     int i, istat = 0;
@@ -259,7 +259,7 @@ bufstring(char *mess)
  *
  ******************************************************************************
  */
-int 
+int
 bufchar(char ch)
 {
     int istat = 0;
@@ -290,7 +290,7 @@ bufchar(char ch)
  *
  ******************************************************************************
  */
-int 
+int
 bufnewline(void)
 {
     int istat = 0;
@@ -346,7 +346,7 @@ flshbuf(void)
  *
  ******************************************************************************
  */
-int 
+int
 outfpint(int i)
 {
     int fid, istat;
@@ -386,7 +386,7 @@ outfpreal(double d)
  *
  ******************************************************************************
  */
-int 
+int
 outfpstring(char *mess)
 {
     int fid, istat;
@@ -394,7 +394,7 @@ outfpstring(char *mess)
     fid = fileno(out_fp);
     if (terminal_output() && fid < 3) /* we are sending to terminal */
 	istat = bufstring(mess);
-    else 
+    else
 	istat = fprintf(out_fp, "%s", mess);
     return istat;
 }
@@ -446,7 +446,7 @@ outfpformatstring(char *form, char *mess)
  *
  ******************************************************************************
  */
-void 
+void
 iclems_flush(void)
 {
     int parlen, messlen;
@@ -476,7 +476,7 @@ iclems_flush(void)
  *
  ******************************************************************************
  */
-value 
+value
 init_output(void)
 {
     value val;

@@ -40,7 +40,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,7 +81,7 @@
           type = 'I'
       elseif (format(1:1).eq.'L') then
           type = 'L'
-      else 
+      else
           type = 'C'
       endif
       end

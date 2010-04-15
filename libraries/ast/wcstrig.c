@@ -28,11 +28,11 @@
 *=============================================================================
 *
 *  This version of wcstrig.c is based on the version in wcslib-2.9, but has
-*  been modified in the following ways by the Starlink project (e-mail: 
+*  been modified in the following ways by the Starlink project (e-mail:
 *  ussc@star.rl.ac.uk):
 *     -  Support for non-ANSI C "const" class removed
 *     -  Changed names of projection functions and degrees trig functions
-*        to avoid clashes with wcslib. 
+*        to avoid clashes with wcslib.
 *=============================================================================
 *
 *   The functions defined herein are trigonometric or inverse trigonometric

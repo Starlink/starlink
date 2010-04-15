@@ -1,13 +1,13 @@
 *+  AB_TRANSLATE_ENV - Translate a environment variable into a full directory
       SUBROUTINE AB_TRANSLATE_ENV( PREFIX, TRANSLATION, STATUS )
 *    Description :
-*     Given a prefix which is a expected to be a logical name or 
+*     Given a prefix which is a expected to be a logical name or
 *     environment variable which is a directory specification translate
 *     it to provide the full directory specification in TRANSLATION.
 *     This routine is provided because FORTRAN I/O in Unix does not
 *     translate environment variables. On a VMS system it should
 *     not matter whether this routine is used or not.
-*     The PREFIX will be a logical name terminated by a colon (VMS) or 
+*     The PREFIX will be a logical name terminated by a colon (VMS) or
 *     an environment varible started with a "$" and terminated by a "/"
 *     (Unix). On Unix add the closing "/" to the translation to complete
 *     the directory specification.
@@ -48,7 +48,7 @@
 *    check for the start and end of the actual environment variable
 
       LENGTH = CHR_LEN( PREFIX)
-      
+
 *    look for "$". If not there assume there is no other starting indication
       START = INDEX (PREFIX, '$')
       IF (START .EQ. 0) THEN

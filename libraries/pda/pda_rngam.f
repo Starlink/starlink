@@ -2,13 +2,13 @@
 *+
 *  Name:
 *     PDA_RNGAM
- 
+
 *  Purpose:
 *     Returns pseudo-random numbers from a gamma distribution.
-      
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     RESULT = PDA_RNGAM( A )
 
@@ -16,13 +16,13 @@
 *     This is a simple random-number generator providing deviates in the
 *     from a gamma distribution, with a period of 2**26, and to 6 or
 *     7 digits accuracy.  It is based upon Ahrens, Dieter & Grube's
-*     TOMS599 routines.  A value of zero is returned if the argument of 
+*     TOMS599 routines.  A value of zero is returned if the argument of
 *     the gamma function is not positive.
- 
-*  Arguments:               
+
+*  Arguments:
 *     A = REAL (Given)
 *        The argument (mean) of the gamma function.
- 
+
 *  Returned Value:
 *     PDA_RNGAM = REAL
 *        The pseudo-random deviate. A value of zero is returned if the
@@ -41,7 +41,7 @@
 *     The factor is the integer of the form 8 * K + 5 (K positive
 *     integer) nearest to to  2**26 * ( sqrt(5) - 1 )/2 (the so called
 *     `golden section').  The initial seed is defined by PDA_RNSED.
-*     The gamma-distribution variates are found using the 
+*     The gamma-distribution variates are found using the
 *     algorithms given in the references below.
 
 *  References:
@@ -56,7 +56,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1996 November 22 (MJC)
 *        Original version.
@@ -65,12 +65,12 @@
 *     1997 February 27 (MJC)
 *        Added SAVE statement.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

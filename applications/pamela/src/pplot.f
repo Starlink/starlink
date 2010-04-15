@@ -2,8 +2,8 @@
 *
 * PPLOT   -- Plots slices of a data frame in either X or Y direction.
 *
-* PPLOT is useful for quick examination of 2D data, determination of bias 
-* regions, good data regions etc. 
+* PPLOT is useful for quick examination of 2D data, determination of bias
+* regions, good data regions etc.
 *
 * Parameters:
 *
@@ -13,7 +13,7 @@
 *                   etc. See NDF help for more details on this. The
 *                  old method prompting for a region is still enabled if
 *                  you specify a plain file.
-*                  
+*
 *
 *   XSTART      -- Lower X limit (if no section defined in IMAGE)
 *
@@ -36,7 +36,7 @@
 *
 *  NDF version created 08/01/1998 by TRM.
 *
-*  Changed to account for specification of region through NDF section 
+*  Changed to account for specification of region through NDF section
 *  as well as old method.
 *
 *PPLOT
@@ -56,7 +56,7 @@ C
       REAL LIMITS(4)
       CHARACTER*128 DEVICE, TOPLABEL
       CHARACTER*64 XLABEL, YLABEL, FILE
-      
+
       IF(STATUS.NE.SAI__OK) RETURN
 C
 C Open file, get name for later use in plot label.
@@ -68,9 +68,9 @@ C Get pixels bounds of ndf
 C
       CALL NDF_BOUND(IMAGE, NDIMX, LBND, UBND, NDIM, STATUS)
 C
-C If NDF is a base component and has 2 dimensions then 
+C If NDF is a base component and has 2 dimensions then
 C prompt for region. If this is less than whole NDF,
-C create a temporary NDF section of this size, and then 
+C create a temporary NDF section of this size, and then
 C move it back to IMAGE.
 C
       CALL NDF_ISBAS(IMAGE, BASE, STATUS)
@@ -96,7 +96,7 @@ C
          END IF
       END IF
 C
-C IMAGE now refers to an NDF covering just the region of interest. 
+C IMAGE now refers to an NDF covering just the region of interest.
 C
       DIM(1) = UBND(1)-LBND(1)+1
       DIM(2) = UBND(2)-LBND(2)+1
@@ -130,7 +130,7 @@ C
 C Map variance
 C
       CALL NDF_STATE(IMAGE,'Variance',EXIST,STATUS)
-      IF(EXIST) 
+      IF(EXIST)
      &     CALL NDF_MAP(IMAGE,'Variance','_REAL','READ',
      &     VPTR,EL,STATUS)
 C
@@ -145,9 +145,9 @@ C
          CALL SET_AXIS(%VAL(CNF_PVAL(APTR)),
      :                 DIM(IAXIS),LBND(IAXIS),STATUS)
       END IF
-C     
+C
 C     Get workspace for slice
-C     
+C
       CALL NDF_TEMP(PLACE, STATUS)
       CALL NDF_NEW('_REAL',1,1,DIM(IAXIS),PLACE,WORK1,STATUS)
       CALL NDF_MAP(WORK1,'Data','_REAL','WRITE',WPTR1,EL,STATUS)
@@ -169,19 +169,19 @@ C Get name of file
 C
       CALL NDF_MSG('NAME', IMAGE)
       CALL MSG_LOAD('BLA','^NAME',FILE,FLEN,STATUS)
-C     
+C
 C     Generate plot label and then plot
 C
       BLOC = INDEX(FILE,'(')
       IF(BLOC.GT.0) FLEN = BLOC - 1
       IF(NDIM.EQ.2) THEN
          IF(PDIR.EQ.'X') THEN
-            WRITE(TOPLABEL,'(2A,4(A,I5))') 
+            WRITE(TOPLABEL,'(2A,4(A,I5))')
      &           'Mean X profile of file ',
      &           FILE(:FLEN),', region: ',
      &           LBND(1),':',UBND(1),',',LBND(2),':',UBND(2)
          ELSE
-            WRITE(TOPLABEL,'(2A,4(A,I5))') 
+            WRITE(TOPLABEL,'(2A,4(A,I5))')
      &           'Mean Y profile of file ',
      &           FILE(:FLEN),', region: ',
      &           LBND(1),':',UBND(1),',',LBND(2),':',UBND(2)
@@ -191,7 +191,7 @@ C
      &        FILE(:FLEN),', region: ',
      &        LBND(1),':',UBND(1)
       ELSE
-         WRITE(TOPLABEL,'(2A,4(A,I5))') 
+         WRITE(TOPLABEL,'(2A,4(A,I5))')
      &        'File: ',
      &        FILE(:FLEN),', region: ',
      &        LBND(1),':',UBND(1),',',LBND(2),':',UBND(2)
@@ -201,7 +201,7 @@ C Compute and plot profile.
 C
       CALL MSG_SYNC(STATUS)
       CALL PLOT_SLICE(%VAL(CNF_PVAL(IPTR)), DIM(1), DIM(2), PDIR,
-     &     %VAL(CNF_PVAL(APTR)), EXIST, %VAL(CNF_PVAL(VPTR)), 
+     &     %VAL(CNF_PVAL(APTR)), EXIST, %VAL(CNF_PVAL(VPTR)),
      :     %VAL(CNF_PVAL(WPTR1)),
      &     %VAL(CNF_PVAL(WPTR2)), DIM(IAXIS), AUTO, LIMITS,
      &     DEVICE, XLABEL, YLABEL, TOPLABEL, STATUS)
@@ -217,10 +217,10 @@ C     Tidy up
 C
       CALL NDF_END(STATUS)
       RETURN
-      END	
+      END
 
       SUBROUTINE PLOT_SLICE(IMAGE,NX,NY,PDIR,XDATA,EXIST,VAR,
-     &     PLOT1,PLOT2,MXWORK,AUTO,LIMITS,DEVICE,XLABEL,YLABEL, 
+     &     PLOT1,PLOT2,MXWORK,AUTO,LIMITS,DEVICE,XLABEL,YLABEL,
      &     TOPLABEL,STATUS)
 C
 C     Collapses region and derives suggested plot limits if needed
@@ -300,10 +300,10 @@ C
            NPIX(J) = NPL
         END DO
       END IF
-C     
+C
 C     Compute automatic plot limits.
 C     These are returned to provide better defaults next time.
-C     
+C
       IF(AUTO) THEN
          YMIN =  1.E30
          YMAX = -1.E30

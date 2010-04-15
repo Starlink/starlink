@@ -32,7 +32,7 @@
 *  History:
 *     07 Dec 1993 (hme):
 *        Original version.
-*     10 May 1995 (rpt): 
+*     10 May 1995 (rpt):
 *        Added support for ISEQ and FILHD
 *     21 Sep 2000 (ajc):
 *        Unused NDIM
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

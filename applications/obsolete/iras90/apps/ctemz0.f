@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,7 +117,7 @@
       PARAMETER ( NTEMP = 45 )
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :       RATIO( NTEMP ),     ! Surface brightness ratio at each
                                  ! temperature.
      :       SB1( NTEMP ),       ! Surface brightness in BAND1 at each
@@ -144,7 +144,7 @@
 
 *  Calculate the factor between adjacent temperatures. This factor is
 *  chosen so that the given temperature range is covered in the given
-*  number of steps. 
+*  number of steps.
       TFAC = ( THI/TLO )**( 1.0D0/DBLE( NTEMP - 1 ) )
 
 *  Initialise the current temperature (in Kelvin) to be the lower bound.
@@ -155,13 +155,13 @@
       RATHI = VAL__MIND
 
 *  Loop round each of the temperature values.
-      DO I = 1, NTEMP      
+      DO I = 1, NTEMP
 
-*  Evaluate the observed flux density in the first waveband at this 
+*  Evaluate the observed flux density in the first waveband at this
 *  temperature, and store it.
          CALL CTEMZ1( T, BAND1, BETA, LERR, RERR, SB1( I ), STATUS )
 
-*  Evaluate the observed flux density in the second waveband at this 
+*  Evaluate the observed flux density in the second waveband at this
 *  temperature, and store it.
          CALL CTEMZ1( T, BAND2, BETA, LERR, RERR, SB2( I ), STATUS )
 
@@ -179,7 +179,7 @@
          TEMP( I ) = T
 
 *  Calculate the next temperature.
-         T = T*TFAC      
+         T = T*TFAC
 
       END DO
 
@@ -193,7 +193,7 @@
 *  of ratio values.
       IFAIL = -1
 *      CALL E01BAF( NTEMP, RATIO, TEMP, %VAL( IPLKR ), %VAL( IPCKR ),
-*     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL ) 
+*     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL )
 
          STATUS = IRC__NAGER
          CALL ERR_REP('CTEMZ0_ERR0',
@@ -214,7 +214,7 @@
 *  temperature.
       IFAIL = -1
 *      CALL E01BAF( NTEMP, TEMP, SB1, %VAL( IPLKF1 ), %VAL( IPCKF1 ),
-*     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL ) 
+*     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL )
 
       STATUS = IRC__NAGER
       CALL ERR_REP('CTEMZ0_ERR0',

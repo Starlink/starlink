@@ -43,7 +43,7 @@ C     13 Oct 1992  HME / UoE, Starlink.  INCLUDE changed. Renamed from
 C                  ROTATE to IROT90.
 C     21 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Bad pixel handling.
-C     26 Jul 1996  MJCL / Starlink, UCL.  Added parameter ABORT 
+C     26 Jul 1996  MJCL / Starlink, UCL.  Added parameter ABORT
 C                  checking.
 C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
 C                  mapped data.
@@ -86,12 +86,12 @@ C
       INTEGER   SLOT             ! Slot number for input mapped data
       INTEGER   SLOTO            ! Slot number for output mapped data
       INTEGER   STATUS           ! Running status for DSA routines
-      INTEGER   TPTR             ! Temporary dynamic-mem pointer for 
+      INTEGER   TPTR             ! Temporary dynamic-mem pointer for
                                  ! axis
       LOGICAL   WEXIST           ! True if axis has width data
       DOUBLE PRECISION WIDTH     ! Width value for axis, if single -
                                  ! ignored
-      INTEGER   WPTR             ! Dynamic-mem pointer for axis-width 
+      INTEGER   WPTR             ! Dynamic-mem pointer for axis-width
                                  ! data
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file

@@ -8,7 +8,7 @@
 *   Description:
 *      An attempt is made to access the mapped spectrum associated with
 *      the current dataset.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     IUEDR Vn. 1.0
 *      Paul Rees          13-OCT-88     IUEDR Vn. 2.0

@@ -2,7 +2,7 @@
 *+
 *  Name:
 *     HDS_FIND
-*     
+*
 *  Purpose:
 *     Find an HDS object.
 
@@ -416,7 +416,7 @@
             I1 = I2 + 2
             GO TO 1
          END IF
-      END IF     
+      END IF
 
 *  If an error has occurred, then annul the returned locator.
       IF ( STATUS .NE. SAI__OK ) THEN

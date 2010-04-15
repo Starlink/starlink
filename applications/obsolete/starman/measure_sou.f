@@ -34,14 +34,14 @@ C ME_ESTH       Do actual work of rough estimate of the star height.
 C ME_SULIST     Find companion stars
 C ME_NONELC     Flag none as cleaned
 C ME_CHEXTRA    Check the effect of the extras on premeasured stars.
-C ME_MAGS       Fit Lorentzians to a list of stars 
+C ME_MAGS       Fit Lorentzians to a list of stars
 C ME_OLDRES     Put out the previous loop's result and clean
 C ME_TWOS       Take 2 nearby undone stars and fit as one.
 C ME_STADD      Cancel a star and restore it to a cleaned image
 C ME_DORES      Arrange storage of result and clean of image
 C ME_DOVOL      Do the volume calculations for all the stars
 C ME_BEFCLEAR   Remove all stars that have a 'pure before' fit from an image
-C ME_CLEAN      Remove the fitted stars from the input image. 
+C ME_CLEAN      Remove the fitted stars from the input image.
 C ME_CLEANA     Display of cleaning
 C ME_SETMEAS    Set up Lorentz fit
 C ME_RESULT     Store the fit result fit and type out a line of result
@@ -59,8 +59,8 @@ C ME_CLEANDO    Find whether to clean a star
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_RLOAD -- Load and set stars from star list to RES area.
-C   Does this into the RES area, after clearing the rows concerned. It flags 
-C   them all as not done (mag=50.0). It also deals with the loading the 
+C   Does this into the RES area, after clearing the rows concerned. It flags
+C   them all as not done (mag=50.0). It also deals with the loading the
 C   default profile to use. The list can be put in starting at a defined row.
 C
 C   a j penny                    stsci               1987-02-22
@@ -87,11 +87,11 @@ Cbegin
 
       if ( ST_FAILED ) return						!Failure check
 
-      
-      call coprr ( intb, tbxvi, tbyi, 6, 7, 1, tbyi, 		        !Copy input to input posn 
+
+      call coprr ( intb, tbxvi, tbyi, 6, 7, 1, tbyi, 		        !Copy input to input posn
      +             %val(IPINAE), 3, TBY, 1, 1+koff )			! store
 
-      do k = 1, tbyi							!Get data to store for all 
+      do k = 1, tbyi							!Get data to store for all
 									! stars in the input list
 
          ka = k + koff							!Row offset
@@ -150,7 +150,7 @@ C   a j penny              ral                  1994-09-02
       include 'measure.inc'
       include 'STARMAN_INC'
 
-      integer	nx			!i: Input table 
+      integer	nx			!i: Input table
       integer	ny			!i: Input table Y size
       real	tb(nx,ny)		!i/o: Input/output table
 C--
@@ -176,7 +176,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_XYTRANA -- XY transform from an array to another array
 C
 C     a j penny                ral                 1994-09-01
-  
+
       subroutine me_xytrana ( a, nxa, nya, b, nxb, nyb, kyo )
 
       implicit none
@@ -195,7 +195,7 @@ C--
       integer j
       real x, y
 Cbegin
-  
+
 
       if ( ST_FAILED ) return
 
@@ -209,7 +209,7 @@ Cbegin
 
       end
 
-  
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_INBOX -- Load box size, see if in image, calc if do map
 C
@@ -226,7 +226,7 @@ C    a j penny           stsci   1988-03-11
       real	res(TBX,TBY)		!i/o: Results array
       logical	tdomap(TBY)		!o:   Flags for use map for a star
 C--
-      real rxl, ryl, thetal, rx, ry, theta, xbox, ybox, xst, xen, yst, 
+      real rxl, ryl, thetal, rx, ry, theta, xbox, ybox, xst, xen, yst,
      +     yen
       integer smapnum, smapx, smapy, k, mapnumb(100), kk, kktot, smapk
       logical inimage, sdomap, domapb(100)
@@ -270,7 +270,7 @@ Cbegin
          xen = xst + 10.0*xbox + 1.0
          yst = res(2,k) - 5.0*ybox
          yen = yst + 10.0*ybox + 1.0
-         if ( xst.gt.real(NX) .or. xen.lt.1.0 .or. 
+         if ( xst.gt.real(NX) .or. xen.lt.1.0 .or.
      +        yst.gt.real(NY) .or. yen.lt.1.0 ) then
             inimage = .false.
             call wcheck ( res(34,k), 9, .false. )
@@ -288,7 +288,7 @@ Cbegin
             else
                smapx = res(38,k)
                smapy = res(39,k)
-               call rchzero ( %val(IPRMAP), MX, MY, MZ, smapnum, 
+               call rchzero ( %val(IPRMAP), MX, MY, MZ, smapnum,
      +                        smapx, smapy, sdomap )
                tdomap(k) = sdomap
                if ( kktot.ne.100 ) then
@@ -307,7 +307,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_EHEIGHT -- Find rough heights of stars at given position
-C      by max height above image mean sky at those posns, with some 
+C      by max height above image mean sky at those posns, with some
 C      safety checks.
 C
 C   a j penny                   stsci                    1987-02-22
@@ -333,17 +333,17 @@ Cbegin
       if ( ST_FAILED ) return						!Failure check
 
       do k = 1, TBY							!Do for all the stars
-	
+
          if ( LOOPNUM.eq.2 .and. res(3,k).lt.49.0 ) then		!Height found already?
 
             res(49,k) = res(9,k)
 
          else
-							
-            if ( rcheck(res(34,k),9) .and.				!Get rough height by 
+
+            if ( rcheck(res(34,k),9) .and.				!Get rough height by
      +          (ESTH_DO .or. res(49,k).eq.0.0) ) then			! finding max in small box
                x = res(1,k)						! round the star, and sky
-               y = res(2,k)						! by min in a larger box. 
+               y = res(2,k)						! by min in a larger box.
                xbox = res(29,k)
                ybox = res(30,k)
                rx = res(12,k)
@@ -391,7 +391,7 @@ Cbegin
       ns = 0
       do k = 1, TBY
          if ( rcheck(res(34,k),9) ) then
-            h = res(49,k) 
+            h = res(49,k)
             if ( h.gt.2.0 .and. h.lt.60000.0 ) then
                sm = sm + 30.0 - 2.5*alog10(h)
                ns = ns + 1
@@ -403,7 +403,7 @@ Cbegin
          amean = 20.0
          call printo ( 'No rough magnitudes can be measured' )
       else
-         amean = sm/real(ns)						
+         amean = sm/real(ns)
       endif
 
       hmean = 10.0**(max(1.0e-5,((30.0-amean)/2.5)))			!Refine mean
@@ -412,8 +412,8 @@ Cbegin
       do k = 1, TBY							!Refine heights
          if ( rcheck(res(34,k),9) ) then				! for good stars
 
-            h = res(49,k)						!Reset any heights which 
-									! are more than 5 mags 
+            h = res(49,k)						!Reset any heights which
+									! are more than 5 mags
             if ( h.lt.0.1 ) h = hmin					! away from the mean to
             amag = 30.0 - 2.5*alog10(h)					! those limits. Also if
             if ( amag.gt.49.0 ) h = hmin				! fit has failed, set the
@@ -478,7 +478,7 @@ Cbegin
       if ( nxst.gt.NX .or. nxen.lt.1 .or. 				!If none of box
      +     nyst.gt.NY .or. nyen.lt.1 ) return				! in image, return
 
-      nxst = max(1,min(NX,nxst))					!Find sky as 
+      nxst = max(1,min(NX,nxst))					!Find sky as
       nxen = max(1,min(NX,nxen))					! min valid value
       nyst = max(1,min(NY,nyst))					! in box. If all
       nyen = max(1,min(NY,nyen))					! invalid, sky=0
@@ -494,13 +494,13 @@ Cbegin
       enddo
       if ( nval.eq.0 ) vsky = 0.0
 
-      nxst = x - 1.0							!Find star height as 
-      nxen = nxst + 2 							! max valid value in 
+      nxst = x - 1.0							!Find star height as
+      nxen = nxst + 2 							! max valid value in
       nyst = y - 1.0							! 3x3 round star posn
       nyen = nyst + 2							! If that box in image
       nval = 0								! and has valid vals
       vmax = 0.0
-      if ( nxst.le.NX .and. nyst.le.NY .and.		
+      if ( nxst.le.NX .and. nyst.le.NY .and.
      +     nxen.ge.1  .and. nyen.ge.1 ) then
          nxst = max(1,min(NX,nxst))
          nxen = max(1,min(NX,nxen))
@@ -518,8 +518,8 @@ Cbegin
       ht = vmax - vsky
 
 C  If only invalid pixels in this box, then star is probably saturated.
-C  And if oustide area, probably bright. So calculate rough height by 
-C  expanding box until there are valid pixels, and from distance of 
+C  And if oustide area, probably bright. So calculate rough height by
+C  expanding box until there are valid pixels, and from distance of
 C  these from input position, say what the peak height of the star is.
 
       if ( nval.eq.0 ) then
@@ -536,7 +536,7 @@ C  these from input position, say what the peak height of the star is.
             nyst = y - yb
             nyen = y + yb
             vmax = 0.0
-            if ( nxst.le.NX .and. nyst.le.NY .and.		
+            if ( nxst.le.NX .and. nyst.le.NY .and.
      +           nxen.ge.1  .and. nyen.ge.1 ) then
                nxst = max(1,min(NX,nxst))
                nxen = max(1,min(NX,nxen))
@@ -559,7 +559,7 @@ C  these from input position, say what the peak height of the star is.
          pow = min((p*(1.0+dd)*alog10(d)),10.0)
          ht = (vmax-vsky)*(1.0+(10.0**pow))
       endif
- 
+
       ht = max(0.001,ht)						!Height must be +ve
       ht = min(1.0e7,ht)
 
@@ -572,9 +572,9 @@ C ME_SULIST -- Find companion stars
 C     This reads through a list of star XY positions
 C     and magnitudes, together with the star profile, and works out
 C     which stars have companions close enough to affect photometry.
-C     It makes for each star a list of those stars which are close 
+C     It makes for each star a list of those stars which are close
 C     enough, and also the measuring box size for that star.
-C     It stores all this back in the working array. 
+C     It stores all this back in the working array.
 C
 C      a j penny                  stsci               1987-02-25
 
@@ -603,7 +603,7 @@ Cbegin
         ypa = res(2,k)
 
 C  Put the star itself as the first one and clear the other SMAX-1 spaces
-C  in the list. 
+C  in the list.
 
         bnst(1) = k
         bimps(1) = 0.0
@@ -622,7 +622,7 @@ C
 C  Thus the more important the star is the more -ve Imp is. If the
 C  star is important enough to worry about (Imp less than 0)
 C  then the star is inserted in the main star list with the more
-C  important stars first. If more than seven stars are important 
+C  important stars first. If more than seven stars are important
 C  enough to get on the list, only the seven most important are saved
 
         bhp = res(49,k)
@@ -635,7 +635,7 @@ C  Do not do for itself or if outside area or if not important
             lookat = .true.
             if ( ja.eq.k ) lookat = .false.
             if ( .not.rcheck(res(34,ja),9) ) lookat = .false.
-            ahp = res(49,ja) 
+            ahp = res(49,ja)
             if ( ahp.lt.0.1 ) lookat = .false.
             xbox = max( res(29,ja), res(29,k) )
             ybox = max( res(30,ja), res(30,k) )
@@ -747,11 +747,11 @@ Cbegin
 
       if ( ST_FAILED .or. .not. (BEFORE.and.EXTRA) ) return		!Check want to do
 
-      do k = 1, TBYA							!Check done before stars 
-         numcomps = nint(res(21,k))					! to see if needed to do 
+      do k = 1, TBYA							!Check done before stars
+         numcomps = nint(res(21,k))					! to see if needed to do
          if ( numcomps.ne.0 ) then					! again because of extra
-            again = .false.						! input; if so, change 
-            do j = 1, numcomps 						! flag to not yet done, 
+            again = .false.						! input; if so, change
+            do j = 1, numcomps 						! flag to not yet done,
                if ( j.le.7 ) ja = nint(res(22+j-1,k))			! reset output for them.
                if ( j.gt.7 ) ja = nint(res(41+j-8,k))
                if ( ja.ne.0 .and. ja.gt.TBYA .and. ja.le.TBY ) then
@@ -774,17 +774,17 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ME_MAGS -- Fit Lorentzians to a list of stars 
+C ME_MAGS -- Fit Lorentzians to a list of stars
 C  This is either done entirely in the main machine or the
 C  actual calculation sent out to a farm of parallel processors.
 C
-C  It goes through the stars, one by one, doing undone ones, 
+C  It goes through the stars, one by one, doing undone ones,
 C  fitting and storing results.
 C
 C  If a star is are flagged as having close companions, that star
 C  and its companions are treated as one group and done together,
-C  in a small box centred on the main star, and only the result 
-C  for the main star is recorded. 
+C  in a small box centred on the main star, and only the result
+C  for the main star is recorded.
 C
 C  The stars are done in order of brightness (found roughly before).
 C
@@ -806,7 +806,7 @@ C  a j penny                   ral                 1990-01-28
       real	res(TBX,TBY)		!i/o: Results array
       real	inae(3,TBY)		!i: Original positions
 C--
-      integer k, lxsor, lysor, klxs, klys, jstar, ksent, kser, ksera, 
+      integer k, lxsor, lysor, klxs, klys, jstar, ksent, kser, ksera,
      +        numpari, kn, nploop, ipkn, nleft, istat
       real xo, yo, baseo, basej
       logical toobig, pmore, doit
@@ -842,8 +842,8 @@ Cbegin
       if ( NUMOP.eq.2 ) call printo (
      +                           'Doing undone ones on cleaned image' )
       if ( LOOPNUM.eq.2 ) call printo ( '2nd loop' )
-      write ( texta, '( '' '', '' Star'', ''   Mag  '', '' Height '', 
-     +         ''  Dx  '', ''  Dy  '', ''  Chi '', '' Its '', 
+      write ( texta, '( '' '', '' Star'', ''   Mag  '', '' Height '',
+     +         ''  Dx  '', ''  Dy  '', ''  Chi '', '' Its '',
      +         ''Inval'', '' Error'', ''  Imp '', '' Diff-2'',
      +         ''   Damp'' )' )
       call printo ( texta )
@@ -878,21 +878,21 @@ CX         call me_pardo ( res, %val(ipkn), pmore, nploop, doit )
             klxs = abs(LXS-lxsor)*10
             klys = abs(LYS-lysor)*10
 
-            if ( LOOPNUM.eq.2 .and. nint(res(21,KSTAR)).eq.0 .and. 	!See if already done for 
+            if ( LOOPNUM.eq.2 .and. nint(res(21,KSTAR)).eq.0 .and. 	!See if already done for
      +           nint(inae(3,KSTAR)).eq.0 .and. klxs.le.LX .and.	! single, stationary star
-     +           klys.le.LY .and. nint(res(3,KSTAR)-50.0).ne.0 ) then	
+     +           klys.le.LY .and. nint(res(3,KSTAR)-50.0).ne.0 ) then
                call me_oldres ( res )					!Use previous result
             else
                ksera = ksera + 1
-               call me_setmeas ( wim, %val(IPRWORK), %val(IPBWORK),	!Set for fit 
+               call me_setmeas ( wim, %val(IPRWORK), %val(IPBWORK),	!Set for fit
      +                           res, %val(IPDOM), inae, baseo, istat )
                call me_toobig ( KSTAR, toobig )				!Check if too big for transputers
                if ( istat.ne.0 ) then					!All pixels bad
                   xo = inae(1,KSTAR)
-                  yo = inae(2,KSTAR)					
-                  call me_result ( %val(IPTBOUT), res, xo, yo, baseo, 
+                  yo = inae(2,KSTAR)
+                  call me_result ( %val(IPTBOUT), res, xo, yo, baseo,
      +                             KSTAR, 1, 0 )
-               elseif ( .not.DOPAR .or. toobig ) then		
+               elseif ( .not.DOPAR .or. toobig ) then
                   HTFIX = .true.
                   call me_fit ( %val(IPRWORK), %val(IPBWORK), 		!Main machine fit
      +                          %val(IPRMAP), 3, %val(IPFWORK), 1 )
@@ -900,8 +900,8 @@ CX         call me_pardo ( res, %val(ipkn), pmore, nploop, doit )
                   call me_fit ( %val(IPRWORK), %val(IPBWORK), 		!Main machine fit
      +                          %val(IPRMAP), 30, %val(IPFWORK), 1 )
                   if ( .not.SUCCESS(1) ) then
-                     call me_setmeas ( wim, %val(IPRWORK), 		!Set for fit 
-     +                    %val(IPBWORK),res, %val(IPDOM), inae, 
+                     call me_setmeas ( wim, %val(IPRWORK), 		!Set for fit
+     +                    %val(IPBWORK),res, %val(IPDOM), inae,
      +                    baseo, istat )
                      call me_fit ( %val(IPRWORK), %val(IPBWORK),
      +                          %val(IPRMAP), 30, %val(IPFWORK), 2 )
@@ -922,7 +922,7 @@ CX         call me_pardo ( res, %val(ipkn), pmore, nploop, doit )
             endif
 
          endif
- 
+
       enddo
       enddo
 
@@ -941,12 +941,12 @@ CX         call me_pardo ( res, %val(ipkn), pmore, nploop, doit )
 
       DLOCN = DLOCN + 1							!Tidy up any display clean
       if ( DLOCN.eq.4 ) DLOCN = 1
-      call me_cleana ( 1 )	
+      call me_cleana ( 1 )
       DLOCN = DLOCN + 1
       if ( DLOCN.eq.4 ) DLOCN = 1
       call me_cleana ( 2 )
 
-      call me_weedm ( res )						!Remove merges from 
+      call me_weedm ( res )						!Remove merges from
 									! results lists
       if ( DOPAR ) call wrkcan ( 'KN' )
 
@@ -995,9 +995,9 @@ Cbegin
       call printo ( texta )
       KPOUT = KPOUT + 1
       if ( KPOUT.eq.(20*(KPOUT/20))) then
-         write ( texta, '( '' '', '' Star'', ''   Mag  '', 
-     +         '' Height '', ''  Dx  '', ''  Dy  '', ''  Chi '', 
-     +         '' Its '', ''Inval'', '' Error'', ''  Imp '', 
+         write ( texta, '( '' '', '' Star'', ''   Mag  '',
+     +         '' Height '', ''  Dx  '', ''  Dy  '', ''  Chi '',
+     +         '' Its '', ''Inval'', '' Error'', ''  Imp '',
      +         '' Diff-2'', ''   Damp'' )' )
          call printo ( texta )
       endif
@@ -1021,7 +1021,7 @@ C  a j penny                      stsci                 1987-02-25
 
       real	res(TBX,TBY)			!i/o: Results array
       real	inae(3,TBY)			!i:   Posns, heights
-      integer	krem(TBY)			!i/o: Flag for star removed 
+      integer	krem(TBY)			!i/o: Flag for star removed
 						!     (0=no;1=yes)
 C--
       integer  k, kser, krema, numpari, ksent, jstar, kn, istat
@@ -1040,7 +1040,7 @@ Cbegin
 
       if ( DOPAR ) call me_par_sii ( numpari, istat )			!Get no of par processors
 
-      call me_eheight ( %val(IPCLEAN), res )				!Estimate rough heights of 
+      call me_eheight ( %val(IPCLEAN), res )				!Estimate rough heights of
 									! failed stars
 
       SHIFTF = 3.5							!Can move star a bit
@@ -1049,14 +1049,14 @@ Cbegin
       call printo ( 'Collapsing undone pairs to single stars' )
       if ( LOOPNUM.eq.2 ) call printo ( '2nd loop' )
       write ( texta, '( '' '', '' Star'', ''   Mag  '', '' Height '',
-     +          ''  Dx  '', ''  Dy  '', ''  Chi '', '' Its '', 
+     +          ''  Dx  '', ''  Dy  '', ''  Chi '', '' Its '',
      +          ''Inval'', '' Comps'', ''  Imp '', '' Diff-2'',
      +          ''   Damp'' )' )
       call printo ( texta )
       KPOUT = 0
 
 C  Go through stars doing undone ones, fitting and storing results
-C  Only do for set number. 
+C  Only do for set number.
 
       kser = 0
       ksent = 0
@@ -1066,24 +1066,24 @@ C  Only do for set number.
          KSTAR = nint(res(37,kser))
          call azerob ( SUCCESS, SMAX )
 
-         if ( me_stardo(KSTAR,res) ) then				!If star in image and not 
-									! yet done and has an 
-            call me_remcomp ( KSTAR, res, %val(IPTBOUT), found, krema)	! undone companion close, 
-            krem(KSTAR) = krema						! do it, removing star 
+         if ( me_stardo(KSTAR,res) ) then				!If star in image and not
+									! yet done and has an
+            call me_remcomp ( KSTAR, res, %val(IPTBOUT), found, krema)	! undone companion close,
+            krem(KSTAR) = krema						! do it, removing star
 									! from companion list
             if ( found ) then
 
                LX = nint(res(29,KSTAR))					!Box size
                LY = nint(res(30,KSTAR))
 
-               call me_setmeas ( %val(IPCLEAN), %val(IPRWORK), 		!Get the data from the 
+               call me_setmeas ( %val(IPCLEAN), %val(IPRWORK), 		!Get the data from the
      +                           %val(IPBWORK), res, %val(IPDOM), inae,
      +                           baseo, istat )				! image and measure star
                call me_toobig ( KSTAR, toobig )				!Check if too big for transputers
                if ( istat.ne.0 ) then					!All pixels bad
                   xo = inae(1,KSTAR)
                   yo = inae(2,KSTAR)
-                  call me_result ( %val(IPTBOUT), res, xo, yo, baseo, 
+                  call me_result ( %val(IPTBOUT), res, xo, yo, baseo,
      +                             KSTAR, 1, 0)
                elseif ( .not.DOPAR .or. toobig ) then
                   HTFIX = .true.
@@ -1093,21 +1093,21 @@ C  Only do for set number.
                   call me_fit ( %val(IPRWORK), %val(IPBWORK), 		!Main machine fit
      +                          %val(IPRMAP), 30, %val(IPFWORK), 1 )
                   if ( .not.SUCCESS(1) ) then
-                     call me_setmeas ( %val(IPCLEAN), %val(IPRWORK), 		!Set for fit 
-     +                    %val(IPBWORK),res, %val(IPDOM), inae, 
+                     call me_setmeas ( %val(IPCLEAN), %val(IPRWORK), 		!Set for fit
+     +                    %val(IPBWORK),res, %val(IPDOM), inae,
      +                    baseo, istat )
                      call me_fit ( %val(IPRWORK), %val(IPBWORK),
      +                          %val(IPRMAP), 30, %val(IPFWORK), 2 )
                   endif
                   call me_dores ( KSTAR, baseo, 0, 0, 0, res, inae, kn)	!Store reply
-                  call me_remstar ( res, %val(IPTBOUT), inae, 		!Remove 'removed' star 
+                  call me_remstar ( res, %val(IPTBOUT), inae, 		!Remove 'removed' star
      +                              krem(KSTAR) )
                else
                   if ( ksent.ge.numpari ) then				!If filled farm, wait
                      call me_parin ( basej, jstar )			! for next reply
                      call me_dores ( jstar, basej, 0, 1, 0, res, inae,	!Store reply
      +                               kn )
-                     call me_remstar ( res, %val(IPTBOUT), inae, 	!Remove 'removed' star 
+                     call me_remstar ( res, %val(IPTBOUT), inae, 	!Remove 'removed' star
      +                                 krem(jstar) )
                   endif
                   call me_parout ( %val(IPRWORK),%val(IPRMAP),baseo,30)	!Push calcs out to farm
@@ -1117,7 +1117,7 @@ C  Only do for set number.
             endif
 
          else
-            call me_setdone ( KSTAR, .false., res, %val(IPTBOUT) )	!Flag star as having been 
+            call me_setdone ( KSTAR, .false., res, %val(IPTBOUT) )	!Flag star as having been
          endif								! looked at
 
       enddo
@@ -1130,7 +1130,7 @@ C  Only do for set number.
                if ( k.eq.1 .and. ksent.lt.numpari ) call me_par_fend
                call me_parin ( basej, jstar )
                call me_dores ( jstar, basej, 0, 1, 0, res, inae, kn ) 	!Store reply
-               call me_remstar ( res, %val(IPTBOUT), inae, krem(jstar))	!Remove 'removed' star 
+               call me_remstar ( res, %val(IPTBOUT), inae, krem(jstar))	!Remove 'removed' star
                if ( k.eq.1 .and. ksent.ge.numpari ) call me_par_fend
             enddo
          endif
@@ -1138,7 +1138,7 @@ C  Only do for set number.
 
       DLOCN = DLOCN + 1							!Tidy up any display clean
       if ( DLOCN.eq.4 ) DLOCN = 1
-      call me_cleana ( 1 )	
+      call me_cleana ( 1 )
       DLOCN = DLOCN + 1
       if ( DLOCN.eq.4 ) DLOCN = 1
       call me_cleana ( 2 )
@@ -1173,7 +1173,7 @@ Cbegin
 
 
       doit = .false.							!Add star to image?
-      if ( DODISP .or. REDOCL .or. CLSTORE .or. TWOS ) doit = .true. 
+      if ( DODISP .or. REDOCL .or. CLSTORE .or. TWOS ) doit = .true.
       if ( rcheck(res(33+LOOPNUM,ks),1) ) doit = .false.
       if ( .not.rcheck(res(33+LOOPNUM,ks),2*NUMOP+1) ) doit = .false.
       if ( .not.rcheck(res(34,ks),9) ) doit = .false.
@@ -1188,12 +1188,12 @@ Cbegin
          y = res(2,ks)
          h = res(9,ks)
          sdomap = tdomap(ks)
-         call popamr ( %val(IPCLEAN), NX, NY, 1.0, RINVAL, x, y, h, 
-     +                 sprof, %val(IPRMAP), MX, MY, MZ, smapnum, 
+         call popamr ( %val(IPCLEAN), NX, NY, 1.0, RINVAL, x, y, h,
+     +                 sprof, %val(IPRMAP), MX, MY, MZ, smapnum,
      +                 smapx, smapy, smagnif, sdomap, ierr, kw )
          call wcheck ( res(34,ks), 12, .false. )
       endif
-      
+
       res(1,ks) = inae(1,ks)
       res(2,ks) = inae(2,ks)
       res(3,ks) = 50.0
@@ -1211,7 +1211,7 @@ Cbegin
       call amovr ( res(32,ks), out(32+5,ks), 4 )
       call amovr ( res(48,ks), out(48+5,ks), 3 )
 
-      call me_setdone ( ks, .true., res, out )				!Set tried and done 
+      call me_setdone ( ks, .true., res, out )				!Set tried and done
 
       end
 
@@ -1233,8 +1233,8 @@ C  a j penny                      ral                 1990-02--25
       integer	kf3		!i: Flag for clean (0/1=y/n)
       real	res(TBX,TBY)	!i/o: Results array
       real	inae(3,TBY)	!i: Original positions
-      integer	kn		!o: Flag (0=ok,cleaned: -1=not ok, not 
-				!   cleaned: +ve=ok, cleaned, another [kn] 
+      integer	kn		!o: Flag (0=ok,cleaned: -1=not ok, not
+				!   cleaned: +ve=ok, cleaned, another [kn]
 				!   restored)
 C--
       real xo, yo, hpa, xpa, ypa, xa, ya, ab
@@ -1244,7 +1244,7 @@ C--
 Cbegin
 
 
-      xo = inae(1,ks)	
+      xo = inae(1,ks)
       yo = inae(2,ks)
 
       call me_chclose ( ks, res, kd, brighter, kf2 )			!See about another close star
@@ -1272,7 +1272,7 @@ Cbegin
          endif
          write ( text, '(1x,i5,f14.1,2x,2f12.2)' ) ks, hpa, xpa, ypa
          call printo ( text )
-         write ( text, '(1x,i5,f14.1,2x,2f12.2)' ) kd, res(9,kd), 
+         write ( text, '(1x,i5,f14.1,2x,2f12.2)' ) kd, res(9,kd),
      +                                          res(1,kd), res(2,kd)
          call printo ( text )
 
@@ -1285,7 +1285,7 @@ Cbegin
          write ( text, '('' Star no '', i5, '' set to zero - too '',
      +         ''close to new brighter star no '',i5)' ) kd, ks
          call printo ( text )
-         write ( text, '(1x,i5,f14.1,2x,2f12.2)' ) kd, res(9,kd), 
+         write ( text, '(1x,i5,f14.1,2x,2f12.2)' ) kd, res(9,kd),
      +                                          res(1,kd), res(2,kd)
          call printo ( text )
          if ( kf2.eq.0 ) then
@@ -1345,13 +1345,13 @@ Cbegin
 
          if ( rcheck(res(34,KSTAR),9) ) then				!See if in image
 
-            call amovr ( res(12,KSTAR), sprof, 9 )			!See if same profile as 
+            call amovr ( res(12,KSTAR), sprof, 9 )			!See if same profile as
             smapnum = nint(res(11,KSTAR))				! one already done
             smapx   = nint(res(38,KSTAR))
             smapy   = nint(res(39,KSTAR))
             smagnif = nint(res(40,KSTAR))
             sdomap  = tdomap(KSTAR)
- 
+
             voldone = .false.
             ja = 0
             do while ( .not.voldone .and. ja.lt.TBY )
@@ -1367,11 +1367,11 @@ Cbegin
                   endif
                endif
             enddo
-  
-            if ( voldone ) then						!If done copy it, else 
+
+            if ( voldone ) then						!If done copy it, else
                vol = res(36,ja)						! calc it. Then store it.
             else
-               call cvolume ( sprof, sdomap, %val(IPRMAP), MX, MY, MZ, 
+               call cvolume ( sprof, sdomap, %val(IPRMAP), MX, MY, MZ,
      +                     smapnum, smapx, smapy, smagnif, RADIUS, vol)
             endif
             res(36,KSTAR) = vol
@@ -1417,7 +1417,7 @@ Cbegin
 
       DLOCN = DLOCN + 1							!Tidy up any display clean
       if ( DLOCN.eq.4 ) DLOCN = 1
-      call me_cleana ( 1 )	
+      call me_cleana ( 1 )
       DLOCN = DLOCN + 1
       if ( DLOCN.eq.4 ) DLOCN = 1
       call me_cleana ( 2 )
@@ -1473,12 +1473,12 @@ Cbegin
       y = res(2,ks)
       h = res(9,ks)
       sdomap = tdomap(ks)
-      call popsmr ( %val(IPCLEAN), NX, NY, 1.0, RINVAL, x, y, h, sprof, 
-     +              %val(IPRMAP), MX, MY, MZ, smapnum, smapx, smapy, 
+      call popsmr ( %val(IPCLEAN), NX, NY, 1.0, RINVAL, x, y, h, sprof,
+     +              %val(IPRMAP), MX, MY, MZ, smapnum, smapx, smapy,
      +              smagnif, sdomap, ierr, kw )
       call wcheck ( res(34,ks), 12, .true. )
       if ( ierr.ne.0 ) return
-      
+
       if ( .not.DODISP ) return						!Displaying?
 
       if ( DFIRST ) DLOCN = 3						!Start counter
@@ -1502,9 +1502,9 @@ Cbegin
          DLOCB(DLOCN,3) = P_LYS
          DLOCB(DLOCN,4) = P_LYS + P_LY - 1
       elseif ( km.eq.2 ) then
-         DLOCB(DLOCN,1) = res(1,ks) - res(29,ks)/2.0 
+         DLOCB(DLOCN,1) = res(1,ks) - res(29,ks)/2.0
          DLOCB(DLOCN,2) = res(1,ks) + res(29,ks)/2.0 - 1.0
-         DLOCB(DLOCN,3) = res(2,ks) - res(30,ks)/2.0 
+         DLOCB(DLOCN,3) = res(2,ks) - res(30,ks)/2.0
          DLOCB(DLOCN,4) = res(2,ks) + res(30,ks)/2.0 - 1.0
       endif
 
@@ -1536,7 +1536,7 @@ Cbegin
       if ( .not.DODISP .and. .not.REDOCL .and. .not.CLSTORE .and.	!Wanted in general?
      +     .not.TWOS ) return
 
-      if ( .not.DSECOND ) then						!Clear last but one area 
+      if ( .not.DSECOND ) then						!Clear last but one area
          if ( DLOCN.eq.1 ) k = 2
          if ( DLOCN.eq.2 ) k = 3
          if ( DLOCN.eq.3 ) k = 1
@@ -1552,7 +1552,7 @@ Cbegin
       endif
 
       if ( .not.DFIRST .and. (kopt.eq.0 .or. kopt.eq.1)  ) then		!Clear last area
-         if ( DLOCN.eq.1 ) k = 3	
+         if ( DLOCN.eq.1 ) k = 3
          if ( DLOCN.eq.2 ) k = 1
          if ( DLOCN.eq.3 ) k = 2
          kxs = nint(min(DLOC(k,1),DLOC(k,1))) - 2*DSCOMFX
@@ -1580,14 +1580,14 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_SETMEAS -- Set up Lorentz fit
-C    Given up to 15 stars from an XY list which are somewhere in 
-C    the image, it copies the appropriate part of the frame into a 
-C    working area, and sets up the parameters for the standard fitting 
+C    Given up to 15 stars from an XY list which are somewhere in
+C    the image, it copies the appropriate part of the frame into a
+C    working area, and sets up the parameters for the standard fitting
 C    subroutine.
 C
 C  a j penny                   stsci                       1987-02-25
 
-      subroutine me_setmeas ( im, imuse, imuseb, res, tdomap, 
+      subroutine me_setmeas ( im, imuse, imuseb, res, tdomap,
      +                        inae, baseo, ok )
 
       implicit none
@@ -1602,7 +1602,7 @@ C  a j penny                   stsci                       1987-02-25
       logical	tdomap(TBY)		!i:   Flags for use of profile maps
       real	inae(3,TBY)		!i:   Original posns, heights
       real	baseo			!o:   Starting fit base level
-      integer   ok			!o:   Bad area flag (0=ok;1=bad-all 
+      integer   ok			!o:   Bad area flag (0=ok;1=bad-all
 					!     invalid, all out of image)
 C--
       real var, rv
@@ -1620,9 +1620,9 @@ Cbegin
       LYS = res(2,KSTAR) - real(LY)/2.0
       lye = lys + LY - 1
 
-CX      ns(1) = KSTAR	
-      HPI(1) = res(49,KSTAR)						!Get the star positions 
-      XPI(1) = res(1,KSTAR) - LXS + 1					! and heights in terms of 
+CX      ns(1) = KSTAR
+      HPI(1) = res(49,KSTAR)						!Get the star positions
+      XPI(1) = res(1,KSTAR) - LXS + 1					! and heights in terms of
       YPI(1) = res(2,KSTAR) - LYS + 1					! this area
       XPOR(1) = inae(1,KSTAR) - LXS + 1
       YPOR(1) = inae(2,KSTAR) - LYS + 1
@@ -1647,7 +1647,7 @@ CX      ns(1) = KSTAR
             if ( NUMOP.ge.2 .and. rcheck(res(34,j),12) ) doit = .false.	!Cleaned from image?
             if ( doit ) then
                ja = ja + 1
-CX               ns(ja) = j					
+CX               ns(ja) = j
                HPI(ja) = res(49,j)
                XPI(ja) = res(1,j) - LXS + 1
                YPI(ja) = res(2,j) - LYS + 1
@@ -1673,11 +1673,11 @@ CX               ns(ja) = j
 
       ok = 1
       if ( lxe.le.LXS .or. lye.le.LYS .or.				!Check to see if box in
-     +     lxs.ge.NX  .or. lxe.le.1   .or.				! main image, and is at 
+     +     lxs.ge.NX  .or. lxe.le.1   .or.				! main image, and is at
      +     lys.ge.NY  .or. lye.le.1         ) return			! least 2x2
       ok = 0
 
-      call coprr ( im, NX, NY, LXS, lxe, LYS, lye, imuse, LX, LY, 1, 1)	!Copy the selected 
+      call coprr ( im, NX, NY, LXS, lxe, LYS, lye, imuse, LX, LY, 1, 1)	!Copy the selected
       NINVAL = 0							! region into working area
       do k = 1, LY				             		! and scale
          do j = 1, LX
@@ -1689,7 +1689,7 @@ CX               ns(ja) = j
             endif
          enddo
       enddo
-									
+
       if ( NINVAL.eq.(LX*LY) ) then
          ok = 1
          return
@@ -1738,7 +1738,7 @@ C   a j penny                        stsci                 87-03-06
       real	yo			!i:   Starting Y posn
       real	baseo			!i:   Fitted base level
       integer   ks			!i:   Star that has been fitted
-      integer   ok			!i:   Flag that fit has been done 
+      integer   ok			!i:   Flag that fit has been done
 					!     (0=yes;1=no)
       integer   kt			!i:   Flag for where results come
 					!     from (0=single;1=prallel procs)
@@ -1828,7 +1828,7 @@ Cbegin
          res(7,ks) = r_rchi
          res(8,ks) = r_ninval
          res(9,ks) = r_hp(1)
-         res(10,ks) = r_base 
+         res(10,ks) = r_base
          res(32,ks) = r_xslope
          res(33,ks) = r_yslope
          res(48,ks) = r_diffm
@@ -1837,7 +1837,7 @@ Cbegin
          res(51,ks) = r_damp
       else
          res(1,ks) = xo						!Fit bad, set null params
-         res(2,ks) = yo	
+         res(2,ks) = yo
          res(3,ks) = 50.0
          res(4,ks) = 0.0
          res(5,ks) = 0.0
@@ -1882,9 +1882,9 @@ Cbegin
       call printo ( texta )
       KPOUT = KPOUT + 1
       if ( KPOUT.eq.(20*(KPOUT/20))) then
-         write ( texta, '( '' '', '' Star'', ''   Mag  '', 
-     +         '' Height '', ''  Dx  '', ''  Dy  '', ''  Chi '', 
-     +         '' Its '', ''Inval'', '' Error'', ''  Imp '', 
+         write ( texta, '( '' '', '' Star'', ''   Mag  '',
+     +         '' Height '', ''  Dx  '', ''  Dy  '', ''  Chi '',
+     +         '' Its '', ''Inval'', '' Error'', ''  Imp '',
      +         '' Diff-2'', ''   Damp'' )' )
          call printo ( texta )
       endif
@@ -1940,13 +1940,13 @@ Cbegin
 
       do k = 1, TBY							!Load heights into temp array, set
          tempa(k) = res(49,k)						! up start order. If no height,
-         if ( .not.rcheck(res(34,k),9) ) tempa(k) = -1.0		! height, then load as very small 
+         if ( .not.rcheck(res(34,k),9) ) tempa(k) = -1.0		! height, then load as very small
          tempb(k) = k							! (-1 in fact)
       enddo
 
       call sort2r ( tempa, tempb, TBY ) 				!sort heights (ascending order)
-	
-      do k = 1, TBY/2							!put the posns in list, into 
+
+      do k = 1, TBY/2							!put the posns in list, into
          temp = tempb(k)						!descending height order
          tempb(k) = tempb(TBY+1-k)
          tempb(TBY+1-k) = temp
@@ -1992,7 +1992,7 @@ Cbegin
 
       end
 
-      
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_WEEDM -- Remove stars that have merged with another
 C
@@ -2062,7 +2062,7 @@ C     a j penny                              dao           1988-05-03
 
       integer	k		!i: Target star
       real	res(TBX,TBY)	!i: Results array
-      integer	ka		!o: Brightest too close done star found 
+      integer	ka		!o: Brightest too close done star found
 				!   (=0 if none such)
       logical	brighter	!o: False= no found or fainter than target
 				!   True=found brighter star
@@ -2093,7 +2093,7 @@ Cbegin
       ra = res(12,k) + res(13,k)
       ht = 0.0
       do j = 1, TBY
-         if ( j.ne.k .and. res(3,j).lt.49.0 .and. 
+         if ( j.ne.k .and. res(3,j).lt.49.0 .and.
      +        rcheck(res(33+LOOPNUM,j),(2*NUMOP+1)) ) then
             dx = xa - res(1,j)
             dy = ya - res(2,j)
@@ -2176,7 +2176,7 @@ C      a j penny                   dao                1988-04-03
       integer   ks				!i:   Star number
       real	res(TBX,TBY)			!i/o: Results array
       real	out(TBXVO,TBY)			!i:   Output results array
-      logical	found				!o:   Flag for a close 
+      logical	found				!o:   Flag for a close
 						!     undone comp found
       integer	krem				!o:   Star number of found
 						!     companion
@@ -2229,9 +2229,9 @@ Cbegin
                   jin = 41 + k - 7
                   jout = jin - 1
                else
-                  jin = 21 + 1 + k 
+                  jin = 21 + 1 + k
                   jout = jin - 1
-               endif 
+               endif
                res(jout,ks) = res(jin,ks)
                out(jout+5,ks) = res(jin,ks)
             enddo
@@ -2332,7 +2332,7 @@ Cbegin
 
       do k = 1, TBY
          j = nint(res(37,k))
-         knord(j) = k     
+         knord(j) = k
       enddo
 
 
@@ -2366,7 +2366,7 @@ Cbegin
          doit = .true.
          return
       endif
-     
+
       kord = knord(KSTAR)						!Order in doing of this star
       num = res(21,KSTAR)						!Number of companions
 
@@ -2383,7 +2383,7 @@ Cbegin
             if ( knord(kn).lt.kord ) notyet = .true.
          endif
       enddo
-   
+
       doit = .true.							!Load output
       if ( notyet ) then
          doit = .false.
@@ -2418,7 +2418,7 @@ Cbegin
       me_cleando = .true.
       if ( rcheck(res(33+LOOPNUM,ks),1) ) me_cleando = .false.
       if ( .not.rcheck(res(33+LOOPNUM,ks),2) ) me_cleando = .false.
-      if ( .not.rcheck(res(33+LOOPNUM,ks),2*NUMOP+2) ) 
+      if ( .not.rcheck(res(33+LOOPNUM,ks),2*NUMOP+2) )
      +                                       me_cleando = .false.
 
       if ( .not.rcheck(res(34,ks),9) ) me_cleando = .false.
@@ -2452,7 +2452,7 @@ Cbegin
 
       call alimi ( MAPNUM, NST, mapmin, mapmax )
 
-      if ( LX*LY.gt.70*70 .or. MX*MY*mapmax.gt.70*70*SMAX .or. 
+      if ( LX*LY.gt.70*70 .or. MX*MY*mapmax.gt.70*70*SMAX .or.
      +     LX*LY*NST.gt.70*70*SMAX ) toobig = .true.
 
       if ( toobig ) then
@@ -2527,7 +2527,7 @@ C
 C    a j penny                  ral                    90-04-14
 
 
-      subroutine me_fit ( imuse, imuseb, map, iterlim, imusef, 
+      subroutine me_fit ( imuse, imuseb, map, iterlim, imusef,
      +                    ktype )
 
       implicit none
@@ -2568,7 +2568,7 @@ C--
       logical endloop			!End if of looping?
       logical loop			!Loop control flag
       real    damp			!Damping factor in simul eqns
-      real    dampmin			!Min allowed damping factor 
+      real    dampmin			!Min allowed damping factor
       real    hplr			!last 'real' loop height of star 1
       integer npf			!No of free parameters at moment
       integer npf1			!No of free parameters before
@@ -2592,11 +2592,11 @@ Cbegin
 
       call me_dovald 							!Calc mean 1D profile
 
-      do k = 1, NST				
-         rx = 1.0/GX(k)			
+      do k = 1, NST
+         rx = 1.0/GX(k)
          ry = 1.0/GY(k)
          call subdiv ( rx, ry, LBOX(k) )				!subdivision amounts
-         XMSTEP(k) = 0.7*(rx+ry)/2.0					!max profile shift step 
+         XMSTEP(k) = 0.7*(rx+ry)/2.0					!max profile shift step
          YMSTEP(k) = 0.7*(rx+ry)/2.0					!in one loop
       enddo
 
@@ -2613,14 +2613,14 @@ Cbegin
       call me_npf ( jfit, NUMMAX, npf )					!Load sim eqns
       npfin = npf
 
-      call me_sload ( xp1, yp1, hp1, a1, b1, c1, jfit, npf, nloop, 
+      call me_sload ( xp1, yp1, hp1, a1, b1, c1, jfit, npf, nloop,
      +                imuse, imuseb, map, imusef, cmat1, cvec1, chisq1 )
 
       damp = 0.01							!Start loop
 
       IF ( PRINTIT.GT.0 ) THEN
        WRITE ( 6,'(''Z1C  NLOOP,NGLOOP,A1,B1,C1,LX,LY,CHISQ1,DAMP'')')
-       WRITE ( 6, '(3X,''  '',2I4,3F8.3,2I3,G17.6,F9.4)' ) 
+       WRITE ( 6, '(3X,''  '',2I4,3F8.3,2I3,G17.6,F9.4)' )
      +            NLOOP, NGLOOP, A1,B1,C1,LX,LY,CHISQ1,DAMP
       ENDIF
 
@@ -2630,7 +2630,7 @@ Cbegin
 
          call amovr ( cmat1, cmat, npf*npf )				!Load eqns
          call amovr ( cvec1, cvec, npf )
-         do k = 1, npf							!Apply damping factor 
+         do k = 1, npf							!Apply damping factor
             kk = (k-1)*npf + k						! to the sim sqns
             cmat(kk) = cmat(kk)*(1.0+damp)
          enddo
@@ -2677,7 +2677,7 @@ Cbegin
 
          IF ( PRINTIT.GT.0 ) THEN
             DCHI = CHISQ2-CHISQ1
-            WRITE ( 6, 
+            WRITE ( 6,
      +         '(''NLOOP,NGLOOP,A2,B2,C2,LX,LY,CHISQ2,DAMP,DCHI'')' )
             WRITE ( 6, '(3X,'' '',2I4,3F8.3,2I3,G17.6,F9.4,F12.4)' )
      +      NLOOP,NGLOOP,A2,B2,C2,LX,LY,CHISQ2,DAMP,DCHI
@@ -2696,25 +2696,25 @@ Cbegin
             damp = damp*sqrt(5.0) 					!No, increasse damping
             dampup = .true.
             if ( damp.gt.29.0 ) then
-               hp2is = hp2(1) 
+               hp2is = hp2(1)
                damp = damp/sqrt(5.0)
                if ( ktype.eq.1 ) then
                   loop = .false.
                   isok = .false.
                   rv = 0.0
-                  if ( hp2(1).gt.0.0 .and. hplast(lasthp).gt.0.0 ) 
+                  if ( hp2(1).gt.0.0 .and. hplast(lasthp).gt.0.0 )
      +               rv = -2.5*alog10(hp2(1)/hplast(lasthp))
                   if ( abs(rv).gt.0.01 ) hp2(1) = 0.0
-                  IF ( PRINTIT.GE.-1 ) WRITE ( 6, 
+                  IF ( PRINTIT.GE.-1 ) WRITE ( 6,
      +                '(''Z6A Damp>29, fit not better, exit'')' )
                   call amovi ( jfit1, jfit, NUMMAX )
                   npf = npf1
                endif
             endif
          endif
-       
+
          if (((chisq2.le.chisq1).and.ktype.eq.1) .or. ktype.eq.2) then	!Better? or ktype=2?
-            ngloop = ngloop + 1						
+            ngloop = ngloop + 1
             endloop = .false.						!End on chi?
             if ( chchi .and. dchi.lt.0.0 .and. dchi.gt.-0.001 .and.
      +           (.not.HTFIX.and.dh.lt.0.001) ) endloop = .true.
@@ -2740,7 +2740,7 @@ Cbegin
                call amovr ( cmat2, cmat1, npf*npf )
                call amovr ( cvec2, cvec1, npf )
 
-               hplr = hp2(1)						!Update last 
+               hplr = hp2(1)						!Update last
                lasthp = lasthp + 1					! results records
                if ( lasthp.eq.4 ) lasthp = 1
                hplast(lasthp) = hplr
@@ -2766,7 +2766,7 @@ Cbegin
 
                IF ( PRINTIT.GT.1 ) THEN
                   DO II = 1, NST
-                     WRITE ( 6, 
+                     WRITE ( 6,
      +                   '(''Z9 I H1 X1 Y1 H2 X2 Y2 endloop remed'')')
                      WRITE ( 6, '(''  '',I3,6F10.3,2L)') II,HP1(II),
      +           XP1(II),YP1(II),HP2(II),XP2(II),YP2(II),ENDLOOP,REMED
@@ -2782,10 +2782,10 @@ Cbegin
      +                            imusef, cmat1, cvec1, chisq1 )
                endif
 
-      
-               CALL ME_PRINT3 ( HP1, XP1, YP1, HP2, XP2, YP2, REMED, 
+
+               CALL ME_PRINT3 ( HP1, XP1, YP1, HP2, XP2, YP2, REMED,
      +                 ENDLOOP, NLOOP, NGLOOP,A1,B1,C1,CHISQ1,DAMP )
-  
+
             endif
 
             IF ( PRINTIT.GT.0 ) THEN
@@ -2794,7 +2794,7 @@ Cbegin
      +                                           ITERLIM,NPF
             ENDIF
 
-            if ( endloop .or. nloop.ge.iterlim .or. npf.le.0 ) 
+            if ( endloop .or. nloop.ge.iterlim .or. npf.le.0 )
      +          loop = .false.
 
          endif
@@ -2816,13 +2816,13 @@ Cbegin
      +        ( abs(xp2(1)-XPOR(1)).gt.SHIFTF*RAD(1) .or.
      +          abs(yp2(1)-YPOR(1)).gt.SHIFTF*RAD(1) )  ) then
             hp2(1) = 0.0
-            IF (PRINTIT.GE.-1)WRITE ( 6, 
+            IF (PRINTIT.GE.-1)WRITE ( 6,
      +               '(''Z10BB Moved too far: SHIFTF,RAD'')' )
      +                               ,SHIFTF,RAD(1)
             loop = .false.
          endif
 
-         CALL ME_PRINT4 (HP1,XP1,YP1,HP2,XP2,YP2,REMED,ENDLOOP,NLOOP, 
+         CALL ME_PRINT4 (HP1,XP1,YP1,HP2,XP2,YP2,REMED,ENDLOOP,NLOOP,
      +     NGLOOP,A1,B1,C1,A2,B2,C2,DCHI,CHISQ1,DAMP,CHISQ2,DH,LOOP)
 
       enddo
@@ -2844,7 +2844,7 @@ Cbegin
          call amovr ( xp2, XP, NST )
          call amovr ( yp2, YP, NST )
          call amovr ( hp2, HP, NST )
- 
+
          call amovr ( xp2, XPI, NST )					!Put back into start
          call amovr ( yp2, YPI, NST )					! in case needed again
          call amovr ( hp2, HPI, NST )
@@ -2868,7 +2868,7 @@ Cbegin
             enddo
             rv = sqrt(abs(cmat2(j+((j-1)*npf))))
             if ( HP(1).gt.0.0 ) then
-               if ( (rv/HP(1)).gt.1.0e-5 ) 
+               if ( (rv/HP(1)).gt.1.0e-5 )
      +            ERRM=2.5*alog10(1.0+(rv/HP(1)))
             endif
          endif
@@ -2914,8 +2914,8 @@ C  from the data.
 C
 C  a j penny               ral              1990-04-14
 
-      subroutine me_sload ( xpt, ypt, hpt, a, b, c, jfit, npf, nloop, 
-     +                      imuse, imuseb, map, imusef, cmat, cvec, 
+      subroutine me_sload ( xpt, ypt, hpt, a, b, c, jfit, npf, nloop,
+     +                      imuse, imuseb, map, imusef, cmat, cvec,
      +                      chisq )
 
       implicit none
@@ -2941,11 +2941,11 @@ C--
       real erf(303)			!error functions
 					!-1 = fix: 1 = use: 0 = not use
       real dlim(1000)
-      integer j, k, nac1, nac2, llx, lly, kk, ja, jx, jy, jfitx, 
+      integer j, k, nac1, nac2, llx, lly, kk, ja, jx, jy, jfitx,
      +        jfity, jfitxy, jfith, n, lgo, nacd
-      real dx, dy, dxa, dya, dxb, dyb, alp, dfdx, dfdy, qt, qa, f9, 
-     +     f4, alg, a0, afact, algo, gg, f, ddxa, ddxb, ddxc, ddya, 
-     +     ddyb, ddyc, ggagph, zd, av, x, y, z, dres, resval, xdm, 
+      real dx, dy, dxa, dya, dxb, dyb, alp, dfdx, dfdy, qt, qa, f9,
+     +     f4, alg, a0, afact, algo, gg, f, ddxa, ddxb, ddxc, ddya,
+     +     ddyb, ddyc, ggagph, zd, av, x, y, z, dres, resval, xdm,
      +     ydm, var, xm, ym, f4s, qd, qdd, g2a, alg2a, alg2, aon2,
      +     dx2, dy2, g2am2, hh
 
@@ -3041,12 +3041,12 @@ C                                  Z = Z + star1 + star2 + ....
                  if ( jfit((j-1)*3+3+3).eq.1 ) nacd = nacd + 1
                enddo
              endif
-                
+
              n = 3*(k-1) + 1 + 3
              jfitx = jfit(n)
 
              if ( jfitx.ne.0 ) then					!If there is a star
-           
+
                jfity = jfit(n+1)
                jfitxy = max(jfitx,jfity)
                jfith = jfit(n+2)
@@ -3061,7 +3061,7 @@ C                                  Z = Z + star1 + star2 + ....
                     z = z + hpt(k)*erf(nac1+nacd+1)
                  else
 
-                   if ( abs(dxa).lt.4.0 .and. abs(dya).lt.4.0 ) then	!If far from star, no need 
+                   if ( abs(dxa).lt.4.0 .and. abs(dya).lt.4.0 ) then	!If far from star, no need
                      afact = LBOX(k)*LBOX(k)				! to subdivide, so only do
                      lgo = LBOX(k)					! once. Else find factors
                      algo = lgo
@@ -3071,18 +3071,18 @@ C                                  Z = Z + star1 + star2 + ....
                      algo = 1.0
                    endif
 
-                   zd = 0.0						!Subdivide pixel if 
+                   zd = 0.0						!Subdivide pixel if
                    do lly = 1, lgo					! profile sharp
                      do llx = 1, lgo
-           
+
                        nac2 = nac1 + nacd
 
                        xdm = -0.5 + (0.5+real(llx)-1.0)/algo
                        ydm = -0.5 + (0.5+real(lly)-1.0)/algo
-                       dxb = x - xpt(k) + xdm 
+                       dxb = x - xpt(k) + xdm
                        dyb = y - ypt(k) + ydm
 
-                       dx = dxb*CO(k) + dyb*SI(k)			!Calc the fit analysis 
+                       dx = dxb*CO(k) + dyb*SI(k)			!Calc the fit analysis
                        dy = dxb*SIM(k) + dyb*CO(k)			! parameters at this point
                        if ( abs(dx).lt.0.0001 ) dx = sign(0.0001,dx)
                        if ( abs(dy).lt.0.0001 ) dy = sign(0.0001,dy)
@@ -3132,9 +3132,9 @@ C                                  Z = Z + star1 + star2 + ....
                           dfdx = dfdx*MAGNIF(k)
                           dfdy = dfdy*MAGNIF(k)
                        endif
-   					
-                       if ( jfitxy.eq.1 ) then				!Error functions for 
-                         ggagph = gg*alg*p(k)/f				! position and intensity 
+
+                       if ( jfitxy.eq.1 ) then				!Error functions for
+                         ggagph = gg*alg*p(k)/f				! position and intensity
                          if ( jfitx.eq.1 ) then				! for each star
                            nac2 = nac2 + 1
                            ddxa = GX2(k)*CO(k)*dx + GY2(k)*SIM(k)*dy
@@ -3193,8 +3193,8 @@ C                                  Z = Z + star1 + star2 + ....
          IF ( PRINTIT.GT.4 ) WRITE ( 6, '(''K,JX,JY,Z,DRES'',4I,F12.5)')
      +                              K,JX,JY,Z,DRES
 
-           if ( abs(dres).gt.1.0e10 ) dres = 1.0e10*sign(1.0,dres)	!Accumulate vector and 
-           if ( abs(dres).lt.1.0e-10 ) dres = 1.0e-10*sign(1.0,dres)	! matrix contributions at 
+           if ( abs(dres).gt.1.0e10 ) dres = 1.0e10*sign(1.0,dres)	!Accumulate vector and
+           if ( abs(dres).lt.1.0e-10 ) dres = 1.0e-10*sign(1.0,dres)	! matrix contributions at
            do j = 1, npf						! this pixel
               if(abs(erf(j)).gt.1.0e10)erf(j) = 1.0e10*sign(1.0,erf(j))
               if(abs(erf(j)).lt.1.0e-10)erf(j)=1.0e-10*sign(1.0,erf(j))
@@ -3206,7 +3206,7 @@ C                                  Z = Z + star1 + star2 + ....
                  cmat(ja,j) = cmat(ja,j) + erf(j)*erf(ja)
               enddo
            enddo
- 
+
          endif
 
        enddo
@@ -3219,7 +3219,7 @@ C                                  Z = Z + star1 + star2 + ....
             cmat(j,k) = cmat(k,j)
          enddo
       enddo
- 
+
 
       do k = 1, NST							!Check sim eqn store flags
          if ( LOADIT(k) ) then
@@ -3245,7 +3245,7 @@ C ME_UPDATE -- Update fit parameters
 C
 C  a j penny               ral               1988-08-03
 
-      subroutine me_update ( rvec, jfit, a1, b1, c1, xp1, yp1, 
+      subroutine me_update ( rvec, jfit, a1, b1, c1, xp1, yp1,
      +                       hp1, a2, b2, c2, xp2, yp2, hp2 )
 
       implicit none
@@ -3329,7 +3329,7 @@ Cbegin
          endif
          yp2(k) = yp1(k) + dy
 
-         
+
          dh = 0.0							!new height
          if ( jfit(3*(k-1)+3+3).eq.1 ) then
             nac = nac + 1
@@ -3420,8 +3420,8 @@ Cbegin
       call amovr ( HPI, hp1, SMAX )					!Load input heights
       call amovr ( XPI, xp1, SMAX )					!Load input x posns
       call amovr ( YPI, yp1, SMAX )					!Load input y posns
-      a1 = BASE								!Load base, slope, 
-      b1 = XSLOPE			
+      a1 = BASE								!Load base, slope,
+      b1 = XSLOPE
       c1 = YSLOPE
 
       call azeroi ( jfit, NUMMAX )					!Clear fit params
@@ -3439,7 +3439,7 @@ Cbegin
          do k = 1, NST
             jfit(3*(k-1)+3+3) = -1
          enddo
-         call me_npf ( jfit, NUMMAX, npf )					
+         call me_npf ( jfit, NUMMAX, npf )
       endif
 
       call me_outclean ( imuse, imuseb, map, xp1, yp1, hp1, jfit,remed)	!If fairly outside box,
@@ -3451,8 +3451,8 @@ Cbegin
 
       call azerob ( SUCCESS, NST )					!Success flags to failure
 
-      call amovkr ( hp1(1), hplast, 3 ) 				!Clear the last 3 
-      lasthp = 3							! results records and 
+      call amovkr ( hp1(1), hplast, 3 ) 				!Clear the last 3
+      lasthp = 3							! results records and
 
       hplr = hp1(1)
 
@@ -3469,7 +3469,7 @@ C     a j penny            ral                   1988-08-06
 
       subroutine me_outclean ( imuse, imuseb, map, xp1, yp1, hp1,
      +                         jfit, remed )
-     
+
       implicit none
 
       include 'measure.inc'
@@ -3480,9 +3480,9 @@ C     a j penny            ral                   1988-08-06
       real	xp1(SMAX)		!i/o: X posns
       real	yp1(SMAX)		!i/o: Y posns
       real	hp1(SMAX)		!i/o: Heights
-      integer	jfit(NUMMAX)		!i:   Fit control params 
+      integer	jfit(NUMMAX)		!i:   Fit control params
 					!     (-1=fix;0=none;1=variable)
-      logical	remed			!i/o: Set true if any removed; 
+      logical	remed			!i/o: Set true if any removed;
 					!     otherwise unchanged
 C--
       integer k, mapnumi, magnifi, mapxi, mapyi, ierr, kww(4)
@@ -3495,10 +3495,10 @@ Cbegin
 
       IF ( PRINTIT.GT.0 ) WRITE ( 6,  '(3X,''ME_OUTCLEAN IN'')')
 
-      do k = 1, NST		
+      do k = 1, NST
          if ( jfit(3*(k-1)+3+3).ne.0 ) then
-            rv = 1.5*RAD(k)			 
-            if ( xp1(k).lt.(1.0-rv) .or.	
+            rv = 1.5*RAD(k)
+            if ( xp1(k).lt.(1.0-rv) .or.
      +           xp1(k).gt.(LX+rv)  .or.
      +           yp1(k).lt.(1.0-rv) .or.
      +           yp1(k).gt.(LY+rv)       ) then
@@ -3525,7 +3525,7 @@ Cbegin
                 WRITE ( 6,  '(3X,''prof6-10 '',4D)')(PROFI(J),J=6,9)
                 ENDIF
 
-                  call popsfr ( imuse, LX, LY, 1.0, imuseb, xpti, ypti, 
+                  call popsfr ( imuse, LX, LY, 1.0, imuseb, xpti, ypti,
      +                          hpti, profi, map, MX, MY, MZ, mapnumi,
      +                      mapxi, mapyi, magnifi, cdomapi, ierr, kww )
                   xp1(k) = XPOR(k)
@@ -3568,7 +3568,7 @@ Cbegin
 
       do k = 1, NST
 
-         GX(k) = 1.0/max(0.1,PROF(1,k))					!Invert the profile radii 
+         GX(k) = 1.0/max(0.1,PROF(1,k))					!Invert the profile radii
          GY(k) = 1.0/max(0.1,PROF(2,k))					! to match s/r convention
          P(k)  = max(0.1,min(20.0,PROF(3,k)))
          HX(k) = 1.0/max(0.1,PROF(4,k))
@@ -3611,8 +3611,8 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_DOVALD -- Calcs how far out from the stars you have to go.
 C      It calculates the mean 1D profile (VALD). This is then used
-C      in the actual fitting, by seeing how far from each star one 
-C      has to go before the star pixel value is less than 0.1 and 
+C      in the actual fitting, by seeing how far from each star one
+C      has to go before the star pixel value is less than 0.1 and
 C      thus it can be ignored.
 C
 C  a j penny                     ral                     1990-04-14
@@ -3667,7 +3667,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ME_LOOPFIX -- Fix stationary stars? 
+C ME_LOOPFIX -- Fix stationary stars?
 C
 C  a j penny                     stsci                   1987-03-01
 
@@ -3679,7 +3679,7 @@ C  a j penny                     stsci                   1987-03-01
 
       real	xp1(SMAX)		!i/o: Star old X posns
       real	yp1(SMAX)		!i/o: Star old Y posns
-      integer	jfit(NUMMAX)		!i:   Fit control params 
+      integer	jfit(NUMMAX)		!i:   Fit control params
 					!     (-1=fix;0=none;1=variable)
       real	xp2(SMAX)		!i/o: Star new X posns
       real	yp2(SMAX)		!i/o: Star new Y posns
@@ -3693,7 +3693,7 @@ Cbegin
 
       do k = 1, NST							!Fix stars not moving
          if ( jfit(3*(k-1)+3+3).ne.0 ) then
-            if ( abs(xp1(k)-xp2(k)).lt.0.002 .and. 
+            if ( abs(xp1(k)-xp2(k)).lt.0.002 .and.
      +           abs(yp1(k)-yp2(k)).lt.0.002 ) then
                if ( jfit(3*(k-1)+1+3).eq.1 ) jfit(3*(k-1)+1+3) = -1
                if ( jfit(3*(k-1)+2+3).eq.1 ) jfit(3*(k-1)+2+3) = -1
@@ -3719,7 +3719,7 @@ C   zero or below and those outside image.
 C
 C  a j penny                     stsci                   1987-03-01
 
-      subroutine me_looprem ( xp1, yp1, hp1, jfit, imuse, imuseb, 
+      subroutine me_looprem ( xp1, yp1, hp1, jfit, imuse, imuseb,
      +                        remed, map )
 
       implicit none
@@ -3728,7 +3728,7 @@ C  a j penny                     stsci                   1987-03-01
 
       real	imuse(LX,LY)		!i/o: Image array
       logical	imuseb(LX,LY)		!i:   Image array pixel use flags
-      integer	jfit(NUMMAX)		!i:   Fit control params 
+      integer	jfit(NUMMAX)		!i:   Fit control params
 					!     (-1=fix;0=none;1=variable)
       real	xp1(SMAX)		!i/o: Star X posns
       real	yp1(SMAX)		!i/o: Star Y posns
@@ -3745,7 +3745,7 @@ Cbegin
 
       remed = .false.							!Set default
 
-      do k = 1, NST							!If star too faint, remove 
+      do k = 1, NST							!If star too faint, remove
          if ( jfit(3*(k-1)+3+3).ne.0 ) then				! it from fit
             if ( hp1(k).lt.0.0000001 ) then
                if ( jfit(3*(k-1)+1+3).ne.0 ) remed = .true.
@@ -3822,7 +3822,7 @@ C  Add removed star height to target star and average the positions
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_PRINT1 --
 C
-      
+
       SUBROUTINE ME_PRINT1 ( IMUSE, IMUSEB, MAP )
 
       implicit none
@@ -3860,7 +3860,7 @@ CX      ACCEPT*,PRINTIT
          ENDDO
          WRITE ( 6, '('' '')' )
          WRITE ( 6, '(''Z1 I1 - X Y H xpor ypor'',5d)')
-     +           HPI(1), XPI(1), YPI(1), XPOR(1), YPOR(1) 
+     +           HPI(1), XPI(1), YPI(1), XPOR(1), YPOR(1)
       ENDIF
 
       END
@@ -3870,12 +3870,12 @@ CX      ACCEPT*,PRINTIT
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_PRINT2 --
 C
-      
+
       SUBROUTINE ME_PRINT2 ( a1, b1, c1, hp1, xp1, yp1 )
 
       implicit none
       include 'measure.inc'
-      
+
       real    a1, b1, c1
       real    hp1(SMAX)			! 1 height for stars
       real    xp1(SMAX)			! 1 X posn for stars
@@ -3911,13 +3911,13 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_PRINT3 --
 C
-      
-      SUBROUTINE ME_PRINT3 ( HP1, XP1, YP1, HP2, XP2,YP2, REMED, 
+
+      SUBROUTINE ME_PRINT3 ( HP1, XP1, YP1, HP2, XP2,YP2, REMED,
      +                 ENDLOOP, NLOOP, NGLOOP,A1,B1,C1,CHISQ1,DAMP )
 
       implicit none
       include 'measure.inc'
-      
+
       real    hp1(SMAX)			! 1 height for stars
       real    xp1(SMAX)			! 1 X posn for stars
       real    yp1(SMAX)			! 1 Y posn for stars
@@ -3941,10 +3941,10 @@ Cbegin
 
                IF ( PRINTIT.GT.0 ) THEN
                   IF(REMED)THEN
-                     WRITE ( 6, 
+                     WRITE ( 6,
      +                      '('' Z10A  NLOOP, NGLOOP,A1,B1,C1,LX,LY,'',
      +                      ''CHISQ1,DAMP'')')
-                     WRITE ( 6, 
+                     WRITE ( 6,
      +                     '(20X,'' '',2I4,3F8.3,2I3,F10.4,F9.4)' )
      +                   NLOOP, NGLOOP,A1,B1,C1,LX,LY,CHISQ1,DAMP
                      WRITE ( 6,  '(20x,''REMOVED STAR(S)'')')
@@ -3958,14 +3958,14 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ME_PRINT4 --
 C
-      
-      SUBROUTINE ME_PRINT4 (HP1,XP1,YP1,HP2,XP2,YP2,REMED,ENDLOOP, 
-     +                      NLOOP, 
+
+      SUBROUTINE ME_PRINT4 (HP1,XP1,YP1,HP2,XP2,YP2,REMED,ENDLOOP,
+     +                      NLOOP,
      +     NGLOOP,A1,B1,C1,A2,B2,C2,DCHI,CHISQ1,DAMP,CHISQ2,DH,LOOP )
 
       implicit none
       include 'measure.inc'
-      
+
       real    hp1(SMAX)			! 1 height for stars
       real    xp1(SMAX)			! 1 X posn for stars
       real    yp1(SMAX)			! 1 Y posn for stars
@@ -4076,7 +4076,7 @@ C    alan penny                ral              1989-08-14
 
       include 'measure.inc'
       include 'ST_IMAGE_INC'
-     
+
       real      imuse(LX*LY)		!i: input array to fit
       real	map(MX,MY,MZ) 		!i: profile map
       real      baseo         		!i: Default base
@@ -4105,7 +4105,7 @@ C    alan penny                ral              1989-08-14
 C--
 Cbegin
 
-      
+
       basej = 0.0
       jstar = 0
       call printo ( 'No parallel processing available' )
@@ -4166,7 +4166,7 @@ C ME_SETUP     Set up defaults
 C ME_GCL       Get input/out measures
 C ME_OPWORK    Open work space
 C ME_OPWORK1   Open work space for fitting
-C ME_ARRSET    Descale for BS BZ 
+C ME_ARRSET    Descale for BS BZ
 C ME_OLOAD     Load output list with present values
 C ME_CHBEFORE  Check to see if an input list is the output of MEASURE
 C ME_OPDISP    Open display
@@ -4241,12 +4241,12 @@ Cbegin
 
       if ( INFORM.gt.0 ) call printo ( 'Setting up fitting' )		!Let users know progress
 
-      call achtsr ( %val(IPMAP), %val(IPRMAP), MX*MY*MZ )		!Profile map to work area. 
+      call achtsr ( %val(IPMAP), %val(IPRMAP), MX*MY*MZ )		!Profile map to work area.
       call arrsc  (  %val(IPRMAP), MX, MY*MZ, PBS, PBZ )
 
       call me_rload ( %val(IPTBA), TBXVA, TBYA, %val(IPRES), KHEAD, 0 )	!Clear work  array; Load
       if ( ST_FAILED ) return						! posns, heights, etc
-      
+
       if ( EXTRA ) call me_rload ( %val(IPTBE), TBXVE, TBYE, 		!Do same for any 2nd file
      +                             %val(IPRES), KHEADE, TBYA )
       if ( ST_FAILED ) return
@@ -4257,16 +4257,16 @@ Cbegin
       call me_cpbefore ( %val(IPTBB), %val(IPRES) )			!Load any before list,
       if ( ST_FAILED ) return						! for valid values
 
-      call me_inbox ( %val(IPRES), %val(IPDOM) )			!Calc boxes round stars, 
+      call me_inbox ( %val(IPRES), %val(IPDOM) )			!Calc boxes round stars,
       if ( ST_FAILED ) return						! see what stars have
 									!  boxes in image
 
-      call me_opwork1 ( %val(IPRES) )					!Open fitting work space 
+      call me_opwork1 ( %val(IPRES) )					!Open fitting work space
       if ( ST_FAILED ) return
 
       if ( INFORM.gt.1 ) call xxtime ( 'Started DOVOL' )
 
-      call me_dovol ( %val(IPRES), %val(IPDOM) )			!Calc the profile volumes 
+      call me_dovol ( %val(IPRES), %val(IPDOM) )			!Calc the profile volumes
       if ( ST_FAILED ) return
 
 
@@ -4281,10 +4281,10 @@ Cbegin
 
       if ( INFORM.gt.1 ) call xxtime ( 'Started CHEXTRA' )
 
-      call me_chextra ( %val(IPRES) )					!Check effect extra stars 
+      call me_chextra ( %val(IPRES) )					!Check effect extra stars
       if ( ST_FAILED ) return						!(if any) on premeasures
 
-      call coprr ( %val(IPRES), TBX, TBY, 21, 21, 1, TBY,	 	!Note 1st loop no of 
+      call coprr ( %val(IPRES), TBX, TBY, 21, 21, 1, TBY,	 	!Note 1st loop no of
      +             %val(IPINAE), 3, TBY, 3, 1 )				! companion stars
       if ( ST_FAILED ) return
 
@@ -4344,29 +4344,29 @@ C--
 Cbegin
 
 
-      if ( ST_FAILED ) return						!Failure check 
+      if ( ST_FAILED ) return						!Failure check
 
       if ( DODISP .or. CLSTORE .or. REDOCL .or. TWOS ) then		!Load cleaning image
          call amovr ( %val(IPIMA), %val(IPCLEAN), NX*NY )
       endif
 
-      kdo = 1								!Do the stars once or twice 
+      kdo = 1								!Do the stars once or twice
       if ( RECYCLE ) kdo = 2						! in cycle
       do LOOPNUM = 1, kdo
 
-         if ( LOOPNUM.eq.2 ) then					!If 2nd loop, recalc 
+         if ( LOOPNUM.eq.2 ) then					!If 2nd loop, recalc
             call me_eheight ( %val(IPIMA),  %val(IPRES) )		! importance of neighbours
             call me_rheight ( %val(IPRES) )				! and new measure order
             call me_sulist  ( %val(IPRES) )
             call me_sortl   ( %val(IPRES), %val(IPHA), %val(IPHB) )
             call me_nonecl  ( %val(IPRES) )				! Flag none as cleaned
          endif
- 
+
          if ( LOOPNUM.eq.2 ) then					!Re-load input image
             if ( DODISP .or. CLSTORE .or. REDOCL .or. TWOS ) then
                call amovr ( %val(IPIMA), %val(IPCLEAN), NX*NY )
             endif
-            if ( DODISP ) call me_idisp ( %val(IPCLEAN), NX, NY, 
+            if ( DODISP ) call me_idisp ( %val(IPCLEAN), NX, NY,
      +                                    1, NX, 1, NY )
          endif
 
@@ -4381,8 +4381,8 @@ Cbegin
             call me_mags ( %val(IPCLEAN), %val(IPRES), %val(IPINAE) )
          endif
 
-         if ( TWOS ) then						!Do undone pairs on the 
-            NUMOP = 3							! cleaned image, cleaning 
+         if ( TWOS ) then						!Do undone pairs on the
+            NUMOP = 3							! cleaned image, cleaning
             call me_twos ( %val(IPRES), %val(IPINAE), %val(IPKREM) )	! any done
          endif
 
@@ -4408,18 +4408,18 @@ Cbegin
 
 
       NX = 1 								!Default array sizes
-      NY = 1 
-      TBXVA = 1 
-      TBYA = 1 
-      TBXVB = 1 
-      TBYB = 1 
-      TBXVE = 1 
-      TBYE = 1 
+      NY = 1
+      TBXVA = 1
+      TBYA = 1
+      TBXVB = 1
+      TBYB = 1
+      TBXVE = 1
+      TBYE = 1
       TBY = 1
-      MX = 1 
-      MY = 1 
+      MX = 1
+      MY = 1
       MZ = 1
- 
+
       IPTBA = 1								!Fake pointers
       IPTBB = 1								! for failure
       IPTBE = 1
@@ -4494,7 +4494,7 @@ Cbegin
       MAPNUMK = 1
       imap = istat
 
-      call optabr ( 'EXTRA', IPTBE, TBXVE, TBYE, .true., istat )	!Input an extra star list. 
+      call optabr ( 'EXTRA', IPTBE, TBXVE, TBYE, .true., istat )	!Input an extra star list.
       if ( ST_FAILED ) return						! If none, open fake one
       if ( istat.eq.2 ) then
          EXTRA = .false.
@@ -4509,7 +4509,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       TBY = TBYA							!Calc total no of stars
-      if ( EXTRA ) TBY = TBYA + TBYE 
+      if ( EXTRA ) TBY = TBYA + TBYE
 
       XCOEFFS(1) = 0.0
       XCOEFFS(2) = 1.0
@@ -4517,9 +4517,9 @@ Cbegin
       YCOEFFS(1) = 0.0
       YCOEFFS(2) = 0.0
       YCOEFFS(3) = 1.0
-      call get3r ( 'XCOEFF', XCOEFFS(1), XCOEFFS(2), XCOEFFS(3), 
+      call get3r ( 'XCOEFF', XCOEFFS(1), XCOEFFS(2), XCOEFFS(3),
      +             .true., -1.0e20, 1.0e20 )
-      call get3r ( 'YCOEFF', YCOEFFS(1), YCOEFFS(2), YCOEFFS(3), 
+      call get3r ( 'YCOEFF', YCOEFFS(1), YCOEFFS(2), YCOEFFS(3),
      +             .true., -1.0e20, 1.0e20 )
 
       call optabw ( 'OUT', IPTBOUT, TBXVO, TBY, .false., istat )	!Open output results file
@@ -4530,7 +4530,7 @@ Cbegin
       call get1c ( 'OUTTIT', STITLE, text, .true. )
       if ( ST_FAILED ) return
 
-      call opimzw ( 'OUTIM', IMTYPE, IPIMCL, NX, NY, .true., istat )	!Get if to store star 
+      call opimzw ( 'OUTIM', IMTYPE, IPIMCL, NX, NY, .true., istat )	!Get if to store star
       if ( istat.eq.1 ) ST_FAILED = .true.				! subtracted image. If
       if ( ST_FAILED ) return  						! so open its output
 									! file and copy headers
@@ -4553,13 +4553,13 @@ Cbegin
          call ptdesr ( 'OUTIM', 'BZERO', BZ )
       endif
 
-      call optabr ( 'BEFORE', IPTBB, TBXVB, TBYB, .true., istat )	!Bring in any previous 
+      call optabr ( 'BEFORE', IPTBB, TBXVB, TBYB, .true., istat )	!Bring in any previous
       if ( ST_FAILED ) return
       if ( istat.eq.2 ) then						! measures
          BEFORE = .false.
          IPTBB = IPTBA
       else if ( istat.eq.0 ) then
-         call me_chbefore 
+         call me_chbefore
          if ( .not.BEFORE ) ST_FAILED = .true.
       else
          ST_FAILED = .true.
@@ -4575,7 +4575,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       flag = .false.							!Get if calc trial heights
-      if ( KHEAD(3).ne.0 ) flag = .true.				! or to take them from 
+      if ( KHEAD(3).ne.0 ) flag = .true.				! or to take them from
       if ( EXTRA ) then							! input file
          if ( KHEADE(3).ne.0 ) flag = .true.
       endif
@@ -4589,7 +4589,7 @@ Cbegin
       call get1b ( 'REDOCL', REDOCL, .true. )				!redo cleaned image?
       if ( ST_FAILED ) return
 
-      call get1b ( 'DOTWOS', TWOS, .true. )				!put star at centre of 
+      call get1b ( 'DOTWOS', TWOS, .true. )				!put star at centre of
       if ( ST_FAILED ) return						! close undone doubles?
 
       call get1b ( 'RECYCLE', RECYCLE, .true. )				!recycle at end, retry
@@ -4601,7 +4601,7 @@ Cbegin
       if ( RECYCLE ) call get1b ( 'OFIX2', OUTFIX(2), .true. )
       if ( ST_FAILED ) return
 
-      call get1r ( 'RADIUS', RADIUS, 30.0, 1.0, 1.0e8 )			!Get radius to integrate 
+      call get1r ( 'RADIUS', RADIUS, 30.0, 1.0, 1.0e8 )			!Get radius to integrate
       if ( ST_FAILED ) return						! out to for VOL
       call ptdesr ( 'OUT', 'RADIUS', RADIUS )
 
@@ -4616,7 +4616,7 @@ Cbegin
       call get1b ( 'FIX', POSNFIX, .false. )				!Get if to fix posns
       if ( ST_FAILED ) return
 
-      call get1r ( 'GAIN',  ZGAIN,  1.0, 1.0e-8, 1.0e8 )		!Get poisson values of 
+      call get1r ( 'GAIN',  ZGAIN,  1.0, 1.0e-8, 1.0e8 )		!Get poisson values of
       call get1r ( 'NOISE', ZNOISE, 0.0, -1.0e8, 1.0e8 )		! input image
       if ( ST_FAILED ) return
 
@@ -4697,17 +4697,17 @@ C--
 Cbegin
 
 
-      if ( ST_FAILED ) return						!Failure check 
-     	
-      MAXAREA = 1							!Max box area      
+      if ( ST_FAILED ) return						!Failure check
+
+      MAXAREA = 1							!Max box area
       if ( LXSIZE.ne.0 .and. LYSIZE.ne.0 ) then
-         MAXAREA = LXSIZE*LYSIZE 
+         MAXAREA = LXSIZE*LYSIZE
       else
          do k = 1, TBY
             ksize = nint(res(29,k))*nint(res(30,k))
-            MAXAREA = max(MAXAREA,ksize)   
+            MAXAREA = max(MAXAREA,ksize)
          enddo
-      endif 
+      endif
 
       call gtwrkr ( 'EAREA', MAXAREA, IPRWORK, istat )			!Open work
       if ( istat.ne.0 ) ST_FAILED = .true.
@@ -4723,7 +4723,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ME_ARRSET -- Descale for BS BZ 
+C ME_ARRSET -- Descale for BS BZ
 C
 C   a j penny                 dao           1988-04-25
 
@@ -4767,27 +4767,27 @@ C--
 Cbegin
 
 
-      if ( ST_FAILED ) return						!Failure check 
+      if ( ST_FAILED ) return						!Failure check
 
-      call azeror ( %val(IPTBOUT), TBXVO*TBY )				!Load output stars file 
+      call azeror ( %val(IPTBOUT), TBXVO*TBY )				!Load output stars file
 									! list starting contents
 
       call coprr ( %val(IPTBA), TBXVA, TBYA, 1, 5, 1, TBYA,		!Copy identifiers to output
      +             %val(IPTBOUT), TBXVO, TBY, 1, 1 )
       if ( EXTRA ) call coprr ( %val(IPTBE), TBXVE, TBYE, 1, 5, 1, TBYE,
      +                          %val(IPTBOUT), TBXVO, TBY, 1, (TBYA+1) )
-      call me_xytrana ( %val(IPTBA), TBXVA, TBYA, 
+      call me_xytrana ( %val(IPTBA), TBXVA, TBYA,
      +                  %val(IPTBOUT), TBXVO, TBY, 0 )
-      if ( EXTRA ) call me_xytrana ( %val(IPTBE), TBXVE, TBYE, 
+      if ( EXTRA ) call me_xytrana ( %val(IPTBE), TBXVE, TBYE,
      +                               %val(IPTBOUT), TBXVO, TBY, TBYA )
-	
-      call tcopdes ( 'INSTARS', 'OUT' , istat )				!Copy file descriptors 
+
+      call tcopdes ( 'INSTARS', 'OUT' , istat )				!Copy file descriptors
       call ptdesc ( 'OUT', 'TITLE', STITLE )				! to output. Load other headers
       do k = 1, TBX
          call pthead ( 'OUT', k, HEADER(k), istat )
       enddo
 
-      call coprr ( %val(IPRES), TBX, TBY, 1, TBX, 1, TBY,		!Load output list with 
+      call coprr ( %val(IPRES), TBX, TBY, 1, TBX, 1, TBY,		!Load output list with
      +             %val(IPTBOUT), TBXVO, TBY, 6, 1 )			! present reduction state
 
 
@@ -4813,7 +4813,7 @@ Cbegin
       BEFORE = .true.							!Set up default flag
 
       if ( TBXVB.ne.(TBX+5) .or. TBYA.ne.TBYB ) then
-         call printo ( 
+         call printo (
      +      'ERROR: Before table must be same size as Input table')
          BEFORE = .false.
          return
@@ -4872,7 +4872,7 @@ Cbegin
 
       text = IMTITLE
       if ( text.eq.' ' ) text = 'MEASURE progress on image'
-      call ds_init ( text, 0, ierr )					!Open display 
+      call ds_init ( text, 0, ierr )					!Open display
       if ( ierr.ne.0 ) return
       call ds_pttit ( text )
 
@@ -4908,7 +4908,7 @@ Cbegin
 
       kxs = 1 + (nxs-1)/DSCOMFX
       kys = 1 + (nys-1)/DSCOMFY
-      call ds_acim ( im, nx, ny, 'REAL', nxs, nxe, nys, nye, 
+      call ds_acim ( im, nx, ny, 'REAL', nxs, nxe, nys, nye,
      +               kxs, kys, .false.)
 
 

@@ -14,35 +14,35 @@
 *     CALL KPG1_GTPLR( PARAM, IWCS, NULL, POLE, PAORIG, CC, BC, STATUS )
 
 *  Description:
-*     This routine obtains a two-dimensional spatial position from the 
-*     environment, using a specified parameter.  The user supplies the 
+*     This routine obtains a two-dimensional spatial position from the
+*     environment, using a specified parameter.  The user supplies the
 *     position in polar co-ordinates about a supplied centre within the
-*     co-ordinate system of the Current Frame in the supplied WCS 
+*     co-ordinate system of the Current Frame in the supplied WCS
 *     FrameSet.  This FrameSet must have two axes, otherwise the routine
 *     will exit with an error.
 
 *     To be acceptable, the supplied position must correspond to a valid
 *     position (on both axes) in the Base Frame of the supplied FrameSet.
-*     If a Frame is supplied instead of a FrameSet this restriction is 
+*     If a Frame is supplied instead of a FrameSet this restriction is
 *     not imposed, however polar co-ordinates cannot be supplied,
 *     only regular co-ordinates along both axes.
 *
-*     If the polar position supplied in argument CC on entry is valid 
+*     If the polar position supplied in argument CC on entry is valid
 *     (i.e. does not contain any AST__BAD values), then it is used as a
 *     dynamic default for the parameter.  Otherwise, no dynamic default
 *     is used.
 *
 *     The parameter is accessed as a single literal string containing a
-*     space- or comma-separated list of radius and position-angle 
+*     space- or comma-separated list of radius and position-angle
 *     values.  For SkyFrames the position angle is measured in degrees
-*     from North via East; for other Frames, it is anticlockwise from 
-*     the origin defined by argument PAORIG.  The allowed formats for 
+*     from North via East; for other Frames, it is anticlockwise from
+*     the origin defined by argument PAORIG.  The allowed formats for
 *     the co-ordinates depends on the class of the Current Frame in the
 *     supplied FrameSet, and are described in SUN/210.
 *
-*     If the string supplied for the parameter consists of a single 
-*     colon, then a description of the Current co-ordinate Frame is 
-*     displayed, together with an indication of the format required for 
+*     If the string supplied for the parameter consists of a single
+*     colon, then a description of the Current co-ordinate Frame is
+*     displayed, together with an indication of the format required for
 *     each axis value, and a new parameter value is then obtained.
 
 *  Arguments:
@@ -57,30 +57,30 @@
 *     NULL = LOGICAL (Given)
 *        If TRUE, a null (!) parameter value will result in the dynamic
 *        default value being used. If FALSE (or if there is no dynamic
-*        default), a null parameter value will result in a PAR__NULL 
+*        default), a null parameter value will result in a PAR__NULL
 *        error status.
 *     PAORIG = DOUBLE PRECISION (Given)
 *        This applies when the current Frame is not a SkyFrame.  It
-*        specifies the origin for the position angle in degrees from 
+*        specifies the origin for the position angle in degrees from
 *        the the first WCS axis.  The normal convention is for this to
-*        be zero (i.e. from X in a Cartesian co-ordinate system) but 
+*        be zero (i.e. from X in a Cartesian co-ordinate system) but
 *        another may be 90 for starting from up or Y.
 *     POLE( 2 )  = DOUBLE PRECISION (Given)
 *        The position of the pole of the polar co-ordinates measured
-*        in the current co-ordinate Frame along each axis.  If any of 
+*        in the current co-ordinate Frame along each axis.  If any of
 *        the co-ordinates are bad, the routine will issue a warning that
 *        it is unable to handle polar co-ordinates and will expect two
 *        spatial positions like routine KPG1_GTPOS.  This can be aborted
 *        (!!) at the parameter prompt.
 *     CC( 2 ) = DOUBLE PRECISION (Given and Returned)
-*        On entry, holds the position to use as the dynamic default for 
-*        the parameter, in the Current Frame of the supplied FrameSet 
-*        (or Frame).  On exit, it holds the supplied position in the 
+*        On entry, holds the position to use as the dynamic default for
+*        the parameter, in the Current Frame of the supplied FrameSet
+*        (or Frame).  On exit, it holds the supplied position in the
 *        Current Frame.  There should be one element for both axes.
 *     BC( 2 ) = DOUBLE PRECISION (Returned)
 *        Returned holding the Base Frame position corresponding to the
-*        supplied Current Frame position.  If a Frame is supplied for 
-*        IWCS instead of a FrameSet, then BC will not be accessed.  The 
+*        supplied Current Frame position.  If a Frame is supplied for
+*        IWCS instead of a FrameSet, then BC will not be accessed.  The
 *        returned values will be good on both axes.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -91,7 +91,7 @@
 *     error occurs during this routine.
 
 *  Copyright:
-*     Copyright (C) 1998, 1999, 2000 Central Laboratory of the Research 
+*     Copyright (C) 1998, 1999, 2000 Central Laboratory of the Research
 *     Councils
 *     Copyright (c) 2007 Science and Technology Facilities Council
 *     All Rights Reserved.
@@ -101,12 +101,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -121,7 +121,7 @@
 *     2007 June 1 (MJC):
 *        Original version based upon DSB's KPG1_GTPOS.
 *     2007 June 12 (MJC):
-*        Fixed incomplete coding for SkyFrame-to-polar mapping, in 
+*        Fixed incomplete coding for SkyFrame-to-polar mapping, in
 *        particular transform radius to 90-latitude and ensure longitude
 *        is measured in degrees North via East.
 *     {enter_further_changes_here}
@@ -130,7 +130,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -173,7 +173,7 @@
 
       DOUBLE PRECISION TWOPI
       PARAMETER ( TWOPI = 2.0D0 * PI )
-                                    
+
 *  Local Variables:
       CHARACTER*12 ATT           ! AST attribute name
       INTEGER BASFRM             ! Pointer to the Base Frame
@@ -230,8 +230,8 @@
 *  See if a FrameSet has been supplied.
       GOTFS = AST_ISAFRAMESET( IWCS, STATUS )
 
-*  If so, get a pointer to the Current and Base Frames, and get the 
-*  number of axes in the Base Frame.  Also get a simplified Mapping for 
+*  If so, get a pointer to the Current and Base Frames, and get the
+*  number of axes in the Base Frame.  Also get a simplified Mapping for
 *  the FrameSet.
       IF ( GOTFS ) THEN
          CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
@@ -309,7 +309,7 @@
 
 *  Define mappings from Sky to user-supplied co-ordinates.
 *  =======================================================
-         ELSE 
+         ELSE
             IF ( ISSKY ) THEN
 
 *  Switch the North pole to its new co-ordinates.
@@ -346,7 +346,7 @@
                IAT = 6
                CALL CHR_PUTD( TWOPI, INVEXP( 2 ), IAT )
                CALL CHR_APPND( ' - THETA', INVEXP( 2 ), IAT )
-                  
+
                IF ( SWITCH ) THEN
                   BUFFER = INVEXP( 1 )
                   INVEXP( 1 ) = INVEXP( 2 )
@@ -381,7 +381,7 @@
 
                IAT = 0
                FOREXP( 2 ) = ' '
-               CALL CHR_APPND( 'THETA = MOD( ATAN2D( Y - (', 
+               CALL CHR_APPND( 'THETA = MOD( ATAN2D( Y - (',
      :                         FOREXP( 2 ), IAT )
                CALL CHR_PUTD( POLE( 2 ), FOREXP( 2 ), IAT )
                CALL CHR_APPND( '),  X - (', FOREXP( 2 ), IAT )
@@ -394,7 +394,7 @@
 *  ---------------
                IAT = 0
                INVEXP( 1 ) = ' '
-               CALL CHR_APPND( 'X = R * COSD( THETA + (', INVEXP( 1 ), 
+               CALL CHR_APPND( 'X = R * COSD( THETA + (', INVEXP( 1 ),
      :                         IAT )
                CALL CHR_PUTD( PAORIG, INVEXP( 1 ), IAT )
                CALL CHR_APPND( ') ) + (', INVEXP( 1 ), IAT )
@@ -415,7 +415,7 @@
 *  =====================================================
 
 *  For a transformed SkyFrame, the expected co-ordinates are still as
-*  before, Lat,Long.  So a radius from the pole will be latitude 
+*  before, Lat,Long.  So a radius from the pole will be latitude
 *  90-radius, and the angle must be in longitude hours.  For most cases
 *  this means a flip of the axis order.
 
@@ -433,11 +433,11 @@
      :                     STATUS )
             CALL AST_SETC( POLFRM, 'LABEL(1)', 'Radius offset', STATUS )
             IF ( ISSKY ) THEN
-               CALL AST_SETC( POLFRM, 'LABEL(2)', 
+               CALL AST_SETC( POLFRM, 'LABEL(2)',
      :                        'Position angle (North through East)',
      :                        STATUS )
             ELSE
-               CALL AST_SETC( POLFRM, 'LABEL(2)', 
+               CALL AST_SETC( POLFRM, 'LABEL(2)',
      :                        'Position angle (from Y anticlockwise)',
      :                        STATUS )
             END IF
@@ -473,7 +473,7 @@
 *  =============================
 
 *  See if a good position has been supplied in CC.  At the same time,
-*  save the axis labels and symbols for use in messages.  Also, form a 
+*  save the axis labels and symbols for use in messages.  Also, form a
 *  comma-separated list of the format strings for each axis.
       GOOD = .TRUE.
 
@@ -504,7 +504,7 @@
          IAT = 7
          CALL CHR_PUTI( I, ATT, IAT )
          CALL CHR_APPND( ')', ATT, IAT )
-         CALL CHR_APPND( AST_GETC( CURFRM, ATT( : IAT ), STATUS ), FMT, 
+         CALL CHR_APPND( AST_GETC( CURFRM, ATT( : IAT ), STATUS ), FMT,
      :                   FIAT )
 
       END DO
@@ -532,7 +532,7 @@
 *  Clear the Digits value.
          CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
 
-*  Otherwise, use PAR_UNSET to ensure any previous dynamic default is 
+*  Otherwise, use PAR_UNSET to ensure any previous dynamic default is
 *  cancelled.
       ELSE
          CALL PAR_UNSET( PARAM, 'DEFAULT', STATUS )
@@ -542,21 +542,21 @@
 *  Obtain and validate user-supplied polar co-ordinates.
 *  =====================================================
 
-*  Loop until a valid position has been obtained from the user, or an 
+*  Loop until a valid position has been obtained from the user, or an
 *  error occurs.
       LOOP = .TRUE.
-      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )       
+      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, POS, STATUS )
 
 *  If a null parameter value has been given, annul the error and return
-*  the dynamic default if there is a dynamic default, and if NULL is 
+*  the dynamic default if there is a dynamic default, and if NULL is
 *  TRUE.
          IF ( STATUS .EQ. PAR__NULL .AND. GOOD .AND. NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             POS = DPOS
-         END IF            
+         END IF
 
 *  Get the indices of the first and last non-blank characters.
          CALL CHR_FANDL( POS, F, L )
@@ -568,7 +568,7 @@
             CALL ERR_REP( 'KPG1_GTPLR_1', 'Blank value supplied for '//
      :                    'parameter %^PAR.', STATUS )
 
-*  Otherwise, if the supplied string is just a colon, display a 
+*  Otherwise, if the supplied string is just a colon, display a
 *  description of the Current Frame, and the default format.
          ELSE IF ( POS( F : L ) .EQ. ':' .AND.
      :             STATUS .EQ. SAI__OK ) THEN
@@ -592,11 +592,11 @@
             LOOP = .FALSE.
             GOOD = .TRUE.
 
-*  If we have a FrameSet, get the base Frame position corresponding to 
+*  If we have a FrameSet, get the base Frame position corresponding to
 *  the default position.
             IF ( GOTFS ) THEN
                CALL AST_TRANN( MAP, 1, NCAXES, 1, CC, .FALSE., NBAXES,
-     :                         1, BC, STATUS ) 
+     :                         1, BC, STATUS )
 
 *  See if this gave a good Base Frame position.
                DO I = 1, NBAXES
@@ -612,7 +612,7 @@
                   CALL MSG_SETC( 'POS', POS( F: L ) )
                   CALL ERR_REP( 'KPG1_GTPLR_7A', 'The default '//
      :                          'position was accepted for parameter '//
-     :                          '%^PAR (''^POS'') but cannot be used!', 
+     :                          '%^PAR (''^POS'') but cannot be used!',
      :                          STATUS )
                END IF
 
@@ -635,12 +635,12 @@
             I = 0
             DO WHILE( I .LT. NCAXES .AND. STATUS .EQ. SAI__OK )
 
-*  Find the start of the next but one axis value (if there is more than 
+*  Find the start of the next but one axis value (if there is more than
 *  one axis value remaining in the string).
                IEND = IPOS
-               CALL CHR_TOCHR( ' ', POS, .TRUE., IEND ) 
-               IF ( IEND .LT. L ) CALL CHR_SKCHR( ' ', POS, .TRUE., 
-     :                                            IEND ) 
+               CALL CHR_TOCHR( ' ', POS, .TRUE., IEND )
+               IF ( IEND .LT. L ) CALL CHR_SKCHR( ' ', POS, .TRUE.,
+     :                                            IEND )
 
 *  Set the index of the last character to be read by AST_UNFORMAT.  This
 *  is done since AST_UNFORMAT may allow spaces within axis values, but
@@ -650,11 +650,11 @@
 *  Read the value for the next axis.  NC is the number of characters
 *  read by AST_UNFORMAT including trailing spaces.
                I = I + 1
-               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), 
+               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ),
      :                            CC( I ), STATUS )
 
-*  Get the last character read by AST_UNFORMAT.  If there are no 
-*  characters left, pretend the last character read was a space (i.e. 
+*  Get the last character read by AST_UNFORMAT.  If there are no
+*  characters left, pretend the last character read was a space (i.e.
 *  an axis delimiter).
                IPOS = IPOS + NC - 1
                IF ( IPOS .LT. L ) THEN
@@ -663,16 +663,16 @@
                   NEXT = ' '
                END IF
 
-*  Increment IPOS to skip the space.  It now points to the first 
+*  Increment IPOS to skip the space.  It now points to the first
 *  character in the next axis value, or to the first character following
-*  the last non-blank character (L) if no axis values are left in the 
+*  the last non-blank character (L) if no axis values are left in the
 *  string.
                IPOS = IPOS + 1
 
 *  If the supplied string was invalid, report an error.  This is the
 *  case if no characters were read form the string, or if the next
 *  character is not a space.
-               IF ( ( NC .EQ. 0 .OR. NEXT .NE. ' ' ) .AND. 
+               IF ( ( NC .EQ. 0 .OR. NEXT .NE. ' ' ) .AND.
      :              STATUS .EQ. SAI__OK ) THEN
                   LOOP = .TRUE.
                   STATUS = SAI__ERROR
@@ -708,7 +708,7 @@
                   IF ( LAB( I + 1 )( : 5 ) .NE. 'axis ' ) THEN
                      CALL ERR_REP( 'KPG1_GTPLR_4', 'No ^LAB value '//
      :                             '(axis ^I) supplied using '//
-     :                             'parameter %^PAR - ''^POS''.', 
+     :                             'parameter %^PAR - ''^POS''.',
      :                             STATUS )
                   ELSE
                      CALL ERR_REP( 'KPG1_GTPLR_5', 'No ^LAB value '//
@@ -720,7 +720,7 @@
 
             END DO
 
-*  If there were any unused characters at the end of the supplied 
+*  If there were any unused characters at the end of the supplied
 *  string, report an error.
             IF ( IPOS .LE. L .AND. STATUS .EQ. SAI__OK ) THEN
                LOOP = .TRUE.
@@ -749,8 +749,8 @@
             IF ( GOTFS ) THEN
 
 *  Convert the supplied position into the Base Frame
-               CALL AST_TRANN( BPMAP, 1, NCAXES, 1, CC, .FALSE., 
-     :                         NBAXES, 1, BC, STATUS ) 
+               CALL AST_TRANN( BPMAP, 1, NCAXES, 1, CC, .FALSE.,
+     :                         NBAXES, 1, BC, STATUS )
 
 *  See if this gave a good Base Frame position.
                GOOD = .TRUE.
@@ -775,7 +775,7 @@
          END IF
 
 *  Do not loop if an error occurred within an infrastructure library
-*  (except for errors reported by AST_UNFORMAT indicating bad text 
+*  (except for errors reported by AST_UNFORMAT indicating bad text
 *  supplied by the user).
          IF ( STATUS .NE. SAI__OK .AND.
      :        STATUS .NE. SAI__ERROR .AND.
@@ -791,7 +791,7 @@
             CALL MSG_SETC( 'DOM', DOM )
             CALL MSG_SETC( 'PAR', PARAM )
             CALL MSG_OUT( 'KPG1_GTPLR_M4', 'Please supply a new ^DOM '//
-     :                    'Domain position for parameter %^PAR.', 
+     :                    'Domain position for parameter %^PAR.',
      :                    STATUS )
 
 *  Cancel the parameter value.
@@ -817,7 +817,7 @@
 *  The Cartesian-polar mapping has all we need.
          ELSE
             CALL AST_TRANN( CPMAP, 1, NCAXES, 1, CC, .FALSE., NCAXES,
-     :                      1, PC, STATUS ) 
+     :                      1, PC, STATUS )
 
             DO I = 1, NCAXES
                CC( I ) = PC( I )
@@ -837,7 +837,7 @@
             CC( I ) = AST__BAD
          END DO
 
-         IF ( GOTFS ) THEN    
+         IF ( GOTFS ) THEN
             DO I =1, NBAXES
                BC( I ) = AST__BAD
             END DO

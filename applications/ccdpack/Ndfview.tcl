@@ -8,8 +8,8 @@
 #
 #     Description.
 #     This class provides a mega-widget which is capable of displaying
-#     an image, zooming it, changing the colour maps etc. and also 
-#     allowing the user to indicate a list of points which can be 
+#     an image, zooming it, changing the colour maps etc. and also
+#     allowing the user to indicate a list of points which can be
 #     marked and retrieved by the caller.
 
 #  Language:
@@ -25,7 +25,7 @@
 #        image, update the display with respect to user actions, etc.
 #        Prior to this call, the visual state of the object will
 #        probably be inconsistent with the configuration options which
-#        have been passed to it.  This method should normally be called 
+#        have been passed to it.  This method should normally be called
 #        only after an NDF has been loaded in using loadndf.
 #
 #     addpoint vx vy ?ipoint?
@@ -62,10 +62,10 @@
 
 #  Public Variables (Configuration Options):
 #     centroiding = boolean
-#        If true, then when the user clicks on the image to add a new 
-#        point, a point will be added at the nearest centroided 
+#        If true, then when the user clicks on the image to add a new
+#        point, a point will be added at the nearest centroided
 #        position (in the event of no centroid being found, a beep
-#        will be beeped and no point will be added).  If false, the 
+#        will be beeped and no point will be added).  If false, the
 #        coordinates indicated by the pointer will be used raw.
 #
 #     info = string
@@ -128,8 +128,8 @@
 #     5-APR-2001 (MBT):
 #        Upgraded for use with Sets.
 #     19-JUL-2001 (MBT):
-#        Added centroiding, moved position marking methods into this 
-#        widget from Gwmview (this widget gets a Markercontrol to do 
+#        Added centroiding, moved position marking methods into this
+#        widget from Gwmview (this widget gets a Markercontrol to do
 #        the work).  Also fixed a troublesome half-pixel alignment bug.
 #     {enter_further_changes_here}
 
@@ -191,7 +191,7 @@
             -view2canvcmd [ code $this view2canv ] \
             -value "" \
             -valuevar markstyle
-      } 
+      }
       itk_component add abort {
          buttoncontrol $panel.abort \
             -text "Abort" \
@@ -233,7 +233,7 @@
       itk_component add row2 { frame [ panel ].row2 }
       set row1 $itk_component(row1)
       set row2 $itk_component(row2)
-      lower $row1 
+      lower $row1
       lower $row2
       pack $row1 $row2 -side top -expand 1 -fill both
       foreach grp { zoom cutoff markers } {
@@ -261,10 +261,10 @@
       public method addpoint { vx vy { ipoint "" } } {
 #-----------------------------------------------------------------------
 
-#  Invoke addpoint method of the marker control widget to add the point 
+#  Invoke addpoint method of the marker control widget to add the point
 #  to the list and draw it.
          set ipoint [ $marklist addpoint $vx $vy $ipoint ]
-      
+
 #  Add a binding to remove the point from the canvas.
          set tag [ $marklist gettag $ipoint ]
          $canvas bind $tag <Button-3> [ code $marklist removepoint $ipoint ]
@@ -319,7 +319,7 @@
          set fullname [ $ndfset name ]
          regsub {.*[./]} $fullname {} shortname
 
-#  Write info substitution variables and image bounds.  We take the 
+#  Write info substitution variables and image bounds.  We take the
 #  opportunity here to verify that all NDFs are two-dimensional.
          set infodata(N) $fullname
          set infodata(n) $shortname
@@ -382,7 +382,7 @@
          set ycanv [ winfo height $canvwin ]
 
 #  If the displayed size is smaller than the size of the scrolledcanvas
-#  widget (but not necessarily than the canvas itself), enlarge it 
+#  widget (but not necessarily than the canvas itself), enlarge it
 #  until it takes up the available space.
          set enlarge 0
          while { 1 } {
@@ -408,7 +408,7 @@
             if { $maxcanv > 0 && [ max $xsize $ysize ] > $maxcanv } {
                incr shrink -1
                if { [ zoominc $zoom $shrink ] >= $z } { break }
-            } else { 
+            } else {
                break
             }
          }

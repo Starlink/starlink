@@ -7,9 +7,9 @@
 
 *  Purpose:
 *     The routine allows the user to input most of the information required
-*     (position, background value etc) for the galaxy profile to be 
-*     performed/displayed and then calls other routines as necessary. 
-* 
+*     (position, background value etc) for the galaxy profile to be
+*     performed/displayed and then calls other routines as necessary.
+*
 *     Information such as pixel size, background count value and its
 *     standard deviation are also input.
 *
@@ -21,20 +21,20 @@
 *  Invocation:
 *     CALL ELF1_KMODE(STATUS)
 
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Description: 
+*  Description:
 *     Profiling is continued until the mean profile value is less than
-*     a user defined number of standard deviation above sky (LIM2) or 
+*     a user defined number of standard deviation above sky (LIM2) or
 *     until the mean profile value increases by a user defined amount
-*     compared to the previous profile (LIM1). The difference between the 
-*     sizes of profile semi-major axis values is controlled using the 
+*     compared to the previous profile (LIM1). The difference between the
+*     sizes of profile semi-major axis values is controlled using the
 *     FINE parameter.
 *
-*     The initial estimate of the galaxy position may be improved by 
-*     selecting the AUTOL option which performs a weighted maximum 
+*     The initial estimate of the galaxy position may be improved by
+*     selecting the AUTOL option which performs a weighted maximum
 *     analysis of the image area immediately surrounding the input value.
 *
 *     Contaminating parts of the image may be defined using an ARD file.
@@ -72,11 +72,11 @@
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! PAR constants
       INCLUDE 'CNF_PAR'
-         
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       CHARACTER *(MSG__SZMSG) FILE    ! NDF file name
       LOGICAL AGAIN                   ! Look at another part of the image?
       LOGICAL ANGCON                  ! Position angle convention
@@ -92,8 +92,8 @@
       INTEGER FIOD                    ! FIO file descriptor
       INTEGER I                       ! Loop variable
       INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index
-      INTEGER NDF1                    ! Identifier for the source NDF  
-      INTEGER NDIM                    ! Number of dimensions in the 
+      INTEGER NDF1                    ! Identifier for the source NDF
+      INTEGER NDIM                    ! Number of dimensions in the
                                       ! image
       INTEGER POINT0(1)               ! Pointer to the data component of
                                       ! the source NDF
@@ -113,31 +113,31 @@
       REAL LIM2                       ! Lower limit on ellipse count
       REAL PSIZE                      ! Size of the image pixels in arc sec
       REAL RESULT(17,ELF__RESUL)      ! Ellipse parameters
-      REAL RLIM                       ! Sampling radius maximum 
+      REAL RLIM                       ! Sampling radius maximum
       REAL SIGMA                      ! Standard deviation of the background value
       REAL XCO                        ! X index of the galaxy origin
       REAL YCO                        ! Y index of the galxay origin
-      REAL ZEROP                      ! Zero point of the surface 
+      REAL ZEROP                      ! Zero point of the surface
                                       ! brightness graphs
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
-*   Begin an NDF context.                               
+*   Begin an NDF context.
       CALL NDF_BEGIN
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      
-*   Obtain an identifier for the NDF structure to be examined.       
+
+*   Obtain an identifier for the NDF structure to be examined.
       CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND(NDF1,2,LBND,UBND,NDIM,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999 
+      IF (STATUS.NE.SAI__OK) GOTO 9999
       PRANGE(1)=UBND(1)-LBND(1)+1
       PRANGE(2)=UBND(2)-LBND(2)+1
-                                       
+
 *   Look on the command line for an ANGCON input.
 *   Otherwise, use the default value.
       CALL PAR_STATE('ANGCON',I,STATUS )
@@ -198,9 +198,9 @@
                INOKAY=.TRUE.
             END IF
          END DO
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*      Use the default ellipse isophotal separation value? 
+*      Use the default ellipse isophotal separation value?
 *      Look on the command line for an output.
 *      Otherwise, use the value specified in elf_par.
          CALL PAR_STATE('FINE',I,STATUS )
@@ -214,7 +214,7 @@
 
 *      Get the pixel size value.
          CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Get the sampling radius.
          CALL PAR_GET0R('RLIM',RLIM,STATUS)
@@ -225,7 +225,7 @@
          CALL PAR_GET0R('ZEROP',ZEROP,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*      Is the galaxy centre to be determined by a weighted search around 
+*      Is the galaxy centre to be determined by a weighted search around
 *      the coords provided?
          CALL PAR_GET0L('AUTOL',AUTOL,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -250,7 +250,7 @@
          IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
             CALL PAR_GET0R('LIM2',LIM2,STATUS)
             CALL MSG_OUT(' ','Command line LIM2 value used.',STATUS)
-         ELSE                           
+         ELSE
             LIM2=ELF__LIM2
          END IF
 
@@ -258,7 +258,7 @@
          CALL NDF_MAP(NDF1,'DATA','_REAL','READ',POINT0(1),
      :                ELEMS,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
-            
+
 *      Get the name of the file being mapped.
          CALL NDF_MSG('FILE',NDF1)
          CALL MSG_LOAD(' ','^FILE',FILE,STLEN,STATUS)
@@ -275,16 +275,16 @@
 *      Un-map the source NDF. Helps to reduce the resources being used.
          CALL NDF_UNMAP(NDF1,'DATA',STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
-                         
+
 *      Allocate the memory needed for the logical mask array.
          CALL PSX_CALLOC(ELEMS,'_INTEGER',POINT3(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
- 
+
 *      Transfer to the ARD driver control routine.
          NDIM=2
          CALL ESP1_ARD_DRIVER(NDIM,ELEMS,LBND,UBND,POINT1,POINT3,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
-  
+
 *      Free the dynamic array space of the logical mask.
          CALL PSX_FREE(POINT3(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
@@ -316,12 +316,12 @@
             END IF
             CALL ERR_RLSE
 
-*         Display the un-analysed data as a graphical plot of radius (in 
+*         Display the un-analysed data as a graphical plot of radius (in
 *         pixels) versus intensity.
-            IF (GRAPH) THEN                      
+            IF (GRAPH) THEN
 
                CALL ELF1_GRAPH(PSIZE,ZEROP,RESULT,VALIDP,
-     :                         STATUS)  
+     :                         STATUS)
                IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *            Turn off the AGI/PGPLOT interface.
@@ -331,7 +331,7 @@
 
          END IF
 
-*      Create a text file containing the latest profile/fit results 
+*      Create a text file containing the latest profile/fit results
 *      (if required).
          CALL ELP1_TEXTO(0,NDF1,VALIDP,ZEROP,
      :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
@@ -356,7 +356,7 @@
          CALL PSX_FREE(POINT1(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*      Get the user selection of preparing a galaxy profile 
+*      Get the user selection of preparing a galaxy profile
 *      or not.
          CALL PAR_GET0L('AGAIN',AGAIN,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -377,9 +377,9 @@
  9999 CONTINUE
 
 *   End the NDF context.
-      CALL NDF_END(STATUS)                              
+      CALL NDF_END(STATUS)
 
-      END   
+      END
 
 
       SUBROUTINE ELP1_KMODE(STATUS)
@@ -389,9 +389,9 @@
 
 *  Purpose:
 *     The routine allows the user to input most of the information required
-*     (position, background value etc) for the galaxy profile to be 
-*     performed/displayed and then calls other routines as necessary. 
-* 
+*     (position, background value etc) for the galaxy profile to be
+*     performed/displayed and then calls other routines as necessary.
+*
 *     Information such as pixel size, background count value and its
 *     standard deviation are also input.
 *
@@ -403,27 +403,27 @@
 *  Invocation:
 *     CALL ELP1_KMODE(STATUS)
 
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Description: 
+*  Description:
 *     Profiling is continued until the mean profile value is less than
-*     a user defined number of standard deviations above sky (LIM2) or 
+*     a user defined number of standard deviations above sky (LIM2) or
 *     until the mean profile value increases by a user defined amount
-*     compared to the previous profile (LIM1). The difference between the 
-*     sizes of profile semi-major axis values is controlled using the 
+*     compared to the previous profile (LIM1). The difference between the
+*     sizes of profile semi-major axis values is controlled using the
 *     FINE parameter.
 *
 *     When profiling an ellipse with a small radius one of two methods may
 *     be employed to determine the values of points located around each
 *     trial ellipse. These are are bi-linear interpolation or a surface
 *     interpolation based on a 8x8 grid of surrounding pixels. The latter
-*     method is slower but may yield better results at small radii. It 
-*     is selected by setting the parameter FAST to false.     
+*     method is slower but may yield better results at small radii. It
+*     is selected by setting the parameter FAST to false.
 *
-*     The initial estimate of the galaxy position may be improved by 
-*     selecting the AUTOL option which performs a centroid 
+*     The initial estimate of the galaxy position may be improved by
+*     selecting the AUTOL option which performs a centroid
 *     analysis of the image area immediately surrounding the input value.
 *
 *     Contaminating parts of the image may be defined using an ARD file.
@@ -461,11 +461,11 @@
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'               ! PAR constants
       INCLUDE 'CNF_PAR'
-         
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       CHARACTER *(MSG__SZMSG) FILE    ! NDF file name
       LOGICAL AGAIN                   ! Look at another part of the image?
       LOGICAL ANGCON                  ! Position angle convention
@@ -484,8 +484,8 @@
       INTEGER I                       ! Loop variable
       INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index
       INTEGER MINMOD                  ! Which residual to use in minimisation
-      INTEGER NDF1                    ! Identifier for the source NDF  
-      INTEGER NDIM                    ! Number of dimensions in the 
+      INTEGER NDF1                    ! Identifier for the source NDF
+      INTEGER NDIM                    ! Number of dimensions in the
                                       ! image
       INTEGER POINT0(1)               ! Pointer to the data component of
                                       ! the source NDF
@@ -502,7 +502,7 @@
       REAL FINE                       ! Determines how closely spaced the
                                       ! chosen radii values are
       REAL FRACT                      ! Fraction of the ellipse points that
-                                      ! must be available for the profile 
+                                      ! must be available for the profile
                                       ! at a given radius to be kept
       REAL LIM1                       ! Maximum permitted count increase factor
       REAL LIM2                       ! Lower limit on ellipse count
@@ -515,32 +515,32 @@
       REAL SIGMA                      ! Std. dev. of the background value
       REAL XCO                        ! X index of the galaxy origin
       REAL YCO                        ! Y index of the galxay origin
-      REAL ZEROP                      ! Zero point of the surface 
+      REAL ZEROP                      ! Zero point of the surface
                                       ! brightness graphs
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
-*   Begin an NDF context.                               
+*   Begin an NDF context.
       CALL NDF_BEGIN
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      
-*   Obtain an identifier for the NDF structure to be examined.       
+
+*   Obtain an identifier for the NDF structure to be examined.
       CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND(NDF1,2,LBND,UBND,NDIM,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999 
+      IF (STATUS.NE.SAI__OK) GOTO 9999
       PRANGE(1)=UBND(1)-LBND(1)+1
       PRANGE(2)=UBND(2)-LBND(2)+1
-                                       
+
 *   Look at the command line value for ANGCON.
 *   Otherwise, use the default.
       CALL PAR_STATE('ANGCON',I,STATUS )
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN    
+      IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
          CALL PAR_GET0L('ANGCON',ANGCON,STATUS)
          CALL MSG_OUT(' ','Command line ANGCON value used.',STATUS)
       ELSE
@@ -551,7 +551,7 @@
 *   Otherwise, use the default.
       CALL PAR_STATE('ANGOFF',I,STATUS )
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN    
+      IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
          CALL PAR_GET0R('ANGOFF',ANGOFF,STATUS)
          CALL MSG_OUT(' ','Command line ANGOFF value used.',STATUS)
       ELSE
@@ -596,14 +596,14 @@
                INOKAY=.TRUE.
             END IF
          END DO
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*      Use the default radii separation. 
+*      Use the default radii separation.
 *      Look on the command line for an output.
 *      Otherwise, use the value specified in elp_par.
          CALL PAR_STATE('FINE',I,STATUS )
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN    
+         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
             CALL PAR_GET0R('FINE',FINE,STATUS)
             CALL MSG_OUT(' ','Command line FINE value used.',STATUS)
          ELSE
@@ -612,7 +612,7 @@
 
 *      Get the pixel size value.
          CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Get the maximum profile radius.
          CALL PAR_GET0R('RLIM',RLIM,STATUS)
@@ -623,7 +623,7 @@
          CALL PAR_GET0R('ZEROP',ZEROP,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*      Is the galaxy centre to be determined by a centroid around 
+*      Is the galaxy centre to be determined by a centroid around
 *      the coords provided?
          CALL PAR_GET0L('AUTOL',AUTOL,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -637,7 +637,7 @@
 *      Otherwise, use the value specified in elp_par.
          CALL PAR_STATE('FAST',I,STATUS )
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN    
+         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
             CALL PAR_GET0L('FAST',FAST,STATUS)
             CALL MSG_OUT(' ','Command line FAST value used.',STATUS)
          ELSE
@@ -649,7 +649,7 @@
 *      Otherwise, use the value specified in elp_par.
          CALL PAR_STATE('LIM1',I, STATUS )
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN    
+         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
             CALL PAR_GET0R('LIM1',LIM1,STATUS)
             CALL MSG_OUT(' ','Command line LIM1 value used.',STATUS)
          ELSE
@@ -661,10 +661,10 @@
 *      Otherwise, use the value specified in elp_par.
          CALL PAR_STATE('LIM2',I,STATUS )
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN    
+         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
             CALL PAR_GET0R('LIM2',LIM2,STATUS)
             CALL MSG_OUT(' ','Command line LIM2 value used.',STATUS)
-         ELSE                           
+         ELSE
             LIM2=ELP__LIM2
          END IF
 
@@ -673,7 +673,7 @@
 *      Otherwise, use the value specified in elp_par.
          CALL PAR_STATE('LIM3',I,STATUS )
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN    
+         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
             CALL PAR_GET0R('LIM3',LIM3,STATUS)
             CALL MSG_OUT(' ','Command line LIM3 value used.',STATUS)
          ELSE
@@ -685,7 +685,7 @@
 *      Otherwise, use the value specified in elp_par.
          CALL PAR_STATE('FRACT',I,STATUS )
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN     
+         IF ((I.EQ.SUBPAR__ACTIVE).OR.(I.EQ.SUBPAR__FPROMPT)) THEN
             CALL PAR_GET0R('FRACT',FRACT,STATUS)
             CALL MSG_OUT(' ','Command line FRACT value used.',STATUS)
          ELSE
@@ -696,7 +696,7 @@
          CALL NDF_MAP(NDF1,'DATA','_REAL','READ',POINT0(1),
      :                ELEMS,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
-            
+
 *      Get the name of the file being mapped.
          CALL NDF_MSG('FILE',NDF1)
          CALL MSG_LOAD(' ','^FILE',FILE,STLEN,STATUS)
@@ -713,16 +713,16 @@
 *      Un-map the source NDF. Helps to reduce the resources being used.
          CALL NDF_UNMAP(NDF1,'DATA',STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
-                         
+
 *      Allocate the memory needed for the logical mask array.
          CALL PSX_CALLOC(ELEMS,'_INTEGER',POINT3(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
- 
+
 *      Transfer to the ARD driver control routine.
          NDIM=2
          CALL ESP1_ARD_DRIVER(NDIM,ELEMS,LBND,UBND,POINT1,POINT3,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
- 
+
 *      Free the dynamic array space of the logical mask.
          CALL PSX_FREE(POINT3(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
@@ -755,12 +755,12 @@
             END IF
             CALL ERR_RLSE
 
-*         Display the un-analysed data as a graphical plot of radius (in 
+*         Display the un-analysed data as a graphical plot of radius (in
 *         pixels) versus intensity.
-            IF (GRAPH) THEN      
+            IF (GRAPH) THEN
 
                CALL ELP1_GRAPH(PSIZE,ZEROP,RESULT,VALIDP,
-     :                        STATUS)  
+     :                        STATUS)
                IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *            Turn off the AGI/PGPLOT interface.
@@ -771,7 +771,7 @@
 
          END IF
 
-*      Create a text file containing the latest profile/fit results 
+*      Create a text file containing the latest profile/fit results
 *      (if required).
          CALL ELP1_TEXTO(0,NDF1,VALIDP,ZEROP,
      :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,SIGMA,
@@ -796,7 +796,7 @@
          CALL PSX_FREE(POINT1(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*      Get the user selection of preparing a galaxy profile 
+*      Get the user selection of preparing a galaxy profile
 *      or not.
          CALL PAR_GET0L('AGAIN',AGAIN,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -817,30 +817,30 @@
  9999 CONTINUE
 
 *   End the NDF context.
-      CALL NDF_END(STATUS)                              
+      CALL NDF_END(STATUS)
 
-      END   
-       
-      
+      END
+
+
       SUBROUTINE SEC1_KMODE(STATUS)
 *+
 *  Name:
 *     SEC1_KMODE
 *
 *  Purpose:
-*     May be used to display the average pixel values within a wedge shaped 
-*     sector of the image. The sector is in the form of a wedge (of user 
+*     May be used to display the average pixel values within a wedge shaped
+*     sector of the image. The sector is in the form of a wedge (of user
 *     defined size) drawn out from an origin point.
 *
 *     The results are displayed as pixel value (in terms of level relative
-*     to sky or surface brightness) versus origin distance. Pixel values 
+*     to sky or surface brightness) versus origin distance. Pixel values
 *     are summed over all the points at a given distance from the origin.
 *
 *     Options include summing results from two equal sized diametrically
 *     opposite sectors, displaying data using a number of possible radius
 *     transformations, the use of an approximate local maximum location as
-*     origin if required, automatic selection of the maximum radius out 
-*     from the origin to be considered and the use of a graphics cursor 
+*     origin if required, automatic selection of the maximum radius out
+*     from the origin to be considered and the use of a graphics cursor
 *     to select the image object to be examined.
 *
 *  Language:
@@ -849,14 +849,14 @@
 *  Invocation:
 *     CALL SEC1_KMODE(STATUS)
 *
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
-*  Description: 
+*  Description:
 *     Allows the pixels count values within a wedge/sector drawn from a
 *     user specified point(s) to be plotted as a function of distance
-*     from the origin point. 
+*     from the origin point.
 *
 *     Also, allows the results from two diametrically opposite sectors
 *     to be plotted as an option. The results are displayed with
@@ -865,16 +865,16 @@
 *
 *     The length of the slice, it's angular width and position angle are
 *     all user defined. The length may also be selected automatically by
-*     the software if desired. 
+*     the software if desired.
 *
 *     The user is allowed to define how the radius values will be displayed
-*     i.e. as R, R**0.25, Log R or R x R. 
+*     i.e. as R, R**0.25, Log R or R x R.
 *
 *     Contaminating parts of the image may be defined using an ARD file.
 *
 *     An option is present allowing the input object location to be
-*     adjusted by the software to employ an approximate (1 pixel 
-*     accuracy) estimate of the location of the weighted intensity maximum. 
+*     adjusted by the software to employ an approximate (1 pixel
+*     accuracy) estimate of the location of the weighted intensity maximum.
 *
 *     This routine operates by keyboard inputs exclusively.
 *
@@ -904,11 +904,11 @@
       INCLUDE 'SEC_PAR'               ! SECTOR constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constant
       INCLUDE 'CNF_PAR'
-   
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       CHARACTER *(256) RADISP         ! Option choice defining how the
                                       ! radius data is to be displayed
 *      CHARACTER *(256) STRINP         ! String array for character input
@@ -920,7 +920,7 @@
       LOGICAL INOKAY                  ! Was the most recent input value okay
       LOGICAL MIRROR                  ! Sum the pixels over a single slice
                                       ! or two diametrically opposite slices
-      LOGICAL SURF                    ! Pixel values expressed as sigma 
+      LOGICAL SURF                    ! Pixel values expressed as sigma
                                       ! or surface brightness
       INTEGER AGIID                   ! AGI identifier
       INTEGER COUNT(2)                ! The number of data points used in the
@@ -934,8 +934,8 @@
       INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index
       INTEGER RLIM                    ! The length of the slice to be taken
       INTEGER LEN2                    ! Temporary storage of RLIM
-      INTEGER NDF1                    ! Identifier for the source NDF  
-      INTEGER NDIM                    ! Number of dimensions in the 
+      INTEGER NDF1                    ! Identifier for the source NDF
+      INTEGER NDIM                    ! Number of dimensions in the
                                       ! image
       INTEGER NVP                     ! The number of valid data points found
       INTEGER POINT0(1)               ! Pointer to the data component of
@@ -947,7 +947,7 @@
       INTEGER UBND(NDF__MXDIM)        ! Upper limit for image index
       REAL ANGWID                     ! Angular width of the slice
       REAL BACK                       ! Background count value
-      REAL CONS(2)                    ! Constant terms of the curves used 
+      REAL CONS(2)                    ! Constant terms of the curves used
                                       ! to find the scale length
       REAL GRAD(2)                    ! Gradients of the curves used
                                       ! to find out the scale length
@@ -968,27 +968,27 @@
       REAL TEMP                       ! Temporary storage
       REAL XCO                        ! X index of the sector origin
       REAL YCO                        ! Y index of the sector origin
-      REAL ZEROP                      ! Zero point of the surface 
+      REAL ZEROP                      ! Zero point of the surface
                                       ! brightness graphs
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
-*   Begin an NDF context.                               
+*   Begin an NDF context.
       CALL NDF_BEGIN
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      
-*   Obtain an identifier for the NDF structure to be examined.       
+
+*   Obtain an identifier for the NDF structure to be examined.
       CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND(NDF1,2,LBND,UBND,NDIM,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999 
+      IF (STATUS.NE.SAI__OK) GOTO 9999
       PRANGE(1)=UBND(1)-LBND(1)+1
       PRANGE(2)=UBND(2)-LBND(2)+1
-                                       
+
 *   Look at another location on the image.
       AGAIN=.TRUE.
       DO WHILE (AGAIN.AND.(STATUS.EQ.SAI__OK))
@@ -1037,11 +1037,11 @@
                INOKAY=.TRUE.
             END IF
          END DO
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Get the pixel size value.
          CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Convert the length in arc secs to length in pixels.
          RLIM=NINT(REAL(RLIM)/PSIZE)
@@ -1074,7 +1074,7 @@
          CALL NDF_MAP(NDF1,'DATA','_REAL','READ',POINT0(1),
      :                ELEMS,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
-            
+
 *      Allocate dynamic memory on which to map the NDF.
          CALL PSX_CALLOC(ELEMS,'_REAL',POINT1(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
@@ -1087,19 +1087,19 @@
 *      Un-map the source NDF. Helps to reduce the resourcse being used.
          CALL NDF_UNMAP(NDF1,'DATA',STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
-                         
+
 *      Allocate the memory needed for the logical mask array.
          CALL PSX_CALLOC(ELEMS,'_INTEGER',POINT3(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
- 
+
 *      Transfer to the ARD driver control routine.
          CALL ESP1_ARD_DRIVER(NDIM,ELEMS,LBND,UBND,POINT1,POINT3,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
-  
+
 *      Free the dynamic array space of the logical mask.
          CALL PSX_FREE(POINT3(1),STATUS)
         IF (STATUS.NE.SAI__OK) GOTO 9998
- 
+
 *      Look for a better (though crude) estimate of the galaxy core position.
          CALL SEC1_AUTOL(AUTOL,ELEMS,PRANGE,OCOUNT,FLAG,
      :                   %VAL(CNF_PVAL(POINT1(1))),XCO,YCO,STATUS)
@@ -1115,8 +1115,8 @@
 
 *      Continue the summation of radius/brightness points using data on
 *      the other side of the origin.
-         IF (MIRROR) THEN 
-   
+         IF (MIRROR) THEN
+
 *          Pass the position angle for the other side of the origin and
 *          then repeat the summation.
             TEMP=POSANG+180.
@@ -1149,11 +1149,11 @@
             END IF
             CALL ERR_RLSE
 
-*         Display the un-analysed data as a graphical plot of radius (in 
+*         Display the un-analysed data as a graphical plot of radius (in
 *         some form) versus intensity (in some form).
-            IF (GRAPH) THEN              
+            IF (GRAPH) THEN
                CALL SEC1_GRAPH(1,ZEROP,RADISP,SURF,RLIM,BACK,NUMBER,
-     :                         PSIZE,SIGMA,SUMMAT,CONS,GRAD,STATUS)  
+     :                         PSIZE,SIGMA,SUMMAT,CONS,GRAD,STATUS)
                IF (STATUS.NE.SAI__OK) GOTO 9998
             END IF
 
@@ -1168,7 +1168,7 @@
 *                  CALL PAR_GET1R('FITLIM',IND,INP,IND2,STATUS)
                   CALL PAR_GET1R('FITLIM',2,INP,IND2,STATUS)
 
-*               Check that the values were not inadvertantly reversed 
+*               Check that the values were not inadvertantly reversed
 *               and swop them round so that the result can be sensible.
                   IF (INP(1).LT.INP(2)) THEN
                      LOR=INP(1)
@@ -1183,7 +1183,7 @@
                      HIR=INP(1)
                   END IF
 
-*               Check to see if it is possible for there to be two 
+*               Check to see if it is possible for there to be two
 *               data points in the radius range required.
                   IF ((HIR-LOR)/PSIZE.LT.2.0) THEN
                      CALL MSG_OUT(' ','The radius range supplied, is '/
@@ -1193,12 +1193,12 @@
                   END IF
 
                END DO
-               IF (STATUS.NE.SAI__OK) GOTO 9999 
+               IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *            Calculate the scale length assuming spiral or elliptical.
 
-*            Obtain the 'fit' parameters for linear fits to the brightness 
-*            versus radius data (suitably transformed). 
+*            Obtain the 'fit' parameters for linear fits to the brightness
+*            versus radius data (suitably transformed).
                 CALL SEC1_LINRE(LOR,HIR,NUMBER,SUMMAT,PSIZE,BACK,
      :                          RLIM,GRAD,CONS,COUNT,SLEN,STATUS)
                 IF (STATUS.NE.SAI__OK) GOTO 9998
@@ -1208,7 +1208,7 @@
 
                   CALL SEC1_GRAPH(2,ZEROP,RADISP,SURF,RLIM,BACK,
      :                            NUMBER,PSIZE,SIGMA,SUMMAT,CONS,
-     :                            GRAD,STATUS) 
+     :                            GRAD,STATUS)
                   IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *               Turn off the AGI/PGPLOT interface.
@@ -1225,7 +1225,7 @@
          IF (NVP.GT.2) THEN
             CALL SEC1_TEXTD(FLAG,NDF1,XCO,YCO,OCOUNT,BACK,SIGMA,CONS,
      :                      GRAD,RLIM,PSIZE,COUNT,ZEROP,SLEN,
-     :                      LOR,HIR,LBND,STATUS)    
+     :                      LOR,HIR,LBND,STATUS)
 
             CALL SEC1_TEXTO(NDF1,SUMMAT,NUMBER,XCO,YCO,BACK,
      :                      SIGMA,CONS,RLIM,PSIZE,ZEROP,SLEN,LBND,
@@ -1238,7 +1238,7 @@
          CALL PSX_FREE(POINT1(1),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*      Get the user selection of preparing a galaxy profile 
+*      Get the user selection of preparing a galaxy profile
 *      or not.
          CALL PAR_GET0L('AGAIN',AGAIN,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -1259,6 +1259,6 @@
  9999 CONTINUE
 
 *   End the NDF context.
-      CALL NDF_END(STATUS)                              
+      CALL NDF_END(STATUS)
 
-      END   
+      END

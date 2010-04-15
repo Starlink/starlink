@@ -15,7 +15,7 @@
 *                      STATUS )
 
 *  Description:
-*     This routine takes two framesets FSET and FSET2, and adds the 
+*     This routine takes two framesets FSET and FSET2, and adds the
 *     Current frame from FSET2 on to FSET.  To do this it locates a
 *     frame in FSET with the same Domain as the Base frame of FSET2,
 *     and adds the Current frame of FSET2 to it using the mapping
@@ -23,7 +23,7 @@
 *     with the same domain as DOMAIN are removed from FSET.  The
 *     Current frame of FSET remains the same (unless it has been
 *     removed by the previous rule, in which case it becomes the
-*     newly added frame).  The newly added frame will be the last 
+*     newly added frame).  The newly added frame will be the last
 *     (highest-index) frame in the FSET.
 *
 *     A couple of modifications to this mapping may be made: if the
@@ -52,7 +52,7 @@
 *        The number of cards in the mapped FITS character array.
 *     IPFITS = INTEGER (Given)
 *        A pointer to the mapped array of FITS header cards.  These
-*        must be mapped as _CHAR*80.  Not accessed if FITROT is blank 
+*        must be mapped as _CHAR*80.  Not accessed if FITROT is blank
 *        or NCARD is zero.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -97,7 +97,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Arguments Given:
       INTEGER FSET
       INTEGER FSET2
@@ -106,7 +106,7 @@
       CHARACTER * ( * ) FITROT
       INTEGER NCARD
       INTEGER IPFITS
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -130,7 +130,7 @@
       DOUBLE PRECISION MATRIX( 4 ) ! Matrix for WinMap
       DOUBLE PRECISION PI        ! Pi
       DOUBLE PRECISION ROTATE    ! Total rotation angle in degrees
-      
+
 *.
 
 *  Check inherited global status.
@@ -153,7 +153,7 @@
       IF ( JMAT .EQ. AST__NOFRAME ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'DOMAIN', DMMAT )
-         CALL ERR_REP( 'CCD1_ADFRM_NODMN', 
+         CALL ERR_REP( 'CCD1_ADFRM_NODMN',
      :   'Frameset does not contain frame ^DOMAIN', STATUS )
          GO TO 99
       END IF
@@ -168,9 +168,9 @@
       IF ( FITROT .NE. ' ' ) THEN
          IF ( NCARD .GT. 0 ) THEN
             FROT = 0D0
-            CALL FTS1_GKEYD( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+            CALL FTS1_GKEYD( NCARD, %VAL( CNF_PVAL( IPFITS ) ),
      :                       1, FITROT, THERE,
-     :                       FROT, ICARD, STATUS, 
+     :                       FROT, ICARD, STATUS,
      :                       %VAL( CNF_CVAL( 80 ) ) )
             IF ( THERE ) THEN
                ROTATE = ROTATE + FROT
@@ -183,7 +183,7 @@
             END IF
          ELSE
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'CCD1_ADFRM_NOFITS', 
+            CALL ERR_REP( 'CCD1_ADFRM_NOFITS',
      :                    'No FITS headers were found', STATUS )
             GO TO 99
          END IF

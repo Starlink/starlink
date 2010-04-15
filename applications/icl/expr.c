@@ -1,8 +1,8 @@
 /******************************************************************************
  *
- *			E X P R . C		
+ *			E X P R . C
  *
- * This file contains routines for interpreting (executing) and printing 
+ * This file contains routines for interpreting (executing) and printing
  * (regenerating) the parse sub-trees which make up ICL expressions.
  *
  *	History
@@ -20,7 +20,7 @@
  *                      A.J.Chipperfield 25/01/94
  *      Use restore_adamstring in quoted_string_interpret
  *                      A.J.Chipperfield 28/11/96
- *      
+ *
  ******************************************************************************
  */
 #include <stdio.h>
@@ -36,13 +36,13 @@ extern char *string_op(int yaccopcode);				/* node.c */
 
 /******************************************************************************
  *
- * The functions in the module interpret the abstract node structure 
+ * The functions in the module interpret the abstract node structure
  * representing an expression.  They are all called with a pointer to the node
- * to be interpreted and an integer flag defining the type of operation 
+ * to be interpreted and an integer flag defining the type of operation
  * required.
  * The operations available are:
  * 	OP_INTERPRET	evaluate the node to an ICL value.
- *	OP-PRINT	print the source reconstruction of the node to the 
+ *	OP-PRINT	print the source reconstruction of the node to the
  *			output stream via routines in output.c.
  *	OP_FORMAT	print the evalated node to format_buf[] using
  *			format_width and format_decimals (set up by an
@@ -50,7 +50,7 @@ extern char *string_op(int yaccopcode);				/* node.c */
  *			layout.
  *	OP_DESTROY	free any embedded contents of the node.
  *
- * All return an ICL value which is either the result of an evaluation 
+ * All return an ICL value which is either the result of an evaluation
  * (for OP_INTERPRET) or representing success (or otherwise) of OP_PRINT etc.
  *
  ******************************************************************************
@@ -95,7 +95,7 @@ interpret_fail(char *routine_name)
  *
  ******************************************************************************
  */
-value 
+value
 undefined_interpret(node *n, int op)
 {
     switch (op) {
@@ -132,7 +132,7 @@ undefined_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 integer_interpret(node *n, int op)
 {
     switch (op) {
@@ -158,7 +158,7 @@ integer_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 logical_interpret(node *n, int op)
 {
     switch (op) {
@@ -168,7 +168,7 @@ logical_interpret(node *n, int op)
 	outfpstring(integer_part(n->val) ? "TRUE" : "FALSE");
 	return noval;
       case OP_FORMAT:
-	sprintf(format_buf, "%*s", format_width, 
+	sprintf(format_buf, "%*s", format_width,
 		integer_part(n->val) ? "TRUE" : "FALSE");
 	return noval;
       case OP_DESTROY:
@@ -185,7 +185,7 @@ logical_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 real_interpret(node *n, int op)
 {
     switch (op) {
@@ -211,7 +211,7 @@ real_interpret(node *n, int op)
  *		S T R I N G    C O N S T A N T S
  *
  * Printing strings is elaborate because of the need to regenerate the two
- * formas of quotes (' and ") in such a way that they will reparse correctly 
+ * formas of quotes (' and ") in such a way that they will reparse correctly
  * to the same internal string.
  *
  * The function restore_iclstring(*string) (utils.c) is used to handle the
@@ -226,7 +226,7 @@ real_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 string_interpret(node *n, int op)
 {
     switch (op) {
@@ -265,7 +265,7 @@ string_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 quoted_string_interpret(node *n, int op)
 {
     if (op != OP_INTERPRET)
@@ -285,7 +285,7 @@ quoted_string_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 openstring_interpret(node *n, int op)
 {
     switch (op) {
@@ -318,18 +318,18 @@ openstring_interpret(node *n, int op)
  *
  * 1) a variable reference in an expression,
  *
- * 2) a function reference (where the name_interpret() node is the sub[0] 
+ * 2) a function reference (where the name_interpret() node is the sub[0]
       member of a function_call_interpret() node),
  *
  * 3) a variable reference on the left of an assignment (where the
- *    name_interpret() node is the sub[0] member of an assign_interpret() 
+ *    name_interpret() node is the sub[0] member of an assign_interpret()
  *    node),
  *
  * 4) to contain the name of a formal parameter. The name_interpret() node
  *    is the sub[1] member of a formal parameter explist_interpret() list)
  *
  * 5) and to record the identity of a pass_by_reference actual parameter
- *    (the name_interpret() node is the sub[0] member of a 
+ *    (the name_interpret() node is the sub[0] member of a
  *    parameter_interpret() node).
  *
  * Only in the case of a variable reference in an expression will such
@@ -338,7 +338,7 @@ openstring_interpret(node *n, int op)
  *
  * Note that to pass ICL variables to ADAM tasks the function setup_hds_args()
  * (in interp.c) alters the parse tree to call name_interpret_hds() (in hds.c)
- * instead of this function. 
+ * instead of this function.
  *
  ******************************************************************************
  */
@@ -349,7 +349,7 @@ openstring_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 name_interpret(node *n, int op)
 {
     extern value lookup_variable_value (char *name);		/* symtab.c */
@@ -386,7 +386,7 @@ name_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 optarg_name_interpret(node *n, int op)
 {
     switch (op) {
@@ -397,7 +397,7 @@ optarg_name_interpret(node *n, int op)
     }
 }
 
-value 
+value
 optarg_name_interpret_end(node *n, int op)
 {
     switch (op) {
@@ -419,7 +419,7 @@ optarg_name_interpret_end(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 name_interpret_nohds(node *n, int op)
 {
     return name_interpret(n, op);
@@ -429,7 +429,7 @@ name_interpret_nohds(node *n, int op)
  *
  *	P A R E N _ I N T E R P R E T (node *n, int op)
  *
- * The parser generates this node for syntax of the form 
+ * The parser generates this node for syntax of the form
  * ( E x p r e s s i o n ) (within an expression or as part of a comand line).
  *
  * The sub[0] member points to the node to be interpreted to evaluate the
@@ -438,7 +438,7 @@ name_interpret_nohds(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 paren_interpret(node *n, int op)
 {
     switch (op) {
@@ -463,15 +463,15 @@ paren_interpret(node *n, int op)
  *
  *	C O N C A T _ I N T E R P R E T (node *n, int op)
  *
- * The parser generates this node for syntax of the form 
+ * The parser generates this node for syntax of the form
  * "Expression & Expression".
  *
- * The concat_interpret() node has its sub[0] member pointing to the left 
+ * The concat_interpret() node has its sub[0] member pointing to the left
  * operand and its sub[1] member to the right operand.
  *
  ******************************************************************************
  */
-value 
+value
 concat_interpret(node *n, int op)
 {
     value val1, val2;
@@ -510,15 +510,15 @@ concat_interpret(node *n, int op)
  *
  *	A N D _ I N T E R P R E T (node *n, int op)
  *
- * The parser generates this node for syntax of the form 
+ * The parser generates this node for syntax of the form
  * "Expression AND Expression".
  *
- * The and_interpret() node has its sub[0] member pointing to the left 
+ * The and_interpret() node has its sub[0] member pointing to the left
  * operand and its sub[1] member to the right operand.
  *
  ******************************************************************************
  */
-value 
+value
 and_interpret(node *n, int op)
 {
     value val1, val2;
@@ -553,15 +553,15 @@ and_interpret(node *n, int op)
  *
  *	O R _ I N T E R P R E T (node *n, int op)
  *
- * The parser generates this node for syntax of the form 
+ * The parser generates this node for syntax of the form
  * "Expression OR Expression".
  *
- * The or_interpret() node has its sub[0] member pointing to the left operand 
+ * The or_interpret() node has its sub[0] member pointing to the left operand
  * and its sub[1] member the right operand.
  *
  ******************************************************************************
  */
-value 
+value
 or_interpret(node *n, int op)
 {
     value val1, val2;
@@ -602,7 +602,7 @@ or_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 not_interpret(node *n, int op)
 {
     value val1;
@@ -633,16 +633,16 @@ not_interpret(node *n, int op)
  *
  *	U N I A R Y A R I T H _ I N T E R P R E T (node *n, int op)
  *
- * The parser generates this node for syntax of the form 
+ * The parser generates this node for syntax of the form
  * "- (NEGATE) or + (MAKE POSITIVE)  Expression".
  *
  * The uniaryarith_interpret() node has its sub[0] member pointing to the
- * operand and the value.integer component set to the internal code of either 
+ * operand and the value.integer component set to the internal code of either
  * SUBTRACT or ADD
  *
  ******************************************************************************
  */
-value 
+value
 unaryarith_interpret(node *n, int op)
 {
     value val2;
@@ -672,17 +672,17 @@ unaryarith_interpret(node *n, int op)
  *
  *	B I N A R Y O P E R A T O R _ I N T E R P R E T (node *n, int op)
  *
- * The parser generates this node for syntax of the form 
+ * The parser generates this node for syntax of the form
  * "expression BINARY ARITHMETIC OPERATOR expression".
  *
- * The binaryoperator_interpret() node is generated for a binary arithmetic 
- * operator (add, subtract etc). The sub[0] and sub[1] members point to the 
+ * The binaryoperator_interpret() node is generated for a binary arithmetic
+ * operator (add, subtract etc). The sub[0] and sub[1] members point to the
  * left operands respectively and the internal code of the arithmetic operation
  * is in the nodes value.integer component.
  *
  ******************************************************************************
  */
-value 
+value
 binaryoperator_interpret(node *n, int op)
 {
     value val1, val2;
@@ -716,17 +716,17 @@ binaryoperator_interpret(node *n, int op)
  *
  *	R E L O P E R A T O R _ I N T E R P R E T (node *n, int op)
  *
- * The parser generates this node for ICL syntax of the form 
+ * The parser generates this node for ICL syntax of the form
  * "expression R E L A T I O N A L expression".
  *
  * The sub[0] member points to the left operand, sub[1] to the right while
  * the yacc code of the operator is held in the value.integer component of the
  * reloperator_interpret() node. Cannot cause overflow.
  *
- * 
+ *
  ******************************************************************************
  */
-value 
+value
 reloperator_interpret(node *n, int op)
 {
     value val1, val2;
@@ -773,7 +773,7 @@ reloperator_interpret(node *n, int op)
  * 	"expression0 : expression1 : expression2"
  * OR	"expression0 : expression1"
  *
- * The sub[0] member of the format_interpret() node points to the expression 
+ * The sub[0] member of the format_interpret() node points to the expression
  * to be formatted, sub[1] the field_width expression and sub[2] is either NIL
  * or points to the decimal_precision expression.
  *
@@ -783,7 +783,7 @@ reloperator_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 format_interpret(node *n, int op)
 {
     extern node *node_value (value v);				/* node.c   */
@@ -862,9 +862,9 @@ format_interpret(node *n, int op)
  * When a procedure or function call is parsed it generates a linked list of
  * abbut_interpret() (procedure) or explist_interpret() (function) nodes
  * chained together using their sub[0] components.
- * 
+ *
  * The arguments themselves are referenced using the node.sub[1] component but
- * in inverse order with the last argument being linked to the first 
+ * in inverse order with the last argument being linked to the first
  * node, the last but one to the next etc.
  * To ease the processing of these lists get_args() copies the argument node
  * pointers into an array arglist[] and counts, in nargs, their number.  Note
@@ -885,7 +885,7 @@ format_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-static int 
+static int
 save_args(node ***saveloc)
 {
     extern node **arglistp;
@@ -912,7 +912,7 @@ save_args(node ***saveloc)
  *
  ******************************************************************************
  */
-static void 
+static void
 restore_args(node **savea, int n)
 {
     extern node **arglistp;
@@ -943,7 +943,7 @@ restore_args(node **savea, int n)
  *
  ******************************************************************************
  */
-value 
+value
 function_call_interpret(node *n, int op)
 {
     extern node *lookup_symbol (char *name, int type);		/* symtab.c */
@@ -1018,7 +1018,7 @@ function_call_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 nonary_func_interpret(node *n, int op)
 {
     value val;
@@ -1040,7 +1040,7 @@ nonary_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET)
@@ -1061,7 +1061,7 @@ func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 unary_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1091,7 +1091,7 @@ unary_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 binary_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1126,7 +1126,7 @@ binary_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 unary_integer_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1158,7 +1158,7 @@ unary_integer_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 binary_integer_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1174,7 +1174,7 @@ binary_integer_func_interpret(node *n, int op)
 	else if (isexc(vals[1] = interpret_to_integer(arg2)))
 	    return vals[1];
 	else
-	    return (call_binary_integer_func(vals[0], vals[1], 
+	    return (call_binary_integer_func(vals[0], vals[1],
 	    (ifunction_part(n->val))));
     } else
 	return noval;
@@ -1193,7 +1193,7 @@ binary_integer_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 unary_numeric_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1224,7 +1224,7 @@ unary_numeric_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 binary_numeric_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1258,7 +1258,7 @@ binary_numeric_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 unary_string_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1289,7 +1289,7 @@ unary_string_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 binary_string_func_interpret(node *n, int op)
 {
     if (op == OP_INTERPRET) {
@@ -1326,7 +1326,7 @@ binary_string_func_interpret(node *n, int op)
  *
  ******************************************************************************
  */
-value 
+value
 except_interpret(node *n, int op)
 {
     switch (op) {

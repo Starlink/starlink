@@ -22,7 +22,7 @@ Because of this, at run time the program needs to know the name of the image
 to be displayed.
 The `name of the image' is a {\em parameter} of the program.
 More complicated programs may have many parameters controlling their actions.
-Thus, your display program may need to know the format of the input image, 
+Thus, your display program may need to know the format of the input image,
 the device on which it is to be displayed, the colour mappings to be used in
 the display, types of axes, scaling methods, and so on.
 All these things are parameters.
@@ -242,7 +242,7 @@ using their objects.
 However, the system tidies up after you when your program finishes so you
 needn't worry about it.
 
-The ASSOC and CANCL routines (described later) are often referred to as 
+The ASSOC and CANCL routines (described later) are often referred to as
 `Parameter Routines' because they are added to a `stand-alone' subroutine
 library in order to integrate it with the ADAM parameter system.
 The equivalent `stand-alone' routines are OPEN and CLOSE.
@@ -534,7 +534,7 @@ any parameter except a device type.
 It may used by the system to check that a supplied parameter value is of a
 type that the application program is expecting.
 It also allows automatic conversion between the primitive data types.
-It is important to distinguish between the type of a parameter and the type 
+It is important to distinguish between the type of a parameter and the type
 of the value to be obtained from it by the application.
 
 The \verb%data-type% may be:
@@ -543,11 +543,11 @@ The \verb%data-type% may be:
 \_LOGICAL, \_CHAR, \_UBYTE, \_BYTE, \_UWORD, \_WORD).
 \item LITERAL --- formerly used to specify that the parameter is of type \_CHAR,
  and to force the parameter system to accept unquoted character strings as
- character values rather than HDS object names. 
+ character values rather than HDS object names.
  This is now the standard behaviour for parameters of type \_CHAR, so data-type
  LITERAL is no longer required.
 \item A `user-defined' type (IMAGE, SPECTRUM {\em etc.}).
-\item UNIV --- used by convention when the parameter type is unimportant. 
+\item UNIV --- used by convention when the parameter type is unimportant.
  Actually, this is treated the same as other `user-defined' types.
 \item A `facility-recommended' type (TAPE for MAG, FILENAME for FIO {\em etc.}).
  These are used by convention --- any user-defined type will do.
@@ -946,7 +946,7 @@ the command line.
 
 This specifies one or more default values for a parameter.
 
-The `\verb+default-value+' field is a string of alphanumeric characters 
+The `\verb+default-value+' field is a string of alphanumeric characters
 containing items to be used as values for the parameter.
 The values may be any expression acceptable to the parameter system.
 This fieldname must not be specified before the `type' fieldname has been

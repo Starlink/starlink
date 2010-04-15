@@ -63,7 +63,7 @@
 *        The factor which converts the sum of the products of sky and
 *        weights, to a CRDD sample value in the required output units.
 *     PWGRID( PWGSZX, PWGSZY ) = REAL (Given)
-*        The array of pixel weights. 
+*        The array of pixel weights.
 *     SKY( XLO:XHI, YLO:YHI ) = REAL (Given)
 *        The sky map.
 *     NBAD = INTEGER (Given and Returned)
@@ -118,7 +118,7 @@
       REAL SKY( XLO:XHI, YLO:YHI )
 
 *  Arguments Given and Returned:
-      INTEGER NBAD 
+      INTEGER NBAD
 
 *  Arguments Returned:
       REAL SMPVAL
@@ -143,7 +143,7 @@
 *  outside the sky area.
       INSIDE = ( RLO + POFFY .GE. YLO ) .AND. ( RHI + POFFY .LE. YHI )
      :         .AND.
-     :         ( PLO + POFFX .GE. XLO ) .AND. ( PHI + POFFX .LE. XHI ) 
+     :         ( PLO + POFFX .GE. XLO ) .AND. ( PHI + POFFX .LE. XHI )
 
 *  Return a bad value if the sample is not wholly inside the sky image.
       IF( .NOT. INSIDE ) THEN
@@ -188,5 +188,5 @@
 
 *  Finish
  999  CONTINUE
-      
+
       END

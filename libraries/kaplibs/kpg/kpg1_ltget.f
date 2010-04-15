@@ -15,17 +15,17 @@
 
 *  Description:
 *     This routine returns an HDS locator for a 2-dimensional array
-*     holding the colour table to load into the currently open graphics 
-*     device. The HDS object is searched for in an HDS container file in 
-*     the users ADAM directory. The  file is called "kappa.lut.sdf" and 
-*     contains a LUT for different devices. The file should have been 
+*     holding the colour table to load into the currently open graphics
+*     device. The HDS object is searched for in an HDS container file in
+*     the users ADAM directory. The  file is called "kappa.lut.sdf" and
+*     contains a LUT for different devices. The file should have been
 *     created by KPG1_LTSAV.
 *
 *     Each lut in the file is a _REAL array of shape (3,n) where
-*     n is the number of colours in the lut. 
+*     n is the number of colours in the lut.
 *
 *     Each array has a name which identifies the graphics device
-*     to which it refers. 
+*     to which it refers.
 *
 *  Arguments:
 *     PLOC = CHARACTER * ( DAT__SZLOC ) (Returned)
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
 *  Initialize
       PLOC = DAT__NOLOC
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Translate the environment variable/logical name for ADAM_USER.
@@ -113,7 +113,7 @@
 *  Obtain the home directory.
          CALL PSX_GETENV( 'HOME', PATH, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'KPG1_LTGET_1', '$HOME not defined.', 
+            CALL ERR_REP( 'KPG1_LTGET_1', '$HOME not defined.',
      :                    STATUS )
             GO TO 999
          END IF
@@ -126,7 +126,7 @@
 
 *  Find the length of the path for ADAM_USER.
          NC = CHR_LEN( PATH )
-  
+
       END IF
 
 *  Generate the full pathname to the file.
@@ -136,11 +136,11 @@
 *  ========================================================================
 
 *  Attempt to open the file assuming it exists.
-      CALL HDS_OPEN( PATH( : NC ), 'READ', LOC, STATUS ) 
+      CALL HDS_OPEN( PATH( : NC ), 'READ', LOC, STATUS )
 
 *  If the file was not found, annul the error.
       IF( STATUS .EQ. DAT__FILNF ) THEN
-         CALL ERR_ANNUL( STATUS )         
+         CALL ERR_ANNUL( STATUS )
 
 *  Otherwise...
       ELSE
@@ -172,14 +172,14 @@
      :                         '^NDIM dimensions. It should have 2.',
      :                          STATUS )
                END IF
-        
+
             END IF
 
 *  Report an error if it is has the wrong number of colour guns.
             IF( DIMS( 1 ) .NE. 3 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL DAT_MSG( 'DAT', PLOC )
-      
+
                IF( DIMS( 1 ) .EQ. 1 ) THEN
                   CALL ERR_REP( 'KPG1_LTGET_4', 'The colour table '//
      :                        'stored in HDS object ''^DAT'' has '//
@@ -192,13 +192,13 @@
      :                        '^NG colour guns. It should have 3.',
      :                        STATUS )
                END IF
-      
+
             END IF
 
 
 *  Promote the locator to a prinmary locator so that the container file
 *  will not be closed when we annul LOC.
-            CALL DAT_PRMRY( .TRUE., PLOC, .TRUE., STATUS ) 
+            CALL DAT_PRMRY( .TRUE., PLOC, .TRUE., STATUS )
 
          END IF
 

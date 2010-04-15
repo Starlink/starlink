@@ -55,7 +55,7 @@
 #     6-MAY-1994 (PDRAPER):
 #        Original version.
 #     29-AUG-1995 (PDRAPER):
-#        Modified to look for default .ccdpack file in the current 
+#        Modified to look for default .ccdpack file in the current
 #        directory.
 #     14-NOV-1995 (PDRAPER):
 #        Stopped CCDdir from being saved.
@@ -65,14 +65,14 @@
 #     {note_any_bugs_here}
 
 #-
-   
+
 #  Global parameters:
       global CCDimportfile
       global CCDimportavail
       global CCDimportfilter
       global env
 #.
-   
+
 #  Get the name of a file to receive the current status.
       set CCDimportfile "[pwd]/.ccdpack"
       set CCDimportfilter ".*"
@@ -83,10 +83,10 @@
 #  to this.
 	 set globals [ info globals "CCD*" ]
 	 if { "$globals" != "" } {
-	 
+
 #  Try to open the file.
 	    if { ! [ catch { open $CCDimportfile w } fileid ] } {
-	    
+
 #  File opened successfully write header.
 	       catch { exec date } date
 	       puts $fileid "#"
@@ -94,13 +94,13 @@
 	       puts $fileid "#"
 	       puts $fileid "#  Written by $env(USER) on $date"
 	       puts $fileid "#"
-	    
+
 #  Loop for each variable. Check if it is an array if so extract
 #  element other wise just write out the variable value.
 	       foreach var $globals {
                   global "$var"
                   if { [array exists $var] } {
-		  
+
 #  Is an array. Get elements and write out their values.
                      set names [ array names $var ]
 		     foreach element $names  {
@@ -108,20 +108,20 @@
 			puts $fileid "set ${var}($element) \{$value\}"
 		     }
 		  } else {
-		  
+
 #  Mustn't be an array.
-                     if { "$var" != "CCDdir" } { 
+                     if { "$var" != "CCDdir" } {
                         eval set value $${var}
                         puts $fileid "set $var \{$value\}"
                      }
 		  }
 	       }
-	    
+
 #  Make sure that file contents are complete and close it.
 	       flush $fileid
 	       close $fileid
 	    } else {
-	    
+
 #  Failed to open file.
 	       CCDIssueError "Failed to open file: $CCDimportfile"
 	    }

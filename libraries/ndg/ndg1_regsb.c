@@ -11,7 +11,7 @@
 #include "star/grp.h"
 
 F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
-                            INTEGER(IGRP), INTEGER(SIZE), INTEGER(STATUS) 
+                            INTEGER(IGRP), INTEGER(SIZE), INTEGER(STATUS)
                             TRAIL(RE) ){
 /*
 *+
@@ -44,12 +44,12 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -119,7 +119,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
    if( ifd == -1 ){
       *STATUS = SAI__ERROR;
       errSyser( "SYS", errno );
-      errRep( " ", "Unable to create a temporary \"regsb_in\" file name: ^SYS", 
+      errRep( " ", "Unable to create a temporary \"regsb_in\" file name: ^SYS",
               STATUS );
       goto CLEANUP;
    }
@@ -129,7 +129,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
    if( ifd == -1 ){
       *STATUS = SAI__ERROR;
       errSyser( "SYS", errno );
-      errRep( " ", "Unable to create a temporary \"regsb_out\" file name: ^SYS", 
+      errRep( " ", "Unable to create a temporary \"regsb_out\" file name: ^SYS",
               STATUS );
       /* close the first file */
       close(ifd);
@@ -151,7 +151,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
       /* Close the first file descriptor */
       close(ifd);
       goto CLEANUP;
-   } 
+   }
 
 /* Get the number of names to store in the file. */
    size = grpGrpsz( igrp0, STATUS );
@@ -171,15 +171,15 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
 /* Allocate memory for the sed command string. */
       script = (char *) malloc( (size_t) ( strlen( "sed -e '" )
                                            + RE_length
-                                           + strlen( "' " )  
-                                           + strlen( infile_name ) 
-                                           + strlen( " 1>" )  
-                                           + strlen( outfile_name ) 
-                                           + strlen( " 2>&1" )  
+                                           + strlen( "' " )
+                                           + strlen( infile_name )
+                                           + strlen( " 1>" )
+                                           + strlen( outfile_name )
+                                           + strlen( " 2>&1" )
                                            + 1 ) );
       if( !script ) {
          *STATUS = SAI__ERROR;
-         errRep( " ", "NDG_REGSB: Failed to allocate memory for sed command.", 
+         errRep( " ", "NDG_REGSB: Failed to allocate memory for sed command.",
                  STATUS );
 
 /* If OK, construct the sed command string. */
@@ -196,7 +196,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
          istat = system( script );
 
 /* Remove the input file. */
-         remove( infile_name );  
+         remove( infile_name );
 
 /* Deallocate the command string. */
          free( script );
@@ -218,7 +218,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
 	     }
 	     fclose( fd );
 	   }
-           
+
 	   goto CLEANUP;
          }
 
@@ -247,7 +247,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
 /* Get the number of names now in the returned group. */
             size = grpGrpsz( igrp, STATUS );
 	    *SIZE = size;
-         }     
+         }
       }
    }
 

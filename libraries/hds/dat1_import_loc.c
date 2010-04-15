@@ -128,7 +128,7 @@ erased - only annuling this locator is allowed).",
                              &hds_gl_status );
             }
          }
-            
+
 /* If still OK, then read the associated Record Control Label and check     */
 /* that the Record ID of the record's parent, as stored in the LCP, matches */
 /* the RID stored in the actual record.                                     */
@@ -159,7 +159,7 @@ longer exists (possible programming error or corrupted HDS container file).",
             hds_gl_status = DAT__LOCIN;
 
 	    /* Store the pointer */
-	    sprintf(strpntr, "%p", loc ); 
+	    sprintf(strpntr, "%p", loc );
 	    emsSetc( "PNTR", strpntr );
             emsRep( "DAT1_IMPORT_LOC_3",
 		    "HDS locator invalid for import: value==^PNTR (possible programming error).",

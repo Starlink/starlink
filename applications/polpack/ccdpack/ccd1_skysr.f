@@ -71,7 +71,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     {enter_new_authors_here}
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -182,7 +182,7 @@
      :           ( DAT1( IP( I1 + 1 ) ) .LE. D1 ) ) THEN
                I1 = I1 + 1
                GO TO 1
-            END IF        
+            END IF
 
 *  Similarly loop to find an upper limit at least IHALF points above
 *  the current data point which has a data value at least as large as
@@ -262,7 +262,7 @@
      :           ( DAT2( IP( I1 + 1 ) ) .LE. D1 ) ) THEN
                I1 = I1 + 1
                GO TO 4
-            END IF        
+            END IF
 
 *  Similarly loop to find an upper limit at least IHALF points above
 *  the current data point which has a data value at least as large as

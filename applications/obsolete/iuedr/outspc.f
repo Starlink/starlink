@@ -147,7 +147,7 @@
 
 *     Open file.
          OPEN ( UNIT = FD, NAME = CFILE( :CLEN ), ACCESS = 'SEQUENTIAL',
-     :          FORM = 'FORMATTED', STATUS = 'UNKNOWN', 
+     :          FORM = 'FORMATTED', STATUS = 'UNKNOWN',
      :          IOSTAT = IOSTAT )
          IF ( IOSTAT .NE. 0 ) THEN
             CALL ERRSTR( FILE )
@@ -192,7 +192,7 @@
 
 *     Open file.
          OPEN ( UNIT = FD, NAME = CFILE( :CLEN ), ACCESS = 'SEQUENTIAL',
-     :          FORM = 'FORMATTED', STATUS = 'UNKNOWN', 
+     :          FORM = 'FORMATTED', STATUS = 'UNKNOWN',
      :          IOSTAT = IOSTAT )
          IF ( IOSTAT .NE. 0 ) THEN
             CALL ERRSTR( FILE )

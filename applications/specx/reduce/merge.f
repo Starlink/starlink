@@ -9,7 +9,7 @@ C  overlapping spectra, assuming that the offset is constant
 C  and that the noise temperature in each quadrant rises as 1/x
 C  toward the end of the quadrant.
 
-C  In order to simplify the programming the routine uses the 
+C  In order to simplify the programming the routine uses the
 C  array XSCALE in a non-standard way. Hence the values in this
 C  array at the end of the call may not be correct.
 
@@ -91,7 +91,7 @@ C  First check that data is from correlator or similar instrument
             RETURN
           END IF
         END DO
-      END IF       
+      END IF
 
 C  Initialize any variables
 
@@ -146,7 +146,7 @@ C  ..Then within the quadrant if now necessary
         END IF
       END DO
 
-C  Now set up new XSCALE to reflect re-ordering 
+C  Now set up new XSCALE to reflect re-ordering
 
       CALL SETXNEW (XSCALE, IFAIL)
       IF (IFAIL.NE.0)  GO TO 100
@@ -185,7 +185,7 @@ C  Set up iteration by quadrant boundary
 C  Identify points involved in overlap
 
 CD      PRINT *, 'NQ, NST1, NEND1, NST2, NEND2 ',
-CD   &           NQ, NST1, NEND1, NST2, NEND2 
+CD   &           NQ, NST1, NEND1, NST2, NEND2
 
         X1 = XSCALE(NST2)
         X1 = XSNART (XSCALE(NST1),X1,NPTS(NQ),IF1)    ! X1 is fractional points
@@ -237,7 +237,7 @@ C  to sampling.
         IF (NQ.EQ.IQCEN-1) THEN
           CSHIFT = F
 CD        PRINT *,'NQ, new CSHIFT',NQ,CSHIFT
-        END IF       
+        END IF
 
 C  Now find the amount by which to shift the second quadrant. Assume a simple
 C  offset is all that is required. Fit the existing offset using Chi-squared
@@ -251,7 +251,7 @@ C  Find total range of overlap
         RANGE = XSCALE(NEND1)-XMIN
 
 C  In the case where sectors may be offset from each other, estimate
-C  offset, and shift spectra to suit. 
+C  offset, and shift spectra to suit.
 
         IF (SECTOR_OFFSET) THEN
 
@@ -320,7 +320,7 @@ C  Finally condense into a single spectrum/quadrant with new boundaries
         END DO
 
 CD      PRINT *,'NQ,NOFF',nq,noff
- 
+
         IF (NQ.EQ.IQCEN-1) THEN
           CSHIFT = CSHIFT + FLOAT(NST2-N1)
 CD        PRINT *,'Total value of CSHIFT',CSHIFT

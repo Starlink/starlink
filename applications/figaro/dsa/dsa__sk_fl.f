@@ -10,7 +10,7 @@ C
 C  Description:
 C    Given the reference slot number in the DSA common tables for an
 C    already open structure, this routine determines whether or not the
-C    main data array holds flagged pixel values. 
+C    main data array holds flagged pixel values.
 C
 C  Language:
 C     FORTRAN
@@ -46,7 +46,7 @@ C     DTA_STRUC         Tests if a data object is a structure.
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -129,7 +129,7 @@ C
             IF (DTA_STATUS.EQ.0) FOUND=.TRUE.
          END IF
 C
-C        Now, we've tried all the possibilities. FOUND is true if we 
+C        Now, we've tried all the possibilities. FOUND is true if we
 C        found a bad pixel flag, in which case the data is flagged if this
 C        has a non-zero value (which we have in FLAG). Otherwise, if we
 C        didn't find a flag at all, the decreed NDF default is that the
@@ -146,7 +146,7 @@ C
 C        This is the DST format case. Here the bad pixel flag is always
 C        called .Z.FLAGGED. If this is set to 1, there are flagged values
 C        in the data, and if it is zero or doesn't exist at all, then
-C        the data is unflagged. 
+C        the data is unflagged.
 C
          OBJECT=OBJ_NAMES(REF_SLOT)(:OBJ_LEN(REF_SLOT))//'.Z.FLAGGED'
          CALL DTA_RDVARI (OBJECT,1,FLAG,DTA_STATUS)
@@ -159,8 +159,8 @@ C
       END IF
 C
 C     Note that we're a bit slack with DTA_STATUS - if it's bad, we've
-C     assumed that's because the flag doesn't exist, which is OK, so we 
-C     just clear the status.  
+C     assumed that's because the flag doesn't exist, which is OK, so we
+C     just clear the status.
 C
       DTA_STATUS=0
 C

@@ -13,30 +13,30 @@
 *     CALL CTG1_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
 
 *  Description:
-*     The supplied group expression is parsed (using the facilities of 
-*     the GRP routine GRP_GROUP, see SUN/150) to produce a list of 
-*     explicit catalogue names. No check is made to see if these catalogues 
-*     exist or not, and any wild-cards in the catalogue names are ignored. 
+*     The supplied group expression is parsed (using the facilities of
+*     the GRP routine GRP_GROUP, see SUN/150) to produce a list of
+*     explicit catalogue names. No check is made to see if these catalogues
+*     exist or not, and any wild-cards in the catalogue names are ignored.
 *     The names are appended to the group identified by IGRP. If IGRP has
-*     the value GRP__NOID on entry, then a new group is created and IGRP 
+*     the value GRP__NOID on entry, then a new group is created and IGRP
 *     is returned holding the new group identifier.
 *
 *     If IGRP0 holds a valid group identifier on entry, then the group
 *     identified by IGRP0 is used as the basis for any modification
 *     element contained in the supplied group expression. If IGRP0 holds
-*     an invalid identifier (such as GRP__NOID) on entry then 
+*     an invalid identifier (such as GRP__NOID) on entry then
 *     modification elements are included literally in the output group.
 
 *  Arguments:
 *     GRPEXP = CHARACTER*(*) (Given)
-*        The group expression specifying the catalogue names to be stored in 
+*        The group expression specifying the catalogue names to be stored in
 *        the group.
 *     IGRP0 = INTEGER (Given)
 *        The GRP identifier for the group to be used as the basis for
-*        any modification elements. 
+*        any modification elements.
 *     IGRP = INTEGER (Given and Returned)
 *        The GRP identifier for the group to which the supplied catalogue
-*        names are to be appended. 
+*        names are to be appended.
 *     SIZE = INTEGER (Returned)
 *        The total number of catalogue names in the returned group.
 *     FLAG = LOGICAL (Returned)
@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -130,21 +130,21 @@
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
       CHARACTER ESC*1            ! Single backslash
-      PARAMETER( ESC = '\\' )    
+      PARAMETER( ESC = '\\' )
 
 *  Local Variables:
       CHARACTER ALTTYP*20          ! Second choice file type from CAT_FORMATS_OUT
       CHARACTER BN1*50             ! Supplied file base name
       CHARACTER DEFTYP*20          ! First choice file type from CAT_FORMATS_OUT
-      CHARACTER DIR*(GRP__SZNAM)   ! Directory path 
-      CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path 
-      CHARACTER DIR2*(GRP__SZFNM)  ! Expanded directory path 
+      CHARACTER DIR*(GRP__SZNAM)   ! Directory path
+      CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path
+      CHARACTER DIR2*(GRP__SZFNM)  ! Expanded directory path
       CHARACTER EXT1*50            ! Supplied catalogue section (ignored)
       CHARACTER FMTOUT*(CTG__SZFMT)! List of output catalogue formats
       CHARACTER NAME*(GRP__SZNAM)  ! Current name
       CHARACTER SUF1*100           ! Supplied file suffix
       CHARACTER TMPLT2*(GRP__SZNAM)! Template with escaped spaces
-      CHARACTER TYP*(GRP__SZNAM)   ! File type 
+      CHARACTER TYP*(GRP__SZNAM)   ! File type
       CHARACTER TYPS( MXTYP )*(SZTYP)! Known foreign file types
       INTEGER ADDED              ! No. of names added to the group
       INTEGER F                  ! Index of first non-blank character
@@ -229,12 +229,12 @@
 *  See if IGRP0 is a valid GRP identifier.
       CALL GRP_VALID( IGRP0, INGRP, STATUS )
 
-*  If the identifier is valid, get identifiers for the associated groups 
+*  If the identifier is valid, get identifiers for the associated groups
 *  holding the individual fields (directory path, file basename, and file
 *  type).
       IF( INGRP ) THEN
          CALL GRP_OWN( IGRP0, IGRPD, STATUS )
-         IF( IGRPD .NE. GRP__NOID ) THEN 
+         IF( IGRPD .NE. GRP__NOID ) THEN
             CALL GRP_OWN( IGRPD, IGRPB, STATUS )
             CALL GRP_OWN( IGRPB, IGRPT, STATUS )
          ELSE
@@ -246,7 +246,7 @@
          IGRPT = GRP__NOID
       END IF
 
-*  Call GRP_GRPEX to append catalogue names specified using the supplied 
+*  Call GRP_GRPEX to append catalogue names specified using the supplied
 *  group expresson, to the group. Any modification elements are based on
 *  the group holding the file base names.
       CALL GRP_GRPEX( GRPEXP, IGRPB, IGRP, SIZE, ADDED, FLAG, STATUS )
@@ -260,7 +260,7 @@
 *  Find the first and last non-blank characters in the template.
          CALL CHR_FANDL( NAME, F, L )
 
-*  We escape any embedded spaces in the template so that the shell script 
+*  We escape any embedded spaces in the template so that the shell script
 *  used by one_find_file will interpret the spaces as part of the file path.
          TMPLT2 = ' '
          J = 1
@@ -275,7 +275,7 @@
 
 *  Split this up into directory, basename, suffix and FITS extension (not
 *  used).
-         CALL CTG1_FPARS( TMPLT2( : J - 1 ), DIR1, BN1, SUF1, EXT1, 
+         CALL CTG1_FPARS( TMPLT2( : J - 1 ), DIR1, BN1, SUF1, EXT1,
      :                    STATUS )
 
 *  If a directory spec was included, expand it to remove any shell
@@ -289,7 +289,7 @@
 *  Expand the directory path to remove shell meta-characters. Use the "-d"
 *  option for the "ls" command to get the directory name itself, rather
 *  than the contents of the directory.
-            IAT = CHR_LEN( DIR1 ) 
+            IAT = CHR_LEN( DIR1 )
             DIR2 = ' '
             FOUND = ONE_FIND_FILE( DIR1( : IAT ), .FALSE., DIR2,
      :           ICONTX, STATUS )
@@ -310,7 +310,7 @@
                CALL CHR_APPND( BN1, NAME, IAT )
                CALL CHR_APPND( SUF1, NAME, IAT )
                CALL CHR_APPND( EXT1, NAME, IAT )
-           
+
             END IF
 
 *  Clear status if no more files
@@ -349,7 +349,7 @@
 
 *  No file type was specified, so we need to choose one now on the basis
 *  of the CAT_FORMATS_OUT default file type, and the file type of the
-*  basis element. If the default file type is "*" use the file type from 
+*  basis element. If the default file type is "*" use the file type from
 *  the basis element.
                IF( DEFTYP .EQ. '*' ) THEN
                   IF( IGRPT .NE. GRP__NOID ) THEN
@@ -382,9 +382,9 @@
                IF( DEFTYP .EQ. '*' ) THEN
                   CALL CHR_APPND( ALTTYP, NAME, IAT )
 
-               ELSE 
+               ELSE
                   CALL CHR_APPND( DEFTYP, NAME, IAT )
-               END IF               
+               END IF
 
             END IF
 
@@ -395,7 +395,7 @@
 
       END DO
 
-*  If an error occured, reset the group back to its original size if a 
+*  If an error occured, reset the group back to its original size if a
 *  group was supplied, or delete the group if no group was supplied.
 *  Ensure FLAG is returned .FALSE.
       IF( STATUS .NE. SAI__OK ) THEN
@@ -413,7 +413,7 @@
 *  Give a context message.
          CALL MSG_SETC( 'P', GRPEXP )
          CALL ERR_REP( 'CTG_CREXP_ERR1','Error obtaining a group of '//
-     :                 'catalogues using group expression ''^P''.', 
+     :                 'catalogues using group expression ''^P''.',
      :                 STATUS )
 
       END IF

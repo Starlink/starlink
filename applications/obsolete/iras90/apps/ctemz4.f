@@ -106,7 +106,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -242,7 +242,7 @@
                VT = VRAT*T( 2 )**2
                VTEMP( I ) = REAL( VT )
 
-*  If an optical depth image is required, evaluate the observed 
+*  If an optical depth image is required, evaluate the observed
 *  surface brightness in BAND1 at this temperature. The NAG routine also
 *  returns the first three derivatives with temperature.
                IF( CC .GT. 0.0D0 ) THEN
@@ -265,7 +265,7 @@
 
 *  Evaluate the uncertainty in SB1( 1 ) given the uncertainty in the
 *  temperature.
-                  VSB1 = VT*( SB1( 2 )**2 ) 
+                  VSB1 = VT*( SB1( 2 )**2 )
 
 *  Calculate the uncertainty in the optical depth.
                   VOD( I ) = REAL( ( ( CC*OD( I ) )**2 )*
@@ -283,7 +283,7 @@
                IF( CC .GT. 0.0D0 ) THEN
                   OD( I ) = VAL__BADR
                   VOD( I ) = VAL__BADR
-               END IF               
+               END IF
 
                BAD = .TRUE.
             END IF
@@ -297,7 +297,7 @@
             IF( CC .GT. 0.0D0 ) THEN
                OD( I ) = VAL__BADR
                VOD( I ) = VAL__BADR
-            END IF               
+            END IF
 
             BAD = .TRUE.
          END IF

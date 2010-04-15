@@ -6,14 +6,14 @@
      &   CONT_ST,CONT_EN,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<),PARAMS (<), TOP_STK (<),
 C STK_STOKES_I (<), STK_STOKES_Q (<), STK_STOKES_QV (<),
@@ -22,10 +22,10 @@ C STK_NPTS (<),STOKES_I (>), STOKES_Q (>),
 C STOKES_QV (>),STOKES_U (>),STOKES_UV (>),LAMBDA (>),NPTS (>),NZONES (<),
 C CONT_ST (<), CONT_EN (<), OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C This subroutine fits a polynomial to the continuum bins of a stack
 C entry and places the resulting fit in the current arrays.
@@ -141,7 +141,7 @@ C
       IF ((ORD+1).GE.NZONES) THEN
        CALL WR_ERROR('Not enough continuum bins defined',OUT_LU)
        GOTO 666
-      ENDIF 
+      ENDIF
 C
 C Fill up the temp arrays.
 C
@@ -198,7 +198,7 @@ C
       DO I = 1,NZONES
        CONTBIN_W(I) = CONTBIN_W(I)/AVA
       ENDDO
-C        
+C
 C Uses Bevington's polynomial least squares fitting routine
 C
       CALL POLFIT(CONTBIN_W,CONTBIN_I,CONTBIN_IV,NZONES,ORD+1,

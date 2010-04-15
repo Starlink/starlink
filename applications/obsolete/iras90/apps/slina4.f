@@ -1,4 +1,4 @@
-      SUBROUTINE SLINA4( PERAS, IRA, SCS, LBND, UBND, 
+      SUBROUTINE SLINA4( PERAS, IRA, SCS, LBND, UBND,
      :                   MXNSCT, MXVTCE, NMERD, NPARL, NGCRL, NPOLY,
      :                   NVTCE, MLON, MLAT, MSCT, PLON, PLAT, PSCT,
      :                   GLON, GLAT, GANG, GSCT, PLYLON, PLYLAT,
@@ -14,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SLINA4( PERAS, IRA, SCS, LBND, UBND, 
+*     CALL SLINA4( PERAS, IRA, SCS, LBND, UBND,
 *                  MXNSCT, MXVTCE, NMERD, NPARL, NGCRL, NPOLY, NVTCE,
 *                  MLON, MLAT, MSCT, PLON, PLAT, PSCT, GLON, GLAT,
 *                  GANG, GSCT, PLYLON, PLYLAT, STATUS )
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,7 +111,7 @@
      :                 GANG( MXNSCT ), GSCT( MXNSCT )
       DOUBLE PRECISION PLYLON( MXNSCT, MXVTCE ),
      :                 PLYLAT( MXNSCT, MXVTCE )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -125,9 +125,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the clear flag to indicate nothing has been erased. 
+*  Initialise the clear flag to indicate nothing has been erased.
       CLEAR = .FALSE.
-      
+
 *  See what to erase.
       CALL PAR_CHOIC( PERAS, ' ', 'MERIDIAN,PARALLEL,GREAT CIRCLE,'/
      :               /'POLYLINE,ALL', .FALSE., ERASE, STATUS )
@@ -140,7 +140,7 @@
          IF ( NMERD .GT. 0 ) THEN
             NMERD = NMERD - 1
             CLEAR = .TRUE.
-      
+
 *  or no meridian has been drawn, report to the user.
          ELSE
             CALL MSG_OUTIF( MSG__NORM, 'SLINA4_MSG1',
@@ -148,7 +148,7 @@
      :                      STATUS )
             CALL MSG_BLANKIF( MSG__NORM, STATUS )
          END IF
-      
+
 *  If last parallel section is to be erased, ...
       ELSE IF ( ERASE( : 8 ) .EQ. 'PARALLEL' ) THEN
 
@@ -217,14 +217,14 @@
       IF ( CLEAR ) THEN
          CALL SGS_CLRZ
 
-*  Redrawn the remaining meridian if there is any.          
+*  Redrawn the remaining meridian if there is any.
          IF ( NMERD .GT. 0 )
-     :      CALL SLINF0( IRA, SCS, LBND, UBND, NMERD, 
+     :      CALL SLINF0( IRA, SCS, LBND, UBND, NMERD,
      :                   MLON, MLAT, MSCT, STATUS )
 
-*  Redrawn the remainning parallel if there is any.          
+*  Redrawn the remainning parallel if there is any.
          IF ( NPARL .GT. 0 )
-     :      CALL SLINF1( IRA, SCS, LBND, UBND, NPARL, 
+     :      CALL SLINF1( IRA, SCS, LBND, UBND, NPARL,
      :                   PLON, PLAT, PSCT, STATUS )
 
 *  Redrawn the remainning great circle sections if there is any.
@@ -234,7 +234,7 @@
 
 *  Redrawn the remainning polylines if there is any.
          IF ( NPOLY .GT. 0 )
-     :      CALL SLINF3( IRA, SCS, LBND, UBND, MXNSCT, MXVTCE, NPOLY, 
+     :      CALL SLINF3( IRA, SCS, LBND, UBND, MXNSCT, MXVTCE, NPOLY,
      :                   NVTCE, PLYLON, PLYLAT, STATUS )
 
       END IF
@@ -244,5 +244,5 @@
 
 *  Cancel the parameter value for next use.
       CALL PAR_CANCL( PERAS, STATUS )
-      
+
       END

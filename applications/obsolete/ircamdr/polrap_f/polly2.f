@@ -83,11 +83,11 @@
      :	  EINTEN67,
      :	  ELDN,
      :	  I,
-     :	  Q, 
-     :	  U, 
-     :	  P, 
-     :	  T, 
-     :	  PE, 
+     :	  Q,
+     :	  U,
+     :	  P,
+     :	  T,
+     :	  PE,
      :	  TE,
      :	  ZP,
      :	  MAG
@@ -99,21 +99,21 @@
       END IF
 
 *    get a 8 intensity values from user
-      CALL AIF_GET0R( 'OINTEN0', 0.0, MINVAL, MAXVAL, OINTEN0, 
+      CALL AIF_GET0R( 'OINTEN0', 0.0, MINVAL, MAXVAL, OINTEN0,
      :	STATUS )
-      CALL AIF_GET0R( 'EINTEN0', 0.0, MINVAL, MAXVAL, EINTEN0, 
+      CALL AIF_GET0R( 'EINTEN0', 0.0, MINVAL, MAXVAL, EINTEN0,
      :	STATUS )
-      CALL AIF_GET0R( 'OINTEN45', 0.0, MINVAL, MAXVAL, OINTEN45, 
+      CALL AIF_GET0R( 'OINTEN45', 0.0, MINVAL, MAXVAL, OINTEN45,
      :	STATUS )
-      CALL AIF_GET0R( 'EINTEN45', 0.0, MINVAL, MAXVAL, EINTEN45, 
+      CALL AIF_GET0R( 'EINTEN45', 0.0, MINVAL, MAXVAL, EINTEN45,
      :	STATUS )
-      CALL AIF_GET0R( 'OINTEN22', 0.0, MINVAL, MAXVAL, OINTEN22, 
+      CALL AIF_GET0R( 'OINTEN22', 0.0, MINVAL, MAXVAL, OINTEN22,
      :	STATUS )
-      CALL AIF_GET0R( 'EINTEN22', 0.0, MINVAL, MAXVAL, EINTEN22, 
+      CALL AIF_GET0R( 'EINTEN22', 0.0, MINVAL, MAXVAL, EINTEN22,
      :	STATUS )
-      CALL AIF_GET0R( 'OINTEN67', 0.0, MINVAL, MAXVAL, OINTEN67, 
+      CALL AIF_GET0R( 'OINTEN67', 0.0, MINVAL, MAXVAL, OINTEN67,
      :	 STATUS )
-      CALL AIF_GET0R( 'EINTEN67', 0.0, MINVAL, MAXVAL, EINTEN67, 
+      CALL AIF_GET0R( 'EINTEN67', 0.0, MINVAL, MAXVAL, EINTEN67,
      :	STATUS )
 
 *    get electrons/dn value
@@ -129,11 +129,11 @@
 	CALL POL2_STOKESCAL( OINTEN22, EINTEN22, OINTEN67, EINTEN67, U)
  	CALL POL2_POLCAL( Q, U, P)
 	CALL POL2_THETACAL( Q, U, T)
-	CALL POL2_ERRCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45, 
-     :	                  OINTEN22, EINTEN22, OINTEN67, EINTEN67, 
+	CALL POL2_ERRCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45,
+     :	                  OINTEN22, EINTEN22, OINTEN67, EINTEN67,
      :	                  P, ELDN, PE, TE)
-	CALL POL2_INTCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45, 
-     :	                  OINTEN22, EINTEN22, OINTEN67, EINTEN67, 
+	CALL POL2_INTCAL( OINTEN0, EINTEN0, OINTEN45, EINTEN45,
+     :	                  OINTEN22, EINTEN22, OINTEN67, EINTEN67,
      :	                  I)
 
 	MAG = ZP - 2.5*LOG10( I)
@@ -141,58 +141,58 @@
 	CALL MSG_OUT( 'BLANK' ,' ', STATUS)
 
 	CALL MSG_SETR( 'OI1', OINTEN0)
-	CALL MSG_OUT( 'MESS', 'o- intensity at  0 degrees           = ^OI1', 
+	CALL MSG_OUT( 'MESS', 'o- intensity at  0 degrees           = ^OI1',
      :	  STATUS)
 	CALL MSG_SETR( 'EI1', EINTEN0)
-	CALL MSG_OUT( 'MESS', 'e- intensity at  0 degrees           = ^EI1', 
+	CALL MSG_OUT( 'MESS', 'e- intensity at  0 degrees           = ^EI1',
      :	  STATUS)
 	CALL MSG_SETR( 'OI2', OINTEN45)
-	CALL MSG_OUT( 'MESS', 'o- intensity at 45 degrees           = ^OI2', 
+	CALL MSG_OUT( 'MESS', 'o- intensity at 45 degrees           = ^OI2',
      :	  STATUS)
 	CALL MSG_SETR( 'EI2', EINTEN45)
-	CALL MSG_OUT( 'MESS', 'e- intensity at 45 degrees           = ^EI2', 
+	CALL MSG_OUT( 'MESS', 'e- intensity at 45 degrees           = ^EI2',
      :	  STATUS)
 	CALL MSG_SETR( 'OI3', OINTEN22)
-	CALL MSG_OUT( 'MESS', 'o- intensity at 22 degrees           = ^OI3', 
+	CALL MSG_OUT( 'MESS', 'o- intensity at 22 degrees           = ^OI3',
      :	  STATUS)
 	CALL MSG_SETR( 'EI3', EINTEN22)
-	CALL MSG_OUT( 'MESS', 'e- intensity at 22 degrees           = ^EI3', 
+	CALL MSG_OUT( 'MESS', 'e- intensity at 22 degrees           = ^EI3',
      :	  STATUS)
 	CALL MSG_SETR( 'OI4', OINTEN67)
-	CALL MSG_OUT( 'MESS', 'o- intensity at 67 degrees           = ^OI4', 
+	CALL MSG_OUT( 'MESS', 'o- intensity at 67 degrees           = ^OI4',
      :	  STATUS)
 	CALL MSG_SETR( 'EI4', EINTEN67)
-	CALL MSG_OUT( 'MESS', 'e- intensity at 67 degrees           = ^EI4', 
+	CALL MSG_OUT( 'MESS', 'e- intensity at 67 degrees           = ^EI4',
      :	  STATUS)
 
 	CALL MSG_OUT( 'BLANK' ,' ', STATUS)
 
 	CALL MSG_SETR( 'I', I)
-	CALL MSG_OUT( 'MESS', 'Total intensity                   = ^I', 
+	CALL MSG_OUT( 'MESS', 'Total intensity                   = ^I',
      :	  STATUS)
 	CALL MSG_SETR( 'Z', ZP)
-	CALL MSG_OUT( 'MESS', 'Zeropoint                         = ^Z', 
+	CALL MSG_OUT( 'MESS', 'Zeropoint                         = ^Z',
      :	  STATUS)
 	CALL MSG_SETR( 'M', MAG)
-	CALL MSG_OUT( 'MESS', 'Magnitude                         = ^M', 
+	CALL MSG_OUT( 'MESS', 'Magnitude                         = ^M',
      :	  STATUS)
 	CALL MSG_SETR( 'Q', Q)
-	CALL MSG_OUT( 'MESS', 'Q-Stokes parameter (%)            = ^Q', 
+	CALL MSG_OUT( 'MESS', 'Q-Stokes parameter (%)            = ^Q',
      :	  STATUS)
 	CALL MSG_SETR( 'U', U)
-	CALL MSG_OUT( 'MESS', 'U-Stokes parameter (%)            = ^U', 
+	CALL MSG_OUT( 'MESS', 'U-Stokes parameter (%)            = ^U',
      :	  STATUS)
 	CALL MSG_SETR( 'P', P)
-	CALL MSG_OUT( 'MESS', 'Percentage polarization (%)       = ^P', 
+	CALL MSG_OUT( 'MESS', 'Percentage polarization (%)       = ^P',
      :	  STATUS)
 !	CALL MSG_SETR( 'PE', PE)
-!	CALL MSG_OUT( 'MESS', 'Polarization shot-noise error (%) = ^PE', 
+!	CALL MSG_OUT( 'MESS', 'Polarization shot-noise error (%) = ^PE',
 !     :	  STATUS)
 	CALL MSG_SETR( 'T', T)
-	CALL MSG_OUT( 'MESS', 'Position angle (degrees)          = ^T', 
+	CALL MSG_OUT( 'MESS', 'Position angle (degrees)          = ^T',
      :	  STATUS)
 !	CALL MSG_SETR( 'TE', TE)
-!	CALL MSG_OUT( 'MESS', 'Position angle error (degrees)    = ^TE', 
+!	CALL MSG_OUT( 'MESS', 'Position angle error (degrees)    = ^TE',
 !     :	  STATUS)
 
 	CALL MSG_OUT( 'BLANK' ,' ', STATUS)

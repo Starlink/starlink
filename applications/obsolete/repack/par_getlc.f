@@ -6,10 +6,10 @@
 * Output
 	CHARACTER*(*) 	VAL
 	INTEGER		STATUS
-        integer         k 
- 
+        integer         k
+
 	IF (STATUS .NE. 0) RETURN
- 
+
 	CALL PAR_GET0C (PAR, VAL, STATUS)
 	CALL CHR_LCASE(VAL)
 

@@ -14,7 +14,7 @@
 *     transform position, and using its value. This may lead to the
 *     occasional instance where two adjacent pixels in the new array
 *     are calculated to have come from the same pixel in the old array.
-*     This implies some slight degradation of resolution. Perhaps a 
+*     This implies some slight degradation of resolution. Perhaps a
 *     better implementation should use bilinear interpolation of the
 *     surrounding points.
 *
@@ -38,7 +38,7 @@
 *    History :
 *
 *     14-11-1985 :  First implementation for ROTATE (REVA::MJM)
-*     17-July-1994  Converted angles to radians to avoid VAX-specific 
+*     17-July-1994  Converted angles to radians to avoid VAX-specific
 *                   trig functions, changed arguments to input DIMS
 *                   separately so that routine will still compile (SKL@JACH)
 *
@@ -55,7 +55,7 @@
       INTEGER
      :    IDIMS1,         ! dimensions of input array
      :    IDIMS2,         ! dimensions of input array
-     :    ODIMS1,         !      "      " output       
+     :    ODIMS1,         !      "      " output
      :    ODIMS2          !      "      " output  "
 
       REAL
@@ -95,7 +95,7 @@
      :    SANGLE,       ! sine of the rotation angle
      :    DTOR          ! factor fro converting degrees to radians
 
-      PARAMETER ( DTOR = 3.141592 / 180.0 ) 
+      PARAMETER ( DTOR = 3.141592 / 180.0 )
 
 *-
 *    check status on entry - return if not o.k.
@@ -110,10 +110,10 @@
       OCX  =  REAL( ODIMS1 ) / 2.0
       OCY  =  REAL( ODIMS2 ) / 2.0
 
-*    set up the sine and cosine of the rotation angle 
+*    set up the sine and cosine of the rotation angle
 *    first convert degrees to radians
 !      ANGLE = ANGLE * DTOR
-*    
+*
       CANGLE  =  COS( ANGLE )
       SANGLE  =  SIN( ANGLE )
 *	type *, 'cangle, sangle = ', cangle, sangle

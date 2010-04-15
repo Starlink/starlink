@@ -32,12 +32,12 @@
 
       DOUBLE PRECISION TWOPI, HALFPI,RDSA,RDST,RDDG,DRA, RA
       COMMON/CONVF/TWOPI,HALFPI,RDSA,RDST,RDDG
- 
+
       CHARACTER*1 ISIGN
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       XP = X + 5.0
       YP = Y
       IF (RA.LT.0.0) THEN
@@ -51,7 +51,7 @@
       ELSE
          CALL SGS_STXJ ('BC')
       ENDIF
- 
+
       CALL SGS_BTEXT (XP,YP)
       CALL SGS_ATXI  (IH,-2)
       CALL SGS_ATEXT (':')
@@ -62,5 +62,5 @@
          CALL SGS_ATXI (IM,-1)
       ENDIF
       CALL SGS_OTEXT
- 
+
       END

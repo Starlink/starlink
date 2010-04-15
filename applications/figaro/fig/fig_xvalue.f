@@ -4,8 +4,8 @@ C
 C     F I G _ X V A L U E
 C
 C     Figaro utility, used to interpolate between the values in
-C     an axis array.  It is passed a fractional bin number and 
-C     interpolates between the values in adjacent bins.  
+C     an axis array.  It is passed a fractional bin number and
+C     interpolates between the values in adjacent bins.
 C
 C     Call:
 C
@@ -40,7 +40,7 @@ C     Variables
 C
       INTEGER NELM
       REAL X1,Y1,Y2
-C    
+C
 C     All this routine does is a simple linear interpolation,
 C     taking care to keep within the range 1..NX
 C

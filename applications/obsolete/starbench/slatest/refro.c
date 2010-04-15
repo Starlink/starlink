@@ -13,7 +13,7 @@ double q1,double*q2)
 #define qfoobar 16384
 {static double Q3=1.623156204;static double q4=8314.32;
 static double qfOBAz=28.9644;static double qfoobaz=18.0152;
-static double QQUUX=6378120.0;static double Q5=18.36;static 
+static double QQUUX=6378120.0;static double Q5=18.36;static
 double QFRED=11000.0;static double qdog=80000.0;double qcat;
 double QFISH;double QgASp;double Q6;double q7;double q8,QBAD
 ,qBuG,qsilly,QBUGGY,QMUM;double qDAd;double q9;double Q10;
@@ -67,16 +67,16 @@ QFISH,QgASp,Q6,q7,q8,QBAD,qBuG,qsilly,QBUGGY,QMUM,QHINT,&q38
 qtrick+=q39;}}qred=Q32*(QYahoO+4.0*qtrick+2.0*q31+Q30)/3.0;
 if(Q14==1)QgreEN=qred;if(fabs(qred-Q28)<=QBIG||Q13>=qfoobar)
 break;Q28=qred;Q13+=Q13;q31+=qtrick;qtrick=0.0;qdisk=2;}}*q2
-=QgreEN+qred;if(q17<0.0)*q2=-(*q2);}static void qfoo(double 
+=QgreEN+qred;if(q17<0.0)*q2=-(*q2);}static void qfoo(double
 qcat,double QFISH,double QgASp,double Q6,double q7,double q8
-,double QBAD,double qBuG,double qsilly,double QBUGGY,double 
-QMUM,double QHINT,double*q38,double*q36,double*q37){double 
+,double QBAD,double qBuG,double qsilly,double QBUGGY,double
+QMUM,double QHINT,double*q38,double*q36,double*q37){double
 QSPEED,QMAGENTA,QCyaN,Q41;QSPEED=QFISH-QgASp*(QHINT-qcat);
 QSPEED=gmin(QSPEED,320.0);QSPEED=gmax(QSPEED,100.0);QMAGENTA
 =QSPEED/QFISH;QCyaN=pow(QMAGENTA,Q6);Q41=pow(QMAGENTA,q7);*
 q38=QSPEED;*q36=1.0+(q8*QCyaN-(QBAD-QBUGGY/QSPEED)*Q41)*
 QMAGENTA;*q37=QHINT*(-qBuG*QCyaN+(qsilly-QMUM/QMAGENTA)*Q41)
-;}static void qbar(double qDAd,double q9,double Q10,double 
+;}static void qbar(double qDAd,double q9,double Q10,double
 Q11,double QHINT,double*q36,double*q37){double QWHITE,QSPEED
 ;QWHITE=Q11/q9;QSPEED=(Q10-1.0)*exp(-QWHITE*(QHINT-qDAd));*
 q36=1.0+QSPEED;*q37=-QHINT*QWHITE*QSPEED;}

@@ -12,7 +12,7 @@
 #  Description:
 #     This class provides GUI controls for the various options which
 #     determine how vectors are selected.
-#    
+#
 #  Invocations:
 #
 #        GaiaPolUSelOpt object_name [configuration options]
@@ -79,7 +79,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -88,7 +88,7 @@ itcl::class gaia::GaiaPolUSelOpt {
       set created_ 0
 
 #  Set defaults
-      reset 
+      reset
    }
 
 #  Destructor:
@@ -180,7 +180,7 @@ itcl::class gaia::GaiaPolUSelOpt {
          }
       }
 
-#  Replace illegal blank values read from the options file with the hardwired 
+#  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
       if { $values_($this,select) == "" } { set values_($this,select) 1 }
       if { $values_($this,shape) == "" } { set values_($this,shape) "box" }
@@ -194,7 +194,7 @@ itcl::class gaia::GaiaPolUSelOpt {
    }
 
 #  Ensure the menu holding recently used selection expressions reflects
-#  the expressions stored in values_($this,sexps). 
+#  the expressions stored in values_($this,sexps).
 #  ---------------------------------------------------------------------
    public method sexpMenu {} {
       set exp0 $values_($this,sexp)
@@ -212,7 +212,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  -----------------
    public method setSelect {s} {
       if { $s } {
-         set values_($this,select) 1      
+         set values_($this,select) 1
       } else {
          set values_($this,select) 0
       }
@@ -272,7 +272,7 @@ itcl::class gaia::GaiaPolUSelOpt {
          if { [lsearch -exact $values_($this,sexps) $tidy] == -1 } {
 
 #  The values to be stored in the menu are kept in element "sexps"
-#  of values_. Add the new expression into this list at the start, 
+#  of values_. Add the new expression into this list at the start,
 #  removing the last entry if there are more than 9.
             if { ![info exists values_($this,sexps)] } {
                set nold 0
@@ -328,7 +328,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -359,7 +359,7 @@ itcl::class gaia::GaiaPolUSelOpt {
          set r -1
 
 #  Label parameters...
-         itk_component add header1 { 
+         itk_component add header1 {
 	    LabelRule $w_.header1 -text "Vector Selection Options:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
@@ -376,7 +376,7 @@ itcl::class gaia::GaiaPolUSelOpt {
                               -indicatoron 1 \
                               -valuewidth 50 \
                               -command [code $this activ sexp] \
-                              -anchor nw 
+                              -anchor nw
          }
          grid $itk_component(sexp) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(sexp) {Choose vectors using an algebraic expression (e.g. ' $P < 10 && $DP < 1.5 ')}
@@ -388,7 +388,7 @@ itcl::class gaia::GaiaPolUSelOpt {
                                                      [code $this activb 0 sexp]
 
 #  Vertical space.
-         grid [frame $w_.space1 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space1 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -398,7 +398,7 @@ itcl::class gaia::GaiaPolUSelOpt {
          itk_component add select {
             LabelMenu $w_.select -text "Operation:" \
                                  -variable [scope values_($this,select)] \
-                                 -labelwidth $lwidth 
+                                 -labelwidth $lwidth
          }
          grid $itk_component(select) -row $r -columnspan $ncol -column 0 -sticky nw -padx $px
          add_short_help $itk_component(select) {Should the vectors you choose be selected or deselected?}
@@ -408,7 +408,7 @@ itcl::class gaia::GaiaPolUSelOpt {
                                     -command "[code $this activ select]"
 
 #  Vertical space.
-         grid [frame $w_.space2 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space2 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -418,7 +418,7 @@ itcl::class gaia::GaiaPolUSelOpt {
          itk_component add shape {
             LabelMenu $w_.shape -text "Region shape:" \
                               -variable [scope values_($this,shape)] \
-                              -labelwidth $lwidth 
+                              -labelwidth $lwidth
          }
          grid $itk_component(shape) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(shape) {The shape to use when choosing vectors by dragging the cursor over the map}
@@ -428,7 +428,7 @@ itcl::class gaia::GaiaPolUSelOpt {
                                     -command "[code $this activ shape]"
 
 #  Vertical space.
-         grid [frame $w_.space2b -height $vspace2] -row [incr r] 
+         grid [frame $w_.space2b -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -442,13 +442,13 @@ itcl::class gaia::GaiaPolUSelOpt {
                                      -labelwidth $lwidth \
                                      -command [code $this activ freeze] \
                                      -anchor nw \
-                                     -variable [scope values_($this,freeze)] 
+                                     -variable [scope values_($this,freeze)]
          }
          grid $itk_component(freeze) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(freeze) {Click to prevent vectors being selected or deselected by clicking and dragging over the vector map}
 
 #  Vertical space.
-         grid [frame $w_.space3 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space3 -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -489,7 +489,7 @@ itcl::class gaia::GaiaPolUSelOpt {
          add_short_help $itk_component(invert) {Click to swap the currently selected and unselected vectors}
 
 #  Vertical space
-         grid [frame $w_.space6 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space6 -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -501,7 +501,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 
 #  Re-instate the original values_ array.
          foreach name [array names values_] {
-            set values_($name) $temp($name) 
+            set values_($name) $temp($name)
          }
 
 #  Ensure the menu holding recently used selection expressions reflects
@@ -543,7 +543,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  A command to call when any control values are changed by the user.
    itk_option define -changecmd changecmd Changecmd {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -557,14 +557,14 @@ itcl::class gaia::GaiaPolUSelOpt {
        variable attr_
 
 #  An array of the previous control values.
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

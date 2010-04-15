@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_related_model( const smfGroup *group, const dim_t subindex, 
+*     smf_open_related_model( const smfGroup *group, const dim_t subindex,
 *                             const char *accmode, smfArray **relfiles,
 *                             int *status );
 
@@ -96,8 +96,8 @@
 
 #define FUNC_NAME "smf_open_related_model"
 
-void smf_open_related_model( const smfGroup *group, const dim_t subindex, 
-			     const char *accmode, smfArray **relfiles, 
+void smf_open_related_model( const smfGroup *group, const dim_t subindex,
+			     const char *accmode, smfArray **relfiles,
 			     int *status ) {
 
   /* Local variables */

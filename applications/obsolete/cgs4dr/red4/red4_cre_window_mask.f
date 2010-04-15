@@ -72,7 +72,7 @@
 *   Check for error on entry
       IF ( STATUS .NE. ADAM__OK ) RETURN
 
-*   Obtain the name of the output structure. 
+*   Obtain the name of the output structure.
       CALL PAR_GET0C( 'MASK', MASK, STATUS )
 
 *   Obtain the required size for the mask. (This should be the same
@@ -94,11 +94,11 @@
 *      Open the mask template file CGS4_TEMPLATES:MASK_TEMPLATE.DST
 *      and use this as a basis for creating the new mask structure
          CALL DSA_NAMED_INPUT( 'MASK_TEMP', MASK_TEMPLATE, STATUS )
-         CALL DSA_NAMED_OUTPUT( 'MASK', MASK, 'MASK_TEMP', 0, 1, STATUS ) 
+         CALL DSA_NAMED_OUTPUT( 'MASK', MASK, 'MASK_TEMP', 0, 1, STATUS )
          CALL DSA_USE_QUALITY( 'MASK', STATUS )
 
 *      Force the data array in the mask structure to be the specified size.
-         CALL DSA_RESHAPE_DATA( 'MASK', 'MASK', NDIM, 
+         CALL DSA_RESHAPE_DATA( 'MASK', 'MASK', NDIM,
      :     DIMS, STATUS )
 
 *      Map the data array in the MASK structure as a byte array.
@@ -109,7 +109,7 @@
 *      Check this has worked
          IF ( STATUS .EQ. ADAM__OK ) THEN
 
-*         Use the size of the data array as defaults for obtaining 
+*         Use the size of the data array as defaults for obtaining
 *         the extent of the window. (The default window would fill
 *         the whole mask with "good" values).
             CALL PAR_DEF0I( 'WINDOW_IMIN', 1, STATUS )
@@ -131,7 +131,7 @@
 *            them and issue a warning.
                IF ( WINDOW_IMIN .LT. 1 ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - Left hand column '/ 
+                  CALL MSG_OUT( ' ', 'WARNING - Left hand column '/
      :              /'number was outside left array bounds - Reset',
      :              STATUS )
 
@@ -140,7 +140,7 @@
 
                IF ( WINDOW_IMIN .GT. DIMS(1) ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - Left hand column '/ 
+                  CALL MSG_OUT( ' ', 'WARNING - Left hand column '/
      :              /'number was outside right array bounds - Reset',
      :              STATUS )
 
@@ -149,7 +149,7 @@
 
                IF ( WINDOW_IMAX .LT. 1 ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - Right hand column '/ 
+                  CALL MSG_OUT( ' ', 'WARNING - Right hand column '/
      :              /'number was outside left array bounds - Reset',
      :              STATUS )
 
@@ -158,7 +158,7 @@
 
                IF ( WINDOW_IMAX .GT. DIMS(1) ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - Right hand column '/ 
+                  CALL MSG_OUT( ' ', 'WARNING - Right hand column '/
      :              /'number was outside right array bounds - Reset',
      :              STATUS )
 
@@ -167,7 +167,7 @@
 
                IF ( WINDOW_JMIN .LT. 1 ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - bottom column '/ 
+                  CALL MSG_OUT( ' ', 'WARNING - bottom column '/
      :              /'number was outside bottom array bounds - '/
      :              /'Reset', STATUS )
 
@@ -176,7 +176,7 @@
 
                IF ( WINDOW_JMIN .GT. DIMS(2) ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - bottom column '/ 
+                  CALL MSG_OUT( ' ', 'WARNING - bottom column '/
      :              /'number was outside top array bounds - Reset',
      :              STATUS )
 
@@ -185,7 +185,7 @@
 
                IF ( WINDOW_JMAX .LT. 1 ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - Top column '/ 
+                  CALL MSG_OUT( ' ', 'WARNING - Top column '/
      :              /'number was outside bottom array bounds - '/
      :              /'Reset', STATUS )
 
@@ -194,8 +194,8 @@
 
                IF ( WINDOW_JMAX .GT. DIMS(2) ) THEN
 
-                  CALL MSG_OUT( ' ', 'WARNING - Top column '/ 
-     :              /'number was outside top array bounds - Reset', 
+                  CALL MSG_OUT( ' ', 'WARNING - Top column '/
+     :              /'number was outside top array bounds - Reset',
      :              STATUS )
 
                   WINDOW_JMAX = DIMS(2)
@@ -275,7 +275,7 @@
 
 *      Close DSA. It will create the new mask structure and will
 *      also unmap all the arrays mapped above.
-*      (The routine will attempt to work even if the status on entry is bad). 
+*      (The routine will attempt to work even if the status on entry is bad).
          CALL DSA_CLOSE( STATUS )
       ELSE
 

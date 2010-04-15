@@ -28,7 +28,7 @@
 *        The global status.
 
 *  Algorithm:
-*     - The current FFT routines accept any image size, so just return the 
+*     - The current FFT routines accept any image size, so just return the
 *       supplied image size.
 
 *  Copyright:

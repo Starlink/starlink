@@ -1,21 +1,21 @@
- 
- 
+
+
       FUNCTION PERIOD_RAN1(IDUM)
- 
+
 C============================================================================
 C Returns a uniform deviate between 0.0 and 1.0. Set IDUM to any negative
 C value to initialise or reinitialise the sequence.
 C
 C Adapted from Numerical Recipes by Vikram Singh Dhillon @Sussex 28-May-1991.
 C
-C Added code to preserve values of R/IX1/IX2/IX3/IFF between calls 
+C Added code to preserve values of R/IX1/IX2/IX3/IFF between calls
 C GJP March 1997
 C
 C Converted to Double Precision (KPD), August 2001
 C============================================================================
- 
+
       IMPLICIT NONE
- 
+
       DOUBLE PRECISION R(97), PERIOD_RAN1
       DOUBLE PRECISION RM1,RM2
       INTEGER IDUM, IFF, IX1, IX2, IX3, J
@@ -26,7 +26,7 @@ C============================================================================
       DATA IFF/0/
 
       SAVE IX1,IX2,IX3,IFF,R
-      
+
       RM1 = 1.0D0/DFLOAT(M1)
       RM2 = 1.0D0/DFLOAT(M2)
 
@@ -57,10 +57,10 @@ C============================================================================
          GO TO 100
       END IF
       PERIOD_RAN1 = R(J)
-    
+
       R(J) = (DFLOAT(IX1)+DFLOAT(IX2)*RM2)*RM1
- 
+
  100  CONTINUE
       RETURN
- 
+
       END

@@ -45,7 +45,7 @@
 *             True if both input arrays have variance arrays
 
 *  Notes:
-*     - Does not use Quality correctly. 
+*     - Does not use Quality correctly.
 *       Uses INTEGER quality rather than UBYTE
 
 *  Implementation Status:
@@ -119,7 +119,7 @@
 
 *.
 
-*  Handle different quality methods separately.  
+*  Handle different quality methods separately.
 
       IF (QUALITY) THEN
 

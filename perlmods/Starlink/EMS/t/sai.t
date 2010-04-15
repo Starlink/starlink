@@ -5,7 +5,7 @@ use Test;
 BEGIN { plan tests => 3 }
 use Starlink::EMS;
 
-# Test the status handling by converting SAI__ERROR to 
+# Test the status handling by converting SAI__ERROR to
 # a code and back again
 
 my $status = Starlink::EMS::SAI__ERROR;

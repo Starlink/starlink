@@ -97,12 +97,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -142,7 +142,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -198,7 +198,7 @@
 *  Save the STATUS value and mark the error stack.
       TSTAT = STATUS
       CALL ERR_MARK
-       
+
 *  Decrement the data object reference count.
       STATUS = SAI__OK
       DCB_REFCT( IDCB ) = DCB_REFCT( IDCB ) - 1
@@ -226,7 +226,7 @@
 
 *  If a data component locator has been acquired for the DCB, then
 *  annul it.
-               IF ( DCB_KTYP( IDCB ) .AND. 
+               IF ( DCB_KTYP( IDCB ) .AND.
      :              DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN
                   CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
                   DCB_DLOC( IDCB ) = ARY__NOLOC
@@ -252,7 +252,7 @@
                END IF
 
 *  Annul any object holding scale information.
-               IF( DCB_KSCL( IDCB ) .AND. 
+               IF( DCB_KSCL( IDCB ) .AND.
      :             DCB_SCLOC( IDCB ) .NE. DAT__NOLOC ) THEN
                   CALL DAT_ANNUL( DCB_SCLOC( IDCB ), STATUS )
                END IF
@@ -320,7 +320,7 @@
             IDCB = 0
          END IF
       END IF
-       
+
 *  Annul any error if STATUS was previously bad, otherwise let the new
 *  error report stand.
       IF ( STATUS .NE. SAI__OK ) THEN

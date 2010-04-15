@@ -46,7 +46,7 @@
 *          is the recommended Starlink method for terminating such an
 *          interaction.  The last character is assumed to be the exit
 *          choice in cases where this string is longer than the number
-*          of choices plus one (the exit). 
+*          of choices plus one (the exit).
 *          characters.  There must be at least %MNCHOI+1 characters.
 *          This string is ignored if the device is an image display.
 *     CURSOR=LOGICAL (Returned)
@@ -75,7 +75,7 @@
 *
 *    Bugs :
 *
-*     None known. 
+*     None known.
 *
 *    Authors :
 *
@@ -156,7 +156,7 @@
 
       CURSOR=.FALSE.
       IMGDIS=.FALSE.
-      
+
 *    Validate input data.
 
       IF ( MNCHOI .LT. 1 .OR. SWCHOI .LT. MNCHOI ) THEN
@@ -166,7 +166,7 @@
      :      STATUS )
          GOTO 999
       END IF
- 
+
 *    Put out a blank line to ensure the commentary appears on the alpha
 *    plane of the terminal.
 
@@ -243,7 +243,7 @@
      :         STATUS )
             GOTO 999
          END IF
- 
+
 *       Trim the button list if necessary.
 
          IF ( NC .GT. MALT + 1 ) THEN
@@ -256,7 +256,7 @@
 *       cursor, otherwise they may appear on the graphics plane instead
 *       of the alpha plane. This is a two-part operation. First we
 *       need to give time to switch to the alpha plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
          DO  I=1, NTERMS
@@ -269,7 +269,7 @@
 
 *       The part is to wait for the messages to appear before returning
 *       to graphics plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
 *       Activate the cursor
@@ -334,7 +334,7 @@
 *          is the recommended Starlink method for terminating such an
 *          interaction.  The last character is assumed to be the exit
 *          choice in cases where this string is longer than the number
-*          of choices plus one (the exit). 
+*          of choices plus one (the exit).
 *          characters.  There must be at least %MNCHOI+1 characters.
 *          This string is ignored if the device is an image display.
 *     CURSOR=LOGICAL (Returned)
@@ -363,12 +363,12 @@
 *
 *    Bugs :
 *
-*     None known. 
+*     None known.
 *
 *    Authors :
 *
 *     Malcolm J. Currie  STARLINK  (RAL::CUR)
-*                     
+*
 *    History :
 *
 *     1989 Nov 10: Original version (RAL::CUR).
@@ -444,7 +444,7 @@
 
       CURSOR=.FALSE.
       IMGDIS=.FALSE.
-      
+
 *    Validate input data.
 
       IF ( MNCHOI .LT. 1 .OR. SWCHOI .LT. MNCHOI ) THEN
@@ -454,7 +454,7 @@
      :      STATUS )
          GOTO 999
       END IF
- 
+
 *    Put out a blank line to ensure the commentary appears on the alpha
 *    plane of the terminal.
 
@@ -531,7 +531,7 @@
      :         STATUS )
             GOTO 999
          END IF
- 
+
 *       Trim the button list if necessary.
 
          IF ( NC .GT. MALT + 1 ) THEN
@@ -544,7 +544,7 @@
 *       cursor, otherwise they may appear on the graphics plane instead
 *       of the alpha plane. This is a two-part operation. First we
 *       need to give time to switch to the alpha plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
          DO  I=1, NTERMS
@@ -557,7 +557,7 @@
 
 *       The part is to wait for the messages to appear before returning
 *       to graphics plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
 *       Activate the cursor
@@ -625,7 +625,7 @@
 *          is the recommended Starlink method for terminating such an
 *          interaction.  The last character is assumed to be the exit
 *          choice in cases where this string is longer than the number
-*          of choices plus one (the exit). 
+*          of choices plus one (the exit).
 *          characters.  There must be at least %MNCHOI+1 characters.
 *          This string is ignored if the device is an image display.
 *     CURSOR=LOGICAL (Returned)
@@ -654,12 +654,12 @@
 *
 *    Bugs :
 *
-*     None known. 
+*     None known.
 *
 *    Authors :
 *
 *     Malcolm J. Currie  STARLINK  (RAL::CUR)
-*                     
+*
 *    History :
 *
 *     1989 Nov 10: Original version (RAL::CUR).
@@ -735,7 +735,7 @@
 
       CURSOR=.FALSE.
       IMGDIS=.FALSE.
-      
+
 *    Validate input data.
 
       IF ( MNCHOI .LT. 1 .OR. SWCHOI .LT. MNCHOI ) THEN
@@ -745,7 +745,7 @@
      :      STATUS )
          GOTO 999
       END IF
- 
+
 *    Put out a blank line to ensure the commentary appears on the alpha
 *    plane of the terminal.
 
@@ -822,7 +822,7 @@
      :         STATUS )
             GOTO 999
          END IF
- 
+
 *       Trim the button list if necessary.
 
          IF ( NC .GT. MALT + 1 ) THEN
@@ -835,7 +835,7 @@
 *       cursor, otherwise they may appear on the graphics plane instead
 *       of the alpha plane. This is a two-part operation. First we
 *       need to give time to switch to the alpha plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
          DO  I=1, NTERMS
@@ -848,7 +848,7 @@
 
 *       The part is to wait for the messages to appear before returning
 *       to graphics plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
 *       Activate the cursor
@@ -913,7 +913,7 @@
 *          is the recommended Starlink method for terminating such an
 *          interaction.  The last character is assumed to be the exit
 *          choice in cases where this string is longer than the number
-*          of choices plus one (the exit). 
+*          of choices plus one (the exit).
 *          characters.  There must be at least %MNCHOI+1 characters.
 *          This string is ignored if the device is an image display.
 *     CURSOR = LOGICAL (Returned)
@@ -942,7 +942,7 @@
 *
 *    Bugs :
 *
-*     None known. 
+*     None known.
 *
 *    Authors :
 *
@@ -1023,7 +1023,7 @@
 
       CURSOR = .FALSE.
       IMGDIS = .FALSE.
-      
+
 *    Validate input data.
 
       IF ( MNCHOI .LT. 1 .OR. SWCHOI .LT. MNCHOI ) THEN
@@ -1033,7 +1033,7 @@
      :      STATUS )
          GOTO 999
       END IF
- 
+
 *    Put out a blank line to ensure the commentary appears on the alpha
 *    plane of the terminal.
 
@@ -1110,7 +1110,7 @@
      :         STATUS )
             GOTO 999
          END IF
- 
+
 *       Trim the button list if necessary.
 
          IF ( NC .GT. MALT + 1 ) THEN
@@ -1123,7 +1123,7 @@
 *       cursor, otherwise they may appear on the graphics plane instead
 *       of the alpha plane. This is a two-part operation. First we
 *       need to give time to switch to the alpha plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
          DO  I = 1, NTERMS
@@ -1136,7 +1136,7 @@
 
 *       The part is to wait for the messages to appear before returning
 *       to graphics plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
 *       Activate the cursor
@@ -1201,7 +1201,7 @@
 *          is the recommended Starlink method for terminating such an
 *          interaction.  The last character is assumed to be the exit
 *          choice in cases where this string is longer than the number
-*          of choices plus one (the exit). 
+*          of choices plus one (the exit).
 *          characters.  There must be at least %MNCHOI+1 characters.
 *          This string is ignored if the device is an image display.
 *     CURSOR = LOGICAL (Returned)
@@ -1230,7 +1230,7 @@
 *
 *    Bugs :
 *
-*     None known. 
+*     None known.
 *
 *    Authors :
 *
@@ -1311,7 +1311,7 @@
 
       CURSOR = .FALSE.
       IMGDIS = .FALSE.
-      
+
 *    Validate input data.
 
       IF ( MNCHOI .LT. 1 .OR. SWCHOI .LT. MNCHOI ) THEN
@@ -1321,7 +1321,7 @@
      :      STATUS )
          GOTO 999
       END IF
- 
+
 *    Put out a blank line to ensure the commentary appears on the alpha
 *    plane of the terminal.
 
@@ -1398,7 +1398,7 @@
      :         STATUS )
             GOTO 999
          END IF
- 
+
 *       Trim the button list if necessary.
 
          IF ( NC .GT. MALT + 1 ) THEN
@@ -1411,7 +1411,7 @@
 *       cursor, otherwise they may appear on the graphics plane instead
 *       of the alpha plane. This is a two-part operation. First we
 *       need to give time to switch to the alpha plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
          DO  I = 1, NTERMS
@@ -1424,7 +1424,7 @@
 
 *       The part is to wait for the messages to appear before returning
 *       to graphics plane.
-      
+
          CALL MSG_SYNC( STATUS )
 
 *       Activate the cursor

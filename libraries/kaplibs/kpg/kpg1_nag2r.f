@@ -4,7 +4,7 @@
 *     KPG1_NAG2R
 
 *  Purpose:
-*     Converts an NAG Hermitian Fourier transform array into an array 
+*     Converts an NAG Hermitian Fourier transform array into an array
 *     usable by FFTPACK routine KPG1_RFFTB.
 
 *  Language:
@@ -14,10 +14,10 @@
 *     CALL KPG1_NAG2R( NP, R, WORK )
 
 *  Description:
-*     This subroutine modifies the supplied array of Fourier co-efficients 
-*     (as produced by NAG subroutine C06FAE) so that an inverse FFT can be 
-*     performed on them using FFTPACK routine KPG1_RFFTB. The resulting 
-*     inverse will have the same normalisation as the original data 
+*     This subroutine modifies the supplied array of Fourier co-efficients
+*     (as produced by NAG subroutine C06FAE) so that an inverse FFT can be
+*     performed on them using FFTPACK routine KPG1_RFFTB. The resulting
+*     inverse will have the same normalisation as the original data
 *     transformed using KPG1_RFFTF.
 *
 *     This function is equivalent to PDA_NAG2R except that it uses work
@@ -33,7 +33,7 @@
 *        Work space.
 
 *  Notes:
-*     -  A call to KPG1_R2NAG followed by a call to KPG1_NAG2R will result in 
+*     -  A call to KPG1_R2NAG followed by a call to KPG1_NAG2R will result in
 *     the original data being divided by NP.
 
 *  Copyright:
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,15 +79,15 @@
 *  Arguments Given and Returned:
       REAL R( NP )
       REAL WORK( NP )
-      
+
 *  Local Variables:
       REAL
      :        FAC                ! Normalisation factor
- 
-      INTEGER 
+
+      INTEGER
      :        I,                 ! Index of current input term.
      :        J                  ! Index of current output term.
-   
+
 *.
 
 *  Store the normalisation factor
@@ -98,7 +98,7 @@
 
 * Copy the supplied array into the work array.
       DO I = 2, NP
-         WORK( I ) = R( I ) 
+         WORK( I ) = R( I )
       END DO
 
 *  Scale the remaining real terms and store in the work array.

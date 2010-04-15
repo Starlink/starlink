@@ -22,7 +22,7 @@
 *                       BOUNDS, NBOUND, GOTDIR, DIRECT, GOTDEF,
 *                       DEFER, GOTMSK, MSKNAM, GOTSAT, SATUR,
 *                       GOTSPR, SETSAT, GOTSVL, SATVAL, GOTPRE,
-*                       PRESER, GOTGEN, GENVAR, GOTNAM, NDFS, 
+*                       PRESER, GOTGEN, GENVAR, GOTNAM, NDFS,
 *                       GOTSET, USESET, STATUS )
 
 *  Description:
@@ -278,7 +278,7 @@
       IF (  GOTSAT ) THEN
 
 *  Will be looking for saturated values.
-         IF ( .NOT. SATUR ) THEN 
+         IF ( .NOT. SATUR ) THEN
             CALL CCD1_MSG( ' ', '  Not looking for saturated pixels',
      :                     STATUS )
          ELSE
@@ -295,7 +295,7 @@
 
 *  Say what saturation preferences are.
             IF ( GOTSPR ) THEN
-               IF ( SETSAT ) THEN 
+               IF ( SETSAT ) THEN
 
 *  Saturated pixels set to saturation value.
                   CALL CCD1_MSG( ' ',
@@ -356,7 +356,7 @@
 *  Where log system information will be written to.
       IF ( GOTLG2 ) THEN
           CALL CCD1_MSG( ' ', ' ', STATUS )
-         IF ( LOGTO .EQ. 'BOTH' ) THEN 
+         IF ( LOGTO .EQ. 'BOTH' ) THEN
             CALL CCD1_MSG( ' ',
      :'  Log information will be written to log file and terminal',
      :      STATUS )
@@ -381,7 +381,7 @@
      :                        STATUS )
             END IF
 
-         ELSE IF ( LOGTO .EQ. 'NEITHER' ) THEN 
+         ELSE IF ( LOGTO .EQ. 'NEITHER' ) THEN
             CALL CCD1_MSG( ' ',
      :'  Log information will not be written', STATUS )
          END IF

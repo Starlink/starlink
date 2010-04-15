@@ -35,7 +35,7 @@ C
 C     Perform the operation.  This could be coded faster by
 C     treating the edges outside the main loop, but that refinement
 C     can come later.
-C 
+C
       DO IY=1,NY
          DO IX=1,NX
             ELEM=IN(IX,IY)

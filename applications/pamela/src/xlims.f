@@ -1,6 +1,6 @@
       SUBROUTINE XLIMS(TRACE,YREF,LEFT,RIGHT,YLO,YHI,XLO,XHI,STATUS)
 C
-C     Evaluates minimum X range needed during extraction (allowing a 
+C     Evaluates minimum X range needed during extraction (allowing a
 C     little bit more than needed for safety). It works in the
 C     case of NPOLY>0 by computing the smallest and largest shifts
 C     and adding these to the left and right limits.

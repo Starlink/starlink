@@ -1,5 +1,5 @@
       SUBROUTINE SURFLIB_REMOVE_DC_FROM_EXP(DORLB, N_EXPOSURES,
-     :     N_INTEGRATIONS, N_MEASUREMENTS, METHOD, DEMOD_POINTER, 
+     :     N_INTEGRATIONS, N_MEASUREMENTS, METHOD, DEMOD_POINTER,
      :     N_BOL, N_POS, IN_DATA, IN_VARIANCE, IN_QUALITY,
      :     OUT_DATA, OUT_VARIANCE, OUT_QUALITY, BADBIT, STATUS)
 *+
@@ -16,9 +16,9 @@
 *    :     OUT_QUALITY, BADBIT, STATUS)
 
 *  Description:
-*     This routine takes a data array. It then removes a 
+*     This routine takes a data array. It then removes a
 *     DC offset (either the mean or the median derived from the scan)
-*     from each scan. 
+*     from each scan.
 
 *  Arguments:
 *     DORLB                       = LOGICAL (Given)
@@ -62,7 +62,7 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL: John Lightfoot (RoE)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995-2002 Particle Physics and Astronomy
@@ -100,7 +100,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -194,7 +194,7 @@
 *     good and a basline can not be fitted
 *     Its open to debate whether we should initially fill the output
 *     arrays with BAD.
-      
+
       DO BOL = 1, N_BOL
          DO POS = 1, N_POS
             OUT_DATA(BOL,POS) = IN_DATA(BOL,POS)
@@ -208,42 +208,42 @@
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
             DO EXPOSURE = 1, N_EXPOSURES
-               
+
 *     Stop looping if STATUS is bad
 
                IF (STATUS .EQ. SAI__OK) THEN
 
                   CALL SCULIB_FIND_SWITCH (DEMOD_POINTER, 1,
-     :                 N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
-     :                 N_POS, 1, EXPOSURE, INTEGRATION, MEASUREMENT, 
+     :                 N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
+     :                 N_POS, 1, EXPOSURE, INTEGRATION, MEASUREMENT,
      :                 SCAN_START, SCAN_END, STATUS)
-                  
+
                   IF ((SCAN_START .EQ. VAL__BADI) .OR.
      :                 (SCAN_START .EQ. 0) ) THEN
                      CALL MSG_SETI ('E', EXPOSURE)
                      CALL MSG_SETI ('I', INTEGRATION)
                      CALL MSG_SETI ('M', MEASUREMENT)
-                     CALL MSG_OUTIF (MSG__NORM, ' ', 
+                     CALL MSG_OUTIF (MSG__NORM, ' ',
      :                    'REMOVE_DC_OFFSET: no data '//
      :                    'for exp ^E in int ^I, meas ^M', STATUS)
                   ELSE
 *     OK, there is some data for the scan
-                     
+
                      CALL MSG_SETI('NI', INTEGRATION)
                      CALL MSG_SETI('NE', EXPOSURE)
                      CALL MSG_OUTIF(MSG__NORM,' ',
      :                    'REMOVE_DC_OFFSET: Processing exposure'//
      :                    ' ^NE  of integration ^NI', STATUS)
-                     
-                     
+
+
                      N_SCAN = SCAN_END - SCAN_START + 1
 
 *     Create workspace for the statistics calculation
-                     CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, QSORT_PTR, 
+                     CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, QSORT_PTR,
      :                    QSORT_END, STATUS)
-                     CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, D_PTR, 
+                     CALL SCULIB_MALLOC(N_SCAN * VAL__NBR, D_PTR,
      :                    D_END, STATUS)
-                     CALL SCULIB_MALLOC(N_SCAN * VAL__NBUB, Q_PTR, 
+                     CALL SCULIB_MALLOC(N_SCAN * VAL__NBUB, Q_PTR,
      :                    Q_END, STATUS)
 
 
@@ -253,12 +253,12 @@
                         COUNT = 0
                         DO POS = SCAN_START, SCAN_END
 
-                           CALL VEC_RTOR(.FALSE., 1, 
-     :                          IN_DATA(BOL,POS), 
+                           CALL VEC_RTOR(.FALSE., 1,
+     :                          IN_DATA(BOL,POS),
      :   %VAL(CNF_PVAL(D_PTR) + COUNT * VAL__NBR),
      :                          IERR, NERR, STATUS)
-                           CALL VEC_UBTOUB(.FALSE., 1, 
-     :                          IN_QUALITY(BOL,POS), 
+                           CALL VEC_UBTOUB(.FALSE., 1,
+     :                          IN_QUALITY(BOL,POS),
      :   %VAL(CNF_PVAL(Q_PTR) + COUNT * VAL__NBUB),
      :                          IERR, NERR, STATUS)
 
@@ -270,8 +270,8 @@
 *     Use 5 sigma clipping by default (make this configurable?)
 
                         NSIGMA = 5.0
-                        CALL SCULIB_STATR(N_SCAN, NSIGMA, 
-     :                       %VAL(CNF_PVAL(D_PTR)), 
+                        CALL SCULIB_STATR(N_SCAN, NSIGMA,
+     :                       %VAL(CNF_PVAL(D_PTR)),
      :                       %VAL(CNF_PVAL(Q_PTR)), BADBIT,
      :                       NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV,
      :                       %VAL(CNF_PVAL(QSORT_PTR)), STATUS)
@@ -304,27 +304,27 @@
                               IF (DORLB) THEN
 
 
-                                 IF (IN_DATA(BOL,POS) .NE. 
+                                 IF (IN_DATA(BOL,POS) .NE.
      :                                VAL__BADR) THEN
 
                                     IF (DCVALUE .NE. VAL__BADR) THEN
-                                       OUT_DATA(BOL,POS) = 
+                                       OUT_DATA(BOL,POS) =
      :                                      IN_DATA(BOL,POS) - DCVALUE
                                     ELSE
                                        OUT_DATA(BOL,POS) = VAL__BADR
                                     END IF
 
                                  ELSE
-                                    OUT_DATA(BOL,POS) = 
+                                    OUT_DATA(BOL,POS) =
      :                                   IN_DATA(BOL,POS)
                                  END IF
-                                 
-                                 OUT_QUALITY(BOL, POS) = 
+
+                                 OUT_QUALITY(BOL, POS) =
      :                                IN_QUALITY(BOL, POS)
-                                 OUT_VARIANCE(BOL, POS) = 
+                                 OUT_VARIANCE(BOL, POS) =
      :                                IN_VARIANCE(BOL,POS)
 
-                                 
+
 *     Store the fit
                               ELSE
 
@@ -333,10 +333,10 @@
                                  OUT_QUALITY(BOL,POS) = 0
 
                               END IF
-                              
+
                            END DO
 
-                        END IF 
+                        END IF
 
                      END DO
 
@@ -357,5 +357,5 @@
          END DO
       END DO
 
-      END 
+      END
 

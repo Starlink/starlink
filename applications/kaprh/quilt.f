@@ -4,7 +4,7 @@
 *     QUILT
 
 *  Purpose:
-*     Generates a mosaic from equally sized 2-d data arrays, optionally 
+*     Generates a mosaic from equally sized 2-d data arrays, optionally
 *     specified from an ASCII file
 
 *  Language:
@@ -20,7 +20,7 @@
 *     This routine provides a more-sophisticated version of the MOSAIC
 *     application for combining many 2-d data arrays into one large
 *     output data array. All the data arrays are stored in IMAGE
-*     structures.  The pixels in overlapping regions may be averaged or 
+*     structures.  The pixels in overlapping regions may be averaged or
 *     summed.
 *
 *     The names of IMAGE structures to be concatenated and their
@@ -98,7 +98,7 @@
 
 *  Deficiencies :
 *     Works with like-sized images only and uses Fortran i/o for getting
-*     stuff from a file. 
+*     stuff from a file.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -147,7 +147,7 @@
 
 *    Local Constants :
 
-      INTEGER  
+      INTEGER
      :  NDIMS                  ! dimensionality of input data arrays
       PARAMETER( NDIMS = 2 ) ! 2-d arrays only
 
@@ -156,7 +156,7 @@
       INTEGER
      :  FD,                    ! file description
      :  NUMBER,                ! number of input images to form mosaic
-     :  MAXI( 2 ),             ! maximum x-y offsets 
+     :  MAXI( 2 ),             ! maximum x-y offsets
      :  MINI( 2 ),             ! minimum  "     "
      :  IDIMS( NDIMS ),        ! dimensions of central data array
      :  ODIMS( NDIMS ),        !      "      " output     "
@@ -170,7 +170,7 @@
      :  I                      ! counter
 
       CHARACTER*(DAT__SZLOC)   ! locators to :
-     :  LOCDC,                 ! structure containing the current input 
+     :  LOCDC,                 ! structure containing the current input
                                ! data array
      :  LOCDI,                 ! structure containing the input central
                                ! data array
@@ -214,7 +214,7 @@
 *       maximum and minimum x-y offsets, and a locator to the central
 *       data array
 
-         CALL MFOPEN( 'FNAME', 'INPICI', FD, LOCI, NUMBER, MAXI, 
+         CALL MFOPEN( 'FNAME', 'INPICI', FD, LOCI, NUMBER, MAXI,
      :                MINI, STATUS )
 
          CALL KPG1_GETIM( ' ', LOCI, LOCDI, DNAMEI, ORIGIN, STATUS )
@@ -386,7 +386,7 @@
 
                      ELSE
 
-*                      Zero the output image and workspace 
+*                      Zero the output image and workspace
 
                         CALL ZERO2D( ODIMS( 1 ), ODIMS( 2 ),
      :                               %VAL( PNTRO ), STATUS )
@@ -394,7 +394,7 @@
      :                               %VAL( PNTRW ), STATUS )
 
 *                      Redefine offsets of central data array to be with
-*                      respect to the lower left corner of the output 
+*                      respect to the lower left corner of the output
 *                      array
 
                         OFFSET( 1 ) = -MINI( 1 )
@@ -445,7 +445,7 @@
                               CALL KPG1_GETIM( ' ', LOCC, LOCDC, DNAMEC,
      :                                         ORIGIN, STATUS )
 
-*                            Check status on return 
+*                            Check status on return
 
                               IF ( STATUS .NE. SAI__OK .AND.
      :                             STATUS .NE. PAR__ABORT ) THEN
@@ -460,9 +460,9 @@
 
 *                            Check offsets returned
 
-                              ELSE IF ( OFFSET( 1 ) .GT. MAXI( 1 ) .OR. 
+                              ELSE IF ( OFFSET( 1 ) .GT. MAXI( 1 ) .OR.
      :                                  OFFSET( 1 ) .LT. MINI( 1 ) .OR.
-     :                                  OFFSET( 2 ) .GT. MAXI( 2 ) .OR. 
+     :                                  OFFSET( 2 ) .GT. MAXI( 2 ) .OR.
      :                                  OFFSET( 2 ) .LT. MINI( 2 ) )THEN
 
 *                               Set up error message and set bad status
@@ -563,7 +563,7 @@
 *                               same size as the central data array
 
                                  IF ( CDIMS( 1 ) .EQ. IDIMS( 1 ) .AND.
-     :                                CDIMS( 2 ) .EQ. IDIMS( 2 ) ) THEN 
+     :                                CDIMS( 2 ) .EQ. IDIMS( 2 ) ) THEN
 
 *                                  Redefine the offsets to be with
 *                                  respect to the lower left corner of
@@ -643,7 +643,7 @@
 
                            CALL DAT_ANNUL( LOCDC, STATUS )
                            CALL DAT_ANNUL( LOCC, STATUS )
-                           IF ( WHERE .NE. 'FILE' ) 
+                           IF ( WHERE .NE. 'FILE' )
      :                       CALL PAR_CANCL( 'CURPIC', STATUS )
 
 *                      End of loop round all requested input data arrays
@@ -712,7 +712,7 @@
 
 *    End of if-no-error-after-getting-central-data array check
 
-      END IF    
+      END IF
 
 *    Check to see if the input was from a File
 

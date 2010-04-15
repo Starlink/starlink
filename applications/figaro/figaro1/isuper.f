@@ -5,10 +5,10 @@ C     I S U P E R
 C
 C     Supersets an image or a spectrum, creating a new image
 C     with larger dimensions than the input, and with the input
-C     data just a part of the output image.  If the AXIS(1) or 
-C     AXIS(2) arrays contain linear data, then output AXIS(1) and 
-C     AXIS(2) sub-structures will be created reflecting this data.  
-C     If they contain non-linear data, ISUPER will not attempt to 
+C     data just a part of the output image.  If the AXIS(1) or
+C     AXIS(2) arrays contain linear data, then output AXIS(1) and
+C     AXIS(2) sub-structures will be created reflecting this data.
+C     If they contain non-linear data, ISUPER will not attempt to
 C     extrapolate the data values and will omit the AXIS(1) or AXIS(2)
 C     sub-structure in question from the output structure.
 C     Note: It is also capable of subsetting.
@@ -61,7 +61,7 @@ C
       LOGICAL    FIG_SCRCHK
       LOGICAL    GEN_CHKNSF
       REAL       GEN_ELEMF
-      CHARACTER  ICH_CI*12   
+      CHARACTER  ICH_CI*12
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
@@ -72,9 +72,9 @@ C
       INTEGER   ELEMENTS         ! Number of elements in axis array
       INTEGER   IPTR             ! Dynamic mem pointer for input data
       INTEGER   IXYST            ! IXST or IYST (used in loop)
-      INTEGER   IXST             ! Pixel number in AXIS(1) at which the 
+      INTEGER   IXST             ! Pixel number in AXIS(1) at which the
                                  ! input image is to start
-      INTEGER   IYST             ! Pixel number in AXIS(2) at which the 
+      INTEGER   IYST             ! Pixel number in AXIS(2) at which the
                                  ! input image is to start
       INTEGER   NAXIS            ! Axis number
       INTEGER   NDIM             ! Number of image dimensions
@@ -99,7 +99,7 @@ C
       INTEGER   XYOPTR           ! Dynamic mem pointer for output axis
                                  ! data
       REAL      XVALUE           ! Used to read in NXOUT
-      DOUBLE PRECISION XY1       ! Value of first axis data element in 
+      DOUBLE PRECISION XY1       ! Value of first axis data element in
                                  ! input AXIS(1) or AXIS(2)
       DOUBLE PRECISION XYLST     ! Value of last axis data element in
                                  ! input AXIS(1) or AXIS(2)
@@ -112,7 +112,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -157,7 +157,7 @@ C     without data.
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
 C
-C     Now create the output data structure, based on that of the 
+C     Now create the output data structure, based on that of the
 C     input file, but with with a data array of the appropriate dimensions.
 C
       IF (NYOUT.EQ.1) THEN
@@ -182,13 +182,13 @@ C
      :                %VAL(CNF_PVAL(OPTR)))
 C
 C     Deal with the axes structures.  This loop is executed
-C     twice, once for AXIS(1), once for AXIS(2), unless the output 
+C     twice, once for AXIS(1), once for AXIS(2), unless the output
 C     structure is 1-dimensional.
 C
       NXY=NX
       IXYST=IXST
       NXYOUT=NXOUT
-      
+
       DO NAXIS=1,NDIM
 C
 C        Try to map the input axis data array.

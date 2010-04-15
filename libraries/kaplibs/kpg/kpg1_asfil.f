@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASFIL( PARAM1, PARAM2, FRM, NP, IPOUT, FNAME, 
+      SUBROUTINE KPG1_ASFIL( PARAM1, PARAM2, FRM, NP, IPOUT, FNAME,
      ;                       STATUS )
 *+
 *  Name:
@@ -14,26 +14,26 @@
 *     CALL KPG1_ASFIL( PARAM1, PARAM2, FRM, NP, IPOUT, FNAME, STATUS )
 
 *  Description:
-*     This routine obtains formatted positions from a text file specified by 
+*     This routine obtains formatted positions from a text file specified by
 *     an environment parameter. The positions are assumed to represent
-*     axis values in the supplied Frame. 
+*     axis values in the supplied Frame.
 *
-*     The file should contain 1 position per line. Each position is given by 
+*     The file should contain 1 position per line. Each position is given by
 *     a set of strings delimited by comma, space or tab (the first gives the
 *     value for axis 1, the second for axis 2, etc). The number of strings
-*     per line should equal the number of axes in the supplied Frame. 
+*     per line should equal the number of axes in the supplied Frame.
 *     The user can specify the columns to use using parameter PARAM2.
 *
-*     The file may contain blank lines, and comment lines commencing with 
+*     The file may contain blank lines, and comment lines commencing with
 *     "!" or "#".
 
 *  Arguments:
 *     PARAM1 = CHARACTER * ( * ) (Given)
 *        The name of an environment parameter to use to get the file.
 *     PARAM2 = CHARACTER * ( * ) (Given)
-*        The name of an environment parameter to use to get the indices of 
-*        the columns within the text file which are to be used. If blank, 
-*        the file must contain a column for every axis in FRM, all of which 
+*        The name of an environment parameter to use to get the indices of
+*        the columns within the text file which are to be used. If blank,
+*        the file must contain a column for every axis in FRM, all of which
 *        are used in the order 1, 2, 3, etc.
 *     FRM = INTEGER (Given)
 *        A pointer to an AST Frame.
@@ -42,7 +42,7 @@
 *     IPOUT = INTEGER (Returned)
 *        A pointer to an _DOUBLE array "COR( NP, * )" holding the obtained
 *        co-ordinates. The second dimension of the array is equal to the
-*        number of axes in the suppleid Frame. Should be released using 
+*        number of axes in the suppleid Frame. Should be released using
 *        PSX_FREE when no longer needed.
 *     FNAME = CHARACTER * ( * ) (Returned)
 *        The file's name. Not accesed if the declared length of the
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,12 +132,12 @@
 
 *  Obtain the input text file, and save its name.
       CALL FIO_ASSOC( PARAM1, 'READ', 'LIST', 0, FD, STATUS )
-      IF( LEN( FNAME ) .GT. 1 ) CALL FIO_FNAME( FD, FNAME, STATUS ) 
+      IF( LEN( FNAME ) .GT. 1 ) CALL FIO_FNAME( FD, FNAME, STATUS )
 
-*  Create a GRP group to hold the file contents. 
+*  Create a GRP group to hold the file contents.
       CALL GRP_NEW( ' ', IGRP, STATUS )
 
-*  Loop round until an error is encountered (this will happen when the end of 
+*  Loop round until an error is encountered (this will happen when the end of
 *  file is reached, if not before).
       DO WHILE ( STATUS .EQ. SAI__OK )
 
@@ -150,7 +150,7 @@
 *  Append the record to the end of the group if it is not a comment line.
          IF( BUFFER .NE. ' ' .AND. BUFFER( 1 : 1 ) .NE. '#' .AND.
      :                             BUFFER( 1 : 1 ) .NE. '!' ) THEN
-            CALL GRP_PUT( IGRP, 1, BUFFER( : NCHAR ), 0, STATUS ) 
+            CALL GRP_PUT( IGRP, 1, BUFFER( : NCHAR ), 0, STATUS )
 
          END IF
 
@@ -178,7 +178,7 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the positions from the group into the array allocated above.
-         CALL KPG1_ASGRP( PARAM2, FRM, IGRP, NP, NAX, 
+         CALL KPG1_ASGRP( PARAM2, FRM, IGRP, NP, NAX,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    STATUS )
 
@@ -194,7 +194,7 @@
 
 *  If an error has occurrred, release the returned pointers.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL PSX_FREE( IPOUT, STATUS )      
+         CALL PSX_FREE( IPOUT, STATUS )
          IPOUT = 0
          NP = 0
 

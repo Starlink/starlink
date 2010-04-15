@@ -2,23 +2,23 @@
 *+
 *  Name:
 *     ARY1_PT1R
- 
+
 *  Purpose:
 *     Write a 1-dimensional array of REAL values to an HDS object.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL ARY1_PT1R( BAD, EL, ARRAY, TYPE, LOC, DCE, STATUS )
- 
+
 *  Description:
 *     The routine writes a 1-dimensional array of REAL values to an
 *     HDS object. The object must be 1-dimensional and must contain
 *     exactly the number of elements to be written. Data type
 *     conversion to any numeric data type is performed if necessary,
 *     with optional testing for bad pixel values.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether to test for bad pixel values.
@@ -37,7 +37,7 @@
 *        happens).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Algorithm:
 *     -  Initialise.
 *     -  If no data type conversion is required, then write the data
@@ -45,7 +45,7 @@
 *     -  If type conversion is required, then map the data object
 *     without type conversion, perform the conversion explicitly and
 *     unmap the data.
- 
+
 *  Copyright:
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     12-JUL-1989 (RFWS):
 *        Original version.
@@ -77,50 +77,50 @@
 *        Changed DAT_UNMAP call to ARY1_HUNMP to ensure unmapping under
 *        error conditions.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
- 
+
 *  Arguments Given:
       LOGICAL BAD
       INTEGER EL
       REAL ARRAY
       CHARACTER * ( * ) TYPE
       CHARACTER * ( * ) LOC
- 
+
 *  Arguments Returned:
       LOGICAL DCE
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER DIM( 1 )           ! Object dimension array
       INTEGER PNTR               ! Pointer to mapped data
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Initialise.
       DIM( 1 ) = EL
- 
+
 *  If no data type conversion is required, then write the data values
 *  directly.
       IF ( TYPE .EQ. '_REAL' ) THEN
          DCE = .FALSE.
          CALL DAT_PUT( LOC, '_REAL', 1, DIM, ARRAY, STATUS )
- 
+
 *  If type conversion is required, then map the data without type
 *  conversion, perform the type conversion explicitly and unmap the
 *  data.
@@ -129,9 +129,9 @@
          CALL ARY1_CVFR( BAD, EL, ARRAY, TYPE, PNTR, DCE, STATUS )
          CALL ARY1_HUNMP( LOC, STATUS )
       END IF
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_PT1R',
      :STATUS )
- 
+
       END

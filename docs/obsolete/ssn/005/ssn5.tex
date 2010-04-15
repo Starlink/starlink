@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -7,7 +7,7 @@
 \newcommand{\stardocnumber}    {5.1}
 \newcommand{\stardocauthors}   {A C Davenhall}
 \newcommand{\stardocdate}      {13 May 1990}
-\newcommand{\stardoctitle}     {APIG --- Installation Guide \footnote{Document version number 1.                 
+\newcommand{\stardoctitle}     {APIG --- Installation Guide \footnote{Document version number 1.
 This document applies to APIG version 1.0.}}
 %------------------------------------------------------------------------------
 
@@ -57,9 +57,9 @@ RUTHERFORD APPLETON LABORATORY\\
 
 \section{Readership}
 
-You should read this document if you are a system manager of other 
+You should read this document if you are a system manager of other
 person intending to install the APIG software for analysing high
-resolution spectra of interstellar absorption lines on a VAX running 
+resolution spectra of interstellar absorption lines on a VAX running
 VMS.
 
 \section{Introduction}
@@ -70,7 +70,7 @@ describes how to install it. It is assumed that you will be installing
 it on either a Starlink node or at least a VAX where Starlink software
 is available.
 
-If you are attempting to install it on a VAX which does not have any 
+If you are attempting to install it on a VAX which does not have any
 other Starlink software then some additional items are required (see
 `Starlink software required' below). Note that some of these items are
 not available in the public domain and a license may be required. If you
@@ -79,7 +79,7 @@ operating system then forget it!
 
 \section{Starlink software required}
 
-APIG requires the following items of either Starlink software or 
+APIG requires the following items of either Starlink software or
 proprietary software distributed with the Starlink software collection:
 
 \begin{enumerate}
@@ -92,18 +92,18 @@ proprietary software distributed with the Starlink software collection:
 
 \end{enumerate}
 
-Note that the various command procedures used by APIG assume the 
-standard Starlink logical names, locations and filenames for these 
+Note that the various command procedures used by APIG assume the
+standard Starlink logical names, locations and filenames for these
 items. The CHR and NCAR libraries should only be required if the APIG
-execution modules have to be regenerated. However, the execution 
+execution modules have to be regenerated. However, the execution
 modules supplied with the release assume that a RAL GKS shareable
 image is available in the standard Starlink form.
 
 \section{Directory structure}
 
-A `root' directory or subdirectory to hold APIG should be created at 
+A `root' directory or subdirectory to hold APIG should be created at
 some convenient point in your directory structure. This directory or
-subdirectory should be called APIG. The save set containing APIG can 
+subdirectory should be called APIG. The save set containing APIG can
 then be re-constructed in this directory. The following directory
 structure will be created;
 
@@ -147,7 +147,7 @@ DEFINE/SYSTEM  APIGDIR (APIG\_root) -- set up in LSSC:STARTUP.COM
    where (APIG\_root) is wherever you have chosen to place the APIG root
    directory.
 
-  \item Arrange for users to run command procedure 
+  \item Arrange for users to run command procedure
 
    \begin{verse}
 
@@ -158,7 +158,7 @@ APIG*SETUP :== APIGDIR:SETUPAPIG.COM  -- set up in SSC:LOGIN.COM
    prior to their attempting to use APIG.
 
 
-   The logical names and symbols set up by SETUPAPIG.COM are as 
+   The logical names and symbols set up by SETUPAPIG.COM are as
    follows:
 
    \begin{description}
@@ -202,13 +202,13 @@ CONTROL\_APIG
 
 \end{verse}
 
-and a prompt should appear. If it does all is ok and you can type 
+and a prompt should appear. If it does all is ok and you can type
 control\_Y to break out. If it does not something is awry.
 
 \section{Customising the graphics devices}
 
 APIG has two text files which describe the various GKS workstations
-that it knows about: 
+that it knows about:
 
 \begin{description}
 
@@ -244,7 +244,7 @@ log files, plotter files etc.
 
 \section{Further information}
 
-Further information on the use of APIG can be found in the APIG user 
+Further information on the use of APIG can be found in the APIG user
 guide. The Latex source for this document is available in file
 
 \begin{center}

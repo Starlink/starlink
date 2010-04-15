@@ -86,7 +86,7 @@ proc drb_stred var1 var2 var3 var4 var5
     fclose_c
     st = getenv("LIRCAMDIR")
     st1 = st & "/fs.dat"
-    open cfile (st1) 
+    open cfile (st1)
     read cfile (dline)
     read cfile (dline)
     actmag2 = -99.99
@@ -569,7 +569,7 @@ proc drb_stred var1 var2 var3 var4 var5
       out2 = out & ".sdf"
       final2 = final & ".sdf"
       obeyw rapi2d CMULT (out2) 1.0 (final2)
-      delfile (out2) 
+      delfile (out2)
     end if
   else
     medorsep = 1
@@ -740,7 +740,7 @@ proc drb_stred var1 var2 var3 var4 var5
             xobj00 = xobj0
             yobj00 = yobj0
             xst0 = xst
-            yst0 = yst            
+            yst0 = yst
             fclose_b
             open bfile (toff)
             iflago = 1
@@ -792,7 +792,7 @@ proc drb_stred var1 var2 var3 var4 var5
         ori = real(ori)
         gam = real(gam)
         print "PSF FWHM        = " (afwhm) "arcsec"
-        print "Mean axis ratio = " (rat) 
+        print "Mean axis ratio = " (rat)
         print "Orientation     = " (ori)
         print "Gamma           = " (gam)
         nc = len(diffim)
@@ -973,12 +973,12 @@ proc drb_stred var1 var2 var3 var4 var5
           if fexist
              write afile (pheader)
              write afile " "
-          end if 
+          end if
        end if
        numstr = (numin-1):2
        standevstr = standdev:8:3
        write afile "The following files gave zero-points or instr. magnitudes~
- which had a standard deviation greater than 0.1." 
+ which had a standard deviation greater than 0.1."
        write afile (filena) "and the following " (numstr) "images have a~
  standard deviation of " (standevstr)
        if medorsep = 1
@@ -988,7 +988,7 @@ proc drb_stred var1 var2 var3 var4 var5
  the file " (flatn)
        end if
        fclose_a
-    end if           
+    end if
     fclose_d
     fclose_b
   end if
@@ -1265,7 +1265,7 @@ proc drb_stred var1 var2 var3 var4 var5
   print "Photometry results appended to file : stdred_photometry.results"
   print " "
   print "Any photometry problems are appended to file : photometry.problems"
-  print " " 
+  print " "
   print "END of procedure DRB_STRED"
   print " "
 end proc

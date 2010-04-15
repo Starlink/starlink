@@ -27,8 +27,8 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  18 Mar 98  Copied from GAIA (Peter Draper, Starlink)
-#                            and renamed to util::HelpWin.             
-#                            Modified comment format a little for use 
+#                            and renamed to util::HelpWin.
+#                            Modified comment format a little for use
 #                            with the itcldoc script to generate
 #                            man pages.
 # Peter W. Draper 01 May 01  Reclaimed to use a hypertext help system.

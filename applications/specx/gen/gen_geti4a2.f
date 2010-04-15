@@ -76,7 +76,7 @@ C   of the default value.
         PSTRING = PROMPT(:ILP)
         PSTRING(ILP+1:) = ' ['
         PSTRING(ILP+3:) = DEFSTR(:IDS)
-        PSTRING(ILP+IDS+4:) = '] '        
+        PSTRING(ILP+IDS+4:) = '] '
         CALL GEN_INPUT (LEVEL, PSTRING,
      &                  TSTRING, ILT, JDEF)
         IF (JDEF.NE.0)  RETURN

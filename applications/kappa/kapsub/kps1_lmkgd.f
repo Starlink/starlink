@@ -62,7 +62,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -102,17 +102,17 @@
 
 *  Initialise the number of pixel centres stored in PIXCEN.
       NCEN = 0
-  
+
 *  Check each pixel.
       DO I = 1, EL
 
-*  Skip it if it is bad 
+*  Skip it if it is bad
          IF( IN( I ) .NE. VAL__BADR ) THEN
 
 *  Store the required GRID co-ordinates.
             NCEN = NCEN + 1
             DO K = 1, NDIM
-               PIXCEN( NCEN, K ) = DBLE( J( K ) ) 
+               PIXCEN( NCEN, K ) = DBLE( J( K ) )
             END DO
 
 *  Abort if the PIXCEN array is now full.
@@ -120,11 +120,11 @@
 
          END IF
 
-*  Increment the pixel indices.   
+*  Increment the pixel indices.
          J( 1 ) = J( 1 ) + 1
 
          K = 1
-         DO WHILE( K .LE. NDIM .AND. J( K ) .GT. DIM( K ) ) 
+         DO WHILE( K .LE. NDIM .AND. J( K ) .GT. DIM( K ) )
             J( K ) = 1
             K = K + 1
             J( K ) = J( K ) + 1

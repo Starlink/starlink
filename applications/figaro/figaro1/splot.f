@@ -31,24 +31,24 @@ C                 it is plotted. (It is implemented as a value
 C                 subtracted from both HIGH and LOW.)
 C                 (HIGH,LOW and BIAS are not required if the
 C                 AUTOSCALE keyword is specified.)
-C     LABEL       A label for the plot.  
+C     LABEL       A label for the plot.
 C     COLOUR      The colour for the plot, assuming the display device
 C                 supports it.  The axes are always white.
 C     THICKNESS   The width of the lines used for the plot.  This is
-C                 only used for 'hard' & 'build' plots, and should 
+C                 only used for 'hard' & 'build' plots, and should
 C                 really be 1 for anything other than a high-resolution
 C                 device like a Versatec or a laser printer.
-C    
+C
 C     Command keywords -
 C
-C     AUTOSCALE   The program is to work out the values for HIGH 
+C     AUTOSCALE   The program is to work out the values for HIGH
 C                 and LOW, using the maximum and minimum values
 C                 in the data over the specified range.
 C     WHOLE       The program is to display all of the spectrum.
 C     HARDCOPY    The plot is to produce a hard copy.
 C     AXES        Axes will be plotted.
 C     ERASE       The screen will be erased before the plot.
-C     LINES       The plot is not done as a histogram, but as 
+C     LINES       The plot is not done as a histogram, but as
 C                 a 'join the dots' line plot.  (Only applies
 C                 to SPLOT.)
 C
@@ -94,7 +94,7 @@ C     25 Jan 1991  JMS/AAO & JAB/JAC. AAO recent modifications (bug
 C                  fixes: PAR_ABORT calls added, BUILD code corrected)
 C                  merged with data quality support added by JAB at
 C                  UKIRT.  PAR_ABORTS and STATUS checks added.
-C     31 Jan 1991  JMS / AAO. Exits program if number of good data 
+C     31 Jan 1991  JMS / AAO. Exits program if number of good data
 C                  points is fewer than or equal to one.
 C     10 Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Eliminate
 C                  DSK_ package (and the build option).
@@ -179,7 +179,7 @@ C
       INTEGER   TEPTR            ! Temporary Error pointer
       INTEGER   TXPTR            ! Temporary X pointer
       INTEGER   TSLOT            ! Temporary slot
-      REAL      VALUE            ! Temporary real 
+      REAL      VALUE            ! Temporary real
       REAL      VMAX             ! Maximum value in data array
       REAL      VMIN             ! Minimum value in data array
       LOGICAL   WHOLE            ! True if WHOLE specified
@@ -285,7 +285,7 @@ C
      :                          NGOOD,%VAL(CNF_PVAL(TDPTR)),
      :                          %VAL(CNF_PVAL(TEPTR)),
      :                          %VAL(CNF_PVAL(TXPTR)),IXST,IXEN)
-                       
+
           NX=NGOOD
           DPTR=TDPTR
           EPTR=TEPTR
@@ -343,7 +343,7 @@ C
       CALL PAR_RDKEY('ERASE',.TRUE.,ERASE)
       IF (SPLO) CALL PAR_RDKEY('LINES',.FALSE.,LINES)
 C
-C     Get the label for the plot - 
+C     Get the label for the plot -
 C
       CALL PAR_RDCHAR('LABEL',' ',PLAB)
 C
@@ -368,7 +368,7 @@ C
          CKEY=1
       END IF
 C
-C     Check for 'BUILD' or 'HARD' 
+C     Check for 'BUILD' or 'HARD'
 C
       HARD=.FALSE.
       BUILD=.FALSE.
@@ -498,7 +498,7 @@ C                  If BUILD is true, DEVICE is the filename to be
 C                  used for the 'build' file.
 C     (>) BUILD    (Logical) Indicates that a 'build' file is to
 C                  be used. Should always be .FALSE.
-C     (>) THICK    (Integer) The line thickness for the plot.  
+C     (>) THICK    (Integer) The line thickness for the plot.
 C     (>) CKEY     (Integer) The GRPCKG code (0..7) for the colour
 C                  of the plot.
 C     (>) XVST     (Real) The actual x-start value for the plot.
@@ -529,14 +529,14 @@ C                                       KS / CIT  26th July 1984
 C     Modified:
 C
 C     8th March 1988   KS / AAO.  Changed for the GKS version of PGPLOT.
-C                      Use of /APPEND re-introduced, and references to 
+C                      Use of /APPEND re-introduced, and references to
 C                      GRPCKG routines changed to PGPLOT equivalents.
 C     31st Aug. 1992.  HME / UoE, Starlink.  Eliminate DSK_ package (and
 C                      the build option).
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL AXES,BUILD,ERASE,LINES
       INTEGER IXST,IXEN,NX,STATUS,THICK,CKEY
@@ -606,8 +606,8 @@ C
 C     F I G _ X Z E P L O T
 C
 C     Plots an array (ZVALS) against another array (XVALS), with errors
-C     as specified by an error array (ERRORS). It is assumed that these 
-C     map element for element, and that the XVALS values represent the 
+C     as specified by an error array (ERRORS). It is assumed that these
+C     map element for element, and that the XVALS values represent the
 C     coordinates at the center of each 'bin', and are in ascending order.
 C
 C     Parameters -   (">" input, "<" output)
@@ -634,7 +634,7 @@ C                  If BUILD is true, DEVICE is the filename to be
 C                  used for the 'build' file.
 C     (>) BUILD    (Logical) Indicates that a 'build' file is to
 C                  be used. Should always be .FALSE.
-C     (>) THICK    (Integer) The line thickness for the plot.  
+C     (>) THICK    (Integer) The line thickness for the plot.
 C     (>) CKEY     (Integer) The GRPCKG code (0..7) for the colour
 C                  of the plot.
 C     (>) XVST     (Real) The actual x-start value for the plot.
@@ -667,14 +667,14 @@ C
 C     12th Aug  1985.  KS / AAO.  Now expects ERRORS to be % values.
 C     22nd July 1986.  KS / AAO.  Reverts to absolute error values.
 C     8th March 1988   KS / AAO.  Changed for the GKS version of PGPLOT.
-C                      Use of /APPEND re-introduced, and references to 
+C                      Use of /APPEND re-introduced, and references to
 C                      GRPCKG routines changed to PGPLOT equivalents.
 C     31st Aug. 1992.  HME / UoE, Starlink.  Eliminate DSK_ package (and
 C                      the build option).
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       LOGICAL AXES,BUILD,ERASE,ERRUSE
       INTEGER IXST,IXEN,NX,STATUS,THICK,CKEY
@@ -767,7 +767,7 @@ C
       END DO
       END
 
-  
+
       SUBROUTINE FIG_SPLOT_REMOVE(NX,D1,E1,X1,QUALITY,ERRUSE,NGOOD,
      :     D2,E2,X2,IXST,IXEN)
 C

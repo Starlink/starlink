@@ -45,7 +45,7 @@ character prefix identifying the facility from which the error originates
 and ENAME is the name of the error code (up to 5 characters).  Some
 existing software does not follow this convention, but all new software
 should. The value SAI__ERROR is available for general use.")))
-    
+
 (new-place "ERROR_NAME"
 	   nil
 	   '((help .
@@ -57,7 +57,7 @@ recommended that upper case alpha-numeric characters be used to construct
 a meaningful name which describes the particular type of error being
 reported (e.g. FAC_OPEN_NONAME).  A maximum of 15 characters in total
 (including the subroutine name and underscores) is permitted.")))
-    
+
 (new-place "DEFINE_MESSAGE_TOKEN"
 	   "CALL MSG_{msg_token_routine}"
 	   '((vert . t)))
@@ -71,7 +71,7 @@ available, then type SET or FMT followed by cntrl-E to obtain an
 appropriate menu from which the full subroutine argument list can be
 obtained.")
 	     (desc . "Name of a MSG_ routine for setting a message token")))
-    
+
 (new-place "MESSAGE_TEXT"
 	   nil
 	   '((help .

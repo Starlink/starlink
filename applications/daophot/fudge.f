@@ -15,10 +15,10 @@ C
 *  History:
 *     17-Mar-1995 (GJP)
 *     Replaced very negative numbers (-1E38) with VAL__MINR.
- 
+
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
- 
+
       INTEGER MAXCOL, MAXPOL, MTERM
       PARAMETER  (MAXPOL=3, MTERM=10)
 C
@@ -26,7 +26,7 @@ C Parameters
 C
 C MAXCOL is the width of the largest picture that can be accomodated.
 C
-C MAXPOL is the largest permitted polynomial order (0 = constant, 
+C MAXPOL is the largest permitted polynomial order (0 = constant,
 C         1 = linear = plane, 2 = quadratic, ...)
 C
 C MTERM = (MAXPOL+1)*(MAXPOL+2)/2
@@ -205,7 +205,7 @@ C
                   END DO
                END IF
             END DO
-C 
+C
 C Upper y.
 C
             IF (MBY .GT. MY) THEN

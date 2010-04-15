@@ -28,16 +28,16 @@ C    (C) QMAX       (Real)     Maximum Q level to plot.
 C    (C) UMIN       (Real)     Minimum U level to plot.
 C    (C) UMAX       (Real)     Maximum U level to plot.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         26/2/1988
 C
 C-
 C
 C  History:
-C    Jan/1988   Original Version.   JAB/AAO 
+C    Jan/1988   Original Version.   JAB/AAO
 C    26/2/1988   TSP Monolith version.  JAB/AAO
 C
 
@@ -136,13 +136,13 @@ C
       ENDIF
 
 *  Do the plot
-                    
+
       IF (STATUS .EQ. SAI__OK) THEN
         CALL TSP_QUPLOT(SIZE,%VAL(T1PTR),%VAL(T2PTR),
      :  UMIN,UMAX,QMIN,QMAX,STATUS)
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(IDLOC,STATUS)
       CALL TSP_UNMAP(QDLOC,STATUS)
@@ -153,11 +153,11 @@ C
       CALL TSP_UNMAP(T1LOC,STATUS)
       CALL TSP_UNMAP(T2LOC,STATUS)
       CALL DAT_ANNUL(QLOC,STATUS)
-      CALL DAT_ANNUL(ULOC,STATUS) 
+      CALL DAT_ANNUL(ULOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-      
+
 
 
 
@@ -177,7 +177,7 @@ C
 *   in percentage polarization.
 *
 *   Bins with no data are filled with the bad value  (VAL__BADR)
-*       
+*
 *    (>)  SIZE   (Integer)            The number of spectral points
 *    (>)  INT    (Real array(SIZE))   The intensity array
 *    (>)  Q      (Real array(SIZE))   The Q stokes parameter array
@@ -188,13 +188,13 @@ C
 *    (<)  TEMP2  (Real array(SIZE))   Binned U array
 *    (>)  BINERR (Real)               Error per bin (percent)
 *    (!)  STATUS (Integer)            Status value
-*   
+*
 *    Jeremy Bailey   12/7/1990
 *
 *    Modified:
 *        11/12/1991  -  Handle bad values
 *
-*+   
+*+
 
 
       IMPLICIT NONE
@@ -248,7 +248,7 @@ C
      :        .AND. U(BIN_END) .NE. VAL__BADR) THEN
 
 *   Add data into bin accumulated values
-             
+
                BIN_INT = BIN_INT+INT(BIN_END)
                BIN_Q = BIN_Q+Q(BIN_END)
                BIN_U = BIN_U+U(BIN_END)
@@ -266,9 +266,9 @@ C
                   BIG_ENOUGH = (SQRT(BIN_VAR) .LT. BINERR*BIN_INT/100.0)
                ENDIF
               ENDIF
-            ENDDO     
+            ENDDO
 
-*  Calculate value for bin. 
+*  Calculate value for bin.
 
             IF (BIN_INT .GT. 0.0) THEN
 
@@ -303,7 +303,7 @@ C
 *
 *   Subroutine to do the polarization plot. Q and U are plotted against
 *   each other as a QU diagram.
-*       
+*
 *   The plot device and plot label are obtained by ADAM PAR_ calls within
 *   this routine
 *
@@ -327,7 +327,7 @@ C
 *      11/12/1991   -  Handle bad values
 *
 *+
-                       
+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -338,17 +338,17 @@ C
       REAL TEMP1(SIZE),TEMP2(SIZE)
       REAL QMIN,QMAX
       REAL UMIN,UMAX
-      INTEGER STATUS     
+      INTEGER STATUS
 
 *  Local variables
 
 *  SGS zone
-      INTEGER ZONE                    
+      INTEGER ZONE
       INTEGER ZONE1
       INTEGER I
 
 *  GKS error flag
-      INTEGER IERR                        
+      INTEGER IERR
       INTEGER STAT
 
 *  First time through flag
@@ -363,7 +363,7 @@ C
 
 *  Plot label
       CHARACTER*80 LABEL
-             
+
       DATA FIRST /.TRUE./
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -388,13 +388,13 @@ C
          ELSE
 *            CALL SNX_AGRES(HEAP)
          ENDIF
-       
+
 *  Set up for NCAR plot
 
          CALL AGSETP('GRAPH.',VIEWP,4)
-                                      
-*  Set position of plot                  
-                
+
+*  Set position of plot
+
          CALL AGSETF('GRID/TOP.',0.86)
          CALL AGSETF('GRID/BOTTOM.',0.14)
 
@@ -420,7 +420,7 @@ C
          CALL AGSETF('RIGHT/MA/CO.',2.0)
 
 *  Plot scaling
-                                
+
          CALL AGSETF('Y/MIN.',UMIN)
          CALL AGSETF('Y/MAX.',UMAX)
          CALL AGSETF('Y/NICE.',0.0)

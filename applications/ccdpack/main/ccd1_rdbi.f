@@ -234,55 +234,55 @@
 
 *  Used a user supplied global zero level write, this out.
             CALL MSG_SETR( 'RDBI_ZERO', REAL( MEAN ) )
-            IF ( EXTBIA ) THEN 
-               CALL CCD1_MSG( ' ',              
+            IF ( EXTBIA ) THEN
+               CALL CCD1_MSG( ' ',
      :   '  Global zero level                : ^RDBI_ZERO*', STATUS )
-            ELSE                                          
-               CALL CCD1_MSG( ' ',                        
+            ELSE
+               CALL CCD1_MSG( ' ',
      :   '  Global zero level                : ^RDBI_ZERO', STATUS )
-            END IF                                        
-         ELSE                                             
-                                                          
-*  All the bias strip things.                             
-*  Readout direction. 1=X, 2=Y                            
-            IF ( DIRECT .EQ. 1 ) THEN                     
-                                                          
-*  X type bounds.                                         
-               CALL MSG_SETC( 'RDBI_DIREC', 'X' )         
-                                                          
-*  Write out readout direction.                           
-               IF ( EXTDIR ) THEN 
-                  CALL CCD1_MSG( ' ',                        
+            END IF
+         ELSE
+
+*  All the bias strip things.
+*  Readout direction. 1=X, 2=Y
+            IF ( DIRECT .EQ. 1 ) THEN
+
+*  X type bounds.
+               CALL MSG_SETC( 'RDBI_DIREC', 'X' )
+
+*  Write out readout direction.
+               IF ( EXTDIR ) THEN
+                  CALL CCD1_MSG( ' ',
      :   '  Readout direction                : ^RDBI_DIREC*', STATUS )
                ELSE
-                  CALL CCD1_MSG( ' ',                        
+                  CALL CCD1_MSG( ' ',
      :   '  Readout direction                : ^RDBI_DIREC', STATUS )
                END IF
 
 *  Bias strips bounds.
                CALL MSG_SETI( 'RDBI_B1', BOUNDS( 1 ) + XORIG - 1 )
                CALL MSG_SETI( 'RDBI_B2', BOUNDS( 2 ) + XORIG - 1 )
-               IF ( NBOUND .GT. 2 ) THEN                  
+               IF ( NBOUND .GT. 2 ) THEN
                   CALL MSG_SETI( 'RDBI_B3', BOUNDS( 3 ) + XORIG - 1 )
                   CALL MSG_SETI( 'RDBI_B4', BOUNDS( 4 ) + XORIG - 1 )
-                  IF ( EXTBDS ) THEN 
-                     CALL CCD1_MSG( ' ',        
+                  IF ( EXTBDS ) THEN
+                     CALL CCD1_MSG( ' ',
      :   '  Bias strip bounds                : (^RDBI_B1:^RDBI_B2'//
-     :   ',^RDBI_B3:^RDBI_B4)*', STATUS )     
-                  ELSE  
-                     CALL CCD1_MSG( ' ',        
+     :   ',^RDBI_B3:^RDBI_B4)*', STATUS )
+                  ELSE
+                     CALL CCD1_MSG( ' ',
      :   '  Bias strip bounds                : (^RDBI_B1:^RDBI_B2'//
-     :   ',^RDBI_B3:^RDBI_B4)', STATUS )     
+     :   ',^RDBI_B3:^RDBI_B4)', STATUS )
                   END IF
-               ELSE                          
-                  IF ( EXTBDS ) THEN 
-                     CALL CCD1_MSG( ' ',        
+               ELSE
+                  IF ( EXTBDS ) THEN
+                     CALL CCD1_MSG( ' ',
      :   '  Bias strip bounds                : (^RDBI_B1:^RDBI_B2)*',
-     :             STATUS )                  
-                  ELSE  
-                     CALL CCD1_MSG( ' ',        
+     :             STATUS )
+                  ELSE
+                     CALL CCD1_MSG( ' ',
      :   '  Bias strip bounds                : (^RDBI_B1:^RDBI_B2)',
-     :             STATUS )                  
+     :             STATUS )
                   END IF
                END IF
             ELSE
@@ -291,10 +291,10 @@
                CALL MSG_SETC( 'RDBI_DIREC', 'Y' )
 
 *  Write out readout direction.
-               IF ( EXTDIR ) THEN 
+               IF ( EXTDIR ) THEN
                   CALL CCD1_MSG( ' ',
      :   '  Readout direction                : ^RDBI_DIREC*', STATUS )
-               ELSE  
+               ELSE
                   CALL CCD1_MSG( ' ',
      :   '  Readout direction                : ^RDBI_DIREC', STATUS )
                END IF
@@ -305,7 +305,7 @@
                IF ( NBOUND .GT. 2 ) THEN
                   CALL MSG_SETI( 'RDBI_B3', BOUNDS( 3 ) + YORIG - 1 )
                   CALL MSG_SETI( 'RDBI_B4', BOUNDS( 4 ) + YORIG - 1 )
-                  IF ( EXTBDS ) THEN 
+                  IF ( EXTBDS ) THEN
                      CALL CCD1_MSG( ' ',
      :   '  Bias strip bounds                : (^RDBI_B1:^RDBI_B2'//
      :   ',^RDBI_B3:^RDBI_B4)*', STATUS )
@@ -315,7 +315,7 @@
      :   ',^RDBI_B3:^RDBI_B4)', STATUS )
                   END IF
                ELSE
-                  IF ( EXTBDS ) THEN 
+                  IF ( EXTBDS ) THEN
                      CALL CCD1_MSG( ' ',
      :   '  Bias strip bounds                : (^RDBI_B1:^RDBI_B2)*',
      :             STATUS )
@@ -370,7 +370,7 @@
          CALL CCD1_MSG( 'GENVAR_MESS',
      :   '  Variance estimates were made ', STATUS )
          CALL MSG_SETR( 'RNOISE_VAL', REAL( RNOISE ) )
-         IF ( EXTNOI ) THEN 
+         IF ( EXTNOI ) THEN
             CALL CCD1_MSG( 'RNOISE_MESS',
      :   '  Readout noise (ADUs)             : ^RNOISE_VAL*', STATUS )
          ELSE
@@ -389,7 +389,7 @@
          IF ( EXTADC ) THEN
             CALL CCD1_MSG( 'ADC_MESS',
      :   '  ADC factor                       : ^ADC_VAL*', STATUS )
-         ELSE  
+         ELSE
             CALL CCD1_MSG( 'ADC_MESS',
      :   '  ADC factor                       : ^ADC_VAL', STATUS )
          END IF

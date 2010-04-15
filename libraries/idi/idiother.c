@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -230,7 +230,7 @@ nsegments = 4 ;
 if ( device[display].roi_flag < 0 )
    {
    XSetPlaneMask( display_id, gccurs, AllPlanes );
-   XDrawSegments(display_id, w_id, gccurs, curso0, nsegments); 
+   XDrawSegments(display_id, w_id, gccurs, curso0, nsegments);
    }
 else
    {
@@ -264,7 +264,7 @@ curso0[3].y1 = y1 - delta[corner][13] - y_off;
 curso0[3].x2 = x0 + delta[corner][14] - x_off;
 curso0[3].y2 = y0 - delta[corner][15] - y_off;
 XSetPlaneMask( display_id, gccurs, mem->pm_mask );
-XDrawSegments(display_id, pixmap_id, gccurs, curso0, nsegments); 
+XDrawSegments(display_id, pixmap_id, gccurs, curso0, nsegments);
 
 /* Plot cursor into pixmap overlay */
 if ( ~device[display].pm_mask > 0 )
@@ -289,7 +289,7 @@ if ( ~device[display].pm_mask > 0 )
    curso0[3].x2 = x0 + delta[corner][14] - x_off;
    curso0[3].y2 = y0 - delta[corner][15] - y_off;
    XSetPlaneMask( display_id, gccurs, mem->pm_mask );
-   XDrawSegments(display_id, pixmap_id, gccurs, curso0, nsegments); 
+   XDrawSegments(display_id, pixmap_id, gccurs, curso0, nsegments);
    }
 
 /* Reset cursor graphics context */
@@ -1012,7 +1012,7 @@ int is_motion_pending( int display, int x_pos, int y_pos )
 *        Current locator position
 *
 *  Algorithm:
-*     If there is a pending event on the queue then peek at it. 
+*     If there is a pending event on the queue then peek at it.
 *     If the next event is a motion event and it the position does not
 *     exceed the maximum allowable then return true otherwise return false.
 *
@@ -1252,12 +1252,12 @@ Pixmap cursor_mask, cursor_pixmap;
 #define cursor_x_hot 7
 #define cursor_y_hot 7
 static unsigned char cursor_bits[] = {
-   0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 
+   0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00,
    0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0xff, 0x7f,
    0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00,
    0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00};
 static unsigned char mask_bits[] = {
-   0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01, 
+   0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01,
    0xc0, 0x01, 0xc0, 0x01, 0xff, 0x7f, 0xff, 0x7f,
    0xff, 0x7f, 0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01,
    0xc0, 0x01, 0xc0, 0x01, 0xc0, 0x01, 0x00, 0x00};
@@ -1281,11 +1281,11 @@ switch ( func )
    case HC_DO:
       {
       back_color.pixel = XWhitePixel( display_id, screen );
-      XQueryColor( display_id, DefaultColormap( display_id, screen), 
+      XQueryColor( display_id, DefaultColormap( display_id, screen),
           &back_color );
       XAllocColor( display_id, cmap, &back_color);
       fore_color.pixel = XBlackPixel( display_id, screen );
-      XQueryColor( display_id, DefaultColormap( display_id, screen), 
+      XQueryColor( display_id, DefaultColormap( display_id, screen),
           &fore_color );
       XAllocColor( display_id, cmap, &fore_color);
       cursor_pixmap = XCreateBitmapFromData( display_id, w_id,
@@ -1305,7 +1305,7 @@ switch ( func )
       {
       yin = device[display].dev_ysiz - 1 - yin;
       GWM_GetScroll( display_id, w_id, &x_off, &y_off );
-      XWarpPointer( display_id, None, w_id, 0, 0, 0, 0, xin + x_off, 
+      XWarpPointer( display_id, None, w_id, 0, 0, 0, 0, xin + x_off,
                     yin + y_off);
       break;
       }

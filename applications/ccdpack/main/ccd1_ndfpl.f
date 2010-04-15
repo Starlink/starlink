@@ -15,25 +15,25 @@
 *                      STATUS )
 
 *  Description:
-*     This routine creates a set of NDF placeholders from an ADAM 
+*     This routine creates a set of NDF placeholders from an ADAM
 *     parameter representing a single name, via the NDG system.
-*     The NDG system is used to keep a uniformity of interface 
+*     The NDG system is used to keep a uniformity of interface
 *     between all NDG command specs and prompts (e.g. can be enclosed
 *     in quotes, read from a file etc).  Note this routine is not
 *     designed for the situation in which the parameter value refers
 *     to a list of files in the filesystem.
 *
-*     A number NPLACE of placeholders are created.  If NPLACE is 
+*     A number NPLACE of placeholders are created.  If NPLACE is
 *     unity, a normal NDF file is created as per the name given by
-*     PARAM.  However, if NPLACE is greater than unity, the name 
+*     PARAM.  However, if NPLACE is greater than unity, the name
 *     given by PARAM is used as the name of an HDS container file,
 *     and placeholders are generated for NDFs within that container.
-*     In addition, the name of the file (either the HDS container 
+*     In addition, the name of the file (either the HDS container
 *     or the normal NDF file) which was created is returned.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter from which is to be read an 
+*        The name of an ADAM parameter from which is to be read an
 *        NDG expression representing a single location for an HDS
 *        object (e.g. a filename).
 *     NPLACE = INTEGER (Given)
@@ -95,17 +95,17 @@
       INCLUDE 'DAT_PAR'          ! HDS system constants
       INCLUDE 'GRP_PAR'          ! GRP system constants
       INCLUDE 'PAR_ERR'          ! PAR system error values
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       CHARACTER * ( * ) PRENAM
       INTEGER NPLACE
       INTEGER NAMGRP
-      
+
 *  Arguments Returned:
       INTEGER PLACE( NPLACE )
       CHARACTER * ( * ) FILNAM
-      
+
 *  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN           ! Used length of string
@@ -124,7 +124,7 @@
       LOGICAL TERM               ! Termination flag
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF structure in container
       CHARACTER * ( DAT__SZLOC ) LOC ! HDS locator
-      
+
 *.
 
 *  Check inherited global status.
@@ -219,6 +219,6 @@
 
 *  Release GRP resources.
       CALL CCD1_GRDEL( GID, STATUS )
-      
+
       END
 * $Id$

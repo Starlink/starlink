@@ -7,7 +7,7 @@
 *
 * Language:
 *    C
-* 
+*
 * Invocation:
 *    Call from C
 *      struct = idlstructarrdef( sloc, name, ndims, dims, status );
@@ -38,7 +38,7 @@
 *    HDSSTRUCTYPE hdstype(dim1,dim2...) and a separate structure component
 *    named NAME_index1_index2... representing each element of the array of
 *    structures.
-*    The HDS structure is analysed and a list of corresponding IDL tags 
+*    The HDS structure is analysed and a list of corresponding IDL tags
 *    created. The function IDL_MakeStruct is then called to create the
 *    structure. If the tag is itself a structure, this function is called
 *    recursively.
@@ -65,7 +65,7 @@
 
 #define TAG__SZNAM DAT__SZNAM+30
 
-IDL_StructDefPtr idlstructarrdef( 
+IDL_StructDefPtr idlstructarrdef(
    HDSLoc *sloc, char *name, int ndims, int dims[], int *status ) {
 
 static char hdsstructype[13] =  "HDSSTRUCTYPE";
@@ -93,7 +93,7 @@ HDSLoc * cloc = NULL;    /* Array cell locator */
    datSize ( sloc, &nels, status );
    tags = (IDL_STRUCT_TAG_DEF *)IDL_GetScratch( &tagvar, (IDL_LONG)nels+2,
             (IDL_LONG)sizeof(IDL_STRUCT_TAG_DEF) );
-   
+
 /* Set tag for the HDS type */
    tags[0].name = hdsstructype;
    tags[0].dims = 0;

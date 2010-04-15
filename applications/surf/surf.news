@@ -16,7 +16,7 @@
     o NOISE
 
   ***
-  ***  In order to obtain the full functionality described in SUN/216 it 
+  ***  In order to obtain the full functionality described in SUN/216 it
   ***  is also necessary to install the Starlink PERL, PERLMODS and
   ***  STARPERL packages from Starlink. See SUN/228 for more details on the
   ***  STARPERL distribution.

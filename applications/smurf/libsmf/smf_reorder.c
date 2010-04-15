@@ -13,27 +13,27 @@
 *     C function
 
 *  Invocation:
-*     smf_reorder( type, void *in, int len, int ndim, int *dims_in, 
-*                  int axis, int *index, int maxis, int *mask, void *out, 
+*     smf_reorder( type, void *in, int len, int ndim, int *dims_in,
+*                  int axis, int *index, int maxis, int *mask, void *out,
 *                  int *status );
 *
-*     smf_reorder<x>( <type> *in, int ndim, int *dims_in, int axis, 
-*                     int *index, int maxis, int *mask, <type> *out, 
+*     smf_reorder<x>( <type> *in, int ndim, int *dims_in, int axis,
+*                     int *index, int maxis, int *mask, <type> *out,
 *                     int *status );
 *
-*     smf_reorderc( char *in, int len, int ndim, int *dims_in, int axis, 
-*                   int *index, int maxis, int *mask, char *out, 
+*     smf_reorderc( char *in, int len, int ndim, int *dims_in, int axis,
+*                   int *index, int maxis, int *mask, char *out,
 *                   int *status );
 
 *  Arguments:
 *     type = const char * (Given)
-*        The HDS data type. Note, this argument is only included in the 
+*        The HDS data type. Note, this argument is only included in the
 *        interface for the generic "smf_reorder" function.
 *     in = <type> * (Given)
 *        Point to the vectorised input array. The elements are assumed to be
 *        stored in fortran order (i.e. the first axis varies fastest).
 *     len = int (Given)
-*        The length of each individual sub-string within the "in" and "out" 
+*        The length of each individual sub-string within the "in" and "out"
 *        arrays. Note, this argument is only included in the interface for
 *        smf_reorder and smf_reorderc. The smf_reorder function ignores
 *        the supplied value if "type" indicates a non-character data type.
@@ -42,19 +42,19 @@
 *     dims_in = int * (Given)
 *        Pointer to an array of "ndim" values, each being the length of
 *        the corresponding dimension of the "in" array. The dimensions of
-*        the "out" array should be the same as those of the "in" array, 
+*        the "out" array should be the same as those of the "in" array,
 *        except that, if a mask is supplied, the "maxis" axis should be
-*        shorter in the "out" array, by the number of zero values in the 
+*        shorter in the "out" array, by the number of zero values in the
 *        mask.
 *     axis = int (Given)
 *        The zero-based index of the dimension that is to be re-ordered.
 *        Ignored if "index" is NULL.
 *     index = int * (Given)
-*        An array with one element for each input pixel on the dimension that 
+*        An array with one element for each input pixel on the dimension that
 *        is being re-ordered (i.e. it should have "dims_in[axis]" elements).
-*        This array lists the old planes in their sorted order. That is, 
+*        This array lists the old planes in their sorted order. That is,
 *        if "index[i]" has a value "j", then "j" is an index along
-*        dimension "axis" in the "in" array, and "i" is the corresponding 
+*        dimension "axis" in the "in" array, and "i" is the corresponding
 *        index in the "out" array. A NULL pointer may be supplied, in
 *        which case the data is copied without re-ordering.
 *     maxis = int (Given)
@@ -62,12 +62,12 @@
 *        the last axis (if no index is supplied), or last but one axis
 *        (if an axis was supplied) can be masked. Ignored if "mask" is NULL.
 *     mask = int * (Given)
-*        An array with one element for each input pixel on the dimension that 
-*        is being masked (i.e. it should have "dims_in[maxis]" elements). This 
+*        An array with one element for each input pixel on the dimension that
+*        is being masked (i.e. it should have "dims_in[maxis]" elements). This
 *        array should contain non-zero values for those hyper-rows that
 *        are to be copied to "out". Other hyper-rows are not copied. If a
 *        NULL pointer is supplied, no masking is performed. The number of
-*        non-zero values in "mask" should equal the length of the "maxis" 
+*        non-zero values in "mask" should equal the length of the "maxis"
 *        axis in "out".
 *     out = <type> * (Returned)
 *        Point to the vectorised output array. The elements are assumed to be
@@ -76,7 +76,7 @@
 *        Pointer to inherited status.
 
 *  Description:
-*     This function re-orders the value in a supplied array by shuffling 
+*     This function re-orders the value in a supplied array by shuffling
 *     the hyper-planes that are perpendicular to a specified axis. The
 *     new order for the hyper-planes is specified by an "index" array that
 *     lists the original hyper-plane indices in their new order. The
@@ -140,8 +140,8 @@
 #include "mers.h"
 #include "smf.h"
 
-void smf_reorder( const char *type, void *in, int len, int ndim, int *dims_in, 
-                  int axis, int *index, int maxis, int *mask, void *out, 
+void smf_reorder( const char *type, void *in, int len, int ndim, int *dims_in,
+                  int axis, int *index, int maxis, int *mask, void *out,
                   int *status ){
 
 /* Check inherited status */

@@ -2,30 +2,30 @@
 *+
 *  Name:
 *     MAG_START
- 
+
 *  Purpose:
 *     initialise MAG library.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG_START( STATUS )
- 
+
 *  Description:
 *     The SCL version of the MAG library is initialised for
 *     the start of an executable image.
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The Global status.
- 
+
 *  Algorithm:
 *     The table of assigned tape devices in the MAG_IO Common Block
 *     is initialised.
 *     The MAG error codes are given to SEM.
 *     The MAG Exit Handler is established.
- 
+
 *  Copyright:
 *     Copyright (C) 1981, 1983, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -49,7 +49,7 @@
 *  Authors:
 *     Sid Wright  (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     15-OCT-1981:  Original.  (UCL::SLW)
 *     17-Apr-1983:  Starlink Version. (UCL::SLW)
@@ -64,15 +64,15 @@
 *        Add INCLUDE 'DAT_PAR'
 *        Add INCLUDE 'PAR_PAR'
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definitions
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
@@ -81,27 +81,27 @@
       INCLUDE 'MAGSCL_PAR'      ! MAG_SCL Internal Constants
 *    Status return :
       INTEGER STATUS            ! Status
- 
+
 *  Global Variables:
       INCLUDE 'MAGPA_SCL'       ! MAG Parameter Table
- 
+
 *  Local Variables:
       INTEGER I                 ! loop index
- 
+
 *.
- 
- 
+
+
 C      print *,'mag_start:status', status
 *    Execution allowed ?
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
       DO 100 I = 1, MAG__MXDEV
          PFREE(I) = .TRUE.
          PDESC(I) = 0
          PTNAME(I) = ' '
          PDLOC(I) = ' '
  100  CONTINUE
- 
+
 C      print *,'mag_start:  completed'
       RETURN
       END

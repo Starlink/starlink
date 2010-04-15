@@ -10,7 +10,7 @@
 * Regions which are significantly different from the average should be avoided
 * since they may be being distorted by other objects on the slit. Try to
 * choose regions symmetrically about an object and choose the same regions for
-* standard as well as target stars, even though it may be obvious that the 
+* standard as well as target stars, even though it may be obvious that the
 * wings of the standard star spill light into sky regions that looked ok for
 * your target.
 *
@@ -24,7 +24,7 @@
 *
 *  DARK      -- Dark frame representing counts unaffected by slit
 *               profile. This will be subtracted off data before applying
-*               the balance factors. 
+*               the balance factors.
 *
 *  TRACE     -- True if a distortion file is wanted
 *
@@ -47,7 +47,7 @@
 *
 *  AUTO      -- Yes to find scales automatically. Based on going from first
 *               to third quartiles, with some extra knobs and twiddles.
-*              
+*
 *  If .NOT.AUTO then set LIMITS
 *
 *  NWIDTH -- If not GREY, a median filter is applied during the collapse;
@@ -78,7 +78,7 @@ C
       DOUBLE PRECISION YREF, YPOS, TOFF
 C
       IF(STATUS.NE.SAI__OK) RETURN
-      CALL NDF_BEGIN      
+      CALL NDF_BEGIN
 C
 C     Open data file
 C
@@ -139,7 +139,7 @@ C
      &        .FALSE.,YLO,STATUS)
          CALL PAR_GDR0I('YEND',UBND(2),YLO,UBND(2),
      &        .FALSE.,YHI,STATUS)
-C     
+C
 C     Replace IMAGE, FLAT and DARK with ndf sections
 C
          IF(XLO.NE.LBND(1) .OR. XHI.NE.UBND(1) .OR.
@@ -185,15 +185,15 @@ C
          CALL PAR_GET0C('DEVICE',DEVICE,STATUS)
       END IF
       CALL PAR_CHOIC('METHOD','C','C,T',.FALSE.,METHOD,STATUS)
-C     
-C     Get work space 
-C     
+C
+C     Get work space
+C
       IF(GREY .OR. TRACE) THEN
          CALL NDF_TEMP(PLACE, STATUS)
          CALL NDF_NEW('_REAL',2,LBND,UBND,PLACE,WORK,STATUS)
          CALL NDF_MAP(WORK,'Data','_REAL','WRITE',WPTR,EL,STATUS)
       END IF
-C     
+C
 C     Map files
 C
       CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
@@ -205,26 +205,26 @@ C     Generate plot title
 C
       CALL NDF_MSG('NAME', IMAGE)
       CALL MSG_LOAD('BLA','^NAME',FILE,FLEN,STATUS)
-C     
+C
 C     Pick sky regions
-C     
-      CALL PICK_SKY(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)), 
+C
+      CALL PICK_SKY(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)),
      &     %VAL(CNF_PVAL(DPTR)), %VAL(CNF_PVAL(RPTR)),
-     &     LEFT, RIGHT, DIM(1), DIM(2), LBND(1), LBND(2), 
+     &     LEFT, RIGHT, DIM(1), DIM(2), LBND(1), LBND(2),
      &     GREY, AUTO, TRACE, LIMITS(1), LIMITS(2),
      &     %VAL(CNF_PVAL(WPTR)), NWIDTH, DEVICE, FILE, YREF,
      &     METHOD, STATUS)
-C     
+C
 C     Store limits for next time
-C     
+C
       IF(AUTO) THEN
          CALL PAR_DEF1R('LIMITS',2,LIMITS,STATUS)
          CALL PAR_GET1R('LIMITS',2,LIMITS,NSET,STATUS)
       END IF
-C     
+C
 C     Create 'pamela' extension if not already one present.
 C     Write full frame size and left and right limits to it.
-C     
+C
       CALL NDF_XSTAT(REGION, 'PAMELA', THERE, STATUS)
       IF(.NOT.THERE) THEN
          CALL NDF_XNEW(REGION,'PAMELA', 'Ext', 0, 0, LOC, STATUS)
@@ -232,85 +232,85 @@ C
       ELSE
          CALL NDF_XLOC(REGION,'PAMELA','UPDATE',LOC,STATUS)
          CALL DAT_THERE(LOC, 'REGPIC', THERE, STATUS)
-         IF(.NOT.THERE) 
+         IF(.NOT.THERE)
      &        CALL DAT_NEW(LOC, 'REGPIC', 'Struct', 0, 0, STATUS)
       END IF
       CALL DAT_ANNUL(LOC, STATUS)
-      CALL NDF_XPT0R(LEFT,REGION,'PAMELA','REGPIC.LEFT',STATUS)      
-      CALL NDF_XPT0R(RIGHT,REGION,'PAMELA','REGPIC.RIGHT',STATUS)      
-      IF(TRACE) 
+      CALL NDF_XPT0R(LEFT,REGION,'PAMELA','REGPIC.LEFT',STATUS)
+      CALL NDF_XPT0R(RIGHT,REGION,'PAMELA','REGPIC.RIGHT',STATUS)
+      IF(TRACE)
      &     CALL NDF_XPT0D(YREF,REGION,'PAMELA','REGPIC.YREF',STATUS)
-C     
+C
 C     Tidy up
-C     
+C
       CALL NDF_END(STATUS)
       RETURN
-      END      
+      END
 
-      SUBROUTINE PICK_SKY(DATA, BAL, DARK, MASK, LEFT, RIGHT, NXS, 
-     &     NYS, XLO, YLO, GREY, AUTO, TRACE, LOW, HIGH, WORK, NWIDTH, 
+      SUBROUTINE PICK_SKY(DATA, BAL, DARK, MASK, LEFT, RIGHT, NXS,
+     &     NYS, XLO, YLO, GREY, AUTO, TRACE, LOW, HIGH, WORK, NWIDTH,
      &     DEVICE, TOPLABEL, YREF, METHOD, STATUS)
 C
 C     PICK_SKY
-C     
+C
 C     Written by T.R. Marsh, June 1988.
 C     Modified by TRM @STSCI June 1989 to have a median filter option.
 C     modified 13/01/98 for NDF sections
-C     
+C
 C     PICK_SKY allows the display of a data frame either as
 C     a greyscale image or a profile in X. The user must then
 C     pick sky and object regions for a number of objects.
 C     This can be done with a cursor if one is available or
 C     through the terminal.
-C     
+C
 C Arguments
-C     
+C
 C     On input:
-C     
+C
 C     REAL DATA(NXS,NYS)   -- The data frame to be displayed.
-C     
+C
 C     REAL BAL(NXS,NYS)    -- Balance frame
 C
 C     REAL DARK(NXS,NYS)   -- Dark frame
-C     
+C
 C     INTEGER NXS, NYS     -- The size of the data frame section
-C     
+C
 C     INTEGER XLO, YLO   -- lower corner in terms of original frame
 C     coords
-C     
+C
 C     LOGICAL GREY       -- .TRUE. for greyscale, else profile display.
-C     
+C
 C     LOGICAL AUTO       -- .TRUE. for automatic scaling.
-C     
+C
 C     LOGICAL TRACE      -- Use a tracing of the spectrum or not
-C     
+C
 C     REAL LOW, HIGH     -- The lower and upper limits for plot.
-C     
+C
 C     LOGICAL INIT       -- If .TRUE. the original values of MASK are used to
 C     ignore certain regions. This is useful if there is
 C     very weak structure that cannot be detected on a
 C     single frame but will show up on their sum.
-C     
+C
 C     INTEGER NWIDTH     -- Width of median filter. .LE. 1 to ignore. This
 C     is applied in Y (after any rebinning) to remove
 C     cosmic rays.
-C     
+C
 C     CHARACTER*(*) DEVICE  Plot device
-C     
+C
 C     CHARACTER*(*) TOPLABEL  Plot label
-C     
+C
 C     REAL WORK(NXS*NYS)  -- Work array required if GREY used to store
 C     balanced image
-C     
+C
 C     DOUBLE PRECISION YREF -- Returned Y reference position in case of
 C     use of TRACK poly
-C     
+C
 C     On output:
 C
 C     INTEGER MASK(NXS)  -- 0 for pixels not in the sky, 1 for a sky pixel.
-C     
+C
 C     REAL LEFT, RIGHT -- The X pixel limits of the object.
-C     
+C
 C     DOUBLE YREF -- To be kept if need be.
 C
       IMPLICIT NONE
@@ -351,24 +351,24 @@ C
          STATUS = SAI__ERROR
          RETURN
       END IF
-C     
+C
       DO IX = 1, NXS
          MASK(IX) = 0
       END DO
       LEFT = 0.
       RIGHT= 0.
-C     
+C
 C     X values referred relative to values calculated at mid point
 C     The mid-point value is returned as it will be needed by any
 C     routines that use the sky regions chosen
-C     
+C
 
       YREF = DBLE(2*YLO+NYS-1)/2.
       IF(TRACE)
      &     CALL GET_TRACK(YREF, XREF, STATUS)
-C     
+C
 C     Open device
-C     
+C
       ID = PGOPEN(DEVICE)
       IF(ID.LT.1) THEN
          STATUS = SAI__ERROR
@@ -377,9 +377,9 @@ C
      &        STATUS)
          RETURN
       END IF
-C     
+C
 C     Check that cursor is possible
-C     
+C
       CALL PGQINF('CURSOR', BACK, LENGTH)
       IF(BACK(1:3).EQ.'YES' .AND. METHOD.EQ.'C') THEN
          REPLY = 'C'
@@ -391,8 +391,8 @@ C
       ELSE
          REPLY = 'T'
       END IF
-C     
-      IF(GREY) THEN 
+C
+      IF(GREY) THEN
          TR(1) = REAL(XLO-1)
          TR(2) = 1.
          TR(3) = 0.
@@ -413,7 +413,7 @@ C
                   WORK(IX,IY) = VAL__BADR
                END IF
             END DO
-         END DO 
+         END DO
          IF(AUTO) THEN
             DATMIN =  1.E30
             DATMAX = -1.E30
@@ -424,10 +424,10 @@ C
                      DATMAX  = MAX(DATMAX, WORK(IX,IY))
                   END IF
                END DO
-            END DO 
-            CALL CDF_LOC(WORK, NXS, NYS, HIST, NHIST, 0.1, 2, 
+            END DO
+            CALL CDF_LOC(WORK, NXS, NYS, HIST, NHIST, 0.1, 2,
      &           DATMIN, DATMAX, LOW)
-            CALL CDF_LOC(WORK, NXS, NYS, HIST, NHIST, 0.9, 2, 
+            CALL CDF_LOC(WORK, NXS, NYS, HIST, NHIST, 0.9, 2,
      &           DATMIN, DATMAX, HIGH)
          END IF
          CALL PGENV(X1,X2,Y1,Y2,0,-2)
@@ -435,17 +435,17 @@ C
          CALL PGBOX('BCNST', 0., 0, 'BCNST', 0., 0)
          CALL PGLAB('X pixels','Y pixels',TOPLABEL)
       ELSE
-C     
+C
 C     Compute average profile by collapsing in Y
-C     
+C
          IF(.NOT.TRACE) THEN
-C     
+C
 C     No distortion map case
-C     
+C
             DO IX = 1, NXS
                NOK = 0
                DO IY = 1, NYS
-                  IF(BAL(IX,IY).NE.VAL__BADR .AND. 
+                  IF(BAL(IX,IY).NE.VAL__BADR .AND.
      &                 DATA(IX,IY).NE.VAL__BADR .AND.
      &                 DARK(IX,IY).NE.VAL__BADR) THEN
                      NOK = NOK + 1
@@ -454,7 +454,7 @@ C
                END DO
                IF(NOK.GT.0) THEN
                   CALL MEDFILT(YDATA,YFILT,NOK,NWIDTH,IFAIL)
-                  SUM = 0.D0    
+                  SUM = 0.D0
                   DO IY = 1, NOK
                      SUM = SUM + YFILT(IY)
                   END DO
@@ -469,11 +469,11 @@ C
 C     Distortion coefficient case
 C
             DO IY = 1, NYS
-C     
+C
 C     Compute shift, load into buffer, shift to the right and then
 C     add into profile
-C     
-               CALL GET_TRACK(DBLE(IY+YLO-1), XD, STATUS) 
+C
+               CALL GET_TRACK(DBLE(IY+YLO-1), XD, STATUS)
                XSHIFT = REAL(XD-XREF)
                DO IX = 1, NXS
                   IF(BAL(IX,IY).NE.VAL__BADR .AND.
@@ -484,19 +484,19 @@ C
                      XDATA(IX)  = 0.
                   END IF
                END DO
-               CALL REBIN(0, 0, XDATA, NXS, TPROF, 1, XSHIFT, 
+               CALL REBIN(0, 0, XDATA, NXS, TPROF, 1, XSHIFT,
      &              0, D1, 0, D2, R1, R2)
-C     
+C
 C     Mask pixels affected by bad data
-C     
+C
                DO IX = 1, NXS
                   I1 = INT(REAL(IX)-XSHIFT)
                   I2 = I1+1
-                  IF((I1.GE.1 .AND. I1.LE.NXS .AND. 
+                  IF((I1.GE.1 .AND. I1.LE.NXS .AND.
      &                 (BAL(I1,IY).EQ.VAL__BADR .OR.
      &                 DATA(I1,IY).EQ.VAL__BADR .OR.
      &                 DARK(I1,IY).EQ.VAL__BADR)) .OR.
-     &                 (I2.GE.1 .AND. I2.LE.NXS .AND. 
+     &                 (I2.GE.1 .AND. I2.LE.NXS .AND.
      &                 (BAL(I2,IY).EQ.VAL__BADR .OR.
      &                 DATA(I2,IY).EQ.VAL__BADR .OR.
      &                 DARK(I2,IY).EQ.VAL__BADR))) THEN
@@ -516,7 +516,7 @@ C
                END DO
                IF(NOK.GT.0) THEN
                   CALL MEDFILT(YDATA,YFILT,NOK,NWIDTH,IFAIL)
-                  SUM = 0.    
+                  SUM = 0.
                   DO IY = 1, NOK
                      SUM = SUM + YFILT(IY)
                   END DO
@@ -535,9 +535,9 @@ C
          X1 = REAL(XLO) - 0.5
          X2 = REAL(XLO+NXS-1) + 0.5
          IF(AUTO) THEN
-C     
+C
 C     Find quartiles for automatic scaling
-C     
+C
             NOK = 0
             DO IX = 1, NXS
                IF(PROF(IX).NE.VAL__BADR) THEN
@@ -581,12 +581,12 @@ C
             ELSE IF(I1.EQ.NXS) THEN
                I2 = I1
             END IF
-            IF(I1.LE.NXS) 
-     &           CALL PGBIN(I2-I1+1, XDATA(I1), 
-     &           PROF(I1),.TRUE.)          
+            IF(I1.LE.NXS)
+     &           CALL PGBIN(I2-I1+1, XDATA(I1),
+     &           PROF(I1),.TRUE.)
          END DO
       END IF
-C     
+C
 C     Now select regions
 C
       WRITE(*,*) ' '
@@ -601,14 +601,14 @@ C
       END IF
       IFAIL = 0
       DO WHILE(IFAIL.EQ.0)
-         CALL GET_LIM(REPLY, XX1, XX2, REAL(XLO), 
-     &        REAL(XLO+NXS-1), YY1, YY2, REAL(YLO), 
+         CALL GET_LIM(REPLY, XX1, XX2, REAL(XLO),
+     &        REAL(XLO+NXS-1), YY1, YY2, REAL(YLO),
      &        REAL(YLO+NYS-1), IFAIL)
          IF(IFAIL.EQ.0) THEN
             IF(GREY .AND. TRACE) THEN
-C     
+C
 C     Refer chosen region back to centre
-C     
+C
                CALL GET_TRACK(DBLE(YY1), XD, STATUS)
                XX1 = REAL(XX1 + XREF - XD)
                CALL GET_TRACK(DBLE(YY2), XD, STATUS)
@@ -623,9 +623,9 @@ C
             DO IX = IX1, IX2
                MASK(IX) = 1
             END DO
-C     
+C
 C     Plot region as red dashed lines
-C     
+C
             CALL PGSCI(2)
             CALL PGSLS(2)
             CALL PLOTREG(XX1,XX2,Y1,Y2,XREF,TRACE,GREY,STATUS)
@@ -635,15 +635,15 @@ C
             END IF
          END IF
       END DO
-C     
+C
       WRITE(*,*) ' '
       WRITE(*,*) 'Sky region selection finished. '
       WRITE(*,*) 'Now pick object limits in the same way.'
       WRITE(*,*) ' '
       IFAIL = 1
       DO WHILE(IFAIL.NE.0)
-         CALL GET_LIM(REPLY, LEFT, RIGHT, REAL(XLO), 
-     &        REAL(XLO+NXS-1), YY1, YY2, REAL(YLO), 
+         CALL GET_LIM(REPLY, LEFT, RIGHT, REAL(XLO),
+     &        REAL(XLO+NXS-1), YY1, YY2, REAL(YLO),
      &        REAL(YLO+NYS-1), IFAIL)
          IF(IFAIL.NE.0) WRITE(*,*) 'Try again'
       END DO
@@ -656,9 +656,9 @@ C
          LEFT  = REAL(NINT(LEFT))
          RIGHT = REAL(NINT(RIGHT))
       END IF
-C     
+C
 C     Plot object in green solid lines
-C     
+C
       CALL PGSLS(1)
       CALL PGSCI(3)
       XX1 = MAX(X1, LEFT)
@@ -667,13 +667,13 @@ C
       CALL PGCLOS
       RETURN
       END
-      
+
       SUBROUTINE PLOTREG(X1,X2,Y1,Y2,XREF,TRACE,GREY,STATUS)
-C     
+C
 C     Plots lines at X1 and X2 extending from Y1 to Y2
 C     and a horizontal line at (Y1+Y2)/2 from X1 to X2
 C     If TRACE then distortion is included.
-C     
+C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INTEGER MAXPLOT, STATUS
@@ -684,7 +684,7 @@ C
       DOUBLE PRECISION XREF, XD, YD
       INTEGER IY
       LOGICAL GREY, TRACE
-C     
+C
       IF(STATUS.NE.SAI__OK) RETURN
       IF(.NOT.TRACE .OR. .NOT.GREY) THEN
          LINEX(1) = X1

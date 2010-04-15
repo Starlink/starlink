@@ -55,7 +55,7 @@
 *     -  If necessary, produce a suitable section.
 *     -  Annul the original ACB entry and issue an identifier for the
 *     new one describing the section.
-       
+
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -102,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -205,7 +205,7 @@
                CALL ARY_BOUND( ACB_DID( IACB ), NDF__MXDIM, NLBND,
      :                         NUBND, NNDIM, STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
-            
+
 *  See if it is necessary to create a new section in order to match the
 *  bounds. First test if the number of dimensions needs changing.
                   IF ( NNDIM .NE. NDIM ) THEN
@@ -242,7 +242,7 @@
 8        CONTINUE
 9        CONTINUE
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_MBNDT', STATUS )
 

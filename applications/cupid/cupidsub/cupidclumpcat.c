@@ -5,7 +5,7 @@
 #include "ast.h"
 #include "star/kaplibs.h"
 
-void cupidClumpCat( const char *param, double *tab, int size, 
+void cupidClumpCat( const char *param, double *tab, int size,
                     int i, int ndim, const char *ttl, int *status ){
 /*
 *+
@@ -20,25 +20,25 @@ void cupidClumpCat( const char *param, double *tab, int size,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidClumpCat( const char *param, char *loc, double *tab, 
+*     void cupidClumpCat( const char *param, char *loc, double *tab,
 *                         int size, int i, int ndim, const char *ttl,
 *                         int *status )
 
 *  Description:
-*     The clump parameters contained within the HDS object located by "loc" 
-*     are copied into the "tab" array. If "param" is not NULL, the contents 
+*     The clump parameters contained within the HDS object located by "loc"
+*     are copied into the "tab" array. If "param" is not NULL, the contents
 *     of the "tab" array are then written out to a catalogue.
 
 *  Parameters:
 *     param
 *        Name of the ADAM parameter to associated with the output
-*        catalogue. 
+*        catalogue.
 *     tab
-*        Pointer to an array holding clump parameters. 
+*        Pointer to an array holding clump parameters.
 *     size
 *        The maximum number of clumps which can be stored in "tab".
 *     i
-*        The number of clumps contained in "tab" once any clump described by 
+*        The number of clumps contained in "tab" once any clump described by
 *        "cloc" has been addded.
 *     ndim
 *        The number of pixel axes in the data.
@@ -117,7 +117,7 @@ void cupidClumpCat( const char *param, double *tab, int size,
 
 /* Determine the number of columns in the catalogue (this equals the
    number of rows in the table). */
-   ncol = ( ( ndim == 1 ) ? CUPID__GCNP1 : ( 
+   ncol = ( ( ndim == 1 ) ? CUPID__GCNP1 : (
               (ndim ==2 ) ? CUPID__GCNP2 : CUPID__GCNP3 ) ) + 1;
 
 /* If a clump has been supplied, add it to the table */
@@ -131,55 +131,55 @@ void cupidClumpCat( const char *param, double *tab, int size,
       datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
-      
+
       datFind( cloc, "PEAK", dloc, status );
       datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
-   
+
       datFind( cloc, "OFFSET", dloc, status );
       datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
-         
+
       datFind( cloc, "CENTRE1", dloc, status );
       datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
-         
+
       datFind( cloc, "FWHM1", dloc, status );
       datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
-   
+
       if( ndim > 1 ) {
          datFind( cloc, "CENTRE2", dloc, status );
          datGetD( dloc, 0, NULL, t, status );
          t += size;
          datAnnul( dloc, status );
-            
+
          datFind( cloc, "FWHM2", dloc, status );
          datGetD( dloc, 0, NULL, t, status );
          t += size;
          datAnnul( dloc, status );
-            
+
          datFind( cloc, "ANGLE", dloc, status );
          datGetD( dloc, 0, NULL,  t, status );
          t += size;
          datAnnul( dloc, status );
-            
+
          if( ndim > 2 ) {
-   
+
             datFind( cloc, "CENTRE3", dloc, status );
             datGetD( dloc, 0, NULL, t, status );
             t += size;
             datAnnul( dloc, status );
-               
+
             datFind( cloc, "FWHM3", dloc, status );
             datGetD( dloc, 0, NULL, t, status );
             t += size;
             datAnnul( dloc, status );
-            
+
             if( *status == SAI__OK ) {
                datFind( cloc, "VGRAD1", dloc, status );
                if( *status == SAI__OK ) {
@@ -191,7 +191,7 @@ void cupidClumpCat( const char *param, double *tab, int size,
                   errAnnul( status );
                }
             }
-   
+
             if( *status == SAI__OK ) {
                datFind( cloc, "VGRAD2", dloc, status );
                if( *status == SAI__OK ) {
@@ -207,7 +207,7 @@ void cupidClumpCat( const char *param, double *tab, int size,
                   errAnnul( status );
                }
             }
-   
+
             if( *status == SAI__OK ) {
                datFind( cloc, "VGRAD3", dloc, status );
                if( *status == SAI__OK ) {
@@ -220,7 +220,7 @@ void cupidClumpCat( const char *param, double *tab, int size,
                }
             }
          }
-      }      
+      }
    }
 
 /* If required, write the table to disk. */
@@ -243,13 +243,13 @@ void cupidClumpCat( const char *param, double *tab, int size,
       astSetC( frm1, "Symbol(4)", "CENTRE1" );
       astSetC( frm1, "Symbol(5)", "FWHM1" );
       astSetC( frm2, "Symbol(1)", "P1" );
-   
+
       if( ndim > 1 ) {
          astSetC( frm1, "Symbol(6)", "CENTRE2" );
          astSetC( frm1, "Symbol(7)", "FWHM2" );
          astSetC( frm1, "Symbol(8)", "ANGLE" );
          astSetC( frm2, "Symbol(2)", "P2" );
-   
+
          if( ndim > 2 ) {
             astSetC( frm1, "Symbol(9)",  "CENTRE3" );
             astSetC( frm1, "Symbol(10)", "FWHM3" );

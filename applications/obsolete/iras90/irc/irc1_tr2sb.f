@@ -18,16 +18,16 @@
 
 *  Description:
 *     This routine displays information about the boresight samples
-*     stored in a SURVEY_BSIGHT CRDD file. The time and date at the 
-*     start of the scan and the no. of boresight samples are displayed 
-*     with priority MSG__NORM and the details of each boresight sample 
+*     stored in a SURVEY_BSIGHT CRDD file. The time and date at the
+*     start of the scan and the no. of boresight samples are displayed
+*     with priority MSG__NORM and the details of each boresight sample
 *     are then displayed with priority MSG__VERB.
 
 *  Arguments:
 *     ROUTNE = EXTERNAL (Given)
 *        A routine to which is passed each line of text for display.
-*        It should have the same argument list as MSG__OUTIF (see 
-*        SUN/104), and should be declared EXTERNAL in the calling 
+*        It should have the same argument list as MSG__OUTIF (see
+*        SUN/104), and should be declared EXTERNAL in the calling
 *        routine.
 *     SUPP = LOGICAL (Given)
 *        True if support info DPSI, DTHETA, GLAT, GLONG is to be
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,10 +134,10 @@
      :             'CRDD file contents      : Survey data with '//
      :             'boresight pointing information', STATUS )
       CALL MSG_SETI( 'BP', BPOSNS )
-      CALL MSG_LOAD( 'IRC1_TR2SB_MSG1', 
+      CALL MSG_LOAD( 'IRC1_TR2SB_MSG1',
      :               'No. of boresight samples: ^BP',
      :               BUF, BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRC_TR2SB_MSG1', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TR2SB_MSG1', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Find the first valid UTCS offset value.
@@ -188,7 +188,7 @@
      :          'Start time              : ^YE-^MO-^DA ^HO:^MI:^SE.^FR',
      :               BUF, BUFLEN, STATUS )
 
-      CALL ROUTNE( MSG__NORM, 'IRC_TR2SB_MSG2', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRC_TR2SB_MSG2', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Loop round all bore sight samples
@@ -202,7 +202,7 @@
          CALL MSG_SETI( 'I', I )
          CALL MSG_LOAD( 'IRC_TR2SB_MSG3',
      :             'Boresight position ^I...', BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__VERB, 'IRC_TR2SB_MSG3', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__VERB, 'IRC_TR2SB_MSG3', BUF( : BUFLEN ),
      :                STATUS )
 
 *  If the UTCS offset value is valid...
@@ -241,7 +241,7 @@
 
             IF( SUPP ) THEN
                IF( DPSI( I ) .NE. VAL__BADR ) THEN
-                  CALL MSG_SETC( 'TEXT', ' +/- ' )      
+                  CALL MSG_SETC( 'TEXT', ' +/- ' )
                   CALL MSG_SETR( 'TEXT', REAL( DPSI( I )*IRA__RTOD ) )
                END IF
             END IF
@@ -257,7 +257,7 @@
             CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG9',
      :                   '   Clock angle         : (not available)',
      :                   STATUS )
-         
+
          END IF
 
 *  Display the cone angle and uncertainty if valid.
@@ -266,7 +266,7 @@
 
             IF( SUPP ) THEN
                IF( DTHETA( I ) .NE. VAL__BADR ) THEN
-                  CALL MSG_SETC( 'TEXT', ' +/- ' )      
+                  CALL MSG_SETC( 'TEXT', ' +/- ' )
                   CALL MSG_SETR( 'TEXT', REAL( DTHETA( I )*IRA__RTOD ) )
                END IF
             END IF
@@ -282,9 +282,9 @@
             CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG11',
      :                   '   Cone angle          : (not available)',
      :                   STATUS )
-         
+
          END IF
- 
+
 *  Display the solar longitude if valid.
          IF( LAMBSU( I ) .NE. VAL__BADR ) THEN
             CALL MSG_SETR( 'TEXT', REAL( LAMBSU( I )*IRA__RTOD ) )
@@ -300,7 +300,7 @@
             CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG13',
      :                   '   Solar longitude     : (not available)',
      :                   STATUS )
-         
+
          END IF
 
 *  If there is any support information...
@@ -310,12 +310,12 @@
             IF( GLONG( I ) .NE. VAL__BADR ) THEN
                CALL IRA_DTOC1( GLONG( I ), 'Equatorial', 1, 2,
      :                         TEXT, STATUS )
-               CALL MSG_SETC( 'TEXT', TEXT )               
+               CALL MSG_SETC( 'TEXT', TEXT )
 
                CALL MSG_LOAD( 'IRC1_TR2SB_MSG14',
      :                        '   Geographic longitude: ^TEXT ', BUF,
      :                        BUFLEN, STATUS )
-               CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG14', 
+               CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG14',
      :                      BUF( : BUFLEN ), STATUS )
 
 *  If the value is bad, indicate this.
@@ -323,19 +323,19 @@
                CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG15',
      :                      '   Geographic longitude: (not available)',
      :                      STATUS )
-      
+
             END IF
 
 *  Display the geographic latitude if valid.
             IF( GLAT( I ) .NE. VAL__BADR ) THEN
                CALL IRA_DTOC1( GLAT( I ), 'Equatorial', 2, 2,
      :                         TEXT, STATUS )
-               CALL MSG_SETC( 'TEXT', TEXT )               
+               CALL MSG_SETC( 'TEXT', TEXT )
 
                CALL MSG_LOAD( 'IRC1_TR2SB_MSG16',
      :                        '   Geographic latitude : ^TEXT ', BUF,
      :                        BUFLEN, STATUS )
-               CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG16', 
+               CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG16',
      :                      BUF( : BUFLEN ), STATUS )
 
 *  If the value is bad, indicate this.
@@ -343,7 +343,7 @@
                CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG17',
      :                      '   Geographic latitude : (not available)',
      :                      STATUS )
-      
+
             END IF
 
 *  If there is no support information, indicate this.
@@ -354,9 +354,9 @@
             CALL ROUTNE( MSG__VERB, 'IRC1_TR2SB_MSG19',
      :                   '   Geographic latitude : (not available)',
      :                   STATUS )
-      
+
          END IF
- 
+
       END DO
 
  999  CONTINUE

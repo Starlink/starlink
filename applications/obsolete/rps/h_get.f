@@ -8,7 +8,7 @@
      & ,            QUERY       ! 	Question.
       CHARACTER*(*) REPLY	! Out	Returned string
       INTEGER STATUS		! 	Status, 0: OK, 1: EOF, 2: Need Help
- 
+
 **********************************************************************************
 *  History
 *     1987 July		M.D.C.Harris, RAL	1st vsn MDH_GET
@@ -29,7 +29,7 @@
       LOGICAL MDH_CTOL
       DOUBLE PRECISION MDH_CTOD
       INTEGER MDH_ENDWORD
- 
+
 *  __________________________ Executable Code _____________________________
 
       CALL MDH_CHECK( DEFAULT , FORMAT , CDEF , DEFIN )                                ! Check and reformat it.
@@ -63,15 +63,15 @@
             CALL H_GETL( QUERY(QST:QEND) , .FALSE., ' ',             LLOCAL, STATUS)
          END IF
          IF (STATUS.NE.0) GOTO 90
-         IF (LLOCAL) THEN 
+         IF (LLOCAL) THEN
            REPLY = 'Y'
          ELSE
            REPLY = 'N'
-         END IF 
+         END IF
 C         WRITE( REPLY , '(' // FORMAT // ')' ) LLOCAL
 
       ELSE IF ( index( format , 'F' ) .ne. 0 .or.
-     &            INDEX( FORMAT , 'D' ) .NE. 0 .AND. 
+     &            INDEX( FORMAT , 'D' ) .NE. 0 .AND.
      &            INDEX( FORMAT , 'DD' ) .EQ. 0 ) THEN
          IF (DEFIN) THEN
             CALL H_GETD( QUERY(QST:QEND) , .TRUE., MDH_CTOD( CDEF ) , DLOCAL, STATUS)
@@ -80,7 +80,7 @@ C         WRITE( REPLY , '(' // FORMAT // ')' ) LLOCAL
          END IF
          IF (STATUS.NE.0) GOTO 90
          WRITE( REPLY , '(' // FORMAT // ')' ) DLOCAL
-  
+
       ELSE									!  Transfer input from called function to return -
          OKAY = .FALSE.
          DO WHILE ( .NOT. OKAY )
@@ -98,5 +98,5 @@ C         WRITE( REPLY , '(' // FORMAT // ')' ) LLOCAL
       DO I=1, NBLANKS
          WRITE(*,*)
       END DO
- 
+
       END

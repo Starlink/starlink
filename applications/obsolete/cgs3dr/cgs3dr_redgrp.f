@@ -67,7 +67,7 @@
       INTEGER      INCR               ! Increment between runs
       INTEGER      NSPEC              ! Number of subspectra
       INTEGER      SSPEC              ! Number of subspectrum
-      INTEGER      I                  ! 
+      INTEGER      I                  !
       CHARACTER*80 GRPFIL,RUNRED      ! Filename of first object run and
      :                                !  reduced run
       CHARACTER*80 POLGRP(4)          ! Filename of 4 pol grps.
@@ -77,7 +77,7 @@
       CHARACTER*440 INVAL, OUTVAL     ! ADAM Message strings
       CHARACTER*10 MODE               ! observing mode
       CHARACTER*3  POL                ! If polarimetry
-      CHARACTER*2  TMPSTR             ! Temporary string      
+      CHARACTER*2  TMPSTR             ! Temporary string
 *    Internal References :
 *     None
 *    Local data :
@@ -261,7 +261,7 @@
             CALL CHR_FILL( ' ', OUTVAL )
             CALL TASK_CNCAT (6, STRINGS, INVAL, STATUS)
             IF (PLOTTING) THEN
-               IF (VERBOSE) CALL MSG_OUT (' ', 
+               IF (VERBOSE) CALL MSG_OUT (' ',
      :          'Plotting merged object spectrum', STATUS)
                CALL CGS3DR_OBEYW (FIGARO_TASK, 'ESPLOT', INVAL, OUTVAL,
      :          120000, STATUS)
@@ -276,7 +276,7 @@
             CALL CHR_FILL( ' ', INVAL )
             CALL CHR_FILL( ' ', OUTVAL )
             CALL TASK_CNCAT (5, STRINGS, INVAL, STATUS)
-            IF (VERBOSE) CALL MSG_OUT (' ', 
+            IF (VERBOSE) CALL MSG_OUT (' ',
      :       'Creating TSP spectrum', STATUS)
             CALL CGS3DR_OBEYW (REDUCTION_TASK, 'CGS3POL', INVAL, OUTVAL,
      :       120000, STATUS)
@@ -290,7 +290,7 @@
             CALL CHR_FILL( ' ', OUTVAL )
             CALL TASK_CNCAT (4, STRINGS, INVAL, STATUS)
             IF (PLOTTING) THEN
-               IF (VERBOSE) CALL MSG_OUT (' ', 
+               IF (VERBOSE) CALL MSG_OUT (' ',
      :          'Plotting polarization spectrum', STATUS)
                CALL CGS3DR_OBEYW (TSP_TASK, 'EPLOT', INVAL, OUTVAL,
      :          120000, STATUS)

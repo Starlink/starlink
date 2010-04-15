@@ -53,7 +53,7 @@
 #        Other CCDPACK applications will also show a little
 #        information. If this value is 3 then we just wait.
 #     args = window (read)
-#        If wait is 1 or 2 then the first of these (syntactically) 
+#        If wait is 1 or 2 then the first of these (syntactically)
 #        optional arguments must give the name of the window controlling
 #        the busy window.  A second optional argument may be given
 #        specifying the text to write in the busy window.
@@ -285,7 +285,7 @@ this interface (probably programming error)."
 #------------------------------------------------------------------------------
       set TASK($app,error) ""
       set TASK($app,output) ""
-      if { $CCDseetasks } { 
+      if { $CCDseetasks } {
          set TASK(window) $Output
          $Output insert end "% $app $arguments\n"
       } else {

@@ -43,7 +43,7 @@ bugfixes.
 
 The user-visible changes are:
 
- * The COSYS parameter has disappeared, made redundant by the addition 
+ * The COSYS parameter has disappeared, made redundant by the addition
    of WCS facilities throughout the program.
 
  * ELLPRO and ELLFOU now take an OUTCAT parameter, which specifies a
@@ -58,29 +58,29 @@ The user-visible changes are:
 
 Version 0.10-1
 --------------
- 
- The ESP package has been re-released on Unix.  This is a package for
- Extended Surface Photometry, aimed at photometry of large galaxies. 
 
- ESP has been modified to be aware of the World Coordinate 
+ The ESP package has been re-released on Unix.  This is a package for
+ Extended Surface Photometry, aimed at photometry of large galaxies.
+
+ ESP has been modified to be aware of the World Coordinate
  System (WCS) components of NDFs.
 
- The COSYS parameter has been removed from all ESP applications, 
- so that all user input and output is now in the Current 
- co-ordinate system of the NDF.  The Current co-ordinate system 
- is a characteristic of the WCS component of the NDF.  
+ The COSYS parameter has been removed from all ESP applications,
+ so that all user input and output is now in the Current
+ co-ordinate system of the NDF.  The Current co-ordinate system
+ is a characteristic of the WCS component of the NDF.
  Thus, instead of setting COSYS to use either 'Data' or 'World'
- co-ordinate sytems, you should now set the Current frame of the 
- NDF's WCS component (e.g. using KAPPA's WCSFRAME apllication) 
- to the desired co-ordinate system before running the ESP 
+ co-ordinate sytems, you should now set the Current frame of the
+ NDF's WCS component (e.g. using KAPPA's WCSFRAME apllication)
+ to the desired co-ordinate system before running the ESP
  application.
 
- Output to data files is however in Base (WCS GRID frame) 
- co-ordinates, which are pixel co-ordinates guaranteed to start 
+ Output to data files is however in Base (WCS GRID frame)
+ co-ordinates, which are pixel co-ordinates guaranteed to start
  at (1,1).
 
  For NDFs which have a WCS component with a SKY frame in it, the
- PSIZE parameter (pixel size in arc seconds) is now determined 
+ PSIZE parameter (pixel size in arc seconds) is now determined
  automatically rather than being solicited from the user.
  This can be overridded by specifying it on the command line.
 
@@ -88,19 +88,19 @@ Version 0.10-1
  propagate the WCS component where appropriate.
 
  ESP is available for Unix shell or ICL. To start ESP in the shell, type:
- 
+
      % esp
- 
+
  or from ICL> type:
- 
+
      ICL> esp
- 
+
  where % and ICL> are the shell and ICL prompts respectively.
- 
- SUN/180 gives full details of ESP.  A hypertext version is available 
+
+ SUN/180 gives full details of ESP.  A hypertext version is available
  (`showme sun180' or `findme esp').
- 
- ESP's maintainer is now Norman Gray at Glasgow (norman@astro.gla.ac.uk). 
- Please report any ESP problems to him and to the Starlink Software 
+
+ ESP's maintainer is now Norman Gray at Glasgow (norman@astro.gla.ac.uk).
+ Please report any ESP problems to him and to the Starlink Software
  Librarian (ussc@star.rl.ac.uk).
- 
+

@@ -74,6 +74,6 @@
          IF (ISTAT.NE.SAI__OK)  CALL ERR_REP('GRUNLD',
      :      'GRLDEV - Unable to list available graphics devices', ISTAT)
       END IF
-      
+
  9999 CONTINUE
       END

@@ -1,5 +1,5 @@
 C+
-      SUBROUTINE GEN_RANGEFV(ARRAY, QDATA, QUAL, FLAGS, FBAD, 
+      SUBROUTINE GEN_RANGEFV(ARRAY, QDATA, QUAL, FLAGS, FBAD,
      :                       IST, IEN, VMAX, VMIN)
 C
 C     G E N _ R A N G E F V
@@ -105,7 +105,7 @@ C
                ENDIF
             END DO
          END IF
-     
+
       ELSE IF (FLAGS) THEN
 C
 C        The quality array is not significant and a magic value is being used.

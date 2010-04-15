@@ -48,19 +48,19 @@
 /* The optional freeing of memory is problematic since it stops
    us declaring clocator as const */
 
-void datExportFloc ( HDSLoc **clocator, int free, int loc_length, 
+void datExportFloc ( HDSLoc **clocator, int free, int loc_length,
 		     char flocator[DAT__SZLOC], int * status);
 
 /* Convert a Fortran locator to a C HDSLoc struct. Memory is allocated
    by this routine that will be freed when the locator is annulled. */
 
-void datImportFloc( const char flocator[DAT__SZLOC], int loc_length, 
+void datImportFloc( const char flocator[DAT__SZLOC], int loc_length,
 		    HDSLoc **clocator, int * status);
 
 /* Convert an array of dimensions (hdsdim) to an array of fortran
    integer dimensions */
 F77_INTEGER_TYPE *
-hdsDimC2F( int ndim, const hdsdim dims[], 
+hdsDimC2F( int ndim, const hdsdim dims[],
 	   F77_INTEGER_TYPE fdims[DAT__MXDIM], int * status );
 
 /* Convert an array of Fortran INTEGER dimensions into an array

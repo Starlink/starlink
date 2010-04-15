@@ -82,38 +82,38 @@ proc CCDUpdateColourLists { element scrollbox filter } {
    global CCDndfs
    global CCDsame
    global CCDfactors
-#. 
+#.
 
 #  Find out how many entries are in the named scrollbox/multitem.
    set nvalues [$scrollbox size]
 
 #  Unset the global variables before update.
-   catch { 
+   catch {
       unset CCDndfs($element,$filter)
-      if { ! $CCDsame(darks) } { 
+      if { ! $CCDsame(darks) } {
          unset CCDfactors($element,$filter,darks)
       }
-      if { ! $CCDsame(flashes) } { 
+      if { ! $CCDsame(flashes) } {
          unset CCDfactors($element,$filter,flashes)
       }
    }
 
 #  For each entry obtain its value(s) and insert into the global arrays.
-   for { set i 0 } { $i < $nvalues } { incr i } { 
+   for { set i 0 } { $i < $nvalues } { incr i } {
       set index 1
       set item [ $scrollbox get $i ]
       lappend CCDndfs($element,$filter) [lindex $item 0]
-      if { ! $CCDsame(darks) } { 
+      if { ! $CCDsame(darks) } {
          lappend CCDfactors($element,$filter,darks) \
             [lindex $item $index]
          incr index
       }
-      if { ! $CCDsame(flashes) } { 
+      if { ! $CCDsame(flashes) } {
          lappend CCDfactors($element,$filter,flashes) \
             [lindex $item $index]
       }
    }
-   
+
 #  Return the number of values entered.
    return $nvalues
 

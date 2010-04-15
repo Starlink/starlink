@@ -7,7 +7,7 @@ proc GetExprn { } {
 #    name{expression}units
 #
 #  'name' and 'expression' are mandatory; 'units' are optional.
-#  
+#
 #  Given
 #    none.
 #
@@ -45,7 +45,7 @@ proc GetExprn { } {
 
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 
@@ -143,7 +143,7 @@ proc GetExprn { } {
        -command {HelpText expressions_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .getexprn.button.default -relief sunken -bd 1

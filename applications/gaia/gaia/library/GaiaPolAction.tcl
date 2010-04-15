@@ -9,10 +9,10 @@
 #     A GaiaPolAction which describes an undo-able action.
 
 #  Description:
-#     This class implements a type of GaiaPolObject which contains a 
-#     description of an action which can be un-done or re-done, typically 
+#     This class implements a type of GaiaPolObject which contains a
+#     description of an action which can be un-done or re-done, typically
 #     using the "Undo" and "Redo" items in the Edit menu.
-#    
+#
 #  Invocations:
 #
 #        GaiaPolAction object_name [configuration options]
@@ -86,15 +86,15 @@ itcl::class gaia::GaiaPolAction {
 #  action. "$desc" is a human readable description of the action. "$obj"
 #  is a reference to an object associated with the action. "$ucmd" is a
 #  string describing a method to be invoked on $obj (with any required
-#  arguments) which will undo the action and "$rcmd" is a method to be 
-#  invoked on $obj which will redo the action. $obj, $ucmd and $rcmd are 
+#  arguments) which will undo the action and "$rcmd" is a method to be
+#  invoked on $obj which will redo the action. $obj, $ucmd and $rcmd are
 #  usually only used if $type is "object".
 #  -----------------------------------------------------------------------
    constructor {type desc {obj ""} {ucmd "" } {rcmd "" } } {
 
-#  Now initialize the class data. If this constructor has been invoked 
-#  to construct the base class part of some super class, do not 
-#  initialize the data since this will be done as a consequence of 
+#  Now initialize the class data. If this constructor has been invoked
+#  to construct the base class part of some super class, do not
+#  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolAction" } {
          init $type $desc $obj $ucmd $rcmd
@@ -107,13 +107,13 @@ itcl::class gaia::GaiaPolAction {
 
 #  Initializer:
 #  ============
-#  Override the parent Init method to initialise the contents of the 
-#  memory allocated by the GaiaPolAction constructor using a user-supplied 
+#  Override the parent Init method to initialise the contents of the
+#  memory allocated by the GaiaPolAction constructor using a user-supplied
 #  argument list.
    protected method init {type desc obj ucmd rcmd} {
 
 #  First initialize the parent class data
-      gaia::GaiaPolObject::init 
+      gaia::GaiaPolObject::init
 
 #  Now initialize this class.
       variable type_ $type
@@ -121,7 +121,7 @@ itcl::class gaia::GaiaPolAction {
       variable obj_ $obj
       variable ucmd_ $ucmd
       variable rcmd_ $rcmd
-      
+
    }
 
 #  Public methods:
@@ -133,7 +133,7 @@ itcl::class gaia::GaiaPolAction {
       if { $obj_ != "" && $ucmd_ != "" } {
          eval $obj_ $ucmd_
       }
-   }  
+   }
 
 #  Redo the action
 #  ---------------
@@ -141,7 +141,7 @@ itcl::class gaia::GaiaPolAction {
       if { $obj_ != "" && $rcmd_ != "" } {
          eval $obj_ $rcmd_
       }
-   }  
+   }
 
 #  Convert to a string
 #  -------------------
@@ -163,7 +163,7 @@ itcl::class gaia::GaiaPolAction {
 #  Public data members:
 #  ====================
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -176,15 +176,15 @@ itcl::class gaia::GaiaPolAction {
 #  The associated object
       variable obj_ ""
 
-#  The undo command for the associated object 
+#  The undo command for the associated object
       variable ucmd_ ""
 
-#  The redo command for the associated object 
+#  The redo command for the associated object
       variable rcmd_ ""
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

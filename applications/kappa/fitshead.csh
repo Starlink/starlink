@@ -108,7 +108,7 @@
 #     1994 November 10 (MJC):
 #        Added ADAM-like prompting user interface.
 #     13-APR-2000 (DSB):
-#        Added "bs=80" to the dd command at the end of the script to prevent 
+#        Added "bs=80" to the dd command at the end of the script to prevent
 #        an unwanted newline being added at 512 intervals.
 #     2003 January 24 (MJC):
 #        Revised the sed termination patterns.  No longer support
@@ -151,7 +151,7 @@ endif
 #   words on the command line, excluding these special keywords.
 #
 set i = 1
-set cmd = 
+set cmd =
 set narg = 0
 set prompt = 0
 while ($i <= $#argv)
@@ -259,7 +259,7 @@ endif
 #
 #   Find whether or not the first argument is a tape drive.  Since the
 #   user may have supplied a wildcarded set of files, these must be
-#   expanded through the () syntax.  Assign a logical value for whether 
+#   expanded through the () syntax.  Assign a logical value for whether
 #   or not the first file is a tape drive.  Once the first file has been
 #   tested break out of the loop.
 #
@@ -494,7 +494,7 @@ if ($tape == 1) then
             exit
 #
 #   Accept the value.  Take the string "last" or the null value to mean the
-#   end of the tape.  Use 999999 to indicate that the headers for 
+#   end of the tape.  Use 999999 to indicate that the headers for
 #   the tape files to the end of the tape should be listed.  This ought to be
 #   enough.
 #
@@ -502,7 +502,7 @@ if ($tape == 1) then
             set finish = 999999
 
 #   Use a logical to expression to decide whether or not the value
-#   given is valid, i.e. is an integer not less than the start value. 
+#   given is valid, i.e. is an integer not less than the start value.
 #
          else if (!($finish =~ [0-9]* && $finish >= $start )) then
             sh -c "echo 'Last tape file number must be a positive integer greater than the start value ("$start")' 1>&2"
@@ -562,7 +562,7 @@ if ($tape == 1) then
 #   List the headers for the current file on the tape.
 #
       dd ibs=$block if=$files[1] cbs=80 conv=unblock | \
-         sed -n -e "$sedsim" -e "$sedext" 
+         sed -n -e "$sedsim" -e "$sedext"
 #
 #   The most-likely error is for the EOT to be found, so there is no
 #   error message reported.  Break from the loop.

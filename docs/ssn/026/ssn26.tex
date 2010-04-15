@@ -37,7 +37,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -180,14 +180,14 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-% HTML document table of contents (if used). 
+% HTML document table of contents (if used).
 % ==========================================
-% Add table of contents header and a navigation button to return 
+% Add table of contents header and a navigation button to return
 % to this point in the document (this should always go before the
 % abstract \section). This places the table of contents on the title
 % page. Do not use this if you want the normal behaviour.
 %   \label{stardoccontents}
-%   \begin{rawhtml} 
+%   \begin{rawhtml}
 %     <HR>
 %     <H2>Contents</H2>
 %   \end{rawhtml}
@@ -227,23 +227,23 @@ Hence, the following suggestions are limited to simple tasks which
 are quick and easy to perform.
 
 Essentially what follows is a series of tips, with only limit
-explanation of the background to the issues which they address. 
+explanation of the background to the issues which they address.
 One consequence of this is that you may not understand all of
 the terms discussed without referring to the Solaris documentation.
 However, to explain everything fully would dramatically increase
 the size of this document and would only repeat information which
-is readily available in the Solaris documentation set. 
+is readily available in the Solaris documentation set.
 Similarly, this paper does not discuss or follow formal performance tuning
-processes for the removal of bottlenecks. 
-Instead it adopts the ``rule of thumb'' approach to the problem. 
-site managers interested in more detailed performance tuning 
+processes for the removal of bottlenecks.
+Instead it adopts the ``rule of thumb'' approach to the problem.
+site managers interested in more detailed performance tuning
 information should read
 
 \begin{itemize}
 
 \item {\bf Sun Performance and Tuning} by Adrian Cockcroft (SunSoft Press).
 This is the best book on the subject, particularly the first 100 pages.
-This is available from SunExpress for under \pounds 30. 
+This is available from SunExpress for under \pounds 30.
 
 \item An earlier version of the above book is available in the form of
 two of Sun White Papers entitled {\bf Sun Performance Tuning Overview}
@@ -259,7 +259,7 @@ of the Solaris documentation set).
 \item {\bf SMCC NFS Server Performance and Tuning Guide} (part of the Solaris
 documentation set).
 
-\item {\bf Network Administration Student Guide} (available as part of the 
+\item {\bf Network Administration Student Guide} (available as part of the
 Sun Network Administration Course).
 
 \end{itemize}
@@ -270,8 +270,8 @@ The present document refers to Solaris 2.4.
 
 \subsection{Swap space}
 How big should your swap file be? The rule of thumb in
-the Solaris manuals suggest that swap space should be 
-the difference between 64Mb and RAM size 
+the Solaris manuals suggest that swap space should be
+the difference between 64Mb and RAM size
 i.e. you don't need a swap file if you have 64Mb of RAM or more. For
 some of our applications, however, you will require more than 64Mb
 of virtual memory so I would err on the side of configuring too
@@ -280,14 +280,14 @@ much rather than too little swap space -- disk space is cheap.
 I would suggest 64Mb as a {\em minimum} on a heavily-used machine, 32Mb on
 lightly-loaded machines (if you have any).
 
-You can determine installed memory and swap usage on a machine with 
+You can determine installed memory and swap usage on a machine with
 the commands
 
 \begin{quote}
 {\tt
 \# /usr/sbin/prtconf | grep Memory
 
-\# /usr/sbin/swap -s 
+\# /usr/sbin/swap -s
 }
 \end{quote}
 
@@ -295,8 +295,8 @@ If you do under-configure your swap space, you can always add a swap
 file later ``on the fly''. Swap files can be created quickly and
 also have the advantage of being removable
 if you need disk space temporarily, but swapping to a file is less
-efficient than swapping to a swap partition. 
-An example of when you might temporarily want to create additional 
+efficient than swapping to a swap partition.
+An example of when you might temporarily want to create additional
 swap space via a swap file is when compiling a program which is
 pushing the optimiser to its limits (e.g. {\tt DIPSO}).
 
@@ -316,9 +316,9 @@ to mount} and the {\tt FS type} as swap.
 
 An alternative way to create extra swap space is to use JumpStart and
 re-install the system. However, that approach is beyond the scope of
-the present discussion. 
+the present discussion.
 
-Do not create a swap file in a file system served from a remote machine. 
+Do not create a swap file in a file system served from a remote machine.
 Processes may be blown away if the remote machine becomes unavailable.
 
 \subsection{X--terminal servers}
@@ -327,7 +327,7 @@ How much memory do you need on a machine supporting X--terminals for each
 X-terminal supported? This is a commonly asked question but
 unfortunately one that does not have a simple answer. It entirely
 depends on what your users are doing and in what mode they use their
-X-terminals. 
+X-terminals.
 
 For example, some users simply use the X-terminal's built-in {\tt
 telnet} program to open a single window on the remote system. This
@@ -347,8 +347,8 @@ typical RAM usage by this type of user of 8--10Mb, again rising to typically
 15--20Mb once that user start doing real work. Similar usages have been
 seen at other sites.
 
-Please note that these figures may not be applicable at your site. 
-They are only included here to give you but the most basic indication 
+Please note that these figures may not be applicable at your site.
+They are only included here to give you but the most basic indication
 of the amount of memory that you might need to support X--terminals.
 
 Clearly, if you have less RAM available, there will be competition
@@ -363,11 +363,11 @@ are not going to be used.
 
 \subsection{NFS and Network Loading}
 
-Firstly, access to an NFS served disk is {\em much}, slower than to 
+Firstly, access to an NFS served disk is {\em much}, slower than to
 a local disk. For example, the author has run the Starlink Benchmarking
-suite (SSN/23) 
+suite (SSN/23)
 and found elapsed runtimes can increase by a factor of up to {\em five}
-when a remote disk served via NFS is used compared to a local disk. 
+when a remote disk served via NFS is used compared to a local disk.
 The faster the machine, the greater the impact of the NFS-served disk
 bottleneck. This is hardly surprising since NFS read and write rates
 of 500 kbytes/second over Ethernet are considered fairly good results,
@@ -385,20 +385,20 @@ machine and then ensure that their data is local to that machine.
 Other sites have dedicated data processing workstations with a DAT drive
 and plenty of local disk space. Users can then book these machines when
 they have particularly heavy data reduction requirements. You will need
-to consider the best solution for your site. 
+to consider the best solution for your site.
 
 During the transition to Unix, your hardware base has grown incrementally.
 Hence, your final configuration may not be optimal. Try to consider if
-relocating peripherals such as disks and tape drives might reduce network load. 
+relocating peripherals such as disks and tape drives might reduce network load.
 You may also wish to move certain users' home and data areas to a different
-machine. 
+machine.
 
 Our systems fall into the category of ``attribute--drive'' networks
-i.e. the access to remote data is mostly random rather than synchronous. 
-In such a network, it is claimed that a single NFS server should 
+i.e. the access to remote data is mostly random rather than synchronous.
+In such a network, it is claimed that a single NFS server should
 be able to support
 20-25 clients (12-14 if fully active), more if CacheFS is used (see
-later). 
+later).
 
 Ideally you want to avoid serving disks and have local disk access
 where possible. In a highly distributed computing environment with many
@@ -411,12 +411,12 @@ NFS runs in the kernel and hence a machine which is busy serving NFS
 requests will give {\em very} poor interactive performance. I speak from bitter
 experience! Configuring the NFS server to be a mail and print server is
 a good way to use up the spare capacity on such a machine. CPU-hungry
-theory batch jobs are another obvious way to use up those space CPU cycles, 
+theory batch jobs are another obvious way to use up those space CPU cycles,
 but not ones requiring a lot of RAM.
 
 NFS servers do not need vast amounts of  memory, not even for a disk
 cache - Unix clients will cache commonly used files themselves. 16Mb is
-sufficient, plus 16Mb for each ethernet interface. if you use it 
+sufficient, plus 16Mb for each ethernet interface. if you use it
 as a print server and you use NeWSprint,
 you are advised to install an additional 16Mb.
 Note that these figures only apply to a dedicated NFS server. Your server
@@ -424,29 +424,29 @@ will need {\rm considerably} more memory if it is also supporting users.
 
 If possible, mount your disk read-only to avoid the write-back of file
 access times. NFS version 2 has reasonable read performance but can be poor
-for writes. 
+for writes.
 NFS implements synchronous writes on the server. A synchronous NFS write
-means that all data must be written to disk before the server can send an 
-acknowledgement back to the client. 
+means that all data must be written to disk before the server can send an
+acknowledgement back to the client.
 Hence, exporting applications
 read-only via NFS is acceptable but you want to avoid writing output from
 programs over NFS if possible.
 
 It has been promised that Solaris 2.5 will include NFS version 3. NFS
-version 2 implements {\rm synchronous} write on the server i.e. 
+version 2 implements {\rm synchronous} write on the server i.e.
 all data must be written to disk
 before the server send an acknowledgement back to the client.  Version
 3 will allow servers to cache client writes in memory until the client
 requests the data be flushed to stable storage. This should result in a
 significant performance improvement at certain installations.  Version 3
 also removes file size and network transfer size limitations. It will
-also use TCP rather than UDP as its preferred transport. 
+also use TCP rather than UDP as its preferred transport.
 
 \subsection{SCSI disks}
 
 If possible, don't put more than 2 heavily loaded disks on the same
 SCSI bus. If you do, there will be contention and an increase in
-response time for all disks on the bus.  
+response time for all disks on the bus.
 
 It is advisable (where possible) to separate your ``slow'' SCSI disks
 from your faster fast SCSI-2 disks. If you mix the slow and fast
@@ -467,7 +467,7 @@ your fast SCSI-2 devices will be degraded.
 Note that it is possible to buy a SCSI S-bus expansion card for a few
 hundred pounds. One could then put slow SCSI disks onto this
 extra SCSI bus, ensuring that you don't slow down fast SCSI-2 devices by
-putting the slower devices on the same bus. 
+putting the slower devices on the same bus.
 
 Try to match the usage of a disk with its specification.  For example,
 you should use your fastest disks for scratch space used for intensive
@@ -496,13 +496,13 @@ It is worth mentioning Cachefs since this is relatively new, appearing
 for the first time in Solaris 2.3. CacheFS is a caching mechanism
 which improves performance by caching a slow file system,
 such as a remote NFS-served file system, on another faster file system
-such as a local disk. Thus in an NFS environment, 
-CacheFS reduces 
+such as a local disk. Thus in an NFS environment,
+CacheFS reduces
 network traffic and server load. The benefits of caching really show up on
 busy networks with loaded servers, but a single client may not
-see an improvement on a lightly loaded network with a powerful server. 
+see an improvement on a lightly loaded network with a powerful server.
 Hence, although bundled with the operating system, CacheFS is not
-enabled by default.  
+enabled by default.
 
 Details of how to set up a cache can be found in
 the Solaris 2.x documentation in {\bf File System Administration}.
@@ -513,7 +513,7 @@ for caching. File systems where data is generally read only once (e.g.
 degradation in performance.
 
 CacheFS can also be used to improve performance for file
-systems on slow media, such as CD-ROM.  
+systems on slow media, such as CD-ROM.
 
 \subsubsection{tmpfs}
 
@@ -522,10 +522,10 @@ systems on slow media, such as CD-ROM.
 access times to the directory using {\tt tmpfs} are significantly decreased,
 since disk device latencies are avoided. However, if memory is low, data
 residing in {\tt tmpfs} is swapped out to disk, and there is no advantage
-over a disk resident filesystem. 
+over a disk resident filesystem.
 
 {\tt tmpfs} should only be used for temporary data since a reboot or
-crash will destroy the data in such a filesystem. 
+crash will destroy the data in such a filesystem.
 
 Note that the use of {\tt tmpfs} for {\tt /tmp} is enabled by default.
 On a machine with a small amount of RAM on which {\tt /tmp} is filled
@@ -544,24 +544,24 @@ was spending a lot of time in WAIT states while accessing data on disk.
 UCL set up a local memory file system (DEC Unix equivalent of {\tt tmpfs})
 and put the data in there. They found that the turnaround time for the
 job decreased by a factor of 3 compared with using a local disk
-(and a factor of 4.5 compared with a using a remote disk). Furthermore, 
+(and a factor of 4.5 compared with a using a remote disk). Furthermore,
 the general performance of the machine for other users was ``better''
-when using the memory file system. 
+when using the memory file system.
 
 \section{Monitoring}
 
 Monitoring your system {\em may} reveal a bottleneck which if removed will
-improve performance. 
+improve performance.
 
-The output from the system monitoring tools that come with Solaris 
+The output from the system monitoring tools that come with Solaris
 (e.g. {\tt vmstat, ps, netstat}, etc) is awkward to understand but can
-give useful information, once you know what to look for. 
+give useful information, once you know what to look for.
 
 More user-friendly tools for system monitoring, such as {\tt top},
 and network monitoring tools such as {\tt intermon} \& {\tt ethermon}
 are recommended. These are available via the Starlink SPARC/Solaris
 operations pages. A monitoring utility based on Adrian Cockcroft's
-{\bf Sun Performance Tuning Rules} is also in the pipeline. 
+{\bf Sun Performance Tuning Rules} is also in the pipeline.
 These are available via the Starlink SPARC/Solaris operations WWW
 pages.
 
@@ -573,7 +573,7 @@ Solaris 2.x.
 
 A CPU that is heavily loaded must share execution cycles amongst all
 processes and each process waits in a queue for execution. Long
-execution wait times may affect the ability of the process to 
+execution wait times may affect the ability of the process to
 provide adequate response time, thus introducing a bottleneck.
 
 You can monitor CPU usage with {\tt sar} (system activity resourcer)
@@ -585,9 +585,9 @@ You can monitor CPU usage with {\tt sar} (system activity resourcer)
 \end{quote}
 
 A high percentage of {\tt usr} CPU {\em might} indicate a problem or it might
-simply show that the system is being fully utilized. In order to 
+simply show that the system is being fully utilized. In order to
 determine if you have a CPU bottleneck, you also need to monitor
-the CPU queue length. 
+the CPU queue length.
 
 \begin{quote}
 {\tt
@@ -595,14 +595,14 @@ the CPU queue length.
 }
 \end{quote}
 
-This shows how many processes are queued for execution.  
+This shows how many processes are queued for execution.
 {\tt runq-sz} (number of process threads in memory awaiting execution)
 should not be consistently higher than 4 per CPU. Values above this
 indicate that the system is CPU-bound. {\tt \%runocc} (\% of time that
 the run queue was occupied) should be low since this indicates a good
 distribution of processing time for each queued process.
 
-You can monitor both together with 
+You can monitor both together with
 
 \begin{quote}
 {\tt
@@ -628,23 +628,23 @@ operations to complete. A large figure here indicates that the CPU is
 not the bottleneck and that you should examine the health of your
 other subsystems.
 
-Continuous low values (less than 10) appearing in the {\tt id} (idle) 
-field of the {\tt cpu} column indicate that the CPU is very busy, 
-but as indicated above, not necessarily a bottleneck. 
+Continuous low values (less than 10) appearing in the {\tt id} (idle)
+field of the {\tt cpu} column indicate that the CPU is very busy,
+but as indicated above, not necessarily a bottleneck.
 
 
 
 
 \subsection{Memory}
 
-If a CPU accesses data directly from memory, rather than from disk, 
+If a CPU accesses data directly from memory, rather than from disk,
 performance is greatly increased since memory access is
 {\em several orders of magnitude} faster than disk access - memory speeds
 are measured in nanoseconds whereas disk speeds are measured in milliseconds.
 Thus low memory availability
-may result in increased disk access and a dramatic reduction in performance. 
+may result in increased disk access and a dramatic reduction in performance.
 When you buy new systems, do not economize on RAM. The default systems
-shipped are usually under-configured in this area to keep unit costs down. 
+shipped are usually under-configured in this area to keep unit costs down.
 
 The command
 \begin{quote}
@@ -653,15 +653,15 @@ The command
 }
 \end{quote}
 
-will report unused memory pages ({\tt freemem}) and disk-based swap space 
+will report unused memory pages ({\tt freemem}) and disk-based swap space
 ({\tt freeswap})
-in 4K pages and 512K blocks respectively. {\tt freemem} is the number of 
-pages of RAM that are immediately ready to be used when a process starts 
+in 4K pages and 512K blocks respectively. {\tt freemem} is the number of
+pages of RAM that are immediately ready to be used when a process starts
 up or needs more memory. The absolute value of {\tt freemem} has no
-useful meaning on its own. Its value relative to some other kernel 
+useful meaning on its own. Its value relative to some other kernel
 thresholds is what is important. However, continuous low (less than
 6\% of installed memory) {\tt freemem} values may indicate a shortage
-of available memory and a potential bottleneck. 
+of available memory and a potential bottleneck.
 
 \begin{quote}
 {\tt
@@ -669,7 +669,7 @@ of available memory and a potential bottleneck.
 }
 \end{quote}
 
-The {\tt pgscan/s} column indicates how busy the page daemon is. This 
+The {\tt pgscan/s} column indicates how busy the page daemon is. This
 daemon only
 runs when available memory is low. Continuous values above 20 per second
 indicate a memory shortfall. This information can also be obtained with
@@ -687,13 +687,13 @@ continuous values above 20 per second indicate a memory shortfall.
 
 Improvements in CPU performance have far outstripped performance of
 disks. Modern disks are considerably larger but not dramatically faster
-then those we were using a few years ago. Hence, the I/O system is a prime 
-candidate for being the bottleneck in your system. 
+then those we were using a few years ago. Hence, the I/O system is a prime
+candidate for being the bottleneck in your system.
 
 Disk bottlenecks occur when a system cannot read and/or write data to
 disk faster enough. This is a common problem on NFS servers supporting
 clients that request data that is spread across different physical locations
-on the server disk filesystems. 
+on the server disk filesystems.
 
 How can you tell if a disk is overloaded? Run the command
 
@@ -703,14 +703,14 @@ How can you tell if a disk is overloaded? Run the command
 }
 \end{quote}
 
-Disks with are more than 30\% busy ({\tt\%b} entry) and which have an 
-I/O service time ({\tt svc\_t} entry) of more than 50ms are considered to 
+Disks with are more than 30\% busy ({\tt\%b} entry) and which have an
+I/O service time ({\tt svc\_t} entry) of more than 50ms are considered to
 be slow. The server time is the time between a user process issuing, for
-example, a read and the read completing. Hence, it is linked to 
+example, a read and the read completing. Hence, it is linked to
 response time.
 
 {\tt iostat} can also be used to measure how well disk loads are
-spread across each disk on a server system. 
+spread across each disk on a server system.
 
 
 \begin{quote}
@@ -720,7 +720,7 @@ spread across each disk on a server system.
 \end{quote}
 
 The first line of output summarizes I/O statistics since the system first
-booted. Each subsequent line represents activity for the specified interval 
+booted. Each subsequent line represents activity for the specified interval
 (here 5 seconds). Compare the {\tt util} fields for each disk and look for
 a disk which is significantly more utilized than the others. If this is the
 case, see if it is possible to move parts of your filesystem to another
@@ -734,7 +734,7 @@ one or more of the other disks.
 }
 \end{quote}
 
-will also indicate unbalanced disk loads. 
+will also indicate unbalanced disk loads.
 
 
 \begin{quote}
@@ -743,21 +743,21 @@ will also indicate unbalanced disk loads.
 }
 \end{quote}
 
-gives buffer cache information. The buffer cache is {\em not} used to 
+gives buffer cache information. The buffer cache is {\em not} used to
 cache all UFS disk I/O as it is in some flavours of Unix. In Solaris 2
 it is used to cache header information, not data.
 
 {\tt \%rcache} should be greater than
 90 and {\tt \%wcache} should be greater than 65. If they are lower than this
 you may need a larger buffer cache. The {\tt bufhwm} parameter in {\tt /etc/system}
-can be used to specify the maximum size for the buffer cache (see Section 4). 
+can be used to specify the maximum size for the buffer cache (see Section 4).
 
 \subsection{Network}
 
-Unless you have recently upgraded you LAN, there is almost certainly room 
-for improvement in this area at your site. 
+Unless you have recently upgraded you LAN, there is almost certainly room
+for improvement in this area at your site.
 The most basic measurement you can make is to determine the collision rate
-for a single host. Use the command 
+for a single host. Use the command
 
 \begin{quote}
 {\tt
@@ -767,20 +767,20 @@ for a single host. Use the command
 
 The collision rate for a single host is {\tt colls*100/(output packets)}.
 Network collision rates are computed by
-collecting the network statistics by running this command on all 
+collecting the network statistics by running this command on all
 active machines, and averaging the network load by adding the total number
 of collisions and dividing by the total number of {\tt output} packets.
 
-Any figure over 5\% 
+Any figure over 5\%
 indicates a heavily used (not necessarily overloaded) ethernet. Collisions
 are a natural part of the functioning of Ethernet. However, too many
 collisions reduces throughput and increases response time for your users.
 Collision rates higher than 10\% signify an over-loaded network that
-should be considered for segmentation. 
+should be considered for segmentation.
 Note that these figures relates to {\em collisions} and not {\rm load}.
 Ethernet runs efficiently with loads of up to 40\%.
-If you believe that your network is overloaded, contact the author to 
-discuss possible remedies. 
+If you believe that your network is overloaded, contact the author to
+discuss possible remedies.
 
 You should also be aware of the {\tt snoop} program which allows you to
 captures packets from the network and display their contents. This can
@@ -802,7 +802,7 @@ and {\tt rlssp2}.
 \subsection{NFS}
 
 The {\tt nfsstat} command is useful for determining NFS client-server
-workloads over a period of time. 
+workloads over a period of time.
 
 \begin{quote}
 {\tt
@@ -810,7 +810,7 @@ workloads over a period of time.
 }
 \end{quote}
 
-The {\tt calls} field displays the number of NFS operations that the server 
+The {\tt calls} field displays the number of NFS operations that the server
 serviced or a client requested. The {\tt badxid} field shows how many times
 a client received a duplicate acknowledgement for a single request. The
 {\tt retrans} field indicates how many times the client retransmitted
@@ -819,7 +819,7 @@ expired.
 
 If the {\tt badxid} and {\tt retrans} values are close, the server is not
 responding to the client quickly enough. Optimizing server performance
-should improve network performance as well, by reducing client retransmissions. 
+should improve network performance as well, by reducing client retransmissions.
 
 The client's {\em perceived} performance may improve by increasing the
 time-out value ({\tt timeo}) option in the client's file system file
@@ -830,7 +830,7 @@ Wait one day
 between modifications and check to see if the number of timeouts is
 decreasing.
 
-If the {\tt badxid} value is much less than {\tt retrans} or 0, then 
+If the {\tt badxid} value is much less than {\tt retrans} or 0, then
 the network itself or the network interface on the server is suspect.
 
 If the ratio of retransmissions to total calls {\tt retrans/calls*100)}
@@ -851,7 +851,7 @@ due to less NFS retransmissions generated by the client.
 To better
 accommodate the datagram size handling capabilities of the intermediate
 nodes, the retransmitted NFS message size can be decreased.  The read
-size and write size are measured with the {\tt nfsstat} command 
+size and write size are measured with the {\tt nfsstat} command
 \begin{quote}
 {\tt
 \# nfsstat -m
@@ -871,17 +871,17 @@ Finally, the command
 }
 \end{quote}
 
-may be used to measure NFS server efficiency in scheduling and servicing 
+may be used to measure NFS server efficiency in scheduling and servicing
 client requests. Non-zero values appearing in the {\tt udpInOverflows}
 field indicate a shortage of server {\tt nfsd}s. Client performance may
 suffer since there are not enough daemons running on the server to service
 each client request. Adjust the number of {\tt nfsd}s spawned at boot
 time in the system startup script {\tt /etc/rc3.d/S15nfs.server}. The
 default is 8 usually (according to the man pages) and this may not be enough.
-To cope with bursts of NFS traffic, a large number of {\tt nfsd}s 
-should be configured. If you configure too many, some may not be used, but 
-it is unlikely that there will be any adverse side effects. 
-The following table gives {\em guidelines} to help you size the number of 
+To cope with bursts of NFS traffic, a large number of {\tt nfsd}s
+should be configured. If you configure too many, some may not be used, but
+it is unlikely that there will be any adverse side effects.
+The following table gives {\em guidelines} to help you size the number of
 {\tt nfsd}s. A rule of thumb is two per active client, or the number in the
 table below, whichever is greater.
 
@@ -901,7 +901,7 @@ Large NFS--only server & 32--64 \\
 \end{center}
 \end{table}
 
-An NFS client will attempt to avoid sending requests for data if the data is 
+An NFS client will attempt to avoid sending requests for data if the data is
 locally available in memory, or cache. Cache consistency checks verify that
 the client only uses data stored in the cache if it is identical to the
 data available on the server. You can avoid unnecessary cache consistency
@@ -912,7 +912,7 @@ by increasing the {\tt actimeo} option in the client's {\tt /etc/vfstab}
 default is 30 seconds. Do not do this for evolving filesystems.
 
 The book {\bf SMCC NFS Server Performance and Tuning guide} gives detailed
-instructions on how to troubleshoot a poorly performing NFS system. 
+instructions on how to troubleshoot a poorly performing NFS system.
 \section{Tuning}
 
 There is very little tuning that can be done under Solaris 2. Most of
@@ -924,14 +924,14 @@ necessary to configure the kernel since it is dynamically linked at
 runtime i.e. the kernel is no longer compiled. Hence, there is no
 kernel configuration file in which to change the default values
 of kernel parameters. This is now achieved by creating entries in
-a system configuration file named {\tt /etc/system}. 
+a system configuration file named {\tt /etc/system}.
 
-Most of the tables that previously were statically allocated at boot time are 
+Most of the tables that previously were statically allocated at boot time are
 now dynamically allocated i.e. they will grow as needed up to a limit. This
 limit is the value of the parameter that controls the size of the table.
-Thus the parameters that used to indicate the size of the tables to be 
+Thus the parameters that used to indicate the size of the tables to be
 allocated at boot time now indicate the maximum size that these tables may
-reach. 
+reach.
 
 The most significant parameter you can adjust in {\tt /etc/system} is {\tt
 maxusers}. {\tt maxusers} is a single variable from which many system
@@ -939,7 +939,7 @@ parameters are derived (e.g. user process limit). The name is
 historical -- it does not indicate the maximum number of users which
 the system should be able to support. The default value of {\tt
 maxusers} depends on the amount of installed RAM (by default, Maxusers
-will be set to 8 on a 16Mb system, 32 on a 32Mb system, 40 on a 64Mb 
+will be set to 8 on a 16Mb system, 32 on a 32Mb system, 40 on a 64Mb
 system and 64 on a
 128Mb system) but this default can be modified from within {\tt
 /etc/system} with a command of the form
@@ -951,10 +951,10 @@ set maxusers=40
 \end{quote}
 
 You may need to increase the value of {\tt maxusers} on a low--RAM machine
-if you hit the maximum process limit. However, in most circumstances you 
-will not need to modify {\tt maxusers} ever. 
+if you hit the maximum process limit. However, in most circumstances you
+will not need to modify {\tt maxusers} ever.
 
-If you have a larger server which many people log into with X--terminals, 
+If you have a larger server which many people log into with X--terminals,
 then you may need to increase the pseudo-tty parameter {\tt pt\_cnt}
 in {\tt /etc/system}. This has had to be done, for example, on the
 large server at Leicester.
@@ -965,23 +965,23 @@ under Solaris 2.4.
 See the man page {\tt system (4)} for full details of this file's
 format but bear in mind that arbitrary tuning can create an unstable
 machine or even an unbootable machine. Be very careful with {\tt set}
-commands in {\tt /etc/system} since these cause automatic patching of 
+commands in {\tt /etc/system} since these cause automatic patching of
 the kernel.
 
 Incidently, you can kid your machine into thinking that it has less
 memory installed than it has by setting the variable {\tt physmem} in
 {\tt /etc/system}. The only possible reason that you might have for doing this
-is in order to check that a heavy application which your users might be 
+is in order to check that a heavy application which your users might be
 developing will run on a system with less memory than your own.
 
 \subsection{Multi-user systems}
 
-Performance can be a problem on multi-user systems since under Unix 
-it is easy for a single user to grap a large fraction of 
+Performance can be a problem on multi-user systems since under Unix
+it is easy for a single user to grap a large fraction of
 CPU, RAM or swap space. There is a school of thought that suggests
 putting
 greedy users onto a machine of their own to avoid them degrading the
-service for others. However, this is not always possible. 
+service for others. However, this is not always possible.
 
 It is possible to configure your system so that a single user cannot
 grab most of one resource. However, the
@@ -994,8 +994,8 @@ the program {\tt adb} (general-purpose debugger). This is very dangerous
 and hence you should only consider undertaking this endeavour if you
 have a serious problem with greedy users at your site which cannot
 be resolved through isolation of those users or via local rules regarding
-the usage of your machines. Instructions for the desperate can be found in 
-{\bf Sun Performance and Tuning}, pages 221--223. 
+the usage of your machines. Instructions for the desperate can be found in
+{\bf Sun Performance and Tuning}, pages 221--223.
 
 The current system--wide resource limits can be found using the command
 
@@ -1008,11 +1008,11 @@ The current system--wide resource limits can be found using the command
 Look under the section entitled Process Resource Limit Tunables.
 
 An alternative to setting a system--wide limit on resource usage
-is to use the {\tt limit} command. This is a shell built-in 
+is to use the {\tt limit} command. This is a shell built-in
 function to set limitations on the system resources available to
-the current shell and it's descendants. 
+the current shell and it's descendants.
 It is possible to use this command in one of your global login files
-to set limits but knowledgeable users can use the same command to 
+to set limits but knowledgeable users can use the same command to
 unset them again. Full details can be found in the {\tt limit}
 man page.
 

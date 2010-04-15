@@ -20,16 +20,16 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     7-MAY-1992 (JBVAD::PAH):                      
-*        Original version.                          
-*     1-FEB-1993 (PCTR):                            
-*        Convert to Starlink prologue.              
-*     {enter_further_changes_here}                          
-                                                    
-*  Bugs:                                            
-*     {note_any_bugs_here}                          
+*     7-MAY-1992 (JBVAD::PAH):
+*        Original version.
+*     1-FEB-1993 (PCTR):
+*        Convert to Starlink prologue.
+*     {enter_further_changes_here}
 
-*-                                                  
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
 *  PROJ_ local status values.
       INTEGER PROJ__UNDEFINED   ! Status value for undefined projection

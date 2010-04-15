@@ -7,7 +7,7 @@ C     Figaro function that attempts to produce a seeing ripple spectrum
 C     from a Figs spectrum, averaging the data from one or more
 C     detectors, normalising the result to unity, and generating a
 C     spectrum in which the normalised data from these detectors
-C     (ideally ones not contaminated by spectral features) are repeated 
+C     (ideally ones not contaminated by spectral features) are repeated
 C     for each detector.
 C
 C     Command parameters -
@@ -25,7 +25,7 @@ C     Modified:
 C
 C     5th  Aug 1987  Revised DSA_ routines - some specs changed. Now
 C                    uses DYN_ routines for dynamic memory handling
-C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected 
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
 C                    in mapping calls.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
 C                    removed.
@@ -87,7 +87,7 @@ C
       END IF
 C
 C     Get detectors to be used.
-C 
+C
       CALL PAR_RDVAL('NDET',1.0,FLOAT(DETECTORS),1.0,' ',VALUE)
       NDET=NINT(VALUE)
       DO I=1,DETECTORS
@@ -157,7 +157,7 @@ C     This routine does the real work for the Figaro application FIGSEE,
 C     producing a seeing ripple spectrum from a Figs spectrum by averaging
 C     the signal in each time period from the specified detectors and then
 C     using the normalised result for all points in the spectrum that
-C     correspond to that time period.  
+C     correspond to that time period.
 C
 C     Parameters -    (">" input, "!" modified, "<" output)
 C
@@ -209,7 +209,7 @@ C
          END IF
       END DO
 C
-C     Now, for each time period, first average the data for the 
+C     Now, for each time period, first average the data for the
 C     specified detectors, then replace the spectral data with the
 C     normalised average value.
 C

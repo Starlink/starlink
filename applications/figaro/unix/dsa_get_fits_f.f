@@ -52,7 +52,7 @@
          call dta_loc(refnam//'.comments.'//item,nloc,status)
          call dat_get0c(nloc,comment,status)
          call dta_annul(nloc,status)
-         
+
 
       else
         status = 0

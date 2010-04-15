@@ -21,16 +21,16 @@ C    (1) INPUT      (TSP, nD)  The Polarization dataset to be corrected.
 C    (2) THETA      (Real)     Angle to rotate through (degrees).
 C    (3) OUTPUT     (TSP, nD)  The output corrected dataset.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         8/5/1993
 C
 C-
 C
 C  History:
-C    30/8/1990   Original Version.   JAB/AAO 
+C    30/8/1990   Original Version.   JAB/AAO
 C    8/5/1993    Make it handle data of 1/2 or 3 dimensions.  JAB/AAO
 C
 
@@ -71,7 +71,7 @@ C
 *  Create the output file
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
-              
+
 *  Copy input to output
 
       CALL TSP_COPY(LOC1,OLOC,STATUS)
@@ -94,8 +94,8 @@ C
       ENDIF
 
 *  Get the Stokes data from output dataset and correct it
-                 
-*  Find the Stokes parameters                 
+
+*  Find the Stokes parameters
       CALL TSP_GET_STOKES(OLOC,'Q',QLOC1,STATUS)
       CALL TSP_GET_STOKES(OLOC,'U',ULOC1,STATUS)
 
@@ -114,7 +114,7 @@ C
      :       %VAL(UPTR1))
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(QDLOC1,STATUS)
       CALL TSP_UNMAP(UDLOC1,STATUS)
@@ -149,7 +149,7 @@ C
 *   Modified:
 *       16/12/1991   -  Handle bad values
 *
-*+       
+*+
 
       IMPLICIT NONE
       INCLUDE 'PRM_PAR'
@@ -169,8 +169,8 @@ C
       UC = SIN(2.0*THETA/DEGRAD)
 
 *  Loop over points
-      DO I=1,SIZE  
-        IF (Q(I) .NE. VAL__BADR .AND. U(I) .NE. VAL__BADR) THEN         
+      DO I=1,SIZE
+        IF (Q(I) .NE. VAL__BADR .AND. U(I) .NE. VAL__BADR) THEN
 
 *  Rotate Stokes vector
           QQ = QC*Q(I) + UC*U(I)

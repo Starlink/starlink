@@ -60,7 +60,7 @@ C  Ok, go...
       WRITE (PLOT_UNIT) ICONT
 
       WRITE (PLOT_UNIT) NPTS, NQUAD, ICHAR, ITIP, IPEN,
-     &                  MASK, NMASK, XFAC, IWEIGHT, LCOLOR, 
+     &                  MASK, NMASK, XFAC, IWEIGHT, LCOLOR,
      &                  BADPIX_VAL, TOPSCAL, OSCFREQ, DOPPFAC
       WRITE (PLOT_UNIT) (XSCALE(J), J=1, NTOT(NQUAD))
       WRITE (PLOT_UNIT) (DATA(J),   J=1, NTOT(NQUAD))

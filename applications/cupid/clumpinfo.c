@@ -1,16 +1,16 @@
-#include "sae_par.h" 
-#include "mers.h" 
-#include "ndf.h" 
-#include "star/ndg.h" 
-#include "ast.h" 
-#include "star/kaplibs.h" 
-#include "star/grp.h" 
-#include "star/hds.h" 
-#include "par.h" 
+#include "sae_par.h"
+#include "mers.h"
+#include "ndf.h"
+#include "star/ndg.h"
+#include "ast.h"
+#include "star/kaplibs.h"
+#include "star/grp.h"
+#include "star/hds.h"
+#include "par.h"
 #include "prm_par.h"
-#include "cupid.h" 
-#include <math.h> 
-#include <string.h> 
+#include "cupid.h"
+#include <math.h>
+#include <string.h>
 #include <stdio.h>
 
 
@@ -47,35 +47,35 @@ void clumpinfo( int *status ) {
 *        - "xx,yy,zz" -- A list of clump indices.
 *
 *        - "xx:yy" --  Clump indices between xx and yy inclusively.  When
-*        xx is omitted the range begins from one; when yy is omitted the 
+*        xx is omitted the range begins from one; when yy is omitted the
 *        range ends with the final clump index.
 *
-*        - Any reasonable combination of above values separated by 
+*        - Any reasonable combination of above values separated by
 *        commas.
 *     FLBND( ) = _DOUBLE (Write)
 *          The lower bounds of the bounding box enclosing the selected
-*          clumps in the current WCS Frame of the input NDF. Celestial axis 
-*          values are always in units of radians, but spectral axis units 
+*          clumps in the current WCS Frame of the input NDF. Celestial axis
+*          values are always in units of radians, but spectral axis units
 *          will be in the spectral units used by the current WCS Frame.
 *     FUBND( ) = _DOUBLE (Write)
 *          The upper bounds of the bounding box enclosing the selected
 *          clumps. See parameter FLBND for more details.
 *     LBOUND( ) = _INTEGER (Write)
 *          The lower pixel bounds of bounding box enclosing the selected
-*          clumps. 
+*          clumps.
 *     NCLUMPS = _INTEGER (Write)
-*        The total number of clumps descrriptions stored within the supplied 
+*        The total number of clumps descrriptions stored within the supplied
 *        NDF.
 *     NDF = NDF (Read)
 *        The NDF defining the previously identified clumps. This
 *        should contain a CUPID extension describing all the identified
-*        clumps, in the format produced by FINDCLUMPS or EXTRACTCLUMPS. 
+*        clumps, in the format produced by FINDCLUMPS or EXTRACTCLUMPS.
 *     QUIET = _LOGICAL (Read)
 *        If TRUE, then no information is written out to the screen,
 *        although the output parameters are still assigned values. [FALSE]
 *     UBOUND( ) = _INTEGER (Write)
 *          The upper pixel bounds of bounding box enclosing the selected
-*          clumps. 
+*          clumps.
 
 *  Notes:
 *     - It is hoped to extend the range of information reported by this
@@ -117,7 +117,7 @@ void clumpinfo( int *status ) {
 *     {note_any_bugs_here}
 
 *-
-*/      
+*/
 
 /* Local Variables: */
    AstFrame *cfrm;      /* Pointer to current WCS Frame */
@@ -159,7 +159,7 @@ void clumpinfo( int *status ) {
 
 
 /* Obtain the input NDF and get a locator for the array of clump
-   descriptions within it. 
+   descriptions within it.
    -----------------------------------------------------------------  */
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
@@ -171,14 +171,14 @@ void clumpinfo( int *status ) {
 
 /* Check the NDF has a suitable CUPID extension containing an array of
    clump cut-outs. Get an HDS locator for the array. */
-   ndfXstat( indf, "CUPID", &there, status ); 
+   ndfXstat( indf, "CUPID", &there, status );
    if( !there ) {
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
          ndfMsg( "NDF", indf );
          errRep( "", "The NDF \"^NDF\" does not contain a CUPID extension "
                  "such as created by FINDCLUMPS or EXTRACTCLUMPS.", status );
-      } 
+      }
 
    } else {
       ndfXloc( indf, "CUPID", "READ", &xloc, status );
@@ -190,8 +190,8 @@ void clumpinfo( int *status ) {
             errRep( "", "The CUPID extension within NDF \"^NDF\" does not "
                     "contain an array of clumps such as created by "
                     "FINDCLUMPS or EXTRACTCLUMPS.", status );
-         } 
-   
+         }
+
       } else {
          datFind( xloc, "CLUMPS", &aloc, status );
          primary = 1;
@@ -214,7 +214,7 @@ void clumpinfo( int *status ) {
    yet been initialised. */
    info.init = 0;
 
-/* Get the WCS FrameSet from the input NDF, and store a pointer to it in 
+/* Get the WCS FrameSet from the input NDF, and store a pointer to it in
    the "info" structure. */
    kpg1Gtwcs( indf, &(info.iwcs), status );
 
@@ -224,7 +224,7 @@ void clumpinfo( int *status ) {
 /* Get the list of clump indices to iclude in the returned information. */
    clump_flags = astMalloc( sizeof( int )*nclumps );
    clump_indices = astMalloc( sizeof( int )*nclumps );
-   kpg1Gilst( 1, (int) nclumps, (int) nclumps, "CLUMPS", clump_flags, clump_indices, 
+   kpg1Gilst( 1, (int) nclumps, (int) nclumps, "CLUMPS", clump_flags, clump_indices,
               &nuse, status );
 
 /* Loop round all clumps that are to be used. */
@@ -244,14 +244,14 @@ void clumpinfo( int *status ) {
 
 
 
-/* Write out the information to the screen and to appropriate output 
+/* Write out the information to the screen and to appropriate output
    parameters.
    -----------------------------------------------------------------  */
 
 /* See if screen output is required. */
    parGet0l( "QUIET", &quiet, status );
    if( !quiet ) msgBlank( status );
-   
+
 /* The number of clumps defined within the input NDF... */
    parPut0i( "NCLUMPS", (int) nclumps, status );
    if( ! quiet ) {
@@ -275,7 +275,7 @@ void clumpinfo( int *status ) {
       msgOut( "", "   Pixel index bounding box: ^SECTION", status );
    }
 
-/* WCS bounding box (first convert the pixel index bounding box into WCS 
+/* WCS bounding box (first convert the pixel index bounding box into WCS
    coords)... */
    cfrm = astGetFrame( info.iwcs, AST__CURRENT );
 
@@ -304,7 +304,7 @@ void clumpinfo( int *status ) {
       for( i = 0; i < info.nwcs; i++) {
          msgSetc( "L", astFormat( cfrm, i + 1, flbnd[ i ] ) );
          msgSetc( "U", astFormat( cfrm, i + 1, fubnd[ i ] ) );
-   
+
          sprintf( tmpstr, "Domain(%d)", i + 1 );
          dom = astGetC( cfrm, tmpstr );
          if( dom && strcmp( dom, "SKY" ) ) {
@@ -313,10 +313,10 @@ void clumpinfo( int *status ) {
          } else {
             msgSetc( "UNT", "" );
          }
-   
+
          sprintf( tmpstr, "Label(%d)", i + 1 );
          msgSetc( "LAB", astGetC( cfrm, tmpstr ) );
-   
+
          msgOut( "", "        ^LAB: ^L -> ^U ^UNT", status );
       }
    }
@@ -340,7 +340,7 @@ L999:;
 /* End the AST context */
    astEnd;
 
-/* If an error has occurred, issue another error report identifying the 
+/* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
       errRep( "CLUMPINFO_ERR", "CLUMPINFO: Failed to obtain information "

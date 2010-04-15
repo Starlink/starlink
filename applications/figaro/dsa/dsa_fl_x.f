@@ -49,7 +49,7 @@
 *-
 
       SUBROUTINE DSA_FLAG_B( VALUE )
-      
+
       IMPLICIT NONE              ! No implicit typing
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       BYTE VALUE
@@ -59,7 +59,7 @@
       END
 
       SUBROUTINE DSA_FLAG_S( VALUE )
-      
+
       IMPLICIT NONE              ! No implicit typing
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INTEGER * 2 VALUE
@@ -69,7 +69,7 @@
       END
 
       SUBROUTINE DSA_FLAG_I( VALUE )
-      
+
       IMPLICIT NONE              ! No implicit typing
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INTEGER VALUE
@@ -79,7 +79,7 @@
       END
 
       SUBROUTINE DSA_FLAG_F( VALUE )
-      
+
       IMPLICIT NONE              ! No implicit typing
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       REAL VALUE
@@ -89,7 +89,7 @@
       END
 
       SUBROUTINE DSA_FLAG_D( VALUE )
-      
+
       IMPLICIT NONE              ! No implicit typing
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       DOUBLE PRECISION VALUE
@@ -99,7 +99,7 @@
       END
 
       SUBROUTINE DSA_FLAG_U( VALUE )
-      
+
       IMPLICIT NONE              ! No implicit typing
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INTEGER * 2 VALUE

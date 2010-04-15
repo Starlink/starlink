@@ -1,9 +1,9 @@
 *RECOMP
 *
-* RECOMP  -- recomputes an output file from PROFIT for a new spectrum 
-*            position and object region. 
+* RECOMP  -- recomputes an output file from PROFIT for a new spectrum
+*            position and object region.
 *
-* recomp allows the fit from one star to be moved onto another. The 
+* recomp allows the fit from one star to be moved onto another. The
 * fractions are normalised over the object region. I haven't used it a
 * great deal and if anyone does, I would be interested in how well it
 * worked.
@@ -34,17 +34,17 @@ C
       IF(STATUS.NE.SAI__OK) RETURN
       CALL NDF_BEGIN
 C
-C     Open fraction file 
+C     Open fraction file
 C
       CALL NDF_ASSOC('FRACT', 'UPDATE', FRACT, STATUS)
 C
 C     Read old left and right limits and X reference position
 C
-      CALL NDF_XGT0R(FRACT,'PAMELA','PROFIT.LEFT',LEFT,STATUS)      
-      CALL NDF_XGT0R(FRACT,'PAMELA','PROFIT.RIGHT',RIGHT,STATUS)      
-      CALL NDF_XGT0D(FRACT,'PAMELA','PROFIT.XREF',XREF,STATUS)      
-      CALL NDF_XGT0I(FRACT,'PAMELA','PROFIT.YLO',OYLO,STATUS)      
-      CALL NDF_XGT0I(FRACT,'PAMELA','PROFIT.YHI',OYHI,STATUS)      
+      CALL NDF_XGT0R(FRACT,'PAMELA','PROFIT.LEFT',LEFT,STATUS)
+      CALL NDF_XGT0R(FRACT,'PAMELA','PROFIT.RIGHT',RIGHT,STATUS)
+      CALL NDF_XGT0D(FRACT,'PAMELA','PROFIT.XREF',XREF,STATUS)
+      CALL NDF_XGT0I(FRACT,'PAMELA','PROFIT.YLO',OYLO,STATUS)
+      CALL NDF_XGT0I(FRACT,'PAMELA','PROFIT.YHI',OYHI,STATUS)
 C
 C     Get size of polynomial array
 C
@@ -57,7 +57,7 @@ C
 C     Get track file
 C
       CALL GET_TRACK(YPOS, TOFF, STATUS)
-C     
+C
 C     What region of frame
 C
       CALL NDF_ISBAS(FRACT, BASE, STATUS)
@@ -92,13 +92,13 @@ C
          LEFT   = LEFT  + XSHIFT
          RIGHT  = RIGHT + XSHIFT
       END IF
-C 
+C
 C     compute minimal range in X to use
 C
       CALL XLIMS(.TRUE.,YREF,LEFT,RIGHT,YLO,YHI,XLO,XHI,STATUS)
 C
 C     Change bounds of fraction NDF
-C 
+C
       IF(XLO.NE.LBND(1) .OR. XHI.NE.UBND(1) .OR.
      &     YLO.NE.LBND(2) .OR. YHI.NE.UBND(2)) THEN
          LBND(1) = XLO
@@ -108,38 +108,38 @@ C
          CALL NDF_RESET(FRACT,'Data',STATUS)
          CALL NDF_SBND(2,LBND,UBND,FRACT,STATUS)
       END IF
-C     
+C
 C     Section dimensions
-C     
+C
       NXS = UBND(1)-LBND(1)+1
       NYS = UBND(2)-LBND(2)+1
 C
 C     Map ndfs
 C
       CALL NDF_MAP(FRACT,'Data','_REAL','WRITE',FRPTR,EL,STATUS)
-      CALL NDF_MAP(PPOLY,'Data','_DOUBLE','READ',PPTR,EL,STATUS)      
+      CALL NDF_MAP(PPOLY,'Data','_DOUBLE','READ',PPTR,EL,STATUS)
 C
 C     Re-compute fractions.
 C
-      CALL RE_COMP(%VAL(CNF_PVAL(FRPTR)), NXS, NYS, XLO, YLO, 
-     &     %VAL(CNF_PVAL(PPTR)), NPOLS, NPOLY, LEFT, RIGHT, 
+      CALL RE_COMP(%VAL(CNF_PVAL(FRPTR)), NXS, NYS, XLO, YLO,
+     &     %VAL(CNF_PVAL(PPTR)), NPOLS, NPOLY, LEFT, RIGHT,
      &     XREF, STATUS)
 C
 C     Update left and right limits and reference positions
 C
-      CALL NDF_XPT0R(LEFT,FRACT,'PAMELA','PROFIT.LEFT',STATUS) 
+      CALL NDF_XPT0R(LEFT,FRACT,'PAMELA','PROFIT.LEFT',STATUS)
       CALL NDF_XPT0R(RIGHT,FRACT,'PAMELA','PROFIT.RIGHT',STATUS)
       CALL NDF_XPT0D(XREF,FRACT,'PAMELA','PROFIT.XREF',STATUS)
       CALL NDF_END(STATUS)
       RETURN
       END
-C        
-      SUBROUTINE RE_COMP(DATA, NXS, NYS, XLO, YLO, PROFILE, 
+C
+      SUBROUTINE RE_COMP(DATA, NXS, NYS, XLO, YLO, PROFILE,
      &     NPOLS, NPOLY, LEFT, RIGHT, XREF, STATUS)
 C
 C     Recomputes fractions from the polynomial coefficients stored in
 C     PROFILE according to the new spectrum position defined by DISTORT
-C     
+C
 C     R*4 DATA(NXS,NYS)        -- Fractions are stored in this file
 C     I*4 NXS, NYS             -- Frame size
 C     I*4 XLO, YLO             -- Lower left corner of section
@@ -147,8 +147,8 @@ C     R*8 PROFILE(NPOLY,NPOLS) -- Polynomial coefficients.
 C     I*4 NPOLS, NPOLY         -- Number of polynomials and number of terms
 C                                 of each.
 C     R*4 LEFT, RIGHT          -- New object limits
-C     
-C     
+C
+C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INTEGER STATUS, I, J, IND, IX, IY, IXL, IXR, IX1, IX2
@@ -200,7 +200,7 @@ C
          END DO
 C
 C     Compute X distortion of spectrum and X limits
-C     of computation region. 
+C     of computation region.
 C
          YD = DBLE(IY+YLO-1)
          CALL GET_TRACK(YD,XD,STATUS)
@@ -236,7 +236,7 @@ C
                         QFAC = 1. - Y*Y/2.
                      ELSE
                         QFAC = (2.-Y)**2./2.
-                     END IF 
+                     END IF
                   ELSE
                      QFAC = SAVE2-(XZ/SPIX)**2
                   END IF

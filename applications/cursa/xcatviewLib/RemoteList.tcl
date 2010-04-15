@@ -136,7 +136,7 @@ proc RemoteList { } {
                   [string range $currentLong 0 $firstSpace]
                 set currentServeType [string trimright $currentServeType]
 
-                if {($currentServeType != "namesvr") && 
+                if {($currentServeType != "namesvr") &&
                     ($currentServeType != "imagesvr")} then {
                    set currentName \
                      [string range $currentLong $firstSpace end]
@@ -149,7 +149,7 @@ proc RemoteList { } {
                    append currentName " ("
                    append currentName "$currentServeType"
                    append currentName ")"
- 
+
                    lappend remoteCatsLong  $currentName
 
                    lappend remoteCatsShort $currentCatsShort

@@ -56,7 +56,7 @@
 *        Expressions such as "*_NEW" are expanded by replacing the "*"
 *        character with each input NDF in turn.
 *     QEXP = LITERAL (Read)
-*        The quality expression. 
+*        The quality expression.
 
 *  Examples:
 *     QUALTOBAD M51* *_CLEAN SATURATED.OR.GLITCH
@@ -80,7 +80,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -157,7 +157,7 @@
       CALL IRM_GETQX( 'QEXP', QEXP, STATUS )
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...', 
+      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...',
      :                IGRP1, SIZE, STATUS )
 
 *  Similarly, get a group containing the names of the output NDFs.
@@ -279,7 +279,7 @@
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( NDFIN, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete the output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL NDF_DELET( NDFOUT, STATUS )
@@ -290,26 +290,26 @@
 *  If an error occured processing the current input NDF...
          IF( STATUS .NE. SAI__OK ) THEN
 
-*  Annul the error and give a more friendly report if the problem was 
+*  Annul the error and give a more friendly report if the problem was
 *  that some quality names were not defined.
             IF( STATUS .EQ. IRQ__NOQNM ) THEN
                CALL ERR_ANNUL( STATUS )
 
-               CALL MSG_SETC( 'C', 
+               CALL MSG_SETC( 'C',
      :    '    The following quality names are undefined in this NDF:')
-               DO J = 1, NUNDEF 
+               DO J = 1, NUNDEF
                   CALL MSG_SETC( 'C', ' ' )
                   CALL MSG_SETC( 'C', UNDEF( J ) )
                END DO
-               CALL MSG_OUTIF( MSG__NORM, 'QUALTOBAD_MSG4', '^C', 
+               CALL MSG_OUTIF( MSG__NORM, 'QUALTOBAD_MSG4', '^C',
      :                         STATUS )
 
-*  Annul the error and give a more friendly report if the problem was 
+*  Annul the error and give a more friendly report if the problem was
 *  that no quality names information was found.
             ELSE IF( STATUS .EQ. IRQ__NOQNI ) THEN
                CALL ERR_ANNUL( STATUS )
                CALL MSG_OUTIF( MSG__NORM, 'QUALTOBAD_MSG5',
-     :             '    This NDF contains no quality name definitions', 
+     :             '    This NDF contains no quality name definitions',
      :                        STATUS )
 
 *  If the problem was neither of these two things, flush the error.
@@ -318,7 +318,7 @@
 
             END IF
 
-*  Give a warning telling the user that no output NDF will be created 
+*  Give a warning telling the user that no output NDF will be created
 *  for the current input NDF.
             CALL GRP_GET( IGRP2, I, 1, OUTNDF, STATUS )
             CALL MSG_SETC( 'NDF', OUTNDF )
@@ -348,13 +348,13 @@
       CALL IRQ_CLOSE( STATUS )
 
 *  Assign a group expression to the output parameter NDFLIST which
-*  specifies all the output NDFs. NDFLIST should normally be associated 
-*  with a suitable global parameter to cause its value to be passed on 
-*  to the next application.  The output parameter NDFLIST is not 
-*  advertised as a user parameter since users will normally not be 
-*  aware of the existence of global parameter, and so will not know 
+*  specifies all the output NDFs. NDFLIST should normally be associated
+*  with a suitable global parameter to cause its value to be passed on
+*  to the next application.  The output parameter NDFLIST is not
+*  advertised as a user parameter since users will normally not be
+*  aware of the existence of global parameter, and so will not know
 *  how to assign a value to it.
-      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'QUALTOBAD', 
+      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'QUALTOBAD',
      :                                   STATUS )
 
 *  Delete all groups.
@@ -367,7 +367,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was requested, 
+*  If a null parameter was given or a parameter abort was requested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

@@ -10,7 +10,7 @@
 \newcommand{\stardocnumber}    {146.4}
 \newcommand{\stardocauthors}   {Julian Osborne, Jeremy Ashley, \& Grant Privett}
 \newcommand{\stardocdate}      {25th June 1996}
-\newcommand{\stardoctitle}     {OBSERVE --- Check Star Observability}    
+\newcommand{\stardoctitle}     {OBSERVE --- Check Star Observability}
 \newcommand{\stardocversion}   {Version 2.2}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {[Text of abstract]}
@@ -45,7 +45,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -114,7 +114,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -136,7 +136,7 @@
 
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
- 
+
 % in-line verbatims
 \newcommand{\myverb}[1]{{\small \verb+#1+}}
 
@@ -145,7 +145,7 @@
 \begin{htmlonly}
 \newcommand{\degrees}{{\rawhtml &deg;}}
 \end{htmlonly}
- 
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -212,12 +212,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -262,9 +262,9 @@ A number of changes have been made in {\bf{observe}} \stardocversion.
 It now makes use of the ADAM parameter system and does not employ
 routines from {\sc ASTERIX} for printing information to the screen. It
 also presents the user with the full list of telescopes from SLALIB,
-allowing a wider choice of pre-defined observing sites. 
+allowing a wider choice of pre-defined observing sites.
 
-In addition, much of the information displayed in graphical format 
+In addition, much of the information displayed in graphical format
 can now be output to a simple text file.
 
 Our thanks go to a number of users for suggesting these changes.
@@ -430,20 +430,20 @@ OBSERVE V2.2
  64) UK 1.2 metre Schmidt, 65) Kiso 1.05 metre Schmi 66) ESO 1 metre Schmidt,
  67) Australia Telescope C
 
-NUMBER - Enter telescope number, or 0 for other /1/ >  
-STAR - Name of object /'Mira'/ > 
-RA - Object coordinates (hh mm ss) /'02 16 48.'/ > 
-DEC - Object coordinates (dd mm ss) /'-3 12 0'/ > 
-YEAR - Year of observation /1994/ > 
+NUMBER - Enter telescope number, or 0 for other /1/ >
+STAR - Name of object /'Mira'/ >
+RA - Object coordinates (hh mm ss) /'02 16 48.'/ >
+DEC - Object coordinates (dd mm ss) /'-3 12 0'/ >
+YEAR - Year of observation /1994/ >
 Calculating rise times etc.
 DEVICE - Output graphics device (e.g. ps_l) /'ps_l'/ >
 Plotting Visibility graph.
-TEXTF - Want text file output? /TRUE/ > 
+TEXTF - Want text file output? /TRUE/ >
 OUT - Text file name /@0/ > outputfile
 AGAIN - New telescope (T); New Star (S); Both (B) or QUIT (Q) > q
 >
 > lpr -Pstar_post gks74.ps
-\end{verbatim}                                                            
+\end{verbatim}
 \end{quote}
 
 Figure~\ref{fig_output} shows the result of the above query.

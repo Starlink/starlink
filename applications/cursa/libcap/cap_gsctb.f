@@ -100,7 +100,7 @@
      :  NPLATE,  ! GSSS Internal plate number.
      :  NMULT    ! Multiple component flag.
 
-*. 
+*.
 
       IF (STATUS .EQ. SAI__OK) THEN
 

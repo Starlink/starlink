@@ -28,7 +28,7 @@
 
       LOGICAL       MDH_WILD
 
-                                                           
+
       DBS_FIELDNO = 0								! Set return value at 1.
       N = NFIELDS( REF_NO )
       FOUND = .FALSE.

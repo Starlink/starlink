@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -25,14 +25,14 @@
 \newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
-This document describes the Character Handling Routine library, CHR, 
+This document describes the Character Handling Routine library, CHR,
 and its use.
 The CHR library augments the limited character handling facilities
 provided by the Fortran 77 standard.
 It offers a range of character handling facilities: from formatting
 Fortran data types into text strings and the reverse, to higher level
 functions such as wild card matching, string sorting, paragraph
-reformatting and justification. 
+reformatting and justification.
 The library may be used simply for building text strings for interactive
 applications or as a basis for more complex text processing applications.
 }
@@ -94,7 +94,7 @@ applications or as a basis for more complex text processing applications.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -516,12 +516,12 @@ applications or as a basis for more complex text processing applications.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -569,17 +569,17 @@ applications or as a basis for more complex text processing applications.
 \section {Introduction}
 
 The Fortran 77 standard provides a data type for the storage of
-character strings (the type {\tt CHARACTER}), an operator specific to 
-character data (the {\tt //} operator for string concatenation), and 
+character strings (the type {\tt CHARACTER}), an operator specific to
+character data (the {\tt //} operator for string concatenation), and
 eight intrinsic functions specifically for handling {\tt CHARACTER} typed
-variables ({\tt CHAR}, {\tt ICHAR}, {\tt INDEX}, {\tt LEN}, {\tt LGE}, 
-{\tt LGT}, {\tt LLE}, {\tt LLT}). 
+variables ({\tt CHAR}, {\tt ICHAR}, {\tt INDEX}, {\tt LEN}, {\tt LGE},
+{\tt LGT}, {\tt LLE}, {\tt LLT}).
 Facilities to write and read Fortran data types to and from
-character strings (using internal files and the {\tt WRITE} and {\tt READ} 
+character strings (using internal files and the {\tt WRITE} and {\tt READ}
 statements respectively) are also provided by the Fortran 77 standard.
 Although these features of the Fortran language are of considerable utility
 when handling character variables in Fortran programs, they constitute only the
-basic tools for the more extensive processing of textual data sometimes 
+basic tools for the more extensive processing of textual data sometimes
 required in applications.
 
 The CHR library augments the limited character handling facilities
@@ -587,7 +587,7 @@ provided by the Fortran 77 standard.
 It offers a range of character handling facilities: from formatting
 Fortran data types into text strings and the reverse, to higher level
 functions such as wild card matching, string sorting, paragraph
-reformatting and justification. 
+reformatting and justification.
 The library may be used simply for building text strings for interactive
 applications or as a basis for more complex text processing applications.
 
@@ -596,9 +596,9 @@ The functions performed by the CHR library may be categorised as follows:
 \begin{itemize}
 \item change case
 \item compare strings
-\item decode Fortran data types 
+\item decode Fortran data types
 \item edit strings
-\item encode Fortran data types 
+\item encode Fortran data types
 \item enquire
 \item facilitate portability
 \item search strings
@@ -609,17 +609,17 @@ A classified list of of these routines is given in Appendix \ref{class_sect}.
 
 \section {Error Handling \label{err_sect} }
 
-None of the CHR routines report error messages; {\em i.e.}\ they do not use 
+None of the CHR routines report error messages; {\em i.e.}\ they do not use
 \xref{the Starlink Error Reporting System}{sun104}{}
 \latex{, ERR (see SUN/104)}.
-However, some routines do use the 
+However, some routines do use the
 \xref{inherited status conventions}{sun104}{inherited_status}
 \latex{(described in SUN/104) }to indicate success or failure.
 Those CHR routines which do not have a status argument handle any errors
 internally and have a specified behaviour on error.
 Those CHR routines which do have a status argument fall into two categories:
-those which obey the full inherited status conventions and return without 
-action if given a status value other than SAI\_\_OK, and those which ignore 
+those which obey the full inherited status conventions and return without
+action if given a status value other than SAI\_\_OK, and those which ignore
 the given status and just return a status value on exit.
 The following routines obey the full inherited status conventions:
 
@@ -643,13 +643,13 @@ The symbolic names of the error values used by CHR are given in Appendix
 
 
 \section {Compiling and Linking \label{compile_sect}}
-The two include files available for use with the Character Handling Routines 
+The two include files available for use with the Character Handling Routines
 are named {\bf sae\_par} and {\bf chr\_err} on UNIX
 machines, and reside in the directory {\bf /star/include}.
 
 When including these files within Fortran code, the Starlink convention
-is that the name in upper case with no path or extension is specified when 
-including these files within Fortran code, 
+is that the name in upper case with no path or extension is specified when
+including these files within Fortran code,
 {\em e.g.}
 \begin{quote}
 \begin{small}
@@ -662,7 +662,7 @@ including these files within Fortran code,
 \end{quote}
 Assuming that the software has been installed in the standard way and
 {\bf /star/bin} has been added to the environment variable
-{\bf PATH}, soft links with these upper-case names pointing to the required 
+{\bf PATH}, soft links with these upper-case names pointing to the required
 file are set up in the user's working directory by the the commands:
 \begin {quote}
 \begin{small}
@@ -672,7 +672,7 @@ file are set up in the user's working directory by the the commands:
 \end{verbatim}
 \end{small}
 \end {quote}
-Then to compile and link a non-ADAM program, the command line would be, 
+Then to compile and link a non-ADAM program, the command line would be,
 {\em e.g.}
 \begin {quote}
 \begin{verbatim}
@@ -682,9 +682,9 @@ Then to compile and link a non-ADAM program, the command line would be,
 The CHR library is included automatically when programs are linked using the
 ADAM application linking commands, {\bf alink} {\em etc}.
 
-If it is necessary to link explicitly with the ADAM version of CHR 
-({\em e.g.}\ to produce a shareable library), the 
-script {\bf chr\_link\_adam} is available in {\bf /star/bin}. 
+If it is necessary to link explicitly with the ADAM version of CHR
+({\em e.g.}\ to produce a shareable library), the
+script {\bf chr\_link\_adam} is available in {\bf /star/bin}.
 The link command might be:
 \begin {quote}
 \begin {small}
@@ -698,7 +698,7 @@ The link command might be:
 Several routines provided by CHR have implications for the efficiency of
 applications which make heavy use of them.
 These routines when used judiciously present no efficiency problem, but
-when they are used indiscriminantly they can have a marked effect on 
+when they are used indiscriminantly they can have a marked effect on
 execution times.
 
 \begin {description}
@@ -707,7 +707,7 @@ statements which can have an impact upon execution times when used heavily.
 Within an application it is only absolutely necessary to perform this type
 conversion once, when it is needed.
 If both representations are needed within an application, store both.
-\item [CHR\_LEN] Checking the used length of a given {\tt CHARACTER} 
+\item [CHR\_LEN] Checking the used length of a given {\tt CHARACTER}
 argument within every subroutine can have a significant impact upon execution
 times and should be avoided.
 For character strings which are not modified, CHR\_LEN need only be called
@@ -739,7 +739,7 @@ If both representations are needed within an application, store both.
 \appendix
 \section {Include Files \label{incl_sect}}
 There are two include files used by the Character Handling Routines
-to define global constants during compilation. 
+to define global constants during compilation.
 These files have the logical names SAE\_PAR and CHR\_ERR.
 The contents of each of these include files are given below.
 
@@ -770,8 +770,8 @@ The classifications are in alphabetical order as follows:
 \item[Decode Fortran data types] --
     Convert a character string into a Fortran data type and return its
     value.
-\item[Editing strings] -- 
-    Edit character strings by replacing, adding or removing defined 
+\item[Editing strings] --
+    Edit character strings by replacing, adding or removing defined
     substrings.
 \item[Encode Fortran data types] --
     Convert a Fortran data type into a character string representation of
@@ -856,10 +856,10 @@ hr/deg:min:sec.
 \item [CHR\_ITOH] -- Write an INTEGER value as a hexadecimal string.
 \item [CHR\_ITOO] -- Write an INTEGER value as an octal string.
 \item [CHR\_LTOC] -- Write a LOGICAL value into a string.
-\item [CHR\_PUTC] -- Put a CHARACTER string into another at a given position. 
-\item [CHR\_PUTD] -- Put a DOUBLE PRECISION value into a string at a given position. 
-\item [CHR\_PUTI] -- Put an INTEGER value into a string at a given position. 
-\item [CHR\_PUTL] -- Put a LOGICAL value into a string at a given position. 
+\item [CHR\_PUTC] -- Put a CHARACTER string into another at a given position.
+\item [CHR\_PUTD] -- Put a DOUBLE PRECISION value into a string at a given position.
+\item [CHR\_PUTI] -- Put an INTEGER value into a string at a given position.
+\item [CHR\_PUTL] -- Put a LOGICAL value into a string at a given position.
 \item [CHR\_PUTR] -- Put a REAL value into a string at a given position.
 \item [CHR\_RTOAN] -- Write a REAL value into a string as hr/deg:min:sec.
 \item [CHR\_RTOC] -- Write a REAL value into a string.
@@ -1613,7 +1613,7 @@ set.
       }
    }
    \sstnotes{
-      This subroutine has been implemenred for machines which use the 
+      This subroutine has been implemenred for machines which use the
       ASCII character set.
    }
 }
@@ -3516,8 +3516,8 @@ set.
 
 \subsection {Overview}
 
-This section discusses the portability of CHR, including the coding 
-standard adopted for CHR and a list of those routines which 
+This section discusses the portability of CHR, including the coding
+standard adopted for CHR and a list of those routines which
 may need to be modified when porting CHR to a new target machine.
 
 
@@ -3525,12 +3525,12 @@ may need to be modified when porting CHR to a new target machine.
 
 The standard of Fortran used for the coding of CHR is fundamentally
 Fortran 77, using the Starlink Fortran coding conventions described in SGP/16.
-Several common extensions to the Fortran 77 standard are used in source 
+Several common extensions to the Fortran 77 standard are used in source
 code for CHR, they are as follows:
 
 \begin {itemize}
 \item End-of-line comments using the ``!'' symbol;
-\item Symbolic subprogram names may be longer than six characters (but are 
+\item Symbolic subprogram names may be longer than six characters (but are
 always shorter than ten characters);
 \item Symbolic subprogram names include the ``\_'' symbol;
 \item Symbolic constant names may be longer than six characters (but are always
@@ -3540,14 +3540,14 @@ shorter than eleven characters);
 \end {itemize}
 
 The CHR library currently has no dependence upon any other package.
-To use CHR on any computer system porting effort is required only for those 
+To use CHR on any computer system porting effort is required only for those
 CHR routines which have operating system dependencies: these routines are
 listed in the following section.
 
 
 \subsection {Operating system specific routines}
 
-Several CHR routines make use of features specific to the operating system or 
+Several CHR routines make use of features specific to the operating system or
 language implementation.
 The names of these routines and their purpose are as follows:
 
@@ -3569,7 +3569,7 @@ The names of these routines and their purpose are as follows:
 \end {description}
 \end {quote}
 
-These routines may have to be rewritten specifically for each new 
+These routines may have to be rewritten specifically for each new
 operating system and Fortran implementation.
 
 
@@ -3647,7 +3647,7 @@ set.
 \section {Changes and New Features in Version 2.2}
 \subsection {Changes in behaviour of existing routines}
 The algorithm used in CHR\_RTOC and CHR\_DTOC has been changed --
-this may result in the returned string being different from that returned 
+this may result in the returned string being different from that returned
 from the previous versions.
 
 \subsection{Documentation Changes}

@@ -20,7 +20,7 @@ c
       integer i, j, k
       double precision dn, f, t1, t2
 c
-      if (nf .ne. uip(1)) call pda_qdrtf(n, x, nf, f, uip, urp, 
+      if (nf .ne. uip(1)) call pda_qdrtf(n, x, nf, f, uip, urp,
      :                                   pda_qdrtf)
       k = 0
       dn = n

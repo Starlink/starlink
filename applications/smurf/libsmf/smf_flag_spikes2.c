@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes2( smfData *data, unsigned char *quality, 
-*                       unsigned char mask, double thresh, 
+*     smf_flag_spikes2( smfData *data, unsigned char *quality,
+*                       unsigned char mask, double thresh,
 *                       size_t box, size_t *nflagged, int *status )
 
 *  Arguments:
@@ -23,7 +23,7 @@
 *     quality = unsigned char * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
-*        will have bit SMF__Q_SPIKE set on exit. 
+*        will have bit SMF__Q_SPIKE set on exit.
 *     mask = unsigned char (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
@@ -37,10 +37,10 @@
 *        Pointer to global status.
 
 *  Description:
-*     Each bolometer is processed independently. At each time slice, the 
-*     median value of the current bolometer in a 1D box centred on the time 
+*     Each bolometer is processed independently. At each time slice, the
+*     median value of the current bolometer in a 1D box centred on the time
 *     slice, and containing "box" time slices, is found. If the residual
-*     between the time slice value and the median value is greater than 
+*     between the time slice value and the median value is greater than
 *     "thresh" times the local noise level, the time slice is flagged as
 *     a spike within the quality mask.
 *
@@ -107,8 +107,8 @@
 
 #define FUNC_NAME "smf_flag_spikes2"
 
-void smf_flag_spikes2( smfData *data, unsigned char *quality, 
-                       unsigned char mask, double thresh, 
+void smf_flag_spikes2( smfData *data, unsigned char *quality,
+                       unsigned char mask, double thresh,
                        size_t box, size_t *nflagged, int *status ){
 
 /* Local Variables */
@@ -171,7 +171,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
      errRep( " ", FUNC_NAME ": No valid QUALITY array was provided", status );
    }
 
-/* Get a pointer to the data array to use. Report an error if we have 
+/* Get a pointer to the data array to use. Report an error if we have
    no data array. */
    dat = data->pntr[0];
    if( !dat && *status == SAI__OK ) {
@@ -186,7 +186,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
       errRep( " ", FUNC_NAME ": Can't find spikes: thresh=^THRESH, must be > 0",
               status);
    }
- 
+
 /* Check the supplied box value is valid. */
    if( box <= 2 && *status == SAI__OK ) {
       *status = SAI__ERROR;
@@ -194,7 +194,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
       errRep( " ", FUNC_NAME ": Can't find spikes: box=^BOX, must be > 2",
               status);
    }
- 
+
 /* Obtain data dimensions, and the stride between adjacent elements on
    each axis (bolometer and time). Use the existing data order to avoid
    the cost of re-ordering. */
@@ -228,13 +228,13 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
 
 /* Initialise pointers to the first data value and quality value for the
    first bolometer. */
-   pdat0 = dat; 
+   pdat0 = dat;
    pqua0 = qua;
 
 /* Initialise pointers to the last data value and quality value for the first
    bolometer. */
-   pdat1 = dat + ( ntime - 1 )*tstride; 
-   pqua1 = qua + ( ntime - 1 )*tstride; 
+   pdat1 = dat + ( ntime - 1 )*tstride;
+   pqua1 = qua + ( ntime - 1 )*tstride;
 
 /* We process each bolometer in turn. */
    for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
@@ -277,7 +277,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
    box. Check we have not reached the end of the noise box. */
             if( pn - noisebox < (int) box ) {
 
-/* Store the value in the next element of the noise box, and if the value is 
+/* Store the value in the next element of the noise box, and if the value is
    good, update the running sums used for calculating the noise level. */
                if( ( *(pn++) = pw2[-1] ) != VAL__BADD ) {
                   nsum += *pdat;
@@ -292,7 +292,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
             pqua += tstride;
          }
 
-/* Calculate the standard deviation of the values in the initial noise box. 
+/* Calculate the standard deviation of the values in the initial noise box.
    We require at least three values. */
          if( nn > 3 ) {
             noise = ( nsum2 - (nsum*nsum)/nn )/( nn - 1 );
@@ -302,7 +302,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                noise = VAL__BADD;
             }
          } else {
-            noise = VAL__BADD; 
+            noise = VAL__BADD;
          }
 
 /* Store the index within the noise box at which to store the next value
@@ -316,7 +316,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
          iold = 0;
 
 /* Note the number of good values stored in the filter box. */
-         inbox = (int)( pw1 - w1 );          
+         inbox = (int)( pw1 - w1 );
 
 /* If there are any bad data values, pad out the w1 array with bad
    values. */
@@ -327,7 +327,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
 
 /* Get pointers to the data value and quality value at the centre of the
    first filter box. */
-         pdat = pdat0 + (box/2)*tstride; 
+         pdat = pdat0 + (box/2)*tstride;
          pqua = pqua0 + (box/2)*tstride;
 
 /* Initialise the median value in the previous box  to "unknown". */
@@ -341,9 +341,9 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
 /*  Assume this time slice is not a spike. */
             spike = 0;
 
-/* If the current sorted filter box contains an odd number of good values, 
-   use the central good value as the median value. If the box contains an 
-   even number of good values, use the mean of the two central values as 
+/* If the current sorted filter box contains an odd number of good values,
+   use the central good value as the median value. If the box contains an
+   even number of good values, use the mean of the two central values as
    the median value. If the box is empty use VAL__BADD. */
             if( inbox == 0 ) {
                median = VAL__BADD;
@@ -357,11 +357,11 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
             }
 
 /* If we have all the values we need, we can check for a spike. */
-            if( !( *pqua & mask ) && *pdat != VAL__BADD && 
+            if( !( *pqua & mask ) && *pdat != VAL__BADD &&
                  median != VAL__BADD && noise != VAL__BADD ) {
 
-/* The median is a robust but intrinsically noisey estimator of the expected 
-   value. So we smooth the median values a bit by using the mean of the 
+/* The median is a robust but intrinsically noisey estimator of the expected
+   value. So we smooth the median values a bit by using the mean of the
    current median and the previous median. */
                if( lmedian != VAL__BADD ) {
                   umedian = 0.5*( median + lmedian );
@@ -369,33 +369,33 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                   umedian = median;
                }
 
-/* If the central value in the filter box deviates from the median by more than 
-   "thresh" times the current noise estimate, flag it as a spike. Note, we can 
-   modify the quality array directly because we will not be re-reading the value 
-   being modified (all the reading is done at the leading edge of the filter 
+/* If the central value in the filter box deviates from the median by more than
+   "thresh" times the current noise estimate, flag it as a spike. Note, we can
+   modify the quality array directly because we will not be re-reading the value
+   being modified (all the reading is done at the leading edge of the filter
    box). */
                if( fabs( *pdat - umedian ) > thresh*noise ) {
                  *pqua |= SMF__Q_SPIKE;
                   nflag++;
                   spike = 1;
-               } 
+               }
             }
 
-/* Save the median in the current box so that we can use it to smooth the 
-   next box. */               
+/* Save the median in the current box so that we can use it to smooth the
+   next box. */
             lmedian = median;
 
 /* Now move the filter box on by one time sample so that we are ready for
    the next "itime" value. Do not do this if we have just done the last
    itime value. */
-            if( itime < lasttime ) { 
+            if( itime < lasttime ) {
 
-/* Get the data value for the time slice that is about to enter the filter 
+/* Get the data value for the time slice that is about to enter the filter
    box. Set it bad if it is flagged in the quality array. */
                dnew = pdat[ newstride ];
                if( pqua[ newstride ] & mask ) dnew = VAL__BADD;
 
-/* Get the data value for the time slice that is about to leave the filter 
+/* Get the data value for the time slice that is about to leave the filter
    box. */
                dold = w2[ iold ];
 
@@ -408,8 +408,8 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
 /* If the new value to be added into the box is good... */
                if( dnew != VAL__BADD ) {
 
-/* Find the index (iadd) within the w1 box at which to store the new 
-   value so as to maintain the ordering of the values in the box. Could do 
+/* Find the index (iadd) within the w1 box at which to store the new
+   value so as to maintain the ordering of the values in the box. Could do
    a binary chop here, but the box size is presumably going to be very
    small and so it's probably not worth it. At the same time, look for
    the value that is leaving the box (if it is not bad). */
@@ -427,7 +427,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                            if( iremove != -1 ) break;
                         }
                      }
-                  
+
                   } else {
                      for( iadd = 0; iadd < (int) inbox; iadd++ ) {
                         if( w1[ iadd ] >= dnew ) break;
@@ -438,8 +438,8 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
    to the end. */
                   if( iadd == -1 ) iadd = inbox;
 
-/* If the value being removed is bad, shuffle all the good values greater 
-   than the new value up one element, and increment the number of good 
+/* If the value being removed is bad, shuffle all the good values greater
+   than the new value up one element, and increment the number of good
    values for this bolometer box. */
                   if( iremove == -1 ) {
                      for( ibox = inbox; (int) ibox > iadd; ibox-- ) {
@@ -447,8 +447,8 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                      }
                      inbox++;
 
-/* If the value being removed is good and the value being added is greater 
-   than the value being removed, shuffle all the intermediate values down 
+/* If the value being removed is good and the value being added is greater
+   than the value being removed, shuffle all the intermediate values down
    one element within the box. */
                   } else if( (int) iadd > iremove ) {
                      for( ibox = iremove; (int) ibox < iadd - 1; ibox++ ) {
@@ -457,7 +457,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                      iadd--;
 
 /* If the value being removed is good and the value being added is less
-   than or equal to the value being removed, shuffle all the intermediate 
+   than or equal to the value being removed, shuffle all the intermediate
    values up one element within the box. */
                   } else {
                      for( ibox = iremove; (int) ibox > iadd; ibox-- ) {
@@ -467,11 +467,11 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
 
 /* Store the new value in the box. */
                   w1[ iadd ] = dnew;
-   
+
 /* If the value being added is bad but the value being removed is good... */
                } else if( dold != VAL__BADD ){
-   
-/* Find the index (iremove) within the w1 box at which is stored the value 
+
+/* Find the index (iremove) within the w1 box at which is stored the value
    that is leaving the box. */
                   iremove = -1;
                   for( iremove = 0; iremove < (int) inbox; iremove++ ) {
@@ -490,7 +490,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                   inbox--;
                }
 
-/* Get the new value (the central value in the filter box) to add to the 
+/* Get the new value (the central value in the filter box) to add to the
    noise box. If the central value was found to be a spike, do not
    include it in the noise box as it would upset the estimate of the
    local noise. */
@@ -499,12 +499,12 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                } else {
                   dnew = *pdat;
                   if( *pqua & mask ) dnew = VAL__BADD;
-               }    
+               }
 
 /* Get the old value to remove from the noise box. */
                dold = noisebox[ inoise ];
 
-/* If the value being added is good, add it into the running sums used to 
+/* If the value being added is good, add it into the running sums used to
    calculate the standard deviation of the values in the local noise box. */
                if( dnew != VAL__BADD ) {
                   nsum += dnew;
@@ -512,7 +512,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                   nn++;
                }
 
-/* If the value being removed is good, remove it from the running sums used 
+/* If the value being removed is good, remove it from the running sums used
    to calculate the standard deviation of the values in the local noise box. */
                if( dold != VAL__BADD ) {
                   nsum -= dold;
@@ -520,7 +520,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                   nn--;
                }
 
-/* Calculate the standard deviation of the values in the new noise box. 
+/* Calculate the standard deviation of the values in the new noise box.
    We require at least three values. */
                if( nn > 3 ) {
                   noise = ( nsum2 - (nsum*nsum)/nn )/( nn - 1 );
@@ -530,7 +530,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
                      noise = VAL__BADD;
                   }
                } else {
-                  noise = VAL__BADD; 
+                  noise = VAL__BADD;
                }
 
 /* Store the new value in the noise box, over-writing the oldest value,
@@ -542,20 +542,20 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
 
 /* Get pointers to the next central data and quality value for the current
    bolometer. */
-            pdat += tstride; 
+            pdat += tstride;
             pqua += tstride;
          }
       }
 
 /* Get pointers to the first data value and quality value for the next
    bolometer. */
-      pdat0 += bstride; 
+      pdat0 += bstride;
       pqua0 += bstride;
 
 /* Get pointers to the last data value and quality value for the next
    bolometer. */
-      pdat1 += bstride; 
-      pqua1 += bstride; 
+      pdat1 += bstride;
+      pqua1 += bstride;
    }
 
 /* Free resources. */

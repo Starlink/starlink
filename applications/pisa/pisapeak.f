@@ -102,7 +102,7 @@
 *     11-MAR-1991 (PDRAPER):
 *        Original version.
 *     07-SEP-2004 (PDRAPER):
-*        Changed to use CNF_PVAL. Look at that previous date! 
+*        Changed to use CNF_PVAL. Look at that previous date!
 *        Boy never thought I'd still be in this job!
 *     {enter_changes_here}
 
@@ -110,7 +110,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -156,7 +156,7 @@
 *  Work out the array size.
       IDIM( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
       IDIM( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
-      
+
 *  Get the model parameters.
       CALL PAR_GET0R( 'GSIGM', GSIGM, STATUS )
       CALL PAR_GET0R( 'CROSS', CROSS, STATUS )
@@ -179,10 +179,10 @@
 
 *  Do the work, derive model radius, model intensity peak ratios and
 *  transform the input data.
-      CALL PEAKN( %VAL( CNF_PVAL( IPIN ) ), IDIM( 1 ), IDIM( 2 ), 
-     :            LBND( 1 ), LBND( 2 ), GSIGM, CROSS, COMIX, BACK, 
+      CALL PEAKN( %VAL( CNF_PVAL( IPIN ) ), IDIM( 1 ), IDIM( 2 ),
+     :            LBND( 1 ), LBND( 2 ), GSIGM, CROSS, COMIX, BACK,
      :            THRESH, IFS, IFO, STATUS )
-      
+
 999   CONTINUE
 
 *  Release the input NDF.

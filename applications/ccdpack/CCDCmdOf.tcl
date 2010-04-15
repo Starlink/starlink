@@ -20,9 +20,9 @@
 #
 #     The current implementation of this relies on knowledge of how the
 #     window names are constructed from command names by CCDTkWidget and
-#     CCDCcdWidget.  That information ought ideally to be entirely 
+#     CCDCcdWidget.  That information ought ideally to be entirely
 #     private to the Ccd::base class, but I don't see how to get round it.
-#     The whole approach is messy, and forced by having to upgrade a 
+#     The whole approach is messy, and forced by having to upgrade a
 #     lot of code from Itcl2/Tcl7 to Itcl3/Tcl8.
 
 #  Arguments:

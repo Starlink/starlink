@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL CON_DIPRD (UNIT, NPTS, NBREAK, BREAK, NMAX, WAVE, FLUX, 
+*      CALL CON_DIPRD (UNIT, NPTS, NBREAK, BREAK, NMAX, WAVE, FLUX,
 *    :                      WAVE1, FLUX1, NCOR, STATUS )
 
 *  Description:
@@ -21,9 +21,9 @@
 *     contain `breaks' where one or more bad data elements have been
 *     removed. This routine estimates how many values have been removed
 *     from the initial data by comparing the gap in the wavelength data
-*     to the wavelength increment within the previous `good patch' of 
+*     to the wavelength increment within the previous `good patch' of
 *     data. At least one bad pixel is inserted at every break point.
-*     The input wavelength and flux data are always of Fortran REAL 
+*     The input wavelength and flux data are always of Fortran REAL
 *     type,  the output data arrays are of HDS type '_REAL'.
 
 *  Arguments:
@@ -52,7 +52,7 @@
 
 *  Prior Requirements:
 *     The Dipso file must have been opened, and the Title and break
-*     information read. 
+*     information read.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council. All
@@ -118,7 +118,7 @@
       INTEGER IB                ! Loop variable
       INTEGER IFIRST            ! Index of first good datum in a break
       INTEGER ILAST             ! Index of last good datum in a break
-      INTEGER IOS               ! I/O status  
+      INTEGER IOS               ! I/O status
       INTEGER KBAD              ! Index in padded array
       INTEGER KOUNT             ! Loop variable
       INTEGER LASTBR            ! Size of last break
@@ -175,14 +175,14 @@
                IF ( LASTBR .GT. 1 ) THEN
                   DELX = ( WAVE( IFIRST - 1) -
      :                     WAVE( IFIRST - LASTBR ) ) / ( LASTBR - 1 )
-                  
+
                   NADD = NINT( ( WAVE( IFIRST ) - WAVE( IFIRST - 1 ) ) /
      :                   DELX ) - 1
                   IF ( NADD .LT. 1 ) NADD = 1
                ELSE
                   NADD = 1
                END IF
-               
+
 *  Keep track of how many bad pixels have been inserted.
                NADDSM = NADDSM + NADD
 
@@ -215,9 +215,9 @@
          CALL ERR_REP( 'CON_DIPRD_WORKSPACE',
      :                 'Ran out of workspace', STATUS )
       END IF
-   
+
   999 CONTINUE
- 
+
 *  Report any I/O error.
       IF ( IOS .NE. 0 ) THEN
          STATUS = SAI__ERROR

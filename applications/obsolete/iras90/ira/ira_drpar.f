@@ -24,7 +24,7 @@
 *     specified by LBND and UBND, and it is assumed that the world
 *     coordinate system within the zone corresponds to image (or pixel)
 *     coordinates.  Only the section of the parallel which lies within
-*     the zone is displayed.  
+*     the zone is displayed.
 *
 *     Various items of information about the plotted curve can be
 *     obtained once the plot has been produced using routine IRA_DRBRK.
@@ -46,7 +46,7 @@
 *        abbreviation will do. This need not be the same as the sky
 *        coordinate system stored in the astrometry structure
 *        identified by IDA. See ID/2 section "Sky Coordinates" for more
-*        information. A blank value will cause the system associated 
+*        information. A blank value will cause the system associated
 *        with IDA to be used.
 *     LBND( 2 ) = REAL (Given)
 *        Lower world coordinate bounds for each axis defining the
@@ -170,9 +170,9 @@
       ACM_M3IN = MAX( -IRA__TWOPI, MIN( IRA__TWOPI, INCA ) )
       ACM_M3ID = IDA
 
-*  If a blank SCS was given, use the value associated with IDA.      
+*  If a blank SCS was given, use the value associated with IDA.
       IF( SCS .EQ. ' ' ) THEN
-         ACM_M3SC = ACM_SCS( IDA ) 
+         ACM_M3SC = ACM_SCS( IDA )
       ELSE
          ACM_M3SC = SCS
       END IF

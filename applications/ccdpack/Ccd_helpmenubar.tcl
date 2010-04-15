@@ -143,7 +143,7 @@
          sethelp Help ccdpack OnHelp
 
 #  And on the File menu.
-         if { [info exists Buttons(File)] } { 
+         if { [info exists Buttons(File)] } {
             sethelp File ccdpack OnFile
          }
       }

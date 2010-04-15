@@ -17,17 +17,17 @@ C
 C     Command keywords -  None
 C
 C                                               KS / AAO 10th Oct 1986
-C     Modified:  
+C     Modified:
 C
 C     24th Oct 1986  KS / AAO.  Format code 2 data now written one pair
 C                    of values to a line.
 C     27th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs
-C                    changed.  Now uses DYN_ routines for 
+C                    changed.  Now uses DYN_ routines for
 C                    dynamic-memory handling.
-C     21st Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs 
+C     21st Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C     27th Jun 1993  KS / AAO. Now uses DSA_OPEN_TEXT_FILE if possible
-C                    and uses DSA_GET_LU instead of VMS routines. Unused 
+C                    and uses DSA_GET_LU instead of VMS routines. Unused
 C                    variables removed.
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
@@ -47,7 +47,7 @@ C
 C
 C     Local variables
 C
-      CHARACTER    COMMENT*80    ! 
+      CHARACTER    COMMENT*80    !
       CHARACTER    DATE*20       ! The current date
       CHARACTER    DAY*9         ! The current day
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
@@ -104,7 +104,7 @@ C
       CALL DSA_MAP_DATA('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Check that there is an X array.  
+C     Check that there is an X array.
 C
       CALL DSA_SEEK_AXIS('SPECT',1,XEXIST,STATUS)
       CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,STATUS)
@@ -144,7 +144,7 @@ C
       CALL PAR_RDCHAR('FILE',' ',FILE)
       IF ( PAR_ABORT() ) GO TO 500
 C
-C     Create file, format etc depending on type code. For the formatted 
+C     Create file, format etc depending on type code. For the formatted
 C     files, use DSA_OPEN_TEXT_FILE, which avoids the need for system
 C     specific OPEN keywords (particulalry on VAXes).
 C
@@ -260,13 +260,13 @@ C     (>) XDATA  (Real array XDATA(NX)) The wavelength data array.
 C     (>) ZDATA  (Real array ZDATA(NX)) The flux data array.
 C     (<) STATUS (Integer) Status code.  0 => OK, non-zero values are
 C                Fortran I/O error codes.
-C   
+C
 C     Common variables used - None
 C
 C     Subroutines / functions used - None
 C
 C                                        KS / AAO 10th Oct 1986
-C     Modified:  
+C     Modified:
 C
 C     24th Oct 1986.  KS / AAO.  Format code 2 data now written one pair
 C                     of values to a line.
@@ -287,7 +287,7 @@ C
       IF (ICODE.EQ.0) THEN
          WRITE (LU,IOSTAT=STATUS) (XDATA(I),ZDATA(I),I=1,NX)
       ELSE IF (ICODE.EQ.1) THEN
-         WRITE (LU,'(4(F8.3,E10.3))',IOSTAT=STATUS) 
+         WRITE (LU,'(4(F8.3,E10.3))',IOSTAT=STATUS)
      :                                    (XDATA(I),ZDATA(I),I=1,NX)
       ELSE
          DO I=1,NX

@@ -291,4 +291,4 @@
       CALL EMS_REP( 'GNS_1INITI_DBN4',
      :              'GNS database file has invalid format', STATUS )
   999 CONTINUE
-      END       
+      END

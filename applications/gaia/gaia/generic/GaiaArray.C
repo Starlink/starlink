@@ -2669,7 +2669,7 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
     /*  If we have values to select then do some work to speed up access.
      *  Create a vector with indices 0-n, where n is the maximum mask value
      *  given and set if the related value is set, using this we can test a
-     *  value by a simple index lookup. 
+     *  value by a simple index lookup.
      *
      *  Note if a single value of -1 is given that means invert the selection
      *  of BAD values so that all non-masked regions are selected, some masks

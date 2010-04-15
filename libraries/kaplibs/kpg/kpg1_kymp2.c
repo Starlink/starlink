@@ -6,7 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 
-/* Local Constants: */ 
+/* Local Constants: */
 #define MAX_COMPLEN 100
 
 void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
@@ -25,8 +25,8 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *     void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status );
 
 *  Description:
-*     This is a service function for kps1Kymp1. It parses the supplied 
-*     "keyword = value" string into a keyword and value. It then parses the 
+*     This is a service function for kps1Kymp1. It parses the supplied
+*     "keyword = value" string into a keyword and value. It then parses the
 *     keyword into a list of dot-separated component names. It then adds
 *     the value into the supplied KeyMap at the correct point.
 
@@ -41,13 +41,13 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *  Notes:
 *     - If the value is a comma-separated list of values, enclosed in
 *     parentheses, then a vector entry will be added to the KeyMap.
-*     Otherwise, a scalar entry will be created. 
-*     - To include a comma or a closing parenthesis literally in a vector 
+*     Otherwise, a scalar entry will be created.
+*     - To include a comma or a closing parenthesis literally in a vector
 *     value, preceed it with a backslash.
-*     - If the string has the form "keyword=<def>" (case insensitive), then 
+*     - If the string has the form "keyword=<def>" (case insensitive), then
 *     any entry for the specified keyword is removed from the KeyMap.
 *     - Component names must contain only alphanumerical characters,
-*     underscores, plus and minus signs [a-zA-Z0-9_+\-], 
+*     underscores, plus and minus signs [a-zA-Z0-9_+\-],
 *     - Any lower case characters contained in a component name will be
 *     translated to the upper case equivalent.
 
@@ -61,12 +61,12 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -82,7 +82,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *        Original version.
 *     17-MAY-2006 (DSB):
 *        Report an error if the value string contains any isolated equals
-*        signs. 
+*        signs.
 *     13-JUN-2008 (DSB):
 *        Add support for vector values.
 *     29-SEP-2009 (EC):
@@ -97,7 +97,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *-
 */
 
-/* Local Variables: */ 
+/* Local Variables: */
    AstKeyMap *compmap = NULL;   /* KeyMap holding components of 1st component */
    AstObject *obj = NULL;       /* Pointer to generic AST Object */
    char *d = NULL;              /* Pointer to next char to read */
@@ -108,8 +108,8 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
    const char **vector = NULL;  /* Pointer to array of vector elements */
    const char *c = NULL;        /* Pointer to next char to examine */
    const char *cend = NULL;     /* Pointer to 1st char after component name */
-   const char *dot = NULL;      /* Pointer to 1st dot */   
-   const char *equals = NULL;   /* Pointer to 1st equals sign */   
+   const char *dot = NULL;      /* Pointer to 1st dot */
+   const char *equals = NULL;   /* Pointer to 1st equals sign */
    const char *start = NULL;    /* Pointer to start of next vector element */
    int clen;                    /* Length of component name */
    int ivec;                    /* Index of vector element */
@@ -120,7 +120,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
    if( *status != SAI__OK ) return;
 
 /* Locate the first equals sign. */
-   equals = strchr( string, '=' );  
+   equals = strchr( string, '=' );
 
 /* Report an error if no equals sign was found. */
    if( !equals ) {
@@ -140,7 +140,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
    }
 
 /* Locate the first dot. */
-   dot = strchr( string, '.' );  
+   dot = strchr( string, '.' );
 
 /* The end of the first component is the earlier of the first equals sign
    and the first dot. */
@@ -198,17 +198,17 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
       if( *c == '(' ) {
 
 /* Loop reading elements from the vector. */
-         veclen = 0;  
-         while( 1 ) {      
+         veclen = 0;
+         while( 1 ) {
 
 /* Search for the next unescaped comma, or the next unescaped closing
    parenthesis, or the end of the string. This marks the end of the vector
    element. */
             start = ++c;
-            while( ( *(++c) != ',' || c[-1] == '\\' ) && 
+            while( ( *(++c) != ',' || c[-1] == '\\' ) &&
                    ( *c != ')' || c[-1] == '\\' ) && *c );
 
-/* Store a null terminated copy of the vector element. */      
+/* Store a null terminated copy of the vector element. */
             vector = astGrow( vector, veclen + 1, sizeof( char *) );
             vallen = c - start;
             val = astStore( NULL, start, vallen + 1 );
@@ -222,7 +222,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
                while( *(++d) ) {
                   if( *d == ',' || *d == ')' ) e--;
                   *(e++) = *d;
-               }               
+               }
                *e = 0;
 
 /* Report an error if then end of the string has been reached without
@@ -240,10 +240,10 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
                      *status = SAI__ERROR;
                      msgSetc( "S", string );
                      errRep( "KPG1KYMP2_ERR3", "Unexpected text following \")\" in \"^S\".", status );
-                  } 
+                  }
                   break;
                }
-            }      
+            }
          }
 
 /* Store the vector in the KeyMap. */
@@ -254,7 +254,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
             for( ivec = 0; ivec < veclen; ivec++ ) {
                vector[ ivec ] = astFree( vector[ ivec ] );
             }
-            vector = astFree( vector );         
+            vector = astFree( vector );
          }
 
 /* If the value string is "<def>" (case insensitive) then remove any
@@ -278,7 +278,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
       } else {
          compmap = astKeyMap( "" );
          astMapPut0A( keymap, comp, compmap, NULL );
-      } 
+      }
 
 /* Call this function recursively to store the component value. */
       kpg1Kymp2( dot + 1, compmap, status );

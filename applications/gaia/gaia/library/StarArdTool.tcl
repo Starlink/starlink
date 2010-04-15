@@ -46,15 +46,15 @@
 #
 #     Sets the name of the GaiaImageCtrl object used to display the
 #     image.
-# 
+#
 #        -selected_colour colour
 #
-#     Sets the colour of regions when they are selected. Default is 
+#     Sets the colour of regions when they are selected. Default is
 #     white.
 #
 #        -deselected_colour colour
 #
-#     Sets the colour of regions when they are not selected. Default is 
+#     Sets the colour of regions when they are not selected. Default is
 #     green.
 #
 #        -continuous_updates boolean
@@ -383,8 +383,8 @@ itcl::class gaia::StarArdTool {
    }
 
    #  Temporarily disable all the ARD region buttons.
-   method disable_types_frame {} { 
-      if { $Buttonbox_ != {} } { 
+   method disable_types_frame {} {
+      if { $Buttonbox_ != {} } {
          foreach i [$object_list_ known_types {}] {
             set l [string tolower $i]
             $Buttonbox_.$l configure -state disabled
@@ -393,8 +393,8 @@ itcl::class gaia::StarArdTool {
    }
 
    #  And enable all the ARD region buttons.
-   method enable_types_frame {} { 
-      if { $Buttonbox_ != {} } { 
+   method enable_types_frame {} {
+      if { $Buttonbox_ != {} } {
          foreach i [$object_list_ known_types {}] {
             set l [string tolower $i]
             $Buttonbox_.$l configure -state normal

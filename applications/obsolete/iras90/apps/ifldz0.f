@@ -27,8 +27,8 @@
 *       by 10 arcminutes between centres. The plates are numbered in
 *       'rows', where each row covers an area of 10 arcminutes of latitude.
 *       The lowest plate number on each row is centered on 0h 0m 0s longitude.
-*       Obviously, the nearer the equator, the more plates there are in the 
-*       row. By calculating which row the plate lies on, and then how many 
+*       Obviously, the nearer the equator, the more plates there are in the
+*       row. By calculating which row the plate lies on, and then how many
 *       plates along from 0h, the plate number can be determined.
 
 *  Parameters:
@@ -71,19 +71,19 @@
 *-
 
 *  No implicit typing
-      IMPLICIT NONE  
+      IMPLICIT NONE
 
 *  Include various constants used by ISFIELD
       INCLUDE 'IRA_PAR'
       INCLUDE 'IRA_ERR'
-      INCLUDE 'SAE_PAR' 
+      INCLUDE 'SAE_PAR'
 
 
 c  Parameters
-      DOUBLEPRECISION LON,    ! Input longitude, in radians 
+      DOUBLEPRECISION LON,    ! Input longitude, in radians
      *                LAT     ! Input latitude, in radians
 
-                              
+
       INTEGER PLATE (4)       ! The desired plate number
       INTEGER NUMPLT          ! Number of plates found (0 - 4)
 
@@ -113,14 +113,14 @@ c  Internal variables
 
       DOUBLEPRECISION CENROW ! The DEC of the centre of the current row
 
-      DOUBLEPRECISION CNTRA(2,2), ! The RA of the centre of each plate per row 
+      DOUBLEPRECISION CNTRA(2,2), ! The RA of the centre of each plate per row
      *                CNTDEC(2)   ! The DEC of the centre of each row
-   
+
       DOUBLEPRECISION SPAN,   ! The size of the centre to the edge of the plate
      *                OFFBAK, ! Temporary offset
      *                RABAK,  ! Temporary RA
      *                CENTRE, ! The centre RA, offset by SEP2
-     *                OVERLAP ! The overlap of the last plate in each row 
+     *                OVERLAP ! The overlap of the last plate in each row
 
       LOGICAL INSIDE          ! Whether a point lies in a given plate or not
 
@@ -129,14 +129,14 @@ c  Internal variables
 c  Set up the data
 c  The number of plates in each row
       DATA PLAROW / 1, 8, 14, 19, 24, 28, 32, 35, 36, 36, 36, 35,
-     *              32, 28, 24, 19, 14, 8, 1 /   
+     *              32, 28, 24, 19, 14, 8, 1 /
 
 c  The plate number of the first plate in each row
       DATA STAROW / 1, 2, 10, 24, 43, 67, 95, 127, 162, 198, 234,
      *              270, 305, 337, 365, 389, 408, 422, 430 /
 
 c  Widths in arcminutes of the plate centres in each row
-      DATA WIDTHS / 360.0, 45.0, 26.0, 19.0, 15.0, 13.0, 11.5, 10.5, 
+      DATA WIDTHS / 360.0, 45.0, 26.0, 19.0, 15.0, 13.0, 11.5, 10.5,
      *              10.0, 10.0, 10.0, 10.5, 11.5, 13.0, 15.0, 19.0,
      *              26.0, 45.0, 360.0 /
 
@@ -180,7 +180,7 @@ c  Check that 1 <= ROW(1) <= 19
 
 c  Abort if the row is out of range
         STATUS = SAI__ERROR
-        CALL ERR_REP('IFLD_BADR', 
+        CALL ERR_REP('IFLD_BADR',
      *       'Arithmetic screwed up calculating the row.', STATUS)
         GOTO 999
       ENDIF
@@ -214,7 +214,7 @@ c  Calculate the span in degrees of each plate in row ROW
 c  Some rows do not have have a number of plates that divides into 360.
 c  This means the last plate in each row is not quite at the same seperation
 c  with the first plate, as with all the other plates on the row
-        OVERLAP = (SEP * PLAROW(ROW(I))) - 360.0 
+        OVERLAP = (SEP * PLAROW(ROW(I))) - 360.0
 
 c  Calculate half of the span of each plate
         SEP2 = SEP / 2.0
@@ -233,7 +233,7 @@ c  This is the best offset for the current row
         OFFSET(I,1) = INT (RA2/SEP)
 
 c  Check the validity of OFFSET
-        IF ((OFFSET(I,1) .LT. 0) .OR. 
+        IF ((OFFSET(I,1) .LT. 0) .OR.
      *         (OFFSET(I,1) .GE. PLAROW(ROW(I)))) THEN
 
 c  Abort if an error calculating the offset
@@ -248,7 +248,7 @@ c  Calculate the RA of the centre of the plate
         CENTRE = CNTRA(I,1) + SEP2
 
 c  If the current row is not the top or bottom row, there is a chance
-c  that the point also lies on a plate to the left or the right of the 
+c  that the point also lies on a plate to the left or the right of the
 c  current one.
         IF (ROW(I) .NE. 1 .AND. ROW(I) .NE. 19) THEN
 
@@ -257,10 +257,10 @@ c  If at all, point also lies on right hand plate
               OFFSET(I,2) = OFFSET(I,1) - 1
 
 c  Check for looping round
-              IF (OFFSET(I,2) .LT. 0.0) 
+              IF (OFFSET(I,2) .LT. 0.0)
      +             OFFSET(I,2) = PLAROW(ROW(I)) -1
               CNTRA(I,2) = OFFSET(I,2) * SEP
- 
+
           ELSE
 
 c  Do the same for the left hand plate
@@ -270,7 +270,7 @@ c  Check for looping around
             IF (OFFSET(I,2) .GE. PLAROW(ROW(I)))
      +             OFFSET(I,2) = 0
             CNTRA(I,2) = OFFSET(I,2) * SEP
-         
+
           ENDIF
         ENDIF
 
@@ -285,7 +285,7 @@ c  and count how many plates
 
 c  If the offset at this row is set, this check if this is a valid plate
           IF (OFFSET(I,J) .NE. -1) THEN
-            CALL IFLDZ3(CNTRA(I,J), CNTDEC(I), RA, DEC, 
+            CALL IFLDZ3(CNTRA(I,J), CNTDEC(I), RA, DEC,
      +                  INSIDE, STATUS)
             IF (INSIDE) THEN
               NUMPLT = NUMPLT + 1

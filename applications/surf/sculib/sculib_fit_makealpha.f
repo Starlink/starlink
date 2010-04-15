@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_FIT_MAKEALPHA (XISQ_ROUTINE, N, A, ALPHA, 
+      SUBROUTINE SCULIB_FIT_MAKEALPHA (XISQ_ROUTINE, N, A, ALPHA,
      :  STATUS)
 *+
 *  Name:
@@ -14,7 +14,7 @@
 *     Method'.
 *
 *        The routine does this by calling routines SCULIB_FIT_D2XISQ_DAJ2
-*     and SCULIB_FIT_D2XISQ_DAJK for each element required. The routine will 
+*     and SCULIB_FIT_D2XISQ_DAJK for each element required. The routine will
 *     only execute if entered with good status.
 
 *  Invocation:
@@ -82,7 +82,7 @@
 *  Local variables:
       DOUBLE PRECISION D2XISQ_DAJK ! differential in chi-squared with variations
                                    ! in A(J) and A(K)
-      DOUBLE PRECISION D2XISQ_DAJ2 ! 2nd differential in chi-squared with 
+      DOUBLE PRECISION D2XISQ_DAJ2 ! 2nd differential in chi-squared with
                                    ! variation in A(J)
       INTEGER J                    ! DO loop variable
       INTEGER K                    ! DO loop variable
@@ -114,7 +114,7 @@
          ELSE IF (ALPHA(J,J) .LT. 0.0D0) THEN
 
             ALPHA (J,J) = -ALPHA (J,J)
-            
+
             IF (J .GT. 1) THEN
                DO K = 1, J-1
                   ALPHA (J,K) = 0.0D0

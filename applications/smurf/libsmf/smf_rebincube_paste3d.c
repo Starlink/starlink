@@ -15,11 +15,11 @@
 *     C function
 
 *  Invocation:
-*     void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, 
-*                                 dim_t iv0, dim_t nxy, double wgt, 
-*                                 int genvar, double invar, float *ddata, 
+*     void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab,
+*                                 dim_t iv0, dim_t nxy, double wgt,
+*                                 int genvar, double invar, float *ddata,
 *                                 float *data_array, float *var_array,
-*                                 double *wgt_array, int *nused, 
+*                                 double *wgt_array, int *nused,
 *                                 int *status );
 
 *  Arguments:
@@ -29,19 +29,19 @@
 *        Number of elements in output cube.
 *     spectab = int * (Given)
 *        This array should have "nchan" elements, and each element should
-*        hold the integer index (zero-based) of the nearest neighbouring 
-*        output channel. A value of -1 should flag input channels that do 
-*        not have any corresponding output channel. 
+*        hold the integer index (zero-based) of the nearest neighbouring
+*        output channel. A value of -1 should flag input channels that do
+*        not have any corresponding output channel.
 *     iv0 = dim_t (Given)
 *        The index within the output cube of the pixel corresponding to
-*        channel zero of the output spectrum into which the input spectrum 
+*        channel zero of the output spectrum into which the input spectrum
 *        is to be pasted.
 *     nxy = dim_t (Given)
 *        Number of elements in one spatial plane of the output cube.
 *     wgt = double (Given)
 *        The weight for the input spectrum.
 *     genvar = int (Given)
-*        Indicates how the output variances should be calculated: 
+*        Indicates how the output variances should be calculated:
 *           0 = do not calculate any output variances
 *           1 = use spread of input data values
 *           2 = use system noise temperatures
@@ -54,18 +54,18 @@
 *        include the data from the supplied input spectrum.
 *     var_array = float * (Given and Returned)
 *        A 2D array in which to store the variances for the output cube if
-*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
-*        zero). The supplied array is updated on exit to include the data from 
-*        the supplied input spectrum. This array should be big enough to hold 
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is
+*        zero). The supplied array is updated on exit to include the data from
+*        the supplied input spectrum. This array should be big enough to hold
 *        a single spatial plane from the output cube (all planes in the
-*        output cube will have the same variance). 
+*        output cube will have the same variance).
 *     wgt_array = double * (Given and Returned)
-*        An array in which to store the relative weighting for each pixel in 
-*        the output cube. The supplied array is update on exit to include the 
+*        An array in which to store the relative weighting for each pixel in
+*        the output cube. The supplied array is update on exit to include the
 *        data from the supplied input spectrum. If "genvar" is 2, this array
-*        should be big enough to hold a single spatial plane from the output 
-*        cube (all planes in the output cube will have the same weight). If 
-*        "genvar" is 2, this array should be big enough to hold two spatial 
+*        should be big enough to hold a single spatial plane from the output
+*        cube (all planes in the output cube will have the same weight). If
+*        "genvar" is 2, this array should be big enough to hold two spatial
 *        planes from the output cube.
 *     nused = int * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
@@ -124,9 +124,9 @@
 #define FUNC_NAME "smf_rebincube_paste3d"
 
 void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
-                            dim_t nxy, double wgt, int genvar, double invar, 
-                            float *ddata, float *data_array, 
-                            float *var_array, double *wgt_array, int *nused, 
+                            dim_t nxy, double wgt, int genvar, double invar,
+                            float *ddata, float *data_array,
+                            float *var_array, double *wgt_array, int *nused,
                             int *status ){
 
 /* Local Variables */

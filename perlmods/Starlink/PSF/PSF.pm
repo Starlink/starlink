@@ -73,7 +73,7 @@ sub integrate_profile {
 
   my $const = 2.0 * log(2.0)**$k ;
 
-  my $integral = $PI * $amp * $widthsq * Math::Gsl::Sf::sf_gamma($k) 
+  my $integral = $PI * $amp * $widthsq * Math::Gsl::Sf::sf_gamma($k)
                       / ( $gamma * $const );
 
   return $integral;

@@ -192,7 +192,7 @@ $(top_builddir)/config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 $(srcdir)/configure:  $(srcdir)/configure.ac $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
 
-$(ACLOCAL_M4):  configure.ac 
+$(ACLOCAL_M4):  configure.ac
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.h: stamp-h1
@@ -205,7 +205,7 @@ stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status config.h
 
-$(srcdir)/config.h.in:  $(top_srcdir)/configure.ac $(ACLOCAL_M4) 
+$(srcdir)/config.h.in:  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 	cd $(top_srcdir) && $(AUTOHEADER)
 	touch $(srcdir)/config.h.in
 
@@ -239,7 +239,7 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-moggy$(EXEEXT): $(moggy_OBJECTS) $(moggy_DEPENDENCIES) 
+moggy$(EXEEXT): $(moggy_OBJECTS) $(moggy_DEPENDENCIES)
 	@rm -f moggy$(EXEEXT)
 	$(CXXLINK) $(moggy_LDFLAGS) $(moggy_OBJECTS) $(moggy_LDADD) $(LIBS)
 

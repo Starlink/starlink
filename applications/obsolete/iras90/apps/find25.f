@@ -1,4 +1,4 @@
-      SUBROUTINE FIND25( CONREQ, DISFIL, ILEVEL, 
+      SUBROUTINE FIND25( CONREQ, DISFIL, ILEVEL,
      : PCONAD, PCONDE, PDENAM,
      : PDISFI, PEDNAM, PINFIL,
      : PMAXLN, PMEN11, PMEN12, PNEXTP, POUTSF,
@@ -16,7 +16,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FIND25(CONREQ, DISFIL, ILEVEL, 
+*     CALL FIND25(CONREQ, DISFIL, ILEVEL,
 *     : PCONAD, PCONDE, PDENAM,
 *     : PDISFI, PEDNAM, PINFIL,
 *     : PMAXLN, PMEN11, PMEN12, PNEXTP, POUTSF,
@@ -25,9 +25,9 @@
 *     : MAXLEN, MENU, STATUS )
 
 *  Description:
-*  
+*
 *  Allows the user to input or edit source positions.
-*     
+*
 *  The user is first asked to selet the data which he wishes to use.
 *  The select menu offers him the choice of:-
 *     Enter a new list of sources, therefore an empty source list is
@@ -37,8 +37,8 @@
 *     List his sources to the screen display or to a file for printing
 *     Change the number of lines displayed on a page
 *     Return to the IRASFIND main menu
-*     Accept the source list 
-*  
+*     Accept the source list
+*
 *  When the user has accepted the selected source list the program
 *  then moves on to the editing menu which allows thw user
 *  to:-
@@ -55,7 +55,7 @@
 *
 *  Please note that entering ! to a parameter request will normally
 *  cause the program to redisplay the menu or menu prompt.
-*  
+*
 *  The setting of ILEVEL will have the following actions
 *     ILEVEL = 1 - Neither menu details or continuously updated lists of
 *                  sources will be displayed. A list of sources can be
@@ -73,7 +73,7 @@
 *                  lists of sources will be displayed. A list of
 *                  sources can also be obtained by entering L on
 *                  either menu prompt.
-      
+
 *  Arguments:
 *     CONREQ = LOGICAL (Given)
 *        Set .TRUE. if added, and edited, sources are to be confirmed
@@ -90,7 +90,7 @@
 *     PDENAM = CHARACTER * ( * ) (Given)
 *        Parameter DELETESOURCENAME for source name to be deleted
 *     PDISFI = CHARACTER * ( * ) (Given)
-*        Parameter DISPLAYORFILE 
+*        Parameter DISPLAYORFILE
 *     PEDNAM = CHARACTER * ( * ) (Given)
 *        Parameter EDITSOURCENAME for source name to be edited
 *     PINFIL = CHARACTER * ( * ) (Given)
@@ -133,17 +133,17 @@
 *        The global status.
 *
 *  Algorithm:
-*  
+*
 *  *********************************************************************
 *  Select data to use
 *  *********************************************************************
-*  
+*
 *     -  Set MENU11 to menu 'M'.
 *
 *  "Repeat until"
 *        MENU11 is Yes 'Y', or MENU11 is new 'N', or
 *        MENU11 is return to main menu 'R'
-*  
+*
 *     -  If MENU11 is menu 'M':-
 *           Ask do you want to:-
 *              Enter new list of sources 'N'
@@ -159,42 +159,42 @@
 *
 *     (If you alter the menu options you should also alter the valid
 *      MENU11CHOICE options in the .IFL file)
-*              
+*
 *     -  If MENU11 is enter new list of sources 'N',
 *           Clear source data area.
 *           Set number of sources to zero.
 *           MENU11 is still 'N'.
-*     
+*
 *     -  If MENU11 is use list of sources currently being used 'C',
 *           Check number of sources is >0 if not print error message.
 *           Set MENU11 to menu 'M'.
-*           
+*
 *     -  If MENU11 is use list of sources stored in a file 'F',
 *           CALL FIND38 to read a source data file.
 *           Inside FIND38, MENU11 is set to menu 'M'.
-*           
+*
 *     -  If MENU11 is display list of sources 'L',
 *           CALL FIND28 to display a paged list of sources.
 *           Inside FIND28, MENU11 is set to menu 'M'.
-*           
+*
 *     -  If MENU11 is change number of lines per page 'P',
 *           Obtain new value for number of lines per page
 *           MENU11 is set to menu 'M'.
-*           
-*     -  If MENU11 is 'Y' accept list of sources, 
+*
+*     -  If MENU11 is 'Y' accept list of sources,
 *           If the source list is not empty the program will continue
 *           into the edit section. If the source list is empty the
 *           program will display a message and return to the menu.
 
 *
 *  Continue the "repeat until"
-*  
+*
 *     -  If the final MENU11 is to return to main menu 'R',
 *           Go to the end of the subroutine.
-*           
+*
 *     -  If the user responded ! to the request for MENU11
 *           Redisplay the menu or menu prompt.
-*           
+*
 *  *********************************************************************
 *  Set up current coordinate system
 *  *********************************************************************
@@ -203,16 +203,16 @@
 *     number of sources is 0 ) set the coordinate system to
 *     Equatorial(1950), otherwise set the cooordinate system to the one
 *     used for the last source.
-*  
+*
 *     -  If MENU12 is .NOT. enter new sources 'N'
 *           Set MENU12 to menu 'M'.
-*     
+*
 *  *********************************************************************
 *  Edit Data
 *  *********************************************************************
-*     
+*
 *  "Repeat until"  MENU12 is save file 'Y'
-*  
+*
 *     -  If MENU12 is menu 'M':-
 *           Ask do you want to:-
 *              Add new sources to the current list of sources 'A',
@@ -223,17 +223,17 @@
 *              Change current coordinate system 'C',
 *              Accept source list 'Y',
 *              ( The enter new sources MENU12 'N' is carried forward
-*              from the previous menu )   
+*              from the previous menu )
 *
 *     (If you alter the menu options you should also alter the valid
 *      MENU12CHOICE options in the .IFL file)
-*        
+*
 *     -  If MENU12 is 'C' change coordinate system, or 'N' enter new
 *     sources :-
 *           Ask user new coordinate system, using old as default.
 *           If this section was entered because change coordinate system
 *           was chosen 'C' reset MENU12 to 'M' to go back to the menu.
-*           
+*
 *     -  If MENU12 is 'N' enter new sources, or 'A' add new sources to
 *     existing list :-
 *           CALL FIND03 to add new sources to the end of the existing
@@ -242,7 +242,7 @@
 *           of each individual source. At the end of FIND03 the MENU is
 *           set back to 'M' so that the user returns to the editing
 *           menu.
-*        
+*
 *     -  If MENU12 is to edit file 'E':-
 *           CALL FIND13 to edit sources within the existing list. This
 *           routine asks the user to give the name of the source to be
@@ -255,7 +255,7 @@
 *           to obtain details of each individual source. At the end of
 *           FIND13 the MENU is set back to 'M' so that the user returns
 *           to the editing menu.
-*        
+*
 *     -  If MENU12 is to delete sources 'D':-
 *           CALL FIND11 to delete sources within the existing list. This
 *           routine asks the user to give the name of the source to be
@@ -270,7 +270,7 @@
 *           rentering the source name. At the end of FIND11 the MENU
 *           is set back to 'M' so that the user returns to the editing
 *           menu.
-*           
+*
 *     -  If MENU12 is display list of sources 'L',
 *           CALL FIND28 to display a paged list of sources.
 *           Inside FIND28, MENU11 is set to menu 'M'.
@@ -278,9 +278,9 @@
 *     -  If MENU12 is change number of lines per page 'P',
 *           Obtain new value for number of lines per page
 *           MENU12 is set to menu 'M'.
-*           
+*
 *  Continue the "repeat until".
-*        
+*
 *    -   If MENU12 is 'Y' accept source list:-
 *           CAL FIND40 to prepare an output source list file
 *
@@ -297,7 +297,7 @@
 *        MSG_FMTC, MSG_OUT
 *     PAR:
 *        PAR_CANCL, PAR_CHOICE, PAR_GET0I
-*     
+*
 *  Authors:
 *     DCP: Diana Parsons (IPMAF/RAL)
 *     {enter_new_authors_here}
@@ -309,7 +309,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -340,7 +340,7 @@
       CHARACTER * ( * )  PMAXLN
       CHARACTER * ( * )  PMEN11
       CHARACTER * ( * )  PMEN12
-      CHARACTER * ( * )  PNEXTP 
+      CHARACTER * ( * )  PNEXTP
       CHARACTER * ( * )  POUTSF
       CHARACTER * ( * )  PSCOR1
       CHARACTER * ( * )  PSCOR2
@@ -351,7 +351,7 @@
 
 *  Arguments Given and Returned:
       INTEGER MAXLEN
-      CHARACTER * ( 1 )  MENU   
+      CHARACTER * ( 1 )  MENU
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -388,7 +388,7 @@
 
 *  Set MENU11 to select_from_menu; M.
       MENU11 = 'M'
-      
+
  100       CONTINUE            ! Start of 'DO WHILE' loop
 
 *  This is a block of IF statements that carries out the various
@@ -430,7 +430,7 @@
          CALL PAR_CANCL( PMEN11, STATUS )
 
       END IF
-      
+
 *  *********************************************************************
 *  If the option is use_new_list_of_sources.
 *  *********************************************************************
@@ -460,7 +460,7 @@
             DO 200 II = 1, MAXSS
                SOSCI( I,II) = 0
  200        CONTINUE
-            SOMADE(I)= .FALSE.                
+            SOMADE(I)= .FALSE.
  300     CONTINUE
 
 *  Set the number of sources in use to zero
@@ -482,7 +482,7 @@
             CALL MSG_OUT( ' ',
      :      'WARNING - Current list of sources is empty', STATUS )
          END IF
-      
+
 *  The choice is changed to M so that the user may select from the menu.
          MENU11 = 'M'
       END IF
@@ -492,7 +492,7 @@
 *  *********************************************************************
       IF ( (MENU11 .EQ. 'F') .AND. (STATUS .EQ. SAI__OK) ) THEN
 *     -  If OPTION is use list of sources stored in a file (F),
-*           Ask user for preexisting file of sources, and wait until a 
+*           Ask user for preexisting file of sources, and wait until a
 *           valid source file or ! (PAR__NULL) for menu is given.
 *           If a valid source file is given it is read in.
 *           Set OPTION to menu(M).
@@ -521,7 +521,7 @@
 
 *  Cancel the parameter for next time through
          CALL PAR_CANCL( PMAXLN, STATUS )
-      
+
 *  Set the parameter back to obtain select data to use menu
          MENU11 = 'M'
 
@@ -539,12 +539,12 @@
             CALL MSG_OUT( ' ',
      :      'Choose either new (N), or file (F), from the menu',
      :      STATUS )
-      
+
 *  The choice is changed to M so that the user may select from the menu.
              MENU11 = 'M'
-         
+
          END IF
-      
+
       END IF
 
 *  *********************************************************************
@@ -563,7 +563,7 @@
 *  options (above) the program finally sets the choice variable to M so
 *  that this IF statement can ensure that the user returns to the
 *  select data menu.
-      IF ( ( (MENU11 .EQ. 'M') .AND. (STATUS .EQ. SAI__OK) ) .OR. 
+      IF ( ( (MENU11 .EQ. 'M') .AND. (STATUS .EQ. SAI__OK) ) .OR.
      :     ( STATUS .EQ. PAR__NULL ) ) THEN
 
 *  If the status is PAR__NULL reset it to SAI__OK and set the menu
@@ -573,7 +573,7 @@
             MENU11 = 'M'
          END IF
          GO TO 100
-      END IF        
+      END IF
 
 
 
@@ -583,7 +583,7 @@
 
 *  *********************************************************************
 *  *********************************************************************
-*  Edit data 
+*  Edit data
 *  *********************************************************************
 *  *********************************************************************
 
@@ -609,7 +609,7 @@
 
 *  Set coordinate system to the last used outside the main edit loop
       IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
 *  This will be Equatorial (B1950) if there is no current list of
 *  sources, or the coordinate system in which the last source was
 *  entered if there is a source list.
@@ -618,9 +618,9 @@
          ELSE
             SCS = SOCOSY( NOFSO )
          END IF
-      
+
       END IF
-      
+
  400       CONTINUE            ! Start of 'DO WHILE' loop
 
 *  This is a block of IF statements that carries out the various
@@ -662,7 +662,7 @@
          CALL PAR_CANCL( PMEN12, STATUS )
 
       END IF
-      
+
 *  *********************************************************************
 *  The user is asked which coordinate system he wishes to use if either
 *  the option is use_new_list_of_sources, or change_coordinate system
@@ -670,7 +670,7 @@
 
       IF ( ((MENU12 .EQ. 'N') .OR. (MENU12 .EQ. 'C'))
      : .AND. (STATUS .EQ. SAI__OK)  ) THEN
-      
+
 *  Use IRA_GTSCS to get the users choice of coordinate system. The coord
 *  system is passed back in the variable SCS.
          CALL IRA_GTSCS( PSCOSY, .TRUE., SCS, STATUS )
@@ -686,7 +686,7 @@
             MENU12 = 'M'
          END IF
 
-*  If the status is abort !! 
+*  If the status is abort !!
          IF ( STATUS .EQ. PAR__ABORT ) RETURN
 
 *  Display message to confirm chosen coordinate system. Since we can't
@@ -715,7 +715,7 @@
 
          CALL FIND03( CONREQ, ILEVEL, MAXLEN, PCONAD, PSCOR1, PSCOR2,
      :     PSCOSY, PSNAME, PSTITL, SCS, MENU12, SOPOS, STATUS )
-      
+
       END IF
 
 *  *********************************************************************
@@ -736,11 +736,11 @@
 
          CALL FIND11( ILEVEL, MAXLEN, PCONDE, PDENAM, MENU12, SOPOS,
      :   STATUS )
-      
+
       END IF
-      
+
 *  *********************************************************************
-*  If the option is list sources 
+*  If the option is list sources
 *  *********************************************************************
       IF ( (MENU12 .EQ. 'L') .AND. (STATUS .EQ. SAI__OK) ) THEN
 
@@ -762,7 +762,7 @@
 
 *  Set the parameter back to obtain edit source list menu
          MENU12 = 'M'
-      
+
       END IF
 
 *  *********************************************************************
@@ -774,20 +774,20 @@
          IF ( NOFSO .EQ. 0 ) THEN
             CALL MSG_OUT( ' ',
      :      'WARNING - Current list of sources is empty', STATUS )
-      
+
 *  The choice is changed to M so that the user may select from the menu.
              MENU12 = 'M'
 
 *  If there is one or more sources
         ELSE
-      
+
 *  Call routine to store source data
             CALL FIND40( POUTSF, STATUS )
 
 *  Set the FINDCRDD main menu choice to 'M'
             MENU = 'M'
          END IF
-      
+
       END IF
 
 *  *********************************************************************

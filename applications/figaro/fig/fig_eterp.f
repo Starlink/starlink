@@ -8,7 +8,7 @@ C    DX      R*4      X position.
 C    DY      R*4      Y position.
 C    NX      I*4      Number of X pts in DATA.
 C    NY      I*4      Number of Y pts in DATA.
-C    DATA    R*4      Image data array. 
+C    DATA    R*4      Image data array.
 C  OUTPUTS:
 C    OUTVAL  R*4      Interpolated value.
 C  Note: This routine is based closely on the routine ETERP from the AIPS
@@ -47,7 +47,7 @@ C                                       Do an x-interpolation:
       END
       SUBROUTINE INITEI (IORD)
 C----------------------------------------------------------------------
-C   INITEI computes certain quantities which are needed by IEVERT 
+C   INITEI computes certain quantities which are needed by IEVERT
 C      when it computes the actual weights for an interpolation. The
 C      result produced by INITEI is in the BCOEF array in the COMMON
 C      block, and is based on binomial coefficients computed by BINOM.
@@ -98,16 +98,16 @@ C
       END
       SUBROUTINE IEVERT (DX, IX, SVECT)
 C----------------------------------------------------------------------
-C   Compute subscript offset and weights for interpolating at a 
+C   Compute subscript offset and weights for interpolating at a
 C   specified position in a vector.  Interpolation is done using a
 C   group of pixels centered on the specified position. The order of
 C   interpolation is specified by integer MORD in subroutine SETCOF.
 C   We do linear interpolation for MORD=0, cubic for 1, and quintic
 C   for 2. If MORD=1 (i.e., cubic interpolation) we will be using
-C   four pixels in the interpolation.  From the Everett interpolation 
-C   package originally coded by Larry Goad at KPNO. This version has been 
-C   lifted almost unchanged from the AIPS package - the only change has 
-C   been that the include files are now explicitly included in the 
+C   four pixels in the interpolation.  From the Everett interpolation
+C   package originally coded by Larry Goad at KPNO. This version has been
+C   lifted almost unchanged from the AIPS package - the only change has
+C   been that the include files are now explicitly included in the
 C   program body.                              KS / CIT  22nd MArch 1984
 C
 C   Inputs:  DX     R*4     Position in vector
@@ -164,7 +164,7 @@ C
       SUBROUTINE BINOM (X, M, VAL)
 C----------------------------------------------------------------------
 C   BINOM generates binomial coefficients for use in the Everett
-C   interpolation routines. It is called only by SETCOF.  From the 
+C   interpolation routines. It is called only by SETCOF.  From the
 C   Everett interpolation package originally coded by Larry Goad, KPNO.
 C----------------------------------------------------------------------
       INTEGER*2  M

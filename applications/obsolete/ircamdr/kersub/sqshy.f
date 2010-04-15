@@ -1,5 +1,5 @@
 *+  SQSHY - squashes the input array into the output array in the Y-direction
-      SUBROUTINE SQSHY( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT, 
+      SUBROUTINE SQSHY( IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, ARROUT,
      :                  YPIX, YWT, STATUS )
 *    Description :
 *     The input array, ARRIN, is squashed in the Y ( second dimension )
@@ -57,7 +57,7 @@
 *    History :
 *     18/08/1983 : Original version                     (ROE::ASOC5)
 *     19/02/1984 : Documentation brought up to standard (ROE::ASOC5)
-*     12-AUG-1994  Changed DIM arguments so that routine will compile(SKL@JACH) 
+*     12-AUG-1994  Changed DIM arguments so that routine will compile(SKL@JACH)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -130,7 +130,7 @@
 
 *          input image second dimension is integral multiple of output
 *          image second dimension
-*          calculate integer and real values of ratio 
+*          calculate integer and real values of ratio
             INTRAT = IDIMS2 / ODIMS2
             YRATIO = REAL( INTRAT )
 

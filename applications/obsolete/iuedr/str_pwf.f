@@ -1,4 +1,4 @@
-      SUBROUTINE str_PWF(FVALUE, RIGHT, FIELD, FIXED, PREC, EDIT, MAXC, 
+      SUBROUTINE str_PWF(FVALUE, RIGHT, FIELD, FIXED, PREC, EDIT, MAXC,
      :                   VALUE)
 
 *+
@@ -49,25 +49,25 @@
 
 *   Import:
       REAL*8 FVALUE           ! float to be coded
- 
+
       LOGICAL RIGHT         ! whether right justified
- 
+
       INTEGER FIELD         ! field size
- 
+
       LOGICAL FIXED         ! whether fixed point
- 
+
       INTEGER PREC          ! precision
- 
+
       BYTE EDIT             ! edit character
- 
+
       INTEGER MAXC          ! maximum size of VALUE
- 
+
 *   Export:
       BYTE VALUE(MAXC)      ! resulting value string
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
- 
+
 *   Local variables:
       BYTE LEDIT            ! local copy of EDIT
       BYTE LOCAL(MAXTOK)    ! local copy of STR
@@ -87,7 +87,7 @@
       ELSE
          LEDIT = EDIT
       END IF
- 
+
 *   Select a format
       IF (LEDIT.EQ.LETI) THEN
          CALL gen_FTOS(FVALUE, 80, 40, MAXTOK, LOCAL)
@@ -95,10 +95,10 @@
          CALL str_TERM(I-1, MAXTOK, LOCAL)
          CALL str_RMBLK(LOCAL)
       ELSE
- 
+
 *      Get precision requirements
          CALL str_DESF(FVALUE, CSIGN, SIGDEC, EXPON)
- 
+
 *      Bandwidth and precision for E-format
          IF (FIXED) THEN
 
@@ -120,7 +120,7 @@
                EPREC = MIN(30, MAX(PREC-1, 0))
             END IF
          END IF
- 
+
 *      Field size and precision for F-format
          IF (FIXED) THEN
 
@@ -143,7 +143,7 @@
          END IF
 
          IF (EXPON.LT.0) FFIELD = FFIELD + 1
- 
+
 *      Encode number
          IF (LEDIT.EQ.LETF) THEN
             CALL gen_FTOS(FVALUE, FFIELD, FPREC, MAXTOK, LOCAL)

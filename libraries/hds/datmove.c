@@ -99,7 +99,7 @@ datMove(HDSLoc **locator1,
    _call( dau_check_name( &name, nambuf ))
 
 /* SZSRV and SZCRV set for LCP2 at this stage                          */
-   
+
 /* Locate the recipient Structure Record Vector entry which contains the ID of
    the component record.        */
 
@@ -144,7 +144,7 @@ datMove(HDSLoc **locator1,
    rec_release_data( &data2->han, SZSRV, off, 'U', &srv );
 
    _call( hds_gl_status )
-   
+
    if (ncomp*SZCRV == rcl.dlen)
       _call(rec_extend_record(&han[0], SZCRV * hds_gl_ncomp0))
 
@@ -223,7 +223,7 @@ datMove(HDSLoc **locator1,
      hds_gl_status = *status;
      emsRep(context_name, context_message " Negative component count.",
 	    status );
-   } 
+   }
    else if (ncomp == 0)
    {
 /*    If it is, then first delete the component record, stick a handle on
@@ -398,13 +398,13 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
 
        src1_dlen = rcl1.dlen;
        if(rcl1.class == DAT__STRUCTURE) {
-          nitem = rcl1.dlen / SZSRV;      
+          nitem = rcl1.dlen / SZSRV;
           SET_64BIT_MODE(des);
           rcl1.dlen = nitem * SZSRV;
        } else {
           SET_64BIT_MODE(des);
        }
-      
+
       _invoke( rec_create_record( des, &rcl1, &des1 ))
       _invoke( dat1_put_odl( &des1,&odl1 ))
       _invoke( rec_locate_data( &des1, rcl1.dlen, 0, 'W', &dpntr1 ) )
@@ -495,7 +495,7 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
 
 /* Having copied and erased all the sub-structures of this component, rubout
    the source object record and move on to the next component. */
-   
+
       _invoke( rec_delete_record( &src1 ))
    }
    return hds_gl_status;

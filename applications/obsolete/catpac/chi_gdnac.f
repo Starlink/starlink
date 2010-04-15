@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHI_GDNAC( INPUT, CNAMES, NUMCOLS, CHARVALS, DOUBVALS, 
+     : CHI_GDNAC( INPUT, CNAMES, NUMCOLS, CHARVALS, DOUBVALS,
      : INTVALS, LOGVALS, REALVALS, COLTYPES, NULLS, STATUS )
 *+
 *  Name:
@@ -12,16 +12,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHI_GDNAC( INPUT, CNAMES, NUMCOLS, CHARVALS, DOUBVALS, 
+*     CALL CHI_GDNAC( INPUT, CNAMES, NUMCOLS, CHARVALS, DOUBVALS,
 *     INTVALS, LOGVALS, REALVALS, COLTYPES, NULLS, STATUS )
 *
 *  Description:
-*     Get all the data from the next entry in a catalogue. Get data from all 
+*     Get all the data from the next entry in a catalogue. Get data from all
 *     the columns in the catalogue. The data is taken from the next entry in the
 *     catalogue.
 *     Data is returned in the appropriate element of the appropriate
 *     array. CNAMES will contain the names of the columns and COLTYPES the
-*     type of column. So if COLTYPES(3) is an 'I' the array INTVALS(3) will 
+*     type of column. So if COLTYPES(3) is an 'I' the array INTVALS(3) will
 *     contain the data from the column whose name is given in CNAMES(3).
 
 *  Arguments:
@@ -52,8 +52,8 @@
 *     Caution should be exercised when using CHI_GDNAC. Several CHI routines
 *     cause catalogues to be RESET to their first entry. They are CHI_COPCAT,
 *     CHI_DCOLS, CHI_DENTS, CHI_ICOLS, CHI_IENTS, CHI_JOIN, CHI_RENAME,
-*     CHI_RCOLS, CHI_RENTS, CHI_SEARCH, CHI_SORT. In addition to these a call 
-*     to CHI_GDNAC after a CHI_GSGNAC or CHI_GSDGSC cause the catalogue to be 
+*     CHI_RCOLS, CHI_RENTS, CHI_SEARCH, CHI_SORT. In addition to these a call
+*     to CHI_GDNAC after a CHI_GSGNAC or CHI_GSDGSC cause the catalogue to be
 *     RESET to their first entry.
 
 *  Anticipated Errors:
@@ -72,7 +72,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,7 +112,7 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Call GDNAC on the appropriate low level system
 *
 *

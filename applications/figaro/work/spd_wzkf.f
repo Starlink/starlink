@@ -145,7 +145,7 @@
       IF ( cand_count .EQ. 0 ) found_all = .TRUE.
 
 *%    Loop until found all (or max_ftr_cand) the best candidates
-      DO WHILE ( .NOT. found_all ) 
+      DO WHILE ( .NOT. found_all )
 
 *%      If top 'max_ftr_cand' candidates found then
         IF ( best_count+1 .GT. max_ftr_cand ) THEN
@@ -164,7 +164,7 @@
            DO i = 1 , cand_count
 
 *%            If best so far then
-              IF ( bpos_distances ( i ) .GT. 0.0 .AND. 
+              IF ( bpos_distances ( i ) .GT. 0.0 .AND.
      :             bpos_distances ( i ) .LT. best ) THEN
 
 *%               Make a note
@@ -182,27 +182,27 @@
 
 *%            Add it to list of the best max_ftr_cand candidates
               best_count = best_count + 1
-              best_distances ( best_count ) = 
+              best_distances ( best_count ) =
      :                             bpos_distances ( got_best )
-              best_dispersion ( best_count ) = 
+              best_dispersion ( best_count ) =
      :                             bpos_dispersion ( got_best )
               best_ftr ( best_count ) =
      :                             bpos_ftr ( got_best )
-              best_next_ftr ( best_count ) = 
+              best_next_ftr ( best_count ) =
      :                             bpos_next_ftr ( got_best )
-              best_next_ftr2 ( best_count ) = 
+              best_next_ftr2 ( best_count ) =
      :                             bpos_next_ftr2 ( got_best )
-              best_prev_ftr ( best_count ) = 
+              best_prev_ftr ( best_count ) =
      :                             bpos_prev_ftr ( got_best )
-              best_prev_ftr2 ( best_count ) = 
+              best_prev_ftr2 ( best_count ) =
      :                             bpos_prev_ftr2 ( got_best )
-              best_posindex ( best_count , 1 ) = 
+              best_posindex ( best_count , 1 ) =
      :                             bpos_posindex ( got_best , 1 )
-              best_posindex ( best_count , 2 ) = 
+              best_posindex ( best_count , 2 ) =
      :                             bpos_posindex ( got_best , 2 )
-              best_posindex ( best_count , 3 ) = 
+              best_posindex ( best_count , 3 ) =
      :                             bpos_posindex ( got_best , 3 )
-              best_posindex ( best_count , 4 ) = 
+              best_posindex ( best_count , 4 ) =
      :                             bpos_posindex ( got_best , 4 )
 
 *%            Disable original copy of candidate

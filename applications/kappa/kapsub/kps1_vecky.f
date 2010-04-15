@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, 
+      SUBROUTINE KPS1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF,
      :                       KDATA, UNITS, JUST, HGTFAC, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, KDATA, UNITS, 
+*     CALL KPS1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, KDATA, UNITS,
 *                      JUST, HGTFAC, STATUS )
 
 *  Description:
@@ -90,7 +90,7 @@
 *     1995 April 13 (MJC):
 *        Corrected millimetre documentation error and typo's.  Made
 *        minor stylistic changes.  Used modern-style variable
-*        declarations.  
+*        declarations.
 *     1995 April 19 (MJC):
 *        Improved the format of the scale value.  Left-justify the
 *        text for consistency with other keys in KAPPA.  Used more of
@@ -104,7 +104,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -186,7 +186,7 @@
 *  and get the extent of the window in world coordinates, and metres.
       CALL KPG1_GDQPC( X1, X2, Y1, Y2, XM, YM, STATUS )
 
-*  Format the vector scale value (data units per centimetre), using the Plot's 
+*  Format the vector scale value (data units per centimetre), using the Plot's
 *  1st axis format attribute.
       VSCTXT = AST_FORMAT( IPLOT, 1, DBLE( VSCALE ), STATUS )
       VSCNC = CHR_LEN( VSCTXT )
@@ -221,7 +221,7 @@
       CALL CHR_APPND( '/cm', VSCTXT, VSCNC )
 
 *  Find the data value corresponding to a vector length equal to the
-*  largest allowed fraction of the width of the key picture.  If the 
+*  largest allowed fraction of the width of the key picture.  If the
 *  supplied data value is smaller than this, use it.
       KEYDAT = ABS( VECMAX * 100.0 * XM * VSCALE )
       IF ( KDATA .GT. 0.0 .AND. KDATA .LT. KEYDAT ) KEYDAT = KDATA
@@ -293,7 +293,7 @@
       CALL PGQCS( 4, XCH, HGT )
 
 *  Set the Y world co-ordinate at the top of the key.
-      YC = Y1 + KEYOFF*( Y2 - Y1 ) 
+      YC = Y1 + KEYOFF*( Y2 - Y1 )
 
 *  Produce text describing the vector scale in words.  Left justify.
       XL = X1 + 0.01 * ( X2 - X1 )
@@ -310,7 +310,7 @@
 *  co-ordinates.
       AHSIZE = ( X2 - X1 ) * AHSIZM / XM
 
-*  Revert to the previous PGPOLOT attribute settings, and then establish the 
+*  Revert to the previous PGPOLOT attribute settings, and then establish the
 *  style requested by the user for lines.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .FALSE., ATTS, STATUS )
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTS, STATUS )
@@ -324,11 +324,11 @@
 
       IF ( JUST .EQ. 'START' ) THEN
          CALL KPS1_VECT( .TRUE., XL + 0.5 * KEYLEN + RADIUS, YC,
-     :                   'CENTRE', KEYLEN, -90.0 * DTOR, AHSIZE, DX1, 
+     :                   'CENTRE', KEYLEN, -90.0 * DTOR, AHSIZE, DX1,
      :                   DX2, DY1, DY2, STATUS )
       ELSE
-         CALL KPS1_VECT( .TRUE., XL + 0.5 * KEYLEN, YC, 'CENTRE', 
-     :                   KEYLEN, -90.0 * DTOR, AHSIZE, DX1, DX2, DY1, 
+         CALL KPS1_VECT( .TRUE., XL + 0.5 * KEYLEN, YC, 'CENTRE',
+     :                   KEYLEN, -90.0 * DTOR, AHSIZE, DX1, DX2, DY1,
      :                   DY2, STATUS )
       END IF
 
@@ -346,7 +346,7 @@
       END IF
       CALL PGSFS( FS0 )
 
-*  Revert to the previous PGPOLOT attribute settings, and then establish the 
+*  Revert to the previous PGPOLOT attribute settings, and then establish the
 *  style requested by the user for text.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTS, STATUS )
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTS, STATUS )
@@ -359,7 +359,7 @@
 
 *  Flush the graphics.
       CALL PGUPDT
-      
+
 *  Arrive here if an error has occurred.
  999  CONTINUE
 

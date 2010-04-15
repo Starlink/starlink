@@ -41,9 +41,9 @@
 *     structure identified by the locator LOC.  Array subscripts may
 *     also be used in this component name.  Thus a string such as
 *     'MYSTRUC.ZONE(2).IMAGE' could be used as a valid NAME value.
-*     -  An NDF can be accessed within an explicitly named container 
-*     file by supplying the symbolic value DAT__ROOT for the LOC 
-*     argument, and specifying the container file within the value 
+*     -  An NDF can be accessed within an explicitly named container
+*     file by supplying the symbolic value DAT__ROOT for the LOC
+*     argument, and specifying the container file within the value
 *     supplied for the NAME argument.
 *     -  If a blank value is given for the NAME argument, then the NDF
 *     to be imported will be the object identified directly by the
@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,7 +143,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If necessary, check the access mode string for validity. Otherwise,
-*  check that the supplied locator is not a locator for an array of 
+*  check that the supplied locator is not a locator for an array of
 *  objects.
       VMODE = 'UPDATE'
       IF ( LOC .EQ. DAT__ROOT ) THEN
@@ -155,7 +155,7 @@
             CALL MSG_SETI( 'ND', NDIM )
             CALL ERR_REP( 'NDF1_NFIND_ERR1', 'The supplied HDS object'//
      :                    ' is a ^ND-dimensional array. It must be a '//
-     :                    'scalar object (possible programming error).', 
+     :                    'scalar object (possible programming error).',
      :                    STATUS )
          END IF
       END IF

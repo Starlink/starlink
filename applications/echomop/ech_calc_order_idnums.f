@@ -236,16 +236,16 @@
 *     Zero counter for the order.
          COUNTS( I ) = 0
          MIN_DIFF = 1.0E20
-      
+
 *     Loop through remaining orders (i.e. above on the frame).
          DO II = I + 1, N_ORDERS
-      
+
 *        If both of the orders are active then.
             IF ( WAVE_COEFFS( 1, I ) .NE. ECH__BAD_DOUBLE .AND.
      :           WAVE_COEFFS( 1, I ) .NE. 0.0 .AND.
      :           WAVE_COEFFS( 1, II ) .NE. ECH__BAD_DOUBLE .AND.
      :           WAVE_COEFFS( 1, II ) .NE. 0.0 ) THEN
-      
+
 *           Estimate start/end range for order.
                CALL ECH_FEVAL( ' ', MAXIMUM_POLY, WAVE_COEFFS( 1, I ),
      :              1, 1.0, TEST_START1, STATUS )
@@ -255,13 +255,13 @@
      :              1, 1.0, TEST_START2, STATUS)
                CALL ECH_FEVAL( ' ', MAXIMUM_POLY, WAVE_COEFFS( 1, II ),
      :              1, FLOAT( NX ), TEST_END2, STATUS )
-      
+
 *           If range is acceptable then.
                IF ( TEST_START1 .GT. ABS_MIN_WAVELENGTH .AND.
      :              TEST_START2 .GT. ABS_MIN_WAVELENGTH .AND.
      :              TEST_END1 .LT. ABS_MAX_WAVELENGTH .AND.
      :              TEST_END2 .LT. ABS_MAX_WAVELENGTH ) THEN
-      
+
 *              Calculate ratio of wavelengths at middle of each order.
                   DELTA_ORDER = II - I
                   CALL ECH_FEVAL( ' ', MAXIMUM_POLY,
@@ -271,10 +271,10 @@
      :                 WAVE_COEFFS( 1, II ), 1, FLOAT( NX / 2 ),
      :                 VALUE2, STATUS )
                   WAVE_RATIO = VALUE1 / VALUE2
-      
+
 *              Initialise order number estimate to first loop counter.
                   IT = I
-      
+
 *              Check for inverted reference frame, and report suspicion.
                   IF ( WAVE_RATIO .LT. 1.0 ) THEN
                      IF ( .NOT. REVERSE ) THEN
@@ -285,16 +285,16 @@
                      WAVE_RATIO = 1.0 / WAVE_RATIO
                      IT = II
                   END IF
-      
+
 *              Loop through all credible order numbers
 *              (1 to max_allowed_ordnum).
                   DO III = 1, MAX_ALLOWED_ORDNUM
-      
+
 *                 Calculate expected ratio (as above), assuming first
 *                 loops' order number is test order number
                      TEST_RATIO = FLOAT( III + DELTA_ORDER ) /
      :                            FLOAT( III )
-      
+
 *                 If calculated ratio for test order number is closest
 *                 yet to that calculated from actual calibrated orders then
 *                 save it as most likely candidate yet.
@@ -304,12 +304,12 @@
                         POSSIBLE_ORDER( IT ) = III
                      END IF
                   END DO
-      
+
 *              If we have an estimated order number and also
 *              a previous one then.
                   IF ( ORDER_ID_NUMBER( IT ) .GT. 0 .AND.
      :                 POSSIBLE_ORDER( IT ) .GT. 0 ) THEN
-      
+
 *                 If estimate and previous value differ, report it.
                      IF ( POSSIBLE_ORDER( IT ) .NE.
      :                    ORDER_ID_NUMBER( IT ) ) THEN
@@ -321,34 +321,34 @@
      :                        REF_STR1( :NCHAR1 ) // ')=' //
      :                        REF_STR2( :NCHAR2 ) // '.'
                         CALL ECH_REPORT( 0, REPORT_STRING )
-      
+
 *                 Else remember it and increment counter of stable estimates.
                      ELSE
                         ORDER_ID_NUMBER( IT ) = POSSIBLE_ORDER( IT )
                         COUNTS( IT ) = COUNTS( IT ) + 1
                      END IF
-      
+
 *              Else remember it and increment counter of stable estimates.
                   ELSE
                      ORDER_ID_NUMBER( IT ) = POSSIBLE_ORDER( IT )
                      COUNTS( IT ) = COUNTS( IT ) + 1
                   END IF
-      
+
 *              Calculate corresponding 'first order' (ie lowest on frame)
 *              assuming the best estimate above was correct.
                   IF ( REVERSE ) THEN
                      FIRST_ORDER = POSSIBLE_ORDER( IT ) + IT - 1
-      
+
                   ELSE
                      FIRST_ORDER = POSSIBLE_ORDER( IT ) - IT + 1
                   END IF
-      
+
 *              Loop through all orders calculating corresponding
 *              start/end wavelengths etc.
                   DO III = 1, N_ORDERS
                      IF ( REVERSE ) THEN
                         POSSIBLE_ORDER( III ) = FIRST_ORDER - III + 1
-      
+
                      ELSE
                         POSSIBLE_ORDER( III ) = FIRST_ORDER + III - 1
                      END IF
@@ -364,7 +364,7 @@
                      END_SEARCH_WAVE( III )  =
      :                      FLOAT( POSSIBLE_ORDER( IT ) ) /
      :                      FLOAT( POSSIBLE_ORDER( III ) ) * VALUE1
-      
+
                      IF ( START_SEARCH_WAVE ( III ) .GT.
      :                    END_SEARCH_WAVE ( III ) ) THEN
                         TEMP = START_SEARCH_WAVE( III )
@@ -377,7 +377,7 @@
                      START_SEARCH_WAVE( III )  =
      :                     START_SEARCH_WAVE( III ) - DELTA_LAMBDA /
      :                     LEEWAY_FACTOR
-      
+
                      END_SEARCH_WAVE( III )  =
      :                     END_SEARCH_WAVE( III ) + DELTA_LAMBDA /
      :                     LEEWAY_FACTOR
@@ -407,7 +407,7 @@
 
 *  If interactively calibrating then.
       IF ( WVCAL_INTERACT ) THEN
-      
+
 *     Inquire wether the ranges are acceptable.
          CALL ECH_GET_PARAMETER(
      :        'INSTANT-PROMPT=Are these acceptable', 'LOGICAL',
@@ -416,7 +416,7 @@
 *  Else accept them by default.
       ELSE
          ANSWER = .TRUE.
-      
+
 *     BUT Check calculated order numbers are reasonable.
          DO I = 1, N_ORDERS
             IF ( POSSIBLE_ORDER( I ) .LT. 10 ) ANSWER = .FALSE.
@@ -427,7 +427,7 @@
             IF ( ABS( POSSIBLE_ORDER( I + 1 ) -
      :           POSSIBLE_ORDER( I ) ) .GT. 1 ) ANSWER = .FALSE.
          END DO
-      
+
 *     Report if we had to disable the order numbers
          IF ( .NOT. ANSWER  )
      :      CALL ECH_REPORT( 0,

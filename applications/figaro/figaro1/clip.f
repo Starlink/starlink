@@ -12,7 +12,7 @@ C
 C     IMAGE    (Character) The name of the structure containing the image.
 C     LOWCLIP  (Numeric) The low threshold value
 C     HIGHCLIP (Numeric) The high threshold value
-C     OUTPUT   (Character) The name of the result of the operation.  This 
+C     OUTPUT   (Character) The name of the result of the operation.  This
 C              can be the same as for IMAGE.  If not, a new structure
 C              is created, with everything but the data a direct
 C              copy of the input.
@@ -22,7 +22,7 @@ C
 C     Modified:
 C
 C     24th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs changed.
-C                    Modified dynamic memory handling - now uses DYN_ 
+C                    Modified dynamic memory handling - now uses DYN_
 C                    routines.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.

@@ -131,7 +131,7 @@ itcl::class gaia::LabelFontChooser {
       if { $font != {} } {
          $font_chooser_ set_default_font $font
       }
-      
+
       if { [$font_chooser_ activate] } {
          configure -value [$font_chooser_ get]
          if { "$itk_option(-command)" != "" } {

@@ -74,12 +74,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -115,7 +115,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Global Variables:
       INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
@@ -238,7 +238,7 @@
             DO 1 D2 = IEND, D1, -1
                IF ( FNAME( D2 : D2 ) .EQ. '/' ) GO TO 2
  1          CONTINUE
- 2          CONTINUE              
+ 2          CONTINUE
 
 *  Return the position of the first character in the name field (equal
 *  to D1 if no directory specification was found).
@@ -260,7 +260,7 @@
                DO 3 T1 = T2, N1, -1
                   IF ( FNAME( T1 : T1 ) .EQ. '.' ) GO TO 4
  3             CONTINUE
- 4             CONTINUE                 
+ 4             CONTINUE
 
 *  If not found, then there is no type field. Otherwise, return
 *  the final character position of the name field.

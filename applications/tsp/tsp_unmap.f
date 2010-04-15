@@ -25,7 +25,7 @@ C                       object - returned by one of the TSP_MAP... routines
 C     (!) STATUS	(Integer,ref) The Status
 C
 C  External subroutines / functions used:
-C                        
+C
 C     Various HDS routines
 C
 C  Support: Jeremy Bailey, JAC
@@ -42,7 +42,7 @@ C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC

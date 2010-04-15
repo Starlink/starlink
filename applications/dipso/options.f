@@ -5,7 +5,7 @@
        INCLUDE 'SAE_PAR'
        INTEGER STATUS
 *
-       COMMON /DMISOPT/ OPTCAL, OPTOK, BLEND, COLUMN, QUART, SCALE, 
+       COMMON /DMISOPT/ OPTCAL, OPTOK, BLEND, COLUMN, QUART, SCALE,
      :                  MODE, MODE1, THE, PUSH, VEL, V1, V2
        COMMON /IDHIRF/ NRF, MAXNRF, POSN, RF
        COMMON /IDHIRF1/ CTITLE
@@ -26,9 +26,9 @@
        CHARACTER*15 VARNAM, COMMND, DEFDIR*8, LINE1*40
        CHARACTER*40 CFILE
        CHARACTER*(*) INFILE
- 
+
        DATA IZERO, IONE, ITWO, IFIVE/0, 1, 2, 5/
- 
+
 *   Check inherited status.
        IF( STATUS .NE. SAI__OK ) RETURN
 
@@ -72,7 +72,7 @@
        TFILE = .FALSE.
        IERR = 0
        CLOSE (68)
-       OPEN (UNIT=68,FILE=INFILE(1:SLEN(INFILE)), 
+       OPEN (UNIT=68,FILE=INFILE(1:SLEN(INFILE)),
      : STATUS='OLD',IOSTAT=IERR)
        IF (IERR.NE.0) THEN
           IF((INDEX(INFILE,']').EQ.0).AND.(INDEX(INFILE,':').EQ.0))THEN
@@ -108,11 +108,11 @@
        ENDIF
        WRITE (*,'(''   ISOPT:  error opening '',A,A)')
      : INFILE(1:SLEN(INFILE)), BLEEP
- 
+
        TFILE = .TRUE.
 !       CLOSE (68)
 !       OPEN (UNIT=68,FILE='TT:',STATUS='UNKNOWN')
- 
+
 *    edit mode prompt
 
   200  CONTINUE
@@ -136,7 +136,7 @@
 *    interpret command, assign it to VARNAM
 
        IF (IOS.NE.0 .AND. IOS.NE.-1) THEN
-          WRITE (*,'(''   ISOPT:  error reading option'',A,A)') 
+          WRITE (*,'(''   ISOPT:  error reading option'',A,A)')
      :    COMMND(1:SLEN(COMMND)), BLEEP
           IF (.NOT.TFILE) THEN
              OK = .FALSE.
@@ -149,7 +149,7 @@
 
 *  Allow "comment cards"
 
-          IF (((COMMND(1:1).EQ.'!') .OR. (COMMND(1:1).EQ.'*')) .AND. 
+          IF (((COMMND(1:1).EQ.'!') .OR. (COMMND(1:1).EQ.'*')) .AND.
      :        (.NOT.TFILE)) GOTO 200
 
           IF (COMMND.EQ.' ') GOTO 200

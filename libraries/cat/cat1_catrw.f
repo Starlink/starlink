@@ -9,10 +9,10 @@
 *  Invocation:
 *     CALL CAT1_CATRW (GI, ROWNO; CATROW; STATUS)
 *  Description:
-*     Convert a row number in either a catalogue, a selection or an 
-*     index into the corresponding catalogue row number.  If the row 
-*     number already corresponds to a catalogue it is unchanged.  If it 
-*     corresponds to a selection or index then the corresponding 
+*     Convert a row number in either a catalogue, a selection or an
+*     index into the corresponding catalogue row number.  If the row
+*     number already corresponds to a catalogue it is unchanged.  If it
+*     corresponds to a selection or index then the corresponding
 *     catalogue row number is returned.
 *  Arguments:
 *     GI  =  INTEGER (Given)
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@
       IF (STATUS .EQ. CAT__OK) THEN
 
 *
-*       Attempt to determine the type of the identifier and proceed if 
+*       Attempt to determine the type of the identifier and proceed if
 *       ok.
 
          CALL CAT_TIDTP (GI, IDTYP, STATUS)
@@ -122,7 +122,7 @@
 
                IF (ROWNO .GE. 1  .AND.  ROWNO .LE. NUMSEL) THEN
                   CALL CAT_TIQAI (GI, 'PTR', PTR, STATUS)
-                  CALL CAT1_GTSRW (NUMSEL, %VAL(CNF_PVAL(PTR)), 
+                  CALL CAT1_GTSRW (NUMSEL, %VAL(CNF_PVAL(PTR)),
      :                             ROWNO, CATROW,
      :              STATUS)
                ELSE

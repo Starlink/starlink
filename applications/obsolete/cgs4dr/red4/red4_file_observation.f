@@ -3,8 +3,8 @@
 *    Description :
 *     This routine files the given observation in the index file,
 *     together with the parameters defining the setup of the instrument
-*     during that observation. The index file is used to record the 
-*     observations that have been reduced, and is searched from time to 
+*     during that observation. The index file is used to record the
+*     observations that have been reduced, and is searched from time to
 *     time for suitable calibration observations.
 *    Invocation :
 *     CALL RED4_FILE_OBSERVATION( STATUS )
@@ -56,7 +56,7 @@
 *                  after 24 hours. Modified so that the number
 *                  of elapsed days since observation 1 is taken
 *                  into account.                                    (SMB)
-*     11-Dec-1990: Split into RED4_FILE_OBSERVATION and 
+*     11-Dec-1990: Split into RED4_FILE_OBSERVATION and
 *                  RED4_FILE_OBSERVATION_2. Description altered and
 *                  code completely restructured.                    (SMB)
 *     12-Dec-1990: Efficiency calculation moved here.               (SMB)
@@ -103,8 +103,8 @@
       IF ( STATUS .EQ. ADAM__OK ) THEN
 
 *      Pass this observation file name to the main filing routine.
-         CALL RED4_FILE_OBSERVATION_2( OBSERVATION, REDOBS, 
-     :      TYPE, STATUS ) 
+         CALL RED4_FILE_OBSERVATION_2( OBSERVATION, REDOBS,
+     :      TYPE, STATUS )
 
 *      Obtain the name of the reduced observation file and report
 *      the efficiency of the observation (ignoring the status).

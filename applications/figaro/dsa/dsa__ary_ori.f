@@ -44,7 +44,7 @@ C                     passed to it, this routine returns immediately.
 C
 C  External variables used:  None.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DTA_SZVAR, DTA_RDVARI
 C
 C  Prior requirements:
@@ -88,7 +88,7 @@ C
       IF (STATUS.NE.0) RETURN
 C
 C     See if an ORIGIN array is present, and if so read it.
-C     
+C
       TSTRING = NAME(:LENGTH)//'.ORIGIN'
       CALL DTA_SZVAR (TSTRING,1,ODIMS,NDIM,DTA_STATUS)
       IF (DTA_STATUS.NE.0) THEN

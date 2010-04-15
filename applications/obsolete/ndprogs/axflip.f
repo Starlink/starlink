@@ -33,7 +33,7 @@ C
 C   AXIS    Number of the axis along which the image is to be reversed.
 C           (integer)(prompted for).
 C
-C   OUTPUT  Name of the structure containing the output image. May be the 
+C   OUTPUT  Name of the structure containing the output image. May be the
 C           same as IMAGE. (character)(prompted for).
 C
 C   Keywords
@@ -51,7 +51,7 @@ C   Method
 C   ------
 C   - The structure IMAGE is copied to OUTPUT.
 C   - The required axis array is reversed in OUTPUT.
-C   - A subroutine appropriate to the data type is called to reverse the 
+C   - A subroutine appropriate to the data type is called to reverse the
 C     OUTPUT data array.
 C
 C   External functions & subroutines called
@@ -88,7 +88,7 @@ C     NDP_GET_IMAGE_INFO
 C
 C   Library PAR:
 C     PAR_RDVAL
-C     
+C
 C
 C   Internal subroutines called
 C   ---------------------------
@@ -102,7 +102,7 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -116,7 +116,7 @@ C       AXFLIP_2D_<T>
 C       AXFLIP_4D_<T>
 C       AXFLIP_5D_<T>
 C       AXFLIP_6D_<T>
-C                                
+C
 C
 C   Author/s
 C   --------
@@ -145,8 +145,8 @@ C
 C     Functions used.
 C
       INTEGER  DSA_TYPESIZE,DYN_ELEMENT
-C   
-C   
+C
+C
 C     Local variables.
 C
       INTEGER   ADDRESS       ! Address of dynamic memory element
@@ -177,7 +177,7 @@ C
       CHARACTER TYPE*8        ! Data array type
       INTEGER   WKPTR         ! Dynamic pointer to workspace
       INTEGER   WKSLOT        ! Map slot number for workspace
-C     
+C
       INTEGER   NEW_FILE,NO_DATA
       PARAMETER (NEW_FILE=1,NO_DATA=0)
 C
@@ -190,7 +190,7 @@ C
       STATUS=0
 C
 C     Open DSA system.
-C                        
+C
       CALL DSA_OPEN(STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
@@ -232,7 +232,7 @@ C
 C
 C     Open file for OUTPUT.
 C
-      CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)       
+      CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
 C     Map required OUTPUT axis.
@@ -372,10 +372,10 @@ C
 
 
 
-                                    
+
 
       SUBROUTINE AXFLIP_NEWAXIS(ARRAY,WORK,DAXIS)
-C            
+C
       IMPLICIT NONE
 C
 C     Parameters

@@ -1,28 +1,28 @@
 /*
  *  This file is part of moggy.
- *  
+ *
  *  Copyright 2001, Council for the Central Laboratory of the Research Councils
- *  
+ *
  *  This program is part of the Starlink Software Distribution: see
- *  http://www.starlink.ac.uk 
- *  
+ *  http://www.starlink.ac.uk
+ *
  *  moggy is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  moggy is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with moggy; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ *
  *  The General Public License is distributed along with this
  *  program in the file LICENCE.
- *  
+ *
  *  Author: Norman Gray <norman@astro.gla.ac.uk>
  *  $Id$
  */
@@ -54,7 +54,7 @@ class CatalogueHandler {
 
     /* All the set... methods return true if the operation completed
        successfully */
-    /* In the case of setCatname, the operation should also check that 
+    /* In the case of setCatname, the operation should also check that
        the catalogue is a valid one */
     bool setCatname (string name);
 
@@ -83,7 +83,7 @@ class CatalogueHandler {
     bool setResultCols (string cols = "SIMPLE");
 
     /* Do the search.  Returns negative if not all required
-       information was present.  If all the information is present, it 
+       information was present.  If all the information is present, it
        does the query and returns the number of rows obtained.
        Should I distinguish a successful search which returns zero
        rows from a search which has some other problem? */
@@ -110,10 +110,10 @@ class CatalogueHandler {
 	const int num_;
 
 	/* Class variable to set column separator.  There's currently
-	   no method to set this. */ 
+	   no method to set this. */
 	static string sep_;
     };
-    friend class CatalogueRow;	/* so we can look at parent_'s private 
+    friend class CatalogueRow;	/* so we can look at parent_'s private
 				   variables */
     CatalogueRow* getrow (int n) { return new CatalogueRow (*this, n); }
     /* Return the list of column names in the retrieved catalogue */
@@ -146,7 +146,7 @@ class CatalogueHandler {
 
     /* Functions to return the columns corresponding to the `common'
        fields requested.  The fields themselves can be returned using
-       the ra(), dec() fields of CatalogueRow; these methods therefore 
+       the ra(), dec() fields of CatalogueRow; these methods therefore
        aren't terribly useful except via the has_ra(), has_dec()
        methods.  These differ from the QueryResult and AstroCatalog
        *_col() methods since they raise an exception if they are

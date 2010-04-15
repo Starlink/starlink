@@ -14,7 +14,7 @@
 
 *  Description:
 *     This subroutine saves the specifications of the parallel sections
-*     store in three arrays. 
+*     store in three arrays.
 
 *  Arguments:
 *     FID = INTEGER (Given)
@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -53,7 +53,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
-                                 
+
 *  Arguments Given:
       INTEGER FID
       CHARACTER*( * ) SCS
@@ -105,5 +105,5 @@
       END DO
 
  999  CONTINUE
-      
+
       END

@@ -14,7 +14,7 @@
 
 *  Description:
 *     The string STR1, or as much of it as there is room for, is
-*     copied into STR2 beginning at position 1. 
+*     copied into STR2 beginning at position 1.
 
 *  Arguments:
 *     STR1 = CHARACTER * ( * ) (Given)
@@ -23,9 +23,9 @@
 *        The returned string.
 
 *  Notes:
-*     This routine is OBSOLETE.  It exists for historical reasons. 
-*     Its function is identical to a Fortran assignment statement. 
-*     It is recommended that an assignment statement be used instead 
+*     This routine is OBSOLETE.  It exists for historical reasons.
+*     Its function is identical to a Fortran assignment statement.
+*     It is recommended that an assignment statement be used instead
 *     of CHR_MOVE.
 
 *  Algorithm:
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

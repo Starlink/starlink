@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The status of the tests. 
+*        The status of the tests.
 
 *  Copyright:
 *     Copyright (C) 1989, 1993, 1994 Science & Engineering Research Council.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -51,10 +51,10 @@
 *     17-AUG-1989 (RLVAD::AJC):
 *        Original version.
 *     14-SEP-1993 (ACC)
-*        Modularised version: broken into one routine for each of 5 main 
+*        Modularised version: broken into one routine for each of 5 main
 *        categories of tests.
 *     02-MAR-1994 (ACC)
-*        Second modularised version: broken further into one routine for 
+*        Second modularised version: broken further into one routine for
 *        each of subroutine tested.  This subroutine created.
 *     12-APR-1994 (ACC)
 *        Superfluous variables removed.
@@ -65,7 +65,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:   
+*  Subprograms called:
 *     CHR_MTOE
 
 *-
@@ -118,27 +118,27 @@
       CALL CHR_MTOE( ' ', CHAR1 )
       ICHR = ICHAR( CHAR1 )
       IF ( ICHR .NE. E_SPACE ) THEN
-         PRINT *, 
+         PRINT *,
      :   'CHR_MTOE FAILS - numeric value returned for blank:', ICHR
          ISTAT = SAI__ERROR
-      END IF  
+      END IF
 
       CALL CHR_MTOE( CHAR(A_INVALID), CHAR1 )
       ICHR = ICHAR( CHAR1 )
       IF ( ICHR .NE. E_SPACE ) THEN
-         PRINT *, 
-     :   'CHR_MTOE FAILS - numeric value returned for invalid value:', 
+         PRINT *,
+     :   'CHR_MTOE FAILS - numeric value returned for invalid value:',
      :   ICHR
          ISTAT = SAI__ERROR
-      END IF  
+      END IF
 
       CALL CHR_MTOE( NUL, CHAR1 )
       ICHR = ICHAR( CHAR1 )
       IF ( ICHR .NE. E_NUL ) THEN
-         PRINT *, 
+         PRINT *,
      :   'CHR_MTOE FAILS - numeric value returned for null:', ICHR
          ISTAT = SAI__ERROR
-      END IF  
+      END IF
 
       CALL CHR_MTOE( 'ABC', CHARS )
       ICHR1 = ICHAR( CHARS(1:1) )
@@ -150,11 +150,11 @@
       IF ( ICHR1 .NE. E_A .AND.
      :     ICHR2 .NE. E_B .AND.
      :     ICHR3 .NE. E_C ) THEN
-         PRINT *, 
-     :   'CHR_MTOE FAILS - incorrect value returned for ''ABC'':', 
+         PRINT *,
+     :   'CHR_MTOE FAILS - incorrect value returned for ''ABC'':',
      :   ICHR1, ICHR2, ICHR3
          ISTAT = SAI__ERROR
-      END IF  
+      END IF
 
       IF (ISTAT .EQ. SAI__OK) THEN
          PRINT *, 'CHR_MTOE OK'

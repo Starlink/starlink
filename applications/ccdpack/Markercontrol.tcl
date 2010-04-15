@@ -13,7 +13,7 @@
 #     [incr Tk] Mega-Widget
 
 #  Description:
-#     This control provides to the calling code a widget which can 
+#     This control provides to the calling code a widget which can
 #     plot points, remove them, and keep track of where they are.
 #     To the user (the person running the GUI) it provides a method
 #     of specifying the appearance and index numbers of marked points.
@@ -21,12 +21,12 @@
 #     Communication is done using view coordinates.  To know the
 #     details of the canvas on which it is plotting, this widget
 #     requires the name of the canvas with which it is associated
-#     and a function to use for converting from view to canvas 
+#     and a function to use for converting from view to canvas
 #     coordinates.
 
 #  Public Methods:
 #     addpoint vx vy ?ipoint?
-#        Adds a point at the given view coordinates to the list of 
+#        Adds a point at the given view coordinates to the list of
 #        marked points.  If the ipoint parameter is not given then
 #        the index of the new point will be selected in a sensible,
 #        perhaps user-selectable, fashion from unused values.
@@ -70,15 +70,15 @@
 #     view2canvcmd
 #        A command which will map view coordinates to canvas coordinates
 #        (for the canvas specified by the 'canvas' configuration option).
-#        If vx and vy are view coordinates, the command 
+#        If vx and vy are view coordinates, the command
 #        [ $view2canvcmd $vx $vy ] should return a two-element list
 #        giving the corresponding canvas coordinates.
 #
-#     uselabels = boolean 
+#     uselabels = boolean
 #        If true, then the index number of each point will be displayed
-#        alongside the marker when it is plotted and it will be 
+#        alongside the marker when it is plotted and it will be
 #        possible for the user to select the index of the next point
-#        to be plotted.  Otherwise an index is chosen automatically 
+#        to be plotted.  Otherwise an index is chosen automatically
 #        from the list of unused ones.  The default is false.
 #
 #     Markercontrol also inherits all the public variables of the Control
@@ -130,7 +130,7 @@
             marknumcontrol $itk_component(control).markernum -max 0
          }
          itk_component add markstylecontrol {
-            markstylecontrol $itk_component(control).markerstyle 
+            markstylecontrol $itk_component(control).markerstyle
          }
 
 #  Set up some private instance variables.
@@ -204,18 +204,18 @@
 
 #  If any point in the list has the index ipoint, then remove it from the
 #  list and from the canvas.
-         set i 0 
+         set i 0
          foreach p $points {
             if { [ lindex $p 0 ] == $ipoint } {
                set tag [ lindex $p 3 ]
-               $canvas delete $tag 
+               $canvas delete $tag
                set points [ lreplace $points $i $i ]
-            }  
+            }
             incr i
-         }  
+         }
 
 #  Possibly modify the number of the next marker to be plotted according
-#  to whether we've just opened up a suitable gap in the list. 
+#  to whether we've just opened up a suitable gap in the list.
          $markernum unuse $ipoint
       }
 

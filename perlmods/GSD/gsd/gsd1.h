@@ -50,12 +50,12 @@
 #define  GSD_SZCHAR   16
 
 enum type_tag
-{  typ_byte  =  1,                      
-   typ_logical, 			       
-   typ_word, 			       
-   typ_int, 			       
-   typ_real, 			       
-   typ_double, 			       
+{  typ_byte  =  1,
+   typ_logical,
+   typ_word,
+   typ_int,
+   typ_real,
+   typ_double,
    typ_char
 };
 
@@ -68,8 +68,8 @@ struct file_descriptor
    int   no_items;        /* Number of items in this file    ?         */
    int   str_data;        /* Start of data area in file - byte number  */
    int   end_data;        /* End of data area - byte number            */
-   char  comment[40];      
-   int size;              
+   char  comment[40];
+   int size;
 };
 
 /* Define the GSD item descriptor.

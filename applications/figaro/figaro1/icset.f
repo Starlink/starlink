@@ -9,7 +9,7 @@ C     NCSET to handle 2D data arrays (which in turn is a non-interactive
 C     version of CSET, but has the possible advantage of allowing the
 C     region to be specified precisely in terms of the X values of the
 C     data).
-C       
+C
 C     This program overcomes the limitations of CLEAN or BCLEAN (qv)
 C     which inherently assume the data to be modified is in the rows of
 C     the input array. This may not be the case for CCD images, and
@@ -43,12 +43,12 @@ C                                              KS / CIT 27th March 1985
 C
 C     Modified:
 C
-C     31st Jul 1987  DJA /AAO. Revised DSA_ routines - some specs 
-C                    changed. Dynamic memory handling now though DYN_ 
+C     31st Jul 1987  DJA /AAO. Revised DSA_ routines - some specs
+C                    changed. Dynamic memory handling now though DYN_
 C                    routines.
 C     16th Aug 1989  MAS / UoM. Modified to handle 2D images rather than
 C                    1D spectra.
-C     31st Jul 1991  HME / UoE. Accept also YSTART/YEND. Constant 
+C     31st Jul 1991  HME / UoE. Accept also YSTART/YEND. Constant
 C                    defaults to 0.
 C     2nd  Aug 1991  HME / UoE.  Call it ICSET.
 C     6th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TAB removed.
@@ -80,7 +80,7 @@ C
       INTEGER      IYST          ! First  "   "  "   "      "
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! No. of elements in data array
-      INTEGER      OPTR          ! Dynamic-memory pointer to output data 
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
                                  ! array
       INTEGER      OSLOT         ! Map slot number outputdata array
       INTEGER      STATUS        ! Running status for DSA_ routines
@@ -164,13 +164,13 @@ C     to a constant value.
 C
 C     Parameters -    (">" input, "<" output)
 C
-C     (>) NX      (Integer) First array dimension 
+C     (>) NX      (Integer) First array dimension
 C     (>) NY      (Integer) Last array dimension
 C     (>) I1      (Integer) First x element of the array to be set
 C     (>) I2      (Integer) Last x element of the array to be set
 C     (>) I3      (Integer) First y element of the array to be set
 C     (>) I4      (Integer) Last y element of the array to be set
-C     (>) NELM    (Integer) number of elements in data array 
+C     (>) NELM    (Integer) number of elements in data array
 C     (>) VALUE   (Real) Value to which elements are to be set
 C     (<) OUTPUT_ARRAY (Real array DATA(1..>=I2)) output array in question.
 C
@@ -188,7 +188,7 @@ C
       INTEGER I1, I2, I3, I4, NELM, NX, NY, IX, IY
       REAL VALUE, OUTPUT_ARRAY( NX,NY )
 C
-C     Set region 
+C     Set region
 C
       DO IY=I3,I4
          DO IX=I1,I2

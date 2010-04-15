@@ -61,12 +61,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -157,10 +157,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -197,10 +197,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -237,10 +237,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -277,10 +277,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -317,10 +317,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -357,10 +357,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEB, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -606,10 +606,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -646,10 +646,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -686,10 +686,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -726,10 +726,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -766,10 +766,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -806,10 +806,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEC, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1055,10 +1055,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1095,10 +1095,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1135,10 +1135,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1175,10 +1175,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1215,10 +1215,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1255,10 +1255,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPED, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1504,10 +1504,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1544,10 +1544,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1584,10 +1584,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1624,10 +1624,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1664,10 +1664,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1704,10 +1704,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEI, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1953,10 +1953,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -1993,10 +1993,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2033,10 +2033,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2073,10 +2073,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2113,10 +2113,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2153,10 +2153,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEL, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2402,10 +2402,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2442,10 +2442,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2482,10 +2482,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2522,10 +2522,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2562,10 +2562,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2602,10 +2602,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPER, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2851,10 +2851,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2891,10 +2891,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2931,10 +2931,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -2971,10 +2971,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -3011,10 +3011,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
@@ -3051,10 +3051,10 @@
 *          set if the attempt fails).  Otherwise set the local null flag.
 
             IF (.NOT. NULFLG) THEN
-               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, 
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC, 
+               CALL CAT1_TCNVT (CAT__TYPEW, VALUEUB, VALUEB, VALUEUW,
+     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
      :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     : 
+     :
      :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN

@@ -1,11 +1,11 @@
-      SUBROUTINE ARD1_UBBOX( NDIM, FRM, TYPE, NPAR, PAR, UBXLB, UBXUB, 
+      SUBROUTINE ARD1_UBBOX( NDIM, FRM, TYPE, NPAR, PAR, UBXLB, UBXUB,
      :                       STATUS )
 *+
 *  Name:
 *     ARD1_UBBOX
 
 *  Purpose:
-*     Return the bounds within user coordinates of a box enclosing the 
+*     Return the bounds within user coordinates of a box enclosing the
 *     supplied region.
 
 *  Language:
@@ -15,8 +15,8 @@
 *     CALL ARD1_UBBOX( NDIM, FRM, TYPE, NPAR, PAR, UBXLB, UBXUB, STATUS )
 
 *  Description:
-*     The user coordinate bounds of an n-D box enclosing the supplied 
-*     region are returned. 
+*     The user coordinate bounds of an n-D box enclosing the supplied
+*     region are returned.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -112,7 +112,7 @@
       DOUBLE PRECISION
      :      COST,                ! Cosine of rotation angle
      :      HW,                  ! Half the requested box width
-     :      RAD,                 ! Radius 
+     :      RAD,                 ! Radius
      :      SINT,                ! Sine of rotation angle
      :      XHW,                 ! Half length of a ellipse on X axis
      :      YHW                  ! Half length of a ellipse on Y axis
@@ -149,14 +149,14 @@
          ELSE
             DO I = 1, NWCS
                HW = ABS( 0.5*PAR( I + NDIM ) )
-               UBXUB( I ) = AST_AXOFFSET( FRM, I, PAR( I ), HW, 
+               UBXUB( I ) = AST_AXOFFSET( FRM, I, PAR( I ), HW,
      :                                    STATUS )
-               UBXLB( I ) = AST_AXOFFSET( FRM, I, PAR( I ), -HW, 
+               UBXLB( I ) = AST_AXOFFSET( FRM, I, PAR( I ), -HW,
      :                                    STATUS )
             END DO
          END IF
 
-*  POLYGON: Parameters are pairs of user co-ordinates, each being a vertex of 
+*  POLYGON: Parameters are pairs of user co-ordinates, each being a vertex of
 *  the polygon. 2-D only.
       ELSE IF( TYPE .EQ. ARD__POL ) THEN
 
@@ -174,7 +174,7 @@
 
 *  Report an error if less than 3 vertices have been supplied.
          ELSE IF( NPAR .LT. 6 ) THEN
-            STATUS = ARD__INTER 
+            STATUS = ARD__INTER
             CALL MSG_SETI( 'NP', NPAR )
             CALL ERR_REP( 'ARD1_UBBOX_ERR1B', 'Wrong no. of '//
      :                    'parameters (^NP) supplied for ARD1_POL '//
@@ -183,17 +183,17 @@
 
 *  If OK...
          ELSE
-         
+
             DO I = 1, NPAR - 1, 2
                UBXUB( 1 ) = MAX( UBXUB( 1 ), PAR( I ) )
                UBXLB( 1 ) = MIN( UBXLB( 1 ), PAR( I ) )
                UBXUB( 2 ) = MAX( UBXUB( 2 ), PAR( I + 1 ) )
                UBXLB( 2 ) = MIN( UBXLB( 2 ), PAR( I + 1 ) )
             END DO
-   
+
          END IF
 
-*  CIRCLE: Parameters are the user co-ordinates of the centre of the circle 
+*  CIRCLE: Parameters are the user co-ordinates of the centre of the circle
 *  or sphere, followed by the radius.
       ELSE IF( TYPE .EQ. ARD__CIR ) THEN
 
@@ -211,8 +211,8 @@
          END IF
 
 *  ELLIPSE: Parameters are the user co-ordinates of the centre of the ellipse,
-*  the half-lengths of the two axes of the ellipse, and the angle (in degrees) 
-*  between the first user axis and the first of the two ellipse axes. 
+*  the half-lengths of the two axes of the ellipse, and the angle (in degrees)
+*  between the first user axis and the first of the two ellipse axes.
 *  Rotation from the 1st to the 2nd axis is positive. 2D only.
       ELSE IF( TYPE .EQ. ARD__ELL ) THEN
 
@@ -229,16 +229,16 @@
 *  If OK...
             ELSE
 
-*  Store the sine and cosine of the orientation of the ellipse in user 
+*  Store the sine and cosine of the orientation of the ellipse in user
 *  co-ordinates.
                SINT = SIN( PAR( 5 )*ARD__DTOR )
                COST = COS( PAR( 5 )*ARD__DTOR )
 
 *  Find the half-ranges of user co-ordinates encompassed by the
 *  ellipse.
-               XHW = SQRT( MAX( 0.0D0, ( PAR( 3 )*COST )**2 + 
+               XHW = SQRT( MAX( 0.0D0, ( PAR( 3 )*COST )**2 +
      :                                 ( PAR( 4 )*SINT )**2 ) )
-               YHW = SQRT( MAX( 0.0D0, ( PAR( 4 )*COST )**2 + 
+               YHW = SQRT( MAX( 0.0D0, ( PAR( 4 )*COST )**2 +
      :                                 ( PAR( 3 )*SINT )**2 ) )
 
 *  Abort if the ellipse is actually a line.
@@ -251,9 +251,9 @@
 
 *  Find the maximum and minimum Y pixel co-ordinates covered by the
 *  ellipse.
-               UBXUB( 1 ) = PAR( 1 ) + XHW 
+               UBXUB( 1 ) = PAR( 1 ) + XHW
                UBXLB( 1 ) = PAR( 1 ) - XHW
-               UBXUB( 2 ) = PAR( 2 ) + YHW 
+               UBXUB( 2 ) = PAR( 2 ) + YHW
                UBXLB( 2 ) = PAR( 2 ) - YHW
 
             END IF

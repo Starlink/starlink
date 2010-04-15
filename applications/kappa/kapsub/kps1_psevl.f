@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_PSEVL( AMP, AXISR, THETA, FWHM, GAMMA, LBND1,
-     :                       UBND1, LBND2, UBND2, PX, PY, ARRAY, 
+     :                       UBND1, LBND2, UBND2, PX, PY, ARRAY,
      :                       STATUS )
 *+
 *  Name:
@@ -41,7 +41,7 @@
 *     LBND1 = INTEGER (Given)
 *        The lower bound on the first pixel axis.
 *     UBND1 = INTEGER (Given)
-*        The upper bound on the first pixel axis. 
+*        The upper bound on the first pixel axis.
 *     LBND2 = INTEGER (Given)
 *        The lower bound on the second pixel axis.
 *     UBND2 = INTEGER (Given)
@@ -98,7 +98,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,14 +153,14 @@
 *  Loop for each line.
       DO J = LBND2, UBND2
 
-*  Find the vertical offset in pixels from the PSF centre to the centre of 
+*  Find the vertical offset in pixels from the PSF centre to the centre of
 *  this line.
          YD = REAL( J ) - 0.5 - PY
 
-*  Loop for each column. 
+*  Loop for each column.
          DO I = LBND1, UBND1
 
-*  Find the horizontal offset in pixels from the PSF centre to the centre of 
+*  Find the horizontal offset in pixels from the PSF centre to the centre of
 *  this column.
             XD = REAL( I ) - 0.5 - PX
 
@@ -175,7 +175,7 @@
 *  this pixel.
                RAD = SQRT( XD * XD +  YD * YD )
 
-*  Compute the co-ordinate angle with respect to the centre. 
+*  Compute the co-ordinate angle with respect to the centre.
                PSI = ATAN2( YD, XD )
 
 *  The polar angular co-ordinate is the difference between the apparent

@@ -24,7 +24,7 @@ datDrep( const HDSLoc *locator,
          char **format_str,
          char **order_str,
          int *status)
- 
+
 {
 /*
 *+
@@ -66,7 +66,7 @@ datDrep( const HDSLoc *locator,
 *     HDS currently supports the following encodings of primitive data
 *     elements. Each description is preceded by the character string
 *     returned by DAT_DREP to describe it:
-*     
+*
 *     -  'BIT0': Used to encode logical values, in which the least
 *     significant bit (bit zero) holds the logical value such that 1
 *     implies .TRUE. and 0 implies .FALSE.. All other bits are

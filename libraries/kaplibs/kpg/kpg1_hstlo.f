@@ -18,7 +18,7 @@
 *     This routine find the set of (X,Y) values representing the centre
 *     of each bin in a given histogram. The logarithm of the supplied
 *     values are used if logarithmic axes are requested. In this case,
-*     zero or negative values result in VAL__BADR values being returned. 
+*     zero or negative values result in VAL__BADR values being returned.
 
 *  Arguments:
 *     NHIST = INTEGER (Given)
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -101,7 +101,7 @@
 
 *  Local Variables:
       INTEGER I                  ! General variable
-      REAL BINWID                ! X axis bin width 
+      REAL BINWID                ! X axis bin width
 *.
 
 *  Check the global inherited status.
@@ -116,10 +116,10 @@
 
 *  Find the width of each bin in linear data units.
          BINWID = ( HMAX - HMIN ) / NHIST
-  
+
 *  Store the linear values at the centre of each histogram step.
          DO I = 1, NHIST
-            YLOC( I ) = REAL( HIST( I ) ) 
+            YLOC( I ) = REAL( HIST( I ) )
             XLOC( I ) = HMIN + ( REAL( I ) - 0.5 ) * BINWID
          END DO
 
@@ -131,12 +131,12 @@
 *  with VAL__BADR.
             DO I = 1, NHIST
                IF( XLOC( I ) .GT. 0.0 ) THEN
-                  XLOC( I ) = LOG10( XLOC( I ) )      
+                  XLOC( I ) = LOG10( XLOC( I ) )
                ELSE
                   XLOC( I ) = VAL__BADR
-               END IF 
+               END IF
             END DO
-   
+
          END IF
 
 *  If a logarithmic Y axis is required, take the log of the linear
@@ -145,10 +145,10 @@
 
             DO I = 1, NHIST
                IF( YLOC( I ) .GT. 0.0 ) THEN
-                  YLOC( I ) = LOG10( YLOC( I ) )      
+                  YLOC( I ) = LOG10( YLOC( I ) )
                ELSE
                   YLOC( I ) = VAL__BADR
-               END IF 
+               END IF
             END DO
 
          END IF

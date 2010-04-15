@@ -220,7 +220,7 @@ C1999    format(1x, 'xfid, yfid: ', 1pe12.3, 1pe12.3)
                DO ROW = STARTR, STOPR
 
 *
-*                Read the XY coordinates for the current row from 
+*                Read the XY coordinates for the current row from
 *                the input catalogue.
 
                   CALL CAT_RGET (CI, ROW, STATUS)
@@ -251,11 +251,11 @@ C2001             format(1x, 'row, xp, yp: ', i5, 1pe15.3, 1pe15.3)
 C                       print3000, corner, xfid, yfid, xp, yp
 C3000                   format(1x, 'inside bounding box' /
 C    :                     1x, 'corner: ', i5 /
-C    :                     1x, 'xfid, yfid, xp, yp: ', 
+C    :                     1x, 'xfid, yfid, xp, yp: ',
 C    :                     1pe15.3, 1pe15.3, 1pe15.3, 1pe15.3)
 
 
-                        CALL CAP_CLCNT (CORNER, XCORNR, YCORNR, 
+                        CALL CAP_CLCNT (CORNER, XCORNR, YCORNR,
      :                    XFID, YFID, XP, YP, CROSS, STATUS)
 
 C                       print3001, cross

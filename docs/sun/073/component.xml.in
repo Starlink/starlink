@@ -12,7 +12,7 @@
      Database computer (STADAT) for the use of all Starlink users. It
      is only available on STADAT and is not installed on any other
      Starlink nodes.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

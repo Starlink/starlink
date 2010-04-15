@@ -23,7 +23,7 @@ C     CALL DSA_CALC_WIDTH (DATA,NX,NSECT,WIDTH,STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
-C     (>) DATA      (Double array,ref) The axis data array.  Note that 
+C     (>) DATA      (Double array,ref) The axis data array.  Note that
 C                   this is treated as a 2D array of NSECT cross-sections
 C                   each NX elements long, as is the width array.
 C     (>) NX        (Integer,ref) The length of each cross-section of the

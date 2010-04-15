@@ -1127,7 +1127,7 @@ static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
     //  hdu get <n> filename [objectname]. Saves only compressed images...
     if ( strcmp( action, "get" ) == 0 ) {
         if ( objc != 5 && objc != 6 ) {
-            Tcl_SetResult( interp, 
+            Tcl_SetResult( interp,
                            "hdu get requires at least an hdu and filename",
                            TCL_VOLATILE );
             return TCL_ERROR;

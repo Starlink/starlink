@@ -38,7 +38,7 @@ proc red4Polysky {taskname} {
     set pf2 [radiobutton $lev(2).f2 -text "RGs" -variable Red4Widgets(PF_POLYFIT) -value "REDUCED_GRP"]
     set pf3 [radiobutton $lev(2).f3 -text "Obj" -variable Red4Widgets(PF_POLYFIT) -value "OBJECT"]
     set pf4 [radiobutton $lev(2).f4 -text "Obj-Sky" -variable Red4Widgets(PF_POLYFIT) -value "OBJ-SKY"]
-    pack $pf2 $pf3 $pf4 -in $lev(2) -side left 
+    pack $pf2 $pf3 $pf4 -in $lev(2) -side left
     bind $pf2 <Button-2> "red4Update red4Polysky PF_POLYFIT"
     bind $pf3 <Button-2> "red4Update red4Polysky PF_POLYFIT"
     bind $pf4 <Button-2> "red4Update red4Polysky PF_POLYFIT"
@@ -52,8 +52,8 @@ proc red4Polysky {taskname} {
     set Red4Widgets(PF_NREJECT) [entry $lev(3).nr -width 15]
     set we [checkbutton $lev(3).we -text "Weight" -variable Red4Widgets(PF_WEIGHT)]
     set l3 [label $lev(3).l3 -text " "]
-    pack $l1 $Red4Widgets(PF_DEGREE) $l2 $Red4Widgets(PF_NREJECT) -in $lev(3) -side left 
-    pack $we $l3 -in $lev(3) -side right 
+    pack $l1 $Red4Widgets(PF_DEGREE) $l2 $Red4Widgets(PF_NREJECT) -in $lev(3) -side left
+    pack $we $l3 -in $lev(3) -side right
     bind $l1 <Button-2> "red4Update red4Polysky ALL"
     bind $l2 <Button-2> "red4Update red4Polysky ALL"
     bind $l3 <Button-2> "red4Update red4Polysky ALL"
@@ -77,14 +77,14 @@ proc red4Polysky {taskname} {
     set skn 4
     while {$skn <=7} {
       set skynum [expr $skn - 3]
-      set l1 [label $lev($skn).l1 -text "Start"]  
-      set l2 [label $lev($skn).l2 -text "End"]  
-      set l3 [label $lev($skn).l3 -text "Sky Area $skynum" -width 15]  
+      set l1 [label $lev($skn).l1 -text "Start"]
+      set l2 [label $lev($skn).l2 -text "End"]
+      set l3 [label $lev($skn).l3 -text "Sky Area $skynum" -width 15]
       set l4 [label $lev($skn).l4 -text " "]
       set Red4Widgets(PF_SAYS$skynum) [entry $lev($skn).s$skn]
       set Red4Widgets(PF_SAYE$skynum) [entry $lev($skn).e$skn]
-      pack $l3 $l4 -in $lev($skn) -side left 
-      pack $Red4Widgets(PF_SAYE$skynum) $l2 $Red4Widgets(PF_SAYS$skynum) $l1 -in $lev($skn) -side right 
+      pack $l3 $l4 -in $lev($skn) -side left
+      pack $Red4Widgets(PF_SAYE$skynum) $l2 $Red4Widgets(PF_SAYS$skynum) $l1 -in $lev($skn) -side right
       bind $l1 <Button-2> "red4Update red4Polysky ALL"
       bind $l1 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
       bind $l2 <Button-2> "red4Update red4Polysky ALL"

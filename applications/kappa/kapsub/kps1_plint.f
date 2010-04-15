@@ -1,27 +1,27 @@
-      SUBROUTINE KPS1_PLINT( INDF, IWCS, MAP, PARAMS, CONTNR, NAXC, 
-     :                       RETAX, INTERP, RSPARS, TOL, STATUS ) 
+      SUBROUTINE KPS1_PLINT( INDF, IWCS, MAP, PARAMS, CONTNR, NAXC,
+     :                       RETAX, INTERP, RSPARS, TOL, STATUS )
 *+
 *  Name:
 *     KPS1_PLINT
 
 *  Purpose:
-*     Extracts and saves to NDFs interpolated slices about given 
+*     Extracts and saves to NDFs interpolated slices about given
 *     co-ordinates supplied by parameter.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_PLINT( INDF, IWCS, MAP, PARAMS, CONTNR, NAXC, RETAX, 
+*     CALL KPS1_PLINT( INDF, IWCS, MAP, PARAMS, CONTNR, NAXC, RETAX,
 *                      INTERP, RSPARS, TOL, STATUS )
 
 *  Description:
-*     This routine extracts interpolated slices from an input NDF for 
+*     This routine extracts interpolated slices from an input NDF for
 *     one or more locations, and stores each slice in its own output NDF.
 *     Slices run parallel to pixel axes, but are not usually at
-*     pixel centres, hence the need to interpolate.  The user provides 
+*     pixel centres, hence the need to interpolate.  The user provides
 *     the slice's fixed co-ordinates in the current Frame through a
-*     parameter (PARAM(1)).  The axes of these fixed co-ordinates have 
+*     parameter (PARAM(1)).  The axes of these fixed co-ordinates have
 *     single elements in each output NDF.   The axes to be retained
 *     are specified through argument RETAX.
 *
@@ -36,9 +36,9 @@
 *     argument CONTNR) in an HDS_CONTAINER type top-level structure.
 
 *  Arguments:
-*     INDF = INTEGER (Given) 
+*     INDF = INTEGER (Given)
 *        Identifer of the input NDF.
-*     IWCS = INTEGER (Given) 
+*     IWCS = INTEGER (Given)
 *        The FrameSet associated with the input NDF.
 *     MAP = INTEGER (Given)
 *        The AST Mapping from the Frame in which the fixed co-ordinates
@@ -59,37 +59,37 @@
 *     INTERP = INTEGER (Given)
 *        The resampling-scheme identifier for AST_RESAMPLE<T>.
 *     RSPARS( 2 ) = DOUBLE PRECISION (Given)
-*        Qualifying parameters required by the Sinc, SincSinc, SincCos, 
+*        Qualifying parameters required by the Sinc, SincSinc, SincCos,
 *        SincGauss, Somb, SombCos, and Gauss interpolation methods in
 *        AST_RESAMPLE<X>.
 *
-*        RSPARS( 1 ) is required by all the above schemes.  It is used 
+*        RSPARS( 1 ) is required by all the above schemes.  It is used
 *        to specify how many pixels are to contribute to the interpolated
-*        result on either side of the interpolation in each dimension. 
-*        Typically, a value of 2 is appropriate and the minimum allowed 
-*        value is 1 (i.e. one pixel on each side).  A value of zero or 
-*        fewer indicates that a suitable number of pixels should be 
+*        result on either side of the interpolation in each dimension.
+*        Typically, a value of 2 is appropriate and the minimum allowed
+*        value is 1 (i.e. one pixel on each side).  A value of zero or
+*        fewer indicates that a suitable number of pixels should be
 *        calculated automatically.
 *
-*        RSPARS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
+*        RSPARS( 2 ) is required only by the SombCos, Gauss, SincSinc,
 *        SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
 *        SincCos schemes, it specifies the number of pixels at which the
 *        envelope of the function goes to zero.  The minimum value is
 *        1.0, and the run-time default value is 2.0.  For the Gauss and
 *        SincGauss scheme, it specifies the full-width at half-maximum
 *        (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
-*        the run-time default is 1.0.  On astronomical images and 
-*        spectra, good results are often obtained by approximately 
+*        the run-time default is 1.0.  On astronomical images and
+*        spectra, good results are often obtained by approximately
 *        matching the FWHM of the envelope function, given by RSPARS(2),
-*        to the point-spread function of the input data.  
+*        to the point-spread function of the input data.
 *     TOL = DOUBLE PRECISION (Given)
 *        The maximum tolerable geometrical distortion which may be
-*        introduced as a result of approximating non-linear Mappings 
+*        introduced as a result of approximating non-linear Mappings
 *        by a set of piece-wise linear transforms.  The resampling
-*        algorithm uses approximate non-linear co-ordinate 
-*        transformations in order to improve performance, and this 
+*        algorithm uses approximate non-linear co-ordinate
+*        transformations in order to improve performance, and this
 *        parameter controls how inaccurate the resulting approximation
-*        is allowed to be, as a displacement in pixels of the input NDF. 
+*        is allowed to be, as a displacement in pixels of the input NDF.
 *        A value of zero will ensure that no such approximation is done,
 *        at the expense of increasing execution time.
 *     STATUS = INTEGER (Given and Returned)
@@ -125,7 +125,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,7 +141,7 @@
 *  Arguments Given:
       INTEGER INDF
       INTEGER IWCS
-      INTEGER MAP 
+      INTEGER MAP
       CHARACTER*(*) PARAMS( 3 )
       LOGICAL CONTNR
       INTEGER NAXC
@@ -164,7 +164,7 @@
                                  ! for retained axes
       DOUBLE PRECISION FULPOS( NDF__MXDIM ) ! Current-frame co-ordinates
                                  ! of section
-      DOUBLE PRECISION GRDPOS( NDF__MXDIM )  ! Grid co-ordinates of 
+      DOUBLE PRECISION GRDPOS( NDF__MXDIM )  ! Grid co-ordinates of
                                  ! section
       INTEGER I                  ! Position index
       DOUBLE PRECISION INPOS( NDF__MXDIM ) ! User-supplied position
@@ -240,7 +240,7 @@
         END IF
       END DO
 
-*  Work out the bounds of an array which would contain the resampled 
+*  Work out the bounds of an array which would contain the resampled
 *  copy of the whole input array and use the midpoint as representative
 *  co-ordinates.
       DO I = 1, NDIM
@@ -256,7 +256,7 @@
       IF ( CONTNR ) THEN
 
 *  As we wish to use the multiple-input processing through LPG, we
-*  first make a dummy NDF of the required name,  Also modify the 
+*  first make a dummy NDF of the required name,  Also modify the
 *  prompt string for PARAMS(2) parameter.
          CALL PAR_PROMT( PARAMS( 2 ), 'Output HDS container file',
      :                   STATUS )
@@ -309,13 +309,13 @@
      :                    0.0D0, STATUS )
          IF ( .NOT. SINGLE ) CALL MSG_BLANK( STATUS )
 
-*  If a null value was supplied, annul the error and indicate that 
+*  If a null value was supplied, annul the error and indicate that
 *  the loop should be left.
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             MORE = .FALSE.
 
-*  If an abort value was supplied, do not annul the error but indicate that 
+*  If an abort value was supplied, do not annul the error but indicate that
 *  the loop should be left.
          ELSE IF ( STATUS .EQ. PAR__ABORT ) THEN
             MORE = .FALSE.
@@ -338,8 +338,8 @@
          END DO
 
 *  Transform the supplied position to the GRID Frame of the NDF.
-         CALL AST_TRANN( MAP, 1, NAXC, 1, FULPOS, .TRUE., NDIM, 
-     :                   1, GRDPOS, STATUS ) 
+         CALL AST_TRANN( MAP, 1, NAXC, 1, FULPOS, .TRUE., NDIM,
+     :                   1, GRDPOS, STATUS )
 
 *  Create a ShiftMap of the offsets.
          DO I = 1, NDIM
@@ -358,37 +358,37 @@
 *  Interpolate and extract about the fixed co-ordinates.
 *  =====================================================
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_PLRSR( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSR( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
-         
+
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_PLRSB( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSB( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
-    
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_PLRSD( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSD( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_PLRSI( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSI( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_PLRSUB( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSUB( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_PLRSUW( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSUW( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_PLRSW( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ), 
+            CALL KPS1_PLRSW( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
          END IF

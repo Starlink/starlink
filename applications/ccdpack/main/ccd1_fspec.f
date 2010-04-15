@@ -24,9 +24,9 @@
 
 *  Arguments:
 *     FSPEC = CHARACTER (Given)
-*        The original file specification. 
+*        The original file specification.
 *     DFSPEC = CHARACTER (Given)
-*        The default file specification. 
+*        The default file specification.
 *     FLDNAM = CHARACTER (Given)
 *        A string specifying which fields are to be returned in FIELD.
 *        FLDNAM can take any of the values: DEVICE, DIRECTORY, NAME,
@@ -82,7 +82,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -192,11 +192,11 @@
       ELSE
 
 *  NAMEND zero - may be just a type here, is there a period?
-         IF( INDEX( FSPEC( IAT : ), '.' ) .NE. 0 ) THEN 
+         IF( INDEX( FSPEC( IAT : ), '.' ) .NE. 0 ) THEN
             TYP1 = FSPEC
          ELSE
             TYP1 = ' '
-         END IF         
+         END IF
       END IF
 
 *=======================================================================
@@ -260,11 +260,11 @@
       ELSE
 
 *  NAMEND zero - may be just a type here, is there a period?
-         IF( INDEX( DFSPEC( IAT : ), '.' ) .NE. 0 ) THEN 
+         IF( INDEX( DFSPEC( IAT : ), '.' ) .NE. 0 ) THEN
             TYP2 = DFSPEC
          ELSE
             TYP2 = ' '
-         END IF         
+         END IF
       END IF
 
 *=======================================================================
@@ -328,10 +328,10 @@
          NAMEND = MAX(1, CHR_LEN( NAM1 ) )
          IF ( TYP1 .EQ. ' ' ) TYP1 = TYP2
          TYPEND = MAX(1, CHR_LEN( TYP1 ) )
-         
-         FIELD = DIR1( : DIREND ) // 
-     :           NAM1( : NAMEND ) // 
-     :           TYP1( : TYPEND ) 
+
+         FIELD = DIR1( : DIREND ) //
+     :           NAM1( : NAMEND ) //
+     :           TYP1( : TYPEND )
       END IF
 
  999  CONTINUE

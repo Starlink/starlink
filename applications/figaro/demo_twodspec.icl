@@ -15,7 +15,7 @@
 {     none.
 
 {  Description:
-{     A short test of Twodspec 
+{     A short test of Twodspec
 
 {  Authors:
 {     tdca: Tim Ash (RAL, Starlink)

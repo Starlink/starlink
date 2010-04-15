@@ -1,15 +1,15 @@
-      SUBROUTINE JCMT_GETPHT (PHT, C3NPP, C3NMAP, C3NSAMPLE, X, Y, 
+      SUBROUTINE JCMT_GETPHT (PHT, C3NPP, C3NMAP, C3NSAMPLE, X, Y,
      :   STATUS)
 *+
 *  Name:
 *     JCMT_GETPHT
 
 *  Purpose:
-*     Copy the pointing history table into X, Y arrays. 
+*     Copy the pointing history table into X, Y arrays.
 
 *  Language:
 *     FORTRAN
-*    
+*
 
 *  Invocation:
 *     CALL JCMT_GETPHT (PHT, C3NPP, C3NMAP, C3NSAMPLE, X, Y, STATUS)
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,7 +69,7 @@
 *  Arguments Returned:
       REAL X (C3NMAP)
       REAL Y (C3NMAP)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 

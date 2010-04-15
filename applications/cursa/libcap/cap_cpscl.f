@@ -183,9 +183,9 @@
 *
 *                Inquire all the attributes of the column.
 
-                  CALL CAT_CINQ (CURID, 10, FCI, FNAME, FGENUS, FEXPR, 
+                  CALL CAT_CINQ (CURID, 10, FCI, FNAME, FGENUS, FEXPR,
      :              FDTYPE, FCSIZE,FDIMS, FSIZEA, FNULL, FXCEPT, FSCALE,
-     :              FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM, 
+     :              FZEROP, FORDER, FUNITS, FXTFMT, FPRFDS, FCOMM,
      :              FDATE, STATUS)
 
 *
@@ -201,7 +201,7 @@
             ELSE IF (IDTYPE .EQ. CAT__EITYP) THEN
 
 *
-*             Invent or copy values for the attributes of the column 
+*             Invent or copy values for the attributes of the column
 *             to be created from the expression.
 
                CALL CAT_TIQAC (CURID, 'NAME', FNAME, STATUS)
@@ -255,7 +255,7 @@
      :           FIOUTC, STATUS)
 
 *
-*             Set the mutable attributes of this column to correspond 
+*             Set the mutable attributes of this column to correspond
 *             to the input column.
 
                CALL CAT_TATTC (FIOUTC, 'EXPR', FEXPR, STATUS)

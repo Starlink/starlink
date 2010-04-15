@@ -74,10 +74,10 @@ endif
 
 
 #
-more $ECHOMOP_DEMO/ech_locate.txt 
+more $ECHOMOP_DEMO/ech_locate.txt
 wait_to_start
 echmenu ech_rdctn=ech_test tracim=test_obj inptim=test_obj arc=test_arc \
-   tune_autloc=yes tune_automate="'1,EXIT'" display=NO soft=$soft 
+   tune_autloc=yes tune_automate="'1,EXIT'" display=NO soft=$soft
 wait_to_continue
 #
 more $ECHOMOP_DEMO/ech_trace.txt

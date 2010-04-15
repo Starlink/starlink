@@ -14,9 +14,9 @@
 *     CALL KPS1_MLYLM( NLINE, YMX, YMN, YLOG, PYLMT, YLMT, STATUS )
 
 *  Description:
-*     This routine gets the upper and lower vertical limits of a 
-*     multi-line display. The suggested default lower limit is the 
-*     smallest value of the bottom line, and the upper limit is such 
+*     This routine gets the upper and lower vertical limits of a
+*     multi-line display. The suggested default lower limit is the
+*     smallest value of the bottom line, and the upper limit is such
 *     that no lines ever overlap after application of the offsets.
 *     When the vertical axis is logarithmic, the lines will not be
 *     offset, so the default upper limit is the max. value of the
@@ -31,7 +31,7 @@
 *     YMX( NLINE ) = REAL (Given)
 *        The maximum data value of each line.
 *     YMN( NLINE ) = REAL (Given)
-*        The minimum data value of each line.     
+*        The minimum data value of each line.
 *     YLOG = LOGICAL (Given)
 *        If true the vertical axis will be logarithmic, otherwise
 *        linear.
@@ -76,7 +76,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,8 +101,8 @@
       REAL DFYLMT( 2 )           ! Default lower and upper y limits
       LOGICAL GOT                ! Flag for finding min at bottom trace
       INTEGER I                  ! Do-loop index
-      REAL SPAN                  ! Maximum trace span in the display 
-      REAL YMIN                  ! Minimum value in the default display 
+      REAL SPAN                  ! Maximum trace span in the display
+      REAL YMIN                  ! Minimum value in the default display
       REAL YMAX                  ! Maximum value in the default display
       REAL YTEMP                 ! A temporary buffer.
 
@@ -114,7 +114,7 @@
 *  If the vertical axis is linear, get the minimum value of the bottom
 *  line.
       IF ( .NOT. YLOG ) THEN
-         I = 1 
+         I = 1
          GOT = .FALSE.
          DO WHILE ( .NOT. GOT .AND. I .LE. NLINE )
 
@@ -128,14 +128,14 @@
 *  line.
             ELSE
                I = I + 1
-            END IF 
+            END IF
          END DO
 
 *  If no minimum value obtained from all lines, set status, report
 *  an error and exit.
          IF ( .NOT. GOT ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPS1_MLYLM_NOVALSMP', 
+            CALL ERR_REP( 'KPS1_MLYLM_NOVALSMP',
      :        'No valid data to display', STATUS )
             GOTO 999
          END IF
@@ -143,10 +143,10 @@
 *  Find the line which has the maximum span, and note down the span.
          SPAN = 0.0
          DO I = 1, NLINE
-            IF ( YMX( I ) .NE. VAL__BADR .AND. 
+            IF ( YMX( I ) .NE. VAL__BADR .AND.
      :           YMN( I ) .NE. VAL__BADR ) THEN
-               IF ( YMX( I ) - YMN( I ) .GT. SPAN ) 
-     :           SPAN = YMX( I ) - YMN( I )  
+               IF ( YMX( I ) - YMN( I ) .GT. SPAN )
+     :           SPAN = YMX( I ) - YMN( I )
             END IF
          END DO
 
@@ -159,13 +159,13 @@
          DFYLMT( 1 ) = VAL__MAXR
          DFYLMT( 2 ) = VAL__MINR
          DO I = 1, NLINE
-            IF ( YMN( I ) .NE. VAL__BADR .AND. 
+            IF ( YMN( I ) .NE. VAL__BADR .AND.
      :           DFYLMT( 1 ) .GT. YMN( I ) ) DFYLMT( 1 ) = YMN( I )
-            IF ( YMX( I ) .NE. VAL__BADR .AND. 
+            IF ( YMX( I ) .NE. VAL__BADR .AND.
      :           DFYLMT( 2 ) .LT. YMX( I ) ) DFYLMT( 2 ) = YMX( I )
          END DO
       END IF
- 
+
 *  Set the selectable range for the lower and upper limits.
       IF ( YLOG ) THEN
          YMIN = VAL__SMLR
@@ -178,10 +178,10 @@
 *  Start a new error context.
       CALL ERR_MARK
 
-*  Enter a do loop to get the vertical limits from the environment. 
+*  Enter a do loop to get the vertical limits from the environment.
       GOT = .FALSE.
-      DO WHILE ( .NOT. GOT )     
-         CALL PAR_GDR1R( PYLMT, 2, DFYLMT, YMIN, YMAX, .FALSE., 
+      DO WHILE ( .NOT. GOT )
+         CALL PAR_GDR1R( PYLMT, 2, DFYLMT, YMIN, YMAX, .FALSE.,
      :                   YLMT, STATUS )
 
 *  Check status, and exit if there was an error.
@@ -201,7 +201,7 @@
 *  cancel the parameter to re-gain the limits.
          IF ( YLMT( 2 ) - YLMT( 1 ) .LE. VAL__SMLR ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPS1_MLYLM_INSUFY', 
+            CALL ERR_REP( 'KPS1_MLYLM_INSUFY',
      :        'The extent of Y axis is too small.', STATUS )
             CALL ERR_FLUSH( STATUS )
             CALL PAR_CANCL( PYLMT, STATUS )

@@ -111,7 +111,7 @@ itcl::class gaia::StarArdAnnBox {
 
    #  Create the annulus.
    private method create_annulus_ {args} {
-      if { $show_annulus } { 
+      if { $show_annulus } {
          set annulus_id_ [eval $canvas create rectangle $coords \
                              -outline $deselected_colour]
          $canvas addtag $annulus_tag withtag $annulus_id_
@@ -134,7 +134,7 @@ itcl::class gaia::StarArdAnnBox {
    #  Return ARD description of annulus. Uses the getard method with
    #  falsified coords.
    public method getann {} {
-      if { $annulus_id_ != {} } { 
+      if { $annulus_id_ != {} } {
          set oldcoords $coords
          set coords [$canvas coords $annulus_id_]
          set ard [getard 0]

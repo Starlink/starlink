@@ -1,17 +1,17 @@
        REAL FUNCTION BBINT(WINT,TEMP,OK)
- 
+
        IMPLICIT NONE
- 
+
        REAL WINT, TEMP
        REAL RN, WN, FAC1, FAC2, TEST
        REAL HKT, U0, SUM1, SUM2
- 
+
        LOGICAL OK
- 
+
        U0 = 1.43883E+08/WINT/TEMP
        SUM1 = 0.0
        SUM2 = 0.0
- 
+
        RN = 0.0
   100  CONTINUE
        RN = RN + 1.0

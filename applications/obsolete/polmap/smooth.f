@@ -1,16 +1,16 @@
 	SUBROUTINE SMOOTH (Y,NPTS)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  S M O O T H
 C
 C
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 c author
 c   Bevington, page 260.
 c
@@ -27,7 +27,7 @@ c
 c subroutines and function subprograms required
 c   none
 c
-C  
+C
 C
 C
 C

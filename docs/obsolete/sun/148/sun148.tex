@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -95,17 +95,17 @@ which runs the startup command procedure.
 
 All of the relevant logical and symbolic definitions should be done for
 you. To run a particular program, just issue the name of the program as if
-it were a standard FIGARO command. In addition a help file will also be 
+it were a standard FIGARO command. In addition a help file will also be
 set up for you. Help on an individual program may be obtained by entering:
 \begin{verbatim}
       $ HELP prog
 \end{verbatim}
-This will give you a list of the program's input parameters as well as an 
+This will give you a list of the program's input parameters as well as an
 option to look at the source header comments for the main routine.
 
 \section{Features supported}
 
-The programs can take data of any type including USHORT data which is 
+The programs can take data of any type including USHORT data which is
 masquerading as INTEGER*2. All processing however is done with REAL*4
 arithmetic.  Output files will be type REAL*4.
 
@@ -121,7 +121,7 @@ SCP\_PROC creates them from the data and the chip noise parameters.
 \section{Package description}
 
 There are currently five routines in the package.  These are SCP\_CHIP,
-SCP\_HEAD, SCP\_NOISE, SCP\_PRE and SCP\_PROC. The main routine is SCP\_PROC. 
+SCP\_HEAD, SCP\_NOISE, SCP\_PRE and SCP\_PROC. The main routine is SCP\_PROC.
 This program was designed to do all the actual work in processing the data with
 a minimal number of parameters from the user.  Hence it is very convenient to
 use in batch. It reads three text files for its instructions. These are:
@@ -141,7 +141,7 @@ The actual parameters will be described in section \ref{sec:proc_pars}.
 
 \item [IMAGES file]This is set up by the user and lists the frames to be
 reduced according to type (bias frame, flat field, etc). The format is quite
-simple and will be discussed in section \ref{sec:imfil}. 
+simple and will be discussed in section \ref{sec:imfil}.
 
 \end{description}
 
@@ -167,7 +167,7 @@ in section \ref{sec:noise}.
 
 \subsection{SCP\_CHIP} \label{sec:chip_pars}
 
-This program sets up the CHIP file for use in SCP\_PROC. 
+This program sets up the CHIP file for use in SCP\_PROC.
 Eventually there should be a standard set of these files in a standard
 directory.  Until then, the user will have to set them up for the
 individual run. The parameters are:
@@ -184,10 +184,10 @@ by default .SCP
 \item [DIMS] These are the dimensions of the total data array for the chip.
 (2 values required)
 
-\item [START, END] These are the starting and ending  points in X and Y for 
+\item [START, END] These are the starting and ending  points in X and Y for
 the actual data. START and END actually define the area of the chip
 where the `useful' data occurs, {\it e.g.} away from the bias strip.  They
-can also be used for defining a sub-region of the frames to be used if you 
+can also be used for defining a sub-region of the frames to be used if you
 are not really interested in the whole data area and would like substantially
 smaller output files. (2 values required for each)
 
@@ -210,14 +210,14 @@ chip which SCP\_PROC will then either flag as bad or interpolate over.
 Here is a sample CHIP file:
 
 \begin{verbatim}
-      ******FILE FOR EEV CCD-02-06******  
-      Chip name! EEV CCD-02-06;           
-      Dimensions! [400,590];              
-      Data region! [12:396,1:578];        
-      Bias strip! [2:6,101:500];          
-      Readout noise! 10;                  
-      Electrons per ADU! 0.65;            
-      Bad pixels! C6;300,101;             
+      ******FILE FOR EEV CCD-02-06******
+      Chip name! EEV CCD-02-06;
+      Dimensions! [400,590];
+      Data region! [12:396,1:578];
+      Bias strip! [2:6,101:500];
+      Readout noise! 10;
+      Electrons per ADU! 0.65;
+      Bad pixels! C6;300,101;
 \end{verbatim}
 
 This is the file for a chip which has dimensions $400 \times 590$.  The data
@@ -384,7 +384,7 @@ estimate by itself.
 
 \item [BIAS\_FRAME] This has a number of uses.  If bias frames are being
 reduced, then this is the name of the output file for the mean bias frame. If a
-bias frame is being subtracted, then this is the name of the input bias frame. 
+bias frame is being subtracted, then this is the name of the input bias frame.
 
 \item [OVERSCAN] If a bias frame is being subtracted, it can be scaled by the
 estimate in the overscan region in order to take care of any fluctuations in
@@ -409,7 +409,7 @@ field.
 \item [DARK\_COR] This is a flag to subtract out dark counts from flat or
 program fields.
 
-\item [DARK\_FRAME] This has a number of uses.  If dark frames are being 
+\item [DARK\_FRAME] This has a number of uses.  If dark frames are being
 processed, then this is the name of the output file for the mean dark frame. If
 a dark frame is being subtracted, then this is the input file name.
 
@@ -433,32 +433,32 @@ suffix \_PRO then the output file is FILE\_PRO.DST).
 The following is a sample PROC file:
 
 \begin{verbatim}
-          *** Procedure file ***                         
-       Process bias frames?                  ! Y         
-       Process flat frames?                  ! N         
-       Process dark frames?                  ! N         
-       Process program frames?               ! Y         
-       Subtract bias?                        ! Y         
-       Subtract bias frame?                  ! Y         
-       Do overscan correction?               ! Y         
-       Mean bias frame                       ! CCD_MBIAS 
-       Remove cosmic rays?                   ! N         
-       Number of bins for histogramming      ! 0         
-       Cell size for CR search               ! 0         
-       Threshold for CR search               ! 0         
-       Remove dud pixels?                    ! N         
-       Dud pixel replacement scheme          ! 0         
-       Divide by flat field?                 ! N         
-       Mean flat field frame                 !           
-       Image flat field?                     ! N         
-       Order of polynomial                   ! 0         
-       Axis parallel to spectrum             ! 0         
-       Do dark count correction?             ! N         
-       Mean dark count frame                 !           
-       Do 16 bit correction?                 ! N         
-       Trim resultant program frames?        ! Y         
-       Want output error arrays?             ! N         
-       Suffix for output program frames      ! _PRE      
+          *** Procedure file ***
+       Process bias frames?                  ! Y
+       Process flat frames?                  ! N
+       Process dark frames?                  ! N
+       Process program frames?               ! Y
+       Subtract bias?                        ! Y
+       Subtract bias frame?                  ! Y
+       Do overscan correction?               ! Y
+       Mean bias frame                       ! CCD_MBIAS
+       Remove cosmic rays?                   ! N
+       Number of bins for histogramming      ! 0
+       Cell size for CR search               ! 0
+       Threshold for CR search               ! 0
+       Remove dud pixels?                    ! N
+       Dud pixel replacement scheme          ! 0
+       Divide by flat field?                 ! N
+       Mean flat field frame                 !
+       Image flat field?                     ! N
+       Order of polynomial                   ! 0
+       Axis parallel to spectrum             ! 0
+       Do dark count correction?             ! N
+       Mean dark count frame                 !
+       Do 16 bit correction?                 ! N
+       Trim resultant program frames?        ! Y
+       Want output error arrays?             ! N
+       Suffix for output program frames      ! _PRE
 \end{verbatim}
 
 In this case the user has opted to process bias and program frames. The mean
@@ -500,20 +500,20 @@ and maybe try and zap the cosmic rays.  In this case you would identify these
 frames as PROGRAM.  Ok, having confused the issue, here's a sample IMAGES file.
 
 \begin{verbatim}
-      #B                               
-      BIAS1;BIAS2;BIAS3;BIAS4;BIAS5;   
-      BIAS6;BIAS7;BIAS8;BIAS9;BIAS10;  
-      #F                               
-      VFLAT1;VFLAT2;                   
-      #D                               
-      DARK1;                           
-      #P                               
-      N5929_V;M31_V;3C273_V;           
+      #B
+      BIAS1;BIAS2;BIAS3;BIAS4;BIAS5;
+      BIAS6;BIAS7;BIAS8;BIAS9;BIAS10;
+      #F
+      VFLAT1;VFLAT2;
+      #D
+      DARK1;
+      #P
+      N5929_V;M31_V;3C273_V;
 \end{verbatim}
 
 In this file the user has ten bias frames, two flat fields, one dark frame and
 three program frames.  Note that a hash mark is used BEFORE each of the type
-designations. Note also that there MUST be a semi-colon after each file name. 
+designations. Note also that there MUST be a semi-colon after each file name.
 If an error message comes up moaning about the IMAGES file, it's more than
 likely that it's one of these two things which is missing somewhere. Other than
 that, it's all very simple.
@@ -551,13 +551,13 @@ pixel is the reciprocal of its variance.  If no error arrays are desired, then
 the weights are uniform.  Thus an output processed dark frame will be in units
 of ADUs per pixel per second.  The flat frames have one more step through which
 to go.  The average (clipped at the $3\sigma$ level) over the data area of the
-mean flat frame is found.  Then the mean frame is normalised by this average. 
+mean flat frame is found.  Then the mean frame is normalised by this average.
 This is to ensure that the number of counts in any program frame which will be
 divided by this flat field is roughly conserved.
 
 \section{A Recipe}
 
-In this section a recipe for using this software is described.  
+In this section a recipe for using this software is described.
 
 \begin{enumerate}
 
@@ -567,14 +567,14 @@ already known, then the answer here is clearly `yes'. If not, then skip to
 item \ref{it:noerr}.
 
 \item Use SCP\_CHIP to define all the parameters of the chip except the noise
-parameters --- these can have dummy values.  
+parameters --- these can have dummy values.
 
 \item Create an IMAGES file with the bias frames (if those are  to be used for
 the bias estimates) and the flat frames. However, make sure that the flat
-frames are listed in the IMAGES file as program frames.  
+frames are listed in the IMAGES file as program frames.
 
 \item Run SCP\_PRE and have it set up a PROC file to subtract the bias and do
-any cosmetic things which might be wanted.  
+any cosmetic things which might be wanted.
 
 \item Run SCP\_HEAD to get the exposure times into the headers of the flat
 frames.
@@ -586,7 +586,7 @@ frames.
 \item \label{it:noerr} Run SCP\_CHIP. Include the noise parameter estimates if
 they are required or dummy values if they are not.
 
-\item Create an IMAGES file with all the frames which are to be reduced.  
+\item Create an IMAGES file with all the frames which are to be reduced.
 
 \item Run SCP\_PRE to create a PROC file with the complete procedure as  it is
 wanted.

@@ -1,28 +1,28 @@
-#include "sae_par.h" 
-#include "mers.h" 
-#include "ndf.h" 
-#include "star/ndg.h" 
-#include "ast.h" 
-#include "star/kaplibs.h" 
+#include "sae_par.h"
+#include "mers.h"
+#include "ndf.h"
+#include "star/ndg.h"
+#include "ast.h"
+#include "star/kaplibs.h"
 #include "star/irq.h"
-#include "star/grp.h" 
-#include "star/hds.h" 
-#include "par.h" 
+#include "star/grp.h"
+#include "star/hds.h"
+#include "par.h"
 #include "prm_par.h"
-#include "cupid.h" 
-#include <math.h> 
-#include <string.h> 
+#include "cupid.h"
+#include <math.h>
+#include <string.h>
 #include <stdio.h>
 
 /* A string used to mark the end of the configuration parameters and the
    start of the ADAM parameters within the group of history text lines. */
 #define ADAM_STRING "           CUPID:FINDCLUMPS ADAM parameter values used:"
 
-/* A string used to mark the start of the configuration parameters within 
+/* A string used to mark the start of the configuration parameters within
    the group of history text lines. */
 #define CONF_STRING "           CUPID:FINDCLUMPS config parameter values used:"
 
-/* A string used to underline the above strings within the group of history 
+/* A string used to underline the above strings within the group of history
    text lines. */
 #define LINE_STRING "           ============================================="
 
@@ -51,7 +51,7 @@ fptrap (int i)
                        cw & ~(_FPU_MASK_ZM | _FPU_MASK_IM | _FPU_MASK_OM));
 }
 
-#  endif 
+#  endif
 #endif
 
 
@@ -74,30 +74,30 @@ void findclumps( int *status ) {
 *     void findclumps( int *status );
 
 *  Description:
-*     This application identifies clumps of emission within a 1, 2 or 3 
+*     This application identifies clumps of emission within a 1, 2 or 3
 *     dimensional NDF. It is assumed that any background has already been
-*     removed from the data array (for instance, using CUPID:FINDBACK). 
+*     removed from the data array (for instance, using CUPID:FINDBACK).
 *     Information about the clumps is returned in several different ways:
 *
 *     - A pixel mask identifying pixels as background, clump or edge
-*     pixels is written to the Quality array of each output NDF (see 
+*     pixels is written to the Quality array of each output NDF (see
 *     parameters OUT and QOUT). Three quality bits will be used; one
-*     is set if and only if the pixel is contained within one or more 
-*     clumps, another is set if and only if the pixel is not contained within 
-*     any clump, and the other is set if and only if the pixel is in a 
+*     is set if and only if the pixel is contained within one or more
+*     clumps, another is set if and only if the pixel is not contained within
+*     any clump, and the other is set if and only if the pixel is in a
 *     clump but on the edge of the clump (i.e. has one or more neighbouring
-*     pixels that are not inside a clump). These three quality bits have 
-*     names associated with them which can be used with the KAPPA 
-*     applications SETQUAL, QUALTOBAD, REMQUAL, SHOWQUAL. The names used 
+*     pixels that are not inside a clump). These three quality bits have
+*     names associated with them which can be used with the KAPPA
+*     applications SETQUAL, QUALTOBAD, REMQUAL, SHOWQUAL. The names used
 *     are "CLUMP", "BACKGROUND" and "EDGE". For instance, to overlay
-*     the outline of a set of 2D clumps held in NDF "fred" on a previously 
-*     displayed 2D image, do "qualtobad fred fred2 background" followed by 
+*     the outline of a set of 2D clumps held in NDF "fred" on a previously
+*     displayed 2D image, do "qualtobad fred fred2 background" followed by
 *     "contour noclear mode=good fred2".
 *
 *     - Information about each clump, including a minimal cut-out image
-*     of the clump and the clump parameters, is written to the CUPID 
-*     extension of the output NDF (see the section "Use of CUPID Extension" 
-*     below). 
+*     of the clump and the clump parameters, is written to the CUPID
+*     extension of the output NDF (see the section "Use of CUPID Extension"
+*     below).
 *
 *     - An output catalogue containing clump parameters can be created (see
 *     parameter OUTCAT).
@@ -106,73 +106,73 @@ void findclumps( int *status ) {
 *     etc) can be specified (see parameter METHOD).
 
 *  Usage:
-*     findclumps in out outcat method 
+*     findclumps in out outcat method
 
 *  ADAM Parameters:
 *     BACKOFF = _LOGICAL (Read)
-*        If TRUE, the background level in each clump is removed from the 
+*        If TRUE, the background level in each clump is removed from the
 *        clump data values before calculating the reported clump sizes and
-*        centroid position (the background level used is the minimum data 
-*        value in the clump). If FALSE, the full data values, including 
-*        background, are used when calculating the clump sizes and centroid 
-*        position. 
-*        
+*        centroid position (the background level used is the minimum data
+*        value in the clump). If FALSE, the full data values, including
+*        background, are used when calculating the clump sizes and centroid
+*        position.
+*
 *        If BACKOFF is FALSE, a clump that sits on a high background level
 *        will have a larger reported width than an identical clump sitting
 *        on a lower background level. The position of the centroid may
-*        also be affected by the background level. This is usually 
-*        undesirable, and so the default value for BACKOFF is usually TRUE. 
-*        The main reason you may want to set BACKOFF to FALSE is if you 
-*        want to compare clump properties found by FINDCLUMPS with those 
-*        found by the IDL version of CLUMPFIND (which includes the 
-*        background in its calculations). For this reason, the dynamic 
-*        default value got BACKOFF is TRUE, unless METHOD is "ClumpFind" 
-*        and the ClumpFind.IDLAlg configuration parameter is non-zero, in 
-*        which case the dynamic default for BACKOFF is FALSE. 
+*        also be affected by the background level. This is usually
+*        undesirable, and so the default value for BACKOFF is usually TRUE.
+*        The main reason you may want to set BACKOFF to FALSE is if you
+*        want to compare clump properties found by FINDCLUMPS with those
+*        found by the IDL version of CLUMPFIND (which includes the
+*        background in its calculations). For this reason, the dynamic
+*        default value got BACKOFF is TRUE, unless METHOD is "ClumpFind"
+*        and the ClumpFind.IDLAlg configuration parameter is non-zero, in
+*        which case the dynamic default for BACKOFF is FALSE.
 *
-*        Note, the other reported clump properties such as total data 
-*        value, peak data value, etc, are always based on the full clump 
+*        Note, the other reported clump properties such as total data
+*        value, peak data value, etc, are always based on the full clump
 *        data values, including background. []
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters used by the
 *        clump finding algorithms. If the string "def" (case-insensitive)
-*        or a null (!) value is supplied, a set of default configuration 
+*        or a null (!) value is supplied, a set of default configuration
 *        parameter values will be used.
 *
-*        The supplied value should be either a comma-separated list of strings 
+*        The supplied value should be either a comma-separated list of strings
 *        or the name of a text file preceded by an up-arrow character
 *        "^", containing one or more comma-separated list of strings. Each
-*        string is either a "keyword=value" setting, or the name of a text 
+*        string is either a "keyword=value" setting, or the name of a text
 *        file preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner (any blank lines or lines beginning 
+*        contain further comma-separated lists which will be read and
+*        interpreted in the same manner (any blank lines or lines beginning
 *        with "#" are ignored). Within a text file, newlines can be used
-*        as delimiters as well as commas. Settings are applied in the order 
-*        in which they occur within the list, with later settings over-riding 
+*        as delimiters as well as commas. Settings are applied in the order
+*        in which they occur within the list, with later settings over-riding
 *        any earlier settings given for the same keyword.
 *
 *        Each individual setting should be of the form:
 *
 *           <keyword>=<value>
-*        
+*
 *        where <keyword> has the form "algorithm.param"; that is, the name
 *        of the algorithm, followed by a dot, followed by the name of the
 *        parameter to be set. If the algorithm name is omitted, the current
-*        algorithm given by parameter METHOD is assumed. The parameters 
-*        available for each algorithm are listed in the "Configuration 
-*        Parameters" sections below. Default values will be used for any 
+*        algorithm given by parameter METHOD is assumed. The parameters
+*        available for each algorithm are listed in the "Configuration
+*        Parameters" sections below. Default values will be used for any
 *        unspecified parameters. Assigning the value "<def>" (case
-*        insensitive) to a keyword has the effect of reseting it to its 
-*        default value. Unrecognised options are ignored (that is, no error 
+*        insensitive) to a keyword has the effect of reseting it to its
+*        default value. Unrecognised options are ignored (that is, no error
 *        is reported). [current value]
 *     DECONV = _LOGICAL (Read)
-*        Determines if the clump properties stored in the output catalogue 
-*        and NDF extension should be corrected to remove the effect of the 
-*        instrumental beam width specified by the FwhmBeam and VeloRes 
+*        Determines if the clump properties stored in the output catalogue
+*        and NDF extension should be corrected to remove the effect of the
+*        instrumental beam width specified by the FwhmBeam and VeloRes
 *        configuration parameters. If TRUE, the clump sizes will be
-*        reduced and the peak values increased to take account of the 
-*        smoothing introduced by the beam width. If FALSE, the undeconvolved 
-*        values are stored in the output catalogue and NDF. Note, the filter 
+*        reduced and the peak values increased to take account of the
+*        smoothing introduced by the beam width. If FALSE, the undeconvolved
+*        values are stored in the output catalogue and NDF. Note, the filter
 *        to remove clumps smaller than the beam width is still applied, even
 *        if DECONV is FALSE. [TRUE]
 *     MSG_FILTER = _CHAR (Read)
@@ -196,7 +196,7 @@ void findclumps( int *status ) {
 *        centre from the clump centroid, weighted by the corresponding
 *        pixel data value. [NORM]
 *     IN = NDF (Read)
-*        The 1, 2 or 3 dimensional NDF to be analysed. 
+*        The 1, 2 or 3 dimensional NDF to be analysed.
 *     LOGFILE = LITERAL (Read)
 *        The name of a text log file to create. If a null (!) value is
 *        supplied, no log file is created. [!]
@@ -215,21 +215,21 @@ void findclumps( int *status ) {
 *        The total number of clumps descrriptions stored within the output
 *        NDF (and catalogue).
 *     OUT = NDF (Write)
-*        The output NDF which has the same shape and size as the input NDF. 
-*        Information about the identified clumps and the configuration 
+*        The output NDF which has the same shape and size as the input NDF.
+*        Information about the identified clumps and the configuration
 *        parameters used will be stored in the CUPID extension of this NDF.
-*        See "Use of CUPID Extension" below for further details about the 
-*        information stored in the CUPID extension. Other applications within 
-*        the CUPID package can be used to display this information in 
-*        various ways. The information written to the DATA array of this NDF 
-*        depends on the value of the METHOD parameter. If METHOD is 
-*        GaussClumps, the output NDF receives the sum of all the fitted 
-*        Gaussian clump models including a global background level chosen to 
-*        make the mean output value equal to the mean input value. If METHOD 
-*        is ClumpFind, FellWalker or Reinhold, each pixel in the output is 
-*        the integer index of the clump to which the pixel has been assigned. 
-*        Bad values are stored for pixels which are not part of any clump. 
-*        The output NDF will inherit the AXIS and WCS components (plus any 
+*        See "Use of CUPID Extension" below for further details about the
+*        information stored in the CUPID extension. Other applications within
+*        the CUPID package can be used to display this information in
+*        various ways. The information written to the DATA array of this NDF
+*        depends on the value of the METHOD parameter. If METHOD is
+*        GaussClumps, the output NDF receives the sum of all the fitted
+*        Gaussian clump models including a global background level chosen to
+*        make the mean output value equal to the mean input value. If METHOD
+*        is ClumpFind, FellWalker or Reinhold, each pixel in the output is
+*        the integer index of the clump to which the pixel has been assigned.
+*        Bad values are stored for pixels which are not part of any clump.
+*        The output NDF will inherit the AXIS and WCS components (plus any
 *        extensions) from the input NDF.
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
@@ -249,18 +249,18 @@ void findclumps( int *status ) {
 *        - Peak: The peak value in the clump.
 *        - Volume: The total number of pixels falling within the clump.
 *
-*        There is also an optional column called "Shape" containing an 
-*        STC-S description of the spatial coverage of each clump. See 
+*        There is also an optional column called "Shape" containing an
+*        STC-S description of the spatial coverage of each clump. See
 *        parameter SHAPE.
 *
 *        The coordinate system used to describe the peak and centroid
-*        positions is determined by the value supplied for parameter 
+*        positions is determined by the value supplied for parameter
 *        WCSPAR. If WCSPAR is FALSE, then positions are specified in the
-*        pixel coordinate system of the input NDF. In addition, the clump 
-*        sizes are specified in units of pixels, and the clump volume is 
+*        pixel coordinate system of the input NDF. In addition, the clump
+*        sizes are specified in units of pixels, and the clump volume is
 *        specified in units of cubic pixels (square pixels for 2D data).
 *        If WCSPAR is TRUE, then positions are specified in the current
-*        coordinate system of the input NDF. In addition, the clump 
+*        coordinate system of the input NDF. In addition, the clump
 *        sizes and volumes are specified in WCS units. Note, the sizes
 *        are still measured parallel to the pixel axes, but are recorded
 *        in WCS units rather than pixel units. Celestial coordinate
@@ -273,27 +273,27 @@ void findclumps( int *status ) {
 *
 *        The catalogue inherits any WCS information from the input NDF.
 *
-*        The "size" of the clump on an axis is the RMS deviation of each 
-*        pixel centre from the clump centroid, where each pixel is weighted 
+*        The "size" of the clump on an axis is the RMS deviation of each
+*        pixel centre from the clump centroid, where each pixel is weighted
 *        by the corresponding pixel data value (optionally with the
-*        background removed - see parameter BACKOFF). If parameter DECONV is 
-*        set TRUE, the values stored for "Size..." and "Peak" are corrected 
-*        to take account of the smoothing introduced by the instrumental 
+*        background removed - see parameter BACKOFF). If parameter DECONV is
+*        set TRUE, the values stored for "Size..." and "Peak" are corrected
+*        to take account of the smoothing introduced by the instrumental
 *        beam. These corrections reduced the "size..." values and
-*        increase the peak value. Beam sizes are specified by configuration 
+*        increase the peak value. Beam sizes are specified by configuration
 *        parameters FWHMBeam and VeloRes.
 *
-*        For the GaussClump algorithm, the Sum and Volume values refer 
+*        For the GaussClump algorithm, the Sum and Volume values refer
 *        to the part of the Gaussian within the level defined by the
 *        GaussClump.ModelLim configuration parameter.
 *
 *        The values used for configuration parameters and ADAM parameters
 *        are written to the history information of the output catalogue.
 *
-*        The KAPPA command "listshow" can be used to draw markers at the 
+*        The KAPPA command "listshow" can be used to draw markers at the
 *        central positions of the clumps described in a catalogue. For
 *        instance, the command "listshow fred plot=mark" will draw
-*        markers identifying the positions of the clumps described in 
+*        markers identifying the positions of the clumps described in
 *        file fred.FIT, overlaying the markers on top of the currently
 *        displayed image. Specifying "plot=STCS" instead of "plot=mark"
 *        will cause the spatial outline of the clump to be drawn if it is
@@ -301,7 +301,7 @@ void findclumps( int *status ) {
 *     PERSPECTRUM = _LOGICAL (Read)
 *        This parameter is ignored unless the supplied input NDF is
 *        3-dimensional and includes a spectral axis. If so, then a TRUE
-*        value for PERSPECTRUM will cause all spectra within the supplied 
+*        value for PERSPECTRUM will cause all spectra within the supplied
 *        cube to be processed independenly of the neighbouring spectra.
 *        That is, each identified clump will contain pixels from only a
 *        single input spectrum. If a clump extends across multiple
@@ -318,50 +318,50 @@ void findclumps( int *status ) {
 *        created. [!]
 *     REPCONF = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the configuration parameters
-*        supplied by the CONFIG parameter will be listed to standard 
+*        supplied by the CONFIG parameter will be listed to standard
 *        output. [current value]
 *     RMS = _DOUBLE (Read)
-*        Specifies a value to use as the global RMS noise level in the 
-*        supplied data array. The suggested default value is the square root 
+*        Specifies a value to use as the global RMS noise level in the
+*        supplied data array. The suggested default value is the square root
 *        of the mean of the values in the input NDF's Variance component.
-*        If the NDF has no Variance component, the suggested default 
-*        is based on the differences between neighbouring pixel values. Any 
-*        pixel-to-pixel correlation in the noise can result in this estimate 
-*        being too low. The value supplied for this parameter will be ignored 
-*        if the RMS noise level is also given in the configuration file 
+*        If the NDF has no Variance component, the suggested default
+*        is based on the differences between neighbouring pixel values. Any
+*        pixel-to-pixel correlation in the noise can result in this estimate
+*        being too low. The value supplied for this parameter will be ignored
+*        if the RMS noise level is also given in the configuration file
 *        specified by parameter CONFIG.
 *     SHAPE = LITERAL (Read)
 *        Specifies the shape that should be used to describe the spatial
 *        coverage of each clump in the output catalogue. It can be set to
 *        "None", "Polygon" or "Ellipse". If it is set to "None", the
 *        spatial shape of each clump is not recorded in the output
-*        catalogue. Otherwise, the catalogue will have an extra column 
-*        named "Shape" holding an STC-S description of the spatial coverage 
-*        of each clump. "STC-S" is a textual format developed by the IVOA 
+*        catalogue. Otherwise, the catalogue will have an extra column
+*        named "Shape" holding an STC-S description of the spatial coverage
+*        of each clump. "STC-S" is a textual format developed by the IVOA
 *        for describing regions within a WCS - see
 *        http://www.ivoa.net/Documents/latest/STC-S.html for details.
-*        These STC-S desriptions can be displayed by the KAPPA:LISTSHOW 
-*        command, or using GAIA. Since STC-S cannot describe regions within 
-*        a pixel array, it is necessary to set parameter WCSPAR to TRUE if 
-*        using this option. An error will be reported if WCSPAR is FALSE. An 
-*        error will also be reported if the WCS in the input data does not 
-*        contain a pair of scelestial sky axes. 
+*        These STC-S desriptions can be displayed by the KAPPA:LISTSHOW
+*        command, or using GAIA. Since STC-S cannot describe regions within
+*        a pixel array, it is necessary to set parameter WCSPAR to TRUE if
+*        using this option. An error will be reported if WCSPAR is FALSE. An
+*        error will also be reported if the WCS in the input data does not
+*        contain a pair of scelestial sky axes.
 *
-*        - Polygon: Each polygon will have, at most, 15 vertices. If the data 
+*        - Polygon: Each polygon will have, at most, 15 vertices. If the data
 *        is 2-dimensional, the polygon is a fit to the clump's outer boundary
-*        (the region containing all godo data values). If the data is 
+*        (the region containing all godo data values). If the data is
 *        3-dimensional, the spatial footprint of each clump is determined
-*        by rejecting the least significant 10% of spatial pixels, where 
-*        "significance" is measured by the number of spectral channels that 
+*        by rejecting the least significant 10% of spatial pixels, where
+*        "significance" is measured by the number of spectral channels that
 *        contribute to the spatial pixel. The polygon is then a fit to
 *        the outer boundary of the remaining spatial pixels.
 *
 *        - Ellipse: All data values in the clump are projected onto the
-*        spatial plane and "size" of the collapsed clump at four different 
-*        position angles - all separated by 45 degrees - is found (see the 
-*        OUTCAT parameter for a description of clump "size"). The ellipse 
-*        that generates the same sizes at the four position angles is then 
-*        found and used as the clump shape. 
+*        spatial plane and "size" of the collapsed clump at four different
+*        position angles - all separated by 45 degrees - is found (see the
+*        OUTCAT parameter for a description of clump "size"). The ellipse
+*        that generates the same sizes at the four position angles is then
+*        found and used as the clump shape.
 *
 *        In general, "Ellipse" will outline the brighter, inner regions
 *        of each clump, and "Polygon" will include the fainter outer
@@ -369,8 +369,8 @@ void findclumps( int *status ) {
 *     WCSPAR = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the clump parameters stored in
 *        the output catalogue and in the CUPID extension of the output NDF,
-*        are stored in WCS units, as defined by the current coordinate frame 
-*        in the WCS component of the input NDF (this can be inspected using 
+*        are stored in WCS units, as defined by the current coordinate frame
+*        in the WCS component of the input NDF (this can be inspected using
 *        the KAPPA:WCSFRAME command). For instance, if the current
 *        coordinate system in the 3D input NDF is (RA,Dec,freq), then the
 *        catalogue columns that hold the clump peak and centroid positions
@@ -378,27 +378,27 @@ void findclumps( int *status ) {
 *        will be stored in arc-seconds, and the spectral clump size will
 *        be stored in the unit of frequency used by the NDF (Hz, GHz, etc).
 *        If a FALSE value is supplied for this parameter, the clump
-*        parameters are stored in units of pixels within the pixel coordinate 
-*        system of the input NDF. The dynamic default for this parameter is 
-*        TRUE if the current coordinate system in the input NDF represents 
+*        parameters are stored in units of pixels within the pixel coordinate
+*        system of the input NDF. The dynamic default for this parameter is
+*        TRUE if the current coordinate system in the input NDF represents
 *        celestial longitude and latitude in some system, plus a recogonised
 *        spectral axis (if the input NDF is 3D). Otherwise, the dynamic
 *        default is FALSE. []
 
 *  Use of CUPID Extension:
-*     This application will create an NDF extension called "CUPID" in the 
+*     This application will create an NDF extension called "CUPID" in the
 *     output NDF and will add the following components to it:
-* 
+*
 *     - CLUMPS: This a an array of CLUMP structures, one for each clump
-*     identified by the selected algorithm. Each such structure contains 
+*     identified by the selected algorithm. Each such structure contains
 *     the same clump parameters that are written to the catalogue via
 *     parameter OUTCAT. It also contains a component called MODEL which
 *     is an NDF containing a section of the main input NDF which is just
-*     large enough to encompass the clump. Any pixels within this section 
+*     large enough to encompass the clump. Any pixels within this section
 *     which are not contained within the clump are set bad. So for instance,
-*     if the input array "fred.sdf" is 2-dimensional, and an image of it has 
+*     if the input array "fred.sdf" is 2-dimensional, and an image of it has
 *     been displayed using KAPPA:DISPLAY, then the outline of clump number 9
-*     (say) in the output image "fred2.sdf" can be overlayed on the image 
+*     (say) in the output image "fred2.sdf" can be overlayed on the image
 *     by doing:
 *
 *     contour noclear "fred2.more.cupid.clumps(9).model" mode=good labpos=\!
@@ -406,26 +406,26 @@ void findclumps( int *status ) {
 *     - CONFIG: Lists the algorithm configuration parameters used to
 *     identify the clumps (see parameter CONFIG).
 *
-*     - QUALITY_NAMES: Defines the textual names used to identify background 
-*     and clump pixels within the Quality mask. 
+*     - QUALITY_NAMES: Defines the textual names used to identify background
+*     and clump pixels within the Quality mask.
 
 *  Algorithms:
-*     - GaussClumps: Based on the algorithm described by Stutski & Gusten 
-*     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
-*     profile to the brightest peak in the data. It then subtracts the fit 
-*     from the data and iterates, fitting a new ellipse to the brightest peak 
-*     in the residuals. This continues until the integrated data sum in the 
-*     fitted Gaussians reaches the integrated data sum in the input array, 
-*     or a series of consecutive fits are made which have peak values below a 
-*     given multiple of the noise level. Each fitted ellipse is taken to be a 
-*     single clump and is added to the output catalogue. In this algorithm, 
-*     clumps may overlap. Any input variance component is used to scale the 
-*     weight associated with each pixel value when performing the Gaussian 
-*     fit. The most significant configuration parameters for this algorithm 
-*     are: GaussClumps.FwhmBeam and GaussClumps.VeloRes which determine the 
+*     - GaussClumps: Based on the algorithm described by Stutski & Gusten
+*     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian
+*     profile to the brightest peak in the data. It then subtracts the fit
+*     from the data and iterates, fitting a new ellipse to the brightest peak
+*     in the residuals. This continues until the integrated data sum in the
+*     fitted Gaussians reaches the integrated data sum in the input array,
+*     or a series of consecutive fits are made which have peak values below a
+*     given multiple of the noise level. Each fitted ellipse is taken to be a
+*     single clump and is added to the output catalogue. In this algorithm,
+*     clumps may overlap. Any input variance component is used to scale the
+*     weight associated with each pixel value when performing the Gaussian
+*     fit. The most significant configuration parameters for this algorithm
+*     are: GaussClumps.FwhmBeam and GaussClumps.VeloRes which determine the
 *     minimum clump size.
 
-*     - ClumpFind: Described by Williams et al (1994, ApJ 428, 693). This 
+*     - ClumpFind: Described by Williams et al (1994, ApJ 428, 693). This
 *     algorithm works by first contouring the data at a multiple of the
 *     noise, then searches for peaks of emission which locate the clumps,
 *     and then follows them down to lower intensities. No a priori clump
@@ -434,24 +434,24 @@ void findclumps( int *status ) {
 *     list of clumps.
 
 *     - Reinhold: Based on an algorithm developed by Kim Reinhold at JAC.
-*     See SUN/255 for more information on this algorithm. The edges of the 
-*     clumps are first found by searching for peaks within a set of 1D 
-*     profiles running through the data, and then following the wings of 
-*     each peak down to the noise level or to a local minimum. A mask is 
-*     thus produced in which the edges of the clumps are marked. These edges 
-*     however tend to be quite noisy, and so need to be cleaned up before 
-*     further use. This is done using a pair of cellular automata which 
-*     first dilate the edge regions and then erode them. The volume between 
-*     the edges are then filled with an index value associated with the 
-*     peak position. Another cellular automata is used to removed noise 
+*     See SUN/255 for more information on this algorithm. The edges of the
+*     clumps are first found by searching for peaks within a set of 1D
+*     profiles running through the data, and then following the wings of
+*     each peak down to the noise level or to a local minimum. A mask is
+*     thus produced in which the edges of the clumps are marked. These edges
+*     however tend to be quite noisy, and so need to be cleaned up before
+*     further use. This is done using a pair of cellular automata which
+*     first dilate the edge regions and then erode them. The volume between
+*     the edges are then filled with an index value associated with the
+*     peak position. Another cellular automata is used to removed noise
 *     from the filled clumps.
 *
 *     - FellWalker: Based on an algorithm which walks up hill along the
 *     line of greatest gradient until a significant peak is reached. It then
 *     assigns all pixels visited along the route to the clump associated
 *     with the peak. Such a walk is performed for every pixel in the data
-*     array which is above a specified background level. See SUN/255 for more 
-*     information on this algorithm. 
+*     array which is above a specified background level. See SUN/255 for more
+*     information on this algorithm.
 
 *  GaussClumps Configuration Parameters:
 *     GaussClumps.FwhmBeam:
@@ -466,8 +466,8 @@ void findclumps( int *status ) {
 *        FwhmBeam is zero), the initial guess at the clump size is based on
 *        the local profile around the pixel with peak value. []
 *     GaussClumps.MaxBad:
-*        The maximum fraction of bad pixels which may be included in a clump. 
-*        Clumps will be excluded if they contain more bad pixels than this 
+*        The maximum fraction of bad pixels which may be included in a clump.
+*        Clumps will be excluded if they contain more bad pixels than this
 *        value [0.05]
 *     GaussClumps.MaxClumps:
 *        Specifies a termination criterion for
@@ -604,10 +604,10 @@ void findclumps( int *status ) {
 *        as absolute data values, or as mutliples of the RMS noise using the
 *        syntax "[x]*RMS", where "[x]" is a numerical value (e.g. "3.2*RMS").[]
 *     ClumpFind.MaxBad:
-*        The maximum fraction of pixels in a clump that are allowed to be 
-*        adjacent to a bad pixel. If the fraction of clump pixels adjacent to 
-*        a bad pixel exceeds this value, the clump is excluded. If a direct 
-*        comparison with other implementations of the ClumpFind algorithm is 
+*        The maximum fraction of pixels in a clump that are allowed to be
+*        adjacent to a bad pixel. If the fraction of clump pixels adjacent to
+*        a bad pixel exceeds this value, the clump is excluded. If a direct
+*        comparison with other implementations of the ClumpFind algorithm is
 *        required, a value of 1.0 should be used. [0.05]
 *     ClumpFind.MinPix:
 *        The lowest number of pixel which a clump can
@@ -665,8 +665,8 @@ void findclumps( int *status ) {
 *        application paremeter DECONV is set TRUE, the clump widths written to
 *        the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     ReinholdClumps.MaxBad:
-*        The maximum fraction of pixels in a clump that are allowed to be 
-*        adjacent to a bad pixel. If the fraction of clump pixels adjacent 
+*        The maximum fraction of pixels in a clump that are allowed to be
+*        adjacent to a bad pixel. If the fraction of clump pixels adjacent
 *        to a bad pixel exceeds this value, the clump is excluded. [0.05]
 *     Reinhold.MinLen:
 *        The minimum number of pixels spanned by a peak
@@ -754,8 +754,8 @@ void findclumps( int *status ) {
 *        application paremeter DECONV is set TRUE, the clump widths written to
 *        the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     FellWalker.MaxBad:
-*        The maximum fraction of pixels in a clump that are allowed to be 
-*        adjacent to a bad pixel. If the fraction of clump pixels adjacent 
+*        The maximum fraction of pixels in a clump that are allowed to be
+*        adjacent to a bad pixel. If the fraction of clump pixels adjacent
 *        to a bad pixel exceeds this value, the clump is excluded. [0.05]
 *     FellWalker.MinDip:
 *        If the dip between two adjacent peaks is less
@@ -869,12 +869,12 @@ void findclumps( int *status ) {
 *  Undocumented Features:
 *     - If the parameter "GaussClumps.ExtraCols" is set to a positive
 *     integer, then extra method-specific columns are added to the output
-*     catalogue. If ExtraCols is set to 1, then the catalogue will include 
-*     columns with names GCFWHM<i> (where <i> is 1, 2, or 3), holding the 
+*     catalogue. If ExtraCols is set to 1, then the catalogue will include
+*     columns with names GCFWHM<i> (where <i> is 1, 2, or 3), holding the
 *     FWHM of the fitted Gaussian in units of pixels (these FWHM values
 *     have NOT been reduced to excluded the effect of the beam width).
 
-*/      
+*/
 
 /* Local Variables: */
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
@@ -902,7 +902,7 @@ void findclumps( int *status ) {
    char dataunits[ 21 ];        /* NDF data units */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
-   char logfilename[ GRP__SZNAM + 1 ]; /* Log file name */ 
+   char logfilename[ GRP__SZNAM + 1 ]; /* Log file name */
    char method[ 15 ];           /* Algorithm string supplied by user */
    char ndfname[GRP__SZNAM+1];  /* Input NDF name, derived from GRP */
    char shape[ 10 ];            /* Shape for spatial STC-S regions */
@@ -979,12 +979,12 @@ void findclumps( int *status ) {
 
    pname = ndfname;
    grpGet( grp, 1, 1, &pname, GRP__SZNAM, status );
-   
+
    grpDelet( &grp, status );
 
 /* Get the Unit component. */
    dataunits[ 0 ] = 0;
-   ndfCget( indf, "Units", dataunits, 20, status ); 
+   ndfCget( indf, "Units", dataunits, 20, status );
 
 /* Get the dimensions of the NDF, and count the significant ones. */
    ndfDim( indf, NDF__MXDIM, dim, &ndim, status );
@@ -1005,12 +1005,12 @@ void findclumps( int *status ) {
                  "significant pixel axes", status );
       }
       goto L999;
-   }          
+   }
 
 /* Get the WCS FrameSet and the significant axis bounds. */
    kpg1Asget( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
 
-/* Find the size of each dimension of the data array, and the skip in 1D 
+/* Find the size of each dimension of the data array, and the skip in 1D
    vector index needed to move by pixel along an axis. */
    for( i = 0; i < nsig; i++ ) {
       dims[ i ] = subnd[ i ] - slbnd[ i ] + 1;
@@ -1060,7 +1060,7 @@ void findclumps( int *status ) {
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
-   parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,  
+   parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,
              status );
    if( *status == SAI__OK ) {
       if( !strcmp( shape, "POLYGON" ) ) {
@@ -1078,7 +1078,7 @@ void findclumps( int *status ) {
          msgSetc( "S", "s" );
          *status = SAI__ERROR;
          errRep( " ", "Cannot produce STC-S ^S: the current WCS frame in "
-                 "the input does not contain a pair of celestial sky axes.", 
+                 "the input does not contain a pair of celestial sky axes.",
                  status );
 
       } else if( !usewcs ) {
@@ -1101,13 +1101,13 @@ void findclumps( int *status ) {
          if( ifr > 0 ) astSetI( iwcs, "Current", ifr );
 
 /* Check the AST System attribute associated with each axis of the
-   current WCS Frame, looking for an axis with a known velocity system. 
+   current WCS Frame, looking for an axis with a known velocity system.
    Note the one-based index of the axis when and if found. */
          for( i = 1; i <= 3; i++ ) {
             sprintf(attr, "System(%d)", i );
             sys = astGetC( iwcs, attr );
             if( sys ) {
-               if( !strcmp( "VRAD", sys ) || 
+               if( !strcmp( "VRAD", sys ) ||
                    !strcmp( "VOPT", sys ) ||
                    !strcmp( "VELO", sys ) ) {
                   vax = i;
@@ -1140,7 +1140,7 @@ void findclumps( int *status ) {
             velax--;
          } else {
             velax = -1;
-         }         
+         }
       }
 
 /* Issue a warnining if no velocity axis was found, and use pixel axis 3. */
@@ -1148,10 +1148,10 @@ void findclumps( int *status ) {
          velax = 2;
          msgOutif( MSG__QUIET, "",
                    "WARNING: Cannot identify a velocity axis within the "
-                   "supplied NDF. Assuming pixel axis 3 is the velocity axis.", 
+                   "supplied NDF. Assuming pixel axis 3 is the velocity axis.",
                    status );
       }
-   }         
+   }
 
 /* Choose the data type to use when mapping the NDF Data array. */
    ndfMtype( "_REAL,_DOUBLE", indf, indf, "DATA", itype, 20, dtype, 20,
@@ -1172,10 +1172,10 @@ void findclumps( int *status ) {
 
 /* Calculate the default RMS value. If the NDF has a Variance component
    it is the square root of the mean Variance value. Otherwise, it is found
-   by looking at differences between adjacent pixel values in the Data 
+   by looking at differences between adjacent pixel values in the Data
    component. */
    ndfState( indf, "VARIANCE", &var, status );
-   if( *status == SAI__OK && var ) {   
+   if( *status == SAI__OK && var ) {
       ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
 
       sum = 0.0;
@@ -1186,7 +1186,7 @@ void findclumps( int *status ) {
             n++;
          }
       }
-      
+
       if( n > 0 ) {
          rms = sqrtf( sum/n );
 
@@ -1194,12 +1194,12 @@ void findclumps( int *status ) {
          *status = SAI__ERROR;
          errRep( "FINDCLUMPS_ERR3", "The supplied data contains insufficient "
                  "good Variance values to continue.", status );
-      }         
+      }
 
    } else {
       ipv = NULL;
       rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
-   }   
+   }
 
 /* Get the RMS noise level. */
    parDef0d( "RMS", rms, status );
@@ -1209,12 +1209,12 @@ void findclumps( int *status ) {
    parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD,"
              "FELLWALKER", 1, method, 15,  status );
 
-/* If the input is a spectral cube, see if spectra are to be processed 
+/* If the input is a spectral cube, see if spectra are to be processed
    independetly of their neighbouring spectra. */
    if( velax != -1 ){
       parGet0l( "PERSPECTRUM", &perspectrum, status );
       if( perspectrum && strcmp( method, "FELLWALKER" ) &&
-                         strcmp( method, "CLUMPFIND" ) && 
+                         strcmp( method, "CLUMPFIND" ) &&
           *status == SAI__OK ){
          *status = SAI__ERROR;
          msgSetc( "M", method );
@@ -1250,7 +1250,7 @@ void findclumps( int *status ) {
          }
       }
 
-/* Otherwise, create an AST KeyMap holding the value for each configuration 
+/* Otherwise, create an AST KeyMap holding the value for each configuration
    setting, indexed using its name, display the config file if needed. */
       if( !keymap && *status == SAI__OK ) {
          kpg1Kymap( grp, &keymap, status );
@@ -1263,9 +1263,9 @@ void findclumps( int *status ) {
    }
 
 /* Delete the group, if any. */
-   if( grp ) grpDelet( &grp, status );      
+   if( grp ) grpDelet( &grp, status );
 
-/* Ensure that NDG will not add provenance or history to the clump 
+/* Ensure that NDG will not add provenance or history to the clump
    cut-out NDFs created below. We will re-start the provenance and GRP
    history blocks before creating the main output NDFs. */
    ndgHltgh( 0, &old, status );
@@ -1273,23 +1273,23 @@ void findclumps( int *status ) {
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-      ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
-                               keymap, velax, beamcorr, status ); 
+      ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms,
+                               keymap, velax, beamcorr, status );
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                             keymap, velax, perspectrum, beamcorr, 
-                             &backoff, status ); 
-      
+                             keymap, velax, perspectrum, beamcorr,
+                             &backoff, status );
+
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                            keymap, velax, beamcorr, status ); 
-      
+                            keymap, velax, beamcorr, status );
+
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, perspectrum, beamcorr, 
-                              status ); 
-      
+                              keymap, velax, perspectrum, beamcorr,
+                              status );
+
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSetc( "METH", method );
@@ -1308,9 +1308,9 @@ void findclumps( int *status ) {
    grpPut1( confgrp, CONF_STRING, 0, status );
    grpPut1( confgrp, LINE_STRING, 0, status );
 
-   if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {     
+   if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {
       kpg1Kygrp( aconfig, &confgrp, status );
-   } 
+   }
 
 /* Append the significant ADAM parameter values. */
    grpPut1( confgrp, " ", 0, status );
@@ -1354,7 +1354,7 @@ void findclumps( int *status ) {
 
 /* Create the main output NDF and map the data array. */
       ipo = NULL;
-      ndfProp( indf, "AXIS,WCS,NOEXTENSION(CUPID)", "OUT", &indf2, 
+      ndfProp( indf, "AXIS,WCS,NOEXTENSION(CUPID)", "OUT", &indf2,
                status );
       if( !strcmp( method, "GAUSSCLUMPS" ) ) {
          ndfMap( indf2, "DATA", itype, "WRITE", &ipo, &el, status );
@@ -1377,7 +1377,7 @@ void findclumps( int *status ) {
 /* Re-halt the NDG provenance and GRP blocks to prevent the clump cut-out
    NDFs receiving provenance and group history. First ensure the default
    history record has been written out to the main NDF as this is the
-   trigger that causes NDG to add the NDF to its list of NDFs to receive 
+   trigger that causes NDG to add the NDF to its list of NDFs to receive
    GRP history, and the NDF library otherwise would not write out the
    default history until the NDF was closed, by which time the NDG gh loop
    will be halted. . */
@@ -1390,32 +1390,32 @@ void findclumps( int *status ) {
    "Unit" component set to "BAD"). */
       ndfState( indf, "WCS", &gotwcs, status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, ishape,
-                        velax, beamcorr, "Output from CUPID:FINDCLUMPS", 
-                        usewcs, gotwcs ? iwcs : NULL, dataunits, 
+                        velax, beamcorr, "Output from CUPID:FINDCLUMPS",
+                        usewcs, gotwcs ? iwcs : NULL, dataunits,
                         confgrp, logfile, &nclumps, status );
 
       if( logfile ) fprintf( logfile, "\n\n" );
 
-/* Allocate room for a mask holding bad values for points which are not 
+/* Allocate room for a mask holding bad values for points which are not
    inside any clump. */
       rmask = astMalloc( sizeof( *rmask )*(size_t) el );
 
-/* Create any output NDF by summing the contents of the NDFs describing the 
+/* Create any output NDF by summing the contents of the NDFs describing the
    found and usable clumps. This also fills the above mask array. */
-      cupidSumClumps( type, ipd, nsig, slbnd, subnd, el, ndfs, 
+      cupidSumClumps( type, ipd, nsig, slbnd, subnd, el, ndfs,
                       rmask, ipo, method, status );
 
-/* Delete any existing quality name information from the output NDF, and 
+/* Delete any existing quality name information from the output NDF, and
    create a structure to hold new quality name info. */
-      irqDelet( indf2, status ); 
+      irqDelet( indf2, status );
       irqNew( indf2, "CUPID", &qlocs, status );
 
 /* Add in quality names; "CLUMP", "BACKGROUND" and "EDGE". */
-      irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
+      irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump",
                 status );
-      irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
+      irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump",
                 status );
-      irqAddqn( qlocs, "EDGE", 0, "set iff a pixel is on the edge of a clump", 
+      irqAddqn( qlocs, "EDGE", 0, "set iff a pixel is on the edge of a clump",
                 status );
 
 /* Transfer the pixel mask to the NDF quality array. */
@@ -1427,10 +1427,10 @@ void findclumps( int *status ) {
       cupidEdges( rmask, el, dims, skip, 1.0, VAL__BADR, status );
       irqSetqm( qlocs, 0, "EDGE", el, rmask, &n, status );
 
-/* Store the configuration parameters relating to the used algorithm in the 
+/* Store the configuration parameters relating to the used algorithm in the
    CUPID extension. We put them into a new KeyMap so that the CUPID NDF
    extension gets names of the form "method.name" rather than just "name". */
-      if( astMapGet0A( keymap, method, (AstObject *) &config ) ) {     
+      if( astMapGet0A( keymap, method, (AstObject *) &config ) ) {
          config2 = astKeyMap( " " );
          astMapPut0A( config2, method, config, NULL );
          cupidStoreConfig( xloc, config2, status );
@@ -1453,8 +1453,8 @@ void findclumps( int *status ) {
          ndgHltpv( 1, &old, status );
 
 /* Create the NDF. */
-         ndfProp( indf, "Units,Data,Variance,Axis,Wcs", "QOUT", &indf3, 
-                  status ); 
+         ndfProp( indf, "Units,Data,Variance,Axis,Wcs", "QOUT", &indf3,
+                  status );
          if( *status == PAR__NULL ) {
             errAnnul( status );
 
@@ -1509,7 +1509,7 @@ void findclumps( int *status ) {
    parPut0i( "NCLUMPS", nclumps, status );
 
 /* If a group was obtained containing configuration parameters, list them. */
-   if( confgrp ) {     
+   if( confgrp ) {
 
 /* Get the number of entries in the group. */
       size = grpGrpsz( confgrp, status );
@@ -1550,7 +1550,7 @@ void findclumps( int *status ) {
       }
 
 /* Delete the GRP group. */
-      grpDelet( &confgrp, status );      
+      grpDelet( &confgrp, status );
 
    }
 
@@ -1573,7 +1573,7 @@ L999:
 /* End the AST context */
    astEnd;
 
-/* If an error has occurred, issue another error report identifying the 
+/* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
       errRep( "FINDCLUMPS_ERR5", "FINDCLUMPS: Failed to identify clumps of "

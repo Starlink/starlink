@@ -1,6 +1,6 @@
 #!/bin/csh
 #
-# !!begin 
+# !!begin
 # !!title  Lists format of files
 # !!author T.R. Marsh
 # !!created   11 January 2005
@@ -17,7 +17,7 @@
 # Arguments: just give a series of fits file names, without the trailing
 # '.sdf'
 #
-# !!end 
+# !!end
 
 source $STARLINK_DIR/etc/cshrc
 source $STARLINK_DIR/etc/login

@@ -1,9 +1,9 @@
- 
+
       SUBROUTINE RDPIPE( LI, MAXENT, INDEX, PRATIO, IBYP, ELL, SXY,
      :                   NOBJ, STATUS )
 *+
 *  Name:
-*     RDPICH - READ PISA PEAK DATA 
+*     RDPICH - READ PISA PEAK DATA
 
 *  Purpose:
 *     To read in the data from an PISAPEAK results file.
@@ -18,7 +18,7 @@
 *  Description:
 *     The routine reads in the PISAPEAK data in FIO file LI, one line at
 *     a time entering the values in the passed arrays. The lines are
-*     parsed using word extraction routines not fortran formatting. 
+*     parsed using word extraction routines not fortran formatting.
 
 *  Arguments:
 *     LI = INTEGER (Given)
@@ -37,7 +37,7 @@
 *     SXY = DOUBLE PRECISION (Returned)
 *        Array of the fifth column values in the file the LI.
 *     NOBJ = INTEGER (Returned)
-*        The number of good lines read in. 
+*        The number of good lines read in.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -63,7 +63,7 @@
       INCLUDE 'FIO_ERR'          ! FIO system error codes
 
 *  Arguments Given:
-      INTEGER LI            
+      INTEGER LI
       INTEGER MAXENT
 
 *  Arguments Returned:
@@ -72,7 +72,7 @@
       DOUBLE PRECISION IBYP( MAXENT )
       DOUBLE PRECISION ELL( MAXENT )
       DOUBLE PRECISION SXY( MAXENT )
-      INTEGER NOBJ 
+      INTEGER NOBJ
 
 *  Status:
       INTEGER STATUS             ! Global status

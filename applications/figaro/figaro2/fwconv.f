@@ -1,15 +1,15 @@
 C+
       SUBROUTINE FWCONV
 C
-C     F W C O N V  
+C     F W C O N V
 C
-C     Converts flux units of a spectrum from/to either 
-C     F_lambda (ergs/sec/cm**2/A), AB magnitudes or F_nu (Janskys). 
+C     Converts flux units of a spectrum from/to either
+C     F_lambda (ergs/sec/cm**2/A), AB magnitudes or F_nu (Janskys).
 C
 C     Command parameters -
 C
 C     SPECTRUM The name of the structure containing the spectrum.
-C              An x-axis data structure giving the wavelengths of the 
+C              An x-axis data structure giving the wavelengths of the
 C              data elements is also required.
 C
 C     OUTPUT   The name of the result of the operation.  This can
@@ -56,7 +56,7 @@ C
       INTEGER      NCH           ! Index of a substring in a string
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
-      INTEGER      OUTYPE        ! Type of output units 
+      INTEGER      OUTYPE        ! Type of output units
       INTEGER      OPTR          ! Dynamic-memory pointer to output data
                                  ! array
       INTEGER      OSLOT         ! Map slot number for output data array
@@ -65,9 +65,9 @@ C
                                  ! units
       CHARACTER    UNITAB(5)*14  ! The names of the different units
       CHARACTER    UNITS*64      ! The units of the data
-      LOGICAL      VEXIST        ! TRUE if a variance array exists   
-      INTEGER      VPTR          ! Dynamic-memory pointer to input 
-                                 ! variance array 
+      LOGICAL      VEXIST        ! TRUE if a variance array exists
+      INTEGER      VPTR          ! Dynamic-memory pointer to input
+                                 ! variance array
       INTEGER      VSLOT         ! Map slot number for input variance
                                  ! array
       INTEGER      XDIMS(10)     ! X-axis data array dimensions
@@ -98,7 +98,7 @@ C     Get dimensions of input data
 C
       CALL DSA_DATA_SIZE ('SPECT',10,NDIM,DIMS,NELM,STATUS)
 C
-C     Get input units. Find out if units of data are compatible 
+C     Get input units. Find out if units of data are compatible
 C     with the conversion to be attempted.
 C
       CALL DSA_GET_DATA_INFO ('SPECT',1,UNITS,0,DUMMY,STATUS)
@@ -166,7 +166,7 @@ C
      :      'Warning: X-data does not appear to be in Angstroms',
      :                                                         IGNORE)
       END IF
-      
+
       CALL DSA_AXIS_SIZE ('SPECT',1,10,XNDIM,XDIMS,XNELM,STATUS)
       IF (XNDIM.GT.1) THEN
          DO I=1,XNDIM
@@ -180,7 +180,7 @@ C
      :                                                         IGNORE)
             GO TO 500    ! Error exit
          END IF
-      END IF               
+      END IF
 
 
 C
@@ -203,7 +203,7 @@ C
 C
 C     Operate on the data. Note that FIG_FWCONV can operate
 C     on data in situ.
-C 
+C
       CALL FIG_FWCONV(%VAL(CNF_PVAL(OPTR)),NELM,INTYPE,OUTYPE,
      :                %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(XPTR)),XNELM)
       UNITS=UNITAB(OUTYPE)(:ULEN(OUTYPE))
@@ -218,7 +218,7 @@ C
          CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',VPTR,
      :                          VSLOT, STATUS)
 C
-        CALL FIG_FWCONV_VAR(%VAL(CNF_PVAL(VPTR)),NELM,INTYPE,OUTYPE,   
+        CALL FIG_FWCONV_VAR(%VAL(CNF_PVAL(VPTR)),NELM,INTYPE,OUTYPE,
      :                      %VAL(CNF_PVAL(VPTR)),%VAL(CNF_PVAL(XPTR)),
      :                      XNELM)
       END IF
@@ -248,11 +248,11 @@ C+
       SUBROUTINE INTERPRET_FLUX(UNITS,TYPE)
 C
 C     To determine flux units and return a coded integer (TYPE) such that
-C        (1) = micro-Janskys 
-C        (2) = milli-Janskys 
-C        (3) = Janskys 
-C        (4) = Ergs/s/cm**2/A 
-C        (5) = AB magnitudes 
+C        (1) = micro-Janskys
+C        (2) = milli-Janskys
+C        (3) = Janskys
+C        (4) = Ergs/s/cm**2/A
+C        (5) = AB magnitudes
 C+
       INTEGER TYPE
       CHARACTER UNITS*(*)
@@ -283,14 +283,14 @@ C+
 C
 C     F I G _ F W C O N V
 C
-C     Converts units of a spectrum, with options of ergs/cm**2/sec/A, 
+C     Converts units of a spectrum, with options of ergs/cm**2/sec/A,
 C     milli-Janskys, or AB magnitudes.
 C
 C     Parameters -  (">" input, "<" output)
 C
 C     (>) IN     (Real array IN(NELM)) The input data.
 C     (>) NELM   (Integer) The number of elements in IN.
-C     (>) INTYPE (Integer) Indicates input units of either 
+C     (>) INTYPE (Integer) Indicates input units of either
 C                1 => Janskys
 C                2 => Milli-Janskys
 C                3 => Micro-Janskys
@@ -313,11 +313,11 @@ C
 C     Functions / subroutines used - None
 C
 C     Note: The conversions are based on the relations
-C         FL=(2.998E-8/WAVELENGTH**2)*FV 
-C         LOG(FV)=-0.4AB+6.56 
-C     where FL is flux in Ergs/cm**2/sec/A 
-C           FV is flux in milli-Janskys and 
-C           AB is in AB magnitudes 
+C         FL=(2.998E-8/WAVELENGTH**2)*FV
+C         LOG(FV)=-0.4AB+6.56
+C     where FL is flux in Ergs/cm**2/sec/A
+C           FV is flux in milli-Janskys and
+C           AB is in AB magnitudes
 C     (quoted in Fillipenko and Greenstein, PASP 1984)
 C
 C                                            KS / CIT 16th Jan 1985
@@ -338,7 +338,7 @@ C
       DATA FLAG,FMIN/10000.0,-1.7E38/
 C
       SCALE=SCALES(INTYPE)/SCALES(OUTYPE)
-      
+
       IF (INTYPE.LE.3) THEN
 C       Input units in Janskys (or subunits thereof)
 
@@ -351,7 +351,7 @@ C         Simple conversion to other Jansky subunit
             IF (IWPTR.GT.NWAV) IWPTR=1
           END DO
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A 
+C         Conversion to Ergs/cm**2/sec/A
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM
@@ -375,12 +375,12 @@ C         Conversion to AB magnitudes
             DO IELM=1,NELM
               IF (OUT(IELM).EQ.FLAG) OUT(IELM)=AMAX
             END DO
-            
+
         END IF
 
-        
+
       ELSE IF (INTYPE.EQ.4) THEN
-C       Input units in Ergs/cm**2/sec/A 
+C       Input units in Ergs/cm**2/sec/A
         SCALE=SCALE/2.998E-8
         IWPTR=1
         IF (OUTYPE.LE.3) THEN
@@ -417,7 +417,7 @@ C         Conversion to Jansky (or a subunit)
             OUT(IELM)=(10.0**(6.56-0.4*IN(IELM)))*SCALE
           END DO
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A  
+C         Conversion to Ergs/cm**2/sec/A
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM
@@ -443,7 +443,7 @@ C     Parameters -  (">" input, "<" output)
 C
 C     (>) IN     (Real array IN(NELM)) The input variance data.
 C     (>) NELM   (Integer) The number of elements in IN.
-C     (>) INTYPE (Integer) Indicates input units of either 
+C     (>) INTYPE (Integer) Indicates input units of either
 C                1 => Janskys
 C                2 => Milli-Janskys
 C                3 => Micro-Janskys
@@ -466,11 +466,11 @@ C
 C     Functions / subroutines used - None
 C
 C     Note: The conversions are based on the relations
-C         FL=(2.998E-8/WAVELENGTH**2)*FV 
-C         LOG(FV)=-0.4AB+6.56 
-C     where FL is flux in Ergs/cm**2/sec/A 
-C           FV is flux in milli-Janskys and 
-C           AB is in AB magnitudes 
+C         FL=(2.998E-8/WAVELENGTH**2)*FV
+C         LOG(FV)=-0.4AB+6.56
+C     where FL is flux in Ergs/cm**2/sec/A
+C           FV is flux in milli-Janskys and
+C           AB is in AB magnitudes
 C     (quoted in Fillipenko and Greenstein, PASP 1984)
 C
 C                                            VGG / RAL 3rd Jul 2001
@@ -492,7 +492,7 @@ C
       DATA FLAG,FMIN/10000.0,-1.7E38/
 C
       SCALE=SCALES(INTYPE)/SCALES(OUTYPE)
-      
+
       IF (INTYPE.LE.3) THEN
 C       Input units in Janskys (or subunits thereof)
 
@@ -500,15 +500,15 @@ C       Input units in Janskys (or subunits thereof)
 C         Simple conversion to other Jansky subunit
           IWPTR=1
           DO IELM=1,NELM
-          
+
             TEMP=SCALE*SQRT(IN(IELM))
             OUT(IELM)=TEMP*TEMP
-            
+
             IWPTR=IWPTR+1
             IF (IWPTR.GT.NWAV) IWPTR=1
           END DO
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A 
+C         Conversion to Ergs/cm**2/sec/A
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM
@@ -534,14 +534,14 @@ C         Conversion to AB magnitudes
             DO IELM=1,NELM
                IF (OUT(IELM).EQ.FLAG) OUT(IELM)=AMAX
             END DO
-                                         
 
-            
+
+
         END IF
 
-        
+
       ELSE IF (INTYPE.EQ.4) THEN
-C       Input units in Ergs/cm**2/sec/A 
+C       Input units in Ergs/cm**2/sec/A
         SCALE=SCALE/2.998E-8
         IWPTR=1
         IF (OUTYPE.LE.3) THEN
@@ -550,7 +550,7 @@ C         Conversion to Jansky (or a subunit)
 
             TEMP = SQRT(IN(IELM))*WAVES(IWPTR)*WAVES(IWPTR)*SCALE
             OUT(IELM)=TEMP*TEMP
-            
+
             IWPTR=IWPTR+1
             IF (IWPTR.GT.NWAV) IWPTR=1
           END DO
@@ -574,37 +574,37 @@ C         Conversion to Jansky (or a subunit)
           DO IELM=1,NELM
              IF (OUT(IELM).EQ.FLAG) OUT(IELM)=AMAX
           END DO
-                       
+
 
         END IF
-        
+
       ELSE IF (INTYPE.EQ.5) THEN
 C       Input units in AB magnitudes
         IF (OUTYPE.LE.3) THEN
 C         Conversion to Jansky (or a subunit)
           DO IELM=1,NELM
-          
+
 
             TEMP = (10.0**(6.56-0.4*SQRT(IN(IELM))))*SCALE
             OUT(IELM)=TEMP*TEMP
 
 
           END DO
-          
+
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A  
+C         Conversion to Ergs/cm**2/sec/A
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM
-          
+
             F_NU=10.0**(6.56-0.4*SQRT(IN(IELM)))
 
             TEMP = SCALE*F_NU/(WAVES(IWPTR)*WAVES(IWPTR))
             OUT(IELM)=TEMP*TEMP
-            
+
             IWPTR=IWPTR+1
             IF (IWPTR.GT.NWAV) IWPTR=1
-            
+
           END DO
         END IF
       END IF

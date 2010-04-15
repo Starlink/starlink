@@ -13,7 +13,7 @@
 *     CALL IRA_IDSCS( IDA, SCS, STATUS )
 
 *  Description:
-*     This routine returns the Sky Coordinate System associated with an 
+*     This routine returns the Sky Coordinate System associated with an
 *     IRA identifier.
 
 *  Arguments:
@@ -21,7 +21,7 @@
 *        The IRA identifier for the astrometry information.
 *     SCS = CHARACTER * ( * ) (Returned)
 *        On exit, contains the full version of the sky coordinate system
-*        associated with the IRA identifier. The supplied variable should 
+*        associated with the IRA identifier. The supplied variable should
 *        have a declared length given by symbolic constant IRA__SZSCS.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -52,7 +52,7 @@
 
 *  History:
 *     4-OCT-2004 (DSB):
-*        Original version. 
+*        Original version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,7 +93,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Store the required SCS string.
-         SCS = ACM_SCS( IDA ) 
+         SCS = ACM_SCS( IDA )
 
 *  If an error occurred, give a context message.
       ELSE

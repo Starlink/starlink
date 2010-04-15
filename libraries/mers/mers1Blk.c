@@ -69,7 +69,7 @@
 #define ERR__SZOUT 79
 #define MSG__SZOUT 79
 
-static MersTune this_err_glbl = { 
+static MersTune this_err_glbl = {
   ERR__SZOUT, 0, 0,
   MSG__SZOUT, 0, MSG__NORM
 };

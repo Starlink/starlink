@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
-*		       int dims[], int nsampcycle, int vxmin, int vymin, 
+*     smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
+*		       int dims[], int nsampcycle, int vxmin, int vymin,
 *		       double *image, double *zero, int *status);
 
 *  Arguments:
@@ -65,7 +65,7 @@
 *     2007-04-10 (AGG):
 *        Remove creation of MAPDATA extension, rename BZ_IMAGE to BOLZERO
 *     2007-07-10 (AGG):
-*        Remove unnecessary HDS locator variable 
+*        Remove unnecessary HDS locator variable
 *     2008-07-18 (TIMJ):
 *        Use smf_find_subarray
 *     2009-08-18 (TIMJ):
@@ -133,8 +133,8 @@
 
 #define FUNC_NAME "smf_store_image"
 
-void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
-		      int dims[], int nsampcycle, int vxmin, int vymin, 
+void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
+		      int dims[], int nsampcycle, int vxmin, int vymin,
 		      double *image, double *zero, int *status) {
 
   smfHead *hdr = NULL;             /* Pointer to header struct */
@@ -164,7 +164,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
   seqstart = cycle * nsampcycle;
   seqend = seqstart + nsampcycle - 1;
-	
+
   slice = (int)( (seqstart + seqend ) /2);
   smf_tslice_ast( data, slice, 1, status);
 
@@ -187,7 +187,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   ndfHcre ( uindf, status );
 
   /* Map the data array */
-  ndfMap ( uindf, "DATA", "_DOUBLE", "WRITE", (void *)&imptr, &el, 
+  ndfMap ( uindf, "DATA", "_DOUBLE", "WRITE", (void *)&imptr, &el,
 	   status );
 
   /* Copy image array */
@@ -252,9 +252,9 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   frame = (int)( (seqstart + seqend ) /2);
   /* Quick and dirty method - just copy the full FITS header */
   imfits = astCopy( hdr->fitshdr );
-  astSetFitsI( imfits, "SUBSCAN", strnum, 
+  astSetFitsI( imfits, "SUBSCAN", strnum,
 	       "Subscan number of reconstructed image", 0);
-  
+
   kpgPtfts( uindf, imfits, status );
 
   /* Unmap the data array */

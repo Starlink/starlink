@@ -1,5 +1,5 @@
       SUBROUTINE SPD_CZME( ORDER, NFDB, NCOMP, NPIX, ROWNUM, FDB,
-     :   LOCATS, IDENTS, WEIGHT, RETVAL, A3, XVAL, RESULT, RESVAR, 
+     :   LOCATS, IDENTS, WEIGHT, RETVAL, A3, XVAL, RESULT, RESVAR,
      :   STATUS )
 *+
 *  Name:
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
       INTEGER I, K               ! Temporary integers
       INTEGER IFAIL1, IFAIL2     ! PDA_DPOLFT stati
       INTEGER NIDENT             ! Number of valid IDs
-      INTEGER IDMIN, IDMAX       ! Indices into FDB corresp. to plot 
+      INTEGER IDMIN, IDMAX       ! Indices into FDB corresp. to plot
                                  ! range
       INTEGER NDEG               ! Highest degree fitted by PDA_DPOLFT
       REAL TEMP                  ! Temporary number
@@ -315,7 +315,7 @@
                   CALL PGMOVE( RESULT(2*I-1,ROWNUM), BOTTOM )
                   CALL PGDRAW( RESULT(2*I-1,ROWNUM), TOP )
                ELSE
-                  CALL PGPT( 1, 
+                  CALL PGPT( 1,
      :               RESULT(2*I-1,ROWNUM), RESULT(2*I,ROWNUM), 5 )
                END IF
             END IF

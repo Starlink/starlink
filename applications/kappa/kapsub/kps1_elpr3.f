@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_ELPR3( VAR, ILO, IHI, JLO, JHI, DATIN, VARIN, 
-     :                       IGRP, REGIND, NBIN, WMEAN, REGVAL, DATOUT, 
+      SUBROUTINE KPS1_ELPR3( VAR, ILO, IHI, JLO, JHI, DATIN, VARIN,
+     :                       IGRP, REGIND, NBIN, WMEAN, REGVAL, DATOUT,
      :                       VAROUT, NSUM, MASK, STATUS )
 *+
 *  Name:
@@ -13,11 +13,11 @@
 
 *  Invocation:
 *     CALL KPS1_ELPR3( VAR, ILO, IHI, JLO, JHI, DATIN, VARIN, IGRP,
-*                      REGIND, NBIN, WMEAN, REGVAL, DATOUT, VAROUT, 
+*                      REGIND, NBIN, WMEAN, REGVAL, DATOUT, VAROUT,
 *                      NSUM, MASK, STATUS )
 
 *  Description:
-*     This subroutine finds the mean (or weighted mean) and variance of the 
+*     This subroutine finds the mean (or weighted mean) and variance of the
 *     data values within specified sub-regions of the supplied data array,
 *     excluding any bad data pixels.  The regions are specified by
 *     means of an "ARD description" (see SUN/183).  The pixel mask
@@ -44,7 +44,7 @@
 *        The identifier for a GRP group containing the ARD description.
 *     REGIND( * ) = INTEGER (Given)
 *        The bin number for each region.  The regions are identified by
-*        their ARD_WORK mask value, which is used as the index into the 
+*        their ARD_WORK mask value, which is used as the index into the
 *        REGIND array.
 *     NBIN = INTEGER (Given)
 *        The number of bins.
@@ -115,7 +115,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      
+
 *  Arguments Given:
       LOGICAL VAR
       INTEGER ILO
@@ -124,20 +124,20 @@
       INTEGER JHI
       REAL    DATIN( ILO:IHI, JLO:JHI )
       REAL    VARIN( ILO:IHI, JLO:JHI )
-      INTEGER IGRP 
+      INTEGER IGRP
       INTEGER REGIND( * )
       INTEGER NBIN
       LOGICAL WMEAN
 
 *  Arguments Given and Returned:
       INTEGER REGVAL
-      
+
 *  Arguments Returned:
       REAL DATOUT( NBIN )
       REAL VAROUT( NBIN )
       INTEGER NSUM( NBIN )
       INTEGER MASK( ILO:IHI, JLO:JHI )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -159,7 +159,7 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Store the smallest mask value which could correspond to a pixel in
 *  one of the required bins.
       MASKLO = REGVAL
@@ -203,15 +203,15 @@
 *  Find the profile bin number into which this pixel falls.
                      IBIN = REGIND( MASK( I, J ) )
 
-*  Increment the weighted bin value and the sum of weights if the data 
+*  Increment the weighted bin value and the sum of weights if the data
 *  and variance values are both good.
                      IF ( DATIN( I, J ) .NE. VAL__BADR .AND.
      :                    VARIN( I, J ) .NE. VAL__BADR .AND.
      :                    VARIN( I, J ) .GT. 0.0 ) THEN
 
                         W = 1.0/VARIN( I, J )
- 
-                        DATOUT( IBIN ) = DATOUT( IBIN ) 
+
+                        DATOUT( IBIN ) = DATOUT( IBIN )
      :                                   + W*DATIN( I, J )
                         VAROUT( IBIN ) = VAROUT( IBIN ) + W
                      END IF
@@ -222,9 +222,9 @@
 *  Store zero in all non-used mask pixels.
                   ELSE
                      MASK( I, J ) = 0
-   
+
                   END IF
-   
+
                END DO
             END DO
 
@@ -239,7 +239,7 @@
                   DATOUT( IBIN ) = VAL__BADR
                   VAROUT( IBIN ) = VAL__BADR
                END IF
-   
+
             END DO
 
 * Now do simple means...
@@ -267,7 +267,7 @@
 *  good.
                      IF ( DATIN( I, J ) .NE. VAL__BADR .AND.
      :                    VARIN( I, J ) .NE. VAL__BADR ) THEN
- 
+
                         DATOUT( IBIN ) = DATOUT( IBIN ) + DATIN( I, J )
                         VAROUT( IBIN ) = VAROUT( IBIN ) + VARIN( I, J )
                         NSUM( IBIN ) = NSUM( IBIN ) + 1
@@ -279,9 +279,9 @@
 *  Store zero in all non-used mask pixels.
                   ELSE
                      MASK( I, J ) = 0
-   
+
                   END IF
-   
+
                END DO
             END DO
 
@@ -290,14 +290,14 @@
             DO IBIN = 1, NBIN
                IF ( NSUM( IBIN ) .GT. 0 ) THEN
                   DATOUT( IBIN ) = DATOUT( IBIN ) / REAL( NSUM( IBIN ) )
-                  VAROUT( IBIN ) = VAROUT( IBIN ) 
+                  VAROUT( IBIN ) = VAROUT( IBIN )
      :                             / REAL( NSUM( IBIN )**2 )
                   ALLBAD = .FALSE.
                ELSE
                   DATOUT( IBIN ) = VAL__BADR
                   VAROUT( IBIN ) = VAL__BADR
                END IF
-   
+
             END DO
 
          END IF
@@ -324,7 +324,7 @@
 
 *  Increment the bin values if the data and variance values are both
 *  good.
-                  IF ( DATIN( I, J ) .NE. VAL__BADR ) THEN 
+                  IF ( DATIN( I, J ) .NE. VAL__BADR ) THEN
 
                      DATOUT( IBIN ) = DATOUT( IBIN ) + DATIN( I, J )
                      NSUM( IBIN ) = NSUM( IBIN ) + 1

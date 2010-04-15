@@ -1,8 +1,8 @@
 ************************************************************************
 
-      SUBROUTINE OUTVAL ( A, E, THETA, CENTRO, CONCEN, PADU, MAGS, 
-     :                    SKYMAG, SKYEST, SKY, SKYSIG, INNER, OUTER, 
-     :                    PHOTON, BIASLE, SATURE, ETIME, USEMSK, 
+      SUBROUTINE OUTVAL ( A, E, THETA, CENTRO, CONCEN, PADU, MAGS,
+     :                    SKYMAG, SKYEST, SKY, SKYSIG, INNER, OUTER,
+     :                    PHOTON, BIASLE, SATURE, ETIME, USEMSK,
      :                    OPTIMA, CLIP, SEE, STATUS )
 
 *+
@@ -108,7 +108,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -146,7 +146,7 @@
 *.
 
       IF ( STATUS .EQ. SAI__OK ) THEN
-      
+
          IF (.NOT. OPTIMA) THEN
 
             CALL MSG_OUT( ' ', ' ', STATUS )
@@ -156,7 +156,7 @@
             CALL MSG_OUT( ' ', TEXT, STATUS )
             WRITE( TEXT, '('' Angle           ='', F6.1 )' ) THETA
             CALL MSG_OUT( ' ', TEXT, STATUS )
-	    
+
 	 ENDIF
 
          CALL MSG_OUT( ' ', ' ', STATUS )
@@ -178,7 +178,7 @@
             ELSE
                WRITE( TEXT, '('' Outer radius    ='', F6.1, 4X,
      :                ''times clipping radius '')' ) OUTER
-            ENDIF	    
+            ENDIF
             CALL MSG_OUT( ' ', TEXT, STATUS )
          ELSE
             CALL MSG_OUT( ' ', ' Interactive sky aperture ', STATUS )
@@ -205,7 +205,7 @@
          ENDIF
          CALL MSG_OUT( ' ', TEXT, STATUS )
 
-         IF ( MAGS ) THEN 
+         IF ( MAGS ) THEN
             WRITE( TEXT, '('' Sky magnitude   ='', F6.1 )' ) SKYMAG
             CALL MSG_OUT( ' ', TEXT, STATUS )
          END IF
@@ -226,7 +226,7 @@
          CALL MSG_OUT( ' ', ' ', STATUS )
          IF ( PHOTON .EQ. 1 ) THEN
             CALL MSG_OUT(' ', ' Errors from photon statistics', STATUS)
-            WRITE( TEXT, 
+            WRITE( TEXT,
      :      '('' Bias level ( data units )       ='', F7.1 )' ) BIASLE
             CALL MSG_OUT( ' ', TEXT, STATUS )
          ELSEIF ( PHOTON .EQ. 2 ) THEN
@@ -236,7 +236,7 @@
          ENDIF
 
 *   Remind user of output data values units.
-         IF ( MAGS ) THEN 
+         IF ( MAGS ) THEN
             CALL MSG_OUT( ' ', ' Results in magnitudes', STATUS )
          ELSE
             CALL MSG_OUT( ' ', ' Results in photon counts', STATUS )
@@ -256,7 +256,7 @@
 	 ELSE
             CALL MSG_OUT( ' ', ' Using aperture extraction', STATUS )
          ENDIF
-	 
+
       ENDIF
 
       END

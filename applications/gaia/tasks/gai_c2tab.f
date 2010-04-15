@@ -211,7 +211,7 @@
  8    CONTINUE
       IF ( .NOT. DONE ) THEN
          CALL CAT_GETXT( CI, DONE, CLASS, TEXT, STATUS )
-         IF ( .NOT. DONE .AND. 
+         IF ( .NOT. DONE .AND.
      :        ( CLASS .EQ. 'COMMENT' .OR. CLASS .EQ. 'AST' ) ) THEN
 
 *  Write the line, note we skip "COMMENT" which is returned from the
@@ -219,7 +219,7 @@
  103        FORMAT( '#T', A )
             IF ( TEXT( : 8 ) .EQ. 'COMMENT ' ) THEN
                WRITE( FI, 103 ) TEXT( 9 : CHR_LEN( TEXT ) )
-            ELSE 
+            ELSE
                WRITE( FI, 103 ) TEXT( 3 : CHR_LEN( TEXT ) )
             END IF
          END IF
@@ -474,7 +474,7 @@
       END IF
 
 *  Now add the column names.
-      WRITE( FI, '(A)' ) ' '      
+      WRITE( FI, '(A)' ) ' '
       IF ( ADDIND ) THEN
          NAME = 'ID_COL'
          LINE = NAME // TAB

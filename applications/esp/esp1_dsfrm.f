@@ -13,7 +13,7 @@
 *     CALL ESP1_DSFRM( FSET, TEXT, STATUS )
 
 *  Description:
-*     This routine displays a textual description of the Current Frame 
+*     This routine displays a textual description of the Current Frame
 *     in the supplied AST FrameSet.
 
 *  Arguments:
@@ -40,7 +40,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,14 +80,14 @@
       LOGICAL GOTFS              ! Was a FrameSet supplied?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get a pointer to the Frame to be described.
-      GOTFS = AST_ISAFRAMESET( FSET, STATUS ) 
+      GOTFS = AST_ISAFRAMESET( FSET, STATUS )
 
       IF( GOTFS ) THEN
          CFRM = AST_GETFRAME( FSET, AST__CURRENT, STATUS )
@@ -101,7 +101,7 @@
          CALL ERR_REP( 'KPG1_DSFRM_ERR', 'KPG1_DSFRM: Inappropriate '//
      :                 'AST Object (class ^CLASS) supplied '//
      :                 '(programming error).', STATUS )
-      END IF      
+      END IF
 
 *  Display any header text.
       IF( TEXT .NE. ' ' ) THEN
@@ -115,12 +115,12 @@
       FRMDMN = AST_GETC( CFRM, 'DOMAIN', STATUS )
       FRMNAX = AST_GETI( CFRM, 'NAXES', STATUS )
 
-*  Display the title (upto 45 characters), and domain. The number of 
+*  Display the title (upto 45 characters), and domain. The number of
 *  dimensions is implied by the list of axes displayed later.
       CALL MSG_SETC( 'TTL', FRMTTL( : 45 ) )
       IF( CHR_LEN( FRMTTL ) .GT. 45 ) CALL MSG_SETC( 'TTL', '...' )
 
-      CALL MSG_OUT( 'WCS_TITLE', 
+      CALL MSG_OUT( 'WCS_TITLE',
      :   '      Frame title         : "^TTL"', STATUS )
 
       CALL MSG_SETC( 'DOMAIN', FRMDMN )
@@ -137,7 +137,7 @@
          SYS = AST_GETC( CFRM, 'SYSTEM', STATUS )
          PRJ = AST_GETC( CFRM, 'PROJECTION', STATUS )
 
-*  Construct a message token holding suitable description for each type of 
+*  Construct a message token holding suitable description for each type of
 *  system...
 *  RA/DEC...
          IF( SYS .EQ. 'FK4' .OR. SYS .EQ. 'FK5' ) THEN
@@ -146,17 +146,17 @@
             CALL MSG_SETC( 'SYS', ' -' )
             IF( EQ .LT. 1984.0 ) THEN
                CALL MSG_SETC( 'SYS', ' B' )
-            ELSE 
+            ELSE
                CALL MSG_SETC( 'SYS', ' J' )
             END IF
             CALL MSG_SETD( 'SYS', EQ )
             CALL MSG_SETC( 'SYS', ')' )
-                 
+
          ELSE IF( SYS .EQ. 'FK4-NO-E' ) THEN
             CALL MSG_SETC( 'SYS', 'Equatorial without E-terms (FK4 -' )
             IF( EQ .LT. 1984.0 ) THEN
                CALL MSG_SETC( 'SYS', ' B' )
-            ELSE 
+            ELSE
                CALL MSG_SETC( 'SYS', ' J' )
             END IF
             CALL MSG_SETD( 'SYS', EQ )
@@ -171,7 +171,7 @@
             CALL MSG_SETC( 'SYS', 'Ecliptic (' )
             IF( EQ .LT. 1984.0 ) THEN
                CALL MSG_SETC( 'SYS', ' B' )
-            ELSE 
+            ELSE
                CALL MSG_SETC( 'SYS', ' J' )
             END IF
             CALL MSG_SETD( 'SYS', EQ )
@@ -188,20 +188,20 @@
 *  Anything else..
          ELSE
             CALL MSG_SETC( 'SYS', SYS )
-         END IF                        
+         END IF
 
 *  Display the system.
-         CALL MSG_OUT( 'WCS_SYS', 
+         CALL MSG_OUT( 'WCS_SYS',
      :   '      System              : ^SYS', STATUS )
 
 *  Display the epoch.
          IF( EP .LT. 1984.0 ) THEN
             CALL MSG_SETC( 'EPOCH', 'B' )
-         ELSE 
+         ELSE
             CALL MSG_SETC( 'EPOCH', 'J' )
          END IF
          CALL MSG_SETD( 'EPOCH', EP )
-         CALL MSG_OUT( 'WCS_EPOCH', 
+         CALL MSG_OUT( 'WCS_EPOCH',
      :   '      Epoch of observation: ^EPOCH', STATUS )
 
 *  Display the projection.
@@ -216,7 +216,7 @@
 *  Only proceed if we have a FrameSet.
       IF( GOTFS ) THEN
 
-*  See if there is a GRID Frame in the FrameSet. 
+*  See if there is a GRID Frame in the FrameSet.
          CALL ESP1_ASFFR( FSET, 'GRID', IGRID, STATUS )
          IF( IGRID .NE. AST__NOFRAME ) THEN
 
@@ -235,20 +235,20 @@
                   GFIRST( 1, IAXIS ) = 1.0
                END DO
 
-*  Map the GRID coordinates at the centre of the first pixel to obtain the 
-*  corresponding coordinates in the Frame. 
+*  Map the GRID coordinates at the centre of the first pixel to obtain the
+*  corresponding coordinates in the Frame.
                CALL AST_TRANN( FSET, 1, NDIM, 1, GFIRST, .TRUE., FRMNAX,
      :                         1, CFIRST, STATUS )
 
 *  Display the resulting coordinates.
-               CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, 1, 
-     :                                             CFIRST( 1, 1 ), 
+               CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, 1,
+     :                                             CFIRST( 1, 1 ),
      :                                             STATUS ) )
 
                DO IAXIS = 2, FRMNAX
                   CALL MSG_SETC( 'FIRST', ',' )
                   CALL MSG_SETC( 'FIRST', ' ' )
-                  CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, IAXIS, 
+                  CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, IAXIS,
      :                            CFIRST( 1, IAXIS ), STATUS ) )
                END DO
 
@@ -279,7 +279,7 @@
          CALL CHR_APPND( ')', ATTRIB, IAT )
 
 *  Get the label and display it.
-         CALL MSG_SETC( 'LABEL', AST_GETC( CFRM, ATTRIB( : IAT ), 
+         CALL MSG_SETC( 'LABEL', AST_GETC( CFRM, ATTRIB( : IAT ),
      :                                     STATUS ) )
          CALL MSG_OUT( 'AXIS_LABEL',
      :   '            Label: ^LABEL', STATUS )

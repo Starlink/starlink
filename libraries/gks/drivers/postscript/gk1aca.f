@@ -1,6 +1,6 @@
- 
- 
- 
+
+
+
       SUBROUTINE GK1ACA(NXDIM,NYDIM,ICOLAR)
 *--------------------------------------------------------------------------
 *
@@ -69,15 +69,15 @@
 *  TD      - Cell array transformation (Image Space to DC)
 *  TI      - Cell array transformation (DC to Image Space)
 *
- 
+
 *
       INTEGER    ICHUNK
       PARAMETER (ICHUNK=50)
- 
+
 *     small real
       REAL       SMALL
       PARAMETER (SMALL=1.0E-4)
- 
+
 *     Offset in Workspace
       INTEGER    ICOLR
       PARAMETER (ICOLR=17)
@@ -97,13 +97,13 @@
 *     according to colour type of workstation.
 *
 *--------------------------------------------------------------------------
- 
- 
+
+
 *     Get Cell array transformation (image space to DC)
       CALL GKCELT(DCX,DCY,TD)
 *     Invert the transformation (to convert from DC to image space)
       CALL GKMTIV(TD,TI)
- 
+
 *
 *     Initialise cell array grid dimensions
 *
@@ -114,7 +114,7 @@
 *
       ISTCOL = KWI3
       ISTROW = KWI4
- 
+
 *
 *     Initialise number of bytes in colour code
 *
@@ -123,14 +123,14 @@
       ELSE
          NBC = 1
       ENDIF
- 
+
 *
 *     Start from a new line in the external file
 *
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       CALL GKFOCO(KIOPB,'save',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Prepare PostScript string to hold one row's data
 *
@@ -138,7 +138,7 @@
   100 FORMAT('/line',I5,' string def')
       CALL GKFOCO(KIOPB,S(1:21),IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     Now send out data in the format required by the ca procedure:
 *     dimensions of source image (NXDX, NYDX), number of bits per
@@ -156,7 +156,7 @@
   111 FORMAT( '[', 4F11.6, 2F11.3, ']{ca}im')
       CALL GKFOCO(KIOPB,S(1:79),IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
- 
+
 *
 *     This should be followed by the raster data.
 *     It is sent in hexadecimal, encoded by GK1ACX.
@@ -175,7 +175,7 @@
              CALL GKFOCO(KIOPB,S(1:JH-1),IREM)
   120     CONTINUE
   130 CONTINUE
- 
+
 *
 *     Restore here, ca doesn't do it.
 *
@@ -183,8 +183,8 @@
       CALL GKFOCO(KIOPB,'restore',IREM)
       CALL GKFOCO(KIOSN,DUMMY,IREM)
       GOTO 999
- 
+
   999 CONTINUE
- 
- 
+
+
       END

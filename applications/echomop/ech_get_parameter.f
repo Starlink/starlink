@@ -262,7 +262,7 @@
      :              ( .NOT. USED_AS_INDEX )  .AND.
      :              REQUIRED_OBJECT( :5 ) .EQ. 'TUNE_' ) THEN
                   REPORT_STRING = ' ' //
-     :                 REQUIRED_OBJECT( 
+     :                 REQUIRED_OBJECT(
      :                 :ECH_WORD_LEN( REQUIRED_OBJECT ) ) //
      :                 ' is set to non-default value: ''' //
      :                 STRING( :CHR_LEN( STRING ) ) // '''.'

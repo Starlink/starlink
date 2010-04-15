@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,7 +103,7 @@
       CALL TASK_GET_NAME( ACTION, STATUS )
 
 *  Initialise the (F)PAR common block.
-      
+
       CALL PSX_GETENV( 'FIGARO_MODE', STRING, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )

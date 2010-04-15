@@ -10,7 +10,7 @@
 *     CALL AGP_ASPEC( AGINAM, GNS, SPEC, STATUS )
 
 *  Description:
-*     Returns the GNS device specification for a supplied AGI workstation 
+*     Returns the GNS device specification for a supplied AGI workstation
 *     name. If the application is linked with native PGPLOT through the
 *     agp_link_adam command, the native PGPLOT device specification can
 *     instead be returned by supplying .FALSE. for the GNS argument.
@@ -21,7 +21,7 @@
 *     AGINAM = CHARACTER*(*) (Given)
 *        The AGI workstation name. No abbreviations allowed.
 *     GNS = LOGICAL (Given)
-*        Supplied .TRUE. if the GNS device specification is required, and 
+*        Supplied .TRUE. if the GNS device specification is required, and
 *        .FALSE. if the native PGPLOT device specification is required.
 *        An error is reported if a native PGPLOT device specifications is
 *        requested but cannot be produced (e.g. because the application
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     31-OCT-2001 (DSB):
 *        Original version.
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -81,12 +81,12 @@
       SPEC = ' '
 
 *  Check status on entry
-      IF( STATUS .NE. SAI__OK ) RETURN 
+      IF( STATUS .NE. SAI__OK ) RETURN
 
 *  This is the Starlink PGPLOT version of this routine, so just use GNS
-*  to find the GNS spec. 
+*  to find the GNS spec.
       IF( GNS ) THEN
-         CALL GNS_IGAG( AGINAM, SPEC, STATUS ) 
+         CALL GNS_IGAG( AGINAM, SPEC, STATUS )
 
 *  Report an error if the native PGPLOT name is requested.
       ELSE

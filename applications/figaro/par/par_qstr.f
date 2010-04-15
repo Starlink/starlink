@@ -11,7 +11,7 @@ C     is registered as of type _CHAR or LITERAL in the application
 C     interface.
 C
 C  Description:
-C     A Figaro application may use this routine to obtain the 
+C     A Figaro application may use this routine to obtain the
 C     value of a character string in response to a prompt.  This
 C     routine should be used (for consistency in the user interface)
 C     rather than a direct dialogue with the terminal using Fortran

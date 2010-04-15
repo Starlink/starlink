@@ -1,4 +1,4 @@
-      SUBROUTINE RTD1_ARDST( BAD, SIMPLE, DATSRC, SHOHED, IGRP, DIM1, 
+      SUBROUTINE RTD1_ARDST( BAD, SIMPLE, DATSRC, SHOHED, IGRP, DIM1,
      :                       DIM2, LBND, UBND, TYPE, IPIN, STATUS )
 *+
 * Name:
@@ -145,14 +145,14 @@
       LBNDI( 1 ) = VAL__MAXI
       LBNDE( 1 ) = VAL__MAXI
       CALL ARD_WORK( IGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI,
      :               LBNDE, UBNDE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Now calculate the statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
          CALL RTD1_STATB( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
-     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, 
+     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD,
      :                    DMIN, DMAX, SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
          CALL RTD1_STATUB( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
@@ -251,23 +251,23 @@
          NOWAT = MAX( WASAT + 12, NOWAT + 1 )
          WASAT = NOWAT
 
-         IF ( DATSRC .NE. ' ' ) THEN 
+         IF ( DATSRC .NE. ' ' ) THEN
             BUFFER( NOWAT: ) = '('
             CALL CHR_PUTC( DATSRC, BUFFER, NOWAT )
             NOWAT = NOWAT + 1
             BUFFER( NOWAT: ) = ')'
-         END IF 
+         END IF
 
-         IF ( SHOHED ) THEN 
+         IF ( SHOHED ) THEN
             CALL MSG_OUT( ' ', HEADER, STATUS )
          END IF
          CALL MSG_OUT( ' ', BUFFER, STATUS )
 
       ELSE
-         IF ( DATSRC .NE. ' ' ) THEN 
+         IF ( DATSRC .NE. ' ' ) THEN
             CALL MSG_SETC( 'DATSRC', DATSRC )
             CALL MSG_OUT( ' ', ' ^DATSRC:', STATUS )
-         END IF 
+         END IF
 
          CALL MSG_SETD( 'MEAN', MEAN )
          CALL MSG_OUT( ' ','   Mean                = ^MEAN', STATUS )

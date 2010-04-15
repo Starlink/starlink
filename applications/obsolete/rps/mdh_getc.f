@@ -33,7 +33,7 @@
 *  -------------------
 
       INTEGER MDH_ENDWORD	! Finds end of string.
-                          
+
       IERR = 1
       DLEN = MDH_ENDWORD( DEFAULT )
       I = 1

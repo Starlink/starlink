@@ -1,7 +1,7 @@
       SUBROUTINE CAT_PNEW0 (CI, PTYPE, PNAME, DTYPE, PI, STATUS)
 *+
 *  Name:
-*     CAT_PNEW0 
+*     CAT_PNEW0
 *  Purpose:
 *     Create a scalar part (column or parameter).
 *  Language:
@@ -36,7 +36,7 @@
 *             Create the default set of values for the attributes of a
 *             column.
 *             Set the values of the attributes corresponding to the name
-*             and the data type (ie. the ones which are passed here as 
+*             and the data type (ie. the ones which are passed here as
 *             arguments).
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -47,7 +47,7 @@
 *             Create the default set of values for the attributes of a
 *             parameter.
 *             Set the values of the attributes corresponding to the name
-*             and the data type (ie. the ones which are passed here as 
+*             and the data type (ie. the ones which are passed here as
 *             arguments).
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -75,12 +75,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -179,7 +179,7 @@
       IF (STATUS .EQ. CAT__OK) THEN
 
 *
-*       Check if the code for the type of identifier corresponds to a 
+*       Check if the code for the type of identifier corresponds to a
 *       part (ie. a column or parameter).
 
          IF (PTYPE .EQ. CAT__FITYP  .OR.  PTYPE .EQ. CAT__QITYP) THEN
@@ -209,7 +209,7 @@
                   IF (PTYPE .EQ. CAT__FITYP) THEN
 
 *
-*                   Create the default set of values for the attributes of 
+*                   Create the default set of values for the attributes of
 *                   a column.
 
                      CALL CAT1_DFATT (FNAME, FGENUS, FEXP, FDTYPE,
@@ -226,7 +226,7 @@
                      FDTYPE = DTYPE
 
 *
-*                   Create the attributes (they are all mutable at this 
+*                   Create the attributes (they are all mutable at this
 *                   stage except those for the name and the data type).
 
                      CALL CAT1_ADDAC (PI, 'NAME', .FALSE., FNAME,
@@ -294,7 +294,7 @@
                      QDTYPE = DTYPE
 
 *
-*                   Create the attributes (they are all mutable at this 
+*                   Create the attributes (they are all mutable at this
 *                   stage except those for the name and the data type).
 
                      CALL CAT1_ADDAC (PI, 'NAME', .FALSE., QNAME,

@@ -46,7 +46,7 @@
 *     prevent successive contour plots being incorrectly located.)
 
 *  Usage:
-*     contover ndf [comp] offset mode ncont [device] 
+*     contover ndf [comp] offset mode ncont [device]
 *        { firstcnt=? stepcnt=?
 *        { heights=?
 *        { percentiles=?
@@ -68,13 +68,13 @@
 *        The colour of the contour lines on devices that support colour.
 *        The options are described below.
 *
-*          "MAX"          - The maximum colour index in the image 
+*          "MAX"          - The maximum colour index in the image
 *                           display colour lookup table.
-*          "MIN"          - The minimum (non-reserved) colour index in 
+*          "MIN"          - The minimum (non-reserved) colour index in
 *                           the image-display colour lookup table.
 *          An integer     - The actual colour index.  It is constrained
 *                           between 0 and the maximum colour index
-*                           available on the device. 
+*                           available on the device.
 *          A named colour - Uses the named colour from the palette, and
 *                           if it is not present, the nearest colour
 *                           from the palette is selected.
@@ -83,7 +83,7 @@
 *        manipulated choose an integer between 0 and 15, or a named
 *        colour.  This parameter will be ignored if PENROT = TRUE.
 *        [The current value, but equals "1" (the foreground colour) if
-*        there is no current value.] 
+*        there is no current value.]
 *     DASHED = _REAL (Read)
 *        The height below which the contours will be drawn with dashed
 *        lines.  A null value (!) means all contours are drawn with
@@ -239,7 +239,7 @@
 *           dashed lines, so this is only suitable for devices
 *           supporting at least three colours simultaneously.
 *
-*     Pen rotation takes precedence over colour control through CONCOL. 
+*     Pen rotation takes precedence over colour control through CONCOL.
 
 *  Algorithm:
 *     -  Find which component to display, obtain an identifier to the
@@ -321,7 +321,7 @@
 *        sections.  Bounds parameters removed.
 *     1992 June 16 (MJC):
 *        Made to work with WINDOW_OVERLAY class.  The restriction on the
-*        number of colour indices has therefore been been relaxed.  
+*        number of colour indices has therefore been been relaxed.
 *     1992 November 30 (MJC):
 *        Does not use non-monotonic axis centres.
 *     1995 October 19 (MJC):
@@ -364,7 +364,7 @@
      :  CELDIM,                ! Tessellation cell dimension
      :  NDIM,                  ! Dimensionality of input array
      :  MXCONT                 ! Maximum number of contour heights
-      PARAMETER( CELDIM = 512 ) 
+      PARAMETER( CELDIM = 512 )
       PARAMETER( NDIM = 2 )    ! Default to 2-d
       PARAMETER( MXCONT = 50 )
 
@@ -700,7 +700,7 @@
 
       CALL SGS_IZONE( X1, X2, Y1, Y2, XM, YM )
 
-*    Assume that the world co-ordinates are in pixels---the normal 
+*    Assume that the world co-ordinates are in pixels---the normal
 *    convention to derive the dimensions of the displayed image.
 
       XRANGI = NINT( X2 ) - NINT( X1 )
@@ -713,9 +713,9 @@
 
 *    Get the offsets.
 *    ================
-*    
+*
 *    Revise minimum values permitted for the upper bound of the region.
-*    The limits ensure that there are at least two pixels in either 
+*    The limits ensure that there are at least two pixels in either
 *    dimension as this is the minimum needed for contouring.  There also
 *    may be an odd pixel due to a rounding error.  The limits allow for
 *    the displacements of lower and upper bounds between the input array
@@ -732,7 +732,7 @@
       DEFOFF( 2 ) = 0
 
 *    Get offsets of current data sub-array with respect to the displayed
-*    image. 
+*    image.
 
       CALL PAR_GRM1I( 'OFFSET', NDIM, DEFOFF, LIML, LIMU, .FALSE.,
      :                OFFS, STATUS )
@@ -898,7 +898,7 @@
          END IF
       END DO
 
-*  Ensure that the pen changes have been applied. This may cause GKS to 
+*  Ensure that the pen changes have been applied. This may cause GKS to
 *  redraw or clear the screen. It must be done now because otherwise, it
 *  would be done when the workstation is closed, resulting in the newly
 *  drawn graphics being erased.

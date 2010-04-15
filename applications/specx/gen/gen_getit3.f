@@ -10,11 +10,11 @@
 
 C   Routine to get location of the next field from the character string STRING
 
-C   If there are insufficient fields the error return is set to 2, 
+C   If there are insufficient fields the error return is set to 2,
 C   otherwise it is returned with a value of 0.
 
 *   Modified form of GEN_GETIT, but returns item locations in string rather
-*   than the actual item. 
+*   than the actual item.
 
 C   A field may be delimited by any of the 3 characters  comma, /, (blank),
 C   or ;, or by a string composed only of a number of blanks in combination with
@@ -75,7 +75,7 @@ C  Suppress leading blanks.
 
       DO WHILE (STRING(ICHAR:ICHAR).EQ.' ' .AND. ICHAR.LE.ILS)
         ICHAR = ICHAR+1
-      END DO       
+      END DO
 
 C  If this now takes us past the end of the string then string is empty
 
@@ -100,7 +100,7 @@ C  At level 5 we just want the whole string
 C  Look for next string:
 
       CHAR = STRING(ICHAR:ICHAR)
- 
+
 C     Check after previous item for occurrence of one of...
 C           Second delimiter ( => null string )
 C           Other character
@@ -110,7 +110,7 @@ C     and find position in STRING of end of this item.
 
 C     Case 1; next character is new delimiter
 
-      IF (IEND.GT.0)   THEN                     ! 2nd delimiter, null string 
+      IF (IEND.GT.0)   THEN                     ! 2nd delimiter, null string
         IFIN  = ICHAR-1
         ICHAR = ICHAR+ILDEL
 
@@ -153,7 +153,7 @@ C           Need to skip to end of hollerith string
 
 *       Exit do by running out of input -- J must be set to character after string
 
-*       If second delimeter found: set end of string to 1 less than start 
+*       If second delimeter found: set end of string to 1 less than start
 *       of delimiter (or end of string if no delimeter)
 
     7   IFIN  = J-1

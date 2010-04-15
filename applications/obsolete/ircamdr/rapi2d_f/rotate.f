@@ -71,8 +71,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'    ! SSE global constants
-      INCLUDE 'NDF_PAR'    
-      INCLUDE 'NDF_ERR'    
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -80,7 +80,7 @@
 
 *    Local constants :
 
-      INTEGER NDIM           
+      INTEGER NDIM
       PARAMETER ( NDIM = 2 ) ! dimensionality of input/output images
 
 *    Local variables :
@@ -94,7 +94,7 @@
      :  IDIMS( NDIM ), ! dimensions for input image
      :  ODIMS( NDIM ), ! dimensions for output image
      :  WKDIMS( NDIM ),! dimensions for workspace
-     :  LBND( 2 ),     ! lower bounds of work array 
+     :  LBND( 2 ),     ! lower bounds of work array
      :  NDIMS,         ! number of dimensions from NDF_DIM
      :  NELEMENTS,     ! number of elements mapped by NDF_MAP
      :  PNTRI,  ! pointer to mapped input image
@@ -103,7 +103,7 @@
      :  ROTSIZ, ! size of the square subimage for rotation
      :  LONG,   ! longest dimension of input image
      :  SHORT,  ! shortest    "      "   "     "
-     :  NUMRA,  ! number of clockwise right angles to be applied  
+     :  NUMRA,  ! number of clockwise right angles to be applied
      :  SQRMAX  ! maximum sub-image box size to be used by ROTAS4
 
       DATA LBND / 1, 1 /
@@ -124,7 +124,7 @@
       IF( STATUS .EQ. SAI__OK )THEN
 
 *       map the input DATA_ARRAY component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :     PNTRI, NELEMENTS, STATUS)
 
          CALL NDF_DIM( LOCI, NDIM, IDIMS, NDIMS, STATUS )
@@ -157,7 +157,7 @@
             NUMRA   =  3
             NRAFLG  = .FALSE.
 
-         ELSE                          
+         ELSE
                                        ! not a simple 90.0 type rotation
             NUMRA   =  0
             NRAFLG  = .TRUE.
@@ -172,8 +172,8 @@
          IF( NRAFLG ) THEN
 
 *          work out the dimensions of the output array to hold the
-*          results of the non-right angle rotation 
-            CALL ROTSIZE( IDIMS(1), IDIMS(2), ANGLE, ODIMS(1), 
+*          results of the non-right angle rotation
+            CALL ROTSIZE( IDIMS(1), IDIMS(2), ANGLE, ODIMS(1),
      :                    ODIMS(2), STATUS )
 *	type *, 'odims = ', odims( 1), odims( 2)
 
@@ -181,13 +181,13 @@
             CALL CREOUT( 'OUTPIC', 'OTITLE', NDIM, ODIMS, LOCO, STATUS )
 
 *          map the output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :        PNTRO, NELEMENTS, STATUS )
 
 *          call the subroutine to do the non-right angle rotation
 *	type *, 'angle = ', angle
-            CALL ROTNRS( %VAL( PNTRI ), IDIMS(1), IDIMS(2), 
-     :                   %VAL( PNTRO ), ODIMS(1), ODIMS(2), ANGLE, 
+            CALL ROTNRS( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
+     :                   %VAL( PNTRO ), ODIMS(1), ODIMS(2), ANGLE,
      :                   STATUS )
 
 *          tidy up the output structure
@@ -207,29 +207,29 @@
                ODIMS( 2 ) = IDIMS( 2 )
 
             ELSE
-   
+
 *             must be 90 or 270 deg. rotate so reverse dimensions
                ODIMS( 1 ) = IDIMS( 2 )
                ODIMS( 2 ) = IDIMS( 1 )
 
             ENDIF
 
-*          create output IMAGE type data structure, create and get 
-*          a value for the TITLE component and create a DATA_ARRAY 
+*          create output IMAGE type data structure, create and get
+*          a value for the TITLE component and create a DATA_ARRAY
 *          component of dimensions ODIMS
             CALL CREOUT( 'OUTPIC', 'OTITLE', NDIM, ODIMS, LOCO, STATUS )
 
 *          map the output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :        PNTRO, NELEMENTS, STATUS )
 
 
             IF( NUMRA .EQ. 2 ) THEN
 
-*             rotation is through 180 degrees so can perform 
+*             rotation is through 180 degrees so can perform
 *             straightforward rotate. Copy input DATA_ARRAY
-*             component into output DATA_ARRAY component 
-               CALL COPY2D( ODIMS(1), ODIMS(2), %VAL( PNTRI ), 
+*             component into output DATA_ARRAY component
+               CALL COPY2D( ODIMS(1), ODIMS(2), %VAL( PNTRI ),
      :           %VAL( PNTRO ), STATUS )
 
 *             perform the 180 degree rotate
@@ -245,22 +245,22 @@
                CALL PAR_GET0I( 'SQRMAX', SQRMAX, STATUS )
 
 *             set up rotation box size, long dimension flag etc.
-               CALL ROTAS3( IDIMS, SQRMAX, XLARGE, 
+               CALL ROTAS3( IDIMS, SQRMAX, XLARGE,
      :           ROTSIZ, LONG, SHORT, STATUS )
 
 *             create workspace and map it
                WKDIMS(1) = ROTSIZ
                WKDIMS(2) = ROTSIZ
 
-	       CALL NDF_CREAT( 'SCRATCH_NAME', '_REAL', NDIM, LBND, 
+	       CALL NDF_CREAT( 'SCRATCH_NAME', '_REAL', NDIM, LBND,
      :                         WKDIMS, WKLOC, STATUS)
 
-	       CALL NDF_MAP( WKLOC, 'DATA', '_REAL', 'WRITE', 
+	       CALL NDF_MAP( WKLOC, 'DATA', '_REAL', 'WRITE',
      :	                     WKPNTR, NELEMENTS, STATUS)
 
 *             perform the +/- 90 deg. rotate
                CALL ROTAS4( NUMRA, LONG, SHORT, ROTSIZ, XLARGE,
-     :                 IDIMS(1), IDIMS(2), %VAL(PNTRI), ODIMS(1), 
+     :                 IDIMS(1), IDIMS(2), %VAL(PNTRI), ODIMS(1),
      :                 ODIMS(2), %VAL(PNTRO), %VAL(WKPNTR), STATUS )
 
 *             tidy up the workspace

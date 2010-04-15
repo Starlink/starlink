@@ -50,12 +50,12 @@
 *     position at its point of closest approach. If the position is
 *     beyond the edges of the focal plane (i.e. is seen by none of the
 *     detectors) then this item (together with item 6) is left blank.
-*     
+*
 *     8) The position angle of the scan at the point of closest
 *     approach to the required position, in degrees. This is the angle
 *     from north to the focal plane Y axis, going positive through
 *     east.
-*    
+*
 *  Usage:
 *     POSCRDD IN LON LAT
 
@@ -116,7 +116,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
       INTEGER NITEM              ! The number of items of information
       PARAMETER ( NITEM = 8 )    ! about each NDF stored in the
                                  ! workspace.
-      
+
 
 *  Local Variables:
       CHARACTER SCS*(IRA__SZSCS) ! Sky coordinate system to use.
@@ -172,10 +172,10 @@
       CALL IRM_RDNDF( 'IN', 0, 1, 'Give more CRDD file names',
      :                IGRP, NCRDDF, STATUS )
 
-*  Abort if an error has been reported, or if there are no NDFs to 
+*  Abort if an error has been reported, or if there are no NDFs to
 *  process.
       IF ( STATUS .NE. SAI__OK .OR. NCRDDF .EQ. 0 ) GO TO 999
-      
+
 *  If required open a log file. The file descriptor returned in FD is
 *  used to access this file.
       CALL IRM_ASFIO( 'LOGFILE', 'WRITE', 'LIST', 80, FD, LOGPOS,
@@ -215,7 +215,7 @@
 
 *  Loop round each input CRDD file, storing information about each in
 *  the workspace.
-      DO INDEX = 1, NCRDDF 
+      DO INDEX = 1, NCRDDF
 
 *  Get an NDF identifier for the input NDF.
          CALL NDG_NDFAS( IGRP, INDEX, 'READ', INDF, STATUS )
@@ -223,7 +223,7 @@
 *  Store information about this CRDD file in the workspace. Invalid
 *  values are stored in the workspace if an error occurs (or has already
 *  occurred).
-         CALL POSCA0( INDF, INDEX, RA, DEC, NCRDDF, NITEM, 
+         CALL POSCA0( INDF, INDEX, RA, DEC, NCRDDF, NITEM,
      :                %VAL( IPW1 ), STATUS )
 
 *  If an error occured processing the current NDF, add a context report,
@@ -255,12 +255,12 @@
      :             STATUS )
 
 *  Display the sorted information.
-      CALL POSCA2( IGRP, A, B, SCS, LOGPOS, FD, NCRDDF, NITEM, 
+      CALL POSCA2( IGRP, A, B, SCS, LOGPOS, FD, NCRDDF, NITEM,
      :             %VAL( IPW1 ), NUSED, STATUS )
 
 *  Store a list of the processed files for use by later applications.
       CALL IRM_LISTN( 'NDFLIST', IGRP, 'POSCRDD', STATUS )
- 
+
 *  Release the work space.
  998  CONTINUE
       CALL PSX_FREE( IPW1, STATUS )

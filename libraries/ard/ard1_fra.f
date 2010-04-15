@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_FRA( RINDEX, LBND1, UBND1, LBND2, UBND2, D, PAR, 
+      SUBROUTINE ARD1_FRA( RINDEX, LBND1, UBND1, LBND2, UBND2, D, PAR,
      :                     B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 *+
 *  Name:
@@ -35,8 +35,8 @@
 *        The upper pixel index bounds of the B array on the second axis.
 *     D( 6 ) = DOUBLE PRECISION (Given)
 *        The coefficients of the user->pixel mapping. The mapping is:
-*        P1 = D0 + D1*U1 + D2*U2 
-*        P2 = D3 + D4*U1 + D5*U2 
+*        P1 = D0 + D1*U1 + D2*U2
+*        P2 = D3 + D4*U1 + D5*U2
 *     PAR = DOUBLE PRECISION (Given and Returned)
 *        The border width, supplied in user coords, returned in pixels.
 *     B( LBND1:UBND1, LBND2:UBND2 ) = INTEGER (Given and Returned)
@@ -57,7 +57,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( 2 ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -99,7 +99,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
      :  MSKSIZ,                  ! No. of elements in mask
      :  UBND( 2 )                ! Mask upper bounds
 
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :  T,                       ! Temporary real storage
      :  XHI,                     ! High bound of pixel x coord
      :  XLO,                     ! Low bound of pixel x coord
@@ -148,7 +148,7 @@
      :  YHI,                     ! High bound of pixel y coord
      :  YLO,                     ! Low bound of pixel y coord
      :  YSCA                     ! Y scale factor
-  
+
 *.
 
 *  Check inherited global status.
@@ -156,8 +156,8 @@
 
 *  Calculate the X and Y scale factors between user co-ordinates and
 *  pixel co-ordinates.
-      XSCA = SQRT( D( 2 )**2 + D( 5 )**2 ) 
-      YSCA = SQRT( D( 3 )**2 + D( 6 )**2 ) 
+      XSCA = SQRT( D( 2 )**2 + D( 5 )**2 )
+      YSCA = SQRT( D( 3 )**2 + D( 6 )**2 )
 
 *  Report an error and abort if the two scale factors are not equal.
       IF( ABS( XSCA - YSCA ) .GE. ABS( XSCA*VAL__EPSD ) .AND.
@@ -175,7 +175,7 @@
       END IF
 
 *  Report an error and abort if the there is any shear.
-      IF( ABS( D( 3 )*D( 6 ) + D( 2 )*D( 5 ) ) .GE. 
+      IF( ABS( D( 3 )*D( 6 ) + D( 2 )*D( 5 ) ) .GE.
      :    100*( XSCA + YSCA )*VAL__EPSD .AND.
      :    STATUS .EQ. SAI__OK ) THEN
 
@@ -242,7 +242,7 @@
 *  Set up the bounds of the new interior bounding box (i.e. the whole
 *  mask excluding the border).
          LBINTB( 1 ) = IXLO
-         UBINTB( 1 ) = IXHI 
+         UBINTB( 1 ) = IXHI
          LBINTB( 2 ) = IYLO
          UBINTB( 2 ) = IYHI
 
@@ -257,7 +257,7 @@
 *  If the interior bounding box is null (because the border was wider
 *  than half the mask size), return the usual value (VAL__MINI for
 *  LBINTB( 1 ) ).
-         IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR. 
+         IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR.
      :       LBINTB( 2 ) .GT. UBINTB( 2 ) ) LBINTB( 1 ) = VAL__MINI
 
 *  Ensure the the exterior bounding box is returned "infinite".

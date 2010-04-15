@@ -10,23 +10,23 @@
 *     SCULIB_REDUCE_SWITCH
 
 *  Purpose:
-*     reduce the demodulated data from the switches of 
+*     reduce the demodulated data from the switches of
 *     an exposure into the exposure result.
 
 *  Description:
 *     This routine reduces the switches in an exposure to give the
 *     exposure result, and returns the weight to be given to the
-*     specified projected bolometer position when combining different 
-*     projected bolometers into the result for a sub-instrument. 
+*     specified projected bolometer position when combining different
+*     projected bolometers into the result for a sub-instrument.
 *       Exposure results are calculated assuming that:-
 *
 *     For a SQUARE chop-function -
-*      switch 1 has the object in the R beam of the `middle' projected 
+*      switch 1 has the object in the R beam of the `middle' projected
 *      bolometer and in the L beam of the `right' bolometer.
 *      switch 2 has the object in the L beam of the `middle' bolometer
 *      and in R beam of the `left' bolometer.
-*      
-*     For a TRIPOS (3-position) chop-function - 
+*
+*     For a TRIPOS (3-position) chop-function -
 *      switch 1 has the object in the M beam of the `middle' bolometer,
 *      in the L beam of the right and the R beam of the `left'.
 *      switch 2 has the object in the R beam of the `middle' bolometer
@@ -225,7 +225,7 @@
                   WEIGHT = 1.0
 
                   EXP_DATA (I) = SWITCH_1_DATA (I)
-                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I) 
+                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I)
                   EXP_QUALITY (I) = SWITCH_1_QUALITY(I)
 
                END DO
@@ -236,7 +236,7 @@
                   WEIGHT = 1.0
 
                   EXP_DATA (I) = - SWITCH_1_DATA (I)
-                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I) 
+                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I)
                   EXP_QUALITY (I) = SWITCH_1_QUALITY(I)
 
                END DO
@@ -258,7 +258,7 @@
                   WEIGHT = 0.5
 
                   EXP_DATA (I) = -2.0 * SWITCH_1_DATA (I)
-                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I) 
+                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I)
                   EXP_QUALITY (I) = SWITCH_1_QUALITY(I)
 
                END DO
@@ -269,7 +269,7 @@
                   WEIGHT = 1.0
 
                   EXP_DATA (I) = SWITCH_1_DATA (I)
-                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I) 
+                  EXP_VARIANCE (I) = SWITCH_1_VARIANCE (I)
                   EXP_QUALITY (I) = SWITCH_1_QUALITY(I)
 
                END DO
@@ -289,7 +289,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_REDUCE_SWITCH: invalid '//
      :        'chop function - ^CHOP', STATUS)
-         
+
          END IF
 
       ELSE IF (SWITCH_PER_EXP .EQ. 2) THEN
@@ -304,7 +304,7 @@
 
                   IF (SWITCH_1_DATA(I) .NE. VAL__BADR .AND.
      :                 SWITCH_2_DATA(I) .NE. VAL__BADR) THEN
-                     EXP_DATA (I) = SWITCH_2_DATA (I) - 
+                     EXP_DATA (I) = SWITCH_2_DATA (I) -
      :                    SWITCH_1_DATA (I)
                   ELSE
                      EXP_DATA(I) = VAL__BADR
@@ -312,7 +312,7 @@
 
                   IF (SWITCH_1_VARIANCE(I) .NE. VAL__BADR .AND.
      :                 SWITCH_2_VARIANCE(I) .NE. VAL__BADR) THEN
-                     EXP_VARIANCE (I) = 
+                     EXP_VARIANCE (I) =
      :                    SWITCH_2_VARIANCE (I) +
      :                    SWITCH_1_VARIANCE (I)
                   ELSE
@@ -338,7 +338,7 @@
                   END IF
                   IF (SWITCH_1_VARIANCE(I) .NE. VAL__BADR .AND.
      :                 SWITCH_2_VARIANCE(I) .NE. VAL__BADR) THEN
-                     EXP_VARIANCE (I) = 
+                     EXP_VARIANCE (I) =
      :                    (SWITCH_2_VARIANCE (I) +
      :                    SWITCH_1_VARIANCE (I)) / 4.0
                   ELSE
@@ -451,7 +451,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_REDUCE_SWITCH: invalid '//
      :        'chop function - ^CHOP', STATUS)
-         
+
          END IF
 
       ELSE IF (SWITCH_PER_EXP .EQ. 3) THEN
@@ -473,7 +473,7 @@
 
                   EXP_DATA (I) = - (2.0 * SWITCH_1_DATA (I) -
      :                 (SWITCH_2_DATA (I) + SWITCH_3_DATA(I))) / 2.0
-                  EXP_VARIANCE (I) = 
+                  EXP_VARIANCE (I) =
      :                 (4.0 * SWITCH_1_VARIANCE (I) +
      :                 (SWITCH_2_VARIANCE (I) +
      :                 SWITCH_3_VARIANCE(I))) / 4.0
@@ -491,7 +491,7 @@
 
                   EXP_DATA (I) = - (2.0 * SWITCH_1_DATA (I) -
      :                 (SWITCH_2_DATA (I) + SWITCH_3_DATA(I))) / 3.0
-                  EXP_VARIANCE (I) = 
+                  EXP_VARIANCE (I) =
      :                 (4.0 * SWITCH_1_VARIANCE (I) +
      :                 (SWITCH_2_VARIANCE (I) +
      :                 SWITCH_3_VARIANCE(I))) / 9.0
@@ -517,7 +517,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_REDUCE_SWITCH: invalid '//
      :        'chop function - ^CHOP', STATUS)
-         
+
          END IF
 
       ELSE

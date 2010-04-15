@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include <limits.h>
 
-void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ], 
+void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
                      int dims[ 3 ], int gp[ 3 ], int iv, int axis, int id,
                      int depth, int *gpeak[ 3 ], int *status ){
 /*
@@ -17,21 +17,21 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     Starlink C
 
 *  Synopsis:
-*     void cupidRFillLine( int *ipa, int *out, int nel, int ndim, 
+*     void cupidRFillLine( int *ipa, int *out, int nel, int ndim,
 *                          int skip[ 3 ], int dims[ 3 ], int gp[ 3 ],
 *                          int iv, int axis, int id, int depth,
 *                          int *gpeak[ 3 ], int *status )
 
 *  Description:
-*     This function fills the volume between the edges marked in the "ipa" 
+*     This function fills the volume between the edges marked in the "ipa"
 *     array which surround a given position. Each pixel within the edges
 *     is assigned the value "id" in the "out" array (all other elements
 *     of "out" are left unchanged).
 *
 *     The algorithm works by moving out away from the central position "gp"
 *     along a 1D line parallel to the axis given by "axis" until pixels
-*     marked as edges within "ipa" are encountered. At each position along 
-*     this line, the "ipeak" value is stored in the corresponding pixel of 
+*     marked as edges within "ipa" are encountered. At each position along
+*     this line, the "ipeak" value is stored in the corresponding pixel of
 *     the "out" array, and the algorithm calls this function recursively
 *     to move out away from the position along a 1D line parallel to an
 *     orthoganal axis, filling the "out" array with "id" until edge
@@ -44,8 +44,8 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *  Parameters:
 *     ipa
 *        Pointer to an array which is the same shape and size as the data
-*        array, and which holds a flag for every pixel. If the pixel is an 
-*        edge pixel this flag will be CUPID__KEDGE. 
+*        array, and which holds a flag for every pixel. If the pixel is an
+*        edge pixel this flag will be CUPID__KEDGE.
 *     out
 *        Pointer to an array which is the same shape and size as the data
 *        array, and which holds a flag for every pixel. Every pixel
@@ -55,14 +55,14 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     ndim
 *        The number of pixel axes in the data (this can be less than 3).
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if there are less than 3 pixel
 *        axes, and the extra elements should be filled with zero's.
 *     dims
-*        The no. of pixels along each pixel axis. This array should have 3 
-*        elements even if there are less than 3 pixel axes, and the extra 
+*        The no. of pixels along each pixel axis. This array should have 3
+*        elements even if there are less than 3 pixel axes, and the extra
 *        elements should be filled with one's.
 *     gp
 *        Grid indices of the central position from which the fill is to
@@ -76,8 +76,8 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     depth
 *        The depth of recursion into this function.
 *     gpeak
-*        Stores the grid coords of each peak. The (x,y,z) values for peak 
-*        "ipeak" are stored at "gpeak[0][ipeak]", "gpeak[1][ipeak]", 
+*        Stores the grid coords of each peak. The (x,y,z) values for peak
+*        "ipeak" are stored at "gpeak[0][ipeak]", "gpeak[1][ipeak]",
 *        "gpeak[2][ipeak]".
 *     status
 *        Pointer to the inherited status value.
@@ -175,9 +175,9 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 /* Call this function recursively to fill the orthogonal line along the
    next axis, starting at the current position. */
       if( depth < 3 ) {
-         cupidRFillLine( ipa, out, nel, ndim, skip, dims, p, ii, iaxis, id, 
+         cupidRFillLine( ipa, out, nel, ndim, skip, dims, p, ii, iaxis, id,
                          depth + 1, gpeak, status );
-      }      
+      }
 
 /* Move to the next +ve axis position. */
       p[ axis ]++;
@@ -223,9 +223,9 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 /* Call this function recursively to fill the orthogonal line along the
    next axis, starting at the current position. */
       if( depth < 3 ) {
-         cupidRFillLine( ipa, out, nel, ndim, skip, dims, p, ii, iaxis, id, 
+         cupidRFillLine( ipa, out, nel, ndim, skip, dims, p, ii, iaxis, id,
                          depth + 1, gpeak, status );
-      }      
+      }
 
 /* Move to the next -ve axis position. */
       p[ axis ]--;

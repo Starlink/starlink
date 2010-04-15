@@ -58,7 +58,7 @@ int dau1_store_flq_malloc( struct LCP * );
 
 /* functions */
 
-int
+int
 dau_defuse_lcp(pntr)
 
 /*+
@@ -128,7 +128,7 @@ struct LCP_DATA  *data;
       }
       return hds_gl_status;
    }
-
+
 int
 dau_refill_flq(void)
 
@@ -224,7 +224,7 @@ dau1_store_flq_malloc( struct LCP * lcp ) {
     /* Need to realloc some space */
       new = starRealloc( malloced, (totpntrs + NBINS_INC) * sizeof(struct LCP*));
     if (new == NULL) {
-      /* just ignore and leak a bit - do not need to free the 
+      /* just ignore and leak a bit - do not need to free the
 	 old memory, since it can still contain useful information */
       return DAT__OK;
     }

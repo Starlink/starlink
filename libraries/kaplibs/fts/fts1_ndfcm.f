@@ -17,10 +17,10 @@
 
 *  Description:
 *     This routine adds the character components, axis structure, WCS
-*     component and FITS extension to an NDF.  It searches a buffer 
-*     containing the FITS header card images for the OBJECT keyword 
-*     whose value, if present, becomes the NDF title.  Similarly BUNIT 
-*     is mapped to the NDF units.  The supplied header structure is 
+*     component and FITS extension to an NDF.  It searches a buffer
+*     containing the FITS header card images for the OBJECT keyword
+*     whose value, if present, becomes the NDF title.  Similarly BUNIT
+*     is mapped to the NDF units.  The supplied header structure is
 *     copied to the FITS extension.
 
 *  Arguments:
@@ -30,27 +30,27 @@
 *     HEADER( NCARD ) = CHARACTER * 80 (Given)
 *        The buffer containing the header card images.
 *     SCARD = INTEGER (Given)
-*        The number of the card from where searches will begin, and 
+*        The number of the card from where searches will begin, and
 *        copying of the headers to the FITS extension.   Therefore
 *        NCARD - SCARD + 1 headers will appear in the extension. This
 *        argument is needed because the headers make contain a dummy
 *        header prior to an extension.
 *     NDF = INTEGER (Given)
-*        Identifier of the NDF to which to write the additional 
+*        Identifier of the NDF to which to write the additional
 *        components and the FITS extension.
 *     NENCOD = INTEGER (Given)
 *        The number of AST encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
-*        The user's preferred AST encodings.  If NENCOD is zero, then 
-*        this is ignored, and an intelligent guess is made as to which 
-*        encoding to use.  The encoding determines which FITS headers 
+*        The user's preferred AST encodings.  If NENCOD is zero, then
+*        this is ignored, and an intelligent guess is made as to which
+*        encoding to use.  The encoding determines which FITS headers
 *        are used to create the NDF WCS component.
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
 *  Copyright:
 *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
-*     Copyright (C) 1996, 1998 Central Laboratory of the Research 
+*     Copyright (C) 1996, 1998 Central Laboratory of the Research
 *                   Councils.
 *     All Rights Reserved.
 
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -166,10 +166,10 @@
 *  Make the WCS component.
 *  =======================
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL FTS1_FTWCS( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS, 
+         CALL FTS1_FTWCS( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS,
      :                    STATUS )
 
-*  Flush any errors which occurred while creating the WCS component 
+*  Flush any errors which occurred while creating the WCS component
 *  since failure to read WCS is not usually fatal.
          IF( STATUS .NE. SAI__OK ) THEN
 

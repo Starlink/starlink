@@ -20,9 +20,9 @@ C                  should be in the range 1 to 10 inclusive.
 C
 C     Common variables used -
 C
-C     (>) MAXTBL   (Integer) Is the maximum allowed value for TBLOCK 
+C     (>) MAXTBL   (Integer) Is the maximum allowed value for TBLOCK
 C                  (fixed parameter).
-C     (<) TBLOCK   (Integer) Is the current blocking factor - number of 
+C     (<) TBLOCK   (Integer) Is the current blocking factor - number of
 C                  logical records in each actual tape record.
 C
 C     Both defined in the file COMF.INC.

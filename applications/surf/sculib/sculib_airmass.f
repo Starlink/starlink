@@ -123,23 +123,23 @@
       IF (COS_Z .LE. 0.0D0) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETD( 'EL', 90.0D0 - ( Z * Q ) )
-         CALL ERR_REP (' ', 
+         CALL ERR_REP (' ',
      :        'SCULIB_AIRMASS: point is below horizon (^EL deg)',
      :        STATUS)
       ELSE
- 
+
          AIRMASS = 1.0D0 / COS_Z
 
          IF (AIRMASS .GT. 2.0) THEN
- 
+
 *  obtain trigonometric elevation above horizon
- 
+
             H_DEG = 90.0D0 - Z * Q
- 
+
 *  compute refraction correction, for a wavelength of 1 mm,
 *  temp of 0 deg C, pressure of 624 mb, and relative humidity of 50 %
 *  See Ian Coulson's memos of 20 and 22 Feb 1988.
- 
+
             B_REFR = - 0.0242D0 - 0.00212D0 * H_DEG +
      :        0.0000676D0 * H_DEG * H_DEG
             TANZ = TAN (Z)
@@ -152,7 +152,7 @@
 *      L = scale height of atmosphere
 *      h = elevation of object above horizon
 *      X = path length through atmosphere  (air mass = X/L)
-*     
+*
 *  It can be shown that:
 *
 *     (R + M + L)**2 = (R + M)**2 + X**2 +
@@ -166,14 +166,14 @@
 *     B = 2 * (R + M) * sin(h)    [because cos (90 + h) = sin(h)]
 *     C = [(R + M)**2 - (R + M + L)**2]
 *       = [ - 2.0 * R * L - 2.0 * M * L - L**2 ]
- 
+
             B = 2.0 * ( R_EARTH + HEIGHT_MK ) * SINH
             C = - 2.0 * R_EARTH * SCALE_HEIGHT
      :        - 2.0 * HEIGHT_MK * SCALE_HEIGHT
      :        -       SCALE_HEIGHT * SCALE_HEIGHT
- 
+
 *  Now solve quadratic equation, giving positive solution, as X > 0
- 
+
             X = (- B + SQRT (B*B - 4.0 * C)) / 2.0
             AIRMASS = X / SCALE_HEIGHT
 

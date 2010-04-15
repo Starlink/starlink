@@ -37,7 +37,7 @@
 *         The main part of the catalogue has 1 record per star
 *         in all approx. 340000 records of 22 bytes each
 *
-*      Type     Data   Description 
+*      Type     Data   Description
 *      ----     ----   -----------
 *      INTEGER  NCAT = Catalogue number & name :
 *               1000000 * cat. no. + star number
@@ -98,7 +98,7 @@
 *        Assigned DMSUPP value to IDMSUP after it's read in, which is an
 *        INTEGER variable, and used IDMSUP in place of DMSUPP in the
 *        code so that we're working with an integer rather LOGICAL*1
-*        type in calculations. 
+*        type in calculations.
 *     22-MAR-1993 (AJJB):
 *        Commented out declarations of unused local variables, to keep
 *        Sun complier quiet.
@@ -108,7 +108,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
       INCLUDE 'CONVF'          ! [global_variables_description]
 *        {descriptions_of_global_variables_referenced}...
 
-                                
+
 *  Local Variables:
       BYTE DMSUPP                ! Replaced by IDMSUP (see history)
       BYTE LMAG                  ! [local_variable_description]
@@ -216,14 +216,14 @@
          DMNO = J * 100000000 + IDMZ * 1000000 + IDMN * 20 + IDMSUP
          IF ( DMSIGN .EQ. '-' ) DMNO = -DMNO
          IF ( MV .NE. 0 ) THEN
-            MAGV = MV 
+            MAGV = MV
          ELSEIF ( NHD .EQ. 1721670 .OR. NHD .EQ. 1248970 ) THEN
             MAGV = MV
          ELSE
             MAGV = 9999
          ENDIF
          IF ( MB .NE. 0 ) THEN
-            MAGP = MB 
+            MAGP = MB
          ELSE IF ( NHD .EQ. 1721670 ) THEN
             MAGP = MB
          ELSE

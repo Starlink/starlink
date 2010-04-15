@@ -1,6 +1,6 @@
       SUBROUTINE
-     :  CHU_INCAT (INPUT, DATAFILE, NUMCOL, CNAMES, INCFORMATS, 
-     :  CUNITS, CCOMMENTS, STARTPOS, STATUS ) 
+     :  CHU_INCAT (INPUT, DATAFILE, NUMCOL, CNAMES, INCFORMATS,
+     :  CUNITS, CCOMMENTS, STARTPOS, STATUS )
 *+
 *  Name:
 *     CHU_INCAT
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHP_UNCAT (INPUT, DATAFILE, NUMCOL, CNAMES, INCFORMATS, 
-*    :  CUNITS, CCOMMENTS, STATUS ) 
+*     CALL CHP_UNCAT (INPUT, DATAFILE, NUMCOL, CNAMES, INCFORMATS,
+*    :  CUNITS, CCOMMENTS, STATUS )
 
 *  Description :
 *     Create a catalogue and load data from an ASCII file into it.
@@ -52,7 +52,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,12 +147,12 @@
            standfmat(fcount) = format
            call chr_ucase(format)
 *
-           if (format.eq.'HH MM SS.S' .or. 
+           if (format.eq.'HH MM SS.S' .or.
      :         format.eq.'HH:MM:SS.S') then
               newfmat(fcount) = '(A10)'
               fieldtypes(fcount) = 'C'
               length(fcount) = 10
-           elseif (format.eq.'HH MM SS' .or. 
+           elseif (format.eq.'HH MM SS' .or.
      :             format.eq.'HH:MM:SS') then
               newfmat(fcount) = '(A8)'
               fieldtypes(fcount) = 'C'
@@ -420,7 +420,7 @@
 *          DOUBLE
 *
               spos = startpos(fcount)
-              epos = spos + length(fcount) - 1 
+              epos = spos + length(fcount) - 1
               read(buff1(spos:epos),newfmat(fcount))doubvals(fcount)
 *
            elseif (newfmat(fcount)(2:2).eq.'F'
@@ -464,8 +464,8 @@
 *
 *    Put the complete row into the table
 *
-          call chp_putent(input,1, numcol,cnames,fieldtypes, charvals, 
-     :  doubvals, intvals, logvals, realvals, ptrvals, nullflags, 
+          call chp_putent(input,1, numcol,cnames,fieldtypes, charvals,
+     :  doubvals, intvals, logvals, realvals, ptrvals, nullflags,
      :  status)
         endif
       enddo
@@ -473,6 +473,6 @@
       if (status .eq. fio__eof) then
         call err_annul(status)
       endif
- 
+
       call fio_close(fd, status)
       end

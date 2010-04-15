@@ -141,7 +141,7 @@ itcl::class gaia::GaiaHyperHelp {
       itk_component add actionbar {
          ::frame $itk_interior.actionbar
       }
-      
+
       itk_component add closebutton {
          button $itk_component(actionbar).close \
             -text {Close} \
@@ -176,7 +176,7 @@ itcl::class gaia::GaiaHyperHelp {
       #  Evaluate any options (sets topics and help directory).
       eval itk_initialize $args
 
-      #  Load first topic 
+      #  Load first topic
       home
    }
 
@@ -190,7 +190,7 @@ itcl::class gaia::GaiaHyperHelp {
 
    #  Methods:
    #  --------
-   
+
    #  METHOD: init
    #
    #  Called after construction is complete.

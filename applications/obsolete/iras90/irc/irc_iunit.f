@@ -15,10 +15,10 @@
 *  Description:
 *     A string is returned containing a list of names identifying the
 *     legal values of the NDF component UNITS. The values are separated
-*     by commas. The currently recognised values are given by the 
+*     by commas. The currently recognised values are given by the
 *     following symbolic constants:
 *
-*     IRC__F      - Flux values in units of Pico-Watts (i.e. 1.0E-12 of 
+*     IRC__F      - Flux values in units of Pico-Watts (i.e. 1.0E-12 of
 *                   a Watt) per square metre.
 *
 *     IRC__J      - Flux density values in Janskys.

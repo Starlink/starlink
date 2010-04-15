@@ -6,7 +6,7 @@
  Changes at v1.3-5:
 
    o As issue in the addstar command random number generating function
-     has been fixed. This problem could cause the PAUSE prompt to be 
+     has been fixed. This problem could cause the PAUSE prompt to be
      issued (sometime repeatably.
 
  This is DAOPHOT v1.3-4.
@@ -29,7 +29,7 @@
      about having too many stars in a file; in this case use the OPTIONS
      command to adjust the value of the new parameter MS (maximum stars
      in file) to a high enough value.
-     Note that the limit on the number of stars within a group for 
+     Note that the limit on the number of stars within a group for
      NSTAR or ALLSTAR, and a few other hard limits, still exist.
 
    o The code has been fixed so that NDF images with pixel indices not
@@ -38,23 +38,23 @@
 
    o In conjunction with the NDF library and the CONVERT utilities,
      foreign data formats may now be used with DAOPHOT, being translated
-     on the fly.  See SSN/20 for details (or if CONVERT is installed 
+     on the fly.  See SSN/20 for details (or if CONVERT is installed
      just type 'convert' and use of most foreign data formats will be
      available automatically).
 
  Changes at v1.2-2:
 
-   o Default array size set so that DAOPHOT and ALLSTAR can cope with 
+   o Default array size set so that DAOPHOT and ALLSTAR can cope with
      images up to 4200 * 4200.
 
-   o String initialisation bug fixed in ALLSTAR (default values of strings 
+   o String initialisation bug fixed in ALLSTAR (default values of strings
      in prompts were sometimes printing garbage).
 
    o DAOPHOT now refuses to attach an image which is too big.
 
  Changes at v1.2-1:
 
-   o MUD/9 added to documentation (DAOPHOT II User's Manual). Note that 
+   o MUD/9 added to documentation (DAOPHOT II User's Manual). Note that
      mud9.tex is a TeX file, not LaTeX, so no hypertext is available.
 
    o 'curator.tex' added to daophot_source.tar for information.
@@ -66,4 +66,4 @@
  Changes at V1.0-1:
 
    o Makefile and mk script updated.
-	
+

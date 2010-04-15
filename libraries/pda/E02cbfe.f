@@ -48,7 +48,7 @@
                   WRITE (NOUT,*) 'Failed IFAIL = ', IFAIL
                END IF
             END IF
-  
+
    80    CONTINUE
          GO TO 20
       END IF

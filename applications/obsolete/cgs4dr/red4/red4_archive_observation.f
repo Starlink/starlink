@@ -2,14 +2,14 @@
       SUBROUTINE RED4_ARCHIVE_OBSERVATION( STATUS )
 *    Description :
 *     This subroutine obtains the parameters which need to be written to
-*     the observation catalogue from the reduced observation file 
-*     corresponding to the given observation. It then opens the 
+*     the observation catalogue from the reduced observation file
+*     corresponding to the given observation. It then opens the
 *     observation catalogue (name obtained from CATFILE parameter),
 *     appends a record, and then closes it again.
 *
 *     The parameters which are written to the observation catalogue are
 *     described in the document CGS4/SOFT/053 entitled "Specification of
-*     the CGS4 archive". The observation catalogue is only opened 
+*     the CGS4 archive". The observation catalogue is only opened
 *     briefly so that at other times it may be interrogated while data
 *     reduction is in progress.
 *    Invocation :
@@ -128,7 +128,7 @@
 *    Check for error on entry.
       IF ( STATUS .NE. ADAM__OK ) RETURN
 
-*   Obtain the name of the observation to be recorded to the 
+*   Obtain the name of the observation to be recorded to the
 *   observation catalogue, and the name of the observation
 *   catalogue.
       CALL PAR_GET0C( 'OBSERVATION', OBSERVATION, STATUS )
@@ -161,9 +161,9 @@
 *         data structure. NOTE - If the item does not exist, or if any
 *         errors occur, a warning message will be generated, but the
 *         routine will carry on and write any information it can
-*         obtain to the archive. 
+*         obtain to the archive.
 *         The total dwell time (i.e. the sum of all the integration
-*         times). 
+*         times).
             CALL DSA_SEEK_FITS( 'RED_OBS', 'EXPOSED', EXIST, ACCESS,
      :        ELEMENTS, STRLEN, DSA_STATUS )
 
@@ -306,7 +306,7 @@
                LOG_FILE = '***************'
             END IF
 
-*         The object name.       
+*         The object name.
             DSA_STATUS = STATUS
             CALL DSA_SEEK_FITS( 'RED_OBS', 'OBJECT', EXIST, ACCESS,
      :        ELEMENTS, STRLEN, DSA_STATUS )
@@ -747,7 +747,7 @@
             CPOS = INDEX( RED_OBS, ':' )
             CLEN = CHR_LEN( RED_OBS )
             ROBSERVATION =  RED_OBS( 1+CPOS:CLEN )
-            CALL RED4_WRITE_ARCHIVE( CATFILE, START_DATE, 
+            CALL RED4_WRITE_ARCHIVE( CATFILE, START_DATE,
      :        START_TIME, OBSERVERS, OBS_TYPE_CODE, OBJECT_NAME,
      :        OBJECT_CLASS, OBJECT_RA, OBJECT_DEC, EQUINOX,
      :        INSTRUMENT, GRATING_NAME, GRATING_WAVELENGTH,
@@ -771,7 +771,7 @@
 
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_ARCHIVE_OBSERVATION: '/
-     :        /'Error accessing reduced '/ 
+     :        /'Error accessing reduced '/
      :        /'observation file', STATUS )
 
 *         This is a DSA error, so reset the status.
@@ -792,7 +792,7 @@
 
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_ARCHIVE_OBSERVATION: '/
-     :     /'Error obtaining %OBSERVATION and '/ 
+     :     /'Error obtaining %OBSERVATION and '/
      :     /'%CATFILE parameters', STATUS )
       END IF
 

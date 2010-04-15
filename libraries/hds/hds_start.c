@@ -77,7 +77,7 @@ F77_SUBROUTINE(hds_start)( F77_INTEGER_TYPE(*status) )
                     "HDS_START: Error activating the Hierarchical Data System \
                      (HDS).",&hds_gl_status );
       }
-           
+
 /* Exit the routine */
       *status = hds_gl_status;
 }

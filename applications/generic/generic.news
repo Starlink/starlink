@@ -3,11 +3,11 @@
   o  Overhauled and updated SUN/7.
 
   o  File extensions may be called .g<types> where <types> is a
-  list of types as used by the -t option.  For instance a .gdr 
-  extension indicates that the routine expands to double precision 
+  list of types as used by the -t option.  For instance a .gdr
+  extension indicates that the routine expands to double precision
   and real versions.
-  
-  o  Simple guidance for generating generic routines from C has been 
+
+  o  Simple guidance for generating generic routines from C has been
   added.  See the file cgeneric.h or the revised SUN/7.
 
   o  -x and -u options added for backwards compatibility with naming

@@ -25,7 +25,7 @@ proc CCDTaskStart { app } {
 #  Global Variables:
 #     MONOLITH = array (read)
 #        This variable describes the known monoliths, the name of
-#        their executable, their status and the command name associated 
+#        their executable, their status and the command name associated
 #        with them. The elements have indices,
 #
 #           (name,location)        ! where the monolith executable is
@@ -34,7 +34,7 @@ proc CCDTaskStart { app } {
 #
 #        This also has an additional element (index) that is
 #        incremented to give unique tasknames to the monoliths (if
-#        they are killed timing problems mean that using the same name 
+#        they are killed timing problems mean that using the same name
 #        may fail)
 #     TASK = array (write)
 #        This variable holds the names of the available applications
@@ -50,7 +50,7 @@ proc CCDTaskStart { app } {
 #        Only the (name,monolith) element is used by this routine.
 
 #  Return Value:
-#     CCDTaskStart = boolean 
+#     CCDTaskStart = boolean
 #        Returns 1 if ok, 0 otherwise (failed to load monolith).
 
 #  Copyright:
@@ -92,12 +92,12 @@ proc CCDTaskStart { app } {
 #.
 
 #  Check that the task is known.
-   if { [info exists TASK($app,monolith)] } { 
+   if { [info exists TASK($app,monolith)] } {
       set mono $TASK($app,monolith)
 
 #  Check is the monolith is loaded (regardless of apparent status).
       if { $MONOLITH($mono,status) == "enabled" } {
-         if { [$MONOLITH($mono,taskname) path] == 0 } { 
+         if { [$MONOLITH($mono,taskname) path] == 0 } {
             set MONOLITH($mono,status) "available"
          }
       }
@@ -121,7 +121,7 @@ proc CCDTaskStart { app } {
          set MONOLITH($mono,status) enabled
          set MONOLITH($mono,taskname) $taskname
       }
-   } else { 
+   } else {
 
 #  Do not know about this application complain and exit in error.
       CCDIssueInfo "The application $app is unknown to this interface \

@@ -15,7 +15,7 @@ void sbmplanet(double qfoo,int qbar,double qbaz[6],int*Q0)
 Q10,Q11,q12,Q13,Q14,qdisk,Q15,q16,q17,QEMPTY,q18,QFULL,qfast
 ,qsmall,QBIG,QOK,QHELLO,QBYE,QMAGIC,q19,q20,qobSCUrE,QSPEED,
 qIndex,Q21;static double qbill[]={6023600.0,408523.5,
-328900.5,3098710.0,1047.355,3498.5,22869.0,19314.0};static 
+328900.5,3098710.0,1047.355,3498.5,22869.0,19314.0};static
 double q22[8][3]={{0.3870983098,0.0,0.0},{0.7233298200,0.0,
 0.0},{1.0000010178,0.0,0.0},{1.5236793419,3e-10,0.0},{
 5.2026032092,19132e-10,-39e-10},{9.5549091915,-0.0000213896,
@@ -106,7 +106,7 @@ static double QNASA[8][10]={{-342.0,136.0,-23.0,62.0,66.0,-
 ,679.0,0.0,-244.0,-419.0,-2531.0,48.0}};static double QERR=
 34.35,Q27=3034.9057,Q28=50.08,qgoogle=1222.1138,q29=238.96,
 QYahoO=144.9600;static double Q30=238.956785,qtrick=144.96,
-q31=-3.908202,Q32=40.7247248;struct QHINT{double q22;double 
+q31=-3.908202,Q32=40.7247248;struct QHINT{double q22;double
 Q33;};struct tm{int Q34;int QBLAcK;int q4;struct QHINT Q35[3
 ];};static struct tm q36[]={{0,0,1,{{-19798886e-6,
 19848454e-6},{-5453098e-6,-14974876e-6},{66867334e-7,

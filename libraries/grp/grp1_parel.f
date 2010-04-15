@@ -91,12 +91,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,7 +117,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -167,7 +167,7 @@
       INTEGER NESTN              ! OPEN_NEST nesting level
       INTEGER NSEPCC             ! No. of separators found so far
 
-      LOGICAL CLN                ! Is current character a "close nest"? 
+      LOGICAL CLN                ! Is current character a "close nest"?
       LOGICAL CLNOK              ! Close nest control character defined?
       LOGICAL DEL                ! Is current character a delimiter?
       LOGICAL DELOK              ! Delimiter control character defined?
@@ -298,7 +298,7 @@
             IF( NESTN .EQ. 0 ) then
 
 *  If the current character is an opening kernel delimiter, increment
-*  the kernel nesting level. 
+*  the kernel nesting level.
                IF( KOP ) THEN
                   NESTK = NESTK + 1
 
@@ -312,7 +312,7 @@
      :                             'Two or more adjacent kernels '//
      :                             'found in ''^TEXT''.', STATUS )
                      GO TO 999
-                  END IF                     
+                  END IF
 
 *  Report an error and abort if a kernel delimiter is found within a
 *  substitution string.
@@ -325,7 +325,7 @@
      :                             '''^SEP'' found in ''^TEXT''.',
      :                             STATUS )
                      GO TO 999
-                  END IF                     
+                  END IF
 
 *  If the current kernel nesting level is one, return the position of
 *  the last character in the prefix, and the position of the first
@@ -365,7 +365,7 @@
      :                             '''^SEP'' found in ''^TEXT''.',
      :                             STATUS )
                      GO TO 999
-                  END IF                     
+                  END IF
 
 *  If the current kernel nesting level is zero, return the position of
 *  the first character in the suffix, and the position of the last
@@ -377,7 +377,7 @@
 
 *  If the current character is a substitution string separator,
 *  increment the number of substitution characters found since the
-*  last reset. 
+*  last reset.
                ELSE IF( SEP ) THEN
                   NSEPCC = NSEPCC + 1
 
@@ -400,17 +400,17 @@
 *  level is zero. Report an error if the next non-blank character is
 *  neither an element delimiter nor a closing kernel delimiter.
                   IF( NSEPCC .EQ. 3 ) THEN
-                     NSEPCC = 0                  
+                     NSEPCC = 0
                      IF( NESTK .EQ. 0 ) T2 = I
 
                      IF( I .LT. LAST ) THEN
                         CALL CHR_FANDL( TEXT( I + 1 : LAST ), N, L )
                         IF( N .LE. L ) THEN
                            N = N + I
-                           IF( 
-     :          .NOT. ( GRP1_CHKCC( TEXT, N, DELCC, ESCCC, ESCOK ) .AND. 
+                           IF(
+     :          .NOT. ( GRP1_CHKCC( TEXT, N, DELCC, ESCCC, ESCOK ) .AND.
      :                  DELOK ) .AND.
-     :          .NOT. ( GRP1_CHKCC( TEXT, N, KCLCC, ESCCC, ESCOK ) .AND. 
+     :          .NOT. ( GRP1_CHKCC( TEXT, N, KCLCC, ESCCC, ESCOK ) .AND.
      :                  KCLOK ) ) THEN
                               STATUS = GRP__INVEL
                               CALL MSG_SETC( 'TEXT', TEXT )
@@ -419,7 +419,7 @@
      :                                 'valid substitution string '//
      :                                 'found in ''^TEXT''.', STATUS )
                               GO TO 999
-                           END IF      
+                           END IF
                         END IF
                      END IF
 
@@ -443,7 +443,7 @@
      :                             '''^SEP'' found in ''^TEXT''.',
      :                             STATUS )
                      GO TO 999
-                  END IF                     
+                  END IF
 
 *  If the current kernel nesting level is zero, return the position of
 *  the end of the kernel or of the suffix (depending on whether or not
@@ -464,9 +464,9 @@
                   END IF
 
                END IF
-      
+
             END IF
-      
+
          END DO
 
 *  If a suffix has been started but not finished, the end of the suffix
@@ -514,7 +514,7 @@
 
       END IF
 
-*  Jump to here if an error occurs or if more than one element is 
+*  Jump to here if an error occurs or if more than one element is
 *  found in the supplied text.
  999  CONTINUE
 

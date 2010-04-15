@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -65,23 +65,23 @@ Starlink is within the agreement.
 If your site wants to install GENSTAT~5, you should contact the Starlink
 Software Librarian (RLVAD::STAR), who will provide a copy of the standard
 installation. Your site will be assigned one of the `mobile' licences, and you
-may proceed to install it. 
+may proceed to install it.
 
 For users who require only infrequent access, one of the `mobile' licences is
 used for the RLVAD cluster which includes the STADAT machine. Users  may use
-their sites' username to access it on STADAT. 
+their sites' username to access it on STADAT.
 
 This document provides the installation (and de-installation) instructions for
 GENSTAT~5 on Starlink VAX machines. It is intended for Starlink Site Mangers
 who need to install or de-install it. Various tasks within these instructions
 require OPER or SYSPRV privileges.
 
-Starlink does not provide GENSTAT~5 on UNIX machines. 
+Starlink does not provide GENSTAT~5 on UNIX machines.
 
 \section{Installation}
 
 This section tells you how to install GENSTAT~5 from the save set which will be
-provided by the Starlink Software Librarian. 
+provided by the Starlink Software Librarian.
 
 \subsection{Copying the Software}
 
@@ -110,8 +110,8 @@ directory called {\tt [GENSTAT]} to hold it:
       $ SET DEFAULT <disk$name>:[000000]
       $ CREATE/DIRECTORY/OWN=STAR/PROTECTION=W:RE [GENSTAT]
 \end{verbatim}
-Ownership should be assigned to the Starlink Software manager's username at 
-your node (usually STAR), and the protection set so that all users have READ 
+Ownership should be assigned to the Starlink Software manager's username at
+your node (usually STAR), and the protection set so that all users have READ
 and EXECUTE access to the {\tt [GENSTAT]} directory.
 
 Next, you need to unpack the software from the save set:
@@ -131,13 +131,13 @@ LSSC:LOGIN.COM} file to contain the symbol definitions.
 \subsubsection{Logical names}
 
 The {\tt [GENSTAT]} directory contains several files for setting up GENSTAT~5.
-The first of these is {\tt GENSTAT\_LSSC\_STARTUP.COM}. 
+The first of these is {\tt GENSTAT\_LSSC\_STARTUP.COM}.
 \begin{enumerate}
 \item Edit {\tt GENSTAT\_LSSC\_STARTUP.COM} to alter \verb+<disk>+ to
 be the name of the disk on which you installed GENSTAT~5.
 \item Run {\tt GENSTAT\_LSSC\_STARTUP.COM} on all nodes in your cluster.
 \item Add the section shown below to your {\tt LSSC:STARTUP.COM} file, ensuring
-you have the correct disk specified. 
+you have the correct disk specified.
 \begin{small}
 \begin{verbatim}
       $! GENSTAT
@@ -152,8 +152,8 @@ logical names necessary for GENSTAT~5 when your node is booted.
 
 \subsubsection{Symbols}
 
-Another file in {\tt [GENSTAT]} is {\tt GENSTAT\_LSSC\_LOGIN.COM}. This 
-contains an insert for your {\tt LSSC:LOGIN.COM} file. The two symbols defined 
+Another file in {\tt [GENSTAT]} is {\tt GENSTAT\_LSSC\_LOGIN.COM}. This
+contains an insert for your {\tt LSSC:LOGIN.COM} file. The two symbols defined
 override the standard Starlink definition which causes the ``Package Not
 Installed'' message to be displayed if GENSTAT~5 is not installed.  The section
 shown below should be added to your {\tt LSSC:LOGIN.COM}.
@@ -169,7 +169,7 @@ shown below should be added to your {\tt LSSC:LOGIN.COM}.
 
 If you have got this far, you are now ready to run GENSTAT~5. You need to logon
 to your node, and execute the {\tt @SSC:LOGIN} procedure to make GENSTAT~5
-available. 
+available.
 
 To run GENSTAT~5, merely type:
 \begin{verbatim}
@@ -241,5 +241,5 @@ cluster:
 
 You should now have no trace left of GENSTAT~5. Inform the Starlink Software
 Librarian (RLVAD::STAR) that you no-longer have GENSTAT~5 installed. Your
-`mobile' licence will then be free to assign to another node. 
+`mobile' licence will then be free to assign to another node.
 \end{document}

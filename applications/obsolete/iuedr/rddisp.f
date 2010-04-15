@@ -142,7 +142,7 @@
 
 *     DISPT0, DISPD0, DISPWS, DISPWL.
          READ ( FD, *, IOSTAT = ISTAT ) DISPT0, DISPD0,
-     :          DISPWS1, DISPWS2, DISPWS3, DISPWS4, 
+     :          DISPWS1, DISPWS2, DISPWS3, DISPWS4,
      :          DISPWL1, DISPWL2, DISPWL3, DISPWL4
          IF ( ISTAT .NE. 0 ) THEN
             CALL ERROUT( 'Error: reading dispersion data\\', STATUS )

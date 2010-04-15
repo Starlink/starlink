@@ -14,14 +14,14 @@
 *     CALL PROJ_AITPTLMQK( PHI0, THETA0, PHI, THETA, GPAR, L, M, STATUS )
 
 *  Description:
-*     Uses a AIT projection 
+*     Uses a AIT projection
 *
 *     L is assumed to be positive to the east
 *     M is assumed to be positive to the north
 *
 *     Based on the AIPS implementation of these geometries - see
 *     AIPS memos 27 & 46 - Eric Greisen.
-*     
+*
 
 *  Arguments:
 *     PHI0 = DOUBLE PRECISION (Given)
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

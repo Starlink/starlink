@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
 *  Write the first value to the array.
       VALUE = FIRST
       ARRAY( 1 ) = VALUE
-      IF ( NELEM .GT. 1 ) THEN 
+      IF ( NELEM .GT. 1 ) THEN
 
 *  Loop over the rest of the array.
          DO 1 I = 2, NELEM

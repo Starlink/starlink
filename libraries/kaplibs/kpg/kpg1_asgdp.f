@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASGDP( MAP, NDIM1, NDIM2, LBND, UBND, INPOS, 
+      SUBROUTINE KPG1_ASGDP( MAP, NDIM1, NDIM2, LBND, UBND, INPOS,
      :                       OUTPOS, STATUS )
 *+
 *  Name:
@@ -16,10 +16,10 @@
 
 *  Description:
 *     This routine finds a position which has good co-ordinates in the
-*     output Frame of the given Mapping, and returns both the input and 
+*     output Frame of the given Mapping, and returns both the input and
 *     output co-ordinates at this position. The position is constrained
 *     to lie within a specified box within the input Frame. The first
-*     point to be tested is the centre of the box. If this does not give 
+*     point to be tested is the centre of the box. If this does not give
 *     valid output co-ordinates then a set of 10000 points randomly
 *     distributed within the box is tested. An error is reported if no
 *     good position can be found.
@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,7 +121,7 @@
       INTEGER K                  ! Axis index
       LOGICAL GOOD               ! Is this position good on all output axes?
       REAL SEED                  ! Random number generator seed
-      REAL VALUE                 ! Random number 
+      REAL VALUE                 ! Random number
 *.
 
 *  Check the inherited global status.
@@ -134,7 +134,7 @@
 
 *  Transform this point.
       CALL AST_TRANN( MAP, 1, NDIM1, 1, INPOS, .TRUE., NDIM2, 1,
-     :                OUTPOS, STATUS )     
+     :                OUTPOS, STATUS )
 
 *  See if all output co-ordinate values are good.
       GOOD = .TRUE.
@@ -162,14 +162,14 @@
 *  Set up a batch of points randomly distributed within the input box.
             DO J = 1, SZBATCH
                DO K = 1, NDIM1
-                  IN( J, K ) = LBND( K ) + ( UBND( K ) - 
+                  IN( J, K ) = LBND( K ) + ( UBND( K ) -
      :                             LBND( K ) )*SLA_RANDOM( SEED )
                END DO
             END DO
 
 *  Transform them.
-            CALL AST_TRANN( MAP, SZBATCH, NDIM1, SZBATCH, IN, .TRUE., 
-     :                      NDIM2, SZBATCH, OUT, STATUS )     
+            CALL AST_TRANN( MAP, SZBATCH, NDIM1, SZBATCH, IN, .TRUE.,
+     :                      NDIM2, SZBATCH, OUT, STATUS )
 
 *  ABort if an error occurred.
             IF( STATUS .NE. SAI__OK ) GO TO 999

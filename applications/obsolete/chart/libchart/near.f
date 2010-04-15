@@ -32,7 +32,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       J = 0
  100  CONTINUE
       J = J + 1
@@ -41,5 +41,5 @@
       IF (J.GT.1.AND.J.LT.N) THEN
         IF (ABS(EX-ARR(J-1)).LT.ABS(DIFF)) J = J - 1
       ENDIF
- 
+
       END

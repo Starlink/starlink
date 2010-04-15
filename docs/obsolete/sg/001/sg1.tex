@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 \markright{SG/1.2}
 \setlength{\textwidth}{160mm}
@@ -283,7 +283,7 @@ To rewind a tape without unloading, {\tt DISMOUNT/NOUNLOAD MTA0}.
 
 To convert .BDF files to KAPPA HDS image format (.SDF files), use the KAPPA program {\bf STARIN} (SUN/96).
 At the time of writing, there is no program for the inverse
-conversion KAPPA HDS 
+conversion KAPPA HDS
 $\rightarrow$
 Starlink .BDF.
 
@@ -457,7 +457,7 @@ integrates pixels within a cursor of arbitrary size.
 The default cursor is circular, but it can also be square or elliptical.
 {\bf APERCUR} is a similar program.
 {\bf APERFOT} is another interactive aperture-photometry program,
-which estimates the sky contribution from an annulus around the 
+which estimates the sky contribution from an annulus around the
 area to be integrated.
 {\bf APERMAG} carries out aperture photometry for a series of objects
 in an x,y list.
@@ -584,7 +584,7 @@ directories.
 A list of the libraries linked may be found in ASPDIR:SLINK.COM.
 
 Use the DCL command LIBRARY to access these files.
-For example, {\tt LIBRARY/LIST} lists the routines stored in a given .TLB file, 
+For example, {\tt LIBRARY/LIST} lists the routines stored in a given .TLB file,
 while {\tt LIBRARY/EXTRACT=(routine1,routine2,...)} will copy the source code
 for the specified routines into a file library-name.TXT.
 
@@ -597,7 +597,7 @@ of display routines, substitutes for ARGSLIB with which ASPIC programs may
 be relinked.
 
 At present, the following commands are available in a relinked form:
-{\bf ACLEAR, ADHC, ADISP, AFLASH, AHARDCOPY, APAN, APERCUR, ARESET, ASAVE, 
+{\bf ACLEAR, ADHC, ADISP, AFLASH, AHARDCOPY, APAN, APERCUR, ARESET, ASAVE,
 LUTCOL, LUTCONT, LUTGREY, SLICE, TBXY}.
 They are discussed in LUN/61 (RGO).
 
@@ -942,7 +942,7 @@ points.
 {\em linear} least squares fit.
 \item [LINCONU]: Read a Starlink image (as unsigned 16 bit integers) together
 with the descriptor items BSCALE and BZERO and convert the data into REAL
-values using: \newline OUTPUT=INPUT*BSCALE+BZERO. 
+values using: \newline OUTPUT=INPUT*BSCALE+BZERO.
 \item [LINCONV]: Read a Starlink image (as 16 bit integers) together with the
 descriptor items BSCALE and BZERO and convert the data into REAL values
 using:\newline OUTPUT=INPUT*BSCALE+BZERO.
@@ -1020,7 +1020,7 @@ in E2D (formerly known as MODPIXASP).
 2D frame.
 Plot up to 500 pixels in the X-direction with a delay between each row
 controlled by the trackerball.
-\item [MSLICE]: Variant of SLICE which allows multiple slices to be obtained 
+\item [MSLICE]: Variant of SLICE which allows multiple slices to be obtained
 but which stores none of them.
 \item [MULCON]: Produce a contour map of a frame, or a series of contour maps
 of selected regions of a frame.
@@ -1568,7 +1568,7 @@ Y directions, the plot is not square unless the SQUARE option is specified on
 the command line.
 
 It is useful for getting a hard copy of any graphics currently displayed on the
-ARGS. 
+ARGS.
 Since the lineprinter can only display a pixel as either white or black, this
 routine does not work well on grey scale images unless the program THRESH has
 been run to define a threshold value, in which case set THRESH=THRESH\_OFFSET
@@ -1768,7 +1768,7 @@ As well as the magnitude, an estimate of the error is made by taking the sky
 estimate and the number of pixels in the sky estimate and then:
 \[RMS = \frac {\sqrt{star + \frac{sky * starpixno}{skypixno}}}{star}\]
 This assumes that the pixel values are Poisson distributed, but there is an
-option to set a correction factor if the values are actually counts divided 
+option to set a correction factor if the values are actually counts divided
 by some constant.
 The RMS is then divided by the square root of this constant.
 This constant is also estimated with each sky level estimate from the scatter
@@ -2178,7 +2178,7 @@ If such a file already exists then a new version will be created.
 \begin{description}
 \item [FUNCTION]:
 Generates output which, when plotted on the Printronix or Versatec printers,
-gives a greyscale representation of the input image. 
+gives a greyscale representation of the input image.
 The technique used generates a density of dots in the output which is
 proportional to the input data value.
 The pattern of dots is random.
@@ -2259,7 +2259,7 @@ DIT.DAT which is automatically queued to the Versatec when the program finishes.
 A file called DIT.LIS is also queued to the Versatec and this contains
 information on the image.
 Additional copies may be obtained by typing the command:
-\begin{verbatim} 
+\begin{verbatim}
     $ PRINT/QUEUE=SYS_VERSATEC/PASSALL/NOFEED DIT.DAT,DIT.LIS
 \end{verbatim}
 \end{description}
@@ -2490,7 +2490,7 @@ FILE\>[IMAGELIS].LIS\>\begin{minipage}[t]{100mm}
 This is the name of the file to which output is written.
 If omitted completely the name IMAGELIS.LIS is used.
 If a name only is entered then a default type of .LIS is used.
-\end{minipage}\\          
+\end{minipage}\\
 FACTOR\>1\>\begin{minipage}[t]{100mm}
 The pixel values are multiplied by FACTOR before being printed.
 It should be chosen so that a 3-digit representation of data*factor is
@@ -2925,7 +2925,7 @@ major axis length to that of the minor axis.
 \end{minipage}\\
 THETA\>\>\begin{minipage}[t]{100mm}
 An output parameter giving the inclination of the major axis of the star images
-to the X axis (increasing pixel number direction). 
+to the X axis (increasing pixel number direction).
 This value is in degrees, X through Y being considered positive.
 \end{minipage}\\
 GAMMA\>\>\begin{minipage}[t]{100mm}

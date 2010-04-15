@@ -22,12 +22,12 @@
 *  Description:
 *     This application converts a supplied Z axis value into the corresponding
 *     Z column value within a given catalogue, returning the nearest
-*     value for which some data exists within the catalogue. The resulting 
-*     Z column value and Z axis value are written to output parameters. This 
+*     value for which some data exists within the catalogue. The resulting
+*     Z column value and Z axis value are written to output parameters. This
 *     application is primarily for use within scripts.
 
 *  Usage:
-*     polzconv cat 
+*     polzconv cat
 
 *  ADAM Parameters:
 *     CAT = LITERAL (Read)
@@ -36,19 +36,19 @@
 *        is assumed if no file type is supplied.
 *     COLX = LITERAL (Read)
 *        The name of the catalogue column which gives the position of each
-*        vector along the first axis. A list of available column names is 
-*        displayed if a non-existent column name is given. See the "Notes" 
-*        section below for further details of how these positions are 
+*        vector along the first axis. A list of available column names is
+*        displayed if a non-existent column name is given. See the "Notes"
+*        section below for further details of how these positions are
 *        interpreted. [X]
 *     COLY = LITERAL (Read)
 *        The name of the catalogue column which gives the position of each
-*        vector along the second axis. A list of available column names is 
-*        displayed if a non-existent column name is given. See the "Notes" 
-*        section below for further details of how these positions are 
+*        vector along the second axis. A list of available column names is
+*        displayed if a non-existent column name is given. See the "Notes"
+*        section below for further details of how these positions are
 *        interpreted. [Y]
 *     COLZ = LITERAL (Read)
 *        The name of the catalogue column which gives the position of each
-*        vector along a third axis. A list of available column names is 
+*        vector along a third axis. A list of available column names is
 *        displayed if a non-existent column name is given. A null (!)
 *        value should be supplied if no third axis is to be used. The dynamic
 *        default is 'Z' if the catalogue contains a Z column, and null
@@ -56,16 +56,16 @@
 *     ZAXVAL = LITERAL (Read)
 *        Specifies the Z axis value to be converted. The
 *        given value should be in the current coordinate Frame of the
-*        supplied catalogue (see parameter COLZ). For instance, if the 
+*        supplied catalogue (see parameter COLZ). For instance, if the
 *        current coordinate Frame contains a calibrated wavelength axis,
-*        the value should be given in the units specified in that frame 
-*        (anstroms, nanometres, etc.). If the wavelength axis has not been 
+*        the value should be given in the units specified in that frame
+*        (anstroms, nanometres, etc.). If the wavelength axis has not been
 *        calibrated, the value will probably need to be supplied in units
-*        of pixels. Entering a colon (":") for the parameter will result in 
-*        a description of the current coordinate Frame being shown. This may 
+*        of pixels. Entering a colon (":") for the parameter will result in
+*        a description of the current coordinate Frame being shown. This may
 *        help to determine the units in which a value is expected. The
-*        value actually used is the closest available value within the 
-*        catalogue. This value is displayed on the screen and written to 
+*        value actually used is the closest available value within the
+*        catalogue. This value is displayed on the screen and written to
 *        parameter ZVALUE. The ZAXVAL parameter is only accessed if a
 *        null (!) value is supplied for parameter ZCOLVAL. See also
 *        parameter COLZ.
@@ -73,35 +73,35 @@
 *        Specifies the Z column value for the vectors to be displayed.
 *        The given value should be in the same coordinate system as the
 *        values stored in the Z column of the catalogue (usually pixels).
-*        This parameter provides an alternative to the ZAXVAL parameter. 
-*        Use the ZCOLVAL parameter to specify the Z value in pixels, and 
+*        This parameter provides an alternative to the ZAXVAL parameter.
+*        Use the ZCOLVAL parameter to specify the Z value in pixels, and
 *        the ZAXVAL parameter to specify the Z value in Hertz, angstroms,
 *        nanometres, etc (if the Z axis has been calibrated). If a null
-*        value is supplied for ZCOLVAL, then ZAXVAL is used to determine 
+*        value is supplied for ZCOLVAL, then ZAXVAL is used to determine
 *        the Z value to display. [!]
 *     ZCOLUSED = LITERAL (Write)
-*        The formatted Z column value to use. This is the nearest value to the 
+*        The formatted Z column value to use. This is the nearest value to the
 *        supplied ZCOLVAL or ZAXVAL for which data exists in the catalogue.
 *        The string "***" is stored if the catalogue does not include a Z
-*        axis. 
+*        axis.
 *     ZAXUSED = LITERAL (Write)
-*        The formatted Z axis value to use. This is the nearest value to the 
+*        The formatted Z axis value to use. This is the nearest value to the
 *        supplied ZAXVAL for which data exists in the catalogue.
 *        The string "***" is stored if the catalogue does not include a Z
 *        axis, or if a vcalue for supplied for ZCOLVAL.
 
 *  Notes:
 *     -  The columns specified by parameters COLX and COLY should hold
-*     coordinates in the "Base Frame" of the WCS information stored as 
-*     an AST FrameSet (see SUN/210) in the supplied catalogue. If the 
-*     catalogue has been produced by one of the POLPACK application polvec 
-*     or polbin, then the Base Frame will be pixel co-ordinates within the 
-*     aligned intensity images, and these will be stored in columns with 
-*     names "X" and "Y". 
+*     coordinates in the "Base Frame" of the WCS information stored as
+*     an AST FrameSet (see SUN/210) in the supplied catalogue. If the
+*     catalogue has been produced by one of the POLPACK application polvec
+*     or polbin, then the Base Frame will be pixel co-ordinates within the
+*     aligned intensity images, and these will be stored in columns with
+*     names "X" and "Y".
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -124,8 +124,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT_ constants 
-      INCLUDE 'PAR_ERR'          ! PAR_ error constants 
+      INCLUDE 'CAT_PAR'          ! CAT_ constants
+      INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -199,7 +199,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an identifier for the Z column. If a null (!) value is
-*  given, annul the error and leave ZAX and ZCOL indicating that no Z 
+*  given, annul the error and leave ZAX and ZCOL indicating that no Z
 *  column is available.
       CALL POL1_GTCTC( 'COLZ', CI, CAT__FITYP, ' ', GIS( 3 ), STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
@@ -211,25 +211,25 @@
 *  Set up dynamic defaults for the Z and Y column names.
          CALL POL1_COLNM( 'X', .FALSE., COLNM, STATUS )
          IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLX', COLNM, STATUS )
-   
+
          CALL POL1_COLNM( 'Y', .FALSE., COLNM, STATUS )
          IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLY', COLNM, STATUS )
 
-*  Get CAT identifiers for the columns which are to be used to define the 
+*  Get CAT identifiers for the columns which are to be used to define the
 *  X and Y coordinates.
-         CALL POL1_GTCTC( 'COLX', CI, CAT__FITYP, ' ', GIS( 1 ), 
+         CALL POL1_GTCTC( 'COLX', CI, CAT__FITYP, ' ', GIS( 1 ),
      :                    STATUS )
-         CALL POL1_GTCTC( 'COLY', CI, CAT__FITYP, ' ', GIS( 2 ), 
+         CALL POL1_GTCTC( 'COLY', CI, CAT__FITYP, ' ', GIS( 2 ),
      :                    STATUS )
 
-*  Find the number of rows in the catalogue. 
+*  Find the number of rows in the catalogue.
          CALL CAT_TROWS( CI, NVEC, STATUS )
 
 *  Allocate workspace.
          CALL PSX_CALLOC( NVEC, '_REAL', IPZ, STATUS )
 
 *  Copy the Z column into the corresponding array.
-         CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+         CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, %VAL( CNF_PVAL( IPZ ) ),
      :                    NGZ,
      :                    STATUS )
 
@@ -242,9 +242,9 @@
      :                    '(^NAME) contains no data.', STATUS )
          END IF
 
-*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
+*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of
 *  this FrameSet will be spanned by axes corresponding to the columns
-*  in GIS. 
+*  in GIS.
          CALL POL1_GTCTA( CI, 3, GIS, IWCS, STATUS )
 
 *  Get the name of the Z column.
@@ -255,7 +255,7 @@
          CALL KPG1_ASSPL( IWCS, 3, MAPS, STATUS )
 
 *  Find the max and min Z values in the Z column.
-         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( CNF_PVAL( IPZ ) ),
      :                    NBAD, SZHI,
      :                    SZLO, MAXPOS, MINPOS, STATUS )
 
@@ -264,33 +264,33 @@
             ZCOL = DBLE( SZLO )
 
 *  Otherwise, allow the user to choose a Z value.
-         ELSE IF( STATUS .EQ. SAI__OK ) THEN 
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
 *  First see if the user wants to give the Z value in pixels.
             CALL PAR_GET0D( 'ZCOLVAL', ZCOL, STATUS )
 
-*  If not, annul the error and get a current Frame Z value.                
-            IF( STATUS .EQ. PAR__NULL ) THEN 
+*  If not, annul the error and get a current Frame Z value.
+            IF( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
 
 *  Get the required Z value in the current Frame.
-               CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, ZAX, 
+               CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, ZAX,
      :                          NVAL, STATUS )
 
 *  Use the third Mapping to transform the current Frame Z value into a
 *  base Frame Z value.
-               IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
-                  CALL AST_TRAN1( MAPS( 3 ), 1, ZAX, .FALSE., ZCOL, 
+               IF( MAPS( 3 ) .NE. AST__NULL ) THEN
+                  CALL AST_TRAN1( MAPS( 3 ), 1, ZAX, .FALSE., ZCOL,
      :                            STATUS )
                ELSE
-                  ZCOL = AST__BAD 
+                  ZCOL = AST__BAD
                END IF
 
 *  If the result was undefined, issue an error, flush it, and use the
 *  lowest availabel Z value.
                IF( ZCOL .EQ. AST__BAD ) THEN
                   CALL PAR_GET0C( 'ZAXVAL', ZTEXT, STATUS )
- 
+
                   STATUS = SAI__ERROR
                   CALL MSG_SETC( 'NAME', NAME )
                   CALL MSG_SETC( 'Z', ZTEXT )
@@ -308,17 +308,17 @@
             END IF
 
 *  Find the closest available value to the requested Z value.
-            CALL POL1_FCLOS( NVEC, %VAL( CNF_PVAL( IPZ ) ), 
+            CALL POL1_FCLOS( NVEC, %VAL( CNF_PVAL( IPZ ) ),
      :                       REAL( ZCOL ), ZUSE,
      :                       STATUS )
             ZCOL = DBLE( ZUSE )
          END IF
 
 *  Find the Z axis value corresponding to the Z column value to be used.
-         IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
+         IF( MAPS( 3 ) .NE. AST__NULL ) THEN
             CALL AST_TRAN1( MAPS( 3 ), 1, ZCOL, .TRUE., ZAX, STATUS )
          ELSE
-            ZAX = AST__BAD 
+            ZAX = AST__BAD
          END IF
       END IF
 
@@ -349,7 +349,7 @@
 
 *  Arrive here if an error occurs.
  999  CONTINUE
-      
+
 *  Release work space.
       IF( IPZ .NE. 0 ) CALL PSX_FREE( IPZ, STATUS )
 

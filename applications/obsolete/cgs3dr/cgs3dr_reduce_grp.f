@@ -1,4 +1,4 @@
-*+  CGS3DR_REDUCE_GRP - REDUCE a group of CGS3 runs 
+*+  CGS3DR_REDUCE_GRP - REDUCE a group of CGS3 runs
       SUBROUTINE CGS3DR_REDUCE_GRP (STATUS)
 *    Description:
 *     performs a basic data reduction sequence on a set of CGS3 data files

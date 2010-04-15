@@ -13,8 +13,8 @@ C
 C     Returns -  (if called as a function)
 C
 C     (<) ICH_FOLD  (Integer) The number - starting from 1 -
-C                   of the last non-blank character in the 
-C                   string.  In some cases this can be the 
+C                   of the last non-blank character in the
+C                   string.  In some cases this can be the
 C                   logical length of the string.
 C
 C                                 KS / UCL  17th June 1982

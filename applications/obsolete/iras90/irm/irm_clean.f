@@ -1,5 +1,5 @@
-      SUBROUTINE IRM_CLEAN( LBND, UBND, DATIN, LBNDW, UBNDW, HBOX, 
-     :                      NITER, NSIGMA, DATOUT, RMS, WORK1, WORK2, 
+      SUBROUTINE IRM_CLEAN( LBND, UBND, DATIN, LBNDW, UBNDW, HBOX,
+     :                      NITER, NSIGMA, DATOUT, RMS, WORK1, WORK2,
      :                      WORK3, STATUS )
 *+
 *  Name:
@@ -16,7 +16,7 @@
 *                     NSIGMA, DATOUT, RMS, WORK1, WORK2, WORK3, STATUS )
 
 *  Description:
-*     The output data is a copy of the input data except that bright 
+*     The output data is a copy of the input data except that bright
 *     sources are replaced by bad values.
 *
 *     The input data is smoothed with a box filter of given width, and
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,12 +119,12 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-       
-*  If the half box size is zero, or if zero iterations are to be 
+
+*  If the half box size is zero, or if zero iterations are to be
 *  performed, just copy the input to the output.
       IF( NITER .EQ. 0 .OR. HBOX .EQ. 0 ) THEN
 
-         DO I = LBND, UBND 
+         DO I = LBND, UBND
             DATOUT( I ) = DATIN( I )
          END DO
 
@@ -136,7 +136,7 @@
 *  value zero. Create an array WORK3 in which each pixel has value 1
 *  if the corresponding pixel in WORK1 is valid, and 0 if it is not.
       DO I = LBND, UBND
-         INVAL = DATIN( I ) 
+         INVAL = DATIN( I )
 
          IF( INVAL .NE. VAL__BADR ) THEN
             WORK1( I ) = INVAL
@@ -149,7 +149,7 @@
          END IF
 
       END DO
-      
+
 *  Pad the supplied data with a half box width of invalid data at each
 *  end so that the convolution has data to work on.
       DO I = LBND - HBOX - 1, LBND - 1
@@ -170,7 +170,7 @@
          BOXVAL = 0.0
          BOXWGT = 0
 
-         DO I = LBND, HBOX 
+         DO I = LBND, HBOX
             BOXVAL = BOXVAL + WORK1( I )
             BOXWGT = BOXWGT + WORK3( I )
          END DO
@@ -231,7 +231,7 @@
 *  Do the next iteration.
       END DO
 
-*  Copy the remaining data to the output 
+*  Copy the remaining data to the output
       DO I = LBND, UBND
          IF( WORK3( I ) .GT. 0 ) THEN
             DATOUT( I ) = DATIN( I )
@@ -247,5 +247,5 @@
      :   'IRM_CLEAN: Unable to remove sources from a 1-D array of data',
      :                 STATUS )
       END IF
-      
+
       END

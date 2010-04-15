@@ -57,7 +57,7 @@
 *     CHCOEF( MCHOEF ) = DOUBLE PRECISION (Given)
 *        The Chebyshev polynomial coefficients, in the order increasing
 *        x power for each increasing y power.  Thus coefficient Aij in
-*        the standard convention is %CHCOEF(i*(%NYPAR)+j+1). The array 
+*        the standard convention is %CHCOEF(i*(%NYPAR)+j+1). The array
 *        may be rectangular, i.e. the highest x and y orders do not
 *        have to be the same.
 *     NCOEF = INTEGER (Given)
@@ -114,7 +114,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -172,7 +172,7 @@
          CALL KPG1_CHE2D( 1, XMIN, XMAX, X( I ), YMIN, YMAX, Y( I ),
      :                    NXPAR - 1, NYPAR - 1, MCHOEF, CHCOEF, MXPAR,
      :                    PX, FIT( I ), STATUS )
- 
+
 *  Form residuals and sums for the rms error of the fit.
          IF ( Z( I ) .NE. VAL__BADD ) THEN
             RESID( I ) = FIT( I ) - Z( I )
@@ -184,10 +184,10 @@
 
 *  End of the loop through the pixels.
       END DO
- 
+
 *  Calculate the rms error of the fit.
       IF ( NPT .GE. 1 ) THEN
-         RMS = SQRT( SUMSQ / REAL( NPT ) ) 
+         RMS = SQRT( SUMSQ / REAL( NPT ) )
       ELSE
          RMS = VAL__BADR
       END IF

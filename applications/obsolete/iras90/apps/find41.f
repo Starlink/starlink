@@ -44,19 +44,19 @@
 *     16-JAN-1992 (DCP):
 *        Original version.
 *        This original version is adapted from SPTR1, a subroutine
-*        of POSNTIM, contained in its utilities subdirectory.        
+*        of POSNTIM, contained in its utilities subdirectory.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-                                
+
 *  Arguments Given:
       REAL A
       REAL AB
@@ -118,7 +118,7 @@
       IF ( .NOT. (( SB .NE. ZERO) .OR. ( CB .NE. ZERO )) .AND.
      :           (( SC .NE. ZERO) .OR. ( CC .NE. ZERO)))     THEN
 
-*  Special cases 
+*  Special cases
          SB =  SA
          CB =  CA
          SC =  0.0

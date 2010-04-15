@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_CALC_BOL_COORDS (OUT_COORDS, FOCAL_STATION,
      :     RA_CENTRE, DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X,
      :     OFFSET_Y,ROTATION, N_POINT, MAX_POINT, POINT_LST, POINT_DAZ,
-     :     POINT_DEL, NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, 
+     :     POINT_DEL, NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC,
      :     U3, U4, U3_CENTRE, U4_CENTRE, X_BOL, Y_BOL,
      :     ELEVATION, PAR_ANGLE, STATUS)
 *+
@@ -13,13 +13,13 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     SCULIB subroutine
- 
+
 *  Invocation:
-*     CALL SCULIB_CALC_BOL_COORS (OUT_COORDS,FOCAL_STATION,RA_CENTRE, 
-*    :  DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION, 
+*     CALL SCULIB_CALC_BOL_COORS (OUT_COORDS,FOCAL_STATION,RA_CENTRE,
+*    :  DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION,
 *    :  N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
 *    :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
 *    :  U4_CENTRE, X_BOL, Y_BOL, ELEVATION, PAR_ANGLE, STATUS)
@@ -96,12 +96,12 @@
 *        - calculating the offsets that must be added to the bolometer
 *          positions to cater for the fact that the origin of the bolometer
 *          coordinate system may be offset from the `centre' specified by
-*          RA_CENTRE , DEC_CENTRE. 
+*          RA_CENTRE , DEC_CENTRE.
 *
-*        - Three types of offsets may be added; Nasmyth offsets which are 
+*        - Three types of offsets may be added; Nasmyth offsets which are
 *          simply subtracted from the bolometer coordinates, azimuth offsets
-*          which are subtracted from the bolometer positions in az and el, 
-*          or offsets in a coordinate system fixed relative to the sky, 
+*          which are subtracted from the bolometer positions in az and el,
+*          or offsets in a coordinate system fixed relative to the sky,
 *          rotated relative to apparent RA,Dec by the angle ROTATION. The
 *          latter are added to the bolometer coordinates when they are in
 *          the form of tangent plane coords in apparent RA,Dec.
@@ -220,7 +220,7 @@
       DOUBLE PRECISION P_DEL              ! applied el pointing correction
                                           ! (arcsec)
       DOUBLE PRECISION Q                  ! parallactic angle (radians)
-      DOUBLE PRECISION RD_X_OFFSET        ! offset of Nasmyth origin from 
+      DOUBLE PRECISION RD_X_OFFSET        ! offset of Nasmyth origin from
                                           ! `centre' in RD tangent plane
                                           ! (radians)
       DOUBLE PRECISION RD_Y_OFFSET        ! offset of Nasmyth origin from
@@ -281,7 +281,7 @@
       END IF
 
 * Check the OUT_COORDS
- 
+
       IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ'
      :     .AND. OUT_COORDS.NE.'RA') THEN
          STATUS = SAI__ERROR
@@ -300,7 +300,7 @@
          IF (N_POINT .GT. 0) THEN
             IF (LST .LE. POINT_LST(1)) THEN
                P_DAZ = DBLE (POINT_DAZ (1))
-               P_DEL = DBLE (POINT_DEL (1)) 
+               P_DEL = DBLE (POINT_DEL (1))
             ELSE IF (LST .GE. POINT_LST(N_POINT)) THEN
                P_DAZ = DBLE (POINT_DAZ (N_POINT))
                P_DEL = DBLE (POINT_DEL (N_POINT))
@@ -315,11 +315,11 @@
                DO WHILE (.NOT. DONE)
                   IF ((LST .GT. POINT_LST(I))   .AND.
      :                (LST .LE. POINT_LST(I+1))) THEN
-                     P_DAZ = DBLE (POINT_DAZ(I)) + 
+                     P_DAZ = DBLE (POINT_DAZ(I)) +
      :                 (LST - POINT_LST(I)) *
      :                 DBLE (POINT_DAZ(I+1) - POINT_DAZ(I)) /
      :                 (POINT_LST(I+1) - POINT_LST(I))
-                     P_DEL = DBLE (POINT_DEL(I)) + 
+                     P_DEL = DBLE (POINT_DEL(I)) +
      :                 (LST - POINT_LST(I)) *
      :                 DBLE (POINT_DEL(I+1) - POINT_DEL(I)) /
      :                 (POINT_LST(I+1) - POINT_LST(I))
@@ -337,11 +337,11 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          HOUR_ANGLE = LST - RA_CENTRE
-         SIN_E = SIN (LAT_OBS) * SIN (DEC_CENTRE) + 
+         SIN_E = SIN (LAT_OBS) * SIN (DEC_CENTRE) +
      :     COS (LAT_OBS) * COS (DEC_CENTRE) * COS (HOUR_ANGLE)
          E = ASIN (SIN_E) ! E is between 0 and 90
 
-         ELEVATION = E  
+         ELEVATION = E
 
 *  and the parallactic angle
 
@@ -375,7 +375,7 @@
                CHAN = BOL_CHAN (BOL)
                ADC = BOL_ADC (BOL)
 
-               U3_OFF = (DBLE(U3(CHAN,ADC)) - DBLE(U3_CENTRE) - 
+               U3_OFF = (DBLE(U3(CHAN,ADC)) - DBLE(U3_CENTRE) -
      :           U3_OFFSET) * ARCSEC2RAD
                U4_OFF = (DBLE(U4(CHAN,ADC)) - DBLE(U4_CENTRE) -
      :           U4_OFFSET) * ARCSEC2RAD
@@ -385,12 +385,12 @@
                DAZ = U3_OFF * COS_E + U4_OFF * SIN_E
                DEL = -U3_OFF * SIN_E + U4_OFF * COS_E
 
-*  add any AZ offset and the pointing offset (assuming pointing corrections 
-*  are tangent plane alt-az offsets with the azimuth value refering to the 
+*  add any AZ offset and the pointing offset (assuming pointing corrections
+*  are tangent plane alt-az offsets with the azimuth value refering to the
 *  error at zero elevation). This has to be applied even if we have
 *  no pointing corrections
 
-               DAZ = DAZ + (P_DAZ * COS (DEL) - AZ_OFFSET) * 
+               DAZ = DAZ + (P_DAZ * COS (DEL) - AZ_OFFSET) *
      :              ARCSEC2RAD
                DEL = DEL + (P_DEL - EL_OFFSET) * ARCSEC2RAD
 

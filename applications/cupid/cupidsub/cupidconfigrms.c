@@ -4,7 +4,7 @@
 #include "cupid.h"
 #include "mers.h"
 
-double cupidConfigRMS( AstKeyMap *config, const char *name, double rms, 
+double cupidConfigRMS( AstKeyMap *config, const char *name, double rms,
                        double def, int *status ){
 /*
 *+
@@ -12,14 +12,14 @@ double cupidConfigRMS( AstKeyMap *config, const char *name, double rms,
 *     cupidConfigRMS
 
 *  Purpose:
-*     Get the value of a configuration parameter, specified either as an 
+*     Get the value of a configuration parameter, specified either as an
 *     absolute value or as a mutiple of the RMS noise.
 
 *  Language:
 *     Starlink C
 
 *  Synopsis:
-*     double cupidConfigRMS( AstKeyMap *config, const char *name, double rms, 
+*     double cupidConfigRMS( AstKeyMap *config, const char *name, double rms,
                              double def, int *status )
 
 *  Description:
@@ -140,9 +140,9 @@ double cupidConfigRMS( AstKeyMap *config, const char *name, double rms,
                                          &nc ) && ( nc >= len ) ) {
          ret = rms;
 
-/* Otherwise, see if the string is a simple numerical value. If so, return 
+/* Otherwise, see if the string is a simple numerical value. If so, return
    it. */
-      } else if( nc = 0, 1 == astSscanf( text, " %lg %n", &ret, &nc ) 
+      } else if( nc = 0, 1 == astSscanf( text, " %lg %n", &ret, &nc )
                                          && ( nc >= len ) ) {
 
 /* Otherwise, return the default value. */

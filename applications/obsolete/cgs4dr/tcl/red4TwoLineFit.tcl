@@ -1,6 +1,6 @@
 proc red4TwoLineFit {taskname type} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -45,7 +45,7 @@ proc red4TwoLineFit {taskname type} {
     bind $Red4Widgets(TLF_LAB01) <Button-2> "red4Update red4TwoLineFit ALL"
     bind $Red4Widgets(TLF_ENT01) <Button-2> "red4Update red4TwoLineFit TLF_ENT01"
     bind $Red4Widgets(TLF_ENT01) <Double-Button-2> "$Red4Widgets(TLF_ENT01) delete 0 end"
-    
+
 # Create, pack and bind row/col widget
     if {$type == "row"} {
       set Red4Widgets(TLF_LAB02) [label $midtop.lb2 -text "First Row"]
@@ -149,7 +149,7 @@ proc red4TwoLineFit {taskname type} {
      cgs4drCursor arrow green black
      return
    } else {
- 
+
 # Remove the dialog box otherwise Figaro SPLOT can't grab input focus!
      destroy .red4Dialogue
    }

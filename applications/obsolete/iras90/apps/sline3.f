@@ -1,4 +1,4 @@
-      SUBROUTINE SLINE3( FID, SCS, MXNSCT, MXVTCE, NPOLY, NVTCE, 
+      SUBROUTINE SLINE3( FID, SCS, MXNSCT, MXVTCE, NPOLY, NVTCE,
      :                   LON, LAT, STATUS )
 *+
 *  Name:
@@ -11,12 +11,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SLINE3( FID, SCS, MXNSCT, MXVTCE, NPOLY, NVTCE, LON, LAT, 
+*     CALL SLINE3( FID, SCS, MXNSCT, MXVTCE, NPOLY, NVTCE, LON, LAT,
 *                  STATUS )
 
 *  Description:
 *     This subroutine saves the specifications of the polylines stored
-*     in two arrays into a text file. 
+*     in two arrays into a text file.
 
 *  Arguments:
 *     FID = INTEGER (Given)
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -59,7 +59,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
-                                 
+
 *  Arguments Given:
       INTEGER FID
       CHARACTER*( * ) SCS
@@ -93,7 +93,7 @@
 
 *  Write the position of the vertices one by one.
          DO J = 1, NVTCE( I )
-      
+
 *  Get the formated string form of the vertice.
             CALL IRA_DTOC( LON( I, J ), LAT( I, J ), SCS, 0, LONST,
      :                     LATST, STATUS )
@@ -116,5 +116,5 @@
       END DO
 
  999  CONTINUE
-      
+
       END

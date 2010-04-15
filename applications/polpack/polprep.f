@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This application prepares an input image for subsequent use by 
+*     This application prepares an input image for subsequent use by
 *     Polka. It is called from within the Polka.tcl script and is not
 *     intended to be used directly by users.
 
@@ -37,7 +37,7 @@
 *        In this case the IN image does not need to have a POLPACK extension.
 *     FRAME = LITERAL (Write)
 *        The Current Frame Domain in the IN image. If REF is FALSE., then
-*        a the string "BADPOL" is returned if the IN image does not have a 
+*        a the string "BADPOL" is returned if the IN image does not have a
 *        usable POLPACK extension.
 
 *  Authors:
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,7 +69,7 @@
       CHARACTER FRAME*50
       INTEGER IFRM
       INTEGER INDF
-      INTEGER INDF2 
+      INTEGER INDF2
       INTEGER IWCS
       LOGICAL OK
       LOGICAL REF
@@ -109,7 +109,7 @@
             CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPLATE, STATUS )
 
 *  If so, the NDF is OK.
-            OK = ( ANLANG .NE. VAL__BADR .OR. WPLATE .NE. VAL__BADR ) 
+            OK = ( ANLANG .NE. VAL__BADR .OR. WPLATE .NE. VAL__BADR )
 
          END IF
 
@@ -123,7 +123,7 @@
 
 *  Get the Domain of the Current Frame in the NDF, and then set it to
 *  PIXEL.
-         CALL KPG1_GTWCS( INDF, IWCS, STATUS )          
+         CALL KPG1_GTWCS( INDF, IWCS, STATUS )
          FRAME = AST_GETC( IWCS, 'DOMAIN', STATUS )
          CALL KPG1_ASFFR( IWCS, 'PIXEL', IFRM, STATUS )
          CALL AST_SETI( IWCS, 'CURRENT', IFRM, STATUS )

@@ -112,7 +112,7 @@
 *  If the used length is 0, set status to error, report and exit.
       IF ( MENULN .EQ. 0 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'IRM_TMENU_ERR1', 
+         CALL ERR_REP( 'IRM_TMENU_ERR1',
      :                 'IRM_TMENU: A blank menu has been supplied.',
      :                 STATUS )
          GOTO 999

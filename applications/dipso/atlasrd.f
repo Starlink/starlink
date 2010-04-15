@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command ATLASRD.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -69,7 +69,7 @@
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! DIPSO array sizes, etc.
-*        ASIZE1 = INTEGER (Read)  
+*        ASIZE1 = INTEGER (Read)
 *           The declared size of the X and Y current arrays.
 
       INCLUDE 'DECLARE_DATA'     ! DIPSO current arrays
@@ -101,7 +101,7 @@
      :        I,                 ! Element count
      :        INDF,              ! NDF identifier
      :        ILOGG,             ! Value of "LogG" parameter * 100
-     :        MODE,              ! Value of "Mode" parameter 
+     :        MODE,              ! Value of "Mode" parameter
      :        NLEN,              ! Index of last non-blank character
      :        PLACE,             ! A dummy place holder (NDF__NOPL)
      :        TEFF               ! Value of "Teff" parameter
@@ -136,7 +136,7 @@
 
 *  Obtain the LogG value. Multiple it by 100 to get the integer value
 *  used in the NDF name.
-      CALL GET0R( PARAMS, 2, .FALSE., COMM, 'LogG', LOGG, LOGG, 
+      CALL GET0R( PARAMS, 2, .FALSE., COMM, 'LogG', LOGG, LOGG,
      :            STATUS )
       ILOGG = NINT( 100.0*LOGG )
 
@@ -166,8 +166,8 @@
          FILE = SPECDAT//NDFNM( : NLEN )//'.sdf'
          INQUIRE( FILE=FILE, EXIST=THERE )
 
-*  If the file could not be found, and if mode 0 is being used, try to 
-*  find an alternative NDF which starts with the letter K instead of F 
+*  If the file could not be found, and if mode 0 is being used, try to
+*  find an alternative NDF which starts with the letter K instead of F
 *  (again in the $SPECDAT directory).
          IF( .NOT. THERE .AND. MODE .EQ. 0 ) THEN
             NDFNM( 1 : 1 ) = 'k'
@@ -185,7 +185,7 @@
          FILE = NDFNM( : NLEN )//'.sdf'
          INQUIRE( FILE=FILE, EXIST=THERE )
 
-*  If the file could not be found, and if mode 0 is being used, try to 
+*  If the file could not be found, and if mode 0 is being used, try to
 *  find an alternative NDF which starts with the letter K instead of F.
          IF( .NOT. THERE .AND. MODE .EQ. 0 ) THEN
             NDFNM( 1 : 1 ) = 'k'
@@ -215,13 +215,13 @@
       CALL NDF_BEGIN
 
 *  Get an identifier for the NDF.
-      CALL NDF_OPEN( DAT__ROOT, NAME, 'READ', 'OLD', INDF, PLACE, 
+      CALL NDF_OPEN( DAT__ROOT, NAME, 'READ', 'OLD', INDF, PLACE,
      :               STATUS )
 
 *  Tell the user what is about to happen.
       CALL NDF_MSG( 'NDFNAM', INDF )
       CALL MSGOUT( COMM, 'Reading Karucz model atmosphere fluxes from'//
-     :             ' NDF ''^NDFNAM'' into the current arrays.', .FALSE., 
+     :             ' NDF ''^NDFNAM'' into the current arrays.', .FALSE.,
      :             STATUS )
 
 *  Read the data from the NDF into the current arrays.

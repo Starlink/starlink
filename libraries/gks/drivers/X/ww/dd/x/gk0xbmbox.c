@@ -14,14 +14,14 @@ PUBLIC void gk0xbmxbox(bm,b,flags) bitmap *bm; box b; int flags;{
 			(flags&BMCLEARALL) ? GXclear : GXinvert;
 		gk0xsetbmrop(opn,bm);
 		if(jdd->jd_flags&JCOPYAREA)XCopyArea(WXD,jbp->jbm_drawable,jbp->jbm_drawable,WXGC,b.b_left,b.b_top,WIDTH(b),HEIGHT(b),b.b_left,b.b_top);
-		else XFillRectangle(WXD,jbp->jbm_drawable,WXGC,b.b_left,b.b_top,WIDTH(b),HEIGHT(b)); 
+		else XFillRectangle(WXD,jbp->jbm_drawable,WXGC,b.b_left,b.b_top,WIDTH(b),HEIGHT(b));
 	}
  	if(flags&(BMCLEAR|BMNOT)){
 		opn = (flags&(BMCLEAR|BMNOT))==(BMCLEAR|BMNOT) ? GXset :
 			(flags&BMCLEAR) ? GXclear : GXinvert;
 		gk0xsetbmrop(opn,bm);
 		if(jdd->jd_flags&JCOPYAREA)XCopyArea(WXD,jbp->jbm_drawable,jbp->jbm_drawable,WXGC,b.b_left+1,b.b_top+1,WIDTH(b)-2,HEIGHT(b)-2,b.b_left+1,b.b_top+1);
-		else XFillRectangle(WXD,jbp->jbm_drawable,WXGC,b.b_left+1,b.b_top+1,WIDTH(b)-2,HEIGHT(b)-2); 
+		else XFillRectangle(WXD,jbp->jbm_drawable,WXGC,b.b_left+1,b.b_top+1,WIDTH(b)-2,HEIGHT(b)-2);
 	}
 	if(flags&BMEDGES){
 		bitmap *save;

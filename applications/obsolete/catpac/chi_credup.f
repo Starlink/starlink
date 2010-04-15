@@ -14,9 +14,9 @@
 *     CALL CHI_CREDUP( INPUT, ESTNUMENTS, OUTPUT, STATUS )
 *
 *  Description:
-*     Create a duplicate catalogue with the same columns but no entries. 
-*     The CHI routines that write data into this catalogue will be more 
-*     efficient if you can provide a good estimate for the size of the 
+*     Create a duplicate catalogue with the same columns but no entries.
+*     The CHI routines that write data into this catalogue will be more
+*     efficient if you can provide a good estimate for the size of the
 *     catalogue. (The number of entries).
 
 *  Arguments:
@@ -45,7 +45,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,7 +77,7 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Split the output name into database part and catname part.
 *
       call chi_splitname(output, outdbname, outcatname, status)

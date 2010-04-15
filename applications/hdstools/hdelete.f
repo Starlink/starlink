@@ -34,7 +34,7 @@
 * Authors :
 *    RJV: R.J. Vallance (Birmingham University)
 *    DJA: D.J. Allan (Birmingham University)
-*    AJC: A.J. Chipperfield (Starlink, RAL) 
+*    AJC: A.J. Chipperfield (Starlink, RAL)
 
 * History :
 *    ??-???-???? (RJV):

@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_GLIGT( IWCS, IPIX, PARAM, MAXPIX, PIXPOS, NPOS, 
+      SUBROUTINE KPS1_GLIGT( IWCS, IPIX, PARAM, MAXPIX, PIXPOS, NPOS,
      :                       STATUS )
 *+
 *  Name:
@@ -69,8 +69,8 @@
 *  Type Definitions:
       IMPLICIT NONE            ! no default typing allowed
 
-*  Global Constants: 
-      INCLUDE 'SAE_PAR'        ! Global SSE parameters 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE parameters
       INCLUDE 'NDF_PAR'        ! NDF definitions
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
@@ -152,7 +152,7 @@
             CALL ERR_ANNUL( STATUS )
             LOOP = .FALSE.
          END IF
-              
+
          FIRST = .FALSE.
 
       END DO

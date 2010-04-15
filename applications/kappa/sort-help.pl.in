@@ -26,7 +26,7 @@
 #  line (the text following the initial "1 " string).
       if( $line =~ /^1 (\s*.*)\s$/ ){
          $key = $1;
-      } 
+      }
 
 #  Use the title as the key into a hash, appending the whole line of text
 #  to any current entry for the key.
@@ -39,7 +39,7 @@
       }
    }
 
-#  Once all text has been read from standard input, sort the hash keys 
+#  Once all text has been read from standard input, sort the hash keys
 #  into alphabetical order, and the write the has entries out to standard
 #  output.
    foreach $key (sort keys %map){

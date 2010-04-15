@@ -20,7 +20,7 @@ C                 (as a number of elements).
 C     (>) WIDTH   (Integer) The number of elements over which the
 C                 gaussian is to be calculated.  This should be
 C                 an odd number, ideally (if even, the effect will
-C                 be the same as for WIDTH-1). 
+C                 be the same as for WIDTH-1).
 C     (W) WORK    (Real array WORK(WIDTH) Workspace.
 C     (<) OUT     (Real array OUT(NX)).  The result array.  Note
 C                 that OUT must NOT be the same array as IN.

@@ -391,7 +391,7 @@
                CALL MAPCC6( XLO, YLO, XHI, YHI, RLO, RHI, PLO, PHI,
      :                      POFFX, POFFY, WFACT, PWGSZX, PWGSZY,
      :                      %VAL( IPPWG( GINDX, GINDY ) ), DATVAL,
-     :                      VARVAL, DATOUT, VAROUT, WGTOUT, INSIDE, 
+     :                      VARVAL, DATOUT, VAROUT, WGTOUT, INSIDE,
      :                      STATUS )
 
 

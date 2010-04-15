@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,14 +69,14 @@
 *     26-SEP-1989 (RFWS):
 *        Original, derived from the equivalent ARY_ system routine.
 *     13-AUG-2001 (DSB):
-*        Ensure the locator for the parent is a primary locator. 
+*        Ensure the locator for the parent is a primary locator.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,7 +101,7 @@
 *  Save the STATUS value and mark the error stack.
       TSTAT = STATUS
       CALL ERR_MARK
-       
+
 *  Find the temporary object's name.
       STATUS = SAI__OK
       CALL DAT_NAME( LOC, NAME, STATUS )
@@ -110,9 +110,9 @@
       CALL DAT_PAREN( LOC, LOCP, STATUS )
 
 *  Promote the locator for the parent to a primary locator to ensure that
-*  the container file will not be closed when the locator for the data 
+*  the container file will not be closed when the locator for the data
 *  object is annulled.
-      CALL DAT_PRMRY( .TRUE., LOCP, .TRUE., STATUS ) 
+      CALL DAT_PRMRY( .TRUE., LOCP, .TRUE., STATUS )
 
 *  Annul the object's locator.
       CALL DAT_ANNUL( LOC, STATUS )
@@ -122,7 +122,7 @@
 
 *  Annul the parent's locator.
       CALL DAT_ANNUL( LOCP, STATUS )
-       
+
 *  Annul any error if STATUS was previously bad, otherwise let the new
 *  error report stand.
       IF ( STATUS .NE. SAI__OK ) THEN

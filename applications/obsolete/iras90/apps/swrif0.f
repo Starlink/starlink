@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -73,7 +73,7 @@
       INTEGER ZONEB              ! SGS ID of the base zone
       INTEGER ZONEP              ! SGS ID of the zone on entry
       INTEGER ZONEW              ! SGS ID of the new zone
-         
+
 *.
 
 *  Check inherited global status.
@@ -111,10 +111,10 @@
 *  Find its extension under the coordinate of the zone on entry.
       CALL SGS_TPZ( ZONEW, XW1, YW1, ZONEP, XWP1, YWP1, STATUS )
       CALL SGS_TPZ( ZONEW, XW2, YW2, ZONEP, XWP2, YWP2, STATUS )
-      
+
 *  Set the coordinate of the new zone as that of the zone on entry.
       CALL SGS_SW( XWP1, XWP2, YWP1, YWP2, STATUS )
-      
+
 *  Release the base zone.
       CALL SGS_RELZ( ZONEB )
 

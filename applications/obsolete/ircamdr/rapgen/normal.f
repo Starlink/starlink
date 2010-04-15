@@ -16,7 +16,7 @@
 *
 *    Method :
 *
-*     If error on entry 
+*     If error on entry
 *        OUTVALUE = INVALUE
 *        Return
 *     Endif
@@ -47,7 +47,7 @@
 *
 *    History :
 *
-*     14-02-1986 : First implementation (REVA::MJM)  
+*     14-02-1986 : First implementation (REVA::MJM)
 *     20-Jul-1994  Changed VAX-specific RAN function to NAG random number
 *                  generator routine, changed arguments as SEED no
 *                  longer required   (SKL@JACH)

@@ -94,7 +94,7 @@
 *  will need to attempt a conversion using the fields themselves to
 *  determine the data types.
       CALL FIO_READF( FI, LINE, STATUS )
-      IF ( LINE .EQ. 'cat2tab' ) THEN 
+      IF ( LINE .EQ. 'cat2tab' ) THEN
          CALL GAI1_T2CN( CI, FI, STATUS )
       ELSE
          CALL GAI1_T2CG( CI, FI, 10, STATUS ) ! XXX 10 should be a parameter.

@@ -31,7 +31,7 @@
 *     22-MAR-1993 (AJJB):
 *        Commented out declaration of local variable which is never
 *        used.
-*     
+*
 *-
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -47,7 +47,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *
 *   Pick up Scale from Parameter File (MJV)
 *
@@ -59,7 +59,7 @@
          CALL CHR_CTOR(VALUE,SCALE,ISTAT)
          IF (ISTAT.NE.0) SCALE=0.0
       ENDIF
- 
+
       WIDE = 2.0 * SIZE
       IF (ABS(SCALE).LT.1E-5) THEN
          WRITE(7,949) IDFLD,WIDE

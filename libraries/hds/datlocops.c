@@ -223,7 +223,7 @@ datCell( const HDSLoc *locator1,
    data2->size  = 1;
    state2->cell = 1;
    data2->valid = 1;
-   
+
    return hds_gl_status;
 }
 
@@ -297,7 +297,7 @@ datVec(const HDSLoc *locator1,
    dbt            = data2->bounds;
    dbt[0][LOWER]  = 1;
    dbt[0][UPPER]  = data2->size;
-     
+
    return hds_gl_status;
 }
 
@@ -442,7 +442,7 @@ datClone(const HDSLoc *locator1,
 }
 
 int
-dat1_get_off(int ndim, const HDS_PTYPE *dims, const HDS_PTYPE *subs, 
+dat1_get_off(int ndim, const HDS_PTYPE *dims, const HDS_PTYPE *subs,
              UINT_BIG *offset)
 
 /*+

@@ -206,7 +206,7 @@
 *     :        SPACE( IND2 ), SPACE( IND3 ), SPACE( IND4 ), FSTATUS )
 *  PDA version.
          ITASK = 1
-         CALL PDA_DGEFS( SPACE, NRANK, NRANK, SPACE( IND1 ), 
+         CALL PDA_DGEFS( SPACE, NRANK, NRANK, SPACE( IND1 ),
      :        ITASK, IND, SPACE( IND3 ), SPACE( IND4 ), FSTATUS )
       ENDIF
 

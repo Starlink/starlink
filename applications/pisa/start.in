@@ -23,7 +23,7 @@
 #     7-MAY-1992 (PDRAPER):
 #       Original Version.
 #     13-MAY-1994 (PDRAPER):
-#       Added PISA2ARD application. Now relies on PISA_DIR 
+#       Added PISA2ARD application. Now relies on PISA_DIR
 #       environment variable rather than installation editting.
 #     {enter_changes_here}
 #

@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -173,7 +173,7 @@
 *  See if the input NDF contains an IRCAM extension.
          CALL NDF_XSTAT( INDF1, 'IRCAM', THERE, STATUS )
 
-*  If not report an error.         
+*  If not report an error.
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF1 )
@@ -181,7 +181,7 @@
      :                    'not contain an IRCAM extension.', STATUS )
          END IF
 
-*  Get a locator to the IRCAM extension.         
+*  Get a locator to the IRCAM extension.
          CALL NDF_XLOC( INDF1, 'IRCAM', 'READ', XLOC, STATUS )
 
 *  See if the extension contains a component called TNORM.
@@ -201,7 +201,7 @@
 
 *  Get the value of the OBS.EXPOSURE_TIME component.
          CALL CMP_GET0R( OBSLOC, 'EXPOSURE_TIME', EXPTIM, STATUS )
-                  
+
 *  Get the value of the OBS.NUMBER_COADDS component.
          CALL CMP_GET0I( OBSLOC, 'NUMBER_COADDS', NCOADD, STATUS )
 
@@ -239,7 +239,7 @@
      :                 STATUS )
 
 *  Divide the input data values by the total time and write to the
-*  output data arrays. 
+*  output data arrays.
          CALL CDIVD( DBLE( TIME ), EL, %VAL( IPIN ), %VAL( IPOUT ),
      :               BAD, STATUS )
 
@@ -261,7 +261,7 @@
      :                    EL, STATUS )
 
 *  Divide the input variance values by the square of the total time and
-*  write to the output variance array. 
+*  write to the output variance array.
             CALL CDIVD( DBLE( TIME**2 ), EL, %VAL( IPIN ),
      :                  %VAL( IPOUT ), BAD, STATUS )
 
@@ -303,7 +303,7 @@
 *  Annul the input NDF identifier.
          CALL NDG_ANNUL( INDF1, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete the output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL NDG_DELET( INDF2, STATUS )
@@ -316,7 +316,7 @@
          IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
 
-*  Give a warning telling the user that no output NDF will be created 
+*  Give a warning telling the user that no output NDF will be created
 *  for the current input NDF.
             CALL GRP_GET( IGRP2, I, 1, OUTNDF, STATUS )
             CALL MSG_SETC( 'NDF', OUTNDF )
@@ -342,11 +342,11 @@
       CALL MSG_BLANK( STATUS )
 
 *  Assign a group expression to the output parameter NDFLIST which
-*  specifies all the output NDFs. NDFLIST should normally be associated 
-*  with a suitable global parameter to cause its value to be passed on 
-*  to the next application.  The output parameter NDFLIST is not 
-*  advertised as a user parameter since users will normally not be 
-*  aware of the existence of global parameter, and so will not know 
+*  specifies all the output NDFs. NDFLIST should normally be associated
+*  with a suitable global parameter to cause its value to be passed on
+*  to the next application.  The output parameter NDFLIST is not
+*  advertised as a user parameter since users will normally not be
+*  aware of the existence of global parameter, and so will not know
 *  how to assign a value to it.
       IF( NOUT .GT. 0 ) CALL LISTN( 'NDFLIST', IGRP2, 'TNORM', STATUS )
 
@@ -361,7 +361,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was requested, 
+*  If a null parameter was given or a parameter abort was requested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

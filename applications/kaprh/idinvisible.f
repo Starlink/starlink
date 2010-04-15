@@ -88,7 +88,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,7 +103,7 @@
 *  Local Constants:
       INTEGER NMEMAX             ! Maximum number of memories
       PARAMETER ( NMEMAX = 10 )
-     
+
 *  Local Variables:
       INTEGER
      :  DID,                     ! Display identifier
@@ -244,17 +244,17 @@
          CALL KPG1_IDERR( 'IIMSMV_ERR', IDSTAT, STATUS )
          GOTO 999
       END IF
-      
+
 *    Closedown sequence.
 *    ===================
-*         
+*
 *    Errors, either obtaining the device or because the device does not
 *    support the required capabilities, fall to this point.
 
  999  CONTINUE
 
       IF ( DEVCAN ) THEN
-      
+
 *       Close down IDI using the parameter system.
 
          CALL IDI_CANCL( 'DEVICE', STATUS )

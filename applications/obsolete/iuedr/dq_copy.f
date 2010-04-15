@@ -29,12 +29,12 @@
 
 *   Import:
       INTEGER NPOINT       ! number of points in arrays
- 
+
       BYTE DQ1(NPOINT)     ! input array
- 
+
 *   Export:
       BYTE DQ2(NPOINT)     ! output array
- 
+
 *   Local variables:
       INTEGER I            ! loop index
 

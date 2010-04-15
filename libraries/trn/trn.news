@@ -1,8 +1,8 @@
 1 TRANSFORM - co-ordinate transformation library
-                                                      Expires: **.**.** 
+                                                      Expires: **.**.**
  V0.9-6
     - Add support for boolean/logical values through operators such as .EQ.
-    .GE. etc, (or their C equivalents) and a new 3-argument function called 
+    .GE. etc, (or their C equivalents) and a new 3-argument function called
     "QIF" which can be used like the C question-mark operator.
     - Add a new function called "IDV" for integer division.
     - Released under the GPL

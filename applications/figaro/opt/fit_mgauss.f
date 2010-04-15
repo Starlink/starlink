@@ -276,7 +276,7 @@
       got_opt_vm2 = .true.
 
 * test function and first derivatives. This isn't needed now that the
-* function is working, but if any changes are made it can be brought 
+* function is working, but if any changes are made it can be brought
 * back into action if problems are encountered!
 *
 *      ifail = 1

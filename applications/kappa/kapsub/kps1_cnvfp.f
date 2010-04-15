@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CNVFP( VAR, NXP, NYP, PSF, NPIX, NLIN, XCEN, YCEN, OUT, 
+*     CALL KPS1_CNVFP( VAR, NXP, NYP, PSF, NPIX, NLIN, XCEN, YCEN, OUT,
 *                      STATUS )
 
 *  Description:
@@ -84,7 +84,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,18 +113,18 @@
       DOUBLE PRECISION FACTOR    ! Normalisation factor
       INTEGER  LIN		 ! Line counter
       INTEGER  OLIN              ! Line counter in output frame
-      INTEGER  OLINHI            ! Highest value of OLIN (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OLINHI            ! Highest value of OLIN (before wrap
+				 ! around) which can be stored in the
 				 ! output image
-      INTEGER  OLINLO            ! Lowest value of OLIN (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OLINLO            ! Lowest value of OLIN (before wrap
+				 ! around) which can be stored in the
 				 ! output image
       INTEGER  OPIX              ! Pixel counter in output frame.
-      INTEGER  OPIXHI            ! Highest value of OPIX (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OPIXHI            ! Highest value of OPIX (before wrap
+				 ! around) which can be stored in the
 				 ! output image
-      INTEGER  OPIXLO            ! Lowest value of OPIX (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OPIXLO            ! Lowest value of OPIX (before wrap
+				 ! around) which can be stored in the
 				 ! output image
       INTEGER  PIX               ! Pixel counter
       DOUBLE PRECISION SUM       ! Total data sum in PSF
@@ -135,7 +135,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the whole output image to zero.
-      DO LIN = 1, NLIN 
+      DO LIN = 1, NLIN
          DO PIX = 1, NPIX
             OUT( PIX, LIN ) = 0.0D0
          END DO
@@ -153,18 +153,18 @@
 *  total data sum in the PSF.
       SUM = 0.0D0
 
-*  Set the bounds of the output image (before wrap-around correction is 
+*  Set the bounds of the output image (before wrap-around correction is
 *  applied to remove negative co-ordinates).
       OPIXLO = ( 1 - NPIX ) / 2
       OPIXHI = NPIX / 2
 
       OLINLO = ( 1 - NLIN ) / 2
       OLINHI = NLIN / 2
-      
+
 *  Loop through all the lines of the input PSF.
       DO LIN = 1, NYP
 
-*  Calculate the line number in the output image at which this input 
+*  Calculate the line number in the output image at which this input
 *  line is stored.  The resulting value may be negative.
          OLIN = LIN - YCEN +1
 
@@ -200,11 +200,11 @@
 *  If the PSF had zero data sum, abort.
       IF ( SUM .EQ. 0.0D0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS1_CNVFP_ERR1', 'PSF has zero data sum.', 
+         CALL ERR_REP( 'KPS1_CNVFP_ERR1', 'PSF has zero data sum.',
      :                  STATUS )
          GO TO 999
       END IF
-      
+
 *  Normalise the PSF to have a total data sum equal to the square root
 *  of the number of pixels in the image.  This ensures that the
 *  zero-frequency pixel will have value 1.0 when the FFT is taken.

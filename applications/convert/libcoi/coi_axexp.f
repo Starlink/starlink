@@ -116,7 +116,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -264,12 +264,12 @@
 *  type.  Use _REAL for all but double-precision centres.  See if the
 *  axis is linear.
             IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
-               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
                   CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
-     :                             DSTART( I ), DEND( I ), LINEAR( I ), 
+     :                             DSTART( I ), DEND( I ), LINEAR( I ),
      :                             STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
@@ -293,12 +293,12 @@
 
 *  Repeat for all other axis-centre data types mapped as real.
             ELSE
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ',
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
                   CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
-     :                             START( I ), END( I ), LINEAR( I ), 
+     :                             START( I ), END( I ), LINEAR( I ),
      :                             STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
@@ -527,7 +527,7 @@
                CALL COI_FKEYC( KEYWRD, 'wtype=linear ',
      :                         ' ', ' ', .FALSE., HEADER, STATUS )
                IF ( STATUS .EQ. SAI__OK ) CALL ADLINE( IMDESC, HEADER )
-                     
+
 *  Increment the header number for the next WAT1_nnn card.
                HEADNO = HEADNO + 1
 
@@ -557,7 +557,7 @@
      :                            ' ', ' ', .FALSE., HEADER, STATUS )
                   IF ( STATUS .EQ. SAI__OK )
      :              CALL ADLINE( IMDESC, HEADER )
-                     
+
 *  Increment the header number for the next WAT1_nnn card.
                   HEADNO = HEADNO + 1
 
@@ -590,10 +590,10 @@
      :                            ' ', ' ', .FALSE., HEADER, STATUS )
                   IF ( STATUS .EQ. SAI__OK )
      :              CALL ADLINE( IMDESC, HEADER )
-                     
+
 *  Increment the header number for the next WAT1_nnn card.
                   HEADNO = HEADNO + 1
-               
+
                END IF
 
 *  Write the CTYPEn header.
@@ -705,7 +705,7 @@
 
 *  Increment the header number for the next WAT1_nnn card.
                HEADNO = HEADNO + 1
-                     
+
 *  Append the axis label to the WATi_nnn keyword.
 *  ==============================================
 
@@ -736,7 +736,7 @@
      :                               STATUS )
                      IF ( STATUS .EQ. SAI__OK )
      :                 CALL ADLINE( IMDESC, HEADER )
-                     
+
 *  Increment the header number for the next WAT1_nnn card.
                      HEADNO = HEADNO + 1
                   END IF
@@ -768,7 +768,7 @@
      :                               STATUS )
                      IF ( STATUS .EQ. SAI__OK )
      :                 CALL ADLINE( IMDESC, HEADER )
-                     
+
 *  Increment the header number for the next WAT1_nnn card.
                      HEADNO = HEADNO + 1
                   END IF
@@ -785,7 +785,7 @@
 *  Append the specN attributes to the WAT1_nnn headers.
                      CALL COI_WMS5D( IMDESC, 1, 1, 2, DSTART, DINCRE,
      :                               0.0, VAL__BADR, VAL__BADR,
-     :                               1.0, 0.0, NELM, 
+     :                               1.0, 0.0, NELM,
      :                               %VAL( CNF_PVAL( APNTR( 1 ) ) ),
      :                               HEADNO, STATUS )
 
@@ -794,7 +794,7 @@
 *  Append the specN attributes to the WAT1_nnn headers.
                      CALL COI_WMS5R( IMDESC, 1, 1, 2, START, INCREM,
      :                               0.0, VAL__BADR, VAL__BADR,
-     :                               1.0, 0.0, NELM, 
+     :                               1.0, 0.0, NELM,
      :                               %VAL( CNF_PVAL( APNTR( 1 ) ) ),
      :                               HEADNO, STATUS )
                   END IF

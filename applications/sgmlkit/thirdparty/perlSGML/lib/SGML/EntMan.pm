@@ -12,12 +12,12 @@
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation; either version 2 of the License, or
 ##  (at your option) any later version.
-## 
+##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##  GNU General Public License for more details.
-##  
+##
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program; if not, write to the Free Software
 ##  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -117,7 +117,7 @@ sub read_catalog_handle {
 ##
 ##	Usage:
 ##	    $fh = $entman->open_entity($name, $pubid, $sysid);
-##	
+##
 ##	undef is returned if entity could not be resolved, and a
 ##	warning message is printed to stderr.
 ##
@@ -137,7 +137,7 @@ sub open_entity {
 ##
 ##	Usage:
 ##	    $fh = $entman->open_doctype($name, $pubid, $sysid);
-##	
+##
 ##	undef is returned if doctype could not be resolved, and a
 ##	warning message is printed to stderr.
 ##
@@ -155,7 +155,7 @@ sub open_doctype {
 ##
 ##	Usage:
 ##	    $fh = $entman->open_public_id($pubid);
-##	
+##
 ##	undef is returned if public id could not be resolved, and a
 ##	warning message is printed to stderr.
 ##
@@ -170,7 +170,7 @@ sub open_public_id {
 ##
 ##	Usage:
 ##	    $fh = $entman->open_system_id($sysid);
-##	
+##
 ##	undef is returned if system id could not be resolved, and a
 ##	warning message is printed to stderr.
 ##
@@ -186,7 +186,7 @@ sub open_system_id {
 ##----------------------------------------------------------------------
 ##	get_public() resolves a public id to a (system id, base,
 ##	override) set.
-##	
+##
 ##	The following algorithm is used to resolve the public_id:
 ##
 ##	1. Check $this->{Catalog}->get_public(), else

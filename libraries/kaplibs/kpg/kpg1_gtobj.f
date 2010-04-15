@@ -7,21 +7,21 @@
 *     Gets an AST Object using an environment parameter.
 
 *  Description:
-*     Gets an AST Object from an NDF, FITS file, HDS path or text file 
+*     Gets an AST Object from an NDF, FITS file, HDS path or text file
 *     using an environment parameter.
 *
-*     First, attempt to interpret the parameter value as an HDS path. The 
-*     HDS object must have a type of WCS, must be scalar, and must contain 
-*     a single 1-D array component with name DATA and type _CHAR. This is 
+*     First, attempt to interpret the parameter value as an HDS path. The
+*     HDS object must have a type of WCS, must be scalar, and must contain
+*     a single 1-D array component with name DATA and type _CHAR. This is
 *     the scheme used for HDS structures created by KPG1_WWRT.
 *
 *     If the above attempt fails, attempt to interpret the parameter
 *     value as an NDF name. If the NDF is opened succesfully, its WCS
 *     FrameSet is returned.
 *
-*     If the above attempt fails, and the parameter value ends with 
+*     If the above attempt fails, and the parameter value ends with
 *     ".FIT", attempt to interpret the parameter value as the name of a
-*     FITS file. Open the FITS file and attempt to obtained an AST 
+*     FITS file. Open the FITS file and attempt to obtained an AST
 *     FrameSet from the primary HDU headers.
 *
 *     If the above attempt fails, attempt to interpret the parameter
@@ -39,7 +39,7 @@
 *        The parameter name.
 *     CLASS = CHARACTER * ( * ) (Given)
 *        The required class. Used in error reports (see ISA). If Objects
-*        of more than 1 class can be used, this should be supplied blank, and 
+*        of more than 1 class can be used, this should be supplied blank, and
 *        the calling routine should verify that the Object is usable.
 *     ISA = EXTERNAL (Given)
 *        A suitable AST "ISA.." function which returns .TRUE. if an Object
@@ -93,7 +93,7 @@
 *     8-JUN-2009 (DSB):
 *        Avoid use of NDF_EXIST since it gives the appearance of a
 *        locator leak (KAPPA monolith locator checsk do not, and cannot,
-*        filter out the locators stored in the parameter system by 
+*        filter out the locators stored in the parameter system by
 *        NDF_EXIST and NDF_ASSOC).
 *     9-JUN-2009 (DSB):
 *        Improve error reporting.
@@ -103,7 +103,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -155,16 +155,16 @@
 *  Check we got some text successfully.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  First of all, attempt to get an object assuming the user has supplied 
+*  First of all, attempt to get an object assuming the user has supplied
 *  an HDS path. Do not use DAT_ASSOC since it required the parameter to
-*  be declared as type UNIV in the IFL file. Instead, get the value of 
-*  the parameter using SUBPAR to avoid interpretation of the string by 
+*  be declared as type UNIV in the IFL file. Instead, get the value of
+*  the parameter using SUBPAR to avoid interpretation of the string by
 *  the parameter system.
       CALL HDS_FIND( DAT__ROOT, PARVAL, 'Read', LOC1, STATUS )
       CALL DAT_NAME( LOC1, NAME, STATUS )
-      CALL DAT_PAREN( LOC1, LOC2, STATUS ) 
+      CALL DAT_PAREN( LOC1, LOC2, STATUS )
 
-      CALL KPG1_WREAD( LOC2, NAME, IAST, STATUS ) 
+      CALL KPG1_WREAD( LOC2, NAME, IAST, STATUS )
 
       CALL DAT_ANNUL( LOC2, STATUS )
       CALL DAT_ANNUL( LOC1, STATUS )
@@ -176,14 +176,14 @@
          END IF
 
       ELSE IF( IAST .NE. AST__NULL ) THEN
-         CALL DAT_MSG( 'OBJ', LOC1 ) 
-         CALL ATL_NOTIF( '   AST data read from HDS object ''^OBJ''.', 
+         CALL DAT_MSG( 'OBJ', LOC1 )
+         CALL ATL_NOTIF( '   AST data read from HDS object ''^OBJ''.',
      :                   STATUS )
       END IF
 
 
-*  If this failed, attempt to access the parameter as an NDF, without 
-*  foreign format conversion (in case the file has a known foreign format 
+*  If this failed, attempt to access the parameter as an NDF, without
+*  foreign format conversion (in case the file has a known foreign format
 *  file type but does not actualy contain an NDF). First switch off format
 *  conversion, then access the NDF then switch format conversion back on
 *  again if required. Note, use NDF_FIND rather than NDF_EXIST since
@@ -192,30 +192,30 @@
 *  (erroneous) appearance of an HDS locator leak to packages such as
 *  KAPPA that perform checks for HDS locators leaks.
       IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
-         CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS ) 
-         CALL NDF_TUNE( 0, 'DOCVT', STATUS ) 
+         CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS )
+         CALL NDF_TUNE( 0, 'DOCVT', STATUS )
 
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL NDF_FIND( DAT__ROOT, PARVAL, INDF, STATUS )
             IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          END IF
 
-         CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS ) 
-   
+         CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS )
+
 *  If succesful, get the WCS FrameSet from it.
          IF( INDF .NE. NDF__NOID ) THEN
             CALL KPG1_GTWCS( INDF, IAST, STATUS )
-   
-*  Tell the user where the object came from. 
+
+*  Tell the user where the object came from.
             IF( IAST .NE. AST__NULL ) THEN
-               CALL NDF_MSG( 'NDF', INDF ) 
-               CALL ATL_NOTIF( '   AST data read from NDF ''^NDF''.', 
+               CALL NDF_MSG( 'NDF', INDF )
+               CALL ATL_NOTIF( '   AST data read from NDF ''^NDF''.',
      :                         STATUS )
             END IF
-   
+
 *  Annul the NDF identifer.
             CALL NDF_ANNUL( INDF, STATUS )
-   
+
          END IF
       END IF
 
@@ -226,7 +226,7 @@
          CALL ATL_GTGRP( PARAM, IGRP, STATUS )
 
 *  Abort if requested.
-         IF( STATUS .EQ. PAR__NULL .OR. 
+         IF( STATUS .EQ. PAR__NULL .OR.
      :       STATUS .EQ. PAR__ABORT ) GO TO 999
 
 *  Tried to read an object from the group.
@@ -235,7 +235,7 @@
 *  Delete the group.
          CALL GRP_DELET( IGRP, STATUS )
 
-*  If it was not in a format readable by ATL, annull the error, and try to 
+*  If it was not in a format readable by ATL, annull the error, and try to
 *  access it as a foreign format NDF.
          IF( STATUS .NE. SAI__OK .AND. DOCVT .NE. 0 ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -246,10 +246,10 @@
             IF( INDF .NE. NDF__NOID ) THEN
                CALL KPG1_GTWCS( INDF, IAST, STATUS )
 
-*  Tell the user where the object came from. 
+*  Tell the user where the object came from.
                IF( IAST .NE. AST__NULL ) THEN
-                  CALL NDF_MSG( 'NDF', INDF ) 
-                  CALL ATL_NOTIF( '   AST data read from NDF ''^NDF''.', 
+                  CALL NDF_MSG( 'NDF', INDF )
+                  CALL ATL_NOTIF( '   AST data read from NDF ''^NDF''.',
      :                             STATUS )
                END IF
 
@@ -260,11 +260,11 @@
       END IF
 
 *  Check the Object class if CLASS is not blank.
-      IF( CLASS .NE. ' ' .AND. STATUS .EQ. SAI__OK .AND. 
-     :    IAST .NE. AST__NULL ) THEN 
+      IF( CLASS .NE. ' ' .AND. STATUS .EQ. SAI__OK .AND.
+     :    IAST .NE. AST__NULL ) THEN
 
 *  See if the object is of the required class.
-         OK = ISA( IAST, STATUS ) 
+         OK = ISA( IAST, STATUS )
 
 *  If not, and if the object is a FrameSet, see if the current Frame is
 *  of the required class. If so return a pointer to the current Frame.
@@ -280,10 +280,10 @@
                END IF
             END IF
 
-*  If not, see if the base to current Mapping is of the required class. If 
+*  If not, see if the base to current Mapping is of the required class. If
 *  so return a pointer to the base to current Mapping.
             IF( .NOT. OK ) THEN
-               IAST2 = AST_GETMAPPING( IAST, AST__BASE, AST__CURRENT, 
+               IAST2 = AST_GETMAPPING( IAST, AST__BASE, AST__CURRENT,
      :                                STATUS )
                IF( ISA( IAST2, STATUS ) ) THEN
                   OK = .TRUE.
@@ -323,8 +323,8 @@
 *  Report an error if no object was read.
       IF( IAST .EQ. AST__NULL ) THEN
          IF( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
-         CALL MSG_SETC( 'P', PARAM ) 
-         CALL MSG_SETC( 'V', PARVAL ) 
+         CALL MSG_SETC( 'P', PARAM )
+         CALL MSG_SETC( 'V', PARVAL )
          CALL MSG_SETC( 'L', CLASS )
 
          IF( INDEX( PARVAL( 1 : 1 ), 'AEIOU' ) .NE. 0 ) THEN
@@ -335,7 +335,7 @@
 
          CALL ERR_REP( 'KPG1_GTOBJ_ERR3', 'Failed to obtain ^A '//
      :                 '^L from ''^V'' (parameter ''^P'').', STATUS )
-      END IF         
+      END IF
 
 *  Annul the object if an error occurred.
  999  IF( STATUS .NE. SAI__OK ) CALL AST_ANNUL( IAST, STATUS )

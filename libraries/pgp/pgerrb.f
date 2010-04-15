@@ -13,14 +13,14 @@ C the start of the error bar, an additional call to PGPT is required.
 C
 C Arguments:
 C  DIR    (input)  : direction to plot the error bar relative to
-C                    the data point. 
+C                    the data point.
 C                    One-sided error bar:
 C                      DIR is 1 for +X (X to X+E);
 C                             2 for +Y (Y to Y+E);
 C                             3 for -X (X to X-E);
 C                             4 for -Y (Y to Y-E).
 C                    Two-sided error bar:
-C                      DIR is 5 for +/-X (X-E to X+E); 
+C                      DIR is 5 for +/-X (X-E to X+E);
 C                             6 for +/-Y (Y-E to Y+E).
 C  N      (input)  : number of error bars to plot.
 C  X      (input)  : world x-coordinates of the data.

@@ -16,7 +16,7 @@ C  RP, 7-Jun-92
 C  The reference position for the map is the top left (maybe should have been
 C  bottom left!)
 
-C  INVERT_AXIS is a logical array: For each dimension (RA, Dec, Velocity) 
+C  INVERT_AXIS is a logical array: For each dimension (RA, Dec, Velocity)
 C  in order INVERT_AXIS is TRUE if the requested map is not the "normal"
 C  way round (R.A. decreasing to right, Dec decreasing down, Velocity in
 C  same order as data coming from map file).
@@ -97,7 +97,7 @@ C     SCALE array containing all values from start to end.
       IMPLICIT  NONE
 
 *     Formal parameters
- 
+
       INTEGER   I            ! Axis being operated on
       REAL      SCALE(*)     ! Workspace array
       INTEGER   NX           ! Length of SCALE

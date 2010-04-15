@@ -1,4 +1,4 @@
-      SUBROUTINE DSA_FMTCON( BAD, CODE1, CODE2, ARRAY1, ARRAY2, 
+      SUBROUTINE DSA_FMTCON( BAD, CODE1, CODE2, ARRAY1, ARRAY2,
      :                                                NELM, NBAD )
 *+
 *  Name:
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

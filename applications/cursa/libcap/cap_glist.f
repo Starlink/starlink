@@ -211,7 +211,7 @@ C3001       format(1x, 'after CAP_GCDET, cmps: ', i5)
             TITLE2 = BUFFER
 
 *
-*          Load the units of the components in the first line of the 
+*          Load the units of the components in the first line of the
 *          title.
 
             BUFFER = ' '
@@ -259,7 +259,7 @@ C3001       format(1x, 'after CAP_GCDET, cmps: ', i5)
                LAST = MIN(ROWS, LAST)
 
                IF (LAST .EQ. ROWS) THEN
-                  FIRST = LAST + 1 - NLIST__SGZ 
+                  FIRST = LAST + 1 - NLIST__SGZ
                   FIRST = MAX(1, FIRST)
                END IF
             ELSE
@@ -318,7 +318,7 @@ C                 WRITE (BUFFER(1 : RUN__SGZ), '(I<RUN__SGZ>)' ) ROW
                ELSE
                   BUFPOS = 1
                END IF
-                     
+
 *
 *             Output the line.
 

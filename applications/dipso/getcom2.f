@@ -23,7 +23,7 @@
        DO I = 1, CMDLEN-1
           COMMND( I : I ) = COMMND( I+1 : I+1 )
        END DO
-       COMMND( CMDLEN : ) = ' ' 
+       COMMND( CMDLEN : ) = ' '
 
        CALL SSTRIP(COMMND)
 

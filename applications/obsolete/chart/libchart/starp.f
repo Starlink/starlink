@@ -30,7 +30,7 @@
 *        Changed I and JSIGN (used as 4th argument in calls to
 *        CONV) to type Character, as CONV has been changed.
 
-*       
+*
 *-
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -44,7 +44,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *
 *   Convert the precessed positions
 *
@@ -89,7 +89,7 @@ C
          NCAT=NCAT-2000000
          WRITE (7,910) J,NCAT,RMAG,MHAO,MINSAO,SECSAO,JSIGN,MDEGD,
      :                 MINSD,SECSD
- 
+
   910    FORMAT (' ',I3,' SAO ',I7,2X,F7.1,I5,I3,F5.1,2X,A1,I2,I3,F5.1)
 *
 *   End of SAO option

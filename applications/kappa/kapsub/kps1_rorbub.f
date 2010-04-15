@@ -129,13 +129,13 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing allowed
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SAE global constants
- 
+
 *  Arguments Given:
       LOGICAL XLARGE
       INTEGER NUMRA
@@ -149,14 +149,14 @@
       BYTE ARRIN( IDIM1, IDIM2 )
       INTEGER ODIM1
       INTEGER ODIM2
- 
+
 *  Arguments Returned:
       BYTE ARROUT( ODIM1, ODIM2 )
       BYTE WORK( ROTSIZ, ROTSIZ )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER DELTAX             ! Pointer to subsection in output
                                  ! array, first dimension
@@ -170,75 +170,75 @@
                                  ! dimension
       INTEGER YIN                ! Index to input-array line
       INTEGER YOUT               ! Index to output-array line
- 
+
 *.
- 
+
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Check for the incorrect number of right angles to rotate.
       IF ( ( NUMRA .EQ. 1 ) .OR. ( NUMRA .EQ. 3 ) ) THEN
- 
+
 *  Transfer ROTSIZ by ROTSIZ section of the input array into workspace.
          IF ( XLARGE ) THEN
             DELTAX = INDEXL - 1
             DELTAY = INDEXS - 1
- 
+
          ELSE
             DELTAX = INDEXS - 1
             DELTAY = INDEXL - 1
- 
+
          END IF
- 
+
          DO  Y = 1, ROTSIZ
- 
+
 *  Calculate the index to the input-array line.
             YIN = Y + DELTAY
             DO X = 1, ROTSIZ
- 
+
 *  Calculate the index to thepoint in the input-array line.
                XIN = X + DELTAX
                WORK( X, Y ) = ARRIN( XIN, YIN )
             END DO
          END DO
- 
+
 *  Perform the rotation on the workspace array.
          CALL KPS1_RORAUB( NUMRA, ROTSIZ, ROTSIZ, ROTSIZ, ROTSIZ, WORK,
      :                      STATUS )
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  Calculate the offsets necessary to get workspace into the correct
 *  place in the output array.
             IF ( XLARGE ) THEN
                IF ( NUMRA .EQ. 3 ) THEN
                   DELTAX = OFSETS - INDEXS
                   DELTAY = INDEXL - 1
- 
+
                ELSE
                   DELTAX = INDEXS - 1
                   DELTAY = OFSETL - INDEXL
- 
+
                END IF
             ELSE
                IF ( NUMRA .EQ. 3 ) THEN
                   DELTAX = OFSETL - INDEXL
                   DELTAY = INDEXS - 1
- 
+
                ELSE
                   DELTAX = INDEXL - 1
                   DELTAY = OFSETS - INDEXS
- 
+
                END IF
             END IF
- 
+
 *  Put the rotated workspace array into the output array.
             DO Y = 1, ROTSIZ
- 
+
 *  Calculate the index to the output-array line.
                YOUT = Y + DELTAY
                DO X = 1, ROTSIZ
- 
+
 *  Calculate the index to the point in the output-array line.
                   XOUT = X + DELTAX
                   ARROUT( XOUT, YOUT ) = WORK( X, Y )
@@ -246,7 +246,7 @@
             END DO
          END IF
       ELSE
- 
+
 *  Report an error if number of right-angles for rotation is not 1 or 3.
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NUMRA', NUMRA )
@@ -254,5 +254,5 @@
      :     'KPS1_RORBx: The number of right-angle rotations cannot be '/
      :     /'^NUMRA (programming error).', STATUS )
       END IF
- 
+
       END

@@ -65,7 +65,7 @@ only) and X-windows.
 written, or where a program is to interact with graphics produced by another
 package (e.g.\ KAPPA).
 It provides facilities for sharing information about pictures such as extent
-and world coordinates. 
+and world coordinates.
 
 \item [GNS] --- enables a program to obtain information about graphics devices.
 
@@ -96,7 +96,7 @@ graphics device:
           IMPLICIT NONE
           INCLUDE 'SAE_PAR'
           INTEGER STATUS
-          REAL RADIUS          ! Radius of circle               
+          REAL RADIUS          ! Radius of circle
           INTEGER ZONE         ! SGS Zone
     *.........................................................
           IF (STATUS.NE.SAI__OK) RETURN
@@ -107,7 +107,7 @@ graphics device:
           END IF
           CALL SGS_ANNUL(ZONE, STATUS)
           CALL SGS_DEACT(STATUS)
-          END                  
+          END
 \end{verbatim}
 \end{small}
 
@@ -145,7 +145,7 @@ RADIUS.
 \end{small}
 
 This closes the graphics workstation without cancelling the associated
-parameter. The routine SGS\_CANCL is similar but {\em does} 
+parameter. The routine SGS\_CANCL is similar but {\em does}
 cancel the parameter.
 
 \begin{small}
@@ -201,7 +201,7 @@ for you):
     RADIUS - Radius of Circle /0.3/ > 0.2
     DEVICE - Graphics Device /@graphon/ > postscript_l
     ICL> $ print/q=sys_ps/form=post gks_72.ps
-    ICL>                               
+    ICL>
 \end{verbatim}
 \end{small}
 
@@ -250,7 +250,7 @@ A better solution is to use AGI to mediate between the packages.
 \section{AGI --- Applications graphics interface}
 \markboth{Programmers}{\stardocname}
 
-One of the recurring problems in graphics programming is that you would 
+One of the recurring problems in graphics programming is that you would
 like a program to know about graphics drawn by another program.
 For instance, you display an image of the sky, then later you want to obtain
 the co-ordinates of the stars within the image via the cursor.
@@ -284,7 +284,7 @@ A generic name specifying the type of the picture.
 Currently the following names are used:
 \begin{itemize}
 \item {\em BASE}\, indicates the base picture --- the picture that extends
- over the  whole of  the plotting area. 
+ over the  whole of  the plotting area.
  This name is reserved and should not be used to name other pictures.
 \item {\em DATA}\, indicates that the picture contains a representation of
  data in a graphical form, e.g.\ a greyscale plot or a histogram.
@@ -339,7 +339,7 @@ These are the usual two routines used to integrate a subroutine library with
 the ADAM parameter system, i.e.\ {\bf ASSOC} and {\bf CANCL}.
 They correspond to the {\bf OPEN} and {\bf CLOSE} stand-alone routines.
 The `picture' object is identified by a picture identifier `picid'.
-The parameter with which the picture is associated is a graphics display 
+The parameter with which the picture is associated is a graphics display
 device,
 normally called a workstation in GKS.
 

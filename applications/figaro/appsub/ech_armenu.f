@@ -25,13 +25,13 @@ C     (>) NLARCS    (Integer) The dimension of the ARCn arrays.
 C     (>) NX        (Integer) The number of data values
 C     (>) NC        (Integer) The maximum number of polynomial
 C                   coefficients.
-C     (>) SIGMA     (Real) The current sigma value. 
+C     (>) SIGMA     (Real) The current sigma value.
 C     (>) NLMAX     (Integer) Maximum possible number of arc lines
 C     (!) CHANS     (Real array CHANS(NLMAX)) The centers of the
 C                   identified lines, in pixel numbers.
 C     (!) WAVES     (Real array WAVES(NLMAX)) The wavelengths of the
 C                   identified lines.
-C     (!) WEIGHTS   (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (!) WEIGHTS   (Real array WEIGHTS(NLMAX)) The weights for the
 C                   identified arc lines.
 C     (!) CLASS     (Integer array CLASS(NLMAX)) The class codes for
 C                   the identified arc lines.
@@ -48,7 +48,7 @@ C     (W) WORK2     (Real array WORK2(NX)) Used to hold the fit-linear
 C                   values for each pixel.
 C     (!) REPEAT    (Logical) Set false if the program is to be exited
 C                   and left unchanged otherwise.
-C     (<) COEFFS    (Double precision array COEFFS(NC)) The 
+C     (<) COEFFS    (Double precision array COEFFS(NC)) The
 C                   coefficients of the final fit.
 C
 C     Originally ARMENU:                      KS / AAO 30th Sept 1985
@@ -201,8 +201,8 @@ C           CALL LIB$GET_LUN(TEMPLU)
             ELSE
                CALL PAR_WRUSER('Unable to create temporary list file',
      :                                                     STATUS)
-            END IF            
-C           CALL LIB$FREE_LUN(TEMPLU)            
+            END IF
+C           CALL LIB$FREE_LUN(TEMPLU)
             IGNOR2=0
             CALL DSA_FREE_LU(TEMPLU,IGNOR2)
 C

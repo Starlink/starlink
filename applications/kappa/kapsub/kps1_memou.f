@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_MEMOU( FILE1, FILE22, NPIX, NLIN, MODEL, NPIXM, 
+      SUBROUTINE KPS1_MEMOU( FILE1, FILE22, NPIX, NLIN, MODEL, NPIXM,
      :                       NLINM, XMARG, YMARG, OUT, BAD, STATUS )
 *+
 *  Name:
@@ -33,9 +33,9 @@
 *        The default model. If the array has dimensions (1,1) then the
 *        single value is used for all pixels.
 *     NPIXM = INTEGER (Given)
-*        The number of pixels per line in the default model image. 
+*        The number of pixels per line in the default model image.
 *     NLINM = INTEGER (Given)
-*        The number of lines in the default model image. 
+*        The number of lines in the default model image.
 *     XMARG = INTEGER (Given)
 *        The width of the left hand X margin, in pixels.
 *     YMARG = INTEGER (Given)
@@ -84,7 +84,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 
 *  Type Definitions:
 
@@ -173,9 +173,9 @@
                   BAD = .TRUE.
 
                END IF
-      
+
             END DO
-   
+
          END DO
 
 
@@ -212,9 +212,9 @@
                   GOOD = .TRUE.
 
                END IF
-      
+
             END DO
-   
+
          END DO
 
       END IF
@@ -228,6 +228,6 @@
       END IF
 
 
-*  Finish.      
+*  Finish.
 
       END

@@ -15,7 +15,7 @@
 
 *  Description:
 *     This subroutine is used to calculate the ideal point source profile
-*     correalation coefficients later used in correlating real data segment 
+*     correalation coefficients later used in correlating real data segment
 *     with the idealised point source template.
 
 *  Arguments:
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -70,7 +70,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION SPSQ, SIP, SP, SISQ, SI, S1, V
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -101,5 +101,5 @@
 *  SIP, SP, SISQ, SI, S1.
       V = SPSQ * SISQ * S1 + 2.0D0 * SIP * SI * SP
       V = V - SP * SP * SISQ - SI * SI * SPSQ - SIP * SIP * S1
-      
+
       END

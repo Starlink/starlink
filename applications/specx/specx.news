@@ -26,10 +26,10 @@
 1 SPECX - v6.8-1
 
  Fixes a bug in the DATE-OBS parser on Linux.
- 
+
  Compares the size of the POSN array with the number of spectra specified
  in the map header and corrects things if there is an inconsistency.
- 
+
  Also traps the case where a spectrum is requested that is higher than
  the number of spectra in the map.
 
@@ -37,39 +37,39 @@
 
  New Command: SET-DATA-DIRECTORY
  to change $DATADIR without restarting SPECX
- 
+
  New Command: SWITCH-DATE
  to change a date part of the DATADIR environment variable and/or a GSD file
  prefix.
- 
+
  WRITE-ASCII-SPECTRUM now includes more significant figures for the frequency
  scale.
- 
+
  SET-GSD-FILENAME can now support a prefix up to 100 characters.
- 
+
  Bugs fixed.
  -----------
  Problem on Linux with interactive plotting mode where the cursor would
  move to random position after selecting a point on the spectrum.
- 
+
  READ_GSD ensure variable state retained between calls
- 
+
  SETX Only copy required quadrants.
- 
+
  XSNART Prevent infinite loop on Linux (addressing 0th element of array).
- 
+
  FSW.SPX Use '!' instead of 'or' in IF statement.
- 
+
 1 SPECX - v6.7-13
  An improved fix for the bug in file-merge fixed in v6.7-12.
  The TOFITS and GSD2FITS macros have been extended to support wideband spectra.
- 
+
 1 SPECX - v6.7-12
 
  Fixes a bug causing false Fortran I/O error reports on Linux.
- Fixes a bug causing file-merge not to work on Linux. 
+ Fixes a bug causing file-merge not to work on Linux.
  Improves startup messages.
- 
+
 1 SPECX - v6.7-11
 
  Fixes a bug which leads to problems for data with large redshifts.
@@ -78,7 +78,7 @@
 
  Corrects a non-standard FORMAT statement, which caused a crash, in
  SET_WEIGHTS.F.
-  
+
 1 SPECX - v6.7-9
 
  Corrects a bug in writing the current mapplane to a FITS file, which caused
@@ -105,7 +105,7 @@
 
 1 SPECX - v6.7-7
 
- SPECX version 6.7-7 is now available. This release contains minor patches 
+ SPECX version 6.7-7 is now available. This release contains minor patches
  and an updated SUN/17 document.
 
  Changes in this release are:
@@ -114,7 +114,7 @@
 
   o FITS DATE header is now Y2K compliant
 
-  o Fix problem translating some dates from the GSD header 
+  o Fix problem translating some dates from the GSD header
     value due to a loss of  precision.
 
   o Fix problem reading old GSD files that did not know about rastering.
@@ -122,23 +122,23 @@
 
 1 SPECX - v6.7-5
 
- SPECX version 6.7-5 is now available.  This is a maintenance update to 
+ SPECX version 6.7-5 is now available.  This is a maintenance update to
  modify the build system to continue to use Starlink-PGPLOT.  There is
  no chnange to functionality.
 
 1 SPECX - v6.7-4
 
- At this update the graphics devices not available to GKS/PGPLOT have 
- been removed from the graphics devices file (various termianl types 
- and gif files).  There is also a fix to prevent an error when using 
+ At this update the graphics devices not available to GKS/PGPLOT have
+ been removed from the graphics devices file (various termianl types
+ and gif files).  There is also a fix to prevent an error when using
  colour PostScript devices.
 
 1 SPECX - v6.7-3
 
- This is a minor update to correct the graphics device names to use the 
- GKS/PGPLOT device names, and to fix a bug in the plotting system that 
+ This is a minor update to correct the graphics device names to use the
+ GKS/PGPLOT device names, and to fix a bug in the plotting system that
  caused problenms for PostScript devices.
- 
+
 1 SPECX - v6.7-2
 
  This release includes a fix to the calculation of integration times
@@ -181,11 +181,11 @@
  Minor technical changes:
 
    a) GSD-PREFIX can now be 32 characters instead of 16.
-   b) The title used for dual channel data (eg RxB3) is now constructed 
+   b) The title used for dual channel data (eg RxB3) is now constructed
       correctly.
    c) System calls are now performed with the SH command on Solaris
       (this is 10 times faster than the equivalent SYSTEM command
-      since a .cshrc file is not sourced).  This means that different 
+      since a .cshrc file is not sourced).  This means that different
       system source files must be used on Alpha and Solaris systems.
 
 1 SPECX - v6.7-1
@@ -194,9 +194,9 @@
    -  exception handling (for ^C)
 
    Please report any problems with floating-point exceptions.
- 
+
    Other changes:
- 
+
     o NEW-PLOT and OVERLAY now accept a color index (1-15) as second
         argument. If the color index is negative, each subband (quadrant)
         of a spectrum is plotted with a different color. The default
@@ -208,11 +208,11 @@
 
     o READ-GSD-DATA now also checks DATADIR for gsd files after current
         directory (setenv DATADIR ... before starting Specx). Has also
-        been speeded up significantly. Reads all subscans at once. 
-        Drawback: won't re-read the disk file (even when altered) until 
+        been speeded up significantly. Reads all subscans at once.
+        Drawback: won't re-read the disk file (even when altered) until
         another GSD file has been read.
 
-    o DAS-MERGE default for DC adjust changed to 'N'. DAS-MERGE has been 
+    o DAS-MERGE default for DC adjust changed to 'N'. DAS-MERGE has been
         changed from a script to a FORTRAN coded command.
 
     o SET-INTERACTIVE now 'N' upon entry to SPECX.
@@ -225,14 +225,14 @@
     o PLOT-LINE-PARS: the bug that cause a crash when not plotting a linear
         sequence of parameter maps (e.g 1, 2, 3) has now been fixed.
 
-    o INDEX-FILE, COMPRESS-FILE, LIST-MAP allow limits on scan nr and 
+    o INDEX-FILE, COMPRESS-FILE, LIST-MAP allow limits on scan nr and
         offset positions if more than 25 scans.
 
-    o New NDF map format - much faster. 
-        Version 4.1 maps WILL BE COPIED to the new format. 
+    o New NDF map format - much faster.
+        Version 4.1 maps WILL BE COPIED to the new format.
 
    New commands:
- 
+
     o DAS-MERGE is now a FORTRAN subroutine i.s.o. a Specx Macro.
 
     o WRITE-FITS-CUBE (under test).

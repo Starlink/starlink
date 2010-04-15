@@ -1,13 +1,13 @@
 C+
       SUBROUTINE ISTAT
 C
-C     I S T A T 
+C     I S T A T
 C
 C     Examines an image (or a subset of an image) an determines
 C     a number of useful statistics about the data in it, such as
 C     the mean, max and minimum values.  For a full list, see below
-C     under 'user variables'.  
-C     
+C     under 'user variables'.
+C
 C     Command parameters -
 C
 C     IMAGE  (Char) The name of the structure containing the image.
@@ -21,7 +21,7 @@ C
 C     PASS2   If specified, the sigma value is calculated using two
 C             passes throught the data.  The one-pass algorithm normally
 C             used is prone to rounding error when large numbers of
-C             pixels are involved, but is rather faster.  If fewer than 
+C             pixels are involved, but is rather faster.  If fewer than
 C             10,000 pixels are involved, ISTAT always uses two passes,
 C             since the other overheads dominate the time taken.
 C     MEDIAN  If specified, the median value of the image data is
@@ -55,16 +55,16 @@ C                  files closed under error conditions.
 C     19 Mar 1987  KS / AAO.  PASS2 keyword added and call to GEN_ASTAT2
 C                  added.  (Note, GEN_ASTAT also modified, so default
 C                  single pass calculation is slightly better anyway.)
-C     20 Jul 1987  DJA / AAO. Revised DSA_ routines - some 
+C     20 Jul 1987  DJA / AAO. Revised DSA_ routines - some
 C                  specifications changed. Updated all WRUSER calls to
 C                  PAR_WRUSERs.
 C     22 Jul 1987  DJA / AAO. Modifed dynamic memory routines - now use
 C                  DYN_ package.
 C     31 Jul 1987  KS / AAO.  Added call to DSA_SET_RANGE.
-C     05 Apr 1989  KS / AAO.  MEDIAN added. 
+C     05 Apr 1989  KS / AAO.  MEDIAN added.
 C     30 Mar 1991  KS / AAO.  Fix integer division bug if !! given in
-C                  response to IMAGE prompt.  Y range no longer listed 
-C                  for 1D data. Range info includes axis values if 
+C                  response to IMAGE prompt.  Y range no longer listed
+C                  for 1D data. Range info includes axis values if
 C                  known.
 C     07 Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                  removed.
@@ -72,7 +72,7 @@ C     21 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  No concurrent mapping. Had to swap mapping axis data
 C                  and getting axis range.
 C     21 May 1997  MJCL / Starlink, UCL.
-C                  Moved Y-range string output into the test for 
+C                  Moved Y-range string output into the test for
 C                  Y-range.
 C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
 C                  mapped data.

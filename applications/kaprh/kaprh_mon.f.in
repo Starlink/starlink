@@ -79,7 +79,7 @@
       CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
 *  Define the current application name for history. The package version
-*  number gets substituted in here when the KAPPA release source tar file 
+*  number gets substituted in here when the KAPPA release source tar file
 *  is contructed.
       CALL NDF_HAPPN( NAME // ' (KAPPA @PACKAGE_VERSION@)', STATUS )
 
@@ -87,7 +87,7 @@
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
 
 *  If not, see if verbose reporting is required.
-      IF( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )      
+      IF( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
 *  See if looping should be disabled.
       CALL KPG1_ENVDF( 'KAPPA_LOOP_DISABLE', DISAB, STATUS )

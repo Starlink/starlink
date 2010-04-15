@@ -8,7 +8,7 @@ C     points in X and Y, returning a power series polynomial.
 C
 C     Parameters -  (">" input, "<" output)
 C
-C     (>) X      (Real array X(NN)) The X values of the points to 
+C     (>) X      (Real array X(NN)) The X values of the points to
 C                be fitted.
 C     (>) Y      (Real array Y(NN)) The Y values of the points to
 C                be fitted.
@@ -21,7 +21,7 @@ C     (>) M      (Integer) The order of the polynomial to be fitted.
 C
 C     Common variables used -  None
 C
-C     History - This routine has a dubious pedigree, originating in a 
+C     History - This routine has a dubious pedigree, originating in a
 C     routine used in the IPCS Interdata software and lifted from one
 C     of the appendices in the IBM Fortran IV manual!  It was then used
 C     in Spica, with modifications made by all sorts of people.  At

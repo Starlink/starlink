@@ -27,7 +27,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
-*  Import: 
+*  Import:
       INTEGER  NDF               ! NDF identifier
       CHARACTER*(*) ITEM         ! Name of FITS item requested
 *  Export:

@@ -469,7 +469,7 @@ package sst {
             prompt {Make suitable for inclusion in LaTeX?}
             helpkey *
           }
-     
+
          parameter reformat {
                              # Whether to re-format paragraphs etc.
             type _LOGICAL
@@ -480,7 +480,7 @@ package sst {
             prompt {Allow re-formatting}
             helpkey *
           }
-     
+
          parameter separate {
                              # Whether to separate output into different files.
             type _LOGICAL

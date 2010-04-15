@@ -83,7 +83,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -109,7 +109,7 @@
       INTEGER I, INP, J, LNY, NY, PL, PR, RNY, PLL, PRR
 
       REAL CROSSL( 2 ), CROSSR( 2 ), INFNIT, OLDY, SFA,
-     :     TEST1( 2 ), TEST2( 2 ), YTEST 
+     :     TEST1( 2 ), TEST2( 2 ), YTEST
 
       LOGICAL TL, TR
 *.

@@ -10,7 +10,7 @@
 *
 * Parameters :
 *
-*     INPIC = ( STRUCTURE)        ! name of sdf file 
+*     INPIC = ( STRUCTURE)        ! name of sdf file
 *
 * Method :
 *
@@ -35,8 +35,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'		! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'       
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
 
 * Status :
 
@@ -46,9 +46,9 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI,				! locator for input structure
-     :	  DIMS( 2),                     ! axes sizes 
+     :	  DIMS( 2),                     ! axes sizes
      :    ACTDIM,                       ! actual dimensions from NDF_DIM
      :    NELEMENTS,                    ! number of elements mapped by NDF_MAP
      :	  IPNTR,
@@ -62,9 +62,9 @@
 	PARAMETER ( NDIMS = 2)
 
 	REAL
-     :    HIGH,                          ! Max data value to be used (the 
+     :    HIGH,                          ! Max data value to be used (the
 *                                        ! white level)
-     :	  LOW                            ! Min data value to be used (the 
+     :	  LOW                            ! Min data value to be used (the
 *                                        ! black level)
 	CHARACTER
      :    DEVICE*80,                    ! The device/type to be used for the
@@ -74,7 +74,7 @@
      :	  YLABEL*80                     ! A label for the plot.
 
 	LOGICAL
-     :	  ERASE,                         ! Erase the screen before plotting, 
+     :	  ERASE,                         ! Erase the screen before plotting,
 *                                        ! if true.
      :	  AXES,                          ! Plot and label axes, if true.
      :	  ADJUST                         ! Adjust scales so as to fil display.
@@ -110,9 +110,9 @@
 *          get the start pixel in x,y and end in x,y
 	    CALL AIF_GET0I( 'IXST', 1, 1, DIMS( 1), IXST, STATUS )
 	    CALL AIF_GET0I( 'IYST', 1, 1, DIMS( 2), IYST, STATUS )
-	    CALL AIF_GET0I( 'IXEN', DIMS( 1), 1, 1000, IXEN, 
+	    CALL AIF_GET0I( 'IXEN', DIMS( 1), 1, 1000, IXEN,
      :                       STATUS )
-	    CALL AIF_GET0I( 'IYEN', DIMS( 2), 1, 1000, IYEN, 
+	    CALL AIF_GET0I( 'IYEN', DIMS( 2), 1, 1000, IYEN,
      :                       STATUS )
 
 *          setup maximum end values if user input 1000
@@ -132,7 +132,7 @@
 	    ADJUST = .FALSE.
 
 *          get the maximum/minimum value to be white/black
-	    CALL AIF_GET0R( 'HIGH', 255.0, -1.0E20, 1.0E20, HIGH, 
+	    CALL AIF_GET0R( 'HIGH', 255.0, -1.0E20, 1.0E20, HIGH,
      :	                    STATUS )
 	    CALL AIF_GET0R( 'LOW', 0.0, -1.0E20, 1.0E20, LOW,
      :	                    STATUS )
@@ -143,14 +143,14 @@
 	    CALL PAR_GET0C( 'YLABEL', YLABEL, STATUS)
 
 *          call fig routine to plot greyscale
-            CALL LFIG_GPLOT( %VAL( IPNTR), DIMS( 1), DIMS( 2), IXST, 
-     :	                     IXEN, IYST, IYEN, DEVICE, LABEL, XLABEL, 
-     :	                     YLABEL, ERASE, AXES, ADJUST, HIGH, LOW, 
+            CALL LFIG_GPLOT( %VAL( IPNTR), DIMS( 1), DIMS( 2), IXST,
+     :	                     IXEN, IYST, IYEN, DEVICE, LABEL, XLABEL,
+     :	                     YLABEL, ERASE, AXES, ADJUST, HIGH, LOW,
      :                       ISTAT)
 
 	  ELSE
 
-	    CALL ERR_REP( 'ERR', 
+	    CALL ERR_REP( 'ERR',
      :	       'STATUS not OK after NDF_MAP ', STATUS)
 
 	  END IF
@@ -158,7 +158,7 @@
 
 	ELSE
 
-	    CALL ERR_REP( 'ERR', 
+	    CALL ERR_REP( 'ERR',
      :	      'STATUS not OK after GETINP ', STATUS)
 
 	END IF

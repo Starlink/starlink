@@ -45,24 +45,24 @@
 *                        its counterpart.
 *          "Variance" -- The VARIANCE component in the input NDF becomes
 *                        the DATA_ARRAY in the output NDF and retains
-*                        its data type.  The original DATA_ARRAY is not 
+*                        its data type.  The original DATA_ARRAY is not
 *                        copied.
-*          "Error"    -- The square root of the VARIANCE component in 
-*                        the input NDF becomes the DATA_ARRAY in the 
-*                        output NDF and retains the VARIANCE's data 
+*          "Error"    -- The square root of the VARIANCE component in
+*                        the input NDF becomes the DATA_ARRAY in the
+*                        output NDF and retains the VARIANCE's data
 *                        type.  The original DATA_ARRAY and VARIANCE
 *                        components are not copied.
-*          "Quality" --  The QUALITY component in the input NDF becomes 
+*          "Quality" --  The QUALITY component in the input NDF becomes
 *                        the DATA_ARRAY in the output NDF and will be
-*                        data type _UBYTE.  The original DATA_ARRAY and 
+*                        data type _UBYTE.  The original DATA_ARRAY and
 *                        VARIANCE components are not copied.
 *        ["Data"]
 *     EXTEN = _LOGICAL (Read)
 *        If set to FALSE (the default), any NDFs contained within
-*        extensions of the input NDF are copied to equivalent places 
+*        extensions of the input NDF are copied to equivalent places
 *        within the output NDF without change. If set TRUE, then any
-*        extension NDFs which have the same bounds as the base input 
-*        NDF are padded or trimmed as necessary in order to ensure that 
+*        extension NDFs which have the same bounds as the base input
+*        NDF are padded or trimmed as necessary in order to ensure that
 *        they have the same bounds as the output NDF. [FALSE]
 *     IN = NDF (Read)
 *        The input NDF (or section) which is to be copied.
@@ -74,12 +74,12 @@
 *        place.  By default, no template will be used and the shape of
 *        the output NDF will therefore match that of the input NDF (or
 *        NDF section).  The shape of the template in either pixel
-*        indices or the current WCS Frame may be used, as selected by 
+*        indices or the current WCS Frame may be used, as selected by
 *        parameter LIKEWCS. [!]
 *     LIKEWCS = _LOGICAL (Read)
-*        If TRUE, then the WCS bounds of the template supplied via 
-*        parameter LIKE are used to decide on the bounds of the output 
-*        NDF.  Otherwise, the pixel bounds of the template are used. 
+*        If TRUE, then the WCS bounds of the template supplied via
+*        parameter LIKE are used to decide on the bounds of the output
+*        NDF.  Otherwise, the pixel bounds of the template are used.
 *        [FALSE]
 *     OUT = NDF (Write)
 *        The output NDF data structure.
@@ -90,20 +90,20 @@
 *     TRIM = _LOGICAL (Read)
 *        If TRUE, then the number of pixel axes in the output NDF will
 *        be reduced if necessary to remove any pixel axes which span
-*        only a single pixel.  For instance if "stokes" is a 
+*        only a single pixel.  For instance if "stokes" is a
 *        three-dimensional data cube with pixel bounds
 *        (1:100,-50:40,1:3), and the parameter IN is given the value
-*        "stokes(,,2)", then the dimensionality of the output depends 
+*        "stokes(,,2)", then the dimensionality of the output depends
 *        on the setting of TRIM: if TRIM=FALSE, the output is
 *        three-dimensional with pixel bounds (1:100,-50:40,2:2), and if
 *        TRIM=TRUE the output is two-dimensional with pixel bounds
 *        (1:100,-50:40).  In this example, the third pixel axis spans
-*        only a single pixel and is consequently removed if TRIM=TRUE. 
+*        only a single pixel and is consequently removed if TRIM=TRUE.
 *        [FALSE]
 *     TRIMBAD = _LOGICAL (Read)
 *        If TRUE, then the pixel bounds of the output NDF are trimmed to
 *        exclude any border of bad pixels within the input NDF. That is,
-*        the output NDF will be the smallest NDF that encloses all good 
+*        the output NDF will be the smallest NDF that encloses all good
 *        data values in the input NDF. [FALSE]
 *     TRIMWCS = _LOGICAL (Read)
 *        This parameter is only accessed if parameter TRIM is TRUE.  It
@@ -114,8 +114,8 @@
 *        removing axes, then the axes to retain are specified by
 *        parameter USEAXIS.  If TRIMWCS=FALSE, then all axes are
 *        retained in the current WCS Frame of the output NDF.  Using the
-*        example in the description of the TRIM parameter, if the input 
-*        NDF "stokes" has a three-dimensional current WCS Frame with 
+*        example in the description of the TRIM parameter, if the input
+*        NDF "stokes" has a three-dimensional current WCS Frame with
 *        axes (RA,Dec,Stokes) and TRIMWSC=TRUE, then an axis will be
 *        removed from the current Frame to make it two-dimensional (that
 *        is, to match the number of pixel axes remaining after the
@@ -136,19 +136,19 @@
 *        retained in the current WCS Frame of the output NDF.  Each axis
 *        can be specified using one of the following options.
 *
-*        - An integer index of an axis within the current Frame of the 
+*        - An integer index of an axis within the current Frame of the
 *        input NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *
 *        - An axis symbol string such as "RA" or "VRAD".
 *
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
-*        sky longitude and latitude axes respectively.  Only those axis 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
+*        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 
-*        The dynamic default selects the axes with the same indices as 
-*        the pixel axes being copied.  The value should be given as a 
+*        The dynamic default selects the axes with the same indices as
+*        the pixel axes being copied.  The value should be given as a
 *        comma-separated list.  []
 
 *  Examples:
@@ -193,7 +193,7 @@
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2000, 2003-2004 Central Laboratory of
 *     the Research Councils. Copyright (C) 2005-2006 Particle Physics &
-*     Astronomy Research Council. 
+*     Astronomy Research Council.
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -247,7 +247,7 @@
 *        comments.
 *     20-MAR-2006 (DSB):
 *        Check if the NDF identifier is for a base or section before
-*        using NDF_LOC to copy AXIS components. Re-write variable 
+*        using NDF_LOC to copy AXIS components. Re-write variable
 *        comments to avoid multiline comments.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
@@ -267,7 +267,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -380,7 +380,7 @@
             CALL ERR_ANNUL( STATUS )
 
 *  If a template was supplied, then obtain the pixel or WCS bounds of
-*  it, as determined by the LIKEWCS parameter, and select a matching 
+*  it, as determined by the LIKEWCS parameter, and select a matching
 *  section from the input NDF.  Annul the original input NDF identifier
 *  and replace it with the section identifier.
          ELSE
@@ -409,7 +409,7 @@
 *  the extensions of the supplied NDF.
       CALL PAR_GET0L( 'EXTEN', EXTEN, STATUS )
 
-*  If so, get a GRP group containing paths to any NDFs contained with 
+*  If so, get a GRP group containing paths to any NDFs contained with
 *  extensions of the supplied NDF. Also get a group containing paths to
 *  the equivalent NDFs in the output.
       IF( EXTEN ) THEN
@@ -439,7 +439,7 @@
 *  Loop round each extension NDF. These are stored such that the higher
 *  level NDFs come first. That is, an earlier NDF may contain a later
 *  NDF, but a later NDF will never contain an earlier NDF. This means
-*  that a lower level NDF may be copied several times, but it ensures 
+*  that a lower level NDF may be copied several times, but it ensures
 *  that the final copy will be the correct one.
          DO I = 1, SIZE
             CALL NDG_NDFAS( IGRPB, I, 'READ', NDF4, STATUS )
@@ -460,19 +460,19 @@
             IF( SAME ) THEN
                IF( NDIM .GT. ONDIM ) THEN
                   DO J = ONDIM + 1, NDIM
-                     OLBND( J ) = LBND( J )               
-                     OUBND( J ) = UBND( J )               
+                     OLBND( J ) = LBND( J )
+                     OUBND( J ) = UBND( J )
                   END DO
                END IF
 
-*  Get a section of the input extension NDF that matches the bounds of 
+*  Get a section of the input extension NDF that matches the bounds of
 *  the output NDF on the pixel axes that they share in common.
                CALL NDF_SECT( NDF4, NDIM, OLBND, OUBND, NDF5, STATUS )
 
 *  Get an identifier for the existing output NDF that is to be replaced.
                CALL NDG_NDFAS( IGRP, I, 'WRITE', NDF6, STATUS )
 
-*  Get an HDS locator for this existing NDF, locate its parent, and 
+*  Get an HDS locator for this existing NDF, locate its parent, and
 *  then delete the NDF.
                CALL NDF_LOC( NDF6, 'WRITE', LOC, STATUS )
                CALL DAT_PAREN( LOC, PLOC, STATUS )
@@ -485,7 +485,7 @@
 
 *  Copy the input extension NDF section to the output, using the above
 *  placeholder to indicate where the new NDF should be placed.
-               CALL KPS1_NDFCP( NDF5, COMP, TRIM, TRMWCS, ' ', PLACE, 
+               CALL KPS1_NDFCP( NDF5, COMP, TRIM, TRMWCS, ' ', PLACE,
      :                          NDF6, STATUS )
 
 *  Free resources.

@@ -10,12 +10,12 @@
 
 *  Description:
 *     This module defines the C interface to the functions of the KAPLIBS
-*     library. The file kaplibs.c contains C wrappers for the Fortran 
+*     library. The file kaplibs.c contains C wrappers for the Fortran
 *     KAPLIBS routines.
 
 *  Notes:
 *     - Given the size of the KAPLIBS library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use KAPLIBS from C extend this file (and
 *     kaplibs.c) to include any functions which they need but which are
 *     not already included.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -128,14 +128,14 @@ void kpg1Wrcat( const char *, int, int, int, double *, int, AstFrameSet *, const
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
 
-void kpgStatd( int, int, const double[], int, const float[], int *, int *, 
-               double *, int *, double *, double *, double *, double *, 
-               int *, int *, double *, int *, double *, double *, double *, 
+void kpgStatd( int, int, const double[], int, const float[], int *, int *,
+               double *, int *, double *, double *, double *, double *,
+               int *, int *, double *, int *, double *, double *, double *,
                double * , int * );
 
-void kpgStati( int, int, const int[], int, const float[], int *, int *, 
-               double *, int *, double *, double *, double *, double *, 
-               int *, int *, double *, int *, double *, double *, double *, 
+void kpgStati( int, int, const int[], int, const float[], int *, int *,
+               double *, int *, double *, double *, double *, double *,
+               int *, int *, double *, int *, double *, double *, double *,
                double * , int * );
 
 void kpg1Wwrt( AstObject *, const char *, const HDSLoc *, int * );

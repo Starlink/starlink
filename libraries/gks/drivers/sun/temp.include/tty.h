@@ -17,7 +17,7 @@
 #define TTY_ATTR(type, ordinal)       ATTR(ATTR_PKG_TTY, type, ordinal)
 #define TTY_ATTR_LIST(ltype, type, ordinal) \
         TTY_ATTR(ATTR_LIST_INLINE((ltype), (type)), (ordinal))
- 
+
 typedef enum {
 
    TTY_ARGV			= TTY_ATTR(ATTR_OPAQUE, 5),
@@ -88,4 +88,4 @@ extern caddr_t term_window_object();
         \E]I<file>\E\   - set icon file to <file>
         \E]L<label>\E\  - set icon label to <label>
 */
-#endif ~tty_DEFINED 
+#endif ~tty_DEFINED

@@ -81,8 +81,8 @@
 *        numbers.  The formating adheres to the FITS standard.
 *        Descriptors already in the FITS format are copied as is, so
 *        La Palma ING-format headers can be propagated.
-*        o  If the BDF descriptors contain the FITS keywords CRVALn, 
-*        CDELTn, the appropriate axis structures are generated in 
+*        o  If the BDF descriptors contain the FITS keywords CRVALn,
+*        CDELTn, the appropriate axis structures are generated in
 *        the output NDF. In addition should CRTYPEn also be present
 *        the labels are added to these structures.
 *        o  If the BDF descriptors contain the FITS keywords TITLE or
@@ -228,7 +228,7 @@
       INCLUDE 'FIO_PAR'              ! FIO_ constants
       INCLUDE 'CNF_PAR'              ! For CNF_PVAL function
 
-*  Status:                  
+*  Status:
       INTEGER STATUS                 ! Global status
 
 *  External References:
@@ -236,7 +236,7 @@
 
 *  Local Constants:
       INTEGER   MAXDIM
-      PARAMETER (MAXDIM=7)           ! Maximum number of dimensions 
+      PARAMETER (MAXDIM=7)           ! Maximum number of dimensions
 
 *  Local Variables:
       LOGICAL   AXTHER(DAT__MXDIM)   ! Indicates if an axis (along a
@@ -335,7 +335,7 @@
             ISTAT = SAI__OK
             CALL FIO_CLOSE(FD, ISTAT)
             IF (ISTAT .NE. SAI__OK) THEN
-               CALL ERR_REP ('BDF2NDF_CLTER', 
+               CALL ERR_REP ('BDF2NDF_CLTER',
      :                       'Unable to close temporary connection '//
      :                       'file', STATUS)
                IF (STATUS .EQ. SAI__OK) STATUS = ISTAT
@@ -361,8 +361,8 @@
 *         Create the temporary command file.
             CALL FIO_OPEN (CMDFIL, 'WRITE','LIST', 80, FD, STATUS)
             IF (STATUS .NE. SAI__OK) THEN
-               CALL ERR_REP ('BDF2NDF_OPCER', 
-     :                       'Unable to open temporary command file', 
+               CALL ERR_REP ('BDF2NDF_OPCER',
+     :                       'Unable to open temporary command file',
      :                        STATUS)
 
             ELSE
@@ -422,13 +422,13 @@
             CALL NDF_CREP ('OUT', FORMAT, NDIM, DIM, NDF, STATUS)
 
 *         Map NDF data array.
-            CALL NDF_MAP (NDF, 'DATA', FORMAT, 'WRITE', DATNDF, NELM, 
+            CALL NDF_MAP (NDF, 'DATA', FORMAT, 'WRITE', DATNDF, NELM,
      :                    STATUS)
 
 *         Copy the data array to the NDF.
             IF (STATUS .EQ. SAI__OK) THEN
                NBYTES = NELM * NBPI
-               CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(DATBDF)), 
+               CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(DATBDF)),
      :                        %VAL(CNF_PVAL(DATNDF)),
      :                        STATUS)
             END IF
@@ -451,19 +451,19 @@
 *         If a TITLE was found among the BDF descriptors insert the
 *         associated value into the NDF TITLE.
             IF (CHR_LEN(TITLE) .GT. 0) THEN
-               CALL NDF_CPUT (TITLE, NDF, 'TITLE', STATUS) 
+               CALL NDF_CPUT (TITLE, NDF, 'TITLE', STATUS)
             END IF
 
 *         If a LABEL was found among the BDF descriptors insert the
 *         associated value into the NDF LABEL.
             IF (CHR_LEN(LABEL) .GT. 0) THEN
-               CALL NDF_CPUT (LABEL, NDF, 'LABEL', STATUS) 
+               CALL NDF_CPUT (LABEL, NDF, 'LABEL', STATUS)
             END IF
 
 *         If a BUNITS was found among the BDF descriptors insert the
 *         associated value into the NDF UNITS.
             IF (CHR_LEN(UNITS) .GT. 0) THEN
-               CALL NDF_CPUT (UNITS, NDF, 'UNITS', STATUS) 
+               CALL NDF_CPUT (UNITS, NDF, 'UNITS', STATUS)
             END IF
 
 *         See if any axes structures can be created.
@@ -480,14 +480,14 @@
 *         component.
             IF ( CRAXIS ) THEN
                DO I = 1, NDIM
-                  CALL NDF_AMAP (NDF, 'CENTRE', I, '_REAL', 'WRITE', 
+                  CALL NDF_AMAP (NDF, 'CENTRE', I, '_REAL', 'WRITE',
      :                           WPTR, NELM, STATUS)
 
 *               Compute the actual start value of the axis allowing for
 *               the displacement between it and the reference pixel.
                   OFFSET = CRVAL( I ) - ( CRPIX( I ) - 1.0 ) *
      :                     CDELT( I )
-                  CALL CON_FILL (NELM, OFFSET, CDELT( I ), 
+                  CALL CON_FILL (NELM, OFFSET, CDELT( I ),
      :                           %VAL(CNF_PVAL(WPTR)), STATUS)
                END DO
 
@@ -496,7 +496,7 @@
 *               If a CRTYPEn was found among the BDF descriptors insert
 *               the associated value into the axis LABEL.
                   IF (CHR_LEN(CRTYPE(I)) .GT. 0) THEN
-                     CALL NDF_ACPUT (LABEL, NDF, 'LABEL', I, STATUS) 
+                     CALL NDF_ACPUT (LABEL, NDF, 'LABEL', I, STATUS)
                   END IF
 
                END DO
@@ -533,7 +533,7 @@
       ISTAT = SAI__OK
       CALL FIO_ERASE (CMDFIL, ISTAT)
       IF (STATUS.EQ.SAI__OK) STATUS = ISTAT
-      
+
 999   CONTINUE
 
 *   De-activate FIO.
@@ -541,5 +541,5 @@
 
 *   Clear the INTERIM common blocks.
       CALL CON_RESCM
-            
+
       END

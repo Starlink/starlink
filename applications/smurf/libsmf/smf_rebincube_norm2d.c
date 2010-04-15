@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar, 
-*                                float *data_array, 
-*                                float *var_array, double *wgt_array, 
+*     void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
+*                                float *data_array,
+*                                float *var_array, double *wgt_array,
 *                                int *pop_array, int *status );
 
 *  Arguments:
@@ -24,24 +24,24 @@
 *     nxy = dim_t (Given)
 *        Number of elements in one spatial plane of the output cube.
 *     genvar = int (Given)
-*        Indicates how the output variances should be calculated: 
+*        Indicates how the output variances should be calculated:
 *           0 = do not calculate any output variances
 *           1 = use spread of input data values
 *           2 = use system noise temperatures
 *     data_array = float * (Given and Returned)
-*        The 3D data array for the output cube. 
+*        The 3D data array for the output cube.
 *     var_array = float * (Given and Returned)
 *        A 2D array in which to store the variances for the output cube if
-*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
-*        zero). This array should be big enough to hold a single spatial 
-*        plane from the output cube (all planes in the output cube will have 
-*        the same variance). 
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is
+*        zero). This array should be big enough to hold a single spatial
+*        plane from the output cube (all planes in the output cube will have
+*        the same variance).
 *     wgt_array = double * (Given and Returned)
-*        An array in which to store the relative weighting for each pixel in 
-*        the output cube. If "genvar" is 2, this array should be big enough 
-*        to hold a single spatial plane from the output cube (all planes in 
-*        the output cube will have the same weight). If "genvar" is 2, this 
-*        array should be big enough to hold two spatial planes from the 
+*        An array in which to store the relative weighting for each pixel in
+*        the output cube. If "genvar" is 2, this array should be big enough
+*        to hold a single spatial plane from the output cube (all planes in
+*        the output cube will have the same weight). If "genvar" is 2, this
+*        array should be big enough to hold two spatial planes from the
 *        output cube.
 *     pop_array = int * (Given)
 *        A 2D array holding the number of input spectra that contribute to
@@ -99,8 +99,8 @@
 
 #define FUNC_NAME "smf_rebincube_norm2d"
 
-void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar, 
-                           float *data_array, float *var_array, 
+void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
+                           float *data_array, float *var_array,
                            double *wgt_array, int *pop_array, int *status ){
 
 /* Local Variables */
@@ -143,16 +143,16 @@ void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
          for( iv0 = 0; iv0 < nxy; iv0++ ) var_array[ iv0 ] = VAL__BADR;
       }
 
-/* Now handle cases where the output variance is calculated on the basis 
+/* Now handle cases where the output variance is calculated on the basis
    of the spread of input values. */
    } else if( genvar == 1 ) {
 
 /* We use the weighted mean squared residual between each input data value
    and the weighted mean data value as an estimate of the variance of the
    input data. We need to correct this by a factor of n/(n-1) (where "n"
-   is the number of input spectra contributing to the output spectrum) to 
-   take account of the reduced number of degrees of freedom when calculating 
-   this weighted mean squared residual (this is important when not many 
+   is the number of input spectra contributing to the output spectrum) to
+   take account of the reduced number of degrees of freedom when calculating
+   this weighted mean squared residual (this is important when not many
    input values are being combined). The ratio is estimated as the
    number of input values that have been pasted into the output cube,
    divided by the number of output pixels that have non-zero weights. */
@@ -182,8 +182,8 @@ void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
             var_array[ iv0 ] = VAL__BADR;
          }
       }
-   
-/* Now handle cases where the output variance is calculated on the basis 
+
+/* Now handle cases where the output variance is calculated on the basis
    of the input Tsys values. */
    } else if( genvar == 2 ) {
       for( iv0 = 0; iv0 < nxy; iv0++ ) {

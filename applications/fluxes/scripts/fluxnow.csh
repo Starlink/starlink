@@ -14,8 +14,8 @@
 #     fluxnow.csh
 #
 #  Description:
-#     This procedure starts the FLUXES system for use from Unix by 
-#     defining some environmental variables appropriately and then 
+#     This procedure starts the FLUXES system for use from Unix by
+#     defining some environmental variables appropriately and then
 #     setting the parameters to those that generate the current values.
 #
 #  Notes:
@@ -45,7 +45,7 @@
 onintr goto quit
 
 # Set up the environmental variables.
- 
+
 # Define the location of fluxes and its data files.
 # This is edited into this script during installation.
 if ($?FLUXES_DIR) then

@@ -22,7 +22,7 @@
 *  Description:
 *     This application reports or write to a text file the contents of
 *     a TRANSFORM structure.  Items listed include:
-*     
+*
 *        - the structure's name;
 *        - the version of the TRANSFORM software used to write the
 *          structure;
@@ -93,7 +93,7 @@
 *        This has the same affect as the previous example.
 *     trantrace \
 *        This reports the contents of the current TRANSFORM structure.
-*     trantrace jkt256.more.ccdpack.transform trn.lis  
+*     trantrace jkt256.more.ccdpack.transform trn.lis
 *        This lists to the text file trn.lis the contents of the
 *        transformation structure located within the HDS file
 *        jkt256.sdf, as component MORE.CCDPACK.TRANSFORM.
@@ -131,7 +131,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

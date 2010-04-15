@@ -120,7 +120,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,13 +149,13 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      BYTE VAL_DTOUB             ! _DOUBLE to _UBYTE conversion  
-      INTEGER*2 VAL_DTOW         ! _DOUBLE to _WORD conversion  
-      INTEGER VAL_DTOI           ! _DOUBLE to _INTEGER conversion  
-      REAL VAL_DTOR              ! _DOUBLE to _REAL conversion  
+      BYTE VAL_DTOUB             ! _DOUBLE to _UBYTE conversion
+      INTEGER*2 VAL_DTOW         ! _DOUBLE to _WORD conversion
+      INTEGER VAL_DTOI           ! _DOUBLE to _INTEGER conversion
+      REAL VAL_DTOR              ! _DOUBLE to _REAL conversion
 
 *  Local Variables:
-      INTEGER DIM( NDF__MXDIM )  ! Size of each dimension 
+      INTEGER DIM( NDF__MXDIM )  ! Size of each dimension
       INTEGER EL                 ! Element counter
       INTEGER FILLI              ! _INTEGER fill value
       REAL FILLR                 ! _REAL fill value
@@ -186,7 +186,7 @@
      :                          STATUS )
       CALL KPG1_MAP( INDF3, COMP, ITYPE, 'WRITE', IPOUT, NEL, STATUS )
 
-*  Get the bounds of the output NDF. 
+*  Get the bounds of the output NDF.
       CALL NDF_BOUND( INDF3, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Store the size of each dimension.
@@ -217,30 +217,30 @@
 *  Copy the appropriate value into the output NDF.
          IF ( ITYPE .EQ. '_UBYTE' ) THEN
             FILLUB = VAL_DTOUB( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPUB( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL KPS1_PLCPUB( EL, NEL, %VAL( CNF_PVAL( IPIN ) ),
      :                        USE, FILLUB,
      :                        %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             FILLW = VAL_DTOW( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPW( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL KPS1_PLCPW( EL, NEL, %VAL( CNF_PVAL( IPIN ) ),
      :                       USE, FILLW,
      :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             FILLI = VAL_DTOI( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPI( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL KPS1_PLCPI( EL, NEL, %VAL( CNF_PVAL( IPIN ) ),
      :                       USE, FILLI,
      :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             FILLR = VAL_DTOR( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPR( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL KPS1_PLCPR( EL, NEL, %VAL( CNF_PVAL( IPIN ) ),
      :                       USE, FILLR,
      :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_PLCPD( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+            CALL KPS1_PLCPD( EL, NEL, %VAL( CNF_PVAL( IPIN ) ),
      :                       USE, FILL,
      :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
          END IF

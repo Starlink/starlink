@@ -32,26 +32,26 @@ C     (!) CACHEI  Cache initialisation flag
 C
 C     All in common blocks CACHEN and CACHEC
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     DTA_HDSERC  (DTA_    "   ) Convert HDS error code to DTA code
 C
 C                                   KS / CIT   18th Oct 1982
-C     Modified: 
+C     Modified:
 C
 C     4th April 1986.  KS / AAO. Modified for use with the HDS based
 C                      version of the DTA package.  Now closes down
 C                      HDS when the last file is closed, and resets
 C                      the cache initialisation flag.
-C     8th  May  1986.  KS / AAO. Test for matching top level name 
+C     8th  May  1986.  KS / AAO. Test for matching top level name
 C                      modified to use all of name cache entry.
 C     26th May  1986.  KS / AAO. Local variable FILES renamed to avoid
 C                      name clash with common variable.
 C     6th Oct 1987.    KS / AAO. No longer calls HDS_STOP, since this may
 C                      interfere with other packages.  Now relies on the
 C                      exit handler to close HDS.
-C     8th  Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     8th  Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C     12th Apr 1993.  HME / UoE, Starlink. For DTACACHE must include SAE_PAR
 C                     and DAT_PAR as well.
@@ -140,7 +140,7 @@ C
       END DO
       STATUS=0
 C
-C     If we have no open files left in the system, close 
+C     If we have no open files left in the system, close
 C     everything down.
 C
       IF (NFILES.EQ.0) CACHEI=.FALSE.

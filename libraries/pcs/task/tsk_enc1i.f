@@ -73,25 +73,25 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       INTEGER NVALS         ! number of values in the 1-D array
- 
+
       INTEGER IVALS(NVALS) ! the array to be encoded
- 
+
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER NDIMS         ! no of dimensions to be passed
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       NDIMS = 1
       CALL TASK_ENCNI ( NDIMS, NVALS, IVALS, STRING, STATUS )
- 
+
       END

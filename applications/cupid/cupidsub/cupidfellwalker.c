@@ -9,7 +9,7 @@
 
 HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                          double *ipv, double rms, AstKeyMap *config, int velax,
-                         int perspectrum, double beamcorr[ 3 ], 
+                         int perspectrum, double beamcorr[ 3 ],
                          int *status ){
 /*
 *+
@@ -24,10 +24,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, 
-*                              void *ipd, double *ipv, double rms, 
+*     HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd,
+*                              void *ipd, double *ipv, double rms,
 *                              AstKeyMap *config, int velax,
-*                              int perspectrum, double beamcorr[ 3 ], 
+*                              int perspectrum, double beamcorr[ 3 ],
 *                              int *status )
 
 *  Description:
@@ -43,34 +43,34 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     greatest gradient. When a peak is reached which is the highest data
 *     value within its neighbourhood, a check is made to see if this peak
 *     pixel has already been assigned to a clump. If it has, then all
-*     pixels which were traversed in following the route to this peak are 
+*     pixels which were traversed in following the route to this peak are
 *     assigned to the same clump. If the peak has not yet been assigned to a
 *     clump, then it, and all the traversed pixels, are assigned to a new
-*     clump. If the route commences at "sea level" and starts with a low 
-*     gradient section (average gradient lower than a given value) then 
-*     the initial section of the route (up to the point where the gradient 
-*     exceeds the low gradient limit) is not assigned to the clump, but is 
-*     instead given a special value which prevents the pixels being re-used 
+*     clump. If the route commences at "sea level" and starts with a low
+*     gradient section (average gradient lower than a given value) then
+*     the initial section of the route (up to the point where the gradient
+*     exceeds the low gradient limit) is not assigned to the clump, but is
+*     instead given a special value which prevents the pixels being re-used
 *     as the start point for a new "walk".
 *
 *     If the high data values in a clump form a plateau with slight
 *     undulations, then the above algorithm may create a separate clump
 *     for each undulation. This is probably inappropriate, especially if
-*     the  dips between the undulations are less than or are comparable to 
+*     the  dips between the undulations are less than or are comparable to
 *     the noise level in the data. This situation can arise for instance
 *     if the pixel-to-pixel noise is correlated on a scale equal to or
 *     larger than the value of the MaxJump configuration parameter. To
 *     avoid this, adjoining clumps are merged together if the dip between
 *     them is less than a specified value. Specifically, if two clumps
-*     with peak values PEAK1 and PEAK2, where PEAK1 is less than PEAK2, 
-*     are adjacent to each other, and if the pixels along the interface 
-*     between the two clumps all have data values which are larger than 
+*     with peak values PEAK1 and PEAK2, where PEAK1 is less than PEAK2,
+*     are adjacent to each other, and if the pixels along the interface
+*     between the two clumps all have data values which are larger than
 *     "PEAK1 - MinDip" (where MinDip is the value of the MinDip
 *     configuration parameter), then the two clumps are merged together.
 
 *  Parameters:
 *     type
-*        An integer identifying the data type of the array values pointed to 
+*        An integer identifying the data type of the array values pointed to
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
 *        cupid.h).
 *     ndim
@@ -86,7 +86,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Fortran order. The data type of this array is given by "itype".
 *     ipv
 *        Pointer to the input Variance array, or NULL if there is no Variance
-*        array. The elements should be stored in Fortran order. The data 
+*        array. The elements should be stored in Fortran order. The data
 *        type of this array is "double".
 *     rms
 *        The default value for the global RMS error in the data array.
@@ -94,10 +94,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        An AST KeyMap holding tuning parameters for the algorithm.
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
-*        used if "ndim" is 3. 
+*        used if "ndim" is 3.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
-*        neighbours. A clump that extends across several spectra will be 
+*        neighbours. A clump that extends across several spectra will be
 *        split into multiple clumps, each restricted to a single spectrum.
 *        Only used if "ndim" is 3.
 *     beamcorr
@@ -110,9 +110,9 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Returned Value:
 *     A locator for a new HDS object which is an array of NDF structures.
-*     Each NDF will hold the data values associated with a single clump 
-*     and will be the smallest possible NDF that completely contains the 
-*     corresponding clump. Pixels not in the clump will be set bad. The 
+*     Each NDF will hold the data values associated with a single clump
+*     and will be the smallest possible NDF that completely contains the
+*     corresponding clump. Pixels not in the clump will be set bad. The
 *     pixel origin is set to the same value as the supplied NDF.
 
 *  Copyright:
@@ -211,14 +211,14 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "FELLWALKER", (AstObject *) &fwconfig ) ) {     
+   if( !astMapGet0A( config, "FELLWALKER", (AstObject *) &fwconfig ) ) {
       fwconfig = astKeyMap( " " );
       astMapPut0A( config, "FELLWALKER", fwconfig, " " );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this
    case the "config" KeyMap may contain values which should really be in
-   the "fwconfig" KeyMap. Add a copy of the "config" KeyMap into "fwconfig" 
+   the "fwconfig" KeyMap. Add a copy of the "config" KeyMap into "fwconfig"
    so that it can be searched for any value which cannot be found in the
    "fwconfig" KeyMap. */
    astMapPut0A( fwconfig, CUPID__CONFIG, astCopy( config ), NULL );
@@ -240,8 +240,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
-   move by pixel along an axis. We use the memory management functions of the 
-   AST library since they provide greater security and functionality than 
+   move by pixel along an axis. We use the memory management functions of the
+   AST library since they provide greater security and functionality than
    direct use of malloc, etc. */
    el = 1;
    for( i = 0; i < ndim; i++ ) {
@@ -263,7 +263,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
    maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, slbnd, rms, fwconfig,
-                        ipa, 
+                        ipa,
                         ( ndim > 2 && perspectrum ) ? velax + 1 : 0, status );
 
 /* Abort if no clumps found. */
@@ -273,7 +273,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       goto L10;
    }
 
-/* Allocate an array used to store the number of pixels remaining in each 
+/* Allocate an array used to store the number of pixels remaining in each
    clump. */
    nrem = astMalloc( sizeof( int )*( maxid + 1 ) );
 
@@ -391,13 +391,13 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          } else if( peakvals[ i ] < minhgt ) {
             nlow++;
 
-         } else if( ( ndim < 3 || !perspectrum ) && 
-                  ( clbnd[ j ] == cubnd[ j ] || 
-                  ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) || 
+         } else if( ( ndim < 3 || !perspectrum ) &&
+                  ( clbnd[ j ] == cubnd[ j ] ||
+                  ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) ||
                   ( clbnd[ j + 2 ] == cubnd[ j + 2 ] && ndim > 2 ) ) ) {
-            nthin++;           
+            nthin++;
 
-         } else if ( !allow_edge && ( 
+         } else if ( !allow_edge && (
            clbnd[ j     ] < 3 || cubnd[ j     ] > dims[ 0 ] - 1 ||
            ( ( clbnd[ j + 1 ] < 3 || cubnd[ j + 1 ] > dims[ 1 ] - 1 ) && ndim > 1 ) ||
            ( ( clbnd[ j + 2 ] < 3 || cubnd[ j + 2 ] > dims[ 2 ] - 1 ) && ndim > 2 ) ) ){
@@ -424,7 +424,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( nthin == 1 ) {
         msgOutif( MSG__NORM, "", "1 clump rejected because it spans only a single "
                 "pixel along one or more axes.", status );
-        
+
       } else if( nthin > 1 ) {
         msgSeti( "N", nthin );
         msgOutif( MSG__NORM, "", "^N clumps rejected because they spans only a single "
@@ -433,13 +433,13 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( nedge == 1 ) {
         msgOutif( MSG__NORM, "", "1 clump rejected because it touches an edge "
                 "of the array.", status );
-        
+
       } else if( nedge > 1 ) {
         msgSeti( "N", nedge );
         msgOutif( MSG__NORM, "", "^N clumps rejected because they touch an edge "
                 "of the array.", status );
       }
-                 
+
 
 /* Sort the clump indices into descending order of peak value. */
       j = ngood;
@@ -460,7 +460,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round creating an NDF describing each usable clump. */
       for( j = 0; j < ngood; j++ ) {
          i = igood[ j ];
-         ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd, 
+         ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd,
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
                               cupidConfigD( fwconfig, "MAXBAD", 0.05, status ),
                               status );
@@ -474,9 +474,9 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 L10:;
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration 
-   parameters for this algorithm. This prevents the values in the secondary 
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is 
+/* Remove the secondary KeyMap added to the KeyMap containing configuration
+   parameters for this algorithm. This prevents the values in the secondary
+   KeyMap being written out to the CUPID extension when cupidStoreConfig is
    called. */
    astMapRemove( fwconfig, CUPID__CONFIG );
 

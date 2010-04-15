@@ -3,7 +3,7 @@
 #include "mers.h"
 #include "sae_par.h"
 
-void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm, 
+void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
                     int *lbnd, int *ubnd, int *status ){
 /*
 *+
@@ -17,16 +17,16 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *     C.
 
 *  Invocation:
-*     void atlAddWcsAxis(  AstFrameSet *wcs, AstMapping *map, AstFrame *frm, 
+*     void atlAddWcsAxis(  AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *                          int *lbnd, int *ubnd, int *status )
 
 *  Description:
-*     This function adds one or more new axes to all the Frames in an NDF 
+*     This function adds one or more new axes to all the Frames in an NDF
 *     WCS FrameSet. Frames that are known to be NDF-special (e.g. GRID,
-*     AXIS, PIXEL and FRACTION) are expanded to include a number of extra 
-*     appropriate axes equal to the Nin attribute of the supplied Mapping. 
-*     all other Frames in the FrameSet are replaced by CmpFrames holding the 
-*     original Frame and the supplied Frame. These new axes are connected to 
+*     AXIS, PIXEL and FRACTION) are expanded to include a number of extra
+*     appropriate axes equal to the Nin attribute of the supplied Mapping.
+*     all other Frames in the FrameSet are replaced by CmpFrames holding the
+*     original Frame and the supplied Frame. These new axes are connected to
 *     the new GRID axes using the supplied Mapping.
 
 *  Arguments:
@@ -39,11 +39,11 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *        the new GRID axes into the new WCS axes.
 *     frm
 *        A pointer to a Frame defining the new WCS axes.
-*     lbnd 
+*     lbnd
 *        An array holding the lower pixel index bounds on the new axes.
 *        If a NULL pointer is supplied, a value of 1 is assumed for all
 *        the new axes.
-*     ubnd 
+*     ubnd
 *        An array holding the upper pixel index bounds on the new axes.
 *        If a NULL pointer is supplied, any FRACTION Frame in the
 *        supplied FrameSet is removed.
@@ -51,9 +51,9 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *        Pointer to the global status variable.
 
 *  Notes:
-*     - The new axes are appended to the end of the existing axes, so the 
-*     axis indices associated with the new axes will extend from "nold+1" 
-*     to "nold+nnew", where "nold" is the number of axes in the original 
+*     - The new axes are appended to the end of the existing axes, so the
+*     axis indices associated with the new axes will extend from "nold+1"
+*     to "nold+nnew", where "nold" is the number of axes in the original
 *     Frame, and "nnew" is the number of new axes.
 *     - An error will be reported if the Nout attribute of "map" is
 *     different to the Naxes attribute of "frm".
@@ -67,12 +67,12 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -149,7 +149,7 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
       msgSeti( "NOUT", astGetI( map, "Nout" ) );
       *status = SAI__ERROR;
       errRep( "", "atlAddWcsAxis: The supplied Mapping has ^NOUT outputs "
-              "but the supplied Frame has ^NAXES axes (programming error).", 
+              "but the supplied Frame has ^NAXES axes (programming error).",
               status );
    }
 
@@ -166,8 +166,8 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
    }
 
 /* Get the indices of the PIXEL, AXIS and FRACTION Frames within the
-   FrameSet (we already know that the GRID Frame is the base Frame, so we 
-   do not need to check for GRID). Frame indices are one-based. Also save 
+   FrameSet (we already know that the GRID Frame is the base Frame, so we
+   do not need to check for GRID). Frame indices are one-based. Also save
    the Mappings from the GRID Frame to each of these other NDF Frames. */
    iaxis = AST__NOFRAME;
    ipix = AST__NOFRAME;
@@ -194,21 +194,21 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
       tfrm = astAnnul( tfrm );
    }
 
-/* Append the supplied Frame to every Frame in the FrameSet, including the 
-   NDF-special Frames. These new axes in each Frame are inter-connected using 
+/* Append the supplied Frame to every Frame in the FrameSet, including the
+   NDF-special Frames. These new axes in each Frame are inter-connected using
    UnitMaps. */
    astAddFrame( wcs, AST__ALLFRAMES, NULL, frm );
 
 /* We now create corrected versions of the NDF-special Frames and add
-   them into the FrameSet. We need to be able to re-instate the original 
+   them into the FrameSet. We need to be able to re-instate the original
    current Frame at the end, so record its index now, before it is changed. */
    icurr = astGetI( wcs, "Current" );
 
-/* Fix up the GRID Frame first. Find the original number of GRID axes, and 
+/* Fix up the GRID Frame first. Find the original number of GRID axes, and
    the number of new GRID axes to add. */
 /* ----------------------------------------------------------------------- */
 
-/* Find the original number of GRID axes, and the number of new GRID axes to 
+/* Find the original number of GRID axes, and the number of new GRID axes to
    add. */
    ngrid_old = astGetI( grid_frm, "Naxes" );
    ngrid_add = astGetI( map, "Nin" );
@@ -242,9 +242,9 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
    new_ttl = astAppendString( new_ttl, &ln, ")" );
    astSetC( new_frm, "Title", new_ttl );
 
-/* Now construct a Mapping that transforms the base Frame in the modified 
-   FrameSet into the expanded GRID Frame created above. This is a parallel 
-   CmpMap that uses a UnitMap to transform the original grid axes, and the 
+/* Now construct a Mapping that transforms the base Frame in the modified
+   FrameSet into the expanded GRID Frame created above. This is a parallel
+   CmpMap that uses a UnitMap to transform the original grid axes, and the
    inverse of the supplied Mapping to transform the newly added grid axes. */
    new_map = astCmpMap( astUnitMap( ngrid_old, " " ), map, 0, " " );
    astInvert( new_map );
@@ -253,7 +253,7 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
    Frame. */
    astAddFrame( wcs, AST__BASE, new_map, new_frm );
 
-/* Note the original base Frame index, and make the new GRID Frame (just  
+/* Note the original base Frame index, and make the new GRID Frame (just
    added) the base Frame. */
    ibase = astGetI( wcs, "Base" );
    astSetI( wcs, "Base", astGetI( wcs, "Current" ) );
@@ -263,9 +263,9 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 /* ----------------------------------------------------------------- */
    if( ipix != AST__NOFRAME ) {
 
-/* Construct a Mapping that transforms the new GRID Frame in the modified 
-   FrameSet into the new PIXEL Frame. This is a parallel CmpMap combining 
-   the original GRID->PIXEL Mapping with a new ShiftMap that produces the 
+/* Construct a Mapping that transforms the new GRID Frame in the modified
+   FrameSet into the new PIXEL Frame. This is a parallel CmpMap combining
+   the original GRID->PIXEL Mapping with a new ShiftMap that produces the
    required origin on the new PIXEL axes. */
       for( i = 0; i < ngrid_add; i++ ) {
          shifts[ i ] = ( lbnd ? lbnd[ i ] : 1 ) - 1.5;
@@ -273,7 +273,7 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
       new_map = astCmpMap( pixmap, astShiftMap( ngrid_add, shifts, " " ),
                            0, " " );
 
-/* Use astPickAxes to create a new PIXEL Frame from the old PIXEL Frame, 
+/* Use astPickAxes to create a new PIXEL Frame from the old PIXEL Frame,
    expanding it to have the required additional number of axes. */
       new_frm = astPickAxes( astGetFrame( wcs, ipix ), ngrid_new, axes, NULL );
 
@@ -308,8 +308,8 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
 /* ----------------------------------------------------------------- */
    if( ifrac != AST__NOFRAME && ubnd ) {
 
-/* Construct a Mapping that transforms the new GRID Frame in the modified 
-   FrameSet into the new FRACTION Frame. This is a parallel CmpMap combining 
+/* Construct a Mapping that transforms the new GRID Frame in the modified
+   FrameSet into the new FRACTION Frame. This is a parallel CmpMap combining
    the original GRID->FRACTION Mapping with a new WinMap. */
       for( i = 0; i < ngrid_add; i++ ) {
          ina[ i ] = 0.5;
@@ -317,11 +317,11 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
          outa[ i ] = 0.0;
          outb[ i ] = 1.0;
       }
-      new_map = astCmpMap( fracmap, astWinMap( ngrid_add, ina, inb, outa, 
+      new_map = astCmpMap( fracmap, astWinMap( ngrid_add, ina, inb, outa,
                                                outb, " " ),
                            0, " " );
 
-/* Use astPickAxes to create a new FRACTION Frame from the old FRACTION Frame, 
+/* Use astPickAxes to create a new FRACTION Frame from the old FRACTION Frame,
    expanding it to have the required additional number of axes. */
       new_frm = astPickAxes( astGetFrame( wcs, ifrac ), ngrid_new, axes, NULL );
 
@@ -356,12 +356,12 @@ void atlAddWcsAxis( AstFrameSet *wcs, AstMapping *map, AstFrame *frm,
    if( iaxis != AST__NOFRAME ) {
 
 /* The NDF library does not place any restrictions on the Mapping from
-   GRID to AXIS (it throws away the AXIS Frame anyway when it writes out 
-   the WCS component to disk). So the new GRID -> AXIS Mapping is just the 
+   GRID to AXIS (it throws away the AXIS Frame anyway when it writes out
+   the WCS component to disk). So the new GRID -> AXIS Mapping is just the
    old one in parallel with the new one. */
       new_map = astCmpMap( axismap, map, 0, " " );
 
-/* Use astPickAxes to create a new AXIS Frame from the old AXIS Frame, 
+/* Use astPickAxes to create a new AXIS Frame from the old AXIS Frame,
    expanding it to have the required additional number of axes. */
       new_frm = astPickAxes( astGetFrame( wcs, iaxis ), ngrid_new, axes, NULL );
 

@@ -39,7 +39,7 @@ C                        This routine always returns good status if
 C                        it runs.
 C
 C  External subroutines / functions used:
-C     DTA_SZVAR, DTA_DLVAR, DSA_ARRAY_SIZE, DSA_ARRAY_EXIST, 
+C     DTA_SZVAR, DTA_DLVAR, DSA_ARRAY_SIZE, DSA_ARRAY_EXIST,
 C     DSA_MAIN_SIZE, DSA_WRUSER, ICH_LEN, GEN_NTH, DSA__INVALIDATE_RANGE,
 C     DSA__ERROR_NAME, DSA__DELETE_QUALITY, DSA__AXIS_DATA_NAME,
 C     DSA__AXIS_WIDTH_NAME, DSA__DELETE_AXIS, DSA_CHECK_NDF_AXIS
@@ -79,15 +79,15 @@ C
 C  Common variable details:
 C     (>) ACTUAL_NAMES  (String array) The fully extended name for the
 C                       structure.
-C     (>) DATA_UPDATE   (Logical array) Indicates that the data array has 
+C     (>) DATA_UPDATE   (Logical array) Indicates that the data array has
 C                       been updated (or at least, mapped for update).
-C     (>) ERROR_UPDATE  (Logical array) Indicates that the error array has 
+C     (>) ERROR_UPDATE  (Logical array) Indicates that the error array has
 C                       been updated (or at least, mapped for update).
 C     (>) MAX_AXES      (Integer parameter) Maximum number of axes.
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
-C     (>) RANGE_UPDATE  (Logical array) Indicates that the data range values 
+C     (>) RANGE_UPDATE  (Logical array) Indicates that the data range values
 C                       have been updated.
 C     (>) REF_USED      (Logical array) Inidcates reference slot in use.
 C     (>) SHAPE_CHECK   (Logical array) Indicates that the data or axis
@@ -127,7 +127,7 @@ C
       INTEGER ICH_LEN
       CHARACTER*2 GEN_NTH
 C
-C     DSA_ common definition 
+C     DSA_ common definition
 C
       INCLUDE 'DSA_COMMON'
 C
@@ -201,7 +201,7 @@ C
 C        Check for quality array unchanged while data modified. In this case,
 C        we delete the array if there has been a shape change, but leave it
 C        while issuing a warning if the shape has been left the same. The
-C        check on SHAPE_CHECK isn't quite as rigorous as we might like - it 
+C        check on SHAPE_CHECK isn't quite as rigorous as we might like - it
 C        might refer just to an axis change - but is easier than coding a
 C        full check on quality and main array dimensions.
 C
@@ -242,7 +242,7 @@ C
                CALL DSA__DELETE_AXIS(REF_SLOT,AXIS,DTA_STATUS)
             END DO
 C
-C           Check that those axes that are still relevant match the 
+C           Check that those axes that are still relevant match the
 C           main data array dimensions.  The check is quite messy - see
 C           DSA_SEEK_AXIS (from which it is lifted) for more details.
 C           If a mismatch is found, flag it - it is surely the fault
@@ -334,7 +334,7 @@ C
      :                                                WDIMS,DTA_STATUS)
                            IF ((DTA_STATUS.EQ.0).AND.(NDWID.GE.1)) THEN
                               CALL DTA_DLVAR(NAME(:LENGTH),DTA_STATUS)
-                              IF ((DTA_STATUS.EQ.0).AND.LOG_DELETES) 
+                              IF ((DTA_STATUS.EQ.0).AND.LOG_DELETES)
      :                                                             THEN
                                  CALL DSA_WRUSER(
      :                           'Note: The width array for the '//NTH//

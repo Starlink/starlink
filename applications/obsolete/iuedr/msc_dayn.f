@@ -6,9 +6,9 @@
 *      SUBROUTINE MSC_DAYN
 *
 *   Description:
-*      Convert YEAR, MONTH and DAY into DATE. IUE day number is given from 
+*      Convert YEAR, MONTH and DAY into DATE. IUE day number is given from
 *      1 JAN 1978.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     IUEDR Vn. 1.0
 *      Paul Rees          04-OCT-88     IUEDR Vn. 2.0
@@ -26,15 +26,15 @@
       INTEGER DAY          ! day in month
       INTEGER MONTH        ! month index
       INTEGER YEAR         ! year A.D.
- 
+
 *   Export:
       INTEGER DATE         ! date from 1 JAN 1978
       INTEGER STATUS       ! status return
- 
+
 *   Local variables:
       INTEGER DAYS(12)     ! days in each month
       INTEGER I            ! loop index
- 
+
 *   Initialisations:
       DATA DAYS/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/
 
@@ -49,7 +49,7 @@
          RETURN
       END IF
 
-*   Extra day in feb in leap years 
+*   Extra day in feb in leap years
       IF (((YEAR + 3) / 4) .EQ. (YEAR / 4)) THEN
          DAYS(2) = 29
       END IF

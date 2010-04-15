@@ -13,12 +13,12 @@
 *     CALL KPG1_LTSAV( STATUS )
 
 *  Description:
-*     This routine saves the colour table for the currently 
-*     open graphics device in an HDS container file in the users ADAM 
-*     directory. The file is called "kappa_lut.sdf" and contains 
-*     LUTs for different devices. Each LUT is a _REAL array of 
-*     shape (3,n) where n is the number of colours in the LUT. Each array 
-*     has a name which identifies the graphics device to which it refers. 
+*     This routine saves the colour table for the currently
+*     open graphics device in an HDS container file in the users ADAM
+*     directory. The file is called "kappa_lut.sdf" and contains
+*     LUTs for different devices. Each LUT is a _REAL array of
+*     shape (3,n) where n is the number of colours in the LUT. Each array
+*     has a name which identifies the graphics device to which it refers.
 *
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -37,12 +37,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
 *  Local Variables:
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
-      CHARACTER PLOC*(DAT__SZLOC)! Locator to LUT array 
+      CHARACTER PLOC*(DAT__SZLOC)! Locator to LUT array
       CHARACTER TYPE*(DAT__SZNAM)! Device type
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
@@ -96,7 +96,7 @@
 
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the range of colour indices available on the current device.
@@ -124,14 +124,14 @@
 *  Obtain the home directory.
             CALL PSX_GETENV( 'HOME', PATH, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_REP( 'KPG1_LTSAV_1', '$HOME not defined.', 
+               CALL ERR_REP( 'KPG1_LTSAV_1', '$HOME not defined.',
      :                       STATUS )
             END IF
 
 *  Generate the path of the ADAM_USER.
             NC = CHR_LEN( PATH )
             CALL CHR_APPND( '/adam', PATH, NC )
-   
+
          ELSE
 
 *  Find the length of the path for ADAM_USER.
@@ -142,18 +142,18 @@
 *  Generate the full pathname to the file.
          CALL CHR_APPND( '/kappa_lut', PATH, NC )
 
-*  Get a locator for the top level object in the container file, creating 
+*  Get a locator for the top level object in the container file, creating
 *  the file if it does not already exist.
 *  ========================================================================
 
 *  Attempt to open the file assuming it exists.
-         CALL HDS_OPEN( PATH( : NC ), 'UPDATE', LOC, STATUS ) 
+         CALL HDS_OPEN( PATH( : NC ), 'UPDATE', LOC, STATUS )
 
 *  If the file was not found, annul the error and open a new file.
          IF( STATUS .EQ. DAT__FILNF ) THEN
-            CALL ERR_ANNUL( STATUS )         
-            CALL HDS_NEW( PATH( : NC ), 'KAPPA_LUT', 'LUT', 0, 0, 
-     :                    LOC, STATUS ) 
+            CALL ERR_ANNUL( STATUS )
+            CALL HDS_NEW( PATH( : NC ), 'KAPPA_LUT', 'LUT', 0, 0,
+     :                    LOC, STATUS )
          END IF
 
 *  Get the name of the component to create within the HDS container file.
@@ -173,23 +173,23 @@
             CALL DAT_ERASE( LOC, TYPE, STATUS )
          END IF
 
-*  Create a suitable array component with the required name and shape, and 
+*  Create a suitable array component with the required name and shape, and
 *  get a locator to it.
          DIMS( 1 ) = 3
          DIMS( 2 ) = UP - LP + 1
-         CALL DAT_NEW( LOC, TYPE, '_REAL', 2, DIMS, STATUS ) 
+         CALL DAT_NEW( LOC, TYPE, '_REAL', 2, DIMS, STATUS )
          CALL DAT_FIND( LOC, TYPE, PLOC, STATUS )
 
 *  Store the LUT in the array.
 *  ===============================
 
 *  Map the array for UPDATE access.
-         CALL DAT_MAPV( PLOC, '_REAL', 'WRITE', PNTR, EL, STATUS ) 
+         CALL DAT_MAPV( PLOC, '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *  Store the required section of the colour table in the array.
-         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ), 
+         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ),
      :                    STATUS )
- 
+
 *  Annul the locator.
          CALL DAT_ANNUL( PLOC, STATUS )
 

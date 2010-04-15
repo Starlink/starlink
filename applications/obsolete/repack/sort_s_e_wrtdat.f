@@ -2,37 +2,37 @@
 	SUBROUTINE SORT_S_E_WRTDAT(EBUF,EVT,CTOL,XRW,YRW,XCO,YCO,RWT,
      :						SRT,MLIM,NTOT,STATUS)
 	IMPLICIT NONE
- 
+
 *   Include files:
 	INCLUDE	'SMAPDEF.INC'
 	INCLUDE 'SORT_DEF.INC'
- 
+
 * Input:
 	RECORD		/EBLOCK/ EBUF
 	RECORD 		/SORT_DEF/ SRT
 	INTEGER		MLIM		! mapping extent of lists
- 
+
 	REAL		RWT(MLIM)	! Raw time tags
 	REAL		XCO(MLIM), YCO(MLIM)
 					! Image offsets (arcsec)
 	REAL		XRW(MLIM), YRW(MLIM)
 					! Linearised det coords
- 
+
 	INTEGER		EVT		! Event time
 *	DOUBLE PRECISION  ETOL(3,3)	! Dcm map locals to image locals
 	DOUBLE PRECISION  CTOL(3,3)	! Dcm map locals to image locals
- 
+
 * Input/Output
 	INTEGER		NTOT		! Total events in evds
 	INTEGER		STATUS		! status flag
- 
+
 	DOUBLE PRECISION XLIN, YLIN	! Detector coords of event
- 
+
 * M. Denby
 * P McGale May 95 UNIX mods
 *-
 *   Local constants
- 
+
 *   Local variables :
 	INTEGER		IXPIX, IYPIX
 	INTEGER		IEV, ITIM
@@ -46,24 +46,24 @@
 	integer		itmp
 
 	LOGICAL		MOONF
-	logical 	anynull 
+	logical 	anynull
 
 	REAL		IRIS2		! Iris radius **2
- 
+
 	DOUBLE PRECISION  XPIX, YPIX
 	DOUBLE PRECISION  DXLOC, DYLOC
 	DOUBLE PRECISION  VX, VY
- 
+
 *   External functions :
 	LOGICAL		CAL_HIT_MASK
 	REAL            RAN
- 
+
 	DATA		ISEED/12789531/
 * Check status
 	IF (STATUS .NE. 0) RETURN
- 
+
 	IRIS2 = (SRT.IRIS)**2
-	IEV = 1 
+	IEV = 1
         linx = ebuf.ev(iev).linx
         liny = ebuf.ev(iev).liny
         if (linx .gt. 128) linx  = linx - 256
@@ -85,14 +85,14 @@
 * Within selected region?
         IF (ABS(DXLOC) .LT. SRT.DAZ .AND.
      :                                ABS(DYLOC) .LT. SRT.DEL) THEN
-	  NTOT = NTOT + 1  
+	  NTOT = NTOT + 1
           IF (NTOT .GT. MLIM) THEN
 	     WRITE(*,*) '   Error in SORT_S_E_WRTDAT',
      :			         ' - Internal buffer overflow'
 	     GOTO 999
           END IF
- 
- 
+
+
           XRW(NTOT) = REAL(XLIN/DTOR)*60.
           YRW(NTOT) = REAL(YLIN/DTOR)*60.
           XCO(NTOT) = REAL(DXLOC/DTOR)*60.
@@ -101,9 +101,9 @@
      :	           	     32.D0 - (SRT.SMJD - SRT.RMJD)*86400.D0)
         ENDIF
 
- 
+
 999	IF (STATUS .NE. 0) THEN
 	  WRITE(*,*) '   Error in SORT_S_E_WRTDAT'
 	ENDIF
- 
+
 	END

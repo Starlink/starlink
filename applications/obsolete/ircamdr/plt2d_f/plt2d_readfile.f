@@ -5,7 +5,7 @@
 *
 
 	IMPLICIT NONE
-  
+
         INCLUDE 'SAE_PAR'
         INCLUDE 'FIO_ERR'
 
@@ -16,20 +16,20 @@
 	CALL FIO_GUNIT( LUN, STATUS )
 
 	IF( NUMFILE .EQ. 1) THEN
-	  OPEN( UNIT=LUN, FILE='IMAGEDIR:QUICK1.DAT', STATUS='OLD', 
-     :	        FORM='UNFORMATTED', 
+	  OPEN( UNIT=LUN, FILE='IMAGEDIR:QUICK1.DAT', STATUS='OLD',
+     :	        FORM='UNFORMATTED',
      :	        ERR=999)
 	ELSE IF( NUMFILE .EQ. 2) THEN
 	  OPEN( UNIT=LUN, FILE='IMAGEDIR:QUICK2.DAT', STATUS='OLD',
-     :	        FORM='UNFORMATTED', 
+     :	        FORM='UNFORMATTED',
      :	        ERR=999)
 	ELSE IF( NUMFILE .EQ. 3) THEN
 	  OPEN( UNIT=LUN, FILE='IMAGEDIR:QUICK3.DAT', STATUS='OLD',
-     :	        FORM='UNFORMATTED', 
-     :	        ERR=999)               
+     :	        FORM='UNFORMATTED',
+     :	        ERR=999)
 	ELSE IF( NUMFILE .EQ. 4) THEN
 	  OPEN( UNIT=LUN, FILE='IMAGEDIR:QUICK4.DAT', STATUS='OLD',
-     :	        FORM='UNFORMATTED', 
+     :	        FORM='UNFORMATTED',
      :	        ERR=999)
 	END IF
 

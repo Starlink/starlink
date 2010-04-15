@@ -47,7 +47,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -115,7 +115,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -218,12 +218,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -888,7 +888,7 @@ Section~\ref{spikes2}
 \end{verbatim}
 
 \begin{htmlonly}
-   For more complex sources, it is best 
+   For more complex sources, it is best
    to subtract a different constant from each row (if the baseline has
    drifted, then a straight line should be subtracted), determined from
    the ends of each row, in the region where both beams were `off source'.
@@ -896,7 +896,7 @@ Section~\ref{spikes2}
 \htmlref{more detailed information.}{base2}
 \end{htmlonly}
 \begin{latexonly}
-   For more complex sources, it is best 
+   For more complex sources, it is best
    to subtract a different constant from each row (if the baseline has
    drifted, then a straight line should be subtracted), determined from
    the ends of each row, in the region where both beams were `off source'.
@@ -1299,9 +1299,9 @@ Section~\ref{obtain}.
    Re-binning by Bessel function convolution.
    INFILE - The name of a file containing JCMT map data /''/ > rxa_146mcsern
    AE2RD1 - No pointing corrections applied
-   INFILE - The name of a file containing JCMT map data /'END'/ > 
+   INFILE - The name of a file containing JCMT map data /'END'/ >
    Coordinates are FK5 J2000.0
-   RA_CENTRE - The RA of the centre of the output map /'+05 35 14.37'/ > 
+   RA_CENTRE - The RA of the centre of the output map /'+05 35 14.37'/ >
    DEC_CENTRE - The Dec. of the centre of the output map /'-005 22 32.3'/ >
    % display omc1 badcol=red axes=t low=-2500 high=35000 accept
    % lutneg
@@ -1611,27 +1611,27 @@ Section~\ref{iras90}.
 
 \begin{verbatim}
    % display prompt
-   SCALE - Scale the data? /YES/ > 
-   COMP - Component to display /'Data'/ > 
-   IN - NDF to be displayed /@omc1/ > 
-   COSYS - Co-ordinate system /'Data'/ > 
-   CLEAR - Is the current picture to be cleared before display? /FALSE/ > 
+   SCALE - Scale the data? /YES/ >
+   COMP - Component to display /'Data'/ >
+   IN - NDF to be displayed /@omc1/ >
+   COSYS - Co-ordinate system /'Data'/ >
+   CLEAR - Is the current picture to be cleared before display? /FALSE/ >
    DEVICE - Name of display device /@xw/ > epsfcol_p
    LUT - NDF containing lookup table /!/ > /home/hme/luts/paslin_lut(,2:)
-   NN - Nearest-neighbour mapping of lookup table? /NO/ > 
-   MODE - Method to define the scaling limits /'SCALE'/ > 
-   AXES - Are annotated axes to be drawn? /NO/ > 
-   BORDER - Is a coloured border required? /NO/ > 
-   BADCOL - Colour of bad pixels /'white'/ > 
-   FILL - Fill the plotting area? /NO/ > 
-   CENTRE - Position at the centre of the display /[-2,10]/ > 
+   NN - Nearest-neighbour mapping of lookup table? /NO/ >
+   MODE - Method to define the scaling limits /'SCALE'/ >
+   AXES - Are annotated axes to be drawn? /NO/ >
+   BORDER - Is a coloured border required? /NO/ >
+   BADCOL - Colour of bad pixels /'white'/ >
+   FILL - Fill the plotting area? /NO/ >
+   CENTRE - Position at the centre of the display /[-2,10]/ >
    XMAGN - Magnif. in X co-ordinate about the centre of array /23.08158/ > 15
-   YMAGN - Magnif. in Y co-ordinate about the centre of array /15/ > 
+   YMAGN - Magnif. in Y co-ordinate about the centre of array /15/ >
    LOW - Low value for display /-71414.210937/ > -2500
    HIGH - High value for display /45424.492188/ > 35000
-   SCALOW - Object to contain the lower scaling value. /0/ > 
-   SCAHIGH - Object to contain the upper scaling value. /0/ > 
-   OUT - NDF for scaled data /!/ > 
+   SCALOW - Object to contain the lower scaling value. /0/ >
+   SCAHIGH - Object to contain the upper scaling value. /0/ >
+   OUT - NDF for scaled data /!/ >
 \end{verbatim}
 
    Now we run {\tt skygrid} to get an RA/Dec grid. We specify
@@ -1641,37 +1641,37 @@ Section~\ref{iras90}.
 
 \begin{verbatim}
    % skygrid prompt
-   MSG_FILTER - Level of information to be displayed /'NORMAL'/ > 
+   MSG_FILTER - Level of information to be displayed /'NORMAL'/ >
    DEVICE - Name of display device /@xw/ > epsfcol_p
-   CLEAR - Clear the graphics window? /NO/ > 
+   CLEAR - Clear the graphics window? /NO/ >
 
      DATA picture "KAPPA_DISPLAY" being used
      The picture covers the image section ( 1:98, 1:96 )
-   IN - The displayed NDF /@omc1/ > 
+   IN - The displayed NDF /@omc1/ >
 
-   COORDS - Sky coordinate system /'EQUATORIAL'/ > 
-   LABEL - Annotate the coordinate grid? /YES/ > 
-   TEXTSIZE - Size of annotation text. /0.02/ > 
-   COORDSIZE - Size of text used for formatted coordinate values. /0.01/ > 
+   COORDS - Sky coordinate system /'EQUATORIAL'/ >
+   LABEL - Annotate the coordinate grid? /YES/ >
+   TEXTSIZE - Size of annotation text. /0.02/ >
+   COORDSIZE - Size of text used for formatted coordinate values. /0.01/ >
    TOLERANCE - Tolerance for the plotting of the grid lines /6/ > 0
    LINES - Grid lines across the image? /NO/ > y
-   LONINT - Right Ascension (B1950) interval between grid marks /'0'/ > 
-   LATINT - Declination (B1950) interval between grid marks /'0'/ > 
-   LONACC - Right Ascension (B1950) accuracy /'0'/ > 
-   LATACC - Declination (B1950) accuracy /'0'/ > 
+   LONINT - Right Ascension (B1950) interval between grid marks /'0'/ >
+   LATINT - Declination (B1950) interval between grid marks /'0'/ >
+   LONACC - Right Ascension (B1950) accuracy /'0'/ >
+   LATACC - Declination (B1950) accuracy /'0'/ >
    PENA - Pen number used to draw boundary /3/ > 1
    PENB - Pen number used to draw curves and tick marks /3/ > 1
-   PENC - Pen number used to draw text labels /1/ > 
-   PEND - Pen number used to draw coordinate labels /1/ > 
+   PENC - Pen number used to draw text labels /1/ >
+   PEND - Pen number used to draw coordinate labels /1/ >
 
    % skygrid prompt
-   MSG_FILTER - Level of information to be displayed /'NORMAL'/ > 
+   MSG_FILTER - Level of information to be displayed /'NORMAL'/ >
    DEVICE - Name of display device /@xw/ > epsfcol_p
-   CLEAR - Clear the graphics window? /NO/ > 
+   CLEAR - Clear the graphics window? /NO/ >
 
      DATA picture "KAPPA_DISPLAY" being used
      The picture covers the image section ( 1:98, 1:96 )
-   IN - The displayed NDF /@omc1/ > 
+   IN - The displayed NDF /@omc1/ >
 
    COORDS - Sky coordinate system /'EQUATORIAL'/ > GALACTIC
    LABEL - Annotate the coordinate grid? /YES/ > no
@@ -1679,12 +1679,12 @@ Section~\ref{iras90}.
    LINES - Grid lines across the image? /NO/ > y
    LONINT - Galactic Longitude interval between grid marks /'0'/ > .05
    LATINT - Galactic Latitude interval between grid marks /'0'/ > .05
-   LONACC - Galactic Longitude accuracy /'0'/ > 
-   LATACC - Galactic Latitude accuracy /'0'/ > 
-   PENA - Pen number used to draw boundary /1/ > 
-   PENB - Pen number used to draw curves and tick marks /1/ > 
-   PENC - Pen number used to draw text labels /1/ > 
-   PEND - Pen number used to draw coordinate labels /1/ > 
+   LONACC - Galactic Longitude accuracy /'0'/ >
+   LATACC - Galactic Latitude accuracy /'0'/ >
+   PENA - Pen number used to draw boundary /1/ >
+   PENB - Pen number used to draw curves and tick marks /1/ >
+   PENC - Pen number used to draw text labels /1/ >
+   PEND - Pen number used to draw coordinate labels /1/ >
 \end{verbatim}
 
    Now we use {\tt skywrite} with B1950 coordinates to indicate what
@@ -1697,7 +1697,7 @@ Section~\ref{iras90}.
      DATA picture "KAPPA_DISPLAY" being used
      Using astrometry information stored with the picture in the
      AGI database
-   PEN - Pen number used to write text /1/ > 
+   PEN - Pen number used to write text /1/ >
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > show
 
      DIRECTION: text up direction - ( 0, 0 )
@@ -1709,22 +1709,22 @@ Section~\ref{iras90}.
      PEN - pen number - 1
 
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > dir
-   DIRECTION - Text up-vector /[0,1]/ > 
+   DIRECTION - Text up-vector /[0,1]/ >
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > hei
    HEIGHT - Text height /0.02/ > .01
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > aspe
-   RATIO - Character aspect ratio (width/height) /0.66667/ > 
+   RATIO - Character aspect ratio (width/height) /0.66667/ >
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > just
-   JUST - Text justification /'BL'/ > 
+   JUST - Text justification /'BL'/ >
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > spac
-   SPACE - Space between characters /0/ > 
+   SPACE - Space between characters /0/ >
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > font
-   FONT - GKS font number /1/ > 
+   FONT - GKS font number /1/ >
    ATTRIBUTE - Text attribute to set /'DEFAULT'/ > !
    LON - Right Ascension (B1950) of the position /'209d'/ > 5h 32m 34s
    LAT - Declination (B1950) of the position /'-19.45'/ > -5d 26m 30s
    TEXT - Text to be written > '  209'
-   LON - Right Ascension (B1950) of the position /'5h 32m 34s'/ > 
+   LON - Right Ascension (B1950) of the position /'5h 32m 34s'/ >
    LAT - Declination (B1950) of the position /'-5d 26m 30s'/ > -5d 23m 30s
    TEXT - Text to be written > '  208.95'
    LON - Right Ascension (B1950) of the position /'5h 32m 34s'/ > 5h 32m 36s
@@ -1812,21 +1812,21 @@ Section~\ref{iras90}.
    % display omc1 badcol=red clear=t low=-2500 high=35000 accept
    % lutgrey
    % skyphot prompt
-   MSG_FILTER - Level of information to be displayed /'NORMAL'/ > 
-   IN - The input NDF /@omc1/ > 
-   MODE - Source of input coordinates /'CURSOR'/ > 
-   PLOT - Are graphics to be produced? /YES/ > 
+   MSG_FILTER - Level of information to be displayed /'NORMAL'/ >
+   IN - The input NDF /@omc1/ >
+   MODE - Source of input coordinates /'CURSOR'/ >
+   PLOT - Are graphics to be produced? /YES/ >
    PEN - SGS pen number for graphics /3/ > 4
-   LOOP - Are multiple operations to be performed? /NO/ > 
-   COORDS - Sky coordinate system /'GALACTIC'/ > 
-   SHAPE - Aperture shape /'ELLIPSE'/ > 
-   SINGLE - Should the application exit after a single position? /NO/ > 
+   LOOP - Are multiple operations to be performed? /NO/ >
+   COORDS - Sky coordinate system /'GALACTIC'/ >
+   SHAPE - Aperture shape /'ELLIPSE'/ >
+   SINGLE - Should the application exit after a single position? /NO/ >
    SIZE - Aperture size in arc-minutes /1/ > 0.5,1
-   BACKVAL - Background surface brightness in MJy/sr /0/ > 
-   LOGFILE - A log file for storing displayed information /!/ > 
+   BACKVAL - Background surface brightness in MJy/sr /0/ >
+   LOGFILE - A log file for storing displayed information /!/ >
      Displaying GALACTIC sky coordinates.
 
-   DEVICE - Name of display device /@xw/ > 
+   DEVICE - Name of display device /@xw/ >
      DATA picture "KAPPA_DISPLAY" being used
 
      Position the cursor at each aperture centre and press any button
@@ -1853,9 +1853,9 @@ Section~\ref{iras90}.
 
 
 
-   MEAN - A dummy value to be replaced by the value of parameter MEAN /0/ > 
-   FLUX - A dummy value to be replaced by the value of parameter FLUX /0/ > 
-   SIGMA - A dummy value to be replaced by the value of parameter SIGMA /0/ > 
+   MEAN - A dummy value to be replaced by the value of parameter MEAN /0/ >
+   FLUX - A dummy value to be replaced by the value of parameter FLUX /0/ >
+   SIGMA - A dummy value to be replaced by the value of parameter SIGMA /0/ >
 \end{verbatim}
 
 \begin{latexonly}
@@ -1904,36 +1904,36 @@ Section~\ref{iras90}.
     ----------- Initialising for  Figaro ------------
                  General data reduction
             Version 3.2-3  15 September 1994
- 
+
              Type "fighelp figaro" for help
        or "fighelp news" for news on 3.1-1, 3.2, 3.2-3
 
    %specdre
- 
+
     ------------ Initialised for Specdre ------------
                Spectroscopy data reduction
                 Version 1.0   17 Sep 1993
- 
+
              Type "spe_help specdre" for help
- 
+
    % iras90
 
       IRAS90 commands are now available -- (Version 1.1)
- 
+
       Type i90help for help on IRAS90 commands
- 
+
    % kappa
- 
-    --     Initialised for KAPPA      -- 
-    --   Version 0.8-6U, 1994 June    -- 
- 
-       Type kaphelp for KAPPA help   
- 
+
+    --     Initialised for KAPPA      --
+    --   Version 0.8-6U, 1994 June    --
+
+       Type kaphelp for KAPPA help
+
    % jcmtdr
- 
+
     ------------ Initialised for JCMTDR ------------
               Version 1.2  10 January 1995
- 
+
             Type "jcmt_help jcmtdr" for help
          or "jcmt_xhelp" to start the Web browser
 \end{verbatim}
@@ -1967,8 +1967,8 @@ Section~\ref{iras90}.
 
 \begin{verbatim}
    % stats prompt
-   NDF - Data structure to analyse /@rxa_146m/ > 
-   COMP - NDF array component to analyse /'DATA'/ > 
+   NDF - Data structure to analyse /@rxa_146m/ >
+   COMP - NDF array component to analyse /'DATA'/ >
    CLIP - Clipping levels /!/ > ?
 
    STATS
@@ -1993,8 +1993,8 @@ Section~\ref{iras90}.
             CLIP array.  A maximum of 5 values may be supplied, all of
             which must be positive. [!]
 
-   CLIP - Clipping levels /!/ > 
-   LOGFILE - File for logging results /!/ > 
+   CLIP - Clipping levels /!/ >
+   LOGFILE - File for logging results /!/ >
 
       Pixel statistics for the NDF structure
       /tmp_mnt/home/hme/dump/rxa_146m
@@ -2014,14 +2014,14 @@ Section~\ref{iras90}.
             Total number of pixels : 4047
             Number of pixels used  : 4047 (100.0%)
 
-   MAXIMUM /0/ > 
-   MEAN /0/ > 
-   MINIMUM /0/ > 
-   SIGMA /0/ > 
-   TOTAL /0/ > 
-   NUMBAD /0/ > 
-   NUMGOOD /0/ > 
-   NUMPIX /0/ > 
+   MAXIMUM /0/ >
+   MEAN /0/ >
+   MINIMUM /0/ >
+   SIGMA /0/ >
+   TOTAL /0/ >
+   NUMBAD /0/ >
+   NUMGOOD /0/ >
+   NUMPIX /0/ >
 \end{verbatim}
 
    Some of the parameters are output rather than input. You should just accept
@@ -2061,7 +2061,7 @@ Section~\ref{iras90}.
 
     FILENAME     : rxa_146.dat
     GSD VERSION  :  4.000
-    LABEL        : JCMT                                    
+    LABEL        : JCMT
     NITEMS       : 131
 
 
@@ -2388,34 +2388,34 @@ Section~\ref{iras90}.
 
 \begin{verbatim}
    % display prompt
-   SCALE - Scale the data? /YES/ > 
-   COMP - Component to display /'Data'/ > 
-   IN - NDF to be displayed /@rxa_146m/ > 
-   COSYS - Co-ordinate system /'Data'/ > 
+   SCALE - Scale the data? /YES/ >
+   COMP - Component to display /'Data'/ >
+   IN - NDF to be displayed /@rxa_146m/ >
+   COSYS - Co-ordinate system /'Data'/ >
    CLEAR - Is the current picture to be cleared before display? /FALSE/ > y
-   DEVICE - Name of display device /@xw/ > 
-   LUT - NDF containing lookup table /!/ > 
+   DEVICE - Name of display device /@xw/ >
+   LUT - NDF containing lookup table /!/ >
    MODE - Method to define the scaling limits /'scale'/ > percentiles
    AXES - Are annotated axes to be drawn? /NO/ > y
    BADCOL - Colour of bad pixels /'white'/ > red
-   FILL - Fill the plotting area? /NO/ > 
-   CENTRE - Position at the centre of the display /[0,0]/ > 
+   FILL - Fill the plotting area? /NO/ >
+   CENTRE - Position at the centre of the display /[0,0]/ >
    XMAGN - Magnif. in X co-ordinate about the centre of array /3.211261/ > 3
-   YMAGN - Magnif. in Y co-ordinate about the centre of array /3/ > 
-   PLTITL - Give the title of the image /'OMC1'/ > 
-   ABSLAB - Give the label for the abscissa axis /'X offset (ARCSEC)'/ > 
-   ORDLAB - Give the label for the ordinate axis /'Y offset (ARCSEC)'/ > 
-   MINTIC - Numbers of minor ticks between major ticks for x and y /[-1,-1]/ > 
-   MAJTIC - Parameter controlling numbers of major ticks for x and y /[3,3]/ > 
-   OUTTIC - Axis tick marks on the outside of the axes? /YES/ > 
-   THICK - Relative thickness of plotted axis lines and annotations /1/ > 
-   FONT - Fount type? /'GKS'/ > 
+   YMAGN - Magnif. in Y co-ordinate about the centre of array /3/ >
+   PLTITL - Give the title of the image /'OMC1'/ >
+   ABSLAB - Give the label for the abscissa axis /'X offset (ARCSEC)'/ >
+   ORDLAB - Give the label for the ordinate axis /'Y offset (ARCSEC)'/ >
+   MINTIC - Numbers of minor ticks between major ticks for x and y /[-1,-1]/ >
+   MAJTIC - Parameter controlling numbers of major ticks for x and y /[3,3]/ >
+   OUTTIC - Axis tick marks on the outside of the axes? /YES/ >
+   THICK - Relative thickness of plotted axis lines and annotations /1/ >
+   FONT - Fount type? /'GKS'/ >
    PERCENTILES - Percentiles for scaling /[5,95]/ > 2,98
-   NUMBIN - Number of bins to compute percentiles /2048/ > 
+   NUMBIN - Number of bins to compute percentiles /2048/ >
    Data will be scaled from 4.095828 to 6.405646.
-   SCALOW - Object to contain the lower scaling value. /0/ > 
-   SCAHIGH - Object to contain the upper scaling value. /0/ > 
-   OUT - NDF for scaled data /!/ > 
+   SCALOW - Object to contain the lower scaling value. /0/ >
+   SCAHIGH - Object to contain the upper scaling value. /0/ >
+   OUT - NDF for scaled data /!/ >
 \end{verbatim}
 
 \begin{latexonly}
@@ -2435,7 +2435,7 @@ Section~\ref{iras90}.
    % display
    IN - NDF to be displayed /@rxa_146m/ > rxa_146m(-50.:50.,-50.:50.)
    MODE - Method to define the scaling limits /'scale'/ >
-   LOW - Low value for display /1.33531320095062/ > 
+   LOW - Low value for display /1.33531320095062/ >
    HIGH - High value for display /9.29243278503418/ >
 \end{verbatim}
 
@@ -2485,7 +2485,7 @@ Section~\ref{iras90}.
    the column. {\tt clean} also does the display itself and updates it
    as you zap pixels, and it allows you to change the grey scale and
    zoom factor. In {\tt clean} set the size of the area to be deleted to
-   1, using the command `N', and select the spikes with the cursor. 
+   1, using the command `N', and select the spikes with the cursor.
    Then the command `X' will replace the value in the bad pixel with an
    interpolation of the adjacent values in the same row. The command `S'
    can be used to change the display levels to allow spikes to be seen

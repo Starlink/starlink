@@ -2,24 +2,24 @@
      &                 STOKES_UV,LAMBDA,TITLE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    W R T S P
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CPARAM (<), NPTS (<), STOKES_I (<), STOKES_Q (<), STOKES_QV (<),
 C STOKES_U (<), STOKES_UV (<), LAMBDA (<), TITLE (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C
@@ -57,7 +57,7 @@ C
       INTEGER UPTR,QVPTR,UVPTR,PLACE
       INTEGER IPTR
 C
-      CHARACTER*(DAT__SZLOC) PLOC,LOC      
+      CHARACTER*(DAT__SZLOC) PLOC,LOC
       INTEGER STATUS
 C
       STATUS = SAI__OK

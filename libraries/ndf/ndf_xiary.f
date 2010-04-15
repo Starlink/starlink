@@ -112,23 +112,23 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
-      INCLUDE 'NDF_CONST'        ! NDF_ private constants      
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'ARY_PAR'          ! ARY_ public constants
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
 *        DCB_XLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator to extension (MORE) structure.
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_DID( NDF__MXACB ) = INTEGER (Read)
 *           ARY_ system identifier for the NDF's data array.
@@ -192,12 +192,12 @@
                CALL ERR_REP( 'NDF_XIARY_NO1',
      :         'There is no ''^XNAME'' extension in the NDF ' //
      :         'structure ^NDF', STATUS )
- 
+
 *  Otherwise, see if the requested extension is present.
             ELSE
                CALL DAT_THERE( DCB_XLOC( IDCB ), XNAME, THERE, STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  If absent, then report an error.
                   IF ( .NOT. THERE ) THEN
                      STATUS = NDF__NOEXT
@@ -231,7 +231,7 @@
             END IF
          END IF
       END IF
- 
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

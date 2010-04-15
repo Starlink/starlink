@@ -22,20 +22,20 @@
 *  Description:
 *     This application resamples or rebins a group of input NDFs,
 *     producing corresponding output NDFs which are aligned
-*     pixel-for-pixel with a specified reference NDF. 
+*     pixel-for-pixel with a specified reference NDF.
 *
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
 *     the supplied NDFs. For each input NDF, alignment is first
-*     attempted in the current co-ordinate Frame of the reference NDF. 
+*     attempted in the current co-ordinate Frame of the reference NDF.
 *     If this fails, alignment is attempted in the current co-ordinate
 *     Frame of the input NDF. If this fails, alignment occurs in the
-*     pixel co-ordinate Frame. A message indicating which Frame 
+*     pixel co-ordinate Frame. A message indicating which Frame
 *     alignment was achieved in is displayed.
 *
 *     Two algorithms are available for determining the output pixel
 *     values: resampling and rebinning (the method used is determined by
-*     the REBIN parameter). 
+*     the REBIN parameter).
 *
 *     Two methods exist for determining the bounds of the output NDFs.
 *     First you can give values for parameters LBND and UBND
@@ -52,14 +52,14 @@
 *     need to be taken into account when comparing the aligned NDFs.
 
 *  Usage:
-*     wcsalign in out lbnd ubnd ref 
+*     wcsalign in out lbnd ubnd ref
 
 *  ADAM Parameters:
 *     ABORT = _LOGICAL (Read)
 *        This controls what happens if an error occurs whilst processing
-*        one of the input NDFs. If a FALSE value is supplied for ABORT, 
+*        one of the input NDFs. If a FALSE value is supplied for ABORT,
 *        then the error message will be displayed, but the application
-*        will attempt to process any remaining input NDFs. If a TRUE 
+*        will attempt to process any remaining input NDFs. If a TRUE
 *        value is supplied for ABORT, then the error message will be
 *        displayed, and  the application will abort. [FALSE]
 *     ACC = _REAL (Read)
@@ -73,17 +73,17 @@
 *        [0.05]
 *     CONSERVE = _LOGICAL (Read)
 *        Only accessed when using the resampling algorithm (i.e. if
-*        REBIN is set FALSE). If set TRUE, then the output pixel values 
-*        will be scaled in such a way as to preserve (approximately) 
+*        REBIN is set FALSE). If set TRUE, then the output pixel values
+*        will be scaled in such a way as to preserve (approximately)
 *        the total data value in a feature on the sky. The scaling
 *        factor is the ratio of the output pixel size to the input pixel
 *        size. This option can only be used if the Mapping is
 *        successfully approximated by one or more linear
 *        transformations. Thus an error will be reported if it used when
-*        the ACC parameter is set to zero (which stops the use of 
+*        the ACC parameter is set to zero (which stops the use of
 *        linear approximations), or if the Mapping is too non-linear to
 *        be approximated by a piece-wise linear transformation. The
-*        ratio of output to input pixel size is evaluated once for each 
+*        ratio of output to input pixel size is evaluated once for each
 *        panel of the piece-wise linear approximation to the Mapping,
 *        and is assumed to be constant for all output pixels in the
 *        panel. Flux conservation can only be approximate when using
@@ -94,8 +94,8 @@
 *        given as  a comma-separated list, in which each list element
 *        can be:
 *
-*        - an NDF name, optionally containing wild-cards and/or regular 
-*        expressions ("*", "?", "[a-z]" etc.). 
+*        - an NDF name, optionally containing wild-cards and/or regular
+*        expressions ("*", "?", "[a-z]" etc.).
 *
 *        - the name of a text file, preceded by an up-arrow character
 *        "^". Each line in the text file should contain a
@@ -110,11 +110,11 @@
 *        a value is given which does not end with a hyphen. All the
 *        NDFs given in this way are concatenated into a single group.
 *     INSITU = _LOGICAL (Read)
-*        If INSITU is set to TRUE, then no output NDFs are created. 
+*        If INSITU is set to TRUE, then no output NDFs are created.
 *        Instead, the pixel origin of each input NDF is modified in
 *        order to align the input NDFs with the reference NDF (which is
 *        a much faster operation than a full resampling). This can only
-*        be done if the mapping from input pixel co-ordinates to 
+*        be done if the mapping from input pixel co-ordinates to
 *        reference pixel co-ordinates is a simple integer pixel shift
 *        of origin. If this is not the case an error will be reported
 *        when the input is processed (what happens then is controlled by
@@ -143,13 +143,13 @@
 *        [1000]
 *     METHOD = LITERAL (Read)
 *        The method to use when sampling the input pixel values (if
-*        resampling), or dividing an input pixel value between a group 
-*        of neighbouring output pixels (if rebinning). For details 
+*        resampling), or dividing an input pixel value between a group
+*        of neighbouring output pixels (if rebinning). For details
 *        on these schemes, see the descriptions of routines
 *        AST_RESAMPLEx and AST_REBINx in SUN/210. METHOD can take the
 *        following values.
 *
-*        - "Bilinear" -- When resampling, the output pixel values are 
+*        - "Bilinear" -- When resampling, the output pixel values are
 *        calculated by bi-linear interpolation among the four nearest
 *        pixels values in the input NDF. When rebinning, the input pixel
 *        value is divided bi-linearly between the four nearest output
@@ -169,12 +169,12 @@
 *        - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
 *        valuable general-purpose scheme, intermediate in its visual
 *        effect on NDFs between the bilinear and nearest-neighbour
-*        schemes. 
+*        schemes.
 *
 *        - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel. Gives
 *        similar results to the "Sincsinc" scheme.
 *
-*        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel. Good 
+*        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel. Good
 *        results can be obtained by matching the FWHM of the
 *        envelope function to the point-spread function of the
 *        input data (see parameter PARAMS).
@@ -188,7 +188,7 @@
 *        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel. This
 *        scheme is similar to the "SincCos" scheme.
 *
-*        - "Gauss" -- Uses the exp(-k*x*x) kernel. This option is only 
+*        - "Gauss" -- Uses the exp(-k*x*x) kernel. This option is only
 *        available when rebinning (i.e. if REBIN is set to TRUE).
 *        The FWHM of the Gaussian is given by parameter PARAMS(2), and
 *        the point at which to truncate the Gaussian to zero is given by
@@ -196,10 +196,10 @@
 *
 *        All methods propagate variances from input to output, but the
 *        variance estimates produced by interpolation schemes other than
-*        nearest neighbour need to be treated with care since the 
-*        spatial smoothing produced by these methods introduces 
-*        correlations in the variance estimates. Also, the degree of 
-*        smoothing produced varies across the NDF. This is because a 
+*        nearest neighbour need to be treated with care since the
+*        spatial smoothing produced by these methods introduces
+*        correlations in the variance estimates. Also, the degree of
+*        smoothing produced varies across the NDF. This is because a
 *        sample taken at a pixel centre will have no contributions from
 *        the neighbouring pixels, whereas a sample taken at the corner
 *        of a pixel will have equal contributions from all four
@@ -213,7 +213,7 @@
 *        "SincSinc".  [current value]
 *     OUT = NDF (Write)
 *        A group of output NDFs corresponding one-for-one with the list
-*        of input NDFs given for parameter IN. This should be given as 
+*        of input NDFs given for parameter IN. This should be given as
 *        a comma-separated list, in which each list element can be:
 *
 *        - an NDF name. If the name contains an asterisk character "*",
@@ -248,7 +248,7 @@
 *        SombCos and Gauss methods.
 *
 *        PARAMS( 1 ) is required by all the above schemes.
-*        It is used to specify how many pixels are to contribute to the 
+*        It is used to specify how many pixels are to contribute to the
 *        interpolated result on either side of the interpolation or
 *        binning point in each dimension. Typically, a value of 2 is
 *        appropriate and the minimum allowed value is 1 (i.e. one pixel
@@ -256,7 +256,7 @@
 *        suitable number of pixels should be calculated automatically.
 *        [0]
 *
-*        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc, 
+*        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
 *        SincCos, and SincGauss schemes. For the SombCos, SincSinc and
 *        SincCos schemes, it specifies the number of pixels at which the
 *        envelope of the function goes to zero. The minimum value is
@@ -275,7 +275,7 @@
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned. If a
 *        null value is supplied for this parameter, the first NDF
-*        supplied for parameter IN is used. 
+*        supplied for parameter IN is used.
 *     UBND() = _INTEGER (Read)
 *        An array of values giving the upper pixel-index bound on each
 *        axis for the output NDFs. The number of values supplied should
@@ -303,7 +303,7 @@
 *        image2 and inherits WCS information from image2.
 *     wcsalign m51* *_al lbnd=! accept
 *        This example resamples all the NDFs with names starting with
-*        the string "m51" in the current directory so that 
+*        the string "m51" in the current directory so that
 *        they are aligned with the first input NDF. The output NDFs
 *        have the same names as the input NDFs, but extended with the
 *        string "_al". Each output NDF is just big enough to contain
@@ -315,8 +315,8 @@
 *        file out.lis.
 
 *  Notes:
-*     -  WCS information (including the current co-ordinate Frame) is 
-*     propagated from the reference NDF to all output NDFs. 
+*     -  WCS information (including the current co-ordinate Frame) is
+*     propagated from the reference NDF to all output NDFs.
 *     -  QUALITY is propagated from input to output only if parameter
 *     METHOD is set to "Nearest" and REBIN is set to FALSE.
 
@@ -324,7 +324,7 @@
 *     KAPPA: WCSFRAME, REGRID; CCDPACK: TRANNDF.
 
 *  Implementation Status:
-*     -  This routine correctly processes the DATA, VARIANCE, LABEL, 
+*     -  This routine correctly processes the DATA, VARIANCE, LABEL,
 *     TITLE, UNITS, WCS, and HISTORY components of the input NDFs (see
 *     the METHOD parameter for notes on the interpretation of output
 *     variances).
@@ -335,7 +335,7 @@
 *     or _REAL for processing.
 
 *  Choice of Algorithm:
-*     The algorithm used to produce the output images is determined by 
+*     The algorithm used to produce the output images is determined by
 *     the REBIN parameter, and is based either on resampling the output
 *     image or rebinning the corresponding input image.
 *
@@ -346,8 +346,8 @@
 *     parameter. The rebinning algorithm steps through every pixel in
 *     the input image, dividing the input pixel value between a group
 *     of neighbouring output pixels, incrementing these output pixel
-*     values by their allocated share of the input pixel value. The way 
-*     in which the input sample is divided between the output pixels 
+*     values by their allocated share of the input pixel value. The way
+*     in which the input sample is divided between the output pixels
 *     is determined by the METHOD parameter.
 *
 *     The two algorithms behaviour quite differently if the
@@ -384,17 +384,17 @@
 *
 *     - Particularly sharp features in the input can cause rings around
 *     the corresponding features in the output image. This can be
-*     minimised by suitable settings for the METHOD and PARAMS 
+*     minimised by suitable settings for the METHOD and PARAMS
 *     parameters. In general such rings can be minimised by using a
 *     wider interpolation kernel (if resampling) or spreading function
 *     (if rebinning), at the cost of degraded resolution.
 *
 *     - Regular patterns of curvy lines covering the whole output image
 *     can be created when using the rebinning algorithm.  These are
-*     caused by a beating effect between the input pixel positions and 
+*     caused by a beating effect between the input pixel positions and
 *     the output pixel's position, and their nature and strength depend
 *     critically upon the nature of the Mapping and the spreading
-*     function being used. In general, the nearest-neighbour spreading 
+*     function being used. In general, the nearest-neighbour spreading
 *     function demonstrates this effect more clearly than the other
 *     functions, and for this reason should be used with caution. Again,
 *     wider spreading functions reduce the effect at the cost of
@@ -411,7 +411,7 @@
 *     resampling algorithm with CONSERVE set to TRUE. They are caused by
 *     the discontinuities  between the adjacent panels of the
 *     approximation, and can be minimised by reducing the value assigned
-*     to the ACC parameter. 
+*     to the ACC parameter.
 
 *  Copyright:
 *     Copyright (C) 1998-1999, 2001-2002, 2004 Central Laboratory of
@@ -441,7 +441,7 @@
 
 *  History:
 *     6-OCT-1998 (DSB):
-*        Original version, based on IRAS90:SKYALIGN. 
+*        Original version, based on IRAS90:SKYALIGN.
 *     8-JUL-1999 (TDCA):
 *        Modified to use AST_RESAMPLE
 *     5-AUG-1999 (DSB):
@@ -496,11 +496,11 @@
       INTEGER MAP                ! AST id for (pix_in -> pix_out) Mapping
       INTEGER MAP4               ! AST id for (grid_in -> pix_in) Mapping
       INTEGER MAXPIX             ! Initial scale size in pixels
-      INTEGER METHOD_CODE        ! Integer corresponding to interp. method 
+      INTEGER METHOD_CODE        ! Integer corresponding to interp. method
       INTEGER NDIMR              ! Number of pixel axes in reference NDF
       INTEGER NPAR               ! No. of required interpolation parameters
       INTEGER ORIGIN( NDF__MXDIM )! New pixel origin
-      INTEGER SHIFT( NDF__MXDIM )! Pixel axis shifts 
+      INTEGER SHIFT( NDF__MXDIM )! Pixel axis shifts
       INTEGER SIZE               ! Total size of the input group
       INTEGER SIZEO              ! Total size of the output group
       INTEGER UBND( NDF__MXDIM ) ! Indices of upper right corner of outputs
@@ -522,7 +522,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...',
      :                 IGRP1, SIZE, STATUS )
 
 *  Begin an NDF context.
@@ -541,11 +541,11 @@
          CALL NDG_NDFAS( IGRP1, 1, 'READ', INDFR, STATUS )
       END IF
 
-*  Get the associated WCS FrameSet. 
+*  Get the associated WCS FrameSet.
       CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
 
 *  Get the dimensionality and pixel bounds of the reference NDF.
-      CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR, STATUS ) 
+      CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR, STATUS )
 
 *  Set the suggested default for LBND and UBND.
       CALL PAR_DEF1I( 'LBND', NDIMR, LBNDR, STATUS )
@@ -562,7 +562,7 @@
 *  put bad values in them.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         DO I = 1, NDIMR 
+         DO I = 1, NDIMR
             LBND( I ) = VAL__BADI
             UBND( I ) = VAL__BADI
          END DO
@@ -595,7 +595,7 @@
 *  Do not do this if alignment is being performed in situ.
       IF( INSITU ) THEN
          IGRP2 = GRP__NOID
-      ELSE 
+      ELSE
          CALL KPG1_WGNDF( 'OUT', IGRP1, SIZE, SIZE,
      :                    '  Give more NDFs...',
      :                     IGRP2, SIZEO, STATUS )
@@ -603,7 +603,7 @@
 
 *  See if the application should abort if any input NDF cannot be
 *  processed.Otherwise, the error is annulled and the application continues
-*  to process remaining inputs. 
+*  to process remaining inputs.
       CALL PAR_GET0L( 'ABORT', ABORT, STATUS )
 
 *  Get the algorithm to use.
@@ -628,7 +628,7 @@
       END DO
 
 *  Tell the user what method is being used, and convert value of
-*  METHOD to one of the values expected by AST_RESAMPLE<x>. 
+*  METHOD to one of the values expected by AST_RESAMPLE<x>.
       IF( REBIN ) THEN
          CALL MSG_SETC( 'W', 'binning' )
       ELSE
@@ -638,22 +638,22 @@
       NPAR = 0
       IF( METHOD( 1 : 1 ) .EQ. 'N' ) THEN
          METHOD_CODE = AST__NEAREST
-         CALL MSG_OUT( 'WCSALIGN_MSG1', 
-     :                 '  Using nearest neighbour ^W.', 
-     :                 STATUS ) 
+         CALL MSG_OUT( 'WCSALIGN_MSG1',
+     :                 '  Using nearest neighbour ^W.',
+     :                 STATUS )
 
       ELSE IF( METHOD( 1 : 2 ) .EQ. 'BI' ) THEN
          METHOD_CODE = AST__LINEAR
-         CALL MSG_OUT( 'WCSALIGN_MSG2', 
-     :                 '  Using bi-linear ^W.', STATUS ) 
+         CALL MSG_OUT( 'WCSALIGN_MSG2',
+     :                 '  Using bi-linear ^W.', STATUS )
 
       ELSE IF( METHOD( 1 : 1 ) .EQ. 'G' ) THEN
          NPAR = 2
          PARAMS( 1 ) = 0.0
          PARAMS( 2 ) = 2.0
          METHOD_CODE = AST__GAUSS
-         CALL MSG_OUT( 'WCSALIGN_MSG2', 
-     :                 '  Using a Gaussian ^W kernel.', STATUS ) 
+         CALL MSG_OUT( 'WCSALIGN_MSG2',
+     :                 '  Using a Gaussian ^W kernel.', STATUS )
 
       ELSE IF ( METHOD( 1 : 4 ) .EQ. 'SINC' ) THEN
          NPAR = 2
@@ -662,25 +662,25 @@
 
          IF ( METHOD( 5 : 5 ) .EQ. 'S' ) THEN
             METHOD_CODE = AST__SINCSINC
-            CALL MSG_OUT( 'WCSALIGN_MSG3', 
-     :                    '  Using sincsinc ^W kernel.', STATUS ) 
+            CALL MSG_OUT( 'WCSALIGN_MSG3',
+     :                    '  Using sincsinc ^W kernel.', STATUS )
 
          ELSE IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
             METHOD_CODE = AST__SINCCOS
-            CALL MSG_OUT( 'WCSALIGN_MSG4', 
-     :                    '  Using sinccos ^W kernel.', STATUS ) 
+            CALL MSG_OUT( 'WCSALIGN_MSG4',
+     :                    '  Using sinccos ^W kernel.', STATUS )
 
          ELSE IF( METHOD( 5 : 5 ) .EQ. 'G' ) THEN
             METHOD_CODE = AST__SINCGAUSS
             PARAMS( 2 ) = 1.0
-            CALL MSG_OUT( 'WCSALIGN_MSG5', 
-     :                    '  Using sincgauss ^W kernel.', STATUS ) 
+            CALL MSG_OUT( 'WCSALIGN_MSG5',
+     :                    '  Using sincgauss ^W kernel.', STATUS )
 
          ELSE
             NPAR = 1
             METHOD_CODE = AST__SINC
-            CALL MSG_OUT( 'WCSALIGN_MSG6', 
-     :                    '  Using sinc ^W kernel.', STATUS ) 
+            CALL MSG_OUT( 'WCSALIGN_MSG6',
+     :                    '  Using sinc ^W kernel.', STATUS )
 
          END IF
 
@@ -691,14 +691,14 @@
 
          IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
             METHOD_CODE = AST__SOMBCOS
-            CALL MSG_OUT( 'WCSALIGN_MSG7', 
-     :                    '  Using sombcos ^W kernel.', STATUS ) 
+            CALL MSG_OUT( 'WCSALIGN_MSG7',
+     :                    '  Using sombcos ^W kernel.', STATUS )
 
          ELSE
             NPAR = 1
             METHOD_CODE = AST__SOMB
-            CALL MSG_OUT( 'WCSALIGN_MSG8', 
-     :                    '  Using somb ^W kernel.', STATUS ) 
+            CALL MSG_OUT( 'WCSALIGN_MSG8',
+     :                    '  Using somb ^W kernel.', STATUS )
 
          END IF
 
@@ -709,16 +709,16 @@
          CALL PAR_DEF1D( 'PARAMS', NPAR, PARAMS, STATUS )
 
 *  Get the required number of interpolation parameters.
-         CALL PAR_EXACD( 'PARAMS', NPAR, PARAMS, STATUS ) 
+         CALL PAR_EXACD( 'PARAMS', NPAR, PARAMS, STATUS )
       END IF
 
 *  Get the positional accuracy required.
-      CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )      
+      CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )
       ERRLIM = MAX( 0.0001, ERRLIM )
 
 *  Get the minimum acceptable output weight
       IF( STATUS .EQ. SAI__OK .AND. REBIN ) THEN
-         CALL PAR_GET0R( 'WLIM', WLIM, STATUS )      
+         CALL PAR_GET0R( 'WLIM', WLIM, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             WLIM = 1.0E-10
@@ -750,14 +750,14 @@
 
 *  Find the Mapping from input pixel co-ordinates to reference (i.e.
 *  output) pixel co-ordinates. This also determines if the Mapping is a
-*  simple integer pixel shift of origin. If it is, it returns the new pixel 
+*  simple integer pixel shift of origin. If it is, it returns the new pixel
 *  origin in ORIGIN.
          CALL KPS1_WALA7( INDF1, IWCSR, MAP, MAP4, ORIGIN, STATUS )
 
 *  If the input pixel->output pixel Mapping is a shift of origin, we do
-*  not need to do a full resampling or rebinning. However, if the output 
-*  bounds have been specified explcitly, then we cannot simply shift the 
-*  input pixel origin. 
+*  not need to do a full resampling or rebinning. However, if the output
+*  bounds have been specified explcitly, then we cannot simply shift the
+*  input pixel origin.
          IF( ORIGIN( 1 ) .NE. VAL__BADI .AND. AUTOBN ) THEN
 
 *  If the alignment is being performed in-situ, get a clone of the input
@@ -777,9 +777,9 @@
 *  Apply the shifts.
             CALL NDF_SHIFT( NDIMR, SHIFT, INDF2, STATUS )
 
-*  If the input pixel->output pixel Mapping is not just a shift of origin, 
-*  we do a full resampling or rebinning. We cannot do this if "in-situ" 
-*  alignment was requested. 
+*  If the input pixel->output pixel Mapping is not just a shift of origin,
+*  we do a full resampling or rebinning. We cannot do this if "in-situ"
+*  alignment was requested.
          ELSE IF( .NOT. INSITU ) THEN
 
 *  Create the output NDF by propagation from the input NDF. The default
@@ -789,9 +789,9 @@
             CALL NDG_NDFPR( INDF1, 'UNITS', IGRP2, I, INDF2, STATUS )
 
 *  Process this pair of input and output NDFs.
-            CALL KPS1_WALA0( NDIMR, INDF1, INDF2, MAP, MAP4, IWCSR, 
-     :                       METHOD_CODE, PARAMS, AUTOBN, LBND, UBND, 
-     :                       ERRLIM, MAXPIX, REBIN, CONSRV, WLIM, 
+            CALL KPS1_WALA0( NDIMR, INDF1, INDF2, MAP, MAP4, IWCSR,
+     :                       METHOD_CODE, PARAMS, AUTOBN, LBND, UBND,
+     :                       ERRLIM, MAXPIX, REBIN, CONSRV, WLIM,
      :                       STATUS )
 
 *  Report an error if in-situ alignment was requested but the Mapping is
@@ -806,7 +806,7 @@
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
 
-*  If an error has occurred, delete any output NDF, otherwise just 
+*  If an error has occurred, delete any output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK .AND. .NOT. INSITU ) THEN
             CALL NDF_DELET( INDF2, STATUS )
@@ -818,12 +818,12 @@
          IF( STATUS .NE. SAI__OK  ) THEN
 
 *  If the user has opted to abort processing if an error occurs,abort.
-            IF( ABORT ) GO TO 999 
+            IF( ABORT ) GO TO 999
 
 *  Flush the error.
             CALL ERR_FLUSH( STATUS )
 
-*  Give a warning telling the user that no output NDF will be created 
+*  Give a warning telling the user that no output NDF will be created
 *  for the current input NDF.
             IF( INSITU ) THEN
                CALL GRP_GET( IGRP1, I, 1, NDFNAM, STATUS )

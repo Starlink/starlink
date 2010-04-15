@@ -29,24 +29,24 @@
 #        The format of each element is {setname ndfname ?ndfname ...?}.
 #        The setname is a text name of each set which is to be presented
 #        to the user (it may be blank, in which case the name of the
-#        first NDF will be used), and each ndfname is the name of one 
-#        of the NDFs which is to be a member of that set.  
+#        first NDF will be used), and each ndfname is the name of one
+#        of the NDFs which is to be a member of that set.
 #     NPOINT = list of integers (Returned)
 #        The number of points for each set.  The Nth entry in this
-#        list contains the number of points selected for the Nth set 
+#        list contains the number of points selected for the Nth set
 #        in the NDFSETS variable.
 #     PERCHI = real (Given and Returned)
 #        The percentile of the data above which all values should be
 #        plotted as the same colour.  Must be between 0 and 100.
 #     PERCLO = real (Given and Returned)
-#        The percentile of the data below which all values should be 
+#        The percentile of the data below which all values should be
 #        plotted as the same colour.  Must be between 0 and 100.
 #     POINTS = list of lists of lists (Returned)
 #        The points selected on the images.  The Nth entry in this list
 #        contains data for the Nth set in the NDFSETS variable.
-#        The entry for each NDF is a list containing one entry for each 
+#        The entry for each NDF is a list containing one entry for each
 #        selected point.  The entry for each point is a three-element
-#        list containing the point index number, X coordinate and 
+#        list containing the point index number, X coordinate and
 #        Y coordinate respectively.  The X and Y coordinates are given
 #        in Pixel coordinates if the corresponding element was a single
 #        NDF (the ndfset had only one member) and in CCD_SET coordinates
@@ -108,7 +108,7 @@
 #  Set defaults for some arguments.
       foreach pair { { ZOOM 1 } { WINX 300 } { WINY 300 } { PERCLO 5 } \
                      { PERCHI 95 } { MAXCANV 0 } { MARKSTYLE "" } } {
-         if { ! [ info exists [ lindex $pair 0 ] ] } { 
+         if { ! [ info exists [ lindex $pair 0 ] ] } {
             eval set $pair
          }
       }
@@ -173,7 +173,7 @@
          ccdputs -log "    $npref points marked initially."
          ccdputs -log "  "
 
-#  Get display preferences from the reference viewer so that they can be 
+#  Get display preferences from the reference viewer so that they can be
 #  propagated to subsequent windows and passed back to the calling routine.
          set WINX [ winfo width .vref ]
          set WINY [ winfo height .vref ]
@@ -183,7 +183,7 @@
          set PERCHI [ lindex [ .vref cget -percentiles ] 1 ]
          set MARKSTYLE [ .vref cget -markstyle ]
 
-#  Allow the user to muck about with the list for the reference NDF 
+#  Allow the user to muck about with the list for the reference NDF
 #  while the later ones are being modified.
          .vref configure -status active
          [ .vref component exit ] configure -state disabled
@@ -246,7 +246,7 @@
    "at any time."
          .vref configure -helptext [ join $helplines "\n" ]
 
-#  Associate the help window of the new viewer with the help window of 
+#  Associate the help window of the new viewer with the help window of
 #  the reference NDF's viewer's window.
          [ .v component help ] configure -redirect [ .vref component help ]
 
@@ -278,7 +278,7 @@
                .v configure -title "$title: %n (#$done/$nother)"
                .v clearpoints
                .v loadndf $ndfset $MAXCANV
-               if { $done == 1 && $setposition } { 
+               if { $done == 1 && $setposition } {
                   wm deiconify .v
                   wm geometry .v $geometry
                }
@@ -335,5 +335,5 @@
 #  Destroy remaining windows.
       .vref configure -status done
       destroy .vref
-    
+
 # $Id$

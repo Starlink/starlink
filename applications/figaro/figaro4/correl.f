@@ -38,9 +38,9 @@
 *     INLIST = LITERAL (Read)
 *        The group of input NDFs. Two or three NDFs must be specified.
 *        A complicated INLIST could look something like
-*        
+*
 *        M_51(25:35,-23.0,-24.0),M101,^LISTFILE.LIS
-*        
+*
 *        This example NDF group specification consists of
 *        -  one identified NDF from which a subset is to be taken,
 *        -  one identified NDF,
@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -229,14 +229,14 @@
       IF ( THREEF ) THEN
 
 *     Correlate 1->3, 3->1.
-         CALL SPD_WAAF( VXIST(3), .TRUE., NELM, 
+         CALL SPD_WAAF( VXIST(3), .TRUE., NELM,
      :                  %VAL( CNF_PVAL(DPTR(1)) ),
      :                  %VAL( CNF_PVAL(DPTR(3)) ),
      :                  %VAL( CNF_PVAL(VPTR(3)) ), NS, A0, A1, R,
      :                  DA0, DA1, SIGMA, CHISQR, STATUS )
          CALL SPD_WAAG( FILNO2, INFO, IN(1), IN(3), NS, A0, A1, R,
      :                  DA0, DA1, SIGMA, CHISQR, STATUS )
-         CALL SPD_WAAF( VXIST(1), .TRUE., NELM, 
+         CALL SPD_WAAF( VXIST(1), .TRUE., NELM,
      :                  %VAL( CNF_PVAL(DPTR(3)) ),
      :                  %VAL( CNF_PVAL(DPTR(1)) ),
      :                  %VAL( CNF_PVAL(VPTR(1)) ), NS, A0, A1, R,

@@ -68,14 +68,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) DATA( * )
       INTEGER ILINE
-      
+
 *  Arguments Returned:
       CHARACTER * ( * ) LINE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 

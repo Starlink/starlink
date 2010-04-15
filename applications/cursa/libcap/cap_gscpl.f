@@ -82,7 +82,7 @@
       INTEGER CHR_LEN
 *  Local Variables:
       INTEGER
-     :  SI,      ! Selection identifier. 
+     :  SI,      ! Selection identifier.
      :  ROWS,    ! Number of rows in the selection.
      :  XPTR,    ! Pointer to the array of X values.
      :  YPTR,    !    "    "   "    "   "  Y   "   .
@@ -154,7 +154,7 @@
                   YID = YID__SPLOT
 
                   CALL CAP_RDSCT (SI, XID, YID, ROWS, PTS,
-     :              %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(YPTR)), 
+     :              %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(YPTR)),
      :              NUMNUL, STATUS)
 
                   IF (NUMNUL .GT. 0) THEN
@@ -203,9 +203,9 @@
 *                      Next determine the plotting range.
 
                         IF (AUTO__SPLOT) THEN
-                           CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(XPTR)), 
+                           CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(XPTR)),
      :                       XMIN, XMAX, STATUS)
-                           CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(YPTR)), 
+                           CALL CAP_PRNG (PTS, %VAL(CNF_PVAL(YPTR)),
      :                       YMIN, YMAX, STATUS)
 
                            XRANGE = XMAX - XMIN
@@ -258,8 +258,8 @@
 *
 *                   Plot the selection.
 
-                     CALL CAP_PSCAT (PGSYMB, PGCOL, PTS, 
-     :                 %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(YPTR)), 
+                     CALL CAP_PSCAT (PGSYMB, PGCOL, PTS,
+     :                 %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(YPTR)),
      :                 STATUS)
 
 *

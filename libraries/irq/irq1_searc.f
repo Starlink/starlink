@@ -41,15 +41,15 @@
 *        false, then the quality is held by no pixels. If FIXED is
 *        false, then VALUE is indeterminate.
 *     BIT = INTEGER (Returned)
-*        The bit number within the QUALITY component which corresponds 
+*        The bit number within the QUALITY component which corresponds
 *        to the quality name. If the quality name has no corresponding
-*        quality bit, then zero is returned. 
+*        quality bit, then zero is returned.
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        A descriptive comment stored with the name.
 *     RDONLY = LOGICAL (Returned)
 *        The read-only flag for the quality name.
 *     FIXBIT = LOGICAL (Returned)
-*        A flag indicating if the bit number associated with the quality 
+*        A flag indicating if the bit number associated with the quality
 *        name should never be changed (even if all pixels hold, or do not
 *        hold, the quality).
 *     SLOT = INTEGER (Returned)
@@ -67,12 +67,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

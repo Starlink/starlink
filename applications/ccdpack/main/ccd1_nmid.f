@@ -14,18 +14,18 @@
 *     CALL CCD1_NMID( ID, JNDF, NCARD, IPFITS, SINDEX, MATCH, STATUS )
 
 *  Description:
-*     This routine checks the characteristics of a given NDF to see 
-*     whether it matches the ID string.  The ID string is 
+*     This routine checks the characteristics of a given NDF to see
+*     whether it matches the ID string.  The ID string is
 *     (of the same type as) that written by
 *     the ASTEXP task to the AST file identifying framesets, so that
-*     matching is in the sense defined by that task.  The ID string 
+*     matching is in the sense defined by that task.  The ID string
 *     consists of a keyword indicating the kind of test, followed by
-*     some text in a format specific to that keyword.  Currently 
+*     some text in a format specific to that keyword.  Currently
 *     implemented keywords are:
 *
 *        FITSID <fitskey> <value>
-*           An NDF matches this ID if the first FITS header card with 
-*           the keyword <fitskey> has the value <value>.  If the value 
+*           An NDF matches this ID if the first FITS header card with
+*           the keyword <fitskey> has the value <value>.  If the value
 *           is of type CHARACTER it must be in single quotes.  <fitskey>
 *           may be compound to permit reading of hierarchical keywords.
 *        INDEX <number>
@@ -42,10 +42,10 @@
 *        Index of NDF in set being considered.  This is used if the ID
 *        is of type INDEX.
 *     NCARD = INTEGER (Given)
-*        The number of FITS header cards pointed to by IPFITS.  This is 
+*        The number of FITS header cards pointed to by IPFITS.  This is
 *        used if the ID is of type FITS.
 *     IPFITS = INTEGER (Given)
-*        A pointer to an array of mapped FITS header cards.  This is 
+*        A pointer to an array of mapped FITS header cards.  This is
 *        used if the ID is of type FITS.
 *     SINDEX = INTEGER (Given)
 *        The Set Index attribute of the NDF.  This is used if the ID is
@@ -95,17 +95,17 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER JNDF
       INTEGER NCARD
       INTEGER IPFITS
       INTEGER SINDEX
       CHARACTER * ( * ) ID
-      
+
 *  Arguments Returned:
       LOGICAL MATCH
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -118,7 +118,7 @@
       INTEGER IWS                ! Position of word start
       INTEGER JFSET              ! Index of frameset
       INTEGER JSET               ! Index of CCD_SET frameset
-      
+
 *.
 
 *  Set default return value.
@@ -167,10 +167,10 @@
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'ID', ID )
-         CALL ERR_REP( 'CCD1_NMID_BADID', 
+         CALL ERR_REP( 'CCD1_NMID_BADID',
      :                    '  ID string "^ID" unrecognised', STATUS )
 
       END IF
-      
+
       END
 * $Id$

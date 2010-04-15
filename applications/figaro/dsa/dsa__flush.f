@@ -61,7 +61,7 @@ C     ICH_LEN       Position of last non-blank char in string
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) MAX_FITSTR    (Integer parameter) Maximum number of buffer strings.
 C     (>) FITS_STRINGS  (String array) Comment strings being buffered.
@@ -128,7 +128,7 @@ C
       INTEGER   EMPTY_SLOT     ! Number of free string in NDF common array
       CHARACTER ERROR*64       ! DTA error description
       LOGICAL   EXIST          ! True if keyword already in structure
-      INTEGER   FIRST_MOD      ! First modified string in block 
+      INTEGER   FIRST_MOD      ! First modified string in block
       LOGICAL   FLUSH          ! True if there are FITS strings to write out
       INTEGER   FULL_SLOT      ! Number of last non-blank NDF string
       LOGICAL   GOT_END        ! True if NDF strings include an END record
@@ -137,7 +137,7 @@ C
       INTEGER   ISTR           ! Index through strings in the NDF common buffer
       INTEGER   ISTRNG         ! Index through strings in the buffer
       INTEGER   LAST           ! Number of last NDF string for this ref slot
-      INTEGER   LAST_MOD       ! Last modified string in block 
+      INTEGER   LAST_MOD       ! Last modified string in block
       INTEGER   MODIFIED       ! Number of NDF strings modified for this slot
       LOGICAL   MORE           ! Used to control loop through NDF FITS array
       CHARACTER NAME*80        ! Name of FITS data object
@@ -160,7 +160,7 @@ C
 C
 C        NDF format.  All strings are held in the array FITS_ARRAY.
 C        First, we see how many strings there are, and whether the
-C        FITS data object in the file (if any) will have to be 
+C        FITS data object in the file (if any) will have to be
 C        extended (or contracted, come to that, although that should
 C        not happen).
 C
@@ -265,7 +265,7 @@ C
 C
 C        Finally, we now have a FITS object in the file to write to.
 C        We have to allow for the fact that they may be split up in
-C        there, and also for the possibility that they may not have 
+C        there, and also for the possibility that they may not have
 C        been modified and so need not be output.  The most efficient
 C        way of updating an array in which only parts have changed is
 C        unclear, but what we do here is look for contiguous strings

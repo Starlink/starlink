@@ -141,7 +141,7 @@ C     CNF_PVAL       : Full pointer to dynamically allocated memory
           else
              xunits = 'km s'//bs//'u-1'//bs//'d'
           end if
-          
+
 *     Make plot
 
           call line_vplot(fit_parms,y,%VAL(CNF_PVAL(d_tlptr)),

@@ -9,7 +9,7 @@
 *  Invocation:
 *     CALL CAP_GPREV (STATUS)
 *  Description:
-*     List the previous page in the current selection to the screen, 
+*     List the previous page in the current selection to the screen,
 *     showing the currently chosen components.
 *  Arguments:
 *     STATUS  =  INTEGER (Given and Returned)

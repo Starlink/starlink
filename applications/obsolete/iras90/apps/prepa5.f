@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -104,14 +104,14 @@
             IF( TEXT .NE. ' ' ) THEN
                CALL CHR_APPND( ':', TITLE, IAT )
                CALL CHR_APPND( ' '//TEXT, TITLE, IAT )
-            END IF      
+            END IF
 
 *  If the image type is unknown, just use the object text.
          ELSE
             TITLE = TEXT
          END IF
 
-      END IF      
+      END IF
 
 *  If a label was supplied, don't replace it.
       IF( LABEL .EQ. ' ' ) THEN

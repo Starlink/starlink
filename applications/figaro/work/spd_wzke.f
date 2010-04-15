@@ -68,13 +68,13 @@
 *     ftr_num = INTEGER (Given)
 *        Feature number (active)
 *     pos_l1 = INTEGER (Given)
-*        Offset of first left hand neighbour identified 
+*        Offset of first left hand neighbour identified
 *     pos_r1 = INTEGER (Given)
-*        Offset of first right hand neighbour identified 
+*        Offset of first right hand neighbour identified
 *     pos_l2 = INTEGER (Given)
-*        Offset of second left hand neighbour identified 
+*        Offset of second left hand neighbour identified
 *     pos_r2 = INTEGER (Given)
-*        Offset of second right hand neighbour identified 
+*        Offset of second right hand neighbour identified
 *     positions() = REAL (Given)
 *        Observed x-coords of active features
 *     ftr_num = INTEGER (Given)
@@ -184,14 +184,14 @@
       REAL max_dispersion
       REAL differ_thresh
       INTEGER num_actv_ftrs
-      INTEGER ccnt ( 10 )        !Counters of success/rejection at each stage  
+      INTEGER ccnt ( 10 )        !Counters of success/rejection at each stage
       INTEGER status             !Input/Output status condition
 
 *     Local variables
       REAL distance
 *          N-d origin distance which is
 *          a measure of the difference between the
-*          observed set of n-n ratios,  and the 
+*          observed set of n-n ratios,  and the
 *          'perfect' set calculated using the reference
 *          list of wavelengths.
       REAL dispersion            !Predicted dispersion over feature
@@ -207,7 +207,7 @@
       INTEGER extra_l1           !Extra check 1st left hand neighbour offset
       INTEGER extra_l2           !Extra check 2nd left hand neighbour offse
       INTEGER extra_r1           !Extra check 1st right hand neighbour offse
-      INTEGER extra_r2           !Extra check 2nd right hand neighbour offse 
+      INTEGER extra_r2           !Extra check 2nd right hand neighbour offse
       INTEGER start_l1           !Start db offset to 1st lhn
       INTEGER start_l2           !Start db offset to 2nd lhn
       INTEGER start_r1           !Start db offset to 1st rhn
@@ -219,7 +219,7 @@
       INTEGER iftr2              !Extra feature number to calculate ratios for
       INTEGER db_index2          !Extra db index predicted for feature
 
-*%    If feature under study (primary feature) is more than halfway 
+*%    If feature under study (primary feature) is more than halfway
 *%    thru set of all active features then
       IF ( ftr_num .GT. num_actv_ftrs/2 ) THEN
 
@@ -235,12 +235,12 @@
          end_l1 = pos_l2 - pos_l1
          start_r2 =  pos_l1 + pos_r1
          end_r2 = MIN ( pos_l1 + pos_r1 , db_scope )
-         start_l2 = start_l1 + 1       
+         start_l2 = start_l1 + 1
          end_l2 = db_scope
          extra_r1 = left_offset ( rindex ,1 )
-         extra_r2 = left_offset ( rindex ,1) + 
+         extra_r2 = left_offset ( rindex ,1) +
      :                     right_offset ( rindex , 1 )
-         extra_l1 = left_offset ( rindex ,2 ) - 
+         extra_l1 = left_offset ( rindex ,2 ) -
      :                     left_offset ( rindex , 1 )
          extra_l2 = extra_l1 + 1
 
@@ -273,38 +273,38 @@
 
 *%    If possible to check for extra meta-feature then
 *%     Calculate ratios for extra meta-feature
-      IF ( iftr2-extra_l1 .GT. 0 .AND. 
+      IF ( iftr2-extra_l1 .GT. 0 .AND.
      :     iftr2-extra_l2 .GT. 0 .AND.
      :     iftr2+extra_r1 .LE. num_actv_ftrs .AND.
      :     iftr2+extra_r2 .LE. num_actv_ftrs  ) THEN
 
-       ratio_1 = ( positions ( iftr2 ) - 
+       ratio_1 = ( positions ( iftr2 ) -
      :                   positions ( iftr2-extra_l1 ) ) /
-     :                     ( positions ( iftr2+extra_r1  ) - 
+     :                     ( positions ( iftr2+extra_r1  ) -
      :                       positions ( iftr2 ) )
-       ratio_2 = ( positions ( iftr2 ) - 
+       ratio_2 = ( positions ( iftr2 ) -
      :                   positions ( iftr2-extra_l1 ) ) /
-     :                     ( positions ( iftr2+extra_r2 ) - 
+     :                     ( positions ( iftr2+extra_r2 ) -
      :                       positions ( iftr2 ) )
-       ratio_3 = ( positions ( iftr2 ) - 
+       ratio_3 = ( positions ( iftr2 ) -
      :                   positions ( iftr2-extra_l2 ) ) /
-     :                     ( positions ( iftr2+extra_r1 ) - 
+     :                     ( positions ( iftr2+extra_r1 ) -
      :                       positions ( iftr2 ) )
-       ratio_4 = ( positions ( iftr2 ) - 
+       ratio_4 = ( positions ( iftr2 ) -
      :                   positions ( iftr2-extra_l2 ) ) /
-     :                     ( positions ( iftr2+extra_r2 ) - 
+     :                     ( positions ( iftr2+extra_r2 ) -
      :                       positions ( iftr2 ) )
 
 *%     Loop thru first left hand neighbours allowed
 * 1 >>>
-       DO pos2_l1 = start_l1 , end_l1 
+       DO pos2_l1 = start_l1 , end_l1
 
 *%      Loop thru first right hand neighbours allowed
 * 2 >>>>
         DO pos2_r1 = start_r1 , end_r1
 
 *%       If ratio (L1/R1) is within threshold then
-         IF ( ABS ( 1.0 - ABS ( ratio_1 / 
+         IF ( ABS ( 1.0 - ABS ( ratio_1 /
      :           ftr_db ( pos2_l1 , pos2_r1 ,db_index2 ) ) )
      :                        .LT. differ_thresh ) THEN
            ccnt(6) = ccnt(6) + 1
@@ -314,7 +314,7 @@
            DO pos2_r2 = start_r2 , end_r2
 
 *%           If ratio (L1/R2) is within threshold then
-             IF ( ABS ( 1.0 - ABS ( ratio_2 / 
+             IF ( ABS ( 1.0 - ABS ( ratio_2 /
      :             ftr_db ( pos2_l1 , pos2_r2 , db_index2 ) ) )
      :                        .LT. differ_thresh ) THEN
                ccnt(7) = ccnt(7)+ 1
@@ -324,96 +324,96 @@
                DO pos2_l2 = start_l2 , end_l2
 
 *%               If ratios (L2/R1 and L2/R2) are within threshold then
-                 IF ( ABS ( 1.0 - ABS ( ratio_3 / 
+                 IF ( ABS ( 1.0 - ABS ( ratio_3 /
      :                ftr_db ( pos2_l2 , pos2_r1 , db_index2 ) ) )
-     :                           .LT. differ_thresh  .AND. 
-     :                         ( ABS ( 1.0 - ABS ( ratio_4 / 
+     :                           .LT. differ_thresh  .AND.
+     :                         ( ABS ( 1.0 - ABS ( ratio_4 /
      :                ftr_db ( pos2_l2 , pos2_r2 , db_index2 ) ) )
      :                                  .LT. differ_thresh ) ) THEN
                    ccnt(8) = ccnt(8) + 1
 
 *%                 Calculate dispersion corresponding to predicted wavelengths
-                   dispersion = (  positions 
+                   dispersion = (  positions
      :                    ( ftr_num + right_offset ( rindex,2 ) ) -
-     :                                       positions 
+     :                                       positions
      :                    ( ftr_num - left_offset ( rindex,1 ) ) ) /
      :                            ( ftr_list ( db_index + pos_r2 )  -
      :                              ftr_list ( db_index - pos_l1 )  )
-                   dispersion2 = (  positions 
+                   dispersion2 = (  positions
      :                    ( ftr_num + right_offset ( rindex,1 ) ) -
-     :                                       positions 
+     :                                       positions
      :                    ( ftr_num - left_offset ( rindex,2 ) ) ) /
      :                            ( ftr_list ( db_index + pos_r1 )  -
      :                              ftr_list ( db_index - pos_l2 )  )
 
 *%                 If dispersion consistent and within dispersion window then
                    IF ( ABS ( 1.0 - dispersion / dispersion2 )
-     :                                              .LT. 0.1  .AND. 
+     :                                              .LT. 0.1  .AND.
      :                  ( ( dispersion .GE. min_dispersion) .AND.
      :                    ( dispersion .LE. max_dispersion) )
-     :                                                   )  THEN 
+     :                                                   )  THEN
                       ccnt(9) = ccnt(9) + 1
 
 *%                    Calculate distance measure based on the difference between
 *%                    the four ratios and their 'perfect' values
                       distance = 0.0
-                      IF ( ratios(rindex,1) .GT. 
+                      IF ( ratios(rindex,1) .GT.
      :                     ftr_db ( pos_l1,pos_r1,db_index) ) THEN
 
-                         distance = distance + 
-     :                              ( ratios(rindex,1) / 
+                         distance = distance +
+     :                              ( ratios(rindex,1) /
      :                        ftr_db ( pos_l1,pos_r1,db_index) ) **2.0
 
                       ELSE
-                         distance = distance +  
+                         distance = distance +
      :                         ( ftr_db ( pos_l1,pos_r1,db_index)  /
      :                           ratios ( rindex,1 ) ) **2.0
 
                       ENDIF
 
 
-                      IF ( ratios(rindex,2) .GT. 
+                      IF ( ratios(rindex,2) .GT.
      :                     ftr_db ( pos_l1,pos_r2,db_index) ) THEN
 
-                         distance = distance + 
-     :                              ( ratios(rindex,2) / 
+                         distance = distance +
+     :                              ( ratios(rindex,2) /
      :                        ftr_db ( pos_l1,pos_r2,db_index) ) **2.0
 
                       ELSE
 
-                         distance = distance +  
+                         distance = distance +
      :                         ( ftr_db ( pos_l1,pos_r2,db_index)  /
      :                           ratios ( rindex,2 ) ) **2.0
 
                       ENDIF
 
 
-                      IF ( ratios(rindex,3) .GT. 
+                      IF ( ratios(rindex,3) .GT.
      :                     ftr_db ( pos_l2,pos_r1,db_index) ) THEN
 
-                         distance = distance + 
-     :                              ( ratios(rindex,3) / 
+                         distance = distance +
+     :                              ( ratios(rindex,3) /
      :                        ftr_db ( pos_l2,pos_r1,db_index) ) **2.0
 
                       ELSE
 
-                         distance = distance +  
+                         distance = distance +
      :                         ( ftr_db ( pos_l2,pos_r1,db_index)  /
      :                           ratios ( rindex,3) ) **2.0
 
                       ENDIF
 
 
-                      IF ( ratios(rindex,4) .GT. 
+                      IF ( ratios(rindex,4) .GT.
      :                     ftr_db ( pos_l2,pos_r2,db_index) ) THEN
 
-                         distance = distance + 
-     :                              ( ratios(rindex,4) / 
+                         distance = distance +
+     :                              ( ratios(rindex,4) /
      :                        ftr_db ( pos_l2,pos_r2,db_index) ) **2.0
 
                       ELSE
 
-                         distance = distance +  
+                         distance = distance +
      :                         ( ftr_db ( pos_l2,pos_r2,db_index)  /
      :                           ratios ( rindex,4 ) ) **2.0
 
@@ -436,25 +436,25 @@
 *%                    Else
                       ELSE
 
-*%                       Add new candidate details 
-                         bpos_prev_ftr ( cand_count ) = 
+*%                       Add new candidate details
+                         bpos_prev_ftr ( cand_count ) =
      :                                            db_index - pos_l1
-                         bpos_prev_ftr2 ( cand_count ) = 
+                         bpos_prev_ftr2 ( cand_count ) =
      :                                            db_index - pos_l2
                          bpos_next_ftr ( cand_count ) =
      :                                            db_index + pos_r1
-                         bpos_next_ftr2 ( cand_count ) = 
+                         bpos_next_ftr2 ( cand_count ) =
      :                                            db_index + pos_r2
                          bpos_distances ( cand_count ) = distance
                          bpos_dispersion ( cand_count ) = dispersion
                          bpos_ftr ( cand_count ) = db_index
-                         bpos_posindex ( cand_count , 1 ) = ftr_num - 
+                         bpos_posindex ( cand_count , 1 ) = ftr_num -
      :                                  left_offset ( rindex , 2 )
-                         bpos_posindex ( cand_count , 2 ) = ftr_num - 
+                         bpos_posindex ( cand_count , 2 ) = ftr_num -
      :                                  left_offset ( rindex , 1 )
-                         bpos_posindex ( cand_count , 3 ) = ftr_num + 
+                         bpos_posindex ( cand_count , 3 ) = ftr_num +
      :                                  right_offset ( rindex , 1 )
-                         bpos_posindex ( cand_count , 4 ) = ftr_num + 
+                         bpos_posindex ( cand_count , 4 ) = ftr_num +
      :                                  right_offset ( rindex , 2 )
 
 *%                    Endif

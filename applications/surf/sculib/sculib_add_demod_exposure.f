@@ -10,7 +10,7 @@
 *     integration result
 
 *  Description:
-*     This routine adds the reduced demodulated data for an exposure in a 
+*     This routine adds the reduced demodulated data for an exposure in a
 *     jiggle-sampled observation into the integration result.
 *       The exposure can contain data either for all or part of ONE run
 *     through the jiggle pattern or for several REPEATS of the entire jiggle
@@ -108,7 +108,7 @@
 
 *  Local variables:
       INTEGER BOL
-      INTEGER J                   
+      INTEGER J
       INTEGER JIG
       INTEGER REPEAT
 
@@ -122,7 +122,7 @@
 
       IF (J_REPEAT .EQ. 1) THEN
 
-*  the exposure measured a section of the jiggle pattern once, insert it into 
+*  the exposure measured a section of the jiggle pattern once, insert it into
 *  the integration result
 
          IF ((J_START+N_JIG-1) .GT. J_COUNT) THEN
@@ -160,7 +160,7 @@
 
             DO BOL = 1, N_BOLS
                DO J = 1, J_COUNT
-       
+
                   INT_DATA (BOL,J) = 0.0
                   INT_QUALITY (BOL,J) = 0
 
@@ -179,7 +179,7 @@
                            INT_VARIANCE (BOL,J) = INT_VARIANCE (BOL,J) +
      :                       EXP_DATA (BOL,JIG) **2
                         END IF
-                        INT_DATA (BOL,J) = INT_DATA (BOL,J) + 
+                        INT_DATA (BOL,J) = INT_DATA (BOL,J) +
      :                    EXP_DATA (BOL,JIG)
                      END IF
 
@@ -193,9 +193,9 @@
                      INT_DATA (BOL,J) = INT_DATA (BOL,J) /
      :                 REAL (INT_QUALITY(BOL,J))
                      INT_VARIANCE (BOL,J) = (INT_VARIANCE(BOL,J) -
-     :                 REAL (INT_QUALITY(BOL,J)) * 
-     :                 INT_DATA(BOL,J) **2) / 
-     :                 REAL (INT_QUALITY(BOL,J) * 
+     :                 REAL (INT_QUALITY(BOL,J)) *
+     :                 INT_DATA(BOL,J) **2) /
+     :                 REAL (INT_QUALITY(BOL,J) *
      :                 (INT_QUALITY(BOL,J) - 1))
                      INT_QUALITY (BOL,J) = 0
                   END IF
@@ -206,7 +206,7 @@
          END IF
 
       ELSE
-  
+
          STATUS = SAI__ERROR
          CALL MSG_SETI ('REPEAT', J_REPEAT)
          CALL ERR_REP (' ', 'SCULIB_ADD_DEMOD_EXPOSURE: invalid '//

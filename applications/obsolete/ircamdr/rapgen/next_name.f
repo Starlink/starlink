@@ -138,7 +138,7 @@
          NEWSTR  =  '00'//NEWSTR( 1 : 2 )
 
       ELSE IF ( NCHAR .EQ. 3 ) THEN
- 
+
 *       output number lies between 100 and 999 - append one 0
          NEWSTR  =  '0'//NEWSTR( 1 : 3 )
 
@@ -147,7 +147,7 @@
 
 *    now form the returned next filename
       NEXTNAME  =  CURRNAME( 1 : I-4 )//NEWSTR
-            
+
 
 *    return and end
       END

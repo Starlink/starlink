@@ -98,13 +98,13 @@
 *
 
 *  If necessary extend the FITS block in memory to allow for an extra card.
-      IF ( NHEAD + 1 .GE. AVAIL ) THEN 
+      IF ( NHEAD + 1 .GE. AVAIL ) THEN
          AVAIL = AVAIL + 256
          CALL PSX_REALLOC( AVAIL * 80, IPHEAD, STATUS )
       END IF
 
 *  Now write in card.
       NHEAD = NHEAD + 1
-      CALL RTD1_WCARD( CARD, NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 
+      CALL RTD1_WCARD( CARD, NHEAD, %VAL( CNF_PVAL( IPHEAD ) ),
      :                 STATUS, %VAL( CNF_CVAL( 80 ) ) )
       END

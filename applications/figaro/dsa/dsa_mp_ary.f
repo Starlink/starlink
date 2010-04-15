@@ -11,7 +11,7 @@ C  Description:
 C     Given the DTA_ system name of a data object that is either an
 C     array or a structure that can provide array data, this routine
 C     maps that data array (the whole or part of the array) and returns
-C     the address of the dynamic memory array that may be used to 
+C     the address of the dynamic memory array that may be used to
 C     access the data.  Optionally, this routine can replace flagged
 C     values in the data and remember their positions for replacement
 C     later.
@@ -20,7 +20,7 @@ C  Language:
 C     FORTRAN
 C
 C  Call:
-C     CALL DSA_MAP_ARRAY (NAME, MODE, TYPE, START, NMAP, NELM, COPY, 
+C     CALL DSA_MAP_ARRAY (NAME, MODE, TYPE, START, NMAP, NELM, COPY,
 C                                UNFLAG, PROP, ADDRESS, SLOT, STATUS)
 C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
@@ -33,13 +33,13 @@ C                    data is to be accessed.  Only the first character is
 C                    significant.
 C     (>) TYPE       (Fixed string,descr) A string specifying the type of
 C                    the array that the data is to be mapped onto.  This
-C                    can be one of 'BYTE', 'CHAR', 'FLOAT', 'SHORT', 
+C                    can be one of 'BYTE', 'CHAR', 'FLOAT', 'SHORT',
 C                    'INT', 'USHORT' or 'DOUBLE' - and must be in upper case.
 C     (>) START      (Integer,ref) The number of the first element in the
 C                    array to be mapped - treating the array as linear, with
-C                    elements numbered from 1 to NELM.  
+C                    elements numbered from 1 to NELM.
 C     (>) NMAP       (Integer,ref) The number of elements in the array to be
-C                    mapped. If the whole of the array is to be mapped, 
+C                    mapped. If the whole of the array is to be mapped,
 C                    set START=1, NMAP=NELM.
 C     (>) NELM       (Integer,ref) The number of elements in the data
 C                    array.  Note that the calling program is expected
@@ -50,7 +50,7 @@ C                    mapped directly onto the file.  This usually indicates
 C                    that some background processing is going to occur
 C                    (like removal of flagged values) that should not be
 C                    allowed to affect the file data itself.
-C     (>) UNFLAG     (Logical,ref) If set, indicates that `flagged' values 
+C     (>) UNFLAG     (Logical,ref) If set, indicates that `flagged' values
 C                    in the array are to be replaced but their positions
 C                    remembered.
 C     (>) PROP       (Logical,ref) If set, `flagged' values are to be
@@ -67,7 +67,7 @@ C                    mapping.
 C     (!) STATUS     (Integer,ref) Status code.  If a non-zero value is
 C                    passed, this routine will return immediately.
 C
-C  External variables used: 
+C  External variables used:
 C     Only common variables used internally by the DSA_ system.
 C
 C  External subroutines / functions used:
@@ -112,7 +112,7 @@ C     (<) MAP_CALL_WORK (Integer array) Work entry corresponding to call.
 C     (<) MAP_CALL_NFLAG(Integer array) Number of values unflagged in array.
 C     (<) MAP_CALL_FSLOT(Integer array) Work entry used for flag data.
 C     (<) MAP_CALL_VSLOT(Integer array) Work entry used for err<->variance
-C                       array conversions.  
+C                       array conversions.
 C
 C  Subroutine / function details:
 C     CNF_PVAL         Full pointer to dynamically allocated memory
@@ -139,7 +139,7 @@ C     DSA__ARRAY_ORIGIN  Get origin values (if any) for a structured array.
 C
 C  History:
 C     25th June 1987    Original version.  KS / AAO.
-C     3rd  Feb  1988    Double<->float conversion error messages 
+C     3rd  Feb  1988    Double<->float conversion error messages
 C                       suppressed.  KS / AAO.
 C     19th July 1988    COPY and UNFLAG parameters added.  Also now
 C                       uses CNV_FMTCON and not DSA_FMTCON.  KS / AAO.
@@ -169,10 +169,10 @@ C      1st June 1993    KS / AAO. Modify previous fix to allow concurrent read
 C                       and update mappings.
 C     25th Oct  1994.   KS / AAO. Calling sequence now includes START and NMAP
 C                       to support mapping of array subsets.
-C      6th Feb  1995.   KS / AAO. Now uses new calling sequence for 
+C      6th Feb  1995.   KS / AAO. Now uses new calling sequence for
 C                       DSA_UNFLAG_DATA.
 C     2005 May 31       Use CNF_PVAL for pointers to mapped data. MJC
-C     2005 June 3       Replace DYNAMIC_MEMORY with 
+C     2005 June 3       Replace DYNAMIC_MEMORY with
 C                       %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
 C                       addressing.  MJC / Starlink
 C
@@ -249,7 +249,7 @@ C
       INTEGER   WORK_PTR                 ! Memory address of work array
       INTEGER   WORK_SLOT                ! Slot number of work area
 C
-C     DSA_ type definitions.  Defines MAX_TYPES, xxxx_TYPE, 
+C     DSA_ type definitions.  Defines MAX_TYPES, xxxx_TYPE,
 C                             TYPE_NAMES, TYPE_SIZE, FMTCON_CODE
 C
       INCLUDE 'DSA_TYPES'
@@ -339,9 +339,9 @@ C
       INVOKE=ICH_FOLD(CHR)
       MAP_CALL_MODE(SLOT)=CHR
 C
-C     See if this array has been mapped already.  Since we allow subset 
+C     See if this array has been mapped already.  Since we allow subset
 C     mapping, we have to be careful here. We treat an already mapped
-C     array that doesn't overlap as a completely separate mapping. We 
+C     array that doesn't overlap as a completely separate mapping. We
 C     do have to check that we're not seeing overlapping mappings, however.
 C     We treat overlapping subset mappings as an error - although we could
 C     probably survive overlapping readonly mappings, it sounds as
@@ -390,7 +390,7 @@ C        trying to map it for write, this will be a problem. If the array
 C        is still mapped (ie no call to DSA_UNMAP has been made) then we
 C        have to use a new mapping. (This won't be a problem, since we can
 C        reasonably have an existing mapping for read and a new mapping
-C        for write. If the array has actually been freed but not physically 
+C        for write. If the array has actually been freed but not physically
 C        unmapped - DSA_UNMAP usually leaves arrays actually
 C        mapped - then we can free it.
 C
@@ -399,7 +399,7 @@ C
                FOUND=.FALSE.
             ELSE
 C
-C              The array is no longer actively mapped by the DSA routines. 
+C              The array is no longer actively mapped by the DSA routines.
 C              Free it and treat it as if we never found it.
 C
                CALL DTA_FRVAR(MAP_ACTNAM(MAP_SLOT),DTA_STATUS)
@@ -426,7 +426,7 @@ C     will map the array just as requested, from element START to element
 C     START+NMAP-1. One exception is a scaled array that is being mapped for
 C     write or update - we can't scale on the basis of a subset, so in that
 C     case we have to map the whole array. We set MSTART and NMAPPED to the
-C     start element and number of elements we actually map. 
+C     start element and number of elements we actually map.
 C
       SCALED=.FALSE.
       IF (.NOT.FOUND) THEN
@@ -453,7 +453,7 @@ C              - the only ones we can handle so far).  The later code
 C              in this routine assumes that scaled arrays are based on
 C              SHORT arrays, so even if this isn't the case we force it
 C              (the map then may not strictly be to its primitive type,
-C              but that's too bad - it's crazy to have any other sort of 
+C              but that's too bad - it's crazy to have any other sort of
 C              scaled array - isn't it?)  We also check for origin values
 C              that we can't handle.
 C
@@ -466,7 +466,7 @@ C
                   DO I=1,NDIM
                      IF (ORIGIN(I).NE.1.0) THEN
                         CALL DSA_WRUSER('Cannot map ')
-                        CALL DSA_WRNAME(NAME)                  
+                        CALL DSA_WRNAME(NAME)
                         CALL DSA_WRUSER(
      :                    ', because this implementation of the data '
      :                    //'access routines cannot handle an array ')
@@ -488,7 +488,7 @@ C
                   END IF
                ELSE
                   CALL DSA_WRUSER('Cannot map ')
-                  CALL DSA_WRNAME(NAME)                  
+                  CALL DSA_WRNAME(NAME)
                   CALL DSA_WRUSER(', because it is of a type (')
                   CALL DSA_WRUSER(OBJ_TYPE(:ICH_LEN(OBJ_TYPE)))
                   CALL DSA_WRUSER(
@@ -517,7 +517,7 @@ C
 C        At this point we should have the name of the actual array to
 C        be mapped in ARRAY_NAME, and its type in OBJ_TYPE.  Note that
 C        we map the array in its natural type, and try to map it for
-C        readonly or update/write as requested, attempting a readonly map 
+C        readonly or update/write as requested, attempting a readonly map
 C        if the update mode fails.  SCALED indicates that this is a scaled
 C        array, and DATA_TYPE is the type of the named data object, which
 C        will be the same as OBJ_TYPE if it is not a structured array.
@@ -680,7 +680,7 @@ C
          GO TO 500
       END IF
 C
-C     See if the mapping was of the correct type, or if we are going 
+C     See if the mapping was of the correct type, or if we are going
 C     to have to do a type conversion into a workspace array.  If the
 C     data is a scaled array, then we will always do type conversion.
 C     There are some cases where we want to force a copy of the data.  If
@@ -728,7 +728,7 @@ C
          IF (.NOT.FOUND) THEN
 C
 C           No, we don't have it in workspace either, so we will have to
-C           grab workspace and then convert the data.  First get the 
+C           grab workspace and then convert the data.  First get the
 C           workspace and link it into the chain for the array.
 C
             BYTES=NMAPPED*TYPE_SIZE(TYPE_CODE)
@@ -766,7 +766,7 @@ C
 C              For a primitive array, all that is required is a format
 C              conversion.  We suppress error messages for real<->double
 C              conversions, since they can only be for -0.0 values.  This
-C              is a little unsatisfactory, but if, say, a new 'FLOAT' array 
+C              is a little unsatisfactory, but if, say, a new 'FLOAT' array
 C              is created and mapped 'DOUBLE', this can happen and it looks
 C              better if no error message occurs.  What we really need is
 C              a DTA_ routine that knows if an array has been initialised.

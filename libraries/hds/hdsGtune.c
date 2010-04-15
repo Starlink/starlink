@@ -143,7 +143,7 @@ hdsGtune(char *param_str,
 (possible programming error).",
                     &hds_gl_status );
       }
-   }                
+   }
 
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )

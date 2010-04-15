@@ -4,7 +4,7 @@
 *     smf_string_to_dtype
 
 *  Purpose:
-*     Return data type representation of a string 
+*     Return data type representation of a string
 
 *  Language:
 *     Starlink ANSI C
@@ -19,7 +19,7 @@
 *     datatype = const char* (Given)
 *        String representation of data type
 *     dtype = smf_dtype* (Returned)
-*        smf_dtype equivalent 
+*        smf_dtype equivalent
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -77,14 +77,14 @@
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status ) {
 
    /* Check entry status */
-   if (*status != SAI__OK) return; 
+   if (*status != SAI__OK) return;
 
    if ( strcmp ( datatype, "_INTEGER" ) == 0 ) {
       *dtype = SMF__INTEGER;
    } else if ( strcmp ( datatype, "_REAL" ) == 0 )
       *dtype = SMF__FLOAT;
    else if ( strcmp ( datatype, "_DOUBLE" ) == 0 )
-      *dtype = SMF__DOUBLE;   
+      *dtype = SMF__DOUBLE;
    else if ( strcmp ( datatype, "_UWORD" ) == 0 )
       *dtype = SMF__USHORT;
    else {
@@ -96,4 +96,4 @@ void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status
    }
 
 }
-      
+

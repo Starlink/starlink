@@ -1,4 +1,4 @@
-      SUBROUTINE CAT_SFNDB (CI, FI, MINRNG, MAXRNG, REJFLG, 
+      SUBROUTINE CAT_SFNDB (CI, FI, MINRNG, MAXRNG, REJFLG,
      :  SI, NUMSEL, SIR, NUMREJ, STATUS)
 *+
 *  Name:
@@ -115,7 +115,7 @@
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -137,12 +137,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -182,7 +182,7 @@
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -238,7 +238,7 @@
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -326,7 +326,7 @@ C    :                    i10, i10, i10)
 *                         selected rows, and, if required, the
 *                         rejected rows.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
 
                            IF (REJFLG) THEN
@@ -334,7 +334,7 @@ C    :                    i10, i10, i10)
 
                               IF (NUMREJ .GT. 0) THEN
                                  LRJFLG = .TRUE.
-                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER', 
+                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
                               ELSE
                                  LRJFLG = .FALSE.
@@ -347,7 +347,7 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       LRJFLG, NUMSEL, NUMREJ,
      :                       %VAL(CNF_PVAL(SELPTR)),
      :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
@@ -430,7 +430,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -486,7 +486,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -536,7 +536,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
       END IF
 
       END
-      SUBROUTINE CAT_SFNDC (CI, FI, MINRNG, MAXRNG, REJFLG, 
+      SUBROUTINE CAT_SFNDC (CI, FI, MINRNG, MAXRNG, REJFLG,
      :  SI, NUMSEL, SIR, NUMREJ, STATUS)
 *+
 *  Name:
@@ -653,7 +653,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -704,7 +704,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -760,7 +760,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -848,7 +848,7 @@ C    :                    i10, i10, i10)
 *                         selected rows, and, if required, the
 *                         rejected rows.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
 
                            IF (REJFLG) THEN
@@ -856,7 +856,7 @@ C    :                    i10, i10, i10)
 
                               IF (NUMREJ .GT. 0) THEN
                                  LRJFLG = .TRUE.
-                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER', 
+                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
                               ELSE
                                  LRJFLG = .FALSE.
@@ -869,7 +869,7 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       LRJFLG, NUMSEL, NUMREJ,
      :                       %VAL(CNF_PVAL(SELPTR)),
      :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
@@ -952,7 +952,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -1008,7 +1008,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -1058,7 +1058,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
       END IF
 
       END
-      SUBROUTINE CAT_SFNDD (CI, FI, MINRNG, MAXRNG, REJFLG, 
+      SUBROUTINE CAT_SFNDD (CI, FI, MINRNG, MAXRNG, REJFLG,
      :  SI, NUMSEL, SIR, NUMREJ, STATUS)
 *+
 *  Name:
@@ -1175,7 +1175,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -1226,7 +1226,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -1282,7 +1282,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -1370,7 +1370,7 @@ C    :                    i10, i10, i10)
 *                         selected rows, and, if required, the
 *                         rejected rows.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
 
                            IF (REJFLG) THEN
@@ -1378,7 +1378,7 @@ C    :                    i10, i10, i10)
 
                               IF (NUMREJ .GT. 0) THEN
                                  LRJFLG = .TRUE.
-                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER', 
+                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
                               ELSE
                                  LRJFLG = .FALSE.
@@ -1391,7 +1391,7 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       LRJFLG, NUMSEL, NUMREJ,
      :                       %VAL(CNF_PVAL(SELPTR)),
      :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
@@ -1474,7 +1474,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -1530,7 +1530,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -1580,7 +1580,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
       END IF
 
       END
-      SUBROUTINE CAT_SFNDI (CI, FI, MINRNG, MAXRNG, REJFLG, 
+      SUBROUTINE CAT_SFNDI (CI, FI, MINRNG, MAXRNG, REJFLG,
      :  SI, NUMSEL, SIR, NUMREJ, STATUS)
 *+
 *  Name:
@@ -1697,7 +1697,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -1748,7 +1748,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -1804,7 +1804,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -1892,7 +1892,7 @@ C    :                    i10, i10, i10)
 *                         selected rows, and, if required, the
 *                         rejected rows.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
 
                            IF (REJFLG) THEN
@@ -1900,7 +1900,7 @@ C    :                    i10, i10, i10)
 
                               IF (NUMREJ .GT. 0) THEN
                                  LRJFLG = .TRUE.
-                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER', 
+                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
                               ELSE
                                  LRJFLG = .FALSE.
@@ -1913,7 +1913,7 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       LRJFLG, NUMSEL, NUMREJ,
      :                       %VAL(CNF_PVAL(SELPTR)),
      :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
@@ -1996,7 +1996,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -2052,7 +2052,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -2102,7 +2102,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
       END IF
 
       END
-      SUBROUTINE CAT_SFNDL (CI, FI, MINRNG, MAXRNG, REJFLG, 
+      SUBROUTINE CAT_SFNDL (CI, FI, MINRNG, MAXRNG, REJFLG,
      :  SI, NUMSEL, SIR, NUMREJ, STATUS)
 *+
 *  Name:
@@ -2219,7 +2219,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -2270,7 +2270,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -2326,7 +2326,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -2414,7 +2414,7 @@ C    :                    i10, i10, i10)
 *                         selected rows, and, if required, the
 *                         rejected rows.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
 
                            IF (REJFLG) THEN
@@ -2422,7 +2422,7 @@ C    :                    i10, i10, i10)
 
                               IF (NUMREJ .GT. 0) THEN
                                  LRJFLG = .TRUE.
-                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER', 
+                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
                               ELSE
                                  LRJFLG = .FALSE.
@@ -2435,7 +2435,7 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       LRJFLG, NUMSEL, NUMREJ,
      :                       %VAL(CNF_PVAL(SELPTR)),
      :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
@@ -2518,7 +2518,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -2574,7 +2574,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -2624,7 +2624,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
       END IF
 
       END
-      SUBROUTINE CAT_SFNDR (CI, FI, MINRNG, MAXRNG, REJFLG, 
+      SUBROUTINE CAT_SFNDR (CI, FI, MINRNG, MAXRNG, REJFLG,
      :  SI, NUMSEL, SIR, NUMREJ, STATUS)
 *+
 *  Name:
@@ -2741,7 +2741,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -2792,7 +2792,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -2848,7 +2848,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -2936,7 +2936,7 @@ C    :                    i10, i10, i10)
 *                         selected rows, and, if required, the
 *                         rejected rows.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
 
                            IF (REJFLG) THEN
@@ -2944,7 +2944,7 @@ C    :                    i10, i10, i10)
 
                               IF (NUMREJ .GT. 0) THEN
                                  LRJFLG = .TRUE.
-                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER', 
+                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
                               ELSE
                                  LRJFLG = .FALSE.
@@ -2957,7 +2957,7 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       LRJFLG, NUMSEL, NUMREJ,
      :                       %VAL(CNF_PVAL(SELPTR)),
      :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
@@ -3040,7 +3040,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -3096,7 +3096,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID
@@ -3146,7 +3146,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
       END IF
 
       END
-      SUBROUTINE CAT_SFNDW (CI, FI, MINRNG, MAXRNG, REJFLG, 
+      SUBROUTINE CAT_SFNDW (CI, FI, MINRNG, MAXRNG, REJFLG,
      :  SI, NUMSEL, SIR, NUMREJ, STATUS)
 *+
 *  Name:
@@ -3263,7 +3263,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *         end if
 *       else
 *         Set the status.
-*         Report error; the given column identifier does not correspond 
+*         Report error; the given column identifier does not correspond
 *         to a column.
 *       end if
 *     else
@@ -3314,7 +3314,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
      :  SI,
      :  NUMSEL,
      :  SIR,
-     :  NUMREJ 
+     :  NUMREJ
 *  Status:
       INTEGER STATUS             ! Global status.
 *  External References:
@@ -3370,7 +3370,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
             END IF
 
 *
-*          Check that the column identifier actually corresponds to 
+*          Check that the column identifier actually corresponds to
 *          a column.
 
             CALL CAT_TIDTP (FI, FIDTYP, STATUS)
@@ -3458,7 +3458,7 @@ C    :                    i10, i10, i10)
 *                         selected rows, and, if required, the
 *                         rejected rows.
 
-                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
+                           CALL CAT1_CRTAR (NUMSEL, '_INTEGER',
      :                       SELPTR, STATUS)
 
                            IF (REJFLG) THEN
@@ -3466,7 +3466,7 @@ C    :                    i10, i10, i10)
 
                               IF (NUMREJ .GT. 0) THEN
                                  LRJFLG = .TRUE.
-                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER', 
+                                 CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
                               ELSE
                                  LRJFLG = .FALSE.
@@ -3479,7 +3479,7 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       LRJFLG, NUMSEL, NUMREJ,
      :                       %VAL(CNF_PVAL(SELPTR)),
      :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
@@ -3562,7 +3562,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 *                   The column is neither ascending nor descending; set
 *                   the status and report an error.  Note that the
 *                   message text varies depending on whether the column
-*                   is unsorted or an invalid sort code has been 
+*                   is unsorted or an invalid sort code has been
 *                   entered.
 
                      STATUS = CAT__INVSR
@@ -3618,7 +3618,7 @@ C                          call chr_putc ('maxrng', expr, lexpr)
 
 *
 *          The input catalogue identifier does not correspond to a
-*          catalogue or a selection.  Set the status and report an 
+*          catalogue or a selection.  Set the status and report an
 *          error.
 
             STATUS = CAT__INVID

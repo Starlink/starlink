@@ -8,7 +8,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SCULIB_SKYFUNCD(X, P, DR, M)
 
@@ -23,12 +23,12 @@
 *
 *     The  theoretical value of the skydip
 *     for the given input parameters is given by:
-*     
+*
 *         Jtheory = (1 - ETA_TEL) * J_TEL + ETA_TEL * J_ATM *
 *                   (1 - B * EXP (-TAU * Airmass(i))
 *
 *
-*           J_ATM = J_AMB * X_G 
+*           J_ATM = J_AMB * X_G
 *
 *             X_G = 1 + h1 * h2 * EXP (-TAU * Airmass(i) / X_Gconst)
 *             .         -------
@@ -36,16 +36,16 @@
 *
 *     The partial derivatives are:
 *
-*         d(F)/d(ETA_TEL) = DR (1) = (- J_TEL + J_ATM - B * J_ATM * 
+*         d(F)/d(ETA_TEL) = DR (1) = (- J_TEL + J_ATM - B * J_ATM *
 *     :                               EXP (-TAU * AIRMASS_IN))
 *
 *         d(F)/d(B) =  DR (2) = (- ETA_TEL * J_ATM * EXP (-TAU * AIRMASS_IN))
-*         
-*         dX_G/dTAU = ((-H1 * H2 * AIRMASS_IN) / (J_AMB * X_GCONST)) * 
+*
+*         dX_G/dTAU = ((-H1 * H2 * AIRMASS_IN) / (J_AMB * X_GCONST)) *
 *     :                EXP (-TAU * AIRMASS_IN / X_GCONST)
-*         
-*         dJ_ATM/dTAU = J_AMB * dX_G/dTAU 
-*         
+*
+*         dJ_ATM/dTAU = J_AMB * dX_G/dTAU
+*
 *         d(F)/d(TAU) = DR (3) = ETA_TEL * dJ_ATM/dTAU - B * ETA_TEL *
 *     :            EXP (-TAU * AIRMASS_IN) * (dJ_ATM/dTAU - J_ATM * AIRMASS_IN)
 *
@@ -84,15 +84,15 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
 *  Arguments Given:
-      INTEGER M      
-      REAL P(M)      
+      INTEGER M
+      REAL P(M)
       REAL X
 
 *  Arguments Returned:
@@ -117,7 +117,7 @@
       DOUBLE PRECISION J_AMB
       DOUBLE PRECISION J_TEL
       DOUBLE PRECISION AIRMASS_IN
-*.      
+*.
 
 
       ETA_TEL = DBLE(P(1))
@@ -129,25 +129,25 @@
       AIRMASS_IN = DBLE(X)
 
       IF (ABS(TAU * AIRMASS_IN) .LT. 20.0D0) THEN
-         X_G = 1.0D0 + (H1 * H2 / J_AMB) * 
+         X_G = 1.0D0 + (H1 * H2 / J_AMB) *
      :        EXP (-TAU * AIRMASS_IN / X_GCONST)
-         
-         J_ATM = J_AMB * X_G 
-         
-         DR (1) = (- J_TEL + J_ATM - B * J_ATM * 
+
+         J_ATM = J_AMB * X_G
+
+         DR (1) = (- J_TEL + J_ATM - B * J_ATM *
      :        EXP (-TAU * AIRMASS_IN))
          DR (2) = (- ETA_TEL * J_ATM * EXP (-TAU * AIRMASS_IN))
-         
-         DX_GDT = ((-H1 * H2 * AIRMASS_IN) / (J_AMB * X_GCONST)) * 
+
+         DX_GDT = ((-H1 * H2 * AIRMASS_IN) / (J_AMB * X_GCONST)) *
      :        EXP (-TAU * AIRMASS_IN / X_GCONST)
-         
-         DJ_ATMDT = J_AMB * DX_GDT 
-         
+
+         DJ_ATMDT = J_AMB * DX_GDT
+
          DR (3) = ETA_TEL * DJ_ATMDT - B * ETA_TEL *
      :        EXP (-TAU * AIRMASS_IN) * (DJ_ATMDT - J_ATM * AIRMASS_IN)
       ELSE
          J_ATM = J_AMB
-         
+
          DR (1) = (- J_TEL + J_ATM)
          DR (2) = 0.0D0
          DR (3) = 0.0D0

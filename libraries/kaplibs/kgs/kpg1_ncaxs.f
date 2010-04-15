@@ -38,7 +38,7 @@
 *       h) control the maximum number of major tick marks to prevent
 *          shrinkage,
 *       i) control the number of minor ticks per major tick;
-*       j) have either or both axes logarithmic; and 
+*       j) have either or both axes logarithmic; and
 *       k) plot with thick lines.
 
 *     Also the terminator of character strings is a dollar.  This is
@@ -49,7 +49,7 @@
 *     image displays and contour plots the zone will normally have the
 *     aspect ratio of the array (of data values that are to be
 *     presented) to get square pixels.
-*     
+*
 
 *  Arguments:
 *     XLOW = REAL (Given)
@@ -118,12 +118,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -224,7 +224,7 @@
       IF ( GRID( 3 ) .GE. 0.0 ) CALL AGGETF( 'GRID/BOTTOM.', OGRID( 3 ))
       IF ( GRID( 4 ) .GE. 0.0 ) CALL AGGETF( 'GRID/TOP.', OGRID( 4 ) )
 
-*  Set the current NCAR grid values. 
+*  Set the current NCAR grid values.
       IF ( GRID( 1 ) .GE. 0.0 ) CALL AGSETF( 'GRID/LEFT.', GRID( 1 ) )
       IF ( GRID( 2 ) .GE. 0.0 ) CALL AGSETF( 'GRID/RIGHT.', GRID( 2 ) )
       IF ( GRID( 3 ) .GE. 0.0 ) CALL AGSETF( 'GRID/BOTTOM.', GRID( 3 ) )
@@ -449,7 +449,7 @@
 
 
 *  Make the axis annotations larger.
-*  
+*
 *  First the numbers,
       CALL AGSETF( 'AXIS/LEFT/NUMERIC/WIDTH.', 0.025 )
       CALL AGSETF( 'AXIS/BOTTOM/NUMERIC/WIDTH.', 0.025 )

@@ -67,7 +67,7 @@
 
       DO WHILE (STRING(NEXT:NEXT).EQ.' ' .AND. NEXT.LE.ILS)
         NEXT = NEXT + 1
-      END DO       
+      END DO
 
 *  This can't take us past the end of the string? Well, actually it can,
 *  since we didn't measure the length of the string ourselves but inherited

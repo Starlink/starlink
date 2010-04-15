@@ -14,7 +14,7 @@
 
    This routine determines if the word is, or is a substring of, one
    of the words "adjust", "disable", "help", "menu", "plot", "exit",
-   "quit", "hyper", with arbitrarily mixed case, then it sets `class' to 
+   "quit", "hyper", with arbitrarily mixed case, then it sets `class' to
    be the single character which starts the word (except that "hyper"
    is returned as character `Y', and "exit" is returned as `q').
    Additionally, it recognises "yes", "+" and "/" as `y'.
@@ -78,7 +78,7 @@ F77_SUBROUTINE(ech_parse_option) (CHARACTER(line),
     };
     int ncommands = sizeof(commands)/sizeof(commands[0]);
 
-    /* It's simplest and most robust, if we simply copy the input line 
+    /* It's simplest and most robust, if we simply copy the input line
        to a local workspace once and for all.  This lets us mess
        around with it freely. */
     if (wssize == 0)		/* uninitialised */

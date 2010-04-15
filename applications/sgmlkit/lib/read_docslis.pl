@@ -11,8 +11,8 @@
 #     Read and parse the docs_lis file.
 #
 #  Description:
-#     This routine reads the docs_lis file which usually lives in 
-#     /star/docs.  It obviously relies heavily on that file having the 
+#     This routine reads the docs_lis file which usually lives in
+#     /star/docs.  It obviously relies heavily on that file having the
 #     right format.  It returns data structures containing the useful
 #     information from that file.
 #
@@ -23,13 +23,13 @@
 #  Return values:
 #     \%docs = ref to hash:
 #        The keys of the hash are document names in the form 'sun666' etc.
-#        The values are refs to a hash with keys 'version', 'date', 
-#        'authinit', 'pages' and 'title'.  As in the docs_lis file, 
+#        The values are refs to a hash with keys 'version', 'date',
+#        'authinit', 'pages' and 'title'.  As in the docs_lis file,
 #        author initials (authinit) entries in lower case indicate that
 #        the named author is first, rather than sole, author.
 #     \%authors = ref to hash:
-#        The keys of the hash are the author's initials, as per the 
-#        'authint' entries of the docs hash, in upper case.  The values 
+#        The keys of the hash are the author's initials, as per the
+#        'authint' entries of the docs hash, in upper case.  The values
 #        are refs to a hash with keys 'name' and 'site'.
 #-
       my( $docslisfile ) = @_;
@@ -46,7 +46,7 @@
                                ([A-Za-z]+) \s+
                                (\d+) \s+
                                (.*) $/x );
-               my( $num, $vers, $y, $m, $d, $init, $pg, $title ) 
+               my( $num, $vers, $y, $m, $d, $init, $pg, $title )
                   = ( $1, $2, $3, $4, $5, $6, $7, $8 );
 
 #  Normalize the format of document number.

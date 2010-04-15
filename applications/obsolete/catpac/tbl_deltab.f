@@ -1,7 +1,7 @@
       SUBROUTINE TBL_DELTAB( TBDSCR, STATUS)
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'

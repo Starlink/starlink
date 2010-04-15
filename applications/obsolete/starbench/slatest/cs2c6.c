@@ -5,7 +5,7 @@
 #include "sbmlib.h"
 #include "sbmmac.h"
 void sbmcs2c6(float qfoo,float qbar,float qbaz,float Q0,
-float qfobar,float q1,float q2[6]){double qfoobar,Q3;float 
+float qfobar,float q1,float q2[6]){double qfoobar,Q3;float
 q4,qfOBAz,qfoobaz,QQUUX,Q5,QFRED,qdog,qcat,QFISH;qfoobar=(
 double)qfoo;Q3=(double)qbar;q4=(float)sin(qfoobar);qfOBAz=(
 float)cos(qfoobar);qfoobaz=(float)sin(Q3);QQUUX=(float)cos(

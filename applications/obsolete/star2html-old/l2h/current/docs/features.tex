@@ -13,21 +13,21 @@
 \index{special considerations}\html{\\}\noindent
 This {section} describes major features available for processing
 documents using \latextohtml.
-Firstly the means whereby \latextohtml{} can be configured to produce output 
-for the \htmlref{different versions}{versions} of \texttt{HTML} 
+Firstly the means whereby \latextohtml{} can be configured to produce output
+for the \htmlref{different versions}{versions} of \texttt{HTML}
 is discussed\latex{ in Section~\ref{versions}}.
 Following this is a description\latex{, in Section~\ref{internat},}
-of how to \htmlref{use languages}{internat} other than English. 
+of how to \htmlref{use languages}{internat} other than English.
 The options available with the \htmlref{creation and reuse of images}{imgcon},
 are presented\latex{ in Section~\ref{imgcon}},
 for those situations where a textual representation is inadequate or undesirable.
 
 There are several strategies available for the \htmlref{presentation
-of mathematics}{maths} according to the desired version of \texttt{HTML}. 
-These are discussed in some detail\latex{, in Section~\ref{maths}}. 
+of mathematics}{maths} according to the desired version of \texttt{HTML}.
+These are discussed in some detail\latex{, in Section~\ref{maths}}.
 Environments such as \env{figure}, \env{table}, \env{tabular}
 and \env{minipage} have \htmlref{special features}{sec:figs}%
-\latex{ which are discussed in Section~\ref{sec:figs}}. 
+\latex{ which are discussed in Section~\ref{sec:figs}}.
 Other supported packages are \hyperref{listed}{listed in Table~}{}{styles}.
 
 
@@ -39,12 +39,12 @@ Other supported packages are \hyperref{listed}{listed in Table~}{}{styles}.
 \index{HTML@\texttt{HTML}!future version, 4.0 }%
 \html{\\}\noindent
 The Hypertext Mark-up Language (\texttt{HTML}) is an evolving standard,
-with different versions supporting different features.  
+with different versions supporting different features.
 In order to make your documents viewable by the widest possible audience,
 you should use the most advanced \texttt{HTML} version with widely-accepted usage.
 
 \cbversion{98.1}\begin{changebar}\cbversion{98.1}
-Currently the most advanced is \HTMLIV. 
+Currently the most advanced is \HTMLIV.
 However this has only recently become an officially recommended version.
 Not all of its features are fully implemented in popular browsers,
 and the level of usage is unclear.
@@ -64,34 +64,34 @@ This provides support for alignment of headings, images and text
 and alignment of rows and columns, variable sizes and colors for
 text and color or patterns for the background
 \end{changebar}
-as well as images, server-side image-maps, interactive forms, 
+as well as images, server-side image-maps, interactive forms,
 and the minimal typographic elements (bold, italic and teletype)
 that were supported already in \texttt{HTML} version 2.0\,.
-Furthermore, \texttt{HTML} version 3.2 
+Furthermore, \texttt{HTML} version 3.2
 adheres to the \htmladdnormallink{ISO--Latin--1}%
 {http://www.w3.org/hypertext/WWW/MarkUp/html-spec_9.html\#SEC9.7.2}
 (ISO--8879) character set.
 
 \medskip\noindent
-\textbf{Note: }Although many people still use old browsers 
-that implement only features available with \texttt{HTML} 2.0, 
-this is \emph{not} a good reason to limit translation of documents 
-to using only these effects. Most of the translation done by \latextohtml{} 
-will still give acceptable results on older browsers. 
-The deficiencies due to lack of super/subscripts, tables 
-and some alignment effects should eventually convince such users 
+\textbf{Note: }Although many people still use old browsers
+that implement only features available with \texttt{HTML} 2.0,
+this is \emph{not} a good reason to limit translation of documents
+to using only these effects. Most of the translation done by \latextohtml{}
+will still give acceptable results on older browsers.
+The deficiencies due to lack of super/subscripts, tables
+and some alignment effects should eventually convince such users
 to overcome the inertia, and update their browsers to later versions that
 correctly support these effects.
 
 \medskip\noindent
-Sometimes it is known that the audience, for which a specific document 
-is intended, has limited browser capabilities. 
+Sometimes it is known that the audience, for which a specific document
+is intended, has limited browser capabilities.
 Or perhaps special extended capabilities are known to be available.
 The \latextohtml{} translation may be customised to suit the
 available functionality.
 
 \medskip\noindent
-Other \texttt{HTML} versions and extensions 
+Other \texttt{HTML} versions and extensions
 supported by \latextohtml\ are described below.
 See the description of the \Cs{html\_version} command-line
 \hyperref[page]{option switch}{option switch, on page~}{}{cs_htmlversion}.
@@ -104,7 +104,7 @@ See the description of the \Cs{html\_version} command-line
 \item[Version 2.0\label{html20}]
 This provides only the functionality of the \texttt{HTML} 2.0 standard.
 There is little provision for aligning headings, paragraphs or images
-nor for super/sub-scripts to be generated. Images are created for tables 
+nor for super/sub-scripts to be generated. Images are created for tables
 and other environments that use \HTMLtag{TABLE} tags with \HTMLiii;
 e.g. \env{eqnarray} and \env{equation} with equation numbering.
 
@@ -118,20 +118,20 @@ e.g. \env{eqnarray} and \env{equation} with equation numbering.
 \item[i18n (internationalised fonts) \strikeout{Version 2.1}]
 This extension (formerly known as \texttt{HTML} version 2.1)
 provides extensions for \htmlref{internationalisation}{internat}.
-Most importantly, the default character set is no longer ISO--8859--1 
+Most importantly, the default character set is no longer ISO--8859--1
 but \htmladdnormallink{ISO--10646}%
 {http://ds.internic.net/internet-drafts/draft-ietf-html-i18n-05.txt} (Unicode).
 This is a 16-bit character set and can thus display a much larger set of characters.
-There are also provisions for bidirectional languages 
-(e.g. in Arabic the text is written from right to left, 
-but numerals from left to right), and provisions in \texttt{HTML} 
+There are also provisions for bidirectional languages
+(e.g. in Arabic the text is written from right to left,
+but numerals from left to right), and provisions in \texttt{HTML}
 to determine the character set and the language used.
 
-Not all of the symbols are available in \TeX, \latextohtml, 
-or any browser yet available.  
+Not all of the symbols are available in \TeX, \latextohtml,
+or any browser yet available.
 However the `\texttt{i18n}' extension to \latextohtml\ is in preparation
 for when such browsers do become available, and such characters
-will be required in Web-accessible documents. 
+will be required in Web-accessible documents.
 
 
 \index{HTML@\texttt{HTML}!Version 2.2, now `table' extension}%
@@ -160,8 +160,8 @@ available with later versions of these browsers.
 \item[\texttt{HTML} 3.0\label{html30}]
 This version of \texttt{HTML} was never accepted to become
 a recognised standard; perhaps because some of its models
-were ``too advanced'' at the time 
-(notably the \htmlref{\texttt{HTML-Math}}{math3} 
+were ``too advanced'' at the time
+(notably the \htmlref{\texttt{HTML-Math}}{math3}
 and the \htmlref{Table Model}{tables3}).
 The proposed \htmladdnormallink{\texttt{HTML} 3.0}%
 {http://www.w3.org/pub/WWW/MarkUp/html3/}
@@ -190,10 +190,10 @@ it is no longer supported by them.
 \cbversion{97.1}\begin{changebar}
 There has been a recent proposal for a Mathematical Markup Language
 (\htmladdnormallink{\texttt{MathML}}%
-{http://www.w3.org/pub/WWW/TR/WD-math-970515}) 
+{http://www.w3.org/pub/WWW/TR/WD-math-970515})
 from the W3C \htmladdnormallink{Math Working Group}%
-{http://www.w3.org/pub/WWW/Markup/Math/}. 
-This would suggest that the \texttt{HTML-Math} model is unlikely 
+{http://www.w3.org/pub/WWW/Markup/Math/}.
+This would suggest that the \texttt{HTML-Math} model is unlikely
 ever to be adopted; better things being expected in the near future
 using \texttt{MathML}.
 
@@ -209,9 +209,9 @@ mathematical equations and expressions.
 \subsection{Internationalisation\label{internat}}%
 %\section{Internationalisation\label{internat}}%
 \index{languages}\index{extensions!languages}\html{\\}%
-A special variable \fn{\$LANGUAGE\_TITLES} 
-in the initialisation or configuration files determines the language 
-in which some section titles will appear. For example setting it to 
+A special variable \fn{\$LANGUAGE\_TITLES}
+in the initialisation or configuration files determines the language
+in which some section titles will appear. For example setting it to
 \begin{quote}
 \begin{verbatim}
 $LANGUAGE_TITLES = 'french';
@@ -225,10 +225,10 @@ customary in that language.
 
 \index{languages!french}\index{languages!english}\index{languages!german}%
 \html{\\}%
-The only languages currently supported are 
+The only languages currently supported are
 \env{french}, \env{english} and \env{german}
 but it is trivial to add support for another language by creating a file
-in the \fn{versions/} subdirectory, 
+in the \fn{versions/} subdirectory,
 or by adding to the file \fn{latex2html.config}.
 As a guide, here is the entry for French titles:
 %begin{latexonly}
@@ -269,9 +269,9 @@ Also, the \texttt{\$GENERIC\_WORDS} are a list of short words to be excluded
 when filenames are specially requested to be created from section-headings.
 \end{changebar}
 In order to provide full support for another language you may also
-replace the navigation buttons which come with \latextohtml{} 
-(by default in English) with your own. 
-As long as the new buttons have the same file-names as the old ones, 
+replace the navigation buttons which come with \latextohtml{}
+(by default in English) with your own.
+As long as the new buttons have the same file-names as the old ones,
 there should not be a problem.
 
 
@@ -280,7 +280,7 @@ there should not be a problem.
 \index{extension!options}%
 \html{\\}%
 \cbversion{98.1}\begin{changebar}
-\latextohtml{} can interpret input using 8-bit fonts, 
+\latextohtml{} can interpret input using 8-bit fonts,
 provided it is told which font-encoding is being used.
 This can be done by appending an ``extension'' option
 to the \Cs{html\_version} command-line switch; e.g.
@@ -317,7 +317,7 @@ be output as the corresponding Unicode number.
 For example, e.g. the Polish {\L} would become \texttt{\&\#321;}.
 Otherwise the browser might render the character as \pounds %\mbox{\pounds},
 which is the character in the corresponding place for ISO-Latin1.
-The input encodings that are recognised are listed in 
+The input encodings that are recognised are listed in
 \hyperref{the following table}{Table~}{}{tab_encodings}.
 
 \begin{table}
@@ -343,7 +343,7 @@ override earlier ones.\html{\\}
 Only in rare circumstances should it be necessary to do this.
 For example, if the latter encoding does not define characters
 in certain places, but an earlier encoding does so, and these
-characters occur within the source. 
+characters occur within the source.
 In this case the \texttt{unicode} extension ought to be loaded also,
 else browsers may get quite confused about what to render.
 
@@ -364,17 +364,17 @@ the chosen font-encoding.
 This is a technique that is used with \IndicHTML, for presenting
 traditional Indic language scripts within Web pages.
 For these the \LaTeX\ source that is to be presented as an image
-needs special treatment using a ``pre-processor''. 
+needs special treatment using a ``pre-processor''.
 For the special styles defined in \IndicHTML, running the preprocessor
-is fully automated, so that it becomes just another step 
+is fully automated, so that it becomes just another step
 within the entire image-generation process.
 
 \medskip
 
-The technique of using images, can be used with \emph{any} font 
-whose glyphs can be typeset using \TeX{} or \LaTeX. 
+The technique of using images, can be used with \emph{any} font
+whose glyphs can be typeset using \TeX{} or \LaTeX.
 Using \TeX's \Lcs{font} command, a macro is defined to declare
-the special font required; 
+the special font required;
 e.g. for Cyrillic characters, using the Univ. of Washington font:
 %begin{latexonly}
 \begin{small}
@@ -426,13 +426,13 @@ Which is the most appropriate normally depends on the context,
 or importance of the mathematics within the entire document.
 What \latextohtml{} will produce depends upon
 \begin{enumerate}
-\item 
+\item
 the version of \texttt{HTML} requested;
 \item
 whether or not the special `\texttt{math}' \htmlref{extension}{} has been loaded;
 \item
 whether the \Cs{no\_math} \htmlref{command-line option}{nomath}
-has been specified, or (equivalently) the \fn{\$NO\_SIMPLE\_MATH} 
+has been specified, or (equivalently) the \fn{\$NO\_SIMPLE\_MATH}
 \htmlref{variable}{nomath} has been set in an initialisation file.
 \end{enumerate}
 %
@@ -455,7 +455,7 @@ uses entities and \HTMLtag{MATH} tags; e.g. for \texttt{HTML-Math}
  loaded & \Cs{no\_math} & textual representation where possible,
  with~images~of sub-expressions \\ \hline
 \end{tabular}
-\caption{Mathematics translation strategies, 
+\caption{Mathematics translation strategies,
  for \texttt{HTML} versions 3.0 and 3.2,\protect\newline
  using \protect\HTMLtag{SUP} and \protect\HTMLtag{SUB} tags
  and \protect\HTMLtag{TABLE}s}
@@ -466,28 +466,28 @@ uses entities and \HTMLtag{MATH} tags; e.g. for \texttt{HTML-Math}
 
 Using the \Cs{no\_math} switch is best for having a consistent
 style used for all mathematical expressions, whether inline or in displays.
-The images are of especially good quality when ``anti-aliasing'' 
+The images are of especially good quality when ``anti-aliasing''
 is being used (see \hyperref[page]{here}{page~}{}{cs_aaliastext}),
 provided the browser is set to have a light background colour.
 (When set against a gray or dark background, these images can become
 rather faint and hard to read.)
 
-The final strategy \hyperref{above}{in Table~}{}{mathconv3}, 
-using \Cs{no\_math} is the preferred method for good quality 
-mathematics with \texttt{HTML} version 3.2~. It combines the browser's 
+The final strategy \hyperref{above}{in Table~}{}{mathconv3},
+using \Cs{no\_math} is the preferred method for good quality
+mathematics with \texttt{HTML} version 3.2~. It combines the browser's
 built-in fonts with the best quality images, when needed.
 To obtain it use the command-line option switches:
 \begin{quote}
 \texttt{ -no\_math -html\_version 3.2,math }
 \end{quote}
-This is what was used when creating\latex{ the \texttt{HTML} version of} 
+This is what was used when creating\latex{ the \texttt{HTML} version of}
 this manual. For a more detailed discussion of processing mathematics
-using this strategy see the online document by the present author, 
+using this strategy see the online document by the present author,
 entitled \htmladdnormallinkfoot{``Mathematics with \latextohtml''}%
 {http://www-math.mpce.mq.edu.au/texdev/LaTeX2HTML/mathdocs/}.
 Examples \htmlref{below}{ex-aalias} show how to generate an image
 of a whole environment, even with these options in force.
- 
+
 \bigskip
 \noindent
 Since the \texttt{HTML} 2.0 standard does not include
@@ -518,10 +518,10 @@ for \texttt{HTML} version 2.0\label{mathconv2}}
 \index{equations!right-justified}\html{\\}%
 
 \noindent
-Here are some examples of mathematical expressions and environments 
-processed by \latextohtml{} using different strategies. 
-They are automatically numbered \dots 
-\begin{equation}\label{eq:demo} 
+Here are some examples of mathematical expressions and environments
+processed by \latextohtml{} using different strategies.
+They are automatically numbered \dots
+\begin{equation}\label{eq:demo}
  \Phi_{l+1,m,n} = \Bigl(\Phi+h\frac{\partial\Phi}{\partial x} +
  \frac{1}{2}h^2\frac{\partial^2\Phi}{\partial x^2} +
  \frac{1}{6}h^3\frac{\partial^3\Phi}{\partial x^3} + \,\ldots\,\Bigr)_{l,m,n}
@@ -555,8 +555,8 @@ first equation and the subscripts at the end of the second equation.
 By inserting an \verb|\htmlimage{}| command into a \env{math},
 \env{equation} or \env{displaymath} environment, a single image
 will be created for the whole environment. For an \env{eqnarray}
-environment, this will lead to having a single separate image 
-for each of the aligned portions. 
+environment, this will lead to having a single separate image
+for each of the aligned portions.
 The argument to \Lc{htmlimage} need not be empty, but may contain
 information which is used to affect characteristics of the resulting
 image. An example of how this is used is given \htmlref{below}{ex:aalias},
@@ -568,17 +568,17 @@ and a fuller discussion of the allowable options is given in
 \paragraph*{Scale-factors for Mathematics.\label{mathscales}}
 %
 When an image is to be made of a mathematical formula or expression,
-it is generally made at a larger size 
+it is generally made at a larger size
 than is normally required on a printed page.
 This is to compensate for the reduced resolution of a computer screen
-compared with laser-print.  
+compared with laser-print.
 The amount of this scaling is given by the
 value of a configuration variable \fn{\$MATH\_SCALE\_FACTOR},
-by default set to 1.6 in \fn{latex2html.config}. 
+by default set to 1.6 in \fn{latex2html.config}.
 \cbversion{97.1}\begin{changebar}
 A further variable \fn{\$DISP\_SCALE\_FACTOR} is used with
 `displayed math' equations and formulas.
-This value multiplies the \fn{\$MATH\_SCALE\_FACTOR} 
+This value multiplies the \fn{\$MATH\_SCALE\_FACTOR}
 to give the actual scaling to be used.
 The main purpose of this extra scaling is to allow some clarity in
 super/subscripts etc.
@@ -588,23 +588,23 @@ super/subscripts etc.
 \index{anti-aliasing!comparison}%
 \paragraph*{Anti-aliased Images.\label{ex:aalias}}
 \hyperref{Here are}{Figure~}{ shows}{eq:pics} the same equations
-as \htmlref{previously}{eq:demo}, this time as images of the 
-complete contents of the \env{equation} environment, 
+as \htmlref{previously}{eq:demo}, this time as images of the
+complete contents of the \env{equation} environment,
 and complete aligned parts of rows in an \env{eqnarray}.
 \begin{latexonly}
 These are images, as they would appear if the \texttt{HTML} page
 were to be printed from the browser. A scaling of 60\% has been
-applied to counteract the combined effects of the \fn{\$MATH\_SCALE\_FACTOR} 
-of 1.4 and \fn{\$DISP\_SCALE\_FACTOR} of 1.2, 
-used for the \texttt{HTML} version of this manual. 
+applied to counteract the combined effects of the \fn{\$MATH\_SCALE\_FACTOR}
+of 1.4 and \fn{\$DISP\_SCALE\_FACTOR} of 1.2,
+used for the \texttt{HTML} version of this manual.
 \end{latexonly}
-For a comparison, the second group of images use anti-aliasing effects, 
+For a comparison, the second group of images use anti-aliasing effects,
 whereas the first image does not; a 600\,dpi printing is probably necessary
 to appreciate the difference in quality. Compare these images with those in
 \hyperref{a later section}{Section~}{}{printqual}.
 
 \smallskip\noindent\index{anti-aliasing!requires@requires \appl{Ghostscript} 4.03}
-\textbf{Note: }To generate anti-aliased images using \appl{Ghostscript} 
+\textbf{Note: }To generate anti-aliased images using \appl{Ghostscript}
 requires version 4.03 or later.
 
 \begin{figure}[hb]
@@ -642,8 +642,8 @@ requires version 4.03 or later.
 \end{figure}
 
 \noindent
-These images of the whole environment were created 
-using the \Lc{htmlimage} command, to suppress the extended parsing 
+These images of the whole environment were created
+using the \Lc{htmlimage} command, to suppress the extended parsing
 that usually occurs when the `\texttt{math}' extension is loaded; viz.
 %
 %begin{latexonly}
@@ -665,8 +665,8 @@ that usually occurs when the `\texttt{math}' extension is loaded; viz.
 %begin{latexonly}
 \end{small}
 %end{latexonly}
-Further aspects of the options available when generating images 
-are discussed in \htmlref{the next section}{imgcon}, in particular 
+Further aspects of the options available when generating images
+are discussed in \htmlref{the next section}{imgcon}, in particular
 with regard to the quality of \htmlref{printed images}{printqual}.
 
 
@@ -675,14 +675,14 @@ with regard to the quality of \htmlref{printed images}{printqual}.
 \paragraph*{The \Lc{mbox} command.}
 \cbversion{97.1}\begin{changebar}
 Another way to force an image to be created of a mathematical expression,
-when global settings are not such as to do this anyway, 
+when global settings are not such as to do this anyway,
 is via the \Lc{mbox} command having math delimiters within its argument.
 
-Normally \Lc{mbox} is used to set a piece of ordinary text within a 
-mathematics environment. It is not usual to have math delimiters 
-\texttt{\$...\$} or \Lc{(}...\Lc{)} within the argument of an \Lc{mbox}. 
-Whereas earlier versions of \latextohtml{} simply ignored the \Lc{mbox} 
-command (treating its argument as normal text), 
+Normally \Lc{mbox} is used to set a piece of ordinary text within a
+mathematics environment. It is not usual to have math delimiters
+\texttt{\$...\$} or \Lc{(}...\Lc{)} within the argument of an \Lc{mbox}.
+Whereas earlier versions of \latextohtml{} simply ignored the \Lc{mbox}
+command (treating its argument as normal text),
 the presence of such delimiters now results in an image being
 generated of the \emph{entire contents} of the \Lc{mbox}.
 It is not necessary for there to be any actual mathematics inside
@@ -695,7 +695,7 @@ will cause an image to be created of the given text.
 \index{parbox@\Lc{parbox} command!generates an image}%
 \paragraph*{The \Lc{parbox} command.}
 \cbversion{97.1}\begin{changebar}
-The \Lc{parbox[}\Meta{align}\verb|]{|\Meta{width}\verb|}{|\Meta{text}\verb|}| 
+The \Lc{parbox[}\Meta{align}\verb|]{|\Meta{width}\verb|}{|\Meta{text}\verb|}|
 command also generates an image of its contents,
 except when used within a \env{tabular} environment, or other
 similar table-making environment.
@@ -715,22 +715,22 @@ alignment and contents, resulting in an image.
 \cbversion{96.1}\begin{changebar}%
 %
 If you need \texttt{HTML} 2.0 compatible Web pages,
-and have a document with a great many displayed equations, 
-then you might try using the \env{heqn} package.  
+and have a document with a great many displayed equations,
+then you might try using the \env{heqn} package.
 Inclusion of the \fn{heqn.sty} file has absolutely
-no effect on the printed version of the article, 
+no effect on the printed version of the article,
 but it does change the way in which \latextohtml{} translates
-displayed equations and equation arrays.  
+displayed equations and equation arrays.
 It causes the equation numbers of the \env{equation}
-environment to be moved outside of the images themselves, 
-so that they become order-independent and hence recyclable.  
+environment to be moved outside of the images themselves,
+so that they become order-independent and hence recyclable.
 Images that result from the \env{eqnarray} environment are also recyclable,
-so long as their equation numbers remain unchanged from the previous run.  
+so long as their equation numbers remain unchanged from the previous run.
 
 \index{nonumber@\Lc{nonumber}}%
 \index{package!html@\env{html}}%
 \index{html@\env{html} package}\html{\\}%
-The \Lc{nonumber} command is recognised 
+The \Lc{nonumber} command is recognised
 in each line of the equation array, to suppress the equation number.
 A side-effect of this approach is that equation numbers will
 appear on the left side of the page.
@@ -753,19 +753,19 @@ override some of the improved functionality already available.
 \tableofchildlinks*\htmlrule
 %
 \noindent
-\latextohtml{} converts equations, special accents, external \PS\ 
-files, and \LaTeX{}  environments it cannot directly translate into 
+\latextohtml{} converts equations, special accents, external \PS\
+files, and \LaTeX{}  environments it cannot directly translate into
 inlined images. This section describes how it is possible to control
 the final appearance of such images. For purposes of discussion \dots
 \begin{itemize}
 \item
 ``small images'' \index{images!small images}\html{\\}%
 refers to inline math expressions, special accents and
-any other \LaTeX{} command which causes an image to be generated; while \dots 
+any other \LaTeX{} command which causes an image to be generated; while \dots
 \item
 ``figures'' \index{images!figures}\html{\\}%
-applies to image-generating \LaTeX{} environments 
-(e.g. \env{makeimage}, \env{figure}, \env{table} (with \texttt{HTML} 2.0), 
+applies to image-generating \LaTeX{} environments
+(e.g. \env{makeimage}, \env{figure}, \env{table} (with \texttt{HTML} 2.0),
  and displayed math environments when required to generate images, etc.).
 \end{itemize}
 
@@ -775,28 +775,28 @@ applies to image-generating \LaTeX{} environments
 \index{images!scale-factor, default 1.6}\html{\\}%
 \noindent
 The size of all ``small images'' depends on a configuration variable
-\fn{\$MATH\_SCALE\_FACTOR} which specifies how much to enlarge or 
-reduce them in relation to their original size in the \PS\  
-version of the document. 
-For example a scale-factor of 0.5 will make all images half as big, 
+\fn{\$MATH\_SCALE\_FACTOR} which specifies how much to enlarge or
+reduce them in relation to their original size in the \PS\
+version of the document.
+For example a scale-factor of 0.5 will make all images half as big,
 while a scale-factor of 2 will make them twice as big.
-Larger scale-factors result in longer processing times and larger 
-intermediate image files. A scale-factor will only be effective 
-if it is greater than 0. 
+Larger scale-factors result in longer processing times and larger
+intermediate image files. A scale-factor will only be effective
+if it is greater than 0.
 The configuration variable \fn{\$FIGURE\_SCALE\_FACTOR} performs
-a similar function for ``figures''. 
+a similar function for ``figures''.
 Both of these variables are initially set to have value 1.6.
 
 \cbversion{97.1}\begin{changebar}
 A further variable \fn{\$DISP\_SCALE\_FACTOR} is used with
 `displayed math' equations and formulas;
-this value multiplies the \fn{\$MATH\_SCALE\_FACTOR} 
+this value multiplies the \fn{\$MATH\_SCALE\_FACTOR}
 to give the actual scaling used.
 With the improved clarity of anti-aliased images, a scaling of 1.6
 may be a little excessive for inline images.
 Accordingly this manual actually uses values of 1.4 and 1.2 respectively,
 for \fn{\$MATH\_SCALE\_FACTOR} and \fn{\$DISP\_SCALE\_FACTOR}.
-These go well with the browser's text-font set at 14\,pt. 
+These go well with the browser's text-font set at 14\,pt.
 The next larger size of 17\,pt is then used for the \HTMLtag{LARGE} tags
 in displayed equations.
 
@@ -805,10 +805,10 @@ in displayed equations.
 \index{extra scaling of images}\html{\\}%
 
 A further variable \fn{\$EXTRA\_IMAGE\_SCALE} allows images to be created
-at a larger size than intended for display. 
-The browser itself scales them down to the intended size, 
-but has the extra information available for a better quality print. 
-This feature is also available with single images. It is discussed, 
+at a larger size than intended for display.
+The browser itself scales them down to the intended size,
+but has the extra information available for a better quality print.
+This feature is also available with single images. It is discussed,
 with examples, \hyperref{on the next page}{in Section~}{}{printqual}.
 \end{changebar}
 
@@ -818,7 +818,7 @@ with examples, \hyperref{on the next page}{in Section~}{}{printqual}.
 \index{figures!fine control}%
 \paragraph*{\Lc{htmlimage\char123}\Meta{options}\texttt{\char125}\label{htmlimage}}
 %
-For finer control, several parameters affecting the conversion 
+For finer control, several parameters affecting the conversion
 of a single image can be controlled
 with the command \Lc{htmlimage}, which is defined in \fn{html.sty}.
 \cbversion{97.1}\begin{changebar}
@@ -839,7 +839,7 @@ mathematics images in \hyperref{the previous section}{Figure~}{}{eq:pics}.
 
 \medskip\noindent
 The \Meta{options} argument is a string separated by commas.
-\index{images!options}\html{\\}% 
+\index{images!options}\html{\\}%
 Allowable options are:
 %
 \begin{itemize}
@@ -853,27 +853,27 @@ allows control over the size of the final image.
 \index{images!inlined by default}%
 \index{images!hypertext link}%
 \item \texttt{external}\\
-will cause the image not to be inlined; 
-instead it will be accessible via a hyperlink. 
+will cause the image not to be inlined;
+instead it will be accessible via a hyperlink.
 
 \index{thumbnail}\index{images!thumbnail}%
 \index{thumbnail!implies external}%
 \index{thumbnail!ignores scale-factors}%
 \label{thumbnail}%
 \item \texttt{thumbnail=}\Meta{scale-factor}\\
-will cause a small inlined image to be placed in the caption. 
+will cause a small inlined image to be placed in the caption.
 The size of the thumbnail depends on the \Meta{scale-factor},
 as a factor of the `natural size' of the image, ignoring
 any \fn{\$FIGURE\_SCALE\_FACTOR} or \fn{\$MATH\_SCALE\_FACTOR}, etc.
-which may be applicable to the full-sized version of the image. 
-Use of the `\texttt{thumbnail=}' option implies 
-the `\texttt{external}' option. 
+which may be applicable to the full-sized version of the image.
+Use of the `\texttt{thumbnail=}' option implies
+the `\texttt{external}' option.
 
 \index{images!image-map}%
 \index{images!server-side image-map}%
 \cbversion{96.1}\begin{changebar}%
 \item \texttt{map=}\Meta{server-side image-map URL}\\
-specifies that the image is to be made into an 
+specifies that the image is to be made into an
 \htmladdnormallink{active image-map}%
 {http://wintermute.ncsa.uiuc.edu:8080/map-tutorial/image-maps.html}.
 (See \hyperref{another section}{Section~}{}{ImageMaps} for more information.)
@@ -902,7 +902,7 @@ This will rotate the image clockwise by $90^\circ$.
 \item `\texttt{rotate270}' or `\texttt{r270}'~
 This will rotate the image counterclockwise by $90^\circ$.
 %
-\item `\texttt{leftright}'~ 
+\item `\texttt{leftright}'~
 This will flip the image around a vertical axis of rotation.
 %
 \item `\texttt{topbottom}'~
@@ -912,16 +912,16 @@ This will flip the image around a horizontal axis of rotation.
 \index{images!alignment}\index{equations!alignment}%
 \index{HTML@\texttt{HTML}!Version 3.0}%
 \item \texttt{align=}\Meta{alignment}\\
-specifies how the \env{figure} will be aligned.  
-The choices are:  
-`\texttt{top}', `\texttt{bottom}', `\texttt{middle}', `\texttt{left}', 
+specifies how the \env{figure} will be aligned.
+The choices are:
+`\texttt{top}', `\texttt{bottom}', `\texttt{middle}', `\texttt{left}',
 `\texttt{right}' and `\texttt{center}'.
 
 The `\texttt{middle}' option specifies that the image is to be
-left-justified in the line, but centered vertically.  
-The `\texttt{center}' option specifies that it should also 
-be centered horizontally. 
-This option is valid only if the \texttt{HTML} version 
+left-justified in the line, but centered vertically.
+The `\texttt{center}' option specifies that it should also
+be centered horizontally.
+This option is valid only if the \texttt{HTML} version
 is \texttt{3.0} or higher.
 The default alignment is `\texttt{bottom}'.%
 \end{changebar}
@@ -943,21 +943,21 @@ regardless of the normal behaviour for similar images.
 
 \index{images!extra scaling}%
 \item \texttt{extrascale=}\Meta{scale-factor}\\
-is used mainly used with a \Meta{scale-factor} of 1.5 or 2, when it is 
-important to get printed versions of the completed \texttt{HTML} pages. 
-The image is created scaled by the amount specified, but it is embedded 
+is used mainly used with a \Meta{scale-factor} of 1.5 or 2, when it is
+important to get printed versions of the completed \texttt{HTML} pages.
+The image is created scaled by the amount specified, but it is embedded
 in the \texttt{HTML} page with attributes to the \HTMLtag{IMG} of
-\texttt{HEIGHT=...} and \texttt{WIDTH=...}, 
-indicating the \emph{unscaled} size. 
+\texttt{HEIGHT=...} and \texttt{WIDTH=...},
+indicating the \emph{unscaled} size.
 A browser is supposed to display the image at the requested size
-by scaling the actual image to fit, 
+by scaling the actual image to fit,
 effectively imposing its own anti-aliasing.
-Some examples of this effect are show 
+Some examples of this effect are show
 \hyperref{here}{later, in Section~}{}{printqual}.
 This effect can be applied to all images in a document by setting
 the \fn{\$EXTRA\_IMAGE\_SCALE} \htmlref{variable}{ximagescale}.
-However it may be desirable to also turn off ``anti-aliasing''\index{anti-aliasing}, 
-as these effects serve similar purposes but need not work well together. 
+However it may be desirable to also turn off ``anti-aliasing''\index{anti-aliasing},
+as these effects serve similar purposes but need not work well together.
 Furthermore different browsers may give results of different quality.
 It may be necessary to experiment a little,
 in order to find the combination that works best at your site.
@@ -976,18 +976,18 @@ to become a percentage of the browser window's width,
 or of \Lc{vsize} or \Lc{textheight} for a percentage height.
 
 \noindent
-\textbf{Note:} images whose sizes are modified in this way may not 
-be acceptable for 
-\hyperref{image-recycling}{image-recycling, (see page~}{)}{recycling}. 
-Instead they may need to be generated afresh on each run of \latextohtml{} 
+\textbf{Note:} images whose sizes are modified in this way may not
+be acceptable for
+\hyperref{image-recycling}{image-recycling, (see page~}{)}{recycling}.
+Instead they may need to be generated afresh on each run of \latextohtml{}
 through the same source document.
 %
 \end{changebar}
 \end{itemize}
 
 \medskip\noindent
-In order to be effective the \Lc{htmlimage} command 
-and its options must be placed \emph{inside the environment} 
+In order to be effective the \Lc{htmlimage} command
+and its options must be placed \emph{inside the environment}
 on which it will operate.
 Environments for alignment and changing the font size do not
 generate images of their contents. Any \Lc{htmlimage}
@@ -997,14 +997,14 @@ but does not apply to a \env{minipage}.
 
 When the \Lc{htmlimage} command occurs in an inappropriate
 place, the following message is printed among the warnings
-at the end of processing. 
-The actual command is shown, with its argument; 
+at the end of processing.
+The actual command is shown, with its argument;
 also the environment name and identifying number, if there is one.
 %
 \begin{quote}
 \begin{small}
 \begin{verbatim}
-The command "\htmlimage" is only effective inside an environment 
+The command "\htmlimage" is only effective inside an environment
 which may generate an image (e.g. "{figure}", "{equation}")
  center92: \htmlimage{ ... }
 \end{verbatim}
@@ -1018,8 +1018,8 @@ which may generate an image (e.g. "{figure}", "{equation}")
 \index{thumbnail}\html{\\}%
 The effect of the \LaTeX{}  commands below can be seen in the
 \htmlref{thumbnail sketch of Figure}{fig:example} \ref{fig:example}.
-A~5\,pt border has also been added around the thumbnail, 
-using \Lc{htmlborder} \htmlref{command}{htmlborder}; 
+A~5\,pt border has also been added around the thumbnail,
+using \Lc{htmlborder} \htmlref{command}{htmlborder};
 this gives a pseudo-3D effect in some browsers.
 %begin{latexonly}
 \begin{small}
@@ -1031,7 +1031,7 @@ this gives a pseudo-3D effect in some browsers.
     \centering\includegraphics[width=5in]{psfiles/figure.ps}
     \latex{\addtocounter{footnote}{-1}}
     \caption{A sample figure showing part of a page generated by
-       \latextohtml{} containing a customised navigation panel 
+       \latextohtml{} containing a customised navigation panel
        (from the \htmladdnormallink
         {CSEP project\latex{\protect\footnotemark}}%
         {http://csep1.phy.ornl.gov/csep.html}).}
@@ -1046,14 +1046,14 @@ this gives a pseudo-3D effect in some browsers.
 \index{figures}%
 \index{figure@\env{figure} environment}%
 \index{environment!figure@\env{figure}}%
-\index{Computer~Science~Education~Project!CSEP}% 
+\index{Computer~Science~Education~Project!CSEP}%
 \begin{figure}[hbt]
     \htmlimage{thumbnail=0.5}
     \htmlborder{5}
     \centering\includegraphics[width=5in]{psfiles/figure.ps}
     \latex{\addtocounter{footnote}{-1}}
     \caption{A sample figure showing part of a page generated by
-       \protect\latextohtml{} containing a customised navigation panel 
+       \protect\latextohtml{} containing a customised navigation panel
        (from the \htmladdnormallink
         {CSEP project\latex{\protect\footnotemark}}%
         {http://csep1.phy.ornl.gov/csep.html}).}
@@ -1066,8 +1066,8 @@ this gives a pseudo-3D effect in some browsers.
 \noindent
 The \Lc{htmlimage} command is also often useful to cancel-out the
 effect of the configuration variable \fn{\$FIGURE\_SCALE\_FACTOR}.
-For example to avoid resizing a color screen snap despite 
-the value of \fn{\$FIGURE\_SCALE\_FACTOR} it is possible to 
+For example to avoid resizing a color screen snap despite
+the value of \fn{\$FIGURE\_SCALE\_FACTOR} it is possible to
 use \verb|\htmlimage{scale=0}|\,.
 
 
@@ -1101,16 +1101,16 @@ and \htmlref{image-maps}{ImageMaps}.
 Furthermore, most images can also be reused.  The only
 exception are those which are \emph{order-sensitive},
 meaning that their content depends upon their location.
-Examples of order-sensitive images are \env{equation} 
-and \env{eqnarray} environments, 
+Examples of order-sensitive images are \env{equation}
+and \env{eqnarray} environments,
 when \Cs{html\_version 2.0} has been specified;
 this is because their figure numbers are part of the image.
 
 \index{figures!captions}%
 \index{tables!captions}\html{\\}%
 
-Figures and tables with captions, on the other hand, 
-are order-insensitive because the figure numbers 
+Figures and tables with captions, on the other hand,
+are order-insensitive because the figure numbers
 are not part of the image itself.%
 \end{changebar}
 \cbversion{97.1}\begin{changebar}
@@ -1127,10 +1127,10 @@ So most images of mathematical formulas can be reused also.%
 %
 \begin{htmlonly}
 Since it is often desirable to get a good quality print on paper
-directly from the browser, \hyperref{here are}{Figure~}{ shows}{eq:pics15} 
+directly from the browser, \hyperref{here are}{Figure~}{ shows}{eq:pics15}
 the same equations as \hyperref[page]{earlier}{on page~}{}{eq:pics}.
 This time the `\texttt{extrascale=}' option has been used with a value of 1.5\,.
-More than twice the number of pixels are available, 
+More than twice the number of pixels are available,
 for a cost of approximately 1.7 times the disk-space\footnote{This figure
 varies with the graphics format used, and the complexity of the actual image.}.
 
@@ -1182,17 +1182,17 @@ for a cost of approximately 1.7 times the disk-space\footnote{This figure
 varies with the graphics format used, and the complexity of the actual image.}.
 \end{latexonly}
 \noindent
-On-screen these images appear slightly blurred or indistinct. 
+On-screen these images appear slightly blurred or indistinct.
 However there can be marked improvement in the print quality,
-when printed from some browsers; others may show no improvement at all. 
+when printed from some browsers; others may show no improvement at all.
 The ``anti-aliasing'' helps on-screen. In the printed version
-jagged edges are indeed softened, but leave an overall fuzziness. 
+jagged edges are indeed softened, but leave an overall fuzziness.
 
 
-\hyperref{Here are}{Figure~}{ shows}{eq:pics2} 
+\hyperref{Here are}{Figure~}{ shows}{eq:pics2}
 the same equations yet again; this time with `\texttt{extrascale=2.0}'.
 Now there are 4~times the pixels at a cost of roughly 2.45~times the disk space.
-Compared with the previous images (having 1.5~times extra-scaling), 
+Compared with the previous images (having 1.5~times extra-scaling),
 there is little difference in the on-screen images.
 Printing at 300\,dpi shows only a marginal improvement;
 but at 600\,dpi the results are most satisfying, especially when
@@ -1239,9 +1239,9 @@ scaled to be comparable with normal 10\,pt type\latex{, as here}.
 \subsection{Figures, Tables and Arbitrary Images\label{sec:figs}}
 %\section{Figures, Tables and Arbitrary Images\label{sec:figs}}
 \index{tables}%
-\index{environment!arbitrary}\index{arbitrary environments}\html{\\}% 
+\index{environment!arbitrary}\index{arbitrary environments}\html{\\}%
 This section is to explain how the translator handles figures, tables
-and other environments. 
+and other environments.
 Compare the paper with the online version.
 
 When the common version of \texttt{HTML} was only 2.0, then almost all
@@ -1253,9 +1253,9 @@ contents placed within \HTMLtag{TABLE} tags; any caption is placed
 as its \HTMLtag{CAPTION}.
 
 For consistency with former practice, the contents of the \env{figure}
-environment are usually represented by generating an image. 
+environment are usually represented by generating an image.
 This is frequently exactly what is required; but not always.
-\hyperref[page]{In another section}{On page~}{}{makeimage} it is 
+\hyperref[page]{In another section}{On page~}{}{makeimage} it is
 described how to use the \env{makeimage} environment,
 defined in the \fn{html.sty} package, to determine just which parts (if any)
 of a \env{figure} environment's contents should be made into images,
@@ -1277,7 +1277,7 @@ Here is a simple example, from the \LaTeX{} \htmlcite{`blue book'}{lamp:latex}.
 \begin{tabular}{||l|lr||}   \hline
 gnats   &       gram    &       \$13.65  \\ \cline{2-3}
         &       each    &        .01    \\ \hline
-gnu     &       stuffed &        92.50  
+gnu     &       stuffed &        92.50
                 \\  \cline{1-1} \cline{3-3}
 emur    &               &       33.33   \\ \hline
 armadillo       & frozen        &       8.99 \\ \hline
@@ -1300,7 +1300,7 @@ table, as follows:
 \begin{tabular}{||l|lr||}   \hline
 gnats   &       gram    &       \$13.65  \\ \cline{2-3}
         &       each    &        .01    \\ \hline
-gnu     &       stuffed &        92.50  
+gnu     &       stuffed &        92.50
                 \\  \cline{1-1} \cline{3-3}
 emur    &               &       33.33   \\ \hline
 armadillo       & frozen        &       8.99 \\ \hline
@@ -1334,9 +1334,9 @@ the screen-shot was taken.
 \paragraph*{\env{minipage} environments.}
 
 The special feature of \env{minipage} environments is in the
-way \Lc{footnote} and \Lc{footnotemark} commands are handled. 
+way \Lc{footnote} and \Lc{footnotemark} commands are handled.
 These are numbered separately from the rest of the footnotes
-throughout the document, and the notes themselves are collected together 
+throughout the document, and the notes themselves are collected together
 to be displayed at the end of the \env{minipage}'s contents.
 
 \medskip
@@ -1356,7 +1356,7 @@ ILU       & Incomplete LU factorization\footnotemark[2] \\ \hline
 
 \bigskip\noindent
 The code used for this example was as follows\footnote{%
-Thanks to John Turner \Email{turner@lanl.gov} for this example, 
+Thanks to John Turner \Email{turner@lanl.gov} for this example,
 which was used in developing
 code to handle \env{minipage} environments correctly.}
 %begin{latexonly}
@@ -1388,8 +1388,8 @@ This is due to a setting designed to enhance anti-aliasing of text
 within images; e.g. for mathematics.
 To alleviate this possible problem, the \Cs{white} command-line option
 can be used, to ensure a white background for images of \env{figure}
-environments. 
-Alternatively, set the \fn{\$WHITE\_BACKGROUND} 
+environments.
+Alternatively, set the \fn{\$WHITE\_BACKGROUND}
 \hyperref{variable}{variable (see section }{)}{cs_white}.
 
 
@@ -1397,42 +1397,42 @@ Alternatively, set the \fn{\$WHITE\_BACKGROUND}
 \tableofchildlinks*
 \index{document class}%
 \cbversion{97.1b}\begin{changebar}
-In general the standard \LaTeX{} document-classes: 
+In general the standard \LaTeX{} document-classes:
 \texttt{article}, \texttt{report}, \texttt{book}, \texttt{letter}, \texttt{slides}
-are translated by \latextohtml{} in the same way. 
+are translated by \latextohtml{} in the same way.
 Currently the only real difference is with the display of section-numbering,
 when the \htmlref{\Cs{show\_section\_numbers}}{showsecnums} switch is used,
-and when numbering of \htmlref{theorem-like environments}{theoremenvs} 
+and when numbering of \htmlref{theorem-like environments}{theoremenvs}
 is linked to section-numbering.
 
 \index{document class!loads file@loads a \texttt{.perl} file}%
 \index{document class!options}%
 
 These differences are achieved using a mechanism that automatically loads a file:
-\fn{article.perl}, \fn{report.perl}, \fn{book.perl}, \fn{letter.perl}, \fn{slides.perl} 
-according to the requested document-class. 
+\fn{article.perl}, \fn{report.perl}, \fn{book.perl}, \fn{letter.perl}, \fn{slides.perl}
+according to the requested document-class.
 These files contain \Perl{} code and are located in the \fn{styles/} directory.
 If a file of the same name exists in the working directory, this will be loaded
 instead.
 
-Typically such files \texttt{\Meta{class}.perl} contain code to define subroutines 
-or sets values for variables that will affect how certain translations are performed. 
+Typically such files \texttt{\Meta{class}.perl} contain code to define subroutines
+or sets values for variables that will affect how certain translations are performed.
 There can be code that is executed only when specific class-options are specified
 along with the chosen document-class.
 For example, the \fn{foils.perl} implementation of \FoilTeX's \env{foils} class
 defines code create a new sub-section for each `foil'.
-It also has code which allows \latextohtml{} to ignore those of \FoilTeX's special 
+It also has code which allows \latextohtml{} to ignore those of \FoilTeX's special
 formatting commands that have no relevance when constructing an \texttt{HTML} page.
 
-\medskip 
+\medskip
 \index{document class!loads file}%
 \index{class-option!loads file}%
 
 Any options given on the \Lc{documentclass} or \Lc{documentstyle} line
-may also cause a file containing \Perl{} code to be loaded. 
+may also cause a file containing \Perl{} code to be loaded.
 Such a file is named \texttt{\Meta{option}.perl} for the appropriate \Meta{option}.
 When such a file exists, in the local directory or in the \fn{styles/} directory,
-it typically contains \Perl{} code to define subroutines or set values for variables 
+it typically contains \Perl{} code to define subroutines or set values for variables
 that will affect how certain translations are performed.
 There can be code that is executed only for specific document-classes.
 
@@ -1443,15 +1443,15 @@ settings made within the document-class file.
 \medskip\index{class-option!specific file}%
 If a file named \texttt{\Meta{class}\_\Meta{option}.perl} happens to exist for
 a given combination of document-class \Meta{class} and class-option \Meta{option},
-then this will be loaded. 
+then this will be loaded.
 When such a file exists, reading and executing its contents is done,
 rather than executing any \Meta{class}\_\Meta{option} specific information
 that may be contained in  \texttt{\Meta{class}.perl} or \texttt{\Meta{option}.perl}~.
 
 \medskip
-Currently there are no special option or class-option files provided with 
-the \latextohtml{} distribution. It is hoped that users will identify ways 
-that specific features can be improved or adapted to specific classes of documents, 
+Currently there are no special option or class-option files provided with
+the \latextohtml{} distribution. It is hoped that users will identify ways
+that specific features can be improved or adapted to specific classes of documents,
 and will write such files themselves, perhaps submitting them for general distribution.
 
 \bigskip
@@ -1461,7 +1461,7 @@ and class-options is more general than that employed by \LaTeXe.
 New options can be defined for document-classes generally, or for specific classes,
 without the need to have corresponding \texttt{.sty} or \texttt{.clo} files.
 \LaTeX{} simply notes the existence of unusupported options---processing is not
-interrupted.  
+interrupted.
 
 \end{changebar}
 
@@ -1476,7 +1476,7 @@ Similar to the document-class mechanism described in
 \hyperref{the previous section}{Section}{}{sec:cls},
 \latextohtml{} provides a mechanism whereby the code to translate specific
 packages and style-files is auto\-matic\-ally loaded, if such code is available.
-For example, when use of a style such as \fn{german.sty} 
+For example, when use of a style such as \fn{german.sty}
 is detected in a \LaTeX{} source document, either by
 \begin{itemize}
 \item
@@ -1489,19 +1489,19 @@ an explicit \Lc{input} or \Lc{include} command;
 the translator looks for a corresponding \texttt{.perl} file
 having the same file-name prefix;
 e.g. the file \fn{\$LATEX2HTMLDIR/styles/german.perl}.
-If such a \texttt{.perl} file is found, 
+If such a \texttt{.perl} file is found,
 then its code will be incorporated with the main script,
-to be used as required. 
+to be used as required.
 
 \index{extensions!examples}\html{\\}%
 
 This mechanism helps to keep the core script smaller, as well as making
-it easier for others to contribute and share solutions on  
+it easier for others to contribute and share solutions on
 how to translate specific style-files.
 \cbversion{96.1}\begin{changebar}
 The current distribution includes the files to support the styles
 listed in \hyperref{the table below}{Table~}{}{styles}.
-These provide good examples of how you can create 
+These provide good examples of how you can create
 further extensions to \latextohtml.%
 \end{changebar}
 
@@ -1617,10 +1617,10 @@ further extensions to \latextohtml.%
 %\end{table}
 \index{extensions!require understanding@require understanding of \Perl{}}\html{\\}%
 \noindent
-The problem however, is that writing such extensions requires an understanding 
-of \Perl{} programming and of the way the processing in \latextohtml{} is organised. 
+The problem however, is that writing such extensions requires an understanding
+of \Perl{} programming and of the way the processing in \latextohtml{} is organised.
 Interfaces that are more ``user-friendly'' are being investigated.
-Some of the techniques currently used are explained in 
+Some of the techniques currently used are explained in
 \hyperref{a later section}{Section~}{}{sec:ext}.
 
 
@@ -1635,7 +1635,7 @@ produces fancier lists in the electronic version of the document%
 This file defines a new \LaTeX{} environment \env{htmllist},
 which causes a user-defined item-mark to be placed at each new
 item of the list, and which causes the optional description
-to be displayed in bold letters.  
+to be displayed in bold letters.
 
 \index{htmlitemmark@\Lc{htmlitemmark}}%
 \index{htmllist@\env{htmllist}!prints as@prints as \env{description}}%
@@ -1643,22 +1643,22 @@ to be displayed in bold letters.
 \index{environment!htmllist@\env{htmllist}}\html{\\}%
 %
 The mark is determined
-by the \verb|\htmlitemmark{|\Meta{item-mark}\verb|}| command.  
-This command accepts either a mnemonic name for the \Meta{item-mark}, 
+by the \verb|\htmlitemmark{|\Meta{item-mark}\verb|}| command.
+This command accepts either a mnemonic name for the \Meta{item-mark},
 from a list of icons established at installation, or the URL of a mark
-not in the installation list. 
-The command \Lc{htmlitemmark} must be used \emph{inside} the 
-\env{htmllist} environment in order to be effective, 
-but it may be used more than once to change the mark within the list.  
-The item-marks supplied with \latextohtml{} are 
-\texttt{BlueBall}, \texttt{RedBall}, \texttt{OrangeBall}, \texttt{GreenBall}, 
+not in the installation list.
+The command \Lc{htmlitemmark} must be used \emph{inside} the
+\env{htmllist} environment in order to be effective,
+but it may be used more than once to change the mark within the list.
+The item-marks supplied with \latextohtml{} are
+\texttt{BlueBall}, \texttt{RedBall}, \texttt{OrangeBall}, \texttt{GreenBall},
 \texttt{PinkBall}, \texttt{PurpleBall}, \texttt{WhiteBall} and \texttt{YellowBall}.
-The \env{htmllist} environment is identical to 
+The \env{htmllist} environment is identical to
 the \env{description} environment in the printed version.
 
 \index{htmllist@\env{htmllist}!example}%
 
-\noindent 
+\noindent
 An example of its usage is:
 %begin{latexonly}
 \begin{small}
@@ -1692,11 +1692,11 @@ An example of its usage is:
 \index{environment!floatingfigure@\env{floatingfigure}}%
 \index{environment!wrapfigure@\env{wrapfigure}}\html{\\}%
 \noindent
-One can also obtain \LaTeXe\ style-files \fn{floatfig.sty} and 
+One can also obtain \LaTeXe\ style-files \fn{floatfig.sty} and
 \fn{wrapfig.sty}, which provide support for the \env{floatingfigure}
 and \env{wrapfigure} environments, respectively.  These environments
-allow text to wrap around a figure in the printed version, 
-but are treated exactly as an ordinary \env{figure}s in the electronic version.  
+allow text to wrap around a figure in the printed version,
+but are treated exactly as an ordinary \env{figure}s in the electronic version.
 They are described in \hypercite{The \LaTeX{} Companion}%
 {\emph{The \LaTeX{} Companion}}{}{goossens:latex}.%
 \end{changebar}
@@ -1734,26 +1734,26 @@ the details.
 \subsubsection{Indicating Differences between Document Versions\index{change-bars}}%
 %\subsection{Indicating Differences between Document Versions\index{change-bars}}%
 \latextohtml{} supports the \LaTeXe\ \fn{changebar.sty} package,
-written by Johannes Braams \Email{JLBraams@cistron.nl}, for 
-inserting \emph{change-bars} in a document in order to indicate 
-differences from previous versions. This is a very primitive form of 
+written by Johannes Braams \Email{JLBraams@cistron.nl}, for
+inserting \emph{change-bars} in a document in order to indicate
+differences from previous versions. This is a very primitive form of
 version control and there is much scope for improvement.
 
-\index{change-bars!different versions}% 
+\index{change-bars!different versions}%
 \cbversion{96.1f}\begin{changebar}%
-Within the \LaTeX{} version of this manual two thicknesses of change-bar 
+Within the \LaTeX{} version of this manual two thicknesses of change-bar
 have been used. Thicker bars indicate changes introduced with version \textsc{v97.1}\,,
 while thinner bars indicate earlier additions since \textsc{v96.1}\,.\html{\\}
-Within the \texttt{HTML} version the change-bars clearly indicate the 
+Within the \texttt{HTML} version the change-bars clearly indicate the
 different revisions with explicit numbering.%
 \end{changebar}
 \cbversion{97.1}\begin{changebar}
 Within the \texttt{HTML} version, the graphic icons representing
 the changebars can be followed by some text indicating the new version.
 This is used repeatedly throughout\latex{ the online version of}
-this manual. It is achieved using the command 
+this manual. It is achieved using the command
 \verb|\cbversion{|\Meta{version}\verb|}|, immediately following
-the \verb|\begin{changebar}|. 
+the \verb|\begin{changebar}|.
 This sets a variable \fn{\$cb\_version} to be used both at the beginning
 and end of the environment. The value of this variable is retained,
 to be used with other \env{changebar} environments, unless changed explicitly
@@ -1777,7 +1777,7 @@ within each (sub)section or (sub)paragraph.
 \cbversion{96.1f}\begin{changebar}
 \latextohtml{} automatically produces an Index consisting of the
 arguments to all \Lc{index} commands encountered, if there are any.
-A hyperlink is created to that point in the text where the 
+A hyperlink is created to that point in the text where the
 \Lc{index} command occurred.
 
 More sophisticated indexing is available by loading the \env{makeidx} package.
@@ -1786,34 +1786,34 @@ This includes:
 %
 \begin{htmllist}\htmlitemmark{RedBall}%
 \index{index!styled entries}%
-\item 
+\item
 [styled entries, using `\texttt{@}' : ]
 Entries of the form \verb|\index{|\Meta{sort-key}\verb|@|\Meta{styled-text}\verb|}|
 produce \Meta{styled-text} as the entry, but sorted according to \Meta{sort-key}.
 
 \index{index!hierarchical}%
-\item 
-[hierarchical entries, using `\texttt{!}' : ] 
+\item
+[hierarchical entries, using `\texttt{!}' : ]
 Entries of the form
 \verb|\index{|\Meta{item}\verb|@|\Meta{sub-item}\verb|}|
 set the \Meta{sub-item} indented below the \Meta{item}.
-Unlimited levels of hierarchy are possible, 
-even though \LaTeX{} is limited to only 3 levels. 
+Unlimited levels of hierarchy are possible,
+even though \LaTeX{} is limited to only 3 levels.
 The \Meta{sort-key}\verb|@|\Meta{styled-text} can be used at each level.
 
 \index{index!page-ranges}%
-\item 
+\item
 [explicit ranges, using `\texttt{|(}' and `\texttt{|)}' : ]
-This is perhaps more useful in the \LaTeX{} version. 
+This is perhaps more useful in the \LaTeX{} version.
 In the \texttt{HTML} version these simply insert words ``from'' and ``to'',
 respectively, prior to the hyperlink to where the index-entry occurs.
 
 \index{index!cross-link}%
 \index{index!see@\texttt{\char124see}}%
-\item 
+\item
 [\texttt{|see\char123}\Meta{index-entry}\texttt{\char125} : ]
-provides a textual reference to another indexed word or phrase, 
-by inserting the word ``see''. 
+provides a textual reference to another indexed word or phrase,
+by inserting the word ``see''.
 This can be used in conjunction with \Lc{htmlref} to create a hyperlink
 to the \Meta{index-entry}; viz.
 \begin{verbatim}
@@ -1826,14 +1826,14 @@ where a \Lc{label} has been specified in some other index-entry, as follows:
 
 \index{index!emph@\texttt{\char124emph}}%
 \item [\texttt{|emph} : ]
-\strikeout{is recognised but \emph{ignored}; 
+\strikeout{is recognised but \emph{ignored};
 other \texttt{|\Meta{command}} commands are \emph{not} processed by \latextohtml{},
 with the following exception\dots} is handled correctly, by applying
 \Lc{emph} to the text of the generated hyperlink.
 
 \index{index!style@\texttt{\char124}\Meta{style}}%
 \item [\texttt{|}\Meta{style} : ]
-where \Meta{style} is the name of \LaTeX{} style-changing command, 
+where \Meta{style} is the name of \LaTeX{} style-changing command,
 without the initial `\Lc{}'; e.g. `\texttt{emph}', `\texttt{textbf}',
 `\texttt{textit}', etc. The corresponding \LaTeX{} command is applied
 to the text of the generated hyperlink.
@@ -1841,8 +1841,8 @@ to the text of the generated hyperlink.
 \index{index!blank lines}%
 \index{index!alphabetization}%
 \item [blank lines and alphabetization: ]
-Having precisely a single space-character after the \verb+|+ 
-(e.g. \verb+\index{A| }+) 
+Having precisely a single space-character after the \verb+|+
+(e.g. \verb+\index{A| }+)
 places a blank line before the index entry and omits the hyperlink.
 This is used mainly for visual formatting; it allows a break before the entries
 starting with each letter, say. Using a printable-key, as in \verb+\index{Q@Q, R| }+,
@@ -1851,9 +1851,9 @@ is appropriate when there are no indexed words starting with `Q', say.
 \index{index!quoted delimiters}%
 \item [quoted delimiters: ]
 The three special delimiters can be used within the printable portion,
-if preceded by the double-quote character: \verb+"@+, \verb+"|+, \verb+"!+ 
-and also \verb+""+ for the quote character itself. 
-Also \verb|\"| produces an umlaut accent on the following character, 
+if preceded by the double-quote character: \verb+"@+, \verb+"|+, \verb+"!+
+and also \verb+""+ for the quote character itself.
+Also \verb|\"| produces an umlaut accent on the following character,
 when appropriate, else is ignored.
 %
 \end{htmllist}%
@@ -1865,7 +1865,7 @@ Furthermore, the printable part of an index entry can contain \texttt{HTML}
 anchors; that is, hyperlinks and/or \verb|\label{...}|s.
 This allows index entries to contain cross-links to other entries, for example,
 as well as allowing index-entries to be the target of hyperlinks from elsewhere
-within the document. 
+within the document.
 
 The \htmlref{next section}{glossind} describes how this feature is used within this
 manual to create a Glossary, containing a short description of all file-names,
@@ -1875,34 +1875,34 @@ easily found, starting from any other.
 
 \index{index!labelled entries}
 
-When a single item is indexed many times, it is sufficient 
-to have a \Lc{label} command appearing within the printable portion 
+When a single item is indexed many times, it is sufficient
+to have a \Lc{label} command appearing within the printable portion
 of the first instance of an \verb|\index{...}| command for that item,
-within a single document segment. 
+within a single document segment.
 
 \medskip
 
-If the index-entries are in different segments of a segmented document, 
-it is sufficient to have the  \verb|\index{...@...\label{...}}| appearing 
-within that segment, in which the item is indexed, whose indexing information 
+If the index-entries are in different segments of a segmented document,
+it is sufficient to have the  \verb|\index{...@...\label{...}}| appearing
+within that segment, in which the item is indexed, whose indexing information
 is loaded earliest via a \verb|\internal[index]{...}| command.
-When in doubt, include one \verb|\index{...@...\label{...}}| per segment 
+When in doubt, include one \verb|\index{...@...\label{...}}| per segment
 in which the item is indexed.
 
 \index{index!cross-link}%
 \index{index!cross-link incorrect}
 
 For cross-links to work effectively within segmented documents,
-the indexing command 
-\verb|\index{...@...\label{...}}| \emph{must} occur earlier 
-in the same segment than any use of 
-\verb|\index{...@...\htmlref{...}{...}}| 
-intended to create a link to that label. 
+the indexing command
+\verb|\index{...@...\label{...}}| \emph{must} occur earlier
+in the same segment than any use of
+\verb|\index{...@...\htmlref{...}{...}}|
+intended to create a link to that label.
 If the \Lc{label} occurs in a different segment,
 then a \verb|\internal[index]{...}| command for that segment,
 may be needed at the beginning of the segment with the \Lc{htmlref}\,.
 When this is done incorrectly, the resulting link will be to the
-segment where the indexed item occurred, 
+segment where the indexed item occurred,
 rather than staying within the Index.
 
 \htmlrule
@@ -1913,17 +1913,17 @@ rather than staying within the Index.
 Since use of section-names, as the text for hyperlinks, can lead to a very long
 and cumbersome Index, especially when single items have been indexed many times,
 a further feature is provided to obtain a more compact Index.
- 
+
 \index{index!codified links}\html{\\}%
-Use of the command-line option \Cs{short\_index} causes a codified 
+Use of the command-line option \Cs{short\_index} causes a codified
 representation of the sectioning to be used, rather than the full section-name.
 The differences are as follows.
 %
 \begin{itemize}
 %
 \item
-For example, `\texttt{2.1}' means sub-node~\#1 of node~\#2, 
-viewing the entire document as a tree-like structure. 
+For example, `\texttt{2.1}' means sub-node~\#1 of node~\#2,
+viewing the entire document as a tree-like structure.
 
 \index{index!codified links!top-most node}%
 \item
@@ -1932,24 +1932,24 @@ The top-most node is simply denoted `\verb|^|'.
 \index{segmentation!child-links}%
 \index{segmentation!codified index}%
 \item
-With a \htmlref{segmented document}{Segmentation}, 
-each segment is codified separately 
+With a \htmlref{segmented document}{Segmentation},
+each segment is codified separately
 using the \htmlref{\Meta{prefix}}{prefix} supplied for that segment.
-The Index includes a legend of these prefixes, 
+The Index includes a legend of these prefixes,
 each giving the title of the leading page from the segment,
-as a hyperlink to the place on that page where its 
+as a hyperlink to the place on that page where its
 child-links are displayed.
 
 \index{index!codified links!for easier browsing}%
 \item
-Hyperlinks start on the same line as the index-key, 
-rather than the next line, separated by `\texttt{|}'. 
+Hyperlinks start on the same line as the index-key,
+rather than the next line, separated by `\texttt{|}'.
 This gives further compactification for easier browsing.
 
 \index{index!with prefix@with \Meta{prefix}}%
 \item
 If \Cs{prefix \Meta{prefix}} has been specified, then the \Meta{prefix}
-is prepended to the codified form. This is most useful for segmented documents. 
+is prepended to the codified form. This is most useful for segmented documents.
 Now the top-most node is indicated by the bare \Meta{prefix}.
 \end{itemize}
 %
@@ -1968,21 +1968,21 @@ provided, of course, that the document loads the \env{makeidx} package.%
 
 \noindent\cbversion{96.1f}\begin{changebar}%
 A large number of different pieces of software are required to make
-\latextohtml{} work effectively, as well as many files containing data or code 
-to work with parts of this software. 
-For this reason, a Glossary is included with this manual. 
+\latextohtml{} work effectively, as well as many files containing data or code
+to work with parts of this software.
+For this reason, a Glossary is included with this manual.
 It contains the names of all files, configuration variables, application software
 and related technical terms, with a short description of what it is, or does,
-and perhaps a URL for further reference. 
+and perhaps a URL for further reference.
 
 \index{Glossary!printed version}%
 \index{Glossary!HTML@\texttt{HTML} version}\html{\\}%
 In the printed version each item in the Glossary is accompanied by the page-numbers
-on which the item is mentioned, somewhat like in the Index. 
+on which the item is mentioned, somewhat like in the Index.
 For the \texttt{HTML} version, each glossary-item contains a hyperlink to an
 index-entry, which then has links to each occurrence.
-These extra index-entries do not appear in the printed version; 
-indeed they also contain a hyperlink back to the corresponding glossary-entry. 
+These extra index-entries do not appear in the printed version;
+indeed they also contain a hyperlink back to the corresponding glossary-entry.
 
 This feature is currently available only when using the \env{makeidx} package,
 and needs also the \env{html} and \env{htmllist} packages.
@@ -1994,7 +1994,7 @@ incorporating an extensive revision of \fn{makeidx.perl}, as well as additions t
 \noindent
 Since \LaTeX{} provides no guidelines for how a Glossary should be constructed,
 the technique used here will be explained in detail, for both the printed and
-\texttt{HTML} versions. 
+\texttt{HTML} versions.
 
 \begin{itemize}
 \item
@@ -2008,8 +2008,8 @@ definition which is ignored by \LaTeX{}.\par
 \item
 Next, the words, phrases or technical terms to be included in the Glossary
 are marked in the main text using the \Lc{glossary} command, used indirectly
-via other macros. For example, file-names are inserted via 
-\verb|\|\verb|fn{html.sty}|, \verb|\|\verb|fn{dvips}|,  \verb|\|\verb|appl{dvips}| etc. 
+via other macros. For example, file-names are inserted via
+\verb|\|\verb|fn{html.sty}|, \verb|\|\verb|fn{dvips}|,  \verb|\|\verb|appl{dvips}| etc.
 which both insert the text and create the glossary-entry; \textit{viz.}
 %
 %begin{latexonly}
@@ -2025,9 +2025,9 @@ which both insert the text and create the glossary-entry; \textit{viz.}
 %end{latexonly}
 
 \item
-The expansions of \Lc{glossary}, and the slightly more general 
+The expansions of \Lc{glossary}, and the slightly more general
 \Lc{Glossary}, are different for the printed and \texttt{HTML} versions.
-For the \texttt{HTML} version the following definitions occur 
+For the \texttt{HTML} version the following definitions occur
 within an \env{htmlonly} environment:
 %
 %begin{latexonly}
@@ -2049,7 +2049,7 @@ within an \env{htmlonly} environment:
 Notice how the feature of \env{makeidx}, allowing the printable portion to
 be separate from the sorting-key, is used to allow text-styles to be included within
 both index-entries and glossary-entries. Indeed the purpose of \Lc{Glossary} is
-to allow deviations from a fixed style, e.g. 
+to allow deviations from a fixed style, e.g.
 %
 %begin{latexonly}
 \begin{small}
@@ -2064,14 +2064,14 @@ to allow deviations from a fixed style, e.g.
 %
 Also notice that in the \texttt{HTML} version an index-entry is created that
 includes, within its printable portion, both a \Lc{label} and a hyperlink.
-The former, having name \texttt{III...}, will ultimately reside on the Index page, 
+The former, having name \texttt{III...}, will ultimately reside on the Index page,
 while the latter will point to an anchor named \texttt{GGG...} on the Glossary page.
-These names must be distinct from any other names used with \Lc{label}s 
+These names must be distinct from any other names used with \Lc{label}s
 elsewhere in the document, hence the use of prefixes \texttt{III} and \texttt{GGG}.
 A short string `\texttt{(G)}' is used for the text of the hyperlink in the Index.
 
 \item
-The text descriptions of the glossary-items are stored in a file 
+The text descriptions of the glossary-items are stored in a file
 called \fn{l2hfiles.dat}, with one description per line.
 For the \texttt{HTML} version this file is actually read as input:
 %
@@ -2112,7 +2112,7 @@ strictly alphabetically, according to the sort-keys associated to each glossary 
 \newline
 (This requirement could be relaxed, but only with a loss in efficiency; see below.)
 
-\LaTeX{} constructs its Glossary by running the \fn{makeindex} utility 
+\LaTeX{} constructs its Glossary by running the \fn{makeindex} utility
 on the file \fn{manual.glo}, using the following command:
 %
 %begin{latexonly}
@@ -2142,7 +2142,7 @@ and subsequently read by \LaTeX{} using:
 \noindent
 The configuration file \fn{l2hglo.ist} is included along with this manual.
 It contains a portion that inserts tricky \TeX{} code at the beginning of \fn{manual.gls}.
-This code extracts from \fn{l2hfiles.dat} that line corresponding to each glossary entry, 
+This code extracts from \fn{l2hfiles.dat} that line corresponding to each glossary entry,
 then typesets it itemized within an environment called \env{theglossary}.
 
 %begin{latexonly}
@@ -2163,7 +2163,7 @@ then typesets it itemized within an environment called \env{theglossary}.
 Currently searching within \fn{l2hfiles.dat} is only done sequentially, stopping
 at the end of the file. If an entry is not found then it is skipped and a message
 printed to the log; the next entry will search from the top of the file.
-If all entries are included and maintained in strict order, there will be no skipping 
+If all entries are included and maintained in strict order, there will be no skipping
 and each line of \fn{l2hfiles.dat} is read exactly once.\par
 
 \item
@@ -2182,7 +2182,7 @@ Within \fn{l2hfiles.dat} the data lines look like:
 \end{small}%
 %end{latexonly}
 %
-For the \LaTeX{} version the \verb|\item[\gn{...}]| is only used for pattern-matching, 
+For the \LaTeX{} version the \verb|\item[\gn{...}]| is only used for pattern-matching,
 to find the correct data entry.
 All typesetting is controlled from within \fn{manual.gls}.
 
@@ -2192,14 +2192,14 @@ However the \texttt{HTML} version requires the following definition:
 \begin{small}%
 %end{latexonly}
 \begin{verbatim}
-\newcommand{\gn}[1]{\texttt{#1}\label{GGG#1}\htmlref{\^}{III#1}}%  
+\newcommand{\gn}[1]{\texttt{#1}\label{GGG#1}\htmlref{\^}{III#1}}%
 \end{verbatim}
 %begin{latexonly}
 \end{small}%
 %end{latexonly}
 %
-which establishes the hyperlink to the Index, marked by `\verb|^|', 
-and provides the \Lc{label} to create the target in the Glossary 
+which establishes the hyperlink to the Index, marked by `\verb|^|',
+and provides the \Lc{label} to create the target in the Glossary
 for any \verb|\glossary{...}| command having the corresponding argument.%
 \end{itemize}
 \end{changebar}

@@ -1,5 +1,5 @@
-      SUBROUTINE SCULIB_NOISE_MEAN (N_INTEGRATIONS, N_BOLS, DEMOD, 
-     :     CHOP_DATA, CHOP_VARIANCE, CAL_DATA, CAL_VARIANCE, 
+      SUBROUTINE SCULIB_NOISE_MEAN (N_INTEGRATIONS, N_BOLS, DEMOD,
+     :     CHOP_DATA, CHOP_VARIANCE, CAL_DATA, CAL_VARIANCE,
      :     QUALITY, WORKSPACE, STATUS)
 *+
 *  Name:
@@ -10,7 +10,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     SCULIB_NOISE_MEAN ( N_INTEGRATIONS, N_BOLS, DEMOD,
 *    :     CHOP_DATA, CHOP_VARIANCE, CAL_DATA, CAL_VARIANCE,
@@ -18,26 +18,26 @@
 
 *  Description:
 *     This routine calculates the mean and variance of a set of integrations
-*     in a NOISE measurement. 
+*     in a NOISE measurement.
 *        If, only one integration was taken then the demodulated chop signal,
-*     chop variance, calibrator signal, calibrator variance and quality will 
-*     be returned in CHOP_DATA, CHOP_VARIANCE, CAL_DATA, CAL_VARIANCE and 
+*     chop variance, calibrator signal, calibrator variance and quality will
+*     be returned in CHOP_DATA, CHOP_VARIANCE, CAL_DATA, CAL_VARIANCE and
 *     QUALITY as they were obtained from the transputers.
 *        If more than 1 integration was obtained then:-
 *
-*          If, for a given bolometer, no valid data was obtained for any of the 
-*          integrations then the QUALITY for that bolometer will be returned 
-*          as 1. 
+*          If, for a given bolometer, no valid data was obtained for any of the
+*          integrations then the QUALITY for that bolometer will be returned
+*          as 1.
 *
-*          If, for that bolometer, one valid integration was obtained then the 
-*          demodulated chop signal and variance will be returned in CHOP_DATA 
-*          and CHOP_VARIANCE, the calibrator signal and variance will be 
-*          returned in CAL_DATA and CAL_VARIANCE, and QUALITY will be set 
-*          to 0. 
-*  
-*          If more than one valid integration was obtained then the means 
+*          If, for that bolometer, one valid integration was obtained then the
+*          demodulated chop signal and variance will be returned in CHOP_DATA
+*          and CHOP_VARIANCE, the calibrator signal and variance will be
+*          returned in CAL_DATA and CAL_VARIANCE, and QUALITY will be set
+*          to 0.
+*
+*          If more than one valid integration was obtained then the means
 *          of the chop and calibrator signals will be returned in CHOP_DATA
-*          and CAL_DATA, and the variances of the individual samples in 
+*          and CAL_DATA, and the variances of the individual samples in
 *          CHOP_VARIANCE and  CAL_VARIANCE, and QUALITY will be set to 0.
 
 *  Arguments:
@@ -46,18 +46,18 @@
 *     N_BOLS                            = INTEGER (Given)
 *           number of bolometers measured
 *     DEMOD (5, N_BOLS, N_INTEGRATIONS) = REAL (Given)
-*           the demodulated data; chop, chop variance, calibrator, cal 
+*           the demodulated data; chop, chop variance, calibrator, cal
 *           variance, quality
 *     CHOP_DATA (N_BOLS)                = REAL (Returned)
 *           the mean of the demodulated chop signal over the integrations
 *     CHOP_VARIANCE (N_BOLS)            = REAL (Returned)
-*           the variance on CHOP_DATA, calculated from the dispersion 
-*           about the mean, or the demodulated variance if there was only 
+*           the variance on CHOP_DATA, calculated from the dispersion
+*           about the mean, or the demodulated variance if there was only
 *           one integration
 *     CAL_DATA (N_BOLS)                 = REAL (Returned)
 *           the mean of the demodulated calibrator signal over the integrations
 *     CAL_VARIANCE (N_BOLS)             = REAL (Returned)
-*           the variance on CAL_DATA, calculated from the dispersion about the 
+*           the variance on CAL_DATA, calculated from the dispersion about the
 *           mean, or the demodulated variance if there was only one integration
 *     QUALITY (N_BOLS)                  = BYTE (Returned)
 *           the quality on the returned data
@@ -81,7 +81,7 @@
 *  History:
 *     26-MAY-1995 (JFL)
 *        Original version.
-*      7-JUN-1996 (JFL) 
+*      7-JUN-1996 (JFL)
 *        Modified to calculate error on sample distribution
 *        rather than on mean.
 *     26-JUN-1996 (JFL)
@@ -166,11 +166,11 @@
 *     A Non-zero 'quality' should set QUALITY to 1
             IF (NINT(DEMOD(5, BOL, 1)) .GT. 0) QUALITY(BOL) = 1
          END DO
-   
+
 *  otherwise have more than one integration coming
 
       ELSE IF (N_INTEGRATIONS .GT. 1) THEN
- 
+
 *  calculate sums
 
          DO I = 1, N_INTEGRATIONS

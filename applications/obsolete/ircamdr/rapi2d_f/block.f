@@ -2,7 +2,7 @@
       SUBROUTINE BLOCK( STATUS )
 *    Description :
 *     Each pixel in the input image, %INPIC, is replaced by the average value
-*     of the pixels in a box of side %BOXSIZ pixels centered on the pixel to 
+*     of the pixels in a box of side %BOXSIZ pixels centered on the pixel to
 *     be replaced. At the image edge pixel replication is used to allow the
 *     smoothing to be performed. %BOXSIZ must be an odd number in the range
 *     3 to 15. The smoothed image is written to the output image, %OUTPIC,
@@ -67,7 +67,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *       map input DATA_ARRAY component
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :      PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions of array
@@ -77,7 +77,7 @@
          CALL ODDGET( 'BOXSIZ', 5, 3, 15, BOXSIZ, STATUS )
 
 *       create output IMAGE type data structure containing a DATA_ARRAY
-*       component of dimensions DIMS and create and get a value for 
+*       component of dimensions DIMS and create and get a value for
 *       a TITLE component
          CALL CREOUT( 'OUTPIC', 'OTITLE', NDIM, DIMS, LOCO, STATUS )
 
@@ -85,7 +85,7 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *          map output DATA_ARRAY component
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :        PNTRO, NELEMENTS, STATUS )
 
 *          set up the workspace array dimensions
@@ -107,7 +107,7 @@
             IF( STATUS .EQ. SAI__OK ) THEN
 
 *             pass everything to the rapid block smoothing routine
-               CALL RAPBLO( BOXSIZ, DIMS(1), DIMS(2), %VAL(PNTRI), 
+               CALL RAPBLO( BOXSIZ, DIMS(1), DIMS(2), %VAL(PNTRI),
      :           %VAL(PNTRO), %VAL(WPNTR1), %VAL(WPNTR2), STATUS )
             ENDIF
 

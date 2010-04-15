@@ -44,8 +44,8 @@
       parameter (MISSING = 1)
       integer ntemp,ntemp2
 C      integer ptr,slot
-      
-      
+
+
 * Set results cube and variance to bad values
 
       call gen_cfill(1,mxpars*spdim1*spdim2*nyp,val__badr,
@@ -133,7 +133,7 @@ C     print *,'axis1'
      :            ntemp,%VAL(CNF_PVAL(d_xptr)),' ',status)
 C     print *,'axis2'
 * Initialise tolerances
-    
+
       call init_tols(tolerance,MAXTOL,ifarc,%VAL(CNF_PVAL(d_xptr)),
      :               ntemp)
 

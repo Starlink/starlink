@@ -22,10 +22,10 @@
 *    Return if status on entry is bad
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Linear contouring 
+*    Linear contouring
       CALL CHR_UCASE( CONTOUR_TYPE(PORT) )
       IF ( CONTOUR_TYPE( PORT ) .EQ. 'LIN' ) THEN
- 
+
          IF ( AUTOSCALE( PORT ) ) THEN
 *          Do not include HIGH, LOW in contour because they are single pixels
             STEP = ( HIGH( PORT )-LOW( PORT ) ) / REAL( CONTOUR_LEVELS( PORT )+1 )

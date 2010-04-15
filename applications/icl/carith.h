@@ -3,7 +3,7 @@
  * 		C A R I T H . H
  *
  * This file contains the interface for the ICL module carith.c.
- * This  contains the implementation of ICL arithmetic in C (ie 
+ * This  contains the implementation of ICL arithmetic in C (ie
  * value X value => value)
  *
  *		Created : 	28/11/91

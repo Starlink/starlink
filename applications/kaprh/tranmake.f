@@ -84,7 +84,7 @@
 *        to the right of the >.  This parameter is ignored unless
 *        TRTYPE="Expres".
 *     FITTYPE = _INTEGER (Read)
-*        The type of fit specified by coefficients supplied via the 
+*        The type of fit specified by coefficients supplied via the
 *        TR parameter.  Appropriate values are:
 *           1 -- shift of origin,
 *           2 -- shift of origin and rotation,
@@ -190,7 +190,7 @@
 *        the angular origin measured in degrees starting from the
 *        x-axis in an anticlockwise direction.  If this is omitted, it
 *        defaults to 0.  The initial suggested default is [0,0,0].
-*        
+*
 *        This parameter is ignored unless TRTYPE="Bilinear" or "Polar".
 *     TRANSFORM = TRN (Write)
 *        The actual or implied HDS object to store the created
@@ -242,7 +242,7 @@
 *  Examples:
 *     tranmake xyz nvin=1 nvout=1 for1="xd=1.01*x-0.34"
 *       inv1="x=(xd+0.34)/1.01" \
-*        This creates a transformation structure TRANSFORM in the HDS  
+*        This creates a transformation structure TRANSFORM in the HDS
 *        file called xyz.sdf.  It specifies mappings between one input
 *        and one output variable.  The output variable is 1.01 the
 *        output variable less 0.34.
@@ -295,9 +295,9 @@
 *     -  On completion, the destination structure for the
 *     transformation information equates to the current transformation
 *     global parameter.
-*     -  Expressions supplied for parameters FOR1-FOR7 and INV1-INV7 
-*     should be enclosed in double quotes (even when given in response 
-*     to a prompt) to protect the equals sign from interpretation by 
+*     -  Expressions supplied for parameters FOR1-FOR7 and INV1-INV7
+*     should be enclosed in double quotes (even when given in response
+*     to a prompt) to protect the equals sign from interpretation by
 *     the shell or parameter system.
 
 *  Related Applications:
@@ -321,7 +321,7 @@
 *        two-dimensional linear fit.
 *     2-JUN-1998 (DSB):
 *        Corrected status check after call to TRN_NEW. Previously
-*        an error was reported saying that the expression failed 
+*        an error was reported saying that the expression failed
 *        to compile if no classifications were given (even if in fact it
 *        had compiled succesfully). Also, added a note to the prologue
 *        telling the user to encloise expressions in double quotes.
@@ -331,7 +331,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -431,7 +431,7 @@
 
 *  Place the transformation in the current object.
 *  -----------------------------------------------
-*  
+*
 *  Get the locator to the parent object.
          CALL DAT_PAREN( LOC, PARLOC, STATUS )
 
@@ -609,7 +609,7 @@
      :        /'^NVIN distinct input variables and ^NVOUT distinct '/
      :        /'output variables.  See SUN/61 for details of the '/
      :        /'permitted operators and functions.', STATUS )
-      
+
 
 *  Assign classifications to the transformation.
 *  =============================================

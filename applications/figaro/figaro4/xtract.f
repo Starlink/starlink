@@ -126,7 +126,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -413,7 +413,7 @@
      :                   %VAL( CNF_PVAL(PNTR(5)) ), STATUS )
       ELSE
          CALL SPD_UAACR( VARUSE, NDIM(1), NELM(1), NELM(2), VAL__BADR,
-     :                   DIM(1,1), DIM(1,2), %VAL( CNF_PVAL(PNTR(1)) ), 
+     :                   DIM(1,1), DIM(1,2), %VAL( CNF_PVAL(PNTR(1)) ),
      :                   %VAL( CNF_PVAL(PNTR(2)) ), BADDAT, BADVAR,
      :                   %VAL( CNF_PVAL(PNTR(3)) ),
      :                   %VAL( CNF_PVAL(PNTR(4)) ),

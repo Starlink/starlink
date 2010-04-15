@@ -58,7 +58,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       call sp_clget 						!Get cluster details
-	
+
       call sp_figet 						!Get field details
 
       TBYO = NCLUST + NFIELD					!Total stars to output
@@ -66,9 +66,9 @@ Cbegin
       if ( TBYO.gt.0 ) then
 
          call printo ( ' ' )
-         call get1r ( 'M1FACT', HM1FACTOR, 100.0, 1.0e-8,	!Get conversion factors 
+         call get1r ( 'M1FACT', HM1FACTOR, 100.0, 1.0e-8,	!Get conversion factors
      +                          1.0e8 )				! from mags to heights
-         call get1r ( 'M2FACT', HM2FACTOR, HM1FACTOR, 1.0e-8, 
+         call get1r ( 'M2FACT', HM2FACTOR, HM1FACTOR, 1.0e-8,
      +                          1.0e8 )
          if ( ST_FAILED ) return
 
@@ -77,9 +77,9 @@ Cbegin
          if ( ST_FAILED ) return
 
          call sp_setupout ( %val(IPO) )
-				
+
          if ( DOCLUST ) call sp_clput ( %val(IPO) )		!Calc,store cluster stars
-   
+
          if ( DOFIELD ) call sp_fiput ( %val(IPO) )		!Calc,store field stars
 
       endif
@@ -181,7 +181,7 @@ Cbegin
       call cswopr ( CXS, CXE )
       CYS = 1.0
       CYE = 100.0
-      call get2r ( 'CYRANGE', CYS, CYE, .true., -1.0e8, 1.0e8 ) 
+      call get2r ( 'CYRANGE', CYS, CYE, .true., -1.0e8, 1.0e8 )
       call cswopr ( CYS, CYE )
 
       call get1i ( 'CNUMBER', NCLUST, 100, 0, 100000000 )		!Get number of stars
@@ -230,7 +230,7 @@ Cbegin
             return
          endif
          if ( TBYFI*(TBVXFI-5).gt.NFSECT ) then
-            call printo ( 
+            call printo (
      +      'ERROR: Field file incorrect - Too many sections' )
             DOFIELD = .false.
             return
@@ -315,9 +315,9 @@ C    a j penny                     stsci                   1987-06-02
 C--
       logical error
       integer k, isum
-      real dx, dy, fract, abeg, a, b, c, fsum, 
+      real dx, dy, fract, abeg, a, b, c, fsum,
      +     ar, ap, bp, am, col, x, y, theta, r, dmag, h1, h2, rv
-      real p(NKING), amstart(NCSECT), amend(NCSECT), 
+      real p(NKING), amstart(NCSECT), amend(NCSECT),
      +     colstart(NCSECT), colend(NCSECT), rsum(NCSECT)
       character text*72
 Cbegin
@@ -325,11 +325,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      if ( .not.CUNIFORM ) call sp_clcmd ( %val(IPCL), amstart, amend, 	!Load File CMD values. 
+      if ( .not.CUNIFORM ) call sp_clcmd ( %val(IPCL), amstart, amend, 	!Load File CMD values.
      +                                 colstart, colend, rsum, error )
       if ( error ) return						!Return if none in permitted range
 
-      a = RADT*RADT/(RADC*RADC*RNKING*RNKING)				!Load King radial distribution 
+      a = RADT*RADT/(RADC*RADC*RNKING*RNKING)				!Load King radial distribution
       b = -1.0*sqrt(1.0/(1+(RADT/RADC)**2.0))				! (turned into annulus counts) into rr
       fsum = 0.0
       do k = 1, NKING
@@ -369,7 +369,7 @@ C  outside range and thus there is probably something wrong.
          x = CXPOS + dx
          y = CYPOS + dy
 
-         if ( x.ge.CXS .and. x.le.CXE .and. 				!See if position in allowed range. 
+         if ( x.ge.CXS .and. x.le.CXE .and. 				!See if position in allowed range.
      +        y.ge.CYS .and. y.le.CYE ) then				! If so, calc mag, col
 
             if ( CUNIFORM ) then
@@ -393,7 +393,7 @@ C  outside range and thus there is probably something wrong.
 
             endif
 
-            if ( am.ge.CMAGS .and. am.le.CMAGE .and. col.ge.CCOLS .and.	!See if calculated mag, col in allowed range 
+            if ( am.ge.CMAGS .and. am.le.CMAGE .and. col.ge.CCOLS .and.	!See if calculated mag, col in allowed range
      +           col.le.CCOLE ) then					! store if ok
                isum = isum + 1
                h1 = hm1factor*10.0**((20.0-am)/2.5)
@@ -406,8 +406,8 @@ C  outside range and thus there is probably something wrong.
                tbo(11,isum) = col
                tbo(12,isum) = am + col
                if ( DOLOG ) then
-                  write ( text, 
-     +            '(1x,''C'',i6,2f10.2,2x,2f10.2,2x,2f10.2)' ) 
+                  write ( text,
+     +            '(1x,''C'',i6,2f10.2,2x,2f10.2,2x,2f10.2)' )
      +            isum, x, y, h1, h2, am, col
                   call printo ( text )
                endif
@@ -424,10 +424,10 @@ C  outside range and thus there is probably something wrong.
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SP_CLCMD -- Cluster cmd to working arrays; calcs number distribution,error
-C              
+C
 C    a j penny                     stsci                   1987-10-15
 
-      subroutine sp_clcmd ( tbcl, amstart, amend, colstart, colend, 
+      subroutine sp_clcmd ( tbcl, amstart, amend, colstart, colend,
      +                      rsum, error )
 
       implicit none
@@ -439,7 +439,7 @@ C    a j penny                     stsci                   1987-10-15
       real	amend(NCSECT)		!o: Magnitude end of line segment
       real	colstart(NCSECT)	!o: Colour start of line segment
       real	colend(NCSECT)		!o: Colour end of line segment
-      real	rsum(NCSECT)		!o: Cumulative fraction of stars in 
+      real	rsum(NCSECT)		!o: Cumulative fraction of stars in
 					!   segments up to and including this one
       logical	error			!o: Error in this s/r flag
 C--
@@ -459,8 +459,8 @@ Cbegin
          colend(k) = tbcl(9,k)
          num(k) = max(0,nint(tbcl(10,k)))
       enddo
-      
-      nums = 0								!Calc HR diagram fractional number 
+
+      nums = 0								!Calc HR diagram fractional number
       do k = 1, TBYCL							! distribution. Load into RSUM
          nums = nums + num(k)
          rsum(k) = nums
@@ -476,7 +476,7 @@ Cbegin
          amout = amend(k) + CDISMOD - CTDISMOD
          colin = colstart(k) + CRED - CTRED
          colout = colend(k) + CRED - CTRED
-         if ( num(k).ne.0 ) call sp_lirect ( colin, amin, colout, 
+         if ( num(k).ne.0 ) call sp_lirect ( colin, amin, colout,
      +                          amout, CCOLS, CMAGS, CCOLE, CMAGE, ok )
          if ( ok ) error = .false.
       enddo
@@ -504,7 +504,7 @@ C        a j penny               stsci            1987-12-23
       real xb		!i: line segment x end
       real yb		!i: line segment y end
       real xc		!i: box x start
-      real yc		!i: box y start 
+      real yc		!i: box y start
       real xd		!i: box x end
       real yd		!i: box y end
       logical ok	!o: =true if they line in or partly in: =false if not
@@ -527,7 +527,7 @@ Cbegin
          if ( xa.lt.xc .or. xa.gt.xd ) then
             return
          else
-            if ( min(ya,yb).lt.min(yc,yd) .and. 
+            if ( min(ya,yb).lt.min(yc,yd) .and.
      +           max(ya,yb).gt.max(yc,yd)       ) then
                  ok = .true.
                  return
@@ -537,7 +537,7 @@ Cbegin
          if ( ya.lt.yc .or. ya.gt.yd ) then
             return
          else
-            if ( min(xa,xb).lt.min(xc,xd) .and. 
+            if ( min(xa,xb).lt.min(xc,xd) .and.
      +           max(xa,xb).gt.max(xc,xd)       ) then
                  ok = .true.
                  return
@@ -625,8 +625,8 @@ Cbegin
             tbo(11,isum) = col
             tbo(12,isum) = am + col
             if ( DOLOG ) then
-               write ( text,'(1x,''F'',i6,2f10.2,2x,2f10.2,2x,2f10.2)') 
-     +         isum, x, y, h1, h2, am, col 
+               write ( text,'(1x,''F'',i6,2f10.2,2x,2f10.2,2x,2f10.2)')
+     +         isum, x, y, h1, h2, am, col
                call printo ( text )
             endif
          endif
@@ -701,7 +701,7 @@ Cbegin
          enddo
       enddo
 
-      error  = .true.							!Check there are stars in 
+      error  = .true.							!Check there are stars in
       do k = 1, TBYFI							! field file in permitted col, mag range
          do j = 6, TBVXFI
             if ( nint(tbfi(j,k)).ne.0 ) then
@@ -710,7 +710,7 @@ Cbegin
                ams = ams + FDISMOD - FTDISMOD
                ame = ame + FDISMOD - FTDISMOD
                if ( ams.lt.FMAGE .and. ame.gt.FMAGS ) then
-                  cols = FCOLSTART + real(j-6)*FCOLSTEP 
+                  cols = FCOLSTART + real(j-6)*FCOLSTEP
                   cole = cols + FCOLSTEP
                   cols = cols + FRED - FTRED
                   cole = cole + FRED - FTRED
@@ -803,6 +803,6 @@ Cbegin
       enddo
 
 
-      end         
+      end
 
 

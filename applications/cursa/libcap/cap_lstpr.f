@@ -10,7 +10,7 @@
 *     CALL CAP_LSTPR (CI, OFLAG, FLUNIT, BAR; STATUS)
 *  Description:
 *     List full details of all the parameters in a catalogue.
-*     
+*
 *     The text is listed to the standard output stream (via MSG_OUT)
 *     and/or a text file.
 *  Arguments:
@@ -53,7 +53,7 @@
 *     end do
 *  Implementation Deficiencies:
 *     Parameter attributes which are not fully implemented, such as the
-*     modification date, are not output.  Output of these attributes 
+*     modification date, are not output.  Output of these attributes
 *     should be added as they are implemented.
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -82,7 +82,7 @@
 *  Status:
       INTEGER STATUS        ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  LSTAT,    ! Local Fortran I/O status.
      :  QI,       ! Parameter identifier.
      :  QCOUNT    ! Number of the current parameter.

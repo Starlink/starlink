@@ -211,7 +211,7 @@ int rec_create_record( const struct HAN *par, struct RCL *rcl,
 
 /* If the dynamic domain needs chaining, then allocate an associated frame  */
 /* of Pure Data Blocks.                                                     */
-         if ( rcl->chain ) 
+         if ( rcl->chain )
          {
             size = _nblocs( rcl->dlen );
             rec1_alloc_frame( par->slot, size, &pdb );

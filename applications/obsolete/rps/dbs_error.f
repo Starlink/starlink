@@ -12,7 +12,7 @@
       CHARACTER*60  MESSAGE(11)	! Data for message.
       INTEGER       ERR		! Error number.
      & ,            SIZE	! Length of the file name.
- 
+
 *  GLobal Variables
       INTEGER  LUN	! Logical unit number of output.
       COMMON / DBS_LUN / LUN

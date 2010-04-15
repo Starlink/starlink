@@ -13,8 +13,8 @@
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
         INTEGER LOCO          ! locator to output image
 	INTEGER I
@@ -51,7 +51,7 @@
 
 	CALL PAR_GET0C( 'INPUT_CHOICE', INPUT_CHOICE, STATUS)
 	if( status .ne. sai__ok) then
-          CALL ERR_REP( 'INPUT', 
+          CALL ERR_REP( 'INPUT',
      :                  'Error after par_get0c input choice ...',
      :                   STATUS )
 	  return
@@ -183,7 +183,7 @@
 
 	      CALL MSG_SETI( 'PENNUM', POS)
 
-	      CALL MSG_OUT( 'MESSAGE', 
+	      CALL MSG_OUT( 'MESSAGE',
      *	                    'Choose INTENSITIES of PEN number ^PENNUM',
      *	                    STATUS)
 
@@ -244,7 +244,7 @@
 
 * create an HDS file for the colour table
 
-	CALL NDF_CREAT( 'OUTPIC', '_REAL', NDIMS, LBND, ODIMS, 
+	CALL NDF_CREAT( 'OUTPIC', '_REAL', NDIMS, LBND, ODIMS,
      :                   LOCO, STATUS)
 
 

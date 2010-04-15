@@ -17,7 +17,7 @@
 *    :     STATUS)
 
 *  Description:
-*     This routine obtains the lst_strt array and compares the 
+*     This routine obtains the lst_strt array and compares the
 *     dimensions with the number of exposures, inegrations and
 *     measurements. The number of switches is returned.
 
@@ -60,9 +60,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
 *  Local constants:
       INTEGER   MAX_DIM          ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
- 
+
 *  Local Variables:
       INTEGER DIM (MAX_DIM)    ! array dimensions
       INTEGER ITEMP              ! Dummy variable

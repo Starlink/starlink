@@ -12,8 +12,8 @@
 *     Create a parameter, simultaneously setting some of its attributes.
 *
 *     Note that the attributes set correspond to the ones usually used
-*     with FITS tables.  Also note that the data type attribute can be 
-*     deduced from the type of the routine.  However for CHARACTER 
+*     with FITS tables.  Also note that the data type attribute can be
+*     deduced from the type of the routine.  However for CHARACTER
 *     parameters the CHARACTER size attribute should be set using
 *     CAT_TATTC.
 *  Arguments:
@@ -37,7 +37,7 @@
 *         Create the default set of attributes of a parameter.
 *         Replace the defaults with the actual values for those
 *         attributes which are passed as arguments.
-*         Create the attributes (they are all mutable at this stage 
+*         Create the attributes (they are all mutable at this stage
 *         except those for the name and the data type).
 *         If (all is ok) then
 *           Increment the number of physical parameters.
@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -163,7 +163,7 @@
                QNAM = QNAME
                QDTYPE = CAT__TYPEB
                QCOMM = COMM
-            
+
 *
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -237,8 +237,8 @@
 *     Create a parameter, simultaneously setting some of its attributes.
 *
 *     Note that the attributes set correspond to the ones usually used
-*     with FITS tables.  Also note that the data type attribute can be 
-*     deduced from the type of the routine.  However for CHARACTER 
+*     with FITS tables.  Also note that the data type attribute can be
+*     deduced from the type of the routine.  However for CHARACTER
 *     parameters the CHARACTER size attribute should be set using
 *     CAT_TATTC.
 *  Arguments:
@@ -262,7 +262,7 @@
 *         Create the default set of attributes of a parameter.
 *         Replace the defaults with the actual values for those
 *         attributes which are passed as arguments.
-*         Create the attributes (they are all mutable at this stage 
+*         Create the attributes (they are all mutable at this stage
 *         except those for the name and the data type).
 *         If (all is ok) then
 *           Increment the number of physical parameters.
@@ -372,7 +372,7 @@
                QNAM = QNAME
                QDTYPE = CAT__TYPEC
                QCOMM = COMM
-            
+
 *
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -446,8 +446,8 @@
 *     Create a parameter, simultaneously setting some of its attributes.
 *
 *     Note that the attributes set correspond to the ones usually used
-*     with FITS tables.  Also note that the data type attribute can be 
-*     deduced from the type of the routine.  However for CHARACTER 
+*     with FITS tables.  Also note that the data type attribute can be
+*     deduced from the type of the routine.  However for CHARACTER
 *     parameters the CHARACTER size attribute should be set using
 *     CAT_TATTC.
 *  Arguments:
@@ -471,7 +471,7 @@
 *         Create the default set of attributes of a parameter.
 *         Replace the defaults with the actual values for those
 *         attributes which are passed as arguments.
-*         Create the attributes (they are all mutable at this stage 
+*         Create the attributes (they are all mutable at this stage
 *         except those for the name and the data type).
 *         If (all is ok) then
 *           Increment the number of physical parameters.
@@ -581,7 +581,7 @@
                QNAM = QNAME
                QDTYPE = CAT__TYPED
                QCOMM = COMM
-            
+
 *
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -655,8 +655,8 @@
 *     Create a parameter, simultaneously setting some of its attributes.
 *
 *     Note that the attributes set correspond to the ones usually used
-*     with FITS tables.  Also note that the data type attribute can be 
-*     deduced from the type of the routine.  However for CHARACTER 
+*     with FITS tables.  Also note that the data type attribute can be
+*     deduced from the type of the routine.  However for CHARACTER
 *     parameters the CHARACTER size attribute should be set using
 *     CAT_TATTC.
 *  Arguments:
@@ -680,7 +680,7 @@
 *         Create the default set of attributes of a parameter.
 *         Replace the defaults with the actual values for those
 *         attributes which are passed as arguments.
-*         Create the attributes (they are all mutable at this stage 
+*         Create the attributes (they are all mutable at this stage
 *         except those for the name and the data type).
 *         If (all is ok) then
 *           Increment the number of physical parameters.
@@ -790,7 +790,7 @@
                QNAM = QNAME
                QDTYPE = CAT__TYPEI
                QCOMM = COMM
-            
+
 *
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -864,8 +864,8 @@
 *     Create a parameter, simultaneously setting some of its attributes.
 *
 *     Note that the attributes set correspond to the ones usually used
-*     with FITS tables.  Also note that the data type attribute can be 
-*     deduced from the type of the routine.  However for CHARACTER 
+*     with FITS tables.  Also note that the data type attribute can be
+*     deduced from the type of the routine.  However for CHARACTER
 *     parameters the CHARACTER size attribute should be set using
 *     CAT_TATTC.
 *  Arguments:
@@ -889,7 +889,7 @@
 *         Create the default set of attributes of a parameter.
 *         Replace the defaults with the actual values for those
 *         attributes which are passed as arguments.
-*         Create the attributes (they are all mutable at this stage 
+*         Create the attributes (they are all mutable at this stage
 *         except those for the name and the data type).
 *         If (all is ok) then
 *           Increment the number of physical parameters.
@@ -999,7 +999,7 @@
                QNAM = QNAME
                QDTYPE = CAT__TYPEL
                QCOMM = COMM
-            
+
 *
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -1073,8 +1073,8 @@
 *     Create a parameter, simultaneously setting some of its attributes.
 *
 *     Note that the attributes set correspond to the ones usually used
-*     with FITS tables.  Also note that the data type attribute can be 
-*     deduced from the type of the routine.  However for CHARACTER 
+*     with FITS tables.  Also note that the data type attribute can be
+*     deduced from the type of the routine.  However for CHARACTER
 *     parameters the CHARACTER size attribute should be set using
 *     CAT_TATTC.
 *  Arguments:
@@ -1098,7 +1098,7 @@
 *         Create the default set of attributes of a parameter.
 *         Replace the defaults with the actual values for those
 *         attributes which are passed as arguments.
-*         Create the attributes (they are all mutable at this stage 
+*         Create the attributes (they are all mutable at this stage
 *         except those for the name and the data type).
 *         If (all is ok) then
 *           Increment the number of physical parameters.
@@ -1208,7 +1208,7 @@
                QNAM = QNAME
                QDTYPE = CAT__TYPER
                QCOMM = COMM
-            
+
 *
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).
@@ -1282,8 +1282,8 @@
 *     Create a parameter, simultaneously setting some of its attributes.
 *
 *     Note that the attributes set correspond to the ones usually used
-*     with FITS tables.  Also note that the data type attribute can be 
-*     deduced from the type of the routine.  However for CHARACTER 
+*     with FITS tables.  Also note that the data type attribute can be
+*     deduced from the type of the routine.  However for CHARACTER
 *     parameters the CHARACTER size attribute should be set using
 *     CAT_TATTC.
 *  Arguments:
@@ -1307,7 +1307,7 @@
 *         Create the default set of attributes of a parameter.
 *         Replace the defaults with the actual values for those
 *         attributes which are passed as arguments.
-*         Create the attributes (they are all mutable at this stage 
+*         Create the attributes (they are all mutable at this stage
 *         except those for the name and the data type).
 *         If (all is ok) then
 *           Increment the number of physical parameters.
@@ -1417,7 +1417,7 @@
                QNAM = QNAME
                QDTYPE = CAT__TYPEW
                QCOMM = COMM
-            
+
 *
 *             Create the attributes (they are all mutable at this stage
 *             except those for the name and the data type).

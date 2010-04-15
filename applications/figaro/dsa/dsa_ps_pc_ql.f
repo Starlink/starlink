@@ -39,7 +39,7 @@ C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the system, and the
 C     structure must have been opened using DSA_INPUT, DSA_OUTPUT or
-C     an equivalent routine.  Data and quality arrays must both have 
+C     an equivalent routine.  Data and quality arrays must both have
 C     been mapped.  DSA_PRE_PROCESS_QUALITY must have been called.
 C
 C  Version date: 6th february 1995.
@@ -105,7 +105,7 @@ C
 C     Local variables
 C
       INTEGER   DATA_ADDR      ! Virtual address of data array
-      CHARACTER DATA_TYPE*16   ! Type of mapped data array 
+      CHARACTER DATA_TYPE*16   ! Type of mapped data array
       INTEGER   I              ! Index through dimensions
       INTEGER   IGNORE         ! Dummy status value
       INTEGER   INVOKE         ! Dummy function value
@@ -115,9 +115,9 @@ C
       INTEGER   NELM           ! Number of data array elements
       CHARACTER OBJ_NAME*128   ! DTA_ name of data object
       INTEGER   QUAL_ADDR      ! Virtual address of quality array
-      CHARACTER QUAL_TYPE*16   ! Type of mapped quality array 
+      CHARACTER QUAL_TYPE*16   ! Type of mapped quality array
       CHARACTER REF_NAME_UC*32 ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT       ! Reference table slot # 
+      INTEGER   REF_SLOT       ! Reference table slot #
       CHARACTER STRUCTURE*128  ! Full structure name from ref_name
       INTEGER   TEMP_ADDR      ! Virtual address of work array
       INTEGER   TEMP_SLOT      ! Workspace slot for work array
@@ -136,12 +136,12 @@ C     Return immediately if bad status passed
 C
       IF (STATUS.NE.0) RETURN
 C
-C     We need an upper case version of REF_NAME 
+C     We need an upper case version of REF_NAME
 C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     Look up the reference name in the tables and get the data 
+C     Look up the reference name in the tables and get the data
 C     array dimensions.
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
@@ -165,12 +165,12 @@ C
       END IF
 C
 C     Now, see if we need to do anything. There is one condition under
-C     which we have to reflag the data in the main array according to 
+C     which we have to reflag the data in the main array according to
 C     the - now potentially updated - quality array. This is the case
 C     where the data array may be flagged, where there is no quality
 C     array associated with the data file, and where the application
-C     program was not handling the flagged data itself. Note that by this 
-C     stage all the common table items such as DATA_FLAGGED will have 
+C     program was not handling the flagged data itself. Note that by this
+C     stage all the common table items such as DATA_FLAGGED will have
 C     been set.
 C
       IF ((DATA_FLAGGED(REF_SLOT).GT.0).AND.
@@ -220,7 +220,7 @@ C        It is possible that the quality array wasn't mapped as a byte
 C        array (how perverse can some people be?).  If that's the case
 C        - and we assume that would be unusual - we need a byte array
 C        of the same size as temporary workspace.
-C        
+C
          IF (QUAL_TYPE.NE.'BYTE') THEN
             CALL DSA_GET_WORKSPACE(NELM,TEMP_ADDR,TEMP_SLOT,STATUS)
             VECSTA = 0

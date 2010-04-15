@@ -10,7 +10,7 @@
 
 #  Description:
 #     Offers to save the nominated renderer state to a file using
-#     the VTK image Writers, TIFF, PNG, JPEG and Postscript. Uses 
+#     the VTK image Writers, TIFF, PNG, JPEG and Postscript. Uses
 #     a vtkLargeRenderedImage so that images with a finer resolution
 #     than the display can be used.
 

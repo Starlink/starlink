@@ -23,7 +23,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-! 
+!
       SIZE = R * 0.70711
       CALL SGS_BPOLY (X-SIZE,Y)
       CALL SGS_APOLY (X,Y+SIZE)
@@ -32,5 +32,5 @@
       CALL SGS_APOLY (X-SIZE,Y)
       CALL SGS_OPOLY
       R=SIZE
- 
+
       END

@@ -253,7 +253,7 @@
          else if(key.eq.cndict) then
 
 *  If greyscale device, then close it
-            
+
             if(.not.ifcont) call clgrap
             return
          end if

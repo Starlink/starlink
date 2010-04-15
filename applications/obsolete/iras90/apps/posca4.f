@@ -2,7 +2,7 @@
 *+
 *{subroutine_prologue}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
             CALL IRC_ANNUL( IDC, STATUS )
             CALL ERR_ANNUL( STATUS )
 
-*  Increment the index of the next input NDF. 
+*  Increment the index of the next input NDF.
             INDEX = INDEX + 1
 
 *  If all input NDFs have been tried, report an error.
@@ -98,9 +98,9 @@
      :                       STATUS )
                GO TO 999
             END IF
-            
+
          END IF
-      
+
 *  Annul the NDF identifier.
          CALL NDF_ANNUL( INDF, STATUS )
 

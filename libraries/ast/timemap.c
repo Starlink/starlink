@@ -11,7 +11,7 @@ c     astTimeMap (also see astTimeAdd)
 f     AST_TIMEMAP (also see AST_TIMEADD)
 
 *  Description:
-*     A TimeMap is a specialised form of 1-dimensional Mapping which can be 
+*     A TimeMap is a specialised form of 1-dimensional Mapping which can be
 *     used to represent a sequence of conversions between standard time
 *     coordinate systems.
 *
@@ -20,8 +20,8 @@ c     (null) Mapping. Using the astTimeAdd
 f     (null) Mapping. Using the AST_TIMEADD
 c     function, a series of coordinate conversion steps may then be
 f     routine, a series of coordinate conversion steps may then be
-*     added. This allows multi-step conversions between a variety of 
-*     time coordinate systems to be assembled out of a set of building 
+*     added. This allows multi-step conversions between a variety of
+*     time coordinate systems to be assembled out of a set of building
 *     blocks.
 *
 *     For details of the individual coordinate conversions available,
@@ -87,7 +87,7 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *        Only call memcpy if the source and destination pointers are
 *        different.
 *     15-APR-2008 (DSB):
-*        Add missing "break;" statement to "case AST__LMSTTOGMST:" 
+*        Add missing "break;" statement to "case AST__LMSTTOGMST:"
 *        in Transform.
 *     20-MAY-2008 (DSB):
 *        Add conversions between Local Time and UTC (LTTOUTC and UTCTOLT).
@@ -206,9 +206,9 @@ static double (* parent_rate)( AstMapping *, double *, int, int, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(TimeMap)
@@ -272,7 +272,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "timemap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     TimeMap member function (over-rides the astEqual protected
@@ -299,16 +299,16 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstTimeMap *that;        
-   AstTimeMap *this;        
-   const char *argdesc[ MAX_ARGS ]; 
-   const char *comment;      
-   int i, j;           
-   int nargs;              
+   AstTimeMap *that;
+   AstTimeMap *this;
+   const char *argdesc[ MAX_ARGS ];
+   const char *comment;
+   int i, j;
+   int nargs;
    int nin;
    int nout;
    int result;
-   int szargs;             
+   int szargs;
 
 /* Initialise. */
    result = 0;
@@ -330,9 +330,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
 
-/* If the Invert flags for the two TimeMaps differ, it may still be possible 
-   for them to be equivalent. First compare the TimeMaps if their Invert 
-   flags are the same. In this case all the attributes of the two TimeMaps 
+/* If the Invert flags for the two TimeMaps differ, it may still be possible
+   for them to be equivalent. First compare the TimeMaps if their Invert
+   flags are the same. In this case all the attributes of the two TimeMaps
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
             if( this->ncvt == that->ncvt ) {
@@ -353,7 +353,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                }
             }
 
-/* If the Invert flags for the two TimeMaps differ, the attributes of the two 
+/* If the Invert flags for the two TimeMaps differ, the attributes of the two
    TimeMaps must be inversely related to each other. */
          } else {
 
@@ -363,7 +363,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -384,7 +384,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "timemap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     TimeMap member function (over-rides the astGetObjSize protected
@@ -518,24 +518,24 @@ static void AddArgs( int cvttype, double *cvtargs, int *status ) {
       break;
 
    case AST__TTTOTDB:
-      palSlaGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );      
+      palSlaGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );
       cvtargs[ 4 ] = 0.001*r*AST__AU;
       cvtargs[ 5 ] = 0.001*z*AST__AU;
       break;
 
    case AST__TDBTOTT:
-      palSlaGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );      
+      palSlaGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );
       cvtargs[ 4 ] = 0.001*r*AST__AU;
       cvtargs[ 5 ] = 0.001*z*AST__AU;
       break;
 
    case AST__TDBTOTCB:
-      cvtargs[ 1 ] = LB*( cvtargs[ 0 ] - (TTOFF/SPD) 
+      cvtargs[ 1 ] = LB*( cvtargs[ 0 ] - (TTOFF/SPD)
                                         - 43144.0 ) + P0/SPD;
       break;
 
    case AST__TCBTOTDB:
-      cvtargs[ 1 ] = LB*( cvtargs[ 0 ] - (TTOFF/SPD) 
+      cvtargs[ 1 ] = LB*( cvtargs[ 0 ] - (TTOFF/SPD)
                                         - 43144.0 ) + P0/SPD;
       break;
 
@@ -547,7 +547,7 @@ static void AddArgs( int cvttype, double *cvtargs, int *status ) {
       cvtargs[ 1 ] = LG*( cvtargs[ 0 ] - (TTOFF/SPD) - 43144.0 );
       break;
 
-   }         
+   }
 }
 
 static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *status ) {
@@ -584,13 +584,13 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *        Pointer to the TimeMap.
 *     cvttype
 *        A code to identify which time coordinate conversion is to be
-*        appended.  See the "Coordinate Conversions" section for details 
+*        appended.  See the "Coordinate Conversions" section for details
 *        of those available.
 *     args
 *        Pointer to an array of double containing the argument values
 *        required to fully specify the required coordinate
 *        conversion. The number of arguments depends on the conversion
-*        (see the "Coordinate Conversions" section for details). This 
+*        (see the "Coordinate Conversions" section for details). This
 *        value is ignored and may be NULL if no arguments are required.
 
 *  Returned Value:
@@ -601,8 +601,8 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *     in order to specify the coordinate conversion to be performed.
 *     The argument(s) required to fully specify each conversion are
 *     indicated in parentheses after each value, and described at the end
-*     of the list. Values for these should be given in the array pointed 
-*     at by "args". 
+*     of the list. Values for these should be given in the array pointed
+*     at by "args".
 *
 *        AST__MJDTOMJD( MJDOFF1, MJDOFF2 )
 *           Convert Modified Julian Date from one offset to another.
@@ -660,7 +660,7 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *           Convert a UTC MJD to a local time MJD.
 *
 *     The units for the values processed by the above conversions are as
-*     follows: 
+*     follows:
 *
 *     - MJD, MJDOFF, JD, JDOFF: days
 *     - Julian epochs, BEPOFF: Tropical years
@@ -676,7 +676,7 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *     - OBSLAT: Observer's geodetic latitude in radians (+ve northwards)
 *     - OBSALT: Observer's geodetic altitude in metres.
 *     - DUT1: The value of UT1-UTC
-*     - LTOFF: The offset between Local Time and UTC (in hours, positive 
+*     - LTOFF: The offset between Local Time and UTC (in hours, positive
 *     for time zones east of Greenwich).
 
 *  Notes:
@@ -708,7 +708,7 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
    error. */
    if ( astOK && !cvt_string ) {
       astError( AST__TIMIN, "AddTimeCvt(%s): Invalid time coordinate "
-                "conversion type (%d).", status, astGetClass( this ),    
+                "conversion type (%d).", status, astGetClass( this ),
                 (int) cvttype );
    }
 
@@ -723,14 +723,14 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
       this->cvtargs = (double **) astGrow( this->cvtargs, ncvt + 1,
                                            sizeof( double * ) );
 
-/* Allocate memory for the argument list, putting a pointer to it into 
+/* Allocate memory for the argument list, putting a pointer to it into
    the TimeMap. */
       this->cvtargs[ ncvt ] = astMalloc( sizeof( double ) * (size_t) szargs );
 
 /* Store the conversion type and increment the conversion count. Also
    copy the supplied arguments into the memory allocated above and put
    suitable values in any elements of the argument array which are beyond
-   the end of the user-supplied arguments. These are intermediate values 
+   the end of the user-supplied arguments. These are intermediate values
    calculated on the basis of the user-supplied arguments. */
       if ( astOK ) {
          this->cvttype[ ncvt ] = cvttype;
@@ -805,80 +805,80 @@ static int CvtCode( const char *cvt_string, int *status ) {
    } else if ( astChrMatch( cvt_string, "JDTOMJD" ) ) {
       result = AST__JDTOMJD;
 
-   } else if ( astChrMatch( cvt_string, "JDTOMJD" ) ) { 
-      result = AST__JDTOMJD; 
+   } else if ( astChrMatch( cvt_string, "JDTOMJD" ) ) {
+      result = AST__JDTOMJD;
 
-   } else if ( astChrMatch( cvt_string, "MJDTOBEP" ) ) { 
-      result = AST__MJDTOBEP; 
+   } else if ( astChrMatch( cvt_string, "MJDTOBEP" ) ) {
+      result = AST__MJDTOBEP;
 
-   } else if ( astChrMatch( cvt_string, "BEPTOMJD" ) ) { 
-      result = AST__BEPTOMJD; 
+   } else if ( astChrMatch( cvt_string, "BEPTOMJD" ) ) {
+      result = AST__BEPTOMJD;
 
-   } else if ( astChrMatch( cvt_string, "MJDTOJEP" ) ) { 
-      result = AST__MJDTOJEP; 
+   } else if ( astChrMatch( cvt_string, "MJDTOJEP" ) ) {
+      result = AST__MJDTOJEP;
 
-   } else if ( astChrMatch( cvt_string, "JEPTOMJD" ) ) { 
-      result = AST__JEPTOMJD; 
+   } else if ( astChrMatch( cvt_string, "JEPTOMJD" ) ) {
+      result = AST__JEPTOMJD;
 
-   } else if ( astChrMatch( cvt_string, "TAITOUTC" ) ) { 
-      result = AST__TAITOUTC; 
+   } else if ( astChrMatch( cvt_string, "TAITOUTC" ) ) {
+      result = AST__TAITOUTC;
 
-   } else if ( astChrMatch( cvt_string, "UTCTOTAI" ) ) { 
-      result = AST__UTCTOTAI; 
+   } else if ( astChrMatch( cvt_string, "UTCTOTAI" ) ) {
+      result = AST__UTCTOTAI;
 
-   } else if ( astChrMatch( cvt_string, "TAITOTT" ) ) { 
-      result = AST__TAITOTT; 
+   } else if ( astChrMatch( cvt_string, "TAITOTT" ) ) {
+      result = AST__TAITOTT;
 
-   } else if ( astChrMatch( cvt_string, "TTTOTAI" ) ) { 
-      result = AST__TTTOTAI; 
+   } else if ( astChrMatch( cvt_string, "TTTOTAI" ) ) {
+      result = AST__TTTOTAI;
 
-   } else if ( astChrMatch( cvt_string, "TTTOTDB" ) ) { 
-      result = AST__TTTOTDB; 
+   } else if ( astChrMatch( cvt_string, "TTTOTDB" ) ) {
+      result = AST__TTTOTDB;
 
-   } else if ( astChrMatch( cvt_string, "TDBTOTT" ) ) { 
-      result = AST__TDBTOTT; 
+   } else if ( astChrMatch( cvt_string, "TDBTOTT" ) ) {
+      result = AST__TDBTOTT;
 
-   } else if ( astChrMatch( cvt_string, "TTTOTCG" ) ) { 
-      result = AST__TTTOTCG; 
+   } else if ( astChrMatch( cvt_string, "TTTOTCG" ) ) {
+      result = AST__TTTOTCG;
 
-   } else if ( astChrMatch( cvt_string, "TCGTOTT" ) ) { 
-      result = AST__TCGTOTT; 
+   } else if ( astChrMatch( cvt_string, "TCGTOTT" ) ) {
+      result = AST__TCGTOTT;
 
-   } else if ( astChrMatch( cvt_string, "TDBTOTCB" ) ) { 
-      result = AST__TDBTOTCB; 
+   } else if ( astChrMatch( cvt_string, "TDBTOTCB" ) ) {
+      result = AST__TDBTOTCB;
 
-   } else if ( astChrMatch( cvt_string, "TCBTOTDB" ) ) { 
-      result = AST__TCBTOTDB; 
+   } else if ( astChrMatch( cvt_string, "TCBTOTDB" ) ) {
+      result = AST__TCBTOTDB;
 
-   } else if ( astChrMatch( cvt_string, "UTTOGMST" ) ) { 
-      result = AST__UTTOGMST; 
+   } else if ( astChrMatch( cvt_string, "UTTOGMST" ) ) {
+      result = AST__UTTOGMST;
 
-   } else if ( astChrMatch( cvt_string, "GMSTTOUT" ) ) { 
-      result = AST__GMSTTOUT; 
+   } else if ( astChrMatch( cvt_string, "GMSTTOUT" ) ) {
+      result = AST__GMSTTOUT;
 
-   } else if ( astChrMatch( cvt_string, "GMSTTOLMST" ) ) { 
-      result = AST__GMSTTOLMST; 
+   } else if ( astChrMatch( cvt_string, "GMSTTOLMST" ) ) {
+      result = AST__GMSTTOLMST;
 
-   } else if ( astChrMatch( cvt_string, "LMSTTOGMST" ) ) { 
-      result = AST__LMSTTOGMST; 
+   } else if ( astChrMatch( cvt_string, "LMSTTOGMST" ) ) {
+      result = AST__LMSTTOGMST;
 
-   } else if ( astChrMatch( cvt_string, "LASTTOLMST" ) ) { 
-      result = AST__LASTTOLMST; 
+   } else if ( astChrMatch( cvt_string, "LASTTOLMST" ) ) {
+      result = AST__LASTTOLMST;
 
-   } else if ( astChrMatch( cvt_string, "LMSTTOLAST" ) ) { 
-      result = AST__LMSTTOLAST; 
+   } else if ( astChrMatch( cvt_string, "LMSTTOLAST" ) ) {
+      result = AST__LMSTTOLAST;
 
-   } else if ( astChrMatch( cvt_string, "UTTOUTC" ) ) { 
-      result = AST__UTTOUTC;    
+   } else if ( astChrMatch( cvt_string, "UTTOUTC" ) ) {
+      result = AST__UTTOUTC;
 
-   } else if ( astChrMatch( cvt_string, "UTCTOUT" ) ) { 
-      result = AST__UTCTOUT;    
+   } else if ( astChrMatch( cvt_string, "UTCTOUT" ) ) {
+      result = AST__UTCTOUT;
 
-   } else if ( astChrMatch( cvt_string, "LTTOUTC" ) ) { 
-      result = AST__LTTOUTC;    
+   } else if ( astChrMatch( cvt_string, "LTTOUTC" ) ) {
+      result = AST__LTTOUTC;
 
-   } else if ( astChrMatch( cvt_string, "UTCTOLT" ) ) { 
-      result = AST__UTCTOLT;    
+   } else if ( astChrMatch( cvt_string, "UTCTOLT" ) ) {
+      result = AST__UTCTOLT;
    }
 
 /* Return the result. */
@@ -900,7 +900,7 @@ static const char *CvtString( int cvt_code, const char **comment,
 
 *  Synopsis:
 *     #include "timemap.h"
-*     const char *CvtString( int cvt_code, const char **comment, int *nargs, 
+*     const char *CvtString( int cvt_code, const char **comment, int *nargs,
 *                            int *szargs, const char *arg[ MAX_ARGS ], int *status )
 
 *  Class Membership:
@@ -922,7 +922,7 @@ static const char *CvtString( int cvt_code, const char **comment,
 *        conversion.
 *     nargs
 *        Address of an int in which to return the number of arguments
-*        required from the user in order to perform the conversion (may 
+*        required from the user in order to perform the conversion (may
 *        be zero).
 *     szargs
 *        Address of an int in which to return the number of arguments
@@ -959,7 +959,7 @@ static const char *CvtString( int cvt_code, const char **comment,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
-      
+
 /* Test for each valid code value in turn and assign the appropriate
    return values. */
    switch ( cvt_code ) {
@@ -1242,19 +1242,19 @@ double astDat_( double in, int forward, int *status ){
 *     double astDat( double in, int forward )
 
 *  Class Membership:
-*     TimeMap member function 
+*     TimeMap member function
 
 *  Description:
-*     This function returns the difference between Coordinated Universal Time 
+*     This function returns the difference between Coordinated Universal Time
 *     (UTC) and International Atomic Time (TAI), at a given epoch.
 
 *  Parameters:
 *     in
-*        UTC date or TAI time (as selected by "forward"), as an absolute 
+*        UTC date or TAI time (as selected by "forward"), as an absolute
 *        MJD.
 *     forward
 *        If non-zero, "in" should be a UTC value, and the returned value
-*        is TAI-UTC. If zero, "in" should be a TAI value, and the returned 
+*        is TAI-UTC. If zero, "in" should be a TAI value, and the returned
 *        value is UTC-TAI.
 
 *  Returned Value:
@@ -1290,7 +1290,7 @@ double astDat_( double in, int forward, int *status ){
 /* Initialise the returned value. */
    if( in == AST__BAD ) return AST__BAD;
 
-/* First do TAI-UTC at a given UTC 
+/* First do TAI-UTC at a given UTC
    ------------------------------- */
    if( forward ) {
 
@@ -1451,7 +1451,7 @@ double astDat_( double in, int forward, int *status ){
          result = 1.4178180 + ( in - 37300.0 )*0.001296;
       }
 
-/* Now do UTC-TAI at a given TAI. 
+/* Now do UTC-TAI at a given TAI.
    ------------------------------  */
    } else {
 
@@ -1557,7 +1557,7 @@ double astDat_( double in, int forward, int *status ){
          result = -10.0;
 
 /* 1968 February 1 */
-      } else if( in >= 39887.0 + ( 4.2131700 
+      } else if( in >= 39887.0 + ( 4.2131700
                                   + ( 39887.0 - 39126.0 )*0.002592 )/SPD ){
          result = -( 4.2131700 + ( in - 39126.0 )*0.002592 )/1.02592;
 
@@ -1647,24 +1647,24 @@ static double Gmsta( double in, double off, int forward, int *status ){
 *     double Gmsta( double in, double off, int forward, int *status ){
 
 *  Class Membership:
-*     TimeMap member function 
+*     TimeMap member function
 
 *  Description:
 *     This functions converts between UT and GMST. Both timescales are
-*     represented by an MJD, rather than as an angle (as is done by SLALIB) 
+*     represented by an MJD, rather than as an angle (as is done by SLALIB)
 *     in order to facilitate conversions from GMST to UT1. This means
 *     that whole days are retained.
 
 *  Parameters:
 *     in
-*        The time to convert, represented as an offset in days from the MJD 
+*        The time to convert, represented as an offset in days from the MJD
 *        zero-point specified by "off". The time is either UT1 or GMST, as
 *        selected by "forward").
 *     off
 *        The MJD value corresponding to a value of 0.0 for "in".
 *     forward
 *        If non-zero, "in" should be a UT1 value, and the returned value
-*        is GMST. If zero, "in" should be a GMST value, and the returned 
+*        is GMST. If zero, "in" should be a GMST value, and the returned
 *        value is UT1.
 *     status
 *        Pointer to the inherited status variable.
@@ -1698,31 +1698,31 @@ static double Gmsta( double in, double off, int forward, int *status ){
       t = ( off + in - 51544.5 )/36525.0;
 
 /* GMST at this UT1. */
-      result = in + ( 24110.54841 + ( 8640184.812866 + ( 0.093104 - 
+      result = in + ( 24110.54841 + ( 8640184.812866 + ( 0.093104 -
                       6.2E-6*t )*t )*t )/86400.0;
 
 /* Now deal with GMST -> UT1
    ----------------------- */
    } else {
 
-/* Form an initial guess at the UT1 value using the inverse of a linear 
+/* Form an initial guess at the UT1 value using the inverse of a linear
    approximation to the UT1->GMST equation. */
       result = 0.996997348638869*in + 154.49194372222 - 0.00300265136113098*off;
 
 /* Loop round improving the guess, until the guess stops changing, or 10
    iterations have been performed. */
-      utl = AST__BAD;       
+      utl = AST__BAD;
       nit = 0;
       while( result != utl && nit++ < 10 ){
 
 /* Calculate the GMST at the current UT1 guess. */
          t = ( off + result - 51544.5 )/36525.0;
-         g = result + ( 24110.54841 + ( 8640184.812866 + ( 0.093104 - 
+         g = result + ( 24110.54841 + ( 8640184.812866 + ( 0.093104 -
                       6.2E-6*t )*t )*t )/86400.0;
 
 /* Calculate the rate of change of GMST with respect to UT1 at the current
    UT1 guess. */
-         dgdu = 1.0 + ( 8640184.812866 + 
+         dgdu = 1.0 + ( 8640184.812866 +
                   ( 0.186208 - 12.4E-6*t )*t)/(36525.0*86400.0);
 
 /* Improve the UT1 guess. */
@@ -1765,7 +1765,7 @@ void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1815,7 +1815,7 @@ void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name, int *status )
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    object->Equal = Equal;
-   mapping->MapMerge = MapMerge;  
+   mapping->MapMerge = MapMerge;
 
 /* Declare the copy constructor, destructor and class dump
    function. */
@@ -2013,7 +2013,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       nstep = ( (AstTimeMap *) ( *map_list )[ where ] )->ncvt;
 
 /* Search adjacent lower-numbered Mappings until one is found which is
-   not a TimeMap. Accumulate the number of transformation steps involved in 
+   not a TimeMap. Accumulate the number of transformation steps involved in
    any TimeMaps found. */
       imap1 = where;
       while ( ( imap1 - 1 >= 0 ) && astOK ) {
@@ -2063,7 +2063,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Store the transformation type code and use "CvtString" to determine
    the associated number of arguments. Then store these arguments. */
             cvttype[ nstep ] = timemap->cvttype[ icvt ];
-            (void) CvtString( cvttype[ nstep ], &comment, 
+            (void) CvtString( cvttype[ nstep ], &comment,
                               &narg, szarg + nstep, argdesc, status );
             if ( !astOK ) break;
             for ( iarg = 0; iarg < szarg[ nstep ]; iarg++ ) {
@@ -2109,23 +2109,23 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             if ( invert ) {
 
 /* Exchange transformation codes for their inverses. */
-               SWAP_CODES( AST__TAITOUTC, AST__UTCTOTAI ) 
-               SWAP_CODES( AST__TAITOTT, AST__TTTOTAI ) 
-               SWAP_CODES( AST__TTTOTDB, AST__TDBTOTT ) 
-               SWAP_CODES( AST__TDBTOTCB, AST__TCBTOTDB ) 
-               SWAP_CODES( AST__TTTOTCG, AST__TCGTOTT ) 
-               SWAP_CODES( AST__UTTOGMST, AST__GMSTTOUT ) 
-               SWAP_CODES( AST__GMSTTOLMST, AST__LMSTTOGMST ) 
-               SWAP_CODES( AST__LASTTOLMST, AST__LMSTTOLAST ) 
-               SWAP_CODES( AST__UTTOUTC, AST__UTCTOUT ) 
-               SWAP_CODES( AST__LTTOUTC, AST__UTCTOLT ) 
+               SWAP_CODES( AST__TAITOUTC, AST__UTCTOTAI )
+               SWAP_CODES( AST__TAITOTT, AST__TTTOTAI )
+               SWAP_CODES( AST__TTTOTDB, AST__TDBTOTT )
+               SWAP_CODES( AST__TDBTOTCB, AST__TCBTOTDB )
+               SWAP_CODES( AST__TTTOTCG, AST__TCGTOTT )
+               SWAP_CODES( AST__UTTOGMST, AST__GMSTTOUT )
+               SWAP_CODES( AST__GMSTTOLMST, AST__LMSTTOGMST )
+               SWAP_CODES( AST__LASTTOLMST, AST__LMSTTOLAST )
+               SWAP_CODES( AST__UTTOUTC, AST__UTCTOUT )
+               SWAP_CODES( AST__LTTOUTC, AST__UTCTOLT )
 
 /* Exchange transformation codes for their inverses, and swap the offset
    values. */
-               SWAP_CODES2( AST__MJDTOMJD, AST__MJDTOMJD ) 
-               SWAP_CODES2( AST__MJDTOJD, AST__JDTOMJD ) 
-               SWAP_CODES2( AST__MJDTOBEP, AST__BEPTOMJD ) 
-               SWAP_CODES2( AST__MJDTOJEP, AST__JEPTOMJD ) 
+               SWAP_CODES2( AST__MJDTOMJD, AST__MJDTOMJD )
+               SWAP_CODES2( AST__MJDTOJD, AST__JDTOMJD )
+               SWAP_CODES2( AST__MJDTOBEP, AST__BEPTOMJD )
+               SWAP_CODES2( AST__MJDTOJEP, AST__JEPTOMJD )
 
             }
 
@@ -2157,8 +2157,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                 cvtargs[ istep ][ 2 ] == 0.0 ) {
                keep = 0;
 
-/* The only simplifications for the conversions currently in this class act 
-   to combine adjacent transformation steps, so only apply them while there 
+/* The only simplifications for the conversions currently in this class act
+   to combine adjacent transformation steps, so only apply them while there
    are at least 2 steps left. */
             } else if ( istep < ( nstep - 1 ) ) {
 
@@ -2174,31 +2174,31 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                ( ( PAIR_CVT( code1, code2 ) ) || \
                  ( PAIR_CVT( code2, code1 ) ) )
 
-/* If a correction is followed by its inverse, and the user-supplied argument 
+/* If a correction is followed by its inverse, and the user-supplied argument
    values are unchanged (we do not need to test values stored in the
-   argument array which were not supplied by the user), we can eliminate them. 
+   argument array which were not supplied by the user), we can eliminate them.
    First check for conversions which have a single user-supplied argument. */
                if( ( PAIR_CVT2( AST__TAITOUTC, AST__UTCTOTAI ) ||
                      PAIR_CVT2( AST__TAITOTT, AST__TTTOTAI ) ||
                      PAIR_CVT2( AST__UTTOGMST, AST__GMSTTOUT ) ||
-                     PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) || 
-                     PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) || 
+                     PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) ||
+                     PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) ||
                      PAIR_CVT2( AST__UTTOUTC, AST__UTCTOUT ) ||
                      PAIR_CVT2( AST__LTTOUTC, AST__UTCTOLT ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ], 
+                          EQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
 
 /* Now check for conversions which have two user-supplied arguments
    (test they are swapped). */
-               } else if( ( PAIR_CVT2( AST__MJDTOJD, AST__JDTOMJD ) || 
-                            PAIR_CVT2( AST__MJDTOMJD, AST__MJDTOMJD ) || 
-                            PAIR_CVT2( AST__MJDTOBEP, AST__BEPTOMJD ) || 
+               } else if( ( PAIR_CVT2( AST__MJDTOJD, AST__JDTOMJD ) ||
+                            PAIR_CVT2( AST__MJDTOMJD, AST__MJDTOMJD ) ||
+                            PAIR_CVT2( AST__MJDTOBEP, AST__BEPTOMJD ) ||
                             PAIR_CVT2( AST__MJDTOJEP, AST__JEPTOMJD ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ], 
+                          EQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ], 
+                          EQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2207,24 +2207,24 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if( ( PAIR_CVT2( AST__TDBTOTCB, AST__TCBTOTDB ) ||
                             PAIR_CVT2( AST__GMSTTOLMST, AST__LMSTTOGMST ) ||
                             PAIR_CVT2( AST__LASTTOLMST, AST__LMSTTOLAST ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ], 
+                          EQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ], 
+                          EQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ], 
+                          EQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) ) {
                   istep++;
                   keep = 0;
 
 /* Now check for conversions which have four user-supplied arguments. */
                } else if( ( PAIR_CVT2( AST__TTTOTDB, AST__TDBTOTT ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ], 
+                          EQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ], 
+                          EQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ], 
+                          EQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 3 ], 
+                          EQUAL( cvtargs[ istep ][ 3 ],
                                  cvtargs[ istep + 1 ][ 3 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2366,37 +2366,37 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 *     from the Mapping class ).
 
 *  Description:
-*     This function returns the rate of change of a specified output of 
-*     the supplied Mapping with respect to a specified input, at a 
-*     specified input position. 
+*     This function returns the rate of change of a specified output of
+*     the supplied Mapping with respect to a specified input, at a
+*     specified input position.
 
 *  Parameters:
 *     this
 *        Pointer to the Mapping to be applied.
 *     at
-*        The address of an array holding the axis values at the position 
-*        at which the rate of change is to be evaluated. The number of 
-*        elements in this array should equal the number of inputs to the 
+*        The address of an array holding the axis values at the position
+*        at which the rate of change is to be evaluated. The number of
+*        elements in this array should equal the number of inputs to the
 *        Mapping.
 *     ax1
-*        The index of the Mapping output for which the rate of change is to 
+*        The index of the Mapping output for which the rate of change is to
 *        be found (output numbering starts at 0 for the first output).
 *     ax2
 *        The index of the Mapping input which is to be varied in order to
-*        find the rate of change (input numbering starts at 0 for the first 
+*        find the rate of change (input numbering starts at 0 for the first
 *        input).
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The rate of change of Mapping output "ax1" with respect to input 
-*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     The rate of change of Mapping output "ax1" with respect to input
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be
 *     calculated.
 
 *  Implementation Deficiencies:
 *     The initial version of this implementation only deals with
 *     frequency->wavelength conversions. This is because the slowness of
-*     the numerical differentiation implemented by the astRate method in 
+*     the numerical differentiation implemented by the astRate method in
 *     the parent Mapping class is cripples conversion between SpecFluxFrames.
 *     Such conversions only rely on rate of change of wavelength with
 *     respect to frequency. This implementation should be extended when
@@ -2417,7 +2417,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
    map = (AstTimeMap *) this;
 
 /* Initialise the returned value. */
-   result = 1.0;   
+   result = 1.0;
 
 /* Loop round each conversion. */
    for( i = 0; i < map->ncvt; i++ ) {
@@ -2425,7 +2425,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 /* Store the type of the current conversion.*/
       cvt = map->cvttype[ i ];
 
-/* Many of the time conversions are linear. If this is the case, multiply 
+/* Many of the time conversions are linear. If this is the case, multiply
    the total rate of change by the rate of change for this step. */
       if( cvt == AST__MJDTOBEP ) {
          result *= 1.0/365.242198781;
@@ -2439,17 +2439,17 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
       } else if( cvt == AST__JEPTOMJD ) {
          result *= 365.25;
 
-/* The GMST scales is not linear, so break if we encounter it, and use the 
-   (numerical) parent astRate method. The other time scale conversions are 
-   assumed to have a slope of unity. In fact the slope will be ever so 
+/* The GMST scales is not linear, so break if we encounter it, and use the
+   (numerical) parent astRate method. The other time scale conversions are
+   assumed to have a slope of unity. In fact the slope will be ever so
    slightly different to unity. */
       } else if( cvt == AST__UTTOGMST || cvt == AST__GMSTTOUT ) {
          result = AST__BAD;
-         break;         
+         break;
       }
    }
 
-/* If this is non-linear TimeMap, use the astRate method inherited from the 
+/* If this is non-linear TimeMap, use the astRate method inherited from the
    parent Mapping class. */
    if( result == AST__BAD ) result = (*parent_rate)( this, at, ax1, ax2, status );
 
@@ -2473,7 +2473,7 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
 *     double Rcc( double tdb, double ut1, double wl, double u, double v, int *status )
 
 *  Class Membership:
-*     TimeMap member function 
+*     TimeMap member function
 
 *  Description:
 *     Relativistic clock correction:  the difference between proper time at
@@ -2498,9 +2498,9 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The clock correction, TDB-TT, in seconds. TDB is coordinate time in the 
-*     solar system barycentre frame of reference, in units chosen to eliminate 
-*     the scale difference with respect to terrestrial time. TT is the proper 
+*     The clock correction, TDB-TT, in seconds. TDB is coordinate time in the
+*     solar system barycentre frame of reference, in units chosen to eliminate
+*     the scale difference with respect to terrestrial time. TT is the proper
 *     time for clocks at mean sea level on the Earth.
 
 *  Notes:
@@ -2510,7 +2510,7 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
 *     - The argument TDB is, strictly, the barycentric coordinate time;
 *     however, the terrestrial time TT can in practice be used without
 *     any significant loss of accuracy.
-*     
+*
 *     - The result returned by Rcc comprises a main (annual)
 *     sinusoidal term of amplitude approximately 0.00166 seconds, plus
 *     planetary and lunar terms up to about 20 microseconds, and diurnal
@@ -2518,7 +2518,7 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
 *     transverse Doppler effect and the gravitational red-shift as the
 *     observer varies in speed and moves through different gravitational
 *     potentials.
-*     
+*
 *     - The geocentric model is that of Fairhead & Bretagnon (1990), in
 *     its full form.  It was supplied by Fairhead (private
 *     communication) as a FORTRAN subroutine.  The original Fairhead
@@ -3387,7 +3387,7 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
 /* -------------------------------------------------------------------- */
 
 /* Local Variables: */
-   double t, tsol, w, elsun, emsun, d, elj, els, wt, w0, w1, w2, w3, w4, 
+   double t, tsol, w, elsun, emsun, d, elj, els, wt, w0, w1, w2, w3, w4,
           wf, wj;
    int i;
 
@@ -3472,10 +3472,10 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
    wf = t*( t*( t*( t*w4 + w3 ) + w2 ) + w1 ) + w0;
 
 /* Adjustments to use JPL planetary masses instead of IAU. */
-   wj =    0.00065E-6  * sin(  6069.776754  *t  +  4.021194  )  + 
-           0.00033E-6  * sin(   213.299095  *t  +  5.543132  )  + 
-        ( -0.00196E-6  * sin( 6208.294251   *t  +  5.696701  ) ) + 
-        ( -0.00173E-6  * sin(   74.781599   *t  +  2.435900  ) ) + 
+   wj =    0.00065E-6  * sin(  6069.776754  *t  +  4.021194  )  +
+           0.00033E-6  * sin(   213.299095  *t  +  5.543132  )  +
+        ( -0.00196E-6  * sin( 6208.294251   *t  +  5.696701  ) ) +
+        ( -0.00173E-6  * sin(   74.781599   *t  +  2.435900  ) ) +
            0.03638E-6*t*t;
 
 
@@ -3562,9 +3562,9 @@ f        The global status.
 
 *  Notes:
 *     - When assembling a multi-stage conversion, it can sometimes be
-*     difficult to determine the most economical conversion path. A solution 
-*     to this is to include all the steps which are (logically) necessary, 
-*     but then to use 
+*     difficult to determine the most economical conversion path. A solution
+*     to this is to include all the steps which are (logically) necessary,
+*     but then to use
 c     astSimplify to simplify the resulting
 f     AST_SIMPLIFY to simplify the resulting
 *     TimeMap. The simplification process will eliminate any steps
@@ -3582,7 +3582,7 @@ f     via the CVT argument to indicate which time coordinate
 *     the conversion, they are listed in parentheses. Values for
 c     these arguments should be given, via the "args" array, in the
 f     these arguments should be given, via the ARGS array, in the
-*     order indicated. Units and argument names are described at the end of 
+*     order indicated. Units and argument names are described at the end of
 *     the list of conversions, and "MJD" means Modified Julian Date.
 *
 *     - "MJDTOMJD"  (MJDOFF1,MJDOFF2): Convert MJD from one offset to another.
@@ -3614,20 +3614,20 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "UTCTOLT" (LTOFF): Convert a UTC MJD to a Local Time MJD.
 *
 *     The units for the values processed by the above conversions are as
-*     follows: 
+*     follows:
 *
 *     - Julian epochs and offsets: Julian years
 *     - Besselian epochs and offsets: Tropical years
 *     - Modified Julian Dates and offsets: days
 *     - Julian Dates and offsets: days
 *
-*     The arguments used in the above conversions are the zero-points 
-*     used by the 
+*     The arguments used in the above conversions are the zero-points
+*     used by the
 c     astTransform function.
 f     AST_TRANSFORM routine.
-*     The axis values supplied and returned by 
-c     astTransform 
-f     AST_TRANSFORM 
+*     The axis values supplied and returned by
+c     astTransform
+f     AST_TRANSFORM
 *     are offsets away from these zero-points:
 *
 *     - MJDOFF: The zero-point being used with MJD values.
@@ -3637,8 +3637,8 @@ f     AST_TRANSFORM
 *     - OBSLON: Observer longitude in radians (+ve westwards).
 *     - OBSLAT: Observer geodetic latitude (IAU 1975) in radians (+ve northwards).
 *     - OBSALT: Observer geodetic altitude (IAU 1975) in metres.
-*     - DUT1: The UT1-UTC value to use. 
-*     - LTOFF: The offset between Local Time and UTC (in hours, positive 
+*     - DUT1: The UT1-UTC value to use.
+*     - LTOFF: The offset between Local Time and UTC (in hours, positive
 *     for time zones east of Greenwich).
 *--
 */
@@ -3761,7 +3761,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    values. */
    ncoord_in = astGetNcoord( in );
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse transformation, according
@@ -3770,7 +3770,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Transform the coordinate values. */
 /* -------------------------------- */
-/* Use "time" as a synonym for the array of time axis values stored in 
+/* Use "time" as a synonym for the array of time axis values stored in
    the output PointSet. */
    if ( astOK ) {
       time = ptr_out[ 0 ];
@@ -3801,13 +3801,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__MJDTOMJD:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 2 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 2 ];
                      }
@@ -3819,13 +3819,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__MJDTOJD:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 2 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 2 ];
                      }
@@ -3837,13 +3837,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__JDTOMJD:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 2 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 2 ];
                      }
@@ -3855,13 +3855,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ----------------------- */
             case AST__MJDTOBEP:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpb( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpb2d( time[ point ] ) + args[ 3 ];
                      }
@@ -3873,13 +3873,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ----------------------- */
             case AST__BEPTOMJD:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpb2d( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpb( time[ point ] ) + args[ 3 ];
                      }
@@ -3891,13 +3891,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* -------------------- */
             case AST__MJDTOJEP:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpj( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpj2d( time[ point ] ) + args[ 3 ];
                      }
@@ -3909,13 +3909,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* -------------------- */
             case AST__JEPTOMJD:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpj2d( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = palSlaEpj( time[ point ] ) + args[ 3 ];
                      }
@@ -3927,16 +3927,16 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ----------- */
             case AST__TAITOUTC:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] +
                                               args[ 0 ], 0 )/SPD;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] +
                                               args[ 0 ], 1 )/SPD;
                      }
                   }
@@ -3947,16 +3947,16 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ----------- */
             case AST__UTCTOTAI:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] +
                                               args[ 0 ], 1 )/SPD;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] +
                                               args[ 0 ], 0 )/SPD;
                      }
                   }
@@ -3967,13 +3967,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__TAITOTT:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += (TTOFF/SPD);
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= (TTOFF/SPD);
                      }
@@ -3985,13 +3985,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__TTTOTAI:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= (TTOFF/SPD);
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += (TTOFF/SPD);
                      }
@@ -4001,11 +4001,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* TT to TDB. */
 /* ---------- */
-/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation 
+/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation
    to UT1, and that TT is a good approximation to TDB. */
             case AST__TTTOTDB:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
@@ -4015,7 +4015,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
@@ -4029,11 +4029,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* TDB to TT. */
 /* ---------- */
-/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation 
+/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation
    to UT1, and that TT is a good approximation to TDB. */
             case AST__TDBTOTT:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
@@ -4043,7 +4043,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
@@ -4059,13 +4059,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__TTTOTCG:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += time[ point ]*LG + args[ 1 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = ( time[ point ] - args[ 1 ] ) /
                                          ( 1.0 + LG );
@@ -4078,14 +4078,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__TCGTOTT:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = ( time[ point ] - args[ 1 ] ) /
                                          ( 1.0 + LG );
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += time[ point ]*LG + args[ 1 ];
                      }
@@ -4095,17 +4095,17 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* TDB to TCB. */
 /* ----------- */
-/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation 
+/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation
    to UT1, and that TT is a good approximation to both TDB and TCB. */
             case AST__TDBTOTCB:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += time[ point ]*LB + args[ 1 ];
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = ( time[ point ] - args[ 1 ] ) /
                                          ( 1.0 + LB );
@@ -4116,18 +4116,18 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* TCB to TDB. */
 /* ----------- */
-/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation 
+/* For the purpose of estimating TDB-TT, we assume UTC is a good approximation
    to UT1, and that TT is a good approximation to TDB. */
             case AST__TCBTOTDB:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = ( time[ point ] - args[ 1 ] ) /
                                          ( 1.0 + LB );
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += time[ point ]*LB + args[ 1 ];
                      }
@@ -4139,13 +4139,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ------------ */
             case AST__UTTOGMST:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = Gmsta( time[ point ], args[ 0 ], 1, status );
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = Gmsta( time[ point ], args[ 0 ], 0, status );
                      }
@@ -4157,13 +4157,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ----------- */
             case AST__GMSTTOUT:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = Gmsta( time[ point ], args[ 0 ], 0, status );
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] = Gmsta( time[ point ], args[ 0 ], 1, status );
                      }
@@ -4175,13 +4175,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ------------- */
             case AST__GMSTTOLMST:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 1 ]/D2PI;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 1 ]/D2PI;
                      }
@@ -4193,13 +4193,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ------------- */
             case AST__LMSTTOGMST:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 1 ]/D2PI;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 1 ]/D2PI;
                      }
@@ -4211,13 +4211,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ------------- */
             case AST__UTTOUTC:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 0 ]/86400.0;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 0 ]/86400.0;
                      }
@@ -4230,31 +4230,31 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ------------- */
             case AST__UTCTOUT:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 0 ]/86400.0;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 0 ]/86400.0;
                      }
                   }
                }
                break;
-            
+
 /* LT to UTC. */
 /* ---------- */
             case AST__LTTOUTC:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 0 ]/24.0;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 0 ]/24.0;
                      }
@@ -4267,20 +4267,20 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------- */
             case AST__UTCTOLT:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] += args[ 0 ]/24.0;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 0 ]/24.0;
                      }
                   }
                }
                break;
-            
+
 /* LMST to LAST. */
 /* ------------- */
 /* Calculating the equation of the equinoxes required TDB. So we need to
@@ -4291,23 +4291,23 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    TTOFF seconds to get TT. This TT is then used as an approximation to
    TDB. The total error in TDB is of the order of a few minutes, which
    corresponds to an error of a few tens of microseconds in the equation of
-   the equinoxes. The sla precession-nutation model is accurate to around 3 
+   the equinoxes. The sla precession-nutation model is accurate to around 3
    mas = 200 us, so the error in TDB will be insignificant. */
             case AST__LMSTTOLAST:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status )
                               + args[ 0 ] + (32 + TTOFF)/SPD;
                         time[ point ] += palSlaEqeqx( tdb )/D2PI;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status )
                               + args[ 0 ] + (32+TTOFF)/SPD;
                         time[ point ] -= palSlaEqeqx( tdb )/D2PI;
                      }
@@ -4319,25 +4319,25 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ------------- */
             case AST__LASTTOLMST:
                if ( forward ) {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status )
                               + args[ 0 ] + (32+TTOFF)/SPD;
                         time[ point ] -= palSlaEqeqx( tdb )/D2PI;
                      }
                   }
                } else {
-                  for ( point = 0; point < npoint; point++ ) { 
+                  for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status )
                               + args[ 0 ] + (32 + TTOFF)/SPD;
                         time[ point ] += palSlaEqeqx( tdb )/D2PI;
                      }
                   }
                }
-            
+
          }
       }
    }
@@ -4576,7 +4576,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    obtain associated descriptive information. If the conversion code
    was not recognised, report an error and give up. */
       if ( astOK ) {
-         sval = CvtString( this->cvttype[ icvt ], &comment, 
+         sval = CvtString( this->cvttype[ icvt ], &comment,
                            &nargs, &szargs, argdesc, status );
          if ( astOK && !sval ) {
             astError( AST__TIMIN,
@@ -4647,7 +4647,7 @@ f     RESULT = AST_TIMEMAP( FLAGS, OPTIONS, STATUS )
 *     This function creates a new TimeMap and optionally initialises
 *     its attributes.
 *
-*     A TimeMap is a specialised form of 1-dimensional Mapping which can be 
+*     A TimeMap is a specialised form of 1-dimensional Mapping which can be
 *     used to represent a sequence of conversions between standard time
 *     coordinate systems.
 *
@@ -4656,8 +4656,8 @@ c     (null) Mapping. Using the astTimeAdd
 f     (null) Mapping. Using the AST_TIMEADD
 c     function, a series of coordinate conversion steps may then be
 f     routine, a series of coordinate conversion steps may then be
-*     added. This allows multi-step conversions between a variety of 
-*     time coordinate systems to be assembled out of a set of building 
+*     added. This allows multi-step conversions between a variety of
+*     time coordinate systems to be assembled out of a set of building
 *     blocks.
 *
 *     For details of the individual coordinate conversions available,
@@ -4701,13 +4701,13 @@ f     AST_TIMEMAP = INTEGER
 
 *  Notes:
 *     - The nature and units of the coordinate values supplied for the
-*     first input (i.e. the time input) of a TimeMap must be appropriate 
-*     to the first conversion step applied by the TimeMap. For instance, if 
+*     first input (i.e. the time input) of a TimeMap must be appropriate
+*     to the first conversion step applied by the TimeMap. For instance, if
 *     the first conversion step is "MJDTOBEP" (Modified Julian Date to
 *     Besselian epoch) then the coordinate values for the first input should
-*     be date in units of days. Similarly, the nature and units of the 
+*     be date in units of days. Similarly, the nature and units of the
 *     coordinate values returned by a TimeMap will be determined by the
-*     last conversion step applied by the TimeMap. 
+*     last conversion step applied by the TimeMap.
 *     - A null Object pointer (AST__NULL) will be returned if this
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
@@ -5125,7 +5125,7 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
 
 /* Obtain the number of arguments associated with the conversion and
    allocate memory to hold them. */
-            (void) CvtString( new->cvttype[ icvt ], &comment, 
+            (void) CvtString( new->cvttype[ icvt ], &comment,
                               &nargs, &szargs, argdesc, status );
             new->cvtargs[ icvt ] = astMalloc( sizeof( double ) *
                                               (size_t) szargs );

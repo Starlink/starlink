@@ -1,13 +1,13 @@
-	SUBROUTINE IMCOMBSUB( DIMSX, DIMSY, ARRIN1, ARRIN2, ARROUT, 
+	SUBROUTINE IMCOMBSUB( DIMSX, DIMSY, ARRIN1, ARRIN2, ARROUT,
      :	                      NUMAREA, XST, YST, XSZ, YSZ, STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
      :	  STATUS,
      :	  J,
      :	  K,
@@ -30,23 +30,23 @@
 
 	PARAMETER ( MAXDATA = 5000)
 
-	REAL 
+	REAL
      :	  ARRIN1( DIMSX, DIMSY),
      :	  ARRIN2( DIMSX, DIMSY),
-     :	  ARROUT( DIMSX, DIMSY), 
-     :	  VALMAX1, 
-     :	  VALMAX2, 
-     :	  VALMIN1, 
+     :	  ARROUT( DIMSX, DIMSY),
+     :	  VALMAX1,
+     :	  VALMAX2,
+     :	  VALMIN1,
      :	  VALMIN2
-      REAL 
+      REAL
      :	  STD1,
      :	  STD2,
-     :	  SUM1, 
-     :	  SUM2, 
-     :	  MEAN1, 
-     :	  MEAN2, 
-     :	  MEDIAN1, 
-     :	  MEDIAN2, 
+     :	  SUM1,
+     :	  SUM2,
+     :	  MEAN1,
+     :	  MEAN2,
+     :	  MEDIAN1,
+     :	  MEDIAN2,
      :	  MODE1,
      :	  MODE2
 
@@ -65,7 +65,7 @@
 
 *      Scan through all areas
 	DO J = 1, NUMAREA
-	  
+
 *        Calculate start and end coordinates of area in image 1
 	  XEN( J) = ( XST( J)+XSZ( J)-1)
 	  YEN( J) = ( YST( J)+YSZ( J)-1)
@@ -120,9 +120,9 @@
 
 *          Median data. First sort
 	    CALL PDA_QSAD( NPTS1, DATARR )
- 
+
 *          Call subroutine to find median for the input DATARR
-	    CALL MED3D_CALMEDSUB( NPTS1, DATARR, VALMAX1, VALMIN1, SUM1, 
+	    CALL MED3D_CALMEDSUB( NPTS1, DATARR, VALMAX1, VALMIN1, SUM1,
      :	                          MEAN1, MEDIAN1, MODE1)
 
 *          Scan through pixels calculate standard deviation
@@ -152,7 +152,7 @@
 	  ELSE
 
 	    CALL MSG_OUT( 'ERR',
-     :	      'Error, number points in area 1 to be medianed = 0', 
+     :	      'Error, number points in area 1 to be medianed = 0',
      :        STATUS)
 
 	  END IF
@@ -166,7 +166,7 @@
 	  IF( YSTART .LT. 1 .OR. YSTART .GT. DIMSY) YSTART = YST( J)
 	  IF( XEND .LT. 1 .OR. XEND .GT. DIMSX) XEND = XEN( J)
 	  IF( YEND .LT. 1 .OR. YEND .GT. DIMSY) YEND = YEN( J)
- 
+
 *        Initialize number pixels variable and scan through area in image 1
 	  NPTS2 = 0
 	  DO K = YSTART, YEND
@@ -193,9 +193,9 @@
 
 *          Median data. First sort
 	    CALL PDA_QSAD( NPTS2, DATARR )
- 
+
 *          Call subroutine to find median for the input DATARR
-	    CALL MED3D_CALMEDSUB( NPTS2, DATARR, VALMAX2, VALMIN2, SUM2, 
+	    CALL MED3D_CALMEDSUB( NPTS2, DATARR, VALMAX2, VALMIN2, SUM2,
      :	                          MEAN2, MEDIAN2, MODE2)
 
 *          Scan through pixels calculate standard deviation
@@ -225,7 +225,7 @@
 	  ELSE
 
 	    CALL MSG_OUT( 'ERR',
-     :	      'Error, number points in area 2 to be medianed = 0', 
+     :	      'Error, number points in area 2 to be medianed = 0',
      :        STATUS)
 
 	  END IF
@@ -233,7 +233,7 @@
 	  CALL MSG_SETI( 'NUM', J)
 	  CALL MSG_SETR( 'MED1', MEDIAN1)
 	  CALL MSG_SETR( 'MED2', MEDIAN2)
-	  CALL MSG_OUT( 'MESS', 
+	  CALL MSG_OUT( 'MESS',
      :	   'Area ^NUM, medians from images 1/2 = ^MED1/^MED2',
      :	   STATUS)
 

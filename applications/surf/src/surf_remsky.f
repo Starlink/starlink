@@ -8,13 +8,13 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_REMSKY( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
@@ -41,7 +41,7 @@
 
 *  ADAM Parameters:
 *     ADD = LOGICAL (Read)
-*        If true the mean of the `sky' level that was removed from every 
+*        If true the mean of the `sky' level that was removed from every
 *        frame is added back onto the data after sky removal. This step should
 *        make sure that flux is not removed from the data. The default is
 *        for ADD to be true for MAPs and false for other modes (the assumption
@@ -57,8 +57,8 @@
 *                              remove bolometers from rings 4 and 1
 *                              and add h8.
 *            [17,18,19,20]     Bolometers 17, 18, 19 and 20
-*            [h6,h7,h8,h9]     Bolometers H6, H7, H8, H9 
-*            [all]             Whole array 
+*            [h6,h7,h8,h9]     Bolometers H6, H7, H8, H9
+*            [all]             Whole array
 *            [r0]              Ring zero (central pixel)
 *            [r0,-19]          No bolometers (bol 19 of LONG is R0/H7)
 *            [h7,r1]           inner ring and H7
@@ -67,7 +67,7 @@
 *            [all,-r1,-h7]     all pixels except the inner ring and H7
 *            [all,-r3,g1]      all pixels except ring 3 but with
 *                                    G1 (which happens to be in r3)
-*            [all,-r1,-r2,-r3,-r4,-r5]        Selects the central pixel 
+*            [all,-r1,-r2,-r3,-r4,-r5]        Selects the central pixel
 *     IN = NDF (Read)
 *        This is the name of the input demodulated data file.
 *     ITER_SIGMA = REAL (Read)
@@ -96,7 +96,7 @@
 
 *  Examples:
 *     remsky ndf sky_removed bolometers='[g1,g2,g3,g4,g5]' mode=median \
-*        Use the median of bolometers g1,g2,g3,g4,g5 (not necessarily 
+*        Use the median of bolometers g1,g2,g3,g4,g5 (not necessarily
 *        the best choice) to calculate the sky signal and write the
 *        output to sky_removed.sdf.
 *     remsky o12_lon_ext bolometers=[all] mode=median \
@@ -104,7 +104,7 @@
 *        output to the default output file (e.g. o12_lon_sky).
 *     remsky o25_sho_ext bolometers=[r5] mode=mean iter_sigma=4 \
 *        Use the outer ring of the short-wave array as the sky bolometers.
-*        Calculate the sky contribution by using a clipped mean of each 
+*        Calculate the sky contribution by using a clipped mean of each
 *        jiggle and remove any points from the
 *        calculation of the mean that are more than 4 sigma from the mean.
 *        Write the output to the default output file.
@@ -123,11 +123,11 @@
 
 *  Related Applications:
 *     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER;
- 
+
 *  Authors:
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 *     {enter_new_authors_here}
- 
+
 
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
@@ -186,10 +186,10 @@
 *        Use MSG_FLEVOK rather than MSG_IFLEV. Only
 *        worked previously when exactly VERBOSE.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -264,11 +264,11 @@
       INTEGER          LBND (MAXDIM)    ! lower bounds of array
       CHARACTER*(4 * SCUBA__NUM_CHAN * SCUBA__NUM_ADC ) LINE
                                         ! Scratch string for bolometer list
-      DOUBLE PRECISION LONG_RAD         ! longitude of telescope centre 
+      DOUBLE PRECISION LONG_RAD         ! longitude of telescope centre
                                         ! (radians)
       DOUBLE PRECISION LONG2_RAD        ! apparent RA of telescope centre at
                                         ! MJD2 (radians)
-      DOUBLE PRECISION MJD1             ! modified Julian day at which object 
+      DOUBLE PRECISION MJD1             ! modified Julian day at which object
                                         ! was at LAT,LONG for PLANET centre
                                         ! coordinate system
       DOUBLE PRECISION MJD2             ! modified Julian day at which object
@@ -292,14 +292,14 @@
       INTEGER          OUTNDF           ! NDF identifier of output file
       INTEGER          OUT_DATA_PTR     ! pointer to data array in output file
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC ! Locator to REDS extension
-      INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
+      INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
       REAL             RTEMP            ! Scratch real
       INTEGER          RUN_NUMBER       ! run number of observation
       CHARACTER*15     SAMPLE_MODE      ! SAMPLE_MODE of observation
       INTEGER          SECNDF           ! NDF id of section
-      CHARACTER*5      SKYBOLC(MAX__BOL)       ! indices or names of 
+      CHARACTER*5      SKYBOLC(MAX__BOL)       ! indices or names of
                                                ! bolometers whose data are to
                                                ! be treated as sky
       INTEGER          SKYBOLS(MAX__BOL)! Indices of sky bolometers
@@ -352,10 +352,10 @@
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS,
      :  STATUS)
 
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :  RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
@@ -371,7 +371,7 @@
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG',PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation '//
      :     'with ^SAMPLE sampling of object ^OBJECT', STATUS)
 
@@ -421,11 +421,11 @@
       END IF
 
 *  get the sub-instrument and wavelength of the data, check for consistency
- 
+
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'SUB_1', SUB_INSTRUMENT, STATUS)
-      
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
+
+      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'WAVE_1', RTEMP, STATUS)
 
 *     Remsky only works (so far) for array observations
@@ -554,14 +554,14 @@
 
 *  now open the output NDF, propagating it from the input file
 
-      CALL NDF_PROP (INDF, 'Units,Data,Var,Qual,Axis', 'OUT', 
+      CALL NDF_PROP (INDF, 'Units,Data,Var,Qual,Axis', 'OUT',
      :     OUTNDF, STATUS)
 
 *     Check for a 'SKY' extension in REDS.
 *     If there is one then we will simply use it
 
       USESKYNDF = .FALSE.
-         
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL NDF_XSTAT(OUTNDF, 'REDS', THERE, STATUS)
 
@@ -634,7 +634,7 @@
      :              STATUS)
 
             END IF
-         
+
 *     Print a message informing the user of the number of selected bolometers
             CALL MSG_SETI('NB',N_GOODBOLS)
             CALL MSG_SETC('PKG', PACKAGE)
@@ -648,10 +648,10 @@
             IF ( MSG_FLEVOK( MSG__VERB, STATUS ) ) THEN
 
                CALL MSG_SETC('PKG',PACKAGE)
-               CALL MSG_OUTIF(MSG__VERB, ' ', 
+               CALL MSG_OUTIF(MSG__VERB, ' ',
      :              '^PKG: Selected sky bolometers:', STATUS)
-               
-*     Write the bolometers into a string 
+
+*     Write the bolometers into a string
 
                IF (STATUS .EQ. SAI__OK) THEN
                   LINE = ' '
@@ -673,15 +673,15 @@
                         CALL MSG_SETC('PKG', PACKAGE)
                         CALL MSG_OUTIF(MSG__VERB, ' ',
      :                       '^PKG: ^BL', STATUS)
-                        
+
                         IPOSN = 0
                         LINE = ' '
-                  
+
                      END IF
 
 *     Convert the index to a string
                      CALL CHR_ITOC(SKYBOLS(I), STEMP, ITEMP)
-                     IF(IPOSN.GT.0) THEN 
+                     IF(IPOSN.GT.0) THEN
                         CALL CHR_APPND(', ',LINE,IPOSN)
                         IPOSN = IPOSN + 1 ! Since len does not see last space
                      END IF
@@ -692,7 +692,7 @@
 *     Print more information in verbose mode
 *     Have to deal with the problem of the string being longer than
 *     MSG__SZMSG and not being able to display all the bolometers
-            
+
                CALL MSG_SETC('BL',LINE)
                CALL MSG_SETC('PKG', PACKAGE)
                CALL MSG_OUTIF(MSG__VERB, ' ',
@@ -716,7 +716,7 @@
       END IF ! End of sidetrack from USESKYNDF
 
 *     Find out if we want to add back the constant offset
-*     The default behaviour should depend on the observation 
+*     The default behaviour should depend on the observation
 *     mode. If this is a MAP then add it on, else (ie for PHOTOM)
 *     do not add it unless asked.
 
@@ -760,7 +760,7 @@
 
          CALL NDF_MAP (SECNDF, 'QUALITY', '_UBYTE', 'UPDATE',
      :        OUT_QUALITY_PTR, ITEMP, STATUS)
-         CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'UPDATE', 
+         CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'UPDATE',
      :        OUT_DATA_PTR, ITEMP, STATUS)
          CALL NDF_MAP (SECNDF, 'VARIANCE', '_REAL', 'UPDATE',
      :        OUT_VARIANCE_PTR, ITEMP, STATUS)
@@ -770,9 +770,9 @@
          IF (USESKYNDF) THEN
 
             CALL SURFLIB_REM_TIMESERIES(N_BOLS, N_POS,
-     :           %VAL(CNF_PVAL(SKYDATA_PTR)), 
+     :           %VAL(CNF_PVAL(SKYDATA_PTR)),
      :           %VAL(CNF_PVAL(SKYVAR_PTR)),
-     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :           %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :           STATUS)
 
@@ -780,7 +780,7 @@
          ELSE
 
             IF (N_BOLS .GT. 1) THEN
-               CALL SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, 
+               CALL SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS,
      :              %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :              %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :              %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
@@ -811,7 +811,7 @@
          CALL NDF_UNMAP(SKYNDF, '*', STATUS)
          CALL NDF_ANNUL(SKYNDF, STATUS)
       END IF
-         
+
       CALL NDF_ANNUL (INDF, STATUS)
       CALL NDF_ANNUL (OUTNDF, STATUS)
 

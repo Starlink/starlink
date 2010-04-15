@@ -30,7 +30,7 @@ C                                               KS / CIT 12th Jan 1983
 C+
       IMPLICIT NONE
 C
-C     Parameters - 
+C     Parameters -
 C
       INTEGER NX,IX
       REAL XVALS(NX),ZVALS(NX),CENT,XCENT

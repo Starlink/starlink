@@ -8,7 +8,7 @@
 
 *  Description:
 *     This routine inverts a matrix by a method opaque to casual inspection
-*     but which has the advantage that it doesn't require any more space 
+*     but which has the advantage that it doesn't require any more space
 *     than the input matrix itself provides. The method is described in
 *     `Data Reduction and Error Analysis for the Physical Sciences' by
 *     Bevington and Robinson, and the code is adapted from the Pascal
@@ -139,7 +139,7 @@
          END IF
 
          J = JK(K)
-   
+
          IF (J .LT. K) THEN
             GOTO 100
          ELSE IF (J .GT. K) THEN
@@ -157,7 +157,7 @@
                ARRAY(I,K) = -ARRAY(I,K) / AMAX
             END IF
          END DO
-   
+
          DO I = 1, M
             DO J = 1, M
                IF ((I .NE. K) .AND. (J .NE. K)) THEN

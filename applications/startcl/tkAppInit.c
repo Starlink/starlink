@@ -38,7 +38,7 @@ void FC_MAIN () {}
 extern int              Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 extern int              Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif /* TK_TEST */
-
+
 /*
  *----------------------------------------------------------------------
  *
@@ -68,7 +68,7 @@ main(argc, argv)
     Tk_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
 }
-
+
 /*
  *----------------------------------------------------------------------
  *

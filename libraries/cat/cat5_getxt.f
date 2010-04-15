@@ -19,14 +19,14 @@
 *         .FALSE. -  a line was obtained ok; input of of textual
 *                    information continues.
 *         .TRUE.  -  all the textual information has already been
-*                    returned; input of textual information has 
+*                    returned; input of textual information has
 *                    terminated.
 *     CLASS   =  CHARACTER*(*) (Returned)
 *         Class of the textual information.  A set of values are
-*         permitted for each type of catalogue back-end (or file 
+*         permitted for each type of catalogue back-end (or file
 *         format), and these sets are different for different back-ends.
-*         Note that this argument is returned rather than given; an 
-*         application cannot prescribe to CAT what class of textual 
+*         Note that this argument is returned rather than given; an
+*         application cannot prescribe to CAT what class of textual
 *         information is required.
 *     TEXT   =  CHARACTER*(*) (Returned)
 *         A single line of textual information.
@@ -35,7 +35,7 @@
 *  Algorithm:
 *     Determine the common block array element for the catalogue.
 *     Get the Fortran unit number for accessing the description file.
-*     If the last element of the description has not already been 
+*     If the last element of the description has not already been
 *     found then
 *       Attempt to read a record from the description file.
 *       If ok then
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

@@ -43,7 +43,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -112,7 +112,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -188,10 +188,10 @@
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -414,7 +414,7 @@
    }
 
 %  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
       \begin{description}
          #1
       \end{description}
@@ -496,12 +496,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -1055,7 +1055,7 @@ which results in the HTML anchor:
 \end{quote}
 
 This contains an initial guess at the required URL (a document stored on the
-RAL service), which will be recognised and 
+RAL service), which will be recognised and
 \hyperref{modified as necessary}{modified as necessary (see \S}{)}{sect:referringtotargets} when the
 document is linked.
 
@@ -1547,12 +1547,12 @@ would search both the titles and page headings in a single pass.
 
 By default, the \findmeref{\hi{findme}} command will search your
 entire documentation set, consisting of all the
-\htmlref{documents}{sect:hypertextdocuments} 
+\htmlref{documents}{sect:hypertextdocuments}
 found on the
 \hyperref{\hi{HTX\_PATH} search path}
 {\hi{HTX\_PATH} search path (see \S}{)}{sect:searchpath}
-\footnote{It will also include the names and titles of documents found in 
-\htmlref{catalogue files}{sect:cataloguefiles} 
+\footnote{It will also include the names and titles of documents found in
+\htmlref{catalogue files}{sect:cataloguefiles}
 \latex{(see\S\ref{sect:cataloguefiles})}}.
 
 However, you can restrict the search to specific documents by listing
@@ -2414,7 +2414,7 @@ hypertext (\qt{.htx}) documents.
          for local use by a WWW browser running on the same machine as the
          \hi{showme} command. It may not be suitable, for instance,
          for embedding in an HTML document that will be interpreted by a remote
-         WWW browser. 
+         WWW browser.
       }
       \sstsubsection{
          -r
@@ -2541,7 +2541,7 @@ hypertext (\qt{.htx}) documents.
       }{
          The name of the directory in which to create temporary communication
          files. If this variable is not set or is null, then
-         \hi{\$HOME/.htxtmp} is used instead 
+         \hi{\$HOME/.htxtmp} is used instead
          \latex{(see \S\ref{sect:intermachinecommunication})}.
       }
    }
@@ -2579,7 +2579,7 @@ Currently, HTX can work only with the browsers listed above.
 
 \htmlref{HTX}{sect:HTX} communicates with your \htmlref{WWW
 browser}{sect:usingwwwbrowsers} using a \st{remote control} mechanism
-which is different for each browser. 
+which is different for each browser.
 
 In general, if you use only one machine at a time and never start up
 more than one copy of your browser, you are unlikely to have

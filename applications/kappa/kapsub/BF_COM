@@ -13,7 +13,7 @@
 
 *  Description:
 *     This file defines the COMMON blocks used by the BEAMFIT task.
-*     It's needed to pass additional information through to routines 
+*     It's needed to pass additional information through to routines
 *     accessed from a PDA fitting routine that in turn invokes a
 *     function-evaluation routine with a fixed API.
 
@@ -58,12 +58,12 @@
 
 *  Common block /BF1_COM/
 *
-*        PC( BF__NCOEF, BF__MXPOS ) = DOUBLE PRECISION 
+*        PC( BF__NCOEF, BF__MXPOS ) = DOUBLE PRECISION
 *           The initial-guess parameter values, including any fixed
 *           values supplied by the user.
 *        PIXOFF( BF__MXPOS - 1, BF__NDIM ) = DOUBLE PRECISION
 *           The pixel offsets of the secondary beam positions with
-*           respect to the primary beam position.  
+*           respect to the primary beam position.
 *        ARATIO( BF__MXPOS - 1 ) = DOUBLE PRECISION
 *           The amplitude ratios of the secondary to the primary beam
 *           positions.
@@ -96,7 +96,7 @@
 *           FWHM of the Gaussian fixed by the user?
 *        POSC = LOGICAL
 *           Position co-ordinates fixed?
-*        RATIOC = LOGICAL 
+*        RATIOC = LOGICAL
 *           Amplitude ratios fixed by the user?
 *        SEPARC = LOGICAL
 *           Are the separations fixed by the user?
@@ -105,7 +105,7 @@
 
       INTEGER IPWD               ! Pointer to work space for data
                                  ! values
-      INTEGER IPWV               ! Pointer to work space for variance 
+      INTEGER IPWV               ! Pointer to work space for variance
                                  ! values
       INTEGER LBND( BF__NDIM )   ! Lower pixel bounds of the data and
                                  ! variance arrays

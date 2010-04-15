@@ -148,6 +148,6 @@
 
        OK = .FALSE.
        WRITE (*,'(''   DAC commands not available'',
-     : '' in this version of DIPSO'')') 
+     : '' in this version of DIPSO'')')
 
        END

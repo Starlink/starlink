@@ -30,7 +30,7 @@ int *status                /* global status (given and returned) */
 void sock_ghbn
 (
 char *rmach,                /* name of remote machine (given) */
-struct hostent *retentptr,  /* network data structure for other 
+struct hostent *retentptr,  /* network data structure for other
                                machine (returned) */
 int *status                 /* global status (given and returned) */
 );
@@ -39,7 +39,7 @@ int *status                 /* global status (given and returned) */
 
 void sock_gpn
 (
-int channel,           /* i/o channel for communications, bound to a socket 
+int channel,           /* i/o channel for communications, bound to a socket
                           (given) */
 struct sockaddr_in *peer, /* structure for peer details (returned) */
 int *status            /* global status (given and returned) */

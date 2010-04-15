@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2009 Science and Technology Facilities Council.}
 
 % Variable part - replace [xxx] as appropriate.
@@ -80,7 +80,7 @@ within an NDF.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -504,12 +504,12 @@ within an NDF.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -581,13 +581,13 @@ may be used to indicate if any DATA pixels are saturated. A particular
 pixel in the QUALITY component would have Bit 3 set (\emph{i.e.} equal
 to 1) if the corresponding DATA pixel is saturated, or cleared
 (\emph{i.e.} equal to 0) if the corresponding DATA pixel is not
-saturated. 
+saturated.
 
 Another option for flagging saturated data is to replace saturated DATA
 pixel values with a `bad' (or `magic') value. This has the disadvantage
 that the datum is permanently destroyed by being flagged, and also there
 is no distinction between data values thst are set bad because of the
-fact they were saturated, and pixels set bad for any other reason. 
+fact they were saturated, and pixels set bad for any other reason.
 
 SUN/33 doesn't specify how the facilities of the QUALITY component are to
 be used, and many possibilities exist. Obviously some co-ordination
@@ -610,7 +610,7 @@ point of view of an application, each defined quality is identified by a
 {\em quality name} rather than by a bit number. Information about these
 quality names is stored in an NDF extension, so that later applications
 can determine which pixels within the NDF hold a given quality (or
-combination of qualities). 
+combination of qualities).
 
 Within IRQ, each defined quality name is usually associated with a bit in
 the QUALITY array, and this bit is set if the corresponding DATA pixels
@@ -625,19 +625,19 @@ all} pixels hold the quality, and {\tt .FALSE.} if {\em no} pixels hold
 the quality. In this way, the number of defined quality names can
 sometimes exceed the number of bits in the QUALITY component. The
 handling of such situations is done within IRQ and is completely
-invisible to the calling application. 
+invisible to the calling application.
 
 IRQ provides the following facilities.
 \begin{itemize}
 \item Add quality name definitions (and associated descriptive comments)
 to an NDF. There is a limit to the number of quality names which may be
 defined within an NDF. The exact number depends on how many quality names
-require a QUALITY bit, but it will always be at least eight. 
+require a QUALITY bit, but it will always be at least eight.
 \item Remove quality name definitions from an NDF.
 \item List all quality names defined within an NDF.
 \item Assign a given quality to selected pixels.
 \item Remove a given quality from selected pixels.
-\item Set `bad' those pixels of a supplied array which hold a certain 
+\item Set `bad' those pixels of a supplied array which hold a certain
 combination of qualities.
 \end{itemize}
 
@@ -647,7 +647,7 @@ The \KAPPA\ package contains a set of four typical IRQ applications,
 which give an indication of the benefits which IRQ can provide for the
 user. The A-TASK documentation for these four applications is included
 in \xref{SUN/95}{sun95}{se_qualitymask}, and they are briefly described
-in this section. 
+in this section.
 
 \subsection{SETQUAL}
 
@@ -666,14 +666,14 @@ destroyed, he could proceed as follows.
 
 \begin{enumerate}
 
-\item Produce a mask NDF from the original NDF by setting all DATA pixels 
-above the saturation value to the `bad' value. 
+\item Produce a mask NDF from the original NDF by setting all DATA pixels
+above the saturation value to the `bad' value.
 
 \item Run SETQUAL on the original NDF, giving some quality name such as
 {\tt SATURATED}, and specifying the mask created in the previous step. This
 leaves the DATA component of the original NDF unchanged, but assigns the
 quality {\tt SATURATED} to all the pixels which correspond to `bad'
-pixels in the mask.  
+pixels in the mask.
 
 \end{enumerate}
 
@@ -689,7 +689,7 @@ any more quality name definitions within an NDF. In this case the user
 may choose to remove some unimportant quality name definitions to make
 room for new, more-important quality names. REMQUAL can also remove {\em
 all} quality names information from an NDF. This can be useful if for any
-reason the quality-name information becomes corrupted. 
+reason the quality-name information becomes corrupted.
 
 \subsection{SHOWQUAL}
 The \xref{SHOWQUAL}{sun95}{SHOWQUAL} application displays all currently
@@ -701,20 +701,20 @@ quality can be displayed.
 
 The \xref{QUALTOBAD}{sun95}{QUALTOBAD} application sets selected
 pixels within an NDF to the `bad' value on the basis of the pixel's
-quality. In effect, QUALTOBAD performs the reverse operation of 
+quality. In effect, QUALTOBAD performs the reverse operation of
 \xref{SETQUAL}{SETQUAL}. For instance, using the example of saturated
 data described above, the user may remove some varying background surface
 from his original data, and then want to set pixels which were saturated
 in the original data to the `bad' value . In this case he would run
 QUALTOBAD specifying the background removed NDF as input, and specifying
 a {\em quality expression} of {\tt SATURATED}. This would cause all pixels
-which hold the quality {\tt SATURATED} to be set bad in the output NDF. 
+which hold the quality {\tt SATURATED} to be set bad in the output NDF.
 
 The `quality expression' can be more complex than a single quality
 name. In fact, a quality expression can consist of several quality
 names combined together using the usual operators of Boolean algebra.
 For instance, if the quality expression {\tt
-SATURATED.AND..NOT.(SOURCE\_A .OR. SOURCE\_B)} was given to 
+SATURATED.AND..NOT.(SOURCE\_A .OR. SOURCE\_B)} was given to
 QUALTOBAD, then pixels would be set `bad' only if they had the quality
 {\tt SATURATED}, but did not have either of the qualities {\tt
 SOURCE\_A} or {\tt SOURCE\_B}.
@@ -733,29 +733,29 @@ Certain names are reserved and may not be used. These are {\tt ANY},
 
 A `Quality Expression' consists of a set of quality names combined
 together using Boolean operators into a legal Boolean expression. See
-\latexhtml{Section~\ref{SEC:QFIND}}{\htmlref{this section}{SEC:QFIND}} 
+\latexhtml{Section~\ref{SEC:QFIND}}{\htmlref{this section}{SEC:QFIND}}
 for a description of the use of quality expressions within IRQ. In the
 following, the symbols {\tt A} and {\tt B} are used to represent two
 qualities. These can be considered as Boolean values; {\tt true} if a
 pixel holds the quality, and {\tt false} otherwise. The supported
-Boolean operators are listed below.  
+Boolean operators are listed below.
 
 \begin {description}
 \item [.AND.] - The expression {\tt (A.AND.B)} is true if and only if
-both {\tt A} and {\tt B} are true.  
-\item [.OR.] - The expression {\tt (A.OR.B)} is true if and only if 
+both {\tt A} and {\tt B} are true.
+\item [.OR.] - The expression {\tt (A.OR.B)} is true if and only if
 either {\tt A} or {\tt B} is true.
 \item [.XOR.] - The
 expression {\tt (A.XOR.B)} is true if and only if either {\tt A} is true and {\tt B}
-is false, or {\tt A} is false and {\tt B} is true. 
-\item [.EQV.] - The expression {\tt (A.EQV.B)} is true if and only if either {\tt A} 
+is false, or {\tt A} is false and {\tt B} is true.
+\item [.EQV.] - The expression {\tt (A.EQV.B)} is true if and only if either {\tt A}
 is true and {\tt B} is true, or A is false and {\tt B} is false.
-\item [.NOT.] - The expression {\tt (.NOT.A)} is true if and only if {\tt A} is 
-false. 
-\end{description} 
+\item [.NOT.] - The expression {\tt (.NOT.A)} is true if and only if {\tt A} is
+false.
+\end{description}
 In addition to the above operators, the Boolean constants {\tt
 .FALSE.} and {\tt .TRUE.} can be included within a quality expression.
-Expressions may contain several levels of nested parentheses. 
+Expressions may contain several levels of nested parentheses.
 
 The precedence of these operators decreases in the following order;
 .NOT., .AND., .OR., .XOR., .EQV. (the final two have equal
@@ -767,7 +767,7 @@ which an expression will be evaluated, parentheses should be used to
 ensure the required order of evaluation.
 
 Some attempts are made to simplify a quality expression to reduce the
-run time needed to evaluate the expression for every pixel. 
+run time needed to evaluate the expression for every pixel.
 
 Quality expressions can be up to 254 characters long, and must not
 contain more than forty symbols (Boolean operators, constants, or
@@ -788,20 +788,20 @@ The IRQ package has associated with it various symbolic constants.
 These values consist of a name of up to five characters prefixed by
 ``IRQ\_\_'' (note the {\em double} underscore), and can be made
 available to an application by including the following line at the
-start of the routines which uses them: 
+start of the routines which uses them:
 
 \begin{verbatim}
       INCLUDE 'IRQ_PAR'
 \end{verbatim}
 
 This assumes that the IRQ library has been installed as part of the
-UNIX Starlink Software Collection. 
+UNIX Starlink Software Collection.
 % If this is not the case, then the alternative instructions given in
 %Appendix~\ref {APP:NOSTAR} should be followed.
 
 The values thus defined are described in the following sections, and
 also in the subroutine specifications. Another set of symbolic
-constants is made available by the statements 
+constants is made available by the statements
 
 \begin{verbatim}
       INCLUDE 'IRQ_ERR'
@@ -810,9 +810,9 @@ constants is made available by the statements
 These values have the same format of those contained in IRQ\_PAR, put define
 various error conditions which can be generated within the IRQ package.
 Applications can compare the $STATUS$ argument with these values to check for
-specific error conditions. These values are described in 
+specific error conditions. These values are described in
 \latexhtml{Appendix~\ref {APP:ERRORS}}{\htmlref{IRQ Error
-Codes}{APP:ERRORS}}. 
+Codes}{APP:ERRORS}}.
 
 \subsection{Initialising an NDF for use with IRQ}
 
@@ -829,11 +829,11 @@ identifier. All access to the NDF by subsequent IRQ routines is achieved
 through this cloned identifier. Once access to the quality names
 information is no longer required, the resources used by these HDS
 locators (including the cloned NDF identifier) should be annulled by
-calling IRQ\_RLSE. Note, routines \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} and 
+calling IRQ\_RLSE. Note, routines \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} and
 \htmlref{IRQ\_CLOSE}{IRQ_CLOSE} play no part in releasing resources used
 for accessing quality name information. These two routines are only used
 for releasing resources used to store {\em compiled quality expressions}
-(see \latexhtml{Section~\ref {SEC:QFIND}}{\htmlref{ a description 
+(see \latexhtml{Section~\ref {SEC:QFIND}}{\htmlref{ a description
 here}{SEC:QFIND}}). IRQ\_RLSE is the only routine which needs
 to be called to release resources used for accessing {\em quality names}.
 
@@ -851,7 +851,7 @@ runs successfully, then an array of HDS locators is returned similar to
 the array returned by IRQ\_NEW. Once access to the quality names
 information is no longer required, the resources used by these HDS
 locators (including the cloned NDF identifier) should be annulled by
-calling \htmlref{IRQ\_RLSE}{IRQ_RLSE}. 
+calling \htmlref{IRQ\_RLSE}{IRQ_RLSE}.
 
 \subsection{Accessing the quality names information stored in an NDF}
 
@@ -879,13 +879,13 @@ Once quality names have been defined, they can be assigned to selected
 pixels within the NDF. There are two ways of specifying which pixels are
 `selected'. Routine \htmlref{IRQ\_SETQM}{IRQ_SETQM} requires a mask image
 to be provided in which the `bad' pixels define the pixels in the NDF
-DATA component to which the quality is to be assigned. Routine 
+DATA component to which the quality is to be assigned. Routine
 \htmlref{IRQ\_SETQL}{IRQ_SETQL} requires a list of pixel indices to be
 provided which defines the pixels in the NDF DATA component to which the
 quality is to be assigned. The quality of the NDF pixels which are {\em
 not} selected is left unchanged. Thus, if an unselected pixel already has
 the specified quality, these routines will not {\em remove} the quality
-from those pixels. 
+from those pixels.
 
 The routines \htmlref{IRQ\_RESQM}{IRQ_RESQM} and
 \htmlref{IRQ\_RESQL}{IRQ_RESQL}, are complementary to
@@ -897,10 +897,10 @@ unchanged.
 
 Routine \htmlref{IRQ\_SETQ}{IRQ_SETQ} ensures that {\em all} pixels in an
 NDF have a specified quality, and routine IRQ\_RESQ ensures that {\em no}
-pixels in an NDF have a specified quality. 
+pixels in an NDF have a specified quality.
 
 The routine \htmlref{IRQ\_CNTQ}{IRQ_CNTQ} will count the number of bits
-set in each bit plane in the QUALITY component. 
+set in each bit plane in the QUALITY component.
 
 \subsection{\xlabel{SEC:QFIND}Finding NDF pixels which satisfy a quality expression}
 \label {SEC:QFIND}
@@ -933,14 +933,14 @@ Note, the array supplied to IRQ\_SBAD must be the same shape and size as
 the NDF supplied to \htmlref{IRQ\_FIND}{IRQ_FIND} or
 \htmlref{IRQ\_NEW}{IRQ_NEW}. If an NDF section was used, then the array
 supplied to IRQ\_SBAD must be the same shape and size as the NDF section,
-{\em not} the base NDF. 
+{\em not} the base NDF.
 
 Up to ten compiled quality expressions can be active at once. The
 identifiers for each compiled quality expression should be annulled
 when it is no longer needed by calling
 \htmlref{IRQ\_ANNUL}{IRQ_ANNUL}. \htmlref{IRQ\_CLOSE}{IRQ_CLOSE}
 should be called when all compiled quality expressions have been
-finished with. 
+finished with.
 
 \section {Compiling and Linking with IRQ}
 \label{SEC:LINK}
@@ -1125,14 +1125,14 @@ STATUS~)}
    \sstdescription{
       This routine adds the quality name specified by QNAME to the NDF
       specified by LOCS. LOCS must previously have been assigned values
-      by one of the routines \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+      by one of the routines \htmlref{IRQ\_FIND}{IRQ_FIND} or
       \htmlref{IRQ\_NEW}{IRQ_NEW}. If the quality name
       is already defined, an error is reported. Note, this routine does
       not reserve a bit in the QUALITY component for the new quality
       name, it mearly established a default value for the quality which
       will be used for all pixels in the NDF if no subsequent call to
-      \htmlref{IRQ\_SETQC}{IRQ_SETQC} is made. Note, the string {\tt ANY} 
-      cannot be used as a quality name. Also, quality names may not contain 
+      \htmlref{IRQ\_SETQC}{IRQ_SETQC} is made. Note, the string {\tt ANY}
+      cannot be used as a quality name. Also, quality names may not contain
       any full stops.
 
       An error is reported if only READ access is available to the NDF.
@@ -1226,7 +1226,7 @@ STATUS~)}
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
-         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
@@ -1258,10 +1258,10 @@ STATUS~)}
 }{
    \sstdescription{
       This routine must be called once all use of compiled quality
-      expression identifiers (as generated by \htmlref{IRQ\_COMP}{IRQ_COMP}) 
+      expression identifiers (as generated by \htmlref{IRQ\_COMP}{IRQ_COMP})
       has been completed.  All internal resources used by any such identifiers
       currently in use are released. Note, this routine does not
-      release the locators created by \htmlref{IRQ\_NEW}{IRQ_NEW} or 
+      release the locators created by \htmlref{IRQ\_NEW}{IRQ_NEW} or
       \htmlref{IRQ\_FIND}{IRQ_FIND}. \htmlref{IRQ\_RLSE}{IRQ_RLSE}
       must be called to release these locators.
 
@@ -1295,8 +1295,8 @@ STATUS~)}
       number of such pixels in each bit plane.
 
       Note, write or update access must be available for the NDF (as
-      set up by routine \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC} for instance), 
-      and the QUALITY component of the NDF must not be mapped on entry 
+      set up by routine \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC} for instance),
+      and the QUALITY component of the NDF must not be mapped on entry
       to this routine.
    }
    \sstinvocation{
@@ -1308,7 +1308,7 @@ STATUS~)}
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
-         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
@@ -1357,8 +1357,8 @@ STATUS~)}
 
       If any of the STATUS values IRQ\_\_BADSY, IRQ\_\_MSOPT or IRQ\_\_MSOPD
       are returned (all of which correspond to various forms of syntax
-      error in the quality expression, 
-      \latexhtml{see Appendix~\ref{APP:ERRORS}}{\htmlref{listed here}{APP:ERRORS}}), 
+      error in the quality expression,
+      \latexhtml{see Appendix~\ref{APP:ERRORS}}{\htmlref{listed here}{APP:ERRORS}}),
       a pointer to the approximate position of the error within the quality
       expression is returned in ERRPNT.
    }
@@ -1372,7 +1372,7 @@ STATUS~)}
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
-         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
@@ -1390,7 +1390,7 @@ STATUS~)}
       \sstsubsection{
          QEXP = CHARACTER$*$($*$) (Given and Returned)
       }{
-         A quality expression. See 
+         A quality expression. See
          \latexhtml{Section~\ref{SEC:QEXP}}{\htmlref{Quality expressions}{SEC:QEXP}}
          for details of the allowed formats for quality expressions.
 	 On exit, the string is converted to upper case and any
@@ -1427,7 +1427,7 @@ STATUS~)}
       }{
          An IRQ identifier for the compiled quality expression. This
          identifier can be passed to IRQ\_SBADx. This identifier should
-         be annulled using routine \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} or 
+         be annulled using routine \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} or
          \htmlref{IRQ\_CLOSE}{IRQ_CLOSE} when it is no
          longer needed.  If an error is reported, then an invalid
          identifier (equal to IRQ\_\_NOID) is returned.
@@ -1565,7 +1565,7 @@ STATUS~)}
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
-         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
@@ -1617,7 +1617,7 @@ STATUS~)}
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
-         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
@@ -1719,8 +1719,8 @@ STATUS~)}
       when calling other IRQ routines. The first locator points to a
       temporary object which holds a cloned identifier for the NDF,
       the other four point to components of the QUALITY\_NAMES structure
-      contained in the NDF. \htmlref{IRQ\_RLSE}{IRQ_RLSE} should be 
-      called to annul these locators (and the NDF identifier) when no 
+      contained in the NDF. \htmlref{IRQ\_RLSE}{IRQ_RLSE} should be
+      called to annul these locators (and the NDF identifier) when no
       further access to the NDFs quality names information is required.
 
       The QUALITY component of the NDF is reset to an undefined state by
@@ -1828,7 +1828,7 @@ STATUS~)}
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
-         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
@@ -1962,7 +1962,7 @@ STATUS~)}
       }{
          An array of five HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
-         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or 
+         been obtained using routine \htmlref{IRQ\_FIND}{IRQ_FIND} or
          routine \htmlref{IRQ\_NEW}{IRQ_NEW}.
       }
       \sstsubsection{
@@ -1986,7 +1986,7 @@ STATUS~)}
    \sstdescription{
       The quality specified by QNAME is removed from all pixels in the
       NDF specified by LOCS (LOCS should be obtained either by calling
-      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}). 
+      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}).
       An error is reported if the quality name is undefined within the NDF.
 
       Note, write or update access must be available for the NDF (as
@@ -2008,7 +2008,7 @@ STATUS~)}
       }{
          The quality name to be removed from all pixels in the NDF. This
          quality name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine 
+         definitions can be added to the NDF using routine
          \htmlref{IRQ\_ADDQN}{IRQ_ADDQN}.
       }
       \sstsubsection{
@@ -2030,11 +2030,11 @@ STATUS~)}
       supplied list of pixel indices. The quality of other pixels
       is left unaltered.  The quality name must be defined in the NDF
       specified by LOCS (LOCS should be obtained either by calling
-      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}). 
+      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}).
       An error is reported if the quality name is undefined.
 
       Note, write or update access must be available for the NDF (as
-      set up by routine \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC} for instance), 
+      set up by routine \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC} for instance),
       and the QUALITY component must not be mapped on entry to this routine.
    }
    \sstinvocation{
@@ -2061,7 +2061,7 @@ STATUS~)}
       }{
          The quality name to be removed from the selected pixels. This
          quality name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine 
+         definitions can be added to the NDF using routine
          \htmlref{IRQ\_ADDQN}{IRQ_ADDQN}.
       }
       \sstsubsection{
@@ -2106,12 +2106,12 @@ STATUS~)}
       pixels in the input mask array.  The quality of all other pixels
       is left unchanged.  The quality name must be defined in the NDF
       specified by LOCS (LOCS should be obtained either by calling
-      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}). An 
+      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}). An
       error is reported if the quality name is undefined.
 
       Note, write or update access must be available for the NDF (as
-      set up by routine \xref{LPG\_ASSOC}{sun263}{LPG_ASSOC} for instance), 
-      and the QUALITY component of the NDF must not be mapped on entry to 
+      set up by routine \xref{LPG\_ASSOC}{sun263}{LPG_ASSOC} for instance),
+      and the QUALITY component of the NDF must not be mapped on entry to
       this routine.
    }
    \sstinvocation{
@@ -2138,7 +2138,7 @@ STATUS~)}
       }{
          The quality name to be removed from the selected pixels. This
          quality name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine 
+         definitions can be added to the NDF using routine
          \htmlref{IRQ\_ADDQN}{IRQ_ADDQN}.
       }
       \sstsubsection{
@@ -2213,7 +2213,7 @@ STATUS~)}
       value to the flag.
 
       If the read-only flag is set for a quality name, any attempt to
-      remove the quality name using \htmlref{IRQ\_REMQN}{IRQ_REMQN} 
+      remove the quality name using \htmlref{IRQ\_REMQN}{IRQ_REMQN}
       will result in an error being reported.
    }
    \sstinvocation{
@@ -2357,7 +2357,7 @@ STATUS~)}
    \sstdescription{
       The quality specified by QNAME is assigned to all pixels in the
       NDF specified by LOCS (LOCS should be obtained either by calling
-      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}). 
+      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}).
       An error is reported if the quality name is undefined within the NDF.
 
       Note, write or update access must be available for the NDF (as
@@ -2400,12 +2400,12 @@ STATUS~)}
       (or, if LISTED is {\tt false}, not included) in the supplied list of
       pixel indices. The quality of other pixels is left unaltered.
       The quality name must be defined in the NDF specified by LOCS
-      (LOCS should be obtained either by calling \htmlref{IRQ\_FIND}{IRQ_FIND} 
+      (LOCS should be obtained either by calling \htmlref{IRQ\_FIND}{IRQ_FIND}
       or \htmlref{IRQ\_NEW}{IRQ_NEW}).
       An error is reported if the quality name is undefined.
 
       Note, write or update access must be available for the NDF (as
-      set up by routine \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC} for instance), 
+      set up by routine \xref{NDF\_ASSOC}{sun33}{NDF_ASSOC} for instance),
       and the QUALITY component must not be mapped on entry to this routine.
    }
    \sstinvocation{
@@ -2475,7 +2475,7 @@ STATUS~)}
       pixels in the input mask array.  The quality of all other pixels
       is left unchanged.  The quality name must be defined in the NDF
       specified by LOCS (LOCS should be obtained either by calling
-      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}). 
+      \htmlref{IRQ\_FIND}{IRQ_FIND} or \htmlref{IRQ\_NEW}{IRQ_NEW}).
       An error is reported if the quality name is undefined.
 
       Note, write or update access must be available for the NDF (as
@@ -2506,7 +2506,7 @@ STATUS~)}
       }{
          The quality name to assign to the selected pixels. This quality
          name must be defined in the NDF specified by LOC. Name
-         definitions can be added to the NDF using routine 
+         definitions can be added to the NDF using routine
          \htmlref{IRQ\_ADDQN}{IRQ_ADDQN}.
       }
       \sstsubsection{
@@ -2544,11 +2544,11 @@ STATUS~)}
       error is reported if a syntax error is detected.  If any of the
       STATUS values IRQ\_\_BADSY, IRQ\_\_MSOPT or IRQ\_\_MSOPD are returned
       (all of which correspond to various forms of syntax error in the
-      quality expression, \latexhtml{see Appendix~\ref{APP:ERRORS}}{\htmlref{listed 
+      quality expression, \latexhtml{see Appendix~\ref{APP:ERRORS}}{\htmlref{listed
       here}{APP:ERRORS}}), a pointer to the
       approximate position of the error within the quality expression
       is returned in ERRPNT.  Note, in order for a quality expression
-      to compile successfully (using \htmlref{IRQ\_COMP}{IRQ_COMP}), it must not 
+      to compile successfully (using \htmlref{IRQ\_COMP}{IRQ_COMP}), it must not
       only contain no syntax errors, but must also contain no undefined quality
       names. IRQ\_SYNTX cannot check for undefined quality names.
    }
@@ -2612,11 +2612,11 @@ below}.
 \hline
 Component Name & TYPE & Brief Description \\ \hline
 {[}{\bf QUAL}{]} & $<${\bf IRQ\_QUAL}$>$ & Vector of quality name definitions\\
-{[}{\bf LAST\_USED}{]} & $<${\bf \_INTEGER}$>$ & Highest used index within 
+{[}{\bf LAST\_USED}{]} & $<${\bf \_INTEGER}$>$ & Highest used index within
 {[}{\bf QUAL}{]}\\
 {[}{\bf NFREE}{]} & $<${\bf \_INTEGER}$>$ & No. of un-used cells within
 {[}{\bf QUAL}{]}\\
-{[}{\bf FREE}(NFREE){]} & $<${\bf \_INTEGER}$>$ & Vector holding indices of 
+{[}{\bf FREE}(NFREE){]} & $<${\bf \_INTEGER}$>$ & Vector holding indices of
 un-used cells in {[}{\bf QUAL}{]}\\
 \hline
 \end{tabular}
@@ -2631,18 +2631,18 @@ QUALITY\_NAMES}{]} structure listed in \latexhtml{Table~\ref
 {TAB:QN}}{Table~1} are used to locate these unused cells. In
 particular, {[}{\bf FREE}{]} is a vector which holds the indices of
 all unused cells within {[}{\bf QUAL}{]}. These indices may appear in
-any order within in {[}{\bf FREE}{]}. 
+any order within in {[}{\bf FREE}{]}.
 
 The set of five HDS locators returned by routines
 \htmlref{IRQ\_NEW}{IRQ_NEW} and \htmlref{IRQ\_FIND}{IRQ_FIND} include
 locators to each of the four components of the {[}{\bf
 QUALITY\_NAMES}{]} structure, together with a locator for a temporary
 HDS structure holding a single $<${\bf \_INTEGER}$>$ scalar used to
-store the cloned NDF identifier. 
+store the cloned NDF identifier.
 
 The information describing each individual quality name is stored in a single
-cell of the {[}{\bf QUAL}{]} vector. The components within each cell of this 
-array are listed in 
+cell of the {[}{\bf QUAL}{]} vector. The components within each cell of this
+array are listed in
 \latexhtml{Table~\ref {TAB:QUAL}}{Table~2}.
 
 \begin{table}[htb]
@@ -2655,12 +2655,12 @@ array are listed in
 Component Name & TYPE & Brief Description \\ \hline
 {[}{\bf NAME}{]} & $<${\bf \_CHAR$\ast$15}$>$ & A quality name (maximum of
 \\
-{[}{\bf FIXED}{]} & $<${\bf \_LOGICAL}$>$ & True if all pixels are in the same 
+{[}{\bf FIXED}{]} & $<${\bf \_LOGICAL}$>$ & True if all pixels are in the same
 state\\
 {[}{\bf VALUE}{]} & $<${\bf \_LOGICAL}$>$ & The state of all pixels, if fixed\\
-{[}{\bf BIT}{]} & $<${\bf \_INTEGER}$>$ & QUALITY bit used to store this 
+{[}{\bf BIT}{]} & $<${\bf \_INTEGER}$>$ & QUALITY bit used to store this
 quality\\
-{[}{\bf COMMENT}{]} & $<${\bf \_CHAR$\ast$}$>$ & A descriptive comment for the 
+{[}{\bf COMMENT}{]} & $<${\bf \_CHAR$\ast$}$>$ & A descriptive comment for the
 quality\\
 \hline
 \end{tabular}
@@ -2672,7 +2672,7 @@ value is stored for {[}{\bf VALUE}{]} if {\em all} pixels hold the
 quality, and a false value if {\em no} pixels hold the quality. In
 either case, {[}{\bf BIT}{]} is ignored since no QUALITY bit needs to
 be reserved for the quality name, thus allowing more than eight
-quality names to be defined simultaneously. 
+quality names to be defined simultaneously.
 
 If some pixels {\em do} hold the quality but some {\em do not}, then a
 false value is stored for {[}{\bf FIXED}{]} and {[}{\bf VALUE}{]} is
@@ -2689,7 +2689,7 @@ being stored in one cell of an array of temporary structures. The
 identifier returned by IRQ\_COMP is just an index within this array.
 Each cell of the array has an HDS {\em name} of {[}{\bf QEXP}{]} and
 an HDS {\em type} of $<${\bf QEXP}$>$, and contains the components
-listed in \latexhtml{Table~\ref {TAB:QEXP}}{Table 3}. 
+listed in \latexhtml{Table~\ref {TAB:QEXP}}{Table 3}.
 
 \begin{table}[htb]
 \centering
@@ -2710,7 +2710,7 @@ are to be tested as part of the evaluation of a quality expression performed by
 routine IRQ\_SBAD. The instruction codes held in {[}{\bf OPCODE}{]} represent
 the operations which must be performed on a ``First In - Last Out'' stack in
 order to evaluate a quality expression. The sizes of theses vectors are held in
-common. 
+common.
 
 \newpage
 \section {Examples of Using IRQ}
@@ -2823,13 +2823,13 @@ already in use.
 \end{quote}
 
 \subsection {Finding pixels which satisfy a quality expression}
-This example produces a copy of an input NDF in which all pixels which do not 
+This example produces a copy of an input NDF in which all pixels which do not
 satisfy the quality expression ``.NOT.( BACKGROUND .OR. SATURATED ) '' are
 set bad.
 
 
 \begin{quote}
-\begin{tabbing} 
+\begin{tabbing}
 
 \verb#*  Attempt to locate any quality name information in   #\\
 \verb#*  the input NDF. If no quality name information is    #\\
@@ -2883,7 +2883,7 @@ access violation would result if a literal string were supplied as an
 argument, instead of a character variable. If either of the quality names
 {\tt SATURATED} or {\tt BACKGROUND} is not defined in the input NDF, then
 an error will be reported by IRQ\_COMP, and the undefined names will be
-returned in the UNDEF array. 
+returned in the UNDEF array.
 
 \end{enumerate}
 
@@ -2900,88 +2900,88 @@ IRQ\_ makes calls to the following packages:
 \item [VEC\_] - The PRIMDAT package; see  \xref{SUN/39}{sun39}{}.
 \end{description}
 
-Access to these packages, together with packages called from within these 
-packages, is necessary to use IRQ. 
+Access to these packages, together with packages called from within these
+packages, is necessary to use IRQ.
 
 \newpage
 
 \section {\xlabel{APP:ERRORS}IRQ Error Codes}
 \label {APP:ERRORS}
 
-IRQ routines can return any STATUS value generated by the subroutine 
+IRQ routines can return any STATUS value generated by the subroutine
 packages which it calls. In addition it can return the following
 IRQ-specific values.
 
 \begin{description}
-\item {\bf IRQ\_\_BADBT}\\ 
+\item {\bf IRQ\_\_BADBT}\\
 Bit value outside range [1,8] supplied.
 \item {\bf IRQ\_\_BADDM}\\
 Incorrect NDF dimensions supplied.
-\item {\bf IRQ\_\_BADNM}\\ 
+\item {\bf IRQ\_\_BADNM}\\
 An illegal quality name has been given.
-\item {\bf IRQ\_\_BADQN}\\ 
+\item {\bf IRQ\_\_BADQN}\\
 Incomplete QUALITY\_NAMES structure found.
-\item {\bf IRQ\_\_BADSL}\\ 
+\item {\bf IRQ\_\_BADSL}\\
 Invalid slot number supplied.
-\item {\bf IRQ\_\_BADST}\\ 
+\item {\bf IRQ\_\_BADST}\\
 Incomplete slot structure found.
-\item {\bf IRQ\_\_BADSY}\\ 
+\item {\bf IRQ\_\_BADSY}\\
 Unrecognised logical operator or constant in quality expression.
-\item {\bf IRQ\_\_CMPLX}\\ 
+\item {\bf IRQ\_\_CMPLX}\\
 Too many symbols in quality expression.
-\item {\bf IRQ\_\_INCOM}\\ 
+\item {\bf IRQ\_\_INCOM}\\
 Supplied vector has different size to the NDF
-\item {\bf IRQ\_\_INTER}\\ 
+\item {\bf IRQ\_\_INTER}\\
 Internal IRQ error (report to maintainer of IRQ).
-\item {\bf IRQ\_\_INVID}\\ 
+\item {\bf IRQ\_\_INVID}\\
 Invalid IRQ identifier supplied.
-\item {\bf IRQ\_\_IVNDF}\\ 
+\item {\bf IRQ\_\_IVNDF}\\
 Invalid NDF identifier found.
-\item {\bf IRQ\_\_LSHRT}\\ 
+\item {\bf IRQ\_\_LSHRT}\\
 Character variable too short.
-\item {\bf IRQ\_\_MSDOT}\\ 
+\item {\bf IRQ\_\_MSDOT}\\
 Missing delimiter "." in quality expression.
-\item {\bf IRQ\_\_MSOPD}\\ 
+\item {\bf IRQ\_\_MSOPD}\\
 Missing operand in quality expression.
-\item {\bf IRQ\_\_MSOPT}\\ 
+\item {\bf IRQ\_\_MSOPT}\\
 Missing or invalid operator in quality expression.
-\item {\bf IRQ\_\_MSPAR}\\ 
+\item {\bf IRQ\_\_MSPAR}\\
 Unpaired parentheses in quality expression.
-\item {\bf IRQ\_\_MULT }\\ 
+\item {\bf IRQ\_\_MULT }\\
 More than one structure found holding quality names information.
 \item {\bf IRQ\_\_NOMOR}\\
 No identifiers left for compiled quality expressions.
-\item {\bf IRQ\_\_NOOPS}\\ 
+\item {\bf IRQ\_\_NOOPS}\\
 No operands can be found.
-\item {\bf IRQ\_\_NOQNM}\\ 
+\item {\bf IRQ\_\_NOQNM}\\
 A quality name could not be found.
-\item {\bf IRQ\_\_NOQNI}\\ 
+\item {\bf IRQ\_\_NOQNI}\\
 No quality names structure found in the NDF.
-\item {\bf IRQ\_\_NOSPA}\\ 
+\item {\bf IRQ\_\_NOSPA}\\
 Can't reclaim space in an instruction array.
-\item {\bf IRQ\_\_NOWRT}\\ 
+\item {\bf IRQ\_\_NOWRT}\\
 Write access to the NDF is unavailable.
-\item {\bf IRQ\_\_QBAD }\\ 
+\item {\bf IRQ\_\_QBAD }\\
 BAD values exists in the QUALITY component.
-\item {\bf IRQ\_\_QEXPL}\\ 
+\item {\bf IRQ\_\_QEXPL}\\
 Too many characters in quality expression.
-\item {\bf IRQ\_\_QIEXS}\\ 
+\item {\bf IRQ\_\_QIEXS}\\
 Extension already contains a quality names structure.
-\item {\bf IRQ\_\_QNEXS}\\ 
+\item {\bf IRQ\_\_QNEXS}\\
 Quality name is already defined.
-\item {\bf IRQ\_\_QLONG}\\ 
+\item {\bf IRQ\_\_QLONG}\\
 Quality name too long.
-\item {\bf IRQ\_\_QREFS}\\ 
+\item {\bf IRQ\_\_QREFS}\\
 Too many quality names in quality expression.
-\item {\bf IRQ\_\_QUNDF}\\ 
+\item {\bf IRQ\_\_QUNDF}\\
 QUALITY component is undefined.
-\item {\bf IRQ\_\_RDONL}\\ 
+\item {\bf IRQ\_\_RDONL}\\
 An attempt has been made to remove a read-only quality name.
-\item {\bf IRQ\_\_STKOV}\\ 
+\item {\bf IRQ\_\_STKOV}\\
 Evaluation stack overflow.
-\item {\bf IRQ\_\_STKUN}\\ 
+\item {\bf IRQ\_\_STKUN}\\
 Evaluation stack underflow.
-\item {\bf IRQ\_\_XBITS}\\ 
+\item {\bf IRQ\_\_XBITS}\\
 No bits left in QUALITY component.
 \end{description}
 

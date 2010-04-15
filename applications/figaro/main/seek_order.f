@@ -47,7 +47,7 @@
 *   PAR_CNPAR called, TNW 25/3/91
 *   Minor changes, TNW 31/7/92
 *   PDA support added A.J. Holloway Oct 97
-*   Remove local unused variables: ACD, 28/9/00 
+*   Remove local unused variables: ACD, 28/9/00
 *-
       implicit none
 * import
@@ -115,7 +115,7 @@
         do kk = 1, kp
            coeff2(kk) = a(kp,kk)
         end do
-        
+
 * Calculate residuals for this order
 
         call calc_resid(coeff2,kp,npts,residuals,x,y,athree

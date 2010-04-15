@@ -27,7 +27,7 @@
 *     feature could be a star or galaxy on the sky, although the
 *     applications is not restricted to 2-dimensional NDFs.
 *
-*     Four methods are available for obtaining the initial positions, 
+*     Four methods are available for obtaining the initial positions,
 *     selected using parameter MODE:
 *
 *     - from the parameter system (see parameter INIT);
@@ -41,14 +41,14 @@
 *     parameter COIN).
 *
 *     In the first two modes the application loops, asking for new
-*     feature co-ordinates until it is told to quit or encounters an 
+*     feature co-ordinates until it is told to quit or encounters an
 *     error.
 *
 *     The results may optionally be written to an output positions list
 *     which can be used to pass the positions on to another application
 *     (see parameter OUTCAT), or to a log file geared more towards human
 *     readers, including details of the input parameters (see parameter
-*     LOGFILE).  
+*     LOGFILE).
 *
 *     The uncertainty in the centroid positions may be estimated if
 *     variance values are available within the supplied NDF (see
@@ -62,51 +62,51 @@
 
 *  ADAM Parameters:
 *     CATFRAME = LITERAL (Read)
-*        A string determining the co-ordinate Frame in which positions 
-*        are to be stored in the output catalogue associated with 
-*        parameter OUTCAT.  The string supplied for CATFRAME can be one 
+*        A string determining the co-ordinate Frame in which positions
+*        are to be stored in the output catalogue associated with
+*        parameter OUTCAT.  The string supplied for CATFRAME can be one
 *        of the following options.
 *
-*        - A Domain name such as SKY, AXIS, PIXEL, etc. 
+*        - A Domain name such as SKY, AXIS, PIXEL, etc.
 *
 *        - An integer value giving the index of the required Frame.
 *
-*        - An IRAS90 Sky Co-ordinate System (SCS) values such as 
+*        - An IRAS90 Sky Co-ordinate System (SCS) values such as
 *        EQUAT(J2000) (see SUN/163).
 *
-*        If a null (!) value is supplied, the positions will be stored 
+*        If a null (!) value is supplied, the positions will be stored
 *        in the current Frame. [!]
 *     CATEPOCH = DOUBLE PRECISION (Read)
 *        The epoch at which the sky positions stored in the output
 *        catalogue were determined.  It will only be accessed if an
-*        epoch value is needed to qualify the co-ordinate Frame 
+*        epoch value is needed to qualify the co-ordinate Frame
 *        specified by COLFRAME.  If required, it should be given as a
-*        decimal years value, with or without decimal places ("1996.8" 
+*        decimal years value, with or without decimal places ("1996.8"
 *        for example).  Such values are interpreted as a Besselian epoch
-*        if less than  1984.0 and as a Julian epoch otherwise. 
+*        if less than  1984.0 and as a Julian epoch otherwise.
 *     CENTRE = LITERAL (Write)
 *        The formatted co-ordinates of the last centroid position, in
-*        the current Frame of the NDF.  
+*        the current Frame of the NDF.
 *     CERROR = _LOGICAL (Read)
 *        If TRUE, errors in the centroided position will be calculated.
-*        The input NDF must contain a VARIANCE component in order to 
+*        The input NDF must contain a VARIANCE component in order to
 *        compute errors.  [FALSE]
 *     COIN = FILENAME (Read)
-*        Name of a text file containing the initial guesses at the 
+*        Name of a text file containing the initial guesses at the
 *        co-ordinates of features to be centroided.  It is only accessed
 *        if parameter MODE is given the value "File".  Each line should
 *        contain the formatted axis values for a single position, in the
-*        current Frame of the NDF. Axis values can be separated by 
-*        spaces, tabs or commas.  The file may contain comment lines 
-*        with the first character # or !. 
+*        current Frame of the NDF. Axis values can be separated by
+*        spaces, tabs or commas.  The file may contain comment lines
+*        with the first character # or !.
 *     DESCRIBE = LOGICAL (Read)
-*        If TRUE, a detailed description of the co-ordinate Frame in 
-*        which  the centroided positions will be reported is displayed 
+*        If TRUE, a detailed description of the co-ordinate Frame in
+*        which  the centroided positions will be reported is displayed
 *        before the positions themselves.  [current value]
 *     DEVICE = DEVICE (Read)
 *        The graphics device which is to be used to give the initial
-*        guesses at the centroid positions.  It is only accessed if 
-*        parameter MODE is given the value "Cursor".  
+*        guesses at the centroid positions.  It is only accessed if
+*        parameter MODE is given the value "Cursor".
 *        [Current graphics device]
 *     ERROR = LITERAL (Write)
 *        The errors associated with the position written to parameter
@@ -118,26 +118,26 @@
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the initial
 *        guesses at the centroid positions, such as produced by
-*        applications CURSOR, LISTMAKE, etc.  It is only accessed if 
-*        parameter MODE is given the value "Catalogue". 
+*        applications CURSOR, LISTMAKE, etc.  It is only accessed if
+*        parameter MODE is given the value "Catalogue".
 *     INIT = LITERAL (Read)
-*        An initial guess at the co-ordinates of the next feature to be 
+*        An initial guess at the co-ordinates of the next feature to be
 *        centroided, in the current co-ordinate Frame of the NDF
-*        (supplying a colon ":" will display details of the current 
-*        co-ordinate Frame).  The position should be supplied as a 
-*        list of formatted axis values separated by spaces or commas. 
-*        INIT is only accessed if parameter MODE is given the value 
-*        "Interface".  If the initial co-ordinates are supplied on the 
-*        command line only one centroid will be found; otherwise the 
+*        (supplying a colon ":" will display details of the current
+*        co-ordinate Frame).  The position should be supplied as a
+*        list of formatted axis values separated by spaces or commas.
+*        INIT is only accessed if parameter MODE is given the value
+*        "Interface".  If the initial co-ordinates are supplied on the
+*        command line only one centroid will be found; otherwise the
 *        application will ask for further guesses, which may be
-*        terminated by supplying the null value (!). 
+*        terminated by supplying the null value (!).
 *     LOGFILE = FILENAME (Read)
 *        Name of the text file to log the results.  If null, there
 *        will be no logging.  Note this is intended for the human reader
 *        and is not intended for passing to other applications.  [!]
 *     MARK = LITERAL (Read)
-*        Only accessed if parameter MODE is given the value "Cursor". 
-*        It indicates which positions are to be marked on the screen 
+*        Only accessed if parameter MODE is given the value "Cursor".
+*        It indicates which positions are to be marked on the screen
 *        using the marker type given by parameter MARKER.  It can take
 *        any of the following values.
 *
@@ -153,8 +153,8 @@
 *        This parameter is only accessed if parameter MARK is set TRUE.
 *        It specifies the type of marker with which each cursor position
 *        should be marked, and should be given as an integer PGPLOT
-*        marker type.  For instance, 0 gives a box, 1 gives a dot, 2 
-*        gives a cross, 3 gives an asterisk, 7 gives a triangle.  The 
+*        marker type.  For instance, 0 gives a box, 1 gives a dot, 2
+*        gives a cross, 3 gives an asterisk, 7 gives a triangle.  The
 *        value must be larger than or equal to -31.  [current value]
 *     MAXITER = _INTEGER (Read)
 *        Maximum number of iterations to be used in the search.  It must
@@ -171,20 +171,20 @@
 *
 *        - "Interface" -- positions are obtained using parameter INIT.
 *
-*        - "Cursor"    -- positions are obtained using the graphics 
-*                         cursor of the device specified by parameter 
+*        - "Cursor"    -- positions are obtained using the graphics
+*                         cursor of the device specified by parameter
 *                         DEVICE.
 *
 *        - "Catalogue" -- positions are obtained from a positions list
 *                         using parameter INCAT.
 *
-*        - "File"      -- positions are obtained from a text file using 
+*        - "File"      -- positions are obtained from a text file using
 *                         parameter COIN.
 *
 *        [current value]
 *     NDF = NDF (Read)
 *        The NDF structure containing the data array to be analysed.  In
-*        cursor mode (see parameter MODE), the run-time default is the 
+*        cursor mode (see parameter MODE), the run-time default is the
 *        displayed data, as recorded in the graphics database.  In other
 *        modes, there is no run-time default and the user must supply a
 *        value.  []
@@ -200,13 +200,13 @@
 *        catalogue is produced.  See also parameter CATFRAME.  [!]
 *     PLOTSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
-*        drawing the graphics markers specified by parameter MARK. 
+*        drawing the graphics markers specified by parameter MARK.
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text 
-*        file preceded by an up-arrow character "^".  Such text files 
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
 *        should contain further comma-separated lists which will be read
-*        and interpreted in the same manner.  Attribute settings are 
+*        and interpreted in the same manner.  Attribute settings are
 *        applied in the order in which they occur within the list, with
 *        later settings overriding any earlier settings given for the
 *        same attribute.
@@ -218,12 +218,12 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section 
-*        "Plotting Attributes" in SUN/95 for a description of the 
+*        defaulted if a null value (!) is supplied.  See section
+*        "Plotting Attributes" in SUN/95 for a description of the
 *        available attributes.  Any unrecognised attributes are ignored
 *        (no error is reported).  [current value]
 *     POSITIVE = _LOGICAL (Read)
-*        TRUE, if array features are positive above the background. 
+*        TRUE, if array features are positive above the background.
 *        [TRUE]
 *     SEARCH() = _INTEGER (Read)
 *        Size in pixels of the search box to be used. If only a single
@@ -232,8 +232,8 @@
 *        Each value must be odd and lie in the range 3--51.  [9]
 *     TITLE = LITERAL (Read)
 *        A title to store with the output catalogue specified by
-*        parameter OUTCAT, and to display before the centroid positions 
-*        are listed.  If a null (!) value is supplied, the title is 
+*        parameter OUTCAT, and to display before the centroid positions
+*        are listed.  If a null (!) value is supplied, the title is
 *        taken from any input catalogue specified by parameter INCAT, or
 *        is a fixed string including the name of the NDF.  [!]
 *     TOLER = _REAL (Read)
@@ -243,12 +243,12 @@
 *        0.0--2.0.  [0.05]
 *     XCEN = LITERAL (Write)
 *         The formatted X co-ordinate of the last centroid position, in
-*         the current co-ordinate Frame of the NDF. 
+*         the current co-ordinate Frame of the NDF.
 *     XERR = LITERAL (Write)
 *         The error associated with the value written to parameter XCEN.
 *     YCEN = LITERAL (Write)
 *         The formatted Y co-ordinate of the last centroid position, in
-*         the current co-ordinate Frame of the NDF. 
+*         the current co-ordinate Frame of the NDF.
 *     YERR = LITERAL (Write)
 *         The error associated with the value written to parameter YCEN.
 
@@ -259,15 +259,15 @@
 *     centroid cluster cu search=21 mark=ce plotstyle='colour=red'
 *        This finds the centroids in the NDF called cluster via the
 *        graphics cursor on the current graphics device.  The search
-*        box for the centroid is 21 pixels in each dimension.  The 
+*        box for the centroid is 21 pixels in each dimension.  The
 *        centroid positions are marked using a red symbol.
 *     centroid cluster i "21.7,5007.1"
 *        This finds the centroid of the object in the two-dimensional
-*        NDF called cluster around the current Frame co-ordinate 
+*        NDF called cluster around the current Frame co-ordinate
 *        (21.7,5007.1).
 *     centroid arp244(6,,) i "40,30" toler=0.01
 *        This finds the 2-dimensional centroid of the feature near
-*        pixel (6,40,30) in the three-dimensional NDF called arp244 
+*        pixel (6,40,30) in the three-dimensional NDF called arp244
 *        (assuming the current co-ordinate Frame of the NDF is PIXEL).
 *        The centroid must be found to 0.01 pixels.
 *     centroid cluster cu xcen=(xp) ycen=(yp)
@@ -284,24 +284,24 @@
 *     centroid cluster mode=cat incat=a outcat=b catframe=ecl
 *        This example reads the initial guess positions from the
 *        positions list in file a.FIT, and writes the accurate centroid
-*        positions to positions list file b.FIT, storing the output 
+*        positions to positions list file b.FIT, storing the output
 *        positions in ecliptic co-ordinates.  The input file may, for
 *        instance, have been created using the application CURSOR.
 
 *  Notes:
-*     -  All positions are supplied and reported in the current 
+*     -  All positions are supplied and reported in the current
 *     co-ordinate Frame of the NDF.  A description of the co-ordinate
 *     Frame being used  is given if parameter DESCRIBE is set to a TRUE
 *     value.  Application WCSFRAME can be used to change the current
 *     co-ordinate Frame of the NDF before running this application if
 *     required.
-*     -  In Cursor or Interface mode, only the first 200 supplied 
-*     positions will be stored in the output catalogue.  Any further 
+*     -  In Cursor or Interface mode, only the first 200 supplied
+*     positions will be stored in the output catalogue.  Any further
 *     positions will be displayed on the screen but not stored in the
 *     output catalogue.
 *     -  The centroid positions are not displayed on the screen when the
 *     message filter environment variable MSG_FILTER is set to QUIET.
-*     The creation of output parameters and files is unaffected by 
+*     The creation of output parameters and files is unaffected by
 *     MSG_FILTER.
 
 *  Related Applications:
@@ -314,10 +314,10 @@
 *  Estimation of Centroid Positions:
 *     Each centroid position is obtained by projecting the data values
 *     within a search box centred on the supplied position, on to each
-*     axis in turn.  This forms a set of profiles for the feature, one 
-*     for each axis.  An estimate of the background at each point in 
-*     these profiles is made and subtracted from the profile.  This 
-*     flattens the profile backgrounds, removing any slope in the data. 
+*     axis in turn.  This forms a set of profiles for the feature, one
+*     for each axis.  An estimate of the background at each point in
+*     these profiles is made and subtracted from the profile.  This
+*     flattens the profile backgrounds, removing any slope in the data.
 *     Once the profiles have been flattened in this way, and estimate of
 *     the background noise in each is made.  The centroid of the feature
 *     is then found using only the data above the noise level.
@@ -326,7 +326,7 @@
 *     the previous estimate of the centroid as the initial position for
 *     another estimation. This loop is repeated up to a maximum number
 *     of iterations, though it normally terminates when a desired
-*     accuracy has been achieved. 
+*     accuracy has been achieved.
 *
 *     The achieved accuracy is affected by noise, and the presence of
 *     non-Gaussian or overlapping features, but typically an accuracy
@@ -338,11 +338,11 @@
 *     derive the standard deviations.
 
 *  Copyright:
-*     Copyright (C) 1991, 1992, 1998-2001 Central Laboratory of 
+*     Copyright (C) 1991, 1992, 1998-2001 Central Laboratory of
 *         the Research Councils
 *     Copyright (C) 2004-2006 Particle Physics and Astronomy Research
 *     Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -369,7 +369,7 @@
 
 *  History:
 *     1991 March 24 (MJC):
-*        Original NDF version based on the pre-0.8 version. 
+*        Original NDF version based on the pre-0.8 version.
 *     1991 July 12 (MJC):
 *        Added COOUT file.
 *     1992 March 3 (MJC):
@@ -423,7 +423,7 @@
       CHARACTER BUFOUT*132      ! Buffer for writing the logfile
       CHARACTER LOCI*(DAT__SZLOC)! Locator for input data structure
       CHARACTER MARK*8          ! Positions to mark
-      CHARACTER MODE*10         ! Mode for getting initial co-ords 
+      CHARACTER MODE*10         ! Mode for getting initial co-ords
       CHARACTER NDFNAM*256      ! Name of input IMAGE
       CHARACTER REFNAM*256      ! Reference name
       CHARACTER TITLE*80        ! Title for output positions list
@@ -516,7 +516,7 @@
 *  Abort if an error occured.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Attempt to open a log file to store the results for human readers. 
+*  Attempt to open a log file to store the results for human readers.
       CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 80, FDL, STATUS )
 
 *  Annul the error if a null value was given, and indicate that a log
@@ -533,10 +533,10 @@
       IF( LOGPOS .AND. .NOT. QUIET ) CALL MSG_OUT( 'LOG', '  Logging '//
      :                                           'to $LOGFILE', STATUS )
 
-*  Attempt to open an output co-ordinate text file.  This facility is 
-*  retained for compatibility with the pre-AST version of this 
+*  Attempt to open an output co-ordinate text file.  This facility is
+*  retained for compatibility with the pre-AST version of this
 *  application, but is no longer documented.  It is expected that people
-*  will now use parameter OUTCAT instead of COOUT.  Only use the 
+*  will now use parameter OUTCAT instead of COOUT.  Only use the
 *  parameter if it was given on the command line.
       CALL LPG_STATE( 'COOUT', STATE, STATUS )
       IF( STATE .EQ. SUBPAR__ACTIVE ) THEN
@@ -551,7 +551,7 @@
 *  output co-ordinate text file is not to be created.
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-   
+
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             OUTCO = .TRUE.
          END IF
@@ -573,18 +573,18 @@
 *  Abort if an error occured.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  No initialization needed for "File" mode.  We cannot read the 
-*  contents of a file yet, because we do not yet have an NDF and so do 
+*  No initialization needed for "File" mode.  We cannot read the
+*  contents of a file yet, because we do not yet have an NDF and so do
 *  not know how many columns the file must contain.
       IF( FILE ) THEN
 
 *  In "Catalogue" mode, open a positions list catalogue and read its
-*  contents.  A pointer to a FrameSet is returned, together with 
-*  pointers to positions and identifiers, and a title.  The positions 
+*  contents.  A pointer to a FrameSet is returned, together with
+*  pointers to positions and identifiers, and a title.  The positions
 *  are returned in the Base Frame of this FrameSet.
       ELSE IF( CAT ) THEN
          IWCSG = AST__NULL
-         CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSG, NPOS, NAXIN, IPIN, 
+         CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSG, NPOS, NAXIN, IPIN,
      :                    IPID, TITLE, ' ', STATUS )
 
 *  In "Cursor" mode, open and prepare the graphics device.
@@ -597,15 +597,15 @@
 *  Find the most recent DATA picture.
          CALL KPG1_AGFND( 'DATA', IPIC, STATUS )
 
-*  Report the name, comment, and label, if one exists, for the current 
+*  Report the name, comment, and label, if one exists, for the current
 *  picture.
          CALL KPG1_AGATC( STATUS )
 
-*  Set the PGPLOT viewport and AST Plot for this DATA picture.  The 
+*  Set the PGPLOT viewport and AST Plot for this DATA picture.  The
 *  PGPLOT viewport is set equal to the selected picture, with world
-*  co-ordinates giving millimetres form the bottom-left corner of the 
-*  view surface.  The returned Plot may include a Frame with Domain 
-*  AGI_DATA representing AGI DATA co-ordinates (defined by a TRANSFORM 
+*  co-ordinates giving millimetres form the bottom-left corner of the
+*  view surface.  The returned Plot may include a Frame with Domain
+*  AGI_DATA representing AGI DATA co-ordinates (defined by a TRANSFORM
 *  structure stored with the picture in the database).
          CALL KPG1_GDGET( IPIC, AST__NULL, .TRUE., IPLOT, STATUS )
 
@@ -615,12 +615,12 @@
 
 *  If so, get the marker type, and set the plotting style.
          IF( MARK .NE. 'NONE' ) THEN
-            CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK, 
+            CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK,
      :                      STATUS )
-            CALL KPG1_ASSET( 'KAPPA_CENTROID', 'PLOTSTYLE', IPLOT, 
+            CALL KPG1_ASSET( 'KAPPA_CENTROID', 'PLOTSTYLE', IPLOT,
      :                       STATUS )
 
-*  Set the current PGPLOT marker attributes (size, colour, etc) so that 
+*  Set the current PGPLOT marker attributes (size, colour, etc) so that
 *  they are the same as the marker attributes specified in the Plot.
 *  The pre-existing PGPLOT attribute values are saved in ATTR.
             CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, STATUS )
@@ -628,7 +628,7 @@
          END IF
 
 *  Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999 
+         IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain a reference to the NDF.
          CALL KPG1_AGREF( IPIC, 'READ', GOTNAM, REFNAM, STATUS )
@@ -648,14 +648,14 @@
 
       END IF
 
-*  Obtain the NDF. If the name is given on the command line it will be 
-*  used.  If not, the database data reference is used, if there is one. 
+*  Obtain the NDF. If the name is given on the command line it will be
+*  used.  If not, the database data reference is used, if there is one.
 *  Otherwise, the user is prompted.
       CALL KPG1_ASREF( 'NDF', 'READ', GOTNAM, REFNAM, INDF, STATUS )
 
-*  Determine whether or not errors are to be estimated, and if so how 
-*  many simulations to perform.  Since a standard deviation is to be 
-*  calculated the minimum number of simulations is 3.  Check that there 
+*  Determine whether or not errors are to be estimated, and if so how
+*  many simulations to perform.  Since a standard deviation is to be
+*  calculated the minimum number of simulations is 3.  Check that there
 *  is variance present in the NDF.
       NSIM = 1
       CALL PAR_GET0L( 'CERROR', CERROR, STATUS )
@@ -667,7 +667,7 @@
      :                    'there is no Variance information in '//
      :                    '''^NDF''.', STATUS )
          ELSE
-            CALL PAR_GDR0I( 'NSIM', 100, 3, 10000, .TRUE., NSIM, 
+            CALL PAR_GDR0I( 'NSIM', 100, 3, 10000, .TRUE., NSIM,
      :                      STATUS )
          END IF
       END IF
@@ -675,7 +675,7 @@
 *  We need to know how many significant axes there are (i.e. pixel axes
 *  spanning more than a single pixel), so count them.  We ignore
 *  insignificant axes since the user will probably not be interested in
-*  them (and the centroiding routines cannot handle axes spanning only 
+*  them (and the centroiding routines cannot handle axes spanning only
 *  a single pixel).
       CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
       NDIMS = 0
@@ -684,7 +684,7 @@
       END DO
 
 *  Now get the WCS FrameSet from the NDF.
-      CALL KPG1_ASGET( INDF, NDIMS, .TRUE., .FALSE., .FALSE., SDIM, 
+      CALL KPG1_ASGET( INDF, NDIMS, .TRUE., .FALSE., .FALSE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Get a pointer to the Current Frame in the NDF.
@@ -696,32 +696,32 @@
 *  Get the Mapping from PIXEL to Current Frame in the NDF. First find
 *  the index of the PIXEL Frame, and then get the Mapping.
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
-      MAP1 = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, 
+      MAP1 = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IPIX, AST__CURRENT,
      :                                     STATUS ), STATUS )
 
 *  We now get the AST Mapping from the Frame in which the positions are
 *  supplied to the Current Frame of the NDF.
       IF( CURSOR ) THEN
 
-*  In cursor mode, the positions will be supplied in GRAPHICS 
-*  co-ordinates (i.e. millimetres from the bottom-left corner of the 
-*  screen).  Merge the Plot read from the graphics database with the 
-*  FrameSet read from the NDF aligning them in some suitable Frame. 
+*  In cursor mode, the positions will be supplied in GRAPHICS
+*  co-ordinates (i.e. millimetres from the bottom-left corner of the
+*  screen).  Merge the Plot read from the graphics database with the
+*  FrameSet read from the NDF aligning them in some suitable Frame.
          CALL KPG1_ASMRG( IPLOT, IWCS, ' ', QUIET, 0, STATUS )
 
 *  Get the Mapping.
-         MAP2 = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE, 
+         MAP2 = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE,
      :                                        AST__CURRENT, STATUS ),
      :                        STATUS )
 
 *  In catalogue mode, the positions are supplied in the Base Frame of
-*  the FrameSet stored in the catalogue.  Merge this FrameSet with the 
-*  FrameSet read from the NDF aligning them in some suitable Frame. 
+*  the FrameSet stored in the catalogue.  Merge this FrameSet with the
+*  FrameSet read from the NDF aligning them in some suitable Frame.
       ELSE IF( CAT ) THEN
          CALL KPG1_ASMRG( IWCSG, IWCS, ' ', QUIET, 0, STATUS )
 
 *  Get the Mapping.
-         MAP2 = AST_SIMPLIFY( AST_GETMAPPING( IWCSG, AST__BASE, 
+         MAP2 = AST_SIMPLIFY( AST_GETMAPPING( IWCSG, AST__BASE,
      :                                        AST__CURRENT, STATUS ),
      :                        STATUS )
 
@@ -736,18 +736,18 @@
 
 *  We need the Mapping from the Frame in which the positions are
 *  supplied, to the PIXEL Frame of the NDF.  We get this Mapping by
-*  concatenating the Mapping from input Frame to Current Frame, with 
-*  the Mapping from Current Frame to PIXEL Frame (obtained by 
+*  concatenating the Mapping from input Frame to Current Frame, with
+*  the Mapping from Current Frame to PIXEL Frame (obtained by
 *  temporarily inverting the Mapping from PIXEL to Current Frame).
       CALL AST_INVERT( MAP1, STATUS )
-      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, MAP1, .TRUE., ' ', 
+      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, MAP1, .TRUE., ' ',
      :                                 STATUS ), STATUS )
       CALL AST_INVERT( MAP1, STATUS )
 
 *  See if a description of the NDFs current Frame is required.
       CALL PAR_GET0L( 'DESCRIBE', DESC, STATUS )
 
-*  If so, give a detailed description of the Frame in which positions 
+*  If so, give a detailed description of the Frame in which positions
 *  will be reported if required.
       IF( DESC .AND. .NOT. QUIET ) THEN
          CALL KPG1_DSFRM( CFRM, 'Positions will be reported in the '//
@@ -758,7 +758,7 @@
 *  If we are in "File" mode, obtain the file and read the positions,
 *  interpreting them as positions within the Current Frame of the NDF.
 *  A pointer to memory holding the positions is returned.  Store a safe
-*  value for the IPID pointer.  Identifiers are generated automatically 
+*  value for the IPID pointer.  Identifiers are generated automatically
 *  in File mode instead of being read from the file, and so we do not
 *  have a pointer to an array of identifiers at this point.
       IF( FILE ) THEN
@@ -766,12 +766,12 @@
          IPID = IPIN
       END IF
 
-*  Allocate work space to hold the output positions list.  These 
-*  positions are given in the Current Frame of the NDF.  There is a 
-*  limit of MXPOS positions in interactive modes (Cursor, and 
+*  Allocate work space to hold the output positions list.  These
+*  positions are given in the Current Frame of the NDF.  There is a
+*  limit of MXPOS positions in interactive modes (Cursor, and
 *  Interface).
       IF( CAT .OR. FILE ) THEN
-         MPOS = NPOS         
+         MPOS = NPOS
       ELSE
          MPOS = MXPOS
       END IF
@@ -800,7 +800,7 @@
          CALL PAR_DEF0C( 'TITLE', TITLE, STATUS )
          CALL PAR_GET0C( 'TITLE', TITLE, STATUS )
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-      END IF      
+      END IF
 
 *  Obtain the search region sizes, duplicating the value if only a
 *  single value is given.  Each size must be a positive odd number.
@@ -814,7 +814,7 @@
 *  Constrain the search area to be odd and no bigger than the image.
       DO  I = 1, NDIMS
 
-         IF( MOD( SEARCH( I ), 2  ) .EQ. 0 .AND. 
+         IF( MOD( SEARCH( I ), 2  ) .EQ. 0 .AND.
      :      STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'S', SEARCH( I ) )
@@ -906,27 +906,27 @@
 *  Allocate work arrays.
          CALL PSX_CALLOC( NPOS * NAXC, '_DOUBLE', IPW1, STATUS )
          CALL PSX_CALLOC( NPOS * NDIMS, '_DOUBLE', IPW2, STATUS )
-         IF( CERROR ) THEN 
+         IF( CERROR ) THEN
             CALL PSX_CALLOC( NSIM * NPOS * NDIMS, '_DOUBLE', IPW3,
      :                       STATUS )
             CALL PSX_CALLOC( NSIM * NPOS * NAXC, '_DOUBLE', IPW4,
      :                       STATUS )
          ELSE
             IPW3 = IPW1
-            IPW4 = IPW1 
+            IPW4 = IPW1
          END IF
 
 *  Find the centroids and errors, and display them.  Sets the hardwired
 *  parameters CENTRE, XCEN, YCEN, XERR, YERR, and ERROR.
-         CALL KPS1_CENBT( INDF, CERROR, MAP3, MAP1, MAP2, CFRM, NPOS, 
-     :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT, 
+         CALL KPS1_CENBT( INDF, CERROR, MAP3, MAP1, MAP2, CFRM, NPOS,
+     :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT,
      :                    %VAL( CNF_PVAL( IPID ) ),
      :                    LOGPOS, FDL, QUIET, NSIM, NDIMS, SLBND, SUBND,
-     :                    SEARCH, POSTVE, GUESS, MXSHFT, MXITER, OUTCO, 
-     :                    FDO, TOLER, TITLE, NSIM * NPOS, 
+     :                    SEARCH, POSTVE, GUESS, MXSHFT, MXITER, OUTCO,
+     :                    FDO, TOLER, TITLE, NSIM * NPOS,
      :                    %VAL( CNF_PVAL( IPW1 ) ),
-     :                    %VAL( CNF_PVAL( IPW2 ) ), 
-     :                    %VAL( CNF_PVAL( IPOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    %VAL( CNF_PVAL( IPW3 ) ),
      :                    %VAL( CNF_PVAL( IPW4 ) ), STATUS )
 
@@ -939,24 +939,24 @@
             CALL PSX_FREE( IPW4, STATUS )
          END IF
 
-*  In interactive modes, find each centroid individually, waiting for 
+*  In interactive modes, find each centroid individually, waiting for
 *  the user to supply a new one before continuing each time.
       ELSE
 
 *  Allocate work arrays.
-         IF( CERROR ) THEN 
+         IF( CERROR ) THEN
             CALL PSX_CALLOC( NSIM * NDIMS, '_DOUBLE', IPW1, STATUS )
             CALL PSX_CALLOC( NSIM * NAXC, '_DOUBLE', IPW2, STATUS )
          END IF
 
 *  Find the centroids and errors, and display them.  Sets the hardwired
 *  parameters CENTRE, XCEN, YCEN, XERR, YERR, and ERROR.
-         CALL KPS1_CENSG( INDF, CERROR, MAP3, MAP1, MAP2, CFRM, 'INIT', 
+         CALL KPS1_CENSG( INDF, CERROR, MAP3, MAP1, MAP2, CFRM, 'INIT',
      :                    CURSOR, MARK, IMARK, NAXC, NAXIN, LOGPOS, FDL,
-     :                    QUIET, NSIM, NDIMS, SLBND, SUBND, SEARCH, 
-     :                    POSTVE, GUESS, MXSHFT, MXITER, OUTCO, FDO, 
+     :                    QUIET, NSIM, NDIMS, SLBND, SUBND, SEARCH,
+     :                    POSTVE, GUESS, MXSHFT, MXITER, OUTCO, FDO,
      :                    TOLER, TITLE, MPOS, %VAL( CNF_PVAL( IPOUT ) ),
-     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ),
      :                    %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Free the work arrays.
@@ -967,10 +967,10 @@
 
       END IF
 
-*  Decide where the position identifiers for the output positions list 
-*  will come from.  In Catalogue mode they are copied from the input 
-*  positions list, which should already have been stored in an array 
-*  pointed to by IPID. Set ID0 to zero to tell KPG1_WRLST to use the 
+*  Decide where the position identifiers for the output positions list
+*  will come from.  In Catalogue mode they are copied from the input
+*  positions list, which should already have been stored in an array
+*  pointed to by IPID. Set ID0 to zero to tell KPG1_WRLST to use the
 *  IPID array.
       IF( CAT ) THEN
          ID0 = 0
@@ -978,22 +978,22 @@
 *  In other modes, no position identifiers are available, so we create
 *  new ones. The identifier for the first position (1) is stored in ID0.
 *  This causes KPG1_WRLST to ignore the IPID array and create its own
-*  monotonically increasing identifiers starting at the value of ID0. 
-*  However, we need to make sure that the IPID variable contains a safe 
+*  monotonically increasing identifiers starting at the value of ID0.
+*  However, we need to make sure that the IPID variable contains a safe
 *  pointer value even though it is not used.  This is to avoid a risk of
-*  an access violation when the pointer is passed using %VAL.  So we 
-*  assign it the value of IPOUT. 
+*  an access violation when the pointer is passed using %VAL.  So we
+*  assign it the value of IPOUT.
       ELSE
          ID0 = 1
          IPID = IPOUT
       END IF
 
-*  Create the output positions list if there are any positions ot 
+*  Create the output positions list if there are any positions ot
 *  output.
       IF( NPOS .GT. 0 ) THEN
-         CALL KPG1_WRLST( 'OUTCAT', MPOS, NPOS, NAXC, 
+         CALL KPG1_WRLST( 'OUTCAT', MPOS, NPOS, NAXC,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
-     :                    AST__CURRENT, IWCS, TITLE, ID0, 
+     :                    AST__CURRENT, IWCS, TITLE, ID0,
      :                    %VAL( CNF_PVAL( IPID ) ),
      :                    .TRUE., STATUS )
       END IF
@@ -1029,7 +1029,7 @@
          IF( GOTLOC ) CALL DAT_ANNUL( LOCI, STATUS )
 
 *  Re-instate any changed PGPLOT marker attributes.
-         IF( MARK .NE. 'NONE' ) CALL KPG1_PGSTY( IPLOT, 'MARKERS', 
+         IF( MARK .NE. 'NONE' ) CALL KPG1_PGSTY( IPLOT, 'MARKERS',
      :                                           .FALSE., ATTR, STATUS )
 
 *  Close the graphics database and device.

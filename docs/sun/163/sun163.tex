@@ -7,7 +7,7 @@
 \newcommand{\stardocnumber}    {163.3}
 \newcommand{\stardocauthors}   {David S. Berry, W Gong, D C Parsons}
 \newcommand{\stardocdate}      {19 February 1995}
-\newcommand{\stardoctitle}     {IRAS90 --- IRAS Survey and PO Data Analysis 
+\newcommand{\stardoctitle}     {IRAS90 --- IRAS Survey and PO Data Analysis
                                 Package\\[2ex] --- Reference Guide}
 %------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@
 % Add any \newcommand or \newenvironment commands here
 
 % degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}} 
+\newcommand{\dgs}{\hbox{$^\circ$}}
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 % A kind of list item, like description, but with an easily adjustable
@@ -241,14 +241,14 @@ DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
 \vspace{5mm}
 
 \setlength{\parskip}{0mm} \tableofcontents
-\setlength{\parskip}{\medskipamount} \markright{\stardocname} \newpage 
+\setlength{\parskip}{\medskipamount} \markright{\stardocname} \newpage
 
 \section{Introduction}
 {\small IRAS90} is a package of applications which provides facilities for the
 reduction and analysis of {\small IRAS} Survey and Pointed Observation (PO) data (also
 known as ``Additional Observation'', or ``AO'' data). It does not provide
 facilities for handling Low Resolution Spectrometer (LRS) data, or catalogue
-data. 
+data.
 
 Specifically, {\small IRAS90} provides the following facilities:
 
@@ -265,11 +265,11 @@ detector Point Spread Functions (PSFs).
 
 \item Preparation of {\small IRAS} {\small FITS} images prior to use by other
 {\small IRAS90} applications, or other {\small ADAM} packages such as {\small
-KAPPA, CCDPACK, PISA,} etc. 
+KAPPA, CCDPACK, PISA,} etc.
 
 \item Creation of colour temperature maps, optical depth maps and colour
 corrected surface brightness maps, based on optically thin greybody source
-spectra. 
+spectra.
 
 \item Various astrometric operations such as returning celestial coordinates
 at given image pixels, aligning a group of images, annotating a displayed
@@ -285,7 +285,7 @@ image or {\small CRDD} file.
 N-dimensional data format'' ({\small NDF}) for storing data in {\small HDS}
 files. {\small IRAS90} uses an {\small NDF} ``extension'' named ``{\small
 IRAS}'' to store package-specific information within each data file. SG/4 gives
-an overview of {\small ADAM}, {\small NDF} and {\small HDS} concepts. 
+an overview of {\small ADAM}, {\small NDF} and {\small HDS} concepts.
 
 \subsection{Use of KAPPA and SUN/95}
 It is expected that users of {\small IRAS90} will also make extensive use of the
@@ -306,14 +306,14 @@ up the full specification of the command in the relevant appendix, and skim
 through it to get an idea of what it does and how the various application
 parameters can be used to modify its behaviour. If the specification uses terms
 with which you are unfamiliar, then you may want to look through the contents
-table at the front of the document to find the sections which describe them. 
+table at the front of the document to find the sections which describe them.
 
 \section{Obtaining IRAS Data}
 {\small IRAS} data can be obtained from {\small FIIS/IPMAF} (the {\small IRAS}
 User Support Group) at the Rutherford Appleton Laboratory ({\small RAL}).
 Enquires should be sent by electronic mail to username {\small IRASMAIL} at
 {\small RLVAD}. The ``{\small IRAS} Data Products Primer'' (SUN/82) should be
-consulted for details of the available data. 
+consulted for details of the available data.
 
 \section{Recipes for Common Operations}
 This section contains brief outlines of how several common {\small IRAS} data
@@ -326,12 +326,12 @@ make it clear to you what is required, then entering a single question mark
 (``?'') will display more information about the current parameter, and then
 repeat the parameter prompt. A double question mark (``??'') will leave the user
 in the {\small IRAS90} help library so that other items of help can be read (the
-parameter prompt is repeated when the help library is finally exited). 
+parameter prompt is repeated when the help library is finally exited).
 
 Having said that, it is strongly recommended that users read the full
 application specifications in appendix \ref{ap:full}. These describe the full
 range of facilities provided by each application, and also describe what each
-application does to the data. 
+application does to the data.
 
 \subsection{Starting up IRAS90}
 {\small IRAS90} comes in two forms.  One is a monolith that is activated within
@@ -342,7 +342,7 @@ initial pause while it loads, all its constituent applications are available
 immediately.  There is no pause while each new application is fired up.  This is
 fine when you wish to run several applications and/or the same application
 several times. However, for single tasks it may be more convenient to run from
-{\small DCL} or the shell. 
+{\small DCL} or the shell.
 
 To run {\small IRAS90} on {\small VMS} from {\small DCL} , just enter the
 command
@@ -358,7 +358,7 @@ names, and defines some logical names to make help information available.
 
 The command to run the {\small IRAS90} monolith is almost the same except you
 must be within the {\small ADAM} command language.  This requires just one extra
-command, namely 
+command, namely
 
 \small
 \begin{verbatim}
@@ -377,7 +377,7 @@ commands known to the command language, and not unexpectedly, it too is
 \normalsize
 
 To run {\small IRAS90} on {\small UNIX} from the shell, first ensure that you
-have a subdirectory {\bf adam} within the directory identified by environment 
+have a subdirectory {\bf adam} within the directory identified by environment
 variable {\bf HOME}. Then enter the command
 
 \small
@@ -385,16 +385,16 @@ variable {\bf HOME}. Then enter the command
      % iras90
 \end{verbatim}
 \normalsize
-This executes a script setting up aliases for {\small IRAS90}'s command names. 
+This executes a script setting up aliases for {\small IRAS90}'s command names.
 
-In all cases you'll see a message telling you which version of {\small IRAS90} 
-is ready for use. 
+In all cases you'll see a message telling you which version of {\small IRAS90}
+is ready for use.
 
 \subsection{Getting Help}
 {\small IRAS90} includes an on-line help library which contains most of the
 information contained in this document, in a hierarchical VMS-like form. It can
-be accessed in several ways: 
-\begin {itemize} 
+be accessed in several ways:
+\begin {itemize}
 \item The command {\small I90HELP} (or {\bf i90help} on {\small UNIX}) will put
 the user at the top level of the help library. The user can then navigate
 through the help library using the usual {\small VMS} techniques (even on
@@ -404,8 +404,8 @@ former displays the description of the current parameter from the help library
 and then re-issues the prompt for the parameter. The latter displays the same
 information, but leaves the user in the help library, thus allowing other
 information to be examined. The parameter prompt is re-issued when the help
-library is finally exited. 
-\item Within {\small ICL}, the command 
+library is finally exited.
+\item Within {\small ICL}, the command
 
 \small
 \begin{verbatim}
@@ -415,7 +415,7 @@ library is finally exited.
 will display information about the specified {\small IRAS90} application. Note,
 the application must be specified on the {\small HELP} command line as shown. The user
 will be left in the {\small IRAS90} help library after the information has been
-displayed. 
+displayed.
 \end{itemize}
 
 \subsection{Preparing FITS Images for use by IRAS90 and KAPPA}
@@ -436,7 +436,7 @@ application {\small PREPARE}. One of the major tasks accomplished by {\small
 PREPARE} is to create an ``astrometry structure'' within the {\small NDF} which
 describes the position on the sky of each pixel in the image. This structure is
 needed if any of the astrometric applications within {\small IRAS90} (such as
-{\small SKYGRID, SKYPOS,} etc) are to be used. 
+{\small SKYGRID, SKYPOS,} etc) are to be used.
 
 \subsection{Creating Images from a Set of CRDD files}
 \label{SEC:MAPS}
@@ -448,7 +448,7 @@ unaltered. {\small BACKCRDD} removes a background from the entire {\small CRDD}
 file (the same background for all detectors), and can thus be used for reducing
 scan-to-scan stripes. {\small MAPCRDD} converts the time ordered {\small CRDD}
 samples into a two dimensional surface brightness image by co-adding the sample
-values which contribute to each image pixel. 
+values which contribute to each image pixel.
 
 \begin{sloppypar}
 I will assume that the current directory is empty except for a set of {\small
@@ -459,15 +459,15 @@ ever many {\small CRDD} files you have. The following commands perform the
 standard mapping operations, using default behaviour (prompts are shown indented
 from the commands, and the user response follows the \verb+>+ character.
 \verb+<RET>+ indicates that the {\small RETURN} key should be pressed without
-entering any other text): 
+entering any other text):
 \end{sloppypar}
 
 \small
 \begin{verbatim}
-     DESTCRDD 
+     DESTCRDD
        IN - Input CRDD files // > xxxx_b1s*
        OUT - Output CRDD files > *_ds
-     BACKCRDD 
+     BACKCRDD
        IN - Input CRDD files // > xxxx_b1s*_ds
        OUT - Output CRDD files > *|_ds|_bk|
      MAPCRDD
@@ -481,7 +481,7 @@ entering any other text):
 \normalsize
 
 Any strings contained between the the two ``\verb+/+'' characters can be ignored
-for the moment. 
+for the moment.
 This sequence of commands will cause all the 12 $\mu$m {\small CRDD} files to be
 mapped into an image stored in the file {\bf xxxx\_b1\_image.sdf}. Note, all
 {\small CRDD} files are processed together, there is no need to  re-invoke each
@@ -494,24 +494,24 @@ except that} {\bf \_ds} {\em is replaced by} {\bf \_bk}''. See section
 input and output {\small NDF}s. Thus the above commands will create a set of
 files {\bf xxxx\_bisj\_ds.sdf} containing the destriped {\small CRDD} files, and
 a set of files {\bf xxxx\_bisj\_bk.sdf} containing the background subtracted
-{\small CRDD} files. 
+{\small CRDD} files.
 
 \subsection{Displaying an Image Annotated with Celestial Coordinates}
-To display a grey-scale image, use {\small KAPPA:DISPLAY}. Then use {\small 
-SKYGRID} to add a celestial coordinate grid round the image. By default, 
+To display a grey-scale image, use {\small KAPPA:DISPLAY}. Then use {\small
+SKYGRID} to add a celestial coordinate grid round the image. By default,
 SKYGRID displays equatorial coordinates (equinox 1950), but if necessary the
-SKYGRID parameter COORDS can be used to specify a different equinox, or to 
+SKYGRID parameter COORDS can be used to specify a different equinox, or to
 specify ecliptic or galactic coordinates (see section \ref{SEC:SKY}).
 
 \subsection{Transforming Between Celestial and Pixel Coordinates}
 If you want to find where-abouts in an image a particular point on the sky is
-positioned, or conversely what celestial coordinates correspond to a given 
-position in the image, {\small SKYPOS} can be used. {\small SKYPOS} can also 
-give information about the local pixel dimensions and image orientation at any 
-position within an image. These can vary across large images because of 
+positioned, or conversely what celestial coordinates correspond to a given
+position in the image, {\small SKYPOS} can be used. {\small SKYPOS} can also
+give information about the local pixel dimensions and image orientation at any
+position within an image. These can vary across large images because of
 projection effects.
 
-\subsection{Producing a Hard-Copy Contour Map Annotated with Celestial Coordinates} 
+\subsection{Producing a Hard-Copy Contour Map Annotated with Celestial Coordinates}
 \begin{sloppypar}
 If the output were required on an image display device, the commands would be
 just {\small KAPPA:TURBOCONT} followed by {\small SKYGRID}. Complications
@@ -523,7 +523,7 @@ output files generated by the two applications. This operation has been
 packaged
 up into a procedure called {\small PSCONT} which is contained within {\small
 IRAS90}. It provides only limited facilities, but can be used as the basis for
-procedures written by the user. 
+procedures written by the user.
 \end{sloppypar}
 
 \subsection{Obtaining Integrated Flux Densities within an Aperture}
@@ -536,7 +536,7 @@ way to use {\small SKYPHOT} is to display the image first (eg using {\small
 KAPPA:DISPLAY}) and then assign the value {\small CURSOR} to {\small SKYPHOT}
 parameter {\small MODE}. The user can then use a cursor to select the centres of
 rectangular or elliptical apertures, or to select the vertices of polygonal
-apertures. 
+apertures.
 
 \subsection{Aligning Images}
 The application {\small SKYALIGN} can be used to align a group of images. This
@@ -544,21 +544,21 @@ may be useful for instance if an image created by {\small MAPCRDD} is to be
 compared, pixel by pixel, with a corresponding image from the {\small IRAS} Sky
 Survey Atlas ({\small ISSA}). {\small SKYALIGN} uses the astrometry information
 stored with the image in the {\small NDF} to perform the alignment. {\small
-MAPCRDD} and {\small PREPARE} create such astrometry information. 
+MAPCRDD} and {\small PREPARE} create such astrometry information.
 
 \subsection{Producing Colour Temperature Maps}
 \label{SEC:TMAP}
-The task of producing colour temperature maps contains at least three separate 
+The task of producing colour temperature maps contains at least three separate
 problems:
 \begin{enumerate}
-\item Producing two images with similar resolution from two different 
+\item Producing two images with similar resolution from two different
 wavebands.
 \item Subtracting a suitable background from each image.
 \item Calculating the temperature at each pixel.
 \end{enumerate}
 The first step can be accomplished using the following recipe:
 \begin{itemize}
-\item Create two images from the two separate wavebands as normal (see section 
+\item Create two images from the two separate wavebands as normal (see section
 \ref{SEC:MAPS}).
 \item Use each image to generate simulated {\small CRDD}, using application
 {\small SIMCRDD}. The input {\small CRDD} files (which are used to define the
@@ -566,8 +566,8 @@ position and PSF for each sample) should be for the {\em other} waveband. For
 instance, if the two wavebands are 60 and 100 $\mu$m, then the 60 $\mu$m image
 should be sampled at positions defined by the 100 $\mu$m {\small CRDD} files,
 and likewise the 100 $\mu$m image should be sampled at positions defined by the
-60 $\mu$m {\small CRDD files}. 
-\item The {\small CRDD} files generated by {\small SIMCRDD} should be mapped 
+60 $\mu$m {\small CRDD files}.
+\item The {\small CRDD} files generated by {\small SIMCRDD} should be mapped
 using {\small MAPCRDD}. The resulting images should have similar resolution.
 \item The images created by {\small MAPCRDD} will have inappropriate wavebands
 stored within them (the stored wavebands will be those of the {\small CRDD}
@@ -576,13 +576,13 @@ files used to define sample positions when creating simulated data). Application
 
 \end{itemize}
 
-Having created two surface brightness images with similar resolution, the 
-facilities of {\small KAPPA} should be used to remove an appropriate background 
+Having created two surface brightness images with similar resolution, the
+facilities of {\small KAPPA} should be used to remove an appropriate background
 from each image, leaving only the flux for which the temperature is required.
 
 Having done that, the {\small IRAS90} application {\small COLTEMP} can be used
 to produce a colour temperature map and an optical depth map from the two
-surface brightness maps (a greybody source spectrum is assumed, with a 
+surface brightness maps (a greybody source spectrum is assumed, with a
 user-specified emissivity spectral index, $\beta$).
 
 An example of a procedure which goes through the entire process of producing
@@ -595,35 +595,35 @@ flux density emitted by the source is inversely proportional to frequency.
 Adjusting quoted flux density values to refer to some other known source
 spectrum is known as ``colour correction'' and is described in the {\em {\small
 IRAS} Catalogs and Atlases Explanatory Supplement}, page VI-27. The application
-{\small COLCORR} produces colour corrected images assuming that the source 
-spectrum is that of an optically thin greybody. The user should first produce 
-colour temperature and optical depth maps using the recipe described in section 
+{\small COLCORR} produces colour corrected images assuming that the source
+spectrum is that of an optically thin greybody. The user should first produce
+colour temperature and optical depth maps using the recipe described in section
 \ref{SEC:TMAP}, and these should then be given as input to {\small COLCORR}.
 
 \subsection{Improved Destriping and Background Removal}
 Sometimes, a very bright extended source can ``fool''  {\small DESTCRDD} or
-{\small BACKCRDD} into thinking that the background level in a given detector 
-data stream is higher than it actually is. If this artificially high 
-background is subtracted from the data, the resulting images can display lower 
-background levels on the in-scan sides of the source than on the cross-scan 
-sides. The applications {\small DESTCRDD} and {\small BACKCRDD} contain 
+{\small BACKCRDD} into thinking that the background level in a given detector
+data stream is higher than it actually is. If this artificially high
+background is subtracted from the data, the resulting images can display lower
+background levels on the in-scan sides of the source than on the cross-scan
+sides. The applications {\small DESTCRDD} and {\small BACKCRDD} contain
 filtering algorithms which can be tuned to reduce these sorts of effects, but if
-necessary, the ``Quality'' system used by  {\small IRAS90} can also be used. 
+necessary, the ``Quality'' system used by  {\small IRAS90} can also be used.
 This requires the user to identify ``source regions'' which are to be excluded
 from the estimation of the destriping constants and background levels. There
 are several ways in which this can be done; for instance the {\small KAPPA}
-applications {\small ZAPLIN} can be used to manually identify and remove 
+applications {\small ZAPLIN} can be used to manually identify and remove
 source regions from an initial map:
 
 \begin{itemize}
-\item Follow the procedure described in section \ref{SEC:MAPS} to produce a 
-first estimate of the map. 
+\item Follow the procedure described in section \ref{SEC:MAPS} to produce a
+first estimate of the map.
 \item Use {\small KAPPA:ZAPLIN}  (with parameter ZAPTYPE set to ``bad'') to
 create a copy of the image in which the area containing the offending source has
-been replaced with ``bad'' values. 
+been replaced with ``bad'' values.
 \item Use {\small SIMCRDD} to generate simulated {\small CRDD} files using the
 output from {\small KAPPA:ZAPLIN} as the trial sky input, and the original
-{\small CRDD} files to define the position and PSF for each sample. The 
+{\small CRDD} files to define the position and PSF for each sample. The
 simulated samples corresponding to the source area will hold ``bad'' values.
 \item Use {\small SETQUAL} to assign a quality name (let's assume you use the
 quality name ``{\small SOURCE}'') to the samples in the original CRDD files
@@ -631,25 +631,25 @@ which fall in the source region. To do this the input {\small NDF}s should be
 the original {\small CRDD} files, and the mask {\small NDF}s should be the ones
 generated by {\small SIMCRDD}. The {\small SETQUAL} function should be ``HS''.
 This ensures that the quality ``{\small SOURCE}'' is held by all the samples
-which are bad in the {\small CRDD} files generated by {\small SIMCRDD} (i.e. 
-all samples falling within the source region). 
+which are bad in the {\small CRDD} files generated by {\small SIMCRDD} (i.e.
+all samples falling within the source region).
 \item Run {\small DESTCRDD} on the original input {\small CRDD} files,
 specifying ``{\small .NOT.SOURCE}'' for parameter {\small QEXP}. This causes all
 the samples with quality ``{\small SOURCE}'' to be excluded from the estimation
 of the detector backgrounds. Note, it does {\em not} mean that these samples
-will be excluded from the output {\small CRDD} files! 
+will be excluded from the output {\small CRDD} files!
 \item Run {\small BACKCRDD} on the output {\small CRDD} files from {\small
 DESTCRDD}, specifying ``{\small .NOT.SOURCE}'' for parameter {\small QEXP}. This
 causes all the samples with quality ``{\small SOURCE}'' to be excluded from the
-estimation of the {\small CRDD} file backgrounds. 
+estimation of the {\small CRDD} file backgrounds.
 \item Run {\small MAPCRDD} again on the output {\small CRDD} files from {\small
 BACKCRDD}.
 \end{itemize}
 
-The {\small ICL} procedure ``{\small MASTER}'' described in appendix 
-\ref{APP:MAS} contains an alternative approach to improved destriping in which 
+The {\small ICL} procedure ``{\small MASTER}'' described in appendix
+\ref{APP:MAS} contains an alternative approach to improved destriping in which
 the source regions are identified automatically. In addition, {\small MASTER}
-uses the extra trick of running the data through {\small DESTCRDD} and {\small 
+uses the extra trick of running the data through {\small DESTCRDD} and {\small
 BACKCRDD} twice.
 
 \section{Using IRAS90 -- Details}
@@ -666,15 +666,15 @@ the users terminal screen or batch job log file. These
 parameters are usually defaulted, but the user can assign any of
 the following three values by specifying it on the command line:
 \begin{description}
-\item [QUIET]   - This value suppresses all informational messages. 
+\item [QUIET]   - This value suppresses all informational messages.
                Error messages are still displayed.
 
-\item [NORMAL]  - This value causes the application to produce 
+\item [NORMAL]  - This value causes the application to produce
                messages of primary interest to a typical user.
 
-\item [VERBOSE] - This value causes extra messages to be displayed 
-               which further describe the processing performed 
-               by the application. These messages may well be of 
+\item [VERBOSE] - This value causes extra messages to be displayed
+               which further describe the processing performed
+               by the application. These messages may well be of
                only secondary interest to a typical user.
 \end{description}
 
@@ -682,21 +682,21 @@ Once a value has been assigned to an {\small MSG\_FILTER} parameter,
 the same value is used as the default for all subsequent applications
 until a new value is assigned to an {\small MSG\_FILTER} parameter.
 This is achieved by associating the {\small MSG\_FILTER} parameter of
-each application with the ``global'' parameter {\small MSG\_FILTER}. 
+each application with the ``global'' parameter {\small MSG\_FILTER}.
 
 \subsection{Group Expressions}
 \label{SEC:GRP}
 A ``group expression'' is a string which identifies a group of
-objects (eg numerical values, {\small NDF}s, etc). A group expression can 
-specify a group of such objects in several ways: 
+objects (eg numerical values, {\small NDF}s, etc). A group expression can
+specify a group of such objects in several ways:
 
 \begin{itemize}
 \item As a comma separated list ( e.g. ``12.1, 23.2, 1.3''
-     or ``HH1\_B1S1,HH2\_B1S2'' ). 
+     or ``HH1\_B1S1,HH2\_B1S2'' ).
 
 \item By reading them from a text file (see ``Indirection'').
 
-\item By modifying an existing group of objects using editing 
+\item By modifying an existing group of objects using editing
      specified by the user (see ``Modification'').
 \end{itemize}
 If the supplied group expression is terminated with a minus
@@ -704,10 +704,10 @@ sign, the user is re-prompted for another group expression. The
 objects specified by this second group expression are added to
 those specified by the first. This re-prompting continues until
 a group expression is supplied which does not end with a minus
-sign. 
+sign.
 
-Certain classes of objects have additional features, for 
-instance if the objects are {\small NDF} names, then wild-card characters 
+Certain classes of objects have additional features, for
+instance if the objects are {\small NDF} names, then wild-card characters
 are allowed in the supplied values (see section \ref{SEC:NDF}).
 
 \subsubsection{Indirection}
@@ -722,7 +722,7 @@ read from the file. Each line within the file is considered to
 be a group expression, and is processed in the same way as a
 group expression supplied directly. In particular, a text file
 may contain references to other text files. If the file
-{\small VALUES.DAT} contained the following two lines: 
+{\small VALUES.DAT} contained the following two lines:
 
 \small
 \begin{verbatim}
@@ -731,24 +731,24 @@ D,^NEWFILE.DAT
 \end{verbatim}
 \normalsize
 
-The the strings A, B, C and D would be returned to the 
-application, and in addition the file {\small NEWFILE.DAT} would be 
+The the strings A, B, C and D would be returned to the
+application, and in addition the file {\small NEWFILE.DAT} would be
 searched for further strings. This nesting of text file can go
-down to seven levels. Text files may also contain comments. 
+down to seven levels. Text files may also contain comments.
 Anything occurring after a ``\verb+#+'' character is ignored. To ignore
-an entire line the \verb+#+ character must be in column 1 (any blanks in 
+an entire line the \verb+#+ character must be in column 1 (any blanks in
 front of the \verb+#+ character are considered to be significant).
 
 \subsubsection{Modification}
 A group of objects can be given by specifying some editing to
 apply to another already existing group of objects. For instance,
 if the string \verb+NEW_*B|_DS|_IM|+ was given in response to a request
-for a group expression, then the following steps occur: 
+for a group expression, then the following steps occur:
 \begin{itemize}
-\item   Each element in some existing group of objects (identified in 
-     the description of the parameter concerned) is substituted 
+\item   Each element in some existing group of objects (identified in
+     the description of the parameter concerned) is substituted
      in turn for the ``\lsk'' character.
-\item  Any occurrences of the string ``\_DS'' is replaced by the string 
+\item  Any occurrences of the string ``\_DS'' is replaced by the string
      ``\_IM''.
 \item  The string ``B'' is added to the end of the string.
 \item  The string ``NEW\_'' is added to the start of the string.
@@ -757,7 +757,7 @@ Thus if the existing group contained the strings {\small FILE1\_DS} and
 {\small FILE2\_DS}, the resulting group would be {\small NEW\_FILE1\_IMB} and
 {\small NEW\_FILE2\_IMB}. Note, this facility is only available if the parameter
 description identifies an existing group which will be used as the basis for the
-modified strings. 
+modified strings.
 
 \subsubsection{NDF Groups}
 \label{SEC:NDF}
@@ -777,28 +777,28 @@ colon) is displayed, but no {\small NDF}s are actually added to the
 group of {\small NDF}s to be processed. The user is then re-prompted
 for another group expression. Note, this facility only applies to group
 expressions representing existing {\small NDF}s, not {\small NDF}s
-which are to be created by the application. 
+which are to be created by the application.
 
 If an {\small IRAS90} application creates more than one output {\small
 NDF}, it will also create an output text file containing the names of
 the output  {\small NDF}s in a form which can be used to specify the
 {\small NDF}s as input to another {\small IRAS90} application. The text
-file is called {\bf iras90\_ndfs.lis} and is located in the users login 
+file is called {\bf iras90\_ndfs.lis} and is located in the users login
 directory. Succesive {\small IRAS90} applications will over-write such
 text files created by previous applications. If such a file is created, then
-the global parameter {\small DATA\_ARRAY} will be modified so that 
+the global parameter {\small DATA\_ARRAY} will be modified so that
 the suggested default for the input {\small NDF}s to the next application
 becomes an indirection element specifying the output {\small NDF}s from
 the previous application.
 
-At the moment group expressions may only be used to specify {\small NDF}s 
+At the moment group expressions may only be used to specify {\small NDF}s
 which are stored at the top level of a container file.
 
 
 
 \subsubsection{Examples}
 \begin{itemize}
-\item If an application asks for a group of input {\small NDF}s, the following 
+\item If an application asks for a group of input {\small NDF}s, the following
 are all possible responses:
 
 \small
@@ -825,7 +825,7 @@ asks the user for  more {\small NDF}s''.
 \end{verbatim}
 \normalsize
 \vspace{-3mm}
-This means ``Use all .sdf files in the current directory''. 
+This means ``Use all .sdf files in the current directory''.
 
 \small
 \begin{verbatim}
@@ -849,10 +849,10 @@ This means ``Read the names of {\small NDF}s from the text file files.lis.
 \end{verbatim}
 \normalsize
 \vspace{-3mm}
-This means ``Use all .sdf files contained in the {\small UNIX} directory 
+This means ``Use all .sdf files contained in the {\small UNIX} directory
 ../data''.
 
-\item If an application asks for a group of output {\small NDF}s, the following 
+\item If an application asks for a group of output {\small NDF}s, the following
 are possible responses:
 
 \small
@@ -869,7 +869,7 @@ This means ``Create file1.sdf, file2.sdf and file3.sdf''.
 \end{verbatim}
 \normalsize
 \vspace{-3mm}
-This means ``Read the names of the output {\small NDF}s from 
+This means ``Read the names of the output {\small NDF}s from
 text file out.dat''.
 
 \small
@@ -878,7 +878,7 @@ text file out.dat''.
 \end{verbatim}
 \normalsize
 \vspace{-3mm}
-This means ``Append the string ``\_ds'' to the end of all 
+This means ``Append the string ``\_ds'' to the end of all
                       the input {\small NDF} names.
 
 \small
@@ -888,7 +888,7 @@ This means ``Append the string ``\_ds'' to the end of all
 \normalsize
 \vspace{-3mm}
 This means ``Substitute the string ``\_bk'' for all  occurrences of the string
-``\_ds'' in the  input {\small NDF} names, and put the files in {\small UNIX} 
+``\_ds'' in the  input {\small NDF} names, and put the files in {\small UNIX}
 directory ../bk''.
 \end{itemize}
 
@@ -899,7 +899,7 @@ be specified by  their X and Y pixel indices, then the pixels (10,11),
 
 \small
 \begin{verbatim}
-  10,11,21,-10,0,0  
+  10,11,21,-10,0,0
 \end{verbatim}
 \normalsize
 \vspace{-3mm}
@@ -938,7 +938,7 @@ The file pixels.dat is read. The file could contain the  following four lines:
 See section \ref{SEC:QINT} for a general description of the use of
 quality. Section \ref{SEC:QNAM} gives details of the strings which may
 be used as quality names. Section \ref{SEC:QEXP} gives details of
-the syntax of quality expressions. 
+the syntax of quality expressions.
 
 \subsubsection{Introduction}
 \label{SEC:QINT}
@@ -951,7 +951,7 @@ indicate that the {\small DATA} value holds some specified property. For
 instance, one of the flags may be used to indicate if the corresponding
 {\small DATA} values are saturated, another may be used to indicate if
 the {\small DATA}
-value lies within a background area, and so on. 
+value lies within a background area, and so on.
 
 The user is free to use the flags in whatever way seems most
 suited to the particular process being performed. The user can
@@ -966,7 +966,7 @@ stored within the {\small NDF} and can be used to refer to the quality
 flag when running later applications. The terminology adopted by
 {\small IRAS90} is that an element of the {\small DATA} array ``holds'' the quality
 ``SATURATED'' (for instance) if the flag which is associated with
-the quality name ``SATURATED'' is set for the corresponding 
+the quality name ``SATURATED'' is set for the corresponding
 element within the {\small QUALITY} array.
 
 The number of quality names which can be stored within an {\small NDF} is
@@ -975,7 +975,7 @@ names which are no  longer needed to make room for new ones. The
 applications {\small SHOWQUAL} and {\small REMQUAL} allow the user to do this.
 {\small SHOWQUAL} displays a list of the quality names  currently defined
 within an {\small NDF}, and {\small REMQUAL} removes specified quality names from
-an {\small NDF}. 
+an {\small NDF}.
 
 Many {\small IRAS90} applications have a parameter {\small QEXP} which may be used
 to specify that the application is only to use data values which
@@ -986,7 +986,7 @@ those data values for which the flag associated with the quality
 name ``BACKGROUND'' is set, are to be used in the estimation of
 the destripe parameters. The quality name ``BACKGROUND'' must
 previously  have been defined and assigned to the appropriate
-data values using application {\small SETQUAL} (or {\small TRACECRDD}). 
+data values using application {\small SETQUAL} (or {\small TRACECRDD}).
 
 The specification of the data values to be used by an application
 can be more complex than this, and can depend on several
@@ -994,7 +994,7 @@ qualities combined together using ``Boolean'' operators. For
 instance, assigning the value ``.NOT. (SOURCE\_A .OR. SOURCE\_B)''
 would cause the application to use only those data values which
 hold neither of the qualities SOURCE\_A and/or SOURCE\_B. These
-sort of strings are  known as ``quality expressions''. 
+sort of strings are  known as ``quality expressions''.
 
 \subsubsection{Quality Names}
 \label{SEC:QNAM}
@@ -1004,8 +1004,8 @@ must not be longer than 15 characters. Leading blanks are ignored, and
 they are always stored in upper case, even if they are supplied by the
 user in lower case. Embedded blanks are considered to  be significant.
 Quality names must not contain any period characters (``.''), and there
-are three reserved names which cannot be used; these are ``ANY'', 
-``IRQ\_BAD\_SLOT'' and ``IRQ\_FREE\_SLOT''. 
+are three reserved names which cannot be used; these are ``ANY'',
+``IRQ\_BAD\_SLOT'' and ``IRQ\_FREE\_SLOT''.
 
 \subsubsection{Quality Expressions}
 \label{SEC:QEXP}
@@ -1019,7 +1019,7 @@ to a true value. Boolean operators are delimited on each side by
 a period (eg ``.AND.'' ). The operands on which these operators
 act must be either a quality name (which must be defined within
 the {\small NDF}), or one of the Boolean constants .TRUE and .FALSE.
-Parentheses can be used to nest expressions. 
+Parentheses can be used to nest expressions.
 
 Quality expressions can be up to 254 characters long, and must
 not contain more than 40 symbols (Boolean operators, constants,
@@ -1028,13 +1028,13 @@ expression to reduce the run time needed to evaluate the
 expression for every data value.
 
 The precedence of the Boolean  operators decreases in the following
-order; .NOT., .AND., .OR., .XOR., .EQV. (the final two have equal 
+order; .NOT., .AND., .OR., .XOR., .EQV. (the final two have equal
 precedence). In an expression such as ( A .XOR. B .EQV. C .XOR. D ) in
 which all operators have equal precedence, the evaluation proceeds from
 left to right., i.e. the expression is evaluated as ( ( ( A .XOR. B )
 .EQV. C ) .XOR. D ). If there is any doubt about the order in which an
 expression will be evaluated, parentheses should be used to ensure the
-required order of evaluation. 
+required order of evaluation.
 
 \begin{description}
 \item [.NOT.] -
@@ -1045,15 +1045,15 @@ The expression (A.AND.B) is true only if A and B are both true.
 
 \item [.OR.] -
 The expression (A.OR.B) is true if either (or both) of A or B are
-true. 
+true.
 
 \item [.XOR.] -
 The expression (A.XOR.B) is true if either A is true and B is
-false, or A is false and B is true. 
+false, or A is false and B is true.
 
 \item [.EQV.] -
 The expression (A.EQV.B) is true if either A is true and B is
-true, or A is false and B is false. 
+true, or A is false and B is false.
 \end{description}
 
 \subsubsection{Examples}
@@ -1063,7 +1063,7 @@ the samples contained within the  first source (from any
 detector), and equivalent qualities could be set up for the other three
 sources. When running {\small DESTCRDD}, it would then be possible to
 exclude the data from these four sources by giving the parameter
-{\small QEXP} the following value: 
+{\small QEXP} the following value:
 
 \small
 \begin{verbatim}
@@ -1078,14 +1078,14 @@ processing applied to each {\small NDF}. This history information is
 automatically created by each application, and is
 stored within the {\small NDF} in a ``{\small HISTORY}'' component. It may be
 displayed, removed or added to manually using the {\small HISTORY}
-application. 
+application.
 
 History information can become quite voluminous, causing the {\small NDF}s
 to occupy correspondingly larger amounts of disk space. For this
 reason, the default behaviour is for {\small IRAS90} applications not to
 store any history information. This can be over-ridden using the
 {\small HISTORY} parameters associated with many of the {\small IRAS90}
-applications. 
+applications.
 
 {\small HISTORY} parameters are used to specify if applications should
 store history in their output {\small NDF}s or not. If {\small HISTORY} has a true
@@ -1094,7 +1094,7 @@ it has a false value then no history is added to the output and
 any existing history is deleted. This ensures that if an {\small NDF}
 does contain history, then the history is complete. As has often
 been said, an incomplete history is more dangerous than no
-history at all. 
+history at all.
 
 It is not necessary to repeatedly assign values to {\small HISTORY}
 parameters for each successive application. Once a value has
@@ -1102,13 +1102,13 @@ been assigned to a {\small HISTORY} parameter, all subsequent
 applications use the same value until a new value is assigned
 to a {\small HISTORY} parameter. This is achieved by associating the
 {\small HISTORY} parameter of each application with the ``global''
-parameter {\small IRAS90\_HISTORY}. 
+parameter {\small IRAS90\_HISTORY}.
 
 \subsubsection{Example}
 If {\small IRAS90} is currently in its default mode (i.e no history is
 being produced by any application), then this can be changed by
 assigning a true value to an application's {\small HISTORY} parameter; eg
-if the next application which the user wishes to run is {\small SETQUAL}, 
+if the next application which the user wishes to run is {\small SETQUAL},
 then the command could be
 
 \small
@@ -1117,8 +1117,8 @@ then the command could be
 \end{verbatim}
 \normalsize
 {\small SETQUAL} (and all subsequent applications) will then add history
-information to the output {\small NDF}s. The default behaviour can be 
-re-instated at some later time by assigning a false value to a 
+information to the output {\small NDF}s. The default behaviour can be
+re-instated at some later time by assigning a false value to a
 {\small HISTORY} parameter; eg
 
 \small
@@ -1136,7 +1136,7 @@ HISTORY} parameter.
 \label{SEC:PROJ}
 Some {\small IRAS90} applications need information describing projections
 used to produce images. The following projections are recognised
-by {\small IRAS90}: 
+by {\small IRAS90}:
 \begin{description}
 \item [GNOMONIC]     - Gnomonic projection.
 \item [LAMBERT]      - Lambert normal equivalent cylindrical projection.
@@ -1152,7 +1152,7 @@ In addition the following pseudonyms are recognised:
 \item [ALL\_SKY]       - Same as AITOFF.
 \end{description}
 
-Any unambiguous abbreviation may be supplied when specifying a 
+Any unambiguous abbreviation may be supplied when specifying a
 projection in response to a parameter prompt (case is ignored).
 
 \subsubsection{Gnomonic}
@@ -1163,7 +1163,7 @@ covered by a pixel depends on how far it is from the tangent
 point. For this reason this projection is not a good one to use
 if large fields are being mapped. The gnomonic projection is
 used (for example) for the {\small IRAS} 16.5 degree extended emission
-{\small SKYFLUX} images, which suffer from a 6\% change in pixel area 
+{\small SKYFLUX} images, which suffer from a 6\% change in pixel area
 across an image.
 
 \subsubsection{Lambert}
@@ -1174,7 +1174,7 @@ equator. The projection proceeds normally to the polar axis. It
 is used, for example, by the {\small IRAS} Galactic Plane images. It is
 an equal area projection (i.e. all image pixels cover the same
 area on the sky, but have different shapes in different parts of
-the image). 
+the image).
 
 \subsubsection{Aitoff}
 The Aitoff projection is an equal area projection which can be
@@ -1192,8 +1192,8 @@ sphere, whereas the Orthographic projection proceeds from a
 point at infinity, diametrically opposite the tangent point
 (i.e. the projection lines are all normal to the tangent plane).
 The Orthographic projection is used (for example) for the {\small IRAS}
-Pointed Observation images. The area of the sky covered by a pixel 
-changes across the image, and so this projection is not a good 
+Pointed Observation images. The area of the sky covered by a pixel
+changes across the image, and so this projection is not a good
 one to use for mapping large areas.
 
 \subsection{Coordinate Files}
@@ -1212,11 +1212,11 @@ are given as simple decimal values, and the formats allowed for sky coordinates
 are described in section \ref{SEC:SKY}. Adjacent items in the file should be
 separated with commas or by placing them on separate lines.  Text occurring
 after a comment character (``\verb+#+'') is ignored (up to the end of the line).
-Blank lines are also ignored. 
+Blank lines are also ignored.
 
 \subsection{Sky Coordinates}
 \label{SEC:SKY}
-{\small IRAS90} has facilities for recognising coordinates in any of the 
+{\small IRAS90} has facilities for recognising coordinates in any of the
 following astronomical systems:
 
 \begin{itemize}
@@ -1225,20 +1225,20 @@ following astronomical systems:
 \item Galactic (IAU 1958)
 \end{itemize}
 
-Some applications have a {\small COORDS} parameter which allows the user 
-to specify the coordinate system which is to be used by the 
-application (eg when requesting sky positions from the user). 
-Once a value has been assigned to a {\small COORDS} parameter the same 
-value is used as the default for all subsequent applications, 
-until a new value is assigned to a {\small COORDS} parameters. This is 
-done by associating each {\small COORDS} parameter with the global 
+Some applications have a {\small COORDS} parameter which allows the user
+to specify the coordinate system which is to be used by the
+application (eg when requesting sky positions from the user).
+Once a value has been assigned to a {\small COORDS} parameter the same
+value is used as the default for all subsequent applications,
+until a new value is assigned to a {\small COORDS} parameters. This is
+done by associating each {\small COORDS} parameter with the global
 parameter {\small SKY\_COORDS}.
 
 \subsubsection{Specifying Sky Coordinate Systems}
 Any of the three strings {\small EQUATORIAL, ECLIPTIC} and {\small
 GALACTIC} can
 be assigned to a {\small COORDS} parameter. Case is insignificant, and
-abbreviations may be given. 
+abbreviations may be given.
 
 Ecliptic and equatorial coordinates are referred to the mean
 equinox of a given epoch. This epoch is specified by
@@ -1249,7 +1249,7 @@ may be preceded by a single character, B or J, indicating if the
 epoch is a Besselian epoch (B) or a Julian epoch (J). If this
 character is missing (as in the above example), then the epoch
 is assumed to be a Besselian epoch. If no equinox is specified
-in this way, then a default of B1950.0 is used. 
+in this way, then a default of B1950.0 is used.
 
 If a Julian epoch is used to specify the reference equinox for
 an equatorial coordinate system, then the equatorial coordinates
@@ -1262,31 +1262,31 @@ A sky coordinate value can consist of a set of up to three
 ``fields''. Each field consists of a numeric value (which can have
 a fractional part) followed by an optional character specifying
 the units of the field.  The following characters are used to
-specify particular units: 
+specify particular units:
 
 \begin{description}
 \item [ h ] - hours
 \item [ d ] - degrees
-\item [ m ] - minutes or arc-minutes (depending on whether the leading 
+\item [ m ] - minutes or arc-minutes (depending on whether the leading
       field is an hours or degrees field).
-\item [ s ] - seconds or arc-seconds (depending on whether the leading 
+\item [ s ] - seconds or arc-seconds (depending on whether the leading
       field is an hours or degrees field).
 \item [ r ] - radians.
 \end{description}
 
-If no such characters are supplied, defaults are assumed for the 
-field units (eg if the string ``11 12 56'' is supplied as a Right 
+If no such characters are supplied, defaults are assumed for the
+field units (eg if the string ``11 12 56'' is supplied as a Right
 Ascension value it is treated the same as ``11h 12m 56s''). Note,
-when making command line assignments to parameters from within {\small ICL}, 
-it is necessary to enclose the string to be assigned to the parameter 
+when making command line assignments to parameters from within {\small ICL},
+it is necessary to enclose the string to be assigned to the parameter
 in double quote marks.
 
-Fields may be omitted, in which case they are assumed to have 
-the value zero. If a degrees or hours field is to be omitted, 
-then the leading field in the supplied string should always 
-include a character to specify its units. For instance, the 
-string ``15 23'' is treated as the RA value ``15h 23m''. If, in fact, 
-the leading field is a minutes field then ``15m 23'' could be 
+Fields may be omitted, in which case they are assumed to have
+the value zero. If a degrees or hours field is to be omitted,
+then the leading field in the supplied string should always
+include a character to specify its units. For instance, the
+string ``15 23'' is treated as the RA value ``15h 23m''. If, in fact,
+the leading field is a minutes field then ``15m 23'' could be
 specified.
 
 In addition, an input string may contain a single field
@@ -1300,41 +1300,41 @@ integer part of the seconds field, the hundreds and thousands
 digits are taken as the minutes fields, the remaining digits are
 taken as the degrees or hours field. Thus -12345.4 would be
 interpreted as (- 1 hour 23 mins 45.4 seconds) or (- 1 degree 23
-mins 45.4 seconds). 
+mins 45.4 seconds).
 
 The supplied values must be in their ``normal'' ranges (i.e. 0h 0m
 0s to 23h 59m 59.99s for RA values, -90d to +90d for DEC values,
 etc). Values outside these ranges cause an error to be reported.
 The exception to this is if the string is prefixed with a ``\lsk''
-character, in which case any numeric value may be supplied. 
+character, in which case any numeric value may be supplied.
 
 Any coordinate value can be specified in degrees, hours or
 radians. If a value is given in unusual units, the corresponding
 normal units are used. For instance, if a declination value of
 ``1.105r'' was given (specifying 1.105 radians) the equivalent
-value in degrees is used (i.e. 63.3118 degrees). A right 
+value in degrees is used (i.e. 63.3118 degrees). A right
 ascension of ``45d'' would cause a value of ``3h'' to be used, etc.
 
 \subsubsection{Examples}
-This section contains some examples of the many ways in which sky 
+This section contains some examples of the many ways in which sky
 positions can be specified:
 
 \begin{description}
-\item [Right Ascension values]: 11 hours, 34 minutes and 56.2 seconds 
+\item [Right Ascension values]: 11 hours, 34 minutes and 56.2 seconds
                           could be specified as
 \begin{itemize}
-\item ``11 34 56.2'' 
+\item ``11 34 56.2''
 \item ``11h 34m 56.2s''
-\item ``11 34.9366'' 
+\item ``11 34.9366''
 \item ``11.58228''
 \item  ``113456.2''.
 \end{itemize}
 
-\item [Declination values]: -45 degrees 12 arc-minutes could be 
+\item [Declination values]: -45 degrees 12 arc-minutes could be
                           specified as
 \begin{itemize}
 \item ``-45 12 00''
-\item ``-45 12'' 
+\item ``-45 12''
 \item ``-45d 12m''
 \item ``-45.2d''
 \item ``-451200''
@@ -1343,34 +1343,34 @@ positions can be specified:
 
 \end{description}
 
-Longitude and latitude values for sky coordinate systems other 
+Longitude and latitude values for sky coordinate systems other
 than equatorial are specified like Declination values.
 
 \subsection{Specifying Detectors}
 \label{SEC:DET}
-Detectors are identified by their ``detector numbers''. These are 
-integers varying from 1 to 62 and are described in paragraph C.4 
-of chapter II of the {\small IRAS} Catalogs and Atlases Explanatory 
-Supplement (``Exp. Supp.''). \footnote{Detectors 17, 20 and 36 were designated 
+Detectors are identified by their ``detector numbers''. These are
+integers varying from 1 to 62 and are described in paragraph C.4
+of chapter II of the {\small IRAS} Catalogs and Atlases Explanatory
+Supplement (``Exp. Supp.''). \footnote{Detectors 17, 20 and 36 were designated
 as ``dead'' because they produced no usable data values.}
 
 If the user is asked to select a group of detectors from a group
 of ``available'' detectors, a group expression may be given (see
 section \ref{SEC:GRP}) in which each string in the group
-can be one of the following: 
+can be one of the following:
 \begin{itemize}
-\item An integer in the range 1 to 62 specifying an explicit    
-     detector number. 
-\item One of the strings ``12um'', ``25um'', ``60um'' and ``100um''. These 
-     cause all available detectors from the specified wave band to   
-     be selected. 
+\item An integer in the range 1 to 62 specifying an explicit
+     detector number.
+\item One of the strings ``12um'', ``25um'', ``60um'' and ``100um''. These
+     cause all available detectors from the specified wave band to
+     be selected.
 \item A range of detectors, specified by two detector numbers
-     separated by a colon (``:''). All available detectors whose 
-     cross scan positions are between those of the two detectors 
-     are selected. If the first detector number is omitted, no lower 
-     limit is imposed. If the second detector is omitted, no upper 
-     limit is imposed. Fig. II.C.6 and table II.C.3 in the Exp. Supp. 
-     list the positions of all 62 detectors. 
+     separated by a colon (``:''). All available detectors whose
+     cross scan positions are between those of the two detectors
+     are selected. If the first detector number is omitted, no lower
+     limit is imposed. If the second detector is omitted, no upper
+     limit is imposed. Fig. II.C.6 and table II.C.3 in the Exp. Supp.
+     list the positions of all 62 detectors.
 \item The string ``{\small ALL}''. This specifies that all available detectors
      should be selected.
 \item The string ``{\small SMALL}''. This specifies that all available small
@@ -1380,7 +1380,7 @@ can be one of the following:
      should be selected, excluding the small detectors.
 \item The string ``{\small NONE}''. This specifies that no detectors should be
      selected, and may not be mixed with other options. A null
-     parameter value is equivalent to ``{\small NONE}''. 
+     parameter value is equivalent to ``{\small NONE}''.
 \item The string ``{\small LIST}''. This causes a list of available detectors
      to be displayed, but no detectors are selected. The user is
      re-prompted if this option is selected. This option may not be
@@ -1394,49 +1394,49 @@ instance the available detectors may be all those from the same
 band as the data supplied as input to the application. The help
 on the parameter concerned should say what detectors are
 available, and this list is displayed at run-time if the keyword
-{\small LIST} is supplied for the parameter. 
+{\small LIST} is supplied for the parameter.
 
 The union of the specified detectors are used. Thus for instance,
 if all 62 detectors are available, and the group expression
 ``12$\mu$m,small'' is supplied, the returned set of detectors consists
 of all 12$\mu$m detectors together with all small detectors from all
-four bands, not just the small detectors from the 12$\mu$m band. 
+four bands, not just the small detectors from the 12$\mu$m band.
 
 \subsection{Detector Bandwidths}
 \label{SEC:BWID}
-The following effective detector bandwidths are assumed for 
+The following effective detector bandwidths are assumed for
 all detectors from each band (in Hz):
 \begin{description}
-\item [12 $\mu$m] - 13.48E12    
-\item [25 $\mu$m] - 5.16E12    
-\item [60 $\mu$m] - 2.58E12    
+\item [12 $\mu$m] - 13.48E12
+\item [25 $\mu$m] - 5.16E12
+\item [60 $\mu$m] - 2.58E12
 \item [100 $\mu$m] - 1.00E12
 \end{description}
 
-These values are taken from the {\small IRAS} Catalogs and Atlases 
+These values are taken from the {\small IRAS} Catalogs and Atlases
 Explanatory Supplement, second edition, page X-13.
 
 \subsection{Detector Solid Angles}
 \label{SEC:SOLAN}
-Each detector is assumed to have the following effective solid 
+Each detector is assumed to have the following effective solid
 angle (in units of 1.0E-7 steradians):
 
 \small
 \begin{verbatim}
     #1     #2     #3     #4     #5     #6     #7     #8     #9
-   14.1,  13.7,  12.9,  13.1,  13.2,  13.2,  13.6,  6.10,  6.04,  
+   14.1,  13.7,  12.9,  13.1,  13.2,  13.2,  13.6,  6.10,  6.04,
 
     #10    #11    #12    #13    #14    #15    #16    #17    #18
-   6.07,  1.92,  4.85,  6.10,  6.19,  6.56,  3.39,  DEAD   3.46,  
+   6.07,  1.92,  4.85,  6.10,  6.19,  6.56,  3.39,  DEAD   3.46,
 
     #19    #20    #21    #22    #23    #24    #25    #26    #27
-   3.40,   DEAD  3.48,  3.38,  3.21,  3.22,  3.17,  0.92,  2.41,  
+   3.40,   DEAD  3.48,  3.38,  3.21,  3.22,  3.17,  0.92,  2.41,
 
     #28    #29    #30    #31    #32    #33    #34    #35    #36
-   2.95,  3.25,  3.25,  1.97,  6.40,  6.32,  6.25,  6.36,   DEAD  
+   2.95,  3.25,  3.25,  1.97,  6.40,  6.32,  6.25,  6.36,   DEAD
 
     #37    #38    #39    #40    #41    #42    #43    #44    #45
-   6.37,  4.84,  1.82,  3.50,  3.44,  3.48,  3.50,  3.45,  3.46,  
+   6.37,  4.84,  1.82,  3.50,  3.44,  3.48,  3.50,  3.45,  3.46,
 
     #46    #47    #48    #49    #50    #51    #52    #53    #54
    1.78,  0.89,  3.31,  3.22,  3.29,  3.25,  3.19,  3.24,  2.45,
@@ -1446,9 +1446,9 @@ angle (in units of 1.0E-7 steradians):
 \end{verbatim}
 \normalsize
 
-These values were derived by M. Moshir at the Infrared 
-Processing and Analysis Centre ({\small IPAC}), CalTech, and are 
-consistent with the detector Point Spread Functions used by 
+These values were derived by M. Moshir at the Infrared
+Processing and Analysis Centre ({\small IPAC}), CalTech, and are
+consistent with the detector Point Spread Functions used by
 {\small IRAS90} (see section \ref{SEC:PSF}).
 
 \subsection{Point Spread Functions}
@@ -1460,7 +1460,7 @@ detector number (1 to 62). These {\small PSF} images were created at {\small
 IPAC} by Merhdad Moshir, and are described in {\small IPAC} Interoffice
 Memorandum 240-87-80(2), dated 29 June 1987. Each {\small NDF} consists of a
 two dimensional {\small DATA} array, oriented so that the first array axis is
-parallel to the focal plane $Z$ axis and the second array axis is parallel to 
+parallel to the focal plane $Z$ axis and the second array axis is parallel to
 the
 focal plane $Y$ axis. The size and position of each pixel in the data array are
 specified in two ways; firstly, each {\small NDF} has two {\small AXIS}
@@ -1485,8 +1485,8 @@ plane coordinates of the detector centres are given in II.C.3 of
 the {\small IRAS} Catalogs and Atlases Explanatory Supplement. In fact, $C3$
 and $C5$ are always zero, and so the area of a {\small PSF} pixel (in
 steradians) is thus given by $C2*C6$. In addition to the {\small TRANS}
-component, the {\small IRAS} extension also contains a component called 
-{\small PSFDET}, which is a single integer value giving the detector 
+component, the {\small IRAS} extension also contains a component called
+{\small PSFDET}, which is a single integer value giving the detector
 number to which the {\small PSF} refers.
 
 The pixel values are normalised so that they represent ``efficiency''
@@ -1501,44 +1501,44 @@ angles used by {\small IRAS90} are derived from these {\small PSF}s, in
 fact they are just equal to $A*\sum_{i}(P_{i})$, so another way of
 representing the total flux measured by a detector is $B*\sum_{i}(
 P_{i}*S_{i} )/\sum_{i}( P_{i} )$, where $B$ is the effective solid
-angle of the detector. 
+angle of the detector.
 
 \subsection{Data Units}
 \label{SEC:UNITS}
-{\small IRAS90} recognises several different system of data units, which 
+{\small IRAS90} recognises several different system of data units, which
 may be specified using the following strings:
 
 \begin{description}
-\item [pW/(M\lsk\lsk2)] - Flux values in Pico-Watts per square metre. 
+\item [pW/(M\lsk\lsk2)] - Flux values in Pico-Watts per square metre.
                           (1pW = 10$^{-12}$W)
-\item [(pW/M\lsk\lsk2)/sr] - Surface brightness values in Pico-Watts per 
+\item [(pW/M\lsk\lsk2)/sr] - Surface brightness values in Pico-Watts per
 square metre, per steradian.
 \item [Jy] - Flux density values in Janskys.
 \item [Jy/sr] - Surface brightness values in Janskys per steradian.
 \item [MJy/sr] - Surface brightness values in Mega-Janskys per steradian.
-\item [Jy/PIXEL] - Surface brightness values in Janskys per pixel 
-\item [(pW/M\lsk\lsk2)/PIXEL] - Surface brightness values in Pico-Watts per 
+\item [Jy/PIXEL] - Surface brightness values in Janskys per pixel
+\item [(pW/M\lsk\lsk2)/PIXEL] - Surface brightness values in Pico-Watts per
 square metre, per pixel.
 \end{description}
 Note, the possible effects of varying pixel size should be borne
 in mind when using either of the last two systems of units,
-especially if dealing with very large areas of the sky. If this 
-may be a problem, then an equal area projection should be used 
-(see section \ref{SEC:PROJ}) when creating the pixel 
+especially if dealing with very large areas of the sky. If this
+may be a problem, then an equal area projection should be used
+(see section \ref{SEC:PROJ}) when creating the pixel
 values.
 
 Some of these units are only available when dealing with {\small CRDD}
-files (eg ``Jy''), and some when dealing with images (eg Jy/PIXEL). 
+files (eg ``Jy''), and some when dealing with images (eg Jy/PIXEL).
 
 Conversions between flux and flux density  values use the detector bandwidths
 described in section \ref{SEC:BWID}. Conversions between flux density and
 surface brightness  values use the effective detector solid angles described in
-section \ref{SEC:SOLAN}. 
+section \ref{SEC:SOLAN}.
 
 \subsection{Time and Date Strings}
 \label{SEC:TIM}
 Time and dates should be specified in the same format as the
-following example: 
+following example:
 
 \small
 \begin{verbatim}
@@ -1546,29 +1546,29 @@ following example:
 \end{verbatim}
 \normalsize
 
-Notes: 
+Notes:
 \begin{itemize}
-\item The first field is the year. Years in the range 0 to 49 
-     are interpreted as 2000 to 2049; years in the range 50 
-     to 99 are interpreted as 1950 to 1999. 
-\item The second field is the first three letters of the month 
+\item The first field is the year. Years in the range 0 to 49
+     are interpreted as 2000 to 2049; years in the range 50
+     to 99 are interpreted as 1950 to 1999.
+\item The second field is the first three letters of the month
      (case insensitive).
 \item The third field is the day in the month.
 \item The fourth field is the hour in the day.
 \item The fifth field is the minute in the hour.
-\item The sixth field is the second in the minute, with an 
+\item The sixth field is the second in the minute, with an
      optional fractional part.
-\item If any leading fields are omitted in the string, they 
+\item If any leading fields are omitted in the string, they
      default to the values for the current time.
-\item If any trailing fields are omitted in the string, they 
+\item If any trailing fields are omitted in the string, they
      default to zero (or 1 for the day and month).
 \item Leading spaces are ignored.
-\item No spaces are allowed within the body of the string except 
+\item No spaces are allowed within the body of the string except
      to separate the time and date sections.
 \end{itemize}
 
 \section{Acknowledgements}
-{\small IRAS90} was jointly developed by {\small FIIS/IPMAF} and 
+{\small IRAS90} was jointly developed by {\small FIIS/IPMAF} and
 {\small STARLINK}. The programming team consisted of:
 \begin{itemize}
 \item David Berry (STARLINK --- MAVAD::DSB)
@@ -1601,12 +1601,12 @@ corresponding CRDD data to be extracted.}
 \menuitem{FFIELD    }{ Identify the ISSA fields covering a given position.}
 \menuitem{HISTORY   }{ Display history from a group of NDFs.}
 \menuitem{I90HELP   }{ Display help on IRAS90.}
-\menuitem{IFIELD    }{ Display IRAS SKY SURVEY ATLAS plate details for a 
+\menuitem{IFIELD    }{ Display IRAS SKY SURVEY ATLAS plate details for a
 specified position.}
 \menuitem{IRASTRACE }{ Display IRAS extension information from a group of NDF.}
 \menuitem{MAPCRDD   }{ Map a group of CRDD files into an image.}
 \menuitem{NEWUNITS  }{ Change the system of units in which an NDF is stored.}
-\menuitem{POINTCRDD }{ Detects point sources along the trace(s) of CRDD NDF 
+\menuitem{POINTCRDD }{ Detects point sources along the trace(s) of CRDD NDF
 file.}
 \menuitem{POSCRDD   }{ Locate the closest CRDD files to a given position.}
 \menuitem{PREPARE   }{ Prepare a FITS image for use by other IRAS90 routines.}
@@ -1618,7 +1618,7 @@ file.}
 \menuitem{SHOWQUAL  }{ Display the qualities currently defined within an NDF.}
 \menuitem{SIMCRDD   }{ Generate simulated CRDD from a supplied trial sky image.}
 \menuitem{SKYALIGN  }{ Align images using internally stored astrometric
-information.}       
+information.}
 \menuitem{SKYBOX    }{ Report extent and position of a rectangular region of the
 sky.}
 \menuitem{SKYGRID   }{ Annotate a picture with a celestial coordinates grid.}
@@ -1667,7 +1667,7 @@ coordinates.
 \begin{description}
 \item[FFIELD:   ] Identify the ISSA fields covering a given position.
 \item[HISTORY:  ] Display history from a group of NDFs.
-\item[IFIELD:   ] Display IRAS SKY SURVEY ATLAS plate details for a 
+\item[IFIELD:   ] Display IRAS SKY SURVEY ATLAS plate details for a
 specified position.
 \item[IRASTRACE:] Display IRAS extension information from a group of NDF.
 \item[PSCONT:   ] Make a hard-copy contour map with sky coordinate grid.
@@ -1682,8 +1682,8 @@ file.
 \mbox{}
 \begin{description}
 \item[BACKCRDD: ] Remove a background from a group of CRDD files.
-\item[COADDCRDD:] Coadd CRDD traces crossing specified positions. 
-\item[DEGLCRDD: ] Deglitch a group of CRDD files. 
+\item[COADDCRDD:] Coadd CRDD traces crossing specified positions.
+\item[DEGLCRDD: ] Deglitch a group of CRDD files.
 \item[DESTCRDD: ] Equalise detector offsets within a group of CRDD files.
 \item[FINDCRDD: ] Accepts a list of sources, and prepares files specifying
 corresponding CRDD data to be extracted.
@@ -1748,8 +1748,8 @@ coordinates.
 \label{ap:full}
 \subsection{Explanatory Notes}
 
-In the routine specifications which follow, application parameters have the 
-following format. 
+In the routine specifications which follow, application parameters have the
+following format.
 
 \begin{verbatim}
      name  =  type (access)
@@ -1760,8 +1760,8 @@ The {\em name} is the string which should be used to refer to the parameter. The
 {\em type} is a description of the type of object or value which should be
 assigned to the value. The {\em access} string specifies if the parameter is
 used to pass information from the environment to the application ( ``{\em
-read}'' access), from the application to the environment ( ``{\em write}'' 
-access), or both ( ``{\em update}'' access). 
+read}'' access), from the application to the environment ( ``{\em write}''
+access), or both ( ``{\em update}'' access).
 
 Each routine specifications includes a {\em Usage\/} entry.  This shows how the
 application is invoked from the command line.   It lists the parameters which
@@ -1784,7 +1784,7 @@ If the following command line was used to invoke SKYGRID
 \end{verbatim}
 \normalsize
 
-then the positional parameters DEVICE and IN would be assigned the values 
+then the positional parameters DEVICE and IN would be assigned the values
 ``XWINDOWS'' and ``M51'' respectively. Parameters PENA and PENB are not included
 in the list of positional parameters in the {\em Usage\/} entry and so need to
 be specified using keyword assignments (eg ``PENA=2''). The parameter LINES
@@ -1792,11 +1792,11 @@ takes a logical value, and so including ``LINES'' on the command line is
 equivalent to ``LINES=YES'' (similarly, ``NOLINES'' would have been equivalent
 to ``LINES=NO'').
 
-There is also an {\em Examples\/} section for most applications.  This shows 
+There is also an {\em Examples\/} section for most applications.  This shows
 how to run the application from the command line.  More often you'll enter the
 command name and just some of the parameters, and be prompted for the rest.
 
-The {\em Parameters\/} section has a notation scheme to indicate 
+The {\em Parameters\/} section has a notation scheme to indicate
 normally defaulted parameters, {\it i.e.}\ those for which there will
 be no prompt.
 For such parameters a matching pair of square brackets ({\ssttt []})
@@ -1812,7 +1812,7 @@ As above, but there are two default values that are created dynamically.
 \item[{\ssttt [}{\rm default}{\ssttt ]}]
 Occasionally, a description of the default is given in normal type,
 {\it e.g.}\ the size of the plotting region in a graphics application,
-where the exact default values depend on the device chosen. 
+where the exact default values depend on the device chosen.
 \item[{\ssttt [default]}]
 If the brackets contain a value in teletype-fount, this is the explicit
 default value.
@@ -2762,7 +2762,7 @@ default value.
       regarded as a glitch. The samples in the detected glitches are
       either replaced by Starlink BAD values or have the quality being
       flagged by a specified quality name (see parameter SETBAD).
-      All other input data is retained in its original form.      
+      All other input data is retained in its original form.
    }
 }
 \newpage
@@ -3444,8 +3444,8 @@ default value.
 }{
    \sstdescription{
 
-      IN UNIX THE USER CAN ONLY USE THIS APPLICATION BY TYPING 
-      iras90\_history TO AVIOD CONFLICT WITH UNIX history COMMAND 
+      IN UNIX THE USER CAN ONLY USE THIS APPLICATION BY TYPING
+      iras90\_history TO AVIOD CONFLICT WITH UNIX history COMMAND
 
       This routine allows several operations to be performed on the
       history information stored within a group of NDFs...
@@ -3482,7 +3482,7 @@ default value.
          BEFORE = LITERAL (Read)
       }{
          Only those history records created before the date and time
-         specified by BEFORE are displayed. See 
+         specified by BEFORE are displayed. See
          section \ref{SEC:TIM} for more information on specifying
          times and dates within IRAS90. A null or blank value results
          in BEFORE being ignored. If LOOP is false then the run time
@@ -3641,7 +3641,7 @@ default value.
 \end{description}
 
       Once in the help library, it can be navigated in the same way
-      as VMS help libraries.  CTRL/Z (on VMS) or CTRL/D (on UNIX) to exit from 
+      as VMS help libraries.  CTRL/Z (on VMS) or CTRL/D (on UNIX) to exit from
       any level, and $<$RET$>$ to move up a level in the hierarchy.
    }
    \sstusage{
@@ -3992,7 +3992,7 @@ default value.
          The sky longitude of the centre of the output image, in the
          coordinate system specified by the parameter COORDS (eg if
          COORDS is EQUATORIAL then CENTRE\_LON should be given the Right
-         Ascension of the image centre).See 
+         Ascension of the image centre).See
 section \ref{SEC:SKY}
          for the formats allowed for this value.
       }
@@ -4120,7 +4120,7 @@ section \ref{SEC:SKY}
       }{
          Specifies the type of projection to use when creating the
          output image. Valid values include GNOMONIC (i.e. tangent
-         plane), ORTHOGRAPHIC, LAMBERT and AITOFF.  See 
+         plane), ORTHOGRAPHIC, LAMBERT and AITOFF.  See
          section \ref{SEC:PROJ} for more information on available
          projections.                                         [GNOMONIC]
       }
@@ -5039,7 +5039,7 @@ section \ref{SEC:SKY}
       direction of decreasing DEC. The output data array is flipped in the
       second dimension to make the second axis increase in the direction of
       increasing DEC (i.e. so that north is upwards when the image is
-      displayed normally). 
+      displayed normally).
 
       2) The following information is stored in the IRAS extension;
       waveband, HCON, plate number, maximum and minimum SOP numbers, and
@@ -5125,7 +5125,7 @@ section \ref{SEC:SKY}
       with the following exceptions:
 
       1) The images are assumed to be orthographic projections of the
-      sky. The value of the keyword CROTA2 is assumed to be 360 degrees 
+      sky. The value of the keyword CROTA2 is assumed to be 360 degrees
       minus the position angle of the second image axis.
 
       2) The following information is stored in the IRAS extension;
@@ -5213,15 +5213,15 @@ printer
           PSCONT is a command procedure, or script.
 
          \sstitem
-          This procedure provides limited facilities for customising the 
-          plot using the other parameter of TURBOCONT and SKYGRID. To do 
+          This procedure provides limited facilities for customising the
+          plot using the other parameter of TURBOCONT and SKYGRID. To do
           this the first argument ({\tt "}NDF{\tt "}) should be given the value PROMPT
           (any values supplied for MODE and NCONT are ignored). This causes
-          the keyword PROMPT to be supplied to SKYGRID and TURBOCONT, thus 
+          the keyword PROMPT to be supplied to SKYGRID and TURBOCONT, thus
           causing the user to be prompted for all parameters used by these
-          two applications (including the NDF parameter). If other 
-          facilities are required, then the applications TURBOCONT, 
-          SKYGRID and PSMERGE must be run individually rather than from 
+          two applications (including the NDF parameter). If other
+          facilities are required, then the applications TURBOCONT,
+          SKYGRID and PSMERGE must be run individually rather than from
           within this command procedure.
       }
    }
@@ -5889,7 +5889,7 @@ printer
          The sky latitude of the projection centre for the output
          images, in the coordinate system specified by the parameter
          COORDS (eg if COORDS is EQUATORIAL then CENTRE\_LAT should be
-         given the Declination of the image centre). See 
+         given the Declination of the image centre). See
 section \ref{SEC:SKY} for the formats allowed for this value. This
          parameter is only used if the parameter REF is given a null
          value.
@@ -5900,7 +5900,7 @@ section \ref{SEC:SKY} for the formats allowed for this value. This
          The sky longitude of the projection centre for the output
          images, in the coordinate system specified by the parameter
          COORDS (eg if COORDS is EQUATORIAL then CENTRE\_LON should be
-         given the Right Ascension of the image centre).See 
+         given the Right Ascension of the image centre).See
 section \ref{SEC:SKY} for the formats allowed for this value. This
          parameter is only used if the parameter REF is given a null
          value.
@@ -5994,7 +5994,7 @@ section \ref{SEC:SKY} for the formats allowed for this value. This
       }{
          Specifies the type of projection to use when creating the
          output images. Valid values include GNOMONIC (i.e. tangent
-         plane), ORTHOGRAPHIC, LAMBERT and AITOFF.  See 
+         plane), ORTHOGRAPHIC, LAMBERT and AITOFF.  See
 section \ref{SEC:PROJ} for more information on available
          projections. This parameter is only used if the parameter REF
          is given a null value.
@@ -6136,7 +6136,7 @@ section \ref{SEC:PROJ} for more information on available
          COORDS = LITERAL (Read)
       }{
          Specifies the sky coordinate system to use.  Valid values
-         include ECLIPTIC, EQUATORIAL, GALACTIC. See 
+         include ECLIPTIC, EQUATORIAL, GALACTIC. See
 section \ref{SEC:SKY} for more information on available sky
          coordinate systems.             [current sky coordinate system]
       }
@@ -6266,7 +6266,7 @@ section \ref{SEC:SKY} for more information on available sky
       \sstsubsection{
          XY2 = REAL (Read)
       }{
-         The image coordinates (X and Y) at the opposite corner of the box. 
+         The image coordinates (X and Y) at the opposite corner of the box.
          XY2 is
          only used if parameter CURSOR has a false value, if a null
          value is supplied for parameter BOXSIZE, and if parameter
@@ -6343,7 +6343,7 @@ section \ref{SEC:SKY} for more information on available sky
          COORDS = LITERAL (Read)
       }{
          Specifies the sky coordinate system to use. Valid values
-         include ECLIPTIC, EQUATORIAL, GALACTIC. See 
+         include ECLIPTIC, EQUATORIAL, GALACTIC. See
 section \ref{SEC:SKY} for more information on available sky
          coordinate systems.
                                          [current sky coordinate system]
@@ -6396,7 +6396,7 @@ section \ref{SEC:SKY} for more information on available sky
          The interval between lines of constant latitude (parallels),
          in the coordinate system specified by the parameter COORDS (eg
          if COORDS is EQUATORIAL then LATINT should be given the
-         interval in declination between parallels). See 
+         interval in declination between parallels). See
 section \ref{SEC:SKY} for the formats allowed for this value.  If
          a value of zero is supplied, a sensible default value will be
          used.                                                       [0]
@@ -6427,7 +6427,7 @@ section \ref{SEC:SKY} for the formats allowed for this value.  If
          The interval between lines of constant longitude (meridians),
          in the coordinate system specified by the parameter COORDS (eg
          if COORDS is EQUATORIAL then LONINT should be given the
-         interval in right ascension between meridians). See 
+         interval in right ascension between meridians). See
 section \ref{SEC:SKY} for the formats allowed for this value.  If
          a value of zero is supplied, a sensible default value will be
          used.                                                       [0]
@@ -6592,7 +6592,7 @@ section \ref{SEC:SKY} for the formats allowed for this value.  If
          COORDS = LITERAL (Read)
       }{
          Specifies the sky coordinate system to use. Valid values
-         include ECLIPTIC, EQUATORIAL, GALACTIC. See 
+         include ECLIPTIC, EQUATORIAL, GALACTIC. See
 section \ref{SEC:SKY} for more information on available sky
          coordinate systems.
                                          [current sky coordinate system]
@@ -6668,7 +6668,7 @@ section \ref{SEC:SKY} for more information on available sky
       }{
          A longitude at the start of a curve, in the coordinate system
          specified by COORDS (eg if COORDS was EQUATORIAL, LON should
-         be given a Right Ascension value).  See 
+         be given a Right Ascension value).  See
 section \ref{SEC:SKY} for more information on available sky
          coordinate systems.
       }
@@ -6896,7 +6896,7 @@ section \ref{SEC:SKY} for more information on available sky
          COORDS = LITERAL (Read)
       }{
          Specifies the sky coordinate system to use. Valid values
-         include ECLIPTIC, EQUATORIAL, GALACTIC. See 
+         include ECLIPTIC, EQUATORIAL, GALACTIC. See
 section \ref{SEC:SKY} for more information on available sky
          coordinate systems.
                                          [current sky coordinate system]
@@ -6922,7 +6922,7 @@ section \ref{SEC:SKY} for more information on available sky
          FILE = FILENAME (Read)
       }{
          A file from which to read coordinates. This is only prompted
-         for if parameter MODE has the value FILE. See the 
+         for if parameter MODE has the value FILE. See the
 section \ref{SEC:COF} for a description of the format required for
          this file.
       }
@@ -6940,7 +6940,7 @@ section \ref{SEC:COF} for a description of the format required for
          A latitude of a position to be marked, in the coordinate
          system specified by COORDS (eg if COORDS was EQUATORIAL, LAT
          should be given a Declination value). LAT is only prompted
-         for if parameter MODE has the value KEYBOARD. See the 
+         for if parameter MODE has the value KEYBOARD. See the
 section \ref{SEC:SKY} for details of the formats allowed for this
          value.
       }
@@ -6958,7 +6958,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          A longitude of a position to be marked, in the coordinate
          system specified by COORDS (eg if COORDS was EQUATORIAL, LAT
          should be given a Right Ascension value). LON is only prompted
-         for if parameter MODE has the value KEYBOARD. See the 
+         for if parameter MODE has the value KEYBOARD. See the
 section \ref{SEC:SKY} for details of the formats allowed for this
          value.
       }
@@ -7296,7 +7296,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
    }
    \sstnotes{
       \sstitemlist{
- 
+
          \sstitem
          Flux density values are displayed in units of Janskys, and
          surface brightness values in mega-Janskys per steradian.
@@ -7604,7 +7604,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          sky coordinates correspond to the displayed image coordinates
          which have been rounded to one decimal place, not to the original
          supplied image coordinates before rounding.
- 
+
          \sstitem
          If the current message filtering level (see parameter
          MSG\_FILTER) is VERBOSE, then additional information is displayed
@@ -7697,7 +7697,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          COORDS = LITERAL (Read)
       }{
          Specifies the sky coordinate system to use. Valid values
-         include ECLIPTIC, EQUATORIAL, GALACTIC. See 
+         include ECLIPTIC, EQUATORIAL, GALACTIC. See
 section \ref{SEC:SKY} for more information on available sky
          coordinate systems.
                                          [current sky coordinate system]
@@ -8630,35 +8630,35 @@ IRAS90} are similar, there are differences. These are the same as for
 Differences'').
 
 \section{The IRAS NDF Extension}
-Various {\small IRAS90} applications store information within an ``{\small NDF} 
-extension''. This is an {\small HDS} data structure which is ``tagged on'' to 
-the main {\small NDF} structure, and is named ``IRAS''. It is used to store 
+Various {\small IRAS90} applications store information within an ``{\small NDF}
+extension''. This is an {\small HDS} data structure which is ``tagged on'' to
+the main {\small NDF} structure, and is named ``IRAS''. It is used to store
 information which futher describes the data in the main {\small NDF} data array.
-Typical items are the waveband (12, 25, 60 or 100 $\mu$m), the instrument 
-(survey array or {\small CPC}), etc. The contents of the extension depends on 
-what sort of data is stored in the {\small NDF} and on what processing has been 
-applied to the data. {\small IRAS90} applications will read the information 
-stored in the {\small IRAS} extension, use it, and write new information to it, 
-as necessary. 
+Typical items are the waveband (12, 25, 60 or 100 $\mu$m), the instrument
+(survey array or {\small CPC}), etc. The contents of the extension depends on
+what sort of data is stored in the {\small NDF} and on what processing has been
+applied to the data. {\small IRAS90} applications will read the information
+stored in the {\small IRAS} extension, use it, and write new information to it,
+as necessary.
 
-The extension contains some components which are data structures rather than 
+The extension contains some components which are data structures rather than
 simple numerical or string values. Of these, the most important are:
 
 \begin{description}
-\item [CRDD\_INFO] - Used to store information describing {\small IRAS90} 
+\item [CRDD\_INFO] - Used to store information describing {\small IRAS90}
 {\small CRDD} files (waveband, boresight pointing information, etc).
-\item [IMAGE\_INFO] - Used to store information describing {\small IRAS90} 
+\item [IMAGE\_INFO] - Used to store information describing {\small IRAS90}
 images (waveband, name of the application which created the image, etc)
-\item [ASTROMETRY] - Used to store information describing the position on the 
+\item [ASTROMETRY] - Used to store information describing the position on the
 sky of each image pixel.
-\item [QUALITY\_NAMES] - Used to store the quality names which are currently 
+\item [QUALITY\_NAMES] - Used to store the quality names which are currently
 defined in an image or {\small CRDD } file.
 \end{description}
 
-The structure and content of the {\small IRAS} extension is described in detail 
-in various additional {\small IRAS90} documents, distributed with the package. 
-These documents are intended for people who want to write their own {\small 
-IRAS90} applications, and are described in the ``{\small IRAS90} Programmers 
+The structure and content of the {\small IRAS} extension is described in detail
+in various additional {\small IRAS90} documents, distributed with the package.
+These documents are intended for people who want to write their own {\small
+IRAS90} applications, and are described in the ``{\small IRAS90} Programmers
 Guide'', SUN/165.
 
 \section{Converting IRAS Data in BDF Format to NDF Format}
@@ -8682,12 +8682,12 @@ package. To start up {\small NDFOUT}, use the following commands:
 \section{An Example of a Colour Temperature Procedure}
 \label{APP:MAS}
 This appendix describes an {\small ICL} procedure called {\small MASTER}
-which is distributed with the {\small VMS} version of {\small IRAS90}. It 
-performs an entire reduction process, starting from two groups of ``raw'' 
-{\small CRDD} files (covering the same region of the sky but at different 
+which is distributed with the {\small VMS} version of {\small IRAS90}. It
+performs an entire reduction process, starting from two groups of ``raw''
+{\small CRDD} files (covering the same region of the sky but at different
 wavelengths), and produces surface brightness, colour temperature and optical
 depth maps. The procedure was optimised for a particular field and may well
-not be ideally suited to other types of field. It should be use as the 
+not be ideally suited to other types of field. It should be use as the
 basis for further experimentation and customisation. The source for the
 procedure is in the file {\small IRAS90\_DIR:MASTER.ICL} ({\small VMS} only).
 To run the procedure as it stands, the following commands should be used:
@@ -8702,16 +8702,16 @@ To run the procedure as it stands, the following commands should be used:
 \end{verbatim}
 \normalsize
 
-This assumes that the text files {\small HCON2\_B1.LIS} and {\small HCON2\_B2.LIS} 
-contain lists of the raw {\small CRDD} files to be used. The temperature and 
+This assumes that the text files {\small HCON2\_B1.LIS} and {\small HCON2\_B2.LIS}
+contain lists of the raw {\small CRDD} files to be used. The temperature and
 optical depth images are put in {\small M51\_TEMP.SDF} and {\small M51\_TAU.SDF}. Other
 files are created by {\small MASTER} as described in the procedure prologue.
 
 The production of a colour temperature map involves dividing one of
-the surface brightness images by the other. This process tends to amplify any 
+the surface brightness images by the other. This process tends to amplify any
 residual stripes present in the two surface brightness images, especially in
-background regions. For this reason, {\small MASTER} pays particular 
-attention to achieving good destriping. 
+background regions. For this reason, {\small MASTER} pays particular
+attention to achieving good destriping.
 
 \small
 \begin{verbatim}
@@ -8721,7 +8721,7 @@ PROC MASTER INA INB TEMP TAU
 {     MASTER
 {
 {  Purpose:
-{     Create colour temperature and optical depth maps from two sets 
+{     Create colour temperature and optical depth maps from two sets
 {     of raw CRDD files.
 {
 {  Type of Module:
@@ -8731,23 +8731,23 @@ PROC MASTER INA INB TEMP TAU
 {     MASTER INA INB TEMP TAU
 {
 {  Description:
-{     This procedure is an example of the way IRAS90 can be used to 
-{     create surface brightness maps and colour temperature maps. 
-{     It is intended to form a basis for users own experimentation, 
+{     This procedure is an example of the way IRAS90 can be used to
+{     create surface brightness maps and colour temperature maps.
+{     It is intended to form a basis for users own experimentation,
 {     and is not intended to be a fool proof, all-singing, all-dancing
 {     tool.
 {
 {     Particular attention is paid to achieving low stripes in the
-{     surface brightness maps. The resolution of the surface 
+{     surface brightness maps. The resolution of the surface
 {     brightness maps are matched by simulating data from each of the
 {     two original maps using the detector PSFs of the other band. The
-{     resulting simulated data is then mapped again. Background 
-{     subtraction is performed by BACKCRDD, resulting in the image 
+{     resulting simulated data is then mapped again. Background
+{     subtraction is performed by BACKCRDD, resulting in the image
 {     having a global background of (roughly) zero.
 {
 {  Parameters:
 {     INA = LITERAL (Read)
-{        A group expression giving the raw CRDD files from the first 
+{        A group expression giving the raw CRDD files from the first
 {        band.
 {     INB = LITERAL (Read)
 {        A group expression giving the raw CRDD files from the second
@@ -8759,7 +8759,7 @@ PROC MASTER INA INB TEMP TAU
 {        The output NDF which is to receive the optical depth map.
 {
 {  Notes:
-{     -  In addition to the above parameters which must be supplied 
+{     -  In addition to the above parameters which must be supplied
 {     on the command line, the user is prompted for:
 {
 {        1)  Dimensions of the mapped area. If one value is given a
@@ -8768,14 +8768,14 @@ PROC MASTER INA INB TEMP TAU
 {        2)  Dimensions of a map pixel. If one value is given the
 {        pixels are assumed to be square.
 {
-{        3) The emmisivity spectral index (see COLTEMP parameter 
+{        3) The emmisivity spectral index (see COLTEMP parameter
 {        BETA).
 {
-{        4) The optical depth wavelength (see COLTEMP parameter 
+{        4) The optical depth wavelength (see COLTEMP parameter
 {        WAVEL).
 {
-{     -  The following intermediate files are left on disk after the 
-{     procedure has completed (where * represents the group of input 
+{     -  The following intermediate files are left on disk after the
+{     procedure has completed (where * represents the group of input
 {     CRDD files):
 {
 {        1) *_DS.SDF - The final destriped CRDD files.
@@ -8792,10 +8792,10 @@ PROC MASTER INA INB TEMP TAU
 {
 {        6) MAPB_SM.SDF - MAPB smoothed to a common resolution.
 {
-{        7) MAPA_SMT.SDF - MAPA_SM thresholded to remove values close 
+{        7) MAPA_SMT.SDF - MAPA_SM thresholded to remove values close
 {           to zero.
-{        
-{        8) MAPB_SMT.SDF - MAPB_SM thresholded to remove values close 
+{
+{        8) MAPB_SMT.SDF - MAPB_SM thresholded to remove values close
 {           to zero.
 {
 {  Authors:
@@ -8816,10 +8816,10 @@ PROC MASTER INA INB TEMP TAU
 {
 INPUT  "Dimensions of map (arc-mins): " (BSIZ)
 INPUTR "Pixel size in arcminutes: " (PIXSIZ)
-INPUTR "Emmisivity spectral index: " (BETA) 
+INPUTR "Emmisivity spectral index: " (BETA)
 INPUTI "Wavelength at which optical depth is required (microns): " ~
        (WAVEL)
-PRINT 
+PRINT
 {
 {  An initial map is made using the standard destriping and background
 {  removal technique. Samples excluded from the estimation of detector
@@ -8835,21 +8835,21 @@ DCL COPY SYS$LOGIN:IRAS90_NDFS.LIS []BK.LIS
 MAPCRDD OUT=MASTER_MAP1 PIXSIZE=(PIXSIZ) BOXSIZE=(BSIZ) ACCEPT
 {
 {  Save MAPCRDD parameters which define the map centre. These values
-{  will be used for all other maps in order to ensure that they are 
+{  will be used for all other maps in order to ensure that they are
 {  aligned.
 {
 GETPAR MAPCRDD CENTRE_LON (LON)
 GETPAR MAPCRDD CENTRE_LAT (LAT)
 {
-{  Create an image in which source regions hold bad values. This is 
+{  Create an image in which source regions hold bad values. This is
 {  done by thresholding the initial map created above. All pixels with
-{  values outide the range -5*SIGMA to +5*SIGMA are set bad, where 
-{  SIGMA is the spread in background values found by DESTCRDD. Note, 
+{  values outide the range -5*SIGMA to +5*SIGMA are set bad, where
+{  SIGMA is the spread in background values found by DESTCRDD. Note,
 {  THRESH does not currently use NDF origins (in effect the origin is
 {  assumed to be at [1,1]) and so the origin of the thresholded image
-{  must be set back to its correct value by using SETORIGIN. When 
-{  THRESH is upgraded to use the ful facilities of the NDF structure, 
-{  the following section can be simplified. 
+{  must be set back to its correct value by using SETORIGIN. When
+{  THRESH is upgraded to use the ful facilities of the NDF structure,
+{  the following section can be simplified.
 {
 PRINT "  Identifing source regions"
 THRESH OUTPIC=MASTER_MAP2 THRLO=(-5*SIGMA) THRHI=(5*SIGMA) NEWLO=BAD ~
@@ -8857,18 +8857,18 @@ THRESH OUTPIC=MASTER_MAP2 THRLO=(-5*SIGMA) THRHI=(5*SIGMA) NEWLO=BAD ~
 SETORIGIN LIKE=MASTER_MAP1 ACCEPT
 {
 {  Generate simulated CRDD from the background map. Source samples
-{  will be bad in these CRDD files. 
+{  will be bad in these CRDD files.
 {
 SIMCRDD IN=(INA) SKY=MASTER_MAP2 OUT=MM_*_SIM
 {
-{  Asssign quality MASTER_SOURCE to samples in the background 
-{  subtracted CRDD files which corrrespond to bad samples in the 
-{  simulated CRDD. 
+{  Asssign quality MASTER_SOURCE to samples in the background
+{  subtracted CRDD files which corrrespond to bad samples in the
+{  simulated CRDD.
 {
 SETQUAL NDF=^BK.LIS QNAME=MASTER_SOURCE MASK=^SYS$LOGIN:IRAS90_NDFS.LIS
 {
 {  Now CRDD files with better destriping, by omiting source samples
-{  from the destriping and background estimation. Note, the cleaning 
+{  from the destriping and background estimation. Note, the cleaning
 {  algorithms used by DESTCRDD and BACKCRDD are switched off to avoid
 {  backcrdd samples being rejected. A linear background is fitted to
 {  each CRDD file.
@@ -8918,7 +8918,7 @@ MAPCRDD OUT=MAPB PIXSIZE=(PIXSIZ) CENTRE_LON=(LON) CENTRE_LAT=(LAT) ~
         BOXSIZE=(BSIZ) ACCEPT
 {
 {  Now smooth the band A map using the satellite response for band B.
-{ 
+{
 PRINT "  Smoothing first map"
 SIMCRDD SKY=MAPA IN=(INB) OUT=MM_*_SIM
 MAPCRDD PIXSIZE=(PIXSIZ) OUT=MAPA_SM CENTRE_LON=(LON) CENTRE_LAT=(LAT) ~
@@ -8926,7 +8926,7 @@ MAPCRDD PIXSIZE=(PIXSIZ) OUT=MAPA_SM CENTRE_LON=(LON) CENTRE_LAT=(LAT) ~
 SETIMAGE NDF=MAPA_SM LIKE=MAPA ACCEPT
 {
 {  Now smooth the band B map using the satellite response for band A.
-{ 
+{
 PRINT "  Smoothing second map"
 SIMCRDD SKY=MAPB IN=(INA) OUT=*_SIM
 MAPCRDD PIXSIZE=(PIXSIZ) OUT=MAPB_SM CENTRE_LON=(LON) CENTRE_LAT=(LAT) ~
@@ -8938,7 +8938,7 @@ SETIMAGE NDF=MAPB_SM LIKE=MAPB ACCEPT
 {
 PRINT "  Thresholding the smoothed images"
 THRESH INPIC=MAPA_SM OUTPIC=MAPA_SMT THRLO=(3*SIGA) THRHI=1E12 ~
-       NEWLO=BAD NEWHI=BAD 
+       NEWLO=BAD NEWHI=BAD
 SETORIGIN LIKE=MAPA_SM ACCEPT
 THRESH INPIC=MAPB_SM OUTPIC=MAPB_SMT THRLO=(3*SIGB) THRHI=1E12 ~
        NEWLO=BAD NEWHI=BAD

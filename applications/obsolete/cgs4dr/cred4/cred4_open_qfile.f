@@ -1,4 +1,4 @@
-*+  CRED4_OPEN_QFILE - Open the data reduction queue file 
+*+  CRED4_OPEN_QFILE - Open the data reduction queue file
       SUBROUTINE CRED4_OPEN_QFILE( STATUS )
 *    Description :
 *     Opens the file containing the list of pending instructions.
@@ -64,8 +64,8 @@
       INVAL = 'PASSWORD="'//QMAN_PWRD(1:CHR_LEN(QMAN_PWRD))/
      :     /'" LOCKWORD="'//QMAN_LWRD(1:CHR_LEN(QMAN_LWRD))//'"'
       QMAN_OK = .FALSE.
-      CALL TASK_OBEY( QMAN_ALIAS(1:CHR_LEN(QMAN_ALIAS)), 'STATUS', 
-     :  INVAL(1:CHR_LEN(INVAL)), OUTVAL, 
+      CALL TASK_OBEY( QMAN_ALIAS(1:CHR_LEN(QMAN_ALIAS)), 'STATUS',
+     :  INVAL(1:CHR_LEN(INVAL)), OUTVAL,
      :  QMAN_PATH, QMAN_MESSID, STATUS )
       IF ( STATUS .NE. DTASK__ACTSTART ) THEN
          QMAN_OK = .FALSE.

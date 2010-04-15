@@ -21,12 +21,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@ int main ( void ) {
   msgSetc( "TOK", "(SETC)" );
   msgOut( " ", "MSG is installed and %%working - ^TOK - ^PF "
           "< missing token", &status );
-  
+
   msgOut(" ", "STATUS token check: ^STATUS", &status);
 
   msgFmt( "D", "%g", 536.7 );
@@ -82,7 +82,7 @@ int main ( void ) {
              42);
 
   msgTune( "STREAM", 1, &status );
-  
+
   for (perc = 0; perc < 100; perc += 10 ) {
     msgOutiff( MSG__VERB, "", "%3d %% done[9D[A",
                &status, perc );

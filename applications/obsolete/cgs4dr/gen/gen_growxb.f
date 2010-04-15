@@ -6,7 +6,7 @@ C
 C     Copies a one dimensional byte array into successive cross-
 C     sections of a two dimensional array.  The cross-sections
 C     are cross-sections in the 'X' direction, ie array elements
-C     for which the second array index is constant. 
+C     for which the second array index is constant.
 C
 C     Parameters -  (">" input, "<" output)
 C

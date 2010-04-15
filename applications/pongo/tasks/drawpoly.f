@@ -63,7 +63,7 @@
 *
 *     - If a projection is used then expect the polygon to be incorrect
 *       if it crosses any discontinuities, or if the edges are severely
-*       distorted (the polygon is filled as plotted on the display 
+*       distorted (the polygon is filled as plotted on the display
 *       surface, not the sky).
 
 *  Examples:

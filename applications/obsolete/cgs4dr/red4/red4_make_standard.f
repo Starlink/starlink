@@ -7,8 +7,8 @@
 *    Parameters :
 *     STATUS   = INTEGER( UPDATE )
 *           Global ADAM status. This must be ADAM__OK on entry, or the
-*           routine will not execute. It will be returned ADAM__OK if 
-*           the routine is successful. Otherwise it will contain an 
+*           routine will not execute. It will be returned ADAM__OK if
+*           the routine is successful. Otherwise it will contain an
 *           error status.
 *    Method :
 *    Deficiencies :
@@ -50,7 +50,7 @@
 *     01-Oct-1991: Convert GEN_*AFE to GEN_AFV*.                  (PND)
 *     23-Jul-1992: Allow XSTART XEND to vary  outside range       (PND)
 *     31-Aug-1992: Cancel the above change (mis-specification)
-*                  but allow the BB to be normalised anywhere 
+*                  but allow the BB to be normalised anywhere
 *                  between 0.8 - 10.0 microns.                    (PND)
 *     22-Feb-1993: Conform to error strategy                      (PND)
 *    endhistory
@@ -167,14 +167,14 @@
 *      standard file.
          DSA_STATUS = STATUS
          CALL DSA_OPEN( DSA_STATUS )
-         CALL DSA_NAMED_INPUT( 'GROUP', GRPFILE, DSA_STATUS ) 
+         CALL DSA_NAMED_INPUT( 'GROUP', GRPFILE, DSA_STATUS )
          CALL DSA_USE_QUALITY( 'GROUP', DSA_STATUS )
          CALL DSA_NAMED_OUTPUT( 'STANDARD', STDFILE,
      :     'GROUP', 0, 0, DSA_STATUS )
          CALL DSA_USE_QUALITY( 'STANDARD', DSA_STATUS )
 
 *      Determine the size of the data array.
-         CALL DSA_DATA_SIZE( 'GROUP', MAXDIM, NDIM, DIMS, 
+         CALL DSA_DATA_SIZE( 'GROUP', MAXDIM, NDIM, DIMS,
      :     NELM, DSA_STATUS )
 
 *      Obtain the number of bytes in a floating point element.
@@ -237,7 +237,7 @@
          CALL PAR_GET0R( 'TEFF', TEFF, STATUS )
 
 *      Obtain the range of Y axis elements over which the extraction
-*      is to take place. The WHOLE parameter is used to specify 
+*      is to take place. The WHOLE parameter is used to specify
 *      whether the whole data set is to be extracted. If WHOLE=FALSE,
 *      the parameters YSTART and YEND are used to specify the range
 *      of rows required.
@@ -274,7 +274,7 @@
             CALL DSA_MAP_QUALITY( 'STANDARD', 'WRITE', 'BYTE',
      :        SQUAL_PTR, SQUAL_SLOT, DSA_STATUS )
 
-*         Obtain the workspace to hold the data, variance and quality 
+*         Obtain the workspace to hold the data, variance and quality
 *         for the 1-D spectrum and the black-body spectrum.
             CALL DSA_GET_WORK_ARRAY( DIMS(1), 'FLOAT', D1DATA_PTR,
      :        D1DATA_SLOT, DSA_STATUS )
@@ -326,11 +326,11 @@
      :           %val(BBVAR_PTR) )
 
 *            The above extraction routine will have combined the bad
-*            pixels using a logical AND function. If an OR is 
+*            pixels using a logical AND function. If an OR is
 *            required instead then redo the bad pixel mask.
                IF ( OPER .EQ. 'OR' ) THEN
 
-                  CALL RED4_XTRACTMASK( DIMS(1), DIMS(2), 
+                  CALL RED4_XTRACTMASK( DIMS(1), DIMS(2),
      :              %val(GQUAL_PTR), JSTART, JEND, 'OR',
      :              %val(D1QUAL_PTR), STATUS )
                END IF
@@ -344,14 +344,14 @@
      :                 /'interpolation', STATUS )
                   END IF
 
-                  CALL GEN_MEND1F( DIMS(1), %val(D1DATA_PTR), 
+                  CALL GEN_MEND1F( DIMS(1), %val(D1DATA_PTR),
      :              %val(D1VAR_PTR), %val(D1QUAL_PTR), .TRUE.,
      :              .FALSE., 0.0, .TRUE., %val(D1DATA_PTR),
      :              %val(D1VAR_PTR), %val(D1QUAL_PTR) )
                END IF
 
 *            Generate a Black-Body spectrum with the specified
-*            effective temperature, normalised at the given 
+*            effective temperature, normalised at the given
 *            wavelength. (GEN_BBSPC is a private routine).
                IF ( VERBOSE ) THEN
 
@@ -368,14 +368,14 @@
 *            It is assumed this model black-body spectrum has no
 *            error associated with it, so fill its variance array
 *            with zeros.
-               CALL GEN_FILL( FLOATSIZE*DIMS(1), 0, %val(BBVAR_PTR), 
+               CALL GEN_FILL( FLOATSIZE*DIMS(1), 0, %val(BBVAR_PTR),
      :           STATUS )
 
 *            Divide the extracted spectrum by this model black-body
 *            spectrum, propagating the variance and quality.
                IF ( VERBOSE ) THEN
 
-                  CALL MSG_OUT( ' ', 'Dividing spectrum by '/ 
+                  CALL MSG_OUT( ' ', 'Dividing spectrum by '/
      :              /'black body and normalising', STATUS )
                END IF
 
@@ -401,9 +401,9 @@
                CALL GEN_GROWXB( %val(D1QUAL_PTR), DIMS(1),
      :           DIMS(2), 1, DIMS(2), %val(SQUAL_PTR) )
 
-*            At this point there is no way of telling if all the 
+*            At this point there is no way of telling if all the
 *            above has worked, but check the status anyway in case
-*            the above routines are given status arguments at some 
+*            the above routines are given status arguments at some
 *            stage.
                IF ( STATUS .EQ. ADAM__OK ) THEN
 
@@ -411,7 +411,7 @@
                   DATA_INFO(2) = 'STANDARD (un-normalised)'
 
                   DSA_STATUS = STATUS
-                  CALL DSA_SET_DATA_INFO( 'STANDARD', NINFO, 
+                  CALL DSA_SET_DATA_INFO( 'STANDARD', NINFO,
      :              DATA_INFO, 0, 0.0D0, DSA_STATUS )
 
 *               Change the object name to 'Standard from <old name>'
@@ -430,14 +430,14 @@
                   CALL DSA_PUT_FITS_C( 'STANDARD', 'OBSTYPE',
      :              'STANDARD', ' ', DSA_STATUS )
 
-*               Record the reference wavelength and effective 
+*               Record the reference wavelength and effective
 *               temperature used in the FITS structure.
                   CALL DSA_PUT_FITS_F( 'STANDARD', 'RFLAMBDA',
      :              RFLAMBDA, ' ', DSA_STATUS )
                   CALL DSA_PUT_FITS_F( 'STANDARD', 'TEFF',
      :              TEFF, ' ', DSA_STATUS )
 
-*               Record the name of the group used in the .FITS 
+*               Record the name of the group used in the .FITS
 *               structure.
                   CLEN = MAX( 1, CHR_LEN( GRPFILE ) )
                   CALL DSA_PUT_FITS_C( 'STANDARD', 'GRPFILE',
@@ -467,7 +467,7 @@
 
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_MAKE_STANDARD: '/
-     :        /'Error accessing data structures '/ 
+     :        /'Error accessing data structures '/
      :        /'and obtaining parameters', STATUS )
          END IF
 
@@ -484,7 +484,7 @@
 
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_MAKE_STANDARD: '/
-     :    /'Error obtaining %GRPFILE, %OPER, '/ 
+     :    /'Error obtaining %GRPFILE, %OPER, '/
      :    /'%MEND and %STANDARD_TYPE parameters', STATUS )
       END IF
 

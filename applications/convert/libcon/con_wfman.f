@@ -75,20 +75,20 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG constants
-      
+
 *  Arguments Given:
-      INTEGER EL      
+      INTEGER EL
       INTEGER NDIM
       INTEGER DIMS( NDIM )
       INTEGER BITPIX
-      
+
 *  Arguments Given and Returned:
       CHARACTER * ( * ) FITSAR( EL )
 

@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,10 +106,10 @@
       INTEGER STATUS             ! Global status
 
 *.
-       
+
 *  Begin a new error reporting environment.
       CALL ERR_BEGIN( STATUS )
-       
+
 *  Check that the PCB index supplied is valid and report an error if it
 *  is not.
       IF ( ( IPCB .LT. 1 ) .OR. ( IPCB .GT. NDF__MXPCB ) ) THEN
@@ -119,7 +119,7 @@
          CALL ERR_REP( 'NDF1_ANNPL_IPCB',
      :        'Routine ^ROUTINE called with an invalid IPCB ' //
      :        'argument of ^IPCB - internal programming error.',
-     :        STATUS ) 
+     :        STATUS )
 
 *  If required, and the placeholder object is a new one created by the
 *  NDF_ system, then delete the associated object, annulling its locator
@@ -136,7 +136,7 @@
 *  Release the PCB slot.
          CALL NDF1_RLS( NDF__PCB, IPCB, STATUS )
       END IF
-       
+
 *  Reset the PCB index.
       IPCB = 0
 

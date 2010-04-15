@@ -175,7 +175,7 @@
      :                    MXPSCL, DMAXCL, TOTLCL, AVGCL, STDVCL,
      :                    STATUS )
 
-*  Pass the result of IRM1_STATR to the returned argument according to 
+*  Pass the result of IRM1_STATR to the returned argument according to
 *  the clipping requirement. Get the max. value of the row.
          IF ( MXMNCL ) THEN
             IF ( NGODCL .GT. 0 ) THEN

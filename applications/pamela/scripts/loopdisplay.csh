@@ -1,6 +1,6 @@
 #!/bin/csh
 #
-# !!begin 
+# !!begin
 # !!title  Displays a list of files
 # !!author T.R. Marsh
 # !!created 12 January 2005
@@ -19,7 +19,7 @@
 # Arguments: just give a series of file names. Optionally -h n will halt for n seconds halt between each frame.
 # This must come first if it used.
 #
-# !!end 
+# !!end
 
 if( ($#argv < 1) || ( ($1 == "-h") && ($#argv < 3) ) ) then
   echo "usage: listformat (-h n) file1 file2 ..."

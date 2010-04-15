@@ -11,7 +11,7 @@
 #include "gwm_err.h"
 #include "gwm.h"
 
-int GWM_SetColTable( Display *display, Window win_id, unsigned long *table, 
+int GWM_SetColTable( Display *display, Window win_id, unsigned long *table,
 	unsigned long size)
 /*
 *+
@@ -50,12 +50,12 @@ int GWM_SetColTable( Display *display, Window win_id, unsigned long *table,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,11 +76,11 @@ int GWM_SetColTable( Display *display, Window win_id, unsigned long *table,
 */
 {
     Atom atom;
-        
+
     atom = XInternAtom(display, "GWM_colour_table", False );
 
     XChangeProperty( display, win_id, atom, XA_INTEGER, 32, PropModeReplace,
         (unsigned char*)(table), size );
- 
+
     return GWM_SUCCESS;
 }

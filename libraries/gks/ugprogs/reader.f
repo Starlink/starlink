@@ -1,27 +1,27 @@
       PROGRAM READER
 *                      GKS Example Program 7.2
- 
+
       INTEGER  MINP
       PARAMETER (MINP = 13)
 *                      Declare metafile input workstation values
       INTEGER  NCMFDR, MFTYPE
       CHARACTER*80 MFDR(200)
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Connect the metafile to the program
       OPEN (UNIT = MINP, FILE = 'myfile.meta', STATUS = 'OLD')
 *                      OPEN and ACTIVATE a metafile input workstation
@@ -48,7 +48,7 @@
       IF (MFTYPE.NE.0) GO TO 10
 *                      At end of run, close MI workstation
       CALL GCLWK (2)
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing

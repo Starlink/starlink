@@ -166,9 +166,9 @@ itcl::class gaia::GaiaCubeChanmap {
    #  Run the CHANMAP application.
    protected method run_main_app_ {ndfname axis lb ub} {
 
-      #  There are some constraints on the estimator and the number of 
+      #  There are some constraints on the estimator and the number of
       #  channels per sub-image. Test for that now (note chanmap creates
-      #  an output image even when exiting in error for the estimator, 
+      #  an output image even when exiting in error for the estimator,
       #  so just letting it fail isn't an option).
       set lbp [expr min($itk_option(-lower_limit),$itk_option(-upper_limit))]
       set ubp [expr max($itk_option(-lower_limit),$itk_option(-upper_limit))]

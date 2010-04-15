@@ -65,7 +65,7 @@ proc GetScatter { } {
      global localAutoScale
 
 #
-#   Bind the return key to set global variable button to "ok".  That is, 
+#   Bind the return key to set global variable button to "ok".  That is,
 #   hitting return will have the same effect as clicking on the "ok"
 #   button.
 
@@ -658,7 +658,7 @@ proc GetScatter { } {
        -command {HelpText GetScatter_help}
 
 #
-#   Pack the buttons into their enclosing frame with a default border around 
+#   Pack the buttons into their enclosing frame with a default border around
 #   the OK button.
 
      frame .getscatter.buttonrow.default -relief sunken -bd 1
@@ -709,7 +709,7 @@ proc GetScatter { } {
 
      .getscatter.opt.title.value delete 0 end
      .getscatter.opt.title.value insert 0 $scatterTitle
-     
+
 #   ... X axis.
 
      .getscatter.opt.xaxis.value delete 0 end

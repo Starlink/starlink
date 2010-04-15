@@ -45,7 +45,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -467,12 +467,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -495,8 +495,8 @@ tape (both in absolute terms and relative to the current position) and can
 control the allocation of the tape drive and the physical mounting of the tape
 on systems which provide that facility.
 
-The library is currently supported for Sun Sparcstations running Solaris and 
-for DEC Alphas running OSF/1. Historically it has been supported for DEC 
+The library is currently supported for Sun Sparcstations running Solaris and
+for DEC Alphas running OSF/1. Historically it has been supported for DEC
 Ultrix and for SunOS and may still work for them.
 
 The library is also available for VAX/VMS systems.
@@ -524,7 +524,7 @@ The library is also available for VAX/VMS systems.
 It is often the case that astronomical data are transported from the data
 acquisition site (telescope, satellite ground station, {\em etc.}) to the
 astronomer's home institution via magnetic tape. The data on such tapes can be
-in a variety of formats. The purpose of the MAG package is to allow 
+in a variety of formats. The purpose of the MAG package is to allow
 programmers to write applications programs that can access the raw data on the
 tapes. MAG provides a means of processing magnetic tapes that is independent of
 the type of computer on which the software is running and the type of tape
@@ -546,7 +546,7 @@ processing magnetic tapes. These differences are hidden from the programmer
 when using the MAG package.
 
 This document describes mainly the version of MAG available on Unix machines
-but differences for the earlier 
+but differences for the earlier
 \htmlref{MAG on VAX/VMS}{vax}
 are also described\latex{ (in Appendix \ref{vax})}.
 
@@ -565,8 +565,8 @@ but note that not all operations are available on all types of tape deck.
 Also note that the status values returned by different machines can differ.
 
 \section{\xlabel{allocating_and_mounting_tapes}Allocating and mounting tapes}
-Most of the MAG facilities are reasonably self explanatory and will be covered 
-in more detail in the following sections, but allocating and mounting tape 
+Most of the MAG facilities are reasonably self explanatory and will be covered
+in more detail in the following sections, but allocating and mounting tape
 drives need some immediate explanation.
 
 On some operating systems (VMS in particular), users can allocate a tape drive
@@ -586,20 +586,20 @@ initialise/reset the MAG system so should be called even on Unix systems
 \dash\ this also makes the software portable.
 
 \section{\xlabel{using_mag_in_the_starlink_software_environment}Using MAG in the Starlink Software Environment}
-MAG routines are designed to be used in the 
+MAG routines are designed to be used in the
 \xref{Starlink Software Environment}{sg4}{}
-and so get the names of the tape drives by means of environment program 
-parameters. The application refers to a tape device using a Device Parameter, 
+and so get the names of the tape drives by means of environment program
+parameters. The application refers to a tape device using a Device Parameter,
 which is associated (via the Parameter System and Command Language and a data
-file known as the 
-\htmlref{{\bf device dataset}}{dataset_intro}) with the actual tape drive. 
-The device dataset is also used to preserve 
+file known as the
+\htmlref{{\bf device dataset}}{dataset_intro}) with the actual tape drive.
+The device dataset is also used to preserve
 \htmlref{position information}{positions}
 for the tape between application
 invocations\latex{ (see Sections \ref{positions} and \ref{dataset_intro})}.
 
-We can see how the association is made by looking at the basic structure of 
-an application which reads from a tape: 
+We can see how the association is made by looking at the basic structure of
+an application which reads from a tape:
 
 \small
 \begin{verbatim}
@@ -639,7 +639,7 @@ device.
 The device is then opened with READ access (2nd argument), and
 a Tape Descriptor returned in the MT variable (3rd argument). The tape
 can subsequently be referenced using this tape descriptor, as can be
-seen in the MAG\_REW call (which rewinds the tape). 
+seen in the MAG\_REW call (which rewinds the tape).
 
 The interface file for the above application could contain:
 
@@ -647,7 +647,7 @@ The interface file for the above application could contain:
 \begin{verbatim}
       PARAMETER TAPE
         TYPE    'TAPE'
-        VPATH   'PROMPT'      
+        VPATH   'PROMPT'
         PROMPT  'Tape Deck'
         PPATH   'CURRENT,DEFAULT'
         DEFAULT /dev/nrmt0l
@@ -666,30 +666,30 @@ tape parameter in an interface file. The values that make sense vary from one
 computer type to another and from one site to another.
 
 \section{\xlabel{using_mag_standalone}Using MAG Stand-alone}
-MAG may also be used stand-alone \dash\ that is without involving the 
-environment parameter system. 
+MAG may also be used stand-alone \dash\ that is without involving the
+environment parameter system.
 None of the subroutines which take a parameter name as an
-argument may be used and the facility for remembering the tape position between 
-application invocations is not available as that is handled by the 
+argument may be used and the facility for remembering the tape position between
+application invocations is not available as that is handled by the
 environment-level subroutines.
 
 For stand-alone use, tape devices are opened using MAG\_OPEN instead
 of MAG\_ASSOC and closed using MAG\_CLOSE instead of MAG\_ANNUL or MAG\_CANCL.
 Note that MAG\_OPEN is given the system name for the required device
-\dash\ there is no indirection via the parameter system and device dataset 
+\dash\ there is no indirection via the parameter system and device dataset
 although the name may be an environment variable name which will be translated.
 
-Within one application invocation, the tape position information will be 
+Within one application invocation, the tape position information will be
 maintained (provided that it is initialized correctly).
 
 \section{\xlabel{reading_and_writing_data}Reading and writing data}
 Reading and writing data is very simple; there are routines, MAG\_READ
 and MAG\_WRITE, to do the operations. The only noteworthy point is that the
-routines deal with arrays of bytes and a byte is not a standard Fortran data 
-type. What is commonly done is to provide the routines with a buffer that is 
-an array of INTEGERs. 
+routines deal with arrays of bytes and a byte is not a standard Fortran data
+type. What is commonly done is to provide the routines with a buffer that is
+an array of INTEGERs.
 A Fortran INTEGER is commonly four bytes, but there is no guarantee
-of this. 
+of this.
 
 A more serious problem is that different computers store data with
 different byte orders. For example if a tape was written on a Sun, then the
@@ -734,14 +734,14 @@ the correct tape position. If this must be done several times for a
 particular tape, the user can get quite lost. This is especially true
 if it is not obvious whether a program which reads a file also skips
 over the tape mark at its end so that it is at the beginning of the next
-file. 
+file.
 
 Some programs avoid the user learning how to skip and count files by
 allowing tape positions to be referred to using absolute file numbers.
 If the program is running in isolation (outside of any environment),
 then this normally means that the tape is rewound afresh each time the
 program is run. If the program is running in some kind of environment,
-then the tape position can be remembered between runs. 
+then the tape position can be remembered between runs.
 
 The MAG package contains facilities for making absolute tape positions
 available to the application (and hence the user) in a  way which is
@@ -752,7 +752,7 @@ specify the explicit file number. This forces the system to find
 out the absolute position.
 
 This is best demonstrated by an example. Suppose an application wishes
-to refer to absolute file positions: 
+to refer to absolute file positions:
 
 \small
 \begin{verbatim}
@@ -776,7 +776,7 @@ to refer to absolute file positions:
 The MAG\_MOVE routine requires absolute tape positions, thus if the
 application is running in an environment which remembers tape positions,
 then this information is immediately available;  otherwise, this might
-involve rewinding the tape. 
+involve rewinding the tape.
 
 The call to MAG\_MOVE then moves the tape to the file number indicated by
 FILE (2nd argument).
@@ -804,32 +804,32 @@ where the returned values (FILE, START and BLOCK) correspond to the
 MAG\_MOVE call. The values of these returned arguments are used to
 indicate whether the tape position is known. For example, FILE=0
 indicates that the absolute file number is not known, similarly for
-BLOCK=0. 
+BLOCK=0.
 
-NOTE that this system is likely to be subverted if devices which automatically 
+NOTE that this system is likely to be subverted if devices which automatically
 reposition the tape on opening or closing are used.
 
 \section{\xlabel{device_datasets}\label{device_datasets}Device Datasets}
 \subsection{\xlabel{introduction_to_device_datasets}\xlabel{device_datasets}\label{dataset_intro}Introduction to Device Datasets}
 MAG\_ASSOC and the other environment-level subroutines which have a
-parameter name as an argument, look for information about each of the user's 
-tape devices in an 
-\xref{HDS}{sun92}{abstract}\latex{\footnote{Hierarchical Data System 
-(see SUN/92)}} file, known as the {\bf user's device dataset} or USRDEVDATA, 
-which is normally file {\tt USRDEVDATA.sdf} in the user's 
+parameter name as an argument, look for information about each of the user's
+tape devices in an
+\xref{HDS}{sun92}{abstract}\latex{\footnote{Hierarchical Data System
+(see SUN/92)}} file, known as the {\bf user's device dataset} or USRDEVDATA,
+which is normally file {\tt USRDEVDATA.sdf} in the user's
 \xref{ADAM\_USER}{sun144}{ADAM_USER_directory}
-directory\latex{ (see SUN/144)}. 
-This may be overridden by setting the required filename in environment 
+directory\latex{ (see SUN/144)}.
+This may be overridden by setting the required filename in environment
 variable USRDEVDATA. If the file does not exist, it will be created.
 
 Figure~\ref{usrdevdata} shows the structure of a device dataset.
 The name of each structure in the device dataset is the name by which the user
-refers to the device. 
+refers to the device.
 The structure is used by the MAG package environment-level routines to hold the
 system name of the device to be associated with it and to retain the absolute
 tape position between runs.
 
-If the user's name for the device is the same as the normal system name 
+If the user's name for the device is the same as the normal system name
 ({\tt /dev/rmt0h}, for example), the whole structure can be created by default.
 However it is possible to create structures associating a user's `pet' name
 for a device with its system name.
@@ -901,13 +901,13 @@ for a device with its system name.
 
 \end{figure}
 
-\subsection{\xlabel{defining_a_pet_name_for_a}\xlabel{tapecreate}\label{tapecreate}Defining a `Pet' Name for a 
+\subsection{\xlabel{defining_a_pet_name_for_a}\xlabel{tapecreate}\label{tapecreate}Defining a `Pet' Name for a
 Tape Device}
 The command {\bf tapecreate} may be used to create or alter a device dataset.
 The system manager can use it to set up a system-wide device dataset
 containing entries for every device on the system. Users may also use it to
 create private user device datasets specifying their own names for devices.
-However, it is more usual to use the system name for the device and rely on 
+However, it is more usual to use the system name for the device and rely on
 automatic creation of device datasets by MAG\_ASSOC {\em etc.}
 
 For each required tape drive, an entry should be created in the file
@@ -923,53 +923,53 @@ tapecreate datn /dev/nrtm0h ~/adam/USRDEVDATA
 \xref{Starlink Software Environment}{sg4}{}
 program with parameters as follows:
 
-The first parameter (DRIVE) is the name by which the device will be known to 
+The first parameter (DRIVE) is the name by which the device will be known to
 the user. It can be any valid HDS structure name and will be prompted for if
 not supplied on the command line.
 
 The second argument (DEVICE) gives the system name for the device \dash\ it
 will be prompted for if not supplied on the command line.
-DEVICE can be the name of an environment variable which translates to a 
-system device name if so desired. The name will be translated to the 
+DEVICE can be the name of an environment variable which translates to a
+system device name if so desired. The name will be translated to the
 system device name when the device is opened for use.
 
-The third parameter (DEVDATASET) is the name of the HDS file to be created or 
-updated (without the {\tt.sdf} extension) \dash\ it defaults to 
+The third parameter (DEVDATASET) is the name of the HDS file to be created or
+updated (without the {\tt.sdf} extension) \dash\ it defaults to
 {\tt devdataset} if not supplied on the command line.
 If the file does not exist, {\bf tapecreate} will create it.
 
 \subsection{\xlabel{runtime_creation_of_device_dataset_entries}Runtime Creation of Device Dataset Entries}
-If no suitably named structure exists in USRDEVDATA when the 
-subroutine is called, an attempt is made to create it by copying the relevant 
-entry from a {\bf system-wide device dataset}. 
+If no suitably named structure exists in USRDEVDATA when the
+subroutine is called, an attempt is made to create it by copying the relevant
+entry from a {\bf system-wide device dataset}.
 If the system-wide device dataset does not exist or no structure with the
-required name exists in it, a structure will be created in USRDEVDATA with 
+required name exists in it, a structure will be created in USRDEVDATA with
 the required name and assuming that the system name for the device is the same
 (in lower case).
 
-By default, the system-wide device dataset 
-is sought by looking for {\bf ../etc/devdataset.sdf} relative to each 
-directory on the user's PATH. However, an alternative file search path may be 
-specified as a list of file pathnames, separated by `:', in environment 
+By default, the system-wide device dataset
+is sought by looking for {\bf ../etc/devdataset.sdf} relative to each
+directory on the user's PATH. However, an alternative file search path may be
+specified as a list of file pathnames, separated by `:', in environment
 variable DEVDATASET. (See Appendix \ref{vax} for filenames on VAX/VMS.)
 
 This indirection of names between the user's name for a device and the
-system device name, intended to assist portability, has proved confusing, 
-so system-wide device datasets (traditionally {\tt /star/etc/devdataset.sdf}) 
+system device name, intended to assist portability, has proved confusing,
+so system-wide device datasets (traditionally {\tt /star/etc/devdataset.sdf})
 are being phased out \dash\ the normal procedure will be to refer to the device
 by its system name.
 
-Note that {\tt /star/etc/devdataset.sdf} will still be required by programs 
+Note that {\tt /star/etc/devdataset.sdf} will still be required by programs
 linked with versions of MAG earlier than 2.0 if an appropriate structure does
-not exist in the user's device dataset. Furthermore, filenames will be 
+not exist in the user's device dataset. Furthermore, filenames will be
 \htmlref{different on VAX/VMS}{vax}\latex{ (see Appendix \ref{vax})}.
 
 \subsection{\xlabel{saving_the_absolute_tape_position}Saving the Absolute Tape Position}
-MAG\_ASSOC will read USRDEVDATA to determine which physical device to use, and 
+MAG\_ASSOC will read USRDEVDATA to determine which physical device to use, and
 will copy the absolute tape position into the MAG common block.
 To operate this system correctly, the tape must be mounted using MAG\_MOUNT
-and the tape descriptor must be annulled using MAG\_CANCL or MAG\_ANNUL at the 
-end of each task invocation with the tape in a known position ({\em i.e.}\ it knew 
+and the tape descriptor must be annulled using MAG\_CANCL or MAG\_ANNUL at the
+end of each task invocation with the tape in a known position ({\em i.e.}\ it knew
 where it was to start with and was able to keep track of its movements).
 MAG\_MOUNT will initialize the tape dataset to FILE=1, START=.TRUE., BLOCK=1
 and MAG\_DISM will `undefine' the entries (as will the creation of an entry
@@ -980,16 +980,16 @@ MAG\_ANNUL/MAG\_CANCL will write the current tape position back to USRDEVDATA.
 \section{\xlabel{error_handling}Error Handling}
 
 The MAG subroutines use the Starlink error strategy. Each routine has a STATUS
-argument and, in most cases, if the value of STATUS is not SAI\_\_OK on entry, 
+argument and, in most cases, if the value of STATUS is not SAI\_\_OK on entry,
 the routine returns without action. Exceptions to this are the `clear-up'
-routines MAG\_ANNUL, MAG\_CANCL, MAG\_CLOSE and MAG\_DEACT which will attempt 
+routines MAG\_ANNUL, MAG\_CANCL, MAG\_CLOSE and MAG\_DEACT which will attempt
 to execute whatever the import status.
 
 If an error is detected during execution, an error message may be reported
-(but not output) using the \xref{ERR}{sun104}{err_error_reporting_system} 
-system \latex{ (see SUN/104)}, and an appropriate STATUS value set. 
-Exceptions to this are the routines like MAG\_ASSOC which obtain a device name 
-via a parameter value. Errors in specifying the device name are reported 
+(but not output) using the \xref{ERR}{sun104}{err_error_reporting_system}
+system \latex{ (see SUN/104)}, and an appropriate STATUS value set.
+Exceptions to this are the routines like MAG\_ASSOC which obtain a device name
+via a parameter value. Errors in specifying the device name are reported
 immediately and the user prompted for another value.
 
 Note that STATUS values returned are rather system-specific. In most cases a
@@ -1018,9 +1018,9 @@ cleared and STATUS reset by calling subroutine
 
 \section{\xlabel{compiling_and_linking}Compiling and Linking}
 Soft links for the the standard Starlink INCLUDE file SAE\_PAR (which defines
-the OK status value, SAI\_\_OK, amongst other things) and the MAG INCLUDE file 
-MAG\_ERR (which defines the 
-\htmlref{MAG error codes}{mag_errors} may be set up in the current 
+the OK status value, SAI\_\_OK, amongst other things) and the MAG INCLUDE file
+MAG\_ERR (which defines the
+\htmlref{MAG error codes}{mag_errors} may be set up in the current
 working directory by obeying:
 \small
 \begin{quote} \begin{verbatim}
@@ -1059,10 +1059,10 @@ For example:
 \xref{Starlink Guide 4}{sg4}{}.
 \bibitem{sun92} R F Warren-Smith \& M D Lawden, {\it HDS \dash\ Hierarchical Data
 System}, \xref{Starlink User Note 92}{sun92}{}.
-\bibitem{sun144} A J Chipperfield, {\it ADAM \dash\ Unix Version}, 
+\bibitem{sun144} A J Chipperfield, {\it ADAM \dash\ Unix Version},
 \xref{Starlink User Note 144}{sun144}{}
 \bibitem{sun104} P C T Rees \& A J Chipperfield, {\it MERS (MSG and ERR )
-\dash\ Message and Error Reporting Systems}, 
+\dash\ Message and Error Reporting Systems},
 \xref{Starlink User Note 104}{sun104}{}
 \end{thebibliography}
 
@@ -1261,7 +1261,7 @@ MAG\_WTM --   Write tape mark
    Annul all tape descriptors
 }{
    \sstdescription{
-      MAG\_ANNUL is performed for all open tape devices which were obtained 
+      MAG\_ANNUL is performed for all open tape devices which were obtained
       with MAG\_ASSOC.
       The associated parameters are not cancelled.
    }
@@ -1763,7 +1763,7 @@ MAG\_WTM --   Write tape mark
    Cancel all tape devices.
 }{
    \sstdescription{
-      MAG\_CANCL is performed for all open tape devices which were obtained 
+      MAG\_CANCL is performed for all open tape devices which were obtained
       with MAG\_ASSOC and the associated parameters are cancelled.
    }
    \sstinvocation{
@@ -1922,13 +1922,13 @@ MAG\_\_BADSS  \dash\ System Service Failed
 \section{\xlabel{use_of_mag_on_vms}\label{vax}Use of MAG on VMS}
 
 The MAG library was originally developed as part of the ADAM environment on
-VAX/VMS and is still available there. However, development of the VMS system 
+VAX/VMS and is still available there. However, development of the VMS system
 has ceased and the Unix system described in this document has already diverged
 from it.
 This appendix describes current differences.
 
 \subsection{\xlabel{device_dataset_names}Device Dataset Names}
-The system-wide device dataset on VMS is required and is defined by the 
+The system-wide device dataset on VMS is required and is defined by the
 logical name DEVDATASET.
 The user's device dataset is defined by the logical name USRDEVDATA.
 
@@ -1936,25 +1936,25 @@ The user's device dataset is defined by the logical name USRDEVDATA.
 This section deals with how to allocate and mount tape devices. It is only
 relevant to VMS as these concepts do not apply on Unix.
 
-The multi-process nature of normal ADAM working and the rules associated 
+The multi-process nature of normal ADAM working and the rules associated
 with device allocation and mounting in VMS can result in confusion.
 
 A simple strategy is to ALLOCATE the tape deck and MOUNT/FOREIGN the
-tape using DCL in the top-level process before entering any user-interface 
-such as ICL (ICL also provides MOUNT and DISMOUNT commands in the 
-top-level process). 
-The advantage of using DCL's ALLOCATE command is that generic device names 
+tape using DCL in the top-level process before entering any user-interface
+such as ICL (ICL also provides MOUNT and DISMOUNT commands in the
+top-level process).
+The advantage of using DCL's ALLOCATE command is that generic device names
 may be specified.
 
-Unfortunately, if MAG\_MOUNT is not used to mount the tape, the position 
+Unfortunately, if MAG\_MOUNT is not used to mount the tape, the position
 information in the MAG common block following the MAG\_ASSOC call may be
 incorrect.
-If absolute tape positions are not required, this presents no problems; 
-however, if absolute tape positions are to be used, special action must be 
+If absolute tape positions are not required, this presents no problems;
+however, if absolute tape positions are to be used, special action must be
 taken to ensure that the MAG package knows the correct position of the tape.
-MAG\_REW as the first operation after MAG\_ASSOC in the task will ensure that 
+MAG\_REW as the first operation after MAG\_ASSOC in the task will ensure that
 the position is correct, but the preferred method is to mount the tape by
-running the TAPEMOUNT task (which calls MAG\_MOUNT) from DCL in the top-level 
+running the TAPEMOUNT task (which calls MAG\_MOUNT) from DCL in the top-level
 process. For example:
 
 \small
@@ -1974,7 +1974,7 @@ The parameters of TAPEMOUNT are:
 \item[ACMODE] \hspace{5mm} The required access mode ('READ' or 'WRITE')
 \end{description}
 
-When the user has finished with the tape, it may be dismounted using the 
+When the user has finished with the tape, it may be dismounted using the
 TAPEDISM task (which calls MAG\_DISM).
 
 {\em E.g.}
@@ -1998,7 +1998,7 @@ even if the mounting process is killed.
 
 \subsection{\xlabel{compiling_and_linking_on_vms}Compiling and Linking on VMS}
 
-Logical names defining the MAG INCLUDE files are defined 
+Logical names defining the MAG INCLUDE files are defined
 
 To link an ADAM program with the MAG libraries, include ADAM\_LIB:MAGLINK/OPT
 in the link command.
@@ -2017,12 +2017,12 @@ created in the current directory and the system-wide device dataset was assumed
 to be {\tt /star/etc/devdataset.sdf}.
 
 The users device dataset may now be defined by environment variable USRDEVDATA
-and will default to {\tt USRDEVDATA.sdf} in the user's 
+and will default to {\tt USRDEVDATA.sdf} in the user's
 \xref{ADAM\_USER directory}{sun144}{ADAM_USER_directory}\latex{ (see SUN/144)}.
 
-System-wide device datasets are not necessary for Version 2.0 onwards but 
+System-wide device datasets are not necessary for Version 2.0 onwards but
 should be retained until all programs using MAG have been re-linked.
-A search path for the dataset may be defined in environment variable 
+A search path for the dataset may be defined in environment variable
 DEVDATASET, otherwise a standard search path will be used.
 
 The system will now assume that user and system names for devices are the

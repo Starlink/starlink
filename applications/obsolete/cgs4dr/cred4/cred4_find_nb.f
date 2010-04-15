@@ -3,7 +3,7 @@
 *    Description :
 *     This routine finds (maps) each of the required items in the
 *     noticeboard and stored the ID for each item in a common block.
-*     (All the items are found at once in this routine because 
+*     (All the items are found at once in this routine because
 *     NBS_FIND_ITEM is relatively slow, and it is more efficient to
 *     find items only once at the beginning).
 *    Invocation :
@@ -46,7 +46,7 @@
 *      2-Feb-1991: ADD_IN_PAIRS and ERRORS parameters added,
 *                  so that OBJECT and SKY observations can be
 *                  added together in pairs. It has been discovered
-*                  that the only way to sky-subtract reliably 
+*                  that the only way to sky-subtract reliably
 *                  is to add pairs in this way.                (UKIRT::SMB)
 *     26-Jun-1991: Add point_source_options                    (UKIRT::PND)
 *     31-Jul-1991: BOXSIZE parameter added.                    (SMB)
@@ -162,7 +162,7 @@
       CALL NBS_FIND_ITEM( REDUCTION_TOPID, 'EXTRACT_SPC', EXTRACT_SPC_TOPID, STATUS )
       CALL NBS_FIND_ITEM( REDUCTION_TOPID, 'AUTOFIT', AUTOFIT_TOPID, STATUS )
 
-*   Find all the EXECUTE items within these structures and 
+*   Find all the EXECUTE items within these structures and
 *   remember the IDs for these in the common block. (Note that,
 *   for a data reduction step, the ID called XXX_ID refers to
 *   the EXECUTE item with the XXX structure rather than the XXX
@@ -249,7 +249,7 @@
 *   flags which are used to control the execution of CRED4,
 *   and which CRED4 can use to signal the data reduction status
 *   to the outside world.
-      CALL NBS_FIND_ITEM( NB_TOPID, 'FLAGS', FLAGS_TOPID, STATUS ) 
+      CALL NBS_FIND_ITEM( NB_TOPID, 'FLAGS', FLAGS_TOPID, STATUS )
 
 *   Find the flags within this structure.
        IF ( STATUS .EQ. SAI__OK .AND. VERBOSE ) CALL MSG_OUT(' ', 'Finding flag items', STATUS )

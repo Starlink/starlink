@@ -1,8 +1,8 @@
-      SUBROUTINE ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, CONCAT, 
-     :                     REGVAL, MASK, LBNDI, UBNDI, LBNDE, UBNDE, 
-     :                     STATUS ) 
-*+ 
-*  Name: 
+      SUBROUTINE ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, CONCAT,
+     :                     REGVAL, MASK, LBNDI, UBNDI, LBNDE, UBNDE,
+     :                     STATUS )
+*+
+*  Name:
 *     ARD_WORK
 
 *  Purpose:
@@ -18,7 +18,7 @@
 *  Description:
 *     This routine returns an array which contains a positive value
 *     for all pixels within the areas specified by a given ARD
-*     description, and zero for all other pixels. 
+*     description, and zero for all other pixels.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -33,7 +33,7 @@
 *        The co-efficients of the mapping from application co-ordinates
 *        (i.e. default user coordinates) to pixel co-ordinates. If the
 *        first element is equal to VAL__BADR, then a unit mapping is used.
-*        This argument is ignored if a call to ARD_WCS has already been 
+*        This argument is ignored if a call to ARD_WCS has already been
 *        made to establish WCS Information.
 *     CONCAT = LOGICAL (Given)
 *        If .TRUE., then an INPUT keyword is inserted at the start of
@@ -41,32 +41,32 @@
 *        already contain any INPUT keywords. If .FALSE., the ARD
 *        description is left as supplied.
 *     REGVAL = INTEGER (Given and Returned)
-*        A positive integer to use to represent the first keyword in 
-*        the ARD description (excluding INPUT keywords). An error is 
-*        reported if the value 1 is supplied. If the supplied value is 
-*        negative or zero, then the value used is one greater than the 
+*        A positive integer to use to represent the first keyword in
+*        the ARD description (excluding INPUT keywords). An error is
+*        reported if the value 1 is supplied. If the supplied value is
+*        negative or zero, then the value used is one greater than the
 *        maximum pixel value supplied in MASK (except that 2 is used if
-*        the maximum mask value is 1 or less). On return, REGVAL holds 
+*        the maximum mask value is 1 or less). On return, REGVAL holds
 *        one more than the largest value used to represent any of the
 *        keywords in the ARD description.
 *     MASK( * ) = INTEGER (Given and Returned)
 *        The mask array. Any negative values in the supplied array are
 *        treated as zero.
 *     LBNDI( NDIM ) = INTEGER (Returned)
-*        The lower pixel bounds of a box which encompasses all internal 
+*        The lower pixel bounds of a box which encompasses all internal
 *        pixels. If there are no internal pixels in the returned mask,
-*        each lower bound is returned greater than the corresponding 
+*        each lower bound is returned greater than the corresponding
 *        upper bound.
 *     UBNDI( NDIM ) = INTEGER (Returned)
-*        The upper pixel bounds of a box which encompasses all internal 
+*        The upper pixel bounds of a box which encompasses all internal
 *        pixels.
 *     LBNDE( NDIM ) = INTEGER (Returned)
-*        The lower pixel bounds of a box which encompasses all external 
+*        The lower pixel bounds of a box which encompasses all external
 *        pixels. If there are no external pixels in the returned mask,
-*        each lower bound is returned greater than the corresponding 
+*        each lower bound is returned greater than the corresponding
 *        upper bound.
 *     UBNDE( NDIM ) = INTEGER (Returned)
-*        The upper pixel bounds of a box which encompasses all external 
+*        The upper pixel bounds of a box which encompasses all external
 *        pixels.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -86,12 +86,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -116,7 +116,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,7 +149,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :  DLBND( ARD__MXDIM ),     ! Lower bounds of pixel coords
      :  DUBND( ARD__MXDIM )      ! Upper bounds of pixel coords
 
@@ -167,7 +167,7 @@
      :  IPUSTI                   ! stack of int. box upper bounds
 
       INTEGER
-     :  AWCS,                    ! WCS Frameset supplied by application 
+     :  AWCS,                    ! WCS Frameset supplied by application
      :  IWCS,                    ! pixel->user FrameSet
      :  I,                       ! Loop count
      :  INDEX1,                  ! Index for 1st keyword
@@ -212,7 +212,7 @@
       DO I = 1, NDIM
          MSKSIZ = MSKSIZ*( UBND( I ) - LBND( I ) + 1 )
       END DO
-      
+
 *  If a zero or negative value has been supplied for REGVAL, find the
 *  maximum value in the supplied mask and limit it to be at least 2.
 *  This value will be used to represent the first keyword in the ARD
@@ -231,11 +231,11 @@
       END IF
 
 *  Create an AST FrameSet describing the known coordinate Frames. The
-*  base Frame of this FrameSet will be pixel coords within the pixel 
-*  mask, and the current Frame will be "Application co-ordinates" (i.e. 
+*  base Frame of this FrameSet will be pixel coords within the pixel
+*  mask, and the current Frame will be "Application co-ordinates" (i.e.
 *  the default user coordinate system). This Frame wil have Domain ARDAPP.
-*  The FrameSet may also contain other Frames specified using the ARD_WCS 
-*  routine. 
+*  The FrameSet may also contain other Frames specified using the ARD_WCS
+*  routine.
       CALL ARD1_APWCS( NDIM, TRCOEF, AWCS, STATUS )
 
 *  Get work space to hold the algebraic Boolean expression
@@ -260,7 +260,7 @@
 *  included in the ARD description. The returned expression corresponds
 *  to the ARD description as supplied (i.e. no implicit .OR.s are
 *  inserted).
-      CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, IPOPND, 
+      CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, IPOPND,
      :                 SZEXPR, SZOPND, INP, IWCS, STATUS )
 
 *  Abort if an error has occured.
@@ -281,7 +281,7 @@
 *  if there were no INPUT keywords in the supplied ARD description and
 *  if the CONCAT argument is .TRUE.
       CALL ARD1_CHECK( ( (.NOT. INP) .AND. CONCAT ), SZEXPR,
-     :                 %VAL( CNF_PVAL( IPEXPR ) ), OUTSIZ, 
+     :                 %VAL( CNF_PVAL( IPEXPR ) ), OUTSIZ,
      :                 %VAL( CNF_PVAL( IPEXP2 ) ), STATUS )
 
 *  Get work space needed to convert the algebraic expression to reverse
@@ -291,9 +291,9 @@
       CALL PSX_CALLOC( OUTSIZ, '_INTEGER', IPOPCO, STATUS )
 
 *  Convert the algebraic expression to reverse polish form.
-      CALL ARD1_ALTRP( OUTSIZ, %VAL( CNF_PVAL( IPEXP2 ) ), 
+      CALL ARD1_ALTRP( OUTSIZ, %VAL( CNF_PVAL( IPEXP2 ) ),
      :                 %VAL( CNF_PVAL( IPSTK ) ),
-     :                 %VAL( CNF_PVAL( IPASTK ) ), 
+     :                 %VAL( CNF_PVAL( IPASTK ) ),
      :                 %VAL( CNF_PVAL( IPOPCO ) ), MXSTK, STATUS )
 
 *  Abort if an error has occured.
@@ -309,12 +309,12 @@
 
 *  Evaluate the ARD expression.
       CALL ARD1_EVAL( INDEX1, NDIM, LBND, UBND, OUTSIZ, SZOPND, MXSTK,
-     :                MSKSIZ, %VAL( CNF_PVAL( IPOPCO )), 
+     :                MSKSIZ, %VAL( CNF_PVAL( IPOPCO )),
      :                %VAL( CNF_PVAL( IPOPND ) ),
-     :                %VAL( CNF_PVAL( IPMSTK ) ), 
-     :                %VAL( CNF_PVAL( IPLSTE ) ), 
+     :                %VAL( CNF_PVAL( IPMSTK ) ),
+     :                %VAL( CNF_PVAL( IPLSTE ) ),
      :                %VAL( CNF_PVAL( IPUSTE ) ),
-     :                %VAL( CNF_PVAL( IPLSTI ) ), 
+     :                %VAL( CNF_PVAL( IPLSTI ) ),
      :                %VAL( CNF_PVAL( IPUSTI ) ), MASK, LBNDE,
      :                UBNDE, LBNDI, UBNDI, REGVAL, STATUS )
 
@@ -354,7 +354,7 @@
 
 *  Arrive here if an error occurs.
  999  CONTINUE
-      
+
 *  Attempt to free the work space.
       CALL PSX_FREE( IPMSTK, STATUS )
       CALL PSX_FREE( IPLSTE, STATUS )

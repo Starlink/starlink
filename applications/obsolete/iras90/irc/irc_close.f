@@ -74,8 +74,8 @@
 *  Begin a new error reporting environment.
       CALL ERR_BEGIN( STATUS )
 
-*  Annul all the currently valid entries. This involves annuling the 
-*  locators to the IRAS NDF extension, the CRDD_INFO object, clearing 
+*  Annul all the currently valid entries. This involves annuling the
+*  locators to the IRAS NDF extension, the CRDD_INFO object, clearing
 *  out pointing information, and releasing the IRC identifier.
       DO I = 1, IRC__MAX
 
@@ -84,7 +84,7 @@
             CALL DAT_ANNUL( CCM_CRDDL( I ), STATUS )
 
 *  If either of the locators were invalid (as caused for instance by
-*  the NDF container file previously having been closed), annul the 
+*  the NDF container file previously having been closed), annul the
 *  error.
             IF( STATUS .EQ. DAT__LOCIN ) CALL ERR_ANNUL( STATUS )
 

@@ -319,7 +319,7 @@
                                SCHI = -.2992 - .0528*EPS
                                COSS = COS
      :                         (PI*(1.93766+SMU+SCHI))
-                               GS = 0.8927 + 0.983*EPS - 
+                               GS = 0.8927 + 0.983*EPS -
      :                         0.688*EPS**2
                                S = (GS*COSS)**2
                                DMU = 0.00295 + 0.007*EPS

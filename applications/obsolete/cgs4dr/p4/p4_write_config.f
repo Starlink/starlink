@@ -33,7 +33,7 @@
      :  VERSION,                 ! Software version id
      :  MACHINE,                 ! Machine type
      :  CALTIME,                 ! Calendar time
-     :  TMPSTR                   ! Temporary string   
+     :  TMPSTR                   ! Temporary string
       CHARACTER*1
      :  CVAL                     ! Character string used for encoding
       INTEGER
@@ -77,10 +77,10 @@
       CALL PSX_CUSERID( USER, STATUS )
       CALL PSX_TIME( NTICKS, STATUS )
       CALL PSX_CTIME( NTICKS, CALTIME, STATUS )
-      CALL PSX_UNAME( SYSNAM, NODENAME, 
+      CALL PSX_UNAME( SYSNAM, NODENAME,
      :   RELEASE, VERSION, MACHINE, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :     'Unable to obtain PoSiX information '/
      :     /'(error ignored)', STATUS )
          CALL ERR_ANNUL( STATUS )
@@ -96,8 +96,8 @@
      :   / CALTIME(1:CHR_LEN(CALTIME))
       CALL FIO_WRITE( LUN, COMMENT(1:CHR_LEN(COMMENT)), STATUS )
       COMMENT = '{ Written under ' // SYSNAM(1:CHR_LEN(SYSNAM)) // ' / '
-     :   // RELEASE(1:CHR_LEN(RELEASE)) // ' / ' 
-     :   // VERSION(1:CHR_LEN(VERSION)) // ' / ' 
+     :   // RELEASE(1:CHR_LEN(RELEASE)) // ' / '
+     :   // VERSION(1:CHR_LEN(VERSION)) // ' / '
      :   // MACHINE(1:CHR_LEN(MACHINE)) // ' '
       CALL FIO_WRITE( LUN, COMMENT(1:CHR_LEN(COMMENT)), STATUS )
       COMMENT = '{ -'

@@ -25,8 +25,8 @@ C  Call:
 C     CALL PAR_RDVAL (NAME,VMIN,VMAX,RESET,UNITS,VALUE)
 C
 C  Parameters:      (">" input, "<" output )
-C     (>) NAME      (Fixed string, descr) The name of the parameter.  
-C                   Should be terminated by a blank or the end of the 
+C     (>) NAME      (Fixed string, descr) The name of the parameter.
+C                   Should be terminated by a blank or the end of the
 C                   string.  Case is not significant.
 C     (>) VMIN      (Real, ref) The minimum valid value for the parameter.
 C     (>) VMAX      (Real, ref) The maximum valid value for the parameter.
@@ -60,7 +60,7 @@ C                     ICH_CF replaces ICH_ENCODE for encoding of default
 C                     value - allows automatic setting of precision.
 C     5th  Sep 1988   KS / AAO.  Support for parameter abort added.
 C     8th  Dec 1989   KS / AAO.  Comments reformatted.
-C     4th  Mar 1991   KS / AAO.  Added support for repeated values 
+C     4th  Mar 1991   KS / AAO.  Added support for repeated values
 C                     read from parameter value files.
 C     8th  Mar 1991   KS / AAO.  Fixed bug introduced in way common values
 C                     are set.

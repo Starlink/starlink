@@ -100,7 +100,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
 
 *  Create a new output NDF based on the input NDF. Propagate the WCS, axis,
 *  quality, units and variance components.
-      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality,Units,Variance', 'OUT', 
+      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality,Units,Variance', 'OUT',
      :               NDF2, STATUS )
 
 *  Determine which data type to use to process the input data array.
@@ -156,40 +156,40 @@
 *  Select the appropriate routine for the data type being processed and
 *  add the constant to the data array.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_CADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_CADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                     CONST,
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_CADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_CADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_CADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                     CONST,
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     NERR, STATUS )
       END IF
 
@@ -205,7 +205,7 @@
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDF2, 'Title', STATUS )
-      
+
 *  End the NDF context.
       CALL NDF_END( STATUS )
 

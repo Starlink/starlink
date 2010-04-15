@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHI_HCRECAT( INPUT, ESTNUMENTS, 
+     : CHI_HCRECAT( INPUT, ESTNUMENTS,
      :             NUMFLDS, FNAMES, FFORMATS, FUNITS, FCOMMENTS,
      :             STATUS)
 
@@ -17,7 +17,7 @@
       INCLUDE 'CHIH_ERR'         ! CHI_HDS error codes
 
 *  Arguments Given:
-      
+
       CHARACTER*(*)     INPUT
       INTEGER           ESTNUMENTS
       INTEGER           NUMFLDS
@@ -35,9 +35,9 @@
       INTEGER  I, NUMENTSCRE, LINENO, PT, CLENGTH
       CHARACTER*(DAT__SZTYP)  DTYPE
       CHARACTER*(1)           FLDTYPES(   CHI__NUMCOLS)
-      
+
 *.
-      
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -65,7 +65,7 @@
      :             FFORMATS(I)(1:1) .EQ. 'E'     ) THEN
                DTYPE = '_REAL'
                FLDTYPES(I) = 'R'
-           ELSEIF( FFORMATS(I)(1:1) .EQ. 'D') THEN  
+           ELSEIF( FFORMATS(I)(1:1) .EQ. 'D') THEN
                DTYPE = '_DOUBLE'
                FLDTYPES(I) = 'D'
            ELSEIF( FFORMATS(I)(1:1) .EQ. 'L') THEN
@@ -80,7 +80,7 @@
            ENDIF
 
           CALL TBL_NEWCOL( CHIH_LOC( 1, CATNO), FNAMES(I), FUNITS(I),
-     +                      FFORMATS(I), FCOMMENTS(I), 
+     +                      FFORMATS(I), FCOMMENTS(I),
      +                      DTYPE, STATUS )
 
           CHIH_NUMFLDS(CATNO) = CHIH_NUMFLDS(CATNO) + 1

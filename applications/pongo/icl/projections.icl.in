@@ -61,8 +61,8 @@ YSCALE 1.7453292E-2
 {  Select a viewport in the top left-hand corner.
 VP_TL
 
-{  Get the limits from the data using the AITOFF projection, note that the 
-{  RA centre is specified in the form of hh:mm:ss.sss and that below is 
+{  Get the limits from the data using the AITOFF projection, note that the
+{  RA centre is specified in the form of hh:mm:ss.sss and that below is
 {  understood to mean 12 hours.
 DLIMITS PROJECTION=AITOFF RACENTRE=12 DECCENTRE=0
 
@@ -96,17 +96,17 @@ VP_BL
 LIMITS -4.0 4.0 -4.0 4.0 PROJECTION=TAN RACENTRE=0 DECCENTRE=30
 WNAD
 MTEXT T 1.0 0.5 0.5 'TAN centre \ga=0\uh\d \gd=30\(2729)'
-GRID 
+GRID
 PEN 6
 POINTS
 
 {  Plot the data in the bottom right-hand corner in an arc projection.
 PEN 1
 VP_BR
-LIMITS -3.1 3.1 -3.1 3.1 PROJECTION=ARC RACENTRE=12 
+LIMITS -3.1 3.1 -3.1 3.1 PROJECTION=ARC RACENTRE=12
 WNAD
 MTEXT T 1.0 0.5 0.5 'ARC centre \ga=12\uh\d \gd=30\(2729)'
-GRID 
+GRID
 PEN 6
 POINTS
 

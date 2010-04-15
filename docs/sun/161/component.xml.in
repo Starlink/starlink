@@ -11,7 +11,7 @@
      of Starlink's ADAM environment, which provides multi-platform availability
      of both data and the programs to process it, and the user friendly interface of
      the parameter entry system.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

@@ -96,20 +96,20 @@ textsw_next( /* textsw */ );
 	Textsw		textsw;
 #							endif
 
-extern void 
-textsw_reset( /* abstract, locx, locy */ ); 
+extern void
+textsw_reset( /* abstract, locx, locy */ );
 #							ifdef notdef
 	Textsw 		abstract;
-	int		locx; 
-	int		locy; 
+	int		locx;
+	int		locy;
 #							endif
 
-extern void 
+extern void
 textsw_file_lines_visible( /* abstract, top, bottom */ );
 #							ifdef notdef
- 
-	Textsw 		abstract; 
-	int 		*top; 
+
+	Textsw 		abstract;
+	int 		*top;
 	int 		*bottom;
 #							endif
 
@@ -392,7 +392,7 @@ typedef enum {
 
 
 /* fields flags */
-#define	TEXTSW_NOT_A_FIELD		0	/* This tells the field code don't do the search, only do a match.  */	
+#define	TEXTSW_NOT_A_FIELD		0	/* This tells the field code don't do the search, only do a match.  */
 #define	TEXTSW_FIELD_FORWARD		1
 #define	TEXTSW_FIELD_BACKWARD		2
 #define	TEXTSW_FIELD_ENCLOSE		3

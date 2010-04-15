@@ -13,7 +13,7 @@
 
  * Invocation:
  *    status = shl_standalone( helplb, isenv, argc, argv );
- 
+
  * Arguments:
  *    helplb = char * (Given)
  *       Name of default help library to open. There must be a corresponding
@@ -44,7 +44,7 @@
  *    The following description assumes this library function is
  *    called as described below by a thin calling routine from main.
  *    The application itself has been factored into a subroutine to simplify
- *    code re-use. Whenever "application" is used it refers to this 
+ *    code re-use. Whenever "application" is used it refers to this
  *    library function. The usage described above is assumed since this
  *    module process the command line arguments.
  *
@@ -97,7 +97,7 @@
  *
  *    #include "shl.h"
  *    void main( int argc, char **argv )
- *    { 
+ *    {
  *       (void) shl_standalone( "KAPPA", 1, argc, argv );
  *    }
  *
@@ -131,12 +131,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -162,7 +162,7 @@
  *    01 Nov 2006 (TIMJ):
  *       Use C interface to Fortran routines.
 
- * Bugs: 
+ * Bugs:
  *    {Enter_new_bugs_here}
 
  *-
@@ -209,13 +209,13 @@ int shl_standalone( char * help_library, int isenv, int argc, char **argv )
  * Set parameter counter (i) such that argv[i] is first topic word.
  */
    if ( argv[1] && !strcmp( "-l", argv[1] ) )      /* library is in argv[2] */
-   {  
+   {
 
      shlTrnvar( argv[2], isenv, libra, LENSTR, &status );
      i = 3;
    }
    else                               /* library is in environment variable */
-   {  
+   {
      if ( help_library == NULL ) {
        /* make sure we have a string */
        /* This should be an SHL error ! */
@@ -238,7 +238,7 @@ int shl_standalone( char * help_library, int isenv, int argc, char **argv )
       (void) strncat( topic, " ",     nleft ); nleft--;
    }
 
-   /* Call the SHL routine for the actual help functionality 
+   /* Call the SHL routine for the actual help functionality
       (force interactive) */
    shlGethlp(libra, topic, 1, &status );
 

@@ -20,7 +20,7 @@ C
 C     LISTING   The name of the text file in which the information
 C               will be listed
 C
-C     Command Keywords - 
+C     Command Keywords -
 C
 C
 C     FULL      By default 80 character listing records are produced.
@@ -32,7 +32,7 @@ C+
 C
 C     Dynamic memory include file - defines DYNAMIC_MEM
 C
-      INCLUDE 'DYNAMIC_MEMORY'      
+      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Constants
 C
@@ -150,10 +150,10 @@ C
 C     Output column headings
 C
                      CALL FIO_WRITE ( FD, ' ', STATUS )
-                         HEAD1 = 
+                         HEAD1 =
      :                  ' Obs  Object      UT start'//
      :                  ' Exptime Grating  Lambda Filter Mode '//
-     :                  ' Airmass Group   ' 
+     :                  ' Airmass Group   '
                      IF (FULL) THEN
                         HEADER = HEAD1//' Ord Slit   '//
      :                   '     R.A.          Dec        Eqnx      '
@@ -215,7 +215,7 @@ C
      :                '':'',I2.2,'':'',I2.2,'' '',F7.3,'' '',A8,'' '',
      :                F6.4,'' '',A6,A7,'' '',F5.3'' '',I5)')
      :                OBS,OBJECT,UTH,UTM,UTS,EXP,GRAT,LAMBDA,
-     :                FIL,MODE,AIRMASS,GROUP      
+     :                FIL,MODE,AIRMASS,GROUP
 
                   IF (FULL) THEN
                      WRITE(OBSREC(81:132),'(I3,'' '',A10,
@@ -223,7 +223,7 @@ C
      :                ''  '',A1,I2.2,'':'',I2.2,'':'',I2.2,''.'',I1,
      :                ''  '',F7.1)')
      :                  ORDER,SLIT,IRA(1),IRA(2),IRA(3),IRA(4),
-     :                  SIGN,IDEC(1),IDEC(2),IDEC(3),IDEC(4),MEQNX    
+     :                  SIGN,IDEC(1),IDEC(2),IDEC(3),IDEC(4),MEQNX
                   ENDIF
                   STATUS=0
                   CALL DSA_CLOSE_STRUCTURE('INPUT',STATUS)

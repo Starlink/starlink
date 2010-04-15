@@ -9,8 +9,8 @@ C     Parameters -   (">" input, "<" output)
 C
 C     (>) BYTES (Integer, ref) The number of bytes to be filled.
 C     (>) VALUE (Byte, ref) The value to be placed in each byte
-C               of ARRAY. 
-C     (<) ARRAY (Array of any type, ref) The array to be 
+C               of ARRAY.
+C     (<) ARRAY (Array of any type, ref) The array to be
 C               filled.
 C
 C     History:
@@ -27,5 +27,5 @@ C
       INTEGER I
       DO 10 I=1,BYTES
          ARRAY(I)=VALUE
-10    CONTINUE 
+10    CONTINUE
       END

@@ -17,7 +17,7 @@
       INTEGER SJBRKS(200)              ! Stack data break points
       INTEGER SNBRKS                   ! Number of stack break points
       CHARACTER*(*) TITLE              ! Associated character string
-      CHARACTER*79 STITLE, TITLEB      ! Temporary character string 
+      CHARACTER*79 STITLE, TITLEB      ! Temporary character string
 *    Status :
       LOGICAL OK                       ! Whether DECODE completed OK
 *    Local constants :
@@ -41,14 +41,14 @@
       DOUBLE PRECISION RE(0:(ARMAX-1))        ! array of real part of transform
       DOUBLE PRECISION IM(0:(ARMAX-1))        ! array of imaginary part of transform
       DOUBLE PRECISION PS(0:(ARMAX-1))        ! array of power spectrum
-      REAL REIX(ARMAX), REIY(ARMAX)           ! real versions of EIX, EIY 
+      REAL REIX(ARMAX), REIY(ARMAX)           ! real versions of EIX, EIY
       REAL RFREQ(ARMAX)                ! real version of FREQ
       REAL RRE(ARMAX)                  ! real version of RE
       REAL RIM(ARMAX)                  ! real version of IM
       REAL RPS(ARMAX)                  ! real version of PS
-      DOUBLE PRECISION PMASK           ! Proportion of data either end to be 
-     +                                 !    masked with a cosine bell 
-      REAL XDIFF, DIFMAX, DIFMIN       ! used to test for constant abscissal spacing 
+      DOUBLE PRECISION PMASK           ! Proportion of data either end to be
+     +                                 !    masked with a cosine bell
+      REAL XDIFF, DIFMAX, DIFMIN       ! used to test for constant abscissal spacing
       INTEGER SAVM                     ! save mode marker (which Fourier data to save)
       LOGICAL INTFLG                   ! Whether or not to interpolate data
       REAL FC, FAC                     ! Temporary FTFILTER variables
@@ -73,7 +73,7 @@ C  Command FTRANS
 C
       IF (CMD.EQ.'FTRANS') THEN
          VALUES (2) = 0.05
-         CALL DECODE (CMD, PARAMS, 1, 2, VALUES, 
+         CALL DECODE (CMD, PARAMS, 1, 2, VALUES,
      :   'Entry ',OK)
          IF (OK) THEN
            INDEX = NINT(VALUES(1))
@@ -105,8 +105,8 @@ C
            STITLE = ' Shifted endmasked data '
            TITLEB = ' Endmasked data: shift removed '
 C
-C  Should data be interpolated ? 
-C  Find smallest and largest interval in the abscissal array (DIFMIN 
+C  Should data be interpolated ?
+C  Find smallest and largest interval in the abscissal array (DIFMIN
 C and DIFMAX respectively).
 C  IF (DIFMAX-DIFMIN)/DIFMAX is not negligible, the data is not evenly
 C spaced and must be interpolated.
@@ -114,7 +114,7 @@ C
            DIFMAX = 1.0E-35
            DIFMIN = 1.0E+35
            DO 3, I = 2, NPTS
-             XDIFF = SJX(I) - SJX(I-1)                     
+             XDIFF = SJX(I) - SJX(I-1)
              IF (ABS(SJX(I)).GE.1.0E-30) THEN
               IF ((XDIFF/ABS(SJX(I))).LT.-1.0E-06) THEN
                WRITE(*,*)'   FTRANS: abscissae not in increasing order'
@@ -127,7 +127,7 @@ C
              ENDIF
              IF (XDIFF.LT.DIFMIN) THEN
                DIFMIN = XDIFF
-             ENDIF                      
+             ENDIF
     3      CONTINUE
            IF ( ABS((DIFMAX-DIFMIN)/DIFMAX).GT.1.0E-02 ) THEN
              WRITE(*,*) '   FTRANS: data are unevenly spaced '
@@ -135,7 +135,7 @@ C
              STITLE = ' Interpolated, shifted, endmasked data '
              TITLEB = ' Interpolated, endmasked data: shift removed '
            ELSE
-             WRITE(*,*) '   FTRANS: data are evenly spaced: will not 
+             WRITE(*,*) '   FTRANS: data are evenly spaced: will not
      + interpolate'
              INTFLG = .FALSE.
            ENDIF
@@ -174,10 +174,10 @@ C
            SNBRKS = 1
            SJBRKS(1) = NPTS
            SWORV = SHIX(1)
-           STITLE = ' Real part of Fourier Transform (RE) '  
+           STITLE = ' Real part of Fourier Transform (RE) '
            CALL UPUSH (ASIZE, RFREQ, RRE, NPTS, BSIZE, SJBRKS, SNBRKS,
      +                 STITLE, SWORV, OK)
-           STITLE = ' Imaginary part of Fourier Transform (IM) '  
+           STITLE = ' Imaginary part of Fourier Transform (IM) '
            CALL UPUSH (ASIZE, RFREQ, RIM, NPTS, BSIZE, SJBRKS, SNBRKS,
      +                 STITLE, SWORV, OK)
            STITLE = ' Power Spectrum = SQRT( RE**2 + IM**2 ) '
@@ -235,13 +235,13 @@ C
            SJBRKS(1) = NPTS
            STITLE = 'Filtered Real part of Fourier Transform'
            CALL UPUSH (ASIZE, RFREQ, RRE, NPTS, BSIZE, SJBRKS, SNBRKS,
-     + STITLE, SWORV, OK) 
+     + STITLE, SWORV, OK)
            STITLE = 'Filtered Imaginary part of Fourier Transform'
            CALL UPUSH (ASIZE, RFREQ, RIM, NPTS, BSIZE, SJBRKS, SNBRKS,
-     + STITLE, SWORV, OK) 
+     + STITLE, SWORV, OK)
            STITLE ='Weighting Function used to filter Fourier Transform'
            CALL UPUSH (ASIZE, RFREQ, RPS, NPTS, BSIZE, SJBRKS, SNBRKS,
-     + STITLE, SWORV, OK) 
+     + STITLE, SWORV, OK)
          ELSE
    20      CONTINUE
          ENDIF
@@ -282,7 +282,7 @@ C
            DO 27, I=1,NPTS
              SJX(I) = SNGL(DX(I))
              SJY(I) = SNGL(DY(I))
-   27      CONTINUE     
+   27      CONTINUE
            SWORV = 1.0
            STITLE = 'Restored data (Fourier inversion) '
            ASIZE = ARMAX
@@ -290,19 +290,19 @@ C
            SNBRKS = 1
            SJBRKS(1) = NPTS
            CALL UPUSH (ASIZE, SJX, SJY, NPTS, BSIZE, SJBRKS, SNBRKS,
-     + STITLE, SWORV, OK)        
+     + STITLE, SWORV, OK)
          ELSE
    30      CONTINUE
          ENDIF
 C
 C  Command PERIGRAM:- obtain the Periodogram (Scargle, 1982, ApJ 263:835)
-C of the data in the current arrays and place the Periodogram in the current 
+C of the data in the current arrays and place the Periodogram in the current
 C arrays
 C
       ELSEIF (CMD.EQ.'PDGRAM') THEN
          IF (NPT .GT. ARMAX) THEN
            WRITE(*,*) '    PDGRAM: too many datum points '
-           OK = .FALSE.    
+           OK = .FALSE.
            GOTO 31
          ENDIF
          VALUES(4) = 0.05
@@ -310,10 +310,10 @@ C
          VALUES (1) = 0.0
          VALUES (2) = TSTVAL
          VALUES (3) = TSTVAL
-         CALL DECODE (CMD, PARAMS, 0, 4, VALUES, 
+         CALL DECODE (CMD, PARAMS, 0, 4, VALUES,
      :    ' ',OK)
-         IF (.NOT.OK) GOTO 31 
-         PMASK = DBLE( VALUES(4) ) 
+         IF (.NOT.OK) GOTO 31
+         PMASK = DBLE( VALUES(4) )
          CHISQ = DBLE( VALUES(1) )
          IF (VALUES(2).EQ.TSTVAL) THEN
             SCAT = DBLE(NPT-1)*0.5D0/(X(NPT)-X(1))
@@ -325,7 +325,7 @@ C
          ELSE
             DWORV = VALUES(3)
          ENDIF
-         IF (VALUES(2).LE.0.0 .OR. VALUES(3).LE.0.0 .OR. 
+         IF (VALUES(2).LE.0.0 .OR. VALUES(3).LE.0.0 .OR.
      :   VALUES(1).LT.0.0) THEN
             WRITE (*,
      :      '(''   PDGRAM:  negative frequencies are nonphysical'')')
@@ -340,18 +340,18 @@ C
          DO I = 1,NPT
            DX(I) = DBLE( X(I) )
            DY(I) = DBLE( Y(I) )
-         ENDDO      
+         ENDDO
          CALL PERIGRAM (DX, DY, NPT, PMASK, CHISQ, SCAT, DWORV,
      +                        X, Y, NPTS, OK)
          IF (OK) THEN
            NPT = NPTS
-           NBRK = 1  
+           NBRK = 1
            BRKS(1) = NPT
            CALL SSTRIP (TITLE)
            TITLE = 'Scargle Periodogram of '//TITLE
          ENDIF
    31    CONTINUE
-       
+
 C
 C  Command WINDOW:- Obtain the window function (Scargle, 1982, ApJ 263:835)
 C of the current X-values and place the window in the current arrays
@@ -359,7 +359,7 @@ C
       ELSEIF (CMD.EQ.'PDGWINDOW') THEN
          IF (NPT .GT. ARMAX) THEN
            WRITE(*,*) '    PDGWINDOW:  too many datum points '
-           OK = .FALSE.    
+           OK = .FALSE.
            GOTO 31
          ENDIF
          VALUES(1) = 0.0
@@ -367,8 +367,8 @@ C
          VALUES(2) = TSTVAL
          VALUES(3) = TSTVAL
          CALL DECODE (CMD, PARAMS, 0, 3, VALUES, ' ', OK)
-         IF (.NOT.OK) GOTO 31 
-         PMASK = DBLE( VALUES(1) ) 
+         IF (.NOT.OK) GOTO 31
+         PMASK = DBLE( VALUES(1) )
          IF (VALUES(2).EQ.TSTVAL) THEN
             CHISQ = 0.5D0*DBLE(NPT-1)/(X(NPT)-X(1))
          ELSE
@@ -398,7 +398,7 @@ C
          VALUES(3) = TSTVAL
          VALUES(4) = TSTVAL
          VALUES(5) = TSTVAL
-         CALL DECODE (CMD, PARAMS, 2, 5, VALUES, 
+         CALL DECODE (CMD, PARAMS, 2, 5, VALUES,
      :   'Entry_1 Entry_2 ',OK)
          IF (OK) THEN
            INDEX = NINT( VALUES(1) )
@@ -464,7 +464,7 @@ C
            CALL UPUSH (ASIZE, REIX, REIY, HOLD, BSIZE, SJBRKS, SNBRKS,
      +                    STITLE, SWORV, OK)
            WRITE(STITLE,'(A7,I4,A12,I4)') 'Entry ',INDEX,' xcor Entry '
-     +                                       ,INDEXB 
+     +                                       ,INDEXB
            ASIZE = ARMAX
            BSIZE = 1
            SNBRKS = 1
@@ -473,7 +473,7 @@ C
      +                    STITLE, SWORV, OK)
          ELSE
    49      CONTINUE
-         ENDIF      
+         ENDIF
 C
 C  Command XCORVEL: convert cross-correlation X-axis from lags (measured in
 C wavelength units) to velocity shifts (measured in kilometers per second).
@@ -486,7 +486,7 @@ C
            COEFS(2) = X(NPT)
            COEFS(3) = (X(NPT)-X(1))/(NPT-1.)
            ORDER = NINT(VALUES(1))
-           IF (NPT.LT.2) GOTO 59 
+           IF (NPT.LT.2) GOTO 59
            NPTS = NPT
            DO I=1,NPTS
              DX(I) = DBLE(X(I))
@@ -500,13 +500,13 @@ C
              X(I) = SNGL(DX(I))
              Y(I) = SNGL(DY(I))
            ENDDO
-           STITLE = TITLE(:30)      
+           STITLE = TITLE(:30)
         WRITE(TITLE,'(A15,I4,1X,A30)')'Lag. Intp. Order = ',ORDER,STITLE
            NBRK = 1
            BRKS(1) = NPT
          ELSE
    59      CONTINUE
-         ENDIF  
+         ENDIF
       ELSEIF (CMD.EQ.'PDGPEAK') THEN
          IF (NPT.LT.3) THEN
            WRITE(*,*) '    PDGPEAK:  too few data points to define peak'

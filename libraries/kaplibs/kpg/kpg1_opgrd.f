@@ -14,11 +14,11 @@
 *     CALL KPG1_OPGRD( NPOS, POS, WEST, PAR, RDIAM, STATUS )
 
 *  Description:
-*     This routine calculates the parameters of a tangent-plane 
-*     projection that gives an optimal representation of a set of 
-*     supplied sky positions. The projection parameters are the normal 
-*     FITS CRPIX1/2, CRVAL1/2, CDELT1/2 and CROTA2 keywords. They are 
-*     chosen in order to maximise the number of sky positions that fall 
+*     This routine calculates the parameters of a tangent-plane
+*     projection that gives an optimal representation of a set of
+*     supplied sky positions. The projection parameters are the normal
+*     FITS CRPIX1/2, CRVAL1/2, CDELT1/2 and CROTA2 keywords. They are
+*     chosen in order to maximise the number of sky positions that fall
 *     close to the centre of a pixel.
 
 *  Arguments:
@@ -30,23 +30,23 @@
 *     WEST = LOGICAL (Given)
 *        If .TRUE., then it is assumed that the X grid axis increases
 *        westwards (assuming north is parallel to +ve Y). This is the
-*        case for most celestial co-ordinate systems such as (RA,Dec) 
-*        etc.  If .FALSE., then it is assumed that the X grid axis 
+*        case for most celestial co-ordinate systems such as (RA,Dec)
+*        etc.  If .FALSE., then it is assumed that the X grid axis
 *        increases eastwards (assuming north is parallel to +ve Y). This
-*        is the case for a few systems such as (az,el) and geographic 
+*        is the case for a few systems such as (az,el) and geographic
 *        (longitude,latitude).
 *     PAR( 7 ) = DOUBLE PRECISION (Given and Returned)
 *        The projection parameters. Each parameter that is supplied with
 *        a value of AST__BAD on entry will be replaced on exit with the
-*        optimal value. Non-bad supplied values will be left unchanged 
-*        on exit. The supplied values will also be left unchanged if 
-*        optimal values cannot be determined. They are stored in the 
-*        order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. 
-*        CRPIX1 and CRPIX2 are in units of pixels. All the other 
+*        optimal value. Non-bad supplied values will be left unchanged
+*        on exit. The supplied values will also be left unchanged if
+*        optimal values cannot be determined. They are stored in the
+*        order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2.
+*        CRPIX1 and CRPIX2 are in units of pixels. All the other
 *        projection parameters will be in units of radians, and refer to
-*        the celestial co-ordinate system in which the POS values are 
-*        supplied. CROTA2 is the angle from the Y axis to celestial 
-*        north, measured north through east (no matter the value of 
+*        the celestial co-ordinate system in which the POS values are
+*        supplied. CROTA2 is the angle from the Y axis to celestial
+*        north, measured north through east (no matter the value of
 *        WEST). Returned pixel sizes are rounded to the nearest tenth of
 *        an arcsecond.
 *     RDIAM = DOUBLE PRECISION (Returned)
@@ -64,12 +64,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -104,7 +104,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -144,7 +144,7 @@
 
 *  Call a subroutine to do the work.
       CALL KPG1_OPGR1( NPOS, POS, WEST, PAR, %VAL( CNF_PVAL( IPAIN ) ),
-     :                 %VAL( CNF_PVAL( IPBIN ) ), 
+     :                 %VAL( CNF_PVAL( IPBIN ) ),
      :                 %VAL( CNF_PVAL( IPXOUT ) ),
      :                 %VAL( CNF_PVAL( IPYOUT ) ), RDIAM, STATUS )
 
@@ -172,15 +172,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_OPGR1( NPOS, POS, WEST, PAR, AIN, BIN, XOUT, YOUT, 
+*     CALL KPG1_OPGR1( NPOS, POS, WEST, PAR, AIN, BIN, XOUT, YOUT,
 *                      RDIAM, STATUS )
 
 *  Description:
-*     This routine calculates the parameters of a tangent-plane 
-*     projection that gives an optimal representation of a set of 
-*     supplied sky positions. The projection parameters are the normal 
-*     FITS CRPIX1/2, CRVAL1/2, CDELT1/2 and CROTA2 keywords. They are 
-*     chosen in order to maximise the number of sky positions that fall 
+*     This routine calculates the parameters of a tangent-plane
+*     projection that gives an optimal representation of a set of
+*     supplied sky positions. The projection parameters are the normal
+*     FITS CRPIX1/2, CRVAL1/2, CDELT1/2 and CROTA2 keywords. They are
+*     chosen in order to maximise the number of sky positions that fall
 *     close to the centre of a pixel.
 
 *  Arguments:
@@ -193,23 +193,23 @@
 *        If .TRUE., then it is assumed that the X grid axis increases
 *        westwards (assuming north is parallel to +ve Y). This is the
 *        case for most celestial co-ordinate systems such as (RA,Dec)
-*        etc. If .FALSE., then it is assumed that the X grid axis 
+*        etc. If .FALSE., then it is assumed that the X grid axis
 *        increases eastwards (assuming north is parallel to +ve Y). This
-*        is the case for a few systems such as (az,el) and geographic 
+*        is the case for a few systems such as (az,el) and geographic
 *        (longitude,latitude).
 *     PAR( 7 ) = DOUBLE PRECISION (Given and Returned)
 *        The projection parameters. Each parameter that is supplied with
 *        a value of AST__BAD on entry will be replaced on exit with the
-*        optimal value. Non-bad supplied values will be left unchanged 
+*        optimal value. Non-bad supplied values will be left unchanged
 *        on exit. The supplied values will also be left unchanged if no
-*        periodicity is visible in the supplied positions. They are 
-*        stored in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, 
-*        CDELT2, CROTA2.  CRPIX1 and CRPIX2 are in units of pixels. All 
-*        the other projection parameters will be in units of radians, 
-*        and refer to the celestial co-ordinate system in which the POS 
-*        values are supplied. CROTA2 is the angle from the Y axis to 
-*        celestial north, measured north through east (no matter what 
-*        the value of WEST). Returned pixel sizes are rounded to the 
+*        periodicity is visible in the supplied positions. They are
+*        stored in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1,
+*        CDELT2, CROTA2.  CRPIX1 and CRPIX2 are in units of pixels. All
+*        the other projection parameters will be in units of radians,
+*        and refer to the celestial co-ordinate system in which the POS
+*        values are supplied. CROTA2 is the angle from the Y axis to
+*        celestial north, measured north through east (no matter what
+*        the value of WEST). Returned pixel sizes are rounded to the
 *        nearest tenth of an arcsecond.
 *     AIN( NPOS ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
@@ -234,12 +234,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -263,7 +263,7 @@
 *        supplied points being co-incident.
 *     21-APR-2009 (DSB):
 *        The mean sample spacing over the bounding box can give a gross
-*        under-estimate of the pixel spacing if the samples are clustered 
+*        under-estimate of the pixel spacing if the samples are clustered
 *        into groups where each group represents one pixel. For this
 *        reason, loop round trying larger sample spacing until the pixel
 *        size converges.
@@ -273,7 +273,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -286,7 +286,7 @@
 *  Arguments Given:
       INTEGER NPOS
       DOUBLE PRECISION POS( 2, NPOS )
-      LOGICAL WEST 
+      LOGICAL WEST
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION PAR( 7 )
@@ -337,7 +337,7 @@
       INTEGER IPHIST
       INTEGER MAP
       LOGICAL OK
-      LOGICAL OPTY          
+      LOGICAL OPTY
       REAL DX
       REAL DY
 
@@ -366,13 +366,13 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Copy the longitude and latitude values into separate arrays, and 
+*  Copy the longitude and latitude values into separate arrays, and
 *  find the index of the first good supplied sky position.
       IGOOD = 0
       DO I = 1, NPOS
          AIN( I ) = POS( 1, I )
          BIN( I ) = POS( 2, I )
-         IF( IGOOD .EQ. 0 .AND. 
+         IF( IGOOD .EQ. 0 .AND.
      :       POS( 1, I ) .NE. AST__BAD .AND.
      :       POS( 2, I ) .NE. AST__BAD ) THEN
             IGOOD = I
@@ -387,10 +387,10 @@
          GO TO 999
       END IF
 
-*  Set up an initial projection. This uses 1 arc-min square pixels with 
-*  north upwards, and X either east or west. Any supplied reference 
-*  point is used, but if no reference point is supplied the first good 
-*  supplied position is used as the reference point, and this point is 
+*  Set up an initial projection. This uses 1 arc-min square pixels with
+*  north upwards, and X either east or west. Any supplied reference
+*  point is used, but if no reference point is supplied the first good
+*  supplied position is used as the reference point, and this point is
 *  placed at grid co-ordinates (1,1).
       PAR0( 1 ) = 1.0D0
       PAR0( 2 ) = 1.0D0
@@ -416,8 +416,8 @@
       PAR0( 6 ) = PIXSCL
       PAR0( 7 ) = 0.0D0
 
-*  Create an AST Mapping describing this initial projection. Use the 
-*  above values to define a FITS-WCS header in a FitsChan (converting 
+*  Create an AST Mapping describing this initial projection. Use the
+*  above values to define a FITS-WCS header in a FitsChan (converting
 *  radian values to degrees as needed by FITS), and then read a FrameSet
 *  from it, and recover the base->current Mapping from the FrameSet.
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
@@ -448,10 +448,10 @@
 
       MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
 
-*  Use the AST Mapping to transform the supplied sky positions into the 
-*  the grid co-ordinate system described by the initial projection. 
+*  Use the AST Mapping to transform the supplied sky positions into the
+*  the grid co-ordinate system described by the initial projection.
       CALL AST_TRAN2( MAP, NPOS, AIN, BIN, .FALSE., XOUT, YOUT, STATUS )
- 
+
 *  Find the bounding box of the supplied positions within the initial
 *  grid co-ordinate system.
       XHI = VAL__MIND
@@ -469,7 +469,7 @@
          END IF
       END DO
 
-*  Report an error if no good pixel positions found. 
+*  Report an error if no good pixel positions found.
       IF( XHI .EQ. VAL__MIND ) THEN
          IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -477,7 +477,7 @@
      :                    'found (programming error).', STATUS )
          END IF
          GO TO 999
-      END IF 
+      END IF
 
 *  Find the diameter of the circle enclosing the bounding box, in units
 *  of initial grid pixels.
@@ -487,13 +487,13 @@
       RDIAM = DIAM*PIXSCL
 
 *  Use zero spacing if the points are co-incident. Otherwise, calculate
-*  what the grid spacing would be (in units of initial grid pixels) if 
-*  the supplied positions were distributed on a regularly spaced grid 
+*  what the grid spacing would be (in units of initial grid pixels) if
+*  the supplied positions were distributed on a regularly spaced grid
 *  over the bounding box.
       IF( DIAM .EQ. 0.0 ) THEN
          SPC = 0.0
       ELSE
-         SPC = SQRT( ( XHI - XLO )*( YHI - YLO ) ) / 
+         SPC = SQRT( ( XHI - XLO )*( YHI - YLO ) ) /
      :               ( SQRT( REAL( NPOS ) ) - 1.0 )
       END IF
 
@@ -514,14 +514,14 @@
 *  cluster represents a single sky position with errors, then the mean
 *  spacing between samples, SPC, will be much smaller than the required
 *  spacing (i.e. the spacing between clusters). This can upset the
-*  calculation of the best orientation. So we loop. On the first pass 
+*  calculation of the best orientation. So we loop. On the first pass
 *  we determine a likely cluster spacing in MXWAVE using the initial mean
 *  sample spacing to determine the histogram spacing. If this cluster
 *  spacing is much bigger than the mean sample spacing, we recalculate
 *  the cluster spacing using a larger histogram spacing.
          MXWAVE = 0.5*SPC
          SPC = 0.0
-         DO WHILE( MXWAVE .GT. 10.0*SPC .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( MXWAVE .GT. 10.0*SPC .AND. STATUS .EQ. SAI__OK )
             pass = pass + 1
 
 c      write(*,*) ' '
@@ -540,7 +540,7 @@ c     :           ' arcsec'
                ALLOCD = HISTSZ
             END IF
 
-*  Store the grid co-ordinate within this work array that will 
+*  Store the grid co-ordinate within this work array that will
 *  correspond to the central position (XC,YC).
             SPC0 = DBLE( ( HISTSZ + 1 )/2 )
 
@@ -548,10 +548,10 @@ c      write(*,*) ' Course scanning angles with sample spacing of ',
 c     :           spc*pixscl*AST__DR2D*3600,' arcsec'
 c      write(*,*) ' '
 
-*  Imagine a line passing through the centre position (XC,YC). We step 
+*  Imagine a line passing through the centre position (XC,YC). We step
 *  through all orientations of this line in units of 3 degrees. Zero
-*  angle corresponds to the second axis in the initial projection (i.e. 
-*  celestial north), and the first axis of the initial projection 
+*  angle corresponds to the second axis in the initial projection (i.e.
+*  celestial north), and the first axis of the initial projection
 *  (either east or west) is at angle of +90 degrees.
             MXAMP = -1.0
             MXWAVE = 0.0
@@ -559,18 +559,18 @@ c      write(*,*) ' '
                ANG = IANG*AST__DD2R
 
 *  For the current line orientation, project every initial grid position
-*  onto the line, and record where about the projected point falls on 
+*  onto the line, and record where about the projected point falls on
 *  the line. The 1D work array allocated earlier is used as a histogram
-*  to bin the number of projected points falling on each point of the 
-*  line. Once all points have been projected onto the line, at the 
-*  current orientation, the amplitude of any periodicity shown in the 
-*  array is determined, together with the wavelength of the periodicity 
-*  (in units of initial grid pixels). The details of the orientation 
-*  with the strongest periodicity are retained in MXAMP, MXANG and 
+*  to bin the number of projected points falling on each point of the
+*  line. Once all points have been projected onto the line, at the
+*  current orientation, the amplitude of any periodicity shown in the
+*  array is determined, together with the wavelength of the periodicity
+*  (in units of initial grid pixels). The details of the orientation
+*  with the strongest periodicity are retained in MXAMP, MXANG and
 *  MXWAVE.
-               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, 
-     :                          SPC0, .TRUE., HISTSZ, 
-     :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP, 
+               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC,
+     :                          SPC0, .TRUE., HISTSZ,
+     :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP,
      :                          MXWAVE, MXANG, STATUS )
 
 *  Next orientation.
@@ -583,23 +583,23 @@ c      write(*,*) '----- Accurate angle scanning ------'
 c      write(*,*)
 
 *  Check a direction was found that shows some periodicity.
-         IF( MXWAVE .GT. 0.0 ) THEN      
+         IF( MXWAVE .GT. 0.0 ) THEN
             pass = pass + 1
 
 *  Now do a finer search through a cone of angles centred on the rough
-*  angle found above. The cone is 3 degrees wide and we use 0.1-degree 
-*  intervals. In this loop the IANG variable is angular offset from 
-*  ANG0 in units of 0.1 degree. This time, we use linear interpolation 
+*  angle found above. The cone is 3 degrees wide and we use 0.1-degree
+*  intervals. In this loop the IANG variable is angular offset from
+*  ANG0 in units of 0.1 degree. This time, we use linear interpolation
 *  to create the histogram, to get a more-accurate result.
             ANG0 = MXANG
             MXAMP = -1.0
             MXWAVE = 0.0
-            	    
+
             DO IANG = -15, 15
                ANG = ANG0 + 0.1*DBLE( IANG )*AST__DD2R
-               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, 
-     :                          SPC0, .TRUE., HISTSZ, 
-     :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP, 
+               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC,
+     :                          SPC0, .TRUE., HISTSZ,
+     :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP,
      :                          MXWAVE, MXANG, STATUS )
             END DO
 
@@ -607,46 +607,46 @@ c      write(*,*)
 *  above chosen direction.
             PAMP = -1.0
             PWAVE = 0.0
-            CALL KPG1_OPGR2( NPOS, XOUT, YOUT, MXANG + AST__DPIBY2, 
-     :                       SPC, XC, YC, SPC0, .TRUE., HISTSZ, 
-     :                       %VAL( CNF_PVAL( IPHIST ) ), 
+            CALL KPG1_OPGR2( NPOS, XOUT, YOUT, MXANG + AST__DPIBY2,
+     :                       SPC, XC, YC, SPC0, .TRUE., HISTSZ,
+     :                       %VAL( CNF_PVAL( IPHIST ) ),
      :                       PAMP, PWAVE, PANG, STATUS )
 
 *  Check that the chosen orientations have some periodicity.
-            IF( MXWAVE .GT. 0.0 .AND. PWAVE .GT. 0.0 ) THEN   
+            IF( MXWAVE .GT. 0.0 .AND. PWAVE .GT. 0.0 ) THEN
                OK = .TRUE.
 
 *  The orientation with the most prominent periodicity can be used as
 *  either the X or Y axis in the returned optimal grid, and can be
-*  either the +ve or -ve direction along the axis. We choose the axis 
-*  and direction in order to put the +ve Y axis in the returned grid as 
-*  close as possible to celestial north. So get the position angle 
-*  (+ve Y through +ve X in the initial grid) of the optimal Y axis, and 
+*  either the +ve or -ve direction along the axis. We choose the axis
+*  and direction in order to put the +ve Y axis in the returned grid as
+*  close as possible to celestial north. So get the position angle
+*  (+ve Y through +ve X in the initial grid) of the optimal Y axis, and
 *  set a flag indicating if the periodicity is associated with the
 *  optimal X or Y grid axis.
                IF( MXANG .LE. 0.5*AST__DPIBY2 ) THEN
                   YANG = MXANG
                   OPTY = .TRUE.
-               
+
                ELSE IF( MXANG .LE. 1.5*AST__DPIBY2 ) THEN
                   YANG = MXANG - AST__DPIBY2
                   OPTY = .FALSE.
-               
+
                ELSE IF( MXANG .LE. 2.5*AST__DPIBY2  ) THEN
                   YANG = MXANG - 2*AST__DPIBY2
                   OPTY = .TRUE.
-               
+
                ELSE IF( MXANG .LE. 3.5*AST__DPIBY2 ) THEN
                   YANG = MXANG - 3*AST__DPIBY2
                   OPTY = .FALSE.
-               
-               ELSE
-                  YANG = MXANG 
-                  OPTY = .TRUE.
-               
-               END IF         
 
-*  Store the CDELT1/2 parameters of the optimal grid. 
+               ELSE
+                  YANG = MXANG
+                  OPTY = .TRUE.
+
+               END IF
+
+*  Store the CDELT1/2 parameters of the optimal grid.
                IF( OPTY ) THEN
                   PAR0( 5 ) = -PWAVE*PIXSCL
                   PAR0( 6 ) = MXWAVE*PIXSCL
@@ -664,16 +664,16 @@ c      write(*,*)
                   PAR0( 7 ) = -YANG
                END IF
 
-*  Round to the nearest 10th of a degree. 
+*  Round to the nearest 10th of a degree.
                PAR0( 7 ) = NINT( PAR0( 7 )*AST__DR2D*10.0 )/
      :                            (10.0*AST__DR2D)
 
 *  Ensure CROTA is in the range 0 -> 2*PI
-               DO WHILE( PAR0( 7 ) .LT. 0.0 ) 
+               DO WHILE( PAR0( 7 ) .LT. 0.0 )
                   PAR0( 7 ) = PAR0( 7 ) + 2*AST__DPI
                END DO
-            
-               DO WHILE( PAR0( 7 ) .GE. 360.0 ) 
+
+               DO WHILE( PAR0( 7 ) .GE. 360.0 )
                   PAR0( 7 ) = PAR0( 7 ) - 2*AST__DPI
                END DO
 
@@ -687,11 +687,11 @@ c      write(*,*)
          END IF
       END IF
 
-*  Check that PAR0 now contains usable pixel size and orientation 
-*  values. 
+*  Check that PAR0 now contains usable pixel size and orientation
+*  values.
       IF( OK ) THEN
 
-*  Store the INITIAL CRPIX1/2 parameters of the optimal grid. 
+*  Store the INITIAL CRPIX1/2 parameters of the optimal grid.
          PAR0( 1 ) = 1.0
          PAR0( 2 ) = 1.0
 
@@ -703,7 +703,7 @@ c      write(*,*)
 *  Find the celestial coordinates at the centre of the bounding box.
             CALL AST_TRAN2( MAP, 1, XC, YC, .TRUE., XOUT, YOUT, STATUS )
 
-*  Report an error if the celestial coords are bad. 
+*  Report an error if the celestial coords are bad.
             IF( XOUT( 1 ) .EQ. VAL__MIND ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -712,8 +712,8 @@ c      write(*,*)
      :                          STATUS )
                END IF
                GO TO 999
-            END IF 
-      	    
+            END IF
+
             PAR0( 3 ) = XOUT( 1 )
             PAR0( 4 ) = YOUT( 1 )
          END IF
@@ -729,15 +729,15 @@ c      write(*,*)
 *  parameters and use it to map the supplied sky positions into grid
 *  co-ordinates.
          FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
-         CALL AST_SETFITSS( FC, 'CTYPE1', 'RA---TAN', ' ', .TRUE., 
+         CALL AST_SETFITSS( FC, 'CTYPE1', 'RA---TAN', ' ', .TRUE.,
      :                      STATUS )
-         CALL AST_SETFITSS( FC, 'CTYPE2', 'DEC--TAN', ' ', .TRUE., 
+         CALL AST_SETFITSS( FC, 'CTYPE2', 'DEC--TAN', ' ', .TRUE.,
      :                      STATUS )
-         CALL AST_SETFITSF( FC, 'CRPIX1', PAR0( 1 ), ' ', .TRUE., 
+         CALL AST_SETFITSF( FC, 'CRPIX1', PAR0( 1 ), ' ', .TRUE.,
      :                      STATUS )
-         CALL AST_SETFITSF( FC, 'CRPIX2', PAR0( 2 ), ' ', .TRUE., 
+         CALL AST_SETFITSF( FC, 'CRPIX2', PAR0( 2 ), ' ', .TRUE.,
      :                      STATUS )
-         CALL AST_SETFITSF( FC, 'CRVAL1', PAR0( 3 )*AST__DR2D, ' ', 
+         CALL AST_SETFITSF( FC, 'CRVAL1', PAR0( 3 )*AST__DR2D, ' ',
      :                      .TRUE., STATUS )
          CALL AST_SETFITSF( FC, 'CRVAL2', PAR0( 4 )*AST__DR2D, ' ',
      :                      .TRUE., STATUS )
@@ -748,9 +748,9 @@ c      write(*,*)
          CALL AST_SETFITSF( FC, 'CROTA2', PAR0( 7 )*AST__DR2D, ' ',
      :                      .TRUE., STATUS )
          CALL AST_CLEAR( FC, 'Card', STATUS )
-         
+
          FS = AST_READ( FC, STATUS )
-         
+
          IF( FS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'KPG1_OPGRD: Failed to read '//
@@ -758,26 +758,26 @@ c      write(*,*)
      :                    'error).', STATUS )
             GO TO 999
          END IF
-         
+
          MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
-         CALL AST_TRAN2( MAP, NPOS, AIN, BIN, .FALSE., XOUT, YOUT, 
+         CALL AST_TRAN2( MAP, NPOS, AIN, BIN, .FALSE., XOUT, YOUT,
      :                   STATUS )
 
 *  Find the fractional pixel offsets that result in the minimum squared
-*  deviation between sample positions and the centres of the 
-*  corresponding pixels. 
+*  deviation between sample positions and the centres of the
+*  corresponding pixels.
          CALL KPG1_OPGR4( NPOS, XOUT, YOUT, DX, DY, STATUS )
 
 *  If the reference point sky coords were supplied, modify the CRPIX1/2
-*  values to put the refence point at the right place, leaving CRVAL1/2 
+*  values to put the refence point at the right place, leaving CRVAL1/2
 *  unchanged.
-         IF( PAR( 3 ) .NE. AST__BAD .OR. 
+         IF( PAR( 3 ) .NE. AST__BAD .OR.
      :       PAR( 4 ) .NE. AST__BAD ) THEN
             PAR0( 1 ) = PAR0( 1 ) + DX
             PAR0( 2 ) = PAR0( 2 ) + DY
 
-*  If the reference point sky coords were not supplied, modify the 
-*  CRVAL1/2 values so that CRPIX1/2 can retain the existing nice 
+*  If the reference point sky coords were not supplied, modify the
+*  CRVAL1/2 values so that CRPIX1/2 can retain the existing nice
 *  integer values.
          ELSE
 
@@ -787,27 +787,27 @@ c      write(*,*)
 
 *  Find the sky coords corresponding to this position, and use them as
 *  the new CRVAL1/2 values ( PAR0(3) and PAR0(4) ).
-            CALL AST_TRAN2( MAP, 1, NPAR1, NPAR2, .TRUE., PAR0( 3 ), 
+            CALL AST_TRAN2( MAP, 1, NPAR1, NPAR2, .TRUE., PAR0( 3 ),
      :                      PAR0( 4 ), STATUS )
          END IF
 
 *  Normalise CRVAL1/2 into range (0->2PI, -PI/2->PI/2)
          IF( PAR0( 4 ) .GT. AST__DPIBY2 ) THEN
-            PAR0( 4 ) = AST__DPI - PAR0( 4 ) 
+            PAR0( 4 ) = AST__DPI - PAR0( 4 )
             PAR0( 3 ) = AST__DPI + PAR0( 3 )
-         
+
          ELSE IF( PAR0( 4 ) .LT. -AST__DPIBY2 ) THEN
-            PAR0( 4 ) = -AST__DPI - PAR0( 4 ) 
+            PAR0( 4 ) = -AST__DPI - PAR0( 4 )
             PAR0( 3 ) = AST__DPI + PAR0( 3 )
-         
+
          END IF
-         
+
          IF( PAR0( 3 ) .LT. 0.0 ) THEN
-            PAR0( 3 ) = PAR0( 3 ) + 2*AST__DPI 
-         
+            PAR0( 3 ) = PAR0( 3 ) + 2*AST__DPI
+
          ELSE IF( PAR0( 3 ) .GT. 2*AST__DPI ) THEN
-            PAR0( 3 ) = PAR0( 3 ) - 2*AST__DPI 
-         
+            PAR0( 3 ) = PAR0( 3 ) - 2*AST__DPI
+
          END IF
 
 *  Find the pixel bounds of the new bounding box.
@@ -815,7 +815,7 @@ c      write(*,*)
          YHI = VAL__MIND
          XLO = VAL__MAXD
          YLO = VAL__MAXD
-         
+
          DO I = 1, NPOS
             IF( XOUT( I ) .NE. AST__BAD .AND.
      :          YOUT( I ) .NE. AST__BAD ) THEN
@@ -828,14 +828,14 @@ c      write(*,*)
 
 *  Choose the integer part of CRPIX1/2 so that it is close to the centre
 *  of the bounding box.
-         PAR0( 1 ) = PAR0( 1 ) + NINT( ( XHI - XLO )/2 ) + 1 
+         PAR0( 1 ) = PAR0( 1 ) + NINT( ( XHI - XLO )/2 ) + 1
      :               - NINT( PAR0( 1 ) )
-         PAR0( 2 ) = PAR0( 2 ) + NINT( ( YHI - YLO )/2 ) + 1 
+         PAR0( 2 ) = PAR0( 2 ) + NINT( ( YHI - YLO )/2 ) + 1
      :               - NINT( PAR0( 2 ) )
 
 *  Check pixel sizes are not zero.
          IF( PAR0( 5 ) .NE. 0.0 .AND. PAR0( 6 ) .NE. 0.0 ) THEN
-               
+
 *  Copy the projection parameters to the supplIed array.
             DO I = 1, 7
                IF( PAR( I ) .EQ. AST__BAD ) PAR( I ) = PAR0( I )
@@ -856,7 +856,7 @@ c      write(*,*)
 
 
       SUBROUTINE KPG1_OPGR2( NPOS, X, Y, ANG, SPC, XC, YC, SPC0, LIN,
-     :                       HISTSZ, HIST, MXAMP, MXWAVE, MXANG, 
+     :                       HISTSZ, HIST, MXAMP, MXWAVE, MXANG,
      :                       STATUS )
 *+
 *  Name:
@@ -869,21 +869,21 @@ c      write(*,*)
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_OPGR2( NPOS, X, Y, ANG, SPC, XC, YC, SPC0, LIN, HISTSZ, 
+*     CALL KPG1_OPGR2( NPOS, X, Y, ANG, SPC, XC, YC, SPC0, LIN, HISTSZ,
 *                      HIST, MXAMP, MXWAVE, MXANG, STATUS )
 
 *  Description:
-*     This routine projects the supplied grid position onto a line at 
-*     the orientation given by ANG, passing through the point given by 
-*     (XC,YC). The projected positions along this line are recorded in 
+*     This routine projects the supplied grid position onto a line at
+*     the orientation given by ANG, passing through the point given by
+*     (XC,YC). The projected positions along this line are recorded in
 *     a histogram in which each bin corresponds to a section of the
-*     line, and the count in each bin is the number of points projected 
+*     line, and the count in each bin is the number of points projected
 *     onto the section of the line corresponding to the bin.
 *
-*     Once all positions have been projected, the sum of the squared 
-*     histogram values is found (this is the same as the 
-*     auto-correlation at zero shift), and used as a measure of the 
-*     strength of the periodicity. 
+*     Once all positions have been projected, the sum of the squared
+*     histogram values is found (this is the same as the
+*     auto-correlation at zero shift), and used as a measure of the
+*     strength of the periodicity.
 *
 *     If the periodicity at this angle is greater than the supplied
 *     value in MXAMP, then the wavelength of the periodicity is found
@@ -896,17 +896,17 @@ c      write(*,*)
 *     when projected onto a line parallel to its X and Y directions. But
 *     it will also have equally strong periodicity when projected onto
 *     a line at 45 degrees to either its X or Y directions. However, in
-*     this second case the pixel sizes (i.e. the wavelength of the 
-*     periodicity) will be smaller than in the first case. We use this 
+*     this second case the pixel sizes (i.e. the wavelength of the
+*     periodicity) will be smaller than in the first case. We use this
 *     fact to distinguish between the two cases. Once the periodicity of
-*     the wavelength has been found, a further check is made before 
-*     accepting the orientation as better than the supplied MXANG 
-*     orientation. This check consists of multiplying the strength of 
-*     the periodicity by the area of the pixel, and only accepting the 
-*     new orientation if this value is greater than the supplied 
+*     the wavelength has been found, a further check is made before
+*     accepting the orientation as better than the supplied MXANG
+*     orientation. This check consists of multiplying the strength of
+*     the periodicity by the area of the pixel, and only accepting the
+*     new orientation if this value is greater than the supplied
 *     MXANG*MXWAVE*MXWAVE value. Since the pixel area will be smaller if
-*     the line is oriented at 45 degrees to an axis, than if it is 
-*     parallel to the axis, the pixel area factor will result in the 
+*     the line is oriented at 45 degrees to an axis, than if it is
+*     parallel to the axis, the pixel area factor will result in the
 *     parallel case being selected rather than the 45-degrees case.
 
 *  Arguments:
@@ -917,7 +917,7 @@ c      write(*,*)
 *     Y( NPOS ) = DOUBLE PRECISION (Given)
 *        The Y grid coordinates.
 *     ANG = DOUBLE PRECISION (Given)
-*        The angle of the line, in radians. Measured from the grid Y 
+*        The angle of the line, in radians. Measured from the grid Y
 *        axis through the grid X axis.
 *     SPC = DOUBLE PRECISION (Given)
 *        The length of each bin in the histogram, in units of grid
@@ -937,12 +937,12 @@ c      write(*,*)
 *        The array to use to hold the histogram.
 *     MXAMP = DOUBLE PRECISION (Given and Returned)
 *        Measures the strength of the periodicity in the histogram. It
-*        is updated on exit if the angle specified by "ANG" 
-*        demonstrates stronger periodicity than the supplied value. 
+*        is updated on exit if the angle specified by "ANG"
+*        demonstrates stronger periodicity than the supplied value.
 *     MXWAVE = DOUBLE PRECISION (Given and Returned)
 *        The wavelength (in grid pixels) of the spatial frequency at the
-*        first peak in the auto-correlation function. Updated if the 
-*        value at the first peak of the auto-correlation function for 
+*        first peak in the auto-correlation function. Updated if the
+*        value at the first peak of the auto-correlation function for
 *        the supplied angle, is greater than the supplied MXAMP value.
 *     MXANG = DOUBLE PRECISION (Given and Returned)
 *        The angle (in radians) which produced the maximum MXAMP value.
@@ -959,12 +959,12 @@ c      write(*,*)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -982,7 +982,7 @@ c      write(*,*)
 *        a quafratic to the 3 values closest to the peak.
 *     10-JAN-2007 (DSB):
 *        Change the scheme used to weight the auro-correlation peak
-*        value when choosing whether to repalce the old "best angle" 
+*        value when choosing whether to repalce the old "best angle"
 *        with the new angle.
 *     11-JAN-2007 (DSB):
 *        Ignored insignificant peaks and troughs in the auto-correlation
@@ -993,10 +993,10 @@ c      write(*,*)
 *        maximum auto-correlation value found to define the wavelength.
 *        Only do this if the maximum auto-correlation value found is
 *        more than ten times the mean auto-correlation value. All this
-*        is to handle cases where the periodicity is defined by a peak 
+*        is to handle cases where the periodicity is defined by a peak
 *        that is small in height compared with the zero-shift value, but
 *        large compared with the noise in the auto-correlation. This may
-*        happen for instance if there are very few positions are 
+*        happen for instance if there are very few positions are
 *        supplied (e.g. a regular grid of five points).
 *     12-JUL-2007 (DSB):
 *        Modify the estimate of the noise in the auto-correlation value.
@@ -1005,16 +1005,16 @@ c      write(*,*)
 *        auto-correlation value).
 *     20-APR-2009 (DSB):
 *        Relax the check that says that the sum of the (un-weighted) squared
-*        values (SUM2) must be better than the previous maximum (MXAMP) for 
-*        the angle to be of any possible interest. This makes the algorithm 
+*        values (SUM2) must be better than the previous maximum (MXAMP) for
+*        the angle to be of any possible interest. This makes the algorithm
 *        slightly less efficient, but more robust.
 *     20-JUN-2009 (DSB):
-*        - Only accept peaks in the autocorrelation function that occur 
+*        - Only accept peaks in the autocorrelation function that occur
 *        within the first third of the histogram width (i.e. that produce
 *        at least three wavelengths within the extent of the data).
 *        - When giving greater weight to longer wavelengths, only do this
 *        up to a certain point (a factor 1.5) in order to avoid accepting
-*        weak periodicities just because they have ridiculously large 
+*        weak periodicities just because they have ridiculously large
 *        wavelengths.
 *     {enter_further_changes_here}
 
@@ -1022,7 +1022,7 @@ c      write(*,*)
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1085,8 +1085,8 @@ c      write(*,*)
       INTEGER MAXSH
       INTEGER MINSH
       INTEGER SHIFT
-      LOGICAL MORE             
-      REAL OFFSET( 3 )          
+      LOGICAL MORE
+      REAL OFFSET( 3 )
 
 
       DATA OFFSET /-0.5, 0.0, 0.5 /
@@ -1124,7 +1124,7 @@ c      write(*,*)
 *  Find the floating point centre of the histogram bin containing this point.
             FFBIN = SPC0 + D/SPC
 
-*  It's possible to get aliasing between the sample spacing on the sky and 
+*  It's possible to get aliasing between the sample spacing on the sky and
 *  the histogram spacing. For instance, if a sample falls on or close
 *  to the edge of two histogram bins, it will be evenly divided between
 *  them, resulting in each bin having only half a sample contribution.
@@ -1133,7 +1133,7 @@ c      write(*,*)
 *  each bin is important, this will unduly favour bins that receive the whole
 *  sample. To avoid this, we add the sample into the histogram several
 *  times, with a slightly jiggled position each time. This causes the
-*  effect of each sample to be spread out over the neighbouring bins. 
+*  effect of each sample to be spread out over the neighbouring bins.
             DO II = 1, 3
 
 *  Select the fraction pixel offset to use.
@@ -1147,7 +1147,7 @@ c      write(*,*)
 *  interpolation.
                IF( LIN ) THEN
 
-*  Split the contribution from this point between the IBIN bin and the 
+*  Split the contribution from this point between the IBIN bin and the
 *  neighbouring bin, using linear interpolation.
                   D = FBIN - IBIN
                   IF( D .GT. 0.0 ) THEN
@@ -1172,7 +1172,7 @@ c      write(*,*)
 
 *  Increment the central bin.
                IF( IBIN .GE. 1 .AND. IBIN .LE. HISTSZ ) THEN
-                  HIST( IBIN ) = HIST( IBIN ) + WBIN 
+                  HIST( IBIN ) = HIST( IBIN ) + WBIN
                END IF
 
             END DO
@@ -1188,15 +1188,15 @@ c      write(*,*)
 c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' 0.5*mxamp: ',
 c     :            0.5*mxamp
 
-*  If it looks like the new angle may be better than the supplied MXANG 
-*  angle, then we continue to evaluate the wavelength of the periodicity. 
-*  Note, SUM only needs to be a significant fraction of MXAMP to prompt 
-*  this further check (a factor of 0.5 is chosen more or less arbitrarily 
-*  and may need tweaking). This is because, even if SUM2 is less than 
-*  MXAMP, the effect of inclusing the wavelength in the weighting may 
-*  result in this angle being preferable to the previous best angle. We 
-*  could in principle do away with this IF check altogether and rely on 
-*  the comparison of the fully wavelength-weighted values performed below 
+*  If it looks like the new angle may be better than the supplied MXANG
+*  angle, then we continue to evaluate the wavelength of the periodicity.
+*  Note, SUM only needs to be a significant fraction of MXAMP to prompt
+*  this further check (a factor of 0.5 is chosen more or less arbitrarily
+*  and may need tweaking). This is because, even if SUM2 is less than
+*  MXAMP, the effect of inclusing the wavelength in the weighting may
+*  result in this angle being preferable to the previous best angle. We
+*  could in principle do away with this IF check altogether and rely on
+*  the comparison of the fully wavelength-weighted values performed below
 *  to select the best angle, but that would involve evaluating the
 *  autocorrelation function for a lot of angles that cannot possibly be of
 *  any interest because of their very low SUM2 values.
@@ -1216,7 +1216,7 @@ c     :            0.5*mxamp
          MINSUM = SUM2
          SUMINC = 0.0
          SUMW = 0.0
-   
+
 *  Loop over increasing shifts until we have found the minimum.
          MORE = .TRUE.
          DO WHILE( MORE )
@@ -1235,7 +1235,7 @@ c     :            0.5*mxamp
                J = J + 1
             END DO
 
-*  Increment sums used to find the weighted mean of the change between 
+*  Increment sums used to find the weighted mean of the change between
 *  adjacent auto-correlation values. The weight is the recprocal of the
 *  auto-correlation value, thus giving greater weight to the lower,
 *  background, values and tending to ignore the steep edges of the peaks
@@ -1253,10 +1253,10 @@ c     :            0.5*mxamp
 *  most recent minimum..
             IF( SUM2 .LT. MINSUM ) THEN
                MINSUM = SUM2
-               MINSH = SHIFT 
+               MINSH = SHIFT
                COUNT = 0
 
-*  Otherwise, increment the count of shifts that have produced a higher 
+*  Otherwise, increment the count of shifts that have produced a higher
 *  SUM" value than the minimum.
             ELSE
                COUNT  = COUNT + 1
@@ -1304,7 +1304,7 @@ c     :           'function at ',minsh, '(',minsum,')'
 
             MORE = .TRUE.
             DO WHILE( MORE )
-      
+
                LLLSUM2 = LLSUM2
                LLSUM2 = LSUM2
                LSUM2 = SUM2
@@ -1326,7 +1326,7 @@ c     :           'function at ',minsh, '(',minsum,')'
 
                IF( SUM2 .GT. MAXSUM ) THEN
                   MAXSUM = SUM2
-                  MAXSH = SHIFT 
+                  MAXSH = SHIFT
                   COUNT = 0
 
                ELSE IF( MAXSH .NE. -1 ) THEN
@@ -1340,21 +1340,21 @@ c     :           'function at ',minsh, '(',minsum,')'
                   END IF
 
                END IF
-   
+
                SHIFT = SHIFT + 1
                IF( SHIFT .EQ. HISTSZ ) MORE = .FALSE.
-   
+
             END DO
 
 
 *  If no peak was found that was more than half the value at zero shift,
-*  use the maximum value found so long as it is more than 10 times the 
-*  noise in the auto-correlation function (this noise is estimated as 
+*  use the maximum value found so long as it is more than 10 times the
+*  noise in the auto-correlation function (this noise is estimated as
 *  the weighted mean of the variation between adjacent auto-correlation
 *  values), and it is shorter than one third of the histogram length (i.e.
 *  we have at least 3 waves in the histogram).
             IF( SHIFT .EQ. HISTSZ .AND. MAXSH .NE. -1 ) THEN
-               IF( MAXSUM .GT. 10.0*(SUMINC/SUMW) .AND. 
+               IF( MAXSUM .GT. 10.0*(SUMINC/SUMW) .AND.
      :             MAXSH .LT. HISTSZ/3 ) THEN
                   SHIFT = MAXSH
                END IF
@@ -1368,8 +1368,8 @@ c         call opgrd_autodump( ang, histsz, hist, status )
 *  Check a peak was found.
          IF( SHIFT .LT. HISTSZ ) THEN
 
-*  Fit a quadratic to the AMP values at the highest point (MAXSH) and 
-*  its two neighbours, and then find the peak of the quadratic in order 
+*  Fit a quadratic to the AMP values at the highest point (MAXSH) and
+*  its two neighbours, and then find the peak of the quadratic in order
 *  to get a more accurate estimate of the peak position.
             XSHIFT = MAXSH + 0.5*( DSUM - USUM )/
      :                           ( DSUM + USUM - 2*MAXSUM )
@@ -1380,8 +1380,8 @@ c         call opgrd_autodump( ang, histsz, hist, status )
 *  We use the new angle if the auto-correlation peak produces a greater
 *  value than the old angle. We include a weighting factor that gives
 *  priority to larger wavelengths. This seems to distinguish succesfully
-*  between the periodicity produced when viewing a grid parallel to an 
-*  axis and when viewing it at 45 degrees to an axis. However, the 
+*  between the periodicity produced when viewing a grid parallel to an
+*  axis and when viewing it at 45 degrees to an axis. However, the
 *  exponent used in this weighting factor has been determined by trial
 *  and error and may not be suitable in all cases. Time will tell. Set up
 *  the weight for the old periodicity.
@@ -1391,7 +1391,7 @@ c         call opgrd_autodump( ang, histsz, hist, status )
 *  is weaker than the old, only accept it if the wavelength is within a
 *  factor of 1.5 of the old wavelength. Rotation by 45 degrees will
 *  change the wavelength by a factor of sqrt(2)=1.414 so any ratio larger
-*  than this is unlikely to be ucased by a 45 degree rotation. 
+*  than this is unlikely to be ucased by a 45 degree rotation.
             IF( ( NEWAMP .LT. MXAMP  ) .AND.
      :          ( NEWWAV .lT. MXWAVE/1.5 .OR.
      :            NEWWAV .GT. MXWAVE*1.5 ) ) THEN
@@ -1436,8 +1436,8 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 
 *  Description:
 *     This function returns the sum of the squared deviations between
-*     each supplied fractional GRID positions, after being shifted by a 
-*     small amount (A,B), and the GRID position at the centre of the 
+*     each supplied fractional GRID positions, after being shifted by a
+*     small amount (A,B), and the GRID position at the centre of the
 *     pixel containing the shifted position.
 
 *  Arguments:
@@ -1466,12 +1466,12 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -1490,7 +1490,7 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1514,7 +1514,7 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
       DOUBLE PRECISION YY
 *.
 
-*  Initialise 
+*  Initialise
       KPG1_OPGR3 = 0.0D0
 
 *  Check the inherited global status.
@@ -1528,10 +1528,10 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
             XX = X( I ) + A
             YY = Y( I ) + B
 
-*  Calculate the squared deviation between this shifted position, and 
-*  the centre of the pixel containing the shifted position, and 
+*  Calculate the squared deviation between this shifted position, and
+*  the centre of the pixel containing the shifted position, and
 *  increment the returned value by this amount.
-            KPG1_OPGR3 = KPG1_OPGR3 + 
+            KPG1_OPGR3 = KPG1_OPGR3 +
      :                   ( XX - NINT( XX ) )**2 + ( YY - NINT( YY ) )**2
 
          END IF
@@ -1557,7 +1557,7 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 *  Description:
 *     This routine finds a small fractional shift in grid co-ordinates
 *     less than one pixel on each axis) that results in the supplied set
-*     of grid positions being close the centre of the corresponding 
+*     of grid positions being close the centre of the corresponding
 *     pixels.
 
 *  Arguments:
@@ -1583,12 +1583,12 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -1607,7 +1607,7 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -1644,10 +1644,10 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
       REAL PCENB
       REAL PSTEP
       REAL S
-      REAL SMIN        
+      REAL SMIN
 *.
 
-*  Initialise 
+*  Initialise
       A = 0.0
       B = 0.0
 
@@ -1655,7 +1655,7 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set up the size (as a fraction of a grid pixel) of each cell in the
-*  test grid. The initial test grid covers a little more than one grid 
+*  test grid. The initial test grid covers a little more than one grid
 *  pixel.
       PSTEP = 1.1/( 2*HSIZE + 1 )
 
@@ -1664,8 +1664,8 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
       PCENB = 0.0
 
 *  On each iteration the error function is found in each cell of the
-*  current test grid. The test grid for the next iteration is then set 
-*  up so that it covers the cell in the current grid with the smallest 
+*  current test grid. The test grid for the next iteration is then set
+*  up so that it covers the cell in the current grid with the smallest
 *  error function.
       DO ITER = 1, 2
 
@@ -1677,10 +1677,10 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 *  offsets corresponding to the centre of the cell.
          DO J = -HSIZE, HSIZE
             BT = PCENB + PSTEP*J
-   
+
             DO I = -HSIZE, HSIZE
                AT = PCENA + PSTEP*I
-   
+
 *  Find the error function (always positive) at these pixel offsets.
                S = KPG1_OPGR3( N, X, Y, AT, BT, STATUS )
 
@@ -1691,11 +1691,11 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
                   B = BT
                   SMIN = S
                END IF
-   
+
             END DO
-   
-         END DO           
-   
+
+         END DO
+
 *  Set up the parameters defining the next test grid to be used. It
 *  covers the cell that had the smallest error function.
          PCENA = A
@@ -1784,14 +1784,14 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
 
 
       subroutine opgrd_autodump( ang, n, hist, status )
-      implicit none       
-      include 'SAE_PAR'   
-      include 'AST_PAR'   
+      implicit none
+      include 'SAE_PAR'
+      include 'AST_PAR'
 
       double precision ang
       integer n, shift, i1, i2, iw
       real hist( n ), sum
-      integer status 
+      integer status
 
       if ( status .ne. sai__ok ) return
 

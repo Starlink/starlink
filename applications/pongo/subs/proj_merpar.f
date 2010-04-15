@@ -38,12 +38,12 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'ASTRO_PAR'
-      
+
 *  Arguments Given:
       DOUBLE PRECISION THETA0
 
@@ -64,7 +64,7 @@
          DT=DAS2R
 ! WRITE AN ERROR MESSAGE  (WARNING)
       ENDIF
-      
+
       TEMP=THETA0/2+DPI/4
 
       GPAR(1)=COS(THETA0)

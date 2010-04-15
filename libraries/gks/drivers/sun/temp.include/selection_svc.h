@@ -17,7 +17,7 @@
 #define	FALSE	0
 
 /*	Seln_client:	opaque handle returned to client from create    */
- 
+
 typedef char *Seln_client;
 
 
@@ -26,7 +26,7 @@ typedef char *Seln_client;
 typedef enum	{
     SELN_FAILED, SELN_SUCCESS,		/*     the basic all-around uses  */
     SELN_NON_EXIST, SELN_DIDNT_HAVE, SELN_WRONG_RANK,	/* special cases  */
-    SELN_CONTINUED, SELN_CANCEL, SELN_UNRECOGNIZED 
+    SELN_CONTINUED, SELN_CANCEL, SELN_UNRECOGNIZED
 }	Seln_result;
 
 

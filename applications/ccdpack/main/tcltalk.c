@@ -15,7 +15,7 @@
 
 *  Notes:
 *     As currently implemented the Tcl interpreter is run in a separate
-*     process and communication is done using pipes.  Because of the 
+*     process and communication is done using pipes.  Because of the
 *     limitations of pipes this means that it is not possible to ask
 *     for evaluation of arbitrarily long Tcl commands, or to receive
 *     arbitrarily long responses from the Tcl interpreter, since this
@@ -24,9 +24,9 @@
 *     here would need to be reimplemented using, say, sockets or files
 *     for communication.
 *
-*     The more straightforward option of running the Tcl interpreter 
+*     The more straightforward option of running the Tcl interpreter
 *     within the same process as the program calling these routines
-*     is not suitable, since the *only* way, as far as I can tell, 
+*     is not suitable, since the *only* way, as far as I can tell,
 *     of shutting down the Adam message system is to terminate the
 *     process which has started it up.  Since it may be necessary to
 *     shut AMS down (for instance, if it is required to run more than
@@ -116,8 +116,8 @@
 *     the ccdTcl_* routines could use this), so don't use it as one.
 *
 *     Commands can be executed within the Tcl interpreter thus constructed
-*     by calling ccdTclDo or one of the other similar functions.  The 
-*     correct way to free the resources associated with this pointer 
+*     by calling ccdTclDo or one of the other similar functions.  The
+*     correct way to free the resources associated with this pointer
 *     is using a call to the ccdTclStop routine.
 
 *  Arguments:
@@ -125,7 +125,7 @@
 *        The global status.
 
 *  Return Value:
-*     On successful execution, a pointer to a ccdTcl_Interp structure, 
+*     On successful execution, a pointer to a ccdTcl_Interp structure,
 *     to be used for subsequent calls to related routines, is returned.
 *     If there is an error then the status argument is set, and NULL
 *     is returned.
@@ -201,7 +201,7 @@
          fcntl( cinterp->downfd[ 0 ], F_SETFD, (long) 0 );
          fcntl( cinterp->upfd[ 1 ], F_SETFD, (long) 0 );
 
-/* Overlay the Tcl interpreter on this process.  If the CCDPACK_DIR 
+/* Overlay the Tcl interpreter on this process.  If the CCDPACK_DIR
    environment variable is defined then use the ccdwish binary there, else
    try to find one on the path. */
          av[ 1 ] = "-pipes";
@@ -245,7 +245,7 @@
       close( cinterp->upfd[ 1 ] );
 
 /* Execute the CCDFixConvert procedure.  This prevents confusion between
-   the temporary HDS container files created for foreign data files by 
+   the temporary HDS container files created for foreign data files by
    the calling process and those created by the ccdwish child process. */
       ccdTclDo( cinterp, "CCDFixConvert tcl-", status );
 
@@ -268,17 +268,17 @@
 
 *  Description:
 *     This routine executes a command in the Tcl interpreter specified
-*     by the cinterp argument, and returns the interpreter's result 
+*     by the cinterp argument, and returns the interpreter's result
 *     as a character string.  If the return code from the Tcl
 *     interpreter was not TCL_OK, then the status argument will be set.
 *
-*     It does it by writing the text of the command down the pipe to 
+*     It does it by writing the text of the command down the pipe to
 *     the child process set up by a previous ccdTclStart call, and then
 *     reading the response sent back up the pipe from that process.
-*     It also watches for, and outputs appropriately, messages for 
+*     It also watches for, and outputs appropriately, messages for
 *     output via the CCDPACK logging system which may come up the pipe.
 *
-*     This function is declared static, and so not intended for use 
+*     This function is declared static, and so not intended for use
 *     by external code.  External routines should use ccdTclDo or one
 *     of the other ccdTcl* functions instead.
 
@@ -354,7 +354,7 @@
       }
       signal( SIGPIPE, handler );
 
-/* Loop until we get a return status which indicates the command has 
+/* Loop until we get a return status which indicates the command has
    completed (i.e. not one which just requires output through the ADAM
    message system). */
       do {
@@ -376,7 +376,7 @@
 
 /* If the read failed then we probably caught a signal or the child
    process stopped writing in the middle of a command.  Neither of these
-   should happen, so signal an error.  It might be desirable to do 
+   should happen, so signal an error.  It might be desirable to do
    something smarter than this on receipt of a signal (like try the
    read again) but I don't think that it is a very likely eventuality. */
             if ( bytes != 1 ) {
@@ -386,7 +386,7 @@
             }
          } while ( *c != '\0' );
 
-/* If the Tcl return status was CCD_CCDMSG, CCD_CCDLOG or CCD_CCDERR then 
+/* If the Tcl return status was CCD_CCDMSG, CCD_CCDLOG or CCD_CCDERR then
    what follows are two strings, separated by a carriage return, to output
    via the ADAM message system. */
          if ( tclrtn == CCD_CCDLOG || tclrtn == CCD_CCDERR ||
@@ -411,7 +411,7 @@
                                   TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
             }
          }
-      } while ( tclrtn == CCD_CCDLOG || tclrtn == CCD_CCDERR || 
+      } while ( tclrtn == CCD_CCDLOG || tclrtn == CCD_CCDERR ||
                 tclrtn == CCD_CCDMSG );
 
 /* If the Tcl return status was not TCL_OK, then flag an error and write
@@ -419,7 +419,7 @@
       if ( tclrtn != TCL_OK ) {
          int done = 0;
          char *estart;
-         char *fmt = ( tclrtn == TCL_ERROR ) ? "Tcl error:\n%s" 
+         char *fmt = ( tclrtn == TCL_ERROR ) ? "Tcl error:\n%s"
                                              : "Unexpected Tcl return:\n%s";
          snprintf( buffer, BUFLENG - strlen( fmt ), fmt, retbuf );
          *status = SAI__ERROR;
@@ -500,7 +500,7 @@
 /* Write an 'exit' command to the Tcl interpreter.  This should cause it
    to shut down in an orderly fashion and, in particular, it will allow
    the Adam Message System to tidy up in whatever arcane way it sees fit.
-   We ignore SIGPIPE but check for an I/O error, so that the program 
+   We ignore SIGPIPE but check for an I/O error, so that the program
    copes gracefully in the case that the pipe is broken. */
       handler = signal( SIGPIPE, SIG_IGN );
       if ( write( ofd, "exit", strlen( "exit" ) + 1 ) < 0 ) {
@@ -538,8 +538,8 @@
 *  Description:
 *     This function executes an arbitrary string of Tcl commands within
 *     the current interpreter and discards the result.  It is better
-*     to use this than ccdTclGetC cast to void if the result string 
-*     may be long, since attempting to pass a long result string up 
+*     to use this than ccdTclGetC cast to void if the result string
+*     may be long, since attempting to pass a long result string up
 *     the result pipe may result in a buffer overflow.
 
 *  Arguments:
@@ -674,7 +674,7 @@
    }
 
 
-   void ccdTclAppC( ccdTcl_Interp *cinterp, char *name, char *value, 
+   void ccdTclAppC( ccdTcl_Interp *cinterp, char *name, char *value,
                     int *status ) {
 /*
 *+
@@ -688,7 +688,7 @@
 *     Starlink C
 
 *  Description:
-*     This routine appends an item to a Tcl variable using the lappend 
+*     This routine appends an item to a Tcl variable using the lappend
 *     command.
 
 *  Arguments:
@@ -744,7 +744,7 @@
    }
 
 
-   void ccdTclSetI( ccdTcl_Interp *cinterp, char *name, int value, 
+   void ccdTclSetI( ccdTcl_Interp *cinterp, char *name, int value,
                     int *status ) {
 /*
 *+
@@ -810,7 +810,7 @@
    }
 
 
-   void ccdTclSetD( ccdTcl_Interp *cinterp, char *name, double value, 
+   void ccdTclSetD( ccdTcl_Interp *cinterp, char *name, double value,
                     int *status ) {
 /*
 *+
@@ -876,7 +876,7 @@
    }
 
 
-   void ccdTclSetC( ccdTcl_Interp *cinterp, char *name, char *value, 
+   void ccdTclSetC( ccdTcl_Interp *cinterp, char *name, char *value,
                     int *status ) {
 /*
 *+
@@ -942,7 +942,7 @@
    }
 
 
-   void ccdTclGetI( ccdTcl_Interp *cinterp, char *script, int *value, 
+   void ccdTclGetI( ccdTcl_Interp *cinterp, char *script, int *value,
                     int *status ) {
 /*
 *+
@@ -1016,7 +1016,7 @@
    }
 
 
-   void ccdTclGetD( ccdTcl_Interp *cinterp, char *script, double *value, 
+   void ccdTclGetD( ccdTcl_Interp *cinterp, char *script, double *value,
                     int *status ) {
 /*
 *+
@@ -1084,7 +1084,7 @@
 /* Convert the returned result to a double value. */
       if ( sscanf( result, "%lf", value ) != 1 ) {
          *status = SAI__ERROR;
-         sprintf( buffer, "Error doing %%lf conversion of string '%s'", 
+         sprintf( buffer, "Error doing %%lf conversion of string '%s'",
                   result );
          errRep( "CCD_TCL_CONV", buffer, status );
       }
@@ -1104,7 +1104,7 @@
 *     Starlink C
 
 *  Description:
-*     This function executes an arbitrary string within the Tcl 
+*     This function executes an arbitrary string within the Tcl
 *     interpreter and returns the result string.  Note it should NOT
 *     be used if the return string may be long (longer than BUFLENG)
 *     since this may cause the read buffer to overflow when the result
@@ -1120,7 +1120,7 @@
 
 *  Return Value:
 *     A pointer to the result of the expression.  If there was an error
-*     then status is set, and the return value will be set to an empty 
+*     then status is set, and the return value will be set to an empty
 *     string.
 
 *  Copyright:

@@ -3,7 +3,7 @@
 #   Copyright 2001, Council for the Central Laboratory of the Research Councils
 #
 #   This program is part of the Starlink Software Distribution: see
-#   http://www.starlink.ac.uk 
+#   http://www.starlink.ac.uk
 #
 #   moggy is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -106,8 +106,8 @@ sub send_input_to_slave_ ($;\@);
 #  <parameter optional default='Skycat built-in default'>
 #    <name>config
 #    <type>URL
-#    <description>An alternative configuration file.  
-#    See the Skycat documentation for a description of the configuration 
+#    <description>An alternative configuration file.
+#    See the Skycat documentation for a description of the configuration
 #    file format.
 #  <parameter optional default='$AUTOASTROM_DIR/moggy'>
 #    <name>moggypath
@@ -353,7 +353,7 @@ sub point ($$$) {
 #
 #  <p>Gets or, with an argument, sets the location of the
 #   `otherpoint' used by moggy.  In the case of the `RADIUS' search, this
-#   point is not used; for the `RADIUS2' search, the search radius is 
+#   point is not used; for the `RADIUS2' search, the search radius is
 #   taken to be the distance between `point' and `otherpoint'; and for the
 #   `BOX' search, this specifies the other corner of the search box.
 #
@@ -433,7 +433,7 @@ sub otherpoint ($$$) {
 #   individual catalogue handlers implement this, it is not actually
 #   guaranteed that the returned results will be in the specified
 #   area, so if it matters, the results should be checked by the
-#   caller, or otherwise post-processed. 
+#   caller, or otherwise post-processed.
 #
 # <argumentlist>
 #   <parameter optional><name>type<type>string<description>One of
@@ -597,8 +597,8 @@ sub astconvert ($$$$) {
 #   methods.  The query results in a status
 #   response indicating success or failure.
 #   If the response is a failure status, it might be due to
-#   us not having specified enough in the query.  
-#   <p>If successful, The results can be retrieved by subsequent calls to 
+#   us not having specified enough in the query.
+#   <p>If successful, The results can be retrieved by subsequent calls to
 #   the `result()', `resultcolumns()', `resultnrows()' and `resultncols()'
 #   methods.
 # <argumentlist none>
@@ -655,9 +655,9 @@ sub query ($) {
 # <routinename>result
 # <description>Returns an array containing the result of a successful query.
 # <argumentlist none>
-# <returnvalue>A reference to an array (of size `resultnrows()') of references 
+# <returnvalue>A reference to an array (of size `resultnrows()') of references
 #   to arrays (of size `resultncols()') containing the result of the query.
-#   This may be used by, for example, 
+#   This may be used by, for example,
 #   <verbatim>
 #     $resref = $cat->result();
 #     $colref = $cat->resultcolumns();
@@ -701,7 +701,7 @@ sub resultcolumns ($) {
 #     <type>string
 #     <description>Name of a column, matched case-insensitively.
 #       If the first character of the column
-#       name is a slash, then it and any trailing slash, is removed, and 
+#       name is a slash, then it and any trailing slash, is removed, and
 #       the string is interpreted as a regular expression.
 # <returnvalue type=integer>
 #   If the column is present, returns the (zero-offset) column number
@@ -805,7 +805,7 @@ sub debug ($;$) {
 # Start the slave.  Nilpotent -- if the slave is already running, then
 # do nothing.  No return: slave's status can be checked by testing the
 # value of {SLAVEPID}, which is non-zero if the slave is running
-# (cf. stop_slave_). 
+# (cf. stop_slave_).
 sub start_slave_ ($) {
     my $self = shift;
 
@@ -953,7 +953,7 @@ sub send_input_to_slave_ ($;\@) {
 #   <p>You may use the parameter-setting methods to configure the
 #     moggy-catalogue object, even if this status returns false, so that
 #     you do not have to check the error status between each of a series
-#     of method calls.  If any of the methods fail, 
+#     of method calls.  If any of the methods fail,
 #     subsequent methods do nothing and do not change the status.  You can
 #     obtain the current status code with the method `current_status()', and
 #     obtain the corresponding message with `current_statusmessage()'.

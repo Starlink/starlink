@@ -1,6 +1,6 @@
 proc red4Derip {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global Red4Widgets
 
@@ -24,9 +24,9 @@ proc red4Derip {taskname} {
     pack $Red4Widgets(DR_LAB01) $Red4Widgets(DR_ENT01) -in $toptop -side left
     $Red4Widgets(DR_ENT01) insert end $Red4Widgets(SP)
 
-    set Red4Widgets(DR_LAB02) [label $bottop.l1 -text "Start"]  
-    set Red4Widgets(DR_LAB03) [label $bottop.l2 -text "End"]  
-    set Red4Widgets(DR_LAB04) [label $bottop.l3 -text "Deripple Region" -width 20]  
+    set Red4Widgets(DR_LAB02) [label $bottop.l1 -text "Start"]
+    set Red4Widgets(DR_LAB03) [label $bottop.l2 -text "End"]
+    set Red4Widgets(DR_LAB04) [label $bottop.l3 -text "Deripple Region" -width 20]
     set Red4Widgets(DR_LAB05) [label $bottop.l4 -text " "]
     set Red4Widgets(DR_ENT02) [entry $bottop.s1]
     set Red4Widgets(DR_ENT03) [entry $bottop.e1]
@@ -64,10 +64,10 @@ proc red4Derip {taskname} {
         set Red4Widgets(XEN) [string trim [$Red4Widgets(DR_ENT03) get]]
         set message "Derippling $Red4Widgets(SP) to form $derip"
         cgs4drInform $taskname $message
-        set param "spectrum=$Red4Widgets(SP) output=$irff xstart=$Red4Widgets(XST) xend=$Red4Widgets(XEN) more='NO'" 
+        set param "spectrum=$Red4Widgets(SP) output=$irff xstart=$Red4Widgets(XST) xend=$Red4Widgets(XEN) more='NO'"
         $taskname obey irflat "$param" -inform "cgs4drInform $taskname %V" -endmsg {set done 1}
         tkwait variable done
-        set param "image1=$Red4Widgets(SP) image2=$irff output=$derip errors='GAUSSIAN'" 
+        set param "image1=$Red4Widgets(SP) image2=$irff output=$derip errors='GAUSSIAN'"
         $taskname obey idiv4 "$param" -inform "cgs4drInform $taskname %V"
       }
     }

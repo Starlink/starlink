@@ -1,4 +1,4 @@
-	SUBROUTINE YADDSUB( DIMS1, DIMS2, ARRIN, ODIMS1, ODIMS2, 
+	SUBROUTINE YADDSUB( DIMS1, DIMS2, ARRIN, ODIMS1, ODIMS2,
      :                      ARROUT, YST, YSZ, AVER, STATUS)
 
 * HISTORY
@@ -9,17 +9,17 @@
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
+	INTEGER
      :	  DIMS1, DIMS2,
-     :	  ODIMS1, ODIMS2, 
+     :	  ODIMS1, ODIMS2,
      :	  STATUS,
      :	  YST,
      :    YSZ,
      :	  J,
      :	  K
 
-	REAL 
-     :	  ARROUT( ODIMS1, ODIMS2 ), 
+	REAL
+     :	  ARROUT( ODIMS1, ODIMS2 ),
      :	  ARRIN( DIMS1, DIMS2 )
 
 	LOGICAL
@@ -41,7 +41,7 @@
 
 *          form the array with the added input pixel values
 
-	    ARROUT( K, ODIMS2) = ARROUT( K, ODIMS2) + ARRIN( K, J) 
+	    ARROUT( K, ODIMS2) = ARROUT( K, ODIMS2) + ARRIN( K, J)
 
 	  END DO
 

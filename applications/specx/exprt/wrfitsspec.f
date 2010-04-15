@@ -62,7 +62,7 @@
       CHARACTER           ORIGIN*32
 
 *     variables used to interface FIT_ routines.
-  
+
       LOGICAL   CHECK
       REAL      DMIN
       REAL      DMAX
@@ -111,7 +111,7 @@
       END IF
 
 *     Substitute BAD values with RBLANK (returned). Scale RBLANK to
-*     BLANK after call to FIT_SCALC. 
+*     BLANK after call to FIT_SCALC.
 
       CALL BAD2BLANK (1, DATA, NPTS(1), RBLANK, NBLANK, IFAIL)
 
@@ -130,8 +130,8 @@
 
       NAXES(1) = NPTS(1)
       NAXES(2) = 1
-      NAXES(3) = 1    
-      NAXES(4) = 1    
+      NAXES(3) = 1
+      NAXES(4) = 1
 
       CALL FIT_HSTAN (BITPIX, NAXIS, NAXES, BSCALE, BZERO, STATUS)
       IF (STATUS.NE.0) GO TO 99
@@ -173,7 +173,7 @@
 
       AZ8 = AZ8 * 180./DPI
       EL8 = EL8 * 180./DPI
- 
+
 *     Gain and frequency parameters...
 *     (n.b.: second call to SETXDOPP in CALC_IMAGE also sets DOPPFAC)
 
@@ -337,7 +337,7 @@
      &                'System temperature (K)',              STATUS)
       CALL FIT_WDBLE ('OBSTIME ', DFLOAT(INTT)/1000.,
      &                'Integration time (sec)',              STATUS)
-      CALL FIT_WDBLE ('SCAN-NUM', DFLOAT(LSCAN), 
+      CALL FIT_WDBLE ('SCAN-NUM', DFLOAT(LSCAN),
      &                'Scan number ',                        STATUS)
       CALL FIT_WDBLE ('TAU-ATM ', TAUATM,
      &                'Zenith opacity (Nepers) ',            STATUS)

@@ -4,7 +4,7 @@
 *     ANT_PAR
 
 *  Purpose:
-*     Constants for ANT library 
+*     Constants for ANT library
 
 *  Language:
 *     {routine_language}

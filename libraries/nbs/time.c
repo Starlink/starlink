@@ -104,7 +104,7 @@ scanf ("%d %d %d",&count,&items,&item);
 
 /*	Determine increment_modify and check_modify flags	*/
 
-inc = 1;  
+inc = 1;
 check = 1;
 printf ("Enter increment_modify and check_modify flags: ");
 scanf ("%d %d",&inc,&check);
@@ -113,7 +113,7 @@ nbc_tune ("check_modify",check,&old_check,&status);
 
 /*	Open output file and report date, time and parameters	*/
 
-file = freopen ("time.lis","w",stdout);  
+file = freopen ("time.lis","w",stdout);
 if (!file)
 	file = stdout;	/* Questionable?	*/
 time (&tim);

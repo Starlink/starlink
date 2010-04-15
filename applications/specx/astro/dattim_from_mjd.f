@@ -75,7 +75,7 @@
       CALL SLA_DD2TF(3, FD, SIGN, IHMSF)
 
 *     Write the values into the string
-      WRITE (ITIME, '(I2.2,'':'',I2.2,'':'',I2.2)') 
+      WRITE (ITIME, '(I2.2,'':'',I2.2,'':'',I2.2)')
      &       IHMSF(1), IHMSF(2), IHMSF(3)
 
 

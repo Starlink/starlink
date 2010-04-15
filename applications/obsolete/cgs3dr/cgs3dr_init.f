@@ -109,7 +109,7 @@
       IF (PLOTTING) THEN
 *       Get the graphics device and open it
          CALL PAR_GET0C ('GDEVICE', GDEVICE, STATUS)
-         CALL CGS3DR_OBEYW (FIGARO_TASK, 'SOFT', GDEVICE, OUTVAL, 
+         CALL CGS3DR_OBEYW (FIGARO_TASK, 'SOFT', GDEVICE, OUTVAL,
      :    20000, STATUS)
       END IF
 

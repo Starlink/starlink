@@ -84,7 +84,7 @@
      :    LOCOBS,			! obs structure
      :    LOCCELL,			! cell locator
      :	  LOCPAR                        ! locator for parameter
- 
+
 *-
 *      check status on entry - return if not o.k.
 
@@ -241,10 +241,10 @@
 
 	    END IF
 
-	  ELSE 
+	  ELSE
 
 	    IF( PTYPE( 1:5) .EQ. '_CHAR') THEN
-	      	  
+
 	      CALL MSG_SETI( 'NUM', J)
 	      CALL MSG_SETC( 'CVAL', CHARVAR)
 	      CALL MSG_OUT( 'MESSAGE', 'Observation ^NUM, Value = ^CVAL',

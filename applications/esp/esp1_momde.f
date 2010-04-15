@@ -1,7 +1,7 @@
-       
+
 
       SUBROUTINE HIS1_MOMDE(ELEMS,NUMBER,ARRAY,
-     :                      MEAN,ADEV,VARI,SDEV,SKEW,KURT,STATUS) 
+     :                      MEAN,ADEV,VARI,SDEV,SKEW,KURT,STATUS)
 *+
 *  Name:
 *     HIS1_MOMDE
@@ -14,13 +14,13 @@
 
 *  Invocation:
 *     CALL HIS1_MOMDE(ELEMS,NUMBER,ARRAY,
-*                     MEAN,ADEV,VARI,SDEV,SKEW,KURT,STATUS) 
-                  
+*                     MEAN,ADEV,VARI,SDEV,SKEW,KURT,STATUS)
+
 *  Description:
-*     Finds values for the absolute deviation, standard deviation, 
+*     Finds values for the absolute deviation, standard deviation,
 *     variance, skewness and kurtosis of pixels in an image.
 
-*  Arguments:                      
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        The number of pixels in the image. Units pixels.
 *     NUMBER = INTEGER (Given)
@@ -32,7 +32,7 @@
 *     ADEV = DOUBLE PRECISION (Returned)
 *        Absolute deviation of the image pixels count distribution.
 *        Units counts.
-*     VARI = DOUBLE PRECISION (Returned)                             
+*     VARI = DOUBLE PRECISION (Returned)
 *        Variance of the image pixel count distribution.
 *     SDEV(2) = DOUBLE PRECISION (Returned)
 *        Standard deviation of the image pixel count distribution
@@ -58,30 +58,30 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HIS_PAR'               ! HISTPEAK system variables
 
 *  Arguments Given:
-      INTEGER ELEMS                   ! Number of pixels in the data 
+      INTEGER ELEMS                   ! Number of pixels in the data
       INTEGER NUMBER                  ! The number of pixels to be used
       REAL ARRAY(ELEMS)               ! Array containing image data
-      DOUBLE PRECISION MEAN           ! Average value in the image 
-                                      ! array       
-             
+      DOUBLE PRECISION MEAN           ! Average value in the image
+                                      ! array
+
 *  Arguments Returned:
-      DOUBLE PRECISION ADEV           ! Absolute deviation of array 
+      DOUBLE PRECISION ADEV           ! Absolute deviation of array
       DOUBLE PRECISION KURT           ! Kurtosis of array values
-      DOUBLE PRECISION SDEV(2)        ! Background standard deviation 
-      DOUBLE PRECISION SKEW           ! Skewness of the array values 
+      DOUBLE PRECISION SDEV(2)        ! Background standard deviation
+      DOUBLE PRECISION SKEW           ! Skewness of the array values
       DOUBLE PRECISION VARI           ! Variance of array values
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables: 
+*  Local variables:
       INTEGER I                       ! Loop variable
       DOUBLE PRECISION VALUE          ! Temporary storage variable
       DOUBLE PRECISION P2             ! Temporary storage variable
@@ -92,7 +92,7 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-       
+
 *   Look through the array to gather information for calculating the
 *   standard deviation, absolute deviation, variance, skewness and
 *   kurtosis of the distribution.
@@ -100,30 +100,30 @@
 
 *      Get the pixel value and check that it isnt bad.
          TEMP=ARRAY(I)
-         IF (TEMP.NE.VAL__BADR) THEN 
+         IF (TEMP.NE.VAL__BADR) THEN
 
 *         Convert to double precision and then calculate the
-*         absolute deviation (first moment of deviation). 
-            VALUE=DBLE(TEMP)-MEAN         
+*         absolute deviation (first moment of deviation).
+            VALUE=DBLE(TEMP)-MEAN
             ADEV=ADEV+ABS(VALUE)
             P2=VALUE*VALUE
             P3=P2*VALUE
             P4=P3*VALUE
 
-*         Variance. 
+*         Variance.
             VARI=VARI+P2
 
-*         Skewness. 
+*         Skewness.
             SKEW=SKEW+P3
 
 *         Kurtosis.
             KURT=KURT+P4
 
          END IF
- 212  CONTINUE  
+ 212  CONTINUE
 
 *   Derive values from the previous summations for absolute deviation,
-*   variance, standard deviation, skewness and kurtosis.     
+*   variance, standard deviation, skewness and kurtosis.
       IF (NUMBER.GE.2) THEN
          ADEV=ADEV/DBLE(NUMBER)
          VARI=VARI/DBLE(NUMBER-1)
@@ -136,14 +136,14 @@
      :                    ' of the standard. deviation etc.',STATUS)
          GOTO 9999
       END IF
-      
+
  9999 CONTINUE
 
       END
-       
+
 
       SUBROUTINE HSB1_MOMDE(ELEMS,NUMBER,ARRAY,
-     :                      MEAN,STATUS,ADEV,VARI,SDEV,SKEW,KURT) 
+     :                      MEAN,STATUS,ADEV,VARI,SDEV,SKEW,KURT)
 *+
 *  Name:
 *     HSB1_MOMDE
@@ -156,13 +156,13 @@
 
 *  Invocation:
 *     CALL HSB1_MOMDE(ELEMS,NUMBER,ARRAY,
-*                     MEAN,STATUS,ADEV,VARI,SDEV,SKEW,KURT) 
-                  
+*                     MEAN,STATUS,ADEV,VARI,SDEV,SKEW,KURT)
+
 *  Description:
-*     Finds values for the absolute deviation, standard deviation, 
+*     Finds values for the absolute deviation, standard deviation,
 *     variance, skewness and kurtosis of pixels in an image.
 
-*  Arguments:                      
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        The number of pixels in the image. Units pixels.
 *     NUMBER = INTEGER (Given)
@@ -176,7 +176,7 @@
 *     ADEV = DOUBLE PRECISION (Returned)
 *        Absolute deviation of the image pixels count distribution.
 *        Units counts.
-*     VARI = DOUBLE PRECISION (Returned)                             
+*     VARI = DOUBLE PRECISION (Returned)
 *        Variance of the image pixel count distribution.
 *     SDEV(2) = DOUBLE PRECISION (Returned)
 *        Standard deviation of the image pixel count distribution
@@ -200,30 +200,30 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HSB_PAR'               ! HSUB system variables
 
 *  Arguments Given:
-      INTEGER ELEMS                   ! Number of pixels in the data 
+      INTEGER ELEMS                   ! Number of pixels in the data
       INTEGER NUMBER                  ! The number of pixels to be used
       REAL ARRAY(ELEMS)               ! Array containing image data
-      DOUBLE PRECISION MEAN           ! Average value in the image 
-                                      ! array       
-             
+      DOUBLE PRECISION MEAN           ! Average value in the image
+                                      ! array
+
 *  Arguments Returned:
-      DOUBLE PRECISION ADEV           ! Absolute deviation of array 
+      DOUBLE PRECISION ADEV           ! Absolute deviation of array
       DOUBLE PRECISION KURT           ! Kurtosis of array values
       DOUBLE PRECISION SDEV(2)        ! Standard deviation
-      DOUBLE PRECISION SKEW           ! Skewness of the array values 
+      DOUBLE PRECISION SKEW           ! Skewness of the array values
       DOUBLE PRECISION VARI           ! Variance of array values
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables: 
+*  Local variables:
       INTEGER I                       ! Loop variable
       REAL VALUE                      ! Temporary storage variable
       DOUBLE PRECISION P2             ! Temporary storage variable
@@ -234,30 +234,30 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-       
+
 *   Look through the array to gather information for calculating the
 *   standard deviation, absolute deviation, variance, skewness and
 *   kurtosis of the distribution.
       DO 212 I=1,ELEMS
          VALUE=ARRAY(I)
-         IF (VALUE.NE.VAL__BADR) THEN 
-*         Absolute deviation (first moment of deviation). 
-            VALUE=VALUE-MEAN         
+         IF (VALUE.NE.VAL__BADR) THEN
+*         Absolute deviation (first moment of deviation).
+            VALUE=VALUE-MEAN
             ADEV=ADEV+ABS(VALUE)
             P2=VALUE*VALUE
             P3=P2*VALUE
             P4=P3*VALUE
-*         Variance. 
+*         Variance.
             VARI=VARI+P2
-*         Skewness. 
+*         Skewness.
             SKEW=SKEW+P3
 *         Kurtosis.
             KURT=KURT+P4
          END IF
- 212  CONTINUE  
+ 212  CONTINUE
 
 *   Derive values from the previous summations for absolute deviation,
-*   variance, standard deviation, skewness and kurtosis.     
+*   variance, standard deviation, skewness and kurtosis.
       IF (NUMBER.GE.2) THEN
          ADEV=ADEV/REAL(NUMBER)
          VARI=VARI/REAL(NUMBER-1)
@@ -270,14 +270,14 @@
      :                    ' of the standard. deviation etc.',STATUS)
          GOTO 9999
       END IF
-      
+
  9999 CONTINUE
 
       END
-       
+
 
       SUBROUTINE LOB1_MOMDE(ELEMS,NUMBER,ARRAY,
-     :                      MEAN,ADEV,VARI,SDEV,STATUS) 
+     :                      MEAN,ADEV,VARI,SDEV,STATUS)
 *+
 *  Name:
 *     LOB1_MOMDE
@@ -290,13 +290,13 @@
 
 *  Invocation:
 *     CALL LOB1_MOMDE(ELEMS,NUMBER,ARRAY,
-*                     MEAN,ADEV,VARI,SDEV,STATUS) 
-                  
+*                     MEAN,ADEV,VARI,SDEV,STATUS)
+
 *  Description:
-*     Finds values for the absolute deviation, standard deviation and 
+*     Finds values for the absolute deviation, standard deviation and
 *     variance of pixels in an image.
 
-*  Arguments:                      
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        The number of pixels in the image. Units pixels.
 *     NUMBER = INTEGER (Given)
@@ -308,7 +308,7 @@
 *     ADEV = DOUBLE PRECISION (Returned)
 *        Absolute deviation of the image pixels count distribution.
 *        Units counts.
-*     VARI = DOUBLE PRECISION (Returned)                             
+*     VARI = DOUBLE PRECISION (Returned)
 *        Variance of the image pixel count distribution.
 *     SDEV(2) = DOUBLE PRECISION (Returned)
 *        Standard deviation of the image pixel count distribution
@@ -330,29 +330,29 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'LOB_PAR'               ! LOBACK system variables
 
 *  Arguments Given:
-      INTEGER ELEMS                   ! Number of pixels in the data 
+      INTEGER ELEMS                   ! Number of pixels in the data
       INTEGER NUMBER                  ! The number of pixels to be used
       REAL ARRAY(ELEMS)               ! Array containing image data
-      DOUBLE PRECISION MEAN           ! Average value in the image 
-                                      ! array       
-             
+      DOUBLE PRECISION MEAN           ! Average value in the image
+                                      ! array
+
 *  Arguments Returned:
-      DOUBLE PRECISION ADEV           ! Absolute deviation of array 
-      DOUBLE PRECISION SDEV(2)        ! Standard deviation and the 
+      DOUBLE PRECISION ADEV           ! Absolute deviation of array
+      DOUBLE PRECISION SDEV(2)        ! Standard deviation and the
                                       ! standard deviation of background
       DOUBLE PRECISION VARI           ! Variance of array values
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables: 
+*  Local variables:
       INTEGER I                       ! Loop variable
       REAL VALUE                      ! Temporary storage variable
       DOUBLE PRECISION P2             ! Temporary storage variable
@@ -361,24 +361,24 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-       
+
 *   Look through the array to gather information for calculating the
-*   standard deviation, absolute deviation and  variance 
+*   standard deviation, absolute deviation and  variance
 *   of the distribution.
       DO 212 I=1,ELEMS
          VALUE=ARRAY(I)
-         IF (VALUE.NE.VAL__BADR) THEN 
-*         Absolute deviation (first moment of deviation). 
-            VALUE=VALUE-MEAN         
+         IF (VALUE.NE.VAL__BADR) THEN
+*         Absolute deviation (first moment of deviation).
+            VALUE=VALUE-MEAN
             ADEV=ADEV+ABS(VALUE)
             P2=VALUE*VALUE
-*         Variance. 
+*         Variance.
             VARI=VARI+P2
          END IF
- 212  CONTINUE  
-      
+ 212  CONTINUE
+
 *   Derive values from the previous summations for absolute deviation,
-*   variance and standard deviation.     
+*   variance and standard deviation.
       IF (NUMBER.GE.2) THEN
          ADEV=ADEV/REAL(NUMBER)
          VARI=VARI/REAL(NUMBER-1)
@@ -390,7 +390,7 @@
          STATUS=SAI__ERROR
          GOTO 9999
       END IF
-      
+
  9999 CONTINUE
 
       END

@@ -31,7 +31,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Global Constants:
       INTEGER CHT__UNOIF         ! Unable to open intermediate file
       PARAMETER ( CHT__UNOIF = 1 )
@@ -60,7 +60,7 @@ c      PARAMETER ( CHT__NONUM = 1 )
       INTEGER CHT__NOFIL         ! Can't open file
       PARAMETER ( CHT__NOFIL = 1003 )
 
-      INTEGER CHT__BADRD         ! Can't read file 
+      INTEGER CHT__BADRD         ! Can't read file
       PARAMETER ( CHT__BADRD = 1004 )
 
 C      [local_constant_specification]...

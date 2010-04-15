@@ -39,7 +39,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -67,7 +67,7 @@
 *
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-*    Close the catalogue. 
+*    Close the catalogue.
 *
 *      call chi_closecat(input, status)
 *

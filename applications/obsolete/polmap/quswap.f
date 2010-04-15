@@ -2,24 +2,24 @@
      &                 STOKES_U,STOKES_UV,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C   Q U S W A P
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C STOKES_I (<), STOKES_Q (><), STOKES_QV (><),
 C STOKES_U (><), STOKES_UV (><), LAMBDA (><), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C  Swaps the q and u arrays of the current polarization spectrum
 C
@@ -57,4 +57,4 @@ C
  666  CONTINUE
       END
 
-       
+

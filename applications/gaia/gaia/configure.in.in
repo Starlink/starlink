@@ -1,4 +1,4 @@
-# E.S.O. - VLT project 
+# E.S.O. - VLT project
 # $Id$
 #
 # This file is used with GNU autoconf to generate a configure script
@@ -198,7 +198,7 @@ OS=`uname`
 AC_SUBST(OS)
 
 #--------------------------------------------------------------------
-# Local tests that depend on the compiler setup, including CFLAGS 
+# Local tests that depend on the compiler setup, including CFLAGS
 #--------------------------------------------------------------------
 GAIA_COMPILER_TESTS
 

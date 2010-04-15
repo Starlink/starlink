@@ -34,7 +34,7 @@
       INTEGER*4 nbytes
       INTEGER*4 itype
       CHARACTER type*4
-      
+
       INTEGER*4 itype1,  itype2
 
       CHARACTER types(ntypes)*4
@@ -113,10 +113,10 @@ CD    Print *,' - operator is "'//operator(1:2)//'"'
           type  = types(itype)
           READ (type(2:gen_ilen(type)), '(I3)') nbytes
 
-          IF (itype1.NE.itype) 
+          IF (itype1.NE.itype)
      &      CALL gen_cvt_type (temp1, type1, nbytes1,
      &                         temp1, type,  nbytes,  ierr)
-          IF (itype2.NE.itype) 
+          IF (itype2.NE.itype)
      &      CALL gen_cvt_type (temp2, type2, nbytes2,
      &                         temp2, type,  nbytes,  ierr)
           IF (ierr.NE.0) GO TO 99
@@ -137,12 +137,12 @@ CD    Print *,' - operator is "'//operator(1:2)//'"'
           type  = types(itype)
           READ (type(2:gen_ilen(type)), '(I3)') nbytes
 
-          IF (itype1.NE.itype) 
+          IF (itype1.NE.itype)
      &        CALL gen_cvt_type (temp1, type1, nbytes1,
      &                           temp1, type,  nbytes,  ierr)
           IF (itype2.NE.itype
      &        .AND. (operator(1:1).NE.'^' .OR. type2.NE.'I4'))
-     &             CALL gen_cvt_type (temp2, type2, nbytes2, 
+     &             CALL gen_cvt_type (temp2, type2, nbytes2,
      &                                 temp2, type, nbytes,   ierr)
           IF (ierr.NE.0) GO TO 99
           CALL gen_exopa (temp1, type, temp2, type2, operator, ierr)

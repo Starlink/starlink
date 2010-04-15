@@ -9,7 +9,7 @@ C     Maps part of the main data array in a structure.
 C
 C  Description:
 C     This routine maps the main data array in a structure, returning
-C     the address of the dynamic memory array that may be used to 
+C     the address of the dynamic memory array that may be used to
 C     access it.   A subset of the whole array is mapped.
 C
 C  Language:
@@ -22,15 +22,15 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) NINDEX       (Integer, ref) The number of dimensions specified in
-C                      the INDICES array. This should be either match the 
+C                      the INDICES array. This should be either match the
 C                      number of dimensions in the array, or should be one
 C                      in which case INDICES is a single integer giving the
 C                      number of the first element in the array to be mapped.
 C     (>) INDICES      (Integer array, ref) Used to specify the first
 C                      element in the array to be mapped. If NINDEX is the
-C                      actual number of dimensions in the array then INDICES 
+C                      actual number of dimensions in the array then INDICES
 C                      contains the index number of the first mapped element
 C                      in the various array dimensions. In some case it is
 C                      simpler to give just the number (from 1) of the first
@@ -43,10 +43,10 @@ C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT', 'USHORT' or 'INT'.  
-C                      If type conversion is needed, it will be performed 
+C                      'CHAR','FLOAT','DOUBLE','SHORT', 'USHORT' or 'INT'.
+C                      If type conversion is needed, it will be performed
 C                      automatically.
-C     (<) ADDRESS      (Integer,ref) The memory address of the start of 
+C     (<) ADDRESS      (Integer,ref) The memory address of the start of
 C                      the mapped data array.
 C     (<) SLOT         (Integer,ref) A handle value that identifies the
 C                      mapping, and can be used, for example, in a
@@ -55,13 +55,13 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
 C     ICH_CI, ICH_LEN, DSA_FIND_REF, DSA_WRUSER, DSA_GET_ACTUAL_NAME,
 C     DSA_MAIN_SIZE, ICH_FOLD, DSA_SEEK_FLAGGED_VALUES,
-C     DSA_SEEK_QUALITY, DSA_TYPESIZE, DSA__SET_FLAGGED, DSA__ARRAY, 
+C     DSA_SEEK_QUALITY, DSA_TYPESIZE, DSA__SET_FLAGGED, DSA__ARRAY,
 C     DSA__DATA_NAME
 C
 C  Prior requirements:
@@ -76,7 +76,7 @@ C  Common variable details:
 C     (>) MAX_AXES     (Integer parameter) Maximum number of axes in data.
 C     (>) USE_FLAGS    (Logical array) Indicates application can handle flagged
 C                      data values.
-C     (<) DATA_UPDATE  (Logical array) Indicates that the data array has 
+C     (<) DATA_UPDATE  (Logical array) Indicates that the data array has
 C                      been updated (or at least, mapped for update).
 C     (>) USE_QUALITY  (Logical array) Indicates application will use a data
 C                      quality array.
@@ -137,7 +137,7 @@ C
       LOGICAL   QUALITY_EXIST               ! Quality info present
       LOGICAL   QUALITY_USED                ! True if quality data handled
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE_NAME*128          ! Full structure name from ref_name
       LOGICAL   TOO_HARD                    ! Array too complicated for us
       CHARACTER TYPE_UC*8                   ! Upper case version of TYPE
@@ -158,7 +158,7 @@ C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     Look up the reference name in the tables and get the data 
+C     Look up the reference name in the tables and get the data
 C     array dimensions.
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
@@ -190,13 +190,13 @@ C
       DO I=NINDEX,2,-1
          MSTART=(MSTART+INDICES(I)-1)*DIMS(I-1)
       END DO
-      MSTART=MSTART+INDICES(1)  
+      MSTART=MSTART+INDICES(1)
 C
 C     The whole process is complicated by the question of data quality,
 C     and the need to pre-process (and post-process) the mapped arrays
 C     in order to handle flagged pixel values that will not be handled
 C     properly by the calling routine. For the moment, in this early
-C     version of the code, we take the easy way out. If there is any 
+C     version of the code, we take the easy way out. If there is any
 C     need for fancy handling of the data, we simply fall back on mapping
 C     the whole array using DSA_MAP_DATA. If things are simple, however,
 C     we can and do handle part of the array.  first we need to find out
@@ -270,7 +270,7 @@ C        mapping, if the application is using flagged values and the structure
 C        does not have data quality information, make sure the `data flagged'
 C        flag for the structure is set. Also set the data slot to give a
 C        handle to the data mapping.
-C 
+C
          IF ((MODE(1:1).NE.'R').AND.(MODE(1:1).NE.'r')) THEN
             DATA_UPDATE(REF_SLOT)=.TRUE.
             RANGE_UPDATE(REF_SLOT)=.FALSE.

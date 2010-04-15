@@ -3,7 +3,7 @@
 *	9 Apr 1992	M. Duesterhaus	Port to Unix
 *************************************************************************
       SUBROUTINE DBS_PUTR( REF_NO , FIELDNO , VALUE )
- 
+
 *INPUT:
 
       INTEGER FIELDNO	! Number of field.

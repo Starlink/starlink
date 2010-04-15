@@ -6,18 +6,18 @@
 *
 * A program to convert star catalogs in NSO format from binary to
 * ASCII format, to enable them to be ported from one system to another.
-* There is, as you might expect, an equal and opposite program which 
+* There is, as you might expect, an equal and opposite program which
 * converts the ASCII format catalog back to binary format once it has
 * been ported, called NSO2B.
 *
 * The program will ask the user which machine it is running on, first,
-* to be able to select the right record length for the RECL specifier 
-* of the OPEN statement, as the VAX expects it in longwords for 
-* unformatted files. It will then prompt the user for the pathnames 
-* for both the existing ASTROM binary file and the text file which is 
+* to be able to select the right record length for the RECL specifier
+* of the OPEN statement, as the VAX expects it in longwords for
+* unformatted files. It will then prompt the user for the pathnames
+* for both the existing ASTROM binary file and the text file which is
 * to be output.
 * Warning: the text files get pretty big - about 12 Mbytes.
-* 
+*
 * It's all standard FORTRAN 77, and uses no external or internal
 * subroutines.
 *
@@ -50,18 +50,18 @@
          LEN = 52
       ENDIF
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname of NSO binary file ?'
       READ(*, '(A)') FILE
 
-      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN, 
+      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN,
      :      FORM = 'UNFORMATTED', STATUS = 'OLD')
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname for NSO ASCII file ?'
       READ(*, '(A)') FILE
 
-      OPEN(UNIT = 11, FILE = FILE, 
+      OPEN(UNIT = 11, FILE = FILE,
      +     FORM = 'FORMATTED', STATUS = 'NEW')
 
       WRITE(*,*)
@@ -89,7 +89,7 @@
       COUNT = COUNT + 1
       READ(10, REC = COUNT, IOSTAT = IOSTAT) NAM, SRA, SDEC, LDIAM,
      +         I2MAG, DES
-      IF (MOD(COUNT, 10000) .EQ. 0)  WRITE(*,*) 'Done ', COUNT 
+      IF (MOD(COUNT, 10000) .EQ. 0)  WRITE(*,*) 'Done ', COUNT
       IF (IOSTAT .EQ. 0) GOTO 300
       WRITE(*,*) 'Finished !'
 

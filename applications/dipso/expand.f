@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command EXPAND.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,34 +125,34 @@
 *  Loop round each character in the supplied string.
          DO I = 1, CHR_LEN( PARTS )
             C = PARTS( I : I )
-         
+
 *  If this character is an A, scale the major tick marks.
             IF( C .EQ. 'A' ) THEN
                HTFAC( MJTICK ) = FACTOR
-         
+
 *  If this character is an I, scale the minor tick marks.
             ELSE IF( C .EQ. 'I' ) THEN
                HTFAC( MNTICK ) = FACTOR
-         
+
 *  If this character is an N, scale the numerical axis labels.
             ELSE IF( C .EQ. 'N' ) THEN
                HTFAC( NUMLAB ) = FACTOR
-         
+
 *  If this character is a T, scale the textual axis labels.
             ELSE IF( C .EQ. 'T' ) THEN
                HTFAC( TXTLAB ) = FACTOR
-         
+
 *  If this character is an M, scale the markers.
             ELSE IF( C .EQ. 'M' ) THEN
                HTFAC( MARKS ) = FACTOR
-         
+
 *  If this character is a P, scale the text created by the PWRITE
 *  command.
             ELSE IF( C .EQ. 'P' ) THEN
                HTFAC( PWRITE ) = FACTOR
-         
+
 *  Otherwise, issue a warning.
-            ELSE 
+            ELSE
                CALL MSG_SETC( 'C', C )
                CALL MSGOUT( COMM, 'Ignoring illegal character ''^C''.',
      :                      .TRUE., STATUS )
@@ -161,8 +161,8 @@
          END DO
 
       END IF
-            
-*  Jump to here if an error occurs. 
+
+*  Jump to here if an error occurs.
  999  CONTINUE
 
 *  If an error has occurred, re-report it with less information if the

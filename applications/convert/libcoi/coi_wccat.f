@@ -67,7 +67,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,7 +96,7 @@
 
 *  Local Variables:
       CHARACTER * ( 80 ) CARD    ! IRAF header card
-      CHARACTER * ( 1 ) CD       ! d in WATd_nnn 
+      CHARACTER * ( 1 ) CD       ! d in WATd_nnn
       CHARACTER * ( 4 ) CN       ! 1000 plus line number nnn
       INTEGER KEYNO              ! Keyword counter
       CHARACTER * ( 8 ) KEYWRD   ! Header keyword

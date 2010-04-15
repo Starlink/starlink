@@ -396,7 +396,7 @@
                IF ( START_BIN .NE. 0 .AND. END_BIN .NE. 0 ) THEN
                   START_SCAN = START_BIN
                   END_SCAN = END_BIN
-            
+
 *              Loop through input image pixels (in x) which contribute.
                   DO USE = START_BIN, END_BIN
                      YCOORD = INT( Y_TRACE_COORD( USE ) + 0.5 ) + JOFF
@@ -405,7 +405,7 @@
                         YOFFSET = REAL( Y_TRACE_COORD( USE ) ) -
      :                        FLOAT( INT( Y_TRACE_COORD( USE ) ) )
                         AYOFFSET = ABS( YOFFSET )
-            
+
 *                    Add contribution from input pixel.
                         IF ( TWO_D( JOFF, USE + 1 ) -
      :                       TWO_D( JOFF, USE ) .NE. 0.0 ) THEN
@@ -432,7 +432,7 @@
                         END IF
                         IF ( NO_ERRORS ) THEN
                            INPUT_VAR = 0.0
-                        
+
                         ELSE
                            INPUT_VAR = UERROR( USE, YCOORD ) ** 2.0
                         END IF
@@ -456,7 +456,7 @@
                         END IF
                      END IF
                   END DO
-            
+
 *              Set output pixels according to current trace offset.
                   IF ( YOFFSET .GE. 0.5 ) THEN
                      REBINNED_ORDER( I, J ) =

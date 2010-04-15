@@ -15,16 +15,16 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
-*                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
-*                       dim_t nxy, dim_t nout, dim_t dim[3], 
-*                       int badmask, int is2d, AstMapping *ssmap, 
-*                       AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-*                       Grp *detgrp, int moving, int usewgt, int genvar, 
-*                       double tfac, double fcon, float *data_array, 
+*     smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
+*                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
+*                       dim_t nxy, dim_t nout, dim_t dim[3],
+*                       int badmask, int is2d, AstMapping *ssmap,
+*                       AstSkyFrame *abskyfrm, AstMapping *oskymap,
+*                       Grp *detgrp, int moving, int usewgt, int genvar,
+*                       double tfac, double fcon, float *data_array,
 *                       float *var_array, double *wgt_array,
-*                       float *texp_array, float *teff_array, int *nused, 
-*                       int *nreject, int *naccept, int *good_tsys, 
+*                       float *texp_array, float *teff_array, int *nused,
+*                       int *nreject, int *naccept, int *good_tsys,
 *                       int *status );
 
 *  Arguments:
@@ -39,10 +39,10 @@
 *        Is this the last call to this routine for the current output
 *        cube?
 *     ptime = int * (Given)
-*        Pointer to an array of integers, each one being the index of a 
-*        time slice that is to be pasted into the output cube. If this is 
+*        Pointer to an array of integers, each one being the index of a
+*        time slice that is to be pasted into the output cube. If this is
 *        NULL, then all time slices are used. The values in the array
-*        should be monotonic increasing and should be terminated by a value 
+*        should be monotonic increasing and should be terminated by a value
 *        of VAL__MAXI.
 *     nchan = dim_t (Given)
 *        Number of spectral channels in input cube.
@@ -62,16 +62,16 @@
 *        output spectrum to be identical to the bad pixel mask of the
 *        first input spectrum that contributes to the output spectrum.
 *        Any subsequent input spectra that contribute to the same output
-*        spectrum but have a different bad pixel mask are ignored. A 
-*        "badmask" value of 1 causes the bad pixel mask for each output 
+*        spectrum but have a different bad pixel mask are ignored. A
+*        "badmask" value of 1 causes the bad pixel mask for each output
 *        spectrum to be the union of the bad pixel masks of all input
 *        spectra that contribute to the output spectrum. That is, an
-*        output pixel will be bad if any of the input pixels that 
+*        output pixel will be bad if any of the input pixels that
 *        contribute to it are bad.
 *     is2d = int (Given)
 *        Should a 2D weights array be used? If so, the weight and
-*        variance within a single output spectrum is assumed to be the 
-*        same for all spectral channels, and so 2D instead of 3D arrays 
+*        variance within a single output spectrum is assumed to be the
+*        same for all spectral channels, and so 2D instead of 3D arrays
 *        can be used, saving lots of memory. A 2D array has a single
 *        element for each spectrum in the output NDF. A 3D array has an
 *        element for every element in the output NDF.
@@ -79,9 +79,9 @@
 *        A Mapping that goes from input spectral grid axis (pixel axis 1)
 *        to the output spectral grid axis (pixel axis 3).
 *     abskyfrm = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe 
+*        A SkyFrame that specifies the coordinate system used to describe
 *        the spatial axes of the output cube. This should represent
-*        absolute sky coordinates rather than offsets even if "moving" is 
+*        absolute sky coordinates rather than offsets even if "moving" is
 *        non-zero.
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output cube to 2D
@@ -90,15 +90,15 @@
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
 *     moving = int (Given)
-*        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted so that the position specified by 
+*        A flag indicating if the telescope is tracking a moving object. If
+*        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output cube.
 *     usewgt = int (Given)
 *        A flag indicating if the input data should be weighted according
 *        to the input variances determined from the input Tsys values.
 *     genvar = int (Given)
-*        Indicates how the output variances should be calculated: 
+*        Indicates how the output variances should be calculated:
 *           0 = do not calculate any output variances
 *           1 = use spread of input data values
 *           2 = use system noise temperatures
@@ -108,31 +108,31 @@
 *     fcon = double (Given)
 *        The ratio of the squared backend degradation factor to the spectral
 *        channel width (this is the factor needed for calculating the
-*        variances from the Tsys value). 
+*        variances from the Tsys value).
 *     data_array = float * (Given and Returned)
 *        The data array for the output cube. This is updated on exit to
 *        include the data from the supplied input NDF.
 *     var_array = float * (Given and Returned)
 *        An array in which to store the variances for the output cube if
-*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
-*        zero). The supplied array is update on exit to include the data from 
-*        the supplied input NDF. This array should be the same shape and size 
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is
+*        zero). The supplied array is update on exit to include the data from
+*        the supplied input NDF. This array should be the same shape and size
 *        as the output data array.
 *     wgt_array = double * (Given and Returned)
-*        An array in which to store the relative weighting for each pixel in 
-*        the output cube. The supplied array is update on exit to include the 
-*        data from the supplied input NDF. This array should be the length of 
-*        "data_array", unless "genvar" is 1, in which case it should be twice 
+*        An array in which to store the relative weighting for each pixel in
+*        the output cube. The supplied array is update on exit to include the
+*        data from the supplied input NDF. This array should be the length of
+*        "data_array", unless "genvar" is 1, in which case it should be twice
 *        the length of "data_array".
 *     texp_array = float * (Given and Returned)
-*        A work array, which holds the total exposure time for each output 
-*        spectrum. It is updated on exit to include the supplied input NDF. 
-*        It should be big enough to hold a single spatial plane from the 
+*        A work array, which holds the total exposure time for each output
+*        spectrum. It is updated on exit to include the supplied input NDF.
+*        It should be big enough to hold a single spatial plane from the
 *        output cube.
 *     teff_array = float * (Given and Returned)
-*        A work array, which holds the effective integration time for each 
-*        output spectrum, scaled by a factor of 4. It is updated on exit to 
-*        include the supplied input NDF. It should be big enough to hold a 
+*        A work array, which holds the effective integration time for each
+*        output spectrum, scaled by a factor of 4. It is updated on exit to
+*        include the supplied input NDF. It should be big enough to hold a
 *        single spatial plane from the output cube.
 *     nused = int * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
@@ -180,7 +180,7 @@
 *     11-OCT-2007 (DSB):
 *        Added parameter "ptime".
 *     12-FEB-2008 (DSB):
-*        Modify the way that good Tsys values are cheked for so that 
+*        Modify the way that good Tsys values are cheked for so that
 *        data that falls outside the otuput cube is included in the check.
 *     12-FEB-2008 (DSB):
 *        Update naccept when using a 3D weights array.
@@ -234,16 +234,16 @@
 
 #define FUNC_NAME "smf_rebincube_nn"
 
-void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
-                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
-                       dim_t nxy, dim_t nout, dim_t dim[3], 
-                       int badmask, int is2d, AstMapping *ssmap, 
-                       AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-                       Grp *detgrp, int moving, int usewgt, int genvar, 
-                       double tfac, double fcon, float *data_array, 
+void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
+                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
+                       dim_t nxy, dim_t nout, dim_t dim[3],
+                       int badmask, int is2d, AstMapping *ssmap,
+                       AstSkyFrame *abskyfrm, AstMapping *oskymap,
+                       Grp *detgrp, int moving, int usewgt, int genvar,
+                       double tfac, double fcon, float *data_array,
                        float *var_array, double *wgt_array,
-                       float *texp_array, float *teff_array, int *nused, 
-                       int *nreject, int *naccept, int *good_tsys, 
+                       float *texp_array, float *teff_array, int *nused,
+                       int *nreject, int *naccept, int *good_tsys,
                        int *status ){
 
 /* Local Variables */
@@ -298,14 +298,14 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
 /* Store the number of pixels in one time slice */
    timeslice_size = ndet*nchan;
 
-/* Use this mapping to get the zero-based output channel number corresponding 
+/* Use this mapping to get the zero-based output channel number corresponding
    to each input channel number. */
    smf_rebincube_spectab( nchan, dim[ 2 ], ssmap, &spectab, status );
    if( !spectab ) goto L999;
 
 /* The 2D weighting scheme assumes that each output channel receives
-   contributions from one and only one input channel in each input file. 
-   Create an array with an element for each output channel, holding the 
+   contributions from one and only one input channel in each input file.
+   Create an array with an element for each output channel, holding the
    number of input channels that contribute to the output channel. */
    nchanout = dim[ 2 ];
    if( is2d ) {
@@ -319,7 +319,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
 
 /* If this is the first pass through this file, initialise the arrays. */
    if( first ){
-      smf_rebincube_init( is2d, nxy, nout, genvar, data_array, var_array, 
+      smf_rebincube_init( is2d, nxy, nout, genvar, data_array, var_array,
                           wgt_array, texp_array, teff_array, nused, status );
 
 /* Allocate an extra work array and initialise it to zero. This holds the
@@ -332,14 +332,14 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
       }
    }
 
-/* Allocate work arrays to hold the input and output grid coords for each 
+/* Allocate work arrays to hold the input and output grid coords for each
    detector. */
    detxin = astMalloc( ndet*sizeof( double ) );
    detyin = astMalloc( ndet*sizeof( double ) );
    detxout = astMalloc( ndet*sizeof( double ) );
    detyout = astMalloc( ndet*sizeof( double ) );
 
-/* Initialise a string to point to the name of the first detector for which 
+/* Initialise a string to point to the name of the first detector for which
    data is available */
    name = hdr->detname;
 
@@ -351,7 +351,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coord
    bad. */
-      if( detgrp ) {    
+      if( detgrp ) {
          found = grpIndex( name, detgrp, 1, status );
          if( !found ) {
             detxin[ idet ] = AST__BAD;
@@ -395,12 +395,12 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    helps keep the number of AST objects in use to a minimum. */
       astBegin;
 
-/* Get a Mapping from the spatial GRID axes in the input the spatial 
-   GRID axes in the output for the current time slice. Note this has 
-   to be done first since it stores details of the current time slice 
+/* Get a Mapping from the spatial GRID axes in the input the spatial
+   GRID axes in the output for the current time slice. Note this has
+   to be done first since it stores details of the current time slice
    in the "smfHead" structure inside "data", and this is needed by
    subsequent functions. */
-      totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving, 
+      totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
 				 status );
       if( !totmap ) {
          astEnd;
@@ -410,17 +410,17 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
 /* Get the effective exposure time, the total exposure time, and the
    Tsys->Variance onversion factor for this time slice. Also get a
    pointer to the start of the Tsys array. */
-      tsys = smf_rebincube_tcon( hdr, itime, fcon, &texp, &teff, &tcon, 
+      tsys = smf_rebincube_tcon( hdr, itime, fcon, &texp, &teff, &tcon,
                                  status );
 
-/* Use this Mapping to get the output spatial grid coords for each input 
+/* Use this Mapping to get the output spatial grid coords for each input
    detector. */
       astTran2( totmap, ndet, detxin, detyin, 1, detxout, detyout );
 
-/* If this is the first time slice from the current input file to be pasted 
-   into the output, see if any of the spectra will end up being pasted on 
-   top of each other in the output. If not we can use a separate thread to 
-   paste each spectrum. Otherwise, we cannot use multiple threads since they 
+/* If this is the first time slice from the current input file to be pasted
+   into the output, see if any of the spectra will end up being pasted on
+   top of each other in the output. If not we can use a separate thread to
+   paste each spectrum. Otherwise, we cannot use multiple threads since they
    may end up trying to write to the same output pixel at the same time. */
       if( first_ts ) {
          first_ts = 0;
@@ -435,10 +435,10 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
                    gyout >= 1 && gyout <= dim[ 1 ] ) {
 
                   for( jdet = idet + 1; idet < ndet; idet++ ) {
-                     if( detxout[ jdet ] != AST__BAD && 
+                     if( detxout[ jdet ] != AST__BAD &&
                          detyout[ jdet ] != AST__BAD ){
-   
-                        if( floor( detxout[ jdet ] + 0.5 ) == gxout && 
+
+                        if( floor( detxout[ jdet ] + 0.5 ) == gxout &&
                             floor( detyout[ jdet ] + 0.5 ) == gyout ) {
                            use_threads = 0;
                            break;
@@ -472,14 +472,14 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
                common_data->is2d = is2d;
             }
 
-/* Ensure we have a structure for each detector to hold the detector-specific 
+/* Ensure we have a structure for each detector to hold the detector-specific
    data, plus a pointer to the common data. */
             init_detector_data = ( detector_data == NULL );
             if( init_detector_data ) ndet_max = 0;
-            detector_data = astGrow( detector_data, sizeof( smfRebincubeNNArgs2 ), 
+            detector_data = astGrow( detector_data, sizeof( smfRebincubeNNArgs2 ),
                                      ndet ) ;
 
-/* Initialise pointers stored within any new elements added to the 
+/* Initialise pointers stored within any new elements added to the
    "detector_data" array. */
             if( ndet > ndet_max && astOK ) {
                for( idet = ndet_max; idet < ndet; idet++ ) {
@@ -495,7 +495,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
             if( astOK ) {
                for( idet = 0; idet < ndet; idet++ ) {
                   detector_data[ idet ].common = common_data;
-                  detector_data[ idet ].work = astGrow( detector_data[ idet ].work, 
+                  detector_data[ idet ].work = astGrow( detector_data[ idet ].work,
                                                         sizeof( float ), nchanout );
                }
             }
@@ -503,7 +503,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
 /* If we are using a single threads, do some alternative preparation. */
          } else {
 
-/* We need an extra work array for 2D weighting that can hold a single 
+/* We need an extra work array for 2D weighting that can hold a single
    output spectrum. This is used as a staging post for each input
    spectrum prior to pasting it into the output cube. */
             work = astMalloc( nchanout*sizeof( float ) );
@@ -514,7 +514,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
 /* Loop round each detector, pasting its spectral values into the output
    cube. */
       for( idet = 0; idet < ndet; idet++ ) {
-      
+
 /* If multi-threaded, initialise a bad value for the detector's weight
    to indicate that it is not being used. */
          if( use_threads ) detector_data[ idet ].wgt = VAL__BADD;
@@ -538,10 +538,10 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    pixel in the first spectral channel. */
                iv0 = ( gyout - 1 )*dim[ 0 ] + ( gxout - 1 );
 
-/* If required calculate the variance associated with this detector, based on 
+/* If required calculate the variance associated with this detector, based on
    the input Tsys values. */
                invar = VAL__BADR;
-               if( usewgt || genvar == 2 ) { 
+               if( usewgt || genvar == 2 ) {
                   if(  rtsys != VAL__BADR ) {
                      if( tcon != VAL__BADD ) invar = tcon*rtsys*rtsys;
                   }
@@ -554,7 +554,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
                if( usewgt ) {
                   if( invar > 0.0 && invar != VAL__BADR ) {
                      wgt = 1.0/invar;
-                  } else { 
+                  } else {
                      ignore = 1;
                   }
 
@@ -567,7 +567,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
                }
 
 /* If we are not ignoring this input spectrum, get a pointer to the start
-   of the input spectrum data and paste it into the output cube using 
+   of the input spectrum data and paste it into the output cube using
    either the 2D or 3D algorithm. */
                if( !ignore ) {
                   ddata = tdata + idet*nchan;
@@ -578,23 +578,23 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
                      naccept_old = *naccept;
 
                      if( is2d ) {
-                        smf_rebincube_paste2d( badmask, nchan, nchanout, spectab, 
-                                               specpop, iv0, nxy, wgt, genvar, 
-                                               invar, ddata, data_array, 
-                                               var_array, wgt_array, pop_array, 
-                                               nused, nreject, naccept, work, 
+                        smf_rebincube_paste2d( badmask, nchan, nchanout, spectab,
+                                               specpop, iv0, nxy, wgt, genvar,
+                                               invar, ddata, data_array,
+                                               var_array, wgt_array, pop_array,
+                                               nused, nreject, naccept, work,
                                                status );
                      } else {
-                        smf_rebincube_paste3d( nchan, nout, spectab, iv0, nxy, 
-                                               wgt, genvar, invar, ddata, 
-                                               data_array, var_array, 
+                        smf_rebincube_paste3d( nchan, nout, spectab, iv0, nxy,
+                                               wgt, genvar, invar, ddata,
+                                               data_array, var_array,
                                                wgt_array, nused, status );
                         (*naccept)++;
                      }
 
 /* Now we update the total and effective exposure time arrays for the
-   output spectrum that receives this input spectrum. Scale the exposure 
-   times of this time slice in order to reduce its influence on the 
+   output spectrum that receives this input spectrum. Scale the exposure
+   times of this time slice in order to reduce its influence on the
    output expsoure times if it does not have much spectral overlap with
    the output cube. Only update the exposure time arrays if the spectrum
    was used (as shown by an increase in the number of accepted spectra). */
@@ -615,8 +615,8 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
                      detector_data[ idet ].nreject = 0;
                      detector_data[ idet ].naccept = 0;
 
-/* Add a job to the workforce's job list. This job calls smf_rebincube_paste2d 
-   or smf_rebincube_paste3d to paste the detector input spectrum into the 
+/* Add a job to the workforce's job list. This job calls smf_rebincube_paste2d
+   or smf_rebincube_paste3d to paste the detector input spectrum into the
    output cube. */
                      smf_add_job( wf, 0, detector_data + idet,
                                   smf_rebincube_paste_thread, NULL, status );
@@ -626,7 +626,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
          }
       }
 
-/* If using multiple threads, wait until all spectra for this time slice 
+/* If using multiple threads, wait until all spectra for this time slice
    have been pasted into the output cube. Then transfer the output values
    from the detector data structures to the returned variables. */
       if( use_threads ) {
@@ -653,14 +653,14 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    }
 
 /* If this is the final pass through this function, normalise the returned
-   data and variance values, and release any static resources allocated 
+   data and variance values, and release any static resources allocated
    within this function. */
    if( last ) {
       if( is2d ) {
-         smf_rebincube_norm2d( nout, nxy, genvar, data_array, 
+         smf_rebincube_norm2d( nout, nxy, genvar, data_array,
                                var_array, wgt_array, pop_array, status );
       } else {
-         smf_rebincube_norm3d( nout, genvar, *nused, data_array, 
+         smf_rebincube_norm3d( nout, genvar, *nused, data_array,
                                var_array, wgt_array, status );
       }
 

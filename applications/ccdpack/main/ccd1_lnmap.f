@@ -13,9 +13,9 @@
 *     CALL CCD1_LNMAP( TR, MAP, STATUS )
 
 *  Description:
-*     Generates a linear two-dimensional AST mapping from the six 
-*     parameters which specify it.  This is just a harness for a set 
-*     of AST calls, useful because it is a bit messy to generate a 
+*     Generates a linear two-dimensional AST mapping from the six
+*     parameters which specify it.  This is just a harness for a set
+*     of AST calls, useful because it is a bit messy to generate a
 *     linear map directly.
 
 *  Arguments:
@@ -67,13 +67,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      
+
 *  Arguments Given:
       DOUBLE PRECISION TR( 6 )
-      
+
 *  Arguments Returned:
       INTEGER MAP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -86,16 +86,16 @@
       INTEGER MAPMAT
       INTEGER MAPWIN
       INTEGER MAPCMP
-      
+
 *  Local Data:
       DATA PIA/ 0D0, 0D0 /
       DATA PIB/ 1D0, 1D0 /
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Generate a mapping representing the non-translational parts of the
 *  linear transformation.
       MATRIX( 1 ) = TR( 2 )
@@ -128,9 +128,9 @@
 *  Check that a valid mapping has been obtained.
       IF ( MAP .EQ. AST__NULL ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'CCD1_LNMAP_NOMAP', 
+         CALL ERR_REP( 'CCD1_LNMAP_NOMAP',
      :   'Failed to obtain a mapping from linear coefficients', STATUS )
-      END IF 
+      END IF
 
-      END 
+      END
 * $Id$

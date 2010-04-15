@@ -660,11 +660,11 @@ itcl::class gaia::GaiaAstReference {
       }
 
       #  And a MJD to go with it (note conversion of B/J/G date to MJD).
-      if { $values_($this,epoch) != {} && 
+      if { $values_($this,epoch) != {} &&
            [$itk_component(epoch) cget -state] != "disabled" } {
          $image aststore $chan MJD-OBS [find_epoch_ $values_($this,epoch)]
       } else {
-         #  No epoch specified, or none applicable to the astrometry. 
+         #  No epoch specified, or none applicable to the astrometry.
          #  Preserve the MJD-OBS or DATE-OBS if present, otherwise we get the
          #  AST default of 2000.0. If both are present they are supposed to be
          #  the same value, so don't worry about that.

@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Store the group identifer in common so that the source function can
-*  get at it. 
+*  get at it.
       IGRPC = IGRP
 
 *  Initialise the next group element to be read.
@@ -108,8 +108,8 @@
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
 
 *  Create a FitsChan through which to read the Objects stored in the
-*  group. 
-      CHAN = AST_FITSCHAN( ATL_SRC2, AST_NULL, ' ', STATUS ) 
+*  group.
+      CHAN = AST_FITSCHAN( ATL_SRC2, AST_NULL, ' ', STATUS )
 
 *  Attempt to read an object from the current channel.
       IAST = AST_READ( CHAN, STATUS )
@@ -174,7 +174,7 @@
 
 *-
       INCLUDE 'SAE_PAR'
-      
+
 *  Arguments:
       CHARACTER BUF*80
       INTEGER STATUS
@@ -193,9 +193,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If any elements remain to be read, get the next element from the group,
-*  and increment the index of the next element to be read from the group. 
-      IF( NEXT .LE. SIZE ) THEN 
-         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS ) 
+*  and increment the index of the next element to be read from the group.
+      IF( NEXT .LE. SIZE ) THEN
+         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
          NEXT = NEXT + 1
          ATL_SRC2 = 1
       END IF

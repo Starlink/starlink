@@ -130,7 +130,7 @@ itcl::class gaia::ManyLabelEntry {
       }
    }
 
-   #  Called for return or keypress in entry, calls command proc 
+   #  Called for return or keypress in entry, calls command proc
    #  with new value.
    method command_proc_ {cmd} {
       lappend cmd [get]

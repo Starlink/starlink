@@ -116,7 +116,7 @@ f77_integer gk9sfa_(nc, xwc, ywc)
     gkdrge_(),			/* For getting pattern directory */
     gkhpgi_(),			/* For getting pattern data */
     gkpclp_();			/* For clipping the area to be filled */
-  
+
   extern char
     *malloc();			/* For allocating C workspace */
 
@@ -164,14 +164,14 @@ f77_integer gk9sfa_(nc, xwc, ywc)
     rasterop,			/* The rasterop for pr_polygon_2() */
     *npts,			/* List of boundary vertex counts */
     i, j;			/* Loop indices / temporary array indices */
-    
+
   char
     *memory;			/* Address of C workspace */
 
    double
-    fmod(), 		
+    fmod(),
     fabs();
- /* 
+ /*
    * Allocate FORTRAN workspace for transformation and clipping.  This is
    * done as one real allocation and one integer allocation,  with subarray
    * addresses calculated after allocation.  The total workspace required is:
@@ -203,7 +203,7 @@ f77_integer gk9sfa_(nc, xwc, ywc)
   /*
    * Clip the area to be filled.  We start with one boundary with 'nc' vertices
    * and finish with 'nbnds' boundaries with the index of the last vertex of
-   * each boundary 'i' (0 <= i < nbnds) in lastvertex[i].  
+   * each boundary 'i' (0 <= i < nbnds) in lastvertex[i].
    */
 
   nbnds = 1;
@@ -221,7 +221,7 @@ f77_integer gk9sfa_(nc, xwc, ywc)
 			     lastvertex[nbnds-1] * sizeof(struct pr_pos)
 			    )
 		 );
-  
+
   npts = (int *)memory;
   vlist = (struct pr_pos *)(memory + nbnds * sizeof(int));
 
@@ -287,7 +287,7 @@ f77_integer gk9sfa_(nc, xwc, ywc)
     }
     else
     {
-      /* 
+      /*
        * Pattern or hatch interior style.  Both require the bounding box
        * dimensions and a texture pixrect the same depth as the backing
        * pixrect.
@@ -349,7 +349,7 @@ f77_integer gk9sfa_(nc, xwc, ywc)
 	for(i = 0; i < pat_desc[1]; i++)
 	  for(j = 0; j < pat_desc[0]; j++)
 	  {
-	    status = pr_put(element, j, i, 
+	    status = pr_put(element, j, i,
 	                    (int)gk9scc_(&pat_data[i*pat_desc[0]+j]));
 	    if(status == PIX_ERR)
 	    {
@@ -357,18 +357,18 @@ f77_integer gk9sfa_(nc, xwc, ywc)
 	      return((f77_integer)0);
 	    }
 	  }
-	
+
 	/*
 	 * Replicate the element over the texture pixrect and set up a copy
 	 * rasterop for pr_polygon_2
 	 */
-        i = pat_desc[0] - 
+        i = pat_desc[0] -
             nint(fmod(fabs((double)(gkywkd_.qwpax[ws] - b_left)),
                            (double) pat_desc[0]));
         j = (int)(fmod(fabs((double)(gkywkd_.qwpay[ws] - b_bottom)),
                             (double) pat_desc[1])) - 1;
 	status = pr_replrop(texture, 0, 0, b_width, b_height, PIX_SRC, element,
-			    i, 
+			    i,
 			    j
 			   );
 	if(status == PIX_ERR)
@@ -416,7 +416,7 @@ f77_integer gk9sfa_(nc, xwc, ywc)
 	 * Copy the contents of the primitives bounding box from the ww
 	 * backing pixrect into the texture pixrect
 	 */
-	  
+
 	status = pr_rop(texture, 0, 0, b_width, b_height, PIX_SRC,
 			display, b_left, b_top
 		       );

@@ -28,7 +28,7 @@
 
 	RETURN
 
-  999	CALL FIO_REP( LUN, NAMEFILE, ISTAT, 
+  999	CALL FIO_REP( LUN, NAMEFILE, ISTAT,
      :      'Error opening file ^fname, status=^iostat', STATUS )
 
 	CALL FIO_PUNIT( LUN, STATUS )

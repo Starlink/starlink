@@ -99,7 +99,7 @@ C
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-	  CALL ERR_REP( 'ERROR', 'after CMP_GET0C MODE,CONFIG ...', 
+	  CALL ERR_REP( 'ERROR', 'after CMP_GET0C MODE,CONFIG ...',
      :                   STATUS)
 	  RETURN
 
@@ -127,7 +127,7 @@ C
 
 	  CALL MSG_OUT( 'ERROR', 'Error, bad CONFIGURE/MODE values',
      :	    STATUS)
-         
+
 	  WHAT_FILLED = 'NO IDEA'
 
 	END IF

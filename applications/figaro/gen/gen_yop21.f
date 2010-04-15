@@ -33,7 +33,7 @@ C     (>) YARRAY  (Real array YARRAY(NY)) The 1D array
 C     (>) YVAR    (Real array YARRAY(NY)) The 1D variances
 C     (<) RESULT  (Real array RESULT(NX,NY)) The 2D result.  Note that
 C                 RESULT and XYARRAY may be the same array.
-C     (<) RVAR    (Real array RESULT(NX,NY)) The 2D resulting variances.  
+C     (<) RVAR    (Real array RESULT(NX,NY)) The 2D resulting variances.
 C
 C                                       KS / CIT  18th Feb 1983
 C+
@@ -105,7 +105,7 @@ C
                  VALUE=1./VALUE
                  DO IX=1,NX
                     RVAR(VPTR)=XYVAR(VPTR)/(XYARRAY(VPTR)**2.)
-                    RVAR(VPTR)=RVAR(VPTR)+(YVAR(IY)/YARRAY(IY)**2.) 
+                    RVAR(VPTR)=RVAR(VPTR)+(YVAR(IY)/YARRAY(IY)**2.)
                     VPTR=VPTR+1
                  END DO
                ENDIF
@@ -128,7 +128,7 @@ C
               VALUE=YARRAY(IY)
               DO IX=1,NX
                  RVAR(VPTR)=XYVAR(VPTR)*(VALUE**2.)
-                 RVAR(VPTR)=RVAR(VPTR)+(YVAR(IY)*(XYARRAY(VPTR)**2.)) 
+                 RVAR(VPTR)=RVAR(VPTR)+(YVAR(IY)*(XYARRAY(VPTR)**2.))
                  VPTR=VPTR+1
               END DO
          END DO

@@ -1,4 +1,4 @@
-	SUBROUTINE CONTOUR_TICKSEC( DIVISOR, TICK_XINTERVAL, 
+	SUBROUTINE CONTOUR_TICKSEC( DIVISOR, TICK_XINTERVAL,
      :                              TICK_YINTERVAL,
      :	                            CONTOUR_MAGNIF, CONTOUR_AXRAT,
      :	                            STATUS)
@@ -9,7 +9,7 @@
 * History
 *   26thOct94 Changed MAGNIF from INT to REAL (SKL@JACH)
 *
- 
+
 	IMPLICIT NONE
 
 	INCLUDE 'PLT2DCOM'
@@ -154,7 +154,7 @@
 	  END IF
 
 	  Y1 = IM_YST +
-     :	       ( Y_ZERO + 
+     :	       ( Y_ZERO +
      :         TICK_YINTERVAL*(J-1))*CONTOUR_MAGNIF*CONTOUR_AXRAT
 
 	  CALL SGS_LINE( X1, Y1, X2, Y1)
@@ -243,7 +243,7 @@
 	    END IF
 
 	    Y1 = IM_YST +
-     :	         ( Y_ZERO 
+     :	         ( Y_ZERO
      :            - TICK_YINTERVAL*(J-1))*CONTOUR_MAGNIF*CONTOUR_AXRAT
 
 	    CALL SGS_LINE( X1, Y1, X2, Y1)

@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -114,9 +114,9 @@
       SEED = 1111
       SEED = ( SEED / 4 ) * 4 + 1
       IF ( SEED .LT. 0 ) SEED = 1
-      
+
 *  Write the main heading.
-      WRITE(*,*) 
+      WRITE(*,*)
      :  'Listing of trial runs for PDA-random-number routines based '/
      :  /'code by Ahrens/Dieter/Kohrt using seed ',SEED
 
@@ -133,34 +133,34 @@
          WRITE(*,*)
          WRITE(*,*)
          IF ( IDIS .EQ. 1 ) THEN
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '1)   0,1 -Uniform distribution:'
             WRITE(*,*)
      :        '*******************************'
 
          ELSE IF ( IDIS .EQ. 2 ) THEN
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '2)  (Standard-) exponential distribution:'
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '*****************************************'
 
          ELSE IF ( IDIS .EQ. 3 ) THEN
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '3)  (Standard-) Normal distribution:'
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '************************************'
 
          ELSE IF ( IDIS .EQ. 4 ) THEN
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '4)  (standard-) gamma-(a) distribution:'
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '***************************************'
 
          ELSE IF ( IDIS .EQ. 5 ) THEN
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '5)  Poisson-(mu) distribution (integer samples are '/
      :        /'displayed as reals):'
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '***************************************************'/
      :        /'********************'
 
@@ -265,7 +265,7 @@
             WRITE(*,*)
 
             DO I = 1, 100, 5
-               WRITE(*,*) SAMPLE( I ), SAMPLE( I + 1 ), 
+               WRITE(*,*) SAMPLE( I ), SAMPLE( I + 1 ),
      :                    SAMPLE( I + 2 ), SAMPLE( I + 3 ),
      :                    SAMPLE( I + 4 )
             END DO
@@ -317,11 +317,11 @@
                E3 = 0.0
                E4 = 0.0
             END IF
- 
+
 *  Write the test data heading.
             WRITE(*,*)
             WRITE(*,*)
-            WRITE(*,*) 
+            WRITE(*,*)
      :        '  Test Data:     (based on ',NRAND,' samples)'
             WRITE(*,*) '  ..........'
 

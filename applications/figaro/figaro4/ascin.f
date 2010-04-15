@@ -25,7 +25,7 @@
 *     Most of these items are optional, mandatory are only
 *     axis values for each axis and data values. Pixel widths can be
 *     read only in the one-dimensional case.
-*     
+*
 *     The user specifies in which columns the different items are to be
 *     found. A range of line numbers to be used can be specified.
 *     Comment lines may be interspersed in this line range, if they are
@@ -41,7 +41,7 @@
 *     will guess from the table a grid that is linear in all directions.
 *     The parameter system is consulted to confirm or modify the
 *     suggested grid.
-*     
+*
 *     The data value read from a line will be stored into exactly one
 *     output pixel, if and only if the table coordinates match that
 *     pixel's coordinate to within a specified fraction of the pixel
@@ -174,7 +174,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -255,7 +255,7 @@
       END IF
 
 *  The dimensionality of the output is the number of returned elements,
-*  or the number of the first 0-element minus 1. 
+*  or the number of the first 0-element minus 1.
       NDIM = NRET
       DO 1 I = 2, NRET
          IF ( COLAXE(I) .LE. 0 ) THEN

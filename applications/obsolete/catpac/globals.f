@@ -41,7 +41,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
       CALL HDS_OPEN( lib, 'READ', LOC, STATUS )
 
 *  Inquire the various global parameters.
-*  ======================================      
+*  ======================================
 
 *  Bracket each with an error context, since we want to annul the
 *  error if the object is not found (DAT__OBJNF) and substitute another

@@ -31,12 +31,12 @@
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot.  The width of the margins left for the annotation may be 
-*        controlled using parameter MARGIN.  The appearance of the axes 
+*        plot.  The width of the margins left for the annotation may be
+*        controlled using parameter MARGIN.  The appearance of the axes
 *        (colours, fonts, etc.) can be controlled using the parameter
 *        STYLE.  [TRUE]
 *     CLEAR = _LOGICAL (Read)
-*        If TRUE the current picture is cleared before the plot is 
+*        If TRUE the current picture is cleared before the plot is
 *        drawn.  If CLEAR is FALSE not only is the existing plot
 *        retained, but also an attempt is made to align the new picture
 *        with the existing picture.  Thus you can generate a composite
@@ -62,7 +62,7 @@
 *        value is supplied (the default), then no logging of results
 *        will take place.  [!]
 *     MARGIN( 4 ) = _REAL (Read)
-*        The widths of the margins to leave for axis annotation, given 
+*        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
 *        picture.  Four values may be given, in the order bottom, right,
 *        top, left.  If fewer than four values are given, extra values
@@ -96,7 +96,7 @@
 *        dynamic range for the data type of the NDF array component.
 *
 *        - "Percentiles" -- The default values for the histogram data
-*        range are set to the specified percentiles of the data.  For 
+*        range are set to the specified percentiles of the data.  For
 *        instance, if the value "Per,10,99" is supplied, then the lowest
 *        10% and highest 1% of the data values are excluded from the
 *        histogram.  If only one value, p1, is supplied, the second
@@ -108,7 +108,7 @@
 *        other sub-strings are needed by this option.  Null (!) is a
 *        synonym for the "Range" method.
 *
-*        - "Sigmas" -- The histogram limiting values are set to the 
+*        - "Sigmas" -- The histogram limiting values are set to the
 *        specified numbers of standard deviations below and above the
 *        mean of the data.  For instance, if the supplied value is
 *        "sig,1.5,3.0", then the histogram extends from the mean of the
@@ -127,8 +127,8 @@
 *        are only calculated where necessary for the chosen method.
 *
 *        The method name can be abbreviated to a single character, and
-*        is case insensitive.  The initial value is "Range".  The 
-*        suggested defaults are the current values, or ! if these do 
+*        is case insensitive.  The initial value is "Range".  The
+*        suggested defaults are the current values, or ! if these do
 *        not exist.  [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
@@ -153,11 +153,11 @@
 *        defaulted if a null value (!) is supplied.  See Section
 *        "Plotting Attributes" in SUN/95 for a description of the
 *        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported). 
+*        (no error is reported).
 *
 *        The appearance of the histogram curve is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc.  (The synonym
-*        Line may be used in place of Curves.)  [current value] 
+*        Line may be used in place of Curves.)  [current value]
 *     TITLE = LITERAL (Read)
 *        Title for the histogram NDF.  ["KAPPA - Histogram"]
 *     XLEFT = _REAL (Read)
@@ -180,7 +180,7 @@
 *        the histogram is used.  The value supplied may be greater than
 *        or less than the value supplied for YTOP.  [!]
 *     YLOG = _LOGICAL (Read)
-*        TRUE if the plot Y axis is to be logarithmic.  Empty bins are 
+*        TRUE if the plot Y axis is to be logarithmic.  Empty bins are
 *        removed from the plot if the Y axis is logarithmic.  [FALSE]
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis of
@@ -210,7 +210,7 @@
 *        the NDF called cube.  The histogram has 32 bins and spans the
 *        full range of data values.  A plot of the histogram is made to
 *        the XWINDOWS device, and is titled "cube".
-*     histogram cube numbin=32 ! device=xwindows ylog style=^style.dat  
+*     histogram cube numbin=32 ! device=xwindows ylog style=^style.dat
 *        As in the previous example except the logarithm of the number
 *        in each histogram bin is plotted, and the contents of the text
 *        file style.dat control the style of the resulting graph.
@@ -237,9 +237,9 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998-2000, 2004 Central Laboratory of the
-*     Research Councils. 
-*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research 
-*     Council. 
+*     Research Councils.
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
+*     Council.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -282,7 +282,7 @@
 *     12-JUL-1999 (TDCA):
 *        Converted graphics to AST/PGPLOT
 *     17-SEP-1999 (DSB):
-*        Tidied up. NDF calls changed to LPG to use auto-looping. 
+*        Tidied up. NDF calls changed to LPG to use auto-looping.
 *        Dynamicdefault parameters changed to use null default.
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
@@ -299,7 +299,7 @@
 *     15-APR-2005 (PWD):
 *        Parameterise use of backslash to improve portability.
 *     23-FEB-2006 (DSB):
-*        Added parameter CUMUL. 
+*        Added parameter CUMUL.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
 *     2008 June 17 (MJC):
@@ -309,7 +309,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -328,7 +328,7 @@
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
-      PARAMETER( BCKSLH = '\\' )    
+      PARAMETER( BCKSLH = '\\' )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -338,7 +338,7 @@
 
 *  Local Constants:
       INTEGER MAXBIN             ! Maximum number of histogram bins
-      PARAMETER( MAXBIN = 10000 )! 
+      PARAMETER( MAXBIN = 10000 )!
 
       INTEGER SZBUF              ! Size of text buffer
       PARAMETER ( SZBUF = 132 )
@@ -376,7 +376,7 @@
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NMLEN              ! Used length of NDFNAM
       INTEGER NDFI               ! Identifier for input NDF
-      CHARACTER * ( 255 ) NDFNAM ! Base name of NDF (+ possibly an HDS 
+      CHARACTER * ( 255 ) NDFNAM ! Base name of NDF (+ possibly an HDS
                                  ! path)
       INTEGER NDFO               ! NDF identifier of output histogram
       INTEGER NERR               ! Number of conversion errors
@@ -413,7 +413,7 @@
 *  Obtain the NDF to be analysed.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
-*  Get its WCS FrameSet. 
+*  Get its WCS FrameSet.
       CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
 
 *  Determine which array component is to be analysed.
@@ -567,15 +567,15 @@
       IF ( TYPE .EQ. '_BYTE' ) THEN
 
 *  Compute the histogram.
-         CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMBIN, CUMUL,
      :                    NUM_DTOB( DRANGE( 2 ) ),
-     :                    NUM_DTOB( DRANGE( 1 ) ), 
+     :                    NUM_DTOB( DRANGE( 1 ) ),
      :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
@@ -587,38 +587,38 @@
          END IF
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
- 
+
 *  Compute the histogram.
-         CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMBIN, CUMUL,
-     :                    DRANGE( 2 ), DRANGE( 1 ), 
+     :                    DRANGE( 2 ), DRANGE( 1 ),
      :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSD( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSDSD( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    DRANGE( 1 ),
      :                    DRANGE( 2 ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLD( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+            CALL KPG1_HSFLD( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       DRANGE( 1 ),
      :                       DRANGE( 2 ), STATUS )
          END IF
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
- 
+
 *  Compute the histogram.
-         CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMBIN, CUMUL,
      :                    NUM_DTOI( DRANGE( 2 ) ),
-     :                    NUM_DTOI( DRANGE( 1 ) ), 
+     :                    NUM_DTOI( DRANGE( 1 ) ),
      :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
@@ -632,13 +632,13 @@
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
 
 *  Compute the histogram.
-         CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMBIN, CUMUL,
      :                    REAL( DRANGE( 2 ) ), REAL( DRANGE( 1 ) ),
      :                    %VAL( CNF_PVAL( HPNTR ) ), STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
@@ -650,17 +650,17 @@
          END IF
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
- 
+
 *  Compute the histogram.
-         CALL KPG1_GHSTUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_GHSTUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     NUMBIN, CUMUL,
      :                     NUM_DTOUB( DRANGE( 2 ) ),
-     :                     NUM_DTOUB( DRANGE( 1 ) ), 
+     :                     NUM_DTOUB( DRANGE( 1 ) ),
      :                     %VAL( CNF_PVAL( HPNTR ) ),
      :                     STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
@@ -674,15 +674,15 @@
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
 
 *  Compute the histogram.
-         CALL KPG1_GHSTUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_GHSTUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     NUMBIN, CUMUL,
      :                     NUM_DTOUW( DRANGE( 2 ) ),
-     :                     NUM_DTOUW( DRANGE( 1 ) ), 
+     :                     NUM_DTOUW( DRANGE( 1 ) ),
      :                     %VAL( CNF_PVAL( HPNTR ) ),
      :                     STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
@@ -694,17 +694,17 @@
          END IF
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
- 
+
 *  Compute the histogram.
-         CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMBIN, CUMUL,
      :                    NUM_DTOW( DRANGE( 2 ) ),
-     :                    NUM_DTOW( DRANGE( 1 ) ), 
+     :                    NUM_DTOW( DRANGE( 1 ) ),
      :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
@@ -731,7 +731,7 @@
 *  Ensure the Title attribute of the Frame has a useful value.
       CALL KPG1_ASTTL( FRAME, IWCS, NDFI, STATUS )
 
-*  Set the Label, Units and Symbol attributes for the X axis so that they 
+*  Set the Label, Units and Symbol attributes for the X axis so that they
 *  describe the required NDF array component.
       CALL KPG1_SAXAT( NDFI, MCOMP, 1, XLOG, FRAME, STATUS )
 
@@ -771,9 +771,9 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the x-y points at the centre of each bin in the histogram.
-         CALL KPG1_HSTLO( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+         CALL KPG1_HSTLO( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                    MINIM, MAXIM,
-     :                    XLOG, YLOG, %VAL( CNF_PVAL( HPPTR1 ) ), 
+     :                    XLOG, YLOG, %VAL( CNF_PVAL( HPPTR1 ) ),
      :                    %VAL( CNF_PVAL( HPPTR2 ) ),
      :                    STATUS )
 
@@ -783,14 +783,14 @@
 *  Plot the locus just computed within annotated axes.  Both axes'
 *  limits are defined. Use a default value of 0.0 for the bottom of the
 *  vertical axis.
-         CALL KPG1_GRAPH( NUMBIN, %VAL( CNF_PVAL( HPPTR1 ) ), 
+         CALL KPG1_GRAPH( NUMBIN, %VAL( CNF_PVAL( HPPTR1 ) ),
      :                    %VAL( CNF_PVAL( HPPTR2 ) ),
      :                    0.0, 0.0,  XL, YL, ' ', ' ',
-     :                    ' ', 1, .TRUE., VAL__BADR, VAL__BADR, 
-     :                    0.0, VAL__BADR, 'KAPPA_HISTOGRAM', .TRUE., 
-     :                    .FALSE., FRAME, STATUS )  
+     :                    ' ', 1, .TRUE., VAL__BADR, VAL__BADR,
+     :                    0.0, VAL__BADR, 'KAPPA_HISTOGRAM', .TRUE.,
+     :                    .FALSE., FRAME, STATUS )
 
-*  If anything was plotted, shut down the graphics workstation and 
+*  If anything was plotted, shut down the graphics workstation and
 *  database.
          IF ( FRAME .NE. AST__NULL ) THEN
             CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
@@ -822,7 +822,7 @@
 
 *  Write the slice to the NDF.
       CALL VEC_ITOI( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
-     :               %VAL( CNF_PVAL( OUTPTR( 1 ) ) ), 
+     :               %VAL( CNF_PVAL( OUTPTR( 1 ) ) ),
      :               IERR, NERR, STATUS )
 
 *  Unmap the histogram.
@@ -845,13 +845,13 @@
       CALL NDF_CGET( NDFI, 'Units', UNITS, STATUS )
 
 *  Put the label and units in the axis structure, which is
-*  also created at this point.  There is only one axis.  Note that 
+*  also created at this point.  There is only one axis.  Note that
 *  NDF_ACPUT does not truncate trailing blanks.
       IF ( LABEL .NE. ' ' ) THEN
          NC = CHR_LEN( LABEL )
          CALL NDF_ACPUT( LABEL( :NC ), NDFO, 'Label', 1, STATUS )
       END IF
-      
+
       IF ( UNITS .NE. ' ' ) THEN
          NC = CHR_LEN( UNITS )
          CALL NDF_ACPUT( UNITS( :NC ), NDFO, 'Units', 1, STATUS )
@@ -883,7 +883,7 @@
       CALL ERR_RLSE
 
 *  Arrive here if an error occurs.
-  999 CONTINUE     
+  999 CONTINUE
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

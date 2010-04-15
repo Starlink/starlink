@@ -130,7 +130,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       }
       pack $itk_component(column) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(column)  {Registry column to qualify query}
- 
+
       itk_component add substring {
          LabelEntry $w_.substring \
             -text "Substring:" \

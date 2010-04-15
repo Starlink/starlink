@@ -388,7 +388,7 @@
 *  then check for some with the right filter.
                   IF ( NFRMS .EQ. 0 .AND. IRFLAT ) THEN
                      CALL CCD1_LOCS3( FTYPES, 2, NNDF, 1, 2, VALID,
-     :                                'TARGET', FILNMS( I ), PTEMP, 
+     :                                'TARGET', FILNMS( I ), PTEMP,
      :                                NFRMS, STATUS )
                   END IF
 

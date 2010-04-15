@@ -43,7 +43,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GNS_PAR'
-      
+
       INTEGER STATUS, ICNTX, LD, IWKS
 
       CHARACTER DESCR*(GNS__SZDES),
@@ -51,7 +51,7 @@
 
       LOGICAL GNS_FILTG
       EXTERNAL GNS_FILTG
-      
+
 *   Start the system for GKS
       STATUS = 0
       CALL GNS_START('GKS',STATUS)

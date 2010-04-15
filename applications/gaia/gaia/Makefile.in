@@ -437,7 +437,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(top_builddir)/c
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-#  Reconfigure when configure is younger than config.status. Sign of 
+#  Reconfigure when configure is younger than config.status. Sign of
 #  update from svn of build system.
 config.status: $(top_builddir)/configure
 	cd $(top_builddir) \

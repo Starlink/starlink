@@ -3,7 +3,7 @@
 /*
  * Copyright (c) 1983 by Sun Microsystems, Inc.
  */
- 
+
 #ifndef tool_DEFINED
 #define	tool_DEFINED
 
@@ -89,10 +89,10 @@ typedef enum {
     WIN_BOUNDARY_MGR	= WIN_ATTR(ATTR_BOOLEAN, 12),
     					/* enable subwindow boundary mover */
 					/* 0 | 1 */
-    WIN_LABEL		= WIN_ATTR(ATTR_STRING, 13),	
+    WIN_LABEL		= WIN_ATTR(ATTR_STRING, 13),
     					/* label in name stripe */
 					/* char * */
-    WIN_FOREGROUND	= WIN_ATTR(ATTR_SINGLE_COLOR_PTR, 14),	
+    WIN_FOREGROUND	= WIN_ATTR(ATTR_SINGLE_COLOR_PTR, 14),
     					/* foreground color (rgb) */
 					/* struct singlecolor * (pixrect.h) */
     WIN_BACKGROUND	= WIN_ATTR(ATTR_SINGLE_COLOR_PTR, 15),

@@ -1,7 +1,7 @@
 #
 # Perl script to generate html help pages for pamela.
-# Generates 
-# 
+# Generates
+#
 # 1) Help on each command
 # 2) Class command lists
 # 3) List of classes.
@@ -10,7 +10,7 @@
 # Load hash of pointers to where help is contained on each command
 
 (@ARGV == 2) or die "usage: genhtml.pl directory alias\n";
- 
+
 $html = shift;
 
 open(HELP,"help_pointers")
@@ -31,7 +31,7 @@ while(<CDEFS>){
        $classes{$class} = $2;
     }
     if(/^([a-zA-Z]*) *-- *(.*) *# *(.*)/){
-       $command = lc $1;		
+       $command = lc $1;
        $prompt  = $2;
        $classes = [split(' ', $3)];
        $comms{$command} = {
@@ -48,7 +48,7 @@ print "Generating command help files ...\n";
 
 foreach $command (keys %comms){
     if($help{$command}){
-	open(IFILE, $help{$command}) or 
+	open(IFILE, $help{$command}) or
 	    die "Failed to open $help{$command} for input\n";
 
 	# Open output and write out standard preamble. Gives command
@@ -56,9 +56,9 @@ foreach $command (keys %comms){
 	# Sets up rest for preformatted input. Use a css file to define the
 	# style.
 
-	open(OFILE, ">$html/$command.html") or 
+	open(OFILE, ">$html/$command.html") or
 	    die "Failed to open $html/$command.html for output\n";
-	
+
 	print OFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\"\n";
 	print OFILE "  \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n";
 	print OFILE "<html>\n<head>\n<title>Help text on $command</title>\n";
@@ -79,7 +79,7 @@ foreach $command (keys %comms){
 		    $save = $1;
 		    @related = split / *, */, $2;
 		}else{
-		    $_ =~ s/^.//;                   
+		    $_ =~ s/^.//;
 		    print OFILE;
 		}
 	    }
@@ -87,7 +87,7 @@ foreach $command (keys %comms){
 	close(IFILE);
 	print OFILE "</pre>\n";
 	if($found){
-	    print OFILE "$save:\n";  
+	    print OFILE "$save:\n";
 	    $n = 0;
 	    foreach $com (@related){
 		$com = lc $com;
@@ -130,16 +130,16 @@ print "Generating class help files ...\n";
 
 foreach $class (keys %classes){
 
-    open(OFILE, ">$html/$class.class.html") or 
+    open(OFILE, ">$html/$class.class.html") or
 	die "Failed to open $html/$class.class.html for output\n";
-	
+
     print OFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\"\n";
     print OFILE "  \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n";
     print OFILE "<html>\n<head>\n<title>Help text on $class pamela class</title>\n";
     print OFILE "<link rel=stylesheet href=\"pamela.css\" type=\"text/css\">\n";
     print OFILE "</head>\n<body>\n<h1>pamela $class commands</h1>\n";
     print OFILE "\n<p>\n<table>\n<ul>\n";
-    
+
     foreach $command (sort keys %comms){
 	$found = 0;
 	foreach $clss (@{$comms{$command}->{"CLASSES"}}){
@@ -162,9 +162,9 @@ foreach $class (keys %classes){
 
 print "Generating class list ...\n";
 
-open(OFILE, ">$html/CLASSES.html") or 
+open(OFILE, ">$html/CLASSES.html") or
     die "Failed to open $html/CLASSES.html for output\n";
-	
+
 print OFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\"\n";
 print OFILE "  \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n";
 print OFILE "<html>\n<head>\n<title>pamela command classes</title>\n";
@@ -173,12 +173,12 @@ print OFILE "</head>\n<body>\n<h1>pamela command classes</h1>\n";
 
 print OFILE <<END1;
 <p>
-The following headings classify pamela commands lossely according to their 
+The following headings classify pamela commands lossely according to their
 function. The same command may appear in more than one class. The help
-files on individual commands sometimes give links to other closely related 
+files on individual commands sometimes give links to other closely related
 commands as well.
 END1
- 
+
 print OFILE "\n<p>\n<ul>\n<table>\n";
 
 foreach $class (sort keys %classes){
@@ -194,9 +194,9 @@ close(OFILE);
 
 print "Generating command list ...\n";
 
-open(OFILE, ">$html/COMMANDS.html") or 
+open(OFILE, ">$html/COMMANDS.html") or
     die "Failed to open $html/COMMANDS.html for output\n";
-	
+
 print OFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\"\n";
 print OFILE "  \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n";
 print OFILE "<html>\n<head>\n<title>pamela commands</title>\n";
@@ -209,10 +209,10 @@ This is the full list of commands available inside pamela. If you
 are new to the program you may find it easier to search using
 the <a href="CLASSES.html">command classes</a> first of all.
 END2
- 
+
 print OFILE "\n<p>\n<ul>\n<table>\n";
 
-foreach $command (sort keys %comms){ 
+foreach $command (sort keys %comms){
     print OFILE "<tr><td><a href=\"$command.html\">$command</a></td>";
     print OFILE "<td>--</td>";
     print OFILE "<td>$comms{$command}->{PROMPT}</td></tr>\n";
@@ -225,9 +225,9 @@ close(OFILE);
 
 print "Generating class list ...\n";
 
-open(OFILE, ">$html/CLASSES.html") or 
+open(OFILE, ">$html/CLASSES.html") or
     die "Failed to open $html/CLASSES.html for output\n";
-	
+
 print OFILE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\"\n";
 print OFILE "  \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n";
 print OFILE "<html>\n<head>\n<title>pamela command classes</title>\n";
@@ -236,12 +236,12 @@ print OFILE "</head>\n<body>\n<h1>pamela command classes</h1>\n";
 
 print OFILE <<END1;
 <p>
-The following headings classify pamela commands lossely according to their 
+The following headings classify pamela commands lossely according to their
 function. The same command may appear in more than one class. The help
-files on individual commands sometimes give links to other closely related 
+files on individual commands sometimes give links to other closely related
 commands as well.
 END1
- 
+
 print OFILE "\n<p>\n<ul>\n<table>\n";
 
 foreach $class (sort keys %classes){
@@ -257,9 +257,9 @@ close(OFILE);
 
 print "Generating index file\n";
 
-open(INDEX, ">$html/INDEX.html") or 
+open(INDEX, ">$html/INDEX.html") or
     die "Failed to open $html/INDEX.html for output\n";
-	
+
 print INDEX <<END3;
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
@@ -279,7 +279,7 @@ acknowledgement.
 <p>
 pamela is a package of routines for the reduction of 2D spectrum data
 to 1D. It does not deal with any subsequent steps such as arc
-calibration etc. pamela includes full propagation of uncertainties 
+calibration etc. pamela includes full propagation of uncertainties
 through the reduction. It implements 2 forms of optimal extraction
 which are Keith Horne's original method for reasonably straight
 spectra and my revised version for spectra with significant tilts or
@@ -292,7 +292,7 @@ pamela now runs over NDF and uses the ADAM parameter system.
 To get pamela running, source the script $alias. You may want to
 define an alias for this if you use pamela frequently.
 
-<H2> Information on pamela </H2> 
+<H2> Information on pamela </H2>
 
 <MENU>
 

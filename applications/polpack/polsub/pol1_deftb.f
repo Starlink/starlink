@@ -20,7 +20,7 @@
 *           FILTER?     PPCKFILT
 *           IMGID?      PPCKIMID
 *           WPLATE?     PPCKWPLT
-*           RAY?        PPCKRAY 
+*           RAY?        PPCKRAY
 *           STOKES?     PPCKSTOK
 *           VERSION?    PPCKVERS
 
@@ -38,7 +38,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berru (STARLINK)
 *     {enter_new_authors_here}
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -74,10 +74,10 @@
 
 *  Local Constants:
       INTEGER NFITS              ! No. of FITS keywords used in table
-      PARAMETER ( NFITS = 7 ) 
+      PARAMETER ( NFITS = 7 )
 
       INTEGER NEXT               ! No. of extension items specified in table
-      PARAMETER ( NEXT = 7 ) 
+      PARAMETER ( NEXT = 7 )
 
 *  Local Variables:
       CHARACTER * ( 20 ) FITSNM( NFITS ) ! Names of FITS keywords
@@ -87,19 +87,19 @@
       CHARACTER * ( 20 ) EXTFUN( NEXT ) ! Functions for extension items
 
 *  Define the default control table information.
-      DATA FITSNM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
+      DATA FITSNM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT',
      :              'PPCKRAY', 'PPCKSTOK', 'PPCKVERS' /,
 
-     :     FITSTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
+     :     FITSTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR',
      :             '_CHAR', '_CHAR' /,
 
-     :     EXTNM / 'ANGROT?', 'FILTER?', 'IMGID?', 'WPLATE?', 'RAY?', 
+     :     EXTNM / 'ANGROT?', 'FILTER?', 'IMGID?', 'WPLATE?', 'RAY?',
      :             'STOKES?', 'VERSION?' /,
 
-     :     EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
+     :     EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR',
      :             '_CHAR', '_CHAR' /,
 
-     :     EXTFUN / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
+     :     EXTFUN / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT',
      :              'PPCKRAY', 'PPCKSTOK', 'PPCKVERS' /
 
 *.

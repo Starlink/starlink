@@ -4,23 +4,23 @@
 
  * Purpose:
  *    Sets up signal handling and runs the Specx main routine.
- 
+
  * Language:
  *    ANSI C
 
  * Description:
  *    This function sets up handlers for most signals and then
- *    activates the main Specx Fortran subroutine. The signal handling is 
- *    done is C because there seems to be no way of doing a long jump in 
- *    fortran (i.e. a GOTO from one subroutine back to a place in a higher 
- *    level subroutine). The standard C library functions "longjmp" and 
- *    "setjmp" are therefore used for this purpose. There is a restriction on 
- *    the use of these library functions in that the function into which the 
- *    jump is to be made must still be active at the time of the jump (i.e. it 
- *    must not have returned). The only place to put a function so that it is 
- *    guaranteed not to have returned is at the very top level (the scl_main.f 
- *    routine would have done were it not for the fact that the destination of 
- *    the jump must be written in C). For this reason, it is necessary to put 
+ *    activates the main Specx Fortran subroutine. The signal handling is
+ *    done is C because there seems to be no way of doing a long jump in
+ *    fortran (i.e. a GOTO from one subroutine back to a place in a higher
+ *    level subroutine). The standard C library functions "longjmp" and
+ *    "setjmp" are therefore used for this purpose. There is a restriction on
+ *    the use of these library functions in that the function into which the
+ *    jump is to be made must still be active at the time of the jump (i.e. it
+ *    must not have returned). The only place to put a function so that it is
+ *    guaranteed not to have returned is at the very top level (the scl_main.f
+ *    routine would have done were it not for the fact that the destination of
+ *    the jump must be written in C). For this reason, it is necessary to put
  *    a C layer on top of the main dipso subroutine.
 
  * Notes:
@@ -81,7 +81,7 @@ extern F77_SUBROUTINE(ndf_end)( INTEGER(status) );
 extern F77_SUBROUTINE(hds_stop)( INTEGER(status) );
 
 /*  Global Variables: */
-jmp_buf here;      
+jmp_buf here;
 
 /* FC_MAIN can be a macro expanding to the entry point used by the
  * Fortran RTL. When that is true assume all Fortran initialisations are
@@ -105,7 +105,7 @@ int main ( void ) {
  */
       ieee_handler( "set", "common", SIGFPE_ABORT );
       nonstandard_arithmetic();
- 
+
 #endif
 
       /* Initialise fortran runtime if not a fortran main */
@@ -116,7 +116,7 @@ int main ( void ) {
 /*  Use the setjmp function to define here to be the place to which the
  *  signal handling function will jump when a signal is detected. Zero is
  *  returned on the first invocation of setjmp. If a signal is detected,
- *  a jump is made into setjmp which then returns a positive signal 
+ *  a jump is made into setjmp which then returns a positive signal
  *  identifier. */
       n = setjmp( here );
 
@@ -202,7 +202,7 @@ int main ( void ) {
 
  * Purpose:
  *    Called when an ignorable exception or interrupt occured.
- 
+
  * Language:
  *    ANSI C
 
@@ -281,7 +281,7 @@ void hand1( int sig )
 
  * Purpose:
  *    Called when an inevitable exception or interrupt occured.
- 
+
  * Language:
  *    ANSI C
 

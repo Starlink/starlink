@@ -13,20 +13,20 @@
 *     C function
 
 *  Invocation:
-*     void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data, 
+*     void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data,
 *                        int *status )
 
 *  Arguments:
 *     ndim = int (Given)
 *        New number of NDF dimensions.
 *     lbnd = int * (Given)
-*        Pointer to array of new lower pixel-index bounds. 
+*        Pointer to array of new lower pixel-index bounds.
 *     ubnd = int * (Given)
-*        Pointer to array of new upper pixel-index bounds. 
+*        Pointer to array of new upper pixel-index bounds.
 *     data = smfData *
 *        Pointer to the structure holding the NDF identifier.
 *     status = int * (Given and Returned)
-*        Inherited status value. 
+*        Inherited status value.
 
 *  Description:
 *     This function unmaps the NDF array components, calls ndfSbnd to
@@ -78,7 +78,7 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
 
-void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data, 
+void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data,
                    int *status ){
 
 /* Local Variables */
@@ -111,13 +111,13 @@ void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data,
 
 /* Map the required components again. */
       type = smf_dtype_string( data, status );
-      if( dm ) ndfMap( data->file->ndfid, "Data", type, "UPDATE", 
+      if( dm ) ndfMap( data->file->ndfid, "Data", type, "UPDATE",
                        &( data->pntr[ 0 ] ), &el, status );
-      if( vm ) ndfMap( data->file->ndfid, "Variance", type, "UPDATE", 
+      if( vm ) ndfMap( data->file->ndfid, "Variance", type, "UPDATE",
                        &( data->pntr[ 1 ] ), &el, status );
       if( qm ) ndfMap( data->file->ndfid, "Quality", "_UBYTE",
                        "UPDATE", &( data->pntr[ 2 ] ), &el, status );
-      
+
 /* Modify the bounds information in the smfData. */
       for( i = 0; i < (size_t)ndim; i++ ) {
          data->dims[ i ] = ubnd[ i ] - lbnd[ i ] + 1;
@@ -127,6 +127,6 @@ void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data,
       }
       data->ndims = ndim;
 
-   }          
+   }
 }
 

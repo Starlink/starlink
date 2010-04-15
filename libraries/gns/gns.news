@@ -1,4 +1,4 @@
-This release of gns correct a bug which caused an infinite loop if an 
+This release of gns correct a bug which caused an infinite loop if an
 X-windows workstation was opened with a name of the form GKS_nn_mm.
 
 The workstation names and description files are now located by searching

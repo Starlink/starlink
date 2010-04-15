@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_UNPACK_JIGGLE_SEPARATES (N_JIGGLES, N_BOLS,  
+      SUBROUTINE SCULIB_UNPACK_JIGGLE_SEPARATES (N_JIGGLES, N_BOLS,
      :  J_DATA, J_VARIANCE, J_QUALITY, J_START, JIGGLE_COUNT,
      :  I_JIGGLE, J_JIGGLE, IDIM, JDIM, MAP_DATA, MAP_VARIANCE,
      :  MAP_QUALITY, MAP_NUMPTS, J_END, BADBIT, STATUS)
@@ -11,11 +11,11 @@
 
 *  Description:
 *     This routine unpacks data from a jiggle observation into a
-*     rectangular 2-d map. 
+*     rectangular 2-d map.
 *
-*        If status is good on entry the data and variance of the output map 
-*     will be initialised to `bad' values, the quality to 1. If there are 
-*     any data to unpack the routine will then attempt to do so. The method 
+*        If status is good on entry the data and variance of the output map
+*     will be initialised to `bad' values, the quality to 1. If there are
+*     any data to unpack the routine will then attempt to do so. The method
 *     used depends on whether the switch covered part/all of the entire jiggle
 *     pattern or contains data for several repeats of the jiggle pattern.
 *
@@ -26,20 +26,20 @@
 *     map as specified by the I_JIGGLE, J_JIGGLE arrays.
 *
 *        When the data cover several repeats of the jiggle pattern, the
-*     routine will check that the jiggle index of the first point in the 
+*     routine will check that the jiggle index of the first point in the
 *     datablock is 1 and that the number of data points is an integer multiple
 *     of the size of the jiggle. If not, an error will be reported and bad
 *     status returned. Otherwise, the data will be unpacked into the
 *     map as specified by I_JIGGLE, J_JIGGLE. The unpacking differs from
 *     the first case in that points in the unpacked map will be set to the
-*     average of the good quality values contributed by the separate jiggles, 
+*     average of the good quality values contributed by the separate jiggles,
 *     variances will be calculated from the dispersion of the values about
 *     the mean if there was more than 1, or set to the input variance
 *     otherwise.
 
 *  Invocation:
 *     CALL SCULIB_UNPACK_JIGGLE_SEPARATES (N_JIGGLES, N_BOLS, J_DATA,
-*    :  J_VARIANCE, J_QUALITY, J_START, JIGGLE_COUNT, I_JIGGLE, 
+*    :  J_VARIANCE, J_QUALITY, J_START, JIGGLE_COUNT, I_JIGGLE,
 *    :  J_JIGGLE, IDIM, JDIM, MAP_DATA, MAP_VARIANCE, MAP_QUALITY, MAP_NUMPTS,
 *    :  J_END, BADBIT, STATUS)
 
@@ -184,7 +184,7 @@
 *  the input data does not contain numbers for several repeats of the jiggle
 *  pattern. Check jiggle indices are OK, if so unpack data
 
-            IF ((J_START .LT. 1) .OR. 
+            IF ((J_START .LT. 1) .OR.
      :          (J_START+N_JIGGLES-1 .GT. JIGGLE_COUNT)) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP (' ', 'SCULIB_UNPACK_JIGGLE_'//
@@ -197,12 +197,12 @@
                   JM = J_JIGGLE (JIGGLE)
 
                   DO BOL = 1, N_BOLS
-                     MAP_DATA (IM,JM,BOL) = J_DATA (BOL,I)       
+                     MAP_DATA (IM,JM,BOL) = J_DATA (BOL,I)
                      MAP_VARIANCE (IM,JM,BOL) = J_VARIANCE (BOL,I)
                      IF (NDF_QMASK(J_QUALITY(BOL,I), BADBIT)) THEN
                         MAP_QUALITY(IM,JM,BOL) = 0
                         MAP_NUMPTS (IM,JM,BOL) = 0
-                     ELSE 
+                     ELSE
                         MAP_NUMPTS (IM,JM,BOL) = 1
                      END IF
                   END DO
@@ -214,7 +214,7 @@
 
             END IF
 
-         ELSE  
+         ELSE
 
 *  datablock does contain several repeats of jiggle pattern. J_START should
 *  be 1 and there should be an integer number of repeats
@@ -243,14 +243,14 @@
                   IM = I_JIGGLE (JIGGLE)
                   JM = J_JIGGLE (JIGGLE)
 
-                  DO BOL = 1, N_BOLS   
+                  DO BOL = 1, N_BOLS
                      IF (NDF_QMASK(J_QUALITY(BOL,I), BADBIT)) THEN
 
                         IF (MAP_DATA(IM,JM,BOL) .EQ. VAL__BADR) THEN
 
 *  an unset map point, just set it
 
-                           MAP_DATA (IM,JM,BOL) = J_DATA (BOL,I)       
+                           MAP_DATA (IM,JM,BOL) = J_DATA (BOL,I)
                            MAP_VARIANCE (IM,JM,BOL) = J_VARIANCE (BOL,I)
                            MAP_NUMPTS (IM,JM,BOL) = 1
                            MAP_QUALITY(IM,JM,BOL) = 1
@@ -262,23 +262,23 @@
 *  numbers store the sum of the squares of the data values in the variance
 *  array so that the variance can be calculated from the distribution
 *  about the mean at the end of the routine
- 
+
                            IF (MAP_NUMPTS(IM,JM,BOL) .EQ. 1) THEN
                               MAP_VARIANCE (IM,JM,BOL) =
-     :                          MAP_DATA (IM,JM,BOL) **2 + 
+     :                          MAP_DATA (IM,JM,BOL) **2 +
      :                          J_DATA (BOL,I) **2
                            ELSE
-                              MAP_VARIANCE (IM,JM,BOL) = 
+                              MAP_VARIANCE (IM,JM,BOL) =
      :                          MAP_VARIANCE (IM,JM,BOL) +
      :                          J_DATA (BOL,I) **2
                            END IF
                            MAP_DATA (IM,JM,BOL) = MAP_DATA (IM,JM,BOL) +
-     :                       J_DATA (BOL,I)       
-                           MAP_NUMPTS (IM,JM,BOL) = 
+     :                       J_DATA (BOL,I)
+                           MAP_NUMPTS (IM,JM,BOL) =
      :                       MAP_NUMPTS (IM,JM,BOL) + 1
                            MAP_QUALITY(IM,JM,BOL) = 0
                         END IF
-                     END IF    
+                     END IF
 
                   END DO
                END DO
@@ -293,11 +293,11 @@
      :                       REAL(MAP_NUMPTS (I,J,BOL))
 
                            IF (MAP_NUMPTS(I,J,BOL) .GT. 1) THEN
-                              MAP_VARIANCE (I,J,BOL) = 
-     :                          (MAP_VARIANCE(I,J,BOL) - 
+                              MAP_VARIANCE (I,J,BOL) =
+     :                          (MAP_VARIANCE(I,J,BOL) -
      :                          MAP_NUMPTS(I,J,BOL) *
-     :                          MAP_DATA(I,J,BOL)**2) / 
-     :                          REAL(MAP_NUMPTS(I,J,BOL) * 
+     :                          MAP_DATA(I,J,BOL)**2) /
+     :                          REAL(MAP_NUMPTS(I,J,BOL) *
      :                          (MAP_NUMPTS(I,J,BOL)-1))
                            END IF
 

@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Provide aperture number from name.
-* 
+*
 *   History:
 *      Jack Giddings      01-MAY-82     IUEDR Vn. 1.0
 *      Paul Rees          13-OCT-88     IUEDR Vn. 2.0
@@ -21,10 +21,10 @@
 
 *   Import:
       BYTE APR(16)          ! aper
- 
+
 *   Export:
       INTEGER IAPER         ! aper index
- 
+
 *   External references:
       LOGICAL STR_SIMLR     ! caseless string equality
 

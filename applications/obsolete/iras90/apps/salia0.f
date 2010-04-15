@@ -1,4 +1,4 @@
-      SUBROUTINE SALIA0( INDF1, INDF2, IDAR, SCS, METHOD, XY1, XY2, 
+      SUBROUTINE SALIA0( INDF1, INDF2, IDAR, SCS, METHOD, XY1, XY2,
      :                   ERRLIM, STATUS )
 *+
 *  Name:
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,7 +80,7 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
 
 *  Arguments Given:
-      INTEGER INDF1 
+      INTEGER INDF1
       INTEGER INDF2
       INTEGER IDAR
       CHARACTER SCS*(*)
@@ -101,7 +101,7 @@
      :        XLOC*(DAT__SZLOC)    ! Locator to NDF extension holding
                                    ! the input astrometry structure
 
-      INTEGER 
+      INTEGER
      :        EL,                  ! No. of elements in a mapped array.
      :        IDA1,                ! IRA identifier for input astrometry
      :                             ! information.
@@ -202,7 +202,7 @@
 
 *  Fill these arrays with the required image coordinates.
       CALL SALIA3( IDAR, IDA1, SCS, LBND2( 1 ), UBND2( 1 ), LBND2( 2 ),
-     :             UBND2( 2 ), ERRLIM, %VAL( IPX ), %VAL( IPY ), 
+     :             UBND2( 2 ), ERRLIM, %VAL( IPX ), %VAL( IPY ),
      :             STATUS )
 
 *  Map the DATA component of the input and output NDF.
@@ -231,7 +231,7 @@
 *  NDFs.
       IF( VAR ) THEN
          CALL NDF_MAP( INDF1, 'VAR', '_REAL', 'READ', IPV1, EL, STATUS )
-         CALL NDF_MAP( INDF2, 'VAR', '_REAL', 'WRITE', IPV2, EL, 
+         CALL NDF_MAP( INDF2, 'VAR', '_REAL', 'WRITE', IPV2, EL,
      :                 STATUS )
       END IF
 

@@ -29,10 +29,10 @@
 *     A DATA_ARRAY is input from the interface, and the dimensions of
 *     the input array are reported to the user, who is then prompted
 *     for an integer expansion to be applied to the input image. The
-*     size of the output image is then calculated and reported to the 
-*     user, and a new data array of this size is created after the user 
-*     is prompted for the name and title for this output. The subroutine 
-*     PIXDUPESUB is then called to do the actual pixel duplication, and 
+*     size of the output image is then calculated and reported to the
+*     user, and a new data array of this size is created after the user
+*     is prompted for the name and title for this output. The subroutine
+*     PIXDUPESUB is then called to do the actual pixel duplication, and
 *     then the data arrays are unmapped and tidied.
 *
 *    Bugs :
@@ -45,7 +45,7 @@
 *
 *    History :
 *
-*     19-09-1985 : First implementation 
+*     19-09-1985 : First implementation
 *                : (REVA::MJM)
 *     15-AUG-1994  Changed input DIM arguments for PIXDUPESUB (SKL@JACH)
 *
@@ -70,7 +70,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  IDIMS( NDIMS ),       ! dimensions of input DATA_ARRAY
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  NDIM,                 ! number of dimensions from NDF_DIM
@@ -93,14 +93,14 @@
 *    get a locator to input IMAGE type data structure
 
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
       IF( STATUS .NE. SAI__OK ) THEN
          RETURN
       END IF
 
 *    map the DATA_ARRAY component of the input data structure
- 
-      CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+
+      CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :               PNTRI, NELEMENTS, STATUS )
 
       CALL NDF_DIM( LOCI, NDIMS, IDIMS, NDIM, STATUS)
@@ -123,15 +123,15 @@
       MAXEXP  =  2048 / ( MAX( IDIMS( 1 ), IDIMS( 2 ) ) )
 
 *    get one-dimensional integer expansion factor ( i.e. factor by
-*    which the image is to be pixel duplicated in each direction ) 
-*    - set default to be 2, minimum 2 (or it's not a expansion), 
+*    which the image is to be pixel duplicated in each direction )
+*    - set default to be 2, minimum 2 (or it's not a expansion),
 *    and maximum to be the value calculated such that the output
 *    image size does not exceed 2048 x 2048
 
-      CALL AIF_GET0I( 'EXPAND', 2, 2, MAXEXP, EXPAND, STATUS ) 
+      CALL AIF_GET0I( 'EXPAND', 2, 2, MAXEXP, EXPAND, STATUS )
 
 *    now work out the size of the output array from the input image
-*    dimensions and the expansion factor 
+*    dimensions and the expansion factor
 
       ODIMS( 1 )  =  IDIMS( 1 ) * EXPAND
       ODIMS( 2 )  =  IDIMS( 2 ) * EXPAND
@@ -153,13 +153,13 @@
 
 *    map output DATA_ARRAY component
 
-      CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+      CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :               PNTRO, NELEMENTS, STATUS )
 
 
 *    now call the subroutine that does the actual work
 
-      CALL PIXDUPESUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2), 
+      CALL PIXDUPESUB( %VAL( PNTRI ), IDIMS(1), IDIMS(2),
      :                 %VAL( PNTRO ), ODIMS(1), ODIMS(2),
      :                 EXPAND, STATUS )
 

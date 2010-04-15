@@ -330,7 +330,7 @@ StarFitsIO* StarFitsIO::initialize( Mem& header, Mem& data, fitsfile* fitsio )
     int bitpix = 0, naxis = 0, width = 0, height = 0;
     double bzero = 0.0, bscale = 1.0;
     get( fitsio, "NAXIS", naxis );
-    if ( naxis > 0 ) {  
+    if ( naxis > 0 ) {
         //  Yes this was seen.
         get( fitsio, "NAXIS1", width );
         get( fitsio, "NAXIS2", height );

@@ -42,7 +42,7 @@
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
 *     PAR( NPAR ) = REAL (Given)
-*        Region parameters. 
+*        Region parameters.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
 *     LBEXTB( NDIM ) = INTEGER (Given and Returned)
@@ -61,7 +61,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -74,12 +74,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,7 +98,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -196,12 +196,12 @@
 *  Loop round each of the rows.
       DO IROW = 3, NPAR - 1, 2
 
-*  Find the maximum distance of the given position from any of the 
+*  Find the maximum distance of the given position from any of the
 *  mask boundaries.
          MXDIST = MAX( ABS( PAR( IROW ) - REAL( LBND( 1 ) ) + 1.0 ),
-     :            MAX( ABS( PAR( IROW ) - REAL( UBND( 1 ) ) ), 
+     :            MAX( ABS( PAR( IROW ) - REAL( UBND( 1 ) ) ),
      :            MAX( ABS( PAR( IROW + 1 ) - REAL( LBND( 2 ) ) + 1.0),
-     :                 ABS( PAR( IROW + 1 ) - REAL( UBND( 2 ) ) ) 
+     :                 ABS( PAR( IROW + 1 ) - REAL( UBND( 2 ) ) )
      :                 ) ) )
 
 *  Store the pixel co-ordinates of the ends of a line which is co-linear
@@ -220,7 +220,7 @@
 
 *  If the interior bounding box is null, return the usual value
 *  (VAL__MINI for LBINTB( 1 ) ).
-      IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR. 
+      IF( LBINTB( 1 ) .GT. UBINTB( 1 ) .OR.
      :    LBINTB( 2 ) .GT. UBINTB( 2 ) ) LBINTB( 1 ) = VAL__MINI
 
 *  Ensure the the exterior bounding box is returned "infinite".

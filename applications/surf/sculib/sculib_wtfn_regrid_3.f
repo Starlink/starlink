@@ -1,6 +1,6 @@
       SUBROUTINE SCULIB_WTFN_REGRID_3 (USEGUARD, RES, PIXSPACE, NI,NJ,
-     :     ICEN, JCEN, TOT_WEIGHT_IN, CONV_DATA_SUM, 
-     :     CONV_VARIANCE_SUM, CONV_QUALITY_SUM, CONV_WEIGHT, 
+     :     ICEN, JCEN, TOT_WEIGHT_IN, CONV_DATA_SUM,
+     :     CONV_VARIANCE_SUM, CONV_QUALITY_SUM, CONV_WEIGHT,
      :     WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 *+
 *  Name:
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_WTFN_REGRID_3 (METHOD,RES,PIXSPACE, NI, NJ, ICEN, JCEN, 
-*    :  TOT_WEIGHT_IN, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
+*     CALL SCULIB_WTFN_REGRID_3 (METHOD,RES,PIXSPACE, NI, NJ, ICEN, JCEN,
+*    :  TOT_WEIGHT_IN, CONV_DATA_SUM, CONV_VARIANCE_SUM,
 *    :  CONV_QUALITY_SUM, CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 
 *  Description:
@@ -92,7 +92,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -139,7 +139,7 @@
       REAL    RPIX                               ! distance of pixel from centre
                                                  ! of convolution function
       REAL    RTEMP                              ! scratch real
-      REAL    XCONV                              ! x coord of convolution 
+      REAL    XCONV                              ! x coord of convolution
                                                  ! function pixel
       REAL    XINC                               ! x-axis pixel increment
       REAL    XPIX                               ! x coord of output pixel
@@ -185,11 +185,11 @@
          FILTER_RAD_SQ = WEIGHTSIZE * WEIGHTSIZE
 
 *  ..extent of convolution function in units of output pixels
-    
+
          SCALE = 1.0 / SCLSZ
 
          SCALESQ = SCALE * SCALE
-      
+
          RTEMP = REAL(WEIGHTSIZE) * SCLSZ / PIXSPACE
          PIX_RANGE = INT (RTEMP) + 1
 
@@ -200,35 +200,35 @@
 
          DO JOUT = 1, NJ
             DO IOUT = 1, NI
-               
+
                IF (TOT_WEIGHT_IN (IOUT,JOUT) .GT. SMALL) THEN
 
 *  OK, good map point, loop through other map points in convolution
 *  function range ...
 
-                  YPIX = REAL (JOUT-JCEN) * YINC     
+                  YPIX = REAL (JOUT-JCEN) * YINC
                   XPIX = REAL (IOUT-ICEN) * XINC
 
-                  DO JCONV = MAX(1,JOUT-PIX_RANGE), 
+                  DO JCONV = MAX(1,JOUT-PIX_RANGE),
      :                 MIN(NJ,JOUT+PIX_RANGE)
-                     DO ICONV = MAX(1,IOUT-PIX_RANGE), 
+                     DO ICONV = MAX(1,IOUT-PIX_RANGE),
      :                    MIN(NI,IOUT+PIX_RANGE)
 
-*  and if they have zero weight, add them into the convolution function 
+*  and if they have zero weight, add them into the convolution function
 *  weight as if they were measured to be zero
 
                         IF (TOT_WEIGHT_IN(ICONV,JCONV) .LT. SMALL) THEN
-                           YCONV = REAL (JCONV-JCEN) * YINC     
-                           XCONV = REAL (ICONV-ICEN) * XINC 
+                           YCONV = REAL (JCONV-JCEN) * YINC
+                           XCONV = REAL (ICONV-ICEN) * XINC
                            RPIX = (YPIX-YCONV)**2 + (XPIX-XCONV)**2
-                           
+
                            WT = 0.0
 * Same method as used in REGRID_2
                            IF (RPIX .LT. RAD_OV_SCAL) THEN
                               ICPIX = NINT(RES_SCAL * RPIX)
                               WT = WTFN(ICPIX+1)
-                              
-                              CONV_WEIGHT(IOUT,JOUT) = 
+
+                              CONV_WEIGHT(IOUT,JOUT) =
      :                             CONV_WEIGHT(IOUT,JOUT) + WT
 
                            ENDIF
@@ -242,7 +242,7 @@
 
             END DO
          END DO
-      
+
       END IF
 
 *  finally go through output pixels normalising them by CONV_WEIGHT
@@ -257,7 +257,7 @@
                CONV_QUALITY_SUM (IOUT,JOUT) = 1
             ELSE
                IF (ABS(CONV_WEIGHT(IOUT,JOUT)) .GT. SMALLRT) THEN
-                  CONV_DATA_SUM (IOUT,JOUT) = 
+                  CONV_DATA_SUM (IOUT,JOUT) =
      :              CONV_DATA_SUM (IOUT,JOUT) /
      :               CONV_WEIGHT (IOUT,JOUT)
                   CONV_VARIANCE_SUM (IOUT,JOUT) =

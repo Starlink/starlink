@@ -9,7 +9,7 @@ C-----------------------------------------------------------------------------
 C  Send (unclosed) plot to nominated device
 
       IMPLICIT   NONE
- 
+
       REAL       XSCALE(*)
       REAL       BUF(*)
       INTEGER    IFAIL
@@ -30,7 +30,7 @@ C  Send (unclosed) plot to nominated device
       END IF
 
 C  Determine the plot device for quick look
-                        
+
       IOLD = -1
       CALL ASK_PLOT_DEVICE (IOLD, IDEV1, SEE_TERMINAL)
 

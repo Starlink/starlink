@@ -1,23 +1,23 @@
       DOUBLE PRECISION FUNCTION DETERM(ARRAY,NORDER)
 C+
 C
-C Double precision function: 
-C    
+C Double precision function:
+C
 C    D E T E R M
 C
 C
 C Author: Bevington
 C
-C Parameters: 
+C Parameters:
 C
 C ARRAY (<), NORDER (<)
 C
-C History: 
-C  
-C   Unknown
-C 
+C History:
 C
-C  
+C   Unknown
+C
+C
+C
 C
 C
 C
@@ -56,7 +56,7 @@ C
           K1  =  K + 1
           DO I  =  K1, NORDER
             DO J  =  K1, NORDER
-              ARRAY(I,J)  =  ARRAY(I,J) - 
+              ARRAY(I,J)  =  ARRAY(I,J) -
      &                       ARRAY(I,K)*ARRAY(K,J)/ARRAY(K,K)
             ENDDO
           ENDDO

@@ -182,7 +182,7 @@
 
 *  May now copy the array and record all the necessary information,
                      CALL RTD_CPB( .FALSE., 0, %VAL( CNF_PVAL( IPIN ) ),
-     :                             EL, %VAL( CNF_PVAL( IPMEM ) ), 
+     :                             EL, %VAL( CNF_PVAL( IPMEM ) ),
      :                             STATUS )
                      IDS( SLOT ) = NDFID
                      IPS( SLOT ) = IPMEM

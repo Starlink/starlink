@@ -13,7 +13,7 @@
  *     Library routine
 
  *  Invocation:
- *     smf_check_units( int count, char current[], 
+ *     smf_check_units( int count, char current[],
  *                      const smfHead *hdr, int * status );
 
  *  Arguments:

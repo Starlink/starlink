@@ -134,7 +134,7 @@ C
             XHI = DATMIN + IBIN*BINSIZ
             IF (CUR.EQ.0.0 .AND. PREV.EQ.0.0) THEN
                CALL GRMOVA(XHI,0.0)
-            ELSE 
+            ELSE
                CALL GRLINA(XLO,CUR)
                IF(CUR.NE.0.0) THEN
                   CALL GRLINA(XHI,CUR)
@@ -145,6 +145,6 @@ C
             PREV = CUR
  60      CONTINUE
       END IF
-C     
+C
       CALL PGEBUF
       END

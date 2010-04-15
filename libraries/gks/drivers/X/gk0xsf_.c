@@ -80,7 +80,7 @@ gk0xFont_info ;
  *		       <X . . . . X .
  *		       <X . . . . X .
  *		       <X . . . . X .<---- GKS baseline
- *			. . . . . . .><---- X baseline 
+ *			. . . . . . .><---- X baseline
  *			. . . . . . .> base_to_bottom (3)
  *			. . . . . . .>
  *			V V V V V V V
@@ -125,7 +125,7 @@ f77_integer gk0xsf_(height)
    min_difference = fabs((double)fonts[0].height - (double)*height);
 
   /* Then scan through 'fonts' looking for a closer match. */
-  
+
    for (i = 1; i < NFONT; i++)
    {
      difference = fabs((double)fonts[i].height - (double)*height);
@@ -135,13 +135,13 @@ f77_integer gk0xsf_(height)
        min_difference = difference;
      }
    }
-   
+
   /* If the font found isn't the same as that currently selected,  load it. */
-  
+
   if (new_font != (int)gkywkd_.kwkdat[wsid][ICHSIZ])
   {
     ddfont = gk0xftload(fonts[new_font].name);
-    
+
     /* If there was an error,  report it.  Otherwise set up WS data. */
     if (ddfont == (fontinfo *)0)
       gkyerr_.kerror = -1016;

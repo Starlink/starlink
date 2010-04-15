@@ -18,7 +18,7 @@
 *     This routine will open either a new or existing text file. It
 *     returns both the full name of the opened file and a Fortran
 *     logical unit number that can be used to access it. If the
-*     file is new, or if the name includes a directory specification 
+*     file is new, or if the name includes a directory specification
 *     or a logical name then the file name supplied will be used
 *     unchanged. If the file is supposed to exist, and no directory
 *     name is specified, then it will be searched for in the standard
@@ -84,7 +84,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,7 +149,7 @@
          CALL ERR_MARK
             STATUS = SAI__ERROR
             IF ( DEFAULT .NE. ' ' ) THEN
-               STRING = ', default ' // DEFAULT 
+               STRING = ', default ' // DEFAULT
                CALL MSG_SETC( 'FDA_T009', STRING )
             ELSE
                CALL MSG_SETC( 'FDA_T009', ' ' )
@@ -168,7 +168,7 @@
 *
       IF ( MAY_EXIST ) THEN
 
-*     If the file may exist, we have to look for it.  We try the 
+*     If the file may exist, we have to look for it.  We try the
 *     various directories one by one.  If we actually fail to
 *     open an existing file, we exit the loop.
          DO I = 1, 6
@@ -250,11 +250,11 @@
          END IF
       END IF
 
-*  If we have got here, then there has been no error so far. Either 
-*  we have opened an existing file, or the file didn't exist and 
+*  If we have got here, then there has been no error so far. Either
+*  we have opened an existing file, or the file didn't exist and
 *  DEFAULT was either 'NEW' or 'UNKNOWN' so we can try to create a
 *  new one. A new file is always opened just by name as it stands.
-*  Note that we don't even bother to test the value of WRITE - we 
+*  Note that we don't even bother to test the value of WRITE - we
 *  assume a new file is not to be opened readonly.
       IF ( .NOT. OPENED ) THEN
          STATUS = 0
@@ -286,7 +286,7 @@
 *  If we got here, we have an open file.  Get it's name.
       INQUIRE( UNIT=LU, NAME=NAME, IOSTAT=IGNORE )
 
-*     Exit.  If we got a logical unit number but failed to open the 
+*     Exit.  If we got a logical unit number but failed to open the
 *     file, release it.
  500  CONTINUE
       IF ( GOTLU .AND. ( STATUS .NE. 0 ) ) THEN

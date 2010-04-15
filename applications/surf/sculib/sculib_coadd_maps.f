@@ -50,7 +50,7 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
- 
+
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
@@ -66,7 +66,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *     Type Definitions :
@@ -94,7 +94,7 @@
 
 *    Local variables:
       INTEGER I                   ! DO loop
-      REAL    SUM                 ! sum of data coadded 
+      REAL    SUM                 ! sum of data coadded
       REAL    SUMSQ               ! sum of data squared coadded
 *.
 
@@ -106,7 +106,7 @@
 *       else is bad)
          IF (QUALITY_IN(I) .EQ. 0) THEN
 
-*  good quality input point, 
+*  good quality input point,
 *  ..recover the sum of the data points and the sum of them squared
 
             IF (NCOADD(I) .EQ. 1) THEN
@@ -114,7 +114,7 @@
                SUMSQ = DATA_OUT(I)**2
             ELSE IF (NCOADD(I) .GT. 1) THEN
                SUM = DATA_OUT (I) * NCOADD (I)
-               SUMSQ = NCOADD(I) * DATA_OUT(I)**2 + 
+               SUMSQ = NCOADD(I) * DATA_OUT(I)**2 +
      :              NCOADD(I) * (NCOADD(I) - 1) * VARIANCE_OUT(I)
             ELSE
                SUM = 0.0
@@ -136,10 +136,10 @@
 
             DATA_OUT(I) = SUM / NCOADD(I)
             IF (NCOADD(I) .GT. 1) THEN
-               VARIANCE_OUT (I) = 
+               VARIANCE_OUT (I) =
      :            (SUMSQ - NCOADD(I) * DATA_OUT(I)**2) /
      :            (NCOADD(I) * (NCOADD(I)-1))
-            ELSE 
+            ELSE
                VARIANCE_OUT (I) = 0.0
             END IF
          END IF

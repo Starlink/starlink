@@ -101,7 +101,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -158,7 +158,7 @@
 
       SUBROUTINE DSA1_MAPCEN( SLOT, AXIS, MODE, TYPE,
      :   ADDRESS, MSLOT, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -271,7 +271,7 @@
      :                       %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ),
      :                       %VAL( CNF_PVAL(DSA__MAPPT2(MSLOT)) ),
      :                       STATUS )
- 
+
 *        Unmap and annull first locator, zero first pointer.
             CALL DAT_UNMAP( DSA__MAPLO1(MSLOT), STATUS )
             CALL DAT_ANNUL( DSA__MAPLO1(MSLOT), STATUS )
@@ -381,13 +381,13 @@
 
 *        Fill the array, selecting the routine of the appropriate type.
                IF ( NDFTY2 .EQ. '_REAL' ) THEN
-                  CALL DSA2_IFILLF( NELM, LBND(AXIS), 
+                  CALL DSA2_IFILLF( NELM, LBND(AXIS),
      :                              %VAL( CNF_PVAL(ADDRESS) ), STATUS )
                ELSE
                   CALL DSA2_IFILLD( NELM, LBND(AXIS),
      :                              %VAL( CNF_PVAL(ADDRESS) ), STATUS )
                END IF
-            END IF 
+            END IF
 
 *        Fill in map slot.
             IF ( STATUS .EQ. SAI__OK ) THEN

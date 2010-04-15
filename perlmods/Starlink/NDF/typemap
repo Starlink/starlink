@@ -10,7 +10,7 @@ ndfdouble       T_DOUBLE
 int *           T_INTP
 NdgProvenance * T_PTROBJ
 
-INPUT 
+INPUT
 
 T_LOCP
 	$var = (char *)SvPV($arg, datszloc)
@@ -20,7 +20,7 @@ T_FLOATP
         $var = ($type)pack1D($arg,'f')
 T_DOUBLEP
         $var = ($type)pack1D($arg,'d')
- 
+
 OUTPUT
 
 T_INTP
@@ -29,6 +29,6 @@ T_FLOATP
         sv_setpv((SV*)$arg, (char *)$var);
 T_DOUBLEP
         sv_setpv((SV*)$arg, (char *)$var);
- 
+
 T_LOCP
         sv_setpvn((SV*)$arg, (char *)$var, datszloc);

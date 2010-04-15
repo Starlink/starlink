@@ -22,11 +22,11 @@
 
 *  Description:
 *     This application can be used to create a new AST Mapping and
-*     optionally use the Mapping to add a new co-ordinate Frame into 
+*     optionally use the Mapping to add a new co-ordinate Frame into
 *     the WCS component of an NDF (see parameter NDF). An output text
-*     file may also be created holding a textual representation of the 
-*     Mapping for future use by other applications such as REGRID (see 
-*     parameter MAPOUT). A number of different types of Mapping can be 
+*     file may also be created holding a textual representation of the
+*     Mapping for future use by other applications such as REGRID (see
+*     parameter MAPOUT). A number of different types of Mapping can be
 *     used (see parameter MAPTYPE).
 *
 *     When adding a new Frame to a WCS component, the Mapping is used
@@ -39,11 +39,11 @@
 *     value of the Domain attribute for the new Frame can be specified
 *     using parameter DOMAIN. Other attribute values for the new Frame
 *     may be specified using parameters ATTRS. The new Frame becomes the
-*     current co-ordinate Frame in the NDF. 
+*     current co-ordinate Frame in the NDF.
 *
-*     WCSADD will only generate Mappings with the same number of 
+*     WCSADD will only generate Mappings with the same number of
 *     input and output axes; this number is determined by the number
-*     of axes in the basis Frame if an NDF is supplied, or by the 
+*     of axes in the basis Frame if an NDF is supplied, or by the
 *     NAXES parameter otherwise.
 
 *  Usage:
@@ -73,15 +73,15 @@
 *        value to assign to the attribute. Default values will be used
 *        for any unspecified attributes---these defaults are inherited
 *        from the basis Frame.  Any unrecognised attributes are ignored
-*        (no error is reported). 
+*        (no error is reported).
 *     CENTRE( 2 ) = _DOUBLE (Read)
 *        The co-ordinates of the centre of a pincushion distortion.
 *        It is only used when MAPTYPE="PINCUSHION". See also DISCO.
 *        [0,0]
 *     DIAG( ) = _DOUBLE (Read)
-*        The elements along the diagonal of the linear transformation 
+*        The elements along the diagonal of the linear transformation
 *        matrix. There will be as many of these as there are axes in the
-*        basis Frame. Each effectively gives the factor by which 
+*        basis Frame. Each effectively gives the factor by which
 *        co-ordinates on the corresponding axis should be multiplied.
 *        This parameter is only used when MAPTYPE="DIAG".
 *     DISCO = _DOUBLE (Read)
@@ -93,7 +93,7 @@
 *
 *                YY = Y + D * (Y - C2) * ( (X - C1)**2 + (Y - C2)**2 )
 *
-*        where (X,Y) are the input co-ordinates, (XX,YY) the output 
+*        where (X,Y) are the input co-ordinates, (XX,YY) the output
 *        co-ordinates, D is DISCO, and C1 and C2 are the two elements of
 *        CENTRE.  DISCO is only used when MAPTYPE=PINCUSHION.
 *     DOMAIN = LITERAL (Read)
@@ -110,15 +110,15 @@
 *        parameter FRAME), then an epoch value is needed to qualify it.
 *        This is the epoch at which the supplied sky positions were
 *        determined. It should be given as a decimal-years value, with
-*        or without decimal places ("1996.8" for example). Such values 
+*        or without decimal places ("1996.8" for example). Such values
 *        are interpreted as a Besselian epoch if less than 1984.0 and
 *        as a Julian epoch otherwise. The suggested default is the
 *        value stored in the basis Frame.
 *     FOREXP = LITERAL (Read)
-*        A group of expressions to be used for the forward co-ordinate 
+*        A group of expressions to be used for the forward co-ordinate
 *        transformations in a MathMap. There must be at least as many
 *        expressions as the number of axes of the Mapping, but there
-*        may be more if intermediate expressions are to be used. The 
+*        may be more if intermediate expressions are to be used. The
 *        expressions may be given directly in response to the prompt, or
 *        read from a text file, in which case the name of the file
 *        should be given, preceded by a "^" character. Individual
@@ -143,12 +143,12 @@
 *        - An integer value giving the index of the required Frame
 *        within the WCS component.
 *
-*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) 
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
 *        (see section "Sky Co-ordinate Systems" in SUN/95).
 *
 *     FRMTYPE = LITERAL (Read)
 *        The type of Frame to add to the NDF. If a null (!) value is
-*        supplied, a copy of the basis Frame is used (as modified by 
+*        supplied, a copy of the basis Frame is used (as modified by
 *        parameters ATTRS and DOMAIN). The allows values are:
 *
 *        - FRAME      -- A simple Cartesian Frame (the number of axes is
@@ -166,7 +166,7 @@
 *
 *        [!]
 *     INVEXP = LITERAL (Read)
-*        The expressions to be used for the inverse co-ordinate 
+*        The expressions to be used for the inverse co-ordinate
 *        transformations in a MathMap. See FOREXP.  INVEXP is only used
 *        when MAPTYPE="MATH".
 *     MAPIN = FILENAME (Read)
@@ -199,7 +199,7 @@
 *        - MATH       -- A general algebraically defined mapping
 *                        (see parameters FOREXP, INVEXP, SIMPFI, SIMPIF)
 *
-*        - PINCUSHION -- A pincushion/barrel distortion (see parameters 
+*        - PINCUSHION -- A pincushion/barrel distortion (see parameters
 *                        DISCO and CENTRE)
 *
 *        - SHIFT      -- A translation (see parameter SHIFT)
@@ -212,7 +212,7 @@
 *        ["LINEAR"]
 *     NAXES = _INTEGER (Read)
 *        The number of input and output axes which the Mapping will
-*        have. Only used if a null value is supplied for parameter NDF. 
+*        have. Only used if a null value is supplied for parameter NDF.
 *     NDF = NDF (Read and Write)
 *        The NDF in which to store a new co-ordinate Frame. Supply a
 *        null (!) value if you do not wish to add a Frame to an NDF (you
@@ -223,17 +223,17 @@
 *        translation. There must be one element for each axis.  SHIFT
 *        is only used when MAPTYPE="SHIFT".
 *     SIMPFI = _LOGICAL (Read)
-*        The value of the Mapping's SimpFI attribute (whether it is 
-*        legitimate to simplify the forward followed by the inverse 
+*        The value of the Mapping's SimpFI attribute (whether it is
+*        legitimate to simplify the forward followed by the inverse
 *        transformation to a unit transformation). This parameter is
 *        only used when MAPTYPE="MATH".  [TRUE]
 *     SIMPIF = _LOGICAL (Read)
-*        The value of the Mapping's SimpIF attribute (whether it is 
-*        legitimate to simplify the inverse followed by the forward 
+*        The value of the Mapping's SimpIF attribute (whether it is
+*        legitimate to simplify the inverse followed by the forward
 *        transformation to a unit transformation). This parameter is
 *        only used when MAPTYPE="MATH".  [TRUE]
 *     TR( ) = _DOUBLE (Read)
-*        The values of this parameter are the coefficients of a linear 
+*        The values of this parameter are the coefficients of a linear
 *        transformation from the basis Frame specified by parameter
 *        FRAME to the new Frame. This parameter is only used when
 *        MAPTYPE="LINEAR". For instance, if a feature has co-ordinates
@@ -243,7 +243,7 @@
 *
 *        - one-dimensional:
 *
-*              U = TR(1) + TR(2)*X 
+*              U = TR(1) + TR(2)*X
 *
 *        - two-dimensional:
 *
@@ -260,26 +260,26 @@
 *              W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
 *
 *        The correct number of values must be supplied (that is, N*(N+1)
-*        where N is the number of axes in the new and old Frames). If a 
-*        null value (!) is given it is assumed that the new Frame and 
+*        where N is the number of axes in the new and old Frames). If a
+*        null value (!) is given it is assumed that the new Frame and
 *        the basis Frame are connected using a unit mapping (i.e.
 *        corresponding axis values are identical in the two Frames).
 *        This parameter is only used when MAPTYPE="LINEAR". [!]
 *     ZOOM = _DOUBLE (Read)
-*        The scaling factor for a ZoomMap; every coordinate will be 
-*        multiplied by this factor in the forward transformation. 
-*        ZOOM is only used when MAPTYPE="ZOOM". 
+*        The scaling factor for a ZoomMap; every coordinate will be
+*        multiplied by this factor in the forward transformation.
+*        ZOOM is only used when MAPTYPE="ZOOM".
 
 *  Examples:
 *     wcsadd speca axis frmtype=specframe maptype=unit \
 *            attrs="'system=wave,unit=Angstrom'"
 *        This example assumes the NDF "speca" has an Axis structure
-*        describing wavelength in Angstroms. It adds a corresponding 
-*        SpecFrame into the WCS component of the NDF. The SpecFrame 
-*        is connected to the Frame describing the NDF Axis structure 
-*        using a unit Mapping. Subsequently, WCSATTRIB  can be used to 
-*        modify the SpecFrame so that it describes the spectral axis 
-*        value in some other system (frequency, velocities of various 
+*        describing wavelength in Angstroms. It adds a corresponding
+*        SpecFrame into the WCS component of the NDF. The SpecFrame
+*        is connected to the Frame describing the NDF Axis structure
+*        using a unit Mapping. Subsequently, WCSATTRIB  can be used to
+*        modify the SpecFrame so that it describes the spectral axis
+*        value in some other system (frequency, velocities of various
 *        forms, energy, wave number, etc).
 *     wcsadd ngc5128 pixel old_pixel unit
 *        This adds a new co-ordinate Frame into the WCS component of the
@@ -301,14 +301,14 @@
 *     wcsadd my_data dist-lum dist(au)-lum diag diag=[2.0628E5,1]
 *        This does exactly the same as the previous example.
 *     wcsadd ax322 ! shrunk zoom zoom=0.25 mapout=zoom.ast
-*        This adds a new Frame to the WCS component of ax322 which is a 
+*        This adds a new Frame to the WCS component of ax322 which is a
 *        one-quarter-scale copy of its current co-ordinate Frame. The
 *        Mapping is also stored in the text file "zoom.ast".
 *     wcsadd cube grid slid shift shift=[0,0,1024]
-*        This adds a new Frame to the WCS component of the NDF cube 
+*        This adds a new Frame to the WCS component of the NDF cube
 *        which matches the GRID-domain co-ordinates in the first two
 *        axes, but is translated by 1024 pixels on the third axis.
-*     wcsadd plane pixel polar math simpif simpfi 
+*     wcsadd plane pixel polar math simpif simpfi
 *           forexp="'r=sqrt(x*x+y*y),theta=atan2(y,x)'"
 *           invexp="'x=r*cos(theta),y=r*sin(theta)'"
 *        A new Frame is added which gives pixel positions in polar
@@ -337,7 +337,7 @@
 *  Notes:
 *     -  The new Frame has the same number of axes as the basis Frame.
 *     -  An error is reported if the transformation supplied using
-*     parameter TR is singular. 
+*     parameter TR is singular.
 
 *  Related Applications:
 *     KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;
@@ -376,7 +376,7 @@
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM
 *     14-DEC-2001 (MBT):
-*        Added MAPTYPE, MAPOUT and other parameters and several new 
+*        Added MAPTYPE, MAPOUT and other parameters and several new
 *        Mapping types.
 *     8-JAN-2002 (DSB):
 *        Minor prologue changes. Change some parameter logic. Use GRP to
@@ -407,11 +407,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Status:
       INTEGER STATUS
@@ -421,7 +421,7 @@
       EXTERNAL AST_ISAMAPPING    ! AST function to classify Object type
 
 *  Local Constants:
-      INTEGER MAXEXP             ! Maximum number of expressions for 
+      INTEGER MAXEXP             ! Maximum number of expressions for
       PARAMETER( MAXEXP = 100 )  ! MathMap
 
 *  Local Variables:
@@ -430,9 +430,9 @@
       CHARACTER DOM0*40          ! Domain for basis Frame
       CHARACTER FRMTYP*16        ! Type of Frame to add
       CHARACTER MAPTYP*16        ! Type of transformation to add
-      CHARACTER FOREXP( MAXEXP ) * ( GRP__SZNAM ) ! Forward expressions 
+      CHARACTER FOREXP( MAXEXP ) * ( GRP__SZNAM ) ! Forward expressions
                                  ! for MathMap
-      CHARACTER INVEXP( MAXEXP ) * ( GRP__SZNAM ) ! Inverse expressions 
+      CHARACTER INVEXP( MAXEXP ) * ( GRP__SZNAM ) ! Inverse expressions
                                  ! for MathMap
       DOUBLE PRECISION CENTRE( 2 ) ! Pincushion distortion centre
       DOUBLE PRECISION DET       ! Matrix determinant
@@ -442,21 +442,21 @@
                                  ! Frame
       DOUBLE PRECISION INB( NDF__MXDIM ) ! Corner "B" of window in input
                                  ! Frame
-      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix 
+      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix
                                  ! (no offset)
-      DOUBLE PRECISION MTEST( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix 
+      DOUBLE PRECISION MTEST( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix
                                  ! (no offset)
       DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Pixel offset vector
       DOUBLE PRECISION OTEST( NDF__MXDIM )  ! Pixel offset vector
-      DOUBLE PRECISION OUTA( NDF__MXDIM )! Corner "A" of window in 
+      DOUBLE PRECISION OUTA( NDF__MXDIM )! Corner "A" of window in
                                  ! output Frame
-      DOUBLE PRECISION OUTB( NDF__MXDIM )! Corner "B" of window in 
+      DOUBLE PRECISION OUTB( NDF__MXDIM )! Corner "B" of window in
                                  ! output Frame
       DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation coefficients
-      DOUBLE PRECISION TR( NDF__MXDIM*( NDF__MXDIM + 1 ) ) ! Mapping 
+      DOUBLE PRECISION TR( NDF__MXDIM*( NDF__MXDIM + 1 ) ) ! Mapping
                                  ! co-effs
       DOUBLE PRECISION ZOOM      ! Scaling factor for ZoomMap
-      INTEGER ACTVAL             ! No. of transformation coefficients 
+      INTEGER ACTVAL             ! No. of transformation coefficients
                                  ! supplied
       INTEGER FRMB               ! Pointer to basis Frame
       INTEGER FRMN               ! Pointer to new Frame
@@ -467,16 +467,16 @@
       INTEGER INDF               ! NDF identifier for NDF being modified
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER J                  ! Column index
-      INTEGER K                  ! Index within supplied list of 
+      INTEGER K                  ! Index within supplied list of
                                  ! coefficients
       INTEGER L                  ! Index within vectorised matrix array
       INTEGER MAP                ! Pointer to old->new Mapping
-      INTEGER MTRMAP             ! MatrixMap implied by given 
+      INTEGER MTRMAP             ! MatrixMap implied by given
                                  ! coefficients
       INTEGER NAXB               ! Number of axes in basis Frame
-      INTEGER NCOEF              ! Required number of transformation 
-                                 ! coefficients 
-      INTEGER NFEXP              ! Number of expressions for forward 
+      INTEGER NCOEF              ! Required number of transformation
+                                 ! coefficients
+      INTEGER NFEXP              ! Number of expressions for forward
                                  ! transforms
       INTEGER NIEXP              ! Number of expressions for inverse
                                  ! transforms
@@ -484,7 +484,7 @@
       INTEGER SING               ! Non-zero if matrix is singular
       INTEGER WINMAP             ! WinMap implied by given coefficients
       INTEGER WORK( NDF__MXDIM ) ! Work space
-      LOGICAL FIBOTH             ! Do we have both forward and inverse 
+      LOGICAL FIBOTH             ! Do we have both forward and inverse
                                  ! mappings?
       LOGICAL SIMPFI             ! SimpFI attribute of MathMap
       LOGICAL SIMPIF             ! SimpIF attribute of MathMap
@@ -509,7 +509,7 @@
 *  Obtain an identifier for the NDF to be modified.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
-*  If a null value was supplied annull the error and indicate that 
+*  If a null value was supplied annull the error and indicate that
 *  we have no ndf.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -521,20 +521,20 @@
          CALL PAR_GDR0I( 'NAXES', -1, 1, VAL__MAXI, .FALSE., NAXB,
      :                   STATUS )
 
-*  If we are adding a new Frame to a WCS FrameSet, we need to extract 
+*  If we are adding a new Frame to a WCS FrameSet, we need to extract
 *  some information about the FrameSet.
       ELSE
 
 *  Get the WCS FrameSet associated with the NDF.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
-*  Get the existing Frame which is to be used as the basis for the new 
+*  Get the existing Frame which is to be used as the basis for the new
 *  Frame.   The selected Frame becomes the Current Frame.
          CALL NDF_MSG( 'NDF', INDF )
-         CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', 
+         CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS',
      :                    .TRUE., '^NDF', STATUS )
 
-*  Get its index, get a pointer to it, and save the number of axes in 
+*  Get its index, get a pointer to it, and save the number of axes in
 *  it.
          IBASIS = AST_GETI( IWCS, 'CURRENT', STATUS )
          FRMB = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
@@ -571,11 +571,11 @@
       ELSE IF ( MAPTYP .EQ. 'LINEAR' ) THEN
 
 *  Get the coefficients of the linear transformation from the basis
-*  Frame to the new Frame.  Ensure the exact required number are 
+*  Frame to the new Frame.  Ensure the exact required number are
 *  supplied.
          ACTVAL = 0
          NCOEF = ( NAXB + 1 )*NAXB
-         DO WHILE( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK )
             CALL PAR_GET1D( 'TR', NCOEF, TR, ACTVAL, STATUS )
             IF( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK ) THEN
                CALL MSG_SETI( 'N', NCOEF )
@@ -586,14 +586,14 @@
             END IF
          END DO
 
-*  If a null value was given, annul the error and create a unit 
+*  If a null value was given, annul the error and create a unit
 *  MatrixMap.
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-            MAP = AST_MATRIXMAP( NAXB, NAXB, 2, 0.0D0, ' ', STATUS ) 
+            MAP = AST_MATRIXMAP( NAXB, NAXB, 2, 0.0D0, ' ', STATUS )
 
 *  Otherwise, if no error has occurred, extract the offset and matrix
-*  from the supplied list of coefficients.         
+*  from the supplied list of coefficients.
          ELSE
 
 *  Extract the offset into a separate vector, making two copies.
@@ -607,17 +607,17 @@
             L = 1
             DO I = 1, NAXB
                K = K + 1
-   
+
                DO J = 1, NAXB
                   MATRIX( L ) = TR( K )
                   MTEST( L ) = TR( K )
                   L = L + 1
                   K = K + 1
                END DO
-   
+
             END DO
 
-*  See if the matrix is singular. The MTEST and OTEST arrays 
+*  See if the matrix is singular. The MTEST and OTEST arrays
 *  are changed by this call, This is why we took two copies above.
             CALL SLA_DMAT( NAXB, MTEST, OTEST, DET, SING, WORK )
 
@@ -632,9 +632,9 @@
 *  Create a MatrixMap from the supplied MATRIX array.
             MTRMAP = AST_MATRIXMAP( NAXB, NAXB, 0, MATRIX, ' ', STATUS )
 
-*  Create a WinMap which gives the required shift of pixel origin. 
+*  Create a WinMap which gives the required shift of pixel origin.
             DO I = 1, NAXB
-               INA( I ) = 0.0D0 
+               INA( I ) = 0.0D0
                INB( I ) = MAX( ABS( OFFSET( I ) ), 1.0D0 )
                OUTA( I ) = INA( I ) + OFFSET( I )
                OUTB( I ) = INB( I ) + OFFSET( I )
@@ -651,12 +651,12 @@
 
 *  Create a MathMap from algebraic expressions supplied by the user.
       ELSE IF ( MAPTYP .EQ. 'MATH' ) THEN
-         
-*  Get a GRP group holding the algebraic expressions for the forward 
+
+*  Get a GRP group holding the algebraic expressions for the forward
 *  transformation.
          IGRP = GRP__NOID
          CALL KPG1_GTGRP( 'FOREXP', IGRP, NFEXP, STATUS )
-         DO WHILE( NFEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( NFEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK )
             CALL MSG_SETI( 'N', NAXB )
             CALL MSG_OUT( 'WCSADD_MSG2', 'At least ^N forward '//
      :                    'expressions are required - please enter '//
@@ -676,12 +676,12 @@
          END IF
 
 *  Copy the expressions into a local array.
-         CALL GRP_GET( IGRP, 1, NFEXP, FOREXP, STATUS ) 
+         CALL GRP_GET( IGRP, 1, NFEXP, FOREXP, STATUS )
 
-*  Similarly, get the algebraic expressions for the inverse 
+*  Similarly, get the algebraic expressions for the inverse
 *  transformation.
          CALL KPG1_GTGRP( 'INVEXP', IGRP, NIEXP, STATUS )
-         DO WHILE( NIEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( NIEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK )
             CALL MSG_SETI( 'N', NAXB )
             CALL MSG_OUT( 'WCSADD_MSG4', 'At least ^N inverse '//
      :                    'expressions are required - please enter '//
@@ -699,7 +699,7 @@
      :                    'should be supplied.', STATUS )
          END IF
 
-         CALL GRP_GET( IGRP, 1, NIEXP, INVEXP, STATUS ) 
+         CALL GRP_GET( IGRP, 1, NIEXP, INVEXP, STATUS )
 
 *  Delete the group.
          CALL GRP_DELET( IGRP, STATUS )
@@ -798,13 +798,13 @@
 
 *  Find the class for the new Frame.
          CALL PAR_CHOIC( 'FRMTYPE', FRMTYP, 'Frame,SkyFrame,'//
-     :                   'SpecFrame,TimeFrame', .FALSE., FRMTYP, 
+     :                   'SpecFrame,TimeFrame', .FALSE., FRMTYP,
      :                   STATUS )
 
 *  If a null value was supplied, simply copy the basis Frame */
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-            FRMN = AST_COPY( FRMB, STATUS ) 
+            FRMN = AST_COPY( FRMB, STATUS )
 
 *  Allow the user to modify the attributes of the Frame.
             CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
@@ -820,15 +820,15 @@
             ELSE IF( FRMTYP .EQ. 'TIMEFRAME' ) THEN
                FRMN = AST_TIMEFRAME( ' ', STATUS )
 
-            ELSE 
-               FRMN = AST_FRAME( AST_GETI( MAP, 'NOUT', STATUS ), ' ', 
+            ELSE
+               FRMN = AST_FRAME( AST_GETI( MAP, 'NOUT', STATUS ), ' ',
      :                           STATUS )
             END IF
 
 *  Allow the user to modify the attributes of the Frame.
             CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
 
-*  Transfer the values of attributes which have been set in the basis 
+*  Transfer the values of attributes which have been set in the basis
 *  Frame to the new Frame, and modify the Mapping.  We temporarily clear
 *  the Domain in the basis Frame (if set) so that we can transfer
 *  attribute values to Frames with other Domains.
@@ -841,14 +841,14 @@
 
 *  Do the transferring.
             RESULT = AST_FINDFRAME( FRMN, FRMB, ' ', STATUS )
-            IF( DOM0 .NE. ' ' ) CALL AST_SETC( FRMB, 'Domain', DOM0, 
+            IF( DOM0 .NE. ' ' ) CALL AST_SETC( FRMB, 'Domain', DOM0,
      :                                         STATUS )
 
 *  If succesful, use the modified new Frame and modify the Mapping.
             IF( RESULT .NE. AST__NULL ) THEN
                FRMN = AST_GETFRAME( RESULT, AST__CURRENT, STATUS )
                MAP = AST_CMPMAP( MAP, AST_GETMAPPING( RESULT, AST__BASE,
-     :                                                AST__CURRENT, 
+     :                                                AST__CURRENT,
      :                                                STATUS ), .TRUE.,
      :                           ' ', STATUS )
                MAP = AST_SIMPLIFY( MAP, STATUS )
@@ -858,7 +858,7 @@
 *  Check the number of axes in the Frame matches the number of outputs
 *  from the Mapping.
          IF( AST_GETI( FRMN, 'NAXES', STATUS ) .NE.
-     :       AST_GETI( MAP, 'NOUT', STATUS ) .AND. 
+     :       AST_GETI( MAP, 'NOUT', STATUS ) .AND.
      :       STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'NOUT', AST_GETI( MAP, 'NOUT', STATUS ) )
@@ -872,7 +872,7 @@
 *  Note the current Domain in the Frame.
          DOM0 = AST_GETC( FRMN, 'Domain', STATUS )
 
-*  If the new Frame has active Unit attributes, check that all Unit 
+*  If the new Frame has active Unit attributes, check that all Unit
 *  attributes have non-blank values.
          IF( AST_GETACTIVEUNIT( FRMN, STATUS ) ) THEN
             ATTRIB = 'Unit('
@@ -880,7 +880,7 @@
                IAT = 5
                CALL CHR_PUTI( I, ATTRIB, IAT )
                CALL CHR_PUTC( ')', ATTRIB, IAT )
-               IF( AST_GETC( FRMN, ATTRIB( : IAT ), STATUS ) .EQ. 
+               IF( AST_GETC( FRMN, ATTRIB( : IAT ), STATUS ) .EQ.
      :             ' ' .AND. STATUS .EQ. SAI__OK ) THEN
                   CALL MSG_SETC( 'AT', ATTRIB( : IAT ) )
                   STATUS = SAI__ERROR
@@ -896,15 +896,15 @@
 *  Get the Domain for the new Frame.  If the current Domain is non-blank
 *  and different to the Domain of the basis Frame, use it as the dynamic
 *  default.
-         DOM = AST_GETC( FRMN, 'Domain', STATUS ) 
-         IF( DOM .NE. ' ' .AND. 
+         DOM = AST_GETC( FRMN, 'Domain', STATUS )
+         IF( DOM .NE. ' ' .AND.
      :       DOM .NE. AST_GETC( FRMB, 'Domain', STATUS ) ) THEN
             CALL PAR_DEF0C( 'DOMAIN', DOM, STATUS )
          END IF
-        
+
          CALL PAR_GET0C( 'DOMAIN', DOM, STATUS )
 
-*  Remove spaces, and convert to upper case. 
+*  Remove spaces, and convert to upper case.
          CALL CHR_RMBLK( DOM )
          CALL CHR_UCASE( DOM )
 
@@ -913,7 +913,7 @@
 
 *  Store the new Domain if it is different to the default Domain.
          IF( DOM .NE. AST_GETC( FRMN, 'DOMAIN', STATUS ) ) THEN
-            CALL AST_SETC( FRMN, 'DOMAIN', 
+            CALL AST_SETC( FRMN, 'DOMAIN',
      :                     DOM( : MAX( 1, CHR_LEN( DOM ) ) ), STATUS )
          END IF
 
@@ -922,27 +922,27 @@
 *  Use the constructed Mapping.
 *  ============================
 
-*  Write the Mapping out to a text file. 
+*  Write the Mapping out to a text file.
       IF( STATUS .NE. SAI__OK ) GO TO 999
       CALL ATL_CREAT( 'MAPOUT', MAP, STATUS )
 
 *  If a null value was supplied, annull the error
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-      
-*  If we do not have an NDF, cancel the parameter and try once more to 
+
+*  If we do not have an NDF, cancel the parameter and try once more to
 *  create an output file.  We do this because the default value for
 *  MAPOUT in the ifl file is a null.
          IF( INDF .EQ. NDF__NOID ) THEN
             CALL PAR_CANCL( 'MAPOUT', STATUS )
             CALL ATL_CREAT( 'MAPOUT', MAP, STATUS )
          END IF
-      END IF      
-         
+      END IF
+
 *  If we have an NDF, add the new Frame into the FrameSet, and store
 *  the modified FrameSet in the NDF.
-      IF( INDF .NE. NDF__NOID ) THEN 
-         CALL AST_ADDFRAME( IWCS, IBASIS, MAP, FRMN, STATUS ) 
+      IF( INDF .NE. NDF__NOID ) THEN
+         CALL AST_ADDFRAME( IWCS, IBASIS, MAP, FRMN, STATUS )
          CALL NDF_PTWCS( IWCS, INDF, STATUS )
       END IF
 

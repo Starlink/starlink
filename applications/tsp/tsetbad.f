@@ -17,27 +17,27 @@ C        which will be ignored by subsequent applications.
 C
 C     Parameters:
 C    (1) INPUT      (TSP, 2D)  The input time series dataset
-C    (2) OUTPUT     (TSP, 2D)  The output dataset with 
+C    (2) OUTPUT     (TSP, 2D)  The output dataset with
 C                               bad points flagged.
 C        CHAN       (Integer)  Channel number of point.
 C        X          (Integer)  Time bin number of point.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         1/3/1990
 C
 C-
 C
 C  History:
-C    1/3/1990   Original Version.   JAB/AAO 
+C    1/3/1990   Original Version.   JAB/AAO
 C
 
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'                          
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'USER_ERR'  
+      INCLUDE 'USER_ERR'
 
 *  Status argument
       INTEGER STATUS
@@ -50,7 +50,7 @@ C
 
 *  Data pointers
       INTEGER PTR,QPTR,UPTR,VPTR,TPTR
-      INTEGER NSTRT                        
+      INTEGER NSTRT
 
 *  Get Locators to the input dataset
       CALL DAT_ASSOC('INPUT','READ',ILOC,STATUS)
@@ -109,7 +109,7 @@ C
 *  Loop over channels
 
       CHAN = 1
-      DO WHILE (CHAN .NE. 0)  
+      DO WHILE (CHAN .NE. 0)
           IF (CHAN .LT. 0 .OR. CHAN .GT. CHANS) THEN
               CALL MSG_OUT(' ','No such channel in dataset',STATUS)
           ENDIF
@@ -187,7 +187,7 @@ C
 *  Parameters
       INTEGER IX,JX,I,J
       REAL X(IX,JX),Q(IX,JX),U(IX,JX),V(IX,JX)
-      
+
 *  Set intensity and Stokes parameters to bad
       X(I,J) = VAL__BADR
       Q(I,J) = VAL__BADR

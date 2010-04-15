@@ -1,6 +1,6 @@
 *+ BGD_GOOD  Decides if background is good at particular time.
 	LOGICAL FUNCTION BGD_GOOD(FIL,EVT)
- 
+
 	implicit  none
 	include 'SMAPDEF.INC'
 	include 'DAT_PAR'
@@ -8,10 +8,10 @@
 * Input
 	integer	 fil				! Filter number
 	integer  evt				! Event time
- 
+
 * P. McGale Jun 92.
 *-
- 
+
 * Local constants
 	integer maxslots			!  LEVS array size.
  	 parameter (maxslots=250000*32)
@@ -42,10 +42,10 @@
 *
 	data	status/0/
 	data	first/.TRUE./
- 
+
 * If first call of function then open up relevant background discrimination
 * file and read in value.
- 
+
 	if (first) then
 * Decide what filter using, and read in relevant mask array.
 	  call hds_open('re_slots','read',locin,status)
@@ -54,7 +54,7 @@
 	    bgd_good = .FALSE.
 	    return
 	  endif
- 
+
 	  filter = cal_filt_n2s(fil)
 	  if (filter .eq. 'S1' ) then
 * Read in HDS scalars and vector.
@@ -81,20 +81,20 @@
 	     status=1
 	     write(*,*)  '   No valid mask array available!'
 	  endif
- 
+
 	  if (status .ne. 0 ) then
 	       write(*,*) '   Problem with HDS in BGD_GOOD.'
 	       bgd_good = .FALSE.
 	       return
 	  endif
 	  CALL HDS_CLOSE (locin,status)
- 
- 
+
+
 * Note that condition has been run.
 	  d_tslot = 86400.D0/real(tslot)
 	  first = .FALSE.
 	endif
- 
+
 * See if background good or bad at time MJD.
 	mjd    = (evt/conv) + s2_ref_mjd
 	slot   = int((mjd-b_mjd)*d_tslot)
@@ -111,5 +111,5 @@
 	       bgd_good = .FALSE.
           endif
 	endif
- 
+
  	end

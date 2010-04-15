@@ -24,7 +24,7 @@
             $state = 4;
          }
          last;
-      } 
+      }
    }
    close( INFILE );
 

@@ -11,7 +11,7 @@ main(){
    const char *xml1 = NULL;
    const char *xml2 = NULL;
 
-   ndfFind( NULL, "provtest", &indf, &status ); 
+   ndfFind( NULL, "provtest", &indf, &status );
    prov1 = ndgReadProv( indf, "FRED", &status );
    ndfAnnul( &indf, &status );
 

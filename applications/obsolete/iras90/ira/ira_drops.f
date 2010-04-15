@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -71,7 +71,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the index at which the option is stored in the common array 
+*  Get the index at which the option is stored in the common array
 *  ACM_DROPT.
       CALL IRA1_OPTID( ITEM, INDX, STATUS )
 
@@ -81,7 +81,7 @@
 
 *  Otherwise, add a context message.
       ELSE
-         CALL ERR_REP( 'IRA_DROPS_ERR1', 
+         CALL ERR_REP( 'IRA_DROPS_ERR1',
      : 'IRA_DROPS: Unable to get the current value of an astrometric '//
      : 'graphics option', STATUS )
       END IF

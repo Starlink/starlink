@@ -4,7 +4,7 @@
 *     smf_resampcube_nn
 
 *  Purpose:
-*     Resample a supplied 3D array into a time series cube using custom 2D 
+*     Resample a supplied 3D array into a time series cube using custom 2D
 *     nearest neighbour code.
 
 *  Language:
@@ -14,11 +14,11 @@
 *     C function
 
 *  Invocation:
-*     void smf_resampcube_nn( smfData *data, dim_t nchan, 
-*                             dim_t ndet, dim_t nslice, dim_t nxy, 
-*                             dim_t dim[3], AstMapping *ssmap, 
-*                             AstSkyFrame *abskyfrm, AstMapping *iskymap, 
-*                             Grp *detgrp, int moving, float *in_data, 
+*     void smf_resampcube_nn( smfData *data, dim_t nchan,
+*                             dim_t ndet, dim_t nslice, dim_t nxy,
+*                             dim_t dim[3], AstMapping *ssmap,
+*                             AstSkyFrame *abskyfrm, AstMapping *iskymap,
+*                             Grp *detgrp, int moving, float *in_data,
 *                             float *out_data, int overlap, int *status );
 
 *  Arguments:
@@ -38,9 +38,9 @@
 *        A Mapping that goes from template spectral grid axis (pixel axis 1)
 *        to the sky cube spectral grid axis (pixel axis 3).
 *     abskyfrm = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe 
+*        A SkyFrame that specifies the coordinate system used to describe
 *        the spatial axes of the sky cube. This should represent
-*        absolute sky coordinates rather than offsets even if "moving" is 
+*        absolute sky coordinates rather than offsets even if "moving" is
 *        non-zero.
 *     iskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the sky cube to 2D
@@ -49,26 +49,26 @@
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
 *     moving = int (Given)
-*        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted so that the position specified by 
+*        A flag indicating if the telescope is tracking a moving object. If
+*        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        sky cube.
 *     in_data = float * (Given)
 *        The 3D data array for the input sky cube. If a NULL pointer is
-*        supplied, then "out_data" is ignored, but the "overlap" value is 
+*        supplied, then "out_data" is ignored, but the "overlap" value is
 *        still returned.
 *     out_data = float * (Returned)
 *        The 3D data array for the output time series array. Ignored if
 *        "in_data" is NULL.
 *     overlap = int * (Returned)
 *        Returned non-zero if any spectra in the template fall within the
-*        bounds of the skycube. 
+*        bounds of the skycube.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
 *  Description:
 *     The data array of the supplied sky cube is resampled at the
-*     detector sample positions specified by the input template. The 
+*     detector sample positions specified by the input template. The
 *     resampled values are stored in the output time series cube.
 *
 *     Specialised code is used that only provides Nearest Neighbour
@@ -126,11 +126,11 @@
 
 #define FUNC_NAME "smf_resampcube_nn"
 
-void smf_resampcube_nn( smfData *data, dim_t nchan, 
-                        dim_t ndet, dim_t nslice, dim_t nxy, 
-                        dim_t dim[3], AstMapping *ssmap, 
-                        AstSkyFrame *abskyfrm, AstMapping *iskymap, 
-                        Grp *detgrp, int moving, float *in_data, 
+void smf_resampcube_nn( smfData *data, dim_t nchan,
+                        dim_t ndet, dim_t nslice, dim_t nxy,
+                        dim_t dim[3], AstMapping *ssmap,
+                        AstSkyFrame *abskyfrm, AstMapping *iskymap,
+                        Grp *detgrp, int moving, float *in_data,
                         float *out_data, int *overlap, int *status ){
 
 /* Local Variables */
@@ -164,19 +164,19 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 /* Store the number of pixels in one time slice */
    timeslice_size = ndet*nchan;
 
-/* Use the supplied mapping to get the zero-based sky cube channel number 
+/* Use the supplied mapping to get the zero-based sky cube channel number
    corresponding to each template channel number. */
    smf_rebincube_spectab( nchan, dim[ 2 ], ssmap, &spectab, status );
    if( !spectab ) goto L999;
 
-/* Allocate work arrays to hold the template and sky cube grid coords for each 
+/* Allocate work arrays to hold the template and sky cube grid coords for each
    detector. */
    detxtemplt = astMalloc( ndet*sizeof( double ) );
    detytemplt = astMalloc( ndet*sizeof( double ) );
    detxskycube = astMalloc( ndet*sizeof( double ) );
    detyskycube = astMalloc( ndet*sizeof( double ) );
 
-/* Initialise a string to point to the name of the first detector for which 
+/* Initialise a string to point to the name of the first detector for which
    data is to be created. */
    name = hdr->detname;
 
@@ -188,7 +188,7 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coord
    bad. */
-      if( detgrp ) {    
+      if( detgrp ) {
          found = grpIndex( name, detgrp, 1, status );
          if( !found ) {
             detxtemplt[ idet ] = AST__BAD;
@@ -210,12 +210,12 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
    helps keep the number of AST objects in use to a minimum. */
       astBegin;
 
-/* Get a Mapping from the spatial GRID axes in the template to the spatial 
-   GRID axes in the sky cube for the current time slice. Note this has 
-   to be done first since it stores details of the current time slice 
+/* Get a Mapping from the spatial GRID axes in the template to the spatial
+   GRID axes in the sky cube for the current time slice. Note this has
+   to be done first since it stores details of the current time slice
    in the "smfHead" structure inside "data", and this is needed by
    subsequent functions. */
-      totmap = smf_rebin_totmap( data, itime, abskyfrm, iskymap, moving, 
+      totmap = smf_rebin_totmap( data, itime, abskyfrm, iskymap, moving,
 				 status );
       if( !totmap ) {
          astEnd;
@@ -224,7 +224,7 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 
 /* Use this Mapping to get the sky cube spatial grid coords for each
    template detector. */
-      astTran2( totmap, ndet, detxtemplt, detytemplt, 1, detxskycube, 
+      astTran2( totmap, ndet, detxtemplt, detytemplt, 1, detxskycube,
                 detyskycube );
 
 /* Loop round each detector, obtaining its output value from the sky cube. */
@@ -250,7 +250,7 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 /* Copy the sky cube spectrum into the output time series cube. */
                *overlap = 1;
                if( in_data ) {
-                  smf_resampcube_copy( nchan, spectab, iv0, nxy, 
+                  smf_resampcube_copy( nchan, spectab, iv0, nxy,
                                        ddata, in_data, status );
                } else {
                   break;

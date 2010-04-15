@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine returns a FrameSet describing the WCS information
-*     in an NDF. If the NDF has no WCS component, any IRAS90 IRA 
+*     in an NDF. If the NDF has no WCS component, any IRAS90 IRA
 *     structure is converted into a FrameSet and returned. If the NDF has
 *     no IRAS90 IRA structure, then an attempt is made to read a FrameSet
 *     from the FITS headers in the FITS extension. If the NDF has no FITS
@@ -25,7 +25,7 @@
 *        The identifier for the NDF.
 *     IWCS = INTEGER (Returned)
 *        An AST pointer to the WCS FrameSet. Returned equal to AST__NULL
-*        if an error occurs. 
+*        if an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 *     16-JUL-1998 (DSB):
 *        Original version.
 *     9-DEC-1998 (DSB):
-*        Modified to ignore un-usable WCS information read from an IRAS90 
+*        Modified to ignore un-usable WCS information read from an IRAS90
 *        astrometry structure, or a FITS extension.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER MAXCOD             ! Max. no. of requested AST encodings 
+      INTEGER MAXCOD             ! Max. no. of requested AST encodings
       PARAMETER( MAXCOD = 5 )
 
       INTEGER CODLEN             ! Max. length of an AST encoding
@@ -175,14 +175,14 @@
       ELSE
 
 *  If we have write access to the NDF, then any new WCS component created
-*  on the basis of IRAS90 or FITS information can be stored in the supplied 
-*  NDF so that it can be accessed faster next time it is needed. 
-         CALL NDF_ISACC( INDF, 'WRITE', WRACC, STATUS ) 
+*  on the basis of IRAS90 or FITS information can be stored in the supplied
+*  NDF so that it can be accessed faster next time it is needed.
+         CALL NDF_ISACC( INDF, 'WRITE', WRACC, STATUS )
 
 *  Initialise the IRA suystem.
          CALL IRA_INIT( STATUS )
 
-*  See if an IRA astrometry structure can be found in the supplied NDF, an 
+*  See if an IRA astrometry structure can be found in the supplied NDF, an
 *  get an HDS locator for it if it can.
          CALL IRA_FIND( INDF, THERE, XNAME, ASNAME, XLOC, STATUS )
 
@@ -208,8 +208,8 @@
 *  Find the index of the PIXEL Frame.
                CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
 
-*  Add the IRA Frame into the FrameSet, using the IRA Mapping to join the 
-*  existing PIXEL Frame to the IRA Frame. This makes PIXEL co-ords and IRA 
+*  Add the IRA Frame into the FrameSet, using the IRA Mapping to join the
+*  existing PIXEL Frame to the IRA Frame. This makes PIXEL co-ords and IRA
 *  "image" co-ords identical.
                CALL AST_ADDFRAME( IWCS, IPIX, IRAMAP, IRAFRM, STATUS )
 
@@ -220,7 +220,7 @@
             CALL DAT_ANNUL( LOC, STATUS )
             CALL DAT_ANNUL( XLOC, STATUS )
 
-*  If an error occurred, annul or flush it since failure to read WCS 
+*  If an error occurred, annul or flush it since failure to read WCS
 *  information is probably not fatal.
             IF( STATUS .NE. SAI__OK ) THEN
 
@@ -249,7 +249,7 @@
                CALL NDF_MSG( 'NDF', INDF )
                CALL MSG_OUT( 'KPG1_GTWCS_MSG1', 'Using WCS '//
      :                       'information read from an IRAS90 '//
-     :                       'astrometry structure in ''^NDF''.', 
+     :                       'astrometry structure in ''^NDF''.',
      :                       STATUS )
 
 *  If the NDF can be modified, save the new FrameSet.
@@ -276,29 +276,29 @@
 
 *  Find the FITS extension and map it.
             CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
-            CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', PNTR, NCARD, 
+            CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', PNTR, NCARD,
      :                     STATUS )
 
-*  If we have write access to the NDF, then any WCS component can be 
+*  If we have write access to the NDF, then any WCS component can be
 *  stored in the supplied NDF so that it can be accessed faster next
-*  time it is needed. If we do not have write access to the NDF, then 
+*  time it is needed. If we do not have write access to the NDF, then
 *  we take a copy of the supplied NDF, and attempt to create a WCS component
 *  in the copy. If write access is available, use the supplied identifier.
             IF( WRACC ) THEN
                INDFC = INDF
 
 *  Otherwise, create a temporary NDF to be used as a host for the WCS
-*  FrameSet with the same pixel origin as the supplied NDF, but a size 
+*  FrameSet with the same pixel origin as the supplied NDF, but a size
 *  of only 1 pixel on each axis.
             ELSE
                CALL NDF_TEMP( PLACE, STATUS )
-               CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, 
+               CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM,
      :                         STATUS )
-               DO I = 1, NDIM 
+               DO I = 1, NDIM
                   UBND( I ) = LBND( I )
                END DO
 
-               CALL NDF_NEW( '_BYTE', NDIM, LBND, UBND, PLACE, INDFC, 
+               CALL NDF_NEW( '_BYTE', NDIM, LBND, UBND, PLACE, INDFC,
      :                       STATUS )
             END IF
 
@@ -308,7 +308,7 @@
 *  Attempt to get the value of the anvironment variable KAPPA_ENCODINGS.
                CALL PSX_GETENV( 'KAPPA_ENCODINGS', ENV, STATUS )
 
-*  If the environment variable was not defined, annul the error, and 
+*  If the environment variable was not defined, annul the error, and
 *  indicate that the default encodings should be used.
                IF( STATUS .EQ. PSX__NOENV ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -323,8 +323,8 @@
                   CALL GRP_NEW( 'Encodings', IGRP, STATUS )
 
 *  Read the encodings from the KAPPA_ENCODINGS string into the group.
-                  CALL GRP_GRPEX( ENV, GRP__NOID, IGRP, NENCOD, ADDED, 
-     :                            FLAG, STATUS ) 
+                  CALL GRP_GRPEX( ENV, GRP__NOID, IGRP, NENCOD, ADDED,
+     :                            FLAG, STATUS )
 
 *  If there are too many encodings in KAPPA_ENCODINGS, warn the user and
 *  reduce the number of encodings to be used to the maximum number.
@@ -336,32 +336,32 @@
      :                    'more than ^N comma delimited encodings '//
      :                    'should be specified in the environment '//
      :                    'variable KAPPA_ENCODINGS. The excess '//
-     :                    'encodings will be ignored - ''^ENV''.', 
+     :                    'encodings will be ignored - ''^ENV''.',
      :                    STATUS )
-   
+
                      NENCOD = MAXCOD
 
                   END IF
 
 *  Extract the encodings from the group into the ENCODS array.
-                  CALL GRP_GET( IGRP, 1, NENCOD, ENCODS, STATUS ) 
+                  CALL GRP_GET( IGRP, 1, NENCOD, ENCODS, STATUS )
 
 *  Delete the group.
                   CALL GRP_DELET( IGRP, STATUS )
 
                END IF
 
-*  Only proceed if no error has occurred. 
+*  Only proceed if no error has occurred.
                IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Attempt to create a WCS component within the NDF selected above. 
-                  CALL FTS1_FTWCS( NCARD, %VAL( CNF_PVAL( PNTR ) ), 
+*  Attempt to create a WCS component within the NDF selected above.
+                  CALL FTS1_FTWCS( NCARD, %VAL( CNF_PVAL( PNTR ) ),
      :                             1, INDFC,
-     :                             NENCOD, ENCODS, STATUS, 
+     :                             NENCOD, ENCODS, STATUS,
      :                             %VAL( CNF_CVAL( 80 ) ) )
 
 *  If an error occurred reading the FITS WCS information, annul or flush it
-*  since failure to read WCS information is probably not fatal. 
+*  since failure to read WCS information is probably not fatal.
                   IF( STATUS .NE. SAI__OK ) THEN
 
 *  See if we are running in verbose mode.
@@ -372,7 +372,7 @@
                         CALL NDF_MSG( 'NDF', INDF )
                         CALL ERR_REP( 'KPG1_GTWCS_ERR2', 'Ignoring '//
      :                                'un-usable WCS information in '//
-     :                                'the FITS extension of ''^NDF''.', 
+     :                                'the FITS extension of ''^NDF''.',
      :                                STATUS )
                         CALL ERR_FLUSH( STATUS )
 
@@ -399,9 +399,9 @@
                         CALL NDF_MSG( 'NDF', INDF )
                         CALL MSG_OUT( 'KPG1_GTWCS_MSG3', 'Using WCS '//
      :                                'information read from the FITS'//
-     :                                ' extension of ''^NDF''.', 
+     :                                ' extension of ''^NDF''.',
      :                                STATUS )
-                     END IF         
+                     END IF
 
                   END IF
 
@@ -415,10 +415,10 @@
                   CALL NDF_DELET( INDFC, STATUS )
 
 *  If the supplied NDF has a defined AXIS structure, we need to replace
-*  the AXIS Frame in the FrameSet obtained from the temporary NDF with the 
+*  the AXIS Frame in the FrameSet obtained from the temporary NDF with the
 *  AXIS Frame obtained from the supplied NDF. This is because the two
-*  NDFs will have different sizes and so the AXIS Frames will differ (e.g. 
-*  if they use LutMaps, the LutMap will have an inappropriate number of 
+*  NDFs will have different sizes and so the AXIS Frames will differ (e.g.
+*  if they use LutMaps, the LutMap will have an inappropriate number of
 *  entries).
                   CALL NDF_STATE( INDF, 'AXIS', THERE, STATUS )
                   IF( THERE .AND. IWCS .NE. AST__NULL ) THEN
@@ -427,7 +427,7 @@
 *  from GRID to AXIS, and the AXIS Frame (the AXIS Frame will be the
 *  current Frame since there is no WCS FrameSet in the supplied NDF).
                      CALL NDF_GTWCS( INDF, IWCS2, STATUS )
-                     AXMAP = AST_GETMAPPING( IWCS2, AST__BASE, 
+                     AXMAP = AST_GETMAPPING( IWCS2, AST__BASE,
      :                                       AST__CURRENT, STATUS )
                      AXFRM = AST_GETFRAME( IWCS2, AST__CURRENT, STATUS )
 
@@ -449,7 +449,7 @@
                         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
                      ELSE IF( ICURR .GT. IAX ) THEN
-                        CALL AST_SETI( IWCS, 'CURRENT', ICURR - 1, 
+                        CALL AST_SETI( IWCS, 'CURRENT', ICURR - 1,
      :                                 STATUS )
                      END IF
 
@@ -466,15 +466,15 @@
 
       END IF
 
-*  If we still have no WCS FrameSet, get the default WCS FrameSet from the 
+*  If we still have no WCS FrameSet, get the default WCS FrameSet from the
 *  NDF.
       IF( IWCS .EQ. AST__NULL ) CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
-*  Export the returned FrameSet from the current AST context so that it is 
+*  Export the returned FrameSet from the current AST context so that it is
 *  not annulled by the following call to AST_END.
       CALL AST_EXPORT( IWCS, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
-    
+
       END

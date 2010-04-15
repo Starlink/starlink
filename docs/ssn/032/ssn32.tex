@@ -40,7 +40,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -189,12 +189,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -234,21 +234,21 @@
 
 
 Custom Jumpstart is a facility provided by Sun
-which allows (almost) hands free Solaris installation.  
+which allows (almost) hands free Solaris installation.
 
 It provides the following benefits
 \begin{itemize}
-\item Unattended Solaris installation 
-\item Facilitates multiple installations 
-\item Facilitates subsequent operating system upgrades 
+\item Unattended Solaris installation
+\item Facilitates multiple installations
+\item Facilitates subsequent operating system upgrades
 \item Automates post-installation configuration tasks
-\item Enables easy system reconfiguration 
+\item Enables easy system reconfiguration
 \item Reduces the need to backup system partitions
 \end{itemize}
 
 It requires perhaps a day's work to configure initially
-but the subsequent savings in adminstration time make it 
-really worthwhile. Whilst of most value to the larger 
+but the subsequent savings in adminstration time make it
+really worthwhile. Whilst of most value to the larger
 installations, a Site Manager with more than three Suns can benefit
 from using this process.
 
@@ -278,7 +278,7 @@ from the boot server. From the client, the jumpstart boot image then issues a
 {\tt hostconfig} request for boot parameters which are returned by the
 bootserver. The client then mounts the root partition from the boot server
 and executes {\tt /kernel/unix}. The bootstrap is now complete. The
-client searches for the configuration and install servers using bootparams 
+client searches for the configuration and install servers using bootparams
 information and
 then mounts the configuration and installation directories. The client
 then runs {\tt suninstall} and installs itself.
@@ -286,7 +286,7 @@ then runs {\tt suninstall} and installs itself.
 \section{Automatic System Configuration}
 
 The automatic system configuration involves collecting and setting up
-the information for a system to introduce it to the network. The following 
+the information for a system to introduce it to the network. The following
 items of information are required:
 
 \begin{itemize}
@@ -328,7 +328,7 @@ There are three server functions required by jumpstart:
 \item {\bf Configuration Server} This server contains the customised
 configuration files used during the automatic installation process.
 \item {\bf Install Server} This server provides the Solaris distribution media
-\item {\bf Boot Server} This server provides clients on the same subnet with 
+\item {\bf Boot Server} This server provides clients on the same subnet with
 the ability to boot and access the network.
 \end{itemize}
 
@@ -363,11 +363,11 @@ your client installation. It contains the following items:
 \item A {\it class profile} for each category of install clients
 \item Possibly {\it begin} scripts which are executed before the
       class files (ie before the actual installation of the software)
-\item Possibly {\it finish} scripts which are executed post-installation 
+\item Possibly {\it finish} scripts which are executed post-installation
 \item A {\tt rules} file specifying which of the above file should be
       executed for each client or category of clients.
 \item The script {\tt check} which produces a file called {\tt rules.ok}
-      from the {\tt rules} file. This is the actual rules file used 
+      from the {\tt rules} file. This is the actual rules file used
       during the installation process.
 \end{itemize}
 
@@ -381,7 +381,7 @@ First create a directory on your configuration server (e.g. {\tt
 
 Then change directory to your Solaris distribution. In my case, it
 is the disk image in {\tt /export/install}.  Next,
-copy the template files in the {\tt auto\_install\_sample} directory, 
+copy the template files in the {\tt auto\_install\_sample} directory,
 {\em  e.g.}:
 
 \begin{quote}
@@ -424,7 +424,7 @@ to be installed. An example profile is listed in Appendix \ref{app:profile}.
 
 The first keyword in the example is {\tt install\_type}. This is required in
 every profile to determine the type of installation (either {\tt
-initial\_install} or {\tt upgrade}). 
+initial\_install} or {\tt upgrade}).
 
 The next keywords relate to the {\tt system\_type}. As I am configuring a
 server without diskless clients, I then define the {\tt num\_clients} and
@@ -432,7 +432,7 @@ server without diskless clients, I then define the {\tt num\_clients} and
 
 I chose to do explicit partitioning and define all of my filesystem sizes
 as can be seen from the next series of commands. It is also possible to use
-{\tt existing} or {\tt default} partitioning. 
+{\tt existing} or {\tt default} partitioning.
 
 On my server, I have chosen to install the full Solaris release ({\tt
 SUNWcall}) but the installed software can be completely tailored with
@@ -466,7 +466,7 @@ disk image) can be installed in the standard way\footnote{The Solaris
 distribution is mounted under the directory {\tt /cdrom} regardless of
 whether it is a disk image or the distribution CD.}.  Then I use the
 finish script to install some additional patches too.  First I created
-a subdirectory of the Solaris distribution directory called: 
+a subdirectory of the Solaris distribution directory called:
 
 \begin{quote}
 {\tt /export/install/additional\_patches}
@@ -491,11 +491,11 @@ run the {\tt newaliases} command.
 
 The only thing that I have not found it possible to do is to run the
 {\tt nisclient} script and this is the only thing I have left to configure
-after the automatic upgrade. 
+after the automatic upgrade.
 
 \subsection{The {\tt check} script}
 
-Once you have written your files, run the {\tt check} script in the 
+Once you have written your files, run the {\tt check} script in the
 configuration directory. It will check the validity of the {\tt rules}
 file and the {\tt class} files. If all is in order, it will create
 a {\tt rules.ok} file for use during the installation.
@@ -533,7 +533,7 @@ This creates an entry in the bootparams file on the install server.
 Now it should be just necessary to boot your client using the syntax:
 
 \begin{quote}
-{\tt boot net - install} 
+{\tt boot net - install}
 \end{quote}
 
 and the auto installation should just get going. Time not just for a
@@ -550,7 +550,7 @@ These are the two problems that I encountered:
 \item
 If the client complains ``{\tt Timeout waiting for ARP/RARP packet ...}''
 then it can't find a system that knows about it on the network. Verify
-the client details (hostname, ethernet address) on the server. 
+the client details (hostname, ethernet address) on the server.
 
 \item
 Make sure that you export the Jumpstart directory {\it read-only} as it
@@ -603,10 +603,10 @@ working correctly.
 # ------------    ---------------       ----------------------
 #  any            minus sign (-)        always matches
 #  arch           text                  system's architecture type
-#  domainname     text                  system's domain name 
-#  disksize       text range            system's disk size 
+#  domainname     text                  system's domain name
+#  disksize       text range            system's disk size
 #                                          disk device name (text)
-#                                          disk size (MBytes range) 
+#                                          disk size (MBytes range)
 #  hostname       text                  system's host name
 #  installed      text text             system's installed version of Solaris
 #                                          disk device name (text)
@@ -625,7 +625,7 @@ working correctly.
 hostname ltsun7                   -             ltsun7-profile   server-finish
 
 hostname darc                     -             darc-upgrade     -
- 
+
 hostname darc2                    -             darc2-profile    client-finish
 
 hostname euve1                    -             euve1-profile    server-finish
@@ -722,7 +722,7 @@ cp ${SI_CONFIG_DIR}/files/xdm/* /a/usr/openwin/lib/xdm
 #
 # now do some links
 #
-ln -s /etc/init.d/xdm /a/etc/rc3.d/S30xdm 
+ln -s /etc/init.d/xdm /a/etc/rc3.d/S30xdm
 ln -s /usr/local/bin/perl /a/usr/bin/perl
 ln -s /soft2/X11R5 /a/opt/X11R5
 ln -s /soft2/X11R5/include/X11 /a/usr/include/X11

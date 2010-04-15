@@ -107,7 +107,7 @@ CD    PRINT *,'   final call to eval_all: lev =', lev
          RETURN
       END IF
 
-*     Return final value to return address in desired type - give it 
+*     Return final value to return address in desired type - give it
 *     its own type and return that if no specific type demanded
 
       READ (opnd_type(1)(2:gen_ilen(opnd_type(1))), '(I3)') nbytes

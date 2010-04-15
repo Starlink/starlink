@@ -33,7 +33,7 @@
 
 *  Since the SwicthMap has 2 inputs, each of the route Mappings must also
 *  have 2 inputs. Produce a PermMap which passes on its 1st input to its
-*  (one and only) output. The inverse transformation supplied a value of 
+*  (one and only) output. The inverse transformation supplied a value of
 *  1.0 for the missing 2nd input (1.0 is the grid Y value for the first
 *  row).
       outperm( 1 ) = 1
@@ -47,7 +47,7 @@
 
 *  Likewise, produce the route Mapping for the second row. The grid y
 *  value for the second row is 2.0, so use this as the constant in the
-*  PermMap (i.e. the value which the inverse transformation supplies for 
+*  PermMap (i.e. the value which the inverse transformation supplies for
 *  the missing second input).
       l1 = 1600.0
       l2 = 2700.0
@@ -66,14 +66,14 @@
 
 *  The inverse selector function needs to decide which route Mapping to
 *  use for any supplied ("output") wavelength value. We arbitrarily
-*  decide to to use the first row for wavelengths less than or equal to 
+*  decide to to use the first row for wavelengths less than or equal to
 *  1800, and the second row for wavelengths larger than 1800 (1800 is the
-*  mid-point of the overlap between the two spectra). We use a MathMap to 
-*  implement this transformation, which must be the *inverse* 
+*  mid-point of the overlap between the two spectra). We use a MathMap to
+*  implement this transformation, which must be the *inverse*
 *  transformation of the MathMap. The forward transformation of the
 *  inverse slector Mapping is never used and so is left unspecified in
 *  the MathMap constructor.
-      is = ast_mathmap( 1, 1, 1, 'y', 1, 'x=qif(y>1800,2,1)', ' ', 
+      is = ast_mathmap( 1, 1, 1, 'y', 1, 'x=qif(y>1800,2,1)', ' ',
      :                  status )
 
 *  Now create the SwitchMap.
@@ -111,7 +111,7 @@
          call stopit( 8, out(4,1), status )
       end if
 
-*  Test the inverse transformation of the SwitchMap. 
+*  Test the inverse transformation of the SwitchMap.
       call ast_trann( swm, 4, 1, 4, out, .true., 2, 4, in, status )
 
       do i = 1, 4
@@ -155,17 +155,17 @@
 *  Check two adjacent opposite SwitchMaps cancel.
       swm2 = ast_copy( swm, status )
       call ast_invert( swm2, status )
-      cm = ast_cmpmap( swm, swm2, .true., ' ', status )      
+      cm = ast_cmpmap( swm, swm2, .true., ' ', status )
       cm2 = ast_simplify( cm, status )
       if( .not. ast_isaunitmap( cm2, status ) ) then
          call stopit( 26, 1.0D0, status )
-      end if         
+      end if
 
-      cm = ast_cmpmap( swm2, swm, .true., ' ', status )      
+      cm = ast_cmpmap( swm2, swm, .true., ' ', status )
       cm2 = ast_simplify( cm, status )
       if( .not. ast_isaunitmap( cm2, status ) ) then
          call stopit( 27, 1.0D0, status )
-      end if         
+      end if
 
 *  Check that the SwitchMap can be written out to a AstChannel and read
 *  back again succesfully.
@@ -176,30 +176,30 @@
 
       at(1) = 20.0
       at(2) = 1.0
-      r = ast_rate( swm, at, 1, 1, status ) 
+      r = ast_rate( swm, at, 1, 1, status )
       if( abs( r - 10.0 ) .gt. 1.0E-6 ) call stopit( 28, r, status )
-    
+
       at(1) = 20.0
       at(2) = 2.0
-      r = ast_rate( swm, at, 1, 1, status ) 
+      r = ast_rate( swm, at, 1, 1, status )
       if( abs( r - 11.0 ) .gt. 1.0E-6 ) call stopit( 29, r, status )
-    
+
       call ast_setl( swm, 'Invert', .true., status )
 
       at(1) = 1700.0
-      r = ast_rate( swm, at, 1, 1, status ) 
+      r = ast_rate( swm, at, 1, 1, status )
       if( abs( r - 1.0/10.0 ) .gt. 1.0E-6 ) call stopit( 30, r, status )
-    
+
       at(1) = 1900.0
-      r = ast_rate( swm, at, 1, 1, status ) 
+      r = ast_rate( swm, at, 1, 1, status )
       if( abs( r - 1.0/11.0 ) .gt. 1.0E-6 ) call stopit( 31, r, status )
-    
+
       call ast_setl( swm, 'Invert', .false., status )
 
 
 *  A 1D input grid has 1 rows and 202 columns. Each half of the row
-*  (1:101 and 102:202) contains a spectrum. The two spectra cover 
-*  overlaping regions of wavelength. The spectrum in thw lower half has 
+*  (1:101 and 102:202) contains a spectrum. The two spectra cover
+*  overlaping regions of wavelength. The spectrum in thw lower half has
 *  "wavelength = (gridx - 1)*10+1000", whilst the spectrum in the upper
 *  half has "wavelength = (gridx - 1)*11+1600". We use a (Nin=1,Nout=1)
 *  SwitchMap to describe the Mapping from grid (x) to wavelength. This
@@ -221,13 +221,13 @@
       rm(2) = ast_winmap( 1, x1, x2, l1, l2, ' ', status )
 
 *  We can use a single MathMap for both selector Mappings - the forward
-*  transformation (used as the forward selector) gives 1 for all gridx less 
-*  than 101.5 and 2 for all gridx greater than 101.5. The inverse 
+*  transformation (used as the forward selector) gives 1 for all gridx less
+*  than 101.5 and 2 for all gridx greater than 101.5. The inverse
 *  transformation (used as the inverse selector) gives 1 for all
 *  wavelengths les than 1800 and 2 for all wavelength greater than 1800
-*  (1800 is the mid point of the overlap region). 
+*  (1800 is the mid point of the overlap region).
       sm = ast_mathmap( 1, 1, 1, 'y=qif(x>101.5,2,1)',
-     :                        1, 'x=qif(y>1800,2,1)', 
+     :                        1, 'x=qif(y>1800,2,1)',
      :                  ' ', status )
 
 *  Now create the SwitchMap.
@@ -263,7 +263,7 @@
          call stopit( 108, out(4,1), status )
       end if
 
-*  Test the inverse transformation of the SwitchMap. 
+*  Test the inverse transformation of the SwitchMap.
       call ast_trann( swm, 4, 1, 4, out, .true., 1, 4, in, status )
 
       do i = 1, 4
@@ -297,17 +297,17 @@
 *  Check two adjacent opposite SwitchMaps cancel.
       swm2 = ast_copy( swm, status )
       call ast_invert( swm2, status )
-      cm = ast_cmpmap( swm, swm2, .true., ' ', status )      
+      cm = ast_cmpmap( swm, swm2, .true., ' ', status )
       cm2 = ast_simplify( cm, status )
       if( .not. ast_isaunitmap( cm2, status ) ) then
          call stopit( 126, 1.0D0, status )
-      end if         
+      end if
 
-      cm = ast_cmpmap( swm2, swm, .true., ' ', status )      
+      cm = ast_cmpmap( swm2, swm, .true., ' ', status )
       cm2 = ast_simplify( cm, status )
       if( .not. ast_isaunitmap( cm2, status ) ) then
          call stopit( 127, 1.0D0, status )
-      end if         
+      end if
 
 *  Check that the SwitchMap can be written out to a AstChannel and read
 *  back again succesfully.
@@ -317,25 +317,25 @@
       call ast_setl( swm, 'Invert', .false., status )
 
       at(1) = 20.0
-      r = ast_rate( swm, at, 1, 1, status ) 
+      r = ast_rate( swm, at, 1, 1, status )
       if( abs( r - 10.0 ) .gt. 1.0E-6 ) call stopit( 128, r, status )
-    
+
       at(1) = 120.0
-      r = ast_rate( swm, at, 1, 1, status ) 
+      r = ast_rate( swm, at, 1, 1, status )
       if( abs( r - 11.0 ) .gt. 1.0E-6 ) call stopit( 129, r, status )
-    
+
       call ast_setl( swm, 'Invert', .true., status )
 
       at(1) = 1700.0
-      r = ast_rate( swm, at, 1, 1, status ) 
-      if( abs( r - 1.0/10.0 ) .gt. 1.0E-6 ) call stopit( 130, r, 
+      r = ast_rate( swm, at, 1, 1, status )
+      if( abs( r - 1.0/10.0 ) .gt. 1.0E-6 ) call stopit( 130, r,
      :                                                   status )
-    
+
       at(1) = 1900.0
-      r = ast_rate( swm, at, 1, 1, status ) 
-      if( abs( r - 1.0/11.0 ) .gt. 1.0E-6 ) call stopit( 131, r, 
+      r = ast_rate( swm, at, 1, 1, status )
+      if( abs( r - 1.0/11.0 ) .gt. 1.0E-6 ) call stopit( 131, r,
      :                                                   status )
-    
+
       call ast_setl( swm, 'Invert', .false., status )
 
 
@@ -388,7 +388,7 @@
 
       fs = ast_selectormap( 2, box, AST__BAD, ' ', status )
 
-*  Inverse Selector Mapping: A PermMap which has an inverse transformation 
+*  Inverse Selector Mapping: A PermMap which has an inverse transformation
 *  which gives an input value of 1 for all output values. This means that the
 *  inverse transformation of the SwitchMap always returns a GRID position in
 *  the lower (left-hand) of the two images.
@@ -422,8 +422,8 @@
 
       call ast_trann( swm, 4, 2, 4, in, .false., 2, 4, out, status )
 
-*  Transform these same positions using the Mapping for the left hand 
-*  image obtained from the FITS header 
+*  Transform these same positions using the Mapping for the left hand
+*  image obtained from the FITS header
       call ast_trann( rm(1), 4, 2, 4, in, .true., 2, 4, rmout, status )
 
 *  Check the SwitchMap results. Points 1 and 3 should be bad because they
@@ -457,7 +457,7 @@
       end if
 
 
-*  Test the inverse transformation of the SwitchMap. 
+*  Test the inverse transformation of the SwitchMap.
       call ast_trann( swm, 4, 2, 4, out, .true., 2, 4, in, status )
 
       if( in(1,1) .ne. AST__BAD ) then
@@ -501,17 +501,17 @@
 *  Check two adjacent opposite SwitchMaps cancel.
       swm2 = ast_copy( swm, status )
       call ast_invert( swm2, status )
-      cm = ast_cmpmap( swm, swm2, .true., ' ', status )      
+      cm = ast_cmpmap( swm, swm2, .true., ' ', status )
       cm2 = ast_simplify( cm, status )
       if( .not. ast_isaunitmap( cm2, status ) ) then
          call stopit( 149, 1.0D0, status )
-      end if         
+      end if
 
-      cm = ast_cmpmap( swm2, swm, .true., ' ', status )      
+      cm = ast_cmpmap( swm2, swm, .true., ' ', status )
       cm2 = ast_simplify( cm, status )
       if( .not. ast_isaunitmap( cm2, status ) ) then
          call stopit( 150, 1.0D0, status )
-      end if         
+      end if
 
 *  Check that the SwitchMap can be written out to a AstChannel and read
 *  back again succesfully.
@@ -522,39 +522,39 @@
 
       at(1) = 140.0
       at(2) = 50.0
-      r1 = ast_rate( swm, at, 1, 1, status ) 
+      r1 = ast_rate( swm, at, 1, 1, status )
 
       at(1) = 50.0
-      r2 = ast_rate( rm(1), at, 1, 1, status ) 
+      r2 = ast_rate( rm(1), at, 1, 1, status )
 
-      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 151, r1, 
+      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 151, r1,
      :                                                  status )
 
       at(1) = 140.0
-      r1 = ast_rate( swm, at, 2, 2, status ) 
+      r1 = ast_rate( swm, at, 2, 2, status )
 
       at(1) = 50.0
-      r2 = ast_rate( rm(1), at, 2, 2, status ) 
+      r2 = ast_rate( rm(1), at, 2, 2, status )
 
-      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 152, r1, 
+      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 152, r1,
      :                                                  status )
 
       at(1) = 140.0
-      r1 = ast_rate( swm, at, 1, 2, status ) 
+      r1 = ast_rate( swm, at, 1, 2, status )
 
       at(1) = 50.0
-      r2 = ast_rate( rm(1), at, 1, 2, status ) 
+      r2 = ast_rate( rm(1), at, 1, 2, status )
 
-      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 153, r1, 
+      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 153, r1,
      :                                                  status )
 
       at(1) = 140.0
-      r1 = ast_rate( swm, at, 2, 1, status ) 
+      r1 = ast_rate( swm, at, 2, 1, status )
 
       at(1) = 50.0
-      r2 = ast_rate( rm(1), at, 2, 1, status ) 
+      r2 = ast_rate( rm(1), at, 2, 1, status )
 
-      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 154, r1, 
+      if( abs( r1 - r2 ) .gt. abs( 1.0E-6*r2 )  ) call stopit( 154, r1,
      :                                                  status )
 
 
@@ -594,7 +594,7 @@
       include 'SAE_PAR'
       include 'AST_PAR'
       character text*(*)
-      integer obj, status, next, end, ch, result, ll, overlap, ibuf, 
+      integer obj, status, next, end, ch, result, ll, overlap, ibuf,
      :        len1, len2
       external mysource, mysink
       character buf1*45000
@@ -637,7 +637,7 @@
 *  Compare it to the suuplied object.
       call compare( obj, result, text, status )
 
-      end  
+      end
 
 
 
@@ -648,7 +648,7 @@
       include 'SAE_PAR'
       include 'AST_PAR'
       character text*(*)
-      integer obj1, status, next, end, ch, result, ll, overlap, ibuf, 
+      integer obj1, status, next, end, ch, result, ll, overlap, ibuf,
      :        len1, len2, obj2
       external mysource, mysink
       character buf1*45000
@@ -693,7 +693,7 @@
 
       end if
 
-      end  
+      end
 
       subroutine mysource( status )
       implicit none
@@ -712,13 +712,13 @@
       if( next .ge. end ) then
          if( ibuf .eq. 1 ) then
             call ast_putline( buf1, -1, status )
-         else 
+         else
             call ast_putline( buf2, -1, status )
          endif
       else
          if( ibuf .eq. 1 ) then
             call ast_putline( buf1( next : ), ll, status )
-         else 
+         else
             call ast_putline( buf2( next : ), ll, status )
          endif
       endif
@@ -768,7 +768,7 @@
          write(*,*) 'Line length ',l,' greater than ',ll
          write(*,*) 'Line overflow in mysink!!'
          status = SAI__ERROR
-      else 
+      else
          end = next + l
          if( ibuf .eq. 1 ) then
             buf1( end : next + ll - 1 ) = ' '

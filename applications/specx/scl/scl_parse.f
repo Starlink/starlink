@@ -172,7 +172,7 @@ CD    Print *,'   input string: ', string(st:ils)
     1 CONTINUE
       DO WHILE (STRING(NEXT:NEXT).EQ.' ' .AND. NEXT.LE.ILS)
         NEXT = NEXT + 1
-      END DO       
+      END DO
 
 *  If this now takes us past the end of the string then string is empty
 

@@ -114,7 +114,7 @@
       integer status
 * --------------------------------------------------------------
 * Square weights
-      
+
       DO 1 I = 1, npts
          weight2(I) = weight(I) * weight(I)
  1    CONTINUE
@@ -158,7 +158,7 @@
      : ,STATUS)
       ENDIF
 
-      
+
       do 2 i = 1,max_fit-1
          rssq(i) = 0D0
  2    continue

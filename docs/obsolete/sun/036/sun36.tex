@@ -249,13 +249,13 @@ NETSHOW is described in appendix~\ref{shownet}.
 
 PHONE and TALK allow you to have conversations with other users (local as well
 as remote).
-PHONE is part of VMS and is described in the VMS HELP but requires a VT 
+PHONE is part of VMS and is described in the VMS HELP but requires a VT
 compatible terminal.
 TALK will work with any sort of terminal and is described in
 appendix~\ref{shownet}.
 Be aware that TALK can be very irritating for other users if their work is
 constantly interrupted by your messages; it is more polite to use MAIL.
-The DECnet node names of the Starlink sites are shown in 
+The DECnet node names of the Starlink sites are shown in
 table~\ref{DECnet-node-names}.
 \begin{table}[htbp]
 \caption{DECnet node names}\label{DECnet-node-names}
@@ -309,7 +309,7 @@ If you are doing something that requires the cooperation of a particular
 machine, then you must use the particular node name. For example, if you are
 using the TALK command, then you are TALKing to someone who is logged onto a
 particular machine, so you must give the node name of the machine that they are
-using. 
+using.
 
 Take note that using the cluster alias when you should use a particular node
 name can cause confusion. For example, if you were to type the command
@@ -423,7 +423,7 @@ The `V' numbers used below have the following meanings.
 \item V23 = 1200/75 baud, full duplex
 \end{itemize}
 Some modems also provide error correction facilities. At present these all use
-the MNP protocol. 
+the MNP protocol.
 
 Some modems have their access controlled by a password. This may be set in the
 modem or in the equipment to which it is connected (e.g.\ terminal server or
@@ -443,8 +443,8 @@ PACX. Contact system manager for details.
 \subsection{Durham}
 \begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
 \addtolength{\leftmargin}{\labelsep}}
-\item[091--374--2133] V21/V23 (8 bit, no parity) . Connects to 
-Gandalf PACX. Enter STAR to connect to STarlink DECserver. 
+\item[091--374--2133] V21/V23 (8 bit, no parity) . Connects to
+Gandalf PACX. Enter STAR to connect to STarlink DECserver.
 \end{list}
 
 \subsection{Jodrell Bank}
@@ -459,7 +459,7 @@ terminal server. Type OPEN JBVAD for the Vax.
 \subsection{Manchester}
 \begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
 \addtolength{\leftmargin}{\labelsep}}
-\item[061--273--5730] V21/V23/V22/V22bis (autobaud), MNP 5, eight bits, 
+\item[061--273--5730] V21/V23/V22/V22bis (autobaud), MNP 5, eight bits,
 no parity, connected to a DECserver 200.
 \end{list}
 
@@ -647,7 +647,7 @@ username called STARLINK (no password) has been created which can be used from
 any SPAN node and can be used to SET~HOST to any Starlink node. If STADAT is
 not defined on the remote SPAN node, you should type SET~HOST~19463 instead.
 Fortunately, Starlink is migrating all of its systems to DECnet area 19 so that
-these routing problems will eventually disappear. 
+these routing problems will eventually disappear.
 
 It should be possible to send mail to computers that are SPAN nodes by using
 CBS-MAIL, although the node name would not be that same as the SPAN node name.
@@ -754,8 +754,8 @@ sited at UCL and subject to very strict `per user' vetting. The gateway
 Improvements since moving to ULCC include free and unrestricted transfer of
 mail to and from JANET registered sites and a `guestftp' facility which allows
 transfer of Internet files (via the relay computers disks) to JANET sites.
-Terminal access to Internet sites is still subject to authorisation and 
-intending users should mail for advice to {\tt liaison at UK.AC.NSFNET-RELAY}. 
+Terminal access to Internet sites is still subject to authorisation and
+intending users should mail for advice to {\tt liaison at UK.AC.NSFNET-RELAY}.
 The NETWORKS VAXnotes conference has some hints on using the `guestftp'
 facility.
 
@@ -931,7 +931,7 @@ POST and CBS-MAIL are two different ways of achieving the same end, i.e.\
 sending a Coloured Books mail message.
 Although it is generally more convenient use CBS-MAIL for interactive use
 there is no need to change command procedures that use the POST command.
-The major advantage of Coloured Books mail over VMS mail is that you can reach 
+The major advantage of Coloured Books mail over VMS mail is that you can reach
 more computers. VMS mail uses DECnet and so is restricted to machines that are
 logically connected to the Starlink DECnet, although these days that includes
 SPAN and HEPnet. Coloured Books mail will in principle allow you to get to any
@@ -943,7 +943,7 @@ interface. The mail is sent out in the same way and in principle, the recipient
 cannot tell which method you used to send it. Like TRANSFER, you can use the
 LIST command to check the progress of your message.
 
-To send a CBS-MAIL message you need to send mail to 
+To send a CBS-MAIL message you need to send mail to
 {\tt CBS\%$<$NRS node name$>$::$<$username$>$}.
 For example,
 \begin{quote}
@@ -960,7 +960,7 @@ you. You can even use this to send mail to Bitnet. In this case you should send
 mail to {\tt CBS\%EARN-RELAY::$<$bitnet node name$>$::$<$username$>$}. Again,
 you can reply to incoming Bitnet mail.
 
-If you prefer, you can send Coloured Books mail using the POST command. 
+If you prefer, you can send Coloured Books mail using the POST command.
 The following example shows how to send mail to username OPER at ROE using POST,
 where the message is typed in directly on your terminal:
 \begin{quote}
@@ -1041,7 +1041,7 @@ forth using {\tt REPLY} is likely to be doomed to failure in the end.
 Consequently, if you receive a message that look like it has been sent in this
 fashion, it would be as well to {\tt SEND} a new message rather than try {\tt
 REPLYing} to it. Despite these warnings, if you always send a new message,
-rather than try replying to old ones, you should have no problems. 
+rather than try replying to old ones, you should have no problems.
 
 \section{Interaction of X.29 terminals protocols with VAX/VMS}
 \label{pad}
@@ -1196,7 +1196,7 @@ ROE &00000700200155 \\
 St.Andrews & 000007007061 \\
 Southampton & 000050315020 \\
 Sussex & not yet known \\
-UCL & 000002005002 
+UCL & 000002005002
 \end{tabular}\end{center}
 
 \section{AAO/Starlink MAIL service}

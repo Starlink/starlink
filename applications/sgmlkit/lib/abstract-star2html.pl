@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w 
+#! /usr/bin/perl -w
 
 $RCSID = '$Id$';
 
@@ -29,12 +29,12 @@ $RCSID = '$Id$';
 #          >>CATALOG 2>abstract-warnings
 # </verbatim>
 #
-# <p>The parsing can cope with <code>\xlabel</code> commands either outside 
+# <p>The parsing can cope with <code>\xlabel</code> commands either outside
 # section headings or inside them, and copes with multiple
 # <code>\xlabel</code> commands within a heading by
 # emitting <code>&lt;label></>
 # elements after the heading.  It logs a message to stderr when it
-# discovers this. 
+# discovers this.
 #
 # <p>If the parser discovers LaTeX markup in the section headings (which is
 # true at some point for almost every file), then it logs a message to STDERR.
@@ -43,7 +43,7 @@ $RCSID = '$Id$';
 #
 # <p>The parsing copes with the arguments to each of the commands it matches
 # (<code>\newcommand{\star...}</code> and <code>\sub*section{...}</code>)
-# being on more than one line. 
+# being on more than one line.
 # It concatenates the lines before analysing them.
 #
 # <p>Emits a warning if an <code>\xlabel</code> doesn't appear in the
@@ -67,7 +67,7 @@ $RCSID = '$Id$';
 # <p>The parsing doesn't attempt to deal with markup in section titles, but it
 # does attempt to detect and warn about it, logging a message to stderr.
 #
-# <p>There's not a lot of point in working hard to make this code do much 
+# <p>There's not a lot of point in working hard to make this code do much
 # better than this, since that would essentially require the sophistication
 # of a full document conversion.
 #
@@ -75,7 +75,7 @@ $RCSID = '$Id$';
 # to dumb down the parsing of them.  The code here will successfully extract
 # document number, author, etc, as long as the corresponding newcommand is
 # all on one line.  I've had to do the same with
-# <code>\(sub)*section</> parsing. 
+# <code>\(sub)*section</> parsing.
 # This will fail sometimes, but the result will be a
 # thin but <em>valid</> SGML document, and will not cause this code to spin
 # its wheels indefinitely.  If you include the option <code>--force</>, then
@@ -98,7 +98,7 @@ $RCSID = '$Id$';
 #    <type>option
 #    <description>The prefix is added to each of the filenames in the
 #      HTX index, to make the generated URLs relative to the appropriate
-#      root of the document server, which is set in the DSSSL variable 
+#      root of the document server, which is set in the DSSSL variable
 #      <code>%starlink-document-server%</code>, and might have the value
 #      <code>`file:///star/docs/'</code>
 #
@@ -166,7 +166,7 @@ if (defined $outputfile) {
 
 # Write an identifying line on STDERR
 # This should be redirected by the caller.
-# This script produces so many warnings that a bit of excess chatter 
+# This script produces so many warnings that a bit of excess chatter
 # won't matter.
 print STDERR "### Processing $inputfilename...\n";
 
@@ -209,9 +209,9 @@ while (defined($line = <TF>))
     next unless $line =~ /^\s*\\(begin\{document\}|newcommand\s*\{\\star|section|subsection|subsubsection|xlabel)/;
 
 
-    $line =~ /(\\(sub)*section.*)/ && do { 
+    $line =~ /(\\(sub)*section.*)/ && do {
 	#    # Append new lines as long as the line-so-far doesn't match
-	#    # the following regexp, which matches only lines with 
+	#    # the following regexp, which matches only lines with
 	#    # A SINGLE LEVEL of balanced braces
 	#    while ($line !~ /\\(sub)*section{([^{]*{[^{}]*})*[^{}]*}/) {
 	#	$newline = <TF>;
@@ -234,7 +234,7 @@ while (defined($line = <TF>))
 	    if (defined($labels{$1})) {
 		print OUTFILE "<label id=\"$1\" export urlpath=\"$urlprefix$labels{$1}\">\n";
 	    } else {
-	    # This xlabel wasn't in the htx.index.  
+	    # This xlabel wasn't in the htx.index.
 	    # Log a remark to STDERR, and print nothing
 	    print STDERR "Unknown \\xlabel{$1}\n";
 	    }
@@ -243,7 +243,7 @@ while (defined($line = <TF>))
 
     # Header lines
     $line =~ /newcommand/ && do {
-	# Don't even attempt to do anything clever with newcommands - 
+	# Don't even attempt to do anything clever with newcommands -
 	# nothing short of magic will do here, so dumb it down to make it
 	# more robust.  The following will only
 	# work if \newcommand{\stardocnumber}{...} is all on one line.
@@ -257,7 +257,7 @@ while (defined($line = <TF>))
 	#    $line =~ s/\s+/ /g;
 	#    print STDERR "$line";
 	#}
-	#my ($cmd,$arg) = 
+	#my ($cmd,$arg) =
 	#    ($line =~ /\\newcommand\s*{([^}]*)}\s*{(([^{]*{[^{}]*})*[^{}]*)}/);
 
 	my ($cmd,$arg) = ($line =~ /\\newcommand\s*{(.*?)}(.*)$/);
@@ -271,7 +271,7 @@ while (defined($line = <TF>))
 	    check_markup ('\stardocnumber', $arg);
 	    $documentnumber = $arg;
 	    next; };
-	$cmd eq '\stardocauthors' && do { 
+	$cmd eq '\stardocauthors' && do {
 	    @documentauthlist = split (/\\\\/, $arg);
 	    for $a (@documentauthlist) {
 		check_markup ('author', $a);
@@ -325,9 +325,9 @@ print OUTFILE "</docbody>\n</documentsummary>\n";
 print $catalogueline;
 exit 0;
 
-# Argument is of form 
+# Argument is of form
 # \(sub)*section{blah \label{something} blah \xlabel{something else} blah}
-# (assumed on one line).  Return a string 
+# (assumed on one line).  Return a string
 # "<(sub*)sect><title>blah blah blah</title>" if \xlabel is empty
 # including ID, EXPORT and URL attributes if \xlabel is specified.
 # Dumbed-down version: don't assume braces match
@@ -335,7 +335,7 @@ sub parse_section {
     $sectheading = shift;
     my ($level, $dummy, $secttitle, @xlabel, $nextxlabel);
 
-    ($level, $dummy, $secttitle) = 
+    ($level, $dummy, $secttitle) =
 	($sectheading =~ /^\\((sub)*sect)ion{(.*)$/);
 
     # discard \label commands
@@ -362,7 +362,7 @@ sub parse_section {
 	if (defined($labels{$nextxlabel})) {
 	    $retval = "<$level id=\"$nextxlabel\" export urlpath=\"$urlprefix$labels{$nextxlabel}\"><title>$secttitle</title>\n";
 	} else {
-	    # This xlabel wasn't in the htx.index.  
+	    # This xlabel wasn't in the htx.index.
 	    # Log a remark to STDERR, and return unadorned heading
 	    print STDERR "Unknown \\xlabel{$nextxlabel}\n";
 	    $retval = "<$level><title>$secttitle</title>\n";
@@ -374,7 +374,7 @@ sub parse_section {
 	    if (defined($labels{$nextxlabel})) {
 		$retval .= "<label id=\"$nextxlabel\" export urlpath=\"$urlprefix$labels{$nextxlabel}\">\n";
 	    } else {
-		# This xlabel wasn't in the htx.index.  
+		# This xlabel wasn't in the htx.index.
 		# Log a remark to STDERR, and do nothing
 		print STDERR "Unknown \\xlabel{$nextxlabel}\n";
 	    }

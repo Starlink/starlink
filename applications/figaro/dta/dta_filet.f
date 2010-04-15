@@ -15,13 +15,13 @@ C     (>) NAME     (Character) The top level structure name as passed
 C                  originally to DTA_ASFNAM.  This is not necessarily
 C                  the same as ENAME because ENAME may have been
 C                  modified to conform to HDS naming requirements.
-C     (>) FILE     (Character) The file name associated with the top 
+C     (>) FILE     (Character) The file name associated with the top
 C                  level name, as passed to DTA_ASFNAM.
 C     (<) STATUS   (Integer) Receives a status code.
 C                  0 => OK
 C                  DTA_NOTFND => ENAME is not in the name cache.
 C-
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     STR$UPCASE  (VMS routine) Convert string to upper case.
 C
@@ -37,8 +37,8 @@ C
 C                                       KS / AAO 26th May 1986
 C     Modified:
 C
-C     8th  Jan 1992.  KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     8th  Jan 1992.  KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN.
 C     12th Apr 1993.  HME / UoE, Starlink. For DTACACHE must include SAE_PAR
 C                     and DAT_PAR as well.

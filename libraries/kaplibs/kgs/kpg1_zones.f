@@ -77,12 +77,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -105,7 +105,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -162,7 +162,7 @@
       REAL KX2                   ! X upper bound of KEY zone
       REAL KY1                   ! Y lower bound of KEY zone
       REAL KY2                   ! Y upper bound of KEY zone
-      REAL X1                    ! X lower bound of current zone w.c. 
+      REAL X1                    ! X lower bound of current zone w.c.
       REAL X2                    ! X upper bound of current zone w.c.
       REAL XM                    ! X extent of current zone in metres
       REAL Y1                    ! Y lower bound of current zone w.c.
@@ -214,7 +214,7 @@
 *  zone covering the fractional extent of the graph-window zone given
 *  by constants ANCLP1 to ANCLP4.
       FACT = ( DX2U - DX1U ) / ( ANCLP2 - ANCLP1 )
-      GX1 = DX1U - ANCLP1 * FACT 
+      GX1 = DX1U - ANCLP1 * FACT
       GX2 = DX2U + ( 1.0 - ANCLP2 ) * FACT
 
       FACT = ( DY2U - DY1U ) / ( ANCLP4 - ANCLP3 )
@@ -238,7 +238,7 @@
 *  original uniform zone.
       ELSE
          GOK = .TRUE.
-         CALL SGS_ZONE( GX1, GX2, GY1, GY2, ZONEG, STATUS )      
+         CALL SGS_ZONE( GX1, GX2, GY1, GY2, ZONEG, STATUS )
          CALL SGS_SELZ( ZONE1, STATUS )
       END IF
 
@@ -264,11 +264,11 @@
 *  Set up the Y co-ordinate of the bottom of the KEY zone.
       KY1 = KY2 - KH
 
-*  If the bottom edge of the KEY zone would be below the current 
+*  If the bottom edge of the KEY zone would be below the current
 *  zone, limit the KEY zone height and find the corresponding width.
       IF ( KY1 .LT. Y1 ) THEN
          KY1 = Y1
-         KH = KY2 - KY1 
+         KH = KY2 - KY1
          KW = ASPKEY * KH
       END IF
 
@@ -291,7 +291,7 @@
 *  uniform zone.
       ELSE
          KOK = .TRUE.
-         CALL SGS_ZONE( KX1, KX2, KY1, KY2, ZONEK, STATUS )      
+         CALL SGS_ZONE( KX1, KX2, KY1, KY2, ZONEK, STATUS )
          CALL SGS_SELZ( ZONE1, STATUS )
       END IF
 
@@ -308,11 +308,11 @@
          FY2 = MAX( FY2, KY2 )
       END IF
 
-      CALL SGS_ZONE( FX1, FX2, FY1, FY2, ZONEF, STATUS )      
+      CALL SGS_ZONE( FX1, FX2, FY1, FY2, ZONEF, STATUS )
 
 *  Release the uniform zone.
       CALL SGS_RELZ( ZONE1 )
 
  999  CONTINUE
-      
+
       END

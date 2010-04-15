@@ -7,7 +7,7 @@ C
 C     Writes to terminal parameters of fitted Gaussians
 C
 C     Parameters -  (">" input, "<" output )
-C    
+C
 C     (>) N       (Integer) Number of Gaussians fitted
 C     (>) GINFP   (Real array) X values of Gaussian peak position
 C     (>) GINFH   (Real array) Height of Gaussian peak
@@ -54,7 +54,7 @@ C
       CALL PAR_WRUSER('                      ',STATUS)
       DO I=1,N,1
         FLU=1.06484*GINFH(I)*GINFW(I)*2.3540
-        IF (ABS(GINFP(I)) .LE. 1.0E6  .AND.  
+        IF (ABS(GINFP(I)) .LE. 1.0E6  .AND.
      :      ABS(GINFP(I)) .GE. 1.0E-1) THEN
           WRITE(STRING,10,IOSTAT=LSTAT)
      :      I,GINFP(I),GINFH(I),GINFW(I),FLU

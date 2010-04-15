@@ -10,9 +10,9 @@ C
 C  Description:
 C     This routine must be called by any routine that has used flagged
 C     data values to process data.  It reverses any operations
-C     on data arrays that DSA_PRE_PROCESS_FLAGGED_VALUES may have 
+C     on data arrays that DSA_PRE_PROCESS_FLAGGED_VALUES may have
 C     performed by in order to handle data structures where the quality
-C     information is in fact held in data quality arrays.  It should be 
+C     information is in fact held in data quality arrays.  It should be
 C     called once all processing on the data array is complete.
 C
 C  Language:
@@ -38,7 +38,7 @@ C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the system, and the
 C     structure must have been opened using DSA_INPUT, DSA_OUTPUT or
-C     an equivalent routine.  The data array must have been mapped.  
+C     an equivalent routine.  The data array must have been mapped.
 C     DSA_PRE_PROCESS_FLAGGED_VALUES must have been called.
 C
 C  Support: Keith Shortridge, AAO
@@ -102,7 +102,7 @@ C
 C     Local variables
 C
       INTEGER   DATA_ADDR                   ! Virtual address of data array
-      CHARACTER DATA_TYPE*16                ! Type of mapped data array 
+      CHARACTER DATA_TYPE*16                ! Type of mapped data array
       INTEGER   I                           ! Index through dimensions
       INTEGER   IGNORE                      ! Dummy status value
       INTEGER   INVOKE                      ! Dummy function value
@@ -114,7 +114,7 @@ C
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       INTEGER   QUAL_ADDR                   ! Virtual address of quality array
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Full structure name from ref_name
       INTEGER   WORK_SLOT                   ! Workspace slot for data
 C
@@ -130,12 +130,12 @@ C     Return immediately if bad status passed
 C
       IF (STATUS.NE.0) RETURN
 C
-C     We need an upper case version of REF_NAME 
+C     We need an upper case version of REF_NAME
 C
       REF_NAME_UC=REF_NAME
       INVOKE=ICH_FOLD(REF_NAME_UC)
 C
-C     Look up the reference name in the tables and get the data 
+C     Look up the reference name in the tables and get the data
 C     array dimensions.
 C
       CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
@@ -159,22 +159,22 @@ C
       END IF
 C
 C     Now, see if we need to do anything.  The only condition we have
-C     to look for is the case where there was a data quality array, 
+C     to look for is the case where there was a data quality array,
 C     which the program was not handling for itself, in which case we have
 C     to set the quality array to reflect any possible changes.  Note that
 C     by this stage all the common table items such as QUAL_EXIST will have
-C     been set.  
+C     been set.
 C
       IF ((QUAL_EXIST(REF_SLOT).GT.0).AND.
      :                 (.NOT.USE_QUALITY(REF_SLOT))) THEN
 C
-C        We don't need to bother updateing the quality if the data array was 
+C        We don't need to bother updateing the quality if the data array was
 C        mapped readonly, because it will not be updated when it is
 C        unmapped.
 C
          IF (MAP_CALL_MODE(DATA_SLOT(REF_SLOT)).NE.'R') THEN
 C
-C           We have to process the flags.  First we have to hunt around the 
+C           We have to process the flags.  First we have to hunt around the
 C           common tables to actually find the mapped arrays.
 C
             WORK_SLOT=MAP_CALL_WORK(DATA_SLOT(REF_SLOT))
@@ -194,7 +194,7 @@ C
             END IF
 C
 C           We also have to find the quality array, which will have been
-C           mapped by DSA_PRE_PROCESS_FLAGGED_VALUES.  We know it will 
+C           mapped by DSA_PRE_PROCESS_FLAGGED_VALUES.  We know it will
 C           have been mapped as 'BYTE', so we don't need the type.
 C
             WORK_SLOT=MAP_CALL_WORK(QUALITY_SLOT(REF_SLOT))
@@ -204,7 +204,7 @@ C
             ELSE
                QUAL_ADDR=WORK_POINTER(WORK_SLOT)
             END IF
-C 
+C
 C           Get the number of elements in the data
 C
             NELM=1
@@ -217,7 +217,7 @@ C           so it will probably have left elements of the data array flagged.
 C           If the array was originally flagged then we will only have ended
 C           up here if there was originally a quality array as well in the
 C           file. We could just unflag the data and set the quality array
-C           elements, but it seems better to leave them flagged but to 
+C           elements, but it seems better to leave them flagged but to
 C           make sure the quality array reflects them. So we need to clear the
 C           quality array before calling DSA_UNFLAG_DATA. If we are leaving
 C           flags in the data, we should make sure we have the array flagged

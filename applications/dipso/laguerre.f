@@ -1,6 +1,6 @@
       SUBROUTINE LAGUERRE (X, Y, NPTS, XMIN, XMAX, DX, PINT, OK)
 C
-C  Subroutine applies EVEN ORDER LAGUERRE Interpolation to imported arrays of 
+C  Subroutine applies EVEN ORDER LAGUERRE Interpolation to imported arrays of
 C datapairs.
 C  X-values do not need to be equally spaced for valid interpolation by this
 C method.
@@ -8,7 +8,7 @@ C
       IMPLICIT NONE
 C Imports:
       DOUBLE PRECISION XMIN, XMAX             ! X-range of interpolated data
-      DOUBLE PRECISION DX                     ! X-spacing of interpolated data 
+      DOUBLE PRECISION DX                     ! X-spacing of interpolated data
       INTEGER PINT                            ! Order of interpolation
       INTEGER NBIGAP
 C Import/exports:
@@ -33,14 +33,14 @@ C
         RETURN
       ENDIF
       MNXSP = (X(NPTS)-X(1))/DBLE(NPTS-1)
-*     WRITE(*,'(A43,E10.4)') ' LAGINT : Mean X-spacing of RAW 
+*     WRITE(*,'(A43,E10.4)') ' LAGINT : Mean X-spacing of RAW
 *    +data was ', MNXSP
       NIN = INT((XMAX-XMIN)/DX) + 1
       IF ( NIN.GT.20000 ) THEN
         WRITE(*,*)'    INTERP:  error - too many interpolated points '
         OK = .FALSE.
         RETURN
-      ENDIF   
+      ENDIF
       XIN(1) = XMIN
       BS=0
       Z=1
@@ -68,9 +68,9 @@ C
           Z=Z+1
           GOTO 2
         ENDIF
-        IF (((X(Z)-X(Z-1)).GE.(3.0D+00*MNXSP)).AND.(ORDER.GE.4)) THEN 
+        IF (((X(Z)-X(Z-1)).GE.(3.0D+00*MNXSP)).AND.(ORDER.GE.4)) THEN
           ORDER = ORDER - 2
-*         WRITE(*,*) 'LAGINT: Gap in data abscissa spacing at least three 
+*         WRITE(*,*) 'LAGINT: Gap in data abscissa spacing at least three
 *    + times mean spacing '
 *         WRITE(*,*) 'detected; switching to ',ORDER,' - point interpolat
 *    +ion to evaluate '
@@ -95,8 +95,8 @@ C
             RETURN
           ENDIF
           YIN(I) = YIN(I) + NUM/DEM * Y(I1)
-   20   CONTINUE  
-  100 CONTINUE        
+   20   CONTINUE
+  100 CONTINUE
         IF (NBIGAP.GT.0) THEN
          WRITE (*,
      :   '(''   INTERP:  low-order interpolation used to span'',

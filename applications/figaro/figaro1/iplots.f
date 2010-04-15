@@ -10,8 +10,8 @@ C     the command keyword 'HARDCOPY'.
 C
 C     Command parameters -
 C
-C     IMAGE       The data to be plotted.  If there is X-axis 
-C                 information then this will be used.  If not, the 
+C     IMAGE       The data to be plotted.  If there is X-axis
+C                 information then this will be used.  If not, the
 C                  X-axis will just have to be the numbers from 1 to n.
 C     XSTART      The x-value at which plotting is to start. XSTART and
 C                 XEND are only prompted for if WHOLE is not specified.
@@ -23,7 +23,7 @@ C     COLOUR      The colour for the plot (only meaningful for the
 C                 Grinnell - later may be extended to map onto
 C                 different line types).  The axes are always white.
 C     NSPECT      The number of cross-sections to be plotted per sheet.
-C    
+C
 C     Command keywords -
 C
 C     WHOLE       The program is to display all of each cross-section.
@@ -56,10 +56,10 @@ C      8 Jan 1988  KS / AAO.  Was colouring axes as well as data
 C                  for all plots after the first if COLOUR was
 C                  specified as non-white.
 C                  Call to DSA_AXIS_BOUNDS dummied out to remove
-C                  error from link step. 
+C                  error from link step.
 C      4 Mar 1988  KS / AAO.  Corrected calculation of IDEN if
 C                  AUTOSCALE specified.  Calculation of number
-C                  of elements to be plotted also corrected - 
+C                  of elements to be plotted also corrected -
 C                  hard to see how that ever got wrong!
 C                  Also changed to produce a histogram plot,
 C                  rather than a join-the-dots plot.
@@ -122,15 +122,15 @@ C
       INTEGER   IDYMIN           ! The first cross-section to be plotted
       INTEGER   IGNORE           ! Used to ignore status codes
       INTEGER   INVOKE           ! Used to invoke functions
-      INTEGER   IDEN             ! Last element to be plotted in data 
+      INTEGER   IDEN             ! Last element to be plotted in data
                                  ! array
       INTEGER   IDST             ! First element to be plotted in data
                                  ! array
-      INTEGER   IXEN             ! Last element to be plotted in x-axis 
+      INTEGER   IXEN             ! Last element to be plotted in x-axis
       INTEGER   IXST             ! First element to be plotted in x-axis
       LOGICAL   KEEPGOING        ! FALSE if plotting to be stopped early
       CHARACTER LABEL*64         ! The group label for all the plots
-      INTEGER   LASTY            ! Number of last cross-section on a 
+      INTEGER   LASTY            ! Number of last cross-section on a
                                  ! page
       REAL      LOW              ! Minimum Y-value for a plot
       DOUBLE PRECISION MAGNITUDE ! Magnitude flag value for data
@@ -139,10 +139,10 @@ C
       INTEGER   NDD              ! Dimensionality of input data
                                  ! structure
       INTEGER   NDELM            ! Total number of elements in the data
-      INTEGER   ND1              ! Total number of elements per 
+      INTEGER   ND1              ! Total number of elements per
                                  ! cross-section
       INTEGER   NEXT             ! ICH_KEY arguement - ignored
-      INTEGER   NPELMS           ! Number of array elements to be 
+      INTEGER   NPELMS           ! Number of array elements to be
                                  ! plotted
       INTEGER   NXELM            ! Total number of elements in x-axis
                                  ! array
@@ -171,14 +171,14 @@ C
       LOGICAL   XTWODIMS         ! X-axis data is two dimensional?
       CHARACTER XUNITS*32        ! Structure x-axis units
       INTEGER   XPTR             ! Dynamic-memory pointer to x-axis data
-      REAL      XVEN             ! Max x-axis value in all data to be 
+      REAL      XVEN             ! Max x-axis value in all data to be
                                  ! plotted
-      REAL      XVST             ! Min x-axis value in all data to be 
+      REAL      XVST             ! Min x-axis value in all data to be
                                  ! plotted
 C
 C      Initialisation of DSA_ routines
 C
-      STATUS=0   
+      STATUS=0
       CALL DSA_OPEN(STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
@@ -284,7 +284,7 @@ C
          NCROSS=1
       END IF
 C
-C      Check for 'HARD' 
+C      Check for 'HARD'
 C
       HARD=.FALSE.
       CALL PAR_RDKEY('HARDCOPY',.FALSE.,HARD)
@@ -345,7 +345,7 @@ C
          GOTO 500
       END IF
 C
-C      If AUTOSCALE not specified then find the extrema of the data 
+C      If AUTOSCALE not specified then find the extrema of the data
 C      values in all the cross-sections under consideration.
 C
       IF (.NOT.AUTOSC) THEN
@@ -558,7 +558,7 @@ C
       CALL PGSCI(WHITE)
       CALL PGSLW(1)
       CALL PGEND
-      
+
       END
 
 C+
@@ -602,7 +602,7 @@ C                       of PGPLOT.
 C+
       IMPLICIT NONE
 C
-C      Parameters 
+C      Parameters
 C
       INTEGER IXST , IDST , NXELM , NDELM , CKEY , NPELMS
       REAL XVALS(NXELM) , DVALS(NDELM) , HIGH , LOW , XVST , XVEN

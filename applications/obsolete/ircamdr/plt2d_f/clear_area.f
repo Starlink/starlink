@@ -87,7 +87,7 @@
 !	type *, 'im_xst etc = ', imxst, imyst, imxen, imyen
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :                   'Error : IMAGE_CLEAR : During PAR_GETs',
      :                   STATUS )
 	  RETURN
@@ -103,7 +103,7 @@
 	CALL NDF_ASSOC( 'SCRATCH_NAME', 'WRITE', LOCSR, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :                 'Error : IMAGE_CLEAR : during NDF_CREP scratch',
      :                   STATUS )
 	  CALL NDF_ANNUL( LOCSR, STATUS)
@@ -113,11 +113,11 @@
 *      reset scratch file pixel boundaries
         CALL NDF_SBND( 2, LBND, NAXIS, LOCSR, STATUS )
 
-	CALL NDF_MAP( LOCSR, 'DATA', '_INTEGER', 'WRITE', 
+	CALL NDF_MAP( LOCSR, 'DATA', '_INTEGER', 'WRITE',
      :	              POINTER_SCRATCH, NELEMENTS, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :                   'Error : IMAGE_CLEAR : During NDF_MAP scratch',
      :                   STATUS )
 	  CALL NDF_ANNUL( LOCSR, STATUS)
@@ -126,11 +126,11 @@
 
 * call subroutine to set temp image to minimum value in last image plotted
 
-	CALL IMAGE_SETVAL( NAXIS(1), NAXIS(2), %VAL( POINTER_SCRATCH), 
+	CALL IMAGE_SETVAL( NAXIS(1), NAXIS(2), %VAL( POINTER_SCRATCH),
      :                     STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :                   'Error : AREA_CLEAR : after IMAGE_SETVAL',
      :                   STATUS )
 	  RETURN
@@ -138,18 +138,18 @@
 
 * plot data image after scaling
 
-!          CALL GCA( IM_XST,                     
-!     :              IM_YEN,                     
-!     :              IM_XEN,             
-!     :              IM_YST,             
-!     :              NAXIS( 1),                  
-!     :              NAXIS( 2),                  
+!          CALL GCA( IM_XST,
+!     :              IM_YEN,
+!     :              IM_XEN,
+!     :              IM_YST,
+!     :              NAXIS( 1),
+!     :              NAXIS( 2),
 !     :              1, 1,
-!     :              NAXIS( 1),  NAXIS( 2),              
-!     :              %VAL( POINTER_IMAGE))       
- 
+!     :              NAXIS( 1),  NAXIS( 2),
+!     :              %VAL( POINTER_IMAGE))
+
 	CALL GCA( IMXST, IMYEN, IMXEN, IMYST, NAXIS( 1), NAXIS( 2),
-     :	          1, 1, NAXIS( 1), NAXIS( 2), 
+     :	          1, 1, NAXIS( 1), NAXIS( 2),
      :	          %VAL( POINTER_SCRATCH))
 
 * flush buffer of residual output
@@ -161,7 +161,7 @@
 	CALL NDF_ANNUL( LOCSR, STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP( 'ERR', 
+          CALL ERR_REP( 'ERR',
      :                   'Error : AREA_CLEAR : after NDF_ANNUL',
      :                   STATUS )
 	  RETURN

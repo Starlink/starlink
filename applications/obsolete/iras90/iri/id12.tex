@@ -57,7 +57,7 @@ components of the IRAS extension used to hold such information, and also
 describes the package of subroutines which should be used for accessing IRAS
 images. Following Starlink programming standards, these subroutines are
 identified by names of up to five characters, together with the prefix
-``IRI\_''. 
+``IRI\_''.
 
 It is assumed that the reader is familiar with the following:
 \begin{itemize}
@@ -68,34 +68,34 @@ It is assumed that the reader is familiar with the following:
 \end{itemize}
 
 \section{Structure of an IRAS Image}
-In order to be a ``legal IRAS90 image'', an NDF must satisfy the following 
+In order to be a ``legal IRAS90 image'', an NDF must satisfy the following
 criteria:
 
 \begin{enumerate}
 
-\item The DATA array must be two dimensional. A two dimensional NDF section is 
+\item The DATA array must be two dimensional. A two dimensional NDF section is
 also acceptable.
 
 \item The NDF must contain an extension called ``IRAS''.
 
-\item The IRAS extension must contain a component structure named ASTROMETRY 
-containing astrometry information as produced by the IRA package. 
+\item The IRAS extension must contain a component structure named ASTROMETRY
+containing astrometry information as produced by the IRA package.
 
-\item The IRAS extension must contain a component structure named IMAGE\_INFO, 
+\item The IRAS extension must contain a component structure named IMAGE\_INFO,
 with HDS {\em type} IMAGE\_INFO.
 
 \item The IMAGE\_INFO structure must not contain any components other than those
 listed in appendix \ref{APP:ITEMS}.
 
-\item The IMAGE\_INFO structure {\bf {\em must} } contain the components 
+\item The IMAGE\_INFO structure {\bf {\em must} } contain the components
 INSTRUMENT, BAND and TYPE (included in the list in appendix \ref{APP:ITEMS}).
 
 \item The IMAGE\_INFO structure must not contain any components which are not
 relevant to the image type specified by component TYPE. Appendix \ref{APP:TYPE}
-identifies such components. 
+identifies such components.
 \end{enumerate}
 
-These are the only restrictions imposed upon IRAS images. In particular, 
+These are the only restrictions imposed upon IRAS images. In particular,
 note the following:
 
 \begin{itemize}
@@ -110,21 +110,21 @@ units. If future applications require some system not included in this list,
 then consideration should be given to including the new system in the list, and
 modifying the IRI package (and other applications) to recognise it. The routine
 IRI\_GETUN can be used to get a specification for one of the standard system of
-units from the environment. 
+units from the environment.
 
 \item No restrictions are placed on the contents of the LABEL component of NDFs
 holding IRAS images. However, as a general guide line, LABEL should be used to
 hold a description of the physical quantity stored in the data array. For
-instance, typical values may be {\em Surface Brightness}, {\em Flux}, etc. 
+instance, typical values may be {\em Surface Brightness}, {\em Flux}, etc.
 
 \item Applications are free to add any components from the list in appendix
 \ref{APP:ITEMS} to the IMAGE\_INFO structure, so long as they are mutually
 compatible. In general, an application should add as many of these components as
-it can, given the information available to the application regarding the image. 
+it can, given the information available to the application regarding the image.
 
-\item Images which were originally imported using a FITS medium may have an NDF 
+\item Images which were originally imported using a FITS medium may have an NDF
 extension called FITS, holding the FITS header cards. Useful information about
-the image may be obtained from this extension. The information stored in 
+the image may be obtained from this extension. The information stored in
 IMAGE\_INFO may contain values derived from these FITS header cards.
 
 \item If applications want to store information about the image for which there
@@ -134,7 +134,7 @@ IRAS extension. Such information must {\em not} be stored within the IMAGE\_INFO
 structure. However, if appropriate, consideration should be given to formally
 adding a new component to the list of legal IMAGE\_INFO components in which to
 store such information, and modifying IRI (and other applications) to recognise
-it. 
+it.
 
 \end{itemize}
 
@@ -143,13 +143,13 @@ it.
 The IRI package provides facilities for the following:
 \begin{itemize}
 \item Checking that an existing NDF is a valid IRAS image.
-\item Adding mandatory items to an existing NDF to establish it as a valid 
+\item Adding mandatory items to an existing NDF to establish it as a valid
 IRAS image.
 \item Obtaining the values of mandatory IMAGE\_INFO components.
 \item Obtaining an HDS locator to the IMAGE\_INFO structure.
 \item Reading and writing values for the NDF UNITS component.
 \item Obtaining and checking specifications of standard units.
-\item Displaying the contents of an IMAGE\_INFO structure in a user-friendly 
+\item Displaying the contents of an IMAGE\_INFO structure in a user-friendly
 format.
 \end{itemize}
 
@@ -159,7 +159,7 @@ format.
 Note, IRI {\em does not} provide facilities for reading or writing any of the
 optional items listed in appendix \ref{APP:ITEMS}. Applications should use calls
 to HDS routines to do this, using the HDS locator provided by the appropriate
-IRI routine. 
+IRI routine.
 }
 \end{center}
 \end{quote}
@@ -173,7 +173,7 @@ The IRI package has associated with it various symbolic constants defining such
 things as standard UNITS, etc. These values consist of a name of up to 5
 characters prefixed by ``IRI\_\_''  (note the {\em double} underscore), and can
 be made available to an application by including the following line at the
-start of the routines which uses them: 
+start of the routines which uses them:
 
 \begin{verbatim}
       INCLUDE 'IRI_PAR'
@@ -189,24 +189,24 @@ These values have the same format of those contained in IRI\_PAR, put define
 various error conditions which can be generated within the IRI package.
 Applications can compare the $STATUS$ argument with these values to check for
 specific error conditions. These values are described in appendix \ref
-{APP:ERRORS}. 
+{APP:ERRORS}.
 
 \subsection{Gaining Access to Existing IRAS Image Information}
 Applications which process existing IRAS images need to consider the following
 steps:
 \begin{itemize}
 
-\item Obtain an NDF identifier for the image, for instance using the NDF\_ or 
+\item Obtain an NDF identifier for the image, for instance using the NDF\_ or
 NDG\_ packages.
 
 \item Call routine IRI\_OLD to check that the NDF is a valid IRAS image, and
 obtain a locator to the IMAGE\_INFO structure. This call also returns the
 mandatory IMAGE\_INFO components, and the value of the NDF
-component UNITS. 
+component UNITS.
 
 \item The application must then check that the image is of a form which the
-application knows how to process. This will usually involve comparing the value 
-of the mandatory IMAGE\_INFO component TYPE against a list of values which can 
+application knows how to process. This will usually involve comparing the value
+of the mandatory IMAGE\_INFO component TYPE against a list of values which can
 be processed.
 
 \item Applications should always give consideration to the value of the NDF
@@ -218,7 +218,7 @@ having arbitrary units. When comparing the value of the UNITS component with the
 standard UNITS values, applications should always use an IRI symbolic constant
 (listed in appendix \ref{APP:UNITS}) rather than literal strings. This removes
 the possibility of unintentional mis-spelling of standard UNITS values which
-might otherwise cause problems. 
+might otherwise cause problems.
 
 \item When the information stored in IMAGE\_INFO is no longer needed, the
 locator should be annulled by calling DAT\_ANNUL.
@@ -230,14 +230,14 @@ Applications which create IRAS images need to consider the following
 steps:
 \begin{itemize}
 
-\item Obtain an NDF identifier for the image, for instance using the NDF\_ or 
+\item Obtain an NDF identifier for the image, for instance using the NDF\_ or
 NDG\_ packages.
 
 \item Write values to the standard NDF components DATA, VARIANCE, etc.
 
-\item Decide what units to use. The routine IRI\_GETUN can be used to obtain a 
-standard system of units from the environment. Routine IRI\_CHECK can be used to 
-check that a given system of units is standard, and to set the case of each 
+\item Decide what units to use. The routine IRI\_GETUN can be used to obtain a
+standard system of units from the environment. Routine IRI\_CHECK can be used to
+check that a given system of units is standard, and to set the case of each
 character within the units specification to the standard form.
 
 \item Call routine IRI\_NEW to create the IRAS extension, and the IMAGE\_INFO
@@ -245,20 +245,20 @@ structure within the IRAS extension, and return an HDS locator to the
 IMAGE\_INFO structure. IRI\_NEW also stores values for the mandatory IMAGE\_INFO
 components, and the NDF component UNITS. Note, an error is reported if a
 non-standard UNITS value is given. This error should be annulled if the
-application {\em must} use non-standard units. 
+application {\em must} use non-standard units.
 
 \item The application can then add any set of mutually compatible
-items to the IMAGE\_INFO structure, selected from the list given in appendix 
+items to the IMAGE\_INFO structure, selected from the list given in appendix
 \ref{APP:ITEMS}. HDS calls should be used to do this (eg DAT\_NEWxx and
 CMP\_PUTxx). In general, an application should add all items for which it has
-the relevant information. 
+the relevant information.
 
 \item When the IMAGE\_INFO structure is complete, the
 locator should be annulled by calling DAT\_ANNUL.
 
 \item An astrometry structure should be added to the IRAS extension (for
 instance by calling IRA\_CREAT) before the NDF identifier is annulled. If this
-is not done, later IRAS90 applications will not be able to process the image. 
+is not done, later IRAS90 applications will not be able to process the image.
 
 \end{itemize}
 
@@ -266,10 +266,10 @@ is not done, later IRAS90 applications will not be able to process the image.
 \label{SEC:LINK}
 This section describes how to compile and link applications which use IRI
 subroutines, on both VMS and UNIX systems. It is assumed that the IRAS90 package
-is installed as part of the Starlink Software Collection. 
+is installed as part of the Starlink Software Collection.
 
 \subsection{VMS}
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use the IRI package should start by issuing the commands:
 
 \begin{verbatim}
@@ -280,12 +280,12 @@ $ IRAS90_DEV
 \end{verbatim}
 
 These commands set up logical names related to all the IRAS90
-subsystems, including IRI. 
+subsystems, including IRI.
 
 To link a VMS ADAM application with the IRI package, the linker options file
 IRAS90\_LINK\_ADAM should be used. For example, to compile and link an ADAM
 application called PROG with the IRI library, the following commands should be
-used: 
+used:
 
 \begin{verbatim}
 $ ADAMSTART
@@ -293,30 +293,30 @@ $ ADAMDEV
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ ALINK PROG, IRAS90_LINK_ADAM/OPT 
+$ ALINK PROG, IRAS90_LINK_ADAM/OPT
 \end{verbatim}
 
 Stand-alone (i.e. non-ADAM) applications can be linked with the ``standalone''
 version of IRI. This version excludes the routines described in appendix
 \ref{APP:ADAM}. To do this the link options file IRAS90\_LINK should be used
 instead of IRAS90\_LINK\_ADAM. Thus to compile and link a stand-alone
-application with the IRI package, the following commands should be given: 
+application with the IRI package, the following commands should be given:
 
 \begin{verbatim}
 $ IRAS90
 $ IRAS90_DEV
 $ FORT PROG
-$ LINK PROG, IRAS90_LINK/OPT 
+$ LINK PROG, IRAS90_LINK/OPT
 \end{verbatim}
 
 \subsection{UNIX}
 
 
-Each terminal session which is to include the compilation or linking of 
+Each terminal session which is to include the compilation or linking of
 applications which use any IRAS90 sub-package should do the following:
 
 \begin{enumerate}
-\item Execute the {\bf iras90} command. This sets up an alias for the 
+\item Execute the {\bf iras90} command. This sets up an alias for the
 {\bf iras90\_dev} command.
 
 \item Execute the {\bf iras90\_dev} command.  This creates soft links
@@ -324,26 +324,26 @@ within the current directory to
 all the iras90 include files, defines an environment variable IRAS90\_SRC
 pointing to the IRAS90 source directory, adds the {\bf bin}
 sub-directory of IRAS90\_SRC on to the end of the current value for the
-environment variable PATH, and adds the {\bf lib} sub-directory of 
-IRAS90\_SRC on to the end of the current value for the environment 
+environment variable PATH, and adds the {\bf lib} sub-directory of
+IRAS90\_SRC on to the end of the current value for the environment
 variable LD\_LIBRARY\_PATH. The command {\bf iras90\_dev star} will do
 the same but will also create soft links to all starlink include files
 (i.e. all files in the directory /star/include).
 
 \item If a UNIX application accesses any include files (such as
-IRI\_PAR) then they should be specified (within the source file) in upper case 
+IRI\_PAR) then they should be specified (within the source file) in upper case
 without any directory
 path. The I90\_PAR file (for instance) can be included using the statement
 
 \verb+      INCLUDE 'I90_PAR'+\\
 
-\item Soft links can be deleted (using the {\bf rm} command) when no longer 
+\item Soft links can be deleted (using the {\bf rm} command) when no longer
 needed.
 The command {\bf iras90\_dev remove} will remove all IRAS90 soft links from
 the current directory. The command {\bf iras90\_dev remove star} will
 remove all IRAS90 and Starlink soft links from the current directory.
-Note, soft links are only accessable in the directory from which the {bf ln} 
-or {\bf iras90\_dev} command was issued. 
+Note, soft links are only accessable in the directory from which the {bf ln}
+or {\bf iras90\_dev} command was issued.
 \item For ADAM applications the following {\bf alink} command should be used:
 
 \verb+% alink prog.f -L$IRAS90_SRC/lib `iri_link_adam`+\\
@@ -388,7 +388,7 @@ apostrophy (') in the above {\bf alink} command.
    \newline
    \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
    \setlength{\sstcaptionlength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstbannerlength}{0.5em}
    \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
    \addtolength{\sstcaptionlength}{-4.45pt}
    \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
@@ -691,7 +691,7 @@ apostrophy (') in the above {\bf alink} command.
          A routine to which is passed each line of text for display.
          It should have the same argument list as MSG\_\_OUTIF (see
          SUN/104), and should be declared EXTERNAL in the calling
-         routine. All calls to this routine are made with priority 
+         routine. All calls to this routine are made with priority
          MSG\_\_NORM.
       }
       \sstsubsection{
@@ -707,103 +707,103 @@ apostrophy (') in the above {\bf alink} command.
 This appendix contains a list of the legal items of image information which may
 be stored as components of the IMAGE\_INFO structure. The HDS {\em name} of each
 item is given, followed by the HDS {\em type}, and a description of the values
-which the component takes. 
+which the component takes.
 
 \begin{description}
 
-\item [COLCOR $\langle$\_CHAR$\rangle$] - A comment describing any colour 
-correction that has been applied to the image. If this component is present then 
-theimage has been colour corrected, otherwise it has not. The content of the 
+\item [COLCOR $\langle$\_CHAR$\rangle$] - A comment describing any colour
+correction that has been applied to the image. If this component is present then
+theimage has been colour corrected, otherwise it has not. The content of the
 string is arbitrary.
 
 \item [BAND $\langle$\_INTEGER$\rangle$] - The IRAS waveband index. This will be in the range 1
 to 4 if item INSTRUMENT has the value ``SURVEY'' (representing the 12, 25, 60
 and 100 $\mu m$ bands), and in the range 1 to 2 if item INSTRUMENT has the value
-``CPC'' (representing the 50 and 100 $\mu m$ bands). 
+``CPC'' (representing the 50 and 100 $\mu m$ bands).
 
 \item [CPCRAW $\langle$\_LOGICAL$\rangle$] - True if the image is a raw CPC image. False if it
-is a cleaned CPC image. Only applicable to CPC images. 
+is a cleaned CPC image. Only applicable to CPC images.
 
 \item [FIELDLAT $\langle$\_DOUBLE$\rangle$] - The sky latitude (eg Declination, Galactic
 latitude, etc) of the reference position for the image. The value should be in
 radians. If FIELDLAT is present, then FIELDLON and FIELDSCS must also be
-present. 
+present.
 
 \item [FIELDLON $\langle$\_DOUBLE$\rangle$] - The sky longitude (eg Right Ascension, Galactic
 longitude, etc) of a reference position for the image. The exact location of the
 reference point is left up to each application to decide but may, for instance,
 be the position of some object of interest within the image. The value should be
 in radians. If FIELDLON is present, then FIELDLAT and FIELDSCS must also be
-present. 
+present.
 
 \item [FIELDSCS $\langle$\_CHAR*(IRA\_\_SZSCS)$\rangle$] - The sky coordinate system in which
 FIELDLON and FIELDLAT are given (eg EQUATORIAL, GALACTIC, etc). This string
 should represent a valid IRA Sky Coordinate System. If FIELDSCS is present, then
-FIELDLAT and FIELDLON must also be present. 
+FIELDLAT and FIELDLON must also be present.
 
 \item [GALCEN $\langle$\_GALCEN$\rangle$] - If true then the image is a low resolution all-sky
 map centred on the galactic centre. If false, then the image is a low resolution
 all-sky map centred on the galactic anti-centre. This item is only applicable to
-the ``Low Resolution All-sky Maps'' distributed by IPAC. 
+the ``Low Resolution All-sky Maps'' distributed by IPAC.
 
 \item [GALMAP $\langle$\_INTEGER$\rangle$] - The map number of a galactic plane map. This item
 is only applicable to the ``Galactic Plane Maps'' distributed by IPAC.
 
 \item [HCON $\langle$\_INTEGER$\rangle$] - The HCON number of the data. This is only applicable
-to survey data which contains data from a single HCON. 
+to survey data which contains data from a single HCON.
 
 \item [INSTRUMENT $\langle$\_CHAR*(IRI\_\_SZINS)$\rangle$] - The IRAS instrument
 which gave rise to the data. Can take the value ``CPC'' or ``SURVEY'' (the LRS
-instrument is not suppored by IRAS90). 
+instrument is not suppored by IRAS90).
 
-\item [ISSAFLD $\langle$\_INTEGER$\rangle$] - The IRAS Sky Survey Atlas 
-field number. Only applicable to ISSA images. 
+\item [ISSAFLD $\langle$\_INTEGER$\rangle$] - The IRAS Sky Survey Atlas
+field number. Only applicable to ISSA images.
 
-\item [MAPCRDD $\langle$\_LOGICAL$\rangle$] - If true, then the image was 
-created by IRAS90 application MAPCRDD. 
+\item [MAPCRDD $\langle$\_LOGICAL$\rangle$] - If true, then the image was
+created by IRAS90 application MAPCRDD.
 
 \item [MAXSOP $\langle$\_INTEGER$\rangle$] - The maximum SOP number which contributed to the
 data in the image. If item MINSOP does not also exist, then all the data is
 assumed to come from the SOP identified by MAXSOP. If item MINSOP does exist,
-then MINSOP must be less than or equal to MAXSOP. 
+then MINSOP must be less than or equal to MAXSOP.
 
 \item [MINSOP $\langle$\_INTEGER$\rangle$] - The minimum SOP number which contributed to the
 data in the image. If item MAXSOP does not also exist, then all the data is
 assumed to come from the SOP identified by MINSOP. If item MAXSOP does exist,
-then MINSOP must be less than or equal to MAXSOP. 
+then MINSOP must be less than or equal to MAXSOP.
 
 \item [OBSNO $\langle$\_INTEGER$\rangle$] - The number of the observation from which the data in
 the image was derived. This can only be used if all the data came from the same
 observation, and is thus not allowed if items MAXSOP and MINSOP indicate that a
-range of SOPs are represented in the image. 
+range of SOPs are represented in the image.
 
 \item [POFLUX $\langle$\_LOGICAL$\rangle$] - If true, then the image is a PO
 flux map. Otherwise it is an intensity PO map. Only applicable to PO
-images. 
+images.
 
 \item [PONMAP $\langle$\_LOGICAL$\rangle$] - If true, then the image is a PO
-noise map. Only applicable to PO images. 
+noise map. Only applicable to PO images.
 
-\item [PONOISE $\langle$\_REAL$\rangle$] - The median noise estimate within a 
-pointed observation image. Only applicable to PO images. This should be in the 
+\item [PONOISE $\langle$\_REAL$\rangle$] - The median noise estimate within a
+pointed observation image. Only applicable to PO images. This should be in the
 units given by component POUNITS. If present, POUNITS must also be present.
 
-\item [POUNITS $\langle$\_CHAR*(IRI\_\_SZUNI)$\rangle$] - The units in which 
+\item [POUNITS $\langle$\_CHAR*(IRI\_\_SZUNI)$\rangle$] - The units in which
 PONOISE is stored. If present, PONOISE must also be present.
 
 \item [SKYFLUX $\langle$\_INTEGER$\rangle$] - The SKYFLUX plate number from which the
 image was derived. This item is only applicable to the ``SKYFLUX'' images
-distributed by IPAC. 
+distributed by IPAC.
 
 \item [SKYWEIGHT $\langle$\_LOGICAL$\rangle$] - If true, then the image is a
 SKYFLUX weight image. If false, it is a SKYFLUX intensity image. This item is
-only applicable to the ``SKYFLUX'' images distributed by IPAC. 
+only applicable to the ``SKYFLUX'' images distributed by IPAC.
 
-\item [TYPE $\langle$\_CHAR*(IRI\_\_SZTYP)$\rangle$] - The type of IRAS image. 
+\item [TYPE $\langle$\_CHAR*(IRI\_\_SZTYP)$\rangle$] - The type of IRAS image.
 Legal values are listed in appendix /ref{APP:TYPE}.
 
-\item [YORTYPE $\langle$\_CHAR*(IRI\_\_SZYOR)$\rangle$] - Specifies the type of 
-data stored in a YORIC/HIRES image. It can take values given by any of the 
+\item [YORTYPE $\langle$\_CHAR*(IRI\_\_SZYOR)$\rangle$] - Specifies the type of
+data stored in a YORIC/HIRES image. It can take values given by any of the
 following IRI parameters:
 \begin{description}
 \item [IRI\_\_YOIMG] - Surface brightness image.
@@ -812,15 +812,15 @@ following IRI parameters:
 \item [IRI\_\_YOCFV] - Correction factor variance image.
 \item [IRI\_\_YORES] - Resolution image.
 \end{description}
-This item is only applicable to the ``YORIC'' or ``HIRES''  images distributed 
-by IPAC. 
+This item is only applicable to the ``YORIC'' or ``HIRES''  images distributed
+by IPAC.
 
 \end{description}
 
 \section{Standard UNITS for IRAS Images}
 \label{APP:UNITS}
 This appendix gives a list of standard units recognised by routine IRI\_NEW.
-The different system of units should be referred to by means of symbolic 
+The different system of units should be referred to by means of symbolic
 constants listed below (see section \ref{SEC:CON}).
 
 \begin{description}
@@ -828,38 +828,38 @@ constants listed below (see section \ref{SEC:CON}).
 \item [IRI\_\_MJPS] - Mega-Janksy's per Steradian.
 \item [IRI\_\_JPP] - Jansky' per pixel (note, care must be taken when dealing
 with these units to ensure that the change in pixel size across large images is
-taken account of). 
+taken account of).
 \item [IRI\_\_FPS] - Flux (in Pico-Watts per square metre) per Steradian (this
-system of units is independent of colour correction). 
+system of units is independent of colour correction).
 \item [IRI\_\_FPP] - Flux (in Pico-Watts per square metre) per pixel.
 \end{description}
 
-In addition the symbolic constant IRI\_\_UNITS contains a concatenated list of 
+In addition the symbolic constant IRI\_\_UNITS contains a concatenated list of
 all the standard units, seperated by commas.
 
 \section{Legal Values for the TYPE Component}
 \label{APP:TYPE}
-The TYPE component of the IMAGE\_INFO structure holds a string identifying the 
-type of IRAS image. The legal values for these strings are given by the 
+The TYPE component of the IMAGE\_INFO structure holds a string identifying the
+type of IRAS image. The legal values for these strings are given by the
 following symbolic constants:
 \begin{description}
 
-\item [IRI\_\_CPC] - An image created from data obtained from the Chopped 
-Photometric Channel instrument. The IMAGE\_INFO component CPCRAW can be used to 
+\item [IRI\_\_CPC] - An image created from data obtained from the Chopped
+Photometric Channel instrument. The IMAGE\_INFO component CPCRAW can be used to
 give further information about such images.
 
-\item [IRI\_\_SKYFL] - A SKYFLUX map. The IMAGE\_INFO components SKYFLUX and 
+\item [IRI\_\_SKYFL] - A SKYFLUX map. The IMAGE\_INFO components SKYFLUX and
 SKYWEIGHT can be used to give further information about such images.
 
 \item [IRI\_\_GALPL] - A galactic plane map. The IMAGE\_INFO component GALMAP
 can be used to give further information about such images.
 
-\item [IRI\_\_ALLSK] - An all sky  map. The IMAGE\_INFO component GALCEN can be 
+\item [IRI\_\_ALLSK] - An all sky  map. The IMAGE\_INFO component GALCEN can be
 used to give further information about such images.
 
 \item [IRI\_\_DSCO] - A Pointed Observation map produced using the IPAC DSCO
 processor. The IMAGE\_INFO components POFLUX, PONOISE, PONMAP and POUNITS can be
-used to give further information about such images. 
+used to give further information about such images.
 
 \item [IRI\_\_ISSA] - An IRAS Sky Survey Atlas map. The IMAGE\_INFO component
 ISSAFLD can be used to give further information about such images.
@@ -872,7 +872,7 @@ ISSAFLD can be used to give further information about such images.
 
 \item [IRI\_\_NONAM] - Specifies that the map was created by some other process.
 
-In addition the symbolic constant IRI\_\_TYPES contains a concatenated list of 
+In addition the symbolic constant IRI\_\_TYPES contains a concatenated list of
 all the legal types, seperated by commas.
 
 \end{description}
@@ -882,17 +882,17 @@ The STARLSE package (see SUN/105) provides facilities for initialising the VAX
 Language Sensitive Editor (LSE) to simplify the generation of Fortran
 code conforming to the Starlink programming standard (see SGP/16). One of the
 facilities provided by LSE is the automatic production of argument lists for
-subroutine calls. Templates for all the subroutines in the IRI package can be 
+subroutine calls. Templates for all the subroutines in the IRI package can be
 made available within LSE by performing the following steps (within LSE):
 \begin{enumerate}
 \item Issue the LSE command GOTO FILE/READ IRI\_DIR:IRI.LSE
 \item Issue the LSE command DO
 \item Issue the LSE command DELETE BUFFER
 \item Move to a buffer holding a .FOR of a .GEN file in the usual way.
-\item IRI subroutine templates are then available by typing in the name of an 
+\item IRI subroutine templates are then available by typing in the name of an
 IRI subroutine (or an abbreviation) and expanding it (CTRL-E).
 \item Help on the subroutine and its arguments can be obtained by placing the
-cursor at a point in the buffer at which the subroutine name has been entered 
+cursor at a point in the buffer at which the subroutine name has been entered
 and pressing GOLD-PF2.
 \end{enumerate}
 
@@ -908,12 +908,12 @@ IRI\_ makes calls to the following packages:
 \item [NDF\_] - The NDF access package; see SUN/33.
 \end{description}
 
-Access to these packages, together with packages called from within these 
-packages, is necessary to use IRI. 
+Access to these packages, together with packages called from within these
+packages, is necessary to use IRI.
 
 \section{IRI Error Codes}
 \label {APP:ERRORS}
-IRI routines can return any $STATUS$ value generated by the subroutine packages 
+IRI routines can return any $STATUS$ value generated by the subroutine packages
 which it calls. In addition it can return the following IRI-specific values:
 
 \begin{description}
@@ -923,7 +923,7 @@ The astrometry structure store within the IRAS extension has an incorrect
 HDS type (should be IRAS\_ASTROMETRY).
 
 \item {\bf IRI\_\_BADBN}\\
-A wave-band index supplied as an argument or retrieved from an NDF is out of 
+A wave-band index supplied as an argument or retrieved from an NDF is out of
 the legal range, given the value of INSTRUMENT.
 
 \item {\bf IRI\_\_BADCM}\\
@@ -952,7 +952,7 @@ A non-standard system of units was supplied.
 Incompatible components were found within in IMAGE\_INFO.
 
 \item {\bf IRI\_\_MISF}\\
-Some, but not all, of the IMAGE\_INFO components FIELDLAT, FIELDLON and FIELDSCS 
+Some, but not all, of the IMAGE\_INFO components FIELDLAT, FIELDLON and FIELDSCS
 were found within an NDF.
 
 \item {\bf IRI\_\_NOT2D}\\
@@ -972,11 +972,11 @@ Changes introduced in version 4 of ID12:
 Changes introduced in version 3 of ID12:
 \begin{itemize}
 \item The new mandatory IMAGE\_INFO component TYPE has been added.
-\item IMAGE\_INFO components CPCOBJ, POGRID, POMACRO and POOBSID have been 
+\item IMAGE\_INFO components CPCOBJ, POGRID, POMACRO and POOBSID have been
 removed.
 \item IMAGE\_INFO components PONMAP and POUNITS added.
 \item If a non-standard system of units is supplied to IRI\_NEW, the routine
-completes before reporting the error. 
+completes before reporting the error.
 \item New routine IRI\_CHECK has been added.
 \end{itemize}
 
@@ -984,7 +984,7 @@ Changes introduced in version 2 of ID12:
 \begin{itemize}
 \item The IRI package has been radically changed since the last version. The new
 document should be read in its entirety and all applications which use IRI will
-need to be modified. 
+need to be modified.
 \end{itemize}
 
-\end {document} 
+\end {document}

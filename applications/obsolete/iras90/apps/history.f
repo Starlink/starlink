@@ -21,8 +21,8 @@
 
 *  Description:
 *
-*     IN UNIX THE USER CAN ONLY USE THIS APPLICATION BY TYPING 
-*     iras90_history TO AVIOD CONFLICT WITH UNIX history COMMAND 
+*     IN UNIX THE USER CAN ONLY USE THIS APPLICATION BY TYPING
+*     iras90_history TO AVIOD CONFLICT WITH UNIX history COMMAND
 *
 *     This routine allows several operations to be performed on the
 *     history information stored within a group of NDFs...
@@ -34,7 +34,7 @@
 *     their creation dates (see parameters SINCE and BEFORE), or on the
 *     basis of the command which created the history (see parameter
 *     COMMAND).
-*     
+*
 *     2) All history information can be deleted (specify using
 *     FUNCTION=ERASE). There is no option to delete selected history
 *     records.
@@ -51,7 +51,7 @@
 *     display all history records from the supplied NDFs and then exit.
 
 *  Usage:
-*     HISTORY NDF [FUNCTION] [LOGFILE] 
+*     HISTORY NDF [FUNCTION] [LOGFILE]
 
 *  ADAM Parameters:
 *     BEFORE = LITERAL (Read)
@@ -98,7 +98,7 @@
 *     NDF = NDF (Update)
 *        The group of NDFs to process. This should be in the form of a
 *        group expression (see help on "Group_expressions").
-*     SINCE = LITERAL (Read) 
+*     SINCE = LITERAL (Read)
 *        Only those history records which were created since the date
 *        and time specified by SINCE are displayed. See help on
 *        "Time_and_date_strings" for more information on specifying
@@ -112,7 +112,7 @@
 *        for more text (the minus sign is removed before the text is
 *        stored in the NDF). The name of an existing text file can be
 *        specified, preceeded with an up-arrow character (^), in which
-*        case the text will be read from the text file. If more than 
+*        case the text will be read from the text file. If more than
 *        one NDF is being processed, the same text is used for each NDF.
 
 *  Examples:
@@ -120,7 +120,7 @@
 *        This will display all the history information contained within
 *        the NDF CENA on the terminal screen.
 *     HISTORY CENA COMMAND=MAPCRDD
-*        This will display all the history information within CENA 
+*        This will display all the history information within CENA
 *        which was created by the MAPCRDD application.
 *     HISTORY M51* ERASE
 *        This will remove all history information from all NDFs with
@@ -153,7 +153,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -191,9 +191,9 @@
                                  ! a text file.
       LOGICAL LOOP               ! True if user is to be re-prompted for
                                  ! further operations.
-      DOUBLE PRECISION MJDBEF    ! Modified Julian Date corresponding 
+      DOUBLE PRECISION MJDBEF    ! Modified Julian Date corresponding
                                  ! to BEFORE.
-      DOUBLE PRECISION MJDSIN    ! Modified Julian Date corresponding 
+      DOUBLE PRECISION MJDSIN    ! Modified Julian Date corresponding
                                  ! to SINCE.
       INTEGER NDFIN              ! Identifier for input NDF.
       CHARACTER NDFLOC*(DAT__SZLOC)! Locator to top level NDF structure.
@@ -203,7 +203,7 @@
       INTEGER NIN                ! No. of NDFs to be processed.
       INTEGER NRECS              ! The current size of the RECORDS
                                  ! structure.
-      INTEGER NTREC              ! No. of lines of text stored in the 
+      INTEGER NTREC              ! No. of lines of text stored in the
                                  ! text group.
       LOGICAL OK                 ! True if a record is to be displayed.
       LOGICAL ON                 ! True if screen output is enabled.
@@ -230,13 +230,13 @@
       CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'NDF', 0, 1, '  Give more NDF names...', IGRP1, 
+      CALL IRM_RDNDF( 'NDF', 0, 1, '  Give more NDF names...', IGRP1,
      :                NIN, STATUS )
 
-*  Abort if an error has been reported, or if there are no NDFs to 
+*  Abort if an error has been reported, or if there are no NDFs to
 *  process.
       IF ( STATUS .NE. SAI__OK .OR. NIN .EQ. 0 ) GO TO 999
-      
+
 *  If required open a log file. The file descriptor returned in FD is
 *  used to access this file.
       CALL IRM_ASFIO( 'LOGFILE', 'WRITE', 'LIST', 80, FD, LOGPOS,
@@ -260,14 +260,14 @@
          CALL PAR_CHOIC( 'FUNCTION', ' ', 'DISPLAY,ADD,ERASE', .FALSE.,
      :                   FUNC, STATUS )
          CALL PAR_CANCL( 'FUNCTION', STATUS )
-      ELSE 
+      ELSE
          CALL PAR_CHOIC( 'FUNCTION', 'DISPLAY', 'DISPLAY,ADD,ERASE',
      :                   .FALSE., FUNC, STATUS )
       END IF
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
 *  If history records are to be displayed,  get a value for parameter
 *  SINCE, using a blank dynamic default if LOOP is false.
       IF( FUNC .EQ. 'DISPLAY' ) THEN
@@ -312,8 +312,8 @@
          CALL GRP_SETCS( IGRP2, .TRUE., STATUS )
 
 *  Suppress checks for the DELIMITER and COMMENT control characters by
-*  setting them to the NULL value. This is in order to stop each line 
-*  of text being split up by any commas included in the text, and to 
+*  setting them to the NULL value. This is in order to stop each line
+*  of text being split up by any commas included in the text, and to
 *  stop strings beginning with # being ignored.
          CALL GRP_SETCC( IGRP2, 'NUL,DEL,COM', '%%%', STATUS )
 
@@ -331,7 +331,7 @@
 *  Warn the user if no text has been supplied.
          IF( NTREC .EQ. 0 ) THEN
             CALL MSG_OUTIF( MSG__NORM, 'HISTORY_MSG2',
-     :                     '    No new history text has been supplied', 
+     :                     '    No new history text has been supplied',
      :                      STATUS )
             GO TO 998
          END IF
@@ -373,7 +373,7 @@
          IF( NEXT .EQ. 1 ) THEN
             IF( FUNC .EQ. 'ADD' ) THEN
 
-*  If there is currently no HISTORY structure within the NDF, create 
+*  If there is currently no HISTORY structure within the NDF, create
 *  one.
                IF( .NOT. THERE ) THEN
                   CALL HISTB0( NDFLOC, HLOC, RLOC, EXTSIZ, NEXT, NRECS,
@@ -387,7 +387,7 @@
 
 *  Tell the user that the record has been created.
                CALL MSG_SETI( 'REC', NEXT - 1 )
-               CALL HISTC0( '    Record ^REC created', LOGPOS, FD, 
+               CALL HISTC0( '    Record ^REC created', LOGPOS, FD,
      :                      STATUS )
 
 *  Give a warning if any other function was selected.
@@ -424,10 +424,10 @@
                NRECS = 0
                THERE = .FALSE.
 
-               CALL HISTC0( '    All history information removed', 
+               CALL HISTC0( '    All history information removed',
      :                      LOGPOS, FD, STATUS )
 
-*  Otherwise, history records are to be displayed. 
+*  Otherwise, history records are to be displayed.
             ELSE
 
 *  Indicate that no records have yet been displayed.
@@ -437,14 +437,14 @@
                DO REC = 1, NEXT - 1
 
 *  See if this record was created by the application specified by
-*  parameter COMMAND before the time specified by parameter BEFORE and 
+*  parameter COMMAND before the time specified by parameter BEFORE and
 *  after the time specified by parameter SINCE.
-                  CALL HISTB1( MJDSIN, MJDBEF, COMMND( : LCMD ), REC, 
+                  CALL HISTB1( MJDSIN, MJDBEF, COMMND( : LCMD ), REC,
      :                         RLOC, OK, STATUS )
 
 *  If it was, display the record, starting a new page for the first NDF.
                   IF( OK ) THEN
-                     CALL HISTA2( NDFNAM( : LNDFNM ), LOGPOS, FD, REC, 
+                     CALL HISTA2( NDFNAM( : LNDFNM ), LOGPOS, FD, REC,
      :                            RLOC, STATUS )
                      SOME = .TRUE.
                   END IF
@@ -492,7 +492,7 @@
 
 *  Delete the group used to hold text.
       IF( FUNC .EQ. 'ADD' ) CALL GRP_DELET( IGRP2, STATUS )
-      
+
 *  If parameter LOOP is true, go round for another FUNCTION.
       IF( LOOP .AND. STATUS .EQ. SAI__OK ) GO TO 10
 
@@ -501,7 +501,7 @@
 
 *  Store a list of the processed files for use by later applications.
       CALL IRM_LISTN( 'NDFLIST', IGRP1, 'HISTORY', STATUS )
- 
+
 *  Delete the group holding NDFs.
  999  CONTINUE
       CALL GRP_DELET( IGRP1, STATUS )
@@ -520,5 +520,5 @@
      :   'HISTORY: Error displaying, erasing or adding NDF history.',
      :   STATUS )
       END IF
-      
+
       END

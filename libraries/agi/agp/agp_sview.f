@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -117,7 +117,7 @@
      :        NAMLEN, PICNUM
 
       REAL CURDEV( 4 ), CURNDC( 4 ), CURWOR( 4 ), BASDEV( 4 ),
-     :     BASNDC( 4 ), BASWOR( 4),  VNDC( 4 ), FACTOR, NDC( 4 ), SFA, 
+     :     BASNDC( 4 ), BASWOR( 4),  VNDC( 4 ), FACTOR, NDC( 4 ), SFA,
      :     VDEV( 4 ), WORLD( 4 )
 
       CHARACTER * ( AGI__CMAX ) CURCOM, BASCOM
@@ -179,10 +179,10 @@
          VNDC( 3 ) = VNDC( 3 ) * BASNDC( 4 )
          VNDC( 4 ) = VNDC( 4 ) * BASNDC( 4 )
       ENDIF
-      
+
 *  Also convert the native PGPLOT device coordinates. These are a fraction
 *  of a pixel different as, for example, with a 768x512 X Window-native
-*  PGPLOT returns the maximum X,Y coordinate of a viewport as (768,512) 
+*  PGPLOT returns the maximum X,Y coordinate of a viewport as (768,512)
 *  whereas GKS-based Starlink PGPLOT as (767,511). Note that the BASE
 *  picture is the same (768,512) in both systems as this is obtained
 *  directly from GKS in Starlink PGPLOT.
@@ -191,7 +191,7 @@
       VDEV( 2 ) = (VDEV( 2 ) * (BASDEV( 2 ) - 1))/ BASDEV( 2 )
       VDEV( 3 ) = (VDEV( 3 ) * (BASDEV( 4 ) - 1))/ BASDEV( 4 )
       VDEV( 4 ) = (VDEV( 4 ) * (BASDEV( 4 ) - 1))/ BASDEV( 4 )
-      
+
 *   If the current picture number is negative then there must be no
 *   pictures on this device so just save the given picture as the first one.
 *   If the current picture number is positive then make sure the current
@@ -210,7 +210,7 @@
             GOTO 99
          ENDIF
 
-         
+
 *   Check that the given viewport lies within the current picture
 *   Have to allow for fuzzy edges because IDI only works with whole
 *   pixels.

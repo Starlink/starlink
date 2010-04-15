@@ -52,8 +52,8 @@ C                  dsa_use_* for input, but not for output.  Now calls
 C                  it for both.
 C     12 Feb 1995  KS/AAO. Now calls DSA_USE_FLAGGED_VALUES and
 C                  DSA_USE_QUALITY for the output as well as for the
-C                  input. 
-C     29 Nov 1995  KS/AAO. Now calls DSA_QUALITY_AND_FLAGS_OK to 
+C                  input.
+C     29 Nov 1995  KS/AAO. Now calls DSA_QUALITY_AND_FLAGS_OK to
 C                  indicate that the program can handle both types of
 C                  quality information simultaneously.
 C     01 Dec 1995  HME / UoE, Starlink.  Re-did the corrections of 6
@@ -88,12 +88,12 @@ C
       LOGICAL  EEXIST            ! Image has an error array?
       INTEGER  EPTR              ! Dynamic mem pointer for input errors
       INTEGER  EPTRO             ! Dynamic mem pointer for output errors
-      LOGICAL  ERRORS            ! Error information is an uncertainty 
+      LOGICAL  ERRORS            ! Error information is an uncertainty
                                  ! array?
       LOGICAL  FEXIST            ! Data contains flagged values?
       INTEGER  IPTR              ! Dynamic mem pointer for input data
       INTEGER  IPTRO             ! Dynamic mem pointer for output data
-      INTEGER  ITXST             ! Temporary value of IXST used for axis 
+      INTEGER  ITXST             ! Temporary value of IXST used for axis
                                  ! data only
       INTEGER  ITYST             ! Temporary value of IYST used for axis
                                  ! data only
@@ -102,14 +102,14 @@ C
       INTEGER  IYEN              ! Index of last AXIS(2) element used
       INTEGER  IYST              ! Index of first AXIS(2) element used
       INTEGER  NDIM              ! Number of image dimensions
-      INTEGER  NELM              ! Number of elements in image 
+      INTEGER  NELM              ! Number of elements in image
       LOGICAL  NONE              ! No error information available?
       INTEGER  NX                ! First dimension of image
       INTEGER  NXNEW             ! First dimension of subsetted image
       INTEGER  NY                ! Second dimension of image
       INTEGER  NYNEW             ! Second dimension of subsetted image
       LOGICAL  SINGLE            ! True if axis width is a single value
-      INTEGER  SLOT              ! Slot number for mapped data -ignored 
+      INTEGER  SLOT              ! Slot number for mapped data -ignored
       INTEGER  STATUS            ! Running status for DSA routines
       LOGICAL  VARIANCE          ! Error information is a variance
                                  ! array?
@@ -118,19 +118,19 @@ C
       INTEGER  XDIMSN(2)         ! Dimensions of new AXIS(1) data array
       REAL     XEN               ! Value of last AXIS(1) element used
       LOGICAL  XEXIST            ! Image has an AXIS(1) data array?
-      INTEGER  XNDIM             ! Number of dimensions of original X 
+      INTEGER  XNDIM             ! Number of dimensions of original X
                                  ! data array
       INTEGER  XNDIMN            ! Number of dimensions of new X data
                                  ! array
       INTEGER  XPTR              ! Dynamic mem pointer for input AXIS(1)
                                  ! data
-      INTEGER  XPTRO             ! Dynamic mem pointer for output 
+      INTEGER  XPTRO             ! Dynamic mem pointer for output
                                  ! AXIS(1) data
       REAL     XST               ! Value of first AXIS(1) element used
       LOGICAL  XWEXIST           ! AXIS(1) array also has a width array?
       INTEGER  XWPTR             ! Dynamic mem pointer for input AXIS(1)
                                  ! width data
-      INTEGER  XWPTRO            ! Dynamic mem pointer for output 
+      INTEGER  XWPTRO            ! Dynamic mem pointer for output
                                  ! AXIS(1) width data
       INTEGER  YDIMS(2)          ! Dimensions of AXIS(2) data array
       INTEGER  YDIMSN(2)         ! Dimensions of new AXIS(2) data array
@@ -155,7 +155,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -194,7 +194,7 @@ C        is mapped and the limits for subsetting are selected.
 C
          CALL DSA_SEEK_AXIS('IMAGE',2,YEXIST,STATUS)
          CALL DSA_AXIS_RANGE('IMAGE',2,' ',.FALSE.,YST,YEN,IYST,IYEN,
-     :                        STATUS)        
+     :                        STATUS)
          NYNEW=IYEN-IYST+1
          IF(YEXIST)THEN
             CALL DSA_MAP_AXIS_DATA('IMAGE',2,'READ','FLOAT',YPTR,
@@ -223,7 +223,7 @@ C     And ditto for X..
 C
       CALL DSA_SEEK_AXIS('IMAGE',1,XEXIST,STATUS)
       CALL DSA_AXIS_RANGE('IMAGE',1,' ',.FALSE.,XST,XEN,IXST,IXEN,
-     :                     STATUS)        
+     :                     STATUS)
       NXNEW=IXEN-IXST+1
       IF(XEXIST)THEN
          CALL DSA_MAP_AXIS_DATA('IMAGE',1,'READ','FLOAT',XPTR,SLOT,
@@ -236,7 +236,7 @@ C
      :                      SLOT,STATUS)
       END IF
 C
-C     Get output structure name and indicate that we can handle 
+C     Get output structure name and indicate that we can handle
 C     flagged values.
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
@@ -294,8 +294,8 @@ C
          END IF
       END IF
 C
-C     Map input and output error or variance arrays if they exists. 
-C     Reshaping of these arrays is automatically performed by 
+C     Map input and output error or variance arrays if they exists.
+C     Reshaping of these arrays is automatically performed by
 C     DSA_RESHAPE_DATA.  The reshaping is independent of which
 C     type of error data we have, but its more efficient to map the
 C     actual array in the data structure than a processed one.
@@ -324,14 +324,14 @@ C
 C
 C     Perform the subsetting.  This is complex for the axis data arrays,
 C     since a) they may not exist, b) if they simply enumerate the
-C     element numbers, we want to do the same in the result image, 
+C     element numbers, we want to do the same in the result image,
 C     rather than just take the corresponding subset.
 C
 C     First, subset the data
 C
       CALL GEN_SUBSET(%VAL(CNF_PVAL(IPTR)),NX,NY,NXNEW,NYNEW,IXST,IYST,
      :                %VAL(CNF_PVAL(IPTRO)))
-C 
+C
 C     Now the AXIS(1) data if any (checking for the nos 1-N).  Also
 C     take the appropriate section from a 2-dimensional axis when this
 C     axis does not have values 1 to NX*NY.
@@ -412,6 +412,6 @@ C
 C
 C     Close down everything
 C
-      CALL DSA_CLOSE(STATUS)   
+      CALL DSA_CLOSE(STATUS)
 
       END

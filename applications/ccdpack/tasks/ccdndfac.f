@@ -26,8 +26,8 @@
 *     in CCDPACK. For this reason the usual application introductory
 *     message is suppressed. The names of the NDFs may be written
 *     out to the terminal as an aid to memory. If no NDFs are accessed
-*     then the output file will not be created, testing for the 
-*     existence of this file is a platform independent way of 
+*     then the output file will not be created, testing for the
+*     existence of this file is a platform independent way of
 *     determining if the invocation has been successful.
 
 *  Usage:
@@ -64,7 +64,7 @@
 *        default is "BOTH".
 *        [BOTH]
 *     IN = LITERAL (Read)
-*        A list of NDF names. The NDF names should be separated 
+*        A list of NDF names. The NDF names should be separated
 *        by commas and may include wildcards.
 *        [!]
 *     MAXNDF = _INTEGER (Read)
@@ -145,7 +145,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -201,14 +201,14 @@
 *  Get the list of NDF names.
       CALL CCD1_NDFGL( 'IN', 1, MAXNDF, GID, NNDF, STATUS )
       CALL PAR_CANCL( 'IN', STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Open the output file which will contain the list of NDF names.
          CALL CCD1_ASFIO( 'NAMELIST', 'WRITE', 'LIST', 0, FD, OPEN,
      :                    STATUS )
 
 *  Write message about NDFs
-         IF ( ECHO .AND. NNDF .GT. 1 ) THEN 
+         IF ( ECHO .AND. NNDF .GT. 1 ) THEN
             CALL CCD1_MSG( ' ', ' ', STATUS )
          END IF
 
@@ -222,7 +222,7 @@
             CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )
 
 *  Echo this though the logging system if required.
-            IF ( ECHO .AND. NNDF .GT. 1 ) THEN 
+            IF ( ECHO .AND. NNDF .GT. 1 ) THEN
                CALL MSG_SETC( 'NAME', NAME )
                CALL MSG_SETI( 'N', I )
                CALL CCD1_MSG( ' ', '  ^N) ^NAME', STATUS )
@@ -233,7 +233,7 @@
          CALL FIO_CLOSE( FD, STATUS )
 
 
-      ELSE  IF ( STATUS .EQ. PAR__NULL ) THEN 
+      ELSE  IF ( STATUS .EQ. PAR__NULL ) THEN
 
 *  A null is acceptable, just get rid of the errors and continue.
          CALL ERR_ANNUL( STATUS )

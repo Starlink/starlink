@@ -87,7 +87,7 @@ proc buildRed4Widgets w {
     $Red4Widgets(LB) insert end multiply_two_images
     $Red4Widgets(LB) insert end normalise_observation
     $Red4Widgets(LB) insert end NOT_an_image
-    $Red4Widgets(LB) insert end open_engineering_log 
+    $Red4Widgets(LB) insert end open_engineering_log
     $Red4Widgets(LB) insert end OR_two_images
     $Red4Widgets(LB) insert end polysky_reduced_observation_or_group
     $Red4Widgets(LB) insert end read_an_emlt_observation_file
@@ -111,7 +111,7 @@ proc buildRed4Widgets w {
 # Set a default output (to item 57 = Status)
     $Red4Widgets(LB) selection set 57
 
-# Create scrolling region for output. 
+# Create scrolling region for output.
     set Red4Widgets(SB2) [scrollbar $middleFrame.scrollbar -orient vertical \
 	-relief sunken -bd 2]
     set Red4Widgets(OUTPUT) [text $middleFrame.text -state disabled \

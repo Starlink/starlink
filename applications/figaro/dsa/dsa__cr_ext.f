@@ -9,7 +9,7 @@ C     Creates the extension substructure for a data structure.
 C
 C  Description:
 C    Given the reference slot number in the DSA common tables for an
-C    already open structure, this routine ensures that there is a suitable 
+C    already open structure, this routine ensures that there is a suitable
 C    place for extensions to the standard format for that structure,
 C    creating it if necessary.  No error messages are output if this fails
 C    but the DTA error code from the create call is returned.
@@ -30,7 +30,7 @@ C
 C  External variables used:
 C     Only common variables internal to the DSA routines.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DTA_CRVAR, DTA_TYVAR
 C
 C  Prior requirements:
@@ -50,7 +50,7 @@ C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
 C                       original Figaro format (DST files).
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C
 C  History:
@@ -81,15 +81,15 @@ C
 C
 C     Local variables
 C
-      INTEGER   LENGTH      ! Number of characters in NAME 
+      INTEGER   LENGTH      ! Number of characters in NAME
       CHARACTER NAME*80     ! Name of the extra info sub-structure
       CHARACTER TYPE*16     ! Type of sub-structure - ignored
 C
       IF (NDF_FORMAT(REF_SLOT)) THEN
 C
 C        In NDF format, extension information goes into a .MORE.FIGARO sub-
-C        structure of the top level structure.  See if this substructure 
-C        exists.  If it doesn't then create the .MORE structure and then the 
+C        structure of the top level structure.  See if this substructure
+C        exists.  If it doesn't then create the .MORE structure and then the
 C        .MORE.FIGARO structure.
 C
          NAME=OBJ_NAMES(REF_SLOT)(:OBJ_LEN(REF_SLOT))//'.MORE.FIGARO'
@@ -102,7 +102,7 @@ C
       ELSE
 C
 C        In the original Figaro format, extra data can appear in the
-C        top level structure itself.  We assume that this exists.  
+C        top level structure itself.  We assume that this exists.
 C
          DTA_STATUS=0
       END IF

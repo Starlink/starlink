@@ -22,7 +22,7 @@
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_chars.inc'
       INCLUDE 'com_dbs_field.inc'
- 
+
 
       UPPER = NAME
       CALL UPC (UPPER)
@@ -110,7 +110,7 @@
       ELSE IF (UPPER .EQ. 'FILENAME' ) THEN
 
         DBS_INFOC = FILENAME( REF_NO )
- 
+
       ELSE
 
          WRITE(9,'(A)') ' DBS_INFOC Unknown name:'//UPPER
@@ -118,4 +118,4 @@
       END IF
 
       END
-                                           
+

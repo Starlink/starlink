@@ -13,15 +13,15 @@
 
 *  Description:
 *     This file defines global variables which describe the state of
-*     IRQ, and properties of each compiled quality expression known to 
-*     IRQ. Information describing each quality expression is stored in 
-*     arrays in common. The same element from different arrays holds 
-*     information for the same quality expression. Different elements 
-*     within each array hold information for different quality 
-*     expressions.  The identifiers used by IRQ to identify each 
-*     quality expression are just the index into these common arrays at 
+*     IRQ, and properties of each compiled quality expression known to
+*     IRQ. Information describing each quality expression is stored in
+*     arrays in common. The same element from different arrays holds
+*     information for the same quality expression. Different elements
+*     within each array hold information for different quality
+*     expressions.  The identifiers used by IRQ to identify each
+*     quality expression are just the index into these common arrays at
 *     which the information describing the quality expression is stored.
-*     The arrays have a lower bound of 1 and an upper bound given by 
+*     The arrays have a lower bound of 1 and an upper bound given by
 *     symbolic constant IRQ__MAXQ.
 *
 *     Note, the op. codes and quality masks which actually form the
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,17 +96,17 @@
 
 *  QEXP array locator.
 *  ===================
-*  The locator to the array of structures holding compiled quality 
+*  The locator to the array of structures holding compiled quality
 *  expressions. Each QEXP structure is one cell of this array.
       CHARACTER QCM_LOC*( DAT__SZLOC )
 
 *  QEXP structure locators.
 *  ========================
-*  This array holds the HDS locators to each individual compiled 
+*  This array holds the HDS locators to each individual compiled
 *  quality expression structure.
       CHARACTER QCM_LOCQ( IRQ__MAXQ )*( DAT__SZLOC )
 
-*  Locators to QEXP components. 
+*  Locators to QEXP components.
 *  ============================
 *  Each QEXP structure has 2 primative array components, called MASKS
 *  and OPCODES. These hold the masks and op codes described above.
@@ -130,7 +130,7 @@
 
 *  Which slots have been used.
 *  ==========================
-*  Each element of this array is .TRUE. if the corresponding element of 
+*  Each element of this array is .TRUE. if the corresponding element of
 *  the other arrays holds information describing a currently defined
 *  compiled quality expression.
       LOGICAL QCM_VALID( IRQ__MAXQ )

@@ -11,7 +11,7 @@
 *
 *  Description :
 *     This routine deallocates temporary storage which has previously
-*     been allocated using DAO_ALLOC.  
+*     been allocated using DAO_ALLOC.
 *     In the event of an error it will print a warning message in the
 *     usual DAOPHOT way and return normally.
 *
@@ -28,18 +28,18 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       INTEGER PNTR
- 
+
 *  Local variables :
       INTEGER STATUS            ! Starlink error status
 
 *.
- 
+
 *  Initialise the status variable.
       STATUS = SAI__OK
 

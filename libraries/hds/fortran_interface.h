@@ -83,7 +83,7 @@ F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
                            F77_POINTER_TYPE *pntr,
                            F77_INTEGER_TYPE *len,
                            F77_INTEGER_TYPE *status
-	                   TRAIL(locator) 
+	                   TRAIL(locator)
                            TRAIL(mode) );
 
 F77_SUBROUTINE(dat_ccopy)( CHARACTER(locator1),
@@ -218,7 +218,7 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
 F77_SUBROUTINE(dat_get0c)( CHARACTER(locator),
 			   CHARACTER(value),
 			   INTEGER(status)
-			   TRAIL(locator) 
+			   TRAIL(locator)
 			   TRAIL(value) );
 
 F77_SUBROUTINE(dat_get0d)( CHARACTER(locator),
@@ -462,7 +462,7 @@ F77_SUBROUTINE(dat_new0)( CHARACTER(locator),
 			  CHARACTER(type),
                           INTEGER(status)
                           TRAIL(locator)
-                          TRAIL(name) 
+                          TRAIL(name)
 			  TRAIL(type) );
 
 F77_SUBROUTINE(dat_new0d)( CHARACTER(locator),
@@ -502,7 +502,7 @@ F77_SUBROUTINE(dat_new1)( CHARACTER(locator),
 			  INTEGER(len),
                           INTEGER(status)
                           TRAIL(locator)
-                          TRAIL(name) 
+                          TRAIL(name)
 			  TRAIL(type) );
 
 F77_SUBROUTINE(dat_new1d)( CHARACTER(locator),
@@ -836,7 +836,7 @@ F77_SUBROUTINE(hds_gtune) ( CHARACTER(param_str),
 F77_SUBROUTINE(hds_link)( CHARACTER(locator),
                           CHARACTER(group),
                           F77_INTEGER_TYPE *status
-	                  TRAIL(locator) 
+	                  TRAIL(locator)
                           TRAIL(group) );
 
 F77_SUBROUTINE(hds_lock)( CHARACTER(locator),
@@ -903,7 +903,7 @@ F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
                            TRAIL(locator) );
 
 /*=================================================================*/
-/*  Deprecated routines!                                           */   
+/*  Deprecated routines!                                           */
 /*=================================================================*/
 
 F77_SUBROUTINE(dat_conv)( CHARACTER(locator),

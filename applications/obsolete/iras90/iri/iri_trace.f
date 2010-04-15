@@ -22,9 +22,9 @@
 *        been obtained using routine IRI_OLD or IRI_NEW.
 *     ROUTNE = EXTERNAL (Given)
 *        A routine to which is passed each line of text for display.
-*        It should have the same argument list as MSG__OUTIF (see 
-*        SUN/104), and should be declared EXTERNAL in the calling 
-*        routine. All calls to this routine are made with priority 
+*        It should have the same argument list as MSG__OUTIF (see
+*        SUN/104), and should be declared EXTERNAL in the calling
+*        routine. All calls to this routine are made with priority
 *        MSG_NORM.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,9 +120,9 @@
 
       END IF
 
-      CALL MSG_LOAD( 'IRI_TRACE_MSG3', 'Waveband            : ^B um', 
+      CALL MSG_LOAD( 'IRI_TRACE_MSG3', 'Waveband            : ^B um',
      :               BUF, BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG3', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG3', BUF( : BUFLEN ),
      :             STATUS )
 
 *  Initialise the type of image.
@@ -227,7 +227,7 @@
       CALL MSG_SETC( 'C', TYPE )
       CALL MSG_LOAD( 'IRI_TRACE_MSG4',
      :               'Image type          : ^C', BUF, BUFLEN, STATUS )
-      CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG4', BUF( : BUFLEN ), 
+      CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG4', BUF( : BUFLEN ),
      :             STATUS )
 
 
@@ -237,9 +237,9 @@
          CALL CMP_GET0C( LOC, 'COLCOR', CVAL, STATUS )
          CALL MSG_SETC( 'C', CVAL )
          CALL MSG_LOAD( 'IRI_TRACE_MSG5',
-     :                'Colour correction   : ^C', BUF, BUFLEN, 
+     :                'Colour correction   : ^C', BUF, BUFLEN,
      :                STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG5', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG5', BUF( : BUFLEN ),
      :                STATUS )
       END IF
 
@@ -248,7 +248,7 @@
          CALL MSG_SETI( 'I', ISSAF )
          CALL MSG_LOAD( 'IRI_TRACE_MSG6',
      :                'Field number        : ^I', BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG6', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG6', BUF( : BUFLEN ),
      :                STATUS )
       END IF
 
@@ -259,7 +259,7 @@
          CALL MSG_SETI( 'I', IVAL )
          CALL MSG_LOAD( 'IRI_TRACE_MSG7',
      :                'Map number          : ^I', BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG7', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG7', BUF( : BUFLEN ),
      :                STATUS )
       END IF
 
@@ -270,7 +270,7 @@
          CALL MSG_SETI( 'I', IVAL )
          CALL MSG_LOAD( 'IRI_TRACE_MSG8',
      :                'HCON                : ^I', BUF, BUFLEN, STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG8', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG8', BUF( : BUFLEN ),
      :                STATUS )
       END IF
 
@@ -295,7 +295,7 @@
          CALL MSG_LOAD( 'IRI_TRACE_MSG9',
      :                'SOP range           : ^MIN to ^MAX', BUF, BUFLEN,
      :                STATUS )
-         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG9', BUF( : BUFLEN ), 
+         CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG9', BUF( : BUFLEN ),
      :                STATUS )
 
       ELSE IF( MAX( MAXSOP, MINSOP ) .NE. 0 ) THEN
@@ -305,7 +305,7 @@
      :                STATUS )
          CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG10', BUF( : BUFLEN ),
      :                STATUS )
-         
+
       END IF
 
 *  OBSNO.
@@ -327,7 +327,7 @@
          CALL MSG_SETR( 'R', RVAL )
          CALL MSG_SETC( 'C', CVAL )
          CALL MSG_LOAD( 'IRI_TRACE_MSG14',
-     :                'Median noise         : ^R ^C', BUF, BUFLEN, 
+     :                'Median noise         : ^R ^C', BUF, BUFLEN,
      :                  STATUS )
          CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG14', BUF( : BUFLEN ),
      :                STATUS )
@@ -366,15 +366,15 @@
          CALL IRA_DTOC1( DVAL, CVAL, 2, 2, BTEXT, STATUS )
 
          CALL MSG_SETC( 'AD', ADESCR )
-         CALL MSG_SETC( 'A', ATEXT )      
-         CALL MSG_LOAD( 'IRI_TRACE_MSG18', '   ^AD ^A', BUF, BUFLEN, 
+         CALL MSG_SETC( 'A', ATEXT )
+         CALL MSG_LOAD( 'IRI_TRACE_MSG18', '   ^AD ^A', BUF, BUFLEN,
      :                  STATUS )
          CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG18', BUF( : BUFLEN ),
      :                STATUS )
 
          CALL MSG_SETC( 'BD', BDESCR )
-         CALL MSG_SETC( 'B', BTEXT )      
-         CALL MSG_LOAD( 'IRI_TRACE_MSG19', '   ^BD ^B', BUF, BUFLEN, 
+         CALL MSG_SETC( 'B', BTEXT )
+         CALL MSG_LOAD( 'IRI_TRACE_MSG19', '   ^BD ^B', BUF, BUFLEN,
      :                  STATUS )
          CALL ROUTNE( MSG__NORM, 'IRI_TRACE_MSG19', BUF( : BUFLEN ),
      :                STATUS )

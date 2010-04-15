@@ -26,7 +26,7 @@
 *     plotting box. This results in any detector to detector striping
 *     being apparent in the traces, which could result in the traces
 *     becoming confused under high magnification.
-*    
+*
 *     2) 'AVERAGE' :This method uses an 'average' data value for each
 *     trace and produces offsets which ensure that these 'average' data
 *     values are equally spaced over the plotting area.  Any detector to
@@ -40,7 +40,7 @@
 *         1 :'CONSTANT' offset
 *
 *         2 :'AVERAGE' offset
-* 
+*
 *     BDET = INTEGER (Given)
 *        The begin index of the detectors in the CRDD data array.
 *     EDET = INTEGER (Given)
@@ -50,7 +50,7 @@
 *     DTINDX( NDISP ) = INTEGER (Given)
 *        The detector indice whose data traces will be displayed.
 *     YLMT( 2 ) = REAL (Given)
-*        The lower and upper limits of the display in flux density after 
+*        The lower and upper limits of the display in flux density after
 *        scaling.
 *     AVERAG( BDET : EDET ) = REAL (Given)
 *        The average unscale data values for each detector.
@@ -78,14 +78,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants.
-                                
+
 *  Arguments Given:
       INTEGER OFMTHD
       INTEGER BDET
@@ -101,7 +101,7 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-                                 ! 
+                                 !
 *  Local Variables:
       INTEGER I                  ! Do loop index
       REAL AVEBTM                ! scaled average value of bottom trace
@@ -125,9 +125,9 @@
 
 *  Get the scaled 'average' value of the bottom trace if it is valid.
          IF ( AVERAG( DTINDX( 1 ) ) .NE. VAL__BADR .AND.
-     :        SCALE( 1 ) .NE. VAL__BADR ) THEN 
+     :        SCALE( 1 ) .NE. VAL__BADR ) THEN
             AVEBTM = SCALE( 1 ) * AVERAG( DTINDX( 1 ) )
-         
+
 *  Otherwise set the bottom average as 0.
          ELSE
             AVEBTM = 0.0
@@ -136,7 +136,7 @@
 *  Enter a do loop to calculate offset for each trace.
          DO I = 1, NDISP
 
-*  If the detector is valid, calculate its offset. 
+*  If the detector is valid, calculate its offset.
             IF ( AVERAG( DTINDX( I ) ) .NE. VAL__BADR .AND.
      :           SCALE( I ) .NE. VAL__BADR ) THEN
                OFFSET( I ) = AVEBTM - SCALE( I ) * AVERAG( DTINDX( I ) )
@@ -149,5 +149,5 @@
             END IF
          END DO
       END IF
-      
+
       END

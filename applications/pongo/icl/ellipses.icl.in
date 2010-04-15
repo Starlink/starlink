@@ -51,7 +51,7 @@ EXPAND 0.5
 {  Set the SCALE global parameter to scale the error ellipses.
 SETGLOBAL PONGO_ERSCALE 2.3
 
-{  Change the axis options global parameters to make the x=0 and y=0 
+{  Change the axis options global parameters to make the x=0 and y=0
 {  lines appear.
 SETGLOBAL PONGO_XOPT ABCNST
 SETGLOBAL PONGO_YOPT ABCNST
@@ -86,12 +86,12 @@ MTEXT T 1.0 0.5 0.5 'Defford only'
 {  Change the plotting pen.
 PEN 2
 
-{  Plot the points - note that because there is no command-line parameter, 
-{  and values have been read into the symbol column, these values are used 
+{  Plot the points - note that because there is no command-line parameter,
+{  and values have been read into the symbol column, these values are used
 {  to determine the symbol type.
 POINTS
 
-{  Change the pen again - note that the full form of the command is being 
+{  Change the pen again - note that the full form of the command is being
 {  used not its alias as above.
 CHANGE COLOUR=4
 
@@ -104,14 +104,14 @@ ELLIPSES NOAXES
 
 {  Find how many data points have been read (this was written out to the
 {  global parameter PONGO_NDATA by the read command.
-GETGLOBAL PONGO_NDATA (NDATA) 
+GETGLOBAL PONGO_NDATA (NDATA)
 
-{  Use the radiate command to draw lines from each of the data points to 
+{  Use the radiate command to draw lines from each of the data points to
 {  the origin.
 RADIATE 0.0 0.0 (NDATA)
 
 {  Draw the axis labels and the plot title.
-LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50 
+LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50
 
 {  Produce two more similar plots in different areas of the screen...
 VP_BR
@@ -119,14 +119,14 @@ READF SELCOND='3 = 12'
 WORLD DATA0
 WNAD
 BOXFRAME
-MTEXT T 1.0 0.5 0.5 'Knockin only' 
+MTEXT T 1.0 0.5 0.5 'Knockin only'
 CHANGE COLOUR=2
 POINTS
 CHANGE COLOUR=4
 ANNOTATE
 CHANGE COLOUR=1
 ELLIPSES NOAXES
-GETGLOBAL PONGO_NDATA (NDATA) 
+GETGLOBAL PONGO_NDATA (NDATA)
 RADIATE 0.0 0.0 (NDATA)
 
 {  Note that LABEL remembers the previous axis labels.
@@ -143,15 +143,15 @@ CHANGE COLOUR=4
 ANNOTATE
 CHANGE COLOUR=1
 ELLIPSES NOAXES
-GETGLOBAL PONGO_NDATA (NDATA) 
+GETGLOBAL PONGO_NDATA (NDATA)
 RADIATE 0.0 0.0 (NDATA)
-LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50 
+LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50
 
 {  Change the character height and viewport back to their default sizes.
 CHANGE CHEIGHT=1.0
 VSTAND
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 

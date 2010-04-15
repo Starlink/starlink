@@ -13,7 +13,7 @@
 
 *  Description:
 *     This file defines global variables which describe the state of
-*     ARD. 
+*     ARD.
 
 *  Prior Requirements:
 *     The SAE_PAR and ARD_CONST include files should be included before
@@ -28,12 +28,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -55,7 +55,7 @@
 *  Operators
 *  =========
 *  The symbols used to represent each operator.
-      CHARACTER CMN_OPSYM( ARD__NOPSY )*( ARD__SZOPR ) 
+      CHARACTER CMN_OPSYM( ARD__NOPSY )*( ARD__SZOPR )
 
 *  The actual length of each operator symbol (including dots).
       INTEGER CMN_OPLEN( ARD__NOPSY )
@@ -101,7 +101,7 @@
 *  Keyword
 *  =======
 *  The symbols used to represent each keyword.
-      CHARACTER CMN_KWSYM( ARD__NKEYW )*( ARD__SZKEY ) 
+      CHARACTER CMN_KWSYM( ARD__NKEYW )*( ARD__SZKEY )
 
 *  The actual length of each keyword.
       INTEGER CMN_KWLEN( ARD__NKEYW )
@@ -113,7 +113,7 @@
 *  Statements
 *  ==========
 *  The symbols used to represent each statement.
-      CHARACTER CMN_STSYM( ARD__NSTAT )*( ARD__SZSTA ) 
+      CHARACTER CMN_STSYM( ARD__NSTAT )*( ARD__SZSTA )
 
 *  The actual length of each statement.
       INTEGER CMN_STLEN( ARD__NSTAT )
@@ -125,10 +125,10 @@
 *  regions, "fills" nonzero-volume regions.
 *  ===============================================================
 *  The MSKSIZ value passed to the ARD "drawing" routines.
-      INTEGER CMN_MSKSC 
+      INTEGER CMN_MSKSC
 
 *  The RINDEX value passed to the ARD "drawing" routines.
-      INTEGER CMN_RNDXC 
+      INTEGER CMN_RNDXC
 
 *  Pointer to the B array passed to the ARD "drawing" routines.
       INTEGER CMN_IPBC
@@ -137,21 +137,21 @@
       INTEGER CMN_IPPAR
 
 *  The lower bounds of the B array passed to the ARD "drawing" routines.
-      INTEGER CMN_LBNDC( 2 ) 
+      INTEGER CMN_LBNDC( 2 )
 
 *  The upper bounds of the B array passed to the ARD "drawing" routines.
-      INTEGER CMN_UBNDC( 2 ) 
+      INTEGER CMN_UBNDC( 2 )
 
-*  The lower bounds of the interior bounding box passed to the ARD 
+*  The lower bounds of the interior bounding box passed to the ARD
 *  "drawing" routines.
-      INTEGER CMN_LBIBC( 2 ) 
+      INTEGER CMN_LBIBC( 2 )
 
-*  The upper bounds of the interior bounding box passed to the ARD 
+*  The upper bounds of the interior bounding box passed to the ARD
 *  "drawing" routines.
-      INTEGER CMN_UBIBC( 2 ) 
+      INTEGER CMN_UBIBC( 2 )
 
 *  The region type.
-      INTEGER CMN_TYPEC 
+      INTEGER CMN_TYPEC
 
 *  The number of region parameters supplied.
       INTEGER CMN_NPARC
@@ -163,10 +163,10 @@
       LOGICAL CMN_INIT
 
 *  GRP identifier for group holding AST_ data.
-      INTEGER CMN_IGRP 
+      INTEGER CMN_IGRP
 
 *  Next element to use in group holding AST_ data.
-      INTEGER CMN_NXTLN 
+      INTEGER CMN_NXTLN
 
 *  Misc.
 *  =====
@@ -206,7 +206,7 @@
      :                CMN_LBNDC, CMN_UBNDC, CMN_LBIBC, CMN_UBIBC,
      :                CMN_MSKSC, CMN_RNDXC, CMN_TYPEC, CMN_NPARC,
      :                CMN_FRMC, CMN_IPPAR, CMN_INIT, CMN_IGRP,
-     :                CMN_NXTLN, CMN_AWCS, CMN_AGRP, CMN_ASTLN, 
+     :                CMN_NXTLN, CMN_AWCS, CMN_AGRP, CMN_ASTLN,
      :                CMN_LINOK
 
 *  Declare the common block /ARD_C2/, to hold character variables.

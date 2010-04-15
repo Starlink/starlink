@@ -1,16 +1,16 @@
 *+  RED4_REDUCE_BIAS_OBS - Reduce a BIAS observation
       SUBROUTINE RED4_REDUCE_BIAS_OBS( OBS_NAME, STATUS )
 *    Description :
-*     This routine take a BIAS observation of name Oyymmdd_n in ODIR, searches 
-*     IDIR (the raw integration directory) for the integrations that belong to 
-*     it (Iyymmdd_n_m) and reduces them all at once into a reduced observation 
+*     This routine take a BIAS observation of name Oyymmdd_n in ODIR, searches
+*     IDIR (the raw integration directory) for the integrations that belong to
+*     it (Iyymmdd_n_m) and reduces them all at once into a reduced observation
 *     file ROyymmdd_n in RODIR. Individual files containing reduced integrations
 *     are not produced. The reduction in this case consists of dividing the
-*     numbers coadded in the ADP for each integration by the number of 
+*     numbers coadded in the ADP for each integration by the number of
 *     exposures that went into the coadd, then adding the result into the
 *     result array of the observation. Errors are calculated from the spread
 *     of the numbers about the mean. Chopped integrations are not allowed,
-*     nor are ones with weighted frames. 
+*     nor are ones with weighted frames.
 *    Invocation :
 *     CALL RED4_REDUCE_BIAS_OBS (OBS_NAME, STATUS)
 *    Parameters :
@@ -154,8 +154,8 @@
       LOGICAL LOOPING                    ! T while looping through component integrations
       LOGICAL EXIST                      ! T if the integration file exists
       INTEGER FLOATSIZE                  ! Number of bytes per element in a 'FLOAT' array
-      INTEGER BYTESIZE                   ! Number of bytes per element in a 'BYTE' array 
-      INTEGER INTEGRATION                ! Number of current integration 
+      INTEGER BYTESIZE                   ! Number of bytes per element in a 'BYTE' array
+      INTEGER INTEGRATION                ! Number of current integration
       INTEGER TOTAL_INTS                 ! The total number of integrations
       INTEGER NDIM                       ! The dimensions of the integration array
       INTEGER N_EXPOSURES                ! The number of exposures that were coadded in the integration
@@ -263,7 +263,7 @@
          GOTO 500
       ENDIF
 
-*    Get the name of the quality mask file, if there is one, and map it 
+*    Get the name of the quality mask file, if there is one, and map it
       CALL PAR_GET0C( 'MASK', MASK, STATUS )
       CALL PAR_CANCL( 'MASK', STATUS )
       IF ( INDEX( MASK, SEPARATOR ) .EQ. 0 ) THEN
@@ -273,7 +273,7 @@
       IF ( INDEX( MASK, '#') .EQ. 0 ) THEN
          CALL MSG_SETC( 'MASK', MASK )
          CALL MSG_OUT( ' ', 'Using the bad pixel mask ^MASK', STATUS )
-         CALL DSA_NAMED_INPUT( 'MASK', MASK, STATUS )  
+         CALL DSA_NAMED_INPUT( 'MASK', MASK, STATUS )
          CALL DSA_MAP_DATA( 'MASK', 'READ', 'BYTE', MASK_DATA, MASK_SLOT, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -299,10 +299,10 @@
 
 *    Obtain the number of bytes per element in a data array of type 'FLOAT' and 'BYTE'
 *    Open the COADDS structure of the reduced observation file. This will
-*    hold info on how many coadds have gone into the result array. Map in 
+*    hold info on how many coadds have gone into the result array. Map in
 *    its data array, and get the DTA name of the associated .COADDED_INTS
 *    structure that will hold the (compressed) names of those
-*    integrations that are added 
+*    integrations that are added
       CALL DSA_GET_ACTUAL_NAME( 'OBS_RED', OBSREDFILE, STATUS )
       CALL DSA_NAMED_INPUT( 'COADDS', OBSREDFILE(1:CHR_LEN(OBSREDFILE))//'.MORE.CGS4_COADDS', STATUS )
       IF ( FIRST ) THEN
@@ -337,7 +337,7 @@
       OBSERVATION_TIME = 0.0
 
       DO WHILE ( LOOPING )
-        
+
 *       Construct integration file name
          INTEGRATION = INTEGRATION + 1
          CALL CHR_ITOC( INTEGRATION, CINTEGRATION, CPOS  )
@@ -394,7 +394,7 @@
 
 *       If a bad pixel mask has been specified, check the dimensions match
          IF ( INDEX( MASK, '#' ) .EQ. 0 ) THEN
-            CALL DSA_MATCH_DIMENSION( 'INT_IN', 1, 'MASK', 1, STATUS ) 
+            CALL DSA_MATCH_DIMENSION( 'INT_IN', 1, 'MASK', 1, STATUS )
             CALL DSA_MATCH_DIMENSION( 'INT_IN', 2, 'MASK', 2, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                STATUS = SAI__ERROR
@@ -473,7 +473,7 @@
       IF ( VERBOSE .AND. STATUS.EQ.SAI__OK ) CALL MSG_OUT( ' ', 'BIAS reduction completed OK', STATUS )
 
 *    Check that the variances are non-negative, they'll crash DSA close if they are
-      IF ( VARIANCE_MAP .AND. ( NELM_OBS .GT. 0 ) ) CALL GEN_CLIPF( %val(RED_VAR), 
+      IF ( VARIANCE_MAP .AND. ( NELM_OBS .GT. 0 ) ) CALL GEN_CLIPF( %val(RED_VAR),
      :   NELM_OBS, 0.0, VAL__MAXR, IGNORE, IGNORE, %val(RED_VAR) )
 
 *    Set the data label and units
@@ -491,6 +491,6 @@
       CALL DSA_SET_EXPOSURE( 'OBS_RED', OBSERVATION_TIME, STATUS )
       CALL DSA_PUT_FITS_C( 'OBS_RED', 'MASKUSED', MASK(1:CHR_LEN(MASK)), ' ', STATUS )
 
-*    Destination for error GOTOs 
+*    Destination for error GOTOs
  500  CONTINUE
       END

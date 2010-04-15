@@ -10,7 +10,7 @@
 *   Sets random-number seed for PDA routines.
 
 * Description:
-*   This routine uses PSX_TIME to obtain a starting INTEGER to feed to 
+*   This routine uses PSX_TIME to obtain a starting INTEGER to feed to
 *   PDA_RNSED to set the random number seed.
 
 * Arguments:
@@ -36,7 +36,7 @@
       IF(STATUS .NE. SAI__OK) RETURN
       SEED = ( TICKS / 4 ) * 4 + 1
       CALL PDA_RNSED( SEED, STATUS )
-      
+
       END
 
 

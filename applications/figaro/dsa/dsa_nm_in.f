@@ -9,7 +9,7 @@ C     Opens a Figaro structure for input, giving it a reference name.
 C
 C  Description:
 C     DSA_NAMED_INPUT takes the name of a data structure object - either
-C     just a file name, eg DISK:[DIR]FILE, or a structured name combining 
+C     just a file name, eg DISK:[DIR]FILE, or a structured name combining
 C     a file name with the name of a structure within that file, eg
 C     DISK$DATA:[DIR.SUBDIR]FILE.DATA_STRUCTURE - and opens it for input,
 C     associating it with a specified reference name.
@@ -33,7 +33,7 @@ C  External variables used:
 C     Only common variables internal to the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     DTA_ERROR, DTA_ASFNAM, DTA_TYVAR, ICH_FOLD, ICH_LEN, 
+C     DTA_ERROR, DTA_ASFNAM, DTA_TYVAR, ICH_FOLD, ICH_LEN,
 C     DSA_WRUSER, DSA_FNAME, DSA_INIT_REF_SLOT, DSA__SET_FILE_TYPE
 C
 C  Prior requirements:
@@ -65,7 +65,7 @@ C                     each file.
 C     (!) FILE_USED   (Logical array) Indicates file table slot in use..
 C     (>) MAX_REFS    (Integer parameter) Maximum number of reference names.
 C     (<) OBJ_LEN     (Integer array) Number of chars in each OBJ_NAME.
-C     (<) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data 
+C     (<) OBJ_NAMES   (String array) Name (as recognised by DTA_) of data
 C                     object corresponding to reference name.
 C     (<) ACTUAL_NAMES(String array) Full ref name structure specification.
 C     (<) REF_FILE    (Integer array) File slot number of file in question.

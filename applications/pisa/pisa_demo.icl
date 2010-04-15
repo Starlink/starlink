@@ -21,9 +21,9 @@
 {     {enter_changes_here}
 
 {-
-{ 
+{
 {  Find out which graphics device we're using.
-proc pisa_demo p1 
+proc pisa_demo p1
    print "Using device",(p1)
 {
 {  Device needs a @ to get HDS variable resolved.
@@ -81,7 +81,7 @@ proc pisa_demo p1
    pisapeak in=$PISA_DIR/frame finddata=pisafind.dat ~
     results=pisapeak.dat reset accept
 {
-{ apply a cut to the data in peakedness 
+{ apply a cut to the data in peakedness
    print " "
    print "......Applying cut to peakedness parameter using PISACUT......"
    pisacut input=pisapeak.dat column=2 thresh=0.85 lower=stars1 ~
@@ -93,7 +93,7 @@ proc pisa_demo p1
    pisamatch one=stars1 two=pisafind.dat out=stars11 reset accept
    pisamatch one=gals1 two=pisafind.dat out=gals11 reset accept
 {
-{ display these 
+{ display these
    pisagrey $PISA_DIR/frame drange=[477,700] ~
     device=(device) noaxes reset accept
    print " "

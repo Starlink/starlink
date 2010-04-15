@@ -119,7 +119,7 @@
 int
 hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 	 int *result, int  *status)
-{        
+{
 /*===============================*/
 /* HDS_INFOI - Retrieve HDS statistic */
 /*===============================*/
@@ -133,7 +133,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 #define context_message\
         "HDS_INFOI: Error retrieving HDS statistics."
 
-   struct DSC      topic; 
+   struct DSC      topic;
 
    struct LCP      *lcp;
    struct LCP_DATA *data;
@@ -144,7 +144,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
    int             i;
    int             j;
    int             ncomp = 0;
-   char            *comps[MAXCOMP]; 
+   char            *comps[MAXCOMP];
    size_t          len;
    int             match;
    int             exclude;

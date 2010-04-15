@@ -1,7 +1,7 @@
       SUBROUTINE CAT_TIDNT (CI, GNAME, GI, STATUS)
 *+
 *  Name:
-*     CAT_TIDNT 
+*     CAT_TIDNT
 *  Purpose:
 *     Get an identifier for a named pre-existing component.
 *  Language:
@@ -9,7 +9,7 @@
 *  Invocation:
 *     CALL CAT_TIDNT (CI, GNAME; GI; STATUS)
 *  Description:
-*     Get an identifier for a named pre-existing component.  The 
+*     Get an identifier for a named pre-existing component.  The
 *     component may be of any type.
 *  Arguments:
 *     CI  =  INTEGER (Given)
@@ -24,7 +24,7 @@
 *  Algorithm:
 *     Attempt to get an existing identifier for the component.
 *     If an identifier was not obtained then
-*       Check whether the component could correspond to a vector 
+*       Check whether the component could correspond to a vector
 *       element.
 *       If so then
 *         Attempt to create a new identifier for the vector element.
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -135,7 +135,7 @@
          END IF
 
 *
-*       If any error occurred the set the identifier to the null 
+*       If any error occurred the set the identifier to the null
 *       identifier (it probably already had this value) and report the
 *       error.
 

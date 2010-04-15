@@ -13,15 +13,15 @@
 *     CALL CHR_SORT( CHR_SCOMP, MXARY, ARRAY, NSORT )
 
 *  Description:
-*     Sort an array of character variables into alphabetical order 
-*     using the collating sequence provided by the routine CHR_SCOMP. 
-*     After the sort, a search is made to remove any values which 
-*     occur more than once. The total number of unique values is 
+*     Sort an array of character variables into alphabetical order
+*     using the collating sequence provided by the routine CHR_SCOMP.
+*     After the sort, a search is made to remove any values which
+*     occur more than once. The total number of unique values is
 *     returned.
 
 *  Arguments:
 *     CHR_SCOMP = LOGICAL FUNCTION (Given)
-*        An external function which compares two character strings 
+*        An external function which compares two character strings
 *        and returns whether the first string is less than the second.
 *     MXARY = INTEGER (Given)
 *        The number of character values to sort.
@@ -31,16 +31,16 @@
 *        The number of unique character values returned.
 
 *  Algorithm:
-*     -  The sort algorithm used in this subroutine is a modified 
+*     -  The sort algorithm used in this subroutine is a modified
 *     bubble sort (the Shell-Mezgar algorithm). Using a diminishing
-*     increment, this variant of the bubble sort has a speed gain of 
-*     N**1/2 over the conventional algorithm. Other, faster, sort 
-*     algorithms all require the use of work-space for character 
+*     increment, this variant of the bubble sort has a speed gain of
+*     N**1/2 over the conventional algorithm. Other, faster, sort
+*     algorithms all require the use of work-space for character
 *     strings and so were not used.
 
 *  Notes:
 *     To use this subroutine it is necessary to declare the function
-*     CHR_SCOMP, or its equivalent, to be EXTERNAL in the calling 
+*     CHR_SCOMP, or its equivalent, to be EXTERNAL in the calling
 *     routine.
 
 *  Copyright:
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,7 +98,7 @@
 *  Local Constants:
       DOUBLE PRECISION LN2INV    ! Inverse of ln(2)
       PARAMETER ( LN2INV = 1.0D+00 / 0.6931471805599453D+00 )
-      
+
       DOUBLE PRECISION TINY      ! Tiny value to overcome rounding
       PARAMETER ( TINY = 1.0D-13 )
 

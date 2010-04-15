@@ -19,7 +19,7 @@
 *                work out sector statistics if enabled (refer to A-B)
 *                if not using non-destructive reads
 *                   subtract suitable BIAS (any) from phase A and phase B
-*                linearise phase A and phase B and variances 
+*                linearise phase A and phase B and variances
 *                subtract phase A from phase B
 *                divide by suitable FLAT (same chip exposure time
 *                   and optical configuration), if required.
@@ -65,7 +65,7 @@
 *     20-Feb-1990: Null bad pixel mask changed from ' ' to '#',
 *                  as it was difficult to process ' ' with ICL
 *                  variables.                                     (SMB)
-*      2-Mar-1990: Status check added before call to 
+*      2-Mar-1990: Status check added before call to
 *                  RED4_INDEX_ARITHMETIC, to prevent an adjustable
 *                  array bounds violation.                        (SMB)
 *      9-Mar-1990: MAXDIM and RMAXDIM parameters added.           (SMB)
@@ -168,7 +168,7 @@
 *                  with standard deviation.                       (SMB)
 *     11-Sep-1991: GEN_MULCAFEV renamed to GEN_MULCAFV, and argument
 *                  list made compatible with Figaro version.      (SMB)
-*      1-Oct-1991: Change other GEN_routines.                     (PND) 
+*      1-Oct-1991: Change other GEN_routines.                     (PND)
 *      8-Oct-1991: Call RED4_GET_OBSERVATION instead of
 *                  RED4_SEEK_OBSERVATION, so that calibration
 *                  observations can be specified explicitly when
@@ -187,8 +187,8 @@
 *    Status :
       INTEGER STATUS
 *    Input :
-      CHARACTER*(*) INT_NAME             ! the basic name of the integration 
-*                                             file to be reduced, e.g. 
+      CHARACTER*(*) INT_NAME             ! the basic name of the integration
+*                                             file to be reduced, e.g.
 *                                             I890816_1_1.
       CHARACTER*(*) TYPE                 ! the particular type of 'SPECTRA'
 *                                             observation this is;
@@ -208,14 +208,14 @@
 *                                             observation
       LOGICAL PROCEED_DARK               ! T if subtracting DARK
 *                                             observation
-      LOGICAL PROCEED_FF                 ! T if dividing by flat-field 
+      LOGICAL PROCEED_FF                 ! T if dividing by flat-field
 *                                             observation
       LOGICAL VARIANCE_MAP               ! T if variance array of reduced
 *                                            observation has been mapped
-      INTEGER NDIM                       ! the dimensions of the raw 
+      INTEGER NDIM                       ! the dimensions of the raw
 *                                             integration array
       INTEGER DIMS( MAXDIM )             !                "
-      INTEGER RED_DIMS( RMAXDIM )        ! the dimensions of the reduced 
+      INTEGER RED_DIMS( RMAXDIM )        ! the dimensions of the reduced
 *                                             integration data array
       INTEGER N_EXPOSURES                ! the number of exposures that were
 *                                             coadded in the integration
@@ -295,7 +295,7 @@
 *    and the parent observation file as 'OBSERVATION' before this
 *    routine is called
 *    start the preparations-
-*    first try to check that we have all the information for 
+*    first try to check that we have all the information for
 *    the integration reduction to proceed.
 *    Get the INT_TYPE (otherwise known as the observing mode, 'STARE',
 *    'CHOP' etc...)
@@ -386,7 +386,7 @@
 
 *    Find the size of the input data array
       CALL DSA_DATA_SIZE ('INT_IN', MAXDIM, NDIM, DIMS, NELM,
-     :  DSA_STATUS) 
+     :  DSA_STATUS)
 
 *    and the number of elements in a single plane of that array
       NPLANE = DIMS(1) * DIMS(2)
@@ -399,7 +399,7 @@
 *    type 'FLOAT' from DSA
       FLOATSIZE = DSA_TYPESIZE( 'FLOAT', DSA_STATUS )
 
-      IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+      IF ( DSA_STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :     /'Error getting FLOAT size', STATUS )
@@ -474,7 +474,7 @@
       END IF
 
 *    Find the name of the observation file responsible for this
-*    integration, from it construct the name of the the observation 
+*    integration, from it construct the name of the the observation
 *    index file which should have a name of the form CGS4_yymmdd.INDEX
 *    Index files are found in the directory whose logical name is
 *    CGS4_INDEX.
@@ -482,7 +482,7 @@
       CALL DSA_GET_FITS_C( 'INT_IN', 'OBSFILE', 0, OBSFILE, COMMENT,
      :  DSA_STATUS )
 
-      IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+      IF ( DSA_STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :     /'Error getting FITS item OBSFILE', STATUS )
@@ -492,7 +492,7 @@
 
 *    If non-destructive reads are not being used, then we need a ready
 *    reduced BIAS observation for this reduction. Either search the index
-*    file for a suitable BIAS, or use one which has been specified 
+*    file for a suitable BIAS, or use one which has been specified
 *    explicitly. The data, errors and quality for this observation
 *    will be held in virtual memory, with the relevant pointers stored
 *    in /RED4_COMMON/.
@@ -520,7 +520,7 @@
 
 *    If the observation was taken in STARE mode, a reduced DARK observation
 *    may also be needed for this reduction. Either search the index
-*    file for a suitable BIAS, or use one which has been specified 
+*    file for a suitable BIAS, or use one which has been specified
 *    explicitly. The data, errors and quality for this observation
 *    will be held in virtual memory, with the relevant pointers stored
 *    in /RED4_COMMON/.
@@ -546,9 +546,9 @@
          ENDIF
       ENDIF
 
-*    If we are dividing by a flat field then we need a ready reduced FLAT 
+*    If we are dividing by a flat field then we need a ready reduced FLAT
 *    observation for this reduction. Either search the index
-*    file for a suitable FLAT, or use one which has been specified 
+*    file for a suitable FLAT, or use one which has been specified
 *    explicitly. The data, errors and quality for this observation
 *    will be held in virtual memory, with the relevant pointers stored
 *    in /RED4_COMMON/.
@@ -582,7 +582,7 @@
                   CALL MSG_OUT( ' ', '**************************'/
      :              /'*******************************', STATUS )
                   CALL MSG_OUT( ' ', ' ', STATUS )
-                  CALL MSG_OUT( ' ', 
+                  CALL MSG_OUT( ' ',
      :              'Reset the RED4 task using', STATUS )
                   CALL MSG_OUT( ' ', '"ICL> OBEYW RED4 RESET"', STATUS )
                   CALL MSG_OUT( ' ', ' ', STATUS )
@@ -616,12 +616,12 @@
          DSA_STATUS = STATUS
          CALL DSA_NAMED_INPUT ('MASK', MASK, DSA_STATUS)
 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS ) 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS ) 
+         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS )
+         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS )
 
          CALL DSA_MAP_DATA ('MASK', 'READ', 'BYTE', MASK_DATA,
      :     MASK_SLOT, DSA_STATUS)
-         IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+         IF ( DSA_STATUS .NE. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :        /'Error mapping MASK data', STATUS )
@@ -632,10 +632,10 @@
 *    so open the output file according to the reduced integration template
 *    and with the correct filename e.g. RI890801_1_1 from I890801_1_1
       DSA_STATUS = STATUS
-      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE', 
+      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE',
      :   INTRED_TEMPLATE, DSA_STATUS)
 
-      IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+      IF ( DSA_STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :     /'Error mapping integration template', STATUS )
@@ -652,20 +652,20 @@
       ENDIF
 
       DSA_STATUS = STATUS
-      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE', 
+      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE',
      :   0, 0, DSA_STATUS)
 
 *    Copy the contents of the FITS structure from the raw integration file
 *    over to the reduced integration file (deleting the old structure first,
 *    if present)
-      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE, 
+      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE,
      :   'INT_RED.'//FITS_STRUCTURE, STATUS )
 
 *    Map in the data array of the reduced integration file, and the
-*    variance and quality arrays 
+*    variance and quality arrays
       DSA_STATUS = STATUS
       CALL DSA_USE_QUALITY ('INT_RED', DSA_STATUS)
-      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA, 
+      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA,
      :   DATA_SLOT, DSA_STATUS)
       CALL DSA_MAP_QUALITY ('INT_RED', 'WRITE', 'BYTE', RED_QUAL,
      :   QUAL_SLOT, DSA_STATUS)
@@ -690,7 +690,7 @@
          CALL GEN_FILL (FLOATSIZE*NPLANE, 0, %val(RED_VAR))
       ENDIF
 
-      IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+      IF ( DSA_STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :     /'First error in DSA routines', STATUS )
@@ -700,13 +700,13 @@
 *    Simpler if split it up into CHOP case and STARE
       IF (INDEX(INT_TYPE,'STARE') .NE. 0) THEN
 
-*       Copy the Phase A plane of the integration array into the result data 
+*       Copy the Phase A plane of the integration array into the result data
 *       array. If a bad pixel mask is being used, copy its contents into
 *       the data quality array. Otherwise fill the data quality array
 *       with zeros.
          IF (DSA_STATUS .EQ. SAI__OK) THEN
 
-            CALL GEN_MOVE (FLOATSIZE*NPLANE, %val(IN_DATA), 
+            CALL GEN_MOVE (FLOATSIZE*NPLANE, %val(IN_DATA),
      :         %val(RED_DATA))
 
             IF ( INDEX( MASK, '#' ) .EQ. 0 ) THEN
@@ -720,7 +720,7 @@
 
 *       Flag as "bad" any values which the ADP has set to -50.0.
 
-         IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+         IF ( DSA_STATUS .NE. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :         /'Error prior to flagging bad value', STATUS )
@@ -750,7 +750,7 @@
      :              N_EXPOSURES, %val(RED_VAR), STATUS )
                ELSE
 
-                  CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA), 
+                  CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA),
      :              NPLANE, N_EXPOSURES, %val(RED_VAR), STATUS)
                END IF
             ENDIF
@@ -780,10 +780,10 @@
                CALL MSG_SETC( 'LINCOEFFS', LINCOEFFS )
                CALL MSG_OUT( ' ', 'Linearising using '/
      :           /'^NCOEFFS^NTH order polynomial in ^LINCOEFFS',
-     :           STATUS ) 
+     :           STATUS )
             END IF
 
-            CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE, 
+            CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE,
      :         %val(RED_DATA), %val(RED_VAR), %val(RED_QUAL),
      :         STATUS )
          END IF
@@ -799,16 +799,16 @@
      :         %VAL(DARK_VAR), %val(RED_VAR),
      :         .TRUE., .FALSE., 0, .TRUE.)
          ENDIF
-      ELSE IF (INDEX(INT_TYPE,'CHOP') .NE. 0) THEN 
+      ELSE IF (INDEX(INT_TYPE,'CHOP') .NE. 0) THEN
 
 *       CHOP case.
 *       Get work space for phase A and B data, copy in the data arrays.
 *       Copy quality array from bad pixel mask or, if there isn't one
 *       initialise quality array to zero.
          DSA_STATUS = STATUS
-         CALL DSA_GET_WORKSPACE (FLOATSIZE*NPLANE, PHASEA_DATA, 
+         CALL DSA_GET_WORKSPACE (FLOATSIZE*NPLANE, PHASEA_DATA,
      :      PHASEA_SLOT, DSA_STATUS)
-         CALL DSA_GET_WORKSPACE (FLOATSIZE*NPLANE, PHASEB_DATA, 
+         CALL DSA_GET_WORKSPACE (FLOATSIZE*NPLANE, PHASEB_DATA,
      :      PHASEB_SLOT, DSA_STATUS)
 
          IF (DSA_STATUS .EQ. SAI__OK) THEN
@@ -834,7 +834,7 @@
 *       Flag as "bad" any values which the ADP has set to -50.0
 *       in either phase.
 
-         IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+         IF ( DSA_STATUS .NE. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :        /'Second error in DSA routines', STATUS )
@@ -847,7 +847,7 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
 
-*          work out the SECTOR statistics if enabled, after first 
+*          work out the SECTOR statistics if enabled, after first
 *          subtracting PHASE A from PHASE B, into the result array.
             IF (INDEX(INT_TYPE,'SECTORS') .NE. 0) THEN
 
@@ -867,18 +867,18 @@
      :              N_EXPOSURES, %val(RED_VAR), STATUS )
                ELSE
 
-                  CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA), 
+                  CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA),
      :              NPLANE, N_EXPOSURES, %val(RED_VAR), STATUS)
                END IF
             ENDIF
-         ENDIF   
+         ENDIF
 
 *       If non-destructive reads were not used, then subtract the BIAS
 *       observation from the phases to prepare for linearisation,
 *       variances are not handled because the BIAS errors will (just
 *       about) cancel out when the phases are subtracted. The BIAS
 *       quality is propagated into the result array during the
-*       subtraction of the BIAS from the PHASEA array. 
+*       subtraction of the BIAS from the PHASEA array.
          IF ( PROCEED_BIAS .AND. (INDEX(INT_TYPE,'NDR').EQ.0) ) THEN
 
             IF (STATUS .EQ. SAI__OK) THEN
@@ -908,26 +908,26 @@
                   CALL MSG_SETC( 'LINCOEFFS', LINCOEFFS )
                   CALL MSG_OUT( ' ', 'Linearising both phases '/
      :              /'using ^NCOEFFS^NTH order polynomial in '/
-     :              /'^LINCOEFFS', STATUS ) 
+     :              /'^LINCOEFFS', STATUS )
                END IF
 
-               CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE, 
+               CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE,
      :            %val(PHASEA_DATA), %val(RED_VAR),
      :            %val(RED_QUAL), STATUS )
 
 *             The reduced data array is used as a dummy variance array here,
-*             it should have been set to a sensible number to avoid probs 
+*             it should have been set to a sensible number to avoid probs
 *             with undefined numbers (often v. large).
                CALL GEN_FILL (FLOATSIZE*NPLANE, 0, %val(RED_DATA))
 
-               CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE, 
+               CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE,
      :            %val(PHASEB_DATA), %val(RED_DATA),
      :            %val(RED_QUAL), STATUS )
             END IF
          END IF
 
 *       No need to subtract DARK observation, just subtract PHASEA from
-*       PHASEB into the result array, variances and quality are already in 
+*       PHASEB into the result array, variances and quality are already in
 *       the right place.
          IF (STATUS .EQ. SAI__OK) THEN
 
@@ -970,7 +970,7 @@
 
 *      If the flat-field has been normalised, then the units will
 *      be the same as the original spectrum. Otherwise they will
-*      just be an arbitrary ratio. 
+*      just be an arbitrary ratio.
          IF ( FLAT_NORMALISED ) THEN
 
             CHAR_ARRAY (1) = 'A/D numbers per exposure'
@@ -997,7 +997,7 @@
             CHAR_ARRAY(2) = CHAR_ARRAY(2)(1:CLEN) // '/FLAT'
             CALL CHR_CTOC( CHAR_ARRAY(2), CHAR_ARRAY(2), CLEN )
          END IF
-      ELSE 
+      ELSE
 
          CHAR_ARRAY (1) = 'A/D numbers per exposure'
 
@@ -1021,12 +1021,12 @@
       CALL DSA_SET_DATA_INFO ('INT_RED', 2, CHAR_ARRAY, 0, 0.0D0,
      :  DSA_STATUS)
 
-*    Obtain the name of the object and write it to the reduced 
+*    Obtain the name of the object and write it to the reduced
 *    integration structure in the standard Figaro way.
       CALL DSA_GET_FITS_C( 'OBSERVATION', 'OBJECT', 0, OBJECT_NAME,
      :  COMMENT, DSA_STATUS )
       CALL DSA_SET_OBJECT( 'INT_RED', OBJECT_NAME, DSA_STATUS )
-   
+
 *    End of reduction
 *    record how the reduction went in the FITS structure.
 *    Date & time
@@ -1052,7 +1052,7 @@
 
          CALL DSA_PUT_FITS_C( 'INT_RED', 'MASKUSED', 'Propagated '/
      :     /'from DARK observation', ' ', DSA_STATUS)
-      ELSE IF ( PROCEED_BIAS .AND. 
+      ELSE IF ( PROCEED_BIAS .AND.
      :          (INDEX(INT_TYPE,'NDR').NE.0) ) THEN
 
          CALL DSA_PUT_FITS_C( 'INT_RED', 'MASKUSED', 'Propagated '/
@@ -1098,12 +1098,12 @@
          CALL DSA_PUT_FITS_C( 'INT_RED', 'FLATUSED', '(none)',
      :     ' ', DSA_STATUS )
       ENDIF
- 
+
 *    The integration time. (Write this in both the FITS structure
 *    and the standard Figaro structure).
       CALL DSA_PUT_FITS_F( 'INT_RED', 'EXPOSED', INTEGRATION_TIME,
      :  ' ', DSA_STATUS )
-      CALL DSA_SET_EXPOSURE( 'INT_RED', INTEGRATION_TIME, DSA_STATUS ) 
+      CALL DSA_SET_EXPOSURE( 'INT_RED', INTEGRATION_TIME, DSA_STATUS )
 
 *    whether linearised or not & the linearisation coefficients used
       IF ( INDEX( LINCOEFFS, '#' ) .EQ. 0 ) THEN
@@ -1126,7 +1126,7 @@
      :     ' ', DSA_STATUS )
       ENDIF
 
-      IF ( DSA_STATUS .NE. SAI__OK ) THEN 
+      IF ( DSA_STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_REDUCE_SPECTRA_INT: '/
      :     /'Error setting FITS items', STATUS )

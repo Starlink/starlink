@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_VECPL( MAP, LBND, UBND, NVEC, 
-     :                       LBND1M, UBND1M, LBND2M, UBND2M, VECMAG, 
-     :                       LBND1O, UBND1O, LBND2O, UBND2O, VECORN, 
+      SUBROUTINE KPS1_VECPL( MAP, LBND, UBND, NVEC,
+     :                       LBND1M, UBND1M, LBND2M, UBND2M, VECMAG,
+     :                       LBND1O, UBND1O, LBND2O, UBND2O, VECORN,
      :                       STEP, ANGFAC, ANGROT, DSCALE, AHSIZE,
      :                       JUST, WORK1, WORK2, STATUS )
 *+
@@ -14,8 +14,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_VECPL( MAP, LBND, UBND, NVEC, LBND1M, UBND1M, 
-*                      LBND2M, UBND2M, VECMAG, LBND1O, UBND1O, LBND2O, 
+*     CALL KPS1_VECPL( MAP, LBND, UBND, NVEC, LBND1M, UBND1M,
+*                      LBND2M, UBND2M, VECMAG, LBND1O, UBND1O, LBND2O,
 *                      UBND2O, VECORN, STEP, ANGFAC, ANGROT, DSCALE, AHSIZE,
 *                      JUST, WORK1, WORK2, STATUS )
 
@@ -113,7 +113,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -172,9 +172,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Store the pixel co-ordinate at the centre of each pixel for which a 
-*  vector is to be plotted. Loop round the plot region, storing positions 
-*  at increments given by argument STEP.  The bottom-left vector is 
+*  Store the pixel co-ordinate at the centre of each pixel for which a
+*  vector is to be plotted. Loop round the plot region, storing positions
+*  at increments given by argument STEP.  The bottom-left vector is
 *  placed in the middle of the bottom-left increment box.
       IVEC = 0
       DO J = LBND( 2 ) + STEP / 2, UBND( 2 ), STEP
@@ -193,7 +193,7 @@
 *  Transform these PIXEL positions into GRAPHICS positions using the
 *  supplied Mapping.
       CALL AST_TRANN( MAP, IVEC, 2, NVEC, WORK1, .TRUE., 2, NVEC, WORK2,
-     :                STATUS ) 
+     :                STATUS )
 
 *  Indicate no vectors have been plotted.
       NPLOT = 0
@@ -202,8 +202,8 @@
       DO K = 1, IVEC
 
 *  Skip over bad GRAPHICS positions.
-         GX = WORK2( K, 1 ) 
-         GY = WORK2( K, 2 ) 
+         GX = WORK2( K, 1 )
+         GY = WORK2( K, 2 )
          IF( GX .NE. AST__BAD .AND. GY .NE. AST__BAD ) THEN
 
 *  Find the corresponding pixel indices.
@@ -211,18 +211,18 @@
            J = NINT( WORK1( K, 2 ) + 0.5D0 )
 
 *  Skip over bad data or orientation values.
-           IF( VECMAG( I, J ) .NE. VAL__BADR .AND. 
+           IF( VECMAG( I, J ) .NE. VAL__BADR .AND.
      :         VECORN( I, J ) .NE. VAL__BADR ) THEN
 
 *  Calculate the length of the vector in units of pixels.
                VECLEN = VECMAG( I, J ) / DSCALE
 
-*  Calculate the vector orientation, in radians. 
+*  Calculate the vector orientation, in radians.
                VECANG = ANGFAC * VECORN( I, J ) + ANGROT
 
-*  Plot the vector.      
-               CALL KPS1_VECT( .TRUE., REAL( GX ), REAL( GY ), JUST, 
-     :                         VECLEN, VECANG, AHSIZE, DX1, DX2, DY1, 
+*  Plot the vector.
+               CALL KPS1_VECT( .TRUE., REAL( GX ), REAL( GY ), JUST,
+     :                         VECLEN, VECANG, AHSIZE, DX1, DX2, DY1,
      :                         DY2, STATUS )
 
 *  Abort if an error has occurred.
@@ -253,7 +253,7 @@
      :                   ' plotted.', STATUS )
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
-      END IF      
+      END IF
 
 *  Arrive here if an error occurs.
  999  CONTINUE

@@ -45,7 +45,7 @@
 *
 *     1988 Jul 7  : Original (RL.STAR::CUR).
 *
-*    Type Definitions :      
+*    Type Definitions :
 
       IMPLICIT NONE
 
@@ -74,7 +74,7 @@
      :    RANGE                 ! The difference between the maximum
                                 ! and the minimum values
 
-      INTEGER 
+      INTEGER
      :    K                     ! loop counter
 
       CHARACTER*50 TEXT         ! summary of the histogram

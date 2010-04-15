@@ -28,24 +28,24 @@
 
 *     The corresponding AST function is AST_GETREGIONBOUDS, but the name
 *     has been contracted to "astgetregbounds" for the purposes of this
-*     ATOOLS command in order not to exceed the allowed length of HDS 
+*     ATOOLS command in order not to exceed the allowed length of HDS
 *     component names.
 
 *  Usage:
-*     ast_getregbounds this 
+*     ast_getregbounds this
 
 *  ADAM Parameters:
 *     LBND() = _DOUBLE (Write)
 *        An array in which to return the lower axis bounds covered by the
-*        Region. It should have at least as many elements as there are axes 
-*        in the Region. If an axis has no lower limit, the returned value 
+*        Region. It should have at least as many elements as there are axes
+*        in the Region. If an axis has no lower limit, the returned value
 *        will be the largest possible negative value.
 *     THIS = LITERAL (Read)
 *        A text file holding the Region.
 *     UBND() = _DOUBLE (Write)
 *        An array in which to return the upper axis bounds covered by the
-*        Region. It should have at least as many elements as there are axes 
-*        in the Region. If an axis has no upper limit, the returned value 
+*        Region. It should have at least as many elements as there are axes
+*        in the Region. If an axis has no upper limit, the returned value
 *        will be the largest possible positive value.
 
 *  Copyright:
@@ -101,7 +101,7 @@
       DOUBLE PRECISION XL( NDF__MXDIM ), XU( NDF__MXDIM )
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -112,7 +112,7 @@
      :                 STATUS )
 
 *  Find the bounding box.
-      CALL AST_GETREGIONBOUNDS( THIS, XL, XU, STATUS ) 
+      CALL AST_GETREGIONBOUNDS( THIS, XL, XU, STATUS )
 
 *  Determine the Naxes attribute of the Region
       NAXES = AST_GETI( THIS, 'Naxes', STATUS)
@@ -125,7 +125,7 @@
       END DO
 
       CALL MSG_OUT( ' ', 'Region lower bounds: (^XL).', STATUS )
-      CALL PAR_PUT1D( 'LBND', NAXES, XL, STATUS ) 
+      CALL PAR_PUT1D( 'LBND', NAXES, XL, STATUS )
 
       DO I = 1, NAXES
          CALL MSG_SETD( 'XU', XU( I ) )
@@ -133,7 +133,7 @@
       END DO
 
       CALL MSG_OUT( ' ', 'Region upper bounds: (^XU).', STATUS )
-      CALL PAR_PUT1D( 'UBND', NAXES, XU, STATUS ) 
+      CALL PAR_PUT1D( 'UBND', NAXES, XU, STATUS )
 
       CALL MSG_BLANK( STATUS )
 

@@ -4,7 +4,7 @@
 *     CHR1_WILD3
 
 *  Purpose:
-*     Return whether a string matches a wild-card pattern which contains 
+*     Return whether a string matches a wild-card pattern which contains
 *     no wild characters.
 
 *  Language:
@@ -14,7 +14,7 @@
 *     RESULT = CHR1_WILD3( STRING, WILDS, SLEN, WLEN )
 
 *  Description:
-*     Perform a character by character comparison. 
+*     Perform a character by character comparison.
 
 *  Arguments:
 *     STRING = CHARACTER * ( * ) (Given)
@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,7 +65,7 @@
 *     8-OCT-1991 (PCTR):
 *        Final (working) version with changes prompted by P.T. Wallace.
 *     8-MAR-1993 (PCTR):
-*        Cure bug which leads to a WILDN chracter being present 
+*        Cure bug which leads to a WILDN chracter being present
 *        at the beginning of the WILDS string.
 *     28-SEP-1993 (ACC):
 *        Subprogram created during modularisation.
@@ -98,14 +98,14 @@
 
 *.
 
-*  There are no wild characters in the wild-card pattern, so perform 
-*  a character by character comparison. The candidate string is 
-*  allowed to be an abbreviation of the wild-card string. 
+*  There are no wild characters in the wild-card pattern, so perform
+*  a character by character comparison. The candidate string is
+*  allowed to be an abbreviation of the wild-card string.
 
       CHR1_WILD3 = .FALSE.
 
 *  Initialise the character pointers.
-   
+
       ICHS = 1
       ICHW = 1
 
@@ -131,7 +131,7 @@
 
 *  Check for a successful match (there may be some remainder in
 *  either of the two strings).
-      IF ( ICHS-1 .EQ. SLEN .AND. ICHW-1 .EQ. WLEN ) 
+      IF ( ICHS-1 .EQ. SLEN .AND. ICHW-1 .EQ. WLEN )
      :   CHR1_WILD3 = .TRUE.
  30   CONTINUE
 

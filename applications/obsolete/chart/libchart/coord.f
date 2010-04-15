@@ -88,4 +88,4 @@
       GLONG = MOD(GLONG+360.0,360.0)
       GLAT  = REAL( ASIN(-(CDP*SCA*SCB)+(SDP*CCB))/RDDG )
       END
- 
+

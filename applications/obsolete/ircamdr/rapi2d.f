@@ -54,8 +54,8 @@
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE  'PAR_PAR'          ! Necessary for non-VMS
-      INCLUDE  'NDF_PAR'          
-      INCLUDE  'NDF_ERR'          
+      INCLUDE  'NDF_PAR'
+      INCLUDE  'NDF_ERR'
 
 
       INTEGER  STATUS             ! global status parameter
@@ -179,7 +179,7 @@
 
       ELSE IF ( NAME .EQ. 'EXPE' ) THEN
 
-*       takes the exponential of an image or scalar 
+*       takes the exponential of an image or scalar
 
          CALL EXPON ( STATUS )
 
@@ -221,7 +221,7 @@
 
       ELSE IF ( NAME .EQ. 'HISTO' ) THEN
 
-*       calculates histogram of an image sub-array and certain 
+*       calculates histogram of an image sub-array and certain
 *       statistical parameters from the histogram
 
          CALL HISTO ( STATUS )
@@ -410,7 +410,7 @@
 
 *        no such option exists
 
-         CALL MSG_OUT( 'RAP_ERR', 
+         CALL MSG_OUT( 'RAP_ERR',
      :                  'No such option honey, hard cheese', STATUS)
 
 	 CALL MSG_SETC( 'NAM', NAME)

@@ -3,21 +3,21 @@ C+
 C
 C     F I G _ W F I L L D
 C
-C     Fills a double precision array with wavelength values.  
+C     Fills a double precision array with wavelength values.
 C     SCRUNCH utility.
 C
 C     Parameters -  (">" input, "<" output)
 C
-C     (>) WSTART    (Double precision) The wavelength of the center of 
+C     (>) WSTART    (Double precision) The wavelength of the center of
 C                   the first bin in the wavelength array.
-C     (>) WEND      (Double precision) The wavelength of the center of 
-C                   the last bin in the wavelength array.  Note that WEND 
+C     (>) WEND      (Double precision) The wavelength of the center of
+C                   the last bin in the wavelength array.  Note that WEND
 C                   is allowed to be less than WSTART.
 C     (>) LOGR      (Logical) True if the wavelengths are to increase
 C                   logarithmically.  Otherwise, the increase will
 C                   be linear.
 C     (>) NBINR     (Integer) The number of wavelength bins.
-C     (<) ARRAY     (Double precision array ARRAY(NBINR)) The output 
+C     (<) ARRAY     (Double precision array ARRAY(NBINR)) The output
 C                   wavelength array.
 C
 C                                              KS / AAO 13th Sept 1985

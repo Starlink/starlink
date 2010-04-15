@@ -120,7 +120,7 @@
       IF ( IRC_TXTON ) THEN
 
 *  Check if the scrolling region is full or there is scrolling.
-         IF ( IRC_LTEXT .GE. IRC_LBOT - IRC_LTOP - 2 .AND. 
+         IF ( IRC_LTEXT .GE. IRC_LBOT - IRC_LTOP - 2 .AND.
      :        IRC_LBOT .GT. IRC_LTOP ) THEN
 
 *  It is:  therefore issue a prompt.  **Note the Vax specific $ format
@@ -131,8 +131,8 @@
 *  Get a line of uppercase input.
             CALL SREAD ( IRC_LUCMD, BUFA, BUFB, IRC_CMD, J )
 
-*  Reset the height and width of the screen in case they have been 
-*  changed.  
+*  Reset the height and width of the screen in case they have been
+*  changed.
             CALL SCRSZ( WIDTH, IRC_LBOT, STATUS )
 
 *  Treat a comment or EOF as blank input.

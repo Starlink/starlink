@@ -6,7 +6,7 @@ for details. Changed in the new version include:
 
 - A new function astAddWcsAxis has been added. It modifies a WCS FrameSet
 by adding one or more axes to the base (GRID) Frame and the current (WCS)
-Frame, using a supplied Mapping to connect the new axes. Any other Frames 
+Frame, using a supplied Mapping to connect the new axes. Any other Frames
 are left unchanged.
 
 - A new function astMapCopy can copy all the keys from one KeyMap into
@@ -19,8 +19,8 @@ with axes corresponding to those in a given Frame.
 
 Changes introduced by V1.1:
 
-- A new C function, atlGetParam, obtains a value for a named parameter 
-from the environment, and places the value in a supplied AST KeyMap. The 
+- A new C function, atlGetParam, obtains a value for a named parameter
+from the environment, and places the value in a supplied AST KeyMap. The
 name of the parameter is used as the key for the new KeyMap entry.
 
 - Add ATL_RMBLFT (atlRmblft) to remove contiguous blank lines

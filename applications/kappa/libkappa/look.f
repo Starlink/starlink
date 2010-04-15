@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This application lists pixel values within a region of a 
+*     This application lists pixel values within a region of a
 *     two-dimensional NDF. The listing may be displayed on the screen
 *     and logged in a text file (see Parameter LOGFILE).  The region
 *     to be listed can be specified either by giving its centre and
@@ -44,13 +44,13 @@
 *        If TRUE, the user is prompted for further regions to list until
 *        a FALSE value is obtained. [FALSE]
 *     ARDDESC = LITERAL (Read)
-*        An `ARD Description' for the parts of the image to be listed. 
+*        An `ARD Description' for the parts of the image to be listed.
 *        Multiple lines can be supplied by ending each line with a
 *        hyphen, in which case further prompts for ARDDESC are made
 *        until a value is supplied which does not end with a hyphen. All
 *        the supplied values are then concatenated together (after
 *        removal of the trailing minus signs).  ARDDESC is only accessed
-*        if MODE is "ARD". Positions in the ARD description are assumed 
+*        if MODE is "ARD". Positions in the ARD description are assumed
 *        to be in the current co-ordinate Frame of the NDF unless there
 *        are COFRAME or WCS statements which indicate a different
 *        system. See "Notes" below.
@@ -66,7 +66,7 @@
 *        be displayed, in the current co-ordinate Frame of the NDF
 *        (supplying a colon ":" will display details of the current
 *        co-ordinate Frame).  The position should be supplied as a list
-*        of formatted axis values separated by spaces or commas. See 
+*        of formatted axis values separated by spaces or commas. See
 *        also Parameter USEAXIS. CENTRE is only acessed if MODE is
 *        "Centre".
 *     COMP = LITERAL (Read)
@@ -88,27 +88,27 @@
 *        readers - the others are primarily intended for being read by
 *        other software.
 *
-*        - "clist" -- Each row of textual output consists of an X pixel 
+*        - "clist" -- Each row of textual output consists of an X pixel
 *        index, followed by a Y pixel index, followed by the pixel data
 *        value. No headers or blank lines are included. The pixels are
 *        listed in "Fortran order" - the lower left pixel first, and the
-*        upper right pixel last. 
+*        upper right pixel last.
 *
 *        - "cglist" -- Like "clist" except bad pixels are omitted from
 *        the list.
 *
 *        - "wlist" -- Each row of textual output consists of the WCS
-*        co-ordinates of the pixel, followed by the pixel data value. No 
-*        headers or blank lines are included. The pixels are listed in 
-*        "Fortran order" - the lower left pixel first, and the upper 
-*        right pixel last. 
+*        co-ordinates of the pixel, followed by the pixel data value. No
+*        headers or blank lines are included. The pixels are listed in
+*        "Fortran order" - the lower left pixel first, and the upper
+*        right pixel last.
 *
 *        - "vlist" -- Each row of textual output consists of just the
-*        pixel data value. No headers or blank lines are included. The 
+*        pixel data value. No headers or blank lines are included. The
 *        pixels are listed in "Fortran order" - the lower-left pixel
 *        first, and the upper-right pixel last.
 *
-*        - "region" -- The pixel data values are listed as a 
+*        - "region" -- The pixel data values are listed as a
 *        two-dimensional region. Each row of textual output contains a
 *        whole row of data values. The textual output may be truncated
 *        if it is too wide. The lowest row is listed first.
@@ -116,9 +116,9 @@
 *        In all cases, adjacent values are separated by spaces, and bad
 *        pixel values are represented by the string "BAD". ["strips"]
 *     LBOUND = LITERAL (Read)
-*        The co-ordinates of the data pixel at the bottom-left of the 
+*        The co-ordinates of the data pixel at the bottom-left of the
 *        area to be displayed, in the current co-ordinate Frame of the
-*        NDF (supplying a colon ":" will display details of the current 
+*        NDF (supplying a colon ":" will display details of the current
 *        co-ordinate Frame). The position should be supplied as a list
 *        of  formatted axis values separated by spaces or commas. See
 *        also Parameter USEAXIS.  A null (!) value causes the
@@ -138,17 +138,17 @@
 *        - "Centre" -- The centre and size of the region are specified
 *        using parameters CENTRE and SIZE.
 *
-*        - "Bounds" -- The bounds of the region are specified using 
+*        - "Bounds" -- The bounds of the region are specified using
 *        parameters LBOUND and UBOUND.
 *
-*        - "ARDFile" -- The region is given by an `ARD Description' 
+*        - "ARDFile" -- The region is given by an `ARD Description'
 *        supplied within a text file specified using Parameter ARDFILE.
 *        Pixels outside the ARD region are represented by the string
-*        "OUT". 
+*        "OUT".
 *
-*        - "ARD" -- The region is given using an ARD description 
-*        supplied directly using Parameter ARDDESC. Pixels outside the 
-*        ARD region are represented by the string "OUT". 
+*        - "ARD" -- The region is given using an ARD description
+*        supplied directly using Parameter ARDDESC. Pixels outside the
+*        ARD region are represented by the string "OUT".
 *
 *        ["Centre"]
 *     NDF = NDF (Read)
@@ -159,7 +159,7 @@
 *        The area is centred on the position specified by parameter
 *        CENTRE.   It is only accessed if MODE is "Centre". [7]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the format to use 
+*        A group of attribute settings describing the format to use
 *        for individual data values.
 *
 *        A comma-separated list of strings should be given in which each
@@ -181,13 +181,13 @@
 *        defaulted if a null value (!) is supplied. See Section
 *        "Plotting Attributes" in SUN/95 for a description of the
 *        available attributes. Any unrecognised attributes are ignored
-*        (no error is reported). 
+*        (no error is reported).
 *
 *        Data values are formatted using attributes Format(1) and
-*        Digits(1).  [current value] 
+*        Digits(1).  [current value]
 *     UBOUND = LITERAL (Read)
 *        The co-ordinates of the data pixel at the top-right corner of
-*        the  area to be displayed, in the current co-ordinate Frame of 
+*        the  area to be displayed, in the current co-ordinate Frame of
 *        the NDF (supplying a colon ":" will display details of the
 *        current co-ordinate Frame). The position should be supplied as
 *        a list of formatted axis values separated by spaces or commas.
@@ -201,21 +201,21 @@
 *        supplying positions for parameters CENTRE, LBOUND and UBOUND.
 *        Each axis can be specified using one of the following options.
 *
-*        - Its integer index within the current Frame of the input 
-*        NDF (in the range 1 to the number of axes in the current 
+*        - Its integer index within the current Frame of the input
+*        NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *        - Its symbol string such as "RA" or "VRAD".
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
 *        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 *
-*        A list of acceptable values is displayed if you supply an 
-*        illegal value. If a null (!) value is supplied, the axes with 
+*        A list of acceptable values is displayed if you supply an
+*        illegal value. If a null (!) value is supplied, the axes with
 *        the same indices as the two used pixel axes within the NDF are
 *        selected.  [!]
 *     VALUE = _DOUBLE (Write)
-*        An output parameter to which is written the data value at the 
+*        An output parameter to which is written the data value at the
 *        top-right pixel in the displayed rectangle.
 
 *  Examples:
@@ -231,11 +231,11 @@
 *        co-ordinates). The listing is displayed on the screen only.
 *     look ngc6872 "10 11" 1
 *        Stores the value of pixel (10,11) in output parameter VALUE,
-*        but does not store it in a log file. This assumes that the 
-*        current co-ordinate Frame in the NDF is pixel co-ordinates. 
+*        but does not store it in a log file. This assumes that the
+*        current co-ordinate Frame in the NDF is pixel co-ordinates.
 *     look ngc6872 mode=ard arddesc="circle(1:27:23,-22:41:12,0:0:10)"
 *        Lists the pixel values within a circle of radius 10 arcseconds,
-*        centred on RA=1:27:23 DEC=-22:41:12. This assumes that the 
+*        centred on RA=1:27:23 DEC=-22:41:12. This assumes that the
 *        current co-ordinate Frame in the NDF is an RA/DEC Frame.
 *     look ngc6872 mode=ardfile ardfile=central.ard
 *        Lists the pixel values specified by the ARD description stored
@@ -265,15 +265,15 @@
 *     KAPPA: TRANDAT, ARDGEN, ARDMASK, ARDPLOT.
 
 *  Implementation Status:
-*     -  This routine correctly processes the DATA, QUALITY and 
+*     -  This routine correctly processes the DATA, QUALITY and
 *     VARIANCE components of the input NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. 
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
+*     Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -322,8 +322,8 @@
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
       INCLUDE 'PAR_ERR'        ! PAR error constants
       INCLUDE 'AST_PAR'        ! AST constants and functions
-      INCLUDE 'GRP_PAR'        ! GRP constants 
-      INCLUDE 'NDF_PAR'        ! NDF constants 
+      INCLUDE 'GRP_PAR'        ! GRP constants
+      INCLUDE 'NDF_PAR'        ! NDF constants
       INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
       INCLUDE 'MSG_PAR'        ! Message-system constants
 
@@ -337,10 +337,10 @@
       CHARACTER MCOMP*8        ! Component to be mapped
       CHARACTER MODE*7         ! Mode for getting regions
       CHARACTER TEXT*80        ! Text buffer
-      DOUBLE PRECISION CC( 2 ) ! Current Frame co-ords 
-      DOUBLE PRECISION CL( 2 ) ! Current Frame co-ords 
-      DOUBLE PRECISION CU( 2 ) ! Current Frame co-ords 
-      DOUBLE PRECISION GC( 2 ) ! GRID co-ords 
+      DOUBLE PRECISION CC( 2 ) ! Current Frame co-ords
+      DOUBLE PRECISION CL( 2 ) ! Current Frame co-ords
+      DOUBLE PRECISION CU( 2 ) ! Current Frame co-ords
+      DOUBLE PRECISION GC( 2 ) ! GRID co-ords
       DOUBLE PRECISION VALUE   ! Final data value
       INTEGER EL               ! No. of mapped values
       INTEGER FDA              ! ARD file descriptor
@@ -355,7 +355,7 @@
       INTEGER IPLINE           ! Pointer to line buffer
       INTEGER IWCS             ! Pointer to the WCS FrameSet from the NDF
       INTEGER MAXLEN           ! Maximum line length
-      INTEGER NAX              ! No. of WCS axes 
+      INTEGER NAX              ! No. of WCS axes
       INTEGER NC               ! No. of characters used
       INTEGER NDIM             ! No. of pixel axes in NDF
       INTEGER NVAL             ! No. of values obtained from parameter
@@ -394,57 +394,57 @@
       CALL KPG1_ARCOG( 'COMP', INDF1, MCOMP, COMP, STATUS )
 
 *  Now get the WCS FrameSet from the NDF.
-      CALL KPG1_ASGET( INDF1, 2, .FALSE., .TRUE., .TRUE., SDIM, 
+      CALL KPG1_ASGET( INDF1, 2, .FALSE., .TRUE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Get the bounds of all pixel axes in the NDF.
-      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )      
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Obtain the mode in which to obtain the region to be listed.
-      CALL PAR_CHOIC( 'MODE', 'Centre', 'Centre,Bounds,ARD,ARDFile', 
+      CALL PAR_CHOIC( 'MODE', 'Centre', 'Centre,Bounds,ARD,ARDFile',
      :                .FALSE., MODE, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the centre position (used as a default for CENTRE).
-      IF( MODE .EQ. 'CENTRE' ) THEN 
-         GC( 1 ) = 0.5*( SUBND( SDIM( 1 ) ) - SLBND( SDIM( 1 ) ) )  
+      IF( MODE .EQ. 'CENTRE' ) THEN
+         GC( 1 ) = 0.5*( SUBND( SDIM( 1 ) ) - SLBND( SDIM( 1 ) ) )
      :             + 1.0
          GC( 2 ) = 0.5*( SUBND( SDIM( 2 ) ) - SLBND( SDIM( 2 ) ) )
      :             + 1.0
-         CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CC( 1 ), 
-     :                   CC( 2 ), STATUS ) 
+         CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CC( 1 ),
+     :                   CC( 2 ), STATUS )
 
 *  KPG1_GTPOS displays the default with large accuracy. This is probably
 *  more than we need here, so reduce the accuracy of the defaults by
 *  formatting them and unformatting them.
          DO I = 1, 2
             TEXT = AST_FORMAT( IWCS, I, CC( I ), STATUS )
-            NC = AST_UNFORMAT( IWCS, I, TEXT, CC( I ), STATUS ) 
+            NC = AST_UNFORMAT( IWCS, I, TEXT, CC( I ), STATUS )
          END DO
 
 *  The defaults for BOUNDS mode are the bottom left and top right
 *  corners of the entire image.
-      ELSE IF( MODE .EQ. 'BOUNDS' ) THEN 
+      ELSE IF( MODE .EQ. 'BOUNDS' ) THEN
          GC( 1 ) = 1.0
          GC( 2 ) = 1.0
-         CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CL( 1 ), 
-     :                   CL( 2 ), STATUS ) 
+         CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CL( 1 ),
+     :                   CL( 2 ), STATUS )
 
          DO I = 1, 2
             TEXT = AST_FORMAT( IWCS, I, CL( I ), STATUS )
-            NC = AST_UNFORMAT( IWCS, I, TEXT, CL( I ), STATUS ) 
+            NC = AST_UNFORMAT( IWCS, I, TEXT, CL( I ), STATUS )
          END DO
 
          GC( 1 ) = DBLE( SUBND( SDIM( 1 ) ) - SLBND( SDIM( 1 ) ) + 1 )
          GC( 2 ) = DBLE( SUBND( SDIM( 2 ) ) - SLBND( SDIM( 2 ) ) + 1 )
-         CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CU( 1 ), 
-     :                   CU( 2 ), STATUS ) 
+         CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CU( 1 ),
+     :                   CU( 2 ), STATUS )
 
          DO I = 1, 2
             TEXT = AST_FORMAT( IWCS, I, CU( I ), STATUS )
-            NC = AST_UNFORMAT( IWCS, I, TEXT, CU( I ), STATUS ) 
+            NC = AST_UNFORMAT( IWCS, I, TEXT, CU( I ), STATUS )
          END DO
 
       END IF
@@ -479,7 +479,7 @@
 
 *  For WLIST format, check the current WCS Frame is two dimensional.
       IF( FORMAT .EQ. 'WLIST' ) THEN
-         NAX = AST_GETi( IWCS, 'Naxes', STATUS ) 
+         NAX = AST_GETi( IWCS, 'Naxes', STATUS )
          IF( NAX .GT. 2 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Current WCS co-ordinate frame has '//
@@ -503,8 +503,8 @@
 *  In CENTER mode, get the centre position and size for the region.
          IF( MODE .EQ. 'CENTRE' ) THEN
 
-*  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
-*  centre of the listing, using Parameter CENTRE. 
+*  Obtain the Current Frame co-ordinates (returned in CC) to put at the
+*  centre of the listing, using Parameter CENTRE.
             CALL KPG1_GTPOS( 'CENTRE', IWCS, .FALSE., CC, GC, STATUS )
 
 *  Get the box size in pixel.
@@ -512,19 +512,19 @@
             IF ( NVAL .LT. 2 ) SIZE( 2 ) = SIZE( 1 )
 
 *  Store the pixel index bounds of the region to be listed.
-            RLBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) ) - 
+            RLBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) ) -
      :                   SIZE( 1 )/2
             RUBND( 1 ) = RLBND( 1 ) + SIZE( 1 ) - 1
-            RLBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) - 
+            RLBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) -
      :                   SIZE( 2 )/2
             RUBND( 2 ) = RLBND( 2 ) + SIZE( 2 ) - 1
- 
+
 *  Get an NDF identifier for the relevant section.
             LBND( SDIM( 1 ) ) = RLBND( 1 )
             LBND( SDIM( 2 ) ) = RLBND( 2 )
             UBND( SDIM( 1 ) ) = RUBND( 1 )
             UBND( SDIM( 2 ) ) = RUBND( 2 )
-            CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF2, STATUS ) 
+            CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF2, STATUS )
 
 *  Map the required NDF component.
             CALL NDF_MAP( INDF2, MCOMP, '_DOUBLE', 'READ', IPDAT, EL,
@@ -536,33 +536,33 @@
 
             CALL KPG1_GTPOS( 'LBOUND', IWCS, .FALSE., CL, GC, STATUS )
             IF( STATUS .EQ. PAR__NULL ) THEN
-               CALL ERR_ANNUL( STATUS )   
-               RLBND( 1 ) = SLBND( SDIM( 1 ) ) 
-               RLBND( 2 ) = SLBND( SDIM( 2 ) ) 
+               CALL ERR_ANNUL( STATUS )
+               RLBND( 1 ) = SLBND( SDIM( 1 ) )
+               RLBND( 2 ) = SLBND( SDIM( 2 ) )
             ELSE
                RLBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) )
-               RLBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) 
+               RLBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) )
             END IF
-   
+
             CALL KPG1_GTPOS( 'UBOUND', IWCS, .FALSE., CU, GC, STATUS )
             IF( STATUS .EQ. PAR__NULL ) THEN
-               CALL ERR_ANNUL( STATUS )   
-               RUBND( 1 ) = SUBND( SDIM( 1 ) ) 
-               RUBND( 2 ) = SUBND( SDIM( 2 ) ) 
+               CALL ERR_ANNUL( STATUS )
+               RUBND( 1 ) = SUBND( SDIM( 1 ) )
+               RUBND( 2 ) = SUBND( SDIM( 2 ) )
             ELSE
                RUBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) )
-               RUBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) 
+               RUBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) )
             END IF
 
 *  Ensure bounds are in the correct order.
             IF( RLBND( 1 ) .GT. RUBND( 1 ) ) THEN
-               TEMP = RLBND( 1 ) 
+               TEMP = RLBND( 1 )
                RLBND( 1 ) = RUBND( 1 )
                RUBND( 1 ) = TEMP
             END IF
 
             IF( RLBND( 2 ) .GT. RUBND( 2 ) ) THEN
-               TEMP = RLBND( 2 ) 
+               TEMP = RLBND( 2 )
                RLBND( 2 ) = RUBND( 2 )
                RUBND( 2 ) = TEMP
             END IF
@@ -572,14 +572,14 @@
             LBND( SDIM( 2 ) ) = RLBND( 2 )
             UBND( SDIM( 1 ) ) = RUBND( 1 )
             UBND( SDIM( 2 ) ) = RUBND( 2 )
-            CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF2, STATUS ) 
+            CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF2, STATUS )
 
 *  Map the required NDF component.
             CALL NDF_MAP( INDF2, MCOMP, '_DOUBLE', 'READ', IPDAT, EL,
      :                    STATUS )
 
 *  In ARD or ARDFILE mode, get an ARD file and use it to define the region.
-         ELSE 
+         ELSE
             IGRP = GRP__NOID
 
 *  In ARD mode, get an ARD description directly from the user, storing
@@ -587,17 +587,17 @@
             IF( MODE .EQ. 'ARD' ) THEN
                CALL ARD_GROUP( 'ARDDESC', GRP__NOID, IGRP, STATUS )
 
-*  In ARDFILE mode, use a parameter to obtain the name of an existing 
-*  text file. Add the GRP indirection symbol so that ARD does 
+*  In ARDFILE mode, use a parameter to obtain the name of an existing
+*  text file. Add the GRP indirection symbol so that ARD does
 *  not treat the filename as a literal ARD description.
             ELSE
-               CALL FIO_ASSOC( 'ARDFILE', 'READ', 'LIST', 0, FDA, 
+               CALL FIO_ASSOC( 'ARDFILE', 'READ', 'LIST', 0, FDA,
      :                          STATUS )
                CALL AIF_FLNAM( 'ARDFILE', FILNAM( 2: ), STATUS )
                CALL FIO_ANNUL( FDA, STATUS )
                FILNAM( 1:1 ) = '^'
 
-*  Read the file to produce an ARD description in a GRP group 
+*  Read the file to produce an ARD description in a GRP group
                CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
 
 *  Set the current Frame to PIXEL so that positions in the ard file
@@ -610,16 +610,16 @@
 *  The next call returns a pointer to some memory which contains a copy of
 *  the requested pixels in the input NDF. The pixel bounds of this region
 *  are also returned.
-            CALL KPS1_LOOK1( INDF1, MCOMP, IWCS, SDIM, IGRP, RLBND, 
+            CALL KPS1_LOOK1( INDF1, MCOMP, IWCS, SDIM, IGRP, RLBND,
      :                       RUBND, IPDAT, STATUS )
 
          END IF
 
 *  Produce the listing.
-         CALL KPS1_LOOK( FRM, RLBND( 1 ), RUBND( 1 ), RLBND( 2 ), 
-     :                   RUBND( 2 ), %VAL( CNF_PVAL( IPDAT ) ), 
+         CALL KPS1_LOOK( FRM, RLBND( 1 ), RUBND( 1 ), RLBND( 2 ),
+     :                   RUBND( 2 ), %VAL( CNF_PVAL( IPDAT ) ),
      :                   QUIET, LOG, FDL,
-     :                   %VAL( CNF_PVAL( IPLINE ) ), 
+     :                   %VAL( CNF_PVAL( IPLINE ) ),
      :                   IWCS, FORMAT, MAXLEN, VALUE,
      :                   STATUS, %VAL( CNF_CVAL( MAXLEN ) ) )
 

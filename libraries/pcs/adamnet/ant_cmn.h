@@ -4,7 +4,7 @@
 *     ANT_CMN
 
 *  Purpose:
-*     Global variables for ANT library 
+*     Global variables for ANT library
 
 *  Language:
 *     {routine_language}
@@ -50,7 +50,7 @@ struct a_ntrans {       /* holds details of a net transaction */
                                       ANT__FULL_T => fully inserted */
 };
 
-/*   The currently active transactions are held in an array of A_NTRANS 
+/*   The currently active transactions are held in an array of A_NTRANS
      structures, indexed by LOCAL_NETTASK_N_TRANS_NUM */
 
 static struct a_ntrans n_trans[MESSYS__MXTRANS];
@@ -66,12 +66,12 @@ struct a_npath {       /* holds details of a network path */
    int local_machine_num;              /* index to list of machines in
                                           this task */
    int path_state;                     /* flag for partially-inserted path */
-   sendq_type local_task_reminit_ack_q;/* local task's queue for receiving 
+   sendq_type local_task_reminit_ack_q;/* local task's queue for receiving
                                           ACK_INIT */
 
 };
 
-/*   The currently active paths are held in an array of A_NPATH 
+/*   The currently active paths are held in an array of A_NPATH
      structures, indexed by LOCAL_NETTASK_N_PATH_NUM */
 
 static struct a_npath n_paths[MESSYS__MXPATH];
@@ -84,14 +84,14 @@ int local_channel;                 /* network channel */
 int remote_machine_num;            /* machine number in remote nettask */
 
 int mach_state;                /* ANT__NULL_MACH => unused entry
-                                  ANT__THIS_START => partial connection, 
+                                  ANT__THIS_START => partial connection,
                                   started from this end
                                   ANT__THIS_INIT => completed connection,
                                   started from this end
-                                  ANT__OTHER_INIT => completed 
+                                  ANT__OTHER_INIT => completed
                                   connection, started from other end */
 
-sendq_type local_task_accept_q;    /* local task's queue for receiving 
+sendq_type local_task_accept_q;    /* local task's queue for receiving
                                       REM_ACCEPT */
 
 };
@@ -127,9 +127,9 @@ static receiveq_type command_q;
 
 /*   buffer for network i/o */
 
-static char netbuffer[C_NET_MAXMSG_LEN];   
+static char netbuffer[C_NET_MAXMSG_LEN];
 
-/*   pointers into network buffer 
+/*   pointers into network buffer
       _r refers to receiving end
       _s refers to sending end */
 

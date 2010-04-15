@@ -37,7 +37,7 @@ C   response to cursor input or otherwise.
       ELSE
        OUTCHAR(2:2) = CHAR(CHARINT)
       END IF
-      
+
       RETURN
       END
 

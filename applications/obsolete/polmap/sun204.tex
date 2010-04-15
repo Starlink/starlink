@@ -44,7 +44,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -112,7 +112,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -198,12 +198,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -243,7 +243,7 @@ $(I_{\lambda},Q_{\lambda},U_{\lambda})$. Hence linear
 spectropolarimetric data is four-dimensional (six-dimensional if the
 variance arrays of the Stokes parameters are included) and cannot be
 manipulated using the standard spectral analysis packages ({\em e.g.},
-{\sc dipso}; Howarth \& Murray 1991). 
+{\sc dipso}; Howarth \& Murray 1991).
 
 {\sc polmap} owes much to {\sc dipso} as far as the style of user
 interface is concerned, but no attempt was made to provide the wealth
@@ -259,7 +259,7 @@ provides many routines for handling time-series and polarimetric data.
 The TSP routines are biased towards data reduction, and facilities are
 provided to reduce data from several different instruments. {\sc
 polmap} does not contain any data reduction routines, but was designed
-with data analysis in mind. 
+with data analysis in mind.
 
 {\sc polmap} also provides routines for displaying data that are not
 available in TSP. Command are provided to read and write TSP
@@ -307,10 +307,10 @@ to point to the location of the {\sc polmap} files, and defines the
 command alias {\tt polmap} to run the {\sc polmap} exectuable.
 
 Then copy the file {\tt sn1987a.sdf} from the {\sc polmap} directory
-into an empty working directory: 
+into an empty working directory:
 
 \begin{quote}
-{\tt cp~\$POLMAP\_DIR/sn1987a.sdf~.} 
+{\tt cp~\$POLMAP\_DIR/sn1987a.sdf~.}
 \end{quote}
 
 Typing {\tt polmap} at your normal shell prompt will start the
@@ -435,7 +435,7 @@ surface erased before each triplot command is executed then use the
 A polarized flux section may be included in the triplot using the {\bf
 PFLUX} command. The {\bf NOPFLUX} command negates this. The polarized
 flux section appears between the percentage flux and the position
-angle section. 
+angle section.
 
 In some cases, the polarization structure is more clearly seen in
 normalized Stokes $Q$ and $U$. The {\bf QUPANEL} will tell the triplot
@@ -536,7 +536,7 @@ and a parameter to be held fixed is defined using the $=$ symbol. A
 typical command line may look like:
 
 \begin{quote}
-{\tt  > isfit q:1.5 u:0.1 w:5500 k=1.15} 
+{\tt  > isfit q:1.5 u:0.1 w:5500 k=1.15}
 \end{quote}
 
 This command holds $k$ at $1.15$ but $q$, $u$  and $w$ are free
@@ -559,7 +559,7 @@ Other useful commands for adding and subtracting polarization vectors
 include {\bf STATADD} and {\bf STATSUB}, which add/subtract a
 constant vector found using the {\bf PTHETA} command. The {\bf ICADD}
 command adds a constant value to the $I$ Stokes spectrum only, thereby
-diluting the polarization. 
+diluting the polarization.
 
 \section{Merging spectra}
 
@@ -585,7 +585,7 @@ fit. This is {\em not} checked for by {\sc polmap}, but may be fixed with a
 call to {\bf ROTPA} prior to the fit. The {\bf PACALIB}
 command applies this fit to the current arrays.
 
-\section{References} 
+\section{References}
 
 Bailey J. A., 1990, SERC Starlink User Note, No. 66.2
 
@@ -611,7 +611,7 @@ command {\bf HELP}.
 \begin{tabular}{lll}
 \hline \hline
 Command & Arguments & Description \\ \hline \hline \\
-\multicolumn{3}{c}{\bf Plotting} \\ \hline 
+\multicolumn{3}{c}{\bf Plotting} \\ \hline
 DEV     & {\it device [nx] [ny]} & Initializes GKS graphics device \\
 TRIPLOT     & {\it error [entry] ... }& Plots pol. spectrum in triplot form \\
 QUPLOT      & {\it error}        & Plots pol. spectrum in $QU$ space \\
@@ -622,23 +622,23 @@ FONT        & {\it type}         & Changes the font style \\
 RDALAS,WRALAS & {\it filename}   & Reads/writes current pol. spectrum (ascii format) \\
 RDTSP,WRTSP & {\it filename}     & Reads/writes current pol. spectrum (TSP format) \\
 RDSTK,WRSTK & {\it filename}     & Reads/writes stack in NDF format \\
-\\ 
+\\
 \multicolumn{3}{c}{\bf Stack} \\ \hline
 PUT         &                    & Puts current pol. spectrum onto stack\\
 GET         &     {\it entry}    & Gets stack number {\it entry} \\
 LIST        &                    & List stack entries            \\
 DEL         & {\it entry [entry] ...}  & Deletes stack entry           \\
-\\ 
+\\
 \multicolumn{3}{c}{\bf Rectification} \\ \hline
 CONTDEF     & {\it [wstart] [wend]} & Defines continuum bins  \\
 CONTFIT     & {\it order entry}   & Fits a polynomial to a pol. spectrum \\
 IDIV        & {\it entry}         & Divides current Stokes $I$ array into {\it entry} \\
-\\ 
+\\
 \multicolumn{3}{c}{\bf PA calibration} \\ \hline
 ROTPA       & {\it angle}         & Rotates PA of polarization spectrum \\
 FITPA       & {\it pa ncoeff}     & Fits polynomial to PA \\
 PACALIB     &                     & Applies polynomial fit \\
-\\ 
+\\
 \multicolumn{3}{c}{\bf Miscellaneous} \\ \hline
 MERGE       & {\it entry}         & Merges current pol. spectrum with stack entry. \\
 HELP    & {\it command}          & Gives online help for {\it command} \\
@@ -685,7 +685,7 @@ Sets the intensity plotting range interactively.
 
 {\bf COMFILE \it filename} \\
 This command tells  polmap to use a command file as input instead of the
-terminal. 
+terminal.
 
 {\bf CPFRANGE} \\
 Sets the polarized flux plotting range interactively.
@@ -785,7 +785,7 @@ arrays.
 
 {\bf HELP \it command} \\
 Gives online help to polmap commands. HELP COMMANDS will give a list of
-all the possible commands. HELP <command> will provide detailed online 
+all the possible commands. HELP <command> will provide detailed online
 help for the selected command. Parameters shown in brackets are optional.
 
 {\bf HIST} \\
@@ -967,7 +967,7 @@ Retitle the specified stack entry. The retitle command will prompt for the
 new title.
 
 {\bf ROTPA \it angle } \\
-Rotates the position angle of the current polarization spectrum through 
+Rotates the position angle of the current polarization spectrum through
 angle where the angle is given in degrees.
 
 {\bf RVEL \it vel} \\
@@ -992,7 +992,7 @@ Sets the height of the characters that are plotted. Standard size is height=1.
 Sets the line style of a triplot. The parameter sould be in the range 1-5.
 
 {\bf SETSYMB \it  style} \\
-Sets the symbol style for a QU plot. The style parameter should be in the 
+Sets the symbol style for a QU plot. The style parameter should be in the
 range 0 to 31.
 
 {\bf SMOOTH  \it n} \\
@@ -1018,7 +1018,7 @@ to regrid the stack polarization spectrum onto the current wavelength grid.
 Swaps the current polarization spectrum with that of a stack entry.
 
 {\bf TAPPEND \it string} \\
-Appends the character string string to the end to the current polarization 
+Appends the character string string to the end to the current polarization
 spectrum title.
 
 {\bf TAUTO} \\
@@ -1113,5 +1113,5 @@ runs from xstart to xend.
 {\bf XLABEL \it label} \\
 Sets the x-axis label for the triplot.
 
-\end{document} 
+\end{document}
 

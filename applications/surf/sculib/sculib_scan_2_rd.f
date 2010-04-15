@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_SCAN_2_RD(VERSION, CENTRE_COORDS, RA_CEN, 
+      SUBROUTINE SCULIB_SCAN_2_RD(VERSION, CENTRE_COORDS, RA_CEN,
      :     DEC_CEN, LONG, LAT, LST, MJD, LAT_OBS, RA_APP, DEC_APP,
      :     STATUS )
 *+
@@ -12,20 +12,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_SCAN_2_RD(VERSION, CENTRE_COORDS, RA_CEN, DEC_CEN, 
+*     CALL SCULIB_SCAN_2_RD(VERSION, CENTRE_COORDS, RA_CEN, DEC_CEN,
 *    :     LONG, LAT, LST, MJD, LAT_OBS, RA_APP, DEC_APP,
 *    :     STATUS )
 
 *  Description:
 *     The start and end of each scan is calculated in different
-*     coordinate systems dependent on the coordinate system of the 
+*     coordinate systems dependent on the coordinate system of the
 *     tracking centre.
 *     This routine calculates the apparent RA/DEC centre for
 *     the supplied long and Lat using knowledge of the transputer system.
 
 *  Arguments:
 *     VERSION = REAL (Given)
-*       Version number of the file. This governs whether we need to 
+*       Version number of the file. This governs whether we need to
 *       even run this subroutine.
 *     CENTRE_COORDS = CHAR (Given)
 *       Centre coordinates of tracking centre
@@ -117,7 +117,7 @@
       DOUBLE PRECISION LST
       DOUBLE PRECISION MJD
       REAL             VERSION
-      
+
 *  Arguments Returned:
       DOUBLE PRECISION RA_APP
       DOUBLE PRECISION DEC_APP
@@ -145,13 +145,13 @@
 *     If we are in an RD centre then everything is already fine
 *     We also do nothing if this is version 1.0 data or newer.
 
-      IF (CENTRE_COORDS .EQ. 'RD' .OR. 
+      IF (CENTRE_COORDS .EQ. 'RD' .OR.
      :     CENTRE_COORDS .EQ. 'PLANET' .OR.
      :     VERSION .GE. 1.0) THEN
 
          RA_APP  = LONG
          DEC_APP = LAT
-         
+
       ELSE
 
 *     First I need to calculate the tangent plane offsets to the map centre
@@ -207,7 +207,7 @@
             CALL SCULIB_CALC_APPARENT(LAT_OBS, MYLONG, MYLAT, 0.0D0,
      :           0.0D0, XI, ETA, STEMP, LST, MJD, 0.0D0,
      :           0.0D0, RA_APP, DEC_APP, DTEMP, STATUS)
-            
+
 
          END IF
 

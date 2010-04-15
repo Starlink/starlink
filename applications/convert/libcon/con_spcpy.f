@@ -67,12 +67,12 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     25-JUN-1997 (ACD): 
+*     25-JUN-1997 (ACD):
 *        Original version.
-*     23-JUL-1997 (ACD): 
+*     23-JUL-1997 (ACD):
 *        First stable version.
 *     27-FEB-2003 (DSB):
-*        Re-format. Flip the output vertically. Change axis ordering to 
+*        Re-format. Flip the output vertically. Change axis ordering to
 *        make the spectral axis the third axis in the output cube.
 *     {enter_further_changes_here}
 
@@ -111,7 +111,7 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Examine every point in the map grid and check whether there is a 
+*  Examine every point in the map grid and check whether there is a
 *  spectrum there or not.
       DO LOOPY = 1, MAPY
 
@@ -130,7 +130,7 @@
 
 *  There is a genuine spectrum; copy it to the cube.
                DO LOOPS = 1, SPSIZE
-                  CUBE( LOOPX, OUTY, LOOPS ) = SPECTR( LOOPS, CSPEC ) 
+                  CUBE( LOOPX, OUTY, LOOPS ) = SPECTR( LOOPS, CSPEC )
                END DO
 
             ELSE

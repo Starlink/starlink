@@ -1,5 +1,5 @@
       SUBROUTINE TRACB6( NSMP, NLIN, INSCN, PROFIL, LINNO, BG, ED, XLMT,
-     :                   YLMT, XPOSN, OFFSET, CONST, SLOPE, STRTH, 
+     :                   YLMT, XPOSN, OFFSET, CONST, SLOPE, STRTH,
      :                   SCNDIR, PEN, STATUS )
 *+
 *  Name:
@@ -18,7 +18,7 @@
 
 *  Description:
 *     This rouinte draw a point source profile centred at the specified
-*     in-scan position with given y offset, constant and slope. 
+*     in-scan position with given y offset, constant and slope.
 
 *  Arguments:
 *     NSMP = INTEGER (Given)
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,7 +126,7 @@
 
 *  Draw the point source profile.
       CALL TRACB9( 1, NSMP, INSCN, PROFIL( 1, LINNO ), BG, ED, XPOSN,
-     :             YOFFST, STRTH, SLOPE, XLMT, YLMT, XORDER, 0, PEN, 
+     :             YOFFST, STRTH, SLOPE, XLMT, YLMT, XORDER, 0, PEN,
      :             STATUS )
 
       END

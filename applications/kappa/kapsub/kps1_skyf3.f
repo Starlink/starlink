@@ -127,19 +127,19 @@
       INTEGER M
       INTEGER N
       INTEGER NPOS
-      DOUBLE PRECISION XC( N )      
-      DOUBLE PRECISION AA( NPOS )      
-      DOUBLE PRECISION BB( NPOS )      
-      DOUBLE PRECISION XX( NPOS )      
-      DOUBLE PRECISION YY( NPOS )      
+      DOUBLE PRECISION XC( N )
+      DOUBLE PRECISION AA( NPOS )
+      DOUBLE PRECISION BB( NPOS )
+      DOUBLE PRECISION XX( NPOS )
+      DOUBLE PRECISION YY( NPOS )
 
 *  Arguments Given and Returned:
-      DOUBLE PRECISION XO( NPOS )      
-      DOUBLE PRECISION YO( NPOS )      
+      DOUBLE PRECISION XO( NPOS )
+      DOUBLE PRECISION YO( NPOS )
 
 *  Arguments Returned:
-      DOUBLE PRECISION FVECC( M )      
-      
+      DOUBLE PRECISION FVECC( M )
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -161,27 +161,27 @@
          PC( 1 ) = XC( I - 1 )
          PC( 2 ) = XC( I )
       END IF
-         
+
       IF ( .NOT. REFIMC ) THEN
          I = I + 2
          PC( 3 ) = XC( I - 1 )
          PC( 4 ) = XC( I )
       END IF
-         
+
       IF ( .NOT. PSIZEC ) THEN
          I = I + 2
          PC( 5 ) = XC( I - 1 )
          PC( 6 ) = XC( I )
       END IF
-                  
+
       IF ( .NOT. ORIENTC ) THEN
          I = I + 1
-         PC( 7 ) = XC( I ) 
+         PC( 7 ) = XC( I )
       END IF
-                  
+
       IF ( .NOT. TILTC ) THEN
          I = I + 1
-         PC( 8 ) = XC( I ) 
+         PC( 8 ) = XC( I )
       END IF
 
 *  Get an IRA identifier for this astrometry information.

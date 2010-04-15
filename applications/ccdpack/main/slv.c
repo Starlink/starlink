@@ -48,7 +48,7 @@ typedef struct param_data {
    int nreq;
    struct param_data *next;
 } param_data;
- 
+
 /* External variables. */
 extern char **environ;           /* Environment variable pointer */
 
@@ -558,7 +558,7 @@ static void WaitK( pid_t pid, int timeout, int *status ) {
          emsSeti( "PID", (int) pid );
          emsRep( "SLV_WAITK_PID",
                     "Process ^PID is not a valid slave process.", status );
-         
+
 /* If the task has not previously been killed, then report an error. */
       } else if ( !task->killed ) {
          *status = SAI__ERROR;
@@ -836,7 +836,7 @@ static pid_t LoadW( const char *name, const char *file, int detach,
 /* Add an assignment which causes an ADAM "I-task" to be created and
    terminate the new environment array. */
             new_environ[ nn++ ] = "ADAM_TASK_TYPE=I";
-            new_environ[ nn++ ] = NULL;      
+            new_environ[ nn++ ] = NULL;
 
 /* Block SIGCHLD signals from terminating child processes. */
             (void) sigemptyset( &set );
@@ -999,7 +999,7 @@ static pid_t LoadW( const char *name, const char *file, int detach,
                      Kill( pid, status );
                      WaitK( pid, timeout, status );
 
-/* Clear the process ID and quit looping. */                     
+/* Clear the process ID and quit looping. */
                      pid = (pid_t) -1;
                      break;
 
@@ -1105,7 +1105,7 @@ static void Closedown( void ) {
             if ( task == active_list ) break;
          }
       }
-   }      
+   }
 
 /* Enable "closedown mode", which causes the SIGCHLD signal handler
    (HandleSIGCHLD) to remove tasks from the active task list
@@ -1301,7 +1301,7 @@ static const char *LookupParamIO( const char *parname, const char *assoc ) {
       (void) sscanf( assoc + i1, "%*[^,]%n", &nc );
       i2 = i1 + nc - 1;
 
-      nc = 0;         
+      nc = 0;
       if ( ( 3 == sscanf( assoc + i1, " %15[ABCDEFGHIJKLMNOPQRSTUVWXYZ] "
                                       "%1[<>]"
                                       " %15[ABCDEFGHIJKLMNOPQRSTUVWXYZ] %n",
@@ -1456,7 +1456,7 @@ static void HandleParamReq( int path, int messid,
    value and asked for a replacement. This time, supply an "abort"
    response as a final attempt to avoid an infinite loop. Only really
    naughty tasks will ignore this. */
-                  } else { 
+                  } else {
                      emsRep( "SLV_OBEYW_NULL",
                                 "Out of values - sending abort parameter "
                                 "value '^PARAM=!!' to slave task.",
@@ -1464,7 +1464,7 @@ static void HandleParamReq( int path, int messid,
                      parvalue = "!!";
                   }
                }
-      
+
 /* If there is a parameter association, call SUBPAR_FINDPAR to obtain
    the index number of the master parameter name. Check for errors. */
             } else {
@@ -1920,7 +1920,7 @@ void SlvKill( pid_t pid, int *status ) {
    emsEnd( status );
 }
 
-/*  
+/*
  *  PWD: added this function to allow parameters to be reset (some
  *       dynamic variable in KAPPA:DISPLAY where causing problems by
  *       remaining locked.

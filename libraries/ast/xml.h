@@ -15,8 +15,8 @@
 *     #include "xml.h"
 
 *  Description:
-*     This include file defines the interface to the internal xml module 
-*     used by the AST library and provides the type definitions, function 
+*     This include file defines the interface to the internal xml module
+*     used by the AST library and provides the type definitions, function
 *     prototypes and macros, etc. needed to use this module.
 
 *  Inheritance:
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 /* ================ */
 
 /* These constants are used as identifiers for the different classes of
-   XML object defined in this file. They are purposefully obscure to reduce 
+   XML object defined in this file. They are purposefully obscure to reduce
    the possibility of random integer values being incorrectly interpreted
    as valid XML types */
 #define AST__XMLBAD    0            /* Id for an uninitialised XmlObject */
@@ -321,7 +321,7 @@ void astInitXmlGlobals_( AstXmlGlobals * );
 #else
 
 #ifdef DEBUG
-int astXmlTrace_( int );           
+int astXmlTrace_( int );
 #endif
 
 #endif
@@ -374,11 +374,11 @@ int astXmlTrace_( int );
 #define astXmlRemoveItem(this) astXmlRemoveItem_(astXmlCheckContentItem(this,0),STATUS_PTR)
 #define astXmlRemoveAttr(this,name,prefix) astXmlRemoveAttr_(astXmlCheckElement(this,0),name,prefix,STATUS_PTR)
 #define astXmlRemoveURI(this,prefix) astXmlRemoveURI_(astXmlCheckElement(this,0),prefix,STATUS_PTR)
-#define astXmlReadDocument(doc,is_wanted,skip,source,data) astXmlReadDocument_(doc,is_wanted,skip,source,data,STATUS_PTR) 
-#define astXmlInsertElement(this,elem) astXmlInsertElement_(astXmlCheckElement(this,0),astXmlCheckElement(elem,0),STATUS_PTR) 
-#define astXmlPurge(this) astXmlPurge_(astXmlCheckParent(this,1),STATUS_PTR) 
-#define astXmlSetXmlDec(this,text) astXmlSetXmlDec_(astXmlCheckDocument(this,0),text,STATUS_PTR) 
-#define astXmlSetDTDec(this,text1,text2,text3) astXmlSetDTDec_(astXmlCheckDocument(this,0),text1,text2,text3,STATUS_PTR) 
+#define astXmlReadDocument(doc,is_wanted,skip,source,data) astXmlReadDocument_(doc,is_wanted,skip,source,data,STATUS_PTR)
+#define astXmlInsertElement(this,elem) astXmlInsertElement_(astXmlCheckElement(this,0),astXmlCheckElement(elem,0),STATUS_PTR)
+#define astXmlPurge(this) astXmlPurge_(astXmlCheckParent(this,1),STATUS_PTR)
+#define astXmlSetXmlDec(this,text) astXmlSetXmlDec_(astXmlCheckDocument(this,0),text,STATUS_PTR)
+#define astXmlSetDTDec(this,text1,text2,text3) astXmlSetDTDec_(astXmlCheckDocument(this,0),text1,text2,text3,STATUS_PTR)
 #define astXmlCheckType(this,type) astXmlCheckType_(this,type,STATUS_PTR)
 #define astXmlCopy(this) astXmlCopy_(astXmlCheckObject(this,1),STATUS_PTR)
 

@@ -1,5 +1,5 @@
-      SUBROUTINE RTD_CENT( TYPE, IPIN, SWAP, NX, NY, XIN, YIN, NIN, 
-     :                     ISIZE, MAXSHF, MAXIT, TOLER, XOUT, YOUT, 
+      SUBROUTINE RTD_CENT( TYPE, IPIN, SWAP, NX, NY, XIN, YIN, NIN,
+     :                     ISIZE, MAXSHF, MAXIT, TOLER, XOUT, YOUT,
      :                     NOUT, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL RTD_CENT( TYPE, IPIN, SWAP, NX, NY, XIN, YIN, NIN, ISIZE, 
-*                    MAXSHF, MAXIT, TOLER, IDOUT, XOUT, YOUT, NOUT, 
+*     CALL RTD_CENT( TYPE, IPIN, SWAP, NX, NY, XIN, YIN, NIN, ISIZE,
+*                    MAXSHF, MAXIT, TOLER, IDOUT, XOUT, YOUT, NOUT,
 *                    STATUS )
 
 *  Description:
@@ -106,7 +106,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -127,7 +127,7 @@
       DOUBLE PRECISION MAXSHF
       INTEGER MAXIT
       DOUBLE PRECISION TOLER
-      
+
 *  Arguments Returned:
       DOUBLE PRECISION XOUT( NIN )
       DOUBLE PRECISION YOUT( NIN )
@@ -139,7 +139,7 @@
 *  Local Variables:
       LOGICAL SIGN              ! Sign of features (positive!)
       DOUBLE PRECISION XACC     ! Centroid position
-      DOUBLE PRECISION YACC     ! Centroid position 
+      DOUBLE PRECISION YACC     ! Centroid position
       INTEGER I                 ! Loop counter
 
 *.
@@ -155,45 +155,45 @@
       SIGN = .TRUE.
 
 *  Try to determine the centroid for all positions.
-      NOUT = 0 
-      DO 1 I = 1, NIN 
+      NOUT = 0
+      DO 1 I = 1, NIN
 
 *  Centroid this position.
          IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL RTD1_CENUB( XIN( I ), YIN( I ), 
-     :                       %VAL( CNF_PVAL( IPIN ) ), 
-     :                       SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+            CALL RTD1_CENUB( XIN( I ), YIN( I ),
+     :                       %VAL( CNF_PVAL( IPIN ) ),
+     :                       SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                       TOLER, XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_BYTE' ) THEN 
-            CALL RTD1_CENB( XIN( I ), YIN( I ), 
-     :                      %VAL( CNF_PVAL( IPIN ) ), 
-     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+         ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
+            CALL RTD1_CENB( XIN( I ), YIN( I ),
+     :                      %VAL( CNF_PVAL( IPIN ) ),
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                      TOLER, XACC, YACC, STATUS )
 
-         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN 
-            CALL RTD1_CENUW( XIN( I ), YIN( I ), 
-     :                       %VAL( CNF_PVAL( IPIN ) ), 
-     :                       SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+            CALL RTD1_CENUW( XIN( I ), YIN( I ),
+     :                       %VAL( CNF_PVAL( IPIN ) ),
+     :                       SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                       TOLER, XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_WORD' ) THEN 
-            CALL RTD1_CENW( XIN( I ), YIN( I ), 
-     :                      %VAL( CNF_PVAL( IPIN ) ), 
-     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+         ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+            CALL RTD1_CENW( XIN( I ), YIN( I ),
+     :                      %VAL( CNF_PVAL( IPIN ) ),
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                      TOLER, XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN 
-            CALL RTD1_CENI( XIN( I ), YIN( I ), 
-     :                      %VAL( CNF_PVAL( IPIN ) ), 
-     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+         ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+            CALL RTD1_CENI( XIN( I ), YIN( I ),
+     :                      %VAL( CNF_PVAL( IPIN ) ),
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                      TOLER, XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_REAL' ) THEN 
-            CALL RTD1_CENR( XIN( I ), YIN( I ), 
-     :                      %VAL( CNF_PVAL( IPIN ) ), 
-     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+         ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+            CALL RTD1_CENR( XIN( I ), YIN( I ),
+     :                      %VAL( CNF_PVAL( IPIN ) ),
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                      TOLER, XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL RTD1_CEND( XIN( I ), YIN( I ), 
-     :                      %VAL( CNF_PVAL( IPIN ) ), 
-     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+            CALL RTD1_CEND( XIN( I ), YIN( I ),
+     :                      %VAL( CNF_PVAL( IPIN ) ),
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                      TOLER, XACC, YACC, STATUS )
          ELSE
 

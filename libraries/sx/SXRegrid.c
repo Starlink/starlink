@@ -18,7 +18,7 @@ Error m_SXRegrid( Object *in, Object *out ){
 *     ANSI C
 
 *  Syntax:
-*     output = SXRegrid( input, grid, nearest, radius, scale, exponent, 
+*     output = SXRegrid( input, grid, nearest, radius, scale, exponent,
 *                        coexp, type );
 
 *  Classification:
@@ -26,20 +26,20 @@ Error m_SXRegrid( Object *in, Object *out ){
 
 *  Description:
 *     The SXRegrid module samples the "data" component of the "input"
-*     field at the positions held in the "positions" component of the 
+*     field at the positions held in the "positions" component of the
 *     "grid" field. It is similar to the standard "Regrid" module, but
 *     provides more versatility in assigning weights to each input position,
 *     the option of returning the sums of the weights or the weighted sum
 *     instead of the weighted mean, and seems to be much faster. Both
-*     supplied fields can hold scattered or regularly gridded points, and 
-*     need not contain "connections" components. The "data" component in the 
+*     supplied fields can hold scattered or regularly gridded points, and
+*     need not contain "connections" components. The "data" component in the
 *     "input" field must depend on "positions".
 *
 *     For each grid position, a set of near-by positions in the input
-*     field are found (using "nearest" and "radius"). Each of these input 
-*     positions is given a weight dependant on its distance from the current 
-*     grid position. The output data value (defined at the grid position) can 
-*     be the weighted mean or weighted sum of these input data values, or 
+*     field are found (using "nearest" and "radius"). Each of these input
+*     positions is given a weight dependant on its distance from the current
+*     grid position. The output data value (defined at the grid position) can
+*     be the weighted mean or weighted sum of these input data values, or
 *     the sum of the weights (selected by "type").
 *
 *     The weight for each input position is of the form:
@@ -47,26 +47,26 @@ Error m_SXRegrid( Object *in, Object *out ){
 *        (d/d0)**exponent
 *
 *     where "d" is the distance from the current grid position to the
-*     current input position. If a single value is given for "scale" then 
-*     that value is used for the d0 constant for all the near-by input 
-*     positions. If more than 1 value is given for "scale" then the first 
-*     value is used for the closest input position, the second value for the 
-*     next closest, etc. The last supplied value is used for any remaining 
+*     current input position. If a single value is given for "scale" then
+*     that value is used for the d0 constant for all the near-by input
+*     positions. If more than 1 value is given for "scale" then the first
+*     value is used for the closest input position, the second value for the
+*     next closest, etc. The last supplied value is used for any remaining
 *     input positions. A value of zero for "scale" causes the
-*     corresponding input position to be given zero weight. 
+*     corresponding input position to be given zero weight.
 *
 *     If "coexp" is not zero, then the above weights are modified to
 *     become:
 *
 *        exp( coexp*( (d/d0)**exponent ) )
 *
-*     If "nearest" is given an integer value, it specifies N, the maximum 
+*     If "nearest" is given an integer value, it specifies N, the maximum
 *     number of near-by input positions to use for each output position.
 *     The N input positions which are closest to the output position are
-*     used. If the string "infinity" is given, then all input positions 
-*     closer than the distance given by "radius" are used. Using "radius", 
-*     you may specify a maximum radius (from the output position) within 
-*     which to find the near-by input positions. If the string "infinity" 
+*     used. If the string "infinity" is given, then all input positions
+*     closer than the distance given by "radius" are used. Using "radius",
+*     you may specify a maximum radius (from the output position) within
+*     which to find the near-by input positions. If the string "infinity"
 *     is given for "radius" then no limit is placed on the radius.
 
 *  Parameters:
@@ -85,21 +85,21 @@ Error m_SXRegrid( Object *in, Object *out ){
 *     coexp = scalar (Given)
 *        exponential co-efficient for weights [0.0]
 *     type = integer (Given)
-*        type of output values required: 0 - weighted mean, 1 - weighted sum, 
+*        type of output values required: 0 - weighted mean, 1 - weighted sum,
 *                                        2 - sum of weights [0]
 *     output = field (Returned)
 *        regridded field
 
 *  Components:
-*     All components except the "data" component are copied from the "grid" 
-*     field. The output "data" component added by this module depends on 
+*     All components except the "data" component are copied from the "grid"
+*     field. The output "data" component added by this module depends on
 *     "positions". An "invalid positions" component is added if any output
-*     data values could not be calculated (e.g. if there are no near-by input 
+*     data values could not be calculated (e.g. if there are no near-by input
 *     data values to define the weighted mean, or if the weights are too
 *     large to be represented, or if the input grid position was invalid).
 
 *  Examples:
-*     This example maps the scattered data described in "CO2.general" onto a 
+*     This example maps the scattered data described in "CO2.general" onto a
 *     regular grid, and displays it. SXRegrid is used to find the data value
 *     at the nearest input position to each grid position.
 *
@@ -111,19 +111,19 @@ Error m_SXRegrid( Object *in, Object *out ){
 *        coloured = AutoColor(regrid);
 *        Display(coloured,camera);
 *
-*     The next example produces a grid containing an estimate of the density 
-*     of the scattered points (i.e. the number of points per unit area). The 
+*     The next example produces a grid containing an estimate of the density
+*     of the scattered points (i.e. the number of points per unit area). The
 *     positions of the original scattered points are shown as dim grey
 *     circles. SXRegrid finds the 5 closest input positions at each grid
-*     position. Zero weight is given to the closest 3 positions. The fourth 
-*     position has a weight which is half the density of the points within the 
+*     position. Zero weight is given to the closest 3 positions. The fourth
+*     position has a weight which is half the density of the points within the
 *     circle passing through the fourth point (i.e. if the fourth point
 *     is at a distance D from the current grid position, there are 3 points
 *     within a circle of radius D, so the density within that circle is
-*     3/(PI*(D**2)) ). The fifth position has a weight which is half the 
+*     3/(PI*(D**2)) ). The fifth position has a weight which is half the
 *     density of the points within the circle passing through the fifth
 *     point. The output data value is the sum of the weights (because
-*     "type" is set to 2), which is the mean of the densities within the 
+*     "type" is set to 2), which is the mean of the densities within the
 *     circles touching the fourth and fifth points.
 *
 *        input = Import("/usr/lpp/dx/samples/data/CO2.general")$
@@ -154,12 +154,12 @@ Error m_SXRegrid( Object *in, Object *out ){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -241,8 +241,8 @@ Error m_SXRegrid( Object *in, Object *out ){
       }
 
 
-/*  Remove (cull) all invalid positions and connections from the input. It is 
- *  necessary to take a copy of the input first, because the input object 
+/*  Remove (cull) all invalid positions and connections from the input. It is
+ *  necessary to take a copy of the input first, because the input object
  *  itself cannot be modified. */
 
       input = DXCopy( in[0], COPY_STRUCTURE );
@@ -305,7 +305,7 @@ Error m_SXRegrid( Object *in, Object *out ){
             ubnd[j] += radius;
          }
 
-      } else {        
+      } else {
          for( j=0; j<ndim; j++ ){
             ext = 0.1*( ubnd[j] - lbnd[j] );
             lbnd[j] -= ext;
@@ -335,7 +335,7 @@ Error m_SXRegrid( Object *in, Object *out ){
                rscale[i] = 1.0/(rsc*rsc);
             } else {
                rscale[i] = 0.0;
-            }            
+            }
          }
 
       }
@@ -350,7 +350,7 @@ Error m_SXRegrid( Object *in, Object *out ){
       }
 
 
-/*  Get the co-efficient to used in the exponential when creating weights for 
+/*  Get the co-efficient to used in the exponential when creating weights for
  *  each input position. */
 
       if( !in[6] ){
@@ -369,7 +369,7 @@ Error m_SXRegrid( Object *in, Object *out ){
       }
 
 
-/*  Produce a copy of the "input" object to use as the output, replacing all 
+/*  Produce a copy of the "input" object to use as the output, replacing all
  *  fields within it with the grid field. Also form a linked list of Fpair
  *  structures describing the fields. */
 
@@ -387,7 +387,7 @@ Error m_SXRegrid( Object *in, Object *out ){
 
 /*  Go through the list of fields looking for fields which share the same
  *  positions component. */
-   
+
       more = 1;
       while( more ){
 
@@ -416,12 +416,12 @@ Error m_SXRegrid( Object *in, Object *out ){
             DXSetError( ERROR_DATA_INVALID, "positions component in \"input\" is not of type FLOAT." );
             goto error;
          }
-                     
+
          if( cat != CATEGORY_REAL ){
             DXSetError( ERROR_DATA_INVALID, "positions component in \"input\" is not of category REAL." );
             goto error;
          }
-                     
+
          if( rank > 1 ){
             DXSetError( ERROR_DATA_INVALID, "rank %d positions component found in \"input\".", rank );
             goto error;
@@ -431,7 +431,7 @@ Error m_SXRegrid( Object *in, Object *out ){
             rank = 1;
             npindim = 1;
          }
-                     
+
          if( npindim != ndim ){
             DXSetError( ERROR_DATA_INVALID, "dimensionality of \"input\" (%d) does not match \"grid\" (%d).", npindim, ndim );
             goto error;
@@ -439,8 +439,8 @@ Error m_SXRegrid( Object *in, Object *out ){
 
 
 /*  Get a pointer to the positions values. */
-         
-         inpos = (float *) DXGetArrayData( inpos_array ); 
+
+         inpos = (float *) DXGetArrayData( inpos_array );
 
 
 /*  Find all fields which have the same positions tag and the same data
@@ -467,10 +467,10 @@ Error m_SXRegrid( Object *in, Object *out ){
 
 
 /*  Store a pointer to the input data array, and its dimensionality. */
-         
-              indata[nfld-1] = (void *) DXGetArrayData( (Array) next->data ); 
+
+              indata[nfld-1] = (void *) DXGetArrayData( (Array) next->data );
               veclen[nfld-1] = next->datalen;
- 
+
 
 /*  Make a new array to hold the output data values. The output data will
  *  have the same dimensionality as the input data unless the required output
@@ -506,7 +506,7 @@ Error m_SXRegrid( Object *in, Object *out ){
 
 /*  Indicate that the data values are dependant on positions. */
 
-              if( !DXSetComponentAttribute( next->outfld, "data", "dep", 
+              if( !DXSetComponentAttribute( next->outfld, "data", "dep",
                                         (Object) DXNewString("positions")) ) goto error;
 
             }
@@ -520,14 +520,14 @@ Error m_SXRegrid( Object *in, Object *out ){
  *  resulting sample values in the output data arrays. */
 
          if( dtype == TYPE_FLOAT ){
-            if( ! SXSampleF( nfld, ndim, veclen, npos, inpos, (float **)indata, 
-                             nsamp, gridpos, (float **) outdata, lbnd, ubnd, 
-                             nearest, radius, rscale, nscale, exponent, coexp, 
+            if( ! SXSampleF( nfld, ndim, veclen, npos, inpos, (float **)indata,
+                             nsamp, gridpos, (float **) outdata, lbnd, ubnd,
+                             nearest, radius, rscale, nscale, exponent, coexp,
                              outtype, outbad ) ) goto error;
          } else {
-            if( ! SXSampleD( nfld, ndim, veclen, npos, inpos, (double **)indata, 
-                             nsamp, gridpos, (double **) outdata, lbnd, ubnd, 
-                             nearest, radius, rscale, nscale, exponent, coexp, 
+            if( ! SXSampleD( nfld, ndim, veclen, npos, inpos, (double **)indata,
+                             nsamp, gridpos, (double **) outdata, lbnd, ubnd,
+                             nearest, radius, rscale, nscale, exponent, coexp,
                              outtype, outbad ) ) goto error;
          }
 
@@ -560,7 +560,7 @@ Error m_SXRegrid( Object *in, Object *out ){
                DXEndField( next->outfld );
 
 
-/*  Increment the field index, and indicate that this input field has 
+/*  Increment the field index, and indicate that this input field has
  *  been done. */
 
                fld++;

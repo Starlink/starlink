@@ -12,7 +12,7 @@ C
 C     (>) NAME     (Character) The name of the object to which
 C                  data is to be written.  This should be in the
 C                  standard data system format, ie name
-C                  components separated by dots followed by 
+C                  components separated by dots followed by
 C                  optional dimensional information enclosed
 C                  in square brackets.  Ideally the name should
 C                  have been created by a call to DTA_CRVAR.
@@ -41,8 +41,8 @@ C
 C                                      KS / CIT 27th Oct 1982
 C     Modified:
 C
-C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C+
       IMPLICIT NONE

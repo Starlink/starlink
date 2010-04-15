@@ -97,7 +97,7 @@ CD        Print *, 'Quoted string: ', string(ist:iend)
           OUT_LINE (L:L+IEND-IST) = STRING(IST:IEND)
           L = L + LS - 1
 
-*       Otherwise it must be a symbol to translate. First search for 
+*       Otherwise it must be a symbol to translate. First search for
 *       optional format argument:
 
         ELSE
@@ -156,7 +156,7 @@ CD        PRINT *,' calling gen_eval_ae on string --> ', string(ist:iend)
               END IF
             END IF
           ELSE IF (TYPE(1:1).EQ.'C') THEN
-       
+
             IF (FORMAT.NE.' ') THEN
               WRITE (OUT_LINE(L:LOUT), FORMAT, IOSTAT=ISTAT, ERR=999)
      &               CVALUE(:NBYTES)

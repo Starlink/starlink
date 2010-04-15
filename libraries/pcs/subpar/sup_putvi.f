@@ -2,31 +2,31 @@
 *+
 *  Name:
 *     SUBPAR_PUTVI
- 
+
 *  Purpose:
 *     Write parameter values as if object were a vector.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_PUTVI ( NAMECODE, NVAL, VALUES, STATUS )
- 
+
 *  Description:
 *     Write the values to a primitive object associated with a Parameter
 *     as if it were vectorised (ie regardless of its actual
 *     dimensionality).
 *     There is a routine for each access type, INTEGER:
- 
+
 *        SUBPAR_PUTVD    DOUBLE PRECISION
 *        SUBPAR_PUTVR    REAL
 *        SUBPAR_PUTVI    INTEGER
 *        SUBPAR_PUTVL    LOGICAL
 *        SUBPAR_PUTVC    CHARACTER[*n]
- 
+
 *     If the object data type differs from the access type, INTEGER, then
 *     conversion is performed (if allowed).
- 
+
 *  Arguments:
 *     NAMECODE=INTEGER ( given)
 *        pointer to the parameter
@@ -35,7 +35,7 @@
 *     VALUES(NVAL)=INTEGER
 *        Array containing the values to be written into the object.
 *     STATUS=INTEGER
- 
+
 *  Copyright:
 *     Copyright (C) 1984, 1986, 1988, 1991, 1992, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -45,12 +45,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     19.11.1984 (BDK):
 *        Original
@@ -83,66 +83,66 @@
 *     26-FEB-1993 (AJC):
 *        Add INCLUDE DAT_PAR
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
- 
+
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! SAI Constants
       INCLUDE 'DAT_PAR'
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'SUBPAR_ERR'
- 
- 
+
+
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter number
- 
+
       INTEGER NVAL                      ! number of values
- 
+
       INTEGER VALUES(*)               ! Array to supply values
- 
+
 *    Status return :
       INTEGER STATUS                    ! Status Return
- 
- 
+
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
- 
+
+
 *  Local Variables:
       LOGICAL INTERNAL                  ! .TRUE. => values are to be
                                         ! stored locally to the program
                                         ! rather than in a
                                         ! user-specified HDS structure.
- 
+
       CHARACTER*(DAT__SZLOC) BOTLOC     ! locator to HDS object
- 
+
       CHARACTER*(DAT__SZLOC) LOCV       ! locator to vecorised object
- 
+
       CHARACTER*15 HDSTYPE              ! type of primitive data
                                         ! to be stored
- 
+
       INTEGER TYPE                      ! encoded data type
- 
+
       CHARACTER*15 POSTYPES(5)          ! possible primitive data types
- 
- 
+
+
 *  Local Data:
       DATA POSTYPES / '_CHAR', '_REAL', '_DOUBLE', '_INTEGER',
      :  '_LOGICAL' /
- 
- 
+
+
 *.
- 
- 
+
+
       IF (STATUS .NE. SAI__OK) RETURN
- 
+
 *
 *   Check that there is write access to the parameter
 *
@@ -176,7 +176,7 @@
          ELSE
             INTERNAL = .FALSE.
          ENDIF
- 
+
          IF ( .NOT. INTERNAL ) THEN
 *
 *         Attempt to get a locator to an HDS structure, and vectorise it
@@ -184,15 +184,15 @@
             CALL SUBPAR_ASSOC ( NAMECODE, 'WRITE', BOTLOC, STATUS )
             IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :           ( PARTYPE(NAMECODE) .LT. 20 ) ) INTERNAL = .TRUE.
- 
- 
+
+
             IF (STATUS .EQ. SAI__OK) THEN
                CALL DAT_VEC ( BOTLOC, LOCV, STATUS )
                CALL DAT_ANNUL ( BOTLOC, STATUS )
             ENDIF
- 
+
          END IF
- 
+
          IF ( INTERNAL ) THEN
 *
 *         Value is to be put into the program's private parameter store.
@@ -200,9 +200,9 @@
 *
             CALL SUBPAR_CRINT ( NAMECODE, HDSTYPE, 1, NVAL, LOCV,
      :           STATUS )
- 
+
          ENDIF
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
 *
 *         Write the data
@@ -221,19 +221,19 @@
 *         Annul the locator.
 *
             CALL DAT_ANNUL ( LOCV, STATUS )
- 
+
          ENDIF
- 
+
       ELSE
- 
+
 *      No write access to parameter
          STATUS = SUBPAR__ICACM
          CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
          CALL EMS_REP ( 'SUP_PUTV2',
      :   'SUBPAR: Failed to ''PUT'' to parameter ^NAME - '//
      :   'access READ specified', STATUS )
- 
+
       ENDIF
- 
- 
+
+
       END

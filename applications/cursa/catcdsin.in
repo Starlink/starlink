@@ -272,7 +272,7 @@ sub GetCommandLineArgs
          $equalPos = index($ARGV[$currentArg], "=");
 
          if ($equalPos > -1)
-         { 
+         {
 
 #
 #          Extract the argument name and value.
@@ -1002,7 +1002,7 @@ sub AssembleAngleDetails
          if ($columnName[$currentColumn] eq "RAh"      ||
              $columnName[$currentColumn] eq "RA2000h"  ||
              $columnName[$currentColumn] eq "RA1950h")
-         {  
+         {
 
 #
 #          Case of separate sexagesimal hours for the Right Ascension.
@@ -1034,7 +1034,7 @@ sub AssembleAngleDetails
 
             $angleName[$angleColumns] = $RACol;
             $angleComments[$angleColumns] = $RAComments;
-            $angleStartPosition[$angleColumns] = 
+            $angleStartPosition[$angleColumns] =
               $startPosition[$currentColumn];
 
             if ($decimalPlaces[$currentColumn] == 0)
@@ -1135,7 +1135,7 @@ sub AssembleAngleDetails
 
             $angleName[$angleColumns] = $DECol;
             $angleComments[$angleColumns] = $DEComments;
-            $angleStartPosition[$angleColumns] = 
+            $angleStartPosition[$angleColumns] =
               $startPosition[$currentColumn];
 
             if ($decimalPlaces[$currentColumn] == 0)
@@ -1163,7 +1163,7 @@ sub AssembleAngleDetails
                   $format = $format .
                             $externalFormat[$currentColumn - 1] . ",";
 
-                  $angleStartPosition[$angleColumns] = 
+                  $angleStartPosition[$angleColumns] =
                      $startPosition[$currentColumn - 1];
                }
             }

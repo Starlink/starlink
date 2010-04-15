@@ -34,7 +34,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF (ABS(EPF-EPI).GT.1E-6) THEN
          T0 = (EPI-1900.0)/100.0
          T = (EPF-EPI)/100.0
@@ -67,4 +67,4 @@
          DP = DJ
       ENDIF
       END
- 
+

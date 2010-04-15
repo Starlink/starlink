@@ -86,7 +86,7 @@
 
       CHARACTER*40 INFILE
       INTEGER I
-      
+
 *   Size of each record in platform specific units
       INTEGER RECLEN
 
@@ -206,7 +206,7 @@
 
       IMPLICIT NONE
       LOGICAL SKIPS,UPCAS
-      
+
 *   Buffer for input records and pointer to current position
       CHARACTER*128 BUFF
       INTEGER NP
@@ -219,7 +219,7 @@
 
       DATA UPPER/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
       DATA LOWER/'abcdefghijklmnopqrstuvwxyz'/
-      
+
 *   Initial value for pointer
       DATA NP /128/
 
@@ -259,7 +259,7 @@
          IND = INDEX (LOWER,C)
          IF (IND.NE.0) C = UPPER(IND:IND)
       END IF
-      
+
 *   Convert to equivalent control character if this character follows an
 *   escape
       IF (ESCAPE) THEN
@@ -271,10 +271,10 @@
 
   100 CONTINUE
       GETNEX = -1
-            
+
  1000 CONTINUE
       END
-       
+
       SUBROUTINE GETWST(IREC,RREC)
 *+
 *  Name:
@@ -345,7 +345,7 @@
 *-
       IMPLICIT NONE
       INCLUDE 'GNS_PAR'
-      
+
       INTEGER BUFSIZ
       PARAMETER (BUFSIZ=165)
       INTEGER IREC(BUFSIZ)
@@ -444,7 +444,7 @@
       NKEYC = 0
       SKIPS = .TRUE.
       UPCAS = .TRUE.
-      
+
       NCHAR = GETNEX(SKIPS,UPCAS)
 
   100 CONTINUE
@@ -474,7 +474,7 @@
                   GO TO 9000
                END IF
 
-   30          CONTINUE      
+   30          CONTINUE
 
 *           Set the next character control variables appropriate to the
 *           data type of this keyword and change the state to "reading a
@@ -496,8 +496,8 @@
                ISTATE = IRDVAL
                NVALC = 0
 
-*        If the keyword just found was WORKSTATION then 
-               IF (IKEYIN.EQ.1) THEN 
+*        If the keyword just found was WORKSTATION then
+               IF (IKEYIN.EQ.1) THEN
 
 *            and we have a already got a workstation
                   IF (IVALS(1).NE.0) THEN
@@ -539,7 +539,7 @@
 *              If we have reached the end of file then exit
                   IF (NCHAR.LT.0) GO TO 9999
                END IF
-      
+
             END IF
 
 *     Otherwise decode the value according to the data type of the
@@ -687,14 +687,14 @@
       PARAMETER (ICONT=-1, IEMPT=-2)
 
       INTEGER I, J, IND, IND1, IWRTN, ITAG, IOFF, ISTAT
-      INTEGER IRBUF1(RECSIZ),IRBUF2(RECSIZ) 
+      INTEGER IRBUF1(RECSIZ),IRBUF2(RECSIZ)
 
 *   Counters for statistics
       INTEGER IRELOC, MAXREC, NWRKS, ICOLS
       COMMON /STATS/ IRELOC, MAXREC, NWRKS, ICOLS
 
       NWRKS = NWRKS + 1
-      
+
 *   Hash the workstation type to get the record index to start writing
       IND = MOD ((IWKSTN * IHASH1),IHASH2) + 1
 
@@ -712,13 +712,13 @@
       READ (UNIT=2, REC=IND, IOSTAT=ISTAT) IRBUF1
       IF (ISTAT.NE.0) GO TO 20
       IF (IRBUF1(1).EQ.IEMPT) GO TO 20
-      
+
 *   The read succeeded and it wasn't an empty record so the record is
 *   already in use so advance the index and try again.
       IND = IND + 1
       ICOLS = ICOLS + 1
       GO TO 10
-      
+
 *   Here the slot we want is free.
    20 CONTINUE
 
@@ -743,11 +743,11 @@
          READ (UNIT=2, REC=IND, IOSTAT=ISTAT) IRBUF1
          IF (ISTAT.NE.0) GO TO 20
          IF (IRBUF1(1).EQ.IEMPT) GO TO 20
-      
+
 *     No, so we have to free the record by moving the current contents
 *     forward one record
          IND1 = IND
-      
+
 *       Read the next record and replace it with previous one.
    40    CONTINUE
          IND1 = IND1 + 1

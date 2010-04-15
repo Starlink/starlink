@@ -23,7 +23,7 @@
 *     SLOT1 = INTEGER * ( * ) (Given)
 *        Slot number of the image containing the extension to be copied.
 *     ESLOT1 = INTEGER * ( * ) (Given)
-*        Slot number of extension to be copied. 
+*        Slot number of extension to be copied.
 *     SLOT2 = INTEGER * ( * ) (Given)
 *        Slot number of the image to get copy.
 *     ESLOT2 = INTEGER * ( * ) (Given)
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -95,7 +95,7 @@
       INTEGER ESLOT1
       INTEGER SLOT2
       INTEGER ESLOT2
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
@@ -117,7 +117,7 @@
       CALL DAT_PAREN( CHILD, PARENT, STATUS )
       CALL DAT_ANNUL( CHILD, STATUS )
       CALL DAT_ERASE( PARENT, ECB_XNAME( SLOT2, ESLOT2 ), STATUS )
-      CALL DAT_COPY( ECB_XLOC( SLOT1, ESLOT1 ), PARENT, 
+      CALL DAT_COPY( ECB_XLOC( SLOT1, ESLOT1 ), PARENT,
      :               ECB_XNAME( SLOT2, ESLOT2 ), STATUS )
 
 *  Update the ECB to point to this extesnsion.

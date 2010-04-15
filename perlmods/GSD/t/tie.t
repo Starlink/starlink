@@ -9,7 +9,7 @@ BEGIN { use_ok( "GSD" ); }
 my $filename = "t/obs_das_0141";
 my (@array, %hash);
 
-# Tie to an array 
+# Tie to an array
 
 my $gsd = tie @array, 'GSD', $filename;
 

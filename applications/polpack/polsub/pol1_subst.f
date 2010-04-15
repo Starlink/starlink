@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SUBST( INSTR, OLD, NEW, ALL, OUTSTR, NSUB, 
+      SUBROUTINE POL1_SUBST( INSTR, OLD, NEW, ALL, OUTSTR, NSUB,
      :                       STATUS )
 *+
 *  Name:

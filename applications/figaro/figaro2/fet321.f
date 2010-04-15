@@ -4,7 +4,7 @@ C
 C     F E T 3 2 1
 C
 C     Given a FIGS data cube as produced by the FIGS data acquisition
-C     system running in one of the etalon modes, processes it to 
+C     system running in one of the etalon modes, processes it to
 C     produce a single spectrum, for one of the detectors only.
 C
 C     Command parameters -
@@ -24,12 +24,12 @@ C                beamswitch and chop backgrounds
 C
 C     'BACK'     Return the background spectrum only
 C
-C     'NORM'     Normalize data to mean level of each cycle. 
+C     'NORM'     Normalize data to mean level of each cycle.
 C
 C     Input data -
 C
 C     CUBE is assumed to have a structure with the actual
-C     cube data in CUBE.Z.DATA  
+C     cube data in CUBE.Z.DATA
 C
 C     This routine assumes that the first axis of the cube data
 C     represents wavelength, that the second represents spectral
@@ -37,7 +37,7 @@ C     scans in the order A1a,A1b,B1a,B1b,B2a,B2b,A2a,A2b, where
 C     A1,A2,B1,B2 represent the parts of the beamswitch ABBA cycle
 C     and a and b represent the signal and background chop positions
 C     respectively.  In etalon mode 2, there are no chop positions,
-C     and the second axis is just A1,B1,A2,B2. This means that the 
+C     and the second axis is just A1,B1,A2,B2. This means that the
 C     second dimension of the cube has to be either 4 or 8.  The
 C     cube third axis represents beamswitch cycle number.
 C     The data is normalized to give a figure in detected photons
@@ -53,7 +53,7 @@ C     .Y or .T sub-structures that CUBE has will be deleted.
 C     If a spectrum is produced the errors (derived from
 C     the cycle to cycle statistics) are placed in the .Z.ERRORS
 C     component
-C     
+C
 C     History:
 C
 C      5th May 1988  KS / AAO.   Original version, based on FIGS321.
@@ -63,7 +63,7 @@ C                    status from LIB$... as logical.
 C     21st Jul 1993  HME / UoE, Starlink.  Don't call GEN_ERRMSG any
 C                    more if LIB$GET/FREE_VM fail.
 C     28th Jul 1993  HME / UoE, Starlink.  Use DSA_ to get workspaces.
-C      3rd Aug 1993  HME / UoE, Starlink.  Convert to DSA, use 
+C      3rd Aug 1993  HME / UoE, Starlink.  Convert to DSA, use
 C                    PAR_ABORT.
 C     13th Mar 1996  HME / UoE, Starlink.  Adapt to FDA library.
 C                    No error messages from DTA. Call PAR_WRUSER instead
@@ -196,16 +196,16 @@ C
          NSPECT=NY
       ELSE
          NSPECT=NY/2
-      END IF         
+      END IF
 C
-C     Get etalon position information 
+C     Get etalon position information
 C
       CALL DSA_GET_FITS_F('CUBE','FIG_ESTS',1,ETLSSTEP,CDUMMY,STATUS)
       IF (STATUS.NE.0)  GO TO 340
       CALL DSA_GET_FITS_F('CUBE','FIG_ESSZ',1,ETLSTP,CDUMMY,STATUS)
       IF (STATUS.NE.0)  GO TO 340
 C
-C     Get Intensity scaling information 
+C     Get Intensity scaling information
 C
       CALL DSA_GET_FITS_F('CUBE','FIG_PTS',1,POINTS,CDUMMY,STATUS)
       IF (STATUS.NE.0)  GO TO 340
@@ -258,18 +258,18 @@ C            multiple sweeps instead.  In mode 1, ETLSWP=1, and SWPERC=2,
 C            while in mode 2, CHOPS=1 and SWPERC=1)
 C     NSPECT is the number of spectra being added up to give the data
 C            for each cycle.  This depends on the mode, and also on the
-C            setting of ADD.  
+C            setting of ADD.
 C
 C     This means that SECS=POINTS*(INT/1000)*ETLSWP*CHOPS*SWPERC gives the
-C     total integration time in seconds represented by the data in each 
+C     total integration time in seconds represented by the data in each
 C     element of each spectrum.  SECS*NSPECT is therefore the total
 C     integration time in seconds represented by each element of the summed
 C     spectra, for each cycle.
 C
 C     FACTOR=SECS*NSPECT*(GAIN/1000)/9.5 is therefore the number of ADUs
-C     (counts) in the summed spectra that represent a data rate of 1 
+C     (counts) in the summed spectra that represent a data rate of 1
 C     photon/sec. That is, adding up the spectra for a beamswitch cycle
-C     and dividing each element by FACTOR will give a result in photons/sec.  
+C     and dividing each element by FACTOR will give a result in photons/sec.
 C
       SECS = POINTS * (INT/1000) * ETLSWP * CHOPS * SWPERC
       FACTOR = SECS * NSPECT * (GAIN/1000) / 9.5
@@ -322,7 +322,7 @@ C
      :                %VAL(CNF_PVAL(NUMPTR)),%VAL(CNF_PVAL(OPTR)),
      :                %VAL(CNF_PVAL(EPTR)))
 C
-C     Force an etalon position array - this code rather assumes that 
+C     Force an etalon position array - this code rather assumes that
 C     there isn't one at present in the input structure.
 C
       DO IX=1,NELM
@@ -368,7 +368,7 @@ C     (>) NY      (Integer) The second dimension of CUBE
 C     (>) NT      (Integer) The third dimension of CUBE
 C     (>) NELM    (Integer) The number of elements in the single
 C                 detector spectrum.
-C     (>) DETECTOR  (Integer) The detector number to use for the 
+C     (>) DETECTOR  (Integer) The detector number to use for the
 C                 spectrum.
 C     (>) DETECTORS (Integer) The number of detectors in use.
 C     (>) ADD     (Logical) If true disables background subtraction
@@ -388,7 +388,7 @@ C     (<) ERRORS  (Real array ERRORS(NELM)) The errors on the spectrum.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     GEN_FILL    (GEN_ package) Fill an array of bytes with a constant.
 C
@@ -542,7 +542,7 @@ C
                SIGMA = ERRORS(IX) * SQRT(REAL(NUM_CYCLES(IX)))
                DO IT=1,NT
                   IF (.NOT. EXCLUDE(IX,IT)) THEN
-                     IF (ABS(IMAGE(IX,IT)-SPECT(IX)) .GT. 
+                     IF (ABS(IMAGE(IX,IT)-SPECT(IX)) .GT.
      :                                           (CUTOFF*SIGMA)) THEN
                         EXCLUDE(IX,IT) = .TRUE.
                         FINISHED = .FALSE.
@@ -552,7 +552,7 @@ C
                         CALL PAR_WRUSER(OUTMES,STATUS)
                      END IF
                   END IF
-               END DO     
+               END DO
             END DO
          END IF
       END DO

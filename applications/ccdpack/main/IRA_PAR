@@ -10,7 +10,7 @@
       INTEGER IRA__MAXP       ! Max. no. of projection parameters
       INTEGER IRA__MXBRK      ! Max. no. of breaks in a plotted curve.
       INTEGER IRA__NOID       ! An invalid IRA identifier.
-      INTEGER IRA__NOPT       ! No. of options which can be set by 
+      INTEGER IRA__NOPT       ! No. of options which can be set by
                               ! routine IRA_DROPT
       INTEGER IRA__SZCLS      ! Length of string needed to hold list of
                               ! sky coordinate system names.
@@ -87,4 +87,4 @@
      : IRA__TH2R = 1.0D0/IRA__R2TH )
 
       PARAMETER (
-     : IRA__NOPT = 12 )    
+     : IRA__NOPT = 12 )

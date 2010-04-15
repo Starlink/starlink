@@ -71,26 +71,26 @@
 
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'TASK_ERR'
- 
+
 *  Arguments Given:
       CHARACTER*(*) STRING  ! the character string to be decoded
- 
+
 *  Arguments Returned:
       REAL RVAL         ! the returned value
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
- 
+
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *   Use appropriate CHR routine
       CALL CHR_CTOR( STRING, RVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -99,5 +99,5 @@
      :   'TASK_DEC0R: Failed to convert ^STR to REAL',
      :    STATUS )
       ENDIF
- 
+
       END

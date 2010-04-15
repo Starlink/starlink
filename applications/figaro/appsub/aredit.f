@@ -23,7 +23,7 @@ C     (!) CHANS    (Real array CHANS(NLID)) Channel numbers for
 C                  identified arc lines.
 C     (!) WAVES    (Real array WAVES(NLID)) Wavelengths of the
 C                  identified arc lines.
-C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (!) CLASS    (Integer array CLASS(NLMAX)) The class codes for
 C                  the identified arc lines.
@@ -68,7 +68,7 @@ C
          IF (EDIT) THEN
             LINE=ABS(VALUE)
             REPLY='Current wavelength is '//ICH_CF(WAVES(LINE))
-            NEXT=ICH_LEN(REPLY)+1     
+            NEXT=ICH_LEN(REPLY)+1
             CALL PAR_WRUSER(REPLY(:NEXT-1),STATUS)
             CALL ARGETW(ARC1,ARC2,ARC3,ARCS,NLARCS,0.,0.,FORGET,
      :                                                     WAVEL)

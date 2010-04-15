@@ -1,11 +1,11 @@
 *+  MA2TO3 - Subroutine to grow a 2-D array into a 3-D array
-      SUBROUTINE MA2TO3( MODE, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2, 
+      SUBROUTINE MA2TO3( MODE, IDIMS1, IDIMS2, ARRIN, ODIMS1, ODIMS2,
      :                   ODIMS3, ARROUT, STATUS )
 *    Description :
 *     The two dimensional input array, ARRIN, is "grown" into the
 *     three dimensional output array, ARROUT. If MODE is 1 ARRIN will
 *     form the XY plane of ARROUT and will be replicated along the Z-axis
-*     If MODE is 2 ARRIN will form the XZ plane and will be replicated 
+*     If MODE is 2 ARRIN will form the XZ plane and will be replicated
 *     along the Y-axis. If MODE is 3 ARRIN will form the YZ plane and will
 *     be replicated along the X-axis.
 *     An immediate return will occur if STATUS has an error value on entry.
@@ -97,7 +97,7 @@
 *    Status :
       INTEGER STATUS
 *    External references :
-      
+
 *    Local variables :
       INTEGER
      :  X, ! index to output array elements, 1st dimension
@@ -113,9 +113,9 @@
 
 *          input array forms X,Y plane of the output array and is replicated
 *          in the Z-axis direction
-            DO Z = 1, ODIMS3 
+            DO Z = 1, ODIMS3
 
-               DO Y = 1, ODIMS2 
+               DO Y = 1, ODIMS2
 
                   DO X = 1, ODIMS1
 
@@ -128,11 +128,11 @@
 
 *          input array forms X,Z plane of the output array and is replicated
 *          in the Y-axis direction
-            DO Z = 1, ODIMS3 
+            DO Z = 1, ODIMS3
 
-               DO Y = 1, ODIMS2 
+               DO Y = 1, ODIMS2
 
-                  DO X = 1, ODIMS1 
+                  DO X = 1, ODIMS1
 
                      ARROUT( X, Y, Z ) = ARRIN( X, Z )
                   ENDDO
@@ -143,11 +143,11 @@
 
 *          input array forms Y,Z  plane of the output array and is replicated
 *          in the X-axis direction
-            DO Z = 1, ODIMS3 
+            DO Z = 1, ODIMS3
 
-               DO Y = 1, ODIMS2 
+               DO Y = 1, ODIMS2
 
-                  DO X = 1, ODIMS1 
+                  DO X = 1, ODIMS1
 
                      ARROUT( X, Y, Z ) = ARRIN( Y, Z )
                   ENDDO

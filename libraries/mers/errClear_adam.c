@@ -16,14 +16,14 @@
 *  Description:
 *     The Error Reporting System is returned to its default context
 *     level and any pending messages are flushed. This routine
-*     effectively resets the Error Reporting System: 
+*     effectively resets the Error Reporting System:
 *
-*        -  unlike errFlush, no 'faulty application' error message is 
-*        reported if it is called when there are no error messages 
-*        pending output, or if it is called with the status value set 
-*        to SAI__OK; 
-*        -  the error table is always annulled by a call to errClear, 
-*        irrespective of any message output errors which may occur. 
+*        -  unlike errFlush, no 'faulty application' error message is
+*        reported if it is called when there are no error messages
+*        pending output, or if it is called with the status value set
+*        to SAI__OK;
+*        -  the error table is always annulled by a call to errClear,
+*        irrespective of any message output errors which may occur.
 *
 *     On exit, the status is always returned as SAI__OK.
 
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

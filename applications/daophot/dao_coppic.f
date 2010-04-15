@@ -1,9 +1,9 @@
 **==coppic.spg  processed by SPAG 4.54K  at 14:22 on  4 Oct 1996
- 
+
 ************************************************************************
- 
+
       SUBROUTINE COPPIC(NEWPICT,IST)
- 
+
 *+
 *  Name :
 *     COPPIC
@@ -58,50 +58,50 @@
 *-
 *  Type Definitions :
       IMPLICIT NONE
- 
+
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
- 
+
 *  Global variables :
 *    ...Daophot picture size:
- 
+
 *    Common block for NDF information
       INCLUDE 'ndf_cmn'
- 
+
 *  Arguments Given :
       CHARACTER*(*) NEWPICT
- 
+
 *  Status :
       INTEGER IST
- 
+
 *  Local variables :
       INTEGER STATUS            ! HDS error status
       INTEGER PLACE
 *.
- 
+
 *   Initialise the HDS status variable.
       STATUS = SAI__OK
- 
+
 *   Get an NDF place holder representing a new file.
       CALL NDF_PLACE(DAT__ROOT,NEWPICT,PLACE,STATUS)
- 
+
 *   Create the new NDF from the old ("DATA") one
       CALL NDF_COPY(NDF_IDATA,PLACE,NDF_ICOPY,STATUS)
- 
+
 *   Report any errors.
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL TBLANK
          CALL ERR_REP(' ','COPPIC - error copying data structure',
      :                STATUS)
       END IF
- 
+
 *   Set the return status value for Daophot.
       IF ( STATUS.EQ.SAI__OK ) THEN
          IST = 0
       ELSE
          IST = STATUS
       END IF
- 
+
 *   Exit routine.
       END

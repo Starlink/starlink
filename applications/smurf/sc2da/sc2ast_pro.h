@@ -1,7 +1,7 @@
 #ifndef HEADGEN____sc2ast_pro_h
-#define HEADGEN____sc2ast_pro_h 
- 
- 
+#define HEADGEN____sc2ast_pro_h
+
+
 /*+ sc2ast_createwcs - create WCS description using a static cache */
 
 void sc2ast_createwcs
@@ -9,7 +9,7 @@ void sc2ast_createwcs
 int subnum,             /* subarray number, 0-7 (given). If -1 is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
-const double instap[2], /* Offset of subarray in the focal plane */ 
+const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
@@ -23,7 +23,7 @@ int subnum,             /* subarray number, 0-7 (given). If -1 is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 double dut1,            /* UT1-UTC (seconds) */
-const double instap[2], /* Offset of subarray in the focal plane */ 
+const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
 AstFrameSet **fset,     /* constructed frameset (returned) */
 sc2astCache *cache,     /* A pointer to a structure holding cached info */
@@ -83,7 +83,7 @@ AstFrameSet **fset,     /* constructed 3-D frameset (returned) */
 int *status             /* global status (given and returned) */
 );
 
-/*+ sc2ast_maketanmap - create a Mapping representing a tangent plane 
+/*+ sc2ast_maketanmap - create a Mapping representing a tangent plane
                         projection */
 
 AstMapping *sc2ast_maketanmap
@@ -109,7 +109,7 @@ void sc2ast_set_output_system
 /*+ sc2ast_convert_system - convert JCMT coordinate system to AST coordinate
                            system
  */
-const char * sc2ast_convert_system 
+const char * sc2ast_convert_system
 (
  const char *label,   /* Input JCMT coordinate system (given) */
  int * status         /* Inherited status (given & returned) */
@@ -122,6 +122,6 @@ void sc2ast_make_bolo_frame
  int * status            /* inherited status (given & returned ) */
 );
 
- 
- 
+
+
 #endif

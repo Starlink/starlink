@@ -1,5 +1,5 @@
 *+  MA2TO1 - Subroutine to extract a 1-D array from a 2-D array
-      SUBROUTINE MA2TO1( MODE, IDIMS1, IDIMS2, ARRIN, ODIMS, ARROUT, 
+      SUBROUTINE MA2TO1( MODE, IDIMS1, IDIMS2, ARRIN, ODIMS, ARROUT,
      :                   STATUS )
 *    Description :
 *     The 1-dimensional output array, ARROUT, is extracted from the
@@ -73,7 +73,7 @@
 *    Status :
       INTEGER STATUS
 *    External references :
-     
+
 *    Local variables :
       INTEGER
      :  X, ! index to input array elements, first dimension
@@ -89,7 +89,7 @@
 *       create output array according to value of mode
          IF( MODE .EQ. 1 ) THEN
 
-            DO Y = 1, IDIMS2 
+            DO Y = 1, IDIMS2
 
                DO X = 1, IDIMS1
 
@@ -100,9 +100,9 @@
 
          ELSEIF( MODE .EQ. 2 ) THEN
 
-            DO Y = 1, IDIMS2 
+            DO Y = 1, IDIMS2
 
-               DO X = 1, IDIMS1 
+               DO X = 1, IDIMS1
 
 *                output array point is sum of points in input array row
                   ARROUT( Y ) = ARROUT( Y ) + ARRIN( X, Y )

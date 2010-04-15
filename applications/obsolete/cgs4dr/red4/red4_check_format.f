@@ -1,5 +1,5 @@
 *+  RED4_CHECK_FORMAT - Checks the format of an observation or integration
-      SUBROUTINE RED4_CHECK_FORMAT( NAME, STATUS ) 
+      SUBROUTINE RED4_CHECK_FORMAT( NAME, STATUS )
 *    Description :
 *      This routine uses the FITS tree to determine the file type.
 *    Invocation :
@@ -50,7 +50,7 @@
           CALL RED4_SET_FORMAT_2( 'NDF', STATUS )
       ELSE
           CALL RED4_SET_FORMAT_2( 'DST', STATUS )
-      ENDIF 
+      ENDIF
 
 *    Exit subroutine
       END

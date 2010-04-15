@@ -69,22 +69,22 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       CHARACTER * ( * ) VALUE
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
-      INTEGER NAMCOD            ! Code for PARAM 
-      
+      INTEGER NAMCOD            ! Code for PARAM
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get the NAMECODE and then set the parameter.
       CALL SUBPAR_FINDPAR( PARAM , NAMCOD, STATUS )
       CALL SUBPAR_CMDPAR( NAMCOD, VALUE, STATUS)

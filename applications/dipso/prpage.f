@@ -55,7 +55,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER COMM*(*)
       CHARACTER TEXT*(*)
@@ -67,11 +67,11 @@
 *  Local Constants:
       INTEGER PLEN               ! No. of lines per page
       PARAMETER ( PLEN = 20 )
-      
+
 *  Local Variables:
       INTEGER NL                 ! No. of lines displayed
       LOGICAL OK                 ! Continue?
-      
+
       SAVE NL
 *.
 
@@ -88,7 +88,7 @@
          IF( NL .EQ. PLEN ) THEN
 
 	    CALL MSG_BLANK( STATUS )
-            CALL GET0L( ' ', 1, .FALSE., COMM, 'Continue', .TRUE., OK, 
+            CALL GET0L( ' ', 1, .FALSE., COMM, 'Continue', .TRUE., OK,
      :                  STATUS )
 	    CALL MSG_BLANK( STATUS )
 
@@ -97,7 +97,7 @@
                CALL ERR_REP( 'PRPAGE_ERR', 'Paged screen output ' //
      :                       'interupted.', STATUS )
             END IF
-            
+
             NL = 0
 
          END IF
@@ -107,7 +107,7 @@
 
 *  Incrment the number of lines displayed.
          NL = NL + 1
-         
+
       END IF
 
       END

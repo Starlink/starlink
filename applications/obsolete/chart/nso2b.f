@@ -5,22 +5,22 @@
 * N S O 2 B
 *- - - - - -
 *
-* A program which converts an ASCII version of the star catalog in 
+* A program which converts an ASCII version of the star catalog in
 * NSO format, as output by NSO2A, back into it's original binary
-* format. 
+* format.
 *     NSO2A and this program, NSO2B, are intended to make possible the
-* porting of NSO format star catalog files between systems, by 
+* porting of NSO format star catalog files between systems, by
 * converting the file into ASCII to make it portable, and back to binary
 * on the target machine.
 *
 * The program will ask the user which machine it is running on, first,
-* to be able to select the right record length for the RECL specifier 
-* of the OPEN statement, as the VAX expects it in longwords for 
-* unformatted files. It will then prompt the user for the pathnames 
-* for both the existing NSO ASCII file and the binary file which is 
+* to be able to select the right record length for the RECL specifier
+* of the OPEN statement, as the VAX expects it in longwords for
+* unformatted files. It will then prompt the user for the pathnames
+* for both the existing NSO ASCII file and the binary file which is
 * to be output.
 * The binary file is 12.4 Mbytes.
-* 
+*
 * It's all standard FORTRAN 77, and uses no external or internal
 * subroutines.
 *
@@ -40,7 +40,7 @@
  100  CONTINUE
       WRITE(*,*) 'What machine is this running on ? Enter V for any'//
      +           ' DEC kit, O for other.'
-      READ(*,'(A)') MACH 
+      READ(*,'(A)') MACH
       IF ((MACH .NE. 'O') .AND. (MACH .NE. 'o') .AND. (MACH .NE. 'V')
      +         .AND. (MACH .NE. 'v')) THEN
          GOTO 100
@@ -53,17 +53,17 @@
          LEN = 52
       ENDIF
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname of NSO ASCII file ?'
       READ(*, '(A)') FILE
 
       OPEN(UNIT = 11, FILE = FILE, FORM = 'FORMATTED', STATUS = 'OLD')
 
-      WRITE(*,*) 
+      WRITE(*,*)
       WRITE(*,*) 'Pathname for NSO binary file ?'
       READ(*, '(A)') FILE
 
-      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN, 
+      OPEN(UNIT = 10, FILE = FILE, ACCESS = 'DIRECT', RECL = LEN,
      +     FORM = 'UNFORMATTED', STATUS = 'NEW')
 
       WRITE(*,*)
@@ -78,7 +78,7 @@
  200  CONTINUE
 
       COUNT = 205
-      READ(11, 1010, IOSTAT = IOSTAT) NAM, SRA, SDEC, 
+      READ(11, 1010, IOSTAT = IOSTAT) NAM, SRA, SDEC,
      +     LDIAM, I2MAG, DES
 
 * Read formatted/write unformatted loop for rest of file, until end of
@@ -87,7 +87,7 @@
  300  WRITE(10, REC = COUNT, IOSTAT = IOSTAT)  NAM, SRA, SDEC,
      +     LDIAM, I2MAG, DES
       COUNT = COUNT + 1
-      READ(11, 1010, IOSTAT = IOSTAT) NAM, SRA, SDEC, 
+      READ(11, 1010, IOSTAT = IOSTAT) NAM, SRA, SDEC,
      +     LDIAM, I2MAG, DES
       IF ((MOD(COUNT, 10000)) .EQ. 0) WRITE(*,*) 'Done ', COUNT
       IF (IOSTAT .EQ. 0)  GOTO 300

@@ -1,23 +1,23 @@
 #!/usr/bin/perl -w
 #
-# !!begin 
+# !!begin
 # !!title    Automatic reduction script
 # !!author   T.R. Marsh
 # !!created  14 January 2001
 # !!revised  13 August 2009
 # !!root     reduce
 # !!index    reduce.pl
-# !!descr    Perl script for automated reduction 
+# !!descr    Perl script for automated reduction
 # !!head1    Automated reduction perl script
 #
-# This script carries out complete reduction of a series of 
+# This script carries out complete reduction of a series of
 # files. It handles identification of which are arcs and which
 # are objects, and extracts normally and optimally and also
 # extracts sky spectra at the position of the object. The user must
 # have set up flat fields, a file defining the sky regions and various other parameters.
 #
-# The arcs (and optionally flats) to be associated with a given object are determined 
-# from the position, time and slit angle. If these are not found, the script will 
+# The arcs (and optionally flats) to be associated with a given object are determined
+# from the position, time and slit angle. If these are not found, the script will
 # issue a warning and take an inclusive approach. i.e. It will assume that
 # an arc is associated unless it can prove that it is not.
 #
@@ -26,10 +26,10 @@
 #
 # !!head2 Invocation
 #
-# reduce.pl datafile (switches) file1 file2 @list1 @list2 
+# reduce.pl datafile (switches) file1 file2 @list1 @list2
 #
 # where file1, file2 are individual files, while list1 and list2 are
-# lists of file names 
+# lists of file names
 #
 # !!head2 Switches
 #
@@ -44,9 +44,9 @@
 #
 # !!head2 Action
 #
-# Given a list of files, !!emph{reduce} first generates a script to 
-# extract positional and timing data and also to analyse the frames 
-# to identify data type using idtype or optionally the headers for 
+# Given a list of files, !!emph{reduce} first generates a script to
+# extract positional and timing data and also to analyse the frames
+# to identify data type using idtype or optionally the headers for
 # format 5 at least. The frames are classified as data, arc, flat, or
 # junk and the latter are ignored (and warnings are issued).
 #
@@ -58,24 +58,24 @@
 # running reduce.
 #
 # !!head2 Setting up for using !!emph{reduce}
-# 
+#
 # A fair bit of setting up is needed to use reduce effectively. You are going to have
 # to decide on the parameters you want to use for reduction. These need to
-# be edited into a separate file -- see !!ref{datafile}{datafile} for a 
-# template. The best way to set the parameters is to go through some 
-# reduction by hand. This will allow you to decide such parameters as 
+# be edited into a separate file -- see !!ref{datafile}{datafile} for a
+# template. The best way to set the parameters is to go through some
+# reduction by hand. This will allow you to decide such parameters as
 # the number of coefficients for fitting the sky background etc. You will
 # also need to set up various files such as a unit and zeroframe, a master
 # sky frame and work out a reference position for skymov.
-# 
+#
 # If you are running on a new set of data you may need to add some code
 # to both this script and the header fixing script.
-# 
+#
 # Once you have done this and set up the data file to your satisfaction
 # then you can try running this script.
-# 
-# !!head2 Files produced by !!emph{reduce} 
-# 
+#
+# !!head2 Files produced by !!emph{reduce}
+#
 # !!emph{reduce} produces many temporary files. These have different name, but all start
 # with !!emph{zzz}, so just delete zzz* to get rid of them. In some cases they may be of
 # use when problems occur which is why they are not deleted automatically.
@@ -83,8 +83,8 @@
 # !!head2 Datafile format
 #
 # Even if you don't have to edit the script file, you will undoubtedly have
-# to edit your own !!ref{datafile}{datafile}. So download it using shift-click 
-# and edit it. Mostly it consists of setting parameters used by the pamela routines. 
+# to edit your own !!ref{datafile}{datafile}. So download it using shift-click
+# and edit it. Mostly it consists of setting parameters used by the pamela routines.
 # You may need to change the format number if you have edited the script for your format.
 #
 # !!end
@@ -151,8 +151,8 @@ my $string = "([^\\s\\#]\\S+)";				    # string
 # the parameters to be read from the file are many ...
 my ($dversion, $balance, $zero, $unit, $master_sky, $data_types, $reduce_script, $reduce_log, @extra_files);
 my ($arc_pos_tol, $arc_pa_tol, $arc_time_tol, $xstart, $ystart, $xend, $yend, $readout, $bias_region, $photon);
-my ($track_npoly, $track_nspline, $track_xstart, $track_xend, $track_template, $track_tweak, $track_offset, $track_fchange, 
-    $track_nobj, $track_iobj, $track_iblock, $track_ypos, $track_width, $track_esig, $track_fwhm, $track_clip, 
+my ($track_npoly, $track_nspline, $track_xstart, $track_xend, $track_template, $track_tweak, $track_offset, $track_fchange,
+    $track_nobj, $track_iobj, $track_iblock, $track_ypos, $track_width, $track_esig, $track_fwhm, $track_clip,
     $track_nblock, $track_psig, $track_tcycle, $track_change);
 my ($profit_npoly, $profit_sizex, $profit_thresh, $profit_nslow, $profit_nblock, $profit_nmed, $profit_badval);
 my ($ident, $nearflat, $twilight, $maskfile, $flat_pos_tol, $flat_pa_tol, $flat_time_tol, $flat_npoly, $flat_thrlo,
@@ -506,7 +506,7 @@ if($nearflat eq "true"){
     if($dichroic_ylo > 0.0){
 	(defined $dichroic_yhi )     or die "dichroic_yhi undefined.\n";
 	(defined $dichroic_balance ) or die "dichroic_balance undefined.\n";
-    }    
+    }
 }
 
 (defined $skymov_slo)    or die "skymov_slo undefined.\n";
@@ -548,7 +548,7 @@ if($nearflat eq "true"){
     -e $maskfile       or die "Failed to find ARD maskfile = $maskfile\n";
     if($dichroic_ylo > 0.0){
 	-e "$dichroic_balance.sdf" or die "Failed to find dichroic balance = $dichroic_balance.sdf\n";
-    }    
+    }
 }
 
 # A few sanity checks
@@ -567,10 +567,10 @@ $extopt_nblock or die "extopt_nblock (=$extopt_nblock) must be > 0\n";
 my @months = (0,31,59,90,120,151,181,212,243,273,304,334);
 
 
-# Finally, we have inputs and they have checked out. 
+# Finally, we have inputs and they have checked out.
 
-# Generate script for extracting header information and for typing 
-# the data files. Each file is assumed to have the relevant headers 
+# Generate script for extracting header information and for typing
+# the data files. Each file is assumed to have the relevant headers
 # gathered in a structure called .more.pamela
 
 open(JUNK, ">zzz_header_info") or die "Can't open zzz_header_info\n";
@@ -581,7 +581,7 @@ print JUNK "source \$STARLINK_DIR/etc/cshrc\n";
 print JUNK "source \$STARLINK_DIR/etc/login\n";
 print JUNK "pamela\n";
 print JUNK "set verbose\n";
- 
+
 foreach $file (@files){
     if($file =~ /\S/){
 	print JUNK "\necho File name = $file\n";
@@ -590,14 +590,14 @@ foreach $file (@files){
 	if(!$skip){
 
 	    if(defined $idtype_track){
-		print JUNK 
+		print JUNK
 		    "idtype image=$file flat=$balance trace=true track=$idtype_track "
 		    . "xstart=$xstart xend=$xend ystart=$ystart yend=$yend "
 		    . "nxwidth=$idtype_nxwidth nywidth=$idtype_nywidth "
 		    . "tobjm=$idtype_tobjm tobja=$idtype_tobja tlinm=$idtype_tlinm "
 		    . "tlina=$idtype_tlina flim=$idtype_flim\n";
 	    }else{
-		print JUNK 
+		print JUNK
 		    "idtype image=$file flat=$balance trace=false "
 		    . "xstart=$xstart xend=$xend ystart=$ystart yend=$yend "
 		    . "nxwidth=$idtype_nxwidth nywidth=$idtype_nywidth "
@@ -618,7 +618,7 @@ if($skip){
 
 system("chmod +x zzz_header_info; ./zzz_header_info > zzz_header_info.log 2>&1");
 
-if($skip){ 
+if($skip){
     print "Finished extracting header info.\n";
 }else{
     print "Finished extracting header info and data typing.\n";
@@ -670,7 +670,7 @@ if($skip){
 	$source{$v2} = $v4;
     }
 }
-	
+
 # Check that all header items were found and compute day time
 
 my %time;
@@ -683,7 +683,7 @@ foreach $file (@files){
 	(defined $source{$file}) or die "source undefined for file = $file\n";
 
 # If we know these headers we can select the arcs with greater confidence,
-# but we can also 
+# but we can also
 
 	(defined $ra{$file})     or print "WARNING: ra undefined for $file. Could cause problems with arc/object association.\n";
 	(defined $dec{$file})    or print "WARNING: dec undefined for $file. Could cause problems with arc/object association.\n";
@@ -696,7 +696,7 @@ foreach $file (@files){
 	}elsif(defined $year{$file} && defined $month{$file} && defined $day{$file} && defined $utc{$file}){
 
 # Compute time in days from zero-point of start of 1980.
-	    
+
 	    $year{$file} > 1979 or die "Can only cope with years > 1979\n";
 	    my $offset = 0;
 	    for(my $n=1980; $n<$year{$file}; $n++){
@@ -710,22 +710,22 @@ foreach $file (@files){
 	    if($year{$file} == 4*int($year{$file}/4) && $month{$file} > 2){
 		$time{$file}++;
 	    }
-	    
+
 	}else{
 	    print "WARNING: could not find either JD or UTC & DATE in .more.pamela in file = $file. Could cause problems with arc/object association.\n";
 	}
     }
-}			       
+}
 
-# Dump a file of data types 
+# Dump a file of data types
 
 if(!$skip){
-    
+
     open(TYPES, ">$data_types") or die "Failed to open $data_types\n";
-    foreach $file (@files){	 
+    foreach $file (@files){
 	print TYPES "File: $file, id: $source{$file}\n";
-    }				
-    close(TYPES);		 
+    }
+    close(TYPES);
     print "Identified data types of files written to $data_types\n\n";
 
     if($types){
@@ -733,9 +733,9 @@ if(!$skip){
 	exit;
     }
 }
-				
 
-# Look for all arcs and flats associated with every object. 
+
+# Look for all arcs and flats associated with every object.
 
 my $twopi = 8.*atan2(1.,1.);
 
@@ -777,11 +777,11 @@ foreach $obj (@files){
 		}
 
 		if($pdiff < $arc_pos_tol && $padiff < $arc_pa_tol && $tdiff < $arc_time_tol){
-		    
+
 # We now have a possible arc but we now check that there are no
 # exposures between it (in time) and the object at a different position
 # and or slit PA
-		    
+
 		    $ok = 1;
 		    foreach $slew (@files){
 			if($slew =~ /\S/){
@@ -803,19 +803,19 @@ foreach $obj (@files){
 		    }
 		}
 	    }
-	}   
-	
+	}
+
 	if($nearflat eq "true"){
 	    $nbefore = $nafter = 0;
 	    foreach $flat (@files){
 		if($flat =~ /\S/ && $source{$flat} eq 'FLAT'){
-		    
+
 		    if(defined $ra{$flat} && defined $ra{$obj}){
 			$rdiff = $ra{$flat}-$ra{$obj};
 		    }else{
 			$rdiff = 0.;
 		    }
-		    
+
 		    if(defined $dec{$flat} && defined $dec{$obj}){
 			$ddiff = $dec{$flat}-$dec{$obj};
 			$cosd  = cos($twopi*$dec{$obj}/360.);
@@ -830,19 +830,19 @@ foreach $obj (@files){
 		    }else{
 			$padiff = 0.;
 		    }
-		    
+
 		    if(defined $time{$flat} && defined $time{$obj}){
 			$tdiff = 24.*60.*abs($time{$flat}-$time{$obj});
 		    }else{
 			$tdiff = 0.;
 		    }
-		    
+
 		    if($pdiff < $flat_pos_tol && $padiff < $flat_pa_tol && abs($tdiff) < $flat_time_tol){
-			
+
 # We now have a possible flat but we now check that there are no
 # exposures between it (in time) and the object at a different position
 # and or slit PA
-			
+
 			$ok = 1;
 			foreach $slew (@files){
 			    if($slew =~ /\S/){
@@ -895,7 +895,7 @@ print REDUCE "set verbose\n";
 my ($bframe, $tdiff_before, $tdiff_after, $w_before, $w_after, $rnorm);
 foreach $obj (@files){
     if($obj =~ /\S/ && $source{$obj} eq 'DATA'){
-  
+
 	print REDUCE "echo Starting file = $obj\n";
 
 # determine readout noise from bias region
@@ -905,9 +905,9 @@ foreach $obj (@files){
 	}else{
 	    print REDUCE "set read = $readout\n";
 	}
-	
+
 	print REDUCE "echo \"Readout noise = \$read\"\n";
-	
+
 	if($nearflat eq "true"){
 
 	    if(@{$flats_before{$obj}} || @{$flats_after{$obj}}){
@@ -916,15 +916,15 @@ foreach $obj (@files){
 # and after.
 
 # Prepare flat before (goes to zzz_before if at least 1 flat)
-		
+
 		if (@{$flats_before{$obj}} == 1) {
 		    print REDUCE "cp $flats_before{$obj}[0].sdf zzz_before.sdf \n";
 		    $tdiff_before = $time{$flats_before{$obj}[0]}-$time{$obj};
-		    
+
 		}elsif(@{$flats_before{$obj}} > 1) {
 		    print REDUCE "rm zzz_before.lis\n";
 		    print REDUCE "touch zzz_before.lis\n";
-		    
+
 		    $tdiff_before = 0;
 		    foreach $flat (@{$flats_before{$obj}}){
 			print REDUCE "echo $flat >> zzz_before.lis\n";
@@ -933,17 +933,17 @@ foreach $obj (@files){
 		    $tdiff_before /= @{$flats_before{$obj}};
 		    print REDUCE "medsky files=zzz_before.lis scaled=true output=zzz_before\n";
 		}
-		
+
 # Prepare flat after (goes to zzz_after if at least 1 flat)
-		
+
 		if (@{$flats_after{$obj}} == 1) {
 		    print REDUCE "cp $flats_after{$obj}[0].sdf zzz_after.sdf \n";
 		    $tdiff_after = $time{$flats_after{$obj}[0]}-$time{$obj};
-		    
+
 		}elsif(@{$flats_after{$obj}} > 1) {
 		    print REDUCE "rm zzz_after.lis\n";
 		    print REDUCE "touch zzz_after.lis\n";
-		    
+
 		    $tdiff_after = 0;
 		    foreach $flat (@{$flats_after{$obj}}){
 			print REDUCE "echo $flat >> zzz_after.lis\n";
@@ -952,33 +952,33 @@ foreach $obj (@files){
 		    $tdiff_after /= scalar(@{$flats_after{$obj}});
 		    print REDUCE "medsky files=zzz_after.lis scaled=true output=zzz_after\n";
 		}
-		
+
 # Linearly interpolate in time between before and after flats.
-		
+
 		if (@{$flats_before{$obj}} && @{$flats_after{$obj}} ){
-		    
+
 		    $w_before =  $tdiff_after/($tdiff_after - $tdiff_before);
 		    $w_after  = -$tdiff_before/($tdiff_after - $tdiff_before);
-		    
+
 		    print REDUCE "icmult image=zzz_before factor=$w_before output=zzz_before\n";
 		    print REDUCE "icmult image=zzz_after  factor=$w_after  output=zzz_after\n";
 		    print REDUCE "iadd image=zzz_before image1=zzz_after output=zzz_flat\n";
-		    
+
 		}elsif(@{$flats_before{$obj}}){
-		    
+
 		    print REDUCE "cp zzz_before.sdf zzz_flat.sdf \n";
-		    
+
 		}elsif(@{$flats_after{$obj}}){
-		    
+
 		    print REDUCE "cp zzz_after.sdf zzz_flat.sdf \n";
-		}		
-		
+		}
+
 # The flat is called = zzz_flat. Now do the usual manipulations to get to a balance frame,
 # which extraction of mean spectrum, masking bad regions, taking log, fitting, anti-logging,
 # dividing out fit to spectrum, replacing spatial profile with one from twilight, making
 # correction for dichroic ripple (in weak flat cases), normalisation by the mean and clipping
 # extreme values.
-		
+
 		print REDUCE "ystract image=zzz_flat xstart=$xstart xend=$xend spectrum=zzz_ycut\n";
 		print REDUCE "ardmask in=zzz_ycut ardfile=$maskfile out=zzz_ycutmasked \n";
 		print REDUCE "logar base=10 in=zzz_ycutmasked out=zzz_lycutmasked\n" ;
@@ -991,7 +991,7 @@ foreach $obj (@files){
 		print REDUCE "extract image=$twilight ystart=$ystart yend=$yend spectrum=zzz_twilight_prof \n";
 		print REDUCE "isxmul image=zzz_flat_isxdiv spectrum=zzz_twilight_prof output=zzz_flat\n";
 		print REDUCE "idiv unit zzz_flat zzz_tonka \n";
-		
+
 		if ($dichroic_ylo > 0.0) {
 		    $rnorm = 1 + $dichroic_yhi - $dichroic_ylo ;
 		    print REDUCE "cp -f zzz_tonka.sdf zzz_save_tonka.sdf\n";
@@ -999,16 +999,16 @@ foreach $obj (@files){
 			. " xend=$dichroic_yhi spectrum=zzz_ripple \n";
 		    print REDUCE "icdiv zzz_ripple $rnorm zzz_ripple \n";
 		    print REDUCE "isymul $dichroic_balance zzz_ripple zzz_tonka \n";
-		    
+
 		}
-		
+
 # Normalise by the mean
-		
+
 		print REDUCE "istat image=zzz_tonka ystart=$ystart yend=$yend"
 		    ." xstart=$xstart xend=$xend\n";
 		print REDUCE "icdiv image=zzz_tonka factor=@\$ADAM_USER/GLOBAL.STAT_MEAN output=zzz_tonka\n";
 		print REDUCE "clip zzz_tonka 0.01 100.0 zzz_tonka\n";
-		
+
 		$bframe = "zzz_tonka";
 	    }else{
 
@@ -1018,22 +1018,22 @@ foreach $obj (@files){
 	    }
 
 	}else{
-	    
+
 # Just use standard balance frame.
-	    
+
 	    $bframe = $balance;
-	    
+
 	}
-	
+
 # Tracing
-	
+
 	if($track_enabled){
-	    
+
 	    if(defined $track_template){
 
 		print REDUCE "\n\\cp -f $track_template.sdf zzz_track.sdf\n";
 		if($track_tweak eq "true"){
-		    print REDUCE 
+		    print REDUCE
 			"\ntrack image=$obj flat=$bframe old=true track=zzz_track nspline=$track_nspline "
 			. "npoly=$track_npoly nfpoly=1 xstart=$track_xstart xend=$track_xend "
 			. "ystart=$ystart yend=$yend tweak=true offset=$track_offset fchange=$track_fchange "
@@ -1042,7 +1042,7 @@ foreach $obj (@files){
 			. "clip=$track_clip nblock=$track_nblock tcycle=$track_tcycle "
 			. " psig=$track_psig\n\n";
 		}else{
-		    print REDUCE 
+		    print REDUCE
 			"\ntrack image=$obj flat=$bframe old=true track=zzz_track nspline=$track_nspline "
 			. "npoly=$track_npoly nfpoly=1 xstart=$track_xstart xend=$track_xend "
 			. "ystart=$ystart yend=$yend tweak=false pick=true nobj=$track_nobj "
@@ -1053,7 +1053,7 @@ foreach $obj (@files){
 			. " psig=$track_psig\n\n";
 		}
 	    }else{
-		print REDUCE 
+		print REDUCE
 		    "\ntrack image=$obj flat=$bframe old=false track=zzz_track nspline=$track_nspline "
 		    . "npoly=$track_npoly nfpoly=1 xstart=$track_xstart xend=$track_xend "
 		    . "ystart=$ystart yend=$yend pick=true nobj=$track_nobj "
@@ -1062,14 +1062,14 @@ foreach $obj (@files){
 		    . "fwhm=$track_fwhm change=$track_change photon=$photon "
 		    . "clip=$track_clip nblock=$track_nblock tcycle=$track_tcycle "
 		    . " psig=$track_psig\n\n";
-		
+
 	    }
 	}
-	
+
 #
 # Now move sky regions
 #
-	print REDUCE 
+	print REDUCE
 	    "\nskymov image=$obj flat=$bframe region=$master_sky "
 	    . "$trace outsky=zzz_sregion xstart=$xstart xend=$xend "
 	    . "ystart=$ystart yend=$yend slo=$skymov_slo shi=$skymov_shi "
@@ -1085,48 +1085,48 @@ foreach $obj (@files){
 	    print REDUCE "\nardmask in=zzz_sregion ardfile=$sky_mask out=zzz_junk\n\n";
 	    print REDUCE "\nmv zzz_junk.sdf zzz_sregion.sdf\n\n";
 	}
-	
+
 #
 # Fit polynomials to sky
 #
-	
+
 	print REDUCE
 	    "\nskyfit image=$obj flat=$bframe dload=no region=zzz_sregion "
 	    . "$trace sky=zzz_skfit xstart=$xstart xend=$xend ystart=$ystart "
 	    . "yend=$yend npoly=$skyfit_npoly thresh=$skyfit_thresh "
 	    . "readout=\$read photon=$photon\n\n";
-	
+
 #
 # Normal extraction
 #
-	
+
 	print REDUCE
 	    "\nextnor image=$obj flat=$bframe dload=no region=zzz_sregion "
 	    . "sky=zzz_skfit $trace spect=${obj}nor$ident ystart=$ystart "
 	    . "yend=$yend readout=\$read photon=$photon\n\n";
-	
+
 #
 # Optimal extraction
 #
-	
+
 	if($track_enabled){
-	    
+
 	    print REDUCE
 		"\nprofit image=$obj flat=$bframe dload=no region=zzz_sregion "
 		."sky=zzz_skfit track=zzz_track fract=zzz_fract ystart=$ystart yend=$yend "
 		. "readout=\$read photon=$photon npoly=$profit_npoly "
 		. "sizex=$profit_sizex thresh=$profit_thresh nslow=$profit_nslow badval=$profit_badval "
 		. "nblock=$profit_nblock nmed=$profit_nmed plot=no\n";
-	    
+
 	    print REDUCE
 		"\noptext image=$obj flat=$bframe dload=no region=zzz_sregion "
 		. "sky=zzz_skfit track=zzz_track fract=zzz_fract spect=${obj}opt$ident "
 		. "ystart=$ystart yend=$yend readout=\$read photon=$photon "
 		. "zaprats=true ratlo=-$optext_ratlim rathi=$optext_ratlim "
 		. "eps=$optext_eps plot=no iave=$optext_iave \n";
-	    
+
 	}else{
-	    
+
 	    print REDUCE
 		"\nextopt image=$obj flat=$bframe region=zzz_sregion sky=zzz_skfit "
 		. "spect=${obj}opt$ident ystart=$ystart yend=$yend readout=\$read "
@@ -1134,76 +1134,76 @@ foreach $obj (@files){
 		. "thresh=$extopt_thresh nblock=$extopt_nblock nmed=$extopt_nmed zaprats=yes dload=no "
 		. "ratlo=-$extopt_ratlim rathi=$extopt_ratlim eps=$extopt_eps "
 		. "plot=no\n";
-	    
+
 	}
-	
+
 #
 # Extraction of sky spectra too. Normal first
-# 
-	
+#
+
 	print REDUCE
 	    "\nextnor image=zzz_skfit flat=$unit region=zzz_sregion sky=$zero "
 	    . "$trace ystart=$ystart yend=$yend dload=no "
 	    . "spect=${obj}skyn$ident readout=\$read photon=$photon\n\n";
-	
+
 #
 # Then optimal
 #
-	
+
 	if($track_enabled){
-	    
+
 	    print REDUCE
 		"\noptext image=zzz_skfit flat=$unit region=zzz_sregion sky=$zero "
 		. "track=zzz_track fract=zzz_fract spect=${obj}skyo$ident dload=no "
 		. "ystart=$ystart yend=$yend readout=\$read photon=$photon "
 		. "zaprats=no plot=no iave=$optext_iave\n\n";
-	    
+
 	}else{
-	    
+
 	    print REDUCE
 		"\nextopt image=zzz_skfit flat=$unit region=zzz_sregion sky=$zero "
 		. "spect=${obj}skyo$ident ystart=$ystart yend=$yend readout=\$read "
 		. "photon=$photon old=yes profit=zzz_profile zaprats=no dload=no "
 		. "plot=no\n\n";
-	    
+
 	}
-	
+
 #
 # Now for the associated arcs (if any)
 #
-	
+
 	foreach $arc (@{$arcs{$obj}}){
-	    
+
 #
 # Normal first
 #
-	    
+
 	    print REDUCE
 		"\nextnor image=$arc flat=$bframe region=zzz_sregion sky=$zero "
 		. "$trace spect=$arc${obj}arcn$ident ystart=$ystart dload=no "
 		. "yend=$yend readout=\$read photon=$photon\n\n";
-	    
+
 #
 # Then optimal
 #
-	    
+
 	    if($track_enabled){
-		
+
 		print REDUCE
 		    "\noptext image=$arc flat=$bframe region=zzz_sregion "
 		    . "sky=$zero track=zzz_track fract=zzz_fract dload=no "
 		    . "spect=$arc${obj}arco$ident ystart=$ystart yend=$yend "
 		    . "readout=\$read photon=$photon zaprats=no plot=no "
 		    . "iave=$optext_iave\n\n";
-		
+
 	    }else{
-		
+
 		print REDUCE
-		    "\nextopt image=$arc flat=$bframe region=zzz_sregion " 
+		    "\nextopt image=$arc flat=$bframe region=zzz_sregion "
 		    . "sky=$zero spect=$arc${obj}arco$ident ystart=$ystart "
 		    . "yend=$yend dload=no readout=\$read photon=$photon "
 		    . "old=yes profit=zzz_profile zaprats=no plot=no\n\n";
-		
+
 	    }
 	}
     }
@@ -1315,13 +1315,13 @@ if($track_enabled){
     print LOG "                    Block size for fits: $profit_nblock\n";
     print LOG "                    Median filter width: $profit_nmed\n";
     print LOG "                    Bad pixel threshold: $profit_badval\n";
-    
+
     print LOG "\noptext parameters:\n\n";
     print LOG "             Cosmic ray rejection limit: $optext_ratlim\n";
     print LOG "  Factor to prevent spurious rejections: $optext_eps\n";
     print LOG "   Number of sky pixels to average over: $optext_iave\n";
 }else{
-    
+
     print LOG "\nextopt parameters:\n\n";
     print LOG "  Number of poly coeffs for column fits: $extopt_npoly\n";
     print LOG "                 Sigma reject threshold: $extopt_thresh\n";

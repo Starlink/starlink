@@ -10,7 +10,7 @@ void sbmnu00a(double qfoo,double*qbar,double*qbaz)
 #define q1 1296000.0
 {
 #define q2 14
-double qfoobar[q2];static struct{int Q3[5];double q4;double 
+double qfoobar[q2];static struct{int Q3[5];double q4;double
 qfOBAz;double qfoobaz;double QQUUX;double Q5;double QFRED;}
 qdog[]={{{0,0,0,0,1},-17206416.1,-17466.6,3338.6,9205233.1,
 908.6,1537.7},{{0,0,2,-2,2},-1317090.6,-167.5,-1369.6,

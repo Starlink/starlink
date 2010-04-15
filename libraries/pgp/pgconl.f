@@ -1,4 +1,4 @@
-C*PGCONL -- label contour map of a 2D data array 
+C*PGCONL -- label contour map of a 2D data array
 C%void cpgconl(const float *a, int idim, int jdim, int i1, int i2, \
 C% int j1, int j2, float c, const float *tr, const char *label, \
 C% int intval, int minint);

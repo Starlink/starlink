@@ -159,7 +159,7 @@
                DO ZELEM = 1, ZSIZE
                   DO YELEM = 1, YSIZE
                      DO XELEM = 1, XSIZE
-                        GRID(XELEM, YELEM, ZELEM) = 
+                        GRID(XELEM, YELEM, ZELEM) =
      :                    GRID(XELEM, YELEM, ZELEM) / RPTS
                      END DO
                   END DO

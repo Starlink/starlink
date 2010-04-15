@@ -79,10 +79,10 @@
       }
 
 #  Now remove any duplicates.
-      if { ! [ info exists CCDlaterunique ] } { 
+      if { ! [ info exists CCDlaterunique ] } {
          set CCDlaterunique 1
       }
-      if { $CCDlaterunique } { 
+      if { $CCDlaterunique } {
 
 #  Keep later values.
          for { set i [expr $n -1]} { $i > 0 } { incr i -1} {
@@ -106,10 +106,10 @@
                   set line($j) {}
                }
             }
-            
+
          }
       }
-      
+
 #  Clear the current contents and insert the unique version.
       $Box clear 0 end
       for { set i 0 } { $i < $n } { incr i } {

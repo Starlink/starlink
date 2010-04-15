@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Put a string into the line parameter at specified position.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -31,14 +31,14 @@
 
 *   Import:
       BYTE VALUE(256)     ! value string
- 
+
       INTEGER MAXC        ! maximum size of line string
- 
+
 *   Import/Export:
       BYTE LINE(MAXC)     ! line to be modified
- 
+
       INTEGER POS         ! character position
- 
+
 *   External references:
       INTEGER str_LEN     ! string length
 

@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -214,7 +214,7 @@
      :                   SHIFT1, %VAL( CNF_PVAL(PNTR(3)) ), STATUS )
       END IF
       CALL SPD_FDACC( 'unknown parameter', NEWTNP, DIM2, SHIFT0,
-     :   SHIFT1, %VAL( CNF_PVAL(PNTR(1) )), STATUS, 
+     :   SHIFT1, %VAL( CNF_PVAL(PNTR(1) )), STATUS,
      :   %VAL(CNF_CVAL(CSIZE)) )
 
 *  Finally, store the new value into its place.

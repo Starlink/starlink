@@ -84,12 +84,12 @@ my $xright  = 0.5 * ( $x1 + $x2 + $nx * $scale );
 my $ybottom = 0.5 * ( $y1 + $y2 - $ny * $scale );
 my $ytop    = 0.5 * ( $y1 + $y2 + $ny * $scale );
 
-# Read data 
+# Read data
 # ---------
 my $array = read_file( $file );
 
 Graphics::PLplot::plimage($array,
-			  $xleft, $xright, 
+			  $xleft, $xright,
 			  $ybottom, $ytop,
 			  0,12000,
 			  $xleft, $xright,
@@ -102,7 +102,7 @@ Graphics::PLplot::plimage($array,
 
 # AST axes
 # --------
-my $plot = Starlink::AST::Plot->new( $wcsinfo, 
+my $plot = Starlink::AST::Plot->new( $wcsinfo,
    [$xleft,$ybottom,$xright,$ytop],[0.5,0.5, $nx+0.5, $ny+0.5], "Grid=1");
 isa_ok( $plot, "Starlink::AST::Plot" );
 
@@ -154,8 +154,8 @@ sub read_file {
              $file, Astro::FITS::CFITSIO::READONLY(), $status);
 
    my ($array, $nullarray, $anynull);
-   $fptr->read_pixnull( 
-     Astro::FITS::CFITSIO::TLONG(), [1,1], $nx*$ny, $array, $nullarray, 
+   $fptr->read_pixnull(
+     Astro::FITS::CFITSIO::TLONG(), [1,1], $nx*$ny, $array, $nullarray,
      $anynull ,$status);
    $fptr->close_file($status);
 

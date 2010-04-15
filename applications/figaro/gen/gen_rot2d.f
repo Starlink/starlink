@@ -8,7 +8,7 @@ C     be any numeric type with 4 byte elements (ie REAL or
 C     INTEGER but not INTEGER*2 or REAL*8).  This routine
 C     attempts to operate efficiently by manipulating the
 C     working set and adjusting the way it handles the data
-C     according to the size of the working set.  This 
+C     according to the size of the working set.  This
 C     routine is VAX specific, both in coding and concept.
 C
 C     Parameters -   (">" input, "<" output)
@@ -19,7 +19,7 @@ C     (>) IX      (Integer) The first dimension of the input
 C                 array.
 C     (>) IY      (Integer) The second dimension of the input
 C                 array.
-C     (<) OUT     (Real or Integer array OUT(IY,IX)) The 
+C     (<) OUT     (Real or Integer array OUT(IY,IX)) The
 C                 rotated data.
 C
 C                                        KS / CIT  23rd Nov 1982
@@ -44,7 +44,7 @@ C     Get the smaller of the two array dimensions
 C
       SMALL=MIN(IX,IY)
 C
-C     Find the current working set size. 
+C     Find the current working set size.
 C
 C     CALL SYS$ADJWSL(,CURWRK)
 C     CALL SYS$ADJWSL(%VAL(2048),NEWRK)

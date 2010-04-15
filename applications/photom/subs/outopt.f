@@ -2,7 +2,7 @@
 
       SUBROUTINE OUTOPT ( FOUT, INDEX, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
      :                    LAREA, LVSTAR, LSKY, LSKYARE, LSIGMA, LVSKY,
-     :                    MAGS, LSKYMAG, PHOTON, LBIASLE, CODE, LETIME, 
+     :                    MAGS, LSKYMAG, PHOTON, LBIASLE, CODE, LETIME,
      :                    STATUS )
 
 *+
@@ -18,7 +18,7 @@
 *  Invocation :
 *     CALL OUTOPT ( FOUT, INDEX, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
 *                   LAREA, LVSTAR, LSKY, LSKYARE, LSIGMA, LVSKY,
-*                   MAGS, LSKYMAG, PHOTON, LBIASLE, CODE, LETIME, 
+*                   MAGS, LSKYMAG, PHOTON, LBIASLE, CODE, LETIME,
 *                   STATUS )
 *
 *  Description :

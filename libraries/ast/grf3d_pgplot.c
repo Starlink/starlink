@@ -13,8 +13,8 @@
 *     This file can be used as a template for the development of
 *     similar implementations based on other graphics systems.
 *
-*     Unlike world coordinates used by the 2D grf interface, the 3D world 
-*     coordinates used by the grf3D interface are assume to be equally scaled 
+*     Unlike world coordinates used by the 2D grf interface, the 3D world
+*     coordinates used by the grf3D interface are assume to be equally scaled
 *     (that is, they are assumed to have the same units). Therefore this
 *     module has no equivalent to the astGScales function defined by the
 *     2D grf interface.
@@ -28,12 +28,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@ typedef struct camera {
    float target_vector[3];
    float up_vector[3];
    float w2c_matrix[9];
-   float screen_distance;   
+   float screen_distance;
    int ok_flag;
 } Camera;
 
@@ -204,10 +204,10 @@ int astG3DAttr( int attr, double value, double *old_value, int prim ){
 *           GRF__SIZE   - Character and marker size scale factor.
 *           GRF__FONT   - Character font.
 *           GRF__COLOUR - Colour index.
-*     value 
+*     value
 *        A new value to store for the attribute. If this is AST__BAD
 *        no value is stored.
-*     old_value 
+*     old_value
 *        A pointer to a double in which to return the attribute value.
 *        If this is NULL, no value is returned.
 *     prim
@@ -244,9 +244,9 @@ int astG3DAttr( int attr, double value, double *old_value, int prim ){
          ccpgsls( ival );
       }
 
-/* If required retrieve the current line width, and set a new line width. 
+/* If required retrieve the current line width, and set a new line width.
    Line width is stored in Plot as a scale factor (1.0 for the default line
-   width which is a fixed fraction of the diagonal of the view surface), but 
+   width which is a fixed fraction of the diagonal of the view surface), but
    pgplot stores it in units of 0.005 of an inch. */
    } else if( attr == GRF__WIDTH ){
 
@@ -274,11 +274,11 @@ int astG3DAttr( int attr, double value, double *old_value, int prim ){
             ival = 1;
          } else if( ival > 201 ){
             ival = 201;
-         } 
+         }
          ccpgslw( ival );
       }
 
-/* If required retrieve the current character size, and set a new size. 
+/* If required retrieve the current character size, and set a new size.
    The attribute value should be a factor by which to multiply the
    default character size. */
    } else if( attr == GRF__SIZE ){
@@ -316,7 +316,7 @@ int astG3DAttr( int attr, double value, double *old_value, int prim ){
       }
 
 /* Give an error message for any other attribute value. */
-   } else {     
+   } else {
       astError( AST__GRFER, "astG3DAttr: Unknown graphics attribute '%d' "
                 "requested.", attr );
       return 0;
@@ -352,10 +352,10 @@ int astG3DCap( int cap, int value ){
 *        GRF3D__ESC: This function should return a non-zero value if the
 *        astG3DText and astG3DTxExt functions can recognise and interpret
 *        graphics escape sequences within the supplied string. These
-*        escape sequences are described below. Zero should be returned 
+*        escape sequences are described below. Zero should be returned
 *        if escape sequences cannot be interpreted (in which case the
 *        Plot class will interpret them itself if needed). The supplied
-*        "value" argument should be ignored only if escape sequences cannot 
+*        "value" argument should be ignored only if escape sequences cannot
 *        be interpreted by astG3DText and astG3DTxExt. Otherwise, "value"
 *        indicates whether astG3DText and astG3DTxExt should interpret escape
 *        sequences in subsequent calls. If "value" is non-zero then
@@ -367,48 +367,48 @@ int astG3DCap( int cap, int value ){
 *     the supplied capability is not recognised.
 
 *  Escape Sequences:
-*     Escape sequences are introduced into the text string by a percent 
-*     "%" character. The following escape sequences are currently recognised 
+*     Escape sequences are introduced into the text string by a percent
+*     "%" character. The following escape sequences are currently recognised
 *     ("..." represents a string of one or more decimal digits):
 *
 *       %%      - Print a literal "%" character (type GRF__ESPER ).
 *
 *       %^...+  - Draw subsequent characters as super-scripts. The digits
-*                 "..." give the distance from the base-line of "normal" 
-*                 text to the base-line of the super-script text, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 "..." give the distance from the base-line of "normal"
+*                 text to the base-line of the super-script text, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF__ESSUP ).
 *       %^+     - Draw subsequent characters with the normal base-line.
 *
 *       %v...+  - Draw subsequent characters as sub-scripts. The digits
-*                 "..." give the distance from the base-line of "normal" 
-*                 text to the base-line of the sub-script text, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 "..." give the distance from the base-line of "normal"
+*                 text to the base-line of the sub-script text, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF__ESSUB ).
 *
 *       %v+     - Draw subsequent characters with the normal base-line
 *                 (equivalent to %^+).
 *
 *       %>...+  - Leave a gap before drawing subsequent characters.
-*                 The digits "..." give the size of the gap, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 The digits "..." give the size of the gap, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF__ESGAP ).
 *
 *       %<...+  - Move backwards before drawing subsequent characters.
-*                 The digits "..." give the size of the movement, scaled 
-*                 so that a value of "100" corresponds to the height of 
+*                 The digits "..." give the size of the movement, scaled
+*                 so that a value of "100" corresponds to the height of
 *                 "normal" text (type GRF_ESBAC).
 *
 *       %s...+  - Change the Size attribute for subsequent characters. The
-*                 digits "..." give the new Size as a fraction of the 
-*                 "normal" Size, scaled so that a value of "100" corresponds 
+*                 digits "..." give the new Size as a fraction of the
+*                 "normal" Size, scaled so that a value of "100" corresponds
 *                 to 1.0  (type GRF__ESSIZ ).
 *
 *       %s+     - Reset the Size attribute to its "normal" value.
 *
 *       %w...+  - Change the Width attribute for subsequent characters. The
-*                 digits "..." give the new width as a fraction of the 
-*                 "normal" Width, scaled so that a value of "100" corresponds 
+*                 digits "..." give the new width as a fraction of the
+*                 "normal" Width, scaled so that a value of "100" corresponds
 *                 to 1.0  (type GRF__ESWID ).
 *
 *       %w+     - Reset the Size attribute to its "normal" value.
@@ -424,18 +424,18 @@ int astG3DCap( int cap, int value ){
 *       %c+     - Reset the Colour attribute to its "normal" value.
 *
 *       %t...+  - Change the Style attribute for subsequent characters. The
-*                 digits "..." give the new Style value  (type GRF__ESSTY ). 
+*                 digits "..." give the new Style value  (type GRF__ESSTY ).
 *
 *       %t+     - Reset the Style attribute to its "normal" value.
 *
-*       %-      - Push the current graphics attribute values onto the top of 
+*       %-      - Push the current graphics attribute values onto the top of
 *                 the stack - see "%+" (type GRF__ESPSH).
 *
 *       %+      - Pop attributes values of the top the stack - see "%-". If
 *                 the stack is empty, "normal" attribute values are restored
 *                 (type GRF__ESPOP).
-*     
-*     The astFindEscape function (in libast.a) can be used to locate escape 
+*
+*     The astFindEscape function (in libast.a) can be used to locate escape
 *     sequences within a text string. It has the following signature:
 *
 *     #include "plot.h"
@@ -447,25 +447,25 @@ int astG3DCap( int cap, int value ){
 *        type
 *           Pointer to a location at which to return the type of escape
 *           sequence. Each type is identified by a symbolic constant defined
-*           in grf.h and is indicated in the above section. The returned value 
-*           is undefined if the supplied text does not begin with an escape 
+*           in grf.h and is indicated in the above section. The returned value
+*           is undefined if the supplied text does not begin with an escape
 *           sequence.
 *        value
 *           Pointer to a lcation at which to return the integer value
 *           associated with the escape sequence. All usable values will be
 *           positive. Zero is returned if the escape sequence has no associated
-*           integer. A value of -1 indicates that the attribute identified by 
-*           "type" should be reset to its "normal" value (as established using 
-*           the astG3DAttr function, etc). The returned value is undefined if 
+*           integer. A value of -1 indicates that the attribute identified by
+*           "type" should be reset to its "normal" value (as established using
+*           the astG3DAttr function, etc). The returned value is undefined if
 *           the supplied text does not begin with an escape sequence.
 *        nc
 *           Pointer to a location at which to return the number of
 *           characters read by this call. If the text starts with an escape
 *           sequence, the returned value will be the number of characters in
 *           the escape sequence. Otherwise, the returned value will be the
-*           number of characters prior to the first escape sequence, or the 
+*           number of characters prior to the first escape sequence, or the
 *           length of the supplied text if no escape sequence is found.
-      
+
 *     Returned Value:
 *        A non-zero value is returned if the supplied text starts with a
 *        graphics escape sequence, and zero is returned otherwise.
@@ -526,12 +526,12 @@ int astG3DLine( int n, float *x, float *y, float *z ){
 *  Parameters:
 *     n
 *        The number of positions to be joined together.
-*     x 
-*        A pointer to an array holding the "n" x values. 
-*     y 
-*        A pointer to an array holding the "n" y values. 
-*     z 
-*        A pointer to an array holding the "n" z values. 
+*     x
+*        A pointer to an array holding the "n" x values.
+*     y
+*        A pointer to an array holding the "n" y values.
+*     z
+*        A pointer to an array holding the "n" z values.
 
 *  Returned Value:
 *     A value of 0 is returned if an error occurs, and 1 is returned
@@ -586,7 +586,7 @@ int astG3DLine( int n, float *x, float *y, float *z ){
    return result;
 }
 
-int astG3DMark( int n, float *x, float *y, float *z, int type,  
+int astG3DMark( int n, float *x, float *y, float *z, int type,
                 float norm[3] ){
 /*
 *+
@@ -608,11 +608,11 @@ int astG3DMark( int n, float *x, float *y, float *z, int type,
 *  Parameters:
 *     n
 *        The number of markers to draw.
-*     x 
+*     x
 *        A pointer to an array holding the "n" x values.
-*     y 
+*     y
 *        A pointer to an array holding the "n" y values.
-*     z 
+*     z
 *        A pointer to an array holding the "n" z values.
 *     type
 *        An integer which can be used to indicate the type of marker symbol
@@ -655,20 +655,20 @@ int astG3DMark( int n, float *x, float *y, float *z, int type,
 /* Initialise */
    ns = 0;
 
-/* Unless the "norm" vector is parallel to the z axis, we use an up vector 
+/* Unless the "norm" vector is parallel to the z axis, we use an up vector
    that is parallel to the z axis. Otherwise we use an up vector paralle
    to the x axis. */
    if( norm[ 0 ] != 0.0 || norm[ 1 ] != 0.0 ) {
-      up[ 0 ] = 0.0;      
-      up[ 1 ] = 0.0;      
-      up[ 2 ] = 1.0;      
+      up[ 0 ] = 0.0;
+      up[ 1 ] = 0.0;
+      up[ 2 ] = 1.0;
    } else {
-      up[ 0 ] = 1.0;      
-      up[ 1 ] = 0.0;      
-      up[ 2 ] = 0.0;      
+      up[ 0 ] = 1.0;
+      up[ 1 ] = 0.0;
+      up[ 2 ] = 0.0;
    }
 
-/* Create unit vectors along the three axes of the text plane 
+/* Create unit vectors along the three axes of the text plane
    coordinate system. */
    ref[ 0 ] = x[ 0 ];
    ref[ 1 ] = y[ 0 ];
@@ -717,7 +717,7 @@ int astG3DMark( int n, float *x, float *y, float *z, int type,
    ccpgqclp( &clip );
    ccpgsclp( 0 );
 
-/* Draw each marker in turn. */   
+/* Draw each marker in turn. */
    for( i = 0; i < n; i++ ) {
 
 /* Store the centre world coords */
@@ -770,7 +770,7 @@ int astG3DQch( float *ch ){
 
 *  Notes:
 *     - Since the 3D world coordinate axes are assumed to be equally
-*     scaled, the height of text in world coordinate units is independent 
+*     scaled, the height of text in world coordinate units is independent
 *     of the orientation of the text. Therefore, this function returns
 *     only one height value, unlike the equivalent 2D astGQch function
 *     that returns two heights.
@@ -778,9 +778,9 @@ int astG3DQch( float *ch ){
 */
    *ch = getCharHeight();
    return 1;
-}               
+}
 
-int astG3DText( const char *text, float ref[3], const char *just, float up[3], 
+int astG3DText( const char *text, float ref[3], const char *just, float up[3],
                 float norm[3]  ){
 /*
 *+
@@ -792,16 +792,16 @@ int astG3DText( const char *text, float ref[3], const char *just, float up[3],
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int astG3DText( const char *text, float ref[3], const char *just, 
+*     int astG3DText( const char *text, float ref[3], const char *just,
 *                     float up[3], float norm[3] )
 
 *  Description:
 *     This function displays a character string at a given position
-*     on a given plane in 3D world coords, using a specified 
+*     on a given plane in 3D world coords, using a specified
 *     justification and up-vector.
 
 *  Parameters:
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
 *     ref
 *        The reference (x,y,z) coordinates.
@@ -811,15 +811,15 @@ int astG3DText( const char *text, float ref[3], const char *just, float up[3],
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", or 'B' for "bottom", and specifies the
 *        vertical location of the reference position. Note, "bottom"
-*        corresponds to the base-line of normal text. Some characters 
-*        (eg "y", "g", "p", etc) descend below the base-line. The second 
-*        character may be 'L' for "left", 'C' for "centre", or 'R' 
-*        for "right", and specifies the horizontal location of the 
+*        corresponds to the base-line of normal text. Some characters
+*        (eg "y", "g", "p", etc) descend below the base-line. The second
+*        character may be 'L' for "left", 'C' for "centre", or 'R'
+*        for "right", and specifies the horizontal location of the
 *        reference position. If the string has less than 2 characters
-*        then 'C' is used for the missing characters. 
+*        then 'C' is used for the missing characters.
 *     up
 *        The (x,y,z) up-vector for the text. The actual up vector used is
-*        the projection of the supplied vector onto the plane specified by 
+*        the projection of the supplied vector onto the plane specified by
 *        "norm".
 *     norm
 *        The (x,y,z) components of a vector that is normal to the plane
@@ -849,7 +849,7 @@ int astG3DText( const char *text, float ref[3], const char *just, float up[3],
 /* Convert the supplied string into a list of PGPLOT symbol numbers */
    getSymbolList( text, MXLEN, &nlist, list );
 
-/* Create unit vectors along the three axes of the text plane 
+/* Create unit vectors along the three axes of the text plane
    coordinate system. */
    if( !getTextAxes( ref, up, norm, just, tx, ty, tz, newjust ) ) return 0;
 
@@ -857,11 +857,11 @@ int astG3DText( const char *text, float ref[3], const char *just, float up[3],
    return Text( list, nlist, ref, newjust, tx, ty, tz );
 
 /* Clear local constants. */
-#undef MXLEN 
+#undef MXLEN
 }
 
-int astG3DTxExt( const char *text, float ref[3], const char *just, 
-                 float up[3], float norm[3], float *xb, float *yb, 
+int astG3DTxExt( const char *text, float ref[3], const char *just,
+                 float up[3], float norm[3], float *xb, float *yb,
                  float *zb, float bl[3] ){
 /*
 *+
@@ -873,18 +873,18 @@ int astG3DTxExt( const char *text, float ref[3], const char *just,
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int astG3DTxExt( const char *text, float ref[3], const char *just, 
+*     int astG3DTxExt( const char *text, float ref[3], const char *just,
 *                      float up[3], float norm[3], float *xb, float *yb,
 *                      float *zb, float bl[3] )
 
 *  Description:
-*     This function returns the corners of a box which would enclose the 
+*     This function returns the corners of a box which would enclose the
 *     supplied character string if it were displayed using astG3DText.
 *
 *     The returned box INCLUDES any leading or trailing spaces.
 
 *  Parameters:
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
 *     ref
 *        The reference (x,y,z) coordinates.
@@ -893,17 +893,17 @@ int astG3DTxExt( const char *text, float ref[3], const char *just,
 *        text string which is to be placed at the reference position
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", 'B' for "baseline", or "M" for "bottom", and
-*        specifies the vertical location of the reference position. Note, 
-*        "baseline" corresponds to the base-line of normal text. Some 
+*        specifies the vertical location of the reference position. Note,
+*        "baseline" corresponds to the base-line of normal text. Some
 *        characters (eg "y", "g", "p", etc) descend below the base-line,
 *        and so "M" and "B" will produce different effects for such
-*        characters. The second character may be 'L' for "left", 'C' for 
-*        "centre", or 'R' for "right", and specifies the horizontal 
-*        location of the reference position. If the string has less than 
-*        2 characters then 'C' is used for the missing characters. 
+*        characters. The second character may be 'L' for "left", 'C' for
+*        "centre", or 'R' for "right", and specifies the horizontal
+*        location of the reference position. If the string has less than
+*        2 characters then 'C' is used for the missing characters.
 *     up
 *        The (x,y,z) up-vector for the text. The actual up vector used is
-*        the projection of the supplied vector onto the plane specified by 
+*        the projection of the supplied vector onto the plane specified by
 *        "norm".
 *     norm
 *        The (x,y,z) components of a vector that is normal to the plane
@@ -928,7 +928,7 @@ int astG3DTxExt( const char *text, float ref[3], const char *just,
 *     otherwise.
 
 *  Notes:
-*     -  The order of the corners is anti-clockwise starting at the 
+*     -  The order of the corners is anti-clockwise starting at the
 *        bottom left when viewing the text normally (i.e. face on).
 *     -  This routine does not recognise PGPLOT escape sequences.
 *     -  A NULL value for "just" causes a value of "CC" to be used.
@@ -955,7 +955,7 @@ int astG3DTxExt( const char *text, float ref[3], const char *just,
 /* Convert the supplied string into a list of symbol numbers */
    getSymbolList( text, MXLEN, &nlist, list );
 
-/* Create unit vectors along the three axes of the text plane 
+/* Create unit vectors along the three axes of the text plane
    coordinate system. */
    if( !getTextAxes( ref, up, norm, just, tx, ty, tz, newjust ) ) return 0;
 
@@ -963,7 +963,7 @@ int astG3DTxExt( const char *text, float ref[3], const char *just,
    return TxExt( list, nlist, ref, newjust, tx, ty, tz, xb, yb, zb, bl );
 
 /* Clear local constants. */
-#undef MXLEN 
+#undef MXLEN
 }
 
 
@@ -983,7 +983,7 @@ int PG3DSetCamera( float eye[3], float target[3], float up[3], float screen ){
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int PG3DSetCamera( float eye[3], float target[3], float up[3], 
+*     int PG3DSetCamera( float eye[3], float target[3], float up[3],
 *                        float screen )
 
 *  Description:
@@ -993,7 +993,7 @@ int PG3DSetCamera( float eye[3], float target[3], float up[3], float screen ){
 *     A "camera" describes the projection of the 3D world coordinate
 *     space onto a 2D "screen". This screen corresponds to the 2D viewing
 *     surface used by PGPLOT. The 2D window used by PGPLOT (as set by
-*     PGSWIN, etc) defines the bounds of the screen area that is visible 
+*     PGSWIN, etc) defines the bounds of the screen area that is visible
 *     in the PGPLOT viewport.
 *
 *     The 3D world coordinate axes (x,y,z) are such that if "z" is
@@ -1001,28 +1001,28 @@ int PG3DSetCamera( float eye[3], float target[3], float up[3], float screen ){
 *     out of the paper away from you. All 3 axes are assume to have equal
 *     scale.
 *
-*     A camera defines a second set of 3D axes (called "(u,v,w)") with 
+*     A camera defines a second set of 3D axes (called "(u,v,w)") with
 *     origin at the 3D world coordinates given by "eye":
 *
 *     -  the "w" axis points towards the position given by "target"
-*     -  the "v" axis is perpendicular to the "w" axis and is in the plane 
+*     -  the "v" axis is perpendicular to the "w" axis and is in the plane
 *        spanned by the "w" axis and the supplied "up" vector
 *     -  the "u" axis is perpendicular to both "w" and "v" and points to
-*        the left when looking from the eye along the w axis with the v 
+*        the left when looking from the eye along the w axis with the v
 *        axis upwards
 *
 *     Thus the "v" axis is parallel to "vertically up" on the 2D screen,
 *     "u" is parallel to "horizontally to the left", and "w" is
 *     perpendicular to the screen, pointing towards the target.
 *
-*     The screen is a plane perpendicular to the "w" axis, at the "w" axis 
+*     The screen is a plane perpendicular to the "w" axis, at the "w" axis
 *     value given by "screen". A 2D cartesian coordinate system (h,r) is
 *     defined on the screen, with origin at the point where the "w" axis
 *     intersects the screen. The "h" (horizontal) axis is parallel to the
-*     "u" axis but points in the opposite direction (to the left), and the 
-*     "r" (vertical) axis is parallel to the "v" axis. The (h,r) system is 
-*     taken to be the same as the PGPLOT 2D world coordinate system, and 
-*     PGSWIN can therefore be used to specify the rectangular area on the 
+*     "u" axis but points in the opposite direction (to the left), and the
+*     "r" (vertical) axis is parallel to the "v" axis. The (h,r) system is
+*     taken to be the same as the PGPLOT 2D world coordinate system, and
+*     PGSWIN can therefore be used to specify the rectangular area on the
 *     screen that is mapped onto the PGPLOT viewport.
 *
 *     It is assumed that all axes (x,y,z), (u,v,w) and (h,r) are measured
@@ -1033,7 +1033,7 @@ int PG3DSetCamera( float eye[3], float target[3], float up[3], float screen ){
 *        The position vector of the camera's "eye", in 3D world coordinates.
 *     target
 *        The position vector of a point in 3D world coordinates that is
-*        at the centre of the camera's view. In other words, the camera is 
+*        at the centre of the camera's view. In other words, the camera is
 *        looking towards this point. Zero will be returned if the target
 *        is the same position as the eye.
 *     up
@@ -1054,7 +1054,7 @@ int PG3DSetCamera( float eye[3], float target[3], float up[3], float screen ){
 *     calling this function.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    float *u, *v, *w;
@@ -1069,9 +1069,9 @@ int PG3DSetCamera( float eye[3], float target[3], float up[3], float screen ){
 /* Store the supplied values in the camera. */
       memcpy( cam->target_vector, target, 3*sizeof( float ) );
       memcpy( cam->eye_vector, eye, 3*sizeof( float ) );
-      cam->screen_distance = screen;   
+      cam->screen_distance = screen;
 
-/* Get pointers to the three rows of the w2c_matrix. This is a 3x3 matrix that 
+/* Get pointers to the three rows of the w2c_matrix. This is a 3x3 matrix that
    rotates vectors in the (x,y,z) system into vectors in the (u,v,w)
    system. Each row in the matrix is a unit vector along the u, v or w
    axes. */
@@ -1145,7 +1145,7 @@ int PG3DSetEye( float eye[3] ){
 *     for the current PGPLOT device by calling PG3DSetCamera.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    int result = 0;
@@ -1155,9 +1155,9 @@ int PG3DSetEye( float eye[3] ){
    cam = getCamera( 1 );
    if( cam ) {
 
-/* If so, modify the camera values, using the supplied eye position but 
+/* If so, modify the camera values, using the supplied eye position but
    retaining the other camera settings. */
-      result = PG3DSetCamera( eye, cam->target_vector, cam->up_vector, 
+      result = PG3DSetCamera( eye, cam->target_vector, cam->up_vector,
                                 cam->screen_distance );
    }
 
@@ -1182,7 +1182,7 @@ int PG3DRotateEye( int dir, float angle ){
 *     PGPLOT device. Other camera settings are left unchanged. See
 *     PG3DSetCamera for more details.
 *
-*     The eye is moved by a gven distance along an arc of a great circle 
+*     The eye is moved by a gven distance along an arc of a great circle
 *     centred on the current target position. The target position itself
 *     is left unchanged.
 
@@ -1208,7 +1208,7 @@ int PG3DRotateEye( int dir, float angle ){
 *     for the current PGPLOT device by calling PG3DSetCamera.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    int result = 0;
@@ -1230,20 +1230,20 @@ int PG3DRotateEye( int dir, float angle ){
 
 /* If we are moving the eye upwards, find the new eye position. */
       if( dir == 1 ) {
-         for( i = 0; i < 3; i++ ) {   
+         for( i = 0; i < 3; i++ ) {
             neweye[ i ] = e[ i ]*cosa + emod*cam->up_vector[ i ]*sina +
                           cam->target_vector[ i ];
          }
-             
+
 /* If we are moving the eye downwards, find the new eye position. */
       } else if( dir == 2 ) {
-         for( i = 0; i < 3; i++ ) {   
+         for( i = 0; i < 3; i++ ) {
             neweye[ i ] = e[ i ]*cosa - emod*cam->up_vector[ i ]*sina +
                           cam->target_vector[ i ];
          }
 
 /* If we are moving the eye left or right we need a vector in the plane
-   of rotation that is at right angles to "e", and points to the right 
+   of rotation that is at right angles to "e", and points to the right
    of the eye. */
       } else {
          vectorProduct( cam->up_vector, e, f );
@@ -1251,19 +1251,19 @@ int PG3DRotateEye( int dir, float angle ){
 
 /* Get the new eye position. */
          if( dir == 3 ) {
-            for( i = 0; i < 3; i++ ) {   
+            for( i = 0; i < 3; i++ ) {
                neweye[ i ] = e[ i ]*cosa - emod*f[ i ]*sina + cam->target_vector[ i ];
             }
 
          } else {
-            for( i = 0; i < 3; i++ ) {   
+            for( i = 0; i < 3; i++ ) {
                neweye[ i ] = e[ i ]*cosa + emod*f[ i ]*sina + cam->target_vector[ i ];
             }
          }
       }
 
 /* Modify the camera eye vector, retaining the other camera settings. */
-      result = PG3DSetCamera( neweye, cam->target_vector, cam->up_vector, 
+      result = PG3DSetCamera( neweye, cam->target_vector, cam->up_vector,
                               cam->screen_distance );
    }
 
@@ -1289,7 +1289,7 @@ int PG3DForward( float distance ){
 *     PG3DSetCamera for more details.
 *
 *     The eye is moved forward by a given distance towards the target
-*     point, and the target point is also moved forward so that the 
+*     point, and the target point is also moved forward so that the
 *     distance between eye and target remains unchanged.
 
 *  Parameters:
@@ -1309,7 +1309,7 @@ int PG3DForward( float distance ){
 *     for the current PGPLOT device by calling PG3DSetCamera.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    int result = 0;
@@ -1325,14 +1325,14 @@ int PG3DForward( float distance ){
       vectorSub( cam->target_vector, cam->eye_vector, e );
 
 /* Find the new eye and target positions. */
-      for( i = 0; i < 3; i++ ){      
+      for( i = 0; i < 3; i++ ){
          neweye[ i ] = cam->eye_vector[ i ] + e[ i ]*distance;
          newtarg[ i ] = cam->target_vector[ i ] + e[ i ]*distance;
       }
 
-/* Modify the camera eye and target vectors, retaining the other camera 
+/* Modify the camera eye and target vectors, retaining the other camera
    settings. */
-      result = PG3DSetCamera( neweye, newtarg, cam->up_vector, 
+      result = PG3DSetCamera( neweye, newtarg, cam->up_vector,
                               cam->screen_distance );
    }
 
@@ -1379,7 +1379,7 @@ int PG3DFindNearest( int n, float *x, float *y, float *z, int *iclose ){
 *     calling this function.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    int result = 0;
@@ -1399,7 +1399,7 @@ int PG3DFindNearest( int n, float *x, float *y, float *z, int *iclose ){
 /*  Loop through all the supplied positions. */
       dmin = FLT_MAX;
       for( i = 0; i < n; i++ ) {
-         
+
 /* Get the required distance. */
          v[ 0 ] = x[ i ];
          v[ 1 ] = y[ i ];
@@ -1455,7 +1455,7 @@ int PG3DSetTarget( float target[3] ){
 *     for the current PGPLOT device by calling PG3DSetCamera.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    int result = 0;
@@ -1465,9 +1465,9 @@ int PG3DSetTarget( float target[3] ){
    cam = getCamera( 1 );
    if( cam ) {
 
-/* If so, modify the camera values, using the supplied target position but 
+/* If so, modify the camera values, using the supplied target position but
    retaining the other camera settings. */
-      result = PG3DSetCamera( cam->eye_vector, target, cam->up_vector, 
+      result = PG3DSetCamera( cam->eye_vector, target, cam->up_vector,
                                 cam->screen_distance );
    }
 
@@ -1495,7 +1495,7 @@ int PG3DSetUp( float up[3] ){
 
 *  Parameters:
 *     up
-*        The new up vector, in 3D world coordinates. Zero is returned if 
+*        The new up vector, in 3D world coordinates. Zero is returned if
 *        the new up vector is parallel to the line joining the eye and
 *        the target positions.
 
@@ -1511,7 +1511,7 @@ int PG3DSetUp( float up[3] ){
 *     for the current PGPLOT device by calling PG3DSetCamera.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    int result = 0;
@@ -1521,9 +1521,9 @@ int PG3DSetUp( float up[3] ){
    cam = getCamera( 1 );
    if( cam ) {
 
-/* If so, modify the camera values, using the supplied up vector but 
+/* If so, modify the camera values, using the supplied up vector but
    retaining the other camera settings. */
-      result = PG3DSetCamera( cam->eye_vector, cam->target_vector, up, 
+      result = PG3DSetCamera( cam->eye_vector, cam->target_vector, up,
                                 cam->screen_distance );
    }
 
@@ -1551,8 +1551,8 @@ int PG3DSetScreen( float screen ){
 
 *  Parameters:
 *     screen
-*        The distance from the camera's eye to the projection screen in 
-*        3D world coordinate units. If this is zero, then an orthographic 
+*        The distance from the camera's eye to the projection screen in
+*        3D world coordinate units. If this is zero, then an orthographic
 *        projection is used.
 
 *  Returned Value:
@@ -1567,7 +1567,7 @@ int PG3DSetScreen( float screen ){
 *     for the current PGPLOT device by calling PG3DSetCamera.
 *-
 */
- 
+
 /* Local Variables: */
    Camera *cam;
    int result = 0;
@@ -1577,9 +1577,9 @@ int PG3DSetScreen( float screen ){
    cam = getCamera( 1 );
    if( cam ) {
 
-/* If so, modify the camera values, using the supplied screen distance but 
+/* If so, modify the camera values, using the supplied screen distance but
    retaining the other camera settings. */
-      result = PG3DSetCamera( cam->eye_vector, cam->target_vector, 
+      result = PG3DSetCamera( cam->eye_vector, cam->target_vector,
                                 cam->up_vector, screen );
    }
 
@@ -1601,7 +1601,7 @@ int PG3DAutoCamera( float lbnd[3], float ubnd[3] ){
 
 *  Description:
 *     This function sets up the camera and the 2D PGPLOT window for the
-*     current device so that it produces a default view of a specified 
+*     current device so that it produces a default view of a specified
 *     volume of 3D world coordinate space.
 
 *  Parameters:
@@ -1621,7 +1621,7 @@ int PG3DAutoCamera( float lbnd[3], float ubnd[3] ){
 *     calling this function.
 *-
 */
- 
+
 /* Local Variables: */
    float target[3], eye[3], up[3], screen, dx, dy, dz, hlo, hhi, rlo, rhi;
    float x[8], y[8], z[8], h[8], r[8];
@@ -1655,7 +1655,7 @@ int PG3DAutoCamera( float lbnd[3], float ubnd[3] ){
       up[ 1 ] = 0.0;
       up[ 2 ] = 1.0;
 
-/* The screen is at the centre of the box. */ 
+/* The screen is at the centre of the box. */
       dx = eye[ 0 ] - target[ 0 ];
       dy = eye[ 1 ] - target[ 1 ];
       dz = eye[ 2 ] - target[ 2 ];
@@ -1700,7 +1700,7 @@ int PG3DAutoCamera( float lbnd[3], float ubnd[3] ){
             hhi = -FLT_MAX;
             rlo = FLT_MAX;
             rhi = -FLT_MAX;
-   
+
             for( i = 0; i < 8; i++ ) {
                if( h[ i ] < hlo ) hlo = h[ i ];
                if( h[ i ] > hhi ) hhi = h[ i ];
@@ -1710,12 +1710,12 @@ int PG3DAutoCamera( float lbnd[3], float ubnd[3] ){
 
 /* Extend these bounds by 5% at each end */
             dx = 0.05*( hhi - hlo );
-            hhi += dx;         
-            hlo -= dx;         
-   
+            hhi += dx;
+            hlo -= dx;
+
             dy = 0.05*( rhi - rlo );
-            rhi += dy;         
-            rlo -= dy;         
+            rhi += dy;
+            rlo -= dy;
 
 /* If the box has non-zero area, set it as the 2D PGPLOT window, and
    indicate success. */
@@ -1736,7 +1736,7 @@ int PG3DAutoCamera( float lbnd[3], float ubnd[3] ){
 /* Private functions for this module */
 /* ================================= */
 
-static int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3], 
+static int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3],
                     float tz[3] ){
 /*
 *  Name:
@@ -1748,18 +1748,18 @@ static int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3],
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3], 
+*     int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3],
 *                  float tz[3] )
 
 *  Description:
 *     This function initialises the contents of a supplied Camera
-*     structure so that the Camera describes the transformation from 3D 
+*     structure so that the Camera describes the transformation from 3D
 *     "text plane" coordinates to 2D PGPLOT world coordinates. The text
 *     plane coordinate system is defined by three vectors along its x, y
 *     and z axes, and an origin position.
 *
 *     Text plane coordinates describe a plane upon which 2D graphics such
-*     as text is drawn. The X axis is parallel to the text base line, the 
+*     as text is drawn. The X axis is parallel to the text base line, the
 *     Y axis is the text up vector, and the Z axis is perpendicular to
 *     the text, passing from the back of the text to the front of the text.
 
@@ -1769,14 +1769,14 @@ static int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3],
 *     ref
 *        The (x,y,z) coordinates at the text plane origin.
 *     tx
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        X axis. This is parallel to the text base line.
 *     ty
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Y axis. This is parallel to the projectionof ht eup vector on to
 *        the text plane.
 *     tz
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Z axis. This is perpendicular to the text plane, passing from
 *        the back of the text to the front of the text.
 
@@ -1799,7 +1799,7 @@ static int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3],
    cam = getCamera( 1 );
    if( !cam ) return 0;
 
-/* Create a Camera structure that describes the transformation from 
+/* Create a Camera structure that describes the transformation from
    text plane coordinates to 2D world coords, putting the origin of text
    plane coordinates at the given reference position. */
    dx = cam->eye_vector[ 0 ] - ref[ 0 ];
@@ -1825,7 +1825,7 @@ static int TextCam( Camera *textcam, float ref[3], float tx[3], float ty[3],
    return 1;
 }
 
-static int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3], 
+static int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3],
                     float tx[3], float ty[3], float tz[3]  ){
 /*
 *  Name:
@@ -1836,13 +1836,13 @@ static int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3],
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3], 
+*     int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3],
 *                  float tx[3], float ty[3], float tz[3] )
 
 *  Description:
-*     This function draws a polygon centred at a given position on a 
+*     This function draws a polygon centred at a given position on a
 *     given  plane in 3D world coords, using a specified up-vector. The
-*     polygon vertices are specified in text plane coordinates via vx, 
+*     polygon vertices are specified in text plane coordinates via vx,
 *     vy and vz.
 
 *  Parameters:
@@ -1850,22 +1850,22 @@ static int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3],
 *        Number of sides for the polygon. Numbers higher than 32 are
 *        treated as 32.
 *     vx
-*        Pointer to an array of "nside" text plane X axis values. 
+*        Pointer to an array of "nside" text plane X axis values.
 *     vy
-*        Pointer to an array of "nside" text plane Y axis values. 
+*        Pointer to an array of "nside" text plane Y axis values.
 *     vz
-*        Pointer to an array of "nside" text plane Z axis values. 
+*        Pointer to an array of "nside" text plane Z axis values.
 *     ref
 *        The (x,y,z) coordinates at the polygon centre.
 *     tx
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        X axis. This is parallel to the text base line.
 *     ty
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Y axis. This is parallel to the projectionof ht eup vector on to
 *        the text plane.
 *     tz
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Z axis. This is perpendicular to the text plane, passing from
 *        the back of the text to the front of the text.
 
@@ -1889,7 +1889,7 @@ static int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3],
 /* Check the number of points. */
    if( nside > MXSIDE) return 0;
 
-/* Create a Camera structure that describes the transformation from 
+/* Create a Camera structure that describes the transformation from
    text plane coordinates to 2D world coords, putting the origin of text
    plane coordinates at the given reference position. */
    if( !TextCam( &newcam, ref, tx, ty, tz ) ) return 0;
@@ -1904,7 +1904,7 @@ static int Polygon( int nside, float *vx, float *vy, float *vz, float ref[3],
    return 1;
 }
 
-static int Text( int *list, int nlist, float ref[3], const char *just, 
+static int Text( int *list, int nlist, float ref[3], const char *just,
                  float tx[3], float ty[3], float tz[3] ){
 /*
 *  Name:
@@ -1915,11 +1915,11 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int Text( int *list, int nlist, float ref[3], const char *just, 
+*     int Text( int *list, int nlist, float ref[3], const char *just,
 *               float tx[3], float ty[3], float tz[3] )
 
 *  Description:
-*     This function displays a symbol list at a given position on a given 
+*     This function displays a symbol list at a given position on a given
 *     plane in 3D world coords, using a specified justification and up-vector.
 
 *  Parameters:
@@ -1935,21 +1935,21 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", or 'B' for "bottom", and specifies the
 *        vertical location of the reference position. Note, "bottom"
-*        corresponds to the base-line of normal text. Some characters 
-*        (eg "y", "g", "p", etc) descend below the base-line. The second 
-*        character may be 'L' for "left", 'C' for "centre", or 'R' 
-*        for "right", and specifies the horizontal location of the 
+*        corresponds to the base-line of normal text. Some characters
+*        (eg "y", "g", "p", etc) descend below the base-line. The second
+*        character may be 'L' for "left", 'C' for "centre", or 'R'
+*        for "right", and specifies the horizontal location of the
 *        reference position. If the string has less than 2 characters
-*        then 'C' is used for the missing characters. 
+*        then 'C' is used for the missing characters.
 *     tx
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        X axis. This is parallel to the text base line.
 *     ty
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Y axis. This is parallel to the projection of the up vector on to
 *        the text plane.
 *     tz
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Z axis. This is perpendicular to the text plane, passing from
 *        the back of the text to the front of the text.
 
@@ -1991,7 +1991,7 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
    is available. */
    if( ! (cam = getCamera( 1 ) ) ) return 0;
 
-/* Create a Camera structure that describes the transformation from 
+/* Create a Camera structure that describes the transformation from
    text plane coordinates to 2D world coords. */
    if( !TextCam( &newcam, ref, tx, ty, tz ) ) return 0;
 
@@ -1999,15 +1999,15 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
    ccpgqclp( &clip );
    ccpgsclp( 0 );
 
-/* Calculate the text plane X coord of the left hand edge of the first 
+/* Calculate the text plane X coord of the left hand edge of the first
    character. */
-   txleft = tx[ 0 ]*( bl[ 0 ] - ref[ 0 ] ) + 
-            tx[ 1 ]*( bl[ 1 ] - ref[ 1 ] ) + 
+   txleft = tx[ 0 ]*( bl[ 0 ] - ref[ 0 ] ) +
+            tx[ 1 ]*( bl[ 1 ] - ref[ 1 ] ) +
             tx[ 2 ]*( bl[ 2 ] - ref[ 2 ] );
 
 /* Calculate the text plane Y coord at the text baseline. */
-   tybase = ty[ 0 ]*( bl[ 0 ] - ref[ 0 ] ) + 
-            ty[ 1 ]*( bl[ 1 ] - ref[ 1 ] ) + 
+   tybase = ty[ 0 ]*( bl[ 0 ] - ref[ 0 ] ) +
+            ty[ 1 ]*( bl[ 1 ] - ref[ 1 ] ) +
             ty[ 2 ]*( bl[ 2 ] - ref[ 2 ] );
 
 /* Get the character height in world coordinate units. A PGPLOT
@@ -2021,7 +2021,7 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
    system used by grsyxd onto text plane coordinates. This transformation
    will be different for each character in the string. The initial
    transformation set up now is appropriate for the first character. The
-   mapping is: 
+   mapping is:
 
       Text_x = txc + tm*Font_x
       Text_y = tyc + tm*Font_y
@@ -2045,7 +2045,7 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
                 xt[ j ] = txc + tm*xygrid[ k++ ];
                 yt[ j ] = tyc + tm*xygrid[ k++ ];
                 zt[ j++ ] = 0.0;
-             } else { 
+             } else {
                 break;
              }
          }
@@ -2069,8 +2069,8 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
 
 /* If this is not the last symbol... */
       if( i != nlist - 1 ) {
-        
-/* Set the text x value at which to place the left edge of the next 
+
+/* Set the text x value at which to place the left edge of the next
    character. This is the right hand edge of the character just drawn. */
          txleft += tm*( xygrid[ 4 ] - xygrid[ 3 ] );
 
@@ -2093,11 +2093,11 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
    return 1;
 
 /* Clear local constants. */
-#undef MXLEN 
+#undef MXLEN
 }
 
-static int TxExt( int *list, int nlist, float ref[3], const char *just, 
-                  float tx[3], float ty[3], float tz[3], float *xb, float *yb, 
+static int TxExt( int *list, int nlist, float ref[3], const char *just,
+                  float tx[3], float ty[3], float tz[3], float *xb, float *yb,
                   float *zb, float bl[3] ){
 /*
 *  Name:
@@ -2108,12 +2108,12 @@ static int TxExt( int *list, int nlist, float ref[3], const char *just,
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int TxExt( int *list, int nlist, float ref[3], const char *just, 
-*                float tx[3], float ty[3], float tz[3], float *xb, float *yb, 
+*     int TxExt( int *list, int nlist, float ref[3], const char *just,
+*                float tx[3], float ty[3], float tz[3], float *xb, float *yb,
 *                float *zb, float bl[3] )
 
 *  Description:
-*     This function returns the corners of a box which would enclose the 
+*     This function returns the corners of a box which would enclose the
 *     supplied symbol list if it were displayed using Text.
 *
 *     The returned box includes any leading or trailing spaces.
@@ -2130,23 +2130,23 @@ static int TxExt( int *list, int nlist, float ref[3], const char *just,
 *        text string which is to be placed at the reference position
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", 'B' for "baseline", or "M" for "bottom", and
-*        specifies the vertical location of the reference position. Note, 
-*        "baseline" corresponds to the base-line of normal text. Some 
+*        specifies the vertical location of the reference position. Note,
+*        "baseline" corresponds to the base-line of normal text. Some
 *        characters (eg "y", "g", "p", etc) descend below the base-line,
 *        and so "M" and "B" will produce different effects for such
-*        characters. The second character may be 'L' for "left", 'C' for 
-*        "centre", or 'R' for "right", and specifies the horizontal 
-*        location of the reference position. If the string has less than 
-*        2 characters then 'C' is used for the missing characters. 
+*        characters. The second character may be 'L' for "left", 'C' for
+*        "centre", or 'R' for "right", and specifies the horizontal
+*        location of the reference position. If the string has less than
+*        2 characters then 'C' is used for the missing characters.
 *     tx
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        X axis. This is parallel to the text base line.
 *     ty
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Y axis. This is parallel to the projectionof ht eup vector on to
 *        the text plane.
 *     tz
-*        A unit vector (expressed in 3D world coords) along the text plane 
+*        A unit vector (expressed in 3D world coords) along the text plane
 *        Z axis. This is perpendicular to the text plane, passing from
 *        the back of the text to the front of the text.
 *     xb
@@ -2167,7 +2167,7 @@ static int TxExt( int *list, int nlist, float ref[3], const char *just,
 *     otherwise.
 
 *  Notes:
-*     -  The order of the corners is anti-clockwise starting at the 
+*     -  The order of the corners is anti-clockwise starting at the
 *        bottom left when viewing the text normally (i.e. face on).
 *     -  This routine does not recognise PGPLOT escape sequences.
 *     -  A NULL value for "just" causes a value of "CC" to be used.
@@ -2198,10 +2198,10 @@ static int TxExt( int *list, int nlist, float ref[3], const char *just,
 
 /* We now find the bounding box of the text in "text plane coordinates".
    These are (tx,ty,tz) axes that span the plane upon which the text is
-   writtens. The origin of (tx,ty,tz) is at the supplied 3D reference 
-   position, the X axis increases along the text baseline, and Y axis 
-   increases along the text up vector, and Z increases from the back 
-   of the text to the front of the text  (all are measured in 3D world 
+   writtens. The origin of (tx,ty,tz) is at the supplied 3D reference
+   position, the X axis increases along the text baseline, and Y axis
+   increases along the text up vector, and Z increases from the back
+   of the text to the front of the text  (all are measured in 3D world
    coord units). We first find the bounds of the text in these text plane
    coordinates, assuming that the bottom left of the text baseline is
    placed at the given reference position (i.e. at the origiin of text
@@ -2295,7 +2295,7 @@ static int TxExt( int *list, int nlist, float ref[3], const char *just,
       return 0;
    }
 
-/* Use the supplied text plane axis vectors to transform the corners of  
+/* Use the supplied text plane axis vectors to transform the corners of
    the text plane bounding box into 3D world coordinates. */
    xb[ 0 ] = tx[ 0 ]*txlo + ty[ 0 ]*tylo + ref[ 0 ];
    yb[ 0 ] = tx[ 1 ]*txlo + ty[ 1 ]*tylo + ref[ 1 ];
@@ -2323,7 +2323,7 @@ static int TxExt( int *list, int nlist, float ref[3], const char *just,
    return 1;
 
 /* Clear local constants. */
-#undef MXLEN 
+#undef MXLEN
 }
 
 static float getCharHeight( void ){
@@ -2357,15 +2357,15 @@ static float getCharHeight( void ){
 /* Get the normalised PGPLOT character height. */
    ccpgqch( &ch );
 
-/* A PGPLOT character height of 1.0 corresponds to 1/40 of the 2D window 
+/* A PGPLOT character height of 1.0 corresponds to 1/40 of the 2D window
    height. Scale the normalised character height into world coordinate
    units, and return it. */
    return ch*fabs( wy1 - wy2 )/40.0;
 
 }
 
-static int getTextAxes( float ref[3], float up[3], float norm[3], 
-                        const char *just, float tx[3], float ty[3], 
+static int getTextAxes( float ref[3], float up[3], float norm[3],
+                        const char *just, float tx[3], float ty[3],
                         float tz[3], char newjust[3] ){
 /*
 *  Name:
@@ -2376,21 +2376,21 @@ static int getTextAxes( float ref[3], float up[3], float norm[3],
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int getTextAxes( float ref[3], float up[3], float norm[3], 
-*                      const char *just, float tx[3], float ty[3], 
+*     int getTextAxes( float ref[3], float up[3], float norm[3],
+*                      const char *just, float tx[3], float ty[3],
 *                      float tz[3], char newjust[3] )
 
 *  Description:
 *     This function returns three unit vectors that define the axes of a
 *     3D Cartesian coordinate system known as "text plane coordinates".
-*     These axes span the plane upon which text (or other graphics) is to 
-*     be written. The origin is at the supplied 3D reference position, the 
-*     X axis increases along the text baseline, and Y axis increases along 
-*     the text up vector, and Z increases from the back of the text to the 
-*     front of the text (all are measured in 3D world  coord units). 
+*     These axes span the plane upon which text (or other graphics) is to
+*     be written. The origin is at the supplied 3D reference position, the
+*     X axis increases along the text baseline, and Y axis increases along
+*     the text up vector, and Z increases from the back of the text to the
+*     front of the text (all are measured in 3D world  coord units).
 *
 *     The returned vectors are reversed if this will result in text
-*     appearing more "normal" (i.e. viewed from the front rather than 
+*     appearing more "normal" (i.e. viewed from the front rather than
 *     the back, and viewed upright rather thna upside down). If the
 *     vectors are reversed, the justification string is also changed so
 *     that the text occupies the requested area on the screen.
@@ -2400,7 +2400,7 @@ static int getTextAxes( float ref[3], float up[3], float norm[3],
 *        The reference (x,y,z) coordinates.
 *     up
 *        The (x,y,z) up-vector for the text. The actual up vector used is
-*        the projection of the supplied vector onto the plane specified by 
+*        the projection of the supplied vector onto the plane specified by
 *        "norm".
 *     norm
 *        The (x,y,z) components of a vector that is normal to the plane
@@ -2430,7 +2430,7 @@ static int getTextAxes( float ref[3], float up[3], float norm[3],
 /* Initialise the returned justification to equal the supplied
    justification, supplying defaults if required. . */
    if( just ) {
-      strncpy( newjust, just, 2 ); 
+      strncpy( newjust, just, 2 );
       if( !newjust[ 0 ] ) newjust[ 0 ] = 'C';
       if( !newjust[ 1 ] ) newjust[ 1 ] = 'C';
       newjust[ 2 ] = 0;
@@ -2446,15 +2446,15 @@ static int getTextAxes( float ref[3], float up[3], float norm[3],
    it in "eye". */
    vectorSub( cam->eye_vector, ref, eye );
 
-/* Create unit vectors along the three axes of the text plane coordinate 
-   system. These unit vectors are represented in terms of the 3D world 
+/* Create unit vectors along the three axes of the text plane coordinate
+   system. These unit vectors are represented in terms of the 3D world
    coordinate axes. The text Z axis is parallel to the supplied "norm"
    vector. */
    tz[ 0 ] = norm[ 0 ];
    tz[ 1 ] = norm[ 1 ];
    tz[ 2 ] = norm[ 2 ];
 
-/* Attempt to normalise the "tz" vector. If it has zero length, use the 
+/* Attempt to normalise the "tz" vector. If it has zero length, use the
    offset from the reference point to the eye. */
    if( ! vectorNorm( tz ) ){
 
@@ -2494,7 +2494,7 @@ static int getTextAxes( float ref[3], float up[3], float norm[3],
       }
    }
 
-/* If the existing vectors cause the text to be viewed upside down, reverse 
+/* If the existing vectors cause the text to be viewed upside down, reverse
    the tx and ty vectors so that he text is viewed right way up. */
    if( dotProduct( ty, cam->up_vector ) < 0.0 ) {
       ty[ 0 ] = -ty[ 0 ];
@@ -2505,7 +2505,7 @@ static int getTextAxes( float ref[3], float up[3], float norm[3],
       tx[ 2 ] = -tx[ 2 ];
 
 /* The text will have spun around the tz vector (i.e. the viewing vector),
-   so modify both vertical and horizontal justification so that the text 
+   so modify both vertical and horizontal justification so that the text
    occupies the same area on the screen. */
       if( newjust[ 0 ] == 'B' || newjust[ 0 ] == 'M' ) {
          newjust[ 0 ] = 'T';
@@ -2541,14 +2541,14 @@ static void getSymbolList( const char *text, int mxlen, int *nlist, int *list ){
 *     symbol numbers for the current PGPLOT font.
 
 *  Parameters:
-*     text 
+*     text
 *        Pointer to a null-terminated character string.
 *     mxlen
 *        The length of the "list" array.
 *     nlist
 *        Pointer to an integer in which to place the number of symbol
 *        values stored in the "list" array. This will be returned equal
-*        to zero if there are no non-blank characters in the supplied 
+*        to zero if there are no non-blank characters in the supplied
 *        string. If there is one or more non-blank characters in "text",
 *        then the returned list will include any trailing spaces.
 *     list
@@ -2569,7 +2569,7 @@ static void getSymbolList( const char *text, int mxlen, int *nlist, int *list ){
 
 /* Find the length of text that can be displayed. */
       tlen = strlen( text );
-      if( tlen > mxlen ) tlen = mxlen;           
+      if( tlen > mxlen ) tlen = mxlen;
 
 /* Get the current PGPLOT font. */
       ccpgqcf( &font );
@@ -2594,9 +2594,9 @@ static Camera *getCamera( int check ){
 *     Camera getCamera( int check )
 
 *  Description:
-*     This function returns a pointer to a static structure that defines the 
+*     This function returns a pointer to a static structure that defines the
 *     position and orientation of the camera in 3D world coords. It can
-*     be used to transform positions from 3D world coordinates (x,y,z) to 
+*     be used to transform positions from 3D world coordinates (x,y,z) to
 *     2D screen coordinates (h,r).
 
 *  Parameters:
@@ -2610,7 +2610,7 @@ static Camera *getCamera( int check ){
 *     Pointer to the Camera, or NULL if an error occurs.
 *-
 */
- 
+
 /* Local Variables: */
    int id;
    Camera *cam = NULL;
@@ -2630,7 +2630,7 @@ static Camera *getCamera( int check ){
    return cam;
 }
 
-static int transform( Camera *cam, int n, float *x, float *y, float *z, 
+static int transform( Camera *cam, int n, float *x, float *y, float *z,
                       float *h, float *r ){
 /*
 *+
@@ -2642,7 +2642,7 @@ static int transform( Camera *cam, int n, float *x, float *y, float *z,
 
 *  Synopsis:
 *     #include "grf3d.h"
-*     int transform( Camera *cam, int n, float *x, float *y, float *z, 
+*     int transform( Camera *cam, int n, float *x, float *y, float *z,
 *                    float *h, float *r )
 
 *  Description:
@@ -2667,10 +2667,10 @@ static int transform( Camera *cam, int n, float *x, float *y, float *z,
 *        An array of "n" values for the "z" axis of the 3D world
 *        coordinate system.
 *     h
-*        An array to receive the "n" values for the "h" axis of the 2D 
+*        An array to receive the "n" values for the "h" axis of the 2D
 *        screen coordinate system.
 *     r
-*        An array to receive the "n" values for the "r" axis of the 2D 
+*        An array to receive the "n" values for the "r" axis of the 2D
 *        screen coordinate system.
 
 *  Returned Value:
@@ -2678,7 +2678,7 @@ static int transform( Camera *cam, int n, float *x, float *y, float *z,
 
 *-
 */
- 
+
 /* Local Variables: */
    float dx, dy, dz, u, v, w, f;
    int i;
@@ -2701,16 +2701,16 @@ static int transform( Camera *cam, int n, float *x, float *y, float *z,
          dz = z[ i ] - (cam->eye_vector)[ 2 ];
 
 /* Get the representation of this vector in the (u,v,w) system. */
-         u = (cam->w2c_matrix)[ 0 ]*dx + 
-             (cam->w2c_matrix)[ 1 ]*dy + 
+         u = (cam->w2c_matrix)[ 0 ]*dx +
+             (cam->w2c_matrix)[ 1 ]*dy +
              (cam->w2c_matrix)[ 2 ]*dz;
-   
-         v = (cam->w2c_matrix)[ 3 ]*dx + 
-             (cam->w2c_matrix)[ 4 ]*dy + 
+
+         v = (cam->w2c_matrix)[ 3 ]*dx +
+             (cam->w2c_matrix)[ 4 ]*dy +
              (cam->w2c_matrix)[ 5 ]*dz;
-   
-         w = (cam->w2c_matrix)[ 6 ]*dx + 
-             (cam->w2c_matrix)[ 7 ]*dy + 
+
+         w = (cam->w2c_matrix)[ 6 ]*dx +
+             (cam->w2c_matrix)[ 7 ]*dy +
              (cam->w2c_matrix)[ 8 ]*dz;
 
 /* Find the screen coords, using either a tangent plane or an
@@ -2728,7 +2728,7 @@ static int transform( Camera *cam, int n, float *x, float *y, float *z,
             h[ i ] = -u;
             r[ i ] = v;
          }
-   
+
       }
    }
    return result;
@@ -2914,7 +2914,7 @@ static void ccgrsyds( int *list, int *nlist, const char *text, int tlen,
       FONT = (F77_INTEGER_TYPE) font;
 
       F77_CALL(grsyds)( INTEGER_ARRAY_ARG(LIST), INTEGER_ARG(&NLIST),
-                        CHARACTER_ARG(LTEXT), INTEGER_ARG(&FONT) 
+                        CHARACTER_ARG(LTEXT), INTEGER_ARG(&FONT)
                         TRAIL_ARG(ftext) );
 
       *nlist = (int) NLIST;
@@ -2946,7 +2946,7 @@ static void ccgrsyxd( int symbol, int *xygrid, int *unused ){
    int i;
 
    SYMBOL = (F77_INTEGER_TYPE) symbol;
-   F77_CALL(grsyxd)( INTEGER_ARG(&SYMBOL), INTEGER_ARRAY_ARG(XYGRID), 
+   F77_CALL(grsyxd)( INTEGER_ARG(&SYMBOL), INTEGER_ARRAY_ARG(XYGRID),
                      LOGICAL_ARG(&UNUSED) );
 
    *unused = ( UNUSED == F77_TRUE );
@@ -3016,7 +3016,7 @@ static void ccpgqvsz(int units, float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE X2;
    F77_REAL_TYPE Y1;
    F77_REAL_TYPE Y2;
-   
+
    UNITS = (F77_INTEGER_TYPE) units;
    F77_CALL(pgqvsz)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
                     REAL_ARG(&Y1), REAL_ARG(&Y2) );
@@ -3100,7 +3100,7 @@ F77_LOGICAL_FUNCTION(ast_g3dmark)( INTEGER(N),
    GENPTR_INTEGER(TYPE)
    GENPTR_REAL_ARRAY(NORM)
    return astG3DMark( *N, X, Y, Z, *TYPE, NORM ) ? F77_TRUE : F77_FALSE;
-   
+
 }
 
 F77_LOGICAL_FUNCTION(ast_g3dline)( INTEGER(N),
@@ -3112,7 +3112,7 @@ F77_LOGICAL_FUNCTION(ast_g3dline)( INTEGER(N),
    GENPTR_REAL_ARRAY(Y)
    GENPTR_REAL_ARRAY(Z)
    return astG3DLine( *N, X, Y, Z ) ? F77_TRUE : F77_FALSE;
-   
+
 }
 
 
@@ -3120,8 +3120,8 @@ F77_INTEGER_FUNCTION(ast_g3dtext)( CHARACTER(TEXT),
                                    REAL_ARRAY(REF),
                                    CHARACTER(JUST),
                                    REAL_ARRAY(UP),
-                                   REAL_ARRAY(NORM) 
-                                   TRAIL(TEXT) 
+                                   REAL_ARRAY(NORM)
+                                   TRAIL(TEXT)
                                    TRAIL(JUST) ){
    GENPTR_CHARACTER(TEXT)
    GENPTR_REAL_ARRAY(REF)
@@ -3133,7 +3133,7 @@ F77_INTEGER_FUNCTION(ast_g3dtext)( CHARACTER(TEXT),
 
    text = astString( TEXT, TEXT_length );
    just = astString( JUST, JUST_length );
-      
+
 /* Ignore trailing spaces in the text */
    p = text + TEXT_length;
    while( !*p || *p == ' ' ) *(p--) = 0;
@@ -3158,8 +3158,8 @@ F77_INTEGER_FUNCTION(ast_g3dtxext)( CHARACTER(TEXT),
                                     REAL_ARRAY(XB),
                                     REAL_ARRAY(YB),
                                     REAL_ARRAY(ZB),
-                                    REAL_ARRAY(BL) 
-                                    TRAIL(TEXT) 
+                                    REAL_ARRAY(BL)
+                                    TRAIL(TEXT)
                                     TRAIL(JUST) ){
    GENPTR_CHARACTER(TEXT)
    GENPTR_REAL_ARRAY(REF)

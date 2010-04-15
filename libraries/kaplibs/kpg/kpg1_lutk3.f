@@ -13,9 +13,9 @@
 *     CALL KPG1_LUTK3( IPLOT, PARAM, APP, LP, UP, X, RGB, STATUS )
 
 *  Description:
-*     This routine produces a colour table key consisting of 1 or 3 line 
+*     This routine produces a colour table key consisting of 1 or 3 line
 *     plots (1 if the colour table is a greyscale, and 3 if it is not).
-*     The line plots are drawn using the supplied Plot. 
+*     The line plots are drawn using the supplied Plot.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
@@ -39,18 +39,18 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
- 
+
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -92,13 +92,13 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop count   
+      INTEGER I                  ! Loop count
       INTEGER IPENY              ! Index of PEN-Y Frame within IPLOT
       INTEGER MAP                ! Pointer to (PEN-Y -> GRAPHICS) Mapping
       INTEGER NCURVE             ! Number of curves to draw
       INTEGER NPEN               ! Number of pens
       INTEGER PEN( 3 )           ! Pen indices for drawing three curves
-      LOGICAL GREY               ! Is the colour table a greyscale?      
+      LOGICAL GREY               ! Is the colour table a greyscale?
       REAL R, G, B               ! Red, Green and Blue intensities
       CHARACTER SYN(3)*3         ! Synonyms for CURVES attributes
 
@@ -113,13 +113,13 @@
 
 *  Find the PEN-Y Frame in the Plot. Axis 1 of this Frame is pen number,
 *  and axis 2 is RGB intensity.
-      CALL KPG1_ASFFR( IPLOT, 'PEN-Y', IPENY, STATUS ) 
+      CALL KPG1_ASFFR( IPLOT, 'PEN-Y', IPENY, STATUS )
 
 *  Get the Mapping from the PEN-Y Frame to the GRAPHICS Frame.
       MAP = AST_GETMAPPING( IPLOT, IPENY, AST__BASE, STATUS )
 
 *  Copy the RGB intensities (0-1) into the RGB array. Also store the
-*  pen numbers in X. Also note if the RGB intensities are equal 
+*  pen numbers in X. Also note if the RGB intensities are equal
 *  for every pen.
       GREY = .TRUE.
       DO I = LP, UP
@@ -135,27 +135,27 @@
       IF( GREY ) THEN
          NCURVE = 1
 
-*  Find the index of a grey pen which contrast with the background. 
+*  Find the index of a grey pen which contrast with the background.
          CALL KPG1_PGCOL( 'WHITE', LP, UP, PEN( 1 ), STATUS )
-         IF( PEN( 1 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP, 
+         IF( PEN( 1 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP,
      :                                          PEN( 1 ), STATUS )
 
 *  If we have a non-greyscale colour table, draw 3 curves.
       ELSE
          NCURVE = 3
 
-*  Find the indices of red, blur and green pens which contrast with the 
-*  background. 
+*  Find the indices of red, blur and green pens which contrast with the
+*  background.
          CALL KPG1_PGCOL( 'RED', LP, UP, PEN( 1 ), STATUS )
-         IF( PEN( 1 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP, 
+         IF( PEN( 1 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP,
      :                                          PEN( 1 ), STATUS )
 
          CALL KPG1_PGCOL( 'GREEN', LP, UP, PEN( 2 ), STATUS )
-         IF( PEN( 2 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP, 
+         IF( PEN( 2 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP,
      :                                          PEN( 2 ), STATUS )
 
          CALL KPG1_PGCOL( 'BLUE', LP, UP, PEN( 3 ), STATUS )
-         IF( PEN( 3 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP, 
+         IF( PEN( 3 ) .EQ. 0 ) CALL KPG1_PGCOL( 'BLACK', LP, UP,
      :                                          PEN( 3 ), STATUS )
 
       END IF
@@ -165,8 +165,8 @@
 
 *  Map the RGB and X values from the PEN-Y Frame into the GRAPHICS Frame.
 *  Overwrite the original RGB values since they are not needed any more.
-         CALL AST_TRAN2( MAP, NPEN, X( LP, 1 ), RGB( LP, I ), .TRUE., 
-     :                   X( LP, 2 ), RGB( LP, I ), STATUS ) 
+         CALL AST_TRAN2( MAP, NPEN, X( LP, 1 ), RGB( LP, I ), .TRUE.,
+     :                   X( LP, 2 ), RGB( LP, I ), STATUS )
 
 *  Select the default pen for drawing curves.
          CALL AST_SETI( IPLOT, 'COLOUR(CURVES)', PEN( I ), STATUS )
@@ -174,8 +174,8 @@
          CALL KPG1_ASPSY( SYN( I ), '(CURVES)', STATUS )
 
 *  Produce the line plot.
-         CALL KPG1_PLTLN( NPEN, 1, NPEN, X( LP, 2 ), RGB( LP, I ), 
-     :                    .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0, PARAM, 
+         CALL KPG1_PLTLN( NPEN, 1, NPEN, X( LP, 2 ), RGB( LP, I ),
+     :                    .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0, PARAM,
      :                    IPLOT, 1, 1, 1, 1, APP, STATUS )
 
          CALL KPG1_ASPSY( ' ', ' ', STATUS )

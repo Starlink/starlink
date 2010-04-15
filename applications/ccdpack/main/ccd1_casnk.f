@@ -67,7 +67,7 @@
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Global Variables:
       INCLUDE 'CCD1_CACM'        ! CCD1_CALEN = INTEGER
                                  !    Length of elements in character array
@@ -94,12 +94,12 @@
       INTEGER J                  ! End of text chunk in line buffer
       INTEGER K                  ! Loop variable
       INTEGER NCHAR              ! Number of characters in line buffer
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get the text to be written from the AST system.
       CALL AST_GETLINE( LINE, NCHAR, STATUS )
 
@@ -130,7 +130,7 @@
          DO I = 1, NCHAR, CCD1_CALEN - 1
 
 *  Before writing each line, check that the HDS array is large enough
-*  to accomodate it. If not, unmap the array and increase its size. 
+*  to accomodate it. If not, unmap the array and increase its size.
 *  Then re-map it and fill it with blanks to avoid problems with phantom
 *  continuation lines.
             IF ( CCD1_CAPOS .GT. CCD1_CANUM ) THEN
@@ -140,8 +140,8 @@
                CALL DAT_MAPV( CCD1_CALOC, '_CHAR', 'UPDATE', CCD1_CAPTR,
      :                        CCD1_CANUM, STATUS )
                DO K = CCD1_CAPOS, CCD1_CANUM
-                  CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ), 
-     :                            K, ' ', STATUS, 
+                  CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ),
+     :                            K, ' ', STATUS,
      :                            %VAL( CNF_CVAL( CCD1_CALEN ) ) )
                END DO
             END IF
@@ -151,12 +151,12 @@
                J = MIN( I + CCD1_CALEN - 1, NCHAR )
 
 *  Write the line, prefixed by the flag_character.
-               CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ), 
+               CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ),
      :                         CCD1_CAPOS,
      :                         FLAG // LINE( I : J ), STATUS,
      :                         %VAL( CNF_CVAL( CCD1_CALEN ) ) )
 
-*  Increment the line number to be used next, and set the flag 
+*  Increment the line number to be used next, and set the flag
 *  appropriately for a continuation line.
                CCD1_CAPOS = CCD1_CAPOS + 1
                FLAG = '+'

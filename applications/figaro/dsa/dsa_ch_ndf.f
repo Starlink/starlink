@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
 *     a call to DSA_RESHAPE_AXIS). If this is the case, it ought to be
 *     moved to the standard location, so we do that.
          STATUS = 0
-         CALL DSA_ARRAY_SIZE( NAME3, MAX_AXES, TNDIM, TDIMS, ERROR, 
+         CALL DSA_ARRAY_SIZE( NAME3, MAX_AXES, TNDIM, TDIMS, ERROR,
      :      STATUS )
          IF ( ( STATUS .EQ. 0 ) .AND. ( TNDIM .EQ. 1 ) ) THEN
             CALL DTA_DLVAR( NAME2, STATUS )
@@ -150,7 +150,7 @@
 *     numbers. This leaves 2 axis arrays in the structure, an n-d array
 *     that Figaro can use, and a 1D array for the rest of us.
          STATUS = 0
-         CALL DSA_ARRAY_SIZE( NAME2, MAX_AXES, TNDIM, TDIMS, ERROR, 
+         CALL DSA_ARRAY_SIZE( NAME2, MAX_AXES, TNDIM, TDIMS, ERROR,
      :      STATUS )
          IF ( STATUS .EQ. 0 ) THEN
             IF ( TNDIM .GT. 1 ) THEN

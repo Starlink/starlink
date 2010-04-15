@@ -3,24 +3,24 @@
      &                 STOKES_UV,LAMBDA,TITLE,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     R D T S P
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CPARAM (<), NPTS (>), STOKES_I (>), STOKES_Q (>), STOKES_QV (>),
 C STOKES_U (>), STOKES_UV (>), LAMBDA (>), TITLE (>) ,OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C This routine reads in a polarization spectrum from a TSP format file
@@ -91,7 +91,7 @@ C
       CALL NDF_MAP(NDF3,'VARIANCE','_REAL','READ',PTRUV,NELM,STATUS)
       IF (NELM.GT.MAXPTS) THEN
        CALL WR_ERROR('TSP file too big to read in',OUT_LU)
-      ELSE 
+      ELSE
        IF (STATUS.EQ.SAI__OK) THEN
        NPTS = NELM
        CALL READ_IT(NPTS,LAMBDA,STOKES_I,STOKES_Q,STOKES_QV,STOKES_U,

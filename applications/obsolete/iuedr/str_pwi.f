@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Encode integer value into parameter string using edit parameters.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -32,25 +32,25 @@
 
 *   Import:
       INTEGER IVALUE        ! integer to be coded
- 
+
       LOGICAL RIGHT         ! whether right justified
- 
+
       INTEGER FIELD         ! field size
- 
+
       BYTE EDIT             ! edit character
- 
+
       INTEGER MAXC          ! maximum size of VALUE
- 
+
 *   Export:
       BYTE VALUE(MAXC)      ! resulting value string
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
- 
+
 *   Local variables:
       BYTE LEDIT            ! local copy of EDIT
       BYTE LOCAL(256)       ! local copy of STR
- 
+
       INTEGER IFIELD        ! concise field size
 
 *   Default edit to B-format
@@ -63,7 +63,7 @@
          LEDIT = EDIT
 
       END IF
- 
+
 *   Choose format
       IF (LEDIT.EQ.105) THEN
 

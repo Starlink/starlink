@@ -58,14 +58,14 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 ***** SCULIB_PAR_GET0I
 
       SUBROUTINE SCULIB_PAR_GET0I(PARAM, VALUE, STATUS)
 
- 
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -103,7 +103,7 @@
       END IF
 
       END
- 
+
 
 **** SCULIB_PAR_GET0R
 

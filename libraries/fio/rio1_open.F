@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,7 +124,7 @@
 
       ELSE IF( RECSZ .EQ. 0 ) THEN
 *  If the record size has been given as zero, report an error if the
-*  access mode is WRITE, otherwise inquire what the record length 
+*  access mode is WRITE, otherwise inquire what the record length
 *  actually is.
          IF( ACMODU .EQ. 'WRITE' ) THEN
             STATUS = FIO__INVRL
@@ -154,7 +154,7 @@
 #if HAVE_FC_OPEN_READONLY
      :        READONLY,
 #endif
-     :        RECL=RECLEN, 
+     :        RECL=RECLEN,
      :        STATUS='OLD' )
       ELSE IF ( ACMODU .EQ. 'WRITE' ) THEN
          OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,

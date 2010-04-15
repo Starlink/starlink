@@ -39,7 +39,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -211,12 +211,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -253,12 +253,12 @@
 
 \section{Introduction}
 
-C is a general-purpose programming language designed in about 1972 for use on the Unix 
+C is a general-purpose programming language designed in about 1972 for use on the Unix
 operating system.
 The decisions to make the language portable and use it to rewrite Unix have
-caused it to become very popular, and many operating systems, compilers and 
+caused it to become very popular, and many operating systems, compilers and
 general purpose applications have been coded using C.
-{\sl The C programming language} by Brian Kernighan and Dennis Ritchie (second 
+{\sl The C programming language} by Brian Kernighan and Dennis Ritchie (second
 edition) is a good introductory textbook.
 
 C combines the advantages of high-level languages such as Fortran in the
@@ -269,52 +269,52 @@ its data types and operators are closely related to the operations of most
 computers. However Starlink does not recommend the use of C for
 applications programming. There are several reasons for this, not least
 that Fortran provides better facilities for the manipulation of
-multi-dimensional data arrays and the dynamic declaration of array size. 
+multi-dimensional data arrays and the dynamic declaration of array size.
 Additionally there is the problem of maintenance.
-It is very easy (and indeed usual) to write C code which is cryptic; and there 
+It is very easy (and indeed usual) to write C code which is cryptic; and there
 is an ever-present temptation to write highly-condensed code.
 A common failing of C programmers is to write code and then collapse it
-into the shortest possible form assuming that anyone reading the code will be 
+into the shortest possible form assuming that anyone reading the code will be
 an expert.
-Whilst the experienced C programmer will recognise the patterns of code 
-which result, it is recommended by Starlink  
+Whilst the experienced C programmer will recognise the patterns of code
+which result, it is recommended by Starlink
 that such structures are well commented for the benefit of the less
 experienced.
 
-The language has no facilities to perform input and output, and lacks 
+The language has no facilities to perform input and output, and lacks
 Fortran's large set of intrinsic functions.
-However all implementations are accompanied by a (more or less) standard 
+However all implementations are accompanied by a (more or less) standard
 library of functions to accomplish I/O and other tasks.
 These standard functions are made available to  a program by specifying
 the modules  which contain the required set of functions via an include file.
 For example the Standard I/O routines are contained in the file {\tt stdio.h},
-which must be explicitly {\tt include}d in the program source if the functions 
+which must be explicitly {\tt include}d in the program source if the functions
 contained therein are to be used.
 
-The suggestions which follow are made with maintainability, portability and 
+The suggestions which follow are made with maintainability, portability and
 efficiency in mind.
-Several of these recommendations are made because certain code constructs 
+Several of these recommendations are made because certain code constructs
 will have different effects on different C  implementations.
 In some cases the ambiguity is resolved by the ANSI  standard.
 However it may be some time before all C implementations meet the standard,
 and in any case it is preferable to avoid code which suggests more than one
 possibility to the human reader.
 
-Starlink has adopted {\sl The Elements of C Programming Style} by Jay Ranade 
-and Alan Nash as its principal C programming standard.  This book is 
-{\it essential reading}\/ for all contributors of Starlink programs written in 
-C. The present document does not reiterate 
-what is in the book, but contains some additions and clarifications.  Where 
-the advice in Chapter 18, Coding for Non-C Programmers, diverges from 
-that in the main body of the book, Starlink recommends that you follow  
+Starlink has adopted {\sl The Elements of C Programming Style} by Jay Ranade
+and Alan Nash as its principal C programming standard.  This book is
+{\it essential reading}\/ for all contributors of Starlink programs written in
+C. The present document does not reiterate
+what is in the book, but contains some additions and clarifications.  Where
+the advice in Chapter 18, Coding for Non-C Programmers, diverges from
+that in the main body of the book, Starlink recommends that you follow
 Chapter 18.
 
 
 \section{Coding standard}
 
-The advice which follows is grouped into five sections concerning 
-Starlink naming conventions, programming advice, program design, 
-machine independence, and preprocessor advice respectively.  The reader is 
+The advice which follows is grouped into five sections concerning
+Starlink naming conventions, programming advice, program design,
+machine independence, and preprocessor advice respectively.  The reader is
 referred to \xref{SGP/16}{sgp16} for general advice on Starlink coding standards.
 
 \subsection{Starlink naming conventions}
@@ -322,38 +322,38 @@ referred to \xref{SGP/16}{sgp16} for general advice on Starlink coding standards
 The following definitions are used in the rules below:
 
 \begin{description}
-\item [EXPORTED] identifiers are the names of functions, types or preprocessor 
+\item [EXPORTED] identifiers are the names of functions, types or preprocessor
 macros defined within a package and made available for public use.
-\item [INTERNAL] identifiers are the names of functions, types, or 
+\item [INTERNAL] identifiers are the names of functions, types, or
 preprocessor macros defined within a package for internal use only.
-\item [OPAQUE TYPE] is a C type which is defined using the \verb~typedef~ 
-keyword and whose 
-value is hidden from the application.  Manipulation of the value of the type 
+\item [OPAQUE TYPE] is a C type which is defined using the \verb~typedef~
+keyword and whose
+value is hidden from the application.  Manipulation of the value of the type
 is usually done using utility functions, {\em e.g.,} the Motif Widget type.
 \end{description}
 
 
 \srule{Naming Conventions -- Symbolic Constants}
 \begin{itemize}
-\item All identifiers for symbolic constants must be in upper case and be 
+\item All identifiers for symbolic constants must be in upper case and be
 defined as macros.
-\item For a given package, the names of symbolic constants which are the 
-numerical equivalent of existing Fortran constants, both EXPORTED and 
+\item For a given package, the names of symbolic constants which are the
+numerical equivalent of existing Fortran constants, both EXPORTED and
 INTERNAL, must be the same.
-\item The existing Fortran naming convention for package symbolic constants 
+\item The existing Fortran naming convention for package symbolic constants
 is strongly recommended:
 \begin{verbatim}
       PKG__NAME
 \end{verbatim}
-\item There is no requirement to distinguish between EXPORTED and INTERNAL 
+\item There is no requirement to distinguish between EXPORTED and INTERNAL
 symbolic constants.
 \begin{itemize}
-\item EXPORTED symbolic constants are defined in the public package header 
+\item EXPORTED symbolic constants are defined in the public package header
 file
 \begin{verbatim}
       pkg.h
 \end{verbatim}
-\item INTERNAL symbolic constants are defined in the private package header 
+\item INTERNAL symbolic constants are defined in the private package header
 file
 \begin{verbatim}
       pkg_sys.h
@@ -376,33 +376,33 @@ is defined in the Starlink header file
 \begin{verbatim}
       star.h
 \end{verbatim}
-which is synonymous with {\tt sae\_par.h} and is reserved for the definition 
+which is synonymous with {\tt sae\_par.h} and is reserved for the definition
 of the Starlink inherited status.
 \end{itemize}
 
 \srule{Naming Conventions -- Functions}
-\begin{itemize}  
-\item EXPORTED package-defined functions and function-like macros, those which 
+\begin{itemize}
+\item EXPORTED package-defined functions and function-like macros, those which
 evaluate their parameters only once, must conform to the naming convention:
 \begin{verbatim}
       pkgName
 \end{verbatim}
-\item For a given package, the names of EXPORTED functions 
-and function-like macros which are 
-equivalent to existing EXPORTED Fortran routines must reflect their 
+\item For a given package, the names of EXPORTED functions
+and function-like macros which are
+equivalent to existing EXPORTED Fortran routines must reflect their
 Fortran equivalents:
 \begin{verbatim}
       Fortran:  PKG_NAME
 
       C:        pkgName
 \end{verbatim}
-\item INTERNAL package-defined functions and function-like macros 
-must indicate that they are INTERNAL 
+\item INTERNAL package-defined functions and function-like macros
+must indicate that they are INTERNAL
 functions by having an underscore appended to their names:
 \begin{verbatim}
       pkgMyname_
 \end{verbatim}
-\item The name-length restrictions applied in Fortran may be relaxed in the 
+\item The name-length restrictions applied in Fortran may be relaxed in the
 case of INTERNAL C functions and function-like macros.
 \end{itemize}
 
@@ -417,14 +417,14 @@ is defined in the standard Starlink header file
 \begin{verbatim}
       star.h
 \end{verbatim}
-and is used for the declaration of integers guaranteed to have a size of 
+and is used for the declaration of integers guaranteed to have a size of
 32 bits.
 \end{itemize}
 
 \subsection{Programming advice}
 
 \srule{Pointer names should be clearly identified.}
-For example, the variable {\tt i} and the associated pointer 
+For example, the variable {\tt i} and the associated pointer
 might be declared thus:
 \begin{verbatim}
       int i, *i_ptr;
@@ -432,15 +432,15 @@ might be declared thus:
 
 
 \srule{Do not include whitespace inside compound operators.}
-The compound assignment operators in C 
-\verb~( += -= *= /= %= <<= >>= &= ^= |= )~ 
-should be considered to be single tokens. In principle, the characters can 
-be separated by whitespace (or even comments); however it is bad programming 
+The compound assignment operators in C
+\verb~( += -= *= /= %= <<= >>= &= ^= |= )~
+should be considered to be single tokens. In principle, the characters can
+be separated by whitespace (or even comments); however it is bad programming
 practice to do so.
 
 \srule{Don't use the remainder operator with negative integral operands.}
 The remainder operator \verb~%~ gives the remainder when the first operand is
-divided by the second. That is, {\tt a\%b} is the modulus of {\tt a} 
+divided by the second. That is, {\tt a\%b} is the modulus of {\tt a}
 with respect to {\tt b}.
 However, if either {\tt a} or {\tt b} is negative the result will vary according to the
 way integer division is implemented on the particular machine.
@@ -451,13 +451,13 @@ Of course, division by zero must also be avoided.
 The use of global variables in C can lead to confusion over which
 variables are active in a particular program module --
 just as the use of COMMON variables in Fortran can be a problem.
-Try to declare  all such variables as {\tt extern} in the routines which 
+Try to declare  all such variables as {\tt extern} in the routines which
 use them.
-If this practice is adopted the reader can just look at a page of code 
+If this practice is adopted the reader can just look at a page of code
 and see a list of ALL the active variables in a module.
 It is recommended that:
 \begin{itemize}
-\item The global variables used by a program are defined only once 
+\item The global variables used by a program are defined only once
 in a single source file  in which they are explicitly initialized.
 For example:
 \begin{verbatim}
@@ -470,9 +470,9 @@ an explicit initializer:
       extern int counter;
 \end{verbatim}
 \end{itemize}
-Of course, the variable must be given the same type in all 
+Of course, the variable must be given the same type in all
 locations.
-The {\tt lint} program which is usually available on Unix machines can be 
+The {\tt lint} program which is usually available on Unix machines can be
 used to check multiple files for consistent declarations.
 
 \srule{When using true/false variables, create a `pseudo-type' BOOL and define
@@ -484,43 +484,43 @@ For example:
       #define FALSE 0
 
       BOOL flag;
-  
+
       flag = TRUE;
-      if ( flag )  
+      if ( flag )
       ...
 \end{verbatim}
 
 \srule{Do not use {\tt long double} data type.}
-Do not use {\tt long double} data type even with ANSI compilers. Not all 
+Do not use {\tt long double} data type even with ANSI compilers. Not all
 support it.
 
-\srule{Use casts to indicate where (legal) type conversions are taking 
+\srule{Use casts to indicate where (legal) type conversions are taking
 place.}
 For example the function {\tt sqrt} expects a {\tt double} argument.
-To find the square root of the integer {\tt n}, the cast below should be 
+To find the square root of the integer {\tt n}, the cast below should be
 used:
 \begin{verbatim}
       sqrt ( ( double ) n )
 \end{verbatim}
-This does not affect the value of {\tt n} but provides a value of type 
+This does not affect the value of {\tt n} but provides a value of type
 {\tt double} as the argument for the {\tt sqrt} function.
 
 
 \srule{Don't cast pointer types.}
-Conversion of a pointer from one type to another can cause problems if the 
+Conversion of a pointer from one type to another can cause problems if the
 alignment requirements for the types in question are different.
-If the resulting pointer is illegal, this can cause an error or the pointer 
+If the resulting pointer is illegal, this can cause an error or the pointer
 may be automatically adjusted to the nearest legal address.
 Conversion back to the original pointer type may not recover the original
 pointer.
 
 \srule{Use function prototypes.}
-Declare all functions and the types of their parameters.  This enables the 
+Declare all functions and the types of their parameters.  This enables the
 compiler to detect errors in the number of parameters and their types.
 
-\srule{Pay careful attention to the type of the return value from 
+\srule{Pay careful attention to the type of the return value from
 library functions.}
-For example the code fragment below is wrong because {\tt getchar} returns 
+For example the code fragment below is wrong because {\tt getchar} returns
 an {\tt int} not a {\tt char}.
 \begin{verbatim}
       #include <stdio.h>
@@ -535,16 +535,16 @@ The correct way to use {\tt getchar} is indicated in the example below:
       if ( ( i = getchar () ) == EOF )
           /* end of file - do something about it */
       else
-          c = ( char ) i;                                  
+          c = ( char ) i;
 \end{verbatim}
 
 \srule{Use a function pointer type that specifies the correct return type.}
 Functions must be correctly typed.
 The assumption that the default
 type ({\tt int}) is sufficiently large to accommodate a pointer of any
-type is not correct on all computers. 
+type is not correct on all computers.
 For example,  the first function shown below will produce unpredictable
-results on some computers. 
+results on some computers.
 The `good' function illustrates the correct approach.
 \begin{verbatim}
       /* Bad: */
@@ -565,42 +565,42 @@ The `good' function illustrates the correct approach.
 \end{verbatim}
 
 \srule{Use {\tt void *} for generic pointers, not {\tt char *.}}
-The ANSI C standard replaces {\tt char~*} with {\tt void~*} as the 
+The ANSI C standard replaces {\tt char~*} with {\tt void~*} as the
 correct type for a generic pointer.
 
 
-\srule{Always test the pointer returned by {\tt malloc} {\it etc.} 
+\srule{Always test the pointer returned by {\tt malloc} {\it etc.}
 for equality with   the null pointer before attempting to use it.}
-Ignoring the possibility that {\tt malloc} has failed 
-can cause an access violation 
+Ignoring the possibility that {\tt malloc} has failed
+can cause an access violation
 on a  VAX and mayhem on many other systems.
 
-\srule{Don't use a null pointer for anything other than assignment or 
+\srule{Don't use a null pointer for anything other than assignment or
 comparison.}
 A null pointer does not point anywhere. The effect of misusing a
-null pointer is unpredictable. 
+null pointer is unpredictable.
 Consider the code below:
 \begin{verbatim}
       ptr = NULL;
       printf ( "Location 0 contains %d\n", *ptr );
 \end{verbatim}
-Some C implementations permit the 
+Some C implementations permit the
 hardware location~0 to be read (and written), whilst others do not.
 Hence the code above will execute on some computers but not on others.
 
 \srule{Don't assume a zeroed variable will be interpreted as a null pointer.}
 Use the value NULL (which is defined as 0 in \verb!<stdio.h>!)
-when assigning a null pointer. That is:  
+when assigning a null pointer. That is:
 \begin{verbatim}
       ptr = NULL;
 \end{verbatim}
 Note that a null pointer does not necessarily
-result from the conversion of a floating-point zero. 
+result from the conversion of a floating-point zero.
 
-Note also that the conversion of an integer zero to a floating-point type 
+Note also that the conversion of an integer zero to a floating-point type
 cannot be assumed to be a floating-point zero.
 
-\srule{If the return value of a function is being discarded then 
+\srule{If the return value of a function is being discarded then
 cast the  value to void.}
 For example, rather than:
 \begin{verbatim}
@@ -615,15 +615,15 @@ use:
 \subsection{Program design}
 
 \srule{No unused variables or unreachable code.}
-Unused variables and unreachable code may occur during program development or 
-testing, and can arise during program modification.  They must not be present 
+Unused variables and unreachable code may occur during program development or
+testing, and can arise during program modification.  They must not be present
 in operational code.
 
 \srule{Finish a switch statement with a break statement.}
 Adding a break statement at the end of a switch statement does not
 affect the program control flow, but does mean that there
 is less likelihood of introducing a bug if a further case is added
-in the future. 
+in the future.
 \begin{verbatim}
       switch ( c ) {
          case 'a':
@@ -637,48 +637,48 @@ in the future.
 
 
 \srule{Use only non-floating loop variables.}
-The effects of cumulative rounding errors in real numbers cannot be ignored; 
-the precision to which non-integer numbers are held must be considered and 
+The effects of cumulative rounding errors in real numbers cannot be ignored;
+the precision to which non-integer numbers are held must be considered and
 explicitly treated in the code if necessary.
 
 
-\srule{Avoid changing the current loop index and range within a 
+\srule{Avoid changing the current loop index and range within a
 {\tt for} loop.}
-Unlike Fortran, C allows the loop index  and range to be changed 
+Unlike Fortran, C allows the loop index  and range to be changed
 from within the loop control structure.
 For example it is permissible to alter both {\tt i} and {\tt n}
 in the body of the {\tt for} loop below.
 \begin{verbatim}
       for ( i=0; i < n; i++ )
-      {                       
+      {
          ...
       }
-\end{verbatim}          
-However this freedom should not be used unnecessarily as it leads to 
+\end{verbatim}
+However this freedom should not be used unnecessarily as it leads to
 confusing code.
 
 
 
 \srule{Don't use bit fields for storing integer values.}
-This should only be done if storage space  
-really is at a premium. Arithmetic on plain \verb~char~s and 
+This should only be done if storage space
+really is at a premium. Arithmetic on plain \verb~char~s and
 \verb~int~s will usually be far more efficient.
 
 \srule{Take care with element order within structures}
 Put the longest elements first to minimize `padding'.
 
-\srule{Don't add any explicit packing to structures in order to achieve optimum 
+\srule{Don't add any explicit packing to structures in order to achieve optimum
 alignment.}
-What is optimal on one machine may not be on another. Rely 
+What is optimal on one machine may not be on another. Rely
 on the advice in the previous item.
 When using bit fields, use an {\tt int~:~0}
 field to ensure re-alignment afterwards if necessary.
 
 
 
-\srule{Don't use casts and {\tt strcmp} (or {\tt memcmp}) to compare the contents of 
+\srule{Don't use casts and {\tt strcmp} (or {\tt memcmp}) to compare the contents of
 structures for equality.}
-The padding regions within the structures may 
+The padding regions within the structures may
 contain junk, even if the declared fields are identical.
 
 \srule{Use assignment to copy structures (not {\tt strcpy} or {\tt memcpy}).}
@@ -686,7 +686,7 @@ As indicated above, this approach avoids the problem of padding.
 
 
 \srule{Use the correct method for error detection.}
-Most library routines return an indication of failure via an external 
+Most library routines return an indication of failure via an external
 variable called {\tt errno}.
 The obvious way to check for an error might appear to be:
 \begin{quote}
@@ -694,7 +694,7 @@ The obvious way to check for an error might appear to be:
     {\tt if ( errno )}\\
     {\sl  \ \ \ \ make an error report}
 \end{quote}
-However there is no guarantee that the library routine will clear {\tt 
+However there is no guarantee that the library routine will clear {\tt
 errno} in the absence of an error. Initializing {\tt errno} to zero
 before  calling the routine does not solve the problem;
 {\tt errno} may be set as
@@ -715,26 +715,26 @@ compliant with Starlink error-reporting conventions.
 
 
 \srule{Adopt a particular order for parameters in functions.}
-It is recommended that the following order is used for parameters in 
+It is recommended that the following order is used for parameters in
 functions:
 \begin{enumerate}
-\item supplied and unchanged, 
-\item supplied and changed, 
-\item returned, and 
+\item supplied and unchanged,
+\item supplied and changed,
+\item returned, and
 \item status return.
 \end{enumerate}
 
 
-\srule{Functions should return a parameter containing a status value 
+\srule{Functions should return a parameter containing a status value
 indicating success or failure.}
-As mentioned above, global status should be the final item 
+As mentioned above, global status should be the final item
 in a function parameter list.
-It should be a pointer to an integer type, and it is recommended that it is 
+It should be a pointer to an integer type, and it is recommended that it is
 implemented as shown in the example below:
 \begin{verbatim}
       #include "star.h"
       int function fun ( int p, int q, StarStatus *status )
-      {      
+      {
          ...
       }
 \end{verbatim}
@@ -743,20 +743,20 @@ returned to the calling module so that appropriate action can be
 taken if an error is detected.
 
 
-\srule{When passing an array to a function pass the size of the array 
+\srule{When passing an array to a function pass the size of the array
 too.}
-A function which is passed an array (particularly a 
+A function which is passed an array (particularly a
 character string) should also be passed the size of the array.
-The size should be used to ensure that the function does not overwrite the 
+The size should be used to ensure that the function does not overwrite the
 end of the array.
-Failure to adopt this practice can lead to bugs which are very difficult to 
-track down.  Note that unlike in Fortran you cannot use a function parameter 
+Failure to adopt this practice can lead to bugs which are very difficult to
+track down.  Note that unlike in Fortran you cannot use a function parameter
 to declare the size of a passed array; only a pre-defined constant can be used.
 
 
 \srule{Use only one return statement in a function.}
 Generally a single return at the end of a function is recommended.
-However it is permissible to have an extra return after 
+However it is permissible to have an extra return after
 an initial status check if such a check is performed.
 
 
@@ -782,8 +782,8 @@ Do not use:
 
 \srule{Beware using standard library pseudo-random number generators.}
 The range of the numbers generated will be machine-dependent.
-ANSI compilers limit the upper bound of the range of numbers generated to 
-{\tt RAND\_MAX}. 
+ANSI compilers limit the upper bound of the range of numbers generated to
+{\tt RAND\_MAX}.
 This number can be used to normalize the distribution, although
 problems with the resolution of the resulting number distribution may remain.
 
@@ -791,34 +791,34 @@ problems with the resolution of the resulting number distribution may remain.
 \subsection{Machine independence}
 
 
-\srule{Don't assume an order of evaluation as specified by brackets 
+\srule{Don't assume an order of evaluation as specified by brackets
 will be followed.}
-Many pre-ANSI C compilers assume that the binary operators 
+Many pre-ANSI C compilers assume that the binary operators
 \verb~+, *, &, ^, |~
-are both associative and commutative, (in the case where all variables have 
+are both associative and commutative, (in the case where all variables have
 the same type).
 Hence it may rearrange the expression
 {\tt ( a + b ) + ( c + d )} to {\tt ( a + d ) + ( b + c )}.
 
-This rearrangement may cause problems if, for example, the order 
+This rearrangement may cause problems if, for example, the order
 specified was chosen to avoid the possibility of overflow.
 In cases where such considerations apply
-it is necessary to use assignment to temporary variables to force the 
+it is necessary to use assignment to temporary variables to force the
 desired evaluation order.
 
 
-This freedom to regroup expressions has been removed by the 
-new ANSI standard, in 
+This freedom to regroup expressions has been removed by the
+new ANSI standard, in
 recognition of the reality that floating-point arithmetic is not in general
-associative and commutative. Hence the above advice will become obsolete as 
+associative and commutative. Hence the above advice will become obsolete as
 ANSI~C-compliant compilers come into general use.
 
 
 
 \srule{Avoid the more obscure parts of the language.}
-Different C implementations are very likely to vary from each other 
+Different C implementations are very likely to vary from each other
 in obscure areas.
-Keeping to the well-known parts of the language will reduce a 
+Keeping to the well-known parts of the language will reduce a
 program's dependence on the implementation getting everything correct.
 
 
@@ -827,30 +827,30 @@ Each standard character in C must have a distinct, positive integer encoding.
 {\bf However this need not be accomplished using the ASCII encoding system.}
 Many C programs rely on the assumption that letters of the alphabet,
 (or the digits 0--9) are coded contiguously as is the case with ASCII.
-For example, the test below might be used to check if a character is 
+For example, the test below might be used to check if a character is
 a capital letter:
 \begin{verbatim}
       c >= 'A' && c <= 'Z'
 \end{verbatim}
 This code will work with ASCII, but not with the EBCDIC character set.
 
-The programmer must use the functions supplied with the standard 
-header 
+The programmer must use the functions supplied with the standard
+header
 \begin{verbatim}
       ctype.h
 \end{verbatim}
 This contains functions for testing and converting characters.  For example,
-the function 
+the function
 \begin{verbatim}
       isupper ( (int) c )
-\end{verbatim} 
+\end{verbatim}
 is a portable replacement for the code above.
-Similarly, the test of whether a character is a decimal digit 
-should be accomplished with the standard function 
+Similarly, the test of whether a character is a decimal digit
+should be accomplished with the standard function
 \begin{verbatim}
       isdigit ( (int) c )
 \end{verbatim}
-not with the test: 
+not with the test:
 \begin{verbatim}
       c >= '0' && c <= '9'
 \end{verbatim}
@@ -858,40 +858,40 @@ not with the test:
 \srule{Initialize all automatic variables before use.}
 If local variables are not set they may contain junk.
 
-\srule{Always explicitly declare {\tt signed} or {\tt unsigned} when using 
+\srule{Always explicitly declare {\tt signed} or {\tt unsigned} when using
 characters to store  numerical ({\sl i.e.} non-character) data.}
-This is important because 
-the default {\tt char} type may be signed 
+This is important because
+the default {\tt char} type may be signed
 or unsigned depending on the implementation.
 
 
 \srule{Don't assume more bits or bytes in a data type than the standard
  requires.}
-Also don't write code which will fail if there are more bits or bytes present 
+Also don't write code which will fail if there are more bits or bytes present
 than the standard requires.
 
 
-\srule{Don't write hex or octal constants which assume the word-length of a 
+\srule{Don't write hex or octal constants which assume the word-length of a
 machine.}
 For example use {\tt$\sim0$}, not {\tt 0Xffffffff}.
 
 
-\srule{Don't make assumptions about the order or degree of packing of 
+\srule{Don't make assumptions about the order or degree of packing of
 bit fields.}
-Both the order and packing of bit fields are machine-dependent, so 
+Both the order and packing of bit fields are machine-dependent, so
 assumptions regarding them will result in non-portable code.
 
-\srule{Don't write C structures to files which must be read on another 
+\srule{Don't write C structures to files which must be read on another
 machine.}
-Details of structure packing are machine-dependent and should not be allowed 
+Details of structure packing are machine-dependent and should not be allowed
 to appear in files which must be portable.
 
 \srule{Restrict use of library functions to those which are
 generally available.}
-Avoid the use of library functions which are only implemented 
+Avoid the use of library functions which are only implemented
 on some platforms. Use ANSI C Standard or POSIX functions.
 
-\srule{Use the Starlink machine-independent macros for Fortran-to-C 
+\srule{Use the Starlink machine-independent macros for Fortran-to-C
 interfaces.}
 These are documented in \xref{SGP/5}{sgp5}.
 
@@ -900,14 +900,14 @@ These are documented in \xref{SGP/5}{sgp5}.
 
 \srule{Set out pre-processor directives correctly.}
 Start all pre-processor directives on column~1 and do not have any white
-space between the {\tt \#} and the keyword -- some compilers insist on 
+space between the {\tt \#} and the keyword -- some compilers insist on
 these requirements.
 
 \srule{Limit use of preprocessor commands.}
-The use of preprocessor commands should be limited to conditional 
+The use of preprocessor commands should be limited to conditional
 statements and the inclusion of symbolic constants.
 In the case of portable interfaces it is sometimes necessary to define
-macros so that a single version of the main body of the C~code can be 
+macros so that a single version of the main body of the C~code can be
 maintained,
 with any architectural differences confined to header files.
 
@@ -917,22 +917,22 @@ For example \verb~#debug, #eject, #list, #module, and #section~
 are not available on every platform.
 
 \srule{Restrict the contents of personal header files.}
-The main purpose of header files is to encapsulate function prototypes 
+The main purpose of header files is to encapsulate function prototypes
 and package-dependent global constants, global variables and global structures.
 Header files must {\sl not\/} be used extensively for conditional
-compilation.  It is recommended that the number of personal header files used  
+compilation.  It is recommended that the number of personal header files used
 be kept to a minimum.
 
 \srule{Define macros only once.}
 Don't rely on defining a macro at one point and then re-defining its
 value at another point. Define any macro only once, otherwise later changes may
 be made at the wrong point and may not be used. Also, if the second
-definition of the macro is inadvertently omitted (perhaps an include 
-file may have been left out) you 
-may use the wrong value unknowingly, 
+definition of the macro is inadvertently omitted (perhaps an include
+file may have been left out) you
+may use the wrong value unknowingly,
 whereas if the macro is defined
-only once, omitting this definition accidentally will probably produce 
-a compiler error and the mistake will be spotted. 
+only once, omitting this definition accidentally will probably produce
+a compiler error and the mistake will be spotted.
 
 
 \srule{Test if macros have already been defined before defining them.}
@@ -947,16 +947,16 @@ not interpreted twice if it has actually been included twice. For example:
 
       #endif
 \end{verbatim}
-This is a requirement for ANSI C header files and should also be applied to 
+This is a requirement for ANSI C header files and should also be applied to
 personal files.
 
 \srule{Don't use reserved words as names of preprocessor macros.}
-The following identifiers are reserved and must not be used as program 
+The following identifiers are reserved and must not be used as program
 identifiers:
 \begin{verbatim}
-      auto, break, case, char, const, continue, default, do, double, 
+      auto, break, case, char, const, continue, default, do, double,
       else, enum, extern, float, for, goto, if, int, long, register,
-      return, short, signed, sizeof, static, struct, switch, typedef, 
+      return, short, signed, sizeof, static, struct, switch, typedef,
       union, unsigned, void, volatile, while.
 \end{verbatim}
 Although  not forbidden by the standard it is bad programming practice
@@ -968,18 +968,18 @@ Rather than specifying directory names, use the
 compiler options to search the relevant directories.
 
 \srule{Use the standard syntax for include files.}
-Files should be included with the standard syntax.  To search for the file 
+Files should be included with the standard syntax.  To search for the file
 beginning where the source program was found, use
 \begin{verbatim}
       #include "filename"
 \end{verbatim}
- 
+
 To search for the file in the system directories, use
 \begin{verbatim}
       #include <filename>
 \end{verbatim}
 
-The VAX C syntax 
+The VAX C syntax
 \begin{verbatim}
       #include filename
 \end{verbatim}
@@ -988,8 +988,8 @@ extracts the header file from a VMS text library. This is non-portable.
 
 \section{Acknowledgements}
 
-Thanks to Peter Allan, Chris Clayton, Malcolm Currie, Brian McIlwrath, Paul 
-Rees, Keith Shortridge, Dave Terrett, Pat Wallace and 
+Thanks to Peter Allan, Chris Clayton, Malcolm Currie, Brian McIlwrath, Paul
+Rees, Keith Shortridge, Dave Terrett, Pat Wallace and
 Rodney Warren-Smith for their help in compiling this document.
 
 \end{document}

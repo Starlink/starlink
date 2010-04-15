@@ -14,7 +14,7 @@
 
 #  Description:
 #     This function creates a Tk widget and sets variables giving the
-#     pathname of the window and the command name of the widget.  The 
+#     pathname of the window and the command name of the widget.  The
 #     purpose of this is so that widgets and Ccd::* widget-type-things
 #     can be manipulated using the same form of command, without having
 #     to remember which is being manipulated.  This whole approach is
@@ -26,7 +26,7 @@
 #        Name of the variable in the calling context which is to be filled
 #        with the command name of the widget.
 #     pathvar = string
-#        Name of the variable in the calling context which is to be filled 
+#        Name of the variable in the calling context which is to be filled
 #        with the pathname of the window.
 #     objtype = string
 #        The Tk widget type which is to be created.

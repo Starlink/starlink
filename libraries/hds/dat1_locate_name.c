@@ -66,7 +66,7 @@
 
 /* Return a pointer to the start of the name field in the required          */
 /* Component Record Vector element.                                         */
-      *name = (char *) ( pcrv + ( i * SZCRV ) ); 
+      *name = (char *) ( pcrv + ( i * SZCRV ) );
 
 /* Return the current global status value.                                  */
       return hds_gl_status;

@@ -132,14 +132,14 @@
          END IF
 
 *
-*       Set the screen width the flag indicating whether or not listings 
+*       Set the screen width the flag indicating whether or not listings
 *       are to be paged.
 
          SHT__SGZ = SHT
 
 *
-*       If there is a catalogue open and each row is to be preceded by 
-*       a sequence number then calculate and set the space required for 
+*       If there is a catalogue open and each row is to be preceded by
+*       a sequence number then calculate and set the space required for
 *       it.  Otherwise set the space required to zero.
 
          IF (COPEN__SGZ) THEN

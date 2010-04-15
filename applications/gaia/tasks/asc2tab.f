@@ -24,11 +24,11 @@
 *     into an equivalent tab-table. It attempts to be intelligent about
 *     the conversion as it recognises the SExtractor ASCII_HEAD format,
 *     which allows the correct identification of the coordinates (X,Y
-*     and RA/Dec). 
+*     and RA/Dec).
 *
 *     If the file isn't in this format the assumption that the file
 *     contains world coordinates in the second and third columns is
-*     checked (these need to be in hh/dd:mm:ss.ss format), if this fails 
+*     checked (these need to be in hh/dd:mm:ss.ss format), if this fails
 *     a tab-table with no other information is produced, unless the
 *     DECCOL, IDCOL, RACOL, XCOL and YCOL parameters are set.
 *
@@ -120,7 +120,7 @@
       LOGICAL EXISTS            ! TRUE if file exists
       LOGICAL INOPN             ! TRUE when input file is opened
       LOGICAL OUTOPN            ! TRUE when output file is opened
-      
+
 *.
 
 *  Check inherited global status.
@@ -138,15 +138,15 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       INOPN = .TRUE.
 
-*  Now access the tab table. If it already exists then quietly dispose of 
+*  Now access the tab table. If it already exists then quietly dispose of
 *  it.
       CALL PAR_GET0C( 'OUT', OUTNAM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       INQUIRE( FILE = OUTNAM, EXIST = EXISTS )
-      IF ( EXISTS ) THEN 
+      IF ( EXISTS ) THEN
          CALL FIO_ERASE( OUTNAM, STATUS )
       END IF
-      CALL FIO_OPEN( OUTNAM, 'WRITE', 'LIST', 0, IFOUT, STATUS ) 
+      CALL FIO_OPEN( OUTNAM, 'WRITE', 'LIST', 0, IFOUT, STATUS )
       CALL FIO_UNIT( IFOUT, FI, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       OUTOPN = .TRUE.
@@ -182,17 +182,17 @@
 
 *  Ok now do the conversion.
       CALL GAI_A2TAB( IFIN, FI, IDCOL, XCOL, YCOL, RACOL, DECCOL,
-     :                STATUS ) 
+     :                STATUS )
 
 *   Exit in error.
  99   CONTINUE
-      IF ( INOPN ) THEN 
+      IF ( INOPN ) THEN
          CALL FIO_CLOSE( IFIN, STATUS )
       END IF
-      IF ( OUTOPN ) THEN 
+      IF ( OUTOPN ) THEN
          CALL FIO_CLOSE( IFOUT, STATUS )
       END IF
-      
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'ASC2TAB',

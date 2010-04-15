@@ -21,14 +21,14 @@
 
 *  Description:
 *     This application creates a new PermMap and optionally initialises
-*     its attributes. A PermMap is a Mapping which permutes the order of 
-*     coordinates, and possibly also changes the number of coordinates, 
-*     between its input and output. 
+*     its attributes. A PermMap is a Mapping which permutes the order of
+*     coordinates, and possibly also changes the number of coordinates,
+*     between its input and output.
 *
 *     In addition to permuting the coordinate order, a PermMap may also
-*     assign constant values to coordinates. This is useful when the number 
-*     of coordinates is being increased as it allows fixed values to be 
-*     assigned to any new ones. 
+*     assign constant values to coordinates. This is useful when the number
+*     of coordinates is being increased as it allows fixed values to be
+*     assigned to any new ones.
 
 *  Usage:
 *     astpermmap inperm outperm constant options results
@@ -36,43 +36,43 @@
 *  ADAM Parameters:
 *     CONSTANT() = _DOUBLE (Read)
 *        An array containing values which may be assigned to input and/or
-*        output coordinates instead of deriving them from other coordinate 
-*        values. If either of the INPERM or OUTPERM arrays contains a 
-*        negative value, it is used to address this CONSTANT array (such 
-*        that -1 addresses the first element, -2 addresses the second 
-*        element, etc.) and the value obtained is used as the corresponding 
-*        coordinate value. 
+*        output coordinates instead of deriving them from other coordinate
+*        values. If either of the INPERM or OUTPERM arrays contains a
+*        negative value, it is used to address this CONSTANT array (such
+*        that -1 addresses the first element, -2 addresses the second
+*        element, etc.) and the value obtained is used as the corresponding
+*        coordinate value.
 *
 *        Care should be taken to ensure that locations lying outside the
 *        extent of this array are not accidentally addressed. The array is
-*        not used if the INPERM and OUTPERM arrays do not contain negative 
+*        not used if the INPERM and OUTPERM arrays do not contain negative
 *        values. Supply a null value (!) if no constants are needed.
-*     INPERM() = _INTEGER (Read) 
-*        An array of integers which, for each input coordinate, should 
+*     INPERM() = _INTEGER (Read)
+*        An array of integers which, for each input coordinate, should
 *        contain the number of the output coordinate whose value is to be
-*        used (note that this array therefore defines the inverse coordinate 
-*        transformation). Coordinates are numbered starting from 1. 
+*        used (note that this array therefore defines the inverse coordinate
+*        transformation). Coordinates are numbered starting from 1.
 *
 *        For details of additional special values that may be used in
 *        this array, see the description of the CONSTANT parameter.
-*     OUTPERM() = _INTEGER (Read) 
+*     OUTPERM() = _INTEGER (Read)
 *        An array which, for each output coordinate, should contain the
-*        number of the input coordinate whose value is to be used (note 
-*        that this array therefore defines the forward coordinate 
-*        transformation). Coordinates are numbered starting from 1. 
+*        number of the input coordinate whose value is to be used (note
+*        that this array therefore defines the forward coordinate
+*        transformation). Coordinates are numbered starting from 1.
 *
 *        For details of additional special values that may be used in
-*        this array, see the description of the CONSTANT argument. 
+*        this array, see the description of the CONSTANT argument.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new PermMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new PermMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new PermMap.
 
 *  Notes:
-*     - The number of input coordinates (NIN) for the PermMap is equal to 
+*     - The number of input coordinates (NIN) for the PermMap is equal to
 *     the number of values supplied for parameter INPERM.
-*     - The number of output coordinates (NOUT) for the PermMap is equal to 
+*     - The number of output coordinates (NOUT) for the PermMap is equal to
 *     the number of values supplied for parameter OUTPERM.
 
 *  Copyright:
@@ -131,20 +131,20 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the input permutation array.
-      CALL PAR_GET1I( 'INPERM', NDF__MXDIM, INPRM, NIN, STATUS ) 
+      CALL PAR_GET1I( 'INPERM', NDF__MXDIM, INPRM, NIN, STATUS )
 
 *  Get the output permutation array.
-      CALL PAR_GET1I( 'OUTPERM', NDF__MXDIM, OUTPRM, NOUT, STATUS ) 
+      CALL PAR_GET1I( 'OUTPERM', NDF__MXDIM, OUTPRM, NOUT, STATUS )
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999      
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the constants array.
       CALL PAR_GET1D( 'CONSTANTS', NDF__MXDIM, CONST, NCON, STATUS )

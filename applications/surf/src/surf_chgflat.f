@@ -8,17 +8,17 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_CHGFLAT( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     The flatfield information is stored inside each demodulated
 *     data file and this task can be used to change the flatfield that is
@@ -56,7 +56,7 @@
 *     13 March 1997 (timj)
 *         Make separate FLATFIELD task from MODIFY
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -83,7 +83,7 @@
 
 *  External references:
       BYTE SCULIB_BITON                          ! function to set a specified
-                                                 ! bit in a byte 
+                                                 ! bit in a byte
 *  Global variables:
 
 *  Local Constants:
@@ -103,17 +103,17 @@
 
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                                  ! channel numbers of
-                                                 ! bolometers used in the 
+                                                 ! bolometers used in the
                                                  ! observation
       DOUBLE PRECISION BOL_DAY (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                                  ! time and day number on which
                                                  ! the bolometer flatfield was
                                                  ! measured
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
-                                                 ! Nasmyth dU3 coords of 
+                                                 ! Nasmyth dU3 coords of
                                                  ! bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
-                                                 ! Nasmyth dU4 coords of 
+                                                 ! Nasmyth dU4 coords of
                                                  ! bolometers
       INTEGER          BOL_QUAL (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                                  ! bolometer flatfield quality
@@ -145,7 +145,7 @@
       CHARACTER*(DAT__SZLOC) IN_SCUCDX_LOC       ! HDS locator of .SCUCD
                                                  ! extension
       INTEGER          ITEMP                     ! scratch integer
-      INTEGER          NDIM                      ! number of dimensions in 
+      INTEGER          NDIM                      ! number of dimensions in
                                                  ! array
       CHARACTER*80     NEW_FLAT                  ! the name of the file
                                                  ! containing the new flatfield
@@ -261,9 +261,9 @@
       CALL NDF_XLOC (IN_NDF, 'SCUBA', 'UPDATE', IN_SCUBAX_LOC, STATUS)
       CALL NDF_XLOC (IN_NDF, 'SCUCD', 'READ', IN_SCUCDX_LOC, STATUS)
 
- 
+
 *  and read in some parameters describing the observation
-     
+
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
@@ -290,7 +290,7 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
      :     STATUS)
 
@@ -328,7 +328,7 @@
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_SETC('TASK', TSKNAME)
             CALL MSG_SETC('FILE', NEW_FLAT)
-            CALL ERR_REP(' ', '^TASK: Error reading ^FILE flatfield'// 
+            CALL ERR_REP(' ', '^TASK: Error reading ^FILE flatfield'//
      :           ' file',STATUS)
          END IF
       END IF
@@ -344,7 +344,7 @@
      :     DIM, STATUS)
       CALL CMP_PUTNR (IN_SCUBAX_LOC, 'BOL_DU4', NDIM, DIM, BOL_DU4,
      :     DIM, STATUS)
-      CALL CMP_PUTNR (IN_SCUBAX_LOC, 'BOL_CALB', NDIM, DIM, BOL_CALB, 
+      CALL CMP_PUTNR (IN_SCUBAX_LOC, 'BOL_CALB', NDIM, DIM, BOL_CALB,
      :     DIM, STATUS)
       CALL CMP_PUTNI (IN_SCUBAX_LOC, 'BOL_QUAL', NDIM, DIM, BOL_QUAL,
      :     DIM, STATUS)
@@ -356,13 +356,13 @@
       FITS_CHANGED = .TRUE.
 
 *  read the number and A/D,channel of the bolometers used
- 
+
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'N_BOLS', N_BOLS, STATUS)
- 
-      CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_CHAN', 
+
+      CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_CHAN',
      :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_CHAN, ITEMP, STATUS)
-      
+
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOLS) THEN
             STATUS = SAI__ERROR
@@ -372,10 +372,10 @@
      :           STATUS)
          END IF
       END IF
- 
-      CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_ADC', 
+
+      CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_ADC',
      :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP, STATUS)
-      
+
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOLS) THEN
             STATUS = SAI__ERROR
@@ -385,18 +385,18 @@
      :           STATUS)
          END IF
       END IF
-      
+
 *  map the quality array and check its dimensions
- 
+
       CALL NDF_DIM (IN_NDF, MAX__DIM, DIM, NDIM, STATUS)
-      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'UPDATE', 
+      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'UPDATE',
      :     IN_QUALITY_PTR, ITEMP, STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
          QUALITY_MAPPED = .TRUE.
       END IF
- 
+
       N_POS = DIM (2)
- 
+
       IF (STATUS .EQ. SAI__OK) THEN
          IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
      :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
@@ -429,13 +429,13 @@
      :              'has bad dimensions - (^NDIM) ^DIM1 ^DIM2', STATUS)
             END IF
          END IF
-      
+
 *  reset the flatfield quality bit according to the new flatfield file
- 
+
          DO B = 1, N_BOLS
             QUALITY_BIT = BOL_QUAL (BOL_CHAN(B), BOL_ADC(B))
-            CALL SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, 
-     :           %VAL(CNF_PVAL(IN_QUALITY_PTR)), 
+            CALL SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM,
+     :           %VAL(CNF_PVAL(IN_QUALITY_PTR)),
      :           B, B, 1, N_POS, 1, N_BEAM, 1,
      :           QUALITY_BIT, STATUS)
          END DO

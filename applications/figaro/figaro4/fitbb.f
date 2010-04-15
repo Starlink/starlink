@@ -298,7 +298,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -704,7 +704,7 @@
 
 *        Plot fit (the whole lot).
             CALL SPD_WAAL( .TRUE., FITTED, VARUSE, ZONID, PLABEL,
-     :                     RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ), 
+     :                     RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ),
      :                     %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
      :                     MASK, PLTRES, FITX, FITY, MSKELM,
      :                     %VAL( CNF_PVAL(PNTR(4)) ),

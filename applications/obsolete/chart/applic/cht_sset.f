@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -294,7 +294,7 @@
 * sensitive, we don't want filenames converting to uppercase ! Don't
 * know why it was there in the first place, but thought I'd better just
 * comment it out.
-* 
+*
 **  Convert to upper case to make testing easier.
 *           CALL CHR_UCASE( VALUE )
 

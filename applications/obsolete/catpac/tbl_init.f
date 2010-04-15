@@ -2,7 +2,7 @@
 
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
@@ -12,7 +12,7 @@
       INCLUDE 'TBL_PAR'
 
 *  Arguments Given and Returned:
-      CHARACTER*(*) TBDSCR 
+      CHARACTER*(*) TBDSCR
       CHARACTER*(*) TBNAME
 
 *  Status:
@@ -85,5 +85,5 @@
           GOTO 9999
       ENDIF
 
-9999  RETURN      
+9999  RETURN
       END

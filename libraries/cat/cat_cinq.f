@@ -1,23 +1,23 @@
-      SUBROUTINE CAT_CINQ (FI, SZDIM, CI, FNAME, GENUS, EXPR, DTYPE, 
-     :  CSIZE,DIMS, SIZEA, NULL, EXCEPT, SCALEF, ZEROP, ORDER, UNITS, 
+      SUBROUTINE CAT_CINQ (FI, SZDIM, CI, FNAME, GENUS, EXPR, DTYPE,
+     :  CSIZE,DIMS, SIZEA, NULL, EXCEPT, SCALEF, ZEROP, ORDER, UNITS,
      :  EXTFMT, PRFDSP, COMM, DATE, STATUS)
 *+
 *  Name:
-*     CAT_CINQ 
+*     CAT_CINQ
 *  Purpose:
 *     Inquire the values of all the attributes for a column.
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT_CINQ (FI, SZDIM; CI, FNAME, GENUS, EXPR, DTYPE, CSIZE, 
-*       DIMS, SIZEA, NULL, EXCEPT, SCALEF, ZEROP, ORDER, UNITS, EXTFMT, 
+*     CALL CAT_CINQ (FI, SZDIM; CI, FNAME, GENUS, EXPR, DTYPE, CSIZE,
+*       DIMS, SIZEA, NULL, EXCEPT, SCALEF, ZEROP, ORDER, UNITS, EXTFMT,
 *       PRFDSP, COMM, DATE; STATUS)
 *  Description:
-*     Inquire the values of all the attributes for a column. Type 
+*     Inquire the values of all the attributes for a column. Type
 *     conversions are performed if necessary. If the conversion fails a
-*     status is set (this is only likely to be important for null 
-*     values).  Note that the exception value is forced into type 
-*     character in order to avoid having a family of routines.  Note 
+*     status is set (this is only likely to be important for null
+*     values).  Note that the exception value is forced into type
+*     character in order to avoid having a family of routines.  Note
 *     also that the genus attribute is returned explicitly.
 *  Arguments:
 *     FI  =  INTEGER (Given)
@@ -53,12 +53,12 @@
 *        permitted values are:
 *        CAT__NULLD - default, HDS null values used,
 *        CAT__NULLS - null values explicitly specified for the column,
-*        CAT__LOCUM - null values not supported for the column and a 
+*        CAT__LOCUM - null values not supported for the column and a
 *                     locum value used instead.
 *     EXCEPT  =  CHARACTER*(*) (Returned)
 *        In the cases where either the column supports explicitly
 *        specified null values, or nulls are not supported and a locum
-*        is used instead, EXCEPT contains the required value, written 
+*        is used instead, EXCEPT contains the required value, written
 *        into a character string.
 *     SCALEF  =  DOUBLE PRECISION (Returned)
 *        Scale factor for scaled columns.  0.0D0 for columns which are
@@ -67,7 +67,7 @@
 *        Zero point for scaled columns.  0.0D0 for columns which are
 *        not scaled.
 *     ORDER  =  INTEGER (Returned)
-*        The order in which values occur in the column, coded as 
+*        The order in which values occur in the column, coded as
 *        follows:
 *        CAT__ASCND - ascending,
 *        CAT__DSCND - descending,
@@ -98,12 +98,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

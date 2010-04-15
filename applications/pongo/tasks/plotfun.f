@@ -47,9 +47,9 @@
 *     INFILE = _LOGICAL (Read)
 *        Used when ACTION is "POLY". If TRUE then the polynomial
 *        coefficients are stored in a file (the first line of which is
-*        the order of the polynomial), otherwise the coefficients 
+*        the order of the polynomial), otherwise the coefficients
 *        are given using the POLYCOEF parameter.
-* 
+*
 *        [FALSE]
 *     NPOLY = _INTEGER (Read and Write)
 *        The order of the polynomial: used when ACTION is "POLY".
@@ -61,7 +61,7 @@
 *
 *        [The value of the global parameter PONGO_POLYCOEF is used.]
 *     POLYFILE = _CHAR (Read)
-*        The name of a file containing the polynomial coefficients to 
+*        The name of a file containing the polynomial coefficients to
 *        be plotted. Only used when ACTION is "POLY" and INFILE is
 *        TRUE.
 *
@@ -201,11 +201,11 @@
          CALL TRN_CLOSE( STATUS )
       ELSE IF ( ACTION( : 4 ) .EQ. 'POLY' ) THEN
 
-*     See if the coefficients are to be given in a file or by the 
-*     usual parameters. 
+*     See if the coefficients are to be given in a file or by the
+*     usual parameters.
          CALL PAR_GET0L( 'INFILE', INFILE, STATUS )
-         IF ( INFILE ) THEN 
-            CALL PON_ASFIO( 'POLYFILE', 'READ', 'LIST', 0, PFD, OPEN, 
+         IF ( INFILE ) THEN
+            CALL PON_ASFIO( 'POLYFILE', 'READ', 'LIST', 0, PFD, OPEN,
      :                      STATUS )
             CALL FIO_READ( PFD, INBUFF, NCHAR, STATUS )
             READ( INBUFF, * ) NPOLY
@@ -215,7 +215,7 @@
                READ( INBUFF, * ) COEFF( I )
  21         CONTINUE
             IF ( OPEN ) CALL FIO_CLOSE( PFD, STATUS )
-         ELSE 
+         ELSE
             CALL PAR_GET0I( 'NPOLY', NPOLY, STATUS )
             NPOLY = NPOLY + 1
             CALL PAR_GET1D( 'POLYCOEF', MAXPOLY, COEFF, NPTEMP, STATUS )
@@ -235,7 +235,7 @@
          CALL PAR_GET0R( 'XMAX', XMAXP, STATUS )
          CALL PON_PLOTPOLY( XMINP, XMAXP, NPOLY, COEFF )
       ELSE IF ( ACTION( : 6 ) .EQ. 'SPLINE' ) THEN
-         CALL PON_ASFIO( 'SPLINEFILE', 'READ', 'LIST', 0, SFD, OPEN, 
+         CALL PON_ASFIO( 'SPLINEFILE', 'READ', 'LIST', 0, SFD, OPEN,
      :                   STATUS )
 
          IF ( STATUS .NE. SAI__OK ) GO TO 999

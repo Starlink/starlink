@@ -9,7 +9,7 @@ C
 C     Function:
 C        List Hatfield Polarimeter Infrared Data
 C
-C     Description:   
+C     Description:
 C        LHATPOL lists the IR data files in Figaro format as produced
 C        by the Hatfield Polarimeter systems on UKIRT. Its principal
 C        use is to detect spikes for subsequent removal using TSETBAD.
@@ -23,16 +23,16 @@ C     Parameters:
 C    (1) FIGARO     (Char)     The IRPS Figaro file to read.
 C    (2) FILE      (File)      Name of listing file.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         1/4/1990
 C
 C-
 C
 C  History:
-C    1/4/1990   Original Version.   JAB/JAC 
+C    1/4/1990   Original Version.   JAB/JAC
 C
 
 
@@ -69,7 +69,7 @@ C
       INTEGER NSTRT
       INTEGER J
       CHARACTER*80 FNAME,LABEL,UNITS,ERRMES,UTSTART,UTEND,UTDATE
-      LOGICAL OK  
+      LOGICAL OK
       INTEGER FD
 
       INTEGER CHR_LEN
@@ -80,7 +80,7 @@ C
       LENNAME = CHR_LEN(FNAME)
       CALL DSA_OPEN(STATUS)
       CALL DSA_NAMED_INPUT('INPUT',FNAME(:LENNAME),STATUS)
-      
+
 *  Get the data array
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -91,7 +91,7 @@ C
             CALL MSG_OUT('MSG','Dimensions of Input File Invalid',
      :          STATUS)
             STATUS = USER__001
-         ELSE                        
+         ELSE
             NPOINTS = DIMS(1)
             N2 = DIMS(2)
             NCYCLES = DIMS(3)
@@ -122,7 +122,7 @@ C
       CALL DSA_CLOSE(STATUS)
       END
 
-      
+
 
 
       SUBROUTINE TSP_LHATPOL(NCYCLES,N2,NPOINTS,IN,FD,STATUS)
@@ -131,9 +131,9 @@ C
 *   T S P _ L H A T P O L
 *
 *   List data from a Hatfield polarimeter data file to a listing file.
-*   Only the IR data (channel 1) is listed - the aim being to detect spikes 
+*   Only the IR data (channel 1) is listed - the aim being to detect spikes
 *   which are only present in the IR.
-*   
+*
 *
 *    (>)  NCYCLES   (Integer)         Number of cycles
 *    (>)  N2        (Integer)         Second dimension of data array
@@ -144,15 +144,15 @@ C
 *
 *   Jeremy Bailey    1/4/1990
 *
-*+    
+*+
 
       IMPLICIT NONE
 
 *  Parameters
       INTEGER NCYCLES,NPOINTS,N2
-      REAL IN(NPOINTS,N2,NCYCLES) 
+      REAL IN(NPOINTS,N2,NCYCLES)
       INTEGER FD
-      INTEGER STATUS        
+      INTEGER STATUS
 
 *  Local variables
       CHARACTER*80 BUF

@@ -34,13 +34,13 @@ datAnnul(HDSLoc **locator,
 
 /* Set a new error context                                                  */
    emsMark();
-   
+
    dat1_import_loc(*locator, &lcp );
 
    if( hds_gl_status == DAT__LOCER )
       emsAnnul(&hds_gl_status);
    emsRlse();
-   
+
    if ( lcp != NULL )
    {
       dat1_annul_lcp( &lcp );
@@ -50,7 +50,7 @@ datAnnul(HDSLoc **locator,
 */
 
    dat1_free_hdsloc(locator );
- 
+
 /*
    If an error occurred, then report a contextual error message.
 */

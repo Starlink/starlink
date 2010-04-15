@@ -26,7 +26,7 @@
  *     17-Sep-2001 (AJC):
  *        Update EMS usage.
  *     03-Jan-2008 (TIMJ):
- *        Use CNF to export the fortran pointer.  
+ *        Use CNF to export the fortran pointer.
  *-
  */
 
@@ -40,7 +40,7 @@
 #include "aio.h"			/* Asterix I/O library */
 
 
-F77_SUBROUTINE(aio_crefco)( CHARACTER(type), CHARACTER(fmt), 
+F77_SUBROUTINE(aio_crefco)( CHARACTER(type), CHARACTER(fmt),
                             POINTER(fco), INTEGER(status)
                             TRAIL(type) TRAIL(fmt) )
   {
@@ -51,7 +51,7 @@ F77_SUBROUTINE(aio_crefco)( CHARACTER(type), CHARACTER(fmt),
   AIOformatControl	*fcoref;
 
   if ( *status != SAI__OK )             /* Check status on entry */
-    return;  
+    return;
 
   fcoref = (AIOformatControl *) 	/* Allocate memory for convertor */
        cnfMalloc(sizeof(AIOformatControl));
@@ -68,7 +68,7 @@ F77_SUBROUTINE(aio_crefco)( CHARACTER(type), CHARACTER(fmt),
     fcoref->func = F77_EXTERNAL_NAME(aio_itoc);
     fcoref->size = sizeof(F77_INTEGER_TYPE);
     }
-  
+
   else if ( ! strncmp( type, "_REAL", 5 ) )
     {
     fcoref->type = AIO_T_REAL;
@@ -110,7 +110,7 @@ F77_SUBROUTINE(aio_crefco)( CHARACTER(type), CHARACTER(fmt),
     fcoref->fmt = cnfCreim( fmt, 	/* Store format in the block */
                         fmt_length );
     fcoref->fmtlen = fmt_length;
-    
+
     *fco = cnfFptr( fcoref );	/* Set return value */
     }
   }

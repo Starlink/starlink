@@ -30,8 +30,8 @@
 *     into an 8-bit representation which is then output to a simple
 *     greyscale TIFF-6.0 file.
 *
-*     If the 'high' scaling value is less than the 'low' value, the 
-*     output image will be a negative.  Bad values are set to 0 for 
+*     If the 'high' scaling value is less than the 'low' value, the
+*     output image will be a negative.  Bad values are set to 0 for
 *     positives and 255 for negatives.
 
 *  Usage:
@@ -41,24 +41,24 @@
 
 *  Parameters:
 *     HIGH = _DOUBLE (Read)
-*        The array value that scales to 255 in the TIFF file.  It is 
+*        The array value that scales to 255 in the TIFF file.  It is
 *        only required if SCALE is "Scale".  All larger array values are
-*        set to 255 when HIGH is greater than LOW, otherwise all array 
-*        values less than HIGH are set to 255.  The dynamic default is 
+*        set to 255 when HIGH is greater than LOW, otherwise all array
+*        values less than HIGH are set to 255.  The dynamic default is
 *        the maximum data value.  There is an efficiency gain when both
 *        LOW and HIGH are given on the command line, because the extreme
-*        values need not be computed.  The highest data value is 
+*        values need not be computed.  The highest data value is
 *        suggested in prompts.
 *     IN = NDF (Read)
 *        Input NDF data structure containing the image to be displayed.
 *     LOW = _DOUBLE (Read)
 *        The array value that scales to 0 in the TIFF file.  It is only
 *        required if SCALE is "Scale".  All smaller array values are
-*        also set to 0 when LOW is less than HIGH, otherwise all array 
-*        values greater than LOW are set to 0.  The dynamic default is 
-*        the minimum data value.  There is an efficiency gain when both 
+*        also set to 0 when LOW is less than HIGH, otherwise all array
+*        values greater than LOW are set to 0.  The dynamic default is
+*        the minimum data value.  There is an efficiency gain when both
 *        LOW and HIGH are given on the command line, because the extreme
-*        values need not be computed.  The lowest data value is 
+*        values need not be computed.  The lowest data value is
 *        suggested in prompts.
 *     MSG_FILTER = LITERAL (Read)
 *        The output message filtering level, QUIET, NORMAL or
@@ -85,23 +85,23 @@
 *                          maximum data values. (This is the default.)
 *          "Faint"       - The image is scaled from the mean minus one
 *                          standard deviation to the mean plus seven
-*                          standard deviations.  
+*                          standard deviations.
 *          "Percentiles" - The image is scaled between the values
-*                          corresponding to two percentiles.  
+*                          corresponding to two percentiles.
 *          "Scale"       - You define the upper and lower limits
 *                          between which the image is to be scaled.  The
 *                          application suggests the maximum and the
 *                          minimum values when prompting.
 *          "Sigmas"      - The image is scaled between two standard-
-*                          deviation limits.  
+*                          deviation limits.
 *     SCALOW = _DOUBLE (Write)
 *        The array value scaled to the minimum colour index.
 *     SIGMAS( 2 ) = _REAL (Read)
 *        The standard-deviation bounds that define the scaling limits.
-*        It is only required if SCALE is "Sigmas".  To obtain values 
-*        either side of the mean both a negative and a positive value 
-*        are required.  Thus [-2,3] would scale between the mean minus 
-*        two and the mean plus three standard deviations.  [3,-2] would 
+*        It is only required if SCALE is "Sigmas".  To obtain values
+*        either side of the mean both a negative and a positive value
+*        are required.  Thus [-2,3] would scale between the mean minus
+*        two and the mean plus three standard deviations.  [3,-2] would
 *        give the negative of that.
 
 *  Examples:
@@ -208,7 +208,7 @@
       DOUBLE PRECISION DMAXV     ! Minimum value in the array
       DOUBLE PRECISION DMINV     ! Maximum value in the array
       REAL DUMMY                 ! Used to swap percentiles
-      INTEGER EL                 ! Number of elements in the input and 
+      INTEGER EL                 ! Number of elements in the input and
                                  ! cell arrays
       INTEGER FIOD               ! FIO File Descriptor
       INTEGER FLEN               ! Size of output file
@@ -269,7 +269,7 @@
          GOTO 980
       END IF
 
-*  Check whether or not bad pixels may be present.      
+*  Check whether or not bad pixels may be present.
       CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
 
 *  Map the image with type _DOUBLE.
@@ -288,8 +288,8 @@
        CALL CHR_UCASE( TEMP )
        NC = CHR_LEN( TEMP )
        IF ( TEMP( NC - 3:NC ) .NE. '.TIF' ) OUT = OUT( 1:NC )//'.tif'
-         
-*  Open the file.  Use of access mode 'APPEND' with RIO just has the 
+
+*  Open the file.  Use of access mode 'APPEND' with RIO just has the
 *  effect of creating the file if it does not exist.
        FLEN = EL + 122
        CALL RIO_OPEN( OUT, 'APPEND', 'UNFORMATTED', FLEN, FIOD,
@@ -299,7 +299,7 @@
 *  Determine the type of scaling.
 *  ==============================
 
-*  If scaling, get the type of scaling to be done on the array.  No 
+*  If scaling, get the type of scaling to be done on the array.  No
 *  scaling is the same as RANGE.
       CALL PAR_CHOIC( 'SCALE', 'Scale',
      :                'Scale,Flash,Faint,Percentiles,Range,Sigma',
@@ -334,15 +334,15 @@
 *  ----------------------------------------------------------
       ELSE IF ( MODE( 1:2 ) .EQ. 'RA' ) THEN
 
-*  Scale the image between user-defined limits.  The cell array has 
-*  values between the colour-index limits and the largest colour index 
+*  Scale the image between user-defined limits.  The cell array has
+*  values between the colour-index limits and the largest colour index
 *  for the device.
 
 *  Obtain the maximum and minimum values.
-         CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+         CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    NINVAL, DIMHI, DIMLO, MAXPOS, MINPOS, STATUS )
 
-*  The number of bad pixels has been counted so it might be possible to 
+*  The number of bad pixels has been counted so it might be possible to
 *  save future processing.
          BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
@@ -350,8 +350,8 @@
 *  --------------------------------------------
       ELSE IF ( MODE( 1:2 ) .EQ. 'SC' ) THEN
 
-*  Determine whether or not the scaling parameters have been found, to 
-*  avoid finding the maximum and minimum values when they are not 
+*  Determine whether or not the scaling parameters have been found, to
+*  avoid finding the maximum and minimum values when they are not
 *  required.
          CALL PAR_STATE( 'LOW', ACTLOW, STATUS )
          CALL PAR_STATE( 'HIGH', ACTHIG, STATUS )
@@ -365,11 +365,11 @@
          ELSE
 
 *  Obtain the maximum and minimum values to be used as dynamic defaults.
-            CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                       NINVAL, DMAXV, DMINV, MAXPOS, MINPOS, 
+            CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       NINVAL, DMAXV, DMINV, MAXPOS, MINPOS,
      :                       STATUS )
 
-*  The number of bad pixels has been counted so it might be possible to 
+*  The number of bad pixels has been counted so it might be possible to
 *  save future processing.
             BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
@@ -401,7 +401,7 @@
 *  Record the polarity.
          POSTIV = PERCNT( 2 ) .GT. PERCNT( 1 )
 
-*  Also get the number of histogram bins to be used; suggest the 
+*  Also get the number of histogram bins to be used; suggest the
 *  maximum allowable as the default.
          CALL PAR_GDR0I( 'NUMBIN', MAXBIN, 1, MAXBIN, .TRUE., NUMBIN,
      :                   STATUS )
@@ -410,19 +410,19 @@
 *  check it has been obtained.
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Obtain the maximum and minimum values to define the bounds of the 
+*  Obtain the maximum and minimum values to define the bounds of the
 *  histogram.
-            CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                       NINVAL, DMAXV, DMINV, MAXPOS, MINPOS, 
+            CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       NINVAL, DMAXV, DMINV, MAXPOS, MINPOS,
      :                       STATUS )
 
-*  The number of bad pixels has been counted so it might be possible to 
+*  The number of bad pixels has been counted so it might be possible to
 *  save future processing.
             BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
 *  Generate the histogram between those bounds.
             CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                       NUMBIN, .FALSE., DMAXV, DMINV, HIST, 
+     :                       NUMBIN, .FALSE., DMAXV, DMINV, HIST,
      :                       STATUS )
 
 *  Estimate the values at the percentiles.
@@ -436,7 +436,7 @@
                PERVAL( 2 ) = DUMMY
             END IF
 
-*  Scale the data values using the percentile values.  Copy the scaling 
+*  Scale the data values using the percentile values.  Copy the scaling
 *  values for output.
             DIMLO = PERVAL( 1 )
             DIMHI = PERVAL( 2 )
@@ -451,11 +451,11 @@
 
 *  Write the TIFF File
 *  ===================
-       
+
 *  Report the scaling limits for future use if MSG_FILTER is VERBOSE.
          CALL MSG_SETD( 'MINVAL', DIMLO )
          CALL MSG_SETD( 'MAXVAL', DIMHI )
-         CALL MSG_OUTIF( MSG__VERB, 'PVLO', 
+         CALL MSG_OUTIF( MSG__VERB, 'PVLO',
      :                   'Data will be scaled from ^MINVAL to ^MAXVAL.',
      :                   STATUS )
 
@@ -463,7 +463,7 @@
          CALL PSX_CALLOC( FLEN, '_CHAR', OPNTR, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-         CALL CON_WRTIF( EL, %VAL( CNF_PVAL( PNTRI(1) ) ), DIMS, FLEN, 
+         CALL CON_WRTIF( EL, %VAL( CNF_PVAL( PNTRI(1) ) ), DIMS, FLEN,
      :                   FIOD, DIMLO, DIMHI, %VAL( CNF_PVAL( OPNTR ) ),
      :                   STATUS )
 

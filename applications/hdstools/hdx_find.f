@@ -55,7 +55,7 @@ C Now find locator
 *  locate whole object
          IF( OBJECT(K) .EQ. ' ' ) THEN
             CALL DAT_CLONE( LOCOUT, LOC, STATUS )
- 
+
          ELSE
             CALL DAT_FIND(LOCOUT,OBJECT(K),LOC,STATUS)
 
@@ -72,12 +72,12 @@ C Now find locator
 
             IF ( CELL ) THEN
                CALL DAT_CELL(LOC,KDIM(K),KELS(1,K),LOCA,STATUS)
- 
+
             ELSE
                CALL DAT_SLICE(LOC,KDIM(K),KELS(1,K),KUPS(1,K),LOCA,
      :                                                      STATUS)
             ENDIF
-            
+
             CALL DAT_ANNUL(LOC,STATUS)
             CALL DAT_CLONE(LOCA,LOC,STATUS)
 

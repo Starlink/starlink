@@ -8,7 +8,7 @@ C     points in X and Y, returning a power series polynomial.
 C
 C     Parameters -  (">" input, "<" output)
 C
-C     (>) X      (Real array X(NN)) The X values of the points to 
+C     (>) X      (Real array X(NN)) The X values of the points to
 C                be fitted.
 C     (>) Y      (Real array Y(NN)) The Y values of the points to
 C                be fitted.
@@ -30,7 +30,7 @@ C     Common variables used -  None
 C
 C     History - This routine is a slight modification to the Figaro
 C     routine XYFIT, having the additional argument giving the weights
-C     of the points. XYFIT had a dubious pedigree, originating in a 
+C     of the points. XYFIT had a dubious pedigree, originating in a
 C     routine used in the IPCS Interdata software and lifted from one
 C     of the appendices in the IBM Fortran IV manual!  It was then used
 C     in Spica, with modifications made by all sorts of people.  At
@@ -42,7 +42,7 @@ C     The original IBM example needed no extra workspace, so none is
 C     passed to the routine.  All further modifications have required
 C     temporary workspace; hence the limitation on the number of points
 C     that can be handled.  The use of PAR_WRUSER for output messages
-C     makes this routine somewhat FIGARO-specific. 
+C     makes this routine somewhat FIGARO-specific.
 C
 C                                          KS / AAO 5th Sept 1985
 C     Modified:

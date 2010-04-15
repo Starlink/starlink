@@ -3,13 +3,13 @@
 #+
 #  Name:
 #     ndf2gif
- 
+
 #  Purpose:
 #     Converts an NDF into a GIF file.
- 
+
 #  Type of Module:
 #     Bourne shell script
- 
+
 #  Usage:
 #     ndf2gif in [out] [scale] {high=? low=?
 #                              {percentiles=[?,?], [numbin=?]
@@ -20,11 +20,11 @@
 #     Graphics Interchange Format (GIF) file.  One- or two-dimensional
 #     images can be handled and various methods of scaling the data are
 #     provided.  The script uses the CONVERT utility NDF2TIFF to produce
-#     a TIFF file and then various Netpbm utilities to convert the TIFF 
+#     a TIFF file and then various Netpbm utilities to convert the TIFF
 #     file into a GIF file.
 #
 #     Error messages are converted into Starlink style (preceded by !).
- 
+
 #  Parameters:
 #     IN = NDF (Read)
 #        The name of the input NDF (the .sdf extension is not required).
@@ -35,9 +35,9 @@
 #        overwritten.
 #
 #     The following parameters are actually parameters of the ADAM task
-#     NDF2TIFF. Their values on the NDF2GIF command line are just passed 
+#     NDF2TIFF. Their values on the NDF2GIF command line are just passed
 #     through to NDF2TIFF, which may prompt for other required values.
-#     The output parameters SCAHIGH and SCALOW will be found in NDF2TIFF's 
+#     The output parameters SCAHIGH and SCALOW will be found in NDF2TIFF's
 #     parameter file.
 #
 #     SCALE = LITERAL (Read)
@@ -50,7 +50,7 @@
 #                          standard deviation to the mean plus seven
 #                          standard deviations.
 #          "Percentiles" - The image is scaled between the values
-#                          corresponding to two percentiles.  
+#                          corresponding to two percentiles.
 #          "Scale"       - You define the upper and lower limits
 #                          between which the image is to be scaled.  The
 #                          application suggests the maximum and the
@@ -97,7 +97,7 @@
 #     MSG_FILTER = The output message filtering level, QUIET, NORMAL or
 #        VERBOSE. If set to verbose, the scaling limits used will be
 #        displayed. [NORMAL]
- 
+
 #  Examples:
 #     ndf2gif old new
 #        This converts the NDF called old (in file old.sdf)
@@ -108,7 +108,7 @@
 #        The user will be prompted for the percentiles to use.
 
 #  Notes:
-#     -  This initial version of the script handles only 256 grey 
+#     -  This initial version of the script handles only 256 grey
 #     levels and does not use the image colour lookup table so
 #     absolute data values may be lost.
 #
@@ -117,13 +117,13 @@
 
 #  Related Applications:
 #     CONVERT: GIF2NDF, NDF2TIFF
- 
+
 #  Authors:
 #     MJC: Malcolm J. Currie (STARLINK)
 #     GJP: G.J. Privett (Starlink - UWCC)
 #     AJC: A.J. Chipperfield (Starlink - RAL)
 #     {enter_new_authors_here}
- 
+
 #  History:
 #     1995 March 2 (MJC):
 #        Original conversion.
@@ -167,7 +167,7 @@ name=`basename $root`
 if [ -n "$1" ]
 then
 # there is a second argument
-   if [ -z "`echo $1 | awk '/[Ss][Cc][Aa][Ll][Ee]=/{print}'`" ] 
+   if [ -z "`echo $1 | awk '/[Ss][Cc][Aa][Ll][Ee]=/{print}'`" ]
    then
 # Not SCALE= - must be output name
       out=$1
@@ -184,7 +184,7 @@ fi
 # Remove any .gif file extension.
 out=`echo $out | sed 's#\.gif$##'`
 
-# Use NDF2TIFF to create a TIFF file.  Only the DATA component is 
+# Use NDF2TIFF to create a TIFF file.  Only the DATA component is
 # propagated.
 ADAM_EXIT=""
 export ADAM_EXIT
@@ -192,7 +192,7 @@ export ADAM_EXIT
 if $CONVERT_DIR/ndf2tiff $root convert_temp_$name $1 $2 $3 $4 $5
 then
    :
-else 
+else
    echo "!  NDF2GIF: Abandoned at NDF2TIFF"
    exit 1
 fi
@@ -204,5 +204,5 @@ fi
     rm -f convert_err?_$name.lis convert_temp_$name.tif
     exit 1
   }
-rm -f convert_err?_$name.lis 
+rm -f convert_err?_$name.lis
 rm -f convert_temp_$name.tif

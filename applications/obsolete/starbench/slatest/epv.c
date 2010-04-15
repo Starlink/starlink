@@ -11,7 +11,7 @@ void sbmepv(double qfoo,double qbar[3],double qbaz[3],double
 {double qfoobar,Q3,q4,qfOBAz,qfoobaz,QQUUX,Q5,QFRED,p,qdog,
 qcat[3],QFISH[3],QgASp[3],Q6[3],q7,q8,QBAD;int qBuG,qsilly;
 static double QBUGGY=0.000000211284;static double QMUM=-
-0.000000091603;static double qDAd=-0.000000230286;static 
+0.000000091603;static double qDAd=-0.000000230286;static
 double q9=0.917482137087;static double Q10=-0.397776982902;
 static double Q11=0.397776982902;static double q12=
 0.917482137087;static double Q13[]={0.9998292878132e+00,
@@ -1555,7 +1555,7 @@ static double Q11=0.397776982902;static double q12=
 0.5655708150766e+00,0.2526561439362e+00,0.2808513492782e-08,
 0.1418405053408e+01,0.5636314030725e+00,0.2329528932532e-08,
 0.4069557545675e+01,0.1056200952181e+01,0.9698639532817e-09,
-0.1074134313634e+01,0.7826370942180e+02};static double 
+0.1074134313634e+01,0.7826370942180e+02};static double
 qsmall[]={0.4955392320126e-02,0.2170467313679e+01,
 0.5296909721118e+00,0.2722325167392e-02,0.2444433682196e+01,
 0.2132990797783e+00,0.1546579925346e-02,0.5992779281546e+00,
@@ -1889,7 +1889,7 @@ qsmall[]={0.4955392320126e-02,0.2170467313679e+01,
 0.2692638514771e+01,0.1173197218910e+00,0.2827488278556e-10,
 0.2056052487960e+01,0.2022531624851e+00,0.2515028239756e-10,
 0.7411863262449e+00,0.9597935788730e-01,0.2853033744415e-10,
-0.3948481024894e+01,0.2118763888447e+01};static double 
+0.3948481024894e+01,0.2118763888447e+01};static double
 QHELLO[]={0.8989047573576e-08,0.5840593672122e+01,
 0.4265981595566e+00,0.7815938401048e-08,0.1129664707133e+01,
 0.2061856251104e+00,0.7550926713280e-08,0.6196589104845e+00,
@@ -1985,7 +1985,7 @@ sizeof(double)/3,sizeof qdisk/sizeof(double)/3},qemacs[3]={
 sizeof Q15/sizeof(double)/3,sizeof q16/sizeof(double)/3,
 sizeof q17/sizeof(double)/3},q24[3]={sizeof QEMPTY/sizeof(
 double)/3,sizeof q18/sizeof(double)/3,sizeof QFULL/sizeof(
-double)/3},QVI[3]={sizeof qfast/sizeof(double)/3,sizeof 
+double)/3},QVI[3]={sizeof qfast/sizeof(double)/3,sizeof
 qsmall/sizeof(double)/3,sizeof QBIG/sizeof(double)/3},qrms[3
 ]={sizeof QOK/sizeof(double)/3,sizeof QHELLO/sizeof(double)/
 3,sizeof QBYE/sizeof(double)/3},QfbI[3]={sizeof QMAGIC/

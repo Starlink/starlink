@@ -27,7 +27,7 @@
 *     Search for MAPCOORD extension and map pointer to lookup table.
 *     For use with files that are left open! smf_close_file frees resources.
 *
-*     
+*
 *  Authors:
 *     Edward Chapin (UBC)
 
@@ -98,10 +98,10 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
   HDSLoc *mapcoordloc=NULL;     /* HDS locator to the MAPCOORD extension */
   int there=0;                  /* Flag for existence of extension */
   int ubnd[1];                  /* Pixel bounds for 1d pointing array */
-  
+
   /* Main routine */
   if (*status != SAI__OK) return;
-  
+
   /* Check for existence of extension */
   if( (*status==SAI__OK) && data->file ) {
     if( data->file->ndfid != NDF__NOID ) {
@@ -113,7 +113,7 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
      extension, and to prevent it from having problems if called multiple
      times, check for NULL states first for the HDS locator / NDF id / LUT
      before trying to get them */
-    
+
   if( (*status == SAI__OK) && there ) {
     nbolo = (data->dims)[0] * (data->dims)[1];
     lbnd[0] = 0;
@@ -125,15 +125,15 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
 
     /* Get NDF identifier if not already opened */
     if( (data->file)->mapcoordid == NDF__NOID ) {
-      (data->file)->mapcoordid = smf_get_ndfid( mapcoordloc, 
+      (data->file)->mapcoordid = smf_get_ndfid( mapcoordloc,
 						"LUT", mode, "UNKNOWN",
-						"_INTEGER", 1, lbnd, ubnd, 
+						"_INTEGER", 1, lbnd, ubnd,
 						status );
     }
-     
+
     if( data->lut == NULL ) {
-      ndfMap( (data->file)->mapcoordid, "DATA", "_INTEGER", mode, mapptr, 
-	      &nmap, status );    
+      ndfMap( (data->file)->mapcoordid, "DATA", "_INTEGER", mode, mapptr,
+	      &nmap, status );
 
       if( *status == SAI__OK ) {
 	data->lut = mapptr[0];
@@ -142,12 +142,12 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
 		status);
       }
     }
-  
+
     /* Annul the HDS locator to the extension */
     datAnnul( &mapcoordloc , status );
   } else {
     *status = SMF__NOLUT;
-    errRep( "", FUNC_NAME 
+    errRep( "", FUNC_NAME
             ": Couldn't get locator for MAPCOORD extension",
             status);
   }

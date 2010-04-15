@@ -53,7 +53,7 @@
 
 * History:
 *    TNW: 3/10/88 Original version
-*    TNW: 25/1/89 Addition of bounds & calrat, together with common 
+*    TNW: 25/1/89 Addition of bounds & calrat, together with common
 *         block opt_cmn (previously keep_itt_command)
 *    TNW: 21/9/89 More moved into this routine
 *    TNW: 26/10/89 Tidied a bit
@@ -173,7 +173,7 @@
 C         print *,'into  map_res'
           call map_res(.false.,ifarc,nocube,status)
 C         print *,'out map_res',status
-          
+
 * Couldn't set this earlier since mgauss not set
 
           if(.not.ifarc) then

@@ -83,7 +83,7 @@
 *        This converts four observations in the IRCAM data file called
 *        ircam_27aug89_1cl into NDFs called rhooph32, rhooph34,
 *        rhooph35, rhooph36.  The scale and offset are applied.
-*     ircam2ndf in=ircam_04nov90_1c config="KTC" obs=5 prefix=bias 
+*     ircam2ndf in=ircam_04nov90_1c config="KTC" obs=5 prefix=bias
 *        This converts the fifth observation in the IRCAM data file
 *        called ircam_04nov90_1c into an NDF called bias5 containing
 *        the electronic pedestal in its data array.  There is no format
@@ -104,16 +104,16 @@
 *       .OBS.KTCB.DATA_ARRAY   ->  .DATA_ARRAY
 *                                  when Parameter CONFIG="KTCCHOP"
 *
-*       .OBS.DATA_LABEL        ->  .LABEL                      
+*       .OBS.DATA_LABEL        ->  .LABEL
 *       .OBS.DATA_UNITS        ->  .UNITS
 *       .OBS.TITLE             ->  .TITLE
 *                                  If .OBS.TITLE is a blank string,
 *                                  OBS.DATA_OBJECT is copied to the
 *                                  NDF title instead.
 *
-*       .OBS.AXIS1_LABEL       ->  .AXIS(1).LABEL                      
+*       .OBS.AXIS1_LABEL       ->  .AXIS(1).LABEL
 *       .OBS.AXIS2_LABEL       ->  .AXIS(2).LABEL
-*       .OBS.AXIS1_UNITS       ->  .AXIS(1).UNITS  
+*       .OBS.AXIS1_UNITS       ->  .AXIS(1).UNITS
 *       .OBS.AXIS2_UNITS       ->  .AXIS(2).UNITS
 *       .GENERAL.INSTRUMENT.PLATE_SCALE becomes the increment between
 *                                  the axis centres, with co-ordinate
@@ -197,7 +197,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -346,7 +346,7 @@
 
 *  Get the numbers of the observations to be converted into NDFs.
       CALL PAR_GET1C( 'OBS', MAXOBS, OBS, NUMSPE, STATUS )
-      
+
 *  Decide whether to convert the data to floating point.
       CALL PAR_GTD0L( 'FMTCNV', .FALSE., .TRUE., FMTCNV, STATUS )
 
@@ -622,20 +622,20 @@
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                BLANK = VAL__BADR
             END IF
-            
+
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.  Call the appropriate routine for the
 *  array data type.
             IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                          IBLANK, VAL__BADI,
-     :                          %VAL( CNF_PVAL( TPNTR ) ), NREP, 
+     :                          %VAL( CNF_PVAL( TPNTR ) ), NREP,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( IPNTR ) ), 
+               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( IPNTR ) ),
      :                          BLANK, VAL__BADR,
-     :                          %VAL( CNF_PVAL( TPNTR ) ), NREP, 
+     :                          %VAL( CNF_PVAL( TPNTR ) ), NREP,
      :                          STATUS )
 
             END IF
@@ -648,14 +648,14 @@
 
 *  Apply the scale and zero to convert the temporary array into the
 *  output NDF's data array.
-               CALL KPG1_SCLOF( EL, %VAL( CNF_PVAL( TPNTR ) ), 
+               CALL KPG1_SCLOF( EL, %VAL( CNF_PVAL( TPNTR ) ),
      :                          DBLE( SCALE ), DBLE( ZERO ),
      :                          %VAL( CNF_PVAL( OPNTR( 1 ) ) ), BAD,
      :                          STATUS )
 
 *  Release the workspace.
                CALL PSX_FREE( TPNTR, STATUS )
-      
+
             END IF
 
 *  Unmap the NDF array.
@@ -712,7 +712,7 @@
                NC = CHR_LEN( CHACMP )
                CALL NDF_CPUT( CHACMP( :NC ), NDF, 'Units', STATUS )
             END IF
- 
+
 *  Make an IRCAM extension.
 *  ========================
 
@@ -823,7 +823,7 @@
                NC = CHR_LEN( AXCHAR )
                CALL NDF_ACPUT( AXCHAR( :NC ), NDF, 'Label', 1, STATUS )
             END IF
- 
+
 *  Now deal with the second axis.
             CALL DAT_THERE( COLOC, 'AXIS2_LABEL', THERE, STATUS )
 
@@ -850,7 +850,7 @@
                   CALL NDF_ACPUT( AXCHAR( :NC ), NDF, 'Units', 1,
      :                            STATUS )
                END IF
- 
+
 *  Now deal with the second axis.
                CALL DAT_THERE( COLOC, 'AXIS2_UNITS', THERE, STATUS )
 

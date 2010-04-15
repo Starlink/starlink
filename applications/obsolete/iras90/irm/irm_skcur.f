@@ -60,14 +60,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Primitive constants
- 
+
 *  Arguments Given:
       INTEGER IDA
       CHARACTER*( * ) SCS
@@ -104,7 +104,7 @@
      :                 STATUS )
          GO TO 999
       END IF
-      
+
 *  Enable cursor.
       CALL SGS_CUVIS( .TRUE. )
 

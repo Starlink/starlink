@@ -1,6 +1,6 @@
 proc red4Remove {taskname type} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -24,9 +24,9 @@ proc red4Remove {taskname type} {
     set Red4Widgets(RM_ENTRY) [entry $frame.en -width 40]
     pack $Red4Widgets(RM_LABEL) $Red4Widgets(RM_ENTRY) -in $frame -side left
     if {$type=="obs" && [string trim [$Red4Widgets(RM_ENTRY) get]]==""} {
-      $Red4Widgets(RM_ENTRY) insert end $Red4Widgets(RO) 
+      $Red4Widgets(RM_ENTRY) insert end $Red4Widgets(RO)
     } elseif {$type=="grp" && [string trim [$Red4Widgets(RM_ENTRY) get]]==""} {
-      $Red4Widgets(RM_ENTRY) insert end $Red4Widgets(RG) 
+      $Red4Widgets(RM_ENTRY) insert end $Red4Widgets(RG)
     }
 
 # Bind defaults to button (different from rest!)

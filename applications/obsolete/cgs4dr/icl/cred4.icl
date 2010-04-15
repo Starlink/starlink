@@ -18,7 +18,7 @@ cred4_alias    = getenv("PID") & 'cred4'
 cred4_nb_alias = 'c' & getenv("PID") & '_ctrlnb'
 cred4_df       = getenv("CGS4_CONFIG")&'/default.cred4'
 
-{ 
+{
 { Defstring some commands
 defstring cred4_loadw loadw $CGS4_EXE/cred4 (cred4_alias)
 defstring cred4_killw killw (cred4_alias)
@@ -223,7 +223,7 @@ defstring cred4_set_r4_alias send (cred4_alias) set red4_alias (red4_alias)
 
 {
 { PROC SET_REDUCTION_SEQUENCE
-proc set_reduction_sequence p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 
+proc set_reduction_sequence p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11
   if UNDEFINED(p1)
     input 'Subtract BIAS observation?  > ' (subtract_bias)
   else
@@ -279,7 +279,7 @@ proc set_reduction_sequence p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11
   else
     extract_spc = p11
   endif
-  { 
+  {
   { Set them
   subtract_bias = UPCASE(subtract_bias)
   set_subtract_bias (subtract_bias)
@@ -308,11 +308,11 @@ endproc
 {
 { PROC GET_REDUCTION_SEQUENCE
 proc get_reduction_sequence
-  { 
+  {
   { Get required items
   subtract_bias = ' '
   get_subtract_bias (subtract_bias)
-  print 'Subtract BIAS frame          = ' (subtract_bias) 
+  print 'Subtract BIAS frame          = ' (subtract_bias)
   subtract_dark = ' '
   get_subtract_dark (subtract_dark)
   print 'Subtract DARK frame          = ' (subtract_dark)
@@ -695,11 +695,11 @@ proc set_polyfit p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12
   endif
 
   set_pftyp '           '
-  pftyp1 = UPCASE(pftyp) 
+  pftyp1 = UPCASE(pftyp)
   set_pftyp (pftyp1)
   set_pfdeg (pfdeg)
   set_pfrej (pfrej)
-  set_pfwei (pfwei) 
+  set_pfwei (pfwei)
   set_pfs1s (pfs1s)
   set_pfs1e (pfs1e)
   set_pfs2s (pfs2s)
@@ -723,7 +723,7 @@ proc get_polyfit
   get_pfrej (pfvar)
   print 'Number of reject points = ' (pfvar)
   pfvar = ' '
-  get_pfwei (pfvar) 
+  get_pfwei (pfvar)
   print 'Weighting enabled = ' (pfvar)
   pfvar = ' '
   get_pfs1s (pfvar)
@@ -1253,4 +1253,4 @@ cred4_set_q4_lwrd
 cred4_set_p4_alias
 cred4_set_r4_alias
 cred4_open_nb
-cred4_open_qfile 
+cred4_open_qfile

@@ -29,7 +29,7 @@
 *     This routine locates (to the nearest X pixel), reference lines
 *     to be used for wavelength calibration purposes.  Generally the
 *     reference spectrum will be an ARC lamp spectrum, but in principle
-*     this routine could more generally be used with a sky-line rich 
+*     this routine could more generally be used with a sky-line rich
 *     spectrum, or even an object with strong emission lines (subject
 *     to user provision of a suitable line list).  In the normal (ARC-
 *     lamp) case, this routine will be called once for each data frame.
@@ -271,7 +271,7 @@
                   DO IV = II, III - 1
                      IF ( IV .GT. ( III + II ) / 2 ) THEN
                         CONTINUUM( IV ) = RIGHT
-                         
+
                      ELSE
                         CONTINUUM( IV ) = LEFT
                      END IF
@@ -301,7 +301,7 @@
                DO II = 1, NX
                   IF ( AVG_SPECTRUM( II ) .LT. REF_SPECTRUM( II ) ) THEN
                      CONTINUUM( II ) = AVG_SPECTRUM( II )
-               
+
                   ELSE
                      CONTINUUM( II ) = REF_SPECTRUM( II )
                   END IF
@@ -435,7 +435,7 @@
                   IF ( LINES( I ) .GT. CONTINUUM( I )  ) THEN
                      IF ( LINE_COUNT .LT. MAX_PERM_LINES - 1 ) THEN
 
-*                    Increment located line counter, and save its 
+*                    Increment located line counter, and save its
 *                    position/intensity.
                         LINE_COUNT = LINE_COUNT + 1
                         LINE_POS( LINE_COUNT, IORD ) = I

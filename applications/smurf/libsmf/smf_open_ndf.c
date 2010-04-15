@@ -24,7 +24,7 @@
 *        Access mode for data array (READ, WRITE or UPDATE)
 *     filename = const char[] (Given)
 *        Name of disk file which holds the requested NDF
-*     dtype = smf_dtype (Given) 
+*     dtype = smf_dtype (Given)
 *        Data type (see smf_typ.h)
 *     ndfdata = smfData** (Returned)
 *        Output smfData with mapped access to requested NDF
@@ -37,7 +37,7 @@
 *     DATA array mapped. Returns a NULL smfData on error.
 
 *  Notes:
-*     - Only the DATA component of the NDF is mapped. Including the VARIANCE 
+*     - Only the DATA component of the NDF is mapped. Including the VARIANCE
 *       and QUALITY components is not beyond the realms of possibility.
 
 *  Authors:
@@ -103,15 +103,15 @@
 
 #define FUNC_NAME "smf_open_ndf"
 
-void smf_open_ndf( const int newndf, const char accmode[], 
-                   const char filename[], 
+void smf_open_ndf( const int newndf, const char accmode[],
+                   const char filename[],
                    smf_dtype dtype, smfData **ndfdata, int *status) {
 
   /* Local variables */
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
   const char *datatype;         /* String for data type */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
-  int flags = 0;                /* Flags for creating smfDA, smfFile and 
+  int flags = 0;                /* Flags for creating smfDA, smfFile and
 				   smfHead components in the output smfData */
   int lbnd[NDF__MXDIM];         /* Lower pixel bounds of NDF */
   int ndat;                     /* Number of elements mapped in the requested NDF */
@@ -144,7 +144,7 @@ void smf_open_ndf( const int newndf, const char accmode[],
   if ( datatype == NULL ) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Unsupported data type. Unable to open new file.", 
+      errRep( FUNC_NAME, "Unsupported data type. Unable to open new file.",
 	      status );
       return;
     }
@@ -175,7 +175,7 @@ void smf_open_ndf( const int newndf, const char accmode[],
   }
 
   /* And populate the new smfData */
-  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, 
+  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype,
                                     datarr, 1, (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
                                     NULL, NULL, status );
 

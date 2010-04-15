@@ -52,7 +52,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@
      :                'TRACC5: No data matches the quality expression.',
      :                    STATUS )
          END IF
-      
+
 *  If any errors have been reported add a context message and then flush
 *  them. Limit the number of re-prompts to 4.
          IF( STATUS .NE. SAI__OK .AND. NBAD .LE. 4 ) THEN

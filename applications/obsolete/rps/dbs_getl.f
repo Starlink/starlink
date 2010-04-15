@@ -26,12 +26,12 @@
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_bytes.inc'
       INCLUDE 'com_dbs_rec.inc'
- 
+
 
       LBYT = RECORD(REF_NO)(START(FIELDNO,REF_NO):START(FIELDNO,REF_NO))
-      IF (LBYT.EQ.'Y') THEN 
+      IF (LBYT.EQ.'Y') THEN
         LOLD = .TRUE.
-      ELSE 
+      ELSE
         LOLD = .FALSE.
       END IF
       DBS_GETL = LOLD								! Transfer value to return variable.

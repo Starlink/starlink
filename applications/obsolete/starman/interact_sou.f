@@ -10,7 +10,7 @@ C AIR_FIRSTSTR    Puts blanks after 1st contiguous characters in a character str
 C AIR_STRCON3     Convert string into 3 reals
 
 
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AIRGKTIME -- Get use of keyboard for exposure time?
 C
@@ -110,7 +110,7 @@ Cbegin
          if ( ST_FAILED ) return
          iv = 1
          call sla_dafin ( cv, iv, DLAT, istat )
-         if ( istat.ne.0 ) call printo ( 
+         if ( istat.ne.0 ) call printo (
      +                             'ERROR: Latitude in wrong format' )
          call get1c (  'RANAME',   RANAME,   'RA', .true. )		!Get image RA location
          call get1c ( 'DECNAME',  DECNAME,  'DEC', .true. )		!Get image Dec location
@@ -211,11 +211,11 @@ Cbegin
       endif
 
       if ( DOHAIR .and. AIRNAME.eq.' ' ) then
-      
-         call gtdesc ( 'IN', RANAME, text, ' ', iv, istat )		!Image RA 
+
+         call gtdesc ( 'IN', RANAME, text, ' ', iv, istat )		!Image RA
          if ( ST_FAILED ) return
          if ( text.eq.' ' .or. istat.ne.0 ) then
-            call printo ( 'ERROR: No RA in image descriptors' ) 
+            call printo ( 'ERROR: No RA in image descriptors' )
          else
             call lbgone ( text )
             call air_firststr ( text )
@@ -259,14 +259,14 @@ Cbegin
          call gtdesc ( 'IN', SIDTNAME, text, ' ', iv, istat )		!Image Sid T
          if ( ST_FAILED ) return
          if ( text.eq.' ' .or. istat.ne.0 ) then
-            call printo ( 'ERROR: No Sid Time in image descriptors' ) 
+            call printo ( 'ERROR: No Sid Time in image descriptors' )
          else
             call lbgone ( text )
             call air_firststr ( text )
             call air_strcon3 ( text, rh, rm, rs, istat )
             rv = rs + rm*60.0 + rh*3600.0
             sidt = rv*PI/(12.0*60.0*60.0)
-   
+
             dha = dabs(dble(ra)-dble(sidt))				!Calc Air Mass
             ddec = dble(dec)
             dzd = sla_zd ( dha, ddec, dlat )
@@ -279,7 +279,7 @@ Cbegin
          call gtdesc ( 'IN', FILTNAME, text, ' ', iv, istat )		!Get image filter and match
          if ( ST_FAILED ) return
          if ( text.eq.' ' .or. istat.ne.0 ) then
-            call printo ( 'ERROR: No Filter in image descriptors' ) 
+            call printo ( 'ERROR: No Filter in image descriptors' )
          else
             filter = text(LOCFILT(1):LOCFILT(2))			! with set of filter names
             jlen = LOCFILT(2) - LOCFILT(1) + 1
@@ -313,7 +313,7 @@ C  alan penny                ral                1992 Oct
       subroutine air_firststr ( text )
 
       implicit none
-       
+
       character*(*)     text		!i/o: String to strip later parts off
 C--
       integer k, klen, jlen
@@ -324,7 +324,7 @@ Cbegin
       jlen = 0
       k = 1
       do while ( k.le.klen .and. jlen.eq.0 )
-         if ( text(k:k).eq.' ' ) jlen = k 
+         if ( text(k:k).eq.' ' ) jlen = k
          k = k + 1
       enddo
       if ( jlen.ne.0 ) text(jlen:klen) = ' '
@@ -379,13 +379,13 @@ Cbegin
           kk(6) = ilen
           ja = 7
       endif
-      
+
       r1 = 0.0								!Failure default
       r2 = 0.0
       r3 = 0.0
       if ( ja.ne.7 ) then						!Not found 3 numbers
          istat = 1
-      else   
+      else
          call chartor ( str(kk(1):kk(2)), r1, istata )			!Turn strings to numbers
          call chartor ( str(kk(3):kk(4)), r2, istatb )
          call chartor ( str(kk(5):kk(6)), r3, istatc )
@@ -412,22 +412,22 @@ C ALT_IMLOAD(RS) Load real:short image into work array
 C ALT_BLANK      Put areas to invalid by cursor or key
 C ALT_CUT        Cut an image out by cursor or key
 C ALT_VALUE      Set pixel value
-C ALT_FLIP       Flip image 
+C ALT_FLIP       Flip image
 C ALT_TRANS      Transform image in x and y
-C ALT_MAGNIFY    Magnify image 
-C ALT_ROTATE     Rotate image 
+C ALT_MAGNIFY    Magnify image
+C ALT_ROTATE     Rotate image
 C ALT_ROT_A      Rotate image by 90,180,270
 C ALT_ROT_B      Do rotate image by 90,180,270
 C ALT_ATRANS     Transform image in x and y
 C ALT_DOTRAN     Do the transform image in x and y
-C ALT_SMOOTH     Smooth image 
+C ALT_SMOOTH     Smooth image
 C ALT_GAUSSR     Smooth a real flagged array with gaussian
 C ALT_MEDIANR    Smooth a real flagged array with boxed median
 C ALT_SETVR      Get a replacement real value for an INVALID pixel
-C ALT_COMPRESS   Compress image 
-C ALT_DOCOMP     Do the binning of an image 
+C ALT_COMPRESS   Compress image
+C ALT_DOCOMP     Do the binning of an image
 C ALT_STORE      Store image on disk
-C ALT_UNSHARP    Unsharp mask image 
+C ALT_UNSHARP    Unsharp mask image
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -450,7 +450,7 @@ C--
       character*12 ktopt
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
       MAIN_SELECT = ' '
@@ -475,7 +475,7 @@ Cbegin
 
          if ( ktopt.eq.'display' .or. ktopt.eq.'flash' .or.		!Check display open
      +        ktopt.eq.'zoom' .or. ktopt.eq.'reset' .or.
-     +        ktopt.eq.'cvalues' .or. ktopt.eq.'clear' ) 
+     +        ktopt.eq.'cvalues' .or. ktopt.eq.'clear' )
      +      call alt_opdisp ( ierr )
 
          if ( ktopt.eq.'blank_c' ) call alt_blank ( %val(IPIM), 1 )	!Put areas to invalid by cursor
@@ -491,11 +491,11 @@ Cbegin
          if ( ktopt.eq.'flipx' ) then					!Flip image in x direction
                                     call gtwrkr ( 'IPWK', NX, ipw,ierr)
                                     if ( ierr.ne.0 ) return
-                                    call alt_flip ( %val(IPIM), 
+                                    call alt_flip ( %val(IPIM),
      +                                              %val(ipw), 0 )
                                     call wrkcan ( 'IPWK' )
                                     call ds_erase
-                                    call ds_acimr ( %val(IPIM), NX, 
+                                    call ds_acimr ( %val(IPIM), NX,
      +                              NY, DSNXS, DSNXE, DSNYS, DSNYE,
      +                              DSIXS, DSIYS, DSWRAP )
                                  endif
@@ -503,11 +503,11 @@ Cbegin
          if ( ktopt.eq.'flipy' ) then 					!Flip image in y direction
                                     call gtwrkr ( 'IPWK', NY, ipw,ierr)
                                     if ( ierr.ne.0 ) return
-                                    call alt_flip ( %val(IPIM), 
+                                    call alt_flip ( %val(IPIM),
      +                                              %val(ipw), 1 )
                                     call wrkcan ( 'IPWK' )
                                     call ds_erase
-                                    call ds_acimr ( %val(IPIM), NX, 
+                                    call ds_acimr ( %val(IPIM), NX,
      +                              NY, DSNXS, DSNXE, DSNYS, DSNYE,
      +                              DSIXS, DSIYS, DSWRAP )
                                  endif
@@ -526,24 +526,24 @@ Cbegin
 
         if ( ktopt.eq.'weed' ) call alt_weed ( %val(IPIM) )		!Set range of values to INVALID
 
-        if ( ktopt.eq.'smooth' ) then 		 			!Smooth image 
+        if ( ktopt.eq.'smooth' ) then 		 			!Smooth image
                                  call alt_smooth ( 2 )
-                                 call ds_acimr ( %val(IPIM), NX, NY, 
-     +                           DSNXS, DSNXE, DSNYS, DSNYE, DSIXS, 
+                                 call ds_acimr ( %val(IPIM), NX, NY,
+     +                           DSNXS, DSNXE, DSNYS, DSNYE, DSIXS,
      +                           DSIYS, DSWRAP )
                                  endif
 
         if ( ktopt.eq.'store' ) call alt_store 				!Store present image
 
         if ( ktopt.eq.'drange' ) then					!Get display range
-                                  call ds_imgscl ( %val(IPIM), NX, NY, 
+                                  call ds_imgscl ( %val(IPIM), NX, NY,
      +                            IMTYPE, 1, NX, 1, NY )
                                   DSKVRANGE = 1
                                   endif
 
         if ( ktopt.eq.'image' ) then                 			!Get ne$
                                    call in_newim ( ierr )
-                                   call alt_loadim ( ierr )	
+                                   call alt_loadim ( ierr )
                                    if ( ierr.ne.0 ) return
                                 endif
 
@@ -555,19 +555,19 @@ Cbegin
      +                                   NX, NY, IMTYPE, DSKVRANGE,
      +                                   IMTITLE )
                                          DISPLAYED = .true.
-                                         call alt_loadim ( ierr )	
+                                         call alt_loadim ( ierr )
                                          if ( ierr.ne.0 ) return
                                          endif
                                       endif
 
          if ( ktopt.eq.'display' ) then					!Display image
-                       call ds_dodisp ( %val(IPIM), NX, NY, IMTYPE, 
+                       call ds_dodisp ( %val(IPIM), NX, NY, IMTYPE,
      +                                  DSKVRANGE, IMTITLE )
                        DISPLAYED = .true.
                        endif
 
          if ( ktopt.eq.'flash' ) then					!Flash image
-                       call ds_doflash ( %val(IPIM), NX, NY, IMTYPE, 
+                       call ds_doflash ( %val(IPIM), NX, NY, IMTYPE,
      +                                   DSKVRANGE, IMTITLE )
                        DISPLAYED = .true.
                        endif
@@ -577,7 +577,7 @@ Cbegin
          if ( ktopt.eq.'reset' ) call ds_zoom ( .true., 1, 0 )		!Reset display zoom/pan
 
          if ( ktopt.eq.'cvalues' ) call ds_gtcur ( .true., kx, ky, kb, 	!Get images values by cursor
-     +                                             ierr ) 
+     +                                             ierr )
 
          if ( ktopt.eq.'panel' ) call choice_panel_sw			!Panel choice
 
@@ -633,7 +633,7 @@ C--
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
 
-      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) / 
+      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'clear', 'Clear screen' ,
      + 'Clear the display screen. (The programme does not forget about',
      + 'the input image.)',
@@ -645,15 +645,15 @@ C--
      + 'the input image.)',
      + ' ', ' ', ' ', ' '/
 
-      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) / 
-     + 'cvalues', 'Show the cursor position and image pixel value', 
-     + 'Show the cursor position and image pixel value.', 
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
+     + 'cvalues', 'Show the cursor position and image pixel value',
+     + 'Show the cursor position and image pixel value.',
      + 'Whilst the cursor is inside the last displayed image in the ',
-     + 'the display screen, and that window is -active-, put these', 
+     + 'the display screen, and that window is -active-, put these',
      + 'values up in the panel window.',
      + ' ', 'Click on the right-hand button to return.' /
 
-      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) / 
+      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'display', 'Display image',
      + 'Display the present input image. The program asks you for:-' ,
      + '1) The display range (default: +3 and -2 std. devs. from mean)',
@@ -662,7 +662,7 @@ C--
      + '3) Where to put the bottom left hand corner of the image' ,
      + '      (default: so as to centre the image in the screen).' /
 
-      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) / 
+      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'flash', 'Display image in standard way',
      + 'Display the present input image. The programme uses the ',
      + 'standard display mode:- ',
@@ -671,12 +671,12 @@ C--
      + '    applicable end of the range',
      + '(3) Place image at centre of screen' /
 
-      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) / 
+      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'image', 'Input new image' ,
-     + 'This asks for a new image (via the keyboard), and forgets', 
+     + 'This asks for a new image (via the keyboard), and forgets',
      + 'about the present image.', ' ', ' ', ' ', ' '/
 
-      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) / 
+      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'im_get_flash', 'Input new image and display it',
      + 'This asks you for a new input image (via the keyboard), and',
      + 'then displays the image with the standard display mode:- ',
@@ -688,23 +688,23 @@ C--
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'open', 'Open the display screen',
      + 'Open the display screen, without displaying an image.',
-     + 'The screen may be any size you want, through keyboard entry', 
-     + 'via the SCREEN parameter.', 
+     + 'The screen may be any size you want, through keyboard entry',
+     + 'via the SCREEN parameter.',
      + ' ', ' ', ' '/
 
-      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) / 
+      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
      + '(In keyboard option entry mode, you can get back to -panel-',
      + '  option entry mode, by choosing the -panel- option.)',
      + ' ', ' ', ' '/
 
-      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) / 
+      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' ', ' '/
 
-      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) / 
+      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'zoom', 'Zoom and pan image by using mouse location ',
      + '-Zoom- means zoom around present position of cursor. ' ,
      + '-Pan-  means set present position of cursor to screen centre.' ,
@@ -721,41 +721,41 @@ C--
 
       data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'flipx', 'Flip image along x direction',
-     + ' ', 
+     + ' ',
      + 'Image is reversed along x (horizontal) direction and ',
-     + 'displayed.', 
+     + 'displayed.',
      + ' ', ' ', ' '/
 
       data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'flipy', 'Flip image along y direction',
      + ' ',
      + 'Image is reversed along y (vertical) direction and ',
-     + 'displayed.', 
+     + 'displayed.',
      + ' ', ' ', ' '/
 
       data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'transform', 'Transform image in X and Y',
-     + 'The user inputs the parameters of the transform equations ', 
-     + 'x(new) = a1 + a2*x(old) + a3*y(old) ', 
-     + 'y(new) = a4 + a5*x(old) + a6*y(old) ', 
-     + 'The image is transformed by giving each new pixel the value', 
+     + 'The user inputs the parameters of the transform equations ',
+     + 'x(new) = a1 + a2*x(old) + a3*y(old) ',
+     + 'y(new) = a4 + a5*x(old) + a6*y(old) ',
+     + 'The image is transformed by giving each new pixel the value',
      + 'of the nearest original pixel. Image shifted to lie against',
      + 'X and Y axes. Image displayed (in larger window if needed).'/
 
       data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'smooth', 'Smooth image',
      + 'The image is smoothed and displayed.',
-     + ' ', 
-     + 'Three smoothing techniques are available:- ', 
-     + 'Box    - Run box over image, replacing pixels by box average', 
-     + 'Gauss  - Run a 2-D Gaussian (in finite box) over image', 
+     + ' ',
+     + 'Three smoothing techniques are available:- ',
+     + 'Box    - Run box over image, replacing pixels by box average',
+     + 'Gauss  - Run a 2-D Gaussian (in finite box) over image',
      + 'Median - Same as Box, but median instead of average'/
 
       data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'rotate', 'Rotate image',
      + 'Image is rotated, counter-clockwise, by given number of',
      + 'degrees. ',
-     + 'The image is transformed by giving each new pixel the value', 
+     + 'The image is transformed by giving each new pixel the value',
      + 'of the nearest original pixel. Image shifted to lie against',
      + 'X and Y axes. ',
      + 'Image displayed (in larger window if needed).'/
@@ -772,27 +772,27 @@ C--
       data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'magnify', 'Magnify image in X and Y by real factors',
      + 'This allows a magnification by  factors in X and in Y.',
-     + ' ', 
-     + 'These factors must lie between 1.0e-10 and 1.0e20. This is ', 
-     + 'really designed for magnification. If the factor is less than ', 
-     + 'about 0.8, then use the -compress- option.', 
+     + ' ',
+     + 'These factors must lie between 1.0e-10 and 1.0e20. This is ',
+     + 'really designed for magnification. If the factor is less than ',
+     + 'about 0.8, then use the -compress- option.',
      + ' '/
 
       data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
      + 'drange', 'Change pixel value display range',
      + 'The present working image is displayed over a certain pixel',
-     + 'value range. ', 
-     + 'This enables you to choose a different range, and the image ', 
-     + 'is then displayed over that range.', 
+     + 'value range. ',
+     + 'This enables you to choose a different range, and the image ',
+     + 'is then displayed over that range.',
      + ' ', ' '/
 
       data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) /
      + 'store', 'Store present image to disk',
      + 'Take the present working image and copy it to disk. ',
-     + ' ', 
-     + 'This does not remove it from the present working array,', 
-     + 'but enables you to keep it, separate from future -alter- ', 
-     + 'actions. ', 
+     + ' ',
+     + 'This does not remove it from the present working array,',
+     + 'but enables you to keep it, separate from future -alter- ',
+     + 'actions. ',
      + ' '/
 
       data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
@@ -801,7 +801,7 @@ C--
      + 'detail where a high background drowns out the detail. This is',
      + 'done smoothing the image, and subtracting from the original.',
      + 'Deciding on how much smoothing and subtraction is an art. ',
-     + 'One can smooth at two scales and subtract different amounts. ', 
+     + 'One can smooth at two scales and subtract different amounts. ',
      + 'A single median smooth and 80% subtraction is set as default.'/
 
       data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) /
@@ -809,7 +809,7 @@ C--
      + 'New set of buttons appear. These are the buttons that were',
      + 'seen at the start of program.',
      + ' ', ' ', ' ', ' ' /
-   
+
       data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) /
      + 'aperture', 'Functions for aperture photometry ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -818,7 +818,7 @@ C--
      + 'automatically getting filter and airmass from image header.',
      + 'Exposure time can be allowed for. Different images can be',
      + 'accessed easily. The results can be output to a file. ' /
-   
+
       data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) /
      + 'colour', 'Functions for changing colour display of the image.',
      + 'New set of buttons appear. Functions then available include:-',
@@ -844,7 +844,7 @@ C--
      + 'radii of the stars, blink the image, contour map, statistics,',
      + 'display area. The output can be put onto any device, not just',
      + 'the screen.' /
-        
+
       data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) /
      + 'positions', 'Functions to get or plot a list of positions ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -880,13 +880,13 @@ C--
      + 'to return to panel choices.' /
 
       data opt_text(32),opt_head(32),(opt_help(j,32),j=1,6) /
-     + 'weed', 'Set range of pixel values to INVALID', 
+     + 'weed', 'Set range of pixel values to INVALID',
      + 'The user inputs a range of pixel values and these are',
      + 'set to the INVALID flag value. Many Starman programs',
      + 'will then ignore those pixels. The display will show them',
      + 'as white.',
      + ' ', ' ' /
-         
+
       data opt_text(33),opt_head(33),(opt_help(j,33),j=1,6) /
      + 'cut_c', 'Use cursor to cut out new rectangular image',
      + 'Use the cursor to define one point on the image. Then',
@@ -904,11 +904,11 @@ C--
      + ' ', ' ' /
 
       data opt_text(35),opt_head(35),(opt_help(j,35),j=1,6) /
-     + 'value_k', 'Set value of pixel by the keyboard', 
+     + 'value_k', 'Set value of pixel by the keyboard',
      + 'Enter the X,Y position and pixel value for a pixel. The',
      + 'pixel is set to that value and the pixel displayed.',
      + ' ', ' ', ' ', ' ' /
-         
+
       data opt_text(36),opt_head(36),(opt_help(j,36),j=1,6) /
      + 'calculate', 'Calculate new image with Fortan-like equation',
      + 'The present image, or no image, may be combined with other',
@@ -929,7 +929,7 @@ C--
       integer sect_num
       parameter ( sect_num=5 )
       character*10 sect_head(sect_num)
-      data sect_head /'GENERAL', 'IMAGE', 
+      data sect_head /'GENERAL', 'IMAGE',
      +                'DISPLAY', 'FUNCTIONS', 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1) / 'blank_c:blank_k:calculate:compress:cut_c:
@@ -941,7 +941,7 @@ C--
       data sect_text(4)/  'aperture:colour:fit_magns:
      +                     inspect:main:positions:scrutiny' /
       data sect_text(5) / 'panel:exit' /
-     
+
       integer help_num
       parameter ( help_num=33 )
       character*68 help_text(help_num)
@@ -988,11 +988,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -1015,7 +1015,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call alt_srmainget
 
       OPDISP    = X_OPDISP
@@ -1040,7 +1040,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -1064,7 +1064,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call alt_srinsget
 
       OPDISP    = X_OPDISP
@@ -1090,7 +1090,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -1124,7 +1124,7 @@ Cbegin
       if ( ST_FAILED ) return
       if ( ierr.ne.0 ) return
 
-      call ds_init ( IMTITLE, 0, ierr )					!Open display 
+      call ds_init ( IMTITLE, 0, ierr )					!Open display
       if ( ST_FAILED ) return
       if ( ierr.ne.0 ) return
       OPDISP = .true.
@@ -1196,7 +1196,7 @@ Cbegin
       IMTYPE = 'REAL'
       BS = 1.0
       BZ = 0.0
-      
+
 
       end
 
@@ -1231,7 +1231,7 @@ Cbegin
                ja = j + DSNXS - 1
                ka = k + DSNYS - 1
                if ( in(ja,ka).eq.INVAL ) then
-                  out(j,k) = INT_INVALR 
+                  out(j,k) = INT_INVALR
                else
                   out(j,k) = BS*real(in(ja,ka)) + BZ
                endif
@@ -1243,7 +1243,7 @@ Cbegin
                ja = j + DSNXS - 1
                ka = k + DSNYS - 1
                if ( in(ja,ka).eq.RINVAL ) then
-                  out(j,k) = INT_INVALR 
+                  out(j,k) = INT_INVALR
                else
                   out(j,k) = real(in(ja,ka))
                endif
@@ -1284,7 +1284,7 @@ Cbegin
                ja = j + DSNXS - 1
                ka = k + DSNYS - 1
                if ( in(ja,ka).eq.RINVAL ) then
-                  out(j,k) = INT_INVALR 
+                  out(j,k) = INT_INVALR
                else
                   out(j,k) = BS*in(ja,ka) + BZ
                endif
@@ -1296,7 +1296,7 @@ Cbegin
                ja = j + DSNXS - 1
                ka = k + DSNYS - 1
                if ( in(ja,ka).eq.RINVAL ) then
-                  out(j,k) = INT_INVALR 
+                  out(j,k) = INT_INVALR
                else
                   out(j,k) = in(ja,ka)
                endif
@@ -1309,7 +1309,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ALT_FLIP -- Flip image 
+C ALT_FLIP -- Flip image
 C
 C alan penny                    ral                  1990-06-16
 
@@ -1326,7 +1326,7 @@ C--
       integer j, k
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       if ( kdir.eq.0 ) then
@@ -1335,7 +1335,7 @@ Cbegin
                wk(j) = in((NX-j+1),k)
             enddo
             do j = 1, NX
-               in(j,k) = wk(j) 
+               in(j,k) = wk(j)
             enddo
          enddo
       else
@@ -1344,7 +1344,7 @@ Cbegin
                wk(j) = in(k,(NY-j+1))
             enddo
             do j = 1, NY
-               in(k,j) = wk(j) 
+               in(k,j) = wk(j)
             enddo
          enddo
       endif
@@ -1420,7 +1420,7 @@ Cbegin
                jys = lys - acs - 2
                jye = jys + 2.0*acs + 4
                call ds_tiv ( jxs, jys, jx, jy )
-               call ds_acim ( im, NX, NY, 'REAL', jxs, jxe, 
+               call ds_acim ( im, NX, NY, 'REAL', jxs, jxe,
      +                        jys, jye, jx, jy, .false. )
             endif
 
@@ -1439,14 +1439,14 @@ Cbegin
 
             if ( DISPLAYED ) then
                call ds_tiv ( lxs, lys, ix, iy )
-               call ds_acim ( im, NX, NY, 'REAL', lxs, lxe, lys, lye, 
+               call ds_acim ( im, NX, NY, 'REAL', lxs, lxe, lys, lye,
      +                        ix, iy, .false. )
             endif
 
          endif
 
       enddo
-               
+
 
       end
 
@@ -1467,7 +1467,7 @@ C alan penny                    ral                  1995 July
       real       im(NX,NY)      !i/o: image
       integer    kopt		!i: Method (1=cursor;2=keyboard)
 C--
-      integer lxs, lxe, lys, lye, kb, nxa, nya, ierr, kcc, ipa, 
+      integer lxs, lxe, lys, lye, kb, nxa, nya, ierr, kcc, ipa,
      +        iptr
       real    x, y, acs
 Cbegin
@@ -1501,7 +1501,7 @@ Cbegin
             if ( ierr.ne.0 ) call printo ( 'ERROR: Invalid entry' )
             if ( ierr.ne.0 .or. kb.eq.3 ) return
          endif
-         
+
       else
          call get4i ( 'AREA', lxs, lys, lxe, lye, .true.,
      +                -1000000, 1000000 )
@@ -1510,7 +1510,7 @@ Cbegin
             call printo ( 'ERROR: Not in image' )
             return
          endif
-      
+
       endif
 
 
@@ -1533,7 +1533,7 @@ Cbegin
 
       call coprr ( %val(IPIM), NX, NY, lxs, lxe, lys, lye,
      +             %val(iptr), nxa, nya, 1, 1 )
-      
+
       if ( WORK_LOAD ) call wrkcan ( 'WORKALT' )
       call gtwrkr ( 'WORKALT', nxa*nya, ipa, ierr )
       call amovr ( %val(iptr), %val(ipa), nxa*nya )
@@ -1545,10 +1545,10 @@ Cbegin
       DSNYE = NY
       IPIM = ipa
 
-      call ds_erase 
+      call ds_erase
       DSIXS = DSSNX/2 - (((DSNXE-DSNXS+1)-1)/DSCOMFX)/2
       DSIYS = DSSNY/2 - (((DSNYE-DSNYS+1)-1)/DSCOMFY)/2
-      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, 
+      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE,
      +                DSNYS, DSNYE, DSIXS, DSIYS, DSWRAP )
 
 
@@ -1601,10 +1601,10 @@ Cbegin
 
       im(kx,ky) = val
 
-      call ds_erase 
+      call ds_erase
       DSIXS = DSSNX/2 - (((DSNXE-DSNXS+1)-1)/DSCOMFX)/2
       DSIYS = DSSNY/2 - (((DSNYE-DSNYS+1)-1)/DSCOMFY)/2
-      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, 
+      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE,
      +                DSNYS, DSNYE, DSIXS, DSIYS, DSWRAP )
 
 
@@ -1647,7 +1647,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ALT_MAGNIFY -- Magnify image 
+C ALT_MAGNIFY -- Magnify image
 C
 C alan penny                    ral                  1994 Oct
 
@@ -1674,15 +1674,15 @@ Cbegin
       trc(4) = 0.0
       trc(5) = 0.0
       trc(6) = ymag
- 
+
       call alt_atrans ( trc )
 
 
       end
 
-     
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ALT_ROTATE -- Rotate image 
+C ALT_ROTATE -- Rotate image
 C
 C alan penny                    ral                  1994 Oct
 
@@ -1729,7 +1729,7 @@ Cbegin
       trc(4) = ceny - cenx*sn - ceny*cs
       trc(5) = sn
       trc(6) = cs
- 
+
       call alt_atrans ( trc )
 
 
@@ -1775,7 +1775,7 @@ Cbegin
       if ( ierr.ne.0 ) return
 
       call alt_rot_b ( %val(IPIM), %val(iptr), pnx, pny, rot )
-      
+
       if ( WORK_LOAD ) call wrkcan ( 'WORKALT' )
       call gtwrkr ( 'WORKALT', pnx*pny, ipa, ierr )
       call amovr ( %val(iptr), %val(ipa), pnx*pny )
@@ -1788,17 +1788,17 @@ Cbegin
       DSNXE = NX
       DSNYE = NY
       IPIM = ipa
-      call ds_erase 
+      call ds_erase
 
       DSIXS = DSSNX/2 - (((DSNXE-DSNXS+1)-1)/DSCOMFX)/2
       DSIYS = DSSNY/2 - (((DSNYE-DSNYS+1)-1)/DSCOMFY)/2
-      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS, 
+      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS,
      +                DSNYE, DSIXS, DSIYS, DSWRAP )
 
 
       end
 
-     
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ALT_ATRANS -- Transform image in x and y
 C
@@ -1851,9 +1851,9 @@ Cbegin
       call gtwrkr ( 'IMTR', pnx*pny, iptr, ierr )
       if ( ierr.ne.0 ) return
 
-      call alt_dotran ( %val(IPIM), %val(iptr), pnx, pny, trc, 
+      call alt_dotran ( %val(IPIM), %val(iptr), pnx, pny, trc,
      +                  pxs, pys )
-      
+
       if ( WORK_LOAD ) call wrkcan ( 'WORKALT' )
       call gtwrkr ( 'WORKALT', pnx*pny, ipa, ierr )
       call amovr ( %val(iptr), %val(ipa), pnx*pny )
@@ -1868,7 +1868,7 @@ Cbegin
 
       DSIXS = DSSNX/2 - (((DSNXE-DSNXS+1)-1)/DSCOMFX)/2
       DSIYS = DSSNY/2 - (((DSNYE-DSNYS+1)-1)/DSCOMFY)/2
-      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS, 
+      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS,
      +                DSNYE, DSIXS, DSIYS, DSWRAP )
 
 
@@ -1966,11 +1966,11 @@ Cbegin
       atrc(4) = (trc(2)*trc(4)-trc(5)*trc(1))/rv
       atrc(5) = trc(5)/rv
       atrc(6) = -1.0*trc(2)/rv
-   
+
       do k = 1, nya
          do j = 1, nxa
-            ja = atrc(1) + atrc(2)*j + atrc(3)*k 
-            ka = atrc(4) + atrc(5)*j + atrc(6)*k 
+            ja = atrc(1) + atrc(2)*j + atrc(3)*k
+            ka = atrc(4) + atrc(5)*j + atrc(6)*k
             if(ja.lt.1 .or. ja.gt.NX .or. ka.lt.1 .or. ka.gt.NY) then
                out(j,k) = INT_INVALR
             else
@@ -1984,7 +1984,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ALT_SMOOTH -- Smooth image 
+C ALT_SMOOTH -- Smooth image
 C
 C alan penny                    ral                  1994 Oct
 
@@ -1998,7 +1998,7 @@ C alan penny                    ral                  1994 Oct
 
       integer   kdef		!i: Default smoothing option (1=box;2=gauss;3=median)
 C--
-      integer nxa, nxb, nya, nyb, iv, ipwa, ipwb, ipwc, ipwd, 
+      integer nxa, nxb, nya, nyb, iv, ipwa, ipwb, ipwc, ipwd,
      +        ipwe, kmeth, ierr
       real rad
 Cbegin
@@ -2035,7 +2035,7 @@ Cbegin
          call get2i ( 'BOX', nxb, nyb, .true., 1, iv )
          if ( ST_FAILED ) return
       endif
-   
+
       if ( kmeth.eq.1 ) then
          nxa = NX + 2*(nxb/2)
          nya = NY + 2*(nyb/2)
@@ -2081,7 +2081,7 @@ C  Take account of invalid pixels.
 C
 C  alan penny                  ral                  1994-05-26
 
-      subroutine alt_gaussr ( rin, nx, ny, rinval, rad, 
+      subroutine alt_gaussr ( rin, nx, ny, rinval, rad,
      +                        ria, nxa, nya, rio, ee, nxb, nyb )
 
       implicit none
@@ -2174,7 +2174,7 @@ Cbegin
                   kdy = ka - kb
                   do ja = 1, nxb
                      jx = j - jb + ja - jb
-                     if ( jx.ge.1 .and. jx.le.nx ) rio(jx,jy) = 
+                     if ( jx.ge.1 .and. jx.le.nx ) rio(jx,jy) =
      +                                    rio(jx,jy) + rv*ee(ja,ka)
                   enddo
                endif
@@ -2185,7 +2185,7 @@ Cbegin
 
       do k = 1, ny
          do j = 1, nx
-            if ( ria(j,k).eq.rinval ) rio(j,k) = rinval 
+            if ( ria(j,k).eq.rinval ) rio(j,k) = rinval
          enddo
       enddo
 
@@ -2215,7 +2215,7 @@ C--
       real rm
 Cbegin
 
-    
+
       if ( ST_FAILED ) return
 
       kxl = (nxb-1)/2
@@ -2285,9 +2285,9 @@ Cbegin
                         nsum = nsum + 1
                      endif
                   endif
-               enddo         
+               enddo
             endif
-         enddo         
+         enddo
 
          if ( .not.some ) then
             rv = 0.0
@@ -2295,14 +2295,14 @@ Cbegin
             rv = sum/real(nsum)
          endif
 
-      enddo         
+      enddo
 
 
       end
 
-     
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ALT_COMPRESS -- Compress image 
+C ALT_COMPRESS -- Compress image
 C
 C alan penny                    ral                  1994 Oct
 
@@ -2331,10 +2331,10 @@ C--
      + 'Sample   Take value of bottom left hand pixel in box'/
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
-      nxst = 1   
+      nxst = 1
       nyst = 1
       lim = max(NX,NY)
       call get2i ( 'BIN', nxst, nyst, .true., 1, lim )
@@ -2369,9 +2369,9 @@ Cbegin
       call gtwrkr ( 'IMTR', nxo*nyo, ipo, ierr )
       if ( ierr.ne.0 ) return
 
-      call alt_docomp ( %val(IPIM), %val(ipo), nxo, nyo, nxst, 
+      call alt_docomp ( %val(IPIM), %val(ipo), nxo, nyo, nxst,
      +                  nyst, sample, ignore )
-      
+
       if ( WORK_LOAD ) call wrkcan ( 'WORKALT' )
       call gtwrkr ( 'WORKALT', nxo*nyo, ipa, ierr )
       call amovr ( %val(ipo), %val(ipa), nxo*nyo )
@@ -2382,11 +2382,11 @@ Cbegin
       DSNXE = NX
       DSNYE = NY
       IPIM = ipa
-      call ds_erase 
+      call ds_erase
 
       DSIXS = DSSNX/2 - (((DSNXE-DSNXS+1)-1)/DSCOMFX)/2
       DSIYS = DSSNY/2 - (((DSNYE-DSNYS+1)-1)/DSCOMFY)/2
-      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS, 
+      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS,
      +                DSNYE, DSIXS, DSIYS, DSWRAP )
 
 
@@ -2412,24 +2412,24 @@ C--
       integer j
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
       bot = 0.0
       top = 0.0
       call get2r ( 'RANGE', bot, top, .true., -1.0e20, 1.0e20 )
       call cswopr ( bot, top )
-   
+
       do j = 1, NX*NY
          rv = im(j)
          if ( rv.ne.RINVAL ) then
             if ( rv.ge.bot .and. rv.le.top ) im(j) = RINVAL
          endif
       enddo
-   
+
       DSIXS = DSSNX/2 - (((DSNXE-DSNXS+1)-1)/DSCOMFX)/2
       DSIYS = DSSNY/2 - (((DSNYE-DSNYS+1)-1)/DSCOMFY)/2
-      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS, 
+      call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS,
      +                DSNYE, DSIXS, DSIYS, DSWRAP )
 
 
@@ -2437,7 +2437,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ALT_DOCOMP -- Do the binning of an image 
+C ALT_DOCOMP -- Do the binning of an image
 C
 C   alan penny                     ral           1994 Oct
 
@@ -2462,7 +2462,7 @@ C--
       logical set
       real high, rv, rvs
 Cbegin
-         
+
 
       if ( SAMPLE.eq.'sample ' ) then
 
@@ -2570,7 +2570,7 @@ Cbegin
       if ( ierr.ne.0 ) then
          call printo ( 'ERROR: Image not stored' )
          return
-      endif 
+      endif
 
       call amovr ( %val(IPIM), %val(ipo), NX*NY )
 
@@ -2582,7 +2582,7 @@ Cbegin
       call ptdesr ( 'OUTIM', 'BSCALE', BS )
       call ptdesr ( 'OUTIM', 'BZERO',  BZ )
       call ptdesr ( 'OUTIM', 'INVAL', RINVAL )
-  
+
       call canpar ( 'OUTIM' )
 
 
@@ -2591,7 +2591,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C ALT_UNSHARP -- Unsharp mask image 
+C ALT_UNSHARP -- Unsharp mask image
 C
 C alan penny                    ral                  1994 Oct
 
@@ -2622,7 +2622,7 @@ Cbegin
       call amovr ( %val(IPIM), %val(ipmb), NX*NY )
 
       call printo ( '  ' )
-      call printo ( 
+      call printo (
      + 'You must first smooth the image - default method is MEDIAN' )
       call printo ( '  ' )
 
@@ -2638,7 +2638,7 @@ Cbegin
       if ( doit ) call alt_smooth ( 3 )
 
       call printo ( '  ' )
-      call printo ( 
+      call printo (
      + 'You now try subtracting various fractions of this from the' )
       call printo ( '  original image.  Default is 80%.' )
       call printo ( '  ' )
@@ -2657,7 +2657,7 @@ Cbegin
          call pargr ( DSVMIN )
          call pargr ( DSVMAX )
          call printd ( ' Display range: Min = %f  Max = %f ' )
-         call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS, 
+         call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS,
      +                   DSNYE, DSIXS, DSIYS, DSWRAP )
 
          call get1b ( 'MORE', more, .true. )
@@ -2720,12 +2720,12 @@ Cbegin
          if ( ANYIN ) then						!Load input images into stack
             do kk = 1, NZ
                if ( IMTY(kk).eq.'SHORT' ) then
-                  call alt_loads ( %val(IPC(kk)), NXC(kk), NYC(kk), 
+                  call alt_loads ( %val(IPC(kk)), NXC(kk), NYC(kk),
      +                              BSC(kk), BZC(kk), INVALI(kk), k,
      +                              kk, %val(IPSTK), NXO, NZ )
                else
-                  call alt_loadr ( %val(IPC(kk)), NXC(kk), NYC(kk), 
-     +                              BSC(kk), BZC(kk), RINVALI(kk), k, 
+                  call alt_loadr ( %val(IPC(kk)), NXC(kk), NYC(kk),
+     +                              BSC(kk), BZC(kk), RINVALI(kk), k,
      +                              kk, %val(IPSTK), NXO, NZ )
                endif
             enddo
@@ -2753,7 +2753,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ALT_OUTLOAD -- Put calculated image to work array and display
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine alt_outload ( )
 
       implicit none
@@ -2804,16 +2804,16 @@ Cbegin
       DSIYS = DSSNY/2 - (((DSNYE-DSNYS+1)-1)/DSCOMFY)/2
       call ds_acimr ( %val(IPIM), NX, NY, DSNXS, DSNXE, DSNYS,
      +                DSNYE, DSIXS, DSIYS, DSWRAP )
-     
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ALT_SDEF -- Set up defaults
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine alt_sdef ( )
 
       implicit none
@@ -2854,7 +2854,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ALT_GCL -- Get input and output info from the command line
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine alt_gcl ( )
 
       implicit none
@@ -2862,8 +2862,8 @@ C  alan penny                         RAL                1991 Dec
       include 'STARMAN_INC'
       include 'ST_IMAGE_INC'
 C--
-      integer k, ierr 
-      character title*50, texta*132, inim*3 
+      integer k, ierr
+      character title*50, texta*132, inim*3
 Cbegin
 
 
@@ -2880,7 +2880,7 @@ Cbegin
 
       call alt_polish ( EXPRS, OPCODE, NOPCODE, IMID, NIM,		!Translate it into reverse polish notation
      +                   IMP, VARID, NVAR, IMPV, CON, NCON, ierr )
-      if ( ierr.ne.0 ) then						
+      if ( ierr.ne.0 ) then
          return
       endif
 
@@ -2903,13 +2903,13 @@ Cbegin
                texta = 'Main'
             else
                inim = 'IN'//IMTOT(k)(2:2)
-               call opimzr ( inim, IPC(k), NXC(k), NYC(k), IMTY(k), 
+               call opimzr ( inim, IPC(k), NXC(k), NYC(k), IMTY(k),
      +                       .false., ierr )
                if ( ierr.ne.0 ) then
                   ST_FAILED = .true.
                   return
                endif
-               call gtimzd ( inim, IMTY(k), BSC(k), BZC(k), INVALI(k), 
+               call gtimzd ( inim, IMTY(k), BSC(k), BZC(k), INVALI(k),
      +                       RINVALI(k), texta, ierr)
                if ( ierr.ne.0 ) then
                   ST_FAILED = .true.
@@ -2931,7 +2931,7 @@ Cbegin
       call alt_vardiff							!How many diff variables?
 
       if ( NVARTOT.gt.0 ) then						!Get input variables
-         do k = 1, NVARTOT		
+         do k = 1, NVARTOT
             call get1r ( VARTOT(k), VAR(k), 0.0, -1.0e37, +1.0e37 )
          enddo
       endif
@@ -2940,7 +2940,7 @@ Cbegin
       call uppcase ( EXPRS, texta )
       if ( index(texta,'RAN').ne.0 .or. index(texta,'GAUSS').ne.0 )
      +   then
-         call get1i ( 'SEED', KSEED, 1234567891, 1200000001, 
+         call get1i ( 'SEED', KSEED, 1234567891, 1200000001,
      +                        1400000001 )
          call ajseed ( KSEED )
       endif
@@ -3005,8 +3005,8 @@ C ALT_POLISH -- Decode equation and sort into reverse Polish
 C
 C  alan penny                RAL                1991 Dec
 
-      subroutine alt_polish ( exprs, opcode, noper, imid, 
-     +                         nim, imp, varid, nvar, impv, con, 
+      subroutine alt_polish ( exprs, opcode, noper, imid,
+     +                         nim, imp, varid, nvar, impv, con,
      +                         ncon, ierr)
 
       implicit none
@@ -3025,7 +3025,7 @@ C  alan penny                RAL                1991 Dec
       integer          ierr		!o: Error flag (0=ok;bad 2=;3=;4=)
 C--
 
-      character in*133, numchr*132, test*7, testa*7, 
+      character in*133, numchr*132, test*7, testa*7,
      +          output*7, fin*2, fina*3
       integer j, k, tos, stk(0:132), symb(132), ll, ncin, nnum,
      +        nsymb, iok, isymb, ndiff, istat, jj
@@ -3042,9 +3042,9 @@ C--
       character*1 endoper(numendoper)
 
       character*7 oper(-3:maxsym), opsymb(-3:maxsym)
-      integer opl(-3:maxsym), opr(-3:maxsym), l(-3:maxsym), 
+      integer opl(-3:maxsym), opr(-3:maxsym), l(-3:maxsym),
      +        prl(-3:maxsym), prr(-3:maxsym)
- 
+
       data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),		!Set up image of operators,
      +        prr(j),j=-3,10 ) /					! symbols and their priorities
      +  '       ', 'LDCON  ', 1, 0, 0, 10, 10,
@@ -3101,20 +3101,20 @@ C--
 
       data endoper / '+', '-', '/', '*', ')', '=', ' ' /
 Cbegin
- 
+
 
       ierr = 0
       ncin = 0
- 
+
       do k = 1, len(exprs)						!Remove embedded blanks
          if ( exprs(k:k).ne.' ' .and. ncin.lt.132  ) then		!Count no of characters
             ncin = ncin + 1
             in(ncin:ncin) = exprs(k:k)
          endif
       enddo
- 
+
       exprs = in(1:ncin)						!Return the expression with blanks removed
- 
+
       ncin = ncin + 1							!Append an '= ' operator to terminate the expression
       in(ncin:ncin) = '='
 
@@ -3125,15 +3125,15 @@ Cbegin
       j = 0
 
       opnext = .false.							!Indicates if an operator is expected next
-									! first entity must not look like an operator 
+									! first entity must not look like an operator
 
       lmore = .true.							!Loop thru OPLs until '='found
       do while ( lmore )
-         found = .false.						!Search through the list of symbols to 
+         found = .false.						!Search through the list of symbols to
          nsymb = -1							! identify which comes next
          do while ( nsymb.lt.maxsym .and. .not.found )
             nsymb = nsymb + 1
-            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like 
+            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like
                test = in(k:min(k+l(nsymb)-1,81))			! an operator or operand from the left, as appropriate
                call uppcase ( test, testa )
                if ( testa.eq.oper(nsymb) ) found = .true.
@@ -3141,22 +3141,22 @@ Cbegin
          enddo
 
          isfile = .false.
-         if ( .not.found ) then						!If symbol was not found: - 
+         if ( .not.found ) then						!If symbol was not found: -
 
             if ( opnext ) then						!Error if an operator expected
                ierr = 3
                call printo ( ' ' )
                call printo ( 'ERROR: Cant understand Equation - ' )
                call pargi ( k )
-               call printd ( 
+               call printd (
      +              'ERROR:   An Operator missing, at character: %d' )
-               call printo ( 
+               call printo (
      +              'ERROR:   - that is a plus, or a minus, etc')
                call alt_eqnerr ( exprs, k )
                return
             elseif ( in(k:k).eq.'!' ) then				!Is it marked as filename?
 
-               nnum = 0			
+               nnum = 0
                numchr = ' '						!extract contiguous characters
 
                ll = index(in(k+1:),'!')					!File name would end with an !
@@ -3165,9 +3165,9 @@ Cbegin
                   call printo ( ' ' )
                   call printo ( 'ERROR: Cant understand Equation - ' )
                   call pargi ( k )
-                  call printd ( 
+                  call printd (
      +              'ERROR:   An ! at character: %d marks start of' )
-                  call printo ( 
+                  call printo (
      +              'ERROR:   filename - but there is no end !')
                   call alt_eqnerr ( exprs, k )
                   return
@@ -3176,20 +3176,20 @@ Cbegin
                   call printo ( ' ' )
                   call printo ( 'ERROR: Cant understand Equation - ' )
                   call pargi ( k )
-                  call printd ( 
+                  call printd (
      +              'ERROR:   An ! at character: %d marks start of' )
-                  call printo ( 
+                  call printo (
      +              'ERROR:   filename - but only another ! follows')
                   call alt_eqnerr ( exprs, k )
                   return
                endif
                nnum = ll + 1
                numchr = in(k+1:k+ll-1)
- 
+
                call file_is ( numchr(:nnum-2), isfile )			!Try to read this as a file
                if ( isfile ) then
                   thisok = .true.
-                  nsymb = -1						
+                  nsymb = -1
                   nim = nim + 1						!If it is a image, add name to image stack
                   fin(1:1) = 'I'
                   fin(2:2) = char(64+nim)
@@ -3199,7 +3199,7 @@ Cbegin
                   call file_par ( numchr(:nnum-2), fina, istat )
                endif
 
-            else if ( (in(k:k).eq.'I' .or. in(k:k).eq.'i')		!If an operand was expected, it may be 
+            else if ( (in(k:k).eq.'I' .or. in(k:k).eq.'i')		!If an operand was expected, it may be
      +                 .and. ischar(in(k+1:k+1)) ) then
                nsymb = -1						! a image, variable or const.
                nim = nim + 1						!If it is a image, add name to image stack
@@ -3215,7 +3215,7 @@ Cbegin
                nnum = 0							!Otherwise it may be a constant...
                numchr = ' '						! extract contiguous numerical characters
 
-               atend = .false.						!Character may be part of a numerical constant 
+               atend = .false.						!Character may be part of a numerical constant
                ll = k - 1						! if it is 0..9 or '.'
                do while ( ll.lt.ncin .and. .not.atend )			! or if it is an 'e' following one of the above
                   ll = ll + 1						! or if it is a sign following an 'e'
@@ -3230,8 +3230,8 @@ Cbegin
                      atend = .true.					!End of number as soon as one of the above tests fails
                   endif
                enddo
-               call chartor ( numchr(:nnum), const, iok )       
- 
+               call chartor ( numchr(:nnum), const, iok )
+
                if ( iok.eq.0 .and. nnum.ne.0 ) then			!If successful, add constant to stack
                   thisok = .true.
                   ncon = ncon + 1
@@ -3246,7 +3246,7 @@ Cbegin
                   numchr = ' '						! extract contiguous characters
 
                   atend = .false.					!File name would end with an operator
-                  ll = k - 1						
+                  ll = k - 1
                   do while ( ll.lt.ncin .and. .not.atend )
                      ll = ll + 1
                      do jj = 1, numendoper
@@ -3257,7 +3257,7 @@ Cbegin
                         numchr(nnum:nnum) = in(ll:ll)
                      endif
                   enddo
- 
+
                   call file_is ( numchr(:nnum), isfile )			!Try to read this as a file
                   if ( isfile .and. nnum.ne.0 ) then
                      thisok = .true.
@@ -3272,33 +3272,33 @@ Cbegin
                   endif
 
                endif
-               
+
                if ( .not.thisok ) then
                   ierr = 2						!Otherwise there is a bad operand error
                   call printo ( ' ' )
                   call printo ( 'ERROR: Cant understand Equation -' )
                   call pargi ( k )
-                  call printd ( 
+                  call printd (
      +            'ERROR:   Operand missing or bad, at character: %d' )
                   call printo ( 'ERROR:   - that is a file, '//
      +                      'a parameter, a constant, or a variable' )
-                  call printo ( 
+                  call printo (
      +            'ERROR:   - If file name, the file may not exist' )
                   call alt_eqnerr ( exprs, k )
                   return
                endif
-  
+
             endif
          endif
- 
-         j = j + 1							!Put the identified symbol into the output 
-         symb(j) = nsymb						! array and move the input pointer to the 
+
+         j = j + 1							!Put the identified symbol into the output
+         symb(j) = nsymb						! array and move the input pointer to the
          if ( isfile ) then
             k = k + nnum
          else
             k = k + l(nsymb)						! next symbol
          endif
- 
+
          opnext = opr(nsymb).ne.1					!Decide whether an operator or operand follows
          if ( opsymb(nsymb).eq.'=' ) lmore = .false.
       enddo
@@ -3311,11 +3311,11 @@ Cbegin
       lmore = .true.
       do while ( lmore )
          lmore = .false.
- 
-         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have 
+
+         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have
      +        oper(symb(isymb)).eq.')' ) then				! matching parentheses, cancel them
- 
-            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the 
+
+            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the
  									! opening parenthesis then send it to the output stream
 
                output = opsymb(stk(tos))				!Remove the enclosed '(' from functions first
@@ -3328,8 +3328,8 @@ Cbegin
                lmore = .true.
              endif
 
-         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has 
-            output = opsymb(stk(tos))					! a high enough priority, transfer it to 
+         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has
+            output = opsymb(stk(tos))					! a high enough priority, transfer it to
             tos = tos - 1						! the output stream
          else
             tos = tos + 1						!Otherwise, transfer the next symbol to the stack
@@ -3337,11 +3337,11 @@ Cbegin
             isymb = isymb + 1
             lmore = .true. 						!Return for next test
          endif
- 
+
          if ( .not.lmore ) then
 
-            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output, 
-               ierr = 4							! it results from unpaired parentheses 
+            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output,
+               ierr = 4							! it results from unpaired parentheses
                call printo ( ' ' )
                call printo ( 'ERROR: ) missing from Equation -' )	! in the input expression...quit qith error
                call printo ( 'ERROR: '//exprs(1:70) )
@@ -3354,27 +3354,27 @@ Cbegin
                return
             endif
 
-            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it 
+            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it
                noper = noper + 1					! if it is unary + or a comma
                opcode(noper) = output
             endif
- 
+
             if ( output.ne.'=' ) lmore = .true.				!Return for next symbol if not the end
 
          endif
 
       enddo
- 
-      if ( nim.ge.1 ) then						!If images or variables are referenced, sort 
-         call alt_sort ( imid, nim, imp, ndiff, symb )			! their names into alphabetical order and obtain 
-         nim = ndiff							! pointers to allow them to be accessed in their 
+
+      if ( nim.ge.1 ) then						!If images or variables are referenced, sort
+         call alt_sort ( imid, nim, imp, ndiff, symb )			! their names into alphabetical order and obtain
+         nim = ndiff							! pointers to allow them to be accessed in their
       endif								! original order
       if ( nvar.ge.1 ) then
          call alt_sort ( varid, nvar, impv, ndiff, symb )
          nvar = ndiff
       endif
- 
- 
+
+
       end
 
 
@@ -3415,12 +3415,12 @@ C ALT_CDOIT -- Combine the lines from the stack of images into one line
 C
 C  alan penny                     RAL            1991 Dec
 
-      subroutine alt_cdoit ( riml, nx, nz, ky, opcode, nopcode, imp, 
+      subroutine alt_cdoit ( riml, nx, nz, ky, opcode, nopcode, imp,
      +                       impv, var, con, rimo, kseed, ierr )
 
       implicit none
       include 'ST_LIMITS_INC'
- 
+
       integer      nx			!i: X size of input lines
       integer      nz			!i: Z size of input lines
       real         riml(nx,nz)		!i: Input lines
@@ -3447,13 +3447,13 @@ C--
       character opsymb(nsymb)*6						!Recognised operations
       data opsymb /
      + 'LDCON ', 'LDVAR ', 'LDIM  ', '=     ',
-     + '-     ', '+     ', '**    ', '*     ', '/     ', 'NEG   ', 
-     + 'SQRT  ', 'EXP   ', 'LOG10 ', 'LOG   ', 'SIN   ', 'COS   ', 
-     + 'TAN   ', 'ASIN  ', 'ACOS  ', 'ATAN  ', 'ATAN2 ', 'SINH  ', 
-     + 'COSH  ', 'TANH  ', 'ABS   ', 'AINT  ', 'ANINT ', 'MOD   ', 
-     + 'SIGN  ', 'DIM   ', 'MIN   ', 'MAX   ', 'XX    ', 'YY    ', 
+     + '-     ', '+     ', '**    ', '*     ', '/     ', 'NEG   ',
+     + 'SQRT  ', 'EXP   ', 'LOG10 ', 'LOG   ', 'SIN   ', 'COS   ',
+     + 'TAN   ', 'ASIN  ', 'ACOS  ', 'ATAN  ', 'ATAN2 ', 'SINH  ',
+     + 'COSH  ', 'TANH  ', 'ABS   ', 'AINT  ', 'ANINT ', 'MOD   ',
+     + 'SIGN  ', 'DIM   ', 'MIN   ', 'MAX   ', 'XX    ', 'YY    ',
      + 'CLIP  ', 'GAUSS ', 'RAN   ' /
-Cbegin 
+Cbegin
 
 
       ierr = 0								!Failure flag
@@ -3470,33 +3470,33 @@ Cbegin
                opwhich(k) = j
                found = .true.
             endif
-         enddo 
+         enddo
          if ( .not.found ) then
             ierr = 1
             return
          endif
       enddo
-      
+
       do j = 1, nx							!Do for all pixels in line
 
          tos = 0							!Initialise the arith, image,
          numiim = 0							! variable, constant stack pointers
          nvar = 0
-         ncon = 0 
- 
+         ncon = 0
+
          nop = 0							!Do the operations
          more = .true.
          bad = .false.
 
          do while ( nop.lt.nopcode .and. more )
-            nop = nop + 1 
+            nop = nop + 1
 
             go to ( 101,102,103,104,105,106,107,108,109,110,111,112,
      +              113,114,115,116,117,118,119,120,121,122,123,124,
      +              125,126,127,128,129,130,131,132,133,134,135,136,
      +              137 ),
      +            opwhich(nop)
-           
+
  101        continue
                tos = tos + 1						!Load constant on to stack
                ncon = ncon + 1
@@ -3693,11 +3693,11 @@ Cbegin
                tos = tos - 1
             go to 100
  133        continue
-               tos = tos + 1						!XX : X position in output image 
+               tos = tos + 1						!XX : X position in output image
                s(tos) = j
             go to 100
  134        continue
-               tos = tos + 1						!YY : Y position in output image 
+               tos = tos + 1						!YY : Y position in output image
                s(tos) = ky
             go to 100
  135        continue
@@ -3725,20 +3725,20 @@ Cbegin
                rimo(j) = INT_INVALR
                more = .false.
             endif
- 
+
          enddo
- 
+
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ALT_IMDIFF -- Get number of diff input images and point to stack
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine alt_imdiff ( )
 
       implicit none
@@ -3750,7 +3750,7 @@ C--
 Cbegin
 
 
-      NZ = 0 
+      NZ = 0
 
       if ( NIM.ne.0 ) then
          do j = 1, NIM
@@ -3795,7 +3795,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ALT_VARDIFF -- Get number of diff input variables and point to stack
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine alt_vardiff ( )
 
       implicit none
@@ -3807,7 +3807,7 @@ C--
 Cbegin
 
 
-      NVARTOT = 0 
+      NVARTOT = 0
 
       if ( NVAR.ne.0 ) then
          do j = 1, NVAR
@@ -3846,9 +3846,9 @@ C ALT_LOADR -- Copy real image into a 3-D stack
 C
 C  alan penny                 ral                     1991 Dec
 
-      subroutine alt_loadr ( im, nx, ny, bs, bz, rinvali, jn, jzn, 
+      subroutine alt_loadr ( im, nx, ny, bs, bz, rinvali, jn, jzn,
      +                        rim, nxo, nz )
- 
+
       implicit none
       include 'ST_LIMITS_INC'
 
@@ -3867,7 +3867,7 @@ C--
       integer k
       real    rv
 Cbegin
- 
+
 
       do k = 1, nxo
          rv = im(k,jn)
@@ -3877,19 +3877,19 @@ Cbegin
             rim(k,jzn) = bs*rv + bz
          endif
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C ALT_LOADS -- Copy int*2 image into a 3-D stack
 C
 C  alan penny                 ral                     1991 Dec
 
-      subroutine alt_loads ( im, nx, ny, bs, bz, invali, jn, jzn, 
+      subroutine alt_loads ( im, nx, ny, bs, bz, invali, jn, jzn,
      +                        rim, nxo, nz )
- 
+
       implicit none
       include 'ST_LIMITS_INC'
 
@@ -3907,7 +3907,7 @@ C  alan penny                 ral                     1991 Dec
 C--
       integer k, kv
 Cbegin
- 
+
 
       do k = 1, nxo
          kv = im(k,jn)
@@ -3917,8 +3917,8 @@ Cbegin
             rim(k,jzn) = bs*real(kv) + bz
          endif
       enddo
- 
- 
+
+
       end
 
 
@@ -3973,7 +3973,7 @@ C  alan penny            ral                     1991 Dec
       subroutine alt_sort ( c, nc, imp, ndiff, iw )
 
       implicit none
- 
+
       integer        nc		!i: Number of identifiers
       character*(*)  c(nc)	!i/o: Identiers
       integer        imp(nc)	!o: pointer to identifier place in stack
@@ -3984,7 +3984,7 @@ C--
       character*132 text
       logical repeat
 Cbegin
- 
+
 
       ndiff = 1								!Only 1?
       iw(1) = 1
@@ -3992,12 +3992,12 @@ Cbegin
       if ( nc.le.1 ) return
 
       nn = min(132,len(c(1)))						!Length of input strings
- 
+
       do k = 1, nc							!Initiallise pointers in workspace
          iw(k) = k
       enddo
 
-      repeat = .true.							!Perform a bubble sort to put 
+      repeat = .true.							!Perform a bubble sort to put
       do while ( repeat ) 						! character strings into alphabetical order
          repeat = .false.
          do k = 1, nc-1
@@ -4010,23 +4010,23 @@ Cbegin
                iw(k+1) = iw(k)
                iw(k) = it
             endif
-         enddo 
+         enddo
       enddo
- 
-      ndiff = 1								!Pointers now point to original positions. scan list to 
+
+      ndiff = 1								!Pointers now point to original positions. scan list to
       imp(iw(1)) = 1							! remove repeated entries and reverse the pointing direction
       do k = 2, nc
-         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and 
+         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and
             ndiff = ndiff + 1						! put it in the correct place in the list
             c(ndiff) = c(k)
          endif
          imp(iw(k)) = ndiff						!Set the appropriate output pointer to its new location
       enddo
- 
- 
+
+
       end
-  
- 
+
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C    APERTURE.F
 C
@@ -4043,7 +4043,7 @@ C AP_CHCENTRE  Toggle method of placing centre of aperture
 C AP_CEN(RS)   Get centre in oval area
 C AP_PMAX(RS)  Get position of max pixel in oval area
 C AP_DOIT(RS)  Calc flux through aperture (star/sky/annulus)
-C AP_MAG       Calc, store and type out star measure 
+C AP_MAG       Calc, store and type out star measure
 C AP_OUT       Put measures out to file
 C AP_REM       Remove the ovals near a point in display
 C AP_LIST      List the measures so far
@@ -4098,7 +4098,7 @@ Cbegin
          endif
 
          if ( .not.GOTIMAGE .and. (ktopt.eq.'measure' .or. 		!Check got image
-     +        ktopt.eq.'flash' .or. ktopt.eq.'display'  .or. 
+     +        ktopt.eq.'flash' .or. ktopt.eq.'display'  .or.
      +        ktopt.eq.'recalc') ) then
             call printo ( 'No displayed image yet' )
             ktopt = ' '
@@ -4125,14 +4125,14 @@ Cbegin
                                     call get1r ( 'APANG', APANG,
      +                                           APANG, -90.0, 90.0 )
                                  endif
-      
-         if ( ktopt.eq.'exptim_k' ) call airgktime 			!Change Zero point by 
+
+         if ( ktopt.eq.'exptim_k' ) call airgktime 			!Change Zero point by
 									! keyboard exposure time?
 
          if ( ktopt.eq.'recalc' ) call ap_mag 				!Calc Magnitude from last star and sky
 
          if ( ktopt.eq.'poisson' ) call get1r ( 'POISS', POISV, POISV,	!Change RMS correction value
-     +                                          1.e-8, 1.e16 ) 
+     +                                          1.e-8, 1.e16 )
 
          if ( ktopt.eq.'noise' ) call get1r ( 'NOISE', NOISE, NOISE, 	!Change extra noise value
      +                                        0.0, 1.e16 )
@@ -4147,16 +4147,16 @@ Cbegin
                         ANNULUS = .true.
                         if ( km.eq.2 ) ANNULUS = .false.
                         endif
-	
+
          if ( ktopt.eq.'centre' ) call ap_chcentre			!Toggle method of finding centre
 
          if ( ktopt.eq.'level' ) then 					!Toggle using median/mean for sky
                         DOMEDIAN = .not.DOMEDIAN
                         if ( DOMEDIAN ) then
-                           call printo ( 
+                           call printo (
      +                     'Median used when measuring sky level' )
                         else
-                           call printo ( 
+                           call printo (
      +                     'Mean used when measuring sky level')
                         endif
                         endif
@@ -4171,10 +4171,10 @@ Cbegin
          if ( ktopt.eq.'show_ap' ) then					!Toggle show apertures when getting?
                         APSHOW = .not.APSHOW
                         if ( APSHOW ) then
-                           call printo ( 
+                           call printo (
      +                        'Apertures shown whilst getting stars' )
                         else
-                           call printo ( 
+                           call printo (
      +                     'Apertures not shown whilst getting stars' )
                         endif
                         endif
@@ -4189,8 +4189,8 @@ Cbegin
                                           NSTLAST = NST
                                           if ( .not.ST_FAILED .and.
      +                                         ierr.eq.0 ) then
-                                          call ds_doflash ( %val(IPIM), 	
-     +                                    NX, NY, IMTYPE, DSKVRANGE, 
+                                          call ds_doflash ( %val(IPIM),
+     +                                    NX, NY, IMTYPE, DSKVRANGE,
      +                                    IMTITLE )
                                           DISPLAYED = .true.
                                           endif
@@ -4207,7 +4207,7 @@ Cbegin
                         call ds_erase
                         DISPLAYED = .false.
                         endif
-  
+
          if ( ktopt.eq.'close' ) then                                  !Close display screen
                                  call ds_close ( ierr )
                                  OPDISP = .false.
@@ -4215,14 +4215,14 @@ Cbegin
                                  endif
 
          if ( ktopt.eq.'open' ) call in_opdisp ( ierr )			!Open display screen
-   
+
          if ( ktopt.eq.'panel' ) call choice_panel_sw			!Panel choice
 
 
          if ( ktopt.eq.'main' .or. ktopt.eq.'alter' .or. 		!Return to main program
      +        ktopt.eq.'colour' .or.
      +        ktopt.eq.'inspect' .or. ktopt.eq.'fit_magns' .or.
-     +        ktopt.eq.'positions' .or. ktopt.eq.'scrutiny' .or. 
+     +        ktopt.eq.'positions' .or. ktopt.eq.'scrutiny' .or.
      +        ktopt.eq.'exit' )  then
                                     MAIN_SELECT = ktopt
                                     loop = .false.
@@ -4230,7 +4230,7 @@ Cbegin
 
          if ( ST_FAILED ) loop = .false.
 
-      enddo								
+      enddo
 
       if ( NST.ne.0 ) then						!Flag not all stoed
          call printo ( ' ' )
@@ -4270,7 +4270,7 @@ C--
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
 
-      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) / 
+      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'airmass', 'Correct for Airmass from image descriptor',
      + 'Do you want to know the observation airmass? If so, what are ',
      + 'the names of the Airmass or Position [RA, Dec, type of coord,',
@@ -4279,15 +4279,15 @@ C--
      + 'tor name, where in it is the Filter code, what codes are to be',
      + 'looked for, and what are the extinctions of those filters?' /
 
-      data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) / 
+      data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) /
      + 'zero_pt', 'Change the -base- magnitude zero point',
      + 'Input (via the keyboard) the -zero point- correction to be' ,
      + 'added to measured magnitude, before it is reported or stored.',
-     + ' ', 
+     + ' ',
      + ' (This is in addition to any -exposure time- zero point used.)',
      + ' ', ' '/
 
-      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) / 
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
      + 'centre', 'Toggle centre => cursor/max pixel/centroid/Gaussian',
      + 'Each time this option is chosen, the method of determining the',
      + 'position to be used for the aperture centre changes. They are:',
@@ -4296,13 +4296,13 @@ C--
      + '(4) The location of a 2-D Gaussian fitted to the -star- in the',
      + 'aperture (choose either fixed or variable Gaussian radii).'/
 
-      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) / 
+      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'clear', 'Clear screen' ,
      + 'Clear the display screen. (The programme does not forget about',
      + 'the input image.)',
      + ' ', ' ', ' ', ' '/
 
-      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) / 
+      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'display', 'Display image',
      + 'Display the present input image. The program asks you for:-' ,
      + '1) The display range (default: +3 and -2 std. devs. from mean)',
@@ -4311,7 +4311,7 @@ C--
      + '3) Where to put the bottom left hand corner of the image' ,
      + '      (default: so as to centre the image in the screen).' /
 
-      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) / 
+      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'exptim_k', 'Change zeropoint by using keyboard exposure time',
      + 'Do you want (KEYTIME) to add a correction to the measured mags',
      + 'corresponding to an -exposure time- correction? If you do, you',
@@ -4320,7 +4320,7 @@ C--
      + ' ',
      + ' (This is in addition to any -base- zero point used.)'/
 
-      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) / 
+      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'Exptim_im', 'Correct for exposure time from image descriptor' ,
      + 'Do you want (DESCRTIME) to correct the measured magnitudes ',
      + 'automatically from the exposure time stored in the image',
@@ -4329,7 +4329,7 @@ C--
      + 'then have a delta mag [= 2.5*log(time)] SUBTRACTED.' ,
      + ' (This is in addition to any -base- zero point used.)' /
 
-      data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) / 
+      data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'flash', 'Display image in standard way',
      + 'Display the present input image. The programme uses the ',
      + 'standard display mode:- ',
@@ -4338,12 +4338,12 @@ C--
      + '    applicable end of the range',
      + '(3) Place image at centre of screen' /
 
-      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) / 
+      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'image', 'Input new image' ,
-     + 'This asks for a new image (via the keyboard), and forgets', 
+     + 'This asks for a new image (via the keyboard), and forgets',
      + 'about the present image.', ' ', ' ', ' ', ' '/
 
-      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) / 
+      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'level', 'Toggle mean/median method for sky level' ,
      + 'When the sky level is measured, either in the annulus or in' ,
      + 'the sky aperture, the level is determined either by taking',
@@ -4352,7 +4352,7 @@ C--
      + 'mean uses trhe scatter in the pixel values, whilst the median',
      + 'uses Poisson (and base noise) theoretical statistics.' /
 
-      data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) / 
+      data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) /
      + 'list', 'List the measures so far' ,
      + 'List the star measures done so far. This has a condensed ' ,
      + 'result for each measure. The full results may be obtained by ',
@@ -4361,7 +4361,7 @@ C--
      + '(-removed- star measures are marked as such. Optionally these',
      + 'can be ommitted from the listing.)' /
 
-      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) / 
+      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'recalc', 'A fresh calc for the last star and last sky' ,
      + 'Take the deatils of the last sky measurement and the last',
      + 'star measurement, and calculate the star magnitude. This can',
@@ -4370,7 +4370,7 @@ C--
      + 'remeasured.' ,
      + 'The result is remembered for later storage. '/
 
-      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) / 
+      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'measure', 'Measure star/sky flux via cursor and buttons',
      + 'In -annulus- mode, the left or centre mouse buttons make the',
      + 'star aperture and sky annulus measure at that position. In',
@@ -4379,7 +4379,7 @@ C--
      + 'The result is remembered for later storage. ',
      + '  Magn = 30 + [Corrns] - 2.5*log10[(star-sky level) flux]'  /
 
-      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) / 
+      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'method', 'Sky determined from annulus or from separate area',
      + 'Choose between the -annulus- and -separate- methods. ',
      + 'In the -annulus- method of star measurement, the sky level is' ,
@@ -4388,7 +4388,7 @@ C--
      + 'star flux or the sky level can be determined. If the star flux',
      + 'is being found, the last measured sky level is used.' /
 
-      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) / 
+      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'noise', 'Level of extra noise/pixel in pixel counts' ,
      + 'Input the amount of -extra- noise that is actually present in',
      + 'each pixel, above the amount the programme thinks is there',
@@ -4396,24 +4396,24 @@ C--
      + 'bias -read-out- noise of a CCD, which is subtracted in the',
      + 'pre-processing.] Input the standard deviation per pixel of any',
      + 'such extra noise.' /
-     
-      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) / 
+
+      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'store', 'Store results in output file',
      + 'Put the star measures done so far into a -Starman- table in a',
      + 'data file. (Optionally ommitting any -removed- star measures.)',
      + 'A stars -name- will be its number and the first 14 digits',
-     + 'of the title of the image it was measured in.  ', 
-     + 'After storing in a file, the measurements are lost and the ', 
+     + 'of the title of the image it was measured in.  ',
+     + 'After storing in a file, the measurements are lost and the ',
      + 'recording starts anew.'/
 
-      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) / 
+      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
      + '(In keyboard option entry mode, you can get back to -panel-',
      + '  option entry mode, by choosing the -panel- option.)',
      + ' ', ' ', ' '/
 
-      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) / 
+      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'poisson', 'Change the Poisson scaling factor for Error',
      + 'The scaling that would have to be applied to pixel values so',
      + 'that their values would have a Poissonian distribution.',
@@ -4422,7 +4422,7 @@ C--
      + '       (no of pixels)*(-Noise- value)*(-Noise- value)',
      + '(This enables the output error estimates to be more correct.)'/
 
-      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) / 
+      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'remove', 'Remove a measure from memory and the display',
      + 'By positioning the cursor inside one of the measure ovals',
      + 'in the image display and pressing the left or centre mouse',
@@ -4431,12 +4431,12 @@ C--
      + 'in listing or storing in a file. The right hand button ends.',
      + ' '/
 
-      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) / 
+      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' ', ' '/
 
-      data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) / 
+      data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) /
      + 'show_ap', 'Show apertures when getting positions',
      + 'Toggle between showing the cursor as a small cross and showing',
      + 'it as the oval(s) that the photometry will use. (the ovals',
@@ -4444,16 +4444,16 @@ C--
      + 'measurement.',
      + ' ', ' '/
 
-      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) / 
+      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
      + 'size_key', 'Set via keyboard: X, Y size of the oval apertures',
      + 'Set X,Y diameters of the four apertures via keyboard.',
      + 'The apertures can thus be vertical or horizontal ovals.',
      + 'The four are (1) the star aperture diameter; (2) the ',
-     + '-annulus- sky aperture inner diameter; (3) the -annulus- ', 
-     + 'sky aperture outer diameter; (4) the -separate- sky aperture', 
+     + '-annulus- sky aperture inner diameter; (3) the -annulus- ',
+     + 'sky aperture outer diameter; (4) the -separate- sky aperture',
      + 'diameter. '/
 
-      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) / 
+      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) /
      + 'size_sky', 'Cursor change the size of the sky aperture(s)',
      + 'Change the size of the sky aperture(s). The left hand button',
      + 'on the mouse decreases the diameter by one pixel, the centre',
@@ -4462,7 +4462,7 @@ C--
      + 'diameter, and then the outer one. The change in the aperture',
      + 'is shown on the image display and the end result typed out.' /
 
-      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) / 
+      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) /
      + 'size_star', 'Cursor change the size of the star aperture' ,
      + 'Change the size of the star measuring aperture. Press the left',
      + 'hand mouse button to decrease the diameter by one pixel, and ',
@@ -4471,7 +4471,7 @@ C--
      + 'image display and the end result typed out.' ,
      + ' '/
 
-      data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) / 
+      data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) /
      + 'zoom', 'Zoom and pan image by using mouse location ',
      + '-Zoom- means zoom around present position of cursor. ' ,
      + '-Pan-  means set present position of cursor to screen centre.' ,
@@ -4480,7 +4480,7 @@ C--
      + '     Left Button then Centre Button = pan'  ,
      + '     Right button once                        = exit' /
 
-      data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) / 
+      data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) /
      + 'im_get_flash', 'Input new image and display it',
      + 'This asks you for a new input image (via the keyboard), and',
      + 'then displays the image with the standard display mode:- ',
@@ -4494,21 +4494,21 @@ C--
      + 'Close the display screen. (The programme does not forget about',
      + 'the input image.)',
      + ' ', ' ', ' ', ' '/
-  
+
       data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) /
      + 'open', 'Open the display screen',
      + 'Open the display screen, without displaying an image.',
-     + 'The screen may be any size you want, through keyboard entry', 
-     + 'via the SCREEN parameter.', 
+     + 'The screen may be any size you want, through keyboard entry',
+     + 'via the SCREEN parameter.',
      + ' ', ' ', ' '/
 
-      data opt_text(30),opt_head(30),(opt_help(j,30),j=1,6) / 
+      data opt_text(30),opt_head(30),(opt_help(j,30),j=1,6) /
      + 'exit', 'Exit from main program',
      + ' ',
      + 'Exit from main program, do not access main option list',
      + ' ', ' ', ' ', ' '/
 
-      data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) / 
+      data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) /
      + 'shape', 'Set via keyboard: aperture ellipticity, angle',
      + 'The apertures are oval, and may be inclined to the X-axis.',
      + 'This option allows you to set this ellipticity and angle, via',
@@ -4531,7 +4531,7 @@ C--
      + 'etc.). Most of the capabilities of the image programs are here',
      + 'in an interactive mode. ',
      + 'The new image may then be written out to disk.' /
-   
+
       data opt_text(33),opt_head(33),(opt_help(j,33),j=1,6) /
      + 'colour', 'Functions for changing colour display of the image.',
      + 'New set of buttons appear. Functions then available include:-',
@@ -4557,7 +4557,7 @@ C--
      + 'radii of the stars, blink the image, contour map, statistics,',
      + 'display area. The output can be put onto any device, not just',
      + 'the screen.' /
-        
+
       data opt_text(36),opt_head(36),(opt_help(j,36),j=1,6) /
      + 'positions', 'Functions to get or plot a list of positions ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -4574,11 +4574,11 @@ C--
      + 'Type it out; display fits; show how nearby stars affect each ',
      + 'other; look at how well stars fitted.' /
 
-         
+
       character*50 title, option
       integer ncode
       data title, option, ncode / 'Aperture Photometry', 'AOPTION', 5 /
-   
+
       integer def_x, def_y
       parameter ( def_x=2 )
       parameter ( def_y=1 )
@@ -4588,7 +4588,7 @@ C--
       integer sect_num
       parameter ( sect_num=7 )
       character*10 sect_head(sect_num)
-      data sect_head / 'ACTIONS', 'APERTURE', 'SETUPS', 'IMAGE', 
+      data sect_head / 'ACTIONS', 'APERTURE', 'SETUPS', 'IMAGE',
      +                 'DISPLAY', 'FUNCTIONS', 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1) / 'measure:list:recalc:remove:store' /
@@ -4602,7 +4602,7 @@ C--
       data sect_text(6) / 'alter:colour:fit_magns:
      +                     inspect:main:positions:scrutiny' /
       data sect_text(7) / 'panel:exit' /
- 
+
       integer help_num
       parameter ( help_num=15 )
       character*68 help_text(help_num)
@@ -4623,17 +4623,17 @@ C--
      + '                               Right Button 3 exits' ,
      + '                  NO         Buttons Left,Centre give values',
      + '                               Right Button 3 exits ' /
- 
+
 Cbegin
 
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -4726,7 +4726,7 @@ Cbegin
 
 
       if ( ANNULUS .and. (ANAPRX(1).eq.ANAPRX(2)) ) then		!Check apertures right
-         call printo ( 
+         call printo (
      +  'ERROR: Sky annulus zero width - will not try to measure')
          return
       endif
@@ -4794,7 +4794,7 @@ Cbegin
       call ap_osize ( SKAPRX, APANG, ELLIPSE, xsize, ysize )
       xxsize = xsize/2.0
       yysize = ysize/2.0
-      
+
       if ( (ax+xxsize).lt.1.0 .or. (ax-xxsize).gt.NX .or.		!Check if any in image
      +     (ay+yysize).lt.1.0 .or. (ay-yysize).gt.NY ) return
 
@@ -4807,13 +4807,13 @@ Cbegin
       kvy = ysize + 4.0
       if ( IMTYPE.eq.'SHORT' ) then
          call gtwrki ( 'WORKAKV', kvx*kvy, ipwkakv, ierr )
-         call ap_doits ( %val(IPIM), ax, ay, DOMEDIAN, 0.0, 
+         call ap_doits ( %val(IPIM), ax, ay, DOMEDIAN, 0.0,
      +                   SKAPRX, %val(ipwkakv), SKFL, SKLEV,
      +                   SKAREA, SKERR, NSKBAD, ngood, rv )
       else
          call gtwrkr ( 'WORKAKV', kvx*kvy, ipwkakv, ierr )
-         call ap_doitr ( %val(IPIM), ax, ay, DOMEDIAN, 0.0, 
-     +                   SKAPRX, %val(ipwkakv), SKFL, SKLEV, 
+         call ap_doitr ( %val(IPIM), ax, ay, DOMEDIAN, 0.0,
+     +                   SKAPRX, %val(ipwkakv), SKFL, SKLEV,
      +                   SKAREA, SKERR, NSKBAD, ngood, rv )
       endif
       call wrkcan ( 'WORKAKV' )
@@ -4830,7 +4830,7 @@ Cbegin
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AP_MEASB -- Measure stars - annulus
 C
-C alan penny                  ral            1994 Dec 
+C alan penny                  ral            1994 Dec
 
       subroutine ap_measb ( ax, ay )
 
@@ -4864,10 +4864,10 @@ Cbegin
       if ( ADOCENTRE.eq.2 ) then					!Get star position
 
          if ( IMTYPE.eq.'SHORT' ) then
-            call ap_pmaxs ( %val(IPIM), NX, NY, INVAL, ax, ay, 
+            call ap_pmaxs ( %val(IPIM), NX, NY, INVAL, ax, ay,
      +                      xsize/1.414, ysize/1.414, BS )
          else
-            call ap_pmaxr ( %val(IPIM), NX, NY, RINVAL, ax, ay, 
+            call ap_pmaxr ( %val(IPIM), NX, NY, RINVAL, ax, ay,
      +                      xsize/1.414, ysize/1.414, BS )
          endif
          call ds_oval ( ax, ay, STAPRX/2.0, APANG, ELLIPSE,3)
@@ -4875,14 +4875,14 @@ Cbegin
       elseif ( ADOCENTRE.eq.3 ) then
 
          if ( IMTYPE.eq.'SHORT' ) then
-            call ap_cens ( %val(IPIM), NX, NY, INVAL, ax, ay, 
+            call ap_cens ( %val(IPIM), NX, NY, INVAL, ax, ay,
      +                     xsize/1.414, ysize/1.414 )
-            call ap_cens ( %val(IPIM), NX, NY, INVAL, ax, ay, 
+            call ap_cens ( %val(IPIM), NX, NY, INVAL, ax, ay,
      +                     xsize/1.414, ysize/1.414 )
          else
-            call ap_cenr ( %val(IPIM), NX, NY, RINVAL, ax, ay, 
+            call ap_cenr ( %val(IPIM), NX, NY, RINVAL, ax, ay,
      +                     xsize/1.414, ysize/1.414 )
-            call ap_cenr ( %val(IPIM), NX, NY, RINVAL, ax, ay, 
+            call ap_cenr ( %val(IPIM), NX, NY, RINVAL, ax, ay,
      +                     xsize/1.414, ysize/1.414 )
          endif
          call ds_oval ( ax, ay, STAPRX/2.0, APANG, ELLIPSE, 3)
@@ -4895,14 +4895,14 @@ Cbegin
          kw = 0
          if ( FIXGRAD ) kw = 1
          if ( IMTYPE.eq.'SHORT' ) then
-            call gauss2sa ( %val(IPIM), NX, NY, ax, ay, lxg, 
-     +                      lyg, kw, AGRX, AGRY, INVAL, 20, 
-     +                      amag, height, base, dx, dy, anx, 
+            call gauss2sa ( %val(IPIM), NX, NY, ax, ay, lxg,
+     +                      lyg, kw, AGRX, AGRY, INVAL, 20,
+     +                      amag, height, base, dx, dy, anx,
      +                      any, rx, ry, rms, iter, ninval )
          else
-            call gauss2ra ( %val(IPIM), NX, NY, ax, ay, lxg, 
-     +                      lyg, kw, AGRX, AGRY, RINVAL, 20, 
-     +                      amag, height, base, dx, dy, anx, 
+            call gauss2ra ( %val(IPIM), NX, NY, ax, ay, lxg,
+     +                      lyg, kw, AGRX, AGRY, RINVAL, 20,
+     +                      amag, height, base, dx, dy, anx,
      +                      any, rx, ry, rms, iter, ninval )
          endif
          if ( amag.gt.49.0 .or. rx.lt.0.1 .or. ry.lt.0.1 .or.
@@ -4915,10 +4915,10 @@ Cbegin
             arx = trunc(rx,3)
             ary = trunc(ry,3)
             write ( text, '(1x,'' Gauss mag = '',f7.3,'//
-     +              ' '' ; Rx '', ''= '',f6.2,'' ; Ry = '',f6.2)' ) 
+     +              ' '' ; Rx '', ''= '',f6.2,'' ; Ry = '',f6.2)' )
      +               aamag, arx, ary
             call printo ( text )
-            call ds_oval ( ax, ay, STAPRX/2.0,APANG,ELLIPSE,3) 
+            call ds_oval ( ax, ay, STAPRX/2.0,APANG,ELLIPSE,3)
          endif
 
       endif
@@ -4932,13 +4932,13 @@ Cbegin
          kvy = ysize + 4.0
          if ( IMTYPE.eq.'SHORT' ) then
             call gtwrki ( 'WORKAKV', kvx*kvy, ipwkakv, ierr )
-            call ap_doits ( %val(IPIM), ax, ay, DOMEDIAN, ANAPRX(1), 
-     +                      ANAPRX(2), %val(ipwkakv), SKFL, SKLEV, 
+            call ap_doits ( %val(IPIM), ax, ay, DOMEDIAN, ANAPRX(1),
+     +                      ANAPRX(2), %val(ipwkakv), SKFL, SKLEV,
      +                      SKAREA, SKERR, NSKBAD, ngood, rv )
          else
             call gtwrkr ( 'WORKAKV', kvx*kvy, ipwkakv, ierr )
-            call ap_doitr ( %val(IPIM), ax, ay, DOMEDIAN, ANAPRX(1), 
-     +                      ANAPRX(2), %val(ipwkakv), SKFL, SKLEV, 
+            call ap_doitr ( %val(IPIM), ax, ay, DOMEDIAN, ANAPRX(1),
+     +                      ANAPRX(2), %val(ipwkakv), SKFL, SKLEV,
      +                      SKAREA, SKERR, NSKBAD, ngood, rv )
          endif
          call wrkcan ( 'WORKAKV' )
@@ -4946,7 +4946,7 @@ Cbegin
      +                       'pixels in sky aperture - set to zero')
       endif
 
-      call ap_loval ( ax, ay, 2 )					!List ovals done 
+      call ap_loval ( ax, ay, 2 )					!List ovals done
 
       call ap_osize ( STAPRX, APANG, ELLIPSE, xsize, ysize )
       kvx = xsize + 4.0
@@ -4954,17 +4954,17 @@ Cbegin
       if ( IMTYPE.eq.'SHORT' ) then
          call gtwrki ( 'WORKAKV', kvx*kvy, ipwkakv, ierr )
          call ap_doits ( %val(IPIM), ax, ay, .false., 0.0,  		!Get star
-     +                   STAPRX, %val(ipwkakv), STRAW, rv, 
+     +                   STAPRX, %val(ipwkakv), STRAW, rv,
      +                   STAREA, rva, NSTBAD, ngood, STTOP )
       else
          call gtwrkr ( 'WORKAKV', kvx*kvy, ipwkakv, ierr )
-         call ap_doitr ( %val(IPIM), ax, ay, .false., 0.0,  
-     +                   STAPRX, %val(ipwkakv), STRAW, rv, 
+         call ap_doitr ( %val(IPIM), ax, ay, .false., 0.0,
+     +                   STAPRX, %val(ipwkakv), STRAW, rv,
      +                   STAREA, rva, NSTBAD, ngood, STTOP )
       endif
       call wrkcan ( 'WORKAKV' )
-      
-      if ( ngood.eq.0 ) call printo ( 
+
+      if ( ngood.eq.0 ) call printo (
      +                  'WARNING: No good pixels in star aperture' )
 
       XST = ax
@@ -5097,7 +5097,7 @@ Cbegin
          do j = kxs, kxe
             xd = real(j) - x
             d = (xd*xd)/(radx*radx) + (yd*yd)/(rady*rady)
-            if ( d.le.1.0 ) then	
+            if ( d.le.1.0 ) then
                rv = im(j,k)
                if ( rv.ne.rinval ) then
                   ns = ns + 1
@@ -5112,7 +5112,7 @@ Cbegin
             endif
          enddo
       enddo
-      
+
       if ( ns.eq.0 .or. vmin.eq.vmax ) then			!Get centroid
          call printo ( 'ERROR: Cannot Centroid Star Position' )
       else
@@ -5124,7 +5124,7 @@ Cbegin
             do j = kxs, kxe
                xd = real(j) - x
                d = (xd*xd)/(radx*radx) + (yd*yd)/(rady*rady)
-               if ( d.le.1.0 ) then	
+               if ( d.le.1.0 ) then
                   rv = im(j,k)
                   if ( rv.ne.rinval ) then
                      rv = rv - vmin
@@ -5148,7 +5148,7 @@ C AP_CENS -- Get centroid in oval int*2 area
 C
 C alan penny             ral            1990-02-10
 
-      subroutine ap_cens ( im, nx, ny, inval, x, y, radx, rady )		
+      subroutine ap_cens ( im, nx, ny, inval, x, y, radx, rady )
 
       implicit none
 
@@ -5181,7 +5181,7 @@ Cbegin
          do j = kxs, kxe
             xd = real(j) - x
             d = (xd*xd)/(radx*radx) + (yd*yd)/(rady*rady)
-            if ( d.le.1.0 ) then	
+            if ( d.le.1.0 ) then
                kv = im(j,k)
                if ( kv.ne.inval ) then
                   ns = ns + 1
@@ -5196,7 +5196,7 @@ Cbegin
             endif
          enddo
       enddo
-      
+
       if ( ns.eq.0 .or. vmin.eq.vmax ) then			!Get centroid
          call printo ( 'ERROR: Cannot Centroid Star Position' )
       else
@@ -5208,7 +5208,7 @@ Cbegin
             do j = kxs, kxe
                xd = real(j) - x
                d = (xd*xd)/(radx*radx) + (yd*yd)/(rady*rady)
-               if ( d.le.1.0 ) then	
+               if ( d.le.1.0 ) then
                   kv = im(j,k)
                   if ( kv.ne.inval ) then
                      rv = real(kv) - vmin
@@ -5271,13 +5271,13 @@ Cbegin
          vmax = rinval
       endif
 
-      ns = 0				
+      ns = 0
       do k = kys, kye
          yd = real(k) - y
          do j = kxs, kxe
             xd = real(j) - x
             d = (xd*xd)/(radx*radx) + (yd*yd)/(rady*rady)
-            if ( d.le.1.0 ) then	
+            if ( d.le.1.0 ) then
                rv = im(j,k)
                if ( rv.ne.rinval ) then
                   if ( (rkw*rv).gt.vmax ) then
@@ -5304,7 +5304,7 @@ C AP_PMAXS -- Get position of max pixel in oval int*2 area
 C
 C alan penny             ral            1990-02-10
 
-      subroutine ap_pmaxs ( im, nx, ny, inval, x, y, radx, rady, bs )		
+      subroutine ap_pmaxs ( im, nx, ny, inval, x, y, radx, rady, bs )
 
       implicit none
 
@@ -5343,13 +5343,13 @@ Cbegin
          kvmax = -32768
       endif
 
-      ns = 0				
+      ns = 0
       do k = kys, kye
          yd = real(k) - y
          do j = kxs, kxe
             xd = real(j) - x
             d = (xd*xd)/(radx*radx) + (yd*yd)/(rady*rady)
-            if ( d.le.1.0 ) then	
+            if ( d.le.1.0 ) then
                kv = im(j,k)
                if ( kv.ne.inval ) then
                   if ( (kw*kv).gt.kvmax ) then
@@ -5377,7 +5377,7 @@ C
 C  alan penny          ral          1990-02-01
 
       subroutine ap_doitr ( im, ax, ay, dome, xradi, xrado,
-     +                      rva, flux, av, area, err, nbad, 
+     +                      rva, flux, av, area, err, nbad,
      +                      ngood, top )
 
       implicit none
@@ -5416,7 +5416,7 @@ Cbegin
       top = 0.0
 
       if ( ELLIPSE.lt.0.0 .or. ELLIPSE.ge.1.0 ) return
- 
+
       dd = max(xradi,xrado)
       call ap_osize ( dd, APANG, ELLIPSE, xsize, ysize )
       kxs = ax - xsize/2.0 - 1.0
@@ -5507,10 +5507,10 @@ Cbegin
          err = max(0.0,err)
          if ( err.gt.0.0 ) err = sqrt(err)/POISV
 
-      else	
+      else
 
          av = 0.0							! Use mean
-         if ( area.ne.0.0 ) av = flux/area	
+         if ( area.ne.0.0 ) av = flux/area
          err = 0.0
          if ( tarea.gt.2.5d0 ) then
             err = (tsumsq-(tsum*tsum/tarea))/
@@ -5530,8 +5530,8 @@ C AP_DOITS -- Calc flux through aperture (star/sky/annulus)
 C
 C  alan penny          ral          1990-02-01
 
-      subroutine ap_doits ( im, ax, ay, dome, xradi, xrado, 
-     +                      kva, flux, av, area, err, nbad, 
+      subroutine ap_doits ( im, ax, ay, dome, xradi, xrado,
+     +                      kva, flux, av, area, err, nbad,
      +                      ngood, top )
 
       implicit none
@@ -5570,7 +5570,7 @@ Cbegin
       top = 0.0
 
       if ( ELLIPSE.lt.0.0 .or. ELLIPSE.ge.1.0 ) return
- 
+
       dd = max(xradi,xrado)
       call ap_osize ( dd, APANG, ELLIPSE, xsize, ysize )
       kxs = ax - xsize/2.0 - 1.0
@@ -5662,10 +5662,10 @@ Cbegin
          err = max(0.0,err)
          if ( err.gt.0.0 ) err = sqrt(err)/POISV
 
-      else	
+      else
 
          av = 0.0							! Use mean
-         if ( area.ne.0.0 ) av = flux/area	
+         if ( area.ne.0.0 ) av = flux/area
          err = 0.0
          if ( tarea.gt.2.5d0 ) then
             err = (tsumsq-(tsum*tsum/tarea))/
@@ -5680,7 +5680,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C AP_MAG -- Calc, store and type out star measure 
+C AP_MAG -- Calc, store and type out star measure
 C
 C  alan penny              ral               1990-01-31
 
@@ -5704,7 +5704,7 @@ Cbegin
       STMAG = 50.0
 
       if ( STFL.gt.0.0 ) then						!Magnitude
-         STMAG = 30.0 - 2.5*alog10(STFL) + ZP 
+         STMAG = 30.0 - 2.5*alog10(STFL) + ZP
          if ( DOKTIME ) STMAG = STMAG + 2.5*alog10(EXPTIM)
          if ( DOHTIME ) STMAG = STMAG + 2.5*alog10(htime)
          if ( DOHAIR )  STMAG = STMAG - extinc
@@ -5726,26 +5726,26 @@ Cbegin
       id(5:6) = ': '
       id(7:20) = IMTITLE(1:14)
       AP_NAMES(NST) = id
-      
+
       rva = trunc(STTOP,6)						!Type result
       rvb = trunc(STFL,7)
       knst = min(999,NST)
-      write ( text,'(1x,i3,3x,2f7.1,14x,f10.2,f11.2,f10.2,i5)') knst, 
+      write ( text,'(1x,i3,3x,2f7.1,14x,f10.2,f11.2,f10.2,i5)') knst,
      +             XST, YST, rva, rvb, SKLEV, NSTBAD
       if ( STFL.gt.0.0 ) then
          write ( text(22:35), '(f8.3,f6.3)' ) STMAG, STMERR
       else
-         write ( text(22:35), '(''     none     '')' ) 
+         write ( text(22:35), '(''     none     '')' )
       endif
       if ( DOKTIME )  write ( text(73:80), '(f8.3)' ) EXPTIM
       if ( DOHTIME )  write ( text(73:80), '(f8.3)' ) htime
-      if ( DOHAIR )  write ( text(82:97), '(f5.3,1x,a4,f6.3)' ) airm, 
-     +                                                 nfilt, extinc 
+      if ( DOHAIR )  write ( text(82:97), '(f5.3,1x,a4,f6.3)' ) airm,
+     +                                                 nfilt, extinc
       call printo ( text )
 
       if ( NST.ge.NYRS ) then						!Store result
          call pargi ( NYRS )
-         call printd ( 'ERROR: Can only store %d  entries' ) 
+         call printd ( 'ERROR: Can only store %d  entries' )
          return
       endif
 
@@ -5806,17 +5806,17 @@ C--
       real rid(5)
       logical keep
       character*20 ahead(NXRS)
-      data ahead / 'X', 'Y', 'Magnitude', 'Error', 'Flux', 
-     +             'Flux Error', 'Max Value', 'Area', 'Num Bad Pixels', 
+      data ahead / 'X', 'Y', 'Magnitude', 'Error', 'Flux',
+     +             'Flux Error', 'Max Value', 'Area', 'Num Bad Pixels',
      +                'Total Flux',
      +             'Sky Level', 'Sky Flux', 'Num Sky Bad Pixels',
-     +                'Sky Area', 'Sky X', 
-     +             'Sky Y', 'Star Ap Maj Dia', 'Sky Ap Maj Dia', 
-     +             'Sky Inner Ann Maj Dia', 'Sky Outer Ann Maj Dia', 
+     +                'Sky Area', 'Sky X',
+     +             'Sky Y', 'Star Ap Maj Dia', 'Sky Ap Maj Dia',
+     +             'Sky Inner Ann Maj Dia', 'Sky Outer Ann Maj Dia',
      +                'Aperture Angle', 'Aperture Ellipticity',
-     +             'Annulus Flag', 'Centering Flag', 'Median Flag', 
-     +                'Extra noise', 'Events/pixel Values', 
-     +             'Exp Time - Keyboard', 'Exp Time - Image', 
+     +             'Annulus Flag', 'Centering Flag', 'Median Flag',
+     +                'Extra noise', 'Events/pixel Values',
+     +             'Exp Time - Keyboard', 'Exp Time - Image',
      +                'Air Mass', 'Air Corrn', 'Zero Point' /
       character*68 thelp(4)
       data thelp /
@@ -5827,7 +5827,7 @@ C--
 Cbegin
 
 
-      if ( NST.eq.0 ) then    
+      if ( NST.eq.0 ) then
          call printo ( 'ERROR: None to output' )
          return
       endif
@@ -5850,7 +5850,7 @@ Cbegin
       endif
 
       if ( .not.keep .and. nrem.ne.0 ) then				!Remove 'removed' stars from list
-         kout = NST     
+         kout = NST
          ka = 1
          do k = 1, NST
             do while ( RCIR(1,ka).lt.0.0 )
@@ -5880,7 +5880,7 @@ Cbegin
       elseif ( istat.eq.0 ) then
          do k = 1, NST
             call nametr ( AP_NAMES(k), rid )
-            call coprr ( rid, 5, 1, 1, 5, 1, 1, %val(ip), ko+5, NST, 
+            call coprr ( rid, 5, 1, 1, 5, 1, 1, %val(ip), ko+5, NST,
      +                   1, k )
          enddo
          call coprr ( DATAS, NXRS, NYRS, 1, ko, 1, NST,
@@ -5888,7 +5888,7 @@ Cbegin
          do k = 1, ko
             call pthead ( 'OUTMAGS', k, ahead(k), istat )
          enddo
-         call get1c  ( 'TITLE', cv, 'Results from Interact:Aperture', 
+         call get1c  ( 'TITLE', cv, 'Results from Interact:Aperture',
      +                 .true. )
          if ( ST_FAILED ) return
          call ptdesc ( 'OUTMAGS', 'TITLE', cv )
@@ -5932,7 +5932,7 @@ Cbegin
 
       more = .true.  							!Loop removing ovals
       do while ( more )
-   
+
          call ds_gcur ( .true., jx, jy, kbut, ierr )			!Get position
 
          if ( ierr.ne.0 ) then
@@ -5952,9 +5952,9 @@ Cbegin
                   dx = jx - XCIR(k)
                   dy = jy - YCIR(k)
                   radx = max(RCIR(1,k),RCIR(2,k),RCIR(3,k),RCIR(4,k))
-                  call ap_osize ( radx, RCIR(5,k), RCIR(6,k), 
+                  call ap_osize ( radx, RCIR(5,k), RCIR(6,k),
      +                            xsize, ysize )
-                  dd = (dx*dx)/(xsize*xsize/4.0) + 
+                  dd = (dx*dx)/(xsize*xsize/4.0) +
      +                 (dy*dy)/(ysize*ysize/4.0)
                   if ( dd.lt.1.0 .and. dd.lt.ddmin ) then
                      ddmin = dd
@@ -5970,7 +5970,7 @@ Cbegin
 
                radx = max(RCIR(1,kmin),RCIR(2,kmin),RCIR(3,kmin),	!Paint image over
      +                    RCIR(4,kmin))
-               call ap_osize ( radx, RCIR(5,kmin), RCIR(6,kmin), 
+               call ap_osize ( radx, RCIR(5,kmin), RCIR(6,kmin),
      +                         xsize, ysize )
                nxs = XCIR(kmin) - xsize/2.0 - 2.0
                nxe = nxs + xsize + 4.0
@@ -5981,7 +5981,7 @@ Cbegin
                nys = max(1,min(NY,nys))
                nye = max(1,min(NY,nye))
                call ds_tiv ( nxs, nys, ivx, ivy )
-               call ds_acim ( %val(IPIM), NX, NY, IMTYPE, nxs, nxe, 
+               call ds_acim ( %val(IPIM), NX, NY, IMTYPE, nxs, nxe,
      +                        nys, nye, ivx, ivy, DSWRAP )
 
                rad = 1.5*(rad+2.0)					!Redraw close ovals
@@ -5994,13 +5994,13 @@ Cbegin
                      if ( d.le.(dr+rad) ) then
                         aap = RCIR(5,k)
                         aelli = RCIR(6,k)
-                        if ( RCIR(1,k).gt.0.0 ) call ds_oval ( 
+                        if ( RCIR(1,k).gt.0.0 ) call ds_oval (
      +               XCIR(k), YCIR(k), RCIR(1,k), aap, aelli, 2 )
-                        if ( RCIR(2,k).gt.0.0 ) call ds_oval ( 
+                        if ( RCIR(2,k).gt.0.0 ) call ds_oval (
      +               XCIR(k), YCIR(k), RCIR(2,k), aap, aelli, 2 )
-                        if ( RCIR(3,k).gt.0.0 ) call ds_oval ( 
+                        if ( RCIR(3,k).gt.0.0 ) call ds_oval (
      +               XCIR(k), YCIR(k), RCIR(3,k), aap, aelli, 2 )
-                        if ( RCIR(4,k).gt.0.0 ) call ds_oval ( 
+                        if ( RCIR(4,k).gt.0.0 ) call ds_oval (
      +               XCIR(k), YCIR(k), RCIR(4,k), aap, aelli, 2 )
                      endif
                   endif
@@ -6066,7 +6066,7 @@ Cbegin
             enddo
             doit = .not.REMCIR(ka)
          endif
-    
+
          if ( doit .or. dolist ) then
 
             x = DATAS(1,k)
@@ -6173,8 +6173,8 @@ Cbegin
 
       if ( kopt.eq.1 ) then
          call printo ( 'Set star aperture size' )			!Get new star size
-         call printo (      
-     +   '       Buttons: LH smaller; Centre Larger; RH - Quit' )   
+         call printo (
+     +   '       Buttons: LH smaller; Centre Larger; RH - Quit' )
          rx1 = STAPRX
          rx2(1) = ANAPRX(1)
          rx2(2) = ANAPRX(2)
@@ -6185,7 +6185,7 @@ Cbegin
             rx2(2) = 0.0
             kc2 = -1
          endif
-         call ds_ovcus ( .true., rx1, 1, rx2, kc2, 
+         call ds_ovcus ( .true., rx1, 1, rx2, kc2,
      +                   APANG, ELLIPSE, 1, kx, ky, kbut )
          STAPRX = rx1
          rv = 2.0*STAPRX
@@ -6197,12 +6197,12 @@ Cbegin
 
          if ( ANNULUS ) then						!Get new sky size
             call printo ( 'Set sky annulus inner aperture size' )
-            call printo (      
-     +      '       Buttons: LH smaller; Centre Larger; RH - Quit' )   
+            call printo (
+     +      '       Buttons: LH smaller; Centre Larger; RH - Quit' )
             rx1 = STAPRX
             rx2(1) = ANAPRX(1)
             rx2(2) = ANAPRX(2)
-            call ds_ovcus ( .true., rx1, 2, rx2, 1, 
+            call ds_ovcus ( .true., rx1, 2, rx2, 1,
      +                      APANG, ELLIPSE, 2, kx, ky, kbut )
             ANAPRX(1) = rx2(1)
             rv = 2.0*ANAPRX(1)
@@ -6210,8 +6210,8 @@ Cbegin
             call printd ( 'Sky annulus inner diameter = %f ' )
 
             call printo ( 'Set sky annulus outer aperture size' )	!Get new sky outer annular size
-            call printo (      
-     +      '       Buttons: LH smaller; Centre Larger; RH - Quit' )   
+            call printo (
+     +      '       Buttons: LH smaller; Centre Larger; RH - Quit' )
             rx1 = STAPRX
             rx2(1) = ANAPRX(1)
             rx2(2) = ANAPRX(2)
@@ -6230,8 +6230,8 @@ Cbegin
 
          else
             call printo ( 'Set sky aperture size' )
-            call printo (      
-     +      '       Buttons: LH smaller; Centre Larger; RH - Quit' )   
+            call printo (
+     +      '       Buttons: LH smaller; Centre Larger; RH - Quit' )
             rx1 = SKAPRX
             rx2(1) = 0.0
             rx2(2) = 0.0
@@ -6258,7 +6258,7 @@ C   a j penny                 ral               1994
       subroutine ap_osize ( rad, rang, elli, xsize, ysize )
 
       implicit none
-      
+
       real    rad	!i: Major axis
       real    rang	!i: Angle to X-axis in degrees
       real    elli	!i: Ellipticity
@@ -6285,8 +6285,8 @@ Cbegin
       enddo
       xsize = 2*kxmax
       ysize = 2*kymax
-      
-      
+
+
       end
 
 
@@ -6307,7 +6307,7 @@ C    alan penny           ral                       1990-02-01
 
 C--
       integer k, ka, kk
-      real  rv, trv, ttrv, sav, cav, dx, dy, rmin, rrmin, 
+      real  rv, trv, ttrv, sav, cav, dx, dy, rmin, rrmin,
      +      sdx(4), sdy(4), dax(45), day(45), f1, f2, f3, f4
       data sdx / 1.0, 1.0, -1.0, -1.0 /
       data sdy / 1.0, -1.0, -1.0, 1.0 /
@@ -6376,7 +6376,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call ap_srmainget
 
       OPDISP    = X_OPDISP
@@ -6401,7 +6401,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -6424,7 +6424,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call ap_srapget
 
       OPDISP    = X_OPDISP
@@ -6450,7 +6450,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -6499,7 +6499,7 @@ Cbegin
          return
       endif
 
-      call in_opdisp ( ierr )						!Check display open 
+      call in_opdisp ( ierr )						!Check display open
 
       call ds_lutbar ( 1 )						!Show LUT bar
 
@@ -6512,7 +6512,7 @@ Cbegin
 
          call co_option_setup ( ktopt, 6, .false. )
          call get_choice ( ktopt, 1 )					!Get choice
-  
+
          if ( ktopt.eq.'flash' .or. ktopt.eq.'display' ) then		!Check image there if needed
              if ( .not.GOTIMAGE ) then
                 call printo ( 'No image yet' )
@@ -6523,7 +6523,7 @@ Cbegin
 
          if ( ktopt.eq.'rotate' ) call ds_lutrot 			!Rotate
 
-         if ( ktopt.eq.'scale' ) call ds_lutsca 			!Squeeze 
+         if ( ktopt.eq.'scale' ) call ds_lutsca 			!Squeeze
 
          if ( ktopt.eq.'bar_clear' ) then				!Clear display of LUT bar
                        call ds_lutbar ( 0 )
@@ -6541,9 +6541,9 @@ Cbegin
 
          if ( ktopt.eq.'wrap' ) then					!Toggle annulus or separate
                         DSWRAP = .not.DSWRAP
-                        if ( DSWRAP ) call printo ( 
+                        if ( DSWRAP ) call printo (
      +                                 'Default: Values wrapped round' )
-                        if ( .not.DSWRAP ) call printo ( 
+                        if ( .not.DSWRAP ) call printo (
      +                            'Default: Values not wrapped round' )
                         endif
 
@@ -6585,7 +6585,7 @@ Cbegin
      +                                     DSKVRANGE, IMTITLE )
                           DISPLAYED = .true.
                           endif
-     
+
          if ( ktopt.eq.'area' ) then                                    !Change area to show
                                 call in_imgsiz ( NX, NY, 1 )
                                 endif
@@ -6595,7 +6595,7 @@ Cbegin
                                  OPDISP = .false.
                                  DISPLAYED = .false.
                                  endif
- 
+
          if ( ktopt.eq.'clear' .and. OPDISP ) then                      !Erase display
                                               call ds_erase
                                               DISPLAYED = .false.
@@ -6606,14 +6606,14 @@ Cbegin
          if ( ktopt.eq.'panel' ) call choice_panel_sw			!Panel choice
 
          if ( ktopt.eq.'main' .or. ktopt.eq.'alter' .or. 		!Return to main program
-     +        ktopt.eq.'aperture' .or. 
+     +        ktopt.eq.'aperture' .or.
      +        ktopt.eq.'inspect' .or. ktopt.eq.'fit_magns' .or.
      +        ktopt.eq.'positions' .or. ktopt.eq.'scrutiny' .or.
      +        ktopt.eq.'exit' )  then
                                     MAIN_SELECT = ktopt
                                     loop = .false.
                                  endif
- 
+
          if ( ST_FAILED ) loop = .false.
 
       enddo								!Loop round again ?
@@ -6646,7 +6646,7 @@ C--
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-   
+
       data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'cvalues', 'Show the cursor position and image pixel value',
      + 'Show the cursor position and image pixel value.',
@@ -6654,20 +6654,20 @@ C--
      + 'the display screen, and that window is -active-, put these',
      + 'values up in the panel window.',
      + ' ', 'Click on the right-hand button to return.' /
-   
-      data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) / 
+
+      data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
      + '(In keyboard option entry mode, you can get back to -panel-',
      + '  option entry mode, by choosing the -panel- option.)',
      + ' ', ' ', ' '/
 
-      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) / 
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' ', ' '/
 
-      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) / 
+      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'zoom', 'Zoom and pan image by using mouse location ',
      + '-Zoom- means zoom around present position of cursor. ' ,
      + '-Pan-  means set present position of cursor to screen centre.' ,
@@ -6676,25 +6676,25 @@ C--
      + '     Left Button then Centre Button = pan'  ,
      + '     Right button once                        = exit' /
 
-      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) / 
+      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'bar_clear', 'Remove display of LUT table bar',
-     + 'The -LUT table bar- is displayed in a delineated area at the', 
+     + 'The -LUT table bar- is displayed in a delineated area at the',
      + 'bottom of the image. It shows the section of actual pixel ',
      + 'values that when scaled and shifted to the 0-255 display ',
-     + 'range. Thus one can see the colours associated with the LUT.', 
-     + ' ', 
+     + 'range. Thus one can see the colours associated with the LUT.',
+     + ' ',
      + 'This option -removes- the bar from the display. ' /
 
-      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) / 
+      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'bar_show', 'Display LUT bar',
-     + 'The -LUT table bar- is displayed in a delineated area at the', 
+     + 'The -LUT table bar- is displayed in a delineated area at the',
      + 'bottom of the image. It shows the section of actual pixel ',
      + 'values that when scaled and shifted to the 0-255 display ',
-     + 'range. Thus one can see the colours associated with the LUT.', 
-     + ' ', 
+     + 'range. Thus one can see the colours associated with the LUT.',
+     + ' ',
      + 'This option -places- the bar in the display. ' /
 
-      data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) / 
+      data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'ends_bw', 'Values below/above LUT ends as black/white',
      + 'When the LUT has been -rotated- or -shifted- so that it does ',
      + 'not fill the 0-255 range that the image pixel values have been',
@@ -6703,7 +6703,7 @@ C--
      + 'For these -empty- values, act as though the LUT colours below',
      + 'the bottom are black and those above the top, white. ' /
 
-      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) / 
+      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'ends_wb', 'Values below/above LUT ends as white/black',
      + 'When the LUT has been -rotated- or -shifted- so that it does ',
      + 'not fill the 0-255 range that the image pixel values have been',
@@ -6712,7 +6712,7 @@ C--
      + 'For these -empty- values, act as though the LUT colours below',
      + 'the bottom are white and those above the top, black. ' /
 
-      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) / 
+      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'ends_cc', 'Values below/above LUT ends as col/col',
      + 'When the LUT has been -rotated- or -shifted- so that it does ',
      + 'not fill the 0-255 range that the image pixel values have been',
@@ -6721,7 +6721,7 @@ C--
      + 'For these -empty- values, act as though the LUT colours at the',
      + 'ends are extended into them.' /
 
-      data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) / 
+      data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) /
      + 'ends_wrap', 'Values below/above LUT ends as wrapped',
      + 'When the LUT has been -rotated- or -shifted- so that it does ',
      + 'not fill the 0-255 range that the image pixel values have been',
@@ -6730,16 +6730,16 @@ C--
      + 'For these -empty- values, act as though the LUT is duplicated',
      + 'below and above its end.' /
 
-      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) / 
+      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'flip', 'Flip LUT',
      + 'Reverse the Look-Up Table, so that pixels painted with the',
-     + 'colours appropriate to the LUT values 0 to 255 are now ', 
-     + 'painted with the colours for 255 to 0. ', 
+     + 'colours appropriate to the LUT values 0 to 255 are now ',
+     + 'painted with the colours for 255 to 0. ',
      + 'Thus, for example, if the LUT was a simple grey scale, a ',
-     + 'black pixel will now be white and a white one black.', 
+     + 'black pixel will now be white and a white one black.',
      + ' ' /
 
-      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) / 
+      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'file_get', 'Read a full Look-Up Table from a file',
      + 'A Look-Up Table is read in from a file.',
      + 'This reads in such a -Starman- table file, in the -LONG- ',
@@ -6748,7 +6748,7 @@ C--
      + ' ',
      + 'See the manual for further information.' /
 
-      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) / 
+      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'file_sget', 'Read a short Look-Up Table from a file',
      + 'A Look-Up Table is read from a file using the -SHORT- format.',
      + 'The format is one whereby the red/green/blue component values',
@@ -6757,58 +6757,58 @@ C--
      + ' ',
      + 'See the manual for further information.' /
 
-      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) / 
+      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'load', 'Load LUT from store',
      + 'The program has eight Look-Up Tables kept in its insides.',
      + 'This option loads one onto the image display.',
      + 'The default one (black at bottom, white at top) is number one.',
      + 'The others are:- 2)purple-black; 3)yellow-red; 4)various;',
-     + '5)black-yellow; 6)blue-purple;7)stepped various;8)white-black', 
+     + '5)black-yellow; 6)blue-purple;7)stepped various;8)white-black',
      + ' ' /
 
-      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) / 
+      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'paint', 'Pick a colour from LUT bar and overwrite range of LUT',
      + 'Select a single colour from those displayed on the LUT bar, ',
-     + 'and overwrite any other range of the LUT with that colour. ', 
-     + 'Place cursor on desired colour, press and release left-hand', 
+     + 'and overwrite any other range of the LUT with that colour. ',
+     + 'Place cursor on desired colour, press and release left-hand',
      + 'Move cursor to start of desired range of LUT bar, press LH',
      + 'button, move cursor to end of range, release button. Repeat as',
      + 'required. Press the right-hand button to leave this option.'/
 
-      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) / 
+      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'rotate', 'Rotate LUT by moving cursor',
-     + 'Place cursor in image, hold left hand or centre mouse button', 
+     + 'Place cursor in image, hold left hand or centre mouse button',
      + 'down, and move cursor across image. -Horizontal- movement will',
      + 'rotate the LUT. -Vertical- movement will not affect the LUT.',
-     + 'Action stops when you move outside the image. Release the ', 
+     + 'Action stops when you move outside the image. Release the ',
      + 'button, replace, repress and restart. To end, release and ',
      + 'press the right hand button.' /
 
-      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) / 
+      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'scale', 'Shift and scale LUT by moving cursor',
-     + 'Place cursor in image, hold left hand or centre mouse button', 
+     + 'Place cursor in image, hold left hand or centre mouse button',
      + 'down, and move cursor across image. -Horizontal- movement will',
      + 'rotate the LUT, -up- movement will expand it, -down- will',
      + 'compress it. Action stops when you move outside the image. ',
      + 'Release the button, replace, repress and restart. To end, ',
      + 'release and press the right hand button.' /
 
-      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) / 
+      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'file_put', 'Write the present Look-Up Table to file',
      + 'Write the presently employed Look-Up Table to a file. ',
      + 'The file produced is a -Starman- table file with each of the ',
-     + '(up to) 256 colours stored as a red/green/blue vector.', 
+     + '(up to) 256 colours stored as a red/green/blue vector.',
      + ' ',
-     + 'This file may be read back in with the -Input- option.', 
+     + 'This file may be read back in with the -Input- option.',
      + ' ' /
 
-      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) / 
+      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'wrap', 'Toggle how image values above/below limits shown',
      + 'This option toggles the default suggestion as to which of the',
      + 'the two methods of how to show image values which are above ',
      + 'or below the limits of the Look-Up Table. This is either to',
      + 'give them at the LUT end colours, or to -wrap- the image pixel',
-     + 'values, modulo the range of the LUT. ', 
+     + 'values, modulo the range of the LUT. ',
      + 'This choice is put into operation in the -DISPLAY- option. ' /
 
       data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
@@ -6823,7 +6823,7 @@ C--
      + 'Clear the display screen (the programme does not forget about',
      + 'the input image).',
      + ' ', ' ', ' ', ' '/
-   
+
       data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
      + 'close', 'Close the display screen',
      + 'Close the display screen (the programme does not forget about',
@@ -6834,7 +6834,7 @@ C--
      + 'open', 'Open the display screen',
      + 'Open the display screen.',
      + ' ', ' ', ' ', ' ', ' '/
-   
+
       data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) /
      + 'display', 'Display image',
      + 'Display the present input image. The program asks you for:-' ,
@@ -6873,7 +6873,7 @@ C--
      + 'etc.). Most of the capabilities of the image programs are here',
      + 'in an interactive mode. ',
      + 'The new image may then be written out to disk.' /
-   
+
       data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) /
      + 'aperture', 'Functions for aperture photometry ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -6882,7 +6882,7 @@ C--
      + 'automatically getting filter and airmass from image header.',
      + 'Exposure time can be allowed for. Different images can be',
      + 'accessed easily. The results can be output to a file. ' /
-   
+
       data opt_text(30),opt_head(30),(opt_help(j,30),j=1,6) /
      + 'fit_magns', 'Functions to get star magnitudes with Gaussians',
      + 'New set of buttons appear. Functions then available include:-',
@@ -6899,7 +6899,7 @@ C--
      + 'radii of the stars, blink the image, contour map, statistics,',
      + 'display area. The output can be put onto any device, not just',
      + 'the screen.' /
-        
+
       data opt_text(32),opt_head(32),(opt_help(j,32),j=1,6) /
      + 'positions', 'Functions to get or plot a list of positions ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -6916,7 +6916,7 @@ C--
      + 'Type it out; display fits; show how nearby stars affect each ',
      + 'other; look at how well stars fitted.' /
 
-         
+
       character*50 title, option
       integer ncode
       data title, option, ncode / 'Interact - Colours', 'COPTION', 6 /
@@ -6926,7 +6926,7 @@ C--
       parameter ( def_y=1 )
       character*12 def_text(def_x,def_y)
       data def_text / ' ', 'load' /
-  
+
       integer sect_num
       parameter ( sect_num=7 )
       character*10 sect_head(sect_num)
@@ -6975,7 +6975,7 @@ C--
      + ' -----------------------------------------------------' ,
      + ' Rotate LUT          Operate when held down       End' ,
      + '                       Move cursor left/right'  ,
-     + ' Scale  LUT          Operate when held down       End', 
+     + ' Scale  LUT          Operate when held down       End',
      + '                       Move cursor left/right' ,
      + '                           and up/down',
      + ' ' /
@@ -7011,11 +7011,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -7038,7 +7038,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call ap_srmainget
 
       OPDISP    = X_OPDISP
@@ -7063,7 +7063,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -7086,7 +7086,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call ap_srapget
 
       OPDISP    = X_OPDISP
@@ -7111,7 +7111,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -7132,15 +7132,15 @@ C INS_MAINGET   Translate main prog params to 'inspect' ones
 C INS_SRMAINGET Get main prog params to temp ones
 C INS_MAINPUT   Translate 'inspect' params to main prog ones
 C INS_SRINSGET  Get 'inspect' s/r params to temp ones
-C INS_SDEF      Set up default parameters into common 
+C INS_SDEF      Set up default parameters into common
 C INS_STYPE     Type out setup
 C INS_DETAILS   Type out image details
 C INS_GDINFO    Access 'display' parameters
 C INS_DESCR     Access descriptors of a file
-C INS_GTAREA    Get the area of interest as 'xs,xe,xstep'  'ys,ye,ystep' 
+C INS_GTAREA    Get the area of interest as 'xs,xe,xstep'  'ys,ye,ystep'
 C INS_GTSTEP    Get the steps in the area of interest
 C INS_GCURSE    Get the area of interest via cursor; Get step size
-C INS_FORMAT    Get display parameters 
+C INS_FORMAT    Get display parameters
 C INS_VTYPE     Type out the values on the CL
 C INS_RTOC      Make real number character string
 C INS_PVTYPE    Type out the values as a 'picture' on the CL
@@ -7148,12 +7148,12 @@ C INS_LOLINE    Print out single spaced x-coords posn line
 C INS_CHINT     Convert an integer into a series of integers
 C INS_GSOLID    Put out a "3-D" graph of the values on the graph window
 C INS_ASTATS    Area statistics
-C INS_HISTO     Put out histogram 
+C INS_HISTO     Put out histogram
 C INS_RADIUS    Get radius, height of star
 C INS_SLICE     Plot out slice through image
 C INS_SLICEA    Plot out slice through image (part 2)
 C INS_GCONTOUR  Put out contour plot to device
-C INS_LOADX     Load X values for histogram 
+C INS_LOADX     Load X values for histogram
 C INS_GDISPLAY  PGPLOT picture of image area to device (hardcopy maybe)
 C INS_OPDISP	Open display
 
@@ -7178,7 +7178,7 @@ C--
       character*12 ktopt
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
       call ins_mainget				  			!Bring in new info
@@ -7205,13 +7205,13 @@ Cbegin
          if ( ktopt.eq.'area_c' ) call ins_gcurse			!Get area via cursor
 
          if ( ktopt.eq.'display' ) then					!Display image
-                       call ds_dodisp ( %val(IPIM), NX, NY, IMTYPE, 
+                       call ds_dodisp ( %val(IPIM), NX, NY, IMTYPE,
      +                                  DSKVRANGE, IMTITLE )
                        DISPLAYED = .true.
                        endif
 
          if ( ktopt.eq.'flash' ) then					!Flash image
-                       call ds_doflash ( %val(IPIM), NX, NY, IMTYPE, 
+                       call ds_doflash ( %val(IPIM), NX, NY, IMTYPE,
      +                                   DSKVRANGE, IMTITLE )
                        DISPLAYED = .true.
                        endif
@@ -7226,7 +7226,7 @@ Cbegin
 
          if ( ktopt.eq.'descriptor' ) call ins_descr ( GOTIMAGE ) 	!Get keyword value
 
-         if ( ktopt.eq.'details' ) call ins_details			!Type out image details 
+         if ( ktopt.eq.'details' ) call ins_details			!Type out image details
 
          if ( ktopt.eq.'values' ) call ins_vtype 			!Type out values
 
@@ -7240,7 +7240,7 @@ Cbegin
 
          if ( ktopt.eq.'controls' ) call ins_stype			!Type out setup
 
-         if ( ktopt.eq.'stats' ) call ins_astats ( GOTIMAGE ) 		!Get area statistics 
+         if ( ktopt.eq.'stats' ) call ins_astats ( GOTIMAGE ) 		!Get area statistics
 
          if ( ktopt.eq.'histogram' ) call ins_histo ( %val(IPIM), 	!Calculate histogram
      +                                                %val(IPIM)  )
@@ -7256,7 +7256,7 @@ Cbegin
          if ( ktopt.eq.'gdisplay' ) call ins_gdisplay 			!Pgplot copy to a device
 
          if ( ktopt.eq.'cvalues' ) call ds_gtcur ( .true., kx, ky, kb, 	!Get images values by cursor
-     +                                             ierr ) 
+     +                                             ierr )
 
          if ( ktopt.eq.'image' ) call in_newim ( ierr )			!Get new image
 
@@ -7299,7 +7299,7 @@ Cbegin
                                     MAIN_SELECT = ktopt
                                     loop = .false.
                                  endif
-  
+
          if ( ST_FAILED ) loop = .false.
 
       enddo
@@ -7333,7 +7333,7 @@ C--
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
 
-      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) / 
+      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'clear', 'Clear screen' ,
      + 'Clear the display screen. (The programme does not forget about',
      + 'the input image.)',
@@ -7344,17 +7344,17 @@ C--
      + 'Close the display screen. (The programme does not forget about',
      + 'the input image.)',
      + ' ', ' ', ' ', ' '/
-  
 
-      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) / 
-     + 'cvalues', 'Show the cursor position and image pixel value', 
-     + 'Show the cursor position and image pixel value.', 
+
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
+     + 'cvalues', 'Show the cursor position and image pixel value',
+     + 'Show the cursor position and image pixel value.',
      + 'Whilst the cursor is inside the last displayed image in the ',
-     + 'the display screen, and that window is -active-, put these', 
+     + 'the display screen, and that window is -active-, put these',
      + 'values up in the panel window.',
      + ' ', 'Click on the right-hand button to return.' /
 
-      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) / 
+      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'display', 'Display image',
      + 'Display the present input image. The program asks you for:-' ,
      + '1) The display range (default: +3 and -2 std. devs. from mean)',
@@ -7363,7 +7363,7 @@ C--
      + '3) Where to put the bottom left hand corner of the image' ,
      + '      (default: so as to centre the image in the screen).' /
 
-      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) / 
+      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'flash', 'Display image in standard way',
      + 'Display the present input image. The programme uses the ',
      + 'standard display mode:- ',
@@ -7372,12 +7372,12 @@ C--
      + '    applicable end of the range',
      + '(3) Place image at centre of screen' /
 
-      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) / 
+      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'image', 'Input new image' ,
-     + 'This asks for a new image (via the keyboard), and forgets', 
+     + 'This asks for a new image (via the keyboard), and forgets',
      + 'about the present image.', ' ', ' ', ' ', ' '/
 
-      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) / 
+      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'im_get_flash', 'Input new image and display it',
      + 'This asks you for a new input image (via the keyboard), and',
      + 'then displays the image with the standard display mode:- ',
@@ -7389,23 +7389,23 @@ C--
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'open', 'Open the display screen',
      + 'Open the display screen, without displaying an image.',
-     + 'The screen may be any size you want, through keyboard entry', 
-     + 'via the SCREEN parameter.', 
+     + 'The screen may be any size you want, through keyboard entry',
+     + 'via the SCREEN parameter.',
      + ' ', ' ', ' '/
 
-      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) / 
+      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
      + '(In keyboard option entry mode, you can get back to -panel-',
      + '  option entry mode, by choosing the -panel- option.)',
      + ' ', ' ', ' '/
 
-      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) / 
+      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' ', ' '/
 
-      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) / 
+      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'zoom', 'Zoom and pan image by using mouse location ',
      + '-Zoom- means zoom around present position of cursor. ' ,
      + '-Pan-  means set present position of cursor to screen centre.' ,
@@ -7414,15 +7414,15 @@ C--
      + '     Left Button then Centre Button = pan'  ,
      + '     Right button once                        = exit' /
 
-      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) / 
+      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'area', 'Select area of image to display',
-     + 'If the image is too large for the display screen, one can ', 
-     + 'select an area to display. ', 
+     + 'If the image is too large for the display screen, one can ',
+     + 'select an area to display. ',
      + 'This is done through the keyboard parameters, XRANGE and',
      + 'YRANGE, which delimit the X and Y areas to work with.',
      + ' ', ' ' /
 
-      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) / 
+      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'area_c', 'Choose (by cursor) new area for inspection ',
      + 'Some of the actions in this panel operate on a sub-area of the',
      + 'image (default whole image). A sub-area is chosen by putting',
@@ -7431,7 +7431,7 @@ C--
      + 'pale blue rectangle. The STEPS option can then define internal',
      + 'stepping in this area. NOT ALL ACTIONS USE THIS STEPPING. '/
 
-      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) / 
+      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'area_k', 'Choose (by keyboard) new area for inspection ',
      + 'Some of the actions in this panel operate on a sub-area of the',
      + 'image. This is selected by the keyboard parameters XAREA and',
@@ -7440,7 +7440,7 @@ C--
      + '-1,7,2- will mean that only pixels at steps 1,3,5,7 are used.',
      + '**** Not all actions use this internal stepping. ****'/
 
-      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) / 
+      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'blink', 'Blink present display',
      + 'By alternately putting the window -above- and -below- any ',
      + 'other window present, -blinking- is simulated. To use, open',
@@ -7449,15 +7449,15 @@ C--
      + 'chooses between end:auto:undr:over modes. For auto, ',
      + 'the LH button slows x2 the blink, centre speeds x2, RH exits.' /
 
-      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) / 
+      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'controls', 'Type out present control parameters',
-     + 'This give some general information about the image, and then', 
+     + 'This give some general information about the image, and then',
      + 'tells you:- (1) Inspection area; (2) Typing out format for',
      + 'values in that area; (3) Image display parameters; (4) Image',
-     + 'selected area. ', 
+     + 'selected area. ',
      + ' ', ' ' /
 
-      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) / 
+      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'descriptor', 'Type out a selected image descriptor',
      + 'Get value of a descriptor in the Starman image extension.',
      + '(A null DESNAME input will give all descriptors in extension.)',
@@ -7466,34 +7466,34 @@ C--
      + 'NDFTRACE/FITSLIST/FITSIMP. Starman IMPORT can load from these',
      + 'extensions to the Starman extension.'/
 
-      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) / 
+      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'gclose', 'Close graphical device ',
      + 'Options with picture or graphical output (contour,gdisplay',
-     + ',solid_w,solid_tw,histogram,slice) may need to -close-', 
-     + 'the PGPLOT -device-. One might want to swop between screen ', 
-     + '(xwindows) and printer, or one might want to get the ', 
-     + 'output from printer [THIS FILE ONLY BECOMES AVAILABLE WHEN', 
+     + ',solid_w,solid_tw,histogram,slice) may need to -close-',
+     + 'the PGPLOT -device-. One might want to swop between screen ',
+     + '(xwindows) and printer, or one might want to get the ',
+     + 'output from printer [THIS FILE ONLY BECOMES AVAILABLE WHEN',
      + 'THE DEVICE IS -CLOSED-]. All options open device if closed.'/
 
-      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) / 
+      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'contour', 'Contour (PGPLOT) image area to device (maybe hard)',
      + 'Take the selected (area_c,area_k, or default) area and plot',
      + 'out a contour map of it in a graphical device.',
      + 'You choose (through parameter CONTOUR) the lowest and highest',
-     + 'contour levels and cotour intervals and what device to ', 
-     + 'plot it on. [The screen name is -xwindows-.] ', 
+     + 'contour levels and cotour intervals and what device to ',
+     + 'plot it on. [The screen name is -xwindows-.] ',
      + '[IF THIS MAKES A FILE, PRESS GCLOSE BEFORE USING FILE.]' /
 
-      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) / 
+      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
      + 'gdisplay', 'Display (PGPLOT) image area to device (maybe hard)',
      + 'Take the selected (area_c,area_k, or default) area and put',
      + 'a greyscale rendering picture of it in a graphical device.',
      + 'You choose (through parameter VPRANGE) the lowest and highest',
      + 'pixel values to scale between. (This can be used to put a',
-     + 'greyscale out to a printer.) [The screen name is -xwindows-.]', 
+     + 'greyscale out to a printer.) [The screen name is -xwindows-.]',
      + '[IF THIS MAKES A FILE, PRESS GCLOSE BEFORE USING FILE.]' /
 
-      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) / 
+      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
      + 'solid_w', 'Display (PGPLOT) solid body plot - hidden lines',
      + 'Put to graphical device a -solid body- plot (lines between',
      + 'pixel values) of a selected (area_c,area_k, or default) area.',
@@ -7502,7 +7502,7 @@ C--
      + 'pixel values to go between. Lines -behind- others are hidden.',
      + 'Screen name is -xwindows-. PRESS GCLOSE BEFORE USING A FILE.'/
 
-      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) / 
+      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) /
      + 'solid_tw', 'Display (PGPLOT) solid body plot - transparent',
      + 'Put to graphical device a -solid body- plot (lines between',
      + 'pixel values) of a selected (area_c,area_k, or default) area.',
@@ -7511,7 +7511,7 @@ C--
      + 'pixel values to go between. Lines -behind- others are shown.',
      + 'Screen name is -xwindows-. PRESS GCLOSE BEFORE USING A FILE.'/
 
-      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) / 
+      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) /
      + 'histogram', 'Display area histogram',
      + 'Take a selected (area_c,area_k, or default) area and put ',
      + 'the histogram of the pixel values in a graphical device.',
@@ -7520,16 +7520,16 @@ C--
      + 'bins to use. [The screen name is -xwindows-.] ',
      + '[IF THIS MAKES A FILE, PRESS GCLOSE BEFORE USING FILE.]' /
 
-      data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) / 
-     + 'pvalues', 'Type out the look area values as a picture', 
-     + 'Code pixel values into single digits and type the ', 
-     + 'selected (area_c,area_k, or default) area, as a kind of ', 
-     + 'simple picture. The values are scaled between lower and ', 
-     + 'upper limits of -3/+2 std devs of the mean value.', 
-     + 'The values go between 1 and 9, with values below the limits', 
+      data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) /
+     + 'pvalues', 'Type out the look area values as a picture',
+     + 'Code pixel values into single digits and type the ',
+     + 'selected (area_c,area_k, or default) area, as a kind of ',
+     + 'simple picture. The values are scaled between lower and ',
+     + 'upper limits of -3/+2 std devs of the mean value.',
+     + 'The values go between 1 and 9, with values below the limits',
      + 'are shown as a -blank-, those above as an -asterisk-. ' /
 
-      data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) / 
+      data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) /
      + 'radius', 'Get radius, height of star',
      + 'Determine the Gaussian radii of a series of star-like objects.',
      + 'First define (IGBOX) the X,Y box size. Then use cursor repeat-',
@@ -7538,32 +7538,32 @@ C--
      + 'are asked for (IGRADII). The fit fails if star too far away.',
      + '|Buttons: Left=Fit-fit radii /Centre=Fit-fix radii /Right=End|'/
 
-      data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) / 
+      data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) /
      + 'slice', 'Plot a slice across the image',
      + 'Plot to a graphical device, a -slice- through a stretch of the',
      + 'Use cursor to define start and end points of line, at any',
      + 'angle. The values along this line are then plotted out between',
-     + 'limits input by you (through VPRANGE).', 
+     + 'limits input by you (through VPRANGE).',
      + '[The screen graphical device name is -xwindows-.] ',
      + '[IF THIS MAKES A FILE, PRESS GCLOSE BEFORE USING FILE.]' /
 
-      data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) / 
+      data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) /
      + 'stats', 'Calculate areas mean  std dev max min',
      + 'Take the selected sub-area (ignoring any internal stepping) ',
-     + 'and calculate the pixel value statistics. It calculates the ', 
+     + 'and calculate the pixel value statistics. It calculates the ',
      + 'mean and standard deviation, the median, the minimum and ',
-     + 'maximum, and the number of pixels flagged as -bad- values ', 
+     + 'maximum, and the number of pixels flagged as -bad- values ',
      + ' ', ' ' /
 
-      data opt_text(30),opt_head(30),(opt_help(j,30),j=1,6) / 
+      data opt_text(30),opt_head(30),(opt_help(j,30),j=1,6) /
      + 'steps', 'Change sampling steps in areas',
      + 'In the options which deal with a sub-area of the image, SOME',
-     + 'of them only look at a -grid- of pixels in the sub-area. This', 
-     + 'option, through the STEPS parameter, lets you determine that', 
-     + 'stepping in X and Y. ', 
+     + 'of them only look at a -grid- of pixels in the sub-area. This',
+     + 'option, through the STEPS parameter, lets you determine that',
+     + 'stepping in X and Y. ',
      + ' ', ' ' /
 
-      data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) / 
+      data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) /
      + 'typeform', 'Change format of typing out of values in area',
      + 'The pixel values typed out in the VALUES option are formatted',
      + 'in this option. The WINDOW parameter gives the lower and upper',
@@ -7572,19 +7572,19 @@ C--
      + 'DECPL parameter gives the number of decimal places to put out.',
      + 'The WIDTH parameter gives the space for each number.' /
 
-      data opt_text(32),opt_head(32),(opt_help(j,32),j=1,6) / 
+      data opt_text(32),opt_head(32),(opt_help(j,32),j=1,6) /
      + 'values', 'Type out the values in the area',
-     + 'Type out pixel values, in a user defined format, for the ', 
-     + 'selected (area_c,area_k, or default) area. The format is', 
-     + 'set by the TYPEFORM option. ', 
+     + 'Type out pixel values, in a user defined format, for the ',
+     + 'selected (area_c,area_k, or default) area. The format is',
+     + 'set by the TYPEFORM option. ',
      + ' ', ' ', ' ' /
 
 
-      data opt_text(33),opt_head(33),(opt_help(j,33),j=1,6) / 
+      data opt_text(33),opt_head(33),(opt_help(j,33),j=1,6) /
      + 'details', 'Type out the details of the image',
      + 'Type out size, image title, ',
      + 'pixel type (REAL - 32-bit real/SHORT - 16-bit/integer),',
-     + 'disk storage factors (bscale, bzero, inval parameters).', 
+     + 'disk storage factors (bscale, bzero, inval parameters).',
      + ' ', ' ', ' ' /
 
       data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) /
@@ -7607,7 +7607,7 @@ C--
      + 'etc.). Most of the capabilities of the image programs are here',
      + 'in an interactive mode. ',
      + 'The new image may then be written out to disk.' /
-   
+
       data opt_text(35),opt_head(35),(opt_help(j,35),j=1,6) /
      + 'aperture', 'Functions for aperture photometry ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -7616,7 +7616,7 @@ C--
      + 'automatically getting filter and airmass from image header.',
      + 'Exposure time can be allowed for. Different images can be',
      + 'accessed easily. The results can be output to a file. ' /
-   
+
       data opt_text(36),opt_head(36),(opt_help(j,36),j=1,6) /
      + 'colour', 'Functions for changing colour display of the image.',
      + 'New set of buttons appear. Functions then available include:-',
@@ -7650,7 +7650,7 @@ C--
      + 'Type it out; display fits; show how nearby stars affect each ',
      + 'other; look at how well stars fitted.' /
 
-         
+
       character*50 title, option
       integer ncode
       data title, option, ncode / 'Interact - Inspect', 'IOPTION', 3 /
@@ -7664,7 +7664,7 @@ C--
       integer sect_num
       parameter ( sect_num=8 )
       character*10 sect_head(sect_num)
-      data sect_head /'AREA', 'GENERAL', 'VALUES', 'GRAPHICS', 'IMAGE', 
+      data sect_head /'AREA', 'GENERAL', 'VALUES', 'GRAPHICS', 'IMAGE',
      +                'DISPLAY', 'FUNCTIONS', 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1) / 'area_c:area_k:steps' /
@@ -7679,7 +7679,7 @@ C--
       data sect_text(7) / 'alter:aperture:colour:fit_magns:
      +                     main:positions:scrutiny' /
       data sect_text(8) / 'panel:exit' /
-     
+
       integer help_num
       parameter ( help_num=33 )
       character*68 help_text(help_num)
@@ -7726,11 +7726,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -7753,7 +7753,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call ins_srmainget
 
       OPDISP    = X_OPDISP
@@ -7778,7 +7778,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -7802,7 +7802,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call ins_srinsget
 
       OPDISP    = X_OPDISP
@@ -7828,7 +7828,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -7838,7 +7838,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C INS_SDEF -- Set up default parameters into common 
+C INS_SDEF -- Set up default parameters into common
 C
 C alan penny                  ral             1990-06-16
 
@@ -7860,7 +7860,7 @@ Cbegin
       NYSTEP = 1
       BOT = -1.0e20                             			!Limits on typed values
       TOP = 1.0e20
-      DECPL = 1                              				!Typed value decimal width 
+      DECPL = 1                              				!Typed value decimal width
       WIDTH = 8                              				!"       "    no of decimal places
       BASE = 0.0 	                             			! Scaling of typed value
       SCALE = 1.0
@@ -7934,7 +7934,7 @@ C   alan penny                    ral               1990-06-15
       include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 C--
-      integer dsnxs, dsnxe, dscomfx, dscomfy, dsnys, dsnye, dssnx, 
+      integer dsnxs, dsnxe, dscomfx, dscomfy, dsnys, dsnye, dssnx,
      +        dssny
       logical dswrap, dsopen
       real dsvmin, dsvmax
@@ -7993,7 +7993,7 @@ Cbegin
       call pargi ( DECPL )
       call printd ( '    Number width = %d No after decimal = %d' )
 
-      call ins_gdinfo ( dsnxs, dsnxe, dscomfx, dscomfy, dsnys, dsnye, 
+      call ins_gdinfo ( dsnxs, dsnxe, dscomfx, dscomfy, dsnys, dsnye,
      +                  dsopen, dsvmin, dsvmax, dswrap, dssnx, dssny )
 
       call printo ( '  Display Parameters ' )
@@ -8029,8 +8029,8 @@ C INS_GDINFO -- Access 'display' parameters
 C
 C alan penny                   ral          1990-09-15
 
-      subroutine ins_gdinfo ( adsnxs, adsnxe, adscomfx, adscomfy, 
-     +                        adsnys, adsnye, adsopen, adsvmin, 
+      subroutine ins_gdinfo ( adsnxs, adsnxe, adscomfx, adscomfy,
+     +                        adsnys, adsnye, adsopen, adsvmin,
      +                        adsvmax, adswrap, adssnx, adssny )
 
       implicit none
@@ -8053,7 +8053,7 @@ Cbegin
 
 
       adsnxs  = DSNXS
-      adsnxe  = DSNXE 
+      adsnxe  = DSNXE
       adscomfx = DSCOMFX
       adscomfy = DSCOMFY
       adsnys  = DSNYS
@@ -8142,7 +8142,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C INS_GTAREA -- Get the area of interest as 'xs,xe,xstep'  'ys,ye,ystep' 
+C INS_GTAREA -- Get the area of interest as 'xs,xe,xstep'  'ys,ye,ystep'
 C   The steps are optional.
 C
 C  alan penny                      ral            1990-06-16
@@ -8244,7 +8244,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C INS_FORMAT -- Get display parameters 
+C INS_FORMAT -- Get display parameters
 C  These are max and min allowed, scaling to do for display, size of decimal places to allow.
 C
 C  alan penny                       ral                   1990-06-15
@@ -8265,7 +8265,7 @@ Cbegin
       call get1r ( 'SCALE', SCALE, SCALE, -1.0e20, 1.0e20 )		!Scaling to apply
       call get1r ( 'BASE', BASE, BASE, -1.0e20, 1.0e20 )
 
-      call get1i ( 'DECPL', DECPL, DECPL, 0, 10000 )			!Display widths 
+      call get1i ( 'DECPL', DECPL, DECPL, 0, 10000 )			!Display widths
       call get1i ( 'WIDTH', WIDTH, WIDTH, 1, 10000 )
 
 
@@ -8299,8 +8299,8 @@ Cbegin
       endif
 
       if ( (NXS.lt.1 .and. NXE.lt.1) .or. 				!Check area is inside
-     +     (NXS.gt.NX .and. NXE.gt.NX) .or. 
-     +     (NYS.lt.1 .and. NYE.lt.1) .or. 
+     +     (NXS.gt.NX .and. NXE.gt.NX) .or.
+     +     (NYS.lt.1 .and. NYE.lt.1) .or.
      +     (NYS.gt.NY .and. NYE.gt.NY) ) then
 	 call printo ( 'Area is outside image' )
          return
@@ -8334,19 +8334,19 @@ Cbegin
          endif
       enddo
       call printo ( text )
-    
+
       if ( WIDTH.eq.1  .and.  DECPL.eq.0 ) call ins_loline ( mxs, mxe,	!X coord line
      +                                                      NXSTEP )
-			
+
       call pargr ( SCALE )
-      call pargr ( BASE )					
+      call pargr ( BASE )
       call printd ( '  True values = (these values)*%f + %f')
 
       call pargr ( TOP )
       call pargr ( BOT )
       call printd('  Data above %f / below %f are put as: * / blank')
 
-      call printo ( 
+      call printo (
      +    '  Data too wide to fit are put as: -999.9/9999.9' )
       call printo ( '  Invalid pixels are put as: IIIII' )
 
@@ -8407,8 +8407,8 @@ Cbegin
                elseif ( WIDTH.eq.1 .and. DECPL.eq.0 ) then		!If 1 character width, then
                   iv = rva - (int(rva)/10)*10 				!do special outputting of
                   write ( text(kl:kl), '(i1)' ) iv			!last digit before dec point
-               else 
-                  call ins_rtoc ( rva, DECPL, WIDTH, ostr ) 		!Normal, but truncate if 
+               else
+                  call ins_rtoc ( rva, DECPL, WIDTH, ostr ) 		!Normal, but truncate if
                   text(kl:kl+WIDTH-1) = ostr(1:WIDTH)			!too wide
                endif
             endif
@@ -8473,8 +8473,8 @@ Cbegin
                elseif ( WIDTH.eq.1 .and. DECPL.eq.0 ) then		!If 1 character width, then
                   iv = rva - (int(rva)/10)*10 				!do special outputting of
                   write ( text(kl:kl), '(i1)' ) iv			!last digit before dec point
-               else 
-                  call ins_rtoc ( rva, DECPL, WIDTH, ostr ) 		!Normal, but truncate if 
+               else
+                  call ins_rtoc ( rva, DECPL, WIDTH, ostr ) 		!Normal, but truncate if
                   text(kl:kl+WIDTH-1) = ostr(1:WIDTH)			!too wide
                endif
             endif
@@ -8518,7 +8518,7 @@ Cbegin
       rva = rv + dv
 
       kl = width - decpl - 1
-      if ( kl.ge.1 ) rva = trunc(rva,kl) 
+      if ( kl.ge.1 ) rva = trunc(rva,kl)
       write ( text, '(f50.20)' ) rva
       call lbgone ( text )
       j = index(text,'.')
@@ -8549,7 +8549,7 @@ C alan penny                  ral             1990-06-16
       include 'STARMAN_INC'
 
 C--
-      integer mxs, mxe, mys, mye, kx(2), 
+      integer mxs, mxe, mys, mye, kx(2),
      +        ky(2), ierr
       real    am, std, amax, amin
 Cbegin
@@ -8563,8 +8563,8 @@ Cbegin
       endif
 
       if ( (NXS.lt.1 .and. NXE.lt.1) .or. 				!Check area is inside
-     +     (NXS.gt.NX .and. NXE.gt.NX) .or. 
-     +     (NYS.lt.1 .and. NYE.lt.1) .or. 
+     +     (NXS.gt.NX .and. NXE.gt.NX) .or.
+     +     (NYS.lt.1 .and. NYE.lt.1) .or.
      +     (NYS.gt.NY .and. NYE.gt.NY) ) then
 	 call printo ( 'Area is outside image' )
          return
@@ -8585,7 +8585,7 @@ Cbegin
          call ranger ( %val(IPIM), NX, NY, kx, ky, RINVAL, am, std,ierr)
       endif
       if ( std.lt.1.0e-8 ) std = 1.0
-        
+
       if ( IMTYPE.eq.'SHORT' ) then
          call ins_pvtypes ( %val(IPIM), mxs, mxe, mys, mye, am, std )
       else
@@ -8599,7 +8599,7 @@ Cbegin
       call pargr ( amin )
       call pargr ( amax )
       call printd ( ' Values range from %f to %f ' )
-      
+
 
       end
 
@@ -8800,7 +8800,7 @@ Cbegin
       enddo
 
       k = iabs(iv)
-      do j = 1, num 
+      do j = 1, num
          ival(num-j+1) = k - 10*(k/10)
          k = k/10
       enddo
@@ -8826,9 +8826,9 @@ C  alan penny                ral                      1990-06-15
       real      rim(NX,NY)	!i: Image (REAL)
       integer	kopt		!i: Flag (1=transparent;2=hiden lines)
 C--
-      integer j, k, l, iv, mxs, mxe, mys, mye, kstart, kx1, kx2, kc, 
+      integer j, k, l, iv, mxs, mxe, mys, mye, kstart, kx1, kx2, kc,
      +        kco(12), kdo(12), lxs, lxe, lxst, lys, lye, lyst,
-     +        keo(12), ngood, nbad, ja, ka, jno, kno, lx, ly, kp(4), 
+     +        keo(12), ngood, nbad, ja, ka, jno, kno, lx, ly, kp(4),
      +        istat
       logical start, last, over
       real rv, rvm, rvmax, rvmin, rvr(1000), rvd(1000),
@@ -8848,8 +8848,8 @@ Cbegin
       endif
 
       if ( (NXS.lt.1 .and. NXE.lt.1) .or. 				!Check area is inside
-     +     (NXS.gt.NX .and. NXE.gt.NX) .or. 
-     +     (NYS.lt.1 .and. NYE.lt.1) .or. 
+     +     (NXS.gt.NX .and. NXE.gt.NX) .or.
+     +     (NYS.lt.1 .and. NYE.lt.1) .or.
      +     (NYS.gt.NY .and. NYE.gt.NY) ) then
 	 call printo ( 'Area is outside image' )
          return
@@ -8930,14 +8930,14 @@ Cbegin
       kno = 1 + ((lye-lys)/lyst)
 
       call st_minmax ( %val(IPIM), NX, NY, BS, BZ, IMTYPE, INVAL, 	!Z scale
-     +                  RINVAL, mxs, mxe, mys, mye, rvmin, rvmax, 
+     +                  RINVAL, mxs, mxe, mys, mye, rvmin, rvmax,
      +                  kp, ngood, nbad )
       call get2r ( 'VPRANGE', rvmin, rvmax, .true., -1.0e20, 1.0e20 )	!Min and max allowed
       if ( ST_FAILED ) return
 
       if ( rvmax.eq.rvmin ) then
          zscale = 1.0
-      else 
+      else
          zscale = 0.7/abs(rvmax-rvmin)
       endif
 
@@ -9042,11 +9042,11 @@ Cbegin
                   akx = 1.0/abs(kx2-kx1)
                endif
                do l = kx1, kx2
-                  rvd(l) = y1 + (l-kx1)*akx*(y2-y1) 
+                  rvd(l) = y1 + (l-kx1)*akx*(y2-y1)
                enddo
                l = kx1
                over = .false.
-               do while ( .not.over ) 
+               do while ( .not.over )
                   start = .false.
                   last = .false.
                   l = l - 1
@@ -9058,27 +9058,27 @@ Cbegin
                            start = .true.
                            kstart = l
                         endif
-                     else 
+                     else
                        if ( start ) last = .true.
                      endif
                   enddo
                   x1 = real(kstart)/1000.0
                   x2 = real(l)/1000.0
                   y1 = rvd(kstart)
-                  y2 = rvd(l)        
+                  y2 = rvd(l)
                   if ( (last.or.over) .and. start ) then
                      call pgmove ( x1, y1 )
                      call pgdraw ( x2, y2 )
                   endif
                enddo
-               do l = kx1, kx2 
+               do l = kx1, kx2
                   if ( rvd(l).gt.rvr(l) ) rvr(l) = rvd(l)
                enddo
                rvm = rv
             enddo
 
 	 enddo
-      else 
+      else
          do k = 1, kno
 
             dk = (real(k)-1.0)/real(kno)
@@ -9199,12 +9199,12 @@ Cbegin
          std = 0.0
       endif
 
-      call st_minmax ( %val(IPIM), NX, NY, BS, BZ, IMTYPE, INVAL, 
+      call st_minmax ( %val(IPIM), NX, NY, BS, BZ, IMTYPE, INVAL,
      +         RINVAL, NXS, NXE, NYS, NYE, amin, amax, kp, ngood, nbad )
 
       if ( IMTYPE.eq.'SHORT' ) then
           call gtwrki ( 'XX_MEDIAN', NX*NY, ipa, ierra )
-          call medians ( %val(IPIM), NX, NY, %val(ipa), kx, ky, INVAL, 
+          call medians ( %val(IPIM), NX, NY, %val(ipa), kx, ky, INVAL,
      +                   rm, ierr )
           call wrkcan ( 'XX_MEDIAN' )
        else
@@ -9248,7 +9248,7 @@ Cbegin
       call pargi ( NXE )
       call pargi ( NYS )
       call pargi ( NYE )
-      call printd ( 
+      call printd (
      + '  Inspected Area covers: X range %d to %d ; Y range %d to %d' )
       call printo ( '  All pixels in this area analysed' )
 
@@ -9276,7 +9276,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C INS_HISTO -- Put out histogram 
+C INS_HISTO -- Put out histogram
 C
 C  alan penny                ral                      1990-06-15
 
@@ -9326,7 +9326,7 @@ Cbegin
 
       call azeror ( ydata, numbin )					!Calc histogram
       if ( IMTYPE.eq.'SHORT' ) then
-         do k = NYS, NYE, NYSTEP 
+         do k = NYS, NYE, NYSTEP
             do j = NXS, NXE, NXSTEP
                iv = im(j,k)
                if ( iv.ne.INVAL ) then
@@ -9337,7 +9337,7 @@ Cbegin
             enddo
          enddo
       else
-         do k = NYS, NYE, NYSTEP 
+         do k = NYS, NYE, NYSTEP
             do j = NXS, NXE, NXSTEP
                rv = rim(j,k)
                if ( rv.ne.RINVAL ) then
@@ -9424,12 +9424,12 @@ Cbegin
             x = kx
             y = ky
             if ( IMTYPE.eq.'SHORT' ) then
-               call gauss2sa ( %val(IPIM), NX, NY, x, y, lxga, lyga, 
-     +                kw, rxga, ryga, INVAL, 20, amag, heightg, baseg, 
+               call gauss2sa ( %val(IPIM), NX, NY, x, y, lxga, lyga,
+     +                kw, rxga, ryga, INVAL, 20, amag, heightg, baseg,
      +                dx, dy, anx, any, rx, ry, rms, iter, ninval )
             else
-               call gauss2ra ( %val(IPIM), NX, NY, x, y, lxga, lyga, 
-     +                kw, rxga, ryga, RINVAL, 20, amag, heightg, baseg, 
+               call gauss2ra ( %val(IPIM), NX, NY, x, y, lxga, lyga,
+     +                kw, rxga, ryga, RINVAL, 20, amag, heightg, baseg,
      +                dx, dy, anx, any, rx, ry, rms, iter, ninval )
             endif
 
@@ -9474,7 +9474,7 @@ Cbegin
                ys = max(1,min(NY,kys))
                ye = max(1,min(NY,kye))
                call ds_box ( xs, xe, ys, ye, 1 )
-     
+
             endif
          endif
 
@@ -9766,14 +9766,14 @@ Cbegin
       call gtwrkr ( 'CONTS', lx*ly, ipcons, ierr )
       if ( ierr.ne.0 ) return
       if ( IMTYPE.eq.'SHORT' ) then
-         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL, 
+         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL,
      +                 %val(ipconr) )
       else
-         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL, 
+         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL,
      +                 %val(ipconr) )
       endif
 
@@ -9819,7 +9819,7 @@ CX      call pgvport ( 0.1, ax, 0.1, ay )
       ja = index(text(j:),',')
       call lbgone(text(j+ja:))
       kl = lens(text)
-      x = 1.0 
+      x = 1.0
       y = aly + (size-1.0)*0.05
       call pgtext ( x, y, text(1:kl) )
 
@@ -9830,10 +9830,10 @@ CX      call pgvport ( 0.1, ax, 0.1, ay )
       j = index(text,' by ')
       call lbgone(text(j+4:))
       kl = lens(text)
-      x = 1.0 
+      x = 1.0
       y = aly + (size-1.0)*0.10
       call pgtext ( x, y, text(1:kl) )
-      
+
       text = ' Image title is: '//IMTITLE
       kl = lens(text)
       x = 1.0
@@ -9850,7 +9850,7 @@ CX      call pgvport ( 0.1, ax, 0.1, ay )
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C INS_LOADX -- Load X values for histogram 
+C INS_LOADX -- Load X values for histogram
 C
 C  alan penny                ral                      1990-06-15
 
@@ -9920,14 +9920,14 @@ Cbegin
          return
       endif
       if ( IMTYPE.eq.'SHORT' ) then
-         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL, 
+         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL,
      +                 %val(ipconr) )
       else
-         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL, 
+         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL,
      +                 %val(ipconr) )
       endif
 
@@ -10003,7 +10003,7 @@ Cbegin
       if ( ST_FAILED ) return
       if ( ierr.ne.0 ) return
 
-      call ds_init ( IMTITLE, 0, ierr )					!Open display 
+      call ds_init ( IMTITLE, 0, ierr )					!Open display
       if ( ST_FAILED ) return
       if ( ierr.ne.0 ) return
       OPDISP = .true.
@@ -10072,7 +10072,7 @@ C  alan penny             ral             1990 Jan
       include 'ST_DS_GEN_INC'
       include 'STARMAN_INC'
       include 'ST_CHOICE_INC'
-    
+
       integer     kopt		!i: 1=default to posns; 2= default to magns
 C--
       logical loop
@@ -10119,13 +10119,13 @@ Cbegin
             call printo ( 'No image got yet' )
             ktopt = ' '
          endif
-   
+
 
          if ( ktopt.eq.'clear' ) then		                      	!Erase display
                                  call ds_erase
                                  DISPLAYED = .false.
                                  endif
-  
+
          if ( ktopt.eq.'close' ) then                                  !Close display screen
                                  call ds_close ( ierr )
                                  OPDISP = .false.
@@ -10133,10 +10133,10 @@ Cbegin
                                  endif
 
          if ( ktopt.eq.'open' ) call in_opdisp ( ierr )                !Open display screen
-  
+
          if ( ktopt.eq.'cvalues' ) call ds_gtcur ( .true., kx, ky, kb, 	!Get cursor image values
      +                                             ierr )
- 
+
          if ( ktopt.eq.'display' ) then					!Display
                        call ds_dodisp ( %val(IPIM), NX, NY, IMTYPE,
      +                                  DSKVRANGE, IMTITLE )
@@ -10155,8 +10155,8 @@ Cbegin
                                        call in_newim ( ierr )
                                        if ( .not.ST_FAILED .and.
      +                                    ierr.eq.0 ) call
-     +                                    ds_doflash ( %val(IPIM), 	
-     +                                    NX, NY, IMTYPE, DSKVRANGE, 
+     +                                    ds_doflash ( %val(IPIM),
+     +                                    NX, NY, IMTYPE, DSKVRANGE,
      +                                    IMTITLE )
                                           DISPLAYED = .true.
                                        endif
@@ -10186,7 +10186,7 @@ Cbegin
 
          if ( ktopt.eq.'fit_params' ) then				!Change fit parameters
                            call get1b ( 'RADFIX', RADGFIX, RADGFIX )
-                           call get2r ( 'RADSIZE', RXGF, RYGF, .true., 
+                           call get2r ( 'RADSIZE', RXGF, RYGF, .true.,
      +                                  0.2, 100.0 )
                            call get2i ( 'BOXSIZE', NXGB, NYGB, .true.,	!Gauss box size
      +                                  3, 200 )
@@ -10202,13 +10202,13 @@ Cbegin
 
          if ( ktopt.eq.'main' .or. ktopt.eq.'alter' .or. 		!Return to main program
      +        ktopt.eq.'aperture' .or. ktopt.eq.'colour' .or.
-     +        ktopt.eq.'inspect' .or. 
+     +        ktopt.eq.'inspect' .or.
      +        ktopt.eq.'scrutiny' .or.
      +        ktopt.eq.'exit' )  then
                                     MAIN_SELECT = ktopt
                                     loop = .false.
                                  endif
- 
+
          if ( ST_FAILED ) loop = .false.
 
       enddo
@@ -10221,7 +10221,7 @@ Cbegin
 
       call po_mainput							!Housekeeping
 
-      
+
       end
 
 
@@ -10247,8 +10247,8 @@ C--
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-   
-      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) / 
+
+      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'clear', 'Clear screen' ,
      + 'Clear the display screen. (The programme does not forget about',
      + 'the input image.)',
@@ -10259,16 +10259,16 @@ C--
      + 'Close the display screen. (The programme does not forget about',
      + 'the input image.)',
      + ' ', ' ', ' ', ' '/
- 
-      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) / 
-     + 'cvalues', 'Show the cursor position and image pixel value', 
-     + 'Show the cursor position and image pixel value.', 
+
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
+     + 'cvalues', 'Show the cursor position and image pixel value',
+     + 'Show the cursor position and image pixel value.',
      + 'Whilst the cursor is inside the last displayed image in the ',
-     + 'the display screen, and that window is -active-, put these', 
+     + 'the display screen, and that window is -active-, put these',
      + 'values up in the panel window.',
      + ' ', 'Click on the right-hand button to return '/
 
-      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) / 
+      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'display', 'Display image',
      + 'Display the present input image. The program asks you for:-' ,
      + '1) The display range (default: +3 and -2 std. devs. from mean)',
@@ -10277,7 +10277,7 @@ C--
      + '3) Where to put the bottom left hand corner of the image' ,
      + '      (default: so as to centre the image in the screen).' /
 
-      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) / 
+      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'flash', 'Display image in standard way',
      + 'Display the present input image. The programme uses the ',
      + 'standard display mode:- ',
@@ -10286,12 +10286,12 @@ C--
      + '    applicable end of the range',
      + '(3) Place image at centre of screen' /
 
-      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) / 
+      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'image', 'Input new image' ,
-     + 'This asks for a new image (via the keyboard), and forgets', 
+     + 'This asks for a new image (via the keyboard), and forgets',
      + 'about the present image.', ' ', ' ', ' ', ' '/
 
-      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) / 
+      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'im_get_flash', 'Input new image and display it',
      + 'This asks you for a new input image (via the keyboard), and',
      + 'then displays the image with the standard display mode:- ',
@@ -10307,19 +10307,19 @@ C--
      + 'via the SCREEN parameter.',
      + ' ', ' ', ' '/
 
-      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) / 
+      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
      + '(In keyboard option entry mode, you can get back to -panel-',
      + '  option entry mode, by choosing the -panel- option.)',
      + ' ', ' ', ' '/
 
-      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) / 
+      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' ', ' '/
 
-      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) / 
+      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'zoom', 'Zoom and pan image by using mouse location ',
      + '-Zoom- means zoom around present position of cursor. ' ,
      + '-Pan-  means set present position of cursor to screen centre.' ,
@@ -10328,13 +10328,13 @@ C--
      + '     Left Button then Centre Button = pan'  ,
      + '     Right button once                        = exit' /
 
-      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) / 
+      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'boxshow', 'Toggle showing and not the box round mag positions',
      + 'Toggle between showing and not showing the box round the',
      + 'fitted magnitude positions. ',
      + ' ', ' ', ' ', ' ' /
 
-      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) / 
+      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'cross', 'Change colour/size of plot/get cross' ,
      + 'This changes the size and colour of the cross painted up, ',
      + 'either when the cursor marks a position or magnitude, or a',
@@ -10343,26 +10343,26 @@ C--
      + 'Different colours for the different modes are allowed.' ,
      + 'The same cross size is used for all modes.' /
 
-      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) / 
+      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'review', 'Type out the present setups' ,
      + 'Types out the -present- state of this -Posns/Magns- option. ',
      + 'These are:- the box size; the characteristics of the Gaussian',
      + 'fit for the magnitude getting; the number of posns and magns',
-     + 'got; the display of the cross.', 
+     + 'got; the display of the cross.',
      + ' ', ' ' /
 
-      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) / 
+      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'flush_magn', 'Forget all star Gauss positions + magnitudes' ,
      + 'Forget all Gaussian positions + magnitudes. (NOT the simple' ,
-     + 'positions.) ', 
+     + 'positions.) ',
      + ' ', ' ', ' ', ' ' /
 
-      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) / 
+      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'flush_posn', 'Forget all positions' ,
      + 'Forget all positions. (NOT the Gaussian ones.)',
      + ' ', ' ', ' ', ' ', ' ' /
 
-      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) / 
+      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'cur_magn', 'Use cursor to get Gauss positions + magnitudes' ,
      + '| Buttons: Left = Enter posn/Centre = Enter Zoom/Right = End |',
      + 'A position selected, a 2-D Gaussian is fitted to the data in a',
@@ -10371,41 +10371,41 @@ C--
      + 'painted up, the results typed and remembered. The fit can have',
      + 'fixed or variable radii. Mag = 30- 2.5*log10(Height.RadX.RadY)'/
 
-      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) / 
+      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'cur_posn', 'Use cursor to get positions',
      + '| Buttons: Left = Enter posn/Centre = Enter Zoom/Right = End |',
      + 'A position selected, the position and image pixel value is',
      + 'typed out and remembered by the program.',
-     + ' ', 
-     + 'These positions are kept entirely separate from the list', 
+     + ' ',
+     + 'These positions are kept entirely separate from the list',
      + 'of Gaussian positions and magnitudes' /
-   
-      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) / 
+
+      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'list_posn', 'Type out positions and pixel values',
      + 'Type out the positions and pixel values marked so far.',
      + 'This gives the X and Y positions of the places marked and the',
-     + 'value of the image pixel at that position', 
+     + 'value of the image pixel at that position',
      + ' ', ' ', ' ' /
 
-      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) / 
+      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
      + 'plot_file', 'Get positions from a file and plot them' ,
-     + 'Input a table of positions from a file. This file must be in', 
+     + 'Input a table of positions from a file. This file must be in',
      + 'the standard -Starman- table format, and the XY positions must',
-     + 'be in the first two columns of the table. The postions are  ', 
-     + 'plotted out on the image. The file is then closed and the ', 
-     + 'positions forgotten. ', 
+     + 'be in the first two columns of the table. The postions are  ',
+     + 'plotted out on the image. The file is then closed and the ',
+     + 'positions forgotten. ',
      + ' ' /
-     
-      data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) / 
+
+      data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) /
      + 'fit_params', 'Set:- radii; fix/vary radii in fit; box size' ,
      + 'To get a stars position and profile magnitude by fitting a 2-D',
      + 'Gaussian, the program selects a rectangle round the star and',
      + 'fits the profile. The profile has fixed or variable X and Y',
      + 'radii, and the size of the box can be changed. The size should',
-     + 'be about 3 times the seeing. Fixed radii are more accurate.', 
+     + 'be about 3 times the seeing. Fixed radii are more accurate.',
      + 'The box used is painted on the display, with the fitted posn.' /
 
-      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) / 
+      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
      + 'store_magn', 'Put acquired Gauss magnitudes into a file',
      + 'Put the Gauss magnitudes acquired so far into a file. The full',
      + 'details of the stars measured using the Gaussians are put into',
@@ -10413,7 +10413,7 @@ C--
      + 'ancillary information. The magnitudes are NOT then forgotten.',
      + ' ', ' ' /
 
-      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) / 
+      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) /
      + 'store_posn', 'Put acquired positions into a file ',
      + 'Put the positions and pixel values acquired so far into a ',
      + 'file. The file has the standard -Starman- format, together ',
@@ -10421,13 +10421,13 @@ C--
      + 'forgotten.',
      + ' ', ' ' /
 
-      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) / 
+      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) /
      + 'list_magn', 'Type out Gauss positions and magnitudes' ,
      + 'Type out the Gaussian measured stars done so far.',
      + 'It shows:- X Y position fitted; X Yshift from the cursor posn;',
      + 'magnitude; Gauss height; Gauss base; star max pixel; no of',
      + 'invalid pixels in box; -rms- of fit; fitted Gaussian radii.',
-     + 'Gauss = base+height.exp(-((x-xo)/rx)**2).exp(-((y-yo)/ry)**2)', 
+     + 'Gauss = base+height.exp(-((x-xo)/rx)**2).exp(-((y-yo)/ry)**2)',
      + 'Mag = 30 - 2.5*log10(Height.RadX.RadY)'/
 
       data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) /
@@ -10450,7 +10450,7 @@ C--
      + 'etc.). Most of the capabilities of the image programs are here',
      + 'in an interactive mode. ',
      + 'The new image may then be written out to disk.' /
-   
+
       data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) /
      + 'aperture', 'Functions for aperture photometry ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -10459,7 +10459,7 @@ C--
      + 'automatically getting filter and airmass from image header.',
      + 'Exposure time can be allowed for. Different images can be',
      + 'accessed easily. The results can be output to a file. ' /
-   
+
       data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) /
      + 'colour', 'Functions for changing colour display of the image.',
      + 'New set of buttons appear. Functions then available include:-',
@@ -10477,7 +10477,7 @@ C--
      + 'radii of the stars, blink the image, contour map, statistics,',
      + 'display area. The output can be put onto any device, not just',
      + 'the screen.' /
-        
+
       data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) /
      + 'scrutiny', 'Functions to look at Starman MEASURE output',
      + 'New set of buttons appear. Functions then available include:-',
@@ -10501,7 +10501,7 @@ C--
       integer sect_num
       parameter ( sect_num=7 )
       character*10 sect_head(sect_num)
-      data sect_head / 'POSITIONS', 'GAUSSIANS', 'SETUPS', 
+      data sect_head / 'POSITIONS', 'GAUSSIANS', 'SETUPS',
      +                 'IMAGE', 'DISPLAY', 'FUNCTIONS', 'CONTROL' /
 
       character*200 sect_text(sect_num)
@@ -10516,7 +10516,7 @@ C--
       data sect_text(6) / 'alter:aperture:colour:
      +                     inspect:main:scrutiny' /
       data sect_text(7) / 'panel:exit' /
-   
+
       integer help_num
       parameter ( help_num=25 )
       character*68 help_text(help_num)
@@ -10553,11 +10553,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -10612,7 +10612,7 @@ C--
       integer k, kin
 
       character*1000 topt
-      data topt / 
+      data topt /
      +     'red:green:blue:cyan:magenta:yellow:coral:palegreen' /
       integer nthelp
       parameter ( nthelp=2 )
@@ -10626,7 +10626,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       call printo ( 'Cross size?' )
-      call get1r ( 'CROSSL', CRSIZG, CRSIZG, 1.0, 1.0e8 )	
+      call get1r ( 'CROSSL', CRSIZG, CRSIZG, 1.0, 1.0e8 )
       if ( ST_FAILED ) return
 
       call printo ( 'Getting posn cross colour?' )
@@ -10693,7 +10693,7 @@ Cbegin
          else
             NUMGP = NUMGP + 1						!Add position
             if ( NUMGP.gt.NMAXGP ) then
-               write ( text, '(''ERROR: Can only store '',i7, 
+               write ( text, '(''ERROR: Can only store '',i7,
      +                         '' entries '')' ) NMAXGP
                call printo ( text )
                NUMGP = NMAXGP
@@ -10764,7 +10764,7 @@ Cbegin
       write ( text, '('' Star   Xpos   Ypos Dx Dy   Mag   Height'',
      +                ''  Base Max Pix Inv  Rms  Radx  Rady'')' )
       call printo ( text )
- 
+
       more = .true.
       do while ( more )
 
@@ -10784,7 +10784,7 @@ Cbegin
 
             NUMGM = NUMGM + 1						!Get magn
             if ( NUMGM.gt.NMAXGM ) then
-               write ( text, '(''ERROR: Can only store '',i7, 
+               write ( text, '(''ERROR: Can only store '',i7,
      +                         '' entries '')' ) NMAXGM
                call printo ( text )
                NUMGM = NMAXGM
@@ -10814,9 +10814,9 @@ C  alan penny             ral             1990 Jan
       integer  jx		!i: Input X posn
       integer  jy		!i: Input Y posn
 C--
-      integer kw, iter, ninval, kxs, kxe, kys, kye, ngood, nbad, 
+      integer kw, iter, ninval, kxs, kxe, kys, kye, ngood, nbad,
      +        kp(4), kinval, karms, kah, kab, kavmax, kadx, kady
-      real    x, y, amag, ht, base, dx, dy, xa, ya, rx, ry, rms, 
+      real    x, y, amag, ht, base, dx, dy, xa, ya, rx, ry, rms,
      +        vmax, vmin, arx, ary, axa, aya, xs, xe, ys, ye
       character*80 text
 
@@ -10830,12 +10830,12 @@ Cbegin
       x = jx
       y = jy
       if ( IMTYPE.eq.'SHORT' ) then
-         call gauss2sa ( %val(IPIM), NX, NY, x, y, NXGB, NYGB, kw, 
-     +                   RXGF, RYGF, INVAL, 20, amag, ht, base, dx, 
+         call gauss2sa ( %val(IPIM), NX, NY, x, y, NXGB, NYGB, kw,
+     +                   RXGF, RYGF, INVAL, 20, amag, ht, base, dx,
      +                   dy, xa, ya, rx, ry, rms, iter, ninval )
       else
-         call gauss2ra ( %val(IPIM), NX, NY, x, y, NXGB, NYGB, kw, 
-     +                   RXGF, RYGF, RINVAL, 20, amag, ht, base, dx, 
+         call gauss2ra ( %val(IPIM), NX, NY, x, y, NXGB, NYGB, kw,
+     +                   RXGF, RYGF, RINVAL, 20, amag, ht, base, dx,
      +                   dy, xa, ya, rx, ry, rms, iter, ninval )
       endif
       ht = ht*BS
@@ -10853,7 +10853,7 @@ Cbegin
       kye = kys + NYGB - 1
 
       call st_minmax ( %val(IPIM), NX, NY, BS, BZ, IMTYPE, INVAL, 	!Max pixel
-     +                 RINVAL, kxs, kxe, kys, kye, vmin, vmax, kp, 
+     +                 RINVAL, kxs, kxe, kys, kye, vmin, vmax, kp,
      +                 ngood, nbad )
 
       karms  = trunc(rms,5)						!Type results
@@ -10937,7 +10937,7 @@ Cbegin
          call pthead ( 'OUTTAB', 1, 'X', istat )
          call pthead ( 'OUTTAB', 2, 'Y', istat )
          call pthead ( 'OUTTAB', 3, 'VALUE', istat )
-         call get1c  ( 'TITLE', cv, 
+         call get1c  ( 'TITLE', cv,
      +                 'XY Positions from Interact:Posns', .true. )
          call ptdesc ( 'OUTTAB', 'TITLE', cv )
          NUMGP = 0
@@ -10963,7 +10963,7 @@ C--
 
       character*20 head(NXMAG)
       data head / 'X', 'Y', 'Magnitude', 'Dx', 'Dy', 'Iterations',
-     +       'Rms', 'Numinval', 'Height', 'Base', 'Max pixel', 
+     +       'Rms', 'Numinval', 'Height', 'Base', 'Max pixel',
      +       'Rx', 'Ry', 'Xbox', 'Ybox' /
 Cbegin
 
@@ -10982,7 +10982,7 @@ Cbegin
          call printo ( 'No file written' )
       elseif ( istat.eq.0 ) then
 
-         call get1c  ( 'TITLE', cv, 'Magnitudes from Interact:Magns', 
+         call get1c  ( 'TITLE', cv, 'Magnitudes from Interact:Magns',
      +                 .true. )
          if ( ST_FAILED ) return
          do k = 1, NXMAG
@@ -10990,7 +10990,7 @@ Cbegin
          enddo
          call ptdesc ( 'OUTTAB', 'TITLE', cv )
          call ident  ( %val(ip), NXMAG+5, NUMGM )
-         call coprr ( RESMAG, NXMAG, NUMGM, 1, NXMAG, 1, NUMGM, 
+         call coprr ( RESMAG, NXMAG, NUMGM, 1, NXMAG, 1, NUMGM,
      +                %val(ip), NXMAG+5, NUMGM, 6, 1 )
          NUMGM = 0
          call canpar ( 'OUTTAB' )
@@ -11014,9 +11014,9 @@ C  alan penny             ral             1990 Jan
 
       integer      kopt		!i: WHich list (1=posns;2=Gauss posns + magns)
 C--
-      integer k, iter, ninval, kinval, karms, kah, kab, kavmax, kadx, 
+      integer k, iter, ninval, kinval, karms, kah, kab, kavmax, kadx,
      +        kady, jx, jy
-      real    amag, ht, base, dx, dy, xa, ya, rx, ry, rms, 
+      real    amag, ht, base, dx, dy, xa, ya, rx, ry, rms,
      +        vmax, arx, ary, axa, aya, vl
       character*80 text
 
@@ -11067,7 +11067,7 @@ Cbegin
               rx = RESMAG(12,k)
               ry = RESMAG(13,k)
 
-              karms  = trunc(rms,5)		
+              karms  = trunc(rms,5)
               kah    = trunc(ht,6)
               kab    = trunc(base,6)
               axa    = trunc(xa,4)
@@ -11078,8 +11078,8 @@ Cbegin
               kady   = trunc(dy,3)
               kavmax = trunc(vmax,6)
               kinval = min(ninval,999)
-              write ( text, '(1x,i4, 1x,f6.1,1x,f6.1, 2i3, f8.3, i7, 
-     +                        i6, 2x,i6, i4, i5,f6.2,f6.2)' ) 
+              write ( text, '(1x,i4, 1x,f6.1,1x,f6.1, 2i3, f8.3, i7,
+     +                        i6, 2x,i6, i4, i5,f6.2,f6.2)' )
      +                       k, axa, aya, kadx, kady,
      +                amag, kah, kab, kavmax, kinval, karms, arx, ary
               call printo ( text )
@@ -11087,7 +11087,7 @@ Cbegin
          endif
 
       endif
-      
+
       end
 
 
@@ -11110,7 +11110,7 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call optabr ( 'INTAB', IPINTAB, NTBX, NTBY, .true., ierr ) 
+      call optabr ( 'INTAB', IPINTAB, NTBX, NTBY, .true., ierr )
       if ( ST_FAILED ) return
       if ( ierr.ne.0 ) then
          if ( ierr.eq.2 ) call printo ( 'ERROR: No file accessed' )
@@ -11127,7 +11127,7 @@ Cbegin
 
       call canpar ( 'INTAB' )
 
-      
+
       end
 
 
@@ -11200,7 +11200,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call po_srmainget
 
       OPDISP    = X_OPDISP
@@ -11225,7 +11225,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -11248,7 +11248,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call po_srapget
 
       OPDISP    = X_OPDISP
@@ -11274,7 +11274,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -11309,7 +11309,7 @@ C SC_GTFORM     Gets format of output line; - Number of characters
 C SC_TEXTLINE   Makes a line of text from a line of data
 C SC_WRTHEAD    Write a text line of headers
 C SC_DOFULL     Types out all the details on a star
-C SC_LNTIDY     Removes the unwanted Identifier characters and if 
+C SC_LNTIDY     Removes the unwanted Identifier characters and if
 C SC_PRFILE     Type out data
 C SC_XIDENT     Loads a table row with an identifier
 C SC_OPDISP	Open display
@@ -11337,7 +11337,7 @@ Cbegin
 
 
       if ( ST_FAILED ) return
-      
+
       call sc_mainget							!Bring in new info
 
       call sc_option_setup ( ktopt, 4, .true. )
@@ -11357,10 +11357,10 @@ Cbegin
          if ( ktopt.eq.'blink' ) call ds_blink ( iva, rva, rvb )        !Blink
 
          if ( ktopt.eq.'display' ) call sc_disimg			!Display
-	
+
          if ( ktopt.eq.'flash' ) then                                   !Flash image
                                     call in_opdisp ( ierr )
-                                    call ds_doflash ( %val(IPIM), NX, 
+                                    call ds_doflash ( %val(IPIM), NX,
      +                                NY, IMTYPE, DSKVRANGE, IMTITLE )
                                     DISPLAYED = .true.
                                  endif
@@ -11376,12 +11376,12 @@ Cbegin
          if ( ktopt.eq.'replace' ) call sc_arem ( %val(IPIN), 2 )	!Replace
 
          if ( ktopt.eq.'reremove' ) call sc_arem ( %val(IPIN), 3 ) 	!Reremove
- 
+
          if ( ktopt.eq.'clear' ) then					!Clear (display)
                                     call ds_erase
                                     DISPLAYED = .false.
                                  endif
-  
+
          if ( ktopt.eq.'close' ) then                                   !Close display
                                     call ds_close ( ierr )
                                     OPDISP = .false.
@@ -11392,9 +11392,9 @@ Cbegin
 
          if ( ktopt.eq.'box' ) call sc_doring				!Ring
 
-         if ( ktopt.eq.'mark_old' ) call sc_bpaint ( %val(IPIN), 2 )	!Shoposn 
+         if ( ktopt.eq.'mark_old' ) call sc_bpaint ( %val(IPIN), 2 )	!Shoposn
 
-         if ( ktopt.eq.'mark_new' ) call sc_bpaint ( %val(IPIN), 1 )	!Shnposn 
+         if ( ktopt.eq.'mark_new' ) call sc_bpaint ( %val(IPIN), 1 )	!Shnposn
 
          if ( ktopt.eq.'zoom' ) call ds_zoom ( .true., 0, 0 )		!Zoom/pan display
 
@@ -11409,25 +11409,25 @@ Cbegin
                                           if ( .not.ST_FAILED .and.
      +                                         ierr.eq.0 ) then
                                              call in_opdisp ( ierr )
-                                             call ds_doflash ( 
-     +                                       %val(IPIM), NX, NY, 
+                                             call ds_doflash (
+     +                                       %val(IPIM), NX, NY,
      +                                       IMTYPE, DSKVRANGE,
      +                                       IMTITLE )
                                              DISPLAYED = .true.
                                           endif
                                        endif
-     
+
          if ( ktopt.eq.'area' ) call in_imgsiz ( NX, NY, 1 )		!Change area to show
-  
+
          if ( ktopt.eq.'list_in' ) call sc_getlist 			!List
 
          if ( ktopt.eq.'list_out' ) call sc_lwrite ( %val(IPIN) )	!Write new
 
          if ( ktopt.eq.'profile_in' ) call sc_getprof			!Profile
 
-         if ( ktopt.eq.'printlist' ) call sc_dotype ( %val(IPIN), 1 )	!Printlist 
+         if ( ktopt.eq.'printlist' ) call sc_dotype ( %val(IPIN), 1 )	!Printlist
 
-         if ( ktopt.eq.'typelist' ) call sc_dotype ( %val(IPIN), 2 )	!Typelist 
+         if ( ktopt.eq.'typelist' ) call sc_dotype ( %val(IPIN), 2 )	!Typelist
 
          if ( ktopt.eq.'lselect' ) call sc_listsel 			!Change list selection
 
@@ -11441,7 +11441,7 @@ Cbegin
          if ( ktopt.eq.'main' .or. ktopt.eq.'alter' .or. 		!Return to main program
      +        ktopt.eq.'aperture' .or. ktopt.eq.'colour' .or.
      +        ktopt.eq.'inspect' .or. ktopt.eq.'fit_magns' .or.
-     +        ktopt.eq.'positions' .or. 
+     +        ktopt.eq.'positions' .or.
      +        ktopt.eq.'exit' )  then
                                     MAIN_SELECT = ktopt
                                     loop = .false.
@@ -11479,8 +11479,8 @@ C--
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-    
-      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) / 
+
+      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'clear', 'Clear screen' ,
      + 'Clear the display screen. (The programme does not forget about',
      + 'the input image.)',
@@ -11491,16 +11491,16 @@ C--
      + 'Close the display screen. (The programme does not forget about',
      + 'the input image.)',
      + ' ', ' ', ' ', ' '/
-  
-      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) / 
-     + 'cvalues', 'Show the cursor position and image pixel value', 
-     + 'Show the cursor position and image pixel value.', 
+
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
+     + 'cvalues', 'Show the cursor position and image pixel value',
+     + 'Show the cursor position and image pixel value.',
      + 'Whilst the cursor is inside the last displayed image in the ',
-     + 'the display screen, and that window is -active-, put these', 
+     + 'the display screen, and that window is -active-, put these',
      + 'values up in the panel window.',
      + ' ', 'Click on the right-hand button to return.' /
 
-      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) / 
+      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
      + 'display', 'Display image',
      + 'Display the present input image. The program asks you for:-' ,
      + '1) The display range (default: +3 and -2 std. devs. from mean)',
@@ -11509,7 +11509,7 @@ C--
      + '3) Where to put the bottom left hand corner of the image' ,
      + '      (default: so as to centre the image in the screen).' /
 
-      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) / 
+      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'flash', 'Display image in standard way',
      + 'Display the present input image. The programme uses the ',
      + 'standard display mode:- ',
@@ -11518,12 +11518,12 @@ C--
      + '    applicable end of the range',
      + '(3) Place image at centre of screen' /
 
-      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) / 
+      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'image', 'Input new image' ,
-     + 'This asks for a new image (via the keyboard), and forgets', 
+     + 'This asks for a new image (via the keyboard), and forgets',
      + 'about the present image.', ' ', ' ', ' ', ' '/
 
-      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) / 
+      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'im_get_flash', 'Input new image and display it',
      + 'This asks you for a new input image (via the keyboard), and',
      + 'then displays the image with the standard display mode:- ',
@@ -11535,23 +11535,23 @@ C--
       data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'open', 'Open the display screen',
      + 'Open the display screen, without displaying an image.',
-     + 'The screen may be any size you want, through keyboard entry', 
-     + 'via the SCREEN parameter.', 
+     + 'The screen may be any size you want, through keyboard entry',
+     + 'via the SCREEN parameter.',
      + ' ', ' ', ' '/
 
-      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) / 
+      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
      + '(In keyboard option entry mode, you can get back to -panel-',
      + '  option entry mode, by choosing the -panel- option.)',
      + ' ', ' ', ' '/
 
-      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) / 
+      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' ', ' '/
 
-      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) / 
+      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'zoom', 'Zoom and pan image by using mouse location ',
      + '-Zoom- means zoom around present position of cursor. ' ,
      + '-Pan-  means set present position of cursor to screen centre.' ,
@@ -11560,7 +11560,7 @@ C--
      + '     Left Button then Centre Button = pan'  ,
      + '     Right button once                        = exit' /
 
-      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) / 
+      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'blink', 'Blink the displayed image' ,
      + 'By alternately putting the window -above- and -below- any ',
      + 'other window present, -blinking- is simulated. To use, open',
@@ -11569,7 +11569,7 @@ C--
      + 'chooses between end:auto:undr:over modes. For auto, ',
      + 'the LH button slows x2 the blink, centre speeds x2, RH exits.' /
 
-      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) / 
+      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'comps_dist', 'Mark posns for next list star with distant comp',
      + 'This searches the MEASURE output list, starting at the list ',
      + 'number you input (0 to end this option), for the next one with',
@@ -11578,25 +11578,25 @@ C--
      + 'wings affecting the main star, whilst being distant from it.',
      + 'The details are typed out and the star and companions painted.'/
 
-      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) / 
+      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'comps_all','Mark posn of a star and its companions in the fit',
      + 'This takes the MEASURE list of magnitudes, and looks at the',
      + 'star whose number you choose. (Enter 0 to end this option.)',
      + 'The details of the fit are typed out and the star and its',
      + 'companions are painted on the displayed image.',
-     + ' ', 
+     + ' ',
      + 'This can only be used for stars with companions in their fit.' /
 
-      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) / 
+      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'lselect', 'Select a portion of the list to look at' ,
-     + 'First, choose the method of selecting which star to look at.', 
+     + 'First, choose the method of selecting which star to look at.',
      + 'The two ways are either by choosing a block of stars in the ',
-     + 'input MEASURE list, or by selecting an area of the image (and', 
-     + 'then only stars in that area are looked at). ', 
+     + 'input MEASURE list, or by selecting an area of the image (and',
+     + 'then only stars in that area are looked at). ',
      + ' ',
      + 'Second, choose that list range or image area. ' /
 
-      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) / 
+      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'nearest', 'Give nearest list star to cursor position',
      + 'Place the cursor near a star, and press the left mouse button.',
      + 'The program finds the nearest star in the list and types',
@@ -11605,14 +11605,14 @@ C--
      + 'to end this option. The list has input and fitted posns, so ',
      + 'the star may be different in the two, so both are typed.' /
 
-      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) / 
+      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'replace', 'Replace the -Remove- box by the original image data',
-     + 'In the -remove- option in this list, an area round a fitted ', 
-     + 'in the displayed image may be cleaned of stars. This option ', 
-     + 'lets you put back the area to what it was before. ', 
+     + 'In the -remove- option in this list, an area round a fitted ',
+     + 'in the displayed image may be cleaned of stars. This option ',
+     + 'lets you put back the area to what it was before. ',
      + ' ', ' ', ' ' /
 
-      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) / 
+      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'remove', 'Clean an area round a list star with stars removed',
      + 'Take a star from the input list, and clear the area in the',
      + 'displayed image used in its fit. Subtract the star itself and',
@@ -11621,58 +11621,58 @@ C--
      + 'fit may be removed. The display in this area may be done at ',
      + 'a high contrast to show the fine details.   **It is slow.**' /
 
-      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) / 
+      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'reremove', 'Display the -Remove- box again',
-     + 'In the -remove- option in this list, an area round a fitted ', 
+     + 'In the -remove- option in this list, an area round a fitted ',
      + 'in the displayed image may be cleaned of stars. Then the',
      + '-rpleace- option lets you put the area back as it was. This ',
      + 'option lets you -remove- the area again, quickly.',
      + ' ', ' ' /
 
-      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) / 
+      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
      + 'box', 'Put a box in the image outside the star -Remove- area',
-     + 'In the -remove- option in this list, an area round a fitted ', 
+     + 'In the -remove- option in this list, an area round a fitted ',
      + 'in the displayed image is cleaned of stars. This option',
      + 'paints a rectangle round this area round the present star.',
      + ' ', ' ', ' ' /
 
-      data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) / 
+      data opt_text(22),opt_head(22),(opt_help(j,22),j=1,6) /
      + 'mark_new', 'Mark up on the display the -new- star list posns',
      + 'Mark on the display the positions of the stars in the MEASURE',
      + 'star list. Both the fitted (-new-) positions and those input',
      + 'before fitting (-old-) are stored in the list. This option',
      + 'uses the -new- ones. The mark can be either a spot or a cross',
-     + 'of size defined by you. You can choose the colour for stars ', 
+     + 'of size defined by you. You can choose the colour for stars ',
      + 'with -good- fits and that for stars with -failed- fits.' /
 
-      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) / 
+      data opt_text(23),opt_head(23),(opt_help(j,23),j=1,6) /
      + 'mark_old', 'Mark up on the display the -old- star list posns',
      + 'Mark on the display the positions of the stars in the MEASURE',
      + 'star list. Both the fitted (-new-) positions and those input',
      + 'before fitting (-old-) are stored in the list. This option',
      + 'uses the -old- ones. The mark can be either a spot or a cross',
-     + 'of size defined by you. You can choose the colours for stars ', 
+     + 'of size defined by you. You can choose the colours for stars ',
      + 'with -good- fits and -failed- fits (from the fitting).' /
 
-      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) / 
+      data opt_text(24),opt_head(24),(opt_help(j,24),j=1,6) /
      + 'stars_add', 'Use cursor to add stars to star list',
      + 'Place the cursor in the displayed image and press the mouse',
-     + 'left-hand button. The cursor position is added on to the end ', 
-     + 'of the star input list. Press the right-hand button to exit', 
-     + 'from this option. Either a spot or a cross may be used to ', 
-     + 'mark the new location. ', 
+     + 'left-hand button. The cursor position is added on to the end ',
+     + 'of the star input list. Press the right-hand button to exit',
+     + 'from this option. Either a spot or a cross may be used to ',
+     + 'mark the new location. ',
      + ' ' /
 
-      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) / 
+      data opt_text(25),opt_head(25),(opt_help(j,25),j=1,6) /
      + 'stars_rem', 'Use cursor to remove stars from star list',
      + 'Place the cursor in the displayed image and press the mouse',
      + 'left-hand button. The star in the input list that is nearest ',
      + 'to the cursor position is removed from the list. Press the ',
      + 'right-hand button to exit from this option. Either a spot or a',
-     + 'cross may be used to mark this removed star. One of the extra', 
+     + 'cross may be used to mark this removed star. One of the extra',
      + 'stars that may have been added by -stars_add- may be selected.'/
 
-      data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) / 
+      data opt_text(26),opt_head(26),(opt_help(j,26),j=1,6) /
      + 'area', 'Select area of image to display',
      + 'If the image is too large for the display screen, one can ',
      + 'select an area to display. ',
@@ -11680,43 +11680,43 @@ C--
      + 'YRANGE, which delimit the X and Y areas to work with.',
      + ' ', ' ' /
 
-      data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) / 
+      data opt_text(27),opt_head(27),(opt_help(j,27),j=1,6) /
      + 'type_one', 'Type out all of a star fit (from number/name)',
      + 'Type out all the details of a star in the MEASURE list. You ',
      + 'can choose whether to select the star by its name or its ',
-     + '-number- (that is its row number in the star list).', 
-     + 'All the details of the stars fit are given out, with their  ', 
-     + 'short description names. ', 
+     + '-number- (that is its row number in the star list).',
+     + 'All the details of the stars fit are given out, with their  ',
+     + 'short description names. ',
      + ' ' /
 
-      data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) / 
+      data opt_text(28),opt_head(28),(opt_help(j,28),j=1,6) /
      + 'printlist', 'Put a neat summary of the fits into an ascii file',
-     + 'Put out into a file the -lselect- portion of the stars list. ', 
-     + 'Either:- a standard selection of the list columns', 
+     + 'Put out into a file the -lselect- portion of the stars list. ',
+     + 'Either:- a standard selection of the list columns',
      + '        (with or without the XY positions)',
      + '    or:- a user-defined selection of the 51 parameters in the',
      + '         list. Any can be chosen, and put in defined form',
      + '         as long as there is room in a single output line' /
 
-      data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) / 
+      data opt_text(29),opt_head(29),(opt_help(j,29),j=1,6) /
      + 'typelist', 'Put a neat summary of the fits onto the terminal',
-     + 'Type out the -lselect- selected portion of the stars list. ', 
-     + 'Either:- a standard selection of the list columns', 
+     + 'Type out the -lselect- selected portion of the stars list. ',
+     + 'Either:- a standard selection of the list columns',
      + '        (with or without the XY positions)',
      + '    or:- a user-defined selection of the 51 parameters in the',
      + '         list. Any can be chosen, and put in defined form',
      + '         as long as there is room in a single output line' /
 
-      data opt_text(30),opt_head(30),(opt_help(j,30),j=1,6) / 
+      data opt_text(30),opt_head(30),(opt_help(j,30),j=1,6) /
      + 'profile_in', 'Load a new star profile (discard the old one)',
      + 'Input the file containing the star profile. This is the image',
      + 'that is produced by PROFILE and used in MEASURE. This program',
-     + 'uses it in adding or removing stars in the image. ', 
-     + ' ', 
+     + 'uses it in adding or removing stars in the image. ',
+     + ' ',
      + 'The image has descriptors for the parameters of the analytical',
      + 'part of the profile, and pixel values for the empirical part.'/
 
-      data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) / 
+      data opt_text(31),opt_head(31),(opt_help(j,31),j=1,6) /
      + 'list_in', 'Load a new star list (discard the old one)',
      + 'Input the MEASURE output file with the fitted star magnitudes.',
      + 'This is the main file of this SCRUTINY function, on which all',
@@ -11725,11 +11725,11 @@ C--
      + '(51 in all). If the list is not a MEASURE output, it can still',
      + 'be used, but care is called for.' /
 
-      data opt_text(32),opt_head(32),(opt_help(j,32),j=1,6) / 
+      data opt_text(32),opt_head(32),(opt_help(j,32),j=1,6) /
      + 'list_out', 'Write to file the -Add- used (extra,removed) list',
-     + 'The -stars_add- and -stars_rem- options of this function can', 
-     + 'be used to add and remove stars from the list.', 
-     + 'This option permits you to save the changed list to file. ', 
+     + 'The -stars_add- and -stars_rem- options of this function can',
+     + 'be used to add and remove stars from the list.',
+     + 'This option permits you to save the changed list to file. ',
      + ' ', ' ', ' ' /
 
       data opt_text(33),opt_head(33),(opt_help(j,33),j=1,6) /
@@ -11752,7 +11752,7 @@ C--
      + 'etc.). Most of the capabilities of the image programs are here',
      + 'in an interactive mode. ',
      + 'The new image may then be written out to disk.' /
-   
+
       data opt_text(35),opt_head(35),(opt_help(j,35),j=1,6) /
      + 'aperture', 'Functions for aperture photometry ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -11761,7 +11761,7 @@ C--
      + 'automatically getting filter and airmass from image header.',
      + 'Exposure time can be allowed for. Different images can be',
      + 'accessed easily. The results can be output to a file. ' /
-   
+
       data opt_text(36),opt_head(36),(opt_help(j,36),j=1,6) /
      + 'colour', 'Functions for changing colour display of the image.',
      + 'New set of buttons appear. Functions then available include:-',
@@ -11787,7 +11787,7 @@ C--
      + 'radii of the stars, blink the image, contour map, statistics,',
      + 'display area. The output can be put onto any device, not just',
      + 'the screen.' /
-        
+
       data opt_text(39),opt_head(39),(opt_help(j,39),j=1,6) /
      + 'positions', 'Functions to get or plot a list of positions ',
      + 'New set of buttons appear. Functions then available include:-',
@@ -11809,7 +11809,7 @@ C--
       integer sect_num
       parameter ( sect_num=7 )
       character*10 sect_head(sect_num)
-      data sect_head / 'STARS', 'LOOKING', 'ACTIONS', 'IMAGE', 
+      data sect_head / 'STARS', 'LOOKING', 'ACTIONS', 'IMAGE',
      +                 'DISPLAY', 'FUNCTIONS', 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1) / 'profile_in:list_in:list_out' /
@@ -11871,11 +11871,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -11906,11 +11906,11 @@ Cbegin
       ktoptd = ktopt
 
       if ( ktopt.eq.'mark_new' .or. ktopt.eq.'mark_old' .or.		!Check displayed image
-     +     ktopt.eq.'comps_all' .or. ktopt.eq.'comps_dist' .or. 
+     +     ktopt.eq.'comps_all' .or. ktopt.eq.'comps_dist' .or.
      +     ktopt.eq.'nearest' .or.
      +     ktopt.eq.'blink' .or. ktopt.eq.'replace' .or.
-     +     ktopt.eq.'remove' .or. ktopt.eq.'reremove' .or. 
-     +     ktopt.eq.'ring' .or. 
+     +     ktopt.eq.'remove' .or. ktopt.eq.'reremove' .or.
+     +     ktopt.eq.'ring' .or.
      +     ktopt.eq.'stars_add' .or. ktopt.eq.'stars_rem' .or.
      +     ktopt.eq.'clear' .or. ktopt.eq.'cvalues' .or.
      +     ktopt.eq.'zoom' ) then
@@ -11953,7 +11953,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call sc_srmainget
 
       OPDISP   = X_OPDISP
@@ -11978,7 +11978,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -12001,7 +12001,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       call sc_srscrutget
 
       OPDISP   = X_OPDISP
@@ -12027,7 +12027,7 @@ C   a j penny                 ral               1990-06-09
 C--
 Cbegin
 
-  
+
       X_OPDISP    = OPDISP
       X_GOTIMAGE  = GOTIMAGE
       X_DISPLAYED = DISPLAYED
@@ -12158,7 +12158,7 @@ Cbegin
       endif
 
       call get_mprof ( 'PROFILE', IPMAP, PROF, MX, MY, MZ, MAGNIFK,
-     +                 MAPXK, MAPYK, pbs, pbz, qbase, volk, volradk, 
+     +                 MAPXK, MAPYK, pbs, pbz, qbase, volk, volradk,
      +                 istat )
       if ( ST_FAILED ) return
       if ( istat.ne.0 ) then
@@ -12206,7 +12206,7 @@ Cbegin
             LPOS(2) = max(1,min(TBYS,LPOS(2)))
          endif
          call get2i ( 'LRANGE', LPOS(1), LPOS(2), .true., 1, TBYS )
-      else         
+      else
          call get2r ( 'LXRANGE', LAREA(1,1), LAREA(2,1), .true.,
      +                -1.0e10, 1.0e10 )
          call get2r ( 'LYRANGE', LAREA(1,2), LAREA(2,2), .true.,
@@ -12269,7 +12269,7 @@ Cbegin
 
          LX = nint(data(29+5,kstar))					!Calculate removed area
          LY = nint(data(30+5,kstar))
-   
+
          if ( .not.DREMOVE .or. LX.ne.LXOLD. or. LY.ne.LYOLD ) then
             if ( DREMOVE ) call wrkcan ( 'WORKA' )
             call gtwrkr ( 'WORKA', LX*LY, ipwa, istat )
@@ -12279,15 +12279,15 @@ Cbegin
          DREMOVE = .true.
 
          if ( IMTYPE.eq.'SHORT' ) then
-            call sc_arclears ( %val(IPIM), data, kstar, %val(ipwa), 
+            call sc_arclears ( %val(IPIM), data, kstar, %val(ipwa),
      +                         LX, LY )
          else
-            call sc_arclearr ( %val(IPIM), data, kstar, %val(ipwa), 
+            call sc_arclearr ( %val(IPIM), data, kstar, %val(ipwa),
      +                         LX, LY )
          endif
          if ( DOCONT ) call ds_imgscl ( %val(ipwa), LX, LY, IMTYPE,
      +                                   1, LX, 1, LY )
-         call ds_acim ( %val(ipwa), LX, LY, IMTYPE, 1, LX, 1, LY, LXS, 
+         call ds_acim ( %val(ipwa), LX, LY, IMTYPE, 1, LX, 1, LY, LXS,
      +                  LYS, .false. )
 
       endif
@@ -12308,16 +12308,16 @@ Cbegin
             LXSOLD = LXS
             LYSOLD = LYS
          endif
-         call ds_acim ( %val(IPIM), NX, NY, IMTYPE, lxsa, lxsb, 
+         call ds_acim ( %val(IPIM), NX, NY, IMTYPE, lxsa, lxsb,
      +                  lysa, lysb, LXS, LYS, .false. )
 
       endif
 
       if ( kopt.eq.3 ) then						!Diplay removed area
 
-         if ( DOCONT ) call ds_imgscl ( %val(ipwa), LX, LY, IMTYPE, 
+         if ( DOCONT ) call ds_imgscl ( %val(ipwa), LX, LY, IMTYPE,
      +                                  1, LX, 1,LY )
-         call ds_acim ( %val(ipwa), LX, LY, IMTYPE, 1, LX, 1, LY, 
+         call ds_acim ( %val(ipwa), LX, LY, IMTYPE, 1, LX, 1, LY,
      +                  LXS, LYS, .false. )
 
       endif
@@ -12328,7 +12328,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SC_DOSEL -- Star to be dealt with (star list posn or area posn)?
-C 
+C
 C    a j penny                    dao          1988-05-29
 
       subroutine sc_dosel ( k, x, y, doit )
@@ -12350,7 +12350,7 @@ Cbegin
      +        k.ge.min(LPOS(1),LPOS(2)) ) doit = .true.
       else
          if ( x.le.max(LAREA(1,1),LAREA(2,1)) .and.
-     +        x.ge.min(LAREA(1,1),LAREA(2,1)) .and. 
+     +        x.ge.min(LAREA(1,1),LAREA(2,1)) .and.
      +        y.le.max(LAREA(1,2),LAREA(2,2)) .and.
      +        y.ge.min(LAREA(1,2),LAREA(2,2)) ) doit = .true.
       endif
@@ -12361,7 +12361,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SC_ARCLEARR -- Make an array of a section the original image with
-C               the fitted stars subtracted, and maybe the fitted 
+C               the fitted stars subtracted, and maybe the fitted
 C               slope subtracted. The area is round a designated star
 C
 C   a.j.penny                   rgo                    83-2-22
@@ -12442,16 +12442,16 @@ Cbegin
                   val = 0.0
                   do k = 1, nst
                      if ( hp(k).ne.0.0 ) call profval (
-     +                  rv, jx, jy, xp(k), yp(k), hp(k), lx, ly, co(k), 
-     +                  si(k), sim(k), gx2(k), gy2(k), p(k), hx2(k), 
-     +                  hy2(k), qh(k), qr(k), qp(k), .true., 
-     +                  %val(IPP), MX, MY, MZ, mapnum(k), mapx(k), 
+     +                  rv, jx, jy, xp(k), yp(k), hp(k), lx, ly, co(k),
+     +                  si(k), sim(k), gx2(k), gy2(k), p(k), hx2(k),
+     +                  hy2(k), qh(k), qr(k), qp(k), .true.,
+     +                  %val(IPP), MX, MY, MZ, mapnum(k), mapx(k),
      +                  mapy(k), magnif(k) )
                      val = val + rv
                   enddo
 
                   if ( DOSLOPE ) val = val + 				!Apply slope
-     +                                 data(32+5,kstar)*(jx-kxs+1) + 
+     +                                 data(32+5,kstar)*(jx-kxs+1) +
      +                                 data(33+5,kstar)*(jy-kys+1)
 
                   resid = im(jx,jy) - val/BS
@@ -12470,7 +12470,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SC_ARCLEARS -- Make an array of a section the original image with
-C               the fitted stars subtracted, and maybe the fitted 
+C               the fitted stars subtracted, and maybe the fitted
 C               slope subtracted. The area is round a designated star
 C
 C   a.j.penny                   rgo                    83-2-22
@@ -12551,16 +12551,16 @@ Cbegin
                   val = 0.0
                   do k = 1, nst
                      if ( hp(k).ne.0.0 ) call profval (
-     +                  rv, jx, jy, xp(k), yp(k), hp(k), lx, ly, co(k), 
-     +                  si(k), sim(k), gx2(k), gy2(k), p(k), hx2(k), 
-     +                  hy2(k), qh(k), qr(k), qp(k), .true., 
-     +                  %val(IPP), MX, MY, MZ, mapnum(k), mapx(k), 
+     +                  rv, jx, jy, xp(k), yp(k), hp(k), lx, ly, co(k),
+     +                  si(k), sim(k), gx2(k), gy2(k), p(k), hx2(k),
+     +                  hy2(k), qh(k), qr(k), qp(k), .true.,
+     +                  %val(IPP), MX, MY, MZ, mapnum(k), mapx(k),
      +                  mapy(k), magnif(k) )
                      val = val + rv
                   enddo
 
                   if ( DOSLOPE ) val = val + 				!Apply slope
-     +                                 data(32+5,kstar)*(jx-kxs+1) + 
+     +                                 data(32+5,kstar)*(jx-kxs+1) +
      +                                 data(33+5,kstar)*(jy-kys+1)
 
                   kresid = im(jx,jy) - val/BS
@@ -12612,7 +12612,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C SC_LWRITE -- Writes to file star and extra list
 C
 C a j penny             stsci                  1987-03-22
- 
+
       subroutine sc_lwrite ( data )
 
       implicit none
@@ -12667,12 +12667,12 @@ Cbegin
       endif
 
       call tcopdes ( 'INSTARS', 'OUTSTARS', istat )			!Transfer headers
-      call get1c  ( 'TITLE', text, 'Stars from Interact:Scrutiny', 
+      call get1c  ( 'TITLE', text, 'Stars from Interact:Scrutiny',
      +              .true. )
       if ( ST_FAILED ) return
       call ptdesc ( 'OUTSTARS', 'TITLE', text )
-      
-      if ( ismore ) then						!Get whether to add prefixes to extra output star names         
+
+      if ( ismore ) then						!Get whether to add prefixes to extra output star names
          call get1b ( 'DOPREF', DOPREF, DOPREF )
          if ( ST_FAILED ) return
          if ( .not.DOPREF ) then
@@ -12707,7 +12707,7 @@ Cbegin
                kout = kout + 1
                call coprr ( EXTRA, NXEE, NYEE, 1, 2, k, k,
      +                      %val(ipxyo), TBVXS, ktot, 6, kout )
-               if ( TBVXS.gt.7 ) call cop1r ( 50.0, 
+               if ( TBVXS.gt.7 ) call cop1r ( 50.0,
      +                              %val(ipxyo), TBVXS, ktot, 8, kout )
                call sc_xident ( %val(ipxyo), TBVXS, ktot, kout, k, pref)
             endif
@@ -12755,12 +12755,12 @@ Cbegin
       call get1b ( 'DOFORM', DOFORM, DOFORM )
       if ( ST_FAILED ) return
       if ( DOFORM ) then
-         call sc_gtform 
+         call sc_gtform
       else
          call get1b ( 'LISTXY', DOXY, DOXY )
          if ( ST_FAILED ) return
       endif
-      
+
       call gtdesc ( 'INSTARS', 'TITLE', title, ' ', iv, istat )
 
       if ( kopt.eq.1 ) then						!Open output file, if wanted
@@ -12823,7 +12823,7 @@ C--
       real x, y
       integer j, k, klen
 Cbegin
-     
+
 
       call sc_wrthead ( atext, btext, klen )
       if ( klen.le.79 ) call printo ( atext )
@@ -12837,9 +12837,9 @@ Cbegin
             call sc_textline ( data, k, atext, btext, klen )
             if ( kopt.eq.2 .and. klen.le.79 ) call printo ( atext )
             if ( kopt.eq.2 .and. klen.gt.79 ) call printo ( btext )
-            if ( kopt.eq.1 .and. klen.le.79 ) write 
+            if ( kopt.eq.1 .and. klen.le.79 ) write
      +                       ( lu, '(1x,79a1)' ) (atext(j:j),j=1,klen)
-            if ( kopt.eq.1 .and. klen.gt.79 ) write 
+            if ( kopt.eq.1 .and. klen.gt.79 ) write
      +                      ( lu, '(1x,131a1)' ) (btext(j:j),j=1,klen)
          endif
       enddo
@@ -12905,9 +12905,9 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C SC_TEXTLINE -- Makes a line of text from a line of data 
-C 
-C a j penny                stsci                 1987-03-22 
+C SC_TEXTLINE -- Makes a line of text from a line of data
+C
+C a j penny                stsci                 1987-03-22
 
       subroutine sc_textline ( data, kline, atext, btext, kl )
 
@@ -12917,9 +12917,9 @@ C a j penny                stsci                 1987-03-22
 
       real      	data(TBVXS,TBYS)	!i: Star list
       integer		kline			!i: Star number to output
-      character*79	atext			!o: Text string (used if 
+      character*79	atext			!o: Text string (used if
 						!                length<=79)
-      character*131	btext			!o: Text string (used if 
+      character*131	btext			!o: Text string (used if
 						!                length<79)
       integer		kl			!o: Length of text string
 C--
@@ -12946,7 +12946,7 @@ Cbegin
 
       call namegt ( data, TBVXS, TBYS, kline, id )			!Get star name
 
-      do k = 1, NUMCOLTOT						!Get and order data, and check and 
+      do k = 1, NUMCOLTOT						!Get and order data, and check and
          knc = NUMCOL(k) + 5						! change numbers too big to fit in.
          adata(k) = trunc ( data(knc,kline), NUMBEF(k) )
       enddo
@@ -13094,9 +13094,9 @@ Cbegin
          return
       endif
 
-      call get_job ( 'SEEK', 'number:name', kget, 1, thelp, 2 )		!Get wether to find star by 
+      call get_job ( 'SEEK', 'number:name', kget, 1, thelp, 2 )		!Get wether to find star by
       if ( ST_FAILED ) return
-      if ( kget.eq.1 ) then						! number in list or by name. 
+      if ( kget.eq.1 ) then						! number in list or by name.
          call get1i ( 'NUMBER', lnum, 1, 1, TBYS )			! If later, check in list
          if ( ST_FAILED ) return
          call namegt ( data, TBVXS, TBYS, lnum, name )
@@ -13117,7 +13117,7 @@ Cbegin
          endif
       endif
 
-      do k = 1, min(TBXS,maxitm)					!Copy line into data buffer and 
+      do k = 1, min(TBXS,maxitm)					!Copy line into data buffer and
          ldata(k) = trunc ( data(k+5,lnum), 8 )				! modify numbers too large to print
       enddo
 
@@ -13132,7 +13132,7 @@ CX      enddo
       call printo ( text )
       do k = 1, 1+((TBXS-1)/5)
          call printo ( htext(k) )
-         write ( text, '(1x,5f12.3)' ) 
+         write ( text, '(1x,5f12.3)' )
      +           (ldata(j), j = 1+5*(k-1), min(TBVXS,5*k) )
          call printo ( text )
       enddo
@@ -13142,8 +13142,8 @@ CX      enddo
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C SC_LNTIDY -- Removes the unwanted Identifier characters and if 
-C              flagged, removes any unwanted decimal points (which are 
+C SC_LNTIDY -- Removes the unwanted Identifier characters and if
+C              flagged, removes any unwanted decimal points (which are
 C              known by having no numbers after them).
 C
 C   a.j.penny                   rgo                    83-2-26
@@ -13153,7 +13153,7 @@ C   a.j.penny                   rgo                    83-2-26
       implicit none
 
       character*(*)	texta		!i: text to tidy
-      integer		n		!i: length of input text 
+      integer		n		!i: length of input text
       integer		numid		!i: no of chars wanted in name
       integer		numaft(100)	!i: no of chars after each dec point
       integer		kw		!i: 1 => remove dec points of ints
@@ -13264,7 +13264,7 @@ Cbegin
             adamp   = trunc(adata(51),2)
             if ( DOXY ) then
                write ( textc, '(1h ,i5,2f7.1,f7.2,f8.1,2f6.1,f7.1,i4,
-     +                 i5,f6.2)' ) k, ax, ay, amag, ah, adx, ady, 
+     +                 i5,f6.2)' ) k, ax, ay, amag, ah, adx, ady,
      +                             arms, iter, ninval, aimp
             else
                write ( textc, '(1h ,i5,f7.2,f8.1,2f6.1,f7.1,i4,i5,i6,
@@ -13339,7 +13339,7 @@ Cbegin
       call ds_gtype ( ierr )						!Get type of display
       if ( ierr.ne.0 ) return
 
-      call ds_init ( IMTITLE, 0, ierr )					!Open display 
+      call ds_init ( IMTITLE, 0, ierr )					!Open display
       if ( ierr.ne.0 ) return
       OPDISP = .true.
 
@@ -13354,7 +13354,7 @@ C  This is SCRUTSUBG.FOR
 C
 C  Contains:-
 C
-C SC_LPAINT    Types companion star posns, paints up star + companions 
+C SC_LPAINT    Types companion star posns, paints up star + companions
 C SC_DORING    Paints a rectangle round the removed area
 C SC_BPAINT    Paints up all stars in list in their old + new posns
 C SC_JPAINT    Takes a star number. Searches star list for next star
@@ -13366,7 +13366,7 @@ C SC_CADD      Adds and removes stars from the list by the image cursor
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C SC_LPAINT -- Types companion star posns, paints up star + companions 
+C SC_LPAINT -- Types companion star posns, paints up star + companions
 C
 C      a j penny               dao              1988-05-29
 
@@ -13395,7 +13395,7 @@ Cbegin
          return
       endif
 
-      ok = .false.							!Check some to display. 
+      ok = .false.							!Check some to display.
       do k = 1, TBYS							! If not return
          if ( data(26,k).gt.0.5 ) ok = .true.
       enddo
@@ -13404,7 +13404,7 @@ Cbegin
          return
       endif
 
-      k = 1								!Choose star and do type, 
+      k = 1								!Choose star and do type,
       ka = 1								! mark
       do while ( k.ge.1 )
          if ( ka.ne.1 ) k = k + 1
@@ -13482,7 +13482,7 @@ C a j penny                       stsci                 1987-03-22
       integer   kopt				!i: Option (1=new:2=old)
 C--
       character*1000 topt
-      data topt / 
+      data topt /
      +    'red:green:blue:cyan:magenta:yellow:coral:palegreen' /
       integer nthelp, kt(2)
       parameter ( nthelp=2 )
@@ -13513,7 +13513,7 @@ Cbegin
 
       call get_job ( 'COL_OK', topt, kt(1), 1, thelp, nthelp )		!Get colours
       if ( ST_FAILED ) return
-      call get_job ( 'COL_BAD', topt, kt(2), 2, thelp, nthelp )	
+      call get_job ( 'COL_BAD', topt, kt(2), 2, thelp, nthelp )
       if ( ST_FAILED ) return
 
       call ds_scol ( 1.0, kt(1) )
@@ -13583,7 +13583,7 @@ Cbegin
          return
       endif
 
-      kgo = 0								!Write 
+      kgo = 0								!Write
       loop = .true.
       ka = TBYS
       do while ( loop )
@@ -13610,7 +13610,7 @@ Cbegin
                      if ( ja.lt.1 .or. ja.gt.TBYS ) then
                         call pargi ( j )
                         call pargi ( ja )
-                        call printd ( 
+                        call printd (
      +        'Companion No %d is List number %d - Input file suspect' )
                         if ( ja.gt.TBYS ) then
                            call pargi ( TBYS )
@@ -13621,14 +13621,14 @@ Cbegin
                         yma = data(7,ja) - data(10,ja)
                         xd = xma - xm
                         yd = yma - ym
-                        if ( abs(xd).gt.xl .or. abs(yd).gt.yl )  
+                        if ( abs(xd).gt.xl .or. abs(yd).gt.yl )
      +                     found = .true.
                      endif
                   enddo
                endif
             enddo
             ka = k
-         
+
             if ( k.eq.TBYS .and. .not.found ) call printo ( 'No stars'//
      +              ' with distant companions in the rest of the list' )
 
@@ -13677,7 +13677,7 @@ Cbegin
       call get1b ( 'DONEW', donew, .true. )
       if ( ST_FAILED ) return
 
-      x = data(6,k) 
+      x = data(6,k)
       y = data(7,k)
       if ( .not.donew ) then
          x = x - data(9,k)
@@ -13721,15 +13721,15 @@ C  from main star to them, if they lie outside measuring box.
             if ( ja.lt.1 .or. ja.gt.TBYS ) then
                call pargi ( j )
                call pargi ( ja )
-               call printd ( 
+               call printd (
      +      'Companion No %d is List number %d - Input file suspect' )
                if ( ja.gt.TBYS ) then
                   call pargi ( TBYS )
                   call printd ( '   - List has only %d stars' )
                endif
             else
-               xo = data(6,ja) 
-               yo = data(7,ja) 
+               xo = data(6,ja)
+               yo = data(7,ja)
                if ( .not.donew ) then
                   xo = xo - data(9,ja)
                   yo = yo - data(10,ja)
@@ -13766,8 +13766,8 @@ C  from main star to them, if they lie outside measuring box.
             if ( j.le.7 ) ja = nint(data(5+21+j,k))			!old posn
             if ( j.gt.7 ) ja = nint(data(5+41+j-8,k))
             if ( ja.ge.1 .and. ja.le.TBYS ) then
-               xo = data(6,ja) 
-               yo = data(7,ja) 
+               xo = data(6,ja)
+               yo = data(7,ja)
                if ( .not.donew ) then
                   xo = xo - data(9,ja)
                   yo = yo - data(10,ja)
@@ -13807,7 +13807,7 @@ C--
       logical more
       character name*20, texta*82, text*72
       integer kx, ky, kbut, kold, knew, kolda, knewa, k, kk, istat
-      real domax, dnmax, xnew, ynew, xold, yold, d, x, y, h, amag, 
+      real domax, dnmax, xnew, ynew, xold, yold, d, x, y, h, amag,
      +     dx, dy
 
       real trunc
@@ -13835,7 +13835,7 @@ Cbegin
 
             if ( GOTLIST ) then
 
-            domax = 1.0e10						!Find nearest star in 
+            domax = 1.0e10						!Find nearest star in
             kold = 0							! star list
             dnmax = 1.0e10
             knew = 0
@@ -13862,8 +13862,8 @@ Cbegin
 
             knewa = 0
             kolda = 0
-            if ( kbut.eq.2 ) then					!Find 2nd nearest star 
-               domax = 1.0e10						! in star list 
+            if ( kbut.eq.2 ) then					!Find 2nd nearest star
+               domax = 1.0e10						! in star list
                dnmax = 1.0e10
                do k = 1, TBYS
                   xnew = data(6,k)
@@ -13909,8 +13909,8 @@ Cbegin
                amag = 50.0
                if ( TBVXS.ge.8 ) amag = trunc ( data(8,knew),  8 )
                kk = min(99999,knew)
-               write ( texta, 
-     +               '('' New'',i5,2x,a20,2f8.2,f11.2,f8.3)' ) 
+               write ( texta,
+     +               '('' New'',i5,2x,a20,2f8.2,f11.2,f8.3)' )
      +                 kk, name, x, y, h, amag
                call printo ( texta )
             endif
@@ -13926,8 +13926,8 @@ Cbegin
                amag = 50.0
                if ( TBVXS.ge.8 ) amag = trunc ( data(8,knewa),  8 )
                kk = min(99999,knewa)
-               write ( texta, 
-     +               '('' New'',i5,2x,a20,2f8.2,f11.2,f8.3)' ) 
+               write ( texta,
+     +               '('' New'',i5,2x,a20,2f8.2,f11.2,f8.3)' )
      +                 kk, name,  x, y, h, amag
                call printo ( texta )
             endif
@@ -13948,8 +13948,8 @@ Cbegin
                amag = 50.0
                if ( TBVXS.ge.8 ) amag = trunc ( data(8,kold),  8 )
                kk = min(99999,kold)
-               write ( texta, 
-     +               '('' Old'',i5,2x,a20,2f8.2,f11.2,f8.3)' ) 
+               write ( texta,
+     +               '('' Old'',i5,2x,a20,2f8.2,f11.2,f8.3)' )
      +                 kk, name, x, y, h, amag
                call printo ( texta )
             endif
@@ -13970,8 +13970,8 @@ Cbegin
                amag = 50.0
                if ( TBVXS.ge.8 ) amag = trunc ( data(8,kolda),  8 )
                kk = min(99999,kolda)
-               write ( texta, 
-     +               '('' Old'',i5,2x,a20,2f8.2,f11.2,f8.3)' ) 
+               write ( texta,
+     +               '('' Old'',i5,2x,a20,2f8.2,f11.2,f8.3)' )
      +                 kk, name,  x, y, h, amag
                call printo ( texta )
             endif
@@ -14001,7 +14001,7 @@ C a j penny             stsci                  1987-03-22
       include 'STARMAN_INC'
 
       real      data(TBVXS,TBYS)		!i: Star list
-C--      
+C--
       logical loop, removed, dospot, doit
       integer kw, kx, ky, kl, j, k, ke, kbut, ierr, kc
       real x, y, d, dmax, alen
@@ -14028,7 +14028,7 @@ C--
      + 'New      The -new- fitted positions' /
 
       character*1000 topt
-      data topt / 
+      data topt /
      +    'red:green:blue:cyan:magenta:yellow:coral:palegreen' /
       integer nthelp2
       parameter ( nthelp2=2 )
@@ -14048,7 +14048,7 @@ Cbegin
       elseif ( .not.GOTIMAGE ) then
          call printo ( 'ERROR: No image' )
          return
-      endif     
+      endif
 
       call ds_pscur ( DSCURPOSX, DSCURPOSY )				!Set cursor at old posn
 
@@ -14098,7 +14098,7 @@ Cbegin
                   removed = .false.
                   if ( NEXTRA.gt.0 ) then
                      do j = 1, NEXTRA
-                        if ( nint(EXTRA(1,j)).eq.k .and. 
+                        if ( nint(EXTRA(1,j)).eq.k .and.
      +                       nint(EXTRA(3,j)).eq.2 ) removed = .true.
                      enddo
                   endif
@@ -14152,10 +14152,10 @@ Cbegin
             write ( text, '(1x,i6,8x,2i7,''   Input'')' ) kl, kx, ky
             call printo ( text )
             endif
-               
+
             if ( dospot ) then
                call ds_spot ( x, y, kc )
-            else 
+            else
                call ds_cross ( x, y, alen, kc )
             endif
 
@@ -14181,14 +14181,14 @@ C a j penny             stsci                  1987-03-22
       include 'ST_DS_GEN_INC'
       include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
-C--      
+C--
       logical loop, dospot, doit
       integer kx, ky, kbut, ierr, kc
       real x, y, alen
       character text*72
 
       character*1000 topt
-      data topt / 
+      data topt /
      +    'red:green:blue:cyan:magenta:yellow:coral:palegreen' /
       integer nthelp2
       parameter ( nthelp2=2 )
@@ -14208,7 +14208,7 @@ Cbegin
       elseif ( .not.GOTIMAGE ) then
          call printo ( 'ERROR: No image' )
          return
-      endif     
+      endif
 
       call ds_pscur ( DSCURPOSX, DSCURPOSY )				!Set cursor at old posn
 
@@ -14251,7 +14251,7 @@ Cbegin
             y = ky
             if ( dospot ) then
                call ds_spot ( x, y, kc )
-            else 
+            else
                call ds_cross ( x, y, alen, kc )
             endif
             NEXTRA = NEXTRA + 1
@@ -14280,7 +14280,7 @@ C IN_SDEF     Set defaults on interact program
 C IN_IMGSIZ   Get image size for display
 C IN_EASYSTART  Flash up an image on the display from easystart
 
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C T_INTERACT -- Run the INTERACTive use of the image display
 C
@@ -14312,7 +14312,7 @@ Cbegin
          call in_easystart
          KLEF_X = CH_DEF_X
          ktopt = 'inspect'
-         call choice_panel_sw			
+         call choice_panel_sw
       else
          call type_hchoice
       endif
@@ -14363,7 +14363,7 @@ Cbegin
 
          if ( ktopt.eq.'inspect' ) call t_inspect 			!Inspect area
 
-         if ( ktopt.eq.'alter' ) call t_alter 				!Play with image 
+         if ( ktopt.eq.'alter' ) call t_alter 				!Play with image
 
          if ( ktopt.eq.'colour' ) call t_colour 			!Change LUT
 
@@ -14433,7 +14433,7 @@ C   alan penny                        ral              1990-01-31
       implicit none
       include 'STARMAN_INC'
       include 'ST_CHOICE_INC'
- 
+
       character*12   ktopt		!i: Chosen option
       integer set_num                   !i: Code for set of options
       logical  koutside                 !i: Is this called from outside loop?
@@ -14446,35 +14446,35 @@ C--
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
- 
-      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) / 
-     + 'area', 'Select area of image to display', 
-     + 'Only use that part of the image defined by the XRANGE and', 
+
+      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
+     + 'area', 'Select area of image to display',
+     + 'Only use that part of the image defined by the XRANGE and',
      + 'YRANGE keyboard parameters, which give the start and end',
      + 'pixels in X and Y to use.',
      + ' ', ' ', ' '/
 
-      data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) / 
+      data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) /
      + 'clear', 'Clear screen' ,
      + 'Clear the display screen (the programme does not forget about',
      + 'the input image).',
      + ' ', ' ', ' ', ' '/
 
-      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) / 
-     + 'close', 'Close the display screen', 
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
+     + 'close', 'Close the display screen',
      + 'Close the display screen (the programme does not forget about',
      + 'the input image).',
      + ' ', ' ', ' ', ' '/
 
-      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) / 
-     + 'cvalues', 'Show the cursor position and image pixel value', 
-     + 'Show the cursor position and image pixel value.', 
+      data opt_text(4),opt_head(4),(opt_help(j,4),j=1,6) /
+     + 'cvalues', 'Show the cursor position and image pixel value',
+     + 'Show the cursor position and image pixel value.',
      + 'Whilst the cursor is inside the last displayed image in the ',
-     + 'the display screen, and that window is -active-, put these', 
+     + 'the display screen, and that window is -active-, put these',
      + 'values up in the panel window.',
      + ' ', 'Click on the right-hand button to return. ' /
 
-      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) / 
+      data opt_text(5),opt_head(5),(opt_help(j,5),j=1,6) /
      + 'display', 'Display image',
      + 'Display the present input image. The program asks you for:-' ,
      + '1) The display range (default: +3 and -2 std. devs. from mean)',
@@ -14483,13 +14483,13 @@ C--
      + '3) Where to put the bottom left hand corner of the image' ,
      + '      (default: so as to centre the image in the screen).' /
 
-      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) / 
+      data opt_text(6),opt_head(6),(opt_help(j,6),j=1,6) /
      + 'exit', 'Exit from this program',
      + 'Exit from this program. Any windows open are closed, and any',
      + 'files open are closed.',
      + ' ', ' ', ' ', ' '/
 
-      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) / 
+      data opt_text(7),opt_head(7),(opt_help(j,7),j=1,6) /
      + 'flash', 'Display image in standard way',
      + 'Display the present input image. The programme uses the ',
      + 'standard display mode:- ',
@@ -14498,12 +14498,12 @@ C--
      + '    applicable end of the range',
      + '(3) Place image at centre of screen' /
 
-      data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) / 
+      data opt_text(8),opt_head(8),(opt_help(j,8),j=1,6) /
      + 'image', 'Input new image' ,
-     + 'This asks for a new image (via the keyboard), and forgets', 
+     + 'This asks for a new image (via the keyboard), and forgets',
      + 'about the present image.', ' ', ' ', ' ', ' '/
 
-      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) / 
+      data opt_text(9),opt_head(9),(opt_help(j,9),j=1,6) /
      + 'im_get_flash', 'Input new image and display (flash) it',
      + 'This asks you for a new input image (via the keyboard), and',
      + 'then displays the image with the standard display mode:- ',
@@ -14512,25 +14512,25 @@ C--
      + '    applicable end of the range',
      + '(3) Place image at centre of screen' /
 
-      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) / 
-     + 'open', 'Open the display screen', 
-     + 'Open the display screen, with a size given by keyboard entry.', 
-     + 'Do not display any image.', 
+      data opt_text(10),opt_head(10),(opt_help(j,10),j=1,6) /
+     + 'open', 'Open the display screen',
+     + 'Open the display screen, with a size given by keyboard entry.',
+     + 'Do not display any image.',
      + ' ', ' ', ' ', ' '/
 
-      data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) / 
+      data opt_text(11),opt_head(11),(opt_help(j,11),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
      + '(In keyboard option entry mode, you can get back to -panel-',
      + '  option entry mode, by choosing the -panel- option.',
      + ' ', ' ', ' '/
 
-      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) / 
+      data opt_text(12),opt_head(12),(opt_help(j,12),j=1,6) /
      + 'reset', 'Reset zoom/pan to unity and centre',
      + 'Reset zoom/pan of the image display to unity and centre.',
      + ' ', ' ', ' ', ' ', ' '/
 
-      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) / 
+      data opt_text(13),opt_head(13),(opt_help(j,13),j=1,6) /
      + 'zoom', 'Zoom and pan image by using mouse location ',
      + '-Zoom- means zoom around present position of cursor. ' ,
      + '-Pan-  means set present position of cursor to screen centre.' ,
@@ -14539,25 +14539,25 @@ C--
      + '     Left Button then Centre Button = pan'  ,
      + '     Right button once                        = exit' /
 
-      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) / 
+      data opt_text(14),opt_head(14),(opt_help(j,14),j=1,6) /
      + 'aperture', 'Functions for aperture photometry ',
      + 'New set of buttons appear. Functions then available include:-',
      + 'Cursor getting of posns to measure flux in a circle. Sky level',
      + 'can be subtracted (annulus/circle). Allowance for extinction,',
      + 'automatically getting filter and airmass from image header.',
-     + 'Exposure time can be allowed for. Different images can be', 
+     + 'Exposure time can be allowed for. Different images can be',
      + 'accessed easily. The results can be output to a file. ' /
 
-      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) / 
+      data opt_text(15),opt_head(15),(opt_help(j,15),j=1,6) /
      + 'colour', 'Functions for changing colour display of the image.',
      + 'New set of buttons appear. Functions then available include:-',
      + 'Use different ways to change -Look-Up Table- that controls the',
-     + 'colour display of image. ', 
+     + 'colour display of image. ',
      + 'A number of standard LUTs can be loaded. Also you can modify ',
      + 'the LUT being used in a number of ways. You can also store the',
      + 'LUT you have modified, and access it again.' /
 
-      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) / 
+      data opt_text(16),opt_head(16),(opt_help(j,16),j=1,6) /
      + 'inspect', 'Functions for image inspection in various ways',
      + 'New set of buttons appear. Functions then available include:-',
      + 'Selection of area, look at values. Histograms, graphical',
@@ -14566,31 +14566,31 @@ C--
      + 'display area. The output can be put onto any device, not just',
      + 'the screen.' /
 
-      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) / 
+      data opt_text(17),opt_head(17),(opt_help(j,17),j=1,6) /
      + 'fit_magns', 'Functions to get star magnitudes with Gaussians',
      + 'New set of buttons appear. Functions then available include:-',
-     + 'Use cursor to pick a star, and fit a 2-D Gaussian to it. ', 
-     + 'This finds the star magnitude and its radius. Also gets an ', 
-     + 'estimate of the sky and star height. Output results.', 
+     + 'Use cursor to pick a star, and fit a 2-D Gaussian to it. ',
+     + 'This finds the star magnitude and its radius. Also gets an ',
+     + 'estimate of the sky and star height. Output results.',
      + ' ', ' ' /
 
-      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) / 
+      data opt_text(18),opt_head(18),(opt_help(j,18),j=1,6) /
      + 'positions', 'Functions to get or plot a list of positions ',
      + 'New set of buttons appear. Functions then available include:-',
      + 'Use the cursor to mark and store a list of XY positions. ',
-     + 'Also take a list of positions from a file and plot it up. ', 
+     + 'Also take a list of positions from a file and plot it up. ',
      + ' ', ' ', ' ' /
 
-      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) / 
+      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
      + 'scrutiny', 'Functions to look at Starman MEASURE output',
      + 'New set of buttons appear. Functions then available include:-',
      + 'Lets you go through the output of using the Starman MEASURE',
-     + 'program, which gets magnitudes by exact profile fitting.', 
-     + 'This output is very complex and this can show it well:- ', 
+     + 'program, which gets magnitudes by exact profile fitting.',
+     + 'This output is very complex and this can show it well:- ',
      + 'Type it out; display fits; show how nearby stars affect each ',
      + 'other; look at how well stars fitted.' /
 
-      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) / 
+      data opt_text(20),opt_head(20),(opt_help(j,20),j=1,6) /
      + 'compress', 'Compress image in either X or Y for display' ,
      + ' ',
      + 'This asks for the X and Y compression factors (via the ',
@@ -14599,7 +14599,7 @@ C--
      + 'These must be integer factors.',
      + ' '/
 
-      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) / 
+      data opt_text(21),opt_head(21),(opt_help(j,21),j=1,6) /
      + 'alter', 'Functions for image altering in various ways',
      + 'New set of buttons appear. The present selected area is copied',
      + 'to a work area in memory, and various alterations may be done',
@@ -14668,11 +14668,11 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
@@ -14702,7 +14702,7 @@ Cbegin
       call ds_gtype ( ierr )						!Get type of display
       if ( ierr.ne.0 ) return
 
-      call ds_init ( IMTITLE, 0, ierr )					!Open display 
+      call ds_init ( IMTITLE, 0, ierr )					!Open display
       if ( ierr.ne.0 ) return
       OPDISP = .true.
 
@@ -14731,7 +14731,7 @@ C--
       integer ierra
 Cbegin
 
-    
+
       if ( GOTIMAGE ) then
          call canpar ( 'IN' )
       else
@@ -14742,7 +14742,7 @@ Cbegin
          WORK_LOAD = .false.
          call wrkcan ( 'WORKALT' )
       endif
-            
+
       call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )		!Get image
       if ( ST_FAILED ) return
       if ( ierr.ne.0 ) then
@@ -14764,7 +14764,7 @@ Cbegin
             NYS = min(NYS,NY)
             NYE = min(NYE,NY)
          endif
- 
+
          DSNXS = 1							!Display area
          DSNXE = NX
          DSNYS = 1
@@ -14781,7 +14781,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C IN_SDEF -- Set defaults on interact program 
+C IN_SDEF -- Set defaults on interact program
 C
 C    a j penny                    ral         1990 jan
 
@@ -14808,7 +14808,7 @@ Cbegin
 
       BS     = 1.0					!Image value scales
       BZ     = 0.0
-      INVAL  = INT_INVALSI 
+      INVAL  = INT_INVALSI
       RINVAL  = INT_INVALR
 
       WORK_LOAD = .false.				!Loaded image into work array?
@@ -14910,7 +14910,7 @@ Cbegin
          WORK_LOAD = .false.
          call wrkcan ( 'WORKALT' )
       endif
-            
+
       call opimgr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )		!Get image
       if ( ierr.ne.0 ) then
          ST_FAILED = .true.
@@ -14933,7 +14933,7 @@ Cbegin
       DSNYS = 1
       DSNYE = max(NY,600)
 
-      call ds_init ( IMTITLE, 1, ierr )					!Open display 
+      call ds_init ( IMTITLE, 1, ierr )					!Open display
       if ( ierr.ne.0 ) then
          call printo ( 'ERROR: Can not open that display device' )
          ST_FAILED = .true.
@@ -14944,7 +14944,7 @@ Cbegin
       DSNXE = NX							!Set back to true size
       DSNYE = NY
 
-      call ds_gtcomf ( 0 )						!Get image display size 
+      call ds_gtcomf ( 0 )						!Get image display size
 
       call ds_imgscl ( %val(IPIM), NX, NY, IMTYPE, 1, NX, 1, NY )	!Get display scale
       DSKVRANGE = 1

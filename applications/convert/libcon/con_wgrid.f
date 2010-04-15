@@ -144,7 +144,7 @@
          CALL FIO_SERR( LSTAT, STATUS )
 
          IF (STATUS .EQ. SAI__OK) THEN
-        
+
 *  Write the header lines.  First the title.
             WRITE( WRUNIT, 2000, IOSTAT=LSTAT ) TITLE
  2000       FORMAT(1X, 'Schematic map grid for ', A // )

@@ -1,4 +1,4 @@
-      SUBROUTINE FTS1_SCTAB( HEADER, PNDSCF, PNTAB, MEDIUM, MD, NCARD, 
+      SUBROUTINE FTS1_SCTAB( HEADER, PNDSCF, PNTAB, MEDIUM, MD, NCARD,
      :                       SCARD, NDIM, DIMS, LOGHDR, FD, CFN, SUBFIL,
      :                       PREFIX, AUTO, BLKSIZ, ACTSIZ, BFPNTR,
      :                       OFFSET, CURREC, RCPNTR, STATUS )
@@ -78,10 +78,10 @@
 *        The actual block size on tape or disk (a multiple of the FITS
 *        record length of 2880 bytes). It is only an input argument for
 *        %MEDIUM = 'DISK'.
-*     BFPNTR = INTEGER (Given) 
+*     BFPNTR = INTEGER (Given)
 *        Pointer to the buffer containing catalogue data, the buffer
-*        itself will be updated each time a tape block is read.  
-*        If the offset equals the block size then the existing data 
+*        itself will be updated each time a tape block is read.
+*        If the offset equals the block size then the existing data
 *        in the buffer will not be used.
 *     OFFSET = INTEGER (Given and Returned)
 *        The number of bytes in the current block already interpreted
@@ -110,12 +110,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -139,7 +139,7 @@
 *        via the NCARD argument for revised FTS1_SDSCF call.
 *     1992 December (RDS):
 *        Portability mods including: BUFFER and RECORD passed in as
-*        pointers. 
+*        pointers.
 *     1992 December 30 (MJC):
 *        Inquire the operating system in order to find the file name.
 *     1992 April 23 (MJC):
@@ -215,7 +215,7 @@
      :  NCPREF,                  ! Number of characters in file prefix
      :  NCROOT,                  ! Number of characters in file root
                                  ! name
-     :  RDISP,                   ! The displacement within the current 
+     :  RDISP,                   ! The displacement within the current
                                  ! FITS record
      :  WKPNTR( 1 )              ! Pointer to work array
 
@@ -247,7 +247,7 @@
 *    Initialise the record-displacement pointer.
 *    ===========================================
 
-*    The FITS data must start in a new record.  Now this record may 
+*    The FITS data must start in a new record.  Now this record may
 *    already be the current FITS record; in this case the record should
 *    be procesed from its start, hence a zero displacement.  The flag
 *    can be switched off as this positioning information is imparted
@@ -309,7 +309,7 @@
 
 *             First look for a right bracket for a directory.  The
 *             filename will start one character after that or from the
-*             first character. 
+*             first character.
 
                IBR = INDEX( CFN, ']' )
 
@@ -411,12 +411,12 @@
 *       length argument after the status is needed for passing the
 *       mapped character array on UNIX platforms.  It is ignored on VMS.
 
-         CALL FTS1_RSTAB( %VAL( CNF_PVAL( WKPNTR( 1 ) ) ), 
+         CALL FTS1_RSTAB( %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
      :                    MEDIUM, MD, PNTAB,
      :                    TABNAM, AUTO, DIMS( 1 ), DIMS( 2 ), BLKSIZ,
-     :                    ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                    ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ),
      :                    OFFSET, CURREC,
-     :                    %VAL( CNF_PVAL( RCPNTR ) ), STATUS, 
+     :                    %VAL( CNF_PVAL( RCPNTR ) ), STATUS,
      :                    %VAL( DIMS( 1 )+1 ) )
 
 *       Check for option not to create file.
@@ -434,7 +434,7 @@
 *          per value, a GCOUNT of 1, and PCOUNT of 0.
 
             CALL FTS1_SKIP( MEDIUM, MD, DIMS( 1 ) * DIMS( 2 ), 1, 1, 0,
-     :                      BLKSIZ, ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                      BLKSIZ, ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ),
      :                      OFFSET,
      :                      %VAL( CNF_PVAL( RCPNTR ) ), RDISP, STATUS )
 

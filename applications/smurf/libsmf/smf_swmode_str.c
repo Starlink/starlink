@@ -85,7 +85,7 @@ const char * smf_swmode_str( smf_swmode mode, int * status ) {
 
   /* Set a default value */
   const char * retval = NULL;
-  
+
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 

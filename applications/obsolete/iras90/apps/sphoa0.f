@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -154,7 +154,7 @@
 *  report a more informative error depending on whether or not the
 *  first element is a valid numerical value.
       IF( STATUS .EQ. IRA__BADSC ) THEN
-         CALL ERR_ANNUL( STATUS )      
+         CALL ERR_ANNUL( STATUS )
 
          CALL CHR_CTOR( COORDS, TEST, STATUS )
 

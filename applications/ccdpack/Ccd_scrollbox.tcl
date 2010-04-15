@@ -304,7 +304,7 @@
             if { [ info exists Scrolls($side) ] } {
                set scroll [CCDPathOf $Scrolls($side)]
                pack forget $scroll
-               
+
 #  Destroy the scrollbar and make the listbox forget about the scrollcommand.
                destroy $scroll
                $List configure -yscrollcommand {}
@@ -428,17 +428,17 @@
 
 #  Perform packing of main elements (need to do this now to get into
 #  correct places.
-         if { $havetop }    { 
-            pack [CCDPathOf $Frames(top)]         -side top    -fill x 
+         if { $havetop }    {
+            pack [CCDPathOf $Frames(top)]         -side top    -fill x
          }
-         if { $havebottom } { 
-            pack [CCDPathOf $Frames(bottom)]      -side bottom -fill x 
+         if { $havebottom } {
+            pack [CCDPathOf $Frames(bottom)]      -side bottom -fill x
          }
-         if { $haveleft }   { 
-            pack [CCDPathOf $Scrolls(left)]       -side left   -fill y 
+         if { $haveleft }   {
+            pack [CCDPathOf $Scrolls(left)]       -side left   -fill y
          }
-         if { $haveright }  { 
-            pack [CCDPathOf $Scrolls(right)]      -side right  -fill y 
+         if { $haveright }  {
+            pack [CCDPathOf $Scrolls(right)]      -side right  -fill y
          }
          pack $list -expand true -fill both
       }
@@ -569,7 +569,7 @@
       protected variable Frames
       protected variable Labelwidget
       protected variable labelwidget ""
-     
+
 
 #  End of class defintion.
    }

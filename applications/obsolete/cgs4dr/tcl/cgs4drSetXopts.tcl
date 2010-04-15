@@ -4,7 +4,7 @@ proc cgs4drSetXopts {} {
   # Check if file exists, if not copy a default
   if {[file exists $cgs4drXopts(File)] == 0} {
     exec /usr/bin/cp $env(CGS4DR_ROOT)/tcl/cgs4dr.xopts $cgs4drXopts(File)
-  } 
+  }
   # Now read the options
   set fid [open $cgs4drXopts(File) r]
   while {[gets $fid text]>=0} {

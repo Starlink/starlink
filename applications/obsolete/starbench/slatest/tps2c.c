@@ -5,7 +5,7 @@
 #include "sbmlib.h"
 #include "sbmmac.h"
 void sbmtps2c(float qfoo,float qbar,float qbaz,float Q0,
-float*qfobar,float*q1,float*q2,float*qfoobar,int*Q3){float 
+float*qfobar,float*q1,float*q2,float*qfoobar,int*Q3){float
 q4,qfOBAz,qfoobaz,QQUUX,Q5,QFRED,qdog,qcat,QFISH;q4=qfoo*
 qfoo;qfOBAz=qbar*qbar;qfoobaz=(float)sin((double)Q0);QQUUX=(
 float)cos((double)Q0);Q5=qfoobaz*(float)sqrt((double)(1.0f+

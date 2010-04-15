@@ -128,9 +128,9 @@
       LQNAME = QNAME( FIRST : LAST )
       CALL CHR_UCASE( LQNAME )
 
-*  Mark the error stack so that any errors generated within IRQ1_SEARC 
-*  will not be delivered immediately. Error reports are automatically 
-*  deferred within ADAM applications, but not within standalone 
+*  Mark the error stack so that any errors generated within IRQ1_SEARC
+*  will not be delivered immediately. Error reports are automatically
+*  deferred within ADAM applications, but not within standalone
 *  applications.
       CALL ERR_MARK
 

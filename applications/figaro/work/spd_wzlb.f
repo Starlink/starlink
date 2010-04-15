@@ -148,7 +148,7 @@
       REAL min
       REAL max
       REAL current
-      REAL threshold 
+      REAL threshold
       INTEGER rough_index_count ( 5000 )
       INTEGER temp_index_start
       INTEGER temp_index_count
@@ -158,7 +158,7 @@
 
       IGNORE = 0
 
-      DO i = 1 , wcal_ftr 
+      DO i = 1 , wcal_ftr
          ftr_list ( i ) = src_ftr_list ( i )
       END DO
 
@@ -174,11 +174,11 @@
 
 *%         Loop through the feature list (expects increasing values)
 *          In the following the 'current' shall be the entry in the list
-*          array pointed to by the index checked by this loop , namely 
-*              
+*          array pointed to by the index checked by this loop , namely
+*
 *                ftr_list ( i )
 * 1 >>>>>>>
-           DO WHILE ( i+db_scope .LT. wcal_ftr ) 
+           DO WHILE ( i+db_scope .LT. wcal_ftr )
 
 *%           Loop thru lower neighbours (up to db_scope of them)
 * 2 >>>>>>>>>
@@ -189,32 +189,32 @@
                 DO right_side_ftr = 1 , db_scope
 
 *%                 Calculate difference between 'current' and a pair of neighbours
-                   distance_l = ftr_list ( i ) - 
+                   distance_l = ftr_list ( i ) -
      :                              ftr_list ( i-left_side_ftr )
                    distance_r = ftr_list ( i+right_side_ftr ) -
      :                              ftr_list ( i )
 
 *%                 Calculate the ratio of the two differences
-                   ftr_db ( left_side_ftr , right_side_ftr , i )  = 
+                   ftr_db ( left_side_ftr , right_side_ftr , i )  =
      :                                        distance_l / distance_r
 
 *%                 Update min/max detectors if this ratio is min/max so far
-                   IF ( ftr_db ( left_side_ftr , right_side_ftr , i ) 
+                   IF ( ftr_db ( left_side_ftr , right_side_ftr , i )
      :                  .GT.  max  )
-     :                       max =  ftr_db ( left_side_ftr , 
-     :                                       right_side_ftr , i ) 
+     :                       max =  ftr_db ( left_side_ftr ,
+     :                                       right_side_ftr , i )
 
-                   IF ( ftr_db ( left_side_ftr , right_side_ftr , i ) 
-     :                        .LT. min )  
-     :                       min =  ftr_db ( left_side_ftr , 
-     :                                       right_side_ftr , i ) 
+                   IF ( ftr_db ( left_side_ftr , right_side_ftr , i )
+     :                        .LT. min )
+     :                       min =  ftr_db ( left_side_ftr ,
+     :                                       right_side_ftr , i )
 
 *%                 Setup the three array entries that describe this 'feature'
 *%                      ie. Current + 2 neighbours
                    index_count = index_count + 1
                    ftr_db_index_l ( index_count ) = left_side_ftr
                    ftr_db_index_r ( index_count ) = right_side_ftr
-                   ftr_db_index_wave ( index_count ) = i 
+                   ftr_db_index_wave ( index_count ) = i
 
 *%              End loop
                 END DO
@@ -236,11 +236,11 @@
      :        ' Composing db lookup index', IGNORE )
 
 *          The 'indicies' is the logarithmic range of the calculated ratios
-           indicies = ( LOG10 ( max ) - LOG10 ( min ) ) 
+           indicies = ( LOG10 ( max ) - LOG10 ( min ) )
 
 *          The 'threshold' is calculated by first scaling the size of the
 *          database , and then evaluating the corresponding antilog
-           threshold = 10.0 ** ( indicies / SQRT ( 
+           threshold = 10.0 ** ( indicies / SQRT (
      :              FLOAT ( db_scope * db_scope *
      :                                          wcal_ftr ) ) )
 
@@ -250,7 +250,7 @@
            quick_index_count = 1
 
 *%         Calculate value which must be reached before we start a new lookup
-*%                  index 
+*%                  index
             current = min * threshold
 
 *%          Loop until lookup index slot starts above the maximum ratio found
@@ -274,7 +274,7 @@
      :        ' Rough indexing phase started', IGNORE )
            temp_index_count = 1
 
-*%         Loop through the lookup index 
+*%         Loop through the lookup index
             DO ii = 1 , quick_index_count
 
 *%             Report progress so far
@@ -295,8 +295,8 @@
 
 *%                   If current ratio exceeds limit for current lookup index slot then
                      IF ( ftr_db ( ftr_db_index_l ( i ) ,
-     :                    ftr_db_index_r ( i ) , 
-     :                    ftr_db_index_wave ( i ) ) 
+     :                    ftr_db_index_r ( i ) ,
+     :                    ftr_db_index_wave ( i ) )
      :                        .GT. ftr_db_quick_value ( ii ) ) THEN
 
 *%                      Ignore entry for the time being
@@ -306,19 +306,19 @@
 *%                      Copy details of feature into roughly sorted versions
                      ELSE
                         ftr_db_temp_l ( temp_index_count ) =
-     :                              ftr_db_index_l ( i ) 
+     :                              ftr_db_index_l ( i )
                         ftr_db_temp_r ( temp_index_count ) =
-     :                              ftr_db_index_r ( i ) 
+     :                              ftr_db_index_r ( i )
                         ftr_db_temp_wave ( temp_index_count ) =
-     :                              ftr_db_index_wave ( i ) 
+     :                              ftr_db_index_wave ( i )
 
 *%                      Update rough index size , flag feature as processed
-                        rough_index_count ( ii )  = 
+                        rough_index_count ( ii )  =
      :                                 rough_index_count ( ii )  + 1
                         ftr_db_index_l ( i ) = -1
                         temp_index_count = temp_index_count + 1
 
-*%                   Endif   
+*%                   Endif
                      ENDIF
 
 *%                Endif
@@ -331,7 +331,7 @@
             END DO
 
 *          Build a finely sorted/indexed version of the database
-*          This is done by taking each roughly sorted section in turn 
+*          This is done by taking each roughly sorted section in turn
 *          and using a SHELL SORT to sort it completely
            IF ( INFO ) THEN
               CALL MSG_OUT( 'FDB_REPORT',
@@ -376,7 +376,7 @@
                        index_r_temp = ftr_db_temp_r ( i )
                        index_wave_temp = ftr_db_temp_wave ( i )
                        ftr_db_temp_l ( i ) = ftr_db_temp_l ( i-1 )
-                       ftr_db_temp_r ( i ) = ftr_db_temp_r ( i-1 )  
+                       ftr_db_temp_r ( i ) = ftr_db_temp_r ( i-1 )
                        ftr_db_temp_wave ( i ) = ftr_db_temp_wave ( i-1 )
                        ftr_db_temp_l ( i-1 ) = index_l_temp
                        ftr_db_temp_r ( i-1 ) = index_r_temp
@@ -403,7 +403,7 @@
               ftr_db_index_wave ( i ) = ftr_db_temp_wave ( i )
            END DO
 
-        ELSE 
+        ELSE
 
            IF ( INFO ) CALL MSG_OUT( 'FDB_REPORT',
      :        ' Cannot create feature database file', IGNORE )
@@ -413,7 +413,7 @@
 *
  1001 FORMAT ( 1X , 'Building lookup index ' , I4 , ' (of ' , I4 , ')')
  1002 FORMAT ( 1X , 'Number of sections to be sorted is ' , I4 )
- 1003 FORMAT ( 1X , 'Sorting lookup index ' , I4 , ' (of ' , 
+ 1003 FORMAT ( 1X , 'Sorting lookup index ' , I4 , ' (of ' ,
      :              I4 , ')  with ' , I4 , ' members'  )
 
       END

@@ -1,11 +1,11 @@
-      SUBROUTINE COF_FTWCS( FUNIT, INDF, NENCOD, ENCODS, FILE, WCSATT, 
+      SUBROUTINE COF_FTWCS( FUNIT, INDF, NENCOD, ENCODS, FILE, WCSATT,
      :                      STATUS )
 *+
 *  Name:
 *     COF_FTWCS
 
 *  Purpose:
-*     Uses coordinate system information in the FITS headers of the current 
+*     Uses coordinate system information in the FITS headers of the current
 *     header and data unit to create WCS and AXIS components in an NDF.
 
 *  Language:
@@ -15,13 +15,13 @@
 *     CALL COF_FTWCS( FUNIT, INDF, NENCOD, ENCODS, FILE, WCSATT, STATUS )
 
 *  Description:
-*     This constructs an AST FrameSet from the FITS headers of the current 
+*     This constructs an AST FrameSet from the FITS headers of the current
 *     header and data unit and adds it into the existing WCS information in
 *     the supplied NDF. It can also create AXIS structures (see below).
 *
 *     The information needed to create the FrameSet can be stored several
 *     times in a single FITS header, using different keywords each time.
-*     Each of these descriptions is known as an "encoding" and AST supports 
+*     Each of these descriptions is known as an "encoding" and AST supports
 *     several different encoding schemes (i.e. FITS-WCS, DSS, NATIVE).
 *     If the supplied FITS header contains more than one encoding then we
 *     need to choose which one to use. This decision is important because
@@ -33,18 +33,18 @@
 *     which exists in the FITS header gets used. If the user does not
 *     know which encoding to use, then we can make an intelligent guess by
 *     comparing the encodings to see which ones are consistent and which
-*     ones are not. 
+*     ones are not.
 *
-*     In addition to the WCS component, this routine also creates AXIS 
-*     Centre, Label and Units components in the NDF, but only if they do 
-*     not already exist, and if the FrameSet read from the FITS header 
-*     contains an AXIS Frame. NDF2FITS does not write out the AXIS Frame 
-*     if it is equivalent to pixel coordinates, and so no AXIS structures 
-*     will be created by this routine in this case. Also, if the AXIS Frame 
-*     represents linear axis coordinates, then there will already be AXIS 
-*     structures in the NDF (created earlier within FITS2NDF), and so again 
-*     no AXIS  structures will be created by this routine. Thus, this routine 
-*     will only create AXIS structures in the cases where the axis coordinates 
+*     In addition to the WCS component, this routine also creates AXIS
+*     Centre, Label and Units components in the NDF, but only if they do
+*     not already exist, and if the FrameSet read from the FITS header
+*     contains an AXIS Frame. NDF2FITS does not write out the AXIS Frame
+*     if it is equivalent to pixel coordinates, and so no AXIS structures
+*     will be created by this routine in this case. Also, if the AXIS Frame
+*     represents linear axis coordinates, then there will already be AXIS
+*     structures in the NDF (created earlier within FITS2NDF), and so again
+*     no AXIS  structures will be created by this routine. Thus, this routine
+*     will only create AXIS structures in the cases where the axis coordinates
 *     are non-linear.
 
 *  Arguments:
@@ -110,7 +110,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,7 +153,7 @@
 *  Begin as AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Create an AST FitsChan. This is an object which acts as a buffer to 
+*  Create an AST FitsChan. This is an object which acts as a buffer to
 *  hold a set of FITS header cards to be used by other AST routines.
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, WCSATT, STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -178,7 +178,7 @@
       DO IHEAD = 1, NHEAD
 
 *  Obtain the header. If an error occurred getting the header, flush
-*  the FITSIO error stack, increment the number of bad headers, but 
+*  the FITSIO error stack, increment the number of bad headers, but
 *  carry on to process any remaining headers.
          HEADER = ' '
          CALL FTGREC( FUNIT, IHEAD, HEADER, FSTAT )
@@ -190,7 +190,7 @@
 *  Add this header into the FitsChan. If an error occurs, annul the
 *  error, increment the number of bad headers, and continue to process any
 *  remaining headers.
-         ELSE 
+         ELSE
             CALL AST_PUTFITS( FC, HEADER, 1, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -206,7 +206,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NBAD', NBAD )
          CALL ERR_REP( 'COF_FTWCS_WARN', 'WARNING: ^NBAD FITS header '//
-     :                 'cards could not be read and were not used.', 
+     :                 'cards could not be read and were not used.',
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
          CALL ERR_RLSE
@@ -234,7 +234,7 @@
 *  information cannot be imported. So if an error occurred, flush it.
          CALL ERR_FLUSH( STATUS )
       END IF
-      
+
 *  End the AST context.
       CALL AST_END( STATUS )
 

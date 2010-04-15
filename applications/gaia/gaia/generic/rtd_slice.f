@@ -54,7 +54,7 @@
 
 *  Notes:
 *     - This routine is designed to be called from GAIA, and is not
-*       intended for use in other ways. 
+*       intended for use in other ways.
 *
 *     - Any bad pixels are just ignored.
 
@@ -166,7 +166,7 @@
 *  Each image type is dealt with separately.
             IF ( TYPE .EQ. '_BYTE' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPB( X, Y, NX, NY, 
+                  CALL RTD1_ETERPB( X, Y, NX, NY,
      :                              %VAL( CNF_PVAL( IPIN ) ), I,
      :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
@@ -174,7 +174,7 @@
                END DO
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPUB( X, Y, NX, NY, 
+                  CALL RTD1_ETERPUB( X, Y, NX, NY,
      :                               %VAL( CNF_PVAL( IPIN ) ), I,
      :                               SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
@@ -182,7 +182,7 @@
                END DO
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPW( X, Y, NX, NY, 
+                  CALL RTD1_ETERPW( X, Y, NX, NY,
      :                              %VAL( CNF_PVAL( IPIN ) ), I,
      :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
@@ -190,7 +190,7 @@
                END DO
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPUW( X, Y, NX, NY, 
+                  CALL RTD1_ETERPUW( X, Y, NX, NY,
      :                               %VAL( CNF_PVAL( IPIN ) ), I,
      :                               SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
@@ -198,7 +198,7 @@
                END DO
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPI( X, Y, NX, NY, 
+                  CALL RTD1_ETERPI( X, Y, NX, NY,
      :                              %VAL( CNF_PVAL( IPIN ) ), I,
      :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
@@ -206,7 +206,7 @@
                END DO
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPR( X, Y, NX, NY, 
+                  CALL RTD1_ETERPR( X, Y, NX, NY,
      :                              %VAL( CNF_PVAL( IPIN ) ), I,
      :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
@@ -214,7 +214,7 @@
                END DO
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPD( X, Y, NX, NY, 
+                  CALL RTD1_ETERPD( X, Y, NX, NY,
      :                              %VAL( CNF_PVAL( IPIN ) ), I,
      :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX

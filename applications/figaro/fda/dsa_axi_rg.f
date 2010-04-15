@@ -233,7 +233,7 @@
       LAST  = DSA2_ELEMF( %VAL( CNF_PVAL(ADDRESS) ), NELM )
       REVERSE = FIRST .GT. LAST
       IF ( NDIM .GT. 1 .AND. .NOT. SIMPLE ) THEN
-         CALL DSA2_RANGEF( .FALSE., %VAL( CNF_PVAL(ADDRESS) ), 1, 
+         CALL DSA2_RANGEF( .FALSE., %VAL( CNF_PVAL(ADDRESS) ), 1,
      :                     ELEMENTS, VMAX, VMIN )
       ELSE
          VMIN = MIN(FIRST,LAST)

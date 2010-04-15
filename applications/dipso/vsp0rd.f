@@ -37,7 +37,7 @@
        INTEGER ASIZE1, NPOINT, MAXBRK, NBREAK
        INTEGER IUNIT
        INTEGER BREAK(MAXBRK)
- 
+
        REAL WAVE(ASIZE1), FLUX(ASIZE1), WORV
        CHARACTER*(*) TITLE
        LOGICAL SUBCHK, LJACK
@@ -49,7 +49,7 @@
 *
        SUBCHK = .TRUE.
        WORV = 1.0
- 
+
 !!!       READ (IUNIT,IOSTAT=IX) TITLE(1:79)
        CALL READVMSREC(sys,'CHAR',vmsrec,title,vmssiz,ix)
 
@@ -83,7 +83,7 @@
        IF (NPOINT.GE.ASIZE1) THEN
           NPOINT = ASIZE1 - 1
           WRITE (*,
-     :    '(''   SP0RD:  too many points, only'',I5,'' read in'')') 
+     :    '(''   SP0RD:  too many points, only'',I5,'' read in'')')
      :    NPOINT
        ENDIF
 !!!       READ (IUNIT,ERR=200) (WAVE(I),FLUX(I),I=1,NPOINT)
@@ -135,7 +135,7 @@
 *
 !!!       CLOSE (IUNIT)
        CALL READVMSREC(sys,'CLOSE',vmsrec,title,vmssiz,ix)
- 
+
        GOTO 300
   200  CONTINUE
        WRITE (*,'(''   SP0RD:  error reading from file'')')

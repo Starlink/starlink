@@ -17,7 +17,7 @@
 *  Description:
 *     Matches NDF bounds and data types for a given component of a
 *     group of NDFs, and maps the required components.  The NDF
-*     identifiers and the pointers to the mapped data, as well as 
+*     identifiers and the pointers to the mapped data, as well as
 *     an identifier for a newly created output NDF propagated from
 *     one of the input ones, are returned.
 
@@ -30,8 +30,8 @@
 *        The component of the NDFs which is to be interrogated.  May
 *        be Data, Variance, Error or Quality.
 *     STRIM = CHARACTER * ( * ) (Given)
-*        Whether the common region should be the union ('PAD') or 
-*        intersection ('TRIM') of the input NDFs.  As presented to 
+*        Whether the common region should be the union ('PAD') or
+*        intersection ('TRIM') of the input NDFs.  As presented to
 *        NDF_MBNDN.
 *     OPARAM = CHARACTER * ( * ) (Given)
 *        The name of an ADAM parameter via which to retrieve the name
@@ -128,10 +128,10 @@
 *  Find its dimensionality.
          CALL NDF_DIM( INDFS( I ), NDF__MXDIM, DIM, NDIM, STATUS )
 
-*  Check that this has the same dimensionality as the first one in the 
+*  Check that this has the same dimensionality as the first one in the
 *  list, and bail out if not.
          IF ( I .EQ. 1 ) THEN
-            NDIM0 = NDIM 
+            NDIM0 = NDIM
          ELSE
             IF ( NDIM .NE. NDIM0 ) THEN
                CALL GRP_GET( IGRP, 1, 1, NAME, STATUS )

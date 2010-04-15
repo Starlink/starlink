@@ -7,7 +7,7 @@
 *     IRM_CFF2R
 
 *  Purpose:
-*     Rejects iteratively defects in a substantially smooth 2-d array. 
+*     Rejects iteratively defects in a substantially smooth 2-d array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -37,7 +37,7 @@
 *     NY = INTEGER (Given)
 *        Second dimension of the image to be cleaned.
 *     INARR( NX * NY ) = REAL (Given)
-*        The input array containing the image from which the pixels 
+*        The input array containing the image from which the pixels
 *        with large deviation will be rejected.
 *     VAR = LOGICAL (Given)
 *        The state of the variance component of the input NDF.  If the
@@ -77,7 +77,7 @@
 *        pixels in the smoothing box should be supplied.
 *     CINARR( NX * NY ) = REAL (Given)
 *        Work array for containing the latest cleaned iteration,
-*        initially the input array to be supplied to the local-mean 
+*        initially the input array to be supplied to the local-mean
 *        routine.  Thus on exit it contains the cleaned image before the
 *        last iteration.
 *     OUTARR( NX * NY ) = REAL (Returned)
@@ -85,7 +85,7 @@
 *     OUTVAR( NVAR ) = REAL (Returned)
 *        The variance of the output array.
 *     NGOOD = INTEGER (Returned)
-*        The valid pixels in the output array. If input array has no 
+*        The valid pixels in the output array. If input array has no
 *        valid pixel at all, it will be set to -1.
 *     SIGMA = DOUBLE PRECISION (Returned)
 *        The estimate of the RMS noise per pixel in the output image.
@@ -118,7 +118,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing.
 
@@ -155,7 +155,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER NDIM               ! Max. dimension of image the routine 
+      INTEGER NDIM               ! Max. dimension of image the routine
                                  ! can handle.
       PARAMETER ( NDIM = 2 )
       REAL Q0                    ! Minimum variance of a pixel can take.
@@ -222,11 +222,11 @@
          END IF
          CINARR( I ) = INARR( I )
    10 CONTINUE
-      
+
 *  If interaction level is high, report the number of valid pixels.
       IF ( ILEVEL .GE. 2 ) THEN
          CALL MSG_SETI( 'NSTART', NSTART )
-         CALL MSG_OUTIF( MSG__NORM, 'IRM_CFF2R_MSG1', 
+         CALL MSG_OUTIF( MSG__NORM, 'IRM_CFF2R_MSG1',
      :     '  Input image initially has ^NSTART valid pixels.', STATUS )
       END IF
 
@@ -234,7 +234,7 @@
       IF ( NSTART .EQ. 0 ) THEN
          NGOOD = -1
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'IRM_CFF2R_ERR1', 
+         CALL ERR_REP( 'IRM_CFF2R_ERR1',
      :       'IRM_CFF2R: There are no valid pixels in the input image.',
      :                  STATUS )
          GOTO 999
@@ -257,7 +257,7 @@
             NGOOD = 0
             DO 30 I = 1, NEL
 
-*  Use only those pixels valid in both image.      
+*  Use only those pixels valid in both image.
                IF ( INARR( I ) .NE. VAL__BADR .AND.
      :              OUTARR( I ) .NE. VAL__BADR ) THEN
                   IF ( INARR( I ) .GE. RANGE( 1 ) .AND.
@@ -332,7 +332,7 @@
                         NGOOD = NGOOD + 1
                      ELSE
 
-*  Set those pixels invalid which deviating from its local-mean by more 
+*  Set those pixels invalid which deviating from its local-mean by more
 *  that the threshold.
                         OUTARR( I ) = VAL__BADR
                      END IF
@@ -345,14 +345,14 @@
                      NEXCL = NEXCL + 1
                   END IF
                ELSE
-      
+
 *  Propagate invalid pixels of the input array of this iteration to
 *  result array.
                   OUTARR( I ) = VAL__BADR
-               END IF            
+               END IF
             END IF
   40     CONTINUE
-      
+
 *  Evaluate the variance estimation of the result array.
          IF ( NGOOD .GE. 1 ) THEN
             VARNCE = MAX( SIG / NUM_ITOR( NGOOD ), Q0 )
@@ -369,7 +369,7 @@
             CALL MSG_SETR( 'SIGMA', NUM_DTOR( SIGMA ) )
             CALL MSG_SETI( 'VALID', NGOOD + NEXCL )
             CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUTIF( MSG__NORM, 'IRM_CFF2R_MSG2', 
+            CALL MSG_OUTIF( MSG__NORM, 'IRM_CFF2R_MSG2',
      :        '  Iteration ^ITER has ^VALID valid pixels left and '/
      :        /'SIGMA = ^SIGMA.', STATUS )
          END IF
@@ -420,5 +420,5 @@
   999 CONTINUE
 
 *  End the routine.
-      
+
       END

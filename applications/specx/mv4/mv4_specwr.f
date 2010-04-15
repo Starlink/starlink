@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
 *     Copy the data from the (I,J)-th row of the cube.
 *     Includes conversion between HDS and Specx bad values.
          IF ( STATUS .EQ. SAI__OK )
-     :      CALL MV4_SPECW2( I, J, MEMCUB, %VAL(CNF_PVAL(POSPTR)), 
+     :      CALL MV4_SPECW2( I, J, MEMCUB, %VAL(CNF_PVAL(POSPTR)),
      :        INDEX(I, J))
 
 

@@ -1,6 +1,6 @@
       SUBROUTINE
      : CHI_APPLY( CVALS, DVALS, IVALS, LVALS, RVALS, NUMFLDS,
-     :            CVALUE, DVALUE, IVALUE, LVALUE, RVALUE, RESTYPE, 
+     :            CVALUE, DVALUE, IVALUE, LVALUE, RVALUE, RESTYPE,
      :            STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL CHI_APPLY( CVALS, DVALS, IVALS, LVALS, RVALS, NUMFLDS,
-*               CVALUE, DVALUE, IVALUE, LVALUE, RVALUE, RESTYPE, 
+*               CVALUE, DVALUE, IVALUE, LVALUE, RVALUE, RESTYPE,
 *               STATUS )
 
 *  Description:
@@ -24,17 +24,17 @@
 *     the parser on you behalf. CHI_1PAR and CHI_2PAR give you direct access
 *     to the parser when 1 or 2 catalogues are involved and must be called
 *     before CHI_APPLY can be called. This routine applies the expression to
-*     a set of data. Data must be of the correct type and supplied in the 
-*     correct position as defined by CHI_1PAR or CHI_2PAR. CHI_1PAR and 
-*     CHI_2PAR return the 
+*     a set of data. Data must be of the correct type and supplied in the
+*     correct position as defined by CHI_1PAR or CHI_2PAR. CHI_1PAR and
+*     CHI_2PAR return the
 *     fieldnames and the fieldtypes which specify how the data is expected
 *     for CHI_APPLY. If the FNAMES(1) is STARNAME and FTYPE(1) is character
-*     then CHARVALS(1) must contain the the value of the STARNAME field as 
-*     given in the next entry in the catalogue. If the FNAMES(3) is VALUE1 
-*     and FTYPE(3) is real then REALVALS(3) must contain the the value of the 
-*     VALUE1 field as given in the next entry in the catalogue. 
-*     For ease of use the CHI_1PAR routine expects values in the same form 
-*     CHI_GETVALALL returns so a CHI_1PAR followed by a sequence of 
+*     then CHARVALS(1) must contain the the value of the STARNAME field as
+*     given in the next entry in the catalogue. If the FNAMES(3) is VALUE1
+*     and FTYPE(3) is real then REALVALS(3) must contain the the value of the
+*     VALUE1 field as given in the next entry in the catalogue.
+*     For ease of use the CHI_1PAR routine expects values in the same form
+*     CHI_GETVALALL returns so a CHI_1PAR followed by a sequence of
 *     CHI_GETVALALL and CHI_APPLY will produce the correct result.
 
 
@@ -82,7 +82,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -129,7 +129,7 @@
 *
 *   Copy the given data into the work area
 *
-      do k = 1, numflds 
+      do k = 1, numflds
         charvals(k) = cvals(k)
         doubvals(k) = dvals(k)
         intvals(k) = ivals(k)
@@ -137,7 +137,7 @@
         realvals(k) = rvals(k)
       enddo
 *
-*   Evaluate the expression via its relational sub-expressions 
+*   Evaluate the expression via its relational sub-expressions
 *   Assume the data is in the common area.
 *
       wptr= 0

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
-*                          int *status ) 
+*                          int *status )
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
@@ -50,8 +50,8 @@
 *     plane UP and zenith NORTH) is used to calculate the new long
 *     axis-zenith angle.
 
-*  Notes: 
-*     - There is a lot of duplicated code between this routine 
+*  Notes:
+*     - There is a lot of duplicated code between this routine
 *       and smf_correct_extinction as they both work in the AzEl
 *       coordinate system
 *     - See also smf_subtract_plane2.c
@@ -99,7 +99,7 @@
 *        Remove astSet calls that are not needed.
 *     2009-07-23 (TIMJ):
 *        Use msgFlevok rather than msgIflev
-*     {enter_further_changes_here} 
+*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -153,7 +153,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_plane1"
 
-void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky, 
+void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
 			  int *status ) {
 
   /* Local variables */
@@ -212,7 +212,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
      doing it again. */
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
-    msgOutif(MSG__VERB," ", 
+    msgOutif(MSG__VERB," ",
              "^F has already been run on these data, returning to caller", status);
     return;
   }
@@ -261,7 +261,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
 
   /* Assign pointer to input data array */
   /* of course, check status on return... */
-  indata = (data->pntr)[0]; 
+  indata = (data->pntr)[0];
   npts = (data->dims)[0] * (data->dims)[1];
 
   /* It is more efficient to call astTran2 with all the points
@@ -325,7 +325,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       } else {
         if ( *status == SAI__OK ) {
           *status = SAI__ERROR;
-          errRep( FUNC_NAME, "Plane removal method requires WCS but input is NULL", 
+          errRep( FUNC_NAME, "Plane removal method requires WCS but input is NULL",
                   status);
         }
       }
@@ -369,11 +369,11 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
         ynew[i] = (xin[i] - 0.5) * cosalpha - (yin[i] - 0.5) * sinalpha;
       }
     } else {
-      smf_tslice_ast( data, k, 0, status ); 
+      smf_tslice_ast( data, k, 0, status );
     }
 
     /* Offset into current data array */
-    base = npts * k; 
+    base = npts * k;
     /* Check fit type */
     if ( fitmean ) {
       /* Calculate average of all pixels in current timeslice */
@@ -452,21 +452,21 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
     if (msgFlevok( MSG__DEBUG, status )) {
       msgSeti("K",k+1);
       msgSetc("F",fittype);
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                " Fit results for timeslice ^K (fit type = ^F)", status );
       msgSetd("DS",sky0);
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                "              Sky0   = ^DS, ", status );
       msgSetd("DE",dskyel);
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                "              Dskyel = ^DE, ", status );
       msgSetd("DA",dskyaz);
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                "              Dskyaz = ^DA", status );
       msgSetd("X",chisq);
-      msgOutif(MSG__DEBUG," ", 
+      msgOutif(MSG__DEBUG," ",
                "              X^2 = ^X", status );
-    } 
+    }
 
   } /* End of loop over timeslice frame */
 
@@ -482,7 +482,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, status);
   } else {
-    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
+    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.",
            status);
   }
 

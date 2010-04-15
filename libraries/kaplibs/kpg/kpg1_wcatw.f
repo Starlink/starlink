@@ -13,11 +13,11 @@
 *     RESULT = KPG1_WCATW( IAST, CI, STATUS )
 
 *  Description:
-*     This routine stores a textual representation of the supplied AST Object 
-*     within the supplied catalogue. The information is stored within COMMENT 
-*     strings which are appended to the supplied catalogue's textual 
-*     information. Lines of AST information which are too long to fit in a 
-*     single COMMENT are split into several lines. Continuation lines are 
+*     This routine stores a textual representation of the supplied AST Object
+*     within the supplied catalogue. The information is stored within COMMENT
+*     strings which are appended to the supplied catalogue's textual
+*     information. Lines of AST information which are too long to fit in a
+*     single COMMENT are split into several lines. Continuation lines are
 *     marked by having a "+" in the first column. Each line of AST
 *     information is preceeded with the string "!!", which is used to
 *     mark the end of any leading blanks etc added by AST when the string is
@@ -31,9 +31,9 @@
 
 *  Arguments:
 *     IAST = INTEGER (Given)
-*        An AST pointer to the Object. 
+*        An AST pointer to the Object.
 *     CI = INTEGER (Given)
-*        A CAT identifier for the catalogue. 
+*        A CAT identifier for the catalogue.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     26-JAN-1998 (DSB):
 *        Original version.
 *     26-MAY-1999 (DSB):
-*        Safety margin of 2 characters removed from ASTTSZ to avoid CAT 
+*        Safety margin of 2 characters removed from ASTTSZ to avoid CAT
 *        splitting lines itself, resulting in lines which do not start
 *        with "!!".
 *     6-APR-2001 (DSB):
@@ -82,15 +82,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT constants (needed by KPG_AST)
-      INCLUDE 'CAT_PAR'          ! CAT constants 
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'CAT_PAR'          ! CAT constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Global Variables:
@@ -140,7 +140,7 @@
       CALL GRP_NEW( 'CAT textual information', ASTGRP, STATUS )
 
 *  Create an AST_ Channel to write the supplied data to the catalogue.
-*  Supply the KPG1_SNKTA routine as the "sink" routine for storing the 
+*  Supply the KPG1_SNKTA routine as the "sink" routine for storing the
 *  data, and specify that only essential information be included. The
 *  source for KPG1_SNKTA is appended to this file.
       CHAN = AST_CHANNEL( AST_NULL, KPG1_SNKTA, 'Full=-1,Comment=0',
@@ -152,7 +152,7 @@
       CALL CAT_SZTXT( CI, 'WRITE', ASTTSZ, STATUS )
       ASTTSZ = MIN( ASTTSZ, GRP__SZNAM )
 
-*  Reduce it by 4 to leave room for the "!!" string used to mark the 
+*  Reduce it by 4 to leave room for the "!!" string used to mark the
 *  start of the AST information, plus an extra safety margin
       ASTTSZ = ASTTSZ - 4
 
@@ -171,13 +171,13 @@
 *  the catalogue.
 *  ===================================================================
 
-*  Loop round each element in the group.   
+*  Loop round each element in the group.
       CALL GRP_GRPSZ( ASTGRP, SIZE, STATUS )
       DO I = 1, SIZE
 
-*  Get the next element from the group. Add the string "!!" to the start. 
-*  This allows KPG1_RCATW (which reads these lines) to identify the start 
-*  of the AST information. This is needed since CAT can add leading spaces, 
+*  Get the next element from the group. Add the string "!!" to the start.
+*  This allows KPG1_RCATW (which reads these lines) to identify the start
+*  of the AST information. This is needed since CAT can add leading spaces,
 *  which are significant to KPG1_RCATW.
          TEXT = '!!'
          CALL GRP_GET( ASTGRP, I, 1, TEXT( 3: ), STATUS )
@@ -186,7 +186,7 @@
 *  the string "!!" to the start. This allows KPG1_RCATW (which reads these
 *  lines) to identify the start of the AST information. This is needed
 *  since CAT can add leading spaces, which are significant to KPG1_RCATW.
-         CALL CAT_PUTXT( CI, 'COMMENT', TEXT( : CHR_LEN( TEXT ) ), 
+         CALL CAT_PUTXT( CI, 'COMMENT', TEXT( : CHR_LEN( TEXT ) ),
      :                   STATUS )
 
       END DO

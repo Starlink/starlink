@@ -1,6 +1,6 @@
- 
+
       SUBROUTINE PERIOD_LOG(LOGFILE, LOG, LOGUNIT, EXIST)
- 
+
 C=============================================================================
 C Routine to open and close a log file for PERIOD.
 C
@@ -9,19 +9,19 @@ C
 C Added EXIST to parameter list - GJP March 1997
 C
 C=============================================================================
- 
+
       IMPLICIT NONE
- 
+
 C-----------------------------------------------------------------------------
 C PERIOD_LOG declarations.
 C-----------------------------------------------------------------------------
- 
+
       INTEGER LOGUNIT, I, NUMENT
       LOGICAL LOG, EXIST
       CHARACTER*72 LOGFILE, JUNK
       CHARACTER*1 REPLY
       DATA NUMENT/1000000/
- 
+
       IF ( LOG ) THEN
 
          IF ( EXIST ) THEN
@@ -48,9 +48,9 @@ C-----------------------------------------------------------------------------
  50            CONTINUE
  60            CONTINUE
                WRITE (*, *) ' '
-               WRITE (*, *) '** OK: Opened old log file = ', 
+               WRITE (*, *) '** OK: Opened old log file = ',
      :                      LOGFILE(1:43)
-               WRITE (*, *) '** OK: Number of lines skipped over = ', 
+               WRITE (*, *) '** OK: Number of lines skipped over = ',
      :                      I - 1
                WRITE (*, *) ' '
 
@@ -59,7 +59,7 @@ C-----------------------------------------------------------------------------
                OPEN (UNIT=LOGUNIT, FILE=LOGFILE, STATUS='NEW', ERR=20)
                EXIST = .TRUE.
                WRITE (*, *) ' '
-               WRITE (*, *) '** OK: Opened new log file = ', 
+               WRITE (*, *) '** OK: Opened new log file = ',
      :                      LOGFILE(1:43)
                WRITE (*, *) ' '
 
@@ -71,7 +71,7 @@ C-----------------------------------------------------------------------------
 
          CLOSE (UNIT=LOGUNIT)
          WRITE (*, *) ' '
-         WRITE (*, *) '** OK: Log file has been closed = ', 
+         WRITE (*, *) '** OK: Log file has been closed = ',
      :                LOGFILE(1:39)
          EXIST = .FALSE.
 
@@ -82,7 +82,7 @@ C-----------------------------------------------------------------------------
          GO TO 100
 
       END IF
-      
+
  100  CONTINUE
       RETURN
       END

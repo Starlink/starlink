@@ -1,4 +1,4 @@
-      SUBROUTINE SURFLIB_CALC_GRIDIJ (TYPE, NX, NY, ICEN, JCEN, 
+      SUBROUTINE SURFLIB_CALC_GRIDIJ (TYPE, NX, NY, ICEN, JCEN,
      :     I, J, STATUS)
 *+
 *  Name:
@@ -9,12 +9,12 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURFLIB_CALC_GRIDIJ( TYPE, NX, NY, ICEN, JCEN, I, J, STATUS)
 
 *  Description:
-*     Calculates the I,J grid positions related to pixel numbers 
+*     Calculates the I,J grid positions related to pixel numbers
 *     1 to NX*NY.
 *     Must calculate all positions in one go since it is very inefficient
 *     to calculate the spiral positions on demand
@@ -74,7 +74,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
@@ -117,9 +117,9 @@
 
 *     Just a simple strip through x at each y
 
-         DO POS = 1, NX * NY 
-      
-            J(POS) = INT((POS - 1) / NX) + 1 
+         DO POS = 1, NX * NY
+
+            J(POS) = INT((POS - 1) / NX) + 1
             I(POS) = POS - ((J(POS)-1) * NX)
 
          END DO
@@ -127,10 +127,10 @@
       ELSE IF (TYPE .EQ. 'YLINEAR') THEN
 
 *     Just a simple strip through y at each x
-      
+
          DO POS = 1, NX * NY
 
-            I(POS) = INT((POS - 1) / NY) + 1 
+            I(POS) = INT((POS - 1) / NY) + 1
             J(POS) = POS - ((I(POS)-1) * NY)
 
          END DO
@@ -139,7 +139,7 @@
 
 *     Start at the reference pixels and spiral out
 *     Must take care of going over the edge.
-*     Can't think of any trick for doing this without going 
+*     Can't think of any trick for doing this without going
 *     through every position of the spiral to get to the required position.
 
          I(1) = ICEN
@@ -188,7 +188,7 @@
                DX = -1
                DY = 0
             END IF
-            
+
 *     Now add on the increment (if we are allowed)
 
             CURR_I = CURR_I + DX
@@ -239,7 +239,7 @@
                CURR_J = STARTY
 
             END IF
-            
+
 *     Now set IJ
 
             I(POS) = CURR_I
@@ -283,7 +283,7 @@
                CURR_J = STARTY
 
             END IF
-            
+
 *     Now set IJ
 
             I(POS) = CURR_I

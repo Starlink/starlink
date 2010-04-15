@@ -20,7 +20,7 @@
 *           If the routine fails to complete, this variable will be
 *           set to an appropriate error number.
 *    Method :
-*     Get object locator using DAT_FIND and 
+*     Get object locator using DAT_FIND and
 *     DAT_STRUC.
 *    Authors :
 *     Jack Giddings (UCL::JRG)

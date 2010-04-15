@@ -100,10 +100,10 @@
 * check size of input colour table
 
         CALL NDF_DIM( LOC_CT, 2, NAXIS, NDIM, STATUS)
- 
+
 	IF( NAXIS( 1) .NE. 3 .OR. NAXIS( 2) .NE. 256) THEN
 
-          CALL MSG_OUT('ERR', 
+          CALL MSG_OUT('ERR',
      :                 'COLOUR_TABLE : Colour table incorrect size',
      :                  STATUS )
 
@@ -133,7 +133,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                  'COLOUR_TABLE : after NDF_ANNUL',
      :                  STATUS )
 

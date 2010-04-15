@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -126,7 +126,7 @@
 
 *  Begin a new error reporting environment.
       CALL ERR_BEGIN( STATUS )
-       
+
 *  Obtain the depth of HDS object nesting, together with its container
 *  file and path name.
       CALL HDS_TRACE( LOC, NLEV, PATH, FILE, STATUS )
@@ -176,7 +176,7 @@
       ELSE
          CALL DAT_ANNUL( LOC, STATUS )
       END IF
-       
+
 *  Reset the returned locator value.
       LOC = DAT__NOLOC
 

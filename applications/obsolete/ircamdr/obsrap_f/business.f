@@ -4,7 +4,7 @@
 
 *     IMAGE (input)                The image
 *     INTEGER*2 (NPIX,NLINES)
-     
+
 *     NPIX,NLINES (input)          The dimensions of the image
 *     INTEGER
 
@@ -45,11 +45,11 @@ C     Declare other stuff
 !     >     summy,
      >     OLDFLUX,CHECK,
      >     DOLD,MEANFLUX,FLUXSE,CHECKUP,CHECKDOWN,PA,AXRAT,ZP
-     
+
 !      CHARACTER*3 ANS
 !      CHARACTER*30 NAME
 !     >             FILE
-      
+
 
 C     First we ask for the pixel scale in arcseconds
 
@@ -82,7 +82,7 @@ C     -------------------------------------------------------
 
 C     Now ask for xy position of the object from the terminal
 
-      WRITE(6,'(A)')'       ' 
+      WRITE(6,'(A)')'       '
       WRITE(6,'(A)')'$ACCURATE X COORD OF OBJECT = '
       READ(5,*)XO
       WRITE(6,'(A)')'$ACCURATE Y COORD OF OBJECT = '
@@ -113,10 +113,10 @@ C     Send info to the terminal clarifying the results of finding the object
  22   FORMAT(' CHOSEN INTEGER XCOORD IS THEREFORE = ',F8.3)
       WRITE(6,23)YO
  23   FORMAT(' CHOSEN INTEGER YCOORD IS THEREFORE = ',F8.3)
-      WRITE(6,'(A)')'       '     
+      WRITE(6,'(A)')'       '
 
 C     Now we wish to extract 2 separate subimages, a large square one from
-C     which the sky parameters can be calculated and an intermediate square 
+C     which the sky parameters can be calculated and an intermediate square
 C     one which will define the region to be cleaned.
 
 
@@ -140,7 +140,7 @@ C     Call the subroutine to estimate the sky parameters
       READ(5,*)AXRAT
       WRITE(6,'(A)')'$ZERO POINT = '
       READ(5,*)ZP
-      
+
 C     ------------------------------------------------------------
 C     Now produce a contour plot of the area to be cleaned
 
@@ -196,7 +196,7 @@ C     Work out the series of aperture magnitudes
          ENDIF
       ENDIF
       CALL PGSCI(NIPPLE)
-      
+
       CALL APERMAG(CLEANEDARRAY,CLEANSIZE,D,DOLD,SKY,
      >PA,AXRAT,FLUX,MEANFLUX,FLUXSE,MAGNITUDE,ERRORMAG,NO)
       CHECK=MEANFLUX/(100.0*0.62*0.62)
@@ -225,7 +225,7 @@ C     Output
       WRITE(9,400)FLUX
  400  FORMAT(' THE INTEGRATED FLUX IS ',F11.3)
       WRITE(9,401)MAGNITUDE,ERRORMAG
- 401  FORMAT(' THE INSTRUMENTAL MAGNITUDE IS ',F7.3,'+ or -',F7.3)      
+ 401  FORMAT(' THE INSTRUMENTAL MAGNITUDE IS ',F7.3,'+ or -',F7.3)
       WRITE(9,402)NO
  402  FORMAT(' THE NUMBER OF PIXELS IS ',I5)
       WRITE(9,'(A)')'      '
@@ -249,7 +249,7 @@ C     Write radial profiles
 
 C     Write out bollocks to data file for straight line fitting
       CALL FIO_OPEN( 'profile.dat', 'WRITE', 'NONE', 0, LUN2, STATUS)
-  
+
       DO I=2,35
          SURFSIG(I)=((SURFBRIGHT(I)-SURFUP(I))+
      >              (SURFDOWN(I)-SURFBRIGHT(I)))/2.0
@@ -268,7 +268,7 @@ C     Write out cleaned and uncleaned images into two quadrants of a big frame
       ENDDO
       DO I=1,45
          DO J=46,90
-            K=J-45 
+            K=J-45
             DISPLAYARRAY(I,J)=CLEANEDARRAY(I,K)
          ENDDO
       ENDDO

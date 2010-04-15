@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_NDFCP( INDF1, COMP, TRIM, TRMWCS, PARAM, OPLACE, 
+      SUBROUTINE KPS1_NDFCP( INDF1, COMP, TRIM, TRMWCS, PARAM, OPLACE,
      :                       INDF2, STATUS )
 *+
 *  Name:
@@ -16,12 +16,12 @@
 
 *  Description:
 *     This routine copies a given NDF (or NDF section) to a new
-*     location.  It performs most of the work for the NDFCOPY 
-*     application.  
+*     location.  It performs most of the work for the NDFCOPY
+*     application.
 *
 *     It also permits the VARIANCE, ERROR or QUALITY components to
 *     become the DATA_ARRAY in the output NDF (see the COMP argument),
-*     thus losing the original DATA_ARRAY and omitting the respective 
+*     thus losing the original DATA_ARRAY and omitting the respective
 *     VARIANCE or QUALITY too.
 
 *  Arguments:
@@ -34,13 +34,13 @@
 *        their counterparts in the output NDF.
 
 *        If this is set to 'VARIANCE' or 'QUALITY' the VARIANCE or
-*        QUALITY component respectively becomes the new DATA_ARRAY in 
+*        QUALITY component respectively becomes the new DATA_ARRAY in
 *        the output NDF.  If it is set to 'ERROR' the square root
-*        VARIANCE component becomes the new DATA_ARRAY.  The chosen 
+*        VARIANCE component becomes the new DATA_ARRAY.  The chosen
 *        array component is absent from the output NDF.  The information
 *        stored within the input DATA_ARRAY is not transferred.  Also
-*        any variance is not propagated when 'QUALITY' is supplied, as 
-*        the variance applies to the DATA_ARRAY.  
+*        any variance is not propagated when 'QUALITY' is supplied, as
+*        the variance applies to the DATA_ARRAY.
 *     TRIM = LOGICAL (Given)
 *        Should insignificant pixel axes be removed form the output NDF?
 *     TRMWCS = LOGICAL (Given)
@@ -63,19 +63,19 @@
 *        retained in the current WCS Frame of the output NDF.  Each axis
 *        can be specified using one of the following options.
 *
-*        - An integer index of an axis within the current Frame of the 
+*        - An integer index of an axis within the current Frame of the
 *        input NDF (in the range 1 to the number of axes in the current
 *        Frame).
 *
 *        - An axis symbol string such as "RA" or "VRAD".
 *
-*        - A generic option where "SPEC" requests the spectral axis, 
-*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
-*        sky longitude and latitude axes respectively.  Only those axis 
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
+*        sky longitude and latitude axes respectively.  Only those axis
 *        domains present are available as options.
 
-*        The dynamic default selects the axes with the same indices as 
-*        the pixel axes being copied.  The value should be given as a 
+*        The dynamic default selects the axes with the same indices as
+*        the pixel axes being copied.  The value should be given as a
 *        comma-separated list.
 
 *  Copyright:
@@ -116,7 +116,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,7 +153,7 @@
       CHARACTER LOC2C*(DAT__SZLOC)! Loc. for a single o/p AXIS structure
       CHARACTER LOC3*(DAT__SZLOC) ! Locator to the input NDF
       CHARACTER LOC4*(DAT__SZLOC) ! Locator to input AXIS array
-      CHARACTER LOC4C*(DAT__SZLOC)! Locator for a single i/p AXIS 
+      CHARACTER LOC4C*(DAT__SZLOC)! Locator for a single i/p AXIS
                                   ! structure
       CHARACTER LOC5*(DAT__SZLOC)! Locator to AXIS component
       CHARACTER NAME*(DAT__SZNAM)! Name of AXIS component
@@ -236,9 +236,9 @@
 *  equals the number of pixel axes, there is nothing to trim.
       IF( SIGDIM .EQ. NDIM ) THEN
          CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
-         IF( AST_GETI( IWCS, 'Nin', STATUS ) .GE. 
+         IF( AST_GETI( IWCS, 'Nin', STATUS ) .GE.
      :       AST_GETI( IWCS, 'NOUT', STATUS ) ) UTRIM = .FALSE.
-    
+
 *  If there are no significant axes, trimming is not possible.
       ELSE IF( SIGDIM .EQ. 0 .AND. TRIM ) THEN
          IF( STATUS .EQ. SAI__OK ) THEN
@@ -264,11 +264,11 @@
       IF( .NOT. UTRIM .AND. DIRECT ) THEN
          IF( PARAM .NE. ' ' ) THEN
             CALL LPG_PROP( INDF1, 'Title,Label,Units,Data,Variance,'//
-     :                     'Quality,Axis,History,WCS', 'OUT', INDF2, 
+     :                     'Quality,Axis,History,WCS', 'OUT', INDF2,
      :                     STATUS )
          ELSE
             CALL NDF_SCOPY( INDF1, 'Title,Label,Units,Data,Variance,'//
-     :                      'Quality,Axis,History,WCS', OPLACE, INDF2, 
+     :                      'Quality,Axis,History,WCS', OPLACE, INDF2,
      :                      STATUS )
          END IF
 
@@ -293,11 +293,11 @@
 *  replacement of the DATA_ARRAY component.
          IF ( UTRIM ) THEN
 
-*  Get the WCS FrameSet from the input NDF. 
-            IF( IWCS .EQ. AST__NULL ) CALL KPG1_GTWCS( INDF1, IWCS, 
+*  Get the WCS FrameSet from the input NDF.
+            IF( IWCS .EQ. AST__NULL ) CALL KPG1_GTWCS( INDF1, IWCS,
      :                                                 STATUS )
 
-*  Get the Mapping from base (GRID) Frame to current Frame. 
+*  Get the Mapping from base (GRID) Frame to current Frame.
             MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
      :                            STATUS )
 
@@ -305,16 +305,16 @@
 *  a SIGDIM_dimensional copy of the GRID Frame, supplying a value of 1.0
 *  for the insignificant axes.
             PM = AST_PERMMAP( NDIM, IPERM, SIGDIM, OPERM, 1.0D0, ' ',
-     :                        STATUS ) 
+     :                        STATUS )
 
 *  Create a SIGDIM-dimensional GRID Frame, then add it into the WCS
 *  FrameSet, deleting the original.  Note, the Mapping returned by
 *  AST_PICKAXES supplies AST__BAD for the insignificant axes and so we
 *  use the better PermMap created above.
             CALL AST_INVERT( IWCS, STATUS )
-            NEWFRM = AST_PICKAXES( IWCS, SIGDIM, OPERM, MAP2, STATUS ) 
+            NEWFRM = AST_PICKAXES( IWCS, SIGDIM, OPERM, MAP2, STATUS )
             ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
-            CALL AST_ADDFRAME( IWCS, AST__CURRENT, PM, NEWFRM, STATUS ) 
+            CALL AST_ADDFRAME( IWCS, AST__CURRENT, PM, NEWFRM, STATUS )
             CALL AST_REMOVEFRAME( IWCS, ICURR, STATUS )
             CALL AST_INVERT( IWCS, STATUS )
 
@@ -330,8 +330,8 @@
                UTRWCS = TRMWCS
             END IF
 
-*  If required, remove WCS axes.   
-            IF( UTRWCS ) THEN 
+*  If required, remove WCS axes.
+            IF( UTRWCS ) THEN
 
 *  See if the non-degenerate GRID axes correspond to a distinct and
 *  independent group of current Frame axes. If so, MAP2 is returned
@@ -350,7 +350,7 @@
                DO I = 1, SIGDIM
                   IAXIS( I ) = OPERM( I )
                END DO
-   
+
                USEPRM = .TRUE.
                IF( MAP2 .NE. AST__NULL ) THEN
                   IF( AST_GETI( MAP2, 'NOUT',
@@ -370,14 +370,14 @@
 *  use a PermMap to selected the required WCS axes (rather than
 *  replacing the base->current Mapping by the component Mapping found
 *  above).
-               IF( .NOT. USEPRM ) THEN 
+               IF( .NOT. USEPRM ) THEN
                   DO I = 1, SIGDIM
                      USEPRM = IAXIS( I ) .NE. CAXES( I )
                   END DO
                END IF
 
 *  Create a new Frame by picking the selected axes from the original
-*  Current Frame.  This also returns a PermMap which goes from the 
+*  Current Frame.  This also returns a PermMap which goes from the
 *  original Frame to the new one, using AST__BAD values for the
 *  un-selected axes.  We will only use this Mapping if the base->current
 *  Mapping was not succesfully split by AST_MAPSPLIT.
@@ -392,7 +392,7 @@
      :             .NOT. AST_TEST( NEWFRM, 'TITLE', STATUS ) ) THEN
                   TTL = AST_GETC( IWCS, 'TITLE', STATUS )
                   LTTL = MAX( 1, CHR_LEN( TTL ) )
-                  CALL AST_SETC( NEWFRM, 'TITLE', TTL( : LTTL ), 
+                  CALL AST_SETC( NEWFRM, 'TITLE', TTL( : LTTL ),
      :                           STATUS )
                END IF
 
@@ -401,86 +401,86 @@
 *  depend on the degenerate pixel axes, then we use the PermMap created
 *  by AST_PICKAXES above to select the required WCS axes.  Add this new
 *  Frame into the FrameSet. It becomes the Current Frame.
-               IF( USEPRM ) THEN                     
-                  CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP3, NEWFRM, 
+               IF( USEPRM ) THEN
+                  CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP3, NEWFRM,
      :                               STATUS )
 
 *  If the degenerate pixel axes correspond to a distinct subset of the
 *  current Frame axes, then we can use the simpler base->current Mapping
 *  returned by AST_MAPSPLIT above.
                ELSE
-                  CALL AST_ADDFRAME( IWCS, AST__BASE, MAP2, NEWFRM, 
+                  CALL AST_ADDFRAME( IWCS, AST__BASE, MAP2, NEWFRM,
      :                               STATUS )
 
                END IF
 
-            END IF                
+            END IF
 
 *  Modify the bounds of the output NDF so that the significant axes
 *  span Axes 1 to SIGDIM.
-            CALL NDF_SBND( SIGDIM, SLBND, SUBND, INDF2, STATUS ) 
+            CALL NDF_SBND( SIGDIM, SLBND, SUBND, INDF2, STATUS )
 
 *  Store the new WCS FrameSet in the output NDF.
             CALL NDF_PTWCS( IWCS, INDF2, STATUS )
 
-*  We now need to copy any AXIS structures into the output NDF so that 
-*  they refer to the re-ordered axes. 
+*  We now need to copy any AXIS structures into the output NDF so that
+*  they refer to the re-ordered axes.
             CALL NDF_STATE( INDF1, 'AXIS', THERE, STATUS )
             IF( THERE ) THEN
 
 *  Since we will be using HDS to modify the output NDF, we need to take
 *  care that the internal representation of the NDF stored within the
-*  common blocks of the NDF library does not get out of step with the 
+*  common blocks of the NDF library does not get out of step with the
 *  actual HDS structure of the NDF.  For this reason, we get an HDS
 *  locator to the NDF and then annul the NDF identifier. We will
 *  re-import the modified NDF back into the NDF library once all the
 *  changes have been made.  Before annulling the NDF, we need to map the
 *  DATA array to put it into a defined state since we are not allowed to
 *  release an NDF with an undefined DATA array.
-               CALL NDF_MAP( INDF2, 'DATA', '_BYTE', 'WRITE', IP2, EL, 
-     :                       STATUS ) 
-               CALL NDF_LOC( INDF2, 'READ', LOC1, STATUS ) 
-               CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS ) 
+               CALL NDF_MAP( INDF2, 'DATA', '_BYTE', 'WRITE', IP2, EL,
+     :                       STATUS )
+               CALL NDF_LOC( INDF2, 'READ', LOC1, STATUS )
+               CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS )
                CALL NDF_ANNUL( INDF2, STATUS )
 
 *  Create a new array of axis structures within the output NDF, and get
 *  a locator to it.
-               CALL DAT_NEW( LOC1, 'AXIS', 'AXIS', 1, SIGDIM, STATUS ) 
+               CALL DAT_NEW( LOC1, 'AXIS', 'AXIS', 1, SIGDIM, STATUS )
                CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
 
 *  Get a locator to the array of AXIS structures in the input NDF. If
 *  the supplied NDF is not a base NDF we need to take a copy of it so
-*  that NDF_LOC will return a locator for a structure describing the 
+*  that NDF_LOC will return a locator for a structure describing the
 *  selected section rather than the base NDF.
                CALL NDF_ISBAS( INDF1, ISBAS, STATUS )
                IF( .NOT. ISBAS ) THEN
                   CALL NDF_TEMP( PLACE, STATUS )
-                  CALL NDF_SCOPY( INDF1, 'AXIS,NOEXTENSION()', PLACE, 
+                  CALL NDF_SCOPY( INDF1, 'AXIS,NOEXTENSION()', PLACE,
      :                            INDF3, STATUS )
-                  CALL NDF_LOC( INDF3, 'READ', LOC3, STATUS ) 
+                  CALL NDF_LOC( INDF3, 'READ', LOC3, STATUS )
                ELSE
-                  CALL NDF_LOC( INDF1, 'READ', LOC3, STATUS ) 
+                  CALL NDF_LOC( INDF1, 'READ', LOC3, STATUS )
                END IF
 
-               CALL DAT_FIND( LOC3, 'AXIS', LOC4, STATUS ) 
+               CALL DAT_FIND( LOC3, 'AXIS', LOC4, STATUS )
 
 *  Loop round each re-ordered axis in the output NDF.
                DO NEWAX = 1, SIGDIM
                   OLDAX = OPERM( NEWAX )
 
 *  Get locators to the appropriate cells of the old and new AXIS arrays.
-                  CALL DAT_CELL( LOC2, 1, NEWAX, LOC2C, STATUS ) 
-                  CALL DAT_CELL( LOC4, 1, OLDAX, LOC4C, STATUS ) 
+                  CALL DAT_CELL( LOC2, 1, NEWAX, LOC2C, STATUS )
+                  CALL DAT_CELL( LOC4, 1, OLDAX, LOC4C, STATUS )
 
 *  Copy all components of the old axis structure into the new axis
 *  structure.
-                  CALL DAT_NCOMP( LOC4C, NCOMP, STATUS ) 
-                  IF( STATUS .EQ. SAI__OK ) THEN 
+                  CALL DAT_NCOMP( LOC4C, NCOMP, STATUS )
+                  IF( STATUS .EQ. SAI__OK ) THEN
                      DO I = 1, NCOMP
-                        CALL DAT_INDEX( LOC4C, I, LOC5, STATUS ) 
-                        CALL DAT_NAME( LOC5, NAME, STATUS ) 
-                        CALL DAT_COPY( LOC5, LOC2C, NAME, STATUS ) 
-                        CALL DAT_ANNUL( LOC5, STATUS ) 
+                        CALL DAT_INDEX( LOC4C, I, LOC5, STATUS )
+                        CALL DAT_NAME( LOC5, NAME, STATUS )
+                        CALL DAT_COPY( LOC5, LOC2C, NAME, STATUS )
+                        CALL DAT_ANNUL( LOC5, STATUS )
                      END DO
                   END IF
 
@@ -561,52 +561,52 @@
 *  Obtain the data type of the array component and determine whether it
 *  contains any bad pixels without reading all its elements.
                CALL NDF_TYPE( INDF1, ICOMPN( I ), TYPE, STATUS )
-               CALL NDF_MAP( INDF1, ICOMP( I ), TYPE, 'READ', IP1, EL, 
-     :                       STATUS ) 
+               CALL NDF_MAP( INDF1, ICOMP( I ), TYPE, 'READ', IP1, EL,
+     :                       STATUS )
                CALL NDF_BAD( INDF1, ICOMPN( I ), .FALSE., BAD, STATUS )
 
 *  The data type may have changed if there's is a new DATA_ARRAY.  NDF
 *  must be told about the potential change of data type.  Even though
 *  the data are mapped and copied using the desired type, upon unmapping
-*  the DATA_ARRAY would revert to the input component's data type.  
+*  the DATA_ARRAY would revert to the input component's data type.
                IF ( .NOT. DIRECT .AND. OCOMP( I ) .NE. 'QUALITY' )
-     :           CALL NDF_STYPE( TYPE, INDF2, OCOMP( I ), STATUS ) 
-               CALL NDF_MAP( INDF2, OCOMP( I ), TYPE, 'WRITE', IP2, EL, 
-     :                       STATUS ) 
-   
+     :           CALL NDF_STYPE( TYPE, INDF2, OCOMP( I ), STATUS )
+               CALL NDF_MAP( INDF2, OCOMP( I ), TYPE, 'WRITE', IP2, EL,
+     :                       STATUS )
+
 *  Now actually copy the array components from input to output.
                IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_DTOD( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
-   
+
                ELSE IF( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_RTOR( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
-   
+
                ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_ITOI( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
-   
+
                ELSE IF( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_WTOW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
-   
+
                ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_UWTOUW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_UWTOUW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
-   
+
                ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_BTOB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
-   
+
                ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOUB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+                  CALL VEC_UBTOUB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
                END IF

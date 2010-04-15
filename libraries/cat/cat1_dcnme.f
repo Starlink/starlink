@@ -63,9 +63,9 @@
 *       If the first character is not alphabetic then
 *         Inset an alphabetic character at the start of the name.
 *       end if
-*       Determine the length of the name.       
+*       Determine the length of the name.
 *       For each character
-*         If the character is not one of: alphabetic, numeric, 
+*         If the character is not one of: alphabetic, numeric,
 *         underscore, '(', or ')' then
 *           Set the name modified flag.
 *           Replace the character with an underscore.
@@ -106,12 +106,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -189,7 +189,7 @@
          IF (ANAME .NE. ' ') THEN
 
 *
-*          Take a copy of the name (henceforth this copy will be 
+*          Take a copy of the name (henceforth this copy will be
 *          used in order not to modify the input argument).
 
             CNAME = ANAME
@@ -236,7 +236,7 @@
                END IF
             END DO
 
-*            
+*
 *          Replace any right or left brackets ('[' or ']') with spaces.
 
             DO LOOP = 1, LCNAME

@@ -24,7 +24,7 @@ C                beamswitch and chop backgrounds
 C
 C     'BACK'     Return the background spectrum only
 C
-C     'NORM'     Normalize data to mean level of each cycle. 
+C     'NORM'     Normalize data to mean level of each cycle.
 C                (FIGS321 only.)
 C
 C     Input data -
@@ -36,8 +36,8 @@ C     A1,A2,B1,B2 represent the parts of the beamswitch ABBA cycle
 C     and a and b represent the signal and background chop positions
 C     respectively.  In grating mode 2, there are no chop positions,
 C     and the second axis is just A1,B1,A2,B2. Grating mode 3 data
-C     is modified by the on-line acquisition software so that it 
-C     has the same format as grating mode 1 data.  This means that the 
+C     is modified by the on-line acquisition software so that it
+C     has the same format as grating mode 1 data.  This means that the
 C     second dimension of the cube has to be either 4 or 8.  The
 C     cube third axis represents beamswitch cycle number.
 C     The data is sorted into wavelength order using the various
@@ -52,7 +52,7 @@ C     except that main data array will only have 1 or 2 dimensions, and
 C     any AXIS sub-structures that CUBE has will be deleted/renamed
 C     as appropriate. If a spectrum is produced the errors (derived from
 C     the cycle to cycle statistics) are generated.
-C     
+C
 C                                     KS / AAO 8th June 1985
 C
 C     Modified:
@@ -68,7 +68,7 @@ C                    .X.WIDTH now calculated and added to output.
 C     27th Jun 1989  JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
-C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT' 
+C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT'
 C                    when mapping input data. Now uses DSA_SET_WIDTH to
 C                    set axis width value. Added STATUS checks to
 C                    support user requested aborts.
@@ -98,37 +98,37 @@ C
       CHARACTER COMENT*16        ! Comment associated with FITS items
       CHARACTER COMMAND*8        ! Figaro command name
       INTEGER   CUPTR            ! Dynamic memory element for CUBE data
-      REAL      CUTOFF           ! Sigma level at which a point will be 
+      REAL      CUTOFF           ! Sigma level at which a point will be
                                  ! ignored (FIGS321 only)
       REAL      DETSP            ! The detector spacing in steps
       INTEGER   DIMS(10)         ! Image dimensions
-      INTEGER   EPTR             ! Dynamic-memory pointer for error 
+      INTEGER   EPTR             ! Dynamic-memory pointer for error
                                  ! array
       INTEGER   EXPTR            ! Dynamic-memory pointer for workspace
-      REAL      FACTOR           ! Integration time in seconds per 
+      REAL      FACTOR           ! Integration time in seconds per
                                  ! element
       LOGICAL   FAULT            ! True if non_DSA problem found
       INTEGER   FSTAT            ! Status for FIG routines
       REAL      GAIN             ! The gain factor of the system
       REAL      GRATORD          ! Grating order.
-      REAL      GRATS            ! Grating start step.  
+      REAL      GRATS            ! Grating start step.
       REAL      GRATSP           ! Number of grating positions used
-      REAL      GRATSW           ! No. of grating sweeps per recorded 
+      REAL      GRATSW           ! No. of grating sweeps per recorded
                                  ! spectrum
       REAL      GRT0ORD          ! Grating step position at 0th order
       REAL      GRTA2S           ! Grating arc sec per halfstep
       REAL      GRTPCH           ! Grating pitch
-      LOGICAL   GSPECT           ! Spectrum (not an image) to be 
+      LOGICAL   GSPECT           ! Spectrum (not an image) to be
                                  ! generated?
       REAL      INT              ! No. of msec for each such integration
       INTEGER   LENGTH           ! Spectrum length
       INTEGER   MODE             ! Cube data grating mode
-      INTEGER   NCITEMS          ! Number of axis character items 
+      INTEGER   NCITEMS          ! Number of axis character items
                                  ! retrieved
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
       DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
-      INTEGER   NNITEMS          ! Number of axis numeric items 
+      INTEGER   NNITEMS          ! Number of axis numeric items
                                  ! retrieved
       LOGICAL   NORM             ! True if normalising required
       INTEGER   NSPECT           ! No. of spectra added per cycle
@@ -136,7 +136,7 @@ C
       INTEGER   NUMPTR           ! Dynamic-memory pointer for workspace
       INTEGER   NX               ! First dimension of CUBE
       INTEGER   NY               ! Second dimension of CUBE
-      INTEGER   OPTR             ! Dynamic-memory pointer for OUTPUT 
+      INTEGER   OPTR             ! Dynamic-memory pointer for OUTPUT
                                  ! data
       INTEGER   OXPTR            ! Dynamic-memory pointer for AXIS(1)
                                  ! data
@@ -144,11 +144,11 @@ C
                                  ! grating setting
       INTEGER   PSTAT            ! Status for PAR routines
       REAL      SECS             ! Total integration time in seconds.
-      INTEGER   SLOT             ! Slot number for mapped data 
+      INTEGER   SLOT             ! Slot number for mapped data
       INTEGER   SLOT1            ! Slot number for mapped workspace
       INTEGER   SLOT2            ! Slot number for mapped workspace
       INTEGER   STATUS           ! Running status for DSA routines
-      REAL      STEP             ! Grating step value.  
+      REAL      STEP             ! Grating step value.
       INTEGER   SWPERC           ! No. of sweeps per chop
       INTEGER   VECTOR(416)      ! Sort vector
       REAL      WAVES(416)       ! Returned with the wavelength values
@@ -166,7 +166,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -239,7 +239,7 @@ C
          GO TO 500
       END IF
 C
-C     Find which command this is.  GSPECT indicates that a 
+C     Find which command this is.  GSPECT indicates that a
 C     spectrum (rather than an image) is to be generated.
 C
       CALL PAR_COMMAND(COMMAND)
@@ -282,7 +282,7 @@ C
          NSPECT=NY
       ELSE
          NSPECT=NY/2
-      END IF         
+      END IF
 C
 C     Get the wavelength information out of the image structure.
 C     It has to be there, so error if it isn't.
@@ -296,7 +296,7 @@ C
       CALL DSA_GET_FITS_F('CUBE','FIG_G0OR',0,GRT0ORD,COMENT,STATUS)
       CALL DSA_GET_FITS_F('CUBE','FIG_DTSP',0,DETSP,COMENT,STATUS)
 C
-C  Get Intensity scaling information 
+C  Get Intensity scaling information
 C
       CALL DSA_GET_FITS_F('CUBE','FIG_PTS',0,POINTS,COMENT,STATUS)
       CALL DSA_GET_FITS_F('CUBE','FIG_INT',0,INT,COMENT,STATUS)
@@ -354,18 +354,18 @@ C            multiple sweeps instead.  In mode 1, GRATSW=1, and SWPERC=2,
 C            while in mode 2, CHOPS=1 and SWPERC=1)
 C     NSPECT is the number of spectra being added up to give the data
 C            for each cycle.  This depends on the mode, and also on the
-C            setting of ADD.  
+C            setting of ADD.
 C
 C     This means that SECS=POINTS*(INT/1000)*GRATSW*CHOPS*SWPERC gives the
-C     total integration time in seconds represented by the data in each 
+C     total integration time in seconds represented by the data in each
 C     element of each spectrum.  SECS*NSPECT is therefore the total
 C     integration time in seconds represented by each element of the summed
 C     spectra, for each cycle.
 C
 C     FACTOR=SECS*NSPECT*(GAIN/1000)/9.5 is therefore the number of ADUs
-C     (counts) in the summed spectra that represent a data rate of 1 
+C     (counts) in the summed spectra that represent a data rate of 1
 C     photon/sec. That is, adding up the spectra for a beamswitch cycle
-C     and dividing each element by FACTOR will give a result in photons/sec.  
+C     and dividing each element by FACTOR will give a result in photons/sec.
 C
       SECS = POINTS * (INT/1000) * GRATSW * CHOPS * SWPERC
       FACTOR = SECS * NSPECT * (GAIN/1000) / 9.5
@@ -389,7 +389,7 @@ C
       END IF
       CALL GEN_QFISORT(WAVES,LENGTH,VECTOR)
 C
-C     Create the output data structure based on the input data 
+C     Create the output data structure based on the input data
 C     structure and map
 C
       IF (GSPECT) THEN
@@ -410,7 +410,7 @@ C
       CALL DSA_SET_DATA_INFO('OUTPUT',NCITEMS,CITEMS,NNITEMS,NITEMS,
      :                        STATUS)
 C
-C     Map the input and output data 
+C     Map the input and output data
 C
       CALL DSA_MAP_DATA('CUBE','READ','INT',CUPTR,SLOT,STATUS)
 
@@ -450,10 +450,10 @@ C
       CALL DSA_FREE_WORKSPACE(SLOT1,STATUS)
       CALL DSA_FREE_WORKSPACE(SLOT,STATUS)
 C
-C     If the original cube had a .T  structure, then 
+C     If the original cube had a .T  structure, then
 C     this may need renaming.
 C
-C   
+C
 C     Copy all of the input structure to the output, except for
 C     the .Y component (which is always lost) and the .T component
 C     (which is lost if a spectrum is created).  The .Z structure is
@@ -489,7 +489,7 @@ C
 C     Set axis width value.
 C
       CALL DSA_SET_WIDTH ('OUTPUT',1,DBLE(WIDTH),STATUS)
-C      
+C
 C
   500 CONTINUE
 C
@@ -537,7 +537,7 @@ C     (<) ERRORS  (Real array ERRORS(NX)) The errors on the spectrum.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     GEN_FILL    (GEN_ package) Fill an array of bytes with a constant.
 C     GEN_FVSORT  (  "     "   ) Indirect array sort using a sort vector
@@ -702,7 +702,7 @@ C
                         CALL PAR_WRUSER(OUTMES,STATUS)
                      END IF
                   END IF
-               END DO     
+               END DO
             END DO
          END IF
       END DO
@@ -729,13 +729,13 @@ C     (<) IMAGE   (Real array IMAGE(NX,NT)) The resulting image.
 C
 C     Common variables used - None
 C
-C     Functions / subroutines used - 
+C     Functions / subroutines used -
 C
 C     GEN_FVSORT  (  "     "   ) Indirect array sort using a sort vector
 C
 C                                            KS / AAO 21st May 1985
 C     Modified:
-C     
+C
 C     12th June 1986   KS / AAO. Grating mode 2 code corrected so
 C                      correct spectra subtracted.
 C+

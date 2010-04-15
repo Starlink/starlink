@@ -1,11 +1,11 @@
       SUBROUTINE CHI_HOPCAT( INPUT, UPDATE_MODE, CATNO, STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR' 
+      INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
       INCLUDE 'CMP_ERR'
       INCLUDE 'CHI_PAR'          ! CHI constants
@@ -41,5 +41,5 @@
       ENDIF
 
 9999  RETURN
-          
+
       END

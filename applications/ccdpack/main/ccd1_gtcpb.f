@@ -160,18 +160,18 @@
       IF ( IMETH .EQ. 4 ) THEN
 
 *  Get the trim fraction for trimmed mean.
-         CALL PAR_GDR0R( 'ALPHA', 0.2, 0.001, 0.499, .FALSE., ALPHA, 
+         CALL PAR_GDR0R( 'ALPHA', 0.2, 0.001, 0.499, .FALSE., ALPHA,
      :                   STATUS )
-      ELSE IF ( IMETH .EQ. 5  .OR.  IMETH .EQ. 6 .OR. IMETH .EQ. 10 ) 
+      ELSE IF ( IMETH .EQ. 5  .OR.  IMETH .EQ. 6 .OR. IMETH .EQ. 10 )
      :   THEN
 
 *  Sigma clipping get the number of sigmas to clip at.
-         CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA, 
+         CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA,
      :                   STATUS )
          IF ( IMETH .EQ. 5  ) THEN
 
 *  Iterative sigma clipping get the maximum number of iterations.
-            CALL PAR_GDR0I( 'NITER', 10, 1, 100, .FALSE., NITER, 
+            CALL PAR_GDR0I( 'NITER', 10, 1, 100, .FALSE., NITER,
      :                      STATUS )
          ELSE
 

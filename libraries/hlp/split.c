@@ -30,23 +30,23 @@ void hlpSplit ( char *string, int istart, int *ifrom, int *ito )
 */
 {
    int l, i, j;
- 
+
 /* Useful length of the string. */
    l = hlpLength ( string );
- 
+
 /* Search for the start of the substring. */
    for ( i = ( istart >= 0 ) ? istart : 0; i < l; i++ ) {
       if ( ! isspace ( ( int ) string [ i ] ) ) {
- 
+
       /* Found it. */
          *ifrom = i;
- 
+
       /* Now find the end of the substring. */
          for ( j = i + 1; j < l && ! isspace ( (int) string [ j ] ); j++ );
- 
+
       /* Found it. */
          *ito = j - 1;
- 
+
       /* All done: leave loop. */
          return;
       }

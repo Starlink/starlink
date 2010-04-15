@@ -15,7 +15,7 @@ C                  be changed by this routine.
 C     (>) NEW      (Character) The new name for the object. The first
 C                  level of NEW should be the same as for OLD (ie they
 C                  should be in the same file).  The name can
-C                  contain dimensional information if this is to be 
+C                  contain dimensional information if this is to be
 C                  changed.  If arrays are made smaller, some of the
 C                  contents will be lost, of course - this applies
 C                  to structure arrays too.
@@ -36,7 +36,7 @@ C     DTA_LOCATE  ( "     "    ) Locate data object
 C     DTA_CACHEO  ( "     "    ) Remove object from name cache
 C     DTA_FILL    ( "     "    ) Fill an array with a single byte
 C     DTA_COPY    ( "     "    ) Fast copy of a byte array
-C     DTA_TRNAME  ( "     "    ) Tidy a name to conform to HDS 
+C     DTA_TRNAME  ( "     "    ) Tidy a name to conform to HDS
 C     DTA_DLVAR   ( "     "    ) Delete a data object
 C     DTA_HDSTYP  ( "     "    ) Get HDS type name from a DTA type
 C     DTA_DTATYP  ( "     "    ) Get DTA type name from an HDS type
@@ -50,7 +50,7 @@ C     DAT_MOVE    ( "     "    ) Move an HDS object
 C     DAT_STATE   ( "     "    ) See if an object is defined
 C     DAT_ANNUL   ( "     "    ) Annul an HDS locator
 C     DAT_NEW     ( "     "    ) Create a new HDS object
-C     DAT_FIND    ( "     "    ) Get locator to an existing HDS object 
+C     DAT_FIND    ( "     "    ) Get locator to an existing HDS object
 C     DAT_BASIC   ( "     "    ) Map an HDS object as a byte array
 C     DAT_UNMAP   ( "     "    ) Unmap an HDS object
 C     DAT_MOULD   ( "     "    ) Change shape of an HDS object
@@ -66,7 +66,7 @@ C                    version of the DTA routines.  The limitations
 C                    on the allowed dimensional changes have been
 C                    removed (note that most changes in dimension
 C                    have to be achieved through the creation of a
-C                    new data object).  OLD and NEW may now differ 
+C                    new data object).  OLD and NEW may now differ
 C                    in their immediate environments, so long as
 C                    they are still part of the same file.
 C     12th Mar 1987  KS / AAO. Modified to make use of the new routine
@@ -77,19 +77,19 @@ C                    no longer be used with the original Bliss version
 C                    of HDS. (Or any version prior to 3.4)
 C     10th Jun 1988  KS / AAO.  No longer refuses to operate on arrays
 C                    of structures.
-C     20th Jun 1988  KS / AAO.  Check for non-empty structure elements 
+C     20th Jun 1988  KS / AAO.  Check for non-empty structure elements
 C                    and delete them prior to reduction in size of a
 C                    structure array.
-C     10th Jan 1992  KS / AAO.  Syntax of include statements changed to 
-C                    remove VMS logical names and to use lower case, to 
+C     10th Jan 1992  KS / AAO.  Syntax of include statements changed to
+C                    remove VMS logical names and to use lower case, to
 C                    enable compilation on a SUN. Unused variable ADIM
 C                    removed.
 C     20th Jan 1992  KS / AAO. DAT_MOVE annuls the locator of the moved
-C                    object. With the new EMS-using version of HDS, 
+C                    object. With the new EMS-using version of HDS,
 C                    any subsequent call to DAT_ANNUL for the same locator
 C                    will fail, and now, even if the HDS status is ignored,
 C                    the fact that an EMS error has been signalled stores up
-C                    trouble for later.  Such calls to DAT_ANNUL are now 
+C                    trouble for later.  Such calls to DAT_ANNUL are now
 C                    avoided.
 C     24th Jan 1992  KS / AAO. Calls to EMS added to control error reporting.
 C     14th Oct 1992  HME / UoE, Starlink.  Locating one level up is
@@ -97,12 +97,12 @@ C                    not as easy as calling DTA_LOCATE with OLEVELS-1.
 C                    One must make sure that OLASTC(OLEVELS-1) points
 C                    in front of any array index.
 C     12th Mar 1993  HME / UoE. Changed CHARACTER*15 to *(DAT__SZLOC).
-C     2005 May 31    MJC/Starlink Use CNF_PVAL for pointers to mapped 
+C     2005 May 31    MJC/Starlink Use CNF_PVAL for pointers to mapped
 C                    data.
 C+
       IMPLICIT NONE
 C
-C     Parameters 
+C     Parameters
 C
       CHARACTER*(*) OLD,NEW
       INTEGER STATUS
@@ -137,7 +137,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Convert OLD and NEW into upper case
 C
@@ -192,7 +192,7 @@ C
       IF (.NOT.SAME) THEN
 C
 C        Objects are different, so look for the new object.  We
-C        don't expect it to exist, so we expect the locator to 
+C        don't expect it to exist, so we expect the locator to
 C        its environment to be returned.
 C
          CALL DTA_LOCATE(FNEW,NLEVELS,NLASTC,LOC,FOUND,ENVLOC,
@@ -228,9 +228,9 @@ C
 C
 C     Can we do this as a simple call to DAT_MOVE, or is a change in
 C     dimensions involved?  A change in dimensions that does not involve
-C     an increase in the number of dimensions, may be done using a 
+C     an increase in the number of dimensions, may be done using a
 C     combination of DAT_MOVE, DAT_ALTER, and DAT_MOULD.  An increase
-C     in the number of dimensions requires that we make a copy of the object.  
+C     in the number of dimensions requires that we make a copy of the object.
 C
 C     We start by assuming that a 'move 'will be OK, and it will not
 C     need to be followed by an 'alter'.
@@ -258,7 +258,7 @@ C
             GO TO 600
          END IF
 C
-C        Character arrays introduce an additional complication, because 
+C        Character arrays introduce an additional complication, because
 C        they are held as arrays of strings rather than as arrays of
 C        single characters.   See if this is a character array.
 C
@@ -295,7 +295,7 @@ C
          ELSE
 C
 C           The change does not involve an increase in dimensions, so may
-C           be done in situ.  We want to find out if the new size (NELM) 
+C           be done in situ.  We want to find out if the new size (NELM)
 C           is different to the actual size at present (ACTELM), because
 C           things are simpler later if this is the case.
 C
@@ -320,7 +320,7 @@ C
       IF (MOVE) THEN
 C
 C        We can do it by a 'move'.  Any re-dimensioning may be done
-C        in situ using DAT_MOULD and DAT_ALTER, Note that since the 
+C        in situ using DAT_MOULD and DAT_ALTER, Note that since the
 C        'move' will annul the original locator we have to
 C        use a clone of it.  This is so DTA_CACHEO can annul the
 C        original locator as part of the cleaning up process.
@@ -331,11 +331,11 @@ C
 C
 C              A change in shape without a change in size may be done
 C              using a simple call to DAT_MOULD.
-C 
+C
                CALL DAT_MOULD(TLOC,NDIM,DIMS,STATUS)
             ELSE
 C
-C              If the size has to be changed, a trick is involved.  
+C              If the size has to be changed, a trick is involved.
 C              DAT_ALTER may change the size of an object, but it
 C              can only change the last dimension.  DAT_MOULD may
 C              change the dimensions of an object, but not its total
@@ -343,7 +343,7 @@ C              size.  So we mould the object into its desired number
 C              of dimensions but with its current size, making its
 C              dimensions [1,1,..,ACTELM], alter this so that it has
 C              the desired number of dimensions and the desired size
-C              by making it [1,1,...,NELM], and then mould it into 
+C              by making it [1,1,...,NELM], and then mould it into
 C              the desired shape.
 C
                DO I=1,NDIM-1
@@ -457,7 +457,7 @@ C
             END IF
          END IF
 C
-C        Check status - which will be an HDS code, and if OK, 
+C        Check status - which will be an HDS code, and if OK,
 C        delete the original object.
 C
          IF (STATUS.NE.0) THEN
@@ -468,7 +468,7 @@ C
             IF (STATUS.NE.0) GO TO 600
          END IF
 C
-C        With the original object deleted, we should now be able 
+C        With the original object deleted, we should now be able
 C        to rename the temporarily named new object back to its
 C        original name.  This is only necessary if we had to use a
 C        temporary name, of course.

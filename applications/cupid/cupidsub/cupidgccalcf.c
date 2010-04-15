@@ -4,7 +4,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by this function. These are set by function cupidGaussClumps. */
 extern CupidGC cupidGC;
 
@@ -35,7 +35,7 @@ void cupidGCcalcf( int n, double *x, int *nf, double *f ){
 *     x
 *        Pointer to an array holding the "n" parameters which define the
 *        model.
-*     nf 
+*     nf
 *        On entry, "*nf" is the number of times "calcf" has been called.
 *        Returned equal to zero if the merit function cannot be evaluated
 *        at "x". Intermediate values are calculated and cached when a new

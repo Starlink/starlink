@@ -1,9 +1,9 @@
-      SUBROUTINE JCMT_SORT_RDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE, 
+      SUBROUTINE JCMT_SORT_RDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE,
      :   INDATA, NCH, X, Y, RBAD, XMIN, XSPACE, NX, YMIN, YSPACE, NY,
      :   OUTDATA, STATUS)
 *+
 *  Name:
-*      JCMT_SORT_RDATA   
+*      JCMT_SORT_RDATA
 
 *  Purpose:
 *     sort real data according to X, Y arrays
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE JCMT_SORT_RDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE, 
+*     SUBROUTINE JCMT_SORT_RDATA (C3NCH, C3MXP, C3NIS, C3NSAMPLE,
 *    :   INDATA, NCH, X, Y, RBAD, XMIN, XSPACE, NX, YMIN, YSPACE, NY,
 *    :   OUTDATA, STATUS)
 
@@ -20,8 +20,8 @@
 *     Sorts data from the JCMT GSD file according to the positions in the
 *     X, Y arrays. The input data may be multichanneled, which is
 *     indicated by the value of C3NCH. The channel which is to be selected
-*     is indicated by NCH. The data is put into OUTDATA at the position 
-*     determined by the map grid calculated by JCMT_CALCULATE_GRID. Output 
+*     is indicated by NCH. The data is put into OUTDATA at the position
+*     determined by the map grid calculated by JCMT_CALCULATE_GRID. Output
 *     array elements that don't get anything put into them are set RBAD.
 
 *  Arguments:
@@ -103,7 +103,7 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*  initialise output data 
+*  initialise output data
 
       DO J = 1, NY
          DO I = 1, NX

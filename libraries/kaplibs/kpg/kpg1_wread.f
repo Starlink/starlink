@@ -17,7 +17,7 @@
 *     HDS object. The component name is specified by the caller. The
 *     component must have a type of WCS, must be scalar, and must contain
 *     a single 1-D array component with name DATA and type _CHAR.
-*     AST__NULL is returned in IAST, and no error is reported if the 
+*     AST__NULL is returned in IAST, and no error is reported if the
 *     named component does not exist.
 
 *  Arguments:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,9 +76,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'KPG_PAR'          ! KPG_ constants      
+      INCLUDE 'KPG_PAR'          ! KPG_ constants
       INCLUDE 'AST_PAR'          ! AST_ public interface
-      
+
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks.
 *        ASTLC = CHARACTER * ( DAT__SZLOC ) (Write)
@@ -87,7 +87,7 @@
 *           Next element to use in HDS _CHAR array holding AST_ data.
 *        ASTPT = INTEGER (Write)
 *           Pointer to mapped HDS _CHAR array holding AST_ data.
-      
+
 *  Arguments Given:
       CHARACTER LOC*(*)
       CHARACTER NAME*(*)
@@ -97,10 +97,10 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-      
+
 *  External References:
       EXTERNAL KPG1_RDAST        ! Read AST_ data from an HDS object
-      
+
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) WCSLOC ! Locator to WCS structure
       CHARACTER * ( DAT__SZTYP ) TYPE ! HDS component type string
@@ -117,7 +117,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Ensure all KAPPA non-graphical AST IntraMaps are registered.
       CALL KPG1_ASRGN( STATUS )
 
@@ -234,7 +234,7 @@
                   END IF
 
 *  Map the DATA component for READ access.
-                  CALL DAT_MAP( ASTLC, '_CHAR', 'READ', NDIM, DIM, 
+                  CALL DAT_MAP( ASTLC, '_CHAR', 'READ', NDIM, DIM,
      :                          ASTPT, STATUS )
 
 *  Create an AST_ Channel to read from the DATA component. Supply the

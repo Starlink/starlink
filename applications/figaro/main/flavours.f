@@ -21,7 +21,7 @@
 *    FIRST = LOGICAL (Given and returned)
 *        If first time routine called
 *    STATUS = INTEGER (Given and returned)
-*       
+*
 * Common include files:
 *    ARC_DIMS
 *
@@ -296,7 +296,7 @@
             call dsa_get_work_array(line_count*mgauss*nxp,'float',ptr14,
      :                              slot14,status)
          end if
-         
+
          if(status.eq.SAI__OK) then
 
             if(batch) then
@@ -342,7 +342,7 @@
             end if
             if(cur_plot(PL_FLX)) then
                call plot_flux(%VAL(CNF_PVAL(d_rptr)),
-     :                        %VAL(CNF_PVAL(d_vptr)), 
+     :                        %VAL(CNF_PVAL(d_vptr)),
      :                        %VAL(CNF_PVAL(staptr)),line_name,
      :                        %VAL(CNF_PVAL(d_wptr)),
      :                        %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),

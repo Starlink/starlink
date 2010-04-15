@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -66,9 +66,9 @@ machine. VMSBACKUP is available on the Sun and DECstation platforms.
 }
 \end{quote}
 
-Vmsbackup reads a VMS generated backup tape, converting  the files  to  Unix 
+Vmsbackup reads a VMS generated backup tape, converting  the files  to  Unix
 format  and writing the files to disk.  The default operation of the program is
-to go through an  entire tape,  extracting  every  file and writing it to disk. 
+to go through an  entire tape,  extracting  every  file and writing it to disk.
 This may be modified by the following options:
 
 \begin{description}
@@ -79,7 +79,7 @@ variable and cr-terminated stream. If \verb!-b! is specified then these files
 are read without interpretation of the RMS record terminators into linefeeds
 (equivalent to using binary mode in \verb!ftp!).
 
-\item [c] --- Use  complete  filenames,  including   the   version number. A 
+\item [c] --- Use  complete  filenames,  including   the   version number. A
 colon and the octal version number will be appended to all filenames. A colon,
 rather than a semicolon, is used since the Unix Shell uses the semicolon as the
 line separator. Using a colon prevents the user from having to escape the
@@ -120,12 +120,12 @@ mode, high density, drive 0).  This must be a raw mode tape device.
 \item [t] --- Produce a table of contents (a directory listing) on the
 standard output of the files on tape.
 
-\item [v] --- Verbose output.  Normally vmsbackup  does  its  work silently.   
+\item [v] --- Verbose output.  Normally vmsbackup  does  its  work silently.
 The   verbose  option  will  cause  the filenames of the files being read from
 tape to  disk to be output on the standard output.
 
-\item [w] --- Vmsbackup prints the action to be taken followed  by file  name, 
-then  wait  for user confirmation. If a word beginning with `y'  is  given, 
+\item [w] --- Vmsbackup prints the action to be taken followed  by file  name,
+then  wait  for user confirmation. If a word beginning with `y'  is  given,
 the  action  is done. Any other input means don't do it.
 
 \item [x] --- Extract the named files from the tape.

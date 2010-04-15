@@ -89,7 +89,7 @@ loops.  There is also a glossary.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -180,21 +180,21 @@ loops.  There is also a glossary.}
 % Also define the html equivalents.
 
 % degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}} 
+\newcommand{\dgs}{\hbox{$^\circ$}}
 %\begin{htmlonly}
-%   \newcommand{\dgs}{{\rawhtml &deg;}} 
+%   \newcommand{\dgs}{{\rawhtml &deg;}}
 %\end{htmlonly}
 
 % arcminute symbol
-\newcommand{\arcm}{\hbox{$^\prime$}} 
+\newcommand{\arcm}{\hbox{$^\prime$}}
 %\begin{htmlonly}
-%   \newcommand{\arcm}{{\rawhtml &acute;}} 
+%   \newcommand{\arcm}{{\rawhtml &acute;}}
 %\end{htmlonly}
 
 % arcsec symbol
 \newcommand{\arcsec}{\arcm\hskip -0.1em\arcm}
 %\begin{htmlonly}
-%   \newcommand{\arcsec}{{\rawhtml &quot;}} 
+%   \newcommand{\arcsec}{{\rawhtml &quot;}}
 %\end{htmlonly}
 
 % hours symbol
@@ -218,29 +218,29 @@ loops.  There is also a glossary.}
 % decimal-minutes symbol
 \newcommand{\um}{\hskip-0.3em\hbox{$^{\rm m}$}\hskip-0.08em}
 %\begin{htmlonly}
-%   \newcommand{\um}{\mn} 
+%   \newcommand{\um}{\mn}
 %\end{htmlonly}
 
 % decimal-degree symbol
 \newcommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
 %\begin{htmlonly}
-%   \newcommand{\udeg}{{\rawhtml &deg;}} 
+%   \newcommand{\udeg}{{\rawhtml &deg;}}
 %\end{htmlonly}
 
 % decimal-second symbol
-\newcommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}  
+\newcommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}
 \begin{htmlonly}
-    \newcommand{\us}{\scn} 
+    \newcommand{\us}{\scn}
 \end{htmlonly}
 
 % decimal-arcminute symbol
-\newcommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}  
+\newcommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}
 %\begin{htmlonly}
-%   \newcommand{\uarcm}{{\rawhtml &acute;}} 
+%   \newcommand{\uarcm}{{\rawhtml &acute;}}
 %\end{htmlonly}
 
 % decimal-arcsecond symbol
-\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}  
+\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}
 %\begin{htmlonly}
 %   \newcommand{\uarcs}{{\rawhtml &quot;}}
 %\end{htmlonly}
@@ -323,10 +323,10 @@ loops.  There is also a glossary.}
 %     source prior to any statements that make of the sst commands.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -417,7 +417,7 @@ loops.  There is also a glossary.}
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -427,7 +427,7 @@ loops.  There is also a glossary.}
 
 %  Format the output results parameters section (for an application).
 \newcommand{\sstresparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Results Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -437,7 +437,7 @@ loops.  There is also a glossary.}
 
 %  Format the graphics style parameters section (for an application).
 \newcommand{\sstgraphparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Graphics-style Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -602,7 +602,7 @@ loops.  There is also a glossary.}
    }
 
 %  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
       \begin{description}
          #1
       \end{description}
@@ -686,12 +686,12 @@ loops.  There is also a glossary.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -935,7 +935,7 @@ Section~\ref{sc4_se_source}).}{\htmlref{here}{sc4_se_source}).}
      alias dff "df \!* |awk \
       '{printf("\"%-20.20s%9.8s%9.8s%9.8s%9.8s %s\\n\",'$1,$2,$3,$4,$5,$6)}' "'"
      alias big20 'ls -l | sort -k 5 | tail -n 20'
-     source /star/etc/cshrc    
+     source /star/etc/cshrc
 \end{verbatim}
 \normalsize
 
@@ -944,7 +944,7 @@ Section~\ref{sc4_se_source}).}{\htmlref{here}{sc4_se_source}).}
 
 There are two methods.  One is permanent; the other overrides an alias
 for a single command.  To remove an alias permanently use the {\tt
-unalias} command.  This accepts {\tt *?[~]} 
+unalias} command.  This accepts {\tt *?[~]}
 \htmlref{\sf wildcards}{sc4_gl_wild} to \htmlref{{\sf match}}{sc4_gl_match} the
 defined aliases.
 
@@ -1060,7 +1060,7 @@ It might look something like this.
 \normalsize
 The first line demands that the C-shell be used.
 The {\tt \$1} represents the first argument supplied on the command line.
-(There is more on this in 
+(There is more on this in
 \latexelsehtml{Section~\ref{sc4_se_arguments}.)}{\htmlref{Script
 arguments and other special variables}{sc4_se_arguments}.)}
 If the command {\tt restore} runs the script, then entering
@@ -1126,7 +1126,7 @@ filename.
      if ( -e $file && -e $file~ ) then
         rm $file
         mv $file~ $file
-     else 
+     else
         if ( ! -e $file ) then
            echo Error: $file does not exist
         endif
@@ -1199,7 +1199,7 @@ around the equals sign are necessary.
 
 You can also remove variables with the {\bf unset} command.  This
 accepts {\tt *?[~]} \htmlref{\sf wildcards}{sc4_gl_wild} to
-\htmlref{{\sf match}}{sc4_gl_match} the names of the 
+\htmlref{{\sf match}}{sc4_gl_match} the names of the
 \htmlref{shell variables}{sc4_se_variables}.
 
 \small
@@ -1268,7 +1268,7 @@ This will echo ~{\tt The most distant quasar observed is at redshift 5.1}.
 This tests whether the value of variable {\tt n} is greater than ten, and
 if it is, executes the statement within the {\bf if\ldots endif}
 structure.  The value is also passed into an integer parameter of the
-application \xref{{\bf mem2d}}{sun95}{MEM2D}; and a string parameter of application 
+application \xref{{\bf mem2d}}{sun95}{MEM2D}; and a string parameter of application
 \xref{{\bf display}}{sun95}{DISPLAY}, so if {\tt n} were forty, the resultant value would
 be {\tt "Result of deconvolution after 40 iterations"}.
 
@@ -1291,7 +1291,7 @@ co-ordinates x=300, y=256.}
 \normalsize
 
 The following illustrates use of a text array to specify the
-annotations of a plot created with application 
+annotations of a plot created with application
 \xref{{\bf linplot}}{sun95}{LINPLOT}.
 \small
 \begin{verbatim}
@@ -1302,7 +1302,7 @@ annotations of a plot created with application
 
 \medskip
 There are some shorthands for specifying subsets of an array.  The best
-way to describe them is through some examples.  
+way to describe them is through some examples.
 All the values assume {\tt set prime = (2 3 5 7 11 13 17 19 23)}.
 
 \begin{center}
@@ -1324,7 +1324,7 @@ Syntax            & Meaning                    & Value \\ \hline
 
 Here we bring some of these ingredients together.  Suppose we are
 experimenting trying to find the most suitable reddish background
-({\tt{palnum=0}}) colour for image display using the 
+({\tt{palnum=0}}) colour for image display using the
 \xref{{\bf palentry}}{sun95}{PALENTRY} command
 from \KAPPAref\@.  The script below loops using a {\bf while...end}
 construct: all the commands inside the construct are repeated until the
@@ -1368,7 +1368,7 @@ Single characters may be escaped with a backslash.  For multiple
 occurrences single quotes {\tt '~'} will pass the enclosed text
 verbatim.  Double quotes {\tt "~"} do the same as single quotes except
 that {\tt \$}, \verb+\+, and left quote {\tt `} retain their special
-meaning.  
+meaning.
 
 \small
 \begin{verbatim}
@@ -1382,7 +1382,7 @@ In the first example the double quotes are part of parameter PLTITL
 (needed because of the embedded space) so are escaped individually.  On
 its own \verb+\+ means continue a line, but for Starlink tasks it is
 shorthand for the {\tt accept} keyword.  So we have to tell the shell to
-treat the backslash literally by preceding it with backslash!  
+treat the backslash literally by preceding it with backslash!
 
 In the last pair of examples an \xref{{\sf NDF section}}{sun95}{se_ndfsect}
 \latex{(see SUN/95's chapter called ``NDF Sections'')}
@@ -1429,7 +1429,7 @@ Syntax            & Meaning \\ \hline
 {\tt \$*}         & All the arguments supplied to the script \\
 {\tt \$\$}        & \htmlref{{\sf Process identification number}}{sc4_gl_pid}
                     (useful for making temporary files with unique names) \\
-\\ \hline 
+\\ \hline
 \end{tabular}
 \end{center}
 Thus inside a script, any command-line arguments are accessed as
@@ -1463,7 +1463,7 @@ Then we run it with four arguments.
 Note that you must enclose any argument passed to a script that contains
 a space or shell \htmlref{{\sf metacharacter}}{sc4_gl_met} in double quotes ({\tt{"}}).
 
-You can see an example using {\tt \$*} to process a list of files 
+You can see an example using {\tt \$*} to process a list of files
 \latexelsehtml{in Section~\ref{sc4_se_wildcard_lists}.
 }{\htmlref{here}{sc4_se_wildcard_lists}.}  There are other examples of script
 arguments in \latexelsehtml{Section~\ref{sc4_se_unix_options}.
@@ -1603,7 +1603,7 @@ any alias {\tt rm}.
 
 If you are executing graphics tasks which use the \xref{graphics
 database}{sun95}{se_agitate}, you may also need to redefine {\tt
-\$AGI\_USER} to another directory.  Usually, it is satisfactory to 
+\$AGI\_USER} to another directory.  Usually, it is satisfactory to
 equate {\tt \$AGI\_USER} to the {\tt \$ADAM\_USER} directory.
 
 \subsection{\xlabel{sc4_se_exit_status}How to test whether or not a
@@ -1613,7 +1613,7 @@ In a typical script involving Starlink software, you will invoke
 several applications.  Should any of them fail, you normally do not
 want the script to continue, unless an error is sometimes expected and
 your shell script can take appropriate action.  Either way you want a
-test that the application has succeeded.  
+test that the application has succeeded.
 
 If you set the ADAM\_EXIT \htmlref{{\sf environment
 variable}}{sc4_gl_env} to {\tt 1} in your script before calling
@@ -1637,7 +1637,7 @@ failure and 0 success.
 \normalsize
 
 The NDF allsky is absent from the current directory, so {\bf stats}
-fails, reflected in the value of {\tt status}, whereas 
+fails, reflected in the value of {\tt status}, whereas
 \$KAPPA\_DIR/comwest does exist.
 
 Here's an example in action.
@@ -1667,7 +1667,7 @@ The script first switches on the ADAM\_EXIT facility.  A little later
 you create an NDF represented by {\tt \$ndfgen} and then compare it with
 the input NDF {\tt \$ndfin} using \xref{{\bf normalize}}{sun95}{NORMALIZE}.
 If the task fails, you issue an error message and move to a block of
-code, normally near the end of the script, where various cleaning 
+code, normally near the end of the script, where various cleaning
 operations occur.  In this case it removes the generated NDF.
 
 When {\bf normalize} terminates successfully, the script accesses the
@@ -1845,7 +1845,7 @@ Remember that UNIX is case sensitive, so for instance, {\tt TRUE} and
 {\tt true} are not the same.
 
 Another popular way is to use an integer, which is assigned to 0 for
-a false value, and 1 for 
+a false value, and 1 for
 \begin{minipage}{80mm}
 \smallskip
 true.  Indeed this is the way logical expressions are evaluated by the
@@ -1885,7 +1885,7 @@ Operator & Meaning \\ \hline
 {\tt >} & Greater than \\
 {\tt <} & Less than \\
 {\tt >=} & Greater or equal to \\
-{\tt <=} & Less than or equal to \\ 
+{\tt <=} & Less than or equal to \\
 \vspace*{-\medskipamount} \\ \hline
 \end{tabular}
 \end{minipage}
@@ -1919,7 +1919,7 @@ another means is needed.  One such is to use the {\bf bc} calculator.
      if ( `echo "if ( ${asp} <= 1.1 ) 1" | bc` ) then
          <statements when $asp is less than or equal to 1.1>
      end
-     
+
 \end{verbatim}
 \normalsize
 
@@ -1934,7 +1934,7 @@ The other two examples show this technique in the context of a loop
 control and an if \ldots then block.
 
 Note {\bf bc} uses an arbitrary and controllable precision (\emph{cf.}
-the length and scale attributes).  Be aware it also uses a 
+the length and scale attributes).  Be aware it also uses a
 \xref{non-standard syntax for scientific
 notation}{sc16}{sc16_writingcsh}, as seen defining variable {\tt
 current} above.
@@ -1990,7 +1990,7 @@ This is fine if you know that the values will always be positive.
 However, {\bf calc} will object if there are adjacent mathematical
 operators, such as {\tt +-} as would happen if {\tt b} were negative.
 So surround variables in parentheses, remembering that the {\tt (~)} are
-\htmlref{{\sf metacharacters}}{sc4_gl_met}. 
+\htmlref{{\sf metacharacters}}{sc4_gl_met}.
 \latexelsehtml{See Section~\ref{sc4_se_spec_char}}{Click
 \htmlref{here}{sc4_se_spec_char}} for more details.
 
@@ -2059,14 +2059,14 @@ want to find the average median value for a series of \NDFref{{\sf NDF}s}.
         set median = `parget median histat`
 
      # Subtract the median from the input NDF.
-        csub $file1 $median  $file1"_m" 
+        csub $file1 $median  $file1"_m"
 
      # Count the number of NDFs.
         @ numndf = $numndf + 1
 
      # Form the string to sum the median values using CALC.  The shell
      # only permits integer arithmetic.  The expression is different
-     # for the first file. 
+     # for the first file.
         if ( $first == 0 ) then
            set expr = "( "$median
            set first = 1
@@ -2130,7 +2130,7 @@ sums two positive differences: {\tt 0} and {\tt 1} respectively.
 Variable {\tt mag} is the magnitude derived from the flux
 stored in variable {\tt counts}.  {\tt separation} is assigned
 the inverse tangent of 35.3 divided by the value of variable
-{\tt dist} measured between $-$180 and 180 degrees. 
+{\tt dist} measured between $-$180 and 180 degrees.
 
 \bigskip
 
@@ -2412,8 +2412,8 @@ replaces every occurrence.
 \begin{verbatim}
      set text = "Eta-Aquarid shower"
      # = "Eta-Aquarid stream"
-     set text = `echo $text | awk '{sub("shower","stream"); print $0}'` 
-     
+     set text = `echo $text | awk '{sub("shower","stream"); print $0}'`
+
      # = "Eta-Aquxid strex"
      set text1 = `echo $text | awk '{gsub("a[a-z]","x"); print $0}'`
 
@@ -2462,7 +2462,7 @@ analogous to the C function of the same name.  The syntax is
 
 \begin{minipage}{73mm}
 The format string may contain text, conversion codes, and interpreted
-sequences.  
+sequences.
 
 The conversion codes appear in the same order as the arguments
 they correspond to.  A conversion code has the form
@@ -2520,9 +2520,9 @@ Code & Interpretation \\ \hline
                        or {\tt m.nnnnnE$\pm$xx} respectively \\
 {\tt f} & floating point in {\tt mmm.nnnn} format\\
 {\tt g} & uses whichever format of {\tt d}, {\tt e}, or {\tt f}
-          is shortest \\ 
+          is shortest \\
 {\tt G} & uses whichever format of {\tt d}, {\tt E}, or {\tt f}
-          is shortest \\ 
+          is shortest \\
 \vspace*{-\medskipamount} \\ \hline
 \end{tabular}
 
@@ -2579,18 +2579,18 @@ Now we turn to some floating-point examples.
 Finally we have some character examples of {\bf printf}.
 \small
 \begin{verbatim}
-     set system = Wavelength   
+     set system = Wavelength
      set confid = 95
      set ndf = m31
      set acol = 12
      set dp = 2
-     
+
      printf "Confidence limit %d%% in the %s system\n" $confid $system
      Confidence limit 95% in the Wavelength system  # Simple case, percentage sign
      printf "Confidence limit %f.1%% in the %.4s system\n" $confid $system
      Confidence limit 95.0% in the Wave system      # Truncates to four characters
      set heading = `printf "%10s: %s\n%10s: %s\n\n" "system" $system "file" $ndf`
-     echo $heading                                  # Aligned output, saved to a 
+     echo $heading                                  # Aligned output, saved to a
          system: Wavelength                         # variable
            file: m31
 
@@ -2600,7 +2600,7 @@ Finally we have some character examples of {\bf printf}.
        confidence: 95.00                            # width and precision
 
      set heading = ""                               # Form a heading by appending to
-     foreach k ( $keywords )                        # variable in a loop.  Note the 
+     foreach k ( $keywords )                        # variable in a loop.  Note the
         set heading = $heading `printf "%8s  " $k`  # absence of \n.
      end
      echo `printf "%s\n" $heading
@@ -2640,7 +2640,7 @@ below.
 Suppose the first argument of a script, {\tt \$1}, is a filename called
 galaxy.bdf.  The value of variable {\tt type} is {\tt bdf} and {\tt
 name} equates to {\tt galaxy} because of the presence of the filename
-modifiers {\tt :e} and {\tt :r}.  The rest of the script uses the 
+modifiers {\tt :e} and {\tt :r}.  The rest of the script uses the
 file type to control the processing, in this case to provide a listing
 of the contents of a data file using the \HDSTRACEref\normalsize\ utility.
 
@@ -2659,7 +2659,7 @@ not contain a full stop, it returns a null string & {\tt sdf} \\
 present, it returns the complete filename & {\tt comwest} \\
 {\bf :h} & The path of the filename (mnemonic: h for head) & {\tt /star/bin/kappa} \\
 {\bf :t} & The tail of the file specification, excluding the path &
-                                         {\tt comwest.sdf} \\ 
+                                         {\tt comwest.sdf} \\
 \\ \hline
 \end{tabular}
 \end{center}
@@ -2686,7 +2686,7 @@ current directory and computes the statistics for them using the
 \xref{{\bf stats}}{sun95}{STATS} command from \KAPPAref\normalsize\@.  {\tt file}
 is a \htmlref{{\sf shell variable}}{sc4_gl_she_var}.  Each time in the
 loop {\tt file} is assigned to the name of the next file of the list
-between the parentheses.  The {\tt *} is the familiar 
+between the parentheses.  The {\tt *} is the familiar
 \htmlref{{\sf wildcard}}{sc4_gl_wild} which
 matches any string.  Remember when you want to use the shell
 variable's value you prefix it with a {\tt \$}.  Thus {\tt
@@ -2752,7 +2752,7 @@ you have made it executable with \mbox{\tt chmod +x splotem}.
 \begin{verbatim}
      #!/bin/csh
      figaro                 # Only need be invoked once per process
-     foreach file ($*) 
+     foreach file ($*)
         if (-e $file) then
            splot $file:r accept
         endif
@@ -2821,7 +2821,7 @@ Note the necessary parentheses around the expression {\tt (\$ndfs[*]
 \$argv[i]".sdf")}.
 
 On the command line the wildcards have to be passed verbatim, because
-the shell will try to match with files than don't have the {\tt .sdf} 
+the shell will try to match with files than don't have the {\tt .sdf}
 file extension.  Thus you must protect the wildcards with quotes.
 It's a nuisance, but the advantages of wildcards more than compensate.
 
@@ -2946,7 +2946,7 @@ a new string.  The following creates another \htmlref{shell
 variable}{sc4_se_variables}, {\tt ndfout} by replacing the string {\tt
 \_flat} from the input NDF name with {\tt \_sm}.  The script
 \htmlref{{\sf pipes}}{sc4_gl_pipe} the input name into the {\bf sed}
-editor which performs the substitution. 
+editor which performs the substitution.
 
 \small
 \begin{verbatim}
@@ -3172,7 +3172,7 @@ Variable {\tt file} is a space-delineated array of the lines in file
 \end{verbatim}
 \normalsize
 where \htmlref{{\sf shell variable}}{sc4_gl_she} {\tt j} is a positive
-integer and no more than the number of lines in the file, returns the $j$th 
+integer and no more than the number of lines in the file, returns the $j$th
 line in variable {\tt text}.
 
 \newpage
@@ -3201,7 +3201,7 @@ pattern or through the {\tt -F} option).
 \small
 \begin{verbatim}
     set nlines = `wc fornax.dat`
-     
+
     set ncol = `awk 'BEGIN { FS = ":" }{if (FNR==1) print NF}' fornax.dat`
     set ncol = `awk -F: '{if (FNR==1) print NF}' fornax.dat`
 \end{verbatim}
@@ -3216,7 +3216,7 @@ can obtain the field count from the last line.
 \end{verbatim}
 \normalsize
 First we obtain the number of lines in the file using {\bf wc} stored
-in {\tt \$lines[1]}.  This shell variable is passed into {\bf awk}, as 
+in {\tt \$lines[1]}.  This shell variable is passed into {\bf awk}, as
 variable {\tt nl}, through the {\tt -v} option.
 
 If you know the comment line begins with a hash (or can be recognised
@@ -3292,7 +3292,7 @@ The fifth example tests for the absence of a null value, {\tt -999}.
 You can find out how many values were extracted through {\tt \$\#}{\em
 var}, such as in the final line above.
 
-You have the standard \htmlref{relational and boolean operators}{sc4_tab_comp_oper} 
+You have the standard \htmlref{relational and boolean operators}{sc4_tab_comp_oper}
 available, as well as {\tt $\sim$} and {\tt !$\sim$} for match and does not match
 respectively.  These last two con involve \htmlref{regular expressions}{sc4_gl_reg_exp}
 giving powerful selection tools.
@@ -3351,7 +3351,7 @@ your script.
      commentary <<\foo
         The AITCH package offers unrivalled facilities.
         It is also easy to use because of its GUI interface.
-        
+
                    Save $$$ if you buy now.
      foo
 \end{verbatim}
@@ -3393,7 +3393,7 @@ attributes\label{sc4_se_dataset_attributes}}
 When writing a data-processing pipeline connecting several applications
 you will often need to know some attribute of the data file, such as
 its number of dimensions, its shape, whether or not it may contain bad
-pixels, a variance array or a specified extension.  The way to 
+pixels, a variance array or a specified extension.  The way to
 access these data is with \xref{{\bf ndftrace}}{sun95}{NDFTRACE} from
 \KAPPAref\ and \xref{{\bf parget}}{sun95}{PARGET} commands.
 {\bf ndftrace} inquires the data, and {\bf parget} communicates the
@@ -3420,7 +3420,7 @@ script.
 
 Note although called \xref{{\bf ndftrace}}{sun95}{NDFTRACE}, this
 function can determine the properties of foreign data formats through
-the automatic conversion system (\xref{SUN/55}{sun55}{}, 
+the automatic conversion system (\xref{SUN/55}{sun55}{},
 \xref{SSN/20}{ssn20}{}).  Of course, other formats do not have all the
 facilities of an NDF.
 
@@ -3511,7 +3511,7 @@ FDOMAIN & Yes & The domain of each co-ordinate Frame stored in the WCS component
                 of the NDF. The elements in this parameter correspond to those in
                 FDIM and FTITLE. The number of elements in each of these
                 parameters is given by NFRAME. \\
-FLABEL & Yes & The axis labels from the current WCS Frame of the NDF. \\ 
+FLABEL & Yes & The axis labels from the current WCS Frame of the NDF. \\
 FLBND  & Yes & The lower bounds of the bounding box enclosing the NDF in the
                current WCS Frame. The number of elements in this parameter is equal
                to the number of axes in the current WCS Frame (see FDIM).\\
@@ -3550,7 +3550,7 @@ WCS & & Whether or not the NDF has any WCS co-ordinate Frames, over and
         above the default GRID, PIXEL and AXIS Frames. \\
 WIDTH & Yes & Whether or not there are axis width arrays present in
               the NDF.  This is only written when FULLAXIS is {\tt TRUE} and AXIS is
-              {\tt TRUE}. \\ 
+              {\tt TRUE}. \\
 \\ \hline
 \end{tabular}
 \end{center}
@@ -3568,7 +3568,7 @@ FITS}}{sc4_gl_fits} file called {\tt dataset.fit} like this.
 \begin{verbatim}
      #  Enable automatic conversion
      convert         # Needs to be invoked only once per process
-     
+
      set file = dataset.fit
      ndftrace $file > /dev/null
      set varpres = `parget variance ndftrace`
@@ -3605,7 +3605,7 @@ need to know whether or not any were actually present, you should run
         goto tidy
      endif
      <perform data processing>
-     
+
      tidy:
      <tidy any temporary files, windows etc.>
      exit
@@ -3636,7 +3636,7 @@ Suppose the name of the dataset being probed is stored in variable
      # Assign the axis labels and number of dimensions to variables.
      set axlabel = `parget atype ndftrace`
      set nodims = `parget ndim`
-     
+
      # Exit the script when there are too many dimensions to handle.
      if ( $nodims > 2 ) then
         echo Cannot process a $nodims-dimensional dataset.
@@ -3663,7 +3663,7 @@ Suppose the name of the dataset being probed is stored in variable
         endif
         @ i++
      end
-     
+
      # Process the spectrum.
      if ( $spectrum == TRUE ) then
 
@@ -3758,7 +3758,7 @@ the \KAPPAref\ commands \xref{{\bf setext}}{sun95}{SETEXT}, and
 
 For example, if you wanted to obtain the value of the EPOCH object
 from an extension called IRAS\_ASTROMETRY in an NDF called lmc,
-you could do it like this. 
+you could do it like this.
 
 \small
 \begin{verbatim}
@@ -3851,7 +3851,7 @@ operators.}
 The box size for the smoothing is evaluated in an expression
 \mbox{\tt @ box = \$box - \$count * 2}.  Note the space between the
 {\tt @} and the variable, and the spaces around the {\tt =}.  Thus
-the box sizes will be 21, 17, 11, 3.  Further details are 
+the box sizes will be 21, 17, 11, 3.  Further details are
 \latexelsehtml{in
 Section~\ref{sc4_se_integer}.}{\htmlref{here}{sc4_se_integer}.}
 You should also give the variable a value with {\bf set} before
@@ -3945,7 +3945,7 @@ Section~\ref{sc4_se_arguments})} as it appends the NDF filenames.  The
 {\tt [1-]} means the first element until the last.
 
 To actually perform the masking we could write an \htmlref{{\sf
-ARD}}{sc4_gl_ard} ellipse shape using the variables, and 
+ARD}}{sc4_gl_ard} ellipse shape using the variables, and
 \htmlref{{\sf pipe}}{sc4_gl_pipe} it into a
 file, in this case {\tt biggal.ard}.
 
@@ -4068,7 +4068,7 @@ seen earlier into lengthier scripts.  So far there is only one.
 \label{sc4_se_long1}}
 
 The following script fits a surface to the background in a series of
-\NDFref{{\sf NDF}s}. 
+\NDFref{{\sf NDF}s}.
 First two bright galaxies are to be excluded from the fitting process by
 being \xref{masked using an ARD region}{sun95}{se_ardwork}\latex{ (see
 SUN/95, ``Doing it the ARD way'')}.  It is known that the brighter
@@ -4110,7 +4110,7 @@ displacement of the two galaxies is constant.
         echo $file:r
         surfit in=$file1"_masked" out=$file1"_bg" estimator=median \
                fittype=polynomial nxpar=4 nypar=4 ix=16 iy=16 \
-               fitclip=\[2,2.5,3\] evaluate=interpolate 
+               fitclip=\[2,2.5,3\] evaluate=interpolate
 
      # Perform the sky subtraction.
         sub $file1 $file1"_bg" $file1"_ss"
@@ -4169,7 +4169,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
 \item {\bf\label{sc4_gl_cur}Current process}\\
       The task currently running the shell (in the context of this
       document).  C-shell scripts invoked from the current process
-      are each run in new (child) processes. 
+      are each run in new (child) processes.
 
 \item {\bf\label{sc4_gl_env}Environment variable}\\
       A global variable to define the characteristics of a UNIX
@@ -4189,9 +4189,9 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       example, {\tt :t} excludes the path.
 
 \item {\bf\label{sc4_gl_fits}FITS}\\
-      Flexible Image Transport System (\FITSref).  The most commonly used 
+      Flexible Image Transport System (\FITSref).  The most commonly used
       format for astronomical data storage.  It comprises a series of
-      text headers followed by image or tabular data. 
+      text headers followed by image or tabular data.
 
 \item {\bf\label{sc4_gl_hds}HDS}\\
       Hierarchical Data System.  The underlying data system for Starlink
@@ -4204,7 +4204,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       Described in \xref{SUN/95}{sun95}{}.
 
 \item {\bf\label{sc4_gl_match}Match}\\
-      A string in a file that is successfully specified by a 
+      A string in a file that is successfully specified by a
       \htmlref{regular expression}{sc4_gl_reg_exp}.  It is also
       a filename, \htmlref{shell variable}{sc4_gl_she_var}, or
       \htmlref{alias}{sc4_gl_alias} successfully specified by

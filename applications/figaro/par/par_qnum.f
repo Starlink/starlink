@@ -19,9 +19,9 @@ C  Call:
 C     STATUS=PAR_QNUM(PROMPT,VMIN,VMAX,DEFAULT,USEDEF,UNITS,VALUE)
 C
 C  Parameters:      (">" input, "<" output)
-C     (>) PROMPT    (Fixed string, descr) The prompt string for the 
+C     (>) PROMPT    (Fixed string, descr) The prompt string for the
 C                   number. This should be 'clean' - it should not have
-C                   clever control characters, nor should it have 
+C                   clever control characters, nor should it have
 C                   the default value encoded in it.
 C     (>) VMIN      (Real, ref) The minimum acceptable value.
 C     (>) VMAX      (Real, ref) The maximum acceptable value.

@@ -51,5 +51,5 @@ C
           B = MI
       ELSE
           B = MI + (MA-MI)*(H-240.0)/60.0
-      END IF    
+      END IF
       END

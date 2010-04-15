@@ -23,7 +23,7 @@ proc CCDGetColour { Topwin element } {
 #        This routine will wait until the interaction is finished
 #        before proceeding.
 #     element = string (read)
-#        The name of the element of the global array CCDprefs to receive 
+#        The name of the element of the global array CCDprefs to receive
 #        the chosen colour.
 
 #  Copyright:

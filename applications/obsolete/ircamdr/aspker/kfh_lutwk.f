@@ -442,7 +442,7 @@
 *                being stored using the GKS routine so that the
 *                relevant GKS tables will be set up so that
 *                they can be accessed by later programs (N.B.
-*                GKS requires the intensities to be in the 
+*                GKS requires the intensities to be in the
 *                range 0 to 1 whereas SRCOLS requires them
 *                in the range 0 to 255). SGS (and hence GKS)
 *                is then closed.

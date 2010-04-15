@@ -52,16 +52,16 @@ proc CCDMin { args } {
 
 #.
    set nargs [llength $args]
-   if { $nargs > 1 } { 
+   if { $nargs > 1 } {
       set min [lindex $args 0]
-      for { set i 1 } { $i < $nargs } { incr i } { 
+      for { set i 1 } { $i < $nargs } { incr i } {
          set v [lindex $args $i]
          if { $v < $min } { set min $v }
       }
       return $min
-   } elseif { $nargs == 1 } { 
+   } elseif { $nargs == 1 } {
       return $args
-   } else { 
+   } else {
       return -1
    }
 

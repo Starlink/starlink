@@ -242,7 +242,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
 
    #  Called when the query completes.
    protected method query_done_ {} {
-      
+
       #  Immediate notification we're finished.
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
@@ -286,10 +286,10 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
             set tempname [$tempcats_ get_name]
             set tst [gaiavotable::save $vot 0 $tempname]
             gaiavotable::close $vot
-            
+
             #  This is the current VOTable now.
             set votable_ $filename
-            
+
          } else {
             set status 0
             set tempname "Query returned an error ($query_status: $errmsg)"
@@ -336,7 +336,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       set list [get_image_center_radius]
       if { [llength $list] > 2 } {
          lassign $list ra_ dec_ size1_
-         
+
          #  Don't set second size. Not all servers seem to support that.
          set size2_ {}
       }
@@ -384,11 +384,11 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
          return
       }
       lassign $list x0 y0 x1 y1
-      
+
       #  Get center and radius in canvas coords.
       set x [expr ($x0+$x1)/2.]
       set y [expr ($y0+$y1)/2.]
-      
+
       if { [catch {$image convert coords $x $y canvas ra dec "wcs J2000"} msg] } {
          error_dialog \
             "error converting canvas ($x, $y) to world coordinates: $msg" $w_
@@ -421,7 +421,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
 
    #  Nameserver for looking up object coordinates.
    itk_option define -namesvr namesvr NameSvr ned@eso
-   
+
    #  GaiaImageCtrl instance.
    itk_option define -gaiactrl gaiactrl GaiaCtrl {}
 

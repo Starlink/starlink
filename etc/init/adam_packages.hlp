@@ -6,9 +6,9 @@ The following ADAM applications packages are available from Starlink:
  CONVERT - Data format conversion.       DAOPHOT - Stellar photometry.
  DATACUBE - Spectral-cube analysis.      ESP - Extended Surface Photometry.
  EXTRACTOR - Astronomical source detection.
- FIGARO  - General data-reduction.       HDSTOOLS - HDS file editing   
- *IRAS90  - IRAS data analysis.         *IRCAMDR - IRCAM3 data reduction.       
- JCMTDR  - JCMT data reduction.          KAPPA   - Image processing.            
+ FIGARO  - General data-reduction.       HDSTOOLS - HDS file editing
+ *IRAS90  - IRAS data analysis.         *IRCAMDR - IRCAM3 data reduction.
+ JCMTDR  - JCMT data reduction.          KAPPA   - Image processing.
 *NDPROGS - n-D data reduction.           PHOTOM  - Aperture photometry.
  PISA    - Position, Intensity and Shape Analysis.
  PONGO   - Interactive Data Plotting.    POLPACK - polarimetry data reduction.
@@ -27,7 +27,7 @@ The following ADAM applications packages are available from Starlink:
 [ The Asterix Package has been withdrawn from the Starlink Software
   distribution.  However, the commands to start the Asterix system
   have remained in the Starlink initialisation scripts to provide
-  for continued use of the Asterix system distributed by University of 
+  for continued use of the Asterix system distributed by University of
   Birmingham. ]
 
 ASTERIX is a collection of applications written to analyse astronomical
@@ -42,12 +42,12 @@ currently has interfaces to all Exosat instruments and the ROSAT WFC.
 
 To start Asterix, you need to type:
 
-% asterix             {defines Asterix environment} 
+% asterix             {defines Asterix environment}
 % icl                 {starts ICL}
 ICL> asterix          {defines Asterix commands}
 
 To get help on an Asterix command type "asthelp command_name" from
-either ICL or the Unix shell. 
+either ICL or the Unix shell.
 
 An introduction to using Asterix can be found in SUN/98.
 
@@ -89,14 +89,14 @@ SUN/120 gives full details of CATPAC.
  registration and mosaicing.  A full listing of the CCDPACK tasks with
  a brief description of their purpose is found under the help topic
  "Classified_Commands".
- 
+
  A major aim of CCDPACK is to help in the processing of large amounts
  of data. Consequently all CCDPACK routines process lists of data and
  log useful information using an internal logging system.
 
- The package is initialised (shell or ICL) using the CCDPACK command.  
+ The package is initialised (shell or ICL) using the CCDPACK command.
  The hypertext help system can be activated using the `ccdwww' command.
- The standard help can be obtained by typing `ccdhelp' or `ccdhelp 
+ The standard help can be obtained by typing `ccdhelp' or `ccdhelp
  "taskname"'.  Help can also be accessed at any prompt by returning a "?".
 
  CCDPACK v2.0 has a GUI based automated data reduction facility.  To use
@@ -115,9 +115,9 @@ SUN/120 gives full details of CATPAC.
 
     MAKEBIAS - produces a bias calibration NDF
 
-    DEBIAS   - debiases NDFs either by bias calibration NDF 
-               subtraction or by interpolation, applies bad data 
-               masks, extracts a subset of the data area, produces 
+    DEBIAS   - debiases NDFs either by bias calibration NDF
+               subtraction or by interpolation, applies bad data
+               masks, extracts a subset of the data area, produces
                variances applies saturation values
 
     MAKECAL  - produces calibration NDFs for flash or dark counts
@@ -132,13 +132,13 @@ SUN/120 gives full details of CATPAC.
 
     FINDOBJ  - locates and centroids NDF image features
 
-    FINDOFF  - Performs pattern-matching between position lists 
+    FINDOFF  - Performs pattern-matching between position lists
                related by simple offsets.
 
     IDICURS  - reads co-ordinates from a graphics device (allows
                zooming and panning)
 
-    MAKEMOS  - makes NDF mosaics by combining and (optionally) 
+    MAKEMOS  - makes NDF mosaics by combining and (optionally)
                normalising
 
     PAIRNDF  - displays and manipulates NDF pairs to allow easy
@@ -156,7 +156,7 @@ SUN/120 gives full details of CATPAC.
 
  Routines which support the function of the main tasks are.
 
-    CCDSETUP - sets up the CCDPACK global parameters; 
+    CCDSETUP - sets up the CCDPACK global parameters;
                should be used first
 
     CCDCLEAR - clears the current global parameters
@@ -184,12 +184,12 @@ SUN/120 gives full details of CATPAC.
       % cgs4dr <data> <UTdate> <format>
 
   where <data> is a data directory, <UTdate> is the UT date of the
-  observations and <format> is the format (ndf or dst). E.g., 
+  observations and <format> is the format (ndf or dst). E.g.,
 
       % cgs4dr /usr/local/scratch/pnd/19940811 940811 ndf
 
   This release is a `stop-gap' release which provides a limited sub-set
-  of the functionality of the VMS system and runs under an ICL command 
+  of the functionality of the VMS system and runs under an ICL command
   line interface. This interface is documented in SUN/27 and users are
   strongly urged to read that document before proceeding.
 
@@ -261,29 +261,29 @@ obtained with DAOPHOT to be displayed on an image device.
 
  o DAOGREY will display a grey scale image of the data on a suitable device.
 
- o DAOPLOT will indicate the positions of objects found with DAOPHOT on top 
+ o DAOPLOT will indicate the positions of objects found with DAOPHOT on top
    of the grey image.
 
  o DAOCURS will allow positions to be measured from the screen.
 
-DAOPHOT is normally run from the Unix shell, more details may be found 
+DAOPHOT is normally run from the Unix shell, more details may be found
 in SUN/42.
 
 1 DATACUBE
 
-DATACUBE is a collection of C-shell scripts layered on top of various 
+DATACUBE is a collection of C-shell scripts layered on top of various
 pieces of the Starlink Software Collection (SSC) for the analysis of
 spectral datacubes, such as from integral-field spectrometers.
-They permit graphical selection of spatial and spectral regions and 
+They permit graphical selection of spatial and spectral regions and
 features using the cursor.
 
 DATACUBE provides facilities:
-  o  to view a `white-light' image of the whole and/or part of the 
-     spectral range (squash, passband); 
-  o  to view a grid of channel maps of defined spectral width (step); 
-  o  to extract individual spectra (ripper); 
-  o  to compare spectra (compare, stacker); 
-  o  to average and compare groups of spectra (multistack); 
+  o  to view a `white-light' image of the whole and/or part of the
+     spectral range (squash, passband);
+  o  to view a grid of channel maps of defined spectral width (step);
+  o  to extract individual spectra (ripper);
+  o  to compare spectra (compare, stacker);
+  o  to average and compare groups of spectra (multistack);
   o  to plot a grid of spectra with spatial averaging (gridspec)
   o  to build a velocity map from an emission line by line
      fitting (velmap) or by intensity-weighted moments (velmoment);
@@ -294,8 +294,8 @@ DATACUBE provides facilities:
 
 The C-Shell approach was a deliberate design decision.  One reason
 being the still-developing nature of the field makes it difficult to
-pin down exactly which visualisation tasks will be necessary, and the 
-choice of C-shell means that the existing scripts can be easily 
+pin down exactly which visualisation tasks will be necessary, and the
+choice of C-shell means that the existing scripts can be easily
 modified by users to do exactly the job required using the wealth of
 existing applications.
 
@@ -382,10 +382,10 @@ set has been merged into FIGARO.  SUN/86 gives details.
   HRESHAPE - Reshape an HDS object.
   HRETYPE  - Change the type of an HDS structure object.
   HTAB     - Display one or more vector objects in table form.
- 
+
  SUN/245 contains details of the tools available.
 
-1 IRAS90 
+1 IRAS90
 
  **** The IRAS90 package is now deprecated and is no longer maintained. ****
  **** It will be withdrawn from the USSC some time in the future.       ****
@@ -426,15 +426,15 @@ The main IRAS90 routines are:
     SETQUAL   -  Assign a quality to a group of pixels in an NDF.
     SHOWQUAL  -  Display the qualities currently defined within an NDF.
     SIMCRDD   -  Generate simulated CRDD from a supplied trial sky image.
-    SKYALIGN  -  Align images using internally stored astrometric 
+    SKYALIGN  -  Align images using internally stored astrometric
                  information.
-    SKYBOX    -  Report extent and position of a rectangular region of 
+    SKYBOX    -  Report extent and position of a rectangular region of
                  the sky.
     SKYGRID   -  Annotate a picture with a celestial coordinates grid.
     SKYLINE   -  Draw meridians, parallels and great circles over an image.
     SKYMARK   -  Draw markers over an image at specified celestial
                  coordinates.
-    SKYPOS    -  Transform positions between image and celestial 
+    SKYPOS    -  Transform positions between image and celestial
                  coordinates.
     SKYWRITE  -  Write text over an image at specified celestial
                  coordinates.
@@ -442,7 +442,7 @@ The main IRAS90 routines are:
 
 1 IRCAMDR
 
-The IRCAMDR package is designed to reduce and analyse IRCAM3 data, but 
+The IRCAMDR package is designed to reduce and analyse IRCAM3 data, but
 can handle old IRCAM1/2 data, and any suitable data in NDF form.
 
 IRCAMDR is started from the shell prompt (%) thus:
@@ -450,7 +450,7 @@ IRCAMDR is started from the shell prompt (%) thus:
     % ircamdr
 
 SUN/41 gives full details of the commands available within IRCAMDR, and
-there is a hypertext version available (`showme sun41' or `findme ircamdr' 
+there is a hypertext version available (`showme sun41' or `findme ircamdr'
 in the shell).
 
 Although IRCAMDR runs under ICL, it may only be started from the shell.
@@ -468,9 +468,9 @@ To start JCMTDR, type:
 
 Further help may be obtained by:
 
-    ICL> help jcmtdr 
+    ICL> help jcmtdr
 
-SUN/132 contains full details of the JCMTDR applications. 
+SUN/132 contains full details of the JCMTDR applications.
 
 1 KAPPA
 
@@ -495,7 +495,7 @@ To make the commands of KAPPA available, type:
  **** The NDPROGS package is now deprecated and is no longer maintained. ****
  **** It will be withdrawn from the USSC some time in the future.        ****
 
- NDPROGS is a Figaro based set of applications for manipulating and 
+ NDPROGS is a Figaro based set of applications for manipulating and
  reducing n-Dimensional data sets.
 
  NDPROGS may be accessed by typing:
@@ -614,7 +614,7 @@ within ICL.
 1 SURF
 
 SURF is the SCUBA User Reduction Facility, a data reduction system written
-at the Joint Astronomy Centre (JACH), Hawaii, for reducing data obtained 
+at the Joint Astronomy Centre (JACH), Hawaii, for reducing data obtained
 with the Sub-mm Common-User Bolometer Array (SCUBA) at the James Clerk
 Maxwell Telescope.  Map, photometry and skydip observing modes are supported.
 
@@ -709,5 +709,5 @@ To use them, just type the application name in response to the ICL> prompt.
    % icl
    ICL> xrt
 
- The XRT command set is the same as that available in AXTERIX. 
+ The XRT command set is the same as that available in AXTERIX.
 

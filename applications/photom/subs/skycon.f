@@ -1,11 +1,11 @@
 ************************************************************************
 
       SUBROUTINE SKYCON (SKYEST, XCEN, YCEN, A2, A3, E, THETA,
-     :                   NX, NY, IMAGE, IMVAR, USEVAR, MASK, 
-     :                   USEMSK, VALUES, NV, LOCSKY, SIGMA, 
+     :                   NX, NY, IMAGE, IMVAR, USEVAR, MASK,
+     :                   USEMSK, VALUES, NV, LOCSKY, SIGMA,
      :                   VSKY, MAXSKY, SKY, SKYSIG, AREA,
      :                   SKYARE, EFACT, ASKY, STATUS )
-     
+
 *+
 *  Name :
 *     SKYCON
@@ -19,10 +19,10 @@
 *  Invocation :
 *
 *      CALL SKYCON (SKYEST, XCEN, YCEN, A2, A3, E, THETA,
-*     :             NX, NY, IMAGE, IMVAR, USEVAR, MASK, 
-*     :             USEMSK, VALUES, NV, LOCSKY, SIGMA, 
+*     :             NX, NY, IMAGE, IMVAR, USEVAR, MASK,
+*     :             USEMSK, VALUES, NV, LOCSKY, SIGMA,
 *     :             VSKY, MAXSKY, SKY,SKYSIG, AREA,
-*     :             SKYARE, EFACT, ASKY, STATUS  ) 
+*     :             SKYARE, EFACT, ASKY, STATUS  )
 *
 *  Description :
 *     {routine_description}...
@@ -60,26 +60,26 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'CNF_PAR'
-            
+
 *  Arguments Given :
 
       INTEGER MAXSKY
-      INTEGER SKYEST 
+      INTEGER SKYEST
       REAL XCEN, YCEN
       REAL A2, A3, E, THETA
       INTEGER NX, NY
-      REAL IMAGE( * ) 
+      REAL IMAGE( * )
       REAL IMVAR( * )
       REAL MASK( * )
       LOGICAL USEVAR, USEMSK
       INTEGER NV
       REAL VALUES( MAXSKY )
-      REAL LOCSKY, SIGMA, VSKY, SKY 
-      REAL SKYSIG, AREA, SKYARE, EFACT 
+      REAL LOCSKY, SIGMA, VSKY, SKY
+      REAL SKYSIG, AREA, SKYARE, EFACT
       INTEGER ASKY
 
 *  Status :
-      
+
       INTEGER STATUS
 
 *  Local Variables :
@@ -89,14 +89,14 @@
 
       CHARACTER * ( DAT__SZLOC ) VLOC
       CHARACTER CODE * 2, TEXT * 72
-            
+
 *.
 
 *   Check status on entry - return if not o.k.
 *      WRITE(*,*) ' DEBUG --- --- Entering SKYCON()'
 *      WRITE(*,*) ' DEBUG --- --- STATUS = ', STATUS
 
-      IF ( STATUS .NE. SAI__OK ) RETURN      
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Use the user supplied value of sky if requested
       IF ( SKYEST .EQ. 4 ) THEN
@@ -128,7 +128,7 @@
          IF ( ASKY .LT. MAXSKY ) THEN
               NV = MAXSKY
 *              WRITE(*,*) ' DEBUG --- --- calling RAGGED() asky < maxsky'
-              CALL RAGGED ( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR, 
+              CALL RAGGED ( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR,
      :                      MASK, USEMSK, NXL, NXH, NYL, NYH, XCEN,
      :                      YCEN, A2, A3, E, THETA, VALUES, NV,
      :                      LOCSKY, SIGMA, VSKY )
@@ -139,9 +139,9 @@
               CALL DAT_TEMP('_REAL', 1, NV, VLOC, STATUS)
               CALL DAT_MAPR(VLOC, 'WRITE', 1, NV, IV, STATUS)
 *              WRITE(*,*) ' DEBUG --- --- calling RAGGED() asky > maxsky'
-              CALL RAGGED( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR, 
-     :                     MASK, USEMSK, NXL, NXH, NYL, NYH, XCEN, 
-     :                     YCEN, A2, A3, E, THETA, 
+              CALL RAGGED( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR,
+     :                     MASK, USEMSK, NXL, NXH, NYL, NYH, XCEN,
+     :                     YCEN, A2, A3, E, THETA,
      :                     %VAL( CNF_PVAL( IV ) ), NV,
      :                     LOCSKY, SIGMA, VSKY )
               CALL DAT_UNMAP( VLOC, STATUS )
@@ -150,7 +150,7 @@
 
 *   Use the number of sky pixels as the sky area
          SKYARE = REAL ( NV )
-                              
+
       ENDIF
 *
 *   End of routine
@@ -159,4 +159,4 @@
 *      WRITE(*,*) ' DEBUG --- --- STATUS = ', STATUS
 *      WRITE(*,*) ' DEBUG --- --- Leaving SKYCON()'
 
-      END                                                      
+      END

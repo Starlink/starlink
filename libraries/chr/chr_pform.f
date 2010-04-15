@@ -13,17 +13,17 @@
 *     CALL CHR_PFORM( MXPAR, PARRAY, JUSTFY, IPOSN, STRING )
 
 *  Description:
-*     This subroutine is called repeatedly to reformat the given 
-*     paragraph to a new width (given by the declared length of the 
-*     returned character variable). The output may be optionally 
-*     justified to the right margin (i.e. the end of the returned 
-*     character variable). This routine should be called repeatedly 
-*     to generate successive returned lines from the given paragraph 
-*     array. Initially, the context argument IPOSN should be set to zero; 
-*     it will be updated after each call, ready to generate the next 
-*     output line. A value of zero is returned for IPOSN when there are 
-*     no more lines to return. Any unprintable characters (e.g. tabs) 
-*     are treated as if they were spaces for the purpose of generating 
+*     This subroutine is called repeatedly to reformat the given
+*     paragraph to a new width (given by the declared length of the
+*     returned character variable). The output may be optionally
+*     justified to the right margin (i.e. the end of the returned
+*     character variable). This routine should be called repeatedly
+*     to generate successive returned lines from the given paragraph
+*     array. Initially, the context argument IPOSN should be set to zero;
+*     it will be updated after each call, ready to generate the next
+*     output line. A value of zero is returned for IPOSN when there are
+*     no more lines to return. Any unprintable characters (e.g. tabs)
+*     are treated as if they were spaces for the purpose of generating
 *     line-breaks.
 
 *  Arguments:
@@ -31,29 +31,29 @@
 *        The maximum length of the given paragraph array, PARRAY.
 *     PARRAY( MXPAR ) = CHARACTER * ( * ) (Given)
 *        The character array which contains the paragraph text to be
-*        reformatted, one line per array element. Leading blanks are 
-*        ignored. A line-break is interpreted as the start of a new 
+*        reformatted, one line per array element. Leading blanks are
+*        ignored. A line-break is interpreted as the start of a new
 *        word.
 *     JUSTFY = LOGICAL (Given)
-*        The right justification flag: if this is given as .TRUE., 
-*        the text is returned right justified; otherwise the text is 
+*        The right justification flag: if this is given as .TRUE.,
+*        the text is returned right justified; otherwise the text is
 *        returned with a ragged right margin.
 *     IPOSN = INTEGER (Given and Returned)
 *        On entry, this argument specifies the character position in
-*        PARRAY from which to start generating the next returned line. 
+*        PARRAY from which to start generating the next returned line.
 *        It is given as the number of characters from the start of the
 *        first character in the first element in PARRAY. If a value less
 *        than 1 is used, then 1 will be used.
 *
-*        On exit, this argument is set to one more than the character 
-*        offset of the start of PARRAY of the last non-blank character 
-*        which appears in the returned line STRING (i.e. the position 
-*        at which the generation of the next output line should start). 
-*        If STRING is blank because there are no more characters to 
+*        On exit, this argument is set to one more than the character
+*        offset of the start of PARRAY of the last non-blank character
+*        which appears in the returned line STRING (i.e. the position
+*        at which the generation of the next output line should start).
+*        If STRING is blank because there are no more characters to
 *        process, then IPOSN is returned set to zero.
 *     STRING = CHARACTER * ( * ) (Returned)
 *        The returned line of text in the paragraph, left justified. The
-*        length of this argument defines the maximum length of the 
+*        length of this argument defines the maximum length of the
 *        returned paragraph line.
 
 *  Copyright:
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -96,7 +96,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -172,8 +172,8 @@
             NPC = MOD( IPOSN-1, IPLEN ) + 1
             NPL = ( IPOSN-1 ) / IPLEN + 1
 
-*        Search for the beginning of the next word: i.e. the next 
-*        non-blank character in PARRAY. 
+*        Search for the beginning of the next word: i.e. the next
+*        non-blank character in PARRAY.
             ICSTRT = NPC
             ILSTRT = NPL
 
@@ -200,7 +200,7 @@
  20         CONTINUE
  30         CONTINUE
 
-*        Set the initial paragraph loop indices to point to the 
+*        Set the initial paragraph loop indices to point to the
 *        beginning of the first word.
             ICSTRT = ICH
             ILSTRT = ILN
@@ -223,18 +223,18 @@
 
                DO 50 ICHP = ICSTRT, IPLEN
 
-*              Get the next character from PARRAY and convert any 
+*              Get the next character from PARRAY and convert any
 *              unprintable characters to blanks.
                   CVALUE = PARRAY( ILNP )( ICHP : ICHP )
                   CALL CHR_CLEAN( CVALUE )
 
-*              If the current character is a blank, then check if the 
+*              If the current character is a blank, then check if the
 *              previous character was also blank: if so, discard it;
 *              else mark the end of the last word.
                   IF ( CVALUE .EQ. ' ' ) THEN
                      IF ( .NOT. ISGAP ) THEN
 
-*                    The end of a word, so update the character and gap 
+*                    The end of a word, so update the character and gap
 *                    counters.
                         NPCH = NPCH + 1
                         NGAP = NGAP + 1
@@ -275,8 +275,8 @@
 *                    if there are any word-breaks in STRING.
                         IF ( NGAP .GT. 0 ) THEN
 
-*                       There are word-breaksin the string, so update 
-*                       the values of NPL, NPC to point to beyond the end 
+*                       There are word-breaksin the string, so update
+*                       the values of NPL, NPC to point to beyond the end
 *                       of the last word.
                            NPC = ICWEND + 1
                            NPL = ILWEND
@@ -352,7 +352,7 @@
 *  Finish off line.
       IF ( NPCHLW .LT. OPLEN ) STRING( NPCHLW : ) = ' '
 
-*  If the line is not the last line in the paragraph, right-justify it 
+*  If the line is not the last line in the paragraph, right-justify it
 *  and return updated value of IPOSN; else reset IPOSN.
       IF ( ILNP .LE. MXPAR ) THEN
          IF ( JUSTFY ) CALL CHR_RJUST( STRING )

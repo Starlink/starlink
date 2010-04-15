@@ -8,10 +8,10 @@ C     Ideally the VAX POLYD instruction should be used.
 C
 C     Parameters - (">" input, "<" output)
 C
-C     (>) VALUE   (Double precision) The value for which the 
+C     (>) VALUE   (Double precision) The value for which the
 C                 polynomial is to be evaluated.
-C     (>) COEFFS  (Double precision  array COEFFS(NCOEFF)) The 
-C                 coefficients of the polynomial, with the 
+C     (>) COEFFS  (Double precision  array COEFFS(NCOEFF)) The
+C                 coefficients of the polynomial, with the
 C                 constant term last.
 C     (>) NCOEFF  (Integer) The number of polynomial coefficients.
 C

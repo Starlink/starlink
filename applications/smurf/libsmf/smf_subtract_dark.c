@@ -115,7 +115,7 @@
 
 #define FUNC_NAME "smf_subtract_dark"
 
-void smf_subtract_dark ( smfData * indata, const smfData * dark1, 
+void smf_subtract_dark ( smfData * indata, const smfData * dark1,
   const smfData * dark2, smf_dark_sub_meth method, int *status ) {
 
   int *idark = NULL;    /* Pointer to int dark frame to subtract */

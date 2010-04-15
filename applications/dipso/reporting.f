@@ -45,7 +45,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -62,9 +62,9 @@
 
 *  Local Variable:
       INTEGER
-     :        DEFIND,            ! Default value 
+     :        DEFIND,            ! Default value
      :        FILTER,            ! Current filter level
-     :        INDEX              ! Requested value 
+     :        INDEX              ! Requested value
 *.
 
 *  Check inherited global status.
@@ -78,14 +78,14 @@
       CALL MSG_IFLEV( FILTER, ' ', STATUS )
       IF( FILTER .EQ. MSG__QUIET ) THEN
          DEFIND = 0
-     
+
       ELSE IF( FILTER .EQ. MSG__NORM ) THEN
          DEFIND = 1
 
       ELSE
          DEFIND = 2
 
-      END IF     
+      END IF
 
 *  Get the integer value which specifies the required message filtering
 *  level.
@@ -98,18 +98,18 @@
          CALL MSGOUT( COMM, 'Setting the message filtering level to 0',
      :                .FALSE., STATUS )
          CALL MSG_IFSET( MSG__QUIET, STATUS )
- 
+
       ELSE IF( INDEX .EQ. 1 ) THEN
          CALL MSGOUT( COMM, 'Setting the message filtering level to 1',
      :                .FALSE., STATUS )
          CALL MSG_IFSET( MSG__NORM, STATUS )
- 
-      ELSE 
+
+      ELSE
          CALL MSGOUT( COMM, 'Setting the message filtering level to 2',
      :                .FALSE., STATUS )
          CALL MSG_IFSET( MSG__VERB, STATUS )
 
-      END IF 
+      END IF
 
 *  If an error has occurred, give a context warning message.
       IF( STATUS .NE. SAI__OK ) THEN

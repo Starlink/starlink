@@ -15,7 +15,7 @@
 *  Description:
 *     This routine implements a source routine which has to be passed to
 *     the AST Channel construction routines (AST_CHANNEL, AST_FITSCHAN)
-*     in order to do input/output on AST objects to a file.  It uses FIO 
+*     in order to do input/output on AST objects to a file.  It uses FIO
 *     to do the input, via a file descriptor held in a common block.
 
 *  Arguments:
@@ -69,17 +69,17 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIO_ERR'          ! FIO error constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
-      
+
 *  Global Variables:
       INCLUDE 'CCD1_FDCM'        ! File descriptor for AST channel CCD1_ASTFD
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for input
       INTEGER NCHAR              ! Number of characters read
-      
+
 *.
 
 *  Check inherited global status.

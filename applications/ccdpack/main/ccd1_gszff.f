@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -78,8 +78,8 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION SCALE( CCD1__MXNDF + 1 )   ! Scale factor correction
-      DOUBLE PRECISION ZERO( CCD1__MXNDF + 1 )   ! Zero point correction 
-        
+      DOUBLE PRECISION ZERO( CCD1__MXNDF + 1 )   ! Zero point correction
+
 *  External References:
 
 *  Local Constants:
@@ -90,16 +90,16 @@
 
 *  Local Variables:
       LOGICAL OK                         ! Ok to read file again
-      
+
       INTEGER NLINE                      ! Line count
       INTEGER NREC                       ! Record count
       INTEGER NWRD                       ! Number of words in line
       INTEGER START( MAXWRD )            ! Starting positions of words in buffer
       INTEGER STOP( MAXWRD )             ! End positions of words in buffer
       INTEGER LSTAT                      ! Local status
-      
+
       INTEGER NDFNO                      ! The number of the NDF we want
-      
+
 *  Status:
       INTEGER STATUS                      ! Global status
 
@@ -122,11 +122,11 @@
             CALL ERR_ANNUL( STATUS )
             OK = .FALSE.
          ELSE
-         
+
 *  Read a line need to determine what it is.
             NLINE = NLINE + 1
             IF ( BUFFER( 1:1 ) .NE. '#' ) THEN
-            
+
 *  Probably something we want (we skip blank lines in this part).
                CALL CHR_DCWRD( BUFFER, MAXWRD, NWRD, START, STOP,
      :                         WORDS, LSTAT )
@@ -136,14 +136,14 @@
                   CALL ERR_REP( 'CCD1_GSZFF_TOOMANY',
      :            'Line ^NUM contains too many fields.', STATUS )
                   OK = .FALSE.
-               ELSE IF ( NWRD .EQ. 3 ) THEN               
+               ELSE IF ( NWRD .EQ. 3 ) THEN
 
 *  3 fields in line, must be an record so strip the info.
                   NREC = NREC + 1
                   CALL CHR_CTOI( WORDS( 1 ), NDFNO, STATUS )
                   CALL CHR_CTOD( WORDS( 2 ), SCALE(NDFNO), STATUS )
                   CALL CHR_CTOD( WORDS( 3 ), ZERO(NDFNO), STATUS )
-                  
+
                ELSE IF ( NWRD .NE. 0 ) THEN
 
 *  Unknown number of records, so report an error.
@@ -155,7 +155,7 @@
                END IF
             END IF
          END IF
-         
+
          GO TO 1                ! Next loop.
       END IF
 
@@ -167,12 +167,12 @@
       ELSE IF( NREC .GT. NIN .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'PHO1_GSZFF_WRONGNO',
-     :   'File contains to many records.', STATUS )      
+     :   'File contains to many records.', STATUS )
       ELSE IF( NREC .LT. NIN .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'PHO1_GSZFF_WRONGNO',
-     :   'File contains to few records.', STATUS )      
+     :   'File contains to few records.', STATUS )
       ENDIF
-      
+
 *  Time at the bar please
       END

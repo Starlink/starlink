@@ -30,7 +30,7 @@
 *     examples of legal SCS values; EQUATORIAL(B1950), EQUAT(J2000),
 *     ECLIP, ECLIP(1983.2534), etc. If the date is not preceded with
 *     either B or J (as in the last example), a Besselian epoch is
-*     assumed if the date is less than 1984.0, and a Julian epoch is 
+*     assumed if the date is less than 1984.0, and a Julian epoch is
 *     assumed otherwise.
 *
 *     The currently supported sky coordinate systems are:
@@ -64,7 +64,7 @@
 *
 *            The longitude axis is horizon azimuth and the latitude axis is
 *            horizon elevation.
-*            
+*
 *     All sky coordinate values supplied to, or returned from any IRA
 *     routine, are given in units of radians.
 
@@ -88,12 +88,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA

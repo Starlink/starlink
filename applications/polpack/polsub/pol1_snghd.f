@@ -1,18 +1,18 @@
-      SUBROUTINE POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, T, EPS, 
+      SUBROUTINE POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, T, EPS,
      :                       IGRP2, LBNDO, UBNDO, NDIMO, ANGRT, STATUS )
 *+
 *  Name:
 *     POL1_SNGHD
 
 *  Purpose:
-*     Gets required POLPACK extension items from a set of single-beam 
+*     Gets required POLPACK extension items from a set of single-beam
 *     intensity images.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, EPS, IGRP2, 
+*     CALL POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, EPS, IGRP2,
 *                      LBNDO, UBNDO, NDIMO, ANGRT, STATUS )
 
 *  Description:
@@ -21,7 +21,7 @@
 
 *  Arguments:
 *     IGRP1 = INTEGER (Given)
-*        A GRP identifier for the group containing the input NDF names. 
+*        A GRP identifier for the group containing the input NDF names.
 *        These should be aligned pixel-for-pixel.
 *     NNDF = INTEGER (Given)
 *        The number of NDFs in the supplied group.
@@ -37,28 +37,28 @@
 *        returned integer values are indices into the IGRP2 group.
 *     T( NNDF ) = REAL (Returned)
 *        Work space to hold the analyser transmission factor for each
-*        input NDF. 
+*        input NDF.
 *     EPS( NNDF ) = REAL (Returned)
 *        Work space to hold the analyser efficieny factor for each
-*        input NDF. 
+*        input NDF.
 *     IGRP2 = INTEGER (Returned)
-*        A GRP identifier for a group holding the unique analyser identifies 
-*        found in the supplied NDFs. These are text strings which identify 
+*        A GRP identifier for a group holding the unique analyser identifies
+*        found in the supplied NDFs. These are text strings which identify
 *        the analysers through which the supplied images were taken. The
 *        string "DEFAULT" is used if no analyser identifier is supplied for
 *        an NDF. Each unique identifier is included only once in the
 *        returned group.
 *     LBNDO( 4 ) = INTEGER (Returned)
-*        The lower bounds required for the output NDF so that it encompasses 
+*        The lower bounds required for the output NDF so that it encompasses
 *        the entire area of all input images (i.e. padded, not trimmmed)
 *     UBNDO( 4 ) = INTEGER (Returned)
-*        The upper bounds required for the output NDF so that it encompasses 
+*        The upper bounds required for the output NDF so that it encompasses
 *        the entire area of all input images (i.e. padded, not trimmmed)
 *     NDIMO = INTEGER (Returned)
 *        The number of axes required for the output NDF.
 *        If the input NDFs are 2D sections from a 3D cube, they will have
 *        a 3rd pixel axis with equal upper and lower bounds. All input
-*        NDFs must have the same 3rd axis value. In this case the output 
+*        NDFs must have the same 3rd axis value. In this case the output
 *        "cube" will be 4D with the bounds for the 3rd axis equal to the
 *        3rd axis bounds in the input NDF. If the input NDFs are not
 *        slices from a 3D cube, then the output cube will be 3D.
@@ -70,7 +70,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -123,7 +123,7 @@
 
 *  Local Variables:
       CHARACTER ANLID*50         ! Analyser identification string
-      CHARACTER RAY*1            ! Dual beam ray identification 
+      CHARACTER RAY*1            ! Dual beam ray identification
       CHARACTER XLOC*(DAT__SZLOC)! Locator to POLPACK extension
       INTEGER I                  ! Index of current input NDF
       INTEGER IANAL              ! Index of analyser id within current group
@@ -169,7 +169,7 @@
          IF( I .EQ. 1 ) NDIMR = NDIM
 
 *  Check this NDF has the correct number of dimensions.
-         IF( NDIM .NE. NDIMR .AND. STATUS .EQ. SAI__OK ) THEN 
+         IF( NDIM .NE. NDIMR .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF )
             CALL MSG_SETI( 'ND', NDIM )
@@ -178,14 +178,14 @@
                CALL MSG_SETC( 'W', 'image' )
             ELSE
                CALL MSG_SETC( 'W', 'cube' )
-            END IF       
+            END IF
             CALL ERR_REP( 'POL1_SNGHD_ERR5', 'Input ^W ''^NDF'' '//
      :                    'is ^ND dimensional, but the first input '//
      :                    '^W is ^NR dimensional.', STATUS )
             GO TO 999
          END IF
 
-*  Update the bounds of axes 1, 2 and of the output NDF so that it covers 
+*  Update the bounds of axes 1, 2 and of the output NDF so that it covers
 *  the union of the areas spanned by all the input NDFs.
          IF( I .EQ. 1 ) THEN
             LBNDO( 1 ) = LBND( 1 )
@@ -203,17 +203,17 @@
             UBNDO( 3 ) = MAX( UBND( 3 ), UBNDO( 3 ) )
          END IF
 
-*  If all the previous NDFs had defined VARIANCE components, see if the 
+*  If all the previous NDFs had defined VARIANCE components, see if the
 *  current NDF also has a defined VARIANCE component.
          IF( VAR ) CALL NDF_STATE( INDF, 'VARIANCE', VAR, STATUS )
 
 *  Get the WCS FrameSet from the first NDF.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
-*  If this is the first input NDF, decide on the reference direction for the 
-*  output Stokes vectors. 
+*  If this is the first input NDF, decide on the reference direction for the
+*  output Stokes vectors.
          IF( I .EQ. 1 ) THEN
-            CALL POL1_ANGRT( IWCS, 
+            CALL POL1_ANGRT( IWCS,
      :                       0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ),
      :                       0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ),
      :                       ANGRT, STATUS )
@@ -228,7 +228,7 @@
                CALL MSG_SETC( 'W', 'image' )
             ELSE
                CALL MSG_SETC( 'W', 'cube' )
-            END IF       
+            END IF
             CALL ERR_REP( 'POL1_SNGHD_ERR1', 'Input ^W ''^NDF'' '//
      :                    'does not contain a POLPACK extension.',
      :                    STATUS )
@@ -246,11 +246,11 @@
 *  Get the half-wave plate position in degrees (if it exists).
          CALL DAT_THERE( XLOC, 'WPLATE', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'WPLATE', H, STATUS ) 
+            CALL CMP_GET0R( XLOC, 'WPLATE', H, STATUS )
 
 *  Store the effective analyser angle for this NDF. This is the ACW angle
-*  between the required reference direction (ANGRT) and a pretend analyser 
-*  (with no half-wave plate), which would have the same effect as the fixed 
+*  between the required reference direction (ANGRT) and a pretend analyser
+*  (with no half-wave plate), which would have the same effect as the fixed
 *  analyser/have-wave plate combination.
             PHI( I ) = 2*H + ANGROT - ANGRT
 
@@ -265,7 +265,7 @@
                   CALL MSG_SETC( 'W', 'image' )
                ELSE
                   CALL MSG_SETC( 'W', 'cube' )
-               END IF       
+               END IF
                CALL ERR_REP( 'POL1_SNGHD_ERR3', 'The POLPACK '//
      :                       'extension in the input ^W ''^NDF'' '//
      :                       'does not contain a WPLATE or ANLANG '//
@@ -274,7 +274,7 @@
             END IF
 
 *  Get the analyser angle, in degrees.
-            CALL CMP_GET0R( XLOC, 'ANLANG', ALPHA, STATUS ) 
+            CALL CMP_GET0R( XLOC, 'ANLANG', ALPHA, STATUS )
 
 *  Store the effective analyser angle for this NDF (ACW angle from the
 *  required reference direction (ANGRT) to the analyser).
@@ -285,19 +285,19 @@
 *  Get the analyser identification string. Use "DEFAULT" by default.
          CALL DAT_THERE( XLOC, 'ANLID', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0C( XLOC, 'ANLID', ANLID, STATUS ) 
+            CALL CMP_GET0C( XLOC, 'ANLID', ANLID, STATUS )
          ELSE
             ANLID = 'DEFAULT'
          END IF
 
 *  Get the index of this analyser within the group of analysers already
 *  found.
-         CALL GRP_INDEX( ANLID, IGRP2, 1, IANAL, STATUS ) 
+         CALL GRP_INDEX( ANLID, IGRP2, 1, IANAL, STATUS )
 
 *  If the analyser identifier from the currrent NDF has not been seen
 *  before, add it to the group of analyser identifiers.
          IF( IANAL .EQ. 0 ) THEN
-            CALL GRP_PUT( IGRP2, 1, ANLID, 0, STATUS ) 
+            CALL GRP_PUT( IGRP2, 1, ANLID, 0, STATUS )
 
 *  Increment the number of analysers found, and set the index of the
 *  current analyser.
@@ -311,29 +311,29 @@
 *  Get the T (analyser transmission factor) value. Use a defualt of 1.0.
          CALL DAT_THERE( XLOC, 'T', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'T', T( I ), STATUS ) 
-         ELSE 
+            CALL CMP_GET0R( XLOC, 'T', T( I ), STATUS )
+         ELSE
             T( I ) = 1.0
-         END IF         
+         END IF
 
 *  Get the EPS (analyser efficiency factor) value. Use a defualt of 1.0.
          CALL DAT_THERE( XLOC, 'EPS', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'EPS', EPS( I ), STATUS ) 
-         ELSE 
+            CALL CMP_GET0R( XLOC, 'EPS', EPS( I ), STATUS )
+         ELSE
             EPS( I ) = 1.0
-         END IF         
+         END IF
 
 *  If this NDF contains E-ray dual-beam data, add 90 degrees onto the
 *  effective analyser angle.
          CALL DAT_THERE( XLOC, 'RAY', THERE, STATUS )
          IF( THERE ) THEN
-            CALL CMP_GET0C( XLOC, 'RAY', RAY, STATUS ) 
+            CALL CMP_GET0C( XLOC, 'RAY', RAY, STATUS )
             IF( RAY .EQ. 'E' ) PHI( I ) = PHI( I ) + 90.0
-         END IF           
+         END IF
 
 *  Convert the effective analyser angle from degrees to radians.
-         PHI( I ) = PHI( I )*DTOR         
+         PHI( I ) = PHI( I )*DTOR
 
 *  Annul the FrameSet pointer.
          CALL AST_ANNUL( IWCS, STATUS )
@@ -342,7 +342,7 @@
          CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Annul the current NDF identifier.
-         CALL NDF_ANNUL( INDF, STATUS ) 
+         CALL NDF_ANNUL( INDF, STATUS )
 
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -352,15 +352,15 @@
 *  Check the output NDF will contain at least one pixel. Report an error if
 *  not.
       IF( ( LBNDO( 1 ) .GT. UBNDO( 1 ) .OR.
-     :      LBNDO( 2 ) .GT. UBNDO( 2 ) .OR. 
-     :      LBNDO( 3 ) .GT. UBNDO( 3 ) ) .AND. 
+     :      LBNDO( 2 ) .GT. UBNDO( 2 ) .OR.
+     :      LBNDO( 3 ) .GT. UBNDO( 3 ) ) .AND.
      :      STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          IF( NDIM .EQ. 2 ) THEN
             CALL MSG_SETC( 'W', 'images' )
          ELSE
             CALL MSG_SETC( 'W', 'cubes' )
-         END IF       
+         END IF
          CALL ERR_REP( 'POL1_SNGHD_ERR4', 'The input intensity ^W'//
      :                 ' have no pixels in common.', STATUS )
          GO TO 999

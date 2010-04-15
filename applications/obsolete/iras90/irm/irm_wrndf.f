@@ -1,4 +1,4 @@
-      SUBROUTINE  IRM_WRNDF( PARAM, IGRP0, MAXSIZ, MINSIZ, TEXT, IGRP, 
+      SUBROUTINE  IRM_WRNDF( PARAM, IGRP0, MAXSIZ, MINSIZ, TEXT, IGRP,
      :                       SIZE, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRM_WRNDF( PARAM, IGRP0, MAXSIZ, MINSIZ, TEXT, IGRP, SIZE, 
+*     CALL IRM_WRNDF( PARAM, IGRP0, MAXSIZ, MINSIZ, TEXT, IGRP, SIZE,
 *                     STATUS )
 
 *  Description:
@@ -32,8 +32,8 @@
 *     contains more than MAXSIZ NDFs, then all but the first MAXSIZ
 *     NDFs are removed from the group. The user is warned if this
 *     happens. If MAXSIZ is supplied with the value zero no limit is
-*     imposed on the number of NDFs within the group.  If the final 
-*     group contains less than MINSIZ NDFs then the user is told to 
+*     imposed on the number of NDFs within the group.  If the final
+*     group contains less than MINSIZ NDFs then the user is told to
 *     supply more, and is re-prompted for further NDF names. All
 *     messages issued by this routine have a priority level of
 *     MSG__NORM.
@@ -42,19 +42,19 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter (of type LITERAL).
 *     IGRP0 = INTEGER (Given)
-*        The NDG identifier for a group containing a set of NDF names 
+*        The NDG identifier for a group containing a set of NDF names
 *        to be used as the basis for any modification elements contained
-*        within the group expressions. If this is supplied equal to 
+*        within the group expressions. If this is supplied equal to
 *        GRP__NOID then modification elements are left un-expanded.
 *     MAXSIZ = INTEGER (Given)
 *        The maximum number of NDFs which can be allowed in the
 *        returned group. If zero is supplied, no limit is imposed.
 *     MINSIZ = INTEGER (Given)
 *        The minimum number of NDFs which can be allowed in the
-*        returned group. If zero is supplied, then the returned group 
+*        returned group. If zero is supplied, then the returned group
 *        may contain no NDFs.
 *     TEXT = CHARACTER * ( * ) (Given)
-*        The text to display between issuing prompts for successive 
+*        The text to display between issuing prompts for successive
 *        group expressions. If blank then no text is displayed.
 *     IGRP = INTEGER (Returned)
 *        The NDG identifier for the returned group holding all the
@@ -209,7 +209,7 @@
          IF( .NOT. FLAG ) THEN
 
 *  Check that the minimum no. of NDFS has been supplied. If not, ask the
-*  user for more NDFs, and set FLAG to cause another prompt to be 
+*  user for more NDFs, and set FLAG to cause another prompt to be
 *  issued.
             IF( SIZE .LT. MINSIZ ) THEN
 

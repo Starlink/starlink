@@ -20,25 +20,25 @@
 *        The global status.
 
 *  Description:
-*     This application should be used to prepare data files prior to 
-*     processing them with POLPACK. It records the values of various items 
-*     of information required by POLPACK (half-wave plate position, filter, 
-*     etc). These values can either be supplied explicitly or can be copied 
-*     ("imported") from FITS keywords stored in the files. Such keywords 
-*     may, for instance, be provided by the instrument/telescope control 
+*     This application should be used to prepare data files prior to
+*     processing them with POLPACK. It records the values of various items
+*     of information required by POLPACK (half-wave plate position, filter,
+*     etc). These values can either be supplied explicitly or can be copied
+*     ("imported") from FITS keywords stored in the files. Such keywords
+*     may, for instance, be provided by the instrument/telescope control
 *     systems. The specified values are stored in the POLPACK extensions
-*     of the supplied data files for use 
+*     of the supplied data files for use
 *
 *     The import is controlled by a "table" which specifies how FITS
 *     keyword values should be used to create the corresponding POLPACK
-*     extension items. Each extension item may be assigned a specified 
+*     extension items. Each extension item may be assigned a specified
 *     constant value, the value of a specified FITS keyword, or the value
 *     of an arbitrary function of several FITS keywords.
 *
 *     During the processing of data, POLPACK adds items to the POLPACK
 *     extension to indicate the state of the processing which has been
-*     applied to the data. This routine also allows values to be assigned 
-*     to these extra extension items and thus can be used to import partially 
+*     applied to the data. This routine also allows values to be assigned
+*     to these extra extension items and thus can be used to import partially
 *     processed data. POLIMP can be used in conjunction with POLEXP to
 *     allow data to be moved backwards and forwards between POLPACK and
 *     other non-NDF based packages.
@@ -51,22 +51,22 @@
 *        If TRUE, then the application aborts immediately if an error
 *        occurs whilst processing any of the input data files. If FALSE,
 *        any such errors are annulled, and the application continues to
-*        process any remaining data files. The run time default is TRUE if 
+*        process any remaining data files. The run time default is TRUE if
 *        only a single data file is being processed, and FALSE otherwise. []
 *     IN = NDF (Read)
-*        A group of data files. This may take the form of a comma separated 
-*        list of file names, or any of the other forms described in the help 
+*        A group of data files. This may take the form of a comma separated
+*        list of file names, or any of the other forms described in the help
 *        on "Group Expressions".
 *     NAMELIST = LITERAL (Read)
-*        The name of a file to create containing a list of the successfully 
-*        processed data files. This file can be used when specifying the input 
+*        The name of a file to create containing a list of the successfully
+*        processed data files. This file can be used when specifying the input
 *        data files for subsequent applications. No file is created if a null
 *        (!) value is given. [!]
 *     TABLE = LITERAL (Read)
 *        The name of the file containing the table describing how FITS
 *        keyword values are to be translated into POLPACK extension
-*        items. If a null value (!) is supplied, then the following default 
-*        table is used which corresponds to the FITS keywords written by 
+*        items. If a null value (!) is supplied, then the following default
+*        table is used which corresponds to the FITS keywords written by
 *        POLEXP:
 *
 *              ANGROT?  PPCKANGR
@@ -80,12 +80,12 @@
 *              WPLATE?  PPCKWPLT
 *              VERSION? PPCKVERS
 *
-*        See the topic "Table Format" for information on how 
-*        to create translation tables. 
+*        See the topic "Table Format" for information on how
+*        to create translation tables.
 *
 *        Note, the ANGROT value is not stored explicitly as a
 *        separate item in the POLPACK extension. Instead, it is used to
-*        create a new co-ordinate Frame (with domain POLANAL) in the NDF's 
+*        create a new co-ordinate Frame (with domain POLANAL) in the NDF's
 *        WCS information. [!]
 
 *  Table Format:
@@ -96,9 +96,9 @@
 *     of FITS keywords stored in the FITS extension.
 *
 *     In its most simple format each line in a FITS control table contains
-*     the name of a POLPACK extension item, followed by a constant value 
+*     the name of a POLPACK extension item, followed by a constant value
 *     or FITS keyword. This causes the value of the specified FITS keyword
-*     or constant, to be assigned to the specified extension item. Some 
+*     or constant, to be assigned to the specified extension item. Some
 *     examples:
 *
 *        WPLATE             HWP
@@ -108,13 +108,13 @@
 *
 *        WPLATE             45.0
 *
-*     This assigns the value 45.0 to the WPLATE component of the POLPACK 
+*     This assigns the value 45.0 to the WPLATE component of the POLPACK
 *     extension.
-*    
+*
 *        IMGID              "M51_PLATEB"
 *
-*     This assigns the value M51_PLATE to the IMGID component of the 
-*     POLPACK extension. Note, textual constants must be enclosed within 
+*     This assigns the value M51_PLATE to the IMGID component of the
+*     POLPACK extension. Note, textual constants must be enclosed within
 *     quotes.
 *
 *     In addition to using the values of FITS keywords directly, it is also
@@ -126,16 +126,16 @@
 *
 *        Data-type          FITS-keyword
 *
-*     Here "Data-type" must be one of _INTEGER, _REAL, _DOUBLE, _WORD, _BYTE, 
+*     Here "Data-type" must be one of _INTEGER, _REAL, _DOUBLE, _WORD, _BYTE,
 *     _CHAR. So for instance if you wanted to assign a value to the WPLATE
-*     extension item, the orientation of the half-wave plate in degrees, from 
-*     the FITS keyword HWP which gives the required value in radians, you 
+*     extension item, the orientation of the half-wave plate in degrees, from
+*     the FITS keyword HWP which gives the required value in radians, you
 *     could use this sequence of commands:
 *
 *        _REAL             HWP
 *        WPLATE            57.29578*HWP
 *
-*     The function may use any of the usual Fortran operators; +, -, *, /, 
+*     The function may use any of the usual Fortran operators; +, -, *, /,
 *     ** and built-in functions (SIN, COS, TAN, LOG, etc). See SUN/61
 *     (appendix A) for complete details.
 *
@@ -153,12 +153,12 @@
 *     IDATE (you can concatentate more than two values). Note, conversion
 *     of numeric values to character strings occurs automatically.
 *
-*     In the second special form, the name of the destination extension item 
-*     is given as usual followed by a FITS-keyword which supplies the string 
-*     to be translated. This is then followed by statements which translate 
-*     an "input" string into an "output" string. So for instance if you 
-*     were doing circular polarimetry, and wanted to translate quarter 
-*     waveplate positions to the equivalent strings recognised by POLPACK 
+*     In the second special form, the name of the destination extension item
+*     is given as usual followed by a FITS-keyword which supplies the string
+*     to be translated. This is then followed by statements which translate
+*     an "input" string into an "output" string. So for instance if you
+*     were doing circular polarimetry, and wanted to translate quarter
+*     waveplate positions to the equivalent strings recognised by POLPACK
 *     you might use something like:
 *
 *        WPLATE  POLPLATE        48.0=0.0 -
@@ -194,8 +194,8 @@
 *        FILTER  (NAME //" - "//MYFILT) "U band"=U "V band"=V "B band"=B
 *
 *     performs the checks for "U band", etc, on the total concatenated
-*     string, rather than on the value of keyword MYFITS. The two 
-*     strings included in a replacement specification may themselves be 
+*     string, rather than on the value of keyword MYFITS. The two
+*     strings included in a replacement specification may themselves be
 *     enclosed within parentheses in which case they may be any complex
 *     character expression involing literal strings, concatentation
 *     operators and nested replacement specifications.
@@ -203,18 +203,18 @@
 *     If a control table contains more than one line for an extension
 *     item, then each line is processed in turn, replacing any value
 *     established by earlier lines. Thus the final value of the extension
-*     item will be given by the last line in the table refering to the 
+*     item will be given by the last line in the table refering to the
 *     extension item.
 *
-*     If it is not known in advance if the FITS extension will contain the 
+*     If it is not known in advance if the FITS extension will contain the
 *     keyword values needed to assign a value to a particular POLPACK
 *     extension item, then a question mark may be appended to the name of
 *     the POLPACK extension item. If the required FITS keyword values
-*     cannot be found, then the error messages which would normally be 
+*     cannot be found, then the error messages which would normally be
 *     issued are suppressed, and any remaining lines in the control table
 *     are processed as normal. If no value has been assigned to the item
 *     when the entire table has been processed, then the item will be set
-*     to its default value if it has one, or left undefined otherwise (see 
+*     to its default value if it has one, or left undefined otherwise (see
 *     below). For instance:
 *
 *        RAY?  OLDRAY
@@ -232,11 +232,11 @@
 *     Fields in the table may be separated by commas if desired, instead
 *     of spaces. Comments may be
 *     placed anywhere and should start with the characters "#" or "!".
-*     Continuation onto a new line is indicated by use of "-". 
+*     Continuation onto a new line is indicated by use of "-".
 
 *  Examples:
 *     polimp in='*' table=mytable.dat
-*        This example processes all the data files in the current directory 
+*        This example processes all the data files in the current directory
 *        using the import control table mytable.dat.
 *
 *     polimp in=^names.lis
@@ -246,20 +246,20 @@
 *        POLEXP.
 
 *  Notes:
-*     -  Any existing values in the POLPACK extension are deleted before 
+*     -  Any existing values in the POLPACK extension are deleted before
 *     processing the supplied control table.
 *     -  A new Frame is added to the WCS component of each NDF and is given the
 *     Domain "POLANAL". This Frame is formed by rotating the grid co-ordinate
 *     Frame so that the first axis is parallel to the analyser axis. The
-*     angle of rotation is given by the ANGROT value and defaults to zero 
+*     angle of rotation is given by the ANGROT value and defaults to zero
 *     if ANGROT is not specified in the control table. As of POLPACK V2.0,
-*     the ANGROT value is no longer stored explicitly in the POLPACK 
+*     the ANGROT value is no longer stored explicitly in the POLPACK
 *     extension; its value is deduced from the POLANAL Frame in the WCS
 *     component.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -306,7 +306,7 @@
       INTEGER FDIN               ! FIO identifier to input table
       INTEGER FITLEN             ! Number of cards in FITS block
       INTEGER IGRP1              ! Input NDF group identifier
-      INTEGER IGRP2              ! Id for group of names of NDF's processed OK 
+      INTEGER IGRP2              ! Id for group of names of NDF's processed OK
       INTEGER IGRP3              ! Id for group of used IMGID values
       INTEGER INDF               ! NDF identifier
       INTEGER INDEX              ! Loop variable
@@ -326,10 +326,10 @@
 
 *  Access a group of NDFs for processing.
       CALL NDF_BEGIN
-      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', IGRP1,
      :            NNDF, STATUS )
 
-*  Access the control table for items in the FITS block. 
+*  Access the control table for items in the FITS block.
       CALL CCD1_ASFIO( 'TABLE', 'READ', 'LIST', 0, FDIN, TOPEN, STATUS )
 
 *  If successful, get the file name.
@@ -337,7 +337,7 @@
          CALL FIO_FNAME( FDIN, FNAME, STATUS )
 
 *  If no control table was opened, a default table will be used.
-      ELSE 
+      ELSE
          FNAME = ' '
       END IF
 
@@ -385,8 +385,8 @@
 *  Ensure that the NDF does not already have a POLPACK extension, and
 *  then create one.
          CALL NDF_XDEL( INDF, 'POLPACK', STATUS )
-         CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC, 
-     :                  STATUS )            
+         CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC,
+     :                  STATUS )
 
 *  Look for a FITS extension in the NDF. Create one if there isn't one
 *  already, containing a single END card.
@@ -394,8 +394,8 @@
          IF( THERE ) THEN
             CALL NDF_XLOC( INDF, 'FITS', 'READ', FITLOC, STATUS )
          ELSE
-            CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, 1, FITLOC, 
-     :                     STATUS ) 
+            CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, 1, FITLOC,
+     :                     STATUS )
             CALL DAT_CELL( FITLOC, 1, 1, CELLOC, STATUS )
             CALL DAT_PUT0C( CELLOC, 'END', STATUS )
             CALL DAT_ANNUL( CELLOC, STATUS )
@@ -404,14 +404,14 @@
 *  Map in the fits block of the NDF, if it exists
          CALL DAT_MAPV( FITLOC, '_CHAR*80', 'READ', IPFIT, FITLEN,
      :                  STATUS )
-            
+
 *  Now interpret and import the FITS information into the NDF. Note
 *  that the lengths of the FITS block character strings are appended
 *  after the last genuine argument. This is the usual method in UNIX
 *  systems (normally implemented by the compiler), on VMS this makes
 *  no difference.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )), 
+            CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )),
      :                        FDIN, FNAME,
      :                        POLLOC, STATUS,
      :                        %VAL( CNF_CVAL( 80 ) ) )
@@ -427,7 +427,7 @@
          CALL DAT_ANNUL( POLLOC, STATUS )
          CALL DAT_ANNUL( FITLOC, STATUS )
 
-*  If an error occurred, delete any POLPACK extension, and 
+*  If an error occurred, delete any POLPACK extension, and
 *  continue to process the next NDF.
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL NDF_XDEL( INDF, 'POLPACK', STATUS )
@@ -472,10 +472,10 @@
       END IF
 
 *  Write an output list of the NDF names for other applications to use.
-      IF ( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
-         CALL POL1_LNAM( 'NAMELIST', 1, NGOOD, 
-     :                   '# POLIMP - NDF name list', IGRP2, .FALSE., 
+         CALL POL1_LNAM( 'NAMELIST', 1, NGOOD,
+     :                   '# POLIMP - NDF name list', IGRP2, .FALSE.,
      :                   STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )

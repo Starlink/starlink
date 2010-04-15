@@ -1,32 +1,32 @@
        SUBROUTINE ELLIPSE(A,B,PA,X,Y,N, STATUS )
-C 
-C
-C         SUBROUTINE ELLIPSE 
 C
 C
-C         This  routine  generates  a  set  of  (x,y)  co-ordinates   which 
-C         represent  an  ellipse  at  any angle. The output is suitable for 
-C         plotting by any polyline routine. 
+C         SUBROUTINE ELLIPSE
 C
-C         A           REAL  IN    This is the size of the longest  diameter 
-C                                 of the ellipse. 
 C
-C         B           REAL  IN    This is the size of the shortest diameter 
-C                                 of the ellipse. 
+C         This  routine  generates  a  set  of  (x,y)  co-ordinates   which
+C         represent  an  ellipse  at  any angle. The output is suitable for
+C         plotting by any polyline routine.
 C
-C         PA          REAL  IN    This is the position angle of  the  major 
-C                                 axis in degrees. 
+C         A           REAL  IN    This is the size of the longest  diameter
+C                                 of the ellipse.
 C
-C         X           REAL  OUT   This is the array (of dimension N)  which 
-C                                 contains the x co-ordinates whi have been 
-C                                 generated. 
+C         B           REAL  IN    This is the size of the shortest diameter
+C                                 of the ellipse.
 C
-C         Y           REAL  OUT   This is the array (of dimension N)  which 
-C                                 contains the y co-ordinates whi have been 
-C                                 generated. 
+C         PA          REAL  IN    This is the position angle of  the  major
+C                                 axis in degrees.
 C
-C         N           INT   IN    This defines the number of points  to  be 
-C                                 generated. 
+C         X           REAL  OUT   This is the array (of dimension N)  which
+C                                 contains the x co-ordinates whi have been
+C                                 generated.
+C
+C         Y           REAL  OUT   This is the array (of dimension N)  which
+C                                 contains the y co-ordinates whi have been
+C                                 generated.
+C
+C         N           INT   IN    This defines the number of points  to  be
+C                                 generated.
 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -34,7 +34,7 @@ C
 C
 *   History:
 
-C         M J Currie               RGO-Starlink                   24-MAY-82 
+C         M J Currie               RGO-Starlink                   24-MAY-82
 C         Modified 20-Jul-84 by J.V.Carey
 C         Modified  7-Feb-85 by B.M.Harris
 *     3-MAR-1993 (AJJB):
@@ -42,7 +42,7 @@ C         Modified  7-Feb-85 by B.M.Harris
 *     3-AUG-2004 (TIMJ):
 *       Remove non-portable COSD,SIND,ATAND
 C
-C-------------------------------------------------------------------------- 
+C--------------------------------------------------------------------------
 
       IMPLICIT NONE
 
@@ -60,7 +60,7 @@ C--------------------------------------------------------------------------
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *
 *    Deal with ellipses
 *
@@ -89,7 +89,7 @@ C--------------------------------------------------------------------------
 
          ENDIF
 *
-*   For rectangles, calculate 4 corners 
+*   For rectangles, calculate 4 corners
 *
       ELSE
          AA = -AA

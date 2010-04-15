@@ -22,7 +22,7 @@
 *     To store data for a scan that has been found to satisfy find scan
 *     acceptance criteria for a source, and to set up crosslinkages
 *     between the scan data and the source data.
-*     
+*
 *     - Store scan details in scan common, this includes:-
 *        Updating the number of scans stored in scan common.
 *        Enter a cross reference to the source details in the scan
@@ -43,14 +43,14 @@
 *        allowance of TITRAL is added to either end of the scan lenght
 *        to allow for errors in translation between SATCAL and UCTS
 *        times).
-*             
+*
 
 *  Arguments:
 *     IOBS = INTEGER (Given)
 *        Do loop control var for Observation loop
 *     ISOP = INTEGER (Given)
 *        Do loop control variable for SOP loop takes values 11 to 603
-*        which are the actual SOP numbers. 
+*        which are the actual SOP numbers.
 *     ISOURC = INTEGER (Given)
 *        Do loop control var for Source loop
 *     OBNSQ = INTEGER (Given)
@@ -91,8 +91,8 @@
 *  Notes on testing of subroutine on GCASS data
 *  The data entered was as follows
 *   Source     Coord             Position               Region size
-*    Name       Sys      1st Coord       2nd Coord    Inscan  Xscan    
-*  GAMMACAS   Eq'50    00 55 00.00     60 40 00.00    120.0   20.0     
+*    Name       Sys      1st Coord       2nd Coord    Inscan  Xscan
+*  GAMMACAS   Eq'50    00 55 00.00     60 40 00.00    120.0   20.0
 *
 *     -  CROSS SCAN SIZE recorded in scan common
 *     For GCASS the x scan offset between source and observation 11 of
@@ -136,7 +136,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,27 +145,27 @@
       INCLUDE 'I90_PAR'          ! IRAS 90 General constants
       INCLUDE 'IRA_PAR'          ! IRAS Astrometry constants
       INCLUDE 'IRA_ERR'          ! IRAS Astrometry errors
-                                
+
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
-                                      
+
 *  Arguments Given:
       INTEGER IOBS
       INTEGER ISOP
-      INTEGER ISOURC             
-      INTEGER OBNSQ 
-      REAL OBPSR                 
-      REAL OBTH                  
-      REAL SLPSI                 
-      REAL SLTH                  
-      REAL SPSLGR                
-      REAL SPSLGT                
-      REAL SPSPD                 
-      DOUBLE PRECISION SPSTCL 
-      REAL SPSTCR                
+      INTEGER ISOURC
+      INTEGER OBNSQ
+      REAL OBPSR
+      REAL OBTH
+      REAL SLPSI
+      REAL SLTH
+      REAL SPSLGR
+      REAL SPSLGT
+      REAL SPSPD
+      DOUBLE PRECISION SPSTCL
+      REAL SPSTCR
       INTEGER SPSTD
       REAL SPSTS
-      DOUBLE PRECISION TIMCT     
+      DOUBLE PRECISION TIMCT
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -216,11 +216,11 @@
 *  Set the scan observation number to
       SCOBS( ISCAN ) = OBNSQ
 
-*  Set the scan theta to the observation theta 
-      SCTH( ISCAN ) = OBTH 
+*  Set the scan theta to the observation theta
+      SCTH( ISCAN ) = OBTH
 
-*  Set the scan nearest point psi to the source psi 
-      SCNPPS( ISCAN ) = SLPSI 
+*  Set the scan nearest point psi to the source psi
+      SCNPPS( ISCAN ) = SLPSI
 
 *  Set the scan nearest point solar longitude to that calculated in
 *  FIND19
@@ -270,17 +270,17 @@
 *  time translation allowance.
       CALL FIND42( SCSTST( ISCAN ), SPSTCL, SPSTCR, SPSTD, SPSTS,
      :             SCSTUT( ISCAN ), STATUS )
-      SCSTUT( ISCAN ) = SCSTUT( ISCAN) - TITRAL 
+      SCSTUT( ISCAN ) = SCSTUT( ISCAN) - TITRAL
 
-*  Translate the end of scan satcal time to UTCS and add 
+*  Translate the end of scan satcal time to UTCS and add
 *  time translation allowance.
       CALL FIND42( SCENST( ISCAN ), SPSTCL, SPSTCR, SPSTD, SPSTS,
      :             SCENUT( ISCAN ), STATUS )
-      SCENUT( ISCAN ) = SCENUT( ISCAN) + TITRAL 
+      SCENUT( ISCAN ) = SCENUT( ISCAN) + TITRAL
 
 *  Set scan required flag to .TRUE.
       SCRQFL( ISCAN ) = .TRUE.
-      
+
 *  Update the number of scans in scan common
       NOSCAN = NOSCAN + 1
 

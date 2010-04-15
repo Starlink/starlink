@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
 
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
+
 *  External routines :
       CHARACTER*15 SUBPAR_CTYPE  ! Character form of TYPE
       INTEGER CHR_LEN            ! Used length of string
@@ -108,7 +108,7 @@
       CHARACTER*15 POSTYPES(5)   ! possible primitive data types
 
 *  Local Data:
-      DATA POSTYPES / '_CHAR*', '_REAL', '_DOUBLE', '_INTEGER', 
+      DATA POSTYPES / '_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
      :  '_LOGICAL' /
 
 *.
@@ -121,14 +121,14 @@
          IF ( PARMIN(2,NAMECODE) .GT. 0 ) THEN
 *        There is a MIN value
             PTR = PARMIN( 1, NAMECODE )
-      
+
          ELSE
 *        No MIN value exists - try a lower RANGE value.
 
             IF (( PARLIMS( 1, NAMECODE ) .GT. 0 ) .AND.
      :            PARCONT( NAMECODE ) ) THEN
 *           There is a RANGE
-               PTR = PARLIMS( 1, NAMECODE )               
+               PTR = PARLIMS( 1, NAMECODE )
             ELSE
 *           Neither MIN nor RANGE
                STATUS = SUBPAR__NOMNMX
@@ -139,20 +139,20 @@
             ENDIF
 
          ENDIF
-        
+
       ELSEIF ( MINMAX .EQ. 'MAX' ) THEN
 *     Maximum value is required
          IF ( PARMAX(2,NAMECODE) .GT. 0 ) THEN
 *        There is a MAX value
             PTR = PARMAX( 1, NAMECODE )
-      
+
          ELSE
 *        No MAX value exists - try an upper RANGE value.
 
             IF (( PARLIMS( 2, NAMECODE ) .GT. 0 ) .AND.
      :            PARCONT( NAMECODE ) ) THEN
 *           There is a RANGE
-               PTR = PARLIMS( 2, NAMECODE )               
+               PTR = PARLIMS( 2, NAMECODE )
             ELSE
 *           Neither MAX nor RANGE
                STATUS = SUBPAR__NOMNMX
@@ -163,7 +163,7 @@
             ENDIF
 
          ENDIF
-        
+
       ELSE
 *     Illegal MINMAX argument
          STATUS = SUBPAR__ERROR
@@ -176,7 +176,7 @@
 
 *  Now we should have a pointer to the required value in the
 *  appropriate typeLIST array.
-      IF ( STATUS .EQ. SAI__OK ) THEN  
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *     Get the parameter type
          TYPE = MOD( PARTYPE(NAMECODE), 10 )
@@ -203,7 +203,7 @@
                   STATUS = SUBPAR__MNMXTY
                   CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
                   CALL EMS_SETC( 'TYPE', SUBPAR_CTYPE(TYPE) )
-                  CALL EMS_REP( 'SUP_MNMX4', 
+                  CALL EMS_REP( 'SUP_MNMX4',
      :            'SUBPAR: Parameter ^NAME - '//
      :            'MIN/MAX is illegal for type ''^TYPE''', STATUS )
                ENDIF

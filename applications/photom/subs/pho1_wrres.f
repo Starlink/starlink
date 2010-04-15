@@ -35,7 +35,7 @@
 *        GRP group containing the information about sky regions
 *        associated with the objects.
 *     OPTIMA = LOGICAL (Given)
-*        Flag to perform optimal extraction using Tim Naylor's algorithim    
+*        Flag to perform optimal extraction using Tim Naylor's algorithim
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -65,7 +65,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'GRP_PAR'         ! GRP constants
       INCLUDE 'PRM_PAR'         ! Primitive data constants
-      
+
 *  Arguments Given:
       INTEGER FD
       INTEGER OBJIND
@@ -75,12 +75,12 @@
       INTEGER SKYIND
       INTEGER SKYINF
       LOGICAL OPTIMA
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
-      INTEGER CHR_LEN 
+      INTEGER CHR_LEN
       EXTERNAL CHR_LEN          ! Used length of string
 
 *  Local Variables:
@@ -100,7 +100,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Find the number of objects and sky regions to process.
       CALL GRP_GRPSZ( OBJIND, NOBJ, STATUS )
       CALL GRP_GRPSZ( PSFIND, NPSF, STATUS )
@@ -116,25 +116,25 @@
          CALL FIO_WRITE( FD, BUFFER( :CHR_LEN( BUFFER ) ), STATUS )
 *  Look for corresponding sky regions.
          NEWSKY = 0
-         DO 4 J = 1, NSKY 
+         DO 4 J = 1, NSKY
             CALL GRP_GET( SKYIND, J, 1, INDEXS, STATUS )
-            IF ( INDEXP .EQ. INDEXS ) THEN 
-               IF ( INDEX( BUFFER, 'annulus' ) .NE. 0 ) THEN 
+            IF ( INDEXP .EQ. INDEXS ) THEN
+               IF ( INDEX( BUFFER, 'annulus' ) .NE. 0 ) THEN
                   BUFFER = '#ANN  '//INDEXS
-                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ), 
+                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ),
      :                          STATUS )
-               ELSE 
+               ELSE
                   BUFFER = '#SKY'
                   IAT = 4
                   CALL CHR_PUTI( NEWSKY, BUFFER, IAT )
                   IAT = IAT + 2
                   BUFFER( IAT: ) = INDEXP
-                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ), 
+                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ),
      :                          STATUS )
                END IF
-               CALL FIO_WRITE( FD, BUFFER( :CHR_LEN( BUFFER ) ), 
+               CALL FIO_WRITE( FD, BUFFER( :CHR_LEN( BUFFER ) ),
      :                         STATUS )
-            END IF 
+            END IF
 4        CONTINUE
 3     CONTINUE
 
@@ -150,24 +150,24 @@
 
 *  Look for corresponding sky regions.
          NEWSKY = 0
-         DO 2 J = 1, NSKY 
+         DO 2 J = 1, NSKY
             CALL GRP_GET( SKYIND, J, 1, INDEXS, STATUS )
-            IF ( INDEXO .EQ. INDEXS ) THEN 
+            IF ( INDEXO .EQ. INDEXS ) THEN
                NEWSKY = NEWSKY + 1
-               IF ( INDEX( BUFFER, 'annulus' ) .NE. 0 ) THEN 
+               IF ( INDEX( BUFFER, 'annulus' ) .NE. 0 ) THEN
                   BUFFER = '#ANN  '//INDEXS
-                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ), 
+                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ),
      :                          STATUS )
-               ELSE 
+               ELSE
                   BUFFER = '#SKY'
                   IAT = 4
                   CALL CHR_PUTI( NEWSKY, BUFFER, IAT )
                   IAT = IAT + 2
                   BUFFER( IAT: ) = INDEXO
-                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ), 
+                  CALL GRP_GET( SKYINF, J, 1, BUFFER( INDLEN: ),
      :                          STATUS )
                END IF
-               CALL FIO_WRITE( FD, BUFFER( :CHR_LEN( BUFFER ) ), 
+               CALL FIO_WRITE( FD, BUFFER( :CHR_LEN( BUFFER ) ),
      :                         STATUS )
             END IF
  2       CONTINUE

@@ -5,33 +5,33 @@
 ***********************************************************************
       SUBROUTINE FORM_PRINT(STATUS)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       INTEGER STATUS			! Exit Status
- 
+
 *  Global Variables
       INCLUDE 'com_form_points.inc'
       INCLUDE 'com_form_files.inc'
       INCLUDE 'com_form_mtext.inc'
       INCLUDE 'com_form_latex.inc'
- 
+
 *  Function
 
 * Local Variables
       CHARACTER*1 OPEN_REQ
- 
+
 *  Print Selection
       CHARACTER*23 PHEADING /'      Print Forms      '/
       CHARACTER*20 POPTIONS(3) /'All Forms, LaTeX', 'Selected Pages,LaTeX',
      &'Blank Forms, LaTeX'/
 
 c	'Resubmit LaTeX',
- 
+
 *  Error Info
       CHARACTER*21 LHEADING /' LaTeX not Available '/
       CHARACTER*20 LOPTIONS /'Continue'/
       CHARACTER*23 ERRMESS/'Record read error      '/
- 
+
       INTEGER     POP_MENU, LPRINT
 
 
@@ -40,7 +40,7 @@ c	'Resubmit LaTeX',
       STATUS = 0
       DSCF_PRINT_GOT= .FALSE.
       LPRINT = POP_MENU(POPTIONS, 3,PHEADING,-1,' ')
- 
+
       IF (REF_FORM .LE.0 ) THEN
          IF (LPRINT .EQ.3) THEN
             OPEN_REQ = 'D'
@@ -59,21 +59,21 @@ c	'Resubmit LaTeX',
             END IF
          END IF
       END IF
- 
+
       IF (LPRINT .EQ.1) THEN			! Print all Pages, LaTeX
- 
+
          CALL FORM_LATEX( 'ALL' , STATUS)
 
       ELSE IF (LPRINT.EQ.2) THEN		! Select
- 
-         CALL FORM_LATEX( 'SELECT', STATUS) 
- 
+
+         CALL FORM_LATEX( 'SELECT', STATUS)
+
       ELSE IF (LPRINT.EQ.3) THEN		! Blank Forms
- 
+
          CALL FORM_LATEX( 'BLANK', STATUS)
- 
+
       END IF
 
-90    CONTINUE 
+90    CONTINUE
 
-      END            
+      END

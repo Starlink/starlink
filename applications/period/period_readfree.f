@@ -1,6 +1,6 @@
- 
+
       SUBROUTINE PERIOD_READFREE(DATA, MX, NX, NY, IUNIT, IFAIL)
- 
+
 C=========================================================================
 C General purpose routine to read free format real data stored in the form
 C of columns. It will ignore all blank lines and lines starting with an
@@ -26,27 +26,27 @@ C Adapted for PERIOD by Vikram Singh Dhillon @Sussex 1-July-1992.
 C
 C GJP June 1995
 C
-C Unused variable NEXT removed. Removed REAL and INTEGER*4 refs. 
+C Unused variable NEXT removed. Removed REAL and INTEGER*4 refs.
 C
 C Converted to Double Precision (KPD), August 2001
 C Modified for dynamic array size calculations on first pass through
 C  the data file  (KPD), August 2001
 C=========================================================================
- 
+
       INTEGER          NX,NY,IFAIL,MX
       DOUBLE PRECISION DATA(MX)
       INTEGER          LENGTH,NLINES,NBLOCK,IUNIT,I
       CHARACTER*100    STRING
       LOGICAL BLANK
- 
+
       LENGTH = LEN(STRING)
       IFAIL = 0
       NLINES = 0
- 
+
 C-------------------------------------------------------------------------
 C Find number of columns.
 C-------------------------------------------------------------------------
- 
+
       IF ( NX.LE.0 ) THEN
          IFAIL = 0
          NBLOCK = 0
@@ -55,21 +55,21 @@ C-------------------------------------------------------------------------
             DO WHILE ( STRING(1:1).EQ.'!' )
                READ (IUNIT, '(A)', IOSTAT=IFAIL) STRING
             END DO
- 
+
 C-------------------------------------------------------------------------
 C Search for number of contiguous blocks of data.
 C-------------------------------------------------------------------------
- 
+
             IF ( IFAIL.EQ.0 ) THEN
                NBLOCK = 0
                BLANK = .TRUE.
                DO 10 I = 1, LENGTH
-                  IF ( BLANK .AND. 
+                  IF ( BLANK .AND.
      :                 (STRING(I:I).NE.' '.AND.STRING(I:I).NE.CHAR(9)) )
      :                 THEN
                      NBLOCK = NBLOCK + 1
                      BLANK = .FALSE.
-                  ELSE IF ( .NOT.BLANK .AND. 
+                  ELSE IF ( .NOT.BLANK .AND.
      :                      (STRING(I:I).EQ.' '.OR.STRING(I:I)
      :                      .EQ.CHAR(9)) ) THEN
                      BLANK = .TRUE.
@@ -122,17 +122,17 @@ C-------------------------------------------------------------------------
          END DO
       END IF
 
- 
+
 C-------------------------------------------------------------------------
 C Error check.
 C-------------------------------------------------------------------------
- 
+
       IF ( IFAIL.GT.0 ) THEN
          NY = 0
          RETURN
       END IF
       IFAIL = 0
       NY = NLINES
- 
+
       RETURN
       END

@@ -6,8 +6,8 @@
 * Designed to reject according to Poisson statistics (Gaussian
 * in the large signal limit). For small numbers, the Poisson
 * distribution is significantly different from a Gaussian
-* and Gaussian rejection is too severe. 
-* 
+* and Gaussian rejection is too severe.
+*
 * Warning: CHANCE distinguishes between Gaussian and Poisson on the
 *          basis of the size of SIGMA**2. This is not scale independent
 *          i.e. if OBS, PRED and SIGMA were all multiplied by some factor
@@ -20,11 +20,11 @@
 *          in OBS and PRED. If PRED = SIGMA*SIGMA as it would for an exact
 *          Poisson setup then NDATA = NINT(OBS) as it should.
 *
-*           If OBS + SIGMA*SIGMA << PRED NDATA floors at 0 and the test 
+*           If OBS + SIGMA*SIGMA << PRED NDATA floors at 0 and the test
 *          becomes insensitive to OBS. This can lead to acceptance of
 *          almost any deviation. This is because this is an unrealistic
 *          situation. A true Poisson deviate could never produce an observed
-*          value with this property and thus CHANCE is being misused. A 
+*          value with this property and thus CHANCE is being misused. A
 *          warning to this effect is given.
 *
 * Given a variable with predicted value PRED, observed OBS
@@ -34,7 +34,7 @@
 * probability of observing OBS/divided by the probability
 * of observing the relevant threshold) (that is THRLO if
 * OBS .lt. PRED, or else THRHI). If not rejected it does not
-* compute the ratio (for speed) and it returns with -1. 
+* compute the ratio (for speed) and it returns with -1.
 * If SIGMA .LT.0. it returns with -2.
 *
 * 19/07/90 TRM @STSCI fixed bug that led to incorrect rejection when
@@ -51,7 +51,7 @@
       REAL OLDTHRLO, OLDTHRHI, POISS_PARAM, PLIM, P, Q
       REAL SUM, QFACTOR
 *
-* PDA_DERFC replaces NAG routine S15ACF used to compute the integral 
+* PDA_DERFC replaces NAG routine S15ACF used to compute the integral
 * from X to infinity of EXP(-X**2/2)/SQRT(2*PI)
 *
 * In fact: S15ACF(X,IFAIL) = PDA_DERFC(X/SQRT(2.))/2
@@ -102,7 +102,7 @@
       END IF
       POISS_PARAM = SIGMA*SIGMA
 *
-* Assume Gaussian if parameter of Poisson 
+* Assume Gaussian if parameter of Poisson
 * distribution is greater than PLIM. Since the
 * variable has been passed by previous test, it
 * must be rejected if it passes the test below.
@@ -118,7 +118,7 @@
             END IF
          ELSE
 *
-* For large deviation (>10), approximate by 
+* For large deviation (>10), approximate by
 * CHANCE = exp(-X**2/2)/sqrt(2*pi)/X. At worst
 * this overestimates CHANCE by 1%.
 *
@@ -148,7 +148,7 @@ c      END IF
       NDATA = MAX(0,NINT(OBS - PRED + POISS_PARAM))
       CHANCE = -1.
 *
-* Case 1: Observed is less than Poisson parameter 
+* Case 1: Observed is less than Poisson parameter
 *
       IF(REAL(NDATA).LT.POISS_PARAM) THEN
         IF(NDATA.EQ.0 .AND. POISS_PARAM.GT.-PROBLO) THEN
@@ -184,7 +184,7 @@ c      END IF
 *
         IF(SUM*CHANCE.GT.1.) THEN
           CHANCE = -1.
-        ELSE 
+        ELSE
           CHANCE = PROBHI - P - LOG(SUM)
         END IF
       END IF

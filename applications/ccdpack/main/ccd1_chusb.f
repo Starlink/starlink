@@ -15,9 +15,9 @@
 *                      IDOUT, XOUT, YOUT, NOUT, STATUS )
 
 *  Description:
-*     This routine selects a subset of an input position list 
+*     This routine selects a subset of an input position list
 *     (ID, X coordinate, Y coordinate) according to whether they fall
-*     between given upper and lower X and Y bounds, and writes 
+*     between given upper and lower X and Y bounds, and writes
 *     them to an output list.  Each point from the input list will
 *     be copied to the output list only if XLO <= XIN( * ) <= XHI
 *     and YLO < YIN( * ) < YHI.
@@ -89,7 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER NIN
       INTEGER IDIN( NIN )
@@ -99,24 +99,24 @@
       DOUBLE PRECISION XHI
       DOUBLE PRECISION YLO
       DOUBLE PRECISION YHI
-      
+
 *  Arguments Given and Returned:
       INTEGER IDOUT( * )
       DOUBLE PRECISION XOUT( * )
       DOUBLE PRECISION YOUT( * )
       INTEGER NOUT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER I                  ! Loop variable
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Initialise number of returned values.
       NOUT = 0
 

@@ -3,7 +3,7 @@
 *+  MAXMIN - returns the max and min values found in a defined sub-array
 
       SUBROUTINE MAXMIN ( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH,
-     :                    YFINISH, NUMPIX, MAXIMUM, MINIMUM, 
+     :                    YFINISH, NUMPIX, MAXIMUM, MINIMUM,
      :                    MAXPOS, MINPOS, STATUS )
 
 *    Description :
@@ -100,7 +100,7 @@
       ENDIF
 
 
-*    check the sub-array coordinates for validity 
+*    check the sub-array coordinates for validity
       IF ( XSTART  .LT. 1 .OR. XSTART  .GT. DIMS1 .OR.
      :     YSTART  .LT. 1 .OR. YSTART  .GT. DIMS2 .OR.
      :     XFINISH .LT. 1 .OR. XFINISH .GT. DIMS1 .OR.
@@ -137,7 +137,7 @@
       NUMPIX  =  ( XFINISH - XSTART + 1 ) * ( YFINISH - YSTART + 1 )
 
 *    initialise max and min variables to be equal to the value of
-*    the lower left corner of the specified subarray, and the 
+*    the lower left corner of the specified subarray, and the
 *    positions of each to be there
       MAXIMUM      =  ARRAY( XSTART, YSTART )
       MINIMUM      =  MAXIMUM
@@ -162,8 +162,8 @@
 *          check current minimum against current pixel value
             IF ( ARRAY( I, J ) .LT. MINIMUM ) THEN
                MINIMUM      =  ARRAY( I, J )
-               MINPOS( 1 )  =  I 
-               MINPOS( 2 )  =  J 
+               MINPOS( 1 )  =  I
+               MINPOS( 2 )  =  J
             END IF
 
 *        end of loop round pixels in current row

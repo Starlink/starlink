@@ -13,9 +13,9 @@
 *     CALL TRACC2( PARAM, FLAGS, STATUS )
 
 *  Description:
-*     This routine uses the supplied parameter to obtain a group of 
+*     This routine uses the supplied parameter to obtain a group of
 *     objects to be omitted from the display produced by routine
-*     TRACA7. A set of flags are returned indicating which of these 
+*     TRACA7. A set of flags are returned indicating which of these
 *     objects are to be plotted, and which are not. A true value for the
 *     flag means the corresponding object is to be plotted, and a false
 *     value means that it is not to be plotted. The sections are refered
@@ -31,7 +31,7 @@
 *
 *     MARKS_RHS:  the right hand detector offset markers = FLAGS(5).
 *
-*     MARKS_LHS:  the left hand detector offset markers (including 
+*     MARKS_LHS:  the left hand detector offset markers (including
 *                 detector numbers) = FLAGS(6).
 *
 *     TABLE:  the table of detector offsets = FLAGS(7).
@@ -42,11 +42,11 @@
 *     sections should be omitted from the display.
 *
 *     Section names can be abbreviated. If an ambiguous abbreviation
-*     is supplied, than all sections matching the abbreviation are 
+*     is supplied, than all sections matching the abbreviation are
 *     omitted from the display. Thus, for instance, the string "M" would
 *     cause both left and right hand markers to be omitted.
 *
-*     The section specifiers are obtained in the form of a GRP group 
+*     The section specifiers are obtained in the form of a GRP group
 *     expression in the normal way.
 
 *  Arguments:
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,7 +81,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
 
 *  Arguments Given:
-      CHARACTER PARAM*(*) 
+      CHARACTER PARAM*(*)
 
 *  Arguments Given and Returned:
       LOGICAL FLAGS( 8 )
@@ -94,7 +94,7 @@
 
 *  Local Constants:
       INTEGER NFLAG              ! No. of section flags.
-      PARAMETER ( NFLAG = 8 ) 
+      PARAMETER ( NFLAG = 8 )
 
 *  Local Variables:
       CHARACTER GRPEXP*(GRP__SZGEX)! Group expression.
@@ -107,7 +107,7 @@
       INTEGER J                  ! Loop count.
       INTEGER LSPEC              ! Used length of SPEC.
       INTEGER NBAD               ! No. of re-prompts so far.
-      INTEGER NMATCH             ! No. of matches between specification 
+      INTEGER NMATCH             ! No. of matches between specification
                                  ! and list of options.
       INTEGER NSPEC              ! No. of items in group.
 
@@ -115,7 +115,7 @@
       LOGICAL MORE               ! True if more re-prompts are needed.
 
 *  Local Data:
-      DATA OPT/ 'IN-LINE', 'LABEL_X', 'LABEL_Y', 'SCAN_DIR', 
+      DATA OPT/ 'IN-LINE', 'LABEL_X', 'LABEL_Y', 'SCAN_DIR',
      :          'MARKS_RHS', 'MARKS_LHS', 'TABLE', 'REF_POS' /
 
 *.
@@ -172,10 +172,10 @@
             CALL CHR_LDBLK( SPEC )
             LSPEC = CHR_LEN( SPEC )
 
-*  If this element is NOTHING (or an abbreviation), then it should be 
+*  If this element is NOTHING (or an abbreviation), then it should be
 *  the only element in the group. Report an error if this is not so.
             IF( INDEX( 'NOTHING', SPEC( : LSPEC ) ) .EQ. 1 ) THEN
-               IF( NSPEC .NE. 1 .AND. STATUS .EQ. SAI__OK ) THEN 
+               IF( NSPEC .NE. 1 .AND. STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
                   CALL ERR_REP( 'TRACC2_ERR1',
      :   'TRACC2: Option "NOTHING" cannot be mixed with other options.',
@@ -185,7 +185,7 @@
 *  If this option specifies a sections to omit...
             ELSE
 
-*  ...loop round each of the options, setting the flags for any which 
+*  ...loop round each of the options, setting the flags for any which
 *  match the current element.
                NMATCH = 0
 
@@ -209,8 +209,8 @@
 
          END DO
 
-*  If an error has occurred (other than PAR__ABORT), add a report 
-*  listing the available options, and another asking the user to try 
+*  If an error has occurred (other than PAR__ABORT), add a report
+*  listing the available options, and another asking the user to try
 *  again. Flush the errors, and reset the group size to zero.
          IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT .AND.
      :       NBAD .LE. 4 ) THEN
@@ -220,10 +220,10 @@
                CALL MSG_SETC( 'L', ',' )
             END DO
 
-            CALL ERR_REP( 'TRACC2_ERR3', 
+            CALL ERR_REP( 'TRACC2_ERR3',
      :                    '  Available options are: ^L or NOTHING.',
      :                    STATUS )
-            CALL ERR_REP( 'TRACC2_ERR4', 
+            CALL ERR_REP( 'TRACC2_ERR4',
      :                  '  Please give a new group of options',
      :                    STATUS )
 
@@ -236,7 +236,7 @@
             MORE = .FALSE.
          END IF
 
-      END DO      
+      END DO
 
 *  Delete the group.
  999  CONTINUE

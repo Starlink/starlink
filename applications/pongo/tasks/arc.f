@@ -159,7 +159,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO global constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
-      
+
 *  Global Variables:
       INCLUDE 'PONGO_CMN'        ! PONGO global variables
 

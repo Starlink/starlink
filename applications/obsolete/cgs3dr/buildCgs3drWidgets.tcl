@@ -11,7 +11,7 @@ proc buildCgs3drWidgets w {
     set bottomFrame [frame $mainFrame.fb -relief sunken -bd 2]
     pack $topFrame $bottomFrame -fill both -expand yes
 
-# Create scrolling region for output in bottom frame 
+# Create scrolling region for output in bottom frame
     set scrollbar [scrollbar $bottomFrame.scrollbar -orient vertical -relief sunken -bd 2]
     set Cgs3drWidgets(OUTPUT) [text $bottomFrame.text -state disabled -wrap word -relief sunken -bd 2 -width 60]
     $scrollbar configure -command "$Cgs3drWidgets(OUTPUT) yview"

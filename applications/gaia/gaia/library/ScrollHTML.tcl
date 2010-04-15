@@ -140,7 +140,7 @@ itcl::class gaia::ScrollHTML {
       catch {focus $itk_component(html).x}
       bind HtmlClip <Motion> {
          set parent [winfo parent %W]
-         set url [$parent href %x %y] 
+         set url [$parent href %x %y]
          if {[string length $url] > 0} {
             $parent configure -cursor hand2
          } else {
@@ -196,7 +196,7 @@ itcl::class gaia::ScrollHTML {
       if { [info exists images_($imgsrc)] } {
          return $images_($imgsrc)
       }
-      
+
       #  Otherwise create the image. Failures (i.e. not available)
       #  return a small gray image.
       if {[catch {image create photo -file $imgsrc} img]} {
@@ -320,7 +320,7 @@ itcl::class gaia::ScrollHTML {
          loadfile $history_($nhist_) 0
       } else {
          incr nhist_ 2
-      } 
+      }
    }
 
    #  Display the "next" file.
@@ -335,20 +335,20 @@ itcl::class gaia::ScrollHTML {
    protected method pageforward_ {} {
       $itk_component(html) yview scroll 1 pages
    }
-   
+
    #  Callback for page back shortcut key.
    protected method pageback_ {} {
       $itk_component(html) yview scroll -1 pages
    }
-   
+
    #  Callback for line forward shortcut key
-   protected method lineforward_ {} { 
-      $itk_component(html) yview scroll 1 units 
+   protected method lineforward_ {} {
+      $itk_component(html) yview scroll 1 units
    }
 
    #  Callback for line back shortcut key
-   protected method lineback_ {} { 
-      $itk_component(html) yview scroll -1 units 
+   protected method lineback_ {} {
+      $itk_component(html) yview scroll -1 units
    }
 
    #  Protected variables:
@@ -359,7 +359,7 @@ itcl::class gaia::ScrollHTML {
 
    #  Name of the file that we're looking at.
    protected variable current_ {}
-   
+
    #  The names of last 20 URLs that we've visited.
    protected variable history_
 

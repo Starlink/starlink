@@ -148,7 +148,7 @@ size_t   maxcp;            /* Max number of chars to copy */
 /* Check that there is either one or two command-line arguments.  */
 
     if (argc == 2  ||  argc == 3)
-    { 
+    {
 
 
 /*    Set the "echo HTTP header" flag depending on whether there is  */
@@ -444,7 +444,7 @@ int port;            /* Port number.  */
             sscanf(charPort, "%d", &port);
          }
          else
-         {  
+         {
             strncpy(queryHost, hostAndPort, bufsize-1);
 	    queryHost[bufsize-1] = '\0';
             port = 80;
@@ -465,7 +465,7 @@ int port;            /* Port number.  */
          strncat(errorBuff, queryUrl, maxcp);
          errorBuff[BUFFER_SIZE-1] = '\0';
          ErrorMsg(errorBuff);
-      } 
+      }
   }
 
 /*Set the return status.  */
@@ -522,8 +522,8 @@ char   errorBuff[80];             /* Buffer for error message.  */
 /*.  */
 
    if (status == 0)
-   {  
-     /* if the host name is greater than 100 characters we probably 
+   {
+     /* if the host name is greater than 100 characters we probably
 	have a problem. Need to do this since on linux gethostbyname
 	core dumps if we pass in a large string. Do not know what the
 	maximum length should be.
@@ -628,12 +628,12 @@ int     start;      /* First character to be listed (after skipped header).  */
 /*.  */
 
    if (status == 0)
-   {  
+   {
 
 
 /*   Intialise the counters, flags etc.  */
 
-      headerRemoved = FALSE;      
+      headerRemoved = FALSE;
       moreInput = TRUE;
 
       while(moreInput == TRUE)
@@ -802,7 +802,7 @@ char   errorBuff[80];             /* Buffer for error message.  */
 /*.  */
 
    if (status == 0)
-   {  
+   {
 
 
 /*   Attempt to obtain a socket for accessing the URL and proceed if ok.  */
@@ -844,7 +844,7 @@ char   errorBuff[80];             /* Buffer for error message.  */
 /*            Assemble the HTTP request to GET the contents of the   */
 /*            Web page.  */
 
-	      /* Abort if we do not think we can do this without a 
+	      /* Abort if we do not think we can do this without a
 		 buffer overflow. Be safe rather than accurate
 		 since being accurate will be ugly for now.
 	      */
@@ -858,11 +858,11 @@ char   errorBuff[80];             /* Buffer for error message.  */
                strcpy(httpBuffer, "GET ");
                strcat(httpBuffer, queryPage);
                strcat(httpBuffer, " HTTP/1.0\n");
- 
+
                strcat(httpBuffer, "Accept: text/plain\n");
                strcat(httpBuffer, "Accept: text/html\n");
                strcat(httpBuffer, "User-Agent: geturl\n\n");
-	      
+
 /*               printf("httpBuffer: %s", httpBuffer);  */
 
 

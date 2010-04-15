@@ -10,7 +10,7 @@ C     Function:
 C        Plot a polarization spectrum as P, Theta
 C
 C     Description:
-C        PPLOT produces a plot of a polarization spectrum. The plot is 
+C        PPLOT produces a plot of a polarization spectrum. The plot is
 C        divided into three panels. The lower panel is the total intensity,
 C        the center panel is the percentage polarization, the top panel
 C        is the position angle in degrees. The polarization data is binned
@@ -34,18 +34,18 @@ C                               Plot range is THETA to 180+THETA.
 C    (H) TMIN       (Real)     Minimum position angle to plot
 C    (H) TMAX       (Real)     Maximum position angle to plot
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         15/8/1990
 C
 C-
 C
 C  History:
-C    Aug/1987   Original Version.   JAB/AAO 
+C    Aug/1987   Original Version.   JAB/AAO
 C    26/2/1988   TSP Monolith version.  JAB/AAO
-C    29/4/1988   Use X-label from data. JAB/AAO                  
+C    29/4/1988   Use X-label from data. JAB/AAO
 C    18/8/1988   Use Y-label from data. JAB/AAO
 C    19/8/1988   Add THETA parameter. JAB/AAO
 C    19/8/1988   Prevent crash on bad input file.  JAB/AAO
@@ -79,16 +79,16 @@ C
       CHARACTER*(DAT__SZLOC) LOC,IDLOC,QDLOC,UDLOC,QELOC,UELOC
       CHARACTER*(DAT__SZLOC) QLOC,ULOC,T1LOC,T2LOC,LLOC
       CHARACTER*64 LABEL,UNITS,XLABEL,YLABEL
-      INTEGER L1,L2     
+      INTEGER L1,L2
 
 *  Position angle scaling
-      REAL THETA                
+      REAL THETA
       REAL TMIN,TMAX
 
-      INTEGER CHR_LEN                            
+      INTEGER CHR_LEN
 
 *  Get the data
-                                       
+
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
       CALL TSP_SIZE(LOC,3,DIMS,ACTDIM,STATUS)
       SIZE = DIMS(1)
@@ -132,7 +132,7 @@ C
           YLABEL = 'Intensity$'
       ELSE
           YLABEL = LABEL(1:L1)//' '//UNITS(1:L2)//'$'
-      ENDIF      
+      ENDIF
 
 *  Get temporary arrays for binned data
 
@@ -142,7 +142,7 @@ C
 *  Get the Binning error
 
       CALL PAR_GET0R('BINERR',BINERR,STATUS)
-               
+
 *  Get Theta scaling values
 
       CALL PAR_GET0R('TMIN',TMIN,STATUS)
@@ -162,7 +162,7 @@ C
 *  Find maximum and minimum values
 
          CALL TSP_EPSCALE(SIZE,%VAL(IPTR),%VAL(T1PTR),IMIN,IMAX,
-     :     PMIN,PMAX,STATUS)   
+     :     PMIN,PMAX,STATUS)
       ENDIF
 
 *  If we are not autoscaling use the min and max values as defaults and
@@ -180,15 +180,15 @@ C
       ENDIF
 
 *  Do the plot
-                    
+
       IF (STATUS .EQ. SAI__OK) THEN
         CALL TSP_PPLOT(SIZE,%VAL(IPTR),%VAL(T1PTR),%VAL(T2PTR),
      :   %VAL(LPTR),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,TMIN,TMAX,
      :   STATUS)
       ENDIF
 
-*  Tidy up      
-                                
+*  Tidy up
+
       CALL TSP_UNMAP(IDLOC,STATUS)
       CALL TSP_UNMAP(QDLOC,STATUS)
       CALL TSP_UNMAP(UDLOC,STATUS)
@@ -198,11 +198,11 @@ C
       CALL TSP_UNMAP(T1LOC,STATUS)
       CALL TSP_UNMAP(T2LOC,STATUS)
       CALL DAT_ANNUL(QLOC,STATUS)
-      CALL DAT_ANNUL(ULOC,STATUS) 
+      CALL DAT_ANNUL(ULOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-      
+
 
 
        SUBROUTINE TSP_PPBIN(SIZE,INT,Q,U,QERROR,UERROR,TEMP1,TEMP2,
@@ -220,7 +220,7 @@ C
 *   in percentage polarization.
 *
 *   Bins with no data are filled with the bad value  (VAL__BADR)
-*       
+*
 *    (>)  SIZE   (Integer)            The number of spectral points
 *    (>)  INT    (Real array(SIZE))   The intensity array
 *    (>)  Q      (Real array(SIZE))   The Q stokes parameter array
@@ -233,13 +233,13 @@ C
 *    (>)  TMIN   (Real)               Minimum theta value
 *    (>)  TMAX   (Real)               Maximum theta value
 *    (!)  STATUS (Integer)            Status value
-*   
+*
 *    Jeremy Bailey   12/7/1990
 *
 *    Modified:
 *        11/12/1991  -  Handle bad values
 *
-*+   
+*+
 
 
       IMPLICIT NONE
@@ -251,7 +251,7 @@ C
       INTEGER SIZE
       REAL INT(SIZE),Q(SIZE),U(SIZE),QERROR(SIZE),TEMP1(SIZE)
       REAL UERROR(SIZE),TEMP2(SIZE)
-      REAL BINERR                         
+      REAL BINERR
       REAL TMIN,TMAX
       INTEGER STATUS
 
@@ -297,7 +297,7 @@ C
      :        .AND. U(BIN_END) .NE. VAL__BADR) THEN
 
 *   Add data into bin accumulated values
-             
+
                BIN_INT = BIN_INT+INT(BIN_END)
                BIN_Q = BIN_Q+Q(BIN_END)
                BIN_U = BIN_U+U(BIN_END)
@@ -322,7 +322,7 @@ C
               ENDIF
             ENDDO
 
-*  Calculate value for bin. 
+*  Calculate value for bin.
 
             IF (BIN_INT .GT. 0.0) THEN
 
@@ -349,7 +349,7 @@ C
 
             DO I=BIN_START, BIN_END-1
                TEMP1(I) = P
-               TEMP2(I) = THETA  
+               TEMP2(I) = THETA
                IF (TEMP2(I) .LT. TMIN) TEMP2(I) = TEMP2(I)+180
                IF (TEMP2(I) .GT. TMAX) TEMP2(I) = TEMP2(I)-180
             ENDDO
@@ -366,23 +366,23 @@ C
 *   T S P _ P P L O T
 *
 *   Subroutine to do the polarization plot. This routine plots
-*   the intensity, polarization and position angle arrays as a function of 
-*   wavelength. It includes the PAR_ calls to get the plot device 
+*   the intensity, polarization and position angle arrays as a function of
+*   wavelength. It includes the PAR_ calls to get the plot device
 *   and plot label.
-*       
+*
 *   (>)  SIZE   (Integer)           The number of spectral points
 *   (>)  INT    (Real array(SIZE))  The intensity array
-*   (>)  TEMP1  (Real array(SIZE))  Temporary array for the binned 
+*   (>)  TEMP1  (Real array(SIZE))  Temporary array for the binned
 *                                     polarization data
-*   (>)  TEMP2  (Real array(SIZE))  Temporary array for the binned 
+*   (>)  TEMP2  (Real array(SIZE))  Temporary array for the binned
 *                                     position angle data
-*   (>)  LAMBDA (Real array(SIZE))  Wavelength array             
+*   (>)  LAMBDA (Real array(SIZE))  Wavelength array
 *   (>)  PMIN   (Real)              Minimum polarization value
 *   (>)  PMAX   (Real)              Maximum polarization value
 *   (>)  IMIN   (Real)              Minimum Intensity for scaling
 *   (>)  IMAX   (Real)              Maximum Intensity for scaling
-*   (>)  XLABEL (Real)              X axis label                        
-*   (>)  YLABEL (Real)              Y axis label         
+*   (>)  XLABEL (Real)              X axis label
+*   (>)  YLABEL (Real)              Y axis label
 *   (>)  TMIN   (Real)              Minimum theta value
 *   (>)  TMAX   (Real)              Maximum theta value
 *   (!)  STATUS (Integer)           Status value
@@ -407,7 +407,7 @@ C
       REAL PMIN,PMAX
       CHARACTER*(*) XLABEL,YLABEL
       REAL TMIN,TMAX
-      INTEGER STATUS     
+      INTEGER STATUS
 
 *  Local variables
 
@@ -430,7 +430,7 @@ C
 
 *  plot label
       CHARACTER*80 LABEL
-             
+
       DATA FIRST /.TRUE./
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -441,7 +441,7 @@ C
 
 *  Get the Graphics device
 
-         CALL SGS_ASSOC('DEVICE','WRITE',ZONE,STATUS)  
+         CALL SGS_ASSOC('DEVICE','WRITE',ZONE,STATUS)
          IF (STATUS .NE. SAI__OK) RETURN
          CALL GQNT(1,IERR,WIND,VIEWP)
 
@@ -453,13 +453,13 @@ C
          ELSE
 *             CALL SNX_AGRES(HEAP)
          ENDIF
-       
+
 *  Set up for NCAR plot
 
          CALL AGSETP('GRAPH.',VIEWP,4)
-                                      
-*  Set position of polarization plot             
-                     
+
+*  Set position of polarization plot
+
          CALL AGSETF('GRID/TOP.',0.70)
          CALL AGSETF('GRID/BOTTOM.',0.5)
 
@@ -482,7 +482,7 @@ C
          CALL AGSETF('X/NICE.',0.0)
 
 *  Plot scaling
-                                
+
          CALL AGSETF('Y/MIN.',PMIN)
          CALL AGSETF('Y/MAX.',PMAX)
          CALL AGSETF('Y/NICE.',0.0)
@@ -498,7 +498,7 @@ C
 *  Plot the polarization data
 
          CALL EZXY(LAMBDA,TEMP1,SIZE,' $')
-                             
+
 *  Bottom part of screen for intensity plot
 
          CALL AGSETF('GRID/TOP.',0.5)
@@ -522,7 +522,7 @@ C
          CALL AGSETF('B/WI.',0.040)
          CALL AGSETF('X/NICE.',0.0)
 
-*  Plot scaling             
+*  Plot scaling
 
          CALL AGSETF('Y/MIN.',IMIN)
          CALL AGSETF('Y/MAX.',IMAX)
@@ -536,7 +536,7 @@ C
 
 *  No numbering on X-axis
 
-         CALL AGSETF('AXIS/BOTTOM/NUMERIC/TYPE.',0.0)  
+         CALL AGSETF('AXIS/BOTTOM/NUMERIC/TYPE.',0.0)
 
 *  Y-axis label
 
@@ -544,7 +544,7 @@ C
          CALL AGSETI('LINE/NUMBER.',100)
          CALL AGSETF('LINE/CHAR.',0.070)
          CALL AGSETC('LINE/TEXT.','Theta (degrees)$')
-                                    
+
 *  Title Size
 
          CALL AGSETC('LABEL/NAME.','T')
@@ -552,7 +552,7 @@ C
          CALL AGSETF('LABEL/CENTERING.',-1.0)
          CALL AGSETI('LINE/NUMBER.',100)
          CALL AGSETF('LINE/CHAR.',0.080)
-                                       
+
 *  Character size and spacing
 
          CALL AGSETF('L/WI.',0.070)

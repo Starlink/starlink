@@ -82,7 +82,7 @@
 *                    Increment running total of weight
 *                 Endif
 *              Endfor
-*              Compute position of median in sorted sample using summed 
+*              Compute position of median in sorted sample using summed
 *                weight
 *              If insufficient valid pixels have been used to form the
 *                sample or median is too small then
@@ -142,7 +142,7 @@
 *        : Documentation brought up to standard
 *     1986 Sep 11: Renamed parameters section to arguments, added
 *                  invalid-pixel handling, which necessitated an
-*                  additional argument (MEDTHR - 5th), reordered 
+*                  additional argument (MEDTHR - 5th), reordered
 *                  ARROUT (old 10th to new 13th) in arguments
 *                  and tidied (RL.STAR::CUR).
 *     1989 Aug  7: Passed array dimensions as separate variables

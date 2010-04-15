@@ -148,7 +148,7 @@
      :    /'Failed to restore noticeboard from common block', STATUS )
       ELSE
         IF ( VERBOSE ) THEN
-          CALL MSG_OUT( ' ', 
+          CALL MSG_OUT( ' ',
      :      'Written to noticeboard from common block OK', STATUS )
         ENDIF
       ENDIF

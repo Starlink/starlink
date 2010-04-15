@@ -119,14 +119,14 @@
          CALL DSA_NAMED_INPUT( 'IMAGE2', IMAGE2, STATUS )
 
 *      Obtain the dimensions of the data array in IMAGE1
-         CALL DSA_DATA_SIZE( 'IMAGE1', MAXDIM, NDIM, DIMS, 
+         CALL DSA_DATA_SIZE( 'IMAGE1', MAXDIM, NDIM, DIMS,
      :     NELM, STATUS )
 
 *      Check that the sizes of the data arrays contained in these
 *      structures, and the range and units of the axes match up.
 *      (If any do not, a bad status will be returned).
 *      (Note that the actual dimensions of the data arrays are not
-*      checked to be the same, so for example a 62x58 mask can be 
+*      checked to be the same, so for example a 62x58 mask can be
 *      combined with a 58x62 mask. Perhaps this check should be
 *      included).
          CALL DSA_MATCH_SIZES( 'IMAGE1', 'IMAGE2', STATUS )
@@ -135,8 +135,8 @@
 *      Open the output structure, using the IMAGE1 structure as
 *      a template. (This will only happen if the STATUS is still ok
 *      at this point).
-         CALL DSA_NAMED_OUTPUT( 'OUTPUT', OUTPUT, 'IMAGE1', 
-     :     0, 0, STATUS ) 
+         CALL DSA_NAMED_OUTPUT( 'OUTPUT', OUTPUT, 'IMAGE1',
+     :     0, 0, STATUS )
 
 *      Check that everything has worked up to this point
          IF ( STATUS .EQ. ADAM__OK ) THEN

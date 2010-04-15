@@ -11,11 +11,11 @@ C        Position Angle Calibrate a Polarization Spectrum
 C
 C     Description:
 C        A polarization spectrum is corrected for wavelength dependent
-C        position angle zero point by applying a calibration curve obtained 
+C        position angle zero point by applying a calibration curve obtained
 C        using the CALFITPA command.
 C
 C        This command is needed for polarimeters which are based on
-C        the use of a superachromatic half-wave plate, since such a 
+C        the use of a superachromatic half-wave plate, since such a
 C        plate shows significant cyclic  wavelength variations of the
 C        position of its fast axis.
 C
@@ -24,16 +24,16 @@ C    (1) INPUT      (TSP, 1D)  The Polarization spectrum to be corrected.
 C    (2) CALIB      (TSP, 1D)  The calibration spectrum.
 C    (3) OUTPUT     (TSP, 1D)  The output corrected dataset.
 C
-C     Support: 
+C     Support:
 C        Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C        20/11/1991
 C
 C-
 C
 C  History:
-C    15/8/1990   Original Version.   JAB/AAO 
+C    15/8/1990   Original Version.   JAB/AAO
 C    20/11/1991  Handle bad values.  JAB/AAO
 C
 
@@ -68,7 +68,7 @@ C
 
       CALL DAT_CREAT('OUTPUT','NDF',0,0,STATUS)
       CALL DAT_ASSOC('OUTPUT','WRITE',OLOC,STATUS)
-              
+
 *  Copy input to output
 
       CALL TSP_COPY(LOC1,OLOC,STATUS)
@@ -98,7 +98,7 @@ C
       IF (DIMS(1) .NE. SIZE) THEN
          CALL MSG_OUT('MSG','Dimensions are different',STATUS)
          STATUS = USER__001
-      ENDIF         
+      ENDIF
 
 *  Get Stokes Data from calibration dataset
 
@@ -108,7 +108,7 @@ C
       CALL TSP_MAP_DATA(ULOC2,'READ',UPTR2,UDLOC2,STATUS)
 
 *  Get the Stokes data from output dataset
-                                  
+
       CALL TSP_GET_STOKES(OLOC,'Q',QLOC1,STATUS)
       CALL TSP_GET_STOKES(OLOC,'U',ULOC1,STATUS)
       CALL TSP_MAP_DATA(QLOC1,'UPDATE',QPTR1,QDLOC1,STATUS)
@@ -126,7 +126,7 @@ C
      :       %VAL(UPTR1),%VAL(QVPTR1),%VAL(UVPTR1))
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(QDLOC2,STATUS)
       CALL TSP_UNMAP(UDLOC2,STATUS)
@@ -147,9 +147,9 @@ C
       SUBROUTINE TSP_CALPA(SIZE,QC,UC,Q,U,QV,UV)
 *+
 *   Subroutine to apply the correction to the data. This is done by
-*   rotating the polarization vector by the appropriate amount for the 
+*   rotating the polarization vector by the appropriate amount for the
 *   corresponding wavelength as given by the calibration array
-*       
+*
 *   (>)  SIZE  (Integer)   Size of stokes and calibration arrays
 *   (>)  QC    (Real array (SIZE))  Q Stokes parameter of calibration array
 *   (>)  UC    (Real array (SIZE))  U Stokes parameter of calibration array
@@ -178,10 +178,10 @@ C
       REAL QQ,UU,QQV,UUV
 
 *  Loop over points
-      DO I=1,SIZE  
+      DO I=1,SIZE
 
 *  Rotate the polarization vector by an angle determined by the
-*  calibration vector         
+*  calibration vector
           QQ = QC(I)*Q(I) + UC(I)*U(I)
           UU = QC(I)*U(I) - UC(I)*Q(I)
 

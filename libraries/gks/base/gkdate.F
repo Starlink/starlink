@@ -51,7 +51,7 @@
       CHARACTER * 8 DATDAT
       CHARACTER * 10 DATTIM
       CHARACTER * 5 DATZON
-      
+
 *
 *-----------------------------------------------------------------------
 #if HAVE_INTRINSIC_DATE_AND_TIME || HAVE_DATE_AND_TIME

@@ -19,7 +19,7 @@ C  Call:
 C     REPLY=PAR_QUEST(PROMPT,DEFAULT)
 C
 C  Parameters:      (">" input, "<" output)
-C     (>) PROMPT    (Fixed string, descr) The prompt string.  Should 
+C     (>) PROMPT    (Fixed string, descr) The prompt string.  Should
 C                   be 'clean' in the sense that it should not
 C                   include clever control characters, and should
 C                   not have the default value formatted in it.
@@ -27,7 +27,7 @@ C     (>) DEFAULT   (Logical, ref) The default value.  Set true if
 C                   the default is YES, to false if it is NO.
 C
 C  Returns:
-C     (<) REPLY     (Logical, function value) Set to true if the reply 
+C     (<) REPLY     (Logical, function value) Set to true if the reply
 C                   was YES, to false if it was NO.
 C
 C  Author: KS: Keith Shortridge (CIT)

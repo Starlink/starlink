@@ -1,7 +1,7 @@
 This is version 1.00 of the perl GSD module
 -------------------------------------------
 
-The James Clerk Maxwell Telescope (JCMT), Mauna Kea, Hawaii uses 
+The James Clerk Maxwell Telescope (JCMT), Mauna Kea, Hawaii uses
 an in-house format for storing spectral line and UKT14 continuum data.
 This format is called the Global Section Data format (GSD).
 
@@ -24,7 +24,7 @@ and RedHat 7.3.
 
 The C GSD library is available separately. See
 http://www.starlink.ac.uk/cgi-store/storeform1?GSD
-with documentation at 
+with documentation at
 http://www.starlink.ac.uk/star/docs/sun229.htx/sun229.html
 
 
@@ -54,25 +54,25 @@ library itself is not included.
 
 
 NB
- 
-It is also possible to link the array handling code separately. This may 
+
+It is also possible to link the array handling code separately. This may
 be necessary if you wish to use this code yourself or if you are trying
 to compile a perl program which includes two modules that use the same
 array handling code. (for example a perl program using the NDF module as
 well as this GSD module)
- 
+
 To do this the following is necessary:
- 
+
         % cd arrays
         % make
- 
+
 This will create libarrays.a. You must then uncomment the libarrays line
 in Makefile.PL and comment out the '#include "arrays/arrays.c"' line in
 NDF.xs.
 
 Copyright
 ---------
- 
+
 This module is copyright (C) 1995-2000,2003 Tim Jenness and the UK Particle
 Physics and Astronomy Research Council.  All rights reserved.
 This program is free software; you can redistribute it and/or

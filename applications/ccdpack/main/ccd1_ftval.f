@@ -19,7 +19,7 @@
 *     If no FITS extension is found, or no matching header is found then
 *     an error message is output and STATUS is set.
 *
-*     The value returned is a string representation of the value 
+*     The value returned is a string representation of the value
 *     requested.
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *        ID of the NDF containing the FITS extension.
 *     FTSVAL = CHARACTER * ( * ) (Returned)
 *        Character representation of the value of the keyword requested.
-*        If the card's value is of character type, it is returned 
+*        If the card's value is of character type, it is returned
 *        surrounded by single quotes.
 *     STATUS = INTEGER (Given and returned)
 *        The global status.
@@ -75,13 +75,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data system constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) FTSKEY
       INTEGER INDF
-      
+
 *  Arguments Returned:
-      CHARACTER * ( * ) FTSVAL 
+      CHARACTER * ( * ) FTSVAL
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -92,7 +92,7 @@
       INTEGER NCARD               ! Number of cards in mapped FITS array
       LOGICAL THERE               ! Whether requested item is present
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator for FITS extension
-      
+
 *.
 
 *  Set default return value.

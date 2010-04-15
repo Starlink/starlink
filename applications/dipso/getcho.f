@@ -27,7 +27,7 @@
 *        The string containing the list of command parameters.
 *     POS = INTEGER (Given)
 *        The index of the required parameter within the list of all
-*        possible parameters. 
+*        possible parameters.
 *     OPT = LOGICAL (Given)
 *        Is the parameter an optional parameter? If so, then the
 *        supplied default value will be returned if no value has
@@ -79,7 +79,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) PARAMS
       INTEGER POS
@@ -88,11 +88,11 @@
       CHARACTER * ( * ) PROMPT
       CHARACTER * ( * ) MENU
       INTEGER DEFIND
-      
+
 *  Arguments Returned:
       INTEGER INDEX
       CHARACTER * ( * ) VALUE
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -109,7 +109,7 @@
      :        I,                 ! Menu item count
      :        LDEF,              ! Length of default value
      :        LITEM,             ! Length of menu item
-     :        NMATCH             ! No. of matching menu items      
+     :        NMATCH             ! No. of matching menu items
 
 *.
 
@@ -117,16 +117,16 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error if the menu is empty.
-      IF( MENU .EQ. ' ' ) THEN      
+      IF( MENU .EQ. ' ' ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'GETCHO_ERR1', 'GETCHO: Null menu supplied '//
      :                 '(programming error).', STATUS )
          GO TO 999
       END IF
-         
+
 *  Obtain the text of the default menu item. Report an error if the
 *  default value is not defined.
-      CALL FWORD( MENU, DEFIND, DEFVAL, LDEF )      
+      CALL FWORD( MENU, DEFIND, DEFVAL, LDEF )
 
 *  Get a value for the parameter.
       CALL GET0C( PARAMS, POS, OPT, COMM, PROMPT, DEFVAL, TVAL,
@@ -136,15 +136,15 @@
 *  in the menu, or an error occurs.
       NMATCH = 0
       DO WHILE( NMATCH .NE. 1 .AND. STATUS .EQ. SAI__OK )
-      
+
 *  Find the first item in the menu
          I = 1
          CALL FWORD( MENU, I, ITEM, LITEM )
-      
+
 *  Loop round each of the menu items, counting the matches.
          NMATCH = 0
-         DO WHILE( LITEM .GT. 0 )      
-            
+         DO WHILE( LITEM .GT. 0 )
+
 *  See if the parameter value is an abbreviation of the current menu
 *  item, allowing for differences in case. If it is, store the current
 *  word index, and increment the number of matches found.
@@ -153,13 +153,13 @@
                VALUE = ITEM
                NMATCH = NMATCH + 1
             END IF
-            
+
 *  Increment the current item index, and get the next item in the menu.
             I = I + 1
             CALL FWORD( MENU, I, ITEM, LITEM )
-            
+
          END DO
-         
+
 *  If no match was found, report an error and then flush it.
 *  Prompt the user for a new value.
          IF( NMATCH .EQ. 0 ) THEN
@@ -167,15 +167,15 @@
             CALL MSG_SETC( 'VAL', TVAL )
             CALL MSG_SETC( 'MENU', MENU )
             CALL ERR_REP( 'GETCHO_ERR2', 'Illegal value ''^VAL'' '//
-     :                    'supplied. Legal values are ''^MENU''.', 
+     :                    'supplied. Legal values are ''^MENU''.',
      :                    STATUS )
             CALL ERR_FLUSH( STATUS )
 
             CALL RDSTR( COMM, PROMPT, DEFVAL, TVAL, STATUS )
-            
+
 *  If more than one match was found, report an error and then flush it.
 *  Prompt the user for a new value.
-         ELSE IF( NMATCH .GT. 1 ) THEN         
+         ELSE IF( NMATCH .GT. 1 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'VAL', TVAL )
             CALL MSG_SETC( 'MENU', MENU )
@@ -183,7 +183,7 @@
      :                    'supplied. Legal values are ''^MENU''.',
      :                    STATUS )
             CALL ERR_FLUSH( STATUS )
-            
+
             CALL RDSTR( COMM, PROMPT, DEFVAL, TVAL, STATUS )
 
          END IF
@@ -193,5 +193,5 @@
 
 *  Jump to here if an error occurs.
  999  CONTINUE
-         
+
       END

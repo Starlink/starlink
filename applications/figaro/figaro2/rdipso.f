@@ -4,12 +4,12 @@ C
 C     R D I P S O
 C
 C     Reads a file in DIPSO/IUEDR format and creates a Figaro file from
-C     the data in it.  The file can have been written in any of what 
+C     the data in it.  The file can have been written in any of what
 C     IUEDR calls SPECTRUM type 0, type 1 or type 2 format.
 C
 C     Command parameters -
 C
-C     FILE      (Character) The name of the DIPSO format file to be 
+C     FILE      (Character) The name of the DIPSO format file to be
 C               read.
 C     CODE      (Numeric) The SPECTRUM type code for the format (0,1 or
 C                2).
@@ -22,14 +22,14 @@ C
 C     Modified:
 C
 C      2nd Sep 1987  DJA/ AAO. Revised DSA_ routines - some specs
-C                    changed. Now uses DYN routines for dynamic-memory 
+C                    changed. Now uses DYN routines for dynamic-memory
 C                    handling.
 C     21st Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C     26th Jun 1993  KS/AAO. Removed READONLY from OPEN statements in
 C                    interests of portability. Changed to use
-C                    DSA_GET_LU instead of VMS routines. Removed unused 
-C                    variables. Made the name of the 
+C                    DSA_GET_LU instead of VMS routines. Removed unused
+C                    variables. Made the name of the
 C                    structure-definition file lower case.
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
@@ -62,7 +62,7 @@ C
       INTEGER      NEXT          ! String index position
       INTEGER      NX            ! Size of 1st dimension
       CHARACTER    OBJECT*80     ! The name of the object
-      INTEGER      OPTR          ! Dynamic-memory pointer to output 
+      INTEGER      OPTR          ! Dynamic-memory pointer to output
                                  ! data array
       INTEGER      OSLOT         ! Map slot number for output data array
       INTEGER      STATUS        ! Running status for DSA_ routines
@@ -222,7 +222,7 @@ C     (<) XDATA  (Real array XDATA(NX)) The wavelength data array.
 C     (<) ZDATA  (Real array ZDATA(NX)) The flux data array.
 C     (<) STATUS (Integer) Status code.  0 => OK, non-zero values are
 C                Fortran I/O error codes.
-C   
+C
 C     Common variables used - None
 C
 C     Subroutines / functions used - None
@@ -240,12 +240,12 @@ C     Local variables
 C
       INTEGER I
 C
-C     Read the data in.  
+C     Read the data in.
 C
       IF (ICODE.EQ.0) THEN
          READ (LU,IOSTAT=STATUS) (XDATA(I),ZDATA(I),I=1,NX)
       ELSE IF (ICODE.EQ.1) THEN
-         READ (LU,'(4(F8.3,E10.3))',IOSTAT=STATUS) 
+         READ (LU,'(4(F8.3,E10.3))',IOSTAT=STATUS)
      :                                    (XDATA(I),ZDATA(I),I=1,NX)
       ELSE
          READ (LU,*,IOSTAT=STATUS) (XDATA(I),ZDATA(I),I=1,NX)

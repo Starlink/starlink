@@ -13,23 +13,23 @@
 *     CALL CHR_ITOH( IVALUE, STRING, STATUS )
 
 *  Description:
-*     Encode an INTEGER value into a hexadecimal string using the 
+*     Encode an INTEGER value into a hexadecimal string using the
 *     machine's character set. The result is right-justified in the
 *     returned string. In the event of an error, '*'s are written to
 *     the string.
- 
+
 *  Arguments:
 *     IVALUE = INTEGER (Given)
 *        Value to be encoded.
 *     STRING = CHARACTER * ( * ) (Returned)
 *        Hexadecimal string encoded from the given value.
 *     STATUS = INTEGER (Given and Returned)
-*        The status value. If this value is not SAI__OK on input, the 
-*        routine returns without action. If the routine fails to 
+*        The status value. If this value is not SAI__OK on input, the
+*        routine returns without action. If the routine fails to
 *        complete successfully, STATUS is returned set to SAI__ERROR.
 
-*  Note: 
-*     This subroutine assumes a 32-bit, twos-complement representation 
+*  Note:
+*     This subroutine assumes a 32-bit, twos-complement representation
 *     of an INTEGER.
 
 *  Algorithm:
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -139,7 +139,7 @@
          ISNEG = .FALSE.
       ELSE IF ( IVALUE .LT. 0 ) THEN
 
-*  Value is negative, check that STRING will hold at least 
+*  Value is negative, check that STRING will hold at least
 *    8 hex digits (32 bits)
          IF ( STRLEN .LT. BUFLEN ) THEN
             CALL CHR_FILL( '*', STRING )
@@ -164,7 +164,7 @@
          IVAL = IVALUE
       END IF
 
-*  Encode the integer into a right-justified binary string: first 
+*  Encode the integer into a right-justified binary string: first
 *  initialise ITEST.
       ITEST = HEXDEC
 
@@ -180,9 +180,9 @@
 
 *  Check that overflow has not occurred.
       IF ( ISNEG ) THEN
-          ICODE = INDEX( HEXCHR, 
+          ICODE = INDEX( HEXCHR,
      :                   BUFFER( BUFLEN-MAXHEX : BUFLEN-MAXHEX ) ) + 8
-          BUFFER( BUFLEN-MAXHEX : BUFLEN-MAXHEX ) 
+          BUFFER( BUFLEN-MAXHEX : BUFLEN-MAXHEX )
      :         = HEXCHR( ICODE : ICODE )
       ELSE IF ( IVAL .GT. 0 ) THEN
          CALL CHR_FILL( '*', STRING )

@@ -32,7 +32,7 @@
 *     This routine reduces the input dark time series by calculating
 *     a mean signal for each bolometer. A new smfData is created with the
 *     result. If the dark is already 2D the routine returns without action.
-*     The caller should check for this condition by making seeing if 
+*     The caller should check for this condition by making seeing if
 *     *outdark is non-NULL. This is done for efficiency.
 
 *  Notes:
@@ -98,15 +98,15 @@
 #include "smf.h"
 #include "smf_typ.h"
 
-void smf_reduce_dark( const smfData *indark, smf_dtype dtype, 
-                      smfData **outdark, 
+void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
+                      smfData **outdark,
                       int *status ) {
 
   float clip[1];      /* Sigma clip levels for statistics */
 
   if (*status != SAI__OK) return;
 
-  /* check we have a dark (inefficient if the caller has already 
+  /* check we have a dark (inefficient if the caller has already
      done so but we can not guarantee) */
   if (!smf_isdark( indark, status)) {
     *status = SAI__ERROR;

@@ -79,7 +79,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -234,12 +234,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -299,7 +299,7 @@ displayed on the screen of \texttt{rlssp0}, you need to type
 \end{quote}
 
 This is easy to forget and too much to type every time you do a remote
-login.  
+login.
 
 \section{\label{ssh}\xlabel{ssh} The preferred solution}
 
@@ -313,7 +313,7 @@ correct one and encrypts all data traffic over the network.
 An additional benefit is that \texttt{ssh} on Unix automatically creates
 an encrypted-channel X11 device on the remote computer, points the
 \texttt{DISPLAY} environment variable towards this and sets up local X11
-authentication to allow remote access from this machine. The setting of 
+authentication to allow remote access from this machine. The setting of
 \texttt{DISPLAY} must be left under the control of \texttt{ssh} to use this
 facility and it is important to check login files (such as \texttt{.login})
 to ensure that these do not alter this environment variable.
@@ -330,8 +330,8 @@ To get X output drawn on your X~server from a remote client, just type
 when you are not logged into a remote system, then nothing will happen
 and the output will still appear on your screen.
 
-What XDISPLAY does is to see where you logged in from and executes an 
-appropriate command to point the X output back to you. 
+What XDISPLAY does is to see where you logged in from and executes an
+appropriate command to point the X output back to you.
 
 \section{\label{wrong}\xlabel{wrong}What can go wrong?}
 
@@ -361,8 +361,8 @@ to occur, is that of multi-hop logins.
 If you are using X-terminal \texttt{ xacc} with an X session on Compaq Alpha
 \texttt{ rlsaxps},  and you log into Compaq Alpha \texttt{ rlsaxp2}, and then type
 \texttt{ xdisplay} on \texttt{ rlsaxp2}, XDISPLAY thinks you are on \texttt{ rlsaxps}
-and will point the display back to \texttt{ rlsaxps}.  This will fail because 
-\texttt{ rlsaxps} is a server machine and does not have an X console.  
+and will point the display back to \texttt{ rlsaxps}.  This will fail because
+\texttt{ rlsaxps} is a server machine and does not have an X console.
 
 A somewhat more embarrassing possibility is that you have logged in from
  one workstation (A) to a second (B), and thence to a third machine
@@ -371,7 +371,7 @@ the X output back to B if the security setting allows it. The trouble
 is that you are sat in front of A wondering where the window has gone
 and the user sat in front of B is wondering why a random window has
 suddenly appeared, and worse, possibly trashed what was displayed on
-a pre-existing graphics window! 
+a pre-existing graphics window!
 
 Making XDISPLAY automatically cope with multi-hop logins verges on the
 impossible, but there is a simple manual override available. If you
@@ -390,7 +390,7 @@ X-server, regardless of the route that you used to log in.
 
 Note that you can only use the \texttt{ xdisplay} command interactively.  You
 cannot put it in a shell script as \texttt{ xdisplay} is actually an alias
-that uses the shell's command line recall features. 
+that uses the shell's command line recall features.
 
 If you need to use XDISPLAY in a file there are two possibilities.  If
 you want to have XDISPLAY work out where you logged in from, put:

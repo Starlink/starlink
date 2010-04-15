@@ -19,32 +19,32 @@
 
 *  Description:
 *     Either
-*     
+*
 *     To display to a screen a sub list from all the sources input to
 *     FINDCRDD. This may be either a single line, indicated by PAGLEN
 *     set to 1, or a list of several lines.
-*     
+*
 *     If a single line is required then PAGLEN will be 1, and SOBOT
 *     will indicate the source position in source common that is to
 *     be displayed. A single line will be displayed without a heading.
-*     
+*
 *     If a page is required, then PAGLEN will be greater than 1 and
 *     SOBOT will be the bottom source required on the page, and the
 *     first source required is calculated as SOBOT - PAGLEN + 1.
 *     The page will be displayed with a two line heading.
-*     
+*
 *     Normally the PAGLEN will be less than or equal to the MAXLEN
 *     page length In this case if there are not enough sources the
 *     subroutine will put up those available and issue enough line
 *     feeds to bring it to the bottom of the page.
-*     
+*
 *     However the program will not display any source who's
 *     source-to-be-deleted marker is set .TRUE.. This will occur
 *     during source deletion. So at this point the PAGLEN may be set
 *     longer than MAXLEN to make a full page allowing for the deletions.
-*     
+*
 *     Or
-*     
+*
 *     The program send to a file details of all sources up to and
 *     including the last entered as SOBOT. The program will not display
 *     any source whos source-to-be-deleted marker is set .TRUE.. This
@@ -52,9 +52,9 @@
 *     Note This is not the file used to store source details for
 *     reinput. That file contains further details such as title and
 *     coords in RA and Dec radians (1950).
-*     
+*
 *     In both cases
-*     
+*
 *     The parameter SURVEY determins whether the region size and
 *     wavebands will be displayed ( SURVEY = .TRUE.) or not.
 
@@ -82,7 +82,7 @@
 *     ERR:
 *        ERR_REP
 *     FIO:
-*        FIO_WRITE   
+*        FIO_WRITE
 *     MSG:
 *        MSG_FMTC, MSG_FMTL, MSG_FMTR, MSG_OUT
 
@@ -98,7 +98,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -131,9 +131,9 @@
       CHARACTER * ( 1 ) CARRET   ! Contains the carrage control for
                                  ! internal writes/reads
       REAL DECROS                ! Cross scan size in arc minutes from
-                                 ! individual source 
+                                 ! individual source
       REAL DEINSC                ! In scan size in arc minutes from
-                                 ! individual source 
+                                 ! individual source
       INTEGER II                 ! DO loop control variable
       INTEGER III                ! DO loop control variable
       INTEGER IOS                ! Status of internal read/write
@@ -156,7 +156,7 @@
 *  *********************************************************************
       IF ( DISMOD ) THEN
 
-      
+
 *  *********************************************************************
 *  *********************************************************************
 *  Terminal Display
@@ -165,7 +165,7 @@
 
 *  If the PAGLEN is not 1, ie not a single line output
          IF ( PAGLEN .GT. 1 ) THEN
-         
+
 *  *********************************************************************
 *  Display page headings
 *  *********************************************************************
@@ -182,32 +182,32 @@
      :         '       2nd Coord    Inscan  Xscan    12 - - 100',
      :         STATUS )
             END IF
-            
+
 *  Calculate the number of the first source to be displayed
             SOTOP = SOBOT - PAGLEN + 1
             IF ( SOTOP .LT. 1 ) THEN
                SOTOP = 1
             END IF
-             
+
 *  Initialise count of number of lines displayed
             NOLINE = 0
-             
+
          ELSE
-          
+
 *  If a single line is to be output set SOTOP equal to SOBOT
             SOTOP = SOBOT
          END IF
-          
+
 *  If there are sources to be displayed
          IF ( SOBOT .GE. 1 ) THEN
-         
+
 *  *********************************************************************
 *  For each source to be displayed
 *  *********************************************************************
             DO 100 II = SOTOP, SOBOT
-              
+
 *  Check whether the source is to_be_deleted, and skip the output lines
-*  if it is  
+*  if it is
                IF ( .NOT. SOMADE(II) ) THEN
 
 *  Call subroutine to generate a string containing the source name and
@@ -261,7 +261,7 @@
                   CALL MSG_OUT( ' ', ' ', STATUS )
  200           CONTINUE
             END IF
-      
+
          END IF
 
 *  *********************************************************************
@@ -274,7 +274,7 @@
 
 *  If there are sources to be displayed
          IF ( SOBOT .GE. 1 ) THEN
-      
+
 *  *********************************************************************
 *  Display page headings
 *  *********************************************************************
@@ -301,9 +301,9 @@
 *  *********************************************************************
 
             DO 300 II = 1, SOBOT
-              
+
 *  Check whether the source is to_be_deleted, and skip the output lines
-*  if it is  
+*  if it is
                IF ( .NOT. SOMADE(II) ) THEN
 
 *  Call subroutine to generate a string containing the source name and
@@ -311,32 +311,32 @@
                   CALL FIND10( II, STNAME, STATUS )
 
 *  Slect output format depending on whether region size and waveband
-*  are required 
+*  are required
                   IF ( .NOT. SURVEY ) THEN
 
 *  Set up the buffer for the output message for output without waveband
 *  and size
                      WRITE ( BUFFER( 3 ), 9999, IOSTAT = IOS )
      :               CARRET, STNAME, SOCO1(II) , SOCO2(II)
-      
+
  9999                FORMAT ( A1, A16, 3X, A12, 4X, A12 )
 
 *  Write out buffer to file
                      CALL FIO_WRITE( FD, BUFFER( 3 ), STATUS )
-      
+
                   ELSE
 *  If size and wavebands are required
-*  Change the radian values for cross scan and in scan to arc minute 
+*  Change the radian values for cross scan and in scan to arc minute
                      DECROS = SOCRSZ( II ) / AMTOR
                      DEINSC = SOINSZ( II ) / AMTOR
-      
+
 *  Set up the buffer for the output message for output with waveband
 *  and size
                      WRITE ( BUFFER( 3 ), 9998, IOSTAT = IOS )
      :               CARRET, STNAME, SOCO1(II) , SOCO2(II),
-     :               DEINSC, DECROS, 
+     :               DEINSC, DECROS,
      :               SOWAB1(II), SOWAB2(II), SOWAB3(II), SOWAB4(II)
-      
+
  9998                FORMAT ( A1, A16, 3X, A12, 4X, A12, 4X,
      :               F5.1, 2X, F5.1, 5X, L1, 1X, L1, 1X, L1, 1X, L1 )
 
@@ -344,23 +344,23 @@
                      CALL FIO_WRITE( FD, BUFFER( 3 ), STATUS )
 
                   END IF
-         
+
                END IF
  300        CONTINUE
          END IF
 
-*  If there is an error in internal reads for file output 
+*  If there is an error in internal reads for file output
          IF ( IOS .NE. 0 ) THEN
             CALL ERR_REP( ' ', 'The source details have not been'//
      :      ' saved to a listable file because of output error '//
      :      ' - program continuing', STATUS )
          END IF
-      
+
 *  *********************************************************************
 *  End if for type of display
 *  *********************************************************************
 
       END IF
-      
+
       END
 

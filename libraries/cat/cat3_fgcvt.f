@@ -16,7 +16,7 @@
 *     Get a value from a FITS table using the FITSIO routines.
 *
 *     This routine is generic, in the sense that that there are multiple
-*     versions, each corresponding to one of the FITS data types.  However 
+*     versions, each corresponding to one of the FITS data types.  However
 *     individual routines are maintained for the different FITS data types
 *     because these data types, and the letters used to distinguish them,
 *     are different from the Starlink ones used by the GENERIC compiler.
@@ -54,7 +54,7 @@
 *     ROWNO   =  INTEGER (Given)
 *        Number of the row in the FITS table which is to be accessed.
 *     ELEM   =  INTEGER (Given)
-*        For binary tables the first pixel of the element vector to be 
+*        For binary tables the first pixel of the element vector to be
 *        accessed; ignored for ASCII tables.
 *     DTYPE  =  INTEGR (Given)
 *        CAT code for the data type to be returned.
@@ -96,7 +96,7 @@
 *           Attempt to convert the value to DOUBLE PRECISION.
 *           If ok then
 *             Apply the scaling.
-*             Attempt to convert the DOUBLE PRECISION value to the 
+*             Attempt to convert the DOUBLE PRECISION value to the
 *             required data type.
 *             If the conversion fails then
 *               Set the null flag.
@@ -120,12 +120,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -212,7 +212,7 @@
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -407,7 +407,7 @@
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -602,7 +602,7 @@
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -797,7 +797,7 @@
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -992,7 +992,7 @@
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -1187,7 +1187,7 @@
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -1385,7 +1385,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -1580,7 +1580,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       CHARACTER        LVALC*(CAT__SZVAL)
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -1776,7 +1776,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 
       COMPLEX          LVALCR
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.
@@ -1980,7 +1980,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       DOUBLE COMPLEX   LVALMD
 
 *
-*    These variables hold an intermediate copy of the value obtained 
+*    These variables hold an intermediate copy of the value obtained
 *    from the FITS column.  They are used in the extra conversion
 *    to data type DOUBLE PRECISION necessary for scaled columns.
 *    There is one variable per CAT data type.

@@ -2,9 +2,9 @@
 *
 * NOISE -- plots variance versus signal and noise models over the top.
 *
-* noise is used to calibrate the parameters READOUT and PHOTON used by 
+* noise is used to calibrate the parameters READOUT and PHOTON used by
 * most of the pamela routines. It needs a series of fairly smooth
-* frames (e.g. biases and flat fields) with different count levels. 
+* frames (e.g. biases and flat fields) with different count levels.
 * The frames should have been debiassed and flat fielded. You should
 * apply a flat field in which large scale variations have been removed
 * in order to preserve the numbers of counts while correcting for pixel
@@ -18,7 +18,7 @@
 * is sensitive to bad pixels. A correction is made for the noise of the
 * mean of 8 pixels.
 *
-* The models that you can plot are 
+* The models that you can plot are
 *
 * Noise = SQRT(READOUT**2 + COUNTS/PHOTON + (COUNTS*GRAIN)**2))
 *
@@ -33,7 +33,7 @@
 * at high counts as flat field noise dominates over photon noise.
 *
 * noise recognizes bad pixels.
-* 
+*
 * Parameters:
 *
 * FILES  -- An ASCII list of the calibration files. Any number is possible.
@@ -90,7 +90,7 @@ C     Read in file names
 C
       MOREFILES=.TRUE.
       NFILE = 1
-      DO WHILE(MOREFILES .AND. STATUS.EQ.SAI__OK .AND. 
+      DO WHILE(MOREFILES .AND. STATUS.EQ.SAI__OK .AND.
      &     NFILE.LE.MXFILE)
          READ (INPUT,'(A64)',IOSTAT=IFAIL) FILE(NFILE)
          IF((FILE(NFILE)(:1).NE.'#')
@@ -147,7 +147,7 @@ C
 C
 C     Plot device
 C
-      CALL PAR_GET0C('DEVICE',DEVICE,STATUS) 
+      CALL PAR_GET0C('DEVICE',DEVICE,STATUS)
       IF(STATUS.EQ.SAI__OK) THEN
          ID = PGOPEN(DEVICE)
          IF(ID.LE.0) THEN
@@ -202,12 +202,12 @@ C
          END IF
 C
 C     Map data
-C     
+C
          CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
 C
-C     Noise analysis 
+C     Noise analysis
 C
-         CALL P_NOISE(%VAL(CNF_PVAL(IPTR)), 
+         CALL P_NOISE(%VAL(CNF_PVAL(IPTR)),
      :                NXS, NYS, NXBOX, NYBOX, STATUS)
 C
 C     Tidy up
@@ -236,12 +236,12 @@ C
                IFAIL = 0
             ELSE
                READ(REPLY,*,IOSTAT=IKEEP) READOUT, PHOTON, GRAIN
-               IF(IKEEP.EQ.0 .AND. READOUT.GE.0. .AND. PHOTON.GT.0. 
+               IF(IKEEP.EQ.0 .AND. READOUT.GE.0. .AND. PHOTON.GT.0.
      &              .AND. GRAIN.GE. 0.) THEN
                   GRAIN = GRAIN/100.
-C     
-C     Evaluate and plot noise model 
-C     
+C
+C     Evaluate and plot noise model
+C
                   DO I = 1, MAXPLOT
                      TEST = PMIN+(PMAX-PMIN)*REAL(I-1)/REAL(MAXPLOT-1)
                      DN = 10.**TEST
@@ -264,11 +264,11 @@ C
       SUBROUTINE P_NOISE(DATA, NX, NY, IXSTEP, IYSTEP, STATUS)
 C
 C     Adapted from NOISEMAP in PAMELA
-C     This routine is used to determine the noise characteristics of 
-C     a detector by examining the way short-scale fluctuations in a 
+C     This routine is used to determine the noise characteristics of
+C     a detector by examining the way short-scale fluctuations in a
 C     flat field (or other) frame vary with data number.
 C     the empirical results may be compared with various noise models.
-C     
+C
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -304,7 +304,7 @@ C
         IYHI = IYHI + 1
       END IF
 C
-      BFAC = SQRT(16.*ATAN(1.)/9.)      
+      BFAC = SQRT(16.*ATAN(1.)/9.)
       DO IYBOX = 1, NYBOX
          IY1 = IYLO + IYSTEP*(IYBOX-1)
          IY1 = MAX(2, MIN(NY-1, IY1))
@@ -343,49 +343,49 @@ C
                   F8 = DATA(IXC,IYP)
                   F9 = DATA(IXP,IYP)
                   IF(F1.NE.VAL__BADR .AND. F2.NE.VAL__BADR
-     &                 .AND. F3.NE.VAL__BADR .AND. 
+     &                 .AND. F3.NE.VAL__BADR .AND.
      &                 F4.NE.VAL__BADR .AND. F5.NE.VAL__BADR
      &                 .AND. F6.NE.VAL__BADR .AND.
      &                 F7.NE.VAL__BADR .AND. F8.NE.VAL__BADR
      &                 .AND. F9.NE.VAL__BADR) THEN
                      AVG = (F1+F2+F3+F4+F6+F7+F8+F9)/8.
                      SUM = SUM + AVG
-C     
+C
 C     The absolute value is more robust than
 C     the squared deviation
-C     
+C
                      SUM2 = SUM2 + ABS(F5-AVG)
                      NPIX = NPIX + 1
                   END IF
                END DO
             END DO
-C     
+C
 C     Average sums sums for the large box
 C     also include a correction for the noise in
 C     the 8 pixel average and for taking the mean of the
 C     absolute deviation
-C     
+C
             IF(NPIX.GT.1) THEN
                SUM  = SUM /MAX(1.,REAL(NPIX))
                SUM2 = BFAC*SUM2/MAX(1.,REAL(NPIX))
-C     
+C
                NPLOT = NPLOT + 1
                PLOT1(NPLOT) = ALOG10( MAX(SUM, 0.11) )
                PLOT2(NPLOT) = ALOG10( MAX(SUM2, 1.) )
-C     
+C
 C     Dump plot buffer if full
-C     
+C
                IF(NPLOT.EQ.NDUMP) THEN
                   CALL PGSCI(1)
                   CALL PGPT(NPLOT, PLOT1, PLOT2, 1)
                   NPLOT = 0
                END IF
             END IF
-         END DO      
+         END DO
       END DO
-C     
+C
 C     Dump final buffer (if any)
-C     
+C
       IF(NPLOT.GT.0) THEN
          CALL PGSCI(1)
          CALL PGPT(NPLOT, PLOT1, PLOT2, 1)

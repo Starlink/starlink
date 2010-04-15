@@ -20,7 +20,7 @@
 *     converting from one data type into another.
 *
 *     The following conversions are fully supported. (They are either
-*     trivial, or are mentioned in the Fortran manual as legal 
+*     trivial, or are mentioned in the Fortran manual as legal
 *     conversions) :-
 *
 *     Function name          Conversion
@@ -53,7 +53,7 @@
 *     DCV_UWTOUW             UNSIGNED WORD to UNSIGNED WORD
 *
 *     The following conversions are partially supported only, and should
-*     be used with caution. (Trial and error has shown that VAX Fortran 
+*     be used with caution. (Trial and error has shown that VAX Fortran
 *     will make the conversions successfully, but they are not mentioned
 *     in the Fortran manual) :-
 *
@@ -166,7 +166,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
 
 *  Declare the types of the dummy arguments
@@ -298,7 +298,7 @@
 #else
       DCV_UWTOD( DUMMY_UW )  = DBLE( IAND( DUMMY_UW , DCV_UWMASK ) )
 #endif
- 
+
 *   (4) Routines resulting in INTEGER
 
       DCV_BTOI( DUMMY_B )    = DUMMY_B                       ! ???
@@ -350,7 +350,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOW( DUMMY_UW )  = ZEXT( DUMMY_UW )
 #else
-      DCV_UWTOW( DUMMY_UW )  = IAND( DUMMY_UW , DCV_UWMASK )      
+      DCV_UWTOW( DUMMY_UW )  = IAND( DUMMY_UW , DCV_UWMASK )
 #endif
 
 *   (7) Routines resulting in UNSIGNED WORD

@@ -21,8 +21,8 @@
 
 *  Description:
 *     This application creates a new LutMap and optionally initialises
-*     its attributes. A LutMap is a specialised form of Mapping which 
-*     transforms 1-dimensional coordinates by using linear interpolation 
+*     its attributes. A LutMap is a specialised form of Mapping which
+*     transforms 1-dimensional coordinates by using linear interpolation
 *     in a lookup table.
 *
 *     Each input coordinate value is first scaled to give the index of
@@ -50,14 +50,14 @@
 *        value between successive lookup table entries). This value
 *        may be positive or negative, but must not be zero.
 *     LUT = GROUP (Read)
-*        A comma-separated list of floating point values to be used as the 
-*        lookup table entries. A text file may be specified by preceeding the 
+*        A comma-separated list of floating point values to be used as the
+*        lookup table entries. A text file may be specified by preceeding the
 *        name of the file with an up arrow character "^". If the supplied value
 *        ends with a minus sign, the user is re-prompted for additional
 *        values.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new LutMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new LutMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new LutMap.
 *     START = _DOUBLE (Read)
@@ -106,7 +106,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -122,7 +122,7 @@
       LOGICAL DONE
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -130,7 +130,7 @@
 
 *  Loop until we have a good LUT.
       DONE = .FALSE.
-      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
 
 *  Get a group holding the formated LUT values.
          IGRP = GRP__NOID
@@ -143,13 +143,13 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, NLUT, 1, %VAL( CNF_PVAL( IPLUT ) ), 
+         CALL ATL1_GTOFL( IGRP, NLUT, 1, %VAL( CNF_PVAL( IPLUT ) ),
      :                    STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the
 *  parameter and go round to get a new group. Otherwise, indicate that we
 *  can leave the loop.
-         IF( STATUS .NE. SAI__OK ) THEN 
+         IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'ASTLUTMAP_ERR1', 'Please supply a new LUT:',
      :                    STATUS )
             CALL ERR_FLUSH( STATUS )
@@ -172,7 +172,7 @@
             CALL PAR_CANCL( 'INC', STATUS )
             STATUS = SAI__ERROR
             CALL ERR_REP( 'ASTLUTMAP_ERR2', 'Zero not allowed for '//
-     :                    'parameter INC. Please supply a new value.', 
+     :                    'parameter INC. Please supply a new value.',
      :                    STATUS )
             CALL ERR_FLUSH( STATUS )
          ELSE
@@ -181,7 +181,7 @@
       END DO
 
 *  Create the required LutMap.
-      RESULT = AST_LUTMAP( NLUT, %VAL( CNF_PVAL( IPLUT ) ), 
+      RESULT = AST_LUTMAP( NLUT, %VAL( CNF_PVAL( IPLUT ) ),
      :                     START, INC, ' ',
      :                     STATUS )
 

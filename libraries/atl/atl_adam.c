@@ -43,7 +43,7 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h" 
+#include "f77.h"
 #include "sae_par.h"
 #include "par_par.h"
 #include "ast.h"
@@ -66,7 +66,7 @@ void atlCreat( const char *param, AstObject *iast, int *status ){
    F77_EXPORT_INTEGER( astP2I( iast ), IAST );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_creat)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IAST), 
+   F77_CALL(atl_creat)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IAST),
                         INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) );
 
    F77_IMPORT_INTEGER( STATUS, *status );

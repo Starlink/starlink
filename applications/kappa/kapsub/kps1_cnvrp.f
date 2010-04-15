@@ -80,7 +80,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER ILO
       INTEGER IHI
@@ -88,23 +88,23 @@
       INTEGER JHI
       INTEGER NPIX
       INTEGER NLIN
-      
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION ARRAY( NPIX, NLIN )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       DOUBLE PRECISION VAL       ! Array value to be replicated
-      INTEGER I                  ! Column index      
-      INTEGER J                  ! Row index      
+      INTEGER I                  ! Column index
+      INTEGER J                  ! Row index
 
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Loop round each of the rows which intersect the given subsection of
 *  the array.
       DO J = JLO, JHI

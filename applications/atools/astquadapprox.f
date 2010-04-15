@@ -20,16 +20,16 @@
 *        The global status.
 
 *  Description:
-*     This application returns the co-efficients of a quadratic fit to the 
+*     This application returns the co-efficients of a quadratic fit to the
 *     supplied Mapping over the input area specified by LBND and UBND.
-*     The Mapping must have 2 inputs, but may have any number of outputs. 
-*     The i'th Mapping output is modelled as a quadratic function of the 
+*     The Mapping must have 2 inputs, but may have any number of outputs.
+*     The i'th Mapping output is modelled as a quadratic function of the
 *     2 inputs (x,y):
 *
-*     output_i = a_i_0 + a_i_1*x + a_i_2*y + a_i_3*x*y + a_i_4*x*x + 
+*     output_i = a_i_0 + a_i_1*x + a_i_2*y + a_i_3*x*y + a_i_4*x*x +
 *                a_i_5*y*y
 *
-*     The FIT array is returned holding the values of the co-efficients 
+*     The FIT array is returned holding the values of the co-efficients
 *     a_0_0, a_0_1, etc.
 
 *  Usage:
@@ -38,10 +38,10 @@
 *  ADAM Parameters:
 *     FIT() = _DOUBLE (Write)
 *        An array returning the co-efficients of the quadratic approximation
-*        to the specified transformation.  The first 6 elements hold the 
-*        fit to the first Mapping output. The next 6 elements hold the 
-*        fit to the second Mapping output, etc. So if the Mapping has 2 
-*        inputs and 2 outputs the quadratic approximation to the forward 
+*        to the specified transformation.  The first 6 elements hold the
+*        fit to the first Mapping output. The next 6 elements hold the
+*        fit to the second Mapping output, etc. So if the Mapping has 2
+*        inputs and 2 outputs the quadratic approximation to the forward
 *        transformation is:
 *
 *        X_out = fit(1) + fit(2)*X_in + fit(3)*Y_in + fit(4)*X_in*Y_in +
@@ -55,36 +55,36 @@
 *        the Mapping from the base Frame of the WCS FrameSet to the
 *        current Frame will be used. The Mapping must have 2 inputs.
 *     LBND( 2 ) = _DOUBLE (Read)
-*        A two element array containing the lower bound of the input region 
-*        in each input dimension. If an NDF was supplied for THIS, then a 
-*        null (!) value can be supplied in which case a 
-*        default will be used corresponding to the GRID cordinates of the 
-*        bottom left corner of the bottom left pixel in the NDF (i.e. a 
+*        A two element array containing the lower bound of the input region
+*        in each input dimension. If an NDF was supplied for THIS, then a
+*        null (!) value can be supplied in which case a
+*        default will be used corresponding to the GRID cordinates of the
+*        bottom left corner of the bottom left pixel in the NDF (i.e. a
 *        value of 0.5 on every grid axis).
 *     NX = _INTEGER (Read)
 *        The number of points to place along the first Mapping input. The
-*        first point is at LBND( 1 ) and the last is at UBND( 1 ). If a 
+*        first point is at LBND( 1 ) and the last is at UBND( 1 ). If a
 *        value less than three is supplied a value of three will be used.
-*        If an NDF was supplied for THIS, then a null 
-*        (!) value can be supplied in which case a default will be used 
+*        If an NDF was supplied for THIS, then a null
+*        (!) value can be supplied in which case a default will be used
 *        corresponding to the number of pixels along the axis.
 *     NY = _INTEGER (Read)
 *        The number of points to place along the second Mapping input. The
-*        first point is at LBND( 2 ) and the last is at UBND( 2 ). If a 
+*        first point is at LBND( 2 ) and the last is at UBND( 2 ). If a
 *        value less than three is supplied a value of three will be used.
-*        If an NDF was supplied for THIS, then a null 
-*        (!) value can be supplied in which case a default will be used 
+*        If an NDF was supplied for THIS, then a null
+*        (!) value can be supplied in which case a default will be used
 *        corresponding to the number of pixels along the axis.
 *     RMS = _DOUBLE (Write)
 *        The RMS residual between the mapping and the fit, taken over all
 *        outputs.
 *     UBND( 2 ) = _DOUBLE (Read)
-*        A two element array containing the upper bound of the input region 
+*        A two element array containing the upper bound of the input region
 *        in each input dimension. If an NDF was supplied for THIS,
-*        then a null (!) value can be supplied in which case a 
-*        default will be used corresponding to the GRID cordinates of the 
-*        top right corner of the top right pixel in the NDF (i.e. a value of 
-*        (DIM+0.5) on every grid axis, where DIM is the number of pixels 
+*        then a null (!) value can be supplied in which case a
+*        default will be used corresponding to the GRID cordinates of the
+*        top right corner of the top right pixel in the NDF (i.e. a value of
+*        (DIM+0.5) on every grid axis, where DIM is the number of pixels
 *        along the axis).
 
 *  Copyright:
@@ -142,7 +142,7 @@
       CHARACTER ATTR*20
       DOUBLE PRECISION LBND( NDF__MXDIM ), UBND( NDF__MXDIM )
       DOUBLE PRECISION FIT( 6*NDF__MXDIM ), RMS
-    
+
 *.
 
 *  Check inherited status.
@@ -215,7 +215,7 @@
       CALL PAR_GET0I( 'NY', NY, STATUS )
 
 *  Find the quadratic fit.
-      IF ( AST_QUADAPPROX( THIS, LBND, UBND, NX, NY, FIT, RMS, 
+      IF ( AST_QUADAPPROX( THIS, LBND, UBND, NX, NY, FIT, RMS,
      :                     STATUS ) ) THEN
 
 *  Display the fit and RMS.
@@ -235,7 +235,7 @@
          CALL PAR_PUT1D( 'FIT', 6 * NOUT, FIT, STATUS )
          CALL PAR_PUT0D( 'RMS', RMS, STATUS )
 
-      ELSE IF ( STATUS .EQ. SAI__OK ) THEN 
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'The least squares quadratic fit could '//
      :                 'not be determined.', STATUS )
@@ -252,7 +252,7 @@
 
 *  Give a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ASTQUADAPPROX_ERR', 'Error finding a'// 
+         CALL ERR_REP( 'ASTQUADAPPROX_ERR', 'Error finding a'//
      :                 ' quadratic approximation to a mapping',
      :                 STATUS )
       END IF

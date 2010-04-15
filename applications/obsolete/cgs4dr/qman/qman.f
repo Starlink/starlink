@@ -96,7 +96,7 @@
             CALL MSG_OUT( ' ', '^IS ', STATUS )
           ENDIF
 
-*     Turn verbose messages on 
+*     Turn verbose messages on
         ELSE IF ( NAME .EQ. 'VERBOSE' ) THEN
           VERBOSE = .TRUE.
           CALL MSG_OUT( ' ', 'QMAN: Verbose mode enabled', STATUS )
@@ -112,11 +112,11 @@
           CALL ERR_REP( ' ' ,  'QMAN: Action not recognised', STATUS )
         ENDIF
 
-*   The context was CANCEL so abort the action 
+*   The context was CANCEL so abort the action
       ELSE IF ( CONTEXT .EQ. CANCEL ) THEN
         CALL TASK_PUT_REQUEST( ACT__CANCEL, STATUS )
 
-*   The CONTEXT was not recognised 
+*   The CONTEXT was not recognised
       ELSE
          STATUS = SAI__ERROR
          CALL ERR_REP(' ', 'QMAN: '/

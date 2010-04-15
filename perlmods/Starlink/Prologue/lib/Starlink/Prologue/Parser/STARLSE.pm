@@ -178,7 +178,7 @@ sub push_line {
 
 Subclass variant of tidy_content(). The base class trims blank lines from
 the start and end of the section, this version also removes section terminators
-of the form 
+of the form
 
      {enter_changes_here}
 

@@ -26,7 +26,7 @@
 *        The global status.
 
 *  Prior Requirements:
-*     The NDF and the IRAF OIF file must already be open.  The 
+*     The NDF and the IRAF OIF file must already be open.  The
 *     other headers should have been written to the IRAF file.
 
 *  Copyright:
@@ -59,14 +59,14 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF__ public constants      
-      INCLUDE 'PRM_PAR'          ! VAL__ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF__ public constants
+      INCLUDE 'PRM_PAR'          ! VAL__ public constants
 
 *  Global Variables:
       INCLUDE 'COI_CMN'          ! Common block for passing required

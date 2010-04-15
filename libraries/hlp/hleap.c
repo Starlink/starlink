@@ -80,24 +80,24 @@ int hlpHleap ( int ( * nametr ) ( int, char*, int, char* ),
 */
 {
    int jstat, nc, iptr;
- 
+
 
 /* Is a switch to another library pending? */
    if ( strcmp ( hlopen, hlnext ) ) {
- 
+
    /* Yes: close the old HELP library file. */
       if ( fclose ( fphl ) ) return hlp_CLOSE_ERROR;
- 
+
    /* Open the new HELP library file and set its logical level number. */
       if ( ( jstat = hlpHopenr ( nametr ) ) ) return jstat;
       levoff = loffnu;
- 
+
    /* Return the position of the first index entry and read it. */
       hlpHtellx ( fname, iadr, logl );
       if ( ( jstat = hlpHdread ( lstring, &nextx, string, &nc ) ) )
          return jstat;
       if ( nc <= 0 ) return hlp_BAD_INDEX;
- 
+
    /* Decode the "data" address. */
       iptr = 0;
       nextd = hlpDec ( string, &iptr );

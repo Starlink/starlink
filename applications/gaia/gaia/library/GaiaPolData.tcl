@@ -17,17 +17,17 @@
 #
 #     The constructor uses the Polpack "polwrtcl" task to create the disk
 #     file from the specified polpack catalogue. This disk file contains
-#     a tcl code fragment which assigns values to properties of the 
+#     a tcl code fragment which assigns values to properties of the
 #     GaiaPolData (including the main data array).
 
 
 #  Invocations:
 #
-#        GaiaPolData object_name disk-file 
+#        GaiaPolData object_name disk-file
 #
 #     This creates an instance of a GaiaPolData object. The returned value
 #     is the name of the object. Disk-file is the full path for the disk
-#     file holding the Polpack catalogue. 
+#     file holding the Polpack catalogue.
 #
 #        object_name configure -configuration_options value
 #
@@ -87,14 +87,14 @@ itcl::class gaia::GaiaPolData {
 #  Constructor:
 #  ===========
 #  $file is the name of the fil as supplied by the user. $w is the top
-#  level window, and $tclfile is the name of a text file created by 
-#  polpack:polwrtcl containing the row/column data. If not supplied, 
+#  level window, and $tclfile is the name of a text file created by
+#  polpack:polwrtcl containing the row/column data. If not supplied,
 #  a new file is created.
    constructor { file w pbar {tclfile ""} } {
 
-#  Now initialize the class data. If this constructor has been invoked 
-#  to construct the base class part of some super class, do not 
-#  initialize the data since this will be done as a consequence of 
+#  Now initialize the class data. If this constructor has been invoked
+#  to construct the base class part of some super class, do not
+#  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolData" } {
          init $file $w $pbar $tclfile
@@ -113,17 +113,17 @@ itcl::class gaia::GaiaPolData {
       set i [lsearch -exact $awake_ $this]
       if { $i > -1 } { set awake_ [lreplace $awake_ $i $i] }
 
-#  Tcl files can be shared betwen GaiaPolData objects. If no objects are 
+#  Tcl files can be shared betwen GaiaPolData objects. If no objects are
 #  left which refer to the tcl file associated with $this, then mark the
 #  tcl file as "not currently in use" by adding it to the $oldfiles_ list.
 #  Note, the file is not deleted in case the user chooses to re-open it
-#  later. We only retain a limited number of unused tcl files to avoid 
-#  exessive disk space usage. 
+#  later. We only retain a limited number of unused tcl files to avoid
+#  exessive disk space usage.
       if { [incr tclFileRefCount_($tclfile_) -1] == 0 } {
 
-#  If this tclfile is already on the old files list, temporarily remove 
+#  If this tclfile is already on the old files list, temporarily remove
 #  it from the list.
-         set i [lsearch -exact $oldfiles_ $tclfile_] 
+         set i [lsearch -exact $oldfiles_ $tclfile_]
          if { $i != -1 } {
             set oldfiles_ [lreplace $oldfiles_ $i $i]
 
@@ -133,22 +133,22 @@ itcl::class gaia::GaiaPolData {
             set oldfiles_ [lrange $oldfiles_ 1 end]
          }
 
-#  Add the tcl file for $this to the end of the list of unused tcl files, 
+#  Add the tcl file for $this to the end of the list of unused tcl files,
 #  and unset the array element used to store its reference count.
          lappend oldfiles_ $tclfile_
-         unset tclFileRefCount_($tclfile_) 
+         unset tclFileRefCount_($tclfile_)
       }
    }
 
 #  Initialiser:
 #  ============
-#  Override the parent Init method to initialise the contents of the 
-#  memory allocated by the GaiaPolData constructor using a user-supplied 
+#  Override the parent Init method to initialise the contents of the
+#  memory allocated by the GaiaPolData constructor using a user-supplied
 #  argument list.
    protected method init { file w pbar tclfile } {
 
 #  First initialize the parent class data
-      gaia::GaiaPolObject::init 
+      gaia::GaiaPolObject::init
 
 #  Now initialize this class...
       set w_ $w
@@ -166,12 +166,12 @@ itcl::class gaia::GaiaPolData {
       if { $tclfile != "" } {
          set tclfile_ $tclfile
          catch { unset knownfiles_($polfile_) }
-  
+
 #  Otherwise we ay need to create one.
       } else {
 
 #  If this polpack file has already been opened once, we may have a tcl file
-#  already. See if the polpack file is included in the static array of 
+#  already. See if the polpack file is included in the static array of
 #  previously opened polpack files. If it does, the array element will
 #  hold the name of the corresponding tcl file.
          if { [info exists knownfiles_($polfile_)] } {
@@ -185,7 +185,7 @@ itcl::class gaia::GaiaPolData {
                if { $i != -1 } { set oldfiles_ [lreplace $oldfiles_ $i $i] }
 
 #  If the tcl file exists, check it is younger than the corresponding
-#  polpack file. If the polpack file has been modified since the tcl 
+#  polpack file. If the polpack file has been modified since the tcl
 #  file was created, delete the tcl file.
                if { [file mtime $tclfile_] < [file mtime $polfile_] } {
                   catch { file delete $tclfile_}
@@ -197,16 +197,16 @@ itcl::class gaia::GaiaPolData {
                unset knownfiles_($polfile_)
                set tclfile_ ""
             }
-   
+
          } else {
             set tclfile_ ""
          }
 
-#  If the is no existing tclfile, create a name for a new one using the 
-#  GaiaPolObject::tmpFile method. Save the name of the tclfile in the 
+#  If the is no existing tclfile, create a name for a new one using the
+#  GaiaPolObject::tmpFile method. Save the name of the tclfile in the
 #  static array of known files.
-         if { $tclfile_ == "" } { 
-            set tclfile_ [tmpFile] 
+         if { $tclfile_ == "" } {
+            set tclfile_ [tmpFile]
             set knownfiles_($polfile_) $tclfile_
          }
       }
@@ -231,7 +231,7 @@ itcl::class gaia::GaiaPolData {
 #  Public methods:
 #  ===============
 #  Calling any public method will "wake" the GaiaPolData. That is, if it
-#  has been "put to sleep" to save memory, the tcl disk file describing the 
+#  has been "put to sleep" to save memory, the tcl disk file describing the
 #  catalogue will be re-sourced so that the data is available for use.
 
 #  Convert between Z axis and Z column values. $type should be either
@@ -250,7 +250,7 @@ itcl::class gaia::GaiaPolData {
       wake
 
 #  Ensure the POLPACK configuration file is appropriate for the column
-#  names being used. If a file already exists, a temporary copy of it is 
+#  names being used. If a file already exists, a temporary copy of it is
 #  taken, and the name of the copy returned.
       set oldrc [makepolrc "X Y Z" ]
       if { $oldrc != "*" } {
@@ -261,18 +261,18 @@ itcl::class gaia::GaiaPolData {
 #  Skip if the above failed.
          if { $polzconv != "" } {
 
-#  Construct the polzconv parameter list.     
+#  Construct the polzconv parameter list.
             set plist "cat=$polfile_ "
             if { $type == "zaval" } {
                append plist "zcolval=! zaxval=$z "
             } else {
                append plist "zcolval=$z zaxval=! "
-            } 
+            }
 
-#  Run polzconv 
+#  Run polzconv
             run $polzconv $plist
 
-#  Form the returned list holding the Z column and axis values calculated by 
+#  Form the returned list holding the Z column and axis values calculated by
 #  polzconv.
             set ret [list [getparam $polzconv zcoluse] [getparam $polzconv zaxuse]]
          }
@@ -304,7 +304,7 @@ itcl::class gaia::GaiaPolData {
       wake
 
 #  Ensure the POLPACK configuration file is appropriate for the column
-#  names being used. If a file already exists, a temporary copy of it is 
+#  names being used. If a file already exists, a temporary copy of it is
 #  taken, and the name of the copy returned.
       set oldrc [makepolrc "X Y I P ANG" ]
       if { $oldrc != "*" } {
@@ -325,7 +325,7 @@ itcl::class gaia::GaiaPolData {
 #  Create a new Tclfile containing the supplied data.
             set tclfile [newTclFile $data]
 
-#  Save the data as a polpack catalogue. This is done using polpack 
+#  Save the data as a polpack catalogue. This is done using polpack
 #  application polrdtcl.
             tclSave $tclfile $polfile_ $file
 
@@ -374,7 +374,7 @@ itcl::class gaia::GaiaPolData {
          clearpolrc $oldrc
 
 #  Delete any temporary files.
-         if { $data != "" } { 
+         if { $data != "" } {
             catch { file delete $file }
             catch { file delete $tclfile }
          }
@@ -392,13 +392,13 @@ itcl::class gaia::GaiaPolData {
 #  -----------------------------------------
    public method save { data file } {
       set mess ""
-      if { $data == "" } { 
+      if { $data == "" } {
          set err [catch {file copy -force $polfile_ $file} mess]
-      } else { 
-         wake 
-         set tclfile [newTclFile $data] 
+      } else {
+         wake
+         set tclfile [newTclFile $data]
          set err [catch {tclSave $tclfile $polfile_ $file} mess]
-      } 
+      }
 
       if { $err || ![file exists $file] } {
          error_dialog "Failed to save data to $file: $mess"
@@ -438,34 +438,34 @@ itcl::class gaia::GaiaPolData {
       if { $gotwcs_ && $ra_ != "" && $dec_ != "" && $equinox_ != "" } {
 
 #  Create the blank image.
-         $rtdimage clear -reuse 1 -width $nxpix_ -height $nypix_ 
+         $rtdimage clear -reuse 1 -width $nxpix_ -height $nypix_
 
 #  Now set the correct WCS values.
          $rtdimage wcsset $ra_ $dec_ $secpix_ $xrefpix_ $yrefpix_ $nxpix_ \
-                                        $nypix_ 0 $equinox_ 0 TAN 
+                                        $nypix_ 0 $equinox_ 0 TAN
 
 #  If no WCS, just create the image with no wcs.
       } else {
-         $rtdimage clear -reuse 1 -width $nxpix_ -height $nypix_ 
+         $rtdimage clear -reuse 1 -width $nxpix_ -height $nypix_
       }
    }
 
-#  Nullify the class members read from the tcl script produced by 
+#  Nullify the class members read from the tcl script produced by
 #  polpack:polwrtcl. This may be done to save memory when the PolData is
 #  not being used.
 #  ----------------------------------------------------------------
    public method sleep {} {
-      set gotwcs_   "" 
-      set uses_     "" 
-      set headings_ "" 
-      set xlo_      "" 
-      set ylo_      "" 
-      set zlo_      "" 
-      set xhi_      "" 
-      set yhi_      "" 
-      set zhi_      "" 
-      set ncol_     "" 
-      set nrow_     "" 
+      set gotwcs_   ""
+      set uses_     ""
+      set headings_ ""
+      set xlo_      ""
+      set ylo_      ""
+      set zlo_      ""
+      set xhi_      ""
+      set yhi_      ""
+      set zhi_      ""
+      set ncol_     ""
+      set nrow_     ""
       set ra_       ""
       set dec_      ""
       set equinox_  ""
@@ -520,20 +520,20 @@ itcl::class gaia::GaiaPolData {
 
 #  Return the heading of the column containing the quantity given by $q.
 #  ---------------------------------------------------------------------
-   public method getColNam {q} { wake; 
+   public method getColNam {q} { wake;
       set icol [lsearch -exact $uses_ $q]
       if { $icol != -1 } {
          set ret [lindex $headings_ $icol]
       } else {
          set ret ""
-      } 
+      }
       return $ret
    }
 
 #  Indicate that the column with heading $c stores the quantity given by
 #  $q.
 #  ---------------------------------------------------------------------
-   public method setColNam {q c} { wake; 
+   public method setColNam {q c} { wake;
 
 #  Find the index of the column with the supplied heading. Do nothing if
 #  no column has this heading.
@@ -549,7 +549,7 @@ itcl::class gaia::GaiaPolData {
 #  Protected methods:
 #  ==================
 
-#  Creates a new disk file holding tcl code defining the contents of 
+#  Creates a new disk file holding tcl code defining the contents of
 #  a catalogue. The name of the disk file is returned. The description
 #  stored in the disk file is a copy of $this except that the supplied
 #  data array is used instead of the data array associated with $this.
@@ -563,7 +563,7 @@ itcl::class gaia::GaiaPolData {
       set nrow [llength $data]
 
 #  Create a name for the new file.
-      set newfile [tmpFile]             
+      set newfile [tmpFile]
 
 #  Open this new file.
       set fd [open $newfile w]
@@ -571,34 +571,34 @@ itcl::class gaia::GaiaPolData {
 #  Write out all the attributes of this PolData to the file.
       puts $fd "set gotwcs_   \"[blanks $gotwcs_]\""
       puts $fd "set uses_     \"[blanks $uses_]\""
-      puts $fd "set headings_ \"[blanks $headings_]\""  
-      puts $fd "set xlo_      \"[blanks $xlo_]\""       
-      puts $fd "set ylo_      \"[blanks $ylo_]\""       
-      puts $fd "set zlo_      \"[blanks $zlo_]\""       
-      puts $fd "set xhi_      \"[blanks $xhi_]\""       
-      puts $fd "set yhi_      \"[blanks $yhi_]\""       
-      puts $fd "set zhi_      \"[blanks $zhi_]\""       
-      puts $fd "set ncol_     \"[blanks $ncol_]\""      
-      puts $fd "set nrow_     \"[blanks $nrow]\""      
-      puts $fd "set ra_       \"[blanks $ra_]\""       
-      puts $fd "set dec_      \"[blanks $dec_]\""      
-      puts $fd "set equinox_  \"[blanks $equinox_]\""  
-      puts $fd "set epoch_    \"[blanks $epoch_]\""  
-      puts $fd "set xrefpix_  \"[blanks $xrefpix_]\""  
-      puts $fd "set yrefpix_  \"[blanks $yrefpix_]\""  
-      puts $fd "set nxpix_    \"[blanks $nxpix_]\""    
-      puts $fd "set nypix_    \"[blanks $nypix_]\""    
-      puts $fd "set secpix_   \"[blanks $secpix_]\""   
-      puts $fd "set fmts_     \"[blanks $fmts_]\""     
-      puts $fd "set hfmts_    \"[blanks $hfmts_]\""    
-      puts $fd "set zcunit_   \"[blanks $zcunit_]\""    
-      puts $fd "set zaunit_   \"[blanks $zaunit_]\""    
+      puts $fd "set headings_ \"[blanks $headings_]\""
+      puts $fd "set xlo_      \"[blanks $xlo_]\""
+      puts $fd "set ylo_      \"[blanks $ylo_]\""
+      puts $fd "set zlo_      \"[blanks $zlo_]\""
+      puts $fd "set xhi_      \"[blanks $xhi_]\""
+      puts $fd "set yhi_      \"[blanks $yhi_]\""
+      puts $fd "set zhi_      \"[blanks $zhi_]\""
+      puts $fd "set ncol_     \"[blanks $ncol_]\""
+      puts $fd "set nrow_     \"[blanks $nrow]\""
+      puts $fd "set ra_       \"[blanks $ra_]\""
+      puts $fd "set dec_      \"[blanks $dec_]\""
+      puts $fd "set equinox_  \"[blanks $equinox_]\""
+      puts $fd "set epoch_    \"[blanks $epoch_]\""
+      puts $fd "set xrefpix_  \"[blanks $xrefpix_]\""
+      puts $fd "set yrefpix_  \"[blanks $yrefpix_]\""
+      puts $fd "set nxpix_    \"[blanks $nxpix_]\""
+      puts $fd "set nypix_    \"[blanks $nypix_]\""
+      puts $fd "set secpix_   \"[blanks $secpix_]\""
+      puts $fd "set fmts_     \"[blanks $fmts_]\""
+      puts $fd "set hfmts_    \"[blanks $hfmts_]\""
+      puts $fd "set zcunit_   \"[blanks $zcunit_]\""
+      puts $fd "set zaunit_   \"[blanks $zaunit_]\""
 
 #  Write out the supplied data array
       puts $fd "set data_ \{ \\"
       foreach row $data {
          puts $fd "\{ $row \} \\"
-      }         
+      }
       puts $fd "\}"
 
 #  Close the file
@@ -621,7 +621,7 @@ itcl::class gaia::GaiaPolData {
          if { [info exists env(POLPACK_DIR)] } {
             set app [::gaia::GaiaApp \#auto  \
                       -application $env(POLPACK_DIR)/$command ]
-            
+
          } else {
             if { [file isdirectory "/star/bin/polpack"] }  {
                set app [::gaia::GaiaApp \#auto \
@@ -639,11 +639,11 @@ itcl::class gaia::GaiaPolData {
          SetGaiaApp $command $app
       }
 
-#  If succesful, configure the GaiaApp object so that it can be used with 
+#  If succesful, configure the GaiaApp object so that it can be used with
 #  this GaiaPolData.
-      if { $app != "" } { 
-         $app configure -notify [code $this completed] 
-         $app configure -parnotify [code $this gotparam] 
+      if { $app != "" } {
+         $app configure -notify [code $this completed]
+         $app configure -parnotify [code $this gotparam]
       }
 
 #  Return the GaiaApp
@@ -658,13 +658,13 @@ itcl::class gaia::GaiaPolData {
          set rcfile $env(POLPACKRC)
       } else {
          set rcfile "$env(HOME)/.polpackrc"
-      }       
+      }
    }
 
 #  Saves a copy of any existing polpack configuration file, and then
-#  creates a new one holding the column definitions for $this. The name of 
+#  creates a new one holding the column definitions for $this. The name of
 #  the file holding the copy of the original configuarion file is returned.
-#  $req is a list of required quanities. Reports an error and returns "*" if 
+#  $req is a list of required quanities. Reports an error and returns "*" if
 #  any required quantity is not available.
 #  ------------------------------------------------------------------------
    protected method makepolrc { req } {
@@ -683,7 +683,7 @@ itcl::class gaia::GaiaPolData {
 #  Open the config for for appending.
       set fd [open $rcfile "a+"]
 
-#  Modify the config file by appending the column definitions for $this 
+#  Modify the config file by appending the column definitions for $this
 #  to the end of the original rc file, overriding any earlier in the file.
       set ok 1
       foreach q "X Y Z RA DEC I Q U V DI DQ DU DV PI P DP ANG DANG DPI" {
@@ -695,9 +695,9 @@ itcl::class gaia::GaiaPolData {
             if { [lsearch -exact $req $q] != -1 } {
                error_dialog "Please use the \"Column Names\" panel to indicate which column holds $q values."
                set ok 0
-               break 
+               break
             }
-         } 
+         }
          puts $fd "Column $q $colnam"
       }
 
@@ -726,7 +726,7 @@ itcl::class gaia::GaiaPolData {
       }
    }
 
-#  Save a given tcl file as a new polpack catalogue. 
+#  Save a given tcl file as a new polpack catalogue.
 #  ----------------------------------------------
    protected method tclSave { tclfile refcat newcat } {
       global ::env
@@ -737,7 +737,7 @@ itcl::class gaia::GaiaPolData {
 #  Skip if the above failed.
       if { $polrdtcl != "" } {
 
-#  Run polrdtcl on the supplied tcl file, propagating meta-data from the 
+#  Run polrdtcl on the supplied tcl file, propagating meta-data from the
 #  supplied catalogue.
          run $polrdtcl "in=$tclfile out=$newcat ref=$refcat accept"
 
@@ -777,7 +777,7 @@ itcl::class gaia::GaiaPolData {
 
 #  Get a parameter value from a GaiaApp.
 #  ------------------------------------
-   protected method getparam {gaiaapp param} {   
+   protected method getparam {gaiaapp param} {
       set done_ 0
       $gaiaapp getparam $param
       while { $done_ == 0 } {
@@ -788,8 +788,8 @@ itcl::class gaia::GaiaPolData {
       return $parval_
    }
 
-#  Set the class members by sourcing the tcl script produced by 
-#  polpack:polwrtcl. 
+#  Set the class members by sourcing the tcl script produced by
+#  polpack:polwrtcl.
 #  ----------------------------------------------------------------
    protected method wake {{report 1}} {
       set msg " "
@@ -814,11 +814,11 @@ itcl::class gaia::GaiaPolData {
             if { ![catch {source $tclfile_} msg] } {
 
 #  Check that critical class data members now have non-null values.
-               if { $gotwcs_ != "" && $uses_ != "" && $headings_ != "" 
-                    && $xlo_ != "" && $ylo_ != "" && 
-                    $xhi_ != "" && $yhi_ != "" && $ncol_ != "" && 
+               if { $gotwcs_ != "" && $uses_ != "" && $headings_ != ""
+                    && $xlo_ != "" && $ylo_ != "" &&
+                    $xhi_ != "" && $yhi_ != "" && $ncol_ != "" &&
                     $nrow_ != "" && $data_ != ""  } {
-   
+
 #  If the maximum number of GaiaPolData objects are already awake, we
 #  need to put one to sleep so that we can wake up $this. Choose the one
 #  which has been awake longest.
@@ -828,7 +828,7 @@ itcl::class gaia::GaiaPolData {
                   }
 
 #  Indicate the PolData can be used (i.e. it is not asleep).
-                  lappend awake_ $this   
+                  lappend awake_ $this
                   set asleep_ 0
                }
             }
@@ -843,10 +843,10 @@ itcl::class gaia::GaiaPolData {
          if { $report } {
             error_dialog "Failed to re-read data for $polfile_ from file $tclfile_ : $msg"
          }
-         set ret $msg 
+         set ret $msg
       } else {
          set ret ""
-      }     
+      }
 
       return $ret
    }
@@ -864,7 +864,7 @@ itcl::class gaia::GaiaPolData {
 #  Skip if the above failed.
       if { $polwrtcl != "" } {
 
-#  Run polwrtcl on the supplied catalogue, putting the results in the 
+#  Run polwrtcl on the supplied catalogue, putting the results in the
 #  Tcl file.
          run $polwrtcl "in=$polfile out=$tclfile accept"
       }
@@ -894,7 +894,7 @@ itcl::class gaia::GaiaPolData {
       } else {
          set ret ""
          foreach el $l {
-            if { $el == "" } { 
+            if { $el == "" } {
                append ret \{\}
             } else {
                append ret $el
@@ -908,7 +908,7 @@ itcl::class gaia::GaiaPolData {
 #  Public data members:
 #  ====================
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -918,7 +918,7 @@ itcl::class gaia::GaiaPolData {
 #  The absolute path for the file containing the polpack catalogue.
       variable polfile_ ""
 
-#  The absolute path for the file containing the Tcl version of the 
+#  The absolute path for the file containing the Tcl version of the
 #  catalogue, created by polpack:polwrtcl.
       variable tclfile_ ""
 
@@ -985,8 +985,8 @@ itcl::class gaia::GaiaPolData {
 
 #  An estimate of the pixel size in arcseconds
       variable secpix_ ""
- 
-#  The equinox of RA/DEC values (eg "2000"). 
+
+#  The equinox of RA/DEC values (eg "2000").
       variable equinox_ ""
 
 #  The epoch as a decimal year (using the 1984 rule to determine B/J)
@@ -1003,13 +1003,13 @@ itcl::class gaia::GaiaPolData {
 
 #  Progress bar.
       variable pbar_ ""
-      
+
 #  A description of the operation which created the catalogue.
       variable desc_ ""
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
    private {
 
@@ -1025,7 +1025,7 @@ itcl::class gaia::GaiaPolData {
 #  Indicates if the data_ array has been nullified to save memory.
       variable asleep_ 0
 
-#  Has the user been warned about the fact that the displayed image does 
+#  Has the user been warned about the fact that the displayed image does
 #  not have WCS whereas this catalgue does?
       variable warned_ 0
    }
@@ -1052,7 +1052,7 @@ itcl::class gaia::GaiaPolData {
    common oldfiles_ ""
 
 #  An array of reference counts for each tcl file.
-   common tclFileRefCount_ 
+   common tclFileRefCount_
 
 #  End of class definition.
 }

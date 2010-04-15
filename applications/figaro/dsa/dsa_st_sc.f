@@ -62,11 +62,11 @@ C
       CHARACTER*(*) VARIABLE, VALUE
 C
 C     DSA_ structure definition common
-C 
+C
       INCLUDE 'DSA_STRUCTURE'
 C
 C     DSA_ error codes
-C 
+C
       INCLUDE 'DSA_ERRORS'
 C
 C     Functions used

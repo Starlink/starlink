@@ -2,8 +2,8 @@
 
       SUBROUTINE SPIKE (NSR, ISR, DATA, NLOW, NHIGH, SRTOL, NBPTS, BAD)
 
-C    Removes up to 16 spikes on points interval (NLOW,NHIGH) 
-C    Channels with spikes are set to bad channel value. 
+C    Removes up to 16 spikes on points interval (NLOW,NHIGH)
+C    Channels with spikes are set to bad channel value.
 
       IMPLICIT  NONE
 
@@ -42,17 +42,17 @@ C  Ok, go...
             NSR = NSR + 1
             ISR(NSR) = J
             DATA(J) = BAD
-            IF (NSR.EQ.16) GO TO 50 
+            IF (NSR.EQ.16) GO TO 50
           ELSE IF (LSP .AND..NOT.ROK) THEN
             DATA(J)  = BAD
             NSR      = NSR+1
             ISR(NSR) = J
-            IF (NSR.EQ.16) GO TO 50 
+            IF (NSR.EQ.16) GO TO 50
           ELSE IF (RSP .AND..NOT.LOK) THEN
             DATA(J)  = BAD
             NSR      = NSR+1
             ISR(NSR) = J
-            IF (NSR.EQ.16) GO TO 50 
+            IF (NSR.EQ.16) GO TO 50
           END IF
         END IF
 

@@ -45,7 +45,7 @@
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CI,       ! Catalogue identifier.
      :  QII,      ! Identifier for a real parameter.
      :  QIR,      ! Identifier for a real parameter.
@@ -148,7 +148,7 @@
 *       Report success or failure writing the catalogue, as appropriate.
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL MSG_OUT (' ', 'Catalogue created successfully.', 
+            CALL MSG_OUT (' ', 'Catalogue created successfully.',
      :        STATUS)
          ELSE
             CALL ERR_REP ('EXAMPLE_WRITE_ERR', 'Failed to create '/

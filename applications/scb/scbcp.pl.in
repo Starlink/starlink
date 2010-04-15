@@ -21,12 +21,12 @@
 #        1) It knows which files to copy.
 #        2) It will copy sparse files in a sparse way.
 #
-#     The second may be important depending on the implementation of 
+#     The second may be important depending on the implementation of
 #     DBM being used.  Some DBMs can create sparse files, that is ones
-#     with large 'holes' in them, which occupy few disk blocks but 
+#     with large 'holes' in them, which occupy few disk blocks but
 #     when copied in any of the usual ways (for instance with cp(1))
 #     produce files which occupy many more blocks.  Whether a file is
-#     sparse can be determined by comparing the output of 'ls -l' and 
+#     sparse can be determined by comparing the output of 'ls -l' and
 #     'ls -s'.
 #
 #     During operation, the utility reports the copies being carried out.

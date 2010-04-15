@@ -13,7 +13,7 @@
 *     CALL NDG_HWRGH( INDF, STATUS )
 
 *  Description:
-*     This routine appends a description of each currently registered GRP 
+*     This routine appends a description of each currently registered GRP
 *     group to the current History record in the supplied NDF. See
 *     NDF_ENDGH. It returns without action if 1) the NDF library has not
 *     yet written a default history record to the NDF, or 2) GRP history
@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -85,19 +85,19 @@
 
 *  Check that the supplied NDF is in the KeyMap holding the paths of NDFs
 *  to which default history has been written.
-      IF( DHKMP_COM2 .NE. AST__NULL ) THEN 
+      IF( DHKMP_COM2 .NE. AST__NULL ) THEN
          CALL NDF_MSG( 'T', INDF )
          CALL MSG_LOAD( ' ', '^T', NDFNAM, NDFLEN, STATUS )
-         IF( AST_MAPHASKEY( DHKMP_COM2, NDFNAM( : NDFLEN ), 
-     :                      STATUS ) ) THEN 
+         IF( AST_MAPHASKEY( DHKMP_COM2, NDFNAM( : NDFLEN ),
+     :                      STATUS ) ) THEN
 
-*  Append the contents of registered groups to the current history record 
+*  Append the contents of registered groups to the current history record
 *  in the NDF.
             CALL NDG1_HWRGH( INDF, STATUS )
 
 *  Remove the path for the supplied NDF form the group, thus preventing
 *  future routines from writing out group contents again.
-            CALL AST_MAPREMOVE( DHKMP_COM2, NDFNAM( : NDFLEN ), STATUS ) 
+            CALL AST_MAPREMOVE( DHKMP_COM2, NDFNAM( : NDFLEN ), STATUS )
          END IF
       END IF
 

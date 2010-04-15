@@ -38,7 +38,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -76,7 +76,7 @@
       IF ( IFAIL .NE. 0 ) GO TO 500
 
 *  Get some information from file header.
-      CALL FV4_FILINF( IFILE, IFAIL ) 
+      CALL FV4_FILINF( IFILE, IFAIL )
       IF ( IFAIL .NE. 0 ) THEN
          IFAIL = 38
          GO TO 500

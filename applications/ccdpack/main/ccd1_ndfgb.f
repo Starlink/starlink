@@ -187,7 +187,7 @@
 *  Set USEEXT to false to indicate this.
             USEEXT = .FALSE.
          END IF
-         IF ( .NOT. USEEXT ) THEN 
+         IF ( .NOT. USEEXT ) THEN
 
 *  Access an exact number of strings as double precision values, or
 *  allow user to return one value which will be expanded to fill all

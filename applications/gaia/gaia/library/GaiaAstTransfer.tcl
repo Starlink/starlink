@@ -236,17 +236,17 @@ itcl::class gaia::GaiaAstTransfer {
    itk_option define -isize isize Isize 9 {
       set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
       set values_($this,isize) $itk_option(-isize)
-      if { [info exists itk_component(table) ] } { 
+      if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -isize $itk_option(-isize)
       }
    }
-   
+
    #  Need to be 3.5->21.5, steps of 1.
    itk_option define -maxshift maxshift Maxshift 5.5 {
       set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
       set itk_option(-maxshift) [expr int($maxshift)+0.5]
       set values_($this,maxshift) $itk_option(-maxshift)
-      if { [info exists itk_component(table) ] } { 
+      if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
       }
    }

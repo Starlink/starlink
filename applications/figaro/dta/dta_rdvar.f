@@ -5,7 +5,7 @@ C     D T A _ R D V A R
 C
 C     Generic routine for reading from an object in the data
 C     structure.  The number of items specified are copied
-C     from the data structure starting at the location 
+C     from the data structure starting at the location
 C     specified by the object name (which can also include
 C     an array element specification).  If necessary, the
 C     data will be converted into the format required by the
@@ -16,7 +16,7 @@ C     Parameters -   (">" input, "<" output )
 C
 C     (>) NAME     (Character) The object name, in the standard
 C                  data structure format.  Should end with a
-C                  blank or the string end, and is case 
+C                  blank or the string end, and is case
 C                  insignificant.
 C     (>) NITEM    (Integer) The number of elements to be
 C                  read from the data structure.
@@ -26,13 +26,13 @@ C                  codes (not a conversion code).
 C     (<) BUFFER   (Any numeric type) Receives the data read from
 C                  the object.  Note that because of the variations in
 C                  the way different compilers pass CHARACTER strings,
-C                  this cannot be used for CHARACTER variables. 
+C                  this cannot be used for CHARACTER variables.
 C     (<) STATUS   (Integer) Returns a status code.
 C                  0 => OK
 C                  Lower level routines may return other error codes
 C-
 C     Subroutines / functions used -
-C 
+C
 C     DTA_PRETR    (DTA_ package) Preliminary set up for data transfer
 C     DTA_HDSERC   ( "      "   ) Convert HDS error code to DTA code
 C     DTA_FILLUP   ( "      "   ) Fill a numeric array with zeros
@@ -52,8 +52,8 @@ C     17th March 1986 KS / AAO. Re-written to use HDS routines.  Call
 C                     for character transfer now requires descriptor,
 C                     not actual data.  Undefined data is returned as
 C                     blanks or zeros.
-C     10th Jan 1992.  KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     10th Jan 1992.  KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN. Can no longer be used
 C                     when BUFFER is a character string, because of the
 C                     incompatible ways different compilers pass such
@@ -99,7 +99,7 @@ C
 C     Set new EMS reporting environment
 C
       EMSTAT=0
-      CALL EMS_BEGIN(EMSTAT) 
+      CALL EMS_BEGIN(EMSTAT)
 C
 C     Perform preliminary processing - check NAME, locate it
 C     in structures, get suitable locator for transfer.
@@ -108,7 +108,7 @@ C
      :                                    UNDEF,TEMPLOC,STATUS)
       IF (STATUS.NE.0)  GO TO 600
 C
-C     Read data into BUFFER, or set buffer to zeros if the 
+C     Read data into BUFFER, or set buffer to zeros if the
 C     object is undefined.
 C
       IF (.NOT.UNDEF) THEN

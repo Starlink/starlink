@@ -161,7 +161,7 @@
 
          NC = CHR_LEN( LABEL )
          CALL NDF_CPUT( LABEL, CUBID, 'LABEL', STATUS )
-         
+
          NC = CHR_LEN( UNITS )
          CALL NDF_CPUT( UNITS, CUBID, 'UNITS', STATUS )
 

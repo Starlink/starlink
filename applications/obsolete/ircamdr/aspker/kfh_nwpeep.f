@@ -22,13 +22,13 @@
 *           The Y coordinate of the centre of the
 *           selected 9x9 section of the image.
 *     STATUS = INTEGER
-*           The status value on entry to this 
+*           The status value on entry to this
 *           subroutine.
 *    Method :
 *     A 9x9 section from an image (defined by the
 *     central pixel) is selected , and a suitable
 *     scaling factor found. The chosen pixels are
-*     then scaled and written (in F9.0 format) to 
+*     then scaled and written (in F9.0 format) to
 *     the terminal. The coordinates of the vertices
 *     and the scaling factor are also reported.
 *    Authors :

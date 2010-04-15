@@ -13,7 +13,7 @@
 *     CALL POL1_CTCLM( CI, NROW, NCOL, GI, OUT, STATUS )
 
 *  Description:
-*     This routine copies NROW values from each of NCOL columns in the 
+*     This routine copies NROW values from each of NCOL columns in the
 *     catalogue identified by CI, to the OUT array. Each column is put in
 *     a separate row in the OUT array.
 
@@ -34,7 +34,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -48,13 +48,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER CI
@@ -74,20 +74,20 @@
       LOGICAL NULL               ! Was no value available?
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop round each row.
       DO I = 1, NROW
 
 *  Read this row into the CAT current row buffer.
-         CALL CAT_RGET( CI, I, STATUS ) 
+         CALL CAT_RGET( CI, I, STATUS )
 
 *  Loop round each column.
          DO J = 1, NCOL
 
 *  Get the value of this column from the current row buffer.
-            CALL CAT_EGT0R( GI( J ), OUT( I, J ), NULL, STATUS ) 
+            CALL CAT_EGT0R( GI( J ), OUT( I, J ), NULL, STATUS )
 
 *  Store a Starlink bad value if the value is null.
             IF( NULL ) OUT( I, J ) = VAL__BADR

@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -103,14 +103,14 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    STEP is the increment in angle about the centre of the ellipse.
-*    TH is angle subtended from the locus to the centre of the 
+*    TH is angle subtended from the locus to the centre of the
 *    ellipse and is defined to be 0 or pi radians on the major axis.
 
       STEP = PI2 / REAL( N - 1 )
 
 *    Convert to polar convention.
 
-      RPA = PA + 0.25 * PI2 
+      RPA = PA + 0.25 * PI2
 
 *    Define the start of ellipse as the positive end of the major axis.
 

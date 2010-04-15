@@ -14,7 +14,7 @@
 
 *  Description:
 *     The supplied HDS object is searched for NDFs, and any NDFs which
-*     are found are deleted. Here, an NDF is defined as an HDS structure 
+*     are found are deleted. Here, an NDF is defined as an HDS structure
 *     containing a component called DATA_ARRAY which can be accessed by the
 *     ARY library.
 
@@ -33,12 +33,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@
       INTEGER ICELL              ! Cell index
       INTEGER ICOMP              ! Component index
       INTEGER IGRP2              ! Group holding locators to be checked
-      INTEGER ILOC               ! No. of locators checked so far 
+      INTEGER ILOC               ! No. of locators checked so far
       INTEGER NCELL              ! No. of cells in array
       INTEGER NCOMP              ! No. of components in object
       INTEGER NDIM               ! No. of dimensions in array component
@@ -129,7 +129,7 @@
 
 *  See if this object contains a component called DATA_ARRAY which can be
 *  accessed by the ARY library. If so, the object is assumed to be an NDF.
-            CALL ARY_FIND( XLOC, 'DATA_ARRAY', IARY, STATUS ) 
+            CALL ARY_FIND( XLOC, 'DATA_ARRAY', IARY, STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
                CALL ARY_ANNUL( IARY, STATUS )
                ISANDF = .TRUE.
@@ -158,18 +158,18 @@
             ELSE
 
 *  See if it is a scalar or an array.
-               CALL DAT_SHAPE( XLOC, DAT__MXDIM, DIM, NDIM, STATUS ) 
+               CALL DAT_SHAPE( XLOC, DAT__MXDIM, DIM, NDIM, STATUS )
 
 *  If it is a scalar...
                IF( NDIM .EQ. 0 ) THEN
 
 *  Find the number of components in the object.
-                  CALL DAT_NCOMP( XLOC, NCOMP, STATUS ) 
+                  CALL DAT_NCOMP( XLOC, NCOMP, STATUS )
 
 *  Add a locator for each component to the end of the group of locators
 *  to be checked.
                   DO ICOMP = 1, NCOMP
-                     CALL DAT_INDEX( XLOC, ICOMP, CLOC, STATUS ) 
+                     CALL DAT_INDEX( XLOC, ICOMP, CLOC, STATUS )
                      CALL GRP_PUT( IGRP2, 1, CLOC, 0, STATUS )
                   END DO
 
@@ -181,9 +181,9 @@
 
 *  Get a vectorised (i.e. 1-d) version of the array.
                   CALL DAT_VEC( XLOC, VLOC, STATUS )
-                    
+
 *  Get the length of the vectorized array.
-                  CALL DAT_SIZE( VLOC, NCELL, STATUS ) 
+                  CALL DAT_SIZE( VLOC, NCELL, STATUS )
 
 *  Add a locator for each cell of the array to the end of the group of locators
 *  to be checked.
@@ -199,7 +199,7 @@
                   CALL DAT_ANNUL( VLOC, STATUS )
 
                END IF
- 
+
             END IF
 
          END IF

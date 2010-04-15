@@ -2,18 +2,18 @@
  *+
  *  Name:
  *     imgIndf
- 
+
  *  Purpose:
  *     Obtains an NDF identifier for an image.
- 
+
  *  Language:
  *     ANSI C
- 
+
  *  Invocation:
  *     imgIndf( param,
  *              indf,
  *              status )
- 
+
  *  Description:
  *     This C function sets up the required arguments and calls the
  *     Fortran subroutine img_indf.
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -51,12 +51,12 @@
  *     The orginal version was generated automatically from the
  *     Fortran source of img_indf by the Perl script fcwrap.
  *     {enter_new_authors_here}
- 
+
  *  History:
  *     17-May-1996 (fcwrap):
  *        Original version
  *     {enter_changes_here}
- 
+
  *-
  */
 #include "cnf.h"
@@ -71,7 +71,7 @@ F77_SUBROUTINE(img_indf)( CHARACTER(param),
 void imgIndf( char *param,
               int *indf,
               int *status ) {
-  
+
   DECLARE_CHARACTER_DYN(fparam);
 
   F77_CREATE_CHARACTER(fparam,strlen( param ));
@@ -83,7 +83,7 @@ void imgIndf( char *param,
                       TRAIL_ARG(fparam) );
 
   F77_FREE_CHARACTER(fparam);
-  
+
   return;
 }
 

@@ -30,8 +30,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	    ! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'       
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
         INCLUDE  'CHR_ERR'
 
 * Status :
@@ -45,7 +45,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI,         	! locator for input data structure
      :    LOCO,         	! locator for output data structure
      :	  IXCEN,
@@ -114,7 +114,7 @@
 
 *      create output data image structures
 
-	CALL NDF_CREAT( 'OUTPIC', '_REAL', NDIMS, LBND, ODIMS, 
+	CALL NDF_CREAT( 'OUTPIC', '_REAL', NDIMS, LBND, ODIMS,
      :                  LOCO, STATUS)
 
 	IF ( STATUS .NE. SAI__OK) THEN
@@ -123,7 +123,7 @@
 	  RETURN
 	END IF
 
-*      get the X and Y search factor and sigma level 
+*      get the X and Y search factor and sigma level
 	CALL PAR_GET0L( 'WHOLE', WHOLE, STATUS)
 	IF( .NOT. WHOLE ) THEN
 	  CALL PAR_GET0I( 'XCEN', IXCEN, STATUS)
@@ -132,7 +132,7 @@
 	  CALL PAR_GET0I( 'YSIZ', IYSZ, STATUS)
 	  IF( ( IXCEN+INT(IXSZ/2.0+0.5)) .GT. IDIMS( 1) .OR.
      :	      ( IYCEN+INT(IYSZ/2.0+0.5)) .GT. IDIMS( 2) ) THEN
-	    CALL MSG_OUT( 'MESS', 
+	    CALL MSG_OUT( 'MESS',
      :	      'ERROR, your search box EXCEEDS image area', STATUS)
 	    CALL NDF_ANNUL( LOCI, STATUS)
 	    CALL NDF_ANNUL( LOCO, STATUS)
@@ -184,9 +184,9 @@
 	END IF
 
 *      call subroutine to do work
-	CALL HOTSHOTSUB( 
-     :        IDIMS( 1), IDIMS( 2), %VAL( PNTRI), WHOLE, IXCEN, 
-     :	      IYCEN, IXSZ, IYSZ, BINX, BINY, SIGMA, THRESH, 
+	CALL HOTSHOTSUB(
+     :        IDIMS( 1), IDIMS( 2), %VAL( PNTRI), WHOLE, IXCEN,
+     :	      IYCEN, IXSZ, IYSZ, BINX, BINY, SIGMA, THRESH,
      :	      SETWHAT, BADVAL, %VAL( PNTRO), NUMHOT, STATUS)
 
 	CALL MSG_SETI( 'HOT', NUMHOT)

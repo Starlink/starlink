@@ -58,7 +58,7 @@
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statements, with calls to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the CARRIAGECONTROL specifier is used which is 
+*        porting, as the CARRIAGECONTROL specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -91,7 +91,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -142,7 +142,7 @@ C
       CALL PAR_CANCL( 'FFILE', STATUS )
       FILE=NAME
 
-*  Check whether file already exists 
+*  Check whether file already exists
 
       INQUIRE( FILE = FILE, EXIST = EXIST )
 
@@ -172,9 +172,9 @@ C
 * If they do wish to add to it, OPEN it
 
          IF ( RESPONSE ) THEN
-      
+
 * This call replaces this statement :
-* 
+*
 *     OPEN (UNIT=3,FILE=FILE,STATUS='OLD',
 *    :      CARRIAGECONTROL='LIST',ERR=500)
 * (see History)
@@ -199,7 +199,7 @@ C
          ENDIF
 
       ENDIF
-      
+
 C
 C      It loops around to here reading in turn:-
 C             RA

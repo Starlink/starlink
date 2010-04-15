@@ -26,11 +26,11 @@
       INCLUDE 'COLOURS.INC'                   ! Colours common block
 *    Local Constants :
       INTEGER MAXDIM                          ! max number of dimensions
-      PARAMETER ( MAXDIM = 3 )            
+      PARAMETER ( MAXDIM = 3 )
 *    Local variables :
       LOGICAL SAME_UNITS                      ! T if axis units are the same
       LOGICAL ERRORS                          ! T if want to plot errors
-      LOGICAL QUALITY                         ! T if want to plot quality 
+      LOGICAL QUALITY                         ! T if want to plot quality
       INTEGER SLEN                            ! Length of string
       INTEGER TLEN                            ! Length of string
       INTEGER XLEN                            ! Length of string
@@ -90,7 +90,7 @@
          GOTO 600
       ENDIF
 
-*   Get datatype sizes 
+*   Get datatype sizes
       FLOATSIZE = DSA_TYPESIZE( 'FLOAT', STATUS )
       BYTESIZE  = DSA_TYPESIZE( 'BYTE', STATUS )
       INTSIZE   = DSA_TYPESIZE( 'INT', STATUS )
@@ -240,7 +240,7 @@
 
 *      Check values of LOW( PORT ) and HIGH( PORT ) are not equal
         IF ( .NOT. AUTOSCALE( PORT ) ) THEN
-           YSTART( PORT ) = LOW( PORT ) 
+           YSTART( PORT ) = LOW( PORT )
            YEND( PORT ) = HIGH( PORT )
         ELSE
 
@@ -277,21 +277,21 @@
       CALL P4_GET_AXLAB( PORT, SAME_UNITS, STATUS )
 
 *    Clear display for new GRAPH, if desired and if possible
-      IF ( DISPLAY_TYPE( PORT ) .EQ. 'GRAPH' .AND. 
+      IF ( DISPLAY_TYPE( PORT ) .EQ. 'GRAPH' .AND.
      :     PRE_ERASE_PLOT( PORT ) ) CALL P4_CLEARPORT( PORT, STATUS )
 
 *    First select basic viewport
       PLOT_OK( PORT ) = .FALSE.
       CALL P4_SELPORT( PORT, STATUS )
 
-*    Set up window 
+*    Set up window
       AXSTART( PORT ) = XSTART( PORT )
       AXEND( PORT ) = XEND( PORT )
       AYSTART( PORT ) = YSTART( PORT )
       AYEND( PORT ) = YEND( PORT )
       IF ( PORT_OK( PORT ) ) THEN
 
-        CALL PGWINDOW( XSTART( PORT ), XEND( PORT ), 
+        CALL PGWINDOW( XSTART( PORT ), XEND( PORT ),
      :     YSTART( PORT ), YEND( PORT ) )
 
 *      Change the pen colour for OVERGRAPH
@@ -305,21 +305,21 @@
 *      Plot the points, with error bars if possible and no offset
         IF ( CUT_DIRECTION( PORT ) .EQ. 'X' ) THEN
            IF ( VERBOSE ) CALL MSG_OUT( ' ', 'Plotting X cut', STATUS )
-           CALL P4_LINE( DIM, ISTART( PORT ), IEND( PORT ), %val( AXIS1_PTR ), 
-     :        %val( DS_PTR ), %val( ES_PTR ), %val( QS_PTR ), PLOT_ERRORS(PORT), 
+           CALL P4_LINE( DIM, ISTART( PORT ), IEND( PORT ), %val( AXIS1_PTR ),
+     :        %val( DS_PTR ), %val( ES_PTR ), %val( QS_PTR ), PLOT_ERRORS(PORT),
      :        QUALITY, 0.0, 0.0, STATUS )
         ELSE IF ( CUT_DIRECTION( PORT ) .EQ. 'Y' ) THEN
            IF ( VERBOSE ) CALL MSG_OUT( ' ', 'Plotting Y cut', STATUS )
-           CALL P4_LINE( DIM, ISTART( PORT ), IEND( PORT ), %val( AXIS2_PTR ), 
+           CALL P4_LINE( DIM, ISTART( PORT ), IEND( PORT ), %val( AXIS2_PTR ),
      :        %val( DS_PTR ), %val( ES_PTR ), %val( QS_PTR ), PLOT_ERRORS(PORT),
      :        QUALITY, 0.0, 0.0, STATUS )
-        ENDIF 
+        ENDIF
 
 *      Plot the ancillary bits if need be
         IF ( PLOT_AXES( PORT ) ) THEN
- 
+
           IF ( DISPLAY_TYPE( PORT ) .EQ. 'GRAPH' ) THEN
-            CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0, 
+            CALL PGBOX( DEVICE_XOPT( PORT ), 0.0, 0,
      :         DEVICE_YOPT( PORT ), 0.0, 0)
 
             XLEN = CHR_LEN( XLABEL(PORT) )

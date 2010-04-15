@@ -7,9 +7,9 @@ C+
 C
 C     E C H _ A R I N T R
 C
-C     This is the main INTeRactive identify, fit, re-identify, and 
+C     This is the main INTeRactive identify, fit, re-identify, and
 C     refit routine for ECHARC, used only for a small number of the
-C     total orders.  Given a single 1D order (Z_array vs. X_array), 
+C     total orders.  Given a single 1D order (Z_array vs. X_array),
 C     it interactively associates arc lines with their wavelengths,
 C     and writes the results along with order number into ARLINES.ECH
 C     (logical unit number IOUT).
@@ -18,7 +18,7 @@ C     Parameters -       (">" Input, "<" Output, "!" Modified)
 C
 C     (>) X_ARRAY  (Real Array X_ARRAY(NPTS)  The X array for this
 C                  echelle order.  Typically this is pixel numbers
-C                  1 ... NPTS, but if original image had X.DATA, 
+C                  1 ... NPTS, but if original image had X.DATA,
 C                  then that is used instead (not expected).
 C     (>) Z_ARRAY  (Real Array Z_ARRAY(NPTS)  The Z data (counts)
 C                  in this order at channels given by  X_ARRAY.
@@ -74,7 +74,7 @@ C                  data for identified lines. File is ARLINES.ECH
 C     (>) AP       (Real) The dispersion in Angstroms/Pixel for this
 C                  echelle order.
 C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX))  An array giving the
-C                  weight to be applied to a certain line when 
+C                  weight to be applied to a certain line when
 C                  calculating a polynomial fit.
 C     (!) W1_ARRAY (Real Array W1_ARRAY(NPTS))  Work array for plots
 C                  of the dispersion curve as determined by the fit.
@@ -133,7 +133,7 @@ C
       REAL    NEWCH(NLOMX),NEWWV(NLOMX),NEWWT(NLOMX)
 C
 C     Other local variables
-C                                
+C
       INTEGER NCHAN,IXST,IXEN,I,INVOKE,NEXT,IX,STATUS
       LOGICAL FITTED,SHOWRMS,XS,REPEAT,COMPLETE,HPLOT,HARD
       REAL    HIGH,LOW,VALUE
@@ -158,7 +158,7 @@ C
 C        Search through ORDER(1..NLID) looking for existing IORDR lines
 C
          DO IX=1,NLID,1
-C                     
+C
 C           If we find one, we copy it to NEW**
 C
             IF (ORDER(IX).EQ.IORDR) THEN
@@ -237,7 +237,7 @@ C
       CALL PGEND
 C
 C     We've gotten back an edited and sorted list of NEW** lines in
-C        the current order, so we'll add them to the end of our 
+C        the current order, so we'll add them to the end of our
 C        master listings...
 C
       DO I=1,NEWNL,1
@@ -285,7 +285,7 @@ C
                IF (IXEN.GT.NPTS) THEN
                   IXEN=NPTS
                   IXST=NPTS-NCHAN+1
-               END IF                                    
+               END IF
                CALL ECH_ARPLOT(X_ARRAY,Z_ARRAY,NPTS,IXST,IXEN,
      :                        XLABEL,ZLABEL,TLABEL,NC,COEFFS,
      :                        NCOEFF,XS,NEWCH,NEWWV,NEWCL,NEWNL,

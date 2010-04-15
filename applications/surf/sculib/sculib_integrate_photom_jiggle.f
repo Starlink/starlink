@@ -13,7 +13,7 @@
 *     jiggle pattern.
 *
 *       After checking status on entry the routine checks that the bolometer
-*     to be integrated is among those that were measured. All being well it 
+*     to be integrated is among those that were measured. All being well it
 *     then loops through the jiggle pattern summing the valid data and variance
 *     measured at each position for that bolometer. If no valid data were
 *     obtained then the result quality will be set bad.
@@ -123,13 +123,13 @@
 *  jiggle pattern measured
 
          DO J = 1, J_COUNT
-  
+
             IF (QUALITY(BOL,J) .EQ. 0) THEN
                RESULT_D = RESULT_D + DATA (BOL,J)
                RESULT_V = RESULT_V + VARIANCE (BOL,J)
                RESULT_Q = 0
             END IF
- 
+
          END DO
 
       END IF

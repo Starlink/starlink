@@ -1,6 +1,6 @@
-      SUBROUTINE SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, 
-     :     J_MEASURED, J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, 
-     :     SUB_FILTER, T_TEL, T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, 
+      SUBROUTINE SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS,
+     :     J_MEASURED, J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT,
+     :     SUB_FILTER, T_TEL, T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT,
      :     B_FIT, TAUZ_FIT, REXISQ, TAU_ERROR, ETA_ERROR,
      :     B_ERROR, RESIDUAL, SIGMA, STATUS)
 *+
@@ -12,25 +12,25 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, J_MEASURED,
 *    :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
-*    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
+*    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT,
 *    :  REXISQ, TAU_ERROR, ETA_ERROR, B_ERROR, RESIDUAL, SIGMA, STATUS)
 
 *  Description:
-*     This routine fits a sub-instrument's measurements of the sky 
+*     This routine fits a sub-instrument's measurements of the sky
 *     brightness at a range of airmasses to obtain the sky opacity, ETAtel
 *     and `b' parameters. The fit is to the function:-
 *
-*        Jmeas = (1-ETAtel) * Jtel + ETAtel * Jatm * (1 - b * exp (-tau * A)) 
+*        Jmeas = (1-ETAtel) * Jtel + ETAtel * Jatm * (1 - b * exp (-tau * A))
 *
 *     Jtel is known and Jatm is related to Jamb by:-
 *
-*         Jatm = integral (from h=0 to infinity) of 
+*         Jatm = integral (from h=0 to infinity) of
 *              {Jamb * (1-h/h1) * exp (k * A * h2 * (exp (-h/h2) - 1)) *
-*              k * A * exp (-h/h2) * dh 
+*              k * A * exp (-h/h2) * dh
 *
 *     where h2 = scale height of absorption ( = 2km)
 *           h1 = coefficient to give 6.5K/km temperature drop in absorber
@@ -53,11 +53,11 @@
 *      Xgconst = 3.669383
 *
 *     See `Calibration of mm and sub-mm Photometers by Skydipping', W.D.Duncan
-*     preprint and `Inversion of Sky Dips', SCU/WDD/31.1/1093 for further 
+*     preprint and `Inversion of Sky Dips', SCU/WDD/31.1/1093 for further
 *     details.
 *
 *        The fit can be made with ETAtel and/or b either fixed or
-*     varying. To allow one of these parameters to vary it should be 
+*     varying. To allow one of these parameters to vary it should be
 *     input to the routine with a value below zero. If the input
 *     value is greater than zero then the routine will fix it at
 *     that for the fit.
@@ -87,7 +87,7 @@
 *     T_AMB                     = REAL (Given)
 *              the ambient temperature (K)
 *     ETA_TEL_IN                = REAL (Given)
-*              if >= 0 then this will the ETAtel assumed in the fit. 
+*              if >= 0 then this will the ETAtel assumed in the fit.
 *              if < 0 then ETAtel will be allowed to vary in the fit.
 *     B_IN                      = REAL (Given)
 *              if >=0 then this value of b will be assumed in the fit.
@@ -182,14 +182,14 @@
 *     Revision 1.8  1998/01/06 00:34:16  timj
 *     Modernise header
 *
-*     11-MAR-1997 (JFL): 
+*     11-MAR-1997 (JFL):
 *        try again, using Bevington LSQ fit routine (JFL).
-*     10-MAR-1997 (TIMJ): 
+*     10-MAR-1997 (TIMJ):
 *        new version, using LSQ_FIT rather than NAG routine (TIMJ).
-*     23-JUL-1996 (JFL): 
+*     23-JUL-1996 (JFL):
 *        renamed SCULIB_ from SCUDR_ and made to fit the correct
 *        function (JFL).
-*      7-FEB-1996 (JFL): 
+*      7-FEB-1996 (JFL):
 *        split off from SCUDR_SKYDIP_SWITCH.
 
 *-
@@ -275,14 +275,14 @@
       CHARACTER*100    BUFFER        ! buffer to hold results of fit
       CHARACTER*80     SIGBUFFER     ! buffer to hold scatter about fit
       INTEGER          COUNT         ! Counter
-      DOUBLE PRECISION DA (6)    
+      DOUBLE PRECISION DA (6)
       DOUBLE PRECISION FIT (3)       ! the fitted parameters
       INTEGER          I             ! DO loop variable
       INTEGER          IK (3)
       INTEGER          ITERATION     ! fit iteration
-      INTEGER          JK (3)     
+      INTEGER          JK (3)
       REAL             J_AMB         ! brightness temperature of ambient air
-      REAL             J_TEL         ! brightness temperature of telescope 
+      REAL             J_TEL         ! brightness temperature of telescope
       DOUBLE PRECISION LAMBDA
       LOGICAL          LOOPING
       DOUBLE PRECISION MEAN_VAR      ! Mean of the input variances
@@ -338,7 +338,7 @@
          COUNT = 0
 
          DO I = 1, N_MEASUREMENTS
-            IF (J_VARIANCE(I) .NE. VAL__BADR .AND. 
+            IF (J_VARIANCE(I) .NE. VAL__BADR .AND.
      :           J_VARIANCE(I) .GE. 0.0D0) THEN
                SUM = SUM + DBLE(J_VARIANCE(I))
                COUNT = COUNT + 1
@@ -375,9 +375,9 @@
 
 *     In general, the number of d.f. is
 *     given by the number of observations _minus_ the number
-*     of free parameters (see Bevington) 
+*     of free parameters (see Bevington)
 *     The - 1 is only used when there is an implicit additive constant
-*     in the fitting function, eg in most polynomial fits. 
+*     in the fitting function, eg in most polynomial fits.
 *     d.f. = n_obs - 1 (since tau is always free - eta & b
 *     may or may not be free parameters) - NFHT
 
@@ -402,7 +402,7 @@
             C_B_LO = DBLE (B_IN)
             FIT (2) = DBLE (B_IN)
          END IF
-         
+
          IF (ETA_TEL_IN .LT. 0.0) THEN
             C_ETA_TEL_HI = 0.9999D0
             C_ETA_TEL_LO = 0.0001D0
@@ -447,11 +447,11 @@
          XIOLD = - XISQ
 
          DO WHILE (LOOPING)
-            CALL SCULIB_FIT_FUNCTION (SCULIB_SKYDIP_XISQ, XICUT, 
+            CALL SCULIB_FIT_FUNCTION (SCULIB_SKYDIP_XISQ, XICUT,
      :        3, FIT, LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
 
             ITERATION = ITERATION + 1
-   
+
 * check for last integration
 
             IF (STATUS .NE. SAI__OK) THEN
@@ -497,7 +497,7 @@
 
          ELSE
 
-* Now we have a fit, we can calculate the error on the 
+* Now we have a fit, we can calculate the error on the
 * tau estimate -NFHT
 
 * First we need a more realistic estimate of the data variance
@@ -535,27 +535,27 @@
             TAU_ERROR = SQRT(ABS(ALPHA(3,3)))
 
             IF (ALPHA(1,1) .LT. 0) THEN
-               CALL MSG_OUTIF (MSG__QUIET,' ', 
+               CALL MSG_OUTIF (MSG__QUIET,' ',
      :              'WARNING: The variance of eta_tel '//
      :              'is negative. Caution is advised.', STATUS)
             END IF
 
             IF (ALPHA(2,2) .LT. 0) THEN
-               CALL MSG_OUTIF (MSG__QUIET,' ', 
+               CALL MSG_OUTIF (MSG__QUIET,' ',
      :              'WARNING: The variance of b '//
      :              'is negative. Caution is advised.', STATUS)
             END IF
 
             IF (ALPHA(3,3) .LT. 0) THEN
-               CALL MSG_OUTIF (MSG__QUIET, ' ', 
+               CALL MSG_OUTIF (MSG__QUIET, ' ',
      :              'WARNING: The variance of tau '//
      :              'is negative. Caution is advised.', STATUS)
             END IF
 
             REDCHISQ = CHISQ / REAL(NDEG)
 
-*     Restore the common block data array to its original form - 
-*     replace the variances with the old variance values out of the 
+*     Restore the common block data array to its original form -
+*     replace the variances with the old variance values out of the
 *     storage array
 
             DO I=1,N_MEASUREMENTS
@@ -585,10 +585,10 @@
      :        'for filter = ^FILT and sub-instrument ^SUB', STATUS)
             CALL ERR_REP (' ', ' - last fit values were:-', STATUS)
 
-*     Since the fit has failed -- there is no point printing 
+*     Since the fit has failed -- there is no point printing
 *     errors (they are bad values)
 
-            WRITE (BUFFER, 15) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
+            WRITE (BUFFER, 15) ETA_TEL_FIT, B_FIT, TAUZ_FIT,
      :           REXISQ, ITERATION
  15         FORMAT ('eta = ', F6.2, '          b = ', F6.2,
      :           '  tau = ', F7.3, '  X= ', F7.1, '  N= ', I4)
@@ -604,7 +604,7 @@
             CALL MSG_OUTIF (MSG__NORM,' ', 'SCULIB: fit for filter '//
      :           '^FILT and sub-instrument ^SUB', STATUS)
 
-* modified to output errors, and 
+* modified to output errors, and
 
             WRITE (BUFFER, 20) ETA_TEL_FIT, ETA_ERROR, B_FIT,
      :           B_ERROR, TAUZ_FIT, TAU_ERROR
@@ -613,7 +613,7 @@
      :           '  tau = ', F7.3, ' +/- ', F5.3)
 
             WRITE (SIGBUFFER, 30) SIGMA, REDCHISQ, ITERATION
- 30         FORMAT ('Standard Deviation of fit residual = ', 
+ 30         FORMAT ('Standard Deviation of fit residual = ',
      :           F6.2, ' K (X= ',F7.1, ' N= ',I4,')')
 
             CALL MSG_SETC ('BUFFER', BUFFER)

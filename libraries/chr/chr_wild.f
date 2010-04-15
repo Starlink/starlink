@@ -13,15 +13,15 @@
 *     RESULT = CHR_WILD( STRING, WILDS, MATCH )
 
 *  Description:
-*     A candidate string is matched with a another character 
+*     A candidate string is matched with a another character
 *     string containing a pattern of characters and wild-card
 *     characters.  The wild-cards used are:
 *
 *        % a single character wild-card;
 *        * an arbitrary length string wild-card, including zero length.
 *
-*     There is also a literal escape character '\' for use when the 
-*     characters '*' and '%' are to be interpreted literally within 
+*     There is also a literal escape character '\' for use when the
+*     characters '*' and '%' are to be interpreted literally within
 *     the wild-card pattern.
 
 *  Arguments:
@@ -31,10 +31,10 @@
 *        The wild-card pattern to be used in the match.
 *     MATCH = CHARACTER * ( * ) (Returned)
 *        The wild-card match: this string must be the same length as
-*        STRING. All characters matched individually are returned as 
+*        STRING. All characters matched individually are returned as
 *        blanks in MATCH, and all characters matched by wild-cards are
 *        returned assigned to the particular wild-cards they matched.
-*        If the length of MATCH is less than that of STRING, then 
+*        If the length of MATCH is less than that of STRING, then
 *        CHR_WILD returns the value .FALSE.
 
 *  Returned Value:
@@ -47,12 +47,12 @@
 *     string arguments.
 *     -  Deal with the trivial cases of match and no match first.
 *     -  Determine if there are any wild-card characters in the wild
-*     card pattern. 
-*        o  If there are no wild-card characters in the wild-card 
+*     card pattern.
+*        o  If there are no wild-card characters in the wild-card
 *        pattern then simply compare the two strings.
 *        o If there are only single-character wild-card in the wild-card
 *        pattern then compare the two strings character by character.
-*        o If there are multi-character wild cards present in the 
+*        o If there are multi-character wild cards present in the
 *        wild-card pattern then compare the two strings substring by
 *        substring, where a substring is a string bounded by the string
 *        limits or a multi-character wild-card. Begin with the left-hand
@@ -89,12 +89,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -111,7 +111,7 @@
 *     8-OCT-1991 (PCTR):
 *        Final (working) version with changes prompted by P.T. Wallace.
 *     8-MAR-1993 (PCTR):
-*        Cure bug which leads to a WILDN chracter being present 
+*        Cure bug which leads to a WILDN chracter being present
 *        at the beginning of the WILDS string.
 *     27-SEP-1993 (ACC):
 *        Modularised.
@@ -173,35 +173,35 @@
          GO TO 999
       END IF
 
-*   Find the number of wild-card characters (NWILDA and NWILDN) in 
+*   Find the number of wild-card characters (NWILDA and NWILDN) in
 *   WILDS.
       CALL CHR1_WILD2 ( WILDS, WLEN, NWILDA, NWILDN, FIRSTN, LASTN )
 
 *   Are there multi-character wild characters in WILDS?
       IF ( NWILDN .EQ. 0 ) THEN
 
-*     There are no multi-character wild characters in WILDS, so the 
+*     There are no multi-character wild characters in WILDS, so the
 *     string comparison can be performed character by character.
 *     Are there single-character wild characters in WILDS?
          IF ( NWILDA .EQ. 0 ) THEN
 
-*        There are no wild characters in the wild-card pattern, so 
-*        perform a character by character comparison. 
+*        There are no wild characters in the wild-card pattern, so
+*        perform a character by character comparison.
             CHR_WILD = CHR1_WILD3 ( STRING, WILDS, SLEN, WLEN )
 
          ELSE
 
-*        There are single-character wild characters in the wild-card 
-*        pattern, so perform a character by character comparison. 
+*        There are single-character wild characters in the wild-card
+*        pattern, so perform a character by character comparison.
             CHR_WILD = CHR1_WILD4 ( STRING, WILDS, SLEN, WLEN, MATCH )
 
          END IF
       ELSE
 
-*     There are multi-character wild characters in WILDS, so the 
-*     string comparison must be made on the identifiable non-wild 
-*     characters in WILDS. Loop to search for and test each of the 
-*     non-wild substrings present in WILDS within the candidate string. 
+*     There are multi-character wild characters in WILDS, so the
+*     string comparison must be made on the identifiable non-wild
+*     characters in WILDS. Loop to search for and test each of the
+*     non-wild substrings present in WILDS within the candidate string.
          CHR_WILD = CHR1_WILD5( STRING, WILDS, SLEN, WLEN, MLEN,
      :                        FIRSTN, LASTN, NWILDA, NWILDN, MATCH )
 

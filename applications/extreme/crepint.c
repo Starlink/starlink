@@ -10,25 +10,25 @@
 *     crepint [ in [ out ] ]
 *
 *  Description:
-*     This program is a filter which takes C source code and replaces 
+*     This program is a filter which takes C source code and replaces
 *     occurrences of the type specifier `int' by the identifier
-*     `INT_BIG'.  This identifier can then be assigned a preprocessor 
+*     `INT_BIG'.  This identifier can then be assigned a preprocessor
 *     value of a suitable integral type (int or long) either using an
 *     include file or with a -DINT_BIG=(type) flag on the C compiler
 *     command line.
 *
 *     It's not quite as simple as replacing every semantically significant
-*     occurrence of the `int' identifier; `short int' and `long int' type 
+*     occurrence of the `int' identifier; `short int' and `long int' type
 *     specifiers will be left alone.
 *
 *     If a use of int appears to be declaring a symbol called `main' or
 *     `argc', then this will be left alone too, and a warning written
 *     to standard error to the effect that it is not being changed.
 *
-*     Additionally, references to the <limits.h> macros INT_MAX, INT_MIN 
-*     and UINT_MAX are replaced by INT_BIG_MAX, INT_BIG_MIN and 
+*     Additionally, references to the <limits.h> macros INT_MAX, INT_MIN
+*     and UINT_MAX are replaced by INT_BIG_MAX, INT_BIG_MIN and
 *     UINT_BIG_MAX respectively.  If any of these substitutions are
-*     made, then a line `#include "extreme.h"' is added after the 
+*     made, then a line `#include "extreme.h"' is added after the
 *     `#include <limits.h>' line which is presumably in the file.
 *     If <limits.h> is not included in the input file, a warning is
 *     written to standard error.
@@ -37,14 +37,14 @@
 *     an INT_BIG token inserted - for instance `static x, y;' will be
 *     changed to `static INT_BIG x, y;'.
 *
-*     The program will write a warning on standard error for certain 
+*     The program will write a warning on standard error for certain
 *     constructions in the code which are likely to cause trouble after
-*     the mass redeclaration of int as INT_BIG has occurred, since in 
+*     the mass redeclaration of int as INT_BIG has occurred, since in
 *     some places the type int, and not INT_BIG, is still required.
 *     These constructions are:
 *        - Inclusion of system header files other than those of the C
-*          standard library, since these may indicate use of functions 
-*          other than those warned about above with arguments of type 
+*          standard library, since these may indicate use of functions
+*          other than those warned about above with arguments of type
 *          pointer to int.
 *        - Use of functions from the C standard library which may require
 *          changes.
@@ -64,35 +64,35 @@
 *     In the case of potentially dangerous format strings, for
 *     convenience a comment is inserted in the output code on the line
 *     before the function call is made.  The comment will contain the
-*     character string `crepint: '.  The warning to standard error 
+*     character string `crepint: '.  The warning to standard error
 *     notes that the comment line has been inserted.
 *
-*     The following constructions are also likely to cause trouble, but 
+*     The following constructions are also likely to cause trouble, but
 *     will not be warned about by the program:
-*        - Use of functions without prototypes.  If header files are 
+*        - Use of functions without prototypes.  If header files are
 *          omitted or old style function declarations are used then the
 *          ANSI C machinery for doing type conversion at function call
-*          time will not work.  Gcc's `-Wstrict-prototypes' and 
+*          time will not work.  Gcc's `-Wstrict-prototypes' and
 *          `-Wimplicit-function-declaration' flags are useful for this.
 *        - Implicit declarations, which are implicitly of type int.
 *          If a name is declared simply by mentioning it without any type
-*          or type qualifiers, it is implicitly of type int, and so 
-*          should become delcared as INT_BIG.  This program does not 
-*          find these.  Such implicit declarations (only?) occur in 
+*          or type qualifiers, it is implicitly of type int, and so
+*          should become delcared as INT_BIG.  This program does not
+*          find these.  Such implicit declarations (only?) occur in
 *          function declarations.  The Tru64 Unix C compiler's `-protois'
-*          flag or gcc's `-Wimplicit-int' flag are useful for identifying 
+*          flag or gcc's `-Wimplicit-int' flag are useful for identifying
 *          these.
 *
-*     The program tries to adjust padding whitespace outside comments 
+*     The program tries to adjust padding whitespace outside comments
 *     so that the spacing of the output looks OK.
 *
-*     No changes are made to comment lines so that, for instance, the 
-*     Synopsis stanza of function prologues will not have formal argument 
+*     No changes are made to comment lines so that, for instance, the
+*     Synopsis stanza of function prologues will not have formal argument
 *     types changed from `int' to `INT_BIG'.
 *
-*     Source code which makes sufficiently inventive use of the C 
+*     Source code which makes sufficiently inventive use of the C
 *     will stand a good chance of confusing this program.
-*       
+*
 *  Notes:
 *     Although this program behaves as a filter, it is written on
 *     the assumption that it will be run on a file of a finite length:
@@ -179,9 +179,9 @@
 *     This function checks the token ID values of a set of token structures
 *     in memory against a list given in the arguments.  The arguments given
 *     are of variable number; the last one should be a zero (this causes
-*     matching to stop).  If by the time the final (zero) argument is 
+*     matching to stop).  If by the time the final (zero) argument is
 *     encountered no mismatches have occurred, a true result is returned,
-*     but if any mismatches occur matching attempts stop and a false 
+*     but if any mismatches occur matching attempts stop and a false
 *     (zero) result is returned.
 *
 *  Arguments:
@@ -266,7 +266,7 @@
 *     Concatenate a number of literal strings.
 *
 *  Description:
-*     This function returns a string which contains the concatenation 
+*     This function returns a string which contains the concatenation
 *     (without the surrounding '"' characters) of as many consecutive
 *     string literals as are represented by the tokitem list starting
 *     at ptok.  The number of tokens concatenated is also returned in
@@ -315,11 +315,11 @@
 *
 *  Description:
 *     This function, given the position in the token list of the start
-*     of an argument in a function call, returns the position in the 
-*     token list of the token after the end of this argument.  This 
+*     of an argument in a function call, returns the position in the
+*     token list of the token after the end of this argument.  This
 *     should be either the start of the next argument, or the terminating
-*     parenthesis of the function call.  It does this basically by 
-*     skipping forward to the next unbracketed (by significant '()', 
+*     parenthesis of the function call.  It does this basically by
+*     skipping forward to the next unbracketed (by significant '()',
 *     '[]' or '{}' characters) comma or closing parenthesis.
 *
 *  Arguments:
@@ -343,23 +343,23 @@
       while( t = (++ptok)->tokval ) {
          trouble = 0;
          switch ( t ) {
-            case '(': 
-               ++plev; 
+            case '(':
+               ++plev;
                break;
-            case ')': 
+            case ')':
                trouble = ( --plev < 0 );
                break;
-            case '{': 
-               ++blev; 
+            case '{':
+               ++blev;
                break;
-            case '}': 
-               trouble = ( --blev < 0 ); 
+            case '}':
+               trouble = ( --blev < 0 );
                break;
-            case '[': 
-               ++slev; 
+            case '[':
+               ++slev;
                break;
-            case ']': 
-               trouble = ( --slev < 0 ); 
+            case ']':
+               trouble = ( --slev < 0 );
                break;
             case ',':
                if ( plev == 0 && blev == 0 && slev == 0 ) return ++ptok;
@@ -426,7 +426,7 @@
 *     Check if a token is an identifier with a given value.
 *
 *  Description:
-*     This function returns true if the token specified is of type 
+*     This function returns true if the token specified is of type
 *     IDENTIFIER, and if the significant part of its string is equal
 *     to a given string.
 *
@@ -438,7 +438,7 @@
 *
 *  Return value:
 *     int
-*        Unity if the token is an identifier which matches the given 
+*        Unity if the token is an identifier which matches the given
 *        string, zero otherwise.
 *-
 */
@@ -494,8 +494,8 @@
 *     To slip a comment into the output stream.
 *
 *  Description:
-*     This function writes a comment into the output stream, which is 
-*     typically done as a warning to the user of the program that 
+*     This function writes a comment into the output stream, which is
+*     typically done as a warning to the user of the program that
 *     something needs human attention.  The comment appears on a line
 *     of its own, in a distinctive format (it contains the name of this
 *     program).  It will be placed at the previous line break to the
@@ -506,7 +506,7 @@
 *  Arguments:
 *     ptok = struct tokitem *
 *        This gives the position into which to interpolate the comment.
-*        The comment should go on the previous line to the matched 
+*        The comment should go on the previous line to the matched
 *        string represented by this token.
 *     message = char *
 *        A short string to form the content text of the comment.
@@ -546,7 +546,7 @@
 /* If the token in which the newline was found is before the start of
    the list, or if the newline was at the end of a token (unlikely),
    then interpolate the text before the start of this token. */
-      if ( ptok->tokval == 0 
+      if ( ptok->tokval == 0
          || nl == ptok->string + strlen( ptok->string ) - 1 ) {
          ptok++;
          cbuf = memok( malloc( strlen( ptok->string ) + tleng + 1 ) );
@@ -570,7 +570,7 @@
    }
 
 
-   void crepint() { 
+   void crepint() {
 /*
 *+
 *  Name:
@@ -585,7 +585,7 @@
 *  Description:
 *     This routine reads characters from standard input and writes them to
 *     standard output.  The output is as similar as possible to the input
-*     except that (most) occurrences of the type specifier token `int' 
+*     except that (most) occurrences of the type specifier token `int'
 *     are replaced by a new string.
 *
 *     Tokenising the input stream is done using code generated by lex.
@@ -656,18 +656,18 @@
          t = tbuf[ i ].tokval;
          t1 = tbuf[ i + 1 ].tokval;
 
-/* Check for, and mostly change, occurences of 'int'.  
+/* Check for, and mostly change, occurences of 'int'.
    NB. this isn't perfect - it will, incorrectly, make a substitution if
-   it finds something like 'short static int'.  Such usages must be pretty 
-   rare, and in any case, such erroneous substitutions will lead to 
+   it finds something like 'short static int'.  Such usages must be pretty
+   rare, and in any case, such erroneous substitutions will lead to
    syntax errors when INT_BIG=long, so will not go unnoticed. */
-         if ( t == INT && tbuf[ i - 1 ].tokval != SHORT 
+         if ( t == INT && tbuf[ i - 1 ].tokval != SHORT
                        && tbuf[ i + 1 ].tokval != SHORT
-                       && tbuf[ i - 1 ].tokval != LONG 
+                       && tbuf[ i - 1 ].tokval != LONG
                        && tbuf[ i + 1 ].tokval != LONG )
-            if ( idmatch( tbuf + i + 1, "argc" ) || 
+            if ( idmatch( tbuf + i + 1, "argc" ) ||
                  idmatch( tbuf + i + 1, "main" ) ) {
-               fprintf( stderr, "%s: Type of %s not changed from int\n", 
+               fprintf( stderr, "%s: Type of %s not changed from int\n",
                                 name, tbuf[ i + 1 ].strmat );
             }
             else {
@@ -690,9 +690,9 @@
 
 /* Check for, and record position of, inclusion of the limits.h header file.
    This is a good place to include extreme.h if it is needed. */
-         if ( tokmatch( tbuf + i, 
-                        CPP_INCLUDE, '<', IDENTIFIER, '.', IDENTIFIER, '>', 0 ) 
-              && idmatch( tbuf + i + 2, "limits" ) 
+         if ( tokmatch( tbuf + i,
+                        CPP_INCLUDE, '<', IDENTIFIER, '.', IDENTIFIER, '>', 0 )
+              && idmatch( tbuf + i + 2, "limits" )
               && idmatch( tbuf + i + 4, "h" ) ) {
             limline = i + 6;
          }
@@ -705,7 +705,7 @@
             char *qc = fname;
             char *pc;
             for ( j = i + 2; tbuf[ j ].tokval != '>' && j < leng; j++ ) {
-               for ( pc = tbuf[ j ].string; *pc && qc - fname < LINELENG; ) 
+               for ( pc = tbuf[ j ].string; *pc && qc - fname < LINELENG; )
                   *(qc++) = *(pc++);
             }
             *qc = '\0';
@@ -718,7 +718,7 @@
 
 /* Check if it is a standard library header file.  If so, no action needs
    to be taken. */
-            else if ( ! strcmp( fname, "assert.h" ) || 
+            else if ( ! strcmp( fname, "assert.h" ) ||
                       ! strcmp( fname, "ctype.h" )  ||
                       ! strcmp( fname, "errno.h" )  ||
                       ! strcmp( fname, "float.h" )  ||
@@ -751,16 +751,16 @@
                    UNSIGNED, TYPEDEF
 #define AFTERDEC   (int) ';', (int) ',', (int) '[', (int) '(', (int) ')'
 
-/* Check for occurrences of int which are implicit in lists of type 
-   qualifiers, e.g. 'static unsigned', which really means 
+/* Check for occurrences of int which are implicit in lists of type
+   qualifiers, e.g. 'static unsigned', which really means
    'static unsigned int'. */
          if ( tokoneof( tbuf + i, TYPEQUALS, 0 ) &&
             ! tokoneof( tbuf + i + 1, TYPEQUALS, TYPES, 0 ) ) {
-            if ( t1 != IDENTIFIER || 
-                 strncmp( tbuf[ i + 1 ].strmat, "F77", 3 ) != 0 && 
+            if ( t1 != IDENTIFIER ||
+                 strncmp( tbuf[ i + 1 ].strmat, "F77", 3 ) != 0 &&
                  tokoneof( tbuf + i + 2, AFTERDEC, 0 ) ) {
 
-/* The token at tbuf[ i ] is the last of a list of known type specifier 
+/* The token at tbuf[ i ] is the last of a list of known type specifier
    tokens.  Now work backwards, skipping over type qualifier tokens. */
                  for ( j = i - 1; tokoneof( tbuf + j, TYPEQUALS, 0 ); j-- );
 
@@ -771,7 +771,7 @@
       asterisk:     part of a complicated pointer declaration
    we don't have implicit int, so we don't have to do anything.
    Otherwise, we should append an INT_BIG specifier to the end of the list. */
-                 if ( ! tokoneof( tbuf + j, TYPES, IDENTIFIER, 
+                 if ( ! tokoneof( tbuf + j, TYPES, IDENTIFIER,
                                             (int) '}', (int) '*', 0 ) ) {
                     tbuf[ i ].interp = " INT_BIG";
                  }
@@ -784,7 +784,7 @@
 
 /* Check for, and warn about, frexp (declared in math.h). */
          if ( t1 == '(' && idmatch( tbuf + i, "frexp" ) ) {
-            fprintf( stderr, "%s: Second arg of frexp() must be int *\n", 
+            fprintf( stderr, "%s: Second arg of frexp() must be int *\n",
                              name );
          }
 
@@ -795,16 +795,16 @@
          }
 
 /* Check for, and warn about, bsearch and qsort (declared in stdlib.h). */
-         else if ( t1 == '(' && ( idmatch( tbuf + i, "bsearch" ) 
+         else if ( t1 == '(' && ( idmatch( tbuf + i, "bsearch" )
                                || idmatch( tbuf + i, "qsort" ) ) ) {
             fprintf( stderr, "%s: Check func passed to %s() is int (*)()\n",
                              name, tbuf[ i ].strmat );
          }
 
 /* Check for, and warn about if necessary, format strings used by printf
-   and related functions (declared in stdio.h). 
+   and related functions (declared in stdio.h).
    This code was written with reference to K&R (2nd Ed.) */
-         else if ( t1 == '(' && ( idmatch( tbuf + i, "printf" ) 
+         else if ( t1 == '(' && ( idmatch( tbuf + i, "printf" )
                                || idmatch( tbuf + i, "fprintf" )
                                || idmatch( tbuf + i, "sprintf" ) ) ) {
             arg = i + 2;
@@ -858,14 +858,14 @@
             if ( *warn ) comment( tbuf + i, warn );
          }
 
-/* Check for, and warn about if necessary, format strings used by scanf 
-   and related functions (declared in stdio.h). 
+/* Check for, and warn about if necessary, format strings used by scanf
+   and related functions (declared in stdio.h).
    This code was written with reference to K&R (2nd Ed.) */
          else if ( t1 == '(' && ( idmatch( tbuf + i, "scanf" )
                                || idmatch( tbuf + i, "fscanf" )
                                || idmatch( tbuf + i, "sscanf" ) ) ) {
             arg = i + 2;
-            if ( ! idmatch( tbuf + i, "scanf" ) ) 
+            if ( ! idmatch( tbuf + i, "scanf" ) )
                arg = nextarg( tbuf + arg ) - tbuf;
             stlit = stlitcat( tbuf + arg, &nlittok );
             tn = tbuf[ arg + nlittok ].tokval;
@@ -911,7 +911,7 @@
          }
       }
 
-/* If we have used any of the macros defined in extreme.h, we should 
+/* If we have used any of the macros defined in extreme.h, we should
    arrange for inclusion of that at a place already identified. */
       if ( usedlimits ) {
          if ( limline ) {
@@ -919,7 +919,7 @@
             char *pc;
             char *qc;
 
-            cbuf = memok( malloc( strlen( tbuf[ limline ].string ) + 
+            cbuf = memok( malloc( strlen( tbuf[ limline ].string ) +
                                   strlen( incline ) + 1 ) );
             pc = tbuf[ limline ].string;
             tbuf[ limline ].string = cbuf;
@@ -938,7 +938,7 @@
          }
       }
 
-/* Go through token buffer outputting the characters associated with each 
+/* Go through token buffer outputting the characters associated with each
    token. */
       col0 = 0;    /* Column the input text is at */
       col1 = 0;    /* Column the output text is at */
@@ -964,7 +964,7 @@
             }
 
 /* We encounter a tab, when we need to skip space. */
-            else if ( c == '\t' && tabstop( col1 ) > tabstop( col0 ) 
+            else if ( c == '\t' && tabstop( col1 ) > tabstop( col0 )
                                               && padding && ! incomm ) {
                col0 = tabstop( col0 );
                if ( ! lastspc ) {

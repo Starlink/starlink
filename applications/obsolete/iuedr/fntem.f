@@ -22,7 +22,7 @@
 
 *   Import:
       INTEGER ORD      ! echelle order number
- 
+
 *   Export:
       INTEGER IORD     ! order index in table
 

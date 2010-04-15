@@ -18,9 +18,9 @@
 *     supplied parameter. The expression is parsed (using the
 *     facilities of the GRP routine GRP_GROUP, see SUN/150) to produce
 *     a list of explicit catalogue names. These names are appended
-*     to the group identified by IGRP. The user is re-prompted if an 
-*     error occurs while parsing the group expression. If IGRP has the 
-*     value GRP__NOID on entry, then a new group is created and IGRP is 
+*     to the group identified by IGRP. The user is re-prompted if an
+*     error occurs while parsing the group expression. If IGRP has the
+*     value GRP__NOID on entry, then a new group is created and IGRP is
 *     returned holding the new group identifier.
 *
 *     If IGRP0 holds a valid group identifier on entry, then the group
@@ -36,27 +36,27 @@
 *     IGRP0 = INTEGER (Given)
 *        The GRP identifier for the group to be used as the basis for
 *        any modification elements. If a valid GRP identifier is
-*        supplied, and if the supplied group expression contains a 
+*        supplied, and if the supplied group expression contains a
 *        modification element, then:
 *
-*        - the basis token (an asterisk) is replaced by the file basename 
+*        - the basis token (an asterisk) is replaced by the file basename
 *        associated with the corresponding element of the basis group (the
 *        "basis catalogue"); else
 *
-*        - if no directory specification is included in the group expression, 
-*        the directory specification associated with the basis catalogue is 
+*        - if no directory specification is included in the group expression,
+*        the directory specification associated with the basis catalogue is
 *        used.
 *
 *        The supplied group will often be created by CTG_ASSOC, but
 *        groups created "by hand" using GRP directly can also be used
 *        (i.e. without the supplemental groups created by CTG). In
 *        this case, there are no defaults for directory path or file type,
-*        and the basis token ("*") in the group expression represents the 
-*        full basis file specification supplied in IGRP0, not just the file 
+*        and the basis token ("*") in the group expression represents the
+*        full basis file specification supplied in IGRP0, not just the file
 *        basename.
 *     IGRP = INTEGER (Given and Returned)
-*        The GRP identifier for the group to which the supplied 
-*        files are to be appended. 
+*        The GRP identifier for the group to which the supplied
+*        files are to be appended.
 *     SIZE = INTEGER (Returned)
 *        The total number of file names in the returned group.
 *     FLAG = LOGICAL (Returned)
@@ -70,20 +70,20 @@
 *     -  Any FITS extensions specified in the group expression are ignored.
 *     -  If an error is reported the group is returned unaltered.
 *     -  A null value (!) can be given for the parameter to indicate
-*     that no more catalogues are to be specified. The corresponding error 
+*     that no more catalogues are to be specified. The corresponding error
 *     is annulled before returning unless no catalogues have been added to
 *     the group.
-*     -  If no file type is supplied in the group expression, then the first 
-*     file type listed in the current value of the CAT_FORMATS_OUT environment 
-*     variable is used. If this is "*" then the file type is copied from the 
-*     corresponding input file if a modification element was used to specify 
-*     the output file name (if the catalogue was not specified by a 
-*     modification element, the second file type in CAT_FORMATS_OUT is 
+*     -  If no file type is supplied in the group expression, then the first
+*     file type listed in the current value of the CAT_FORMATS_OUT environment
+*     variable is used. If this is "*" then the file type is copied from the
+*     corresponding input file if a modification element was used to specify
+*     the output file name (if the catalogue was not specified by a
+*     modification element, the second file type in CAT_FORMATS_OUT is
 *     used).
-*     -  If the last character in the supplied group expression is 
-*     a colon (:), a list of the catalogues represented by the group 
+*     -  If the last character in the supplied group expression is
+*     a colon (:), a list of the catalogues represented by the group
 *     expression (minus the colon) is displayed, but none are
-*     actually added to the group. The user is then re-prompted for 
+*     actually added to the group. The user is then re-prompted for
 *     a new group expression.
 *     -  The returned group has no associated groups holding supplemental
 *     information (unlike the group returned by CTG_ASSOC).
@@ -97,12 +97,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -157,7 +157,7 @@
       LOGICAL LIST                 ! True if a listing of files is required.
 *.
 
-*  Ensure that a .FALSE. value is returned for FLAG if an error 
+*  Ensure that a .FALSE. value is returned for FLAG if an error
 *  has already occured.
       FLAG = .FALSE.
       SIZE = 0
@@ -172,7 +172,7 @@
 *  supplied, use a size of zero.
       CALL GRP_GRPSZ( IGRP, SIZE0, STATUS )
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_ANNUL( STATUS )         
+         CALL ERR_ANNUL( STATUS )
          SIZE0 = 0
       END IF
 
@@ -193,12 +193,12 @@
          GRPEXP( LAST : LAST ) = ' '
       END IF
 
-*  If the last character is a colon remove it and set a flag 
-*  indicating that the names are to be listed but not included in the 
+*  If the last character is a colon remove it and set a flag
+*  indicating that the names are to be listed but not included in the
 *  returned group.
       CALL CHR_FANDL( GRPEXP, FIRST, LAST )
       IF( GRPEXP( LAST : LAST ) .EQ. ':' ) THEN
-         LIST = .TRUE.      
+         LIST = .TRUE.
          GRPEXP( LAST : LAST ) = ' '
       ELSE
          LIST = .FALSE.
@@ -208,14 +208,14 @@
 *  them to the end of the specified group.
       CALL CTG1_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
 
-*  If an error has occurred while expanding the group expression, ask 
+*  If an error has occurred while expanding the group expression, ask
 *  the user to try again.
       IF( STATUS .NE. SAI__OK ) THEN
          AGAIN = .TRUE.
 
 *  If all went well, but the group expression ended in a colon,
-*  list the new names added to the group, and indicate that a new 
-*  group is required. Flush each report individually to avoid the 
+*  list the new names added to the group, and indicate that a new
+*  group is required. Flush each report individually to avoid the
 *  possibilioty of the EMS stack overflowing if many catalogues have
 *  been specified.
       ELSE IF( LIST ) THEN
@@ -248,7 +248,7 @@
       END IF
 
 *  If the user is to be re-prompted...
-      IF( AGAIN ) THEN      
+      IF( AGAIN ) THEN
 
 *  Ask the user to give a new parameter value.
          CALL MSG_SETC( 'P', PARAM )
@@ -302,7 +302,7 @@
       ELSE IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'CTG_CREAT_ERR4', 'Unable to associate a '//
-     :                 'group of catalogues with parameter %^P', 
+     :                 'group of catalogues with parameter %^P',
      :                 STATUS )
       END IF
 

@@ -113,7 +113,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                  ! No implicit typing
 
@@ -129,7 +129,7 @@
 *  Local Constants:
       INTEGER   MAXBRK
       PARAMETER (MAXBRK = 1000)      ! Max. no. of breaks allowed in
-                                     ! DIPSO data 
+                                     ! DIPSO data
       INTEGER   MAXSIZ
       PARAMETER (MAXSIZ = 28000)     ! Max. no. of data points allowed
                                      ! in DIPSO data
@@ -157,7 +157,7 @@
 
 *  Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-      
+
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
@@ -175,7 +175,7 @@
      :     'NDF2DIPSO: Data array should be 1-dimensional. '/
      :     /'NDF ^NDF is ^NDIM-dimensional.', STATUS)
          GOTO 999
-      END IF    
+      END IF
 
 *  Check the number of points does not exceed the DIPSO limit.
       IF (DIM(1) .GT. MAXSIZ) THEN
@@ -183,18 +183,18 @@
          CALL MSG_SETI ('NPTS', DIM(1))
          CALL NDF_MSG( 'NDF', NDF )
          CALL MSG_SETI ('MAXSIZ', MAXSIZ)
-         CALL ERR_REP('NDF2DIPSO_TOO_MANY_ELEMENTS', 
+         CALL ERR_REP('NDF2DIPSO_TOO_MANY_ELEMENTS',
      :     'NDF2DIPSO: Number of elements (^NPTS) in NDF ^NDF exceeds '/
      :     /'DIPSO limit of ^MAXSIZ.', STATUS)
          GOTO 999
-      END IF    
+      END IF
 
 *  Check the axis component exists.
       CALL NDF_ASTAT (NDF, 'Centre', 1, AXSTAT, STATUS)
       IF (.NOT.AXSTAT) THEN
          STATUS=SAI__ERROR
          CALL NDF_MSG( 'NDF', NDF )
-         CALL ERR_REP('NDF2DIPSO_NO_AXIS_DATA', 
+         CALL ERR_REP('NDF2DIPSO_NO_AXIS_DATA',
      :     'NDF2DIPSO: NDF ^NDF does not contain AXIS(1) structure.',
      :     STATUS)
          GOTO 999
@@ -204,7 +204,7 @@
       CALL NDF_MAP (NDF, 'Data', '_REAL', 'READ', DATPTR, NPTS, STATUS)
 
 *  Map the input axis array.
-      CALL NDF_AMAP (NDF, 'Centre', 1, '_REAL', 'READ', AXPTR, NPTS, 
+      CALL NDF_AMAP (NDF, 'Centre', 1, '_REAL', 'READ', AXPTR, NPTS,
      :               STATUS )
 
 *  Get the title from NDF, if one is present.
@@ -217,9 +217,9 @@
 
 *   Check to see if data array contains bad pixels.
       CALL NDF_BAD (NDF, 'DATA', .FALSE., BAD, STATUS)
-   
+
       IF (STATUS .NE. SAI__OK) GOTO 999
- 
+
 *   Create a scratch area in which to put the new wavelength array.
       WAVLOC = ' '
       CALL AIF_TEMP('_REAL', 1, DIM, WAVLOC, STATUS)
@@ -242,9 +242,9 @@
       CALL FIO_UNIT (FD, UNIT, STATUS)
 
 *   Call routine to write the data to a DIPSO file.
-      CALL CON_DIPWR( UNIT, TITLE, NPTS, %VAL(CNF_PVAL(DATPTR)), 
+      CALL CON_DIPWR( UNIT, TITLE, NPTS, %VAL(CNF_PVAL(DATPTR)),
      :                %VAL(CNF_PVAL(AXPTR)),
-     :                %VAL(CNF_PVAL(FLXPTR)), %VAL(CNF_PVAL(WAVPTR)), 
+     :                %VAL(CNF_PVAL(FLXPTR)), %VAL(CNF_PVAL(WAVPTR)),
      :                BAD, MAXBRK, BREAK, STATUS )
 
 *   Cancel the ADAM parameter OUT and deactivate FIO.

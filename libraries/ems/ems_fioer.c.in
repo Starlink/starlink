@@ -72,7 +72,7 @@
  *        Support for PC Solaris.
  *     20-MAY-2008 (PWD):
  *        Support use in threads by protecting initialisation of static variables.
- *        Replace msg_printf with sprintf to avoid a static buffer. 
+ *        Replace msg_printf with sprintf to avoid a static buffer.
  *        Various code normalisations.
  *     {enter_changes_here}
 
@@ -363,12 +363,12 @@ static void initMessageInfo( void )
             nmsg = sizeof(msgs)/sizeof(msgs[0]);
             msgInfo->msgs = &msgs[0];
         }
-        
+
         /* shared information */
         msgInfo->name = AC_FC;
         msgInfo->last_iostat = msgInfo->first_iostat + nmsg - 1;
         msgInfo->lookup = 0;
-        
+
     } else if ( STRING_EQ( AC_FC, "f77" )
                 && ( STRING_EQ( AC_vendor, "sun" ) ||
                      STRING_NEQ( AC_os, "solaris", 7 ) ) ) {
@@ -410,29 +410,29 @@ static void initMessageInfo( void )
             "exponent overflow on numeric input",    /* 1032 */
         };
         static int nmsg = sizeof(msgs)/sizeof(msgs[0]);
-        
+
         msgInfo->msgs = &msgs[0];
         msgInfo->name = "Sun f77";
         msgInfo->first_iostat = 1000;
         msgInfo->last_iostat = msgInfo->first_iostat + nmsg - 1;
         msgInfo->lookup = 0;
-        
+
     } else if ( STRING_EQ( AC_vendor, "dec" ) ) {
         /* These are alpha codes.  There isn't a continuous sequence, so
            use a function to hold the map. */
-        
+
         msgInfo->msgs = 0;                    /* signal to use lookup */
         msgInfo->name = "Alpha f77";
         msgInfo->first_iostat = 0;            /* ignored */
         msgInfo->last_iostat = 0;             /* ignored */
         msgInfo->lookup = alpha_iostat_lookup;
-        
+
     } else {
         msgInfo->msgs = 0;
         msgInfo->name = "UNKNOWN";
         msgInfo->first_iostat = 0;
         msgInfo->last_iostat = 0;
-        
+
     }
 
     return;
@@ -565,7 +565,7 @@ static const char* alpha_iostat_lookup( const int iostat )
     };
     static int nmsgs = sizeof(msgs)/sizeof(msgs[0]);
     IostatMessagePair *p;
-    
+
     p = (IostatMessagePair*) bsearch( &iostat, (void*)msgs, nmsgs,
                                       sizeof(IostatMessagePair),
                                       &compareIostatMessagePair );

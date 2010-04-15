@@ -1,4 +1,4 @@
-PROC COLL 
+PROC COLL
   print ' '
   asknum (FLATH) 'Enter the current FLAT HORIZONTAL setting \0.0\ '
   asknum (FLATV) 'Enter the current FLAT VERTICAL   setting \0.0\ '
@@ -63,8 +63,8 @@ PROC COLL
     DLINE = '-------------------------------------------------------------------------------'
     write cfile (DLINE)
   END LOOP
-  fclose_c 
+  fclose_c
   print 'File ircam3_coll.dat contains user-defined collimation settings'
   print ' '
   sh lp ircam3_coll.dat
-END PROC 
+END PROC

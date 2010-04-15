@@ -78,7 +78,7 @@
 *        Removed removal of '=' in input and added suppression of
 *        comma removal in ().
 *     13-SEP-1995 (PDRAPER):
-*        Removed fold to upper case. This is necessary when reading 
+*        Removed fold to upper case. This is necessary when reading
 *        file names on UNIX.
 *     12-JUL-2001 (MBT):
 *        Removed check for empty file.  This was questionable anyway,
@@ -90,7 +90,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,7 +171,7 @@
 *  Is the line a comment or blank line ?
             IF ( CCD1_ISCOM( BUFFER, STATUS ) ) THEN
 
-*  Have a comment line skip this 
+*  Have a comment line skip this
                NEWLIN =.TRUE.
             ELSE
 
@@ -189,7 +189,7 @@
                END IF
 
 *  Add the rest to the real line. Increment the character counter.
-               IF ( NCHAR + NBUFF .LT. LENGTH ) THEN 
+               IF ( NCHAR + NBUFF .LT. LENGTH ) THEN
                   LINE( NCHAR: )  = BUFFER( :NBUFF )
                   NCHAR = NCHAR + NBUFF
                ELSE
@@ -211,7 +211,7 @@
 
 *  Go for next loop.
             GO TO 1
-         END IF     
+         END IF
 
 *  Now that we have the whole line remove commas. Leave any within
 *  parentheses untouched.
@@ -238,7 +238,7 @@
          CALL CCD1_MSG( 'RDLIN_WARN_PAR',
      :   '  Warning - line ^LINNUM  of file ^FILNAM contains '//
      :   'unbalanced parentheses', STATUS )
-      END IF      
+      END IF
 
 99    CONTINUE
       END

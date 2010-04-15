@@ -2,7 +2,7 @@
 #define REC_INCLUDED 1
 
 #define REC__SZRCL  19		 /* Length of packed Record Control Label   */
-#define REC__SZORCL 10           /* Length of RCL for pre-HDS V4 records    */ 
+#define REC__SZORCL 10           /* Length of RCL for pre-HDS V4 records    */
 
 #define SZRCL (hds_gl_64bit ? REC__SZRCL : REC__SZORCL)
 

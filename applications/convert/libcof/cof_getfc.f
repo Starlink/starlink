@@ -22,13 +22,13 @@
 *     previous values entered ended with the "-" continuation character.
 *
 *     The values are validated.  The values should be boolean or
-*     "Native" (the latter can be abbrevated to "Na").  An error report 
+*     "Native" (the latter can be abbrevated to "Na").  An error report
 *     is made should an invalid value be supplied and the group cleared.
 *     A null value (!) equates to a TRUE value.
 *
 *     If fewer than MAXVAL values are supplied, the missing values take
-*     the value of the last supplied flag.  If more than MAXVAL values 
-*     are supplied, a SAI_ERROR STATUS is returned and the group 
+*     the value of the last supplied flag.  If more than MAXVAL values
+*     are supplied, a SAI_ERROR STATUS is returned and the group
 *     deleted.
 
 *  Arguments:
@@ -81,7 +81,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -140,7 +140,7 @@
                CALL ERR_ANNUL( STATUS )
                CALL GRP_PUT1( GRPID, 'TRUE', 0, STATUS )
             END IF
-            
+
 *  Cancel the parameter association in order to get more group values
 *  through the parameter, unless there are no more to obtain.
             IF ( CFLAG ) CALL PAR_CANCL( PARNAM, STATUS )
@@ -157,7 +157,7 @@
 
 *  Validate the values.  First get each value.  Command-line
 *  keywords can appear instead of the values.  So recognise the
-*  command-line keyword presence meaning TRUE and no<keyword> meaning 
+*  command-line keyword presence meaning TRUE and no<keyword> meaning
 *  FALSE.  Update the group values.
          DO I = 1, NFC
             CALL GRP_GET( GRPID, I, 1, FMTCON, STATUS )
@@ -177,7 +177,7 @@
             ENDIF
             CALL ERR_RLSE( STATUS )
 
-*  Convert the group value to a logical and then test that the 
+*  Convert the group value to a logical and then test that the
 *  conversion was successful.
             IF ( FMTCON .NE. 'NATIVE' ) THEN
                CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
@@ -225,7 +225,7 @@
 *  Extend the group by duplication to give the same number of values
 *  as input files.  The last value is duplicated.
       ELSE IF ( NFC .LT. MAXVAL ) THEN
-        
+
 *  Obtain the last value.
          CALL GRP_GET( GRPID, NFC, 1, FMTCON, STATUS )
 

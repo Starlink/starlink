@@ -2,23 +2,23 @@
 *+
 *  Name:
 *     PON_ISORT
- 
+
 *  Purpose:
 *     Re-arrange the given array into increasing order.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL PON_SORTV( NDATA, IRANK, WORK, ARRAY, STATUS )
- 
+
 *  Description:
-*     This routine uses the result of the 'heap-sort' routine, 
-*     PON_ISORT, to re-arrange the given array into the order given by 
-*     the contents of IRANK; i.e. if ARRAY was the array from which 
-*     IRANK was derived, it will be returned with its values re-arranged 
+*     This routine uses the result of the 'heap-sort' routine,
+*     PON_ISORT, to re-arrange the given array into the order given by
+*     the contents of IRANK; i.e. if ARRAY was the array from which
+*     IRANK was derived, it will be returned with its values re-arranged
 *     into ascending order.
- 
+
 *  Arguments:
 *     NDATA = INTEGER (Given)
 *        The number of given data to sort.
@@ -35,34 +35,34 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     2-DEC-1992 (PCTR):
 *        Original version.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER NDATA
       INTEGER IRANK( NDATA )
- 
+
 *  Arguments Given and Returned:
       DOUBLE PRECISION WORK( NDATA )
       DOUBLE PRECISION ARRAY( NDATA )
 
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER IDX                ! Loop index
 
@@ -70,7 +70,7 @@
 
 *  Check the inherited global status.
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
 *  Check the given value of NDATA.
       IF ( NDATA.EQ.1 ) THEN
 
@@ -88,6 +88,6 @@
             ARRAY( IDX ) = WORK( IRANK( IDX ) )
  100     CONTINUE
       END IF
- 
+
       END
 * $Id$

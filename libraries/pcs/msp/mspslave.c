@@ -96,7 +96,7 @@ int main()
       message[actlen] = '\0';
       printf ( "slave: received size %d mess %s\n", actlen, message );
       printf ( "slave: connection %hd queue %hd\n", mastercom.connection,
-        mastercom.ack_queue ); 
+        mastercom.ack_queue );
    }
 
 /*   Trigger exit handler */

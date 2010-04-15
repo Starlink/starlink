@@ -1,13 +1,13 @@
 C+
       SUBROUTINE CMPLXADD
 C
-C     C M P L X A D D   /   C M P L X S U B  
+C     C M P L X A D D   /   C M P L X S U B
 C
 C     C M P L X D I V   /   C M P L X M U L T
 C
 C     This routine services the Figaro complex structure arithmetic
 C     routines CMPLXADD, CMPLXSUB, CMPLXDIV, and CMPLXMULT.  These
-C     commands operate on two complex structures, performing element 
+C     commands operate on two complex structures, performing element
 C     by element arithmetic to produce a new structure.  The complex
 C     structures may be of any dimensions, so long as they match.
 C
@@ -25,7 +25,7 @@ C
 C      7th Feb 1989  JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
-C     18th Feb 1991  JMS / AAO. Added STATUS checks to support user 
+C     18th Feb 1991  JMS / AAO. Added STATUS checks to support user
 C                    requested aborts.
 C     30th Mar 1991  KS / AAO. Removed source of FIG_CMPCHK - this
 C                    common routine is now in the FIG library.
@@ -52,7 +52,7 @@ C     Local variables
 C
       CHARACTER COMMAND*9        ! Figaro command name
       INTEGER   DIMS(10)         ! Image dimensions
-      LOGICAL   FAULT            ! Either input is not valid complex 
+      LOGICAL   FAULT            ! Either input is not valid complex
                                  ! structure?
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image
@@ -60,9 +60,9 @@ C
                                  ! data in CDATA
       INTEGER   I1PTR            ! Dynamic-memory pointer for imaginary
                                  ! data in CDATA1
-      INTEGER   RPTR             ! Dynamic-memory pointer for real data 
+      INTEGER   RPTR             ! Dynamic-memory pointer for real data
                                  ! in CDATA
-      INTEGER   R1PTR            ! Dynamic-memory pointer for real data 
+      INTEGER   R1PTR            ! Dynamic-memory pointer for real data
                                  ! in CDATA1
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       INTEGER   STATUS           ! Running status for DSA routines
@@ -71,7 +71,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0
@@ -123,10 +123,10 @@ C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','CDATA0',0,NEW_FILE,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Map the first structure input data arrays.  Note that these will 
-C     have been copied to 'OUTPUT' as a new output file was created by 
+C     Map the first structure input data arrays.  Note that these will
+C     have been copied to 'OUTPUT' as a new output file was created by
 C     copying the first input file, so these arrays can be used instead.
-C     
+C
 C     CALL DSA_MAP_DATA('OUTPUT','UPDATE','DOUBLE',RPTR,SLOT,STATUS)
 C     CALL DSA_MAP_IMAGINARY('OUTPUT','UPDATE','DOUBLE',IPTR,SLOT,
 C    :                       STATUS)
@@ -197,21 +197,21 @@ C
 C     (>) NELM     (Integer) Number of elements in each array.
 C     (>) RDATA    (Double precision array RDATA(NELM)) Real part of
 C                  the first complex array.
-C     (>) IDATA    (Double precision array IDATA(NELM)) Imaginary part 
+C     (>) IDATA    (Double precision array IDATA(NELM)) Imaginary part
 C                  the first complex array.
 C     (>) RDATA1   (Double precision array RDATA1(NELM)) Real part of
 C                  the second complex array.
-C     (>) IDATA1   (Double precision array IDATA1(NELM)) Imaginary part 
+C     (>) IDATA1   (Double precision array IDATA1(NELM)) Imaginary part
 C                  of the second complex array.
 C     (>) ROUT     (Double precision array ROUT(NELM)) Real part of
 C                  the resulting complex array.
-C     (>) IOUT     (Double precision array IOUT(NELM)) Imaginary part 
+C     (>) IOUT     (Double precision array IOUT(NELM)) Imaginary part
 C                  of the resulting complex array.
 C
 C     Common variables used - None
 C
 C                                            KS / AAO 11th Sept 1986
-C+  
+C+
       IMPLICIT NONE
 C
 C     Parameters
@@ -245,15 +245,15 @@ C
 C     (>) NELM     (Integer) Number of elements in each array.
 C     (>) RDATA    (Double precision array RDATA(NELM)) Real part of
 C                  the first complex array.
-C     (>) IDATA    (Double precision array IDATA(NELM)) Imaginary part 
+C     (>) IDATA    (Double precision array IDATA(NELM)) Imaginary part
 C                  the first complex array.
 C     (>) RDATA1   (Double precision array RDATA1(NELM)) Real part of
 C                  the second complex array.
-C     (>) IDATA1   (Double precision array IDATA1(NELM)) Imaginary part 
+C     (>) IDATA1   (Double precision array IDATA1(NELM)) Imaginary part
 C                  of the second complex array.
 C     (>) ROUT     (Double precision array ROUT(NELM)) Real part of
 C                  the resulting complex array.
-C     (>) IOUT     (Double precision array IOUT(NELM)) Imaginary part 
+C     (>) IOUT     (Double precision array IOUT(NELM)) Imaginary part
 C                  of the resulting complex array.
 C
 C     (RDATA,IDATA) is divided by (RDATA1,IDATA1) to give (ROUT,IOUT).
@@ -261,7 +261,7 @@ C
 C     Common variables used - None
 C
 C                                            KS / AAO 11th Sept 1986
-C+  
+C+
       IMPLICIT NONE
 C
 C     Parameters

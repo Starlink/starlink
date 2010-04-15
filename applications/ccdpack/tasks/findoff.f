@@ -4,7 +4,7 @@
 *     FINDOFF
 
 *  Purpose:
-*     Performs pattern-matching between position lists related by 
+*     Performs pattern-matching between position lists related by
 *     simple offsets.
 
 *  Language:
@@ -38,7 +38,7 @@
 
 *  ADAM Parameters:
 *     COMPLETE = _DOUBLE (Read)
-*        A completeness threshold for rejecting matched position 
+*        A completeness threshold for rejecting matched position
 *        list pairs. A completeness factor is estimated by counting the
 *        number of objects in the overlap region of two lists, taking
 *        the minimum of these two values (this adjusts for
@@ -48,9 +48,9 @@
 *        this value the lower the quality of the match.
 *        [0.5]
 *     ERROR = _DOUBLE (Read)
-*        The error, in pixels, in the X and Y positions. This value is 
-*        used to determine which positions match within an error box 
-*        (SLOW) or as a bin size (FAST). An inaccurate value may result 
+*        The error, in pixels, in the X and Y positions. This value is
+*        used to determine which positions match within an error box
+*        (SLOW) or as a bin size (FAST). An inaccurate value may result
 *        in excessive false or null matches.
 *        [1.0]
 *     FAILSAFE = _LOGICAL (Read)
@@ -75,7 +75,7 @@
 *        specified using indirection (other CCDPACK position list
 *        processing routines will write the names of their results file
 *        into files suitable for use in this manner) the indirection
-*        character is "^". 
+*        character is "^".
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -106,17 +106,17 @@
 *        (in pixels) between the original alignment of the NDFs and the
 *        alignment in which the objects are matched.  If frames have
 *        to be displaced more than this value to obtain a match, the
-*        match is rejected.  This will be of use when USEWCS is set 
+*        match is rejected.  This will be of use when USEWCS is set
 *        and the NDFs are already fairly well aligned in their Current
 *        coordinate systems.  It should be set to the maximum
-*        expected inaccuracy in that alignment.  If null, arbitrarily 
-*        large displacements are allowed, although note that a 
+*        expected inaccuracy in that alignment.  If null, arbitrarily
+*        large displacements are allowed, although note that a
 *        similar restriction is effectively imposed by setting the
 *        RESTRICT parameter.
 *        [!]
 *     MINMATCH = _INTEGER (Read)
 *        This parameter specifies the minimum number of positions
-*        which must be matched for a comparison of two lists to be 
+*        which must be matched for a comparison of two lists to be
 *        deemed successful.  Small values (especially less than 3) of
 *        this parameter can lead to a high probability of false matches,
 *        and are only advisable for very sparsely populated lists
@@ -126,7 +126,7 @@
 *     MINSEP = _DOUBLE (Read)
 *        Positions which are very close may cause false matches by being
 *        within the error box of other positions. The value of this
-*        parameter controls how close (in pixels) objects may be before 
+*        parameter controls how close (in pixels) objects may be before
 *        they are both rejected (this occurs before pattern-matching).
 *        [Dynamic -- 5.0*ERROR]
 *     NAMELIST = LITERAL (Read)
@@ -174,29 +174,29 @@
 *        incomplete solution. Such solutions will result when only a
 *        subset of the input position lists have been matched.
 *        If the associating position lists with NDFs option has
-*        been chosen, an position list will still be written for 
+*        been chosen, an position list will still be written for
 *        each input NDF, but for NDFs which were not matched the
 *        output list will be empty (will consist only of comment lines).
 *
-*        Incomplete matching would ideally indicate that one, or more, 
-*        of the input lists are from positions not coincident with the 
-*        others, in which case it is perfectly legimate to proceed. 
-*        However, it is equally possible that they have too few positions 
-*        and have consequently been rejected.  
+*        Incomplete matching would ideally indicate that one, or more,
+*        of the input lists are from positions not coincident with the
+*        others, in which case it is perfectly legimate to proceed.
+*        However, it is equally possible that they have too few positions
+*        and have consequently been rejected.
 *        [TRUE]
 *     RESTRICT = _LOGICAL (Read)
 *        This parameter determines whether the Current coordinate system
 *        is used to restrict the choice of objects to match with each
 *        other.  If set TRUE, then the only objects which are
 *        considered for matching are those which would appear in
-*        the overlap of two frames given that they are correctly 
-*        aligned in their Current coordinate system.  If it is set 
+*        the overlap of two frames given that they are correctly
+*        aligned in their Current coordinate system.  If it is set
 *        FALSE, then all objects in both frames are considered for
 *        matching.
 *
-*        This parameter should therefore be set TRUE if the frames 
+*        This parameter should therefore be set TRUE if the frames
 *        are quite well aligned in their Current coordinate systems
-*        (especially in the case that there are many objects and a 
+*        (especially in the case that there are many objects and a
 *        small overlap), and FALSE if they are not.
 *
 *        This parameter is ignored if USEWCS is FALSE.
@@ -228,16 +228,16 @@
 *        in their WCS components, the setting of USESET will make
 *        no difference.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 *     USEWCS = _LOGICAL (Read)
 *        This parameter specifies whether the coordinates in the
 *        position lists should be transformed from Pixel coordinates
-*        into the Current coordinate system of the associated NDF 
+*        into the Current coordinate system of the associated NDF
 *        before use.
 *        If the Current coordinates are related to pixel coordinates
-*        by a translation, the setting of this parameter is usually 
+*        by a translation, the setting of this parameter is usually
 *        unimportant (but see also the RESTRICT parameter).
 *
 *        This parameter is ignored if NDFNAMES is false.
@@ -246,14 +246,14 @@
 *  Examples:
 *     findoff inlist='*' error=1 outlist='*.off'
 *        In this example all the NDFs in the current directory are
-*        accessed and their associated position lists are used.  
+*        accessed and their associated position lists are used.
 *        The NDFs are related by a simple offset (translation) in
 *        their Current coordinate system, although not necessarily
-*        their pixel coordinate system.  The matched position lists are 
-*        named *.off.  The method used is to try the FAST algorithm, 
-*        switching to SLOW if FAST fails. The completeness measure 
-*        is used when forming the spanning tree.  Matches with 
-*        completenesses less than 0.5 and or with less than three 
+*        their pixel coordinate system.  The matched position lists are
+*        named *.off.  The method used is to try the FAST algorithm,
+*        switching to SLOW if FAST fails. The completeness measure
+*        is used when forming the spanning tree.  Matches with
+*        completenesses less than 0.5 and or with less than three
 *        positions, are rejected.
 *
 *     findoff fast nofailsafe
@@ -264,7 +264,7 @@
 *        to weight the edges of the spanning tree.
 *
 *     findoff error=8 minsep=100
-*        In this example very fuzzy measurements (or small pixels) are 
+*        In this example very fuzzy measurements (or small pixels) are
 *        being used.  The intrinsic error in the measurements is around
 *        8 pixels and positions within a box 100 pixels of each other
 *        are rejected.
@@ -273,7 +273,7 @@
 *        This form would be used if the NDFs 'data*' are already
 *        approximately aligned in their Current coordinates. Setting the
 *        RESTRICT parameter then tells FINDOFF to consider only objects
-*        in the region which overlaps in the Current coordinates of 
+*        in the region which overlaps in the Current coordinates of
 *        each pair of frames. This can save a lot of time if there
 *        are many objects and a small overlap, but will result in
 *        failure of the program if the NDFs are not translationally
@@ -281,7 +281,7 @@
 *
 *     findoff inlist='data*' outlist='*.off' restrict minmatch=2
 *             maxdisp=20 minsep=30
-*        In this example the NDFs are sparsely populated, and a pair 
+*        In this example the NDFs are sparsely populated, and a pair
 *        will be considered to match if as few as two matching objects
 *        can be found.  The NDFs have been initially aligned in their
 *        Current coordinate systems to an accuracy of 20 or better.  As
@@ -290,7 +290,7 @@
 *        are used for matching.
 
 *  Notes:
-*     - Position list formats. 
+*     - Position list formats.
 *
 *       CCDPACK supports data in two formats.
 *
@@ -306,12 +306,12 @@
 *       lines with the same column-1 value in different files represent
 *       the same object.  In the input position lists column-1 values
 *       are ignored.  If additional columns are present they must be
-*       numeric, and there must be the same number of them in every 
+*       numeric, and there must be the same number of them in every
 *       line.  These have no effect on the calculations, but FINDOFF
 *       will propagate them to the corresponding lines in the output
 *       list.
 *
-*       EXTERNAL format - positions are specified using just an X 
+*       EXTERNAL format - positions are specified using just an X
 *       and a Y entry and no other entries.
 *
 *          - Column 1: the X position
@@ -325,10 +325,10 @@
 *       In all cases, the coordinates in position lists are pixel
 *       coordinates.
 *
-*     - NDF extension items. 
+*     - NDF extension items.
 *
 *       If NDFNAMEs is TRUE then the names of the input position lists
-*       will be gotten from the item "CURRENT_LIST" of the CCDPACK 
+*       will be gotten from the item "CURRENT_LIST" of the CCDPACK
 *       extension of the input NDFs. On exit this item will be updated
 *       to contain the name of the appropriate output lists.
 
@@ -352,13 +352,13 @@
 
 *  Notes On Algorithms:
 *     The pattern-matching process uses two main algorithms, one which
-*     matches all the point pair-offsets between any two input lists, 
-*     looking for the matches with the most common positions, and one 
-*     which uses a statistical method based on a histogram of the 
-*     differences in the offsets (where the peak in the histogram is 
-*     assumed the most likely difference). In each case an estimate of 
-*     the positional error must be given as it is used when deciding 
-*     which positions match (given an offset) or is used as the bin 
+*     matches all the point pair-offsets between any two input lists,
+*     looking for the matches with the most common positions, and one
+*     which uses a statistical method based on a histogram of the
+*     differences in the offsets (where the peak in the histogram is
+*     assumed the most likely difference). In each case an estimate of
+*     the positional error must be given as it is used when deciding
+*     which positions match (given an offset) or is used as the bin
 *     size when forming histograms.
 *
 *     Which algorithm you should use depends on the number of points
@@ -382,14 +382,14 @@
 *     the SLOW algorithm when you have small datasets and do not
 *     expect large areas (numbers of positions) of overlap.
 *
-*     A third algorithm, referred to as SNGL, is used automatically if 
+*     A third algorithm, referred to as SNGL, is used automatically if
 *     one or both of the lists in a pair contains only a single object.
-*     In this case object matching is trivial and, of course, may 
+*     In this case object matching is trivial and, of course, may
 *     easily be in error.  SNGL can only be used if the MINMATCH
 *     parameter has been set to 1, which should be done with care.  The
-*     SNGL algorithm may be useful if there really is only one object, 
-*     correctly identified, in all the frames.  If this is not the 
-*     case, it should only be used when USEWCS is true and MAXDISP is 
+*     SNGL algorithm may be useful if there really is only one object,
+*     correctly identified, in all the frames.  If this is not the
+*     case, it should only be used when USEWCS is true and MAXDISP is
 *     set to a low value, indicating that the alignment of the NDFs in
 *     their Current coordinate systems is already fairly accurate.
 *
@@ -475,7 +475,7 @@
 *        Modified so that ERROR and MAXDISP are in units of pixels (not
 *        current coordinates).
 *     1-NOV-1999 (MBT):
-*        Modified so that output is in units appropriate to current 
+*        Modified so that output is in units appropriate to current
 *        coordinate frame.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
@@ -514,7 +514,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -533,7 +533,7 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of character string
-      EXTERNAL CHR_LEN 
+      EXTERNAL CHR_LEN
 
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for reading in data
@@ -624,7 +624,7 @@
       INTEGER ISUP( CCD1__MXLIS ) ! Superlist index applying to this list
       INTEGER IWCS              ! AST pointer to WCS frameset
       INTEGER J                 ! Loop variable
-      INTEGER LBND( 2 )         ! Lower pixel-index bounds of NDF 
+      INTEGER LBND( 2 )         ! Lower pixel-index bounds of NDF
       INTEGER K                 ! Loop index
       INTEGER L                 ! Loop index for lists
       INTEGER LOOPS             ! Number of comparison loops
@@ -686,7 +686,7 @@
 *  Begin NDF context.
       CALL NDF_BEGIN
 
-*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on 
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on
 *  an uninitialised group cannot cause trouble.
       FIOGR = GRP__NOID
       OUTGRP = GRP__NOID
@@ -702,7 +702,7 @@
       CALL PAR_GET0L( 'NDFNAMES', NDFS, STATUS )
 
 *  Get the lists of of positions.
-      CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS, 
+      CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS,
      :                 .FALSE., NOPEN, FIOGR, NDFGR, NNOLIS, NLGR,
      :                 STATUS )
       CALL CCD1_GRDEL( NLGR, STATUS )
@@ -759,7 +759,7 @@
       FSAFE = .FALSE.
       IF ( FAST ) CALL PAR_GET0L( 'FAILSAFE', FSAFE, STATUS )
 
-*  See if we should continue with registration if only a few of the 
+*  See if we should continue with registration if only a few of the
 *  datasets have been matched.
       OVERRD = .FALSE.
       CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
@@ -799,9 +799,9 @@
 
 *  Get bounding box: BNDX and BNDY contain the X and Y pixel coordinates
 *  of the corners of the NDF's DATA array, for the purpose of determining
-*  where overlaps are expected once WCS information has been obtained.  
-*  They must be listed in BNDX and BNDY in a clockwise, or anti-clockwise, 
-*  order.  They are modified here by the ERROR parameter so that pixels 
+*  where overlaps are expected once WCS information has been obtained.
+*  They must be listed in BNDX and BNDY in a clockwise, or anti-clockwise,
+*  order.  They are modified here by the ERROR parameter so that pixels
 *  outside the box by that distance are considered for matching.
                XP( 1 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
                XP( 2 ) = DBLE( UBND( 1 ) ) + ERROR
@@ -819,9 +819,9 @@
 
 *  Work out the approximate linear size of a pixel.  This will
 *  be used to convert ERROR and MAXDISP from pixel coordinates to the
-*  coordinates of the frame in question.  It's chosen 
+*  coordinates of the frame in question.  It's chosen
 *  arbitrarily from one or other of the NDFs in a pair being matched,
-*  but if they aren't of very similar scale they are not going to 
+*  but if they aren't of very similar scale they are not going to
 *  match anyway.
             CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
             CALL CCD1_PSIZE( IWCS, AST__CURRENT, PSIZE( I ), STATUS )
@@ -845,14 +845,14 @@
 
 *  And the rest of the parameters.
       CALL MSG_SETD( 'ERROR', ERROR )
-      CALL CCD1_MSG( '  ', '  Error in positions: ^ERROR pixels', 
+      CALL CCD1_MSG( '  ', '  Error in positions: ^ERROR pixels',
      :               STATUS )
       IF ( MAXDIS .NE. 0D0 ) THEN
          CALL MSG_SETD( 'MAXDIS', MAXDIS )
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      :    '  Maximum displacement allowed: ^MAXDIS pixels', STATUS )
       ELSE
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      :    '  Arbitrarily large displacements allowed', STATUS )
       END IF
       CALL MSG_SETD( 'MINSEP', MINSEP )
@@ -878,10 +878,10 @@
          CALL CCD1_MSG( ' ', '  Pixel coordinates will be used'//
      :   ' direct', STATUS )
       END IF
-      IF ( RSTRCT ) THEN 
+      IF ( RSTRCT ) THEN
          CALL CCD1_MSG( ' ', '  Attempted matches will be'//
      :   ' restricted to apparent overlap zones', STATUS )
-      ELSE 
+      ELSE
          CALL CCD1_MSG( ' ', '  All objects will be considered'//
      :   ' for possible matches', STATUS )
       END IF
@@ -894,7 +894,7 @@
       END IF
 
 *  What sort of comparison will be performed.
-      IF ( FAST ) THEN 
+      IF ( FAST ) THEN
          CALL CCD1_MSG( ' ', '  Using FAST matching algorithm', STATUS )
          IF ( FSAFE ) THEN
             CALL CCD1_MSG( ' ', '  Failsafe in operation', STATUS )
@@ -927,14 +927,14 @@
       END DO
 
 *  Extract the data present in the input files.
-      DO I = 1, NOPEN 
+      DO I = 1, NOPEN
 
 *  Open the input files and test the number of entries.
          CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
          CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL, STATUS )
          IF ( NVAL .GT. 0 ) THEN
-            IF ( NVAL .EQ. 2 ) THEN 
+            IF ( NVAL .EQ. 2 ) THEN
 
 *  Map in X and Y positions only (non-standard file)
                NXVAL( I ) = 0
@@ -946,31 +946,31 @@
                NXVAL( I ) = NVAL - 3
                CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT,
      :                         NREC( I ), NVAL, STATUS )
-               CALL CCD1_MFREE( IPIND, STATUS )            
+               CALL CCD1_MFREE( IPIND, STATUS )
             END IF
 
 *  Accumulate the number of records in this superlist.
-            NRECS( ISUP( I ) ) = NRECS( ISUP( I ) ) + NREC( I ) 
+            NRECS( ISUP( I ) ) = NRECS( ISUP( I ) ) + NREC( I )
 
-*  Get workspace for storing the point identifiers and X and Y pixel 
+*  Get workspace for storing the point identifiers and X and Y pixel
 *  coordinate values.
             CALL CCD1_MALL( NREC( I ), '_INTEGER', IPSEQ( I ), STATUS )
             CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXP, STATUS )
             CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYP, STATUS )
 
 *  Prepare a list of unique indices identifying each point.  This will
-*  enable us later on to keep track of the file in which each point 
+*  enable us later on to keep track of the file in which each point
 *  originated.
-            CALL CCD1_GISEQ( IPOS, 1, NREC( I ), 
+            CALL CCD1_GISEQ( IPOS, 1, NREC( I ),
      :                       %VAL( CNF_PVAL( IPSEQ( I ) ) ),
      :                       STATUS )
             IPOS = IPOS + NREC( I )
 
 *  Extract the X and Y values from the mapped data array.
-            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), 
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ),
      :                      NREC( I ), NVAL, 1,
      :                      %VAL( CNF_PVAL( IPXP ) ), STATUS )
-            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), 
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ),
      :                      NREC( I ), NVAL, 2,
      :                      %VAL( CNF_PVAL( IPYP ) ), STATUS )
 
@@ -978,9 +978,9 @@
             IF ( USEWCS ) THEN
                CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXQ( I ), STATUS )
                CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYQ( I ), STATUS )
-               CALL AST_TRAN2( MAPS( I ), NREC( I ), 
+               CALL AST_TRAN2( MAPS( I ), NREC( I ),
      :                         %VAL( CNF_PVAL( IPXP ) ),
-     :                         %VAL( CNF_PVAL( IPYP ) ), .TRUE., 
+     :                         %VAL( CNF_PVAL( IPYP ) ), .TRUE.,
      :                         %VAL( CNF_PVAL( IPXQ( I ) ) ),
      :                         %VAL( CNF_PVAL( IPYQ( I ) ) ), STATUS )
                CALL CCD1_MFREE( IPXP, STATUS )
@@ -994,7 +994,7 @@
             IF ( NXVAL( I ) .GT. 0 ) THEN
                CALL CCD1_MALL( NREC( I ) * NXVAL( I ), '_DOUBLE',
      :                         IPXDAT( I ), STATUS )
-               CALL CCD1_XDAT( %VAL( CNF_PVAL( IPDAT ) ), 
+               CALL CCD1_XDAT( %VAL( CNF_PVAL( IPDAT ) ),
      :                         NREC( I ), NVAL,
      :                         %VAL( CNF_PVAL( IPXDAT( I ) ) ), STATUS )
             END IF
@@ -1012,10 +1012,10 @@
          CALL FIO_CLOSE( FDIN, STATUS )
       END DO
 
-*  Construct the initial position superlists.  If Set headers are not 
+*  Construct the initial position superlists.  If Set headers are not
 *  being used, these will just be the position lists read in.
-*  However, if Set headers are being used, one position superlist will 
-*  contain the union of all the points in all the read lists with 
+*  However, if Set headers are being used, one position superlist will
+*  contain the union of all the points in all the read lists with
 *  the same Set Name attribute.
       DO I = 1, NSUP
          IF ( NRECS( I ) .GE. MINMAT ) THEN
@@ -1027,17 +1027,17 @@
                DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
                   L = ILIS( J )
                   IF ( NREC( L ) .GT. 0 ) THEN
-                     CALL CCG1_COPSI( 1, %VAL( CNF_PVAL( IPSEQ( L ) ) ), 
+                     CALL CCG1_COPSI( 1, %VAL( CNF_PVAL( IPSEQ( L ) ) ),
      :                                NREC( L ),
-     :                                IOFF, %VAL( CNF_PVAL( IPRDN ) ), 
+     :                                IOFF, %VAL( CNF_PVAL( IPRDN ) ),
      :                                STATUS )
-                     CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPXQ( L ) ) ), 
+                     CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPXQ( L ) ) ),
      :                                NREC( L ),
-     :                                IOFF, %VAL( CNF_PVAL( IPXN ) ), 
+     :                                IOFF, %VAL( CNF_PVAL( IPXN ) ),
      :                                STATUS )
-                     CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPYQ( L ) ) ), 
+                     CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPYQ( L ) ) ),
      :                                NREC( L ),
-     :                                IOFF, %VAL( CNF_PVAL( IPYN ) ), 
+     :                                IOFF, %VAL( CNF_PVAL( IPYN ) ),
      :                                STATUS )
                      IOFF = IOFF + NREC( L )
                      CALL CCD1_MFREE( IPSEQ( L ), STATUS )
@@ -1057,14 +1057,14 @@
             CALL CCD1_MALL( NRECS( I ), '_INTEGER', IPRAN( I ), STATUS )
             CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPX( I ), STATUS )
             CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPY( I ), STATUS )
-            CALL CCD1_PRMIN( %VAL( CNF_PVAL( IPXN ) ), 
-     :                       %VAL( CNF_PVAL( IPYN ) ), 
+            CALL CCD1_PRMIN( %VAL( CNF_PVAL( IPXN ) ),
+     :                       %VAL( CNF_PVAL( IPYN ) ),
      :                       %VAL( CNF_PVAL( IPRDN ) ),
-     :                       NRECS( I ), 
+     :                       NRECS( I ),
      :                       MINSEP * PSIZE( ILIS( ILISOF( I ) ) ),
-     :                       %VAL( CNF_PVAL( IPX( I ) ) ), 
+     :                       %VAL( CNF_PVAL( IPX( I ) ) ),
      :                       %VAL( CNF_PVAL( IPY( I ) ) ),
-     :                       %VAL( CNF_PVAL( IPRAN( I ) ) ), 
+     :                       %VAL( CNF_PVAL( IPRAN( I ) ) ),
      :                       NRECN( I ), STATUS )
             CALL CCD1_MFREE( IPRDN, STATUS )
             CALL CCD1_MFREE( IPXN, STATUS )
@@ -1133,12 +1133,12 @@
       END IF
       CALL CCD1_MSG( ' ', LINE1, STATUS )
       CALL CCD1_MSG( ' ', LINE2, STATUS )
-         
+
 *  Loop comparing each list with all the lists which follow it.
-      COUNT = 0 
+      COUNT = 0
       NMATCH = 0
       DO 3 I = 1, NSUP - 1
-         DO 4 J = I + 1, NSUP 
+         DO 4 J = I + 1, NSUP
 
 *  Increment counters and set number of matched positions.
             COUNT = COUNT + 1
@@ -1179,7 +1179,7 @@
 *  Prepare the lists of points we will actually use (these may omit
 *  ones which do not appear in the overlap).
             IF ( RSTRCT ) THEN
-               
+
 *  Allocate space for points in the overlap between NDFs.
                CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPXI1, STATUS )
                CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPYI1, STATUS )
@@ -1189,53 +1189,53 @@
 *  Select only points in list I which fall inside bounding boxes
 *  associated with list J.
                CALL CCD1_MALL( NRECN( I ), '_LOGICAL', IPGOOD, STATUS )
-               CALL CCG1_STVL( .FALSE., NRECN( I ), 
+               CALL CCG1_STVL( .FALSE., NRECN( I ),
      :                         %VAL( CNF_PVAL( IPGOOD ) ),
      :                         STATUS )
                DO K = ILISOF( J ), ILISOF( J + 1 ) - 1
                   L = ILIS( K )
                   CALL CCD1_INPLY( BNDX( 1, L ), BNDY( 1, L ), 4,
-     :                             %VAL( CNF_PVAL( IPX( I ) ) ), 
+     :                             %VAL( CNF_PVAL( IPX( I ) ) ),
      :                             %VAL( CNF_PVAL( IPY( I ) ) ),
-     :                             NRECN( I ), 
+     :                             NRECN( I ),
      :                             %VAL( CNF_PVAL( IPGOOD ) ), STATUS )
                END DO
-               CALL CCD1_CHUSP( %VAL( CNF_PVAL( IPGOOD ) ), 
+               CALL CCD1_CHUSP( %VAL( CNF_PVAL( IPGOOD ) ),
      :                          %VAL( CNF_PVAL( IPX( I ) ) ),
-     :                          %VAL( CNF_PVAL( IPY( I ) ) ), 
+     :                          %VAL( CNF_PVAL( IPY( I ) ) ),
      :                          NRECN( I ),
-     :                          %VAL( CNF_PVAL( IPXI1 ) ), 
+     :                          %VAL( CNF_PVAL( IPXI1 ) ),
      :                          %VAL( CNF_PVAL( IPYI1 ) ),
-     :                          %VAL( CNF_PVAL( IPRBN1 ) ), 
+     :                          %VAL( CNF_PVAL( IPRBN1 ) ),
      :                          NUMI1, STATUS )
                CALL CCD1_MFREE( IPGOOD, STATUS )
 
 *  Select only points in list J which fall inside bounding boxes
 *  associated with list I.
                CALL CCD1_MALL( NRECN( J ), '_LOGICAL', IPGOOD, STATUS )
-               CALL CCG1_STVL( .FALSE., NRECN( J ), 
+               CALL CCG1_STVL( .FALSE., NRECN( J ),
      :                         %VAL( CNF_PVAL( IPGOOD ) ),
      :                         STATUS )
                DO K = ILISOF( I ), ILISOF( I + 1 ) - 1
                   L = ILIS( K )
                   CALL CCD1_INPLY( BNDX( 1, L ), BNDY( 1, L ), 4,
-     :                             %VAL( CNF_PVAL( IPX( J ) ) ), 
+     :                             %VAL( CNF_PVAL( IPX( J ) ) ),
      :                             %VAL( CNF_PVAL( IPY( J ) ) ),
-     :                             NRECN( J ), 
+     :                             NRECN( J ),
      :                             %VAL( CNF_PVAL( IPGOOD ) ), STATUS )
                END DO
-               CALL CCD1_CHUSP( %VAL( CNF_PVAL( IPGOOD ) ), 
+               CALL CCD1_CHUSP( %VAL( CNF_PVAL( IPGOOD ) ),
      :                          %VAL( CNF_PVAL( IPX( J ) ) ),
-     :                          %VAL( CNF_PVAL( IPY( J ) ) ), 
+     :                          %VAL( CNF_PVAL( IPY( J ) ) ),
      :                          NRECN( J ),
-     :                          %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                          %VAL( CNF_PVAL( IPXI2 ) ),
      :                          %VAL( CNF_PVAL( IPYI2 ) ),
-     :                          %VAL( CNF_PVAL( IPRBN2 ) ), 
+     :                          %VAL( CNF_PVAL( IPRBN2 ) ),
      :                          NUMI2, STATUS )
                CALL CCD1_MFREE( IPGOOD, STATUS )
             ELSE
 
-*  No restrictions on which points to consider - copy all to the 
+*  No restrictions on which points to consider - copy all to the
 *  arrays for matching.
                IPXI1 = IPX( I )
                IPYI1 = IPY( I )
@@ -1243,9 +1243,9 @@
                IPYI2 = IPY( J )
                NUMI1 = NRECN( I )
                NUMI2 = NRECN( J )
-               CALL CCD1_GISEQ( 1, 1, NUMI1, %VAL( CNF_PVAL( IPRBN1 ) ), 
+               CALL CCD1_GISEQ( 1, 1, NUMI1, %VAL( CNF_PVAL( IPRBN1 ) ),
      :                          STATUS )
-               CALL CCD1_GISEQ( 1, 1, NUMI2, %VAL( CNF_PVAL( IPRBN2 ) ), 
+               CALL CCD1_GISEQ( 1, 1, NUMI2, %VAL( CNF_PVAL( IPRBN2 ) ),
      :                          STATUS )
             END IF
 
@@ -1261,19 +1261,19 @@
 *  One or both lists have only one object.  Treat as a special case.
                METHOD = 'SNGL'
                CALL CCD1_SNGL( MAXDIS * PIXSIZ,
-     :                         %VAL( CNF_PVAL( IPXI1 ) ), 
+     :                         %VAL( CNF_PVAL( IPXI1 ) ),
      :                         %VAL( CNF_PVAL( IPYI1 ) ),
      :                         %VAL( CNF_PVAL( IPRBN1 ) ), NUMI1,
-     :                         %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                         %VAL( CNF_PVAL( IPXI2 ) ),
      :                         %VAL( CNF_PVAL( IPYI2 ) ),
      :                         %VAL( CNF_PVAL( IPRBN2 ) ), NUMI2,
      :                         %VAL( CNF_PVAL( IPXO1( COUNT ) ) ),
      :                         %VAL( CNF_PVAL( IPYO1( COUNT ) ) ),
      :                         %VAL( CNF_PVAL( IPXO2( COUNT ) ) ),
-     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ), 
+     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ),
      :                         NMAT( COUNT ),
      :                         XOFF( COUNT ), YOFF( COUNT ),
-     :                         %VAL( CNF_PVAL( IPRAN1 ) ), 
+     :                         %VAL( CNF_PVAL( IPRAN1 ) ),
      :                         %VAL( CNF_PVAL( IPRAN2 ) ), STATUS )
 
 *  If the match was successful, completeness must be unity.
@@ -1288,24 +1288,24 @@
 *  Perform matching using histogram of X and Y offsets refined through
 *  iteration.
                METHOD = 'FAST'
-               CALL CCD1_STAO( ERROR * PIXSIZ, MAXDIS * PIXSIZ, 
-     :                         %VAL( CNF_PVAL( IPXI1 ) ), 
+               CALL CCD1_STAO( ERROR * PIXSIZ, MAXDIS * PIXSIZ,
+     :                         %VAL( CNF_PVAL( IPXI1 ) ),
      :                         %VAL( CNF_PVAL( IPYI1 ) ),
      :                         %VAL( CNF_PVAL( IPRBN1 ) ), NUMI1,
-     :                         %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                         %VAL( CNF_PVAL( IPXI2 ) ),
      :                         %VAL( CNF_PVAL( IPYI2 ) ),
      :                         %VAL( CNF_PVAL( IPRBN2 ) ), NUMI2,
      :                         %VAL( CNF_PVAL( IPWRK1 ) ),
      :                         %VAL( CNF_PVAL( IPXO1( COUNT ) ) ),
      :                         %VAL( CNF_PVAL( IPYO1( COUNT ) ) ),
      :                         %VAL( CNF_PVAL( IPXO2( COUNT ) ) ),
-     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ), 
+     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ),
      :                         NMAT( COUNT ),
      :                         XOFF( COUNT ), YOFF( COUNT ),
-     :                         %VAL( CNF_PVAL( IPRAN1 ) ), 
+     :                         %VAL( CNF_PVAL( IPRAN1 ) ),
      :                         %VAL( CNF_PVAL( IPRAN2 ) ), STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
-               
+
 *  This mode has failed. If failsafe is set set FAILED to TRUE. Annul
 *  the error and continue in any case.
                   IF ( FSAFE ) THEN
@@ -1321,17 +1321,17 @@
 *  Match is a success. If failsafe is in operation then check that this
 *  has also passed the other success criteria, such as minimum number
 *  and completeness.
-                  IF ( FSAFE ) THEN 
+                  IF ( FSAFE ) THEN
 
 *  Now do the test.
                      CALL CCD1_OVCOM( %VAL( CNF_PVAL( IPX( I ) ) ),
-     :                                %VAL( CNF_PVAL( IPY( I ) ) ), 
+     :                                %VAL( CNF_PVAL( IPY( I ) ) ),
      :                                NRECN( I ),
      :                                %VAL( CNF_PVAL( IPX( J ) ) ),
-     :                                %VAL( CNF_PVAL( IPY( J ) ) ), 
+     :                                %VAL( CNF_PVAL( IPY( J ) ) ),
      :                                NRECN( J ),
      :                                NMAT( COUNT ), XOFF( COUNT ),
-     :                                YOFF( COUNT ), ERROR * PIXSIZ, 
+     :                                YOFF( COUNT ), ERROR * PIXSIZ,
      :                                COMFAC, STATUS )
 
 *  Now check for minimum number match and completeness. Set failed if
@@ -1343,39 +1343,39 @@
                   END IF
                END IF
             END IF
-                  
+
 *  Perform matching using the straight-forward distance comparisons
 *  if this is required.
-            IF ( ( .NOT. FAST .OR. ( FSAFE .AND. FAILED ) ) 
-     :           .AND. METHOD .NE. 'SNGL' .AND. OK ) THEN 
-            
+            IF ( ( .NOT. FAST .OR. ( FSAFE .AND. FAILED ) )
+     :           .AND. METHOD .NE. 'SNGL' .AND. OK ) THEN
+
 *  Get workspace and perform comparison.
                METHOD = 'SLOW'
                CALL CCD1_MALL( NPOSS, '_DOUBLE', IPWRK2, STATUS )
                CALL CCD1_MALL( NPOSS, '_INTEGER', IPWRK3, STATUS )
-               CALL CCD1_MALL( NUMI2 + 2, '_INTEGER', IPWRK4, 
+               CALL CCD1_MALL( NUMI2 + 2, '_INTEGER', IPWRK4,
      :                         STATUS )
-               CALL CCD1_MALL( NUMI2 + 2, '_INTEGER', IPWRK5, 
+               CALL CCD1_MALL( NUMI2 + 2, '_INTEGER', IPWRK5,
      :                         STATUS )
-               CALL CCD1_SOFF( ERROR * PIXSIZ, MAXDIS * PIXSIZ, 
-     :                         %VAL( CNF_PVAL( IPXI1 ) ), 
+               CALL CCD1_SOFF( ERROR * PIXSIZ, MAXDIS * PIXSIZ,
+     :                         %VAL( CNF_PVAL( IPXI1 ) ),
      :                         %VAL( CNF_PVAL( IPYI1 ) ),
      :                         %VAL( CNF_PVAL( IPRBN1 ) ), NUMI1,
-     :                         %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                         %VAL( CNF_PVAL( IPXI2 ) ),
      :                         %VAL( CNF_PVAL( IPYI2 ) ),
      :                         %VAL( CNF_PVAL( IPRBN2 ) ), NUMI2,
-     :                         %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK1 ) ),
      :                         %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                         %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK3 ) ),
      :                         %VAL( CNF_PVAL( IPWRK4 ) ),
      :                         %VAL( CNF_PVAL( IPWRK5 ) ),
      :                         %VAL( CNF_PVAL( IPXO1( COUNT ) ) ),
      :                         %VAL( CNF_PVAL( IPYO1( COUNT ) ) ),
      :                         %VAL( CNF_PVAL( IPXO2( COUNT ) ) ),
-     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ), 
+     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ),
      :                         NMAT( COUNT ),
      :                         XOFF( COUNT ), YOFF( COUNT ),
-     :                         %VAL( CNF_PVAL( IPRAN1 ) ), 
+     :                         %VAL( CNF_PVAL( IPRAN1 ) ),
      :                         %VAL( CNF_PVAL( IPRAN2 ) ), STATUS )
                CALL CCD1_MFREE( IPWRK2, STATUS )
                CALL CCD1_MFREE( IPWRK3, STATUS )
@@ -1396,14 +1396,14 @@
             ELSE
 
 *  Now do the test.
-               CALL CCD1_OVCOM( %VAL( CNF_PVAL( IPX( I ) ) ), 
+               CALL CCD1_OVCOM( %VAL( CNF_PVAL( IPX( I ) ) ),
      :                          %VAL( CNF_PVAL( IPY( I ) ) ),
-     :                          NRECN( I ), 
+     :                          NRECN( I ),
      :                          %VAL( CNF_PVAL( IPX( J ) ) ),
-     :                          %VAL( CNF_PVAL( IPY( J ) ) ), 
+     :                          %VAL( CNF_PVAL( IPY( J ) ) ),
      :                          NRECN( J ),
-     :                          NMAT( COUNT ), XOFF( COUNT ), 
-     :                          YOFF( COUNT ), ERROR * PIXSIZ, 
+     :                          NMAT( COUNT ), XOFF( COUNT ),
+     :                          YOFF( COUNT ), ERROR * PIXSIZ,
      :                          COMFAC, STATUS )
             END IF
 
@@ -1433,29 +1433,29 @@
 
 *  If matching process failed then reset values for this pass and
 *  release workspace which will not now be used.
-            IF ( .NOT. OK ) THEN 
+            IF ( .NOT. OK ) THEN
                NMAT( COUNT ) = 0
                NMATCH = NMATCH - 1
                CALL CCD1_MFREE( IPXO1( COUNT ), STATUS )
                CALL CCD1_MFREE( IPYO1( COUNT ), STATUS )
                CALL CCD1_MFREE( IPXO2( COUNT ), STATUS )
                CALL CCD1_MFREE( IPYO2( COUNT ), STATUS )
-            ELSE 
+            ELSE
 
 *  Keep track of the permutation of the points.
-               CALL CCD1_MALL( NMAT( COUNT ), '_INTEGER', 
+               CALL CCD1_MALL( NMAT( COUNT ), '_INTEGER',
      :                         IPRCN1( COUNT ), STATUS )
                CALL CCD1_MALL( NMAT( COUNT ), '_INTEGER',
      :                         IPRCN2( COUNT ), STATUS )
-               CALL CCG1_PRMTI( %VAL( CNF_PVAL( IPRAN( I ) ) ), 
+               CALL CCG1_PRMTI( %VAL( CNF_PVAL( IPRAN( I ) ) ),
      :                          %VAL( CNF_PVAL( IPRAN1 ) ),
      :                          1, NMAT( COUNT ),
-     :                          %VAL( CNF_PVAL( IPRCN1( COUNT ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRCN1( COUNT ) ) ),
      :                          STATUS )
-               CALL CCG1_PRMTI( %VAL( CNF_PVAL( IPRAN( J ) ) ), 
+               CALL CCG1_PRMTI( %VAL( CNF_PVAL( IPRAN( J ) ) ),
      :                          %VAL( CNF_PVAL( IPRAN2 ) ),
      :                          1, NMAT( COUNT ),
-     :                          %VAL( CNF_PVAL( IPRCN2( COUNT ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRCN2( COUNT ) ) ),
      :                          STATUS )
 
 *  Generate the weight; it is the number of matches, perhaps multiplied
@@ -1478,8 +1478,8 @@
             CALL CCD1_MFREE( IPRAN2, STATUS )
             CALL CCD1_MFREE( IPRBN1, STATUS )
             CALL CCD1_MFREE( IPRBN2, STATUS )
- 4       CONTINUE 
- 3    CONTINUE    
+ 4       CONTINUE
+ 3    CONTINUE
 
 *  Free rank pointer workspace.
       DO I = 1, NSUP
@@ -1514,26 +1514,26 @@
             CALL CCD1_ERREP( 'TOTAL_FAILURE',
      :'  No positions were matched between any dataset', STATUS )
             GO TO 99
-         ELSE     
-            IF ( OVERRD ) THEN 
+         ELSE
+            IF ( OVERRD ) THEN
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL CCD1_MSG( ' ',
      :'  Warning - not all position datasets have been successfully'//
      :' matched.', STATUS )
                CALL CCD1_MSG( ' ', '  Continuing with those that have.',
-     :                        STATUS ) 
+     :                        STATUS )
                CALL CCD1_MSG( ' ', '  (associated position lists will'//
      :                        ' be empty for the others).', STATUS )
                CALL CCD1_MSG( ' ', ' ', STATUS )
             ELSE
                STATUS = SAI__ERROR
                CALL CCD1_ERREP( 'TOTAL_FAILURE',
-     :'  Not all position datasets have been successfully matched', 
+     :'  Not all position datasets have been successfully matched',
      :                          STATUS )
                GO TO 99
             END IF
-         END IF   
-      END IF      
+         END IF
+      END IF
 
 *=======================================================================
 *  End of data intercomparison and offset estimation
@@ -1551,32 +1551,32 @@
       CALL CCD1_MALL( NMATCH * 4, '_INTEGER', IPSUB, STATUS )
       CALL CCD1_MALL( MAX( NSUP, NMATCH ), '_INTEGER', IPQUE, STATUS )
       CALL CCD1_MALL( MAX( NSUP, NMATCH ), '_LOGICAL', IPBEEN, STATUS )
-                           
+
 *  Look for a maximum likelihood span of the graph of positions (each
 *  position is treated as a node, the node-node transformations are
 *  the edges with weights the number of positions matched).
-*  First create the graph. 
-      CALL CCD1_CRGR( NMAT, COUNT, NSUP, %VAL( CNF_PVAL( IPGRA ) ), 
+*  First create the graph.
+      CALL CCD1_CRGR( NMAT, COUNT, NSUP, %VAL( CNF_PVAL( IPGRA ) ),
      :                NEDGES,
      :                STATUS )
-                           
+
 *  Call routine to determine if the graph is complete.
-      CALL CCD1_GRAPC( %VAL( CNF_PVAL( IPGRA ) ), NEDGES, 1, 
+      CALL CCD1_GRAPC( %VAL( CNF_PVAL( IPGRA ) ), NEDGES, 1,
      :                 %VAL( CNF_PVAL( IPQUE ) ),
-     :                 %VAL( CNF_PVAL( IPBEEN ) ), COMPL, CYCLIC, 
+     :                 %VAL( CNF_PVAL( IPBEEN ) ), COMPL, CYCLIC,
      :                 %VAL( CNF_PVAL( IPSUB ) ),
      :                 NEWED, TOTNOD, STATUS )
-      IF ( COMPL ) THEN    
-                           
+      IF ( COMPL ) THEN
+
 *  Graph is complete -- all nodes connected. Determine the most likely
 *  spanning sub-graph. The most likely one is the graph which is most
 *  strongly connected (largest count of matched pairs).
-         CALL CCD1_MLSPG( %VAL( CNF_PVAL( IPGRA ) ), 
+         CALL CCD1_MLSPG( %VAL( CNF_PVAL( IPGRA ) ),
      :                    WEIGHT, NEDGES, TOTNOD,
-     :                    %VAL( CNF_PVAL( IPQUE ) ), 
-     :                    %VAL( CNF_PVAL( IPBEEN ) ), 
+     :                    %VAL( CNF_PVAL( IPQUE ) ),
+     :                    %VAL( CNF_PVAL( IPBEEN ) ),
      :                    %VAL( CNF_PVAL( IPSPAN ) ),
-     :                    %VAL( CNF_PVAL( IPSUB ) ), 
+     :                    %VAL( CNF_PVAL( IPSUB ) ),
      :                    NEWED, NNODE, STATUS )
 
 *  Determine the "complete" solution.
@@ -1584,7 +1584,7 @@
 *  node of first edge of spanning graph is assumed to be the reference
 *  set).
          CALL CCD1_GROFF( %VAL( CNF_PVAL( IPSUB ) ), NEWED, XOFF, YOFF,
-     :                    NSUP, %VAL( CNF_PVAL( IPBEEN ) ), 
+     :                    NSUP, %VAL( CNF_PVAL( IPBEEN ) ),
      :                    %VAL( CNF_PVAL( IPQUE ) ),
      :                    XOFFN, YOFFN, STATUS )
 
@@ -1592,7 +1592,7 @@
          DO I = 1, NSUP
             FRM( I ) = FRMS( ILIS( ILISOF( I ) ) )
          END DO
-         CALL CCD1_PROFF( NSUP, %VAL( CNF_PVAL( IPBEEN ) ), 
+         CALL CCD1_PROFF( NSUP, %VAL( CNF_PVAL( IPBEEN ) ),
      :                    XOFFN, YOFFN, FRM,
      :                    USEWCS, STATUS )
 
@@ -1601,7 +1601,7 @@
          DO I = 1, NSUP
             TOLS( I ) = 0D0
          END DO
-         CALL CCD1_GMMP( %VAL( CNF_PVAL( IPSUB ) ), 
+         CALL CCD1_GMMP( %VAL( CNF_PVAL( IPSUB ) ),
      :                   NEWED, NSUP, IPXO1, IPYO1,
      :                   IPRCN1, IPXO2, IPYO2, IPRCN2, NMAT, TOLS,
      :                   OFFS, IPX, IPY, IPRAN, IPID, NOUT, STATUS )
@@ -1616,11 +1616,11 @@
          GO TO 99
       END IF
 
-*  Free memory used in matching (this may have overflowed the internal 
-*  resources of CCD1_MALL/MFREE, so need to be more careful than just 
+*  Free memory used in matching (this may have overflowed the internal
+*  resources of CCD1_MALL/MFREE, so need to be more careful than just
 *  using -1 in MFREE call).
       DO 1 I = 1, COUNT
-         IF ( NMAT( I ) .NE. 0 ) THEN 
+         IF ( NMAT( I ) .NE. 0 ) THEN
             CALL CCD1_MFREE( IPXO1( I ), STATUS )
             CALL CCD1_MFREE( IPYO1( I ), STATUS )
             CALL CCD1_MFREE( IPXO2( I ), STATUS )
@@ -1634,7 +1634,7 @@
       CALL CCD1_MFREE( IPSUB, STATUS )
       CALL CCD1_MFREE( IPQUE, STATUS )
       CALL CCD1_MFREE( IPBEEN, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99 
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *=======================================================================
 *   End of spanning graph section
@@ -1644,7 +1644,7 @@
 *  Get the output position lists file names. Use the input NDF names
 *  as possible modification elements when possible otherwise use the
 *  input position list names.
-      IF ( NDFS ) THEN 
+      IF ( NDFS ) THEN
          CALL CCD1_STRGR( 'OUTLIST', NDFGR, NOPEN, NOPEN, OUTGRP, NRET,
      :                    STATUS )
       ELSE
@@ -1657,7 +1657,7 @@
       CALL CCD1_MSG( ' ', '    Output position lists:', STATUS )
       CALL CCD1_MSG( ' ', '    ----------------------', STATUS )
 
-*  Initialise the value of the next position in the global list to 
+*  Initialise the value of the next position in the global list to
 *  be encountered.
       IPOS = 1
 
@@ -1673,7 +1673,7 @@
          CALL CCD1_FIOHD( FDOUT, 'Output from FINDOFF', STATUS )
 
 *  If there are any points, get them in a suitable form for output.
-         IF ( NOUT( IS ) .GT. 0 ) THEN 
+         IF ( NOUT( IS ) .GT. 0 ) THEN
 
 *  Get arrays representing the points of the list L, which may need
 *  to be extracted from the points of the superlist IS.
@@ -1686,14 +1686,14 @@
                CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPLY, STATUS )
 
 *  Extract the positions belonging to this list from the owning superlist.
-               CALL CCD1_EXLIS( %VAL( CNF_PVAL( IPRAN( IS ) ) ), 
+               CALL CCD1_EXLIS( %VAL( CNF_PVAL( IPRAN( IS ) ) ),
      :                          %VAL( CNF_PVAL( IPID( IS ) ) ),
-     :                          %VAL( CNF_PVAL( IPX( IS ) ) ), 
+     :                          %VAL( CNF_PVAL( IPX( IS ) ) ),
      :                          %VAL( CNF_PVAL( IPY( IS ) ) ),
      :                          NOUT( IS ), IPOS, IPOS + NREC( L ) - 1,
-     :                          %VAL( CNF_PVAL( IPLRAN ) ), 
+     :                          %VAL( CNF_PVAL( IPLRAN ) ),
      :                          %VAL( CNF_PVAL( IPLID ) ),
-     :                          %VAL( CNF_PVAL( IPLX ) ), 
+     :                          %VAL( CNF_PVAL( IPLX ) ),
      :                          %VAL( CNF_PVAL( IPLY ) ), NLOUT,
      :                          STATUS )
             ELSE
@@ -1712,9 +1712,9 @@
                IF ( USEWCS ) THEN
                   CALL CCD1_MALL( NLOUT, '_DOUBLE', IPXT, STATUS )
                   CALL CCD1_MALL( NLOUT, '_DOUBLE', IPYT, STATUS )
-                  CALL AST_TRAN2( MAPS( L ), NLOUT, 
+                  CALL AST_TRAN2( MAPS( L ), NLOUT,
      :                            %VAL( CNF_PVAL( IPLX ) ),
-     :                            %VAL( CNF_PVAL( IPLY ) ), .FALSE., 
+     :                            %VAL( CNF_PVAL( IPLY ) ), .FALSE.,
      :                            %VAL( CNF_PVAL( IPXT ) ),
      :                            %VAL( CNF_PVAL( IPYT ) ), STATUS )
                   CALL CCD1_MFREE( IPLX, STATUS )
@@ -1728,24 +1728,24 @@
 
 *  First doctor the point index values so they refer to position within
 *  this file not position within all encountered files.
-                  CALL CCG1_CADDI( %VAL( CNF_PVAL( IPLRAN ) ), 
+                  CALL CCG1_CADDI( %VAL( CNF_PVAL( IPLRAN ) ),
      :                             NLOUT, 1 - IPOS,
      :                             STATUS )
 
-*  Permute the data values into the right order using the doctored 
+*  Permute the data values into the right order using the doctored
 *  point index values.
                   CALL CCD1_MALL( NXVAL( L ) * NLOUT, '_DOUBLE', IPXDP,
      :                            STATUS )
-                  CALL CCG1_PRMTD( %VAL( CNF_PVAL( IPXDAT( L ) ) ), 
+                  CALL CCG1_PRMTD( %VAL( CNF_PVAL( IPXDAT( L ) ) ),
      :                             %VAL( CNF_PVAL( IPLRAN ) ),
-     :                             NXVAL( L ), NLOUT, 
+     :                             NXVAL( L ), NLOUT,
      :                             %VAL( CNF_PVAL( IPXDP ) ),
      :                             STATUS )
 
 *  And write them out.
-                  CALL CCD1_WRIDI( FDOUT, %VAL( CNF_PVAL( IPLID ) ), 
+                  CALL CCD1_WRIDI( FDOUT, %VAL( CNF_PVAL( IPLID ) ),
      :                             %VAL( CNF_PVAL( IPLX ) ),
-     :                             %VAL( CNF_PVAL( IPLY ) ), 
+     :                             %VAL( CNF_PVAL( IPLY ) ),
      :                             %VAL( CNF_PVAL( IPXDP ) ),
      :                             NXVAL( L ), NLOUT, LINE, CCD1__BLEN,
      :                             STATUS )
@@ -1755,9 +1755,9 @@
 *  If no extra data columns, just output ID, X and Y; no permutations
 *  are necessary.
                ELSE
-                  CALL CCD1_WRIXY( FDOUT, %VAL( CNF_PVAL( IPLID ) ), 
+                  CALL CCD1_WRIXY( FDOUT, %VAL( CNF_PVAL( IPLID ) ),
      :                             %VAL( CNF_PVAL( IPLX ) ),
-     :                             %VAL( CNF_PVAL( IPLY ) ), 
+     :                             %VAL( CNF_PVAL( IPLY ) ),
      :                             NLOUT, LINE,
      :                             CCD1__BLEN, STATUS )
                END IF
@@ -1795,11 +1795,11 @@
 
 *  Update the index of the next encountered position.
          IPOS = IPOS + NREC( L )
-      END DO 
+      END DO
 
 *  If the filenames were supplied directly then write an output list of
 *  the names for other applications to use.
-      IF ( .NOT. NDFS .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF ( .NOT. NDFS .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Write the names of the output files to a file which may be used for
 *  indirection into other applications.
@@ -1817,7 +1817,7 @@
 
 *  End NDF context.
       CALL NDF_END( STATUS )
-                  
+
 *  Annul group identifiers.
       CALL CCD1_GRDEL( FIOGR, STATUS )
       CALL CCD1_GRDEL( OUTGRP, STATUS )

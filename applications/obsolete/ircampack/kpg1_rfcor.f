@@ -1,20 +1,20 @@
       SUBROUTINE KPG1_RFCOR( FD, DIM1, DIM2, POSCOD, COUNT, CODATA,
      :                        LBND, UBND, CMPLET, STATUS )
- 
+
 *+
 *  Name:
 *     KPG1_RFCOx
- 
+
 *  Purpose:
 *     Reads co-ordinate data from a text free-format file.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPG1_RFCOx( FD, DIM1, DIM2, POSCOD, COUNT, CODATA, LBND,
 *    :                 UBND, CMPLET, STATUS )
- 
+
 *  Description:
 *     This routine reads co-ordinate information and from a text
 *     free-format file and converts it to floating-point values.  The
@@ -24,7 +24,7 @@
 *     array uses a new line for each record of the file, its columns
 *     storing the given positional data in the order x, y, z etc.  If
 *     the end of file is not reached a flag is returned.
- 
+
 *  Arguments:
 *     FD = INTEGER (Given)
 *        Fortran file identifier.
@@ -57,7 +57,7 @@
 *        If .TRUE., the text file has been completely read.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for real and double-precision data types:
 *     replace "x" in the routine name by R or D respectively.  The
@@ -76,10 +76,10 @@
 *     SLA_FLOTIN for details of the conversion from free-format to
 *     floating-point value.  Missing columns that are not numeric
 *     cannot have these embedded spaces.
- 
+
 *  Prior Requirements:
 *     -  The Fortran text file must already be opened.
- 
+
 *  Algorithm:
 *     -  Get the number of the furthest column to be read.
 *     -  While the buffer is not full and there is no error, read a
@@ -87,11 +87,11 @@
 *     storing them in the output file, and computing the bounds of the
 *     array.  Report the context of an error should one occur.
 *     -  If the file was completely read, set a flag to indicate this.
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 Sep 26 (MJC):
 *        Original version based on KPS1_TRDRx.
@@ -107,47 +107,47 @@
 *     1996 January 31 (MJC):
 *        Replaced NAG calls.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'FIO_ERR'          ! Fortran-I/O-system errors
- 
+
 *  Arguments Given:
       INTEGER FD
       INTEGER DIM1
       INTEGER DIM2
       INTEGER POSCOD( DIM1 )
- 
+
 *  Arguments Given and Returned:
       INTEGER COUNT
       REAL CODATA( DIM1, DIM2 )
       REAL LBND( DIM1 )
       REAL UBND( DIM1 )
- 
+
 *  Arguments Returned:
       LOGICAL CMPLET
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  External References:
       INTEGER CHR_LEN            ! Length of the string less trailing
                                  ! blanks
- 
+
 *  Local Constants:
       INTEGER NCHLIN             ! Maximum number of characters in an
                                  ! input record
       PARAMETER ( NCHLIN = 256 )
- 
+
 *  Local Variables:
       CHARACTER * ( NCHLIN ) BUFFER ! Buffer to store input and output
                                  ! strings
@@ -170,52 +170,52 @@
       INTEGER SHRIEK             ! Column where a shriek is found in the
                                  ! input buffer
       INTEGER WSKIP              ! Number of words (columns to skip)
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Assume for the moment that the array will not be big enough to store
 *  all the points.
       CMPLET = .FALSE.
- 
+
 *  Initialise counter.
       IF ( COUNT .LT. 1 )  COUNT  =  1
- 
+
 *  Sort the columns positions.
 *  ===========================
- 
+
 *  Copy the columns.
       DO  I = 1, DIM1
          ORDPOS( I ) = POSCOD( I )
       END DO
- 
+
 *  Sort the columns to be able to read them in sequence and obtain an
 *  index to old positions.
       CALL PDA_QSIAI( DIM1, ORDPOS, INDPOS )
- 
+
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 *  Start a new error context.
       CALL ERR_MARK
- 
+
 *  Now run through free-format file picking up the required co-ordinate
 *  and data values (up to the maximum allowed within the array bounds).
       DO WHILE ( COUNT .LE. DIM2 .AND. STATUS .EQ. SAI__OK )
- 
+
 *  Read from the free-format file.
          CALL FIO_READ( FD, BUFFER, NCHAR, STATUS )
- 
+
          IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *  Extract the data from the character buffer.
 *  ===========================================
- 
+
 *  Look for a comment.
             SHRIEK = INDEX( BUFFER, '!' )
             HASH = INDEX( BUFFER, '#' )
- 
+
 *  Get the length of the string, watching for blank lines or comment
 *  lines.  A hash or shriek in the first column indicates a comment
 *  line.  In such cases the line can be ignored.
@@ -225,36 +225,36 @@
             ELSE
                NCOM = CHR_LEN( BUFFER )
             END IF
- 
+
 *  Initialise to the start of the string, and the number of values
 *  stored.
             NVAL = 0
             INDEXE = 1
- 
+
 *  Find the number of words to skip at the start.
             WSKIP = ORDPOS( NVAL + 1 ) - 1
- 
+
 *  Loop until the end of the buffer.
             DO WHILE ( INDEXE .LT. NCOM .AND. NVAL .LT. DIM1 .AND.
      :                 STATUS .EQ. SAI__OK )
- 
+
 *  Skip to the correct word.
                IF ( WSKIP .GT. 0 ) THEN
                   DO I = 1, WSKIP
- 
+
 *  Shift the search to the next value.
                      INDEXS = INDEXE
- 
+
 *  In case the value is numeric containing a space after a +,-,D, or E
 *  try reading it as numeric first.  If this fails try skipping over it
 *  as a word.  As the error may shift the column pointer, use a dummy
 *  index.  Any errors that result from this call are irrelevant, and so
 *  should be annulled within a new error context.
                      CALL ERR_MARK
- 
+
                      NCO = INDEXS
                      CALL KPG1_FFRR( BUFFER, 1, NCO, JUNK, STATUS )
- 
+
 *  A bad status means that the string could not be interpreted as
 *  numeric.  If the interpretation worked, the column pointer marks the
 *  end of the word, so record that column number.
@@ -262,25 +262,25 @@
                         CALL ERR_ANNUL( STATUS )
                         INDEXE = NCO
                      ELSE
- 
+
 *  Find the start and end indices of the non-numeric word.
                         CALL CHR_FIWS( BUFFER, INDEXS, STATUS )
                         INDEXE = INDEXS
                         CALL CHR_FIWE( BUFFER, INDEXE, STATUS )
- 
+
 *  CHR_FIWE returns a column position immediately prior to the word
 *  delimiter.  To use the same system as KPG1_FFRR, pointer must be
 *  moved to after the delimiter.
                         INDEXE = INDEXE + 2
                      END IF
- 
+
                      CALL ERR_RLSE
                   END DO
                END IF
- 
+
 *  Shift the search to the next value actually required.
                INDEXS = INDEXE
- 
+
 *  Increment the number of co-ordinates read in this record.  Use the
 *  index to find to which dimension this corresponds.  Extract the
 *  numeric value required for the co-ordinates.
@@ -288,25 +288,25 @@
                J = INDPOS( NVAL )
                CALL KPG1_FFRR( BUFFER, 1, INDEXS, CODATA( J, COUNT ),
      :                           STATUS )
- 
+
 *  The column index returned is now the end of the value.
                INDEXE = INDEXS
- 
+
 *  Find the bounds of the array.
                UBND( J )  =  MAX( UBND( J ), CODATA( J, COUNT ) )
                LBND( J )  =  MIN( LBND( J ), CODATA( J, COUNT ) )
- 
+
 *  Find the number of words to skip, unless the last word required has
 *  been extracted.
                IF ( NVAL .LT. DIM1 )
      :            WSKIP = ORDPOS( NVAL + 1 ) - ORDPOS( NVAL ) - 1
- 
+
             END DO
- 
+
 *  Increment the count of pixels by one if it is not a comment line in
 *  the file.
             IF ( NCOM .NE. -1 ) COUNT = COUNT + 1
- 
+
 *  Something may have gone wrong interpreting the file, either a
 *  typographical error, or it is not arranged in columns.
             IF ( STATUS .NE. SAI__OK ) THEN
@@ -316,43 +316,43 @@
      :           /'format.  For example, it must contain co-ordinate '/
      :           /'data.  The last buffer was "^BUFFER".', STATUS )
             END IF
- 
+
          ELSE IF ( STATUS .NE. FIO__EOF ) THEN
- 
+
 *  Report an error and abort.
             CALL MSG_SETC( 'BUFFER', BUFFER )
             CALL ERR_REP( 'KPG1_RFCOx_RDATA',
      :        'KPG1_RFCOx: Error reading data file : ^STATUS.  Line '/
      :        /'was ^BUFFER.', STATUS )
             GOTO 980
- 
+
 *  End of no-error-reading-record-in-file check.
          END IF
- 
+
       END DO
- 
+
 *  Last record in the file has been read successfully.  If has not the
 *  CMPLET logical will still be false, and so a larger array will be
 *  created.
       IF ( STATUS .EQ. FIO__EOF ) THEN
- 
+
 *  Record that no more points are to be read.
          CMPLET = .TRUE.
- 
+
 *  Correct the actual number of points.
          COUNT = COUNT - 1
- 
+
 *  The end-of-file condition is expected, and therefore the error can be
 *  annulled.
          CALL ERR_ANNUL( STATUS )
- 
+
       END IF
- 
+
   980 CONTINUE
- 
+
 *  Release the error context.
       CALL ERR_RLSE
- 
+
   999 CONTINUE
- 
+
       END

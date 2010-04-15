@@ -44,10 +44,10 @@
 *  Local variables:
       INTEGER I
 *.
-       
+
       DO I = 1, N
          OUT(INDEX(I)) = IN(I)
       END DO
 
       END
-              
+

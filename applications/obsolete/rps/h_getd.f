@@ -19,7 +19,7 @@
 
 *  Functions
       INTEGER MDH_ENDWORD	! Finds end of string.
- 
+
 *  Local Variables
       CHARACTER*64 DEFSTRING
       INTEGER NCHS
@@ -31,7 +31,7 @@
       LOGICAL       DOT		! Indicates if decimal point exists.
 
 * _____________________________ Executable Code ______________________________
- 
+
       IF (DEFIN) THEN
          WRITE( DEFSTRING ,'(A,F11.5 )' ) ', Default is ', DEFAULT
          NCHS = 24

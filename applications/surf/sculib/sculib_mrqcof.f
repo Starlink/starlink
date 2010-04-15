@@ -153,7 +153,7 @@
             CALL ERR_OUT (' ', 'SCULIB_MRQCOF: zero noise on point',
      :        STATUS)
          END IF
-         DY = Y(I) - YMOD 
+         DY = Y(I) - YMOD
          J = 0
          DO L = 1, MA
             IF (IA(L) .NE. 0) THEN

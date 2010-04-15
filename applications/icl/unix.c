@@ -39,7 +39,7 @@
 extern node *lookup_symbol(char *name, int type);	/* symtab.c */
 extern value sys_exception1(char *format, char *arg1);  /* procs.c  */
 extern char *editor;					/* procs.c  */
-extern value do_load 
+extern value do_load
 	(char *whofor, char *filenametobeloaded);	/* input.c  */
 
 #define FUNC_DATE	1
@@ -105,7 +105,7 @@ extern int iopid;						/* main.c */
  *
  *****************************************************************************
  */
-static value 
+static value
 Setenv(char *var, char *valu)
 {
 #if HAVE_SETENV && HAVE_UNSETENV
@@ -122,7 +122,7 @@ Setenv(char *var, char *valu)
   }
   return trueval;
 #else
- /* Should consider optionally using putenv here. I worry 
+ /* Should consider optionally using putenv here. I worry
     about memory leaks though */
     extern char **environ;			/* run time environment */
     char **environ_new;
@@ -134,7 +134,7 @@ Setenv(char *var, char *valu)
 		for (; environ[ind] != NULL; ind++)
 		    environ[ind] = environ[ind + 1];
 	    else {		/* free (environ[ind]); */
-		environ[ind] = (char *) malloc((unsigned) 
+		environ[ind] = (char *) malloc((unsigned)
 			((int) strlen(var) + (int) strlen(valu) + 2));
 		if (environ[ind] == CHARNIL)
 		    return exception("Setenv: ICL has exhausted its memory");
@@ -180,7 +180,7 @@ Setenv(char *var, char *valu)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_setenv(node *n)
 {
     char *variable, *s;
@@ -210,7 +210,7 @@ proc_setenv(node *n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_unsetenv(node *n)
 {
     char *variable;
@@ -225,7 +225,7 @@ proc_unsetenv(node *n)
     variable = string_part(val);
     return (Setenv(variable, CHARNIL));
 }
-    
+
 /******************************************************************************
  *
  * 	T I M E _ D A T E (int func)
@@ -260,7 +260,7 @@ time_date(int func)
 		1900 + now->tm_year);
     else {
 	(void) gettimeofday(&tod, (struct timezone *) 0);
-	sprintf(buf, "%2d:%02d:%05.2f", now->tm_hour, now->tm_min, 
+	sprintf(buf, "%2d:%02d:%05.2f", now->tm_hour, now->tm_min,
 		now->tm_sec + tod.tv_usec / 1e6);
     }
     return strcopy(buf);
@@ -272,7 +272,7 @@ time_date(int func)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_date(void)
 {
     char *s;
@@ -289,7 +289,7 @@ func_date(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_time(void)
 {
     char *s;
@@ -313,7 +313,7 @@ func_time(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_status(void)
 {
     return value_logical(os_status == 0);
@@ -327,7 +327,7 @@ func_status(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_ok(void)
 {
     return exception(
@@ -344,7 +344,7 @@ func_ok(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_getenv(char *s)
 {
     char *t, *p;
@@ -365,7 +365,7 @@ func_getenv(char *s)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_get_symbol(void)
 {
     return exception(
@@ -381,7 +381,7 @@ func_get_symbol(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_unimpl(void)
 {
     return exception("IMPLERR  Unimplemented function");
@@ -396,7 +396,7 @@ func_unimpl(void)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_oserr(node *n)
 {
     return exception("OSERR  not available on UNIX");
@@ -415,7 +415,7 @@ proc_oserr(node *n)
  *
  ******************************************************************************
  */
-static value 
+static value
 func_file_exists(char *s)
 {
     char *fullname;
@@ -432,16 +432,16 @@ func_file_exists(char *s)
  * Issue a command to Unix.
  *
  * Uses the fact that the iosubsystem process resets the terminal
- * characteristics to before stopping itself on receipt of an 
+ * characteristics to before stopping itself on receipt of an
  * IO_COMMAND_SUSPEND from icl. The iosubsystem then stops and awits
  * a SIGCONT signal before proceeding.
  *
- * Returns either the status returned from the shell running the command 
+ * Returns either the status returned from the shell running the command
  * or -1 if a system service fails.
  *
  ******************************************************************************
  */
-int 
+int
 os_command(char *command)
 {
     int pid, status=-1, iostatus=0;
@@ -456,7 +456,7 @@ os_command(char *command)
     signal(SIGCHLD, SIG_DFL);
 /*
  * The Unix command is likely to write directly to the tty. We suspend the
- * io-subsystem process by sending it an IO_COMMAND_SUSPEND command. 
+ * io-subsystem process by sending it an IO_COMMAND_SUSPEND command.
  * The io-subsustem resets the terminal then suspends itself waiting for
  * a SIGCONT signal.
  */
@@ -510,7 +510,7 @@ os_command(char *command)
  *
  ******************************************************************************
  */
-value 
+value
 proc_sh(node *n)
 {
     char *comm;
@@ -542,7 +542,7 @@ proc_sh(node *n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_dcl(node *n)
 {
     extern char *currentproc(void);			/* main.c */
@@ -588,7 +588,7 @@ proc_dcl(node *n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_edit(node *n)
 {
     extern value fileaproc(char *procname, char *filename,
@@ -604,7 +604,7 @@ proc_edit(node *n)
     sprintf(filename, "iclout%d.icl", getpid());
     if (proc = lookup_symbol(name, SYM_PROC))
 	fileaproc(name, filename, "EDIT");
-    sprintf(command, "%s %s", editor ? editor : (getenv("EDITOR") ? 
+    sprintf(command, "%s %s", editor ? editor : (getenv("EDITOR") ?
 				getenv("EDITOR") : "vi"), filename);
     if (os_command(command) != 0)
 	val = exception("EDIT - system editor command failed");
@@ -615,28 +615,28 @@ proc_edit(node *n)
 }
 
 /******************************************************************************
- * 
- * 
+ *
+ *
  *	P R O C _ D E F A U L T (node *n)
- * 
+ *
  * Implements the ICL command "DEFAULT directory".
- * 
+ *
  * Set the current working directory for the process running ICL.
- * The directory may be specified in any of the forms accepted by the Unix 
+ * The directory may be specified in any of the forms accepted by the Unix
  * chdir command.
- * 
+ *
  * DEFAULT with no parameter displays the current default directory.
- * 
- * On entry, n will point to the parsed abstract syntax node form of 
+ *
+ * On entry, n will point to the parsed abstract syntax node form of
  * "directory".
  * This is interpreted and, seen as a string, passed to chdir().
- * 
+ *
  * When 'n' is null or after changing directory, getcwd() is used to get the
  * current working directory.
- * 
+ *
  ******************************************************************************
  */
-static value 
+static value
 proc_default(node *n)
 {
     char *dir, *fulldir, *taskname;
@@ -664,7 +664,7 @@ proc_default(node *n)
 	   return val;
     } else {
 	if (isexc(val = interpret_to_string(arglist[1])))
-	    return val;	
+	    return val;
 	taskname = string_part(val);
         if (isexc(val = adam_control(taskname, "DEFAULT", fulldir)))
 	   return val;
@@ -691,7 +691,7 @@ proc_default(node *n)
  *
  ******************************************************************************
  */
-static value 
+static value
 proc_cd(node *n)
 {
     char *dir = CHARNIL;
@@ -721,7 +721,7 @@ proc_cd(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 proc_version(node *n)
 {
     extern char *version;
@@ -747,7 +747,7 @@ proc_version(node *n)
  *
  ******************************************************************************
  */
-value 
+value
 init_os(void)
 {
 #include "node.h"

@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -54,12 +54,12 @@ RUTHERFORD APPLETON LABORATORY\\
 %------------------------------------------------------------------------------
 
 \section{SUMMARY}
-This is a partial release of ADAM to update Version 1.9-3. 
-Full installation instructions are given in the Starlink Software 
+This is a partial release of ADAM to update Version 1.9-3.
+Full installation instructions are given in the Starlink Software
 Change Notice.
 
 The purpose of the release is to change references to the setup procedures
-for HDS and REF in line with the reorganization of those libraries. 
+for HDS and REF in line with the reorganization of those libraries.
 A new procedure is added to ease the task of starting up an ADAM session.
 
 The opportunity is also taken to update ICL and SMS with some enhancements
@@ -81,7 +81,7 @@ already been obeyed.
 \subsection{ADAMDEV}
 The setup for ADAM application development has been modified as follows:
 \begin{itemize}
-\item Now obeys HDS\_DEV to set up logical names {\em etc.} for HDS 
+\item Now obeys HDS\_DEV to set up logical names {\em etc.} for HDS
 application development.\\
 (ADAMDEV.COM, APPLOG.COM)
 \item Now defines symbol REF to be `REF\_DEV'.
@@ -105,7 +105,7 @@ The setup for ADAM system development has been modified as follows:
 before. However, that procedure no longer defines logical names for REF so
 reference to REF is removed from the comment in LIB\_DIR:LOGICAL.COM.\\
 (Modified LOGICAL.COM)
-\item HDS\_DIR is now defined as a SYSTEM logical name pointing to the 
+\item HDS\_DIR is now defined as a SYSTEM logical name pointing to the
 top-level directory for HDS, therefore a new logical name, HDS\_KERNEL, is used
 for ADAM system development to point to the HDS kernel directory.\\
 (Modified: DIR.COM, ADAMSHARE.COM, LINKNOSHR.OPT)
@@ -131,7 +131,7 @@ Notes:
 \begin{itemize}
 \item \verb%command% is optional and may be any valid ICL command, {\em e.g.}
 KAPPA.
-\item Any other initialisation procedure specified via the ICL\_LOGIN 
+\item Any other initialisation procedure specified via the ICL\_LOGIN
 logical name will still be executed beforehand.
 \item Invocations of ADAM.COM other than the first in a process will not obey
 ADAMSTART.
@@ -177,12 +177,12 @@ Note the following points:
 and \verb%<ctrl>% means press at the same time as the following letter.
 \item None of these keys get into the command buffer so can be freely mixed with
 any other input you may be entering at the command prompt.
-\item Currently the previous 100 lines of SMS output are available in this way 
+\item Currently the previous 100 lines of SMS output are available in this way
 and the width of the buffer is 132 characters.
 \item On pressing return and thus exiting from command mode, the display
 automatically scrolls to the bottom of the buffer.
 \end{itemize}
-(Modified: SMS\_\-GETUSRLIN, SMS\_\-KEYCHAR, SMS\_\-WRSCRL, SMS\_\-SCROLL\-VIEW, 
+(Modified: SMS\_\-GETUSRLIN, SMS\_\-KEYCHAR, SMS\_\-WRSCRL, SMS\_\-SCROLL\-VIEW,
 SMS\_\-GET\-USR\-KEY, SMS\_\-DODCL, SMS\-DEFNS, SMS\-COM\-SMG, INFO.LIS\\
 New include file: SMSCOMVIEW.)
 
@@ -190,7 +190,7 @@ New include file: SMSCOMVIEW.)
 SSN/45.13 and ARN/19-4.1 describe ADAM release 1.9-4. The ARN will remain when
 the SSN is superseded.
 
-The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have 
+The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have
 been updated, as has the COPYDOCS procedure.
 
 \section{BUGS FIXED}
@@ -203,7 +203,7 @@ large number of LOAD commands, has been fixed.\\
 \item LOAD files are now opened `READONLY' to prevent inter-user conflicts.\\
 (Modified: ICLMAIN.PAS)
 \item A bug, which caused incorrect behaviour if \verb%<CR>% or \verb%?% was
-given in response to parameter prompts when ICL was in screen mode, has been 
+given in response to parameter prompts when ICL was in screen mode, has been
 fixed. (There is still a problem if \verb%<TAB>% is typed.)\\
 (Modified: UFACE\_ASKPARAM)
 \end{itemize}

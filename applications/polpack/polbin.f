@@ -29,13 +29,13 @@
 *     terms of the X and Y columns in the catalogue. Spectropolarimetry
 *     data can also be binned in the frequency axis (see parameter ZBOX).
 *     The grid contains sufficient cells to include all the vector
-*     positions included in the input catalogue. Each position in the output 
-*     catalogue corresponds to one of these cells. The Stokes parameters for 
-*     the cell are formed by combining together the Stokes parameters of all 
-*     input positions which fall within the cell, using the method specified 
-*     by the parameter METHOD. The degree of polarization, angle of 
-*     polarization, and polarized intensity are then derived from these 
-*     combined Stokes parameters. The vector position in the output catalogue 
+*     positions included in the input catalogue. Each position in the output
+*     catalogue corresponds to one of these cells. The Stokes parameters for
+*     the cell are formed by combining together the Stokes parameters of all
+*     input positions which fall within the cell, using the method specified
+*     by the parameter METHOD. The degree of polarization, angle of
+*     polarization, and polarized intensity are then derived from these
+*     combined Stokes parameters. The vector position in the output catalogue
 *     is the position at the centre of the corresponding cell.
 
 *  Usage:
@@ -43,17 +43,17 @@
 
 *  ADAM Parameters:
 *     BOX( 2 ) = _REAL (Read)
-*        The x and y bin sizes. These values refer to the coordinate Frame 
+*        The x and y bin sizes. These values refer to the coordinate Frame
 *        defined by columns "X" and "Y" and will usually be in units of pixels.
 *        This parameter is not accessed if parameter INTEGRATE is TRUE.
 *        Parameter ZBOX specifies binning along the frequency axis when
 *        dealing with spectropolarimeter data.
 *     DEBIAS = _LOGICAL (Read)
 *        TRUE if a correction for statistical bias is to be made to
-*        percentage polarization and polarized intensity. The returned 
-*        variance values are unchanged. This correction only applies to 
-*        calculations of linear polarization, and cannot be used if the 
-*        input catalogue does not contain variance values. If a null value 
+*        percentage polarization and polarized intensity. The returned
+*        variance values are unchanged. This correction only applies to
+*        calculations of linear polarization, and cannot be used if the
+*        input catalogue does not contain variance values. If a null value
 *        (!) is supplied, then the correction is applied if output variances
 *        are being created, and not otherwise.           [!]
 *     IN = LITERAL (Read)
@@ -61,10 +61,10 @@
 *        if none is provided.
 *     INTEGRATE = LOGICAL_ (Read)
 *        If TRUE, then all the input vectors are placed in a single bin.
-*        In this case, parameter BOX is not used and the output catalogue 
+*        In this case, parameter BOX is not used and the output catalogue
 *        will contain only a single vector. [FALSE]
 *     METHOD = LITERAL (Read)
-*        The method to be used when binning Stokes parameters. This may be 
+*        The method to be used when binning Stokes parameters. This may be
 *        set to any unique abbreviation of the following:
 *           -  MEAN      -- Mean of the input data values
 *           -  MEDIAN    -- Median of the input data values
@@ -78,43 +78,43 @@
 *        if none is provided.
 *     RADEC = _LOGICAL (Read)
 *        If TRUE, columns holding the RA and DEC (FK5, J2000) are added
-*        to the output catalogue, if the input catalogue contains the 
-*        necessary WCS information. If FALSE, no RA and DEC columns are 
-*        written. For large catalogues, creating RA and DEC columns can 
+*        to the output catalogue, if the input catalogue contains the
+*        necessary WCS information. If FALSE, no RA and DEC columns are
+*        written. For large catalogues, creating RA and DEC columns can
 *        cause a significant delay. [current value]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
 *     ZBOX = _REAL (Read)
-*        The bin size along the third (Z) axis in the input catalogue. 
+*        The bin size along the third (Z) axis in the input catalogue.
 *        a Z column. The supplied value should usually be in units of pixels.
 *        This parameter is not accessed if parameter INTEGRATE is TRUE, or
 *        if the input catalogue does not contain a Z column.
 
 *  Notes:
 *     -  The reference direction for the Stokes vectors and polarization
-*     vectors in the output catalogue will be north if the input catalogue 
-*     has a celestial co-ordinate Frame within its WCS information. Otherwise, 
+*     vectors in the output catalogue will be north if the input catalogue
+*     has a celestial co-ordinate Frame within its WCS information. Otherwise,
 *     the reference direction will be the second pixel axis. The POLANAL
 *     Frame in the WCS information of the output catalogue is updated to
 *     describe the new reference direction.
 *     -  The bottom left corner of each bin is chosen so that the origin
-*     of the (X,Y) Frame (or (X,Y,Z) Frame if the data is 3D) would 
-*     correspond to a bin corner. 
+*     of the (X,Y) Frame (or (X,Y,Z) Frame if the data is 3D) would
+*     correspond to a bin corner.
 
 *  Examples:
 *     polbin intab outtab 4
 *        Bins the Stokes parameters in catalogue "intab.FIT" and produces
 *        catalogue "outtab.FIT" containing binned Stokes parameters and
 *        corresponding polarization parameters. Each bin measures 4 pixels
-*        along both the X and Y axes, and has a value based on the median 
+*        along both the X and Y axes, and has a value based on the median
 *        of the corresponding input Stokes values.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -131,8 +131,8 @@
 *     6-APR-1999 (DSB):
 *        Changed reference direction scheme.
 *     14-MAR-2000 (DSB):
-*        Change the choice of bottom left corner of each bin so that the 
-*        origin of the (X,Y) Frame would correspond to a bin corner. 
+*        Change the choice of bottom left corner of each bin so that the
+*        origin of the (X,Y) Frame would correspond to a bin corner.
 *     17-DEC-2000 (DSB):
 *        Added parameter INTEGRATE.
 *     5-FEB-2001 (DSB):
@@ -156,9 +156,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT_ constants 
-      INCLUDE 'NDF_PAR'          ! NDF_ constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CAT_PAR'          ! CAT_ constants
+      INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -168,9 +168,9 @@
       INTEGER KPG1_CEIL          ! Returns smallest integer >= X
       INTEGER KPG1_FLOOR         ! Returns largest integer <= X
       INTEGER CHR_LEN            ! Used length of a string
-   
+
 *  Local Constants:
-      INTEGER MAX_ID               
+      INTEGER MAX_ID
       PARAMETER ( MAX_ID = 11 )
 
 *  Local Variables:
@@ -234,7 +234,7 @@
       INTEGER NCOL               ! No. of columns to be read
       INTEGER NDIMO              ! No. of dimensions in output NDFs
       INTEGER NEXTID             ! Next Id to use
-      INTEGER NMAT               ! Size of workspace 
+      INTEGER NMAT               ! Size of workspace
       INTEGER NSTOKE             ! No. of planes in cube
       INTEGER NVAL               ! No. of BOX values supplied
       INTEGER NXBIN              ! No. of output bins along X axis
@@ -280,12 +280,12 @@
       REAL NSIGMA                ! No. of sigmas to clip at
       REAL Q                     ! Stored Q in input catalogue
       REAL RTOD                  ! Conversion factor; radians to degrees
-      REAL SXHI                  ! Upper bound of used region of X axis 
-      REAL SXLO                  ! Lower bound of used region of X axis 
-      REAL SYHI                  ! Upper bound of used region of Y axis 
-      REAL SYLO                  ! Lower bound of used region of Y axis 
-      REAL SZHI                  ! Upper bound of used region of Z axis 
-      REAL SZLO                  ! Lower bound of used region of Z axis 
+      REAL SXHI                  ! Upper bound of used region of X axis
+      REAL SXLO                  ! Lower bound of used region of X axis
+      REAL SYHI                  ! Upper bound of used region of Y axis
+      REAL SYLO                  ! Lower bound of used region of Y axis
+      REAL SZHI                  ! Upper bound of used region of Z axis
+      REAL SZLO                  ! Lower bound of used region of Z axis
       REAL TR( 6 )               ! Coeff.s of (X,Y,Z) -> cell indices mapping
       REAL TR2( 6 )              ! Coeff.s of cell indices -> (X,Y,Z) mapping
       REAL U                     ! Stored U in input catalogue
@@ -322,11 +322,11 @@
 *  Get CAT identifiers for the required columns. First get position columns
 *  (X and Y) and total intensity (I).
       X_ID = 1
-      CALL POL1_GTCOL( CIIN, 'X', .TRUE., GI( X_ID ), STATUS )       
+      CALL POL1_GTCOL( CIIN, 'X', .TRUE., GI( X_ID ), STATUS )
       Y_ID = 2
-      CALL POL1_GTCOL( CIIN, 'Y', .TRUE., GI( Y_ID ), STATUS )       
+      CALL POL1_GTCOL( CIIN, 'Y', .TRUE., GI( Y_ID ), STATUS )
       I_ID = 3
-      CALL POL1_GTCOL( CIIN, 'I', .TRUE., GI( I_ID ), STATUS )       
+      CALL POL1_GTCOL( CIIN, 'I', .TRUE., GI( I_ID ), STATUS )
 
       NEXTID = 4
 
@@ -334,8 +334,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If there is a column named "Z" we are dealing with spectropolarimetry.
-*  Attempt to get a CAT identifier for the "Z" column. 
-      CALL POL1_GTCOL( CIIN, 'Z', .FALSE., GI( NEXTID ), STATUS )       
+*  Attempt to get a CAT identifier for the "Z" column.
+      CALL POL1_GTCOL( CIIN, 'Z', .FALSE., GI( NEXTID ), STATUS )
       IF( GI( NEXTID ) .EQ. CAT__NOID ) THEN
          SPEC = .FALSE.
          NDIMO = 2
@@ -350,16 +350,16 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If there is a column named "V" we are dealing with circular polarimetry.
-*  Attempt to get a CAT identifier for the "V" column. Otherwise, 
-*  assume we are dealing with linear polarimetry. In this case get columns 
-*  for Q and U instead. 
-      CALL POL1_GTCOL( CIIN, 'V', .FALSE., GI( NEXTID ), STATUS )       
+*  Attempt to get a CAT identifier for the "V" column. Otherwise,
+*  assume we are dealing with linear polarimetry. In this case get columns
+*  for Q and U instead.
+      CALL POL1_GTCOL( CIIN, 'V', .FALSE., GI( NEXTID ), STATUS )
       IF( GI( NEXTID ) .EQ. CAT__NOID ) THEN
          CIRC = .FALSE.
          Q_ID = NEXTID
          U_ID = NEXTID + 1
-         CALL POL1_GTCOL( CIIN, 'Q', .TRUE., GI( Q_ID ), STATUS )       
-         CALL POL1_GTCOL( CIIN, 'U', .TRUE., GI( U_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'Q', .TRUE., GI( Q_ID ), STATUS )
+         CALL POL1_GTCOL( CIIN, 'U', .TRUE., GI( U_ID ), STATUS )
          NEXTID = NEXTID + 2
       ELSE
          CIRC = .TRUE.
@@ -371,11 +371,11 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Try to find corresponding error columns for these columns (except X
-*  and Y (and Z) ). 
-      CALL POL1_GTCOL( CIIN, 'DI', .TRUE., GI( NEXTID ), STATUS )       
+*  and Y (and Z) ).
+      CALL POL1_GTCOL( CIIN, 'DI', .TRUE., GI( NEXTID ), STATUS )
 
       IF( CIRC ) THEN
-         CALL POL1_GTCOL( CIIN, 'DV', .TRUE., GI( NEXTID + 1 ), STATUS ) 
+         CALL POL1_GTCOL( CIIN, 'DV', .TRUE., GI( NEXTID + 1 ), STATUS )
       ELSE
          CALL POL1_GTCOL( CIIN, 'DQ', .TRUE., GI( NEXTID + 1 ), STATUS )
          CALL POL1_GTCOL( CIIN, 'DU', .TRUE., GI( NEXTID + 2 ), STATUS )
@@ -388,14 +388,14 @@
          VAR = .FALSE.
          CALL ERR_BEGIN( STATUS )
 
-         CALL CAT_TRLSE( GI( NEXTID ), STATUS )       
+         CALL CAT_TRLSE( GI( NEXTID ), STATUS )
 
          IF( CIRC ) THEN
-            CALL CAT_TRLSE( GI( NEXTID + 1 ), STATUS )       
+            CALL CAT_TRLSE( GI( NEXTID + 1 ), STATUS )
             NCOL = 4
          ELSE
-            CALL CAT_TRLSE( GI( NEXTID + 1 ), STATUS )       
-            CALL CAT_TRLSE( GI( NEXTID + 2 ), STATUS )       
+            CALL CAT_TRLSE( GI( NEXTID + 1 ), STATUS )
+            CALL CAT_TRLSE( GI( NEXTID + 2 ), STATUS )
             NCOL = 5
          END IF
 
@@ -456,32 +456,32 @@
 
 *  Read the required columns from the catalogue into the work arrays
 *  allocated above. This is done in a single pass through the catalogue
-*  in order to speed it up a bit. 
-      CALL POL1_CTCLM( CIIN, NCIN, NCOL, GI, %VAL( CNF_PVAL( IP ) ), 
+*  in order to speed it up a bit.
+      CALL POL1_CTCLM( CIIN, NCIN, NCOL, GI, %VAL( CNF_PVAL( IP ) ),
      :                 STATUS )
 
 *  Square the standard deviation columns so that they become variance values.
       IF( VAR ) THEN
          CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IP ) + VIOFF ), STATUS )
          IF( CIRC ) THEN
-            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IP ) + VVOFF ), 
+            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IP ) + VVOFF ),
      :                       STATUS )
          ELSE
-            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IP ) + VQOFF ), 
+            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IP ) + VQOFF ),
      :                       STATUS )
-            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IP ) + VUOFF ), 
+            CALL POL1_SQUAR( NCIN, %VAL( CNF_PVAL( IP ) + VUOFF ),
      :                       STATUS )
-         END IF          
+         END IF
       END IF
 
 *  Attempt to read an AST FrameSet from the input catalogue. This WCS
 *  information will be copied to the output catalogue when the
-*  output catalogue is closed. 
+*  output catalogue is closed.
       CALL POL1_GTCTW( CIIN, IWCS, STATUS )
 
-*  Get the ACW angle from the X axis to the input reference direction 
+*  Get the ACW angle from the X axis to the input reference direction
 *  (ANGROT). This is defined by the POLANAL Frame in the WCS FrameSet.
-      IF( IWCS .NE. AST__NULL ) THEN 
+      IF( IWCS .NE. AST__NULL ) THEN
          ANGROT = 0.0
          CALL POL1_GTANG( NDF__NOID, CIIN, IWCS, ANGROT, STATUS )
 
@@ -498,27 +498,27 @@
      :                 'axis.', STATUS )
          CALL MSG_BLANK( STATUS )
 
-*  Create a default FrameSet containing a single Frame describing the X and 
+*  Create a default FrameSet containing a single Frame describing the X and
 *  Y columns. The Axis Symbols are assigned the column names.
          FRM = AST_FRAME( NDIMO, ' ', STATUS )
 
          CALL CAT_TIQAC( GI( X_ID ), 'NAME', NAME, STATUS )
-         CALL AST_SETC( FRM, 'Symbol(1)', NAME( : CHR_LEN( NAME ) ), 
+         CALL AST_SETC( FRM, 'Symbol(1)', NAME( : CHR_LEN( NAME ) ),
      :                  STATUS )
-         CALL AST_SETC( FRM, 'Label(1)', NAME( : CHR_LEN( NAME ) ), 
+         CALL AST_SETC( FRM, 'Label(1)', NAME( : CHR_LEN( NAME ) ),
      :                  STATUS )
 
          CALL CAT_TIQAC( GI( Y_ID ), 'NAME', NAME, STATUS )
-         CALL AST_SETC( FRM, 'Symbol(2)', NAME( : CHR_LEN( NAME ) ), 
+         CALL AST_SETC( FRM, 'Symbol(2)', NAME( : CHR_LEN( NAME ) ),
      :                  STATUS )
-         CALL AST_SETC( FRM, 'Label(2)', NAME( : CHR_LEN( NAME ) ), 
+         CALL AST_SETC( FRM, 'Label(2)', NAME( : CHR_LEN( NAME ) ),
      :                  STATUS )
 
          IF( SPEC ) THEN
             CALL CAT_TIQAC( GI( Z_ID ), 'NAME', NAME, STATUS )
-            CALL AST_SETC( FRM, 'Symbol(3)', NAME( : CHR_LEN( NAME ) ), 
+            CALL AST_SETC( FRM, 'Symbol(3)', NAME( : CHR_LEN( NAME ) ),
      :                  STATUS )
-            CALL AST_SETC( FRM, 'Label(3)', NAME( : CHR_LEN( NAME ) ), 
+            CALL AST_SETC( FRM, 'Label(3)', NAME( : CHR_LEN( NAME ) ),
      :                  STATUS )
          END IF
 
@@ -542,9 +542,9 @@
          CALL ERR_ANNUL( STATUS )
          DEBIAS = VAR
 
-*  Otherwise issue a warning if the user wants to debias the results and there 
+*  Otherwise issue a warning if the user wants to debias the results and there
 *  are no variances available.
-      ELSE IF ( DEBIAS .AND. ( .NOT. VAR ) .AND. 
+      ELSE IF ( DEBIAS .AND. ( .NOT. VAR ) .AND.
      :          STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLBIN_2', 'Vectors will not be '/
@@ -554,35 +554,35 @@
          DEBIAS = .FALSE.
       END IF
 
-*  Get the coefficients of the linear transformation from (X,Y(,Z)) 
+*  Get the coefficients of the linear transformation from (X,Y(,Z))
 *  position to bin indices.
 *  =================================================================
 *  Find the maximum and minimum X value. Ensure that at least one pixel
 *  is spanned by the recorded max and min values.
-      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + XOFF ), 
+      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + XOFF ),
      :                 NBAD, SXHI,
      :                 SXLO, MAXPOS, MINPOS, STATUS )
       IF( SXHI - SXLO .LT. 1.0  ) THEN
-         SXHI = 0.5*( SXHI + SXLO + 1.0 ) 
+         SXHI = 0.5*( SXHI + SXLO + 1.0 )
          SXLO = SXHI - 1.0
       END IF
 
 *  Find the maximum and minimum Y value.
-      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + YOFF ), 
+      CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + YOFF ),
      :                 NBAD, SYHI,
      :                 SYLO, MAXPOS, MINPOS, STATUS )
       IF( SYHI - SYLO .LT. 1.0  ) THEN
-         SYHI = 0.5*( SYHI + SYLO + 1.0 ) 
+         SYHI = 0.5*( SYHI + SYLO + 1.0 )
          SYLO = SYHI - 1.0
       END IF
 
 *  If required find min and max Z values.
-      IF( SPEC ) THEN 
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + ZOFF ), 
+      IF( SPEC ) THEN
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + ZOFF ),
      :                    NBAD, SZHI,
      :                    SZLO, MAXPOS, MINPOS, STATUS )
          IF( SZHI - SZLO .LT. 1.0  ) THEN
-            SZHI = 0.5*( SZHI + SZLO + 1.0 ) 
+            SZHI = 0.5*( SZHI + SZLO + 1.0 )
             SZLO = SZHI - 1.0
          END IF
       ELSE
@@ -603,10 +603,10 @@
       IF( .NOT. INTGRT ) THEN
 
 *  Obtain the sizes of each bin.
-         CALL PAR_GDRVR( 'BOX', 2, 1.0E-6, VAL__MAXR, BOX, NVAL, 
+         CALL PAR_GDRVR( 'BOX', 2, 1.0E-6, VAL__MAXR, BOX, NVAL,
      :                   STATUS )
 
-*  Duplicate the value if only a single value was given.  
+*  Duplicate the value if only a single value was given.
          IF ( NVAL .LT. 2 ) BOX( 2 ) = BOX( 1 )
 
 *  If required, get the spectral bin size.
@@ -640,7 +640,7 @@
 *  Find the total number of bins.
          NBIN = NXBIN*NYBIN*NZBIN
 
-*  Find the X, Y and Z values corresponding to the bottom left corner of the 
+*  Find the X, Y and Z values corresponding to the bottom left corner of the
 *  bottom left bin. Again, this assumes that the origin on each axis is at
 *  a bin edge.
          X0 = IXLO*BOX( 1 )
@@ -649,7 +649,7 @@
 
 *  Find the coefficients of the transformation. The X cell index for a
 *  position (X,Y,Z) is given by INT( TR( 1 ) + TR( 2 )*X ), the Y cell
-*  index is given by INT( TR( 3 ) + TR( 4 )*Y ), the Z cell index is given 
+*  index is given by INT( TR( 3 ) + TR( 4 )*Y ), the Z cell index is given
 *  by INT( TR( 5 ) + TR( 6 )*Z ).
          TR( 1 ) = 1.0 - X0/BOX( 1 )
          TR( 2 ) = 1.0/BOX( 1 )
@@ -674,11 +674,11 @@
          NYBIN = 1
          NZBIN = 1
          NBIN = 1
-         TR( 1 ) = 1.0 
+         TR( 1 ) = 1.0
          TR( 2 ) = 0.0
-         TR( 3 ) = 1.0 
+         TR( 3 ) = 1.0
          TR( 4 ) = 0.0
-         TR( 5 ) = 1.0 
+         TR( 5 ) = 1.0
          TR( 6 ) = 0.0
          TR2( 1 ) = XC
          TR2( 2 ) = 0.0
@@ -690,7 +690,7 @@
 
 *  Now find the largest number of input positions inn any bin.
 *  ===========================================================
-*  Allocate an integer work array with one element per bin to hold the 
+*  Allocate an integer work array with one element per bin to hold the
 *  number of input positions in each bin.
       CALL PSX_CALLOC( NBIN, '_INTEGER', IPW1, STATUS )
 
@@ -699,16 +699,16 @@
 
 *  Count the number of input catalogue positions contained in each output
 *  cell. The largest number in any one cell is returned.
-      CALL POL1_CLCNT( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + XOFF ), 
+      CALL POL1_CLCNT( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + XOFF ),
      :                 %VAL( CNF_PVAL( IP ) + YOFF ),
-     :                 %VAL( CNF_PVAL( IP ) + ZOFF ), TR, NXBIN, NYBIN, 
+     :                 %VAL( CNF_PVAL( IP ) + ZOFF ), TR, NXBIN, NYBIN,
      :                 NZBIN, %VAL( CNF_PVAL( IPW1 ) ), MXCNT, STATUS )
 
 *  Now copy the input Stokes parameters into arrays suitable for binning
 *  using the vector routines of CCDPACK.
 *  =====================================================================
 *  Each value to be binned requires a 2D array in which each column
-*  corresponds to one output cell. The CCDPACK routines combine the values 
+*  corresponds to one output cell. The CCDPACK routines combine the values
 *  in each column to form a combined column value which is stored in the
 *  output catalogue. First, allocate an array for the total intensity.
       CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPIST, STATUS )
@@ -717,12 +717,12 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the total intensity values from the input catalogue to the work array.
-      CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + IOFF ), 
-     :                %VAL( CNF_PVAL( IP ) + XOFF ), 
+      CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + IOFF ),
+     :                %VAL( CNF_PVAL( IP ) + XOFF ),
      :                %VAL( CNF_PVAL( IP ) + YOFF ),
-     :                %VAL( CNF_PVAL( IP ) + ZOFF ), 
+     :                %VAL( CNF_PVAL( IP ) + ZOFF ),
      :                NXBIN, NYBIN, NZBIN, MXCNT, TR,
-     :                %VAL( CNF_PVAL( IPIST ) ), 
+     :                %VAL( CNF_PVAL( IPIST ) ),
      :                %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
 *  Do the same for the other required Stokes vectors (V, or Q and U).
@@ -730,11 +730,11 @@
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VOFF ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VOFF ),
      :                   %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                   %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                   %VAL( CNF_PVAL( IP ) + YOFF ),
      :                   %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
-     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVST ) ), 
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVST ) ),
      :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
@@ -742,22 +742,22 @@
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPQST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + QOFF ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + QOFF ),
      :                   %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                   %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                   %VAL( CNF_PVAL( IP ) + YOFF ),
      :                   %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
-     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPQST ) ), 
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPQST ) ),
      :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPUST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + UOFF ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + UOFF ),
      :                   %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                   %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                   %VAL( CNF_PVAL( IP ) + YOFF ),
      :                   %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
-     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPUST ) ), 
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPUST ) ),
      :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
       END IF
@@ -767,11 +767,11 @@
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVIST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VIOFF ), 
+         CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VIOFF ),
      :                   %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                   %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                   %VAL( CNF_PVAL( IP ) + YOFF ),
      :                   %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
-     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVIST ) ), 
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVIST ) ),
      :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
@@ -779,11 +779,11 @@
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVVST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VVOFF ), 
+            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VVOFF ),
      :                      %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                      %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                      %VAL( CNF_PVAL( IP ) + YOFF ),
      :                      %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
-     :                      NZBIN, MXCNT, TR, 
+     :                      NZBIN, MXCNT, TR,
      :                      %VAL( CNF_PVAL( IPVVST ) ),
      :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
@@ -791,22 +791,22 @@
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVQST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VQOFF ), 
+            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VQOFF ),
      :                      %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                      %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                      %VAL( CNF_PVAL( IP ) + YOFF ),
      :                      %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
-     :                      NZBIN, MXCNT, TR, 
+     :                      NZBIN, MXCNT, TR,
      :                      %VAL( CNF_PVAL( IPVQST ) ),
      :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVUST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VUOFF ), 
+            CALL POL1_STK2( NCIN, SPEC, %VAL( CNF_PVAL( IP ) + VUOFF ),
      :                      %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                      %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                      %VAL( CNF_PVAL( IP ) + YOFF ),
      :                      %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
-     :                      NZBIN, MXCNT, TR, 
+     :                      NZBIN, MXCNT, TR,
      :                      %VAL( CNF_PVAL( IPVUST ) ),
      :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
@@ -823,11 +823,11 @@
 
 *  If using sigma clipping, get the number of sigmas to clip at.
       IF ( METH .EQ. 'SIGMA' ) THEN
-         CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA, 
+         CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA,
      :                   STATUS )
       END IF
 
-*  Get the absolute number of good input values required to create a good 
+*  Get the absolute number of good input values required to create a good
 *  output value.
       CALL PAR_GET0I( 'MINVAL', MINVAL, STATUS )
       MINVAL = MIN( 1, MINVAL )
@@ -841,7 +841,7 @@
 
       IF( VAR .AND. METH .NE. 'MEAN' .AND. STATUS .EQ. SAI__OK ) THEN
          CALL PSX_CALLOC( MXCNT, '_DOUBLE', IPPP, STATUS )
-         NMAT = MXCNT*( MXCNT + 1 )/2 
+         NMAT = MXCNT*( MXCNT + 1 )/2
          CALL PSX_CALLOC( MXCNT*NMAT, '_DOUBLE', IPCOV, STATUS )
          IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'POLBIN_3', 'Try using METHOD=MEAN or '//
@@ -852,12 +852,12 @@
          IPCOV = IPNCON
       END IF
 
-*  Allocate an array to hold the binned values. This array is accessed 
-*  as a 4D hyper-cube by POL1_PLVEC. The hyper-cube consists of 2 or 3 
-*  cubes (depending on whether or not we are doing circular polarimetry), 
-*  each spanned by the X, Y and Z axes (having NXBIN, NYBIN and NZBIN 
-*  elements respectively). The first cube contains total intensity, the 
-*  second contains V or Q, and the third (if used) contains U. Get pointers 
+*  Allocate an array to hold the binned values. This array is accessed
+*  as a 4D hyper-cube by POL1_PLVEC. The hyper-cube consists of 2 or 3
+*  cubes (depending on whether or not we are doing circular polarimetry),
+*  each spanned by the X, Y and Z axes (having NXBIN, NYBIN and NZBIN
+*  elements respectively). The first cube contains total intensity, the
+*  second contains V or Q, and the third (if used) contains U. Get pointers
 *  to the start of each cube.
       IF( CIRC ) THEN
          CALL PSX_CALLOC( NBIN*2, '_REAL', IPBIN, STATUS )
@@ -896,116 +896,116 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Bin the total intensity...
-         CALL POL1_CM1RR( %VAL( CNF_PVAL( IPIST ) ), NBIN, MXCNT, 
+         CALL POL1_CM1RR( %VAL( CNF_PVAL( IPIST ) ), NBIN, MXCNT,
      :                    %VAL( CNF_PVAL( IPVIST ) ),
-     :                    METH, MINVAL, NSIGMA, 
+     :                    METH, MINVAL, NSIGMA,
      :                    %VAL( CNF_PVAL( IPBIN ) + IBNOFF ),
-     :                    %VAL( CNF_PVAL( IPVBIN ) + VIBNOFF ), 
+     :                    %VAL( CNF_PVAL( IPVBIN ) + VIBNOFF ),
      :                    %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                    %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :                    %VAL( CNF_PVAL( IPPP ) ), 
+     :                    %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                    %VAL( CNF_PVAL( IPPP ) ),
      :                    %VAL( CNF_PVAL( IPCOV ) ),
-     :                    NMAT, %VAL( CNF_PVAL( IPNCON ) ), 
+     :                    NMAT, %VAL( CNF_PVAL( IPNCON ) ),
      :                    %VAL( CNF_PVAL( IPPNT ) ),
      :                    %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  Bin V (if needed)...
          IF( CIRC ) THEN
-            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPVST ) ), NBIN, MXCNT, 
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPVST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVVST ) ),
-     :                       METH, MINVAL, NSIGMA, 
+     :                       METH, MINVAL, NSIGMA,
      :                       %VAL( CNF_PVAL( IPBIN ) + VBNOFF ),
-     :                       %VAL( CNF_PVAL( IPVBIN ) + VVBNOFF ), 
+     :                       %VAL( CNF_PVAL( IPVBIN ) + VVBNOFF ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPPP ) ),
-     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT, 
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT,
      :                       %VAL( CNF_PVAL( IPNCON ) ),
-     :                       %VAL( CNF_PVAL( IPPNT ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 
 *  Bin Q and U (if needed)...
-         ELSE 
-            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPQST ) ), NBIN, MXCNT, 
+         ELSE
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPQST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVQST ) ),
-     :                       METH, MINVAL, NSIGMA, 
+     :                       METH, MINVAL, NSIGMA,
      :                       %VAL( CNF_PVAL( IPBIN ) + QBNOFF ),
-     :                       %VAL( CNF_PVAL( IPVBIN ) + VQBNOFF ), 
+     :                       %VAL( CNF_PVAL( IPVBIN ) + VQBNOFF ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPPP ) ),
-     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT, 
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT,
      :                       %VAL( CNF_PVAL( IPNCON ) ),
-     :                       %VAL( CNF_PVAL( IPPNT ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
-            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPUST ) ), NBIN, MXCNT, 
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPUST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVUST ) ),
-     :                       METH, MINVAL, NSIGMA, 
+     :                       METH, MINVAL, NSIGMA,
      :                       %VAL( CNF_PVAL( IPBIN ) + UBNOFF ),
-     :                       %VAL( CNF_PVAL( IPVBIN ) + VUBNOFF ), 
+     :                       %VAL( CNF_PVAL( IPVBIN ) + VUBNOFF ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
      :                       %VAL( CNF_PVAL( IPPP ) ),
-     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT, 
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT,
      :                       %VAL( CNF_PVAL( IPNCON ) ),
-     :                       %VAL( CNF_PVAL( IPPNT ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          END IF
 
 *  Now do the binning if there are no variances.
       ELSE
 
-*  Allocate an array to hold the variance to use for each line of data, 
+*  Allocate an array to hold the variance to use for each line of data,
 *  and set each element to 1.0 (i.e. give all input values equal weight).
          CALL PSX_CALLOC( MXCNT, '_REAL', IPVAR, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
-         CALL POL1_SETR( MXCNT, 1.0, %VAL( CNF_PVAL( IPVAR ) ), 
+         CALL POL1_SETR( MXCNT, 1.0, %VAL( CNF_PVAL( IPVAR ) ),
      :                   STATUS )
 
 *  Total intensity...
-         CALL POL1_CM3RR( %VAL( CNF_PVAL( IPIST ) ), NBIN, MXCNT, 
+         CALL POL1_CM3RR( %VAL( CNF_PVAL( IPIST ) ), NBIN, MXCNT,
      :                    %VAL( CNF_PVAL( IPVAR ) ),
-     :                    METH, MINVAL, NSIGMA, 
+     :                    METH, MINVAL, NSIGMA,
      :                    %VAL( CNF_PVAL( IPBIN ) + IBNOFF ),
-     :                    %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                    %VAL( CNF_PVAL( IPWRK1 ) ),
      :                    %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                    %VAL( CNF_PVAL( IPNCON ) ), 
+     :                    %VAL( CNF_PVAL( IPNCON ) ),
      :                    %VAL( CNF_PVAL( IPPNT ) ),
      :                    %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  V (if needed)...
          IF( CIRC ) THEN
-            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPVST ) ), NBIN, MXCNT, 
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPVST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVAR ) ),
-     :                       METH, MINVAL, NSIGMA, 
+     :                       METH, MINVAL, NSIGMA,
      :                       %VAL( CNF_PVAL( IPBIN ) + VBNOFF ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
      :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
      :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  Q and U (if needed)...
-         ELSE 
-            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPQST ) ), NBIN, MXCNT, 
+         ELSE
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPQST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVAR ) ),
-     :                       METH, MINVAL, NSIGMA, 
+     :                       METH, MINVAL, NSIGMA,
      :                       %VAL( CNF_PVAL( IPBIN ) + QBNOFF ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
      :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
      :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
-            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPUST ) ), NBIN, MXCNT, 
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPUST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVAR ) ),
-     :                       METH, MINVAL, NSIGMA, 
+     :                       METH, MINVAL, NSIGMA,
      :                       %VAL( CNF_PVAL( IPBIN ) + UBNOFF ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
      :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
      :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
          END IF
@@ -1023,13 +1023,13 @@
 
 *  Get the units string from total intensity column of the input catalogue.
       UNITS = ' '
-      CALL CAT_TIQAC( GI( I_ID ), 'UNITS', UNITS, STATUS) 
+      CALL CAT_TIQAC( GI( I_ID ), 'UNITS', UNITS, STATUS)
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the TITLE parameter (if any) from the input catalogue.
-      CALL CAT_TIDNT( CIIN, 'TITLE', GTTL, STATUS )       
+      CALL CAT_TIDNT( CIIN, 'TITLE', GTTL, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS )
          CALL CAT_TRLSE( GTTL, STATUS )
@@ -1054,7 +1054,7 @@
 *  Allocate work arrays.
       IF( EQMAP .NE. AST__NULL ) THEN
          CALL PSX_CALLOC( NXBIN*NYBIN*NDIMO, '_DOUBLE', IPW2, STATUS )
-      ELSE 
+      ELSE
          IPW2 = IP
       END IF
 
@@ -1062,31 +1062,31 @@
 *  produce output images containing the polarization parameters, These
 *  are not wanted here, but pointers still have to be given even though
 *  they are ignored. Use IP as a safe pointer.
-      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE, 
-     :                 NXBIN*NYBIN, %VAL( CNF_PVAL( IPBIN ) ), 
+      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE,
+     :                 NXBIN*NYBIN, %VAL( CNF_PVAL( IPBIN ) ),
      :                 %VAL( CNF_PVAL( IPVBIN ) ),
      :                 STOKES, DEBIAS, VAR, ANGROT, ANGRT, NDIMO,
      :                 .FALSE., .FALSE., .FALSE., .FALSE.,
-     :                 .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
-     :                 %VAL( CNF_PVAL( IP ) ), 
-     :                 %VAL( CNF_PVAL( IP ) ), 
+     :                 .FALSE., .FALSE., .FALSE., .TRUE., CIOUT,
      :                 %VAL( CNF_PVAL( IP ) ),
-     :                 %VAL( CNF_PVAL( IP ) ), 
-     :                 %VAL( CNF_PVAL( IP ) ), 
      :                 %VAL( CNF_PVAL( IP ) ),
-     :                 %VAL( CNF_PVAL( IP ) ), 
-     :                 %VAL( CNF_PVAL( IP ) ), 
      :                 %VAL( CNF_PVAL( IP ) ),
-     :                 %VAL( CNF_PVAL( IP ) ), 
-     :                 %VAL( CNF_PVAL( IP ) ), 
      :                 %VAL( CNF_PVAL( IP ) ),
-     :                 %VAL( CNF_PVAL( IP ) ), 
-     :                 %VAL( CNF_PVAL( IP ) ), 
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
+     :                 %VAL( CNF_PVAL( IP ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 STATUS )
 
 *  Free the work space.
-      IF( EQMAP .NE. AST__NULL ) CALL PSX_FREE( IPW2, STATUS )   
+      IF( EQMAP .NE. AST__NULL ) CALL PSX_FREE( IPW2, STATUS )
 
 *  Closedown sequence.
 *  ===================
@@ -1094,7 +1094,7 @@
 *  Arrive here if an error occurs.
  999  CONTINUE
 
-*  Close the output catalogue, storing a copy of the WCS information from 
+*  Close the output catalogue, storing a copy of the WCS information from
 *  the input catalogue.
       CALL POL1_CLCAT( IWCS, CIOUT, STATUS )
 
@@ -1111,7 +1111,7 @@
 
       IF( VAR ) THEN
          CALL PSX_FREE( IPVIST, STATUS )
-         IF( IPPP .NE. IPNCON ) THEN 
+         IF( IPPP .NE. IPNCON ) THEN
             CALL PSX_FREE( IPPP, STATUS )
             CALL PSX_FREE( IPCOV, STATUS )
          END IF

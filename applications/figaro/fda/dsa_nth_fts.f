@@ -92,7 +92,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -192,7 +192,7 @@
       IF ( CMMT ) THEN
 
 *     Count items in the array that have this keyword.
-         CALL DSA1_KEYCNT( DSA__REFFNE(SLOT), 
+         CALL DSA1_KEYCNT( DSA__REFFNE(SLOT),
      :                     %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
      :                     KEYUC, NELM, STATUS, %VAL(CNF_CVAL(80)) )
 

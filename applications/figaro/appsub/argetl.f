@@ -14,13 +14,13 @@ C
 C     (>) IOUT     (Integer) Fortran unit number to be used.
 C     (>) ARFILE   (Character) Name of previous line list.
 C     (>) NLMAX    (Integer) Maximum possible number of lines.
-C     (>) PREV     (Logical) If true, routine is to read previous 
+C     (>) PREV     (Logical) If true, routine is to read previous
 C                  line list.
 C     (<) CHANS    (Real array CHANS(NLMAX)) Channel numbers of
 C                  identified lines.
 C     (<) WAVES    (Real array WAVES(NLMAX)) Wavelengths of
 C                  identified lines.
-C     (<) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the 
+C     (<) WEIGHTS  (Real array WEIGHTS(NLMAX)) The weights for the
 C                  identified arc lines.
 C     (<) CLASS    (Integer array CLASS(NLMAX)) The class codes for
 C                  the identified arc lines.
@@ -79,7 +79,7 @@ C
          ELSE
             READ (IOUT,'(I5,23X,A//)',IOSTAT=STATUS) NLID,FILE
             DO NFILE=1,NLID
-               READ (IOUT,'(2F13.4,33X,A)',IOSTAT=STATUS) 
+               READ (IOUT,'(2F13.4,33X,A)',IOSTAT=STATUS)
      :                                 CHANS(NFILE),WAVES(NFILE),AUTO
                IF (STATUS.NE.0) THEN
                   CALL PAR_WRUSER('I/O error reading arcline file',

@@ -13,14 +13,14 @@
 *     CALL TEST_ENCODE(STATUS)
 
 *  Description:
-*     Test each of the encoding routines listed in Appendix A.3 
+*     Test each of the encoding routines listed in Appendix A.3
 *     of SUN/40.3.
 *     If any failure occurs, return STATUS = SAI__ERROR.
 *     Otherwise, STATUS is unchanged.
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
-*        The status of the tests. 
+*        The status of the tests.
 
 *  Copyright:
 *     Copyright (C) 1993, 1994 Science & Engineering Research Council.
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -56,11 +56,11 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*  Subprograms called:    
-*     TEST_DTOAN, TEST_DTOC, TEST_ITOB, TEST_ITOC, TEST_ITOH, 
-*     TEST_ITOO, TEST_LTOC, TEST_PUTC, TEST_PUTD, TEST_PUTI, 
+*  Subprograms called:
+*     TEST_DTOAN, TEST_DTOC, TEST_ITOB, TEST_ITOC, TEST_ITOH,
+*     TEST_ITOO, TEST_LTOC, TEST_PUTC, TEST_PUTD, TEST_PUTI,
 *     TEST_PUTL, TEST_PUTR, TEST_RTOAN, TEST_RTOC
-*     
+*
 
 *-
 
@@ -201,7 +201,7 @@
 
 *    Write summary message
 
-      IF (STATUS .EQ. SAI__OK) THEN 
+      IF (STATUS .EQ. SAI__OK) THEN
          PRINT *,'*** All encode routines OK ***'
       ELSE
          PRINT *,'*** Error(s) in encode routines ***'

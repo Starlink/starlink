@@ -52,7 +52,7 @@ of the packages public interface.
 
 =item B<_GFlush>
 
-This function ensures that the display device is up-to-date, by flushing 
+This function ensures that the display device is up-to-date, by flushing
 any pending graphics to the output device.
 
    my $status = _GFlush();
@@ -75,10 +75,10 @@ This function displays lines joining the given positions.
 sub _GLine {
    my $x = shift;
    my $y = shift;
-   
+
    if( scalar(@$x) > 1 && scalar(@$x) == scalar(@$y) ) {
       pgline( scalar(@$x), $x, $y );
-   }   
+   }
    return 1;
 }
 
@@ -105,17 +105,17 @@ sub _GMark {
 
 =item B<_GText>
 
-This function displays a character string $text at a given position using 
+This function displays a character string $text at a given position using
 a specified justification and up-vector.
 
    my $status = _GText( $text, $x, $y, $just, $upx, $upy );
 
-where $x is the reference x coordinate, $y is the reference y coordinate, 
+where $x is the reference x coordinate, $y is the reference y coordinate,
 and where $just is a character string which specifies the location within
 the text string which is to be placed at the reference position given by x
 and y. The first character may be 'T' for "top", 'C' for "centre", or 'B'
 for "bottom", and specifies the vertical location of the reference position.
-Note, "bottom" corresponds to the base-line of normal text. Some characters 
+Note, "bottom" corresponds to the base-line of normal text. Some characters
 (eg "y", "g", "p", etc) descend below the base-line. The second  character
 may be 'L' for "left", 'C' for "centre", or 'R'  for "right", and specifies
 the horizontal location of the  reference position. If the string has less
@@ -135,23 +135,23 @@ top on the screen.
 
 sub _GText {
    my ( $text, $x, $y, $just, $upx, $upy ) = @_;
-   
+
    # check we have a string to print
    if( defined $text && length($text) != 0 ) {
-   
+
       # validate the justifcation
       my $just1 = substr $just, 0, 1;
       my $just2 = substr $just, 1, 1;
       if ( defined $just && length($just) == 2 ) {
-         
-        # if we have a bogus justification string default it 
+
+        # if we have a bogus justification string default it
         unless( $just1 =~ /^[TBC]/ ) {
            warn "_GText: bad vertical justification defaulting to 'C'\n";
            $just1 = "C";
         }
         unless( $just2 =~ /[LCR]/ ) {
            warn "_GText: bad horizontal justification defaulting to 'C'\n";
-           $just2 = "C"; 
+           $just2 = "C";
         }
       } else {
          warn "_GText: No justification string defaulting to 'CC'\n";
@@ -159,19 +159,19 @@ sub _GText {
          $just2 = "C";
       }
       $just = $just1 . $just2;
-      
+
       # get the axis scaling
       my ( $ret, $alpha, $beta ) = _GScales();
       return 0 if $ret == 0;
-      
-      # If either axis is reversed, reverse the supplied up-vector 
+
+      # If either axis is reversed, reverse the supplied up-vector
       # components so that they refer to the world-coordinates axes.
       $upx = -$upx if $alpha < 0.0;
       $upy = -$upy if $beta < 0.0;
-      
-      # Get the angle between the text base-line and horizontal. 
+
+      # Get the angle between the text base-line and horizontal.
       my $angle = atan2( -$upx*$alpha, $upy*$beta)*R2D;
-      
+
       # Get the fractional horizontal justification as needed by PGPLOT.
       my $fjust;
       if( $just2 eq "L" ) {
@@ -181,21 +181,21 @@ sub _GText {
       } else {
         $fjust = 0.5;
       }
-      
+
       # Unless the requested justification is "Bottom", we need to adjust
       # the supplied reference position before we use it with PGPLOT because
       # PGPLOT assumes "Bottom" justification.
       if( $just1 ne "B" ) {
-      
-         # Get the bounding box of the string. Note, only the size of the box 
-         # is significant here, not its position. Also note, leading and 
+
+         # Get the bounding box of the string. Note, only the size of the box
+         # is significant here, not its position. Also note, leading and
          # trailing spaces are not included in the bounding box.
          my ( @xbox, @ybox );
          pgqtxt( $x, $y, $angle, $fjust, $text, \@xbox, \@ybox );
 
          # Normalise the up-vector in world coordinates.
          my $uplen = sqrt( $upx*$upx + $upy*$upy );
-         if( $uplen > 0.0 ){ 
+         if( $uplen > 0.0 ){
             $upx /= $uplen;
             $upy /= $uplen;
          } else {
@@ -203,10 +203,10 @@ sub _GText {
             return 0;
          }
 
-         # Find the height of the text above the base-line. Note, the PGPLOT  
+         # Find the height of the text above the base-line. Note, the PGPLOT
          # manual is not clear about the order of the corners returned by
-         # pgqtxt, so we have to find the largest distance between the corners 
-         # in the direction of the supplied up-vector. 
+         # pgqtxt, so we have to find the largest distance between the corners
+         # in the direction of the supplied up-vector.
          my $hu = 0.0;
          for my $i ( 0 ... 3 ) {
             my $test = $upx*( $xbox[$i] - $x ) + $upy*( $ybox[$i] - $y );
@@ -214,8 +214,8 @@ sub _GText {
          }
 
          # Adjust the vertical position of the reference point, since PGPLOT
-         # requires it to be at the bottom of the text. 
-         if( $just1 eq 'T' ) { 
+         # requires it to be at the bottom of the text.
+         if( $just1 eq 'T' ) {
             $x -= $upx*$hu;
             $y -= $upy*$hu;
          } elsif( $just1 eq 'C' ){
@@ -228,13 +228,13 @@ sub _GText {
       my $tbg;
       pgqtbg( $tbg );
       pgstbg( 0 );
-      pgptxt( $x, $y, $angle, $fjust, $text ); 
+      pgptxt( $x, $y, $angle, $fjust, $text );
       pgstbg( $tbg );
    }
-   
+
    # Return, all is well strangely
    return 1;
-}            
+}
 
 
 =item B<_GScales>
@@ -242,7 +242,7 @@ sub _GText {
 This function returns two values (one for each axis) which scale
 increments on the corresponding axis into a "normal" coordinate system in
 which: The axes have equal scale in terms of (for instance) millimetres
-per unit distance, X values increase from left to right and the Y values 
+per unit distance, X values increase from left to right and the Y values
 increase from bottom to top.
 
    my ( $status, $alpha, $beta ) = _GScales()
@@ -252,10 +252,10 @@ increase from bottom to top.
 sub _GScales {
     my $alpha = shift;
     my $beta = shift;
-    
+
     my ( $nx1, $nx2, $ny1, $ny2, $wx1, $wx2, $wy1, $wy2, $ret );
     pgqvp( 2, $nx1, $nx2, $ny1, $ny2 );
-    pgqwin( $wx1, $wx2, $wy1, $wy2 );    
+    pgqwin( $wx1, $wx2, $wy1, $wy2 );
 
     if( $wx2 != $wx1 && $wy2 != $wy1 && $nx2 != $nx1 && $ny2 != $ny1 ) {
        $alpha = ( $nx2 - $nx1 ) / ( $wx2 - $wx1 );
@@ -266,18 +266,18 @@ sub _GScales {
        $ret = 0;
     }
     return ( $ret, $alpha, $beta );
-}       
+}
 
 
 =item B<_GTxExt>
 
-This function returns the corners of a box which would enclose the 
-supplied character string if it were displayed using astGText. The 
+This function returns the corners of a box which would enclose the
+supplied character string if it were displayed using astGText. The
 returned box INCLUDES any leading or trailing spaces.
 
    my ( $status, $xb, $yb ) = _GTxtExt( $text, $x, $y, $just, $upx, $upy);
 
-where $x is the reference x coordinate, $y is the reference y coordinate, 
+where $x is the reference x coordinate, $y is the reference y coordinate,
 and where $justification is a character string which specifies the
 location within the text string which is to be placed at the reference
 position given by x and y. The first character may be 'T' for "top", 'C'
@@ -285,9 +285,9 @@ for "centre", or 'B' for "bottom", and specifies the vertical location of
 the reference position. Note, "bottom" corresponds to the base-line of
 normal text. Some characters  (eg "y", "g", "p", etc) descend below the
 base-line. The second  character may be 'L' for "left", 'C' for "centre",
-or 'R'  for "right", and specifies the horizontal location of the 
+or 'R'  for "right", and specifies the horizontal location of the
 reference position. If the string has less than 2 characters then 'C' is
-used for the missing characters. 
+used for the missing characters.
 
 And $upx is the x component of the up-vector for the text, in graphics
 world coordinates. If necessary the supplied value should be negated to
@@ -316,30 +316,30 @@ Notes:
 
 sub _GTxExt {
    my ( $text, $x, $y, $just, $upx, $upy ) = @_;
-   
+
    # initalise @$xb and @$yb
    my ( @xb, @yb );
    foreach my $i ( 0 ... 3 ) {
       $xb[$i] = 0.0;
       $yb[$i] = 0.0;
-   }   
-   
+   }
+
    # check we have a string to print
    if( defined $text && length($text) != 0 ) {
-   
+
       # validate the justifcation
       my $just1 = substr $just, 0, 1;
       my $just2 = substr $just, 1, 1;
       if ( defined $just && length($just) == 2 ) {
-         
-        # if we have a bogus justification string default it 
+
+        # if we have a bogus justification string default it
         unless( $just1 =~ /[TBC]/ ) {
            warn "_GText: bad vertical justification defaulting to 'C'\n";
            $just1 = "C";
         }
         unless( $just2 =~ /[LCR]/ ) {
            warn "_GText: bad horizontal justification defaulting to 'C'\n";
-           $just2 = "C"; 
+           $just2 = "C";
         }
       } else {
          warn "_GText: No justification string defaulting to 'CC'\n";
@@ -347,20 +347,20 @@ sub _GTxExt {
          $just2 = "C";
       }
       $just = $just1 . $just2;
-      
+
       # get the axis scaling
       my ( $ret, $alpha, $beta ) = _GScales();
       return ( 0 ) if $ret == 0;
-      
-      # If either axis is reversed, reverse the supplied up-vector 
+
+      # If either axis is reversed, reverse the supplied up-vector
       # components so that they refer to the world-coordinates axes.
       $upx = -$upx if $alpha < 0.0;
       $upy = -$upy if $beta < 0.0;
-      
+
       # convert the up-vector into millimetres
       my $ux = $alpha*$upx;
       my $uy = $beta*$upy;
-      
+
       # normalise the up-vector to a length of 1 millimetre
       my $uplen = sqrt( $ux*$ux + $uy*$uy );
       if ( $uplen > 0.0 ) {
@@ -370,8 +370,8 @@ sub _GTxExt {
          ReportGrfError("_GTxtExt: Zero length up-vector supplied.");
          return ( 0 );
       }
- 
-      # Form the base-line vector by rotating the up-vector by 90 degrees 
+
+      # Form the base-line vector by rotating the up-vector by 90 degrees
       # clockwise.
       my $vx = $uy;
       my $vy = -$ux;
@@ -390,19 +390,19 @@ sub _GTxExt {
          $ybox[ $i ] *= $beta;
       }
 
-      # Find the height of the bounding box, in millimetres. Note, 
-      # the PGPLOT manual is not clear about the order of the corners 
+      # Find the height of the bounding box, in millimetres. Note,
+      # the PGPLOT manual is not clear about the order of the corners
       # returned by pgqtxt, so we have to find the largest distance between
       # the corners in the direction of the supplied up-vector. The reference
       # point is on the text base-line which is not usually at the bottom of
       # the bounding box (some letters - like "y" - extend below the base-line).
       # Find the distance from the base-line to the top (hu) and bottom (hd)
-      # of the bounding box. 
+      # of the bounding box.
       my $hu = -(FLT_MAX);
       my $hd = FLT_MAX;
       foreach my $i ( 0 ... 3 ) {
          my $test = $ux*$xbox[ $i ] + $uy*$ybox[ $i ];
-         $hu = $test if $test > $hu; 
+         $hu = $test if $test > $hu;
          $hd = $test if $test < $hd;
       }
 
@@ -420,35 +420,35 @@ sub _GTxExt {
       my ( $xl, $yl );
       pglen( 2, $text, $xl, $yl );
 
-      # The abolute width of the string in millimetres may depend on the   
+      # The abolute width of the string in millimetres may depend on the
       # up-vector. The values returned by pglen are for horizontal and
-      # vertical text. Find the width using the supplied up-vector. 
+      # vertical text. Find the width using the supplied up-vector.
       my $a = $uy*$xl;
       my $b = $ux*$yl;
       my $width = sqrt( $a*$a + $b*$b );
 
       # The pglen function returns a value which is slightly smaller than
       # the area cleared to hold the text when written using pgptxt. Increase
-      # the text width so that it is about equal to the area cleared. 
+      # the text width so that it is about equal to the area cleared.
       $width += 0.2*$hu;
 
       # Scale the base-line vector so that its length is equal to the width
-      # of the bounding box (including spaces). 
+      # of the bounding box (including spaces).
       $vx *= $width;
       $vy *= $width;
 
-      # Convert the base-line vector back into world coordinates. 
+      # Convert the base-line vector back into world coordinates.
       $vx /= $alpha;
       $vy /= $beta;
 
-      # Convert the up and down vectors into world coordinates. 
+      # Convert the up and down vectors into world coordinates.
       $uxu /= $alpha;
       $uyu /= $beta;
       $uxd /= $alpha;
       $uyd /= $beta;
 
       # Find the coordinates at the centre of the bounding box in world
-      # coordinates. 
+      # coordinates.
       my $xc = $x;
       my $yc = $y;
 
@@ -468,13 +468,13 @@ sub _GTxExt {
          $yc -= 0.5*$vy;
       }
 
-      # Get the corners of the bounding box. 
+      # Get the corners of the bounding box.
       my $vdx = 0.5*$vx;
       my $vdy = 0.5*$vy;
       my $udx = 0.5*$uxu;
       my $udy = 0.5*$uyu;
 
-      # Bottom left corner... 
+      # Bottom left corner...
       $xb[ 0 ] = $xc - $vdx - $udx + $uxd;
       $yb[ 0 ] = $yc - $vdy - $udy + $uyd;
 
@@ -482,20 +482,20 @@ sub _GTxExt {
       $xb[ 1 ] = $xc + $vdx - $udx + $uxd;
       $yb[ 1 ] = $yc + $vdy - $udy + $uyd;
 
-      # Top right corner... 
+      # Top right corner...
       $xb[ 2 ] = $xc + $vdx + $udx;
       $yb[ 2 ] = $yc + $vdy + $udy;
 
-      # Top left corner... 
+      # Top left corner...
       $xb[ 3 ] = $xc - $vdx + $udx;
       $yb[ 3 ] = $yc - $vdy + $udy;
 
    }
-   
+
    # Return
-   return (1, \@xb, \@yb );     
-      
-}          
+   return (1, \@xb, \@yb );
+
+}
 
 =item B<_GQch>
 
@@ -514,43 +514,43 @@ increment in the Y axis.
 sub _GQch {
    # return variables
    my ( $status, $chv, $chh );
-   
+
    # local variables
    my ( $vx1, $vx2, $vy1, $vy2, $wx1, $wx2, $wy1, $wy2);
 
-   # Get the character height in normalised device coordinates 
+   # Get the character height in normalised device coordinates
    pgqcs( 0, $chv, $chh );
 
    # Get the bounds of the PGPLOT viewport in normalised device
-   # coordinates. 
+   # coordinates.
    pgqvp( 0, $vx1, $vx2, $vy1, $vy2 );
 
-   # Get the bounds of the PGPLOT window in world coordinates. 
+   # Get the bounds of the PGPLOT window in world coordinates.
    pgqwin( $wx1, $wx2, $wy1, $wy2 );
 
-   # Convert the text height from normalised device coordinates into world 
-   # coordinates for vertical text. Print an error message if the viewport 
-   # has zero size. 
+   # Convert the text height from normalised device coordinates into world
+   # coordinates for vertical text. Print an error message if the viewport
+   # has zero size.
    if( $vx1 != $vx2 ){
       $chv *= ( $wx2 - $wx1 )/( $vx2 - $vx1 );
    } else {
       ReportGrfError("_GQch: The graphics viewport has zero size in the X direction.");
       return (0);
-   }   
+   }
 
-   # Convert the text height from normalised device coordinates into world 
-   # coordinates for horizontal text. Print an error message if the viewport 
-   # has zero size. 
+   # Convert the text height from normalised device coordinates into world
+   # coordinates for horizontal text. Print an error message if the viewport
+   # has zero size.
    if( $vy1 != $vy2 ){
       $chh *= ( $wy2 - $wy1 )/( $vy2 - $vy1 );
    } else {
       ReportGrfError("_GQch: The graphics viewport has zero size in the Y direction.");
       return (0);
-   }   
+   }
 
-   # Return. 
+   # Return.
    return ( 1, $chv, $chh );
-}   
+}
 
 
 =item B<_GAttr>
@@ -562,7 +562,7 @@ value is converted to an integer value if necessary before use.
 
    my ( $status, $old_value ) = _GAttr( $attr, $value, $prim );
 
-Where $attr is an integer value identifying the required attribute. 
+Where $attr is an integer value identifying the required attribute.
 The following symbolic values are defined in the AST grf.h:
 
            GRF__STYLE  - Line style.
@@ -571,12 +571,12 @@ The following symbolic values are defined in the AST grf.h:
            GRF__FONT   - Character font.
            GRF__COLOUR - Colour index.
 
-$value is a new value to store for the attribute. If this is 
+$value is a new value to store for the attribute. If this is
 AST__BAD no value is stored, and $old_value is a scalar containing
-the old attribute value, if this is NULL no value is returned. 
+the old attribute value, if this is NULL no value is returned.
 
-Finally $prim is the sort of graphics primitive to be drawn with 
-the new attribute. Identified by the following values defined in 
+Finally $prim is the sort of graphics primitive to be drawn with
+the new attribute. Identified by the following values defined in
 AST's grf.h:
 
            GRF__LINE
@@ -589,11 +589,11 @@ sub _GAttr {
    my $attr = shift;
    my $value = shift;
    my $prim = shift;
-   
+
    my ( $ival, $rval, $dx, $dy, $deflw, $x1, $x2, $y1, $y2 );
    my $old_value = undef;
 
-   # If required retrieve the current line style, and set a new line style. 
+   # If required retrieve the current line style, and set a new line style.
    if( $attr == Starlink::AST::Grf::GRF__STYLE() ){
       pgqls( $ival );
       $old_value = $ival;
@@ -608,43 +608,43 @@ sub _GAttr {
          pgsls( $ival );
       }
 
-   # If required retrieve the current line width, and set a new line width. 
+   # If required retrieve the current line width, and set a new line width.
    # Line width is stored in Plot as a scale factor (1.0 for the default line
-   # width which is a fixed fraction of the diagonal of the view surface), but 
-   # pgplot stores it in units of 0.005 of an inch. 
+   # width which is a fixed fraction of the diagonal of the view surface), but
+   # pgplot stores it in units of 0.005 of an inch.
    } elsif( $attr == Starlink::AST::Grf::GRF__WIDTH() ){
 
-      # Get the bounds of the view surface in inches. 
+      # Get the bounds of the view surface in inches.
       pgqvsz( 1, $x1, $x2, $y1, $y2 );
 
       # Find the default line width in inches (i.e. 0.0005 of the length
-      # of the view surface diagonal). 
+      # of the view surface diagonal).
       $dx = ( $x1 - $x2 );
       $dy = ( $y1 - $y2 );
       $deflw = 0.0005*sqrt( $dx*$dx + $dy*$dy );
 
-      # Get the current pgplot line width in units of 0.005 of an inch. 
+      # Get the current pgplot line width in units of 0.005 of an inch.
       pgqlw( $ival );
 
       # If required, return the factor by which this exceeds the default line
-      # width found above. 
+      # width found above.
       $old_value = $ival/( 200.0 * $deflw );
 
       # If a new line width has been provided, the pgplot line width needs to
-      # be set to the corresponding absolute value. 
+      # be set to the corresponding absolute value.
       if( $value != Starlink::AST::AST__BAD() ){
          $ival = 200.0*$value*$deflw;
          if( $ival < 1 ) {
             $ival = 1;
          } elsif( $ival > 201 ){
             $ival = 201;
-         } 
+         }
          pgslw( $ival );
       }
 
-   # If required retrieve the current character size, and set a new size. 
+   # If required retrieve the current character size, and set a new size.
    # The attribute value should be a factor by which to multiply the
-   # default character size. 
+   # default character size.
    } elsif( $attr == Starlink::AST::Grf::GRF__SIZE() ){
       pgqch( $rval );
       $old_value = $rval;
@@ -653,7 +653,7 @@ sub _GAttr {
          pgsch( $value );
       }
 
-   # If required retrieve the current character font, and set a new font. 
+   # If required retrieve the current character font, and set a new font.
    } elsif( $attr == Starlink::AST::Grf::GRF__FONT() ){
       pgqcf( $ival );
       $old_value = $ival;
@@ -668,7 +668,7 @@ sub _GAttr {
       }
 
    # If required retrieve the current colour index, and set a new colour
-   # index. 
+   # index.
    } elsif( $attr == Starlink::AST::Grf::GRF__COLOUR() ){
       pgqci( $ival );
       $old_value = $ival;
@@ -679,13 +679,13 @@ sub _GAttr {
          pgsci( $ival );
       }
 
-   # Give an error message for any other attribute value. 
+   # Give an error message for any other attribute value.
    } else {
       ReportGrfError("_GAttr: Unknown graphics attribute $attr requested.");
       return ( 0 );
    }
 
-   # Return. 
+   # Return.
    return ( 1, $old_value );
 
 }
@@ -761,7 +761,7 @@ sub ReportGrfError {
 Copyright (C) 2004 Particle Physics and Astronomy Research Council.
 Copyright (C) 2004 University of Exeter. All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify 
+This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Public License.
 
 This program is free software; you can redistribute it and/or modify it under

@@ -21,72 +21,72 @@
 
 *  Description:
 *     This application creates an NDF from a supplied catalogue. The
-*     output NDF can be either a simple 1-dimensional list of column values 
+*     output NDF can be either a simple 1-dimensional list of column values
 *     without any spatial information, or it can be a 2 or 3 dimensional
-*     array in which column values retain their spatial positions (see 
-*     parameter SHAPE). The columns containing data value and (optionally) 
+*     array in which column values retain their spatial positions (see
+*     parameter SHAPE). The columns containing data value and (optionally)
 *     variance are specified using parameters COLDAT and COLVAR.
 *
 *     If parameter SHAPE is set TRUE, a 2 or 3 dimensional NDF is created
-*     in which the spatial position of each data value is read from the 
-*     catalogue columns specified using parameters COLX, COLY and COLZ. The 
+*     in which the spatial position of each data value is read from the
+*     catalogue columns specified using parameters COLX, COLY and COLZ. The
 *     NDF is formed by binning the catalogue values into a grid of equally
-*     sized rectangular cells, the dimensions of each cell being given by 
-*     parameter BOX. Each pixel in the output NDF corresponds to one of 
-*     these cells. The  data values for the cell are formed by combining 
-*     together the COLDAT values of all input positions which fall within 
-*     the cell, using the method specified by the parameter METHOD. 
+*     sized rectangular cells, the dimensions of each cell being given by
+*     parameter BOX. Each pixel in the output NDF corresponds to one of
+*     these cells. The  data values for the cell are formed by combining
+*     together the COLDAT values of all input positions which fall within
+*     the cell, using the method specified by the parameter METHOD.
 *
-*     If parameter SHAPE is set FALSE, a 1D NDF is created in which the 
-*     spatial position of each data value is ignored. The data values are 
-*     just copied into the 1D NDF in the same order that they appear in the 
-*     input catalogue. That is, the first value in the catalogue becomes 
-*     pixel 1, the seconds catalogue value becomes pixel 2, etc. This avoids 
-*     any binning of the data values, and is useful if applications which do 
-*     not use spatial information (such as the KAPPA applications STATS, 
+*     If parameter SHAPE is set FALSE, a 1D NDF is created in which the
+*     spatial position of each data value is ignored. The data values are
+*     just copied into the 1D NDF in the same order that they appear in the
+*     input catalogue. That is, the first value in the catalogue becomes
+*     pixel 1, the seconds catalogue value becomes pixel 2, etc. This avoids
+*     any binning of the data values, and is useful if applications which do
+*     not use spatial information (such as the KAPPA applications STATS,
 *     HISTOGRAM, etc) are to be used.
 
 *  Usage:
-*     polimage in out coldat [colvar] [colx] [coly] [method] [colz] 
+*     polimage in out coldat [colvar] [colx] [coly] [method] [colz]
 
 *  ADAM Parameters:
 *     BOX( 3 ) = _REAL (Read)
 *        The x, y and z bin sizes. These values refer to the co-ordinate Frame
-*        given by parameters COLX and COLY. Only accessed if parameter SHAPE 
+*        given by parameters COLX and COLY. Only accessed if parameter SHAPE
 *        is TRUE. If not supplied, the third value defaults to 1.0 and the
 *        second value defaults to the first value.
 *     COLDAT = LITERAL (Read)
 *        The name of the catalogue column holding the values to be stored
-*        in the DATA component of the output NDF. A list of available 
-*        column names is displayed if a non-existent column name is given. 
+*        in the DATA component of the output NDF. A list of available
+*        column names is displayed if a non-existent column name is given.
 *        An arbitrary algebraic combination of columns may be used by
 *        supplying a CURSA expression instead of a single column name. See
 *        SUN/190 for details of the syntax of these expressions.
 *     COLVAR = LITERAL (Read)
-*        The name of the catalogue column holding the values to be stored 
-*        in the VARIANCE component of the output NDF. A list of available 
-*        column names is displayed if a non-existent column name is given. 
-*        If a null (!) value is supplied, no VARIANCE component is created. 
+*        The name of the catalogue column holding the values to be stored
+*        in the VARIANCE component of the output NDF. A list of available
+*        column names is displayed if a non-existent column name is given.
+*        If a null (!) value is supplied, no VARIANCE component is created.
 *        An arbitrary algebraic combination of columns may be used by
 *        supplying a CURSA expression instead of a single column name.
 *        For instance, supplying the string "DP**2" causes the square of
-*        the values in column DP to be used. See SUN/190 for details of the 
+*        the values in column DP to be used. See SUN/190 for details of the
 *        syntax of these expressions. [!]
 *     COLX = LITERAL (Read)
-*        The name of the catalogue column which gives the coordinate 
-*        of each data value along the first axis. A list of available column 
-*        names is displayed if a non-existent column name is given. An 
-*        arbitrary algebraic combination of columns may be used by supplying 
-*        a CURSA expression instead of a single column name. See SUN/190 for 
+*        The name of the catalogue column which gives the coordinate
+*        of each data value along the first axis. A list of available column
+*        names is displayed if a non-existent column name is given. An
+*        arbitrary algebraic combination of columns may be used by supplying
+*        a CURSA expression instead of a single column name. See SUN/190 for
 *        details of the syntax of these expressions. Only accessed if
 *        parameter SHAPE is TRUE. [X]
 *     COLY = LITERAL (Read)
-*        The name of the catalogue column which gives the coordinate 
+*        The name of the catalogue column which gives the coordinate
 *        of each data value along the second axis. See COLX for further
 *        details. [Y]
 *     COLZ = LITERAL (Read)
-*        The name of the catalogue column which gives the coordinate 
-*        of each data value along a third axis. If a null (!) value is 
+*        The name of the catalogue column which gives the coordinate
+*        of each data value along a third axis. If a null (!) value is
 *        supplied the output NDF will be 2-dimensional. The dynamic default
 *        is "Z" if the catalogue contains a column named "Z", and is null
 *        (!) otherwise. See COLX for further details. []
@@ -95,7 +95,7 @@
 *        supported by the CAT library (see SUN/181). A file type of .FIT
 *        is assumed if no file type is supplied.
 *     METHOD = LITERAL (Read)
-*        The method to be used when binning data values. This may be 
+*        The method to be used when binning data values. This may be
 *        set to any unique abbreviation of the following:
 *
 *           -  MEAN      -- Mean of the input data values
@@ -105,18 +105,18 @@
 *        Only accessed if parameter SHAPE is TRUE. [MEAN]
 *     MINVAL = _INTEGER (Read)
 *        The minimum number of good input values which must be present in
-*        a cell to create a good output value. Only accessed if parameter 
+*        a cell to create a good output value. Only accessed if parameter
 *        SHAPE is TRUE. [1]
 *     OUT = NDF (Read)
-*        The name of the output NDF. 
+*        The name of the output NDF.
 *     SHAPE = _LOGICAL (Read)
 *        If a TRUE value is supplied for parameter SHAPE, then the output
-*        NDF is 2 or 3-dimensional and inherits the spatial positions given 
-*        in the columns specified by COLX, COLY and COLZ. If a FALSE value is 
+*        NDF is 2 or 3-dimensional and inherits the spatial positions given
+*        in the columns specified by COLX, COLY and COLZ. If a FALSE value is
 *        supplied, the output NDF is 1-dimensional and the spatial position
-*        of each data value is ignored. In this case, the number of pixels 
+*        of each data value is ignored. In this case, the number of pixels
 *        in the output NDF will equal the number of rows in the input
-*        catalogue. The data values are stored in the NDF in the same order 
+*        catalogue. The data values are stored in the NDF in the same order
 *        as in the input catalogue. [TRUE]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
@@ -132,24 +132,24 @@
 *     polimage incat outimg p noshape
 *        Creates a 1-D NDF called "outimg" containing the values of column
 *        P in the catalogue "incat.FIT". The number of pixels in the output
-*        is equal to the number of rows in the catalogue, and the catalogue 
-*        values are copied into the output in the order in which they occur 
+*        is equal to the number of rows in the catalogue, and the catalogue
+*        values are copied into the output in the order in which they occur
 *        in the catalogue.
 
 *  Notes:
-*     - If parameter SHAPE is set TRUE, the output NDF will have an AXIS 
-*     component representing the COLX, COLY and COLZ values. It will also 
+*     - If parameter SHAPE is set TRUE, the output NDF will have an AXIS
+*     component representing the COLX, COLY and COLZ values. It will also
 *     inherit any WCS information from the catalogue so long as the Base
 *     Frame of the WCS information is spanned by axes with symbols equal
 *     to the names of the columns given by COLX, COLY and COLZ.
-*     - If parameter SHAPE is set FALSE, the output NDF will contain no AXIS 
+*     - If parameter SHAPE is set FALSE, the output NDF will contain no AXIS
 *     or WCS components.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -164,7 +164,7 @@
 *        Updated to handle 3D data.
 *     7-OCT-2002 (DSB):
 *        Modified to handle cases where input catalogue contains only 2
-*        positions and the box size is an exact integral part of the 
+*        positions and the box size is an exact integral part of the
 *        axis range.
 *     7-APR-2003 (DSB):
 *        Modified to propagate AXIS Frame from catalogue WCS FrameSet to
@@ -190,8 +190,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
-      INCLUDE 'CAT_PAR'          ! CAT_ constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CAT_PAR'          ! CAT_ constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -273,7 +273,7 @@
       INTEGER NCOL               ! No. of columns to be read
       INTEGER NDIMO              ! Number of axes in output NDF
       INTEGER NEL                ! Number of mapped elements
-      INTEGER NMAT               ! Size of workspace 
+      INTEGER NMAT               ! Size of workspace
       INTEGER NVAL               ! No. of BOX values supplied
       INTEGER NXBIN              ! No. of output bins along X axis
       INTEGER NYBIN              ! No. of output bins along Y axis
@@ -296,12 +296,12 @@
       LOGICAL XYPIX              ! Are (COLX,COLY) pixel co-ordinates?
       REAL BOX( 3 )              ! Bin size
       REAL NSIGMA                ! No. of sigmas to clip at
-      REAL SXHI                  ! Upper bound of used region of X axis 
-      REAL SXLO                  ! Lower bound of used region of X axis 
-      REAL SYHI                  ! Upper bound of used region of Y axis 
-      REAL SYLO                  ! Lower bound of used region of Y axis 
-      REAL SZHI                  ! Upper bound of used region of Z axis 
-      REAL SZLO                  ! Lower bound of used region of Z axis 
+      REAL SXHI                  ! Upper bound of used region of X axis
+      REAL SXLO                  ! Lower bound of used region of X axis
+      REAL SYHI                  ! Upper bound of used region of Y axis
+      REAL SYLO                  ! Lower bound of used region of Y axis
+      REAL SZHI                  ! Upper bound of used region of Z axis
+      REAL SZLO                  ! Lower bound of used region of Z axis
       REAL TR( 6 )               ! Coeff.s of (X,Y) -> cell indices mapping
       REAL TR2( 6 )              ! Coeff.s of cell indices -> (X,Y) mapping
       REAL X0                    ! X at bottom left of bottom left cell
@@ -338,7 +338,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the TITLE parameter (if any) from the input catalogue.
-      CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )       
+      CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS )
          CALL CAT_TRLSE( GTTL, STATUS )
@@ -358,22 +358,22 @@
 *  column.
       DID = 1
       NCOL = DID
-      CALL POL1_GTCTC( 'COLDAT', CI, CAT__FITYP, ' ', GI( DID ), 
+      CALL POL1_GTCTC( 'COLDAT', CI, CAT__FITYP, ' ', GI( DID ),
      :                 STATUS )
 
-*  If the output NDF has shape, get CAT identifiers for the position columns. 
-      IF( SHAPE ) THEN 
+*  If the output NDF has shape, get CAT identifiers for the position columns.
+      IF( SHAPE ) THEN
          XID = NCOL + 1
          YID = NCOL + 2
          NCOL = YID
          CALL POL1_COLNM( 'X', .FALSE., COLNM, STATUS )
-         CALL POL1_GTCTC( 'COLX', CI, CAT__FITYP, COLNM, GI( XID ), 
+         CALL POL1_GTCTC( 'COLX', CI, CAT__FITYP, COLNM, GI( XID ),
      :                     STATUS )
 
          CALL POL1_COLNM( 'Y', .FALSE., COLNM, STATUS )
-         CALL POL1_GTCTC( 'COLY', CI, CAT__FITYP, COLNM, GI( YID ), 
+         CALL POL1_GTCTC( 'COLY', CI, CAT__FITYP, COLNM, GI( YID ),
      :                     STATUS )
-         
+
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -394,16 +394,16 @@
          END IF
 
 *  Get an identifier for a column holding a third axis.
-         CALL POL1_GTCTC( 'COLZ', CI, CAT__FITYP, DFCOLZ, GI( ZID ), 
+         CALL POL1_GTCTC( 'COLZ', CI, CAT__FITYP, DFCOLZ, GI( ZID ),
      :                     STATUS )
 
 *  If a null value was supplied, annul the error. Otherwise icrement the
 *  number of columns to use.
-         IF( STATUS .EQ. PAR__NULL ) THEN 
+         IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             GOTZ = .FALSE.
             NDIMO = 2
-         ELSE IF( STATUS .EQ. SAI__OK ) THEN 
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
             GOTZ = .TRUE.
             NCOL = ZID
             NDIMO = 3
@@ -416,7 +416,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
       VID = NCOL + 1
-      CALL POL1_GTCTC( 'COLVAR', CI, CAT__FITYP, ' ', GI( VID ), 
+      CALL POL1_GTCTC( 'COLVAR', CI, CAT__FITYP, ' ', GI( VID ),
      :                  STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -440,8 +440,8 @@
       END IF
 
 *  Any WCS FrameSet obtained earlier from the catalogue can only be used
-*  if it has the same number of axes as the output NDF, and if the axes 
-*  of its Base Frame has symbols equal to the column names for X, Y 
+*  if it has the same number of axes as the output NDF, and if the axes
+*  of its Base Frame has symbols equal to the column names for X, Y
 *  (and Z). If this is not the case, annul the FrameSet.
       IF( IWCS .NE. AST__NULL ) THEN
          BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
@@ -460,7 +460,7 @@
             ELSE IF( GOTZ ) THEN
                CALL CAT_TIQAC( GI( ZID ), 'NAME', ZLAB, STATUS )
 
-               IF( AST_GETC( BFRM, 'Symbol(3)', STATUS ) .NE. ZLAB ) 
+               IF( AST_GETC( BFRM, 'Symbol(3)', STATUS ) .NE. ZLAB )
      :             CALL AST_ANNUL( IWCS, STATUS )
 
             END IF
@@ -476,7 +476,7 @@
 
 *  Now do cases where spatial position information is required.
 *  ------------------------------------------------------------
-      IF( SHAPE ) THEN 
+      IF( SHAPE ) THEN
 
 *  Store the values of the required catalogue columns in work arrays.
 *  ==================================================================
@@ -495,18 +495,18 @@
 
 *  Read the required columns from the catalogue into the work arrays
 *  allocated above. This is done in a single pass through the catalogue
-*  in order to speed it up a bit. 
-         CALL POL1_CTCLM( CI, NCIN, NCOL, GI, %VAL( CNF_PVAL( IP ) ), 
+*  in order to speed it up a bit.
+         CALL POL1_CTCLM( CI, NCIN, NCOL, GI, %VAL( CNF_PVAL( IP ) ),
      :                    STATUS )
 
 *  Get the coefficients of the linear transformation from (X,Y) position
 *  to bin indices.
 *  =====================================================================
 *  Obtain the sizes of each bin.
-         CALL PAR_GDRVR( 'BOX', 3, 1.0E-20, VAL__MAXR, BOX, NVAL, 
+         CALL PAR_GDRVR( 'BOX', 3, 1.0E-20, VAL__MAXR, BOX, NVAL,
      :                   STATUS )
 
-*  Duplicate the first value if only a single value was given.  
+*  Duplicate the first value if only a single value was given.
          IF ( NVAL .LT. 2 ) BOX( 2 ) = BOX( 1 )
 
 *  Use 1.0 for the Z value if not supplied.
@@ -516,18 +516,18 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the maximum and minimum COLX value.
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + XOFF ), 
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + XOFF ),
      :                    NBAD, SXHI,
      :                     SXLO, MAXPOS, MINPOS, STATUS )
 
 *  Find the maximum and minimum COLY value.
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + YOFF ), 
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + YOFF ),
      :                    NBAD, SYHI,
      :                     SYLO, MAXPOS, MINPOS, STATUS )
 
 *  If supplied find the maximum and minimum COLZ value.
-         IF( GOTZ ) THEN 
-            CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + ZOFF), 
+         IF( GOTZ ) THEN
+            CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + ZOFF),
      :                       NBAD, SZHI,
      :                       SZLO, MAXPOS, MINPOS, STATUS )
          ELSE
@@ -536,7 +536,7 @@
          END IF
 
 *  If the X, Y and Z columns are pixel coordinates, use the edges of the
-*  corresponding pixel as the upper and lower bounds. 
+*  corresponding pixel as the upper and lower bounds.
          IF( IWCS .NE. AST__NULL ) THEN
             SXHI = KPG1_CEIL( SXHI )
             SXLO = KPG1_CEIL( SXLO ) - 1
@@ -558,27 +558,27 @@
 *  Find the total number of bins.
          NBIN = NXBIN*NYBIN*NZBIN
 
-*  If the total data range on an axis is a integer multiple of the box 
-*  size on that axis, the point with the highest axis value will be on the 
+*  If the total data range on an axis is a integer multiple of the box
+*  size on that axis, the point with the highest axis value will be on the
 *  higher edge of the highest bin and so will not be counted as being in
-*  the bin. To avoid this, increase the box size slightly so that the 
+*  the bin. To avoid this, increase the box size slightly so that the
 *  highest axis value is inside the highest bin.
-         IF( SXHI - SXLO .EQ. NXBIN*BOX( 1 ) ) BOX( 1 ) = 
+         IF( SXHI - SXLO .EQ. NXBIN*BOX( 1 ) ) BOX( 1 ) =
      :                                               BOX( 1 )*1.00001
-         IF( SYHI - SYLO .EQ. NYBIN*BOX( 2 ) ) BOX( 2 ) = 
+         IF( SYHI - SYLO .EQ. NYBIN*BOX( 2 ) ) BOX( 2 ) =
      :                                               BOX( 2 )*1.00001
-         IF( SZHI - SZLO .EQ. NZBIN*BOX( 3 ) ) BOX( 3 ) = 
+         IF( SZHI - SZLO .EQ. NZBIN*BOX( 3 ) ) BOX( 3 ) =
      :                                               BOX( 3 )*1.00001
 
-*  Find the X, Y and Z values corresponding to the bottom left corner of the 
+*  Find the X, Y and Z values corresponding to the bottom left corner of the
 *  bottom left bin.
-         X0 = SXLO - 0.5*( NXBIN*BOX( 1 ) - SXHI + SXLO ) 
-         Y0 = SYLO - 0.5*( NYBIN*BOX( 2 ) - SYHI + SYLO ) 
-         Z0 = SZLO - 0.5*( NZBIN*BOX( 3 ) - SZHI + SZLO ) 
+         X0 = SXLO - 0.5*( NXBIN*BOX( 1 ) - SXHI + SXLO )
+         Y0 = SYLO - 0.5*( NYBIN*BOX( 2 ) - SYHI + SYLO )
+         Z0 = SZLO - 0.5*( NZBIN*BOX( 3 ) - SZHI + SZLO )
 
 *  Find the coefficients of the transformation. The X cell index for a
 *  position (X,Y) is given by INT( TR( 1 ) + TR( 2 )*X ), the Y cell
-*  index is given by INT( TR( 3 ) + TR( 4 )*Y ), the Y cell index is 
+*  index is given by INT( TR( 3 ) + TR( 4 )*Y ), the Y cell index is
 *  given by INT( TR( 5 ) + TR( 6 )*Z ).
          TR( 1 ) = 1.0 - X0/BOX( 1 )
          TR( 2 ) = 1.0/BOX( 1 )
@@ -597,9 +597,9 @@
          UBND( 2 ) = NYBIN
          UBND( 3 ) = NZBIN
          XYPIX = .FALSE.
-   
+
          IF( IWCS .NE. AST__NULL ) THEN
-            IF( AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ), 
+            IF( AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
      :                    'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
                XYPIX = .TRUE.
                LBND( 1 ) = INT( SXLO ) + 1
@@ -612,7 +612,7 @@
          END IF
 
 *  Create the output NDF.
-         CALL NDF_CREAT( 'OUT', '_REAL', NDIMO, LBND, UBND, INDF, 
+         CALL NDF_CREAT( 'OUT', '_REAL', NDIMO, LBND, UBND, INDF,
      :                   STATUS )
 
 *  Get the default WCS FrameSet from the output NDF.
@@ -629,7 +629,7 @@
             CALL CAT_TIDTP( GI( ZID ), IDTYPZ, STATUS )
          ELSE
             IDTYPZ = CAT__FITYP
-         END IF   
+         END IF
 
          IF( IDTYPX .EQ. CAT__FITYP .AND. IDTYPY .EQ. CAT__FITYP .AND.
      :       IWCS .NE. AST__NULL ) THEN
@@ -654,38 +654,38 @@
 
 *  Form a WinMap which maps output GRID positions into (COLX,COLY,COLZ)
 *  positions.
-            WINMAP = AST_WINMAP( NDIMO, AIN, BIN, AOUT, BOUT, ' ', 
+            WINMAP = AST_WINMAP( NDIMO, AIN, BIN, AOUT, BOUT, ' ',
      :                           STATUS )
 
 *  Get the Mapping from (COLX,COLY,COLZ) Frame to the Current Frame in the
 *  input catalogues WCS FrameSet.
-            CMAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, 
+            CMAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
      :                             STATUS )
 
 *  Merge these Mappings to get the Mapping from the NDF GRID Frame to the
 *  catalogues Current Frame, and simplify.
-            TMAP = AST_SIMPLIFY( AST_CMPMAP( WINMAP, CMAP, .TRUE., ' ', 
+            TMAP = AST_SIMPLIFY( AST_CMPMAP( WINMAP, CMAP, .TRUE., ' ',
      :                                       STATUS ), STATUS )
 
 *  Remove the AXIS Frame in the output NDF default FrameSet, so that any
-*  AXIS Frame in the catalogue WCS FrameSet will be retained. 
+*  AXIS Frame in the catalogue WCS FrameSet will be retained.
             DO I = 1, AST_GETI( IWCSO, 'NFRAME', STATUS )
                FRM = AST_GETFRAME( IWCSO, I, STATUS )
-               IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 
+               IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ.
      :                       'AXIS' ) THEN
                   CALL AST_REMOVEFRAME( IWCSO, I, STATUS )
-               END IF     
+               END IF
             END DO
 
 *  Add the input catalogues WCS FrameSet into the default FrameSet
-*  obtained from the output NDF.  
+*  obtained from the output NDF.
             CALL AST_ADDFRAME( IWCSO, AST__BASE, TMAP, IWCS, STATUS )
 
          END IF
 
 *  Now find the largest number of input positions in any bin.
 *  ===========================================================
-*  Allocate an integer work array with one element per bin to hold the 
+*  Allocate an integer work array with one element per bin to hold the
 *  number of input positions in each bin.
          CALL PSX_CALLOC( NBIN, '_INTEGER', IPW1, STATUS )
 
@@ -694,9 +694,9 @@
 
 *  Count the number of input catalogue positions contained in each output
 *  cell. The largest number in any one cell is returned.
-         CALL POL1_CLCNT( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + XOFF ), 
+         CALL POL1_CLCNT( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + XOFF ),
      :                    %VAL( CNF_PVAL( IP ) + YOFF ),
-     :                    %VAL( CNF_PVAL( IP ) + ZOFF ), 
+     :                    %VAL( CNF_PVAL( IP ) + ZOFF ),
      :                    TR, NXBIN, NYBIN, NZBIN,
      :                    %VAL( CNF_PVAL( IPW1 ) ), MXCNT, STATUS )
 
@@ -704,7 +704,7 @@
 *  using the vector routines of CCDPACK.
 *  =====================================================================
 *  Each value to be binned requires a 2D array in which each column
-*  corresponds to one output cell. The CCDPACK routines combine the values 
+*  corresponds to one output cell. The CCDPACK routines combine the values
 *  in each column to form a combined column value which is stored in the
 *  output catalogue. First, allocate an array for the total intensity.
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPDST, STATUS )
@@ -713,11 +713,11 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the data values from the input catalogue to the work array.
-         CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + DOFF ), 
+         CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + DOFF ),
      :                   %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                   %VAL( CNF_PVAL( IP ) + YOFF ), 
-     :                   %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN, 
-     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPDST ) ), 
+     :                   %VAL( CNF_PVAL( IP ) + YOFF ),
+     :                   %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPDST ) ),
      :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
@@ -725,10 +725,10 @@
          IF( VAR ) THEN
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
-   
-            CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + VOFF ), 
+
+            CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + VOFF ),
      :                      %VAL( CNF_PVAL( IP ) + XOFF ),
-     :                      %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                      %VAL( CNF_PVAL( IP ) + YOFF ),
      :                      %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
      :                      NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVST ) ),
      :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
@@ -743,11 +743,11 @@
 
 *  If using sigma clipping, get the number of sigmas to clip at.
          IF ( METH .EQ. 'SIGMA' ) THEN
-            CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA, 
+            CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA,
      :                      STATUS )
          END IF
 
-*  Get the absolute number of good input values required to create a good 
+*  Get the absolute number of good input values required to create a good
 *  output value.
          CALL PAR_GET0I( 'MINVAL', MINVAL, STATUS )
          MINVAL = MIN( 1, MINVAL )
@@ -761,13 +761,13 @@
 
          IF( VAR ) THEN
             CALL PSX_CALLOC( MXCNT, '_DOUBLE', IPPP, STATUS )
-            NMAT = MXCNT*( MXCNT + 1 )/2 
+            NMAT = MXCNT*( MXCNT + 1 )/2
             CALL PSX_CALLOC( MXCNT*NMAT, '_DOUBLE', IPCOV, STATUS )
          END IF
 
-*  Map the DATA array of the output NDF. This will hold the binned data 
-*  values. 
-         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'WRITE', IPBIN, NEL, 
+*  Map the DATA array of the output NDF. This will hold the binned data
+*  values.
+         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'WRITE', IPBIN, NEL,
      :                 STATUS )
 
 *  Check the pointers can be used.
@@ -776,46 +776,46 @@
 *  Do the binning. First deal with cases where variances are available.
          IF( VAR ) THEN
 
-*  Map the output VARIANCE array of the output NDF. This will hold the 
-*  binned variance values. 
-            CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVBIN, 
+*  Map the output VARIANCE array of the output NDF. This will hold the
+*  binned variance values.
+            CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVBIN,
      :                    NEL, STATUS )
 
 *  Check the pointers can be used.
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Bin the data values and variances...
-            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPDST ) ), NBIN, MXCNT, 
+            CALL POL1_CM1RR( %VAL( CNF_PVAL( IPDST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVST ) ),
-     :                      METH, MINVAL, NSIGMA, 
+     :                      METH, MINVAL, NSIGMA,
      :                      %VAL( CNF_PVAL( IPBIN ) ),
-     :                      %VAL( CNF_PVAL( IPVBIN ) ), 
+     :                      %VAL( CNF_PVAL( IPVBIN ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ), 
-     :                      %VAL( CNF_PVAL( IPPP ) ), 
+     :                      %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                      %VAL( CNF_PVAL( IPPP ) ),
      :                      %VAL( CNF_PVAL( IPCOV ) ),
-     :                      NMAT, %VAL( CNF_PVAL( IPNCON ) ), 
+     :                      NMAT, %VAL( CNF_PVAL( IPNCON ) ),
      :                      %VAL( CNF_PVAL( IPPNT ) ),
      :                      %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
 *  Now do the binning if there are no variances.
          ELSE
 
-*  Allocate an array to hold the variance to use for each line of data, 
+*  Allocate an array to hold the variance to use for each line of data,
 *  and set each element to 1.0 (i.e. give all input values equal weight).
             CALL PSX_CALLOC( MXCNT, '_REAL', IPVAR, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
-            CALL POL1_SETR( MXCNT, 1.0, %VAL( CNF_PVAL( IPVAR ) ), 
+            CALL POL1_SETR( MXCNT, 1.0, %VAL( CNF_PVAL( IPVAR ) ),
      :                      STATUS )
 
 *  Bin the data values.
-            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPDST ) ), NBIN, MXCNT, 
+            CALL POL1_CM3RR( %VAL( CNF_PVAL( IPDST ) ), NBIN, MXCNT,
      :                       %VAL( CNF_PVAL( IPVAR ) ),
-     :                       METH, MINVAL, NSIGMA, 
+     :                       METH, MINVAL, NSIGMA,
      :                       %VAL( CNF_PVAL( IPBIN ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
      :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPNCON ) ),
      :                       %VAL( CNF_PVAL( IPPNT ) ),
      :                       %VAL( CNF_PVAL( IPUSED ) ), STATUS )
 
@@ -829,26 +829,26 @@
          CALL NDF_CREAT( 'OUT', '_REAL', 1, 1, NCIN, INDF, STATUS )
 
 *  Map the DATA array.
-         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'WRITE', IPBIN, NEL, 
+         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'WRITE', IPBIN, NEL,
      :                 STATUS )
 
 *  Check the pointers can be used.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the data values from the catalogue into the NDF DATA array.
-         CALL POL1_CTCLM( CI, NCIN, 1, GI( DID ), 
+         CALL POL1_CTCLM( CI, NCIN, 1, GI( DID ),
      :                    %VAL( CNF_PVAL( IPBIN ) ),
      :                    STATUS )
 
 *  If variances are required, do the same for the VARIANCE array.
          IF( VAR ) THEN
 
-            CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVBIN, 
+            CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVBIN,
      :                    NEL, STATUS )
 
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_CTCLM( CI, NCIN, 1, GI( VID ), 
+            CALL POL1_CTCLM( CI, NCIN, 1, GI( VID ),
      :                       %VAL( CNF_PVAL( IPVBIN ) ),
      :                       STATUS )
 
@@ -862,25 +862,25 @@
 *  Store the WCS FrameSet in the output NDF.
       IF( SHAPE ) CALL NDF_PTWCS( IWCSO, INDF, STATUS )
 
-*  Set the UNITS component of the output NDF.   
+*  Set the UNITS component of the output NDF.
       CLEN = CHR_LEN( UNITS )
-      IF( CLEN .GT. 0 ) CALL NDF_CPUT( UNITS( : CLEN ), INDF, 
+      IF( CLEN .GT. 0 ) CALL NDF_CPUT( UNITS( : CLEN ), INDF,
      :                                 'UNITS', STATUS )
 
-*  Set the TITLE component of the output NDF.   
+*  Set the TITLE component of the output NDF.
       CLEN = CHR_LEN( TITLE )
-      IF( CLEN .GT. 0 ) CALL NDF_CPUT( TITLE( : CLEN ), INDF, 
+      IF( CLEN .GT. 0 ) CALL NDF_CPUT( TITLE( : CLEN ), INDF,
      :                                 'TITLE', STATUS )
 
-*  Set the LABEL component of the output NDF.   
+*  Set the LABEL component of the output NDF.
       CLEN = CHR_LEN( LABEL )
-      IF( CLEN .GT. 0 ) CALL NDF_CPUT( LABEL( : CLEN ), INDF, 'LABEL', 
+      IF( CLEN .GT. 0 ) CALL NDF_CPUT( LABEL( : CLEN ), INDF, 'LABEL',
      :                                 STATUS )
 
 *  If the COLX, COLY, COLZ values are not known to be pixel co-ordinates,
 *  create AXIS structures in the output NDF holding the COLX and COLY
 *  values at the centre of each pixel.
-      IF( SHAPE .AND. .NOT. XYPIX ) THEN 
+      IF( SHAPE .AND. .NOT. XYPIX ) THEN
 
 *  Store the coefficients of the transformation from cell indices to
 *  (X,Y) coordinates at the cell centre.
@@ -896,21 +896,21 @@
      :                  STATUS )
          CALL NDF_AMAP( INDF, 'CENTRE', 2, '_REAL', 'WRITE', IPAX2, NEL,
      :                  STATUS )
-         IF( GOTZ ) THEN 
-            CALL NDF_AMAP( INDF, 'CENTRE', 3, '_REAL', 'WRITE', IPAX3, 
+         IF( GOTZ ) THEN
+            CALL NDF_AMAP( INDF, 'CENTRE', 3, '_REAL', 'WRITE', IPAX3,
      :                     NEL, STATUS )
          ELSE
             IPAX3 = IPAX1
          END IF
 
 *  Store the Axis values.
-         CALL POL1_AXSET( GOTZ, AST__NULL, TR2, NXBIN, NYBIN, NZBIN, 
-     :                    %VAL( CNF_PVAL( IPAX1 ) ), 
-     :                    %VAL( CNF_PVAL( IPAX2 ) ), 
+         CALL POL1_AXSET( GOTZ, AST__NULL, TR2, NXBIN, NYBIN, NZBIN,
+     :                    %VAL( CNF_PVAL( IPAX1 ) ),
+     :                    %VAL( CNF_PVAL( IPAX2 ) ),
      :                    %VAL( CNF_PVAL( IPAX3 ) ),
      :                    STATUS )
 
-*  Store the Axes Label and Units strings.  
+*  Store the Axes Label and Units strings.
          CALL CAT_TIQAC( GI( XID ), 'NAME', LABEL, STATUS )
          CLEN = CHR_LEN( LABEL )
          IF( CLEN .GT. 0 ) CALL NDF_ACPUT( LABEL( : CLEN ), INDF,
@@ -949,25 +949,25 @@
 *  If the COLX, COLY, COLZ values are known to be pixel co-ordinates,
 *  create AXIS structures in the output NDF holding values from the AXIS
 *  Frame of the WCS FrameSet (if any) inherited from the catalogue.
-      ELSE IF( SHAPE ) THEN 
+      ELSE IF( SHAPE ) THEN
 
 *  Get the indices of the AXIS and PIXEL Frames in the output NDF FrameSet.
          IAXIS = AST__NOFRAME
          DO I = 1, AST_GETI( IWCSO, 'NFRAME', STATUS )
             FRM = AST_GETFRAME( IWCSO, I, STATUS )
 
-            IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 
+            IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ.
      :                    'AXIS' ) THEN
                IAXIS = I
 
-            ELSE IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 
+            ELSE IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ.
      :              'PIXEL' ) THEN
                IPIX = I
-            END IF     
+            END IF
 
          END DO
 
-*  If found, get the Mapping from PIXEL to AXIS. 
+*  If found, get the Mapping from PIXEL to AXIS.
          IF( IAXIS .NE. AST__NOFRAME ) THEN
             AXMAP = AST_GETMAPPING( IWCSO, IPIX, IAXIS, STATUS )
 
@@ -975,25 +975,25 @@
             CALL NDF_RESET( INDF, 'AXIS', STATUS )
 
 *  Map the AXIS Centre arrays. This will produce default AXIS values
-*  equaivelent to PIXEL values. 
-            CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'UPDATE', IPAX1, 
+*  equaivelent to PIXEL values.
+            CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'UPDATE', IPAX1,
      :                     NEL, STATUS )
-            CALL NDF_AMAP( INDF, 'CENTRE', 2, '_REAL', 'UPDATE', IPAX2, 
+            CALL NDF_AMAP( INDF, 'CENTRE', 2, '_REAL', 'UPDATE', IPAX2,
      :                     NEL, STATUS )
-            IF( GOTZ ) THEN 
-               CALL NDF_AMAP( INDF, 'CENTRE', 3, '_REAL', 'UPDATE', 
+            IF( GOTZ ) THEN
+               CALL NDF_AMAP( INDF, 'CENTRE', 3, '_REAL', 'UPDATE',
      :                        IPAX3, NEL, STATUS )
             ELSE
                IPAX3 = IPAX1
             END IF
 
 *  Store the Axis values.
-            CALL POL1_AXSET( GOTZ, AXMAP, TR2, NXBIN, NYBIN, NZBIN, 
-     :                       %VAL( CNF_PVAL( IPAX1 ) ), 
+            CALL POL1_AXSET( GOTZ, AXMAP, TR2, NXBIN, NYBIN, NZBIN,
+     :                       %VAL( CNF_PVAL( IPAX1 ) ),
      :                       %VAL( CNF_PVAL( IPAX2 ) ),
      :                       %VAL( CNF_PVAL( IPAX3 ) ), STATUS )
 
-*  Store the Axes Label and Units strings.  
+*  Store the Axes Label and Units strings.
             AXFRM = AST_GETFRAME( IWCSO, IAXIS, STATUS )
 
             LABEL = AST_GETC( AXFRM, 'LABEL(1)', STATUS )
@@ -1022,7 +1022,7 @@
                CLEN = CHR_LEN( LABEL )
                IF( CLEN .GT. 0 ) CALL NDF_ACPUT( LABEL( : CLEN ), INDF,
      :                                           'LABEL', 3, STATUS )
-	       
+
                UNITS = AST_GETC( AXFRM, 'UNIT(3)', STATUS )
                CLEN = CHR_LEN( UNITS )
                IF( CLEN .GT. 0 ) CALL NDF_ACPUT( UNITS( : CLEN ), INDF,
@@ -1041,7 +1041,7 @@
  999  CONTINUE
 
 *  Release work space.
-      IF( SHAPE ) THEN 
+      IF( SHAPE ) THEN
 
          CALL PSX_FREE( IP, STATUS )
          CALL PSX_FREE( IPW1, STATUS )
@@ -1051,7 +1051,7 @@
          CALL PSX_FREE( IPNCON, STATUS )
          CALL PSX_FREE( IPPNT, STATUS )
          CALL PSX_FREE( IPUSED, STATUS )
-   
+
          IF( VAR ) THEN
             CALL PSX_FREE( IPVST, STATUS )
             CALL PSX_FREE( IPPP, STATUS )

@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX, CGX, CGY,
-     :                       NSAMP, ARRAY, X0, Y0, DX, DY, YTOP, 
+     :                       NSAMP, ARRAY, X0, Y0, DX, DY, YTOP,
      :                       YBOT, GOOD, WORK1, WORK2, WORK3,
      :                       STATUS )
 *+
@@ -14,14 +14,14 @@
 
 *  Invocation:
 *     CALL KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX, CGX, CGY,
-*                      NSAMP, ARRAY, X0, Y0, DX, DY, YTOP, 
+*                      NSAMP, ARRAY, X0, Y0, DX, DY, YTOP,
 *                      YBOT, GOOD, WORK1, WORK2, WORK3, STATUS )
 
 *  Description:
-*     This routine extracts the spatral data to be plotted in a single 
+*     This routine extracts the spatral data to be plotted in a single
 *     CLINPLOT cell.  This will be one row of pixels within the supplied
-*     data array, binned up to produce the required number of samples. 
-*     The data are returned in two arrays representing graphics X and Y 
+*     data array, binned up to produce the required number of samples.
+*     The data are returned in two arrays representing graphics X and Y
 *     values along the polyline that represents the spectrum.
 
 *  Arguments:
@@ -62,7 +62,7 @@
 *     YBOT = REAL (Given)
 *        The minimum data value to be displayed in a cell.
 *     GOOD = LOGICAL (Returned)
-*        Returned .TRUE. if the returned spectrum contains any good 
+*        Returned .TRUE. if the returned spectrum contains any good
 *        data values.
 *     WORK1( NSAMP ) = DOUBLE PRECISION (Returned)
 *        Returned holding a series of X-axis values in the GRAPHICS
@@ -76,8 +76,8 @@
 *        Global status value.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
-*     Copyright (C) 2008 Science & Technology Facilities Council. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -107,7 +107,7 @@
 *     2008 November 14 (MJC):
 *        No longer return bad values in WORK2 when the ARRAY values lie
 *        outside the bounds of the cell.  Clipping to prevent plotting
-*        in a vertically adjacent cell is now handled by redefining the 
+*        in a vertically adjacent cell is now handled by redefining the
 *        viewport and window bounds for each cell in CLINPLOT itself.
 *     {enter_further_changes_here}
 
@@ -118,7 +118,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
@@ -197,7 +197,7 @@
       END IF
 
 *  Get the vector index of the first element in the spectrum.
-      IV = ROOT( 1 ) + DIM( 1 )*( ROOT( 2 ) - 1 + 
+      IV = ROOT( 1 ) + DIM( 1 )*( ROOT( 2 ) - 1 +
      :                 DIM( 2 )*( ROOT( 3 ) - 1 ) )
 
 *  In WORK1, store the GRAPHICS X value at the centre of each of the
@@ -229,8 +229,8 @@
             END IF
             IV = IV + STEP
          END DO
-        
-*  If the number of samples is fewer than the spectral axis dimension, 
+
+*  If the number of samples is fewer than the spectral axis dimension,
 *  there is some binning to be done.
       ELSE IF( NSAMP .LT. DIM( SPBAX ) ) THEN
 

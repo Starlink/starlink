@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,7 +86,7 @@
          CALL ERR_REP( 'IRI_GETUN_ERR1',
      :  'IRI_GETUN: The "^U" system of units is not yet supported by '//
      :  'subroutine IRI_CHECK.', STATUS )
-         
+
       END IF
 
 *  If an error has occurred, return a blank value for UNITS.

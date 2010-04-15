@@ -1,4 +1,4 @@
-      SUBROUTINE HISTA0( LOC, THERE, HLOC, RLOC, EXTSIZ, NEXT, NRECS, 
+      SUBROUTINE HISTA0( LOC, THERE, HLOC, RLOC, EXTSIZ, NEXT, NRECS,
      :                   STATUS )
 *+
 *  Name:
@@ -22,7 +22,7 @@
 *  Arguments:
 *     LOC = CHARACTER * ( * ) (Given)
 *        A locator to an HDS object, potentially containing a HISTORY
-*        structure. 
+*        structure.
 *     THERE = LOGICAL (Returned)
 *        True if the object located by LOC contains a HISTORY structure.
 *        False otherwise.
@@ -34,12 +34,12 @@
 *        structure exists.
 *     EXTSIZ = INTEGER (Returned)
 *        The value of the EXTEND_SIZE component. Set to 5 if no
-*        HISTORY structure exists. 
+*        HISTORY structure exists.
 *     NEXT = INTEGER (Returned)
-*        The index of the next HISTORY record to be written. One more 
+*        The index of the next HISTORY record to be written. One more
 *        than the value of the CURRENT_RECORD component (interpreted as
-*        the most recently completed HISTORY record). Set to one if no 
-*        HISTORY structure exists. 
+*        the most recently completed HISTORY record). Set to one if no
+*        HISTORY structure exists.
 *     NRECS = INTEGER (Returned)
 *        The current size of the RECORDS array. Set to zero if no
 *        HISTORY structure exists.
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -109,7 +109,7 @@
          RLOC = ' '
          EXTSIZ = 5
          NEXT = 1
-         NRECS = 0         
+         NRECS = 0
       END IF
 
       END

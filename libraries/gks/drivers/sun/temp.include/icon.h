@@ -95,7 +95,7 @@ extern void	icon_display(); /* how are icons undisplayed? */
 	    0, 0, ICON_DEFAULT_WIDTH, ICON_DEFAULT_HEIGHT,		\
 	    NULL, (struct pixfont *)0, ICON_BKGRDGRY};
 
-#else 
+#else
 
 #define	DEFINE_ICON_FROM_IMAGE(name, image)				\
 	static struct mpr_data CAT(name,_data) = {			\

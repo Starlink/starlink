@@ -121,7 +121,7 @@
 
 *    Local Constants :
 
-      INTEGER  
+      INTEGER
      :    NCHLIN,              ! maximum number of characters in a
                                ! an output record
      :    LNSPPA               ! Number of lines per page for output

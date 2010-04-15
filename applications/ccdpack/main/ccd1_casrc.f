@@ -67,7 +67,7 @@
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'CCD1_PAR'         ! Local CCDPACK constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Global Variables:
       INCLUDE 'CCD1_CACM'        ! CCD1_CALEN = INTEGER
                                  !    Length of elements in character array
@@ -79,7 +79,7 @@
                                  !    Pointer to character array
                                  ! CCD1_CALOC = CHARACTER * ( DAT__SZLOC )
                                  !    Locator for HDS component storing array
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -88,7 +88,7 @@
       CHARACTER * ( CCD1__BLEN ) NEX ! Next buffer for input
       CHARACTER * ( 2048 ) LINE  ! Buffer for an entire line
       INTEGER IAT                ! Write position in line buffer
-      
+
 *.
 
 *  Check inherited global status.
@@ -99,7 +99,7 @@
          CALL AST_PUTLINE( ' ', -1, STATUS )
 
 *  If there are lines left, read one.
-      ELSE 
+      ELSE
 
 *  Initialise position in buffer.
          IAT = 0
@@ -118,15 +118,15 @@
             CALL CHR_APPND( BUF( 2: ), LINE, IAT )
          ELSE
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'CCD1_CASRC_OFLOW', 
+            CALL ERR_REP( 'CCD1_CASRC_OFLOW',
      :                    'CCD1_CASRC: Buffer overflow', STATUS )
          END IF
 
 *  Take a look at the next line if there is one.
-         IF ( CCD1_CAPOS .LT. CCD1_CANUM .AND. STATUS .EQ. SAI__OK ) 
+         IF ( CCD1_CAPOS .LT. CCD1_CANUM .AND. STATUS .EQ. SAI__OK )
      :      THEN
             CALL CCD1_CA2C( %VAL( CNF_PVAL( CCD1_CAPTR ) ), CCD1_CAPOS,
-     :                      BUF, STATUS, 
+     :                      BUF, STATUS,
      :                      %VAL( CNF_CVAL( CCD1_CALEN ) ) )
 
 *  If the next line is a continuation line loop round.

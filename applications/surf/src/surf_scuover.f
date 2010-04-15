@@ -26,7 +26,7 @@
 *     positions it is also necessary to read in the extinction corrected
 *     data file that was used to regrid the data (in fact any extinction
 *     corrected file can be used, possibly with strange results).
-*     By default the position of the bolometers at the start of 
+*     By default the position of the bolometers at the start of
 *     the first integration and zero jiggle offset is plotted. Optionally,
 *     it is possible to plot the bolometer positions at any point during
 *     the observation (still with zero jiggle offset).
@@ -82,7 +82,7 @@
 *        Overlay the bolometer positions at the start of the second
 *        integration but do not label them
 
-*  Notes: 
+*  Notes:
 *     - An image must have already been displayed before using SCUOVER.
 *     - The image must have been displayed using an AST aware application
 *     (such as KAPPA DISPLAY). Otherwise the alignment will not occur.
@@ -91,7 +91,7 @@
 *     SHIFT_DY in REBIN. (the relevant information is not stored in the
 *     rebinned image).
 *     - Pointing shifts are taken into account.
-*     - It is assumed that the displayed image id regridded to the 
+*     - It is assumed that the displayed image id regridded to the
 *     default map centre. SCUOVER aligns the image using AXIS coordinates
 *     and not SKY coordinates therefore there will be an error if incorrect
 *     sky coordinates are assumed.
@@ -146,7 +146,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -232,7 +232,7 @@
       INTEGER          EXT_NDF         ! NDF id of extinction file
       CHARACTER*80     FILENAME        ! default Name of extinction file
                                        ! names of input files read
-      CHARACTER*80     FITS (SCUBA__MAX_FITS) 
+      CHARACTER*80     FITS (SCUBA__MAX_FITS)
                                        ! array of FITS keywords
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
@@ -329,7 +329,7 @@
       INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
                                        ! in input file
       INTEGER          N_MEASUREMENTS  ! number of measurements in input file
-      INTEGER          N_POINT         ! dimension of pointing correction 
+      INTEGER          N_POINT         ! dimension of pointing correction
                                        ! array in input file
       INTEGER          N_POS           ! number of positions measured in input
                                        ! files
@@ -341,7 +341,7 @@
       CHARACTER*10     OUTCRDS         ! Dummy output coords variable
       DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
                                        ! (radians)
-      DOUBLE PRECISION OUT_LAT         ! longitude of output map centre 
+      DOUBLE PRECISION OUT_LAT         ! longitude of output map centre
                                        ! (radians)
       DOUBLE PRECISION OUT_LONG        ! longitude of output map centre
                                        ! (radians)
@@ -349,7 +349,7 @@
                                        ! (radians)
       DOUBLE PRECISION OUT_ROTATION    ! angle between apparent N and N of
                                        ! output coord system (radians)
-      LOGICAL          PLOTNAME        ! Plot the name of the bolometer 
+      LOGICAL          PLOTNAME        ! Plot the name of the bolometer
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                        ! azimuth pointing corrections (radians)
       REAL             POINT_DEL (SCUBA__MAX_POINT)
@@ -357,7 +357,7 @@
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                        ! LST of pointing corrections (radians)
-      LOGICAL          REBIN           ! .TRUE. if REBIN application has 
+      LOGICAL          REBIN           ! .TRUE. if REBIN application has
                                        ! been run on input file
       LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
                                        ! has been run on input file
@@ -432,13 +432,13 @@
 *     Obtain a reference to the NDF.
 *     ==============================
       CALL KPG1_AGREF( IPICD, 'READ', GOTNAM, REFNAM, STATUS )
-      
+
 *     See whether the reference is a name or locator.  The latter should
 *     be phased out, but there may be some old databases and software in
 *     circulation.
       CALL DAT_VALID( REFNAM, GOTLOC, STATUS )
       IF ( GOTLOC ) LOCI = REFNAM
-      
+
 *     End immediately if there was an error.
       IF ( STATUS .NE. SAI__OK ) THEN
          DEVCAN = .TRUE.
@@ -450,7 +450,7 @@
 
 *     Begin an NDF context
       CALL NDF_BEGIN
-      
+
 *     Obtain the NDF.  If the name is given on the command line it will be
 *     used.  If not, the database data reference is used, if there is one.
 *     Otherwise, the user is prompted.
@@ -472,8 +472,8 @@
      :           'file contains too many FITS items', STATUS)
          END IF
       END IF
-      
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, 
+
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS,
      :     N_FITS, STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
@@ -505,13 +505,13 @@
                CALL ERR_REP(' ','WCS read correctly but was not a '//
      :              'FrameSet', STATUS)
             ELSE
-               
+
 *     Select a sky frame
 *     This should set the sky frame to the current frame
 *     if it isnt already
                IF (.NOT. AST_ISASKYFRAME(IWCS, STATUS) ) THEN
-                  IWCSNEW = AST_FINDFRAME( IWCS, 
-     :                 AST_SKYFRAME( ' ', STATUS ), ' ', STATUS ) 
+                  IWCSNEW = AST_FINDFRAME( IWCS,
+     :                 AST_SKYFRAME( ' ', STATUS ), ' ', STATUS )
                END IF
 
 *     Read the epoch
@@ -523,7 +523,7 @@
                END IF
 
             END IF
-         
+
          END IF
 
       END IF
@@ -567,15 +567,15 @@
             CALL ERR_ANNUL (STATUS)
             NREC = 0
          END IF
-         
+
          REDUCE_SWITCH = .FALSE.
          EXTINCTION = .FALSE.
          FLATFIELD = .FALSE.
          REBIN = .FALSE.
-         
+
          IF (NREC .GT. 0) THEN
             DO I = 1, NREC
-               CALL NDF_HINFO (EXT_NDF, 'APPLICATION', 
+               CALL NDF_HINFO (EXT_NDF, 'APPLICATION',
      :              I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
                IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
@@ -602,7 +602,7 @@
       END IF
 
 
-*     Get the Bolometer NA coordinates 
+*     Get the Bolometer NA coordinates
 *     ================================
 
       CALL NDF_DIM (EXT_NDF, MAX_DIM, DIM, NDIM, STATUS)
@@ -612,11 +612,11 @@
 
 *  Get locators
 
-      CALL NDF_XLOC (EXT_NDF, 'SCUBA', 'READ', 
+      CALL NDF_XLOC (EXT_NDF, 'SCUBA', 'READ',
      :     IN_SCUBAX_LOC, STATUS)
-      CALL NDF_XLOC (EXT_NDF, 'SCUCD', 'READ', 
+      CALL NDF_XLOC (EXT_NDF, 'SCUCD', 'READ',
      :     IN_SCUCDX_LOC, STATUS)
-      
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL NDF_XLOC (EXT_NDF, 'REDS', 'READ', IN_REDSX_LOC,
      :        STATUS)
@@ -647,8 +647,8 @@
      :           'file contains too many FITS items', STATUS)
          END IF
       END IF
-      
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, 
+
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS,
      :     N_FITS, STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
@@ -661,14 +661,14 @@
      :     'MODE', OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
       SAMPLE_MODE = ' '
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
 
 *     Telescope and instrument name and sub-instrument name
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'INSTRUME', INSTRUMENT, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'TELESCOP', TELESCOPE, STATUS)
 
 *     We know there can only be one sub instrument and that it is
@@ -680,16 +680,16 @@
 *     And calculate the focal station
       CALL SURFLIB_GET_FOCAL_STATION( TELESCOPE, INSTRUMENT,
      :     SUB_INSTRUMENT, FOCAL_STATION, STATUS )
-      
+
 *     coords of telescope centre
 
       IN_CENTRE_COORDS = ' '
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'CENT_CRD', IN_CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (IN_CENTRE_COORDS)
 
 
-      IF (OUT_COORDS .EQ. 'PL' .AND. 
+      IF (OUT_COORDS .EQ. 'PL' .AND.
      :     IN_CENTRE_COORDS .NE. 'PLANET') THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC('TASK', TSKNAME)
@@ -701,10 +701,10 @@
 
       IN_LONG_RAD = 0.0D0
       IN_LAT_RAD = 0.0D0
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LAT', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LAT_RAD, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LONG', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LONG_RAD, STATUS)
 
@@ -720,7 +720,7 @@
      :        STATUS)
          CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'MJD1', IN_MJD1, STATUS)
-         CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+         CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'MJD2', IN_MJD2, STATUS)
       END IF
 
@@ -733,10 +733,10 @@
       END IF
 
 *     offset from telescope centre
-      
+
       MAP_X = 0.0
       MAP_Y = 0.0
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MAP_X', MAP_X, STATUS)
       MAP_X = MAP_X / REAL (R2AS)
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -774,7 +774,7 @@
      :        POINT_DAZ, N_POINT, STATUS)
          CALL CMP_GET1R(IN_REDSX_LOC,'POINT_DEL',SCUBA__MAX_POINT,
      :        POINT_DEL, N_POINT, STATUS)
-         
+
          IF (STATUS .NE. SAI__OK) THEN
             CALL ERR_ANNUL(STATUS)
             N_POINT = 0
@@ -785,7 +785,7 @@
 *     map the DEM_PNTR and LST arrays and check their dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
-     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
 
 *  Check LST_STRT
@@ -795,12 +795,12 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :                    IN_UT1,
      :     RTEMP, RTEMP, STATUS)
 
 *  see if the observation completed normally or was aborted
- 
+
       STATE = ' '
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
      :  STATE, STATUS)
@@ -812,12 +812,12 @@
 
 *     Write out the standard info concerning number of int/meas/exp
 * Print out information on observation
- 
+
       IF (ABORTED) THEN
 
 *  get the exposure, integration, measurement numbers at which the abort
 *  occurred
- 
+
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'EXP_NO', N_EXPOSURES, STATUS)
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -832,16 +832,16 @@
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
+      CALL MSG_OUTIF (MSG__NORM, ' ',
      :     '^PKG: file contains data for ^N_E '//
      :     'exposure(s) in ^N_I integration(s) in '//
      :     '^N_M measurement(s)', STATUS)
 
 
 *     calculate the apparent RA and Dec of the map centre at IN_UT1
-*     Cannot add MAP_X and MAP_Y here since 
+*     Cannot add MAP_X and MAP_Y here since
 *       1. This routine does not support LOCAL_COORDS
-*       2. The tracking centre moves if LOCAL_COORDS is AZ for 
+*       2. The tracking centre moves if LOCAL_COORDS is AZ for
 *          a fixed RA,Dec centre.
 *     The reference centre will always be the map centre and not the
 *     offset map centre.
@@ -857,7 +857,7 @@
       IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
 
          CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
-     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
+     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT,
      :        JIGGLE_P_SWITCH, SAMPLE_PA, SAMPLE_COORDS, JIGGLE_X,
      :        JIGGLE_Y, STATUS)
 
@@ -882,11 +882,11 @@
 *     longitude and latitude from the extinction FITS header
 *     Note that I rebin in tangent plane centred on RD coordinates.
 
-      IF (SAMPLE_MODE .EQ. 'RASTER' .AND. 
+      IF (SAMPLE_MODE .EQ. 'RASTER' .AND.
      :     (OUT_COORDS .EQ. 'NA' .OR. OUT_COORDS .EQ. 'AZ')) THEN
 
          OUTCRDS = 'RD'
-         CALL SCULIB_CALC_OUTPUT_COORDS (IN_RA_CEN, IN_DEC_CEN, 
+         CALL SCULIB_CALC_OUTPUT_COORDS (IN_RA_CEN, IN_DEC_CEN,
      :        MJD_STANDARD, OUTCRDS, OUT_LONG, OUT_LAT, STATUS)
 
       END IF
@@ -935,21 +935,21 @@
 *     calculate position of each bolometer at first measurement
 
       CALL SURFLIB_PROCESS_BOLS(TSKNAME, 0, N_BOL,
-     :     N_POS, 1, N_SWITCHES, N_EXPOSURES, 
+     :     N_POS, 1, N_SWITCHES, N_EXPOSURES,
      :     N_INTEGRATIONS,N_MEASUREMENTS,
      :     START_EXP, END_EXP, START_INT, END_INT, START_MEAS, END_MEAS,
      :     0, N_FITS, FITS,
-     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :     %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :     IN_ROTATION, SAMPLE_MODE,
      :     SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
      :     JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :     FOCAL_STATION, IN_RA_CEN, IN_DEC_CEN,
      :     %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
-     :     %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
+     :     %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)),
      :     MJD_STANDARD,
-     :     IN_UT1,IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
-     :     IN_LONG2_RAD, IN_LAT2_RAD, 
+     :     IN_UT1,IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2,
+     :     IN_LONG2_RAD, IN_LAT2_RAD,
      :     LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
@@ -1004,10 +1004,10 @@
          SHIFT_DY = 0.0
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_APPARENT_2_TP (N_BOL, 
-     :           %VAL(CNF_PVAL(BOL_RA_PTR)), 
+            CALL SCULIB_APPARENT_2_TP (N_BOL,
+     :           %VAL(CNF_PVAL(BOL_RA_PTR)),
      :           %VAL(CNF_PVAL(BOL_DEC_PTR)),
-     :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
+     :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
      :           DBLE(SHIFT_DX), DBLE(SHIFT_DY), STATUS)
          END IF
 
@@ -1034,7 +1034,7 @@
 *     Set the plotting style.
          CALL KPG1_ASSET( 'SURF_SCUOVER', 'STYLE', IPLOT, STATUS )
 
-*     Set the appearance of lines drawn using PGPLOT so that they mimic 
+*     Set the appearance of lines drawn using PGPLOT so that they mimic
 *     curves produced using astCurves.
          CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS1, STATUS )
 
@@ -1046,13 +1046,13 @@
             BOL_DIST = 15.0D0
 
          ELSE
-         
+
 *     Need to find half distance between bolometers
             CALL VEC_DTOD(.TRUE., 2, %VAL(CNF_PVAL(BOL_RA_PTR)),
      :           XTEMP, IERR, NERR, STATUS)
             CALL VEC_DTOD(.TRUE., 2, %VAL(CNF_PVAL(BOL_DEC_PTR)),
      :           YTEMP, IERR, NERR, STATUS)
-         
+
             BOL_DIST = SQRT((XTEMP(2)-XTEMP(1))**2 +
      :           (YTEMP(2)-YTEMP(1))**2)
             BOL_DIST = BOL_DIST * R2AS * 0.5D0
@@ -1071,7 +1071,7 @@
 
          BOL_DIST_WORLD = REAL(ABS(YTEMP(2) - YTEMP(1)))
 
-*     Now that we have converted bolometer separation to world coordinates 
+*     Now that we have converted bolometer separation to world coordinates
 *     for textht, we need to calculate the required size relative to
 *     the default PGPLOT TEXT HEIGHT. This is because the standard
 *     font size is defined a 1/40 the height of the view surface!!!!
@@ -1095,14 +1095,14 @@
                CALL ERR_ANNUL( STATUS )
             END IF
          END IF
-         
+
 *     Set the Fill-Area mode to outline so we can see the text
 *     in the circles
          CALL PGSFS( 2 )
 
 *     We are going to do this loop twice. Once to draw the circles
 *     and again to write the labels. This is so that we can change
-*     style between plots and can therefore draw the labels in 
+*     style between plots and can therefore draw the labels in
 *     a different colour to the circles
 *     Not very elegant since we end up calculating the positions
 *     twice. Do not want to store the positions since will need
@@ -1112,10 +1112,10 @@
 *     Loop through all bolometers
          DO I = 1, N_BOL
 
-            CALL VEC_DTOD(.TRUE., 1, 
+            CALL VEC_DTOD(.TRUE., 1,
      :                    %VAL(CNF_PVAL(BOL_RA_PTR)+(I-1)*VAL__NBD),
      :           DXTEMP, IERR, NERR, STATUS)
-            CALL VEC_DTOD(.TRUE., 1, 
+            CALL VEC_DTOD(.TRUE., 1,
      :                    %VAL(CNF_PVAL(BOL_DEC_PTR)+(I-1)*VAL__NBD),
      :           DYTEMP, IERR, NERR, STATUS)
 
@@ -1125,7 +1125,7 @@
 *     Transform to world coordinates
 *     It is probably better to do this outside the loop since
 *     AST_TRAN2 can convert many coordinates at once
-            CALL AST_TRAN2( AX2GRMAP, 1, DXTEMP, DYTEMP, 
+            CALL AST_TRAN2( AX2GRMAP, 1, DXTEMP, DYTEMP,
      :           .TRUE., DXTEMP, DYTEMP, STATUS)
             RTEMP = SNGL( DXTEMP )
             RDTEMP = SNGL( DYTEMP )
@@ -1143,7 +1143,7 @@
 *     Set up BOLometer as a synonym for textlab
          CALL KPG1_ASPSY( '(BOL*OMETER)', '(TEXTLAB)', STATUS )
 
-*     Set the appearance of fonts drawn using PGPLOT so that they mimic 
+*     Set the appearance of fonts drawn using PGPLOT so that they mimic
 *     curves produced using astText.
          CALL KPG1_PGSTY( IPLOT, 'TEXTLAB', .TRUE., ATTRS2, STATUS )
 
@@ -1153,10 +1153,10 @@
          IF (PLOTNAME) THEN
             DO I = 1, N_BOL
 
-               CALL VEC_DTOD(.TRUE., 1, 
+               CALL VEC_DTOD(.TRUE., 1,
      :                       %VAL(CNF_PVAL(BOL_RA_PTR)+(I-1)*VAL__NBD),
      :              DXTEMP, IERR, NERR, STATUS)
-               CALL VEC_DTOD(.TRUE., 1, 
+               CALL VEC_DTOD(.TRUE., 1,
      :              %VAL(CNF_PVAL(BOL_DEC_PTR)+(I-1)*VAL__NBD),
      :              DYTEMP, IERR, NERR, STATUS)
 
@@ -1166,16 +1166,16 @@
 *     Transform to world coordinates
 *     It is probably better to do this outside the loop since
 *     AST_TRAN2 can convert many coordinates at once
-               CALL AST_TRAN2( AX2GRMAP, 1, DXTEMP, DYTEMP, 
+               CALL AST_TRAN2( AX2GRMAP, 1, DXTEMP, DYTEMP,
      :              .TRUE., DXTEMP, DYTEMP, STATUS)
                RTEMP = SNGL( DXTEMP )
                RDTEMP = SNGL( DYTEMP )
 
 *     Convert to proper bol name if necessary
                IF (BOLNAME) THEN
-                  CALL SCULIB_BOLNAME(BOL_ADC(I), BOL_CHAN(I), BOL, 
+                  CALL SCULIB_BOLNAME(BOL_ADC(I), BOL_CHAN(I), BOL,
      :                 STATUS)
-               ELSE 
+               ELSE
                   CALL CHR_ITOC(I, BOL, ITEMP)
                END IF
 
@@ -1202,7 +1202,7 @@
 
       CALL SCULIB_FREE ('BOL_RA', BOL_RA_PTR, BOL_RA_END, STATUS)
       CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR, BOL_DEC_END, STATUS)
- 
+
  980  CONTINUE
 
 *  Tidy up the locators.
@@ -1221,5 +1221,5 @@
 
 *  End the error context
       CALL ERR_END(STATUS)
- 
+
       END

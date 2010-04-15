@@ -205,7 +205,7 @@ proc action_end_hook {name} {
 # We assume the numbering is correct
     if { [lsearch -exact [array names parRec] 0] >= 0 } {
         set non_positionals 1
-    } else { 
+    } else {
         set non_positionals 0
     }
     if { [lsearch -exact [array names parRec] 1] >= 0 } {
@@ -226,7 +226,7 @@ proc action_end_hook {name} {
     } {
        puts $packageIniScript \
             "task \$$name = \"$Current(package)\$$Current(executable).e\""
-    }    
+    }
     puts $exeTclScript "set OutputParList($name) \{$OutputPars\}"
     puts $exeTclScript "set DynParList($name) \{$DynPars\}"
 }
@@ -421,7 +421,7 @@ proc task_end_hook {action} {
                 }
              }
           }
-       }    
+       }
 
        puts $packageIniScript \
          "task $Current(command) = \"$Current(package)\$$Current(command).cl\""
@@ -444,19 +444,19 @@ proc task_end_hook {action} {
       "begin"
     foreach param $Inheritpars {
        puts $auxScript \
-         " string t${param}=\"\""          
+         " string t${param}=\"\""
        puts $auxScript \
-         " string g${param}"          
+         " string g${param}"
     }
     foreach param $Inheritpars {
        puts $auxScript \
-         " g$param = str($param)"          
+         " g$param = str($param)"
        if { $Partype($param) == "s" || $Partype($param) == "struc" } {
          puts $auxScript \
-            " if ( g${param} != \"\" ) t$param = \"$param=\\\"\" + g$param + \"\\\" \""  
+            " if ( g${param} != \"\" ) t$param = \"$param=\\\"\" + g$param + \"\\\" \""
        } {
          puts $auxScript \
-            " if ( g${param} != \"\" ) t$param = \"$param=\" + g$param + \" \""  
+            " if ( g${param} != \"\" ) t$param = \"$param=\" + g$param + \" \""
        }
        puts $auxScript \
          " ;"
@@ -475,7 +475,7 @@ proc taskparam_start_hook { val } {
     set temp [lreplace $temp 0 0 [adampar2iraf [lindex $temp 0] ] ]
     regsub -all {"} [lindex $temp 1] {\"} tmp
     set temp [lreplace $temp 1 1 $tmp]
-    
+
     set string [join $temp =]
     lappend Parameters "\"$string \""
 }

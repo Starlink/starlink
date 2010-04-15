@@ -36,7 +36,7 @@ C     XSTART   The first x-value of the range to be used to calculate
 C              the mean value for each spectrum.
 C     XEND     The last x-value of the range to be used to calculate
 C              the mean value for each spectrum.
-C     CRSIG    The cutoff sigma value to be used.  
+C     CRSIG    The cutoff sigma value to be used.
 C     MSPECT   The name of the mean spectrum produced, if WMEAN is true.
 C     OUTPUT   The name of the resulting image with the cosmic rays removed.
 C
@@ -52,7 +52,7 @@ C  Files used:
 C     BADPIX.DAT  Contains a list of the cosmic rays removed from the data.
 C
 C  History:
-C     8th  Sept  1987  Original version DJA / AAO 
+C     8th  Sept  1987  Original version DJA / AAO
 C     6th  March 1990  Reworked to use DSA routines, and some changes
 C                      to the parameters made.  KS / AAO.
 C     2nd  July  1990  Fixed 'double counting' bug causing excessive
@@ -212,7 +212,7 @@ C+
       SUBROUTINE FIG_COS_REJ (NX,NY,IXST,IXEN,CRSIG,WMEAN,BFILE,DATA,
      :                                                     MSPEC,REJ)
 C
-C     F I G _ C O S R E J 
+C     F I G _ C O S R E J
 C
 C     Attempts to remove cosmic rays from an array containing a set of
 C     similar spectra.  The algorithm is described in more detail at
@@ -274,7 +274,7 @@ C
       INTEGER   NREJ               ! Number of pixels rejected in last pass
       INTEGER   PIXEL              ! Loop counter along spectra
       LOGICAL   REJECTED(MAXSPEC)  ! TRUE if a pixel has been rejected
-      INTEGER   SPECT              ! Spectrum being considered 
+      INTEGER   SPECT              ! Spectrum being considered
       CHARACTER STRING*64          ! Output message text
       REAL      TOTAL              ! Used for summing set of values
       REAL      MEANS(MAXSPEC)     ! Mean values for spectra
@@ -372,7 +372,7 @@ C
             END DO
          END DO
 C
-C        Set the rejected pixels to the mean value of the unrejected 
+C        Set the rejected pixels to the mean value of the unrejected
 C        pixels, and list them as well.
 C
          TOTAL=0.0
@@ -412,7 +412,7 @@ C
       STRING=' '
       CALL PAR_WRUSER (STRING,IGNORE)
       WRITE (BFILE,'(1X,A)',IOSTAT=IGNORE) STRING
-      WRITE (STRING,'(A,I10)',IOSTAT=IGNORE) 
+      WRITE (STRING,'(A,I10)',IOSTAT=IGNORE)
      :                        'Total no. pixels rejected = ',REJ
       CALL PAR_WRUSER (STRING,IGNORE)
       WRITE (BFILE,'(1X,A)',IOSTAT=IGNORE) STRING

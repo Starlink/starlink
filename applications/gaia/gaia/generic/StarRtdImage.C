@@ -5956,7 +5956,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     *fitsext = new char[namelen];
     strcpy( *fullname, imagename );
 
-    //  Does the name as given exist as a file? If so we don't need to 
+    //  Does the name as given exist as a file? If so we don't need to
     //  check for slices & paths.
     int exists = fileExists( *fullname );
 

@@ -55,12 +55,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -81,7 +81,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -125,7 +125,7 @@
       INDF = NDF__NOID
 
 *  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN 
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check that the ACB index is valid and report an error if it is not.
       IF ( ( IACB .LT. 1 ) .OR. ( IACB .GT. NDF__MXACB ) ) THEN
@@ -152,7 +152,7 @@
 
 *  Assign the current identifier context level to the ACB entry.
          ACB_CTX( IACB ) = ACB_IDCTX
-      END IF       
+      END IF
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_EXPID', STATUS )

@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
-*                      AstMapping *ospecmap, AstSkyFrame *oskyframe, 
-*                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
-*                      int genvar, float *data_array, float *var_array, 
-*                      int *ispec, float *texp_array, float *teff_array, 
+*                      AstMapping *ospecmap, AstSkyFrame *oskyframe,
+*                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
+*                      int genvar, float *data_array, float *var_array,
+*                      int *ispec, float *texp_array, float *teff_array,
 *                      double *fcon, int *status );
 
 *  Arguments:
@@ -27,16 +27,16 @@
 *        Is this the first call to this routine for the current output
 *        cube?
 *     ptime = int * (Given)
-*        Pointer to an array of integers, each one being the index of a 
-*        time slice that is to be pasted into the output cube. If this is 
+*        Pointer to an array of integers, each one being the index of a
+*        time slice that is to be pasted into the output cube. If this is
 *        NULL, then all time slices are used. The values in the array
-*        should be monotonic increasing and should be terminated by a value 
+*        should be monotonic increasing and should be terminated by a value
 *        of VAL__MAXI.
 *     ospecfrm = AstFrame * (Given)
-*        Pointer to the SpecFrame within the current Frame of the output WCS 
+*        Pointer to the SpecFrame within the current Frame of the output WCS
 *        Frameset.
 *     ospecmap = AstMapping * (Given)
-*        Pointer to the Mapping from the SpecFrame to the third GRID axis 
+*        Pointer to the Mapping from the SpecFrame to the third GRID axis
 *        within the current Frame of the output WCS Frameset.
 *     oskyframe = AstFrame * (Given)
 *        Pointer to the SkyFrame in the output WCS FrameSet.
@@ -57,23 +57,23 @@
 *        include the data from the supplied input NDF.
 *     var_array = float * (Given and Returned)
 *        An array in which to store the variances for the output cube if
-*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
-*        zero). The supplied array is update on exit to include the data from 
-*        the supplied input NDF. This array should be big enough to hold a 
-*        single spatial plane from the output cube (all planes will have the 
-*        same variance and so only one plane need be calculated). 
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is
+*        zero). The supplied array is update on exit to include the data from
+*        the supplied input NDF. This array should be big enough to hold a
+*        single spatial plane from the output cube (all planes will have the
+*        same variance and so only one plane need be calculated).
 *     ispec = int * (Given and Returned)
 *        Index of the next spectrum to be stored in the output NDF.
 *     texp_array = float * (Given and Returned)
-*        A work array, which holds the total exposure time for each output 
-*        spectrum. It is updated on exit to include the supplied input 
-*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
+*        A work array, which holds the total exposure time for each output
+*        spectrum. It is updated on exit to include the supplied input
+*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough
 *        to hold a single spatial plane from the output cube.
 *     teff_array = float * (Given and Returned)
-*        A work array, which holds the effective integration time (scaled 
-*        by a factor of 4) "on" time for each output 
-*        spectrum. It is updated on exit to include the supplied input 
-*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
+*        A work array, which holds the effective integration time (scaled
+*        by a factor of 4) "on" time for each output
+*        spectrum. It is updated on exit to include the supplied input
+*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough
 *        to hold a single spatial plane from the output cube.
 *     fcon = double * (Given and Returned)
 *        If "first" is supplied non-zero, then *fcon is returned holding
@@ -116,9 +116,9 @@
 *     12-OCT-2007 (DSB):
 *        Added parameter "ptime".
 *     12-FEB-2008 (DSB):
-*        Replaced argument "index" with "first". This is because different 
-*        output tiles and/or polarisation bins will receive contributions 
-*        from different input files, not necessarily starting at the first 
+*        Replaced argument "index" with "first". This is because different
+*        output tiles and/or polarisation bins will receive contributions
+*        from different input files, not necessarily starting at the first
 *        input file or ending at the last.
 *     11-FEB-2009 (DSB):
 *        Ignore negative or zero input Tsys values.
@@ -166,10 +166,10 @@
 #define FUNC_NAME "smf_rebinsparse"
 
 void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
-                      AstMapping *ospecmap, AstSkyFrame *oskyframe, 
-                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
-                      int genvar, float *data_array, float *var_array, 
-                      int *ispec, float *texp_array, float *teff_array, 
+                      AstMapping *ospecmap, AstSkyFrame *oskyframe,
+                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ],
+                      int genvar, float *data_array, float *var_array,
+                      int *ispec, float *texp_array, float *teff_array,
                       double *fcon, int *status ){
 
 /* Local Variables */
@@ -236,34 +236,34 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 /* Store the number of pixels in one time slice */
    timeslice_size = (data->dims)[ 0 ]*(data->dims)[ 1 ];
 
-/* We want a description of the spectral WCS axis in the input file. If 
+/* We want a description of the spectral WCS axis in the input file. If
    the input file has a WCS FrameSet containing a SpecFrame, use it,
-   otherwise we will obtain it from the FITS header later. NOTE, if we knew 
-   that all the input NDFs would have the same spectral axis calibration, 
-   then the spectral WCS need only be obtained from the first NDF. However, 
-   in the general case, I presume that data files may be combined that use 
-   different spectral axis calibrations, and so these differences need to 
+   otherwise we will obtain it from the FITS header later. NOTE, if we knew
+   that all the input NDFs would have the same spectral axis calibration,
+   then the spectral WCS need only be obtained from the first NDF. However,
+   in the general case, I presume that data files may be combined that use
+   different spectral axis calibrations, and so these differences need to
    be taken into account. */
-   if( hdr->tswcs ) {   
+   if( hdr->tswcs ) {
       fs = astClone( hdr->tswcs );
-   
+
 /* The first axis should be a SpecFrame. See if this is so. If not annul
    the specframe pointer. */
       specax = 1;
       specframe = astPickAxes( fs, 1, &specax, NULL );
       if( !astIsASpecFrame( specframe ) ) specframe = astAnnul( specframe );
-   } 
+   }
 
-/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the 
-   FITS extension of the input NDF. Take a copy of the FITS header (so that 
-   the contents of the header are not changed), and then read a FrameSet 
+/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the
+   FITS extension of the input NDF. Take a copy of the FITS header (so that
+   the contents of the header are not changed), and then read a FrameSet
    out of it. */
    if( !specframe ) {
       fc = astCopy( hdr->fitshdr );
       astClear( fc, "Card" );
       fs = astRead( fc );
 
-/* Extract the SpecFrame that describes the spectral axis from the current 
+/* Extract the SpecFrame that describes the spectral axis from the current
    Frame of this FrameSet. This is assumed to be the third WCS axis (NB
    the different axis number). */
       specax = 3;
@@ -271,7 +271,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    }
 
 /* Split off the 1D Mapping for this single axis from the 3D Mapping for
-   the whole WCS. This results in "specmap" holding the Mapping from 
+   the whole WCS. This results in "specmap" holding the Mapping from
    SpecFrame value to GRID value. */
    fsmap = astGetMapping( fs, AST__CURRENT, AST__BASE );
    astMapSplit( fsmap, 1, &specax, pixax, &specmap );
@@ -280,16 +280,16 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    coord to spectral coord. */
    astInvert( specmap );
 
-/* Get a Mapping that converts values in the input spectral system to the 
+/* Get a Mapping that converts values in the input spectral system to the
    corresponding values in the output spectral system. */
    fs = astConvert( specframe, ospecfrm, "" );
 
-/* Concatenate these Mappings with the supplied spectral Mapping to get 
+/* Concatenate these Mappings with the supplied spectral Mapping to get
    a Mapping from the input spectral grid axis (pixel axis 1) to the
    output spectral grid axis (pixel axis 3). Simplify the Mapping. */
    ssmap = astCmpMap( astCmpMap( specmap, astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                 1, " " ), 
+                                 1, " " ),
                       ospecmap, 1, " " );
    ssmap = astSimplify( ssmap );
 
@@ -307,7 +307,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                spectab[ ichan ] = iz;
             } else {
                spectab[ ichan ] = 0;
-            }             
+            }
          } else {
             spectab[ ichan ] = 0;
          }
@@ -321,11 +321,11 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    xout = astMalloc( (data->dims)[ 1 ] * sizeof( *xout ) );
    yout = astMalloc( (data->dims)[ 1 ] * sizeof( *yout ) );
 
-/* Initialise a string to point to the name of the first detector for which 
+/* Initialise a string to point to the name of the first detector for which
    data is available */
    name = hdr->detname;
 
-/* Store input coords for the detectors. Axis 1 is the detector index, and 
+/* Store input coords for the detectors. Axis 1 is the detector index, and
    axis 2 is a dummy axis that always has the value 1. */
    for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
       xin[ irec ] = irec + 1.0;
@@ -333,7 +333,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coords bad. */
-      if( detgrp ) {    
+      if( detgrp ) {
          found = grpIndex( name, detgrp, 1, status );
          if( !found ) {
             xin[ irec ] = AST__BAD;
@@ -345,7 +345,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
       name += strlen( name ) + 1;
    }
 
-/* Find the constant factor associated with the current input file. This 
+/* Find the constant factor associated with the current input file. This
    is the squared backend degradation factor, divided by the noise bandwidth.
    Get the required FITS headers, checking they were found. */
    if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
@@ -353,12 +353,12 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
 /* Get a Mapping that converts values in the input spectral system to
    topocentric frequency in Hz, and concatenate this Mapping with the
-   Mapping from input GRID coord to the input spectral system. The result 
+   Mapping from input GRID coord to the input spectral system. The result
    is a Mapping from input GRID coord to topocentric frequency in Hz. */
       specframe2 = astCopy( specframe );
       astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
-      fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe, 
-                                                            specframe2, 
+      fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe,
+                                                            specframe2,
                                                             "" ),
                                                 AST__BASE, AST__CURRENT ),
                         1, " " );
@@ -368,8 +368,8 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
       at = 0.5*nchan;
       dnew = astRate( fmap, &at, 1, 1 );
 
-/* Modify the channel width to take account of the effect of the FFT windowing 
-   function. Allow undef value because FFT_WIN for old data had a broken value 
+/* Modify the channel width to take account of the effect of the FFT windowing
+   function. Allow undef value because FFT_WIN for old data had a broken value
    in hybrid subband modes. */
       if( dnew != AST__BAD ) {
          dnew = fabs( dnew );
@@ -392,12 +392,12 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
          }
 
 /* Form the required constant. */
-         fcon2 = k*k/dnew;  
+         fcon2 = k*k/dnew;
 
       } else {
          fcon2 = VAL__BADD;
       }
- 
+
    } else {
       fcon2 = VAL__BADD;
    }
@@ -424,10 +424,10 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 /* Store a pointer to the first input data value in this time slice. */
       pdata = ( (float *) (data->pntr)[ 0 ] ) + itime*timeslice_size;
 
-/* Get a FrameSet describing the spatial coordinate systems associated with 
-   the current time slice of the current input data file. The base frame in 
-   the FrameSet will be a 2D Frame in which axis 1 is detector number and 
-   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame 
+/* Get a FrameSet describing the spatial coordinate systems associated with
+   the current time slice of the current input data file. The base frame in
+   the FrameSet will be a 2D Frame in which axis 1 is detector number and
+   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
       smf_tslice_ast( data, itime, 1, status );
@@ -483,7 +483,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
       astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
 
 /* Loop round all detectors. */
-      for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) { 
+      for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
 /* If the detector has a valid position, see if it produced any good
    data values. */
@@ -495,10 +495,10 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                   good = 1;
                   break;
                }
-            }         
+            }
 
 /* If it did, calculate the variance associated with each detector
-   sample (if required), based on the input Tsys values, and copy the 
+   sample (if required), based on the input Tsys values, and copy the
    spectrum to the output NDF. */
             if( good ) {
                if( *ispec < dim[ 0 ] ){
@@ -514,17 +514,17 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                      texp_array[ *ispec ] = texp;
                      teff_array[ *ispec ] = teff;
                   }
-   
+
                   for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
                      iz = spectab[ ichan ] - 1;
-                     if( iz >= 0 && iz < dim[ 2 ] ) { 
+                     if( iz >= 0 && iz < dim[ 2 ] ) {
                         iv = *ispec + dim[ 0 ]*iz;
                         data_array[ iv ] = *pdata;
                      }
                   }
 
                   (*ispec)++;
-   
+
                } else if( *status == SAI__OK ){
                   *status = SAI__ERROR;
                   msgSeti( "DIM", dim[ 0 ] );
@@ -532,7 +532,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                           "the output NDF (programming error).", status );
                   break;
                }
-   
+
 /* If this detector does not have any valid data values, increment the data
    pointer to point at the first sample for the next detector. */
             } else {
@@ -549,7 +549,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 /* For efficiency, explicitly annul the AST Objects created in this tight
    loop. */
       fs = astAnnul( fs );
-   }   
+   }
 
 /* Free resources */
    spectab = astFree( spectab );

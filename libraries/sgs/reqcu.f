@@ -195,9 +195,9 @@
 
          IF (ISTAT.EQ.GOK) THEN
 
-*        If choice device is the keyboard then search the choice string for 
+*        If choice device is the keyboard then search the choice string for
 *        the character. This will set N to zero if the key is not in the
-*        choice string. 
+*        choice string.
             IF (NCHODV.EQ.0) THEN
                CALL sgs_1UPCAS(CHAR(N+31),C)
                N = INDEX(CHOIST(1:LCHOST),C)

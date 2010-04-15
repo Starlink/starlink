@@ -9,9 +9,9 @@ C     Releases previously obtained workspace.
 C
 C  Description:
 C     When workspace is obtained through a call to DSA_GET_WORKSPACE,
-C     or through a call to DSA_GET_WORK_ARRAY, a handle value (SLOT) 
-C     is returned to identify the workspace obtained.  The workspace 
-C     can be released through a call to DSA_FREE_WORKSPACE, specifying 
+C     or through a call to DSA_GET_WORK_ARRAY, a handle value (SLOT)
+C     is returned to identify the workspace obtained.  The workspace
+C     can be released through a call to DSA_FREE_WORKSPACE, specifying
 C     that slot number.
 C
 C  Language:
@@ -108,10 +108,10 @@ C     Flag the slot as unused
 C
       WORK_USED(SLOT)=.FALSE.
 C
-C     Release the virtual memory allocated for the slot. The error reporting 
-C     is not as good as it should be here, since we have to disable EMS (DSA 
-C     not being a proper EMS environment) and the saving of the bad PSX 
-C     status code in VMS_CODE is clearly an historical oddity that should be 
+C     Release the virtual memory allocated for the slot. The error reporting
+C     is not as good as it should be here, since we have to disable EMS (DSA
+C     not being a proper EMS environment) and the saving of the bad PSX
+C     status code in VMS_CODE is clearly an historical oddity that should be
 C     sorted out sometime.
 C
       EMSTAT=0

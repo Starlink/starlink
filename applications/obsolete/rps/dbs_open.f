@@ -7,13 +7,13 @@
 *     1987 Aug	M Harris	1st version
 *     1988 Oct	M Ricketts	Change access to dscf to 'readonly'
 *     1989 Jan	   ::		Add Open_type, shows how file was opened (re-edit!)
-*     1992 Apr  M. Dueterhaus   Remove VAX RTL calls 
+*     1992 Apr  M. Dueterhaus   Remove VAX RTL calls
 *     1996 Mar  m Ricketts      tidy filenames
 
 *DESCRIPTION:
 
-*     This subroutine opens the files and then gets the field information for the 
-*     database and loads it into common blocks for access by the rest of the 
+*     This subroutine opens the files and then gets the field information for the
+*     database and loads it into common blocks for access by the rest of the
 *     program. It also provides a backup file in case of errors.
 
 * Caliing Arguments
@@ -31,10 +31,10 @@
       INCLUDE 'com_dbs_iof.inc'
       INCLUDE 'com_dbs_bytes.inc'
       INCLUDE 'com_form_files.inc'
- 
+
       CHARACTER*5   FILESYM(MAX_FILE_COUNT)		! Symbolic name of file.
       COMMON / DBS_FILES / FILESYM
- 
+
 *  Local Variables
       INTEGER MAXFILES_PLUS1
       PARAMETER(MAXFILES_PLUS1=MAX_FILE_COUNT + 1)
@@ -50,7 +50,7 @@
 
 *  Functions
       INTEGER  MDH_ENDWORD, nchars
- 
+
 *  ________________________  Executable Code  ______________________________
 	j = MDH_ENDWORD(FILE)
 
@@ -106,7 +106,7 @@
 
       ELSE
 
-        FILENAME( I ) =' ' 
+        FILENAME( I ) =' '
         IF ( POINTER .LE. 0 ) THEN
             CALL GETLUN( IDSCF )						!  Get logical unit number.
 
@@ -117,7 +117,7 @@
           else
             WRITE(*,*) ' Error - dbs_open, i=',I
             stop
-	  END IF	
+	  END IF
           OPEN( IDSCF , FILE = TEMPNAME, STATUS = 'OLD'
      &       ,    IOSTAT = IERR )  					!  Open descriptor file if it exists.
 
@@ -139,7 +139,7 @@
 
           IF ( USE(:1) .EQ. 'W' ) THEN						! If write open required.
 										!  To make a backup file.
-	      LEN_TEMP_FILE= MDH_ENDWORD(FILE)	
+	      LEN_TEMP_FILE= MDH_ENDWORD(FILE)
 	      TEMPNAME = FILE(1:LEN_TEMP_FILE)
 	      NONUMNAME = TEMPNAME
               NCHARS = MDH_ENDWORD(NONUMNAME)
@@ -154,7 +154,7 @@
           ELSE
 
             CALL GETLUN( LUNNUM )
-            LEN_TEMP_FILE= MDH_ENDWORD(FILE) 
+            LEN_TEMP_FILE= MDH_ENDWORD(FILE)
             TEMPNAME = FILE(1:LEN_TEMP_FILE)
             OPEN( LUNNUM , FILE = TEMPNAME ,
 	1	STATUS = 'OLD' , ACCESS = 'DIRECT'
@@ -195,14 +195,14 @@
         CALL DBS_READ_DSCF(REF_NO, IDSCF, POINTER )
 
         IF ( USE(:1) .EQ. 'C' ) THEN						! If file is to be re-opened.
-          CALL GETLUN( LNDB( I ) )		
+          CALL GETLUN( LNDB( I ) )
 	  LEN_TEMP_FILE= MDH_ENDWORD(FILE)
           OPEN (LNDB(I),FILE = FILE(1:LEN_TEMP_FILE),STATUS='NEW'			!  Open the file.
 	1     ,     RECL = 80 , ACCESS = 'DIRECT'		!  Set record size and access.
 	2     ,     IOSTAT = IERR)			!  Set organisation.
           ARRAY( I ) = 2
 
-        ELSE IF ( USE(:1) .EQ. 'D' ) THEN               
+        ELSE IF ( USE(:1) .EQ. 'D' ) THEN
           ARRAY( I ) = 1
 
         ELSE

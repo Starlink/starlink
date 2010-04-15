@@ -153,7 +153,7 @@
       USEOLD = .FALSE.
       CLONEABLE = .FALSE.
       REGISTERED = .FALSE.
-      
+
       STATUS = 0
       STATIC_INDICIES = 0
       MAPPED_ADDRESS = 0
@@ -212,7 +212,7 @@
      :        0, DUMDIM, 1, 0, ' ', STATUS )
          CLONE_FILE_OPEN = .FALSE.
       END IF
-       
+
 *  Close a result file.
       IF ( ( REQ_OBJ .EQ. 'ECH_RDUCD' ) .AND.
      :     ( OPERATION .EQ. 'CLOSE' ) .AND. RESULT_FILE_OPEN ) THEN
@@ -748,7 +748,7 @@
      :                       NEW_HANDLE, DUMDIM, 1, 0, ' ', STATUS )
                      END IF
                   END IF
-                   
+
                ELSE
                   GO TO 999
                END IF
@@ -978,5 +978,5 @@
       END IF
 
   999 CONTINUE
-      
+
       END

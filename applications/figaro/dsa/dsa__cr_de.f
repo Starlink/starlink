@@ -52,7 +52,7 @@ C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
 C                       original Figaro format (DST files).
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C
 C  History:
@@ -86,7 +86,7 @@ C
 C
 C     In NDF format, the data arrays are at top level, so little
 C     needs doing. However, we do set the flagged value flag to false
-C     unless it already exists, in which case we leave it alone.  In 
+C     unless it already exists, in which case we leave it alone.  In
 C     THE original Figaro format, a .Z structure must exist, so we create that.
 C
       IF (NDF_FORMAT(REF_SLOT)) THEN

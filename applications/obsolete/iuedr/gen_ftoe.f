@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE gen_FTOE
 *
-*   Description: 
+*   Description:
 *      Encode float value into string using E-format.
 *
 *   Authors:
@@ -40,18 +40,18 @@
 
 *   Import:
       REAL*8 FVALUE                 ! decoded value
- 
+
       INTEGER FIELD               ! field width
       INTEGER PREC                ! precision
       INTEGER MAXC                ! maximum size of string
- 
+
 *   Export:
       BYTE SVALUE(MAXC)           ! string to be filled
- 
+
 *   Local variables:
       CHARACTER CVALUE*(MAXBUF)   ! Fortran 77 version of value string
       CHARACTER FORMAT*(MAXFMT)   ! Fortran 77 format string
- 
+
       INTEGER NCHAR               ! character count
       INTEGER CODE                ! local status
 

@@ -83,7 +83,7 @@ C
       INTEGER   IPTR        ! Pointer into character string
 C
 C     Return immediately if bad status passed
-C 
+C
       IF (STATUS.NE.0) RETURN
 C
 C     HISTORY, COMMENT and blank keywords have values that start
@@ -133,7 +133,7 @@ C
                      IF ((IPTR.EQ.0).OR.(IPTR.GE.80)) THEN
                         COMMENT=' '
                      ELSE
-                        IF (FITS_ARRAY(NSTR)(IPTR+1:IPTR+1).EQ.' ') 
+                        IF (FITS_ARRAY(NSTR)(IPTR+1:IPTR+1).EQ.' ')
      :                                                           THEN
                            COMMENT=FITS_ARRAY(NSTR)(IPTR+2:)
                         ELSE

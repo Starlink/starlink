@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -134,12 +134,12 @@
             IF (STATUS .EQ. CAT__OK  .AND.  FI .NE. CAT__NOID) THEN
 
 *
-*             Get the order of the column and check if it is in 
+*             Get the order of the column and check if it is in
 *             ascending or descending order.
 
                CALL CAT_TIQAI (FI, 'ORDER', ORDER, STATUS)
 
-               IF (ORDER .EQ. CAT__ASCND  .OR.  ORDER .EQ. CAT__DSCND) 
+               IF (ORDER .EQ. CAT__ASCND  .OR.  ORDER .EQ. CAT__DSCND)
      :           THEN
 
 *
@@ -148,7 +148,7 @@
                   CALL CAT_TIQAC (FI, 'NAME', FNAME, STATUS)
 
 *
-*                Check whether the order keyword has already been 
+*                Check whether the order keyword has already been
 *                created.
 
                   IF (.NOT. FSORT) THEN
@@ -258,7 +258,7 @@
             END IF
 
 *
-*          If the status is not ok or the identifier is null then set 
+*          If the status is not ok or the identifier is null then set
 *          the termination flag.
 
             IF (STATUS .NE. CAT__OK  .OR.  FI .EQ. CAT__NOID) THEN

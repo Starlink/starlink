@@ -138,15 +138,15 @@
       CHARACTER * ( 2 ) CODE
 
 *  Local Variables :
-   
+
       CHARACTER * ( 72 ) TEXT   ! Buffer for output messages
       INTEGER STATUS
 
       INTEGER J
-      REAL EPOS(2) 
-      
+      REAL EPOS(2)
+
       LOGICAL CENTRO
-      
+
       REAL XINIT, YINIT, XFINAL, YFINAL
 
 *  APAR(1) = SHAPE(1) = First Gaussian FWHM
@@ -196,8 +196,8 @@
 *          WRITE(*,*) ' DEBUG --- --- APAR(2) YCEN = ', APAR(2)
 *          WRITE(*,*) ' DEBUG --- --- APAR(5) XCEN = ', APAR(5)
 *          WRITE(*,*) ' DEBUG --- --- APAR(6) YCEN = ', APAR(6)
-      
-      
+
+
       CALL FPEAK(IMAGE, CLIP, SKY, SIGMA, VSKY, APAR, PADU,
      :           NX, NY, CODE, STATUS)
 
@@ -211,16 +211,16 @@
 *      WRITE(*,*) ' DEBUG --- --- APAR(5) XCEN = ', APAR(5)
 *      WRITE(*,*) ' DEBUG --- --- APAR(6) YCEN = ', APAR(6)
 
-      CENTRO = .TRUE.      
+      CENTRO = .TRUE.
       IF ( CENTRO ) THEN
-      
+
 *          WRITE(*,*) 'DEBUG -- doing extra centroiding step'
-      
+
           CALL ERR_MARK
           XINIT = APAR(5)
-          YINIT = APAR(6)   
+          YINIT = APAR(6)
 *          WRITE(*,*) ' DEBUG --- --- calling LOCATE()'
-          
+
 *          WRITE(*,*) ' DEBUG --- --- NX     = ', NX
 *          WRITE(*,*) ' DEBUG --- --- NY     = ', NY
 *          WRITE(*,*) ' DEBUG --- --- XINIT  = ', XINIT
@@ -229,18 +229,18 @@
 *          WRITE(*,*) ' DEBUG --- --- POSTVE = ', POSTVE
 *          WRITE(*,*) ' DEBUG --- --- MXSHFT = ', MXSHFT
 *          WRITE(*,*) ' DEBUG --- --- MXITER = ', MXITER
-     
-          
+
+
          CALL LOCATE( IMAGE, NX, NY, XINIT, YINIT, INT(DCEN), POSTVE,
      :                      MXSHFT, MXITER, TOLER, XFINAL, YFINAL,
      :                      STATUS )
- 
+
 *          WRITE(*,*) ' DEBUG --- --- returned from LOCATE()'
-*     
+*
 *          WRITE(*,*) ' DEBUG --- --- XFINAL = ', XFINAL
 *          WRITE(*,*) ' DEBUG --- --- YFINAL = ', YFINAL
 *          WRITE(*,*) ' DEBUG --- --- STATUS = ', STATUS
-          
+
 *  If the routine finished succesfully then replace values of
 *  XPOS, YPOS.
           IF ( STATUS .EQ. SAI__OK ) THEN
@@ -256,7 +256,7 @@
           ENDIF
           CALL ERR_RLSE
       ENDIF
- 
+
 *   Set the normalisation.
 
       IF( IMAGE(NINT(APAR(5)),NINT(APAR(6)))
@@ -265,7 +265,7 @@
       ELSE
             APAR(4) = SQRT(VSKY)
       ENDIF
-            
+
 *   Call the gaussian fit routine
 
 *      WRITE(*,*) ' DEBUG --- --- calling GFIT()'

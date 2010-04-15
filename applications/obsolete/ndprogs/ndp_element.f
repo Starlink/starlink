@@ -9,7 +9,7 @@ C   Description
 C   -----------
 C   Computes the element number for any pixel coordinate in an image of
 C   given dimensions and dimensionality. The element number is counted in
-C   the normal FORTRAN sequence from (1,1,...) up to the pixel with the 
+C   the normal FORTRAN sequence from (1,1,...) up to the pixel with the
 C   highest possible coordinate in every dimension.
 C
 C
@@ -29,7 +29,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   None.
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------

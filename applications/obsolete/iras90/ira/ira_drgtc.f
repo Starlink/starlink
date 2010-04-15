@@ -27,7 +27,7 @@
 *     UBND, and it is assumed that the world coordinate system within
 *     the zone corresponds to image (or pixel) coordinates.  Only the
 *     section of the great circle which lies within the zone is
-*     displayed.  
+*     displayed.
 *
 *     Various items of information about the plotted curve can be
 *     obtained once the plot has been produced using routine IRA_DRBRK.
@@ -53,7 +53,7 @@
 *        abbreviation will do. This need not be the same as the sky
 *        coordinate system stored in the astrometry structure
 *        identified by IDA. See ID/2 section "Sky Coordinates" for more
-*        information. A blank value will cause the system associated 
+*        information. A blank value will cause the system associated
 *        with IDA to be used.
 *     LBND( 2 ) = REAL (Given)
 *        Lower world coordinate bounds for each axis defining the
@@ -67,7 +67,7 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine is effected by the TOLERANCE, LINES and PEN2 
+*     -  This routine is effected by the TOLERANCE, LINES and PEN2
 *     options set up by routine IRA_DROPT.
 
 *  Authors:
@@ -186,7 +186,7 @@
       ACM_M1DS = MAX( -IRA__TWOPI, MIN( IRA__TWOPI, DIST ) )
       ACM_M1ID = IDA
 
-*  If a blank SCS was given, use the value associated with IDA.      
+*  If a blank SCS was given, use the value associated with IDA.
       IF( SCS .EQ. ' ' ) THEN
          ACM_M1SC = ACM_SCS( IDA )
       ELSE

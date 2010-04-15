@@ -5,7 +5,7 @@
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
 
-      INTEGER STATUS 
+      INTEGER STATUS
       LOGICAL SUBCHK
       INTEGER IHX, NDIMPS, NDI2PS, NPARPS, NUMFITPS, NCURPS, MAXFCPS
 
@@ -21,7 +21,7 @@
 
 *   Save ELF fit coefficient stack
       IF( NUMFITPS .EQ. 0 ) THEN
-         CALL MSGOUT( 'CTRL-C', 'ELF coefficient stack is empty', 
+         CALL MSGOUT( 'CTRL-C', 'ELF coefficient stack is empty',
      :                 .TRUE., STATUS )
 
       ELSE
@@ -39,7 +39,7 @@
          END IF
 
          IF( .NOT. SUBCHK ) THEN
-            CALL MSGOUT( 'CTRL-C', 'Error saving ELF.ESTK', .TRUE., 
+            CALL MSGOUT( 'CTRL-C', 'Error saving ELF.ESTK', .TRUE.,
      :                   STATUS )
             SUBCHK = .TRUE.
          END IF

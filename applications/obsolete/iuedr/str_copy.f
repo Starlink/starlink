@@ -34,15 +34,15 @@
 
 *   Import:
       BYTE STR1(ARB)      ! string to be copied from
- 
+
       INTEGER C1          ! start character in str1
       INTEGER C2          ! end character in str1
       INTEGER START       ! start character in str2
       INTEGER SIZE        ! maximum size of str2
- 
+
 *   Import/Export:
       BYTE STR2(SIZE)     ! string to be changed
- 
+
 *   External references:
       INTEGER str_LEN     ! string length
 

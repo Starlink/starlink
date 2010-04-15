@@ -40,7 +40,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -69,23 +69,23 @@
       ELSE IF ( NAME .EQ. 'PISAFIT' ) THEN
          CALL PISAFIT( STATUS )
       ELSE IF ( NAME .EQ. 'PISAGEN' ) THEN
-         CALL PISAGEN( STATUS ) 
+         CALL PISAGEN( STATUS )
       ELSE IF ( NAME .EQ. 'PISAPEAK' ) THEN
-         CALL PISAPEAK( STATUS ) 
+         CALL PISAPEAK( STATUS )
       ELSE IF ( NAME .EQ. 'PISAKNN' ) THEN
-         CALL PISAKNN( STATUS ) 
+         CALL PISAKNN( STATUS )
       ELSE IF ( NAME .EQ. 'PISAMATCH' ) THEN
-         CALL PISAMATCH( STATUS ) 
+         CALL PISAMATCH( STATUS )
       ELSE IF ( NAME .EQ. 'PISACUT' ) THEN
-         CALL PISACUT( STATUS ) 
+         CALL PISACUT( STATUS )
       ELSE IF ( NAME .EQ. 'ADDNOISE' ) THEN
-         CALL ADDNOISE( STATUS ) 
+         CALL ADDNOISE( STATUS )
       ELSE IF ( NAME .EQ. 'PISAGREY' ) THEN
-         CALL PISAGREY( STATUS ) 
+         CALL PISAGREY( STATUS )
       ELSE IF ( NAME .EQ. 'PISA2ARD' ) THEN
-         CALL PISA2ARD( STATUS ) 
+         CALL PISA2ARD( STATUS )
       ELSE IF ( NAME .EQ. 'PISA2CAT' ) THEN
-         CALL PISA2CAT( STATUS ) 
+         CALL PISA2CAT( STATUS )
 
 *  If the name name is not recognised, then report an error.
       ELSE

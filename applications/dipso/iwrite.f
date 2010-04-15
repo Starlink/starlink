@@ -31,7 +31,7 @@
 *
 
        INTEGER SLEN, LSTR, IERR, J
-     
+
        CHARACTER*10 INTSTR
        CHARACTER*132 OUTSTR
 

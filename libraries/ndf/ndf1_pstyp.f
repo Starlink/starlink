@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -107,27 +107,27 @@
 *  ...byte data.
       IF ( CHR_SIMLR( TYPE, '_BYTE' ) ) THEN
          ITYPE = NDF__TYPB
- 
+
 *  ...unsigned byte data.
       ELSE IF ( CHR_SIMLR( TYPE, '_UBYTE' ) ) THEN
          ITYPE = NDF__TYPUB
- 
+
 *  ...double precision data.
       ELSE IF ( CHR_SIMLR( TYPE, '_DOUBLE' ) ) THEN
          ITYPE = NDF__TYPD
- 
+
 *  ...integer data.
       ELSE IF ( CHR_SIMLR( TYPE, '_INTEGER' ) ) THEN
          ITYPE = NDF__TYPI
- 
+
 *  ...real data.
       ELSE IF ( CHR_SIMLR( TYPE, '_REAL' ) ) THEN
          ITYPE = NDF__TYPR
- 
+
 *  ...word data.
       ELSE IF ( CHR_SIMLR( TYPE, '_WORD' ) ) THEN
          ITYPE = NDF__TYPW
- 
+
 *  ...unsigned word data.
       ELSE IF ( CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
          ITYPE = NDF__TYPUW

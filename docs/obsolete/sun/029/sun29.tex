@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -55,9 +55,9 @@ RUTHERFORD APPLETON LABORATORY\\
 \section{Introduction}
 
 The NAG Graphics Library is a library of versatile plotting
-routines which supercedes the {\em ``NAG Graphical Supplement''\/} which was an 
-addition to the {\em ``NAG Fortran Library''\/}. 
-At the introduction of the Fortran Library Mk 14, the Graphical 
+routines which supercedes the {\em ``NAG Graphical Supplement''\/} which was an
+addition to the {\em ``NAG Fortran Library''\/}.
+At the introduction of the Fortran Library Mk 14, the Graphical
 Supplement was released as a stand-alone Graphics Library, Mk 3.
 
 \section{NAG Graphics on Starlink}
@@ -83,7 +83,7 @@ package. On Starlink, this is GKS.
 \subsection{The Fortran Routines Library}
 
 The NAG Graphics Library needs a subset of the full NAG Fortran Library
-routines. The Fortran Routines Library contains this subset. 
+routines. The Fortran Routines Library contains this subset.
 
 To save disk space at Starlink sites, the Fortran Routines Library has been
 omitted, and the full Fortran Library should be used.
@@ -94,22 +94,22 @@ The NAG Libraries (both Fortran Mk 14 and Graphics Mk 3) are installed on
 Starlink machines as an Optional Item. If your site does not have the NAG
 Libraries, see your Site Manager.
 
-Starlink has both Double Precision and Single Precision versions of the 
+Starlink has both Double Precision and Single Precision versions of the
 NAG Graphics Library Mk 3. Each version has its own high-level Graphical
-Subroutines Library and  Graphical Interface Library, and each should use the 
+Subroutines Library and  Graphical Interface Library, and each should use the
 relevant version of the full NAG Fortran Library.
 
 \subsubsection{Double Precision}
 
-The Double Precision version of the NAG Graphical Subroutines Library is 
-GRLIB.OLB in directory NAGRAFDIR. For easier reference, the Library has the 
+The Double Precision version of the NAG Graphical Subroutines Library is
+GRLIB.OLB in directory NAGRAFDIR. For easier reference, the Library has the
 logical name NAGRAF\_LIB.
 
 The low level Graphical Interface Library is NAG3GKS.OLB, in the same directory
 as the Graphical Subroutines. This Library has the logical name NAG3GKS\_LIB.
 
 The Graphical Subroutines call the Graphics Interface routines at Double
-Precision but the calls to the GKS routines are Single Precision.   
+Precision but the calls to the GKS routines are Single Precision.
 
 To link using the Double Precision NAG Graphics Library, use the following:
 \begin{verbatim}
@@ -122,16 +122,16 @@ Precision Libraries can be used. It has the logical name NAGD, so link using:
 \end{verbatim}
 
 \subsubsection{Single Precision}
-The Single Precision version of the NAG Graphical Subroutines Library is 
-GRSLIB.OLB in directory NAGRAFSDIR. For easier reference, the Library has the 
+The Single Precision version of the NAG Graphical Subroutines Library is
+GRSLIB.OLB in directory NAGRAFSDIR. For easier reference, the Library has the
 logical name NAGRAFS\_LIB.
 
 The low-level Graphical Interface Library is NAG3GKSS.OLB, in the same directory
 as the Graphical subroutines. This Library has the logical name NAG3GKSS\_LIB.
 
 The Graphical Subroutines call the Graphical Interface routines at Single
-Precision. Double precision calculations are used internally, but the calls to 
-the GKS routines are Single Precision.   
+Precision. Double precision calculations are used internally, but the calls to
+the GKS routines are Single Precision.
 
 To link using the Single Precision NAG Graphics Library, use the following:
 \begin{verbatim}
@@ -152,7 +152,7 @@ programs (See Section - Information) may be found in NAGRAFDIR:XXXXXX.FOR.
 
 The following code fragment may be used as a guide for initialising the GKS
 system. It initialises GKS to use a Canon laser printer.
-\begin{verbatim}  
+\begin{verbatim}
       C
             INTEGER BUFA, CONID, ERRFIL, WKID, WTYPE
       C
@@ -183,7 +183,7 @@ SUN/83 : GKS - Graphical Kernal System (7.2)
 \section{Information}
 
 There are various elements of information available for the NAG Graphics
-Library. 
+Library.
 
 \subsection{Manuals}
 
@@ -222,18 +222,18 @@ NAG Graphics Library, and by the example programs.
 \end{description}
 
 Users are advised to read the Users Note for the version they are using, and to
-note that the names of the various libraries mentioned therein are not the same 
+note that the names of the various libraries mentioned therein are not the same
 as the names used on Starlink. The Text of the Double Precision version of the
-Users' Note is appended as Appendix A 
+Users' Note is appended as Appendix A
 
 \section{Testing}
 The Starlink installation of the NAG Graphics Library contains example programs
 and data for each version. Each set of programs and data is contained in a
-separate text library in the appropriate directory. Example programs and data 
+separate text library in the appropriate directory. Example programs and data
 may be extracted using the VMS LIBRARY command.
 
 There is also an interface test program for each version, together with its
-test data. 
+test data.
 
 The Double Precision versions are in NAGRAFDIR:
 \begin{description}
@@ -257,8 +257,8 @@ The Single Precision versions are in NAGRAFSDIR:
 
 The Interface Test program and the example programs require that a routine
 called XXXXXX.FOR is supplied which opens an appropriate plotting device in the
-normal GKS manner (see above). An example of XXXXXX.FOR is contained in 
-NAGRAFDIR. 
+normal GKS manner (see above). An example of XXXXXX.FOR is contained in
+NAGRAFDIR.
 
 \newpage
 \begin{center}
@@ -267,41 +267,41 @@ NAGRAFDIR.
 
 \begin{verbatim}
                           NAG Graphics Library, Mark 3
-              
+
                                    GLDVV03D
-              
+
                           DEC VAX/VMS Double Precision
-              
+
                                   Users' Note
-              
+
                                    Contents
 
      1. Introduction
-     
+
      2. NAG Graphical Software
-     
+
      3. General Information
-     
+
         3.1. Accessing the High-level Library and Interfaces
         3.2. Initialisation of Underlying Plotting Package
         3.3. Output from Graphics Library Routines
         3.4. Interpretation of Bold Italicised Terms
         3.5. Example Programs
         3.6. User Documentation
-     
+
      4. Routine-specific Information
-     
+
         4.1. J06AQF
         4.2. Constants
-     
+
      5. Interface-specific Information
-     
+
         5.1. GINO-F
         5.2. DEC ReGIS
         5.3. Hewlett Packard HPGL
-     
+
      6. Additional Services from NAG
-     
+
      7. Contact with NAG
 
      8. NAG Users Association
@@ -309,12 +309,12 @@ NAGRAFDIR.
 \newpage
 \begin{verbatim}
      1. Introduction
-     
+
         This document is essential reading for every user of the NAG
         Graphics Library Implementation specified in the title. It
         provides implementation-specific detail that augments the
         information provided in the NAG Graphics Library Handbook.
-     
+
         NAG recommends that users read the following minimum reference
         material before calling any library routine:
 
@@ -322,14 +322,14 @@ NAGRAFDIR.
         (b) Chapter Introduction
         (c) Routine Document
         (d) Implementation-specific Users' Note
-     
+
         Items (a), (b) and (c) are included in the NAG Graphics Library
         Handbook; item (d) is this document. Each NAG Graphics Library
         Service site is supplied with at least one copy of each of the
         above. Please ask your NAG Site Contact for further information.
 
      2. NAG Graphical Software
-     
+
         The NAG Graphics Library is the successor product to the NAG
         Graphical Supplement which, as its name suggests, was originally
         designed for use as a supplementary product to the NAG Fortran
@@ -340,7 +340,7 @@ NAGRAFDIR.
         machines etc. It is with these considerations in mind that NAG
         decided to re-launch the NAG Graphical Supplement as the NAG Graphics
         Library.
-     
+
         The Graphics Library (which has been labelled as Mark 3 for
         historical consistency) can be considered as an updated, consistent
         enhancement of the Graphical Supplement which can be used
@@ -351,7 +351,7 @@ NAGRAFDIR.
         Library or to use graphical routines with the NAG Workstation
         Library etc. Existing users will not be affected other than
         noticing a change of product name.
-     
+
         The NAG Graphics Library can be thought of as consisting of three
         distinct parts; high-level graphics routines, low-level routines
         and support routines. When calling the NAG Graphics Library to draw
@@ -366,7 +366,7 @@ NAGRAFDIR.
         hence are optional if that Library is available at an installation,
         but are needed otherwise to ensure that the NAG Graphics Library
         is complete.
-     
+
         There is a version of the NAG Graphical Interface for each plotting
         package (or protocol) supported. The Interface translates drawing
         requests into a form which can be accepted by the underlying
@@ -374,47 +374,47 @@ NAGRAFDIR.
         time only one version of an application program need be written and
         maintained. Irrespective of the plotting software used, all routines
         in the NAG Graphical Interface have the same parameter sequence.
-     
+
      3. General Information
-     
+
      3.1. Accessing the High-level Library and Interfaces
-     
+
           A user will need to link his compiled program with the following
           libraries (in the given order):
-     
+
           - NAG Graphics Library high-level routines (NAG$LIBJ06.OLB)
           - NAG Graphical Interface Library (e.g. TEXTG27.OLB)
           - NAG Fortran support routines (NAG$LIBFOR.OLB or the NAG
             Fortran Library)
           - underlying Graphics package (e.g. GINO-F version 2.7)
-     
+
           For example, to compile, link and execute the example program
           J06BZF.FOR using data J06BZF.DAT and with the libraries available in the
           same directory (or accessible via logical names), the steps would be:
 
           - to compile the program, type
-     
+
             FORTRAN J06BZF
-     
-          - to link the program, using the GINO-F 2.7 version of the 
+
+          - to link the program, using the GINO-F 2.7 version of the
             NAG Graphical Interface and the NAG Fortran support routines,
             type
-     
+
             LINK J06BZF, NAG$LIBJ06/LIB, TEXTG27/LIB, NAG$LIBFOR/LIB, GINO/LIB
 
           - to link the program, using the GINO-F 2.7 version of the
             NAG Graphical Interface and the full NAG Fortran Library,
             type
-     
+
             LINK J06BZF, NAG$LIBJ06/LIB, TEXTG27/LIB, NAG$LIBRARY/LIB, GINO/LIB
-     
+
           - to run the program, type
-     
+
             ASSIGN/USER_MODE J06BZF.DAT FOR005
             RUN J06BZF
-     
+
      3.2. Initialisation of Underlying Plotting Package
-     
+
           Usually the first step when using a graphics package is to
           initialise the system and/or select a particular graphical
           output device. Users must make an explicit call to the local
@@ -425,16 +425,16 @@ NAGRAFDIR.
           gives recommended initialisation statements. However, for
           generality, the example programs contain the dummy initialisation
           statement:
-     
+
               CALL XXXXXX
-     
+
           Users who adapt the example programs for their own use must
           replace this statement by an appropriate initialisation call if
           local versions of XXXXXX have not been established at installation
           time.
-     
+
      3.3. Output from Graphics Library Routines
-     
+
           It is important to note that a file must always be attached to the
           current error and warning message units (see routines J06VAF and
           J06VBF), even when graphs are the only expected output. This is
@@ -444,16 +444,16 @@ NAGRAFDIR.
           detected. Additionally, if the Lineprinter interface is in use then
           plots are output on the current advisory message unit (see routine
           J06VBF).
-     
+
           Command sequence output may also be produced by the DEC ReGIS,
           HPGL and Adobe PostScript interfaces (see routine J06VCF). Some
           routines for contouring or the plotting of the solution of ordinary
           differential equations use option-setting facilities. Routine J06VEF
           specifies the unit number of any corresponding option-setting SAVE
           file.
-     
+
      3.4. Interpretation of Bold Italicised Terms
-     
+
           For this implementation, the bold italicised terms used in the
           NAG Graphics Library Handbook (and shown here as //.....// )
           should be interpreted as:
@@ -463,12 +463,12 @@ NAGRAFDIR.
           //real// as an intrinsic function name - DBLE
           //e// in constants, e.g. 1.0//e//-4    - D, e.g. 1.0D-4
           //e// in formats, e.g. //e//12.4       - D, e.g. D12.4
-     
+
           Thus a parameter described as //real// should be declared as
           DOUBLE PRECISION in the user's program.
-     
+
      3.5. Example Programs
-     
+
           The example programs published in the NAG Graphics Library
           Handbook are presented in a generalised form, using bold
           italicised terms as described in Section 3.4. The programs
@@ -479,9 +479,9 @@ NAGRAFDIR.
           PostScript interfaces may also need to include a call to J06VCF
           to direct the resultant command sequences to a chosen Fortran
           unit.
-     
+
      3.6. User Documentation
-     
+
           The following machine-readable information files are provided by
           NAG on the library release medium. Please consult your local
           advisory service or NAG Site Contact for further details:
@@ -497,19 +497,19 @@ NAGRAFDIR.
                         indirectly.
 
      4. Routine-specific Information
-     
+
      4.1. J06AQF
-     
+
           Users are warned that axis annotation produced by J06AQF may
           show variations in tick mark positioning and numbering on
           different systems. This is due to differences in machine
           precision.
-     
+
      4.2. Constants
-     
+
           Graphics Library routines make use of the following
           implementation-dependent constants:
-     
+
           J06VAF GIVES NERR  =     6  (error message unit number)
           J06VBF GIVES NADV  =     6  (advisory message unit number)
           J06VCF GIVES NCOMM =     7  (command sequence unit number)
@@ -522,11 +522,11 @@ NAGRAFDIR.
           X02BBF =       2147483647  (largest positive integer)
           X02BEF =               16  (precision in decimal digits)
           X02DAF =                F  (indicates how underflow is handled)
-     
+
      5. Interface-specific Information
 
      5.1. GINO-F
-     
+
           GINO-F uses * (asterisk) as the default string escape character
           to be used in conjunction with the GINO routine CHASTR. The GINO-F
           NAG Graphical Interface resets the escape character to !
@@ -536,14 +536,14 @@ NAGRAFDIR.
           routine J06WAF:
 
               CALL STRESC('?')
-     
+
           If the version of GINO-F available at your site is older than
           release 2.7c then you should use the alternative routine:
-     
+
               CALL CHAESC(1H?)
-     
+
      5.2. DEC ReGIS
-     
+
           The form and standard use of the ReGIS instruction set does not
           lend itself to easy incorporation into Fortran code. It has,
           therefore, been necessary to develop a set of emulator routines
@@ -551,7 +551,7 @@ NAGRAFDIR.
           that the names used for these routines should not be
           duplicated. Details of the 'reserved names' can be found in the
           DEC ReGIS Interface Appendix to the NAG Graphics Library Handbook.
-     
+
      5.3. Hewlett Packard HPGL
 
 
@@ -563,11 +563,11 @@ NAGRAFDIR.
           duplicated. Details of the 'reserved names' can be found in the
           Hewlett Packard HPGL Interface Appendix to the NAG Graphics Library
           Handbook.
-     
+
      6. Additional Services from NAG
-     
+
         (a) Printed Manuals
-     
+
             Where a manual has been provided as part of the contract issue,
             this manual is updated automatically at each new release of the
             software, by the supply of a manual update set or a complete new
@@ -576,56 +576,56 @@ NAGRAFDIR.
             are NOT sent automatically. Additional complete manuals and the
             manual updates (where relevant) are available at prices published
             in the NAG documentation order form.
-     
+
         (b) On-line Information System
-     
+
             To complement the manuals NAG produce an On-line Information
             System which fulfils two roles:
-     
+
             - it gives key-word-driven guidance on the selection of the
               appropriate NAG routine
             - it gives abbreviated on-line documentation of the NAG routines,
               to enable the user to call the routines and investigate any
               IFAIL messages without recourse to the manual.
-     
+
         (c) Other Products
-     
+
             NAG is continually striving to bring the best in mathematical,
             statistical and graphical software to its users. It caters for
             the package user, the software developer and the Fortran, Ada,
             C, Pascal or Algol 68 enthusiast.
-     
+
             To find out more about the growing range of facilities available
             please contact NAG and ask for a free information pack.
-     
+
      7. Contact with NAG
-     
+
         Queries concerning this document or the implementation generally
         should be directed initially to your local Advisory Service.  If
         you have difficulty in making contact locally, you can write to NAG
         directly, at one of the addresses given on the back of the title
         page in the NAG Graphics Library Handbook or this document.
-     
+
      8. NAG Users Association
-     
+
         NAGUA is the NAG Users Association, and membership is open to all
         users of NAG products and services.  As a member of NAGUA your
         organisation would receive our newsletter "NAGUA News" three times
         a year, would receive discounts at the annual conference, and those
         sites with access to electronic mail would be able to participate in
         NAGMAG, our electronic mail digest.
-     
+
         For an information pack and membership application form, contact
-     
+
            Caroline Foers
            NAGUA Co-ordinator
            NAG Users Association
            PO Box 426
            OXFORD
            United Kingdom   OX2 8SD
-     
+
            Tel:   (0865) 311102
                   International +44 865 311102
-     
+
 \end{verbatim}
 \end{document}

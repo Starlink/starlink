@@ -7,8 +7,8 @@
 #		adamtask <name> [<file>]
 #
 # where <name> is the name of the task and <file> is the image file. If
-# <file> is supplied, the adam task is spawned otherwise it is assumed to 
-# be already running. A tcl command called <name> is created that accepts 
+# <file> is supplied, the adam task is spawned otherwise it is assumed to
+# be already running. A tcl command called <name> is created that accepts
 # the following arguments:
 #
 # <name> kill
@@ -61,12 +61,12 @@
 # (RELAY_PATH)     : The path to the relay task
 # (RELAY_MESSID)   : The message id of the transaction with the relay task.
 # (PID,<name>)     : The pid of an adam task.
-# (<path>,<messid>,<type>) : The command to be executed when a message of 
+# (<path>,<messid>,<type>) : The command to be executed when a message of
 #                     type <type> arrives.
 #
 #  History:
 #     5-MAY-1999 (DSB):
-#        adamtask.exit modified to re-instate the original exit command 
+#        adamtask.exit modified to re-instate the original exit command
 #        before doing anything else. This avoids recursion if anything
 #        goes wrong within adamtask.exit.
 
@@ -80,8 +80,8 @@ proc adamtask.init {} {
     if {[array names adamtask_priv RELAY_NAME] != ""} {
 	if {[adam_path $adamtask_priv(RELAY_NAME)] == 1} return
     }
-       
-# Initialise the Adam message system using our tcl interpreter name as our 
+
+# Initialise the Adam message system using our tcl interpreter name as our
 # message system name. This should be unique (except perhaps if we are using
 # more than one X display.
     adam_start [winfo name .]
@@ -94,7 +94,7 @@ proc adamtask.init {} {
 	set relayName $startcl_library/adamMessageRelay
     }
 
-# Create the message relay process. 
+# Create the message relay process.
     set adamtask_priv(PIPE) [open "|$relayName \"[winfo name .]\"" r]
 
 # Wait for the initial OBEY from the relay.
@@ -169,7 +169,7 @@ proc adamtask.message {message} {
 	set subst(x) [lindex $subst(V) 4]
     }
 
-# Perform the subsitution. The first element of $priv($path,$messid,$command) 
+# Perform the subsitution. The first element of $priv($path,$messid,$command)
 # contains the command to be executed (after substitution of % tokens).
     set proc [adamtask.subst [lindex $priv($path,$messid,$command) 0] subst]
 
@@ -200,8 +200,8 @@ proc adamtask.message {message} {
 
 proc adamtask {taskname {execfile ""}} {
 #+
-# exec's an adam task (if specified) and creates a new tcl command with the 
-# name of the task. The pid of the new process is stored in 
+# exec's an adam task (if specified) and creates a new tcl command with the
+# name of the task. The pid of the new process is stored in
 # adamtask_priv(PID,<taskname>) if it is created by this procedure.
 #-
     upvar #0 adamtask_priv priv
@@ -253,7 +253,7 @@ proc adamtask {taskname {execfile ""}} {
 
 proc adamtask.send {command} {
 #+
-# Sends a command to be executed by the relay process and returns the 
+# Sends a command to be executed by the relay process and returns the
 # result.
 #-
     upvar #0 adamtask_priv priv
@@ -340,7 +340,7 @@ proc adamtask.cancel {task arglist} {
 
 proc adamtask.kill {task arglist} {
 #+
-# Kills a task (if started by this tk application) and removes the task 
+# Kills a task (if started by this tk application) and removes the task
 # procedure.
 #-
     upvar #0 adamtask_priv priv

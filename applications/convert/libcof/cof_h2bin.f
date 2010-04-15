@@ -89,9 +89,9 @@
 *        Extended to convert primitive objects too.
 *     1-2-1999 (DSB):
 *        Corrected string length arguments used in calls which pass a
-*        character array using %VAL. 
+*        character array using %VAL.
 *     12-MAR-2002 (AJC):
-*        Correct CRDNM for TDIMn card error message.  Add string length 
+*        Correct CRDNM for TDIMn card error message.  Add string length
 *        to dimensions in TDIMn cards for _CHAR arrays.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
@@ -105,7 +105,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -153,7 +153,7 @@
       CHARACTER * ( 8 ) CRDNAM   ! Header-card name to insert TNULLn
       CHARACTER * ( MXSLEN ) CVALUE ! Character component value
       INTEGER DIMS( DAT__MXDIM + 1) ! Component and structure dimensions
-                                 ! +1 allows for string length for_CHAR 
+                                 ! +1 allows for string length for_CHAR
                                  ! array
       DOUBLE PRECISION DVALUE    ! D.p. component value
       INTEGER EL                 ! Number of array elements
@@ -297,7 +297,7 @@
 *  convention is in use by writing the LONGSTRN keyword containing the
 *  version number of the convention.
          NC = CHR_LEN( EXTNAM( NCEXT: ) )
-         IF ( NC .GT. FITSCH ) THEN 
+         IF ( NC .GT. FITSCH ) THEN
 
 *  Write the NDF's component name.  This writes a dummy EXTNAME,
 *  a unique EXTVER, and the full component name in keyword EXTNAMEF.
@@ -323,7 +323,7 @@
      :        TYPE .EQ. '_WORD' .OR. TYPE .EQ. '_UWORD' .OR.
      :        TYPE .EQ. '_INTEGER' ) THEN
 
-*  FITSIO does not permit cards to be placed after a named card; 
+*  FITSIO does not permit cards to be placed after a named card;
 *  it requires that we read that named card first.  So choose the
 *  the TFORM1 card.  Note that by definition the table only has one
 *  column.
@@ -360,11 +360,11 @@
 *  Write the TDIM1 card for a multi-dimensional column.
 *  ====================================================
 
-*  This is only necessary when the object is multi-dimensional.  
+*  This is only necessary when the object is multi-dimensional.
          IF ( NDIM .GT. 1 ) THEN
-         
-*  If the type is _CHAR*n, we must adjust the dimensions to make the 
-*  first equal the number of characters per element, as required by the 
+
+*  If the type is _CHAR*n, we must adjust the dimensions to make the
+*  first equal the number of characters per element, as required by the
 *  rAw convention for TFORM.
             IF ( TYPE(1:6) .EQ. '_CHAR*' ) THEN
                DO I = NDIM, 1, -1
@@ -374,7 +374,7 @@
                CALL CHR_CTOI( TYPE(7:), DIMS(1), STATUS )
             END IF
 
-*  FITSIO does not permit cards to be placed after a named card; 
+*  FITSIO does not permit cards to be placed after a named card;
 *  it requires that we read that named card first.
             CDUMMY = ' '        ! valgrind
             CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
@@ -534,7 +534,7 @@
                     CALL FTPCLI( FUNIT, 1, 1, 1, 1, IVALUE, FSTAT )
                     ROUTIN = 'FTPCLI'
                  END IF
-      
+
 *  Obtain a short string.
               ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
      :                  STRLEN .LE. MXSLEN ) THEN
@@ -577,12 +577,12 @@
 *  a blank string.  Copy this blank string to the binary table.
                     CALL ERR_ANNUL( STATUS )
                     CVALUE = ' '
-                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, CVALUE, 
+                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, CVALUE,
      :                           FSTAT )
                  ELSE
 
 *  Copy the mapped value to the binary table.
-                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, 
+                    CALL FTPCLS( FUNIT, 1, 1, 1, EL,
      :                           %VAL( CNF_PVAL( OPNTR ) ),
      :                           FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
                  END IF
@@ -704,7 +704,7 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCNI( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         NUM_BTOW( VAL__BADB ), FSTAT )
                   ROUTIN = 'FTPCNI'
@@ -719,7 +719,7 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNB( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCNB( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         NUM_UBTOI( VAL__BADUB ), FSTAT )
                   ROUTIN = 'FTPCNB'
@@ -734,7 +734,7 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCNI( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADW, FSTAT )
                   ROUTIN = 'FTPCNI'
@@ -750,7 +750,7 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         NUM_UWTOI( VAL__BADUW ), FSTAT )
                   ROUTIN = 'FTPCNJ'
@@ -765,7 +765,7 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADI, FSTAT )
                   ROUTIN = 'FTPCNJ'
@@ -787,7 +787,7 @@
      :                            CVALUE( :STRLEN ), FSTAT )
                   END DO
                ELSE
-                  CALL FTPCLS( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCLS( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
                END IF
@@ -802,7 +802,7 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNE( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCNE( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADR, FSTAT )
                   ROUTIN = 'FTPCNE'
@@ -817,7 +817,7 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCND( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCND( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADD, FSTAT )
                   ROUTIN = 'FTPCND'
@@ -837,7 +837,7 @@
                      CALL FTPCLL( FUNIT, 1, 1, LEL, 1, .TRUE., FSTAT )
                   END DO
                ELSE
-                  CALL FTPCLL( FUNIT, 1, 1, 1, EL, 
+                  CALL FTPCLL( FUNIT, 1, 1, 1, EL,
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         FSTAT )
                   ROUTIN = 'FTPCLL'
@@ -960,7 +960,7 @@
 *  Obtain the data type.
                   CALL DAT_TYPE( LOC, EXTTYP, STATUS )
 
-*  Need to determine the shape of the full array.  Test whether or not 
+*  Need to determine the shape of the full array.  Test whether or not
 *  the supplementary locator to a full array structure is valid.
                   CALL DAT_VALID( ALOC, VALID, STATUS )
                   IF ( VALID ) THEN
@@ -1007,7 +1007,7 @@
 *  convention is in use by writing the LONGSTRN keyword containing the
 *  version number of the convention.
                   NC = CHR_LEN( EXTNAM( NCEXT: ) )
-                  IF ( NC .GT. FITSCH ) THEN 
+                  IF ( NC .GT. FITSCH ) THEN
 
 *  Write the NDF's component name.  This writes a dummy EXTNAME,
 *  a unique EXTVER, and the full component name in keyword EXTNAMEF.
@@ -1043,7 +1043,7 @@
                         CRDNAM = 'TFORM'
                         CALL CHR_APPND( CN, CRDNAM, NC )
 
-*  FITSIO does not permit cards to be placed after a named card; 
+*  FITSIO does not permit cards to be placed after a named card;
 *  it requires that we read that named card first.
                         CDUMMY = ' ' ! valgrind
                         CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
@@ -1058,9 +1058,9 @@
 
 *  An integer type must have its null value defined before it is used.
 *  Floating-point values take defined NaN values.
-                        IF ( TYPE .EQ. '_BYTE' .OR. 
+                        IF ( TYPE .EQ. '_BYTE' .OR.
      :                       TYPE .EQ. '_UBYTE' .OR.
-     :                       TYPE .EQ. '_WORD' .OR. 
+     :                       TYPE .EQ. '_WORD' .OR.
      :                       TYPE .EQ. '_UWORD' .OR.
      :                       TYPE .EQ. '_INTEGER' ) THEN
 
@@ -1102,7 +1102,7 @@
 *  Write the TDIMn cards for any multi-dimensional columns.
 *  ========================================================
 
-*  This is only necessary when the object is multi-dimensional.  
+*  This is only necessary when the object is multi-dimensional.
                   IF ( NMDCOL .GT. 0 ) THEN
                      DO ICMD = 1, NMDCOL
 *  Convert the column number into character form.
@@ -1114,19 +1114,19 @@
                         CRDNAM = 'TFORM'
                         CALL CHR_APPND( CN, CRDNAM, NC )
 
-*  FITSIO does not permit cards to be placed after a named card; 
+*  FITSIO does not permit cards to be placed after a named card;
 *  it requires that we read that named card first.
                         CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
 
-*  Get a locator to the object so that we can determine its shape and 
-*  type.  This information was obtained before, but inquiring again 
-*  avoids having large dimension arrays.  Release the locator at the 
+*  Get a locator to the object so that we can determine its shape and
+*  type.  This information was obtained before, but inquiring again
+*  avoids having large dimension arrays.  Release the locator at the
 *  end.
                         CALL DAT_INDEX( LOC, MDCOMP( ICMD ), LCMP,
      :                                  STATUS )
                         CALL DAT_TYPE( LCMP, TYPE, STATUS )
 
-*  Get the dimensions.  If the type is _CHAR*n, we must adjust the 
+*  Get the dimensions.  If the type is _CHAR*n, we must adjust the
 *  dimensions to make the first equal the number of characters per
 *  element, as required by the rAw convention for TFORM.
                         IF( TYPE(1:6) .EQ. '_CHAR*' ) THEN
@@ -1146,7 +1146,7 @@
      :                               FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.  Specify from which routine the error arose.  Form the 
+*  warnings.  Specify from which routine the error arose.  Form the
 *  name of the TDIMn keyword along the way.
                         IF ( FSTAT .GT. FITSOK ) THEN
                            NC = 4
@@ -1356,7 +1356,7 @@
      :                                        IVALUE, FSTAT )
                                  ROUTIN = 'FTPCLI'
                               END IF
-      
+
 *  Obtain a short string.
                            ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
      :                               STRLEN .LE. MXSLEN ) THEN
@@ -1407,7 +1407,7 @@
 *  Copy the mapped value to the binary table.
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
      :                                      %VAL( CNF_PVAL( OPNTR ) ),
-     :                                      FSTAT, 
+     :                                      FSTAT,
      :                                      %VAL( CNF_CVAL( STRLEN ) ) )
                               END IF
 
@@ -1536,9 +1536,9 @@
                            END IF
 
 *  Map each array using the appropriate type and write it to the binary
-*  table.  Certain data types (_BYTE and _UWORD) are not available in 
-*  FITS.  These must be converted to the next higher integer data type. 
-*  HDS undefined values are assigned the table undefined value.  A new 
+*  table.  Certain data types (_BYTE and _UWORD) are not available in
+*  FITS.  These must be converted to the next higher integer data type.
+*  HDS undefined values are assigned the table undefined value.  A new
 *  error context is used handle undefined values transparently.
 
 *  Byte is converted to word for the binary table.
@@ -1651,7 +1651,7 @@
                               ELSE
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
      :                                      %VAL( CNF_PVAL( OPNTR ) ),
-     :                                      FSTAT, 
+     :                                      FSTAT,
      :                                      %VAL( CNF_CVAL( STRLEN ) ) )
                               END IF
                               ROUTIN = 'FTPCLS'

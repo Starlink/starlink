@@ -10,7 +10,7 @@
 
 #  Description:
 #     GaiaPolObjects are [incr Tcl] objects which have an associated
-#     reference count, which enables the class to know when an object is 
+#     reference count, which enables the class to know when an object is
 #     no longer used, and can thus be destroyed. This class also handles
 #     the creation of directories for temporary files used by PolObjects,
 #     and the naming of such files.
@@ -88,7 +88,7 @@ itcl::class gaia::GaiaPolObject {
 #  has been created.
       mkTempDir
 
-#  Append this objects name to the end of the list of all currently 
+#  Append this objects name to the end of the list of all currently
 #  active PolObjects.
       lappend objects_ $this
 
@@ -115,11 +115,11 @@ itcl::class gaia::GaiaPolObject {
          if { $objects_ == "" } {
 
 #  Remove the directory used to hold temporary files.
-            rmDir	     
+            rmDir
             set tempdir_ ""
-	    
+
 #  Destroy all the GaiaApps stored as static variables.
-            ClearGaiaApps 
+            ClearGaiaApps
          }
 
 #  Otherwise, issue a warning.
@@ -167,7 +167,7 @@ itcl::class gaia::GaiaPolObject {
       incr refCount_ -1
 
       if { $refCount_ == 0 } {
-         ::itcl::delete object $this         
+         ::itcl::delete object $this
       }
       return ""
    }
@@ -175,27 +175,27 @@ itcl::class gaia::GaiaPolObject {
 #  Return the object reference count.
 #  --------------------------------------------------------------------
    public method refCount {} {
-      return $refCount_ 
+      return $refCount_
    }
 
 #  Return the object parent.
 #  -------------------------
    public method getParent {} {
-      return $parent_ 
+      return $parent_
    }
 
 #  Return the head of the clan.
 #  -------------------------
    public method getTop {} {
-      return $top_ 
+      return $top_
    }
 
-#  Call this to create a clone of (i.e. a new handle for) a GaiaPolObject. 
-#  it increases the reference count for the object by one, and returns the 
+#  Call this to create a clone of (i.e. a new handle for) a GaiaPolObject.
+#  it increases the reference count for the object by one, and returns the
 #  object name. Note, no new GaiaPolObject is created.
 #  --------------------------------------------------------------------
    public method clone {} {
-      incr refCount_ 
+      incr refCount_
       return $this
    }
 
@@ -210,7 +210,7 @@ itcl::class gaia::GaiaPolObject {
    public proc annullAll {top} {
       foreach obj $objects_ {
          if { ![catch {set topper [$obj getTop]}] } {
-            if { $topper == $top } { 
+            if { $topper == $top } {
                $obj annull
             }
          }
@@ -248,7 +248,7 @@ itcl::class gaia::GaiaPolObject {
 #  Remove all files in the directory used to store temporary files, etc.
 #  --------------------------------------------------------------------
    public proc emptyDir {} {
-      foreach file [glob -nocomplain "$tempdir_/*"] { 
+      foreach file [glob -nocomplain "$tempdir_/*"] {
          file delete $file
       }
    }
@@ -292,7 +292,7 @@ itcl::class gaia::GaiaPolObject {
       return $ret
    }
 
-#  Initialise the contents of the memory allocated by the 
+#  Initialise the contents of the memory allocated by the
 #  GaiaPolObject constructor using a user-supplied argument list.
 #  -------------------------------------------------------
    protected method init {} {
@@ -305,7 +305,7 @@ itcl::class gaia::GaiaPolObject {
       while { [info exists parent] } {
          if { $parent != $this } {
             set parent_ $parent
-            break 
+            break
          }
          upvar [incr n] this parent
       }
@@ -327,7 +327,7 @@ itcl::class gaia::GaiaPolObject {
    private method mkTempDir {} {
       global ::env
 
-#  Do nothing if this has already been done.      
+#  Do nothing if this has already been done.
       if { $tempdir_ == "" } {
          global env
 
@@ -346,8 +346,8 @@ itcl::class gaia::GaiaPolObject {
          rmDir
          catch {exec mkdir -p $tempdir_}
 
-#  Initialise the sequence number. 
-         set ifile_ 0 
+#  Initialise the sequence number.
+         set ifile_ 0
 
       }
    }
@@ -359,7 +359,7 @@ itcl::class gaia::GaiaPolObject {
 #  ====================
 #  (none)
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -374,7 +374,7 @@ itcl::class gaia::GaiaPolObject {
 
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

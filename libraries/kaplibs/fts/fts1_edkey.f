@@ -36,7 +36,7 @@
 *        Maximum number of cards in the resultant FITS array.  This must
 *        be not less than NOCARD + NKEY + 1.
 *     EDITS( MAXMOD ) = CHARACTER * ( * ) (Returned)
-*        The editing commands.  Allowed values are 'Amend', 'Delete', 
+*        The editing commands.  Allowed values are 'Amend', 'Delete',
 *        'Exist', 'Move', 'Rename', 'Print', 'Update', and 'Write'.
 *        Each element can be abbreviated to the initial letter.
 *
@@ -53,7 +53,7 @@
 *        it defaults to the END card, and if the END card is absent,
 *        the new location is at the end of the headers.
 *
-*        'Null' nullifies the value of the named keyword.  Spaces 
+*        'Null' nullifies the value of the named keyword.  Spaces
 *        substitute the keyword's value.
 *
 *        'Print' causes the value of a named keyword to be displayed to
@@ -90,23 +90,23 @@
 *        The position keyword names.  A position name may be compound
 *        to handle hierarchical keywords, and it has the form
 *        keyword1.keyword2.keyword3 etc.  The maximum number of
-*        keywords per FITS card is twenty.  Each keyword must be no 
+*        keywords per FITS card is twenty.  Each keyword must be no
 *        longer than eight characters.  When locating the position card,
 *        comparisons are made in uppercase and with the blanks removed.
 
 *        The new keywords are inserted immediately before each
 *        corresponding position keyword.  If any name in it does not
 *        exist in FITS array, the consequences will be as follows.  In
-*        the Write, Amend (new keyword), and Move edits its 
+*        the Write, Amend (new keyword), and Move edits its
 *        corresponding keyword will be inserted just before the END
 *        card or appended to FITS array when the END card does not
-*        exist; however, the card is not relocated for an Update or 
-*        Amend (with an existing keyword) edit.  If two or more new 
-*        cards have the same position name, they will all be put just  
-*        before the position name in the same order as they are in 
+*        exist; however, the card is not relocated for an Update or
+*        Amend (with an existing keyword) edit.  If two or more new
+*        cards have the same position name, they will all be put just
+*        before the position name in the same order as they are in
 *        NAMES.
 *
-*        A positional keyword is used by the Move, Write, Amend, and 
+*        A positional keyword is used by the Move, Write, Amend, and
 *        Update editing commands.
 *     KOCCUR( NKEY ) = INTEGER (Given)
 *        The occurrences of the NAMES keywords to use.  Values less than
@@ -127,7 +127,7 @@
 *        for a Write edit; whereas the FITS-header value is unchanged
 *        for Update if there are problems with this positional keyword.
 *        edited.
-*        
+*
 *        For a Rename edit, VALUES has a different meaning; in this
 *        case it stores the replacement keyword name.
 *     COMNTS( NKEY ) = CHARACTER * ( * ) (Given)
@@ -191,12 +191,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -226,7 +226,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -294,7 +294,7 @@
       INTEGER DCARD              ! Dummy card number
       DOUBLE PRECISION DVALUE    ! FITS value
       CHARACTER * ( 1 ) EDIT     ! Edit command abbreviation
-      INTEGER ENDCAR             ! Card number of END card 
+      INTEGER ENDCAR             ! Card number of END card
       INTEGER I                  ! Do-loop index
       LOGICAL INTTYP             ! One of the integer data types?
       INTEGER IVALUE             ! FITS value
@@ -313,7 +313,7 @@
       CHARACTER * ( HKEYLN ) NEWKEY ! Replacement keyword
       INTEGER OLDLST             ! Last card number of old FITS array
       INTEGER PCARD              ! Number of positional card
-      LOGICAL PEXIST             ! Shows position name is in FITS array 
+      LOGICAL PEXIST             ! Shows position name is in FITS array
       INTEGER PSTLN              ! Used length of PSTNAM
       LOGICAL PRESNT             ! Named card is present? (dummy)
       CHARACTER * ( HKEYLN ) PSTNAM ! A position keyword
@@ -340,7 +340,7 @@
       LOGICAL WREND              ! END card present?
       LOGICAL WRKEY              ! Write a new keyword (W or A modes)
       LOGICAL UPKEY              ! Update a keyword (U or A modes)
- 
+
 *  Local Data:
       INCLUDE 'FTS_PAR'          ! FTS package constants and some
                                  ! declarations
@@ -387,14 +387,14 @@
          OLDLST = NOCARD + 1
          ENDCAR = OLDLST
          FTSCAR( ENDCAR ) = 'END '
-        
+
       END IF
 
 *  Initially, last card is the original last card.  The last card to
 *  write is immediately before the virtual END card.  An actual END
 *  card may be written upon completion of the editing.
       LSTCAR = OLDLST
-      
+
 *  Initialise linked lists.
 *  ========================
 
@@ -408,7 +408,7 @@
       IARY1( OLDLST ) = 0
       CHAIN2 = OLDLST
       IARY2( OLDLST ) = OLDLST - 1
-      IARY2( 1 ) = 0 
+      IARY2( 1 ) = 0
       IF ( OLDLST .GT. 2 ) THEN
          DO I = 2, MAX( 2, OLDLST - 1 )
             IARY1( I ) = I + 1
@@ -426,7 +426,7 @@
 *  Prepare the keyword name.
 *  =========================
 
-*  Convert it and its position name to its formal format.  
+*  Convert it and its position name to its formal format.
          KEYNAM = NAMES( I )
 
 *  Remove all blanks and convert it to upper case.
@@ -443,7 +443,7 @@
 
 *  Check whether this keyword is a reserved one.  The names and lengths
 *  of the reserved keywords are stored in the FTS_PAR include file.
-         RESVED = .FALSE.       
+         RESVED = .FALSE.
          DO J = 1, FTS__NREKY
             IF ( KEYNAM( :KEYLN ) .EQ.
      :           FTS__REKEY( J )( :FTS__RKLEN( J ) ) ) RESVED = .TRUE.
@@ -494,10 +494,10 @@
             CALL ERR_RLSE
          END IF
 
-*  The card must exist except for the Write, Amend, and Exist commands.  
+*  The card must exist except for the Write, Amend, and Exist commands.
 *  Just output a message so that the task can continue, and indeed the
 *  warning can be suppressed.
-         IF ( EDIT .NE. 'W' .AND. EDIT .NE. 'E' .AND. 
+         IF ( EDIT .NE. 'W' .AND. EDIT .NE. 'E' .AND.
      :        EDIT .NE. 'A' .AND. .NOT. THERE ) THEN
             CALL MSG_SETC( 'E', EDITS( I ) )
             CALL MSG_SETC( 'KEY', KEYNAM )
@@ -516,7 +516,7 @@
             GO TO 100
          END IF
 
-*  Decide whether or not we need to write a new keyword.  If the keyword 
+*  Decide whether or not we need to write a new keyword.  If the keyword
 *  is absent for anm Amend edit, set the card index as if it were a
 *  Write edit.
          WRKEY = EDIT .EQ. 'W' .OR. ( EDIT .EQ. 'A' .AND. .NOT. THERE )
@@ -543,13 +543,13 @@
 *  ==============================
 
 *  A blank positional keyword for the update edit means leave the
-*  card unmoved.  FITSMOD and FTS1_RFMOD do not know whether the 
+*  card unmoved.  FITSMOD and FTS1_RFMOD do not know whether the
 *  keyword exists, so a null position keyword is set to END even for
-*  Amend.  Here the existence of the keyword is known, and so the END 
-*  card can be replaced with a blank positional keyword since the 
+*  Amend.  Here the existence of the keyword is known, and so the END
+*  card can be replaced with a blank positional keyword since the
 *  Amend wants to Update the header in situ.
             IF ( ( PSTNAM( :PSTLN ) .EQ. 'END' .AND. EDIT .EQ. 'A' .AND.
-     :             THERE ) .OR. 
+     :             THERE ) .OR.
      :             PSTNAM( :PSTLN ) .EQ. ' ' .AND. UPKEY ) THEN
                PCARD = CARD
 
@@ -612,7 +612,7 @@
          IF ( EDIT .EQ. 'E' ) THEN
             EXISTS = THERE
             CALL MSG_SETL( 'KEYX', THERE )
-            CALL MSG_OUTIF( MSG__QUIET, 'EXIST', '^KEYX', STATUS ) 
+            CALL MSG_OUTIF( MSG__QUIET, 'EXIST', '^KEYX', STATUS )
 
 *  Perform the Read command.
 *  ==========================
@@ -765,8 +765,8 @@
 
 *  Validate the value as a keyword.  Although the card index to the
 *  original keyword is known, use a new variable for the name because we
-*  still need to search for the current value by name with the $V 
-*  special value.  Later it will be renamed to create the updated card 
+*  still need to search for the current value by name with the $V
+*  special value.  Later it will be renamed to create the updated card
 *  at that location.  The occurrence is not used here.
                CALL ERR_MARK
                CALL FTS1_EVKEY( VALUE, NEWKEY, LREFVK, REVOC, STATUS )
@@ -854,7 +854,7 @@
 *  Exclude the special case when the length is 0 (already defaults to
 *  current editing keyword).
                      IF ( LREFVK .GT. 0 ) THEN
-      
+
 *  Extract the uppercase positional keyword and any occurrence, and
 *  find the length of the keyword.  Also validate the keyword.
                         CALL ERR_MARK
@@ -880,7 +880,7 @@
 *  it has no value, hence set a flag to to issue a warning.
                      ELSE IF ( WRKEY ) THEN
                         VCARD = -1
- 
+
                      END IF
 
 *  Find the desired occurrence of the value keyword, by searching by
@@ -913,7 +913,7 @@
 *  it has no value, hence set a flag to to issue a warning.
                   ELSE IF ( WRKEY ) THEN
                      VCARD = -1
- 
+
                   END IF
 
 *  Cannot write a non-comment card without a value.  Strictly we could
@@ -1005,8 +1005,8 @@
 *  At present the only special values are $C meaning use the current
 *  comment of the current keyword, and $C(keyword{[occurrence]}) meaning
 *  use the comment of the occurrence of a named keyword.
-            REFCOM = COMENT( 1:2 ) .EQ. '$C' 
-            
+            REFCOM = COMENT( 1:2 ) .EQ. '$C'
+
             IF ( REFCOM ) THEN
 
 *  Initialise as the current editing keyword.
@@ -1030,7 +1030,7 @@
 *  Exclude the special case when the length is 0 (already defaults to
 *  current editing keyword).
                   IF ( LREFCK .GT. 0 ) THEN
-      
+
 *  Extract the uppercase positional keyword and any occurrence, and
 *  find the length of the keyword.  Also validate the keyword.
                      CALL ERR_MARK
@@ -1271,5 +1271,5 @@
 *  If there was no END-card originally, remove the END-card that was
 *  added.
       IF ( .NOT. WREND ) ACTNUM = ACTNUM - 1
-      
+
       END

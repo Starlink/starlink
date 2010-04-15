@@ -345,7 +345,7 @@
 *  Otherwise, give an error message
       ELSE
          CALL ERR_REP( 'IRM_MLINE_ERR1',
-     :                 'IRM_MLINE: Error setting NCAR parameters', 
+     :                 'IRM_MLINE: Error setting NCAR parameters',
      :                 STATUS )
       END IF
 

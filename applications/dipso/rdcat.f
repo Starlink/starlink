@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Implements the DIPSO command RDCAT.
- 
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -31,7 +31,7 @@
 *     -  If the X units are km/s, WORV is the rest wavelength (in
 *     Angstroms) to which the velocities are referenced, divided by
 *     he speed of light (in km/s). If the X units are not km/s, then
-*     WORV will be set to 1.0. 
+*     WORV will be set to 1.0.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -46,7 +46,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

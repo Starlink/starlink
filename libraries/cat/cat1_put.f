@@ -11,7 +11,7 @@
 *  Description:
 *     Put a value of type BYTE into a string at a given position.
 *     The value is appended to the string beginning at position IPOSN+1.
-*     IPOSN is updated to indicate the last element of STRING after the 
+*     IPOSN is updated to indicate the last element of STRING after the
 *     insertion.  If no copying is done, IPOSN is returned unchanged. The
 *     size of STRING is based on the declared Fortran 77 size given by
 *     the intrinsic function LEN.
@@ -54,12 +54,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -134,7 +134,7 @@
       CLVAL = ' '
 
 *
-*    Determine the declared size of the output string and proceed if 
+*    Determine the declared size of the output string and proceed if
 *    there is any space remaining at the end of it.
 
       STRNGS = LEN(STRING)
@@ -229,7 +229,7 @@
 *  Description:
 *     Put a value of type CHARACTER*(*) into a string at a given position.
 *     The value is appended to the string beginning at position IPOSN+1.
-*     IPOSN is updated to indicate the last element of STRING after the 
+*     IPOSN is updated to indicate the last element of STRING after the
 *     insertion.  If no copying is done, IPOSN is returned unchanged. The
 *     size of STRING is based on the declared Fortran 77 size given by
 *     the intrinsic function LEN.
@@ -336,7 +336,7 @@
       CLVAL = ' '
 
 *
-*    Determine the declared size of the output string and proceed if 
+*    Determine the declared size of the output string and proceed if
 *    there is any space remaining at the end of it.
 
       STRNGS = LEN(STRING)
@@ -431,7 +431,7 @@
 *  Description:
 *     Put a value of type DOUBLE PRECISION into a string at a given position.
 *     The value is appended to the string beginning at position IPOSN+1.
-*     IPOSN is updated to indicate the last element of STRING after the 
+*     IPOSN is updated to indicate the last element of STRING after the
 *     insertion.  If no copying is done, IPOSN is returned unchanged. The
 *     size of STRING is based on the declared Fortran 77 size given by
 *     the intrinsic function LEN.
@@ -538,7 +538,7 @@
       CLVAL = ' '
 
 *
-*    Determine the declared size of the output string and proceed if 
+*    Determine the declared size of the output string and proceed if
 *    there is any space remaining at the end of it.
 
       STRNGS = LEN(STRING)
@@ -633,7 +633,7 @@
 *  Description:
 *     Put a value of type INTEGER into a string at a given position.
 *     The value is appended to the string beginning at position IPOSN+1.
-*     IPOSN is updated to indicate the last element of STRING after the 
+*     IPOSN is updated to indicate the last element of STRING after the
 *     insertion.  If no copying is done, IPOSN is returned unchanged. The
 *     size of STRING is based on the declared Fortran 77 size given by
 *     the intrinsic function LEN.
@@ -740,7 +740,7 @@
       CLVAL = ' '
 
 *
-*    Determine the declared size of the output string and proceed if 
+*    Determine the declared size of the output string and proceed if
 *    there is any space remaining at the end of it.
 
       STRNGS = LEN(STRING)
@@ -835,7 +835,7 @@
 *  Description:
 *     Put a value of type LOGICAL into a string at a given position.
 *     The value is appended to the string beginning at position IPOSN+1.
-*     IPOSN is updated to indicate the last element of STRING after the 
+*     IPOSN is updated to indicate the last element of STRING after the
 *     insertion.  If no copying is done, IPOSN is returned unchanged. The
 *     size of STRING is based on the declared Fortran 77 size given by
 *     the intrinsic function LEN.
@@ -942,7 +942,7 @@
       CLVAL = ' '
 
 *
-*    Determine the declared size of the output string and proceed if 
+*    Determine the declared size of the output string and proceed if
 *    there is any space remaining at the end of it.
 
       STRNGS = LEN(STRING)
@@ -1037,7 +1037,7 @@
 *  Description:
 *     Put a value of type REAL into a string at a given position.
 *     The value is appended to the string beginning at position IPOSN+1.
-*     IPOSN is updated to indicate the last element of STRING after the 
+*     IPOSN is updated to indicate the last element of STRING after the
 *     insertion.  If no copying is done, IPOSN is returned unchanged. The
 *     size of STRING is based on the declared Fortran 77 size given by
 *     the intrinsic function LEN.
@@ -1144,7 +1144,7 @@
       CLVAL = ' '
 
 *
-*    Determine the declared size of the output string and proceed if 
+*    Determine the declared size of the output string and proceed if
 *    there is any space remaining at the end of it.
 
       STRNGS = LEN(STRING)
@@ -1239,7 +1239,7 @@
 *  Description:
 *     Put a value of type INTEGER*2 into a string at a given position.
 *     The value is appended to the string beginning at position IPOSN+1.
-*     IPOSN is updated to indicate the last element of STRING after the 
+*     IPOSN is updated to indicate the last element of STRING after the
 *     insertion.  If no copying is done, IPOSN is returned unchanged. The
 *     size of STRING is based on the declared Fortran 77 size given by
 *     the intrinsic function LEN.
@@ -1346,7 +1346,7 @@
       CLVAL = ' '
 
 *
-*    Determine the declared size of the output string and proceed if 
+*    Determine the declared size of the output string and proceed if
 *    there is any space remaining at the end of it.
 
       STRNGS = LEN(STRING)

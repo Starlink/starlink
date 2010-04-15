@@ -46,7 +46,7 @@
 
 *  Notes:
 *     -  The calling routine must close all the files which are opened
-*     before exit. 
+*     before exit.
 *     -  The calling routine must annul the GRP group before exit.
 
 *  Copyright:
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename 
+      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename
       INTEGER NRET
       INTEGER I
       INTEGER FD
@@ -126,7 +126,7 @@
       CALL CCD1_STRGR( PARNAM, MGRP, MINOPN, MAXOPN, GID, NRET, STATUS )
 
 *  Report the number of file names returned.
-      IF ( NRET .EQ. 1 ) THEN 
+      IF ( NRET .EQ. 1 ) THEN
          CALL MSG_SETI( 'NOPEN', NRET )
          CALL MSG_SETC( 'PARNAM', PARNAM )
          CALL MSG_OUT( ' ',

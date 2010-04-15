@@ -74,7 +74,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -170,7 +170,7 @@
             CENTRE( I ) = VAL__BADD
          END DO
       END IF
-      
+
   999 CONTINUE
 
       END

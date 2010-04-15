@@ -327,7 +327,7 @@ found in the SPECX data reduction package.
 
 \section{\xlabel{a_specx_cookbook}A \SPECX\ ``Cookbook''}
 \label{sec:specx-cookbook}
-\SPECX\ is a versatile spectral line data reduction package written by Rachael 
+\SPECX\ is a versatile spectral line data reduction package written by Rachael
 Padman (Cavendish Laboratory, Cambridge, U.K), and supported also by
 Starlink and local effort at the Joint Astronomy Centre in Hilo,
 Hawaii.  It is made available to all users at the JCMT, and a
@@ -343,7 +343,7 @@ ago\footnote{The first version of this section appeared as the `SPECX
 Cookbook' and was written by Thomas Walker. He moved on to greater
 things, but still accepts accolades and greenbacks at
 {\tt walker@stsci.edu}.} to help the novice
-\SPECX\ user get a spectrum on the screen and do some simple data reduction. 
+\SPECX\ user get a spectrum on the screen and do some simple data reduction.
 The original aim is preserved in this version: it is not meant to be a
 complete manual on all the facets of \SPECX ; the definitive words on
 any topic contained in this section will be found in the full \SPECX\
@@ -374,7 +374,7 @@ the last being for version 6.3.
 
 \section{\xlabel{rapid_introduction_to_specx}Rapid Introduction to \SPECX }
 \label{sec:rapid-specx}
-Let's assume you just got your data from the telescope; 
+Let's assume you just got your data from the telescope;
 now you need to
 look at the data, but don't want to read the \SPECX\ manual or this
 one. Then follow these steps, depending on what you want to do. You
@@ -410,19 +410,19 @@ the system responds with the \SPECX\ prompt:
 
 \aside
 If \SPECX\ complains that it cannot find your data, this is likely
-if you started \SPECX\ in a directory that does not contain your data, 
+if you started \SPECX\ in a directory that does not contain your data,
 you
 should exit \SPECX\ (using the command {\tt{exit}}), and before
 restarting up \SPECX\ type e.g.:
 
 \verb|% setenv DATADIR /data/m96bc05/|
 
-or wherever you happen to have stored your data. \SPECX\ will then 
-look for data first in your current directory but then in your data 
+or wherever you happen to have stored your data. \SPECX\ will then
+look for data first in your current directory but then in your data
 directory (as defined by the DATADIR environment variable).
 
 \myline
- 
+
 \subsection{Initialization}
 \label{sec:specx-init}
 \margnote{sec:preparing-specx}
@@ -430,7 +430,7 @@ Check, and perhaps set, terminal device,
 plot device, and hardcopy device. Generally the defaults will be what
 you want, but it won't hurt to go through the motions:
 
-\SP\ {\tt{s-t-d}} \hspace*{0.5in}(system default is {\tt{xw}} for a 
+\SP\ {\tt{s-t-d}} \hspace*{0.5in}(system default is {\tt{xw}} for a
 Sun workstation such as {\tt{IIWI}})
 
 \SP\ {\tt{s-p-d t}} \hspace*{0.35in}(set to plot on terminal screen)
@@ -466,7 +466,7 @@ Unix also has a bad habit of leaving the cursor on the plot window.
 
 Change plot scales\margnote{sec:specx_5.1} with:
 
-\SP\ {\tt{s-p-sc}} 
+\SP\ {\tt{s-p-sc}}
 
 and answer the questions.
 
@@ -486,7 +486,7 @@ To average\margnote{sec:specx_8.2} three spectra (131, 132 and 133) type:
 \SP\ {\tt{r-g-d 132; ave}}\\
 \SP\ {\tt{r-g-d 133; ave}}
 
-Plot result, with 
+Plot result, with
 
 \SP\ {\tt{n}}
 
@@ -495,9 +495,9 @@ line, separated by semicolons, as shown in this example.
 
 \subsection{Dealing with \das\ spectra: basics}
 \label{sec:subbands}
-As described elsewhere, 
+As described elsewhere,
 \das\ spectra usually
-\margnote{sec:das-merge} 
+\margnote{sec:das-merge}
 consist of several overlapping (in frequency/velocity space) sections
 (or `sub-bands'). Except for single sub-band (125-MHz) spectra it is
 necessary to combine these sub-bands to produce a nice spectrum. This
@@ -512,15 +512,15 @@ however, see Section~\ref{sec:das-merge} for caveats etc.  The final
 spectrum should be free of evidence of sub-band edges, except in
 pathological cases.
 
-%Note that in the current version of \SPECX\ the horizontal 
-%plot scale is reset. 
+%Note that in the current version of \SPECX\ the horizontal
+%plot scale is reset.
 
 \reversemarginpar
 Note that:
 \begin{itemize}
 \item
 It is not necessary to do the {\tt das-merge} operation on individual
-spectra before averaging; the average can be formed first and 
+spectra before averaging; the average can be formed first and
 {\tt{das-merge}} applied to the result.
 \item
 If you have modified the centre frequency of the previous spectrum
@@ -531,7 +531,7 @@ using
 
 \SP\ {\tt{s-l-r-f 0.0}}
 
-before attempting the {\tt{das-merge}} command. 
+before attempting the {\tt{das-merge}} command.
 \end{itemize}
 
 \subsection{Sending plots to laser printer}
@@ -545,7 +545,7 @@ asked for Postscript files to be made (these are the required type for
 our normal printer). This plot file will be overwritten every time you
 issue a new plot command.
 
-To send any other plot directly to the (laser) printer, first change plot 
+To send any other plot directly to the (laser) printer, first change plot
 device to {\tt{hardcopy}}:
 
 \SP\ {\tt{s-p-d h}}
@@ -556,7 +556,7 @@ then open a new plotfile:
 
 and {\it{either}} close the plotfile;
 
-\SP\ {\tt{cl-pl}} 
+\SP\ {\tt{cl-pl}}
 
 {\it or} open a new plotfile;
 
@@ -566,7 +566,7 @@ and {\it{either}} close the plotfile;
 
 \SP\ {\tt{s-p-d t}}
 
-all of which create the plotfile \verb|specx_pgplot.ps|. 
+all of which create the plotfile \verb|specx_pgplot.ps|.
 To plot it on the default (local) printer use
 
 \SP\ \verb|$ lp specx_pgplot.ps|
@@ -579,7 +579,7 @@ and if you like this plot enough you can save the Postscript file with
 \subsection{Saving the results}
 Data may be written to {\it{files}}, which can contain many spectra, or
 saved temporarily in {\it{storage registers}}, each of which contains
-only one spectrum. 
+only one spectrum.
 
 To write data to a file, first open one\margnote{sec:data-files}:
 
@@ -626,7 +626,7 @@ To read a spectrum (say, number 16, from file 2):
 
 \SP\ {\tt{rea-s 2 16}}
 
-This places the result in the x-register, from where it is immediately 
+This places the result in the x-register, from where it is immediately
 available for plotting or whatever you might have in mind.
 
 To get data from a temporary storage area\margnote{sec:temp-storage} (say, 3):
@@ -646,7 +646,7 @@ The latter is where the interactive mode comes in handy. First type:
 
 Then use\margnote{sec:linear-baselines}
 
-\SP\ {\tt{r-l-b}} 
+\SP\ {\tt{r-l-b}}
 
 to remove a {\it{linear}} baseline from the current spectrum. Define
 {\it{two}} fitting regions by placing the cursor in the respective
@@ -660,7 +660,7 @@ To remove a polynomial baseline, type\margnote{sec:poly-baselines}
 and define a number of regions to which the baseline is to be
 fitted. If you use the cursor as before, exit the plot screen with an
 `{\tt{e}}' (for `exit'). If you supply the fit ranges in
-non-interactive mode terminate the entries with \ctrld 
+non-interactive mode terminate the entries with \ctrld
 .\footnote{\SPECX\ prompts you for an `{\tt{EOF}}' (end-of-file);
 what the Unix-types don't tell you is that this is a \ctrld ; it is
 \ctrlz\ under VMS.} Next you will be prompted for the order of polynomial to
@@ -696,15 +696,15 @@ observations, and a few other things (answer the questions). Be sure
 to set the map size to be adequate for your needs, or else you will
 have to recreate it later. Only one map file may be open at one time.
 
-To place the current spectrum in the map file, use the {\tt{add-to-map}} 
+To place the current spectrum in the map file, use the {\tt{add-to-map}}
 command\margnote{sec:specx_13.2}:
 
 \SP\ {\tt{a-t-m}}
 
 \normalmarginpar
-To overwrite an existing spectrum in the map, first use 
+To overwrite an existing spectrum in the map, first use
 
-\SP\ {\tt{s-m-a}} 
+\SP\ {\tt{s-m-a}}
 
 to set map access (or not, as the case may be).
 
@@ -742,11 +742,11 @@ commands, or typing {\tt see-map}, will save the image to a file
 \subsection{Some other things}
 Any command may be aborted while it awaits input by typing \ctrlc .
 
-Data may be `binned' (averaged) over {\it n} channels by typing 
+Data may be `binned' (averaged) over {\it n} channels by typing
 
 \SP\ {\tt bin} {\it n}
 
-and smoothed using 
+and smoothed using
 
 \SP\ {\tt hann}
 
@@ -772,7 +772,7 @@ to build procedures for repetitive operations. So, you will have to
 read the full introduction to \SPECX\ in this cookbook, or Rachael
 Padman's full \SPECX\ manual. Also, experimentation is a good thing;
 the worst that can happen is a core dump (a large file called {\tt
-core} will be created in your directory). You should delete this file 
+core} will be created in your directory). You should delete this file
 if this happens.
 
 %%%%%%%%%%%%%%%%%%
@@ -781,7 +781,7 @@ if this happens.
 A More Complete Introduction to \SPECX }
 \label{sec:specx-intro}
 
-\SPECX\ should be run on a graphics-capable terminal for full use of its 
+\SPECX\ should be run on a graphics-capable terminal for full use of its
 capabilities; at the JCMT and elsewhere the preferred device is a Sun
 workstation. Alternatives are other Xwindow devices (such as DECstation
 4000's and VXT2000's) and `dumb terminals' like VT330's. Plot display
@@ -794,10 +794,10 @@ plot you can run \SPECX\ on a non-graphics terminal (\eg\ a VT220).
 
 \SPECX\ can read data from data directories that are distinct from your
 working directory. This leads to directories that are far less cluttered than
-would otherwise be the case. \SPECX\ does this by using the DATADIR 
+would otherwise be the case. \SPECX\ does this by using the DATADIR
 environment variable. When a {\tt read-gsd-data} or {\tt read-gsd-raster}
 command is issued \SPECX\ searches for the GSD file in the current directory
-and, if the file can not be found, then in the directory specified by 
+and, if the file can not be found, then in the directory specified by
 DATADIR.
 
 For example, if you stored your data in /data/jcmtrun then you would issue the
@@ -857,7 +857,7 @@ hand\ldots
 One of the strengths of \SPECX\ is that it allows the user to create
 procedures containing strings of commands. This permits repetitive
 operations. We will offer some simple examples later.
-\item 
+\item
 One can exit from a command part-way through it using \ctrlc .
 Usually this gives back the \SPECX\ prompt along with an obscure
 message.
@@ -898,7 +898,7 @@ correct, and it may be necessary to reset some parameters. {\tt
 specx.dmp} is especially useful when recovering from the times when
 SPECX crashes. On the other hand, if you find yourself in an
 intractable pickle, {\tt specx.dmp} may have become corrupted, and
-then the only solution is to delete the dump file after exiting 
+then the only solution is to delete the dump file after exiting
 \SPECX:
 
 \verb|% rm specx.dmp|
@@ -922,10 +922,10 @@ and I recommend running through them each time you start up,
 especially if you have colleagues who may be working in the same area,
 and who may have reset some variables.
 
-1) To select a driver for your graphics terminal, you must send the command 
+1) To select a driver for your graphics terminal, you must send the command
 {\tt set-terminal-} {\tt device}:
 
-\SP\  {\tt s-t-d} 
+\SP\  {\tt s-t-d}
 
 If you are using a Sun workstation, such as {\tt IIWI} itself, take
 {\tt xw}, and the default device. For a VT330 answer with
@@ -937,20 +937,20 @@ display up until you close it, whatever happens.
 destination of plot files.  This can be a hardcopy device, such as a
 laser printer, but initially this will be your terminal screen:
 
-\SP\  {\tt s-p-d  t} 
+\SP\  {\tt s-p-d  t}
 
 3) Lastly specify the driver appropriate to your hardcopy device (this
 will usually be a LaserJet printer, which is what we have in at the
 summit, at HP and in Hilo):
 
-\SP\  {\tt s-h-d} 
+\SP\  {\tt s-h-d}
 
 Taking the default ({\tt{ps\_l}}) will usually be what you want, at JCMT at
 least. {\tt ps\_p} re-orientates the page for portrait format.  One of the
 advances made by \SPECX {\tt 6.7} is the inclusion of colour Postscript
 (\eg\ {\tt cps\_l}) and GIF output (\eg\ {\tt gif\_l}) by virtue of the
 upgrade to a modern version of PGPLOT. The latter are very useful for
-glossy publications and overheads, and Web presentations respectively. 
+glossy publications and overheads, and Web presentations respectively.
 
 \aside
 
@@ -965,7 +965,7 @@ reasons have renamed a file with a different prefix. It doesn't really
 matter what the prefix is, so long as the last part of the name has the
 scan number in it. For instance you could call your data files {\tt
 my\_data\_}{\it nnnn}{\tt .dat}. Thus for such a case you would use {\tt
-set-gsd-filename}: 
+set-gsd-filename}:
 
 \SP\ {\tt s-g-f my\_data\_}
 
@@ -998,9 +998,9 @@ Section~\ref{sec:long-spectra}.}
 If for some reason you have to do this outside the {\tt das} or {\tt
 aosc} commands, use the
 
-\SP\ {\tt set-quadrant-display} 
+\SP\ {\tt set-quadrant-display}
 
-command. You will be asked to mask out (with a zero) each of the sections you 
+command. You will be asked to mask out (with a zero) each of the sections you
 are not using. Thus the \das\ uses
 
 \SP {\tt s-q-d 1 1 1 1 1 1 1 1}
@@ -1079,7 +1079,7 @@ Now you want to look at the spectrum.  Just do;
 obvious, but it makes sense once you are used to it. Actually, it's a
 little more subtle than that; the full command is
 
-\SP\ {\tt new-plot} 
+\SP\ {\tt new-plot}
 
 and this command requires two variables to be input; pen width and
 colour. `{\tt{n}}' alone has been defined as equivalent to
@@ -1115,7 +1115,7 @@ frame, most of the information which might be needed is present.}  }
 
 The spectrum can be plotted in two ways: histogram (the default on
 startup), and line (connect the dots). One can also set the line
-thickness and the colour (set to 1 and 3 [=green] on startup). 
+thickness and the colour (set to 1 and 3 [=green] on startup).
 The first two are controlled by the flags
 {\tt histogram} and {\tt line\_weight}. That is, on startup the
 defaults are
@@ -1246,7 +1246,7 @@ the results may be a little strange on occasion.
 Parameters may be omitted altogether if you want to take the defaults,
 or the previous settings. In this case one can either use the
 placeholder symbol
-\verb+#+: 
+\verb+#+:
 
 \SP\ \verb|s-p-sc\n\#\n\#\ |
 
@@ -1257,7 +1257,7 @@ or nothing at all:
 \subsection{Dressing Up Your Spectrum}
 \label{sec:specx_5.2}
 Now that you've got your spectrum on the screen you can make it look a
-little better by doing some simple operations on it.  
+little better by doing some simple operations on it.
 
 \subsubsection{Smoothing the data}
 \label{sec:specx_binning}
@@ -1377,8 +1377,8 @@ spectrum with the first of the previously chosen boxes (if any)
 outlined in dot-dashed lines. {\it If you are using Xwindows click
 first on the title bar at the top of the plot window} -- it will be
 labelled ``{\tt{PGPLOT Window 1}}''; depending on how your system is
-set up clicking elsewhere in the window may give erroneous results. 
-Then either 
+set up clicking elsewhere in the window may give erroneous results.
+Then either
 \begin{itemize}
 \item
 tap the return key at this point to choose the range shown (which will
@@ -1403,20 +1403,20 @@ cursor anywhere inside the plot window. If you want to leave the
 interactive mode altogther use the command
 
 \SP\ \verb|s-i n|
- 
+
 In non-interactive mode the following exchange is typical. The result
 in this particular instance is shown in
 Figure~\ref{fig:specx_rlb}. Remember, {\tt EOF} is \ctrld .
 \begin{verbatim}
- >> r-l-b 
+ >> r-l-b
  Doing R-L-B for quadrant/sub-band #   1
    2 baseline regions currently defined
   Type intervals, one at a time, EOF to finish
- Current units are km/s  
- 
+ Current units are km/s
+
  # [   46.00,   56.03] 30 50
  # [   80.00,   90.02] 80 100
- >> 
+ >>
 \end{verbatim}
 %
 \begin{figure}[htb]
@@ -1435,7 +1435,7 @@ it is the effect of removing a linear baseline tied to clean
 \end{minipage}
 \end{center}
 \end{figure}
- 
+
 \subsubsection{Polynomial baselines}
 \label{sec:poly-baselines}
 Fitting a polynomial baseline is similar, by using the command
@@ -1463,13 +1463,13 @@ was used.  }}
 Again, in interactive mode the screen will display the current
 spectrum and you have to tell it where to fit the polynomial.  There
 are two differences from a linear baseline removal though; first, you
-can choose {\it one or more} regions, and second, after you fit a 
+can choose {\it one or more} regions, and second, after you fit a
 baseline \SPECX\
 won't remove it until you tell it to.  You use the same keys as
 before, {\tt l} for the left boundary of a region, {\tt r} for the
 right and {\tt a } to accept the region. When you are done marking
 regions, hit the {\tt e} for exit and \SPECX\ will ask you for the
-order of polynomial you want and then make its fit. 
+order of polynomial you want and then make its fit.
 
 In non-interactive mode the exchange might look like:
 \begin{verbatim}
@@ -1477,14 +1477,14 @@ In non-interactive mode the exchange might look like:
  >> f-p-b
    4 baseline regions currently defined
   Type intervals, one at a time, EOF to finish
- Current units are km/s  
- 
+ Current units are km/s
+
  # [  -15.96,   10.59] 0 20
  # [   26.37,   40.18] 30 60
  # [   47.76,   56.77] 80 100
- # [   85.82,  105.52]  
+ # [   85.82,  105.52]
  Order of polynomial to be fitted? [ 5] 4
- >> 
+ >>
 \end{verbatim}
 
 The fitted baseline is now the current spectrum in the x-register, so if
@@ -1494,7 +1494,7 @@ look at it just use the {\tt overlay} command; \eg :
 \SP\ \verb|over 1 5|
 
 As shown in Figure~\ref{fig:specx_fpb} this will plot the fitted curve
-on top of the original spectrum. 
+on top of the original spectrum.
 
 \begin{figure}[htb]
 \centering
@@ -1538,7 +1538,7 @@ where {\it file-name} is your choice of file to which to write the
 information.  Remember to reset the output to your screen subsequently
 (use {\tt s-l-f t}).
 
-The key commands here are {\tt fit-gaussian-model} and {\tt 
+The key commands here are {\tt fit-gaussian-model} and {\tt
 calculate-gaussian-model}, {\tt f-g-m} and {\tt c-g-m} respectively.
 
 In non-interactive mode, the dialog might proceed as follows:
@@ -1643,13 +1643,13 @@ Table~\ref{tab:specx_tab1} shows the results of these four commands.
 \caption{Understanding stack operations}
 \begin{center}
 \begin{tabular}{ccccc}
-Stack posn & Scan no &      & Stack posn & Scan no \\ 
-X & 001 &                                & X & 002 \\ 
+Stack posn & Scan no &      & Stack posn & Scan no \\
+X & 001 &                                & X & 002 \\
 Y & 002 & {\huge $\Longrightarrow$}      & Y & 001 \\
 Z & 003 & {\footnotesize XY-INTERCHANGE} & Z & 003 \\
 T & 004 &                                & T & 004 \\
   &     &                                &   &     \\
-X & 001 &                                & X & 002 \\ 
+X & 001 &                                & X & 002 \\
 Y & 002 & {\huge $\Longrightarrow$}      & Y & 003 \\
 Z & 003 & {\footnotesize ROLL-STACK}     & Z & 004 \\
 T & 004 &                                & T & 001 \\
@@ -1703,7 +1703,7 @@ The answers to the questions about file title and owner are not crucial.
 They will only appear if you make a listing of the file contents. However,
 {\it do not allow spaces, dashes, or semicolons} to appear in either
 field, or, for that matter, in the filename; otherwise the results will
-not be what you wanted. 
+not be what you wanted.
 
 Now a file {\tt stanley.sdf} will appear in my directory.  To get the
 data into the file you use {\tt write-spectrum}.  This puts the
@@ -1711,14 +1711,14 @@ spectrum in the stack X register into the file.  So I do the following
 command;
 
 \begin{verbatim}
- >> write-spectrum 
+ >> write-spectrum
  File number? (EOF to list) 1
  Filed as scan   1 of stanley
- >> 
+ >>
 \end{verbatim}
 
-When first created the file access is set to write-only. When opened on 
-subsequent occasions the default file access is read-only. If you want to 
+When first created the file access is set to write-only. When opened on
+subsequent occasions the default file access is read-only. If you want to
 change this use the {\tt set-file-access} command:
 
 \begin{verbatim}
@@ -1744,9 +1744,9 @@ read access: \eg
 
 \begin{verbatim}
 >> rea-sp
-File number? (EOF to list) [1] 
+File number? (EOF to list) [1]
 Scan? 2
->> 
+>>
 \end{verbatim}
 
 \subsubsection{Temporary Storage}
@@ -1875,7 +1875,7 @@ command
 
 first. The consequence of not doing this is that the first subband
 of the new spectrum appears to {\tt das-merge} to not have the correct
-frequency, and the error message 
+frequency, and the error message
 
 \verb| -- SPECX#033 -W- Can't MERGE - quadrants do not overlap --|
 
@@ -1892,9 +1892,9 @@ adjustment actually can introduce low-level offsets between subbands,
 which, particularly for wide weak lines, could result in spurious
 detections.  Hence one should use the default command, equivalent to
 
-\SP\ {\tt das-merge$\backslash$\#$\backslash$n$\backslash$} 
+\SP\ {\tt das-merge$\backslash$\#$\backslash$n$\backslash$}
 
-for almost all cases. 
+for almost all cases.
 
 One particular case which can readily introduce baselevel offsets if one
 applies the vertical subband adjustment is when one has a bright line
@@ -1961,7 +1961,7 @@ stack.
 For example, if I want to average spectra 1 through 5, I would have
 to do the following.  Read in spectrum 1, read in spectrum 2, average
 them, read spectrum 3, average again, read spectrum 4, average, read 5
-and average one more time.  
+and average one more time.
 
 Thus to average five spectra (131, 132, 133, 134 and 135, say) you
 would type:
@@ -1984,19 +1984,19 @@ you. Such a do-loop might go like this:
  Enter commands to do, line at a time, EOF to finish
  insert >> r-g-d i
  insert >> ave
- insert >>  
+ insert >>
 \end{verbatim}
 This would then average your spectra. Certainly less typing if you
 have a lot of spectra in sequence(s) to average. Note that having done
 the do-loop once creates a file called {\tt temp.spx} which does the
 same thing as the do-loop we just made. So if you had two more groups
 of spectra (say, 138--143 and 145--150) to average with the preceding
-average, just type 
+average, just type
 
 \SP\ \verb|@temp 138 143|\\
 \SP\ \verb|@temp 145 150|
 
-to complete the set of spectra to be averaged. 
+to complete the set of spectra to be averaged.
 
 \subsubsection{Displaying More Than One Spectrum}
 \label{sec:specx_8.3}
@@ -2043,12 +2043,12 @@ of eight subsections.  Loading this spectrum into \SPECX\ shows that
           (x,y) offset = ( 159.9,   0.5) arcsec
           rotation angles: x2y =  -90.0 deg.; v2y =    0.0 deg.
           (r,d) offset = ( 159.9,   0.5) arcsec
- 
- 
+
+
  Stack posn    Scan no    Title
-     X           46      0046.000_B  SATURN   JCMT 
-     Y           46      0046.000_A  SATURN   JCMT 
- >> 
+     X           46      0046.000_B  SATURN   JCMT
+     Y           46      0046.000_A  SATURN   JCMT
+ >>
 \end{verbatim}
 
 The following sequence of commands will reduce this to a single
@@ -2085,7 +2085,7 @@ procedure to do this (see later).
 \begin{minipage}[t]{5in}
 \caption[Extreme wideband spectra (concatenation)]
 {\small{An example of a spectrum taken in the dual subsystem mode with
-receiver C2, covering about 1.8~GHz, after concatenating and merging 
+receiver C2, covering about 1.8~GHz, after concatenating and merging
 the two subsystems.
  }}
 \label{fig:concatenation}
@@ -2122,7 +2122,7 @@ and
 
 \SP\ \verb|div 7.8|
 
-The defaults factors are set to unity (they used to be zero). 
+The defaults factors are set to unity (they used to be zero).
 
 \subsubsection{Spectrum Statistics}
 \label{sec:specx_10}
@@ -2218,8 +2218,8 @@ as, say,
 \verb|emacs &|
 
 to start up {\tt emacs} in a separate window which will remain until
-you specifically close it. 
-\item 
+you specifically close it.
+\item
 You can just type this without asking for the prompt, of course:
 
 \verb|>> $ emacs &|
@@ -2229,8 +2229,8 @@ If you are using a windowed terminal, open a completely separate {\tt
 xterm}, say, for the purpose.
 \end{enumerate}
 
-A command file is very simple to understand because it's just a list of 
-\SPECX\ commands.  The only pitfalls are knowing what order to submit the 
+A command file is very simple to understand because it's just a list of
+\SPECX\ commands.  The only pitfalls are knowing what order to submit the
 commands to \SPECX\ and knowing in advance what questions \SPECX\ is
 going to ask. This implies a little experience is useful before trying
 to write your own command procedures. Which is why this information is
@@ -2248,7 +2248,7 @@ give in \SPECX :
 \SP\ \verb|sm-sp 5| \\
 \SP\ \verb|n|
 
-These lines would be faithfully reproduced in a command procedure. 
+These lines would be faithfully reproduced in a command procedure.
 You would type, say:
 
 \verb|$ pico|
@@ -2303,9 +2303,9 @@ done.  I would write the following command file, which I'll call {\tt
 rlb.spx}:
 
 \begin{verbatim}
-r-g-d\?\ 
-r-l-b\-40 -20\20 40\ 
-wr-sp\1\ 
+r-g-d\?\
+r-l-b\-40 -20\20 40\
+wr-sp\1\
 \end{verbatim}
 
 The {\tt ?} in the first line will prompt me for a scan number every
@@ -2319,7 +2319,7 @@ files). To run the command file type
 
 \SP\ \verb|@rlb|
 
-and \SPECX\ will ask which scan you want to read (because of the {\tt ?}). 
+and \SPECX\ will ask which scan you want to read (because of the {\tt ?}).
 Alternatively, you could type, say,
 
 \SP\ \verb|@rlb 137|
@@ -2346,8 +2346,8 @@ new command file \eg\
 @RLB 120
 \end{verbatim}
 
-Saving this command with some name (say, {\tt 1to20.spx}) and running it 
-by typing 
+Saving this command with some name (say, {\tt 1to20.spx}) and running it
+by typing
 
 \SP\ {\tt @1to20}
 
@@ -2364,9 +2364,9 @@ is, if one creates a command file (call it, say, {\tt doit.spx}):
 
 \begin{verbatim}
 do n 101 120
-r-g-d\n\ 
-r-l-b\-40 -20\20 40\ 
-wr-sp\1\ 
+r-g-d\n\
+r-l-b\-40 -20\20 40\
+wr-sp\1\
 enddo
 \end{verbatim}
 
@@ -2419,15 +2419,15 @@ way:
  Enter commands to do, line at a time, EOF to finish
  insert >> g-s-f-m i
  insert >> wr-sp 1
- insert >>  
- Filed as scan  31 of junk                    
- Filed as scan  32 of junk                       
- Filed as scan  33 of junk                       
- Filed as scan  34 of junk                       
- Filed as scan  35 of junk                       
- Filed as scan  36 of junk                       
- Filed as scan  37 of junk                       
- Filed as scan  38 of junk                       
+ insert >>
+ Filed as scan  31 of junk
+ Filed as scan  32 of junk
+ Filed as scan  33 of junk
+ Filed as scan  34 of junk
+ Filed as scan  35 of junk
+ Filed as scan  36 of junk
+ Filed as scan  37 of junk
+ Filed as scan  38 of junk
  >>
 \end{verbatim}
 Using the variable {\tt i} as a simple counter, I read the series of
@@ -2448,7 +2448,7 @@ created by the preceding simple do loop looks like:
  wr-sp 1
  enddo
  return
- >> 
+ >>
 \end{verbatim}
 This routine could be re-used by simply typing
 
@@ -2464,17 +2464,17 @@ There are occasions when it is helpful to change the x-axis on a
 spectrum. This is particularly true for observations made with offset
 frequencies designed to accommodate two or more spectral lines from
 the same or different sidebands. There are four commands which are
-very useful in this respect: 
+very useful in this respect:
 \begin{enumerate}
 \item
 \verb|set-x| enables one to change the x-axis scale;
 \item
 with \verb|set-line-rest-frequency| it is possible to modify the plot
 so that the spectrum appears as if this frequency had been chosen as
-the rest frequency 
+the rest frequency
 \item
 \verb|set-velocity-frame| lets one enter a velocity to which the
-spectrum will be referred in subsequent plots; 
+spectrum will be referred in subsequent plots;
 \item
 \verb|change-sideband| shows the spectrum as if it were referred to
 the other sideband. Use of this command {\it frees the x axis plot
@@ -2487,7 +2487,7 @@ be discussed together.  One important thing to realise is that the
 header values of the spectrum are not changed by any of these
 commands, just the relative positioning of the spectrum in
 velocity/frequency space for the purpose of plotting. Some parameters,
-but not all, are carried over into the headers of stored reduced 
+but not all, are carried over into the headers of stored reduced
 spectra and map files.
 
 \subsubsection{{\tt set-x}}
@@ -2498,9 +2498,9 @@ clarity, and the command {\tt set-x} is provided to enable one to plot
 with a different x-axis. There are three main choices: points,
 frequency, and velocity. The `points' option is useful for determining
 which channels to lose from the spectrum if you are planning to make a
-map. 
+map.
 
-For instance, the spectrum below (Fig.~\ref{fig:set-x-orig}) 
+For instance, the spectrum below (Fig.~\ref{fig:set-x-orig})
 is typical of those obtained toward
 OMC-1. Within the band are two lines in which I happened to be
 interested at the time, neither of which will appear at the expected
@@ -2529,27 +2529,27 @@ line-rich source.
 
 The two lines (of HDO) are at about $-50$ and $-145$~km/s
 respectively, but it is rather messy to work this out at altitude.  It
-is actually more useful to work in frequency in this case. So, 
+is actually more useful to work in frequency in this case. So,
 to change from velocity scale to a frequency scale, use {\tt set-x}
-and the following exchange occurs: 
+and the following exchange occurs:
 
 \begin{verbatim}
  >> set-x
- 
+
  Set units for X-scale:
  Key:    1      Points scale
          2      Frequency scale
          3      Velocity scale
          4      User defined scale
- 
-    Current units are km/s  
- 
+
+    Current units are km/s
+
  Key?  [3] 2
- Apply polynomial correction to frequency scale? (Y/N) [N] 
+ Apply polynomial correction to frequency scale? (Y/N) [N]
  Absolute or relative frequencies? (A/R) [R] a
- 
- X-scale units set - GHz 
-\end{verbatim} 
+
+ X-scale units set - GHz
+\end{verbatim}
 
 Note that there is more to this command than just choosing an
 x-axis. One must also choose the origin, effectively, in this case via
@@ -2561,7 +2561,7 @@ correction; having this on is useful only for non-linear scales such as
 that produced
 by the \aosc . The \das\ scale is quite linear by definition. The use
 of absolute frequency scales enables me easily to see what frequencies
-my lines have. As shown below in Fig.~\ref{fig:set-x-to-freq}, 
+my lines have. As shown below in Fig.~\ref{fig:set-x-to-freq},
 this provides both upper and lower
 sideband frequency scales, on the bottom and top x axes
 respectively. However, these scales will be correct {\it only if one
@@ -2577,10 +2577,10 @@ So, if I put the correct velocity in place using {\tt s-v-f}:
 \begin{verbatim}
  >> s-v-f
  Output in different vel frame? (Y/N) [N] y
- Velocity frame? (TELLuric, LSR, HELIocentric, GEOcentric) [ LSR] 
- Velocity law definition? (OPTical, RADio, RELativistic) [RAD] 
- Velocity in new frame? (km/s) [  7.00] 
- >> 
+ Velocity frame? (TELLuric, LSR, HELIocentric, GEOcentric) [ LSR]
+ Velocity law definition? (OPTical, RADio, RELativistic) [RAD]
+ Velocity in new frame? (km/s) [  7.00]
+ >>
 \end{verbatim}
 and then changing the x-axis to frequency using {\tt set-x} we get the
 result following in Fig.~\ref{fig:set-x-to-freq}:
@@ -2602,7 +2602,7 @@ x-axis and providing \SPECX\ with the correct lsr velocity.
 \end{minipage}
 \end{minipage}
 \end{figure}
-   
+
 From these data the two HDO lines at 310.5333 (upper x axis; lower
 sideband) and 313.7506~GHz (lower x axis; upper sideband) are clearly
 seen to be present. Of course, the spectrum is reversed now because of
@@ -2620,17 +2620,17 @@ at
 313.7506~GHz:
 \begin{verbatim}
  >> s-l-r-f 313.7506
- >> s-v-f \y\lsr\rad\7.0\ 
+ >> s-v-f \y\lsr\rad\7.0\
  >> n
- 
+
  Plot opened; sequence no. 024
- 
+
  Warning ** Rest frequency set using values from SET-LINE-REST-FREQ.
  Do S-L-R-F. to use defaults from header
- 
+
  -- sxgdevice --/xwindow         SPECXDIR:SPECX_PGPLOT.PS
- >> 
-\end{verbatim} 
+ >>
+\end{verbatim}
 
 Note the warning \SPECX\ issues, to let you know that you have
 modified the frequency/velocity scale. If you want to revert to the
@@ -2656,7 +2656,7 @@ frequency in the upper sideband.
 \end{minipage}
 \end{minipage}
 \end{figure}
-   
+
 Here we see that our line is centered at about 0 km/s, because we have
 referred the scale to an LSR velocity of 7 km/s, the actual velocity of
 this source.
@@ -2665,32 +2665,32 @@ Once again, note that although the correct LSR velocity was chosen
 when the observations were made, as seen in the `header' below the
 plot, this is largely irrelevant to this discussion. We can choose to
 concentrate on any line by a correct choice of rest frequency,
-sideband and velocity. 
+sideband and velocity.
 
 For an equivalent display of the {\it lower sideband} line we need to
 change the sideband also:
 \begin{verbatim}
- >> s-l-r-f 310.5333 
+ >> s-l-r-f 310.5333
  >> s-v-f \y\lsr\rad\7.0\
  >> ch-sid
- 
+
  Warning ** Rest frequency set using values from SET-LINE-REST-FREQ.
  Do S-L-R-F. to use defaults from header
- 
+
  Sector  1: First I.F. = -1.608541 GHz
- 
+
   --- Header entries changed to other sideband ---
-      Note that f_rest still refers to frequency  
+      Note that f_rest still refers to frequency
       used as reference in velocity transformation:
       You should not normally need to change this.
- 
+
  >> s-p-sc
  Do you want automatic scaling of X-axis? (Y/N) [Y] n
- X-axis scale: Beginning and end? [ -50.00   50.00] 
- Do you want automatic scaling of Y-axis? (Y/N) [N] 
- Y-axis scale: Beginning and end? [   2.00   10.00] 
- >> 
-\end{verbatim} 
+ X-axis scale: Beginning and end? [ -50.00   50.00]
+ Do you want automatic scaling of Y-axis? (Y/N) [N]
+ Y-axis scale: Beginning and end? [   2.00   10.00]
+ >>
+\end{verbatim}
 
 
 Note that {\tt ch-sid} turns on the default x-axis scaling, and we
@@ -2708,7 +2708,7 @@ containing the other HDO line, again centered around 0 km/s:
 \begin{minipage}[b]{0.45\textwidth}
 \caption[Part of the same in the LSB ]
 {\small{Figure~\ref{fig:set-x-orig} after changing to a frequency
-x-axis and providing \SPECX\ with the correct lsr velocity, and the 
+x-axis and providing \SPECX\ with the correct lsr velocity, and the
 frequency in the lower sideband.
 \vspace*{1cm}
 }}
@@ -2716,7 +2716,7 @@ frequency in the lower sideband.
 \end{minipage}
 \end{minipage}
 \end{figure}
-   
+
 Sometimes, because it's fairly difficult to get everything the way one
 might want it, it can be useful to collect the commands together in a
 procedure, which can be edited and re-run until you get the result you
@@ -2726,7 +2726,7 @@ of the lines are in the lower sideband, and one in the upper
 sideband.\footnote{By the way, in case I didn't mention it before
 any characters following a `{\tt{!}}' on a command line are taken to be
 comments. I often use comment lines to `store' command lines I might need
-some other time.} 
+some other time.}
 
 \begin{verbatim}
 !o-fil tests
@@ -2756,7 +2756,7 @@ cl-pl
 !the end
 \end{verbatim}
 
-The result of this procedure is shown in Figure~\ref{fig:s-l-r-f}. 
+The result of this procedure is shown in Figure~\ref{fig:s-l-r-f}.
 
 \begin{figure}[htb]
 \centering
@@ -2765,7 +2765,7 @@ The result of this procedure is shown in Figure~\ref{fig:s-l-r-f}.
 \vspace*{-0.5cm}
 \begin{center}
 \begin{minipage}[t]{5.5in}
-\caption[Using s-l-r-f etc] 
+\caption[Using s-l-r-f etc]
 {\small{Bottom through top: lines of HNC (4--3; 362.3603~GHz), H$_2$CO
 (5$_{05}$--4$_{04}$; 362.7359~GHz) and H$_2$CO (5$_{23}$--4$_{22}$;
 365.3634~GHz) observed toward NGC2071IR; all three lines appear in the
@@ -2838,7 +2838,7 @@ emission towards L1498 appears at the bottom of this panel. A linear baseline
 was subtracted for clarity. At the top is the `shifted and subtracted'
 spectrum. The final CO line profile is at the middle (V$\sim 8$ km/s), flanked
 by negative-going `ghost' images. The left-hand one of the latter coincides
-with a `ghost' image from telluric CO, off the frame to the left. 
+with a `ghost' image from telluric CO, off the frame to the left.
 }}
 \label{fig:fsw_reduction}
 \end{minipage}
@@ -2887,7 +2887,7 @@ shifted-and-averaged version. As noted within the procedure you may be
 asked to provide a frequency; this is the result of a software
 workaround for `slow-frequency switching' (using receivers A2 and
 C2). To find out the frequency run {\tt SPECSUM} and note the rest
-frequency given there for the data in question. 
+frequency given there for the data in question.
 
 \item
 Any residual baselines can now be removed with a polynomial (use {\tt
@@ -2919,7 +2919,7 @@ device (terminal, printer, or null --- the latter is a bit bucket);
  >> see-plot
  Terminal / Hardcopy / Null (T/H/N) t
  -- sxgdevice --/xwindow         SPECXDIR:SPECX_PGPLOT.PS
- >> 
+ >>
 \end{verbatim}
 
 A more involved way involves first creating a plot file with which you
@@ -2928,20 +2928,20 @@ medium you want using the command {\tt s-h-d}:
 
 \begin{verbatim}
  >> s-h-d
- Printers available: 
- cps_l,            cps_p,            ps_l,             ps_p,             
- ln03_l,           ln03_p,           ecpsf_ltex,       ecpsf_ptex,       
- epsf_ltex,        epsf_ptex,        gif_l,            gif_p             
- 
+ Printers available:
+ cps_l,            cps_p,            ps_l,             ps_p,
+ ln03_l,           ln03_p,           ecpsf_ltex,       ecpsf_ptex,
+ epsf_ltex,        epsf_ptex,        gif_l,            gif_p
+
  Printer type? [gif_l] cps_l
- >> 
+ >>
 \end{verbatim}
 
 As you can see there are quite a few possibilities, thanks to the use
 of up-to-date PGPLOT. In this case I wanted to change from a landscape
 GIF format to a color Postscript landscape plot. \SPECX\ always gives
 the output file a default name; \verb|specx_pgplot.ps| for Postscript,
-\verb|specx_pgplot.eps| for Encapsulated Postscript, 
+\verb|specx_pgplot.eps| for Encapsulated Postscript,
 and \verb|specx_pgplot.gif| for GIF files, for instance. Unix being
 what it is, this file will be overwritten every time you create a new
 plot file of the same type.  Therefore if you want to save the plot
@@ -2952,7 +2952,7 @@ should copy the generic file to a name of your choice; \eg :
 
 % $ Help emacs
 
-One cannot use the {\tt laser} command for maps (see below). 
+One cannot use the {\tt laser} command for maps (see below).
 
 \subsection{Making Maps}
 \label{sec:specx_13}
@@ -3000,15 +3000,15 @@ very} inefficient to transfer data from one map to another, using the
 commands
 \verb|get-spectrum-from-map| and {\tt add-to-map} in a command file. It is
 much better to hold the data in a \SPECX\ data file and use that as an
-intermediary. 
+intermediary.
 \end{itemize}
 
 The key to all this is to experiment first with the data you plan to
 put in a map. Let's illustrate this with an example of a real life
 situation.
 
-The first thing to do is open a map file. The following dialog ensues once we 
-type the command {\tt open-map-file}: 
+The first thing to do is open a map file. The following dialog ensues once we
+type the command {\tt open-map-file}:
 
 \begin{verbatim}
 >> o-map
@@ -3072,9 +3072,9 @@ rather than saving disk space.
 To get data into the map, the command is {\tt add-to-map}.  This takes
 the spectrum in the {\tt X} register and puts it in the map at the
 correct cell position.  The first point you put in defines where the
-map centre will be (using the source coordinates and offsets), if you 
+map centre will be (using the source coordinates and offsets), if you
 left that to be defaulted when you defined the map file setup with
-{\tt o-map}; hence it doesn't matter which map point you first put in 
+{\tt o-map}; hence it doesn't matter which map point you first put in
 the map. There is also a {\tt delete-from-map}
 for removing data from the map.  If you want to see a listing of what is
 in the map do {\tt list-map}. If you want to take a spectrum out of a
@@ -3122,12 +3122,12 @@ This file illustrates some more points about command file syntax.
 \item
 Comment lines can be inserted by starting the lines with {\tt !}.
 \item
-The `{\tt{n}}' in the {\tt das-merge} command inhibits subband offset 
+The `{\tt{n}}' in the {\tt das-merge} command inhibits subband offset
 adjustments; the `\verb|#|' is a `placeholder' for the default channel
 drop.
 \item
 Two regions are chosen either side of the line emission for the
-polynomial fit.  Note the method, using \verb|^D| (or \verb|^Z|), of 
+polynomial fit.  Note the method, using \verb|^D| (or \verb|^Z|), of
 terminating
 input to questions which have a larger number of possible answers
 than you need.
@@ -3160,8 +3160,8 @@ to make a map of CS 7--6 in the lower sideband, having observed CO
 can be brought into service as required:
 \begin{verbatim}
 ! map-adding procedure
-! CS 7-6 
-! 
+! CS 7-6
+!
 declare scan i4
 declare first i4
 declare last i4
@@ -3183,14 +3183,14 @@ drop 100 1000
 ! n
 a-t-m
 enddo
-\end{verbatim} 
+\end{verbatim}
 
 \subsubsection{The {\tt read-gsd-raster} routine}
 \label{sec:r-g-r}
 Because map making can be slow due to system overheads, it is quite
 often useful to create a basic data file first from the various map
 observation GSD files. The routine {\tt read-gsd-raster} provides this
-capability. You should have a file open first, to which the data can 
+capability. You should have a file open first, to which the data can
 be written, and the routine reminds you to turn off the screen chatter
 with \verb|>> s-l-f n| if you don't want to see all the gory details.
 
@@ -3199,32 +3199,32 @@ Then, for example, the routine looks like this:
 \begin{verbatim} >> r-g-r
  GSD scan number? [ 337] 333
  GSD version  5.3
- 
+
  Use SET-LIST-FILE N to reduce output messages
- 
- File number? (EOF to list) [1]  
+
+ File number? (EOF to list) [1]
  1  junk                                      W    -1
- File number? (EOF to list) [1] 
+ File number? (EOF to list) [1]
           (x,y) offset = ( -56.0, -56.0) arcsec
           rotation angles: x2y =  -90.0 deg.; v2y =    0.0 deg.
           (r,d) offset = ( -56.0, -56.0) arcsec
- 
- 
- Stack posn    Scan no    Title
-     X          333      0333.0001   IRAS2227 JCMT 
 
- Perform DAS-MERGE before writing ? (Y/N) [Y] 
+
+ Stack posn    Scan no    Title
+     X          333      0333.0001   IRAS2227 JCMT
+
+ Perform DAS-MERGE before writing ? (Y/N) [Y]
 There are  222 overlapping channels
- Number of overlap channels to use? [ 111] 
- Adjust any DC offset quadrants? (Y/N) [N] 
- 
-\end{verbatim} 
+ Number of overlap channels to use? [ 111]
+ Adjust any DC offset quadrants? (Y/N) [N]
+
+\end{verbatim}
 
 Then, away it goes. This routine does not fit baselines or truncate
 the noisy channels from the ends of the spectra, but it
 does {\tt das-merge} the spectra as required. Subsequent application
 of the command {\tt merge-files} allows data which should go in a
-single map cube to be combined. If one has two files containing 
+single map cube to be combined. If one has two files containing
 grid, pattern, or raster data taken to a common centre {\tt
 merge-files} will combine these data in a third file, averaging data
 taken at the same offsets. Thus this method is especially useful when
@@ -3234,8 +3234,8 @@ observations of the same map grid. With the recent upgrade in speed
 resulting from improvements to the {\tt r-g-d} routine this method
 does not confer any special advantage as to speed of application. It
 also tend to gobble up disk space due to the possibility of creating
-several large files rather than one.  
- 
+several large files rather than one.
+
 \subsubsection{Grid Spectra}
 \label{sec:specx_13.3}
 One of the most useful ways of displaying small \SPECX\ does maps is
@@ -3467,7 +3467,7 @@ occur:
 !! HDS locator invalid: value=' ', length=15 (possible programming error).
 !  DAT_ANNUL: Error annulling an HDS locator.
  -- SPECX#010 -W- Error opening file --
- >> 
+ >>
 \end{verbatim}
 A similar error message will occur if the output filename already exists.
 \item
@@ -3490,7 +3490,7 @@ required. Providing it will give an error \eg :
  Failed to open input file, IOSTAT =  1018
  File name was mars_12.map.map
  -- SPECX#010 -W- Error opening file --
- >>  3 
+ >>  3
 \end{verbatim}
 \end{itemize}
 
@@ -3518,7 +3518,7 @@ Tilanus}.
 First write the spectra to a \SPECX\ output file after applying \dm\
 and any other processing you want (such as baseline fits, binning
 etc). Then use the
-\SPECX\ command 
+\SPECX\ command
 
 \SP \verb|tofits|
 
@@ -3556,7 +3556,7 @@ in the instance of a 15-position map having been used for observation
 If one chooses to imprint the filenames with the sequence number in
 the \SPECX\ input data file, the subscan number is omitted: file names
 will look like
-\verb|jcmt_nnnn.fits|. 
+\verb|jcmt_nnnn.fits|.
 
 In both cases it will be useful to make a print-out of the input file
 using
@@ -3586,16 +3586,16 @@ for all practical purposes appears as a disk-to-disk conversion.  For
 example:
 
 \begin{verbatim}
- >> g2f 
- 
+ >> g2f
+
  Routine to directly convert GSD DAS/AOSC files to FITS using CONCAT
  and DAS-MERGE if necessary.
- 
+
  *** WARNING *** THIS ROUTINE IS DANGEROUS: data that need CONCAT
  and/or DAS-MERGE should really be inspected after these operations
  and before conversion to FITS, otherwise the DATA QUALITY may be
  severely compromised.
- 
+
  /jcmt_sw/sun4_Solaris/specx/gsd2fits> First scan #? 51
  /jcmt_sw/sun4_Solaris/specx/gsd2fits> Last scan #? 59
 
@@ -3618,38 +3618,38 @@ velocity slices or complete cubes via the {\tt write-fits-map}
 latter is a relatively recent addition and seems to work well
 generally.
 
-{\tt w-f-m} creates velocity slices 
+{\tt w-f-m} creates velocity slices
 \ie\ maps of intensity versus position over a specified velocity range, say.
 Having decided on the velocity increment to use, and whether to use
 integrated or peak line strengths, one first opens a FITS file with
 the command
 \verb|open-fits|. The name given the FITS file is quite literal; if
 you want the filetype to be {\tt .fits} you have to specify it as
-shown in the examples below. 
+shown in the examples below.
 Remember to close the FITS file with {\tt close-fits}.
 
-The following sequence is a typical example of how this would work: 
+The following sequence is a typical example of how this would work:
 
 \begin{verbatim}
  >> w-f-m
  Velo range? (km/s  ) [ -10.0000,   0.0000] -6 -4
- Integrated intensity? (rather than average) (Y/N) [Y] 
+ Integrated intensity? (rather than average) (Y/N) [Y]
  R.A. offset scaled from   56.000 to  -56.000
  Dec. offset scaled from   56.000 to  -56.000
  Map centre as specified when map opened
- Centre channel VLSR (Rad def'n) -4.06757    
+ Centre channel VLSR (Rad def'n) -4.06757
  Sector  1 : New I.F. = -1.500078 GHz
   -- specx_wrfitsmap --
-     VFRAME  = LSR 
+     VFRAME  = LSR
      VDEF    = RAD
-     VELCODE = VLSR    
+     VELCODE = VLSR
      VELREF  =   257
      Image frequency =     342796160906.77
      Deltav          =    -135.45202891868
  >> cl-fits
  >> $ls -l *.fits
 -rw-r--r--   1 hem      astro      17280 Oct 13 23:19 src34.fits
- >> 
+ >>
 \end{verbatim}
 
 {\tt w-f-c} is also really very painless, and quite similar in
@@ -3657,16 +3657,16 @@ mechanism to {\tt w-f-m}:
 \begin{verbatim}
  >> open-fits
  Filename for FITS output file? [src34.fits] src34_cube.fits
- Should disk file be byte-reversed? (Y/N) [Y] 
+ Should disk file be byte-reversed? (Y/N) [Y]
  >> w-f-c
  Flagged   50400 undefined pixels
  Map centre as specified when map opened
- Centre channel VLSR (Rad def'n) -26.3031    
+ Centre channel VLSR (Rad def'n) -26.3031
  Sector  1 : New I.F. = -1.500000 GHz
   -- specx_wrfitscube --
-     VFRAME  = LSR 
+     VFRAME  = LSR
      VDEF    = RAD
-     VELCODE = VLSR    
+     VELCODE = VLSR
      VELREF  =   257
      Image frequency =     227537914962.07
      Deltav          =    -406.38704960595
@@ -3694,7 +3694,7 @@ command should begin with.  If you type {\tt set}, for example, it
 will give you all the commands that begin with the word {\tt set} in
 them.
 
-There is a message which flashes by when you start \SPECX . This message 
+There is a message which flashes by when you start \SPECX . This message
 contains useful information on updates to the version you are using.
 If you want to see it again, type the command
 

@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode, 
+*     gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
 *                        mapVars *mapVars, int *status )
 
 *  Arguments:
@@ -25,10 +25,10 @@
 *     mapVars = mapVars* (Given and Returned)
 *        Map/Chop/Scan variables
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
-*     Retrieves values from the GSD headers in order to fill the 
+*     Retrieves values from the GSD headers in order to fill the
 *     Sampling/Switch modes and the chop, scan and map parameters.
 
 *  Authors:
@@ -88,7 +88,7 @@
 
 #define FUNC_NAME "gsdac_getMapVars"
 
-void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode, 
+void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
                         mapVars *mapVars, int *status )
 
 {
@@ -99,77 +99,77 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
   if ( strncmp ( gsdVars->swMode, "POSITION_SWITCH", 15 ) == 0 ) {
 
     if ( gsdVars->chopping ) {
-      if ( gsdVars->referenceX == 0.0 && gsdVars->referenceY == 0.0 ) 
+      if ( gsdVars->referenceX == 0.0 && gsdVars->referenceY == 0.0 )
         strcpy ( mapVars->swMode, "freq" );
-      else 
+      else
         strcpy ( mapVars->swMode, "pssw" );
     } else {
-      if ( gsdVars->referenceX == 0.0 && gsdVars->referenceY == 0.0 ) { 
+      if ( gsdVars->referenceX == 0.0 && gsdVars->referenceY == 0.0 ) {
         strcpy ( mapVars->swMode, "freq" );
         /* Print a message, this was likely intended as a freq. sw. */
         msgOutif(MSG__VERB," ", "SWITCH_MODE was POSITION_SWITCH and CHOPPING was 0, this was likely intended to be a frequency switch", status);
       } else strcpy ( mapVars->swMode, "pssw" );
-    } 
+    }
 
   } else if ( strncmp ( gsdVars->swMode, "BEAMSWITCH", 10 ) == 0 ) {
 
     if ( gsdVars->chopping ) {
       strcpy ( mapVars->swMode, "chop" );
-    } else {    
+    } else {
       strcpy ( mapVars->swMode, "none" );
       msgOutif(MSG__VERB," ", "SWITCH_MODE was BEAMSWITCH and CHOPPING was 0, this may be an error...)", status);
-    } 
+    }
 
   } else if ( strncmp ( gsdVars->swMode, "CHOPPING", 8 ) == 0 ) {
 
     strcpy ( mapVars->swMode, "freq" );
     if ( gsdVars->chopping ) {
       msgOutif(MSG__VERB," ", "SWITCH_MODE was CHOPPING and CHOPPING was 1, this appears to be a misconfigured frequency switch", status);
-    } 
+    }
 
   } else if ( strncmp ( gsdVars->swMode, "NO_SWITCH", 7 ) == 0 ) {
 
     strcpy ( mapVars->swMode, "none" );
     if ( gsdVars->chopping ) {
       msgOutif(MSG__VERB," ", "SWITCH_MODE was NO_SWITCH and CHOPPING was 1, this may be an error...", status);
-    } 
- 
+    }
+
   } else {
     *status = SAI__ERROR;
     msgSetc ( "SWITCHMODE", gsdVars->swMode );
     errRep ( "gsdac_getMapVars", "Couldn't identify switch mode ^SWITCHMODE", status );
-    return;      
+    return;
   }
 
   /* Get the chopping parameters for grid beamswitches
      and samples. */
-  if ( ( strcmp ( samMode, "grid" ) == 0 && 
+  if ( ( strcmp ( samMode, "grid" ) == 0 &&
          strcmp ( mapVars->swMode, "chop" ) == 0 ) ||
        strcmp ( samMode, "sample" ) == 0 ) {
 
-    if ( strncmp ( gsdVars->chopCoords, "AZ", 2 ) ) 
+    if ( strncmp ( gsdVars->chopCoords, "AZ", 2 ) )
       strcpy ( mapVars->chopCrd, "AZEL" );
-    else if ( strncmp ( gsdVars->chopCoords, "EQ", 2 ) ) 
+    else if ( strncmp ( gsdVars->chopCoords, "EQ", 2 ) )
       strcpy ( mapVars->chopCrd, "HADEC" );
-    else if ( strncmp ( gsdVars->chopCoords, "RB", 2 ) ) 
+    else if ( strncmp ( gsdVars->chopCoords, "RB", 2 ) )
       strcpy ( mapVars->chopCrd, "B1950" );
-    else if ( strncmp ( gsdVars->chopCoords, "RJ", 2 ) ) 
+    else if ( strncmp ( gsdVars->chopCoords, "RJ", 2 ) )
       strcpy ( mapVars->chopCrd, "J2000" );
-    else if ( strncmp ( gsdVars->chopCoords, "RD", 2 ) ) 
+    else if ( strncmp ( gsdVars->chopCoords, "RD", 2 ) )
       strcpy ( mapVars->chopCrd, "APP" );
-    else if ( strncmp ( gsdVars->chopCoords, "GA", 2 ) ) 
+    else if ( strncmp ( gsdVars->chopCoords, "GA", 2 ) )
       strcpy ( mapVars->chopCrd, "GAL" );
     else {
       strcpy ( mapVars->chopCrd, "" );
-      msgOutif(MSG__VERB," ", 
-	       "Couldn't identify chop coordinates, continuing anyway", status); 
-    } 
+      msgOutif(MSG__VERB," ",
+	       "Couldn't identify chop coordinates, continuing anyway", status);
+    }
 
   }
 
   /* Get the local offset coordinate system. */
   switch ( gsdVars->cellCode ) {
-    
+
     case COORD_AZ:
       strcpy ( mapVars->loclCrd, "AZEL" );
       break;
@@ -193,16 +193,16 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
       break;
     default:
       strcpy ( mapVars->loclCrd, "" );
-      msgOutif(MSG__VERB," ", 
-               "Couldn't identify local map coordinates, continuing anyway", status);   
+      msgOutif(MSG__VERB," ",
+               "Couldn't identify local map coordinates, continuing anyway", status);
       break;
 
   }
 
   /* Convert to ACSIS formatted string. */
-  sprintf ( mapVars->skyRefX, "[OFFSET] %.0f [%s]", 
+  sprintf ( mapVars->skyRefX, "[OFFSET] %.0f [%s]",
             gsdVars->referenceX, mapVars->loclCrd );
-  sprintf ( mapVars->skyRefY, "[OFFSET] %.0f [%s]", 
+  sprintf ( mapVars->skyRefY, "[OFFSET] %.0f [%s]",
             gsdVars->referenceY, mapVars->loclCrd );
 
   /* Get the scanning coordinates. */
@@ -217,17 +217,17 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
     mapVars->mapWdth = gsdVars->nMapPtsY * gsdVars->cellY;
 
     /* Get the scan velocity and spacing. */
-    if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 ) {          
-      mapVars->scanVel = gsdVars->cellX * gsdVars->nMapPtsX / 
+    if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 ) {
+      mapVars->scanVel = gsdVars->cellX * gsdVars->nMapPtsX /
                           gsdVars->scanTime;
       mapVars->scanDy = gsdVars->cellY;
     } else if ( strncmp ( gsdVars->obsDirection, "VERTICAL", 8 ) == 0 ) {
-      mapVars->scanVel = gsdVars->cellY * gsdVars->nMapPtsY / 
+      mapVars->scanVel = gsdVars->cellY * gsdVars->nMapPtsY /
                           gsdVars->scanTime;
       mapVars->scanDy = gsdVars->cellX;
     } else {
       *status = SAI__ERROR;
-      errRep ( "gsdac_getMapVars", "Error getting scan velocity", 
+      errRep ( "gsdac_getMapVars", "Error getting scan velocity",
                status );
       return;
     }
@@ -235,7 +235,7 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
     if ( gsdVars->scanRev ) strcpy ( mapVars->scanPat, "BOUSTROPHEDON" );
     else strcpy ( mapVars->scanPat, "RASTER" );
 
-  } 
+  }
 
   mapVars->scanPA = gsdVars->cellV2X;
   mapVars->mapPA = mapVars->scanPA - 90.0;

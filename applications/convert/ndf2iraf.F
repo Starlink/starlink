@@ -25,7 +25,7 @@
 *  Description:
 *     This application converts an NDF to an IRAF image.  See the Notes
 *     for details of the conversion.
-*  
+*
 *  Usage:
 *     ndf2iraf in out [fillbad]
 
@@ -192,7 +192,7 @@
 *        significant in the IRAF headers, and additional headers may be
 *        written following it.  Added examples.
 *     1997 Nov 24 (AJC):
-*        Remove use of CHR_MOVE (obsolete).  Remove unnecessary 
+*        Remove use of CHR_MOVE (obsolete).  Remove unnecessary
 *        initialisations of CARD.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
@@ -202,7 +202,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -224,13 +224,13 @@
 *  Local Constants:
       INTEGER FITSLN             ! Length of FITS card image
       PARAMETER ( FITSLN = 80 )
-      
-      INTEGER NDIM               ! Maximum number of dimensions the 
+
+      INTEGER NDIM               ! Maximum number of dimensions the
       PARAMETER ( NDIM = 3 )     ! application can handle
-        
+
       INTEGER STRLEN             ! Length of output title string.
       PARAMETER ( STRLEN = 80 )
-      
+
 *  Local Variables:
       INTEGER ACCESS             ! Access mode for opening IRAF image
                                  ! using imopen()
@@ -269,7 +269,7 @@
       LOGICAL PROHIS             ! Propagate the history records?
       LOGICAL REPBAD             ! True if there are bad values to
                                  ! replace
-      CHARACTER*25 TSTRING       ! Current time and date from 
+      CHARACTER*25 TSTRING       ! Current time and date from
                                  ! PSX_ASCTIME()
       INTEGER TSTRUCT            ! Time structure from PSX_LOCALTIME()
       INTEGER UBND( NDIM )       ! Upper bounds array
@@ -309,7 +309,7 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Associate NDF identifier with IN, via the parameter system.      
+*  Associate NDF identifier with IN, via the parameter system.
       CALL NDF_ASSOC( 'IN', 'READ', NDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -337,7 +337,7 @@
 
 *  Derive the number of columns in the input NDF.
       DIMS( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
-      
+
 *  Derive the number of lines in the input NDF.
       DIMS( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
 
@@ -368,7 +368,7 @@
          IMTYPE = 6
          ITYPE = '_REAL'
       END IF
-      
+
 *  Map the data array with the type needed by the IRAF image.
       CALL NDF_MAP( NDF, 'Data', ITYPE, 'READ', PNTR, EL, STATUS )
 
@@ -425,18 +425,18 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-            CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       VAL__BADW, WFILBA,
-     :                       %VAL( CNF_PVAL( PNTRT( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRT( 1 ) ) ),
      :                       NREP, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-            CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+            CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       VAL__BADR, FILBAD,
-     :                       %VAL( CNF_PVAL( PNTRT( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTRT( 1 ) ) ),
      :                       NREP, STATUS )
 
          END IF
@@ -489,7 +489,7 @@
          CALL CON_CD2IW( MDIM, DIMS( 1 ), DIMS( 2 ), DIMS( 3 ),
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), IMDESC, ERR,
      :                   %VAL( CNF_PVAL( LIPNTR ) ), STATUS )
-      
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL CON_CD2IR( MDIM, DIMS( 1 ), DIMS( 2 ), DIMS( 3 ),
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), IMDESC, ERR,
@@ -550,7 +550,7 @@
 
 *  Add the line to the image.
       CALL ADLINE( IMDESC, LINE )
-      
+
 *  Find the name of the NDF and the current time counter.
       CALL NDF_MSG( 'NDFNAME', NDF )
       CALL PSX_TIME( NTICKS, STATUS )
@@ -561,7 +561,7 @@
          CALL PSX_LOCALTIME( NTICKS, JUNKIT, JUNKIT, JUNKIT, JUNKIT,
      :                       JUNKIT, JUNKIT, JUNKIT, JUNKIT, JUNKIT,
      :                       TSTRUCT, STATUS )
-         CALL PSX_ASCTIME( TSTRUCT, TSTRING, STATUS )      
+         CALL PSX_ASCTIME( TSTRUCT, TSTRING, STATUS )
          CALL MSG_SETC( 'TIME', TSTRING )
 
 *  Create the history text.
@@ -573,10 +573,10 @@
 
 *  Add the card image to the IRAF image.
       CALL ADLINE( IMDESC, LINE )
-      
+
 *  Close the IRAF image.
       CALL IMCLOS( IMDESC, ERR )
-      
+
   999 CONTINUE
 
 *  Check for an error from IMFORT.

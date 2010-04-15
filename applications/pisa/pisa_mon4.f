@@ -34,7 +34,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE
 
@@ -57,9 +57,9 @@
 
 *   Call the appropriate task
       IF ( NAME .EQ. 'PISAFIND4' ) THEN
-         CALL PISAFIND4( STATUS ) 
+         CALL PISAFIND4( STATUS )
       ELSE IF ( NAME .EQ. 'PISAFIT4' ) THEN
-         CALL PISAFIT4( STATUS ) 
+         CALL PISAFIT4( STATUS )
 
 *  If the name name is not recognised, then report an error.
       ELSE

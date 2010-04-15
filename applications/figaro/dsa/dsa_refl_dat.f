@@ -28,7 +28,7 @@ C                   DSA system.
 C     (!) DATA      (Array, ref) The data array to be processed.  Note that
 C                   even a character array is passed by reference.
 C     (>) FLAGS     (Byte array, ref) The quality array produced by
-C                   DSA_UNFLAG_ARRAY. Elements corresponding to flagged 
+C                   DSA_UNFLAG_ARRAY. Elements corresponding to flagged
 C                   elements are set to 1, all others are set to zero.
 C     (!) STATUS    (Integer,ref) Status value.  If bad status is passed to
 C                   it, this routine returns immediately.

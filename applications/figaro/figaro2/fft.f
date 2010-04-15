@@ -21,7 +21,7 @@
 *        The global status.
 
 *  Description:
-*     These Figaro functions take the FFT of the data in a file.  
+*     These Figaro functions take the FFT of the data in a file.
 *     FFT performs a forward transform, BFFT performs an inverse
 *     transform.  The input file must contain a complex data
 *     structure, i.e. one with IMAGINARY and DATA components.
@@ -114,11 +114,11 @@ C     Functions
 C
       CHARACTER GEN_NTH*2        ! Returns 'st','th','rd' etc.
                                  ! appropriate to N
-      CHARACTER ICH_CI*12        ! Return an integer as a 
+      CHARACTER ICH_CI*12        ! Return an integer as a
                                  ! character string
       INTEGER  ICH_LEN           ! Position of last non-blank char in
                                  ! string
-      INTEGER  DSA_TYPESIZE      ! Returns byte size of data type  
+      INTEGER  DSA_TYPESIZE      ! Returns byte size of data type
 C
 C     Local variables
 C
@@ -144,7 +144,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       FAULT=.FALSE.
@@ -220,7 +220,7 @@ C
 C     Work out how much workspace is needed and grab it.  The FFT
 C     routines need a) for 1D data, an array the same size as the
 C     data, or b) for nD data, an array 3 times the length of the
-C     largest dimension.  The data rotator needs an array the same 
+C     largest dimension.  The data rotator needs an array the same
 C     size as the data arrays.
 C
       IF (NDIM.EQ.1) THEN
@@ -279,7 +279,7 @@ C
      :                 %VAL(CNF_PVAL(IPTR)))
       END IF
 C
-C     If this is a forward transform, then any .X etc structures are 
+C     If this is a forward transform, then any .X etc structures are
 C     no longer applicable, so rename them and create new axis
 C     structures that reflect the transformed data.  On a reverse
 C     transform, delete the new structures and rename the old ones back.
@@ -344,7 +344,7 @@ C
       REAL STEP
 C
 C     Set axis values.  Note that the final element is always +1.0,
-C     zero is the middle element (if NELM is odd) or the element on 
+C     zero is the middle element (if NELM is odd) or the element on
 C     the low side of the middle (if NELM is even).  The first element
 C     will be -1.0 if NELM is odd and -1.0+step is NELM is even.  This
 C     all follows from the way the C06 routines handle the transform

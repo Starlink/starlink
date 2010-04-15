@@ -42,7 +42,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -86,7 +86,7 @@
      :      'The file on unit ^UNIT has been closed by CHART',
      :       STATUS )
       END IF
-      
+
       DO U = 11, 13
          INQUIRE( UNIT=U, OPENED=OPENED )
          IF ( OPENED ) THEN
@@ -97,5 +97,5 @@
      :          STATUS )
          END IF
       END DO
-      
+
       END

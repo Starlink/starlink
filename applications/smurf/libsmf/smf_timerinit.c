@@ -25,7 +25,7 @@
 
 *  Return Value:
 
-*  Description: 
+*  Description:
 *     This functionn initializes two timers to the current time of day
 
 *  Notes:

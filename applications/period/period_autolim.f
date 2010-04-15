@@ -1,7 +1,7 @@
- 
-      SUBROUTINE PERIOD_AUTOLIM(DATA, NDATA, MAXPTS, MINFREQ, MAXFREQ, 
+
+      SUBROUTINE PERIOD_AUTOLIM(DATA, NDATA, MAXPTS, MINFREQ, MAXFREQ,
      :                          FINTERVAL, FMIN, FMAX, FINT, IFAIL)
- 
+
 C=============================================================================
 C Routine to set the frequency search limits. If any one of the frequency
 C limits are less than or equal to zero, PERIOD_AUTOLIM returns default values.
@@ -18,11 +18,11 @@ C Converted to Double Precision (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C=============================================================================
- 
+
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
- 
+
       INTEGER NDATA, MAXPTS, IFAIL, I
       INTEGER INTMAX
       DOUBLE PRECISION DATA(NDATA)
@@ -30,28 +30,28 @@ C=============================================================================
       DOUBLE PRECISION FMIN, FMAX, FINT
       DOUBLE PRECISION OTI, STI, PPB
       DATA PPB/4.0D0/
- 
+
 C-----------------------------------------------------------------------------
 C Calculate the Smallest Time Interval STI.
 C-----------------------------------------------------------------------------
- 
+
       IFAIL = 0
 
       STI = DPMX30
       DO 100 I = 2, NDATA
          IF ( (DATA(I)-DATA(I-1)).LT.STI ) STI = DATA(I)-DATA(I-1)
  100  CONTINUE
- 
+
 C-----------------------------------------------------------------------------
 C Calculate the Overall Time Interval OTI.
 C-----------------------------------------------------------------------------
- 
+
       OTI = DATA(NDATA)-DATA(1)
-  
+
 C-----------------------------------------------------------------------------
 C If any frequency limit is less than or equal to zero, set to default value.
 C-----------------------------------------------------------------------------
- 
+
       IF ( MINFREQ.LE.0.0D0 ) THEN
          FMIN = 0.0D0
       ELSE
@@ -60,7 +60,7 @@ C-----------------------------------------------------------------------------
 
       IF ( MAXFREQ.LE.0.0D0 ) THEN
 *  Check STI to avoid divide by zero error. GJP.
-         IF ( DABS(STI).GT.DPMN30 ) THEN 
+         IF ( DABS(STI).GT.DPMN30 ) THEN
             FMAX = 0.5D0/STI
          ELSE
             CALL PERIOD_WRITEBELL()
@@ -72,10 +72,10 @@ C-----------------------------------------------------------------------------
       ELSE
          FMAX = MAXFREQ
       END IF
- 
+
       IF ( FINTERVAL.LE.0.0D0 ) THEN
 *  Check OTI to avoid divide by zero error. GJP.
-         IF ( DABS(OTI).GT.DPMN30 ) THEN 
+         IF ( DABS(OTI).GT.DPMN30 ) THEN
             FINT = 1.0D0/(PPB*OTI)
          ELSE
             CALL PERIOD_WRITEBELL()
@@ -87,19 +87,19 @@ C-----------------------------------------------------------------------------
       ELSE
          FINT = FINTERVAL
       END IF
- 
+
 C-----------------------------------------------------------------------------
 C Output final frequency limits.
 C-----------------------------------------------------------------------------
- 
+
       WRITE (*, *) '** OK: Minimum frequency  = ', FMIN
       WRITE (*, *) '** OK: Maximum frequency  = ', FMAX
       WRITE (*, *) '** OK: Frequency interval = ', FINT
- 
+
 C-----------------------------------------------------------------------------
 C Check frequency limits.
 C-----------------------------------------------------------------------------
- 
+
       IF ( FMAX.LE.FMIN ) THEN
          CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Maximum frequency not greater than'
@@ -118,7 +118,7 @@ C-----------------------------------------------------------------------------
             MAXPTS = INTMAX
          END IF
       END IF
- 
+
  200  CONTINUE
 
       RETURN

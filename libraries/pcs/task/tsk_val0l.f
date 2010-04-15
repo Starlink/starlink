@@ -70,23 +70,23 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'SAE_PAR'
- 
+
 *  Arguments Given:
       LOGICAL LVAL         ! the value to be encoded
- 
+
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
- 
+
 *  Status:
       INTEGER STATUS
 *.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       CALL TASK_ENC0L ( LVAL, STRING, STATUS )
- 
+
       END
- 
+
 !*+  TASK_VAL0 - encode a value as a character string
 !      SUBROUTINE TASK_VAL0
 !*    Description :

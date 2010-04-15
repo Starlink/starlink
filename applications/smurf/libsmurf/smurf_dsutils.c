@@ -173,7 +173,7 @@
 *          the current coordinate Frame and then using KAPPA:ARDPLOT (for
 *          instance "wcsframe outmag s8a" followed by "ardplot s8a"). [!]
 *     OUTSLICE = NDF (Write)
-*          If a value was supplied for IN and ITIME, then OUTSLICE gives the 
+*          If a value was supplied for IN and ITIME, then OUTSLICE gives the
 *          name of  the NDF in which to store the bolometer data for the
 *          given time slice, including celestial WCS.
 *     SUBARRAY = LITERAL (Write)
@@ -2054,10 +2054,10 @@ static int SaveBoloMapping( const char *param, smfData *data, int *status ){
 
 
 
-/* Write the bolometer data form a given timeslice to a 2D NDF. 
+/* Write the bolometer data form a given timeslice to a 2D NDF.
    ---------------------------------------------------------- */
 
-static int SaveTimeSlice( const char *param1, const char *param2, 
+static int SaveTimeSlice( const char *param1, const char *param2,
                           smfData *data, int *status ){
 
 /* Local Variables: */
@@ -2070,7 +2070,7 @@ static int SaveTimeSlice( const char *param1, const char *param2,
    int el;
    int i;
    int indf;
-   int ival; 
+   int ival;
    int lbnd[ 3 ];
    int result;
    int ubnd[ 3 ];
@@ -2114,9 +2114,9 @@ static int SaveTimeSlice( const char *param1, const char *param2,
    if( data->dtype == SMF__DOUBLE ) {
 
 /* Create and map the output NDF. */
-      ndfCreat( param1, "_DOUBLE", 2, lbnd, ubnd, &indf, status ); 
+      ndfCreat( param1, "_DOUBLE", 2, lbnd, ubnd, &indf, status );
       ndfMap( indf, "Data", "_DOUBLE", "Write", (void **) &ipd, &el,
-              status ); 
+              status );
 
 /* Copy the bolometer values into the NDF Data array. */
       d_data = (double *)(data->pntr)[0] + itime*tstride;
@@ -2129,9 +2129,9 @@ static int SaveTimeSlice( const char *param1, const char *param2,
    } else if( data->dtype == SMF__INTEGER ) {
 
 /* Create and map the output NDF. */
-      ndfCreat( param1, "_INTEGER", 2, lbnd, ubnd, &indf, status ); 
+      ndfCreat( param1, "_INTEGER", 2, lbnd, ubnd, &indf, status );
       ndfMap( indf, "Data", "_INTEGER", "Write", (void **) &ipi, &el,
-              status ); 
+              status );
 
 /* Copy the bolometer values into the NDF Data array. */
       i_data = (int *)(data->pntr)[0] + itime*tstride;

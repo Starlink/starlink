@@ -19,7 +19,7 @@
 *     The used length of the input string is found.
 *     If it is zero, the number of substrings is set to 1 and the
 *     first element of the substring array set to blank.
-*     Otherwise the string is searched for occurrences of the 
+*     Otherwise the string is searched for occurrences of the
 *     separator and intervening characters saved in consecutive
 *     elements of the substring array. A check is made to ensure
 *     that the substring array does not overflow.
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,7 +105,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       I = 1
       N = 1
 
@@ -134,7 +134,7 @@
                IF ( J .EQ. 1 ) THEN
                   SUBSTS( N ) = ' '
 *           Otherwise copy the substring to the substring array
-               ELSE            
+               ELSE
                   SUBSTS( N ) = STRING( I:I+J-2 )
                ENDIF
 
@@ -142,13 +142,13 @@
                I = I + J
                N = N + 1
 
-*        Otherwise the separator was not found - 
+*        Otherwise the separator was not found -
 *        put all of remainder into next SUBSTS
 *        and force loop exit
             ELSE
                SUBSTS( N ) = STRING( I:STRLEN )
                I = STRLEN + 1
-      
+
             ENDIF
 
 *     MAXST exceeded - too many substrings for SUBSTS
@@ -168,7 +168,7 @@
          ENDIF
 
       ENDDO
-      
+
       NSTR = N
-      
+
       END

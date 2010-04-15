@@ -1,4 +1,4 @@
-	SUBROUTINE CURSOR_VALUES( XRPOS, YRPOS, X_PIXEL, Y_PIXEL, CURSOR_VALUE, 
+	SUBROUTINE CURSOR_VALUES( XRPOS, YRPOS, X_PIXEL, Y_PIXEL, CURSOR_VALUE,
      :	                          STATUS)
 
 * Description : gets cursor position, value from an input image
@@ -34,8 +34,8 @@
 	INCLUDE 'DTERRS'
 
 	INCLUDE 'SAE_PAR'
-        INCLUDE 'NDF_PAR'       
-        INCLUDE 'NDF_ERR'       
+        INCLUDE 'NDF_PAR'
+        INCLUDE 'NDF_ERR'
 
 * Import :
 
@@ -101,7 +101,7 @@
 
 * associate image in CURSOR_IMAGE
 
-	CALL NDF_ASSOC( 'CURSOR_IMAGE', 'READ', LOC_CURSOR_IMAGE, 
+	CALL NDF_ASSOC( 'CURSOR_IMAGE', 'READ', LOC_CURSOR_IMAGE,
      :                   STATUS)
 
 	IF( STATUS. NE. SAI__OK)THEN
@@ -139,14 +139,14 @@
 
 	  IF( STATUS. NE. SAI__OK)THEN
 	    CALL NDF_ANNUL( LOC_CURSOR_IMAGE, STATUS)
-            CALL ERR_REP('ERR', 'after PAR_GETs SUBIM_ST/EN', 
+            CALL ERR_REP('ERR', 'after PAR_GETs SUBIM_ST/EN',
      :                    STATUS )
 	    RETURN
 	  END IF
 
 * GET slice locator
 
-	  CALL NDF_SECT( LOC_CURSOR_IMAGE, 2, SUBIM_ST, SUBIM_EN, 
+	  CALL NDF_SECT( LOC_CURSOR_IMAGE, 2, SUBIM_ST, SUBIM_EN,
      :                   LOC_SUBIM, STATUS)
 
 	  IF( STATUS. NE. SAI__OK)THEN

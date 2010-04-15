@@ -19,7 +19,7 @@
 
 /*================================*/
 /* DAT_NEW - Create new component */
-/*================================*/                    
+/*================================*/
 
 int
 datNew( const HDSLoc    *locator,
@@ -196,7 +196,7 @@ datNew( const HDSLoc    *locator,
 
 /*====================================*/
 /* DAT_NEWC - Create string component */
-/*====================================*/                    
+/*====================================*/
 
 int
 datNewC(const HDSLoc    *locator,
@@ -226,7 +226,7 @@ datNewC(const HDSLoc    *locator,
 
 /*====================================*/
 /* DAT_CCTYP - Create type string     */
-/*====================================*/                    
+/*====================================*/
 
 void
 datCctyp( size_t size,

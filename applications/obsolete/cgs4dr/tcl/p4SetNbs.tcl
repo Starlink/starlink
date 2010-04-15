@@ -6,11 +6,11 @@ proc p4SetNbs {nbsroot} {
     global P4NoticeBoard
 
 #  Put character nbs items
-    nbs put ${nbsroot}.display_data  [string trim [$P4Widgets(DATA) get]] 
-    nbs put ${nbsroot}.title         [string trim [$P4Widgets(TITLE) get]] 
-    nbs put ${nbsroot}.device_name   [string trim [$P4Widgets(DEVICE) get]] 
-    nbs put ${nbsroot}.device_xopt   [string trim [$P4Widgets(XOPT) get]] 
-    nbs put ${nbsroot}.device_yopt   [string trim [$P4Widgets(YOPT) get]] 
+    nbs put ${nbsroot}.display_data  [string trim [$P4Widgets(DATA) get]]
+    nbs put ${nbsroot}.title         [string trim [$P4Widgets(TITLE) get]]
+    nbs put ${nbsroot}.device_name   [string trim [$P4Widgets(DEVICE) get]]
+    nbs put ${nbsroot}.device_xopt   [string trim [$P4Widgets(XOPT) get]]
+    nbs put ${nbsroot}.device_yopt   [string trim [$P4Widgets(YOPT) get]]
     nbs put ${nbsroot}.device_lut    [string trim $P4Widgets(LUT)]
     nbs put ${nbsroot}.display_type  [string trim $P4Widgets(DISPLAY_TYPE)]
     nbs put ${nbsroot}.display_plane [string trim $P4Widgets(DISPLAY_PLANE)]
@@ -20,14 +20,14 @@ proc p4SetNbs {nbsroot} {
     nbs put ${nbsroot}.fg_colour     [string trim $P4Widgets(FGCOLOUR)]
     nbs put ${nbsroot}.bg_colour     [string trim $P4Widgets(BGCOLOUR)]
     nbs put ${nbsroot}.cut_direction [string trim $P4Widgets(CUT_DIRECTION)]
-    nbs put ${nbsroot}.last_type     [string trim $P4Widgets(DISPLAY_TYPE)] 
+    nbs put ${nbsroot}.last_type     [string trim $P4Widgets(DISPLAY_TYPE)]
 
 #  Put logical nbs items
-    nbs put ${nbsroot}.plot_axes      $P4Widgets(PLOT_AXES) 
-    nbs put ${nbsroot}.plot_errors    $P4Widgets(PLOT_ERRORS) 
-    nbs put ${nbsroot}.plot_whole     $P4Widgets(PLOT_WHOLE) 
-    nbs put ${nbsroot}.pre_erase_plot $P4Widgets(PRE_ERASE_PLOT) 
-    nbs put ${nbsroot}.autoscale      $P4Widgets(AUTOSCALE) 
+    nbs put ${nbsroot}.plot_axes      $P4Widgets(PLOT_AXES)
+    nbs put ${nbsroot}.plot_errors    $P4Widgets(PLOT_ERRORS)
+    nbs put ${nbsroot}.plot_whole     $P4Widgets(PLOT_WHOLE)
+    nbs put ${nbsroot}.pre_erase_plot $P4Widgets(PRE_ERASE_PLOT)
+    nbs put ${nbsroot}.autoscale      $P4Widgets(AUTOSCALE)
     nbs put ${nbsroot}.port_ok        1
     nbs put ${nbsroot}.plot_ok        1
 

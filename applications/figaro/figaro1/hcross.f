@@ -6,29 +6,29 @@ C
 C     Main body of the Figaro HCROSS function.  This computes
 C     the cross-correlation of two spectra and the location of the
 C     central peak of the cross-correlation.  It can be used to
-C     determine a relative shift between two spectra. Routines added to 
-C     calculate the confidence levels and improved error estimates 
+C     determine a relative shift between two spectra. Routines added to
+C     calculate the confidence levels and improved error estimates
 C     (CCFPAR) according to analysis in Heavens A.F.,1993, MNRAS, 263,
 C     735.  Routine added to calculate the redshift and error in
 C     redshift directly (GET_LOGSTEP and CALCRS).  The cross-correlation
 C     function can also be saved in a disk structure.
 C
-C     Command parameters - 
+C     Command parameters -
 C
 C     SPECTRUM    (Character) The spectrum to be compared with
-C                 a template spectrum.  
+C                 a template spectrum.
 C     TEMPLATE    (Character) The template spectrum to be used.
 C                 The two spectra should be the same length.
-C     BASERED     (Numeric) Redshift of template spectrum. 
+C     BASERED     (Numeric) Redshift of template spectrum.
 C                 Negative=blueshift.  Required if VELOCITIES=FALSE
-C     BASERR      (Numeric) Redshift error of template. 
+C     BASERR      (Numeric) Redshift error of template.
 C                 Required if VELOCITIES=FALSE
-C     BASEVEL     (Numeric) Recession velocity in km/s 
-C                 (see keyword VELOCITIES below) of template spectrum. 
+C     BASEVEL     (Numeric) Recession velocity in km/s
+C                 (see keyword VELOCITIES below) of template spectrum.
 C                 Negative=blueshift. Required if VELOCITIES=TRUE
 C     BASEVERR    (Numeric) Velocity error of template (km/s).
 C                 Required if VELOCITIES=TRUE
-C     XSTART      (Numeric) Data with an axis data value less than 
+C     XSTART      (Numeric) Data with an axis data value less than
 C                 XSTART will be ignored in the cross-correlation.
 C     XEND        (Numeric) Data with an axis data value greater than
 C                 XEND will also be ignored.  Note that these values are
@@ -51,19 +51,19 @@ C     FITCONT     If specified, a continuum fit is performed on the
 C                 two spectra prior to application of the cosine bell.
 C     RECORD      If specified, the cross-correlation of the two
 C                 spectra will be recorded as a new data structure.
-C     VELOCITIES  If true, template redshift and error are entered in 
+C     VELOCITIES  If true, template redshift and error are entered in
 C                 km/s (Negative=blueshift), and results are printed in km/s.
-C                 Recommended option, and default, is FALSE 
+C                 Recommended option, and default, is FALSE
 C                 i.e. a redshift z is expected and returned.
 C                 Velocity option only makes sense if v<<c.
-C                 v=cz and is accurate to O(z) 
-C 
+C                 v=cz and is accurate to O(z)
+C
 C     User variables used -
 C
 C     SHIFT       (Numeric) The relative shift of the two spectra.
 C     REDSHIFT    (Numeric) The redshift of the spectrum.
 C     REDERR      (Numeric) Redshift error of spectrum.
-C     VELOCITY    (Numeric) Recession velocity of spectrum (km/s): 
+C     VELOCITY    (Numeric) Recession velocity of spectrum (km/s):
 C                           Only meaningful if <<c.
 C     VELERR      (Numeric) Recession velocity error of spectrum (km/s)
 C     CONF        (Numeric) The confidence in the redshift of the spectrum
@@ -77,44 +77,44 @@ C      6th May 1985  KS / AAO.  FITCONT and CBPC parameters added.
 C     21st Nov 1988  JM / RAL. Modified to use DSA_ routines.
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
-C     23rd Aug 1990  KS / AAO. Minor tidying. Changed STATUS in 
+C     23rd Aug 1990  KS / AAO. Minor tidying. Changed STATUS in
 C                    PAR_WRUSER calls to IGNORE, modified calculation of
 C                    workspace pointers.
 C     16th Jan 1991  JMS / AAO. Included PAR_ABORT and STATUS checks for
 C                    user requested aborts.
 C     21st Jan 1991  JMS / AAO. Restricted maximum allowed dimensions of
 C                    data arrays to 1D.
-C     12th Feb 1991  JMS / AAO. Included check to test that the data 
+C     12th Feb 1991  JMS / AAO. Included check to test that the data
 C                    arrays of the two spectra match in size.
-C     13th Feb 1991  JMS / AAO. Added an extra check to test that the 
+C     13th Feb 1991  JMS / AAO. Added an extra check to test that the
 C                    X-axes match. Now aborts if specified range is of
 C                    zero length.
-C     14th Feb 1991  JMS / AAO. Changed minimum range length to two 
+C     14th Feb 1991  JMS / AAO. Changed minimum range length to two
 C                    pixels.
 C     22nd Feb 1991  JMS / AAO. Changed minimum range length to three
 C                    pixels.
 C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Call
 C                    PAR_WRUSER rather than DSA_WRUSER.
 C      5th Oct 1993  AFH,NEJ / UoE. Routines added to calculate the
-C                    confidence levels and improved error estimates 
+C                    confidence levels and improved error estimates
 C                    (CCFPAR) to comply with Heavens A.F.,1993, MNRAS,
-C                    263,735. Routine added to calculate the redshift 
+C                    263,735. Routine added to calculate the redshift
 C                    and error in redshift directly (GET_LOGSTEP and
 C                    CALCRS).
 C     17th Mar 1994  **J changed to **REAL(J) (also **(2*J)) in
 C                    CALC_JTH_MOMENT
 C     13th Jan 1995  AFH / UoE.  Error calculation can fail if spectrum
-C                    and template are very different.  Tonry and Davis 
+C                    and template are very different.  Tonry and Davis
 C                    result is returned, with a warning message.
 C                    - Output format is more compact.
-C                    - Option to use km/s rather than redshifts 
+C                    - Option to use km/s rather than redshifts
 C                    introduced (via VELOCITIES keyword).
 C     25th Apr 1995  HME / UoE, Starlink. No longer use NAG.
-C      9th Jan 1996  AFH / UoE. Bug in 0^0 calculation on alphas 
-C                    in CALC_JTH_MOMENT fixed.  Minor bug fixed in 
-C                    WARNING message (see 13/1/95) appearing when 
+C      9th Jan 1996  AFH / UoE. Bug in 0^0 calculation on alphas
+C                    in CALC_JTH_MOMENT fixed.  Minor bug fixed in
+C                    WARNING message (see 13/1/95) appearing when
 C                    autocorrelating.
-C     25th Mar 1996  HME / UoE, Starlink. Use PDA_DERF, not 
+C     25th Mar 1996  HME / UoE, Starlink. Use PDA_DERF, not
 C                    inadvertently DERF.
 C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
@@ -154,42 +154,42 @@ C
       INTEGER CPTR       ! Dynamic memory pointer to CORRL data
       REAL    DELTA      ! The error in SHIFT
       LOGICAL DELTA_OK   ! TRUE if error calculated by Fourier methods
-C                          FALSE if width of ccf used (only if Fourier 
+C                          FALSE if width of ccf used (only if Fourier
 C                          fails)
       INTEGER DIMS(1)    ! Accommodates data dimensions
-      INTEGER FSTAT      ! Running status for calculation of SUMMAT 
+      INTEGER FSTAT      ! Running status for calculation of SUMMAT
 C                          returned as non-zero from CCFPAR if a problem
 C                          of division by zero occurs.
-      INTEGER FT0        ! Pointer to the fourier transform of SPECT 
+      INTEGER FT0        ! Pointer to the fourier transform of SPECT
 C                          data
       INTEGER FT1        ! Pointer to the fourier transform of TEMPLATE
 C                          data
-      INTEGER FTACFN     ! Pointer to the fourier transform of 
+      INTEGER FTACFN     ! Pointer to the fourier transform of
 C                          antisymetric part of the correlation function
       INTEGER FTFCN      ! Pointer to the fourier transform of CORRL
 C                          data
-      REAL    WARN       ! Set to 1 if routine detects 
+      REAL    WARN       ! Set to 1 if routine detects
 C                          badly matched spectra.  0 otherwise
       INTEGER IGNORE     ! Status for VAR_SETNUM and PAR_WRUSER calls
       LOGICAL ISNEW      ! Is address new to CNF?
       INTEGER IXST       ! Pixel number associated with XSTART
       INTEGER IXEN       ! Pixel number associated with XEND
-      INTEGER KZ(4)      ! Defines the cosine bell used to filter the 
+      INTEGER KZ(4)      ! Defines the cosine bell used to filter the
 C                          FTs
-      REAL    LOGSTEP    ! The constant in the transformation used to 
+      REAL    LOGSTEP    ! The constant in the transformation used to
 C                          bin the spectra
       INTEGER NDIM       ! Number of dimensions in data
       INTEGER NELM       ! Number of data elements in object
       INTEGER NEXT       ! Used in encoding STRING to report answer
       DOUBLE PRECISION  NITEMS(1)  ! Axis numeric items retrieved
-      LOGICAL NORM       ! True if cross-correlation fn. to be 
+      LOGICAL NORM       ! True if cross-correlation fn. to be
 C                          normalised
       INTEGER NX0        ! The number of elements in the two spectra.
       INTEGER NX         ! Either equal to NX or next highest power of 2
       LOGICAL RECORD     ! True if correlation fn. to be written to a
 C                          file
       REAL    REDERR     ! The error in REDSHIFT
-      REAL    REDSHIFT   ! Shift of spectrum accounting for template 
+      REAL    REDSHIFT   ! Shift of spectrum accounting for template
 C                          shift
       REAL    SHIFT      ! Shift of peak of correlation fn. from zero
 C                          point
@@ -202,14 +202,14 @@ C                          point
       REAL    VELERR     ! Recession velocity error of spectrum (km/s)
       LOGICAL VELOCITIES ! True if input/output is in km/s
 C                          False if input and output are redshifts
-      REAL    VELOCITY   ! Recession velocity (in km/s) of spectrum 
+      REAL    VELOCITY   ! Recession velocity (in km/s) of spectrum
       REAL    WIDTH      ! The width of the correlation function
       INTEGER WPTR       ! Temporary pointer
       REAL    XEND       ! Last axis data value used
-      REAL    XSTART     ! First axis data value used 
+      REAL    XSTART     ! First axis data value used
       INTEGER XV         ! Pointer to array holding spectra pixel values
-      REAL    ZPC        ! Percentage of spectrum covered at each end 
-C                          by a cosine bell prior to fourier 
+      REAL    ZPC        ! Percentage of spectrum covered at each end
+C                          by a cosine bell prior to fourier
 C                          transformation
 
 C
@@ -221,7 +221,7 @@ C
 C     Open DSA
 C
       CALL DSA_OPEN(STATUS)
-      IF(STATUS.NE.0)GOTO 500     
+      IF(STATUS.NE.0)GOTO 500
 C
 C     Get byte size for float and double precision numbers
 C
@@ -229,7 +229,7 @@ C
       BDOUB=DSA_TYPESIZE('DOUBLE',STATUS)
 C
 C     Get the name of SPECTRUM and open the file
-C    
+C
       CALL DSA_INPUT('SPECT','SPECTRUM',STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
@@ -237,7 +237,7 @@ C     Ditto TEMPLATE
 C
       CALL DSA_INPUT('TEMPL','TEMPLATE',STATUS)
       IF(STATUS.NE.0)GOTO 500
-C     
+C
 C     Get sizes of both data arrays
 C
       CALL DSA_DATA_SIZE ('SPECT',1,NDIM,DIMS,NELM,STATUS)
@@ -273,12 +273,12 @@ C
 C
 C     Use the utility routine DSA_AXIS_RANGE to get XSTART and XEND, then reset
 C     NX0 to reflect the length of the spectrum to be actually used
-C       
+C
       CALL DSA_AXIS_RANGE('SPECT',1,' ',.FALSE.,XSTART,XEND,
      :                     IXST,IXEN,STATUS)
 C
 C     See if there is any indication that the input spectrum and template
-C     are binned on a log scale. They should be. Note that NITEMS(1) as 
+C     are binned on a log scale. They should be. Note that NITEMS(1) as
 C     returned by DSA_GET_AXIS_INFO is the log binning flag.
 C
       CALL DSA_GET_AXIS_INFO('SPECT',1,0,0,
@@ -353,7 +353,7 @@ C
       BYTES=BFLOAT*NX0
       CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(ARRAY0)))
       IF (ISNEW) CALL CNF_UNREGP(TPTR)
-C      
+C
       CALL DSA_MAP_DATA('TEMPL','READ','FLOAT',WPTR,SLOT,STATUS)
       CALL DYN_INCAD(WPTR,'FLOAT',IXST-1,TPTR,ISNEW,STATUS)
       IF(STATUS.NE.0)GOTO 500
@@ -363,8 +363,8 @@ C
       IF (ISNEW) CALL CNF_UNREGP(TPTR)
 C
 C     Pick reasonable values for the fourier domain filter - this
-C     section could be refined, but these will do.  Old values 
-C     gave lower confidences, so some short-wavelength power has been 
+C     section could be refined, but these will do.  Old values
+C     gave lower confidences, so some short-wavelength power has been
 C     restored.
 C
       ZPC=CBPC
@@ -413,7 +413,7 @@ C
       CALL CALCRS(REDSHIFT,SHIFT,BASERED,BASERR,LOGSTEP,DELTA,REDERR)
 
 C
-C If VELOCITIES keyword is set TRUE, outputs are changed to 
+C If VELOCITIES keyword is set TRUE, outputs are changed to
 C velocities in km/s:
 C
       VELOCITY = REDSHIFT*C
@@ -448,7 +448,7 @@ C
          CALL ICH_ENCODE(STRING,CONF,NEXT+14,4,NEXT)
          CALL PAR_WRUSER(STRING,STATUS)
       END IF
- 
+
 C
 C     Set the user variables SHIFT, REDSHIFT, REDERR, VELOCITY, VELERR, CONF
 C     and WARN:
@@ -461,7 +461,7 @@ C
       CALL VAR_SETNUM('CONF',0,0,CONF,IGNORE)
       CALL VAR_SETNUM('WARN',0,0,WARN,IGNORE)
 C
-C     Now, if required, create the output structure for the 
+C     Now, if required, create the output structure for the
 C     cross-correlation.
 C
       IF (RECORD) THEN
@@ -527,8 +527,8 @@ C+
       SUBROUTINE CALCRS(REDSHIFT,SHIFT,BASERED,BASERR,LOGSTEP,DELTA,
      >                                REDERR)
 C
-C     This is a subroutine to compute the red shift directly from the shift in 
-C     pixels. 
+C     This is a subroutine to compute the red shift directly from the shift in
+C     pixels.
 C
 C     Parameters -  (">" input, "<" output)
 C
@@ -559,7 +559,7 @@ C     Correct for redshift of template
 C
       REDSHIFT =  REDSHIFT + BASERED + REDSHIFT*BASERED
       REDERR   =  (1.0+BASERED**2)*REDERR**2 +
-     :            (1.0+REDSHIFT**2)*BASERR**2 
+     :            (1.0+REDSHIFT**2)*BASERR**2
       REDERR   =  SQRT(REDERR)
 C
       END
@@ -573,7 +573,7 @@ C
 C     Routine which will work out the error in the position of the peak of the
 C     cross correlation of two spectra and the confidence level associated with
 C     that peak.
-C     
+C
 C     Parameters - (">" input, "<" output, "W" workspace)
 C
 C     (>) CFN       (Real array CFN(NX)) The correlation function.
@@ -589,14 +589,14 @@ C     (>) FT0       (Complex array FT0(NX)) The fourier transform of the spectru
 C     (W) FTACFN    (Complex array FTACFN(NX)) The fourier transform of the
 C                   antisymetric part of the correlation function.
 C     (<) DELTA     (Real) The error in SHIFT in pixels.  Set to zero if spectra
-C                   are so badly matched that error estimate is nonsense.  
+C                   are so badly matched that error estimate is nonsense.
 C     (<) DELTA_OK  (Logical) TRUE if Fourier method has calculated error.
 C                   FALSE if delta has been set to zero.  If this fails, the
-C                   template and spectrum are so different as to make the 
+C                   template and spectrum are so different as to make the
 C                   CCF method useless.  An error can still be assigned, and is
 C                   in the routine FIG_CROSS.  The calling routine uses this value
 C                   and reports a warning message.
-C     (>) FSTAT     (Integer) Running status for calculation of SUMMAT 
+C     (>) FSTAT     (Integer) Running status for calculation of SUMMAT
 C                   returned as non-zero if a problem of division by zero occurs.
 C
       IMPLICIT NONE
@@ -642,10 +642,10 @@ C
 C     Scale the fourier transform of the correlation function properly
 C
       DO I = 1,NX
-         FTCFN(I) = FTCFN(I) / 
+         FTCFN(I) = FTCFN(I) /
      >        (SQRT(SIGMA0_SQUARED_S*SIGMA0_SQUARED_T)*REAL(NX))
       END DO
-C     
+C
 C     Calculate the height of the peak in the correlation function
 C
       REAL_HEIGHT = CFN(1)
@@ -669,7 +669,7 @@ C
       CALL CALC_JTH_MOM(FTACFN,NX,0,SIGMA0_SQUARED_A)
       CALL CALC_JTH_MOM(FTACFN,NX,1,SIGMA1_SQUARED_A)
       CALL CALC_JTH_MOM(FTACFN,NX,2,SIGMA2_SQUARED_A)
-C     
+C
 C     Calculate the sum of (power in antisymmetric correlation function)/
 C     (power in template). The antisymmetric power should only be non-
 C     zero if the template power is non-zero.
@@ -679,14 +679,14 @@ C
       DO I = 1,NX/2-1
          IF(ABS(FT1(I)).EQ.0.0 .AND. ABS(FTACFN(I)).GT.0.0)THEN
             FSTAT = 1
-            CALL PAR_WRUSER 
+            CALL PAR_WRUSER
      :        (' Division by zero calculating error.',STATUS)
             GOTO 500
          ELSE IF(ABS(FTACFN(I)).GT.0.0 .AND. ABS(FT1(I)).GT.0.0 ) THEN
             SUMMAT = SUMMAT + ( ABS(FTACFN(I)) / ABS(FT1(I)) )**2
-         END IF 
+         END IF
       END DO
-C     
+C
       SUMMAT = SUMMAT*2.0
 C
 C     Calculate DELTA the error in the position of the peak in pixels
@@ -702,7 +702,7 @@ C
          DELTA_OK = .FALSE.
       END IF
 C
-C     Calculate the confidence in the value of shift. Height is the 
+C     Calculate the confidence in the value of shift. Height is the
 C     height of the cross correlation peak in units of the noise r.m.s.
 C     To avoid crashes when a spectrum is autocorrelated (when there is
 C     no antisymmetric part of the ccf), put in a test:
@@ -734,24 +734,24 @@ C
 
  500  CONTINUE
 C
-      END 
-      
+      END
+
 C+
       SUBROUTINE CALC_JTH_MOM(ARRAY,NX,J,SIGMAJ_SQUARED)
 C
 C     CALC_JTH_MOM
 C
-C     This subroutine calculates the 2Jth moment of an array where the 
+C     This subroutine calculates the 2Jth moment of an array where the
 C     2Jth moment is the sum over I from 1 to NX of
 C     ARRAY(I)*(2*pi*(I-1)/NX)**(2*J).
 C     It is designed for calculating power in one dimensional fourier
 C     transforms of real data so a normality factor of 1/(NX**2)
-C     is included. The power as in I > NX/2 is the same as in I < NX/2 
+C     is included. The power as in I > NX/2 is the same as in I < NX/2
 C     so only half the items are summed and the result doubled.
 C
 C     Parameters (">" input, "<" output)
 C
-C     (>) ARRAY            (Complex array ARRAY(NX)) The array whose 
+C     (>) ARRAY            (Complex array ARRAY(NX)) The array whose
 C                          2Jth moment is to be calculated
 C     (>) NX               (Integer) The dimension of ARRAY
 C     (>) J                (Integer) J
@@ -780,12 +780,12 @@ C
 C
       IF( J.EQ.0 )THEN
          DO I =1,NX/2
-            SIGMAJ_SQUARED = SIGMAJ_SQUARED + 
+            SIGMAJ_SQUARED = SIGMAJ_SQUARED +
      :             ABS(ARRAY(I))**2
          END DO
       ELSE
          DO I = 1,NX/2
-            SIGMAJ_SQUARED = SIGMAJ_SQUARED + 
+            SIGMAJ_SQUARED = SIGMAJ_SQUARED +
      :             (ABS(ARRAY(I))*(REAL(I-1))**REAL(J))**2
          END DO
       END IF
@@ -794,7 +794,7 @@ C
      :                (TWOPI/REAL(NX))**REAL(2*J)
 C
       END
-         
+
 
       SUBROUTINE JTY_FILTERSQRT(N,K1,K2,K3,K4,X)
 * Filter a Fourier tranform by multiplying by a cosine bell.NB

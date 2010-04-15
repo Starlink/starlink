@@ -124,7 +124,7 @@
 
 *  Identify and execute the task.
 *  ==============================
-*  
+*
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 

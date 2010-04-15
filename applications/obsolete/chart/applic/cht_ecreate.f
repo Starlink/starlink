@@ -59,7 +59,7 @@
 *     19-MAR-1993 (AJJB):
 *        Replaced OPEN statements, with calls to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the CARRIAGECONTROL specifier is used which is 
+*        porting, as the CARRIAGECONTROL specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -93,7 +93,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -114,8 +114,8 @@
 *     CHARACTER * ( 40 ) REPLY   ! [local_variable_description]
       DOUBLE PRECISION ANGLE     ! [local_variable_description]
       LOGICAL RESPONSE           ! [local_variable_description]
-      INTEGER J                  ! 
-*     INTEGER L                  ! 
+      INTEGER J                  !
+*     INTEGER L                  !
       REAL DATE                  !
       LOGICAL EXIST              ! Flags whether file already exists
 *.
@@ -145,7 +145,7 @@ C
       CALL PAR_CANCL( 'EFILE', STATUS )
       FILE=NAME
 
-*  Check whether file already exists 
+*  Check whether file already exists
 
       INQUIRE( FILE = FILE, EXIST = EXIST )
 
@@ -206,9 +206,9 @@ C
 * If they do wish to add to it, OPEN it
 
          IF ( RESPONSE ) THEN
-      
+
 * This call replaces this statement :
-* 
+*
 *     OPEN (UNIT=3,FILE=FILE,STATUS='OLD',
 *    :      CARRIAGECONTROL='LIST',ERR=500)
 * (see History)
@@ -251,7 +251,7 @@ C
             CALL PAR_CANCL( 'RA', STATUS )
             CALL CHR_UCASE( RA )
 C
-C         This is the start of a long IF-block which allows 
+C         This is the start of a long IF-block which allows
 C         entry of values unless a null response was given to RA and
 C         also includes a check that all is OK before proceeding.
 C
@@ -315,7 +315,7 @@ C
 *  If an error occurred, then report a contextual message.
 
  500  CONTINUE
-      
+
       IF (  STATUS .NE. SAI__OK  ) THEN
          CALL ERR_REP( 'ECREATE_ERR',
      :   'ECREATE: Failed to create list of extra objects.',

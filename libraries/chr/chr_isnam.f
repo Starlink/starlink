@@ -13,7 +13,7 @@
 *     RESULT = CHR_ISNAM( STRING )
 
 *  Description:
-*     Determine whether the given string is a valid name: i.e. 
+*     Determine whether the given string is a valid name: i.e.
 *     whether it starts with an alphabetic character and continues
 *     with alphanumeric or underscore characters.
 
@@ -23,11 +23,11 @@
 
 *  Returned Value:
 *     CHR_ISNAM = LOGICAL
-*        Returns .TRUE. if the given string is a valid name, returns 
+*        Returns .TRUE. if the given string is a valid name, returns
 *        .FALSE. otherwise.
 
 *  Algorithm:
-*     Use CHR_LEN to determine the string length, ignoring trailing 
+*     Use CHR_LEN to determine the string length, ignoring trailing
 *     blanks.
 *     Check that the first character is alphabetic using CHR_ISALF.
 *     Check any remaining characters using CHR_ISALM.
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,7 +93,7 @@
 *  Trap zero-length strings.
       IF ( SIZE .GT. 0 ) THEN
 
-*     The string is non-blank, so initialise the returned value and 
+*     The string is non-blank, so initialise the returned value and
 *     the position index.
          CHR_ISNAM = CHR_ISALF( STRING( 1 : 1 ) )
          IPOSN = 1
@@ -108,7 +108,7 @@
          END IF
       ELSE
 
-*     String is of 0 length or totally blank. Set the returned 
+*     String is of 0 length or totally blank. Set the returned
 *     value to false.
          CHR_ISNAM = .FALSE.
       END IF

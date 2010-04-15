@@ -176,14 +176,14 @@
       IF ( .NOT. PON_DEVOP( .TRUE., STATUS ) ) GO TO 99
 
 *  Now get the parameters... If SYMBOL is null or hasn't been
-*  set (on the command-line or in reponse to a forced prompt), then 
+*  set (on the command-line or in reponse to a forced prompt), then
 *  record this as an suggestion to use the stored symbols.
       CALL PAR_GET0C( 'ACTION', ACTION, STATUS )
       CALL CHR_UCASE( ACTION )
       CALL PAR_STATE( 'SYMBOL', SSTATE, STATUS )
       CALL ERR_MARK
       CALL PAR_GET0I( 'SYMBOL', SYMBOL, STATUS )
-      IF ( STATUS .EQ. PAR__NULL ) THEN 
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          SSTATE = SUBPAR__NULL
       END IF

@@ -32,8 +32,8 @@
 * Global constants :
 
 	INCLUDE  'SAE_PAR'	    ! SSE global definitions
-        INCLUDE  'NDF_PAR'	    
-        INCLUDE  'NDF_ERR'	    
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
 
 * Status :
 
@@ -46,7 +46,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  IDIMS( NDIMS ),  ! dimensions of input DATA_ARRAY
      :  ODIMS( NDIMS ),  ! dimensions of output DATA_ARRAY
      :  PNTRI,	    	 ! pointer to input DATA_ARRAY component
@@ -78,7 +78,7 @@
 * map in its DATA_ARRAY component and get dimensions
 *
 	CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
-     :		       PNTRI, NELEMENTS, STATUS ) 
+     :		       PNTRI, NELEMENTS, STATUS )
         CALL NDF_DIM( LOCI, NDIMS, IDIMS, ACTDIM, STATUS)
 	IF ( STATUS .NE. SAI__OK ) THEN
 	  CALL NDF_ANNUL( LOCI, STATUS )
@@ -137,7 +137,7 @@
 *
 * put channel A and channel B data into the output arrays
 *
-	CALL COPYAB( IDIMS(1), IDIMS(2), %VAL( PNTRI ), 
+	CALL COPYAB( IDIMS(1), IDIMS(2), %VAL( PNTRI ),
      :               ODIMS(1), ODIMS(2), %VAL( PNTROA ),
      :	             %VAL( PNTROB), STATUS )
 *

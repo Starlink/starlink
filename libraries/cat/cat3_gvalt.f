@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     30/1/94 (ACD): Modified for proper treatment of null values.
 *     2/2/94  (ACD): Added handling of vector column elements.
-*     7/5/94  (ACD): Re-written to handle complex columns and properly 
+*     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
 *  Bugs:
 *     None known
@@ -133,17 +133,17 @@
 *       routine corresponding to the FITS data type of the column.
 
          IF (FITYPE .EQ. CAT3__FTYPX) THEN
-            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPB) THEN
-            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPI) THEN
-            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -153,32 +153,32 @@
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
-            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPD) THEN
-            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPL) THEN
-            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPA) THEN
-            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPC) THEN
-            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPM) THEN
-            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEB, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -207,7 +207,7 @@
          END IF
 
 *
-*       If the null flag has been set then set the returned value to 
+*       If the null flag has been set then set the returned value to
 *       the standard Starlink null value.
 
          IF (NULFLG) THEN
@@ -278,7 +278,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     30/1/94 (ACD): Modified for proper treatment of null values.
 *     2/2/94  (ACD): Added handling of vector column elements.
-*     7/5/94  (ACD): Re-written to handle complex columns and properly 
+*     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
 *  Bugs:
 *     None known
@@ -336,17 +336,17 @@
 *       routine corresponding to the FITS data type of the column.
 
          IF (FITYPE .EQ. CAT3__FTYPX) THEN
-            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPB) THEN
-            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPI) THEN
-            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -356,32 +356,32 @@
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
-            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPD) THEN
-            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPL) THEN
-            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPA) THEN
-            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPC) THEN
-            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPM) THEN
-            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEC, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -410,7 +410,7 @@
          END IF
 
 *
-*       If the null flag has been set then set the returned value to 
+*       If the null flag has been set then set the returned value to
 *       the standard Starlink null value.
 
          IF (NULFLG) THEN
@@ -481,7 +481,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     30/1/94 (ACD): Modified for proper treatment of null values.
 *     2/2/94  (ACD): Added handling of vector column elements.
-*     7/5/94  (ACD): Re-written to handle complex columns and properly 
+*     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
 *  Bugs:
 *     None known
@@ -539,17 +539,17 @@
 *       routine corresponding to the FITS data type of the column.
 
          IF (FITYPE .EQ. CAT3__FTYPX) THEN
-            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPB) THEN
-            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPI) THEN
-            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -559,32 +559,32 @@
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
-            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPD) THEN
-            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPL) THEN
-            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPA) THEN
-            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPC) THEN
-            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPM) THEN
-            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPED, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -613,7 +613,7 @@
          END IF
 
 *
-*       If the null flag has been set then set the returned value to 
+*       If the null flag has been set then set the returned value to
 *       the standard Starlink null value.
 
          IF (NULFLG) THEN
@@ -684,7 +684,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     30/1/94 (ACD): Modified for proper treatment of null values.
 *     2/2/94  (ACD): Added handling of vector column elements.
-*     7/5/94  (ACD): Re-written to handle complex columns and properly 
+*     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
 *  Bugs:
 *     None known
@@ -742,17 +742,17 @@
 *       routine corresponding to the FITS data type of the column.
 
          IF (FITYPE .EQ. CAT3__FTYPX) THEN
-            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPB) THEN
-            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPI) THEN
-            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -762,32 +762,32 @@
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
-            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPD) THEN
-            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPL) THEN
-            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPA) THEN
-            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPC) THEN
-            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPM) THEN
-            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEI, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -816,7 +816,7 @@
          END IF
 
 *
-*       If the null flag has been set then set the returned value to 
+*       If the null flag has been set then set the returned value to
 *       the standard Starlink null value.
 
          IF (NULFLG) THEN
@@ -887,7 +887,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     30/1/94 (ACD): Modified for proper treatment of null values.
 *     2/2/94  (ACD): Added handling of vector column elements.
-*     7/5/94  (ACD): Re-written to handle complex columns and properly 
+*     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
 *  Bugs:
 *     None known
@@ -945,17 +945,17 @@
 *       routine corresponding to the FITS data type of the column.
 
          IF (FITYPE .EQ. CAT3__FTYPX) THEN
-            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPB) THEN
-            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPI) THEN
-            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -965,32 +965,32 @@
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
-            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPD) THEN
-            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPL) THEN
-            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPA) THEN
-            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPC) THEN
-            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPM) THEN
-            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEL, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -1019,7 +1019,7 @@
          END IF
 
 *
-*       If the null flag has been set then set the returned value to 
+*       If the null flag has been set then set the returned value to
 *       the standard Starlink null value.
 
          IF (NULFLG) THEN
@@ -1090,7 +1090,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     30/1/94 (ACD): Modified for proper treatment of null values.
 *     2/2/94  (ACD): Added handling of vector column elements.
-*     7/5/94  (ACD): Re-written to handle complex columns and properly 
+*     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
 *  Bugs:
 *     None known
@@ -1148,17 +1148,17 @@
 *       routine corresponding to the FITS data type of the column.
 
          IF (FITYPE .EQ. CAT3__FTYPX) THEN
-            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPB) THEN
-            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPI) THEN
-            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -1168,32 +1168,32 @@
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
-            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPD) THEN
-            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPL) THEN
-            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPA) THEN
-            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPC) THEN
-            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPM) THEN
-            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPER, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -1222,7 +1222,7 @@
          END IF
 
 *
-*       If the null flag has been set then set the returned value to 
+*       If the null flag has been set then set the returned value to
 *       the standard Starlink null value.
 
          IF (NULFLG) THEN
@@ -1293,7 +1293,7 @@
 *     24/1/94 (ACD): Modified error reporting.
 *     30/1/94 (ACD): Modified for proper treatment of null values.
 *     2/2/94  (ACD): Added handling of vector column elements.
-*     7/5/94  (ACD): Re-written to handle complex columns and properly 
+*     7/5/94  (ACD): Re-written to handle complex columns and properly
 *       handle scaled columns.
 *  Bugs:
 *     None known
@@ -1351,17 +1351,17 @@
 *       routine corresponding to the FITS data type of the column.
 
          IF (FITYPE .EQ. CAT3__FTYPX) THEN
-            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPB) THEN
-            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPI) THEN
-            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -1371,32 +1371,32 @@
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
-            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPD) THEN
-            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPL) THEN
-            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPA) THEN
-            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPC) THEN
-            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
          ELSE IF (FITYPE .EQ. CAT3__FTYPM) THEN
-            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO, 
+            CALL CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
      :        ELEM, CAT__TYPEW, VALUEUB, VALUEB, VALUEUW, VALUEW,
      :        VALUEI, VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 
@@ -1425,7 +1425,7 @@
          END IF
 
 *
-*       If the null flag has been set then set the returned value to 
+*       If the null flag has been set then set the returned value to
 *       the standard Starlink null value.
 
          IF (NULFLG) THEN

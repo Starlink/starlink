@@ -4,7 +4,7 @@
 *     ASTTRAN2
 
 *  Purpose:
-*     Use a Mapping to transform a set of position in two dimensions. 
+*     Use a Mapping to transform a set of position in two dimensions.
 
 *  Language:
 *     Starlink Fortran 77
@@ -31,20 +31,20 @@
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF, FITS file or text file holding the Mapping. If an NDF is 
+*        An NDF, FITS file or text file holding the Mapping. If an NDF is
 *        supplied, the Mapping from the base Frame of the WCS FrameSet to the
-*        current Frame will be used. If a FITS file is supplied, the Mapping 
+*        current Frame will be used. If a FITS file is supplied, the Mapping
 *        from the pixel grid coordinates to the primary axis descriptions
 *        will be used.
 *     XIN = GROUP (Read)
-*        A comma-separated list of floating point values to be used as the 
-*        input X axis value. A text file may be specified by preceeding the 
+*        A comma-separated list of floating point values to be used as the
+*        input X axis value. A text file may be specified by preceeding the
 *        name of the file with an up arrow character "^". If the supplied value
 *        ends with a minus sign, the user is re-prompted for additional
 *        values.
 *     YIN = GROUP (Read)
-*        A comma-separated list of floating point values to be used as the 
-*        input Y axis value. A text file may be specified by preceeding the 
+*        A comma-separated list of floating point values to be used as the
+*        input Y axis value. A text file may be specified by preceeding the
 *        name of the file with an up arrow character "^". If the supplied value
 *        ends with a minus sign, the user is re-prompted for additional
 *        values.
@@ -104,7 +104,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  External References:
@@ -120,7 +120,7 @@
 
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -131,7 +131,7 @@
      :                 STATUS )
 
 *  Check that the the Nin and Nout attributes of the Mapping are both 2.
-      NP = AST_GETI( THIS, 'Nin', STATUS) 
+      NP = AST_GETI( THIS, 'Nin', STATUS)
       IF( NP .NE. 2 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NI', NP )
@@ -139,7 +139,7 @@
      :                 '^NI input axes (should be 2).', STATUS)
       END IF
 
-      NP = AST_GETI( THIS, 'Nout', STATUS) 
+      NP = AST_GETI( THIS, 'Nout', STATUS)
       IF( NP .NE. 2 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NI', NP )
@@ -177,13 +177,13 @@
       CALL ATL1_GTOFL( IGRP2, NP, 1, %VAL( CNF_PVAL( IPYIN ) ), STATUS )
 
 * Transform the positions.
-      CALL AST_TRAN2( THIS, NP, %VAL( CNF_PVAL( IPXIN ) ), 
+      CALL AST_TRAN2( THIS, NP, %VAL( CNF_PVAL( IPXIN ) ),
      :                %VAL( CNF_PVAL( IPYIN ) ), FORWRD,
-     :                %VAL( CNF_PVAL( IPXOUT ) ), 
+     :                %VAL( CNF_PVAL( IPXOUT ) ),
      :                %VAL( CNF_PVAL( IPYOUT ) ), STATUS )
 
 *  Output the results.
-      CALL ATL1_PRNT2( NP, %VAL( CNF_PVAL( IPXOUT ) ), 
+      CALL ATL1_PRNT2( NP, %VAL( CNF_PVAL( IPXOUT ) ),
      :                 %VAL( CNF_PVAL( IPYOUT ) ), 'XOUT',
      :                 'YOUT', STATUS )
 

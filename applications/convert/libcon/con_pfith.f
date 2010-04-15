@@ -136,7 +136,7 @@
       MOREXT = .FALSE.
       LAST = .FALSE.
 
-*  Define the start of the first extension in the sub-file, and 
+*  Define the start of the first extension in the sub-file, and
 *  initialise the count of headers in the section.
       NHEADS = 1
       HDNUM( NHEADS ) = 0
@@ -306,7 +306,7 @@
       END IF
       GOTO 999
 
-*  Only come here following an error condition whilst reading the file. 
+*  Only come here following an error condition whilst reading the file.
  980  CONTINUE
 
 *  Error reading the file.  Report context and abort.

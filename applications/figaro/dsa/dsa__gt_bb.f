@@ -23,14 +23,14 @@ C
 C     (>) REF_SLOT       (Integer,ref) The number of the reference slot
 C                        for the structure in the internal common tables.
 C     (<) BADBITS        (Byte,ref) The value of the BADBITS flag associated
-C                        with the quality array in the structure.  
+C                        with the quality array in the structure.
 C     (<) DTA_STATUS     (Integer,ref) Status code. This is a status code
 C                        returned by the DTA system.
 C
 C  External variables used:
 C     Only common variables internal to the DSA routines.
 C
-C  External subroutines / functions used:  
+C  External subroutines / functions used:
 C     DTA_STRUC
 C
 C  Prior requirements:
@@ -46,7 +46,7 @@ C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
 C                       original Figaro format (DST files).
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C
 C  History:
@@ -87,7 +87,7 @@ C
 C
 C        In NDF format, .QUALITY can be a primitive array, or it
 C        can be a structure where the actual array is .QUALITY.QUALITY.
-C        If it is primitive, there is no BADBITS value as such, but 
+C        If it is primitive, there is no BADBITS value as such, but
 C        interpretation is up to the application, so we can feel free
 C        to assume a BADBITS value with all bits set.  If it is a
 C        structure, then SGP 38 says that there should be a BADBITS

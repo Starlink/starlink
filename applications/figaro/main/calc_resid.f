@@ -32,7 +32,7 @@
 *   Y(NPTS) = DOUBLE PRECISION ARRAY (Given)
 *      Actual Y values
 *   RESIDUALS(NPTS) = DOUBLE PRECISION ARRAY (Returned)
-*      Residuals calculated   
+*      Residuals calculated
 *   ATHREE (3*MAXNPTS+3*MAX_KPLUS1) = DOUBLE PRECISION ARRAY (Workspace)
 *     PDA fitting results array
 

@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_MPSPT( MAP, MAP0, MAP1, MAP2, INPRM, OUTPRM, 
+      SUBROUTINE NDF1_MPSPT( MAP, MAP0, MAP1, MAP2, INPRM, OUTPRM,
      :                       STATUS )
 *+
 *  Name:
@@ -15,12 +15,12 @@
 *     CALL NDF1_MPSPT( MAP, MAP0, MAP1, MAP2, INPRM, OUTPRM, STATUS )
 
 *  Description:
-*     This routine attempts to partition the inputs of the supplied 
-*     Mapping into two groups; a group that can be re-constructed from 
-*     a corresponding group of Mapping outputs, and a group that cannot 
-*     be re-constructed because the required inverse transformation is 
+*     This routine attempts to partition the inputs of the supplied
+*     Mapping into two groups; a group that can be re-constructed from
+*     a corresponding group of Mapping outputs, and a group that cannot
+*     be re-constructed because the required inverse transformation is
 *     not defined. A Mapping is returned for each group, together with
-*     the permutation arrays needed to permute the inputs and outputs of 
+*     the permutation arrays needed to permute the inputs and outputs of
 *     these Mappings back into their original order.
 
 *  Arguments:
@@ -35,27 +35,27 @@
 *        originally have an inverse.
 *     MAP1 = INTEGER (Returned)
 *        A Mapping that transforms a subset of the inputs of MAP into a
-*        subset of the outputs of MAP. The subset contains all inputs for 
+*        subset of the outputs of MAP. The subset contains all inputs for
 *        which the Mapping has an inverse transformation (i.e. all inputs
 *        that can be re-generated from the corresponding output values).
 *        AST__NULL will be returned if no unique subset of inputs can be
 *        found that has a defined inverse.
 *     MAP2 = INTEGER (Returned)
 *        A Mapping that transforms a subset of the inputs of MAP into a
-*        subset of the outputs of MAP. The subset contains all inputs for 
-*        which the Mapping does not have an inverse transformation (i.e. all 
-*        inputs that cannot be re-generated from the corresponding output 
-*        values). AST__NULL will be returned if all the inputs have defined 
+*        subset of the outputs of MAP. The subset contains all inputs for
+*        which the Mapping does not have an inverse transformation (i.e. all
+*        inputs that cannot be re-generated from the corresponding output
+*        values). AST__NULL will be returned if all the inputs have defined
 *        inverse transformations.
 *     INPRM( NDF__MXDIM ) = INTEGER (Returned)
 *        The index into this array is the index of an input to MAP. The
-*        values returned in the array are the indices of the corresponding 
-*        inputs within a compound Mapping formed by combining MAP1 and MAP2 
+*        values returned in the array are the indices of the corresponding
+*        inputs within a compound Mapping formed by combining MAP1 and MAP2
 *        in parallel.
 *     OUTPRM( NDF__MXDIM ) = INTEGER (Returned)
 *        The index into this array is the index of an output within a
-*        compound Mapping formed by combining MAP1 and MAP2. The values 
-*        returned in the array are the indices of the corresponding 
+*        compound Mapping formed by combining MAP1 and MAP2. The values
+*        returned in the array are the indices of the corresponding
 *        outputs within MAP.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -69,12 +69,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,13 +93,13 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants      
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Arguments Given:
@@ -147,12 +147,12 @@
       NOUT = AST_GETI( MAP, 'Nout', STATUS )
 
 *  Split the supplied Mapping up into the largest possible number
-*  of parallel Mappings. 
-      CALL NDF1_MPANL( MAP, NMAP, MAPS, HASINV, INMAP, ININD, 
+*  of parallel Mappings.
+      CALL NDF1_MPANL( MAP, NMAP, MAPS, HASINV, INMAP, ININD,
      :                 OUTMAP, OUTIND, MAP0, STATUS )
 
-*  Loop round all the component Mappings found above, accumulating all 
-*  the component Mappings that have, and do not have, defined inverse 
+*  Loop round all the component Mappings found above, accumulating all
+*  the component Mappings that have, and do not have, defined inverse
 *  transformations within the supplied Mapping.
       DO I = 1, NMAP
 
@@ -162,7 +162,7 @@
             IF( MAP1 .EQ. AST__NULL ) THEN
                MAP1 = AST_CLONE( MAPS( I ), STATUS )
             ELSE
-               TMAP = AST_CMPMAP( MAP1, MAPS( I ), .FALSE., ' ', 
+               TMAP = AST_CMPMAP( MAP1, MAPS( I ), .FALSE., ' ',
      :                            STATUS )
                CALL AST_ANNUL( MAP1, STATUS )
                MAP1 = TMAP
@@ -174,7 +174,7 @@
             IF( MAP2 .EQ. AST__NULL ) THEN
                MAP2 = AST_CLONE( MAPS( I ), STATUS )
             ELSE
-               TMAP = AST_CMPMAP( MAP2, MAPS( I ), .FALSE., ' ', 
+               TMAP = AST_CMPMAP( MAP2, MAPS( I ), .FALSE., ' ',
      :                            STATUS )
                CALL AST_ANNUL( MAP2, STATUS )
                MAP2 = TMAP
@@ -193,13 +193,13 @@
       END IF
       IIN1 = 0
       IOUT1 = 0
- 
+
 *  Now loop round all the component Mappings again.
       DO I = 1, NMAP
 
-*  Find all inputs of the supplied Mapping that feed the current component 
-*  Mapping. For each, store the index of the corresponding input within a 
-*  parallel CmpMap holding MAP1 and MAP2. 
+*  Find all inputs of the supplied Mapping that feed the current component
+*  Mapping. For each, store the index of the corresponding input within a
+*  parallel CmpMap holding MAP1 and MAP2.
          DO J = 1, NIN
             IF( INMAP( J ) .EQ. I ) THEN
 
@@ -212,9 +212,9 @@
             END IF
          END DO
 
-*  Find all outputs of the supplied Mapping that are fed by the current 
-*  component Mapping. For each, store the index of the corresponding 
-*  output within a parallel CmpMap holding MAP1 and MAP2. 
+*  Find all outputs of the supplied Mapping that are fed by the current
+*  component Mapping. For each, store the index of the corresponding
+*  output within a parallel CmpMap holding MAP1 and MAP2.
          DO J = 1, NOUT
             IF( OUTMAP( J ) .EQ. I ) THEN
 
@@ -239,7 +239,7 @@
 *  Free the Mapping pointer since it is no longer needed.
          CALL AST_ANNUL( MAPS( I ), STATUS )
 
-      END DO         
+      END DO
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_MPSPT', STATUS )

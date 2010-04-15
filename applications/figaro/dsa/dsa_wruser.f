@@ -10,9 +10,9 @@ C
 C  Description:
 C     DSA_WRUSER outputs a message string to the user, buffering it until
 C     either a line's worth of output has been received or until a string
-C     containing a newline code (`backslash n', as in C's printf) is 
-C     received.  So a call to this routine does not necessarily result in 
-C     a single line being output immediately to the user.  Output is 
+C     containing a newline code (`backslash n', as in C's printf) is
+C     received.  So a call to this routine does not necessarily result in
+C     a single line being output immediately to the user.  Output is
 C     through the Figaro parameter system (the routine PAR_WRUSER).
 C
 C  Language:
@@ -25,7 +25,7 @@ C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) STRING      (Fixed string,descr) The string to be output.  Words
 C                     from STRING are buffered and output when the 80 char
-C                     buffer is full, or when a newline (backslash n) is 
+C                     buffer is full, or when a newline (backslash n) is
 C                     found in the string.  All spaces in STRING - including
 C                     trailing spaces - are treated as significant.
 C
@@ -34,7 +34,7 @@ C     Common variables used internally by the DSA_ package.
 C
 C  External subroutines / functions used:  PAR_WRUSER
 C
-C  Prior requirements:  
+C  Prior requirements:
 C     DSA_OPEN should have been called to initialise the DSA_ system.
 C
 C  Support: Keith Shortridge, AAO

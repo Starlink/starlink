@@ -10,8 +10,8 @@ C
 C.    Description:
 C     Returns the next 'word' in a string.  A word is defined here
 C     as anything separated by any of a number of specified separating
-C     delimiters, or enclosed between any of a number of specified 
-C     pairs of bracketing delimiters.  
+C     delimiters, or enclosed between any of a number of specified
+C     pairs of bracketing delimiters.
 C
 C.    Language: Fortran
 C
@@ -23,15 +23,15 @@ C     (>) STRING    (Fixed string, dscr) The string in question.
 C     (>) IST       (Integer, ref) The number of the first character in
 C                   the string to be examined.  (The first character
 C                   is 1, not 0)
-C     (>) DELIMS    (Fixed string, descr) The possible delimiters - space 
-C                   is not automatically assumed to be a delimiter, it 
+C     (>) DELIMS    (Fixed string, descr) The possible delimiters - space
+C                   is not automatically assumed to be a delimiter, it
 C                   has to be specified explicitly.
-C     (>) QUOTES    (Fixed string, descr) The 'bracketing delimiters' - 
+C     (>) QUOTES    (Fixed string, descr) The 'bracketing delimiters' -
 C                   pairsd of characters that can enclose a word.  Setting
 C                   QUOTES to blank disables this feature.
 C     (<) WORD      (Fixed string, descr) The delimited word.
 C     (<) LWORD     (Integer, descr) The number of characters in WORD.
-C     (<) CHAR      (Fixed string, descr) If the word was bracketed, CHAR 
+C     (<) CHAR      (Fixed string, descr) If the word was bracketed, CHAR
 C                   is returned with the single character used for the
 C                   first bracket.  Otherwise, CHAR will be blank.
 C.    Returns:
@@ -55,13 +55,13 @@ C     other delimiting characters is treated as a single delimiter.
 C     ICH_WORD starts at a given position (IST) in a character string
 C     (STRING) and works along until it comes to the start of a delimited
 C     word.  Then it continues until it finds the end of the word and
-C     the end of the delimiter that terminates that word.  Optionally, 
+C     the end of the delimiter that terminates that word.  Optionally,
 C     if the word begins with any of a number of bracketing delimiters
-C     (QUOTES - a typical example might be the [] pair, or "") then 
+C     (QUOTES - a typical example might be the [] pair, or "") then
 C     ICH_WORD will include in the word anything between the two bracketing
 C     delimiters (but not the delimiters themselves.)
 C
-C     For example, if the delimiters are specified as ';., ' and 
+C     For example, if the delimiters are specified as ';., ' and
 C     quotes as '{}""' then the string
 C
 C     A "quoted string", a {Pascal comment}; and nothing else.
@@ -76,16 +76,16 @@ C     and
 C     nothing
 C     else
 C
-C     The way POSN (the function value) is set is as follows: If the word 
-C     was delimited by a combination of blanks and a delimiting character, 
-C     POSN will point to the delimiting character. If it was delimited 
-C     only by blanks, it will point to the final blank.  If the word was 
+C     The way POSN (the function value) is set is as follows: If the word
+C     was delimited by a combination of blanks and a delimiting character,
+C     POSN will point to the delimiting character. If it was delimited
+C     only by blanks, it will point to the final blank.  If the word was
 C     delimited by the end of the string, POSN will be set to zero.  If
-C     application of these rules would make POSN point to the final 
-C     character in the string, it is set to -1.  This is so the calling 
-C     program can test POSN and, so long as POSN was positive, can always 
+C     application of these rules would make POSN point to the final
+C     character in the string, it is set to -1.  This is so the calling
+C     program can test POSN and, so long as POSN was positive, can always
 C     call ICH_WORD again with IST=POSN+1.  An exceptional condition occurs
-C     when ICH_WORD reaches the end of the string before it finds the end 
+C     when ICH_WORD reaches the end of the string before it finds the end
 C     of a bracketed string, and in this case POSN is returned as -2.
 C
 C.    Internal declaration:
@@ -104,7 +104,7 @@ C        3rd  Sept 1987.  Minor bug fix.  Quotes were not being recognised
 C                         if they appeared immediately after text, eg
 C                         if [] were a quote pair, they were missed in
 C                         'DATA[1524]', but spotted in 'DATA [1524]'.
-C                         KS / AAO. 
+C                         KS / AAO.
 C+
       IMPLICIT NONE
 C

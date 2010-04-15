@@ -30,7 +30,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -45,8 +45,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -66,8 +66,8 @@
      :  ODIMS( NDIMS ),       ! dimensions of output DATA_ARRAYs
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
-     :  PNTRI,                !    "     " input      " 
-     :  PNTRO,                !    "     " output     " 
+     :  PNTRI,                !    "     " input      "
+     :  PNTRO,                !    "     " output     "
      :	IXST,
      :	IYST,
      :	IXEN,
@@ -111,7 +111,7 @@
             CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                    PNTRO, NELEMENTS, STATUS )
 
-*          check for error 
+*          check for error
 	    IF( STATUS .EQ. SAI__OK ) THEN
 
 *            ask user for area for bad pixels
@@ -131,24 +131,24 @@
 	        CALL PAR_GET0R( 'SIGMALEVEL', SIGMALEVEL, STATUS)
 
 *              pass everything to the work routine
-	        CALL MAKEMASKSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
+	        CALL MAKEMASKSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
      :	                          %VAL( PNTRO), IXST, IYST, IXEN, IYEN,
-     :	                          SIGMALEVEL, MEAN, STD, NUMPIX, 
+     :	                          SIGMALEVEL, MEAN, STD, NUMPIX,
      :                            STATUS)
 
 *              tell user the bad news...
 	        CALL MSG_SETR( 'ME', MEAN)
-	        CALL MSG_OUT( 'MESS', 
-     :	         'Mean in input image area = ^ME', 
+	        CALL MSG_OUT( 'MESS',
+     :	         'Mean in input image area = ^ME',
      :	         STATUS)
 	        CALL MSG_SETR( 'NS', SIGMALEVEL)
 	        CALL MSG_SETR( 'ST', STD)
-	        CALL MSG_OUT( 'MESS', 
-     :	      '^NS-sigma standard deviation in input image area = ^ST', 
+	        CALL MSG_OUT( 'MESS',
+     :	      '^NS-sigma standard deviation in input image area = ^ST',
      :	         STATUS)
 	        CALL MSG_SETI( 'NP', NUMPIX)
-	        CALL MSG_OUT( 'MESS', 
-     :	         'Number of masked to 0 in image = ^NP', 
+	        CALL MSG_OUT( 'MESS',
+     :	         'Number of masked to 0 in image = ^NP',
      :	         STATUS)
 
 	      END IF

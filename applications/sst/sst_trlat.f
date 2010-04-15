@@ -28,7 +28,7 @@
 
 *  Copyright:
 *     Copyright (C) 1990, 1994 Science & Engineering Research Council.
-*     Copyright (C) 2005, 2006  Particle Physics & Engineering Research 
+*     Copyright (C) 2005, 2006  Particle Physics & Engineering Research
 *        Council.
 *     All Rights Reserved.
 
@@ -37,11 +37,11 @@
 *     the terms of the GNU General Public License as published by the Free Software
 *     Foundation; either version 2 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,but WITHOUT ANY
 *     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 *     PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License along with
 *     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 *     Place,Suite 330, Boston, MA  02111-1307, USA
@@ -49,7 +49,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
-*     DSB: David S. Berry 
+*     DSB: David S. Berry
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -171,7 +171,7 @@
      :     .EQ. '.' ) THEN
          SCB_LC( LAST ) = SCB_LC( LAST ) - 1
       ENDIF
-      CALL SST_LATP( 3, FIRST, LAST, STATUS )         
+      CALL SST_LATP( 3, FIRST, LAST, STATUS )
       CALL SST_PUT( 0, '}{', STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -267,7 +267,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Applicability:      
+*  Applicability:
 *  ==============
 *  If processing an A-task prologue, locate the routine's "Applicability"
 *  section.
@@ -356,7 +356,7 @@
       NAME( 13 ) = 'History'
       NAME( 14 ) = 'Implementation Status'
       NAME( 15 ) = 'Bugs'
-         
+
 *  Inhibit those not required at all.
       NAME( 16 ) = 'Type of Module'
       NAME( 17 ) = 'Algorithm'
@@ -365,7 +365,7 @@
       NAME( 20 ) = 'Synopsis'
       NAME( 21 ) = 'Licence'
       NAME( 22 ) = 'Copyright'
-      
+
 *  Loop to find all remaining sections.
 1     CONTINUE                   ! Start of 'DO WHILE' loop
       CALL SST_NSECT( .FALSE., 22, NAME, HEADER, FIRST, LAST, STATUS )
@@ -415,7 +415,7 @@
 *  If no implementation status section was found, then skip it.
 *  Otherwise, output the section body in paragraph mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-         CALL SST_PUT( 3, SST__BKSLH // 'sstimplementationstatus{', 
+         CALL SST_PUT( 3, SST__BKSLH // 'sstimplementationstatus{',
      :                 STATUS )
          CALL SST_LATP( 6, FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '}', STATUS )

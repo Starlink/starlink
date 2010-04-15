@@ -94,7 +94,7 @@ itcl::class gaia::GaiaPolUHigh {
 #  Increment the number of GaiaPolUHigh objects created.
       incr id_
 
-#  Create a unique font name for highlight labels. 
+#  Create a unique font name for highlight labels.
       set font_ "GaiaPolHighFont$id_"
 
 #  Create the font

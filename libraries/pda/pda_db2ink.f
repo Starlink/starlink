@@ -140,9 +140,9 @@ C                      7 == NY out of range
 C                      8 == KY out of range
 C                      9 == Y not strictly increasing
 C                     10 == TY not non-decreasing
-C    
-C   STATUS   Integer. Starlink error status. 
-C  
+C
+C   STATUS   Integer. Starlink error status.
+C
 C***REFERENCES  CARL DE BOOR, A PRACTICAL GUIDE TO SPLINES,
 C                 SPRINGER-VERLAG, NEW YORK, 1978.
 C               CARL DE BOOR, EFFICIENT COMPUTER MANIPULATION OF TENSOR
@@ -163,7 +163,7 @@ C  PARAMETERS
 C
 
       INTEGER NX, NY, LDF, KX, KY, IFLAG
-      DOUBLE PRECISION X(NX), Y(NY), FCN(LDF,NY), TX(1), TY(1) 
+      DOUBLE PRECISION X(NX), Y(NY), FCN(LDF,NY), TX(1), TY(1)
       DOUBLE PRECISION BCOEF(NX,NY),WORK(1)
 C
 C  LOCAL VARIABLES
@@ -177,7 +177,7 @@ C
 C***FIRST EXECUTABLE STATEMENT
 
 *   Check the inherited global status.
-      IF (STATUS.NE.0) RETURN   
+      IF (STATUS.NE.0) RETURN
 
       IF ((IFLAG .LT. 0) .OR. (IFLAG .GT. 1))  GO TO 920
       IF (NX .LT. 3)  GO TO 930

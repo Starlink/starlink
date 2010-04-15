@@ -293,7 +293,7 @@ package tsp {
             ppath CURRENT
             prompt {Output Dataset}
           }
-                   
+
       }
       action ccd2stokes {
 
@@ -401,7 +401,7 @@ package tsp {
             position 3
             prompt {Output Dataset}
           }
-                   
+
       }
       action ccdphot {
 
@@ -640,7 +640,7 @@ package tsp {
             ppath CURRENT
             prompt {Output Dataset}
           }
-                   
+
       }
       action cmult {
 
@@ -882,7 +882,7 @@ package tsp {
             prompt {Maximum Polarization Level to Plot}
           }
 
-           
+
          parameter theta {
             type _REAL
             vpath DEFAULT
@@ -909,7 +909,7 @@ package tsp {
             vpath PROMPT
             prompt {Extinction Coefficient Spectrum }
           }
-                               
+
          parameter airmass {
             type _REAL
             position 3
@@ -1210,7 +1210,7 @@ package tsp {
             position 3
             prompt {Output Dataset}
           }
-                   
+
       }
       action irflux {
 
@@ -1229,7 +1229,7 @@ package tsp {
             vpath PROMPT
             prompt {Calibration (standard star) Spectrum }
           }
-                               
+
          parameter temp {
             type _REAL
             position 3
@@ -1515,7 +1515,7 @@ package tsp {
             ppath CURRENT
             prompt {Output Dataset}
           }
-                   
+
       }
       action irispolc {
 
@@ -1598,7 +1598,7 @@ package tsp {
             ppath CURRENT
             prompt {Output Dataset}
           }
-                   
+
       }
       action lhatpol {
 
@@ -1655,7 +1655,7 @@ package tsp {
             ppath CURRENT
             position 1
           }
-           
+
          parameter output {
             type NDF
             prompt {Corrected Dataset}
@@ -1776,7 +1776,7 @@ package tsp {
             default 1
             prompt {Channel for 1st Plot}
           }
-                                   
+
          parameter item1 {
             type _CHAR
             position 5
@@ -1831,7 +1831,7 @@ package tsp {
             ppath CURRENT DYNAMIC
             prompt {Maximum Data Level to Plot}
           }
-                
+
 
          parameter chan2 {
             type _INTEGER
@@ -1840,7 +1840,7 @@ package tsp {
             default 1
             prompt {Channel for 2nd Plot}
           }
-                                   
+
          parameter item2 {
             type _CHAR
             vpath PROMPT
@@ -1895,7 +1895,7 @@ package tsp {
             default 1
             prompt {Channel for 3rd Plot}
           }
-                                   
+
          parameter item3 {
             type _CHAR
             vpath PROMPT
@@ -1950,7 +1950,7 @@ package tsp {
             default 1
             prompt {Channel for 4th Plot}
           }
-                                   
+
          parameter item4 {
             type _CHAR
             vpath PROMPT
@@ -2005,7 +2005,7 @@ package tsp {
             default 1
             prompt {Channel for 5th Plot}
           }
-                                   
+
          parameter item5 {
             type _CHAR
             vpath PROMPT
@@ -2060,7 +2060,7 @@ package tsp {
             default 1
             prompt {Channel for 6th Plot}
           }
-                                   
+
          parameter item6 {
             type _CHAR
             vpath PROMPT
@@ -2107,7 +2107,7 @@ package tsp {
             prompt {Maximum Data Level to Plot}
           }
 
-              
+
          parameter whole {
             type _LOGICAL
             vpath PROMPT
@@ -2137,7 +2137,7 @@ package tsp {
             ppath CURRENT DYNAMIC
             prompt {Last X value (JD) to Plot}
           }
-                
+
          parameter line {
             type _LOGICAL
             vpath DEFAULT
@@ -2153,7 +2153,7 @@ package tsp {
             default 1
             prompt {SGS Pen to Plot In}
           }
-            
+
          parameter size {
             type _REAL
             vpath DEFAULT
@@ -2169,7 +2169,7 @@ package tsp {
             default 0.90
             prompt {Coordinates of top of plot}
           }
-                
+
          parameter pbottom {
             type _REAL
             vpath DEFAULT
@@ -2193,7 +2193,7 @@ package tsp {
             default PHASEPLOT.DAT
             prompt {Name of Text File}
           }
-                
+
       }
       action pplot {
 
@@ -2269,7 +2269,7 @@ package tsp {
             prompt {Maximum Polarization Level to Plot}
           }
 
-           
+
          parameter tmin {
             type _REAL
             vpath DEFAULT
@@ -2339,7 +2339,7 @@ package tsp {
             default 1
             prompt {Channel for 1st Plot}
           }
-                                   
+
          parameter item {
             type _CHAR
             position 4
@@ -2401,7 +2401,7 @@ package tsp {
             ppath CURRENT DYNAMIC
             prompt {Last X value (JD) to Plot}
           }
-                
+
          parameter line {
             type _LOGICAL
             vpath DEFAULT
@@ -2409,7 +2409,7 @@ package tsp {
             default FALSE
             prompt {Plot as Continuous Line}
           }
-            
+
          parameter errors {
             type _LOGICAL
             vpath DEFAULT
@@ -2425,8 +2425,8 @@ package tsp {
             default 1
             prompt {SGS Pen to Plot In}
           }
-              
-                
+
+
       }
       action qumerge {
 
@@ -2455,7 +2455,7 @@ package tsp {
           }
 
       }
-                   
+
       action quplot {
 
          parameter input {
@@ -2585,7 +2585,7 @@ package tsp {
             position 2
             prompt {Output Dataset}
           }
- 
+
          parameter period {
             type _REAL
             vpath PROMPT
@@ -2669,7 +2669,7 @@ package tsp {
             position 3
             prompt {Output Dataset}
           }
-                   
+
       }
       action rhathsp {
 
@@ -2688,7 +2688,7 @@ package tsp {
             position 2
             prompt {Output Dataset}
           }
-                   
+
       }
       action rhatpol {
 
@@ -2843,7 +2843,7 @@ package tsp {
             position 3
             prompt {Output Dataset}
           }
-                   
+
          parameter zeropt {
             type _REAL
             vpath PROMPT
@@ -3122,7 +3122,7 @@ package tsp {
             position 2
             prompt {Name of Text File}
           }
-                
+
       }
 
       action spflux {
@@ -3142,7 +3142,7 @@ package tsp {
             vpath PROMPT
             prompt {Figaro Calibration Spectrum }
           }
-                               
+
          parameter time {
             type _REAL
             position 3
@@ -3338,7 +3338,7 @@ package tsp {
             prompt {Bin size (negative for no binning)}
           }
 
-              
+
          parameter whole {
             type _LOGICAL
             vpath PROMPT
@@ -3368,7 +3368,7 @@ package tsp {
             ppath CURRENT
             prompt {Output Dataset}
           }
-                
+
       }
       action tcadd {
 
@@ -3517,7 +3517,7 @@ package tsp {
             default 1
             prompt {Channel to list}
           }
-                                   
+
          parameter whole {
             type _LOGICAL
             vpath PROMPT
@@ -3547,8 +3547,8 @@ package tsp {
             ppath CURRENT
             prompt {Name of listing file}
           }
-              
-                
+
+
       }
       action tmerge {
 
@@ -3586,7 +3586,7 @@ package tsp {
             ppath CURRENT
             position 1
           }
-           
+
          parameter output {
             type NDF
             prompt {Corrected Dataset}
@@ -3719,7 +3719,7 @@ package tsp {
             default 1
             prompt {Channel for 1st Plot}
           }
-                                   
+
          parameter item1 {
             type _CHAR
             position 5
@@ -3774,7 +3774,7 @@ package tsp {
             ppath CURRENT DYNAMIC
             prompt {Maximum Data Level to Plot}
           }
-                
+
 
          parameter chan2 {
             type _INTEGER
@@ -3783,7 +3783,7 @@ package tsp {
             default 1
             prompt {Channel for 2nd Plot}
           }
-                                   
+
          parameter item2 {
             type _CHAR
             vpath PROMPT
@@ -3838,7 +3838,7 @@ package tsp {
             default 1
             prompt {Channel for 3rd Plot}
           }
-                                   
+
          parameter item3 {
             type _CHAR
             vpath PROMPT
@@ -3893,7 +3893,7 @@ package tsp {
             default 1
             prompt {Channel for 4th Plot}
           }
-                                   
+
          parameter item4 {
             type _CHAR
             vpath PROMPT
@@ -3948,7 +3948,7 @@ package tsp {
             default 1
             prompt {Channel for 5th Plot}
           }
-                                   
+
          parameter item5 {
             type _CHAR
             vpath PROMPT
@@ -4003,7 +4003,7 @@ package tsp {
             default 1
             prompt {Channel for 6th Plot}
           }
-                                   
+
          parameter item6 {
             type _CHAR
             vpath PROMPT
@@ -4050,7 +4050,7 @@ package tsp {
             prompt {Maximum Data Level to Plot}
           }
 
-              
+
          parameter whole {
             type _LOGICAL
             vpath PROMPT
@@ -4073,7 +4073,7 @@ package tsp {
             ppath CURRENT DYNAMIC
             prompt {Last X value (MJD) to Plot}
           }
-                
+
          parameter line {
             type _LOGICAL
             vpath DEFAULT
@@ -4081,7 +4081,7 @@ package tsp {
             default FALSE
             prompt {Plot as Continuous Line}
           }
-            
+
          parameter errors {
             type _LOGICAL
             vpath DEFAULT
@@ -4097,7 +4097,7 @@ package tsp {
             default 1
             prompt {SGS Pen to Plot In}
           }
-              
+
          parameter size {
             type _REAL
             vpath DEFAULT
@@ -4113,7 +4113,7 @@ package tsp {
             default 0.90
             prompt {Coordinates of top of plot}
           }
-                
+
          parameter pbottom {
             type _REAL
             vpath DEFAULT
@@ -4137,8 +4137,8 @@ package tsp {
             default PHASEPLOT.DAT
             prompt {Name of Text File}
           }
-                
-                
+
+
       }
       action tsprofile {
 

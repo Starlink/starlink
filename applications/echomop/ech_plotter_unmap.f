@@ -86,7 +86,7 @@
       CALL ECH_REPORT( 0, STRING )
       OBJECT = PATH_NAME
       PLEN = ECH_WORD_LEN( PATH_NAME )
-      IF ( INDEX .GT. 0 ) 
+      IF ( INDEX .GT. 0 )
      :   OBJECT = PATH_NAME( :PLEN ) // CINDICIES // ' '
 
 *  Unmap the object if it is already mapped.

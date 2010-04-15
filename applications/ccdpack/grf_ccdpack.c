@@ -244,9 +244,9 @@ int astGLine( int n, const float *x, const float *y ){
 *  Parameters:
 *     n
 *        The number of positions to be joined together.
-*     x 
+*     x
 *        A pointer to an array holding the "n" x values.
-*     y 
+*     y
 *        A pointer to an array holding the "n" y values.
 
 *  Synopsis:
@@ -315,9 +315,9 @@ int astGMark( int n, const float *x, const float *y, int type ){
 *  Parameters:
 *     n
 *        The number of markers to draw.
-*     x 
+*     x
 *        A pointer to an array holding the "n" x values.
-*     y 
+*     y
 *        A pointer to an array holding the "n" y values.
 *     type
 *        An integer which can be used to indicate the type of marker symbol
@@ -391,11 +391,11 @@ int astGText( const char *text, float x, float y, const char *just,
 *     -  Any unrecognised character in "just" causes an error.
 
 *  Parameters:
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
-*     x 
+*     x
 *        The reference x coordinate.
-*     y 
+*     y
 *        The reference y coordinate.
 *     just
 *        A character string which specifies the location within the
@@ -403,21 +403,21 @@ int astGText( const char *text, float x, float y, const char *just,
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", or 'B' for "bottom", and specifies the
 *        vertical location of the reference position. Note, "bottom"
-*        corresponds to the base-line of normal text. Some characters 
-*        (eg "y", "g", "p", etc) descend below the base-line. The second 
-*        character may be 'L' for "left", 'C' for "centre", or 'R' 
-*        for "right", and specifies the horizontal location of the 
+*        corresponds to the base-line of normal text. Some characters
+*        (eg "y", "g", "p", etc) descend below the base-line. The second
+*        character may be 'L' for "left", 'C' for "centre", or 'R'
+*        for "right", and specifies the horizontal location of the
 *        reference position. If the string has less than 2 characters
-*        then 'C' is used for the missing characters. 
+*        then 'C' is used for the missing characters.
 *     upx
 *        The x component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        left to right on the screen.
 *     upy
 *        The y component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        bottom to top on the screen.
 
 *  Synopsis:
@@ -459,9 +459,9 @@ int astGText( const char *text, float x, float y, const char *just,
 
 /* Local Variables: */
    char lj[ 2 ];
-   float uplen, xbox[ 4 ], ybox[ 4 ];   
+   float uplen, xbox[ 4 ], ybox[ 4 ];
    float angle, fjust, hu, test, alpha, beta;
-   int i, tbg;   
+   int i, tbg;
 
 /* Check that there is something to draw. */
    if( text && text[ 0 ] != 0 ){
@@ -489,7 +489,7 @@ int astGText( const char *text, float x, float y, const char *just,
          lj[ 1 ] = 'C';
       }
 
-/* Find the conversion factors between increment in world coordinate axes, 
+/* Find the conversion factors between increment in world coordinate axes,
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
       if( !astGAxScale( &alpha, &beta ) ) return 0;
@@ -523,15 +523,15 @@ int astGText( const char *text, float x, float y, const char *just,
 
 /* Normalise the up-vector in world coordinates. */
          uplen = sqrt( (double) (upx*upx + upy*upy) );
-         if( uplen > 0.0 ){ 
+         if( uplen > 0.0 ){
             upx /= uplen;
             upy /= uplen;
          } else {
             astError( AST__GRFER, "astGText: Zero length up-vector supplied.");
             return 0;
          }
-      
-/* Find the height of the text above the base-line. Note, the PGPLOT  
+
+/* Find the height of the text above the base-line. Note, the PGPLOT
    manual is not clear about the order of the corners returned by
    pgqtxt, so we have to find the largest distance between
    the corners in the direction of the supplied up-vector. */
@@ -553,12 +553,12 @@ int astGText( const char *text, float x, float y, const char *just,
       }
 
 /* Display the text, using the currently set PGPLOT background colour. */
-      ccpgptxt( x, y, angle, fjust, (char *) text ); 
+      ccpgptxt( x, y, angle, fjust, (char *) text );
    }
-   
+
 /* Return. */
    return 1;
-}               
+}
 
 int astGAxScale( float *alpha, float *beta ){
 /*
@@ -631,15 +631,15 @@ int astGAxScale( float *alpha, float *beta ){
 
 /* Local Variables: */
    float nx1, nx2, ny1, ny2, wx1, wx2, wy1, wy2;
-   int ret;   
+   int ret;
 
-/* Find the conversion factors between increment in world coordinate axes, 
+/* Find the conversion factors between increment in world coordinate axes,
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
    ccpgqvp( 2, &nx1, &nx2, &ny1, &ny2 );
    ccpgqwin( &wx1, &wx2, &wy1, &wy2 );
-   
-   if( wx2 != wx1 && wy2 != wy1 && 
+
+   if( wx2 != wx1 && wy2 != wy1 &&
        nx2 != nx1 && ny2 != ny1 ) {
       *alpha= ( nx2 - nx1 ) / ( wx2 - wx1 );
       *beta = ( ny2 - ny1 ) / ( wy2 - wy1 );
@@ -666,7 +666,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *     Starlink C
 
 *  Description:
-*     This function returns the corners of a box which would enclose the 
+*     This function returns the corners of a box which would enclose the
 *     supplied character string if it were displayed using astGText.
 *
 *     The returned box INCLUDES any leading or trailing spaces.
@@ -684,11 +684,11 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *     -  Zero is returned for all bounds of the box if an error occurs.
 
 *  Parameters:
-*     text 
+*     text
 *        Pointer to a null-terminated character string to be displayed.
-*     x 
+*     x
 *        The reference x coordinate.
-*     y 
+*     y
 *        The reference y coordinate.
 *     just
 *        A character string which specifies the location within the
@@ -696,21 +696,21 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *        given by x and y. The first character may be 'T' for "top",
 *        'C' for "centre", or 'B' for "bottom", and specifies the
 *        vertical location of the reference position. Note, "bottom"
-*        corresponds to the base-line of normal text. Some characters 
-*        (eg "y", "g", "p", etc) descend below the base-line. The second 
-*        character may be 'L' for "left", 'C' for "centre", or 'R' 
-*        for "right", and specifies the horizontal location of the 
+*        corresponds to the base-line of normal text. Some characters
+*        (eg "y", "g", "p", etc) descend below the base-line. The second
+*        character may be 'L' for "left", 'C' for "centre", or 'R'
+*        for "right", and specifies the horizontal location of the
 *        reference position. If the string has less than 2 characters
-*        then 'C' is used for the missing characters. 
+*        then 'C' is used for the missing characters.
 *     upx
 *        The x component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        left to right on the screen.
 *     upy
 *        The y component of the up-vector for the text, in graphics world
 *        coordinates. If necessary the supplied value should be negated
-*        to ensure that positive values always refer to displacements from 
+*        to ensure that positive values always refer to displacements from
 *        bottom to top on the screen.
 *     xb
 *        An array of 4 elements in which to return the x coordinate of
@@ -758,11 +758,11 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 
 /* Local Variables: */
    char lj[ 2 ];
-   float udx, udy, vdx, vdy, vx, vy, uplen, xbox[ 4 ], 
-         ybox[ 4 ], uxu, uyu, uxd, uyd, ux, uy;   
+   float udx, udy, vdx, vdy, vx, vy, uplen, xbox[ 4 ],
+         ybox[ 4 ], uxu, uyu, uxd, uyd, ux, uy;
    float angle, width, test, xl, yl;
    float alpha, beta, xc, yc, hu, hd, a, b;
-   int i;   
+   int i;
 
 /* Initialise the returned values to indicate no box available. */
    for( i = 0; i < 4; i++ ){
@@ -796,7 +796,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
          lj[ 1 ] = 'C';
       }
 
-/* Find the conversion factors between increment in world coordinate axes, 
+/* Find the conversion factors between increment in world coordinate axes,
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
       if( !astGAxScale( &alpha, &beta ) ) return 0;
@@ -812,7 +812,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 
 /* Normalise the up-vector to a length of 1 millimetre. */
       uplen = sqrt( (double) (ux*ux + uy*uy) );
-      if( uplen > 0.0 ){ 
+      if( uplen > 0.0 ){
          ux /= uplen;
          uy /= uplen;
       } else {
@@ -820,7 +820,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
          return 0;
       }
 
-/* Form the base-line vector by rotating the up-vector by 90 degrees 
+/* Form the base-line vector by rotating the up-vector by 90 degrees
    clockwise. */
       vx = uy;
       vy = -ux;
@@ -838,8 +838,8 @@ int astGTxExt( const char *text, float x, float y, const char *just,
          ybox[ i ] *= beta;
       }
 
-/* Find the height of the bounding box, in millimetres. Note, 
-   the PGPLOT manual is not clear about the order of the corners 
+/* Find the height of the bounding box, in millimetres. Note,
+   the PGPLOT manual is not clear about the order of the corners
    returned by pgqtxt, so we have to find the largest distance between
    the corners in the direction of the supplied up-vector. The reference
    point is on the text base-line which is not usually at the bottom of
@@ -867,7 +867,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
    using pglen instead of using the bounding box returned by pgqtxt. */
       ccpglen( 2, (char *) text, &xl, &yl );
 
-/* The abolute width of the string in millimetres may depend on the   
+/* The abolute width of the string in millimetres may depend on the
    up-vector. The values returned by pglen are for horizontal and
    vertical text. Find the width using the supplied up-vector. */
       a = uy*xl;
@@ -938,10 +938,10 @@ int astGTxExt( const char *text, float x, float y, const char *just,
       yb[ 3 ] = yc - vdy + udy;
 
    }
-   
+
 /* Return. */
    return 1;
-}               
+}
 
 int astGQch( float *chv, float *chh ){
 /*
@@ -1022,8 +1022,8 @@ int astGQch( float *chv, float *chh ){
 /* Get the bounds of the PGPLOT window in world coordinates. */
    ccpgqwin( &wx1, &wx2, &wy1, &wy2 );
 
-/* Convert the text height from normalised device coordinates into world 
-   coordinates for vertical text. Print an error message if the viewport 
+/* Convert the text height from normalised device coordinates into world
+   coordinates for vertical text. Print an error message if the viewport
    has zero size. */
    if( vx1 != vx2 ){
       *chv *= ( wx2 - wx1 )/( vx2 - vx1 );
@@ -1032,10 +1032,10 @@ int astGQch( float *chv, float *chh ){
       astError( AST__GRFER, "astGQch: The graphics viewport has zero size "
                 "in the X direction.");
       return 0;
-   }   
+   }
 
-/* Convert the text height from normalised device coordinates into world 
-   coordinates for horizontal text. Print an error message if the viewport 
+/* Convert the text height from normalised device coordinates into world
+   coordinates for horizontal text. Print an error message if the viewport
    has zero size. */
    if( vy1 != vy2 ){
       *chh *= ( wy2 - wy1 )/( vy2 - vy1 );
@@ -1043,11 +1043,11 @@ int astGQch( float *chv, float *chh ){
       astError( AST__GRFER, "astGQch: The graphics viewport has zero size "
                 "in the Y direction.");
       return 0;
-   }   
+   }
 
 /* Return. */
    return 1;
-}               
+}
 
 int astGAttr( int attr, double value, double *old_value, int prim ){
 /*
@@ -1080,10 +1080,10 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 *           GRF__SIZE   - Character and marker size scale factor.
 *           GRF__FONT   - Character font.
 *           GRF__COLOUR - Colour index.
-*     value 
+*     value
 *        A new value to store for the attribute. If this is AST__BAD
 *        no value is stored.
-*     old_value 
+*     old_value
 *        A pointer to a double in which to return the attribute value.
 *        If this is NULL, no value is returned.
 *     prim
@@ -1147,9 +1147,9 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
          ccpgsls( ival );
       }
 
-/* If required retrieve the current line width, and set a new line width. 
+/* If required retrieve the current line width, and set a new line width.
    Line width is stored in Plot as a scale factor (1.0 for the default line
-   width which is a fixed fraction of the diagonal of the view surface), but 
+   width which is a fixed fraction of the diagonal of the view surface), but
    pgplot stores it in units of 0.005 of an inch. */
    } else if( attr == GRF__WIDTH ){
 
@@ -1177,11 +1177,11 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
             ival = 1;
          } else if( ival > 201 ){
             ival = 201;
-         } 
+         }
          ccpgslw( ival );
       }
 
-/* If required retrieve the current character size, and set a new size. 
+/* If required retrieve the current character size, and set a new size.
    The attribute value should be a factor by which to multiply the
    default character size. */
    } else if( attr == GRF__SIZE ){
@@ -1219,7 +1219,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
       }
 
 /* Give an error message for any other attribute value. */
-   } else {     
+   } else {
       astError( AST__GRFER, "astGAttr: Unknown graphics attribute '%d' "
                 "requested.", attr );
       return 0;
@@ -1290,10 +1290,10 @@ static void ccpgpt(int n, float xpts[], float ypts[], int symbol){
 }
 
 static void ccpgptxt(float x, float y, float angle, float fjust, char *text ){
-   F77_REAL_TYPE X;   
-   F77_REAL_TYPE Y;   
-   F77_REAL_TYPE ANGLE;   
-   F77_REAL_TYPE FJUST;   
+   F77_REAL_TYPE X;
+   F77_REAL_TYPE Y;
+   F77_REAL_TYPE ANGLE;
+   F77_REAL_TYPE FJUST;
    DECLARE_CHARACTER(LTEXT,MXSTRLEN);
    int ftext_length;
 
@@ -1306,17 +1306,17 @@ static void ccpgptxt(float x, float y, float angle, float fjust, char *text ){
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    astStringExport( text, LTEXT, ftext_length );
 
-   F77_CALL(pgptxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE), 
+   F77_CALL(pgptxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
                      REAL_ARG(&FJUST), CHARACTER_ARG(LTEXT)
                      TRAIL_ARG(ftext) );
 }
 
 static void ccpgqtxt(float x, float y, float angle, float fjust, char *text,
                      float xbox[], float ybox[]){
-   F77_REAL_TYPE X;   
-   F77_REAL_TYPE Y;   
-   F77_REAL_TYPE ANGLE;   
-   F77_REAL_TYPE FJUST;   
+   F77_REAL_TYPE X;
+   F77_REAL_TYPE Y;
+   F77_REAL_TYPE ANGLE;
+   F77_REAL_TYPE FJUST;
    DECLARE_CHARACTER(LTEXT,MXSTRLEN);
    F77_REAL_TYPE XBOX[ 4 ];
    F77_REAL_TYPE YBOX[ 4 ];
@@ -1332,7 +1332,7 @@ static void ccpgqtxt(float x, float y, float angle, float fjust, char *text,
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    astStringExport( text, LTEXT, ftext_length );
 
-   F77_CALL(pgqtxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE), 
+   F77_CALL(pgqtxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
                      REAL_ARG(&FJUST), CHARACTER_ARG(LTEXT),
                      REAL_ARRAY_ARG(XBOX), REAL_ARRAY_ARG(YBOX)
                      TRAIL_ARG(ftext) );
@@ -1382,7 +1382,7 @@ static void ccpglen(int units, char *text, float *xl, float *yl ){
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    astStringExport( text, LTEXT, ftext_length );
 
-   F77_CALL(pglen)( INTEGER_ARG(&UNITS), CHARACTER_ARG(LTEXT), 
+   F77_CALL(pglen)( INTEGER_ARG(&UNITS), CHARACTER_ARG(LTEXT),
                     REAL_ARG(&XL), REAL_ARG(&YL) TRAIL_ARG(ftext) );
 
    *xl = (float) XL;
@@ -1395,7 +1395,7 @@ static void ccpgqvp(int units, float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE X2;
    F77_REAL_TYPE Y1;
    F77_REAL_TYPE Y2;
-   
+
    UNITS = (F77_INTEGER_TYPE) units;
    F77_CALL(pgqvp)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
                     REAL_ARG(&Y1), REAL_ARG(&Y2) );
@@ -1411,7 +1411,7 @@ static void ccpgqvsz(int units, float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE X2;
    F77_REAL_TYPE Y1;
    F77_REAL_TYPE Y2;
-   
+
    UNITS = (F77_INTEGER_TYPE) units;
    F77_CALL(pgqvsz)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
                     REAL_ARG(&Y1), REAL_ARG(&Y2) );

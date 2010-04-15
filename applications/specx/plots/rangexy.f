@@ -36,7 +36,7 @@ C  Ok, go...
       IF (IERR.NE.0) RETURN
 
 C     First find maximum and minimum values in unmasked data
- 
+
       BLIM = +1.E20
       ULIM = -1.E20
 

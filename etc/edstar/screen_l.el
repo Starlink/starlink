@@ -17,7 +17,7 @@
     (progn
       (copy-face 'default 'edstar-screen-limit-face)
       (set-face-background 'edstar-screen-limit-face "red")))
-    
+
 ;;; Set overlays to mark lines which are too long.
   (defun edstar-set-screen-limits (start end)
     (if edstar-right-screen-limit
@@ -45,7 +45,7 @@
 		      (overlay-put ov 'face 'edstar-screen-limit-face)
 		      (overlay-put ov 'edstar-screen-limit t))))
 	      (setq more (and (= (forward-line 1) 0) (<= (point) last))))))))
-    
+
   (defun edstar-zap-screen-limits (start end)
     (let (pos last more ov ovlist)
       (setq pos (save-excursion

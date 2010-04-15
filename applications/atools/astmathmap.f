@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application creates a new MathMap and optionally initialises
-*     its attributes. 
+*     its attributes.
 *
 *     A MathMap is a Mapping which allows you to specify a set of forward
 *     and/or inverse transformation functions using arithmetic operations
@@ -34,8 +34,8 @@
 *     Mapping whose descriptions may be stored as part of a dataset and
 *     interpreted by other programs.
 *
-*     See the reference documentation for the AstMathMap constructor in 
-*     SUN/210 for a complete description of the syntax of the transformation 
+*     See the reference documentation for the AstMathMap constructor in
+*     SUN/210 for a complete description of the syntax of the transformation
 *     functions.
 
 *  Usage:
@@ -44,17 +44,17 @@
 *  ADAM Parameters:
 *     FWD =  (Read)
 *        A group expression specifying the expressions defining the forward
-*        transformation. The number of forward transformation functions 
+*        transformation. The number of forward transformation functions
 *        supplied must be at least equal to NOUT, but may be increased to
 *        accommodate any additional expressions which define intermediate
-*        variables for the forward transformation. The syntax of these 
+*        variables for the forward transformation. The syntax of these
 *        expressions is described in SUN/210
 *     INV =  (Read)
 *        A group expression specifying the expressions defining the inverse
-*        transformation. The number of inverse transformation functions 
+*        transformation. The number of inverse transformation functions
 *        supplied must be at least equal to NIN, but may be increased to
 *        accommodate any additional expressions which define intermediate
-*        variables for the inverse transformation. The syntax of these 
+*        variables for the inverse transformation. The syntax of these
 *        expressions is described in SUN/210
 *     NIN = _INTEGER (Read)
 *        Number of input variables for the MathMap. This determines the
@@ -63,8 +63,8 @@
 *        Number of output variables for the MathMap. This determines the
 *        value of its Nout attribute.
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new MathMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new MathMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new MathMap.
 
@@ -107,8 +107,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Status:
       INTEGER STATUS
@@ -118,8 +118,8 @@
       PARAMETER( MAXEXP = 100 )
 
 *  Local Variables:
-      CHARACTER FWD( MAXEXP )*(GRP__SZNAM) 
-      CHARACTER INV( MAXEXP )*(GRP__SZNAM) 
+      CHARACTER FWD( MAXEXP )*(GRP__SZNAM)
+      CHARACTER INV( MAXEXP )*(GRP__SZNAM)
       INTEGER IGRP
       INTEGER NFWD
       INTEGER NIN
@@ -128,23 +128,23 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the number of input coordinates.
-      CALL PAR_GDR0I( 'NIN', 2, 1, NDF__MXDIM, .FALSE., NIN, STATUS ) 
+      CALL PAR_GDR0I( 'NIN', 2, 1, NDF__MXDIM, .FALSE., NIN, STATUS )
 
 *  Get the number of output coordinates.
-      CALL PAR_GDR0I( 'NOUT', 2, 1, NDF__MXDIM, .FALSE., NOUT, STATUS ) 
+      CALL PAR_GDR0I( 'NOUT', 2, 1, NDF__MXDIM, .FALSE., NOUT, STATUS )
 
-*  Get a GRP group holding the algebraic expressions for the forward 
+*  Get a GRP group holding the algebraic expressions for the forward
 *  transformation.
       IGRP = GRP__NOID
       CALL KPG1_GTGRP( 'FWD', IGRP, NFWD, STATUS )
-      DO WHILE( NFWD .LT. NOUT .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( NFWD .LT. NOUT .AND. STATUS .EQ. SAI__OK )
          CALL MSG_SETI( 'N', NOUT )
          CALL MSG_OUT( 'ASTMATHMAP_MSG1', 'At least ^N forward '//
      :                 'expressions are required - please enter '//
@@ -164,12 +164,12 @@
       END IF
 
 *  Copy the expressions into a local array.
-      CALL GRP_GET( IGRP, 1, NFWD, FWD, STATUS ) 
+      CALL GRP_GET( IGRP, 1, NFWD, FWD, STATUS )
 
-*  Likewise, get a GRP group holding the algebraic expressions for the 
+*  Likewise, get a GRP group holding the algebraic expressions for the
 *  inverse transformation.
       CALL KPG1_GTGRP( 'INV', IGRP, NINV, STATUS )
-      DO WHILE( NINV .LT. NIN .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( NINV .LT. NIN .AND. STATUS .EQ. SAI__OK )
          CALL MSG_SETI( 'N', NIN )
          CALL MSG_OUT( 'ASTMATHMAP_MSG2', 'At least ^N inverse '//
      :                 'expressions are required - please enter '//
@@ -189,7 +189,7 @@
       END IF
 
 *  Copy the expressions into a local array, and delete the group.
-      CALL GRP_GET( IGRP, 1, NINV, INV, STATUS ) 
+      CALL GRP_GET( IGRP, 1, NINV, INV, STATUS )
       CALL GRP_DELET( IGRP, STATUS )
 
 *  Create the required MathMap.

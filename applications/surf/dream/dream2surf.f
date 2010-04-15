@@ -18,11 +18,11 @@
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This routine reads in a DREAM format file and converts it
 *     into a file format that can be processed by SURF.
-*     This new file will have been 'REDUCE_SWITCH'ed and 
+*     This new file will have been 'REDUCE_SWITCH'ed and
 *     'FLATFIELD'ed.
 
 *  Usage:
@@ -72,12 +72,12 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'       ! Starlink status
       INCLUDE 'DAT_PAR'       ! DAT__ constants
@@ -100,7 +100,7 @@
 *  Local Constants:
       INTEGER       DREAM__NBYTES
       PARAMETER     (DREAM__NBYTES = 4)  ! Number of bytes per DREAM record
-      INTEGER       SRECSIZE                 
+      INTEGER       SRECSIZE
       PARAMETER     (SRECSIZE = 4096)          ! Small record size in bytes
       INTEGER       HEADER
       PARAMETER     (HEADER   = 5120)          ! Nr of I4 in Header records
@@ -111,7 +111,7 @@
       PARAMETER (LAT_OBS = 19.8258323669)
       DOUBLE PRECISION LONG_OBS          ! Longitude of JCMT (degrees)
       PARAMETER (LONG_OBS = 204.520278931)
-       
+
 
 
 *  Local variables:
@@ -123,10 +123,10 @@
                                                  ! the bolometer flatfield was
                                                  ! measured
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
-                                                 ! Nasmyth dU3 coords of 
+                                                 ! Nasmyth dU3 coords of
                                                  ! bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
-                                                 ! Nasmyth dU4 coords of 
+                                                 ! Nasmyth dU4 coords of
                                                  ! bolometers
       INTEGER          BOL_QUAL (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                                  ! bolometer flatfield quality
@@ -193,7 +193,7 @@
       INTEGER RECIN           ! Current input record
       INTEGER RECORD          ! Record number in input file
       INTEGER RECSS           ! Record size in words
-      CHARACTER *20 RUNNO     ! Run number in 0 padded form (eg 0015) 
+      CHARACTER *20 RUNNO     ! Run number in 0 padded form (eg 0015)
       CHARACTER * 80 STEMP    ! Scratch string
       INTEGER UBND ( 2 )      ! Upper bounds of output NDF
 
@@ -201,7 +201,7 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*     Read in the DREAM file (currently assume that 
+*     Read in the DREAM file (currently assume that
 *     user will supply full path or use $DREAM_OUT
 
       CALL RIO_ASSOC('IN', 'READ', 'UNFORMATTED', SRECSIZE, FD,
@@ -235,7 +235,7 @@
 
 *     Ask for the number of cycles to be selected
       MAXCYC = r_Ncycle - FSCYCLE + 1
-      CALL PAR_GDR0I('NRCYCLE', MAXCYC, 1, MAXCYC, .FALSE., 
+      CALL PAR_GDR0I('NRCYCLE', MAXCYC, 1, MAXCYC, .FALSE.,
      :     NRCYCLE, STATUS)
 
 *     Now we can start doing things.
@@ -372,7 +372,7 @@
 *     Axis 1: bolometers   2: Data
 
 *     Deal with BOLOMETER axis
- 
+
       CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
      :     OUT_A_PTR, ITEMP, STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
@@ -384,7 +384,7 @@
 *     Integrations
       CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
      :     OUT_A_PTR, ITEMP, STATUS)
- 
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_NFILLR (ITEMP, %val(OUT_A_PTR))
          CALL SCULIB_MULCAR(ITEMP, %VAL(OUT_A_PTR), 1.0/REAL(NPIX),
@@ -472,7 +472,7 @@
 *     Loop over cycles
       DO I = FSCYCLE, NRCYCLE
          LST = LST_STRT + (DBLE(I-1) * DLST)
-         
+
          CALL VEC_DTOD(.FALSE., 1, LST,
      :        %VAL(DEM_PNTR + (I-FSCYCLE) * VAL__NBD), IERR, NERR,
      :        STATUS)
@@ -506,7 +506,7 @@
 
       ITEMP = 0
       DO I = 0, MAX_PIX  - 1
-         IF (INT_POS(I) .NE. - 1) THEN 
+         IF (INT_POS(I) .NE. - 1) THEN
             ITEMP = ITEMP + 1
             JIGL_X(ITEMP) = JIG_X(I)
             JIGL_Y(ITEMP) = JIG_Y(I)
@@ -599,10 +599,10 @@
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'SAM_MODE', 'JIGGLE', 'Sampling method', STATUS)
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SAM_CRDS', 'NA', 'Coordinate system of sampling mesh', 
+     :     'SAM_CRDS', 'NA', 'Coordinate system of sampling mesh',
      :     STATUS)
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SAM_PA', -1, 'Scan P.A. rel. to lat. line; 0=lat, 90=long', 
+     :     'SAM_PA', -1, 'Scan P.A. rel. to lat. line; 0=lat, 90=long',
      :     STATUS)
 
 *     Coordinates of observation
@@ -626,7 +626,7 @@
 *     Store in token
       CALL MSG_SETC('DEC', STEMP)
 
-*     Determine Right ascension 
+*     Determine Right ascension
       RA = DBLE(RAHH) + (DBLE(RAMN)/60.0D0) + (DBLE(RASS)/3600.0D0)
       IPOSN = 0
       CALL CHR_RTOAN(REAL(RA), 'HOURS', STEMP, IPOSN)
@@ -676,7 +676,7 @@
 *     Write the date
 *      STEMP = '1998:1:1'
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'UTDATE', STEMP, 'UT Date of observation', STATUS)     
+     :     'UTDATE', STEMP, 'UT Date of observation', STATUS)
 
 
 
@@ -713,7 +713,7 @@
 *     Also store STEND
       IPOSN = 0
 
-      DTEMP = LST_STRT + (DLST * DBLE(FSCYCLE + NRCYCLE - 1) 
+      DTEMP = LST_STRT + (DLST * DBLE(FSCYCLE + NRCYCLE - 1)
      :     * 180.0D0 / (PI * 15.0D0))
       CALL CHR_DTOAN(DTEMP,
      :     'HOURS',STEMP, IPOSN)
@@ -729,17 +729,17 @@
 
 *     Set up MAP_X and MAP_Y offsets
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :      'MAP_X', 0.0, 
+     :      'MAP_X', 0.0,
      :      'Map X offset from telescope centre (arcsec)',
      :      STATUS)
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :      'MAP_Y', 0.0, 
+     :      'MAP_Y', 0.0,
      :      'Map Y offset from telescope centre (arcsec)',
      :      STATUS)
 
 *     Number of bolometers
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :      'N_BOLS', R_NBOL, 
+     :      'N_BOLS', R_NBOL,
      :      'Number of bolometers selected', STATUS)
 
 *     State of the observation (anything except ABORT)
@@ -774,7 +774,7 @@
      :     'LAT-OBS', LAT_OBS, 'Latitude of observatory (degrees)',
      :     STATUS)
       CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'LONG-OBS', LONG_OBS, 
+     :     'LONG-OBS', LONG_OBS,
      :     'East Longitude of observatory (degrees)',
      :     STATUS)
 
@@ -827,7 +827,7 @@
 
 
 *     Write FITS component
-      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', 1, N_FITS, 
+      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', 1, N_FITS,
      :     OUT_FITS_LOC, STATUS)
       CALL DAT_PUT1C (OUT_FITS_LOC, N_FITS, FITS, STATUS)
 
@@ -843,7 +843,7 @@
 
 *     Close the NDF and shut down the NDF system (write DREAM history)
       CALL NDF_ANNUL(OUT_NDF, STATUS)
- 
+
 *     It seems that the only way to write multiple history
 *     entries is to open and close the NDF multiple times!
 
@@ -853,7 +853,7 @@
 
 *     Need to write REDUCE_SWITCH and FLATFIELD tags to fool SURF
 *     into thinking that the data have been processed by these tasks
-      CALL NDF_HPUT(' ', 'REDUCE_SWITCH', .TRUE., 1, 
+      CALL NDF_HPUT(' ', 'REDUCE_SWITCH', .TRUE., 1,
      :     'This is a dummy history component to fool SURF',
      :     .FALSE., .TRUE., .FALSE., OUT_NDF, STATUS)
 
@@ -865,7 +865,7 @@
       CALL NDF_ASSOC('OUT', 'UPDATE', OUT_NDF, STATUS)
 
 
-      CALL NDF_HPUT(' ', 'FLATFIELD', .TRUE., 1, 
+      CALL NDF_HPUT(' ', 'FLATFIELD', .TRUE., 1,
      :     'This is a dummy history component to fool SURF',
      :     .FALSE., .TRUE., .FALSE., OUT_NDF, STATUS)
 
@@ -906,7 +906,7 @@
 *     MAX_PTS = INTEGER (Given)
 *        Max number of jiggle positions in SURF data
 *     START_POS = INTEGER (Given)
-*        Start position (Time axis) in SURF array 
+*        Start position (Time axis) in SURF array
 *     JIG_QUAL = INTEGER ( N_JIG )
 *        Array determining whether a jiggle position was used
 *        or not. Not used if equal to -1.
@@ -916,7 +916,7 @@
 *        The SURF data array
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     This routine converts the DREAM data (JIGGLE, BOL)
 *     to SURF format (BOL, JIGGLE) whilst removing the jiggle
@@ -943,12 +943,12 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'       ! Starlink status
 *      INCLUDE 'SCU_SOL'       ! Description of DREAM header file
@@ -983,11 +983,11 @@
 *     Loop over bolometers
       DO BOL = 1, N_BOL
 
-*     Loop over jiggle positions. Note that DREAM has more jiggle 
+*     Loop over jiggle positions. Note that DREAM has more jiggle
 *     positions defined than are actually stored so keep track
 *     with a counter
          CURRENT = 0
-         
+
          DO JIG = 1, N_JIG
 
             IF (JIG_QUAL(JIG) .NE. -1) THEN
@@ -1045,7 +1045,7 @@
 *        Modified julian date
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
- 
+
 *  Description:
 *     Converts a UT to local sidereal time and Modified Julian date
 
@@ -1070,12 +1070,12 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global constants:
       INCLUDE 'SAE_PAR'       ! Starlink status
 
@@ -1149,12 +1149,12 @@
 
 *     Equation of the equinoxes
       EQEQX = SLA_EQEQX( MJD )
-      
+
 *     Local sidereal time = Greenwich mean sidereal time +
 *                           Equation of the equinox +
 *                           Longitude in radians
 
-      LST = GMST + EQEQX + (LONGITUDE * DD2R) 
+      LST = GMST + EQEQX + (LONGITUDE * DD2R)
 
 *     Add 24 h if less than 0
       IF (LST .LT. 0.0D0) LST = LST + (2.0 * DPI)

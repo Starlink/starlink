@@ -49,12 +49,12 @@ f     - AST_SETREFPOS: Set reference position in any celestial system
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -202,7 +202,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* GeoLat. */
 /* ------- */
-/* Retained for backward compatibility with older versions of AST in which 
+/* Retained for backward compatibility with older versions of AST in which
    TemplateClass had GeoLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( !strcmp( attrib, "geolat" ) ) {
       astClearAttrib( this, "obslat" );
@@ -227,7 +227,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "templateclass.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that )
 
 *  Class Membership:
 *     TemplateClass member function (over-rides the astEqual protected
@@ -293,7 +293,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "templateclass.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this )
 
 *  Class Membership:
 *     TemplateClass member function (over-rides the astGetObjSize protected
@@ -435,7 +435,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          if ( !result ) {
             astError( AST__SCSIN,
                      "astGetAttrib(%s): Corrupt %s contains invalid AlignStdOfRest "
-                     "identification code (%d).", astGetClass( this ), 
+                     "identification code (%d).", astGetClass( this ),
                      astGetClass( this ), (int) sor );
          }
       }
@@ -483,7 +483,7 @@ void astInitTemplateClassVtab_(  AstTemplateClassVtab *vtab, const char *name ) 
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -653,7 +653,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* GeoLat. */
 /* ------- */
-/* Retained for backward compatibility with older versions of AST in which 
+/* Retained for backward compatibility with older versions of AST in which
    TemplateClass had GeoLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( nc = 0,
               ( 0 == astSscanf( setting, "geolat=%n%*s %n", &off, &nc ) )
@@ -742,7 +742,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* GeoLat. */
 /* ------- */
-/* Retained for backward compatibility with older versions of AST in which 
+/* Retained for backward compatibility with older versions of AST in which
    TemplateClass had GeoLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( !strcmp( attrib, "geolat" ) ) {
       result = astTestAttrib( this, "obslat" );
@@ -769,7 +769,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *     AlignSpecOffset
 
 *  Purpose:
-*     Align TemplateClasss using the offset coordinate system? 
+*     Align TemplateClasss using the offset coordinate system?
 
 *  Type:
 *     Public attribute.
@@ -782,14 +782,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *     behaves when it is used (by
 c     astFindTemplateParent or astConvert) as a template to match another (target)
 f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
-*     TemplateClass. It determines whether alignment occurs between the offset 
-*     values defined by the current value of the SpecOffset attribute, or 
+*     TemplateClass. It determines whether alignment occurs between the offset
+*     values defined by the current value of the SpecOffset attribute, or
 *     between the corresponding absolute spectral values.
 *
-*     The default value of zero results in the two TemplateClasss being aligned 
-*     so that a given absolute spectral value in one is mapped to the same 
-*     absolute value in the other. A non-zero value results in the TemplateClasss 
-*     being aligned so that a given offset value in one is mapped to the same 
+*     The default value of zero results in the two TemplateClasss being aligned
+*     so that a given absolute spectral value in one is mapped to the same
+*     absolute value in the other. A non-zero value results in the TemplateClasss
+*     being aligned so that a given offset value in one is mapped to the same
 *     offset value in the other.
 
 *  Applicability:
@@ -888,7 +888,7 @@ static void Delete( AstObject *obj ) {
 *     This function attempts to execute even if the global error status is
 *     set.
 */
-   
+
 /* Local Variables: */
    AstTemplateClass *this;
    int i;
@@ -978,7 +978,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
          if ( !sval ) {
             astError( AST__SCSIN,
                      "%s(%s): Corrupt %s contains invalid standard of rest "
-                     "identification code (%d).", "astWrite", 
+                     "identification code (%d).", "astWrite",
                      astGetClass( channel ), astGetClass( this ), (int) sor );
          }
       }
@@ -997,13 +997,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Standard class functions. */
 /* ========================= */
-/* Implement the astIsATemplateClass and astCheckTemplateClass functions using the 
+/* Implement the astIsATemplateClass and astCheckTemplateClass functions using the
    macros defined for this purpose in the "object.h" header file. */
 astMAKE_ISA(TemplateClass,TemplateParent,check,&class_init)
 astMAKE_CHECK(TemplateClass)
 
 
->>> Change constructor argument list 
+>>> Change constructor argument list
 AstTemplateClass *astTemplateClass_( >>> const char *options, ... ) {
 /*
 *+
@@ -1065,7 +1065,7 @@ AstTemplateClass *astTemplateClass_( >>> const char *options, ... ) {
 
 /* Initialise the TemplateClass, allocating memory and initialising the virtual
    function table as well if necessary. */
-   new = astInitTemplateClass( NULL, sizeof( AstTemplateClass ), !class_init, 
+   new = astInitTemplateClass( NULL, sizeof( AstTemplateClass ), !class_init,
                            &class_vtab, "TemplateClass" );
 
 /* If successful, note that the virtual function table has been initialised. */
@@ -1177,7 +1177,7 @@ AstTemplateClass *astInitTemplateClass_( void *mem, size_t size, int init,
 /* ----------------------------- */
 /* Initialise all attributes to their "undefined" values. */
 >>>
-      new->alignstdofrest = AST__BADSOR;    
+      new->alignstdofrest = AST__BADSOR;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -1189,7 +1189,7 @@ AstTemplateClass *astInitTemplateClass_( void *mem, size_t size, int init,
 }
 
 AstTemplateClass *astLoadTemplateClass_( void *mem, size_t size,
-                                 AstTemplateClassVtab *vtab, 
+                                 AstTemplateClassVtab *vtab,
                                  const char *name, AstChannel *channel ) {
 /*
 *+
@@ -1205,7 +1205,7 @@ AstTemplateClass *astLoadTemplateClass_( void *mem, size_t size,
 *  Synopsis:
 *     #include "templateclass.h"
 *     AstTemplateClass *astLoadTemplateClass( void *mem, size_t size,
-*                                      AstTemplateClassVtab *vtab, 
+*                                      AstTemplateClassVtab *vtab,
 *                                      const char *name, AstChannel *channel )
 
 *  Class Membership:
@@ -1355,7 +1355,7 @@ AstTemplateClass *astLoadTemplateClass_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 >>>
-void astGetRefPos_( AstTemplateClass *this, AstSkyTemplateParent *frm, double *lon, 
+void astGetRefPos_( AstTemplateClass *this, AstSkyTemplateParent *frm, double *lon,
                     double *lat ){
    if ( !astOK ) return;
    (**astMEMBER(this,TemplateClass,GetRefPos))(this,frm,lon,lat);
@@ -1466,7 +1466,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the TemplateClass, allocating memory and initialising the virtual
    function table as well if necessary. */
-   new = astInitTemplateClass( NULL, sizeof( AstTemplateClass ), !class_init, 
+   new = astInitTemplateClass( NULL, sizeof( AstTemplateClass ), !class_init,
                            &class_vtab, "TemplateClass" >>> );
 
 /* If successful, note that the virtual function table has been initialised. */

@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +91,7 @@
       REAL XHIGH, YHIGH       ! Upper bound of the current window
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get bounds of window.
@@ -99,7 +99,7 @@
       XCEN = 0.5 * ( XLOW + XHIGH )
       YCEN = 0.5 * ( YLOW + YHIGH )
 
-*  Set defaults to current region. Report the co-ordinates of the current 
+*  Set defaults to current region. Report the co-ordinates of the current
 *  window.
       CALL MSG_SETR( 'X1', XLOW )
       CALL MSG_SETR( 'Y1', YLOW )
@@ -111,7 +111,7 @@
       REPEAT = .TRUE.
       DO WHILE ( REPEAT )
 
-*  Store the maximum and minimum values permitted for passing to the PAR 
+*  Store the maximum and minimum values permitted for passing to the PAR
 *  routine.  Also use these as the suggested defaults.
          LIML( 1 ) = XLOW
          LIML( 2 ) = YLOW

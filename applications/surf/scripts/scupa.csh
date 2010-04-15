@@ -1,4 +1,4 @@
-#!/bin/csh 
+#!/bin/csh
 
 # Script to run scuquick on an observation, display and overlay array
 #   Tim Jenness (1997-06-19)
@@ -66,7 +66,7 @@ endif
 
 echo "Running data through SURF tasks..."
 
-scuquick -quick -notau -rebin -quiet --sub=$sub MSG_FILTER=quiet OUT_COORDS=AZ OUT=$out $in 
+scuquick -quick -notau -rebin -quiet --sub=$sub MSG_FILTER=quiet OUT_COORDS=AZ OUT=$out $in
 
 # Now I have an output file which contains the subinstrument name!
 

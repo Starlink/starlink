@@ -35,7 +35,7 @@ C                  arc coefficients permissible.
 C     (!) COEFFS   (Double Precision array COEFFS(NC))  The polynomial
 C                  arc coefficients giving wavelength as a function of
 C                  channel number for an echelle order.
-C     (!) NCOEFF   (Integer)  The number of arc coefficients selected by 
+C     (!) NCOEFF   (Integer)  The number of arc coefficients selected by
 C                  the user for use in the fit.
 C     (>) PARMS    (Real array PARMS(2)) Parameters for use in the auto
 C                  fit routine.
@@ -49,7 +49,7 @@ C     (!) CHANS    (Real Array CHANS(NLMAX))  The channel numbers of arc
 C                  lines identified so far, into which new line IDs are
 C                  also recorded.
 C     (!) WAVES    (Real Array WAVES(NLMAX))  The wavelengths of arc lines
-C                  identified so far, into which new line IDs are also 
+C                  identified so far, into which new line IDs are also
 C                  recorded.
 C     (!) CLASS    (Integer Array CLASS(NLMAX))  The class code of lines
 C                  identified so far, into which new line IDs are also
@@ -74,7 +74,7 @@ C                  a single order.
 C     (W) ARCTOT   (Real array ARCTOT(3*NLARCS))  Workspace array for
 C                  the combined list of ARC1, ARC2, and ARC3.
 C     (!) WEIGHTS  (Real array WEIGHTS(NLMAX))  An array giving the
-C                  weight to be applied to a certain line when 
+C                  weight to be applied to a certain line when
 C                  calculating a polynomial fit.
 C     (W) PTRS     (Integer array PTRS(NX))  Workspace array for ECH_ARCFIT.
 C     (W) WORK1    (Double precision array WORK1(*)) Workspace     "   "   .
@@ -323,7 +323,7 @@ C
                   CALL PGPOINT(K,XPLOT,YPLOT,3)
                END IF
             END DO
-         END IF   
+         END IF
       END IF
 C
 C     This is the main loop over orders of ZDATA and WDATA ...
@@ -343,15 +343,15 @@ C           DO I=1,NINTFIT,1
 C              IORDR=ABS(INTFIT(I)-FORDR)+1
 C              IF (IORDR.EQ.J) THEN
 C                 FIT=.TRUE.
-C              END IF                                      
+C              END IF
 C           END DO
 C        ELSE
             FIT=(FITS(J).EQ.2)
-            IF ((.NOT.FIT).AND.(NZ.EQ.NZSEARCH+1)) 
+            IF ((.NOT.FIT).AND.(NZ.EQ.NZSEARCH+1))
      :         CALL PAR_WRUSER(' *** 2nd PASS RESULTS ***',STATUS)
-            IF ((.NOT.FIT).AND.(NZ.EQ.NZSEARCH+2)) 
+            IF ((.NOT.FIT).AND.(NZ.EQ.NZSEARCH+2))
      :         CALL PAR_WRUSER(' *** 3rd PASS RESULTS ***',STATUS)
-            IF ((.NOT.FIT).AND.(NZ.EQ.NZSEARCH+3)) 
+            IF ((.NOT.FIT).AND.(NZ.EQ.NZSEARCH+3))
      :         CALL PAR_WRUSER(' *** 4th PASS RESULTS ***',STATUS)
             IF (FITS(J).EQ.0) THEN
                CALL ECH_ARDELE(ORDERN,0,NLMAX,ORDER,CHANS,WAVES,
@@ -361,7 +361,7 @@ C        END IF
 C
          IF (.NOT.FIT) THEN
 C
-C           We must find arc lines automatically below.  Start by 
+C           We must find arc lines automatically below.  Start by
 C              filling the 1D arrays ZPTS and WPTS, and perform 1st fit...
 C
             DO I=1,NX,1
@@ -501,7 +501,7 @@ C
       CALL PAR_WRUSER(STRING,STATUS)
 *-
                            NREJEX=NREJEX+1
-C 
+C
                         END IF
 C
                      ELSE
@@ -595,7 +595,7 @@ C
                         ELSE
 C
 C                          Throw away both lines
-C 
+C
 *+
       CALL PAR_WRUSER(
      :   'Rejected current and previous lines because neither is '//
@@ -627,17 +627,17 @@ C
                      ISRCHK=MAX(1,IWAVEK-5)
 C
                   ELSE
-C 
+C
 C                    No obvious line nearby, so keep looking next time from
 C                       where we left off this time...
-C                      
+C
                      ISRCHK=MAX(1,IWAVEK-1)
 C
                   END IF
 C
                END DO
 C
-C              Done identifying lines in the current order "I".  To play it 
+C              Done identifying lines in the current order "I".  To play it
 C                 safe, sort the NEWxx arrays before going ahead to and re-
 C                 computing the coefficients based on the lines we found ...
 C
@@ -778,7 +778,7 @@ C              found....
 C
             OLDNLID = NLID
             DO K=1,NEWNL,1
-               I = 1                             
+               I = 1
                MATCH = 0
                DO WHILE (I.LE.OLDNLID.AND.MATCH.EQ.0)
                   IF (ORDER(I).EQ.ORDERN.AND.

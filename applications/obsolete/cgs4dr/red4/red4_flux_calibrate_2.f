@@ -1,10 +1,10 @@
-*+  RED4_FLUX_CALIBRATE_2, general flux manipulation procedure 
-      SUBROUTINE RED4_FLUX_CALIBRATE_2( FVALUE, BAND, INPUT, OUTPUT, 
+*+  RED4_FLUX_CALIBRATE_2, general flux manipulation procedure
+      SUBROUTINE RED4_FLUX_CALIBRATE_2( FVALUE, BAND, INPUT, OUTPUT,
      :  RFLAMBDA, FLUX, STATUS )
 *    Description :
 *     This routine accepts magnitudes and fluxes and outputs a flux
 *     value in selected units.
-*      CALL SUBROUTINE RED4_FLUX_CALIBRATE_2( FVALUE, BAND, INPUT, OUTPUT, 
+*      CALL SUBROUTINE RED4_FLUX_CALIBRATE_2( FVALUE, BAND, INPUT, OUTPUT,
 *     :  RFLAMBDA, FLUX, STATUS )
 *    Parameters :
 *     FVALUE    = REAL( READ )
@@ -13,7 +13,7 @@
 *           The input band for the flux or magnitude
 *           Expects one of V, J, H, K, L, L', M, N, Q or 'Flux'
 *     INPUT     = CHAR( READ )
-*           The input units of FVALUE 
+*           The input units of FVALUE
 *           Expects one of MAG, W/M2/UM, W/M2/HZ, ERGS/S/CM2/UM or MJY
 *     OUTPUT    = CHAR( READ )
 *           The output units of FVALUE
@@ -22,7 +22,7 @@
 *     RFLAMBDA  = REAL( READ )
 *           The standard or BB reference wavelength (in microns)
 *     FLUX      = REAL( UPDATE )
-*           The output flux in the given units based upon values 
+*           The output flux in the given units based upon values
 *           for Vega as given in the IRTF Photometry Handbook (Feb 1986)
 *    STATUS     = INTEGER( UPDATE )
 *           The global ADAM status
@@ -78,7 +78,7 @@
 *    Internal References :
 *    Local data : from IRTF Photometry Handbook, February 1986
       DATA KNOWN_BANDS / ' ',
-     :   'V', 'J', 'H', 'K', 'L', 'L''', 'M', ' ', ' ', ' ', 
+     :   'V', 'J', 'H', 'K', 'L', 'L''', 'M', ' ', ' ', ' ',
      :   'N', ' ', ' ', ' ', 'Q'/
       DATA KNOWN_LAMBDA /0.0E00,
      :   0.5556, 1.25, 1.65, 2.20, 3.45, 3.80, 4.80, 7.8, 8.7,
@@ -126,7 +126,7 @@
 
          OUTPUT = 'mJy'
          OUTPUT_POS = 4
-      ELSE 
+      ELSE
 
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_FLUX_CALIBRATE_2: '/
@@ -149,7 +149,7 @@
       ELSE IF ( INPUT .EQ. 'MJY' ) THEN
 
          INPUT_POS = 4
-      ELSE 
+      ELSE
 
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'RED4_FLUX_CALIBRATE_2: '/
@@ -194,11 +194,11 @@
          CALL ERR_REP( ' ', 'RED4_FLUX_CALIBRATE_2: '/
      :     /'Unknown magnitude band or flux option', STATUS)
       ENDIF
- 
+
 *    Report the difference between the reference lambda and the band
       DELTA_LAMBDA = ABS( RFLAMBDA - KNOWN_LAMBDA( ARRAY_POS ) )
       CALL MSG_SETR( 'DELTA_LAMBDA', DELTA_LAMBDA )
-      CALL MSG_OUT( ' ', 
+      CALL MSG_OUT( ' ',
      :  'Reference and band wavelength differ by '/
      :  /'^DELTA_LAMBDA microns', STATUS )
 
@@ -223,7 +223,7 @@
          IF ( OUTPUT_POS .EQ. 4 ) FLUX = REAL(FLUX4)
 
          CALL MSG_SETR( 'FLUX', FLUX )
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :      'The flux at the band wavelength is ^FLUX', STATUS )
 
          GOTO 500
@@ -264,7 +264,7 @@
          IF ( OUTPUT_POS .EQ. 4 ) FLUX = REAL(FLUX4)
 
          CALL MSG_SETR( 'FLUX', FLUX )
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :      'The flux at the reference wavelength is ^FLUX', STATUS )
 
          GOTO 500

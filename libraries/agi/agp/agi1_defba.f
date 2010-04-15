@@ -16,12 +16,12 @@
 *  Description:
 *     This defines the coordinate system of the base picture for the
 *     given workstation. The coordinate system is calculated to be the
-*     same as that used by GKS to enable interoperability of AGI database 
-*     entries. The PGPLOT view surface is defined to be represented by NDC 
+*     same as that used by GKS to enable interoperability of AGI database
+*     entries. The PGPLOT view surface is defined to be represented by NDC
 *     coodinates of (0,1.,0,1.) even on rectangular devices while GKS
 *     always maintains a square aspect ratio until explicitly altered.
 *
-*     GKS compatible representations of the device, normalised device and 
+*     GKS compatible representations of the device, normalised device and
 *     world coordinates of the base picture are returned.
 
 *  Arguments:
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -115,7 +115,7 @@
 
 *   Get view surface size in inches
             CALL PGQVSZ( 2, VSURSZ(1), VSURSZ(2), VSURSZ(3), VSURSZ(4) )
-	 
+
 *   Calculate the normalised device coordinates for this display
             D = MAX( ABS( VSURSZ(2) ), ABS( VSURSZ(4) ) )
             XN = VSURSZ(2) / D

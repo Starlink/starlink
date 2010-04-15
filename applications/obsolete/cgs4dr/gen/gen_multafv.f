@@ -52,7 +52,7 @@ C
       INTEGER  GOOD, BAD
       PARAMETER (BAD = 1, GOOD = 0)
 C
-C     Handle different quality methods separately.  
+C     Handle different quality methods separately.
 C
       IF (QUAL) THEN
 C

@@ -100,7 +100,7 @@ char *ems1Gthreadbuf( void )
     /*  If the thread ID doesn't match that of the initial thread then then
      *  look for a local table. If not found create one and associate it as
      *  thread-specific data. */
-    if ( ems_thread_initial_set == 0 || 
+    if ( ems_thread_initial_set == 0 ||
          pthread_equal( pthread_self(), ems_thread_initial_id ) ) {
 
         /* This is the initial thread, so we use the global static buffer. */

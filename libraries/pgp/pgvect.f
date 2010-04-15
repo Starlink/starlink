@@ -88,7 +88,7 @@ C
 C Ignore vector if element of A and B are both equal to BLANK
 C
             IF (.NOT.(A(I,J).EQ.BLANK .AND. B(I,J).EQ.BLANK)) THEN
- 
+
 C
 C Define the vector starting and end points according to NC.
 C
@@ -108,7 +108,7 @@ C
                   X2 = X1 + A(I,J)*CC
                   Y2 = Y1 + B(I,J)*CC
                END IF
-C     
+C
 C Draw vector.
 C
                CALL PGARRO(X1, Y1, X2, Y2)

@@ -10,8 +10,8 @@ C     Function:
 C        Subtract a Q,U vector from a polarization spectrum.
 C
 C     Description:
-C        QUSUB subtracts a percentage polarization expressed as a Q,U 
-C        vector from a polarization spectrum. This can be used as a 
+C        QUSUB subtracts a percentage polarization expressed as a Q,U
+C        vector from a polarization spectrum. This can be used as a
 C        crude correction for interstellar polarization.
 C
 C     Parameters:
@@ -28,7 +28,7 @@ C
 C-
 C
 C  History:
-C    Jan/1988   Original Version.   JAB/AAO 
+C    Jan/1988   Original Version.   JAB/AAO
 C    28/2/1988   TSP Monolith version.  JAB/AAO
 C
 
@@ -81,7 +81,7 @@ C
       IF (ACTDIM .NE. 1) THEN
           CALL MSG_OUT('OUT','Invalid Dimensions',STATUS)
           STATUS = USER__001
-      ENDIF             
+      ENDIF
       SIZE = DIMS(1)
 
 *  Map the intensity data
@@ -99,13 +99,13 @@ C
       CALL TSP_MAP_DATA(ULOC,'UPDATE',UPTR,UDLOC,STATUS)
 
 *  Do the subtraction
-                    
+
       IF (STATUS .EQ. SAI__OK) THEN
         CALL TSP_QUSUB(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(UPTR),
      :    QVAL,UVAL,STATUS)
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(IDLOC,STATUS)
       CALL TSP_UNMAP(QDLOC,STATUS)
@@ -116,7 +116,7 @@ C
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-      
+
 
        SUBROUTINE TSP_QUSUB(SIZE,INT,Q,U,QVAL,UVAL,STATUS)
 *+
@@ -126,7 +126,7 @@ C
 *   QUSUB command
 *
 *   Subroutine to do the polarization vector subtraction
-*       
+*
 *   (>)  SIZE  (Integer)          The number of spectral points
 *   (>)  INT   (Real array(SIZE)) The intensity array
 *   (>)  Q     (Real array(SIZE)) The Q array
@@ -134,7 +134,7 @@ C
 *   (>)  QVAL  (Real array(SIZE)) The percentage Q value to subtract
 *   (>)  UVAL  (Real array(SIZE)) The percentage U value to subtract
 *   (!)  STATUS (Integer)         Status value
-*   
+*
 *   Jeremy Bailey   28/2/1988
 *
 *   Modified:
@@ -151,7 +151,7 @@ C
       INTEGER SIZE
       REAL INT(SIZE),Q(SIZE),U(SIZE)
       REAL QVAL,UVAL
-      INTEGER STATUS     
+      INTEGER STATUS
 
 *  Local variables
       INTEGER I

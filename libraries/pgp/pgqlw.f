@@ -12,7 +12,7 @@ C--
 C  5-Nov-1985 - new routine [TJP].
 C-----------------------------------------------------------------------
       LOGICAL PGNOTO
-C     
+C
       IF (PGNOTO('PGQLW')) THEN
          LW = 1
       ELSE

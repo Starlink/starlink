@@ -9,7 +9,7 @@ C
 C     The VARIANCE array, if present, is propagated in exactly the same
 C     way as the DATA array.  This procedure it not formally correct if
 C     re-sampling occurs (that is, if either of the shifts is
-C     non-integer) and in this case the resulting variance will probably 
+C     non-integer) and in this case the resulting variance will probably
 C     under-estimate the true error.
 C
 C     Command parameters -
@@ -25,7 +25,7 @@ C            shifted in Y.  Sense is as for XSHIFT.
 C
 C     XSPLIT (Numeric) The number of sub-divisions to be made in
 C            each of the original pixels in X.
-C   
+C
 C            Note that if both YSHIFT and XSHIFT are integers, the
 C            routine will just perform a fast data move, rather
 C            than hit the problem with the big hammer of a general
@@ -35,7 +35,7 @@ C     YSPLIT (Numeric) The number of sub-divisions to be made in
 C            each of the original pixels in Y.
 C
 C            Note that if XSPLIT or YSPLIT are greater than 1,
-C            the data will be interpolated using a fit to a 2D 
+C            the data will be interpolated using a fit to a 2D
 C            parabola.  This increases the accuracy (sometimes)
 C            of the rebinning, but results in increased CPU usage.
 C
@@ -91,12 +91,12 @@ C
       INTEGER      NELM          ! Total number of elements in data
       INTEGER      NPIX          ! Size of 1st dimension
       INTEGER      NLINE         ! Size of 2nd dimension (if present)
-      INTEGER      OPTR          ! Dynamic-memory pointer to output data 
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
                                  ! array
       INTEGER      OSLOT         ! Map slot number for output data array
-      INTEGER      OVPTR         ! Dynamic-memory pointer to output 
-                                 ! variance 
-      INTEGER      OVSLOT        ! Map slot number for output variance 
+      INTEGER      OVPTR         ! Dynamic-memory pointer to output
+                                 ! variance
+      INTEGER      OVSLOT        ! Map slot number for output variance
                                  ! array
       INTEGER      PX            ! Workspace pointer
       INTEGER      PXSLOT        ! Map slot number for workspace
@@ -120,7 +120,7 @@ C
       REAL         YSHIFT        !
       LOGICAL      VEXIST        ! TRUE if a variance array exists
       INTEGER      VPTR          ! Dynamic-memory pointer to input
-                                 ! variance 
+                                 ! variance
       INTEGER      VSLOT         ! Map slot number for input variance
                                  ! array
 C
@@ -203,7 +203,7 @@ C
          CALL DSA_GET_WORK_ARRAY(2*(NPIX+3),'FLOAT',PY,PYSLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
 C
-C        Set the remaining parameters for FIG_REBIN2D and then let it 
+C        Set the remaining parameters for FIG_REBIN2D and then let it
 C        get on with the job.
 C
          MODE=1

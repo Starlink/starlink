@@ -3,7 +3,7 @@ C+
 C
 C     F I T _ W L O G
 C
-C     Writes a logical keyword into a FITS header.  Assumes 
+C     Writes a logical keyword into a FITS header.  Assumes
 C     FIT_INIT has been called to initialise the header routines.
 C
 C     Parameters -  (">" input, "<" output)

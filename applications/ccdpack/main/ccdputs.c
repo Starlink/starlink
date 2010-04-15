@@ -15,7 +15,7 @@
 *  Description:
 *     The message supplied to this command is output via ADAM message
 *     system.  According to the flags it may be output to the ADAM
-*     message system direct using a MSG_OUT call, or via the CCDPACK 
+*     message system direct using a MSG_OUT call, or via the CCDPACK
 *     logging system using CCD1_MSG or CCD1_ERREP calls.
 
 *  Arguments:
@@ -23,7 +23,7 @@
 *        The following options may be submitted:
 *           -log
 *               This will cause the message to be written via the CCDPACK
-*               logging system using the CCD1_MSG call (should not be used 
+*               logging system using the CCD1_MSG call (should not be used
 *               with -error).
 *           -error
 *               This will cause the message to be written via the CCDPACK
@@ -37,7 +37,7 @@
 *        will be passed directly to the ADAM message system using a
 *        MSG_OUT call.
 *     message ?message ...? = string
-*        All message arguments will be concatenated and output as the 
+*        All message arguments will be concatenated and output as the
 *        message.  The total length must not exceed MSG__SZMSG characters.
 
 *  Usage:
@@ -150,7 +150,7 @@
       for ( i = nflag + 1; i < objc; i++ ) {
          msg = Tcl_GetStringFromObj( objv[ i ], &mleng );
          if ( strlen( buffer ) + mleng >= MSG__SZMSG ) {
-            Tcl_SetObjResult( interp, 
+            Tcl_SetObjResult( interp,
                               Tcl_NewStringObj( "Message too long", -1 ) );
             return TCL_ERROR;
          }
@@ -170,7 +170,7 @@
       }
       else {
 
-/* We are running freestanding.  Simply output the message to standard 
+/* We are running freestanding.  Simply output the message to standard
    output. */
          printf( "%s\n", buffer );
       }

@@ -1,11 +1,11 @@
-      SUBROUTINE KPS1_MFGNS( PARNAM, AXIS, NDIM, DIMS, 
+      SUBROUTINE KPS1_MFGNS( PARNAM, AXIS, NDIM, DIMS,
      :                       NCSECT, SECT, STATUS )
 *+
 *  Name:
 *     KPS1_MFGNS
 
 *  Purpose:
-*     Obtains the NDF section to average for automatic range 
+*     Obtains the NDF section to average for automatic range
 *     determination for MFITTREND.
 
 *  Language:
@@ -15,7 +15,7 @@
 *     CALL KPS1_MFGNS( PARNAM, AXIS, NDIM, DIMS, NCSECT, SECT, STATUS )
 
 *  Description:
-*     This routine serves MFITTREND.  It returns an NDF section 
+*     This routine serves MFITTREND.  It returns an NDF section
 *     describing the lines that are to be averaged and analysed
 *     to specfify regions to exclude from the detrending.  This section
 *     is supplied through an ADAM parameter (argument PARNAM) unless the
@@ -128,13 +128,13 @@
 
 *  If the NDF is one-dimensional, there's no section to access, and we
 *  set the null default, meaning use all the data.
-      NCSECT = 0 
+      NCSECT = 0
       SECT = ''
 
-      IF ( UDIM .GT. 1 ) THEN 
+      IF ( UDIM .GT. 1 ) THEN
          DEFSEC = .FALSE.
 
-*  Obtain the NDF section.  
+*  Obtain the NDF section.
          CALL PAR_GET0C( PARNAM, SECT, STATUS )
          NCSECT = CHR_LEN( SECT )
 
@@ -143,7 +143,7 @@
             DEFSEC = .TRUE.
 
 *  Along the axis whose lines are to be detrended, the section should
-*  be the full pixel axis.  Thus split the section into its 
+*  be the full pixel axis.  Thus split the section into its
 *  comma-separated elements, remove any subsections along the detrend
 *  axis, and reform the section string.  This step also removes surplus
 *  dimensions.
@@ -151,19 +151,19 @@
             CALL CHR_TRCHR( ',', ' ', SECT, STATUS )
             CALL CHR_DCWRD( SECT, NDF__MXDIM, NWORD, STWORD, ENWORD,
      :                      WORDS, STATUS )
-               
+
             SECT = ' '
             NCSECT = 0
             DO I = 1, NDIM
                IF ( I .NE. AXIS ) THEN
                   CALL CHR_APPND( WORDS( I ), SECT, NCSECT )
                END IF
-               IF ( I .LT. NDIM ) CALL CHR_APPND( ',', SECT, NCSECT ) 
+               IF ( I .LT. NDIM ) CALL CHR_APPND( ',', SECT, NCSECT )
             END DO
          END IF
 
 *  Form a default section.  It is arbitrary, but call a representative
-*  region the square root of the dimension along each pixel axis 
+*  region the square root of the dimension along each pixel axis
 *  located about its centre.  This does not apply to the axis whose
 *  lines are to be fitted.
          IF ( DEFSEC ) THEN
@@ -171,12 +171,12 @@
             NCSECT = 0
             DO I = 1, NDIM
                IF ( I .NE. AXIS ) THEN
-                  SDIM = MAX( MIN( 10, DIMS( I ) ), 
+                  SDIM = MAX( MIN( 10, DIMS( I ) ),
      :                        NINT( SQRT( REAL( DIMS( I ) ) ) ) )
                   CALL CHR_APPND( '~', SECT, NCSECT )
                   CALL CHR_PUTI( SDIM, SECT, NCSECT )
                END IF
-               IF ( I .LT. NDIM ) CALL CHR_APPND( ',', SECT, NCSECT ) 
+               IF ( I .LT. NDIM ) CALL CHR_APPND( ',', SECT, NCSECT )
             END DO
 
          END IF

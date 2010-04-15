@@ -34,7 +34,7 @@ C     (<) SIGMA   (Real) The standard deviation of the data in the subset
 C     (<) SIZE    (Real) The number of pixels in the subset (this is
 C                 not necessarily that implied by IXST,IYST etc, if these
 C                 parameters would take the subset outside the array
-C                 bounds.  SIZE is the number of pixels actually examined, 
+C                 bounds.  SIZE is the number of pixels actually examined,
 C                 or if some of the points are flagged as bad.
 C     (>) QUAL    (Logical)    True if input has quality information
 C     (>) FLAGS   (Logical)    True if input has flagged data values
@@ -43,7 +43,7 @@ C
 C                                               KS / AA0 19th March 1987
 C     Modified:
 C
-C     17th Nov  1990  PRB / ROE.  Modified from GEN_ASTAT2 to handle 
+C     17th Nov  1990  PRB / ROE.  Modified from GEN_ASTAT2 to handle
 C     quality or flagged values on the data.
 C+
       IMPLICIT NONE

@@ -30,7 +30,7 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        A parameter to which the name of the newly created text file
 *        will be written. IRAS90 applications should use parameter
-*        NDFLIST. 
+*        NDFLIST.
 *     IGRP = INTEGER (Given)
 *        The GRP identifier for the group containing the names of the
 *        NDFs.
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -80,7 +80,7 @@
       PARAMETER ( FNAME = 'ircampack_ndfs.lis' )
 
 *  Local Variables:
-      
+
       CHARACTER
      :        COMMNT*80,         ! A comment to store in the file.
      :        DUM1*1,            ! Dummy argument
@@ -126,7 +126,7 @@
 *  Attempt to delete any existing file with the same name.
          CALL ERR_MARK
          CALL FIO_ERASE( FILE( : LHOME + LFNAME )//';0', STATUS )
-      
+
 *  If an error occured, annul it and continue.
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE

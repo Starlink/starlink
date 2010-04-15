@@ -15,37 +15,37 @@
 *  Description:
 *     This routine merges two FITS headers, each supplied in an AST
 *     FitsChan, in one of several different ways. The resulting merged
-*     list of headers is returned in a new FitsChan. 
+*     list of headers is returned in a new FitsChan.
 
 *  Arguments:
 *     METHOD = INTEGER (Given)
 *        Indicates how the two FITS headers should be merged:
-*        
-*        1 - Concatenation. Store the contents of FC1 in the returned 
-*            FitsChan, and then append the contents of FC2 to the end of 
-*            the returned FitsChan. No checks are made for multiple 
+*
+*        1 - Concatenation. Store the contents of FC1 in the returned
+*            FitsChan, and then append the contents of FC2 to the end of
+*            the returned FitsChan. No checks are made for multiple
 *            occurences of the same keyword.
 *
-*        2 - Union (with priority given to FC2): For every header in FC1, see 
-*            if FC2 contains the same keyword. If it does not, copy the FC1 
-*            header to the returned FitsChan. Then append the contents of FC2 
+*        2 - Union (with priority given to FC2): For every header in FC1, see
+*            if FC2 contains the same keyword. If it does not, copy the FC1
+*            header to the returned FitsChan. Then append the contents of FC2
 *            to the end of the returned FitsChan.
 *
-*        3 - Overlap: For every header in FC1, see if FC2 contains the same 
+*        3 - Overlap: For every header in FC1, see if FC2 contains the same
 *            keyword. If it does, and if the keyword value is the same in
-*            both FitsChans, copy the FC1 header to the returned FitsChan. 
+*            both FitsChans, copy the FC1 header to the returned FitsChan.
 *     FC1 = INTEGER (Given)
-*        Pointer to the first FitsChan. 
+*        Pointer to the first FitsChan.
 *     FC2 = INTEGER (Given)
-*        Pointer to the second FitsChan. 
+*        Pointer to the second FitsChan.
 *     FC3 = INTEGER (Returned)
-*        Pointer to the returned FitsChan. 
+*        Pointer to the returned FitsChan.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  The contents of FC1 and FC2 are unchanged on exit.
-*     -  For METHOD 3 (overlap), floating point values are compared 
+*     -  For METHOD 3 (overlap), floating point values are compared
 *     by formatting into a string (using the accuracy specified by the
 *     FitsDigits attributes of the two supplied FitsChans) and then
 *     comparing the formatted strings for exact equality.
@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -100,7 +100,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -155,7 +155,7 @@
          FC3 = AST_COPY( FC1, STATUS )
 
 *  Ensure the current card in FC3 is the "end-of-file".
-         CALL AST_SETI( FC3, 'CARD', 
+         CALL AST_SETI( FC3, 'CARD',
      :                  AST_GETI( FC3, 'NCARD', STATUS ) + 1, STATUS )
 
 *  Loop round all the cards in FC2
@@ -180,7 +180,7 @@
 *  Loop round all cards in FC3.
          DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .TRUE., STATUS ) )
 
-*  We retain cards from FC1 that do not have a value (i.e. cards which do 
+*  We retain cards from FC1 that do not have a value (i.e. cards which do
 *  not have an equals sign in column 10 )
             IF( CARD( 9 : 10 ) .EQ. '= ' ) THEN
 
@@ -193,7 +193,7 @@
 *  call to AST_FINDFITS advances the curent card on each invocation, so
 *  the current card at the moment is the one following the card described in
 *  CARD).
-                  CALL AST_SETI( FC3, 'CARD', 
+                  CALL AST_SETI( FC3, 'CARD',
      :                           AST_GETI( FC3, 'CARD', STATUS ) - 1,
      :                           STATUS )
 
@@ -212,7 +212,7 @@
 
 
 *  Method 3: Store cards in FC3 which are present in both FC1 and FC2.
-*  Both the keyword name and the keyword value must match for the card 
+*  Both the keyword name and the keyword value must match for the card
 *  to be included in FC3.
 *  --------------------------------------------------------------------
       ELSE IF( METHOD .EQ. 3 ) THEN
@@ -223,11 +223,11 @@
 *  Rewind FC3 so that AST FindFits searches from the first card in FC3.
          CALL AST_CLEAR( FC3, 'CARD', STATUS )
 
-*  Loop round all cards in FC3 (note, AST_FINDFITS does NOT advance to 
+*  Loop round all cards in FC3 (note, AST_FINDFITS does NOT advance to
 *  the next card because of the .FALSE. fourth argument).
          DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .FALSE., STATUS ) )
 
-*  We retain cards from FC1 that do not have a value (i.e. cards which do 
+*  We retain cards from FC1 that do not have a value (i.e. cards which do
 *  not have an equals sign in column 10 )
             IF( CARD( 9 : 10 ) .EQ. '= ' ) THEN
 
@@ -249,7 +249,7 @@
 
 *  Get the values for comparison and store in VALUE2 and VALUE3
                      DUMMY = AST_GETFITSS( FC2, CARD, VALUE2, STATUS )
-                     DUMMY = AST_GETFITSS( FC3, CARD, VALUE3, STATUS ) 
+                     DUMMY = AST_GETFITSS( FC3, CARD, VALUE3, STATUS )
 
 *  See if we have a match
                      IF ( VALUE2 .EQ. VALUE3 ) THEN
@@ -270,7 +270,7 @@
 
 * Otherwise, move on to the next card in FC3
                   ELSE
-                     CALL AST_SETI( FC3, 'CARD', 
+                     CALL AST_SETI( FC3, 'CARD',
      :                              AST_GETI( FC3, 'CARD', STATUS ) + 1,
      :                              STATUS )
                   END IF
@@ -281,7 +281,7 @@
                END IF
 
             ELSE
-               CALL AST_SETI( FC3, 'CARD', 
+               CALL AST_SETI( FC3, 'CARD',
      :                        AST_GETI( FC3, 'CARD', STATUS ) + 1,
      :                        STATUS )
             END IF
@@ -289,11 +289,11 @@
 
 *  Report an error for any other method.
 *  -------------------------------------
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN 
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'M', METHOD )
          CALL ERR_REP( 'ATL_MGFTS_ERR1', 'ATL_MGFTS: Illegal METHOD'//
-     :                 ' value (^M) supplied (programming error).', 
+     :                 ' value (^M) supplied (programming error).',
      :                 STATUS )
       END IF
 
@@ -308,7 +308,7 @@
 
 *  If an error occurred, delete any returned FitsCHan.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL AST_ANNUL( FC3, STATUS )         
+         CALL AST_ANNUL( FC3, STATUS )
       END IF
 
       END

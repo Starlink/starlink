@@ -11,7 +11,7 @@ C     Copy a TSP structure from one locator to another
 C
 C  Description:
 C     Given a locator to a TSP structure, a complete copy of the structure
-C     is created at a second locator. 
+C     is created at a second locator.
 C
 C  Language:
 C     FORTRAN
@@ -22,10 +22,10 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) LOC		(Fixed string,descr) A locator to the
-C                       top level of the object to 
+C                       top level of the object to
 C                       be copied (e.g. supplied by DAT_ASSOC)
 C     (>) LOC2          (Fixed string,descr) A locator to the top level
-C                       object of an empty structure in which the 
+C                       object of an empty structure in which the
 C                       copy will be created (e.g. supplied by DAT_CREAT)
 C     (!) STATUS	(Integer,ref) The Status
 C
@@ -65,20 +65,20 @@ C
       INTEGER NDIMS,I,SUB(1)
 C
       IF (STATUS .EQ. SAI__OK) THEN
-                             
+
           CALL NDF_BEGIN
           CALL NDF_IMPRT(LOC,ID1,STATUS)
           CALL NDF_PLACE(LOC2,' ',PLACE,STATUS)
           CALL NDF_COPY(ID1,PLACE,ID2,STATUS)
           IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_NDF_END(STATUS)                        
+             CALL TSP_NDF_END(STATUS)
              IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL(STATUS)
           ENDIF
 C
 C  Make sure items are defined as some NDF applications will complain
 C  about undefined items. (It doesn't seem to be possible to do this
 C  using NDF itself).
-C  
+C
           CALL ERR_MARK
           IF (STATUS .NE. SAI__OK) RETURN
           CALL DAT_FIND(LOC2,'TITLE',TLOC,STATUS)
@@ -130,7 +130,7 @@ C
               ENDIF
               CALL DAT_ANNUL(TLOC3,STATUS)
               CALL DAT_ANNUL(TLOC2,STATUS)
-          ENDDO    
+          ENDDO
           CALL DAT_ANNUL(TLOC,STATUS)
           IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL(STATUS)
           CALL ERR_RLSE

@@ -97,7 +97,7 @@ bootstrap GSD  $VERSION;
 
 =head1 OBJECT ORIENTED INTERFACE
 
-An OO interface is provided. This can be used to hide 
+An OO interface is provided. This can be used to hide
 the GSD layer from the user.
 
 =head2 Constructors
@@ -128,7 +128,7 @@ sub new ($$) {
   # Return undef on error
   return undef if $status != 0;
 
-  # Strip trsiling space 
+  # Strip trsiling space
   $label =~ s/\s+$//;
 
   # Create the object (an anon hash) and populate it
@@ -231,7 +231,7 @@ sub Find ($$) {
       return (undef, undef, undef, undef);
     }
   } else {
-    return ( $status == 0 ? $itemno : undef );    
+    return ( $status == 0 ? $itemno : undef );
   }
 }
 
@@ -379,7 +379,7 @@ sub Item ($$) {
     }
   } else {
     $name =~ s/\s+$//;
-    return ( $status == 0 ? $name : undef );    
+    return ( $status == 0 ? $name : undef );
   }
 }
 
@@ -419,7 +419,7 @@ sub InqSize ($$) {
 =item B<DESTROY>
 
 Automatic destructor. This tidies up the object and frees
-memory when the object goes out of scope. It is not 
+memory when the object goes out of scope. It is not
 necessary to run this method explicitly.
 
 This methods runs C<gsdClose> so that the user does not
@@ -532,9 +532,9 @@ sub _getTypedData {
   # If the method is there, run it
   if ($self->can($method) ) {
     if ($array) {
-      my ($dimnm, $dimunt, $dimvals, $size) = $self->InqSize($itemno);      
+      my ($dimnm, $dimunt, $dimvals, $size) = $self->InqSize($itemno);
       if (defined $size) {
-	# We need to specify the correct dimensions here so that 
+	# We need to specify the correct dimensions here so that
 	# the PDL subclass will get the shape correct
 	my (@start, @end);
 	foreach (@$dimvals) {
@@ -670,14 +670,14 @@ sub NEXTKEY {
 
 # SHARED TIE METHODS
 
-sub FETCH { 
+sub FETCH {
   # Need to see whether we are fetching a number (ARRAY) or string
   my $key = $_[1];
 
   my @data;
   if ($key =~ /^-?\d+$/) {
     # We have an ARRAY
-    # Need to take care of negative indices and also 
+    # Need to take care of negative indices and also
     # that counting starts at 0 for a perl array
     if ($key >= 0) {
       $key++;  # increment offset
@@ -690,7 +690,7 @@ sub FETCH {
     @data = $_[0]->GetByName($key);
   }
 
-  # Now we have to return an array ref if we have more than one 
+  # Now we have to return an array ref if we have more than one
   # item
   if ($#data == 0) {
     return $data[0];
@@ -712,7 +712,7 @@ sub DELETE {
 }
 
 sub CLEAR {
-  carp "GSD files are read-only. Can not clear all entries. Use unlink() instead"; 
+  carp "GSD files are read-only. Can not clear all entries. Use unlink() instead";
 }
 
 =head1 NOTES
@@ -722,7 +722,7 @@ This is far more convenient for packages such as C<PDL> which need
 to manipulate the array without a perl array overhead. The PDL::IO::GSD
 module hides this from the casual user.
 
-This library is read-only. 
+This library is read-only.
 
 =head1 AUTHOR
 

@@ -17,7 +17,7 @@
 *     The records are 80 bytes in length and contain the values
 *     1-80, 2-81 etc. in the first file and 6-86, 7-87 etc. in
 *     the second file.
-*     The tape is then rewound and the second records of each 
+*     The tape is then rewound and the second records of each
 *     file are read and the first 10 bytes printed.
 
 *  ADAM Parameters
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,7 +90,7 @@
       CALL STATPRINT('ALOC', STATUS)
       CALL MAG_MOUNT('TAPE', 'UPDATE', STATUS)
       CALL STATPRINT('MOUNT', STATUS)
-     
+
 *    Repeat allocate and mount
       CALL MAG_ALOC('TAPE', STATUS)
       CALL STATPRINT('ALOC', STATUS)
@@ -111,7 +111,7 @@
          IREC = 1
          DO IFILE = 1, 2
             JREC = 1
-            DOWHILE ((JREC .LE. 5) .AND. (STATUS .EQ. SAI__OK)) 
+            DOWHILE ((JREC .LE. 5) .AND. (STATUS .EQ. SAI__OK))
 *             Set up byte array buffer
                IBYTE = 1
                DO IBYTE = 1, 80
@@ -172,7 +172,7 @@
             STATUS = SAI__ERROR
          ENDIF
          CALL MSG_SETI('NWRIT', NWRIT)
-         CALL STATPRINT( 'WRITING EXTRA-LONG BLOCK - NWRIT is ^NWRIT', 
+         CALL STATPRINT( 'WRITING EXTRA-LONG BLOCK - NWRIT is ^NWRIT',
      :    STATUS)
          IF (STATUS .NE. SAI__OK) GO TO 999
 
@@ -224,7 +224,7 @@
          IF (STATUS .NE. SAI__OK) GO TO 999
 
 *       Try DISMOUNT again
-         CALL MAG_DISM( 'TAPE', .FALSE., STATUS) 
+         CALL MAG_DISM( 'TAPE', .FALSE., STATUS)
          CALL STATPRINT( 'DISMOUNT', STATUS)
          IF (STATUS .NE. SAI__OK) GO TO 999
 

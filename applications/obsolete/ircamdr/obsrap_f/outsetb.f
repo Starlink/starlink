@@ -43,7 +43,7 @@
 *            value to be substituted for pixels outside the box
 *           If no error then
 *              Create an output structure to hold processed image
-*              If no error then 
+*              If no error then
 *                 Map a data array component in the output structure
 *                 If no error then
 *                    Call working subroutine to copy input data array
@@ -81,8 +81,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'         ! SSE global definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
       INCLUDE 'PRM_PAR'             ! PRIMDAT constants
 
 *    Status :
@@ -91,7 +91,7 @@
 
 *    Local Constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                 ! image dimensionality
       PARAMETER ( NDIMS  =  2 ) ! 2-d images only
 
@@ -103,7 +103,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :    LOCI,                 ! locator for input data structure
      :    LOCO,                 ! locator for output data structure
      :    IDIMS( NDIMS ),       ! dimensions of input DATA_ARRAY
@@ -113,10 +113,10 @@
      :    PNTRO,                ! pointer to output DATA_ARRAY component
      :    XSTART,               ! x coordinate of box start
      :    YSTART,               ! y coordinate of box start
-     :    XSIZE,                ! x size of box 
-     :    YSIZE                 ! y size of box 
+     :    XSIZE,                ! x size of box
+     :    YSIZE                 ! y size of box
 
-      REAL 
+      REAL
      :    NEWVAL                ! new value for points outside circle
 
 *-
@@ -129,7 +129,7 @@
 *    get a locator to input IMAGE type data structure
 
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    check status before continuing
 
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -139,7 +139,7 @@
          CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
          CALL NDF_DIM( LOCI, NDIMS, IDIMS, ACTDIM, STATUS )
-      
+
 *       check status before continuing
 
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -154,13 +154,13 @@
 
 *          get x and y start of box and size to be used
 
-            CALL AIF_GET0I( 'XSTART', 1, 1, IDIMS( 1), XSTART, 
+            CALL AIF_GET0I( 'XSTART', 1, 1, IDIMS( 1), XSTART,
      :                       STATUS )
-            CALL AIF_GET0I( 'YSTART', 1, 1, IDIMS( 2), YSTART, 
+            CALL AIF_GET0I( 'YSTART', 1, 1, IDIMS( 2), YSTART,
      :                       STATUS )
-            CALL AIF_GET0I( 'XSIZE', ( IDIMS( 1)-XSTART+1), 1, 
+            CALL AIF_GET0I( 'XSIZE', ( IDIMS( 1)-XSTART+1), 1,
      :	                    IDIMS( 1), XSIZE, STATUS )
-            CALL AIF_GET0I( 'YSIZE', ( IDIMS( 2)-YSTART+1), 1, 
+            CALL AIF_GET0I( 'YSIZE', ( IDIMS( 2)-YSTART+1), 1,
      :	                    IDIMS( 2), YSIZE, STATUS )
 
 *          get replacement value for pixels outside defined box
@@ -174,7 +174,7 @@
 
 *             now get an output array to contain modified data
 
-               CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, 
+               CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS,
      :                                IDIMS, LOCO, STATUS )
 
 *             check error before continuing
@@ -192,9 +192,9 @@
 
 *                   now call the subroutine that does the actual work
 
-                     CALL OUTSETBSUB( %VAL( PNTRI ), %VAL( PNTRO ), 
-     :                                IDIMS(1), IDIMS(2), XSTART, 
-     : 	                              YSTART, XSIZE, YSIZE, NEWVAL, 
+                     CALL OUTSETBSUB( %VAL( PNTRI ), %VAL( PNTRO ),
+     :                                IDIMS(1), IDIMS(2), XSTART,
+     : 	                              YSTART, XSIZE, YSIZE, NEWVAL,
      :                                STATUS )
 
 *                end of if-no-error-before-accessing-pointers check

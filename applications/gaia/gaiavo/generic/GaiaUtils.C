@@ -138,19 +138,19 @@ namespace gaia {
     void split_tabbed( const char *pval, vector<string>& words )
     {
         if ( pval && pval[0] != '\0' ) {
-            
+
             //  Position in string.
             const char *p = pval;
-            
+
             //  Position of current start.
             const char *s = p;
-            
+
             //  Loop over string until end (so must be \0 terminated).
             while( *p ) {
-                
+
                 //  Skip forward until end of string or see a tab.
                 while ( *p && *p != '\t' ) p++;
-                
+
                 //  No movement, first char is another tab, means no value.
                 if ( p == s ) {
                     words.push_back( string( "---" ) );
@@ -159,7 +159,7 @@ namespace gaia {
                     //  Extract value and save.
                     words.push_back( string( s, p - s ) );
                 }
-                
+
                 //  Forward over tab and star new substring, unless this is the
                 //  end of string.
                 if ( *p ) {

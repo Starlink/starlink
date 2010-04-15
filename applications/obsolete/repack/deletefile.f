@@ -15,7 +15,7 @@ C     try to open the file, so see if it exists
  2    call ftopen(unit,filename,1,blocksize,status)
 
       if (status .eq. 0)then
-C         file was opened;  so now delete it 
+C         file was opened;  so now delete it
  3        call ftdelt(unit,status)
       else if (status .eq. 103)then
 C         file doesn't exist, so just reset status to zero and clear errors

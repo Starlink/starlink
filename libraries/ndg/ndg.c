@@ -12,7 +12,7 @@
 
 *  Notes:
 *     - Given the size of the NDG library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use NDG from C extend this file (and
 *     ndg.h) to include any functions which they need but which are
 *     not already included.
@@ -70,7 +70,7 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h" 
+#include "f77.h"
 #include "sae_par.h"
 #include "par_par.h"
 #include "star/grp.h"
@@ -82,7 +82,7 @@
 /* Wrapper function implementations. */
 /* ================================= */
 
-F77_SUBROUTINE(ndg_ndfas)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(MODE), INTEGER(INDF), 
+F77_SUBROUTINE(ndg_ndfas)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(MODE), INTEGER(INDF),
 INTEGER(STATUS) TRAIL(MODE) );
 
 void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int * indf, int * status ) {
@@ -200,7 +200,7 @@ void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp ** igrp2, si
 
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
-   
+
    F77_IMPORT_INTEGER( STATUS, *status );
    *igrp2 = (Grp *) grpF2C( IGRP2, status );
 
@@ -213,7 +213,7 @@ F77_SUBROUTINE(ndg_gtsup)( INTEGER(IGRP), INTEGER(I), CHARACTER_ARRAY(FIELDS),
                            INTEGER(STATUS) TRAIL(FIELDS) );
 
 /* Note the addition of a "len" parameter following the "fields" array.
-   This should be supplied equal to the allocated length of the shortest 
+   This should be supplied equal to the allocated length of the shortest
    string for which a pointer has been supplied in "fields". This length
    should include room for the trailing null. */
 
@@ -232,7 +232,7 @@ void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int 
    F77_CALL(ndg_gtsup)( INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&I),
                         CHARACTER_ARRAY_ARG(FIELDS),
-                        INTEGER_ARG(&STATUS) 
+                        INTEGER_ARG(&STATUS)
                         TRAIL_ARG(FIELDS) );
 
    F77_IMPORT_CHARACTER_ARRAY_P(FIELDS,FIELDS_length,fields,
@@ -243,7 +243,7 @@ void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int 
    return;
 }
 
-F77_SUBROUTINE(ndg_cpsup)( INTEGER(IGRP1), INTEGER(I), INTEGER(IGRP2), 
+F77_SUBROUTINE(ndg_cpsup)( INTEGER(IGRP1), INTEGER(I), INTEGER(IGRP2),
                            INTEGER(STATUS) );
 
 void ndgCpsup( const Grp *igrp1, size_t i, Grp *igrp2, int * status ) {
@@ -344,7 +344,7 @@ void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp ** igrp, size_t *size,
 
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
-   
+
    F77_IMPORT_INTEGER( STATUS, *status );
    *igrp = (Grp *) grpF2C( IGRP, status );
 
@@ -393,7 +393,7 @@ void ndgHltgh( int new, int *old, int *status ){
    F77_EXPORT_LOGICAL( new, NEW );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_hltgh)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD), 
+   F77_CALL(ndg_hltgh)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
                         INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_LOGICAL( OLD, *old );
@@ -412,7 +412,7 @@ void ndgHltpv( int new, int *old, int *status ){
    F77_EXPORT_LOGICAL( new, NEW );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_hltpv)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD), 
+   F77_CALL(ndg_hltpv)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
                         INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_LOGICAL( OLD, *old );

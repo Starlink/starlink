@@ -36,7 +36,7 @@
 *           2-D (flat field) data to be normalised.
 *           This array is overwritten in situ.
 *     VARIANCE( NPIX, NLINE ) = REAL( UPDATE )
-*           The variance of the 2-D data (to be processed 
+*           The variance of the 2-D data (to be processed
 *           simultateously).
 *     QUALITY( NPIX, NLINE )  = BYTE( UPDATE )
 *           The quality array associated with the input data.
@@ -54,7 +54,7 @@
 *           Global status
 *    Method :
 *    Deficiencies :
-*     The routine may return an array with an average value 
+*     The routine may return an array with an average value
 *     significantly greater than 1.0 if many if the data values
 *     end up being below <fracmin> of the fitted polynomial.
 *     This is because the data are normalised to the fit.
@@ -183,7 +183,7 @@
 *   Check there are sufficient points for the required polynomial fit.
       IF ( NPT .GE. (ORDER + 1) ) THEN
 
-*      Fit the required polynomial to the data. 
+*      Fit the required polynomial to the data.
          NCOEFF = ORDER + 1
          SCALE(1) = X(1)
          SCALE(2) = X(NPT)
@@ -203,14 +203,14 @@
 *      to obtain normalised data corrected for wavelength variations.
 *      Process the variances to ensure they are scaled with the data.
 *      Only "good" data values which are greater than a fraction <fracmin>
-*      of the average value are used, the rest are set to zero and 
+*      of the average value are used, the rest are set to zero and
 *      their quality set to "bad"
          DO J = 1,NLINE
             DO I = 1,NPIX
 
                IF ( QUALITY(I,J) .EQ. GOOD ) THEN
                   IF ( ( SPECTRUM(I) .NE. 0.0 ) .AND.
-     :                 ( DATA(I,J) .GE. (FRACMIN * SPECTRUM(I)) ) ) THEN 
+     :                 ( DATA(I,J) .GE. (FRACMIN * SPECTRUM(I)) ) ) THEN
 
                      DATA(I,J) = DATA(I,J) / SPECTRUM(I)
 

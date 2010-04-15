@@ -137,7 +137,7 @@ sub tidy_content {
   # remove blank lines from the front
   my $nonblank;
   for my $pos (0..$#content) {
-    # loop until we 
+    # loop until we
     if (defined $content[$pos] && $content[$pos] =~ /\S/) {
       $nonblank = $pos;
       last;

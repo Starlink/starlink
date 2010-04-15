@@ -1,27 +1,27 @@
       PROGRAM CHNGTX
 *                      GKS Example Program 8.5
- 
+
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GSTRKP
       INCLUDE 'GKS_PAR'
       REAL CPX, CPY, CTX, CTY, BOXX(4), BOXY(4)
- 
+
 *                      Open GKS, open and activate workstation.
- 
+
       WRITE(*,1000)
  1000 FORMAT(' Connection identifier?')
       READ(*,'(I2)') ICONID
       WRITE(*,1010)
  1010 FORMAT(' Workstation type?')
       READ(*,'(I4)') IWTYPE
- 
+
       CALL GOPKS (0, -1)
       CALL GOPWK (1 , ICONID , IWTYPE)
       CALL GACWK (1)
 *                      End of standard opening sequence
 *---------------------------------------------------------------------
- 
+
 *                      Set text bundles
       CALL GSTXR (1,4,-104,GSTRKP,1.0,0.0,1)
       CALL GSTXR (1,5,-105,GSTRKP,1.0,0.0,1)
@@ -69,7 +69,7 @@
       CALL GSCHH (0.018)
       CALL GTX (CTX,CTY,'within a line.')
     1 CONTINUE
- 
+
 *---------------------------------------------------------------------
 *                      Update workstation and await operator action
 *                      before finishing

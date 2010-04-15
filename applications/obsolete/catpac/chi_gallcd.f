@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHI_GALLCD( INPUT, NUMCOLS, CNAMES, CFORMATS, CTYPES, 
+     : CHI_GALLCD( INPUT, NUMCOLS, CNAMES, CFORMATS, CTYPES,
      : CUNITS, CCOMMENTS, CMDATAACC, CDATAACC, STATUS)
 *+
 *  Name:
@@ -17,7 +17,7 @@
 *
 *  Description:
 *     Gets all the information about all the columns in a catalogue. Each
-*     column has associated with it a name, format, type, units,  
+*     column has associated with it a name, format, type, units,
 *     comment and access information.
 
 *  Arguments:
@@ -59,7 +59,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -99,7 +99,7 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Call GALLCD on the appropriate low level system
 *
       if (dbname .eq. 'HDS') then

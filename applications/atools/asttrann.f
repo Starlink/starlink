@@ -32,73 +32,73 @@
 *     FORWARD = _LOGICAL (Read)
 *        A TRUE value indicates that the Mapping's forward coordinate
 *        transformaton is to be used (in which case the number of values
-*        supplied for the INCOLS parameter must be equal to the Nin 
-*        attribute of the Mapping, and the number of values supplied for 
+*        supplied for the INCOLS parameter must be equal to the Nin
+*        attribute of the Mapping, and the number of values supplied for
 *        the OUTCOLS parameter must be equal to the Nout attribute).
 *        A FALSE value indicates that the Mapping's inverse coordinate
 *        transformaton is to be used (in which case the number of values
 *        supplied for the INCOLS parameter must be equal to the Nout
-*        attribute of the Mapping, and the number of values supplied for 
+*        attribute of the Mapping, and the number of values supplied for
 *        the OUTCOLS parameter must be equal to the Nin attribute).
 *     IN = LITERAL (Read)
-*        Only used if a null(!) value is supplied for POSIN. A 2-dimensional 
-*        NDF holding the positions to be transformed. The DATA array of this 
-*        NDF is interpreted  as a table in which each column of pixels holds 
-*        values for a specified quantity, some of which are the axis values 
-*        at the positions to be transformed. Each row of pixels corresponds 
-*        to a separate position. The columns holding the axis values are 
+*        Only used if a null(!) value is supplied for POSIN. A 2-dimensional
+*        NDF holding the positions to be transformed. The DATA array of this
+*        NDF is interpreted  as a table in which each column of pixels holds
+*        values for a specified quantity, some of which are the axis values
+*        at the positions to be transformed. Each row of pixels corresponds
+*        to a separate position. The columns holding the axis values are
 *        specified using parameter INCOLS.
 *     INCOLS() = INTEGER (Read)
-*        Only used if a null(!) value is supplied for POSIN. A set of 
-*        distinct column indices within the NDF specified by parameter 
+*        Only used if a null(!) value is supplied for POSIN. A set of
+*        distinct column indices within the NDF specified by parameter
 *        IN. These should identify the columns holding
-*        the axis values to be transformed, in the order required by 
+*        the axis values to be transformed, in the order required by
 *        the Mapping. If a null (!) value is supplied the lowest N
 *        columns will be used, where N is the number of axes required
 *        by the Mapping (see parameter FORWARD). [!]
 *     OUT = LITERAL (Read)
-*        Only used if a null(!) value is supplied for POSIN. A 2-dimensional 
-*        NDF to receive the transformed positions. The DATA array of this 
-*        NDF is interpreted  as a table in which each column of pixels holds 
-*        values for a specified quantity, some of which are the axis values 
-*        at the transformed positions. Each row of pixels corresponds to a 
-*        separate position. The columns to receive the transformed axis 
-*        values are specified using parameter OUTCOLS. The output NDF is 
-*        formed by taking a copy of the input NDF, and then expanding its 
-*        bounds to accomodate any extra columns specified by parameter 
-*        OUTCOLS (any such extra columns are initialized to hold bad 
-*        values). The initial values for the columns specified by parameter 
+*        Only used if a null(!) value is supplied for POSIN. A 2-dimensional
+*        NDF to receive the transformed positions. The DATA array of this
+*        NDF is interpreted  as a table in which each column of pixels holds
+*        values for a specified quantity, some of which are the axis values
+*        at the transformed positions. Each row of pixels corresponds to a
+*        separate position. The columns to receive the transformed axis
+*        values are specified using parameter OUTCOLS. The output NDF is
+*        formed by taking a copy of the input NDF, and then expanding its
+*        bounds to accomodate any extra columns specified by parameter
+*        OUTCOLS (any such extra columns are initialized to hold bad
+*        values). The initial values for the columns specified by parameter
 *        OUTCOLS are then over-written with the transformed axis values.
 *     OUTCOLS() = INTEGER (Read)
-*        Only used if a null(!) value is supplied for POSIN. A set of 
-*        distinct column indices within the NDF specified by parameter 
-*        OUT. These should identify the columns in which the transformed 
-*        axis values should be stored, in the order produced by the 
-*        Mapping (see parameter FORWARD). There is no restriction on the 
-*        values which may be supplied (the output NDF will be expanded 
-*        to accomodate all supplied column indices). If the number of 
-*        input and output axes required by the Mapping are equal, the 
-*        run-time default is to use the same columns as those used for 
-*        parameter INCOLS. If the number of input and output axes are 
+*        Only used if a null(!) value is supplied for POSIN. A set of
+*        distinct column indices within the NDF specified by parameter
+*        OUT. These should identify the columns in which the transformed
+*        axis values should be stored, in the order produced by the
+*        Mapping (see parameter FORWARD). There is no restriction on the
+*        values which may be supplied (the output NDF will be expanded
+*        to accomodate all supplied column indices). If the number of
+*        input and output axes required by the Mapping are equal, the
+*        run-time default is to use the same columns as those used for
+*        parameter INCOLS. If the number of input and output axes are
 *        different, there is no run-time default and the user is prompted. []
 *     POSIN = LITERAL (Read)
-*        A comma-separated list of floating point values to be used as the 
+*        A comma-separated list of floating point values to be used as the
 *        input axis values. The list should start with all the values for
 *        input axis 1, followed by all the values for input axis 2, etc. A
-*        text file may be specified by preceeding the name of the file with 
-*        an up arrow character "^". If the supplied value ends with a minus 
+*        text file may be specified by preceeding the name of the file with
+*        an up arrow character "^". If the supplied value ends with a minus
 *        sign, the user is re-prompted for additional values. If a null (!)
 *        value is supplied, the input positions are obtained using
 *        parameter IN.   [!]
 *     POSOUT = LITERAL (Read)
-*        Only accessed if a value is supplied for parameter POSIN. The name 
-*        of a text file in which to put the transformed axis values. No file 
-*        is produced if a null (!) value is supplied. One axis value is 
-*        stored on each line of the file. All the values for axis 1 comes 
+*        Only accessed if a value is supplied for parameter POSIN. The name
+*        of a text file in which to put the transformed axis values. No file
+*        is produced if a null (!) value is supplied. One axis value is
+*        stored on each line of the file. All the values for axis 1 comes
 *        first, followed by all the values for aixs 2, etc. [!]
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Mapping to use. If an NDF is 
-*        supplied, the Mapping from the Base Frame to the Current Frame 
+*        An NDF or text file holding the Mapping to use. If an NDF is
+*        supplied, the Mapping from the Base Frame to the Current Frame
 *        of its WCS FrameSet will be used.
 
 *  Copyright:
@@ -132,7 +132,7 @@
 *        Original version.
 *     11-JUN-2001 (DSB):
 *        Tidied up (removed unused variables and INCLUDE statements,
-*        split into separate files, etc), and modified in order to make 
+*        split into separate files, etc), and modified in order to make
 *        coding and documentation conform to various ATOOLS conventions.
 *        Remove restriction on lower NDF bounds being equal to 1. Remove
 *        all restrictions on OUTCOLS indices and expand the output NDF to
@@ -161,7 +161,7 @@
       INCLUDE 'AST_PAR'         ! AST constants and function declarations
       INCLUDE 'PAR_ERR'         ! PAR errors
       INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
-      INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  External references
       EXTERNAL AST_ISAMAPPING
@@ -204,7 +204,7 @@
       LOGICAL MORE              ! Continue looping?
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin AST and NDF contexts
@@ -234,11 +234,11 @@
       CALL PAR_GET0L( 'FORWARD', FORWRD, STATUS )
 
 *  Store the number of axes in the input positions and the number in the
-*  output positions.         
+*  output positions.
       IF( FORWRD ) THEN
          NAXIN = NIN
          NAXOUT = NOUT
-      ELSE      
+      ELSE
          NAXIN = NOUT
          NAXOUT = NIN
       END IF
@@ -251,8 +251,8 @@
       CALL KPG1_GTGRP( 'POSIN', IGRP, NAXVAL, STATUS )
 
 *  If a null value was supplied, annul the error and use NDFs to store
-*  the input and output positions.. 
-      IF( STATUS .EQ. PAR__NULL ) THEN 
+*  the input and output positions..
+      IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
 *  Get an identifier for the input NDF and get its bounds.
@@ -260,10 +260,10 @@
          CALL NDF_BOUND( INDF1, 2, LBND, UBND, NDIM, STATUS )
 
 *  Calculate the dimensions of the input NDF.
-         NCIN = UBND( 1 ) - LBND( 1 ) + 1      
-         NROW = UBND( 2 ) - LBND( 2 ) + 1      
+         NCIN = UBND( 1 ) - LBND( 1 ) + 1
+         NROW = UBND( 2 ) - LBND( 2 ) + 1
 
-*  The number of columns in the input NDF must be greater than or equal to 
+*  The number of columns in the input NDF must be greater than or equal to
 *  NAXIN.
          IF( NCIN .LT. NAXIN .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -286,15 +286,15 @@
          DO I = 1, NAXIN
             INCOL( I ) = LBND( 1 ) + I - 1
          END DO
-      
+
 *  Loop until we have good values for INCOLS.
          MORE = .TRUE.
-         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
-*  Read the INCOLS parameter, getting exactly one value in the range 
+*  Read the INCOLS parameter, getting exactly one value in the range
 *  LBND( 1 ) to UBND( 1 ) for each input axis. The initial pass will use
 *  the defaults set up above.
-            CALL PAR_GDR1I( 'INCOLS', NAXIN, INCOL, LBND( 1 ), 
+            CALL PAR_GDR1I( 'INCOLS', NAXIN, INCOL, LBND( 1 ),
      :                      UBND( 1 ), .TRUE., INCOL, STATUS)
 
 *  Assume for the moment that we have a usable set of column indices.
@@ -305,26 +305,26 @@
 *  to re-prompt.
             DO I = 1, NAXIN - 1
                DO J = I + 1, NAXIN
-	    
-                  IF( INCOL( I ) .EQ. INCOL( J ) .AND. 
+
+                  IF( INCOL( I ) .EQ. INCOL( J ) .AND.
      :                STATUS .EQ. SAI__OK ) THEN
                      STATUS = SAI__ERROR
-	    
+
                      CALL MSG_SETI( 'AX', INCOL( I ) )
                      CALL ERR_REP( 'ASTTRANN_ERR3', 'Column ^AX was '//
      :                           'specified more than once in the '//
      :                           'value supplied for parameter INCOLS.',
      :                           STATUS )
-	    
+
                      CALL ERR_FLUSH( STATUS )
                      CALL PAR_CANCL( 'INCOLS', STATUS )
                      MORE = .TRUE.
                      GO TO 10
                   END IF
-	    
+
                END DO
-	    
-            END DO 
+
+            END DO
 
  10         CONTINUE
 
@@ -336,17 +336,17 @@
             DO I = 1, NIN
                OUTCOL( I ) = INCOL( I )
             END DO
-            CALL PAR_DEF1I( 'OUTCOLS', NIN, INCOL, STATUS ) 
+            CALL PAR_DEF1I( 'OUTCOLS', NIN, INCOL, STATUS )
          END IF
 
 *  Loop until we have good values for OUTCOLS.
          MORE = .TRUE.
-         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
 *  Read the OUTCOLS parameter, getting exactly one value (without any
 *  restriction on value) for each output axis. The initial pass will use
 *  the defaults set up above.
-            CALL PAR_EXACI( 'OUTCOLS', NAXOUT, OUTCOL, STATUS ) 
+            CALL PAR_EXACI( 'OUTCOLS', NAXOUT, OUTCOL, STATUS )
 
 *  Assume for the moment that we have a usable set of column indices.
             MORE = .FALSE.
@@ -356,26 +356,26 @@
 *  to re-prompt.
             DO I = 1, NAXOUT - 1
                DO J = I + 1, NAXOUT
-	    
-                  IF( OUTCOL( I ) .EQ. OUTCOL( J ) .AND. 
+
+                  IF( OUTCOL( I ) .EQ. OUTCOL( J ) .AND.
      :                STATUS .EQ. SAI__OK ) THEN
                      STATUS = SAI__ERROR
-	    
+
                      CALL MSG_SETI( 'AX', OUTCOL( I ) )
                      CALL ERR_REP( 'ASTTRANN_ERR4', 'Column ^AX was '//
      :                          'specified more than once in the '//
      :                          'value supplied for parameter OUTCOLS.',
      :                          STATUS )
-	    
+
                      CALL ERR_FLUSH( STATUS )
                      CALL PAR_CANCL( 'OUTCOLS', STATUS )
                      MORE = .TRUE.
                      GO TO 20
                   END IF
-	    
+
                END DO
-	    
-            END DO 
+
+            END DO
 
  20         CONTINUE
 
@@ -398,10 +398,10 @@
          CALL NDF_PROP( INDF1, 'DATA', 'OUT', INDF2, STATUS )
 
 *  Now expand the output NDF to accomodate the requested output columns.
-         CALL NDF_SBND( 2, LBNDO, UBNDO, INDF2, STATUS ) 
+         CALL NDF_SBND( 2, LBNDO, UBNDO, INDF2, STATUS )
 
 *  Map the DATA arrays.
-         CALL NDF_MAP( INDF1, 'DATA', '_DOUBLE', 'READ', IPIN, ELIN, 
+         CALL NDF_MAP( INDF1, 'DATA', '_DOUBLE', 'READ', IPIN, ELIN,
      :                 STATUS)
          CALL NDF_MAP( INDF2, 'DATA', '_DOUBLE', 'UPDATE', IPOUT, ELOUT,
      :                 STATUS)
@@ -411,20 +411,20 @@
          CALL PSX_CALLOC( NAXOUT*NROW, '_DOUBLE', IPW2, STATUS )
 
 *  Copy the input positions from the input NDF to the first work array.
-         CALL ATL1_CPCOL( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
-     :                   NAXIN, INCOL, .TRUE., %VAL( CNF_PVAL( IPIN ) ), 
+         CALL ATL1_CPCOL( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ),
+     :                   NAXIN, INCOL, .TRUE., %VAL( CNF_PVAL( IPIN ) ),
      :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
 *  Transform the positions.
-         CALL AST_TRANN( THIS, NROW, NAXIN, NROW, 
+         CALL AST_TRANN( THIS, NROW, NAXIN, NROW,
      :                   %VAL( CNF_PVAL( IPW1 ) ), FORWRD,
-     :                   NAXOUT, NROW, %VAL( CNF_PVAL( IPW2 ) ), 
+     :                   NAXOUT, NROW, %VAL( CNF_PVAL( IPW2 ) ),
      :                   STATUS )
 
 *  Copy the output positions from the second work array to the output NDF.
-         CALL ATL1_CPCOL( LBNDO( 1 ), UBNDO( 1 ), LBNDO( 2 ), 
-     :                    UBNDO( 2 ), NAXOUT, OUTCOL, .FALSE., 
+         CALL ATL1_CPCOL( LBNDO( 1 ), UBNDO( 1 ), LBNDO( 2 ),
+     :                    UBNDO( 2 ), NAXOUT, OUTCOL, .FALSE.,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
@@ -434,7 +434,7 @@
       ELSE
 
 *  Find the number of input positions.
-         NP = NAXVAL/NAXIN         
+         NP = NAXVAL/NAXIN
 
 *  Report an error if no complete positions were specified.
          IF( NP .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -453,7 +453,7 @@
             CALL MSG_SETI( 'NAXVAL', NAXVAL )
             CALL ERR_REP( 'ASTTRANN_ERR6', 'The number of comma '//
      :                    'separated axis values supplied (^NAXVAL) '//
-     :                    'is not an exact multiple of ^NAXIN.', 
+     :                    'is not an exact multiple of ^NAXIN.',
      :                    STATUS )
             GO TO 999
          END IF
@@ -463,16 +463,16 @@
          CALL PSX_CALLOC( NP*NAXOUT, '_DOUBLE', IPW2, STATUS )
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, NAXVAL, 1, %VAL( CNF_PVAL( IPW1 ) ), 
+         CALL ATL1_GTOFL( IGRP, NAXVAL, 1, %VAL( CNF_PVAL( IPW1 ) ),
      :                    STATUS )
 
 *  Transform the positions.
-         CALL AST_TRANN( THIS, NP, NAXIN, NP, %VAL( CNF_PVAL( IPW1 ) ), 
-     :                   FORWRD, NAXOUT, NP, %VAL( CNF_PVAL( IPW2 ) ), 
+         CALL AST_TRANN( THIS, NP, NAXIN, NP, %VAL( CNF_PVAL( IPW1 ) ),
+     :                   FORWRD, NAXOUT, NP, %VAL( CNF_PVAL( IPW2 ) ),
      :                   STATUS )
 
 *  Output the results.
-         CALL ATL1_PRNTN( NP, NAXOUT, %VAL( CNF_PVAL( IPW2 ) ), 
+         CALL ATL1_PRNTN( NP, NAXOUT, %VAL( CNF_PVAL( IPW2 ) ),
      :                    'POSOUT', STATUS )
 
 *  Delete the group

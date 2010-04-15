@@ -1,13 +1,13 @@
-      SUBROUTINE SCULIB_READ_JIGGLE (JIGGLE_NAME, MAX_JIGGLE, 
-     :  JIGGLE_P_SWITCH, JIGGLE_REPEAT, EXP_PER_INT, JIGGLE_X, JIGGLE_Y, 
-     :  JIGGLE_COUNT, JIGGLE_X_MAX, JIGGLE_X_MIN, JIGGLE_Y_MAX, 
+      SUBROUTINE SCULIB_READ_JIGGLE (JIGGLE_NAME, MAX_JIGGLE,
+     :  JIGGLE_P_SWITCH, JIGGLE_REPEAT, EXP_PER_INT, JIGGLE_X, JIGGLE_Y,
+     :  JIGGLE_COUNT, JIGGLE_X_MAX, JIGGLE_X_MIN, JIGGLE_Y_MAX,
      :  JIGGLE_Y_MIN, STATUS)
 *+
 *  Name:
 *     SCULIB_READ_JIGGLE
 
 *  Purpose:
-*     read a jiggle pattern 
+*     read a jiggle pattern
 
 *  Description:
 *     This routine reads in a jiggle pattern and sets some variables associated
@@ -15,12 +15,12 @@
 *     be measured in each exposure, the number of times the pattern will be
 *     repeated in each exposure, the maximum offsets in the pattern.
 *
-*        After checking status on entry, SCULIB_READ_NUMBERS is called to read 
+*        After checking status on entry, SCULIB_READ_NUMBERS is called to read
 *     in the jiggle offsets from the file named in JIGGLE_NAME, an error will
 *     be reported and bad status returned if no offsets are read. The maximum
 *     and minimum x and y offsets in the pattern are calculated.
 *
-*        Next, the variables governing the way the jiggle pattern will be 
+*        Next, the variables governing the way the jiggle pattern will be
 *     divided among the exposures making up each integration is worked out.
 *     An error will be reported and bad status returned if JIGGLE_P_SWITCH
 *     is less than or equal to zero. Otherwise, the number of exposures
@@ -29,12 +29,12 @@
 *     is calculated. If JIGGLE_P_SWITCH is larger than the number of jiggles
 *     in the pattern then the jiggle pattern will be repeated an integer
 *     number of times during each switch of the exposure and JIGGLE_P_SWITCH
-*     will be reset accordingly. 
+*     will be reset accordingly.
 
 *  Invocation:
-*     CALL SCULIB_READ_JIGGLE (JIGGLE_NAME, MAX_JIGGLE, 
-*    :  JIGGLE_P_SWITCH, JIGGLE_REPEAT, EXP_PER_INT, JIGGLE_X, JIGGLE_Y, 
-*    :  JIGGLE_COUNT, JIGGLE_X_MAX, JIGGLE_X_MIN, JIGGLE_Y_MAX, 
+*     CALL SCULIB_READ_JIGGLE (JIGGLE_NAME, MAX_JIGGLE,
+*    :  JIGGLE_P_SWITCH, JIGGLE_REPEAT, EXP_PER_INT, JIGGLE_X, JIGGLE_Y,
+*    :  JIGGLE_COUNT, JIGGLE_X_MAX, JIGGLE_X_MIN, JIGGLE_Y_MAX,
 *    :  JIGGLE_Y_MIN, STATUS)
 
 *  Arguments:
@@ -134,7 +134,7 @@
 
 *  read in jiggle offsets
 
-      CALL SCULIB_READ_NUMBERS (JIGGLE_NAME, 2, MAX_JIGGLE, 
+      CALL SCULIB_READ_NUMBERS (JIGGLE_NAME, 2, MAX_JIGGLE,
      :  JIGGLE_X, JIGGLE_Y, 0, JIGGLE_COUNT, STATUS)
 
       IF (STATUS .NE. SAI__OK) THEN
@@ -151,7 +151,7 @@
          END IF
       END IF
 
-*  calculate the maximum offsets 
+*  calculate the maximum offsets
 
       IF (STATUS .EQ. SAI__OK) THEN
          JIGGLE_X_MAX = JIGGLE_X (1)

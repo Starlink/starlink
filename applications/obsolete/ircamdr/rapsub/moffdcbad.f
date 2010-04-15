@@ -2,13 +2,13 @@
 *+  MOFFDCBAD - calculates d.c. sky offset between an image mosaic pair - this
 *               version handles bad pixels
 
-      SUBROUTINE MOFFDCBAD ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1, 
-     :                       DIMSB2, XOFF, YOFF, BADMASK, BADDIMS1, 
+      SUBROUTINE MOFFDCBAD ( ARRAYA, DIMSA1, DIMSA2, ARRAYB, DIMSB1,
+     :                       DIMSB2, XOFF, YOFF, BADMASK, BADDIMS1,
      :                       BADDIMS2, DCOFF, STATUS )
 
 *    Description :
 *
-*     This routine calculates the d.c. sky offset between the two images of 
+*     This routine calculates the d.c. sky offset between the two images of
 *     a mosaic pair. The x,y spatial offset should have been located using
 *     MOFFXYSUB, and this routine assumes that the input x,y spatial offset
 *     input is correct. The value returned is the offset from the first to
@@ -25,7 +25,7 @@
 *    Parameters :
 *
 *     ARRAYA( DIMSA(1), DIMSA(2) )  =  REAL( READ )
-*         First input image 
+*         First input image
 *     DIMSA( 2 )  =  INTEGER( READ )
 *         Dimensions of first input image
 *     ARRAYB( DIMSB(1), DIMSB(2) )  =  REAL( READ )
@@ -123,11 +123,11 @@
             DO  I  =  1, DIMSA1 - XOFF
 
 *             check for a bad pixel in either or both input arrays
-               IF ( BADMASK(I,J)           .EQ. 0 .AND. 
+               IF ( BADMASK(I,J)           .EQ. 0 .AND.
      :              BADMASK(I+XOFF,J+YOFF) .EQ. 0 ) THEN
 
 *                add current deviation to running total
-                  CURTOT  =  CURTOT + 
+                  CURTOT  =  CURTOT +
      :                      (ARRAYB(I,J) - ARRAYA(I+XOFF,J+YOFF))
 
 *                increment valid pixel counter
@@ -150,11 +150,11 @@
             DO  I  =  1, DIMSA1 - IP
 
 *             check for a bad pixel in either or both input arrays
-               IF ( BADMASK(I+IP,J+JP) .EQ. 0 .AND. 
+               IF ( BADMASK(I+IP,J+JP) .EQ. 0 .AND.
      :              BADMASK(I,J)       .EQ. 0 ) THEN
 
 *                add current deviation to running total
-                  CURTOT  =  CURTOT + 
+                  CURTOT  =  CURTOT +
      :                      (ARRAYB(I+IP,J+JP) - ARRAYA(I,J))
 
 *                increment valid pixel counter
@@ -176,11 +176,11 @@
             DO  I  =  1, DIMSA1 - XOFF
 
 *             check for a bad pixel in either or both input arrays
-               IF ( BADMASK(I,J+JP)   .EQ. 0 .AND. 
+               IF ( BADMASK(I,J+JP)   .EQ. 0 .AND.
      :              BADMASK(I+XOFF,J) .EQ. 0 ) THEN
 
 *                add current deviation to running total
-                  CURTOT  =  CURTOT + 
+                  CURTOT  =  CURTOT +
      :                       (ARRAYB(I,J+JP) - ARRAYA(I+XOFF,J))
 
 *                increment valid pixel counter
@@ -202,11 +202,11 @@
             DO  I  =  1, DIMSA1 - IP
 
 *             check for a bad pixel in either or both input arrays
-               IF ( BADMASK(I+IP,J)   .EQ. 0 .AND. 
+               IF ( BADMASK(I+IP,J)   .EQ. 0 .AND.
      :              BADMASK(I,J+YOFF) .EQ. 0 ) THEN
 
 *                add current deviation to running total
-                  CURTOT  =  CURTOT + 
+                  CURTOT  =  CURTOT +
      :                      (ARRAYB(I+IP,J) - ARRAYA(I,J+YOFF))
 
 *                increment valid pixel counter
@@ -228,7 +228,7 @@
          DCOFF  =  CURTOT / NUMVAL
 
       ELSE
-  
+
 *       none were so set mean offset to large number
          DCOFF  =  1.0E30
 

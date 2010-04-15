@@ -17,15 +17,15 @@
 
 *  Arguments:
 *     data = void * (Given)
-*        A pointer to a data structure (a smfRebinSeqArgs) holding parameter 
-*        values for astRebinSeq. 
+*        A pointer to a data structure (a smfRebinSeqArgs) holding parameter
+*        values for astRebinSeq.
 *     status = int * (Given and Returned)
 *        A pointer to the inherited status value.
 
 *  Description:
-*     This function invokes astRebinSeqF or astRebinSeqF from within a 
-*     new thread. The API for this function is dictated by the smf_add_job 
-*     function (in smf_threads.c), so information needed for astRebinSeq 
+*     This function invokes astRebinSeqF or astRebinSeqF from within a
+*     new thread. The API for this function is dictated by the smf_add_job
+*     function (in smf_threads.c), so information needed for astRebinSeq
 *     is passed into this function within a smfRebinSeqArgs structure.
 
 *  Authors:
@@ -74,7 +74,7 @@ void smf_rebinseq_thread( void *data_ptr, int *status ){
 
 /* Local Variables: */
    int *old_status;
-   smfRebinSeqArgs *data = (smfRebinSeqArgs *) data_ptr;  
+   smfRebinSeqArgs *data = (smfRebinSeqArgs *) data_ptr;
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -84,27 +84,27 @@ void smf_rebinseq_thread( void *data_ptr, int *status ){
 
 /* The Mapping pointer in the data structure should have been unlocked by
    the parent thread, so we can now lock it for exclusive use by this
-   thread. In order to enforce carefull usage of Objects, AST insists that 
+   thread. In order to enforce carefull usage of Objects, AST insists that
    Objects be locked before they are used */
    astLock( data->this, 0 );
 
-/* And finally call astRebinSeqF or astRebinSeqD to paste the input data 
+/* And finally call astRebinSeqF or astRebinSeqD to paste the input data
    into the output array. */
    if( data->is_double ) {
-      astRebinSeqD( data->this, data->wlim, data->ndim_in, data->lbnd_in, 
-                    data->ubnd_in, (double *)data->in, (double *)data->in_var, 
-                    data->spread, data->params, data->flags, data->tol, 
-                    data->maxpix, data->badval_d, data->ndim_out, 
-                    data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd, 
-                    (double *) data->out, (double *) data->out_var, 
+      astRebinSeqD( data->this, data->wlim, data->ndim_in, data->lbnd_in,
+                    data->ubnd_in, (double *)data->in, (double *)data->in_var,
+                    data->spread, data->params, data->flags, data->tol,
+                    data->maxpix, data->badval_d, data->ndim_out,
+                    data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd,
+                    (double *) data->out, (double *) data->out_var,
                     data->weights, &(data->nused) );
    } else {
-      astRebinSeqF( data->this, data->wlim, data->ndim_in, data->lbnd_in, 
-                    data->ubnd_in, (float *)data->in, (float *)data->in_var, 
-                    data->spread, data->params, data->flags, data->tol, 
-                    data->maxpix, data->badval_f, data->ndim_out, 
-                    data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd, 
-                    (float *) data->out, (float *) data->out_var, 
+      astRebinSeqF( data->this, data->wlim, data->ndim_in, data->lbnd_in,
+                    data->ubnd_in, (float *)data->in, (float *)data->in_var,
+                    data->spread, data->params, data->flags, data->tol,
+                    data->maxpix, data->badval_f, data->ndim_out,
+                    data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd,
+                    (float *) data->out, (float *) data->out_var,
                     data->weights, &(data->nused) );
    }
 

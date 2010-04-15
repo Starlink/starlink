@@ -71,15 +71,15 @@ C
       INTEGER STATUS
 C
 C     Functions
-C  
+C
       INTEGER ICH_LEN
 C
 C     Local variables
 C
       INTEGER   DTA_STATUS                  ! DTA routine status
-      CHARACTER ERROR*64                    ! Error string 
+      CHARACTER ERROR*64                    ! Error string
       INTEGER   IGNORE                      ! Status we don't care about
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Full name of structure
 C
 C     Return immediately on bad status

@@ -15,15 +15,15 @@
 
 #  Description:
 #     This routine is for updating the text description of one of a set
-#     of buttons created by the Ccd::reveal widget. The text is updated to 
-#     show a count of the number of entries in the associated window 
-#     (which should be a listbox-like widget, such as a scrollbox or 
+#     of buttons created by the Ccd::reveal widget. The text is updated to
+#     show a count of the number of entries in the associated window
+#     (which should be a listbox-like widget, such as a scrollbox or
 #     table). This is used by the CCDNDFDoImport procedure.
 
 #  Arguments:
 #     Reveal = window (read)
-#       The name of the Ccd::reveal widget whose button labels are to be 
-#       changed to reflect the contents of an associated listbox-like 
+#       The name of the Ccd::reveal widget whose button labels are to be
+#       changed to reflect the contents of an associated listbox-like
 #       widget.
 #     name = string (read)
 #       The name of the button (i.e. its creation name). The new name
@@ -76,8 +76,8 @@
 #.
 
 #  Get the number of entries in the listbox-like widget.
-      if { [winfo exists [CCDPathOf $Reveal]] } { 
-         if { [winfo exists [CCDPathOf $Box]] } { 
+      if { [winfo exists [CCDPathOf $Reveal]] } {
+         if { [winfo exists [CCDPathOf $Box]] } {
             set size [$Box size]
             $Reveal resettext $name "$name ($size)"
          }

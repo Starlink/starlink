@@ -239,7 +239,7 @@
 
           enddo
 
-*      Increment accumulators and print out some diagnostics over 
+*      Increment accumulators and print out some diagnostics over
 *      masked range.
 
           nfailsum   = nfailsum + nfailed

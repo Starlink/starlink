@@ -1,4 +1,4 @@
-      SUBROUTINE BADCHK( COMM, BADVAL, MXPIX, MXBRK, N, X, Y, NBREAK, 
+      SUBROUTINE BADCHK( COMM, BADVAL, MXPIX, MXBRK, N, X, Y, NBREAK,
      :                   BREAK, WORK, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL BADCHK( COMM, BADVAL, MXPIX, MXBRK, N, X, Y, NBREAK, BREAK, 
+*     CALL BADCHK( COMM, BADVAL, MXPIX, MXBRK, N, X, Y, NBREAK, BREAK,
 *                  WORK, STATUS )
 
 *  Description:
@@ -34,7 +34,7 @@
 *     MXBRK = INTEGER (Given)
 *        The size of the BREAK array.
 *     N = INTEGER (Given and Returned)
-*        The number of elements in the X and Y arrays. 
+*        The number of elements in the X and Y arrays.
 *     X( MXPIX ) = REAL (Given and Returned)
 *        The X axis values.
 *     Y( MXPIX ) = REAL (Given and Returned)
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -90,7 +90,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :        IBRK,              ! Index of next supplied break
      :        IR,                ! Index of next element to be read
      :        IW,                ! Index of next element to be written
@@ -106,7 +106,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If any break points have been supplied, ensure that they are in 
+*  If any break points have been supplied, ensure that they are in
 *  ascending order. Store the number of supplied break points and the
 *  index of the first. Report an error if the first break is at an index
 *  of less than 1.
@@ -145,7 +145,7 @@
 *  Only store good input values in the returned array.
          IF( .NOT. BAD ) THEN
 
-*  Shuffle the current X and Y values towards the start of the array if 
+*  Shuffle the current X and Y values towards the start of the array if
 *  required, in order to over-write any previously encountered bad values.
             IF( IR .GT. IW ) THEN
                X( IW ) = X( IR )
@@ -156,7 +156,7 @@
             BAD = X( IR + 1 ) .EQ. BADVAL .OR. Y( IR + 1 ) .EQ. BADVAL
 
 *  The current element of the returned arrays will be a break point
-*  if it was break point in the supplied arrays, OR if the 
+*  if it was break point in the supplied arrays, OR if the
 *  following input element is bad. First deal with the former
 *  case.
             IF( IR .EQ. NXTBRK ) THEN
@@ -181,7 +181,7 @@
 *  stored in the returned array.
             IW = IW + 1
 
-*  If the current input element i sbad, check the next input element to 
+*  If the current input element i sbad, check the next input element to
 *  see if it is also bad.
          ELSE
             BAD = X( IR + 1 ) .EQ. BADVAL .OR. Y( IR + 1 ) .EQ. BADVAL
@@ -192,7 +192,7 @@
 
 *  Process the very last element if it is not bad...
       IF( .NOT. BAD ) THEN
-         IR = MIN( N, MXPIX ) 
+         IR = MIN( N, MXPIX )
 
 *  Store it at its new position in the returned array.
          IF( IR .GT. IW ) THEN
@@ -200,11 +200,11 @@
             Y( IW ) = Y( IR )
          END IF
 
-*  The last element of the returned arrays will always be a break 
+*  The last element of the returned arrays will always be a break
 *  point.
          NBRK = NBRK + 1
          WORK( NBRK ) = IW
- 
+
 *  Increment the position at which the next good supplied value will be
 *  stored in the returned array.
          IW = IW + 1
@@ -231,7 +231,7 @@
       ELSE
          NBAD = MIN( N, MXPIX ) - IW + 1
 
-         IF( NBAD .EQ. 1 ) THEN 
+         IF( NBAD .EQ. 1 ) THEN
             CALL MSG_SETR( 'BADVAL', BADVAL )
             CALL MSGOUT( COMM, '1 bad data value equal to ^BADVAL '//
      :                   'found and removed.', .FALSE., STATUS)
@@ -261,4 +261,4 @@
 *  Jump to here if an error occurs.
  999  CONTINUE
 
-      END 
+      END

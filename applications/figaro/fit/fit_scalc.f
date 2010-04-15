@@ -9,7 +9,7 @@ C     and zero values needed to write it out as a) 8 bit
 C     unsigned integers, b) 16 bit signed integers, c) 32 bit
 C     signed integers.  The user has to choose which of these
 C     representations should be used, trading off precision
-C     against compactness of data.  
+C     against compactness of data.
 C
 C     Parameters -   (">" input, "<" output)
 C
@@ -19,7 +19,7 @@ C                  treated here as 1-dimensional for generality.
 C     (>) NELM     (Integer) The number of elements in DATA.
 C     (>) CHECK    (Logical) If true, the routine will pass through
 C                  the data applying the scaling for each integer
-C                  representaion and then applying the inverse 
+C                  representaion and then applying the inverse
 C                  operation to the result.  The maximum errors
 C                  found will be returned in ERRORS.
 C     (<) VMIN     (Real) Minimum value in DATA.
@@ -69,9 +69,9 @@ C
          IF (DATA(I).LT.VMIN) VMIN=DATA(I)
       END DO
 C
-C     Now get the three scales and zeros.  Note that we don't 
+C     Now get the three scales and zeros.  Note that we don't
 C     try to make use of the VERY ends of the integer ranges, to
-C     allow a little slop for rounding errors etc.  
+C     allow a little slop for rounding errors etc.
 C
       RANGE=VMAX-VMIN
       IF (RANGE.LT.1.E-35) THEN

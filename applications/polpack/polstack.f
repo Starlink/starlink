@@ -21,17 +21,17 @@
 
 *  Description:
 *     This application combines a set of intensity images into a smaller
-*     number of similar intensity images (it may also be used to combine 
+*     number of similar intensity images (it may also be used to combine
 *     intensity cubes containing spectropolarimetry data). The input images
 *     must all be aligned pixel-for-pixel. Each output image corresponds to
-*     a range of analysis angle, and is formed by stacking together the  
-*     input images which have analysis angles within the range of the output 
-*     image. The variance component of each output image is set to hold 
-*     the standard error of the input images which contribute to the 
-*     output image. The output images may, for instance, be processed by 
-*     POLCAL. In addition, a 3D (or 4D if processing spectropolarimetry data) 
+*     a range of analysis angle, and is formed by stacking together the
+*     input images which have analysis angles within the range of the output
+*     image. The variance component of each output image is set to hold
+*     the standard error of the input images which contribute to the
+*     output image. The output images may, for instance, be processed by
+*     POLCAL. In addition, a 3D (or 4D if processing spectropolarimetry data)
 *     stack may be created containing all the output images in a single data
-*     array - see parameter STACK. 
+*     array - see parameter STACK.
 *
 *     The same reference direction in used for all output images, and is
 *     equal to the reference direction in the first input image. For each
@@ -42,26 +42,26 @@
 *     (typically zero) to the value (ORIGIN+BIN). The second bin extends
 *     from (ORIGIN+BIN) to (ORIGIN+2*BIN), etc. If parameter TWOPI is
 *     FALSE, the number of bins used is chosen so that they cover a range
-*     of ORIGIN to (180+ORIGIN) degrees, and input images with analysis 
-*     angles outside this range are mapped into the range by subtracting 
-*     (or adding) a multiple of 180 degrees. If parameter TWOPI is TRUE, the 
-*     number of bins used is chosen so that they cover a range of ORIGIN to 
-*     (360+ORIGIN) degrees, and input images with analysis angles outside 
-*     this range are mapped into the range by subtracting (or adding) a 
+*     of ORIGIN to (180+ORIGIN) degrees, and input images with analysis
+*     angles outside this range are mapped into the range by subtracting
+*     (or adding) a multiple of 180 degrees. If parameter TWOPI is TRUE, the
+*     number of bins used is chosen so that they cover a range of ORIGIN to
+*     (360+ORIGIN) degrees, and input images with analysis angles outside
+*     this range are mapped into the range by subtracting (or adding) a
 *     multiple of 360 degrees.
 *
 *     An output image is produced for each bin containing more than the
 *     minimum required number of images specified by parameter MININ. The
-*     output DATA value at each pixel is the mean of the corresponding 
-*     pixels in the input images which fall within the range of analysis 
-*     angles covered by the output image. A VARIANCE component is added to 
-*     the output image in which each pixel contains the standard error of 
-*     the corresponding input pixels. If there are less than 2 good input 
+*     output DATA value at each pixel is the mean of the corresponding
+*     pixels in the input images which fall within the range of analysis
+*     angles covered by the output image. A VARIANCE component is added to
+*     the output image in which each pixel contains the standard error of
+*     the corresponding input pixels. If there are less than 2 good input
 *     pixel values, then the VARIANCE value is set bad.
 *
 *     Each output image contains a POLPACK extension in which the ANLANG
-*     value (which specifies the analysis angle) is set to the mean of the 
-*     analysis angles for the corresponding input images. This mean value 
+*     value (which specifies the analysis angle) is set to the mean of the
+*     analysis angles for the corresponding input images. This mean value
 *     refers to the output reference direction which is inherited from
 *     the first input NDF.
 
@@ -82,16 +82,16 @@
 *        image. [NORM]
 *     IN = NDF (Read)
 *        A group specifying the names of the input intensity images or cubes.
-*        This may take the form of a comma separated list, or any of the other 
+*        This may take the form of a comma separated list, or any of the other
 *        forms described in the help on "Group Expressions". These images
 *        must be aligned pixel-for-pixel.
 *     MININ = _INTEGER (Read)
 *        The minimum number of input images required to create an output
 *        image. If any bin contains fewer than this many input images, no
-*        output image will be created for the bin. The run-time default 
+*        output image will be created for the bin. The run-time default
 *        is the current value, or 3 if there is no current value. []
 *     ORIGIN = _REAL (Read)
-*        The analysis angle at the start of the first bin, in degrees. 
+*        The analysis angle at the start of the first bin, in degrees.
 *        The run-time default is the current value, or 0.0 if there is no
 *        current value. []
 *     OUT = NDF (Read)
@@ -102,9 +102,9 @@
 *        analyser position.
 *     STACK = NDF (Write)
 *        An optional 3-dimensional (or 4-dimensional when dealing with
-*        spectropolarimetry data) output cube. If created, each plane (or 
+*        spectropolarimetry data) output cube. If created, each plane (or
 *        cube) contains a copy of the output image (or cube) with the same
-*        sequence number (see parameter OUT). The analyser position 
+*        sequence number (see parameter OUT). The analyser position
 *        corresponding to each plane is stored in the Axis structure for the
 *        last axis. No POLPACK extension is created. The stack is not created
 *        if a null (!) value is supplied. [!]
@@ -117,14 +117,14 @@
 *     extensions of the input images are ignored. The output images will
 *     not contain any T or EPS values and so default values of 1.0 will
 *     be used for both when POLCAL is run.
-*     -  Any FILTER or IMGID values in the POLPACK extensions of the 
-*     input images are ignored. The output images will not contain any 
+*     -  Any FILTER or IMGID values in the POLPACK extensions of the
+*     input images are ignored. The output images will not contain any
 *     FILTER or IMGID values.
 *     -  Any VARIANCE components in the input images are ignored.
 
 *  Examples:
 *     polstack "*_A" "bin*" 10
-*        The intensity images specified by "*_A" are binned into a set 
+*        The intensity images specified by "*_A" are binned into a set
 *        of intensity images each covering a range of 10 degrees of
 *        analysis angle. These output images are called "bin1", "bin2",
 *        etc.
@@ -158,7 +158,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -167,15 +167,15 @@
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'GRP_PAR'          ! GRP parameters
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER TEXT*20          ! Formatted integer
-      INTEGER IGRP1              ! GRP identifier for input images group      
+      INTEGER IGRP1              ! GRP identifier for input images group
       INTEGER IGRP2              ! GRP identifier foR sequence number group
-      INTEGER IGRP3              ! GRP identifier for output images group      
+      INTEGER IGRP3              ! GRP identifier for output images group
       INTEGER INDEX              ! Index of current intensity image
       INTEGER INDF               ! Identifier for output stack
       INTEGER IOUT               ! No. of output images created so far
@@ -186,8 +186,8 @@
       INTEGER MININ              ! Min. no. of i/p images for an o/p image
       INTEGER NBIN               ! No. of analysis angle bins
       INTEGER NDIMO              ! No. of axes in output NDF
-      INTEGER NNDF               ! No. of input images to process      
-      INTEGER NOUT               ! No. of output NDFs 
+      INTEGER NNDF               ! No. of input images to process
+      INTEGER NOUT               ! No. of output NDFs
       INTEGER TLEN               ! Length of formated integer
       INTEGER UBND( 4 )          ! Upper pixel bounds for output stack
       LOGICAL TWOPI              ! Bin over range 0 to 360 degrees?
@@ -203,9 +203,9 @@
 *  Start an NDF context.
       CALL NDF_BEGIN
 
-*  Get a group containing the names of the template intensity frames to be 
+*  Get a group containing the names of the template intensity frames to be
 *  used.
-      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...',
      :            IGRP1, NNDF, STATUS )
 
 *  Tell the user how many NDFs there are to process.
@@ -232,7 +232,7 @@
          RANGE = 180.0
       END IF
 
-*  Get the analysis angle at the start of the first bin. 
+*  Get the analysis angle at the start of the first bin.
       CALL PAR_GET0R( 'ORIGIN', ORIGIN, STATUS )
       CALL MSG_SETR( 'ORG', ORIGIN )
       CALL MSG_OUT( ' ', '  Using origin of ^ORG degrees',
@@ -252,19 +252,19 @@
 *  contributing to each output NDF, plus output pixel bounds.
       CALL PSX_CALLOC( NBIN*( NNDF + 7 ), '_INTEGER', IPW1, STATUS )
 
-*  Allocate an array in which to store the analysis angle for each input 
+*  Allocate an array in which to store the analysis angle for each input
 *  NDF.
       CALL PSX_CALLOC( NNDF, '_REAL', IPPHI, STATUS )
 
 *  Fill this array, and find the number of output NDFs required and the
 *  output reference direction.
       CALL POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
-     :                 BIN, ANGRT, %VAL( CNF_PVAL( IPW1 ) ), NOUT, 
+     :                 BIN, ANGRT, %VAL( CNF_PVAL( IPW1 ) ), NOUT,
      :                 %VAL( CNF_PVAL( IPPHI )),
      :                 NDIMO, LBND, UBND, STATUS )
 
 *  Abort if no output images will be created.
-      IF( NOUT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF( NOUT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLSTACK_ERR1', 'There are no output images '//
      :                 'to create.', STATUS )
@@ -280,7 +280,7 @@
       CALL GRP_NEW( 'Sequence numbers', IGRP2, STATUS )
       DO INDEX = 1, NOUT
          CALL CHR_ITOC( INDEX, TEXT, TLEN )
-         CALL GRP_PUT( IGRP2, 1, TEXT( : TLEN ), INDEX, STATUS ) 
+         CALL GRP_PUT( IGRP2, 1, TEXT( : TLEN ), INDEX, STATUS )
       END DO
 
 *  Get the group of output images.
@@ -294,8 +294,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  See if an output 3D stack is required.
-      CALL NDF_CREAT( 'STACK', '_REAL', NDIMO, LBND, UBND, INDF, 
-     :                STATUS ) 
+      CALL NDF_CREAT( 'STACK', '_REAL', NDIMO, LBND, UBND, INDF,
+     :                STATUS )
 
 *  If not annul the error.
       IF( STATUS .EQ. PAR__NULL ) THEN
@@ -303,13 +303,13 @@
 
 *  If so, map the centre array for the last axis.
       ELSE
-         CALL NDF_AMAP( INDF, 'Centre', NDIMO, '_REAL', 'WRITE', 
-     :                  IPSAX, NOUT, STATUS ) 
+         CALL NDF_AMAP( INDF, 'Centre', NDIMO, '_REAL', 'WRITE',
+     :                  IPSAX, NOUT, STATUS )
 
 *  Set other axis attributes.
-         CALL NDF_ACPUT( 'Degrees', INDF, 'Units', NDIMO, STATUS ) 
+         CALL NDF_ACPUT( 'Degrees', INDF, 'Units', NDIMO, STATUS )
          CALL NDF_ACPUT( 'Analyser position', INDF, 'Label', NDIMO,
-     :                   STATUS ) 
+     :                   STATUS )
 
       END IF
 
@@ -320,19 +320,19 @@
       DO INDEX = 1, NBIN
 
 *  Create the output NDF if the bin is not empty.
-         IF( IOUT .LT. NOUT ) THEN 
+         IF( IOUT .LT. NOUT ) THEN
             CALL POL1_STKIM( MININ, ANGRT, IGRP1, IGRP3, INDEX, INDF,
-     :                       NBIN, NNDF, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       NBIN, NNDF, %VAL( CNF_PVAL( IPW1 ) ),
      :                       %VAL( CNF_PVAL( IPPHI ) ),
      :                       ( INDEX - 1 )*BIN + ORIGIN,
-     :                       INDEX*BIN + ORIGIN, NDIMO - 1, IOUT, 
+     :                       INDEX*BIN + ORIGIN, NDIMO - 1, IOUT,
      :                       %VAL( CNF_PVAL( IPSAX ) ), STATUS )
          END IF
 
 *  Flush any error.
          IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
-      END DO     
+      END DO
 
 * Tidy up.
  999  CONTINUE
@@ -340,7 +340,7 @@
 *  Release work space.
       CALL PSX_FREE( IPW1, STATUS )
       CALL PSX_FREE( IPPHI, STATUS )
-      
+
 *  Delete the groups.
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )

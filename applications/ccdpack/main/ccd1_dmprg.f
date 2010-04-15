@@ -15,11 +15,11 @@
 *  Description:
 *     This routine removes all frames from a frameset which have the
 *     domain name supplied.  Optionally, the index of one domain to
-*     exempt from this process may be supplied.  For each domain 
-*     removed, a message may be logged through the CCDPACK logging 
+*     exempt from this process may be supplied.  For each domain
+*     removed, a message may be logged through the CCDPACK logging
 *     system.
 *
-*     Normally the Current and Base frames are not disturbed by 
+*     Normally the Current and Base frames are not disturbed by
 *     this routine.  However, if one of these is deleted, a
 *     new Current or Base frame will be assigned using normal AST
 *     rules.  The exception to this is that if a Current or Base
@@ -36,7 +36,7 @@
 *        ignored.
 *     REPORT = LOGICAL (Given)
 *        If REPORT is set .TRUE. then for each domain removed, a message
-*        is logged through the CCDPACK logging system.  Otherwise 
+*        is logged through the CCDPACK logging system.  Otherwise
 *        operation is silent.
 *     JKEEP = INTEGER (Given and Returned)
 *        Any frame with this index will not be deleted, even if it has
@@ -44,7 +44,7 @@
 *        frame as on entry, although if frames with indices below its
 *        value have been removed, its numerical value will have changed.
 *
-*        If no frames are to be exempted, this should be set to a 
+*        If no frames are to be exempted, this should be set to a
 *        non-positive (e.g. AST__NOFRAME).  In this case, it is allowed
 *        to supply a constant rather than a variable for this parameter.
 *     STATUS = INTEGER (Given and Returned)
@@ -91,13 +91,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      
+
 *  Arguments Given:
       INTEGER FSET
       CHARACTER * ( * ) DOMAIN
       LOGICAL REPORT
       INTEGER JKEEP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -108,12 +108,12 @@
       INTEGER NFRM               ! Number of frames in frameset
       LOGICAL ISBAS              ! Is this the Base frame?
       LOGICAL ISCUR              ! Is this the Current frame?
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Get case folded and despaced domain name.
       DMN1 = DOMAIN
       CALL CHR_UCASE( DMN1 )
@@ -144,7 +144,7 @@
 *  Log to user if required.
                CALL MSG_SETC( 'DMN', DMN1 )
                IF ( REPORT )
-     :            CALL CCD1_MSG( ' ', 
+     :            CALL CCD1_MSG( ' ',
      :         '      Removing existing frame in domain ^DMN', STATUS )
 
 *  Keep track of the position of the retained frame.

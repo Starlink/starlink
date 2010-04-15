@@ -1,30 +1,30 @@
       SUBROUTINE MEAN_COUNTS(STOKES_I,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C  M E A N _ C O U N T S
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C STOKES_I (<), NPTS (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Find the mean counts per bin in the current polarization spectrum
 C
 C
 C-
 
-      IMPLICIT NONE 
+      IMPLICIT NONE
       INTEGER NPTS,I,OUT_LU
       REAL STOKES_I(*),TOT
       TOT=0.

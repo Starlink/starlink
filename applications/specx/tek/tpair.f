@@ -68,7 +68,7 @@ C--------------------------------------------------------------------------
       ELSE IF (ISTAT.EQ.2) THEN                ! =2, ^Z or \ (end of list)
         TPAIR = 2
 
-      ELSE 
+      ELSE
         TPAIR = -1                             ! -ve, error return
       END IF
 

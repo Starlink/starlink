@@ -109,7 +109,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -155,7 +155,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       SCALED = SCALE .GT. 0.0
-      
+
 *  Initialise sums to form the rms error of the fit.
       SUMSQ = 0.0
       NPT = 0
@@ -202,12 +202,12 @@
          IF ( SCALED ) THEN
             RMS = SQRT( SUMSQ / REAL( NPT ) ) / SCALE
          ELSE
-            RMS = SQRT( SUMSQ / REAL( NPT ) ) 
+            RMS = SQRT( SUMSQ / REAL( NPT ) )
          END IF
       ELSE
          RMS = VAL__BADR
       END IF
 
   999 CONTINUE
- 
+
       END

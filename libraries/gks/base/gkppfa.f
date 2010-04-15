@@ -43,7 +43,7 @@ C# IL>=a, OL>=0
 *     TRI2    Twice the area of triangle formed by
 *             pick point and line-segment
 *             Negative, if line-segment passes pick point anti-clockwise
- 
+
       REAL    AX,AY,  BX,BY, TRI2
       INTEGER IA, IB, NCROSS
 *
@@ -62,19 +62,19 @@ C# IL>=a, OL>=0
 *     BX is 0.
 *
 *-------------------------------------------------------------
- 
+
       NCROSS = 0
- 
+
 *     First point
       AX = RX(1) - XP
- 
+
 *     Loop over lines joining consecutive points
       DO 10 IA=1,NRD
- 
+
 *        Latter point
          IB = IA+1-NRD*(IA/NRD)
          BX = RX(IB) - XP
- 
+
 *        If the two points are at either side of the pick point,
 *        check whether the line joining them goes above.
 *        If so increment the crossing count.
@@ -99,10 +99,10 @@ C# IL>=a, OL>=0
 *        Make latter pt former for next line-segment
          AX = BX
    10 CONTINUE
- 
+
 *     Give result
       INSIDE = (NCROSS .NE. 2*(NCROSS/2))
- 
+
       RETURN
 *
       END

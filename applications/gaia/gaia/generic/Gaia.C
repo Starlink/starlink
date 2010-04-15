@@ -81,7 +81,7 @@ extern "C" {
     int SpectralPlot_Init();
     int Tcladam_Init( Tcl_Interp *interp );
     int Word_Init();
-    
+
     int Tkhtml_Init( Tcl_Interp *interp );
 }
 
@@ -189,7 +189,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     }
 
     //  HTML viewer widget.
-    
+
     if (Tkhtml_Init(interp) == TCL_ERROR ) {
         return TCL_ERROR;
     }

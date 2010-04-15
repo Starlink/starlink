@@ -9,7 +9,7 @@
 *  Invocation:
 *     CALL CAP_GSCCL (CIOUT, MXCOL; NUMCOL, FIOUT; STATUS)
 *  Description:
-*     Create a set of columns for a HST GSC region converted to the 
+*     Create a set of columns for a HST GSC region converted to the
 *     preferred CURSA format.  Note that the catalogue will be sorted
 *     on Declination.
 *  Arguments:

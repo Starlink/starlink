@@ -19,7 +19,7 @@
 *     calculating the various sums required for the least-squares method.
 *     Data with bad quality or zero variance are ignored. If no `good' data
 *     are found then an error will be reported and the routine will return
-*     with bad status. 
+*     with bad status.
 *
 *        A matrix equation of the form M * B = Z is constructed, where:-
 *
@@ -30,12 +30,12 @@
 *     S[x/var]         S[x^2/var]        S[xy/var]        S[(x^3+xy^2)/var]
 *
 *     S[y/var]         S[xy/var]         S[y^2/var]       S[(x^2y+y^3)/var]
-* 
+*
 *     S[(x^2+y^2)/var] S[(x^3+xy^2)/var] S[(x^2y+y^3)/var] S[(x^2+y^2)^2/var]
 *
 *
 *           B = A0 + A1 * X0^2 + A1 * Y0^2
-*               
+*
 *                      - 2 * A1 * X0
 *
 *                      - 2 * A1 * Y0
@@ -51,7 +51,7 @@
 *
 *               S[(x^2+y^2)z/var]
 *
-*     where x, y, z and var are the x,y coords, value and variance of the 
+*     where x, y, z and var are the x,y coords, value and variance of the
 *     measured points and S[...] denotes the sum of the expression over all
 *     valid points.
 *
@@ -224,7 +224,7 @@
                SUM_X2 = SUM_X2 + X(I)*X(I) / VARIANCE(I)
                SUM_Y2 = SUM_Y2 + Y(I)*Y(I) / VARIANCE(I)
                SUM_XY = SUM_XY + X(I)*Y(I) / VARIANCE(I)
-               SUM_X3XY2 = SUM_X3XY2 + 
+               SUM_X3XY2 = SUM_X3XY2 +
      :           (X(I)*X(I)*X(I) + X(I)*Y(I)*Y(I)) / VARIANCE(I)
                SUM_X2YY3 = SUM_X2YY3 +
      :           (X(I)*X(I)*Y(I) + Y(I)*Y(I)*Y(I)) / VARIANCE(I)
@@ -234,7 +234,7 @@
                SUM_Z = SUM_Z + DATA(I) / VARIANCE(I)
                SUM_XZ = SUM_XZ + X(I)*DATA(I) / VARIANCE(I)
                SUM_YZ = SUM_YZ + Y(I)*DATA(I) / VARIANCE(I)
-               SUM_X2Y2Z = SUM_X2Y2Z + (X(I)*X(I) + Y(I)*Y(I)) * 
+               SUM_X2Y2Z = SUM_X2Y2Z + (X(I)*X(I) + Y(I)*Y(I)) *
      :           DATA(I) / VARIANCE(I)
             END IF
          END DO
@@ -300,14 +300,14 @@
                X0 = REAL (-B(2)) / (2.0 * A1)
                Y0 = REAL (-B(3)) / (2.0 * A1)
                A0 = REAL (B(1)) - A1 * (X0*X0 + Y0*Y0)
-               
-               Z_PEAK = REAL(B(1)) + REAL(B(2))*X0 + REAL(B(3))*Y0 + 
+
+               Z_PEAK = REAL(B(1)) + REAL(B(2))*X0 + REAL(B(3))*Y0 +
      :              REAL(B(4))*(X0**2 + Y0**2)
-               Z_PEAK_VAR = REAL(MATRIX(1,1)) + 
+               Z_PEAK_VAR = REAL(MATRIX(1,1)) +
      :              X0**2 * REAL(MATRIX(2,2)) +
-     :              Y0**2 * REAL(MATRIX(3,3)) + 
+     :              Y0**2 * REAL(MATRIX(3,3)) +
      :              (X0**2+Y0**2)**2 * REAL(MATRIX(4,4)) +
-     :              2.0 * X0 * REAL(MATRIX(1,2)) + 
+     :              2.0 * X0 * REAL(MATRIX(1,2)) +
      :              2.0 * Y0 * REAL(MATRIX(1,3)) +
      :              2.0 * (X0**2+Y0**2) * REAL(MATRIX(1,4)) +
      :              2.0 * X0 * Y0 * REAL(MATRIX(2,3)) +
@@ -322,6 +322,6 @@
             END IF
          END IF
       END IF
-            
+
 *      print *, 'fit ', z_peak, z_peak_var, x0, y0
       END

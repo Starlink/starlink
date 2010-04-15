@@ -19,11 +19,11 @@
 *     so that the returned arrays looks like the equivalent arrays returned
 *     by NAG routine C06FCE.
 *
-*     The real and imaginary co-efficients produced by PDA_CFFTF are numerically 
-*     larger than the corresponding C06FCE co-efficients by a factor of 
+*     The real and imaginary co-efficients produced by PDA_CFFTF are numerically
+*     larger than the corresponding C06FCE co-efficients by a factor of
 *     SQRT( NP ), and are stored differently. NAG uses two separate
-*     1-dimensional arrays to store the real and imaginary co-efficients, 
-*     whereas FFTPACK stored them in a single two dimensional array (each 
+*     1-dimensional arrays to store the real and imaginary co-efficients,
+*     whereas FFTPACK stored them in a single two dimensional array (each
 *     row holds a pair of corresponding real and imaginary co-efficients).
 
 *  Arguments:
@@ -60,11 +60,11 @@
 *  Arguments Returned:
       REAL    X( NP )
       REAL    Y( NP )
-      
+
 *  Local Variables:
       REAL    FAC                ! Normalisation factor
       INTEGER J                  ! Loop count
-   
+
 *.
 
 *  Store the normalisation factor

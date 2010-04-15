@@ -58,7 +58,7 @@
          B = 1.0
 
       ELSE
-      
+
 *   Monochrome device - grey scale ramp from index 2 upwards
          IF (ICOL.EQ.GNO) THEN
             R = REAL(I)/REAL(NCOL-1)

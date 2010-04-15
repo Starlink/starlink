@@ -16,11 +16,11 @@
 *     CALL STRING_STRIPQUOT ( ENTRY, VALUE, STATUS )
 
 *  Description:
-*     Produces the 'value' of a character string formatted following 
-*     FORTRAN 77 syntax - ie. It is contained within single quotes, but 
-*     the single quote character can be included as part of the string 
+*     Produces the 'value' of a character string formatted following
+*     FORTRAN 77 syntax - ie. It is contained within single quotes, but
+*     the single quote character can be included as part of the string
 *     by doubling it.
-*     If the given string contains no quotes, then it is simply copied 
+*     If the given string contains no quotes, then it is simply copied
 *     to the output string.
 
 *  Arguments:
@@ -31,8 +31,8 @@
 *     STATUS=INTEGER (returned)
 
 *  Algorithm:
-*     The quotes surrounding the input string are found. The characters 
-*     between them are copied to the output string, pairs of quotes 
+*     The quotes surrounding the input string are found. The characters
+*     between them are copied to the output string, pairs of quotes
 *     being contracted to single quotes.
 
 *  Copyright:
@@ -94,10 +94,10 @@
       PARAMETER ( QUOTE = '''' )
 
 *  Local Variables:
-      INTEGER FIRSTQ                     ! position of first quote in 
+      INTEGER FIRSTQ                     ! position of first quote in
                                          ! ENTRY
 
-      INTEGER LASTQ                      ! position of last quote in 
+      INTEGER LASTQ                      ! position of last quote in
                                          ! ENTRY
 
       INTEGER I

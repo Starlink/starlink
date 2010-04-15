@@ -16,7 +16,7 @@
 
 *  Description:
 *     This subroutine is used by application SKYWRITE to set text
-*     attributes. 
+*     attributes.
 
 *  Arguments:
 *     XDIM = REAL (Given)
@@ -34,7 +34,7 @@
 *     FONT = INTEGER (Given)
 *        The setting of the text font.
 *     PEN = INTEGER (Given)
-*        The setting of the SGS pen to be used.  
+*        The setting of the SGS pen to be used.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -51,7 +51,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
 
 *  Set height as the fraction of the X dimension of the image.
       CALL SGS_SHTX( MAX( 0.00001, HEIGHT ) * XDIM )
-      
+
 *  Set Aspect ratio.
       CALL SGS_SARTX( ABS( RATIO ) )
 
@@ -94,7 +94,7 @@
 
 *  Set space between characters.
       CALL SGS_SSPTX( SPACE )
-            
+
 *  Set font number.
       CALL SGS_SFONT( MAX( 1, FONT ) )
 
@@ -107,7 +107,7 @@
          CALL SGS_SPEN( 1 )
       END IF
 
-*  See if an error was reported by SGS/GKS.      
+*  See if an error was reported by SGS/GKS.
       CALL GKS_GSTAT( STATUS )
 
       END

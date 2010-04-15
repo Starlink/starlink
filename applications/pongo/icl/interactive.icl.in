@@ -107,7 +107,7 @@ CCMATH Z=1/(Z+0.1)
 PRINT "Invoking the SIZEPLOT command to plot scaled symbols."
 SIZEPLOT
 
-{  This line resets the plotting pen, font, point fill style, line style 
+{  This line resets the plotting pen, font, point fill style, line style
 {  and line width to their defaults.
 CHANGE RESET
 

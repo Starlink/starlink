@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE str_APPND
 *
-*   Description: 
+*   Description:
 *      Append one string onto another.
 *
 *   Authors:
@@ -33,12 +33,12 @@
 
 *   Import:
       BYTE STR1(ARB)       ! string to be appended
- 
+
       INTEGER SIZE2        ! maximum size of final string
- 
+
 *   Import/Export:
       BYTE STR2(SIZE2)     ! string to be extended
- 
+
 *   External references:
       INTEGER str_LEN      ! string length
 

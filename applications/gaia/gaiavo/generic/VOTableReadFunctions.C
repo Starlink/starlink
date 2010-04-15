@@ -74,7 +74,7 @@ namespace gaia {
      *  Main routine for reading. Translate contents of a Skycat tab table
      *  into a DOM rooted at the given VOTABLE.
      */
-    int VOTable::votable_read( AstroCatalog *cat, 
+    int VOTable::votable_read( AstroCatalog *cat,
                                votable_11::VOTABLE &votable )
     {
         using namespace votable_11;

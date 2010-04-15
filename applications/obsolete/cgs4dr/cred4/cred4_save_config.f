@@ -3,7 +3,7 @@
 *    Description :
 *     This routine reads the data reduction configuration from the
 *     noticeboard and then saves it to a given file. The file is assumed
-*     to be in the CGS4_CONFIG directory by default. 
+*     to be in the CGS4_CONFIG directory by default.
 *    Invocation :
 *     CALL CRED4_SAVE_CONFIG( STATUS )
 *    Authors :

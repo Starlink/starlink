@@ -36,7 +36,7 @@
 ;;; the bottom border. Find the window line corresponding to this border
 ;;; width.
 	(setq bot (- last (/ (* nlines edstar-bottom-scroll-border) 100)))
-      
+
 ;;; If point lies below this line, then scroll to bring the line containing
 ;;; point up to the bottom border position.
 	(if (> current bot)

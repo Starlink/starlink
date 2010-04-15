@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_MLPLB( NDISP, USE, N, X, Y, OFFSET, IPLOT, PARAM1,
-     :                       PARAM2, PARAM3, PARAM4, APP, LINDX, ZMARK, 
+     :                       PARAM2, PARAM3, PARAM4, APP, LINDX, ZMARK,
      :                       IGRP3, STATUS )
 *+
 *  Name:
@@ -7,7 +7,7 @@
 
 *  Purpose:
 *     Adds curve labels and zero-point markers to the plot produced by
-*     MLINPLOT. 
+*     MLINPLOT.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,12 +18,12 @@
 *                      STATUS )
 
 *  Description:
-*     This routine adds curve labels and zero0point markers to the plot 
+*     This routine adds curve labels and zero0point markers to the plot
 *     produced by MLINPLOT.  The following graphical attributes may be
 *     used to control the apperance of the labels and zero-point
 *     markers.
 *
-*        Size(Zeromark)  : Relative scale factor for the length of the 
+*        Size(Zeromark)  : Relative scale factor for the length of the
 *                          zero-point markers.
 *        Colour(Zeromark): Colour for the zero-point markers.
 *        Width(Zeromark) : Line width for the zero-point markers.
@@ -35,17 +35,17 @@
 *        Style(Labels)   : Line style for the curve labels.
 *        Font(Labels)    : Line style for the curve labels.
 *
-*        LabPos(Left)    : Horizontal position of the left-curve label. 
-*        LabPos(Right)   : Horizontal position of the right-curve 
-*                          label. 
+*        LabPos(Left)    : Horizontal position of the left-curve label.
+*        LabPos(Right)   : Horizontal position of the right-curve
+*                          label.
 *
 *     Minimum abbreviation for "ZeroMark" Is "Zer".
 *     Minimum abbreviation for "Labels" Is "Lab".
 *     Minimum abbreviation for "Left" Is "L".
 *     Minimum abbreviation for "Right" Is "R".
 *
-*     "LabPos" without any qualifier refers to the Left label.  LabPos 
-*     values are floating point, with 0.0 meaning the left edge of the 
+*     "LabPos" without any qualifier refers to the Left label.  LabPos
+*     values are floating point, with 0.0 meaning the left edge of the
 *     plotting area, and 1.0 the right edge.
 
 *  Arguments:
@@ -55,20 +55,20 @@
 *        Set .FALSE. if the corresponding curve was not drawn.
 *     N = INTEGER (Given)
 *        Number of points to be plotted.
-*     X( N, NDISP ) = DOUBLE PRECISION (Given) 
-*        The X value at each point in each curve, in PGPLOT world 
-*        co-ordinate (i.e. millimetres from the bottom=left corner 
+*     X( N, NDISP ) = DOUBLE PRECISION (Given)
+*        The X value at each point in each curve, in PGPLOT world
+*        co-ordinate (i.e. millimetres from the bottom=left corner
 *        of the view surface).
-*     Y( N, NDISP ) = DOUBLE PRECISION (Given) 
+*     Y( N, NDISP ) = DOUBLE PRECISION (Given)
 *        The Y value at each point, in PGPLOT world co-ordinate (i.e.
 *        millimetres from the bottom-left corner of the view surface).
-*     OFFSET( NDISP ) = DOUBLE PRECISION (Given) 
-*        The zero-point for each curve, in PGPLOT world co-ordinate 
+*     OFFSET( NDISP ) = DOUBLE PRECISION (Given)
+*        The zero-point for each curve, in PGPLOT world co-ordinate
 *        (i.e. millimetres from the bottom of the view surface).
 *     IPLOT = INTEGER (Given)
-*        An AST Plot which can be used to do the drawing.  The Base 
-*        Frame should be GRAPHICS co-ordinates (millimetres from the 
-*        bottom-left corner of the PGPLOT view surface). 
+*        An AST Plot which can be used to do the drawing.  The Base
+*        Frame should be GRAPHICS co-ordinates (millimetres from the
+*        bottom-left corner of the PGPLOT view surface).
 *     PARAM1 = CHARACTER * ( * ) (Given)
 *        The name of the style parameter to be used when obtaining the
 *        plotting style.
@@ -130,17 +130,17 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants and function 
+      INCLUDE 'AST_PAR'          ! AST constants and function
                                  ! declarations
-      INCLUDE 'GRP_PAR'          ! GRP constants 
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Arguments Given:
       INTEGER NDISP
@@ -159,25 +159,25 @@
       LOGICAL ZMARK
 
 *  Arguments Returned:
-      INTEGER IGRP3              
+      INTEGER IGRP3
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
       INTEGER NAT                ! No. of AST attributes used
-      PARAMETER ( NAT = 11 )   
+      PARAMETER ( NAT = 11 )
 
 *  Local Variables:
-      CHARACTER ATTNAM( NAT )*20 ! Names of attributes used by this 
+      CHARACTER ATTNAM( NAT )*20 ! Names of attributes used by this
                                  ! routine
       CHARACTER LAB*( GRP__SZNAM ) ! A curve label
-      CHARACTER PENDEF*( GRP__SZNAM )! AST attribute settings for 
+      CHARACTER PENDEF*( GRP__SZNAM )! AST attribute settings for
                                  ! current pen
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
-      DOUBLE PRECISION DIST      ! X distance between data sample and 
+      DOUBLE PRECISION DIST      ! X distance between data sample and
                                  ! label
-      DOUBLE PRECISION GAP       ! Gap between left edge and label 
+      DOUBLE PRECISION GAP       ! Gap between left edge and label
                                  ! centre
       DOUBLE PRECISION MNDIST    ! Minimum X distance found so far
       DOUBLE PRECISION POS( 2 )  ! Label position
@@ -190,7 +190,7 @@
       INTEGER IGRP2              ! GRP identifier for label group
       INTEGER IPEN               ! Index of current pen definition
       INTEGER J1                 ! Index at start of attribute setting
-      INTEGER J2                 ! Index of comma at end of attribute 
+      INTEGER J2                 ! Index of comma at end of attribute
                                  ! setting
       INTEGER K                  ! Line index
       INTEGER NLAB               ! Number of labels supplied in IGRP2
@@ -209,7 +209,7 @@
       REAL YT                    ! Top Y limit of PGPLOT window
       REAL ZEROSZ                ! Length of zero-point marker
 
-      DATA ATTNAM /'COLOUR(AXES)',  'WIDTH(AXES)',     'STYLE(AXES)', 
+      DATA ATTNAM /'COLOUR(AXES)',  'WIDTH(AXES)',     'STYLE(AXES)',
      :             'MAJTICKLEN',    'COLOUR(TEXTLAB)', 'WIDTH(TEXTLAB)',
      :             'FONT(TEXTLAB)', 'STYLE(TEXTLAB)',  'SIZE(TEXTLAB)',
      :             'TEXTLABGAP(1)', 'TEXTLABGAP(2)' /
@@ -217,7 +217,7 @@
       DATA UP / 0.0, 1.0 /
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Save the index of the Plot's Current Frame, and then set it to the
@@ -244,7 +244,7 @@
       CALL GRP_NEW( 'Curve labels', IGRP3, STATUS )
 
 *  Get a group of labels from the environment, storing them in the group
-*  created above.  Annul the error if no labels are supplied. 
+*  created above.  Annul the error if no labels are supplied.
       CALL KPG1_GTGRP( PARAM3, IGRP2, NLAB, STATUS )
       IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
@@ -253,7 +253,7 @@
 *  =================================================================
 
 *  Save the plotting attributes for the AST graphical elements which may
-*  be changed by this routine, so that we can reinstate before we 
+*  be changed by this routine, so that we can reinstate before we
 *  return.
       DO I = 1, NAT
          ATT0( I ) = AST_GETR( IPLOT, ATTNAM( I ), STATUS )
@@ -261,29 +261,29 @@
       END DO
 
 *  Establish synonyms for AST graphical element names to be recognised
-*  during the following call to KPG1_ASSET.  The length of the 
-*  zero-point markers is specified by "Size(zeromark)" which is a 
-*  synonym for "MajTickLen".  MajTickLen is used because it can take 
-*  both negative and positive values.  We first translate any explicit 
-*  MajTickLen settings into settings for the illegal attribute name 
-*  DUMMY.  This prevents MajTickLen settings from changing the length 
+*  during the following call to KPG1_ASSET.  The length of the
+*  zero-point markers is specified by "Size(zeromark)" which is a
+*  synonym for "MajTickLen".  MajTickLen is used because it can take
+*  both negative and positive values.  We first translate any explicit
+*  MajTickLen settings into settings for the illegal attribute name
+*  DUMMY.  This prevents MajTickLen settings from changing the length
 *  of the zero-point markers.
       CALL KPG1_ASPSY( 'MAJTICKLEN', 'DUMMY', STATUS )
 
-*  Now translate any Size(zeromark) settings into settings for 
+*  Now translate any Size(zeromark) settings into settings for
 *  MajTickLen.  Note, since this is done after the previous translation,
-*  these MajTickLen settings will not get translated into settings for 
+*  these MajTickLen settings will not get translated into settings for
 *  DUMMY.
       CALL KPG1_ASPSY( 'SIZE(ZER*OMARK)', 'MAJTICKLEN', STATUS )
 
 *  The other attributes for the zero-point markers are set equal to
-*  those of AST "axes".  We first translate any explicitly supplied 
-*  Axes values into Dummy values so that they do not effect the 
+*  those of AST "axes".  We first translate any explicitly supplied
+*  Axes values into Dummy values so that they do not effect the
 *  appearance of the zero-point markers.
       CALL KPG1_ASPSY( '(AXES)', '(DUMMY)', STATUS )
       CALL KPG1_ASPSY( '(ZER*OMARK)', '(AXES)', STATUS )
 
-*  The attributes for the curve labels are set equal to those of AST 
+*  The attributes for the curve labels are set equal to those of AST
 *  "strings".
       CALL KPG1_ASPSY( '(LAB*ELS)', '(STRINGS)', STATUS )
 
@@ -292,16 +292,16 @@
 *  First ignore any explicit settings for these attributes.
       CALL KPG1_ASPSY( 'TEXTLABGAP', 'DUMMY', STATUS )
 
-*  Now translate "LabPos(L*eft)" into "TextLabGap(1), and 
+*  Now translate "LabPos(L*eft)" into "TextLabGap(1), and
 *  "LabPos(R*ight)" into "TextLabGap(2).  "LabPos" is made equivalent to
 *  "LabPos(Left)".
       CALL KPG1_ASPSY( 'LABPOS', 'LABPOS(LEFT)', STATUS )
       CALL KPG1_ASPSY( 'LABPOS(L*EFT)', 'TEXTLABGAP(1)', STATUS )
       CALL KPG1_ASPSY( 'LABPOS(R*IGHT)', 'TEXTLABGAP(2)', STATUS )
 
-*  Set the attributes of the supplied Plot using the supplied parameter 
-*  to access a plotting style.  The above synonyms are recognised and 
-*  translated into the corresponding AST attribute names.  Colour names 
+*  Set the attributes of the supplied Plot using the supplied parameter
+*  to access a plotting style.  The above synonyms are recognised and
+*  translated into the corresponding AST attribute names.  Colour names
 *  are also translated into colour indices.
       CALL KPG1_ASSET( APP, PARAM1, IPLOT, STATUS )
 
@@ -350,17 +350,17 @@
 *  Store a single precision copy of the offset for this curve.
          OFF = REAL( OFFSET( K ) )
 
-*  If different pens are being used, set the required attributes in the 
+*  If different pens are being used, set the required attributes in the
 *  Plot to produce the pen style for this curve.
          IF( NPEN .GT. 0 ) THEN
 
-*  Get the next list of AST Attribute settings from the group. 
+*  Get the next list of AST Attribute settings from the group.
             CALL GRP_GET( IGRP1, IPEN, 1, PENDEF, STATUS )
 
 *  Abort if an error has occurred.
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Loop round each comma-delimited attribute in the definitions, 
+*  Loop round each comma-delimited attribute in the definitions,
 *  translating colour names and any defined synonyms, and storing it in
 *  the Plot.
             IF( PENDEF .NE. ' ' ) THEN
@@ -368,13 +368,13 @@
                DO WHILE( J1 .LE. GRP__SZNAM )
                   J2 = J1
                   CALL CHR_FIND( PENDEF, ',', .TRUE., J2 )
-                  CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE., 
+                  CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE.,
      :                             .TRUE., IPLOT, BADAT, STATUS )
                   J1 = J2 + 1
 
 *  Annul any error which occurred while setting the pen.
                   IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-      
+
                END DO
 
             END IF
@@ -391,7 +391,7 @@
 *  Set up the correct PGPLOT attributes.
             CALL KPG1_PGSTY( IPLOT, 'AXES', .TRUE., ATTR, STATUS )
 
-*  Get the size of the markers.  This is scaled by the "size(zero)" 
+*  Get the size of the markers.  This is scaled by the "size(zero)"
 *  attribute which is a synonym for "size(curves)".
             ZEROSZ = AST_GETR( IPLOT, 'MAJTICKLEN', STATUS )*NL
 
@@ -414,12 +414,12 @@
          IF( K .LE. NLAB ) THEN
             CALL GRP_GET( IGRP2, K, 1, LAB, STATUS )
 
-*  Otherwise, format the line pixel index, preceeding it by a "#". 
+*  Otherwise, format the line pixel index, preceeding it by a "#".
 *  Store the label in the group.
          ELSE
             LAB = '#'
             IAT = 1
-            CALL CHR_PUTI( LINDX( K ), LAB, IAT )            
+            CALL CHR_PUTI( LINDX( K ), LAB, IAT )
          END IF
 
 *  Only proceed if the label is not blank, and labels are required.
@@ -429,9 +429,9 @@
             CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTR, STATUS )
 
 *  First do the left label.
-            IF( LINLAB ) THEN 
+            IF( LINLAB ) THEN
 
-*  Get the horizontal position of the label (0.0 -> left edge, 1.0 -> 
+*  Get the horizontal position of the label (0.0 -> left edge, 1.0 ->
 *  right edge).
                GAP = AST_GETD( IPLOT, 'TEXTLABGAP(1)', STATUS )
                POS( 1 ) = XL * ( 1.0 - GAP ) + XR * GAP
@@ -447,7 +447,7 @@
                         MNDIST = DIST
                         POS( 2 ) = Y( I, K )
                      END IF
-                  END IF                     
+                  END IF
                END DO
 
 *  Draw the label.
@@ -456,10 +456,10 @@
             END IF
 
 *  Now do the right label, so long as it is not above or below the plot.
-            IF( ZMARK .AND. OFFSET( K ) .GE. YMIN .AND. 
-     :                      OFFSET( K ) .LE. YMAX ) THEN 
+            IF( ZMARK .AND. OFFSET( K ) .GE. YMIN .AND.
+     :                      OFFSET( K ) .LE. YMAX ) THEN
 
-*  Get the horizontal position of the label (0.0 -> left edge, 1.0 -> 
+*  Get the horizontal position of the label (0.0 -> left edge, 1.0 ->
 *  right edge).
                GAP = AST_GETD( IPLOT, 'TEXTLABGAP(2)', STATUS )
                POS( 1 ) = XL * ( 1.0 - GAP ) + XR * GAP
@@ -477,7 +477,7 @@
 *  End the PGPLOT buffering context.
          CALL PGEBUF
 
-*  If separate pen definitions are being used, re-instate the plotting 
+*  If separate pen definitions are being used, re-instate the plotting
 *  attributes specified by the parameter PARAM1.
          IF( NPEN .GT. 0 ) THEN
             DO I = 1, NAT
@@ -508,7 +508,7 @@
 *  Release resources used to store the synonyms.
       CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
-*  Re-instate the original plotting attributes for the AST graphical elements 
+*  Re-instate the original plotting attributes for the AST graphical elements
 *  which may have been changed by this routine.
       DO I = 1, NAT
          CALL AST_SETR( IPLOT, ATTNAM( I ), ATT0( I ), STATUS )

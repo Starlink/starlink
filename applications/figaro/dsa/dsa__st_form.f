@@ -11,7 +11,7 @@ C  Description:
 C     DSA__SET_FORMAT looks at the value of the logical name (or
 C     environment variable, depending on the system in use) FIGARO_FORMATS
 C     and uses this to control the formats that the DSA routines will
-C     recognise.  
+C     recognise.
 C
 C  Language:
 C     FORTRAN
@@ -22,7 +22,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (!) STATUS       (Integer,ref) Status code.  If a bad status value
-C                      is passed, this routine returns immediately. 
+C                      is passed, this routine returns immediately.
 C
 C  External variables used:
 C     Common variables used only by the DSA_ package.

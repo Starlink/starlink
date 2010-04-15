@@ -47,12 +47,12 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) COMM
       CHARACTER * ( * ) PARAMS
       INTEGER MAXPAR
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -64,18 +64,18 @@
       INTEGER
      :        W1LEN,             ! Used length of W1
      :        W2LEN              ! Used length of W2
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Try to find a (MAXPAR+1)'th word in the supplied string.
-      CALL FWORD( PARAMS, MAXPAR+1, W1, W1LEN )      
+      CALL FWORD( PARAMS, MAXPAR+1, W1, W1LEN )
 
 *  If found, try to find a (MAXPAR+2)'th word in the supplied string.
       IF( W1LEN .GT. 0 ) THEN
-         CALL FWORD( PARAMS, MAXPAR+2, W2, W2LEN )      
+         CALL FWORD( PARAMS, MAXPAR+2, W2, W2LEN )
 
 *  Issue a suitable warning message.
          IF( W2LEN .GT. 0 ) THEN
@@ -91,5 +91,5 @@
          END IF
 
       END IF
-      
+
       END

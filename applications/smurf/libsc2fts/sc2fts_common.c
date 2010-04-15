@@ -99,12 +99,12 @@ void csi_simplified(float *y_old, int _n, double *x_new, int _m, float *y_new)
    free(z);
    free(_coeff_x);
 
-   for(i=0; i<_m; i++) 
+   for(i=0; i<_m; i++)
    {
       int k = (int)(x_new[i]) + 1;
-      if(k>_n) 
-      { 
-        y_new[i] = 0.0; 
+      if(k>_n)
+      {
+        y_new[i] = 0.0;
       }
       else
       {

@@ -18,7 +18,7 @@
 *     Get locator to structure containing image
 *     If no error then
 *        See if there is a data array component in structure
-*        If there is 
+*        If there is
 *           Get its shape
 *           Output dimensions to user
 *        Else
@@ -26,7 +26,7 @@
 *        Endif
 *     Endif
 *     End
-*    
+*
 *    Authors :
 *
 *     Mark McCaughrean (REVA::MJM)
@@ -45,8 +45,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'         ! global SSE parameters
-      INCLUDE 'NDF_PAR'         
-      INCLUDE 'NDF_ERR'         
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -54,7 +54,7 @@
 
 *    Local constants :
 
-      INTEGER 
+      INTEGER
      :    NDIMS                 ! dimensionality of input images
       PARAMETER ( NDIMS  =  3 ) ! upto 3-d arrays allowed
 
@@ -107,12 +107,12 @@
 
 *          if more than one dimension
             IF ( ACTDIM .GT. 1 ) THEN
- 
-*             write out second dimension            
+
+*             write out second dimension
                CALL MSG_SETI( 'YDIM', DIMS( 2 ) )
                CALL MSG_OUT( 'Y_DIM',
      : ' Second dimension has ^YDIM pixels', STATUS )
-            
+
 *          set second dimension value in global
 	    CALL PAR_PUT0I( 'YDIM', DIMS( 2), STATUS)
 

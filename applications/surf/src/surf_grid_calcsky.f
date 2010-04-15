@@ -1,6 +1,6 @@
-      SUBROUTINE SURF_GRID_CALCSKY( TSKNAME, N_FILES, N_PTS, N_POS, 
-     :     N_BOLS, NYQUIST, IMNDF, N_M_FITS, MODEL_FITS, 
-     :     CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR,  BOL_DEC_PTR, 
+      SUBROUTINE SURF_GRID_CALCSKY( TSKNAME, N_FILES, N_PTS, N_POS,
+     :     N_BOLS, NYQUIST, IMNDF, N_M_FITS, MODEL_FITS,
+     :     CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR,  BOL_DEC_PTR,
      :     DATA_PTR, QUALITY_PTR, SKY_PTR, SKY_ERR, BADBIT, STATUS )
 *+
 *  Name:
@@ -11,11 +11,11 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
-*     CALL SURF_GRID_CALCSKY ( TSKNAME, N_FILES, N_PTS, N_POS, N_BOLS, 
+*     CALL SURF_GRID_CALCSKY ( TSKNAME, N_FILES, N_PTS, N_POS, N_BOLS,
 *    :     N_BOLS, NYQUIST, IMNDF, N_M_FITS, MODEL_FITS,
-*    :     CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR,  BOL_DEC_PTR, 
+*    :     CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR,  BOL_DEC_PTR,
 *    :     DATA_PTR, QUALITY_PTR, SKY_PTR, SKY_ERR, BADBIT, STATUS )
 
 *  Description:
@@ -27,19 +27,19 @@
 *     When calculating the source structure internally a similar
 *     method to that used by DESPIKE is employed. The input data
 *     are placed into bins of size one quarter beamwidth. The median
-*     of each bin is calculated and this is treated as the source 
+*     of each bin is calculated and this is treated as the source
 *     model (cf. REBIN_METHOD=MEDIAN in REBIN).
-*     
+*
 *     Once the source model is available, it is removed from
 *     all of the input data. The source-removed data are then analysed
 *     with the sky emission derived from the mean of the signal across
 *     the array for all the sample times.
-*     
+*
 *     Since the sky signal is expected to vary on timesales of the
 *     order of one second, an option is included for smoothing the
 *     sky signal. This is especially useful for scan map data where
-*     samples are taken at 7.8 Hz. 
-*     
+*     samples are taken at 7.8 Hz.
+*
 
 
 *  Arguments:
@@ -70,7 +70,7 @@
 *       Size of smoothing box - pixels
 *     BOL_RA_PTR( N_FILES ) = INTEGER (Given)
 *       Array of pointers to position information (X coords)
-*       Note that each data set has positions for N_POS * N_BOLS 
+*       Note that each data set has positions for N_POS * N_BOLS
 *     BOL_RA_PTR( N_FILES ) = INTEGER (Given)
 *       Array of pointers to position information (Y coords)
 *     DATA_PTR( N_FILES ) = INTEGER (Given, modified data)
@@ -96,8 +96,8 @@
 *     CHOP = REAL (Read)
 *       Chop throw to add to model (arcsec)
 *     IN = CHAR (Read)
-*        The name of the input file to be processed. This parameter is 
-*        requested repeatedly until a NULL value (!) is supplied. 
+*        The name of the input file to be processed. This parameter is
+*        requested repeatedly until a NULL value (!) is supplied.
 *        LOOP must be TRUE. IN can include a SCUBA section.
 *        Like the REF parameter this parameter accepts a text file.
 *     LOOP = LOGICAL (Read)
@@ -113,12 +113,12 @@
 *     NOSRC = NDF (Write)
 *       File to store source removed data. This can be used to
 *       check the source removal. Note that this output file can
-*       not be used directly by SURF for further processing since 
+*       not be used directly by SURF for further processing since
 *       the header is incomplete. No file is written by default.
 *     OUT_COORDS = CHAR (Read)
 *        The coordinate system to be used for the model determination.
 *        Available coordinate systems are:
-*        - AZ:  Azimuth/elevation offsets 
+*        - AZ:  Azimuth/elevation offsets
 *        - NA:  Nasmyth offsets
 *        - PL:  RA/Dec Offsets from moving centre (eg Planets)
 *        - RB:  RA/Dec (B1950)
@@ -149,7 +149,7 @@
 
 *  Examples:
 *     calcsky test_rlb model=! \\
-*       Calculate sky for test_rlb.sdf. Only read in one file and 
+*       Calculate sky for test_rlb.sdf. Only read in one file and
 *       don't use an external source model.
 *     calcsky list.inp model=m82 noloop\\
 *       Read in the files specified in list.inp and use m82.sdf
@@ -238,7 +238,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'DAT_PAR'                          ! DAT__SZLOC
@@ -248,7 +248,7 @@
       INCLUDE 'SURF_PAR'                         ! SURF constants
       INCLUDE 'NDF_PAR'                          ! NDF__NOID
       INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
- 
+
 *  Arguments Given:
       CHARACTER * (*) TSKNAME
       INTEGER N_FILES
@@ -271,7 +271,7 @@
       INTEGER JCEN
       REAL    CHOP_PA
       REAL    CHOP_THROW
-      
+
 *  Arguments Returned:
       INTEGER SKY_ERR ( N_FILES )
       INTEGER SKY_PTR ( N_FILES )
@@ -280,7 +280,7 @@
       INTEGER STATUS                        ! Global status
 
 *  Local Constants:
- 
+
 *  Local Variables:
       LOGICAL ADDCHOP                       ! To add or not to add the chop
       INTEGER BIN_PTR                       ! Binned data
@@ -344,7 +344,7 @@
 
 *  Local data
 *.
- 
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Initialise pointers
@@ -413,7 +413,7 @@
      :           'CRPIX1', ICEN, STATUS)
             CALL SCULIB_GET_FITS_I(SCUBA__MAX_FITS, N_M_FITS,MODEL_FITS,
      :           'CRPIX2', JCEN, STATUS)
-            
+
 *     Status bad - resort to calculating it from the bounds
             IF (STATUS .NE. SAI__OK) THEN
                CALL ERR_ANNUL(STATUS)
@@ -425,14 +425,14 @@
 
 *     If no model supplied we have to derive the source signal from the
 *     data. Calculate ourselves
-      ELSE 
-         
+      ELSE
+
          HAVE_MODEL = .FALSE.
 
 *     Choose a pixel size based on wavelength
 *     and dish diameter.
 *     Try for quarter beam size first.
-            
+
          OUT_PIXEL = REAL(NYQUIST) / 2.0
 
 *     Now find out how big an output grid is needed
@@ -479,7 +479,7 @@
 *     Fill the array with data. (1 file at a time)
 
          CALL SURFLIB_CALC_IJPOS(N_PTS(I), DBLE(OUT_PIXEL), ICEN, JCEN,
-     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBR)),
      :        STATUS)
@@ -497,7 +497,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
 
             CALL SURFLIB_HISTOGRAM_GRID( N_PTS(I), NX, NY, .TRUE.,
-     :           %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :           %VAL(CNF_PVAL(DATA_PTR(I))),
      :           %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
      :           %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
      :           %VAL(CNF_PVAL(GRID_PTR)), IMAX, JMAX, NMAX, STATUS)
@@ -558,7 +558,7 @@
          IF (ADDCHOP) THEN
 
 *     Assume it is a dual beam signal
-*     Now ask for the throw (in arcsec) and position angle 
+*     Now ask for the throw (in arcsec) and position angle
 *     Defaults come from the first input file
 
 *     Chop throw
@@ -580,7 +580,7 @@
 
 *     Add the dual beam
             CALL SURFLIB_CALC_CHOPPED_IMAGE( 2, MODEL_THROW, MODEL_PA,
-     :           NX, NY, %VAL(CNF_PVAL(MODEL_PTR)), 
+     :           NX, NY, %VAL(CNF_PVAL(MODEL_PTR)),
      :           %VAL(CNF_PVAL(STATS_PTR)), .FALSE.,
      :           0, 0, STATUS)
 
@@ -593,8 +593,8 @@
 *            CALL NDF_NEW('_REAL',2,LBND,UBND, ITEMP, GRNDF, STATUS)
 *            CALL NDF_MAP(GRNDF, 'DATA','_REAL', 'WRITE', GRPNTR,
 *     :           ITEMP, STATUS)
-*            CALL VEC_RTOR(.FALSE., NX * NY, 
-*     :           %VAL(STATS_PTR), 
+*            CALL VEC_RTOR(.FALSE., NX * NY,
+*     :           %VAL(STATS_PTR),
 *     :           %VAL(GRPNTR), IERR, NERR, STATUS)
 *            CALL NDF_UNMAP(GRNDF, '*', STATUS)
 *            CALL NDF_ANNUL(GRNDF, STATUS)
@@ -644,26 +644,26 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
-            CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, 
+            CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR,
      :                         %VAL(CNF_PVAL(BIN_PTR)))
-            CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI, 
+            CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI,
      :           %VAL(CNF_PVAL(BIN_POS_PTR)))
          END IF
 
 *     Now we need to copy the data into BIN_PTR and the positions
-*     into BIN_POS_PTR. 
+*     into BIN_POS_PTR.
 
          OFFSET = 0
 
          DO I = 1, N_FILES
 
             IF (STATUS .EQ. SAI__OK) THEN
-               
+
                CALL SURFLIB_FILL_GRID(N_PTS(I), NX, NY, NMAX, OFFSET,
-     :              %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :              %VAL(CNF_PVAL(DATA_PTR(I))),
      :              %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
      :              %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
-     :              %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :              %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)),
      :              %VAL(CNF_PVAL(BIN_POS_PTR)),
      :              STATUS)
 
@@ -689,7 +689,7 @@
 *     in each bin
 
          CALL SCULIB_MALLOC(NMAX * VAL__NBR, PNT_PTR, PNT_END, STATUS)
-         CALL SCULIB_MALLOC(NMAX * VAL__NBR, SCRATCH_PTR, SCRATCH_END, 
+         CALL SCULIB_MALLOC(NMAX * VAL__NBR, SCRATCH_PTR, SCRATCH_END,
      :        STATUS)
 
 
@@ -708,19 +708,19 @@
      :        STATUS)
          CALL SCULIB_MALLOC(NX * NY * VAL__NBI, JPOS_PTR, JPOS_END,
      :        STATUS)
-      
+
 *     ...and calculate the new grid look up table
 
          UMODE = 'XLINEAR'
          CALL SURFLIB_CALC_GRIDIJ(UMODE, NX, NY, ICEN, JCEN,
-     :        %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)), 
+     :        %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)),
      :        STATUS)
 
 
 *     Calculate the statistics of each bin and store in an array.
 *     Since this is generally useful for the plotting and the
 *     despiking itself.
-*     Have three measurements: 
+*     Have three measurements:
 *         Median and The mean + nsigma and the mean - nsigma
 *     Note that SURFLIB_PLOT_GRID still needs to work out the
 *     positions itself since it can not deal with bad pixels.
@@ -731,19 +731,19 @@
 
          STATS_PTR = 0
          STATS_END = 0
-         CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR,STATS_END, 
+         CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR,STATS_END,
      :        STATUS)
 
 *     Calculate stats using the specified smoothing mode
 
          SMODE = 'NONE'
          NSIGMA = 0.0
-         CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA, 
+         CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA,
      :        %VAL(CNF_PVAL(IPOS_PTR)),
-     :        %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :        %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)),
      :        %VAL(CNF_PVAL(PNT_PTR)),
      :        %VAL(CNF_PVAL(STATS_PTR)), STATUS)
-         
+
 *     Free memory
          CALL SCULIB_FREE('PNT_PTR', PNT_PTR, PNT_END, STATUS)
          CALL SCULIB_FREE('SCRATCH', SCRATCH_PTR, SCRATCH_END, STATUS)
@@ -753,7 +753,7 @@
          CALL SCULIB_FREE('JPOS_PTR', JPOS_PTR, JPOS_END, STATUS)
 
 
-*     Free BIN_PTR 
+*     Free BIN_PTR
          CALL SCULIB_FREE('BIN_PTR', BIN_PTR, BIN_PTR_END, STATUS)
          CALL SCULIB_FREE('BIN_POS', BIN_POS_PTR, BIN_POS_END, STATUS)
 
@@ -770,9 +770,9 @@
 *     Subtract source model
          CALL SURFLIB_REM_GRID(N_PTS(I), NX, NY,
      :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
-     :        %VAL(CNF_PVAL(STATS_PTR)), %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        %VAL(CNF_PVAL(STATS_PTR)), %VAL(CNF_PVAL(DATA_PTR(I))),
      :        STATUS)
-      
+
 *     Find new offset in lookup table
          OFFSET = OFFSET + N_PTS(I)
 
@@ -801,18 +801,18 @@
       UBND(2) = N_POS(1)
       IF (STATUS .EQ. SAI__OK) THEN
          CALL NDF_CREAT('NOSRC','_REAL', 2, LBND, UBND, GRNDF, STATUS)
- 
+
          IF (STATUS .NE. PAR__NULL) THEN
- 
-            CALL NDF_MAP(GRNDF, 'DATA', '_REAL', 'WRITE', GRPNTR, 
+
+            CALL NDF_MAP(GRNDF, 'DATA', '_REAL', 'WRITE', GRPNTR,
      :           ITEMP, STATUS)
-            CALL VEC_RTOR(.FALSE., N_BOLS(1) * N_POS(1), 
+            CALL VEC_RTOR(.FALSE., N_BOLS(1) * N_POS(1),
      :           %VAL(CNF_PVAL(DATA_PTR(1))),
      :           %VAL(CNF_PVAL(GRPNTR)), IERR, NERR, STATUS)
             CALL NDF_UNMAP(GRNDF, 'DATA', STATUS)
-            CALL NDF_MAP(GRNDF, 'QUALITY', '_UBYTE', 'WRITE', GRPNTR, 
+            CALL NDF_MAP(GRNDF, 'QUALITY', '_UBYTE', 'WRITE', GRPNTR,
      :           ITEMP, STATUS)
-            CALL VEC_UBTOUB(.FALSE., N_BOLS(1) * N_POS(1), 
+            CALL VEC_UBTOUB(.FALSE., N_BOLS(1) * N_POS(1),
      :           %VAL(CNF_PVAL(QUALITY_PTR(1))),
      :           %VAL(CNF_PVAL(GRPNTR)), IERR, NERR, STATUS)
             CALL NDF_UNMAP(GRNDF, 'QUALITY', STATUS)
@@ -873,7 +873,7 @@
 
             NGOOD = 0
             DO K = 1, N_BOLS(I)
-               
+
                CALL VEC_RTOR(.FALSE., 1,
      :   %VAL(CNF_PVAL(DATA_PTR(I)) + ((K-1) + OFFSET) * VAL__NBR),
      :              RTEMP, IERR, NERR, STATUS)
@@ -898,22 +898,22 @@
 
 *       Dont need to do anything special here. Just pass the data
 *       to stats (bad pixel and all)
-            
-*            CALL SCULIB_STATR(N_BOLS(I), -1.0, 
+
+*            CALL SCULIB_STATR(N_BOLS(I), -1.0,
 *     :           %VAL(DATA_PTR(I) + OFFSET * VAL__NBR),
 *     :           %VAL(QUALITY_PTR(I) + OFFSET * VAL__NBUB),
             CALL SCULIB_STATR(NGOOD, -1.0,
-     :           %VAL(CNF_PVAL(SCRATCH2_PTR)), 
+     :           %VAL(CNF_PVAL(SCRATCH2_PTR)),
      :           %VAL(CNF_PVAL(SCRATCHUB_PTR)),
      :           BADBIT(I), ITEMP, MEAN, MEDIAN, SUM, SUMSQ,
      :           STDEV, %VAL(CNF_PVAL(SCRATCH_PTR)), STATUS)
 
 *     Copy this value to the SKY_PTR array
-            CALL VEC_DTOR(.TRUE., 1, MEDIAN, 
+            CALL VEC_DTOR(.TRUE., 1, MEDIAN,
      :           %VAL(CNF_PVAL(SKY_PTR(I)) + (J-1) * VAL__NBR),
      :           IERR, NERR, STATUS)
 *     Copy in the error
-            CALL VEC_DTOR(.TRUE., 1, STDEV, 
+            CALL VEC_DTOR(.TRUE., 1, STDEV,
      :           %VAL(CNF_PVAL(SKY_ERR(I)) + (J-1) * VAL__NBR),
      :           IERR, NERR, STATUS)
 
@@ -952,7 +952,7 @@
      :        %VAL(CNF_PVAL(SCRATCH_PTR)), IERR, NERR, STATUS)
          BTEMP = 0
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_CFILLB(N_POS(I), BTEMP, 
+            CALL SCULIB_CFILLB(N_POS(I), BTEMP,
      :                         %VAL(CNF_PVAL(SCRATCHUB_PTR)))
          END IF
 
@@ -976,14 +976,14 @@
 
 *     Copy result to output file
 *     Copy this value to the SKY_PTR array
-               CALL VEC_DTOR(.TRUE., 1, MEAN, 
+               CALL VEC_DTOR(.TRUE., 1, MEAN,
      :              %VAL(CNF_PVAL(SKY_PTR(I)) + (J-1) * VAL__NBR),
      :              IERR, NERR, STATUS)
 *     Copy in the error if the status was good
 *     if not (eg bin was 1 pixel wide). Just keep the variance
 *     from the earlier calculation
                IF (STDEV .NE. VAL__BADD) THEN
-                  CALL VEC_DTOR(.TRUE., 1, STDEV, 
+                  CALL VEC_DTOR(.TRUE., 1, STDEV,
      :                 %VAL(CNF_PVAL(SKY_ERR(I)) + (J-1) * VAL__NBR),
      :                 IERR, NERR, STATUS)
                END IF
@@ -993,9 +993,9 @@
 
 *     Free the scratch space
          CALL SCULIB_FREE('SCRAT_SM', SCRATCH_PTR, SCRATCH_END, STATUS)
-         CALL SCULIB_FREE('SCRAT2_SM', SCRATCH2_PTR, SCRATCH2_END, 
+         CALL SCULIB_FREE('SCRAT2_SM', SCRATCH2_PTR, SCRATCH2_END,
      :        STATUS)
-         CALL SCULIB_FREE('SCRATUB_SM', SCRATCHUB_PTR, SCRATCHUB_END, 
+         CALL SCULIB_FREE('SCRATUB_SM', SCRATCHUB_PTR, SCRATCHUB_END,
      :        STATUS)
 
       END DO

@@ -15,7 +15,7 @@
 *     CALL SLINC2( PNLON, PNLAT, PNANG, PNARC, MODE, IRA, SCS, LBND,
 *                  UBND, MXNSCT, NGCRL, GLON, GLAT, GANG, GSCTLN,
 *                  STATUS )
-      
+
 *  Description:
 *     This subroutine is used to draw sections of great circles
 *     interactively. The user will be continuously prompted for the new
@@ -25,7 +25,7 @@
 *     and its length. When the length supplied by the user is a zeor,
 *     the subroutine will draw a longest great circle section over the
 *     image passing the given begin position. The spcifications of the
-*     ploted sections are appended to the ones on entry and returned.  
+*     ploted sections are appended to the ones on entry and returned.
 
 *  Arguments:
 *     PNLON = CHARACTER*( * ) (Given)
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -89,7 +89,7 @@
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'MSG_PAR'          ! MSG_ constant
-                                                                 
+
 *  Arguments Given:
       CHARACTER*( * ) PNLON
       CHARACTER*( * ) PNLAT
@@ -114,7 +114,7 @@
 *  External References:
       DOUBLE PRECISION SLA_DBEAR ! Position angle from one point to
                                  ! another
-                                
+
 *  Local Variables:
       DOUBLE PRECISION ANG       ! Position angle of a great circle
       DOUBLE PRECISION LON, LAT  ! Longitude & latitude of begin point
@@ -147,10 +147,10 @@
       EXIT = .FALSE.
       DO WHILE ( .NOT.EXIT .AND. NGCRL .LE. MXNSCT
      :           .AND. STATUS .EQ. SAI__OK )
-      
+
 *  Use keyboard if in keyboard mode.
          IF ( MODE( : 8 ) .EQ. 'KEYBOARD' ) THEN
-      
+
 *  Get begin position of the great circle section.
             CALL IRA_GETCO( PNLON, PNLAT,
      :                      ' at the start of the great circle arc',
@@ -167,7 +167,7 @@
                EXIT = .TRUE.
                CALL ERR_ANNUL( STATUS )
             END IF
-      
+
 *  Or use cursor in cursor mode.
          ELSE
 
@@ -178,7 +178,7 @@
      :   'any button (position the cursor outside the image to exit).',
      :                            STATUS )
             CALL MSG_BLANKIF( MSG__NORM, STATUS )
-      
+
 *  Get the begin position of the great circle section.
             CALL IRM_SKCUR( IRA, SCS, LBND, UBND, LON, LAT, OUT,
      :                      STATUS )
@@ -202,7 +202,7 @@
 
 *  If cursor position outside the image, set exit flag.
             IF ( OUT ) EXIT = .TRUE.
-      
+
          END IF
 
 *  If not exit and no error happened, draw the section. And record the
@@ -226,7 +226,7 @@
 
 *  Draw the curve.
                CALL IRA_DRGTC( IRA, LON, LAT, ANG, SCT, SCS, LBND, UBND,
-     :                         STATUS ) 
+     :                         STATUS )
 
             END IF
 
@@ -253,5 +253,5 @@
       END DO
 
  999  CONTINUE
-      
+
       END

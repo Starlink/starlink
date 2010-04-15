@@ -13,7 +13,7 @@
 *     CLEANSIZE (input)                  The side length of the extracted image
 *     INTEGER
 
-*     SKY,SKYSIGMA (input)               The median sky value and error as 
+*     SKY,SKYSIGMA (input)               The median sky value and error as
 *     REAL                               calculated by subroutine sky
 
 *     SSKY (input)                       The median sky value at the cleaning
@@ -81,7 +81,7 @@ C     Set the Cleanstore array to zero
       ENDDO
 
 C     Set the final output array to zero
- 
+
       DO J=1,45
          DO I=1,45
             CLEANEDARRAY(I,J)=0.0
@@ -97,7 +97,7 @@ C     Choose the level of noise to clean to
 
       NOISEPEAK=2.5*SKYSIGMA
 
-C     Now subtract the sky value from the array and make a copy 
+C     Now subtract the sky value from the array and make a copy
 C     for checking purposes
 
       TOP=0.0
@@ -138,7 +138,7 @@ C     for a full blooded clean
         ENDDO
         WRITE(6,'(A)')' NOW FORMING CLEANED IMAGE '
         DO J=1,CLEANSIZE
-           DO I=1,CLEANSIZE 
+           DO I=1,CLEANSIZE
                cleanedarray(I,J)=cleanarray(I,J)
 C              CLEANEDARRAY(I,J)=CLEANARRAY(I,J)+CLEANSTORE(I,J)
            ENDDO
@@ -175,7 +175,7 @@ C     Search the array for the largest absolute peak
          ENDDO
       ENDDO
 
-      
+
 
 C     Check that this peak is not below the noise
 C     or that clean is starting to diverge
@@ -233,7 +233,7 @@ C     Now form the cleaned image
  3    WRITE(6,'(A)')' NOW FORMING CLEANED IMAGE '
 
       DO J=1,CLEANSIZE
-         DO I=1,CLEANSIZE 
+         DO I=1,CLEANSIZE
             CLEANEDARRAY(I,J)=CLEANARRAY(I,J)+CLEANSTORE(I,J)
          ENDDO
       ENDDO
@@ -253,7 +253,7 @@ C     We now enter a checking section, slices,counts,etc
             ENDIF
          ENDDO
       ENDDO
-   
+
       WRITE(6,'(A)')' SLICES OF CLEANED OBJECT ABOUT TO BE PLOTTED '
 
       CALL PLOTSLICE(CLEANEDARRAY,CLEANSIZE,

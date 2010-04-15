@@ -19,10 +19,10 @@
       INTEGER I                   ! Loop variable
 *-
       DO I = 1, DIM
- 
+
          WRITE(*,*) I, ARRAY( I )
       END DO
- 
+
       END
 *+
       SUBROUTINE RED4_WRITED( DIM, ARRAY )
@@ -45,10 +45,10 @@
       INTEGER I                   ! Loop variable
 *-
       DO I = 1, DIM
- 
+
          WRITE(*,*) I, ARRAY( I )
       END DO
- 
+
       END
 *+
       SUBROUTINE RED4_WRITEI( DIM, ARRAY )
@@ -71,10 +71,10 @@
       INTEGER I                   ! Loop variable
 *-
       DO I = 1, DIM
- 
+
          WRITE(*,*) I, ARRAY( I )
       END DO
- 
+
       END
 *+
       SUBROUTINE RED4_WRITER( DIM, ARRAY )
@@ -97,10 +97,10 @@
       INTEGER I                   ! Loop variable
 *-
       DO I = 1, DIM
- 
+
          WRITE(*,*) I, ARRAY( I )
       END DO
- 
+
       END
 *+
       SUBROUTINE RED4_WRITEW( DIM, ARRAY )
@@ -123,8 +123,8 @@
       INTEGER I                   ! Loop variable
 *-
       DO I = 1, DIM
- 
+
          WRITE(*,*) I, ARRAY( I )
       END DO
- 
+
       END

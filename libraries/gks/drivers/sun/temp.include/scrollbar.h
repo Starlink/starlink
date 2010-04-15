@@ -72,7 +72,7 @@ typedef enum {
    SCROLL_END_POINT_AREA	= SCROLL_ATTR(ATTR_INT,          41)
 
 } Scrollbar_attribute;
- 
+
 typedef enum {
 
 SCROLL_ALWAYS,
@@ -101,8 +101,8 @@ typedef caddr_t	Scrollbar;
 /****************************************************************************/
 
 #define SCROLL_DEFAULT_WIDTH			14
-#define SCROLL_DEFAULT_BUBBLE_MARGIN 		0	
-#define SCROLL_DEFAULT_NORMALIZE_MARGIN 	4	
+#define SCROLL_DEFAULT_BUBBLE_MARGIN 		0
+#define SCROLL_DEFAULT_NORMALIZE_MARGIN 	4
 #define SCROLL_FIT_PIXWIN			-1
 
 /****************************************************************************/

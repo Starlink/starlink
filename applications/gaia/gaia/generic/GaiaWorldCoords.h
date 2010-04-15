@@ -65,7 +65,7 @@ public:
     void setRangeCheck( int check_range ) { check_range_ = check_range; }
 
     //  Output formatted versions of the position (use instead of prints).
-    void format( char* ra_buf, char* dec_buf, const char* equinoxStr, 
+    void format( char* ra_buf, char* dec_buf, const char* equinoxStr,
                  int hmsFlag=1 );
     void format( char* ra_buf, char* dec_buf, double equinox, int hmsFlag=1 );
 

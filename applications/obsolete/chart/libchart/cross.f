@@ -28,7 +28,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       GAP = R/5.0
- 
+
       CALL SGS_BPOLY (X+GAP,Y)
       CALL SGS_APOLY (X+R,Y)
       CALL SGS_BPOLY (X,Y+GAP)
@@ -38,5 +38,5 @@
       CALL SGS_BPOLY (X,Y-GAP)
       CALL SGS_APOLY (X,Y-R)
       CALL SGS_OPOLY
- 
+
       END

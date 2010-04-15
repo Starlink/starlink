@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ paper.
 The use of Packages is described in more detail in section 6.
 
 This paper only provides an introduction to ASPIC and DSCL.
-More detailed information on some of the ASPIC programs is contained in SUN/24 
+More detailed information on some of the ASPIC programs is contained in SUN/24
 and on DSCL in SUN/74.
 A lot of information is also stored on-line where it may be accessed using the
 HELP facility or extracted for printing using the ASPIC program FILEDOC.
@@ -955,7 +955,7 @@ selected regions of an image.
 \item [ISLICE]: The equivalent of SLICE after use of ICDISP.
 \item [MEAN*]: Calculate the mean from a patch of an array.
 \item [MEDBOX*]: Calculate the median from a patch of an array.
-\item [MSLICE]: Variant of SLICE which allows multiple slices to be obtained 
+\item [MSLICE]: Variant of SLICE which allows multiple slices to be obtained
 but which stores none of them.
 \item [MULCON]: Produce a contour map of a frame, or a series of contour maps
 of selected regions of a frame.
@@ -1120,7 +1120,7 @@ N.B.\ for large images this program is {\em very} slow; use procedure BIGCONV
 for such images.
 \item[CRDDBLUR]: Performs in-scan smoothing of CRDD using the in-scan
 point spread function of a specified IRAS band.
-\item[CRDDSAMPLE]: Subtracts linear baselines from a CRDD file to make the 
+\item[CRDDSAMPLE]: Subtracts linear baselines from a CRDD file to make the
 data consistent with a given image.
 \item[CRDDTRACE]: Graphically displays data streams from individual IRAS
 detectors.
@@ -1129,7 +1129,7 @@ histogram points, and makes them available for use by other programs.
 \item[DRAWSCAN]: Draws a coloured box around a single IRAS scan which forms
 part of a mosiaced image displayed on an ARGS or IKON.
 \item[EDRSIN]: Converts a 2d image stored in any BDF data format into an image
-usable by EDRS and EDRSX, and ensures all the descriptors are set up properly. 
+usable by EDRS and EDRSX, and ensures all the descriptors are set up properly.
 \item[FIXINVAL]: Sets all invalid (or blank) pixels in an image, to a given
 valid value.
 \item[FOURIER]: Produces the Fourier transform of an image.
@@ -1171,7 +1171,7 @@ the difference between mean data value in the overlapp regions.
 vice-versa.
 \item[SCATTER]: Produces a scatter plot of pixel values in one image
 against those in another.
-\item[SOURCEFIT]: Fits Gaussian-like sources to a set of merged features in an 
+\item[SOURCEFIT]: Fits Gaussian-like sources to a set of merged features in an
 image.
 \item[XYPLOT]: Plots positions held in an XY list on an image overlay device.
 \end{description}
@@ -1194,7 +1194,7 @@ be moved relative to the other while blinking is in progress.
 for more information).
 \item [IRASSTACK]: Aligns and stacks separate IRAS scans.
 \item [MASKGEN]: Used to create masks for destriping IRAS images.
-\item [MEMASK]: Creates a mask for use with the ANALYSE facility in program 
+\item [MEMASK]: Creates a mask for use with the ANALYSE facility in program
 MEMCRDD.
 \item [SKYSUB]: Calculates a polynomial background to an image and subtracts
 it off the image.
@@ -1548,7 +1548,7 @@ format.
 \item [INDPIX*]: Change an indicated pixel to a defined value.
 \item [LINCONU]: Read a Starlink image (as unsigned 16 bit integers) together
 with the descriptor items BSCALE and BZERO and convert the data into REAL
-values using: \newline OUTPUT=INPUT*BSCALE+BZERO. 
+values using: \newline OUTPUT=INPUT*BSCALE+BZERO.
 \item [LINCONV]: Read a Starlink image (as 16 bit integers) together with the
 descriptor items BSCALE and BZERO and convert the data into REAL values
 using:\newline OUTPUT=INPUT*BSCALE+BZERO.
@@ -1745,105 +1745,105 @@ described.
 {\scriptsize
 \begin{tabbing}
 BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
- ABLINK - 1                              \>CNTEXT* - 13                          
+ ABLINK - 1                              \>CNTEXT* - 13
    \>FLAG - 19                               \>
- LIN - 19                                \>PERIOD - 19                           
+ LIN - 19                                \>PERIOD - 19
    \>STARFIT - 8                             \\
- ABLOCK - 1                              \>COG - 5                               
+ ABLOCK - 1                              \>COG - 5
    \>FLAT - 15                               \>
- LINCONU - 18                            \>PICK - 22                             
+ LINCONU - 18                            \>PICK - 22
    \>STARMAG - 8                             \\
- ABOXASP - 13                            \>COLCYCLE - 17                         
+ ABOXASP - 13                            \>COLCYCLE - 17
    \>FLATTEN - 15                            \>
- LINCONV - 18                            \>PIXDUPE - 22                          
+ LINCONV - 18                            \>PIXDUPE - 22
    \>STARSIM* - 18                           \\
- ACLEAR - 1                              \>COLDIF - 13                           
+ ACLEAR - 1                              \>COLDIF - 13
    \>FLIP - 14                               \>
- LINEFIT - 8                             \>PIXFILL - 8                           
+ LINEFIT - 8                             \>PIXFILL - 8
    \>STARXY - 3                              \\
- ADD - 2                                 \>COLFIX* - 18                          
+ ADD - 2                                 \>COLFIX* - 18
    \>FLIPMSK - 2                             \>
- LINFIX* - 18                            \>PIXMAP - 8                            
+ LINFIX* - 18                            \>PIXMAP - 8
    \>STATS - 5                               \\
- ADDMSK - 2                              \>COLLAPSE - 8                          
+ ADDMSK - 2                              \>COLLAPSE - 8
    \>FOLD - 19                               \>
- LINPLOT - 6                             \>PIXUNMAP - 8                          
+ LINPLOT - 6                             \>PIXUNMAP - 8
    \>STK23 - 14                              \\
- ADHC - 1                                \>COLSEL - 17                           
+ ADHC - 1                                \>COLSEL - 17
    \>FOURIER - 9                             \>
- LIST - 6                                \>PLOTDAT - 19                          
+ LIST - 6                                \>PLOTDAT - 19
    \>STOKES - 21                             \\
- ADISOV - 1                              \>COLSLICE - 17                         
+ ADISOV - 1                              \>COLSLICE - 17
    \>FREQ - 19                               \>
- LISTLEV - 18                            \>PLOTFIT - 19                          
+ LISTLEV - 18                            \>PLOTFIT - 19
    \>STORE - 19                              \\
- ADISP - 1                               \>COMPAVE - 22                          
+ ADISP - 1                               \>COMPAVE - 22
    \>FRINGE - 18                             \>
- LISTPAR - 19                            \>PLOTPS - 19                           
+ LISTPAR - 19                            \>PLOTPS - 19
    \>SUB - 2                                 \\
- ADISP3 - 1                              \>COMPICK - 22                          
+ ADISP3 - 1                              \>COMPICK - 22
    \>FTCONJ - 12                             \>
- LOFREQ* - 18                            \>PLOTQTH - 6                           
+ LOFREQ* - 18                            \>PLOTQTH - 6
    \>SURFIT - 8                              \\
- AEROV - 1                               \>CONCAT - 19                           
+ AEROV - 1                               \>CONCAT - 19
    \>GAUFIT - 15                             \>
- LOG - 2,10                              \>POLAR - 21                            
+ LOG - 2,10                              \>POLAR - 21
    \>SWEEP - 17                              \\
- AFLASH - 1                              \>CONFLEV - 4                           
+ AFLASH - 1                              \>CONFLEV - 4
    \>GAUMAG - 15                             \>
- LORCUR - 15                             \>POLFIT - 18                           
+ LORCUR - 15                             \>POLFIT - 18
    \>SYMDIS* - 18                            \\
- AFRAME - 1                              \>CONT - 8                              
+ AFRAME - 1                              \>CONT - 8
    \>GAUSFIT - 20                            \>
- LORFIT - 15                             \>POLYFILLA - 16                        
+ LORFIT - 15                             \>POLYFILLA - 16
    \>SYNTH - 19                              \\
- AGBLINK - 1                             \>CONTOUR - 6                           
+ AGBLINK - 1                             \>CONTOUR - 6
    \>GBLINKER - 1                            \>
- LORMUL - 15                             \>POWER - 19                            
+ LORMUL - 15                             \>POWER - 19
    \>TARGET - 18                             \\
- AHARDCOPY - 6                           \>CONV - 11                             
+ AHARDCOPY - 6                           \>CONV - 11
    \>GETLEV - 18                             \>
- LORSIM - 15                             \>PRAPERCUR - 15                        
+ LORSIM - 15                             \>PRAPERCUR - 15
    \>TBXY - 5                                \\
- ALIGN - 15                              \>CONVOLVE - 9                          
+ ALIGN - 15                              \>CONVOLVE - 9
    \>GETLIM* - 20                            \>
- LSEE - 18                               \>PRAPERMAG - 15                        
+ LSEE - 18                               \>PRAPERMAG - 15
    \>TBXY2 - 5                               \\
- ALIST - 1                               \>COORDS - 3                            
+ ALIST - 1                               \>COORDS - 3
    \>GETPAR - 20                             \>
- LUTCOL - 17                             \>PRFDECASP - 13                        
+ LUTCOL - 17                             \>PRFDECASP - 13
    \>TESTFIT - 3                             \\
- ANNOTASP - 6                            \>COSBELL - 12                          
+ ANNOTASP - 6                            \>COSBELL - 12
    \>GETSKY - 20                             \>
- LUTCONT - 17                            \>PRFLOGASP - 13                        
+ LUTCONT - 17                            \>PRFLOGASP - 13
    \>THRESH - 6                              \\
- APAN - 1                                \>COSFIT - 18                           
+ APAN - 1                                \>COSFIT - 18
    \>GETTHR - 20                             \>
- LUTE - 17                               \>PRFPLTASP - 13                        
+ LUTE - 17                               \>PRFPLTASP - 13
    \>THRESHOLD - 18                          \\
- APANG - 1                               \>CPOW - 2                              
+ APANG - 1                               \>CPOW - 2
    \>GREYCELL - 1                            \>
- LUTFC - 17                              \>PRFPRTASP - 13                        
+ LUTFC - 17                              \>PRFPRTASP - 13
    \>TOSTAR - 16                             \\
- APERASP - 20                            \>CRDDTRACE - 9                         
+ APERASP - 20                            \>CRDDTRACE - 9
    \>GREYSCALE - 6                           \>
- LUTGREY - 17                            \>PRFVISASP - 13                        
+ LUTGREY - 17                            \>PRFVISASP - 13
    \>TRCONCAT - 8                            \\
- APERCUR - 15                            \>CREDOC - 7                            
+ APERCUR - 15                            \>CREDOC - 7
    \>GRID - 18                               \>
- LUTLIN -17                              \>PRGAUMAG - 15                         
+ LUTLIN -17                              \>PRGAUMAG - 15
    \>TRIM - 8                                \\
- APERFOT - 15                            \>CSUB - 2                              
+ APERFOT - 15                            \>CSUB - 2
    \>HEATCOL - 17                            \>
- LUTREAD - 17                            \>PRIAXEASP - 13                        
+ LUTREAD - 17                            \>PRIAXEASP - 13
    \>TWOTONE - 10                            \\
- APERMAG - 15                            \>CURFIT - 3                            
+ APERMAG - 15                            \>CURFIT - 3
    \>HEATCON - 17                            \>
- LUTROT - 17                             \>PRINTTAB - 18                         
+ LUTROT - 17                             \>PRINTTAB - 18
    \>TYPEIN - 16                             \\
- APIC - 1                                \>CURVAL - 5                            
+ APIC - 1                                \>CURVAL - 5
    \>HIDE - 6                                \>
- LUTSET - 17                             \>PRLORCUR - 15                         
+ LUTSET - 17                             \>PRLORCUR - 15
    \>TYPETAB - 18                            \\
 \end{tabbing}
 
@@ -1851,105 +1851,105 @@ BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBB
 
 \begin{tabbing}
 BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
- APLOT* - 6                              \>CUT - 8                               
+ APLOT* - 6                              \>CUT - 8
    \>HIFREQ* - 18                            \>
- LUTSTORE - 17                           \>PRLORMUL - 15                         
+ LUTSTORE - 17                           \>PRLORMUL - 15
    \>UNDOC - 7                               \\
- APLOTQ - 6                              \>CVPLOT - 21                           
+ APLOTQ - 6                              \>CVPLOT - 21
    \>HIST* - 5                               \>
- LUTTWEAK - 17                           \>PRLORSIM - 15                         
+ LUTTWEAK - 17                           \>PRLORSIM - 15
    \>UNPACK - 4                              \\
- APLOTRNG - 6                            \>CYDSCR - 5                            
+ APLOTRNG - 6                            \>CYDSCR - 5
    \>HISTMATCH - 18                          \>
- MAGAV - 15                              \>PRMAGS - 15                           
+ MAGAV - 15                              \>PRMAGS - 15
    \>UNZOOM - 1                              \\
- ARESET - 1                              \>DATARANGE - 9                         
+ ARESET - 1                              \>DATARANGE - 9
    \>HISTOGRAM - 9                           \>
- MAGCNTASP - 13                          \>PROFILE - 8                           
+ MAGCNTASP - 13                          \>PROFILE - 8
    \>USMASK - 11                             \\
- ARGPIC - 8                              \>DATIM - 1                             
+ ARGPIC - 8                              \>DATIM - 1
    \>HISTPLOT - 5                            \>
- MAGCOR - 15                             \>PROMPT - 8                            
+ MAGCOR - 15                             \>PROMPT - 8
    \>VARGREY - 17                            \\
- ARGSCIR - 20                            \>DESCR - 5                             
+ ARGSCIR - 20                            \>DESCR - 5
    \>HSICOL - 17                             \>
- MAGDIAG - 15                            \>PRPLOT - 21                           
+ MAGDIAG - 15                            \>PRPLOT - 21
    \>VELINT - 10                             \\
- ARGSCUR - 20                            \>DESCRIPT - 8                          
+ ARGSCUR - 20                            \>DESCRIPT - 8
    \>IAMANAL - 20                            \>
- MAGRMS - 15                             \>PSFEST - 12                           
+ MAGRMS - 15                             \>PSFEST - 12
    \>VERGREY - 6                             \\
- ARITH - 8                               \>DESTRIPE - 9                          
+ ARITH - 8                               \>DESTRIPE - 9
    \>IAMEDRS - 18                            \>
- MANIC - 22                              \>PSPEC - 12                            
+ MANIC - 22                              \>PSPEC - 12
    \>VIDISP - 10                             \\
- ASAVE - 18                              \>DETREND - 19                          
+ ASAVE - 18                              \>DETREND - 19
    \>IAMHELP - 20                            \>
- MANYG - 16                              \>PSTACK - 15                           
+ MANYG - 16                              \>PSTACK - 15
    \>VIEW - 8                                \\
- ASXY - 15                               \>DFFTASP - 12                          
+ ASXY - 15                               \>DFFTASP - 12
    \>IAMHIS* - 20                            \>
- MASK - 8                                \>PUTDOC - 7                            
+ MASK - 8                                \>PUTDOC - 7
    \>WAVEGET - 18                            \\
- ATEXT - 1                               \>DISKFIL* - 18                         
+ ATEXT - 1                               \>DISKFIL* - 18
    \>IAMPR - 20                              \>
- MASKGEN - 9                             \>PUTSTAR - 15                          
+ MASKGEN - 9                             \>PUTSTAR - 15
    \>WEIGHTGEN - 9                           \\
- AUCUR - 1                               \>DIV - 2                               
+ AUCUR - 1                               \>DIV - 2
    \>ICBLINK - 1,15                          \>
- MATHS - 8                               \>PW - 19                               
+ MATHS - 8                               \>PW - 19
    \>WONB - 6                                \\
- AVERAGE - 8                             \>DIVFF - 2                             
+ AVERAGE - 8                             \>DIVFF - 2
    \>ICDISP - 1,15                           \>
- MEAN* - 5                               \>RADEC - 9                             
+ MEAN* - 5                               \>RADEC - 9
    \>WRDSCR - 5                              \\
- AZOOM - 1                               \>DOODLE - 6                            
+ AZOOM - 1                               \>DOODLE - 6
    \>ICFLASH - 15                            \>
- MEDBOX* - 5                             \>RDKEY - 3                             
+ MEDBOX* - 5                             \>RDKEY - 3
    \>WRHIST - 5                              \\
- BATCH - 9                               \>DRAWSCAN - 9                          
+ BATCH - 9                               \>DRAWSCAN - 9
    \>IFLASH - 15                             \>
- MEDIAN - 11                             \>RDLIST - 3                            
+ MEDIAN - 11                             \>RDLIST - 3
    \>XYARITH - 15                            \\
- BATFLAT - 15                            \>E2DCOL - 17                           
+ BATFLAT - 15                            \>E2DCOL - 17
    \>IGJOB - 20                              \>
- MEM - 11                                \>RDTOXY - 3                            
+ MEM - 11                                \>RDTOXY - 3
    \>XYCHART - 15                            \\
- BATIMSTAC - 15                          \>EDDOC - 7                             
+ BATIMSTAC - 15                          \>EDDOC - 7
    \>IGPLOT - 20                             \>
- MEMPOW - 19                             \>REALFR - 18                           
+ MEMPOW - 19                             \>REALFR - 18
    \>XYCOEFF - 8                             \\
- BATLORMUL - 15                          \>EDITLEV - 18                          
+ BATLORMUL - 15                          \>EDITLEV - 18
    \>IJOIN - 15                              \>
- MERGE - 18,22                           \>RECFIL* - 18                          
+ MERGE - 18,22                           \>RECFIL* - 18
    \>XYCUR - 8                               \\
- BATLORSIM - 15                          \>EDITTAB - 18                          
+ BATLORSIM - 15                          \>EDITTAB - 18
    \>IMANIC - 15,22                          \>
- MODAL - 11                              \>RESAMPLE - 8                          
+ MODAL - 11                              \>RESAMPLE - 8
    \>XYCURA - 8,15                           \\
- BATPDSIM - 15                           \>EDRSIN - 9                            
+ BATPDSIM - 15                           \>EDRSIN - 9
    \>IMERGE - 15                             \>
- MODE - 11                               \>RESCALE - 8                           
+ MODE - 11                               \>RESCALE - 8
    \>XYCURB - 15                             \\
- BDFGEN - 9                              \>ELLPLTP - 13                          
+ BDFGEN - 9                              \>ELLPLTP - 13
    \>IMGARITH - 8                            \>
- MODHELP - 18                            \>RESTORE - 19                          
+ MODHELP - 18                            \>RESTORE - 19
    \>XYCUT - 15                              \\
- BDFKEY - 8                              \>ELLPRTP - 13                          
+ BDFKEY - 8                              \>ELLPRTP - 13
    \>IMGEDIT - 9                             \>
- MOVE - 14                               \>RHDC1 - 11                            
+ MOVE - 14                               \>RHDC1 - 11
    \>XYDRAW - 15                             \\
- BIGCONV - 9                             \>ENTERTAB - 18                         
+ BIGCONV - 9                             \>ENTERTAB - 18
    \>IMGSTACK - 9                            \>
- MOVIE - 6                               \>RHDC2 - 11                            
+ MOVIE - 6                               \>RHDC2 - 11
    \>XYDRAWA - 15                            \\
- BIN - 8                                 \>EQPROFASP - 13                        
+ BIN - 8                                 \>EQPROFASP - 13
    \>IMSIZE - 5                              \>
- MSLICE - 5                              \>RINGCOL - 17                          
+ MSLICE - 5                              \>RINGCOL - 17
    \>XYEDIT - 15                             \\
- BITMASK - 2                             \>EXP - 2                               
+ BITMASK - 2                             \>EXP - 2
    \>IMSTACK - 15                            \>
- MULCON - 5                              \>ROT3D - 14                            
+ MULCON - 5                              \>ROT3D - 14
    \>XYFIT - 8                               \\
 \end{tabbing}
 \vspace{20mm}
@@ -1962,101 +1962,101 @@ BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBB
 
 \begin{tabbing}
 BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
- BLANK - 8                               \>EXPAND - 21                           
+ BLANK - 8                               \>EXPAND - 21
    \>INCARN - 18                             \>
- MULT - 2                                \>RTOI - 18                             
+ MULT - 2                                \>RTOI - 18
    \>XYFITA - 15                             \\
- BLINK - 9                               \>EXTEND - 19                           
+ BLINK - 9                               \>EXTEND - 19
    \>INDPIX* - 18                            \>
- NITPIK - 11                             \>SATCOR - 15                           
+ NITPIK - 11                             \>SATCOR - 15
    \>XYJOIN - 15                             \\
- BLINKER - 1                             \>EXTRACT - 19                          
+ BLINKER - 1                             \>EXTRACT - 19
    \>INSPECT - 5,15                          \>
- NON - 19                                \>SECTOR - 5                            
+ NON - 19                                \>SECTOR - 5
    \>XYKEY - 8                               \\
- BLURR - 11                              \>FC - 10                               
+ BLURR - 11                              \>FC - 10
    \>INVARG - 17                             \>
- NOPROMPT - 8                            \>SEGMENT - 8                           
+ NOPROMPT - 8                            \>SEGMENT - 8
    \>XYKEYA - 8,15                           \\
- BONW - 6                                \>FCDISP - 10                           
+ BONW - 6                                \>FCDISP - 10
    \>INVCOL - 17                             \>
- NORMALIZE - 8                           \>SELECT - 19                           
+ NORMALIZE - 8                           \>SELECT - 19
    \>XYLIST - 8                              \\
- BOXASP - 13                             \>FCPACK - 10                           
+ BOXASP - 13                             \>FCPACK - 10
    \>IPCSIN - 16                             \>
- NORMFILT - 11                           \>SETALL* - 20                          
+ NORMFILT - 11                           \>SETALL* - 20
    \>XYLISTA - 8,15                          \\
- BOXFILTER - 8                           \>FCSAT - 10                            
+ BOXFILTER - 8                           \>FCSAT - 10
    \>IPOLYGON - 16                           \>
- NSTACK - 8                              \>SETAREA* - 20                         
+ NSTACK - 8                              \>SETAREA* - 20
    \>XYMATCH - 15                            \\
- CADD - 2                                \>FCSCALE - 10                          
+ CADD - 2                                \>FCSCALE - 10
    \>IRASBACK - 9                            \>
- ODDHDC1 - 11                            \>SETLEV - 18                           
+ ODDHDC1 - 11                            \>SETLEV - 18
    \>XYMULTA - 15                            \\
- CALHELP - 18                            \>FCTHSI - 10                           
+ CALHELP - 18                            \>FCTHSI - 10
    \>IRASCOEF - 9                            \>
- ODDHDC2 - 11                            \>SETLIM* - 20                          
+ ODDHDC2 - 11                            \>SETLIM* - 20
    \>XYPMATCH - 15                           \\
- CALIB - 18                              \>FCTRGB - 10                           
+ CALIB - 18                              \>FCTRGB - 10
    \>IRASCORR - 9                            \>
- OUTSET* - 18                            \>SETMAG* - 20                          
+ OUTSET* - 18                            \>SETMAG* - 20
    \>XYPRNT - 15                             \\
- CATCOPY - 18                            \>FFCLEAN - 8                           
+ CATCOPY - 18                            \>FFCLEAN - 8
    \>IRASDSCR - 9                            \>
- PACK - 4                                \>SETPER* - 20                          
+ PACK - 4                                \>SETPER* - 20
    \>XYRENUM - 15                            \\
- CCDCON - 5                              \>FFT - 12                              
+ CCDCON - 5                              \>FFT - 12
    \>IRASIN - 9                              \>
- PARDIF - 18                             \>SIMPAR - 18                           
+ PARDIF - 18                             \>SIMPAR - 18
    \>XYSORT - 15                             \\
- CCIRD - 3                               \>FFTPOW - 19                           
+ CCIRD - 3                               \>FFTPOW - 19
    \>IRASSHIFT - 9                           \>
- PARPLTP - 13                            \>SINCFIL* - 18                         
+ PARPLTP - 13                            \>SINCFIL* - 18
    \>XYSTAT - 15                             \\
- CDEMO - 1                               \>FILDEF - 12                           
+ CDEMO - 1                               \>FILDEF - 12
    \>IRASSTACK - 9                           \>
- PATCH - 18                              \>SKYSUB - 9                            
+ PATCH - 18                              \>SKYSUB - 9
    \>XYTORD - 3                              \\
- CDIV - 2                                \>FILEDOC - 7                           
+ CDIV - 2                                \>FILEDOC - 7
    \>ISLICE - 5,15                           \>
- PCT - 18                                \>SLAFIT - 18                           
+ PCT - 18                                \>SLAFIT - 18
    \>XYTRAN - 8                              \\
- CENTROID - 8                            \>FILLGAP - 19                          
+ CENTROID - 8                            \>FILLGAP - 19
    \>ITFCORR - 8                             \>
- PDM - 19                                \>SLICE - 5                             
+ PDM - 19                                \>SLICE - 5
    \>XYWEED - 15                             \\
- CFICI - 3                               \>FILTSPEC - 8                          
+ CFICI - 3                               \>FILTSPEC - 8
    \>ITFGEN - 8                              \>
- PDSCOR - 15                             \>SMOOTH - 11                           
+ PDSCOR - 15                             \>SMOOTH - 11
    \>XYWEEDA - 15                            \\
- CFITR - 3                               \>FINULS - 11                           
+ CFITR - 3                               \>FINULS - 11
    \>ITFGENA - 15                            \>
- PDSIM - 15                              \>SPECOL - 17                           
+ PDSIM - 15                              \>SPECOL - 17
    \>ZAPLIN - 18                             \\
- CFIXY - 3                               \>FITBAKASP - 13                        
+ CFIXY - 3                               \>FITBAKASP - 13
    \>ITFHIST - 9                             \>
- PDSIN - 16                              \>SPLEQ - 19                            
+ PDSIN - 16                              \>SPLEQ - 19
    \>ZAPTAB - 9                              \\
- CINVERT - 8                             \>FITELLP - 13                          
+ CINVERT - 8                             \>FITELLP - 13
    \>ITFPLOT - 8                             \>
- PDSMULTI - 15                           \>SPLFIT - 18                           
+ PDSMULTI - 15                           \>SPLFIT - 18
    \>ZEBRA - 17                              \\
- CLRLIM - 20                             \>FITSHEAD - 18                         
+ CLRLIM - 20                             \>FITSHEAD - 18
    \>ITOR - 8                                \>
- PDSRASTER - 15                          \>SQORST - 22                           
+ PDSRASTER - 15                          \>SQORST - 22
    \\
- CLRQUAD - 6                             \>FITSIN - 16                           
+ CLRQUAD - 6                             \>FITSIN - 16
    \>JONESASP - 13                           \>
- PDSRIPPLE - 15                          \>SQRT - 2                              
+ PDSRIPPLE - 15                          \>SQRT - 2
    \\
- CMPRS - 22                              \>FITSOUT - 18                          
+ CMPRS - 22                              \>FITSOUT - 18
    \>LAPLACE - 11                            \>
- PECALBASP - 13                          \>STAR - 5                              
+ PECALBASP - 13                          \>STAR - 5
    \\
- CMULT - 2                               \>FIXINVAL - 9                          
+ CMULT - 2                               \>FIXINVAL - 9
    \>LIMITS - 6                              \>
- PEEP - 6                                \>STAREMASP - 13                        
+ PEEP - 6                                \>STAREMASP - 13
    \\
 \end{tabbing}}
 \end{document}

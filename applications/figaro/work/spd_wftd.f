@@ -156,7 +156,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -188,7 +188,7 @@
 
       SUBROUTINE SPD_WFTE( FITPAR, PAR1, FVAL, NDATA, MSKXDW,
      :   NCOMP, DCONT, FSCALE, PARNO, PARFLG, PAR0 )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

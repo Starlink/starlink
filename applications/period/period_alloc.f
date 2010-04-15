@@ -25,9 +25,9 @@
 *
 *  Notes :
 *     This routine currently makes use of PSX_CALLOC to allocate memory
-*     from the heap.  Historically, PERIOD has manipulated images in 
+*     from the heap.  Historically, PERIOD has manipulated images in
 *     memory so this is likely to be adequate.  However, if it became
-*     necessary to use much more storage, this routine and PERIOD_DEALL 
+*     necessary to use much more storage, this routine and PERIOD_DEALL
 *     could be recoded to map memory backed with file storage, for
 *     instance using AIF_TMP.
 *
@@ -44,19 +44,19 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
       INTEGER SIZE
 
 *  Arguments Returned:
       INTEGER PNTR
- 
+
 *  Local variables :
       INTEGER STATUS
 
 *.
- 
+
 *  Initialise the status variable.
       STATUS = 0
 

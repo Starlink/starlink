@@ -26,7 +26,7 @@
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   int rec1_read_file( int slot, INT_BIG bloc, int size, 
+   int rec1_read_file( int slot, INT_BIG bloc, int size,
                        unsigned char *buffer )
    {
 /*+                                                                         */

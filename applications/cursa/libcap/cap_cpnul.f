@@ -24,7 +24,7 @@
 *     For every column
 *       Check the data type of the column, and for the appropriate
 *       data type:
-*         Get the value for the current field from the input 
+*         Get the value for the current field from the input
 *         catalogue.
 *         Put the value to the current field in the output catalogue.
 *       end case
@@ -72,7 +72,7 @@
 
 *
 *          Check the data type of the column, and for the appropriate
-*          data type put a null value to the current field in the 
+*          data type put a null value to the current field in the
 *          output catalogue.
 
             IF (FITYPE(CURID) .EQ. CAT__TYPEB) THEN

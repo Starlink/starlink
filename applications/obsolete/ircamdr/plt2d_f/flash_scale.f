@@ -93,7 +93,7 @@
 
 * invert the canon and qms intensity scale
 
-	    IF( DEVICE_NAME .EQ. 'CANON'. OR. 
+	    IF( DEVICE_NAME .EQ. 'CANON'. OR.
      :	        DEVICE_NAME .EQ. 'QMS_LANDSCAPE' .OR.
      :	        DEVICE_NAME .EQ. 'QMS_PORTRAIT' .OR.
      :	        DEVICE_NAME .EQ. 'PS_LANDSCAPE' .OR.

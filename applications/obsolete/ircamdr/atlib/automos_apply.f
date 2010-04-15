@@ -1,13 +1,13 @@
 *+  AUTOMOS_APPLY - applies DC correction to a set of images
 
-      SUBROUTINE AUTOMOS_APPLY ( DIMSAX, DIMSAY, ARRAYA, DIMSBX, DIMSBY, 
+      SUBROUTINE AUTOMOS_APPLY ( DIMSAX, DIMSAY, ARRAYA, DIMSBX, DIMSBY,
      :	                         ARRAYB, DCOFF, STATUS )
 
 *    Description :
 *
 *    Invocation :
 *
-*     CALL AUTOMOS_APPLY ( DIMSAX, DIMSAY, ARRAYA, DIMSBX, DIMSBY, 
+*     CALL AUTOMOS_APPLY ( DIMSAX, DIMSAY, ARRAYA, DIMSBX, DIMSBY,
 *                          ARRAYB, DCOFF, STATUS )
 *
 *    Parameters :
@@ -16,14 +16,14 @@
 *     DIMSAY  =  INTEGER( READ )
 *         Dimensions of first input image
 *     ARRAYA( DIMSAX, DIMSAY )  =  REAL( READ )
-*         input image 
+*         input image
 *     DIMSBX  =  INTEGER( READ )
 *     DIMSBY  =  INTEGER( READ )
 *         Dimensions of output image
 *     ARRAYB( DIMSBX, DIMSBY )  =  REAL( READ )
 *         output image
 *     DCOFF  =  REAL( WRITE )
-*         Calculated d.c. sky offset 
+*         Calculated d.c. sky offset
 *     STATUS  =  INTEGER( UPDATE )
 *         Global status parameter
 *

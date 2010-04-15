@@ -5,7 +5,7 @@
 
       SUBROUTINE SPECX_REORDER (N, ISOURCE)
 
-C  Routine to rearrange individual receiver spectra according to 
+C  Routine to rearrange individual receiver spectra according to
 C  source array ISOURCE. Modified by JFL from SPECX_REORDER,
 C  DATA array with variable sized quadrants catered for.
 
@@ -43,7 +43,7 @@ CD    PRINT '('' # of sectors, sort array = '',I4.1,8I3.1)',
 CD   &          N, (ISOURCE(K),K=1,N)
 
 C     First reorder data array
-C     Get virtual memory and take copy of data 
+C     Get virtual memory and take copy of data
 
       NTOTAL = NTOT(N)
 
@@ -90,7 +90,7 @@ C     release virtual memory
 
 C     What will happen to IQCEN?
 
-      DO NQ = 1,N 
+      DO NQ = 1,N
         IF (ISOURCE(NQ) .EQ. IQCEN) IQCEN = NQ
       END DO
 

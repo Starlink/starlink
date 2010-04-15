@@ -32,8 +32,8 @@ Error m_SXList( Object *in, Object*out){
 *
 *     It is not an error to give a null "input", but nothing will be
 *     written to the file.
-*    
-*     If no value is supplied for "file" then the list will be displayed 
+*
+*     If no value is supplied for "file" then the list will be displayed
 *     in the message window.
 *
 *     If "append" is set to 1, the output will be appended to any
@@ -55,7 +55,7 @@ Error m_SXList( Object *in, Object*out){
 
 *  Examples:
 *     In this example, the "data" and "positions" components from a field are
-*     written out to a text file called "dump.dat". The file starts with a 
+*     written out to a text file called "dump.dat". The file starts with a
 *     header containing 3 comment lines:
 *
 *        input = Import("/usr/lpp/dx/samples/data/CO2.general");
@@ -76,12 +76,12 @@ Error m_SXList( Object *in, Object*out){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -129,8 +129,8 @@ Error m_SXList( Object *in, Object*out){
       char   *p;
       void   *pnt[MAX_NAMES];
       int     rank;
-      Type    type[MAX_NAMES];   
-  
+      Type    type[MAX_NAMES];
+
 
 /*  Return without doing anything if no "input" object has been supplied. */
 
@@ -182,7 +182,7 @@ Error m_SXList( Object *in, Object*out){
       case CLASS_FIELD:
 
 
-/*  Get the components listed in the "names" object and obtain information 
+/*  Get the components listed in the "names" object and obtain information
  *  about them. */
 
          n = 0;
@@ -197,7 +197,7 @@ Error m_SXList( Object *in, Object*out){
             }
 
             array = (Array) DXGetComponentValue( (Field) in[0], name );
-            if( !array ){         
+            if( !array ){
                DXSetError( ERROR_MISSING_DATA, "no \"%s\" component found",
                            name );
                goto error;
@@ -218,7 +218,7 @@ Error m_SXList( Object *in, Object*out){
             if( len < nel[n] ) len = nel[n];
 
             n++;
- 
+
          }
 
 
@@ -266,7 +266,7 @@ Error m_SXList( Object *in, Object*out){
 /*  Report an error if the input object is neither a field or an array. */
 
       default:
-         DXSetError( ERROR_BAD_PARAMETER, "\"input\" is of wrong class");   
+         DXSetError( ERROR_BAD_PARAMETER, "\"input\" is of wrong class");
          goto error;
 
       }
@@ -292,8 +292,8 @@ Error m_SXList( Object *in, Object*out){
 
                } else {
                   sprintf( p, "%*c", ndim[i], ' ' );
-               } 
-               while( *(++p) ); 
+               }
+               while( *(++p) );
 
 
             } else {
@@ -312,7 +312,7 @@ Error m_SXList( Object *in, Object*out){
                      } else {
                         sprintf( p, "%5c", ' ' );
                      }
-                     while( *(++p) ); 
+                     while( *(++p) );
 
                   } else if( type[i] == TYPE_INT ){
                      if( p - buf >= BUF_SIZE - 24 ){
@@ -327,7 +327,7 @@ Error m_SXList( Object *in, Object*out){
                      } else {
                         sprintf( p, "%12c", ' ' );
                      }
-                     while( *(++p) ); 
+                     while( *(++p) );
 
                   } else if( type[i] == TYPE_FLOAT ){
                      if( p - buf >= BUF_SIZE - 26 ){
@@ -343,7 +343,7 @@ Error m_SXList( Object *in, Object*out){
                      } else {
                         sprintf( p, "%13c", ' ' );
                      }
-                     while( *(++p) ); 
+                     while( *(++p) );
 
                   } else if( type[i] == TYPE_DOUBLE ){
                      if( p - buf >= BUF_SIZE - 26 ){
@@ -358,7 +358,7 @@ Error m_SXList( Object *in, Object*out){
                      } else {
                         sprintf( p, "%13c", ' ' );
                      }
-                     while( *(++p) ); 
+                     while( *(++p) );
 
                   } else {
                      DXSetError( ERROR_UNEXPECTED, "cannot print data of supplied type");

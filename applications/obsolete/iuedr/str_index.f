@@ -38,7 +38,7 @@
 
 *   External references:
       INTEGER str_LEN       ! string length
- 
+
 *   Local variables:
       INTEGER NCHAR         ! character count
 

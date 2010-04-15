@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ Rutherford, ROE and UCL.
 \section{Using the Honeywell}
 
 Once the Honeywell has been set up by your system manager, it is very simple
-to use. Users should not touch any of the front panel control buttons, except 
+to use. Users should not touch any of the front panel control buttons, except
 as described in Section 2.2. Your system may also be set up so that
 you can control the Honeywell entirely via the VAX. Ask your
 system manager if your system has this option. If so, then you
@@ -72,7 +72,7 @@ should read Section 2.3 entitled ``Using the Honeywell via the VAX''.
 
 \subsection{Getting started}
 
-At your site, the 35mm camera may not be permanently attached to the main 
+At your site, the 35mm camera may not be permanently attached to the main
 Honeywell unit
 for security reasons. It is worth pointing out that the 35mm camera back has
 been modified and is completely useless as a conventional camera. Once
@@ -82,13 +82,13 @@ is stored), attach the camera to the main body {\bf with the power off}.
 Power the unit on via the green button (bottom left). The unit will now
 warm-up for 4 minutes. During this period it is not possible to take
 exposures. The message window indicates how much longer you must wait. For example,
-the message WT3 indicates that you must wait for another 
+the message WT3 indicates that you must wait for another
 3 minutes. At the end of the warm-up sequence, an AUTO-CAL (automatic
 brightness calibration) procedure will commence during which time CAL will
 briefly
-appear in the message window. 
+appear in the message window.
 After the warm-up sequence the number showing in the display is the frame count
-for that particular film setting. 
+for that particular film setting.
 It is worth noting that it is possible to skip
 the warm up procedure if you do not intend to take any photos but are simply
 checking parameters etc. This can be done by holding down RESET and pressing
@@ -101,13 +101,13 @@ by sliding the back cover lock release down. Place a roll of 35mm film into the
 cavity at the left of the camera back. Lay the leading end of the film flat
 along the back of the camera so that the holes in the film fit over the
 sprocket at the other side. The leading edge of the film should extend over to
-the roller. It does not have to wrap around the roller. Close the back 
+the roller. It does not have to wrap around the roller. Close the back
 cover of the camera and the film will automatically advance to the first frame.
 
 When the entire roll of film has been exposed, the End of Film indicator LED
 will light. Push down the film rewind button on the bottom on the 35mm
 camera body. Flip up the film rewind crank and turn it clockwise to
-rewind the film into the film magazine.  When it is completely rewound, 
+rewind the film into the film magazine.  When it is completely rewound,
 the needle in the film advance indicator will stop turning and the rewind crank
 will turn freely. Open the back cover of the 35mm camera back by sliding the
 backing cover release down and remove the film.
@@ -121,12 +121,12 @@ operating instructions. The four buttons in a vertical line on the left each
 have 2 green LEDs and each button corresponds to 2 settings, as indicated. For
 example, the top button is for settings 1 \& 2. If the left LED is lit then
 film setting 1 is selected and if the right LED is lit, then setting 2 is
-selected. 
+selected.
 
 To select a film setting, hold down SHIFT and press the appropriate
 button once for the left and twice for the right parameter. For example, if you
 wish to select film setting 4, hold down SHIFT, and press the button marked 3-4
-twice. The right LED on this button will then light. 
+twice. The right LED on this button will then light.
 
 Do NOT change any of the settings on either the camera or the main body {\bf under
 any circumstances} without first consulting your site manager. The C/BW
@@ -136,7 +136,7 @@ display is via RGB only and there is no input for the B/W mode
 The P/N (positive/negative)
 switch is disabled when in C mode and will be fixed on P.
 The M/A (manual/automatic film wind-on switch) must be on A.
-However, it can be set on M if superposition is required but exposure 
+However, it can be set on M if superposition is required but exposure
 times must obviously be shortened. Superposition could in theory be used to give
 256$^3$ colours although this has not yet been tried.
 The COMP (composite) must always be selected and NOT red, blue and
@@ -147,7 +147,7 @@ green. The camera shutter should be on B.
 After the warm-up sequence the number showing in the display is the frame count
 for that particular film setting. This is useful if you have more than one
 camera back, each  with a different film type in since the Honeywell can
-remember how many exposures have been made on each film. If you have put in a 
+remember how many exposures have been made on each film. If you have put in a
 new film and wish to zero the frame counter, simply press the MINUS key until
 the display reads 0.
 
@@ -156,13 +156,13 @@ IKON  attached to the Honeywell and press either the EXP button or the
 footswitch if you have one. The camera will take three exposures of the image
 through a red, blue and a green filter onto the same piece of film. This takes
 about 10 seconds. When you hear the camera automatically wind on you may
-change the display on the IKON ready for the next exposure. 
+change the display on the IKON ready for the next exposure.
 
 \subsection{Using the Honeywell via the VAX}
 
 Your system may have been set up so that your Honeywell can be controlled
-entirely via the VAX using the program HONEY. Ask you system manager if this 
-is the case at your site and also the names of the films that it supports. 
+entirely via the VAX using the program HONEY. Ask you system manager if this
+is the case at your site and also the names of the films that it supports.
 
 You must first startup HONEY and load the parameter set for the film
 you wish to use from VAX disk into the Honeywell via the RESTORE command. The
@@ -178,7 +178,7 @@ $ HONEY
 
 \begin{quote}
 \begin{verbatim}
-HONEY> RESTORE 
+HONEY> RESTORE
   File to restore from: ED100
 \end{verbatim}
 \end{quote}
@@ -194,7 +194,7 @@ HONEY> RESET
 (Resets film counter to zero - this step is optional)
 
 You are now ready to take an exposure. Display the required image on the
-IKON attached to the Honeywell and type EXPOSE at the HONEY prompt.   
+IKON attached to the Honeywell and type EXPOSE at the HONEY prompt.
 
 \begin{quote}
 \begin{verbatim}
@@ -208,10 +208,10 @@ The
 camera will take three exposures of the image through a red, blue and a green
 filter onto the same piece of film. This takes about 10 seconds. When you hear
 the camera automatically wind on you may change the display on the IKON
-ready for the next exposure. 
+ready for the next exposure.
 
 More HONEY instructions can be found in Appendix A. Users should only use
-RESTORE, RESET, EXPOSE, BRACKET, CANCEL, FRAME, HELP, PAGE, SAVE \& 
+RESTORE, RESET, EXPOSE, BRACKET, CANCEL, FRAME, HELP, PAGE, SAVE \&
 SHOW. The other
 commands are for system managers to aid them in setting up the Honeywell
 film settings.
@@ -220,7 +220,7 @@ Use CTRL-Z to exit from the HONEY program.
 
 \section{Setting up the Honeywell (for system managers only)}
 
-\subsection{Introduction} 
+\subsection{Introduction}
 
 The Honeywell should be connected to the IKON monitor via separate R,G,B \&
 Sync cables to the BNC connectors on the rear panels of each device. The four
@@ -249,18 +249,18 @@ been used in anger at Starlink sites, have given satisfactory results and
 have been passed on to the authors by site managers for inclusion in this
 document. Please send any corrections or additions to this table to Chris
 Clayton at RLVAD::CAC.
-     				
+
 \begin{table}[htb]
 \begin{center}
-\begin{tabular}{|l|l|c|c|c|c|c|c|c|c|c|c|} 
+\begin{tabular}{|l|l|c|c|c|c|c|c|c|c|c|c|}
 \hline
-{FILM TYPE} & {VAX file} & 
-\multicolumn{3}{|c|}{{BRIGHTNESS}} & 
-\multicolumn{3}{|c|}{{CONTRAST}} & 
+{FILM TYPE} & {VAX file} &
+\multicolumn{3}{|c|}{{BRIGHTNESS}} &
+\multicolumn{3}{|c|}{{CONTRAST}} &
 \multicolumn{3}{|c|}{{RATIO}} & {EXPOSE} \\
-\cline {3-11} 
-& & {\tt R} & {\tt G} & {\tt B} & {\tt R} & {\tt G} & 
-{\tt B}& {\tt R} &  {\tt G} & {\tt B} & \\ 
+\cline {3-11}
+& & {\tt R} & {\tt G} & {\tt B} & {\tt R} & {\tt G} &
+{\tt B}& {\tt R} &  {\tt G} & {\tt B} & \\
 \hline
 %{\bf From Manual} &&&&&&&&&&& \\
 %\hline
@@ -269,39 +269,39 @@ Clayton at RLVAD::CAC.
 
 % {809} & {\tt 8x10} & {\tt015} & {\tt 015} & {\tt 015} & {\tt 425} &
 % {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 500} \\
-% 
+%
 % {891} & {\tt 8x10} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 425} &
 % {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 500} \\
-% 
+%
 % {6118} & {\tt 8x10} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 620} &
 % {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & {\tt 230} & {\tt 500} \\
-% 
+%
 % {508 (558)} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 620} &
 % {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & {\tt 500} & {\tt 800} \\
-% 
+%
 % {509 (559)} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 425} &
 % {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 800} \\
-% 
+%
 % {591} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 425} &
 % {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 800} \\
-% 
+%
 % {6118} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 620} &
 % {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & {\tt 230} & {\tt 800} \\
-% 
+%
 % {708*} & {\tt SX70} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 210} &
 % {\tt 305} & {\tt 285} & {\tt 300} & {\tt 750} & {\tt 400} & {\tt 300} \\
-% 
+%
 {EKT \scriptsize TUNGSTEN ASA 160} & {\tt ET160} & {\tt 015} & {\tt 015} &
-{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & 
+{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} &
 {\tt 230} & {\tt 120} \\
 
 {EKT \scriptsize DAYLIGHT ASA 64} & {\tt ED64} & {\tt 015} & {\tt 015} &
-{\tt 015} & {\tt 425} & {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & 
+{\tt 015} & {\tt 425} & {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} &
 {\tt 650} & {\tt 200} \\
 
 % {7240 \scriptsize TUNGSTEN ASA 125} & {\tt 16mm} & {\tt 015} & {\tt 015} &
-% {\tt 015} & {\tt 620} & {\tt 465} 
-% & {\tt 360} & {\tt 600} & {\tt 600} & 
+% {\tt 015} & {\tt 620} & {\tt 465}
+% & {\tt 360} & {\tt 600} & {\tt 600} &
 % {\tt 230} & {\tt 350} \\
 % \hline
 % {\bf From David Malin (AAO)} &&&&&&&&&&& \\
@@ -309,49 +309,49 @@ Clayton at RLVAD::CAC.
 % {EKT-6117 \scriptsize ASA 64} & {\tt 4x5} & {\tt 010} & {\tt 010} & {\tt 010} &
 % {\tt 400} & {\tt 300} & {\tt 400} & {\tt 600} & {\tt 750} & {\tt 650} &
 % {\tt 800} \\
-% 
+%
 % {Polaroid Colour (559)} & {\tt 4x5} & {\tt 010} & {\tt 010} & {\tt 010} &
-% {\tt 640} & {\tt 500} & {\tt 380} & {\tt 400} & {\tt 400} & {\tt 800} & 
+% {\tt 640} & {\tt 500} & {\tt 380} & {\tt 400} & {\tt 400} & {\tt 800} &
 % {\tt 800} \\
-% 
-% {Polaroid Colour} & {\tt SX70} & {\tt 025} & {\tt 025} & {\tt 025} & 
-% {\tt 200} & {\tt 300} & {\tt 280} & {\tt 350} & {\tt 750} & {\tt 600} & 
+%
+% {Polaroid Colour} & {\tt SX70} & {\tt 025} & {\tt 025} & {\tt 025} &
+% {\tt 200} & {\tt 300} & {\tt 280} & {\tt 350} & {\tt 750} & {\tt 600} &
 % {\tt 275} \\
-% 
-{EKT \scriptsize DAYLIGHT ASA 100} & {\tt ED100} & {\tt 015} & {\tt 015} & 
+%
+{EKT \scriptsize DAYLIGHT ASA 100} & {\tt ED100} & {\tt 015} & {\tt 015} &
 {\tt 015} & {\tt 425} & {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} &
 {\tt 650} & {\tt 160} \\
 
-{EKT \scriptsize DAYLIGHT ASA 400} & {\tt ED400} & {\tt 015} & {\tt 015} & 
+{EKT \scriptsize DAYLIGHT ASA 400} & {\tt ED400} & {\tt 015} & {\tt 015} &
 {\tt 015} & {\tt 425} & {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} &
 {\tt 650} & {\tt 40} \\
 
 % {(B\&W) Polaroid 55 PN} & {\tt 4x5} & -- & {\tt 035} & -- & -- &
 % {\tt 275} & -- & --& -- & -- & {\tt 950} \\
-% 
+%
 % {(B\&W) Polaroid 52} & {\tt 4x5} & -- & {\tt 035} & -- & -- & {\tt 275} &
-% -- & -- & -- & -- & {\tt 350} \\                       
-% 
-% {(B\&W) Polaroid 57} & {\tt 4x5} & -- & {\tt 010} & -- & -- & {\tt 350} &   
+% -- & -- & -- & -- & {\tt 350} \\
+%
+% {(B\&W) Polaroid 57} & {\tt 4x5} & -- & {\tt 010} & -- & -- & {\tt 350} &
 %  -- & -- & -- & -- & {\tt 020} \\
-% 
-%{(B\&W) Kodak Plus-X} & {\tt 35mm} & -- & {\tt 035} & -- & -- & {\tt 275} & 
+%
+%{(B\&W) Kodak Plus-X} & {\tt 35mm} & -- & {\tt 035} & -- & -- & {\tt 275} &
 %   -- & -- & -- & -- & {\tt 150} \\
 % \hline
 % {\bf From IoA, Cambridge} &&&&&&&&&&& \\
 % \hline
 %{Polachrome} & {\tt 35mm} & {\tt 015} & {\tt 015} &
-%{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & 
+%{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} &
 %{\tt 230} & {\tt 200} \\
 %{Ektachrome 400 (day)} & {\tt 35mm} & {\tt 015} & {\tt 015} &
-%{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & 
+%{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} &
 %{\tt 230} & {\tt 50} \\
-{FP4 (B \& W)} & {\tt FP4} & {\tt 015}  & {\tt 015} & {\tt 015}  
-& {\tt 600} & {\tt 450} & {\tt 450} & {\tt 600} & {\tt 600} & {\tt 600} & 
+{FP4 (B \& W)} & {\tt FP4} & {\tt 015}  & {\tt 015} & {\tt 015}
+& {\tt 600} & {\tt 450} & {\tt 450} & {\tt 600} & {\tt 600} & {\tt 600} &
 {\tt 180} \\
-%{(B\&W) Polapan} & {\tt 35mm} & -- & {\tt 015} & -- & -- & {\tt 200} & 
+%{(B\&W) Polapan} & {\tt 35mm} & -- & {\tt 015} & -- & -- & {\tt 200} &
 %   {\tt 500} & {\tt 500} & {\tt 200} & {\tt 200} & {\tt 250} \\
-%{(B\&W) 2415 (Tech. pan)} & {\tt 35mm} & -- & {\tt 015} & -- & -- & {\tt 200} & 
+%{(B\&W) 2415 (Tech. pan)} & {\tt 35mm} & -- & {\tt 015} & -- & -- & {\tt 200} &
 %   -- & -- & -- & -- & {\tt 300} \\
 \hline
 \end {tabular}
@@ -368,7 +368,7 @@ is vital that you do NOT adjust the brightness of the CRT (as described below)
 whilst in the meter mode. If you do, then the auto-calibration routine which
 takes place when one changes from MTR to BRT mode and will interpret the
 change in brightness as an error and will compensate by changing the brightness
-drive to the CRT. The end result will be new parameter and meter numbers 
+drive to the CRT. The end result will be new parameter and meter numbers
 i.e. it manifests itself to the user as ``drift'' in the meter readings.
 
 \begin{enumerate}
@@ -376,8 +376,8 @@ i.e. it manifests itself to the user as ``drift'' in the meter readings.
 \item Select desired parameter set (film) as described in Section 2.2
 
 \item Select RED video by pressing ``R'' switch on the front panel.
-    
-\item Select the Brightness Parameter function by holding down the SHIFT 
+
+\item Select the Brightness Parameter function by holding down the SHIFT
 switch and depressing the BRT-MTR switch once, such that the LED on
 the left hand side of the BRT-MTR switch is illuminated.
 
@@ -387,58 +387,58 @@ the left hand side of the BRT-MTR switch is illuminated.
 ``+'' and ``-''  switches on the front panel.
 In an unadjusted Honeywell,
 an intial brightness parameter number of 365 will yield a brightness meter
-reading of 015 with a black screen on the IKON. Hence, you should use 365 
-as a starting point on the brightness parameter side.          
+reading of 015 with a black screen on the IKON. Hence, you should use 365
+as a starting point on the brightness parameter side.
 
 \item Hold down the SHIFT switch and press the BRT-MTR switch once such
-that the LED on the right hand side of the BRT-MTR switch is 
+that the LED on the right hand side of the BRT-MTR switch is
 illuminated.  Release the SHIFT switch and then press the BRT-MTR switch
 several times until the reading in the message window is constant.
 Always press the meter switch several times to obtain an average reading.
 Do not take the first reading as this is usual low. It will normally
-take three presses to reach the final meter value. This is especially important 
+take three presses to reach the final meter value. This is especially important
 in the brightness meter mode with a black video display. A reading of
-015 represents a very small light sensor output voltage and even a very 
+015 represents a very small light sensor output voltage and even a very
 slight change in light level caused by ambient or residual light could change
 that number.
 Note this number.  If the reading is 015 go to step 9.
 
 \item Should the reading not be 015 then the number set in step 5 must
-be changed to a higher value if the reading is less than 015 and to a 
+be changed to a higher value if the reading is less than 015 and to a
 lower value if the reading is greater than 015.
 
-\item 
+\item
 NEVER use the ``+'' and ``-'' buttons when in brightness meter mode.
 For example, if the brightness meter reads 005 when it should read 015, shift
 over to the brightness parameter mode and increase the parameter number. Then switch
 back to the brightness meter and note the new meter value -- It should be higher.
 Do this by holding down the SHIFT switch and pressing the BRT-MTR switch
 once such that the LED on the left hand side of the BRT-MTR switch is
-illuminated.  
+illuminated.
 Increase or decrease the parameter number from 300 in the message
-window by, say 30, to 330 or 270 as appropriate, and repeat this 
-section until 015 is read consistently. 
+window by, say 30, to 330 or 270 as appropriate, and repeat this
+section until 015 is read consistently.
 
 \item Hold in the SHIFT switch and press the BRT-MTR switch once such that
 the left hand LED on the BRT-MTR is illuminated. Note the number for
 future reference.
 
 \item Select the GREEN video by pressing the G switch on the panel and repeat
-steps 3 through 9.                                                 
+steps 3 through 9.
 
 \item Select the BLUE video by pressing the B switch on the panel and repeat
-steps 3 through 9.                                                 
+steps 3 through 9.
 
 \end{enumerate}
 
 \subsection {\bf Contrast parameter adjustment procedure}
 
 Please note that the contrast meter and parameter modes may be used
-interchangeably to increment the contrast drive voltage. 
+interchangeably to increment the contrast drive voltage.
 This is
 NOT the case when adjusting the brightness parameter. The difference is
 because the contrast meter (along with providing a readout of the light sensor
-output voltage) parallels the function of the contrast parameter mode 
+output voltage) parallels the function of the contrast parameter mode
 in that it {\bf directly} controls the drive voltage to the video amplifier.
 The brightness parameter setting, on the other hand, only {\bf indirectly}
 controls the brightness drive.
@@ -447,7 +447,7 @@ controls the brightness drive.
 
 \item Select Red video by pressing the RED switch on the front panel.
 
-\item Select the Contrast Meter function by pressing and holding the 
+\item Select the Contrast Meter function by pressing and holding the
 SHIFT switch while simultaneously pressing the CNT-MTR switch twice
 such that the right hand LED on the CNT-MTR switch lights.
 
@@ -477,8 +477,8 @@ used.
 
 \item Select Red video by pressing the RED switch on the front panel.
 
-\item Select the Ratio Parameter by pressing and holding the SHIFT switch 
-while simultaneously pressing the RATIO button once, such that it 
+\item Select the Ratio Parameter by pressing and holding the SHIFT switch
+while simultaneously pressing the RATIO button once, such that it
 lights.
 
 \item Using the ``+'' or ``-'' switch, set the display in the message window to
@@ -487,14 +487,14 @@ to be used.
 
 \item Select Green video by pressing the GRN switch on the front panel.
 
-\item Using the ``+'' or ``-'' switch, set the display in the message window 
-to the value listed in Table 1 under `RATIO - G' for the type 
+\item Using the ``+'' or ``-'' switch, set the display in the message window
+to the value listed in Table 1 under `RATIO - G' for the type
 of film to be used.
 
 \item Select Blue video by pressing the BLU switch on the front panel.
 
 \item Using the ``+'' or ``-'' switch, set the display in the message window to
-the value listed in Table 1 under `RATIO - B' for the type of film 
+the value listed in Table 1 under `RATIO - B' for the type of film
 to be used.
 
 \end{enumerate}
@@ -509,8 +509,8 @@ left hand LED on the EXP-NO switch lights.
 
 \item Using the ``+'' or ``-'' switch, set the display in the message window to
 the value listed in Table 1 under EXPOSE for the type of film to be
-used.           
-             
+used.
+
 \item Select the Exposure Parameter by pressing and holding the SHIFT switch
 while simultaneously pressing the EXP-NO. switch twice, such that the
 right hand LED on the EXP-NO. switch lights.
@@ -518,7 +518,7 @@ right hand LED on the EXP-NO. switch lights.
 \item Using the ``+'' or ``-'' switch, set the display in the message window to
 1. This sets up single exposures. Multiple exposures are also possible by
 selecting a higher number.
-           
+
 \end{enumerate}
 
 
@@ -528,19 +528,19 @@ non-volatile memory. However, the lifetime of this non-volatile memory
 is only about two weeks. Hence it is necessary to power-on your unit
 about once per week in order to revitalize the non-volatile memory. Failure
 to do this will result in the loss of your parameter setting and you will have
-to restore them either by hand or using the HONEY program described below, 
-and also in Appendix A. 
+to restore them either by hand or using the HONEY program described below,
+and also in Appendix A.
 
 \subsection{Setting up your system for use with the HONEY control program}
 
-To allow users to control the Honeywell entirely from the VAX as described in 
+To allow users to control the Honeywell entirely from the VAX as described in
 Section 2.3, system managers must first set up the appropriate hardware and
-software as indicated below. 
+software as indicated below.
 
 Connection of the Honeywell to the VAX is via an RS232 cable. The Honeywell end should be male
-and have pins 4, 5 \& 20 soldered together. Pins 2, 3 \& 7 should 
-run straight through to pins 2,3 \& 7 on the end to be connected 
-to a terminal server port. 
+and have pins 4, 5 \& 20 soldered together. Pins 2, 3 \& 7 should
+run straight through to pins 2,3 \& 7 on the end to be connected
+to a terminal server port.
 The port should also have the following characteristics set:
 
 \begin{itemize}
@@ -559,7 +559,7 @@ The port should also have the following characteristics set:
 
 The port must be set up as an application port using
 a command procedure such as the example from Starlink Project VAXcluster
-shown below. A number of logical names must also be defined. 
+shown below. A number of logical names must also be defined.
 You will have to change the
 node name, port name and device name for your own site and place
 these lines in a startup command procedure that is run at boot time.
@@ -578,7 +578,7 @@ $ DEFINE/SYSTEM HONEYHELP HONEYWELL_DIR:HONEY.HLB
 \end{verbatim}
 \end{quote}
 
-HONEY can be run via the symbol 
+HONEY can be run via the symbol
 
 \begin{quote}
 \begin{verbatim}
@@ -595,8 +595,8 @@ $ HONEY :== $ HONEYWELL_DIR:HONEY
 \end{quote}
 
 Once system managers have set up their Honeywell cameras as described earlier in
-Section 3, they should use the SAVE option in HONEY to save these settings 
-into VAX files in the system directory HONEY\_S\_DIR. These settings can then 
+Section 3, they should use the SAVE option in HONEY to save these settings
+into VAX files in the system directory HONEY\_S\_DIR. These settings can then
 easily be reloaded into the Honeywell using the RESTORE option in HONEY.
 Indeed, RESTORE should always be used before taking photographs to ensure that
 the parameter settings currently in the Honeywell
@@ -612,10 +612,10 @@ in more detail in Appendix~A
 In order to facilitate the geometrical adjustment of the Honeywell, a
 graticule that sits inside the CRT bevel has been supplied to all sites, marked
 with a cross--hatch which matches the pattern produced by the program
-HONEYWELL\_DIR:GRAT.EXE. This enables the geometry to be set up quite accurately and 
-also ensures that the overall size is right and that all the information 
+HONEYWELL\_DIR:GRAT.EXE. This enables the geometry to be set up quite accurately and
+also ensures that the overall size is right and that all the information
 lies within the visible region of a mounted slide. Managers should not attempt
-to tweak the Honeywell themselves. Instead, they should use it to diagnose 
+to tweak the Honeywell themselves. Instead, they should use it to diagnose
 poor geometry and supply the graticule to service engineers when they arrive to
 tune the camera.
 
@@ -628,23 +628,23 @@ opportunity arise.
 All the Honeywell cameras around Starlink should now be set up with
 good geometry. Software does exist to illustrate deviations from perfect
 geometry by analysing the deviations of the true positions of dots in an array
-from their expected positions. However, this procedure requires specialist equipment 
+from their expected positions. However, this procedure requires specialist equipment
 in order to determine the dot positions from photographs of the dot array
 and hence is not described here. Furthermore, it is hoped
-that the Honeywells are stable and that it will not become necessary to 
+that the Honeywells are stable and that it will not become necessary to
 use this software again.
 
 For testing purposes, it is necessary to have an image displayed when not
 exposing. This can be done in two ways. The crude method
-is to hold down SHIFT and press BRT-MTR once. This will display the image on 
-the IKON for 
+is to hold down SHIFT and press BRT-MTR once. This will display the image on
+the IKON for
 about 20 seconds. The image can be left up on the CRT permanently on some
 machines. Unlock the
 cross-head screws on the back and remove the cover. On the right of the machine
 are three PCBs. The middle one has at its top-right corner a switch marked S2.
 Flip this switch and the image will stay on. The RGB buttons can select each
 video channel. Alternatively, you can
-remove the top plate just in front of the CRT and look directly onto the screen. 
+remove the top plate just in front of the CRT and look directly onto the screen.
 This plate is held on by two small allen screws but be {\bf very, very} careful
 when taking them out since they are very easy to drop into the main unit.
 Don't forget to flip switch S2 back again when you have finished. Keep clear of
@@ -652,15 +652,15 @@ the mains input and EHT regions. Starlink accepts no responsibility for
 injuries sustained by users or staff who have gained access to the interior of
 a machine as described.
 
-The position of the interlace switch on the rear on the main unit did not 
+The position of the interlace switch on the rear on the main unit did not
 appear to affect the unit tested. This should be left on X1 since this
-does not attempt any line smoothing. 
+does not attempt any line smoothing.
 
 \section{Testcard programs for IKON}
 
 There are a number of test programs in HONEYWELL\_DIR which can be used to
-aid system managers set-up and check their Honeywell camera. All 
-are self-explanatory when run, and use GKS device names. Each is briefly 
+aid system managers set-up and check their Honeywell camera. All
+are self-explanatory when run, and use GKS device names. Each is briefly
 described below:
 
 \begin{description}
@@ -675,7 +675,7 @@ distributed to site managers.
 circles.
 \item[TESTCARD] -- Colourful demonstration to check colour fidelity.
 \item[TRIANGLES] -- Colourful demonstration to check colour fidelity.
-\end{description} 
+\end{description}
 
 \appendix
 
@@ -725,7 +725,7 @@ be entered until the sequence has finished.
 After a command to change the setting, the program will show the setting
 of that parameter (or set of parameters), to allow the user to confirm
 that the parameter is changed. Please note that some of the commands
-such as {\bf MONOCHROME, POSITIVE \& NEGATIVE} should not be used with the 
+such as {\bf MONOCHROME, POSITIVE \& NEGATIVE} should not be used with the
 Starlink Honeywells but are included for completeness.
 
 \subsection{Summary of Commands}
@@ -768,7 +768,7 @@ same as MULTIPLE 1)
 \item[\bf CTRL-Z] - Leave program
 \end{list}
 
-For BRIGHTNESS, CONTRAST and RATIO the colour (e.g. RED) must be 
+For BRIGHTNESS, CONTRAST and RATIO the colour (e.g. RED) must be
 specified if in colour mode, but omitted in monochrome mode (but note
 that RATIO only applies to colour mode). Where {\em n} is given as a
 parameter, it is an integer from 0 to 999, except for PAGE, where it is

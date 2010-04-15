@@ -3,11 +3,11 @@
 
 	SUBROUTINE LINIMAG_NDR( STATUS)
 
-* Description : This routine linearizes an image 
+* Description : This routine linearizes an image
 *               by subtracting a bias image then applying a 5th order poly-
 *               nomial correction to the data.  In non-destructive read mode
-*               the KTC image is added back onto the PhaseA image and 
-*               the resultant image is linearizes.  After this the KTC 
+*               the KTC image is added back onto the PhaseA image and
+*               the resultant image is linearizes.  After this the KTC
 *               images is re-subtracted from the PhaseA image.
 *
 * Invocation :
@@ -44,7 +44,7 @@
 *     14-12-1989 : Created this version from LINCONT (JACH::CAA)
 *     17-06-1991 : Created this version from LINCONT_NDR (JACH::CAA)
 *     29-JUN-1994  Changed MSG_OUT on error to ERR_REP, STR$ and LIB$
-*                  to FIO_, CHR_ (SKL@JACH) 
+*                  to FIO_, CHR_ (SKL@JACH)
 *     07-Sept-1994 Removed unused variables identified by UNIX compiler(SKL@JACH)
 * Type definitions :
 
@@ -66,7 +66,7 @@
 
 * Local variables :
 
-	INTEGER DIMS( 2)		! dimensions array 
+	INTEGER DIMS( 2)		! dimensions array
 	INTEGER DIMS_IMAGE( 2)		! dimensions array for data image
 	INTEGER INCODE			! code for input container file
 	INTEGER J			! loop counter variable
@@ -137,7 +137,7 @@
 *      get the name of the coefficient file from parameter system
 	CALL PAR_GET0C( 'COEFFILE', COEFFICIENT_FILENAME, STATUS)
 *	CALL CHR_UCASE( COEFFICIENT_FILENAME )
-        CALL AB_TRANSLATE_ENV( COEFFICIENT_FILENAME, TRANSLATION, 
+        CALL AB_TRANSLATE_ENV( COEFFICIENT_FILENAME, TRANSLATION,
      :	  STATUS)
         COEFFICIENT_FILENAME = TRANSLATION
 
@@ -155,7 +155,7 @@
 	  READ( LUN, *) COEFFICIENT( J)
 	  CALL MSG_SETI( 'NUM', J)
 	  CALL MSG_SETR( 'C', COEFFICIENT( J))
-	  CALL MSG_OUT( 'MESSAGE', 'Linearization coefficient ^NUM = ^C', 
+	  CALL MSG_OUT( 'MESSAGE', 'Linearization coefficient ^NUM = ^C',
      :	                STATUS)
 	END DO
 
@@ -164,7 +164,7 @@
 	READ( LUN, *) TOP
 	CALL MSG_SETR( 'BASE', BASE)
 	CALL MSG_SETR( 'TOP', TOP)
-	CALL MSG_OUT( 'MESSAGE', 'Base = ^BASE, Top = ^TOP', 
+	CALL MSG_OUT( 'MESSAGE', 'Base = ^BASE, Top = ^TOP',
      :	              STATUS)
 
 *      close coefficient file and release lun
@@ -188,11 +188,11 @@
 	CALL SUBPAR_FINDPAR( 'OUTPIC', OUTCODE, STATUS)
 	CALL SUBPAR_PUTNAME ( OUTCODE, OUTNAME( 1:LEN2), STATUS)
 
-*      associate container file 
+*      associate container file
 	CALL DAT_ASSOC( 'CONTAINER', 'READ', LOCTOP_O, STATUS )
 	CALL DAT_FIND( LOCTOP_O, 'OBS', LOCOBS_O, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-	  CALL ERR_REP( 'ERROR', 'Error, after find LOCOBS_O ...', 
+	  CALL ERR_REP( 'ERROR', 'Error, after find LOCOBS_O ...',
      :                   STATUS)
 	  RETURN
 	END IF
@@ -204,7 +204,7 @@
 *      create NEW HDS container file for IRCAM images
 	CALL DAT_CREAT( 'OUTPIC', 'STRUCTURE', 0, 0, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-	  CALL ERR_REP( 'ERROR', 'Error, after DAT_CREAT new file ...', 
+	  CALL ERR_REP( 'ERROR', 'Error, after DAT_CREAT new file ...',
      :                   STATUS)
 	  RETURN
 	END IF
@@ -215,7 +215,7 @@
 *      associate container created with active HDS locator
 	CALL DAT_ASSOC( 'OUTPIC', 'WRITE', LOCTOP_N, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-	  CALL ERR_REP( 'ERROR', 'Error, after DAT_ASSOC new file ...', 
+	  CALL ERR_REP( 'ERROR', 'Error, after DAT_ASSOC new file ...',
      :                   STAT)
 	  RETURN
 	END IF
@@ -227,7 +227,7 @@
 *      get a locator to the cell being processed
 	CALL DAT_CELL( LOCOBS_O, 1, SUBS, LOCCELL_O, STATUS)
 	IF( STATUS .NE. SAI__OK) THEN
-	  CALL ERR_REP( 'ERROR', 'Error, after DAT_CELL LOCCELL_O ...', 
+	  CALL ERR_REP( 'ERROR', 'Error, after DAT_CELL LOCCELL_O ...',
      :                   STATUS)
 	  RETURN
 	END IF
@@ -237,7 +237,7 @@
 	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_ANNUL( STATUS )
 	  CALL MSG_SETI( 'J', OBSNUM)
-	  CALL MSG_OUT( 'ERROR', 'Error, observation ^J not defined ...', 
+	  CALL MSG_OUT( 'ERROR', 'Error, observation ^J not defined ...',
      :	    STATUS)
 	  FILLED = .FALSE.
 	END IF
@@ -245,10 +245,10 @@
 *      find out what is set in the DATA_ARRAY components
 	CALL REDCONT_WHATSET( OBSNUM, LOCOBS_O, WHAT_FILLED, STATUS)
         CALL CHR_CLEAN( WHAT_FILLED )
-        LEN1 = 0 
+        LEN1 = 0
 	CALL CHR_APPND( WHAT_FILLED, WHAT_FILLED, LEN1)
 	IF( STATUS .NE. SAI__OK) THEN
-	   CALL ERR_REP( 'ERROR', 'Error, after REDCONT_WHATSET ...', 
+	   CALL ERR_REP( 'ERROR', 'Error, after REDCONT_WHATSET ...',
      :                    STATUS)
 	  RETURN
 	END IF
@@ -315,24 +315,24 @@
 	    CALL DAT_FIND( LOCCELL_O, 'PHASEA', LOCTMP_O, STATUS)
 	    CALL DAT_FIND( LOCTMP_O, 'DATA_ARRAY', LOCPRIM_O, STATUS)
 	    CALL DAT_SHAPE( LOCPRIM_O, 2, DIMS_IMAGE, NDIMS, STATUS)
-	    CALL DAT_MAPR( LOCPRIM_O, 'READ', NDIMS, DIMS_IMAGE, 
+	    CALL DAT_MAPR( LOCPRIM_O, 'READ', NDIMS, DIMS_IMAGE,
      :	                     PNTR_IMAGE, STATUS)
 	    CALL DAT_FIND( LOCCELL_O, 'KTCA', LOCTMP2_O, STATUS)
 	    CALL DAT_FIND( LOCTMP2_O, 'DATA_ARRAY', LOCPRIM2_O, STATUS)
 	    CALL DAT_SHAPE( LOCPRIM2_O, 2, DIMS_IMAGE, NDIMS, STATUS)
-	    CALL DAT_MAPR( LOCPRIM2_O, 'READ', NDIMS, DIMS_IMAGE, 
+	    CALL DAT_MAPR( LOCPRIM2_O, 'READ', NDIMS, DIMS_IMAGE,
      :	                   PNTR2_IMAGE, STATUS)
             IF( STATUS .NE. SAI__OK) THEN
-	      CALL ERR_REP( 'ERROR', 
+	      CALL ERR_REP( 'ERROR',
      :	        'Error, after MAPR PHASEA+KTCA image ...', STATUS)
 	      RETURN
 	    END IF
 
 *          call subroutine to scale image, add on ktc image, linearize,
 *          re-scale image, subtract ktc and store in output image
-	    CALL LINIMAG_NDR_LIN( DIMS_IMAGE( 1), DIMS_IMAGE( 2), 
-     :	                          %VAL( PNTR_IMAGE), %VAL( PNTR2_IMAGE), 
-     :	                          %VAL( SPNTR), NUMBER_COADDS_IMAGE, 
+	    CALL LINIMAG_NDR_LIN( DIMS_IMAGE( 1), DIMS_IMAGE( 2),
+     :	                          %VAL( PNTR_IMAGE), %VAL( PNTR2_IMAGE),
+     :	                          %VAL( SPNTR), NUMBER_COADDS_IMAGE,
      :	                          NUMCOEFF, COEFFICIENT, BASE, TOP, RAT)
 
 *          release the image/annul locators
@@ -349,28 +349,28 @@
 	  IF( WHAT_FILLED( 1:LEN1) .EQ. 'PHASEB+KTCB' .OR.
      :	      WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA+PHASEB+KTCA+KTCB') THEN
 
-*          find the DATA_ARRAY component, get it's shape and map it 
+*          find the DATA_ARRAY component, get it's shape and map it
 	    CALL DAT_FIND( LOCCELL_O, 'PHASEB', LOCTMP_O, STATUS)
 	    CALL DAT_FIND( LOCTMP_O, 'DATA_ARRAY', LOCPRIM_O, STATUS)
 	    CALL DAT_SHAPE( LOCPRIM_O, 2, DIMS_IMAGE, NDIMS, STATUS)
-	    CALL DAT_MAPR( LOCPRIM_O, 'READ', NDIMS, DIMS_IMAGE, 
+	    CALL DAT_MAPR( LOCPRIM_O, 'READ', NDIMS, DIMS_IMAGE,
      :	                   PNTR_IMAGE, STATUS)
 	    CALL DAT_FIND( LOCCELL_O, 'KTCB', LOCTMP2_O, STATUS)
 	    CALL DAT_FIND( LOCTMP2_O, 'DATA_ARRAY', LOCPRIM2_O, STATUS)
 	    CALL DAT_SHAPE( LOCPRIM2_O, 2, DIMS_IMAGE, NDIMS, STATUS)
-	    CALL DAT_MAPR( LOCPRIM2_O, 'READ', NDIMS, DIMS_IMAGE, 
+	    CALL DAT_MAPR( LOCPRIM2_O, 'READ', NDIMS, DIMS_IMAGE,
      :	                   PNTR2_IMAGE, STATUS)
 	    IF( STATUS .NE. SAI__OK) THEN
-	      CALL ERR_REP( 'ERROR', 
+	      CALL ERR_REP( 'ERROR',
      :	        'Error, after MAPR PHASEB+KTCB image ...', STATUS)
 	      RETURN
 	    END IF
 
 *          call subroutine to scale images, add KTC, linearize
 *          re-scale image, subtract ktc and store in output image
-	    CALL LINIMAG_NDR_LIN( DIMS_IMAGE( 1), DIMS_IMAGE( 2), 
-     :	                          %VAL( PNTR_IMAGE), %VAL( PNTR2_IMAGE), 
-     :	                          %VAL( SPNTR), NUMBER_COADDS_IMAGE, 
+	    CALL LINIMAG_NDR_LIN( DIMS_IMAGE( 1), DIMS_IMAGE( 2),
+     :	                          %VAL( PNTR_IMAGE), %VAL( PNTR2_IMAGE),
+     :	                          %VAL( SPNTR), NUMBER_COADDS_IMAGE,
      :	                          NUMCOEFF, COEFFICIENT, BASE, TOP, RAT)
 
 *          release the image/annul locators
@@ -387,7 +387,7 @@
 	  IF( WHAT_FILLED( 1:LEN1) .EQ. 'PHASEA' .OR.
      :	      WHAT_FILLED( 1:LEN1) .EQ. 'PHASEB') THEN
 	    CALL MSG_SETI( 'NUM', J)
-	    CALL MSG_OUT( 'ERROR', 
+	    CALL MSG_OUT( 'ERROR',
      :	      'Error, observation ^NUM is NOT a NDR observation...',
      :	      STATUS)
 	  END IF
@@ -416,7 +416,7 @@
 	GOTO 888
 
   999	CALL MSG_SETC( 'C', COEFFICIENT_FILENAME)
-	CALL ERR_REP( 'MESSAGE', 
+	CALL ERR_REP( 'MESSAGE',
      :	  'Error, cannot find coefficient file ^C', STATUS)
 
   888	END

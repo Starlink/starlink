@@ -4,7 +4,7 @@
 *     smf_filter_ident
 
 *  Purpose:
-*     Set a smfFilter to the real or complex identity filter 
+*     Set a smfFilter to the real or complex identity filter
 
 *  Language:
 *     Starlink ANSI C
@@ -121,5 +121,5 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
   if( complex ) {
     filt->imag = smf_malloc( filt->dim, sizeof(*filt->imag), 1, status );
     filt->isComplex = 1;
-  } 
+  }
 }

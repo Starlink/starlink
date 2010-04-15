@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_INTRA( THIS, NPOINT, NCOORD_IN, INDIM, IN, 
+      SUBROUTINE ARD1_INTRA( THIS, NPOINT, NCOORD_IN, INDIM, IN,
      :                       FORWARD, NCOORD_OUT, OUTDIM, OUT, STATUS )
 *+
 *  Name:
@@ -26,7 +26,7 @@
 *     NCOORD_IN = INTEGER (Given)
 *        The number of coordinates being supplied for each input point
 *        (i.e. the number of dimensions of the space in which the
-*        input points reside). 
+*        input points reside).
 *     INDIM = INTEGER (Given)
 *        The number of elements along the first dimension of the IN
 *        array (which contains the input coordinates). This value is
@@ -71,12 +71,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -138,8 +138,8 @@
 
 *  Call a lower level routine which can access the parameter array.
       CALL ARD1_INTRB( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-     :                 NCOORD_OUT, OUTDIM, CMN_TYPEC, CMN_NPARC, 
-     :                 %VAL( CNF_PVAL( CMN_IPPAR ) ), 
+     :                 NCOORD_OUT, OUTDIM, CMN_TYPEC, CMN_NPARC,
+     :                 %VAL( CNF_PVAL( CMN_IPPAR ) ),
      :                 CMN_FRMC, OUT, STATUS )
 
       END

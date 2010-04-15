@@ -23,7 +23,7 @@
 *     parKeymap = AstKeyMap* (Given)
 *        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
 *
@@ -69,7 +69,7 @@
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
 
-void sc2fts_portimbalance 
+void sc2fts_portimbalance
 (
 Grp *igrp,
 Grp* ogrp,

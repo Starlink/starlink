@@ -110,7 +110,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -133,7 +133,7 @@
       DOUBLE PRECISION MAXSHF
       INTEGER MAXIT
       DOUBLE PRECISION TOLER
-      
+
 *  Arguments Returned:
       INTEGER IDOUT( * )
       DOUBLE PRECISION XOUT( * )
@@ -146,7 +146,7 @@
 *  Local Variables:
       DOUBLE PRECISION XACC      ! Centroid position
       DOUBLE PRECISION XPOS      ! Initial position
-      DOUBLE PRECISION YACC      ! Centroid position 
+      DOUBLE PRECISION YACC      ! Centroid position
       DOUBLE PRECISION YPOS      ! Initial position
       INTEGER I                  ! Loop counter
 
@@ -160,8 +160,8 @@
       CALL ERR_MARK
 
 *  Try to determine the centroid for all positions.
-      NOUT = 0 
-      DO 1 I = 1, NIN 
+      NOUT = 0
+      DO 1 I = 1, NIN
 
 *  Transform this position to pixel indices.
          XPOS = XIN( I ) - DBLE( LBND( 1 ) ) + 1.5D0
@@ -169,37 +169,37 @@
 
 *  Centroid this position.
          IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL CCG1_CENUB( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ), 
+            CALL CCG1_CENUB( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
      :                       NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_BYTE' ) THEN 
-            CALL CCG1_CENB( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ), 
+         ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
+            CALL CCG1_CENB( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
      :                      NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN 
-            CALL CCG1_CENUW( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ), 
+         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+            CALL CCG1_CENUW( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
      :                       NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_WORD' ) THEN 
-            CALL CCG1_CENW( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ), 
+         ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+            CALL CCG1_CENW( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
      :                      NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN 
-            CALL CCG1_CENI( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ), 
+         ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+            CALL CCG1_CENI( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
      :                      NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )
-         ELSE IF ( TYPE .EQ. '_REAL' ) THEN 
-            CALL CCG1_CENR( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ), 
+         ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+            CALL CCG1_CENR( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
      :                      NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL CCG1_CEND( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ), 
+            CALL CCG1_CEND( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
      :                      NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )

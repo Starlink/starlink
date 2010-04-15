@@ -35,7 +35,7 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       L=2+LEN(PAR)
       DEF=' '
       NPOS=0

@@ -12,7 +12,7 @@
 #     source $FIG_DIR/figaro.csh
 #
 #  Description:
-#     This procedure starts the Figaro package for use from the C shell by 
+#     This procedure starts the Figaro package for use from the C shell by
 #     defining the aliases needed to execute each application.
 #
 #  Authors:

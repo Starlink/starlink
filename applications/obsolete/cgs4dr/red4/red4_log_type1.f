@@ -7,9 +7,9 @@
 *
 *     The record will consist of a set of values in a predefined order.
 *     All the records of "type 1" may be extracted from the engineering
-*     log file to produce a file with consistent columns of numbers 
-*     which may be read into SCAR or MONGO. (Type 1 records will be used 
-*     for testing the detector translation, detector focus, slit 
+*     log file to produce a file with consistent columns of numbers
+*     which may be read into SCAR or MONGO. (Type 1 records will be used
+*     for testing the detector translation, detector focus, slit
 *     rotation and slit positional accuracy, as described in CGS4/GEN/006.1/.
 *     It is envisaged that other types of record may appear when other
 *     engineering tests are devised).
@@ -85,7 +85,7 @@
 *    Obtain a time stamp
       CALL RED4_TIME_STAMP( STAMP, STATUS )
 
-*    Build up the first title line 
+*    Build up the first title line
       CALL CHR_FILL( ' ', LINE )
       CPOS = 0
       CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LINE, CPOS )
@@ -96,7 +96,7 @@
       ENDDO
       CALL FIO_WRITE( LOG_UNIT, LINE(1:CPOS), STATUS )
 
-*    Build up the second title line 
+*    Build up the second title line
       CALL CHR_FILL( ' ', LINE )
       CPOS = 0
       CALL CHR_PUTC( STAMP(1:CHR_LEN(STAMP))//'>! ', LINE, CPOS )

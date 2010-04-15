@@ -113,7 +113,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -199,7 +199,7 @@
 *  this as an error. Prepend the result to FILE, inserting a '/' if the
 *  translation doesn't end with this.
       FULNAM = FILE
-      SLEN = CHR_LEN( SYMDIR ) 
+      SLEN = CHR_LEN( SYMDIR )
       IF ( SLEN .GT. 0 ) THEN
          ISTAT2 = STATUS
          STATUS = SAI__OK
@@ -244,7 +244,7 @@
 *  If the file is to be created.
       IF ( NEW ) THEN
 
-*     See if we can create it. 
+*     See if we can create it.
 *     Under Unix, an open using 'NEW' will fail if a file of the same
 *     name already exists.
          IF ( EXIST ) THEN

@@ -15,7 +15,7 @@
 *
 *  Description:
 *     Not part of the CHI interface definition. Use CHI_RELCD in conjunction
-*     with CHI_GETCD. If the catalogue is open close it and release the 
+*     with CHI_GETCD. If the catalogue is open close it and release the
 *     catalogue descriptor.
 
 *  Arguments:
@@ -42,7 +42,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -77,7 +77,7 @@
 *
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-        icount = 1     
+        icount = 1
         openflg = .false.
         do while (icount .le. chi__mxass .and. .not. openflg)
           if (opcatnames(icount) .eq. input .and.

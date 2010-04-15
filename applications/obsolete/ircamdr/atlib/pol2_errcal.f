@@ -1,5 +1,5 @@
-	SUBROUTINE POL2_ERRCAL( INT_1, INT_2, INT_3, INT_4, 
-     :	                        INT_5, INT_6, INT_7, INT_8, 
+	SUBROUTINE POL2_ERRCAL( INT_1, INT_2, INT_3, INT_4,
+     :	                        INT_5, INT_6, INT_7, INT_8,
      :	                        POL, ELDN, POL_ERROR, THETA_ERROR)
 
 *      Subroutine to calculate the polarization error from the 8 intensities
@@ -8,13 +8,13 @@
 
 *      Define local variables
 
-	REAL 
+	REAL
      :       ELDN,		! electrons/data number
-     :       INT_1,		! The o- intensity at 0 degrees 
+     :       INT_1,		! The o- intensity at 0 degrees
      :	     INT_2,		! The e- intensity at 0 degrees
      :	     INT_3,		! The o- intensity at 45 degrees
      :	     INT_4,		! The e- intensity at 45 degrees
-     :       INT_5,		! The o- intensity at 22.5 degrees 
+     :       INT_5,		! The o- intensity at 22.5 degrees
      :	     INT_6,		! The e- intensity at 22.5 degrees
      :	     INT_7,		! The o- intensity at 67.5 degrees
      :	     INT_8,		! The e- intensity at 67.5 degrees
@@ -26,7 +26,7 @@
 
 *      Calculate the sum of the intensities
 
-	SUM = INT_1 + INT_2 + INT_3 + INT_4 + 
+	SUM = INT_1 + INT_2 + INT_3 + INT_4 +
      :	      INT_5 + INT_6 + INT_7 + INT_8
 
 *      Check if sum of four intensities > ZERO

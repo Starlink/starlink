@@ -18,7 +18,7 @@
 *  Description:
 *     Obtains name by which the task is to register with the ADAM Message
 *     System (AMS).
-*     This is the Unix version - returns either the name set by ICL OR the 
+*     This is the Unix version - returns either the name set by ICL OR the
 *     name of the exe running.
 
 *  Arguments:
@@ -30,7 +30,7 @@
 
 *  Algorithm:
 *     If the environment variable ICL_TASK_NAME exists then take the
-*     its translation as the AMS task name to use. 
+*     its translation as the AMS task name to use.
 *     Otherwise get ARG 0, find the end of any path information and take the
 *     the remainder as the name.
 
@@ -117,7 +117,7 @@
          STNM = STRING_IANYR( ARGV0(1:LENGTH), '/' ) + 1
          NAME = ARGV0(STNM:LENGTH)
          LENGTH = LENGTH - STNM + 1
-      ENDIF         
+      ENDIF
 
       CALL EMS_RLSE
 

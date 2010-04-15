@@ -14,14 +14,14 @@
 *     CALL PROJ_CONVPTLM( PROJ, PHI0, THETA0, PHI, THETA, L, M, STATUS )
 
 *  Description:
-*     Uses 
-*     
+*     Uses
+*
 *     L is assumed to be positive to the east
 *     M is assumed to be positive to the north
 *
 *     Based on the AIPS implementation of these geometries - see
 *     AIPS memos 27 & 46 - Eric Greisen.
-*     
+*
 
 *  Arguments:
 *     PHI0 = DOUBLE PRECISION (Given)
@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,7 +72,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-                                 ! projection 
+                                 ! projection
 
 *.
 
@@ -83,21 +83,21 @@
          STATUS = PROJ__NSCHPROJ
          GO TO 1000
       END IF
-      
+
       GO TO ( 10, 20, 30, 40, 50, 60, 70 ), PROJ
- 10      CALL PROJ_TANPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS ) 
+ 10      CALL PROJ_TANPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS )
          GOTO 1000
- 20      CALL PROJ_SINPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS ) 
+ 20      CALL PROJ_SINPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS )
          GOTO 1000
- 30      CALL PROJ_ARCPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS ) 
+ 30      CALL PROJ_ARCPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS )
          GOTO 1000
- 40      CALL PROJ_GLSPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS ) 
+ 40      CALL PROJ_GLSPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS )
          GOTO 1000
- 50      CALL PROJ_AITPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS ) 
+ 50      CALL PROJ_AITPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS )
          GOTO 1000
- 60      CALL PROJ_MERPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS ) 
+ 60      CALL PROJ_MERPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS )
          GOTO 1000
- 70      CALL PROJ_STGPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS ) 
+ 70      CALL PROJ_STGPTLM ( PHI0, THETA0, PHI, THETA, L, M, STATUS )
          GOTO 1000
 
 *   Put some error messages here

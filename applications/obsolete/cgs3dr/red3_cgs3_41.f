@@ -64,11 +64,11 @@ C
 C    Initialization of DSA routines
       CALL DSA_OPEN(STATUS)
 
-C    Get the name of the input file 
+C    Get the name of the input file
       CALL PAR_GET0C ('INPUT',INPUT,STATUS)
       CALL DSA_NAMED_INPUT ('INPUT',INPUT,STATUS)
 
-C    Determine dimensions of input. 
+C    Determine dimensions of input.
       CALL DSA_DATA_SIZE ('INPUT',4,NDIM,DIMS,ELEMENTS,STATUS)
       IF ((NDIM .NE. 4) .OR. (DIMS(1) .GT. 1) .OR. (DIMS(3) .GT. 2))
      : THEN
@@ -113,7 +113,7 @@ C    Get NSIGMA
          STATUS = SAI__ERROR
       END IF
 
-C    Get output name 
+C    Get output name
       CALL PAR_GET0C ('OUTPUT',OUTPUT,STATUS)
 
 C    Get output and coerce the shape of the output
@@ -123,7 +123,7 @@ C    Get output and coerce the shape of the output
 
 C    Map the input file
       CALL DSA_MAP_DATA ('INPUT','READ','FLOAT',IPTR,SLOT,STATUS)
-      CALL DSA_MAP_AXIS_DATA ('INPUT',2,'READ','FLOAT',AIPTR,SLOT, 
+      CALL DSA_MAP_AXIS_DATA ('INPUT',2,'READ','FLOAT',AIPTR,SLOT,
      :   STATUS)
 
 C    Get the axis2 info from input
@@ -229,7 +229,7 @@ C    And while we're at it, reverse the data, as CGS3 delivers it backwards.
 C    Calculate the average and variance for each point
       DO I = 1, NWAVE
          OUT_DATA(I) = SUM(I) / NCYCLES
-         IF (NCYCLES .GT. 1) OUT_VARIANCE (I) = 
+         IF (NCYCLES .GT. 1) OUT_VARIANCE (I) =
      :    (SUMSQ(I) - (SUM(I)**2)/NCYCLES)/(NCYCLES * (NCYCLES-1))
          IF (OUT_VARIANCE(I) .LT. 0.0) THEN
             OUT_VARIANCE (I) = 0.0
@@ -282,7 +282,7 @@ C    Re-Initialise the sums
       IF (N_CYC .GT. 0) THEN
          DO I = 1, NWAVE
             OUT_DATA(I) = SUM(I) / N_CYC
-            IF (N_CYC .GT. 1) OUT_VARIANCE (I) = 
+            IF (N_CYC .GT. 1) OUT_VARIANCE (I) =
      :       (SUMSQ(I) - (SUM(I)**2)/N_CYC)/(N_CYC * (N_CYC-1))
             IF (OUT_VARIANCE(I) .LT. 0.0) THEN
                OUT_VARIANCE (I) = 0.0

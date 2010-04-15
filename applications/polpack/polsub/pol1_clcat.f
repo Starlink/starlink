@@ -13,17 +13,17 @@
 *     CALL POL1_CLCAT( IWCS, CI, STATUS )
 
 *  Description:
-*     This routine write the supplied AST FrameSet in the textual 
+*     This routine write the supplied AST FrameSet in the textual
 *     information associated with the supplied catalogue, and then closes
 *     the catalogue. NB, at the moment, the CAT library reports errors if
-*     you try to store textual information in a FITS file before any rows 
+*     you try to store textual information in a FITS file before any rows
 *     have been written to the catalogue. For this reason, the WCS
 *     information is stored after all rows have been written, just before
 *     the catalogue is closed.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
-*        An AST pointer to a FrameSet. This should have been obtained using 
+*        An AST pointer to a FrameSet. This should have been obtained using
 *        the KPG1_GTWCS subroutine.
 *     CI = INTEGER (Given and Returned)
 *        A CAT identifier for the catalogue. Returned equal to CAT__NOID.
@@ -32,7 +32,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -45,7 +45,7 @@
 *        is defined in a catalogue.
 *     17-JUL-2000 (DSB):
 *        Reinstate the GRID Frame in the catalogue, to facilitiate
-*        alignment with systems that do not know about PIXEL co-ords 
+*        alignment with systems that do not know about PIXEL co-ords
 *        (eg GAIA).
 *     7-FEB-2001 (DSB):
 *        Add support for 3D data.
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,14 +83,14 @@
 
 *  Copy the supplied FrameSet so that we do not alter the supplied
 *  FrameSet.
-         LWCS = AST_COPY( IWCS, STATUS ) 
+         LWCS = AST_COPY( IWCS, STATUS )
 
 *  Routine POL1_MKCAT creates the X, Y (and Z) catalogue columns with names
 *  X, Y (and Z). Applications which access the WCS information in the
-*  catalogue use the routine POL1_GTCTA to look for a Frame spanned by 
+*  catalogue use the routine POL1_GTCTA to look for a Frame spanned by
 *  axes with Symbol attributes equal to the catalogue column names. In
 *  order for this to succeed, we ensure that he symbols on axes 1, 2 (and
-*  3) of the Base Frame correspond to the names of the catalogue columns 
+*  3) of the Base Frame correspond to the names of the catalogue columns
 *  (i.e. "X", "Y" (and "Z") ).
          FRM = AST_GETFRAME( LWCS, AST__BASE, STATUS )
          CALL AST_SETC( FRM, 'Symbol(1)', 'X', STATUS )

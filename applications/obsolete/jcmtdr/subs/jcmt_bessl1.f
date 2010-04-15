@@ -1,4 +1,4 @@
-      SUBROUTINE JCMT_BESSEL_REGRID_1 (WEIGHT, X, Y, NPIX, PIXSPACE, 
+      SUBROUTINE JCMT_BESSEL_REGRID_1 (WEIGHT, X, Y, NPIX, PIXSPACE,
      :   NI, NJ, ICEN, JCEN, XCEN, YCEN, AV_WEIGHT, SCRATCH, STATUS)
 *+
 *  Name:
@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -91,7 +91,7 @@
       DOUBLE PRECISION XINC                      ! the x-axis pixel increment
       DOUBLE PRECISION YINC                      ! the y-axis pixel increment
       DOUBLE PRECISION XOFF                      ! x offset
-      
+
 *   local data
 *.
 
@@ -113,7 +113,7 @@
       END DO
 
 *  go through the input pixels of this dataset, set all elements of
-*  the scratch array to xero that lie within one pixel space of an input 
+*  the scratch array to xero that lie within one pixel space of an input
 *  point. Correct x offset (RA) for cos(dec) effect.
 
       DO PIX = 1, NPIX

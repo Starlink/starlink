@@ -154,7 +154,7 @@ CD    call ttgraph
 
       IF (ISUM) THEN
         DZ = 1.0                                 ! Already in K-km/s or whatever
-      ELSE 
+      ELSE
         DZ = ABS (PEND(LINK(3))-PBEG(LINK(3)))   ! Average TA*, multiply by width
       END IF
 
@@ -194,7 +194,7 @@ CD    call ttgraph
       I2 = (IX2+LXPIX-2)/(LXPIX-1)
       J1 = (IY1+LYPIX-3)/(LYPIX-1) + 1
       J2 = (IY2+LXPIX-2)/(LYPIX-1)
- 
+
 CD    call sxgtidle
 CD    print *,'-- CHKMAP --'
 CD    print *,'Enclosed data points x-limits:',i1,i2
@@ -203,7 +203,7 @@ CD    call sxgttgraph
 
 *  If box is not bounded by actual known pixels, then expand check
 *  range to include the adjacent measured points (but not outside of actual map
-*  boundary). 
+*  boundary).
 *
 *  This code also takes care of the case of a box within the actual map area but
 *  not enclosing ANY measured points (seen by I1,J1 .GT. I2,J2).

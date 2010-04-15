@@ -71,7 +71,7 @@ C                     in the bottom level cache which were one or more
 C                     levels up from the object. The net effect was that
 C                     the cache ended up containing duplicate entries
 C                     with different locators.
-C                     To fix this problem, the routine was modified to 
+C                     To fix this problem, the routine was modified to
 C                     check for matches at all levels from LEVELS down
 C                     to 4 in the bottom level cache.
 C     12th Apr 1991.  KS / AAO. Recoded to try to minimise the number of
@@ -125,7 +125,7 @@ C
          DO J=LEVELS,4,-1
             IENP=LASTC(J)
             ENDCHR=NAME(IENP:IENP)
-            DO I=1,NCACHB 
+            DO I=1,NCACHB
                COMPS=COMPS+1
                IF (ENDCHR.EQ.CACHEB(I)(IENP:IENP)) THEN
                   IF (NAME(:IENP).EQ.CACHEB(I)) THEN

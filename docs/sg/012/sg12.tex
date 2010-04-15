@@ -100,7 +100,7 @@ to use IRAF or who are using it for the first time.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -173,7 +173,7 @@ to use IRAF or who are using it for the first time.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -261,12 +261,12 @@ to use IRAF or who are using it for the first time.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -468,7 +468,7 @@ useful document is {\it A User's Introduction to the IRAF Command
 Language}\/\cite{SHAMES86} which describes the IRAF command language,
 {\tt cl}.
 
-Copies of these documents can be retrieved from the IRAF 
+Copies of these documents can be retrieved from the IRAF
 \htmladdnormallinkfoot{Web}
 {http://www.starlink.ac.uk/iraf/web/docs/docmain.html}
 or anonymous ftp sites (see Section~\ref{OBTAIN} for details).  The
@@ -515,7 +515,7 @@ probably contain the answers to most of your initial queries about
 IRAF.  An on-line version is available at the following URLs:
 
 \begin{tabular}{ll}
-NOAO, Tucson:    & \htmladdnormallink{ {\tt 
+NOAO, Tucson:    & \htmladdnormallink{ {\tt
     http://iraf.noao.edu/iraf/web/faq/FAQ.html} }
    {http://iraf.noao.edu/iraf/web/faq/FAQ.html}      \\
 Starlink mirror: & \htmladdnormallink{ {\tt
@@ -545,7 +545,7 @@ registration file:
 
 and return it to username {\tt iraf-requests@noao.edu}.
 
-Back issues of the {\it Newsletter}\, are 
+Back issues of the {\it Newsletter}\, are
 \htmladdnormallink{available on the IRAF Web pages}
 {http://www.starlink.ac.uk/iraf/web/irafnews/newslet.html}.
 A \htmladdnormallink{table-of-contents}
@@ -739,9 +739,9 @@ hotseat@cfa.harvard.edu}.
 Most Starlink software is written using the Starlink software environment
 and stores data in the N-dimensional Data Format (NDF;
 \xref{SUN/33}{sun33}{}\cite{SUN33}).  A substantial degree of
-inter-operability is possible between this software and IRAF.  
+inter-operability is possible between this software and IRAF.
 
-At the most basic level Starlink provides the CONVERT package 
+At the most basic level Starlink provides the CONVERT package
 (\xref{SUN/55}{sun55}{}\cite{SUN55}) which is a set of applications
 for converting data files between a number of different data formats.
 It includes applications for converting an NDF format file to one in
@@ -792,7 +792,7 @@ with obtaining and installing it you should consult your local
 site manager.
 
 If you have a problem with or query about using IRAF then your first
-port of call should be the 
+port of call should be the
 \htmladdnormallink{FAQ}{http://www.starlink.ac.uk/iraf/web/faq/FAQ.html}
 (see Section~\ref{FAQ}), which will often have the answer.
 
@@ -857,7 +857,7 @@ Section~\ref{OBTAIN} for details) from file:
 The file is a compressed tar archive.  Remember to set ftp to binary
 mode prior to retrieving it.  The file should be decompressed using Unix
 command {\tt uncompress} (sic).  Instructions for installing the
-examples are given in file 
+examples are given in file
 \htmladdnormallink{{\tt exer2102.readme}}
 {ftp://iraf.noao.edu/iraf/misc/exer2102.readme}
 (which is included in the tar archive).
@@ -918,8 +918,8 @@ The procedure is as follows.
   \end{quote}
 
    See your site manager for the details at your site.  It is probably most
-   convenient to put these lines at the end of the file.  
-   
+   convenient to put these lines at the end of the file.
+
   \item Either log out and log in again or {\tt source} your {\tt
    .tcshrc} (or {\tt .cshrc}) file.
 
@@ -1103,7 +1103,7 @@ to use a FITS image of your own.
    File {\tt ccdframe.imh} should be created in your IRAF directory
    and file {\tt ccdframe.pix} in the pixels directory (probably
    subdirectory {\tt pixels} if you have used the {\tt loginuser.cl}
-   file supplied with this document).  From the IRAF command language 
+   file supplied with this document).  From the IRAF command language
    you can show the files in the current directory with command {\tt
    dir}, change to a new directory with {\tt cd} and list a text
    file with {\tt cat}; these commands behave similarly to the
@@ -1169,7 +1169,7 @@ to use a FITS image of your own.
        (upper = INDEF)          Upper cutoff for pixel values
     (binwidth = 0.1)            Bin width of histogram in sigma
       (format = yes)            Format output and print column labels?
-        (mode = "ql")           
+        (mode = "ql")
   \end{verbatim}
 
    The parameters enclosed in brackets are hidden (in this case this
@@ -1399,22 +1399,22 @@ Sigma = 308.263
          xend =                 *! (XEnd) Last X value to be used
        (pass2 = no)             (PAss2) Pass twice through data for better sigm
       (median = no)             (MEDian) Calculate median as well as other stat
-  (stat_total = 0.)             
-    (stat_max = 0.)             
-    (stat_min = 0.)             
-   (stat_mean = 0.)             
-  (stat_sigma = 0.)             
-   (stat_size = 0.)             
-   (stat_xmax = 0.)             
-   (stat_xmin = 0.)             
-   (stat_ymax = 0.)             
-   (stat_ymin = 0.)             
- (stat_xstart = 0.)             
-   (stat_xend = 0.)             
- (stat_ystart = 0.)             
-   (stat_yend = 0.)             
- (stat_median = 0.)             
-        (mode = "ql")           
+  (stat_total = 0.)
+    (stat_max = 0.)
+    (stat_min = 0.)
+   (stat_mean = 0.)
+  (stat_sigma = 0.)
+   (stat_size = 0.)
+   (stat_xmax = 0.)
+   (stat_xmin = 0.)
+   (stat_ymax = 0.)
+   (stat_ymin = 0.)
+ (stat_xstart = 0.)
+   (stat_xend = 0.)
+ (stat_ystart = 0.)
+   (stat_yend = 0.)
+ (stat_median = 0.)
+        (mode = "ql")
   \end{verbatim}
 
   \item In addition to the quantities calculated automatically {\tt istat}
@@ -1565,7 +1565,7 @@ print("Subtracted ",x,"to create file newframe.")
 
 \end{figure}
 
-As with any unfamiliar programming language, your first reaction is 
+As with any unfamiliar programming language, your first reaction is
 probably one of trepidation as you wonder what is going on.  No variables
 were declared at the start of this script although variables are used
 throughout the program for parameter passing. The {\tt cl} has some built-in
@@ -1787,7 +1787,7 @@ Any mistakes, of course, are our own.
    File: {\tt beguide.ps.Z}.  See Section~\ref{DOC} for details of
    obtaining IRAF documents.
 
-  \bibitem{SSN35} A.J.~Chipperfield, 1997, \xref{SSN/35.3}{ssn35}{}: 
+  \bibitem{SSN35} A.J.~Chipperfield, 1997, \xref{SSN/35.3}{ssn35}{}:
    {\it IRAFSTAR -- The IRAF/Starlink Inter-operability Infrastructure}\,
    (Starlink).
 

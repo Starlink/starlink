@@ -25,7 +25,7 @@
 *        The second NDF, which defines teh required area.
 *     LIKWCS = LOGICAL (Given)
 *        If .TRUE., then the section selected from INDF1 matches the WCS
-*        bounding box of INDF2. If .FALSE., then the section selected 
+*        bounding box of INDF2. If .FALSE., then the section selected
 *        from INDF1 matches the pixel index bounding box of INDF2.
 *     INDF3 = INTEGER (Returned)
 *        The required section of INDF1.
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,14 +65,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER INDF1
@@ -105,13 +105,13 @@
       INTEGER UBND2( NDF__MXDIM ) ! Input NDF upper bounds
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 * Get the pixel index bounds of the template.
       CALL NDF_BOUND( INDF2, NDF__MXDIM, LBND2, UBND2, NDIM2, STATUS )
 
-*  If WCS bounds are being used, we need to transform these pixel index 
+*  If WCS bounds are being used, we need to transform these pixel index
 *  bounds into the PIXEL frame of INDF1, aligning in some suitable common
 *  WCS frame.
       IF( LIKWCS ) THEN
@@ -120,7 +120,7 @@
          CALL AST_BEGIN( STATUS )
 
 * Get the pixel index bounds of the template.
-         CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, 
+         CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1,
      :                   STATUS )
 
 *  Get the WCS FrameSets from the two input NDFs.
@@ -147,10 +147,10 @@
             DO I = 1, NDIM1
 
 *  Get the corresponding GRID bounds within INDF1.
-               CALL AST_MAPBOX( FS, DLBND2, DUBND2, .TRUE., I, 
+               CALL AST_MAPBOX( FS, DLBND2, DUBND2, .TRUE., I,
      :                          DLBND1, DUBND1, XL, XU, STATUS )
 
-*  Convert to pixel indices   
+*  Convert to pixel indices
                UBND1( I ) = LBND1( I ) + NINT( DUBND1 ) - 2
                LBND1( I ) = LBND1( I ) + NINT( DLBND1 ) - 1
             END DO

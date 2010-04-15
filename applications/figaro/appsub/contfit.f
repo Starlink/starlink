@@ -17,10 +17,10 @@ C     (>) ZVALS   (Real array) The Y values of the observed data points.
 C     (>) CX      (Integer) The total number of points to be continuum
 C                 fitted
 C     (>) ICST    (Integer) The start of the continuum fitted region
-C     (>) ICONO   (Integer array) The array indicating points to be 
+C     (>) ICONO   (Integer array) The array indicating points to be
 C                 included in the continuum fit
 C     (>) KORD    (Integer) Order of polynomial fit + 1
-C     (>) A       (Double Precision array) 2d array of Chebyshev 
+C     (>) A       (Double Precision array) 2d array of Chebyshev
 C                 polynomial coefficients ( passed for dimensioning purposes )
 C     (<) CONVALS (Real array) The fitted continuum points
 C     (<) RMS     (Real array) R.m.s. on continuum fit
@@ -81,7 +81,7 @@ C
         RMS(I)=0.
       END DO
       RMS(KPLUS1)=SNGL(EPS)
-C 
+C
 C     Evaluate the continuum points.
 C
       IFAIL=0

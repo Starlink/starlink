@@ -6,9 +6,9 @@
 *    Description :
 *
 *     This routine takes 4 input arrays and bins up all the pixels
-*     that lie within a user specified aperture to simulate measurement 
-*     of polarization with single element detector instruments.  
-*     A sky annulus is used around the object aperture to calculate 
+*     that lie within a user specified aperture to simulate measurement
+*     of polarization with single element detector instruments.
+*     A sky annulus is used around the object aperture to calculate
 *     the sky contribution in the object aperture.
 *
 *    Invocation :
@@ -30,7 +30,7 @@
 *     FNAME = CHAR( READ )
 *            Name of file containing input data
 *     TERMOUT = CHAR( READ )
-*            Does use want terminal out of file input data 
+*            Does use want terminal out of file input data
 *     XCEN = REAL( READ )
 *            X coordinate of aperture centre
 *     YCEN = REAL( READ )
@@ -69,7 +69,7 @@
 *        Map in DATA_ARRAYs
 *        Check dimesions and output to user
 *        Get the source of the subsequent input
-*        If user has selected file input then 
+*        If user has selected file input then
 *          Get filename
 *          Does user want terminal output of data or just file
 *        Else if user has selected terminal input then
@@ -95,7 +95,7 @@
 *     Endif
 *     End
 *
-*    Deficiencies : 
+*    Deficiencies :
 
 *     Works on integer pixels only not partial pixels
 *
@@ -111,7 +111,7 @@
 *    History :
 *
 *     22-10-1985 : First implementation (REVA::MJM)
-*     17-01-1986 : More error checking and tidying (REVA::MJM) 
+*     17-01-1986 : More error checking and tidying (REVA::MJM)
 *     03-12-1987 : ask if want another input (UKTH::CAA)
 *     16-01-1988 : created aperphot from aperadd (UKTH::CAA)
 *     13-05-1990 : added option to change aperture size/position (JACH::CAA)
@@ -128,9 +128,9 @@
 
 *      Global constants :
 	INCLUDE  'SAE_PAR'          ! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'      
-        INCLUDE  'CHR_ERR' 
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
+        INCLUDE  'CHR_ERR'
         INCLUDE  'FIO_PAR'
 
 *      Status :
@@ -253,14 +253,14 @@
      :	   MODE22,             ! mode      "      "   "      "
      :	   MODE23,             ! mode      "      "   "      "
      :	   MODE24,             ! mode      "      "   "      "
-     :     NOISE11,            ! std       "      "   "      "   
-     :     NOISE12,            ! std       "      "   "      "   
-     :     NOISE13,            ! std       "      "   "      "   
-     :     NOISE14,            ! std       "      "   "      "   
-     :     NOISE21,            ! std       "      "   "      "   
-     :     NOISE22,            ! std       "      "   "      "   
-     :     NOISE23,            ! std       "      "   "      "   
-     :     NOISE24             ! std       "      "   "      "   
+     :     NOISE11,            ! std       "      "   "      "
+     :     NOISE12,            ! std       "      "   "      "
+     :     NOISE13,            ! std       "      "   "      "
+     :     NOISE14,            ! std       "      "   "      "
+     :     NOISE21,            ! std       "      "   "      "
+     :     NOISE22,            ! std       "      "   "      "
+     :     NOISE23,            ! std       "      "   "      "
+     :     NOISE24             ! std       "      "   "      "
 
 	REAL
      :	   BADVAL,             ! bad pixel value
@@ -289,7 +289,7 @@
 	CHARACTER*132
      :	   LINE1               ! input line
 
-	LOGICAL 
+	LOGICAL
      :	   AGAIN,              ! another input option
      :	   MORE,               ! another read option
      :	   USEBAD,             ! option to use bad pixel value
@@ -330,9 +330,9 @@
           CALL NDF_DIM( LOCI4, NDIMS, IDIMS4, ACTDIM, STATUS )
 
 *        check dimensions are all same
-	  SUMDIMS( 1) 
+	  SUMDIMS( 1)
      :          = IDIMS1( 1) + IDIMS2( 1) + IDIMS3( 1) + IDIMS4( 1)
-	  SUMDIMS( 2) 
+	  SUMDIMS( 2)
      :          = IDIMS1( 2) + IDIMS2( 2) + IDIMS3( 2) + IDIMS4( 2)
 
 	  IF( SUMDIMS( 1) .NE. IDIMS1( 1)*4 .OR.
@@ -340,8 +340,8 @@
 
 *          tell user that images are not the same size and he is a bozo
 	    CALL MSG_OUT( 'BLANK', ' ', STATUS)
-	    CALL MSG_OUT( 'BOZO', 
-     :                    'VAXVMS-E-BOZO, Images are not same size', 
+	    CALL MSG_OUT( 'BOZO',
+     :                    'VAXVMS-E-BOZO, Images are not same size',
      :	                   STATUS)
 	    CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
@@ -359,7 +359,7 @@
             CALL MSG_SETI( 'XDIM', IDIMS1( 1 ) )
             CALL MSG_SETI( 'YDIM', IDIMS2( 2 ) )
             CALL MSG_OUT( 'INPUT_DIMS',
-     :          'Images are all ^XDIM by ^YDIM pixels in size', 
+     :          'Images are all ^XDIM by ^YDIM pixels in size',
      :           STATUS )
 
 	  END IF
@@ -367,7 +367,7 @@
 *        get source of data input F=file, T=terminal
 	  CALL PAR_GET0C( 'DATASOURCE', DATASOURCE, STATUS)
 	  CALL CHR_UCASE( DATASOURCE )
-	  IF( DATASOURCE( 1:1) .NE. 'F' .AND. 
+	  IF( DATASOURCE( 1:1) .NE. 'F' .AND.
      :	      DATASOURCE( 1:1) .NE. 'T') THEN
 	    DATASOURCE( 1:1) = 'T'
 	  END IF
@@ -379,7 +379,7 @@
 	    IF( DATASOURCE( 1:1) .EQ. 'F') THEN
 	      CALL PAR_GET0C( 'TERMOUT', TERMOUT, STATUS)
 	      CALL CHR_UCASE( TERMOUT )
-	      IF( TERMOUT( 1:1) .NE. 'T' .AND. 
+	      IF( TERMOUT( 1:1) .NE. 'T' .AND.
      :	          TERMOUT( 1:1) .NE. 'F' .AND.
      :	          TERMOUT( 1:1) .NE. 'B') THEN
 	        TERMOUT( 1:1) = 'B'
@@ -394,7 +394,7 @@
 
 *            get the aperture centre coordinates - the aperture centre
 *            cannot be off edge of the image
-	      IF( RUNSORT( 1:1) .EQ. 'P' .OR. RUNSORT( 1:1) .EQ. 'B') 
+	      IF( RUNSORT( 1:1) .EQ. 'P' .OR. RUNSORT( 1:1) .EQ. 'B')
      :         THEN
                 CALL AIF_GET0R( 'XCEN', REAL( IDIMS1( 1 )/2.0 ), 0.0,
      :                          REAL( IDIMS1( 1 ) ), XCEN, STATUS )
@@ -411,9 +411,9 @@
 
 *            get the aperture eccentricity and position angle
 	      IF( RUNSORT( 1:1) .EQ. 'B') THEN
-                CALL AIF_GET0R( 'ECC', 0.0, 0.0, 0.9999, ECC, 
+                CALL AIF_GET0R( 'ECC', 0.0, 0.0, 0.9999, ECC,
      :                           STATUS )
-                CALL AIF_GET0R( 'POSANG', 0.0, 0.0, 180.0, POSANG, 
+                CALL AIF_GET0R( 'POSANG', 0.0, 0.0, 180.0, POSANG,
      :	                        STATUS )
 	        CALL PAR_CANCL( 'ECC', STATUS)
 	        CALL PAR_CANCL( 'POSANG', STATUS)
@@ -426,13 +426,13 @@
 	      END IF
 
 *            get the major axis of the aperture in arbitrary units
-	      IF( RUNSORT( 1:1) .EQ. 'M' .OR. RUNSORT( 1:1) .EQ. 'B') 
+	      IF( RUNSORT( 1:1) .EQ. 'M' .OR. RUNSORT( 1:1) .EQ. 'B')
      :         THEN
-	        CALL AIF_GET0R( 'MAJAX1', 10.0, 0.0001, 10000.0, 
+	        CALL AIF_GET0R( 'MAJAX1', 10.0, 0.0001, 10000.0,
      :                          MAJAX1, STATUS )
 	        CALL PAR_CANCL( 'MAJAX1', STATUS)
 	        IF( SKYANNUL) THEN
-                  CALL AIF_GET0R( 'MAJAX2', MAJAX1*2, MAJAX1, 10000.0, 
+                  CALL AIF_GET0R( 'MAJAX2', MAJAX1*2, MAJAX1, 10000.0,
      :                            MAJAX2, STATUS )
 	          CALL PAR_CANCL( 'MAJAX2', STATUS)
 	        END IF
@@ -440,7 +440,7 @@
 
 *            get the size of a pixel in these arbitrary units
 	      IF( RUNSORT( 1:1) .EQ. 'B') THEN
-                CALL AIF_GET0R( 'SCALE', 0.286, 0.0001, 10000.0, 
+                CALL AIF_GET0R( 'SCALE', 0.286, 0.0001, 10000.0,
      :                          SCALE, STATUS )
 	        CALL PAR_CANCL( 'SCALE', STATUS)
 	      END IF
@@ -451,7 +451,7 @@
 
 *              just announce the error, clear up and abort
                 CALL ERR_REP( 'FUNNY_PARS',
-     :           'Something wrong with input parameters - aborting', 
+     :           'Something wrong with input parameters - aborting',
      :            STATUS )
                 CALL NDF_ANNUL( LOCI1, STATUS )
                 CALL NDF_ANNUL( LOCI2, STATUS )
@@ -468,7 +468,7 @@
 	          CALL CHR_UCASE( USEWHAT )
 	          IF( USEWHAT( 1:3) .NE. 'MED' .AND.
      :                USEWHAT( 1:3) .NE. 'MEA') THEN
-	            CALL MSG_OUT( 'MESS', 'Using MEDIAN...', 
+	            CALL MSG_OUT( 'MESS', 'Using MEDIAN...',
      :                STATUS)
 	            USEWHAT( 1:3) = 'MED'
 	          END IF
@@ -487,14 +487,14 @@
 
 *            ask user for position angle correction value
 	      IF( RUNSORT( 1:1) .EQ. 'B') THEN
-	        CALL AIF_GET0R( 'THETACOR', 0.0, 0.0, 180.0, THETACOR, 
+	        CALL AIF_GET0R( 'THETACOR', 0.0, 0.0, 180.0, THETACOR,
      :	                        STATUS)
 	        CALL PAR_CANCL( 'THETACOR', STATUS)
 	      END IF
 
 *            ask user for electrons/dn in image
 	      IF( RUNSORT( 1:1) .EQ. 'B') THEN
-	        CALL AIF_GET0R( 'ELDN', 6.0, 0.0, 1.0E37, ELDN, 
+	        CALL AIF_GET0R( 'ELDN', 6.0, 0.0, 1.0E37, ELDN,
      :                           STATUS )
 	        CALL PAR_CANCL( 'ELDN', STATUS)
 	      END IF
@@ -507,10 +507,10 @@
 	        RAD2 = MAJAX1/2.0
 
 *              call subroutine that does work for object aperture
-	        CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2), %VAL( PNTRI1), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX11, 
-     :	                          BNUMPIX11, TOTAL11, MEAN11, MEDIAN11, 
+	        CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2), %VAL( PNTRI1),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX11,
+     :	                          BNUMPIX11, TOTAL11, MEAN11, MEDIAN11,
      :	                          MODE11, VALMAX11, VALMIN11, NOISE11)
 
 *	type *, idims1( 1), idims1( 2)
@@ -521,10 +521,10 @@
 *	type *, total11, mean11, median11, mode11
 *	type *, valmax11, valmin11, noise11
 
-	        CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2), %VAL( PNTRI2), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX12, 
-     :	                          BNUMPIX12, TOTAL12, MEAN12, MEDIAN12, 
+	        CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2), %VAL( PNTRI2),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX12,
+     :	                          BNUMPIX12, TOTAL12, MEAN12, MEDIAN12,
      :	                          MODE12, VALMAX12, VALMIN12, NOISE12)
 
 *	type *, idims2( 1), idims2( 2)
@@ -535,16 +535,16 @@
 *	type *, total12, mean12, median12, mode12
 *	type *, valmax12, valmin12, noise12
 
-	        CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2), %VAL( PNTRI3), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX13, 
-     :	                          BNUMPIX13, TOTAL13, MEAN13, MEDIAN13, 
+	        CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2), %VAL( PNTRI3),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX13,
+     :	                          BNUMPIX13, TOTAL13, MEAN13, MEDIAN13,
      :	                          MODE13, VALMAX13, VALMIN13, NOISE13)
 
-	        CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2), %VAL( PNTRI4), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX14, 
-     :	                          BNUMPIX14, TOTAL14, MEAN14, MEDIAN14, 
+	        CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2), %VAL( PNTRI4),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX14,
+     :	                          BNUMPIX14, TOTAL14, MEAN14, MEDIAN14,
      :	                          MODE14, VALMAX14, VALMIN14, NOISE14)
 
 *              put all interesting parameters to interface
@@ -569,38 +569,38 @@
 	        CALL PAR_PUT0R( 'MEDIAN14', MEDIAN14, STATUS)
 	        CALL PAR_PUT0R( 'NOISE14', NOISE14, STATUS)
 
-*              calculate the inner and outer radius of the sky annulus 
+*              calculate the inner and outer radius of the sky annulus
 	        RAD1 = MAJAX1/2.0+0.1
 	        RAD2 = MAJAX2/2.0
 
 *              call subroutines that do the actual work
 	        IF( SKYANNUL) THEN
-	          CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2), 
-     :	                            %VAL( PNTRI1), IXCEN, IYCEN, ECC, 
-     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :                              BADVAL, NUMPIX21, BNUMPIX21, 
-     :	                            TOTAL21, MEAN21, MEDIAN21, MODE21, 
+	          CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2),
+     :	                            %VAL( PNTRI1), IXCEN, IYCEN, ECC,
+     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :                              BADVAL, NUMPIX21, BNUMPIX21,
+     :	                            TOTAL21, MEAN21, MEDIAN21, MODE21,
      :	                            VALMAX21, VALMIN21, NOISE21)
 
-	          CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2), 
-     :	                            %VAL( PNTRI2), IXCEN, IYCEN, ECC, 
-     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :                              BADVAL, NUMPIX22, BNUMPIX22, 
-     :	                            TOTAL22, MEAN22, MEDIAN22, MODE22, 
+	          CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2),
+     :	                            %VAL( PNTRI2), IXCEN, IYCEN, ECC,
+     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :                              BADVAL, NUMPIX22, BNUMPIX22,
+     :	                            TOTAL22, MEAN22, MEDIAN22, MODE22,
      :	                            VALMAX22, VALMIN22, NOISE22)
 
-	          CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2), 
-     :	                            %VAL( PNTRI3), IXCEN, IYCEN, ECC, 
-     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :	                            BADVAL, NUMPIX23, BNUMPIX23, TOTAL23, 
-     :	                            MEAN23, MEDIAN23, MODE23, VALMAX23, 
+	          CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2),
+     :	                            %VAL( PNTRI3), IXCEN, IYCEN, ECC,
+     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :	                            BADVAL, NUMPIX23, BNUMPIX23, TOTAL23,
+     :	                            MEAN23, MEDIAN23, MODE23, VALMAX23,
      :                              VALMIN23, NOISE23)
 
-	          CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2), 
-     :	                            %VAL( PNTRI4), IXCEN, IYCEN, ECC, 
-     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :                              BADVAL, NUMPIX24, BNUMPIX24, 
-     :	                            TOTAL24, MEAN24, MEDIAN24, MODE24, 
+	          CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2),
+     :	                            %VAL( PNTRI4), IXCEN, IYCEN, ECC,
+     :	                            POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :                              BADVAL, NUMPIX24, BNUMPIX24,
+     :	                            TOTAL24, MEAN24, MEDIAN24, MODE24,
      :	                            VALMAX24, VALMIN24, NOISE24)
 
 *                put all interesting parameters to interface
@@ -631,7 +631,7 @@
 	            TOTAL22 = MEDIAN22*NUMPIX12
 	            TOTAL23 = MEDIAN23*NUMPIX13
 	            TOTAL24 = MEDIAN24*NUMPIX14
-	          ELSE 
+	          ELSE
 	            TOTAL21 = MEAN21*NUMPIX11
 	            TOTAL22 = MEAN22*NUMPIX12
 	            TOTAL23 = MEAN23*NUMPIX13
@@ -683,12 +683,12 @@
 
 	        IF( SKYANNUL) THEN
 	          IF( USEWHAT( 1:3) .EQ. 'MED') THEN
-	            CALL MSG_OUT( 'MESS', 
-     :	          'Sky contribution calculated from MEDIAN in annulus', 
+	            CALL MSG_OUT( 'MESS',
+     :	          'Sky contribution calculated from MEDIAN in annulus',
      :	              STATUS )
 	          ELSE
-	            CALL MSG_OUT( 'MESS', 
-     :	             'Sky contribution calculated from MEAN in annulus', 
+	            CALL MSG_OUT( 'MESS',
+     :	             'Sky contribution calculated from MEAN in annulus',
      :	              STATUS )
 	          END IF
 	        END IF
@@ -716,15 +716,15 @@
 
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
-*              calculate the polarization 
+*              calculate the polarization
 
 	        CALL POL_STOKESCAL( TOTAL31, TOTAL32, Q)
 	        CALL POL_STOKESCAL( TOTAL33, TOTAL34, U)
 	        CALL POL_POLCAL( Q, U, P)
 	        CALL POL_THETACAL( Q, U, T)
-	        CALL POL_ERRCAL( TOTAL31, TOTAL32, TOTAL33, TOTAL34, 
+	        CALL POL_ERRCAL( TOTAL31, TOTAL32, TOTAL33, TOTAL34,
      :	                         P, ELDN, PE, TE)
-	        CALL POL_INTCAL( TOTAL31, TOTAL32, TOTAL33, 
+	        CALL POL_INTCAL( TOTAL31, TOTAL32, TOTAL33,
      :                           TOTAL34, I)
 
 *              correct the position angle by users amount
@@ -738,32 +738,32 @@
 
 *              tell user what's going down brother ...
 	        CALL MSG_SETR( 'I', I)
-	        CALL MSG_OUT( 'MESS', 
-     :                        'Total Intensity                   = ^I', 
+	        CALL MSG_OUT( 'MESS',
+     :                        'Total Intensity                   = ^I',
      :	                      STATUS)
 	        CALL MSG_SETR( 'Q', Q)
-	        CALL MSG_OUT( 'MESS', 
-     :                        'Q-Stokes parameter (%)            = ^Q', 
+	        CALL MSG_OUT( 'MESS',
+     :                        'Q-Stokes parameter (%)            = ^Q',
      :	                      STATUS)
 	        CALL MSG_SETR( 'U', U)
-	        CALL MSG_OUT( 'MESS', 
-     :                        'U-Stokes parameter (%)            = ^U', 
+	        CALL MSG_OUT( 'MESS',
+     :                        'U-Stokes parameter (%)            = ^U',
      :	                      STATUS)
 	        CALL MSG_SETR( 'P', P)
-	        CALL MSG_OUT( 'MESS', 
-     :                        'Percentage polarization (%)       = ^P', 
+	        CALL MSG_OUT( 'MESS',
+     :                        'Percentage polarization (%)       = ^P',
      :	                      STATUS)
 	        CALL MSG_SETR( 'T', T)
-	        CALL MSG_OUT( 'MESS', 
-     :                        'Position angle (degrees)          = ^T', 
+	        CALL MSG_OUT( 'MESS',
+     :                        'Position angle (degrees)          = ^T',
      :	                      STATUS)
 	        CALL MSG_SETR( 'PE', PE)
-	        CALL MSG_OUT( 'MESS', 
-     :                        'Polarization shot-noise error (%) = ^PE', 
+	        CALL MSG_OUT( 'MESS',
+     :                        'Polarization shot-noise error (%) = ^PE',
      :	                       STATUS)
 	        CALL MSG_SETR( 'TE', TE)
-	        CALL MSG_OUT( 'MESS', 
-     :                        'Position angle error (degrees)    = ^TE', 
+	        CALL MSG_OUT( 'MESS',
+     :                        'Position angle error (degrees)    = ^TE',
      :	                      STATUS)
 
 	        CALL MSG_OUT( 'BLANK' ,' ', STATUS)
@@ -778,7 +778,7 @@
 *              tell user the even more marvellous news
 	        CALL PAR_PUT0R( 'MAG', MAG3, STATUS)
 	        CALL MSG_SETR( 'MAG3', MAG3)
-	        CALL MSG_OUT( 'MESSAGE', 
+	        CALL MSG_OUT( 'MESSAGE',
      :	          'Magnitude from absolute value of I      = ^MAG3',
      :	          STATUS)
 
@@ -793,14 +793,14 @@
               CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
 *            if user wants more runs then get sort of run
-	      IF( AGAIN) THEN 
+	      IF( AGAIN) THEN
 	        CALL PAR_GET0C( 'RUNSORT', RUNSORT, STATUS)
 	        CALL PAR_CANCL( 'RUNSORT', STATUS)
 	        CALL CHR_UCASE( RUNSORT )
 	        IF( RUNSORT( 1:1) .NE. 'M' .AND.
      :	            RUNSORT( 1:1) .NE. 'P') THEN
-	          CALL MSG_OUT( 'MESS', 
-     :                          'Changing aperture MAJOR AXIS ...', 
+	          CALL MSG_OUT( 'MESS',
+     :                          'Changing aperture MAJOR AXIS ...',
      :	                        STATUS)
 	          RUNSORT( 1:1) = 'M'
 	        END IF
@@ -820,7 +820,7 @@
 	    IF( DATASOURCE( 1:1) .EQ. 'F') THEN
 	      CALL PAR_GET0C( 'TERMOUT', TERMOUT, STATUS)
 	      CALL CHR_UCASE( TERMOUT )
-	      IF( TERMOUT( 1:1) .NE. 'T' .AND. 
+	      IF( TERMOUT( 1:1) .NE. 'T' .AND.
      :	          TERMOUT( 1:1) .NE. 'F' .AND.
      :	          TERMOUT( 1:1) .NE. 'B') THEN
 	        TERMOUT( 1:1) = 'B'
@@ -835,7 +835,7 @@
 
 *          check if user wants terminal, file or both output
 	    IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	        TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	        TERMOUT( 1:1) .EQ. 'B') THEN
 
 *            create output filename
 	      L1 = INDEX( FNAME1, '.')
@@ -860,14 +860,14 @@
               IF (STATUS .NE. SAI__OK) GO TO 998
 
 *            write header line to output file
-	      LINE1 = 
-     :	      '     X     Y     E    POS    D1    D2    N1   BN1    '// 
+	      LINE1 =
+     :	      '     X     Y     E    POS    D1    D2    N1   BN1    '//
      :	      'N2   BN2             I         P        TH        ' //
-     :	      'PE        TE        MAG' 
+     :	      'PE        TE        MAG'
 
               CALL CHR_CLEAN( LINE1 )
               L1 = 0
-              CALL CHR_APPND( LINE1, LINE1, L1 ) 
+              CALL CHR_APPND( LINE1, LINE1, L1 )
               CALL FIO_WRITE( LUN2, LINE1(1:L1), STATUS)
 
 	    END IF
@@ -889,8 +889,8 @@
 *              read input variables from input line
 	        READ( LINE1, *, ERR=997, END=996) XCEN, YCEN, ECC,
      :	                                          POSANG, ISKY,
-     :	                                          MAJAX1, MAJAX2, 
-     :	                                          SCALE, IUSEWHAT, 
+     :	                                          MAJAX1, MAJAX2,
+     :	                                          SCALE, IUSEWHAT,
      :	                                          IUSEBAD, BADVAL,
      :	                                          THETACOR, ELDN
 
@@ -922,28 +922,28 @@
 	        RAD2 = MAJAX1/2.0
 
 *              call subroutine that does the actual work
-	        CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2), %VAL( PNTRI1), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX11, 
-     :	                          BNUMPIX11, TOTAL11, MEAN11, MEDIAN11, 
+	        CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2), %VAL( PNTRI1),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX11,
+     :	                          BNUMPIX11, TOTAL11, MEAN11, MEDIAN11,
      :	                          MODE11, VALMAX11, VALMIN11, NOISE11)
 
-	        CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2), %VAL( PNTRI2), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX12, 
-     :	                          BNUMPIX12, TOTAL12, MEAN12, MEDIAN12, 
+	        CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2), %VAL( PNTRI2),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX12,
+     :	                          BNUMPIX12, TOTAL12, MEAN12, MEDIAN12,
      :	                          MODE12, VALMAX12, VALMIN12, NOISE12)
 
-	        CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2), %VAL( PNTRI3), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX13, 
-     :	                          BNUMPIX13, TOTAL13, MEAN13, MEDIAN13, 
+	        CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2), %VAL( PNTRI3),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX13,
+     :	                          BNUMPIX13, TOTAL13, MEAN13, MEDIAN13,
      :	                          MODE13, VALMAX13, VALMIN13, NOISE13)
 
-	        CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2), %VAL( PNTRI4), 
-     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2, 
-     :	                          SCALE, USEBAD, BADVAL, NUMPIX14, 
-     :	                          BNUMPIX14, TOTAL14, MEAN14, MEDIAN14, 
+	        CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2), %VAL( PNTRI4),
+     :	                          IXCEN, IYCEN, ECC, POSANG, RAD1, RAD2,
+     :	                          SCALE, USEBAD, BADVAL, NUMPIX14,
+     :	                          BNUMPIX14, TOTAL14, MEAN14, MEDIAN14,
      :	                          MODE14, VALMAX14, VALMIN14, NOISE14)
 
 *              put all interesting parameters to interface
@@ -968,39 +968,39 @@
 !	        CALL PAR_PUT0R( 'MEDIAN14', MEDIAN14, STATUS)
 !	        CALL PAR_PUT0R( 'NOISE14', NOISE14, STATUS)
 
-*              calculate the inner and outer radius of the sky annulus 
+*              calculate the inner and outer radius of the sky annulus
 	        RAD1 = MAJAX1/2.0+0.1
 	        RAD2 = MAJAX2/2.0
 
 *              call subroutines that do the actual work
 	        IF( SKYANNUL) THEN
-	          CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2), 
-     :	                            %VAL( PNTRI1), IXCEN, IYCEN, ECC, 
-     :                              POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :	                            BADVAL, NUMPIX21, BNUMPIX21, 
-     :	                            TOTAL21, MEAN21, MEDIAN21, MODE21, 
+	          CALL APERPHOTSUB( IDIMS1( 1), IDIMS1( 2),
+     :	                            %VAL( PNTRI1), IXCEN, IYCEN, ECC,
+     :                              POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :	                            BADVAL, NUMPIX21, BNUMPIX21,
+     :	                            TOTAL21, MEAN21, MEDIAN21, MODE21,
      :	                            VALMAX21, VALMIN21, NOISE21)
 
-	          CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2), 
-     :	                            %VAL( PNTRI2), IXCEN, IYCEN, ECC, 
-     :                              POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :	                            BADVAL, NUMPIX22, BNUMPIX22, 
-     :	                            TOTAL22, MEAN22, MEDIAN22, MODE22, 
+	          CALL APERPHOTSUB( IDIMS2( 1), IDIMS2( 2),
+     :	                            %VAL( PNTRI2), IXCEN, IYCEN, ECC,
+     :                              POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :	                            BADVAL, NUMPIX22, BNUMPIX22,
+     :	                            TOTAL22, MEAN22, MEDIAN22, MODE22,
      :	                            VALMAX22, VALMIN22, NOISE22)
 
-	          CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2), 
-     :	                            %VAL( PNTRI3), IXCEN, IYCEN, ECC, 
-     :                              POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :	                            BADVAL, NUMPIX23, BNUMPIX23, 
-     :	                            TOTAL23, MEAN23, MEDIAN23, 
-     :	                            MODE23, VALMAX23, VALMIN23, 
+	          CALL APERPHOTSUB( IDIMS3( 1), IDIMS3( 2),
+     :	                            %VAL( PNTRI3), IXCEN, IYCEN, ECC,
+     :                              POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :	                            BADVAL, NUMPIX23, BNUMPIX23,
+     :	                            TOTAL23, MEAN23, MEDIAN23,
+     :	                            MODE23, VALMAX23, VALMIN23,
      :                              NOISE23)
 
-	          CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2), 
-     :	                            %VAL( PNTRI4), IXCEN, IYCEN, ECC, 
-     :                              POSANG, RAD1, RAD2, SCALE, USEBAD, 
-     :                              BADVAL, NUMPIX24, BNUMPIX24, 
-     :	                            TOTAL24, MEAN24, MEDIAN24, MODE24, 
+	          CALL APERPHOTSUB( IDIMS4( 1), IDIMS4( 2),
+     :	                            %VAL( PNTRI4), IXCEN, IYCEN, ECC,
+     :                              POSANG, RAD1, RAD2, SCALE, USEBAD,
+     :                              BADVAL, NUMPIX24, BNUMPIX24,
+     :	                            TOTAL24, MEAN24, MEDIAN24, MODE24,
      :	                            VALMAX24, VALMIN24, NOISE24)
 
 *                put all interesting parameters to interface
@@ -1031,7 +1031,7 @@
 	            TOTAL22 = MEDIAN22*NUMPIX12
 	            TOTAL23 = MEDIAN23*NUMPIX13
 	            TOTAL24 = MEDIAN24*NUMPIX14
-	          ELSE 
+	          ELSE
 	            TOTAL21 = MEAN21*NUMPIX11
 	            TOTAL22 = MEAN22*NUMPIX12
 	            TOTAL23 = MEAN23*NUMPIX13
@@ -1068,14 +1068,14 @@
 	          TOTAL34 = 0.0
 	        END IF
 
-*              calculate the polarization 
+*              calculate the polarization
 	        CALL POL_STOKESCAL( TOTAL31, TOTAL32, Q)
 	        CALL POL_STOKESCAL( TOTAL33, TOTAL34, U)
 	        CALL POL_POLCAL( Q, U, P)
 	        CALL POL_THETACAL( Q, U, T)
-	        CALL POL_ERRCAL( TOTAL31, TOTAL32, TOTAL33, TOTAL34, 
+	        CALL POL_ERRCAL( TOTAL31, TOTAL32, TOTAL33, TOTAL34,
      :	                         P, ELDN, PE, TE)
-	        CALL POL_INTCAL( TOTAL31, TOTAL32, TOTAL33, 
+	        CALL POL_INTCAL( TOTAL31, TOTAL32, TOTAL33,
      :                           TOTAL34, I)
 
 *              correct the position angle by users amount
@@ -1096,7 +1096,7 @@
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'T' .OR.
-     :	            TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	            TERMOUT( 1:1) .EQ. 'B') THEN
 
 *	         on return, output the relevant figures
 	          CALL MSG_OUT( 'BLANK', ' ', STATUS )
@@ -1113,12 +1113,12 @@
 
 	          IF( SKYANNUL) THEN
 	            IF( USEWHAT( 1:3) .EQ. 'MED') THEN
-	              CALL MSG_OUT( 'MESS', 
-     :            'Sky contribution calculated from MEDIAN in annulus', 
+	              CALL MSG_OUT( 'MESS',
+     :            'Sky contribution calculated from MEDIAN in annulus',
      :	                STATUS )
 	            ELSE
-	              CALL MSG_OUT( 'MESS', 
-     :	             'Sky contribution calculated from MEAN in annulus', 
+	              CALL MSG_OUT( 'MESS',
+     :	             'Sky contribution calculated from MEAN in annulus',
      :	                STATUS )
 	            END IF
 	          END IF
@@ -1148,32 +1148,32 @@
 
 *                tell user what's going down brother ...
 	          CALL MSG_SETR( 'I', I)
-	          CALL MSG_OUT( 'MESS', 
-     :                        'Total Intensity                   = ^I', 
+	          CALL MSG_OUT( 'MESS',
+     :                        'Total Intensity                   = ^I',
      :	                        STATUS)
 	          CALL MSG_SETR( 'Q', Q)
-	          CALL MSG_OUT( 'MESS', 
-     :                        'Q-Stokes parameter (%)            = ^Q', 
+	          CALL MSG_OUT( 'MESS',
+     :                        'Q-Stokes parameter (%)            = ^Q',
      :	                        STATUS)
 	          CALL MSG_SETR( 'U', U)
-	          CALL MSG_OUT( 'MESS', 
-     :                        'U-Stokes parameter (%)            = ^U', 
+	          CALL MSG_OUT( 'MESS',
+     :                        'U-Stokes parameter (%)            = ^U',
      :	                        STATUS)
 	          CALL MSG_SETR( 'P', P)
-	          CALL MSG_OUT( 'MESS', 
-     :                        'Percentage polarization (%)       = ^P', 
+	          CALL MSG_OUT( 'MESS',
+     :                        'Percentage polarization (%)       = ^P',
      :	                        STATUS)
 	          CALL MSG_SETR( 'T', T)
-	          CALL MSG_OUT( 'MESS', 
-     :                        'Position angle (degrees)          = ^T', 
+	          CALL MSG_OUT( 'MESS',
+     :                        'Position angle (degrees)          = ^T',
      :	                        STATUS)
 	          CALL MSG_SETR( 'PE', PE)
-	          CALL MSG_OUT( 'MESS', 
-     :                        'Polarization shot-noise error (%) = ^PE', 
+	          CALL MSG_OUT( 'MESS',
+     :                        'Polarization shot-noise error (%) = ^PE',
      :	                        STATUS)
 	          CALL MSG_SETR( 'TE', TE)
-	          CALL MSG_OUT( 'MESS', 
-     :                       'Position angle error (degrees)    = ^TE', 
+	          CALL MSG_OUT( 'MESS',
+     :                       'Position angle error (degrees)    = ^TE',
      :	                        STATUS)
 
 	          CALL MSG_OUT( 'BLANK' ,' ', STATUS)
@@ -1181,7 +1181,7 @@
 *                tell user the even more marvellous news
 	          CALL PAR_PUT0R( 'MAG', MAG3, STATUS)
 	          CALL MSG_SETR( 'MAG3', MAG3)
-	          CALL MSG_OUT( 'MESSAGE', 
+	          CALL MSG_OUT( 'MESSAGE',
      :	            'Magnitude from absolute value of I      = ^MAG3',
      :	            STATUS)
 
@@ -1191,18 +1191,18 @@
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	            TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	            TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                write line to users output file
-	          WRITE( LUN2, 
-     :	    '(2F6.1,2X,F4.2,2X,F5.1,2F6.1,4I6,F14.2,4(2x,F8.3),F11.3)') 
-     :	            XCEN, YCEN, 
+	          WRITE( LUN2,
+     :	    '(2F6.1,2X,F4.2,2X,F5.1,2F6.1,4I6,F14.2,4(2x,F8.3),F11.3)')
+     :	            XCEN, YCEN,
      :	            ECC, POSANG,
      :	            MAJAX1, MAJAX2,
      :	            NUMPIX11, BNUMPIX11,
      :	            NUMPIX21, BNUMPIX21,
-     :	            I, P, 
-     :	            T, PE, 
+     :	            I, P,
+     :	            T, PE,
      :	            TE, MAG3
 
 	        END IF
@@ -1211,12 +1211,12 @@
 
 *              check if user wants terminal, file or both output
 	        IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	          TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	          TERMOUT( 1:1) .EQ. 'B') THEN
 
 *                write comment line to users output file
                   CALL CHR_CLEAN( LINE1 )
                   L1 = 0
-	          CALL CHR_APPND( LINE1, LINE1, L1 ) 
+	          CALL CHR_APPND( LINE1, LINE1, L1 )
                   CALL FIO_WRITE(LUN2, LINE1(1:L1), STATUS)
 
 	        END IF
@@ -1232,7 +1232,7 @@
 
 *          check if user wants terminal, file or both output
 	    IF( TERMOUT( 1:1) .EQ. 'F' .OR.
-     :	        TERMOUT( 1:1) .EQ. 'B') THEN 
+     :	        TERMOUT( 1:1) .EQ. 'B') THEN
 
 *            close output files and free lun
               CALL FIO_CLOSE( LUN2, STATUS )
@@ -1240,7 +1240,7 @@
 *            tell user the name of the output file
 	      CALL MSG_OUT( 'BLANK', ' ', STATUS)
 	      CALL MSG_SETC( 'FO', FNAME2)
-	      CALL MSG_OUT( 'MESS', 'Output file is called ^FO', 
+	      CALL MSG_OUT( 'MESS', 'Output file is called ^FO',
      :                       STATUS)
 	      CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
@@ -1254,7 +1254,7 @@
 	GOTO 200
 
 *      error messages
-       
+
   999   CALL MSG_SETC( 'FI', FNAME1)
         CALL ERR_REP( 'MESSAGE', 'Error, opening input file ^FI',
      :                 STATUS )
@@ -1264,11 +1264,11 @@
      :                 STATUS )
 	GOTO 200
   997	CALL MSG_SETC( 'LINE', LINE1)
-        CALL ERR_REP( 'MESSAGE', 
+        CALL ERR_REP( 'MESSAGE',
      :                'Error, reading from input line ^LINE', STATUS )
 	GOTO 200
   996	CALL MSG_SETC( 'LINE', LINE1)
-        CALL ERR_REP( 'MESSAGE', 
+        CALL ERR_REP( 'MESSAGE',
      :                'Error, end of input line ^LINE', STATUS )
 *      here at end of program
   200	CONTINUE

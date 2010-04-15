@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE line_WRITI
 *
-*   Description: 
+*   Description:
 *      Encode integer value into internal buffer under format control.
 *
 *   Authors:
@@ -36,7 +36,7 @@
 
 *   Import:
       BYTE CNTRL(MAXTOK)   ! control string
- 
+
       INTEGER IVALUE       ! integer value
 
 *   CMLINE:

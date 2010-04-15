@@ -17,7 +17,7 @@
 *
 *    History :
 *
-*      4 May 1994 (DJA): 
+*      4 May 1994 (DJA):
 *        Original version. Derived from old UTIL_SELOUT routine
 *     22 Feb 1996 (DJA):
 *        Strict F77 version to cope with Linux

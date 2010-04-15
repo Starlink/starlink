@@ -44,7 +44,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,12 +113,12 @@
 
       CALL HISTC0( ' ', LOGPOS, FD, STATUS )
 
-*  Call a lower level routine to display the text. Pass the length of 
+*  Call a lower level routine to display the text. Pass the length of
 *  each character string as an "invisible" argument at the end. This
 *  extra argument is ignored on VMS because there is no corresponding
 *  argument defined in HISTA3, but is used on UNIX to get access to the
 *  mapped character array.
-      CALL HISTA3( SIZE, %VAL( PNTR ), LOGPOS, FD, STATUS, 
+      CALL HISTA3( SIZE, %VAL( PNTR ), LOGPOS, FD, STATUS,
      :             %VAL( CLEN ) )
 
 *  Annul the locators (thus unmapping the TEXT array).

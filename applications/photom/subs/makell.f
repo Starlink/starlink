@@ -25,7 +25,7 @@
 *     circle in equal steps and dropping down a line perpendicular to the
 *     semi-major axis of the ellipse. Where this line meets the ellipse
 *     is where the vertex is calculated. If the semi-major axis of the
-*     ellipse lies along the x-axis then this point corrseponds to 
+*     ellipse lies along the x-axis then this point corrseponds to
 *     x = a * cos( u ),  y = b * sin( u ),
 *     where u is the angle around the exscribed circle from the x-axis.
 *     The orientation has been adjusted to be a position angle.
@@ -64,7 +64,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 

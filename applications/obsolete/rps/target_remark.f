@@ -18,7 +18,7 @@
       COMMON / ECL_COORD/ DECLONG, DECLAT	! Available from ROS_VIEW
       LOGICAL SMG
       COMMON / SMG_KEEP / SMG
- 
+
 *   Functions :
       INTEGER DBS_FIELDNO					!Gets field number from the database.
       INTEGER DBS_GETI						!Gets integer value from the database.
@@ -39,7 +39,7 @@
       QUOTE = CHAR(39)
       PTARGET = 1
       COUNT_REM = 0
- 
+
       IF (REF_FORM .LE.0 ) THEN							! Open files if necessary
          CALL FORM_OPEN( 'R', IERR)
          IF (IERR .NE. 0) GOTO 90
@@ -57,7 +57,7 @@ C      END IF
            CALL TARG_READ(JTARGET,IERR)
            IF (IERR.NE.0) GOTO 90
            TARG_NUM = DBS_GETI(REF_TARGET,1)
-           IF (TARG_NUM.EQ.ITARGET) THEN 
+           IF (TARG_NUM.EQ.ITARGET) THEN
              GOTO 60
            END IF
          END DO
@@ -110,7 +110,7 @@ C            END IF
                   END IF
                END DO
             END DO
-     
+
             WRITE(NUM ,'(I2)') TARG_NO(JTARGET)
 
 * write to latex file

@@ -1,6 +1,6 @@
 *+  P4_GET_STATS - Obtain stats on a sub-set of a 2-D array.
-      SUBROUTINE P4_GET_STATS( DIM1, DIM2, DATA, QUALITY, 
-     :  QUAL, WHOLE, IST, IEN, IINCR, JST, JEN, JINCR, 
+      SUBROUTINE P4_GET_STATS( DIM1, DIM2, DATA, QUALITY,
+     :  QUAL, WHOLE, IST, IEN, IINCR, JST, JEN, JINCR,
      :  AUTOSCALE, HIGH, LOW, MEAN, SIGMA, STATUS )
 *    Description :
 *     This routine returns the mean and sigma for a sub-array. If autoscaling
@@ -94,7 +94,7 @@
      :  I, J,                             ! Loop counters
      :  ISTART, IEND,                     ! Counter limits
      :  JSTART, JEND                      ! Counter limits
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      : TOTALDP,                           ! Total values (ie Sum(X) )
      : TOTSQ                              ! Total square values ( ie Sum(X**2) )
       REAL
@@ -153,8 +153,8 @@
                      HIGH = MAX( HIGH, DATA(I,J) )
                   ELSE
 
-                     IF ( DATA(I,J).GE.LOW .AND. 
-     :                    DATA(I,J).LE.HIGH )  THEN 
+                     IF ( DATA(I,J).GE.LOW .AND.
+     :                    DATA(I,J).LE.HIGH )  THEN
                         SIZE = SIZE + 1.0
                         TOTALDP = TOTALDP + DATA(I,J)
                         TOTSQ = TOTSQ + DATA(I,J)*DATA(I,J)
@@ -172,8 +172,8 @@
                   HIGH = MAX( HIGH, DATA(I,J) )
                ELSE
 
-                  IF ( DATA(I,J).GE.LOW .AND. 
-     :                 DATA(I,J).LE.HIGH )  THEN 
+                  IF ( DATA(I,J).GE.LOW .AND.
+     :                 DATA(I,J).LE.HIGH )  THEN
                      SIZE = SIZE + 1.0
                      TOTALDP = TOTALDP + DATA(I,J)
                      TOTSQ = TOTSQ + DATA(I,J)*DATA(I,J)
@@ -194,7 +194,7 @@
             LOW  = 0.0
          ENDIF
 
-         CALL MSG_OUT( ' ', 
+         CALL MSG_OUT( ' ',
      :     'NB: Array contains no good data points', STATUS )
       ELSE
 

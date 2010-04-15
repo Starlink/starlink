@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,7 +86,7 @@
 *     31-AUG-2006 (DSB):
 *        DAT_RENAM seems not to work if the object being renamed is an
 *        empty structure. Therefore this routine has been restructured to
-*        rename the original primitive data component rather than the new 
+*        rename the original primitive data component rather than the new
 *        simple data component.
 *     {enter_further_changes_here}
 
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -180,7 +180,7 @@
 *  Move the original primitive array into the DATA component within
 *  the new ARRAY structure. Store the locator to the resulting new
 *  "simple" array in the DCB.
-      IF( DEFER ) THEN 
+      IF( DEFER ) THEN
          CALL DAT_ANNUL( DCB_LOC( IDCB ), STATUS )
       ELSE
          CALL DAT_MOVE( DCB_LOC( IDCB ), LOC, 'DATA', STATUS )
@@ -189,7 +189,7 @@
 
 *  Obtain a locator to the non-imaginary data component and store it in
 *  the DCB.
-      IF( .NOT. DEFER ) THEN 
+      IF( .NOT. DEFER ) THEN
          CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', DCB_DLOC( IDCB ),
      :                  STATUS )
       END IF
@@ -201,7 +201,7 @@
 *  DCB.
       DCB_KTYP( IDCB ) = STATUS .EQ. SAI__OK
       DCB_KFRM( IDCB ) = STATUS .EQ. SAI__OK
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DP2S', STATUS )
 

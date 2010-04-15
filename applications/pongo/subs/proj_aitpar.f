@@ -38,12 +38,12 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
       INCLUDE 'ASTRO_PAR'
-      
+
 *  Arguments Given:
       DOUBLE PRECISION THETA0
 

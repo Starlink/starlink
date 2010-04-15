@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,9 +91,9 @@
          CALL DAT_NAME( TLOC, NAME, STATUS )
          CALL DAT_ANNUL( TLOC, STATUS )
          CALL DAT_ERASE( LOC2, NAME, STATUS )
-      END DO 
+      END DO
 
-*  Loop over all source components. 
+*  Loop over all source components.
       CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
       DO I = 1, NCOMP
 

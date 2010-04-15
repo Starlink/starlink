@@ -21,7 +21,7 @@
       IF (KRES.EQ.'H') THEN
          WRITE (LUREP,'(/4X,''Report resolution is High''/)')
       ELSE IF (KRES.EQ.'M') THEN
-         WRITE (LUREP,'(/4X,''Report resolution is Medium''/)') 
+         WRITE (LUREP,'(/4X,''Report resolution is Medium''/)')
       ELSE
          WRITE (LUREP,'(/4X,''Report resolution is Low''/)')
       END IF

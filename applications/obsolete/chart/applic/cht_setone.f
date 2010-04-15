@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,7 +118,7 @@
       CALL PAR_CANCL( 'PARAM', STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Convert the parameter name to upper case 
+*  Convert the parameter name to upper case
 
             CALL CHR_UCASE( PAR )
 
@@ -135,7 +135,7 @@
             CALL PAR_GET0C( 'VALUE', VALUE, STATUS )
             CALL PAR_CANCL( 'VALUE', STATUS )
             IF( STATUS .EQ. SAI__OK ) THEN
-      
+
 * Convert new value to uppercase if parameter is not a filename or a
 * device name
 
@@ -161,7 +161,7 @@
                   CALL CHR_UCASE( VALUE )
 
                ENDIF
-            
+
                PARAMS( NPOS )( 21:70 ) = VALUE
             END IF
          ELSE

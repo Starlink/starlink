@@ -38,18 +38,18 @@
 
 *  ADAM Parameters:
 *     BACKMEAN = _REAL (Write)
-*        An output parameter to which is written the mean background 
-*        surface brightness after destriping. The mean is taken over 
-*        all the CRDD files specified by parameter IN, and is in units 
+*        An output parameter to which is written the mean background
+*        surface brightness after destriping. The mean is taken over
+*        all the CRDD files specified by parameter IN, and is in units
 *        of Mega-Janskys per steradian. This value is also written
 *        to the screen once all the CRDD files have been processed.
 *     BACKSIGMA = _REAL (Write)
 *        An output parameter to which is written the standard deviation
-*        of the background surface brightness after destriping. The 
-*        standard deviation is taken over all CRDD files specified by 
+*        of the background surface brightness after destriping. The
+*        standard deviation is taken over all CRDD files specified by
 *        parameter IN, and is in units of Mega-Janskys per steradian.
-*        This value is also written to the screen once all the CRDD 
-*        files have been processed. 
+*        This value is also written to the screen once all the CRDD
+*        files have been processed.
 *     BOX = _INTEGER (Read)
 *        The size of the smoothing box used during the cleaning
 *        algorithm, given as a number of samples. This is roughly the
@@ -119,10 +119,10 @@
 *        results in ZCMA_B1S1_DS.
 *     DESTCRDD *_RAW *|_RAW|_DS| QEXP=.NOT.(SOURCE_A.OR.SOURCE_B)
 *        This command attempts to destripe all NDFs in the current
-*        directory which have names ending with "_RAW", placing the 
-*        results in corresponding output NDFs in which "_RAW" is 
-*        replaced by "_DS". Any samples which have either of the two 
-*        qualities SOURCE_A and/or SOURCE_B are excluded from the 
+*        directory which have names ending with "_RAW", placing the
+*        results in corresponding output NDFs in which "_RAW" is
+*        replaced by "_DS". Any samples which have either of the two
+*        qualities SOURCE_A and/or SOURCE_B are excluded from the
 *        estimation of the detector offsets.
 
 *  Estimation of Detector Offsets:
@@ -132,7 +132,7 @@
 *     the given quality expression are included in the estimation of the
 *     detector offsets. Qualities can be assigned to selected samples
 *     using routine SETQUAL.
-*     
+*
 *     After removing samples which do not satisfy the quality
 *     expression, each detector data stream is "cleaned" by removing
 *     any remaining bright sources which may adversly influence the
@@ -171,8 +171,8 @@
 *     DESTCRDD with routine BACKCRDD before combining them into an
 *     image.
 *
-*     After all CRDD files have been destriped, the mean background 
-*     surface brightness (taken over all the output CRDD files) is 
+*     After all CRDD files have been destriped, the mean background
+*     surface brightness (taken over all the output CRDD files) is
 *     displayed in Mega-Janskys per steradian. The spread in background
 *     values in the output CRDD files is also displayed. These values
 *     are written to the output parameters BACKMEAN and BACKSIGMA.
@@ -190,7 +190,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -239,7 +239,7 @@
       INTEGER INDF2              ! Output NDF identifier.
       INTEGER IPIN               ! Pointer to mapped input DATA array.
       INTEGER IPOUT              ! Pointer to mapped output DATA array.
-      INTEGER IPT                ! Pointer to temporary copy of input 
+      INTEGER IPT                ! Pointer to temporary copy of input
                                  ! DATA array.
       INTEGER IPW1               ! Pointer to first work array.
       INTEGER IPW2               ! Pointer to second work array.
@@ -304,7 +304,7 @@
 
 *  Get the no. of standard deviations at which to reject data during
 *  cleaning.
-      CALL PAR_GDR0R( 'CLIP', 3.0, 0.0, VAL__MAXR, .TRUE., CLIP, 
+      CALL PAR_GDR0R( 'CLIP', 3.0, 0.0, VAL__MAXR, .TRUE., CLIP,
      :                 STATUS )
 
 *  Get the number of cleaning iterations to perform.
@@ -336,7 +336,7 @@
       CALL GRP_GETCC( IGRP2, 'COMMENT', COMC, STATUS )
 
 *  Initialise the IRC package.
-      CALL IRC_INIT( STATUS )      
+      CALL IRC_INIT( STATUS )
 
 *  Allocate some workspace for use by the cleaning algorithm. It is
 *  expanded as necssary.
@@ -363,7 +363,7 @@
 
 *  Loop round each pair of input and output CRDD files...
       NOUT = 0
-      DO INDEX = 1, NCRDDF 
+      DO INDEX = 1, NCRDDF
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
@@ -393,7 +393,7 @@
      :                        STATUS )
             END IF
 
-         ELSE 
+         ELSE
             FIRST = .FALSE.
             BAND0 = BAND
 
@@ -440,7 +440,7 @@
 *  If necessary, increase the size of the workspace for use by the
 *  cleaning algorithm.
          IF( WSHIGH - WSLOW + 1 .GT. WSIZE ) THEN
-            WSIZE = WSHIGH - WSLOW + 1 
+            WSIZE = WSHIGH - WSLOW + 1
             CALL PSX_REALLOC( VAL__NBR*WSIZE, IPW1, STATUS )
             CALL PSX_REALLOC( VAL__NBR*WSIZE, IPW2, STATUS )
             CALL PSX_REALLOC( VAL__NBI*WSIZE, IPW3, STATUS )
@@ -453,9 +453,9 @@
 *  Abort if an error has occurred.
          IF ( STATUS .NE. SAI__OK ) GO TO 998
 
-*  Destripe the current CRDD file. 
+*  Destripe the current CRDD file.
          CALL DESTA0( IDC, UBND( 2 ), LBND( 2 ), UBND( 1 ), LBND( 1 ),
-     :                %VAL( IPIN ), %VAL( IPT ), HBOX, NITER, CLIP, 
+     :                %VAL( IPIN ), %VAL( IPT ), HBOX, NITER, CLIP,
      :                UNITS, WSLOW, WSHIGH, OK, QNAME, LOCS,
      :                %VAL( IPOUT ), DETNO, DETOFF, BSB, NS, BAD,
      :                %VAL( IPW1 ), %VAL( IPW2 ), %VAL( IPW3 ), STATUS )
@@ -466,7 +466,7 @@
 *  Ensure that the surface brightness statistics are not incremented if
 *  an error has occurred.
          IF ( STATUS .NE. SAI__OK ) GO TO 998
-      
+
 *  Increment the sum of the mean surface brightnesses, the squared mean
 *  surface brightnesses and the number of points summed.
          SBSUM = SBSUM + NS*BSB
@@ -490,7 +490,7 @@
          CALL NDF_ANNUL( TNDF, STATUS )
          CALL NDF_ANNUL( INDF1, STATUS )
 
-*  If an error has occurred, delete the output NDF, otherwise just 
+*  If an error has occurred, delete the output NDF, otherwise just
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL NDF_DELET( INDF2, STATUS )
@@ -532,11 +532,11 @@
 *  output CRDD files which were not succesfully created are replaced by
 *  strings starting with a comment character and identifying the output
 *  CRDD file which could not be produced.
-      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'DESTCRDD', 
-     :                                   STATUS )      
+      IF( NOUT .GT. 0 ) CALL IRM_LISTN( 'NDFLIST', IGRP2, 'DESTCRDD',
+     :                                   STATUS )
 
-*  Write out the mean and standard deviation of the background surface 
-*  brightnesses to the parameters BACKMEAN and BACKSIGMA, and to the 
+*  Write out the mean and standard deviation of the background surface
+*  brightnesses to the parameters BACKMEAN and BACKSIGMA, and to the
 *  screen.
       IF( NSUM .GT. 0.0 ) THEN
          SB = SBSUM/REAL( NSUM )
@@ -599,7 +599,7 @@
       CALL PSX_FREE( IPW1, STATUS )
       CALL PSX_FREE( IPW2, STATUS )
       CALL PSX_FREE( IPW3, STATUS )
-      
+
 *  Delete the input and output groups.
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )

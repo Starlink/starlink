@@ -34,7 +34,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       CALL CHR_UCASE( COLOUR )
- 
+
       IF ( COLOUR .EQ. 'BLACK' ) THEN
          CVAL = 14
          RD = 0.0

@@ -1,21 +1,21 @@
       SUBROUTINE HELP(CPARAM,IO_LU,TRANS,OUT_LU,IN_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     H E L P
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C CPARAM (<), IO_LU (<), TRANS (<), OUT_LU (<), IN_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C
 C
@@ -85,7 +85,7 @@ C
              WRITE(OUT_LU,'(1X,A)') HELPSTR
             ENDIF
            ENDDO
-          ENDIF 
+          ENDIF
         ENDIF
        ENDDO
        CLOSE(IO_LU)

@@ -13,7 +13,7 @@ f     AST_POLYMAP
 *  Description:
 *     A PolyMap is a form of Mapping which performs a general polynomial
 *     transformation.  Each output coordinate is a polynomial function of
-*     all the input coordinates. The coefficients are specified separately 
+*     all the input coordinates. The coefficients are specified separately
 *     for each output coordinate. The forward and inverse transformations
 *     are defined independantly by separate sets of coefficients.
 
@@ -38,12 +38,12 @@ f     The PolyMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -57,8 +57,8 @@ f     The PolyMap class does not define any new routines beyond those
 *        Original version.
 *     13-APR-2005 (DSB):
 *        Changed the keys used by the Dump/astLoadPolyMap functions. They
-*        used to exceed 8 characters and consequently caused problems for 
-*        FitsChans. 
+*        used to exceed 8 characters and consequently caused problems for
+*        FitsChans.
 *     20-MAY-2005 (DSB):
 *        Correct the indexing of keywords produced in the Dump function.
 *     20-APR-2006 (DSB):
@@ -125,9 +125,9 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(PolyMap)
@@ -182,7 +182,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "polymap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     PolyMap member function (over-rides the astEqual protected
@@ -209,9 +209,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstPolyMap *that;        
-   AstPolyMap *this;        
-   int i, j, k; 
+   AstPolyMap *that;
+   AstPolyMap *this;
+   int i, j, k;
    int nin;
    int nout;
    int result;
@@ -236,9 +236,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
 
-/* If the Invert flags for the two PolyMaps differ, it may still be possible 
-   for them to be equivalent. First compare the PolyMaps if their Invert 
-   flags are the same. In this case all the attributes of the two PolyMaps 
+/* If the Invert flags for the two PolyMaps differ, it may still be possible
+   for them to be equivalent. First compare the PolyMaps if their Invert
+   flags are the same. In this case all the attributes of the two PolyMaps
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
 
@@ -248,7 +248,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                if( this->ncoeff_f[ i ] != that->ncoeff_f[ i ] ||
                    this->mxpow_i[ i ] != that->mxpow_i[ i ] ) {
                   result = 0;
-               } 
+               }
             }
 
 
@@ -280,7 +280,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                if( this->ncoeff_i[ i ] != that->ncoeff_i[ i ] ||
                    this->mxpow_f[ i ] != that->mxpow_f[ i ] ) {
                   result = 0;
-               } 
+               }
             }
 
 
@@ -308,7 +308,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                }
             }
 
-/* If the Invert flags for the two PolyMaps differ, the attributes of the two 
+/* If the Invert flags for the two PolyMaps differ, the attributes of the two
    PolyMaps must be inversely related to each other. */
          } else {
 
@@ -318,7 +318,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -380,7 +380,7 @@ static void FreeArrays( AstPolyMap *this, int forward, int *status ) {
          }
          this->coeff_f = astFree( this->coeff_f );
       }
-   
+
       if( this->power_f ) {
          for( i = 0; i < nout; i++ ) {
             if( this->ncoeff_f && this->power_f[ i ] ) {
@@ -392,7 +392,7 @@ static void FreeArrays( AstPolyMap *this, int forward, int *status ) {
          }
          this->power_f = astFree( this->power_f );
       }
-   
+
       this->ncoeff_f = astFree( this->ncoeff_f );
       this->mxpow_f = astFree( this->mxpow_f );
 
@@ -405,7 +405,7 @@ static void FreeArrays( AstPolyMap *this, int forward, int *status ) {
          }
          this->coeff_i = astFree( this->coeff_i );
       }
-   
+
       if(this->power_i ) {
          for( i = 0; i < nin; i++ ) {
             if( this->ncoeff_i && this->power_i[ i ] ) {
@@ -417,7 +417,7 @@ static void FreeArrays( AstPolyMap *this, int forward, int *status ) {
          }
          this->power_i = astFree( this->power_i );
       }
-   
+
       this->ncoeff_i = astFree( this->ncoeff_i );
       this->mxpow_i = astFree( this->mxpow_i );
    }
@@ -453,7 +453,7 @@ void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -676,7 +676,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Save a pointer to the nominated PolyMap. */
    pmap0 = (AstPolyMap *) ( *map_list )[ where ];
 
-/* The only simplification which can currently be performed is to merge a PolyMap 
+/* The only simplification which can currently be performed is to merge a PolyMap
    with its own inverse. This can only be done in series. Obviously,
    there are potentially other simplications which could be performed, but
    time does not currently allow these to be coded. */
@@ -696,7 +696,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Continue with the next pass if the neighbour does not exist. */
          if( i < 0 || i >= *nmap ) continue;
-          
+
 /* Continue with the next pass if this neighbour is not a PermMap. */
          if( strcmp( "PolyMap", astGetClass( ( *map_list )[ i ] ) ) ) continue;
 
@@ -887,12 +887,12 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    calculations needed to generate the output coordinate values. */
 
 /* Determine the numbers of points and coordinates per point from the input
-   and output PointSets and obtain pointers for accessing the input and 
+   and output PointSets and obtain pointers for accessing the input and
    output coordinate values. */
    ncoord_in = astGetNcoord( in );
    ncoord_out = astGetNcoord( result );
    npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );      
+   ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse mapping, according to the
@@ -952,11 +952,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             outpow = power[ out_coord ];
 
 /* Loop round all polynomial coefficients.*/
-            nc = ncoeff[ out_coord ]; 
-            for ( ico = 0; ico < nc && outval != AST__BAD; 
+            nc = ncoeff[ out_coord ];
+            for ( ico = 0; ico < nc && outval != AST__BAD;
                   ico++, outcof++, outpow++ ) {
 
-/* Initialise the current term to be equal to the value of the coefficient. 
+/* Initialise the current term to be equal to the value of the coefficient.
    If it is bad, store a bad output value. */
                term = *outcof;
                if( term == AST__BAD ) {
@@ -981,7 +981,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Otherwise multiply the current term by the exponentiated axis value. */
                         } else {
-                           term *= xp;                           
+                           term *= xp;
                         }
                      }
                   }
@@ -993,7 +993,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             }
 
 /* Store the output value. */
-            ptr_out[ out_coord ][ point ] = outval;        
+            ptr_out[ out_coord ][ point ] = outval;
 
          }
       }
@@ -1086,16 +1086,16 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    nin = ( (AstMapping *) in )->nin;
    nout = ( (AstMapping *) in )->nout;
 
-/* Copy the number of coefficients associated with each output of the forward 
+/* Copy the number of coefficients associated with each output of the forward
    transformation. */
    if( in->ncoeff_f ) {
       out->ncoeff_f = (int *) astStore( NULL, (void *) in->ncoeff_f,
-                                        sizeof( int )*(size_t) nout ); 
+                                        sizeof( int )*(size_t) nout );
 
-/* Copy the maximum power of each input axis value used by the forward 
+/* Copy the maximum power of each input axis value used by the forward
    transformation. */
       out->mxpow_f = (int *) astStore( NULL, (void *) in->mxpow_f,
-                                       sizeof( int )*(size_t) nin ); 
+                                       sizeof( int )*(size_t) nin );
 
 /* Copy the coefficient values used by the forward transformation. */
       if( in->coeff_f ) {
@@ -1103,12 +1103,12 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
          if( astOK ) {
             for( i = 0; i < nout; i++ ) {
                out->coeff_f[ i ] = (double *) astStore( NULL, (void *) in->coeff_f[ i ],
-                                                     sizeof( double )*(size_t) in->ncoeff_f[ i ] ); 
+                                                     sizeof( double )*(size_t) in->ncoeff_f[ i ] );
             }
          }
       }
 
-/* Copy the input axis powers associated with each coefficient of the forward 
+/* Copy the input axis powers associated with each coefficient of the forward
    transformation. */
       if( in->power_f ) {
          out->power_f = astMalloc( sizeof( int ** )*(size_t) nout );
@@ -1129,21 +1129,21 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* Do the same for the inverse transformation. */
    if( in->ncoeff_i ) {
       out->ncoeff_i = (int *) astStore( NULL, (void *) in->ncoeff_i,
-                                        sizeof( int )*(size_t) nin ); 
-   
+                                        sizeof( int )*(size_t) nin );
+
       out->mxpow_i = (int *) astStore( NULL, (void *) in->mxpow_i,
-                                       sizeof( int )*(size_t) nout ); 
-   
+                                       sizeof( int )*(size_t) nout );
+
       if( in->coeff_i ) {
          out->coeff_i = astMalloc( sizeof( double * )*(size_t) nin );
          if( astOK ) {
             for( i = 0; i < nin; i++ ) {
                out->coeff_i[ i ] = (double *) astStore( NULL, (void *) in->coeff_i[ i ],
-                                                     sizeof( double )*(size_t) in->ncoeff_i[ i ] ); 
+                                                     sizeof( double )*(size_t) in->ncoeff_i[ i ] );
             }
          }
       }
-   
+
       if( in->power_i ) {
          out->power_i = astMalloc( sizeof( int ** )*(size_t) nin );
          if( astOK ) {
@@ -1273,7 +1273,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* First do the forward transformation arrays. Check they are used. */
    if( this->ncoeff_f ) {
 
-/* Store the maximum power of each input axis value used by the forward 
+/* Store the maximum power of each input axis value used by the forward
    transformation. */
       for( i = 0; i < nin; i++ ){
          (void) sprintf( buff, "MPF%d", i + 1 );
@@ -1281,7 +1281,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
           astWriteInt( channel, buff, 1, 1, (this->mxpow_f)[ i ], comm );
       }
 
-/* Store the number of coefficients associated with each output of the forward 
+/* Store the number of coefficients associated with each output of the forward
    transformation. */
       for( i = 0; i < nout; i++ ){
          (void) sprintf( buff, "NCF%d", i + 1 );
@@ -1301,7 +1301,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
          }
       }
 
-/* Store the input axis powers associated with each coefficient of the forward 
+/* Store the input axis powers associated with each coefficient of the forward
    transformation. */
       iv = 1;
       for( i = 0; i < nout; i++ ){
@@ -1320,7 +1320,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Now do the inverse transformation arrays. Check they are used. */
    if( this->ncoeff_i ) {
 
-/* Store the maximum power of each output axis value used by the inverse 
+/* Store the maximum power of each output axis value used by the inverse
    transformation. */
       for( i = 0; i < nout; i++ ){
          (void) sprintf( buff, "MPI%d", i + 1 );
@@ -1328,7 +1328,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
           astWriteInt( channel, buff, 1, 1, (this->mxpow_i)[ i ], comm );
       }
 
-/* Store the number of coefficients associated with each input of the inverse 
+/* Store the number of coefficients associated with each input of the inverse
    transformation. */
       for( i = 0; i < nin; i++ ){
          (void) sprintf( buff, "NCI%d", i + 1 );
@@ -1348,7 +1348,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
          }
       }
 
-/* Store the output axis powers associated with each coefficient of the inverse 
+/* Store the output axis powers associated with each coefficient of the inverse
    transformation. */
       iv = 1;
       for( i = 0; i < nin; i++ ){
@@ -1392,10 +1392,10 @@ f     AST_POLYMAP
 *  Synopsis:
 c     #include "polymap.h"
 c     AstPolyMap *astPolyMap( int nin, int nout, int ncoeff_f, const double coeff_f[],
-c                             int ncoeff_i, const double coeff_i[], 
+c                             int ncoeff_i, const double coeff_i[],
 c                             const char *options, ... )
-f     RESULT = AST_POLYMAP( NIN, NOUT, NCOEFF_F, COEFF_F, NCOEFF_I, COEFF_I, 
-f                           OPTIONS, STATUS ) 
+f     RESULT = AST_POLYMAP( NIN, NOUT, NCOEFF_F, COEFF_F, NCOEFF_I, COEFF_I,
+f                           OPTIONS, STATUS )
 
 *  Class Membership:
 *     PolyMap constructor.
@@ -1406,7 +1406,7 @@ f                           OPTIONS, STATUS )
 *
 *     A PolyMap is a form of Mapping which performs a general polynomial
 *     transformation.  Each output coordinate is a polynomial function of
-*     all the input coordinates. The coefficients are specified separately 
+*     all the input coordinates. The coefficients are specified separately
 *     for each output coordinate. The forward and inverse transformations
 *     are defined independantly by separate sets of coefficients.
 
@@ -1424,9 +1424,9 @@ f     NCOEFF_F = INTEGER (Given)
 *        forward transformation will be undefined.
 c     coeff_f
 f     COEFF_F( * ) = DOUBLE PRECISION (Given)
-*        An array containing 
-c        "ncoeff_f*( 2 + nin )" elements. Each group of "2 + nin" 
-f        "NCOEFF_F*( 2 + NIN )" elements. Each group of "2 + NIN" 
+*        An array containing
+c        "ncoeff_f*( 2 + nin )" elements. Each group of "2 + nin"
+f        "NCOEFF_F*( 2 + NIN )" elements. Each group of "2 + NIN"
 *        adjacent elements describe a single coefficient of the forward
 *        transformation. Within each such group, the first element is the
 *        coefficient value; the next element is the integer index of the
@@ -1437,12 +1437,12 @@ f        "NCOEFF_F*( 2 + NIN )" elements. Each group of "2 + NIN"
 *        point values are rounded to the nearest integer).
 c        If "ncoeff_f" is zero, a NULL pointer may be supplied for "coeff_f".
 *
-*        For instance, if the PolyMap has 3 inputs and 2 outputs, each group 
+*        For instance, if the PolyMap has 3 inputs and 2 outputs, each group
 *        consisting of 5 elements, A groups such as "(1.2, 2.0, 1.0, 3.0, 0.0)"
-*        describes a coefficient with value 1.2 which is used within the 
+*        describes a coefficient with value 1.2 which is used within the
 *        definition of output 2. The output value is incremented by the
 *        product of the coefficient value, the value of input coordinate
-*        1 raised to the power 1, and the value of input coordinate 2 raised 
+*        1 raised to the power 1, and the value of input coordinate 2 raised
 *        to the power 3. Input coordinate 3 is not used since its power is
 *        specified as zero. As another example, the group "(-1.0, 1.0,
 *        0.0, 0.0, 0.0 )" describes adds a constant value -1.0 onto
@@ -1460,10 +1460,10 @@ f     NCOEFF_I = INTEGER (Given)
 *        inverse transformation will be undefined.
 c     coeff_i
 f     COEFF_I( * ) = DOUBLE PRECISION (Given)
-*        An array containing 
-c        "ncoeff_i*( 2 + nout )" elements. Each group of "2 + nout" 
-f        "NCOEFF_I*( 2 + NOUT )" elements. Each group of "2 + NOUT" 
-*        adjacent elements describe a single coefficient of the inverse 
+*        An array containing
+c        "ncoeff_i*( 2 + nout )" elements. Each group of "2 + nout"
+f        "NCOEFF_I*( 2 + NOUT )" elements. Each group of "2 + NOUT"
+*        adjacent elements describe a single coefficient of the inverse
 c        transformation, using the same schame as "coeff_f",
 f        transformation, using the same schame as "COEFF_F",
 *        except that "inputs" and "outputs" are transposed.
@@ -1515,8 +1515,8 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the PolyMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitPolyMap( NULL, sizeof( AstPolyMap ), !class_init, 
-                         &class_vtab, "PolyMap", nin, nout, 
+   new = astInitPolyMap( NULL, sizeof( AstPolyMap ), !class_init,
+                         &class_vtab, "PolyMap", nin, nout,
                          ncoeff_f, coeff_f, ncoeff_i, coeff_i );
 
 /* If successful, note that the virtual function table has been
@@ -1553,7 +1553,7 @@ AstPolyMap *astPolyMapId_( int nin, int nout, int ncoeff_f, const double coeff_f
 *  Synopsis:
 *     #include "polymap.h"
 *     AstPolyMap *astPolyMap( int nin, int nout, int ncoeff_f, const double coeff_f[],
-*                             int ncoeff_i, const double coeff_i[], 
+*                             int ncoeff_i, const double coeff_i[],
 *                             const char *options, ... )
 
 *  Class Membership:
@@ -1596,8 +1596,8 @@ AstPolyMap *astPolyMapId_( int nin, int nout, int ncoeff_f, const double coeff_f
 
 /* Initialise the PolyMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitPolyMap( NULL, sizeof( AstPolyMap ), !class_init, 
-                         &class_vtab, "PolyMap", nin, nout, 
+   new = astInitPolyMap( NULL, sizeof( AstPolyMap ), !class_init,
+                         &class_vtab, "PolyMap", nin, nout,
                          ncoeff_f, coeff_f, ncoeff_i, coeff_i );
 
 /* If successful, note that the virtual function table has been
@@ -1619,7 +1619,7 @@ AstPolyMap *astPolyMapId_( int nin, int nout, int ncoeff_f, const double coeff_f
    return astMakeId( new );
 }
 
-AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init, 
+AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
                              AstPolyMapVtab *vtab, const char *name,
                              int nin, int nout, int ncoeff_f, const double coeff_f[],
                              int ncoeff_i, const double coeff_i[], int *status ){
@@ -1638,8 +1638,8 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
 *     #include "polymap.h"
 *     AstPolyMap *astInitPolyMap( void *mem, size_t size, int init,
 *                                 AstPolyMapVtab *vtab, const char *name,
-*                                 int nin, int nout, int ncoeff_f, 
-*                                 const double coeff_f[], int ncoeff_i, 
+*                                 int nin, int nout, int ncoeff_f,
+*                                 const double coeff_f[], int ncoeff_i,
 *                                 const double coeff_i[] )
 
 *  Class Membership:
@@ -1700,12 +1700,12 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
 *	 use with each input coordinate value (powers must not be
 *	 negative)
 *
-*        For instance, if the PolyMap has 3 inputs and 2 outputs, each group 
+*        For instance, if the PolyMap has 3 inputs and 2 outputs, each group
 *        consisting of 5 elements, A groups such as "(1.2, 2.0, 1.0, 3.0, 0.0)"
-*        describes a coefficient with value 1.2 which is used within the 
+*        describes a coefficient with value 1.2 which is used within the
 *        definition of output 2. The output value is incremented by the
 *        product of the coefficient value, the value of input coordinate
-*        1 raised to the power 1, and the value of input coordinate 2 raised 
+*        1 raised to the power 1, and the value of input coordinate 2 raised
 *        to the power 3. Input coordinate 3 is not used since its power is
 *        specified as zero. As another example, the group "(-1.0, 1.0,
 *        0.0, 0.0, 0.0 )" describes adds a constant value -1.0 onto
@@ -1719,10 +1719,10 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
 *        inverse transformation of the PolyMap. If zero is supplied, the
 *        inverse transformation will be undefined.
 *     coeff_i
-*        An array containing 
-*        "ncoeff_i*( 2 + nout )" elements. Each group of "2 + nout" 
-*        adjacent elements describe a single coefficient of the inverse 
-*        transformation, using the same schame as "coeff_f", except that 
+*        An array containing
+*        "ncoeff_i*( 2 + nout )" elements. Each group of "2 + nout"
+*        adjacent elements describe a single coefficient of the inverse
+*        transformation, using the same schame as "coeff_f", except that
 *        "inputs" and "outputs" are transposed.
 
 *  Returned Value:
@@ -1782,7 +1782,7 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
          new->mxpow_f = astMalloc( sizeof( int )*(size_t) nin );
          new->power_f = astMalloc( sizeof( int ** )*(size_t) nout );
          new->coeff_f = astMalloc( sizeof( double * )*(size_t) nout );
-         if( astOK ) {  
+         if( astOK ) {
 
 /* Initialise the count of coefficients for each output coordinate to zero. */
             for( i = 0; i < nout; i++ ) new->ncoeff_f[ i ] = 0;
@@ -1815,13 +1815,13 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
                   if( pow < 0 ) {
                      astError( AST__BADPW, "astInitPolyMap(%s): Forward "
                                "coefficient %d has a negative power (%d) "
-                               "for input coordinate %d.", status, name, i + 1, pow, 
+                               "for input coordinate %d.", status, name, i + 1, pow,
                                 j + 1 );
                      astError( AST__BADPW, "All powers should be zero or "
                                "positive." , status);
                      break;
                   }
-                  if( pow > new->mxpow_f[ j ] ) new->mxpow_f[ j ] = pow;      
+                  if( pow > new->mxpow_f[ j ] ) new->mxpow_f[ j ] = pow;
                }
             }
 
@@ -1852,7 +1852,7 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
                   if( astOK ) {
                      for( j = 0; j < nin; j++ ) {
                         pows[ j ] = floor( group[ 2 + j ] + 0.5 );
-                     }                  
+                     }
                   }
                }
             }
@@ -1867,7 +1867,7 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
          new->mxpow_i = astMalloc( sizeof( int )*(size_t) nout );
          new->power_i = astMalloc( sizeof( int ** )*(size_t) nin );
          new->coeff_i = astMalloc( sizeof( double * )*(size_t) nin );
-         if( astOK ) {  
+         if( astOK ) {
 
 /* Initialise the count of coefficients for each input coordinate to zero. */
             for( i = 0; i < nin; i++ ) new->ncoeff_i[ i ] = 0;
@@ -1900,13 +1900,13 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
                   if( pow < 0 ) {
                      astError( AST__BADPW, "astInitPolyMap(%s): Inverse "
                                "coefficient %d has a negative power (%d) "
-                               "for output coordinate %d.", status, name, i + 1, pow, 
+                               "for output coordinate %d.", status, name, i + 1, pow,
                                 j + 1 );
                      astError( AST__BADPW, "All powers should be zero or "
                                "positive." , status);
                      break;
                   }
-                  if( pow > new->mxpow_i[ j ] ) new->mxpow_i[ j ] = pow;      
+                  if( pow > new->mxpow_i[ j ] ) new->mxpow_i[ j ] = pow;
                }
             }
 
@@ -1937,7 +1937,7 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
                   if( astOK ) {
                      for( j = 0; j < nout; j++ ) {
                         pows[ j ] = floor( group[ 2 + j ] + 0.5 );
-                     }                  
+                     }
                   }
                }
             }
@@ -2095,8 +2095,8 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
 /* Assume the forward transformation is defined. */
          undef = 0;
 
-/* Get the maximum power of each input axis value used by the forward 
-   transformation. Set a flag "undef" if no values relating to the 
+/* Get the maximum power of each input axis value used by the forward
+   transformation. Set a flag "undef" if no values relating to the
    forward transformation are found (this indicates that the forward
    transformation is not defined). */
          for( i = 0; i < nin && !undef; i++ ){
@@ -2105,7 +2105,7 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
             if( (new->mxpow_f)[ i ] == INT_MAX ) undef = 1;
          }
 
-/* Get the number of coefficients associated with each output of the forward 
+/* Get the number of coefficients associated with each output of the forward
    transformation. */
          for( i = 0; i < nout && !undef; i++ ){
             (void) sprintf( buff, "ncf%d", i + 1 );
@@ -2134,7 +2134,7 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
             }
          }
 
-/* Get the input axis powers associated with each coefficient of the forward 
+/* Get the input axis powers associated with each coefficient of the forward
    transformation. */
          iv = 0;
          for( i = 0; i < nout && !undef; i++ ){
@@ -2176,8 +2176,8 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
 /* Assume the inverse transformation is defined. */
          undef = 0;
 
-/* Get the maximum power of each output axis value used by the inverse 
-   transformation. Set a flag "undef" if no values relating to the 
+/* Get the maximum power of each output axis value used by the inverse
+   transformation. Set a flag "undef" if no values relating to the
    inverse transformation are found (this indicates that the inverse
    transformation is not defined). */
          for( i = 0; i < nout && !undef; i++ ){
@@ -2186,7 +2186,7 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
             if( (new->mxpow_i)[ i ] == INT_MAX ) undef = 1;
          }
 
-/* Get the number of coefficients associated with each input of the inverse 
+/* Get the number of coefficients associated with each input of the inverse
    transformation. */
          for( i = 0; i < nin && !undef; i++ ){
             (void) sprintf( buff, "nci%d", i + 1 );
@@ -2212,7 +2212,7 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
             }
          }
 
-/* Get the output axis powers associated with each coefficient of the inverse 
+/* Get the output axis powers associated with each coefficient of the inverse
    transformation. */
          iv = 0;
          for( i = 0; i < nin && !undef; i++ ){

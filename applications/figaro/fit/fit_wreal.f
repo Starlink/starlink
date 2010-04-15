@@ -3,7 +3,7 @@ C+
 C
 C     F I T _ W R E A L
 C
-C     Writes a real keyword into a FITS header.  Assumes 
+C     Writes a real keyword into a FITS header.  Assumes
 C     FIT_INIT has been called to initialise the header routines.
 C
 C     Parameters -  (">" input, "<" output)

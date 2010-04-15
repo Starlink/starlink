@@ -49,7 +49,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -120,7 +120,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -143,21 +143,21 @@
 % Also define the html equivalents.
 
 % degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}} 
+\newcommand{\dgs}{\hbox{$^\circ$}}
 \begin{htmlonly}
-\newcommand{\dgs}{{\rawhtml &deg;}} 
+\newcommand{\dgs}{{\rawhtml &deg;}}
 \end{htmlonly}
 
 % arcminute symbol
-\newcommand{\arcm}{\hbox{$^\prime$}} 
+\newcommand{\arcm}{\hbox{$^\prime$}}
 \begin{htmlonly}
-\newcommand{\arcm}{{\rawhtml &acute;}} 
+\newcommand{\arcm}{{\rawhtml &acute;}}
 \end{htmlonly}
 
 % arcsec symbol
 \newcommand{\arcsec}{\arcm\hskip -0.1em\arcm}
 \begin{htmlonly}
-\newcommand{\arcsec}{{\rawhtml &quot;}} 
+\newcommand{\arcsec}{{\rawhtml &quot;}}
 \end{htmlonly}
 
 % hours symbol
@@ -181,29 +181,29 @@
 % decimal-minutes symbol
 \newcommand{\um}{\hskip-0.3em\hbox{$^{\rm m}$}\hskip-0.08em}
 \begin{htmlonly}
-\newcommand{\um}{\mn} 
+\newcommand{\um}{\mn}
 \end{htmlonly}
 
 % decimal-degree symbol
 \newcommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
 \begin{htmlonly}
-\newcommand{\udeg}{{\rawhtml &deg;}} 
+\newcommand{\udeg}{{\rawhtml &deg;}}
 \end{htmlonly}
 
 % decimal-second symbol
-\newcommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}  
+\newcommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}
 \begin{htmlonly}
-\newcommand{\us}{\scn} 
+\newcommand{\us}{\scn}
 \end{htmlonly}
 
 % decimal-arcminute symbol
-\newcommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}  
+\newcommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}
 \begin{htmlonly}
-\newcommand{\uarcm}{{\rawhtml &acute;}} 
+\newcommand{\uarcm}{{\rawhtml &acute;}}
 \end{htmlonly}
 
 % decimal-arcsecond symbol
-\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}  
+\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}
 \begin{htmlonly}
 \newcommand{\uarcs}{{\rawhtml &quot;}}
 \end{htmlonly}
@@ -317,10 +317,10 @@
 %     source prior to any statements that make of the sst commands.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -419,7 +419,7 @@
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -429,7 +429,7 @@
 
 %  Format the output results parameters section (for an application).
 \newcommand{\sstresparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Results Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -439,7 +439,7 @@
 
 %  Format the graphics style parameters section (for an application).
 \newcommand{\sstgraphparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Graphics-style Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -610,7 +610,7 @@
    }
 
 %  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
       \begin{description}
          #1
       \end{description}
@@ -840,12 +840,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -861,10 +861,10 @@
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %   ==================
-{\footnotesize KAPRH} is an applications package containing commands 
+{\footnotesize KAPRH} is an applications package containing commands
 which have been ``retired'' from the KAPPA package (see SUN/95). They
 are retained within KAPRH to satisfy any occasional need there may be for
-them. 
+them.
 % ? End of document abstract
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
@@ -890,17 +890,17 @@ them.
 \section{\xlabel{se_kaprhintro}Introduction\label{se:kaprhintro}}
 
 KAPRH forms a sort of ``rest home'' for old and worn-out KAPPA commands,
-that is, commands which have been removed from the KAPPA package for 
+that is, commands which have been removed from the KAPPA package for
 various reasons. They are retained here in order to satisfy
 any occasional need there may be for them. It is not intended to spend
 any significant effort in the maintenance or development of these
-commands - they are presented ``as is''. 
+commands - they are presented ``as is''.
 
 This document contains the reference information for these commands, but
 does not contain any general information about data structure,
 parameters, \emph{etc}. See SUN/95 for extra information. The one
-exception to this is that the appendix contains a description of the 
-old IMAGE format data structure which is used by some of the commands within 
+exception to this is that the appendix contains a description of the
+old IMAGE format data structure which is used by some of the commands within
 KAPRH.
 
 \newpage
@@ -980,7 +980,7 @@ in this format use the moribund \htmlref{IMAGE format}{ap:IMAGEformat}.
 \begin{description}
 \item [NDF layout]
 In this layout the specification of parameters has the following
-format. 
+format.
 
 \begin{verbatim}
      name  =  type (access)
@@ -1000,7 +1000,7 @@ mutually exclusive.  An example should clarify.
 \bigskip
 
 {\ssttt \hspace*{1.0em}
-        contour ndf [comp] mode ncont [key] [device] 
+        contour ndf [comp] mode ncont [key] [device]
         \newline\hspace*{2.5em}
         $\left\{ {\begin{tabular}{l}
                     FIRSTCNT=? STEPCNT=? \\
@@ -1020,7 +1020,7 @@ will be needed (MODE~=~{\tt "Free"}); alternatively, if the mode requires a
 start height and spacing between contours FIRSTCNT and STEPCNT should be
 specified (MODE~=~{\tt "Linear"} or {\tt "Magnitude"}).  Note that there
 are other modes which do not require additional information, and hence no
-more parameters. 
+more parameters.
 
 There is also an {\em Examples\/} section. \label{ap:example}  This
 shows how to run the application from the command line.  More often
@@ -1053,7 +1053,7 @@ is only relevant when parameter MODE is {\tt "Cursor"}.
 
 {\tt \%name} means the value of parameter {\it name}.
 
-The description entry has a notation scheme to indicate 
+The description entry has a notation scheme to indicate
 normally defaulted parameters, {\it{i.e.}}\ those for which there will
 be no prompt.
 For such parameters a matching pair of square brackets ({\tt{[]}})
@@ -1068,7 +1068,7 @@ As above, but there are two default values that are created dynamically.
 \item[{\tt [}{\rm default}{\tt{]}}]
 Occasionally, a description of the default is given in normal type,
 {\it{e.g.}}\ the size of the plotting region in a graphics application,
-where the exact default values depend on the device chosen. 
+where the exact default values depend on the device chosen.
 \item[{\tt [default]}]
 If the brackets contain a value in teletype-fount, this is the explicit
 default value.
@@ -1384,7 +1384,7 @@ default value.
                supporting at least three colours simultaneously.
          \end{enumerate}
 
-         Pen rotation takes precedence over colour control through CONCOL. 
+         Pen rotation takes precedence over colour control through CONCOL.
       }
    }
    \sstdiytopic{
@@ -1454,7 +1454,7 @@ default value.
          of the array is produced to assist in a sensible choice).  The
          loop is terminated by a null in response to either of the
          prompts.
-      \item The lookup table may be saved in an NDF.  A null response, 
+      \item The lookup table may be saved in an NDF.  A null response,
          {\tt !}, to the request for the name of the file in which the table is
          to be stored will result in the table not being saved.
          Likewise the palette may be saved in an NDF.
@@ -1754,9 +1754,9 @@ default value.
       greyplot in [comp] key [device] mode [pxsize] [pysize] [out]
         \newline\hspace*{1.5em}
         $\left\{ {\begin{tabular}{l}
-                    white=? black=? \\  
+                    white=? black=? \\
                     percentiles=? \\
-                    sigmas=? 
+                    sigmas=?
                   \end{tabular} }
         \right.$
         \newline\hspace*{1.9em}
@@ -2313,7 +2313,7 @@ default value.
       KAPPA: IDCLEAR, IDSTATE.
    }
 }
-  
+
 \sstroutine{
    IDPAZO
 }{
@@ -2865,7 +2865,7 @@ default value.
          Name of the NDF structure to save the Slice in its data array.
          If null, {\tt !}, is entered, the slice NDF is not created.
          It is only required in the {\tt "Slice"} option.  The
-         suggested default is {\tt !}. 
+         suggested default is {\tt !}.
       }
       \sstsubsection{
          SLSTART( 2 ) = \_INTEGER (Read)
@@ -3177,7 +3177,7 @@ default value.
          \sstitem
          The routine correctly processes the AXIS, DATA, QUALITY, VARIANCE,
          LABEL, TITLE, UNITS, and HISTORY components of an NDF, and
-         propagates the WCS component, plus all extensions, to the output 
+         propagates the WCS component, plus all extensions, to the output
          Region NDF.
 
          \sstitem
@@ -3274,7 +3274,7 @@ default value.
          gives help on {\tt BOX}, which is a subtopic of {\tt Parameters},
          which in turn is a subtopic of {\tt BLOCK};
 
-         \sstitem 
+         \sstitem
          a {\tt $<$CR$>$} to see more text at a {\tt Press RETURN to
          continue ...} request;
 
@@ -3290,14 +3290,14 @@ default value.
          \sstitem
          a question mark {\tt ?} to redisplay the text for the current topic,
          including the list of topic or subtopic names; or
- 
+
          \sstitem
          an ellipsis {\tt ...} to display all the text below the current
          point in the hierarchy.  For example, {\tt BLOCK...} displays
          information on the BLOCK topic as well as information on all the
          subtopics under BLOCK.
       }
- 
+
       You can abbreviate any topic or subtopic using the following rules.
 
       \sstitemlist{
@@ -3305,12 +3305,12 @@ default value.
          \sstitem
          Just give the first few characters, {\it e.g.}\ {\tt PARA} for
          {\tt Parameters}.
- 
+
          \sstitem
          Some topics are composed of several words separated by
          underscores.  Each word of the keyword may be abbreviated,
          {\it e.g.}\ {\tt Colour\_Set} can be shortened to {\tt C\_S}.
- 
+
          \sstitem
          The characters {\tt \%} and {\tt $\lsk$} act as wildcards, where
          the percent sign matches any single character, and asterisk
@@ -3320,7 +3320,7 @@ default value.
          \sstitem
          If a word contains, but does end with an asterisk wildcard, it
          must not be truncated.
- 
+
          \sstitem
          The entered string must not contain leading or embedded spaces.
       }
@@ -3582,7 +3582,7 @@ default value.
       }{
          If FULL is {\tt TRUE}, the whole colour-table for the device is
          rotated, including the reserved pens.  When FULL is {\tt FALSE},
-         the reserved pens in the palette are unaltered. 
+         the reserved pens in the palette are unaltered.
          {\tt [FALSE]}
       }
       \sstsubsection{
@@ -3835,7 +3835,7 @@ default value.
         {\tt 125}              & ! total number of frames \\
         {\tt 345  229}         & ! maximum {$x$}-{$y$} offsets \\
         {\tt -356  -232}       & ! minimum {$x$}-{$y$} offsets \\
-        {\tt image\_2}         & ! subsequent {\mantt{IMAGE}} and \\ 
+        {\tt image\_2}         & ! subsequent {\mantt{IMAGE}} and \\
         {\tt 35  34}           & ! its {$x$}-{$y$} offsets \\
         {\tt image\_3}         & \\
         {\tt 36  -33}          & \\
@@ -3866,7 +3866,7 @@ default value.
   Whether input comes from an ASCII {\mantt{'File'}} or from the
   {\mantt{'Interface'}}.
 \manparameterentry {{\mantt{READ}} }{{\mantt{FNAME}}  }{{\mantt{\_CHAR}}}
-  Name of the ASCII file holding the input information to define 
+  Name of the ASCII file holding the input information to define
   the mosaic.
 \manparameterentry {{\mantt{READ}} }{{\mantt{NUMBER}}  }{{\mantt{\_INTEGER}}}
   Number of data arrays to form the mosaic.
@@ -3904,7 +3904,7 @@ default value.
 \end{manparametertable}
 \manroutineitem {Deficiencies }{}
   Works with like-sized images only and uses Fortran i/o for getting
-  stuff from a file. 
+  stuff from a file.
 
 \manroutineitem {Bugs }{}
   None known.
@@ -3964,7 +3964,7 @@ default value.
       KAPPA: GDCLEAR, OVSET.
    }
 }
- 
+
 \sstroutine{
    OVSET
 }{
@@ -3995,7 +3995,7 @@ default value.
       }
    }
 }
- 
+
 \sstroutine{
    SNAPSHOT
 }{
@@ -4026,7 +4026,7 @@ default value.
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Input image-display device.  {\tt [}Current image-display 
+         Input image-display device.  {\tt [}Current image-display
          device{\tt ]}
       }
       \sstsubsection{
@@ -4093,8 +4093,8 @@ default value.
       \sstexamplesubsection{
          snapshot whole odevice=canon\_l
       }{
-         This will dump the whole of the current image display's 
-         memories to the canon\_l device.  The plot will occupy half 
+         This will dump the whole of the current image display's
+         memories to the canon\_l device.  The plot will occupy half
          of the maximum area available on the device, {\it i.e.}
          $\surd2/2$ magnification.
       }
@@ -4572,14 +4572,14 @@ default value.
          the top-level structure TRANSFORM within the HDS file
          {\tt warp9.sdf}.  In this case the container file may already
          exist.  If, on the other hand, the explicit structure is
-         named, the transformation information will be placed there. 
+         named, the transformation information will be placed there.
          For example, to place the transformation in the extension
          GALPHOT of the NDF called NGC253, parameter TRANSFORM would be
          {\tt NGC253.MORE.GALPHOT}.  The structure name is limited to 15
          printing characters.  Note that in either case the structure
          must not already exist.  If it does, an error condition
          results.
- 
+
          This has parameter no suggested default.
       }
       \sstsubsection{
@@ -4623,10 +4623,10 @@ default value.
          tranmake xyz nvin=1 nvout=1 for1="xd=1.01$*$x-0.34"
          inv1="x=(xd$+$0.34)/1.01" $\backslash$
       }{
-          This creates a transformation structure TRANSFORM in the HDS  
+          This creates a transformation structure TRANSFORM in the HDS
           file called {\tt xyz.sdf}.  It specifies mappings between one input and
           one output variable.  The output variable is 1.01 the output
-          variable less 0.34. 
+          variable less 0.34.
       }
       \sstexamplesubsection{
          tranmake xyz nvin=1 nvout=1 for1="xd=1.01$*$x-0.34" class=linear
@@ -4700,9 +4700,9 @@ default value.
          global parameter.
 
          \sstitem
-         Expressions supplied for parameters FOR1-FOR7 and INV1-INV7 
-         should be enclosed in double quotes (even when given in response 
-         to a prompt) to protect the equals sign from interpretation by 
+         Expressions supplied for parameters FOR1-FOR7 and INV1-INV7
+         should be enclosed in double quotes (even when given in response
+         to a prompt) to protect the equals sign from interpretation by
          the shell or parameter system.
 
       }
@@ -5204,7 +5204,7 @@ default value.
 \begin{quote}
 \begin{center}
 \emph{ Note, this application will be withdrawn at the next release of
-KAPPA. Use ``CONTOUR'' instead.} 
+KAPPA. Use ``CONTOUR'' instead.}
 \end{center}
 \end{quote}
 \vspace{5mm}
@@ -5673,7 +5673,7 @@ KAPPA. Use ``CONTOUR'' instead.}
          \end{enumerate}
 
          Annotation takes precedence over pen rotation, which in turn
-         overrides colour control through CONCOL. 
+         overrides colour control through CONCOL.
       }
    }
    \sstdiytopic{

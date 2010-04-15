@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
-     :  BDATA, VARIANCE, QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, 
+     :  BDATA, VARIANCE, QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN,
      :  NUM_ADC, BOL_FLAT, BOL_QUALITY, STATUS)
 *+
 *  Name:
@@ -141,7 +141,7 @@
      :                    BOL_FLAT (CHAN,ADC)
 
                      IF (VARIANCE(BOL,POS,BEAM) .NE. VAL__BADR) THEN
-                        VARIANCE (BOL,POS,BEAM) = 
+                        VARIANCE (BOL,POS,BEAM) =
      :                       VARIANCE (BOL,POS,BEAM) *
      :                       BOL_FLAT (CHAN,ADC)**2
                      END IF
@@ -150,7 +150,7 @@
                      VARIANCE(BOL,POS,BEAM) = VAL__BADR
                   END IF
                ELSE
-                  QUALITY (BOL,POS,BEAM) = 
+                  QUALITY (BOL,POS,BEAM) =
      :                 SCULIB_BITON(QUALITY(BOL,POS,BEAM),1)
                END IF
 

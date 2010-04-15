@@ -40,8 +40,8 @@ C LEFT, or RIGHT). Look at the other three sides of the cell we are
 C entering to decide where to go next. It is important to look to the
 C two sides before looking straight ahead, in order to avoid self-
 C intersecting contours. If all 3 sides have unused crossing-points,
-C the cell is "degenerate" and we have to decide which of two possible 
-C pairs of contour segments to draw; at present we make an arbitrary 
+C the cell is "degenerate" and we have to decide which of two possible
+C pairs of contour segments to draw; at present we make an arbitrary
 C choice. If we have reached the edge of the array, we have
 C finished drawing an unclosed contour. If none of the other three
 C sides of the cell have an unused crossing-point, we must have

@@ -1,13 +1,13 @@
 /*
  * gk0xrk_.c --- Module for handling a stroke tool on the Xlib workstation for
- * 		 RAL GKS. 
+ * 		 RAL GKS.
  *
  * Written by: A C Arnold, University of Manchester Computer Graphics Unit,
  * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405
  *
  * Maintenance log:
  *
- *	12/03/87  ???   Modified to use buffer size correctly. 
+ *	12/03/87  ???   Modified to use buffer size correctly.
  *      18/03/87  TAW   Changed name to gk0xrk_
  *      06/05/87  PJWR  Corrected to use GKS drawing area of bitmap rather than
  *                      the entire bitmap.
@@ -68,8 +68,8 @@ static int
 static f77_integer one = 1;
 
 /*
- * The following is derived from stroke.cursor (generated from SUN's 
- * iconeditor run through conv and then hacked into here. I'm sure there's 
+ * The following is derived from stroke.cursor (generated from SUN's
+ * iconeditor run through conv and then hacked into here. I'm sure there's
  * a better way of doing it.
  */
 
@@ -118,7 +118,7 @@ static cursor *skcp;				/* Pointer to cursor */
 static box echoarea;				/* Box for echo area */
 static window *echowin;				/* Window for digital echo */
 
-f77_integer 
+f77_integer
 gk0xrk_(npts, maxpts, rx, ry)
   f77_integer *npts, *maxpts;
   f77_real rx[], ry[];
@@ -224,16 +224,16 @@ gk0xrk_(npts, maxpts, rx, ry)
 
 /*
  * draw_line draws a line from (xx1,yy1) to (xx2,yy2) where the coords are in
- * NDC space. 
+ * NDC space.
  */
 
-static 
+static
   draw_line(xx1, yy1, xx2, yy2)
 double xx1, yy1, xx2, yy2;
 {
 	f77_real x1_dc, x2_dc, y1_dc, y2_dc,
 	x1 = xx1, y1 = yy1, x2 = xx2, y2 = yy2;	/* This is 'orrible! */
-	
+
 	gk9tnww(1, &x1, &y1, &x1_dc, &y1_dc);
 	gk9tnww(1, &x2, &y2, &x2_dc, &y2_dc);
 	gk0xline((int) x1_dc, (int) y1_dc, LNMOVEABS);
@@ -242,14 +242,14 @@ double xx1, yy1, xx2, yy2;
 
 /* draw_stroke draws a polyline with the coords in NDC */
 
-static 
+static
   draw_stroke(npts, skpts)
 f77_integer npts;
 struct skelem skpts[];
 {
 	int i;
 	f77_real cx, cy;
-	
+
 	gk9tnww(1, &skpts[0].xpt, &skpts[0].ypt,
 		&cx, &cy);			/* Move to first point */
 	gk0xline((int) cx, (int) cy, LNMOVEABS);
@@ -263,10 +263,10 @@ struct skelem skpts[];
 /*
  * gk9twwn is a C callable routine for converting from WW space to NDC space.
  * It also inverts the Y coordinate to correct for WW's silly coordinate
- * space. 
+ * space.
  */
 
-static 
+static
   gk9twwn(n, xdc, ydc, xndc, yndc)		/* Convert DC to NDC */
 int n;
 f77_real xdc[], ydc[], xndc[], yndc[];
@@ -274,7 +274,7 @@ f77_real xdc[], ydc[], xndc[], yndc[];
 	int i,
 	    t = n,
 	    ymax = (int)gkywdt_.kdsry[gkywca_.kwkix - 1] - 1;
-	
+
 	for (i = 0; i < n; i++) {		/* Invert to "real" DC */
 		ydc[i] = ymax - ydc[i];
 	}
@@ -283,10 +283,10 @@ f77_real xdc[], ydc[], xndc[], yndc[];
 
 /*
  * gk9tnww is a C callable routine for converting from NDC space to WW space.
- * It inverts the Y coordinate to cope with WW's silly coordinate space. 
+ * It inverts the Y coordinate to cope with WW's silly coordinate space.
  */
 
-static 
+static
   gk9tnww(n, xndc, yndc, xdc, ydc)
 int n;
 f77_real xndc[], yndc[], xdc[], ydc[];
@@ -294,7 +294,7 @@ f77_real xndc[], yndc[], xdc[], ydc[];
 	int i,
 	    t = n,
 	    ymax = (int)gkywdt_.kdsry[gkywca_.kwkix - 1] - 1;
-	
+
 	gktnd_(&t, xndc, yndc, xdc, ydc);		/* Convert it */
 	for (i = 0; i < n; i++) {
 		ydc[i] = ymax - ydc[i];			/* Invert Y */

@@ -99,7 +99,7 @@
       CALL IRQ_NEW( INDF, 'TEST', LOCS, STATUS )
 
 *  Add a new quality name FRED.
-      CALL IRQ_ADDQN( LOCS, 'FRED', .FALSE., 'A TEST', STATUS )      
+      CALL IRQ_ADDQN( LOCS, 'FRED', .FALSE., 'A TEST', STATUS )
 
 *  Assign the quality FRED to the mid pixel of the NDF.
       CALL IRQ_SETQL( LOCS, .TRUE., 'FRED', 1, 1, ( LBND + UBND )/2,
@@ -122,7 +122,7 @@
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
 *  Check that the array VEC holds the correct values.
       DO I = LBND, UBND
 

@@ -215,8 +215,8 @@
 *  POSVEL(1) to POSVEL(3) hold X,Y and Z components of the boresight
 *  position, POSVEL(4) to POSVEL(6) hold X,Y and Z  components of the
 *  boresight velocity.
-            CALL SLA_DS2C6( BLONG, BLAT, 1.0D0, 
-     :                      DBLE( CCM_CAGRD( IDC ) ), 0.0D0, 0.0D0, 
+            CALL SLA_DS2C6( BLONG, BLAT, 1.0D0,
+     :                      DBLE( CCM_CAGRD( IDC ) ), 0.0D0, 0.0D0,
      :                      POSVEL )
 
 *  Swap the Cartesian axes around so that X is towards the sun, Y is 90

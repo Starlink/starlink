@@ -17,7 +17,7 @@
      file called, say, params-mod.dsl, modify it to suit your needs, and
      create a catalogue file in the same directory which has an line like:
 
-         PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN" 
+         PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"
              ../dsssl/sl/commonslparams.dsl
 
      (but all on a single line), giving the path to the parameterisation file,
@@ -45,7 +45,7 @@ working on it, or another which refers to it often.
 <routine>
 <routinename>%short-crossrefs%
 <purpose>Generate shorter crossrefs
-<description>If true, this will make the down-converter generate shorter 
+<description>If true, this will make the down-converter generate shorter
 link texts for cross-references.
 <returnvalue type=boolean>Return true to generate short references
 <codebody>
@@ -56,9 +56,9 @@ link texts for cross-references.
 <routinename>suppress-manifest
 <purpose>Turn off generation of manifest
 <description>
-If true, this will suppress the generation of a manifest, even if the variable 
+If true, this will suppress the generation of a manifest, even if the variable
 <funcname>%latex-manifest%</> or <funcname>%html-manifest</> is given.
-(This option can conveniently be set with <code>-V suppress-manifest</> on the 
+(This option can conveniently be set with <code>-V suppress-manifest</> on the
 Jade command line).
 <returnvalue type=boolean>True if the manifest is to be suppressed
 <codebody>
@@ -101,7 +101,7 @@ formatted.  If "diytopic" is present in this list, it represents all
 the diytopic elements, which are formatted together.
 <p>Although one might expect the "purpose" element to appear here,
 it is normally displayed using formatting different to that of
-other elements in this list, so is best handled explicitly by 
+other elements in this list, so is best handled explicitly by
 formatting routines.
 <returnvalue type='list of strings'>List of string names of element
 types.

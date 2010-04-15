@@ -35,7 +35,7 @@
       REAL ELF__FRACT
       PARAMETER (ELF__FRACT=0.75)
 
-*  The maximum size of the results arrays. 
+*  The maximum size of the results arrays.
       INTEGER ELF__RESUL
       PARAMETER ( ELF__RESUL = 10001 )
 
@@ -44,7 +44,7 @@
       INTEGER ELF__PIXEL
       PARAMETER ( ELF__PIXEL = 2000 )
 
-*  The maximum number of points in an ellipse. 
+*  The maximum number of points in an ellipse.
       INTEGER ELF__MXPOI
       PARAMETER ( ELF__MXPOI = 145 )
 
@@ -60,7 +60,7 @@
 
 *  The factor used to determine the size of mean count value increase at which
 *  the ellipse fitting will stop. It is assumed that if the fluctuations have
-*  become this big then the galaxy can no longer be properly profiled.   
+*  become this big then the galaxy can no longer be properly profiled.
       REAL ELF__LIM1
       PARAMETER ( ELF__LIM1 = 1.2 )
 
@@ -74,12 +74,12 @@
       REAL ELF__PIVAL
       PARAMETER ( ELF__PIVAL = 3.1415926 )
 
-*  The value of the geometric constant needed to convert radians to 
+*  The value of the geometric constant needed to convert radians to
 *  degrees format.
       REAL ELF__PI2360
       PARAMETER ( ELF__PI2360 = ELF__PIVAL*2./360. )
 
-*  The maximum number of ellipses that will be generated during 
+*  The maximum number of ellipses that will be generated during
 *  the fitting.
       REAL ELF__RLIM
       PARAMETER ( ELF__RLIM = 150. )

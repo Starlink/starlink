@@ -106,24 +106,24 @@
 *        file in records following an optional header.  When FIXED is
 *        FALSE all records are padded out to the recordlength.
 *        -  The NDF array elements are written in Fortran order, i.e.
-*        the first dimension varies fastest, followed by the second 
+*        the first dimension varies fastest, followed by the second
 *        dimension and so on.  For example, a 2x2x2-element cube's
-*        indices will appear in the order (1,1,1), (2,1,1), (1,2,1), 
+*        indices will appear in the order (1,1,1), (2,1,1), (1,2,1),
 *        (2,2,1), (1,1,2), (2,1,2), (1,2,2), (2,2,2).
 *        -  HISTORY is not propagated.
 *        -  ORIGIN information is lost.
 *
 *     When a header is to be made, it is composed of FITS-like card
 *     images as follows:
-*        -  The number of dimensions of the data array is written 
+*        -  The number of dimensions of the data array is written
 *        to the keyword NAXIS, and the actual dimensions to NAXIS1,
 *        NAXIS2 etc. as appropriate.
-*        -  If the NDF contains any linear axis structures the 
-*        information necessary to generate these structures is 
-*        written to the FITS-like headers. For example, if a linear 
-*        AXIS(1) structure exists in the input NDF the value of the 
+*        -  If the NDF contains any linear axis structures the
+*        information necessary to generate these structures is
+*        written to the FITS-like headers. For example, if a linear
+*        AXIS(1) structure exists in the input NDF the value of the
 *        first data point is stored with the keyword CRVAL1,
-*        and the incremental value between successive axis data is 
+*        and the incremental value between successive axis data is
 *        stored in keyword CDELT1.  By definition the reference pixel is
 *        1.0 and is stored in keyword CRPIX1.  If there is an axis label
 *        it is written to keyword CTYPE1, and axis unit is written to
@@ -135,8 +135,8 @@
 *        -  If the input NDF contains TITLE, LABEL or UNITS components
 *        these are stored with the keywords TITLE, LABEL or BUNIT
 *        respectively.
-*        -  If the input NDF contains a FITS extension, the FITS items 
-*        may be written to the FITS-like header, with the following 
+*        -  If the input NDF contains a FITS extension, the FITS items
+*        may be written to the FITS-like header, with the following
 *        exceptions:
 *           o  BITPIX is derived from the type of the NDF data array,
 *           and so it is not copied from the NDF FITS extension.
@@ -214,7 +214,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -316,7 +316,7 @@
 *  exist for the file to be an NDF.
       COMLIS = 'Data'
       COMLN = 4
-      
+
 *  If the Quality component exists, append it to component list.
       CALL NDF_STATE( NDF, 'Quality', THERE, STATUS )
       IF ( THERE ) THEN
@@ -329,7 +329,7 @@
          CALL CHR_APPND( ','//'Variance', COMLIS, COMLN )
       END IF
 
-*  Find which component to copy. 
+*  Find which component to copy.
       CALL PAR_CHOIC( 'COMP', 'Data', COMLIS( :COMLN ), .FALSE., COMP,
      :                 STATUS )
 
@@ -370,7 +370,7 @@
 *  of precision depending on the data type.
          IF ( TYPE .EQ. '_BYTE' ) THEN
             NCPVAL = VAL__SZB
-         
+
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             NCPVAL = VAL__SZD
 
@@ -399,7 +399,7 @@
          CALL PAR_GDR0I( 'NOPEREC', 8, 1, RECL, .FALSE., NUMPRE,
      :                   STATUS )
 
-*  Derive the recordlength in bytes, allowing for a space between each 
+*  Derive the recordlength in bytes, allowing for a space between each
 *  value.
          RECL = MAX( RECMIN, ( NCPVAL + 1 ) * NUMPRE )
       ELSE
@@ -580,7 +580,7 @@
 *  Write the FITS card to the text file.
          CALL FIO_WRITE( FD, FITSTR, STATUS )
 
-*  Insert NAXIS, AXISn, and optional keywords to the header. 
+*  Insert NAXIS, AXISn, and optional keywords to the header.
          CALL CON_SPHEA( NDF, FD, TYPE, 'FORMATTED', NFLAGS, CMPFND,
      :                   STATUS )
 
@@ -599,7 +599,7 @@
 *  Obtain the implementation type.
       CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', NDF, NDF, COMP, ITYPE,
      :                DTYPE, STATUS )
-      
+
 *  Map the input data array using the implementation data type.
       CALL NDF_MAP( NDF, COMP, ITYPE, 'READ', PNTR, EL, STATUS )
 
@@ -611,17 +611,17 @@
 *  integer array and it gets converted back to the actual type when the
 *  array is unmapped.
       IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_OAFFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OAFFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   FIXED, NCPVAL,
      :                   NUMPRE, RECL, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_OAFFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OAFFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   FIXED, NCPVAL,
      :                   NUMPRE, RECL, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_OAFFR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL CON_OAFFR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   FIXED, NCPVAL,
      :                   NUMPRE, RECL, STATUS )
 

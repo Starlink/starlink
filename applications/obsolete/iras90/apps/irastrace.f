@@ -22,10 +22,10 @@
 *  Description:
 *     This routine displays the information stored in the IRAS
 *     extensions of a group of NDFs. Either CRDD files or images may be
-*     specified. 
+*     specified.
 
 *  Usage:
-*     IRASTRACE IN [LOGFILE] 
+*     IRASTRACE IN [LOGFILE]
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,7 +93,7 @@
 *  Local Variables:
       CHARACTER CLOC*(DAT__SZLOC)! Locator to a component of the IRASTRACE extension.
       CHARACTER CTYPE*(DAT__SZTYP)! Type of component.
-      CHARACTER CVAL*60          ! Component value (converted to 
+      CHARACTER CVAL*60          ! Component value (converted to
                                  ! character form if necessary).
       CHARACTER INSTRM*(IRI__SZINS)! IRAS instrument.
       CHARACTER LOC*(DAT__SZLOC) ! Locator to the IRASTRACE extension.
@@ -129,13 +129,13 @@
       CALL MSG_IFLEV( TRA_FILT )
 
 *  Get a group containing the names of the NDFs to be processed.
-      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...', IGRP1, 
+      CALL IRM_RDNDF( 'IN', 0, 1, '  Give more NDF names...', IGRP1,
      :                NIN, STATUS )
 
-*  Abort if an error has been reported, or if there are no NDFs to 
+*  Abort if an error has been reported, or if there are no NDFs to
 *  process.
       IF ( STATUS .NE. SAI__OK .OR. NIN .EQ. 0 ) GO TO 999
-      
+
 *  If required open a log file. The file descriptor returned in FD is
 *  used to access this file.
       CALL IRM_ASFIO( 'LOGFILE', 'WRITE', 'LIST', 80, TRA_FD, TRA_LOG,
@@ -217,9 +217,9 @@
      :                   STATUS )
 
             CRDD = .FALSE.
-            IMAGE = .FALSE.            
+            IMAGE = .FALSE.
             AST = .FALSE.
-      
+
             DO J = 1, NCOMP
 
                CALL DAT_INDEX( LOC, J, CLOC, STATUS )
@@ -257,11 +257,11 @@
                      CALL DAT_GET0C( CLOC, CVAL, STATUS )
                      CALL MSG_SETC( 'V', ' -' )
                      CALL MSG_SETC( 'V', ' '//CVAL )
-                  END IF                     
+                  END IF
 
                END IF
-               
-               CALL ITRAA0( MSG__NORM, 'IRASTRACE_MSG8', 
+
+               CALL ITRAA0( MSG__NORM, 'IRASTRACE_MSG8',
      :                      '       ^NAME ^V', STATUS )
 
                CALL DAT_ANNUL( CLOC, STATUS )
@@ -305,7 +305,7 @@
                TRA_NBL = 0
 
 *  Annul the IRC identifier.
-               CALL IRC_ANNUL( IDC, STATUS )               
+               CALL IRC_ANNUL( IDC, STATUS )
 
             END IF
 
@@ -324,14 +324,14 @@
                TRA_NBL = 0
 
 *  Annul the IRA identifier.
-               CALL IRA_ANNUL( IDA, STATUS )               
+               CALL IRA_ANNUL( IDA, STATUS )
 
             END IF
 
 *  If an IMAGE_INFO component was found, try importing the NDF into the
 *  IRI system.
             IF( IMAGE ) THEN
-               CALL IRI_OLD( NDFIN, INSTRM, BAND, TYPE, UNITS, CLOC, 
+               CALL IRI_OLD( NDFIN, INSTRM, BAND, TYPE, UNITS, CLOC,
      :                       STATUS )
 
 *  Display the image information with 7 leading spaces.
@@ -356,7 +356,7 @@
 *  If an error occured processing the current NDF, flush the error.
          IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
-*  If the user has switched off screen output, don't process any more 
+*  If the user has switched off screen output, don't process any more
 *  input NDFs.
          CALL IRM_SPAGE( ON )
          IF( .NOT. ON ) GO TO 998
@@ -395,5 +395,5 @@
      :   'IRASTRACE: Error displaying IRAS extension information.',
      :   STATUS )
       END IF
-      
+
       END

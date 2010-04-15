@@ -153,7 +153,7 @@
       Y = MAX(Y,ZTV(3,ISZID))
       X1 = MIN(X+XVN,ZTV(2,ISZID))
       Y1 = MIN(Y+YVN,ZTV(4,ISZID))
-      
+
 *  Set up zone with appropriate viewport
       CALL sgs_1NEWZ(IZONID,X,X1,Y,Y1)
 

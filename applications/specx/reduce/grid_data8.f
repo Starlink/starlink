@@ -41,7 +41,7 @@ C     Local variables:
       REAL      SUM
       REAL      TWID
       REAL      WEIGHT
- 
+
 C     Functions
 
       REAL*8    XSNART8
@@ -86,7 +86,7 @@ C       finishes at N+0.5 points.
 
         PL = XSNART8 (XSCALE, BL, NDAT, IERR1)
         PR = XSNART8 (XSCALE, BR, NDAT, IERR2)
-        
+
 C       Don't do any more if bin does not lie wholly within original spectrum...
 
         IF ( IERR1 .eq. 0  .and.  IERR2 .eq. 0) THEN
@@ -101,7 +101,7 @@ C       Reorder so that PR is always greater than PL
 C         Integrate over affected input channels to find new values,
 C         Average so that new spectrum will also
 C         be correct on temperature scale (not integrated intensity).
-C         Width of *input* bin is taken as difference of x-values at 
+C         Width of *input* bin is taken as difference of x-values at
 C         plus or minus half a channel from nominal channel number.
 
           TWID = 0.0
@@ -129,7 +129,7 @@ C         Write new value into current output point.
 
         END IF
       END DO
-  
+
 C     Regridded array is complete:
 
       PRINT *,'First and last useful channels in input:',NBOT,NTOP

@@ -34,7 +34,7 @@
 *        The input NDF.  An error is reported if it contains no VARIANCE
 *        component.
 *     OUT = NDF (Write)
-*        The output NDF. 
+*        The output NDF.
 *     LIMIT = _DOUBLE (Read)
 *        Either the maximum acceptable standard deviation or variance
 *        value, or the minimum acceptable signal-to-noise ratio
@@ -121,7 +121,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -177,7 +177,7 @@
 
 *  Get the output NDF, propagating all components and extensions except
 *  DATA and VARIANCE.
-      CALL LPG_PROP( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF2, 
+      CALL LPG_PROP( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF2,
      :               STATUS )
 
 *  See what type of limit is to be used.
@@ -194,7 +194,7 @@
          CALL MSG_OUTIF( MSG__NORM, 'ERRCLIP_MSG2', '  Applying an '/
      :     /'upper limit on variance.', STATUS )
 
-      ELSE 
+      ELSE
          CALL MSG_OUTIF( MSG__NORM, 'ERRCLIP_MSG3', '  Applying a '/
      :     /'lower limit on signal-to-noise ratio.', STATUS )
 
@@ -214,9 +214,9 @@
 
 *  Store values in the output arrays.
       CALL KPS1_ERRCL( LIMIT, MODE, EL, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
-     :                 %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPIN( 2 ) ) ),
      :                 %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
-     :                 %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                 BAD, NBAD, STATUS )
 
 *  Set the bad pixel flags in the output NDF.

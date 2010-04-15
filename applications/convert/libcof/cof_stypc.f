@@ -70,7 +70,7 @@
 *     {enter_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -119,5 +119,5 @@
 
 *  Change the type of the component.
       CALL NDF_STYPE( ITYPE, NDF, COMP, STATUS )
- 
+
       END

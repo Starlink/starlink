@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
 The PINE mail interface is a user-friendly mail utility for Unix systems.
 It has been adopted by Starlink as the recommended mail utility because
 of its ease of use compared with the mail utilities supplied as standard with
-the Unix operating system. PINE is intended to be intuitive and ``{\it 
+the Unix operating system. PINE is intended to be intuitive and ``{\it
 to be learned by exploration rather than reading manuals}''. Here however
 are a few brief notes to get you started.
 
@@ -91,7 +91,7 @@ file will be created in your home directory. If you wish to save it
 elsewhere, include either a relative (to your home directory)
 or absolute directory specification with the filename.
 
-{\em e.g.}~~{\tt savemail/message.1} will save file {\tt message.1} to 
+{\em e.g.}~~{\tt savemail/message.1} will save file {\tt message.1} to
 {\tt \$HOME/savemail/message.1}
 
 To print mail, use the {\tt Y} command. This will prompt for
@@ -131,7 +131,7 @@ by default however.  When commencing composition, it is necessary to
 use command {\tt $<$CTRL$>$-$<$underscore$>$} to invoke your personal
 editor.  Afterwards, exit your editor in the usual way.
 
-Once the message is finished (whichever editor was used for composition), 
+Once the message is finished (whichever editor was used for composition),
 type  {\tt $<$CTRL$>$-X} to send it.
 
 \subsection{Replying/Forwarding Mail}
@@ -170,30 +170,30 @@ some of the configurable ones are listed below, together with
 explanations (as comment lines beginning with {\tt \#}).
 
 \begin{small}
-\begin{verbatim} 
-# default-fcc specifies a folder where a copy of outgoing mail is saved.  
+\begin{verbatim}
+# default-fcc specifies a folder where a copy of outgoing mail is saved.
 # To suppress saving of outgoing mail, set: default-fcc=""
 default-fcc="saved-messages"
 
-# signature-file specifies the name or path of a file containing text that 
+# signature-file specifies the name or path of a file containing text that
 # will automatically be inserted in outgoing mail.
 signature-file=/home/ltsun0/grm/signature.txt
 
-# sort-key= order in which messages will be presented...  
-# Choose one: subject, from, arrival, date, size.  
+# sort-key= order in which messages will be presented...
+# Choose one: subject, from, arrival, date, size.
 # Normal default is "arrival"
 sort-key=date
 
 # editor specifies the program invoked by ^_ in the Composer.
 # This is normally an alternative to Pine's internal composer (Pico)
 editor=/usr/local/bin/jed
- 
+
 # Program to view images if format such as GIF and TIFF
 image-viewer=/soft2/bin/xv
 
 # Your printer selection
 printer=lpr -Pstar_laser
- 
+
 # Special print command if it isn't one of the standard printers
 personal-print-command=lpr -Pstar_laser
 \end{verbatim}
@@ -201,11 +201,11 @@ personal-print-command=lpr -Pstar_laser
 
 \section{Mail addresses}
 
-For information on how to determine and construct mail addresses 
+For information on how to determine and construct mail addresses
 see SUN/182 "Email Addressing".
 
 \section{Acknowledgements}
- 
+
 I would like to thank Dr A.C.Davenhall and Dr C.G.Page for their assistance
 in preparing this document.
 

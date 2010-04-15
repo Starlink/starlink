@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_LNAM( PARAM, INDXHI, INDXLO, TITLE, GRPID, COMGID, 
+*     CALL CCD1_LNAM( PARAM, INDXHI, INDXLO, TITLE, GRPID, COMGID,
 *                     COMMEN, STATUS )
 
 *  Description:
@@ -23,9 +23,9 @@
 *     the file.
 *
 *     If the COMGID argument is not equal to GRP__NOID then it indicates
-*     a GRP group which contains comment strings to be written 
+*     a GRP group which contains comment strings to be written
 *     alongside the names.  These comments will be appended to each
-*     line following a comment character (the GRP COMMENT character 
+*     line following a comment character (the GRP COMMENT character
 *     for GRPID, which by default is '#').  If COMGID is GRP__NOID, no
 *     comment will be written.
 
@@ -44,7 +44,7 @@
 *     GRPID = INTEGER (Given)
 *        The GRP identifier of the group.
 *     COMGID = INTEGER (Given)
-*        The GRP identifier for a group giving a comment string to 
+*        The GRP identifier for a group giving a comment string to
 *        append to each line of the output.  It should have the same
 *        number of elements as the GRPID group.  If supplied equal to
 *        GRP__NOID, no comments will be written.
@@ -98,7 +98,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -182,7 +182,7 @@
             CALL FIO_WRITE( FD, LINE( 1:LENG ), STATUS )
  1       CONTINUE
 
-         IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN 
+         IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Write a comment about the name of the list.
             CALL FIO_FNAME( FD, FNAME, STATUS )

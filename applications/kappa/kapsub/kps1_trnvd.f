@@ -99,35 +99,35 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT  NONE              ! no default typing allowed
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! SSE global definitions
       INCLUDE 'DAT_PAR'           ! Data-system constants
- 
+
 *  Arguments Given:
       INTEGER
      :  NDIMS,
      :  ODIMS( NDIMS ),
      :  NPTS
- 
+
       REAL
      :  PSCALE( NDIMS ),
      :  CODATA( NDIMS, NPTS ),
      :  COMIN( NDIMS )
- 
+
       DOUBLE PRECISION
      :  VADATA( NPTS )
- 
+
 *  Arguments Returned:
       DOUBLE PRECISION
      :  OUTARR( * )
- 
+
 *  Status:
       INTEGER  STATUS
- 
+
 *  Local Variables:
       INTEGER
      :  COORD,                 ! Co-ordinates of output array pixel
@@ -136,52 +136,52 @@
      :  NELM,                  ! Number of elements in the output array
      :  VECPOS                 ! Element number of the pixel in the
                                ! vectorised array
- 
+
       REAL
      :  CURPOS                 ! Current position values
- 
+
 *.
- 
+
 *    Check status on entry - return if not o.k.
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Find the number of elements in the output array, and the number
 *    in the lower dimensions.
- 
+
       NELM = 1
       DO  J = 1, NDIMS
          FDIMS( J ) = NELM
          NELM = NELM * ODIMS( J )
       END DO
- 
+
 *    Loop round all the points in INDATA, getting out the co-ordinate
 *    and data values for each one.
- 
+
       DO  K = 1, NPTS
          DO  J = 1, NDIMS
- 
+
             CURPOS = CODATA( J, K )
- 
+
 *          Calculate the pixel "co-ordinate" of the current data point.
- 
+
             COORD = IFIX( ( ( CURPOS - COMIN( J ) ) / PSCALE( J ) ) ) +
      :              1
- 
+
 *          Find the position within the vector.
- 
+
             IF ( J .EQ. 1 ) THEN
                VECPOS = COORD
             ELSE
                VECPOS = VECPOS + ( COORD - 1 ) * FDIMS( J )
             END IF
          END DO
- 
+
 *       Now set the requisite output array pixel to the correct value.
- 
+
          OUTARR( VECPOS ) = VADATA( K )
       END DO
- 
+
 *    Return and end.
- 
+
       END

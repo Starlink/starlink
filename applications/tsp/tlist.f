@@ -9,7 +9,7 @@ C
 C     Function:
 C        List time series data to a file.
 C
-C     Description:                      
+C     Description:
 C        List the time, intensity and percentage stokes parameters
 C        for a specified channel of a time series data set to an
 C        ASCII file
@@ -22,10 +22,10 @@ C    (C) XSTART     (Double)   First time value (MJD) to use.
 C    (C) XEND       (Double)   Last time value (MJD) to use.
 C        FILE       (File)     Name of file for output
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         27/2/1990
 C
 C-
@@ -40,9 +40,9 @@ C
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
-      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays   
+      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays
       INTEGER XPTR                         ! Pointer to X (time) array
-      INTEGER WPTR                         ! Pointer to wavelength axis     
+      INTEGER WPTR                         ! Pointer to wavelength axis
       INTEGER STRT,FIN                     ! Start and finish channels
       INTEGER SIZE                         ! Original size of data in X
       INTEGER FSIZE                        ! Size after X limits selection
@@ -59,15 +59,15 @@ C
       INTEGER XXPTR,T1PTR,YRPTR
 
 *  Get the data
-                                             
+
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN                           
+      IF (STATUS .EQ. SAI__OK) THEN
 
 *  Get Axis data
-          
+
 *  Map time axis
-       
+
           CALL TSP_MAP_TIME(LOC,'READ',XPTR,XLOC,STATUS)
 
 *  Map wavelength axis
@@ -86,9 +86,9 @@ C
 
           CALL TSP_TEMP(SIZE,'_REAL',T1PTR,T1LOC,STATUS)
           CALL TSP_TEMP(SIZE,'_DOUBLE',XXPTR,XXLOC,STATUS)
-                                                    
+
 *   Find X plotting limits
-                     
+
           CALL TSP_PHSXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
           SIZE = FIN-STRT+1
           FSIZE = SIZE
@@ -115,7 +115,7 @@ C
 *   Get file name
 
           CALL FIO_ASSOC('FILE','WRITE','LIST',0,FD,STATUS)
- 
+
 *   List data
 
           IF (STATUS .EQ. SAI__OK) THEN
@@ -130,20 +130,20 @@ C
 *  Unmap data
 
           CALL TSP_PHSUNMAPITEM(LOC,STATUS)
-      ENDIF        
+      ENDIF
 
-*  Tidy up      
-                                  
+*  Tidy up
+
       CALL TSP_UNMAP(XXLOC,STATUS)
       CALL TSP_UNMAP(T1LOC,STATUS)
       CALL TSP_UNMAP(XLOC,STATUS)
       CALL TSP_UNMAP(WLOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)
       END
-                          
 
 
- 
+
+
 
 
 
@@ -190,11 +190,11 @@ C
           VP = 100.0*V(IX)/I(IX)
 
 *  Write results to buffer
-          WRITE(BUFFER,'(I5,F16.7,G14.4,3F12.3)',IOSTAT=IOS) 
+          WRITE(BUFFER,'(I5,F16.7,G14.4,3F12.3)',IOSTAT=IOS)
      :        IX,X(IX),I(IX),QP,UP,VP
 
 *  Output buffer to file
           CALL FIO_WRITE(FD,BUFFER,STATUS)
       ENDDO
- 
+
       END

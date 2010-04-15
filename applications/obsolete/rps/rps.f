@@ -21,7 +21,7 @@
 ********************************************************************************
 
       IMPLICIT NONE
- 
+
 * Global Variables
 
       INCLUDE 'com_form_files.inc'
@@ -39,15 +39,15 @@
       DOUBLE PRECISION AO_MJD0 /51162.0D0/    ! Dec 15th, 1998
       DOUBLE PRECISION AO_PERIOD /365.0D0/
       DOUBLE PRECISION AO_DELAY /1.0D0/
-      DOUBLE PRECISION SUN_MAX_OFF_DEG /14.0D0/	
+      DOUBLE PRECISION SUN_MAX_OFF_DEG /14.0D0/
       COMMON /AO_SPECS/ AO_MJD0,AO_PERIOD,AO_DELAY,SUN_MAX_OFF_DEG
- 
+
       CHARACTER*8 HELPLIB /'rps_help'/
       COMMON / HELP_LIB_NAME / HELPLIB
 
       CHARACTER*64 END_MESSAGE/'  '/
       COMMON /EXITEXT/END_MESSAGE
- 
+
       INTEGER      WIDTH/132/, START_WIDTH/80/
       LOGICAL COLS132
       COMMON /WIDTH_KEEP/ WIDTH,COLS132,START_WIDTH
@@ -55,10 +55,10 @@
       INCLUDE 'com_form_mtext.inc'		! Text for smg_menu
       INCLUDE 'com_form_ao.inc'			! AO number
       INCLUDE 'com_form_qual.inc'			! AO number
- 
+
 *  Functions
       INTEGER     POP_MENU
-*- 
+*-
 *  Local Variables
       INTEGER      STATUS, INIT_CURS/1/, ISTAT
       INTEGER      OUT /1/
@@ -98,7 +98,7 @@
 
       CALL FORM_INTRO
       CALL FORM_FILENAME
- 
+
       DO WHILE ( OUT .NE. NOPT1)
 
          OUT = POP_MENU(OPTIONS, NOPT , HEADING,INIT_CURS ,MTEXT) 	! Call menu and get program to run.
@@ -117,7 +117,7 @@
          IF (out .EQ. 1) THEN   ! Form filler
             CALL form_fill(width,status)
             IF (status .NE. 0) GOTO 99
- 
+
           ELSE IF (out .EQ. 2) THEN
             CALL form_edit(status)
             IF (status .LT. 0) GOTO 99
@@ -127,7 +127,7 @@
 
           ELSE IF (out .EQ. 4) THEN ! Print form
             CALL form_print(status)
- 
+
           ELSE IF (out .EQ. 5) THEN ! Submit proposal
             CALL form_submit
 

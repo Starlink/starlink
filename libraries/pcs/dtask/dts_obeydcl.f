@@ -16,7 +16,7 @@
 *     CALL DTASK_OBEYDCL ( DTASK_APPLIC, NAME, VALUE, STATUS )
 
 *  Description:
-*     Carry out an OBEY. This includes handling any command-line 
+*     Carry out an OBEY. This includes handling any command-line
 *     parameters which came with the OBEY.
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Check the given action in the list of declared actions for the 
+*     Check the given action in the list of declared actions for the
 *     task.
 *     If everything is ok pass the command line parameter string to the
 *     parameter system
@@ -128,12 +128,12 @@
 
 *  Local Variables:
       INTEGER ACTPTR                 ! pointer to the action in the
-                                     ! action list 
+                                     ! action list
       INTEGER SCHEDTIME              ! time in milliseconds for
-                                     ! rescheduled action 
+                                     ! rescheduled action
       INTEGER SEQ                    ! sequence number for stage of
-                                     ! action 
-      INTEGER ACODE                  ! code number for the action in the 
+                                     ! action
+      INTEGER ACODE                  ! code number for the action in the
                                      ! parameter system
       CHARACTER*(SUBPAR__NAMELEN) ANAME   ! action name
       INTEGER ACTLEN                 ! length of ANAME
@@ -158,11 +158,11 @@
          ACTPTR = 0
          SEQ = 0
          CALL DTASK_APPLIC ( OBEY, ACODE, ANAME, ACTPTR, SEQ, VALUE,
-     :     SCHEDTIME, REQUEST, STATUS ) 
+     :     SCHEDTIME, REQUEST, STATUS )
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 *
-*         Translate known application request returns. 
+*         Translate known application request returns.
 *
             IF ( REQUEST .EQ. ACT__END ) THEN
                STATUS = DTASK__ACTCOMPLETE
@@ -187,7 +187,7 @@
      :              'returned illegal SS$_NORMAL', STATUS )
                ELSE IF ( REQUEST .EQ. ACT__CANCEL ) THEN
                   STATUS = DTASK__IVACTSTAT
-                  CALL ERR_REP ( ' ', 'DTASK_OBEYDCL: application '// 
+                  CALL ERR_REP ( ' ', 'DTASK_OBEYDCL: application '//
      :              'returned illegal ACT__CANCEL', STATUS )
                ENDIF
             ENDIF

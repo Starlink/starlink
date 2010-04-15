@@ -86,7 +86,7 @@
         IERR = 5
         GO TO 99
       END IF
-      
+
 *     Remove any leading blanks (index to start of non-blank string)
 
       I = 1
@@ -105,7 +105,7 @@
       IF (LBRACKET.NE.0) THEN
         RBRACKET = INDEX (NAME, ')')
         IF (RBRACKET.EQ.0) RBRACKET = LEN(NAME)
-        READ (NAME(LBRACKET+1:RBRACKET-1), *, IOSTAT=ERROR) 
+        READ (NAME(LBRACKET+1:RBRACKET-1), *, IOSTAT=ERROR)
      &        ARRAY_LENGTH
         IF (ERROR.NE.0) THEN
           IERR = 85
@@ -137,7 +137,7 @@
 *     --------------
 
    99 CONTINUE
-      
+
       IF (IERR.EQ.1) THEN
         IERR = 104                ! variable table full
       ELSE IF (IERR.EQ.2) THEN
@@ -200,7 +200,7 @@
         CALL GEN_INQSYMB (SYMBOL(:ILS), SYM_INDEX, SYM_TYPE,
      &                    SYM_LEN, SYM_ADDR, READONLY, IERR)
         IF (SYM_INDEX.NE.0) THEN
-          WRITE (ILOUT2, '(5X,A16,1X,A4,1X,I4.1,6X)', IOSTAT=IERR) 
+          WRITE (ILOUT2, '(5X,A16,1X,A4,1X,I4.1,6X)', IOSTAT=IERR)
      &                   SYMBOL, SYM_TYPE, SYM_LEN
         ELSE
           PRINT *, 'Symbol name "', SYMBOL(:ILS), '" not found.'
@@ -230,7 +230,7 @@
 
       CHARACTER*16 NAME
       CHARACTER*4  TYPE
-      INTEGER*4    LENGTH 
+      INTEGER*4    LENGTH
       INTEGER*4    ADDRESS
 
 *  ok, go..
@@ -248,7 +248,7 @@
         CALL GEN_INQSYMENT( I, NAME, TYPE, LENGTH, ADDRESS, IERR )
         CALL SCL_MATCH_WILD (NAME, TSYMBOL, MATCH_OK)
         IF (MATCH_OK)
-     &    WRITE (ILOUT, '(5X,A16,1X,A4,1X,I4.1,6X)', IOSTAT=IERR) 
+     &    WRITE (ILOUT, '(5X,A16,1X,A4,1X,I4.1,6X)', IOSTAT=IERR)
      &           NAME,
      &           TYPE,
      &           LENGTH

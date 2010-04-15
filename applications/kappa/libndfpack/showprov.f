@@ -26,16 +26,16 @@
 *     parent NDFs and older ancestor NDFs (i.e. the parents of the
 *     parents, etc).
 *
-*     The screen output can be either tabular or non-tabular. In tabular 
+*     The screen output can be either tabular or non-tabular. In tabular
 *     format the screen output consists of a number of lines of text,
 *     each holding a complete description of an NDF containing several
-*     fields. In non-tabular mode, each NDF is described by a block of 
+*     fields. In non-tabular mode, each NDF is described by a block of
 *     lines, each holding a single field. Non-tabular mode is usually
-*     better for screen display since tabular mode can produce very long 
-*     lines that wrap. In both cases, each NDF has an integer index number 
-*     that is displayed at the start of the line or block. The first line 
-*     or block will always describe the supplied NDF itself. Subsequent 
-*     lines or blocks will describe the NDFs that were used in the creation 
+*     better for screen display since tabular mode can produce very long
+*     lines that wrap. In both cases, each NDF has an integer index number
+*     that is displayed at the start of the line or block. The first line
+*     or block will always describe the supplied NDF itself. Subsequent
+*     lines or blocks will describe the NDFs that were used in the creation
 *     of the supplied NDF.
 *
 *     Each line or block contains a number of fields, each with a
@@ -45,14 +45,14 @@
 *     - "PATH": The path of the NDF. Note, this is where the NDF was when
 *     the provenance information was recorded. It is of course possible that
 *     the NDF may subsequently have been moved or deleted .
-*     - "DATE": The formatted UTC date and time at which the provenance 
+*     - "DATE": The formatted UTC date and time at which the provenance
 *     information for the NDF was recorded.
 *     - "CREATOR": A string identifying the software that created the
 *     NDF.
-*     - "PARENTS": A comma separated list of integers that are the indices 
+*     - "PARENTS": A comma separated list of integers that are the indices
 *     of the immediate parents of the NDF. The integers refer to the "ID"
 *     column.
-*     - "MORE": A summary of any extra information about the NDF stored with 
+*     - "MORE": A summary of any extra information about the NDF stored with
 *     the provenance information. In general this may be an arbitrary HDS
 *     structure and so full details cannot be given on a single line. The
 *     HDSTRACE command can be used to examine the MORE field in detail. To
@@ -60,9 +60,9 @@
 *     "hdstrace fred.more.provenance.ancestors'(12)'", where "fred" is
 *     the name of the NDF supplied for parameter "NDF".
 *
-*     By default, not all of these fields are displayed on the screen. The 
+*     By default, not all of these fields are displayed on the screen. The
 *     choice and order of fields to be displayed can be controlled using
-*     parameter SHOW.      
+*     parameter SHOW.
 
 *  Usage:
 *     showprov ndf show basename tabular
@@ -77,7 +77,7 @@
 *     SHOW = LITERAL (Read)
 *        A string indicating which items of provenance information are
 *        to be displayed and in what order. The supplied string should
-*        consist entirely of characters taken from the set P, D, C, T 
+*        consist entirely of characters taken from the set P, D, C, T
 *        and M. These refer to the Path, Date, Creator, Parent and More
 *        fields respectively. The initial default value is "PT". If a
 *        character occurs more than once in the supplied string, then the
@@ -86,13 +86,13 @@
 *        If TRUE, then tabular screen output is produced. [FALSE]
 
 *  Notes:
-*     - If a KAPPA application uses one or more input NDFs to create an 
-*     output NDF, the output NDF may or may not contain provenance 
+*     - If a KAPPA application uses one or more input NDFs to create an
+*     output NDF, the output NDF may or may not contain provenance
 *     information depending on two things: 1) whether any of the
 *     input NDFs already contain provenance information and 2) the value
-*     of the AUTOPROV environment variable. It is usually necessary to 
+*     of the AUTOPROV environment variable. It is usually necessary to
 *     set the AUTOPROV variable to "1" in order to create output NDFs that
-*     contain provenance information. The exception to this if you are 
+*     contain provenance information. The exception to this if you are
 *     supplied with NDFs from another source that already contain
 *     provenance. If such NDFs are used as inputs to KAPPA applicatiosn
 *     then the output NDFs will contain provenance even if the AUTOPROV
@@ -102,8 +102,8 @@
 *     for creating and propagating provenance information.
 
 *  Examples:
-*     showprov m51 
-*        This displays the provenance information in the NDF m51. 
+*     showprov m51
+*        This displays the provenance information in the NDF m51.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -140,8 +140,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PAR_PAR'          ! PAR constants 
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'PAR_PAR'          ! PAR constants
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Status:
       INTEGER STATUS
@@ -156,7 +156,7 @@
 *  Local Variables:
       CHARACTER KEY*20           ! Key for entry within KeyMap
       CHARACTER SHOW*20          ! Supplied value for parameter SHOW
-      CHARACTER TEXT*(BUFLEN)    ! Buffer for line output         
+      CHARACTER TEXT*(BUFLEN)    ! Buffer for line output
       CHARACTER USHOW*5          ! Verified codes for fields to display
       CHARACTER VALUE*(BUFLEN)   ! Buffer for one field value
       INTEGER I                  ! Loop index
@@ -209,13 +209,13 @@
          IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'No MXLEN entry found in KeyMap '//
-     :                    'returned by NDG_FMPRV (programming error).', 
+     :                    'returned by NDG_FMPRV (programming error).',
      :                    STATUS )
          END IF
          GO TO 999
       END IF
 
-*  Determine what is to be shown and in what order. 
+*  Determine what is to be shown and in what order.
       CALL PAR_GET0C( 'SHOW', SHOW, STATUS )
       CALL CHR_UCASE( SHOW )
       SHOWLN = CHR_LEN( SHOW )
@@ -225,7 +225,7 @@
          STATUS = SAI__ERROR
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL ERR_REP( ' ', 'No ID entry found in MXLEN KeyMap '//
-     :                    'returned by NDG_FMPRV (programming error).', 
+     :                    'returned by NDG_FMPRV (programming error).',
      :                    STATUS )
          END IF
          GO TO 999
@@ -249,7 +249,7 @@
             KEY = 'PATH'
             DONE = PDONE
             PDONE = .TRUE.
-            
+
          ELSE IF( SHOW( I : I ) .EQ. 'D' ) THEN
             KEY = 'DATE'
             DONE = DDONE
@@ -275,7 +275,7 @@
             CALL MSG_SETC( 'C', SHOW( I : I ) )
             CALL MSG_SETC( 'S', SHOW )
             CALL ERR_REP( ' ', 'Illegal character "^C" included in '//
-     :                    'value supplied for parameter SHOW ("^S").', 
+     :                    'value supplied for parameter SHOW ("^S").',
      :                    STATUS )
             GO TO 999
          END IF
@@ -295,7 +295,7 @@
                GO TO 999
             END IF
 
-            TAB( NFIELD + 1 ) = TAB( NFIELD ) + 
+            TAB( NFIELD + 1 ) = TAB( NFIELD ) +
      :                          MAX( 9, LEN( KEY ), MXLEN ) + 2
 
          END IF
@@ -307,44 +307,44 @@
          CALL MSG_BLANK( STATUS )
 
          TEXT = 'ID'
-   
+
          DO I = 1, NFIELD
-   
+
             IF( USHOW( I : I ) .EQ. 'P' ) THEN
                KEY = 'PATH'
-               
+
             ELSE IF( USHOW( I : I ) .EQ. 'D' ) THEN
                KEY = 'DATE'
-   
+
             ELSE IF( USHOW( I : I ) .EQ. 'C' ) THEN
                KEY = 'CREATOR'
-   
+
             ELSE IF( USHOW( I : I ) .EQ. 'T' ) THEN
                KEY = 'PARENTS'
-   
+
             ELSE IF( USHOW( I : I ) .EQ. 'M' ) THEN
                KEY = 'MORE'
-   
+
             END IF
-   
+
             IF( TAB( I ) + LEN( KEY ) .LE. BUFLEN ) THEN
                TEXT( TAB( I ) : ) = KEY
             ELSE
                CALL MSG_OUT( ' ', 'WARNING: Line truncated.', STATUS )
             END IF
-   
+
          END DO
-   
+
          CALL MSG_OUT( ' ', TEXT, STATUS )
          CALL MSG_BLANK( STATUS )
       END IF
 
 *  Loop round each NDF to be described.
-      DO IROW = 1, NROW 
+      DO IROW = 1, NROW
 
 *  Get the KeyMap holding details for this row.
          CALL CHR_ITOC( IROW - 1, KEY, NC )
-         IF( .NOT. AST_MAPGET0A( KYMAP1, KEY( : NC ), KYMAP2, 
+         IF( .NOT. AST_MAPGET0A( KYMAP1, KEY( : NC ), KYMAP2,
      :                           STATUS ) ) THEN
             STATUS = SAI__ERROR
             IF( STATUS .EQ. SAI__OK ) THEN
@@ -361,7 +361,7 @@
             TEXT = ' '
 
 *  Append each field to the text buffer. First the ID value.
-            IF( .NOT. AST_MAPGET0C( KYMAP2, 'ID', TEXT, NC, 
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'ID', TEXT, NC,
      :                              STATUS ) ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -371,42 +371,42 @@
                END IF
                GO TO 999
             END IF
-   
+
 * Now the other fields.
             DO I = 1, NFIELD
-            
+
                IF( USHOW( I : I ) .EQ. 'P' ) THEN
                   KEY = 'PATH'
-                  
+
                ELSE IF( USHOW( I : I ) .EQ. 'D' ) THEN
                   KEY = 'DATE'
-            
+
                ELSE IF( USHOW( I : I ) .EQ. 'C' ) THEN
                   KEY = 'CREATOR'
-            
+
                ELSE IF( USHOW( I : I ) .EQ. 'T' ) THEN
                   KEY = 'PARENTS'
-            
+
                ELSE IF( USHOW( I : I ) .EQ. 'M' ) THEN
                   KEY = 'MORE'
-            
+
                END IF
-            
-               IF( .NOT. AST_MAPGET0C( KYMAP2, KEY, VALUE, NC, 
+
+               IF( .NOT. AST_MAPGET0C( KYMAP2, KEY, VALUE, NC,
      :                                 STATUS ) ) THEN
                   VALUE = '<unknown>'
                   NC = 9
-               END IF            
-   
+               END IF
+
                IF( TAB( I ) + NC .LE. BUFLEN ) THEN
                   TEXT( TAB( I ) : ) = VALUE( : NC )
                ELSE
-                  CALL MSG_OUT( ' ', 'WARNING: Line truncated.', 
+                  CALL MSG_OUT( ' ', 'WARNING: Line truncated.',
      :                          STATUS )
                END IF
-   
+
             END DO
-   
+
 *  Display the buffer.
             CALL MSG_OUT( ' ', TEXT, STATUS )
 
@@ -415,7 +415,7 @@
             CALL MSG_BLANK( STATUS )
 
 *  First do the ID value.
-            IF( .NOT. AST_MAPGET0C( KYMAP2, 'ID', VALUE, NC, 
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'ID', VALUE, NC,
      :                              STATUS ) ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -431,34 +431,34 @@
 
 * Now the other fields.
             DO I = 1, NFIELD
-            
+
                IF( USHOW( I : I ) .EQ. 'P' ) THEN
                   KEY = 'PATH'
-                  
+
                ELSE IF( USHOW( I : I ) .EQ. 'D' ) THEN
                   KEY = 'DATE'
-            
+
                ELSE IF( USHOW( I : I ) .EQ. 'C' ) THEN
                   KEY = 'CREATOR'
-            
+
                ELSE IF( USHOW( I : I ) .EQ. 'T' ) THEN
                   KEY = 'PARENTS'
-            
+
                ELSE IF( USHOW( I : I ) .EQ. 'M' ) THEN
                   KEY = 'MORE'
-            
+
                END IF
-            
-               IF( .NOT. AST_MAPGET0C( KYMAP2, KEY, VALUE, NC, 
+
+               IF( .NOT. AST_MAPGET0C( KYMAP2, KEY, VALUE, NC,
      :                                 STATUS ) ) THEN
                   VALUE = '<unknown>'
                   NC = 9
-               END IF            
-   
+               END IF
+
                CALL MSG_SETC( 'K', KEY )
                CALL MSG_SETC( 'V', VALUE( : NC ) )
                CALL MSG_OUT( ' ', '   ^K: ^V', STATUS )
-   
+
             END DO
 
          END IF

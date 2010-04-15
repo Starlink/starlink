@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_POI2( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                     IWCS, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                     IWCS, B, LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                     STATUS )
 *+
 *  Name:
@@ -37,8 +37,8 @@
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
 *        A list of user co-ordinates, in groups of NDIM.
 *     IWCS = INTEGER (Given)
-*        An identifer for an AST FrameSet. The Base Frame should be 
-*        PIXEL coordinates within the B array. The Current Frame should 
+*        An identifer for an AST FrameSet. The Base Frame should be
+*        PIXEL coordinates within the B array. The Current Frame should
 *        be user coordinates.
 *     B( MSKSIZ ) = INTEGER (Given and Returned)
 *        The array.
@@ -58,7 +58,7 @@
 *        element 1 is used to indicate a zero sized box.
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in B. 
+*        interior points in B.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -72,12 +72,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,7 +98,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,7 +118,7 @@
       INTEGER NPAR
       DOUBLE PRECISION PAR( NPAR )
       INTEGER IWCS
-     
+
 *  Arguments Given and Returned:
       INTEGER B( MSKSIZ )
       INTEGER LBEXTB( NDIM )
@@ -137,7 +137,7 @@
      :        I,                 ! Loop count
      :        IND,               ! Current Cartesian co-ord. value
      :        IPAR,              ! Index of current Cartesian co-ord.
-     :        MAP,               ! AST identifier for user -> pixel Mapping 
+     :        MAP,               ! AST identifier for user -> pixel Mapping
      :        NWCS,              ! No. of user axes
      :        VA                 ! Vector address eqv to Cartesian pnt.
 
@@ -188,8 +188,8 @@
 
 *  Increment the pointer to the next set of co-ordinates.
          IPAR = IPAR + NDIM
-      
-      END DO 
+
+      END DO
 
 *  Annull the Mapping.
       CALL AST_ANNUL( MAP, STATUS )

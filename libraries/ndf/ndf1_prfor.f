@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -90,7 +90,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,11 +105,11 @@
 *        DCB_IFMT( NDF__MXDCB ) = INTEGER (Read)
 *           FCB format code for associated foreign file (zero if no
 *           foreign file exists).
-      
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
-      
+
       INCLUDE 'NDF_PCB'          ! NDF_ Placeholder Control Block
 *        PCB_FORFL( NDF__MXPCB ) = CHARACTER * ( NDF__SZFIL ) (Read and
 *        Write)
@@ -253,7 +253,7 @@
 *  dummy placeholder file. If an error is detected, report context
 *  information.
                CALL NDF1_EXPFN( PCB_FORFL( IPCB ), .FALSE., EXPFIL,
-     :                          LEXP, FORID, STATUS ) 
+     :                          LEXP, FORID, STATUS )
                CALL NDF1_CRFOR( FORFIL( : LFOR ), PCB_IFMT( IPCB ),
      :                          EXPFIL, LEXP, FORID, STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
@@ -297,7 +297,7 @@
 *  propagated to the PCB entry.
          IF ( STATUS .EQ. SAI__OK ) PCB_PRFMT( IPCB ) = .FALSE.
       END IF
- 
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_PRFOR', STATUS )
 

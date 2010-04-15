@@ -95,12 +95,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -126,7 +126,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -188,7 +188,7 @@
 *  object and erase it.
       ELSE
          IF ( .NOT. STATE ) THEN
-            IF( LOC .NE. ARY__NOLOC ) THEN 
+            IF( LOC .NE. ARY__NOLOC ) THEN
                CALL DAT_ANNUL( LOC, STATUS )
                LOC = ARY__NOLOC
             END IF
@@ -236,27 +236,27 @@
             IF ( CHR_SIMLR( NTYPE, '_BYTE' ) ) THEN
                CALL ARY1_CVTB( BAD, EL, TYPE, OLDPTR,
      :                         %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
             ELSE IF ( CHR_SIMLR( NTYPE, '_UBYTE' ) ) THEN
                CALL ARY1_CVTUB( BAD, EL, TYPE, OLDPTR,
      :                          %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
             ELSE IF ( CHR_SIMLR( NTYPE, '_DOUBLE' ) ) THEN
                CALL ARY1_CVTD( BAD, EL, TYPE, OLDPTR,
      :                         %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
             ELSE IF ( CHR_SIMLR( NTYPE, '_INTEGER' ) ) THEN
                CALL ARY1_CVTI( BAD, EL, TYPE, OLDPTR,
      :                         %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
             ELSE IF ( CHR_SIMLR( NTYPE, '_REAL' ) ) THEN
                CALL ARY1_CVTR( BAD, EL, TYPE, OLDPTR,
      :                         %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
             ELSE IF ( CHR_SIMLR( NTYPE, '_WORD' ) ) THEN
                CALL ARY1_CVTW( BAD, EL, TYPE, OLDPTR,
      :                         %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
- 
+
             ELSE IF ( CHR_SIMLR( NTYPE, '_UWORD' ) ) THEN
                CALL ARY1_CVTUW( BAD, EL, TYPE, OLDPTR,
      :                          %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
@@ -272,7 +272,7 @@
             CALL ARY1_ANTMP( TLOC, STATUS )
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_RETYP', STATUS )
 

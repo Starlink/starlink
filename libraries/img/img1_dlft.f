@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -116,9 +116,9 @@
 
 *  Try to delete the value (this actually results in the record being
 *  set blank).
-      CALL IMG1_DKEY( ECB_FTSN( SLOT ), 
+      CALL IMG1_DKEY( ECB_FTSN( SLOT ),
      :                %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
-     :                ITEM, NOCCUR, DELETE, STATUS, 
+     :                ITEM, NOCCUR, DELETE, STATUS,
      :                %VAL( CNF_CVAL( 80 ) ) )
       END
 

@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +120,7 @@
 
 *  Create the VARIANT component within the RECORD cell, and assign the
 *  value SIMPLE to it.
-      CALL DAT_NEW0C( CLOC, 'VARIANT', 6, STATUS )         
+      CALL DAT_NEW0C( CLOC, 'VARIANT', 6, STATUS )
       CALL CMP_PUT0C( CLOC, 'VARIANT', 'SIMPLE', STATUS )
 
 *  Get the date and time in the format described in SGP/38 (HISTORY
@@ -135,7 +135,7 @@
 
 *  Create the DATE component within the RECORD cell, and assign the
 *  date and time string to it.
-      CALL DAT_NEW0C( CLOC, 'DATE', 24, STATUS )         
+      CALL DAT_NEW0C( CLOC, 'DATE', 24, STATUS )
       CALL CMP_PUT0C( CLOC, 'DATE', DATTIM, STATUS )
 
 *  Create the COMMAND component within the RECORD cell, and assign the
@@ -157,7 +157,7 @@
 *  Store the text in the mapped array.
       CALL GRP_GET( IGRP, 1, SIZE, %VAL( PNTR ), STATUS, %VAL( 80 ) )
 
-*  Update the value of CURRENT_RECORD, and increment NEXT. 
+*  Update the value of CURRENT_RECORD, and increment NEXT.
 *  CURRENT_RECORD holds the index of the most recently completed HISTORY
 *  record.
       CALL CMP_PUT0I( HLOC, 'CURRENT_RECORD', NEXT, STATUS )

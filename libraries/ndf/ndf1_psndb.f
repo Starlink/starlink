@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, FRAME, 
+      SUBROUTINE NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, FRAME,
      :                       ISDEF, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, FRAME, 
+*     CALL NDF1_PSNDB( STR, DEF, AXIS, IWCS, WCSSEC, VALUE, FRAME,
 *                      ISDEF, STATUS )
 
 *  Description:
@@ -30,26 +30,26 @@
 *        is .FALSE., then the AXIS value is the index of a pixel axis.
 *        Otherwise, it is the index of a WCS axis.
 *     IWCS = INTEGER (Given)
-*        An AST pointer to the NDF's WCS FrameSet. 
+*        An AST pointer to the NDF's WCS FrameSet.
 *     WCSSEC = LOGICAL (Given)
-*        If .TRUE., then the section specifier uses "WCS syntax". Otherwise, 
+*        If .TRUE., then the section specifier uses "WCS syntax". Otherwise,
 *        it uses the old pixel/axis syntax. In WCS syntax, the supplied
 *        STR string should contain a specification for the bounds on each
 *        WCS axis, supplied in the order of the WCS axes. Each bound
 *        specification must be given using WCS axis values. The number of
-*        bounds specifications must equal the number of WCS axes. If WCSSEC 
-*        is .FALSE., the supplied STR string should contain a specification 
-*        for the bounds on each pixel axis, supplied in the order of the 
-*        pixel axes. Each bound specification must be given using either 
-*        pixel indices (integers), or WCS values (non-integers). 
+*        bounds specifications must equal the number of WCS axes. If WCSSEC
+*        is .FALSE., the supplied STR string should contain a specification
+*        for the bounds on each pixel axis, supplied in the order of the
+*        pixel axes. Each bound specification must be given using either
+*        pixel indices (integers), or WCS values (non-integers).
 *     VALUE = DOUBLE PRECISION (Returned)
 *        Dimension bound value.
 *     FRAME = LOGICAL (Returned)
-*        0 ==> VALUE is to be interpreted as a WCS or axis coordinate 
+*        0 ==> VALUE is to be interpreted as a WCS or axis coordinate
 *        value, 1 ==> it is a pixel index, 2 ==> it is a FRACTION value.
 *     ISDEF = LOGICAL (Returned)
-*        .TRUE. ==> the VALUE value is a default value and was not 
-*        specified in the supplied string. .FALSE. ==> VALUE was 
+*        .TRUE. ==> the VALUE value is a default value and was not
+*        specified in the supplied string. .FALSE. ==> VALUE was
 *        specified explicitly in the supplied string.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -64,12 +64,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -146,7 +146,7 @@
 
       ELSE
 
-*  If we are using the old pixel/axis syntax, see if the supplied value is 
+*  If we are using the old pixel/axis syntax, see if the supplied value is
 *  an integer, in which case it is assumed to be a pixel index.
          FRAME = 0
          IF( .NOT. WCSSEC ) THEN
@@ -167,9 +167,9 @@
                   VALUE = 0.01D0*VALUE
                END IF
 
-*  Otherwise, first see if it is numerical. STATUS will be set but no error 
+*  Otherwise, first see if it is numerical. STATUS will be set but no error
 *  will be reported if not.
-            ELSE 
+            ELSE
                CALL CHR_CTOD( STR( F : L ), VALUE, STATUS )
 
 *  If it is not numerical, clear the status value.
@@ -187,21 +187,21 @@
             END IF
          END IF
 
-*  If the value is not a pixel index, and is not a FRACTION value, we 
-*  interpret the string using the AST_UNFORMAT method of the supplied 
+*  If the value is not a pixel index, and is not a FRACTION value, we
+*  interpret the string using the AST_UNFORMAT method of the supplied
 *  FrameSet.
          IF( FRAME .EQ. 0 ) THEN
 
 *  Now read the value from the formatted text.
             NCUSED = AST_UNFORMAT( IWCS, AXIS, STR, VALUE, STATUS )
 
-*  Report an error if there was any spurious text in the string. 
-            IF( NCUSED .LT. LEN( STR ) .AND. STATUS .EQ. SAI__OK ) THEN 
+*  Report an error if there was any spurious text in the string.
+            IF( NCUSED .LT. LEN( STR ) .AND. STATUS .EQ. SAI__OK ) THEN
                ATTR = 'Label('
                IAT = 6
                CALL CHR_PUTI( AXIS, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
-               CALL MSG_SETC( 'L', AST_GETC( IWCS, ATTR( : IAT ), 
+               CALL MSG_SETC( 'L', AST_GETC( IWCS, ATTR( : IAT ),
      :                                       STATUS ) )
                CALL MSG_SETC( 'BADBOUND', STR( F : L ) )
 
@@ -213,7 +213,7 @@
 
          END IF
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_PSNDB', STATUS )
 

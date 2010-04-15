@@ -82,21 +82,21 @@
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
+
 *  Arguments Given:
       INTEGER M
       INTEGER N
- 
+
 *  Arguments Given and Returned:
       REAL A( M, N )
       REAL B( M, N )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local variables:
       REAL IM                 ! Imaginary value
       INTEGER J                  ! Pixel count
@@ -104,35 +104,35 @@
       REAL PHASE              ! Phase value
       REAL POWER              ! Power value
       REAL RL                 ! Real value
- 
+
 *.
- 
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Just do it a pixel at a time.
       DO K = 1, N
- 
+
          DO J = 1, M
- 
+
             RL = A( J, K )
             IM = B( J, K )
- 
+
             POWER = SQRT( RL * RL + IM * IM )
- 
+
             IF ( IM .NE. 0.0E0 .OR. RL .NE. 0.0E0 ) THEN
                PHASE = ATAN2( IM, RL )
             ELSE
                PHASE = 0.0E0
             END IF
- 
+
 *  Overwrite the real and imaginary parts of the image with the power
 *  and phase.
             A( J, K ) = POWER
             B( J, K ) = PHASE
- 
+
          END DO
- 
+
       END DO
- 
+
       END

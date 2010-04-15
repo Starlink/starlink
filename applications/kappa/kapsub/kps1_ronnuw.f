@@ -116,14 +116,14 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT  NONE             ! no implicit typing allowed
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
- 
+
 *  Arguments Given:
       INTEGER IDIM1
       INTEGER IDIM2
@@ -131,17 +131,17 @@
       REAL ANGLE
       INTEGER ODIM1
       INTEGER ODIM2
- 
+
 *  Arguments Returned:
       INTEGER*2 OUTARR( ODIM1, ODIM2 )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Constants:
       REAL DGTORD                ! Degrees to radians
       PARAMETER ( DGTORD = 0.01745329 )
- 
+
 *  Local Variables:
       REAL CANGLE                ! Cosine of the rotation angle
       INTEGER I                  ! Array counter
@@ -163,35 +163,35 @@
       REAL RJP                   ! Y distance of corresponding input
                                  ! array point from input array centre
       REAL SANGLE                ! Sine of the rotation angle
- 
+
 *.
- 
+
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Set up the real co-ordinates of the two array centres.
       ICX = REAL( IDIM1 ) / 2.0
       ICY = REAL( IDIM2 ) / 2.0
       OCX = REAL( ODIM1 ) / 2.0
       OCY = REAL( ODIM2 ) / 2.0
- 
+
 *  Set up the sine and cosine of the rotation angle.
       CANGLE = COS( DGTORD * ANGLE )
       SANGLE = SIN( DGTORD * ANGLE )
- 
+
 *  Loop round each line in the output array.
       DO J = 1, ODIM2
- 
+
 *  Set up real y distance of the current line from the output-array
 *  centre.
          RJ = REAL( J ) - 0.5 - OCY
- 
+
 *  Loop round each pixel in the current line.
          DO I = 1, ODIM1
- 
+
 *  Set up real x distance of current point from output array centre.
             RI = REAL( I ) - 0.5 - OCX
- 
+
 *  Get the real co-ordinates in the input array from which the current
 *  output array co-ordinates have been transformed.  Do this by
 *  evaluating the pre-rotation distances RIP, RJP from the
@@ -199,27 +199,27 @@
 *  using a matrix transform.
             RIP = ( RI * CANGLE )  - ( RJ * SANGLE )
             RJP = ( RI * SANGLE )  + ( RJ * CANGLE )
- 
+
 *  Convert these real distances into integer pixel indices, e.g.
 *  (56,45); add the input array centre co-ordinate first, then another
 *  0.5, and then take the nearest integer.
             IIP = NINT( RIP + ICX + 0.5 )
             IJP = NINT( RJP + ICY + 0.5 )
- 
+
 *  Now determine if this calculated point exists in the input array.
 *  If so, set output-array pixel to that value; if not, set
 *  output-array pixel invalid.
             IF ( IIP .GE. 1 .AND. IIP .LE. IDIM1 .AND.
      :           IJP .GE. 1 .AND. IJP .LE. IDIM2 ) THEN
                OUTARR( I, J ) = INARR( IIP, IJP )
- 
+
             ELSE
                OUTARR( I, J ) = VAL__BADUW
- 
+
             END IF
- 
+
 *  End of loops for all columns and lines of output array
          END DO
       END DO
- 
+
       END

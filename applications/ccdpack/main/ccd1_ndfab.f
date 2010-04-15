@@ -16,7 +16,7 @@
 
 *  Description:
 *     The routine accesses a sequence of NDFs, using the NDG system
-*     whose ADAM parameter name NDFNAM.  An NDG group is returned 
+*     whose ADAM parameter name NDFNAM.  An NDG group is returned
 *     containing the NDF names.  A maximum number of NDFs MAXNDF may be
 *     returned. The actual number of NDFs is returned in NNDF.  After
 *     the NDFs have been accessed an attempt is made to get associated
@@ -38,7 +38,7 @@
 *        NDF's CCDPACK extension which contains the factor to access.
 *        (Probably one of EXPOSURE DARK FLASH.)
 *     USEEXT = LOGICAL (Given)
-*         Whether to attempt to get the relative factors from the NDF 
+*         Whether to attempt to get the relative factors from the NDF
 *     NDFNAM = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name used to prompt for the NDFs.
 *     MAXNDF = INTEGER (Given)
@@ -162,7 +162,7 @@
      :' from NDF extensions; using values from parameter ^FACNAM',
      : STATUS )
          END IF
-         IF ( .NOT. ALLOK .OR. .NOT. USEEXT ) THEN 
+         IF ( .NOT. ALLOK .OR. .NOT. USEEXT ) THEN
 
 *  Access an exact number of strings as double precision values, or
 *  allow use to return one value which will be expanded to fill all

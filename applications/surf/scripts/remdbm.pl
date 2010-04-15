@@ -30,7 +30,7 @@ if (! $@) {
   # do not seem to be evaluated.
   $SAI__OK = &Starlink::ADAM::SAI__OK;
   $DTASK__ACTCOMPLETE = &Starlink::ADAM::DTASK__ACTCOMPLETE;
-} 
+}
 
 # Need to uncomment if we are using external ORAC classes
 #use ORAC::Msg::ADAM::Shell;             # monolith control via shell
@@ -62,7 +62,7 @@ $h = 1 unless $result == 1;  # Print help info if unknown option
 $use_ams = 0 if $noams;
 
 # Print a help message
- 
+
 ($h) && do {
   print qq/
 Usage:
@@ -77,7 +77,7 @@ Options:
 \t"files"   \tList of files to be processed.
 Description:
 \tThis program should be used to reduce SCAN-MAP data taken
-\tusing the technique described by Emerson 
+\tusing the technique described by Emerson
 \t(1995, ASP Conf Ser 75, 309). The following is assumed by the
 \tprogram:
 \t\t1. Each chop configuration has been regridded independently
@@ -99,13 +99,13 @@ Description:
   if ($use_ams) {
     print "AMS communication enabled\n";
   } else {
-    print "AMS communication disabled\n";    
+    print "AMS communication disabled\n";
   }
   exit;
 };
 
 # Check for Starlink
-die "Must execute a Starlink login" unless (exists $ENV{SURF_DIR});  
+die "Must execute a Starlink login" unless (exists $ENV{SURF_DIR});
 
 
 if ($use_ams) {
@@ -149,7 +149,7 @@ if ($use_ams) {
   check_status($status);
   $adam->timeout(1200);     # task timeout of 20 minutes
 
-  
+
 } else {
 
   $Mon{surf_mon} = new ORAC::Msg::ADAM::Shell("surf_mon_$$", $ENV{SURF_DIR}."/surf_mon");
@@ -250,7 +250,7 @@ foreach $frame ($Grp->members) {
     $status = $Mon{kappa_mon}->obeyw("add","in1=$outwt in2=$wt out=junk$$ title='Total_Weight' reset ");
     rename ("junk$$"."$ext", "$wt$ext");
     # Remove the weight
-    unlink($outwt . $ext) or die "Eek $outwt$ext $!"; 
+    unlink($outwt . $ext) or die "Eek $outwt$ext $!";
 
   } else {
     rename ("$outwt$ext", "$wt$ext");
@@ -279,12 +279,12 @@ foreach $frame ($Grp->members) {
   unlink "junk$$"."$ext" if (-e "junk$$"."$ext");
 
   # We now need to divide this by the FT of the chop and multiply
-  # by the weight of the chop 
+  # by the weight of the chop
   # Call the FT of the chop iF, then we have (chop is purely imaginary)
-  # 
+  #
   # New = (x + iy) * F**2 / iF
   #     = (x + iy) F / i
-  #     = ( x + iy ) F *  i 
+  #     = ( x + iy ) F *  i
   #         ------       ---
   #           i           i
   #
@@ -293,7 +293,7 @@ foreach $frame ($Grp->members) {
   # This means we multiply the imaginary part by the FT of the chop
   # to generate the new real component, and the real by -F to generate
   # the new imaginary component
-  
+
   $status = $Mon{kappa_mon}->obeyw("mult","in1=$realout in2=$outft out=ijunk$$ reset");
   check_status($status);
   $status = $Mon{kappa_mon}->obeyw("cmult","in=ijunk$$ scalar=-1.0 out=imtemp reset");
@@ -492,7 +492,7 @@ sub new {
   # If an arguments are supplied then we can configure the object
   # Currently the argument will simply be the group name (ID)
 
-  if (@_) { 
+  if (@_) {
     $group->name(shift);
   }
 
@@ -537,7 +537,7 @@ sub file {
 sub header {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     my $arg = shift;
     croak("Argument is not a hash reference") unless ref($arg) eq "HASH";
     $self->{Header} = $arg;
@@ -580,14 +580,14 @@ sub members {
   if (@_) { @{ $self->{Members} } = @_;}
   return @{ $self->{Members} };
 }
- 
+
 # This method returns the reference to the array
 
 
 sub aref {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     my $arg = shift;
     croak("Argument is not an array reference") unless ref($arg) eq "ARRAY";
     $self->{Members} = $arg;
@@ -740,7 +740,7 @@ sub updateout {
   my $self = shift;
 
   my $suffix = shift;
-  
+
   # Now loop over the members
   foreach my $member ($self->members) {
 
@@ -794,14 +794,14 @@ sub reduce {
 sub readhdr {
 
   my $self = shift;
-  
+
   # Just read the NDF fits header
   my ($ref, $status) = fits_read_header($self->file);
 
   # Return an empty hash if bad status
   $ref = {} if ($status != &NDF::SAI__OK);
 
-  # Set the header in the group 
+  # Set the header in the group
   $self->header($ref);
 
   return $ref;
@@ -859,7 +859,7 @@ sub stripfname {
 
   # Strip everything after the first dot
   $name =~ s/\.(sdf)(\.gz|\.Z)?$//;
-  
+
   return $name;
 
 }
@@ -881,7 +881,7 @@ sub new {
   my $class = ref($proto) || $proto;
 
   my $frame = {};  # Anon hash
- 
+
   $frame->{RawName} = undef;
   $frame->{Header} = undef;
   $frame->{Group} = undef;
@@ -893,29 +893,29 @@ sub new {
   $frame->{WaveLengths} = [];
 
   bless($frame, $class);
- 
+
   # If arguments are supplied then we can configure the object
   # Currently the argument will be the filename.
   # This could be extended to include a reference to a hash holding the
   # header info but this may well compromise the object since
   # the best way to generate the header (including extensions) is to use the
   # readhdr method.
- 
-  if (@_) { 
+
+  if (@_) {
     $frame->configure(@_);
   }
- 
+
   return $frame;
- 
+
 }
 
 sub file {
 
-  # May be able to drop all the wacky returns if we let 
-  
+  # May be able to drop all the wacky returns if we let
+
 
   my $self = shift;
- 
+
   # Set it to point to first member by default
   my $index = 0;
 
@@ -926,7 +926,7 @@ sub file {
 
     # If this is an integer then proceed
     # Check for int and non-zero (since strings eval as 0)
-    # Cant use int() since this extracts integers from the start of a 
+    # Cant use int() since this extracts integers from the start of a
     # string! Match a string containing only digits
     if ($firstarg =~ /^\d+$/ && $firstarg != 0) {
 
@@ -936,8 +936,8 @@ sub file {
       # If we have more arguments we are setting a value
       # else wait until we return the specified value
       if (@_) {
-         ${$self->aref}[$index] = $self->stripfname(shift);         
-      } 
+         ${$self->aref}[$index] = $self->stripfname(shift);
+      }
     } else {
       # Just set the first value
       ${$self->aref}[$index] = $self->stripfname($firstarg);
@@ -966,24 +966,24 @@ The sub-instrument configuration is also stored.
 
 sub configure {
   my $self = shift;
- 
+
   my $fname = shift;
 
   # Set the filename
   $self->file($fname);
- 
+
   # Set the raw data file name
   $self->raw($fname);
- 
+
   # Populate the header
   $self->header($self->readhdr);
- 
+
   # Find the group name and set it
 #  $self->group($self->findgroup);
- 
+
   # Find the recipe name
 #  $self->recipe($self->findrecipe);
- 
+
   # Find number of sub-instruments from header
   # and store this value along with all sub-instrument info.
   # Do this so that the header can be changed without us
@@ -1008,7 +1008,7 @@ is done by configure() ).
 
     $hashref = $Obj->readhdr;
 
-If there is an error during the read a reference to an empty hash is 
+If there is an error during the read a reference to an empty hash is
 returned.
 
 Currently this method assumes that the reduced group is stored in
@@ -1019,22 +1019,22 @@ There are no input arguments.
 =cut
 
 sub readhdr {
- 
+
   my $self = shift;
-  
+
   # Just read the NDF fits header
   my ($ref, $status) = fits_read_header($self->file);
- 
+
   # Return an empty hash if bad status
   $ref = {} if ($status != &NDF::SAI__OK);
- 
+
   return $ref;
 }
 
 
 =item findgroup
 
-Return the group associated with the Frame. 
+Return the group associated with the Frame.
 This group is constructed from header information.
 
 For remdbm - they should all be in the group so return a constant.
@@ -1050,7 +1050,7 @@ sub findgroup {
 
   # construct group name
   my $group = 'REMDBM';
- 
+
   return $group;
 
 }
@@ -1058,7 +1058,7 @@ sub findgroup {
 
 =item inout
 
-Method to return the current input filename and the 
+Method to return the current input filename and the
 new output filename given a suffix and a sub-instrument
 number.
 Currently the suffix is simply appended to the input.
@@ -1082,7 +1082,7 @@ sub inout {
   my $suffix = shift;
 
   # Find the sub-instrument
-  if (@_) { 
+  if (@_) {
     $num = shift;
   } else {
     $num = 1;
@@ -1115,7 +1115,7 @@ associated with the frame object.
     @files = $Obj->files;
 
 =cut
- 
+
 sub files {
   my $self = shift;
   if (@_) { @{ $self->{Files} } = @_;}
@@ -1133,16 +1133,16 @@ group.
 
 =cut
 
- 
+
 sub aref {
   my $self = shift;
- 
-  if (@_) { 
+
+  if (@_) {
     my $arg = shift;
     croak("Argument is not an array reference") unless ref($arg) eq "ARRAY";
     $self->{Files} = $arg;
   }
- 
+
   return $self->{Files};
 }
 
@@ -1159,11 +1159,11 @@ This is identical to the $# construct.
 =cut
 
 sub num {
- 
+
   my $self = shift;
- 
+
   return $#{$self->aref};
- 
+
 }
 
 =item nsubs
@@ -1191,7 +1191,7 @@ with the frame.
 
 sub subs {
   my $self = shift;
-  
+
   if (@_) {
     @{$self->{Subs}} = @_;
   }
@@ -1209,7 +1209,7 @@ in the frame.
 
 sub filters {
   my $self = shift;
-  
+
   if (@_) {
     @{$self->{Filters}} = @_;
   }
@@ -1227,7 +1227,7 @@ in the frame.
 
 sub wavelengths {
   my $self = shift;
-  
+
   if (@_) {
     @{$self->{WaveLengths}} = @_;
   }
@@ -1239,7 +1239,7 @@ sub wavelengths {
 =item findnsubs
 
 Forces the object to determine the number of sub-instruments
-associated with the data by looking in the header(). 
+associated with the data by looking in the header().
 The result can be stored in the object using nsubs().
 
 Unlike findgroup() this method will always search the header for
@@ -1258,7 +1258,7 @@ sub findnsubs {
 =item findsubs
 
 Forces the object to determine the names of all sub-instruments
-associated with the data by looking in the header(). 
+associated with the data by looking in the header().
 The result can be stored in the object using subs().
 
 Unlike findgroup() this method will always search the header for
@@ -1289,7 +1289,7 @@ sub findsubs {
 =item findfilters
 
 Forces the object to determine the names of all sub-instruments
-associated with the data by looking in the header(). 
+associated with the data by looking in the header().
 The result can be stored in the object using subs().
 
 Unlike findgroup() this method will always search the header for
@@ -1318,7 +1318,7 @@ sub findfilters {
 =item findwavelengths
 
 Forces the object to determine the names of all sub-instruments
-associated with the data by looking in the header(). 
+associated with the data by looking in the header().
 The result can be stored in the object using subs().
 
 Unlike findgroup() this method will always search the header for
@@ -1350,7 +1350,7 @@ sub findwavelengths {
 =head1 PRIVATE METHODS
 
 The following methods are intended for use inside the module.
-They are included here so that authors of derived classes are 
+They are included here so that authors of derived classes are
 aware of them.
 
 =over 4
@@ -1365,14 +1365,14 @@ the extension when accessing the file name.
 =cut
 
 sub stripfname {
- 
+
   my $self = shift;
- 
+
   my $name = shift;
- 
+
   # Strip everything after the first dot
   $name =~ s/\.(sdf)(\.gz|\.Z)?$//;
-  
+
   return $name;
 }
 
@@ -1494,7 +1494,7 @@ This methods takes and returns a reference to a hash.
 sub header {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     my $arg = shift;
     croak("Argument is not a hash") unless ref($arg) eq "HASH";
     $self->{Header} = $arg;
@@ -1654,7 +1654,7 @@ This methods takes and returns a reference to a hash.
 sub userheader {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     my $arg = shift;
     croak("Argument is not a hash") unless ref($arg) eq "HASH";
     $self->{UserHeader} = $arg;
@@ -1667,7 +1667,7 @@ sub userheader {
 
 =item uhdr
 
-This method allows specific entries in the user specified header to 
+This method allows specific entries in the user specified header to
 be accessed. The header must be available (set by the "userheader" method).
 The input argument should correspond to the keyword in the header
 hash.
@@ -1697,7 +1697,7 @@ no strict 'subs';
 use Carp;
 
 # Need this to perform the get() function
-use NDF; 
+use NDF;
 
 # Need to strip a path
 use File::Basename;
@@ -1713,14 +1713,14 @@ use constant ORAC__ERROR => -1;
 sub new {
   my $proto = shift;
   my $class = ref($proto) || $proto;
- 
+
   my $task = {};  # Anon hash
- 
+
   # Need to store some information
   $task->{Name} = undef;
   $task->{Monolith} = undef;
   $task->{Path}  = undef;
-  
+
   # Set to current directory when initialised
   $task->{Cwd} = getcwd;
 
@@ -1730,7 +1730,7 @@ sub new {
   # If we have arguments then we are trying to do a load
   # as well
   if (@_) { $task->load(@_); };
- 
+
   return $task;
 }
 
@@ -1741,7 +1741,7 @@ sub new {
 # Store and access the messaging name
 # Not overly useful but keep it any way
 
-sub name {  
+sub name {
   my $self = shift;
   if (@_) { $self->{Name} = shift; }
   return $self->{Name};
@@ -1774,7 +1774,7 @@ should operate.
   ($cwd, $status) = $obj->cwd("newdir")
   ($cwd, $status) = $obj->cwd;
 
-If the specified directory does not exist, bad status is 
+If the specified directory does not exist, bad status is
 returned and the cwd is not changed.
 
 =cut
@@ -1784,12 +1784,12 @@ sub cwd {
   my $status = ORAC__OK;
 
   # Supply an argument
-  if (@_) { 
+  if (@_) {
     my $cwd = shift;
 
     # Check that the directory exists
     if (-d $cwd) {
-      $self->{Cwd} = $cwd; 
+      $self->{Cwd} = $cwd;
     } else {
       $status = ORAC__ERROR;
     }
@@ -1806,7 +1806,7 @@ sub cwd {
 =item load
 
 Initialise the monolith into the object. What this really
-does is store the directory of the monolith 
+does is store the directory of the monolith
 so that it can be run and so that we can determine
 which tasks are linked to it.
 
@@ -1823,12 +1823,12 @@ sub load {
   $self->name($name);
 
   # A further argument (optional) will be the monolith name
-  if (@_) { 
+  if (@_) {
     my $monolith = shift;
 
     # Need to separate monolith name from the path
     my ($mon, $path, $junk) = fileparse($monolith);
-    
+
     # Check for a path. If current directory
     # then expand since I have no other idea
     if ($path eq "./") {
@@ -1839,7 +1839,7 @@ sub load {
     $self->mon($mon);
 
   }
-  
+
   # Have to return a status
   return ORAC__OK;
 }
@@ -1852,12 +1852,12 @@ Return the shell exit status.
 
   $status = obeyw("task", "arguments");
 
-Full path to "task" is not required since this was setup 
+Full path to "task" is not required since this was setup
 when the object was initialised via load().
 
 Note that currently we have no control over the output
 messages. It is conceivable that I could at least
-redirect to /dev/null if a flag was set in the 
+redirect to /dev/null if a flag was set in the
 ControlSH module.
 
 =cut
@@ -1892,7 +1892,7 @@ sub obeyw {
 
   # Now try to replace single quotes with a "' '" combination
   # and only do this for strings containing commas
-  # Probably will not work if we have a '{xx,xx}' combination 
+  # Probably will not work if we have a '{xx,xx}' combination
 
   $args =~ s/\'(\w+,\w+)+\'/\"$&\"/g;
 
@@ -1978,7 +1978,7 @@ sub control {
 
   if ($type eq "default") {
     my $newdir = shift;
-    
+
     # An argument was passed
     if (defined $newdir) {
       $self->cwd($newdir);
@@ -1995,7 +1995,7 @@ sub control {
   } else {
     croak "Unrecognised control type. Should be \'default\' or '\par_reset\'";
   }
-   
+
 }
 
 
@@ -2012,8 +2012,8 @@ Do nothing for now!
 
 sub resetpars {
   my $self = shift;
-  
-  
+
+
   return ORAC__OK;
 }
 
@@ -2061,7 +2061,7 @@ Requires the C<NDF>, C<Cwd> and C<File::Basename> modules.
 
 =head1 See Also
 
-L<perl>, 
+L<perl>,
 L<ORAC::Msg::ADAM::Task>
 
 =cut
@@ -2083,17 +2083,17 @@ use strict;
 # Just include the methods that we need to run remdbm.pl
 
 sub new {
- 
+
   my $proto = shift;
   my $class = ref($proto) || $proto;
- 
+
   my $task = {};  # Anon hash
- 
+
   $task->{OBJ} = new Starlink::AMS::Init;
- 
+
   # Bless this ams into class
   bless($task, $class);
- 
+
   # Allow for the messaging system to be initiated automatically
   # if a true  argument '1' is passed
   if (@_) {
@@ -2105,7 +2105,7 @@ sub new {
         unless $status == &Starlink::ADAM::SAI__OK;
     }
   }
- 
+
   # Return to caller
   return $task;
 };
@@ -2119,7 +2119,7 @@ sub obj {
 
 sub messages {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $val = shift;
     $self->obj->messages($val);
   }
@@ -2129,7 +2129,7 @@ sub messages {
 
 sub timeout {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $val = shift;
     $self->obj->timeout($val);
   }
@@ -2178,10 +2178,10 @@ $SAI__OK = &Starlink::ADAM::SAI__OK;
 =item new
 
 Create a new instance of a ORAC::Msg::ADAM::Task object.
- 
+
   $obj = new ORAC::Msg::ADAM::Task;
   $obj = new ORAC::Msg::ADAM::Task("name_in_message_system","monolith");
- 
+
 If supplied with arguments (matching those expected by load() ) the
 specified task will be loaded upon creating the object. If the load()
 fails then undef is returned (which will not be an object reference).
@@ -2192,20 +2192,20 @@ fails then undef is returned (which will not be an object reference).
 sub new {
   my $proto = shift;
   my $class = ref($proto) || $proto;
- 
+
   my $task = {};  # Anon hash
- 
+
   # Since we are really simply handling another object
   # Create the new object (Starlink::AMS::Task) and store it.
   $task->{Obj} = new Starlink::AMS::Task;  # Name in AMS
- 
+
   # Bless task into class
   bless($task, $class);
 
   # If we have arguments then we are trying to do a load
   # as well
   if (@_) { $task->load(@_); };
- 
+
   return $task;
 }
 
@@ -2227,7 +2227,7 @@ This task is called by the 'new' method.
   $status = $obj->load("name","monolith_binary");
 
 If the second argument is omitted it is assumed that the binary
-is already running and can be called by "name".   
+is already running and can be called by "name".
 
 If a path to a binary with name "name" already exists then the monolith
 is not loaded.
@@ -2235,7 +2235,7 @@ is not loaded.
 =cut
 
 sub load {
-  
+
   my $self = shift;
   # initialise
   my $status = $main::SAI__OK;
@@ -2292,14 +2292,14 @@ Standard ADAM interface and follows the ORAC definition.
 
 sub get {
   # Check number of arguments
-  if (scalar(@_) != 3) { 
+  if (scalar(@_) != 3) {
     croak 'get: Wrong number of arguments. Usage: $task->get(\'task\', \'param\')';
   }
 
   my $self = shift;
 
   # Now need to construct the arguments for the AMS layer
-  
+
   my $task = shift;
   my $param = shift;
 
@@ -2311,12 +2311,12 @@ sub get {
   my @values = ();
 
   # an array of values if we have a square bracket at the start
-  # something and a square bracket at the end 
+  # something and a square bracket at the end
 
   if ($result =~ /^\s*\[.*\]\s*$/) {
     # Remove the brackets
     $result =~ s/^\s*\[(.*)]\s*/$1/;
-  
+
     # Now split on comma
     @values = split(/,/, $result);
 
@@ -2351,14 +2351,14 @@ Set the value of a parameter
 
 sub set {
   # Check number of arguments
-  if (scalar(@_) != 4) { 
+  if (scalar(@_) != 4) {
     croak 'get: Wrong number of arguments. Usage: $task->set(\'task\', \'param\', \'newvalue\')';
   }
 
   my $self = shift;
 
   # Now need to construct the arguments for the AMS layer
-  
+
   my $task = shift;
   my $param = shift;
   my $value = shift;
@@ -2400,8 +2400,8 @@ sub control {
 
   my ($value, $status);
   my $self = shift;
-  
-  if (@_) { 
+
+  if (@_) {
     ($value, $status) = $self->obj->control(@_);
 
     # Convert from ADAM to ORAC status
@@ -2510,7 +2510,7 @@ L<Starlink::AMS::Task>
 =head1 AUTHORS
 
 Tim Jenness (t.jenness@jach.hawaii.edu)
-and Frossie Economou (frossie@jach.hawaii.edu)    
+and Frossie Economou (frossie@jach.hawaii.edu)
 
 =cut
 
@@ -2521,13 +2521,13 @@ __END__
 *+
 *  Name:
 *    REMDBM
- 
+
 *  Purpose:
 *    Remove dual beam signature from scan maps
- 
+
 *  Language:
 *    Perl 5
- 
+
 *  Description:
 *    This program should be used to reduce SCAN-MAP data taken
 *    using the technique described by Emerson (1995, ASP Conf Ser 75, 309).

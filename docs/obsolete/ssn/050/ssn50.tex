@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -42,13 +42,13 @@ RUTHERFORD APPLETON LABORATORY\\
 \section{Function}
 
 This item of software is a command procedure which is designed to help Starlink
-Site Managers maintain their news libraries. It has been written under 
+Site Managers maintain their news libraries. It has been written under
 Version 5 of the VMS operating system and is incompatible with earlier versions.
 
 It offers more options than earlier versions of NEWSMAINT and works on any
 library. The use of the logical names HLP\$LIBRARY  (and its subsidiaries
 HLP\$LIBRARY\_1, HLP\$LIBRARY\_2 etc, see VMS General User Volume 4, DCL
-Dictionary for more information) allows these libraries to be picked up by 
+Dictionary for more information) allows these libraries to be picked up by
 the HELP command.
 
 Default values are offered in bold type to the user, so a video terminal is
@@ -66,7 +66,7 @@ The procedure may be invoked in one of four ways:
 in which case you will be presented with a menu of options. The procedure
 defaults to a library called sys\$manager:sysnews.hlb. (which can be shortened
 to sysnews).
-Most options have default values indicated by bold type (and usually within 
+Most options have default values indicated by bold type (and usually within
 parentheses).
 After selecting an option, you will be prompted for a parameter in the form of
 a file, news item name, or cutoff date etc.
@@ -74,9 +74,9 @@ a file, news item name, or cutoff date etc.
 \begin{verbatim}
     $ NEWSMAINT [Library]
 \end{verbatim}
-in which case you will be prompted for a parameter. The library may be 
-specified as sysnews, oldnews, jobsnews, faultsnews, localnews or by 
-a full file specification. System managers should edit the procedure to 
+in which case you will be prompted for a parameter. The library may be
+specified as sysnews, oldnews, jobsnews, faultsnews, localnews or by
+a full file specification. System managers should edit the procedure to
 reflect any other libraries they may have at their site.
 \item by typing:
 \begin{verbatim}
@@ -122,7 +122,7 @@ items:
 which is more than 75 characters long.
 Longer lines are automatically wrapped by the librarian, thus producing an
 unindented layout, and this check has been included in order to give warning
-that this will happen. 
+that this will happen.
 \item A message is output on your terminal whenever a numeral is found in
 column 1 of a line of text.
 This check has been included in order to highlight the position of numerals
@@ -138,17 +138,17 @@ You may attempt to insert text, whether or not it contains errors.
 \section{The temporary file NEWS.TMP}
 
 The procedure creates  a number of temporary files named ``NEWS.TMP" in the
-current default directory. 
+current default directory.
 Whenever either item addition or item modification have been performed, you will
 be asked whether or not you wish to delete all files of this name.
 If you do not wish to do so, a purge will be performed, leaving the last
-{\em two} versions of the file intact. 
+{\em two} versions of the file intact.
 
 If the {\bf Add} option is selected and no filename is supplied, the latest
-version of NEWS.TMP, if such a file exists, will be loaded into the editor. 
+version of NEWS.TMP, if such a file exists, will be loaded into the editor.
 
 If the {\bf Before} or {\bf Since} option is selected, you may specify the
-cutoff date either in days (eg 30, the default) or in the standard system 
+cutoff date either in days (eg 30, the default) or in the standard system
 time format (eg 30-AUG-1989).
 \end{document}
 

@@ -21,7 +21,7 @@
 \newcommand{\stardoccategory}  {Starlink System Note}
 \newcommand{\stardocinitials}  {SSN}
 \newcommand{\stardocsource}    {ssn\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -110,7 +110,7 @@ will provide catalogue and image data for GAIA \emph{etc}.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -271,12 +271,12 @@ will provide catalogue and image data for GAIA \emph{etc}.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -321,7 +321,7 @@ who can be contacted as follows.
 
 Postal address: \\
 \begin{tabular}{l}
-The Document Librarian. Starlink Project, Rutherford Appleton Laboratory, 
+The Document Librarian. Starlink Project, Rutherford Appleton Laboratory,
   Chilton, \\
 DIDCOT, Oxfordshire, OX11 0QX, United Kingdom.                \\
 \end{tabular}
@@ -399,7 +399,7 @@ from overseas:                  & +44-131-668-8416 \\
 can interrogate remote catalogues via the Internet to retrieve lists of
 objects which satisfy a given criterion.  GAIA can also extract images
 of a specified region of sky from remote databases.  Similar facilities
-are also available in other packages, such as the ESO 
+are also available in other packages, such as the ESO
 \htmladdnormallinkfoot{{\it SkyCat}\/}{http://archive.eso.org/skycat/}
 image display tool and the Gemini observing tool.  This functionality
 is achieved by having servers on the remote systems which accept queries
@@ -596,7 +596,7 @@ The important files used in the tutorial are:
   \item[{\tt simpleserver.cgi}] a simple server script,
 
   \item[{\tt secondserver.cgi}] a second, slightly more complicated, server
-   script, 
+   script,
 
   \item[{\tt genfield.c}] a program to generate the list of stars returned
    by the servers,
@@ -801,22 +801,22 @@ http://www.roe.ac.uk/~acd/cgi-bin/simpleserver.cgi?ra=10.0&dec=30.0&radius=3
 \begin{quote}
 \begin{verbatim}
 
-Example Star Field. 
+Example Star Field.
 
-#column-units:          DEGREES         DEGREES         Magnitudes 
-#column-types:   CHAR*8         DOUBLE  DOUBLE  REAL 
-#column-formats: A8     F12.6   F12.6   F6.2 
+#column-units:          DEGREES         DEGREES         Magnitudes
+#column-types:   CHAR*8         DOUBLE  DOUBLE  REAL
+#column-formats: A8     F12.6   F12.6   F6.2
 
-Id      RA      DEC     mag 
+Id      RA      DEC     mag
 --      --      ---     ---
-Star 1  150.026667      30.050000       0.580000 
-Star 2  149.968333      29.961667       0.120000 
-Star 3  149.983333      30.041667       1.640000 
-Star 4  149.993333      30.005000       2.210000 
-Star 5  150.000000      30.000000       1.700000 
-Star 6  150.006667      29.996667       1.790000 
-Star 7  149.983333      29.993333       3.380000 
-Star 8  150.015000      29.951667       4.130000 
+Star 1  150.026667      30.050000       0.580000
+Star 2  149.968333      29.961667       0.120000
+Star 3  149.983333      30.041667       1.640000
+Star 4  149.993333      30.005000       2.210000
+Star 5  150.000000      30.000000       1.700000
+Star 6  150.006667      29.996667       1.790000
+Star 7  149.983333      29.993333       3.380000
+Star 8  150.015000      29.951667       4.130000
 [EOD]
 \end{verbatim}
 
@@ -927,7 +927,7 @@ The purposes of the various items are as follows.
   \item[{\tt url:}] the URL used to access the server.  Following the
    usual conventions for a CGI gateway it consists of the URL corresponding
    to the script which constitutes the server, followed by a `{\tt ?}'
-   and then a string defining the query passed to the server (see 
+   and then a string defining the query passed to the server (see
    Section~\ref{QUERY_T}).
 
   \item[{\tt symbol:}] specifies how objects are to be plotted (see
@@ -1185,7 +1185,7 @@ sky.  In practice such queries are quite common.  Unfortunately, the ACL
 format does not prescribe the action the server should take in this case.
 However, the {\it recommended}\/ action is for the server to return an
 empty TST table.  That is, it should return all the header information
-for a TST generated from the catalogue being queried (see 
+for a TST generated from the catalogue being queried (see
 Section~\ref{TST_R}), down to and including the list of column names
 and the line of dashes anf tab characters which terminate the header,
 but no table of values.
@@ -1209,8 +1209,8 @@ This section describes the format of the ACL configuration file.  When
 you refer to it you might find it useful to have to hand a copy of
 either {\tt simpleconfig.cfg} or some other configuration file.
 
-An ACL configuration file mediates the interaction between 
-a client such as \xref{GAIA}{sun214}{} and a remote server.  
+An ACL configuration file mediates the interaction between
+a client such as \xref{GAIA}{sun214}{} and a remote server.
 The configuration file comprises a list of one or more databases,
 giving details for each.  Usually each `database' will be a simple
 astronomical catalogue.  However, other alternatives are possible:
@@ -1409,7 +1409,7 @@ are as follows.  If an unrecognised type is specified it will be ignored
    returns a TST catalogue with a single row and three columns.
    The row corresponds to the object named and the three columns are:
    identifier (name), Right Ascension and Declination.  See
-   configuration file {\tt simpleconfig.cfg} for an example of a 
+   configuration file {\tt simpleconfig.cfg} for an example of a
    {\tt namesvr} entry.
 
   \item[{\tt imagesvr}] The database is an image server.  See
@@ -1434,7 +1434,7 @@ gateway it consists of the URL corresponding to the script which
 constitutes the server, followed by a `{\tt ?}' and then a string
 defining the query passed to the server.  The query string consists of
 simple characters and `tokens'.  The tokens start with a `{\tt \%}'
-character.  When a client makes a query the tokens are replaced 
+character.  When a client makes a query the tokens are replaced
 with values which correspond to the individual query and the resulting
 string is sent to the server.  An example query string for a server
 which provides circular area searches on a single catalogue might be:
@@ -1548,7 +1548,7 @@ digitised photographic plate.  The following rules apply.
     \verb+ra_col:     -1+  \\
     \verb+dec_col:    -1+  \\
     \verb+x_col:      +(sequence number of column holding $x$\/ coordinate) \\
-    \verb+y_col:      +(sequence number of column holding $y$\/ coordinate) 
+    \verb+y_col:      +(sequence number of column holding $y$\/ coordinate)
   \end{quote}
 
    Setting {\tt ra\_col} and {\tt dec\_col} to {\tt -1} indicates that
@@ -1808,7 +1808,7 @@ It is a list comprising the following items:
   \item[{\tt symbol: mag \{circle red\} 15-\$mag}] ~ \\
    Plots objects as red circles scaled according to magnitude.
 
-  \item[{\tt symbol: \{a b pa\} \{ellipse red \$a/\$b \$pa\} 
+  \item[{\tt symbol: \{a b pa\} \{ellipse red \$a/\$b \$pa\}
    \{\$a/3600.0 "deg J2000"\} }] ~ \\
    Plots objects as red ellipses.  The ratio of the ellipse is computed
    from the semi-major and semi-minor axes ({\tt a} and {\tt b}
@@ -1816,7 +1816,7 @@ It is a list comprising the following items:
    pa}).  The image size is computed in degrees from the semi-major axis,
    which is assumed to be in seconds of arc.
 
-  \item[{\tt symbol: \{mag rv\} \{circle red "" "" "" \$rv>0 \} 15-\$mag :} 
+  \item[{\tt symbol: \{mag rv\} \{circle red "" "" "" \$rv>0 \} 15-\$mag :}
    ${\tt \backslash}$] ~ \\
    {\tt \{mag rv\} \{circle blue "" "" "" \$rv<=0 \} 15-\$mag} \\
    Plot objects as circles scaled according to magnitude.  However,
@@ -2147,7 +2147,7 @@ which follow.
 
 Image servers differ from other types of ACL server in that they return
 a direct image or `pixel map' of a region of sky rather than a catalogue
-of objects.  The image is returned formatted as a 
+of objects.  The image is returned formatted as a
 \htmladdnormallinkfoot{FITS}{http://fits.gsfc.nasa.gov/fits\_home.html}
 file which may optionally be compressed.
 
@@ -2230,8 +2230,8 @@ are my own.
 \addcontentsline{toc}{section}{References}
 \begin{thebibliography}{99}
 
-  \bibitem{SERVERURL} M.~Albrecht, M.~Barylak, D.~Durand, P.~Fernique, 
-   A.~Micol, F.~Ochsenbein, F.~Pasian, B.~Pirenne, D.~Ponz and 
+  \bibitem{SERVERURL} M.~Albrecht, M.~Barylak, D.~Durand, P.~Fernique,
+   A.~Micol, F.~Ochsenbein, F.~Pasian, B.~Pirenne, D.~Ponz and
    M.~Wenger, 19 September 1996, {\it Astronomical Server URL}\,
    (Version 1.0).  See URL: \htmladdnormallink{
    {\tt http://vizier.u-strasbg.fr/doc/asu.html}}

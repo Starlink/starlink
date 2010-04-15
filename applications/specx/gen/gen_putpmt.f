@@ -83,13 +83,13 @@ C   in straightforward calls with single line prompts.
         PSTRING(1:1) = '('
         PSTRING(2:) = PROMPT(JLS+1:ILS-1)
         PSTRING(ILS-JLS+1:) = ')'
-        WRITE (TPROMPT, PSTRING(1:ILS-JLS+2), ERR=100, IOSTAT=IERR) 
+        WRITE (TPROMPT, PSTRING(1:ILS-JLS+2), ERR=100, IOSTAT=IERR)
         ILS = GEN_ILEN (TPROMPT)
         JLS = 1
-        DO WHILE (TPROMPT(JLS:JLS) .EQ. ' ' .AND. JLS .LT. ILS) 
+        DO WHILE (TPROMPT(JLS:JLS) .EQ. ' ' .AND. JLS .LT. ILS)
           JLS = JLS + 1
         ENDDO
-        DO WHILE (TPROMPT(ILS:ILS) .EQ. ' ' .AND. ILS .GT. JLS) 
+        DO WHILE (TPROMPT(ILS:ILS) .EQ. ' ' .AND. ILS .GT. JLS)
           ILS = ILS - 1
         ENDDO
         WRITE (SPROMPT, 1000, ERR=101, IOSTAT=IERR) TPROMPT(JLS:ILS)

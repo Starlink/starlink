@@ -441,7 +441,7 @@
 *%      Count number of observed features for which positions could be obtained
         no_of_positions = 0
         DO WHILE ( input_ftr_positions ( no_of_positions+1 )
-     :                          .GT. 0.0 .AND. 
+     :                          .GT. 0.0 .AND.
      :            (  no_of_positions+1 .LE. max_perm_ftrs  )  )
           no_of_positions = no_of_positions + 1
         END DO
@@ -454,12 +454,12 @@
 
 *%      Determine size of quick-access index into feature database
         quick_index_size = 0
-        DO WHILE ( ftr_db_quick_index ( quick_index_size+1 )  .GT. 0 
+        DO WHILE ( ftr_db_quick_index ( quick_index_size+1 )  .GT. 0
      :            .AND. (quick_index_size+1 .LE. ftr_db_index_size ) )
           quick_index_size = quick_index_size + 1
         END DO
 
-*%      Determine wavelength search window 
+*%      Determine wavelength search window
         CALL SPD_WZKB( INFO, MAX_ARC_LINES, FTR_LIST,
      :     INT(xend-xstart+0.5), no_of_features, min_dispersion,
      :     max_dispersion, start_wavelength, end_wavelength,
@@ -474,7 +474,7 @@
                IF ( obs_strength ( ii ) .GT.
      :                                  max_strength ) THEN
                  max_strength = obs_strength ( ii )
-                 pos_of_max_strength = 
+                 pos_of_max_strength =
      :                  input_ftr_positions ( ii )
                  ii_of_max_strength = ii
               ENDIF
@@ -531,7 +531,7 @@
 *%       Else
          ELSE
 
-*          Extract next most intense 'add_features' and add to 
+*          Extract next most intense 'add_features' and add to
 *          'ftr_positions' array
 *%         Loop thru number of features to be added to active list
            DO i = 1 , add_features
@@ -569,7 +569,7 @@
            DO i = 1 , no_of_positions
               IF ( ftr_used ( i ) ) THEN
                  used_features = used_features + 1
-                 ftr_positions ( used_features ) = 
+                 ftr_positions ( used_features ) =
      :                                      input_ftr_positions ( i )
               ENDIF
            END DO
@@ -586,20 +586,20 @@
          ENDIF
 
          IF ( INFO ) THEN
-          CALL MSG_OUT( 'FDB_REPORT', 
+          CALL MSG_OUT( 'FDB_REPORT',
      :                    '---------------------------------------'//
      :                    '----------------------------------------',
      :                    IGNORE )
-          WRITE ( report_string , 1005 ) 
+          WRITE ( report_string , 1005 )
           CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
           WRITE ( report_string , 1000 ) used_features
           CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
-          WRITE ( report_string , 1006 ) 
+          WRITE ( report_string , 1006 )
      :                   start_wavelength,end_wavelength
           CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
           WRITE ( report_string , 1001 ) delta_position_limit
           CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
-          CALL MSG_OUT( 'FDB_REPORT', 
+          CALL MSG_OUT( 'FDB_REPORT',
      :                    '---------------------------------------'//
      :                    '----------------------------------------',
      :                    IGNORE )
@@ -644,7 +644,7 @@
 *%       Endif
          ENDIF
 
-         IF ( .NOT. manual .AND. 
+         IF ( .NOT. manual .AND.
      :        inv_meta_count+4 .LT. min_solution_size ) THEN
             IF ( INFO ) CALL MSG_OUT( 'FDB_REPORT',
      :         ' Checking for normal arc', IGNORE )
@@ -678,39 +678,39 @@
 
          ENDIF
 
-*%       If a solution is found involving at least 
+*%       If a solution is found involving at least
 *%                           'min_solution_size' features then
-         IF ( manual .OR. 
+         IF ( manual .OR.
      :        meta_count+4 .GE. min_solution_size .OR.
      :        inv_meta_count+4 .GE. min_solution_size ) THEN
 
 *%      Calculate estimate of dispersion and wavelength range
-           overall_dispersion = ( ftr_positions ( meta_ftrs ( 
-     :                                             meta_count ) )   - 
-     :                         ftr_positions ( meta_ftrs ( 1 ) ) ) 
-     :                                                              / 
-     :                       ( ftr_list ( best_ftr ( 
-     :                                meta_guess ( meta_count ) , 
+           overall_dispersion = ( ftr_positions ( meta_ftrs (
+     :                                             meta_count ) )   -
+     :                         ftr_positions ( meta_ftrs ( 1 ) ) )
+     :                                                              /
+     :                       ( ftr_list ( best_ftr (
+     :                                meta_guess ( meta_count ) ,
      :                                meta_ftrs ( meta_count )))    -
-     :                         ftr_list ( best_ftr ( 
-     :                                meta_guess ( 1 ) , 
+     :                         ftr_list ( best_ftr (
+     :                                meta_guess ( 1 ) ,
      :                                meta_ftrs ( 1 ) ) ) )
 
-           best_start = ftr_list ( best_ftr ( meta_guess ( 1 ) , 
-     :                                  meta_ftrs ( 1 ) ) ) - 
-     :                 ftr_positions ( meta_ftrs ( 1 ) ) / 
+           best_start = ftr_list ( best_ftr ( meta_guess ( 1 ) ,
+     :                                  meta_ftrs ( 1 ) ) ) -
+     :                 ftr_positions ( meta_ftrs ( 1 ) ) /
      :                     overall_dispersion
 
            best_end = best_start
      :              + ( xend - xstart ) / overall_dispersion
 
            overall_dispersion = ABS ( overall_dispersion )
-           IF ( overall_dispersion .LT. min_dispersion .OR.  
+           IF ( overall_dispersion .LT. min_dispersion .OR.
      :         overall_dispersion .GT. max_dispersion .OR.
-     :         best_start .LT. start_wavelength .OR. 
+     :         best_start .LT. start_wavelength .OR.
      :         best_end .GT. end_wavelength ) THEN
 
-              IF ( INFO ) CALL MSG_OUT( 'FDB_REPORT', 
+              IF ( INFO ) CALL MSG_OUT( 'FDB_REPORT',
      :           ' Solution fails range/scale criteria', IGNORE )
 
            ELSE
@@ -718,7 +718,7 @@
 *%      Report initial results of identification
             IF ( INFO ) THEN
                WRITE ( report_string , 1008 )
-     :                       overall_dispersion , 
+     :                       overall_dispersion ,
      :                       best_start , best_end
                CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
             END IF
@@ -726,41 +726,41 @@
             identified_ftrs = meta_count + 4
 
 *%      Setup details (wavelength/position) for identified features
-            iden_ftr_position ( 1 ) = ftr_positions (  best_posindex ( 
-     :                                   meta_guess ( 1 ) ,1, 
+            iden_ftr_position ( 1 ) = ftr_positions (  best_posindex (
+     :                                   meta_guess ( 1 ) ,1,
      :                                   meta_ftrs ( 1 )  ) )
-            iden_ftr_position ( 2 ) = ftr_positions (  best_posindex ( 
-     :                                   meta_guess ( 1 ) ,2, 
+            iden_ftr_position ( 2 ) = ftr_positions (  best_posindex (
+     :                                   meta_guess ( 1 ) ,2,
      :                                   meta_ftrs ( 1 )  ) )
-            iden_ftr_wavelength ( 1 ) = 
-     :               ftr_list ( best_prev_ftr2 ( meta_guess ( 1 ) , 
+            iden_ftr_wavelength ( 1 ) =
+     :               ftr_list ( best_prev_ftr2 ( meta_guess ( 1 ) ,
      :                                         meta_ftrs ( 1 ) ) )
-            iden_ftr_wavelength ( 2 ) = 
-     :               ftr_list ( best_prev_ftr ( meta_guess ( 1 ) , 
+            iden_ftr_wavelength ( 2 ) =
+     :               ftr_list ( best_prev_ftr ( meta_guess ( 1 ) ,
      :                                        meta_ftrs ( 1 ) ) )
 
             DO i = 1 , meta_count
-             iden_ftr_position ( i+2 ) = 
+             iden_ftr_position ( i+2 ) =
      :                      ftr_positions ( meta_ftrs ( i ) )
-             iden_ftr_wavelength ( i+2 ) = 
+             iden_ftr_wavelength ( i+2 ) =
      :                      ftr_list ( best_ftr ( meta_guess ( i ) ,
      :                                        meta_ftrs ( i ) ) )
             END DO
 
-            iden_ftr_wavelength ( meta_count + 3 ) = 
-     :          ftr_list ( best_next_ftr ( meta_guess ( meta_count ) , 
+            iden_ftr_wavelength ( meta_count + 3 ) =
+     :          ftr_list ( best_next_ftr ( meta_guess ( meta_count ) ,
      :                                  meta_ftrs ( meta_count ) ) )
-            iden_ftr_wavelength ( meta_count + 4 ) = 
-     :          ftr_list ( best_next_ftr2 ( meta_guess ( meta_count ) , 
+            iden_ftr_wavelength ( meta_count + 4 ) =
+     :          ftr_list ( best_next_ftr2 ( meta_guess ( meta_count ) ,
      :                                   meta_ftrs ( meta_count ) ) )
 
-            iden_ftr_position ( meta_count + 3 ) = 
-     :                 ftr_positions (  best_posindex ( 
-     :                                  meta_guess ( meta_count ) ,3, 
+            iden_ftr_position ( meta_count + 3 ) =
+     :                 ftr_positions (  best_posindex (
+     :                                  meta_guess ( meta_count ) ,3,
      :                                  meta_ftrs ( meta_count )  ) )
-            iden_ftr_position( meta_count + 4 ) = 
-     :                 ftr_positions (  best_posindex ( 
-     :                                  meta_guess ( meta_count ) ,4, 
+            iden_ftr_position( meta_count + 4 ) =
+     :                 ftr_positions (  best_posindex (
+     :                                  meta_guess ( meta_count ) ,4,
      :                                  meta_ftrs ( meta_count )  ) )
 
             got_a_match = .TRUE.
@@ -782,9 +782,9 @@
 
 *%       If no solution yet , and full set of features has been used then
          IF ( status .NE. 0   .AND. (
-     :       ( used_features + add_features .GT. 
-     :                              no_of_positions ) .OR. 
-     :       ( used_features + add_features .GT. 
+     :       ( used_features + add_features .GT.
+     :                              no_of_positions ) .OR.
+     :       ( used_features + add_features .GT.
      :                         max_positions_to_use ) )  ) THEN
 
 *%        Clear active feature flag array
@@ -802,7 +802,7 @@
 *%           Increase by 1 , and inform user
              IF ( delta_position_limit .GE. db_scope ) THEN
                 IF ( INFO ) THEN
-                   CALL MSG_OUT( 'FDB_REPORT', 
+                   CALL MSG_OUT( 'FDB_REPORT',
      :     ' Not enough candidate features to increase search scope',
      :                IGNORE )
                    WRITE ( report_string , 1004 )
@@ -816,7 +816,7 @@
                    WRITE ( report_string , 1003 )
                    CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
                 END IF
-                IF ( add_features .LE. delta_position_limit*2+2 ) 
+                IF ( add_features .LE. delta_position_limit*2+2 )
      :                     add_features = delta_position_limit * 3
              ENDIF
 
@@ -853,6 +853,6 @@
  1007  FORMAT ( 1X , 'Spectrum already has identifications' )
 
  1008  FORMAT ( 1X , 11HDispersion= ,f16.5,
-     :                8H from W=,f10.2,4H to ,f10.2 ) 
+     :                8H from W=,f10.2,4H to ,f10.2 )
 
       END

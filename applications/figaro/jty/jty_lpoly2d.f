@@ -1,7 +1,7 @@
       REAL FUNCTION JTY_LPOLY2D(X,Y,SCALE,NCX,NCY,COEFF)
 * The desired fit has NCX coefficients in X and NCY in Y.
       REAL*8 COEFF(1), XSC, YSC, JTY_LPI, TEMP
-      REAL*4 SCALE(1) 
+      REAL*4 SCALE(1)
 
       NFIT = NCX*NCY
 

@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_PRIN( PROMPT, NDFS, NNDF, FTYPES, FILT, DARK, 
+      SUBROUTINE CCD1_PRIN( PROMPT, NDFS, NNDF, FTYPES, FILT, DARK,
      :                      FLASH, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_PRIN( PROMPT, NDFS, NNDF, FTYPES, FILT, DARK, FLASH, 
+*     CALL CCD1_PRIN( PROMPT, NDFS, NNDF, FTYPES, FILT, DARK, FLASH,
 *                     STATUS)
 
 *  Description:
@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,12 +120,12 @@
       INTEGER NTRY               ! Number of tries
       INTEGER INDEX              ! Loop index
       LOGICAL RENEW              ! Whether to renew input group
-      LOGICAL TERM               ! Input has terminator flagged 
+      LOGICAL TERM               ! Input has terminator flagged
       LOGICAL AGAIN              ! Loop again or not.
       INTEGER ADDED              ! How many values have been added
       INTEGER NRET               ! Number of values returned
       CHARACTER * ( GRP__SZNAM ) CURSTR ! Item read from group
-      
+
 *.
 
 *  Check inherited global status.
@@ -150,7 +150,7 @@
 
 *  Get the user return.
          TERM = .FALSE.
-         CALL GRP_GROUP( PROMPT, GRP__NOID, IDH2, NRET, ADDED, TERM, 
+         CALL GRP_GROUP( PROMPT, GRP__NOID, IDH2, NRET, ADDED, TERM,
      :                   STATUS )
 
 *  Get out if a null return has been given or a PAR__ABORT. Also quit
@@ -244,12 +244,12 @@
       IF ( AGAIN ) GO TO 3
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Extract the fields from the input and try to access the NDFs. The 
+*  Extract the fields from the input and try to access the NDFs. The
 *  NDF types are entered into their own group as is the final field.
 
 *  Create a group consisting of only the NDF names.
       CALL GRP_NEW( 'CCD1_PRINT:NDFS', NDFS, STATUS )
-      NNDF = 0 
+      NNDF = 0
       DO 4 INDEX = 1, NRET, 5
 
 *  Get the NDF name string.

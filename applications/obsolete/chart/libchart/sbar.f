@@ -23,11 +23,11 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *   If ARGS Set Pen Colour
- 
+
       IF (COLOUR) CALL SGS_SPEN (4)
- 
+
       REP=20.0
       BLEN=1200.0/SCALE
       DO I=1,1000
@@ -39,50 +39,50 @@
          ENDIF
       END DO
  100  CONTINUE
- 
+
       XP = 12.5
       YP = 12.5
- 
+
       RLEN = BLEN / 2.0
- 
+
       CALL SGS_BPOLY (XP-RLEN,YP-RLEN)
       CALL SGS_APOLY (XP+RLEN,YP-RLEN)
       CALL SGS_APOLY (XP+RLEN,YP+RLEN)
       CALL SGS_APOLY (XP-RLEN,YP+RLEN)
       CALL SGS_APOLY (XP-RLEN,YP-RLEN)
       CALL SGS_OPOLY
- 
+
 *
 *   If ARGS set Pen Colour
 *
- 
+
       CALL SGS_SPEN (1)
- 
+
       XP=12.5+RLEN+0.5*CW
       YP=12.5+0.6*CH
- 
+
       CALL SGS_STXJ ('CL')
- 
+
       IF (REP.GE.10.0) THEN
- 
+
          CALL SGS_TXR (XP,YP,REP,0,-1)
- 
+
       ELSE
- 
+
          CALL SGS_TXR (XP,YP,REP,0,1)
- 
+
       ENDIF
- 
+
       CALL SGS_ATEXT ('''')
       CALL SGS_OTEXT
- 
+
       IF ( EXTENS ) THEN
- 
+
          YP = YP - 1.2 * CH
          CALL SGS_BTEXT (XP,YP)
          CALL SGS_ATEXT ('SQUARE')
          CALL SGS_OTEXT
- 
+
       ENDIF
- 
+
       END

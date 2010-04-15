@@ -88,7 +88,7 @@
       ENDIF
 
 *    loop round all the rows of the output array
-      DO  J  =  1, DIMS2 
+      DO  J  =  1, DIMS2
 
 *       evaluate the row in the input array from which the current
 *       output row was shifted
@@ -109,7 +109,7 @@
 
 *          if INSIDE is true, then subtract the value of the current
 *          unshifted pixel from the value of the corresponding
-*          shifted pixel to get the output value - else set it 
+*          shifted pixel to get the output value - else set it
 *          to zero
             IF ( INSIDE ) THEN
                OUTARRAY( I, J )  =  INARRAY( II, JJ ) - INARRAY( I, J )

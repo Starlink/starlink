@@ -3,7 +3,7 @@ C+
 C
 C     G E N _ S U B S E T B
 C
-C     Returns a subset of a 2-dimensional byte array.  
+C     Returns a subset of a 2-dimensional byte array.
 C
 C     Parameters -   (">" input, "<" output)
 C
@@ -24,7 +24,7 @@ C     values of the parameters are such that they imply accesses
 C     outside the bounds of IN, the corresponding elements of OUT
 C     will be left unchanged.
 C
-C     IN and OUT can be the same array, but 'clever' usages 
+C     IN and OUT can be the same array, but 'clever' usages
 C     involving overlapping arrays with IN(1,1) not equivalent
 C     to OUT(1,1) should be avoided.
 C

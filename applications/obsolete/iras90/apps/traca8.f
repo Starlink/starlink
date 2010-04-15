@@ -1,5 +1,5 @@
       SUBROUTINE TRACA8( PARAM, PDET, PDEV, PXSZ, PYSZ, PXLMT, PYLMT,
-     :                   PTITL, PUNITS, POFMD, POFF, POMIT, PQEXP, 
+     :                   PTITL, PUNITS, POFMD, POFF, POMIT, PQEXP,
      :                   PXSCAN, INDF, IDC, BSMP, ESMP, BDET, EDET,
      :                   INSCN, XSCN, DATA, DETDAT, DATUNT, YMX, YMN,
      :                   NAVAIL, ADET, QEXP, DETOUT, DTINDX, NDISP,
@@ -28,7 +28,7 @@
 *  Description:
 *     This routine changes the parameter values being used in program
 *     TRACECRDD. The effect of the following parameters may
-*     be changed:  
+*     be changed:
 *         DETS
 *         DEVICE ( including PXSZ and PYSZ )
 *         XLMT
@@ -45,7 +45,7 @@
 *     parameters to change its value. After changing a parameter value,
 *     the user will be prompted for further changing until a command of
 *     REDRAW DISPLAY is issued or the last parameter changed is DEVICE.
-*         
+*
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter used to get the command from the
@@ -110,7 +110,7 @@
 *     YMN( BDET : EDET ) = REAL (Given)
 *        The min. value of each detector data trace.
 *     NAVAIL = INTEGER (Given)
-*        The number of available detector for display. 
+*        The number of available detector for display.
 *     ADET( NAVAIL ) = INTEGER (Given)
 *        Array holding available detector numbers.
 *     QEXP = CHARACTER * ( * ) (Given and Returned)
@@ -145,12 +145,12 @@
 *     XLMT( 2 ) = INTEGER (Given and Returned)
 *        The x limits of the display.
 *     YLMT( 2 ) = INTEGER (Given and Returned)
-*        The y limits of the display.     
+*        The y limits of the display.
 *     USECUR = LOGICAL (Given and Returned)
 *        The using cursor flag. When it is true, the command menu will
 *        be display on the graphic device and the cursor will be used to
-*        select a command. When it is false, there will be no menu display 
-*        on the graphic device and the keyboard will be used to get a 
+*        select a command. When it is false, there will be no menu display
+*        on the graphic device and the keyboard will be used to get a
 *        command from the user.
 *     TITLE = CHARACTER * ( * ) (Given and Returned)
 *        The title of the display.
@@ -182,7 +182,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -193,7 +193,7 @@
       INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRC_PAR'          ! IRC_ constants
       INCLUDE 'IRQ_PAR'          ! IRQ_ constants
-                                
+
 *  Arguments Given:
       CHARACTER PARAM*(*)
       CHARACTER PDET*(*)
@@ -243,7 +243,7 @@
       CHARACTER TITLE*(*)
       CHARACTER DISUNT*(*)
       INTEGER OFFMTD
-      REAL OFFSET( BDET : EDET ) 
+      REAL OFFSET( BDET : EDET )
       LOGICAL FLAGS( 8 )
 
 *  Status:
@@ -252,7 +252,7 @@
 *  External reference:
       INTEGER CHR_LEN            ! The used length of a string
       INTEGER IRC_DETIN          ! Detector index of a detector
-                                
+
 *  Local Variables:
       CHARACTER CMMNT*128        ! Comment string of the picture
       CHARACTER COMM*20          ! A selected item
@@ -274,7 +274,7 @@
       LOGICAL MORE               ! flag for changing more parameter
 
       REAL TEMP                  ! Temporary REAL storage.
-      REAL XSCAN( 2 )            ! Cross scan limits.      
+      REAL XSCAN( 2 )            ! Cross scan limits.
 *.
 
 *  Check inherited global status.
@@ -313,7 +313,7 @@
      :                     -0.22, 'Select a parameter by positioning'/
      :                     /' cursor and pressing any key', COLOUR,
      :                     1, 0.02, .TRUE., ITEMNO, STATUS )
-            
+
 *  Otherwise, select a parameter from the keyboard.
          ELSE
 
@@ -357,15 +357,15 @@
                      XSCAN( 1 ) = XSCAN( 2 )
                      XSCAN( 2 ) = TEMP
                   END IF
-   
+
                END IF
 
                CALL TRACA2( IDC, NAVAIL, BDET, EDET, ADET, XSCN, XSCAN,
      :                      DETOUT, NDISP, DETLIS, DETLN, STATUS )
 
-            END IF      
+            END IF
 
-*  Check status. 
+*  Check status.
             IF ( STATUS .NE. SAI__OK ) THEN
 
 *  If a null value was supplied, annul the error and keep the previous
@@ -375,7 +375,7 @@
                   GOTO 888
 
 *  For any other error, exit.
-               ELSE 
+               ELSE
                   GOTO 999
                END IF
             END IF
@@ -415,21 +415,21 @@
             DO I = 1, NDISP
                DTINDX( I ) = IRC_DETIN( IDC, DETOUT( I ), STATUS )
             END DO
-             
+
 *  Calculate the scale factors to convert the data of these newly
 *  selected detectors from the units of original NDF file to the units
 *  desired by the user.
             CALL IRM_UNTCV( DATUNT, DISUNT, NDISP, DETOUT, SCALE,
      :                      STATUS )
-      
-*  Set up new Y limits (the user is not prompted).      
+
+*  Set up new Y limits (the user is not prompted).
             CALL TRACA6( IDC, BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
      :                   NDISP, DTINDX, SCALE, XLMT, YMX, YMN, ' ',
      :                   YLMT, STATUS )
 
 *  If getting a new graphic device is required,
          ELSE IF ( ITEMNO .EQ. 3 .OR. COMM( : 6 ) .EQ. 'DEVICE' ) THEN
-            
+
 *  Close SGS and AGI, and cancel the values associated with parameter
 *  PDEV, PXSZ, PYSZ.
             CALL AGS_DEACT( STATUS )
@@ -445,17 +445,17 @@
 *  Get a new graphic device, and open it for NCAR use.
             CMMNT = 'TRACECRDD_'//TITLE
             CMNTLN = CHR_LEN( CMMNT )
-            CALL IRM_GROPN( PDEV, PXSZ, PYSZ, .TRUE., 
-     :                      CMMNT( : CMNTLN ), PIC0, PIC1, ZONE, 
+            CALL IRM_GROPN( PDEV, PXSZ, PYSZ, .TRUE.,
+     :                      CMMNT( : CMNTLN ), PIC0, PIC1, ZONE,
      :                      COLOUR, CURSOR, CLRBLK, STATUS )
 
-*  Check status, if error happened, re-active the SGS package to 
+*  Check status, if error happened, re-active the SGS package to
 *  ensure that application all be closed correctly. Then exit.
             IF ( STATUS .NE. SAI__OK ) THEN
                LSTAT = SAI__OK
                CALL AGS_ACTIV( LSTAT )
                GOTO 999
-               
+
 *  If no error happened, end the loop.
             ELSE
                MORE = .FALSE.
@@ -472,8 +472,8 @@
 *  Cancel the previous value associated with the parameter PXLMT and
 *  get a new value for it.
             CALL PAR_CANCL( PXLMT, STATUS )
-            CALL TRACA5( BSMP, ESMP, BDET, EDET, INSCN, NDISP, 
-     :                   DTINDX, PXLMT, XLMT, STATUS )    
+            CALL TRACA5( BSMP, ESMP, BDET, EDET, INSCN, NDISP,
+     :                   DTINDX, PXLMT, XLMT, STATUS )
 
 *  Check the status.
             IF ( STATUS .NE. SAI__OK ) THEN
@@ -487,7 +487,7 @@
 *  For any other error, exit.
                ELSE
                   GOTO 999
-               END IF   
+               END IF
             END IF
 
 *  If Y limits of the display need be changed,
@@ -514,14 +514,14 @@
                   GOTO 999
                END IF
             END IF
- 
+
 *  If the title of the display is to be changed,
          ELSE IF ( ITEMNO .EQ. 6 .OR. COMM( : 5 ) .EQ. 'TITLE' ) THEN
 
 *  Cancel the previous value and get a new value for parameter PTITL.
             CALL PAR_CANCL( PTITL, STATUS )
             CALL PAR_GET0C( PTITL, TITLE, STATUS )
-              
+
 *  Check status.
             IF ( STATUS .NE. SAI__OK ) THEN
 
@@ -536,7 +536,7 @@
                   GOTO 999
                END IF
             END IF
- 
+
 *  If ask to change the display units, cancel the previous value of the
 *  parameter PUNITS.
          ELSE IF ( ITEMNO .EQ. 7 .OR. COMM( : 5 ) .EQ. 'UNITS' ) THEN
@@ -549,18 +549,18 @@
             CALL IRM_UNTCV( DATUNT, DISUNT, NDISP, DETOUT, SCALE,
      :                      STATUS )
 
-*  Set up new Y limits (the user is not prompted).      
+*  Set up new Y limits (the user is not prompted).
             CALL TRACA6( IDC, BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
      :                   NDISP, DTINDX, SCALE, XLMT, YMX, YMN, ' ',
      :                   YLMT, STATUS )
 
 *  If ask to use alternative way to issue the coomand,
-         ELSE IF ( ITEMNO .EQ. 8 .OR. 
+         ELSE IF ( ITEMNO .EQ. 8 .OR.
      :             COMM( : 14 ) .EQ. 'COMMAND SOURCE' ) THEN
 
 *  If current mode is 'cursor', set to 'keybord'
             CURMOD = USECUR
-            IF ( CURMOD ) THEN 
+            IF ( CURMOD ) THEN
                USECUR = .NOT.USECUR
 
 *  If current mode is 'keybord', and the device can be in cursor mode,
@@ -568,7 +568,7 @@
             ELSE
                IF ( CURSOR .AND. CLRBLK ) THEN
                   USECUR = .NOT.USECUR
- 
+
 *  Otherwise give a warning message and does not change the mode.
                ELSE
                   CALL MSG_BLANKIF( MSG__QUIET, STATUS )
@@ -577,7 +577,7 @@
      :                            STATUS )
                   CALL MSG_BLANKIF( MSG__QUIET, STATUS )
                END IF
-            END IF   
+            END IF
 
 *  Report to the user the present command source.
             IF ( USECUR ) THEN
@@ -586,13 +586,13 @@
             ELSE
                CALL MSG_OUT( MSG__NORM, 'TRACA8_MSG5',
      :                   '  Using keyboard for command source', STATUS )
-               
+
             END IF
 
 *  If the offset method is to be changed.
          ELSE IF ( ITEMNO .EQ. 9 .OR.
      :             COMM( : 13 ) .EQ. 'OFFSET METHOD' ) THEN
-               
+
 *  Cancel the previous value and get a new value for parameter POFMD.
             CALL PAR_CANCL( POFMD, STATUS )
             CALL PAR_CANCL( POFF, STATUS )
@@ -612,9 +612,9 @@
                   GOTO 999
                END IF
             END IF
- 
+
 *  If parts of the display are to be selected or omitted,
-         ELSE IF( ITEMNO .EQ. 10 .OR. 
+         ELSE IF( ITEMNO .EQ. 10 .OR.
      :            COMM( : 17 ) .EQ. 'DISPLAY STRUCTURE' ) THEN
 
 *  Cancel the previous value and get a new value for parameter POMIT.
@@ -624,7 +624,7 @@
 *  Check status.
             IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If parameter get a NULL value annul the error and keep flags 
+*  If parameter get a NULL value annul the error and keep flags
 *  unchanged.
                IF ( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -637,7 +637,7 @@
             END IF
 
 *  If a new quality expression is to be used...
-         ELSE IF( ITEMNO .EQ. 11 .OR. 
+         ELSE IF( ITEMNO .EQ. 11 .OR.
      :            COMM( : 18 ) .EQ. 'QUALITY EXP.' ) THEN
 
             CALL PAR_CANCL( PQEXP, STATUS )
@@ -645,7 +645,7 @@
      :                  ( ESMP - BSMP + 1 )*( EDET - BDET + 1 ), DATA,
      :                  DETDAT, QEXP, STATUS )
 
-*  Check status. 
+*  Check status.
             IF ( STATUS .NE. SAI__OK ) THEN
 
 *  If a null value was supplied, annul the error and keep the previous
@@ -655,12 +655,12 @@
                   GOTO 888
 
 *  For any other error, exit.
-               ELSE 
+               ELSE
                   GOTO 999
                END IF
             END IF
 
-*  Set up new Y limits (the user is not prompted).      
+*  Set up new Y limits (the user is not prompted).
             CALL TRACA6( IDC, BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
      :                   NDISP, DTINDX, SCALE, XLMT, YMX, YMN, ' ',
      :                   YLMT, STATUS )
@@ -670,11 +670,11 @@
             IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
 *  If redrew display is required, end the loop.
-         ELSE IF ( ITEMNO .EQ. 1 .OR. 
+         ELSE IF ( ITEMNO .EQ. 1 .OR.
      :             COMM( : 14 ) .EQ. 'REDRAW DISPLAY' ) THEN
             MORE = .FALSE.
          END IF
-      
+
  888     CONTINUE
 
 *  Go back to change more parameter values, unless 'Redraw display' or
@@ -682,5 +682,5 @@
       END DO
 
  999  CONTINUE
-      
+
       END

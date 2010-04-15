@@ -1,9 +1,9 @@
 
 *+  KFH_NLIST - Produces a listing of an image.
-      SUBROUTINE KFH_NLIST(A,NX,NY,X1,Y1,X2,Y2,FNAME,FACTOR)                                    
+      SUBROUTINE KFH_NLIST(A,NX,NY,X1,Y1,X2,Y2,FNAME,FACTOR)
 *    Description :
 *     This routine generates a formatted listing of a
-*     1-D or a 2-D image. The resulting file may be 
+*     1-D or a 2-D image. The resulting file may be
 *     typed or printed in the usual manner.
 *    Invocation :
 *     CALL KFH_NLIST(A,NX,NY,X1,Y1,X2,Y2,FNAME,FACTOR)
@@ -23,20 +23,20 @@
 *     Y2 = INTEGER
 *           The upper Y bound of the region of the image.
 *     FNAME = CHARACTER*(*)
-*           The name of the file that is to hold 
+*           The name of the file that is to hold
 *           the listing.
 *     FACTOR = REAL
-*           The factor by which the pixel values 
+*           The factor by which the pixel values
 *           are to be multiplied.
 *    Method :
 *     A new file is created with the filename that
 *     the user has given in KFH_NWLIST. The image
 *     is divided into vertical strips of 30 pixels
-*     wide , so that the first strip runs from 
+*     wide , so that the first strip runs from
 *     pixel 0 to 29. Each horizontal line of data
 *     within the range of the strip is taken and
 *     put into a buffer called LINE and written to
-*     the file. If a FACTOR is specified , then the 
+*     the file. If a FACTOR is specified , then the
 *     data is multiplied by that figure before
 *     writing it to file.
 *    Authors :
@@ -76,8 +76,8 @@
       INTEGER Y2                         ! The upper Y bound of the region.
       REAL Z                             ! Variable to hold the result
 *                                        ! of FACTOR * pixel value.
-*-                                                                                 
- 
+*-
+
 *
 *    Re-arrange coordinates , if necessary.
 *
@@ -98,150 +98,150 @@
 
       ENDIF
 
-*                                                                                
-*    Open report.                                                                  
+*
+*    Open report.
 *
 
-      OPEN (UNIT=1,FILE=FNAME,STATUS='NEW')                                     
+      OPEN (UNIT=1,FILE=FNAME,STATUS='NEW')
 
 *
-*    Initialise strip count.                                                       
+*    Initialise strip count.
 *
 
-      NSTRIP = 0                                                                  
+      NSTRIP = 0
 
-*                                                                                
-*    List in vertical strips each of 30 pixels wide.                                  
+*
+*    List in vertical strips each of 30 pixels wide.
 *
 
-      DO IXS = X1,X2,30                                                            
+      DO IXS = X1,X2,30
 
-*                                                                                
+*
 *       Initialise strip count.
 *
 
-         NSTRIP = NSTRIP + 1                                                        
+         NSTRIP = NSTRIP + 1
 
 *
-*       To save paper a new page is thrown after each                       
-*       strip if there are more than 8 strips.                                             
-*       This is really done to handle the 1-D case!                                             
-*
-                                                                                
-         IF (Y2.GT.8) THEN                                                      
-
-            WRITE (1,'(''1STRIP'',I3,30X,                                       
-     :       ''DIVIDE LISTED VALUES BY'',G12.4/)') NSTRIP,FACTOR          
-
-         ELSE                                                                   
-
-            WRITE(1,'(''0STRIP'',I3,30X,                                        
-     :       ''DIVIDE LISTED VALUES BY'',G12.4/)') NSTRIP,FACTOR         
-
-         END IF                                                                 
-                                                                                
-*
-*       Report first and last X.                                                     
+*       To save paper a new page is thrown after each
+*       strip if there are more than 8 strips.
+*       This is really done to handle the 1-D case!
 *
 
-         IXE = MIN(IXS+29,X2)                                                     
-         LINE = ' '                                                               
-         WRITE (LINE(:12),'(I12)') IXS-1                                        
-         K = 4 + 4 * (IXE-IXS)                                                        
-         WRITE (LINE(K+1:K+8),'(I8)') IXE-1                                       
-         WRITE (1,'(A/)') LINE                                                  
-                                                                                
+         IF (Y2.GT.8) THEN
+
+            WRITE (1,'(''1STRIP'',I3,30X,
+     :       ''DIVIDE LISTED VALUES BY'',G12.4/)') NSTRIP,FACTOR
+
+         ELSE
+
+            WRITE(1,'(''0STRIP'',I3,30X,
+     :       ''DIVIDE LISTED VALUES BY'',G12.4/)') NSTRIP,FACTOR
+
+         END IF
+
 *
-*       Line by line.                                                              
+*       Report first and last X.
 *
 
-         DO IY = Y2,Y1,-1                                                          
-                                                                                
+         IXE = MIN(IXS+29,X2)
+         LINE = ' '
+         WRITE (LINE(:12),'(I12)') IXS-1
+         K = 4 + 4 * (IXE-IXS)
+         WRITE (LINE(K+1:K+8),'(I8)') IXE-1
+         WRITE (1,'(A/)') LINE
+
 *
-*          Reset line buffer.                                                      
+*       Line by line.
 *
 
-            LINE = ' '                                                            
-                                                                                
+         DO IY = Y2,Y1,-1
+
 *
-*          Format line coordinate.                                                    
+*          Reset line buffer.
 *
 
-            WRITE (LINE(:5),'(I5)') IY-1                                        
+            LINE = ' '
 
-*                                                                                
-*          Pixel by pixel.                                                         
+*
+*          Format line coordinate.
 *
 
-            DO IX = IXS,IXE                                                       
-                                                                                
+            WRITE (LINE(:5),'(I5)') IY-1
+
 *
-*             Buffer pointer.                                                      
+*          Pixel by pixel.
 *
 
-               K = 9 + 4 * (IX-IXS)                                                   
-                                                                                
+            DO IX = IXS,IXE
+
+*
+*             Buffer pointer.
+*
+
+               K = 9 + 4 * (IX-IXS)
+
 *
 *             Format pixel.
 *
-                                                        
-               Z = FACTOR*A(IX,IY)                                                
 
-               IF (ABS(Z).GT.1000.0) THEN                           
+               Z = FACTOR*A(IX,IY)
+
+               IF (ABS(Z).GT.1000.0) THEN
 
                   Z = SIGN(Z,1000.0)
 
                ENDIF
 
-               IZ = NINT(Z)                                                       
+               IZ = NINT(Z)
 
-               IF (IZ.LT.-99) THEN                                              
+               IF (IZ.LT.-99) THEN
 
-                  LINE(K:K+3) = '----'                                             
+                  LINE(K:K+3) = '----'
 
-               ELSE IF (IZ.GT.999) THEN                                         
+               ELSE IF (IZ.GT.999) THEN
 
-                       LINE(K:K+3) = '++++'                                             
+                       LINE(K:K+3) = '++++'
 
-               ELSE                                                             
+               ELSE
 
-                  WRITE (LINE(K:K+3),'(I4)') IZ                                 
+                  WRITE (LINE(K:K+3),'(I4)') IZ
 
-               END IF                                                           
-                                                                                
+               END IF
+
 *
-*          Next pixel.                                                          
-*
-
-            END DO                                                              
-                                                                                
-*
-*          Output the line.                                                        
+*          Next pixel.
 *
 
-            WRITE (1,'(A)') LINE                                                
-                                                                                
+            END DO
+
 *
-*       Next line.                                                              
+*          Output the line.
 *
 
-         END DO                                                                 
-                                                                                
+            WRITE (1,'(A)') LINE
+
 *
-*    Next strip.                                                                
+*       Next line.
 *
 
-      END DO                                                                    
-                                                                                
+         END DO
+
+*
+*    Next strip.
+*
+
+      END DO
+
 *
 *    Close report.
 *
-                                                                 
-      WRITE (1,'(''1'')')                                                       
-      CLOSE (UNIT=1)                                                            
-                                                                                
+
+      WRITE (1,'(''1'')')
+      CLOSE (UNIT=1)
+
 *
 *    Exit.
-*                                                                         
-                                                                                
-      END                                                                       
+*
+
+      END

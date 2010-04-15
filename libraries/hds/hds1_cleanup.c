@@ -75,7 +75,7 @@
  */
 
 /* Local Variables:                                                         */
-     struct LCP *lcp; 
+     struct LCP *lcp;
 
 /* Dereference the status pointer.                                          */
      hds_gl_status = *status;

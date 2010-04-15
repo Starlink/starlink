@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -199,7 +199,7 @@ int HtmlUsableHeight(HtmlWidget *htmlPtr){
 /*
 ** Compute a pair of floating point numbers that describe the current
 ** vertical scroll position.  The first number is the fraction of
-** the document that is off the top of the visible region and the second 
+** the document that is off the top of the visible region and the second
 ** number is the fraction that is beyond the end of the visible region.
 */
 void HtmlComputeVerticalPosition(
@@ -286,14 +286,14 @@ static void ClearGcCache(HtmlWidget *htmlPtr){
     }
   }
 }
-  
+
 
 /*
 ** This routine is called when the widget command is deleted.  If the
 ** widget isn't already in the process of being destroyed, this command
 ** starts that process rolling.
 **
-** This routine can be called in two ways.  
+** This routine can be called in two ways.
 **
 **   (1) The window is destroyed, which causes the command to be deleted.
 **       In this case, we don't have to do anything.
@@ -335,13 +335,13 @@ static void HtmlRedrawCallback(ClientData clientData){
   Pixmap pixmap;           /* The buffer on which to render HTML */
   int x, y, w, h;          /* Virtual canvas coordinates of area to draw */
   int hw;                  /* highlight thickness */
-  int insetX, insetY;      /* Total highlight thickness, border width and 
+  int insetX, insetY;      /* Total highlight thickness, border width and
                            ** padx/y */
   int clipwinH, clipwinW;  /* Width and height of the clipping window */
   HtmlBlock *pBlock;       /* For looping over blocks to be drawn */
   int redoSelection = 0;   /* True to recompute the selection */
-  
-  /* 
+
+  /*
   ** Don't bother doing anything if the widget is in the process of
   ** being destroyed.
   */
@@ -354,7 +354,7 @@ static void HtmlRedrawCallback(ClientData clientData){
   **
   ** Calling HtmlLayout() is tricky because HtmlLayout() may invoke one
   ** or more callbacks (thru the "-imagecommand" callback, for instance)
-  ** and these callbacks could, in theory, do nasty things like delete 
+  ** and these callbacks could, in theory, do nasty things like delete
   ** or unmap this widget.  So we have to take precautions:
   **
   **   *  Don't remove the REDRAW_PENDING flag until after HtmlLayout()
@@ -364,7 +364,7 @@ static void HtmlRedrawCallback(ClientData clientData){
   **      being deleted out from under us.
   **
   */
-  if( (htmlPtr->flags & RESIZE_ELEMENTS)!=0 
+  if( (htmlPtr->flags & RESIZE_ELEMENTS)!=0
   && (htmlPtr->flags & STYLER_RUNNING)==0 ){
     HtmlImage *pImage;
     for(pImage=htmlPtr->imageList; pImage; pImage=pImage->pNext){
@@ -385,7 +385,7 @@ static void HtmlRedrawCallback(ClientData clientData){
   ** a complete RELAYOUT.  Someday, we need to fix EXTEND_LAYOUT so
   ** that it works right...
   */
-  if( (htmlPtr->flags & (RELAYOUT|EXTEND_LAYOUT))!=0 
+  if( (htmlPtr->flags & (RELAYOUT|EXTEND_LAYOUT))!=0
   && (htmlPtr->flags & STYLER_RUNNING)==0 ){
     htmlPtr->nextPlaced = 0;
     htmlPtr->nInput = 0;
@@ -524,7 +524,7 @@ static void HtmlRedrawCallback(ClientData clientData){
   insetY = htmlPtr->pady + htmlPtr->inset;
   if( htmlPtr->flags & RESIZE_CLIPWIN ){
     int h, w;
-    Tk_MoveResizeWindow(clipwin, insetX, insetY, 
+    Tk_MoveResizeWindow(clipwin, insetX, insetY,
        htmlPtr->realWidth - 2*insetX,
        htmlPtr->realHeight - 2*insetY);
     if( !Tk_IsMapped(clipwin) ){
@@ -602,18 +602,18 @@ static void HtmlRedrawCallback(ClientData clientData){
     xrec.width = w;
     xrec.height = h;
     XFillRectangles(display, pixmap, gcBg, &xrec, 1);
-                       
+
     /* Render all visible HTML onto the pixmap */
     HtmlLock(htmlPtr);
     for(pBlock=htmlPtr->firstBlock; pBlock; pBlock=pBlock->pNext){
-      if( pBlock->top <= y+h && pBlock->bottom >= y 
+      if( pBlock->top <= y+h && pBlock->bottom >= y
       && pBlock->left <= x+w && pBlock->right >= x ){
         HtmlBlockDraw(htmlPtr,pBlock,pixmap,x,y,w,h);
         if( htmlPtr->tkwin==0 ) break;
       }
     }
     dead = HtmlUnlock(htmlPtr);
-     
+
     /* Finally, copy the pixmap onto the window and delete the pixmap */
     if( !dead ){
       XCopyArea(display, pixmap, Tk_WindowId(clipwin),
@@ -642,9 +642,9 @@ static void HtmlRedrawCallback(ClientData clientData){
         if( imageTop > bottom
          || imageTop + pElem->image.h < top
          || pElem->image.x > right
-         || pElem->image.x + pElem->image.w < left ){ 
-            TestPoint(0); 
-            continue; 
+         || pElem->image.x + pElem->image.w < left ){
+            TestPoint(0);
+            continue;
         }
         HtmlDrawImage(pElem, Tk_WindowId(htmlPtr->clipwin),
                       left, top, right, bottom);
@@ -669,7 +669,7 @@ static void HtmlRedrawCallback(ClientData clientData){
 */
 void HtmlScheduleRedraw(HtmlWidget *htmlPtr){
   if( (htmlPtr->flags & REDRAW_PENDING)==0
-    && htmlPtr->tkwin!=0 
+    && htmlPtr->tkwin!=0
     && Tk_IsMapped(htmlPtr->tkwin)
   ){
     Tcl_DoWhenIdle(HtmlRedrawCallback, (ClientData)htmlPtr);
@@ -679,12 +679,12 @@ void HtmlScheduleRedraw(HtmlWidget *htmlPtr){
 
 /*
 ** If any part of the screen needs to be redrawn, Then call this routine
-** with the values of a box (in window coordinates) that needs to be 
+** with the values of a box (in window coordinates) that needs to be
 ** redrawn.  This routine will make sure an idle callback is scheduled
 ** to do the redraw.
 **
 ** The box coordinates are relative to the clipping window (clipwin),
-** not the main window (tkwin).  
+** not the main window (tkwin).
 */
 void HtmlRedrawArea(
   HtmlWidget *htmlPtr,      /* The widget to be redrawn */
@@ -697,7 +697,7 @@ void HtmlRedrawArea(
   if( left > htmlPtr->realWidth ){ TestPoint(0); return; }
   if( htmlPtr->dirtyTop > top ){ htmlPtr->dirtyTop = top; TestPoint(0);}
   if( htmlPtr->dirtyLeft > left ){ htmlPtr->dirtyLeft = left; TestPoint(0);}
-  if( htmlPtr->dirtyBottom < bottom ){ 
+  if( htmlPtr->dirtyBottom < bottom ){
     htmlPtr->dirtyBottom = bottom;
     TestPoint(0);
   }
@@ -753,7 +753,7 @@ static void HtmlRedrawPush(HtmlWidget *htmlPtr){
 void HtmlRedrawText(HtmlWidget *htmlPtr, int y){
   int yOffset;        /* Top-most visible canvas coordinate */
   int clipHeight;     /* Height of the clipping window */
-  
+
   yOffset = htmlPtr->yOffset;
   clipHeight = HtmlUsableHeight(htmlPtr);
   y -= yOffset;
@@ -1072,7 +1072,7 @@ GC HtmlGetGC(HtmlWidget *htmlPtr, int color, int font){
   int mask;
   Tk_Font tkfont;
 
-  /* 
+  /*
   ** Check for an existing GC.
   */
   if( color < 0 || color >= N_COLOR ){ color = 0; TestPoint(0); }
@@ -1082,7 +1082,7 @@ GC HtmlGetGC(HtmlWidget *htmlPtr, int color, int font){
     if( (font<0 || p->font==font) && p->color==color ){
       if( p->index>1 ){
         for(j=0; j<N_CACHE_GC; j++){
-          if( htmlPtr->aGcCache[j].index 
+          if( htmlPtr->aGcCache[j].index
           && htmlPtr->aGcCache[j].index < p->index ){
             htmlPtr->aGcCache[j].index++;
           }
@@ -1157,7 +1157,7 @@ static void HtmlEventProc(ClientData clientData, XEvent *eventPtr){
         TestPoint(0);
       }else if( eventPtr->xexpose.window!=Tk_WindowId(htmlPtr->tkwin) ){
         /* Exposure in the clipping window */
-        HtmlRedrawArea(htmlPtr, eventPtr->xexpose.x - 1, 
+        HtmlRedrawArea(htmlPtr, eventPtr->xexpose.x - 1,
                    eventPtr->xexpose.y - 1,
                    eventPtr->xexpose.x + eventPtr->xexpose.width + 1,
                    eventPtr->xexpose.y + eventPtr->xexpose.height + 1);
@@ -1188,7 +1188,7 @@ static void HtmlEventProc(ClientData clientData, XEvent *eventPtr){
       break;
     case ConfigureNotify:
       if( htmlPtr->tkwin!=0
-       && eventPtr->xconfigure.window==Tk_WindowId(htmlPtr->tkwin) 
+       && eventPtr->xconfigure.window==Tk_WindowId(htmlPtr->tkwin)
       ){
         p = (XConfigureRequestEvent*)eventPtr;
         if( p->width != htmlPtr->realWidth ){
@@ -1285,7 +1285,7 @@ Tk_Font HtmlGetFont(
 
     name[0] = 0;
 
-    /* Run the -fontcommand if it is specified 
+    /* Run the -fontcommand if it is specified
     */
     if( htmlPtr->zFontCommand && htmlPtr->zFontCommand[0] ){
       int iFam;           /* The font family index.  Value between 0 and 7 */
@@ -1320,7 +1320,7 @@ Tk_Font HtmlGetFont(
         return NULL;
       }
       if( rc!=TCL_OK ){
-        Tcl_AddErrorInfo(htmlPtr->interp, 
+        Tcl_AddErrorInfo(htmlPtr->interp,
               "\n    (-fontcommand callback of HTML widget)");
         Tcl_BackgroundError(htmlPtr->interp);
       }else{
@@ -1369,19 +1369,19 @@ Tk_Font HtmlGetFont(
     */
     htmlPtr->aFont[iFont] = Tk_GetFont(htmlPtr->interp, htmlPtr->tkwin, name);
     if( htmlPtr->aFont[iFont]==0 ){
-      Tcl_AddErrorInfo(htmlPtr->interp, 
+      Tcl_AddErrorInfo(htmlPtr->interp,
               "\n    (trying to create a font named \"");
       Tcl_AddErrorInfo(htmlPtr->interp, name);
       Tcl_AddErrorInfo(htmlPtr->interp, "\" in the HTML widget)");
       Tcl_BackgroundError(htmlPtr->interp);
-      htmlPtr->aFont[iFont] = 
+      htmlPtr->aFont[iFont] =
        Tk_GetFont(htmlPtr->interp, htmlPtr->tkwin, "fixed");
     }
     if( htmlPtr->aFont[iFont]==0 ){
       Tcl_AddErrorInfo(htmlPtr->interp,
               "\n    (trying to create font \"fixed\" in the HTML widget)");
       Tcl_BackgroundError(htmlPtr->interp);
-      htmlPtr->aFont[iFont] = 
+      htmlPtr->aFont[iFont] =
        Tk_GetFont(htmlPtr->interp, htmlPtr->tkwin, "helvetica -12");
     }
     FontSetValid(htmlPtr, iFont);
@@ -1498,7 +1498,7 @@ int HtmlGetDarkShadowColor(HtmlWidget *htmlPtr, int iBgColor){
   }
   return htmlPtr->iDark[iBgColor] - 1;
 }
-	
+
 /*
 ** Check to see if the given color is too light to be easily distinguished
 ** from white.
@@ -1554,7 +1554,7 @@ LOCAL int GetColorByValue(HtmlWidget *htmlPtr, XColor *pRef){
   b = pRef->blue &= COLOR_MASK;
   for(i=0; i<N_COLOR; i++){
     XColor *p = htmlPtr->apColor[i];
-    if( p && (p->red & COLOR_MASK)==r && (p->green & COLOR_MASK)==g 
+    if( p && (p->red & COLOR_MASK)==r && (p->green & COLOR_MASK)==g
     && (p->blue & COLOR_MASK)==b ){
       htmlPtr->colorUsed |= (1<<i);
       return i;
@@ -1661,20 +1661,20 @@ void HtmlVerticalScroll(HtmlWidget *htmlPtr, int yOffset){
   htmlPtr->flags |= VSCROLL;
   htmlPtr->yOffset = yOffset;
   if( diff < 0 ){
-    XCopyArea(htmlPtr->display, 
+    XCopyArea(htmlPtr->display,
             Tk_WindowId(htmlPtr->clipwin),    /* source */
             Tk_WindowId(htmlPtr->clipwin),    /* destination */
-            gc, 
+            gc,
             0, -diff,                         /* source X, Y */
             w, h + diff,                      /* Width and height */
             0, 0);                            /* Destination X, Y */
     HtmlRedrawArea(htmlPtr, 0, h + diff, w, h);
     TestPoint(0);
   }else{
-    XCopyArea(htmlPtr->display, 
+    XCopyArea(htmlPtr->display,
             Tk_WindowId(htmlPtr->clipwin),    /* source */
             Tk_WindowId(htmlPtr->clipwin),    /* destination */
-            gc, 
+            gc,
             0, 0,                             /* source X, Y */
             w, h - diff,                      /* Width and height */
             0, diff);                         /* Destination X, Y */
@@ -1700,7 +1700,7 @@ void HtmlHorizontalScroll(HtmlWidget *htmlPtr, int xOffset){
 /*
 ** The following array defines all possible widget command.  The main
 ** widget command function just parses up the command line, then vectors
-** control to one of the command service routines defined in the 
+** control to one of the command service routines defined in the
 ** following array:
 */
 static struct HtmlSubcommand {
@@ -1766,7 +1766,7 @@ static int HtmlWidgetCommand(
   c = argv[1][0];
   length = strlen(argv[1]);
   for(i=0, pCmd=aSubcommand; i<nSubcommand; i++, pCmd++){
-    if( pCmd->zCmd1==0 || c!=pCmd->zCmd1[0] 
+    if( pCmd->zCmd1==0 || c!=pCmd->zCmd1[0]
     || strncmp(pCmd->zCmd1,argv[1],length)!=0 ){
       TestPoint(0);
       continue;
@@ -1823,8 +1823,8 @@ static int HtmlWidgetCommand(
   Tcl_AppendResult(interp,"unknown command \"", argv[1], "\" -- should be "
     "one of:", 0);
   for(i=0; i<nSubcommand; i++){
-    if( aSubcommand[i].zCmd1==0 || aSubcommand[i].zCmd1[0]=='_' ){ 
-      TestPoint(0); 
+    if( aSubcommand[i].zCmd1==0 || aSubcommand[i].zCmd1[0]=='_' ){
+      TestPoint(0);
       continue;
     }
     Tcl_AppendResult(interp, " ", aSubcommand[i].zCmd1, 0);
@@ -1903,7 +1903,7 @@ static int HtmlCommand(
       HtmlWidgetCommand, (ClientData)htmlPtr, HtmlCmdDeletedProc);
     Tcl_CreateCommand(interp, htmlPtr->zClipwin,
       HtmlWidgetCommand, (ClientData)htmlPtr, HtmlCmdDeletedProc);
-    
+
     Tk_SetClass(new,"Html");
     Tk_SetClass(clipwin,"HtmlClip");
     Tk_CreateEventHandler(htmlPtr->tkwin,
@@ -1975,7 +1975,7 @@ static int HtmlCommand(
       "reformat urljoin urlsplit", 0);
     return TCL_ERROR;
   }
-  return TCL_OK;   
+  return TCL_OK;
 }
 
 /*
@@ -2006,7 +2006,7 @@ DLL_EXPORT int Tkhtml_Init(Tcl_Interp *interp){
     return TCL_ERROR;
   }
 #endif
-  Tcl_CreateCommand(interp,"html", HtmlCommand, 
+  Tcl_CreateCommand(interp,"html", HtmlCommand,
       Tk_MainWindow(interp), 0);
   /* Tcl_GlobalEval(interp,HtmlLib); */
 #ifdef DEBUG

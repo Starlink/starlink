@@ -44,7 +44,7 @@
 *        Name of an ADAM parameter supplying the name of the destination
 *        frame if TRTYPE is WCS.
 *     IWCSF = INTEGER (Given)
-*        NDF identifier for NDF containing WCS information if TRTYPE is 
+*        NDF identifier for NDF containing WCS information if TRTYPE is
 *        WCS and INEXT is false.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -93,10 +93,10 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-  
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message system parameters
@@ -141,7 +141,7 @@
          CALL CCD1_TROUT( TR, 0, .FALSE., STATUS )
 
 *  Transformation given as a expression.
-      ELSE IF ( TRTYPE .EQ. 'EXPRES' ) THEN 
+      ELSE IF ( TRTYPE .EQ. 'EXPRES' ) THEN
          CALL CCD1_MSG( ' ',
      : '  Transformation defined by the expressions:', STATUS )
          CALL MSG_SETC( 'XMAP', XMAP )
@@ -153,7 +153,7 @@
 
       ELSE IF ( TRTYPE .EQ. 'WCS' ) THEN
 
-*  Transformation derived from a WCS component of an NDF.  This is 
+*  Transformation derived from a WCS component of an NDF.  This is
 *  either the WCS component of each NDF or from one which serves all.
 *  Print frame identifiers.
          CALL PAR_GET0C( FR1PAR, FR1, STATUS )
@@ -170,16 +170,16 @@
             CALL MSG_SETC( 'FR2', 'frame ' // FR2 )
          END IF
          CALL MSG_SETC( 'FR1', 'frame ' // FR1 )
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      : '  Transformation is the mapping from ^FR1 to ^FR2', STATUS )
 
 *  Print name of single WCS containing file or alternative as appropriate.
          IF ( INEXT ) THEN
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      : '  in the WCS component of each NDF.', STATUS )
-         ELSE 
+         ELSE
             CALL NDF_MSG( 'WCSFIL', IWCSF )
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      : '  in the WCS component of NDF ^WCSFIL.', STATUS )
          END IF
 
@@ -210,7 +210,7 @@
             CALL DAT_MSG( 'OBJ', LOCTR )
             CALL CCD1_MSG( ' ', '    ^OBJ', STATUS )
          END IF
-      END IF 
+      END IF
 
 *  Error status exit.
  99   CONTINUE

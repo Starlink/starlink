@@ -55,10 +55,10 @@ $pcdmap->Set("PcdCen(1)" => 25, "PcdCen(2)" => 50 );
 my %attribs = $pcdmap->Get("PcdCen", "Disco");
 is( $attribs{'Disco'}, 1, "Disco attribute of pcdmap through hash");
 is( $attribs{'PcdCen'}, 25, "PcdCen(1) attribute of pcdmap through hash");
-      
+
 my $disco = $pcdmap->Get("Disco");
-is( $disco, 1, "Disco attribute of pcdmap through scalar context");      
-            
+is( $disco, 1, "Disco attribute of pcdmap through scalar context");
+
 my %attribs2 = $pcdmap->Get("PcdCen(1)", "PcdCen(2)");
 is( $attribs2{'PcdCen(1)'}, 25, "PcdCen(1) attribute of pcdmap through hash");
 is( $attribs2{'PcdCen(2)'}, 50, "PcdCen(2) attribute of pcdmap through hash");

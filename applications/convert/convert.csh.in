@@ -199,7 +199,7 @@ $NDF_FORMATS_OUT',FITSGZ(.fts.gz),FITSGZ(.fits.gz)'
 
 #  FITS conversions
 #  ----------------
-#  Because NDF2FITS uses HDS_WILD which will only accept container files 
+#  Because NDF2FITS uses HDS_WILD which will only accept container files
 #  as input, NDF_TEMP_FITS must specify an alternative to the default
 #  HDS scratch file.
 if ( $?HDS_SCRATCH ) then
@@ -343,7 +343,7 @@ if ( $?HDS_SCRATCH ) then
 else
    setenv NDF_TEMP_COMPRESSED 'temp_Z_^name'
 endif
- 
+
 #  GZIP compression conversions
 #  ----------------------------
 setenv NDF_FROM_GZIP \
@@ -359,7 +359,7 @@ if ( $?HDS_SCRATCH ) then
 else
    setenv NDF_TEMP_GZIP 'temp_gz_^name'
 endif
- 
+
 #  FITSGZ FITS compression conversions
 #  -----------------------------------
 setenv NDF_FROM_FITSGZ \
@@ -375,7 +375,7 @@ if ( $?HDS_SCRATCH ) then
 else
    setenv NDF_TEMP_FITSGZ 'temp_fgz_^name'
 endif
- 
+
 #  DEBUG
 #  -----
 #  Switch off display all conversion operations for debugging.
@@ -389,7 +389,7 @@ if ( ${?IDL_PATH} ) then
       setenv IDL_DLM_PATH ${IDL_DLM_PATH}:$CONVERT_DIR
    else
       setenv IDL_DLM_PATH $CONVERT_DIR
-   endif         
+   endif
 endif
 
 #

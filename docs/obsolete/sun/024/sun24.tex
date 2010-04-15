@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -114,14 +114,14 @@ paper.
 
 The GREYCELL program, which runs in the Starlink Interim Environment, is
 designed to produce a grey scale representation of a Starlink image file on
-raster graphics devices known to GKS 7.2, for example the Sigmex ARGS and the 
+raster graphics devices known to GKS 7.2, for example the Sigmex ARGS and the
 Canon laser printer.
-Vector graphics devices such as Tektronix 4010 emulators cannot be used. 
+Vector graphics devices such as Tektronix 4010 emulators cannot be used.
 
 \subsection{Imaging Method}
 
-The program makes use of the imaging capability provided by the cell array 
-plotting facility of GKS, which plots a greyscale or colour image by 
+The program makes use of the imaging capability provided by the cell array
+plotting facility of GKS, which plots a greyscale or colour image by
 reference to the GKS colour table for the selected device.
 The image pixel values are therefore scaled by GREYCELL so that they become
 integers within the  range of the colour table.
@@ -138,10 +138,10 @@ The histogram is automatically stretched and rebinned to enable the best curve
 fit over the range of grey tones addressable on the selected device.
 The whole grey scale may be optionally biased towards white or black.
 
-The options of a simple linear or logarithmic grey scale between selected 
-limits are also offered. 
- 
-The manner in which the grey tones are rendered depends on the device 
+The options of a simple linear or logarithmic grey scale between selected
+limits are also offered.
+
+The manner in which the grey tones are rendered depends on the device
 type.
 For example, on the Sigmex ARGS each pixel of the image is mapped to one pixel
 on the display.
@@ -207,9 +207,9 @@ CPU time (high contrast method) & 1 min 50 sec\cr
 CPU time (linear method) & 1 min 47 sec\cr
 Canon plot file size & 1524 blocks\cr
 Plotting time on Canon (theoretical) & 11 min\cr
-}}$$ 
-The theoretical plotting time on the Canon is based on a line speed of 9600 
-baud. In practice however, installation-dependent factors can increase the time 
+}}$$
+The theoretical plotting time on the Canon is based on a line speed of 9600
+baud. In practice however, installation-dependent factors can increase the time
 by as much as 100\%.
 
 \section {EDRS --- Electronography Data Reduction System}
@@ -288,7 +288,7 @@ image display and handling on ARGS displays.
 The programs which produce line graphics have been re-written to support all
 GKS 7.2 graphics devices, and the image handling programs have been modified to
 use Digisolve IKON displays as well as ARGS displays.
-The on-line help library has also been updated to describe the new facilities. 
+The on-line help library has also been updated to describe the new facilities.
 
 \section {EDRSX --- An extension to EDRS}
 
@@ -350,12 +350,12 @@ To use EDRS and EDRSX, start up the DSCL command language by typing
 \begin{verbatim}
     $ DSCL
 \end{verbatim}
-The prompt should then become Dscl$>$ . Now type 
+The prompt should then become Dscl$>$ . Now type
 \begin{verbatim}
     Dscl>  GO EDRSX
 \end{verbatim}
 A page of introductory information should then be displayed and the prompt
-becomes EDRSX$>$. 
+becomes EDRSX$>$.
 (The significance of the prompt is purely informational.
 In fact, DSCL is still the current command language.)
 The introductory text should be read at least once, but when a user considers
@@ -1399,7 +1399,7 @@ multiplies a FFT image frame by a {\em sinc} function.
 You supply a value A, say, which is used to derive the {\em sinc} function.
 Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
 \begin{displaymath}
-B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} + 
+B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} +
 (Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
 \end{displaymath}
 \end{description}

@@ -10,14 +10,14 @@
 #     Unix C-shell
 
 #  Invocation:
-#     pazo [-d device] 
+#     pazo [-d device]
 
 #  Description:
-#     This script allows the user to explore a displayed NDF by displaying 
-#     a series of sections from the NDF, selected using the cursor. 
+#     This script allows the user to explore a displayed NDF by displaying
+#     a series of sections from the NDF, selected using the cursor.
 #
-#     Clicking the left mouse button twice over the displayed image defines 
-#     a rectangular sub-section of the image to be re-displayed. This may be 
+#     Clicking the left mouse button twice over the displayed image defines
+#     a rectangular sub-section of the image to be re-displayed. This may be
 #     done repeatedly, resulting in a series of sections being displayed
 #     (i.e. zoom in).
 #
@@ -94,7 +94,7 @@
           set devname = $args[1]
           shift args
           breaksw
-       case *:         
+       case *:
           echo "Usage: pazo [-d device]"
           exit
        endsw
@@ -116,13 +116,13 @@
 
 #  Get the name of the displayed NDF, without any trailing section
 #  specifier. First split the total string into two words (the NDF name
-#  and the section specifier) by putting a space in front of any parenthesis. 
+#  and the section specifier) by putting a space in front of any parenthesis.
 #  Then save the first word as the NDF name.
      set list = `echo $stack | sed -e 's#(# (#'`
      set ndf = $list[1]
 
 #  Loop until less than 2 positons are given.
-     while ( $again == 1 ) 
+     while ( $again == 1 )
 
 #  Allow the user to give another single point using the cursor.
         cursor nodescribe device=$devname frame=pixel noinfo maxpos=1 \
@@ -152,7 +152,7 @@
 #  If there is more than one section on the stack, remove the section just
 #  displayed. We always leave the originally dispalyed NDF section on the
 #  stack.
-              if( $#stack > 1 ) then           
+              if( $#stack > 1 ) then
                  shift stack
               endif
 
@@ -194,7 +194,7 @@
            gdclear current device=$devname
 
 #  Redisplay the selected section of the ndf. Discard text output.
-           display $section accept > /dev/null 
+           display $section accept > /dev/null
 
        endif
     end

@@ -1,21 +1,21 @@
       SUBROUTINE GET_PARAMD(NAME,VL,OK,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C    G E T _ P A R A M D
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NAME (<), VL (>), OK (>), OUT_LU (<)
 C
-C History: 
-C  
+C History:
+C
 C   May 1994 Created
-C 
+C
 C
 C Obtains the value of a double precision parameter from the user
 C

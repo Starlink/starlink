@@ -8,8 +8,8 @@ C
 C   Description
 C   -----------
 C   Calculates the moments (total flux, position, variance, skewness,
-C   and kurtosis) of spectral emission components in a ZXY-sorted image. 
-C   The spectra may be binned in the spatial directions to improve 
+C   and kurtosis) of spectral emission components in a ZXY-sorted image.
+C   The spectra may be binned in the spatial directions to improve
 C   signal/noise. A mask image may be used to avoid parts of the image.
 C   The moments results are written to a results structure.
 C
@@ -54,19 +54,19 @@ C   Keywords
 C   --------
 C   USEMASK  If specified, a mask image is used to select spectra.
 C
-C   FINDSEQ  If specified, the spectrum will be searched from the first pixel 
-C            and peaks will be processed in the sequence in which they are 
+C   FINDSEQ  If specified, the spectrum will be searched from the first pixel
+C            and peaks will be processed in the sequence in which they are
 C            encountered. A peak is identified if the flux rises to a maximum
-C            and then drops below THRESH. The WIDTH of peaks and the GAP 
+C            and then drops below THRESH. The WIDTH of peaks and the GAP
 C            between them will be used to avoid areas where valid peaks are not
-C            likely to be found. If FINDSEQ is not specified, peaks will be 
+C            likely to be found. If FINDSEQ is not specified, peaks will be
 C            located by finding the maximum pixel in the spectrum. A number of
 C            pixels around the peak, governed by WIDTH, will then be masked and
-C            the next maximum will be found among the pixels remaining. 
+C            the next maximum will be found among the pixels remaining.
 C            (hidden keyword).
-C                       
+C
 C   WEIGHT   Flag to determine whether to weight statistics with variance
-C            values (if applicable). 
+C            values (if applicable).
 C
 C   Propagation of data structure
 C   -----------------------------
@@ -84,26 +84,26 @@ C   - If a mask image is requested, the dimensions of its data array must
 C     match the dimensions of IMAGE which have been designated X and Y, in
 C     this case dimensions 2 and 3 since IMAGE is ZXY-sorted.
 C   - The results structure for MOMENTS is created.
-C   - The IMAGE data array may be binned in the spatial dimensions to 
+C   - The IMAGE data array may be binned in the spatial dimensions to
 C     improve signal/noise. The bin average is computed at each pixel in the
 C     spectral dimension. MOMENTS_MASKBIN performs binning and masking. If
-C     masking is requested, a spectrum only contributes to the average in 
-C     a bin if the relevant MASK pixel is clear, i.e. non-magic. A 3-D work 
-C     array containing the binned and/or masked data is used in subsequent 
-C     operations. If the binning interval is 1 and a mask is not used, 
-C     MOMENTS_MASKBIN is skipped and the IMAGE array is mapped directly. 
+C     masking is requested, a spectrum only contributes to the average in
+C     a bin if the relevant MASK pixel is clear, i.e. non-magic. A 3-D work
+C     array containing the binned and/or masked data is used in subsequent
+C     operations. If the binning interval is 1 and a mask is not used,
+C     MOMENTS_MASKBIN is skipped and the IMAGE array is mapped directly.
 C   - Once the masking has been done, the MASK array is unmapped and the
-C     structure is closed. This is because the maximum number of structures 
-C     which may be referenced at one time is eight, set by the MAX_REFS 
+C     structure is closed. This is because the maximum number of structures
+C     which may be referenced at one time is eight, set by the MAX_REFS
 C     parameter in the DSA common block.
-C   - Peaks may be found in two ways. MOMENTS_FINDMAX locates a peak by 
-C     looking for the maximum pixel over the whole spectrum, regardless of 
-C     where it is. MOMENTS_FINDSEQ starts at pixel 1 and identifies a peak 
-C     if the flux rises to a maximum and then drops below the required 
-C     threshold. The first method is more commonly used, but if there are 
-C     two or more emissions of more or less equal strength, the second 
-C     delivers them in a definite order. Once a peak has been found, both 
-C     routines store the pixel number of its maximum value in a 2-D work 
+C   - Peaks may be found in two ways. MOMENTS_FINDMAX locates a peak by
+C     looking for the maximum pixel over the whole spectrum, regardless of
+C     where it is. MOMENTS_FINDSEQ starts at pixel 1 and identifies a peak
+C     if the flux rises to a maximum and then drops below the required
+C     threshold. The first method is more commonly used, but if there are
+C     two or more emissions of more or less equal strength, the second
+C     delivers them in a definite order. Once a peak has been found, both
+C     routines store the pixel number of its maximum value in a 2-D work
 C     array, and then mask the required width of spectrum around the peak by
 C     flagging the corresponding pixels in a 3-D work array.
 C
@@ -117,9 +117,9 @@ C     DSA_INPUT
 C     DSA_MAP_AXIS_DATA
 C     DSA_MAP_DATA
 C     DSA_MAP_VARIANCE
-C     DSA_OPEN         
+C     DSA_OPEN
 C     DSA_SEEK_ERRORS
-C     DSA_SEEK_QUALITY                              
+C     DSA_SEEK_QUALITY
 C     DSA_SIMPLE_OUTPUT
 C     DSA_TYPESIZE
 C     DSA_UNMAP
@@ -145,7 +145,7 @@ C
 C   Library PAR:
 C     PAR_RDCHAR
 C     PAR_RDKEY
-C     
+C
 C   Library VAR:
 C     VAR_GETNUM
 C     VAR_SETNUM
@@ -172,7 +172,7 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
-C                                             
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -202,7 +202,7 @@ C                   the usual quality and error array processing. (GOLDJIL)
 C
 C   16-MAR-1992   - Got rid of DSA_ACTNAME and replaced DSA_CFILLx's with
 C                   GEN_FILL's.
-C   
+C
 C   02-DEC-1992   - Unix version.
 C   06-OCT-1994   - Unused variables removed. (GJP)
 C   10-OCT-1994   - Added section setting up workspace for
@@ -216,11 +216,11 @@ C   Functions used.
 C
       CHARACTER ICH_CI*8
       INTEGER   DSA_TYPESIZE,DYN_ELEMENT,ICH_ENCODE,ICH_LEN
-C                                                             
+C
 C   Local variables.
 C
       CHARACTER ACT_NAME*128      ! Actual full structure name
-      INTEGER   ADDRESS           ! Address of dynamic memory element   
+      INTEGER   ADDRESS           ! Address of dynamic memory element
       INTEGER   AXPTR             ! Dynamic pointer to spectral axis
       INTEGER   AXSLOT            ! Map slot number for spectral axis
       LOGICAL   BADPIX            ! Value of bad pixel flag in IMAGE
@@ -232,7 +232,7 @@ C
       INTEGER   BYTES             ! How many bytes does sir/madam require?
       CHARACTER CHCOMP            ! Component number as character string
       INTEGER   CMPPTR            ! Dynamic pointer to component count array
-      INTEGER   CMPSLOT           ! Map slot number of count array 
+      INTEGER   CMPSLOT           ! Map slot number of count array
       INTEGER   DIMS(10)          ! Dimensions of IMAGE
       INTEGER   DUMINT            ! INTEGER dummy variable
       REAL      DUMREAL           ! REAL dummy variable
@@ -279,12 +279,12 @@ C
       INTEGER   VBINPTR           ! Dynamic pointer to variance bin array
       INTEGER   VBINSLOT          ! Map slot number for variance bin array
       LOGICAL   WEIGHT            ! Use normal or weighted means?
-      REAL      WIDTH             ! Width of peak in pixels    
+      REAL      WIDTH             ! Width of peak in pixels
       INTEGER   WRKPTR            ! Dynamic pointer to workspace array
       INTEGER   WRKSLOT           ! Map slot number for workspace array
       INTEGER   XYAXES(2)         ! Image axes which represent X and Y dims
 C
-      INCLUDE 'DYNAMIC_MEMORY'                          
+      INCLUDE 'DYNAMIC_MEMORY'
       INCLUDE 'MAGIC_VALUES'
       INCLUDE 'NUMERIC_RANGES'
 C
@@ -292,7 +292,7 @@ C
 C
 C   Initialize.
 C
-      XYAXES(1)=2                
+      XYAXES(1)=2
       XYAXES(2)=3
       TITLE(1)='Total flux (zeroth moment)'
       TITLE(2)='Peak position (first moment)'
@@ -307,17 +307,17 @@ C
 C
 C   Open file for IMAGE.
 C
-      CALL DSA_INPUT('IMAGE','IMAGE',STATUS)                         
+      CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
-C   Get information about IMAGE, which must be ZXY-sorted. The user must verify 
+C   Get information about IMAGE, which must be ZXY-sorted. The user must verify
 C   this by looking at the output from NDP_GET_IMAGE_INFO.
-C                                      
+C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.FALSE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
 C   Get dimensions of IMAGE data array.
-C                    
+C
       CALL DSA_DATA_SIZE('IMAGE',3,NDIM,DIMS,NELM,STATUS)
       IF(STATUS.NE.0)GO TO 500
       IF(NDIM.LT.3)THEN
@@ -334,15 +334,15 @@ C
 C   Use magic values even if quality is present
 C
       IF (QUAL) BADPIX=.TRUE.
-      IF (ERR) 
+      IF (ERR)
      &  CALL PAR_RDKEY('WEIGHT',.TRUE.,WEIGHT)
 C
 C   Get instruction to use a mask image.
 C
       CALL PAR_RDKEY('USEMASK',.FALSE.,USEMASK)
-C                      
+C
 C   Open file for mask image and check that its dimensions match those of the
-C   image to be processed.  
+C   image to be processed.
 C
       IF(USEMASK)THEN
         CALL PAR_RDCHAR('MASK',' ',MSKFILE)
@@ -359,27 +359,27 @@ C
       CALL PAR_RDKEY('FINDSEQ',.FALSE.,FINDSEQ)
       FINDMAX=.NOT.FINDSEQ
 C
-C   Get number of peaks to be found.            
-C                    
+C   Get number of peaks to be found.
+C
       CALL PAR_RDVAL('PEAKS',1.0,8.0,1.0,' ',DUMREAL)
       PEAKS=INT(DUMREAL)
 C
-C   Get threshold pixel value.            
+C   Get threshold pixel value.
 C
       CALL PAR_RDVAL('THRESH',0.0,MAX_FLOAT,100.0,' ',THRESH)
 C
 C   Get peak width.
-C                               
+C
       CALL PAR_RDVAL('WIDTH',0.0,MAX_FLOAT,10.0,' ',WIDTH)
 C
 C   Get peak separation if finding peaks in sequence from pixel 1.
-C                               
+C
       IF(FINDSEQ)THEN
         CALL PAR_RDVAL('GAP',0.0,MAX_FLOAT,10.0,' ',GAP)
       END IF
 C
 C   Get binning factor.
-C                               
+C
       CALL PAR_RDVAL('BIN',1.0,180.0,1.0,' ',DUMREAL)
       BIN=INT(DUMREAL)
 C
@@ -388,11 +388,11 @@ C
       BINDIMS(1)=DIMS(1)
       BINDIMS(2)=DIMS(2)/BIN
       BINDIMS(3)=DIMS(3)/BIN
-      BINNELM=1  
+      BINNELM=1
       DO I=1,3
         BINNELM=BINNELM*BINDIMS(I)
       END DO
-C     
+C
 C   Open file for results structure.
 C
       CALL DSA_OUTPUT('RESULTS','RESULTS',' ',1,1,STATUS)
@@ -400,7 +400,7 @@ C
       OPTIONS='D,E,'
       DO I=3,4
         OPTIONS=OPTIONS//'A'//ICH_CI(I)//'['//ICH_CI(DIMS(I-1))//'],'
-      END DO 
+      END DO
       RESDIMS(1)=NPAR
       RESDIMS(2)=PEAKS
       RESDIMS(3)=DIMS(2)
@@ -410,8 +410,8 @@ C
 C
 C   Map IMAGE data array. If the image is to be masked or binned, map it in its
 C   own data type. The MOMENTS_MASKBIN_* routine will transfer it to a REAL
-C   array. If neither masking nor binning is required, map the data array as 
-C   FLOAT and assign it the BINPTR pointer, so as to pretend that it has been 
+C   array. If neither masking nor binning is required, map the data array as
+C   FLOAT and assign it the BINPTR pointer, so as to pretend that it has been
 C   through the masking/binning routine.
 C
       CALL DSA_USE_FLAGGED_VALUES('IMAGE',STATUS)
@@ -453,14 +453,14 @@ C
 C   Map the spectral axis of IMAGE.
 C
       CALL DSA_MAP_AXIS_DATA
-     &  ('IMAGE',1,'READ','FLOAT',ADDRESS,AXSLOT,STATUS)                 
+     &  ('IMAGE',1,'READ','FLOAT',ADDRESS,AXSLOT,STATUS)
       IF(STATUS.NE.0)GO TO 500
       AXPTR=DYN_ELEMENT(ADDRESS)
 C
 C   Get workspace for binned data array. This 3-D REAL array contains the image
 C   data after it has been rebinned in X and Y.
 C
-      IF(BIN.GT.1)THEN                
+      IF(BIN.GT.1)THEN
         ELEM=DSA_TYPESIZE('FLOAT',STATUS)
         CALL DSA_GET_WORKSPACE(BINNELM*ELEM,ADDRESS,BINSLOT,STATUS)
         IF(STATUS.NE.0)GO TO 500
@@ -474,9 +474,9 @@ C
           VBINPTR=DYN_ELEMENT(ADDRESS)
         END IF
       END IF
-C     
-C   Get workspace for peak position array and initialize it with zeros. This 
-C   2-D INTEGER array contains the pixel number at which the current peak is 
+C
+C   Get workspace for peak position array and initialize it with zeros. This
+C   2-D INTEGER array contains the pixel number at which the current peak is
 C   found.
 C
       ELEM=DSA_TYPESIZE('INT',STATUS)
@@ -486,10 +486,10 @@ C
       PKPTR=DYN_ELEMENT(ADDRESS)
       BYTES=BINDIMS(2)*BINDIMS(3)*DSA_TYPESIZE('INT',STATUS)
       CALL GEN_FILL(BYTES,0,DYNAMIC_MEM(PKPTR))
-C     
+C
 C   Get workspace for usage array and initialize it with zeros. This 3-D BYTE
-C   array is a mask indicating which pixels in each spectrum have been used in 
-C   moments computation. It is only used when peaks are to be found at overall 
+C   array is a mask indicating which pixels in each spectrum have been used in
+C   moments computation. It is only used when peaks are to be found at overall
 C   maxima.
 C
       IF(FINDMAX)THEN
@@ -503,7 +503,7 @@ C
       END IF
 C
 C   Get workspace for spectrum array. This 1-D REAL array contains the spectrum
-C   or average binned spectrum from which moments will be computed. 
+C   or average binned spectrum from which moments will be computed.
 C
       ELEM=DSA_TYPESIZE('FLOAT',STATUS)
       CALL DSA_GET_WORKSPACE(DIMS(1)*ELEM,ADDRESS,SPSLOT,STATUS)
@@ -511,9 +511,9 @@ C
       SPPTR=DYN_ELEMENT(ADDRESS)
 C
 C   Get workspace for validity array. This 1-D INTEGER*2 array flags the valid,
-C   i.e. not magic value, pixels in the spectrum array. It is used in the 
-C   computation of the average value at each binned pixel. 
-C                    
+C   i.e. not magic value, pixels in the spectrum array. It is used in the
+C   computation of the average value at each binned pixel.
+C
       ELEM=DSA_TYPESIZE('SHORT',STATUS)
       CALL DSA_GET_WORKSPACE(DIMS(1)*ELEM,ADDRESS,VALSLOT,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -526,16 +526,16 @@ C
       IF (STATUS.NE.0)GO TO 500
       WRKPTR=DYN_ELEMENT(ADDRESS)
 
-C    
+C
 C   Get workspace for component count
-C    
+C
       ELEM=DSA_TYPESIZE('BYTE',STATUS)
       CALL DSA_GET_WORKSPACE(DIMS(2)*DIMS(3)*ELEM,ADDRESS,
      : CMPSLOT,STATUS)
       IF (STATUS.NE.0)GO TO 500
       CMPPTR=DYN_ELEMENT(ADDRESS)
-      CALL GEN_FILL(DIMS(2)*DIMS(3)*ELEM,0,DYNAMIC_MEM(CMPPTR))  
- 
+      CALL GEN_FILL(DIMS(2)*DIMS(3)*ELEM,0,DYNAMIC_MEM(CMPPTR))
+
 C
 C   If a mask is being used, map its data array as FLOAT (this covers all
 C   likely types of mask). Otherwise, map 4 bytes of dummy workspace.
@@ -554,7 +554,7 @@ C
       END IF
 C
 C   Mask and/or bin the image data and variance arrays if required.
-C  
+C
       IF(USEMASK .OR. BIN.GT.1)THEN
         CALL DSA_WRUSER('Masking and/or binning arrays...\\N')
         IF(TYPE.EQ.'SHORT')THEN
@@ -618,7 +618,7 @@ C
         RVPTR=DYN_ELEMENT(ADDRESS)
 
 C
-C   - extract the necessary information for each 
+C   - extract the necessary information for each
 C
       DO ICOMP=1,PEAKS
 C
@@ -663,10 +663,10 @@ C
      &         BINDIMS(1),BINDIMS(2),BINDIMS(3),THRESH,WIDTH,GAP,BIN)
           END IF
         END IF
-C    
+C
 C   - compute moments.
-C                           
-        CALL DSA_WRUSER('Computing moments...\\N')               
+C
+        CALL DSA_WRUSER('Computing moments...\\N')
         IF(.NOT.BADPIX)THEN
           IF (WEIGHT) THEN
             CALL MOMENTS_COMPUTE_RV
@@ -707,9 +707,9 @@ C
         CALL DSA_UNMAP(RSLOT,STATUS)
 C
       END DO
-C                      
-C   If a mask is being used, open the file and map the data array again. This 
-C   daft exercise is necessitated by the limited number of reference slots. 
+C
+C   If a mask is being used, open the file and map the data array again. This
+C   daft exercise is necessitated by the limited number of reference slots.
 C   Otherwise, map four bytes of dummy workspace as before.
 C
       IF(USEMASK)THEN
@@ -728,17 +728,17 @@ C
       END IF
 C
 C   Tidy and exit.
-C                                       
+C
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
-C           
+C
       END
 
 
 
       SUBROUTINE MOMENTS_COMPUTE_RQ
      &  (BINNED,PEAKPOS,AXIS,RESULTS,RESVARS,
-     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)       
+     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)
 C
       IMPLICIT NONE
 C
@@ -756,17 +756,17 @@ C
      &            RESULTS(NPAR,NY,NZ,PEAKS),
      &            RESVARS(NPAR,NY,NZ,PEAKS),
      &            WIDTH
-C                   
-C   Local variables.   
-C                        
+C
+C   Local variables.
+C
       LOGICAL     BADPIX
       LOGICAL     BADSK
-      INTEGER     ENDPIX     
+      INTEGER     ENDPIX
       INTEGER     HALF
       INTEGER     I
       INTEGER     J
       INTEGER     JEN
-      INTEGER     JJ 
+      INTEGER     JJ
       INTEGER     JST
       INTEGER     K
       INTEGER     KEN
@@ -784,15 +784,15 @@ C
       REAL        TEMP2
       REAL        VARI
       REAL        BINVAL
-c                             
+c
       include 'MAGIC_VALUES'
 c
 c   Initialize.
-c                      
+c
       badpix=.false.
       half=int(0.5*width)
       peakctr=1
-c                     
+c
 c   For each binned spectrum -
 c
       do kk=1,nbz
@@ -807,7 +807,7 @@ c   - check that a peak was found.
 c
           if(peakpos(jj,kk).gt.magic_int)then
 c
-c   - initialize.                  
+c   - initialize.
 c
             npts=0
             vari=0.0
@@ -894,7 +894,7 @@ c    Store magic value if a peak was not present.
 c
           else
             do k=kst,ken
-              do j=jst,jen                              
+              do j=jst,jen
                 badpix=.true.
                 results(1,j,k,icomp)=magic_float
                 results(2,j,k,icomp)=magic_float
@@ -925,7 +925,7 @@ c
             resvars(5,j,k,icomp)=resvars(5,nby*bin,k,icomp)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
@@ -944,7 +944,7 @@ c
         end do
       end if
 c
-      end                              
+      end
 
 
 
@@ -968,7 +968,7 @@ C
      &             GAP
 C
 C   Local variables.
-C                        
+C
       INTEGER      ENDPIX
       LOGICAL      FOUND
       INTEGER      HALF
@@ -981,7 +981,7 @@ C
       INTEGER      KEN
       INTEGER      KK
       INTEGER      KST
-      INTEGER      MAXPIX                                                
+      INTEGER      MAXPIX
       REAL         MAXVAL
       INTEGER      STAPIX
 C
@@ -1000,8 +1000,8 @@ c
           found=.false.
           maxval=min_float
 c
-c   - check whether a magic value has been stored, meaning there are no more 
-c     peaks to be found. Scan through the spectrum, avoiding any masked areas. 
+c   - check whether a magic value has been stored, meaning there are no more
+c     peaks to be found. Scan through the spectrum, avoiding any masked areas.
 c
           if(peakpos(jj,kk).gt.magic_int)then
               do i=1,nbx
@@ -1059,22 +1059,22 @@ c
             comp(j,k)=comp(nby*bin,k)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
           do j=1,ny
-            comp(j,k)=comp(j,nbz*bin)  
+            comp(j,k)=comp(j,nbz*bin)
           end do
         end do
       end if
 c
-      end                          
+      end
 
 
 
 
-      
+
       SUBROUTINE MOMENTS_FINDSEQ_R
      &  (BINNED,COMP,PEAKPOS,NY,NZ,NBX,NBY,NBZ,THRESH,WIDTH,GAP,BIN)
 C
@@ -1093,7 +1093,7 @@ C
      &             GAP
 C
 C   Local variables.
-C                        
+C
       LOGICAL      FOUND
       INTEGER      HALF
       INTEGER      I
@@ -1105,7 +1105,7 @@ C
       INTEGER      KEN
       INTEGER      KK
       INTEGER      KST
-      INTEGER      MAXPIX                                                
+      INTEGER      MAXPIX
       REAL         MAXVAL
       INTEGER      STAPIX
 C
@@ -1124,18 +1124,18 @@ c
           found=.false.
           maxval=min_float
 c
-c   - check whether a magic value has been stored, meaning there are no more 
+c   - check whether a magic value has been stored, meaning there are no more
 c     peaks to be found. Also check whether the spectrum been searched to
 c     within GAP of the last pixel, in which case it is not worth searching
 c     the remainder.
 c
-          if(peakpos(jj,kk).gt.magic_int .and. 
+          if(peakpos(jj,kk).gt.magic_int .and.
      &       peakpos(jj,kk).lt.nbx-nint(gap))then
 c
-c   - decide on the first pixel to be searched. If a peak has already been 
-c     found, advance by (GAP - 0.5*WIDTH) to reach the new start point, or if 
+c   - decide on the first pixel to be searched. If a peak has already been
+c     found, advance by (GAP - 0.5*WIDTH) to reach the new start point, or if
 c     GAP < WIDTH, by (0.5*WIDTH). If no peak has yet been found, start at
-c     pixel 1. 
+c     pixel 1.
 c
             if(peakpos(jj,kk).gt.0)then
               if(gap.ge.width)then
@@ -1147,13 +1147,13 @@ c
               stapix=1
             end if
 c
-c   - scan through the spectrum, starting after any previous peak. As soon as 
-c     a flux value above THRESH is encountered, assume that a peak has been 
-c     found (this requires THRESH to be carefully chosen). Compare each 
+c   - scan through the spectrum, starting after any previous peak. As soon as
+c     a flux value above THRESH is encountered, assume that a peak has been
+c     found (this requires THRESH to be carefully chosen). Compare each
 c     subsequent value with the maximum value so far and store the pixel number
-c     of the new maximum. If the pixel is more than (0.5*WIDTH) from the 
-c     maximum pixel and a new maximum has not been found, assume that the peak 
-c     has ended and store the maximum pixel. Likewise if the flux drops below 
+c     of the new maximum. If the pixel is more than (0.5*WIDTH) from the
+c     maximum pixel and a new maximum has not been found, assume that the peak
+c     has ended and store the maximum pixel. Likewise if the flux drops below
 c     THRESH, assume that the peak has ended.
 c
             do i=stapix,nbx
@@ -1165,7 +1165,7 @@ cq            if(binned(i,jj,kk).gt.magic_float)then
                     maxpix=i
                   else
                     if(i.gt.maxpix+half)go to 10
-                  end if        
+                  end if
                 else
                   if(found)go to 10
                 end if
@@ -1182,7 +1182,7 @@ c
 c   - update the component count array.
 c
             jst=(jj-1)*bin+1
-            jen=jst+bin-1                           
+            jen=jst+bin-1
             kst=(kk-1)*bin+1
             ken=kst+bin-1
             do k=kst,ken
@@ -1208,25 +1208,25 @@ c
             comp(j,k)=comp(nby*bin,k)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
           do j=1,ny
-            comp(j,k)=comp(j,nbz*bin)  
+            comp(j,k)=comp(j,nbz*bin)
           end do
         end do
       end if
 c
-      end                          
-                                      
+      end
+
 
 
 
 
       SUBROUTINE MOMENTS_COMPUTE_R
      &  (BINNED,PEAKPOS,AXIS,RESULTS,RESVARS,
-     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)       
+     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)
 C
       IMPLICIT NONE
 C
@@ -1244,17 +1244,17 @@ C
      &            RESULTS(NPAR,NY,NZ,PEAKS),
      &            RESVARS(NPAR,NY,NZ,PEAKS),
      &            WIDTH
-C                   
-C   Local variables.   
-C                        
+C
+C   Local variables.
+C
       LOGICAL     BADPIX
       LOGICAL     BADSK
-      INTEGER     ENDPIX     
+      INTEGER     ENDPIX
       INTEGER     HALF
       INTEGER     I
       INTEGER     J
       INTEGER     JEN
-      INTEGER     JJ 
+      INTEGER     JJ
       INTEGER     JST
       INTEGER     K
       INTEGER     KEN
@@ -1272,15 +1272,15 @@ C
       REAL        TEMP2
       REAL        VARI
       REAL        BINVAL
-c                             
+c
       include 'MAGIC_VALUES'
 c
 c   Initialize.
-c                      
+c
       badpix=.false.
       half=int(0.5*width)
       peakctr=1
-c                     
+c
 c   For each binned spectrum -
 c
       do kk=1,nbz
@@ -1295,7 +1295,7 @@ c   - check that a peak was found.
 c
           if(peakpos(jj,kk).gt.magic_int)then
 c
-c   - initialize.                  
+c   - initialize.
 c
             npts=0
             vari=0.0
@@ -1377,7 +1377,7 @@ c    Store magic value if a peak was not present.
 c
           else
             do k=kst,ken
-              do j=jst,jen                              
+              do j=jst,jen
                 badpix=.true.
                 results(1,j,k,icomp)=magic_float
                 results(2,j,k,icomp)=magic_float
@@ -1408,7 +1408,7 @@ c
             resvars(5,j,k,icomp)=resvars(5,nby*bin,k,icomp)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
@@ -1427,7 +1427,7 @@ c
         end do
       end if
 c
-      end                              
+      end
 
       SUBROUTINE MOMENTS_FINDMAX_RQ
      &  (BINNED,COMP,PEAKPOS,USED,NX,NY,NZ,NBX,NBY,NBZ,THRESH,WIDTH,
@@ -1449,7 +1449,7 @@ C
      &             GAP
 C
 C   Local variables.
-C                        
+C
       INTEGER      ENDPIX
       LOGICAL      FOUND
       INTEGER      HALF
@@ -1462,7 +1462,7 @@ C
       INTEGER      KEN
       INTEGER      KK
       INTEGER      KST
-      INTEGER      MAXPIX                                                
+      INTEGER      MAXPIX
       REAL         MAXVAL
       INTEGER      STAPIX
 C
@@ -1481,8 +1481,8 @@ c
           found=.false.
           maxval=min_float
 c
-c   - check whether a magic value has been stored, meaning there are no more 
-c     peaks to be found. Scan through the spectrum, avoiding any masked areas. 
+c   - check whether a magic value has been stored, meaning there are no more
+c     peaks to be found. Scan through the spectrum, avoiding any masked areas.
 c
           if(peakpos(jj,kk).gt.magic_int)then
               do i=1,nbx
@@ -1542,17 +1542,17 @@ c
             comp(j,k)=comp(nby*bin,k)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
           do j=1,ny
-            comp(j,k)=comp(j,nbz*bin)  
+            comp(j,k)=comp(j,nbz*bin)
           end do
         end do
       end if
 c
-      end                          
+      end
 
 
 
@@ -1575,7 +1575,7 @@ C
      &             GAP
 C
 C   Local variables.
-C                        
+C
       LOGICAL      FOUND
       INTEGER      HALF
       INTEGER      I
@@ -1587,7 +1587,7 @@ C
       INTEGER      KEN
       INTEGER      KK
       INTEGER      KST
-      INTEGER      MAXPIX                                                
+      INTEGER      MAXPIX
       REAL         MAXVAL
       INTEGER      STAPIX
 C
@@ -1606,18 +1606,18 @@ c
           found=.false.
           maxval=min_float
 c
-c   - check whether a magic value has been stored, meaning there are no more 
+c   - check whether a magic value has been stored, meaning there are no more
 c     peaks to be found. Also check whether the spectrum been searched to
 c     within GAP of the last pixel, in which case it is not worth searching
 c     the remainder.
 c
-          if(peakpos(jj,kk).gt.magic_int .and. 
+          if(peakpos(jj,kk).gt.magic_int .and.
      &       peakpos(jj,kk).lt.nbx-nint(gap))then
 c
-c   - decide on the first pixel to be searched. If a peak has already been 
-c     found, advance by (GAP - 0.5*WIDTH) to reach the new start point, or if 
+c   - decide on the first pixel to be searched. If a peak has already been
+c     found, advance by (GAP - 0.5*WIDTH) to reach the new start point, or if
 c     GAP < WIDTH, by (0.5*WIDTH). If no peak has yet been found, start at
-c     pixel 1. 
+c     pixel 1.
 c
             if(peakpos(jj,kk).gt.0)then
               if(gap.ge.width)then
@@ -1629,13 +1629,13 @@ c
               stapix=1
             end if
 c
-c   - scan through the spectrum, starting after any previous peak. As soon as 
-c     a flux value above THRESH is encountered, assume that a peak has been 
-c     found (this requires THRESH to be carefully chosen). Compare each 
+c   - scan through the spectrum, starting after any previous peak. As soon as
+c     a flux value above THRESH is encountered, assume that a peak has been
+c     found (this requires THRESH to be carefully chosen). Compare each
 c     subsequent value with the maximum value so far and store the pixel number
-c     of the new maximum. If the pixel is more than (0.5*WIDTH) from the 
-c     maximum pixel and a new maximum has not been found, assume that the peak 
-c     has ended and store the maximum pixel. Likewise if the flux drops below 
+c     of the new maximum. If the pixel is more than (0.5*WIDTH) from the
+c     maximum pixel and a new maximum has not been found, assume that the peak
+c     has ended and store the maximum pixel. Likewise if the flux drops below
 c     THRESH, assume that the peak has ended.
 c
             do i=stapix,nbx
@@ -1646,7 +1646,7 @@ c
                     maxpix=i
                   else
                     if(i.gt.maxpix+half)go to 10
-                  end if        
+                  end if
                 else
                   if(found)go to 10
                 end if
@@ -1662,7 +1662,7 @@ c
 c   - update the component count array.
 c
             jst=(jj-1)*bin+1
-            jen=jst+bin-1                           
+            jen=jst+bin-1
             kst=(kk-1)*bin+1
             ken=kst+bin-1
             do k=kst,ken
@@ -1688,22 +1688,22 @@ c
             comp(j,k)=comp(nby*bin,k)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
           do j=1,ny
-            comp(j,k)=comp(j,nbz*bin)  
+            comp(j,k)=comp(j,nbz*bin)
           end do
         end do
       end if
 c
-      end                          
-                                      
+      end
+
 
       SUBROUTINE MOMENTS_COMPUTE_RV
      &  (BINNED,PEAKPOS,AXIS,RESULTS,RESVARS,VBIN,
-     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)       
+     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)
 C
       IMPLICIT NONE
 C
@@ -1722,17 +1722,17 @@ C
      &            RESULTS(NPAR,NY,NZ,PEAKS),
      &            RESVARS(NPAR,NY,NZ,PEAKS),
      &            WIDTH
-C                   
-C   Local variables.   
-C                        
+C
+C   Local variables.
+C
       LOGICAL     BADPIX
       LOGICAL     BADSK
-      INTEGER     ENDPIX     
+      INTEGER     ENDPIX
       INTEGER     HALF
       INTEGER     I
       INTEGER     J
       INTEGER     JEN
-      INTEGER     JJ 
+      INTEGER     JJ
       INTEGER     JST
       INTEGER     K
       INTEGER     KEN
@@ -1750,15 +1750,15 @@ C
       REAL        TEMP2
       REAL        VARI
       REAL        WT,BINVAL,WTSUM
-c                             
+c
       include 'MAGIC_VALUES'
 c
 c   Initialize.
-c                      
+c
       badpix=.false.
       half=int(0.5*width)
       peakctr=1
-c                     
+c
 c   For each binned spectrum -
 c
       do kk=1,nbz
@@ -1773,7 +1773,7 @@ c   - check that a peak was found.
 c
           if(peakpos(jj,kk).gt.magic_int)then
 c
-c   - initialize.                  
+c   - initialize.
 c
             npts=0
             vari=0.0
@@ -1858,7 +1858,7 @@ c    Store magic value if a peak was not present.
 c
           else
             do k=kst,ken
-              do j=jst,jen                              
+              do j=jst,jen
                 badpix=.true.
                 results(1,j,k,icomp)=magic_float
                 results(2,j,k,icomp)=magic_float
@@ -1889,7 +1889,7 @@ c
             resvars(5,j,k,icomp)=resvars(5,nby*bin,k,icomp)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
@@ -1908,12 +1908,12 @@ c
         end do
       end if
 c
-      end                              
+      end
 
 
       SUBROUTINE MOMENTS_COMPUTE_RQV
      &  (BINNED,PEAKPOS,AXIS,RESULTS,RESVARS,VBIN,
-     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)       
+     &   NX,NY,NZ,NBX,NBY,NBZ,ICOMP,WIDTH,BIN,NPAR,PEAKS)
 C
       IMPLICIT NONE
 C
@@ -1932,17 +1932,17 @@ C
      &            RESULTS(NPAR,NY,NZ,PEAKS),
      &            RESVARS(NPAR,NY,NZ,PEAKS),
      &            WIDTH
-C                   
-C   Local variables.   
-C                        
+C
+C   Local variables.
+C
       LOGICAL     BADPIX
       LOGICAL     BADSK
-      INTEGER     ENDPIX     
+      INTEGER     ENDPIX
       INTEGER     HALF
       INTEGER     I
       INTEGER     J
       INTEGER     JEN
-      INTEGER     JJ 
+      INTEGER     JJ
       INTEGER     JST
       INTEGER     K
       INTEGER     KEN
@@ -1960,15 +1960,15 @@ C
       REAL        TEMP2
       REAL        VARI
       REAL        WT,BINVAL,WTSUM
-c                             
+c
       include 'MAGIC_VALUES'
 c
 c   Initialize.
-c                      
+c
       badpix=.false.
       half=int(0.5*width)
       peakctr=1
-c                     
+c
 c   For each binned spectrum -
 c
       do kk=1,nbz
@@ -1983,7 +1983,7 @@ c   - check that a peak was found.
 c
           if(peakpos(jj,kk).gt.magic_int)then
 c
-c   - initialize.                  
+c   - initialize.
 c
             npts=0
             vari=0.0
@@ -2072,7 +2072,7 @@ c    Store magic value if a peak was not present.
 c
           else
             do k=kst,ken
-              do j=jst,jen                              
+              do j=jst,jen
                 badpix=.true.
                 results(1,j,k,icomp)=magic_float
                 results(2,j,k,icomp)=magic_float
@@ -2103,7 +2103,7 @@ c
             resvars(5,j,k,icomp)=resvars(5,nby*bin,k,icomp)
           end do
         end do
-      end if                      
+      end if
 c
       if(nbz*bin .lt. nz)then
         do k=nbz*bin+1,nz
@@ -2122,5 +2122,5 @@ c
         end do
       end if
 c
-      end                              
+      end
 

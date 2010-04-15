@@ -18,7 +18,7 @@ proc cred4Configs {taskname} {
 
     set l1 [label $frame.l1 -text "Filename"]
     set Cred4Widgets(CONFIG) [entry $frame.config -width 60 -relief sunken -bd 2 -textvariable config_file]
-    pack $l1 $Cred4Widgets(CONFIG) -in $frame -side left 
+    pack $l1 $Cred4Widgets(CONFIG) -in $frame -side left
 
     set config_file [string trim $config_file]
     if {$config_file == ""} {

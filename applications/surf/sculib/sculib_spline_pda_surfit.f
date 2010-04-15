@@ -62,7 +62,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -105,7 +105,7 @@
       REAL    BY                                 ! Used in LWRK1 calculation
       INTEGER C_END                              ! End of C_PTR
       INTEGER C_PTR                              ! Spline coefficients
-      INTEGER DATA_END                           ! End of DATA_PTR 
+      INTEGER DATA_END                           ! End of DATA_PTR
       INTEGER DATA_OFFSET                        ! Pointer offset
       INTEGER DATA_PTR                           ! Scratch output grid
       REAL    FP                                 ! Sum of squared residuals
@@ -148,7 +148,7 @@
       REAL    XE                                 ! X upper bound of approx
       REAL    YB                                 ! Y lower bound of approx
       REAL    YE                                 ! Y upper bound of approx
-      
+
 *   local data
 *.
 
@@ -247,12 +247,12 @@
 
 *     Call the fitting routine
 
-      CALL PDA_SURFIT(IOPT, NDP, X_IN, Y_IN, DATA_IN, 
+      CALL PDA_SURFIT(IOPT, NDP, X_IN, Y_IN, DATA_IN,
      :                %VAL(CNF_PVAL(WEIGHT_PTR)),
-     :     XB, XE, YB, YE, KX, KY, S, NXEST, NYEST, NMAX, EPS, NX, 
-     :     %VAL(CNF_PVAL(TX_PTR)), NY, %VAL(CNF_PVAL(TY_PTR)), 
+     :     XB, XE, YB, YE, KX, KY, S, NXEST, NYEST, NMAX, EPS, NX,
+     :     %VAL(CNF_PVAL(TX_PTR)), NY, %VAL(CNF_PVAL(TY_PTR)),
      :     %VAL(CNF_PVAL(C_PTR)), FP,
-     :     %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, %VAL(CNF_PVAL(WRK2_PTR)), 
+     :     %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, %VAL(CNF_PVAL(WRK2_PTR)),
      :     LWRK2, %VAL(CNF_PVAL(IWRK_PTR)),
      :     KWRK, IER)
 
@@ -278,10 +278,10 @@
          IOPT = 0
          CALL PDA_SURFIT(IOPT, NDP, X_IN, Y_IN,DATA_IN,
      :                   %VAL(CNF_PVAL(WEIGHT_PTR)),
-     :        XB, XE, YB, YE, KX, KY, RTEMP, NXEST, NYEST, NMAX, EPS,NX, 
-     :        %VAL(CNF_PVAL(TX_PTR)), NY, %VAL(CNF_PVAL(TY_PTR)), 
+     :        XB, XE, YB, YE, KX, KY, RTEMP, NXEST, NYEST, NMAX, EPS,NX,
+     :        %VAL(CNF_PVAL(TX_PTR)), NY, %VAL(CNF_PVAL(TY_PTR)),
      :        %VAL(CNF_PVAL(C_PTR)), FP,
-     :        %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, %VAL(CNF_PVAL(WRK2_PTR)), 
+     :        %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, %VAL(CNF_PVAL(WRK2_PTR)),
      :        LWRK2,
      :        %VAL(CNF_PVAL(IWRK_PTR)), KWRK, IER)
 
@@ -311,7 +311,7 @@
       CALL MSG_OUTIF(MSG__NORM,' ','SPLINE_PDA_SURFIT: There '//
      :     'are ^NX knots in X and ^NY in Y. Sum of squared '//
      :     'residuals is ^FP (IER=^IER)', STATUS)
-      
+
 
 *     Free memory that is no longer needed
       CALL SCULIB_FREE('SURFIT_WRK1', WRK1_PTR, WRK1_END, STATUS)
@@ -329,12 +329,12 @@
          WRK1_END = 0
          IWRK_END = 0
          IWRK_PTR = 0
-         
+
          CALL SCULIB_MALLOC(VAL__NBR * LWRK1, WRK1_PTR, WRK1_END,
      :        STATUS)
          CALL SCULIB_MALLOC(VAL__NBR * KWRK, IWRK_PTR, IWRK_END, STATUS)
-      
-         CALL SCULIB_MALLOC(VAL__NBR * NX_OUT * NY_OUT, DATA_PTR, 
+
+         CALL SCULIB_MALLOC(VAL__NBR * NX_OUT * NY_OUT, DATA_PTR,
      :        DATA_END, STATUS)
 
 *     Calculate grid
@@ -350,11 +350,11 @@
          END IF
 
 *     Calculate the output data
-         CALL PDA_BISPEV(%VAL(CNF_PVAL(TX_PTR)), NX, 
+         CALL PDA_BISPEV(%VAL(CNF_PVAL(TX_PTR)), NX,
      :                   %VAL(CNF_PVAL(TY_PTR)), NY,
-     :        %VAL(CNF_PVAL(C_PTR)), 
+     :        %VAL(CNF_PVAL(C_PTR)),
      :        KX, KY, X_OUT, NX_OUT, Y_OUT, NY_OUT,
-     :        %VAL(CNF_PVAL(DATA_PTR)), %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, 
+     :        %VAL(CNF_PVAL(DATA_PTR)), %VAL(CNF_PVAL(WRK1_PTR)), LWRK1,
      :        %VAL(CNF_PVAL(IWRK_PTR)),
      :        KWRK, IER)
 
@@ -369,7 +369,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             DO I = 1, NX_OUT
                DO J = 1, NY_OUT
-               
+
                   DATA_OFFSET = (J-1) + (I-1) * NY_OUT
 
                   CALL VEC_RTOR(.FALSE., 1, %VAL(CNF_PVAL(DATA_PTR) +

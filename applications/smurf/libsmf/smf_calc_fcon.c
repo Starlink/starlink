@@ -5,7 +5,7 @@
 *     smf_calc_fcon
 
 *  Purpose:
-*     Calculate a factor needed for converting input Tsys values into 
+*     Calculate a factor needed for converting input Tsys values into
 *     Variance values.
 
 *  Language:
@@ -35,9 +35,9 @@
 *        Pointer to the inherited status.
 
 *  Description:
-*     This function returns the ratio of the squared backend degradation 
-*     factor to the input spectral channel width, needed for calculating 
-*     the variances from the Tsys value. It is independent of the time slice. 
+*     This function returns the ratio of the squared backend degradation
+*     factor to the input spectral channel width, needed for calculating
+*     the variances from the Tsys value. It is independent of the time slice.
 *     The total factor for converting Tsys to Variance is the product of the
 *     factor returned by this function, and the time-slice dependent factor
 *     returned by smf_rebincube_tcon.
@@ -85,15 +85,15 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-double smf_calc_fcon( smfData *data, dim_t nchan, int report, 
+double smf_calc_fcon( smfData *data, dim_t nchan, int report,
                       AstMapping **specmap, AstFrame **specframe,
                       int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
-   AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */           
+   AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */
    AstFrame *specframe2 = NULL;/* Temporary copy of SpecFrame in input WCS */
-   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
+   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */
    AstMapping *fsmap = NULL;   /* Mapping extracted from FrameSet */
    char *fftwin = NULL;        /* Name of FFT windowing function */
    double at;                  /* Frequency at which to take the gradient */
@@ -106,7 +106,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
    int gotdnu = 0;             /* Has spectral channel width been obtained? */
    int pixax[ 3 ];             /* Pixel axis indices */
    int specax;                 /* The index of the input spectral axis */
-   smfHead *hdr;          
+   smfHead *hdr;
 
 /* Check the inherited status. */
    *specframe = NULL;
@@ -120,34 +120,34 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
 /* Get a pointer to the header. */
    hdr = data->hdr;
 
-/* We want a description of the spectral WCS axis in the input file. If 
+/* We want a description of the spectral WCS axis in the input file. If
    the input file has a WCS FrameSet containing a SpecFrame, use it,
-   otherwise we will obtain it from the FITS header later. NOTE, if we knew 
-   that all the input NDFs would have the same spectral axis calibration, 
-   then the spectral WCS need only be obtained from the first NDF. However, 
-   in the general case, I presume that data files may be combined that use 
-   different spectral axis calibrations, and so these differences need to 
+   otherwise we will obtain it from the FITS header later. NOTE, if we knew
+   that all the input NDFs would have the same spectral axis calibration,
+   then the spectral WCS need only be obtained from the first NDF. However,
+   in the general case, I presume that data files may be combined that use
+   different spectral axis calibrations, and so these differences need to
    be taken into account. */
-   if( hdr->tswcs ) {   
+   if( hdr->tswcs ) {
       fs = astClone( hdr->tswcs );
-   
+
 /* The first axis should be a SpecFrame. See if this is so. If not annul
    the specframe pointer. */
       specax = 1;
       *specframe = astPickAxes( fs, 1, &specax, NULL );
       if( !astIsASpecFrame( *specframe ) ) *specframe = astAnnul( *specframe );
-   } 
+   }
 
-/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the 
-   FITS extension of the input NDF. Take a copy of the FITS header (so that 
-   the contents of the header are not changed), and then read a FrameSet 
+/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the
+   FITS extension of the input NDF. Take a copy of the FITS header (so that
+   the contents of the header are not changed), and then read a FrameSet
    out of it. */
    if( !*specframe ) {
       fc = astCopy( hdr->fitshdr );
       astClear( fc, "Card" );
       fs = astRead( fc );
 
-/* Extract the SpecFrame that describes the spectral axis from the current 
+/* Extract the SpecFrame that describes the spectral axis from the current
    Frame of this FrameSet. This is assumed to be the third WCS axis (NB
    the different axis number). */
       specax = 3;
@@ -155,7 +155,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
    }
 
 /* Split off the 1D Mapping for this single axis from the 3D Mapping for
-   the whole WCS. This results in "specmap" holding the Mapping from 
+   the whole WCS. This results in "specmap" holding the Mapping from
    SpecFrame value to GRID value. */
    fsmap = astGetMapping( fs, AST__CURRENT, AST__BASE );
    astMapSplit( fsmap, 1, &specax, pixax, specmap );
@@ -165,8 +165,8 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
    astInvert( *specmap );
 
 /* Find the constant factor associated with the current input file, used
-   when converting Tsys values to variance values. This is the squared 
-   backend degradation factor, divided by the noise bandwidth. Get the 
+   when converting Tsys values to variance values. This is the squared
+   backend degradation factor, divided by the noise bandwidth. Get the
    required FITS headers, checking they were found. */
    if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
        astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
@@ -174,12 +174,12 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
 
 /* Get a Mapping that converts values in the input spectral system to
    topocentric frequency in Hz, and concatenate this Mapping with the
-   Mapping from input GRID coord to the input spectral system. The result 
+   Mapping from input GRID coord to the input spectral system. The result
    is a Mapping from input GRID coord to topocentric frequency in Hz. */
       specframe2 = astCopy( *specframe );
       astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
-      fmap = astCmpMap( *specmap, astGetMapping( astConvert( *specframe, 
-                                                            specframe2, 
+      fmap = astCmpMap( *specmap, astGetMapping( astConvert( *specframe,
+                                                            specframe2,
                                                             "" ),
                                                 AST__BASE, AST__CURRENT ),
                         1, " " );
@@ -193,8 +193,8 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
          dnu = abs( gout[ 0 ] - gout[ 1 ] );
          gotdnu = 1;
 
-/* Modify the channel width to take account of the effect of the FFT windowing 
-   function. Allow undef value because FFT_WIN for old data had a broken value 
+/* Modify the channel width to take account of the effect of the FFT windowing
+   function. Allow undef value because FFT_WIN for old data had a broken value
    in hybrid subband modes. */
          dnu = fabs( dnu );
 
@@ -216,7 +216,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
          }
 
 /* Form the required constant. */
-         fcon2 = k*k/dnu;  
+         fcon2 = k*k/dnu;
 
       } else {
          gotdnu = 0;
@@ -233,7 +233,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
    if( report && fcon2 == VAL__BADD ) {
       if( *status == SAI__OK ) {
          smf_smfFile_msg( data->file, "F", 1, "<unknown file>", status);
-         errRep( "", "Cannot calculate input variances for ^F", 
+         errRep( "", "Cannot calculate input variances for ^F",
                  status );
          if( !gotbf ) {
             errRep( "", "BEDEGFAC and/or FFT_WIN is missing from the FITS "

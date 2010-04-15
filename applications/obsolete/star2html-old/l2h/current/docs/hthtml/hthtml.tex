@@ -3,7 +3,7 @@
 \usepackage{html}
 \usepackage{hthtml}
 \title{\htmladdnormallinkfoot{hthtml}
-  {http://www.cs.tu-bs.de/\~{}krinke/hthtml/index.html} 
+  {http://www.cs.tu-bs.de/\~{}krinke/hthtml/index.html}
   - an extended interface to LaTeX2HTML}
 \author{\htmladdnormallinkfoot{Jens Krinke}%
   {http://www.cs.tu-bs.de/\~{}krinke/}\\
@@ -12,7 +12,7 @@
 \htmetainfo{keywords}{latex2html, hthtml}
 \htsetvar{NO_NAVIGATION}{1}
 \htsetvar{ADDRESS}
-{'<A HREF="http://www.cs.tu-bs.de/~krinke/hthtml/index.html">Original 
+{'<A HREF="http://www.cs.tu-bs.de/~krinke/hthtml/index.html">Original
 site</A><P><HR>' . \$ADDRESS}
 \begin{document}
 \maketitle
@@ -23,7 +23,7 @@ The use of \texttt{html.sty} makes the use of some special
 LaTeX and give different results in the generated DVI-file and the
 translated HTML-file.  However, more support can be added, which makes
 it easier to write documents that are looking similar in DVI and HTML
-format. 
+format.
 
 \section{Features of \texttt{hthtml}}
 
@@ -31,7 +31,7 @@ format.
 
 Every now and the somebody asks how to use `\verb|_|' and
 `\verb|~|' in the \texttt{htmladdnormallink}-commands.  This is
-not supported, one has to use \verb|\_| and \verb|\~{}|.  
+not supported, one has to use \verb|\_| and \verb|\~{}|.
 
 The following commands are able to process `\verb|_|' and `\verb|~|'
 directly:
@@ -69,7 +69,7 @@ This is made from:
 \verb|htlink| and \verb|hturl| aren't useable inside commands like
 \verb|\author| or \verb|\title|, where one has to use the old
 \verb|\htmladdnormallinkfoot| command.  This command is redefined in
-\emph{hthtml} to set the footnote in typewriter-style. 
+\emph{hthtml} to set the footnote in typewriter-style.
 
 \subsection{A patched description environment}
 
@@ -116,13 +116,13 @@ This is made from:
 \item \verb|\htsetvar{|\emph{variable}\verb|}{|\emph{value}\verb|}|:
   Sets a variable of latex2html to a different value.  Has no other
   effect and can be used to set configuration variables in the
-  \TeX-source. 
+  \TeX-source.
 
 Look at this Example, which is part of this document:
 \begin{verbatim}
 \htsetvar{NO_NAVIGATION}{1}
 \htsetvar{ADDRESS}
-{'<A HREF="http://www.cs.tu-bs.de/~krinke/hthtml/index.html">Original 
+{'<A HREF="http://www.cs.tu-bs.de/~krinke/hthtml/index.html">Original
 site</A><P><HR>' . \$ADDRESS}
 \end{verbatim}
 

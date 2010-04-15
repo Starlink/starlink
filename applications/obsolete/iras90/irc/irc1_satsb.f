@@ -116,7 +116,7 @@
          CALL IRC1_SCOSB( IDC, SAMPLE( IVAL ), PSI( IVAL ),
      :                    THETA( IVAL ), SOLONG( IVAL ), UTCS( IVAL ),
      :                    STATUS )
-      
+
 *  Do the next required position.
       END DO
 

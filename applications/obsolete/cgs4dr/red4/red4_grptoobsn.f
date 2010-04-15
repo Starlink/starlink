@@ -131,7 +131,7 @@
 
       IF ( FILE_COUNTER .NE. 1 ) THEN
         CALL MSG_SETC( 'OBS1_FILE', OBS1_FILE )
-        CALL MSG_OUT( ' ', 
+        CALL MSG_OUT( ' ',
      :    'Using ^OBS1_FILE as a time reference', STATUS )
       ENDIF
 

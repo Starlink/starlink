@@ -9,7 +9,7 @@
 \newcommand{\stardocnumber}    {62.5}
 \newcommand{\stardocauthors}   {M.\, Denby \& P.\, McGale}
 \newcommand{\stardocdate}      {5 December 1995}
-\newcommand{\stardoctitle}     {WFCPACK --- ROSAT Wide Field Camera data 
+\newcommand{\stardoctitle}     {WFCPACK --- ROSAT Wide Field Camera data
                                 reduction}
 \newcommand{\stardocversion}   {Version 6}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -43,7 +43,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -111,7 +111,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -195,12 +195,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -255,7 +255,7 @@ between the various UNIX flavours.
 \section{Getting Started}
 \label{sec:staring}
 
-Assuming that WFCPACK is installed at your site, it may be started 
+Assuming that WFCPACK is installed at your site, it may be started
 by executing the setup commands:
 
 \begin{quote} {\tt
@@ -263,7 +263,7 @@ by executing the setup commands:
 \% wfcstart}
 \end{quote}
 
-The tasks are callable from the command line by simply typing the 
+The tasks are callable from the command line by simply typing the
 task name in response to the UNIX prompt, {\em e.g.}:
 
 \begin{quote}{\tt
@@ -283,14 +283,14 @@ command:
 \label{sec:rwod}
 
 The RWOD is a set of two data files distributed to the ROSAT WFC observer.
-Each RWOD contains data from a single pointed phase observation in the 
-form of a tar file.  The software described in this document does not 
-require the data to be stored in a predefined directory.  After starting 
+Each RWOD contains data from a single pointed phase observation in the
+form of a tar file.  The software described in this document does not
+require the data to be stored in a predefined directory.  After starting
 ICL, the data on an RWOD may be recovered to disk as follows:
 
 \begin{verbatim}
     ICL>default location                     ! The target directory
-    ICL>wfcdisk /dev/rmt0h 141887 location   ! Replace with the tape drive and 
+    ICL>wfcdisk /dev/rmt0h 141887 location   ! Replace with the tape drive and
                                              ! the tar file required
 \end{verbatim}
 
@@ -298,8 +298,8 @@ The files which are essential for the sorting software to work are:
 
 \begin{description}
 \begin{description}
-\item [{\tt mcf\_nn.sdf}] The WFC Master Calibration File, version {\tt nn} 
-{\em e.g.}, 12. 
+\item [{\tt mcf\_nn.sdf}] The WFC Master Calibration File, version {\tt nn}
+{\em e.g.}, 12.
 \item [{\tt \verb+<+RWOD\verb+>+.sdf}] Events, housekeeping, attitude data file
 \end{description}
 \end{description}
@@ -355,19 +355,19 @@ section \ref{sec:programs:wfcdbm}).  Below is an example of the header
 records from a typical RWOD:
 
 \begin{verbatim}
- ROR Sequence #          : B50026    
+ ROR Sequence #          : B50026
  Axis Ra                 :  359.38
  Axis Dec                :   20.92
  Roll                    :   -8.50
  POP_FLAGS               : 00000B03
- Target                  : MKN335 (Day 46, ROR 150026 offset)      
- Observer                : WCALIB                                  
- Instrument              : WFC                                     
- Base date               : 16-JUL-90  
+ Target                  : MKN335 (Day 46, ROR 150026 offset)
+ Observer                : WCALIB
+ Instrument              : WFC
+ Base date               : 16-JUL-90
  Base MJD                : 48088.8086
  End MJD                 : 48088.8369
  Total Events            :    20879
- File Revision Level     : 5.2 
+ File Revision Level     : 5.2
 
  Slot        Stime            Etime        Durn.  Flt  Fmt  Zm  Win   HT
         d:hh:mm:ss       d:hh:mm:ss
@@ -481,7 +481,7 @@ institute.
 
 \begin{description}
 
-\item [CMND] 
+\item [CMND]
 A number of commands, specified by the CMND parameter, are
 available and are specified below:
 
@@ -501,8 +501,8 @@ The name of a file to hold listing o/p. The default is TERMINAL.
 
 \item[INDF   ]
 The name the Index file which holds information on all the RWODs
-in the library. If this file does not already exist it should be created 
-using the CREATE option. Thereafter the index file may be 
+in the library. If this file does not already exist it should be created
+using the CREATE option. Thereafter the index file may be
 updated and searched.
 
 \item[SMJD   ]
@@ -531,7 +531,7 @@ Any unique string which identifies the target
 
 \item[SELECT1]
 The search function is performed on a series of selection criteria
-which are entered in response to the repeated SELECTn prompts. The valid 
+which are entered in response to the repeated SELECTn prompts. The valid
 requests are:
 
 \begin{verbatim}
@@ -563,7 +563,7 @@ knowledge of the contents of the RWOD event header records.
 \subsection{WFCSORT}
 \label{sec:programs:wfcsort}
 
-This task is used to sort pre-processed events from the RWOD into 
+This task is used to sort pre-processed events from the RWOD into
 ASTERIX (HDS) datasets.
 
 \subsubsection{Parameters}
@@ -581,7 +581,7 @@ operations are performed on the same RWOD the user may wish to reply
 occurrences.
 
 \item[OUTPUT]
-The name of the output dataset. The default extension for the file is 
+The name of the output dataset. The default extension for the file is
 {\tt .sdf} and should NOT be provided by the user.
 
 \item[DTYPE]
@@ -604,7 +604,7 @@ The Declination of the sort field centre (decimal degs). By default this
 is set to the axis DEC value in the header.
 
 \item[DAZ]
-The half extent of the square field to be sorted (degs), 
+The half extent of the square field to be sorted (degs),
 the default value is 3 degrees.
 
 \item[INRAD]
@@ -626,7 +626,7 @@ A text string which specifies which observation slots to include in
 the sort. (These are the slots which are displayed when SHOW = Y is selected).
 Specify the slots in the format i-j,k,l-m. The slots selected
 should all have the same filter at the focus. If a slot value of `0' is
-selected the selection mode changes and the user is prompted for the 
+selected the selection mode changes and the user is prompted for the
 filter type via the FILTER parameter.
 
 \item[START\_T]
@@ -664,7 +664,7 @@ Each record in the file should contain a pair of start and stop MJDs
 separated by a space and with each MJD preceded by the letter `M'.
 
 \item[NBINS]
-The number of bins into which the time extent of the sort 
+The number of bins into which the time extent of the sort
 is to be divided. If a value `0' is given the program prompts for the
 time duration for each bin (see TBIN).
 
@@ -687,7 +687,7 @@ the second column of the following table:
       6             S2A          Le/Be
       7             P2           Sn/Al
       8             S1A          Le/C/B4C
- 
+
       (MCF = Master Calibration File)
 \end{verbatim}
 
@@ -759,8 +759,8 @@ The name of an input ASTERIX dataset. The dataset may be either a time series
 or an image.
 
 \item[OUT]
-The name of an output ASTERIX dataset. The dataset is cloned from the input and 
-then the raw count array is replaced by an exposure corrected 
+The name of an output ASTERIX dataset. The dataset is cloned from the input and
+then the raw count array is replaced by an exposure corrected
 count/sec array.
 
 \item[EFFCOR]
@@ -772,7 +772,7 @@ spread fraction.
 
 \item[WFCF]
 This hidden parameter, {\em i.e.}, user must specify it if
-required as it is not prompted for, can be used to specify the {\em e.g.}, 
+required as it is not prompted for, can be used to specify the {\em e.g.},
 a time--series' parent RWOD.  ({\tt wfcexp} normally finds the RWOD name
 automatically.)
 
@@ -883,9 +883,9 @@ event selection in the {\tt wfcsort} program.
 The name of the input RWOD.  The default extension for the file is {\tt .sdf}.
 
 \item[SHOW]
-Requests that a sub-set of the information from the RWOD event header records 
+Requests that a sub-set of the information from the RWOD event header records
 is displayed at the user terminal. In a situation where many
-operations are performed on the same event file the user may wish to 
+operations are performed on the same event file the user may wish to
 reply `Y' to the first occurrence of the prompt but `N' to all subsequent
 occurrences.
 
@@ -894,7 +894,7 @@ A text string which specifies which observation slots to include in
 the sort. (These are the slots which are displayed when SHOW = Y is selected).
 Specify the slots in the format i-j,k,l-m. The slots selected
 should all have the same filter at the focus. If a slot value of `0' is
-selected the selection mode changes and the user is prompted for the 
+selected the selection mode changes and the user is prompted for the
 filter type via the FILTER parameter.
 
 \item[SFILE]
@@ -917,7 +917,7 @@ the second column of the following table:
       6             S2A          Le/Be
       7             P2           Sn/Al
       8             S1A          Le/C/B4C
- 
+
       (MCF = Master Calibration File)
 \end{verbatim}
 
@@ -927,7 +927,7 @@ the second column of the following table:
 \label{sec:programs:wfcslmrg}
 
 The program is used to merge time slot files into a single file of common
-time slots. The merged file may then be used to control event selection in 
+time slots. The merged file may then be used to control event selection in
 the {\tt wfcsort} program.
 
 \subsubsection{Parameters}
@@ -948,7 +948,7 @@ The name of the output merged time slot file.
 \subsection{WPSSCORR}
 \label{sec:programs:wpsscorr}
 
-Converts raw flux in a source search results file produced by {\tt pss} to 
+Converts raw flux in a source search results file produced by {\tt pss} to
 ``on--axis'' counts per second by correcting for vignetting, dead time,
 and degradation of detector efficiency.  The source list files can be
 examined by using the ASTERIX program {\tt ssdump}.
@@ -983,7 +983,7 @@ prompts and typical user responses are shown.
 
 \begin{verbatim}
    % aststart                          ! Define necessary UNIX symbols etc.
-   % wfcstart			       
+   % wfcstart
 
    ICL>wfcpack                         ! Load up WFC ICL procedures
 
@@ -1001,7 +1001,7 @@ prompts and typical user responses are shown.
        TBIN - 5.                       ! Set the bin width to 5 secs
        REJECT - NONE                   ! Don't do event discrimination
        OUTPUT - tim_p1                 ! O/p Asterix dataset
- 
+
    ICL>wfcexp
        INP - tim_p1                    ! I/p raw time series
        OUT - tim_p1c                   ! O/p corrected time series
@@ -1096,7 +1096,7 @@ location of source and background boxes from the currently displayed
 image and produces a background subtracted, exposure corrected, light
 curve for the source in the file specified by the argument OUTF. The
 background can be estimated from either an annulus around the source or
-from an offset position. The bin size in seconds is specified via the 
+from an offset position. The bin size in seconds is specified via the
 TBIN argument.
 
 \subsection{WFCSPC $<$OUTF$>$ $<$MERGE$>$ $<$XTIM$>$}
@@ -1138,8 +1138,8 @@ procedures, or {\tt arithmetic}, are failing to execute properly.
 \label{sec:contact}
 
 The VMS version of WFCPACK was written by Mike Denby ({\tt md@star.le.ac.uk}).
-It was ported to UNIX by Jeremy Ashley ({\tt jka@star.le.ac.uk}) and Paul 
-McGale ({\tt pam@star.le.ac.uk}).  A further point of contact is John Pye 
+It was ported to UNIX by Jeremy Ashley ({\tt jka@star.le.ac.uk}) and Paul
+McGale ({\tt pam@star.le.ac.uk}).  A further point of contact is John Pye
 ({\tt pye@star.le.ac.uk}).
 
 \end{document}

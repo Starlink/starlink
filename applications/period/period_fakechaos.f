@@ -3,7 +3,7 @@ C===========================================================================
 
       SUBROUTINE PERIOD_FAKECHAOS(IPARRAY, NUMPTS, MXCOL, COEFF,
      :                             INITVAL, STARTPT, ENDPT)
- 
+
 C===========================================================================
 C Calculates chaotic data for FAKE. All arrays can correspond to slices
 C of dynamically-allocated memory, provided that the appropriate "calling"

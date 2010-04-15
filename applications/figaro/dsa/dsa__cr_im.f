@@ -3,7 +3,7 @@ C                   D S A _ _ C R E A T E _ I M A G I N A R Y
 C
 C  Routine name:
 C     DSA__CREATE_IMAGINARY
-C     
+C
 C  Function:
 C     Structure-specific conversion of a real main array into a complex one.
 C
@@ -11,7 +11,7 @@ C  Description:
 C     This routine assumes that the structure whose reference slot number
 C     it is passed contains a real data array but no imaginary array.
 C     It creates the necessary imaginary array, allowing for the requirements
-C     of the format used by the structure. 
+C     of the format used by the structure.
 C
 C  Language:
 C     FORTRAN
@@ -47,8 +47,8 @@ C  Support: Keith Shortridge, AAO
 C
 C  Version date: 29th August 1992
 C
-C  Note: 
-C     This version supports both the original Figaro data format and 
+C  Note:
+C     This version supports both the original Figaro data format and
 C     Starlink's NDF format.
 C-
 C  Subroutine / function details:
@@ -62,7 +62,7 @@ C     ICH_LEN       Position of last non-blank char in string.
 C
 C  Common variable details:
 C     (>) OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is
@@ -122,7 +122,7 @@ C        For NDF format, things are a little messy, since there will
 C        be an existing real array which may be either primitive or
 C        structured, and we need to put it into a COMPLEX_ARRAY
 C        structure along with our new imaginary array.  So we create
-C        such a structure (using a temporary name), copy the existing array 
+C        such a structure (using a temporary name), copy the existing array
 C        into it, add the imaginary array, and then rename the structure
 C        so that it is now the new data array.  If we do this, we have to
 C        be sure that none of the DATA_ARRAY components are mapped (which

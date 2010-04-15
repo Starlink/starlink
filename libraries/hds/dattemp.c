@@ -21,9 +21,9 @@
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
-           
+
 #include "hds.h"
-                                                                 
+
 /* Static variables     */
 
 static struct HAN       temp_handle;/* Handle to temp component list */
@@ -98,7 +98,7 @@ datTemp(const char      *type_str,
    }
    else
    {
-      hds_gl_64bit = ( rec_ga_fcv[temp_handle.slot].hds_version > 
+      hds_gl_64bit = ( rec_ga_fcv[temp_handle.slot].hds_version >
                        REC__VERSION3 );
    }
 
@@ -205,7 +205,7 @@ dat1_locate_name( crv, 0, &name1 );
    dat1_put_ncomp(&temp_handle, ncomp);
    data->level = 1;
    data->struc = (obj->class == DAT__STRUCTURE);
-   data->valid = 1;    
+   data->valid = 1;
    return hds_gl_status;
 }
 
@@ -272,13 +272,13 @@ dat1_make_scratch(void)
    rcl.zero  = 1;
    rcl.slen  = 0;
 
- 
+
 /* Set 64-bit file format flag appropriately                            */
 /*   hds_gl_64bit = hds_gl_c64bit; */
-     
+
    rcl.dlen  = SZCRV;
-   
-   _invoke( rec_attach_file( 1, (const char *) file.body, file.length, 'S', 
+
+   _invoke( rec_attach_file( 1, (const char *) file.body, file.length, 'S',
                              'W', &rcl, &han[ 0 ] ) );
    rec_refcnt( &han[ 0 ], 1, &refcnt, &hds_gl_status );
 

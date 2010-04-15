@@ -73,7 +73,7 @@
       CALL CHR_UCASE( GPACK )
       IF ( GPACK( : 3 ) .NE. 'GKS' .AND. GPACK( : 3 ) .NE. 'SGS' ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'IRM_GDTYP_ERR1', 
+         CALL ERR_REP( 'IRM_GDTYP_ERR1',
      :   'IRM_GDTYP: Unsupported graphic package is used. Unable '//
      :   'to get workstation class.', STATUS )
          GOTO 999

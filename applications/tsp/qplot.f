@@ -9,7 +9,7 @@ C
 C     Function:
 C        Quick plot of time series data.
 C
-C     Description:                      
+C     Description:
 C        QPLOT provides a quick means of plotting one item from a time
 C        series data set, but without the many options provided by TSPLOT.
 C        Plotting is done with the NCAR/SGS/GKS graphics system.
@@ -38,7 +38,7 @@ C
 C-
 C
 C  History:
-C    Nov/1987   Original Version.   JAB/AAO 
+C    Nov/1987   Original Version.   JAB/AAO
 C    28/2/1988   TSP Monolith version.  JAB/AAO
 C
 
@@ -50,10 +50,10 @@ C
 
 *  Status argument
       INTEGER STATUS
-      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays   
+      INTEGER IPTR,QPTR,UPTR,VPTR          ! Pointers to Stokes arrays
       INTEGER IEPTR,QEPTR,UEPTR,VEPTR      ! Pointers to variances
       INTEGER XPTR                         ! Pointer to X (time) array
-      INTEGER WPTR                         ! Pointer to wavelength axis     
+      INTEGER WPTR                         ! Pointer to wavelength axis
       INTEGER STRT,FIN                     ! Start and finish channels
       INTEGER SIZE                         ! Original size of data in X
       INTEGER FSIZE                        ! Size after X limits selection
@@ -65,7 +65,7 @@ C
       CHARACTER*20 YLABEL                  ! Y label for current plot
       CHARACTER*40 XLABEL                  ! X axis label
       INTEGER NCHANS                       ! Number of channels in data
-      INTEGER ZONE                         ! SGS zone for plot      
+      INTEGER ZONE                         ! SGS zone for plot
       CHARACTER*(DAT__SZLOC) XLOC,WLOC     ! Axis locators
       INTEGER ACTDIM,DIMS(7)
 
@@ -75,17 +75,17 @@ C
       INTEGER XXPTR,T1PTR,T2PTR,YRPTR
 
 *  Get the data
-                                             
+
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN                           
+      IF (STATUS .EQ. SAI__OK) THEN
 
 *  Initialize for plotting
 
         CALL TSP_PHSINITAG(ZONE,STATUS)
 
 *  Get X Axis data
-                 
+
         CALL TSP_MAP_TIME(LOC,'READ',XPTR,XLOC,STATUS)
 
 *  Get wavelength axis data
@@ -105,9 +105,9 @@ C
         CALL TSP_TEMP(SIZE,'_REAL',T1PTR,T1LOC,STATUS)
         CALL TSP_TEMP(SIZE,'_REAL',T2PTR,T2LOC,STATUS)
         CALL TSP_TEMP(SIZE,'_DOUBLE',XXPTR,XXLOC,STATUS)
-                                                    
+
 *   Find X plotting limits
-                     
+
         CALL TSP_QPLTXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
         SIZE = FIN-STRT+1
         FSIZE = SIZE
@@ -134,7 +134,7 @@ C
      :       IEPTR,QEPTR,UEPTR,VEPTR,STATUS)
 
 *   Check that all the necessary components are available
-       
+
           IF (ITEM .EQ. 'I') THEN
 
 *  Intensity
@@ -166,16 +166,16 @@ C
               IF (UPTR .EQ. 0) THEN
                   CALL MSG_OUT('MSG','Item Not Available',STATUS)
                   STATUS = USER__001
-              ENDIF                                                     
+              ENDIF
           ENDIF
 
 *  Bin Size and Autoscaling?
 
-          CALL PAR_GET0L('AUTO',AUTO,STATUS)    
+          CALL PAR_GET0L('AUTO',AUTO,STATUS)
 
 *  Bin data, convert the item to required form for plots, and get scaling limits
 
-          IF (ITEM .EQ. 'I') THEN  
+          IF (ITEM .EQ. 'I') THEN
 
 *  Take square root of variance to get sigma
 
@@ -194,8 +194,8 @@ C
      :             %VAL(T2PTR),IMIN,IMAX,STATUS)
               YRPTR = IPTR
 
-*  Stokes Q  
-                       
+*  Stokes Q
+
           ELSE IF (ITEM .EQ. 'Q') THEN
 
 *  Take square root of variance to get sigma
@@ -212,12 +212,12 @@ C
 *  Find the scaling limits
 
               CALL TSP_PHSSCALE(SIZE,%VAL(XXPTR),%VAL(QPTR),
-     :             %VAL(T2PTR),IMIN,IMAX,STATUS) 
+     :             %VAL(T2PTR),IMIN,IMAX,STATUS)
               YRPTR = QPTR
 
 *  Stokes U
 
-          ELSE IF (ITEM .EQ. 'U') THEN          
+          ELSE IF (ITEM .EQ. 'U') THEN
               IF (UEPTR .NE. 0) THEN
 
 *  Take square root of variance to get sigma
@@ -234,7 +234,7 @@ C
 
               CALL TSP_PHSSCALE(SIZE,%VAL(XXPTR),%VAL(UPTR),
      :             %VAL(T2PTR),IMIN,IMAX,STATUS)
-              YRPTR = UPTR                          
+              YRPTR = UPTR
 
 *  Stokes V
 
@@ -257,7 +257,7 @@ C
      :             %VAL(T2PTR),IMIN,IMAX,STATUS)
               YRPTR = VPTR
 
-          ENDIF         
+          ENDIF
 
 *  Set scaling limits using max and min determined above as defaults
 
@@ -266,14 +266,14 @@ C
              CALL PAR_DEF0R('MAX',IMAX,STATUS)
              CALL PAR_GET0R('MIN',IMIN,STATUS)
              CALL PAR_GET0R('MAX',IMAX,STATUS)
-          ENDIF        
+          ENDIF
 
 *  Set Y label
 
-          IF (ITEM .EQ. 'I') THEN     
+          IF (ITEM .EQ. 'I') THEN
               YLABEL = 'Counts/sec'
           ELSE IF (ITEM .EQ. 'V') THEN
-              YLABEL = 'V'              
+              YLABEL = 'V'
           ELSE IF (ITEM .EQ. 'Q') THEN
               YLABEL = 'Q'
           ELSE IF (ITEM .EQ. 'U') THEN
@@ -288,10 +288,10 @@ C
      :        XLABEL,YLABEL,IMIN,IMAX,STATUS)
           ENDIF
           CALL TSP_QPLTUNMAPITEM(LOC,STATUS)
-      ENDIF        
+      ENDIF
 
-*  Tidy up      
-                                  
+*  Tidy up
+
       CALL TSP_UNMAP(XXLOC,STATUS)
       CALL TSP_UNMAP(T1LOC,STATUS)
       CALL TSP_UNMAP(T2LOC,STATUS)
@@ -300,7 +300,7 @@ C
       CALL DAT_ANNUL(LOC,STATUS)
       CALL SGS_ANNUL(ZONE,STATUS)
       END
-                          
+
 
       SUBROUTINE TSP_QPLTSQ(SIZE,X,Y)
 *+
@@ -322,10 +322,10 @@ C
 *  Modified:
 *      11/12/1991  -  Handle bad values
 *
-*+  
+*+
       IMPLICIT NONE
       INCLUDE 'PRM_PAR'
-      
+
 *  Parameters
       INTEGER SIZE
       REAL X(SIZE),Y(SIZE)
@@ -336,7 +336,7 @@ C
 *  Loop over data points replacing all good values with their square root
       DO I=1,SIZE
           IF (X(I) .GE. 0. .AND. X(I) .NE. VAL__BADR) THEN
-              Y(I)=SQRT(X(I)) 
+              Y(I)=SQRT(X(I))
           ELSE
               Y(I)=VAL__BADR
           ENDIF
@@ -360,11 +360,11 @@ C
 *  Jeremy Bailey    28/2/1988
 *
 *  Modified:
-*      11/12/1991 
+*      11/12/1991
 *
-*+  
+*+
       IMPLICIT NONE
- 
+
 *  Parameters
       INTEGER SIZE
       REAL Y(SIZE)
@@ -378,7 +378,7 @@ C
       END
 
 
- 
+
 
 
 
@@ -394,7 +394,7 @@ C
 *   Subroutine to do the plot  -  The Y data array is plotted against
 *   the X array (an array of MJD times). Error bars are plotted if the
 *   ADAM parameter ERRORS is TRUE.
-*       
+*
 *   Plotting should already have been initialized by a call
 *   to TSP_PHSINITAG (in the PHASEPLOT program)
 *
@@ -407,7 +407,7 @@ C
 *  (>)  YLABEL  (Char)    -  Y axis label
 *  (>)  IMIN    (Real)    -  Minimum Y value for plot scaling
 *  (>)  IMAX    (Real)    -  Maximum Y value for plot scaling
-*  (!)  STATUS  (Integer) -  Status value 
+*  (!)  STATUS  (Integer) -  Status value
 *
 *  Jeremy Bailey     28/2/1988
 *
@@ -428,45 +428,45 @@ C
       REAL XR(SIZE)
       REAL IMIN,IMAX
       INTEGER STATUS
-      CHARACTER*(*) YLABEL                              
-      CHARACTER*40 XLABEL        
+      CHARACTER*(*) YLABEL
+      CHARACTER*40 XLABEL
 
 *  LOCAL VARIABLES
-      INTEGER I   
+      INTEGER I
       CHARACTER*80 TSTRING
 
-*  MJD zero point             
-      INTEGER JDZERO                                       
+*  MJD zero point
+      INTEGER JDZERO
 
 *  Data in autograph coordinates
       REAL GX,GY,GY1,GY2
 
 *  Coordinate conversion functions
-      REAL SNX_AGUGX,SNX_AGUGY 
-      REAL ZEROPT,ZEROT   
-      CHARACTER*40 LABEL                       
+      REAL SNX_AGUGX,SNX_AGUGY
+      REAL ZEROPT,ZEROT
+      CHARACTER*40 LABEL
       CHARACTER*20 BUFF
 
 *  Line mode flag
-      LOGICAL LINE 
+      LOGICAL LINE
 
-*  Error bar flag                                
+*  Error bar flag
       LOGICAL ERRORS
 
 *  SGS pen number
-      INTEGER PEN       
-      INTEGER IZ,J,IZA                     
+      INTEGER PEN
+      INTEGER IZ,J,IZA
       REAL AX(2),AY(2)
       INTEGER L
       INTEGER CHR_LEN
 
 
       IF (STATUS .EQ. SAI__OK) THEN
-                              
-                            
+
+
 *  Get the plot label
- 
-             CALL PAR_GET0C('LABEL',LABEL,STATUS)   
+
+             CALL PAR_GET0C('LABEL',LABEL,STATUS)
 
 *  Get LINE parameter
 
@@ -475,11 +475,11 @@ C
 *  Get ERRORS parameter
 
              CALL PAR_GET0L('ERRORS',ERRORS,STATUS)
-                 
+
 *  Get PEN parameter
 
              CALL PAR_GET0I('PEN',PEN,STATUS)
-                 
+
 *  Set up X array for plot
              DO I=1,SIZE
                  XR(I) = REAL(X(I) - DBLE(INT(X(1))))
@@ -493,7 +493,7 @@ C
              ZEROT = XR(1)
 
 *  Set up plot position
-                                  
+
          CALL AGSETF('GRID/TOP.',0.90)
          CALL AGSETF('GRID/BOTTOM.',0.15)
 
@@ -501,7 +501,7 @@ C
 
          CALL AGSETC('LABEL/NAME.','B')
          CALL AGSETI('LINE/NUMBER.',-100)
-         CALL AGSETC('LINE/TEXT.',XLABEL) 
+         CALL AGSETC('LINE/TEXT.',XLABEL)
          CALL AGSETF('LINE/CHAR.',0.030)
          CALL AGSETF('B/WI.',0.030)
          CALL AGSETF('B/MA/CO.',2.0)
@@ -541,17 +541,17 @@ C
          CALL AGSETF('Y/MAX.',IMAX)
 
 *  Plot the data
-                      
+
 
 *  Draw axes
-                
+
          CALL AGSTUP(XR,1,1,SIZE,1,Y,1,1,SIZE,1)
-         CALL AGBACK                     
+         CALL AGBACK
          CALL SGS_ICURZ(IZA)
 
 *  Set SGS Zone to correspond to Autograph User Coordinates
-                                 
-         CALL SNX_AGCS                                     
+
+         CALL SNX_AGCS
 
 *  Select Window
 
@@ -576,8 +576,8 @@ C
 
 *  Calculate ends of error bars
 
-                GY1=SNX_AGUGY(Y(I)+YE(I)) 
-                GY2=SNX_AGUGY(Y(I)-YE(I)) 
+                GY1=SNX_AGUGY(Y(I)+YE(I))
+                GY2=SNX_AGUGY(Y(I)-YE(I))
 
 *  Draw error bar
 
@@ -587,27 +587,27 @@ C
 
 *  Draw polygon to represent point
 
-            CALL SGS_BPOLY(GX+.002,GY)                
-            CALL SGS_APOLY(GX+.0014,GY+.0020)         
-            CALL SGS_APOLY(GX,GY+.003)                
-            CALL SGS_APOLY(GX-.0014,GY+.0020)         
-            CALL SGS_APOLY(GX-.002,GY)                
-            CALL SGS_APOLY(GX-.0014,GY-.0020)         
-            CALL SGS_APOLY(GX,GY-.003)                
-            CALL SGS_APOLY(GX+.0014,GY-.0020)         
-            CALL SGS_APOLY(GX+.002,GY) 
+            CALL SGS_BPOLY(GX+.002,GY)
+            CALL SGS_APOLY(GX+.0014,GY+.0020)
+            CALL SGS_APOLY(GX,GY+.003)
+            CALL SGS_APOLY(GX-.0014,GY+.0020)
+            CALL SGS_APOLY(GX-.002,GY)
+            CALL SGS_APOLY(GX-.0014,GY-.0020)
+            CALL SGS_APOLY(GX,GY-.003)
+            CALL SGS_APOLY(GX+.0014,GY-.0020)
+            CALL SGS_APOLY(GX+.002,GY)
 
 *  Output the polygon
-               
-            CALL SGS_OPOLY           
-          ENDIF                 
-         ENDDO       
+
+            CALL SGS_OPOLY
+          ENDIF
+         ENDDO
 
 *  Draw line joining points if the LINE parameter is set
-      
+
          IF (LINE) THEN
             GX=SNX_AGUGX(XR(1))
-            GY=SNX_AGUGY(Y(1))                    
+            GY=SNX_AGUGY(Y(1))
 
 *  Set start of line
 
@@ -619,21 +619,21 @@ C
               IF (Y(I) .NE. VAL__BADR) THEN
                 GX=SNX_AGUGX(XR(I))
                 GY=SNX_AGUGY(Y(I))
-                CALL SGS_APOLY(GX,GY)    
+                CALL SGS_APOLY(GX,GY)
               ENDIF
             ENDDO
 
 *  Output the line
 
             CALL SGS_OPOLY
-         ENDIF               
+         ENDIF
          CALL SGS_SPEN(1)
 
 *  Flush any remaining output
 
-         CALL SGS_FLUSH     
+         CALL SGS_FLUSH
          CALL SGS_SELZ(IZA,J)
-                             
+
       ENDIF
       END
 

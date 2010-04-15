@@ -1,8 +1,8 @@
-      SUBROUTINE TBL_GETCVC( IN, START, LEN, SZARR, OUT, COLOUT, 
+      SUBROUTINE TBL_GETCVC( IN, START, LEN, SZARR, OUT, COLOUT,
      : CLENGTH)
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'

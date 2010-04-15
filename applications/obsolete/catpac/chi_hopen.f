@@ -1,11 +1,11 @@
       SUBROUTINE CHI_HOPEN( STATUS )
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR' 
+      INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
       INCLUDE 'CMP_ERR'
       INCLUDE 'CHI_PAR'          ! CHI constants
@@ -25,9 +25,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*** COMMENT NEXT LINE OUT IF INSIDE_ADAM_ENVIRONMENT     
+*** COMMENT NEXT LINE OUT IF INSIDE_ADAM_ENVIRONMENT
 *************       CALL HDS_START( STATUS )
-      
+
       DO I = 1, CHIH__NUMCATS
           DO J = 1, CHIH__NUMASS
               CHIH_CATNAME(   J, I) = ' '
@@ -48,6 +48,6 @@
 
       CURR_CAT   = 0
       NCATS_OPEN = 0
-          
+
       END
 

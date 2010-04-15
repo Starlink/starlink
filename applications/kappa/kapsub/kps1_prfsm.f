@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP, POS, 
+      SUBROUTINE KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP, POS,
      :                       OUTDAT, OUTVAR, BADD, BADV, STATUS )
 *+
 *  Name:
@@ -11,13 +11,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP, POS, OUTDAT, 
+*     CALL KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP, POS, OUTDAT,
 *                      OUTVAR, BADD, BADV, STATUS )
 
 *  Description:
 *     This routine produces a 1-D array of data and variances values by
-*     sampling the supplied data at given positions. Nearest neighbour 
-*     interpolation is used. 
+*     sampling the supplied data at given positions. Nearest neighbour
+*     interpolation is used.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -79,12 +79,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
-      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER NDIM
@@ -133,21 +133,21 @@
 *  Go round each axis.
          DO J = 1, NDIM
 
-*  If this axis is bad, store bad values in the returned arrays and leave 
+*  If this axis is bad, store bad values in the returned arrays and leave
 *  the loop, unless the axis spans only a single pixel in which case use
 *  that pixel.
             IF( POS( I, J ) .EQ. AST__BAD ) THEN
                IF( DIM( J ) .GT. 1 ) THEN
                   OUTDAT( I ) = VAL__BADD
                   BADD = .TRUE.
-   
+
                   IF( VAR ) THEN
                      OUTVAR( I ) = VAL__BADD
                      BADV = .TRUE.
                   END IF
-   
+
                   GO TO 10
-               ELSE 
+               ELSE
                   IA = 1
                END IF
 
@@ -171,7 +171,7 @@
 
 *  Otherwise, increment the vector index appropriately.
             ELSE
-              IV = IV + ( IA - 1 )*SKIP 
+              IV = IV + ( IA - 1 )*SKIP
             END IF
 
 *  Set the skip for the next axis.

@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article} 
+\documentstyle[11pt]{article}
 \pagestyle{headings}
 
 %------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ of Fortran subroutines produced by {\em Maximum Entropy Data Consultants (MEDC)
 Ltd}. They are designed to find and use maximum entropy reconstructions of
 images, power spectra, and other such additive distributions from arbitrary sets
 of data. It should be read in conjunction with the MEMSYS manuals produced by
-{em MEDC Ltd}. 
+{em MEDC Ltd}.
 
 %------------------------------------------------------------------------------
 %  Add this part if you want a table of contents
@@ -95,12 +95,12 @@ of data. It should be read in conjunction with the MEMSYS manuals produced by
 \vspace{30mm}
 
 \section {Introduction}
-MEMSYS is a ``quantified maximum entropy image reconstruction 
+MEMSYS is a ``quantified maximum entropy image reconstruction
 package'', consisting of subroutines callable from FORTRAN programs.
-It was written by J. Skilling and S. Gull of Maximum Entropy Data 
-Consultants Ltd, and embodies their ``Classic'' Maximum Entropy 
+It was written by J. Skilling and S. Gull of Maximum Entropy Data
+Consultants Ltd, and embodies their ``Classic'' Maximum Entropy
 algorithm, described in more detail in the MEMSYS3 users manual (see
-also references \cite{ref:Gull88} and \cite{ref:Skilling88}). For a historical 
+also references \cite{ref:Gull88} and \cite{ref:Skilling88}). For a historical
 review of the use of Maximum Entropy in Astrophysics see \cite{ref:Narayan}.
 
 Starlink currently distribute two versions of MEMSYS; the older MEMSYS3 and the
@@ -112,31 +112,31 @@ applications. This note was originally written to describe the use of MEMSYS3.
 The steps needed to produce a MEMSYS5 application are slightly different to
 those listed in section \ref {SEC:STEPS}. It is hoped to completely revise this
 note at some time in the future to take account of MEMSYS5. However, people
-who want to use MEMSYS5 can (and should) consult the MEMSYS5 manual for 
-details. 
+who want to use MEMSYS5 can (and should) consult the MEMSYS5 manual for
+details.
 
-The algorithms of both MEMSYS3 and MEMSYS5 differ greatly from their previous 
+The algorithms of both MEMSYS3 and MEMSYS5 differ greatly from their previous
 MEM algorithms, in
 that it is based on a fully Bayesian analysis of the image reconstruction
 problem. The new packages provides the following extra functionality:
 \begin {itemize}
-\item Automatic calculation of the most probable noise level in the input 
+\item Automatic calculation of the most probable noise level in the input
 data.
 \item Estimation of errors in the output reconstruction.
 \item Provision for handling negative data values.
 \item Provision for handling limited non-linearities in the data.
 \item Poisson or Gaussian statistics for input data noise.
-\item MEMSYS5 provides facilities for generating random samples from the 
-``probability bubble'' which represents the deconvolution. Each sample is an 
-image, similar to the mean image returned as ``the deconvolved image''. 
-Intercomparison of these images can give the user a visual appreciation of the 
-variability present in the reconstruction, particularly if the images are 
+\item MEMSYS5 provides facilities for generating random samples from the
+``probability bubble'' which represents the deconvolution. Each sample is an
+image, similar to the mean image returned as ``the deconvolved image''.
+Intercomparison of these images can give the user a visual appreciation of the
+variability present in the reconstruction, particularly if the images are
 displayed in rapid succession on an image display, ``movie''style.
 \end {itemize}
 
-This note does not aim to replace the MEMSYS manuals. It merely provides 
-a much simplified introduction to the algorithm, and some broad guide lines for 
-putting together a MEMSYS3 applications program. The MEMSYS manuals must be 
+This note does not aim to replace the MEMSYS manuals. It merely provides
+a much simplified introduction to the algorithm, and some broad guide lines for
+putting together a MEMSYS3 applications program. The MEMSYS manuals must be
 read by anyone intending to write such a program.
 
 \section {What MEMSYS can do}
@@ -144,7 +144,7 @@ MEMSYS deals with ``data sets'' and ``images''. A {\em data set} holds
 information corresponding to the available experimental data, and an {\em image}
 holds information corresponding to the ``true'' image from which the data was
 generated. MEMSYS handles problems where the relationship between data and
-image can described as follows: 
+image can described as follows:
 
 \begin {equation}
 F_{k}=\sum_{j=1}^{Mj} (R_{kj}*f_{j})+n_{k}  \label {EQ:DATA}
@@ -152,7 +152,7 @@ F_{k}=\sum_{j=1}^{Mj} (R_{kj}*f_{j})+n_{k}  \label {EQ:DATA}
 
 where $F_{k}$ is the $k$th data value, $M_{k}$ is the number of data values,
 $f_{j}$ is the $j$th image value, $R_{kj}$ is the response of sample $F_{k}$ to
-pixel $f_{j}$, and $n_{k}$ is the noise on sample $k$. 
+pixel $f_{j}$, and $n_{k}$ is the noise on sample $k$.
 
 This is a linear relationship between data and image. MEMSYS can also cope
 with non-linear data, so long as the data $D_{k}$ can be expressed as follows:
@@ -160,13 +160,13 @@ with non-linear data, so long as the data $D_{k}$ can be expressed as follows:
 \begin {equation}
 D_{k} = \Phi(F_{k})
 \end {equation}
- where $\Phi$ is some known function with known derivative, and $F_{k}$ is 
-linearly dependant on the data. 
+ where $\Phi$ is some known function with known derivative, and $F_{k}$ is
+linearly dependant on the data.
 
-The image and data set are described as one dimensional arrays purely for ease 
+The image and data set are described as one dimensional arrays purely for ease
 of access within the package. In fact, they could be of any dimensionality. The
-program calling MEMSYS needs to set up the correspondence between N dimensional 
-coordinates and the one dimensional coordinate used above. For instance for a 
+program calling MEMSYS needs to set up the correspondence between N dimensional
+coordinates and the one dimensional coordinate used above. For instance for a
 two dimensional image with coordinates $(pix,lin)$ the relationship may be
 
 \begin {equation}
@@ -175,8 +175,8 @@ two dimensional image with coordinates $(pix,lin)$ the relationship may be
 
 where $NPIX$ is the number of pixels per line of the image.
 
-A common example of the use of MEMSYS is to deconvolve a 2D image given a Point 
-Spread Function (PSF). In this case the data is linear and the matrix $R_{kj}$ 
+A common example of the use of MEMSYS is to deconvolve a 2D image given a Point
+Spread Function (PSF). In this case the data is linear and the matrix $R_{kj}$
 embodies the PSF.
 
 \section {Bayesian image reconstruction}
@@ -197,28 +197,28 @@ uses an entropy function for this prior probability, in which zero entropy is
 defined by an image (called the ``default model'') which can be supplied by the
 user , but which is usually taken to be a flat surface equal to the mean of the
 data. Any image which deviates from this default model has a negative entropy
-value, the greater the deviation the more negative the entropy. 
+value, the greater the deviation the more negative the entropy.
 
-The other key quantity in the MEMSYS algorithm is the {\em likelihood}. This is 
-the probability that the observed data $D$ could have been generated from a 
+The other key quantity in the MEMSYS algorithm is the {\em likelihood}. This is
+the probability that the observed data $D$ could have been generated from a
 given image $f$. The probability of $D$ given $f$  is written as $P( D \mid f )$
-where the ``$\mid$'' character means ``given''. The likelihood is based on a 
-model of the noise statistics in the data, and on a model of the response 
-function of the experimental system. Given an image, the response model can be 
-used to generate the data which {\em would} have been observed (in the absence 
-of noise) if the true sky looked exactly like the given image. The noise model 
-can then be used to find the probability that all the deviations of 
-this simulated data from the real data could be explained as noise. As an 
-example, if $F$ is the simulated data from some image $f$, and $D$ is the 
-corresponding real data, subject to Gaussian noise of standard deviation 
-$\sigma$, then 
+where the ``$\mid$'' character means ``given''. The likelihood is based on a
+model of the noise statistics in the data, and on a model of the response
+function of the experimental system. Given an image, the response model can be
+used to generate the data which {\em would} have been observed (in the absence
+of noise) if the true sky looked exactly like the given image. The noise model
+can then be used to find the probability that all the deviations of
+this simulated data from the real data could be explained as noise. As an
+example, if $F$ is the simulated data from some image $f$, and $D$ is the
+corresponding real data, subject to Gaussian noise of standard deviation
+$\sigma$, then
 
 \begin{equation}
 P(D \mid f) = (2\pi\sigma^{2})^{-0.5}.e^{-(D-F)^{2}/2\sigma^{2}}
 \end{equation}
 
 What is needed from the deconvolution is not $P( D \mid f)$ but $P( f \mid D)$
-i.e. the probability of the image $f$ given the data $D$. Bayes' theorem can be 
+i.e. the probability of the image $f$ given the data $D$. Bayes' theorem can be
 used to calculate $P( f \mid D )$ as follows:
 
 \begin{equation}
@@ -230,7 +230,7 @@ of  the data given $f$, and $P(D)$ (known as the data ``evidence'') is a
 constant  which normalises $P( f \mid D )$ to a sum of unity, and gives the
 probability of  the data.
 
-MEMSYS is an iterative algorithm, each iteration producing a new version of 
+MEMSYS is an iterative algorithm, each iteration producing a new version of
 the reconstruction image $f$. It starts with $f$ equal to the default model
 (i.e. $f$ starts off with zero entropy).  This gives a high prior probability,
 but will in general give a {\em very} low likelihood, thus the probability of
@@ -245,49 +245,49 @@ than the likelihood is rising and so the overall  probability would go down. In
 practice, going beyond the peak results in noise  being interpreted as real
 structure.
 
-A crucial point to understand when interpreting MEMSYS results is that the 
-image returned is only the most probable. There could be other images only 
-{\em slightly} less probable than the one returned. In fact MEMSYS does, in 
-effect, keep track of the probability of {\em all} images. If inferences about 
+A crucial point to understand when interpreting MEMSYS results is that the
+image returned is only the most probable. There could be other images only
+{\em slightly} less probable than the one returned. In fact MEMSYS does, in
+effect, keep track of the probability of {\em all} images. If inferences about
 the reconstruction are to made (such as the integrated flux in some region)
 then all images should really be taken into account, weighting the contributions
 to the final answer by the probabilities $P( f \mid D)$. MEMSYS provides a
-facility to do just this. An image can be given (a ``mask'' image) which is 
+facility to do just this. An image can be given (a ``mask'' image) which is
 multiplied by the
 reconstruction. The best estimate of the total data sum in the product is
 returned together with the standard deviation on the total data sum. This
 uncertainty represents the spread in values between the different plausible
-images. 
+images.
 
 
 \section {How to use MEMSYS3}
 \label {SEC:STEPS}
 This section describes how to write an application using the MEMSYS3 package.
-The steps required are slightly different if using the MEMSYS5 package. A 
-future revision of this note will describe the use of MEMSYS5, but of course, 
-the MEMSYS5 manual should in any case be consulted before writing MEMSYS5 
+The steps required are slightly different if using the MEMSYS5 package. A
+future revision of this note will describe the use of MEMSYS5, but of course,
+the MEMSYS5 manual should in any case be consulted before writing MEMSYS5
 applications.
 
-A program must be written to set up the data structures required by MEMSYS3 and 
-then to call the main MEMSYS3 subroutine (MEM3) repeatedly until MEM3 indicates 
-that the requested termination criterion has been reached. Two additional 
-subroutines must be written by the user which are called from within MEMSYS3. 
-These are called OPUS and TROPUS, and they provide MEMSYS3 with a model of the 
+A program must be written to set up the data structures required by MEMSYS3 and
+then to call the main MEMSYS3 subroutine (MEM3) repeatedly until MEM3 indicates
+that the requested termination criterion has been reached. Two additional
+subroutines must be written by the user which are called from within MEMSYS3.
+These are called OPUS and TROPUS, and they provide MEMSYS3 with a model of the
 response functions used to generate the data.
 
-The KAPPA program MEM2D can be examined as an example of the use of MEMSYS3 
-within the Starlink ADAM environment. It performs deconvolution of 2D images, 
-using the same PSF at every point in the image. A simpler stand-alone 
-demonstration program called TOY is provided with the MEMSYS3 software. The 
+The KAPPA program MEM2D can be examined as an example of the use of MEMSYS3
+within the Starlink ADAM environment. It performs deconvolution of 2D images,
+using the same PSF at every point in the image. A simpler stand-alone
+demonstration program called TOY is provided with the MEMSYS3 software. The
 source for this is MEMSYS3\_DIR:TOY.FOR.
 
-The following sections give a general description of the steps involved in 
-designing a program to use MEMSYS3. For specific details of subroutine argument 
-lists, etc, see the MEMSYS3 user manual. 
+The following sections give a general description of the steps involved in
+designing a program to use MEMSYS3. For specific details of subroutine argument
+lists, etc, see the MEMSYS3 user manual.
 
 \subsection {Step 1 --- Design OPUS}
 The first step to producing a MEMSYS3 application program is to design the
-OPUS subroutine.  OPUS is required to generate a simulated data set 
+OPUS subroutine.  OPUS is required to generate a simulated data set
 $F_{k}$ ($k\in[1,Mk]$) from a supplied ``trial'' image $f$.
 The operation of OPUS can be described by the equation:
 
@@ -295,11 +295,11 @@ The operation of OPUS can be described by the equation:
 F_{k}=\sum_{j=1}^{Mj} R_{kj}*f_{j}        \label {EQ:OPUS}
 \end {equation}
 
-where $R_{kj}$ is the response of sample $F_{k}$ to pixel $f_{j}$ of the 
+where $R_{kj}$ is the response of sample $F_{k}$ to pixel $f_{j}$ of the
 image, and $M_{j}$ is the number of pixels in the image.
-Usually, any one data sample will receive non-zero contributions only 
-from a limited number of pixels close to the data sample centre, so the 
-majority of the $R_{kj}$ terms will be zero. Equation \ref{EQ:OPUS} can be 
+Usually, any one data sample will receive non-zero contributions only
+from a limited number of pixels close to the data sample centre, so the
+majority of the $R_{kj}$ terms will be zero. Equation \ref{EQ:OPUS} can be
 written as a matrix equation:
 
 \begin {equation}
@@ -328,9 +328,9 @@ matrix.
 
 This is a simple case because the data  and image are in the same format (equal
 sized 2D images). More complicated  situations can arise. For instance, the
-data may come as a series of randomly  positioned samples of the sky. An extra 
-complication may be that the data samples don't all have the same PSF. This is 
-the case with IRAS raw data. In this sort of situation, OPUS would need to 
+data may come as a series of randomly  positioned samples of the sky. An extra
+complication may be that the data samples don't all have the same PSF. This is
+the case with IRAS raw data. In this sort of situation, OPUS would need to
 divide the data samples into groups, each containing samples which have a
 common PSF.  For each group, the supplied image is smoothed with the groups
 PSF. The smoothed  image is then sampled at the position of each data sample
@@ -341,7 +341,7 @@ as the real data.
 
 \subsection {Step 2 --- Design TROPUS}
 
-Having design OPUS, the next step is to design the TROPUS subroutine (the name 
+Having design OPUS, the next step is to design the TROPUS subroutine (the name
 means ``TRansposed OPUS''). The function which TROPUS performs is not so easy
 to  visualize as the data simulation performed by OPUS. TROPUS is required to
 calculate an image $f_{j}$, given a data set $F_{k}$, where:
@@ -350,7 +350,7 @@ calculate an image $f_{j}$, given a data set $F_{k}$, where:
 f_{j}=\sum_{k=1}^{Mk} R_{kj}*F_{k}        \label {EQ:TROPUS}
 \end {equation}
 
-$R_{kj}$ in this equation must have the same value as in equation \ref 
+$R_{kj}$ in this equation must have the same value as in equation \ref
 {EQ:OPUS}. In matrix notation this is:
 
 \begin {equation}
@@ -361,10 +361,10 @@ where ${\bf R}^{T}$ is the transpose of ${\bf R}$.
 
 
 A good way to arrive at an implementation of TROPUS is to first describe OPUS
-as  a matrix equation as was done in equation \ref {EQ:MEM2D_OPUS} for the OPUS 
-routine used in program MEM2D. The response matrix ${\bf R}$ can then be 
-identified and its transpose expressed in terms of the operations performed in 
-OPUS. For instance, comparing equations \ref {EQ:MATRIX_OPUS} and \ref 
+as  a matrix equation as was done in equation \ref {EQ:MEM2D_OPUS} for the OPUS
+routine used in program MEM2D. The response matrix ${\bf R}$ can then be
+identified and its transpose expressed in terms of the operations performed in
+OPUS. For instance, comparing equations \ref {EQ:MATRIX_OPUS} and \ref
 {EQ:MEM2D_OPUS}, it can be seen that
 
 \begin {equation}
@@ -383,7 +383,7 @@ This can be expanded to become
 {\bf R^{T}}={\bf A}^{T}.{\bf P}^{T}.({\bf A^{-1}})^{T}
 \end {equation}
 
-Now the matrices ${\bf A}$, ${\bf A^{-1}}$ and ${\bf P}$ are all symmetric so 
+Now the matrices ${\bf A}$, ${\bf A^{-1}}$ and ${\bf P}$ are all symmetric so
 this becomes
 
 \begin {equation}
@@ -396,13 +396,13 @@ Thus, for MEM2D TROPUS should perform the operation
 \underline{f}={\bf A}.{\bf P}.{\bf A^{-1}}.\underline{F}
 \end {equation}
 
-In words, this corresponds to first taking the inverse Fourier transform of the 
+In words, this corresponds to first taking the inverse Fourier transform of the
 supplied data set (assuming the imaginary component to be zero), multiplying
 the  transform by the Fourier transform of the PSF image, and then taking the
 forward Fourier transform to get the required image as the  real component.
 
-It usually possible to work out what TROPUS should do by this means of 
-expressing OPUS as a matrix equation, identifying ${\bf R}$, and then expanding 
+It usually possible to work out what TROPUS should do by this means of
+expressing OPUS as a matrix equation, identifying ${\bf R}$, and then expanding
 its transpose. The more complicated situation described earlier, which is  used
 with IRAS data, can also be expressed this way. An extra matrix is required  in
 the expression for ${\bf R}$ describing the sampling operation.
@@ -414,12 +414,12 @@ TROPUS should perform the exact transpose of OPUS. If it
 doesn't, MEMSYS3 will fail to converge properly. A subroutine called MEMTRQ is
 included in MEMSYS3 which allows the consistency of OPUS and TROPUS to be
 checked. It should always be used to ensure that OPUS and TROPUS have been coded
-correctly. 
+correctly.
 
 It is usually necessary to communicate extra information to OPUS and TROPUS (eg
 the image size etc) which is not provided by the subroutine arguments. This must
 be done by using a common block. The application program must set up this common
-block before calling MEM3. 
+block before calling MEM3.
 
 \subsection {Step 3 --- Design code to set up the common block /MECOMP/}
 
@@ -432,24 +432,24 @@ Common block /MECOMP/ (``P'' for Pointers) contains information giving the size
 of each used internal file and pointers to the start of each one within the main
 storage array. It is possible to store just part of each data set or image in
 /MECOMS/, the rest residing in a disk file and accessed as necessary. In this
-mode, /MECOMS/ provides room for a buffer for each image or data set. 
+mode, /MECOMS/ provides room for a buffer for each image or data set.
 
-Having designed OPUS and TROPUS it is usually possible to decide how big the 
-data sets and images need to be (they are not necessarily the same size), 
-and how many internal files are needed (for instance, the MEM2D program stores 
+Having designed OPUS and TROPUS it is usually possible to decide how big the
+data sets and images need to be (they are not necessarily the same size),
+and how many internal files are needed (for instance, the MEM2D program stores
 the PSF image in internal file 3 which is not used by MEMSYS3).
-This is the information which is needed by the code which sets up the common 
-block /MECOMP/. See the MEMSYS3 manual for full detailed description of the 
+This is the information which is needed by the code which sets up the common
+block /MECOMP/. See the MEMSYS3 manual for full detailed description of the
 contents of /MECOMP/.
 
 
 In many cases not all the data supplied by the user is used in the image
-reconstruction. The input data may contain values which are ``bad'' for one 
-reason or another and need to be excluded, or the user may only want to 
+reconstruction. The input data may contain values which are ``bad'' for one
+reason or another and need to be excluded, or the user may only want to
 reconstruct a sub-set of the input data. The data set size stored in /MECOMP/
-must be the number of data samples which are {\em actually} used in the 
-reconstruction, although it is possible to make MEMSYS3 ignore a data sample 
-stored in /MECOMS/ by setting its corresponding ``accuracy'' to zero (see the 
+must be the number of data samples which are {\em actually} used in the
+reconstruction, although it is possible to make MEMSYS3 ignore a data sample
+stored in /MECOMS/ by setting its corresponding ``accuracy'' to zero (see the
 next section).
 
 \subsection {Step 4 --- Design code to set up the common block /MECOMS/}
@@ -457,10 +457,10 @@ next section).
 Only internal files 1, 2, and 20 to 29 are ever used by MEMSYS3. Files 1,2
 and 20 each contains an image and are of size $Mj$, while files 21 to 28 each
 contains a data set and are of size $Mk$. Of these, files 20, 21 and 22 are
-unaffected by MEMSYS3 and contain data set up by the calling program. It is 
-possible to use the remaining internal files to store things which are required 
-by OPUS and TROPUS. Example may be a PSF image or a data set holding the solid 
-angle of each data sample. Code needs to be designed to set up internal 
+unaffected by MEMSYS3 and contain data set up by the calling program. It is
+possible to use the remaining internal files to store things which are required
+by OPUS and TROPUS. Example may be a PSF image or a data set holding the solid
+angle of each data sample. Code needs to be designed to set up internal
 files 20, 21, 22 and any others used by OPUS and TROPUS, prior to calling MEM3.
 
 \subsubsection {Internal file 20 --- The default model}
@@ -485,14 +485,14 @@ negative values.
 
 This file contains the $Mk$ data samples to be included in the reconstruction.
 Better results are usually obtained if this data has a zero background level,
-and so some suitable background estimation and subtraction process may be 
+and so some suitable background estimation and subtraction process may be
 performed on the data before calling the main MEMSYS3 routine MEM3. Care should
-be taken that any negative data samples resulting from the background 
+be taken that any negative data samples resulting from the background
 subtraction are consistent with the noise level. If many data samples have
-large  negative values (compared with the noise level) then the convergence of 
-the MEMSYS3 algorithm will be be badly affected. If such samples exist, it may 
-be necessary to use the ``positive/negative entropy'' option available in 
-MEMSYS3, which removes the usual MEM restriction that all reconstructed image 
+large  negative values (compared with the noise level) then the convergence of
+the MEMSYS3 algorithm will be be badly affected. If such samples exist, it may
+be necessary to use the ``positive/negative entropy'' option available in
+MEMSYS3, which removes the usual MEM restriction that all reconstructed image
 pixels must have strictly positive values.
 
 \subsubsection {Internal file 22 --- The data accuracies}
@@ -503,8 +503,8 @@ standard  deviation of $\sigma$, then the accuracy is $1/\sigma$. In may be
 possible to assume that the accuracies of all data samples are equal.  In this
 case room can be save in /MECOMS/ by setting MEM3 argument ``ACC'' to  the
 accuracy value, and argument ``METHOD'' to indicate that ACC should be used  to
-define the accuracies rather than internal file 22. File 22 is then not 
-needed. 
+define the accuracies rather than internal file 22. File 22 is then not
+needed.
 
 If an accuracy of zero is specified for a data sample, then the sample will
 have  no effect on the reconstruction. This can be used to exclude bad data
@@ -512,15 +512,15 @@ samples.
 
 
 \subsection {Step 5 --- Design code to call MEM3 with suitable argument values}
-The reconstruction process is iterative, one call to routine MEM3 performing 
-one iteration of the process. MEM3 should be repeatedly called until either 
-the returned status indicates successful convergence, or a specified iteration 
+The reconstruction process is iterative, one call to routine MEM3 performing
+one iteration of the process. MEM3 should be repeatedly called until either
+the returned status indicates successful convergence, or a specified iteration
 limit is reached.
 
-MEM3 has twenty arguments, all described in the MEMSYS3 users manual. A few 
+MEM3 has twenty arguments, all described in the MEMSYS3 users manual. A few
 comments are made here about three of them:
 
-\begin {description} 
+\begin {description}
 
 \item [METHOD] - Used to select various options available in MEM3. One option
 is  the ``stopping criterion''. This determines how far the algorithm goes
@@ -530,18 +530,18 @@ the stopping  criterion is based on the $\chi^2$ statistic describing the
 deviation of the  reconstructed image from the data. The reconstruction is
 considered complete  when $\chi^{2}=Mk$ is reached, i.e. each data sample is
 fitted, on average, to  one standard deviation. Gull and Skilling now consider
-this to be an ad hoc  criterion, with little philosophical justification. 
+this to be an ad hoc  criterion, with little philosophical justification.
 
-In Classic MEM the stopping criterion is that the reconstruction should be the 
-most probable, as described in section \ref {SEC:ENTROPY}. This  fully 
-Bayesian approach generally produces images which are closer fits to the data 
-than those produced by Historic MEM, but requires many more calls to OPUS and 
+In Classic MEM the stopping criterion is that the reconstruction should be the
+most probable, as described in section \ref {SEC:ENTROPY}. This  fully
+Bayesian approach generally produces images which are closer fits to the data
+than those produced by Historic MEM, but requires many more calls to OPUS and
 TROPUS to achieve.
 
-The Bayesian approach results in the data evidence being calculated. Unknown 
+The Bayesian approach results in the data evidence being calculated. Unknown
 parameters in the experimental response model, noise model, default model, etc,
 can be estimated by varying their values until the evidence is maximized.  In
-general this is an extremely long-winded process, since it requires MEMSYS3 to 
+general this is an extremely long-winded process, since it requires MEMSYS3 to
 be run many times with different parameter values. However, the package
 contains  the facility to optimise one particular parameter during a single
 run. This  parameter is a noise scaling factor, which is applied to all the
@@ -556,20 +556,20 @@ can be  produced, for example, if an image is expanded. The noise value in
 adjacent  pixels are then related to each other. In such situations it seems
 better to  switch off the automatic noise scaling option.
 
-\item [RATE] - RATE controls the rate at which the convergence is allowed to 
-proceed and should normally have a value of the order of unity. Lower values 
-cause more iterations to be required to reach termination, but each iteration 
-usually requires fewer calls to OPUS and TROPUS. On the other hand, a larger 
-value of RATE causes termination to be reached in fewer iterations, but each 
-iteration takes more calls to OPUS and TROPUS. In general a smaller value is to 
+\item [RATE] - RATE controls the rate at which the convergence is allowed to
+proceed and should normally have a value of the order of unity. Lower values
+cause more iterations to be required to reach termination, but each iteration
+usually requires fewer calls to OPUS and TROPUS. On the other hand, a larger
+value of RATE causes termination to be reached in fewer iterations, but each
+iteration takes more calls to OPUS and TROPUS. In general a smaller value is to
 be preferred since it will prevent the convergence process from wandering off
-its  trajectory, and so give a better result. If RATE is too high, it can cause 
-MEMSYS3 to crash with a ``floating overflow'' message. If this happens try 
+its  trajectory, and so give a better result. If RATE is too high, it can cause
+MEMSYS3 to crash with a ``floating overflow'' message. If this happens try
 re-running the application with a much lower value for RATE.
 
-\item [ISTAT] - An integer status value. Each digit indicates a particular 
-condition. When the least significant 4 digits are returned all zero, the 
-reconstruction is complete and no more calls to MEM3 need be made. The top 3 
+\item [ISTAT] - An integer status value. Each digit indicates a particular
+condition. When the least significant 4 digits are returned all zero, the
+reconstruction is complete and no more calls to MEM3 need be made. The top 3
 digits can be ignored when deciding if to call MEM3 again.
 \end {description}
 
@@ -586,56 +586,56 @@ image. MEMASK  then returns the value $\rho$ where:
 \rho=\sum_{j=1}^{Mj} f_{j}.p_{j}
 \end {equation}
 
-where $f_{j}$ is the $j$th pixel of the final reconstruction held in internal 
-file 1, and $p_{j}$ is the $j$th pixel of the mask image held in internal file 
-2. The real point of using MEMASK is that, as well as $\rho$, it also 
+where $f_{j}$ is the $j$th pixel of the final reconstruction held in internal
+file 1, and $p_{j}$ is the $j$th pixel of the mask image held in internal file
+2. The real point of using MEMASK is that, as well as $\rho$, it also
 calculates the standard deviation of $\rho$.
 
-For instance, masks can be set up which result in $\rho$ being the integrated 
+For instance, masks can be set up which result in $\rho$ being the integrated
 flux within some source region minus an average background brightness defined
 in  some background region. The standard deviation on $\rho$ will then allow
-the  user to tell if the source is significant or not. 
+the  user to tell if the source is significant or not.
 
 MEMASK works by taking into account the probability of {\em all} images, not
 just  the most probable image returned as the final reconstruction (see section
-\ref  {SEC:ENTROPY}). The numbers returned by MEMASK should be seen as the real 
-``result'' of a MEM reconstruction, since the actual image returned is only one 
-out of a potentially large range or plausible images with only slightly lower 
+\ref  {SEC:ENTROPY}). The numbers returned by MEMASK should be seen as the real
+``result'' of a MEM reconstruction, since the actual image returned is only one
+out of a potentially large range or plausible images with only slightly lower
 probabilities.
 
-A point to note is that, as the area over which the reconstruction is being 
-integrated gets less, the value of $\rho$ drops faster than its standard 
-deviation. This means that as the source area gets smaller and smaller the 
+A point to note is that, as the area over which the reconstruction is being
+integrated gets less, the value of $\rho$ drops faster than its standard
+deviation. This means that as the source area gets smaller and smaller the
 {\em relative} uncertainty of the integral value $\rho$ gets larger and larger.
 
 \subsection {Intrinsic Correlation Functions}
 
-One of the axioms on which the MEMSYS3 algorithm rests is that there are no 
-pixel-to-pixel correlations in the reconstructed image. This means that the 
+One of the axioms on which the MEMSYS3 algorithm rests is that there are no
+pixel-to-pixel correlations in the reconstructed image. This means that the
 reconstruction in one part of the image will not influence the reconstruction
-in  another part. Consequently, MEMSYS3 is free to develop high frequency 
-structure in the reconstruction, so long as there is evidence for it in the 
-data. In practice, most images do have significant intrinsic pixel-to-pixel 
-correlations. This often results in unpleasantly high levels of spurious 
+in  another part. Consequently, MEMSYS3 is free to develop high frequency
+structure in the reconstruction, so long as there is evidence for it in the
+data. In practice, most images do have significant intrinsic pixel-to-pixel
+correlations. This often results in unpleasantly high levels of spurious
 structure in the reconstruction. What is needed is some way of incorporating
 prior knowledge about  the spatial correlations into the reconstruction
 algorithm without compromising  the axioms of Maximum Entropy.
 
-This can be done by defining an Intrinsic Correlation Function (ICF) which 
-describes the correlation expected in the reconstructed image $f$. The 
+This can be done by defining an Intrinsic Correlation Function (ICF) which
+describes the correlation expected in the reconstructed image $f$. The
 ``hidden'' image $h$ is defined by
 
 \begin {equation}
  f = i \otimes h
 \end {equation}
 
-where $i$ is the ICF and $\otimes$ represents convolution. The hidden image is 
+where $i$ is the ICF and $\otimes$ represents convolution. The hidden image is
 thus the {\em de}convolution of the required reconstruction with the ICF. It is
 assumed that the hidden image contains no spatial correlations, i.e. {\em all}
-spatial correlations in $f$ are considered to be caused by the ICF. MEMSYS3 can 
-now safely be used to calculate the hidden image. Once this has been done the 
-returned image $h$ can be convolved with the ICF to get the required 
-reconstruction $f$. 
+spatial correlations in $f$ are considered to be caused by the ICF. MEMSYS3 can
+now safely be used to calculate the hidden image. Once this has been done the
+returned image $h$ can be convolved with the ICF to get the required
+reconstruction $f$.
 
 OPUS must be changed to take into account the fact that the supplied image is
 no  longer an estimate of the required reconstruction, but an estimate of the
@@ -662,15 +662,15 @@ supplied data, in the same way it would have done if no ICF were being used, and
 then apply the transpose ICF matrix to the resulting image. If the hidden image
 is smoothed using Fourier transforms, then ${\bf I}={\bf A^{-1}}.{\bf i}.{\bf
 A}$ where ${\bf i}$ is a diagonal matrix containing the Fourier transform of the
-ICF values, and $({\bf I})^{T}={\bf A}.{\bf i}.{\bf A^{-1}}$ 
+ICF values, and $({\bf I})^{T}={\bf A}.{\bf i}.{\bf A^{-1}}$
 
-In the simple case of 2d deconvolution with a constant PSF, this can easily be 
+In the simple case of 2d deconvolution with a constant PSF, this can easily be
 implemented by smoothing the PSF with the ICF before calling MEM3. There is
 then  no need to modify OPUS and TROPUS, so long as the new smoothed PSFs are
 used.
 
 To use the inference routine MEMASK, it is necessary to smooth the supplied
-mask  with the ICF before calling MEMASK, to make it relate to the hidden image 
+mask  with the ICF before calling MEMASK, to make it relate to the hidden image
 stored in internal file 1.
 
 The particular choice of ICF is up to the application program. In principle,
@@ -689,26 +689,26 @@ using the fortran INCLUDE statement:
 \begin{verbatim}
 
 *  Include the MEMSYS3 common blocks
-      INCLUDE 'MECOMS.INC'   
-      INCLUDE 'MECOMP.INC'   
-      INCLUDE 'MECOML.INC'   
-      INCLUDE 'MECOMC.INC'   
+      INCLUDE 'MECOMS.INC'
+      INCLUDE 'MECOMP.INC'
+      INCLUDE 'MECOML.INC'
+      INCLUDE 'MECOMC.INC'
 \end{verbatim}
 
 Issuing the command {\bf memsys3\_dev} before attempting to compile such a
 subroutine will ensure that the include files can be found by the
 compiler.
 
-UNIX applications may be linked with MEMSYS3 by specifying `memsys3\_link` 
-on the compiler command line. Thus, to compile and link an application 
-called `prog', the following might be used: 
+UNIX applications may be linked with MEMSYS3 by specifying `memsys3\_link`
+on the compiler command line. Thus, to compile and link an application
+called `prog', the following might be used:
 
 \begin{verbatim}
       f77 prog.f `memsys3_link` -o prog.out
 \end{verbatim}
 
-Note, backward quote characters should be used rather than the more common 
-forward quote character. This command assumes that the file `prog.f' contains 
+Note, backward quote characters should be used rather than the more common
+forward quote character. This command assumes that the file `prog.f' contains
 the code for all required routines (including OPUS and TROPUS).
 
 VMS applications which use MEMSYS3 should use the following link command:
@@ -717,7 +717,7 @@ VMS applications which use MEMSYS3 should use the following link command:
       $LINK <application name>,OPUS,TROPUS,MEMSYS3_DIR:MEMSYS3/LIB
 \end{verbatim}
 
-If the OPUS and TROPUS routines are contained within an object library then the 
+If the OPUS and TROPUS routines are contained within an object library then the
 command should be:
 
 \begin{verbatim}
@@ -734,7 +734,7 @@ disk  storage, then the ``INCLUDE'' list should also include subroutine UGET
 and UPUT  (written by the user, see the MEMSYS3 manual).
 
 If a MEMSYS3 application uses the non-linear data option, then the ``INCLUDE''
-list  should also include subroutine MEMEX (written by the user, see the 
+list  should also include subroutine MEMEX (written by the user, see the
 MEMSYS3 manual).
 
 \subsection{Gaining Access to MEMSYS}
@@ -742,12 +742,12 @@ MEMSYS3 manual).
 The MEMSYS package is a commercial package. Under the Licence Agreement, users
 must sign a copy of the {\rm MEMSYS Academic User's Licence Agreement}, before
 being given access to the software. Access will be granted by Starlink site
-managers using ACL's (VMS) or group protection (Unix). The agreement covers 
+managers using ACL's (VMS) or group protection (Unix). The agreement covers
 use of both MEMSYS3 and MEMSYS5.
 
 Copies of the licence aggreement may be obtained from Site Managers, or from
-the Starlink Software Librarian at RAL. The \LaTeX\ source for the Agreement is 
-available in on Unix systems as {\tt /star/memsys/memsys.tex} and on VMS 
+the Starlink Software Librarian at RAL. The \LaTeX\ source for the Agreement is
+available in on Unix systems as {\tt /star/memsys/memsys.tex} and on VMS
 systems as {\tt MEMSYS\_DIR:MEMSYS.TEX}.
 
 The software is only licensed by the terms of the above mentioned agreement
@@ -756,45 +756,45 @@ for use at Starlink nodes and United Kingdom Observatories.
 
 \appendix
 \section {User callable MEMSYS3 subroutines}
-MEMSYS3 consists of a FORTRAN subroutine library. The following 
+MEMSYS3 consists of a FORTRAN subroutine library. The following
 subroutines provide an interface to the whole package:
 \begin {description}
-\item [MEM3] - The main MEMSYS3 subroutine which performs a single 
+\item [MEM3] - The main MEMSYS3 subroutine which performs a single
 iteration of the MEM algorithm.
 \item [MEMASK] - The ``inference'' routine. It calculates integrals (eg
 aperture photometry) over the current reconstruction, and also computes
 the standard deviation for the integral value.
-\item [MEMTRQ] - Checks the consistency of the OPUS and TROPUS 
+\item [MEMTRQ] - Checks the consistency of the OPUS and TROPUS
 subroutines supplied by the user.
 \item [VRAND] - A fast random number generator
 \item [MEMJ] - Copies an internal image file
 \item [MEMK] - Copies an internal data file
 \end {description}
-The full specifications for these routines can be found in the MEMSYS3 
+The full specifications for these routines can be found in the MEMSYS3
 users manual.
 
 \section {MEMSYS3 on a Vaccelerator}
-A version of the MEMSYS3 library exists which has been compiled to run an a 
+A version of the MEMSYS3 library exists which has been compiled to run an a
 Vaccelerator AP30. The object modules are contained in the object library
 
 MEMSYS3\_DIR:VMEMSYS3.88LB
 
-The .88LB file type indicates that it is a Vaccelerator object library. The 
-KAPPA program MEM2D has been modified to run on a Vaccelerator. The modified 
-version is called VMEM2D and can be inspected as an example of how to run 
+The .88LB file type indicates that it is a Vaccelerator object library. The
+KAPPA program MEM2D has been modified to run on a Vaccelerator. The modified
+version is called VMEM2D and can be inspected as an example of how to run
 MEMSYS3 on a Vaccelerator.
 
 To get the MEMSYS3 package running on the Vaccelerator, it was necessary to
 make  the following minor changes to the code:
 
 \begin {itemize}
-\item In subroutines MEMDE1 and MEMDE2, arrays PPOLY, QPOLY, RPOLY and WPOLY 
-were all declared as ``assumed size'' arrays with dimensions (0:$*$). This does 
-not seem to be supported on the Vaccelerator, and so the ``$*$'' character has 
-been replace with the value 40 for arrays QPOLY, RPOLY and WPOLY, and the value 
-39 in PPOLY. These are the values used in the original declaration of these 
+\item In subroutines MEMDE1 and MEMDE2, arrays PPOLY, QPOLY, RPOLY and WPOLY
+were all declared as ``assumed size'' arrays with dimensions (0:$*$). This does
+not seem to be supported on the Vaccelerator, and so the ``$*$'' character has
+been replace with the value 40 for arrays QPOLY, RPOLY and WPOLY, and the value
+39 in PPOLY. These are the values used in the original declaration of these
 arrays in routine MEMDET. MEMDE1 and MEMDE2 are called only from MEMDET.
-\item In subroutine MEM3, after the call to subroutine MEMA, the following line 
+\item In subroutine MEM3, after the call to subroutine MEMA, the following line
 is inserted:
 
 \begin{verbatim}
@@ -806,22 +806,22 @@ VAX which gives EXP(0.0)-1.0 = 0E00. This causes the entropy, S, to have a value
 of about 1E-8 on the first iteration, which is then multiplied by ALPHA. On the
 first iteration ALPHA has a value of 1E20 and so the product  ALPHA.S is thus
 0E00 on the VAX, but 1E12 on the Vaccelerator. The above extra line gets round
-this by setting the entropy S explicitly to zero on the first iteration only. 
+this by setting the entropy S explicitly to zero on the first iteration only.
 
 \end {itemize}
 
-In addition, it was found necessary to compile the subroutine MEMDIV with the 
-Avalon optimizer switched off, otherwise the program crashed with an Avalon 
+In addition, it was found necessary to compile the subroutine MEMDIV with the
+Avalon optimizer switched off, otherwise the program crashed with an Avalon
 ``Numeric error''.
 
 \begin{thebibliography}{1}
 \bibitem{ref:Gull88} S.F. Gull. (1989) ``Developments in Maximum Entropy Data
-Analysis'' in {\em Maximum Entropy and Bayesian Methods}, ed. J. 
+Analysis'' in {\em Maximum Entropy and Bayesian Methods}, ed. J.
 Skilling, Kluwer Academic Press.
-\bibitem{ref:Narayan} Narayan, R., Nityananda, R. 1986. {\em Ann. Rev. 
+\bibitem{ref:Narayan} Narayan, R., Nityananda, R. 1986. {\em Ann. Rev.
 Astron. Astrophys.} {\bf 24}: 127 - 170
-\bibitem{ref:Skilling88} J. Skilling. (1989) ``Classic Maximum Entropy'' in 
-{\em Maximum Entropy and Bayesian Methods}, ed. J. Skilling, Kluwer 
+\bibitem{ref:Skilling88} J. Skilling. (1989) ``Classic Maximum Entropy'' in
+{\em Maximum Entropy and Bayesian Methods}, ed. J. Skilling, Kluwer
 Academic Press.
 \end{thebibliography}
 \end{document}

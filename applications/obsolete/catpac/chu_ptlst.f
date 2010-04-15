@@ -1,13 +1,13 @@
 *+  CHU_PTLST - outputs list of column values for rows in a table.
-      SUBROUTINE CHU_PTLST (BUFFER, MODE, UNIT, STATUS)    
+      SUBROUTINE CHU_PTLST (BUFFER, MODE, UNIT, STATUS)
 *    Description :
 *     Outputs buffer to file or environment, specified by mode.
-*    Invocation : 
-*     CALL CHU_PTLST (BUFFER, MODE, UNIT, STATUS)    
+*    Invocation :
+*     CALL CHU_PTLST (BUFFER, MODE, UNIT, STATUS)
 *    Parameters :
 *     BUFFER =  CHARACTER *(*) (READ)
 *           Output buffer
-*     MODE   =  CHARACTER *(*) (READ) 
+*     MODE   =  CHARACTER *(*) (READ)
 *           Mode for output
 *     UNIT   =  INTEGER (READ)
 *           FIO unit number for output file
@@ -36,7 +36,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE 'SAE_PAR'   
+      INCLUDE 'SAE_PAR'
 *    Import :
       CHARACTER
      :  BUFFER*(*)    ! Output buffer
@@ -60,7 +60,7 @@
       INTEGER
      :  BUFLEN,        ! Length of output buffer
      :  WSTAT,         ! File write status
-     :  POS            ! Position in error message string 
+     :  POS            ! Position in error message string
 *    Internal References :
 *    Local data :
 *-
@@ -70,12 +70,12 @@
 
 *       Get length of buffer
           BUFLEN = CHR_LEN(BUFFER)
- 
+
           IF (MODE) THEN
-              CALL MSG_OUT ('MESSAGE 1', BUFFER(1:BUFLEN), STATUS)              
-          ELSE 
+              CALL MSG_OUT ('MESSAGE 1', BUFFER(1:BUFLEN), STATUS)
+          ELSE
               CALL FIO_WRITE(UNIT, BUFFER(1:BUFLEN), STATUS)
           END IF
-      END IF 
+      END IF
 
       END

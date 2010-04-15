@@ -41,7 +41,7 @@ C  Routine to clip high points and set to bad channel value:
         CALL SWAP2 (CLIPLIM(1), CLIPLIM(2))
       END IF
 
-      DO NQ = 1, NQUAD 
+      DO NQ = 1, NQUAD
        IF (DOQUAD(NQ)) THEN
 
          NCLIP = 0

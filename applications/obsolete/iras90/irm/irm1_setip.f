@@ -43,7 +43,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -75,7 +75,7 @@
 *  Loop round the input data array.
       DO I = 1, EL
 
-*  If it is a good pixel, increment the number of good pixels and add 
+*  If it is a good pixel, increment the number of good pixels and add
 *  its index into the array of indices.
          IF( DATA( I ) .NE. VAL__BADR ) THEN
             NGOOD = NGOOD + 1

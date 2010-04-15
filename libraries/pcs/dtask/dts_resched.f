@@ -16,7 +16,7 @@
 *     CALL DTASK_RESCHED ( ACTPTR, ACTCNT, SCHEDTIME, STATUS )
 
 *  Description:
-*     Set a timer. When the timer completes the action specified by 
+*     Set a timer. When the timer completes the action specified by
 *     ACTPTR and ACTCNT will be rescheduled if it is still waiting.
 
 *  Arguments:
@@ -30,14 +30,14 @@
 
 *  Algorithm:
 *     Use the Unix interval timer process accessed through FATIMER_SETTIMR
-*     and DTASK_ASTHDLR to deliver a MESSYS format message to a task on its 
+*     and DTASK_ASTHDLR to deliver a MESSYS format message to a task on its
 *     reschedule queue after a delay.
 *     The values of ACTPTR and ACTCNT are passed to and returned from the
-*     interval timer in the reschedule message by packing them into 4 bytes. 
-*     Note that the VALUE of the packed result has to be passed - if the 
-*     ADDRESS was used it would get overwritten by the next action to request 
+*     interval timer in the reschedule message by packing them into 4 bytes.
+*     Note that the VALUE of the packed result has to be passed - if the
+*     ADDRESS was used it would get overwritten by the next action to request
 *     a timed reschedule.
-*     The timer parameter (c.f. AST value on VMS) doubles as the timer 
+*     The timer parameter (c.f. AST value on VMS) doubles as the timer
 *     identifier, so it is stored to allow subsequent cancelling of the timer.
 
 *  Copyright:
@@ -114,8 +114,8 @@
       INCLUDE 'DTASK_SYS'
 *  Arguments Given:
       INTEGER ACTPTR          ! pointer to required action in action
-                              ! list 
-      INTEGER ACTCNT          ! timer counter for the action 
+                              ! list
+      INTEGER ACTCNT          ! timer counter for the action
       INTEGER SCHEDTIME       ! time before re-scheduling in
                               ! milliseconds
 *  Status:
@@ -141,10 +141,10 @@
 *   Set timer running
 *
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL FATIMER_SETTIMR( SCHEDTIME, TIMERVAL, DTASK_CHDLR, 
+         CALL FATIMER_SETTIMR( SCHEDTIME, TIMERVAL, DTASK_CHDLR,
      :                         STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP ( ' ', 'DTASK_RESCHED: failed to start timer', 
+            CALL ERR_REP ( ' ', 'DTASK_RESCHED: failed to start timer',
      :        STATUS )
          ELSE
             ACTTIM(ACTPTR) = TIMERVAL

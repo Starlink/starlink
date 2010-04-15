@@ -1,10 +1,10 @@
- 
- 
+
+
       SUBROUTINE PDA_IDPDRV(ndp,xd,yd,zd,ncp,ipc,pd,istat)
- 
+
 c this subroutine estimates partial derivatives of the first and
 c second order at the data points.
- 
+
 c the input parameters are
 c     ndp = number of data points,
 c     xd,yd,zd = arrays of dimension ndp containing the x,
@@ -14,27 +14,27 @@ c           mating partial derivatives at each data point,
 c     ipc = integer array of dimension ncp*ndp containing
 c           the point numbers of ncp data points closest to
 c           each of the ndp data points.
- 
+
 c the output parameter is
 c     pd  = array of dimension 5*ndp, where the estimated
 c           zx, zy, zxx, zxy, and zyy values at the data
 c           points are to be stored.
 *     istat = starlink error message.
- 
- 
+
+
 c declaration statements
       dimension xd(100), yd(100), zd(100), ipc(400), pd(500)
       real nmx, nmy, nmz, nmxx, nmxy, nmyx, nmyy
       integer istat
- 
+
 *   check the inherited error status.
       if ( istat.ne.0 ) return
- 
+
 c preliminary processing
       ndp0 = ndp
       ncp0 = ncp
       ncpm1 = ncp0 - 1
- 
+
 c estimation of zx and zy
       do 100 ip0 = 1, ndp0
          x0 = xd(ip0)
@@ -76,7 +76,7 @@ c estimation of zx and zy
          pd(jpd0-4) = -nmx/nmz
          pd(jpd0-3) = -nmy/nmz
  100  continue
- 
+
 c estimation of zxx, zxy, and zyy
       do 200 ip0 = 1, ndp0
          jpd0 = jpd0 + 5

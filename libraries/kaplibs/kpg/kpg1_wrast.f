@@ -20,7 +20,7 @@
 *
 *     This routine has only a STATUS argument, so it communicates with
 *     other KPG routines via global variables stored in the KPG_AST
-*     common blocks. These are described below under "Global Variables 
+*     common blocks. These are described below under "Global Variables
 *     used as Arguments".
 
 *  Arguments:
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -92,19 +92,19 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'KPG_PAR'          ! KPG_ constants      
+      INCLUDE 'KPG_PAR'          ! KPG_ constants
       INCLUDE 'AST_PAR'          ! AST_ public interface
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-      
+
 *  Global Variables:
-      INCLUDE 'KPG_AST'          ! KPG AST common blocks 
+      INCLUDE 'KPG_AST'          ! KPG AST common blocks
 *        ASTLC = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator to HDS _CHAR array holding AST_ data.
 *        ASTLN = INTEGER (Read and Write)
 *           Next element to use in HDS _CHAR array holding AST_ data.
 *        ASTPT = INTEGER (Read and Write)
 *           Pointer to mapped HDS _CHAR array holding AST_ data.
-      
+
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
 

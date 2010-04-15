@@ -1,7 +1,7 @@
 ************************************************************************
 
       SUBROUTINE OHEAD ( NX, NY, CLIP, SEE, STATUS )
-     
+
 *+
 *  Name :
 *     OHEAD
@@ -52,7 +52,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -64,7 +64,7 @@
       INTEGER NX
       INTEGER NY
       REAL CLIP, SEE
-      
+
 *  Status :
       INTEGER STATUS
 
@@ -79,7 +79,7 @@
       CALL MSG_OUT( ' ', '========================================'//
      :                   '============================', STATUS )
 
-      CALL MSG_OUT( ' ', '         nx       ny        clip        see', 
+      CALL MSG_OUT( ' ', '         nx       ny        clip        see',
      :              STATUS )
 
       WRITE( TEXT, '( 2X, 2I9, F11.2, F11.2 )' ) NX, NY, CLIP, SEE

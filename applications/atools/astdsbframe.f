@@ -21,24 +21,24 @@
 
 *  Description:
 *     This application creates a new DSBSpecFrame and optionally initialises
-*     its attributes. A DSBSpecFrame is a specialised form of SpecFrame which 
-*     represents positions in a spectrum obtained using a dual sideband 
-*     instrument. Such an instrument produces a spectrum in which each point 
-*     contains contributions from two distinctly different frequencies, one 
+*     its attributes. A DSBSpecFrame is a specialised form of SpecFrame which
+*     represents positions in a spectrum obtained using a dual sideband
+*     instrument. Such an instrument produces a spectrum in which each point
+*     contains contributions from two distinctly different frequencies, one
 *     from the "lower side band" (LSB) and one from the "upper side band"
 *     (USB). Corresponding LSB and USB frequencies are connected by the fact
 *     that they are an equal distance on either side of a fixed central
 *     frequency known as the "Local Oscillator" (LO) frequency.
 *
 *     When quoting a position within such a spectrum, it is necessary to
-*     indicate whether the quoted position is the USB position or the 
+*     indicate whether the quoted position is the USB position or the
 *     corresponding LSB position. The SideBand attribute provides this
 *     indication.
 *
 *     In practice, the LO frequency is specified by giving the distance
-*     from the LO frequency to some "central" spectral position. Typically 
-*     this central position is that of some interesting spectral feature. 
-*     The distance from this central position to the LO frequency is known 
+*     from the LO frequency to some "central" spectral position. Typically
+*     this central position is that of some interesting spectral feature.
+*     The distance from this central position to the LO frequency is known
 *     as the "intermediate frequency" (IF). The value supplied for IF can
 *     be a signed value in order to indicate whether the LO frequency is
 *     above of below the central position.
@@ -48,8 +48,8 @@
 
 *  ADAM Parameters:
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new DSBSpecFrame. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new DSBSpecFrame.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new DSBSpecFrame.
 
@@ -100,7 +100,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

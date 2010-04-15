@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
-     :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, 
+     :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT,
      :                       APP, QUIET, LMODE, IPLOT, STATUS )
 *+
 *  Name:
@@ -13,15 +13,15 @@
 
 *  Invocation:
 *     CALL KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL, XSYM,
-*                      YSYM, MODE, NULL, XL, XR, YB, YT, APP, QUIET, 
+*                      YSYM, MODE, NULL, XL, XR, YB, YT, APP, QUIET,
 *                      LMODE, IPLOT, STATUS )
 
 *  Description:
-*     Opens a graphics device and draws a graph displaying a supplied 
-*     set of points. Each point is defined by an X and Y value, plus an 
-*     optional error bar. An AST Plot is returned so that the calling 
-*     application can add further graphics to the plot if needed. When 
-*     complete, the calling application should annul the Plot, and close 
+*     Opens a graphics device and draws a graph displaying a supplied
+*     set of points. Each point is defined by an X and Y value, plus an
+*     optional error bar. An AST Plot is returned so that the calling
+*     application can add further graphics to the plot if needed. When
+*     complete, the calling application should annul the Plot, and close
 *     the workstation:
 *
 *       CALL AST_ANNUL( IPLOT, STATUS )
@@ -40,38 +40,38 @@
 *        Y value at each point.
 *     NSIGMA = REAL (Given)
 *        Controls the length of the vertical error bars. A value of zero
-*        suppresses error bars. Otherwise error bars are drawn which extend 
+*        suppresses error bars. Otherwise error bars are drawn which extend
 *        by from Y - NSIGMA*YSIGMA to Y + NSIGMA*YSIGMA.
 *     YSIGMA( N ) = REAL (Given)
 *        The standard deviation associated with each Y value.
 *     XLAB = CHARACTER * ( * ) (Given)
 *        A default label for the X axis. Only used if the user does not
 *        supply an alternative. Trailing spaces are ignored. If a Plot is
-*        supplied via IPLOT, then the "Label(1)" attribute in the Plot is 
+*        supplied via IPLOT, then the "Label(1)" attribute in the Plot is
 *        used as the default in preference to XLAB.
 *     YLAB = CHARACTER * ( * ) (Given)
 *        A default label for the Y axis. Only used if the user does not
 *        supply an alternative. Trailing spaces are ignored. If a Plot is
-*        supplied via IPLOT, then the "Label(2)" attribute in the Plot is 
+*        supplied via IPLOT, then the "Label(2)" attribute in the Plot is
 *        used as the default in preference to YLAB.
 *     TTL = CHARACTER * ( * ) (Given)
 *        A default title for the plot. Only used if the user does not
-*        supply an alternative. If a Plot is supplied via IPLOT, then the 
-*        "Title" attribute in the Plot is used as the default in preference 
+*        supply an alternative. If a Plot is supplied via IPLOT, then the
+*        "Title" attribute in the Plot is used as the default in preference
 *        to TTL.
 *     XSYM = CHARACTER * ( * ) (Given)
-*        The default symbol for the horizontal axis. Only used if the user 
+*        The default symbol for the horizontal axis. Only used if the user
 *        does not supply an alternative. This will be stored with the Plot
-*        in the AGI database and (for instance) used by CURSOR as axis 
+*        in the AGI database and (for instance) used by CURSOR as axis
 *        symbols when displaying the cursor positions on the screen. If
-*        a Plot is supplied via IPLOT, then the "Symbol(1)" attribute in 
+*        a Plot is supplied via IPLOT, then the "Symbol(1)" attribute in
 *        the Plot is used as the default in preference to XSYM.
 *     YSYM = CHARACTER * ( * ) (Given)
-*        The default symbol for the horizontal axis. Only used if the user 
+*        The default symbol for the horizontal axis. Only used if the user
 *        does not supply an alternative. This will be stored with the Plot
-*        in the AGI database and (for instance) used by CURSOR as axis 
+*        in the AGI database and (for instance) used by CURSOR as axis
 *        symbols when displaying the cursor positions on the screen. If
-*        a Plot is supplied via IPLOT, then the "Symbol(2)" attribute in 
+*        a Plot is supplied via IPLOT, then the "Symbol(2)" attribute in
 *        the Plot is used as the default in preference to XSYM.
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented:
@@ -80,7 +80,7 @@
 *            2 - The points are joined by straight lines.
 *            3 - A marker is placed at each point.
 *            4 - (not used)
-*            5 - A "chain" in which each point is marker by a marker and also 
+*            5 - A "chain" in which each point is marker by a marker and also
 *                join by straight lines to its neighbouring points.
 *     NULL = LOGICAL (Given)
 *        If .TRUE., then the user may supply a null (!) value for most of the
@@ -97,11 +97,11 @@
 *        margin).
 *     YB = REAL (Given)
 *        The default value for the YBOT parameter. If VAL__BADR is
-*        supplied, the minimum of the low end of the Y error bars is 
+*        supplied, the minimum of the low end of the Y error bars is
 *        used (plus a small margin).
 *     YT = REAL (Given)
 *        The default value for the YTOP parameter. If VAL__BADR is
-*        supplied, the maximum of the high end of the Y error bars is 
+*        supplied, the maximum of the high end of the Y error bars is
 *        used (plus a small margin).
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the application in the form "<package>_<application>".
@@ -112,17 +112,17 @@
 *        the alpha screen.
 *     LMODE = LOGICAL (Given)
 *        If .TRUE., then the user is given the chance to specify the
-*        default vertical bounds for the plot using parameter LMODE. If 
-*        .FALSE., the supplied bounds (YB, YT ) are used, and the 
-*        eqivalent of "Extended" LMODE is used for any bounds which are 
+*        default vertical bounds for the plot using parameter LMODE. If
+*        .FALSE., the supplied bounds (YB, YT ) are used, and the
+*        eqivalent of "Extended" LMODE is used for any bounds which are
 *        not supplied.
 *     IPLOT = INTEGER (Given and Returned)
-*        On entry, this can either be AST_NULL or a pointer to a 2D 
-*        Frame. If AST__NULL, the supplied values for the XLAB, YLAB, 
+*        On entry, this can either be AST_NULL or a pointer to a 2D
+*        Frame. If AST__NULL, the supplied values for the XLAB, YLAB,
 *        TTL, XSYM and YSYM arguments are used without change. If a Frame
-*        is supplied, the Label, Title, Units and Symbol attributes of 
-*        the Frame are used in preference to XLAB, YLAB, TTL, XSYM and 
-*        YSYM (which are then ignored). Any supplied Frame pointer is 
+*        is supplied, the Label, Title, Units and Symbol attributes of
+*        the Frame are used in preference to XLAB, YLAB, TTL, XSYM and
+*        YSYM (which are then ignored). Any supplied Frame pointer is
 *        annulled before returning, and a pointer to the Plot used to
 *        draw the axes is returned.
 *     STATUS = INTEGER (Given and Returned)
@@ -143,12 +143,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -163,7 +163,7 @@
 *     17-JUN-1999 (DSB):
 *        Original version.
 *     1-OCT-1999 (DSB):
-*        Added argument LMODE. 
+*        Added argument LMODE.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
 *     15-OCT-2009 (DSB):
@@ -174,7 +174,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -225,13 +225,13 @@
       IF( NSIGMA .GT. 0 ) THEN
          CALL PSX_CALLOC( 2*N, '_DOUBLE', IPW3, STATUS )
       ELSE
-         IPW3 = IPW1 
+         IPW3 = IPW1
       END IF
 
 *  Draw the graph.
       CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
-     :                 XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP, 
-     :                 QUIET, LMODE, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP,
+     :                 QUIET, LMODE, %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 %VAL( CNF_PVAL( IPW3 ) ), IPLOT, STATUS )
 

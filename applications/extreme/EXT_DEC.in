@@ -13,10 +13,10 @@
 *
 *  Description:
 *     This file contains the declarations for statement functions and
-*     their arguments to be used with the EXTREME package. 
-*     It currently contains declarations required for the function 
+*     their arguments to be used with the EXTREME package.
+*     It currently contains declarations required for the function
 *     EXT_ITOX which converts an INTEGER value to an extended integer
-*     value, where an extended integer is the type declared as 
+*     value, where an extended integer is the type declared as
 *     INTEGER * 8 in the original (pre-built) source code of a package.
 *
 *  Authors:

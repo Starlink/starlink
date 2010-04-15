@@ -454,7 +454,7 @@ C1009       FORMAT ( <NGCHEB>( 1X, 4D16.5/ ) )
          END IF
 
          IF ( NDISP .GT. 0 ) THEN
-            WRITE( RT_FMT, '(''( '', I4, ''( 1X, 2D16.5/ ))'')') NDISP 
+            WRITE( RT_FMT, '(''( '', I4, ''( 1X, 2D16.5/ ))'')') NDISP
             READ ( FD, RT_FMT, IOSTAT = IOSTAT )
      :             ( DISPS( I ), DISPL( I ), I = 1, NDISP )
             IF ( IOSTAT .NE. 0 ) THEN
@@ -523,7 +523,7 @@ C1009       FORMAT ( <NGCHEB>( 1X, 4D16.5/ ) )
          END IF
 
          IF ( NDISP .GT. 0 ) THEN
-            WRITE( RT_FMT, '(''( '', I4, ''( 1X, 2D16.5/ ))'')') NDISP 
+            WRITE( RT_FMT, '(''( '', I4, ''( 1X, 2D16.5/ ))'')') NDISP
             READ ( FD, RT_FMT, IOSTAT = IOSTAT )
      :             ( DISPS( I ), DISPL( I ), I = 1, NDISP )
 C1012       FORMAT ( <NDISP>( 1X, 2D16.5/ ) )

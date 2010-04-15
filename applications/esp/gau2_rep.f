@@ -1,7 +1,7 @@
-      
+
 * See gau2_pro for discussion
 
-      subroutine gau2_rep (n, iv, v, x, c, xerrs, calcerrs, 
+      subroutine gau2_rep (n, iv, v, x, c, xerrs, calcerrs,
      :     liv, lv, p, l, gau2par, status)
 
 *+
@@ -43,7 +43,7 @@
 *     status = integer (given)
 *       Inherited status
 *-
-      
+
 *   Types
       implicit none
       include 'SAE_PAR'
@@ -62,10 +62,10 @@
       character remark*40       ! variable remark
 
       if (status .ne. sai__ok) return
-      
+
       call msg_blank (status)
       call msg_out (' ', 'GAUFIT2: algorithm performance', status)
-      
+
       if (gau2par(gau2bg) .eq. 0) then
 *      background was subtracted, not fitted
          ngaussians = l
@@ -74,8 +74,8 @@
       endif
 
       if (gau2par(gau2debug) .gt. 0) then
-         write (*, 
-     :     '("Finished! ngaussians=",i2," status=",i10," iv(1)=",i10)') 
+         write (*,
+     :     '("Finished! ngaussians=",i2," status=",i10," iv(1)=",i10)')
      :        ngaussians, status, iv(1)
          write (*,'(" x=",5f12.3)') (x(i),i=1,5*ngaussians)
          if (calcerrs)
@@ -84,7 +84,7 @@
          if (gau2par(gau2bg) .ne. 0)
      :        write (*,'("Background fit=",f10.3)') c(l)
       endif
-      
+
 *      Write the value of the data standard deviation which was
 *      _assumed_ in the calculation of the covariance matrix.  This
 *      should be output at the end of the calculation, and EXAMINED by
@@ -93,8 +93,8 @@
 *      be a problem, then we can have a think about the statistics of
 *      what's going on here, and see if we can accomodate the user's
 *      value in a statistically legitimate way.  See NSG sect. 10 for
-*      notes about (simple) rescaling of this value. 
-      call msg_setr( 'SD', real(sqrt(2*v(10)/(n-p)))) 
+*      notes about (simple) rescaling of this value.
+      call msg_setr( 'SD', real(sqrt(2*v(10)/(n-p))))
       call msg_out (' ','Effective data s.d.: ^SD Check reasonable',
      :     status)
 
@@ -120,8 +120,8 @@
 *      call msg_setr ('COND', real(1/v(53)**2))
 *      call msg_out  (' ', '  Condition number:    >^COND', status)
 
-*   Calculate a metric to measure how well the assumptions in the calls 
-*   in mrnsg to calcada are being satisfied.  
+*   Calculate a metric to measure how well the assumptions in the calls
+*   in mrnsg to calcada are being satisfied.
 *     iv(6):  the number of A evaluations, including for regression calcn
 *     iv(52): the number for regression calcn
 *     iv(30): the number of DA evaluations, including for regression
@@ -149,10 +149,10 @@
       call msg_setr('VT', real(vt))
       call msg_setc('REM', remark)
       call msg_out (' ','Optimisation metric: ^VT ^REM',status)
-*      call msg_setr ('OPT',      
+*      call msg_setr ('OPT',
 *     :     1.0 - real(gau2par(gau2calcda)) / real(iv(30)))
 *      call msg_out (' ', '  Optimisation metric: ^OPT', status)
-         
+
       call msg_blank (status)
-      
+
       end

@@ -72,7 +72,7 @@
 *       For every column
 *         Check the data type of the column, and for the appropriate
 *         data type:
-*           Get the value for the current field from the input 
+*           Get the value for the current field from the input
 *           catalogue.
 *           Put the value to the current field in the output catalogue.
 *         end case
@@ -149,7 +149,7 @@
 
 *
 *    The following values hold the value read (and written) for the
-*    current field.  There are values for each of the data types 
+*    current field.  There are values for each of the data types
 *    supported by SCAR/ADC.
 
       BYTE             VALUEB
@@ -273,7 +273,7 @@
 *          Check whether the column is a scalar or a vector.
 
             IF (DIMS .EQ. CAT__SCALR) THEN
-           
+
 *
 *             Add the identifier to the list of columns to copy.
 
@@ -289,7 +289,7 @@
             ELSE
 
 *
-*             The column is a vector; determine the number of elements 
+*             The column is a vector; determine the number of elements
 *             and its name, then get an identifier for each element.
 
                CALL CAT_TIQAI (FIINC, 'SIZE', SIZE, STATUS)
@@ -483,9 +483,9 @@
 *
 *             Check the data type of the column, and for the appropriate
 *             data type:
-*              Get the value for the current field from the input 
+*              Get the value for the current field from the input
 *              catalogue.
-*              Put the value to the current field in the output 
+*              Put the value to the current field in the output
 *              catalogue.
 
                IF (FDTYPI(CURID) .EQ. CAT__TYPEB) THEN

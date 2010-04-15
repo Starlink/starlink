@@ -8,9 +8,9 @@
 
 *  Purpose:
 *     Generates the graphics required when the galaxy origin and maximum
-*     permitted ellipse radius are specified by the user and when the 
-*     quadrant to be used for the results graph is cleared. 
-      
+*     permitted ellipse radius are specified by the user and when the
+*     quadrant to be used for the results graph is cleared.
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -19,11 +19,11 @@
 
 *  Description:
 *     Generates the graphics showing the gaaxy origin and the maximum
-*     permitted ellipse radius as specified by the user. 
+*     permitted ellipse radius as specified by the user.
 *     Employs SGS to do so.
 *
 *     The variable MODE defines what is to be drawn: ie
-*        
+*
 *        MODE=0  Open file, save results and close file in one go
 *        MODE=1  Draw the cross at the centre of the chosen sector
 *        MODE=2  Draw the circle showing the radius limit for profiling
@@ -31,7 +31,7 @@
 *                  displayed
 
 
-*  Arguments:         
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        Indicates what sort of graphics output is to take place.
 *     COLOUR = INTEGER (Given)
@@ -61,29 +61,29 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELF_PAR'               ! ELLFOU constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
-*  Arguments Given:                                  
-      INTEGER COLOUR                  ! Pen colour used to show galaxy marker 
-      INTEGER MODE                    ! Which part of the sector drawing 
+*  Arguments Given:
+      INTEGER COLOUR                  ! Pen colour used to show galaxy marker
+      INTEGER MODE                    ! Which part of the sector drawing
                                       ! is to take place.
-      REAL CURSIZ                     ! Size of the cross to be drawn at 
+      REAL CURSIZ                     ! Size of the cross to be drawn at
                                       ! the first point specified.
       REAL RLIM                       ! Sampling radius maximum
-      REAL X(10)                      ! X co-ordinates for various parts of 
+      REAL X(10)                      ! X co-ordinates for various parts of
                                       ! the sector to be drawn.
-      REAL Y(10)                      ! Y co-ordinates for various parts of 
+      REAL Y(10)                      ! Y co-ordinates for various parts of
                                       ! the sector to be drawn.
 
-*  Arguments Given and Returned:        
+*  Arguments Given and Returned:
 
 *  Arguments Returned:
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -95,11 +95,11 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Draw the cross at the centre of the indicated galaxy.
-      IF (MODE.EQ.1) THEN         
+      IF (MODE.EQ.1) THEN
          CALL SGS_SPEN(COLOUR)
          CALL SGS_LINE(X(1)-CURSIZ,Y(1),X(1)+CURSIZ,Y(1))
          CALL SGS_LINE(X(1),Y(1)-CURSIZ,X(1),Y(1)+CURSIZ)
-         CALL SGS_LINE(X(1),Y(1),X(1),Y(1))         
+         CALL SGS_LINE(X(1),Y(1),X(1),Y(1))
       END IF
 
 *   Draw a circle defining the maximum radius required..
@@ -110,7 +110,7 @@
          CALL SGS_ARC(X(1),Y(1),RLIM,TEMP1,TEMP2)
       END IF
 
-*   Clear the quadrant of the window where the results will be displayed 
+*   Clear the quadrant of the window where the results will be displayed
 *   and then draw a border around it.
       IF (MODE.EQ.7) THEN
          CALL SGS_SPEN(1)
@@ -121,7 +121,7 @@
 *   Flush any SGS errors.
  9999 CALL SGS_FLUSH
 
-      END 
+      END
 
 
 
@@ -132,9 +132,9 @@
 
 *  Purpose:
 *     Generates the graphics required when the galaxy origin and maximum
-*     permitted ellipse radius are specified by the user and when the 
-*     quadrant to be used for the results graph is cleared. 
-      
+*     permitted ellipse radius are specified by the user and when the
+*     quadrant to be used for the results graph is cleared.
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -143,11 +143,11 @@
 
 *  Description:
 *     Generates the graphics showing the gaaxy origin and the maximum
-*     permitted ellipse radius as specified by the user. 
+*     permitted ellipse radius as specified by the user.
 *     Employs SGS to do so.
 *
 *     The variable MODE defines what is to be drawn: ie
-*        
+*
 *        MODE=0  Open file, save results and close file in one go
 *        MODE=1  Draw the cross at the centre of the chosen sector
 *        MODE=2  Draw the circle showing the radius limit for profiling
@@ -155,7 +155,7 @@
 *                  displayed
 
 
-*  Arguments:         
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        Indicates what sort of graphics output is to take place.
 *     COLOUR = INTEGER (Given)
@@ -185,29 +185,29 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELP_PAR'               ! ELLPRO constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
-*  Arguments Given:                                   
+*  Arguments Given:
       INTEGER COLOUR                  ! Galaxy marker colour
-      INTEGER MODE                    ! Which part of the sector drawing 
+      INTEGER MODE                    ! Which part of the sector drawing
                                       ! is to take place.
-      REAL CURSIZ                     ! Size of the cross to be drawn at 
+      REAL CURSIZ                     ! Size of the cross to be drawn at
                                       ! the first point specified.
       REAL RLIM                       ! Radius of the largest permitted ellipse
-      REAL X(10)                      ! X co-ordinates for various parts of 
+      REAL X(10)                      ! X co-ordinates for various parts of
                                       ! the sector to be drawn.
-      REAL Y(10)                      ! Y co-ordinates for various parts of 
+      REAL Y(10)                      ! Y co-ordinates for various parts of
                                       ! the sector to be drawn.
 
-*  Arguments Given and Returned:        
+*  Arguments Given and Returned:
 
 *  Arguments Returned:
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -219,7 +219,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Draw the cross at the centre of the indicated galaxy.
-      IF (MODE.EQ.1) THEN         
+      IF (MODE.EQ.1) THEN
          CALL SGS_SPEN(COLOUR)
          CALL SGS_LINE(X(1)-CURSIZ,Y(1),X(1)+CURSIZ,Y(1))
          CALL SGS_LINE(X(1),Y(1)-CURSIZ,X(1),Y(1)+CURSIZ)
@@ -233,7 +233,7 @@
          CALL SGS_ARC(X(1),Y(1),RLIM,TEMP1,TEMP2)
       END IF
 
-*   Clear the quadrant of the window where the results will be displayed 
+*   Clear the quadrant of the window where the results will be displayed
 *   and then draw a border around it.
       IF (MODE.EQ.7) THEN
          CALL SGS_SPEN(1)
@@ -244,7 +244,7 @@
 *   Flush any SGS errors.
  9999 CALL SGS_FLUSH
 
-      END 
+      END
 
 
       SUBROUTINE SEC1_GRBIT(MODE,CURSIZ,X,Y,POSANG,
@@ -254,10 +254,10 @@
 *     SEC1_GRBIT
 
 *  Purpose:
-*     Generates the graphics required when the sector is specified by 
+*     Generates the graphics required when the sector is specified by
 *     the user and when the quadrant to be used fro the results graph is
-*     cleared. 
-      
+*     cleared.
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -265,12 +265,12 @@
 *     CALL SEC1_GRBIT(MODE,CURSIZ,X,Y,POSANG,ANGWID,RADIUS,COLOUR,STATUS)
 
 *  Description:
-*     Generates the graphics showing the sector specified by the user. 
+*     Generates the graphics showing the sector specified by the user.
 *     Employs SGS to do so.
 *
 *     The variable MODE defines whcih part of the sector is to be
 *     drawn: ie
-*        
+*
 *        MODE = 1  Draw the cross at the centre of the chosen sector
 *        MODE = 2  Draw a line outward from the sector centre to its
 *                  edge in the direction specified
@@ -284,7 +284,7 @@
 *                  displayed
 
 
-*  Arguments:         
+*  Arguments:
 *     MODE = INTEGER (Given)
 *        Indicates which part of the sector drawing is to take place.
 *     CURSIZ = REAL (Given)
@@ -295,7 +295,7 @@
 *        Y co-ordinates for various parts of the sector to be drawn.
 *     POSANG = REAL (Given)
 *        Position angle of the sector. Units radians.
-*     ANGWID = REAL (Given) 
+*     ANGWID = REAL (Given)
 *        Angular width of the sector. Units radians.
 *     RADIUS = REAL (Given)
 *        Radius out from the chosen sector origin that the sector
@@ -319,42 +319,42 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'SEC_PAR'               ! SECTOR constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
-*  Arguments Given:                                   
+*  Arguments Given:
       INTEGER COLOUR                  ! The colour of the galaxy centre marker
-      INTEGER MODE                    ! Which part of the sector drawing 
+      INTEGER MODE                    ! Which part of the sector drawing
                                       ! is to take place.
-      REAL ANGWID                     ! Angular width of the sector 
-      REAL CURSIZ                     ! Size of the cross to be drawn at 
+      REAL ANGWID                     ! Angular width of the sector
+      REAL CURSIZ                     ! Size of the cross to be drawn at
                                       ! the first point specified.
       REAL POSANG                     ! Position angle of the sector
-      REAL RADIUS                     ! Radius out from the chosen sector 
+      REAL RADIUS                     ! Radius out from the chosen sector
                                       ! origin that the sector should extend.
-      REAL X(10)                      ! X co-ordinates for various parts of 
+      REAL X(10)                      ! X co-ordinates for various parts of
                                       ! the sector to be drawn.
-      REAL Y(10)                      ! Y co-ordinates for various parts of 
+      REAL Y(10)                      ! Y co-ordinates for various parts of
                                       ! the sector to be drawn.
 
-*  Arguments Given and Returned:        
+*  Arguments Given and Returned:
 
 *  Arguments Returned:
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
       REAL TEMP1                      ! Temporary value
       REAL TEMP2                      ! Temporary value
       REAL X4                         ! X Co-ordinate of one end of the arc
-      REAL X5                         ! X Co-ordinate of the other 
+      REAL X5                         ! X Co-ordinate of the other
                                       ! end of the arc
       REAL Y4                         ! Y Co-ordinate of one end of the arc
-      REAL Y5                         ! Y Co-ordinate of the other 
+      REAL Y5                         ! Y Co-ordinate of the other
                                       ! end of the arc
 
 *.
@@ -364,7 +364,7 @@
 
 
 *   Draw the cross at the centre of the proposed sector.
-      IF (MODE.EQ.1) THEN         
+      IF (MODE.EQ.1) THEN
          CALL SGS_SPEN(COLOUR)
          CALL SGS_LINE(X(1)-CURSIZ,Y(1),X(1)+CURSIZ,Y(1))
          CALL SGS_LINE(X(1),Y(1)-CURSIZ,X(1),Y(1)+CURSIZ)
@@ -385,24 +385,24 @@
          TEMP2=POSANG+ANGWID/2.
          CALL SGS_SPEN(COLOUR)
          IF (MODE.EQ.4) THEN
-            X4=X(1)+SIN(TEMP1)*RADIUS 
-            Y4=Y(1)+COS(TEMP1)*RADIUS   
+            X4=X(1)+SIN(TEMP1)*RADIUS
+            Y4=Y(1)+COS(TEMP1)*RADIUS
             X5=X(1)+SIN(TEMP2)*RADIUS
-            Y5=Y(1)+COS(TEMP2)*RADIUS   
+            Y5=Y(1)+COS(TEMP2)*RADIUS
          ELSE
-            X4=X(1)-SIN(TEMP1)*RADIUS 
-            Y4=Y(1)-COS(TEMP1)*RADIUS   
+            X4=X(1)-SIN(TEMP1)*RADIUS
+            Y4=Y(1)-COS(TEMP1)*RADIUS
             X5=X(1)-SIN(TEMP2)*RADIUS
-            Y5=Y(1)-COS(TEMP2)*RADIUS   
+            Y5=Y(1)-COS(TEMP2)*RADIUS
          END IF
-                       
+
 *      Draw the sides of the sector requested.
          CALL SGS_LINE(X(1),Y(1),X4,Y4)
          CALL SGS_LINE(X(1),Y(1),X5,Y5)
 
 *      Calculate the angles of the sides in the angular convention
 *      required for SGS_ARC and then draw the arc.
-         IF (MODE.EQ.4) THEN 
+         IF (MODE.EQ.4) THEN
             TEMP1=-TEMP1+SEC__PIVAL/2.
             TEMP2=-TEMP2+SEC__PIVAL/2.
          ELSE
@@ -418,7 +418,7 @@
 
       END IF
 
-*   Clear the quadrant of the window where the results will be displayed 
+*   Clear the quadrant of the window where the results will be displayed
 *   and then draw a border around it.
       IF (MODE.EQ.7) THEN
          CALL SGS_SPEN(1)
@@ -430,4 +430,4 @@
 *   Flush any SGS errors.
  9999 CALL SGS_FLUSH
 
-      END 
+      END

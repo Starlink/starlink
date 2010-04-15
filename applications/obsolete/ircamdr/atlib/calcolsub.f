@@ -1,19 +1,19 @@
-	SUBROUTINE CALCOLSUB( DIMSX, DIMSY, ARRIN1, ARRIN2, ARROUT, 
+	SUBROUTINE CALCOLSUB( DIMSX, DIMSY, ARRIN1, ARRIN2, ARROUT,
      :	                      LSB1, LSB2, PLATESCALE, STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
      :	  STATUS,
      :	  J,
      :	  K
 
-	REAL 
-     :	  ARROUT( DIMSX, DIMSY), 
+	REAL
+     :	  ARROUT( DIMSX, DIMSY),
      :	  ARRIN1( DIMSX, DIMSY),
      :	  ARRIN2( DIMSX, DIMSY),
      :	  LSB1,

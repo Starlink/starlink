@@ -7,7 +7,7 @@
 *    Convert character string to integer
 *
 *    Attempt to read an integer from a character string, and return
-*    the result. No attempt is made to avoid integer overflow. A valid 
+*    the result. No attempt is made to avoid integer overflow. A valid
 *    integer is any sequence of decimal digits.
 *
 *    Inputs

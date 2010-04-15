@@ -82,7 +82,7 @@ C
           IF (INTER) CALL GRBPIC
       END IF
       PGXOFF(PGID) = PGXVP(PGID) + (PGNXC(PGID)-1)*PGXSZ(PGID)
-      PGYOFF(PGID) = PGYVP(PGID) + 
+      PGYOFF(PGID) = PGYVP(PGID) +
      1               (PGNY(PGID)-PGNYC(PGID))*PGYSZ(PGID)
 C
 C Window the plot in the new viewport.

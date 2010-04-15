@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This routine is equivalent to CCDPACK:FINDCENT, but is simpler and 
+*     This routine is equivalent to CCDPACK:FINDCENT, but is simpler and
 *     therefore faster. It is tailored to the needs of the Polka
 *     application, and is not intended for public use. The algorithm
 *     used by CCG1_CENR has been modified to improve the background
@@ -51,32 +51,32 @@
 *        centroid. On each iteration the box of data from which the
 *        centroid is estimated is updated. If the new centroid does not
 *        differ from the previous value by more than this amount (in X
-*        and Y) then iteration stops. Failure to meet this level of 
-*        accuracy does not result in the centroid being rejected, the 
-*        centroiding process just stops after the permitted number of 
+*        and Y) then iteration stops. Failure to meet this level of
+*        accuracy does not result in the centroid being rejected, the
+*        centroiding process just stops after the permitted number of
 *        iterations (MAXITER).
 *        [0.05]
 *     INFILE = LITERAL (Read)
-*        The name of a text file containing the the X and Y values to 
+*        The name of a text file containing the the X and Y values to
 *        be used as the initial guess at accurate positions. Each line
 *        should hold the X value followed by the Y value separated by
 *        spaces.
 *     OUTFILE = LITERAL (Read)
 *        The name of a text file to create containing the accurate
 *        positions. Each line will hold the accurate X and Y values for
-*        the corresponding input position, separated by spaces. Positions 
+*        the corresponding input position, separated by spaces. Positions
 *        which cannot be found are set to -100000 (both X and Y).
 *     XYOUT = LITERAL (Write)
 *        A string holding the last accurate X and Y values, separated by
-*        a space. 
+*        a space.
 
 *  Implementation Status:
 *     - Bad pixels can be handled. The NDF is accessed as an array of
-*     single precision values. 
+*     single precision values.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -85,7 +85,7 @@
 *  History:
 *     18-MAY-1997 (DSB):
 *        Original version, derived from CCDPACK:FINDCENT. The CCDPACK
-*        version was slow, and it crashed sometimes because it did not 
+*        version was slow, and it crashed sometimes because it did not
 *        release its IRH groups before returning.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
@@ -95,7 +95,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,7 +141,7 @@
       REAL YIN( MXPNT )          ! Original guess at input position
       REAL YOUT( MXPNT )         ! Accurate position
       INTEGER FD, FDO, NBUFF
-      CHARACTER BUFFER*80 
+      CHARACTER BUFFER*80
       LOGICAL TOPEN
 *.
 
@@ -161,7 +161,7 @@
 
 *  Get the other parameter values...
 
-*  The initial position guesses. 
+*  The initial position guesses.
       CALL CCD1_ASFIO( 'INFILE', 'READ', 'LIST', 0, FD, TOPEN, STATUS )
 
       NPNT = 0
@@ -199,7 +199,7 @@
       CALL PAR_GET0L( 'POSITIVE', SIGN, STATUS )
 
 *  The output file.
-      CALL CCD1_ASFIO( 'OUTFILE', 'WRITE', 'LIST', 0, FDO, TOPEN, 
+      CALL CCD1_ASFIO( 'OUTFILE', 'WRITE', 'LIST', 0, FDO, TOPEN,
      :                 STATUS )
 
 *  Check the status so that we can be sure that any error detected
@@ -214,7 +214,7 @@
          YPOS = DBLE( YIN( IPNT ) - REAL( LBND( 2 ) ) + 1.5 )
 
 *  Centroid the position.
-         CALL CCG1_CENR( XPOS, YPOS, %VAL( CNF_PVAL( IPIN ) ), 
+         CALL CCG1_CENR( XPOS, YPOS, %VAL( CNF_PVAL( IPIN ) ),
      :                   NCOL, NLINE,
      :                   ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                   XACC, YACC, STATUS )
@@ -228,7 +228,7 @@
 
 *  Otherwise, transform this position back to input coordinates.
          ELSE
-            XOUT( IPNT ) = REAL( XACC + DBLE( LBND( 1 ) ) - 1.5D0 ) 
+            XOUT( IPNT ) = REAL( XACC + DBLE( LBND( 1 ) ) - 1.5D0 )
             YOUT( IPNT ) = REAL( YACC + DBLE( LBND( 2 ) ) - 1.5D0 )
          END IF
 
@@ -241,7 +241,7 @@
 
          WRITE( TEXT, * ) XOUT( IPNT ), YOUT( IPNT )
          CALL FIO_WRITE( FDO, TEXT, STATUS )
- 
+
       END DO
 
 *  Close the outut file.
@@ -256,7 +256,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*  If a null parameter was given or a parameter abort was requested, 
+*  If a null parameter was given or a parameter abort was requested,
 *  annul the error.
          IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
             CALL ERR_ANNUL( STATUS )

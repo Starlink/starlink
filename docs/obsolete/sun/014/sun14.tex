@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -40,42 +40,42 @@ RUTHERFORD APPLETON LABORATORY\\
 \vspace{5mm}
 
 \section{Introduction}
-The IRAS LRS (Low Resolution Spectrograph) database contains about 
-170~000 spectra for about 40~000 sources. 
-The LRS Atlas contains the ``best'' averaged spectra for 5425 sources, so 
+The IRAS LRS (Low Resolution Spectrograph) database contains about
+170~000 spectra for about 40~000 sources.
+The LRS Atlas contains the ``best'' averaged spectra for 5425 sources, so
 there are a lot of new spectra; some good, some rubbish.
 The LRS operates from around 7$\mu$m to 24$\mu$m, using a blue and red
-channel, with some overlap around 12$\mu$m to 13$\mu$m. 
+channel, with some overlap around 12$\mu$m to 13$\mu$m.
 There are 100 sample points in each channel.
 The LRS is a slitless spectrograph, so extended sources and multiple sources
 confuse the blue and the red channels.
-During the IRAS mission, whenever a sufficiently bright point source 
+During the IRAS mission, whenever a sufficiently bright point source
 triggered the algorithm, the spectrum was extracted from the LRS datastream
-and stored in the LRS dataset. 
+and stored in the LRS dataset.
 This means that, although the source may not be in the Point Source Catalog
-(but in the Rejects file) the spectra are still in the dataset. 
+(but in the Rejects file) the spectra are still in the dataset.
 
 The program to average the spectra, and output them, started life as a batch
-program on an old IBM main-frame. 
+program on an old IBM main-frame.
 Parts of this program are the original pieces used to create the LRS Atlas,
-and by setting flags appropriately you could recreate the Atlas. 
-The original program was written by E. Raimond, F. Olnon, K. Lugtenberg. 
+and by setting flags appropriately you could recreate the Atlas.
+The original program was written by E. Raimond, F. Olnon, K. Lugtenberg.
 The program was modified to run ``interactively'' on a Vax (at Groningen)
 by P. te Lintel, and he added a radio astronomy plotting package, POPS, to it.
 The present copy was sent to H. Walker (at NASA Ames) by P. Wesselius, and
-now, having been loaded onto STADAT, the Ames command procedures have been 
+now, having been loaded onto STADAT, the Ames command procedures have been
 modified by D. Giaretta.
 This warns you that the package is fragile, and temperamental.
 There is a complete user manual available, in the [iraslrs] directory.
 
 \section{The IRASLRS captive account}
 
-Users should log into the IRASLRS account on STADAT, through their Starlink 
+Users should log into the IRASLRS account on STADAT, through their Starlink
 node.
 \begin{center}
-ONLY ONE USER MAY BE LOGGED IN AT A TIME 
+ONLY ONE USER MAY BE LOGGED IN AT A TIME
 \end{center}
-the login command procedure checks this and may log you out 
+the login command procedure checks this and may log you out
 immediately if someone is already using the account.
 
 There are a limited number of things you can do in the captive account, you
@@ -128,13 +128,13 @@ To input positions, for example, type
     > F CPOS
     > CPOS ON
 \end{verbatim}
-You are moved to a new menu page requiring up to 18 search circle definitions. 
+You are moved to a new menu page requiring up to 18 search circle definitions.
 
 \begin{verbatim}
     > RAD1 2.0     --- defines the search circle for the 1st source as 2.0 arcmin
        < RETURN >  --- moves to the next menu page, which contains positions
     > RA1 18 35 12 --- either input like this or with `:' between pieces
-    > DEC1 38:44:00 
+    > DEC1 38:44:00
     > EXIT         --- to leave this page of the menu
     > EXIT         --- to leave the ZED editor
     > LRS          --- to start the retrieval section
@@ -143,7 +143,7 @@ You are moved to a new menu page requiring up to 18 search circle definitions.
 
 \section{Output data}
 You will be informed of the program's success in finding spectra around the
-specified position, by the logging of additional spectra to the SCANS set 
+specified position, by the logging of additional spectra to the SCANS set
 in DISK.
 The position of each scan is given, in degrees, for galactic and equatorial
 coordinates.
@@ -153,7 +153,7 @@ You may have several sources extracted for one given position.
 Normally, you will find 2 -- 3 spectra for each source, from the 2 -- 3
 HCONs of the mission.
 For example, with IRAS 18352+3844 (Vega), 2 average spectra are extracted,
-one with 3 spectra and one with 4 spectra. 
+one with 3 spectra and one with 4 spectra.
 The spectra are stored sequentially in the program's DISK file (for later
 use with POPS), and so there are now 9 spectra in DISK.
 Another run of the program will add more scans to the DISK file, so regular
@@ -163,19 +163,19 @@ is created for each spectrum scan from the coordinates, so that it looks like
 an IRAS name, e.g.\ for Vega we get A01\_18352P3844.SPE, A02\_18352P3844.SPE,
 A03\_18351P3845.SPE, etc.
 If the names of 2 different spectra are the same (because the coordinates are
-identical), which is the case for Vega, two version numbers are created, so 
-look carefully, and rename before purging, e.g.\ A01\_18352P3844.SPE;2 and 
-A01\_18352P3844.SPE;1 are two different averaged spectra.  
+identical), which is the case for Vega, two version numbers are created, so
+look carefully, and rename before purging, e.g.\ A01\_18352P3844.SPE;2 and
+A01\_18352P3844.SPE;1 are two different averaged spectra.
 The same type of processor is used to combine the spectra as was used to
 combine sightings for the Point Source Catalog.
 
-There are 100 samples from the blue channel and 100 samples from the red 
-channel output. 
+There are 100 samples from the blue channel and 100 samples from the red
+channel output.
 Of these, lines 30 -- 74 and 127 -- 175 in your file contain useful data.
 Beyond this, to red and blue in each channel, are data which should be used for
-noise and baseline calculations. 
+noise and baseline calculations.
 The first column in the file gives the wavelength in microns, the second
-column in the flux in watts.m$^{-2}$.$\mu$m$^{-1}$, i.e. not what is 
+column in the flux in watts.m$^{-2}$.$\mu$m$^{-1}$, i.e. not what is
 displayed in the LRS Atlas.
 
 \section{Post-processing}
@@ -183,7 +183,7 @@ displayed in the LRS Atlas.
 There is information about the spectra extracted, in SCAN.LOG.
 This can be very complicated to appreciate without knowing the IRAS satellite
 intimately, but some flags may be worth checking if you are uncertain about
-the quality of your spectra. 
+the quality of your spectra.
 The LRS had 5 detectors, 3 for the blue channel and 2 for the red channel.
 Part of the SCAN.LOG output for Vega is shown below (the far right side of
 the printed output).
@@ -212,43 +212,43 @@ the printed output).
     - means not set, + means set but do not reject, * means reject
 
     SS  skip flags for blue and red channels. These flags are set
-    12  when any of the rest of the flags are set leading to the 
+    12  when any of the rest of the flags are set leading to the
         rejection of that piece of spectrum for the average.
     RR  survey/LRS flux density ratio out of bounds
-    12  
+    12
 
     DG  deglitch count too high (per second in 5 second period)
     GC  in high source density region (i.e. near galactic plane)
- 
+
    ACC  in the average, how many spectra were accepted,
    REJ  and how many rejected
 \end{verbatim}
 There is a post-processor to reformat the data for use in DIPSO or MONGO.
 The first 10 wavelengths for each part are 0.0 in the .SPE files.
-The post-processor alters these to the first non-zero wavelength in that 
+The post-processor alters these to the first non-zero wavelength in that
 section.
 This allows plotting to be done with defaulted axes, but also maintains the
 information about baselines contained in those first few channels.
 
 \subsection{DIPSO}
-There is a post-processor to alter the output files so that they can be 
+There is a post-processor to alter the output files so that they can be
 read by DISPO. Type:
 \begin{verbatim}
     $ CHANGE
 \end{verbatim}
-to initiate this, and answer the prompts. 
-All the spectra you have retrieved can be changed by using {\tt A*.SPE} as 
+to initiate this, and answer the prompts.
+All the spectra you have retrieved can be changed by using {\tt A*.SPE} as
 answer to the file name query.
 The output files have extension ``DIPSO''.
 
 \subsection{MONGO}
-There is a post processor to alter the output files so that they can be 
+There is a post processor to alter the output files so that they can be
 read by MONGO. Type:
 \begin{verbatim}
     $ CHANGE
 \end{verbatim}
-to initiate this, and answer the prompts. 
-All the spectra you have retrieved can be changed by using {\tt A*.SPE} as 
+to initiate this, and answer the prompts.
+All the spectra you have retrieved can be changed by using {\tt A*.SPE} as
 answer to the file name query.
 The output files have extension ``MONGO''.
 
@@ -278,7 +278,7 @@ MONGO72$>$ CONNECT                 &  \\
 MONGO72$>$ XLABEL $\backslash$gl (in microns)& label the axes\\
 MONGO72$>$ YLABEL w.m$\backslash$$\backslash$u--2$\backslash$$\backslash$
   d.$\backslash$gmm$\backslash$$\backslash$u--1$\backslash$$\backslash$d& \\
-MONGO72$>$ LIST                    & prepare the commands for hardcopy\\ 
+MONGO72$>$ LIST                    & prepare the commands for hardcopy\\
 MONGO72$>$ DELETE 3 6              & remove the investigation for yscale\\
 MONGO72$>$ TERMINAL CANON          & select appropriate hardcopy device\\
 MONGO72$>$ PLAYBACK                & play the commands above to it\\

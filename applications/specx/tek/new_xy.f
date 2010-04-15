@@ -14,7 +14,7 @@ C   in header records in plot file.
       INCLUDE  'FLAGCOMM'
       INCLUDE  'PLOTPAR1'
       INCLUDE  'NEWXY'
- 
+
       IF (.NOT.ISETSC) THEN
         XXST  = XST
         YYST  = YST

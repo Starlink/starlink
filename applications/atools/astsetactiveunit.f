@@ -20,13 +20,13 @@
 *        The global status.
 
 *  Description:
-*     This application sets the current value of the ActiveUnit flag for 
-*     a Frame, which controls how the Frame behaves when it is used (by 
-*     ASTFINDFRAME) as a template to match another (target) Frame, or is 
-*     used as the TO Frame by ASTCONVERT. It determines if the Mapping 
-*     between the template and target Frames should take differences in 
-*     axis units into account. The default value for simple Frames is 
-*     FALSE, which preserves the behaviour of versions of AST prior to 
+*     This application sets the current value of the ActiveUnit flag for
+*     a Frame, which controls how the Frame behaves when it is used (by
+*     ASTFINDFRAME) as a template to match another (target) Frame, or is
+*     used as the TO Frame by ASTCONVERT. It determines if the Mapping
+*     between the template and target Frames should take differences in
+*     axis units into account. The default value for simple Frames is
+*     FALSE, which preserves the behaviour of versions of AST prior to
 *     version 2.0.
 *
 *     If the ActiveUnit flag of the template Frame is FALSE, then the
@@ -74,18 +74,18 @@
 *  ADAM Parameters:
 *     RESULT = LITERAL (Read)
 *        An NDF or text file to receive the modified Frame. If an NDF
-*        is supplied, the WCS FrameSet within the NDF will be replaced by 
-*        the new Object if possible (i.e. if it is a FrameSet in which the base 
+*        is supplied, the WCS FrameSet within the NDF will be replaced by
+*        the new Object if possible (i.e. if it is a FrameSet in which the base
 *        Frame has Domain GRID and has 1 axis for each NDF dimension).
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the original Frame. If an NDF is 
+*        An NDF or text file holding the original Frame. If an NDF is
 *        supplied, the WCS FrameSet will be used.
 *     VALUE = _LOGICAL (Read)
 *        The value to assign to the ActiveUnit flag.
 
 *  Notes:
-*     - This application corresponds to the AST routine AST_SETACTIVEUNIT. 
-*     The name has been abbreviated due to a limitation on the length of 
+*     - This application corresponds to the AST routine AST_SETACTIVEUNIT.
+*     The name has been abbreviated due to a limitation on the length of
 *     ADAM command names.
 
 *  Copyright:
@@ -136,13 +136,13 @@
       INTEGER THIS
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Get a Frame. 
+*  Get a Frame.
       CALL KPG1_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS, STATUS )
 
 *  Get the new value for the ActiveUnit flag.

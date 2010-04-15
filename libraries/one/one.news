@@ -43,10 +43,10 @@
      the routines in the aforementioned libraries/applications can
      be replaced.
 
-   - An explicit command for linking ADAM tasks with the ONE 
+   - An explicit command for linking ADAM tasks with the ONE
      library is now available: one_link_adam
 
-   - Added ONE_SHELL_ECHO to to return the result of expanding a string 
+   - Added ONE_SHELL_ECHO to to return the result of expanding a string
      containing shell metacharacters, but with file globbing.
 
 3 V1.0

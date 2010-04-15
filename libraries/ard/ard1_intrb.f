@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_INTRB( THIS, NPOINT, NCOORD_IN, INDIM, IN, 
+      SUBROUTINE ARD1_INTRB( THIS, NPOINT, NCOORD_IN, INDIM, IN,
      :                       FORWARD, NCOORD_OUT, OUTDIM, TYPE, NPAR,
      :                       PAR, FRM, OUT, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_INTRB( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD, 
+*     CALL ARD1_INTRB( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
 *                      NCOORD_OUT, OUTDIM, TYPE, NPAR, PAR, FRM, OUT, STATUS )
 
 *  Description:
@@ -27,7 +27,7 @@
 *     NCOORD_IN = INTEGER (Given)
 *        The number of coordinates being supplied for each input point
 *        (i.e. the number of dimensions of the space in which the
-*        input points reside). 
+*        input points reside).
 *     INDIM = INTEGER (Given)
 *        The number of elements along the first dimension of the IN
 *        array (which contains the input coordinates). This value is
@@ -80,12 +80,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -104,7 +104,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -136,7 +136,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :     A1,              ! An angle
      :     D,               ! Distance along curve (0-1)
      :     EDLEN,           ! Distance along geodesic edge
@@ -195,7 +195,7 @@
          ELSE
 
 *  BOX: Parameters are the supplied user co-ordinates of the box centre,
-*  followed by the lengths of the box sides in user co-ordinates. 
+*  followed by the lengths of the box sides in user co-ordinates.
             IF( TYPE .EQ. ARD__BOX ) THEN
 
 *  Corners of the box occur at offsets 0, 0.25, 0.5, 0.75 and 1.0. The edge
@@ -212,13 +212,13 @@
                   OUT( POINT, 1 ) = XH
                   OUT( POINT, 2 ) = YH - 4.0*( D - 0.5 )*YW
 
-               ELSE 
+               ELSE
                   OUT( POINT, 1 ) = XH - 4.0*( D - 0.75 )*XW
                   OUT( POINT, 2 ) = YL
 
                END IF
 
-*  POLYGON: Parameters are pairs of user co-ordinates, each being a vertex of 
+*  POLYGON: Parameters are pairs of user co-ordinates, each being a vertex of
 *  the polygon.
             ELSE IF( TYPE .EQ. ARD__POL ) THEN
 
@@ -248,31 +248,31 @@
                END IF
 
 *  Find the coords of the point, by offsetting along a geodesic.
-               CALL AST_OFFSET( FRM, PAR( 2*IV1 + 1 ), 
+               CALL AST_OFFSET( FRM, PAR( 2*IV1 + 1 ),
      :                          PAR( 2*IV2 + 1 ), W*EDLEN,
      :                          POS, STATUS )
 
 *  Store the results in the returned array.
                OUT( POINT, 1 ) = POS( 1 )
                OUT( POINT, 2 ) = POS( 2 )
-               
-*  CIRCLE: Parameters are the user co-ordinates of the centre of the circle 
+
+*  CIRCLE: Parameters are the user co-ordinates of the centre of the circle
 *  or sphere, followed by the radius.
             ELSE IF( TYPE .EQ. ARD__CIR ) THEN
 
 *  The offset is an angular offset with D=1 meaning 2*PI. Offset away
-*  from the centre along a geodesic radius to find the corresponding 
+*  from the centre along a geodesic radius to find the corresponding
 *  position.
-               A1 = AST_OFFSET2( FRM, PAR, D*ARD__TWOPI, PAR( 3 ), POS, 
-     :                           STATUS ) 
+               A1 = AST_OFFSET2( FRM, PAR, D*ARD__TWOPI, PAR( 3 ), POS,
+     :                           STATUS )
 
 *  Store the results in the returned array.
                OUT( POINT, 1 ) = POS( 1 )
                OUT( POINT, 2 ) = POS( 2 )
 
 *  ELLIPSE: Parameters are the user co-ordinates of the centre of the ellipse,
-*  the half-lengths of the two axes of the ellipse, and the angle (in degrees) 
-*  between the first user axis and the first of the two ellipse axes. 
+*  the half-lengths of the two axes of the ellipse, and the angle (in degrees)
+*  between the first user axis and the first of the two ellipse axes.
 *  Rotation from the 1st to the 2nd axis is positive.
             ELSE IF( TYPE .EQ. ARD__ELL ) THEN
 
@@ -283,14 +283,14 @@
 *  An ellipse is parameterized as x = a*cos(theta) y = b*sin(theta)
 *  Find the radius to the ellipse at the angle A1.
                THETA = ATAN2( SIN( A1 )/PAR( 4 ), COS( A1 )/PAR( 3 ) )
-               R = SQRT( ( PAR( 3 )*COS( THETA ) )**2 + 
+               R = SQRT( ( PAR( 3 )*COS( THETA ) )**2 +
      :                   ( PAR( 4 )*SIN( THETA ) )**2 )
 
-*  Offset away from the centre along a geodesic radius to find the 
+*  Offset away from the centre along a geodesic radius to find the
 *  corresponding position.
-               A1 = AST_OFFSET2( FRM, PAR, 
-     :                           ARD__DTOR*( 90.0 - PAR( 5 ) ) - A1, 
-     :                           R, POS, STATUS ) 
+               A1 = AST_OFFSET2( FRM, PAR,
+     :                           ARD__DTOR*( 90.0 - PAR( 5 ) ) - A1,
+     :                           R, POS, STATUS )
 
 *  Store the results in the returned array.
                OUT( POINT, 1 ) = POS( 1 )
@@ -302,7 +302,7 @@
                CALL MSG_SETI( 'TYPE', TYPE )
                CALL ERR_REP( 'ARD1_INTRB_ERR1', 'Illegal keyword '//
      :                       'identifier (^TYPE) encountered in '//
-     :                       'routine ARD1_INTRB (programming error).', 
+     :                       'routine ARD1_INTRB (programming error).',
      :                       STATUS )
                GO TO 999
             END IF

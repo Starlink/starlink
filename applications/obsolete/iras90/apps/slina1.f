@@ -49,7 +49,7 @@
 *        beginning of a curve section.
 *     PNARC = CHARACTER (Given)
 *        Name of the parameter used to get the length of a curve
-*        section.     
+*        section.
 *     PNANG = CHARACTER (Given)
 *        Name of the parameter used to get the position angle of a
 *        great circle section.
@@ -62,7 +62,7 @@
 *     LBND( 2 ), UBND( 2 ) = REAL (Given)
 *        The bounds of the current SGS zone.
 *     MXNSCT = INTEGER (Given)
-*        The max. number of curve sections can be drawn by SKYLINE.   
+*        The max. number of curve sections can be drawn by SKYLINE.
 *     MXVTCE = INTEGER (Given)
 *        Max. number of vertice of a polyline can have.
 *     NMERD = INTEGER (Given and Returned)
@@ -120,7 +120,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -170,16 +170,16 @@
          IF ( STATUS .EQ. PAR__NULL ) THEN
             NULL = .TRUE.
             CALL ERR_ANNUL( STATUS )
-      
+
 *  If an valid type is obtained, draw curves according to the type.
          ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-           
+
 *  If meridian sections are wanted, draw sections interactively.
             IF ( TYPE( : 8 ) .EQ. 'MERIDIAN' ) THEN
                CALL SLINC0( PNLON, PNLAT, PNARC, MODE, IRA, SCS,
      :                      LBND, UBND, MXNSCT, NMERD, MLON,
      :                      MLAT, MSCTLN, STATUS )
-            
+
 *  If parallel sections are wanted, draw parallel sections
 *  interactively.
             ELSE IF ( TYPE( : 8 ) .EQ. 'PARALLEL' ) THEN
@@ -188,10 +188,10 @@
      :                      PLAT, PSCTLN, STATUS )
 
 *  If great circle sections are wanted, draw great circle sections
-*  interactively. 
+*  interactively.
             ELSE IF ( TYPE( : 12 ) .EQ. 'GREAT CIRCLE' ) THEN
                CALL SLINC2( PNLON, PNLAT, PNANG, PNARC, MODE, IRA, SCS,
-     :                      LBND, UBND, MXNSCT, NGCRL, GLON, GLAT, 
+     :                      LBND, UBND, MXNSCT, NGCRL, GLON, GLAT,
      :                      GANG, GSCTLN, STATUS )
 
 *  If polylines are required, draw polylines interactively.

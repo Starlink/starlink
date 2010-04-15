@@ -266,7 +266,7 @@ PRIVATE void wwLeaveNotify(ev)XEvent ev;{ /* (XLeaveWindowEvent==XCrossingEvent)
 			gk0xbmfree(bm);
 		}
 		XSetWindowBorderPixmap(WXD,jwp->jw_xwindow,greyborder);
-	}	
+	}
 #endif WANTBLACKBORDER
 	if((jdd->jd_flags&JINSTALLMAP) && jwp->jw_cmap!=0)
 		XUninstallColormap(WXD,jwp->jw_cmap);
@@ -579,7 +579,7 @@ PRIVATE void gk0xipsetscreen(win,flag)window *win;{
 PUBLIC void gk0xipxset(wp,flag) window *wp;int flag;{
 	if(jwin(wp)->jw_flags&JWSCREEN){
 		gk0xipsetscreen(wp,flag);
-		return;	
+		return;
 	}
 	switch(flag){
 	case IPON:

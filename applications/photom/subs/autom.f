@@ -169,7 +169,7 @@
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -242,11 +242,11 @@
 
       REAL AREA, EFACT, LOCSKY, SIGMA, SKYARE, STAR, VALUES( MAXSKY ),
      :     VAREA, VSKY, VSTAR, XCEN, XFINAL, XINIT, YCEN, YFINAL, YINIT
-      REAL DCEN, OPTNRM, XCOMP, YCOMP, FLUX, 
+      REAL DCEN, OPTNRM, XCOMP, YCOMP, FLUX,
      :     ERROR, XFIT, YFIT, XERR, YERR, PEAK, BESTN
 
       REAL SHAPE(3)
-     
+
       CHARACTER * ( DAT__SZLOC ) VLOC
       CHARACTER * 72 TEXT
       CHARACTER * ( 2 ) CODE
@@ -260,10 +260,10 @@
 
 *   We have not made a PSF measurement so
       DOPSF = .FALSE.
-      
+
 *   We have yet to make a sky measurement
       SKYFLG = .FALSE.
-      
+
 *   Is the variance used to estimate the errors
       USEVAR = .FALSE.
       IF ( PHOTON .EQ. 3 ) THEN
@@ -281,7 +281,7 @@
 
 *   Write out the output file header
       IF( OPTIMA ) THEN
-         CALL OHEAD(NX,NY,CLIP,SEE,STATUS)      
+         CALL OHEAD(NX,NY,CLIP,SEE,STATUS)
       ELSE
          CALL HEADER(NX,NY,A,E,THETA,STATUS )
       ENDIF
@@ -318,12 +318,12 @@
 
 *   If we haven't done a PSF measurement next star better have
 *   and index of 0 and be a PSF candidate or we abort
-	    
+
 	    IF(OPTIMA .AND. (.NOT.DOPSF) .AND. (INDEX.NE.0)) THEN
                TEXT = 'ERROR   > No PSF star present.'
                CALL MSG_OUT( ' ', TEXT, STATUS )
-               GOTO 98  
-	    ENDIF                  		    
+               GOTO 98
+	    ENDIF
 
 *   Allow for any NDF origin shift
             XCEN = XCEN - REAL( ORIGIN( 1 ) - 1 )
@@ -352,29 +352,29 @@
                   CALL ERR_ANNUL( STATUS )
                ENDIF
             ENDIF
-	  
+
 	    IF ( OPTIMA ) THEN
 *               WRITE(*,*) ' DEBUG --- if ( optima == true )'
 
 *                ********************
-*   We are using *OPTIMAL EXTRACTION* 	 
+*   We are using *OPTIMAL EXTRACTION*
 *                ********************
 
 *   We always use concentric aperture in non interactive mode so
 *   we'll have a sky measurement for the PSF star
-	   	       
-*   Have we already selected a PSF star?	 
+
+*   Have we already selected a PSF star?
 	          IF( .NOT. DOPSF ) THEN
 *                        WRITE(*,*) ' DEBUG --- doing PSF star'
 
 *   Get the sky value if using concentric annulus
 *                        WRITE(*,*) ' DEBUG --- calling SKYCON()'
                         CALL SKYCON(SKYEST,XCEN,YCEN,A2,A3,E,THETA,
-     :                              NX, NY, IMAGE, IMVAR, USEVAR, MASK, 
-     :                              USEMSK, VALUES, NV, LOCSKY, SIGMA, 
+     :                              NX, NY, IMAGE, IMVAR, USEVAR, MASK,
+     :                              USEMSK, VALUES, NV, LOCSKY, SIGMA,
      :                              VSKY, MAXSKY, SKY,SKYSIG, AREA,
-     :                              SKYARE, EFACT, ASKY, STATUS ) 
-     
+     :                              SKYARE, EFACT, ASKY, STATUS )
+
 *                        WRITE(*,*) ' DEBUG --- STATUS = ', STATUS
 
 *   Do the PSF measurement
@@ -382,61 +382,61 @@
 		          DCEN = CLIP
                     ELSE
 		          DCEN = 0.0
-                    ENDIF   
+                    ENDIF
 		    IF( USEVAR ) THEN
 		         VSKY = VSKY
 			 SIGMA = SIGMA/SQRT(REAL(NV))
 	            ELSE
                          VSKY = SIGMA**2.0
-			 SIGMA  = SIGMA/SQRT(REAL(NV))  
+			 SIGMA  = SIGMA/SQRT(REAL(NV))
 	            END IF
-		    
+
 		    CODE = ' '
 *                    WRITE(*,*) ' DEBUG --- calling PSFCAL()'
                     CALL PSFCAL(XCEN, YCEN, DCEN, 1, IMAGE,
-     :                          NX, NY, SEE, CLIP, PADU, 
-     :                          SATURE, XFINAL, YFINAL, SHAPE, LOCSKY, 
-     :                          SIGMA,VSKY, CODE, SEARCH, POSTVE, 
+     :                          NX, NY, SEE, CLIP, PADU,
+     :                          SATURE, XFINAL, YFINAL, SHAPE, LOCSKY,
+     :                          SIGMA,VSKY, CODE, SEARCH, POSTVE,
      :                          MXSHFT, MXITER, TOLER, STATUS)
                     XFINAL = XFINAL - 0.5 ! back to grid co-ordinates
                     YFINAL = YFINAL - 0.5
-		  	      
-*   Done a PSF measurement	
+
+*   Done a PSF measurement
 		     DOPSF = .TRUE.
-		       		     
+
 *   Output the results of this measurement.
 *                    WRITE(*,*) ' DEBUG --- calling OUTPSF()'
-                     CALL OUTPSF (FOUT, INDEX, XFINAL, YFINAL, ORIGIN, 
+                     CALL OUTPSF (FOUT, INDEX, XFINAL, YFINAL, ORIGIN,
      :                            SHAPE, LOCSKY, PADU, CODE, STATUS)
-     
+
 *   Do a extraction
                   ELSE
 
 *   Get the sky value if using concentric annulus
 *                        WRITE(*,*) ' DEBUG --- calling SKYCON()'
                         CALL SKYCON(SKYEST,XCEN,YCEN,A2,A3,E,THETA,
-     :                              NX,NY,IMAGE,IMVAR,USEVAR,MASK, 
-     :                              USEMSK,VALUES,NV,LOCSKY,SIGMA, 
+     :                              NX,NY,IMAGE,IMVAR,USEVAR,MASK,
+     :                              USEMSK,VALUES,NV,LOCSKY,SIGMA,
      :                              VSKY,MAXSKY,SKY,SKYSIG,AREA,
-     :                              SKYARE,EFACT,ASKY,STATUS ) 
+     :                              SKYARE,EFACT,ASKY,STATUS )
 
-*   Do the star measurement	       
+*   Do the star measurement
 	            IF( CENTRO )  THEN
 		          DCEN = CLIP
                     ELSE
 		          DCEN = 0.0
-                    ENDIF   
+                    ENDIF
 		    IF( USEVAR ) THEN
 		         VSKY = VSKY
 			 SIGMA = SIGMA/SQRT(REAL(NV))
 	            ELSE
                          VSKY = SIGMA**2.0
-			 SIGMA  = SIGMA/SQRT(REAL(NV))  
-	            END IF		    
-		    
+			 SIGMA  = SIGMA/SQRT(REAL(NV))
+	            END IF
+
                     COMPAN = .FALSE.
 		    OPTNRM = 0.0
-		    CODE = ' '		    
+		    CODE = ' '
 *                    WRITE(*,*) ' DEBUG --- calling EXTR()'
                     CALL EXTR(XCEN, YCEN, DCEN, IMAGE, NX, NY, SEE,
      :                        CLIP, PADU, SATURE, SHAPE, OPTNRM,
@@ -444,30 +444,30 @@
      :                        XFIT, YFIT, XERR, YERR, PEAK, BESTN,
      :                        LOCSKY, SIGMA, VSKY, CODE, STATUS)
                     XFIT = XFIT - 0.5 ! back to grid co-ordinates
-                    YFIT = YFIT - 0.5     
-                    
+                    YFIT = YFIT - 0.5
+
                     IF( STATUS .NE. SAI__OK ) THEN
                        TEXT = 'ERROR   > Problem with optimal '//
      :                        'extraction.'
                        CALL MSG_OUT( ' ', TEXT, STATUS )
-                       GOTO 99		    
+                       GOTO 99
 		    ENDIF
-		         
+
 
 *   Output the results of this measurement.
 *                    WRITE(*,*) ' DEBUG --- calling OUTOPT()'
-                    CALL OUTOPT ( FOUT, INDEX, XFIT, YFIT, ORIGIN, 
-     :			          PADU, FLUX, AREA, ERROR, LOCSKY, 
-     :			          SKYARE, SIGMA, VSKY, MAGS, SKYMAG, 
+                    CALL OUTOPT ( FOUT, INDEX, XFIT, YFIT, ORIGIN,
+     :			          PADU, FLUX, AREA, ERROR, LOCSKY,
+     :			          SKYARE, SIGMA, VSKY, MAGS, SKYMAG,
      :			          PHOTON, BIASLE, CODE, ETIME, STATUS )
-     
+
 	          ENDIF
 
 *               *********************
-*   We're doing *APERTURE EXTRACTION*	    
+*   We're doing *APERTURE EXTRACTION*
 *               *********************
 
-	    ELSE 
+	    ELSE
 *              WRITE(*,*) ' DEBUG --- if ( optima == false )'
 
 *   Calculate the useful area of the grid array to be a box of size 2a
@@ -509,11 +509,11 @@
 *   Get the sky value
 *            WRITE(*,*) ' DEBUG --- calling SKYCON()'
             CALL SKYCON(SKYEST,XCEN,YCEN,A2,A3,E,THETA,
-     :                  NX, NY, IMAGE, IMVAR, USEVAR, MASK, 
-     :                  USEMSK, VALUES, NV, LOCSKY, SIGMA, 
+     :                  NX, NY, IMAGE, IMVAR, USEVAR, MASK,
+     :                  USEMSK, VALUES, NV, LOCSKY, SIGMA,
      :                  VSKY, MAXSKY, SKY,SKYSIG, AREA,
-     :                  SKYARE, EFACT, ASKY, STATUS ) 
-       
+     :                  SKYARE, EFACT, ASKY, STATUS )
+
 
 *   If the ellipse has been cut by the edge of the array flag an error
             IF ( CUTOFF ) THEN
@@ -524,11 +524,11 @@
 *            WRITE(*,*) ' DEBUG --- calling OUTRES()'
             CALL OUTRES ( FOUT, INDEX, XCEN, YCEN, ORIGIN, PADU, STAR,
      :                    AREA, VSTAR, LOCSKY, SKYARE, SIGMA, VSKY,
-     :                    MAGS, SKYMAG, PHOTON, BIASLE, A, E, THETA, 
+     :                    MAGS, SKYMAG, PHOTON, BIASLE, A, E, THETA,
      :                    CODE, ETIME, STATUS )
 
          ENDIF
-	 
+
 	 ENDIF
 
       ENDDO

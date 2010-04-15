@@ -35,7 +35,7 @@
 *
 *  LOCALS
 *  ------
-*     LOGNAM   Logical name 
+*     LOGNAM   Logical name
 *     ISTAT    System service status
 *     EQUNAM   Equivalence name
 *     LEQU     Length of equivalence name
@@ -50,7 +50,7 @@
 *!         INTEGER RETLEN
 *!         INTEGER ZERO
 *!      END STRUCTURE
-*!      RECORD /ITEMLIST/ ITMLST     
+*!      RECORD /ITEMLIST/ ITMLST
 *!#endif
 *
 *  COMMENTS
@@ -72,7 +72,7 @@
 *!      IF (ISTAT .AND. (LEQU.GT.0)) THEN
 *!#else
       CALL GETENV(LOGNAM, EQUNAM)
-    
+
       IF (EQUNAM.NE.'          ') THEN
 *!#endif
          READ(EQUNAM, '(BN,I10)', ERR=10) IVAL

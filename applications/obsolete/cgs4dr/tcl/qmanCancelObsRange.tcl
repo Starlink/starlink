@@ -34,7 +34,7 @@ proc qmanCancelObsRange {taskname} {
 # Clear the global abort flag.
     global QmanAbort
     set QmanAbort 0
- 
+
 # Send obey lock and call stage 2 when done.
     global QmanAccess
     $taskname obey lock $QmanAccess -inform "cgs4drInform $taskname %V" -endmsg "qmanCancelObs1 $taskname $index $end $step $qpos"
@@ -44,7 +44,7 @@ proc qmanCancelObsRange {taskname} {
 proc qmanCancelObs1 {taskname index end step qpos} {
 #+
 # Cancel observation stage 2.
-    
+
 # Check for loop termination (index equal to end or the interrupt flag set).
     global QmanAbort
     if {$index != $end && $QmanAbort==0} {

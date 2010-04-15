@@ -28,18 +28,18 @@
 *        array if the WCS Mappings are non-linear. The array should have
 *        one element for each GRID axis.
 *     PIXSC( * ) = DOUBLE PRECISION (Returned)
-*        The returned pixel scales. Note, the pixel scale for both celestial 
+*        The returned pixel scales. Note, the pixel scale for both celestial
 *        longitude and latitude axes are returned as an arc-distance in
 *        radians. The array should have one element for each WCS axis.
 *     VALUE( * ) = CHARACTER( * ) (Returned)
 *        The formatted pixel scales. Celestial axes are formatted as
-*        arc-seconds using a "G15.6" format. Time values are also formatted 
+*        arc-seconds using a "G15.6" format. Time values are also formatted
 *        using G15.6 (the Format attribute in the current WCS Frame is
 *        ignored, since it may produce a calendar date), in what ever
-*        units are indicated in the current Frame. Other types of 
-*        axes (including spectral axes) are formatted using the axis Format 
-*        attribute in the current WCS Frame. The array should have one 
-*        element for each WCS axis. Each element of the array should be at 
+*        units are indicated in the current Frame. Other types of
+*        axes (including spectral axes) are formatted using the axis Format
+*        attribute in the current WCS Frame. The array should have one
+*        element for each WCS axis. Each element of the array should be at
 *        least 15 characters long. The returned text is left justified.
 *     UNIT( * ) = CHARACTER( * ) (Returned)
 *        Units strings that describe the values returned in VALUES. The
@@ -56,12 +56,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -157,14 +157,14 @@
          END DO
 
 *  Transform them into WCS coords.
-         CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT, 
+         CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT,
      :                   STATUS )
 
-*  Save a copy of the WCS co-ordinates at the AT point. Initialise Q to 
+*  Save a copy of the WCS co-ordinates at the AT point. Initialise Q to
 *  be the same as the AT point.
          DO I = 1, NWCS
             ATWCS( I ) = OUT( 1, I )
-            Q( I ) = ATWCS( I ) 
+            Q( I ) = ATWCS( I )
          END DO
 
 *  Now loop round each WCS axis.
@@ -172,14 +172,14 @@
 
 *  Get the co-ordinates of a point that is a small distance away from AT
 *  along the current WCS axis.
-            Q( I ) = OUT( 2, I ) 
+            Q( I ) = OUT( 2, I )
 
-*  Find the geodesic distance in the WCS frame between this point and the 
+*  Find the geodesic distance in the WCS frame between this point and the
 *  AT point.
             DWCS = AST_DISTANCE( FWCS, ATWCS, Q, STATUS )
 
 *  Transform the outlying WCS positions back into GRID coords.
-            CALL AST_TRANN( MAP, 1, NWCS, 1, Q, .FALSE., NPIX, 1, QGRID, 
+            CALL AST_TRANN( MAP, 1, NWCS, 1, Q, .FALSE., NPIX, 1, QGRID,
      :                      STATUS )
 
 *  Find the distance between the two points in the GRID frame.
@@ -238,7 +238,7 @@
 *  Reset Q back to the AT point.
             Q( I ) = ATWCS( I )
 
-         END DO      
+         END DO
 
 *  If the Mapping is missing an inverse transformation, we may still be
 *  able to deal with WCS axes that correspond with a single pixel axis.
@@ -262,7 +262,7 @@
                   CALL AST_TRAN1( OMAP, 2, XIN, .TRUE., XOUT, STATUS )
 
 *  Find and return the axis scale.
-                  IF( XOUT( 1 ) .NE. AST__BAD .AND. 
+                  IF( XOUT( 1 ) .NE. AST__BAD .AND.
      :                XOUT( 2 ) .NE. AST__BAD ) THEN
                      PIXSC( I ) = ABS( XOUT( 2 ) - XOUT( 1 ) )
 
@@ -293,19 +293,19 @@
                         IAT = 5
                         CALL CHR_PUTI( I, ATTR, IAT )
                         CALL CHR_APPND( ')', ATTR, IAT )
-                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), 
+                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ),
      :                                        STATUS )
 
 *  All other axes are formatted using their own Format attribute.
                      ELSE
-                         VALUE( I ) = AST_FORMAT( FWCS, I, PIXSC( I ), 
+                         VALUE( I ) = AST_FORMAT( FWCS, I, PIXSC( I ),
      :                                            STATUS )
 
                         ATTR = 'Unit('
                         IAT = 5
                         CALL CHR_PUTI( I, ATTR, IAT )
                         CALL CHR_APPND( ')', ATTR, IAT )
-                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), 
+                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ),
      :                                        STATUS )
                      END IF
 
@@ -316,7 +316,7 @@
         END DO
 
       END IF
-     
+
 *  Free resources
       CALL AST_ANNUL( FGRID, STATUS )
       CALL AST_ANNUL( FWCS, STATUS )

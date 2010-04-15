@@ -33,7 +33,7 @@ f     AST_FRAME
 *  Attributes:
 *     In addition to those attributes common to all Mappings, every
 *     Frame also has the following attributes (if the Frame has only one
-*     axis, the axis specifier can be omited from the following attribute 
+*     axis, the axis specifier can be omited from the following attribute
 *     names):
 *
 *     - AlignSystem: Coordinate system used to align Frames
@@ -50,7 +50,7 @@ f     AST_FRAME
 *     - MinAxes: Minimum number of Frame axes to match
 *     - Naxes: Number of Frame axes
 *     - NormUnit(axis): Normalised axis physical units
-*     - ObsAlt: Geodetic altitude of observer 
+*     - ObsAlt: Geodetic altitude of observer
 *     - ObsLat: Geodetic latitude of observer
 *     - ObsLon: Geodetic longitude of observer
 *     - Permute: Permute axis order?
@@ -121,12 +121,12 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -200,20 +200,20 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        - Added astResolvePoints.
 *        - Override astEqual.
 *     29-NOV-2004 (DSB):
-*        - Set/Get/Test/ClearAttrib: Allow axis specifier to be omitted from 
+*        - Set/Get/Test/ClearAttrib: Allow axis specifier to be omitted from
 *        axis attribute names if the Frame only has one axis.
 *     2-FEB-2005 (DSB):
 *        - Avoid using astStore to allocate more storage than is supplied
-*        in the "data" pointer. This can cause access violations since 
+*        in the "data" pointer. This can cause access violations since
 *        astStore will then read beyond the end of the "data" area.
 *     17-FEB-2005 (DSB):
 *        - Change use of ActiveUnit flag so that both target and template
-*        Frames must have active units in order for the Mapping to take 
-*        account of differences in units. Previously, the test was based 
+*        Frames must have active units in order for the Mapping to take
+*        account of differences in units. Previously, the test was based
 *        on the template Frame alone.
 *     23-MAR-2005 (DSB):
 *        - GetActiveUnit: Always return zero if the Frame contains any
-*        SkyAxes. 
+*        SkyAxes.
 *     5-APR-2005 (DSB):
 *        Correct error checking in Clear/Get/Set/TestAttrib.
 *     12-MAY-2005 (DSB):
@@ -233,7 +233,7 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     16-AUG-2006 (DSB):
 *        Correct "Class Applicability" to "Applicability".
 *     5-OCT-2006 (DSB):
-*        Increase the number of digits used when formating a ObsLon or 
+*        Increase the number of digits used when formating a ObsLon or
 *        ObsLat value in GetAttrib.
 *     14-OCT-2006 (DSB):
 *        - Add Dut1 attribute
@@ -243,13 +243,13 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     17-MAY-2007 (DSB):
 *        Added read-only attribute NormUnit.
 *     21-MAY-2007 (DSB):
-*        Use rather than ignore the value returned by astTestAxisDigits in 
+*        Use rather than ignore the value returned by astTestAxisDigits in
 *        TestAttrib.
 *     25-JUN-2007 (DSB):
 *        Documentation typos.
 *     26-NOV-2007 (DSB):
-*        In Clear/Get/Set/TestAttrib, include any appropriate axis index in 
-*        the attribute name when attempting to get the attribute value from 
+*        In Clear/Get/Set/TestAttrib, include any appropriate axis index in
+*        the attribute name when attempting to get the attribute value from
 *        the primary frame
 *     17-NOV-2008 (DSB):
 *        Correct parent class in invocation of astMAKE_ISA.
@@ -710,12 +710,12 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 /* Define a variable to hold a SkyFrame which will be used for formatting
    and unformatting ObsLat and ObsLon values. */
-static AstSkyFrame *skyframe;      
+static AstSkyFrame *skyframe;
 
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0; \
@@ -742,33 +742,33 @@ astMAKE_INITGLOBALS(Frame)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
-/* Buffer returned by GetAttrib. */ 
+/* Buffer returned by GetAttrib. */
 static char getattrib_buff[ GETATTRIB_BUFF_LEN + 1 ];
 
-/* Strings returned by astFormatID */ 
+/* Strings returned by astFormatID */
 static char *astformatid_strings[ ASTFORMATID_MAX_STRINGS ];
 
 /* Offset of next string in "AstFormatID_Strings" */
 static int astformatid_istr;
 
-/* "AstFormatID_Strings" array initialised? */ 
+/* "AstFormatID_Strings" array initialised? */
 static int astformatid_init;
 
-/* Default Label string buffer */ 
-static char label_buff[ LABEL_BUFF_LEN + 1 ]; 
+/* Default Label string buffer */
+static char label_buff[ LABEL_BUFF_LEN + 1 ];
 
 /* Default Symbol buffer */
-static char symbol_buff[ SYMBOL_BUFF_LEN + 1 ]; 
+static char symbol_buff[ SYMBOL_BUFF_LEN + 1 ];
 
 /* Default Title string buffer */
-static char title_buff[ TITLE_BUFF_LEN + 1 ]; 
+static char title_buff[ TITLE_BUFF_LEN + 1 ];
 
 /* Buffer for result string */
-static char astfmtdecimalyr_buff[ ASTFMTDECIMALYR_BUFF_LEN + 1 ]; 
+static char astfmtdecimalyr_buff[ ASTFMTDECIMALYR_BUFF_LEN + 1 ];
 
 
 /* Define the class virtual function table and its initialisation flag
@@ -963,7 +963,7 @@ static int ManageLock( AstObject *, int, int, AstObject **, int * );
 
 /* Member functions. */
 /* ================= */
-static const char *Abbrev( AstFrame *this, int axis,  const char *fmt, 
+static const char *Abbrev( AstFrame *this, int axis,  const char *fmt,
                            const char *str1, const char *str2, int *status ) {
 /*
 *+
@@ -978,7 +978,7 @@ static const char *Abbrev( AstFrame *this, int axis,  const char *fmt,
 
 *  Synopsis:
 *     #include "frame.h"
-*     const char *astAbbrev( AstFrame *this, int axis, const char *fmt, 
+*     const char *astAbbrev( AstFrame *this, int axis, const char *fmt,
 *                            const char *str1, const char *str2 )
 
 *  Class Membership:
@@ -1472,7 +1472,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
 *  Implementation Deficiencies;
 *     - The protected interface for this function uses 1-based axis
 *     numbering (like the public interface), rather than the more usual
-*     zero-based system used by all other protected interfaces. There is 
+*     zero-based system used by all other protected interfaces. There is
 *     no real reason for this, and it should be changed at some time.
 
 */
@@ -1543,14 +1543,14 @@ static int AxIn( AstFrame *this, int axis, double lo, double hi, double val,
 *        considered to be within the interval. Otherwise they are outside.
 
 *  Returned Value:
-*     Non-zero if the test value is inside the interval. 
+*     Non-zero if the test value is inside the interval.
 
 *  Applicability:
 *     Frame
 *        Uses simple Euclidean test
 *     SkyFrame
-*        All angles which are numerically between "lo" and "hi" are within 
-*        the interval. Angle outside this range are also within the interval 
+*        All angles which are numerically between "lo" and "hi" are within
+*        the interval. Angle outside this range are also within the interval
 *        if they can be brought into the range by addition or subtraction
 *        of a multiple of 2.PI.
 *-
@@ -1561,7 +1561,7 @@ static int AxIn( AstFrame *this, int axis, double lo, double hi, double val,
    int result;                   /* Returned value */
 
 /* For speed, omit the astOK check and axis validation (since this is
-   protected code, AST should get it right). Obtain a pointer to the 
+   protected code, AST should get it right). Obtain a pointer to the
    required Axis. */
    ax = astGetAxis( this, axis );
 
@@ -1962,11 +1962,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* A flag indicating that we do not need to free the axis_attrib memory. */
    free_axis_attrib = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_attrib = NULL;
    old_attrib = NULL;
 
-/* Jump back to here if we are trying the same attribute but with an explicit 
+/* Jump back to here if we are trying the same attribute but with an explicit
    axis "(1)" added to the end of the name. */
 L1:
 
@@ -2130,7 +2130,7 @@ L1:
    (which has additional attributes not recognised here). */
    } else if( !free_axis_attrib && ( nc = 0,
                  ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
-                                      &axis_nc, &axis, &nc ) ) 
+                                      &axis_nc, &axis, &nc ) )
                && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
@@ -2144,7 +2144,7 @@ L1:
 /* Assume that we will be able to use the attribute name. */
          used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -2155,8 +2155,8 @@ L1:
          astClearAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
          if( astStatus == AST__BADAT ) {
             astClearStatus;
@@ -2171,11 +2171,11 @@ L1:
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
                sprintf( pfrm_attrib, "%s(%d)", axis_attrib, paxis + 1 );
-            
+
 /* Attempt to clear the attribute as an attribute of the primary Frame. */
                astClearAttrib( pfrm, pfrm_attrib );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute name. */
                if( !astOK ) {
                   astClearStatus;
@@ -2204,8 +2204,8 @@ L1:
 /* Re-instate the original error reporting state. */
          astReporting( oldrep );
 
-/* If we could not use the attribute name, attempt to clear the axis 
-   attribute again, this time retaining the error report. This is done 
+/* If we could not use the attribute name, attempt to clear the axis
+   attribute again, this time retaining the error report. This is done
    to ensure the user gets an appropriate error message. */
          if( !used ) astClearAttrib( ax, axis_attrib );
       }
@@ -2218,7 +2218,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && astGetNaxes( this ) == 1 ) {
 
@@ -2246,7 +2246,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute name is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original attrib 
+   method for further interpretation. First re-instate the original attrib
    name string if it was changed above. */
    } else {
       if( free_axis_attrib ) {
@@ -2606,8 +2606,8 @@ f        AST_TRAN2), then it provides a means of converting coordinates
 
 *  Applicability:
 *     DSBSpecFrame
-*        If the AlignSideBand attribute is non-zero, alignment occurs in the 
-*        upper sideband expressed within the spectral system and standard of 
+*        If the AlignSideBand attribute is non-zero, alignment occurs in the
+*        upper sideband expressed within the spectral system and standard of
 *        rest given by attributes AlignSystem and AlignStdOfRest. If
 *        AlignSideBand is zero, the two DSBSpecFrames are aligned as if
 *        they were simple SpecFrames (i.e. the SideBand is ignored).
@@ -2680,10 +2680,10 @@ f        it by specifying its domain in the DOMAINLIST string, or (b)
 *        making it the base Frame, since this is always considered
 *        first.
 *     SpecFrame
-*        Alignment occurs within the spectral system and standard of rest 
+*        Alignment occurs within the spectral system and standard of rest
 *        given by attributes AlignSystem and AlignStdOfRest.
 *     TimeFrame
-*        Alignment occurs within the time system and time scale given by 
+*        Alignment occurs within the time system and time scale given by
 *        attributes AlignSystem and AlignTimeScale.
 
 *  Examples:
@@ -3265,7 +3265,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "frame.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     Frame member function (over-rides the astEqual protected
@@ -3287,7 +3287,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 *     One if the Frames are equivalent, zero otherwise.
 
 *  Notes:
-*     - The two Frames are considered equivalent if the Mapping between 
+*     - The two Frames are considered equivalent if the Mapping between
 *     them is a UnitMap.
 *     - A value of zero will be returned if this function is invoked
 *     with the global status set, or if it should fail for any reason.
@@ -3333,8 +3333,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    return result;
 }
 
-static int Fields( AstFrame *this, int axis, const char *fmt, 
-                   const char *str, int maxfld, char **fields, 
+static int Fields( AstFrame *this, int axis, const char *fmt,
+                   const char *str, int maxfld, char **fields,
                    int *nc, double *val, int *status ) {
 /*
 *+
@@ -3349,16 +3349,16 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 
 *  Synopsis:
 *     #include "frame.h"
-*     int astFields( AstFrame *this, int axis, const char *fmt, 
-*                    const char *str, int maxfld, char **fields, 
-*                    int *nc, double *val ) 
+*     int astFields( AstFrame *this, int axis, const char *fmt,
+*                    const char *str, int maxfld, char **fields,
+*                    int *nc, double *val )
 
 *  Class Membership:
 *     Frame method.
 
 *  Description:
-*     This function identifies the numerical fields within a Frame axis 
-*     value that has been formatted using astAxisFormat. It assumes that 
+*     This function identifies the numerical fields within a Frame axis
+*     value that has been formatted using astAxisFormat. It assumes that
 *     the value was formatted using the supplied format string. It also
 *     returns the equivalent floating point value.
 
@@ -3377,10 +3377,10 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 *     maxfld
 *        The maximum number of fields to identify within "str".
 *     fields
-*        A pointer to an array of at least "maxfld" character pointers. 
-*        Each element is returned holding a pointer to the start of the 
-*        corresponding field  in "str" (in the order in which they occur 
-*        within "str"), or NULL if no corresponding field can be found. 
+*        A pointer to an array of at least "maxfld" character pointers.
+*        Each element is returned holding a pointer to the start of the
+*        corresponding field  in "str" (in the order in which they occur
+*        within "str"), or NULL if no corresponding field can be found.
 *     nc
 *        A pointer to an array of at least "maxfld" integers. Each
 *        element is returned holding the number of characters in the
@@ -3388,7 +3388,7 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 *        found.
 *     val
 *        Pointer to a location at which to store the value
-*        equivalent to the returned field values. If this is NULL, 
+*        equivalent to the returned field values. If this is NULL,
 *        it is ignored.
 
 *  Returned Value:
@@ -3403,9 +3403,9 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 *     - Fields are counted from the start of the formatted string. If the
 *     string contains more than "maxfld" fields, then trailing fields are
 *     ignored.
-*     - If this function is invoked with the global error status set, or 
-*     if it should fail for any reason, then a value of zero will be returned 
-*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     - If this function is invoked with the global error status set, or
+*     if it should fail for any reason, then a value of zero will be returned
+*     as the function value, and "fields", "nc" and "val"  will be returned
 *     holding their supplied values
 *-
 */
@@ -3651,14 +3651,14 @@ f        found as part of the RESULT FrameSet. If the target is
 c     result = astFindFrame( target, astSkyFrame( "MaxAxes=100" ), "" );
 f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'MaxAxes=100', STATUS ), ' ', STATUS )
 *        This is like the last example, except that in the event of the
-*        target being a CmpFrame, the component Frames encapsulated by the 
+*        target being a CmpFrame, the component Frames encapsulated by the
 *        CmpFrame will be searched for a SkyFrame. If found, the returned
 *        Mapping will included a PermMap which selects the required axes
-*        from the target CmpFrame. 
+*        from the target CmpFrame.
 *
-*        This is acomplished by setting the MaxAxes attribute of the 
-*        template SkyFrame to a large number (larger than or equal to the 
-*        number of axes in the target CmpFrame). This allows the SkyFrame 
+*        This is acomplished by setting the MaxAxes attribute of the
+*        template SkyFrame to a large number (larger than or equal to the
+*        number of axes in the target CmpFrame). This allows the SkyFrame
 *        to be used as a match for Frames containing from 2 to 100 axes.
 c     result = astFindFrame( target, astSkyFrame( "System=FK5" ), "" );
 f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'System=FK5', STATUS ), ' ', STATUS )
@@ -3747,15 +3747,15 @@ f     (b) the value of its Domain attribute appears in the DOMAINLIST
 *     class as the template. Note however, the MaxAxes and MinAxes
 *     attributes of the template must be set to suitable values to allow
 *     it to match the CmpFrame. That is, the MinAxes attribute must be
-*     less than or equal to the number of axes in the target, and the MaxAxes 
+*     less than or equal to the number of axes in the target, and the MaxAxes
 *     attribute must be greater than or equal to the number of axes in
 *     the target.
-*     - If using a CmpFrame as a template frame, the MinAxes and MaxAxes 
-*     for the template are determined by the MinAxes and MaxAxes values of 
-*     the component Frames within the template. So if you want a template 
+*     - If using a CmpFrame as a template frame, the MinAxes and MaxAxes
+*     for the template are determined by the MinAxes and MaxAxes values of
+*     the component Frames within the template. So if you want a template
 *     CmpFrame to be able to match Frames with different numbers of axes,
 *     then you must set the MaxAxes and/or MinAxes attributes in the component
-*     template Frames, before combining them together into the template 
+*     template Frames, before combining them together into the template
 *     CmpFrame.
 *     - If a template has a value set for any of its main attributes, then
 *     it will only match Frames which have an identical value for that
@@ -3941,7 +3941,7 @@ const char *astFmtDecimalYr_( double year, int digits, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(NULL);
 
 /* Limit the precision to what is meaningful. */
@@ -4208,9 +4208,9 @@ f     invoked with STATUS set to an error value, or if it should fail for
    }
 
 /* If the Frame contains a SkyAxis the ActiveUnit flag is always zero. */
-   if( !has_skyaxis ) {   
+   if( !has_skyaxis ) {
 
-/* Otherwise, get the value from the Frame. If it has not yet been assigned a 
+/* Otherwise, get the value from the Frame. If it has not yet been assigned a
    value return the value zero. */
       result = this->active_unit;
       if( result == -INT_MAX ) result = 0;
@@ -4304,10 +4304,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the Frame structure. */
@@ -4320,11 +4320,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* A flag indicating that we do not need to free the axis_attrib memory. */
    free_axis_attrib = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_attrib = NULL;
    old_attrib = NULL;
 
-/* Jump back to here if we are trying the same attribute but with an explicit 
+/* Jump back to here if we are trying the same attribute but with an explicit
    axis "(1)" added to the end of the name. */
 L1:
 
@@ -4508,7 +4508,7 @@ L1:
                      "astGetAttrib(%s): Corrupt %s contains invalid "
                      "AlignSystem identification code (%d).", status,
                      astGetClass( this ), astGetClass( this ), (int) system );
-         }   
+         }
       }
 
 /* System. */
@@ -4525,7 +4525,7 @@ L1:
                      "astGetAttrib(%s): Corrupt %s contains invalid "
                      "System identification code (%d).", status,
                      astGetClass( this ), astGetClass( this ), (int) system );
-         }   
+         }
       }
 
 /* Title. */
@@ -4553,7 +4553,7 @@ L1:
       dval = astGetObsLat( this );
       if ( astOK ) {
 
-/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+/* If not already created, create an FK5 J2000 SkyFrame which will be used
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
             astBeginPM;
@@ -4562,7 +4562,7 @@ L1:
          }
 
 /* Display absolute value preceeded by "N" or "S" as appropriate. */
-         if( dval < 0 ) {         
+         if( dval < 0 ) {
             (void) sprintf( getattrib_buff, "S%s",  astFormat( skyframe, 1, -dval ) );
          } else {
             (void) sprintf( getattrib_buff, "N%s",  astFormat( skyframe, 1, dval ) );
@@ -4579,7 +4579,7 @@ L1:
 /* Put into range +/- PI. */
          dval = palSlaDrange( dval );
 
-/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+/* If not already created, create an FK5 J2000 SkyFrame which will be used
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
             astBeginPM;
@@ -4588,7 +4588,7 @@ L1:
          }
 
 /* Display absolute value preceeded by "E" or "W" as appropriate. */
-         if( dval < 0 ) {         
+         if( dval < 0 ) {
             (void) sprintf( getattrib_buff, "W%s",  astFormat( skyframe, 1, -dval ) );
          } else {
             (void) sprintf( getattrib_buff, "E%s",  astFormat( skyframe, 1, dval ) );
@@ -4636,7 +4636,7 @@ L1:
 /* Assume that we will be able to use the attribute name. */
          used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -4647,8 +4647,8 @@ L1:
          result = astGetAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
          if( astStatus == AST__BADAT ) {
             astClearStatus;
@@ -4663,11 +4663,11 @@ L1:
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
                sprintf( pfrm_attrib, "%s(%d)", axis_attrib, paxis + 1 );
-            
+
 /* Attempt to use the Axis astGetAttrib method to obtain the result. */
                result = astGetAttrib( pfrm, pfrm_attrib );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute name. */
                if( !astOK ) {
                   astClearStatus;
@@ -4696,8 +4696,8 @@ L1:
 /* Re-instate the original error reporting state. */
          astReporting( oldrep );
 
-/* If we could not use the attribute name, attempt to get the axis 
-   attribute again, this time retaining the error report. This is done 
+/* If we could not use the attribute name, attempt to get the axis
+   attribute again, this time retaining the error report. This is done
    to ensure the user gets an appropriate error message. */
          if( !used ) result = astGetAttrib( ax, axis_attrib );
       }
@@ -4710,7 +4710,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && naxes == 1 ) {
 
@@ -4738,7 +4738,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute name is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original attrib 
+   method for further interpretation. First re-instate the original attrib
    name string if it was changed above. */
    } else {
       if( free_axis_attrib ) {
@@ -4831,7 +4831,7 @@ static const char *GetDefaultLabel( int axis, int *status ) {
 *     const char *GetDefaultLabel( int axis, int *status )
 
 *  Class Membership:
-*     Frame member function 
+*     Frame member function
 
 *  Description:
 *     This function returns a pointer to a string holding a default axis
@@ -4852,7 +4852,7 @@ static const char *GetDefaultLabel( int axis, int *status ) {
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(NULL);
 
 /* Format the axis index, putting the string in a global buffer. */
@@ -4878,7 +4878,7 @@ static const char *GetDefaultSymbol( AstFrame *this, int axis, int *status ) {
 *     const char *GetDefaultSymbol( AstFrame *this, int axis, int *status )
 
 *  Class Membership:
-*     Frame member function 
+*     Frame member function
 
 *  Description:
 *     This function returns a pointer to a string holding a default axis
@@ -4901,7 +4901,7 @@ static const char *GetDefaultSymbol( AstFrame *this, int axis, int *status ) {
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this);
 
 /* Note we use "sprintf" once to determine how many characters are
@@ -4938,7 +4938,7 @@ static const char *GetDefaultTitle( AstFrame *this, int *status ) {
 *     const char *GetDefaultTitle( AstFrame *this, int *status )
 
 *  Class Membership:
-*     Frame member function 
+*     Frame member function
 
 *  Description:
 *     This function returns a pointer to a string holding a default Title value.
@@ -4958,7 +4958,7 @@ static const char *GetDefaultTitle( AstFrame *this, int *status ) {
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
-/* Get a pointer to the structure holding thread-specific global data. */   
+/* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this);
 
 /* Create the Title value and put it in the global buffer. */
@@ -5043,7 +5043,7 @@ static int GetIsLinear( AstMapping *this_mapping, int *status ){
 */
    return 1;
 }
- 
+
 static int GetIsSimple( AstMapping *this_mapping, int *status ){
 /*
 *  Name:
@@ -5562,7 +5562,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
 
 static void Intersect( AstFrame *this, const double a1[2],
                        const double a2[2], const double b1[2],
-                       const double b2[2], double cross[2], 
+                       const double b2[2], double cross[2],
                        int *status ) {
 /*
 *++
@@ -5587,14 +5587,14 @@ f     CALL AST_INTERSECT( THIS, A1, A2, B1, B2, CROSS, STATUS )
 *     Frame method.
 
 *  Description:
-c     This function 
+c     This function
 f     This routine
 *     finds the coordinate values at the point of intersection between
-*     two geodesic curves. Each curve is specified by two points on 
+*     two geodesic curves. Each curve is specified by two points on
 *     the curve.  It can only be used with 2-dimensional Frames.
 *
 *     For example, in a basic Frame, it will find the point of
-*     intersection between two straight lines. But for a SkyFrame it 
+*     intersection between two straight lines. But for a SkyFrame it
 *     will find an intersection of two great circles.
 
 *  Parameters:
@@ -5612,7 +5612,7 @@ f     A2( 2 ) = DOUBLE PRECISION (Given)
 c        An array of double, with one element for each Frame axis
 f        An array with one element for each Frame axis
 *        (Naxes attribute). This should contain the coordinates of a
-*        second point on the first geodesic curve. It should not be 
+*        second point on the first geodesic curve. It should not be
 *        co-incident with the first point.
 c     b1
 f     B1( 2 ) = DOUBLE PRECISION (Given)
@@ -5625,22 +5625,22 @@ f     B2( 2 ) = DOUBLE PRECISION (Given)
 c        An array of double, with one element for each Frame axis
 f        An array with one element for each Frame axis
 *        (Naxes attribute). This should contain the coordinates of a
-*        second point on the second geodesic curve. It should not be 
+*        second point on the second geodesic curve. It should not be
 *        co-incident with the first point.
 c     cross
 f     CROSS( 2 ) = DOUBLE PRECISION (Returned)
 c        An array of double, with one element for each Frame axis
 f        An array with one element for each Frame axis
-*        in which the coordinates of the required intersection will 
+*        in which the coordinates of the required intersection will
 *        be returned.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
 *     - For SkyFrames each curve will be a great circle, and in general
-*     each pair of curves will intersect at two diametrically opposite 
+*     each pair of curves will intersect at two diametrically opposite
 *     points on the sky. The returned position is the one which is
-*     closest to point 
+*     closest to point
 c     "a1".
 f     A1.
 *     - This function will return "bad" coordinate values (AST__BAD)
@@ -5730,7 +5730,7 @@ f     AST_DISTANCE function.
 /* Find the intercection. */
          cross[ 0 ] = a1[ 0 ];
          cross[ 1 ] = mb*a1[ 0 ] + cb;
-      } 
+      }
    }
 }
 
@@ -5759,7 +5759,7 @@ static int IsUnitFrame( AstFrame *this, int *status ){
 *     class inherits from Mapping and therefore every Frame is also a Mapping).
 
 *  Parameters:
-*     this 
+*     this
 *        Pointer to the Frame.
 
 *  Returned Value:
@@ -5797,42 +5797,42 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point, 
 
 *  Description:
 *     This function determines if the supplied point is on the supplied
-*     line within the supplied Frame. The start point of the line is 
-*     considered to be within the line, but the end point is not. The tests 
-*     are that the point of closest approach of the line to the point should 
-*     be between the start and end, and that the distance from the point to 
-*     the point of closest aproach should be less than 1.0E-7 of the length 
+*     line within the supplied Frame. The start point of the line is
+*     considered to be within the line, but the end point is not. The tests
+*     are that the point of closest approach of the line to the point should
+*     be between the start and end, and that the distance from the point to
+*     the point of closest aproach should be less than 1.0E-7 of the length
 *     of the line.
 
 *  Parameters:
 *     this
 *        Pointer to the Frame.
 *     l
-*        Pointer to the structure defining the line. 
+*        Pointer to the structure defining the line.
 *     def
 *        Should be set non-zero if the "point" array was created by a
 *        call to astLineCrossing (in which case it may contain extra
 *        information following the axis values),and zero otherwise.
 *     point
-*        Point to an array containing the axis values of the point to be 
+*        Point to an array containing the axis values of the point to be
 *        tested, possibly followed by extra cached information (see "def").
 
 *  Returned Value:
-*     A non-zero value is returned if the line contains the point. 
+*     A non-zero value is returned if the line contains the point.
 
 *  Notes:
-*     - The pointer supplied for "l" should have been created using the 
-*     astLineDef method. These structures contained cached information about 
-*     the lines which improve the efficiency of this method when many 
-*     repeated calls are made. An error will be reported if the structure 
+*     - The pointer supplied for "l" should have been created using the
+*     astLineDef method. These structures contained cached information about
+*     the lines which improve the efficiency of this method when many
+*     repeated calls are made. An error will be reported if the structure
 *     does not refer to the Frame specified by "this".
-*     - Zero will be returned if this function is invoked with the global 
+*     - Zero will be returned if this function is invoked with the global
 *     error status set, or if it should fail for any reason.
 *-
 */
 
 /* Local Variables: */
-   int result;                
+   int result;
    double dx, dy, p;
 
 /* Initialise. */
@@ -5857,7 +5857,7 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point, 
       p = dx*l->dir[ 0 ] + dy*l->dir[ 1 ];
       if( p >= 0.0 && p < l->length ) {
 
-/* Check the distance from the point to the nearest point on the line is not 
+/* Check the distance from the point to the nearest point on the line is not
    further than 1.0E-7 of the length of the line. */
          if( fabs( dx*l->q[ 0 ] + dy*l->q[ 1 ] ) <= 1.0E-7*l->length ) {
             result = 1;
@@ -5872,7 +5872,7 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point, 
    return result;
 }
 
-static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
+static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
                          double **cross, int *status ) {
 /*
 *+
@@ -5887,8 +5887,8 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 
 *  Synopsis:
 *     #include "frame.h"
-*     int astLineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
-*                          double **cross ) 
+*     int astLineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
+*                          double **cross )
 
 *  Class Membership:
 *     Frame method.
@@ -5904,19 +5904,19 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 *     this
 *        Pointer to the Frame.
 *     l1
-*        Pointer to the structure defining the first line. 
+*        Pointer to the structure defining the first line.
 *     l2
-*        Pointer to the structure defining the second line. 
+*        Pointer to the structure defining the second line.
 *     cross
 *        Pointer to a location at which to put a pointer to a dynamically
 *        alocated array containing the axis values at the crossing. If
-*        NULL is supplied no such array is returned. Otherwise, the returned 
-*        array should be freed using astFree when no longer needed. If the 
-*        lines are parallel (i.e. do not cross) then AST__BAD is returned for 
-*        all axis values. Note usable axis values are returned even if the 
-*        lines cross outside the segment defined by the start and end points 
+*        NULL is supplied no such array is returned. Otherwise, the returned
+*        array should be freed using astFree when no longer needed. If the
+*        lines are parallel (i.e. do not cross) then AST__BAD is returned for
+*        all axis values. Note usable axis values are returned even if the
+*        lines cross outside the segment defined by the start and end points
 *        of the lines. The order of axes in the returned array will take
-*        account of the current axis permutation array if appropriate. Note, 
+*        account of the current axis permutation array if appropriate. Note,
 *        sub-classes such as SkyFrame may append extra values to the end
 *        of the basic frame axis values. A NULL pointer is returned if an
 *        error occurs.
@@ -5925,7 +5925,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 *     A non-zero value is returned if the lines cross at a point which is
 *     within the [start,end) segment of the lines that are flagged as
 *     finite (if a line is marked as infinite any crossing is assumed to
-*     be within the bounds of the line). If the crossing point is outside 
+*     be within the bounds of the line). If the crossing point is outside
 *     this segment on either (inifinte) line, or if the lines are parallel,
 *     zero is returned. Note, the start point is considered to be inside
 *     the length of the segment, but the end point is outside.
@@ -5936,7 +5936,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 *     information about the lines which improve the efficiency of this method
 *     when many repeated calls are made. An error will be reported if
 *     either structure does not refer to the Frame specified by "this".
-*     - Zero will be returned if this function is invoked with the global 
+*     - Zero will be returned if this function is invoked with the global
 *     error status set, or if it should fail for any reason.
 *-
 */
@@ -5956,7 +5956,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 /* Initialise. */
    result = 0;
    crossing = astMalloc( sizeof(double)*2 );
-   
+
 /* Check that both lines refer to the supplied Frame. */
    if( l1->frame != this ) {
       astError( AST__INTER, "astLineCrossing(%s): First supplied line does "
@@ -5989,7 +5989,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
          } else {
             crossing[ 0 ] = l2->start[ 0 ] + t2*l2->dir[ 0 ];
             crossing[ 1 ] = l2->start[ 1 ] + t2*l2->dir[ 1 ];
-         } 
+         }
 
 /* See if the intersection is within the length of both lines (excluding
    the end points). If a line is flagged as infinite, set the "t" parameter
@@ -6023,7 +6023,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
    return result;
 }
 
-static AstLineDef *LineDef( AstFrame *this, const double start[2], 
+static AstLineDef *LineDef( AstFrame *this, const double start[2],
                             const double end[2], int *status ) {
 /*
 *+
@@ -6038,8 +6038,8 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 
 *  Synopsis:
 *     #include "frame.h"
-*     AstLineDef *astLineDef( AstFrame *this, const double start[2], 
-*                             const double end[2] ) 
+*     AstLineDef *astLineDef( AstFrame *this, const double start[2],
+*                             const double end[2] )
 
 *  Class Membership:
 *     Frame method.
@@ -6086,10 +6086,10 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
       astError( AST__INTER, "astLineDef(%s): The supplied %s is not 2 "
                 "dimensional (internal AST proramming error).", status,
                  astGetClass( this ), astGetClass( this ) );
-   } 
+   }
 
 /* Check the axis values are good */
-   if( start[ 0 ] != AST__BAD && start[ 1 ] != AST__BAD && 
+   if( start[ 0 ] != AST__BAD && start[ 1 ] != AST__BAD &&
        end[ 0 ] != AST__BAD && end[ 1 ] != AST__BAD ) {
 
 /* Allocate memory for the returned structure. */
@@ -6112,10 +6112,10 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
          } else {
             result->dir[ 0 ] = 1.0;
             result->dir[ 1 ] = 0.0;
-         } 
+         }
 
 /* Store a unit vector perpendicular to the line, such that the vector
-   points to the left, as vewied from the observer, when moving from the 
+   points to the left, as vewied from the observer, when moving from the
    start to the end of the line. */
          result->q[ 0 ] = -result->dir[ 1 ];
          result->q[ 1 ] = result->dir[ 0 ];
@@ -6125,7 +6125,7 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 
 /* Indicate that the line is considered to be terminated at the start and
    end points. */
-         result->infinite = 0; 
+         result->infinite = 0;
       }
    }
 
@@ -6136,7 +6136,7 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
    return result;
 }
 
-static void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+static void LineOffset( AstFrame *this, AstLineDef *line, double par,
                         double prp, double point[2], int *status ){
 /*
 *+
@@ -6151,7 +6151,7 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
 
 *  Synopsis:
 *     #include "frame.h"
-*     void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+*     void LineOffset( AstFrame *this, AstLineDef *line, double par,
 *                      double prp, double point[2] )
 
 *  Class Membership:
@@ -6165,7 +6165,7 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
 *     this
 *        Pointer to the Frame.
 *     line
-*        Pointer to the structure defining the line. 
+*        Pointer to the structure defining the line.
 *     par
 *        The distance to move along the line from the start towards the end.
 *     prp
@@ -6174,10 +6174,10 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
 *        the observer, when moving from start towards the end.
 
 *  Notes:
-*     - The pointer supplied for "line" should have been created using the 
-*     astLineDef method. This structure contains cached information about the 
-*     line which improves the efficiency of this method when many repeated 
-*     calls are made. An error will be reported if the structure does not 
+*     - The pointer supplied for "line" should have been created using the
+*     astLineDef method. This structure contains cached information about the
+*     line which improves the efficiency of this method when many repeated
+*     calls are made. An error will be reported if the structure does not
 *     refer to the Frame specified by "this".
 *-
 */
@@ -6199,7 +6199,7 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, 
+static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
 /*
 *  Name:
@@ -6213,8 +6213,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
-*                            AstObject **fail, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
 
 *  Class Membership:
 *     CmpMap member function (over-rides the astManageLock protected
@@ -6222,7 +6222,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 *  Description:
 *     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
+*     lock can be locked, unlocked or checked by this function as
 *     deteremined by parameter "mode". See astLock for details of the way
 *     these locks are used.
 
@@ -6241,21 +6241,21 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *        AST__CHECKLOCK: Check that the object is locked for use by the
 *        calling thread (report an error if not).
 *     extra
-*        Extra mode-specific information. 
+*        Extra mode-specific information.
 *     fail
 *        If a non-zero function value is returned, a pointer to the
 *        Object that caused the failure is returned at "*fail". This may
 *        be "this" or it may be an Object contained within "this". Note,
 *        the Object's reference count is not incremented, and so the
-*        returned pointer should not be annulled. A NULL pointer is 
+*        returned pointer should not be annulled. A NULL pointer is
 *        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*    A local status value: 
+*    A local status value:
 *        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
+*        1 - Could not lock or unlock the object because it was already
 *            locked by another thread.
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
@@ -6317,7 +6317,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 *     inherited from the Mapping class).
 
 *  Description:
-*     This function creates a new Mapping by picking specified inputs from 
+*     This function creates a new Mapping by picking specified inputs from
 *     an existing Frame. This is only possible if the specified inputs
 *     correspond to some subset of the Frame outputs. That is, there
 *     must exist a subset of the Frame outputs for which each output
@@ -6327,27 +6327,27 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 
 *  Parameters:
 *     this
-*        Pointer to the Frame to be split (the Frame is not actually 
+*        Pointer to the Frame to be split (the Frame is not actually
 *        modified by this function).
 *     nin
 *        The number of inputs to pick from "this".
 *     in
 *        Pointer to an array of indices (zero based) for the inputs which
 *        are to be picked. This array should have "nin" elements. If "Nin"
-*        is the number of inputs of the supplied Frame, then each element 
+*        is the number of inputs of the supplied Frame, then each element
 *        should have a value in the range zero to Nin-1.
 *     map
 *        Address of a location at which to return a pointer to the new
 *        Mapping. This Mapping will have "nin" inputs (the number of
 *        outputs may be different to "nin"). A NULL pointer will be
-*        returned if the supplied Frame has no subset of outputs which 
+*        returned if the supplied Frame has no subset of outputs which
 *        depend only on the selected inputs.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
-*     elements in this array will equal the number of outputs for the 
+*     elements in this array will equal the number of outputs for the
 *     returned Mapping. Each element will hold the index of the
 *     corresponding output in the supplied Frame. The array should be
 *     freed using astFree when no longer needed. A NULL pointer will
@@ -6652,7 +6652,7 @@ static int Match( AstFrame *template, AstFrame *target,
    return match;
 }
 
-static void MatchAxes( AstFrame *frm1, AstFrame *frm2, int *axes, 
+static void MatchAxes( AstFrame *frm1, AstFrame *frm2, int *axes,
                        int *status ) {
 /*
 *++
@@ -6675,9 +6675,9 @@ f     CALL AST_MATCHAXES( FRM1, FRM2, AXES, STATUS )
 *     Frame method.
 
 *  Description:
-*     This function looks for corresponding axes within two supplied 
+*     This function looks for corresponding axes within two supplied
 *     Frames. An array of integers is returned that contains an element
-*     for each axis in the second supplied Frame. An element in this array 
+*     for each axis in the second supplied Frame. An element in this array
 *     will be set to zero if the associated axis within the second Frame
 *     has no corresponding axis within the first Frame. Otherwise, it
 *     will be set to the index (a non-zero positive integer) of the
@@ -6692,15 +6692,15 @@ f     FRM2 = INTEGER (Given)
 *        Pointer to the second Frame.
 c     axes
 f     AXES = INTEGER( * ) (Returned)
-c        Pointer to an 
+c        Pointer to an
 f        An
 *        integer array in which to return the indices of the axes (within
 *        the first Frame) that correspond to each axis within the second
 *        Frame. Axis indices start at 1. A value of zero will be stored
-*        in the returned array for each axis in the second Frame that has 
+*        in the returned array for each axis in the second Frame that has
 *        no corresponding axis in the first Frame.
 *
-*        The number of elements in this array must be greater than or 
+*        The number of elements in this array must be greater than or
 *        equal to the number of axes in the second Frame.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
@@ -6711,7 +6711,7 @@ f        The global status.
 
 *  Notes:
 *     -  Corresponding axes are identified by the fact that a Mapping can
-*     be found between them using 
+*     be found between them using
 c     astFindFrame or astConvert.
 f     AST_FINDFRAME or AST_CONVERT.
 *     Thus, "corresponding axes" are not necessarily identical. For
@@ -6741,7 +6741,7 @@ f     AST_FINDFRAME or AST_CONVERT.
    astMatchAxesX( frm2, frm1, axes );
 }
 
-static void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes, 
+static void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes,
                         int *status ) {
 /*
 *+
@@ -6773,9 +6773,9 @@ static void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes,
 */
 
 /* Local Variables: */
-   AstFrame *pfrm;               
-   AstFrame *resfrm;          
-   AstMapping *resmap;              
+   AstFrame *pfrm;
+   AstFrame *resfrm;
+   AstMapping *resmap;
    int *frm1_axes;
    int *pfrm_axes;
    int ifirst;
@@ -6822,11 +6822,11 @@ static void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes,
 /* Loop round the axes in the frm2 Frame. */
    for( ifirst = 0; ifirst < nax2; ifirst++ ) {
 
-/* Identify the primary Frame defining the current axis in the frm2 
+/* Identify the primary Frame defining the current axis in the frm2
    Frame. */
       astPrimaryFrame( frm2, ifirst, &pfrm, &pax );
 
-/* Attempt to find a sub-frame within the frm1 Frame that corresponds to 
+/* Attempt to find a sub-frame within the frm1 Frame that corresponds to
    this primary Frame. */
       if( astMatch( frm1, pfrm, &frm1_axes, &pfrm_axes, &resmap, &resfrm ) ) {
 
@@ -7029,7 +7029,7 @@ f        The global status.
 *     will typically be wrapped into an appropriate standard range,
 *     such as zero to 2*pi.
 *     - The NormMap class is a Mapping which can be used to normalise a
-*     set of points using the 
+*     set of points using the
 c     astNorm function
 f     AST_NORM routine
 *     of a specified Frame.
@@ -7433,7 +7433,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *
 *        If any axis in the result Frame is not associated with a template
 *        axis, the corresponding element of this array should be set to -1.
-*        
+*
 *        If a NULL pointer is supplied, the template and result axis
 *        indicies are assumed to be identical.
 *     result
@@ -7846,7 +7846,7 @@ double astReadDateTime_( const char *value, int *status ) {
 *     Gregorian Date and Time
 *        Any calendar date (as above) but with a fraction of a day expressed
 *        as hours, minutes and seconds ("1996-Oct-2 12:13:56.985" for example).
-*        The date and time can be separated by a space or by a "T" (as used 
+*        The date and time can be separated by a space or by a "T" (as used
 *        by ISO8601).
 
 *  Notes:
@@ -8001,8 +8001,8 @@ double astReadDateTime_( const char *value, int *status ) {
          v += nc;
          l -= nc;
 
-/* ISO8601 format uses the litter T as a delimiter between the date and time. 
-   If there is a T in the remaining string, take a copy and change the T to 
+/* ISO8601 format uses the litter T as a delimiter between the date and time.
+   If there is a T in the remaining string, take a copy and change the T to
    a space. */
          p = strchr( v, 'T' );
          if( p ) {
@@ -8011,7 +8011,7 @@ double astReadDateTime_( const char *value, int *status ) {
             v = cc;
          } else {
             cc = NULL;
-         }                     
+         }
 
 /* We now try to match the following characters but without reading
    any values.  This is done to ensure the string has the correct form
@@ -8066,7 +8066,7 @@ double astReadDateTime_( const char *value, int *status ) {
                match =
                   ( nc = 0, ( 4 == astSscanf( v,
                                         " %2d%*1[ ] %2d %1[:/-] %2d %n",
-                                        &iday, &hour, sep3, &minute, &nc ) && 
+                                        &iday, &hour, sep3, &minute, &nc ) &&
                                         ( nc == l ) ) );
                match = match ||
                   ( nc = 0, ( 4 == astSscanf( v, " %2d%*1[ ] %2d%1[ ] %2d %n",
@@ -8481,7 +8481,7 @@ f     AST_DISTANCE function.
 
 }
 
-static AstPointSet *ResolvePoints( AstFrame *this, const double point1[], 
+static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
                                    const double point2[], AstPointSet *in,
                                    AstPointSet *out, int *status ) {
 /*
@@ -8497,7 +8497,7 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 
 *  Synopsis:
 *     #include "frame.h"
-*     AstPointSet *astResolvePoints( AstFrame *this, const double point1[], 
+*     AstPointSet *astResolvePoints( AstFrame *this, const double point1[],
 *                                    const double point2[], AstPointSet *in,
 *                                    AstPointSet *out )
 
@@ -8529,18 +8529,18 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 *        resolved.
 *     out
 *        Pointer to a PointSet which will hold the length of the two
-*        resolved components. A NULL value may also be given, in which 
+*        resolved components. A NULL value may also be given, in which
 *        case a new PointSet will be created by this function.
 
 *  Returned Value:
-*     Pointer to the output (possibly new) PointSet. The first axis will 
-*     hold the lengths of the vector components parallel to the basis vector. 
-*     These values will be signed (positive values are in the same sense as 
-*     movement from point 1 to point 2. The second axis will hold the lengths 
+*     Pointer to the output (possibly new) PointSet. The first axis will
+*     hold the lengths of the vector components parallel to the basis vector.
+*     These values will be signed (positive values are in the same sense as
+*     movement from point 1 to point 2. The second axis will hold the lengths
 *     of the vector components perpendicular to the basis vector. These
 *     values will be signed only if the Frame is 2-dimensional, in which
-*     case a positive value indicates that rotation from the basis vector 
-*     to the tested vector is in the same sense as rotation from the first 
+*     case a positive value indicates that rotation from the basis vector
+*     to the tested vector is in the same sense as rotation from the first
 *     to the second axis of the Frame.
 
 *  Notes:
@@ -8551,9 +8551,9 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 *     - A null pointer will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
-*     - We assume flat geometry throughout this function. Other classes,  
-*     (e.g. SkyFrame) will override this method using more appropriate 
-*     geometry. 
+*     - We assume flat geometry throughout this function. Other classes,
+*     (e.g. SkyFrame) will override this method using more appropriate
+*     geometry.
 *-
 */
 
@@ -8659,7 +8659,7 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 
 /* If the Frame has only one axis, then the supplied basic vector is
    irrelevant - the returned perpendicular distances are always zero and
-   the returned parallel distances are just the distances from point1 
+   the returned parallel distances are just the distances from point1
    to each input point. */
    if( nax < 2 && basisv ) {
       ip = ptr_in[ 0 ];
@@ -8721,23 +8721,23 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 /* If this input position is good... */
             if( ok ) {
 
-/* The dot product is the required parallel component length multiplied by the 
+/* The dot product is the required parallel component length multiplied by the
    length of the basis vector. Form the distance d1. */
                *d1 = dp/bv;
 
-/* Offset away from point 1 towards point 2 by a distance of d1, and form the 
+/* Offset away from point 1 towards point 2 by a distance of d1, and form the
    required length d2. */
                c = *d1/bv;
                if( nax > 2 ) {
                   *d2 = 0.0;
                   for( axis = 0; axis < nax; axis++ ){
-                     d = ptr_in[ axis ][ ipoint ] - 
+                     d = ptr_in[ axis ][ ipoint ] -
                          ( point1[ axis ] + c*basisv[ axis ] );
                      *d2 += d*d;
                   }
                   *d2 = sqrt( *d2 );
 
-/* If the Frame is 2 dimensional, we can give a sign the the perpendicular 
+/* If the Frame is 2 dimensional, we can give a sign the the perpendicular
    component. */
                } else {
                   x1 = c*basisv[ 0 ];
@@ -8800,16 +8800,16 @@ f     CALL AST_SETACTIVEUNIT( THIS, VALUE, STATUS )
 c     This function
 f     This routine
 *     sets the current value of the ActiveUnit flag for a Frame, which
-*     controls how the Frame behaves when it is used (by 
-c     astFindFrame or astConvert) 
-f     AST_FINDFRAME or AST_CONVERT) 
+*     controls how the Frame behaves when it is used (by
+c     astFindFrame or astConvert)
+f     AST_FINDFRAME or AST_CONVERT)
 *     to match another Frame. If the ActiveUnit flag is set in both
-*     template and target Frames then the returned Mapping takes into account 
-*     any differences in axis units. The default value for simple Frames is 
-*     zero, which preserves the behaviour of versions of AST prior to 
+*     template and target Frames then the returned Mapping takes into account
+*     any differences in axis units. The default value for simple Frames is
+*     zero, which preserves the behaviour of versions of AST prior to
 *     version 2.0.
 *
-*     If the ActiveUnit flag of either Frame is 
+*     If the ActiveUnit flag of either Frame is
 c     zero,
 f     .FALSE.,
 *     then the Mapping will ignore any difference in the Unit attributes of
@@ -8819,13 +8819,13 @@ f     .FALSE.,
 *     This is the behaviour which all Frames had in older version of AST,
 *     prior to the introduction of this attribute.
 *
-*     If the ActiveUnit flag of both Frames is 
+*     If the ActiveUnit flag of both Frames is
 c     non-zero,
 f     .TRUE.,
-*     then the Mapping from template to target will take account of any 
-*     difference in the axis Unit attributes, where-ever possible. For 
-*     instance, if corresponding target and template axes have Unit strings of 
-*     "km" and "m", then the FrameSet class will use a ZoomMap to connect 
+*     then the Mapping from template to target will take account of any
+*     difference in the axis Unit attributes, where-ever possible. For
+*     instance, if corresponding target and template axes have Unit strings of
+*     "km" and "m", then the FrameSet class will use a ZoomMap to connect
 *     them which introduces a scaling of 1000. If no Mapping can be found
 *     between the corresponding units string, then an error is reported.
 *     In this mode, it is assumed that values of the Unit attribute conform
@@ -8839,9 +8839,9 @@ f     .TRUE.,
 *     same unknown units - thus "flops" can be transformed to "Mflops"
 *     even though "flops" is not a standard FITS unit symbol).
 *
-*     A range of common non-standard variations of unit names and multiplier 
-*     prefixes are also allowed, such as adding an "s" to the end of Angstrom, 
-*     using a lower case "a" at the start of "angstrom", "micron" instead of 
+*     A range of common non-standard variations of unit names and multiplier
+*     prefixes are also allowed, such as adding an "s" to the end of Angstrom,
+*     using a lower case "a" at the start of "angstrom", "micron" instead of
 *     "um", "sec" instead of "s", etc.
 *
 c     If the ActiveUnit flag is non-zero, setting a new Unit value for an
@@ -9024,7 +9024,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* A flag indicating that we do not need to free the axis_setting memory. */
    free_axis_setting = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_setting = NULL;
    old_setting = NULL;
 
@@ -9189,7 +9189,7 @@ L1:
                    "astSetAttrib(%s): Invalid AlignSystem description \"%s\".", status,
                    astGetClass( this ), system + setting );
       }
-   
+
 /* System. */
 /* ------- */
    } else if ( nc = 0,
@@ -9207,7 +9207,7 @@ L1:
                    "astSetAttrib(%s): Invalid System description \"%s\".", status,
                    astGetClass( this ), system + setting );
       }
-   
+
 /* Title. */
 /* ------ */
    } else if ( nc = 0,
@@ -9241,9 +9241,9 @@ L1:
          sign = -1;
       } else {
          sign = +1;
-      } 
+      }
 
-/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+/* If not already created, create an FK5 J2000 SkyFrame which will be used
    for formatting and unformatting ObsLon and ObsLat values. */
       if( !skyframe ) {
          astBeginPM;
@@ -9259,7 +9259,7 @@ L1:
 /* Report an error if the string value wasn't recognised. */
       } else {
          astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
-                   "ObsLat (observers latitude) \"%s\".", status, astGetClass( this ), 
+                   "ObsLat (observers latitude) \"%s\".", status, astGetClass( this ),
                    setting + off );
       }
 
@@ -9281,9 +9281,9 @@ L1:
          sign = -1;
       } else {
          sign = +1;
-      } 
+      }
 
-/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+/* If not already created, create an FK5 J2000 SkyFrame which will be used
    for formatting and unformatting ObsLon and ObsLat values. */
       if( !skyframe ) {
          astBeginPM;
@@ -9299,7 +9299,7 @@ L1:
 /* Report an error if the string value wasn't recognised. */
       } else {
          astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
-                   "ObsLon (observers longitude) \"%s\".", status, astGetClass( this ), 
+                   "ObsLon (observers longitude) \"%s\".", status, astGetClass( this ),
                    setting + off );
       }
 
@@ -9360,7 +9360,7 @@ L1:
 /* Assume that we will be able to use the setting. */
             used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -9372,8 +9372,8 @@ L1:
             astSetAttrib( ax, axis_setting );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
             if( astStatus == AST__BADAT ) {
                astClearStatus;
@@ -9388,21 +9388,21 @@ L1:
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
                   sprintf( pfrm_attrib, "%.*s(%d)", axis_nc, setting, paxis + 1 );
-            
-/* Create a setting string in which the attribute name refers to the axis 
+
+/* Create a setting string in which the attribute name refers to the axis
    numbering of the primary frame. */
                   pfrm_setting = NULL;
                   nc = 0;
                   pfrm_setting = astAppendString( pfrm_setting, &nc, pfrm_attrib );
                   pfrm_setting = astAppendString( pfrm_setting, &nc, setting + axis_value );
-                  
+
 /* Attempt to set the attribute within the primary Frame. */
                   astSetAttrib( pfrm, pfrm_setting );
 
 /* Free the memory. */
                   pfrm_setting = astFree( pfrm_setting );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute setting. */
                   if( !astOK ) {
                      astClearStatus;
@@ -9446,7 +9446,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && astGetNaxes( this ) == 1 && equals ) {
 
@@ -9477,7 +9477,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original setting 
+   method for further interpretation. First re-instate the original setting
    string if it was changed above. */
    } else {
       if( free_axis_setting ) {
@@ -9575,8 +9575,8 @@ static void SetFrameFlags( AstFrame *this, int flags, int *status ){
 *        A bit mask holding the flags. Currently, the following bits are
 *        used:
 *
-*        0 - Used to indicate if the Frame is currently involved in an 
-*        attempt to restore the integrity of a FrameSet following 
+*        0 - Used to indicate if the Frame is currently involved in an
+*        attempt to restore the integrity of a FrameSet following
 *        changes to the attribute values of the Frame.
 
 *-
@@ -9909,7 +9909,7 @@ static int SubFrame( AstFrame *target, AstFrame *template,
 /* Note that coordinate conversion is possible. */
          match = 1;
 
-/* If the ActiveUnit flag in both template and result Frame is non-zero, we 
+/* If the ActiveUnit flag in both template and result Frame is non-zero, we
    now modify the Mapping to take account of any differences in the Units
    attributes of the target and results Frames. */
          if( template && astGetActiveUnit( template ) &&
@@ -10255,11 +10255,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* A flag indicating that we do not need to free the axis_attrib memory. */
    free_axis_attrib = 0;
 
-/* Initialise things to avoid compiler warnings. */   
+/* Initialise things to avoid compiler warnings. */
    axis_attrib = NULL;
    old_attrib = NULL;
 
-/* Jump back to here if we are trying the same attribute but with an explicit 
+/* Jump back to here if we are trying the same attribute but with an explicit
    axis "(1)" added to the end of the name. */
 L1:
 
@@ -10435,7 +10435,7 @@ L1:
 /* Assume that we will be able to use the attribute name. */
          used = 1;
 
-/* Temporarily switch off error reporting so that if the following attempt 
+/* Temporarily switch off error reporting so that if the following attempt
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
@@ -10446,8 +10446,8 @@ L1:
          result = astTestAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
-   the attribute name was not recognised, clear the status so that we can 
-   try to interpret the attribute name as an attribute of the primary Frame 
+   the attribute name was not recognised, clear the status so that we can
+   try to interpret the attribute name as an attribute of the primary Frame
    containing the specified axis. */
          if( astStatus == AST__BADAT ) {
             astClearStatus;
@@ -10462,11 +10462,11 @@ L1:
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
                sprintf( pfrm_attrib, "%s(%d)", axis_attrib, paxis + 1 );
-            
+
 /* Attempt to test the attribute as an attribute of the primary Frame. */
                result = astTestAttrib( pfrm, pfrm_attrib );
 
-/* If this failed, clear the status and indicate that we have not managed to 
+/* If this failed, clear the status and indicate that we have not managed to
    use the attribute name. */
                if( !astOK ) {
                   astClearStatus;
@@ -10495,8 +10495,8 @@ L1:
 /* Re-instate the original error reporting state. */
          astReporting( oldrep );
 
-/* If we could not use the attribute name, attempt to test the axis 
-   attribute again, this time retaining the error report. This is done 
+/* If we could not use the attribute name, attempt to test the axis
+   attribute again, this time retaining the error report. This is done
    to ensure the user gets an appropriate error message. */
          if( !used ) result = astTestAttrib( ax, axis_attrib );
       }
@@ -10509,7 +10509,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
-   and the attribute name does not already include an axis specifier, try 
+   and the attribute name does not already include an axis specifier, try
    again after appending "(1)" to the end of the attribute name. */
    } else if( !has_axis && astGetNaxes( this ) == 1 ) {
 
@@ -10537,7 +10537,7 @@ L1:
 /* Not recognised. */
 /* --------------- */
 /* If the attribute name is still not recognised, pass it on to the parent
-   method for further interpretation. First re-instate the original attrib 
+   method for further interpretation. First re-instate the original attrib
    name string if it was changed above. */
    } else {
       if( free_axis_attrib ) {
@@ -11031,7 +11031,7 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 /* If the value is out of bounds, report an error. */
    if ( system < FIRST_SYSTEM || system > LAST_SYSTEM ) {
          astError( AST__AXIIN, "%s(%s): Bad value (%d) given for the System "
-                   "or AlignSystem attribute of a %s.", status, method, 
+                   "or AlignSystem attribute of a %s.", status, method,
                    astGetClass( this ), (int) system, astGetClass( this ) );
 
 /* Otherwise, return the supplied value. */
@@ -11121,7 +11121,7 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 *        attribute).
 *     Plot
 *        The Direction attribute of the base Frame in a Plot is set to
-*        indicate the sense of the two graphics axes, as implied by the 
+*        indicate the sense of the two graphics axes, as implied by the
 *        graphics bounding box supplied when the Plot was created.
 
 *  Notes:
@@ -11159,12 +11159,12 @@ MAKE_TEST(Direction)
 *  Description:
 *     This attribute is used when calculating the Local Apparent Sidereal
 *     Time corresponding to SkyFrame's Epoch value (used when converting
-*     positions to or from the "AzEl" system). It should be set to the 
-*     difference, in seconds, between the UT1 and UTC timescales at the 
-*     moment in time represented by the SkyFrame's Epoch attribute. The 
-*     value to use is unpredictable and depends on changes in the earth's 
-*     rotation speed. Values for UT1-UTC can be obtained from the 
-*     International Earth Rotation and Reference Systems Service 
+*     positions to or from the "AzEl" system). It should be set to the
+*     difference, in seconds, between the UT1 and UTC timescales at the
+*     moment in time represented by the SkyFrame's Epoch attribute. The
+*     value to use is unpredictable and depends on changes in the earth's
+*     rotation speed. Values for UT1-UTC can be obtained from the
+*     International Earth Rotation and Reference Systems Service
 *     (IERS) at http://www.iers.org/.
 *
 *     Currently, the correction is always less than 1 second. This is
@@ -11173,7 +11173,7 @@ MAKE_TEST(Direction)
 *     is assigned to this attribute (in which case a default value of
 *     zero is used). However, it is possible that a decision may be taken
 *     at some time in the future to abandon the introduction of leap
-*     seconds, in which case the DUT correction could grow to significant 
+*     seconds, in which case the DUT correction could grow to significant
 *     sizes.
 
 *  Applicability:
@@ -11182,7 +11182,7 @@ MAKE_TEST(Direction)
 
 *att--
 */
-/* The UT1-UTC correction, in seconds. Has a value of AST__BAD when not set 
+/* The UT1-UTC correction, in seconds. Has a value of AST__BAD when not set
    yielding a default value of 0.0. */
 astMAKE_CLEAR(Frame,Dut1,dut1,AST__BAD)
 astMAKE_GET(Frame,Dut1,double,0.0,(this->dut1 == AST__BAD ? 0.0 : this->dut1))
@@ -11216,9 +11216,9 @@ astMAKE_TEST(Frame,Dut1,( this->dut1 != AST__BAD ))
 *     when setting its value it may be given in a variety of
 *     formats. See the "Input Formats" section (below) for details.
 *     Strictly, the Epoch value should be supplied in the TDB timescale,
-*     but for some purposes (for instance, for converting sky positions 
+*     but for some purposes (for instance, for converting sky positions
 *     between different types of equatorial system) the timescale is not
-*     significant, and UTC may be used.   
+*     significant, and UTC may be used.
 
 *  Input Formats:
 *     The formats accepted when setting an Epoch value are listed
@@ -11249,7 +11249,7 @@ astMAKE_TEST(Frame,Dut1,( this->dut1 != AST__BAD ))
 *
 *     - Gregorian Date and Time: Any calendar date (as above) but with
 *     a fraction of a day expressed as hours, minutes and seconds
-*     ("1996-Oct-2 12:13:56.985" for example). The date and time can be 
+*     ("1996-Oct-2 12:13:56.985" for example). The date and time can be
 *     separated by a space or by a "T" (as used by ISO8601 format).
 
 *  Output Format:
@@ -11276,7 +11276,7 @@ astMAKE_TEST(Frame,Dut1,( this->dut1 != AST__BAD ))
 *        Otherwise, the default Epoch value from the first component
 *        Frame is used as the default for the CmpFrame. When the Epoch
 *        attribute of a CmpFrame is set or cleared, it is also set or
-*        cleared in the two component Frames. 
+*        cleared in the two component Frames.
 *     FrameSet
 *        The Epoch attribute of a FrameSet is the same as that of its current
 *        Frame (as specified by the Current attribute).
@@ -11306,12 +11306,12 @@ astMAKE_TEST(Frame,Dut1,( this->dut1 != AST__BAD ))
 *        See the description of the System attribute for details of which
 *        qualifying attributes apply to each celestial coordinate system.
 *     TimeFrame
-*        A TimeFrame describes a general time axis and so cannot be completely 
-*        characterised by a single Epoch value. For this reason the TimeFrame 
-*        class makes no use of the Epoch attribute. However, user code can 
-*        still make use of the attribute if necessary to represent a "typical" 
+*        A TimeFrame describes a general time axis and so cannot be completely
+*        characterised by a single Epoch value. For this reason the TimeFrame
+*        class makes no use of the Epoch attribute. However, user code can
+*        still make use of the attribute if necessary to represent a "typical"
 *        time spanned by the TimeFrame. The default Epoch value for a TimeFrame
-*        will be the TDB equivalent of the current value of the TimeFrame's 
+*        will be the TDB equivalent of the current value of the TimeFrame's
 *        TimeOrigin attribute. If no value has been set for TimeOrigin,
 *        then the default Epoch value is J2000.0.
 
@@ -11466,9 +11466,9 @@ c        this.
 *        attribute). Note that the syntax of the Format string is also
 *        determined by the current Frame.
 *     TimeFrame
-*        The TimeFrame class extends the syntax of the Format string to 
+*        The TimeFrame class extends the syntax of the Format string to
 *        allow the formatting of TimeFrame axis values as Gregorian calendar
-*        dates and times. The syntax of TimeFrame Format strings is described 
+*        dates and times. The syntax of TimeFrame Format strings is described
 *        (below) in the "TimeFrame Formats" section.
 
 *  SkyFrame Formats:
@@ -11494,7 +11494,7 @@ c        this.
 *     separate fields.
 *
 *     - "g": Use a letter and symbols to separate fields ("h"/"d", "m" or "s",
-*     etc, as appropriate), but include escape sequences in the formatted 
+*     etc, as appropriate), but include escape sequences in the formatted
 *     value so that the Plot class will draw the separators as small
 *     super-scripts.
 *
@@ -11525,15 +11525,15 @@ c        this.
 *     is). The "." should be followed immediately by an unsigned
 *     integer which gives the number of decimal places required, or by an
 *     asterisk. If an asterisk is supplied, a default number of decimal
-*     places is used which is based on the value of the Digits 
-*     attribute. 
+*     places is used which is based on the value of the Digits
+*     attribute.
 *
 *     All of the above format specifiers are case-insensitive. If
 *     several characters make conflicting requests (e.g. if both "i"
 *     and "b" appear), then the character occurring last takes
 *     precedence, except that "d" and "h" always override "t".
 *
-*     If the format string starts with a percentage sign (%), then the 
+*     If the format string starts with a percentage sign (%), then the
 *     whole format string is assumed to conform to the syntax defined by
 *     the Frame class, and the axis values is formated as a decimal
 *     radians value.
@@ -11547,27 +11547,27 @@ c        this.
 *     - C "printf" syntax: If the Format string is a C "printf" format
 *     description such as "%1.7G", the TimeFrame axis value will be
 *     formatted without change as a floating point value using this format.
-*     The formatted string will thus represent an offset from the zero point 
+*     The formatted string will thus represent an offset from the zero point
 *     specified by the TimeFrame's TimeOrigin attribute, measured in
 *     units given by the TimeFrame's Unit attribute.
 *
 *     - "iso" syntax: This is used to format a TimeFrame axis value as a
 *     Gregorian date followed by an optional time of day. If the Format
 *     value commences with the string "iso" then the TimeFrame axis value
-*     will be converted to an absolute MJD, including the addition of the 
-*     current TimeOrigin value, and then formatted as a Gregorian date 
+*     will be converted to an absolute MJD, including the addition of the
+*     current TimeOrigin value, and then formatted as a Gregorian date
 *     using the format "yyyy-mm-dd". Optionally, the Format value may
-*     include an integer precision following the "iso" specification (e.g. 
-*     "iso.2"), in which case the time of day will be appended to the 
+*     include an integer precision following the "iso" specification (e.g.
+*     "iso.2"), in which case the time of day will be appended to the
 *     formatted date (if no time of day is included, the date field is
-*     rounded to the nearest day). The integer value in the Format string 
-*     indicates the number of decimal places to use in the seconds field. For 
-*     instance, a Format value of "iso.0" produces a time of day of the form 
-*     "hh:mm:ss", and a Format value of "iso.2" produces a time of day of the 
-*     form "hh:mm:ss.ss". The date and time fields will be separated by a 
+*     rounded to the nearest day). The integer value in the Format string
+*     indicates the number of decimal places to use in the seconds field. For
+*     instance, a Format value of "iso.0" produces a time of day of the form
+*     "hh:mm:ss", and a Format value of "iso.2" produces a time of day of the
+*     form "hh:mm:ss.ss". The date and time fields will be separated by a
 *     space unless 'T' is appended to the end of string, in which case
-*     the letter T (upper case) will be used as the separator. The value of 
-*     the Digits attribute is ignored when using this "iso" format. 
+*     the letter T (upper case) will be used as the separator. The value of
+*     the Digits attribute is ignored when using this "iso" format.
 
 *  Notes:
 *     - When specifying this attribute by name, it should be
@@ -11819,8 +11819,8 @@ f     Frame axis (e.g. using AST_FORMAT). Its value may be set either
 *     Note that the Digits value acts only as a means of determining a
 *     default Format string. Its effects are over-ridden if a Format
 *     string is set explicitly for an axis. However, if the Format
-*     attribute specifies the precision using the string ".*", then 
-*     the Digits attribute is used to determine the number of decimal 
+*     attribute specifies the precision using the string ".*", then
+*     the Digits attribute is used to determine the number of decimal
 *     places to produce.
 
 *  Applicability:
@@ -11833,7 +11833,7 @@ f     Frame axis (e.g. using AST_FORMAT). Its value may be set either
 *        Current attribute).
 *     Plot
 *        The default Digits value used by the Plot class when drawing
-*        annotated axis labels is the smallest value which results in all 
+*        annotated axis labels is the smallest value which results in all
 *        adjacent labels being distinct.
 *     TimeFrame
 *        The Digits attribute is ignored when a TimeFrame formats a value
@@ -11939,11 +11939,11 @@ f     AST_FINDFRAME) as a template to match another (target) Frame. It
 *        The MaxAxes attribute of a CmpFrame defaults to a large number
 *        (1000000) which is much larger than any likely number of axes in
 *        a Frame. Combined with the MinAxes default of zero (for a
-*        CmpFrame), this means that the default behaviour for a CmpFrame 
-*        is to match any target Frame that consists of a subset of the 
+*        CmpFrame), this means that the default behaviour for a CmpFrame
+*        is to match any target Frame that consists of a subset of the
 *        axes in the template CmpFrame. To change this so that a CmpFrame
 *        will only match Frames that have the same number of axes, you
-*        should set the CmpFrame MaxAxes and MinAxes attributes to the 
+*        should set the CmpFrame MaxAxes and MinAxes attributes to the
 *        number of axes in the CmpFrame.
 *     FrameSet
 *        The MaxAxes attribute of a FrameSet is the same as that of
@@ -12004,12 +12004,12 @@ f     AST_FINDFRAME) as a template to match another (target) Frame. It
 *        The default MinAxes value for a Frame is equal to the number
 *        of Frame axes (Naxes attribute).
 *     CmpFrame
-*        The MinAxes attribute of a CmpFrame defaults to zero. Combined 
-*        with the MaxAxes default of 1000000 (for a CmpFrame), this means 
-*        that the default behaviour for a CmpFrame is to match any target 
-*        Frame that consists of a subset of the axes in the template 
-*        CmpFrame. To change this so that a CmpFrame will only match Frames 
-*        that have the same number of axes, you should set the CmpFrame 
+*        The MinAxes attribute of a CmpFrame defaults to zero. Combined
+*        with the MaxAxes default of 1000000 (for a CmpFrame), this means
+*        that the default behaviour for a CmpFrame is to match any target
+*        Frame that consists of a subset of the axes in the template
+*        CmpFrame. To change this so that a CmpFrame will only match Frames
+*        that have the same number of axes, you should set the CmpFrame
 *        MinAxes and MaxAxes attributes to the number of axes in the CmpFrame.
 *     FrameSet
 *        The MinAxes attribute of a FrameSet is the same as that of
@@ -12347,9 +12347,9 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        associated celestial coordinate systems:
 *
 *        - "AZEL": Horizon coordinates. The longitude axis is azimuth
-*        such that geographic north has an azimuth of zero and geographic 
+*        such that geographic north has an azimuth of zero and geographic
 *        east has an azimuth of +PI/2 radians. The zenith has elevation
-*        +PI/2. When converting to and from other celestial coordinate 
+*        +PI/2. When converting to and from other celestial coordinate
 *        systems, no corrections are applied for atmospheric refraction
 *        or polar motion (however, a correction for diurnal aberattion is
 *        applied). Note, unlike most other
@@ -12359,7 +12359,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        because of the gross diurnal rotation which this system undergoes,
 *        causing a small change in time to translate to a large rotation.
 *        When converting to or from an AzEl system, the Epoch value for
-*        both source and destination SkyFrames should be supplied in the 
+*        both source and destination SkyFrames should be supplied in the
 *        TDB timescale. The difference between TDB and TT is between 1
 *        and 2 milliseconds, and so a TT value can usually be supplied in
 *        place of a TDB value. The TT timescale is related to TAI via
@@ -12408,9 +12408,9 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *
 *        - "HELIOECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
 *        ecliptic and mean equinox of J2000.0, in which an offset is added to
-*        the longitude value which results in the centre of the sun being at 
-*        zero longitude at the date given by the Epoch attribute. Attempts to 
-*        set a value for the Equinox attribute will be ignored, since this 
+*        the longitude value which results in the centre of the sun being at
+*        zero longitude at the date given by the Epoch attribute. Attempts to
+*        set a value for the Equinox attribute will be ignored, since this
 *        system is always referred to J2000.0.
 *
 *        - "ICRS": The Internation Celestial Reference System, realised
@@ -12425,7 +12425,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        dynamical equator and equinox of the J2000 epoch. The dynamical
 *        equator and equinox differ slightly from those used by the FK5
 *        model, and so a "J2000" SkyFrame will differ slightly from an
-*        "FK5(Equinox=J2000)" SkyFrame. The J2000 System need not be 
+*        "FK5(Equinox=J2000)" SkyFrame. The J2000 System need not be
 *        qualified by an Equinox value
 *
 *        - "SUPERGALACTIC": De Vaucouleurs Supergalactic coordinates.
@@ -12480,15 +12480,15 @@ f        (see AST_SETACTIVEUNIT routine for further information).
 *        to be made to the units. For instance, the usual definition of
 *        "MJD" and "JD" include the statement that the values will be in
 *        units of days. However, AST does allow the use of other units
-*        with all the above supported systems (except BEPOCH), on the 
-*        understanding that conversion to the "correct" units involves 
-*        nothing more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h, 
+*        with all the above supported systems (except BEPOCH), on the
+*        understanding that conversion to the "correct" units involves
+*        nothing more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h,
 *        1 h = 60 min, 1 min = 60 s). Besselian epoch values are defined
 *        in terms of tropical years of 365.2422 days, rather than the
 *        usual Julian year of 365.25 days. Therefore, to avoid any
-*        confusion, the Unit attribute is automatically cleared to "yr" when 
+*        confusion, the Unit attribute is automatically cleared to "yr" when
 *        a System value of BEPOCH System is selected, and an error is
-*        reported if any attempt is subsequently made to change the Unit 
+*        reported if any attempt is subsequently made to change the Unit
 *        attribute.
 *
 *        Note that the default value for the ActiveUnit flag
@@ -12508,11 +12508,11 @@ f        (see AST_SETACTIVEUNIT routine for further information).
 *        - "SFCBR": Surface brightness in frequency units (W/m^2/Hz/arcmin**2)
 *        - "SFCBRW": Surface brightness in wavelength units (W/m^2/Angstrom/arcmin**2)
 *
-*        The above lists specified the default units for each System. If an 
-*        explicit value is set for the Unit attribute but no value is set 
-*        for System, then the default System value is determined by the Unit 
-*        string (if the units are not appropriate for describing any of the 
-*        supported Systems then an error will be reported when an attempt is 
+*        The above lists specified the default units for each System. If an
+*        explicit value is set for the Unit attribute but no value is set
+*        for System, then the default System value is determined by the Unit
+*        string (if the units are not appropriate for describing any of the
+*        supported Systems then an error will be reported when an attempt is
 *        made to access the System value). If no value has been specified for
 *        either Unit or System, then System=FLXDN and Unit=W/m^2/Hz are
 *        used.
@@ -12599,7 +12599,7 @@ astMAKE_TEST(Frame,Title,( this->title != NULL ))
 *     ObsLat
 
 *  Purpose:
-*     The geodetic latitude of the observer 
+*     The geodetic latitude of the observer
 
 *  Type:
 *     Public attribute.
@@ -12609,28 +12609,28 @@ astMAKE_TEST(Frame,Title,( this->title != NULL ))
 
 *  Description:
 *     This attribute specifies the geodetic latitude of the observer, in
-*     degrees, relative to the IAU 1976 reference ellipsoid. The basic Frame 
-*     class makes no use of this attribute, but specialised subclasses of 
-*     Frame may use it. For instance, the SpecFrame, SkyFrame and TimeFrame 
+*     degrees, relative to the IAU 1976 reference ellipsoid. The basic Frame
+*     class makes no use of this attribute, but specialised subclasses of
+*     Frame may use it. For instance, the SpecFrame, SkyFrame and TimeFrame
 *     classes use it. The default value is zero.
 *
-*     The value is stored internally in radians, but is converted to and 
-*     from a degrees string for access. Some example input formats are: 
-*     "22:19:23.2", "22 19 23.2", "22:19.387", "22.32311", "N22.32311", 
-*     "-45.6", "S45.6". As indicated, the sign of the latitude can 
-*     optionally be indicated using characters "N" and "S" in place of the 
-*     usual "+" and "-". When converting the stored value to a string, the 
+*     The value is stored internally in radians, but is converted to and
+*     from a degrees string for access. Some example input formats are:
+*     "22:19:23.2", "22 19 23.2", "22:19.387", "22.32311", "N22.32311",
+*     "-45.6", "S45.6". As indicated, the sign of the latitude can
+*     optionally be indicated using characters "N" and "S" in place of the
+*     usual "+" and "-". When converting the stored value to a string, the
 *     format "[s]dd:mm:ss.ss" is used, when "[s]" is "N" or "S".
 
 *  Applicability:
 *     Frame
 *        All Frames have this attribute.
 *     SpecFrame
-*        Together with the ObsLon, Epoch, RefRA and RefDec attributes, 
-*        it defines the Doppler shift introduced by the observers diurnal 
-*        motion around the earths axis, which is needed when converting to 
+*        Together with the ObsLon, Epoch, RefRA and RefDec attributes,
+*        it defines the Doppler shift introduced by the observers diurnal
+*        motion around the earths axis, which is needed when converting to
 *        or from the topocentric standard of rest. The maximum velocity
-*        error which can be caused by an incorrect value is 0.5 km/s. The 
+*        error which can be caused by an incorrect value is 0.5 km/s. The
 *        default value for the attribute is zero.
 *     TimeFrame
 *        Together with the ObsLon attribute, it is used when converting
@@ -12638,8 +12638,8 @@ astMAKE_TEST(Frame,Title,( this->title != NULL ))
 
 *att--
 */
-/* The geodetic latitude of the observer (radians). Clear the ObsLat value by 
-   setting it to AST__BAD, returning zero as the default value. Any value is 
+/* The geodetic latitude of the observer (radians). Clear the ObsLat value by
+   setting it to AST__BAD, returning zero as the default value. Any value is
    acceptable. */
 astMAKE_CLEAR(Frame,ObsLat,obslat,AST__BAD)
 astMAKE_GET(Frame,ObsLat,double,0.0,((this->obslat!=AST__BAD)?this->obslat:0.0))
@@ -12653,7 +12653,7 @@ astMAKE_TEST(Frame,ObsLat,(this->obslat!=AST__BAD))
 *     ObsAlt
 
 *  Purpose:
-*     The geodetic altitude of the observer 
+*     The geodetic altitude of the observer
 
 *  Type:
 *     Public attribute.
@@ -12663,20 +12663,20 @@ astMAKE_TEST(Frame,ObsLat,(this->obslat!=AST__BAD))
 
 *  Description:
 *     This attribute specifies the geodetic altitude of the observer, in
-*     metres, relative to the IAU 1976 reference ellipsoid. The basic Frame 
-*     class makes no use of this attribute, but specialised subclasses of 
-*     Frame may use it. For instance, the SpecFrame, SkyFrame and TimeFrame 
+*     metres, relative to the IAU 1976 reference ellipsoid. The basic Frame
+*     class makes no use of this attribute, but specialised subclasses of
+*     Frame may use it. For instance, the SpecFrame, SkyFrame and TimeFrame
 *     classes use it. The default value is zero.
 
 *  Applicability:
 *     Frame
 *        All Frames have this attribute.
 *     SpecFrame
-*        Together with the ObsLon, Epoch, RefRA and RefDec attributes, 
-*        it defines the Doppler shift introduced by the observers diurnal 
-*        motion around the earths axis, which is needed when converting to 
+*        Together with the ObsLon, Epoch, RefRA and RefDec attributes,
+*        it defines the Doppler shift introduced by the observers diurnal
+*        motion around the earths axis, which is needed when converting to
 *        or from the topocentric standard of rest. The maximum velocity
-*        error which can be caused by an incorrect value is 0.5 km/s. The 
+*        error which can be caused by an incorrect value is 0.5 km/s. The
 *        default value for the attribute is zero.
 *     TimeFrame
 *        Together with the ObsLon attribute, it is used when converting
@@ -12684,8 +12684,8 @@ astMAKE_TEST(Frame,ObsLat,(this->obslat!=AST__BAD))
 
 *att--
 */
-/* The geodetic altitude of the observer (metres). Clear the ObsAlt value by 
-   setting it to AST__BAD, returning zero as the default value. Any value is 
+/* The geodetic altitude of the observer (metres). Clear the ObsAlt value by
+   setting it to AST__BAD, returning zero as the default value. Any value is
    acceptable. */
 astMAKE_CLEAR(Frame,ObsAlt,obsalt,AST__BAD)
 astMAKE_GET(Frame,ObsAlt,double,0.0,((this->obsalt!=AST__BAD)?this->obsalt:0.0))
@@ -12699,7 +12699,7 @@ astMAKE_TEST(Frame,ObsAlt,(this->obsalt!=AST__BAD))
 *     ObsLon
 
 *  Purpose:
-*     The geodetic longitude of the observer 
+*     The geodetic longitude of the observer
 
 *  Type:
 *     Public attribute.
@@ -12709,30 +12709,30 @@ astMAKE_TEST(Frame,ObsAlt,(this->obsalt!=AST__BAD))
 
 *  Description:
 *     This attribute specifies the geodetic (or equivalently, geocentric)
-*     longitude of the observer, in degrees, measured positive eastwards. 
-*     See also attribute ObsLat. The basic Frame class makes no use of this 
-*     attribute, but specialised subclasses of Frame may use it. For instance, 
+*     longitude of the observer, in degrees, measured positive eastwards.
+*     See also attribute ObsLat. The basic Frame class makes no use of this
+*     attribute, but specialised subclasses of Frame may use it. For instance,
 *     the SpecFrame, SkyFrame and TimeFrame classes use it. The default value
 *     is zero.
 *
-*     The value is stored internally in radians, but is converted to and 
-*     from a degrees string for access. Some example input formats are: 
-*     "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311", "E155.32311", 
-*     "-204.67689", "W204.67689". As indicated, the sign of the longitude can 
-*     optionally be indicated using characters "E" and "W" in place of the 
-*     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]ddd:mm:ss.ss" is used, when "[s]" is "E" or "W" and the 
+*     The value is stored internally in radians, but is converted to and
+*     from a degrees string for access. Some example input formats are:
+*     "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311", "E155.32311",
+*     "-204.67689", "W204.67689". As indicated, the sign of the longitude can
+*     optionally be indicated using characters "E" and "W" in place of the
+*     usual "+" and "-". When converting the stored value to a string, the
+*     format "[s]ddd:mm:ss.ss" is used, when "[s]" is "E" or "W" and the
 *     numerical value is chosen to be less than 180 degrees.
 
 *  Applicability:
 *     Frame
 *        All Frames have this attribute.
 *     SpecFrame
-*        Together with the ObsLon, Epoch, RefRA and RefDec attributes, 
-*        it defines the Doppler shift introduced by the observers diurnal 
-*        motion around the earths axis, which is needed when converting to 
+*        Together with the ObsLon, Epoch, RefRA and RefDec attributes,
+*        it defines the Doppler shift introduced by the observers diurnal
+*        motion around the earths axis, which is needed when converting to
 *        or from the topocentric standard of rest. The maximum velocity
-*        error which can be caused by an incorrect value is 0.5 km/s. The 
+*        error which can be caused by an incorrect value is 0.5 km/s. The
 *        default value for the attribute is zero.
 *     TimeFrame
 *        Together with the ObsLon attribute, it is used when converting
@@ -12740,8 +12740,8 @@ astMAKE_TEST(Frame,ObsAlt,(this->obsalt!=AST__BAD))
 
 *att--
 */
-/* The geodetic longitude of the observer (radians). Clear the ObsLon value by 
-   setting it to AST__BAD, returning zero as the default value. Any value is 
+/* The geodetic longitude of the observer (radians). Clear the ObsLon value by
+   setting it to AST__BAD, returning zero as the default value. Any value is
    acceptable. */
 astMAKE_CLEAR(Frame,ObsLon,obslon,AST__BAD)
 astMAKE_GET(Frame,ObsLon,double,0.0,((this->obslon!=AST__BAD)?this->obslon:0.0))
@@ -14039,8 +14039,8 @@ const char *astAbbrev_( AstFrame *this, int axis, const char *fmt,
    if ( !astOK ) return str2;
    return (**astMEMBER(this,Frame,Abbrev))( this, axis, fmt, str1, str2, status );
 }
-int astFields_( AstFrame *this, int axis, const char *fmt, 
-                const char *str, int maxfld, char **fields, 
+int astFields_( AstFrame *this, int axis, const char *fmt,
+                const char *str, int maxfld, char **fields,
                 int *nc, double *val, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,Fields))( this, axis, fmt, str, maxfld, fields, nc, val, status );
@@ -14050,13 +14050,13 @@ void astCheckPerm_( AstFrame *this, const int *perm, const char *method, int *st
    (**astMEMBER(this,Frame,CheckPerm))( this, perm, method, status );
 }
 
-AstPointSet *astResolvePoints_( AstFrame *this, const double point1[], 
+AstPointSet *astResolvePoints_( AstFrame *this, const double point1[],
                                 const double point2[], AstPointSet *in,
                                 AstPointSet *out, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,ResolvePoints))( this, point1, point2, in, out, status );
 }
-AstLineDef *astLineDef_( AstFrame *this, const double start[2], 
+AstLineDef *astLineDef_( AstFrame *this, const double start[2],
                              const double end[2], int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,LineDef))( this, start, end, status );
@@ -14066,7 +14066,7 @@ int astLineCrossing_( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,LineCrossing))( this, l1, l2, cross, status );
 }
-void astLineOffset_( AstFrame *this, AstLineDef *line, double par, double prp, 
+void astLineOffset_( AstFrame *this, AstLineDef *line, double par, double prp,
                      double point[2], int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,LineOffset))( this, line, par, prp, point, status );
@@ -14158,19 +14158,19 @@ int astMatch_( AstFrame *this, AstFrame *target,
 
 /* If the template ("this") could not be used to probe the target, it may
    be because the template class is a more specialised form of the target
-   class. E.g. a SkyFrame cannot directly be used to probe a Frame, but a 
+   class. E.g. a SkyFrame cannot directly be used to probe a Frame, but a
    Frame *can* be used to probe a SkyFrame. This means (for instance),
    that a basic Frame with Domain FRED cannot be aligned (using astConvert)
    with a CmpFrame with Domain FRED. This sort of alignment is often
    useful, so we try now to use the supplied template to probe a modified
    form of the target that has been cast into the same class as the
-   template. This is only possible if the template class is a sub-class of 
+   template. This is only possible if the template class is a sub-class of
    the target class. Attempt to do the cast. */
    if( ! match ) {
       super_this = (AstFrame *) astCast( this, target );
 
 /* If the cast was  possible, fix the template Domain since the parent
-   class may provide a different default Domain, and then invoke the Match 
+   class may provide a different default Domain, and then invoke the Match
    method appropriate to the new template class (i.e. the target class). */
       if( super_this ) {
          if( astTestDomain( target ) ) {
@@ -14178,8 +14178,8 @@ int astMatch_( AstFrame *this, AstFrame *target,
             if( astChrLen( dom ) > 0 ) astSetDomain( super_this, dom );
          }
          match = (**astMEMBER(super_this,Frame,Match))( super_this, target,
-                                                        template_axes, 
-                                                        target_axes, map, 
+                                                        template_axes,
+                                                        target_axes, map,
                                                         result, status );
          super_this = astAnnul( super_this );
       }
@@ -14226,7 +14226,7 @@ double astOffset2_( AstFrame *this, const double point1[2], double angle,
 }
 void astIntersect_( AstFrame *this, const double a1[2],
                     const double a2[2], const double b1[2],
-                    const double b2[2], double cross[2], 
+                    const double b2[2], double cross[2],
                     int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,Intersect))( this, a1, a2, b1, b2, cross, status );
@@ -14303,7 +14303,7 @@ const char *astSystemString_( AstFrame *this, AstSystemType system, int *status 
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,SystemString))( this, system, status );
 }
-int astAxIn_( AstFrame *this, int axis, double lo, double hi, double val, 
+int astAxIn_( AstFrame *this, int axis, double lo, double hi, double val,
               int closed, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,AxIn))( this, axis, lo, hi, val, closed, status );
@@ -14448,10 +14448,10 @@ f     reason.
    zero-based. */
    fvalue = astFormat( this, axis - 1, value );
 
-/* If OK, store a copy of the resulting string in dynamically allocated memory, 
-   putting a pointer to the copy into the next element of the "astformatid_strings" 
-   array.  (This process also de-allocates any previously allocated memory pointed 
-   at by this "astformatid_strings" element, so the earlier string is effectively 
+/* If OK, store a copy of the resulting string in dynamically allocated memory,
+   putting a pointer to the copy into the next element of the "astformatid_strings"
+   array.  (This process also de-allocates any previously allocated memory pointed
+   at by this "astformatid_strings" element, so the earlier string is effectively
    replaced by the new one.) */
    if ( astOK ) {
       astBeginPM;
@@ -14459,8 +14459,8 @@ f     reason.
                                   strlen( fvalue ) + (size_t) 1 );
       astEndPM;
 
-/* If OK, return a pointer to the copy and increment "astformatid_istr" to use 
-   the next element of "astformatid_strings" on the next invocation. Recycle 
+/* If OK, return a pointer to the copy and increment "astformatid_istr" to use
+   the next element of "astformatid_strings" on the next invocation. Recycle
    "astformatid_istr" to zero when all elements have been used. */
       if ( astOK ) {
          result = astformatid_strings[ astformatid_istr++ ];
@@ -14778,11 +14778,11 @@ f     AST_PICKAXES = INTEGER
 
 *  Applicability:
 *     Frame
-*        This function applies to all Frames. The class of Frame returned 
-*        may differ from that of the original Frame, depending on which 
-*        axes are selected. For example, if a single axis is picked from a 
-*        SkyFrame (which must always have two axes) then the resulting 
-*        Frame cannot be a valid SkyFrame, so will revert to the parent 
+*        This function applies to all Frames. The class of Frame returned
+*        may differ from that of the original Frame, depending on which
+*        axes are selected. For example, if a single axis is picked from a
+*        SkyFrame (which must always have two axes) then the resulting
+*        Frame cannot be a valid SkyFrame, so will revert to the parent
 *        class (Frame) instead.
 *     FrameSet
 *        Using this function on a FrameSet is identical to using it on
@@ -14791,14 +14791,14 @@ f     AST_PICKAXES = INTEGER
 *     Region
 *        If this function is used on a Region, an attempt is made to
 *        retain the bounds information on the selected axes. If
-*        succesful, the returned Frame will be a Region of some class. 
-*        Otherwise, the returned Frame is obtained by calling this 
+*        succesful, the returned Frame will be a Region of some class.
+*        Otherwise, the returned Frame is obtained by calling this
 *        function on the Frame represented by the supplied Region (the
 *        returned Frame will then not be a Region). In order to be
 *        succesful, the selected axes in the Region must be independent
 *        of the others. For instance, a Box can be split in this way but
 *        a Circle cannot. Another requirement for success is that no
-*        default axes are added (that is, the 
+*        default axes are added (that is, the
 c        "axes"
 f        AXES
 *        array must not contain any zero values.

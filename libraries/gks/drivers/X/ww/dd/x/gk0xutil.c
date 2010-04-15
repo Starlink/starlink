@@ -104,7 +104,7 @@ PRIVATE int wwXfatal(dis)Display *dis;{
 	fprintf(console,"ww: connection to X server lost\n");
 	fflush(console);
 	kill(getpid(),1);
-	exit(1);	
+	exit(1);
 }
 /*
  * initialise, but dont open any windows yet. return true if ok.
@@ -141,7 +141,7 @@ DDPUBLIC int gk0xwwstartup(colours){
 	if(WXD==0)wwfail("gk0xwwinit: cannot XOpenDisplay",FALSE);
 	jdd->jd_xscreen = DefaultScreen(WXD);
 	gk0xddselect(ConnectionNumber(WXD),WWSELSET);
-	XSetErrorHandler(wwXerror); 
+	XSetErrorHandler(wwXerror);
 	XSetIOErrorHandler(wwXfatal);
 #ifdef GETHANDLEFROMX
 	jdd->jd_backhandle = XInternAtom(WXD,"WWwindowptr",False);
@@ -352,10 +352,10 @@ PUBLIC int gk0xunportask(pointer,what) void *pointer; int what;{
 		return((int)jwin((window *)pointer)->jw_xwindow);
 	case ASKDISPLAY: /* Ask display */
 		if (wwrunning) return((int)jdd->jd_xdisplay);
-		else return(0);		
+		else return(0);
 	case ASKSCREEN: /* Ask screen */
 		if (wwrunning) return((int)jdd->jd_xscreen);
-		else return(0);				
+		else return(0);
 	default:
 		return(WWERROR);
 	}

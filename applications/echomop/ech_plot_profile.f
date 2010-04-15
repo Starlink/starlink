@@ -370,7 +370,7 @@
 
 *     Overplot IRAF-style markers
          IF ( ( PROFILING_MODE( :1 ) .EQ. 'O' .OR.
-     :        PROFILING_MODE( :1 ) .EQ. 'S' ) .AND. 
+     :        PROFILING_MODE( :1 ) .EQ. 'S' ) .AND.
      :        GRAPHICS_SETUP ) THEN
             CALL ECH_GR_SET_LINESTYLE( STY_FULL )
             IF ( CURR_TYPE .EQ. TYPE_SKY .OR.

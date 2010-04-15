@@ -78,14 +78,14 @@
 *        lines should be drawn.  The null value or 0.0 causes a line to
 *        be drawn at the mean value.
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use 
+*        A group of attribute settings describing the plotting style to use
 *        for the lines.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text file
 *        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
+*        contain further comma-separated lists which will be read and
+*        interpreted in the same manner. Attribute settings are applied in
 *        the order in which they occur within the list, with later settings
 *        over-riding any earlier settings given for the same attribute.
 *
@@ -99,17 +99,17 @@
 *        defaulted if a null value (!) is supplied. See section "Plotting
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        reported).
 *
 *        The attributes Colour(Curves), Width(Curves), etc, can be used
 *        to specify the style for the lines ("Lines" is recognised as a
 *        synonym for "Curves"). These values apply to all
 *        lines unless subsequent attributes over-ride them. Attributes for
-*        individual clipping levels can be given by replacing "Curves" above 
+*        individual clipping levels can be given by replacing "Curves" above
 *        by a string of the form "Nsig<i>" where "<i>" is an integer
 *        index into the list of clipping levels supplied for parameter
 *        NSIGMA. Thus, "Colour(Nsig1)" will set the colour for the lines
-*        associated with the first clipping level, etc. The attribute 
+*        associated with the first clipping level, etc. The attribute
 *        settings can be restricted to one of the two lines by appending
 *        either a "+" or a "-" to the "Nsig<i>" string. Thus,
 *        "Width(Nsig2-)" sets the line width for the lower of the two
@@ -201,7 +201,7 @@
 *     {enter_further_changes_here}
 
 *-
- 
+
 *  Type Definitions:
       IMPLICIT  NONE             ! No implicit typing allowed
 
@@ -257,7 +257,7 @@
       INTEGER INDF               ! NDF identifier
       INTEGER IPIC0              ! Input picture identifier
       INTEGER IPICD              ! Data image picture identifier
-      INTEGER IPIN               ! Pointer to input array 
+      INTEGER IPIN               ! Pointer to input array
       INTEGER IPLOT              ! Plot for drawing over DATA picture
       INTEGER NCLIP              ! Number of clipping iterations
       INTEGER NGOOD              ! Number of valid pixels in array
@@ -287,7 +287,7 @@
 *  Open the graphics device and workstation. An error is reported if no
 *  existing DATA picture can be found. An AST Plot is returned which
 *  can be used to draw in the existing Plot.
-      CALL KPG1_PLOTA( AST__NULL, 'OLD', ' ', IPIC0, IPICD, IPLOT, 
+      CALL KPG1_PLOTA( AST__NULL, 'OLD', ' ', IPIC0, IPICD, IPLOT,
      :                 STATUS )
 
 *  Report the name, comment, and label, if one exists, for the current
@@ -302,7 +302,7 @@
 *  in circulation.
       CALL DAT_VALID( REFNAM, GOTLOC, STATUS )
       IF( GOTLOC ) LOCI = REFNAM
-      
+
 *  End immediately if there was an error.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -329,10 +329,10 @@
 *  End immediately if there was an error.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Obtain an array of clipping limits to be applied. Constrain the values to 
+*  Obtain an array of clipping limits to be applied. Constrain the values to
 *  be positive.
       NCLIP = 0
-      CALL PAR_GDRVR( 'NSIGMA', MXCLIP, 0.0, VAL__MAXR, CLIP, NSIGMA, 
+      CALL PAR_GDRVR( 'NSIGMA', MXCLIP, 0.0, VAL__MAXR, CLIP, NSIGMA,
      :                STATUS )
 
 *  Interpret a null value as indicating that a line at the mean be drawn.
@@ -364,10 +364,10 @@
       UBNDIN( 1 ) = X2
       UBNDIN( 2 ) = Y2
 
-      CALL AST_MAPBOX( IPLOT, LBNDIN, UBNDIN, .TRUE., OTHAX, 
+      CALL AST_MAPBOX( IPLOT, LBNDIN, UBNDIN, .TRUE., OTHAX,
      :                 START( OTHAX ), FINISH( OTHAX ), XL, XU, STATUS )
 
-*  Find Some Statistics. If the clipped mean and standard deviaiton is to be 
+*  Find Some Statistics. If the clipped mean and standard deviaiton is to be
 *  reported (verbose message reporting), print some headings.
       CALL MSG_OUT( 'BLANK', ' ', STATUS )
       CALL MSG_OUT( 'HEADING',
@@ -394,42 +394,42 @@
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
- 
+
          ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
             CALL KPG1_STATUB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                        CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                        IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                        IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC,
      :                        SUMC, MEANC, STDEVC, STATUS )
- 
+
          ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_STATD( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
- 
+
          ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_STATI( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
- 
+
          ELSE IF( TYPE .EQ. '_REAL' ) THEN
             CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
- 
+
          ELSE IF( TYPE .EQ. '_WORD' ) THEN
             CALL KPG1_STATW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
- 
+
          ELSE IF( TYPE .EQ. '_UWORD' ) THEN
             CALL KPG1_STATUW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                        CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
@@ -451,11 +451,11 @@
          CALL CHR_PUTI( I, SYN, IAT )
          CALL CHR_APPND( ')', SYN, IAT )
          CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
-         
+
          IAT = IAT - 1
          CALL CHR_APPND( '+)', SYN, IAT )
          CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
-         
+
 *  Set the plotting style for the upper (positive) line.
          CALL KPG1_ASSET( 'KAPPA_DRAWSIG', 'STYLE', IPLOT, STATUS )
 
@@ -480,11 +480,11 @@
             CALL CHR_PUTI( I, SYN, IAT )
             CALL CHR_APPND( ')', SYN, IAT )
             CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
-            
+
             IAT = IAT - 1
             CALL CHR_APPND( '-)', SYN, IAT )
             CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
-         
+
 *  Set the plotting style for the upper (positive) line.
             CALL KPG1_ASSET( 'KAPPA_DRAWSIG', 'STYLE', IPLOT, STATUS )
 
@@ -495,7 +495,7 @@
 
          END IF
 
-*  Report the clipped mean and standard deviation. Report the unclipped 
+*  Report the clipped mean and standard deviation. Report the unclipped
 *  values first.
          IF( I .EQ. 1 .AND. NGOOD .GT. 0 ) THEN
             WRITE( BUFFER, '(16X,3(5X,G13.6))' ) MEAN, STDEV,

@@ -15,7 +15,7 @@
 
 *  Description:
 *     Initialize common variables for a parse.
-* 
+*
 
 *  Arguments:
 *     CD = INTEGER (Given)
@@ -37,7 +37,7 @@
 *     None
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,7 +84,7 @@
 *
 *   Get all the information about the first catalogues fields.
 *
-      CALL CHP_GALLCDB(CD, NUMFLDS, FNAMES, FFORMATS, 
+      CALL CHP_GALLCDB(CD, NUMFLDS, FNAMES, FFORMATS,
      :  FXUNITS, FCOMMENTS, FPREFDIS, FCOLTYPES, FCOLDES,
      :  FARRSHP, FARRDIM, FASSERT, FASSEXP, FDOMCHK, FDATELM,
      :  FVCFLAG, FVCEXP, FDELIND, FFMATFLAG, STATUS)
@@ -108,7 +108,7 @@
         EUNIT(I) = FXUNITS(I)
 *        ENULL(I) = FNULLS(I)
         ECOMNT(I) = FCOMMENTS(I)
-       
+
       ENDDO
 *
       ENITEMS = NUMFLDS

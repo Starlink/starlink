@@ -1,6 +1,6 @@
 *+
 *  Name:
-*     LPG_COM 
+*     LPG_COM
 
 *  Purpose:
 *     Define the common blocks used by the LPG library.
@@ -12,12 +12,12 @@
 *     Global variables include file.
 
 *  Description:
-*     This file contains declarations of global variables used internally 
-*     by the LPG library for accessing groups of data files (NDFs or 
-*     catalogues). 
+*     This file contains declarations of global variables used internally
+*     by the LPG library for accessing groups of data files (NDFs or
+*     catalogues).
 
 *  Prior Requirements:
-*     The DAT_PAR and LPG_CONST include file should be included prior to 
+*     The DAT_PAR and LPG_CONST include file should be included prior to
 *     this file, in order to define constants which are needed here.
 
 *  Copyright:
@@ -29,12 +29,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -53,19 +53,19 @@
 
 *-
 
-*  The names of the data file parameters (NDFs and catalogues) used by the 
+*  The names of the data file parameters (NDFs and catalogues) used by the
 *  application.
-      CHARACTER PNAME( LPG__MXPAR )*( DAT__SZNAM ) 
+      CHARACTER PNAME( LPG__MXPAR )*( DAT__SZNAM )
 
 *  The names of other parameters used by the application.
-      CHARACTER PNAME2( LPG__MXPAR )*( DAT__SZNAM ) 
+      CHARACTER PNAME2( LPG__MXPAR )*( DAT__SZNAM )
 
-*  The identifier for the GRP groups holding the names supplied for 
+*  The identifier for the GRP groups holding the names supplied for
 *  each data file parameter.
-      INTEGER IGRP( LPG__MXPAR ) 
+      INTEGER IGRP( LPG__MXPAR )
 
 *  The number of data files supplied for each data file parameter.
-      INTEGER SIZE( LPG__MXPAR ) 
+      INTEGER SIZE( LPG__MXPAR )
 
 *  The number of data file parameters used by the application.
       INTEGER NPAR
@@ -74,22 +74,22 @@
       INTEGER NPAR2
 
 *  The number of times the application has been invoked so far.
-      INTEGER NRUN               
+      INTEGER NRUN
 
 *  A flag for each data file parameter indicating if the parameter is
 *  used to access existing (i.e. old) data files. If not, the parameter
 *  is used to access new data files to be created by the application.
       LOGICAL OLD( LPG__MXPAR )
 
-*  A flag for each data file parameter indicating if the parameter value 
+*  A flag for each data file parameter indicating if the parameter value
 *  has been reported.
       LOGICAL REP( LPG__MXPAR )
 
-*  The original (i.e. before the first invocation was performed) PAR state 
+*  The original (i.e. before the first invocation was performed) PAR state
 *  of each parameter listed in array PNAME2.
       INTEGER STATE2( LPG__MXPAR )
 
-*  A flag indicating if the values used for each data file parameter 
+*  A flag indicating if the values used for each data file parameter
 *  should be displayed each time the parameter is accessed.
       LOGICAL VERB
 
@@ -106,15 +106,15 @@
 *  be open by the NDF system. In this case the temporary NDF
 *  is copied to the requested position once the application has
 *  finished.  The TMPLST group holds adjacent pairs of file
-*  specs; the first one in each pair is the spec of the temporary 
+*  specs; the first one in each pair is the spec of the temporary
 *  output NDF, the second is the spec of the requested output NDF.
-      INTEGER TMPLST 
+      INTEGER TMPLST
 
 
 *  A GRP identifier for a group holding the full specification
 *  for any existing NDFs which have been opened for read-only
-*  input by this invocation of the application. 
-      INTEGER OPNLST 
+*  input by this invocation of the application.
+      INTEGER OPNLST
 
 *  Should the user be allowed to use the same input as both
 *  input and output? If so, a temporary NDF will be used to
@@ -123,7 +123,7 @@
 *  replaced by a copy of the temporary NDF. If REPLACE is false
 *  an error will be reported if an attempt is amde to use a
 *  single NDF as both input and output.
-      LOGICAL REPLACE 
+      LOGICAL REPLACE
 
 *  Declare the common blocks, one for numeric/boolean data, and one for
 *  character data.
@@ -134,4 +134,4 @@
 *  Ensure the contents of the common blocks are retained throughout the
 *  life of the applicaton.
       SAVE /LPG_COM1/
-      SAVE /LPG_COM2/ 
+      SAVE /LPG_COM2/

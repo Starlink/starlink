@@ -33,17 +33,17 @@
 *    Status :
       INTEGER STATUS       ! Global status
 *-
- 
+
 *   Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *   Convert the name and value into tokens.
       CALL MSG_SETC( 'NAME', NAME )
       CALL MSG_SETC( 'VALUE', VALUE )
- 
+
 *   Display the name and the value.
       CALL MSG_OUT( ' ', '   ^NAME = ^VALUE', STATUS )
- 
+
       END
 *+  CRED4_LIST0D - List the value of a scalar DOUBLE PRECISION parameter
       SUBROUTINE CRED4_LIST0D( NAME, VALUE, STATUS )
@@ -81,17 +81,17 @@
       INTEGER STATUS       ! Global status
 *    External references :
 *-
- 
+
 *   Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
-  
+
 *   Convert the name and value into tokens.
       CALL MSG_SETC( 'NAME', NAME )
       CALL MSG_SETD( 'VALUE', VALUE )
- 
+
 *   Display the name and the value.
       CALL MSG_OUT( ' ', '   ^NAME = ^VALUE', STATUS )
- 
+
       END
 *+  CRED4_LIST0I - List the value of a scalar INTEGER parameter
       SUBROUTINE CRED4_LIST0I( NAME, VALUE, STATUS )
@@ -129,17 +129,17 @@
       INTEGER STATUS       ! Global status
 *    External references :
 *-
- 
+
 *   Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *   Convert the name and value into tokens.
       CALL MSG_SETC( 'NAME', NAME )
       CALL MSG_SETI( 'VALUE', VALUE )
- 
+
 *   Display the name and the value.
       CALL MSG_OUT( ' ', '   ^NAME = ^VALUE', STATUS )
- 
+
       END
 *+  CRED4_LIST0L - List the value of a scalar LOGICAL parameter
       SUBROUTINE CRED4_LIST0L( NAME, VALUE, STATUS )
@@ -176,17 +176,17 @@
 *    Status :
       INTEGER STATUS       ! Global status
 *-
- 
+
 *   Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Convert the name and value into tokens. 
+*   Convert the name and value into tokens.
       CALL MSG_SETC( 'NAME', NAME )
       CALL MSG_SETL( 'VALUE', VALUE )
- 
+
 *   Display the name and the value.
       CALL MSG_OUT( ' ', '   ^NAME = ^VALUE', STATUS )
- 
+
       END
 *+  CRED4_LIST0R - List the value of a scalar REAL parameter
       SUBROUTINE CRED4_LIST0R( NAME, VALUE, STATUS )
@@ -223,15 +223,15 @@
 *    Status :
       INTEGER STATUS       ! Global status
 *-
- 
+
 *   Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
-*   Convert the name and value into tokens. 
+
+*   Convert the name and value into tokens.
       CALL MSG_SETC( 'NAME', NAME )
       CALL MSG_SETR( 'VALUE', VALUE )
- 
+
 *   Display the name and the value.
       CALL MSG_OUT( ' ', '   ^NAME = ^VALUE', STATUS )
- 
+
       END

@@ -12,7 +12,7 @@
 
 *  Notes:
 *     - Given the size of the GRP library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use GRP from C extend this file (and
 *     grp.h) to include any functions which they need but which are
 *     not already included.
@@ -52,7 +52,7 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h"                 
+#include "f77.h"
 #include "grp1.h"
 #include "grp_err.h"
 #include "sae_par.h"
@@ -67,11 +67,11 @@ extern Grp *Grp_Pointers[ GRP__MAXG ];
 /* Prototypes for local static functions */
 /* ===================================== */
 
-F77_SUBROUTINE(grp_list)( CHARACTER(PARAM), 
-                          INTEGER(INDXLO), 
-                          INTEGER(INDXHI), 
-                          CHARACTER(COMNT), 
-                          INTEGER(IGRP), 
+F77_SUBROUTINE(grp_list)( CHARACTER(PARAM),
+                          INTEGER(INDXLO),
+                          INTEGER(INDXHI),
+                          CHARACTER(COMNT),
+                          INTEGER(IGRP),
                           INTEGER(STATUS)
                           TRAIL(PARAM)
                           TRAIL(COMMNT) );
@@ -103,8 +103,8 @@ void grpList( const char *param, size_t indxlo, size_t indxhi,
                        INTEGER_ARG(&INDXHI),
                        CHARACTER_ARG(COMNT),
                        INTEGER_ARG(&IGRP),
-                       INTEGER_ARG(&STATUS) 
-                       TRAIL_ARG(PARAM) 
+                       INTEGER_ARG(&STATUS)
+                       TRAIL_ARG(PARAM)
                        TRAIL_ARG(COMNT) );
 
    F77_FREE_CHARACTER( PARAM );

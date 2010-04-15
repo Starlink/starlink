@@ -20,9 +20,9 @@
 *     from a formatted file described by LI. This line is then parsed
 *     in an attempt to extract first four fields, which should be the
 *     object number (integer ) and the x and y positions (reals), and
-*     the magnitude; if the attached file uses the present PISA 
+*     the magnitude; if the attached file uses the present PISA
 *     standard. If the first word in the buffer is not an integer then
-*     it is assumed to be the x position and the next word the y 
+*     it is assumed to be the x position and the next word the y
 *     position. Blank lines are skipped.
 
 *  Arguments:
@@ -55,7 +55,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -63,7 +63,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER LI            
+      INTEGER LI
       CHARACTER*(*) BUF
 
 *  Arguments Returned:

@@ -12,7 +12,7 @@
 *  PURPOSE OF THE ROUTINE
 *  ----------------------
 *     Experimental X-windows driver for GKS-UK
-*     
+*
 *  MAINTENANCE LOG
 *  ---------------
 *
@@ -33,7 +33,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-*   
+*
       INCLUDE '../../include/gkmc.par'
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/GKS_PAR'
@@ -165,7 +165,7 @@
 
 * Initialise flags used by escapes -1 and -2
       KWKDAT(ICHFLG, KWKIX) = KNIL
-      KWKDAT(ILCFLG, KWKIX) = KNIL 
+      KWKDAT(ILCFLG, KWKIX) = KNIL
 
 *  Create a window
       KERROR = GK0XOP(KWKIX, KWKTYP, KWI1, KDSRX(KWKIX), KDSRY(KWKIX),
@@ -204,7 +204,7 @@
       QCWVXR(KWKIX) = QDSDX(KWKIX)
       QCWVYB(KWKIX) = 0.0
       QCWVYT(KWKIX) = QDSDY(KWKIX)
-      
+
       IF (NEW.EQ.GYES .OR. INOCLR.EQ.GNO) THEN
 
 * Load the default colour table
@@ -243,7 +243,7 @@
         CALL GKSLDL(KSSGPT(KWKIX))
       ENDIF
       GOTO 9999
-                         
+
 
 * Clear workstation
    30 CONTINUE
@@ -347,7 +347,7 @@
 
 *   Set hardware linestyle, line width and colour
       CALL GK0XLS(KWKIX,GLSOLI,1,KWPMCI(KWKIX))
-           
+
       CALL GKSTAL(KREALS,ICHUNK*2,IOFF)
       IF (KERROR.EQ.0) THEN
         N = ICHUNK
@@ -440,7 +440,7 @@
               KERROR=0
            ENDIF
         ENDIF
- 
+
         CALL GKCRCS(KWI1, NRD, RX, RY, 1, .TRUE., 1.0, GK0XLN, GK0XRO)
 
 *   Pattern uses cell array so flush the buffer
@@ -686,7 +686,7 @@
 *     Data returned:
 *     KWI1   : Status
 *     KWI2   : Choice value
- 
+
       IF (KWKDAT(ICHFLG,KWKIX) .NE. KNIL .AND. KWI1.EQ.2) THEN
 *        Escape has been used to associate locator device 1 with
 *        choice device 2.
@@ -890,7 +890,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          QWR3 = QWR3 / REAL(IXXSP) * XXSM
       ENDIF
       GOTO 9999
-      
+
 
 * Inquire text facilities
 
@@ -948,7 +948,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
       CALL GKQWK(IENT,NID,IDAT,NRD,RX,RY,NCD,STR)
       KERROR = GK0XCF(KWKTYP, IXCOL, IXDYN, IXBPC, NCOLS)
       IF (KERROR.EQ.0) THEN
-         KWI1 = 2**IXBPC 
+         KWI1 = 2**IXBPC
          IF (KWI3.GT.NCOLS) KWI3 = NCOLS
          IF (IXCOL.EQ.GYES) THEN
             KWI2 = GCOLOR

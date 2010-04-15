@@ -118,7 +118,7 @@
       endif
 
       sf2 = ast_specframe( 'system=wave,unit=nm', status )
-      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/Angstrom', 
+      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/Angstrom',
      :                     status )
       if( ast_GetC( ff2, 'System', status ) .ne. 'FLXDNW' ) then
          write(*,*)  ast_GetC( ff2, 'System', status )
@@ -142,7 +142,7 @@
       sf = ast_specframe( 'system=freq,unit=GHz', status )
       ff = ast_Fluxframe( 123.0D0, sf, 'unit=W/m^2/Hz', status )
       sf2 = ast_specframe( 'system=wave,unit=nm', status )
-      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/m', 
+      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/m',
      :                     status )
       fs = ast_convert( ff, ff2, ' ', status )
       if( fs .eq. ast__null ) then
@@ -157,15 +157,15 @@
 
 
       sf = ast_specframe( 'system=freq,unit=GHz', status )
-      ff = ast_Fluxframe( 123.0D0, sf, 'unit=W/m^2/Hz/arcsec**2', 
+      ff = ast_Fluxframe( 123.0D0, sf, 'unit=W/m^2/Hz/arcsec**2',
      :                    status )
-      if( ast_getc( ff, 'System', status ) .ne. 'SFCBR' ) 
+      if( ast_getc( ff, 'System', status ) .ne. 'SFCBR' )
      :       call stopit( status, 'error 27a' )
 
       sf2 = ast_specframe( 'system=wave,unit=nm', status )
-      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/m/deg**2', 
+      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/m/deg**2',
      :                     status )
-      if( ast_getc( ff2, 'System', status ) .ne. 'SFCBRW' ) 
+      if( ast_getc( ff2, 'System', status ) .ne. 'SFCBRW' )
      :       call stopit( status, 'error 27b' )
 
       fs = ast_convert( ff, ff2, ' ', status )
@@ -181,9 +181,9 @@
       end if
 
 
-      ff = ast_Fluxframe( 123.0D0, sf, 'unit=W/m^2/Hz/arcsec**2', 
+      ff = ast_Fluxframe( 123.0D0, sf, 'unit=W/m^2/Hz/arcsec**2',
      :                    status )
-      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/m', 
+      ff2 = ast_Fluxframe( 2437337.06D0, sf2, 'unit=W/m^2/m',
      :                     status )
 
       fs = ast_convert( ff, ff2, ' ', status )
@@ -233,7 +233,7 @@
       external mysource, mysink
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -255,7 +255,7 @@
          write(*,*) text
          call stopit( status, 'Cannot read object from channel' )
       end if
-     
+
 
 
       if( ast_getd( obj, 'specval', status ) .ne.
@@ -266,7 +266,7 @@
          call stopit( status, 'Object has changed' )
       end if
 
-      end  
+      end
 
       subroutine sink1( status )
       implicit none
@@ -285,7 +285,7 @@
       if( index( line( : l ),'Unc =' ) .GT. 0 ) then
          done = .true.
 
-      else if( .not. done .and. 
+      else if( .not. done .and.
      :         index( line( : l ),'FrameSet' ) .GT. 0 ) then
          fsfound= .true.
       end if
@@ -299,7 +299,7 @@
       integer status, next, end, ll
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -322,7 +322,7 @@
       character buf*25000
       character line*1000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -341,7 +341,7 @@
          write(*,*) buf( next : next + l)
          write(*,*) 'Line length ',l
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
       endif

@@ -76,21 +76,21 @@
 #.
 
 itcl::class gaia::StarArdEllipse {
-   
+
    #  Inheritances:
    #  -------------
-   
+
    inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------
    constructor {args} {
 
-      #  Set the type of canvas object. 
+      #  Set the type of canvas object.
       configure -mode ellipse
       eval configure $args
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {
@@ -118,24 +118,24 @@ itcl::class gaia::StarArdEllipse {
    #  Set the properties of the object to those of an ARD description
    #  of an object of this type.
    method setard {desc} {
-      if {$desc != "" } { 
-         set failed 1 
-         if { [check_description ellipse $desc] } { 
-            if { [llength $qualifiers_] == 5 } { 
+      if {$desc != "" } {
+         set failed 1
+         if { [check_description ellipse $desc] } {
+            if { [llength $qualifiers_] == 5 } {
                lassign $qualifiers_ x y semimajor semiminor angle
                lassign [canvas_coord $x $y] xs ys
                set smaj [canvas_dist $semimajor]
                set smin [canvas_dist $semiminor]
                set sang [canvas_angle $angle $x $y]
                configure -coords "$xs $ys"
-               configure -semimajor $smaj 
-               configure -semiminor $smin 
+               configure -semimajor $smaj
+               configure -semiminor $smin
                configure -angle $sang
                set failed 0
                set_size_
             }
          }
-         if { $failed } { 
+         if { $failed } {
             error "Failed to interpret \"$desc\" as an ARD ellipse"
          }
       }
@@ -152,7 +152,7 @@ itcl::class gaia::StarArdEllipse {
    method set_size_ {args} {
       $canvas itemconfigure $canvas_id_ \
          -semimajor $semimajor -semiminor $semiminor -angle $angle
-      if { [lindex $args 0] != {} } { 
+      if { [lindex $args 0] != {} } {
          eval $args
       }
    }
@@ -163,7 +163,7 @@ itcl::class gaia::StarArdEllipse {
       if { $name == {} } {
          set name ".circle$canvas_id_"
       }
-      if { ! [create_properties_window $name] } { 
+      if { ! [create_properties_window $name] } {
 
          #  Now add the buttons for the description.
          set Xcentre_ [LabelEntry $Frame_.xcentre \
@@ -187,7 +187,7 @@ itcl::class gaia::StarArdEllipse {
                         -labelwidth $labelwidth_ \
                         -command [code $this configure -angle]]
          pack $Xcentre_ $Ycentre_ $Major_ $Minor_ $Angle_ -side top -fill x
-      } 
+      }
 
       #  Update the information to be current.
       update_properties
@@ -208,7 +208,7 @@ itcl::class gaia::StarArdEllipse {
       set angle [image_angle $ang]
 
       #  Update the properties box if it exists.
-      if { [winfo exists $Properties_] } { 
+      if { [winfo exists $Properties_] } {
          $Xcentre_ configure -value $x
          $Ycentre_ configure -value $y
          $Major_ configure -value $semimajor
@@ -224,8 +224,8 @@ itcl::class gaia::StarArdEllipse {
    #  ----------------------
 
    #  X position in image coordinates.
-   public variable x {0} { 
-      if { [winfo exists $Xcentre_] } { 
+   public variable x {0} {
+      if { [winfo exists $Xcentre_] } {
          $Xcentre_ configure -value $x
          lassign [canvas_coord $x $y] xc yc
          set coords "$xc $y"
@@ -234,8 +234,8 @@ itcl::class gaia::StarArdEllipse {
    }
 
    #  Y position in image coordinates.
-   public variable y {0} { 
-      if { [winfo exists $Ycentre_] } { 
+   public variable y {0} {
+      if { [winfo exists $Ycentre_] } {
          $Ycentre_ configure -value $y
          lassign [canvas_coord $x $y] xc yc
          set coords "$x $yc"
@@ -244,8 +244,8 @@ itcl::class gaia::StarArdEllipse {
    }
 
    #  Semi-major axis in image pixels.
-   public variable semimajor {10} { 
-      if { [winfo exists $Major_] } { 
+   public variable semimajor {10} {
+      if { [winfo exists $Major_] } {
          $Major_ configure -value $semimajor
          set maj [canvas_dist $semimajor]
          $canvas itemconfigure $canvas_id_ -semimajor $maj
@@ -253,8 +253,8 @@ itcl::class gaia::StarArdEllipse {
    }
 
    #  Semi-minor axis in image pixels.
-   public variable semiminor {5} { 
-      if { [winfo exists $Minor_] } { 
+   public variable semiminor {5} {
+      if { [winfo exists $Minor_] } {
          $Minor_ configure -value $semiminor
          set min [canvas_dist $semiminor]
          $canvas itemconfigure $canvas_id_ -semiminor $min
@@ -262,8 +262,8 @@ itcl::class gaia::StarArdEllipse {
    }
 
    #  Position angle.
-   public variable angle {0} { 
-      if { [winfo exists $Angle_] } { 
+   public variable angle {0} {
+      if { [winfo exists $Angle_] } {
          $Angle_ configure -value $angle
          set ang [canvas_angle $angle $x $y]
          $canvas itemconfigure $canvas_id_ -angle $ang

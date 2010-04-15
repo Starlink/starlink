@@ -64,9 +64,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -74,7 +74,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER*(*) LOC      
+      CHARACTER*(*) LOC
       INTEGER       NUM_ADC
       INTEGER       NUM_CHAN
       INTEGER       N_BOL
@@ -92,7 +92,7 @@
 *  Local constants:
       INTEGER   MAX_DIM          ! max number of dims in array
       PARAMETER (MAX_DIM = 2)
- 
+
 *  Local Variables:
       INTEGER DIM (MAX_DIM)      ! actual array dimensions
       INTEGER DIMX (MAX_DIM)     ! expected array dimensions
@@ -109,9 +109,9 @@
 
 *     BOL_TYPE
 
-      CALL CMP_GETNC (LOC, 'BOL_TYPE', NDIM, DIMX, BOL_TYPE, 
+      CALL CMP_GETNC (LOC, 'BOL_TYPE', NDIM, DIMX, BOL_TYPE,
      :     DIM, STATUS)
-      
+
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 2)                 .OR.
      :        (DIM(1) .NE. NUM_CHAN) .OR.
@@ -121,7 +121,7 @@
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
             CALL ERR_REP (' ', 'SCULIB_GET_BOL_DESC: .SCUBA.BOL_TYPE '//
-     :           'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2', 
+     :           'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2',
      :           STATUS)
          END IF
       END IF
@@ -130,7 +130,7 @@
 
       CALL CMP_GETNR (LOC, 'BOL_DU3', NDIM, DIMX,
      :     BOL_DU3, DIM, STATUS)
-      
+
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 2)                 .OR.
      :        (DIM(1) .NE. NUM_CHAN) .OR.
@@ -180,7 +180,7 @@
 
 *     BOL_ADC
 
-      CALL CMP_GET1I(LOC, 'BOL_ADC', NUM_CHAN * NUM_ADC, 
+      CALL CMP_GET1I(LOC, 'BOL_ADC', NUM_CHAN * NUM_ADC,
      :     BOL_ADC, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN

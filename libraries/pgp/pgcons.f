@@ -78,7 +78,7 @@ C
             GOTO (60,70,60,70), ICORN
 C
    60       XX = I+IDELT(ICORN+1)
-            YY = REAL(J+IDELT(ICORN)) + 
+            YY = REAL(J+IDELT(ICORN)) +
      1           DELTA*REAL(IDELT(ICORN+1)-IDELT(ICORN))
             GOTO 80
 C

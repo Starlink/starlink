@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_WCFAX( LBND, UBND, MAP, JAXIS, IAXIS, CENTRE, 
+      SUBROUTINE KPG1_WCFAX( LBND, UBND, MAP, JAXIS, IAXIS, CENTRE,
      :                       WORK, STATUS )
 *+
 *  Name:
@@ -12,21 +12,21 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_WCFAX( LBND, UBND, MAP, JAXIS, IAXIS, CENTRE, WORK, 
+*     CALL KPG1_WCFAX( LBND, UBND, MAP, JAXIS, IAXIS, CENTRE, WORK,
 *                      STATUS )
 
 *  Description:
 *     This routine returns the world co-ordinate along a nominated WCS
-*     axis for each pixel centre of an NDF.  The co-ordinates are defined 
+*     axis for each pixel centre of an NDF.  The co-ordinates are defined
 *     within the current Frame in the supplied FrameSet. It is assumed
 *     that the nominated axis is independent of the other axes.
 
 *  Arguments:
 *     LBND( * ) = INTEGER (Given)
-*        The lower pixel index bounds of the NDF. This array should have 
+*        The lower pixel index bounds of the NDF. This array should have
 *        one element for each NDF pixel axis.
 *     UBND( * ) = INTEGER (Given)
-*        The upper pixel index bounds of the NDF. This array should have 
+*        The upper pixel index bounds of the NDF. This array should have
 *        one element for each NDF pixel axis.
 *     MAP = INTEGER (Given)
 *        Mapping from PIXEL coords in the NDF to current WCS coords.
@@ -35,7 +35,7 @@
 *     IAXIS = INTEGER (Given)
 *        The number of the WCS axis whose values are returned.
 *     CENTRE( * ) = DOUBLE PRECISION (Returned)
-*        The current-Frame co-ordinate along the nominated axis at each 
+*        The current-Frame co-ordinate along the nominated axis at each
 *        pixel centre. The size and shape of this array should be the
 *        same as the NDF.
 *     WORK( * ) = DOUBLE PRECISION (Returned)
@@ -53,12 +53,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -171,7 +171,7 @@
          PPOS( JAXIS ) = DBLE( I ) - 0.5D0
 
 *  Transform into current frame coords
-         CALL AST_TRANN( MAP, 1, NAXPIX, 1, PPOS, .TRUE., NAXWCS, 
+         CALL AST_TRANN( MAP, 1, NAXPIX, 1, PPOS, .TRUE., NAXWCS,
      :                   1, WPOS, STATUS )
 
 *  Store the required WCS axis value
@@ -193,7 +193,7 @@
 *  Store the pixel indices of the next pixel in the N-d array.
          PIND( 1 ) = PIND( 1 ) + 1
          I = 1
-         DO WHILE( PIND( I ) .GT. UBND( I ) .AND. I .LT. NAXPIX  ) 
+         DO WHILE( PIND( I ) .GT. UBND( I ) .AND. I .LT. NAXPIX  )
             PIND( I ) = LBND( I )
             I = I + 1
             PIND( I ) = PIND( I ) + 1

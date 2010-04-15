@@ -1,5 +1,5 @@
 
-      SUBROUTINE LFIG_GPLOT( DATARR, NX, NY, IXST, IXEN, IYST, IYEN, 
+      SUBROUTINE LFIG_GPLOT( DATARR, NX, NY, IXST, IXEN, IYST, IYEN,
      :                       DEVICE, LABEL, XLABEL, YLABEL, ERASE,
      : 	                     AXES, ADJUST, HIGH, LOW, STATUS)
 C
@@ -65,10 +65,10 @@ C     Perform the plot
          ELSE
             IADJ=1
          END IF
-         CALL PGENV( FLOAT( IXST), FLOAT( IXEN), FLOAT( IYST), 
+         CALL PGENV( FLOAT( IXST), FLOAT( IXEN), FLOAT( IYST),
      :               FLOAT( IYEN), IADJ, 0)
 	 CALL PGSLW( 3)
-         CALL PGGRAY( DATARR, NX, NY, IXST, IXEN, IYST, IYEN, LOW, 
+         CALL PGGRAY( DATARR, NX, NY, IXST, IXEN, IYST, IYEN, LOW,
      :                HIGH, TR)
 	 CALL PGBOX( 'BCNTS', 0.0, 0, 'BCNTS', 0.0, 0)
          CALL PGLABEL( XLABEL, YLABEL, LABEL)

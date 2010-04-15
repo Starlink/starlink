@@ -5,11 +5,11 @@
 
 *    Description :
 *
-*     This routine deglitches an image. The glitch positions are defined 
-*     according to values found in a free-format file, the name of which 
+*     This routine deglitches an image. The glitch positions are defined
+*     according to values found in a free-format file, the name of which
 *     is given as input. Returned is the deglitched image, and the number
-*     of pixels listed in the free-format file to be deglitched, and the 
-*     number that were actually valid and consequently deglitched, are 
+*     of pixels listed in the free-format file to be deglitched, and the
+*     number that were actually valid and consequently deglitched, are
 *     both output.
 *     If the specified file could not be opened, the status parameter is
 *     set to error and an immediate return follows.
@@ -143,7 +143,7 @@
       CALL FIO_GUNIT( LUN, STATUS )
 
 *    open the requested named file as the unit specified above
-      OPEN( UNIT = LUN, FILE = FILENAME, STATUS = 'OLD', IOSTAT=STAT, 
+      OPEN( UNIT = LUN, FILE = FILENAME, STATUS = 'OLD', IOSTAT=STAT,
      :      ERR = 999 )
 
 *    get the header string from the file
@@ -151,7 +151,7 @@
 
 *    write out the header to the user
       CALL MSG_OUT( 'BLANK', ' ', STATUS )
-      CALL MSG_OUT( 'LINE1', 
+      CALL MSG_OUT( 'LINE1',
      : 'Title of glitch list file :', STATUS )
       CALL MSG_SETC( 'HEADER', HEADER )
       CALL MSG_OUT( 'LINE2', '^HEADER', STATUS )
@@ -165,7 +165,7 @@
 
 *       read in the current pixel position as a free-format integer pair -
 *       jump out of loop if the end of file is found
-         READ( LUN, *, IOSTAT=STAT, END = 998, ERR = 999 ) 
+         READ( LUN, *, IOSTAT=STAT, END = 998, ERR = 999 )
      :         XPOS, YPOS
 
 *       increment the counter keeping track of the number of requested
@@ -173,11 +173,11 @@
          TRIED  =  TRIED + 1
 
 *       check that given pixel position lies on the input data array
-         IF ( XPOS .GE. 1 .AND. XPOS .LE. DIMS1 .AND. 
+         IF ( XPOS .GE. 1 .AND. XPOS .LE. DIMS1 .AND.
      :        YPOS .GE. 1 .AND. YPOS .LE. DIMS2 ) THEN
 
 *          position is valid - deglitch it
-            CALL GLITCHSUB( DIMS1, DIMS2, ARRAY, XPOS, YPOS, OLDVAL, 
+            CALL GLITCHSUB( DIMS1, DIMS2, ARRAY, XPOS, YPOS, OLDVAL,
      :                      NEWVAL, STATUS )
 
 *          increment valid deglitch counter by one
@@ -218,7 +218,7 @@
 
 *    come here if there is an error on opening the requested file -
 *    return an error status and free the unit number
-999   CALL FIO_REP( LUN, FILENAME, STAT, ' ', STATUS )     
+999   CALL FIO_REP( LUN, FILENAME, STAT, ' ', STATUS )
       CALL FIO_PUNIT( LUN, STATUS )
 
       RETURN

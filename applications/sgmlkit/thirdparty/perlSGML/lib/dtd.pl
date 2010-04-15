@@ -14,12 +14,12 @@
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation; either version 2 of the License, or
 ##  (at your option) any later version.
-## 
+##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##  GNU General Public License for more details.
-##  
+##
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program; if not, write to the Free Software
 ##  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -147,7 +147,7 @@ $USEMAP		= "USEMAP";
 ## SGML key character variables ##
 ##------------------------------##
 ## NOTE: Some variables have '\' characters because those variables are
-##	 normally used in a Perl regular expression.  The variables 
+##	 normally used in a Perl regular expression.  The variables
 ##	 with the '_' appended to the end, are the non-escaped version
 ##	 of the variable.
 ##
@@ -370,7 +370,7 @@ $PrTreeEntry	  = "pr_tree_entry";
 ##
 ##	    You need the "dtd'" to qualify the variables since they were
 ##	    defined in package dtd (unless in package dtd).
-##    
+##
 ##  NOTE: The routine DTDget_elem_attr can be used to easily retrieve
 ##	  the associative array of attributes for an element.
 ##
@@ -405,7 +405,7 @@ $PrTreeEntry	  = "pr_tree_entry";
 ##-------------------------##
 $DocType	= '';	# Document type name (if applicable)
 
-$extentcnt	= 0;	# Used to create unique filehandles 
+$extentcnt	= 0;	# Used to create unique filehandles
 
 $DidParents	= 0;	# Flag if parent elements has been computed
 %Parents 	= ();	# Possible parents of elements
@@ -433,7 +433,7 @@ $dirsep  = $ENV{'COMSPEC'} ? '\\' : '/';
 {
     local(@a) = (split(/$pathsep/o, $ENV{'P_SGML_PATH'}),
 		 split(/$pathsep/o, $ENV{'SGML_SEARCH_PATH'}));
-    @P_SGML_PATH = grep(/\S/, @a);	# Keep only non-whitespace components 
+    @P_SGML_PATH = grep(/\S/, @a);	# Keep only non-whitespace components
     push(@P_SGML_PATH, '.');
 }
 
@@ -1369,7 +1369,7 @@ sub do_element {
     } else {
 	$tagm = "- -";
     }
- 
+
     $elcont = &get_next_group(*line);	 # Get content
 
     if ($elcont ne $EMPTY) {		 # Get inclusion/exclusion groups
@@ -1846,7 +1846,7 @@ sub errMsg {
 sub notin_lit {
     local($str) = ($_[0]);
     local($q, $after);
- 
+
     while ($str =~ /([${lit}${lita}])/o) {
         $q = $1;
         $after = $';
@@ -2148,9 +2148,9 @@ sub print_elem {
 	    $indent .= " " x $padlen[$i-1];
 	}
 	if ($iselem) {
-	    $indent .= $elem ? " |_" : " | "; 
+	    $indent .= $elem ? " |_" : " | ";
 	} elsif ($elem ne "") {
-	    $indent .= " | "; 
+	    $indent .= " | ";
 	}
 	print $TREEFILE sprintf("%s",
 				&$PrTreeEntry($iselem, "$indent$elem\n"));

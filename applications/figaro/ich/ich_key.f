@@ -86,7 +86,7 @@ C     Look for first non-blank character (if any)
 C
       IPTR=ICH_VERIF(STRING,NST,' ')
       IF (IPTR.NE.0) THEN
-C     
+C
 C        There is something in the string, so get its length
 C
          NEXT=ICH_DELIM(STRING,IPTR,DELIMS)

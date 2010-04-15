@@ -4,7 +4,7 @@
 *     MAKESURFACE
 
 *  Purpose:
-*     Creates a two-dimensional NDF from the coefficients of a 
+*     Creates a two-dimensional NDF from the coefficients of a
 *     polynomial surface
 
 *  Language:
@@ -65,7 +65,7 @@
 *        are the upper bounds of the IN NDF.
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, a uniform variance array equated to the mean squared
-*        residual of the fit is created in the output NDF, provided the 
+*        residual of the fit is created in the output NDF, provided the
 *        SURFACEFIT structure  contains the RMS component.  [FALSE]
 *     XLIMIT( 2 ) = _DOUBLE (Read)
 *        Co-ordinates of the left then right edges of the x axis (if
@@ -78,7 +78,7 @@
 
 *  Examples:
 *     makesurface flatin flatout \
-*        This generates a two-dimensional image in the NDF called 
+*        This generates a two-dimensional image in the NDF called
 *        flatout using the surface fit stored in the two-dimensional NDF
 *        flatin.  The created image has the same data type, bounds, and
 *        co-ordinate limits as the data array of flatin.
@@ -93,22 +93,22 @@
 *        increasing pixel index), the output image will be correctly
 *        oriented.
 *     makesurface flatin flatout template title="Surface fit"
-*        This generates a two-dimensional image in the NDF called 
+*        This generates a two-dimensional image in the NDF called
 *        flatout using the surface fit stored in the two-dimensional NDF
-*        flatin.  The created image inherits the attributes of the NDF 
+*        flatin.  The created image inherits the attributes of the NDF
 *        called template.  The title of flatout is "Surface fit".
 
 *  Notes:
 *     -  The polynomial surface fit is stored in SURFACEFIT extension,
-*     component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.  
+*     component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.
 *     This extension is created by FITSURFACE.  Also read from the
 *     SURFACEFIT extension is the co-ordinate system (component COSYS),
 *     and the fit RMS (component RMS).
 *     -  When LIKE=!, COSYS="Data" or "Axis" and the original NDF had an
-*     axis that decreased with increasing pixel index, you may want to 
-*     flip the co-ordinate limits (via parameters XLIMIT or YLIMIT) to 
-*     match the original sense of the axis, otherwise the created 
-*     surface will be flipped with respect to the image from which it 
+*     axis that decreased with increasing pixel index, you may want to
+*     flip the co-ordinate limits (via parameters XLIMIT or YLIMIT) to
+*     match the original sense of the axis, otherwise the created
+*     surface will be flipped with respect to the image from which it
 *     was fitted.
 
 *  Related Applications:
@@ -116,9 +116,9 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an 
+*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an
 *     NDF data structure and propagates all extensions.  However,
-*     neither QUALITY nor a SURFACEFIT extension is propagated when 
+*     neither QUALITY nor a SURFACEFIT extension is propagated when
 *     LIKE is not null.
 *     -  All non-complex numeric data types can be handled.  Processing
 *     is performed in single- or double-precision floating point, as
@@ -127,7 +127,7 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997-1998, 2004 Central Laboratory of the
-*     Research Councils. 
+*     Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
@@ -185,14 +185,14 @@
 *     2007 July 6 (MJC):
 *        Added support and restructured for BSPLINE variant.
 *     2008 January 3 (MJC):
-*        Denormalise the fit variances before evaluation. 
+*        Denormalise the fit variances before evaluation.
 *     2008 January 5 (MJC):
-*        Write a constant variance array using the SURFACEFIT.RMS 
+*        Write a constant variance array using the SURFACEFIT.RMS
 *        component when parameter VARIANCE is TRUE.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
 *     2009 December 19 (MJC):
-*        Instead of a fixed work array use a dynamic workspace whose 
+*        Instead of a fixed work array use a dynamic workspace whose
 *        type depends on the fit type.
 *     {enter_further_changes_here}
 
@@ -256,7 +256,7 @@
       CHARACTER * ( DAT__SZTYP ) FTYPE ! Type of FIT structure
       INTEGER I                  ! Loop counter
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Implementation data type
-      CHARACTER * ( DAT__SZTYP ) INTYPE ! Data type of NDF containing 
+      CHARACTER * ( DAT__SZTYP ) INTYPE ! Data type of NDF containing
                                  ! coefficients
       CHARACTER * ( 40 ) LABEL   ! Data label of NDF
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
@@ -492,7 +492,7 @@
 *  Map the axis arrays of the new NDF for read access.
             CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 1 ), ATYPE, 'READ',
      :                     XPTR, EL, STATUS )
-            CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 2 ), ATYPE, 'READ', 
+            CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 2 ), ATYPE, 'READ',
      :                     YPTR, EL, STATUS )
 
 *  Determine the bounds of the axes of the template NDF.
@@ -503,7 +503,7 @@
      :                          YMAX, STATUS )
 
             ELSE
-               CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ), DXMIN, 
+               CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ), DXMIN,
      :                          DXMAX, STATUS )
                CALL KPG1_AXBND( YDIM, %VAL( CNF_PVAL( YPTR ) ), DYMIN,
      :                          DYMAX, STATUS )
@@ -524,15 +524,15 @@
                   CALL KPG1_SSAZR( XDIM, 1.0D0,
      :                             DBLE( LBND( 1 ) ) - 0.5D0,
      :                             %VAL( CNF_PVAL( XPTR ) ), STATUS )
-                  CALL KPG1_SSAZR( YDIM, 1.0D0, 
+                  CALL KPG1_SSAZR( YDIM, 1.0D0,
      :                             DBLE( LBND( 2 ) ) - 0.5D0,
      :                             %VAL( CNF_PVAL( YPTR ) ), STATUS )
-     
+
                ELSE
-                  CALL KPG1_SSAZD( XDIM, 1.0D0, 
+                  CALL KPG1_SSAZD( XDIM, 1.0D0,
      :                             DBLE( LBND( 1 ) ) - 0.5D0,
      :                             %VAL( CNF_PVAL( XPTR ) ), STATUS )
-                  CALL KPG1_SSAZD( YDIM, 1.0D0, 
+                  CALL KPG1_SSAZD( YDIM, 1.0D0,
      :                             DBLE( LBND( 2 ) ) - 0.5D0,
      :                             %VAL( CNF_PVAL( YPTR ) ), STATUS )
                END IF
@@ -545,7 +545,7 @@
      :                             %VAL( CNF_PVAL( XPTR ) ),  STATUS )
                   CALL KPG1_SSAZR( YDIM, 1.0D0, DBLE( LBND( 2 ) ),
      :                             %VAL( CNF_PVAL( YPTR ) ), STATUS )
-     
+
                ELSE
                   CALL KPG1_SSAZD( XDIM, 1.0D0, DBLE( LBND( 1 ) ),
      :                             %VAL( CNF_PVAL( XPTR ) ),  STATUS )
@@ -634,7 +634,7 @@
          END IF
 
 *  Propagate the x-axis label of the input NDF, if there is one
-*  present, to the output NDF.  Note that NDF_ACPUT does not truncate 
+*  present, to the output NDF.  Note that NDF_ACPUT does not truncate
 *  trailing blanks.
          CALL NDF_ASTAT( NDFI, 'LABEL', SDIM( 1 ), STATE, STATUS )
          IF ( STATE ) THEN
@@ -676,9 +676,9 @@
 
 *  Obtain the required co-ordinate range for this polynomial, using the
 *  full range of the polynomial as a default, or for a spline the
-*  defaults cover the extreme knots that are just exterior to the 
-*  original array's bounds.  If this is not accurate enough the SPLINE 
-*  variant would need modification to record the limits. The NDF will be 
+*  defaults cover the extreme knots that are just exterior to the
+*  original array's bounds.  If this is not accurate enough the SPLINE
+*  variant would need modification to record the limits. The NDF will be
 *  filled with bad values outside the range of the polynomial.
          XLIMIT( 1 ) = PXMIN
          XLIMIT( 2 ) = PXMAX
@@ -706,22 +706,22 @@
 *  are double precision not the generic type.
          IF ( ATYPE .EQ. '_REAL' ) THEN
             IF ( XDIM .EQ. 1 )  THEN
-               CALL KPG1_SSAZR( XDIM, 0.0D0, DXMIN, 
+               CALL KPG1_SSAZR( XDIM, 0.0D0, DXMIN,
      :                          %VAL( CNF_PVAL( XPTR ) ), STATUS )
             ELSE
-               CALL KPG1_SSAZR( XDIM, 
-     :                          ( DXMAX - DXMIN ) / DBLE( XDIM - 1 ), 
+               CALL KPG1_SSAZR( XDIM,
+     :                          ( DXMAX - DXMIN ) / DBLE( XDIM - 1 ),
      :                          DXMIN, %VAL( CNF_PVAL( XPTR ) ),
      :                          STATUS )
             END IF
 
             IF ( YDIM .EQ. 1 )  THEN
-               CALL KPG1_SSAZR( YDIM, 0.0D0, DYMIN, 
+               CALL KPG1_SSAZR( YDIM, 0.0D0, DYMIN,
      :                          %VAL( CNF_PVAL( YPTR ) ), STATUS )
             ELSE
-               CALL KPG1_SSAZR( YDIM, 
-     :                          ( DYMAX - DYMIN ) / DBLE( YDIM - 1 ), 
-     :                          DYMIN, %VAL( CNF_PVAL( YPTR ) ), 
+               CALL KPG1_SSAZR( YDIM,
+     :                          ( DYMAX - DYMIN ) / DBLE( YDIM - 1 ),
+     :                          DYMIN, %VAL( CNF_PVAL( YPTR ) ),
      :                          STATUS )
             END IF
 
@@ -734,21 +734,21 @@
 
         ELSE
             IF ( XDIM .EQ. 1 )  THEN
-               CALL KPG1_SSAZD( XDIM, 0.0D0, DXMIN, 
+               CALL KPG1_SSAZD( XDIM, 0.0D0, DXMIN,
      :                          %VAL( CNF_PVAL( XPTR ) ), STATUS )
             ELSE
-               CALL KPG1_SSAZD( XDIM, 
-     :                          ( DXMAX - DXMIN ) / DBLE( XDIM - 1 ), 
+               CALL KPG1_SSAZD( XDIM,
+     :                          ( DXMAX - DXMIN ) / DBLE( XDIM - 1 ),
      :                          DXMIN, %VAL( CNF_PVAL( XPTR ) ),
      :                          STATUS )
             END IF
 
             IF ( YDIM .EQ. 1 )  THEN
-               CALL KPG1_SSAZD( YDIM, 0.0D0, DYMIN, 
+               CALL KPG1_SSAZD( YDIM, 0.0D0, DYMIN,
      :                          %VAL( CNF_PVAL( YPTR ) ), STATUS )
             ELSE
-               CALL KPG1_SSAZD( YDIM, 
-     :                          ( DYMAX - DYMIN ) / DBLE( YDIM - 1 ), 
+               CALL KPG1_SSAZD( YDIM,
+     :                          ( DYMAX - DYMIN ) / DBLE( YDIM - 1 ),
      :                          DYMIN, %VAL( CNF_PVAL( YPTR ) ),
      :                          STATUS )
             END IF
@@ -821,7 +821,7 @@
       CALL PSX_CALLOC( XDIM, ATYPE, WPTR, STATUS )
 
 *  Check everything has worked so far.  (This test guards against
-*  KPS1_MSPAx and KPS1_MSSAx being called with junk for the mapped 
+*  KPS1_MSPAx and KPS1_MSSAx being called with junk for the mapped
 *  data pointers).
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -834,14 +834,14 @@
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_MSPAR( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
      :                       PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
-     :                       PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
+     :                       PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF,
      :                       CHCOEF, %VAL( CNF_PVAL( WPTR ) ),
      :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_MSPAD( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
      :                       PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
-     :                       PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
+     :                       PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF,
      :                       CHCOEF, %VAL( CNF_PVAL( WPTR ) ),
      :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
          END IF
@@ -857,7 +857,7 @@
             CALL KPS1_MSSAR( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
      :                       XMIN, XMAX, %VAL( CNF_PVAL( YPTR ) ),
      :                       YMIN, YMAX, NXKNOT, NYKNOT, XKNOT,
-     :                       YKNOT, SCALE, NCOEF, COEFF, 
+     :                       YKNOT, SCALE, NCOEF, COEFF,
      :                       %VAL( CNF_PVAL( WPTR ) ),
      :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
 
@@ -865,7 +865,7 @@
             CALL KPS1_MSSAD( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
      :                       XMIN, XMAX, %VAL( CNF_PVAL( YPTR ) ),
      :                       YMIN, YMAX, NXKNOT, NYKNOT, XKNOT,
-     :                       YKNOT, SCALE, NCOEF, COEFF, 
+     :                       YKNOT, SCALE, NCOEF, COEFF,
      :                       %VAL( CNF_PVAL( WPTR ) ),
      :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
          END IF
@@ -875,11 +875,11 @@
 *  ===================================
          IF ( CREVAR ) THEN
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_FILLR( RMS * RMS, EL, 
+               CALL KPG1_FILLR( RMS * RMS, EL,
      :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_FILLD( DBLE( RMS * RMS ), EL, 
+               CALL KPG1_FILLD( DBLE( RMS * RMS ), EL,
      :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
             END IF
          END IF
@@ -892,7 +892,7 @@
       END IF
 
   999 CONTINUE
-  
+
       CALL DAT_VALID( XLOC, VALID, STATUS )
       IF ( VALID ) CALL DAT_ANNUL( XLOC, STATUS )
 

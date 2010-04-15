@@ -38,7 +38,7 @@
 *     YCEN = INTEGER (Given)
 *        Y pixel index of the centre of the PSF.
 *     OUT( C1_NPX, C1_NLN ) = REAL (Returned)
-*        The Hermitian FFT of the PSF. 
+*        The Hermitian FFT of the PSF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -82,7 +82,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -115,18 +115,18 @@
       REAL     FACTOR            ! Normalisation factor
       INTEGER  LIN		 ! Line counter
       INTEGER  OLIN              ! Line counter in output frame
-      INTEGER  OLINHI            ! Highest value of OLIN (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OLINHI            ! Highest value of OLIN (before wrap
+				 ! around) which can be stored in the
 				 ! output image
-      INTEGER  OLINLO            ! Lowest value of OLIN (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OLINLO            ! Lowest value of OLIN (before wrap
+				 ! around) which can be stored in the
 				 ! output image
       INTEGER  OPIX              ! Pixel counter in output frame
-      INTEGER  OPIXHI            ! Highest value of OPIX (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OPIXHI            ! Highest value of OPIX (before wrap
+				 ! around) which can be stored in the
 				 ! output image
-      INTEGER  OPIXLO            ! Lowest value of OPIX (before wrap 
-				 ! around) which can be stored in the 
+      INTEGER  OPIXLO            ! Lowest value of OPIX (before wrap
+				 ! around) which can be stored in the
 				 ! output image
       INTEGER  PIX               ! Pixel counter
       REAL     PSFVAL            ! Current PSF value
@@ -138,7 +138,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the whole output image to zero.
-      DO LIN = 1, C1_NLN 
+      DO LIN = 1, C1_NLN
          DO PIX = 1, C1_NPX
             OUT( PIX, LIN ) = 0.0
          END DO
@@ -162,7 +162,7 @@
 *  Loop through all the lines of the input PSF.
       DO LIN = 1, NLIN
 
-*  Calculate the line number in the output image at which this input 
+*  Calculate the line number in the output image at which this input
 *  line is stored.  The resulting value may be negative.
          OLIN = LIN - YCEN +1
 
@@ -170,7 +170,7 @@
 *  the area of the output image.
          IF ( OLIN .GE. OLINLO .AND. OLIN .LE. OLINHI ) THEN
 
-*  If the line number is negative wrap it round to the other side of 
+*  If the line number is negative wrap it round to the other side of
 *  the output image.
             IF ( OLIN .LE. 0 ) OLIN = OLIN + C1_NLN
 
@@ -182,9 +182,9 @@
 
                   IF ( OPIX .LE. 0 ) OPIX = OPIX + C1_NPX
 
-*  Copy the input PSF value to the correct place in the output image, 
+*  Copy the input PSF value to the correct place in the output image,
 *  and increment the total data sum.
-                  PSFVAL = PSF( PIX, LIN )            
+                  PSFVAL = PSF( PIX, LIN )
                   OUT( OPIX, OLIN ) = PSFVAL
                   SUM = SUM + PSFVAL
 
@@ -199,11 +199,11 @@
 *  If the PSF had zero data sum, abort.
       IF ( SUM .EQ. 0.0 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS1_MEMFP_ERR1', 'PSF has zero data sum.', 
+         CALL ERR_REP( 'KPS1_MEMFP_ERR1', 'PSF has zero data sum.',
      :                  STATUS )
          GO TO 999
       END IF
-      
+
 *  Normalize the PSF to have a total data sum equal to the square root
 *  of the number of pixels in the image.  This ensures that the
 *  zero-frequency pixel will have value 1.0 when the FFT is taken.

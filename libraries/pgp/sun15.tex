@@ -24,7 +24,7 @@
 \newcommand{\stardocversion}   {v5.1.1/v5.2.0}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {PGPLOT is the \emph{de facto} standard plotting
-library in Astronomy.  Starlink supports both the original `Native' version and the GKS-based `Starlink' version.  This document describes their use on 
+library in Astronomy.  Starlink supports both the original `Native' version and the GKS-based `Starlink' version.  This document describes their use on
 Starlink systems.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ Starlink systems.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -237,12 +237,12 @@ Starlink systems.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -293,7 +293,7 @@ The package exists in two versions: the original or `Native' version
 which uses the low level graphics package GRPCKG which was also
 written at Caltech, and a version developed by Starlink, in
 collaboration with Dr Pearson, which uses GKS.  The two versions have
-identical subroutine interfaces and in most cases, applications can be 
+identical subroutine interfaces and in most cases, applications can be
 moved from one version to the other simply by re-linking.
 
 Starlink supports both the `Native' version and the `Starlink' version
@@ -331,7 +331,7 @@ user note used instead:
 \section{\xlabel{native-pgplot}Native-PGPLOT}
 \label{native-pgplot}
 
-Readers interested in the Starlink-PGPLOT version should refer to 
+Readers interested in the Starlink-PGPLOT version should refer to
 section~\latexhtml{\ref{starlink-pgplot}} %%
 {\htmlref{\emph{Starlink-PGPLOT}}{starlink-pgplot}}.
 
@@ -354,19 +354,19 @@ Native-PGPLOT device names are described in the PGPLOT manual.  The
 Native-PGPLOT device names are not the same as those used for other
 Starlink graphics and it does not support the Starlink device name system.
 However, substantially the same graphics device types are available
-(Xwindows, Postscript).  
+(Xwindows, Postscript).
 
 It should be noted that the two PGPLOT systems have different Xwindows
 device drivers which do not interact -- hence a program using
-Starlink-PGPLOT and drawing to the `\texttt{xwindows}' device will not draw 
-in the same display window as a Native-PGPLOT program drawing to the 
+Starlink-PGPLOT and drawing to the `\texttt{xwindows}' device will not draw
+in the same display window as a Native-PGPLOT program drawing to the
 `\texttt{/XWIN}' device.
 
 \subsection{\xlabel{native_pgplot_examples}Native-PGPLOT examples}
 \label{native_pgplot_examples}
 
 \begin{quote}
-\emph{ On non-Starlink systems you may have to replace \texttt{/star} by 
+\emph{ On non-Starlink systems you may have to replace \texttt{/star} by
 some other path name to locate the files referred to in this section.}
 \end{quote}
 
@@ -378,13 +378,13 @@ They can be run with a command such as:
 \texttt{/star/bin/examples/pgplot/pgdemo{\emph{n}}}
 \end{quote}
 
-where \texttt{\emph{n}} is between 1 and 17, provided that they have 
+where \texttt{\emph{n}} is between 1 and 17, provided that they have
 been installed.  (They may not have been in order to save disk space).
 
 \section{\xlabel{starlink-pgplot}Starlink-PGPLOT}
 \label{starlink-pgplot}
 
-Readers interested in the Native-PGPLOT version should refer to 
+Readers interested in the Native-PGPLOT version should refer to
 section~\latexhtml{\ref{native-pgplot}} %%
 {\htmlref{\emph{Native-PGPLOT}}{native-pgplot}}.
 
@@ -392,7 +392,7 @@ section~\latexhtml{\ref{native-pgplot}} %%
 \label{using_the_gks_version}
 
 There are two ways in which the GKS version of PGPLOT can be used:
-     
+
 \begin{enumerate}
 
 \item As a self contained graphics package where \emph{all} graphics, including
@@ -406,10 +406,10 @@ are linked with the command:
 
 \item To plot a picture in the current viewport of an already open GKS
 workstation (see \latexhtml{section~\ref{plotting_in_the_current_viewport}} %%
-{\htmlref{Plotting in the current viewport}{plotting_in_the_current_viewport}}). 
+{\htmlref{Plotting in the current viewport}{plotting_in_the_current_viewport}}).
 \end{enumerate}
 
-To use PGPLOT in an ADAM application, consult the 
+To use PGPLOT in an ADAM application, consult the
 \xref{\emph{ADAM Graphics Programmer's Guide}}{sun113}{} (SUN/113).
 
 \subsection{\xlabel{starlink-pgplot_device_names}Starlink-PGPLOT device names}
@@ -447,7 +447,7 @@ specified using a GNS workstation name.
 \label{starlink-pgplot_examples}
 
 \begin{quote}
-\emph{ On non-Starlink systems you may have to replace \texttt{/star} by 
+\emph{ On non-Starlink systems you may have to replace \texttt{/star} by
 some other path name to locate the files referred to in this section.}
 \end{quote}
 
@@ -482,7 +482,7 @@ but the state of GKS is restored to what it was at the time that
 
 PGPLOT assumes that it has exclusive control over the GKS and so the only
 graphics calls allowed between \texttt{PGBEG} and \texttt{PGEND} are PGPLOT
-routines and GKS inquiry routines. 
+routines and GKS inquiry routines.
 
 The following simple example is a subroutine that uses PGPLOT to draw an X, Y
 plot in an SGS zone.
@@ -494,8 +494,8 @@ plot in an SGS zone.
       *   XYPLOT   Draw X,Y plot in an SGS zone.
       *
       *   Description:
-      *                                                                      
-      *      Uses PGPLOT to draw an X,Y plot of the real arrays X & Y in the 
+      *
+      *      Uses PGPLOT to draw an X,Y plot of the real arrays X & Y in the
       *      region of the display surface defined be the specified SGS zone.
       *
       *   Input arguments:
@@ -552,7 +552,7 @@ plot in an SGS zone.
                END IF
             END IF
             END
-\end{verbatim}                                                         
+\end{verbatim}
 \end{small}
 
 Because other plotting packages may have plotted on the same physical device,
@@ -574,12 +574,12 @@ display surface is empty.
 \section{\xlabel{other_differences}Other Differences}
 \label{other_differences}
 
-In general the two versions produce nearly identical results when run on 
+In general the two versions produce nearly identical results when run on
 the same device but the following differences should be noted:
 
 \begin{itemize}
-\item The GKS version of \xref{\texttt{PGPAGE}}{sun15}{PGPAGE} cannot be 
-used to make the display surface larger than the default size provided by 
+\item The GKS version of \xref{\texttt{PGPAGE}}{sun15}{PGPAGE} cannot be
+used to make the display surface larger than the default size provided by
 \xref{\texttt{PGBEG}}{sun15}{PGBEG}.
 \item The GKS version of \texttt{PGBEG} clears the display surface immediately
 instead of waiting until the first vector is plotted.

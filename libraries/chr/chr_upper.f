@@ -22,20 +22,20 @@
 
 *  Returned Value:
 *     CHR_UPPER = CHARACTER * 1
-*        Uppercase equivalent of the given character, if the given 
-*        character is a lowercase letter; otherwise the character is 
+*        Uppercase equivalent of the given character, if the given
+*        character is a lowercase letter; otherwise the character is
 *        returned unchanged.
 
 *  Algorithm:
-*     This algorithm will only work for character sets which have a 
-*     constant offset between upper and lowercase and is therefore 
+*     This algorithm will only work for character sets which have a
+*     constant offset between upper and lowercase and is therefore
 *     dependent upon the Fortran 77 implementation.
 *
 *     Get the integer code of the given character.
 *     If the given character is not a lowercase letter then
 *        Set the returned value to the given character.
 *     Else
-*        The returned value is set to its uppercase equivalent, 
+*        The returned value is set to its uppercase equivalent,
 *        assuming a constant offset between upper and lowercase.
 *     Endif
 
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     29-JUN-1984 (ASOC5):
 *        Original version.
 *     25-JAN-1990 (DLT):
-*        Use ICHAR instead of integer parameters because of DECstation 
+*        Use ICHAR instead of integer parameters because of DECstation
 *        compiler bugs.
 *     6-FEB-1991 (PCTR):
 *        Use the LLT and LGT intrinsic functions to determine case.

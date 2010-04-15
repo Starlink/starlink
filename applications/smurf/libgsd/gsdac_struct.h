@@ -4,7 +4,7 @@
  *     gsdac_struct.h
 
  *  Purpose:
- *     structure definitions for gsd2acsis 
+ *     structure definitions for gsd2acsis
 
  *  Language:
  *     Starlink ANSI C
@@ -14,7 +14,7 @@
 
  *  Description:
  *     Structures used by the gsd2acsis library.
- 
+
 
  *  Authors:
  *     J. Balfour (j.balfour@jach.hawaii.edu)
@@ -76,7 +76,7 @@
 typedef enum {DAS_NONE, DAS_TP, DAS_CONT_CAL, DAS_CROSS_CORR} dasFlag;
 
 /* Enumerated type for DAS file type */
-enum {COORD_AZ = 1, COORD_EQ = 3, COORD_RD = 4, 
+enum {COORD_AZ = 1, COORD_EQ = 3, COORD_RD = 4,
       COORD_RB = 6, COORD_RJ = 7, COORD_GA = 8};
 
 /* Enumerated type for GSD headers and arrays (data types). */
@@ -102,7 +102,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
                                  limited main beam */
   int *BEChans;               /* number of BE chans for each section */
   int BEConfig;               /* backend configuration */
-  int *BEConnChans;           /* number of IF output channels connected 
+  int *BEConnChans;           /* number of IF output channels connected
                                  to each BE input channel */
   int *BEInputChans;          /* number of BE input chans for each section */
   double *BEInputFreqs;       /* BE input frequencies (GHz) */
@@ -117,12 +117,12 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   int cellCode;               /* code for cell coordinate frame */
   char cellCoords[MAXSTRING]; /* cell coordinate frame */
   char cellUnit[MAXSTRING];   /* units of cell and mapping */
-  double cellV2X;             /* scanning angle from local vertical to 
+  double cellV2X;             /* scanning angle from local vertical to
                                  x axis measured CW (degrees) */
-  double cellV2Y;             /* position angle of cell y axis 
+  double cellV2Y;             /* position angle of cell y axis
                                  (degrees CCW) */
   double cellX;               /* width of cells (arcsec) */
-  double cellX2Y;             /* angle between cell y and x axis 
+  double cellX2Y;             /* angle between cell y and x axis
                                  (degrees CCW) */
   double cellY;               /* height of cells (arcsec) */
   double centreAz;            /* Az of centre at obs date (degrees) */
@@ -183,7 +183,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   double errEl;               /* El offset at start (arcsec) */
   double etafss;              /* forward spillover and scattering
                                  efficiency */
-  double etal;                /* rear spillover and scattering 
+  double etal;                /* rear spillover and scattering
                                  efficiency */
   double *FEFreqs;            /* observing frequencies */
   double *FELOFreqs;          /* FE LO frequencies */
@@ -199,7 +199,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   float *hotPower;            /* total power measurement on hot load */
   int IFONCycle;              /* ?? */
   int IFONIntCycle;           /* ?? */
-  int IFONPhase;              /* number of phases for interferometry 
+  int IFONPhase;              /* number of phases for interferometry
                                  observing */
   int IFPerSection;           /* number of IF inputs per section */
   int *intTimes;              /* integration times. */
@@ -222,7 +222,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   int nMapPts;                /* number of map points */
   int nMapPtsX;               /* number of map points in X direction */
   int nMapPtsY;               /* number of map points in Y direction */
-  int noCyclePts;             /* total number of xy positions 
+  int noCyclePts;             /* total number of xy positions
                                  observed during a cycle */
   int noCycles;               /* Maximum number of cycles in scan */
   double nObs;                /* observation number */
@@ -230,7 +230,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   int nPhases;                /* number of phases per cycle */
   int nPhaseVars;             /* number of phase table variables */
   int nScan;                  /* number of scans done */
-  int nScanPts;               /* maximum number of map points done in 
+  int nScanPts;               /* maximum number of map points done in
                                  a phase */
   int nScanVars1;             /* number of scan table 1 variables */
   int nScanVars2;             /* number of scan table 2 variables */
@@ -266,15 +266,15 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   double RXJLengthX;          /* X length of projected baseline (metres) */
   double RXJLengthY;          /* Y length of projected baseline (metres) */
   double RXJLengthZ;          /* Z length of projected baseline (metres) */
-  double RXJConstant;         /* coefficient of constant term in expression 
+  double RXJConstant;         /* coefficient of constant term in expression
                                  for fringe rate */
-  double RXJCos;              /* coefficient of cos term in expression 
+  double RXJCos;              /* coefficient of cos term in expression
                                  for fringe rate */
   int RXJCSOSwitch;           /* delay setting of RXJ micro for CSO side */
   int RXJJCMTSwitch;          /* delay setting of RXJ micro for JCMT side */
-  int RXJNSecs;               /* number of the tick on which integration 
+  int RXJNSecs;               /* number of the tick on which integration
                                  started */
-  double RXJSin;              /* coefficient of sin term in expression 
+  double RXJSin;              /* coefficient of sin term in expression
                                  for fringe rate */
   float *samples;             /* samples to store for cross_correlation mode */
   float *sbGainNorms;         /* normalizes signal sideband gain */
@@ -286,7 +286,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   char scanRev;               /* scan reversal flag */
   int scanTime;               /* total time of scan (seconds) */
   float *scanTable1;          /* array of data from scan table 1 */
-  float *scanTable2;          /* array of data from scan table 2 */  
+  float *scanTable2;          /* array of data from scan table 2 */
   char *scanVars1;            /* array of column names for table 1 */
   char *scanVars2;            /* array of column names for table 2 */
   float seeing;               /* seeing at JCMT */
@@ -302,7 +302,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   float smuEWScale;           /* SMU EW chop scale (arcsec/enc) */
   int smuNSEnc;               /* SMU NS encoder value (encoder) */
   float smuNSScale;           /* SMU NS chop scale (arcsec/enc) */
-  float smuOffsEW;            /* SMU offset parallel to lower axis 
+  float smuOffsEW;            /* SMU offset parallel to lower axis
                                  (arcsec) */
   float smuOffsNS;            /* SMU offset parallel to upper axis
                                  (arcsec) */
@@ -343,7 +343,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
 } gsdVars;
 
 typedef struct gsdac_gsdWCS_struct  /* pointing and time */
-{  
+{
   double airmass;            /* airmass */
   double acAz;               /* actual telescope Az */
   double acEl;               /* actual telescope El */
@@ -362,9 +362,9 @@ typedef struct gsdac_gsdWCS_struct  /* pointing and time */
 typedef struct gsdac_mapVars_struct  /* map/chop/scan parameters */
 {
   char chopCrd[SZFITSCARD];   /* chopper coordinate system */
-  char loclCrd[SZFITSCARD];   /* local offset coordinate system for 
+  char loclCrd[SZFITSCARD];   /* local offset coordinate system for
                                  map_x / map_y */
-  float mapHght;              /* requested height of rectangle to be mapped 
+  float mapHght;              /* requested height of rectangle to be mapped
                                  (arcsec) */
   float mapPA;                /* requested PA of map vertical, +ve towards
                                  +ve long */
@@ -373,24 +373,24 @@ typedef struct gsdac_mapVars_struct  /* map/chop/scan parameters */
   char scanCrd[SZFITSCARD];   /* coordinate system of scan */
   float scanDy;               /* scan spacing perpendicular to scan
                                  (arcsec) */
-  float scanPA;               /* Scan PA rel. to lat. line; 0=lat, 
+  float scanPA;               /* Scan PA rel. to lat. line; 0=lat,
                                  90=long in scanCrd system */
   char scanPat[SZFITSCARD];   /* name of scanning scheme */
   float scanVel;              /* scan velocity (arcsec/sec) */
-  char skyRefX[SZFITSCARD];   /* X co-ord of reference position (arcsec) */  
-  char skyRefY[SZFITSCARD];   /* Y co-ord of reference position (arcsec) */  
+  char skyRefX[SZFITSCARD];   /* X co-ord of reference position (arcsec) */
+  char skyRefY[SZFITSCARD];   /* Y co-ord of reference position (arcsec) */
   char swMode[SZFITSCARD];    /* switch mode */
 } mapVars;
 
 typedef struct gsdac_dateVars_struct  /* date and time data */
 {
-  char dateEnd[SZFITSCARD];   /* UTC datetime of end of observation 
+  char dateEnd[SZFITSCARD];   /* UTC datetime of end of observation
                                  in format YYYY-MM-DDTHH:MM:SS */
-  char dateObs[SZFITSCARD];   /* UTC datetime of start of observation 
+  char dateObs[SZFITSCARD];   /* UTC datetime of start of observation
                                  in format YYYY-MM-DDTHH:MM:SS */
-  char HSTend[SZFITSCARD];    /* HST at observation end in format 
+  char HSTend[SZFITSCARD];    /* HST at observation end in format
                                  YYYY-MM-DDTHH:MM:SS */
-  char HSTstart[SZFITSCARD];  /* HST at observation start in format 
+  char HSTstart[SZFITSCARD];  /* HST at observation start in format
                                  YYYY-MM-DDTHH:MM:SS */
   char LSTstart[SZFITSCARD];  /* LST at observation start in format
                                  YYYY-MM-DDTHH:MM:SS */

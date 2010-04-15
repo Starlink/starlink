@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL PAR1_MENU( CHOICE, OPTS, SEPAR, PENLIM, OPTION, NCHAR, 
+*     CALL PAR1_MENU( CHOICE, OPTS, SEPAR, PENLIM, OPTION, NCHAR,
 *                     PENALT, STATUS )
 
 *  Description:
@@ -82,12 +82,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -106,7 +106,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -202,11 +202,11 @@
 *  Initialise the column of the last delimiter, and the maximum penalty.
       CDELIM = 1 - SLEN
       MAXPEN = 100000000
-      
+
 *  Loop until the last value has been found or a match has been found.
   100 CONTINUE
 
-*  Search for the delimiter. 
+*  Search for the delimiter.
          SEPARC = INDEX( OPTS( CDELIM + SLEN : ), SEPAR( : SLEN ) )
 
 *  See whether or not this is the last item in the list.
@@ -286,7 +286,7 @@
       IF ( DUPLIC ) THEN
          CALL MSG_SETC( 'CHOICE', CHOICE )
          CALL MSG_SETC( 'OPTS', OPTS )
-         IF ( MAXPEN .GT. PENLIM ) THEN    
+         IF ( MAXPEN .GT. PENLIM ) THEN
             STATUS = PAR__ERROR
             CALL ERR_REP( 'PAR1_MENU_NOTFOUND',
      :        'The choice ^CHOICE is not in the menu.  The '/

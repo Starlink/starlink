@@ -492,7 +492,7 @@
 *  Write the integer array to the display memory.
 *  (Draw pixels, the whole array, world coordinates are display pixel
 *  numbers.)
-      CALL PGPIXL( %VAL(CNF_PVAL(PNTR(3))), SDIMS(1), SDIMS(2), 1, 
+      CALL PGPIXL( %VAL(CNF_PVAL(PNTR(3))), SDIMS(1), SDIMS(2), 1,
      :             SDIMS(1), 1, SDIMS(2), WINDOW(1), WINDOW(2),
      :             WINDOW(3), WINDOW(4) )
 

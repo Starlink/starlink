@@ -1,11 +1,11 @@
 *+  CRED4_DIVIDE_BY_STD:Divide a reduced group by a suitable standard
-      SUBROUTINE CRED4_DIVIDE_BY_STD( INPUT, OUTPUT, ASK, WAIT, DIVIDED, STATUS ) 
+      SUBROUTINE CRED4_DIVIDE_BY_STD( INPUT, OUTPUT, ASK, WAIT, DIVIDED, STATUS )
 *    Description :
 *     This routine instructs the RED4 task to divide the INPUT group
 *     by a suitable flux standard, to make the OUTPUT group.
 *    Invocation :
 *     CALL CRED4_DIVIDE_BY_STD( INPUT, OUTPUT, ASK, WAIT, DIVIDED,
-*     :  STATUS ) 
+*     :  STATUS )
 *    Parameters :
 *     INPUT     = CHARACTER*(*)( READ )
 *           The name of the reduced group to be divided by a suitable standard.
@@ -121,10 +121,10 @@
 *       so if it has failed don't worry beyond printing a warning.
          IF ( RED4_ACTIVE ) THEN
 
-            CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL, 
+            CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID, OUTVAL,
      :        STATUS)
 
-            RED4_ACTIVE = .FALSE. 
+            RED4_ACTIVE = .FALSE.
 
             IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                IF (STATUS .EQ. DTASK__ACTINFORM) THEN
@@ -183,7 +183,7 @@
          CALL TASK_OBEY( RED4_ALIAS, 'DIVIDE_BY_STD', INVAL(1:CPOS),
      :      OUTVAL, RED4_PATH, RED4_MESSID, STATUS)
 
-*      Check that the action started OK, 
+*      Check that the action started OK,
          IF (STATUS .NE. DTASK__ACTSTART) THEN
 
             ERR_STATUS = STATUS
@@ -204,7 +204,7 @@
                CALL TASK_DONE (-1, RED4_PATH, RED4_MESSID,
      :            OUTVAL, STATUS)
 
-               RED4_ACTIVE = .FALSE. 
+               RED4_ACTIVE = .FALSE.
 
                IF (STATUS .NE. DTASK__ACTCOMPLETE) THEN
                   IF (STATUS .EQ. DTASK__ACTINFORM) THEN

@@ -13,7 +13,7 @@
 #
 #  Description:
 #     This procedure starts the EXTREME system for use from the C shell by
-#     setting aliases for the commands it provides and setting up any 
+#     setting aliases for the commands it provides and setting up any
 #     environment variables.
 #
 #  Authors:

@@ -13,16 +13,16 @@ C  Description:
 C     GEN_POWEREQ raises each value of a real array to a specified power.
 C     This is an extension of the simpler routine GEN_POWER, modified to
 C     support data quality arrays, flagged data values, and error arrays.
-C     It checks for the three possible cases where:- 1) a quality array 
+C     It checks for the three possible cases where:- 1) a quality array
 C     exists, 2) flagged data values are used, and 3) there is no quality
-C     information supplied at all.  In all three cases, it checks whether 
+C     information supplied at all.  In all three cases, it checks whether
 C     error arrays exist, and if so, it calculates the error value for each
-C     new array element.  If a data element cannot be raised to the desired 
+C     new array element.  If a data element cannot be raised to the desired
 C     power (either because it is negative and the power is not an integer,
-C     or because the result would be too large or too small) it is set to 
+C     or because the result would be too large or too small) it is set to
 C     a default value (usually 0.0) or flagged. In these cases, the variance
 C     is set to the same value as the pixel value (so it's obvious that
-C     particular variance is bad). 
+C     particular variance is bad).
 C
 C  Language:
 C     FORTRAN
@@ -51,7 +51,7 @@ C  External subroutines / functions used:  GEN_SIMILAR
 C
 C  Support:  Keith Shortridge, AAO
 C
-C  Version Date: 8th Jan. 1991        
+C  Version Date: 8th Jan. 1991
 C-
 C  History:
 C     8th Jan  1991.  JMS/AAO. Original version, closely based on a routine
@@ -59,7 +59,7 @@ C                     by JM/RAL.
 C     24th Mar 1997.  JJL / Starlink, Southampton. Fixed a bug in the
 C                     error calculation and made it appropriate for
 C                     a variance rather than an uncertainty.
-C+        
+C+
 C
       IMPLICIT NONE
 C
@@ -82,7 +82,7 @@ C
       INTEGER FAILURES
       INTEGER I
 C
-C     Set maximum and minimum number sizes (arbitrarily, we choose to 
+C     Set maximum and minimum number sizes (arbitrarily, we choose to
 C     use the VAX floating point limits)
 C
       REAL FMAX,FMIN
@@ -99,7 +99,7 @@ C     be raised to the required power.
 C
       FAILURES = 0
 C
-      IF (POWER.GT.1.0) THEN 
+      IF (POWER.GT.1.0) THEN
          MAX=FMAX**(1.0/POWER)
       ELSE IF (POWER.LT.-1.0) THEN
          MAX=(1/FMIN)**(1/ABS(POWER))
@@ -116,7 +116,7 @@ C
       IF (.NOT.DECPOWER) THEN
          IF (AMOD(POWER,2.0).NE.0.0) THEN
             SIGN = -1.0
-         ELSE 
+         ELSE
             SIGN = 1.0
          END IF
       END IF
@@ -124,9 +124,9 @@ C
 C     If POWER=0.5 then use SQRT for efficiency. Determine if necessary.
 C
       SQROOT=(GEN_SIMILAR(POWER,0.5))
-C                  
+C
 C     Handle different quality methods separately.  In all cases, for
-C     good elements only, sum elements for data, sum squares of errors 
+C     good elements only, sum elements for data, sum squares of errors
 C     and finally take root of sum as final error.  If any pixels are
 C     bad, flag the final pixel - either using a flag value or the quality
 C     array.  If any pixels cannot be raised to the required power (-ve
@@ -170,13 +170,13 @@ C
                   ARRAY2(I)=SIGN*(ABS(VALUE)**POWER)
                ELSE
                   IF (SQROOT) THEN
-                     ARRAY2(I)=SQRT(VALUE) 
-                  ELSE 
+                     ARRAY2(I)=SQRT(VALUE)
+                  ELSE
                      ARRAY2(I)= VALUE**POWER
                   END IF
                END IF
                IF(ERRORS)THEN
-C        Don't have to sqare E1DATA as it is a variance. 
+C        Don't have to sqare E1DATA as it is a variance.
                   E2DATA(I)=E1DATA(I)*((ARRAY2(I)*POWER/VALUE)**2.0)
                ENDIF
                Q2DATA(I)=Q1DATA(I)
@@ -205,20 +205,20 @@ C
                   ARRAY1(I)=FBAD
                      IF (ERRORS) E2DATA(I)=FBAD
                END IF
-            ELSE 
+            ELSE
                IF (ARRAY1(I).NE.FBAD)THEN
                   VALUE=ARRAY1(I)
                   IF (VALUE.LT.0.0) THEN
                      ARRAY2(I)=SIGN*(ABS(VALUE)**POWER)
                   ELSE
                      IF (SQROOT) THEN
-                        ARRAY2(I)=SQRT(VALUE) 
-                     ELSE 
+                        ARRAY2(I)=SQRT(VALUE)
+                     ELSE
                         ARRAY2(I)= VALUE**POWER
                      END IF
                   END IF
                   IF (ERRORS) THEN
-C     Make sure that VALUE is not zero. This leads to a divide by 
+C     Make sure that VALUE is not zero. This leads to a divide by
 C     zero problem and a badly defined error propagation. If it
 C     is zero, flag the data as BAD.
                     IF (VALUE.EQ.0.0) THEN
@@ -258,15 +258,15 @@ C
                     ARRAY2(I)=SIGN*(ABS(VALUE)**POWER)
                  ELSE
                     IF (SQROOT) THEN
-                       ARRAY2(I)=SQRT(VALUE) 
-                    ELSE 
+                       ARRAY2(I)=SQRT(VALUE)
+                    ELSE
                        ARRAY2(I)= VALUE**POWER
                     END IF
                  END IF
              IF (ERRORS) THEN
-C     Make sure that VALUE is not zero. This leads to a divide by 
+C     Make sure that VALUE is not zero. This leads to a divide by
 C     zero problem and a badly defined error propagation. If it
-C     is zero, flag the data as BAD. 
+C     is zero, flag the data as BAD.
                     IF (VALUE.EQ.0.0) THEN
                        Q2DATA(I) = BAD
                        ARRAY2(I) = 0.0
@@ -280,5 +280,5 @@ C     is zero, flag the data as BAD.
          ENDDO
 
       END IF
-C      
+C
       END

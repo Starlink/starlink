@@ -109,7 +109,7 @@
             IF( STRING .EQ. 'YES' ) THEN
 
                CALL PGQINF( 'FILE', STRING, LENSTR )
-               IF( STRING .NE. ' ' ) THEN 
+               IF( STRING .NE. ' ' ) THEN
                   CALL MSG_BLANK( STATUS )
                   CALL MSG_SETC( 'F', STRING )
                   CALL MSG_OUT( ' ', 'All output will go to file ^F '//

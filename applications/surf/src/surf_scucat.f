@@ -8,13 +8,13 @@
 
 *  Language:
 *     Starlink Fortran 77
-      
+
 *  Type of Module:
 *     ADAM A-task
-      
+
 *  Invocation:
 *     CALL SURF_SCUCAT( STATUS )
-      
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *       The global status
@@ -23,7 +23,7 @@
 *     This routine reads in a list of user specified files and concatenates
 *     their data, variance and quality arrays so that KAPPA routines like
 *     STATS and KSTEST can analyse a complete set of photometry observations.
-*     If METHOD=SEPARATE (default) data for each individual bolometer is 
+*     If METHOD=SEPARATE (default) data for each individual bolometer is
 *     written to a different file.
 *     If a file contained data for H7 and H9 then two output files would
 *     be created (eg test_h7 and test_h9 - if the OUT parameter was set to
@@ -44,7 +44,7 @@
 *     IN = NDF (Read)
 *       The input dataset(s). This parameter is requested repeatedly
 *       until a NULL (!) value is given. The input dataset can either
-*       be output from SCUPHOT or an NDF file. The GRP system is 
+*       be output from SCUPHOT or an NDF file. The GRP system is
 *       used so that multiple files can be specified in response to
 *       this parameter (eg wildcards or comma-separated list) or read
 *       a text file (use the ^ character)
@@ -65,8 +65,8 @@
 
 *  Examples:
 *     scucat test phot
-*       This routine will copy the data from phot to test_<bol>, 
-*       reducing multiple bolometers to individual files. 
+*       This routine will copy the data from phot to test_<bol>,
+*       reducing multiple bolometers to individual files.
 *       If the input set contained data
 *       for bolometer H7 the output file will be test_h7.sdf.
 *       The program will then ask for another data set.
@@ -133,78 +133,78 @@
 *
 *     Revision 1.21  1997/09/04 19:40:53  timj
 *     Use SCULIB_GET_FILENAME
-*     
+*
 *     Revision 1.20  1997/06/27 23:16:39  timj
 *     Tweak the header.
-*     
+*
 *     Revision 1.19  1997/06/13 00:10:44  timj
 *     Use SURF_PAR and change name
-*     
+*
 *     Revision 1.18  1997/06/13 00:09:58  timj
 *     Now read NDFs as well.
 *     Close each file after writing instead of keeping NDF identifier.
 *     Have LOOP and BOLS parameters.
-*     
+*
 *     Revision 1.17  1997/06/11 01:08:55  timj
 *     Update documentation
-*     
+*
 *     Revision 1.16  1997/05/27 22:21:33  timj
 *     BOL_LIST now ' ' - Alpha does not like null strings
-*     
+*
 *     Revision 1.15  1997/05/22 21:01:45  timj
 *     Allow for 200 components in an input NDF.
 *     (Necessary when using the ALLBOLS parameter in SCUPHOT)
-*     
+*
 *     Revision 1.14  1997/04/30 03:01:46  timj
 *     Add MSG_OUTIF.
-*     
+*
 *     Revision 1.13  1997/03/31 21:18:29  timj
 *     Use PACKAGE and TSKNAME.
-*     
+*
 *     Revision 1.12  1997/01/17 00:32:36  timj
 *     Spell fixes to header.
-*     
+*
 c     Revision 1.11  1997/01/09  18:35:02  timj
 c     Write a new NDF for each bolometer found in input files.
-c     
+c
 c     Revision 1.10  1996/12/06  18:31:59  timj
 c     Now recognises multiple bolometers in file and writes out all bolometer
 c     data to concatenated data.
-c     
+c
 c     Revision 1.9  1996/11/02  01:42:34  timj
 c     Fix bug in Author/History header
-c     
+c
 c     Revision 1.8  1996/11/02  01:24:00  timj
 c     Change Name to SCUCAT (from REDS_SCUCAT)
-c     
+c
 c     Revision 1.7  1996/10/30  20:23:05  timj
 c     Add modern STARLINK header.
 c     Replace SCULIB_COPY? with VEC_
 c     Annul LOC after use.
-c     
+c
 c     Revision 1.6  1996/10/24  21:29:09  timj
 c     Fixed GLOBAL default problem (use DUMMY PARAMETER)
-c     
+c
 c     Revision 1.5  1996/10/19  00:07:04  timj
 c     Use GLOBAL.sdf and DAT_ASSOC, remove FILENAME(FILE)
-c     
+c
 c     Revision 1.4  1996/10/17  18:13:49  timj
 c     Open OUT after reporting information on first input file
-c     
+c
 c     Revision 1.3  1996/09/18  19:14:18  timj
 c     Change from CONCAT to SCUCAT
-c     
+c
 c     Revision 1.2  1996/09/18  02:16:51  timj
 c     Add bad bit mask
-c     
+c
 c     Revision 1.1  1996/09/18  02:02:07  timj
 c     Initial revision
-c     
+c
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
-      
+
 *-
 
 *     Type definitions:
@@ -304,9 +304,9 @@ c
 
 
 *     start up the NDF system and read in the input photometry data
-      
+
       CALL NDF_BEGIN
-      
+
       USE_OUT = .FALSE.
       READING = .TRUE.
       LOOPING = .TRUE.
@@ -340,7 +340,7 @@ c
 
 
 *     read the name of the file to be read
-         
+
 *     Read in the GLOBAL value first
          IF (.NOT.READPARAM) THEN
             CALL SCULIB_GET_FILENAME('DUMMY', FILENAME, STATUS)
@@ -363,7 +363,7 @@ c
 *     Create a new group
             CALL GRP_NEW('Input files', IGRP, STATUS )
 
-*     Read in the group members 
+*     Read in the group members
             CALL GRP_GROUP('IN', GRP__NOID, IGRP, NMEMBERS, ADDED,
      :           FLAG, STATUS)
 
@@ -375,7 +375,7 @@ c
                CALL ERR_ANNUL(STATUS)
                LOOPING = .FALSE.
                READING = .FALSE.
-               
+
             ELSE IF (STATUS .EQ. PAR__ABORT) THEN
 *     Just finish with bad status
                LOOPING = .FALSE.
@@ -383,7 +383,7 @@ c
 
             ELSE
 *     Loop through all group members
-               
+
                IF (STATUS .NE. SAI__OK) NMEMBERS = 0
 
 *     Loop over all members of group
@@ -403,24 +403,24 @@ c
 
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL DAT_NCOMP(LOC, NCOMP, STATUS)
-                     
+
                      DO I = 1, MIN(NCOMP, MAXCMP)
                         CALL DAT_INDEX(LOC, I, NLOC, STATUS)
-                        
+
                         CALL DAT_NAME(NLOC, NAME(I), STATUS)
 
                         ITEMP = CHR_LEN(NAME(I))
                         CALL CHR_FIND(NAME(I), '_PEAK', .FALSE., ITEMP)
 
 *     A photometry observation
-                        IF (ITEMP .GT. 0 .AND. 
+                        IF (ITEMP .GT. 0 .AND.
      :                       ITEMP .LT. CHR_LEN(NAME(I))) THEN
                            N_PHOT = N_PHOT + 1
                            BOL(N_PHOT) = NAME(I)(:ITEMP-1)
                            CALL CHR_LCASE(BOL(N_PHOT))
-                           
+
 *     Get an NDF identifier for the NDF
-                           CALL NDF_FIND(NLOC, ' ', IN_NDF(N_PHOT), 
+                           CALL NDF_FIND(NLOC, ' ', IN_NDF(N_PHOT),
      :                          STATUS)
                         END IF
 
@@ -443,10 +443,10 @@ c
 
                         IF (TYPE(:CHR_LEN(TYPE)) .EQ. 'NDF') THEN
                            N_PHOT = 1 ! Can only be one input bolometer
-                           
-                           CALL NDF_FIND(LOC, ' ', IN_NDF(N_PHOT), 
+
+                           CALL NDF_FIND(LOC, ' ', IN_NDF(N_PHOT),
      :                          STATUS)
-                           
+
                            IF (STATUS .EQ. SAI__OK) THEN
 
 *     Now I need to actually ask for the bolometer name
@@ -462,7 +462,7 @@ c
                                  BOL(N_PHOT) = 'UNKNOWN'
                               END IF
 
-                              IF (STATUS .EQ. PAR__ABORT) THEN 
+                              IF (STATUS .EQ. PAR__ABORT) THEN
 
                                  N_PHOT = 0
                                  LOOPING = .FALSE.
@@ -478,7 +478,7 @@ c
 *     Everything is okay so I set the LOOP
 
                                  LOOPING = LOOP
-                                 
+
                               END IF
 
                            ELSE
@@ -487,13 +487,13 @@ c
                               READING = .FALSE.
                               CALL MSG_SETC('TASK',TSKNAME)
                               CALL MSG_SETC('FILE',FILENAME)
-                              
+
                               CALL ERR_REP(' ', '^TASK: Error '//
      :                             'opening the NDF ^FILE', STATUS)
 
                               CALL ERR_FLUSH(STATUS)
                               FILE = FILE - 1
-                              
+
                            END IF
 
 *     If the locator wasn't associated with an NDF then just report
@@ -521,7 +521,7 @@ c
 
 *     End looping if LOOP is set (since we read a file okay)
                         LOOPING = LOOP
-                        
+
                      END IF
 
 *     Finish with LOC
@@ -533,7 +533,7 @@ c
                      STATUS = SAI__ERROR
                      CALL ERR_REP(' ', '^TASK: Failed to open file '//
      :                    '^FILE', STATUS)
-                     
+
                      CALL ERR_FLUSH(STATUS)
                      FILE = FILE - 1
                   END IF
@@ -542,13 +542,13 @@ c
 
 *     Have I found a photometry observation
                   IF (N_PHOT .GT. 0 .AND. STATUS .EQ. SAI__OK) THEN
-                     
+
 *     Sort the bolometer list
 
                      BOL_LIST = ' '
                      IPOSN = 0
                      DO I =  1, N_PHOT
-                        IF(IPOSN.GT.0) 
+                        IF(IPOSN.GT.0)
      :                       CALL CHR_APPND(', ',BOL_LIST,IPOSN)
                         CALL CHR_APPND(BOL(I),BOL_LIST, IPOSN)
                      END DO
@@ -576,14 +576,14 @@ c
                      END DO
 
                   ELSE
-                     
+
                      READING = .FALSE.
 
                   END IF
-                  
+
 *     END of If (status ok)
 *     END IF
-                  
+
                   IF (READING.AND. STATUS .EQ. SAI__OK) THEN
 
 *     Loop through all bolometers
@@ -591,9 +591,9 @@ c
 
 *     Map the input file
                         CALL NDF_SQMF(.FALSE., IN_NDF(NUM_NDF), STATUS)
-                        CALL NDF_MAP(IN_NDF(NUM_NDF), 'QUALITY', 
+                        CALL NDF_MAP(IN_NDF(NUM_NDF), 'QUALITY',
      :                       '_UBYTE','READ', IN_QUAL_PTR, EL, STATUS)
-                        CALL NDF_MAP(IN_NDF(NUM_NDF), 'Data,','_REAL', 
+                        CALL NDF_MAP(IN_NDF(NUM_NDF), 'Data,','_REAL',
      :                       'READ', IN_DATA_PTR, EL, STATUS)
                         CALL NDF_MAP(IN_NDF(NUM_NDF), 'Variance',
      :                       '_REAL', 'READ', IN_VAR_PTR, EL, STATUS)
@@ -603,13 +603,13 @@ c
                         IF (NUM_NDF .EQ. 1) THEN
 
 *     Name of source, label and units
-                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Title', 
+                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Title',
      :                          TITLE, STATUS)
-                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Units', 
+                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Units',
      :                          UNITS, STATUS)
-                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Label', 
+                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Label',
      :                          LABEL, STATUS)
-                           CALL NDF_ACGET(IN_NDF(NUM_NDF), 'Label', 
+                           CALL NDF_ACGET(IN_NDF(NUM_NDF), 'Label',
      :                          1,AXLABEL, STATUS)
 
 *     Number of integrations
@@ -618,7 +618,7 @@ c
                            CALL MSG_SETC('UNT', UNITS)
                            CALL MSG_SETC('LAB', AXLABEL)
                            CALL MSG_SETC('PKG', PACKAGE)
-                           
+
                            CALL MSG_OUTIF(MSG__NORM, ' ',
      :                          '^PKG: This is a PHOTOM '//
      :                          'observation of ^TITLE. There are '//
@@ -651,11 +651,11 @@ c
                            IPOSN = CHR_LEN(OUTROOT)
                            OUTFILE = OUTROOT
                            CALL CHR_APPND('_', OUTFILE, IPOSN)
-                           CALL CHR_APPND(BOLUSED(INDEX) ,OUTFILE, 
+                           CALL CHR_APPND(BOLUSED(INDEX) ,OUTFILE,
      :                          IPOSN)
 
                         ELSE IF (METHOD .EQ. 'CATALL') THEN
-                           
+
                            OUTFILE = OUTROOT
                            INDEX = 1  ! Always use same index
 
@@ -675,9 +675,9 @@ c
                            UBND(INDEX) = 2
 
 *     Make NDF
-                           CALL NDF_PLACE(DAT__ROOT, OUTFILE, OUTPLACE, 
+                           CALL NDF_PLACE(DAT__ROOT, OUTFILE, OUTPLACE,
      :                          STATUS)
-                           CALL NDF_NEW('_REAL', 1, LBND(INDEX), 
+                           CALL NDF_NEW('_REAL', 1, LBND(INDEX),
      :                          UBND(INDEX), OUTPLACE, OUT_NDF, STATUS)
                            UBND(INDEX) = 0
 
@@ -693,15 +693,15 @@ c
 *     These should be propagated from the first input
 *     image since the data may have been calibrated
 *     Do not want to check that units are consistent...
-                           CALL NDF_ACPUT(AXLABEL, OUT_NDF, 
+                           CALL NDF_ACPUT(AXLABEL, OUT_NDF,
      :                          'LABEL', 1, STATUS)
-                           CALL NDF_CPUT(UNITS, OUT_NDF, 'UNITS', 
+                           CALL NDF_CPUT(UNITS, OUT_NDF, 'UNITS',
      :                          STATUS)
-                           CALL NDF_CPUT(TITLE, OUT_NDF, 'Title', 
+                           CALL NDF_CPUT(TITLE, OUT_NDF, 'Title',
      :                          STATUS)
-                           CALL NDF_CPUT(LABEL, OUT_NDF, 'LAB', 
+                           CALL NDF_CPUT(LABEL, OUT_NDF, 'LAB',
      :                          STATUS)
-                           
+
 *     Set all bits to bad
                            BADBIT = VAL__BADUB
                            CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
@@ -714,7 +714,7 @@ c
 
 *     Change the bounds
                         UBND(INDEX) = UBND(INDEX) + EL
-                        CALL NDF_SBND(1, LBND(INDEX), UBND(INDEX), 
+                        CALL NDF_SBND(1, LBND(INDEX), UBND(INDEX),
      :                       OUT_NDF, STATUS)
 
 *     Get the new NDF section
@@ -736,21 +736,21 @@ c
 *     fill the section with integers. (Ive tried it by mapping SEC_NDF)
 *     but it works if I map the whole axis and overwrite it every time.
 *     Hopefully people wont notice this!!!
-                        CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_INTEGER', 
+                        CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_INTEGER',
      :                       MODE, OUT_APTR, ITEMP, STATUS)
 
 *     Copy the input data into the output data
-                        CALL VEC_RTOR(.FALSE., EL, 
+                        CALL VEC_RTOR(.FALSE., EL,
      :                                %VAL(CNF_PVAL(IN_DATA_PTR)),
-     :                       %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :                       %VAL(CNF_PVAL(OUT_DATA_PTR)),
      :                       IERR, NERR, STATUS)
-                        CALL VEC_RTOR(.FALSE., EL, 
+                        CALL VEC_RTOR(.FALSE., EL,
      :                                %VAL(CNF_PVAL(IN_VAR_PTR)),
-     :                       %VAL(CNF_PVAL(OUT_VAR_PTR)), 
+     :                       %VAL(CNF_PVAL(OUT_VAR_PTR)),
      :                       IERR, NERR, STATUS)
-                        CALL VEC_UBTOUB(.FALSE., EL, 
+                        CALL VEC_UBTOUB(.FALSE., EL,
      :                                  %VAL(CNF_PVAL(IN_QUAL_PTR)),
-     :                       %VAL(CNF_PVAL(OUT_QUAL_PTR)), 
+     :                       %VAL(CNF_PVAL(OUT_QUAL_PTR)),
      :                       IERR, NERR, STATUS)
 
 *     Copy the axis values (just integers)
@@ -777,9 +777,9 @@ c
                         CALL NDF_ANNUL(OUT_NDF, STATUS)
 
                      END DO
-                     
+
                   END IF
-                  
+
                END DO           ! End of GRP DO
 
 *     Close the GROUP
@@ -790,12 +790,12 @@ c
          END IF
 
 *     break out of loop if status has gone bad
-         
+
          IF (STATUS .NE. SAI__OK) THEN
             LOOPING = .FALSE.
             READING = .FALSE.
          END IF
-         
+
       END DO
 
 

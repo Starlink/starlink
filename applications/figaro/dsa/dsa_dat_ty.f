@@ -82,7 +82,7 @@ C
       INTEGER   LENGTH                      ! Object name length
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
 C
 C     Return immediately on bad status
 C
@@ -103,7 +103,7 @@ C
       END IF
 C
 C     Now get its type.
-C     
+C
       CALL DSA_ARRAY_TYPE (OBJ_NAME(:LENGTH),'main data array',
      :                                            TYPE,STRUCT,STATUS)
 C

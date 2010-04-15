@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -210,7 +210,7 @@
                   CALL EMS_SETC ( 'PARAM', PARNAMES(NAMECODE) )
                   CALL EMS_REP ( 'SUP_VALASS1',
      :            'SUBPAR_VALASS: Parameter ^PARAM - ' //
-     :            'object exceeds buffer size', 
+     :            'object exceeds buffer size',
      :             STATUS )
                ENDIF
             ELSE IF ( HDSTYPE(1:8) .EQ. '_INTEGER') THEN
@@ -245,31 +245,31 @@
                   DO J = 1, SIZE
                      CVALUE = CARRAY(J)
                      LENGTH = CHR_LEN( CVALUE )
-                     CALL SUBPAR_ENQUOTE( 
+                     CALL SUBPAR_ENQUOTE(
      :                CVALUE(1:LENGTH), CARRAY(J), LENGTH, STATUS )
                      IF( STATUS .NE. SAI__OK ) THEN
                         STATUS = SUBPAR__ERROR
                         CALL EMS_SETC ( 'PARAM', PARNAMES(NAMECODE) )
                         CALL EMS_REP ( 'SUP_VALASS1',
      :                  'SUBPAR_VALASS: Parameter ^PARAM - ' //
-     :                  'object exceeds buffer size', 
+     :                  'object exceeds buffer size',
      :                  STATUS )
                      ENDIF
                   ENDDO
                ELSE IF ( HDSTYPE(1:8) .EQ. '_INTEGER') THEN
-                  CALL DAT_GETI ( BOTLOC, ACTDIM, DIMS, IARRAY, 
+                  CALL DAT_GETI ( BOTLOC, ACTDIM, DIMS, IARRAY,
      :                            STATUS )
                   DO J = 1, SIZE
                      CALL CHR_ITOC ( IARRAY(J), CARRAY(J), NCHAR )
                   ENDDO
                ELSE IF ( HDSTYPE(1:5) .EQ. '_REAL') THEN
-                  CALL DAT_GETR ( BOTLOC, ACTDIM, DIMS, RARRAY, 
+                  CALL DAT_GETR ( BOTLOC, ACTDIM, DIMS, RARRAY,
      :                            STATUS )
                   DO J = 1, SIZE
                      CALL CHR_RTOC ( RARRAY(J), CARRAY(J), NCHAR )
                   ENDDO
                ELSE
-                  CALL DAT_GETD ( BOTLOC, ACTDIM, DIMS, DARRAY, 
+                  CALL DAT_GETD ( BOTLOC, ACTDIM, DIMS, DARRAY,
      :                            STATUS )
                   DO J = 1, SIZE
                      CALL CHR_DTOC ( DARRAY(J), CARRAY(J), NCHAR)

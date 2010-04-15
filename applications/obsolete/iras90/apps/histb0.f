@@ -50,7 +50,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,7 +124,7 @@
 
 *  Create the CURRENT_RECORD component, and assign the value 0 to it.
 *  NOTE, SGP/38 is not clear what is meant by a "current record". This
-*  routine assumes it means the index of the most recently completed 
+*  routine assumes it means the index of the most recently completed
 *  record.
       CALL DAT_NEW0I( HLOC, 'CURRENT_RECORD', STATUS )
       CALL CMP_PUT0I( HLOC, 'CURRENT_RECORD', 0, STATUS )

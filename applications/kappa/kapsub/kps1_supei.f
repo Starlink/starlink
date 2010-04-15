@@ -63,7 +63,7 @@
 *     CHCOEF( MCHOEF ) = DOUBLE PRECISION (Given)
 *        The Chebyshev polynomial coefficients, in the order increasing
 *        x power for each increasing y power.  Thus coefficient Aij in
-*        the standard convention is %CHCOEF(i*(%NYPAR)+j+1). The array 
+*        the standard convention is %CHCOEF(i*(%NYPAR)+j+1). The array
 *        may be rectangular, i.e. the highest x and y orders do not
 *        have to be the same.
 *     NCOEF = INTEGER (Given)
@@ -124,7 +124,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -194,7 +194,7 @@
       BX = REAL ( IDX )
       BY = REAL ( IDY )
       BXY = BX * BY
-      
+
 *  Initialise sums to form the rms error of the fit.
       SUMSQ = 0.0
       NPT = 0
@@ -203,7 +203,7 @@
 *  co-ordinates for each bin.
       DO JMIN = 1, DIM2, IDY
          JMAX = MIN( JMIN + IDY - 1, DIM2 )
- 
+
 *  Find the y co-ordinates of the top and bottom sides of the bin.
          Y( 1 ) = DBLE( JMIN ) - 0.5D0
          Y( 2 ) = DBLE( JMAX ) + 0.5D0
@@ -241,13 +241,13 @@
 
 *  Now scan all pixels in the bin, evaluating the bi-linear surface.
             DY = -0.5
- 
+
             DO J = JMIN, JMAX
                DY = DY + 1.0
                FA = ZA + ZC * DY
                FB = ZB + ZD * DY
                DX = -0.5
- 
+
                DO I = IMIN, IMAX
                   DX = DX + 1.0
                   FUN = FA + FB * DX
@@ -265,11 +265,11 @@
 *  End of the loops through the bins.
          END DO
       END DO
- 
+
 
 *  Calculate the rms error of the fit.
       IF ( NPT .GE. 1 ) THEN
-         RMS = SQRT( SUMSQ / REAL( NPT ) ) 
+         RMS = SQRT( SUMSQ / REAL( NPT ) )
       ELSE
          RMS = VAL__BADR
       END IF

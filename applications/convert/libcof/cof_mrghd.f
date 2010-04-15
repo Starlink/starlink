@@ -22,9 +22,9 @@
 *     unwanted primary cards, such as HISTORY and COMMENT will not have been
 *     saved.
 *
-*     A mask is maintained for the saved primary header keywords and the 
+*     A mask is maintained for the saved primary header keywords and the
 *     corresponding element set FALSE if a current header keyword overrides
-*     the  primary header.  Any primary header keywords which have not been 
+*     the  primary header.  Any primary header keywords which have not been
 *     overridden are then added to the new header.
 
 *  Arguments:
@@ -73,7 +73,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -146,14 +146,14 @@
          CALL COF_GKEYL( FUNITE, 'INHERIT', THERE, INHERIT, COMENT,
      :                   STATUS )
 
-         IF ( (STATUS .EQ. SAI__OK ) .AND. THERE .AND. INHERIT ) THEN      
+         IF ( (STATUS .EQ. SAI__OK ) .AND. THERE .AND. INHERIT ) THEN
 
 *  Get memory for the primary header mask.
             CALL PSX_CALLOC( NPHEAD, '_LOGICAL', PMASK, STATUS )
             CALL CON_CONSL( .TRUE., NPHEAD, %VAL( CNF_PVAL( PMASK ) ),
      :                      STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
-           
+
 *  Get a free unit number and open a  FITS file in memory.
                CALL FTGIOU( FUNITM, FSTAT )
                CALL FTINIT( FUNITM, 'mem://', 1, FSTAT )
@@ -188,31 +188,31 @@
                            CALL MSG_SETC( 'FILE', FILE( :NCF ) )
                            CALL COF_FIOER( FSTAT, 'COF_MRGHD_GHEAD',
      :                       'FTGREC', 'Error obtaining a FITS header '/
-     :                       /'(^IH of ^NH) from FITS file ^FILE.', 
+     :                       /'(^IH of ^NH) from FITS file ^FILE.',
      :                       STATUS )
                            GOTO 980
 
 *  Ignore extension-only keywords
                         ELSE
                            IF ( .NOT. ( ( HEADER(1:8) .EQ. 'XTENSION' )
-!     :                  .OR. ( HEADER(1:8) .EQ. 'EXTNAME' ) 
-!     :                  .OR. ( HEADER(1:8) .EQ. 'EXTVER' ) 
-!     :                  .OR. ( HEADER(1:8) .EQ. 'EXTLEVEL' ) 
-     :                  .OR. ( HEADER(1:8) .EQ. 'INHERIT' ) 
-     :                  .OR. ( HEADER(1:8) .EQ. 'CHECKSUM' ) 
-     :                  .OR. ( HEADER(1:8) .EQ. 'PCOUNT' ) 
+!     :                  .OR. ( HEADER(1:8) .EQ. 'EXTNAME' )
+!     :                  .OR. ( HEADER(1:8) .EQ. 'EXTVER' )
+!     :                  .OR. ( HEADER(1:8) .EQ. 'EXTLEVEL' )
+     :                  .OR. ( HEADER(1:8) .EQ. 'INHERIT' )
+     :                  .OR. ( HEADER(1:8) .EQ. 'CHECKSUM' )
+     :                  .OR. ( HEADER(1:8) .EQ. 'PCOUNT' )
      :                  .OR. ( HEADER(1:8) .EQ. 'GCOUNT' ) ) ) THEN
-                  
+
 *  Eliminate similar keywords from the primary header...
-                              IF ( HEADER .NE. ' ' ) THEN                 
-                                 CALL COF_CHKP( HEADER(1:8), 
+                              IF ( HEADER .NE. ' ' ) THEN
+                                 CALL COF_CHKP( HEADER(1:8),
      :                                          %VAL(CNF_PVAL(H0_PTR)),
-     :                                          NPHEAD, 
+     :                                          NPHEAD,
      :                                          %VAL(CNF_PVAL(PMASK)),
      :                                          STATUS )
                               END IF
 
-*  and write the header to the merged header.  Keep a count of the 
+*  and write the header to the merged header.  Keep a count of the
 *  number of cards written.
                               CARD = CARD + 1
                               CALL FTPREC( FUNITM, HEADER, FSTAT )
@@ -230,11 +230,11 @@
 
 *  Free the PMASK memory.
                      CALL PSX_FREE( PMASK )
-                     
+
 *  Add the END card.
                      HEADER = 'END'
                      CALL FTPREC( FUNITM, HEADER, FSTAT )
-                     
+
 
                   END IF  ! Got number of header cards OK
 
@@ -250,7 +250,7 @@
          END IF  ! Need to merge
 
       END IF  ! Primary saved
-        
+
 *  Restore the bad status when something went wrong with the FITSIO calls.
       IF ( FSTAT .GT. FITSOK ) STATUS = SAI__ERROR
 

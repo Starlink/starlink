@@ -15,12 +15,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -57,27 +57,27 @@ typedef struct fpair {
     struct fpair *next;
                      } Fpair;
 
-Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos, 
+Error SXSampleD( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                  double *indata[], int noutpos, float *outpos, double
-                 *outdata[], float *lbout, float *ubout, int nclose, 
-                 float maxrad, float *rscale, int nscale, float power, 
+                 *outdata[], float *lbout, float *ubout, int nclose,
+                 float maxrad, float *rscale, int nscale, float power,
                  float coexp, char type, int *outbad );
 
-Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos, 
+Error SXSampleF( int nfld, int ndim, int veclen[], int ninpos, float *inpos,
                  float *indata[], int noutpos, float *outpos, float
-                 *outdata[], float *lbout, float *ubout, int nclose, 
-                 float maxrad, float *rscale, int nscale, float power, 
+                 *outdata[], float *lbout, float *ubout, int nclose,
+                 float maxrad, float *rscale, int nscale, float power,
                  float coexp, char type, int *outbad );
 
-int *SXInitClose( int ndim, int npos, float *pos, float *lbnd, 
+int *SXInitClose( int ndim, int npos, float *pos, float *lbnd,
                   float *ubnd, float *lbndl, int *gdim, float *rdcell );
 
 Error SXFindClose( int ndim, int npos, float *pos, float *samp,
-                   int nclose, float rdcell, float *lbndl, int *gdim, 
+                   int nclose, float rdcell, float *lbndl, int *gdim,
                    int *work, int *posres, float *disres );
 
 Error SXFindRadius( int ndim, int npos, float *pos, float *samp,
-                    float maxrad, float rdcell, float *lbndl, int *gdim, 
+                    float maxrad, float rdcell, float *lbndl, int *gdim,
                     int *work, int *nres, int **posres, float **disres );
 
 void SXSort( int n, float *d, int *m );
@@ -88,33 +88,33 @@ int   *SXGet1i( char *name, Object in, int *n );
 
 float *SXPut1r( char *name, int n, Object *out );
 
-Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt, 
+Error  SXGet0rs( char *param, Object in, float hi, float lo, int nopt,
                  char *opt[], float *rval, int *sval );
 
-Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt, 
+Error  SXGet0is( char *param, Object in, int hi, int lo, int nopt,
                  char *opt[], int *ival, int *sval );
 
-Object SXMakeOut( Object in, Field template, int typecheck, int maxrank, 
+Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
                   int maxshape, char *dep );
 
-Error SXGetInvPos( Object field, int nel, int ndim, float *data, 
+Error SXGetInvPos( Object field, int nel, int ndim, float *data,
                    char *dep );
 
-Error SXSetInvPosD( Object field, int nel, int ndim, double *data, 
+Error SXSetInvPosD( Object field, int nel, int ndim, double *data,
                     char *dep );
 
-Error SXSetInvPosF( Object field, int nel, int veclen, float *data, 
+Error SXSetInvPosF( Object field, int nel, int veclen, float *data,
                     char *dep );
 
 float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
                   *ubnd, Object *grid );
 
-Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[], 
-              int nbin, float *outdata[], int *map, int *counts, 
+Error SXBinF( int nfld, int veclen[], int ninpos, float *indata[],
+              int nbin, float *outdata[], int *map, int *counts,
               char type, int *outbad );
 
-Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[], 
-              int nbin, double *outdata[], int *map, int *counts, 
+Error SXBinD( int nfld, int veclen[], int ninpos, double *indata[],
+              int nbin, double *outdata[], int *map, int *counts,
               char type, int *outbad );
 
 Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid );

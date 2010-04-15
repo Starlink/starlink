@@ -191,7 +191,7 @@ CD    PRINT *, '                 do depth = ', do_depth
 *  Error return
 
    99 CONTINUE
-      
+
       SCL_DO = .FALSE.
       RETURN
 

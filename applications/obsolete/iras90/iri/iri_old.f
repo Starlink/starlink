@@ -17,8 +17,8 @@
 *     This routine checks that the supplied NDF holds a valid IRAS
 *     image. If the NDF is not a legal IRAS image then an error is
 *     reported. The values of the mandatory IMAGE_INFO components
-*     BAND, INSTRUMENT and TYPE are returned, together with a locator 
-*     to the IMAGE_INFO structure. The value of the NDF component 
+*     BAND, INSTRUMENT and TYPE are returned, together with a locator
+*     to the IMAGE_INFO structure. The value of the NDF component
 *     UNITS is also returned.
 
 *  Arguments:
@@ -35,9 +35,9 @@
 *        in the range 1 - 4 for data from the survey array and 1 - 2
 *        for data from the CPC.
 *     TYPE = CHARACTER * ( * ) (Returned)
-*        The type of IRAS image; see ID/12 for a list of values. The 
-*        supplied variable should have a length equal to symbolic 
-*        constant IRI__SZTYP. If the variable is too short the returned 
+*        The type of IRAS image; see ID/12 for a list of values. The
+*        supplied variable should have a length equal to symbolic
+*        constant IRI__SZTYP. If the variable is too short the returned
 *        string will be truncated but no error will be reported.
 *     UNITS = CHARACTER * ( * ) (Returned)
 *        The value of the NDF UNITS component. The supplied variable
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check that the NDF is two dimensional.
-      CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )      
+      CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
       IF( STATUS .EQ. SAI__OK .AND. NDIM .NE. 2 ) THEN
          STATUS = IRI__NOT2D
          CALL MSG_SETI( 'ND', NDIM )
@@ -161,7 +161,7 @@
 
 *  Get a locator to the IMAGE_INFO structure.
       CALL DAT_FIND( XLOC, 'IMAGE_INFO', LOC, STATUS )
-      
+
 *  Annul the locator to the IRAS extension.
       CALL DAT_ANNUL( XLOC, STATUS )
 
@@ -206,10 +206,10 @@
      :                    STATUS )
          GO TO 999
       END IF
-      
+
 *  Get the value of IMAGE_INFO component TYPE, and check it is OK.
       CALL CMP_GET0C( LOC, 'TYPE', TYPE, STATUS )
-      IF( TYPE .NE. IRI__CPC .AND.      
+      IF( TYPE .NE. IRI__CPC .AND.
      :    TYPE .NE. IRI__SKYFL .AND.
      :    TYPE .NE. IRI__GALPL .AND.
      :    TYPE .NE. IRI__ALLSK .AND.
@@ -227,7 +227,7 @@
      :                 STATUS )
          GO TO 999
 
-      END IF      
+      END IF
 
 *  Initialise the flags used to indicate that IMAGE_INFO components
 *  have been found.
@@ -374,14 +374,14 @@
       IF( FPOUNI .AND. TYPE .NE. IRI__DSCO ) CALL CHR_APPND( 'POUNITS,',
      :                                                       LIST, IAT )
 
-      IF( FSKYFL .AND. TYPE .NE. IRI__SKYFL ) 
+      IF( FSKYFL .AND. TYPE .NE. IRI__SKYFL )
      :                          CALL CHR_APPND( 'SKYFLUX,', LIST, IAT )
 
-      IF( FSKYWE .AND. TYPE .NE. IRI__SKYFL ) 
+      IF( FSKYWE .AND. TYPE .NE. IRI__SKYFL )
      :                         CALL CHR_APPND( 'SKYWEIGHT,', LIST, IAT )
 
 
-      IF( FYORTY .AND. TYPE .NE. IRI__YORIC ) 
+      IF( FYORTY .AND. TYPE .NE. IRI__YORIC )
      :                           CALL CHR_APPND( 'YORTYPE,', LIST, IAT )
 
 
@@ -399,10 +399,10 @@
 *  If YORTYPE was found, check it has a good value.
       IF( FYORTY .AND. STATUS .EQ. SAI__OK ) THEN
          CALL CMP_GET0C( LOC, 'YORTYPE', YORTYP, STATUS )
-         IF( YORTYP .NE. IRI__YOIMG .AND. 
-     :       YORTYP .NE. IRI__YOPHN .AND. 
-     :       YORTYP .NE. IRI__YOCVG .AND. 
-     :       YORTYP .NE. IRI__YOCFV .AND. 
+         IF( YORTYP .NE. IRI__YOIMG .AND.
+     :       YORTYP .NE. IRI__YOPHN .AND.
+     :       YORTYP .NE. IRI__YOCVG .AND.
+     :       YORTYP .NE. IRI__YOCFV .AND.
      :       YORTYP .NE. IRI__YORES ) THEN
             STATUS = IRI__MISF
             CALL MSG_SETC( 'V', YORTYP )
@@ -415,7 +415,7 @@
 
 *  Check that the items FIELDLAT, FIELDLON and FIELDSCS occur together,
 *  or not at all.
-      IF( STATUS .EQ. SAI__OK .AND. ( FLAT .OR. FLON .OR. FSCS ) 
+      IF( STATUS .EQ. SAI__OK .AND. ( FLAT .OR. FLON .OR. FSCS )
      :   .AND..NOT. ( FLAT .AND. FLON .AND. FSCS ) ) THEN
 
          STATUS = IRI__MISF
@@ -426,9 +426,9 @@
 
       END IF
 
-*  Check that the items POUNITS and PONOISE occur together, or not at 
+*  Check that the items POUNITS and PONOISE occur together, or not at
 *  all.
-      IF( ( FPOUNI .XOR. FPONOI ) .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF( ( FPOUNI .XOR. FPONOI ) .AND. STATUS .EQ. SAI__OK ) THEN
 
          STATUS = IRI__MISF
          CALL ERR_REP( 'IRI_OLD_ERR10',
@@ -449,13 +449,13 @@
      :         'IRI_OLD: MAXSOP (^MX) is less than MINSOP (^MN)',
      :                 STATUS )
             GO TO 999
-      
+
          END IF
 
 *  Check that OBSNO is not present if MAXSOP and MINSOP indicate a
 *  range of SOPs.
-         IF( MAXSOP .NE. MINSOP .AND. FOBSNO .AND. 
-     :       STATUS .EQ. SAI__OK ) THEN            
+         IF( MAXSOP .NE. MINSOP .AND. FOBSNO .AND.
+     :       STATUS .EQ. SAI__OK ) THEN
 
             STATUS = IRI__BADOB
             CALL ERR_REP( 'IRI_OLD_ERR12',

@@ -16,7 +16,7 @@
 *     This routine applies in order default (CCDPACK-style), caller-
 *     specified (in the argument SETING), and environment-specified
 *     (from the parameter PARAM) style settings to an AST Plot object.
-*     It picks up the default settings from a file in the 
+*     It picks up the default settings from a file in the
 *     CCDPACK_DIR directory.
 
 *  Arguments:
@@ -26,9 +26,9 @@
 *     SETING = CHARACTER * ( * ) (Given)
 *        A string passed to AST_SET to apply settings.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter from which additional style 
-*        settings are to be taken.  This will be treated as a GRP 
-*        group, so the normal GRP facilities such as continuation lines 
+*        The name of an ADAM parameter from which additional style
+*        settings are to be taken.  This will be treated as a GRP
+*        group, so the normal GRP facilities such as continuation lines
 *        and file indirection are available.  If set to an empty
 *        string, no attempt will be made to interrogate the parameter
 *        system.
@@ -36,7 +36,7 @@
 *        The global status.
 
 *  Notes:
-*     This scheme follows, but is much simpler than, the one used in 
+*     This scheme follows, but is much simpler than, the one used in
 *     KAPPA.
 
 *  Copyright:
@@ -79,12 +79,12 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
-      
+
 *  Arguments Given:
       INTEGER PLOT
       CHARACTER * ( * ) SETING
       CHARACTER * ( * ) PARAM
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -102,7 +102,7 @@
       CHARACTER * ( 256 ) CCDDIR ! Value of CCDPACK_DIR environment variable
       CHARACTER * ( 256 ) DEFNAM ! Default style file location
       CHARACTER * ( GRP__SZNAM ) STYEL ! Style element string
-      
+
 *.
 
 *  Check inherited global status.
@@ -119,7 +119,7 @@
      :   STATUS )
          GO TO 99
       END IF
-      
+
 *  Read elements from the CCDPACK default file into a group.  An error
 *  here is not fatal.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -128,7 +128,7 @@
       DEFNAM = CCDDIR( :CHR_LEN( CCDDIR ) ) // '/ccdpack_style.def'
       NGRP = NGRP + 1
       CALL GRP_NEW( 'CCDPACK:STYLE', GID( NGRP ), STATUS )
-      CALL GRP_GRPEX( '^' // DEFNAM, GRP__NOID, GID( NGRP ), NEL, 
+      CALL GRP_GRPEX( '^' // DEFNAM, GRP__NOID, GID( NGRP ), NEL,
      :                NADD, FLAG, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -168,7 +168,7 @@
          DO J = 1, NEL
             CALL GRP_GET( GID( I ), J, 1, STYEL, STATUS )
             IF ( STYEL .NE. ' ' ) THEN
-               CALL AST_SET( PLOT, STYEL( 1 : CHR_LEN( STYEL ) ), 
+               CALL AST_SET( PLOT, STYEL( 1 : CHR_LEN( STYEL ) ),
      :                       STATUS )
             END IF
          END DO

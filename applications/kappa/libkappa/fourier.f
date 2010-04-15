@@ -332,7 +332,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -363,12 +363,12 @@
       INTEGER ACTPHA             ! The PHASEIN parameter state
       INTEGER ACTPOW             ! The POWERIN parameter state
       INTEGER ACTREA             ! The REALIN parameter state
-      LOGICAL AVFILL             ! Average in the array is the fill 
+      LOGICAL AVFILL             ! Average in the array is the fill
                                  ! value?
       CHARACTER * ( 20 ) CFILL   ! Fill value for invalid pixels and
                                  ! padding, but may contain special
                                  ! options
-      DOUBLE PRECISION DFILL     ! Fill value for invalid pixels and 
+      DOUBLE PRECISION DFILL     ! Fill value for invalid pixels and
                                  ! padding
       INTEGER DIM( NDIM )        ! Dimensions of output data array, i.e.
                                  ! input dimensions plus any padding
@@ -376,9 +376,9 @@
                                  ! estimates of the same Fourier
                                  ! component
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Final data type
-      INTEGER EL                 ! Total no. of pixels in output data 
+      INTEGER EL                 ! Total no. of pixels in output data
                                  ! arrays returned by mapping calls
-      REAL FILL                  ! Fill value for invalid pixels and 
+      REAL FILL                  ! Fill value for invalid pixels and
                                  ! padding
       INTEGER FTWKSZ             ! Size of work array needed for FFTs
       LOGICAL HERMI              ! Hermitian NDF given?
@@ -389,7 +389,7 @@
       LOGICAL IMAGI              ! Imaginary NDF given?
       LOGICAL IMAGO              ! Imaginary NDF created?
       LOGICAL INVERS             ! An inverse transformation required?
-      INTEGER INPNTS             ! Total no. of pixels in input data 
+      INTEGER INPNTS             ! Total no. of pixels in input data
                                  ! arrays
 *
                                  ! Pointer to:
@@ -448,7 +448,7 @@
                                  ! End of NDF indentifiers
 *
       INTEGER NN                 ! Number NDFs for which to match types
-      INTEGER NPNTS              ! Total no. of pixels in output data 
+      INTEGER NPNTS              ! Total no. of pixels in output data
                                  ! arrays
       LOGICAL PHASEI             ! Phase NDF given?
       LOGICAL PHASEO             ! Phase NDF created?
@@ -541,7 +541,7 @@
          CALL NDF_SECT( NDFRS, MDIM, LBNDR, UBNDR, NDFRSC, STATUS )
          CALL KPG1_SECSH( NDFRSC, SDIMR( NDIM ), STATUS )
 
-*  Must have a 2-d.  
+*  Must have a 2-d.
          IF ( STATUS .EQ. NDF__XSDIM ) THEN
             CALL NDF_MSG( 'NDF', NDFRS )
             CALL ERR_REP( 'FOURIER_BADDIM',
@@ -742,12 +742,12 @@
 *  implementation type.
                   IF ( AVFILL ) THEN
                      IF ( ITYPE .EQ. '_REAL' ) THEN
-                        CALL KPG1_MEANR( RDIM( 1 ) * RDIM( 2 ), 
-     :                                   %VAL( CNF_PVAL( IPIN ) ), 
+                        CALL KPG1_MEANR( RDIM( 1 ) * RDIM( 2 ),
+     :                                   %VAL( CNF_PVAL( IPIN ) ),
      :                                   FILL, STATUS )
                      ELSE
-                        CALL KPG1_MEAND( RDIM( 1 ) * RDIM( 2 ), 
-     :                                   %VAL( CNF_PVAL( IPIN ) ), 
+                        CALL KPG1_MEAND( RDIM( 1 ) * RDIM( 2 ),
+     :                                   %VAL( CNF_PVAL( IPIN ) ),
      :                                   DFILL, STATUS )
                      END IF
                   END IF
@@ -766,25 +766,25 @@
 *  ( INT( ( M+1 ) / 2 ), INT( ( N+1 ) / 2 ), where M is the number of
 *  columns, and N is the number of lines in the array.
                         CALL KPS1_FOPRR( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPIN ) ), 
+     :                                   %VAL( CNF_PVAL( IPIN ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), FILL, .FALSE.,
-     :                                   %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   STATUS )
 
                         CALL KPS1_FOQUR( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   RDIM( 1 ),
-     :                                   RDIM( 2 ), QUART, 
+     :                                   RDIM( 2 ), QUART,
      :                                   %VAL( CNF_PVAL( IP ) ),
      :                                   STATUS )
                      ELSE
 
                         CALL KPS1_FOPRR( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPIN ) ), 
+     :                                   %VAL( CNF_PVAL( IPIN ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), FILL, .FALSE.,
-     :                                   %VAL( CNF_PVAL( IP ) ), 
+     :                                   %VAL( CNF_PVAL( IP ) ),
      :                                   STATUS )
                      END IF
 
@@ -797,25 +797,25 @@
 *  ( INT( ( M+1 ) / 2 ), INT( ( N+1 ) / 2 ), where M is the number of
 *  columns, and N is the number of lines in the array.
                         CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPIN ) ), 
+     :                                   %VAL( CNF_PVAL( IPIN ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .FALSE.,
-     :                                   %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   STATUS )
 
                         CALL KPS1_FOQUD( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   RDIM( 1 ),
-     :                                   RDIM( 2 ), QUART, 
+     :                                   RDIM( 2 ), QUART,
      :                                   %VAL( CNF_PVAL( IP ) ),
      :                                   STATUS )
                      ELSE
 
                         CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPIN ) ), 
+     :                                   %VAL( CNF_PVAL( IPIN ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .FALSE.,
-     :                                   %VAL( CNF_PVAL( IP ) ), 
+     :                                   %VAL( CNF_PVAL( IP ) ),
      :                                   STATUS )
                      END IF
                   END IF
@@ -826,16 +826,16 @@
 *  Call the appropriate routine for the implementation type.
                   IF ( ITYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_FOFOR( DIM( 1 ), DIM( 2 ), UNTANG,
-     :                                %VAL( CNF_PVAL( IP ) ), 
+     :                                %VAL( CNF_PVAL( IP ) ),
      :                                %VAL( CNF_PVAL( IPW1 ) ),
-     :                                %VAL( CNF_PVAL( IPW3 ) ), 
+     :                                %VAL( CNF_PVAL( IPW3 ) ),
      :                                %VAL( CNF_PVAL( IPW2 ) ),
      :                                STATUS )
                   ELSE
                      CALL KPS1_FOFOD( DIM( 1 ), DIM( 2 ), UNTANG,
-     :                                %VAL( CNF_PVAL( IP ) ), 
+     :                                %VAL( CNF_PVAL( IP ) ),
      :                                %VAL( CNF_PVAL( IPW1 ) ),
-     :                                %VAL( CNF_PVAL( IPW3 ) ), 
+     :                                %VAL( CNF_PVAL( IPW3 ) ),
      :                                %VAL( CNF_PVAL( IPW2 ) ),
      :                                STATUS )
                   END IF
@@ -881,7 +881,7 @@
      :                              STATUS )
                      ELSE
                         CALL VEC_DTOD( .FALSE., NPNTS,
-     :                              %VAL( CNF_PVAL( IPW2 ) ), 
+     :                              %VAL( CNF_PVAL( IPW2 ) ),
      :                              %VAL( CNF_PVAL( IPRO ) ),
      :                              IERR, NERR,
      :                              STATUS )
@@ -899,14 +899,14 @@
 *  3rd: imaginary part of complex output.
                   IF ( IMAGO ) THEN
                      IF ( ITYPE .EQ. '_REAL' ) THEN
-                        CALL VEC_RTOR( .FALSE., NPNTS, 
-     :                              %VAL( CNF_PVAL( IPW1 ) ), 
+                        CALL VEC_RTOR( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPW1 ) ),
      :                              %VAL( CNF_PVAL( IPIO ) ),
      :                              IERR, NERR,
      :                              STATUS )
                      ELSE
                         CALL VEC_DTOD( .FALSE., NPNTS,
-     :                              %VAL( CNF_PVAL( IPW1 ) ), 
+     :                              %VAL( CNF_PVAL( IPW1 ) ),
      :                              %VAL( CNF_PVAL( IPIO ) ),
      :                              IERR, NERR,
      :                              STATUS )
@@ -926,12 +926,12 @@
 *  The power and phase must be calculated first.
                      IF ( ITYPE .EQ. '_REAL' ) THEN
                         CALL KPS1_FOPPR( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPW2 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW2 ) ),
      :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   STATUS )
                      ELSE
                         CALL KPS1_FOPPD( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPW2 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW2 ) ),
      :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   STATUS )
                      END IF
@@ -941,13 +941,13 @@
                         IF ( ITYPE .EQ. '_REAL' ) THEN
                            CALL VEC_RTOR( .FALSE., NPNTS,
      :                                 %VAL( CNF_PVAL( IPW2 ) ),
-     :                                 %VAL( CNF_PVAL( IPPO ) ), 
+     :                                 %VAL( CNF_PVAL( IPPO ) ),
      :                                 IERR, NERR,
      :                                 STATUS )
                         ELSE
                            CALL VEC_DTOD( .FALSE., NPNTS,
      :                                 %VAL( CNF_PVAL( IPW2 ) ),
-     :                                 %VAL( CNF_PVAL( IPPO ) ), 
+     :                                 %VAL( CNF_PVAL( IPPO ) ),
      :                                 IERR, NERR,
      :                                 STATUS )
                         END IF
@@ -965,13 +965,13 @@
                         IF ( ITYPE .EQ. '_REAL' ) THEN
                            CALL VEC_RTOR( .FALSE., NPNTS,
      :                                 %VAL( CNF_PVAL( IPW1 ) ),
-     :                                 %VAL( CNF_PVAL( IPZO ) ), 
+     :                                 %VAL( CNF_PVAL( IPZO ) ),
      :                                 IERR, NERR,
      :                                 STATUS )
                         ELSE
                            CALL VEC_DTOD( .FALSE., NPNTS,
      :                                 %VAL( CNF_PVAL( IPW1 ) ),
-     :                                 %VAL( CNF_PVAL( IPZO ) ), 
+     :                                 %VAL( CNF_PVAL( IPZO ) ),
      :                                 IERR, NERR,
      :                                 STATUS )
                         END IF
@@ -1018,7 +1018,7 @@
 
 *  Find which input NDFs are supplied.
 *  ===================================
-*  
+*
 *  Find which combination is specified on the command line.  We do not
 *  want to prompt unnecessarily.  The priority list is 1) HERMIN, 2)
 *  REALIN and/or IMAGIN, and 3) POWERIN and/or PHASEIN.
@@ -1078,7 +1078,7 @@
 *  we do not want to prompt for the `real' and `imaginary' NDFs.  If
 *  neither has, or either of the `real' and `imaginary' NDFs have been
 *  given on the command line, the real and imaginary take precedence.
-         RORI = .NOT. HERMI .AND. 
+         RORI = .NOT. HERMI .AND.
      :            ( ( ACTREA .EQ. PAR__ACTIVE .OR.
      :                ACTIMA .EQ. PAR__ACTIVE ) .OR. .NOT.
      :              ( ACTPOW .EQ. PAR__ACTIVE .OR.
@@ -1151,7 +1151,7 @@
 
 *  See whether the phase is specified on the command line.
          IF ( PORP .AND. ACTPHA .EQ. PAR__ACTIVE ) THEN
-      
+
 *  Next get the phase NDF.
             CALL LPG_ASSOC( 'PHASEIN', 'READ', NDFZI, STATUS )
 
@@ -1210,7 +1210,7 @@
             CALL NDF_SECT( NDFR, MDIM, LBNDR, UBNDR, NDFRC, STATUS )
             CALL KPG1_SECSH( NDFRC, SDIMR( NDIM ), STATUS )
 
-*  Must have a 2-d.  
+*  Must have a 2-d.
             IF ( STATUS .EQ. NDF__XSDIM ) THEN
                CALL NDF_MSG( 'NDF', NDFRS )
                CALL ERR_REP( 'FOURIER_BADDIM',
@@ -1248,7 +1248,7 @@
             CALL NDF_SECT( NDFI, LDIM, LBNDI, UBNDI, NDFIC, STATUS )
             CALL KPG1_SECSH( NDFIC, SDIMI( NDIM ), STATUS )
 
-*  Must have a 2-d.  
+*  Must have a 2-d.
             IF ( STATUS .EQ. NDF__XSDIM ) THEN
                CALL NDF_MSG( 'NDF', NDFRS )
                CALL ERR_REP( 'FOURIER_BADDIM',
@@ -1279,10 +1279,10 @@
      :           STATUS )
                GO TO 999
             END IF
-         END IF 
-      
+         END IF
+
          IF ( IMAGI .OR. PHASEI ) THEN
-      
+
 *  Copy the dimensions of the imaginary array to the reference
 *  dimension.
             RDIM( 1 ) = IDIM( 1 )
@@ -1292,7 +1292,7 @@
 
 *  Find and report the size of the output NDFs, and apply padding.
 *  ===============================================================
-*  
+*
 *  Calculate the size of output NDFs which can be processed by the FFT
 *  routine. (For FFTPACK, these return the input values as FFTPACK canb
 *  accept arbitrarily shaped arrays.)
@@ -1347,7 +1347,7 @@
 *  Do the padding by creating a superset.
             IF ( HERMI .OR. REALI .OR. POWERI )
      :         CALL NDF_SECT( NDFRC, MDIM, LBNDR, UBNDR, NDFS, STATUS )
-            
+
             IF ( IMAGI .OR. PHASEI )
      :        CALL NDF_SECT( NDFIC, LDIM, LBNDI, UBNDI, NDFSI, STATUS )
 
@@ -1433,17 +1433,17 @@
 *  If required, find the mean value of the input array and use it as
 *  the filling value.
                      IF ( AVFILL ) CALL KPG1_MEANR( INPNTS,
-     :                                              
+     :
      :   %VAL( CNF_PVAL( IPINH ) ),
      :                                              FILL, STATUS )
 
                      CALL KPS1_FOPRR( RDIM( 1 ), RDIM( 2 ),
-     :                                %VAL( CNF_PVAL( IPINH ) ), 
+     :                                %VAL( CNF_PVAL( IPINH ) ),
      :                                DIM( 1 ), DIM( 2 ),
-     :                                FILL, .FALSE., 
+     :                                FILL, .FALSE.,
      :                                %VAL( CNF_PVAL( IPH ) ),
      :                                STATUS )
-                  ELSE 
+                  ELSE
 
                      IF ( .NOT. PORP ) THEN
 
@@ -1451,36 +1451,36 @@
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEANR( INPNTS, 
-     :                                      %VAL( CNF_PVAL( IPINR ) ), 
+                           CALL KPG1_MEANR( INPNTS,
+     :                                      %VAL( CNF_PVAL( IPINR ) ),
      :                                      FILL,
      :                                      STATUS )
                         END IF
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRR( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINR ) ), 
+     :                                   %VAL( CNF_PVAL( IPINR ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), FILL, .NOT. REALI,
-     :                                   %VAL( CNF_PVAL( IPR ) ), 
+     :                                   %VAL( CNF_PVAL( IPR ) ),
      :                                   STATUS )
 
                         IF ( AVFILL .AND. IMAGI ) THEN
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEANR( INPNTS, 
-     :                                      %VAL( CNF_PVAL( IPINI ) ), 
+                           CALL KPG1_MEANR( INPNTS,
+     :                                      %VAL( CNF_PVAL( IPINI ) ),
      :                                      FILL,
      :                                      STATUS )
                         END IF
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRR( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINI ) ), 
+     :                                   %VAL( CNF_PVAL( IPINI ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), FILL, .NOT. IMAGI,
-     :                                   %VAL( CNF_PVAL( IPI ) ), 
+     :                                   %VAL( CNF_PVAL( IPI ) ),
      :                                   STATUS )
 
 *  If the power and phase inputs were given convert them to real and
@@ -1491,8 +1491,8 @@
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEANR( INPNTS, 
-     :                                      %VAL( CNF_PVAL( IPINR ) ), 
+                           CALL KPG1_MEANR( INPNTS,
+     :                                      %VAL( CNF_PVAL( IPINR ) ),
      :                                      FILL,
      :                                      STATUS )
 
@@ -1500,18 +1500,18 @@
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRR( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINR ) ), 
+     :                                   %VAL( CNF_PVAL( IPINR ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), FILL, .NOT. POWERI,
-     :                                   %VAL( CNF_PVAL( IPR ) ), 
+     :                                   %VAL( CNF_PVAL( IPR ) ),
      :                                   STATUS )
 
                         IF ( AVFILL .AND. PHASEI ) THEN
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEANR( INPNTS, 
-     :                                      %VAL( CNF_PVAL( IPINI ) ), 
+                           CALL KPG1_MEANR( INPNTS,
+     :                                      %VAL( CNF_PVAL( IPINI ) ),
      :                                      FILL,
      :                                      STATUS )
 
@@ -1519,25 +1519,25 @@
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRR( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINI ) ), 
+     :                                   %VAL( CNF_PVAL( IPINI ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), FILL, .NOT. PHASEI,
-     :                                   %VAL( CNF_PVAL( IPI ) ), 
+     :                                   %VAL( CNF_PVAL( IPI ) ),
      :                                   STATUS )
 
 *  Finally in this section, convert the phase and power arrays to real
 *  and imaginary.
                         CALL KPS1_FORIR( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPR ) ), 
+     :                                   %VAL( CNF_PVAL( IPR ) ),
      :                                   %VAL( CNF_PVAL( IPI ) ),
      :                                   STATUS )
 
                      END IF
 
 *  Produce an Hermitian array from the real and imaginary arrays.
-                     CALL KPS1_FOHER( DIM( 1 ), DIM( 2 ), 
+                     CALL KPS1_FOHER( DIM( 1 ), DIM( 2 ),
      :                                %VAL( CNF_PVAL( IPR ) ),
-     :                                %VAL( CNF_PVAL( IPI ) ), 
+     :                                %VAL( CNF_PVAL( IPI ) ),
      :                                %VAL( CNF_PVAL( IPH ) ),
      :                                MAXDEV, STATUS )
 
@@ -1563,17 +1563,17 @@
 *  If required, find the mean value of the input array and use it as
 *  the filling value.
                      IF ( AVFILL ) CALL KPG1_MEAND( INPNTS,
-     :                                              
+     :
      :   %VAL( CNF_PVAL( IPINH ) ),
      :                                              DFILL, STATUS )
 
                      CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
-     :                                %VAL( CNF_PVAL( IPINH ) ), 
+     :                                %VAL( CNF_PVAL( IPINH ) ),
      :                                DIM( 1 ), DIM( 2 ),
-     :                                DFILL, .FALSE., 
+     :                                DFILL, .FALSE.,
      :                                %VAL( CNF_PVAL( IPH ) ),
      :                                STATUS )
-                  ELSE 
+                  ELSE
 
                      IF ( .NOT. PORP ) THEN
 
@@ -1581,34 +1581,34 @@
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEAND( INPNTS, 
+                           CALL KPG1_MEAND( INPNTS,
      :                                      %VAL( CNF_PVAL( IPINR ) ),
      :                                      DFILL, STATUS )
                         END IF
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINR ) ), 
+     :                                   %VAL( CNF_PVAL( IPINR ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. REALI,
-     :                                   %VAL( CNF_PVAL( IPR ) ), 
+     :                                   %VAL( CNF_PVAL( IPR ) ),
      :                                   STATUS )
 
                         IF ( AVFILL .AND. IMAGI ) THEN
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEAND( INPNTS, 
+                           CALL KPG1_MEAND( INPNTS,
      :                                      %VAL( CNF_PVAL( IPINI ) ),
      :                                      DFILL, STATUS )
                         END IF
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINI ) ), 
+     :                                   %VAL( CNF_PVAL( IPINI ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. IMAGI,
-     :                                   %VAL( CNF_PVAL( IPI ) ), 
+     :                                   %VAL( CNF_PVAL( IPI ) ),
      :                                   STATUS )
 
 *  If the power and phase inputs were given convert them to real and
@@ -1619,7 +1619,7 @@
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEAND( INPNTS, 
+                           CALL KPG1_MEAND( INPNTS,
      :                                      %VAL( CNF_PVAL( IPINR ) ),
      :                                      DFILL, STATUS )
 
@@ -1627,17 +1627,17 @@
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINR ) ), 
+     :                                   %VAL( CNF_PVAL( IPINR ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. POWERI,
-     :                                   %VAL( CNF_PVAL( IPR ) ), 
+     :                                   %VAL( CNF_PVAL( IPR ) ),
      :                                   STATUS )
 
                         IF ( AVFILL .AND. PHASEI ) THEN
 
 *  Find the mean value of the input array and use it as the filling
 *  value.
-                           CALL KPG1_MEAND( INPNTS, 
+                           CALL KPG1_MEAND( INPNTS,
      :                                      %VAL( CNF_PVAL( IPINI ) ),
      :                                      DFILL, STATUS )
 
@@ -1645,25 +1645,25 @@
 
 *  Now do the filling and padding or set to zeros.
                         CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPINI ) ), 
+     :                                   %VAL( CNF_PVAL( IPINI ) ),
      :                                   DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. PHASEI,
-     :                                   %VAL( CNF_PVAL( IPI ) ), 
+     :                                   %VAL( CNF_PVAL( IPI ) ),
      :                                   STATUS )
 
 *  Finally in this section, convert the phase and power arrays to real
 *  and imaginary.
                         CALL KPS1_FORID( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPR ) ), 
+     :                                   %VAL( CNF_PVAL( IPR ) ),
      :                                   %VAL( CNF_PVAL( IPI ) ),
      :                                   STATUS )
 
                      END IF
 
 *  Produce an Hermitian array from the real and imaginary arrays.
-                     CALL KPS1_FOHED( DIM( 1 ), DIM( 2 ), 
+                     CALL KPS1_FOHED( DIM( 1 ), DIM( 2 ),
      :                                %VAL( CNF_PVAL( IPR ) ),
-     :                                %VAL( CNF_PVAL( IPI ) ), 
+     :                                %VAL( CNF_PVAL( IPI ) ),
      :                                %VAL( CNF_PVAL( IPH ) ),
      :                                DMXDEV, STATUS )
 
@@ -1693,14 +1693,14 @@
 
 *  Process using the appropriate data type.
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPS1_FORER( DIM( 1 ), DIM( 2 ), 
+                  CALL KPS1_FORER( DIM( 1 ), DIM( 2 ),
      :                             %VAL( CNF_PVAL( IPH ) ),
-     :                             %VAL( CNF_PVAL( IPW1 ) ), 
+     :                             %VAL( CNF_PVAL( IPW1 ) ),
      :                             %VAL( CNF_PVAL( IPW2 ) ), STATUS )
                ELSE
-                  CALL KPS1_FORED( DIM( 1 ), DIM( 2 ), 
+                  CALL KPS1_FORED( DIM( 1 ), DIM( 2 ),
      :                             %VAL( CNF_PVAL( IPH ) ),
-     :                             %VAL( CNF_PVAL( IPW1 ) ), 
+     :                             %VAL( CNF_PVAL( IPW1 ) ),
      :                             %VAL( CNF_PVAL( IPW2 ) ), STATUS )
                END IF
                IF ( STATUS .EQ. SAI__OK ) THEN
@@ -1735,15 +1735,15 @@
                      IF ( SQUAD ) THEN
 
                         CALL KPS1_FOQUR( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   RDIM( 1 ),
      :                                   RDIM( 2 ), -QUART,
-     :                                   %VAL( CNF_PVAL( IPH ) ), 
+     :                                   %VAL( CNF_PVAL( IPH ) ),
      :                                   STATUS )
 
 *  Copy the reconfigured array to the output data array.
                         CALL VEC_RTOR( .FALSE., NPNTS,
-     :                              %VAL( CNF_PVAL( IPH ) ), 
+     :                              %VAL( CNF_PVAL( IPH ) ),
      :                              %VAL( CNF_PVAL( IPO ) ),
      :                              IERR, NERR,
      :                              STATUS )
@@ -1751,7 +1751,7 @@
 
 *  Copy the work array to the output data array.
                         CALL VEC_RTOR( .FALSE., NPNTS,
-     :                              %VAL( CNF_PVAL( IPW1 ) ), 
+     :                              %VAL( CNF_PVAL( IPW1 ) ),
      :                              %VAL( CNF_PVAL( IPO ) ),
      :                              IERR, NERR,
      :                              STATUS )
@@ -1764,15 +1764,15 @@
                      IF ( SQUAD ) THEN
 
                         CALL KPS1_FOQUD( DIM( 1 ), DIM( 2 ),
-     :                                   %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                   %VAL( CNF_PVAL( IPW1 ) ),
      :                                   RDIM( 1 ),
      :                                   RDIM( 2 ), -QUART,
-     :                                   %VAL( CNF_PVAL( IPH ) ), 
+     :                                   %VAL( CNF_PVAL( IPH ) ),
      :                                   STATUS )
 
 *  Copy the reconfigured array to the output data array.
                         CALL VEC_DTOD( .FALSE., NPNTS,
-     :                              %VAL( CNF_PVAL( IPH ) ), 
+     :                              %VAL( CNF_PVAL( IPH ) ),
      :                              %VAL( CNF_PVAL( IPO ) ),
      :                              IERR, NERR,
      :                              STATUS )
@@ -1780,7 +1780,7 @@
 
 *  Copy the work array to the output data array.
                         CALL VEC_DTOD( .FALSE., NPNTS,
-     :                              %VAL( CNF_PVAL( IPW1 ) ), 
+     :                              %VAL( CNF_PVAL( IPW1 ) ),
      :                              %VAL( CNF_PVAL( IPO ) ),
      :                              IERR, NERR,
      :                              STATUS )

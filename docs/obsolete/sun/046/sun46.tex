@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -40,11 +40,11 @@ RUTHERFORD APPLETON LABORATORY\\
 \end{center}
 \vspace{5mm}
 
-\section{Introduction}                  
+\section{Introduction}
 
 NOD2 (Haslam, 1974) is a subroutine library for the general
 manipulation of radio single-dish observations. The package was
-developed at the Max Planck Institut f\"{u}r Radioastronomie, Bonn. The 
+developed at the Max Planck Institut f\"{u}r Radioastronomie, Bonn. The
 library also forms the basis of the data reduction
 package developed by NRAO, Tucson, for the 12-m telescope (Salter, 1985).
 A large part of this package, with some extensions, has been adopted for
@@ -54,8 +54,8 @@ Although the term `NOD2' should in principle be reserved to described
 the subroutine library, it is also commonly used to refer to the NRAO
 data reduction system. In this Note, the term NOD2 is used to refer to
 the implementation of the package released by Starlink for the reduction
-of JCMT data.                    
-                      
+of JCMT data.
+
 \section {Starting Up NOD2}
 
 The data reduction package consists of a set of stand-alone
@@ -65,7 +65,7 @@ type:
 \begin{verbatim}
     $ NOD2
 \end{verbatim}
-at DCL level. This will cause a command file to be run to set up the 
+at DCL level. This will cause a command file to be run to set up the
 DCL command table and the global symbols. NOD2 commands may then
 be freely interspersed with normal DCL commands. For most NOD2 commands
 it is sufficient to simply give the command name, and then answer the
@@ -84,11 +84,11 @@ despite this however, because it contains implementations of certain
 algorithms, essential to the reduction of mm-wave single dish observations,
 which are not available elsewhere. These include the `RESTOR' routine,
 which will reconstruct the equivalent single-beam map from data taken
-in beam-switched mode (Emersion {\it et al.}, 1979), and 
+in beam-switched mode (Emersion {\it et al.}, 1979), and
 `CONVERT', which will create an R.A.-dec
 map from Az-El data. The current method for reducing data from the JCMT
 is thus to use NOD2 for the immediate processing required to
-perform the `instrument-specific' part of the data reduction process, 
+perform the `instrument-specific' part of the data reduction process,
 and then to convert the resulting maps into another package (such as the
 IRCAM reduction package, or FIGARO) for subsequent analysis. It is
 hoped that in the long term, the capabilities of the NOD2 system will
@@ -131,5 +131,5 @@ Salter, C.J., 1985. `Continuum Mapping with the 12-M Telescope',
 NRAO, Tucson.
 
 \end{document}
-             
-                                                        
+
+

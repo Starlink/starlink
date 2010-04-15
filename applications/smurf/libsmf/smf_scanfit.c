@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_scanfit( smfData *data, unsigned char *quality, int order, 
+*     smf_scanfit( smfData *data, unsigned char *quality, int order,
 *                  int *status );
 
 *  Arguments:
@@ -22,7 +22,7 @@
 *        Will be created by this routine, or NULL on error.
 *     quality = unsigned char * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. 
+*        If NULL, use the QUALITY associated with data.
 *     order = int (Given)
 *        Order of polynomial to be fitted
 *     status = int* (Given and Returned)
@@ -151,14 +151,14 @@ void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
      makes no sense to carry out a fit to these data */
   if ( smf_history_check( data, "smf_subtract_poly", status) ||
        smf_history_check( data, "smf_subtract_plane", status) ) {
-    msgOutif(MSG__VERB," ", 
-	     "Data have been sky-subtracted already, will not perform fit", 
+    msgOutif(MSG__VERB," ",
+	     "Data have been sky-subtracted already, will not perform fit",
 	     status );
     return;
   }
 
   /* Get the dimensions */
-  smf_get_dims( data,  &nrows, &ncols, &nbol, &nframes, NULL, NULL, NULL, 
+  smf_get_dims( data,  &nrows, &ncols, &nbol, &nframes, NULL, NULL, NULL,
                 status);
 
   /* Return with error if order is greater than the number of data
@@ -169,7 +169,7 @@ void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
       msgSeti("NF",nframes);
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or "
-              "equal to number of points, ^NF. Unable to fit polynomial.", 
+              "equal to number of points, ^NF. Unable to fit polynomial.",
               status );
       return;
     }
@@ -191,7 +191,7 @@ void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
   if( data->file && (data->file->ndfid != NDF__NOID) && (*status == SAI__OK)) {
 
     /* Obtain the HDS locator for the SCU2RED extension */
-    ploc = smf_get_xloc( data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 0, 0, 
+    ploc = smf_get_xloc( data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 0, 0,
 			 status);
     if ( ploc == NULL ) {
       *status = SAI__ERROR;
@@ -206,17 +206,17 @@ void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
     ubnd[0] = nrows;
     ubnd[1] = ncols;
     ubnd[2] = ncoeff;
-    
+
     /* Open SCANFIT extension - note if SCANFIT exists, opening it with
        WRITE access will overwrite the current contents */
-    pndf = smf_get_ndfid( ploc, "SCANFIT", "WRITE", "UNKNOWN", "_DOUBLE", 3, 
+    pndf = smf_get_ndfid( ploc, "SCANFIT", "WRITE", "UNKNOWN", "_DOUBLE", 3,
 			  lbnd, ubnd, status );
 
     /* Check the returned NDF identifier */
     if ( pndf == NDF__NOID ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, 
-	     "Unable to obtain an NDF identifier for SCANFIT coefficients", 
+      errRep(FUNC_NAME,
+	     "Unable to obtain an NDF identifier for SCANFIT coefficients",
 	     status );
     } else {
       /* Map the pointer for polynomial coefficients */
@@ -235,7 +235,7 @@ void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
   /*    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
 	poly, status );*/
 
-  smf_fit_poly ( data, quality, order, poly, status );    
+  smf_fit_poly ( data, quality, order, poly, status );
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to carry out scanfit", status);
   }

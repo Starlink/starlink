@@ -53,7 +53,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -118,7 +118,7 @@
          GO TO 500
       END IF
 
-*  Make sure that the passed data object a) exists, b) is of the correct 
+*  Make sure that the passed data object a) exists, b) is of the correct
 *  type, c) is a structure, and d) is empty.
       CALL ERR_MARK
          STATUS=SAI__OK
@@ -177,11 +177,11 @@
       CALL ERR_RLSE
 
 *  Creating a hierarchial structure is really a recursive operation.
-*  We tackle this here by using stacks to hold our current position 
+*  We tackle this here by using stacks to hold our current position
 *  in the structure definition, the position of the last element
-*  of the structure we're building, and the name of the structure 
-*  being built.  Once we create an object, we check to see if it's a 
-*  structure, and if it is we push our three values and start on the 
+*  of the structure we're building, and the name of the structure
+*  being built.  Once we create an object, we check to see if it's a
+*  structure, and if it is we push our three values and start on the
 *  new structure.  I wish I could have written this in C.  (The name
 *  of the structure being built is saved just as a pointer to the
 *  end of the name, since the name just expands and contracts - eg
@@ -248,7 +248,7 @@
                   END IF
                END IF
 
-*           See if that element was a structure. 
+*           See if that element was a structure.
                CALL DTA_STRUC (NAME(:LENAME)//ELEMENT,STRUCT,
      :                                                     DTA_STATUS)
                IF (STRUCT) THEN

@@ -13,8 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated, 
-*                        smf_modeltype *modeltyps, dim_t nmodels, 
+*     smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
+*                        smf_modeltype *modeltyps, dim_t nmodels,
 *                        size_t available, size_t *necessary, int *status );
 
 *  Arguments:
@@ -106,8 +106,8 @@
 
 #define FUNC_NAME "smf_checkmem_dimm"
 
-void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated, 
-			smf_modeltype *modeltyps, dim_t nmodels, 
+void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
+			smf_modeltype *modeltyps, dim_t nmodels,
 			size_t available, size_t *necessary, int *status ) {
 
 
@@ -122,7 +122,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Check inputs */  
+  /* Check inputs */
 
   if( maxlen < 1 ) {
     *status = SAI__ERROR;
@@ -134,7 +134,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     msgSeti("NREL",nrelated);
     msgSeti("MAXREL",SMF__MXSMF);
     *status = SAI__ERROR;
-    errRep("", FUNC_NAME ": nrelated, ^NREL, must be in the range [1,^MAXREL]", 
+    errRep("", FUNC_NAME ": nrelated, ^NREL, must be in the range [1,^MAXREL]",
 	   status);
     return;
   }
@@ -142,7 +142,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   if( modeltyps ) {
     if( nmodels < 1 ) {
     *status = SAI__ERROR;
-    errRep("", FUNC_NAME ": modeltyps specified, mmodels cannot be < 1", 
+    errRep("", FUNC_NAME ": modeltyps specified, mmodels cannot be < 1",
            status);
     return;
     }
@@ -171,18 +171,18 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   }
 
   if( *status == SAI__OK ) {
-    
+
     nsamp = ndet*maxlen;
-    
+
     /* Calculate memory usage of static model components: */
 
     total = nsamp*smf_dtype_sz(SMF__DOUBLE,status);     /* RES */
     total += nsamp*smf_dtype_sz(SMF__DOUBLE,status);    /* AST */
     total += nsamp*smf_dtype_sz(SMF__INTEGER,status);   /* LUT */
     total += nsamp*smf_dtype_sz(SMF__UBYTE,status);     /* QUA */
-  
+
     total *= nrelated;  /* All of these get multiplies by # subarrays */
-  
+
   }
 
   if( *status == SAI__OK ) {
@@ -230,8 +230,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
       *status = SMF__NOMEM;
       msgSeti("REQ",total/SMF__MB);
       msgSeti("AVAIL",available/SMF__MB);
-      errRep("", FUNC_NAME 
-	     ": Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb", 
+      errRep("", FUNC_NAME
+	     ": Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb",
 	     status);
     }
 
@@ -241,5 +241,5 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     }
 
   }
-    
+
 }

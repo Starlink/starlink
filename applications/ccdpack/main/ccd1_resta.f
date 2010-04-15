@@ -97,7 +97,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,9 +147,9 @@
 *  'entropy' must be correct as this requires the most effort to
 *  reproduce). If an NDF has been flatfielded exclude it as well and
 *  make a report.
-      IF ( NNDF .GT. 1 ) THEN 
+      IF ( NNDF .GT. 1 ) THEN
          DO 1 I = 1, NNDF - 1
-            IF ( VALID( I ) .AND. ORIG( I ) .NE. ' ' ) THEN 
+            IF ( VALID( I ) .AND. ORIG( I ) .NE. ' ' ) THEN
 
 *  Set frame which is highest up processing chain.
                KEEP = I
@@ -162,8 +162,8 @@
                IF ( DEBICR( I ) ) IRANK = IRANK + 1
 
 *  Compare this will all other NDFs which are valid.
-               DO 2 J = I + 1, NNDF 
-                  IF ( VALID ( J ) .AND. ORIG( J ) .NE. ' ' ) THEN 
+               DO 2 J = I + 1, NNDF
+                  IF ( VALID ( J ) .AND. ORIG( J ) .NE. ' ' ) THEN
 
 *  Scan the list of names looking for a correspondence. This is
 *  identified by the same original file name and the same frame type and

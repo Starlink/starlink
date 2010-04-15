@@ -13,7 +13,7 @@
 *      Paul Rees          28-OCT-88     IUEDR Vn. 2.0
 *
 *   Method:
-*      A logical value is decoded from the supplied line string as 
+*      A logical value is decoded from the supplied line string as
 *      specified by the CNTRL format control string.
 *
 *-
@@ -24,18 +24,18 @@
 *   Import:
       BYTE CNTRL(256)       ! control string
       BYTE LINE(100)        ! string to be scanned
- 
+
 *   Import/Export:
       INTEGER POS           ! current character position in line
- 
+
 *   Export:
       LOGICAL LVALUE        ! string value
- 
+
       INTEGER STATUS        ! status return
- 
+
 *   External references:
       LOGICAL STR_SIMLR     ! caseless string equality
- 
+
 *   Local variables:
       BYTE SVALUE(3)        ! temporary string
 

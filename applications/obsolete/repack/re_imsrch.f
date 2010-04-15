@@ -22,7 +22,7 @@
         real sep				! Separation (rads)
         real bsep				! Best separation (rads)
 	integer fc, lc, lun1,lun2
-	integer status				
+	integer status
 	character*80 rec			! Data record
 	character*80 brec			! Choice record
 	character*80 re_res			! Reserv. file directory
@@ -77,7 +77,7 @@
         endif
 * read RA/DEC from file if open
  50     continue
-	if (lun1.ne.0) then 
+	if (lun1.ne.0) then
 	  read(lun1,*,end=299,iostat=status) sra,sdec
 	  if (status.ne.0) then
 	     write(*,*) 'Error: invalid co-ordinate pairs ignored'
@@ -91,7 +91,7 @@
 	    write(*,*)'   Can''t get RECAL environment variable.'
 	endif
 	call chr_fandl(re_res, fc, lc)
-	open(10, file=re_res(fc:lc)//'/re_imge.dat', 
+	open(10, file=re_res(fc:lc)//'/re_imge.dat',
      &                          status='old', readonly)
 
 * Search for image with centre closest to input RA & Dec.
@@ -109,13 +109,13 @@
  100	read(10, '(a)',end=199) rec
 	  read(rec(36:57), *) im_ra, im_dec
 	  im_ra  = im_ra  * dtor
-	  im_dec = im_dec * dtor	  
+	  im_dec = im_dec * dtor
 	  sep = sla_sep(sra, sdec, im_ra, im_dec)
 	  if (sep .lt. bsep) then
             brec = rec
             bsep = sep
-	    c_ra  = im_ra  
-	    c_dec = im_dec 
+	    c_ra  = im_ra
+	    c_dec = im_dec
 	  endif
 	  goto 100
  199	continue

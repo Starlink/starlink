@@ -27,7 +27,7 @@ C  Formal parameters
       REAL      XSCALE(*)
       REAL      DATA(*)
       INTEGER   IERR
-      
+
 C  Include files
 
       INCLUDE 'FLAGCOMM'

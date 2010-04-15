@@ -9,7 +9,7 @@ C     Prompts for a numeric value during a graphics dialogue.
 C
 C  Description:
 C     This routine prompts for a numeric value during an interactive
-C     graphics dialogue using the alphanumeric terminal screen 
+C     graphics dialogue using the alphanumeric terminal screen
 C     controlled by the GKD_ package.  It is intended to be used
 C     instead of PAR_QNUM during such dialogues.
 C
@@ -20,9 +20,9 @@ C  Call:
 C     STATUS = GKD_QNUM(PROMPT,VMIN,VMAX,DEFAULT,USEDEF,UNITS,VALUE)
 C
 C  Parameters:      (">" input, "<" output)
-C     (>) PROMPT    (Fixed string, descr) The prompt string for the 
+C     (>) PROMPT    (Fixed string, descr) The prompt string for the
 C                   number. This should be 'clean' - it should not have
-C                   clever control characters, nor should it have 
+C                   clever control characters, nor should it have
 C                   the default value encoded in it.
 C     (>) VMIN      (Real, ref) The minimum acceptable value.
 C     (>) VMAX      (Real, ref) The maximum acceptable value.
@@ -36,7 +36,7 @@ C     (<) VALUE     (Real, ref) The value obtained.  Will lie between
 C                   VMIN and VMAX.
 C
 C  Returns:
-C     (<) STATUS    (Logical, function value) True if there actually was a 
+C     (<) STATUS    (Logical, function value) True if there actually was a
 C                   number entered, false for a null response.  Note that
 C                   a null response is always accepted.
 C

@@ -24,7 +24,7 @@ C
 C-
 C
 C  History:
-C    27/4/1988   Original Version.   JAB/AAO 
+C    27/4/1988   Original Version.   JAB/AAO
 C    6/12/1991   Handle bad values.  JAB/AAO
 C
 
@@ -63,11 +63,11 @@ C
       IF (ACTDIM .NE. 1) THEN
           CALL MSG_OUT('OUT','Invalid Dimensions',STATUS)
           STATUS = USER__001
-      ENDIF             
-      SIZE = DIMS(1)       
+      ENDIF
+      SIZE = DIMS(1)
 
 *  Find the Stokes parameters
-          
+
       CALL TSP_STOKES(OLOC,NUM,QZ,UZ,VZ,STATUS)
 
 *  Try to get a Stokes parameter (first one found in sequence Q,U,V)
@@ -88,19 +88,19 @@ C
       CALL TSP_MAP_DATA(SLOC,'UPDATE',SPTR,SDLOC,STATUS)
 
 *  Do the sign flip
-                    
+
       IF (STATUS .EQ. SAI__OK) THEN
         CALL TSP_FLIP(SIZE,%VAL(SPTR))
       ENDIF
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(SDLOC,STATUS)
       CALL DAT_ANNUL(OLOC,STATUS)
       CALL DAT_ANNUL(LOC,STATUS)
       END
 
-      
+
 
        SUBROUTINE TSP_FLIP(SIZE,S)
 *+
@@ -108,10 +108,10 @@ C
 *   T S P _ F L I P
 *
 *   Subroutine to do the polarization sign flip
-*       
+*
 *    (>)  SIZE     (Integer)           The number of spectral points
 *    (!)  S        (Real array(SIZE))  The stokes array
-*   
+*
 *    Jeremy Bailey    27/4/1988
 *
 *    Modified:

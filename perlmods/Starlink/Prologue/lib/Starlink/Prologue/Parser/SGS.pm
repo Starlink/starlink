@@ -203,7 +203,7 @@ sub push_line {
                     $arr = '()';
                     $type =~ s/\(\)//;
                  }
-              
+
 	my %types = (
                                routine => 'SUBROUTINE',
                                c => 'CHAR',
@@ -233,7 +233,7 @@ sub push_line {
       # we should store it in case it is within a section
       # unless we are in a Purpose and need to switch to Description
       my $s = $self->section;
-      if (defined $s && $s eq 'Purpose' && 
+      if (defined $s && $s eq 'Purpose' &&
 	 @{$self->content}) {
 	$self->flush_section;
 	$self->section("Description");

@@ -20,7 +20,7 @@
 
 *  Description:
 *     Return column identifier for column, based
-*     on column name.This routine may be called 
+*     on column name.This routine may be called
 *     more than once for a given column name.
 *     Use the column identifier for all subsequent
 *     references to columns until the table is closed.
@@ -32,7 +32,7 @@
 *     COLIDN = CHARACTER (Returned)
 *        The locator(identifier) for the given CNAME.
 *     TBDSCR = CHARACTER (Given)
-*        Similar to a pointer ,Only this is 
+*        Similar to a pointer ,Only this is
 *        a character which identifies the table
 *        i.e. used to immediately locate the
 *        position of the table.
@@ -40,8 +40,8 @@
 *        The global status.
 
 
-*  Notes: 
-*     -  This routine will return without action 
+*  Notes:
+*     -  This routine will return without action
 *        if on entry the STATUS is not SAI__OK.
 
 *  Algorithm:
@@ -65,7 +65,7 @@
 
 
 *  Type Definitions:
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
@@ -75,7 +75,7 @@
 
 
 *  Arguments Given and Returned:
-      CHARACTER*(DAT__SZLOC) TBDSCR, COLIDN 
+      CHARACTER*(DAT__SZLOC) TBDSCR, COLIDN
       CHARACTER*(DAT__SZNAM) CNAME
 
 

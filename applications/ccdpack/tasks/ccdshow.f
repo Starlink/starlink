@@ -21,7 +21,7 @@
 
 *  Description:
 *     This routine shows the current value of any CCDPACK global
-*     parameters.  It can also be used to save the current setup 
+*     parameters.  It can also be used to save the current setup
 *     to a file for restoration by CCDSETUP.
 
 *  Usage:
@@ -54,9 +54,9 @@
 *        default is "BOTH".
 *        [BOTH]
 *     SAVE = _LOGICAL (Read)
-*        Whether or not to save the values of the program parameters 
-*        to a "restoration" file, which can later be used by CCDSETUP 
-*        to restore the current values of the global parameters.  
+*        Whether or not to save the values of the program parameters
+*        to a "restoration" file, which can later be used by CCDSETUP
+*        to restore the current values of the global parameters.
 *        If TRUE then you'll need to specify the name of the file using
 *        the SAVEFILE parameter.
 *        [FALSE]
@@ -67,7 +67,7 @@
 *        [CCDPACK_SETUP.DAT]
 *     USESET = _LOGICAL (Read)
 *        This parameter determines whether values keyed by Set Index
-*        are to be displayed.  If CCDSETUP has been used to set up 
+*        are to be displayed.  If CCDSETUP has been used to set up
 *        different global parameter values for different members of
 *        each Set, and this parameter is true, CCDSHOW will display
 *        the parameter values specific to each Set Index value
@@ -76,11 +76,11 @@
 
 *  Examples:
 *     ccdshow
-*        This displays the current values of all the CCDPACK global 
+*        This displays the current values of all the CCDPACK global
 *        parameters to the screen.
 *     ccdshow save savefile=params.save
-*        As well as displaying the global parameter values to the 
-*        screen, this will also write them to a restoration file 
+*        As well as displaying the global parameter values to the
+*        screen, this will also write them to a restoration file
 *        called 'params.save'.  This file can be used at a later date
 *        to restore the current global parameter setup using CCDSETUP.
 
@@ -134,7 +134,7 @@
 *        is substantially rewritten.  In particular access to global
 *        variables is now not done via the parameter system at all,
 *        but using direct inspection of the GLOBAL ADAM parameter file
-*        (via the CCD1_KPGT routine).  SAVE and SAVEFILE parameters 
+*        (via the CCD1_KPGT routine).  SAVE and SAVEFILE parameters
 *        are also added.
 *     {enter_further_changes_here}
 
@@ -151,7 +151,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
       INCLUDE 'PAR_ERR'          ! Parameter system constants
       INCLUDE 'MSG_PAR'          ! Message system constants
-      INCLUDE 'FIO_PAR'          ! FIO parameters 
+      INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'CCD1_PAR'         ! CCDPACK private constants
 
 *  Status:
@@ -175,7 +175,7 @@
       DOUBLE PRECISION ADC       ! ADC factor
       DOUBLE PRECISION DEFER     ! Deferred charge value
       DOUBLE PRECISION RNOISE    ! Readout noise
-      DOUBLE PRECISION SATVAL    ! Saturation value 
+      DOUBLE PRECISION SATVAL    ! Saturation value
       INTEGER BOUNDS( 4 )        ! Bias strip bounds
       INTEGER EXTENT( 4 )        ! Useful CCD area
       INTEGER FDS                ! Restoration file descriptor
@@ -247,7 +247,7 @@
      :              'CCDPACK global parameters:',
      :              STATUS )
       IF ( USESET ) THEN
-         CALL CCD1_MSG( ' ', 
+         CALL CCD1_MSG( ' ',
      :'  Set Index-keyed values will be shown where available', STATUS )
       END IF
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -320,7 +320,7 @@
             CALL DAT_ANNUL( ULOC, STATUS )
             CALL CHR_RTOC( REAL( RNOISE ), USTR, LENG )
          END IF
-         IF ( NK .GT. 0 ) THEN 
+         IF ( NK .GT. 0 ) THEN
             DO I = 1, NK
                CALL DAT_GET0D( KLOCS( I ), RNOISE, STATUS )
                CALL DAT_ANNUL( KLOCS( I ), STATUS )
@@ -328,10 +328,10 @@
                CALL MSG_SETR( 'RNOISE', REAL( RNOISE ) )
             END DO
          END IF
-         CALL CCD1_KPOP( 'Global readout noise (ADUs)', 
+         CALL CCD1_KPOP( 'Global readout noise (ADUs)',
      :                   QUNKEY, USTR, NK, KEYS, KSTRS, STATUS )
       END IF
-     
+
 *  Bounds of the bias strips. May default to none.
       CALL CCD1_KPGT( 'BOUNDS', MKEY, QUNKEY, ULOC, NK, KEYS, KLOCS,
      :                STATUS )
@@ -379,13 +379,13 @@
                END IF
                CALL CHR_PUTC( ')', KSTRS( I ), IAT )
             END DO
-         END IF 
-         CALL CCD1_KPOP( 'Global bias strip bounds', 
+         END IF
+         CALL CCD1_KPOP( 'Global bias strip bounds',
      :                   QUNKEY, USTR, NK, KEYS, KSTRS, STATUS )
       END IF
 
 *  The readout direction.
-      CALL CCD1_KPGT( 'DIRECTION', MKEY, QUNKEY, ULOC, NK, KEYS, 
+      CALL CCD1_KPGT( 'DIRECTION', MKEY, QUNKEY, ULOC, NK, KEYS,
      :                KLOCS, STATUS )
       GOTDIR = QUNKEY .OR. NK .GT. 0
       IF ( GOTDIR ) THEN
@@ -491,7 +491,7 @@
             CALL CCD1_KPGT( 'SETSAT', 0, QUNKEY, ULOC, NK, KEYS, KLOCS,
      :                      STATUS )
             GOTSPR = QUNKEY
-            IF ( GOTSPR ) THEN 
+            IF ( GOTSPR ) THEN
                CALL DAT_GET0L( ULOC, SETSAT, STATUS )
                CALL DAT_ANNUL( ULOC, STATUS )
                IF ( SETSAT ) THEN
@@ -513,7 +513,7 @@
          GOTONE = .TRUE.
          IF ( QUNKEY ) THEN
             CALL DAT_THERE( ULOC, 'NAMEPTR', THERE, STATUS )
-            IF ( THERE ) THEN 
+            IF ( THERE ) THEN
                CALL CMP_GET0C( ULOC, 'NAMEPTR', BIAS, STATUS )
             ELSE
                CALL DAT_GET0C( ULOC, BIAS, STATUS )
@@ -533,7 +533,7 @@
                KSTRS( I ) = BIAS
             END DO
          END IF
-         CALL CCD1_KPOP( 'Global master bias', 
+         CALL CCD1_KPOP( 'Global master bias',
      :                   QUNKEY, USTR, NK, KEYS, KSTRS, STATUS )
       END IF
 
@@ -545,7 +545,7 @@
          GOTONE = .TRUE.
          IF ( QUNKEY ) THEN
             CALL DAT_THERE( ULOC, 'NAMEPTR', THERE, STATUS )
-            IF ( THERE ) THEN 
+            IF ( THERE ) THEN
                CALL CMP_GET0C( ULOC, 'NAMEPTR', FLAT, STATUS )
             ELSE
                CALL DAT_GET0C( ULOC, FLAT, STATUS )
@@ -565,7 +565,7 @@
                KSTRS( I ) = FLAT
             END DO
          END IF
-         CALL CCD1_KPOP( 'Global master flatfield', 
+         CALL CCD1_KPOP( 'Global master flatfield',
      :                   QUNKEY, USTR, NK, KEYS, KSTRS, STATUS )
       END IF
 
@@ -577,7 +577,7 @@
          GOTONE = .TRUE.
          IF ( QUNKEY ) THEN
             CALL DAT_THERE( ULOC, 'NAMEPTR', THERE, STATUS )
-            IF ( THERE ) THEN 
+            IF ( THERE ) THEN
                CALL CMP_GET0C( ULOC, 'NAMEPTR', CAL, STATUS )
             ELSE
                CALL DAT_GET0C( ULOC, CAL, STATUS )
@@ -597,7 +597,7 @@
                KSTRS( I ) = CAL
             END DO
          END IF
-         CALL CCD1_KPOP( 'Global (general) calibration NDF', 
+         CALL CCD1_KPOP( 'Global (general) calibration NDF',
      :                   QUNKEY, USTR, NK, KEYS, KSTRS, STATUS )
       END IF
 
@@ -680,7 +680,7 @@
          CALL DAT_ANNUL( ULOC, STATUS )
          CALL CHR_UCASE( LOGTO )
          IF ( LOGTO .EQ. 'BOTH' ) THEN
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      :'  Log information will be written to log file and terminal',
      :                     STATUS )
          ELSE IF ( LOGTO .EQ. 'TERMINAL' ) THEN
@@ -692,7 +692,7 @@
          ELSE IF ( LOGTO .EQ. 'NEITHER' ) THEN
             CALL CCD1_MSG( ' ',
      :'  Log information will be not be written', STATUS )
-         END IF     
+         END IF
       END IF
 
 *  What is the name of the log file?
@@ -712,7 +712,7 @@
       END IF
 
 *  If there were no significant values, mention this.
-      IF ( .NOT. GOTONE ) THEN 
+      IF ( .NOT. GOTONE ) THEN
          IF ( GOTLGN .OR. GOTLG2 ) CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ', '  No current settings exist for any'//
      :                      ' significant CCDPACK global parameters -',

@@ -1,17 +1,17 @@
 *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++!
 *
        SUBROUTINE RECORD(COMND,RESTRING,OK)
- 
+
        IMPLICIT NONE
- 
+
        CHARACTER*(*) COMND
        CHARACTER*(*) RESTRING
        LOGICAL OK
- 
+
        CHARACTER*200 TSTRING
        CHARACTER*20 QUOSTR
        INTEGER MCLOSE, NCLOSE, NTEMP, SLEN
- 
+
        CALL SSTRIP(COMND)
        IF (COMND(1:6).EQ.'RECORD') THEN
           COMND(1:) = COMND(7:)
@@ -58,16 +58,16 @@
                 OK = .FALSE.
                 GOTO 100
              ENDIF
- 
+
              RESTRING = COMND(1:NCLOSE-1)
              COMND(1:) = COMND(NCLOSE:)
              DO 60 WHILE (COMND(1:1).EQ.'"')
                 COMND(1:) = COMND(2:)
    60        CONTINUE
- 
+
           ENDIF
        ENDIF
- 
+
   100  CONTINUE
 
        END

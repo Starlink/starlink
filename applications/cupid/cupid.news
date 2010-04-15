@@ -2,20 +2,20 @@
 
  The CUPID package is currently under construction...
 
- CUPID (ClUmP IDentification) provides commands which identify 
- and  analyse clumps of emission within 2- or 3- dimensional 
+ CUPID (ClUmP IDentification) provides commands which identify
+ and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
 Changes introduced at V1.2
 
-   - MAKECLUMPS now allows clump parameters to be distributed 
+   - MAKECLUMPS now allows clump parameters to be distributed
      using a Poisson distribution.
 
    - MAKECLUMPS now allows a SHAPE column to be added to the output
      catalogue, holding the STC-S outline of each clump. See parameter
      SHAPE.
 
-   - MAKECLUMPS now allows the output WCS to be copied from an input 
+   - MAKECLUMPS now allows the output WCS to be copied from an input
      NDF. See parameter LIKE.
 
 
@@ -24,8 +24,8 @@ Changes introduced at V1.1
    - For consistency with other Starlink applications the ILEVEL
      parameter has been renamed MSG_FILTER.
 
-   - The MaxBad configuration parameter should now be given as a fraction 
-     of the total number of pixels in the clump. Previously, MaxBad 
+   - The MaxBad configuration parameter should now be given as a fraction
+     of the total number of pixels in the clump. Previously, MaxBad
      was given as an absolute number of pixels, but this unfairly
      discriminates against large clumps that by their nature tend to
      include more bad pixels. This was particularly noticable with the
@@ -40,7 +40,7 @@ Changes introduced at V1.0
      has been changed.
 
    - FINDCLUMPS has a new parameter called SHAPE that allows an optional
-     column holding a textual description of the spatial shape of each 
+     column holding a textual description of the spatial shape of each
      clump to be added to the output catalogue. The format for this
      description is the STC-S format developed by the IVOA. These shapes
      can be plotted using either KAPPA:LISTSHOW or GAIA.
@@ -69,12 +69,12 @@ Changes introduced at V0.0-39:
 Changes introduced at V0.0-38:
 
    - Use a dynamic default of FALSE for parameter "BACKOFF" if METHOD is
-   "ClumpFind" and the Clumpfind.IDLAlg configuration parameter is set 
+   "ClumpFind" and the Clumpfind.IDLAlg configuration parameter is set
    non-zero. Otherwise use a dynamic default of TRUE.
 
 Changes introduced at V0.0-37:
 
-   - Add parameter "BACKOFF" to FINDCLUMPS. It controls whether or not 
+   - Add parameter "BACKOFF" to FINDCLUMPS. It controls whether or not
    the background level in a clump is removed from the clump data values
    before calculating the clump sizes and centroid position. Set it to
    FALSE to compare clump parameters with those found by the IDL version
@@ -83,16 +83,16 @@ Changes introduced at V0.0-37:
 
 Changes introduced at V0.0-36:
 
-   - Add parameter "PERSPECTRUM" to FINDCLUMPS. If this parameter is 
+   - Add parameter "PERSPECTRUM" to FINDCLUMPS. If this parameter is
    set TRUE, it causes each spectrum in a spectral cube to be processed
    independently of its neighbours. This will in general cause lots more
    clumps to be reported since a single source that spans more than one
    spectrum will result in multiple clumps.
    - A bug that caused the top contour level to be ignored when using the
    ClumpFind method within FINDCLUMPS has been fixed.
-   - The FellWalker algorithm has been changed slightly in that adjacent 
-   clumps with shallow dips between them (as specified by FellWalker.MinDip) 
-   are merged before, rather than after, the clumps are cleaned (as 
+   - The FellWalker algorithm has been changed slightly in that adjacent
+   clumps with shallow dips between them (as specified by FellWalker.MinDip)
+   are merged before, rather than after, the clumps are cleaned (as
    specified by FellWalker.CleanIter).
 
 
@@ -119,15 +119,15 @@ Changes introduced at V0.0-33:
    changed to better cope with high noise cases.
    - FellWalker bug fixed that could cause inappropriate clumps to be
    merged together.
-   - Fix bug that could prevent configuration parameters being read if 
+   - Fix bug that could prevent configuration parameters being read if
    they are qualified by their method name (e.g. "FellWalker.MinDip" as
    opposed to just "MinDip").
 
 Changes introduced at V0.0-32:
 
    - New application call CLUMPINFO added, which reports information
-   about one or more previously identified clumps. Currently, it just 
-   returns the total number of clumps detected and the bounding box of 
+   about one or more previously identified clumps. Currently, it just
+   returns the total number of clumps detected and the bounding box of
    a specified list of clumps.
    - Plug NDF identifier leak that could cause error messages about "all
    slots being used".
@@ -150,9 +150,9 @@ Changes introduced at V0.0-31:
 
 Changes introduced at V0.0-30:
 
-   - GaussClumps: Reduce the initial guess at the clump peak value by 
-   subtracting the RMS noise level from the peak data value (the noise 
-   will normally cause the peak data value to be larger than the peak 
+   - GaussClumps: Reduce the initial guess at the clump peak value by
+   subtracting the RMS noise level from the peak data value (the noise
+   will normally cause the peak data value to be larger than the peak
    clump value).
    - Default value for GaussCLumps.ModelLim changed from 1.0 to 0.5. A
    lower value works better with higher noise data, and should not make
@@ -161,27 +161,27 @@ Changes introduced at V0.0-30:
 Changes introduced at V0.0-29:
 
   - Fixed a bug that could cause huge negative pixel values to be
-  introduced into clump cut-outs and statistics produced by FellWalker 
+  introduced into clump cut-outs and statistics produced by FellWalker
   or Reinhold when using FINDCLUMPS.
-  - When using GaussClumps to find clumps, issue a warning message if 
+  - When using GaussClumps to find clumps, issue a warning message if
   the total input data sum is negative, as this probably indicates that
   there is a negative background level. GaussClumps assumes that any
   background level has first been removed (e.g. using CUPID:FINDBACK).
-  - FINDBACK has a new parameter called SUB that be set TRUE to indicate 
+  - FINDBACK has a new parameter called SUB that be set TRUE to indicate
   that the output NDF should hold the background-subtracted input data,
   rather than the background estimate itself.
   - FINDBACK has a new parameter called RMS that can be used to override
   the RMS noise estimate calculated by FINDBACK. If the data contains
-  correlated noise, then the internal RMS noise estimate will be too low, 
+  correlated noise, then the internal RMS noise estimate will be too low,
   resulting in the final background estimate being systematically too low.
 
 Changes introduced at V0.0-28:
   - GaussClumps now has an additional termination crietrion; if the total
   integrated sum in the fitted Gaussians equals or exceeds the total
-  integrated data sum in the input array, then the iterative fitting process 
+  integrated data sum in the input array, then the iterative fitting process
   will terminate. This is the termination criterion described by Stutzki
-  and Gusten in their paper describing GaussClumps. GaussClumps has several 
-  terminiation criteria, and the process terminates when the first such 
+  and Gusten in their paper describing GaussClumps. GaussClumps has several
+  terminiation criteria, and the process terminates when the first such
   criterion is met.
   - Gaussians fitted by GaussClumps are now constrained to have positive
   background values.
@@ -190,7 +190,7 @@ Changes introduced at V0.0-28:
   - Bug fixed in the algorithm used to make the initial guess at the
   clump size when using GaussClumps. This bug could cuase segmentation
   violations when fitting low signal-to-noise clumps.
- 
+
 Changes introduced at V0.0-27:
 
  - The algorithm used to make the initial guess at the clump size when
@@ -202,7 +202,7 @@ Changes introduced at V0.0-27:
 Changes introduced at V0.0-26:
 
  - Fix a bug that could cause an error to be reported saying "supplied
-   locator is not a NULL pointer" when using FINDCLUMPS with the 
+   locator is not a NULL pointer" when using FINDCLUMPS with the
    GaussClumps method and the "ExtraCols=1" configuration option.
 
 Changes introduced at V0.0-25:
@@ -240,8 +240,8 @@ Changes introduced at V0.0-21:
 
 Changes introduced at V0.0-20:
 
- - Introduction of a new command called FINDBACK, which uses spatial 
-   filtering to remove small-scale structure from the input NDF, thus 
+ - Introduction of a new command called FINDBACK, which uses spatial
+   filtering to remove small-scale structure from the input NDF, thus
    producing an estimate of the background within the NDF.
 
 Changes introduced at V0.0-19:
@@ -254,7 +254,7 @@ Changes introduced at V0.0-19:
 
 Changes introduced at V0.0-18:
 
- - Guard against null HDS locator errors when GaussClumps cannot find any 
+ - Guard against null HDS locator errors when GaussClumps cannot find any
    clumps.
 
  - Issue a warning if configuration parameters are not separated by commas
@@ -333,11 +333,11 @@ Changes introduced at V0.0-12:
 
 Changes introduced at V0.0-11:
 
- - The CLUMPS command has been renamed as FINDCLUMPS. However, CLUMPS 
+ - The CLUMPS command has been renamed as FINDCLUMPS. However, CLUMPS
  will still be recognised as an alias for FINDCLUMPS.
 
  - A new configuration parameter called MaxBad has been added to all
- algorithms. It specified the maximum number of bad pixels which may 
+ algorithms. It specified the maximum number of bad pixels which may
  adjoin a clump. If this number is exceeded, the clump is excluded.
 
  - A new application called "makesnr" has been added to the cupid
@@ -357,7 +357,7 @@ Changes introduced at V0.0-10:
 
  - The default value for the MinPix configuration parameter (that
  specified the minimum number of pixels in a clump) has been modified
- so that it corresponds to one beam area. However, if the beam area is 
+ so that it corresponds to one beam area. However, if the beam area is
  less than 16 pixels, then the old default of 16 is retained.
 
  - Clumps are now rejected if they touch or contain any bad pixels.
@@ -444,12 +444,12 @@ Changes introduced at V0.0-5:
  algorithms.
 
  - The default value for the GaussClumps.Thresh configuration parameter has
- been changed from 20 to 2 in order to make it the same as the defaults for 
+ been changed from 20 to 2 in order to make it the same as the defaults for
  the equivalent parameters for the other algorithms.
 
- - The default values for the GaussClumps.VeloRes and GaussClumps.FWHMBeam 
- configuration parameters have been changed from 3.0 to 2.0 in order to make 
- them more comparable to the defaults for the equivalent parameters for the 
+ - The default values for the GaussClumps.VeloRes and GaussClumps.FWHMBeam
+ configuration parameters have been changed from 3.0 to 2.0 in order to make
+ them more comparable to the defaults for the equivalent parameters for the
  other algorithms.
 
 
@@ -458,19 +458,19 @@ Changes introduced at V0.0-4:
  - The FellWalker algorithm algorithm has been changed so that the
  initial flat section of a walk is only ignored if the walk starts at or
  close to the background level. This fixes a problem in which pixels with
- a large data value (well above the background level) were not assigned to 
+ a large data value (well above the background level) were not assigned to
  any clump if they occurred within a flat area between higher peaks.
 
  - The FellWalker algorithm has been modified so that neighbouring clumps
  are merged together into a single clump unless there is a significant dip
- between the peaks of the clumps. The depth of the dip needed to prevent 
- adjoining peaks from being merged is given by a new configuration parameter 
- called FellWalker.MinDip. This reduces the number of distinct clumps 
+ between the peaks of the clumps. The depth of the dip needed to prevent
+ adjoining peaks from being merged is given by a new configuration parameter
+ called FellWalker.MinDip. This reduces the number of distinct clumps
  typically identified by the FellWalker algorithm.
 
  - The FellWalker algorithm algorithm has been changed so that only those
  clumps which have a peak data value above a specified value are accepted.
- The limiting data value is specified by the new configuration parameter 
+ The limiting data value is specified by the new configuration parameter
  FellWalker.MinHeight.
 
 
@@ -479,9 +479,9 @@ Changes introduced at V0.0-3:
  - The reporting of the current configuration at the end of the CLUMPS
  command now includes each parameter only once.
 
- - The default value for ClumpFind.DeltaT is now set to twice the RMS noise 
- level no matter how many contours this would produce. Previously, the 
- default value was higher than 2*RMS if necessary in order to limit the 
+ - The default value for ClumpFind.DeltaT is now set to twice the RMS noise
+ level no matter how many contours this would produce. Previously, the
+ default value was higher than 2*RMS if necessary in order to limit the
  number of contours to 100.
 
  - The value supplied for the "RMS" program parameter can now be
@@ -493,7 +493,7 @@ Changes introduced at V0.0-3:
 Changes introduced at V0.0-2:
 
  - All algorithms have been re-worked slightly to avoid a limit of 2048
- on the total number of usable clumps which can be found. This limit was 
+ on the total number of usable clumps which can be found. This limit was
  imposed by the ARY library. The total number of usable clumps is now
  unlimited.
 

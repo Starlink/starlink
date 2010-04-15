@@ -53,7 +53,7 @@
             write(*,*) 'TestXmlChan: files 1 and 3 have different '//
      :                 'lengths (',filelen( 1 ),',',filelen( 3 ),').'
             ok =.false.
-         else 
+         else
             do i = 1,  filelen( 1 )
                if( files( 1, i ) .ne. files( 3, i ) ) then
                   write(*,*) 'TestXmlChan: Line ',i,' differs in '//
@@ -61,7 +61,7 @@
                   write(*,*) files( 1, i )
                   write(*,*) files( 3, i )
                   ok = .false.
-                  go to 10        
+                  go to 10
                end if
             end do
          end if
@@ -89,7 +89,7 @@
       end
 
 *
-*  Reads line "iline" from internal file "ifile" and returns it to AST using 
+*  Reads line "iline" from internal file "ifile" and returns it to AST using
 *  the AST_PULINE routine. Then increments "iline" ready for next time.
 *
       subroutine source( status )
@@ -107,7 +107,7 @@
          call ast_putline( ' ', -1, status )
       end if
 
-      end        
+      end
 
 *
 *  Append a line obtained using ast_getline function to the end of the
@@ -121,7 +121,7 @@
       integer status, l
       character line*(linelen)
 
-      call ast_getline( line, l, status ) 
+      call ast_getline( line, l, status )
       if( l .gt. 0 ) then
 
          if( filelen( ifile ) .ge. mxline ) then
@@ -137,7 +137,7 @@
 
       end if
 
-      end      
+      end
 
 *
 *  Create an AST object to be used as the test object.
@@ -149,7 +149,7 @@
       integer obj, sf, f, m, status
 
       obj = ast__null
-      if( status .ne. sai__ok ) return 
+      if( status .ne. sai__ok ) return
 
       sf = Ast_SkyFrame( ' ', status )
       f = Ast_Frame( 2, ' ', status )
@@ -174,7 +174,7 @@
       external sink
       integer obj, ifil, status, ch
 
-      if( status .ne. sai__ok ) return 
+      if( status .ne. sai__ok ) return
 
       ifile = ifil
       filelen( ifil ) = 0
@@ -202,12 +202,12 @@
       integer obj, ifil, status, ch
       character fmt*(*)
 
-      if( status .ne. sai__ok ) return 
+      if( status .ne. sai__ok ) return
 
       ifile = ifil
       filelen( ifil ) = 0
 
-      ch = ast_xmlchan( ast_null, sink, 'indent=1,comment=1', 
+      ch = ast_xmlchan( ast_null, sink, 'indent=1,comment=1',
      :                  status )
       call ast_seti( ch, 'xmllength', linelen, status )
       call ast_setc( ch, 'xmlformat', fmt, status )
@@ -231,7 +231,7 @@
       external source
       integer obj, ifil, status, ch
 
-      if( status .ne. sai__ok ) return 
+      if( status .ne. sai__ok ) return
 
       ifile = ifil
       iline = 1

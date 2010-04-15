@@ -46,7 +46,7 @@
 *     need to sum all the variances and twice the covariances and use
 *     these to modify the actual variance of the (unordered) data.
 *
-*     - It is assumed that NSET cannot be any larger than MXVAL.    
+*     - It is assumed that NSET cannot be any larger than MXVAL.
 
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
@@ -58,12 +58,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@
 *     24-FEB-1997 (PDRAPER):
 *        Removed unnecessary EXP1 and EXP2 estimates
 *     28-JAN-1998 (PDRAPER):
-*        Added check for normal scores with a population of 2. 
+*        Added check for normal scores with a population of 2.
 *        The second score isn't calculated as it is the negative
 *        of the first score.
 *     7-MAR-2000 (DSB):
@@ -100,7 +100,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
-      
+
 *     Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
@@ -162,7 +162,7 @@
 
 *  Get the covariance matrix for I*I.
             V11 = PDA_V11( I, IFAIL )
-            CALL PDA_COVMAT( MATRIX, I, MXVAL, V11, PP( 1 ), 
+            CALL PDA_COVMAT( MATRIX, I, MXVAL, V11, PP( 1 ),
      :                       PP( 2 ), SUMSQ, IFAIL)
 
 *  Now pack this into the output matrix in the form recognised by other

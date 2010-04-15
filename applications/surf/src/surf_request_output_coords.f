@@ -12,7 +12,7 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SURF_REQUEST_OUTPUT_COORDS( TASK, PARLONG, PARLAT,
 *    :     OUT_COORDS, LAT_OBS, DEF_RA_CEN, DEF_DEC_CEN, MJD, HOURS,
@@ -42,7 +42,7 @@
 *     DEF_DEC_CEN = DOUBLE (Given)
 *        Apparent Dec of the default map centre (radians)
 *     MJD = DOUBLE (Given)
-*        Modified Julian date to be used as reference for apparent 
+*        Modified Julian date to be used as reference for apparent
 *        RA/Dec coordinates
 *     HOURS = LOGICAL (Given)
 *        Flag to decide whether longitude is expressed as hours or degrees
@@ -93,20 +93,20 @@
 
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
 
 *  Arguments Given:
-      DOUBLE PRECISION DEF_DEC_CEN 
-      DOUBLE PRECISION DEF_RA_CEN 
+      DOUBLE PRECISION DEF_DEC_CEN
+      DOUBLE PRECISION DEF_RA_CEN
       LOGICAL          HOURS
       DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION MJD
       CHARACTER *(*)   OUT_COORDS
       CHARACTER *(*)   PARLAT
       CHARACTER *(*)   PARLONG
-      CHARACTER *(*)   TASK     
+      CHARACTER *(*)   TASK
 
 *  Arguments Returned:
       DOUBLE PRECISION OUT_DEC_CEN
@@ -130,13 +130,13 @@
 
 *     Decide whether we have a sky frame
 
-      IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' 
+      IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ'
      :     .AND. OUT_COORDS.NE.'PL')) THEN
 
 *     Convert the input coordinates to the output coordinates
 *     and use them as the default.
 
-         CALL SCULIB_CALC_OUTPUT_COORDS (DEF_RA_CEN, DEF_DEC_CEN, 
+         CALL SCULIB_CALC_OUTPUT_COORDS (DEF_RA_CEN, DEF_DEC_CEN,
      :        MJD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
 
 *     Construct a string containing the suggested output centre
@@ -145,7 +145,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             IF (HOURS) then
                CALL SLA_DR2TF (2, OUT_LONG, SIGN, HMSF)
-                  
+
                STEMP = SIGN
                WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
                STEMP (4:4) = ' '
@@ -156,7 +156,7 @@
                WRITE (STEMP(11:12),'(I2.2)') HMSF(4)
             ELSE
                CALL SLA_DR2AF (1, OUT_LONG, SIGN, HMSF)
-               
+
                STEMP = SIGN
                WRITE (STEMP(2:4), '(I3.3)') HMSF(1)
                STEMP (5:5) = ' '
@@ -167,15 +167,15 @@
                WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
             END IF
          END IF
-      
+
 
 *     Ask for long of output image
-      
+
          CALL PAR_DEF0C (PARLONG, STEMP, STATUS)
          CALL PAR_GET0C (PARLONG, STEMP, STATUS)
 
 *     Decode longitude string
-         
+
          IF (STATUS .EQ. SAI__OK) THEN
             ITEMP = 1
             CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
@@ -191,12 +191,12 @@
                END IF
             END IF
          END IF
-         
+
 *     Construct the latitude string
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
-            
+
             STEMP = SIGN
             WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
             STEMP (5:5) = ' '
@@ -206,14 +206,14 @@
             STEMP (11:11) = '.'
             WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
          END IF
-      
+
 *     Ask for the lat
-            
+
          CALL PAR_DEF0C (PARLAT, STEMP, STATUS)
          CALL PAR_GET0C (PARLAT, STEMP, STATUS)
 
 *     Decode the string
-            
+
          IF (STATUS .EQ. SAI__OK) THEN
             ITEMP = 1
             CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
@@ -227,7 +227,7 @@
          END IF
 
 *     Convert this centre to apparent ra/dec
- 
+
          CALL SCULIB_CALC_APPARENT (LAT_OBS, OUT_LONG, OUT_LAT, 0.0D0,
      :        0.0D0, 0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD, 0.0D0, 0.0D0,
      :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)

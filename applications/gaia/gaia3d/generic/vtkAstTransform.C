@@ -93,7 +93,7 @@ void vtkAstTransform::InternalDeepCopy( vtkAbstractTransform *transform )
         this->InverseFlag = astTransform->InverseFlag;
         this->Modified();
     }
-    
+
     //  Deep so full copy.
     if ( Mapping != NULL ) {
         this->SetMapping( (AstMapping *) astCopy( Mapping ) );
@@ -107,7 +107,7 @@ vtkAbstractTransform *vtkAstTransform::MakeTransform()
 
 //  Transform a single point.
 template<class T>
-void vtkTransform1( AstMapping *mapping, const T inPoint[3], 
+void vtkTransform1( AstMapping *mapping, const T inPoint[3],
                     int forwards, T outPoint[3] )
 {
     double in[3];
@@ -121,7 +121,7 @@ void vtkTransform1( AstMapping *mapping, const T inPoint[3],
     //in[0]+=1.0;
     //in[1]+=1.0;
     //in[2]+=1.0;
-    
+
     //cout << in[0]  << ", " << in[1]  << ", " << in[2];
     //cout << " --> ";
     astTranN( mapping, 1, 3, 1, in, forwards, 3, 1, out );
@@ -133,7 +133,7 @@ void vtkTransform1( AstMapping *mapping, const T inPoint[3],
 }
 
 template<class T>
-void vtkForwardTransform( AstMapping *mapping, const T inPoint[3], 
+void vtkForwardTransform( AstMapping *mapping, const T inPoint[3],
                           T outPoint[3], T derivative[3][3] )
 {
     vtkTransform1( mapping, inPoint, 1, outPoint );
@@ -146,14 +146,14 @@ void vtkForwardTransform( AstMapping *mapping, const T inPoint[3],
 }
 
 template<class T>
-void vtkForwardTransform( AstMapping *mapping, const T inPoint[3], 
+void vtkForwardTransform( AstMapping *mapping, const T inPoint[3],
                           T outPoint[3] )
 {
     vtkTransform1( mapping, inPoint, 1, outPoint );
 }
 
 template<class T>
-void vtkBackwardTransform( AstMapping *mapping, const T inPoint[3], 
+void vtkBackwardTransform( AstMapping *mapping, const T inPoint[3],
                            T outPoint[3] )
 {
     vtkTransform1( mapping, inPoint, 0, outPoint );

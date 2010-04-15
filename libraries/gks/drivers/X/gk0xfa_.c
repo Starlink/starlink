@@ -113,7 +113,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
     {
       { 64, 64, 0,  8, hatch_1 }, { 64, 64, 0,  8, hatch_2 },
       { 60, 60, 0, 10, hatch_3 }, { 60, 60, 0, 10, hatch_4 },
-      { 64, 64, 0, 16, hatch_5 }, { 60, 60, 0, 20, hatch_6 }, 
+      { 64, 64, 0, 16, hatch_5 }, { 60, 60, 0, 20, hatch_6 },
       { 48, 56, 0, 14, hatch_7 }, { 48, 48, 0, 12, hatch_8 },
       { 44, 44, 0, 16, hatch_9 }, { 48, 56, 0, 14, hatch_10 }
     };
@@ -124,11 +124,11 @@ f77_integer gk0xfa_(nc, xwc, ywc)
     gkdrge_(),			/* For getting pattern directory */
     gkhpgi_(),			/* For getting pattern data */
     gkpclp_();			/* For clipping the area to be filled */
-  
+
   extern char
     *malloc();			/* For allocating C workspace */
   extern GC XDefaultGC();	/* for getting default GC */
-  extern int gk0xunportask();   
+  extern int gk0xunportask();
   f77_integer
     nbnds,			/* Number of boundaries to/from gkpclp_() */
     type,			/* Data type for GKS stack routines */
@@ -152,7 +152,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
     *vlist;			/* Pixmap coordinates of area to be filled */
 
   static GC LGC;		/* The GC to setup for drawing */
-  static GC HatchGC;		/* The GC to setup for drawing on 
+  static GC HatchGC;		/* The GC to setup for drawing on
   				   the hatch element*/
   Display
     *display = 			/* ww backing display */
@@ -178,7 +178,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
   char
     *memory;			/* Address of C workspace */
 
-  /* 
+  /*
    * Allocate FORTRAN workspace for transformation and clipping.  This is
    * done as one real allocation and one integer allocation,  with subarray
    * addresses calculated after allocation.  The total workspace required is:
@@ -210,7 +210,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
   /*
    * Clip the area to be filled.  We start with one boundary with 'nc' vertices
    * and finish with 'nbnds' boundaries with the index of the last vertex of
-   * each boundary 'i' (0 <= i < nbnds) in lastvertex[i].  
+   * each boundary 'i' (0 <= i < nbnds) in lastvertex[i].
    */
 
   nbnds = 1;
@@ -228,7 +228,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
 			     lastvertex[nbnds-1] * sizeof(XPoint)
 			    )
 		 );
-  
+
   npts = (int *)memory;
   vlist = (XPoint *)(memory + nbnds * sizeof(int));
 
@@ -260,8 +260,8 @@ f77_integer gk0xfa_(nc, xwc, ywc)
 
   /* Set up LGC and the parts with common values for all fill areas */
     if(LGC == (GC)0) LGC = XDefaultGC(display,gk0xunportask(ddbm,050));
-      XSetFunction(display,LGC,GXcopy); 
-  
+      XSetFunction(display,LGC,GXcopy);
+
   /* Render the polygon as specified by the interior style */
 
   if(gkywkd_.kwfais[ws] == GHOLLO)
@@ -280,17 +280,17 @@ f77_integer gk0xfa_(nc, xwc, ywc)
       XDrawLines(display, (Drawable *)gk0xunportask(ddbm,ASKBMMEMORY),
                           LGC, vlist, npts[i], CoordModeOrigin);
       XDrawLine(display, (Drawable *)gk0xunportask(ddbm,ASKBMMEMORY),
-                LGC, vlist->x, vlist->y, 
+                LGC, vlist->x, vlist->y,
                 (vlist+npts[i]-1)->x, (vlist+npts[i]-1)->y);
       vlist += npts[i];
     }
    }
-  else 
+  else
   {
    if(gkywkd_.kwfais[ws] == GSOLID)
     {
       /*
-       * Set up rest of LGC with fill_style = FillSolid, foreground = 
+       * Set up rest of LGC with fill_style = FillSolid, foreground =
        * fill area colour index for XFillPolygon.
        */
 
@@ -299,7 +299,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
     }
     else
     {
-      /* 
+      /*
        * Pattern or hatch interior style.
        */
 
@@ -350,25 +350,25 @@ f77_integer gk0xfa_(nc, xwc, ywc)
 	  gkyerr_.kerror = -1016;
 	  return((f77_integer)0);
 	}
-	
+
         XSetFunction(display, LGC, GXcopy);
 
          /* This is what should happen for both colour and monochrome patterns but tiles set up in colour
             seem to get the first 4 elements of each row shifted up on row so we have to compensate for
             this by shifting them back down. There must be a good reason for this but I cant find it.
-            Patterns for colour workstations need to be multiples of 4 wide I think. TAW 
-         *	
+            Patterns for colour workstations need to be multiples of 4 wide I think. TAW
+         *
          *for(i = 0; i < p_width; i++)
 	 * for(j = 0; j < p_height; j++)
 	 * {
-	 *   XSetForeground(display, LGC, 
+	 *   XSetForeground(display, LGC,
 	 *                  (unsigned long)gk0xcc_(&pat_data[j*p_width+i]));
          *   XDrawPoint(display, element, LGC, i, j);
 	 * }
 	 */
-	if((gkywdt_.kpci[ws] > 2) && (display->release==11) 
-	   && (display->vnumber<3)) 
-	 /* Pattern on a colour workstation  before XV11R3 had a bug */ 
+	if((gkywdt_.kpci[ws] > 2) && (display->release==11)
+	   && (display->vnumber<3))
+	 /* Pattern on a colour workstation  before XV11R3 had a bug */
 	 for(i = 0; i < p_width; i++)
 	  for(j = 0; j < p_height; j++)
 	  {
@@ -376,7 +376,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
 	                   (unsigned long)gk0xcc_(&pat_data[j*p_width+i])
 	                  );
 	    if(i<4) XDrawPoint(display, element, LGC, i, rem(j+1,p_width));
-	    else XDrawPoint(display, element, LGC, i, j); 
+	    else XDrawPoint(display, element, LGC, i, j);
 	  }
 	else /* Pattern on a monochrome workstation */
 	  for(i = 0; i < p_width; i++)
@@ -385,9 +385,9 @@ f77_integer gk0xfa_(nc, xwc, ywc)
 	    XSetForeground(display, LGC,
 	                   (unsigned long)gk0xcc_(&pat_data[j*p_width+i])
 	                  );
-	    XDrawPoint(display, element, LGC, i, j); 
+	    XDrawPoint(display, element, LGC, i, j);
 	  }
-             
+
 	/*
 	 * Set up element as tile in LGC for XFillPolygon and set up
 	 * Tiling origin from GKS pattern origin.
@@ -395,9 +395,9 @@ f77_integer gk0xfa_(nc, xwc, ywc)
 
         XSetTile(display, LGC, element);
 	XSetFillStyle(display, LGC, FillTiled);
-	 
-	XSetTSOrigin(display, LGC, 
-	            rem( (int)gkywkd_.qwpax[ws], p_width) - p_width, 
+
+	XSetTSOrigin(display, LGC,
+	            rem( (int)gkywkd_.qwpax[ws], p_width) - p_width,
 	            rem(y_max - (int)gkywkd_.qwpay[ws] - p_height, p_height)
 	            );
      }
@@ -409,10 +409,10 @@ f77_integer gk0xfa_(nc, xwc, ywc)
 	 */
 
 	i = abs((int)gkywkd_.kwfasi[ws]) - 1;
-	if (hatches[i].image ==0) 
+	if (hatches[i].image ==0)
 	{
 	  /* Make the hatch pattern in image */
-	  hatches[i].image = XCreatePixmap(display, 
+	  hatches[i].image = XCreatePixmap(display,
 	                        (Drawable *)gk0xunportask(ddbm,ASKBMMEMORY),
 	                        hatches[i].width,  hatches[i].height, 1);
           if (hatches[i].image==0)
@@ -422,9 +422,9 @@ f77_integer gk0xfa_(nc, xwc, ywc)
           }
 	  /* Get GC for element Pixmap has to be separate as it is always
 	     one pixel deep */
-	  if(HatchGC==(GC)0) 
-	   HatchGC = XCreateGC(display, hatches[i].image, 0, 0); 
-          
+	  if(HatchGC==(GC)0)
+	   HatchGC = XCreateGC(display, hatches[i].image, 0, 0);
+
           XSetForeground(display,HatchGC,BlackPixel(display,DefaultScreen(display)));
           XSetLineAttributes(display,HatchGC,0,LineSolid,CapButt,JoinMiter);
           XDrawSegments(display,hatches[i].image,
@@ -433,7 +433,7 @@ f77_integer gk0xfa_(nc, xwc, ywc)
         }
 	/*
 	 * Set hatch to be the stipple, set function, and foreground to
-	 * be the fill area colour index 
+	 * be the fill area colour index
 	 */
 
 	XSetForeground(display,LGC,dd->d_fore);

@@ -56,7 +56,7 @@ C
       INTEGER   NX               ! Number of elements in 1D array
       INTEGER   NELM             ! Total number of elements in x-axis
       REAL      PARSH            ! Starting shift for parabola fit
-      REAL      SHIFT            ! Distance of highest peak from 1st 
+      REAL      SHIFT            ! Distance of highest peak from 1st
                                  ! pixel
       INTEGER   STATUS           ! Status return from DSA_xxx routines
       CHARACTER STRING*80        ! Output message string
@@ -143,7 +143,7 @@ C
 C     (>) NX     (Integer) The size of the data array
 C     (>) DATA   (Real array DATA(NX)) The data array
 C     (<) SHIFT  (Real) The position of the center of the highest peak,
-C                given as a shift relative to the center of the first 
+C                given as a shift relative to the center of the first
 C                data element.
 C     (<) WIDTH  (Real) The width of the peak, in pixels.
 C     (<) STATUS (Integer) A status code. 0=> OK, non-zero => unable
@@ -151,10 +151,10 @@ C                to find/fit peak.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     FIG_WXYFIT    (Figaro routine) Least squares polynomiual fit.
-C 
+C
 C                                             KS / AAO 29th Sept 1986
 C+
       IMPLICIT NONE
@@ -233,7 +233,7 @@ C
 C     (>) NX     (Integer) The size of the data array
 C     (>) DATA   (Real array DATA(NX)) The data array
 C     (!) SHIFT  (Real) The position of the center of the highest peak,
-C                given as a shift relative to the center of the first 
+C                given as a shift relative to the center of the first
 C                data element.
 C     (!) WIDTH  (Real) The width of the peak, in pixels.
 C     (<) STATUS (Integer) A status code. 0=> OK, non-zero => unable
@@ -241,11 +241,11 @@ C                to find/fit peak.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used - 
+C     Subroutines / functions used -
 C
 C     GEN_CENTROID (GEN_ package) Find line peak by convolution with
 C                                 the derivative of a Gaussian.
-C 
+C
 C                                             KS / AAO 29th Sept 1986
 C+
       IMPLICIT NONE

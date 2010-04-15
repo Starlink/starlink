@@ -31,17 +31,17 @@
          call stopit( status, 'Error 4' )
       end if
 
-      call ast_setc( sf, 'System', 'freq', status )    
+      call ast_setc( sf, 'System', 'freq', status )
       call ast_setc( sf, 'Unit(1)', 'Hz', status )
-      if( abs( ast_GetD( sf, 'SpecOrigin', status ) ) .ne. 
+      if( abs( ast_GetD( sf, 'SpecOrigin', status ) ) .ne.
      :            rf*1.0D9 ) then
          write(*,*) ast_GetD( sf, 'SpecOrigin', status )
          call stopit( status, 'Error 5' )
       end if
 
-      call ast_setc( sf, 'StdOfRest', 'LSRD', status )    
-      if( abs( ast_GetD( sf, 'SpecOrigin', status ) - 
-     :                  rf*1.00000212890848D9 ) .gt. 10.0 ) then 
+      call ast_setc( sf, 'StdOfRest', 'LSRD', status )
+      if( abs( ast_GetD( sf, 'SpecOrigin', status ) -
+     :                  rf*1.00000212890848D9 ) .gt. 10.0 ) then
          write(*,*) ast_GetD( sf, 'SpecOrigin', status )
          write(*,*) 'Should be ',rf*1.00000212890848D9
          call stopit( status, 'Error 6' )
@@ -83,7 +83,7 @@
       call ast_setc( sf, 'SourceVRF', 'BARY', status )
       call ast_setc( sf, 'SourceSys', 'ZOPT', status )
 
-      if( abs( ast_getd(  sf, 'SourceVel', status ) - 
+      if( abs( ast_getd(  sf, 'SourceVel', status ) -
      :         0.00334028336870307D0 ) .gt. 1.0D-10 ) then
          write(*,*) ast_getd(  sf, 'SourceVel', status )
          call stopit( status, 'Error 11' )
@@ -93,7 +93,7 @@
       call ast_setc( sf, 'SourceVRF', 'LSRK', status )
       call ast_setc( sf, 'SourceSys', 'VREL', status )
 
-      if( abs( ast_getd(  sf, 'SourceVel', status ) - 
+      if( abs( ast_getd(  sf, 'SourceVel', status ) -
      :         1000.0D0 ) .gt. 1.0D-6 ) then
          write(*,*) ast_getd(  sf, 'SourceVel', status )
          call stopit( status, 'Error 12' )
@@ -129,7 +129,7 @@
       external mysource, mysink
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -151,7 +151,7 @@
          write(*,*) text
          call stopit( status, 'Cannot read object from channel' )
       end if
-     
+
 
 
       if( ast_getd( obj, 'specorigin', status ) .ne.
@@ -162,7 +162,7 @@
          call stopit( status, 'Object has changed' )
       end if
 
-      end  
+      end
 
       subroutine sink1( status )
       implicit none
@@ -181,7 +181,7 @@
       if( index( line( : l ),'Unc =' ) .GT. 0 ) then
          done = .true.
 
-      else if( .not. done .and. 
+      else if( .not. done .and.
      :         index( line( : l ),'FrameSet' ) .GT. 0 ) then
          fsfound= .true.
       end if
@@ -195,7 +195,7 @@
       integer status, next, end, ll
       character buf*25000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -218,7 +218,7 @@
       character buf*25000
       character line*1000
 
-      common /ss1/ buf 
+      common /ss1/ buf
       common /ss2/ next, end, ll
 
       if( status .ne. sai__ok ) return
@@ -237,7 +237,7 @@
          write(*,*) buf( next : next + l)
          write(*,*) 'Line length ',l
          call stopit( status, 'Line overflow in mysink!!' )
-      else 
+      else
          end = next + l
          buf( end : next + ll - 1 ) = ' '
       endif

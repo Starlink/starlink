@@ -1,5 +1,5 @@
 /******************************************************************************
-* DSX_GENC.C             
+* DSX_GENC.C
 -
  Contains:-
 -
@@ -120,7 +120,7 @@ int	KYO;		/*  Y Last cursor Y posn */
 
 char   TEXTAA[200];
 /*
-  (void) sprintf ( TEXTAA, " F1XXX %d %d %d %d %d ", 
+  (void) sprintf ( TEXTAA, " F1XXX %d %d %d %d %d ",
                           PDSOPEN, DSNXS, DSNXE, DSNYS, DSNYE );
    (void) c_printo ( TEXTAA );
 */
@@ -129,7 +129,7 @@ char   TEXTAA[200];
   DSX_PTTIT -- Put image title on display - FORTRAN interface (Xwindows)
 
     alan penny                ral              1990-01-31
-    pat morris             leeds        1992 jan  
+    pat morris             leeds        1992 jan
 */
 
 F77_SUBROUTINE(dsx_pttit) ( CHARACTER(title) TRAIL(title) )
@@ -140,7 +140,7 @@ F77_SUBROUTINE(dsx_pttit) ( CHARACTER(title) TRAIL(title) )
        char *name;
 /* Cbegin */
 
-       
+
        name = cnf_creim ( title, title_length );
 
        (void) dsxc_pttit ( name );
@@ -157,7 +157,7 @@ F77_SUBROUTINE(dsx_pttit) ( CHARACTER(title) TRAIL(title) )
     alan penny           ral                       1990-02-01
 */
 
-F77_SUBROUTINE(dsx_vtim) ( INTEGER(jvxs), INTEGER(jvxe), INTEGER(jvys), 
+F77_SUBROUTINE(dsx_vtim) ( INTEGER(jvxs), INTEGER(jvxe), INTEGER(jvys),
                            INTEGER(jvye), INTEGER(kcl) )
 
 {
@@ -200,7 +200,7 @@ F77_SUBROUTINE(dsx_pscur) ( REAL(x), REAL(y) )
   pat morris             leeds        1992 jan
 */
 
-F77_SUBROUTINE(dsx_getcurpb) ( LOGICAL(isimage), INTEGER(kx), INTEGER(ky), 
+F77_SUBROUTINE(dsx_getcurpb) ( LOGICAL(isimage), INTEGER(kx), INTEGER(ky),
                                INTEGER_ARRAY(kb), INTEGER(ierr) )
 
 {
@@ -230,9 +230,9 @@ F77_SUBROUTINE(dsx_getcurpb) ( LOGICAL(isimage), INTEGER(kx), INTEGER(ky),
 */
 
 F77_SUBROUTINE(dsx_paintova) ( REAL(pxo), REAL(pyo), REAL(rxo), REAL(ryo),
-                              REAL(px),  REAL(py), 
-                              REAL(rax1), REAL(ray1), INTEGER(kc1), 
-                              REAL_ARRAY(rax2), REAL_ARRAY(ray2), 
+                              REAL(px),  REAL(py),
+                              REAL(rax1), REAL(ray1), INTEGER(kc1),
+                              REAL_ARRAY(rax2), REAL_ARRAY(ray2),
                               INTEGER(kc2) )
 
 {
@@ -251,10 +251,10 @@ F77_SUBROUTINE(dsx_paintova) ( REAL(pxo), REAL(pyo), REAL(rxo), REAL(ryo),
 /* C-- */
 /* Cbegin */
 
-       
+
       (void) dsxc_paintova ( *pxo, *pyo, *rxo, *ryo, *px, *py, *rax1, *ray1,
                              *kc1, rax2, ray2, *kc2 );
-       
+
 
 }
 
@@ -266,7 +266,7 @@ F77_SUBROUTINE(dsx_paintova) ( REAL(pxo), REAL(pyo), REAL(rxo), REAL(ryo),
   pat morris             leeds        1992 jan
 */
 
-F77_SUBROUTINE(dsx_paintovb) ( INTEGER_ARRAY(kcx), INTEGER_ARRAY(kcy), 
+F77_SUBROUTINE(dsx_paintovb) ( INTEGER_ARRAY(kcx), INTEGER_ARRAY(kcy),
                                INTEGER(kc1), INTEGER(kc2),
                                REAL(pxo), REAL(pyo), REAL(rxo), REAL(ryo) )
 {
@@ -281,9 +281,9 @@ F77_SUBROUTINE(dsx_paintovb) ( INTEGER_ARRAY(kcx), INTEGER_ARRAY(kcy),
 /* C-- */
 /* Cbegin */
 
-       
+
       (void) dsxc_paintovb ( kcx, kcy, *kc1, *kc2, *pxo, *pyo, *rxo, *ryo );
-       
+
 
 }
 
@@ -515,7 +515,7 @@ F77_SUBROUTINE(dsx_cross) ( REAL(x), REAL(y), REAL(crs), INTEGER(kc) )
 					      5=cyan;6=mauve;7=tan;8=pink)
 					      9=black;10=white) */
 /* C-- */
-/* Cbegin */  
+/* Cbegin */
 
 
      (void) dsxc_cross ( *x, *y, *crs, *kc );
@@ -532,7 +532,7 @@ F77_SUBROUTINE(dsx_cross) ( REAL(x), REAL(y), REAL(crs), INTEGER(kc) )
   pat morris             leeds        1992 jan
 */
 
-F77_SUBROUTINE(dsx_line) ( REAL(xs), REAL(ys), REAL(xe), REAL(ye), 
+F77_SUBROUTINE(dsx_line) ( REAL(xs), REAL(ys), REAL(xe), REAL(ye),
                             INTEGER(kc) )
 
 {
@@ -582,8 +582,8 @@ F77_SUBROUTINE(dsx_updown) ( INTEGER(kf) )
   pat morris             leeds        1992 jan
 */
 
-F77_SUBROUTINE(dsx_acimr) ( REAL_ARRAY(im), INTEGER(mx), INTEGER(my), 
-                            INTEGER(ixs), INTEGER(ixe), INTEGER(iys), INTEGER(iye), 
+F77_SUBROUTINE(dsx_acimr) ( REAL_ARRAY(im), INTEGER(mx), INTEGER(my),
+                            INTEGER(ixs), INTEGER(ixe), INTEGER(iys), INTEGER(iye),
                             INTEGER(ix), INTEGER(iy), LOGICAL(wrap) )
 
 GENPTR_INTEGER(mx) 		/* i: Actual image X size */
@@ -735,10 +735,10 @@ dsxc_init ( title, kscreenopt, ierr )
       nnya = nya - 25 ;
 
       if ( nnxa*nnya > MAXVIRT ) {
-         (void) sprintf ( texta, 
+         (void) sprintf ( texta,
          "  WARNING: Total screen size is %5d x %5d :", nxa, nya );
          (void) c_printo ( texta );
-         (void) sprintf ( texta, 
+         (void) sprintf ( texta,
          "           Opening a window with more than 8%d pixels ", MAXVIRT );
          (void) c_printo ( texta );
          (void) c_printo ( "           will crash this program" );
@@ -747,17 +747,17 @@ dsxc_init ( title, kscreenopt, ierr )
       jx  = DSNXE - DSNXS + 1 ;		/* Get screen pixel size */
       jy  = DSNYE - DSNYS + 1 ;
       if ( jx<16 || jy<16 ) {
-         (void) sprintf ( texta, 
+         (void) sprintf ( texta,
          "  WARNING: Window size asked for was %5d x %5d :", jx, jy);
          (void) c_printo ( texta );
-         (void) c_printo (           
+         (void) c_printo (
          "           For technical reasons, display sides must be > 15" );
          if ( jx<16 ) jx = 16;
          if ( jy<16 ) jy = 16;
          (void) sprintf ( texta,
          "           Window will be opened as size %5d x %5d :", jx, jy);
          (void) c_printo ( texta );
-       }      
+       }
       DSSNX = jx ;
       DSSNY = jy ;
       if ( (jx > nnxa) || (jy > nnya) ) {
@@ -768,21 +768,21 @@ dsxc_init ( title, kscreenopt, ierr )
          lxy = 1 + imax((kka/nnxa),(kkb/nnya));
          DSSNX = 1 + ((jx-1)/lxy);
          DSSNY = 1 + ((jy-1)/lxy);
-         (void) sprintf ( texta, 
-                          " Image size %5d x %5d is too large for screen size - %5d x %5d", 
+         (void) sprintf ( texta,
+                          " Image size %5d x %5d is too large for screen size - %5d x %5d",
                           jx, jy, nnxa, nnya );
          (void) c_printo ( texta );
-         (void) sprintf ( texta, " Displayed image will be compressed by %5d x %5d", 
+         (void) sprintf ( texta, " Displayed image will be compressed by %5d x %5d",
                           lxy, lxy);
          (void) c_printo ( texta );
       }
 
       if ( kscreenopt==0 ) {
-         k = imax(nnxa,nnya); 
-         ivx = DSSNX; 
+         k = imax(nnxa,nnya);
+         ivx = DSSNX;
          ivy = DSSNY;
          (void) c_get2i ( "SCREEN", &ivx, &ivy, True, 1, k );
-         DSSNX = ivx; 
+         DSSNX = ivx;
          DSSNY = ivy;
       }
 
@@ -817,7 +817,7 @@ dsxc_init ( title, kscreenopt, ierr )
          return ;
       }
 
-      if ( vinfo.visual != D_VISUAL ) 
+      if ( vinfo.visual != D_VISUAL )
 	  (void) c_printo ( "Not default visual" );
       if (!PDSOPEN) (void) dsxc_opcolmap ();				/* Open colour map */
 
@@ -846,7 +846,7 @@ dsxc_init ( title, kscreenopt, ierr )
       GC_ID = XCreateGC ( VD_ID, WD_ID, (GCForeground | GCBackground), &xgcvl );
 
       if ( (font = XLoadQueryFont ( VD_ID, font_name ) ) == NULL ) {	/* Load the font for text writing */
-         (void) c_printo ( 
+         (void) c_printo (
          "WARNING: Couldn\'t open fonts - any text may be wrong size");
       }else{
          XSetFont ( VD_ID, GC_ID, font->fid );
@@ -885,8 +885,8 @@ dsxc_init ( title, kscreenopt, ierr )
          argv[4] = '\0';
          execvp ( "s_refresh", argv );
         _exit ( errno );
-       } 
- 
+       }
+
       XMapWindow ( VD_ID, WD_ID );					/* Map the windows */
       XFlush ( VD_ID );
 
@@ -979,10 +979,10 @@ dsxc_opcolmap (void)
                (void) c_printo ( "        Any change to the LUT will also need to have the image redisplayed" );
                OWNCOL = False;
             }
-            else 
+            else
                (void) c_printo ( "WARNING: Only 50 steps in image display" );
          }
-         else 
+         else
             (void) c_printo ( "WARNING: Only 75 steps in image display" );
       }
 
@@ -1025,11 +1025,11 @@ dsxc_bytecol (void)
             BY_PC_ID[k-1] = 0;
 	 else
             BY_PC_ID[k-1] = iv;
-         
-      } 
+
+      }
 
 
-}      
+}
 
 
 /*************************************************************************
@@ -1051,72 +1051,72 @@ dsxc_cicon (void)
       Pixmap          icon_pixmap;
       Atom            wmatom;
       static unsigned char icon_bits[512] = {
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x3c, 0x1f, 0x63, 0x23, 0x62, 0x88, 0x00, 0x00, 
-        0x02, 0x04, 0x43, 0x64, 0x63, 0x88, 0x00, 0x00, 
-        0x02, 0x84, 0x44, 0x64, 0x93, 0x98, 0x00, 0x00, 
-        0x02, 0x84, 0x64, 0xa3, 0x92, 0xa8, 0x00, 0x00, 
-        0x1c, 0x84, 0x44, 0x21, 0x92, 0xa8, 0x00, 0x00, 
-        0x20, 0x84, 0x47, 0x22, 0xf2, 0xc8, 0x00, 0x00, 
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x3c, 0x1f, 0x63, 0x23, 0x62, 0x88, 0x00, 0x00,
+        0x02, 0x04, 0x43, 0x64, 0x63, 0x88, 0x00, 0x00,
+        0x02, 0x84, 0x44, 0x64, 0x93, 0x98, 0x00, 0x00,
+        0x02, 0x84, 0x64, 0xa3, 0x92, 0xa8, 0x00, 0x00,
+        0x1c, 0x84, 0x44, 0x21, 0x92, 0xa8, 0x00, 0x00,
+        0x20, 0x84, 0x47, 0x22, 0xf2, 0xc8, 0x00, 0x00,
 
-        0x20, 0x44, 0x48, 0x22, 0x0a, 0x89, 0x00, 0x00, 
-        0x1e, 0x44, 0x48, 0x24, 0x0a, 0x89, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+        0x20, 0x44, 0x48, 0x22, 0x0a, 0x89, 0x00, 0x00,
+        0x1e, 0x44, 0x48, 0x24, 0x0a, 0x89, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
-        0x80, 0x84, 0x20, 0x30, 0x1e, 0x00, 0x00, 0x00, 
-        0x80, 0xcc, 0x20, 0x48, 0x02, 0x00, 0x00, 0x00, 
-        0x80, 0xcc, 0x48, 0x08, 0x02, 0x00, 0x00, 0x00, 
-        0x80, 0xb4, 0x48, 0x04, 0x02, 0x00, 0x00, 0x00, 
-        0x80, 0x84, 0x48, 0x64, 0x0e, 0x00, 0x00, 0x00, 
-        0x80, 0x84, 0x68, 0x48, 0x02, 0x00, 0x00, 0x00, 
-        0x80, 0x84, 0x84, 0x48, 0x02, 0x00, 0x00, 0x00, 
-        0x80, 0x84, 0x84, 0x30, 0x1e, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0xf0, 0xff, 0xff, 0xff, 0xff, 0x0f, 0x00, 0x00, 
-        0x00, 0xff, 0xff, 0xff, 0x0f, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0xff, 0x0f, 0x00, 0x00, 0x00, 0x00, 
+        0x80, 0x84, 0x20, 0x30, 0x1e, 0x00, 0x00, 0x00,
+        0x80, 0xcc, 0x20, 0x48, 0x02, 0x00, 0x00, 0x00,
+        0x80, 0xcc, 0x48, 0x08, 0x02, 0x00, 0x00, 0x00,
+        0x80, 0xb4, 0x48, 0x04, 0x02, 0x00, 0x00, 0x00,
+        0x80, 0x84, 0x48, 0x64, 0x0e, 0x00, 0x00, 0x00,
+        0x80, 0x84, 0x68, 0x48, 0x02, 0x00, 0x00, 0x00,
+        0x80, 0x84, 0x84, 0x48, 0x02, 0x00, 0x00, 0x00,
+        0x80, 0x84, 0x84, 0x30, 0x1e, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xf0, 0xff, 0xff, 0xff, 0xff, 0x0f, 0x00, 0x00,
+        0x00, 0xff, 0xff, 0xff, 0x0f, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0xff, 0x0f, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } ;
 /* Cbegin */
 
@@ -1188,7 +1188,7 @@ dsxc_setcol (void)
       static float sgb[5]={0.0,  0.5,  0.75,  0.89,  1.0};
 /* Cbegin */
 
-      
+
       flags = DoRed | DoGreen | DoBlue ;
 
       if ( OWNCOL ) {
@@ -1386,18 +1386,18 @@ dsxc_vtim ( jvxs, jvxe, jvys, jvye, kcl )
          nn = DSZM*DSZM*(kvxe-kvxs+1)*(kvye-kvys+1);
 
          if ( nn<=0 ) {
-         (void) sprintf ( texta, 
+         (void) sprintf ( texta,
             "ERROR:  %d size workspace asked in - s/r dsxc_vtim", nn);
             (void ) c_printo ( texta );
             return;
          }
          ptr = calloc ( nn, sizeof(char) );
          if ( ptr==NULL ) {
-            (void ) c_printo ( 
+            (void ) c_printo (
                     "ERROR: cant get workspace - in s/r dsxc_vtim" );
             return;
          }
-         (void) dsxc_vtima ( ptr, nn, kcl, ksxs, ksxe, ksys, ksye, 
+         (void) dsxc_vtima ( ptr, nn, kcl, ksxs, ksxe, ksys, ksye,
                                 kvxs, kvxe, kvys, kvye );
          free ( ptr);
       }
@@ -1456,20 +1456,20 @@ dsxc_vtima ( vt, nn, kcl, ksxs, ksxe, ksys, ksye, kvxs, kvxe, kvys, kvye )
       if ( (DSZM==1) && (kvxs==1) && (kvxe==DSSNX) &&			/* Display whole vitual image */
            (kvys==1) && (kvye==DSSNY) ) {
          ipd = malloc ( kx*ky );
-         for ( k=0;k<kx*ky;k++ ) 
+         for ( k=0;k<kx*ky;k++ )
             ipd[k] = VT_IM[k];
       } else {
          (void) dsxc_vtload ( vt, nn, kvxs, kvxe, kvys, kvye, ksxs );	/* Load array */
 
          ipd = malloc ( kx*ky );
-         for ( k=0; k<kx*ky; k++ ) 
+         for ( k=0; k<kx*ky; k++ )
             ipd[k] = vt[k];
       }
 
       image = XCreateImage ( VD_ID, D_VISUAL, DEPTH, ZPixmap, 0,	/* Point to image */
                              ipd, ukx, uky, 8, kx);
       if ( image == NULL ) {
-         (void) c_printo ( 
+         (void) c_printo (
                    "ERROR: Could not get image - in s/r dsxc_vtima" );
          return;
       }
@@ -1495,7 +1495,7 @@ dsxc_vtima ( vt, nn, kcl, ksxs, ksxe, ksys, ksye, kvxs, kvxe, kvys, kvye )
  The area is defined in the standard 'virtual' array - the 'VT_IM'
  input and 'vt' output are Y-reversed from this.
 
- If the 'right' of the new (perhaps enlarged) array lies 
+ If the 'right' of the new (perhaps enlarged) array lies
  outside the screen, then the array is filled up only to the edge.
 
  The output array is usually sized so that it is big enough
@@ -1524,7 +1524,7 @@ dsxc_vtload ( vt, nn, kvxs, kvxe, kvys, kvye, ksxs )
       DSSNX = F77_NAMED_COMMON(ds_gen).dssnx;
       DSSNY = F77_NAMED_COMMON(ds_gen).dssny;
       DSZM = F77_NAMED_COMMON(ds_gen).dszm;
-      
+
       kxs = kvxs - 1;						/* VT_IM and vt coordinates */
       kxe = kvxe - 1;
       kys = DSSNY - kvye;
@@ -1533,7 +1533,7 @@ dsxc_vtload ( vt, nn, kvxs, kvxe, kvys, kvye, ksxs )
       if ( DSZM == 1 ) {
 
          ka = 0;						/* Unzoomed is easy */
-         for ( j = kys; j <= kye; j++ ) { 
+         for ( j = kys; j <= kye; j++ ) {
              ja = j*DSSNX;
              for ( k = kxs; k <= kxe; k++ ) {
                  vt[ka] = VT_IM[ja+k];
@@ -1545,7 +1545,7 @@ dsxc_vtload ( vt, nn, kvxs, kvxe, kvys, kvye, ksxs )
 
          kxf = DSZM;						/* Fraction of zoomed pixel */
          kxd = ksxs + (kvxe-kvxs+1)*DSZM - 1;			/* at right edge */
-         if ( kxd>DSSNX ) kxf = DSZM - (kxd-DSSNX); 
+         if ( kxd>DSSNX ) kxf = DSZM - (kxd-DSSNX);
 
          ka = 0;
          for ( j = kys; j <= kye; j++ ) {			/* Y rows */
@@ -1556,7 +1556,7 @@ dsxc_vtload ( vt, nn, kvxs, kvxe, kvys, kvye, ksxs )
                   for ( k = kxs; k <= kxe-1; k++ ) {
                      for ( kk = 1; kk<= DSZM; kk++ ) {
                         vt[ka] = VT_IM[ja+k];
-                        ka = ka + 1; 
+                        ka = ka + 1;
                      }
                   }
                }
@@ -1675,7 +1675,7 @@ dsxc_erase ()
 
       ipd = malloc (DSSNX*DSSNY);				/* Clear virtual screen */
       for ( k=0 ; k<(DSSNX*DSSNY) ; k++ ) {
-         ipd[k] = kbya;		
+         ipd[k] = kbya;
          VT_IM[k] = kbya;
       }
 
@@ -1737,7 +1737,7 @@ dsxc_clear (void)
       XDestroyImage ( image );
       XFlush ( VD_ID );
       free (ipd);
-      
+
 
 
 }
@@ -1805,14 +1805,14 @@ dsxc_scur (void)
       Cursor cursor;
       Pixmap   cursor_pixmap;
       static unsigned char cursor_bits[32] = {
-                              0x80, 0x00, 0x80, 0x00, 
-                              0x80, 0x00, 0x80, 0x00, 
-                              0x80, 0x00, 0x80, 0x00, 
-                              0x80, 0x00, 0x80, 0x00, 
-                              0xff, 0xff, 0x80, 0x00, 
-                              0x80, 0x00, 0x80, 0x00, 
-                              0x80, 0x00, 0x80, 0x00, 
-                              0x80, 0x00, 0x80, 0x00 } ; 
+                              0x80, 0x00, 0x80, 0x00,
+                              0x80, 0x00, 0x80, 0x00,
+                              0x80, 0x00, 0x80, 0x00,
+                              0x80, 0x00, 0x80, 0x00,
+                              0xff, 0xff, 0x80, 0x00,
+                              0x80, 0x00, 0x80, 0x00,
+                              0x80, 0x00, 0x80, 0x00,
+                              0x80, 0x00, 0x80, 0x00 } ;
       XColor cursor_dummy;
       XColor cursor_foreground;
       XColor cursor_background;
@@ -1859,7 +1859,7 @@ dsxc_scur (void)
       F77_NAMED_COMMON(ds_gen).dscurposx = xo;
       F77_NAMED_COMMON(ds_gen).dscurposy = yo;
       F77_NAMED_COMMON(ds_genb).dsscur = F77_TRUE;
-     
+
 }
 
 
@@ -1907,7 +1907,7 @@ dsxc_pcur ( kx, ky )
       F77_NAMED_COMMON(ds_gen).dscurposy = yo;
       F77_NAMED_COMMON(ds_genb).dscurset = F77_TRUE;
 
-} 
+}
 
 
 /**********************************************************************
@@ -2000,12 +2000,12 @@ int    *ierr;            /* o: Error flag ( 0=ok; 1=bad) */
          return;
       }
 
-      istat = XQueryPointer ( VD_ID, win, &root, &child, &kwx, &kwy, 
+      istat = XQueryPointer ( VD_ID, win, &root, &child, &kwx, &kwy,
                               &jkx, &jky, &kbstat );
       XFlush ( VD_ID );
 
       jkx = jkx + 1;
-      if ( isimage ) 
+      if ( isimage )
          jky = DSSNY - jky;
       else
          jky = PNSNY - jky;
@@ -2020,7 +2020,7 @@ int    *ierr;            /* o: Error flag ( 0=ok; 1=bad) */
 
       if ( *ierr == 0 && NUMXBUTTONS==2 && kb[1]==1 ) {
          (void) dsxc_mswait ( 400 );
-         istat = XQueryPointer ( VD_ID, win, &root, &child, &kwx, &kwy, 
+         istat = XQueryPointer ( VD_ID, win, &root, &child, &kwx, &kwy,
                                  &jkx, &jky, &kbstat );
          XFlush ( VD_ID );
 
@@ -2045,7 +2045,7 @@ int    *ierr;            /* o: Error flag ( 0=ok; 1=bad) */
       }
 
 
-}      
+}
 
 
 /***********************************************************
@@ -2124,7 +2124,7 @@ void dsxc_putim ( data, kx, ky, ksxs, ksys )
       uky = ky;
 
       ipd = malloc (kx*ky);
-      for ( k=0;k<kx*ky;k++ ) 
+      for ( k=0;k<kx*ky;k++ )
           ipd[k] = data[k];
 
       image = XCreateImage ( VD_ID, D_VISUAL, DEPTH, ZPixmap, 0, ipd,	/* Point to image */
@@ -2143,7 +2143,7 @@ void dsxc_putim ( data, kx, ky, ksxs, ksys )
 }
 
 
-/************************************************************************ 
+/************************************************************************
      DSXC_PAINTOVA -- Paint moving oval  at X/Y normals - erase last (Xwindows)
 
   alan penny             ral             1990 Jan
@@ -2167,7 +2167,7 @@ dsxc_paintova ( pxo, pyo, rxo, ryo, px, py, rx1, ry1, kc1, rx2, ry2, kc2 )
 
 /* C-- */
 {
-      int      kvxs, kvxe, kvys, kvye, kvx, kvy, kpxo, kpyo, 
+      int      kvxs, kvxe, kvys, kvye, kvx, kvy, kpxo, kpyo,
                jx, jy, jxs, jys, jxe, jye;
       unsigned int  krx, kry;
       float    rx, ry, pxi, pyi;
@@ -2192,7 +2192,7 @@ dsxc_paintova ( pxo, pyo, rxo, ryo, px, py, rx1, ry1, kc1, rx2, ry2, kc2 )
 
       if ( kc1!=-1 ) {							/* Paint new oval */
          pxi = px + (DSZM/2);
-         pyi = py + (DSZM/2);   
+         pyi = py + (DSZM/2);
          (void) dsxc_setthecol ( kc1 );
 
          rx = (float) (DSZM) * rx1/ (float) (DSCOMFX);
@@ -2206,7 +2206,7 @@ dsxc_paintova ( pxo, pyo, rxo, ryo, px, py, rx1, ry1, kc1, rx2, ry2, kc2 )
 
       if ( kc2!=-1 ) {							/* Paint new oval */
          pxi = px + (DSZM/2);
-         pyi = py + (DSZM/2);    
+         pyi = py + (DSZM/2);
          (void) dsxc_setthecol ( kc2 );
 
          rx = (float) (DSZM) * rx2[0]/ (float) (DSCOMFX);
@@ -2231,7 +2231,7 @@ dsxc_paintova ( pxo, pyo, rxo, ryo, px, py, rx1, ry1, kc1, rx2, ry2, kc2 )
 }
 
 
-/************************************************************************ 
+/************************************************************************
      DSXC_PAINTOVB -- Paint moving oval (XY) - erase last (Xwindows)
 
   alan penny             ral             1990 Jan
@@ -2240,7 +2240,7 @@ dsxc_paintova ( pxo, pyo, rxo, ryo, px, py, rx1, ry1, kc1, rx2, ry2, kc2 )
 
 dsxc_paintovb ( kcx, kcy, kc1, kc2, pxo, pyo, rxo, ryo )
 
-    
+
     int     kcx[];	/* i: Centre/Inner/Outer oval X posns (image scale) */
     int     kcy[];	/* i: Centre/Inner/Outer oval Y posns (image scale) */
     int     kc1;	/* i: Inner oval colour (1-8) */
@@ -2252,7 +2252,7 @@ dsxc_paintovb ( kcx, kcy, kc1, kc2, pxo, pyo, rxo, ryo )
 
 /* C-- */
 {
-      int      kvxs, kvxe, kvys, kvye, kvx, kvy, kpxo, kpyo, 
+      int      kvxs, kvxe, kvys, kvye, kvx, kvy, kpxo, kpyo,
                kpxi, kpyi, k;
       XPoint   theline[185];
 /* Cbegin */
@@ -2268,7 +2268,7 @@ dsxc_paintovb ( kcx, kcy, kc1, kc2, pxo, pyo, rxo, ryo )
       kvye = kvys + (int) ((2.0*ryo/DSCOMFY)+12.0);
       (void) dsxc_vtim ( kvxs, kvxe, kvys, kvye, 0 );
       XFlush ( VD_ID );
-	
+
       if ( kc1!=-1 ) {							/* Paint new oval */
          (void) dsxc_setthecol ( kc1 );
          for ( k=0; k<=180; k++ ) {
@@ -2367,7 +2367,7 @@ dsxc_ovala ( xp, yp, radx, angle, elli, kc )
 /* C-- */
 {
       float rx, ry, da, rxx, ryy, dx1, dy1, rx1, ry1, tt, sdx[5], sdy[5];
-      int j, k, nxv, nyv, kkcol, kp, jx, jy, krv, krva, ivx, ivy, 
+      int j, k, nxv, nyv, kkcol, kp, jx, jy, krv, krva, ivx, ivy,
           kvx, kvy, kxp, kyp, kpx, kpy, kpxi, kpyi, krx, kry, ns;
 /* Cbegin */
 
@@ -2448,7 +2448,7 @@ dsxc_ovala ( xp, yp, radx, angle, elli, kc )
                tt = tt*tt;
                dx1 = sqrt(1.0/(rxx+(tt*ryy)));
                dy1 = sqrt(1.0/(ryy+(rxx/tt)));
-               nxv = kvx + sdx[j]*dx1; 
+               nxv = kvx + sdx[j]*dx1;
                nyv = kvy + sdy[j]*dy1;
                kp = nxv + (DSSNY-nyv)*DSSNX;
                if ( (nxv>=1) && (nxv<=DSSNX) && (nyv>=1) && (nyv<=DSSNY) ){
@@ -2483,9 +2483,9 @@ dsxc_ovalb ( xp, yp, radx, angle, elli, kc )
 /* C-- */
 {
       float ry, sav, cav, ryy, trv, ttrv, dx, dy, rv, afx, afy, ax1, ax2,
-            ay1, ay2, dfx, dfy, dax[48], day[48], sdx[5], sdy[5], 
+            ay1, ay2, dfx, dfy, dax[48], day[48], sdx[5], sdy[5],
             f1, f2, f3, f4;
-      int   k, kk, kkcol, kp, ka, kcx[185], kcy[185], kcxa[185], kcya[185], 
+      int   k, kk, kkcol, kp, ka, kcx[185], kcy[185], kcxa[185], kcya[185],
             kpx, kpy, kxp, kyp, nxv, nyv, nxva, nyva;
       XPoint  theline[185];
 /* Cbegin */
@@ -2571,7 +2571,7 @@ dsxc_ovalb ( xp, yp, radx, angle, elli, kc )
       kcya[180] = kcya[0];
       kcx[180] = kcx[0];
       kcy[180] = kcy[0];
-   
+
       for ( k=0; k<=180; k++ ) {
          theline[k].x = kcx[k];
          theline[k].y = DSSNY - kcy[k];
@@ -2616,7 +2616,7 @@ dsxc_osize ( rad, ang, ell, xs, ys )
       *xs = 2.0*rad;
       *ys = 2.0*rad;
 
-     
+
 }
 
 
@@ -2637,7 +2637,7 @@ dsxc_cross ( x, y, crs, kc )
 					      9=black;10=white) */
 /* C-- */
 {
-      int iv, jx, jxs, jxe, jy, jys, jye, k, kxa, kxb, kya, kyb, 
+      int iv, jx, jxs, jxe, jy, jys, jye, k, kxa, kxb, kya, kyb,
           kkcol, kjs, kje, kx, ky, kpx, kpy, kdx, kdy;
 /* Cbegin */
 
@@ -2772,7 +2772,7 @@ dsxc_line ( xs, ys, xe, ye, kc )
       (void) vtc_tis ( kxe, kye, &kpxe, &kpye );				/*Get screen position*/
 
       kpxs = kpxs + (DSZM/2);
-      kpys = kpys + (DSZM/2);    
+      kpys = kpys + (DSZM/2);
 
       kpxe = kpxe + (DSZM/2);
       kpye = kpye + (DSZM/2);
@@ -2787,7 +2787,7 @@ dsxc_line ( xs, ys, xe, ye, kc )
 
       (void) vtc_tsv ( kpxs, kpys, &kxa, &kya );				/* Put in virtual image */
       (void) vtc_tsv ( kpxe, kpye, &kxb, &kyb );
-   
+
       (void) dsxc_scolnum ( kc, &kkcol );
 
       if ( kxa==kxb ) {
@@ -2933,7 +2933,7 @@ dsxc_updown ( kf )
       Bool      wrap;		/* i: Flag to wrap values round display limits */
 /* C--*/
 {
-      int     iv, j, jj, ja, jx, jy, k, ka, kxoff, kyoff, kvxs, 
+      int     iv, j, jj, ja, jx, jy, k, ka, kxoff, kyoff, kvxs,
               kvxe, kvys, kvye, knv, kas, kbs, kcs, nxs, nxe, nys, nye;
       float   zero, delta, rv, rva;
       char    byteim[2048];
@@ -3043,7 +3043,7 @@ dsxc_updown ( kf )
       Bool      wrap;		/* i: Flag to wrap values round display limits */
 /* C--*/
 {
-      int   iv, j, ja, jj, jx, jy, kk, k, ka, kv, kxoff, kyoff, kvxs, 
+      int   iv, j, ja, jj, jx, jy, kk, k, ka, kv, kxoff, kyoff, kvxs,
             kvxe, kvys, kvye, knv, kas, kbs, kcs, nxs, nxe, nys, nye;
       float zero, delta, rv, rva;
       char  byteim[2048];
@@ -3124,7 +3124,7 @@ dsxc_updown ( kf )
             VT_IM[kbs+kas] = byteim[kcs+kas];
          }
       }
-      
+
       dsxc_vtim ( kvxs, kvxe, kvys, kvye, 0 );		/* Display section of virtual image */
 
 
@@ -3238,12 +3238,12 @@ float fmax ( float f1, float f2 )
     if ( msecs <= 0 ) return;					/* Check for a positive time interval.  */
 
     if ( msecs < 1000 ) {  					/* Set up the time structure, allowing */
-       time_struct.tv_sec = 0; 					/* for times longer than 1 second.     */ 
+       time_struct.tv_sec = 0; 					/* for times longer than 1 second.     */
        time_struct.tv_usec = msecs * 1000;
-    } else {  
-       time_struct.tv_sec = msecs / 1000;  
-       time_struct.tv_usec = ( msecs % 1000 ) * 1000;  
-    }  
+    } else {
+       time_struct.tv_sec = msecs / 1000;
+       time_struct.tv_usec = ( msecs % 1000 ) * 1000;
+    }
 
     FD_ZERO (&ia); FD_ZERO (&ib); FD_ZERO (&ic);
     ret = select ( 0, &ia, &ib, &ic, &time_struct );	  	/* Call select with null file descriptor sets */

@@ -10,7 +10,7 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  21 Nov 95  Created
-# Peter W. Draper 17 May 99  Modified for use in GAIA 
+# Peter W. Draper 17 May 99  Modified for use in GAIA
 
 puts {
 /*

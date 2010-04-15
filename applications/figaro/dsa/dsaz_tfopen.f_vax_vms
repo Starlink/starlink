@@ -17,12 +17,12 @@ C     an environment variable, etc. This can be blank. The special case
 C     where this is the single character '$' is taken as a reference to
 C     the directory from which the current program is being run. Systems
 C     where this concept cannot be implemented will simply not find
-C     an existing file in this 'execute' directory and will not be able to 
+C     an existing file in this 'execute' directory and will not be able to
 C     create a new file in it. The routine is also passed a file name,
-C     which may be a completely specified file name, complete with 
+C     which may be a completely specified file name, complete with
 C     directory specification, file extension and version number (where
-C     supported), or can be just the bare filename. It is also passed a 
-C     default file extension for use if this is not provided in the filename. 
+C     supported), or can be just the bare filename. It is also passed a
+C     default file extension for use if this is not provided in the filename.
 C     (If the filename appears to contain an extension, ie a dot within the
 C     body of the filename, then the default extension will be ignored,
 C     so a filename 'FILE.EXT' with a default extension of '.EXT' will
@@ -43,8 +43,8 @@ C     this depends on the operating system. Note that the symbolic directory
 C     is always used if it is non-blank; usually this program will be called
 C     several times as a file is searched for, with various symbols for the
 C     directory, and in one of these cases the symbolic directory will
-C     normally be blank to allow the case where the filename itself 
-C     contains the directory specification to succeed. 
+C     normally be blank to allow the case where the filename itself
+C     contains the directory specification to succeed.
 C
 C  Language:
 C     FORTRAN
@@ -70,7 +70,7 @@ C     (<) EXIST    (Logical) Independent of whether or not the file
 C                  was opened, indicates if it existed or not.
 C     (<) ERROR    (Character*(*)) A single string describing any error.
 C     (!) STATUS   (Integer) Status value.  If this is passed as non
-C                  zero, this routine returns immediately. If the file 
+C                  zero, this routine returns immediately. If the file
 C                  cannot be opened, this will be set to some non-zero
 C                  code.
 C
@@ -135,7 +135,7 @@ C
             CALL GEN_EXEDIR(EXEDIR,NCH)
             FULL_NAME=EXEDIR(:NCH)//FILENAME
             FLEN=NCH+FLEN
-         ELSE            
+         ELSE
             FULL_NAME=SYMDIR(:ICH_LEN(SYMDIR))//':'//FILENAME
             FLEN=SLEN+1+FLEN
          END IF
@@ -153,7 +153,7 @@ C
       IF (NEW) THEN
 C
 C        If the file is to be created, see if we can create it. If FILENAME
-C        contained a directory name and SYMDIR was non-blank, this will 
+C        contained a directory name and SYMDIR was non-blank, this will
 C        probably fail with a filename error, which is only to be expected.
 C
          OPEN (UNIT=LU,FILE=FULL_NAME(:FLEN),DEFAULTFILE=DEFEXT,
@@ -163,11 +163,11 @@ C
          END IF
       ELSE
 C
-C        The file should already exist. See if it did - this assumes that 
-C        this routine will be called more frequently for a file that doesn't 
-C        exist than for one that does, and that the INQUIRE is faster than 
+C        The file should already exist. See if it did - this assumes that
+C        this routine will be called more frequently for a file that doesn't
+C        exist than for one that does, and that the INQUIRE is faster than
 C        a tentative OPEN. (Otherwise, we'd only do the INQUIRE for the
-C        'new' case and just use an OPEN here.) If it does exist, try to 
+C        'new' case and just use an OPEN here.) If it does exist, try to
 C        open it.
 C
          IF (EXIST) THEN

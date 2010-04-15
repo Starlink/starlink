@@ -55,7 +55,7 @@ C      integer tmpend
       logical flag,loop,par_quest,iffibre,qstat,par_qnum,ifer
       include 'status_inc'
       character*79 chars,chars2
-      
+
       loop = .true.
       ix = 1
       iy = 1

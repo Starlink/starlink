@@ -1,6 +1,6 @@
 ************************************************************************
 
-      SUBROUTINE OUTPSF ( FOUT, INDEX, XCEN, YCEN, ORIGIN, 
+      SUBROUTINE OUTPSF ( FOUT, INDEX, XCEN, YCEN, ORIGIN,
      :                    SHAPE, SKY, PADU, CODE, STATUS)
 
 *+
@@ -14,7 +14,7 @@
 *     FORTRAN
 *
 *  Invocation :
-*     CALL OUTPSF (  FOUT, INDEX, XCEN, YCEN, ORIGIN, 
+*     CALL OUTPSF (  FOUT, INDEX, XCEN, YCEN, ORIGIN,
 *    :               SHAPE, SKY, PADU, CODE, STATUS)
 *
 *  Description :
@@ -92,11 +92,11 @@
       REAL PSKY
 
       CHARACTER CTEMP * 80
-      
+
       CHARACTER CINDEX * 5
       CHARACTER CXCEN * 9, CYCEN * 9
-      CHARACTER CFWHM1 * 11, CFWHM2 * 11, CROT * 9      
-      CHARACTER CSKY * 11     
+      CHARACTER CFWHM1 * 11, CFWHM2 * 11, CROT * 9
+      CHARACTER CSKY * 11
       CHARACTER TEXT * 80
 
 *.
@@ -121,9 +121,9 @@
 
 *   Y-FWHM
       WRITE( CFWHM2, '( F9.4 )' ) SHAPE(2) * 1.665
-      
+
 *   Rotation
-      WRITE( CROT, '( F7.4 )' ) SHAPE(3)      
+      WRITE( CROT, '( F7.4 )' ) SHAPE(3)
 
 *   Sky - use E format if number is too large
       PSKY = SKY * PADU
@@ -143,6 +143,6 @@
       CALL MSG_OUT( ' ', ' ', STATUS )
       CALL MSG_OUT( ' ', '          x        y      fwhm     fwhm'//
      :              '     angle  code', STATUS )
-      
+
       END
 

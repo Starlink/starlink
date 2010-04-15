@@ -24,7 +24,7 @@ C     information and to call DSA_USE_FLAGGED_VALUES if the file contained
 C     flagged values, under the assumption that only one of these would in
 C     fact be called. If presented with a file containing both types of
 C     quality information, such a program may call both routines but - having
-C     assumed only one would be called - may then not process the data 
+C     assumed only one would be called - may then not process the data
 C     properly.)
 C
 C  Language:
@@ -55,7 +55,7 @@ C+
 C
       IMPLICIT NONE
 C
-C     DSA_ common definition 
+C     DSA_ common definition
 C
       INCLUDE 'DSA_COMMON'
 C

@@ -40,7 +40,7 @@ foreach my $hdr (@parts) {
 
   is( $key, $hdr->[0], "Key");
   is( $val, $hdr->[1], "Value");
-  is( $com, $hdr->[2], "Comment"); 
+  is( $com, $hdr->[2], "Comment");
 
 }
 

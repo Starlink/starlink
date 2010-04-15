@@ -15,7 +15,7 @@
 *  Description:
 *     Obtains the size and type of a specified NDF component
 
-*  Arguments:      
+*  Arguments:
 *     argc = int (Given);
 *        The number of elements in argv.
 *     argv[] = void * (Given)
@@ -154,7 +154,7 @@ int oplen;              /* Length of error message */
       ndf_name = (IDL_STRING *)argv[0];
       comp = (IDL_STRING *)argv[1];
       type = (IDL_STRING *)argv[2];
-      ndims = (int *)argv[3]; 
+      ndims = (int *)argv[3];
       dims = (int *)argv[4];
    /*
    ** Enable NDF calls
@@ -185,9 +185,9 @@ int oplen;              /* Length of error message */
 */
    fstat = status;
    while ( status != SAI__OK ) {
-      errLoad( 
+      errLoad(
          param, ERR__SZPAR, &parlen, opstr, ERR__SZMSG, &oplen, &status );
-      if ( status != SAI__OK ) 
+      if ( status != SAI__OK )
          printf( "%s %s\r\n", errn++?"! ":"!!", opstr );
    }
    errRlse();
@@ -196,5 +196,5 @@ int oplen;              /* Length of error message */
 **  That's it, return to the calling routine
 */
    return( fstat == SAI__OK );
-   
+
 }

@@ -86,7 +86,7 @@
 	CALL PAR_GET0R( 'Y_CUR_REAL', YPOS, STATUS)
 
 	IF( STATUS. NE. SAI__OK)THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :       'Error : PLOT_CURCIRCLE after PAR_GET cursor position',
      :                  STATUS )
 	  RETURN
@@ -106,7 +106,7 @@
 	CALL PAR_GET0C( 'ELLIPSE_COLOUR', COLOUR_CODE, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :       'Error : PLOT_CURCIRCLE after PAR_GETS',
      :                  STATUS )
 	  RETURN
@@ -122,7 +122,7 @@
 
 * plot ELLIPSE
 
-	CALL SGS_ELLIPS( XPOS, YPOS, 
+	CALL SGS_ELLIPS( XPOS, YPOS,
      :	                 ELLIPSE_MAJOR*MAGNIF/2.0/ARCSEC_PIXEL,
      :	                 ELLIPSE_ECC, ELLIPSE_ANG)
 

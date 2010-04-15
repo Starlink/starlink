@@ -16,7 +16,7 @@
 *  Description:
 *     Create a new catalogue containing only entries that meet the given
 *     criteria. If an invalid expression error is reported CRITERIA
-*     is returned containing diagnostic information. 
+*     is returned containing diagnostic information.
 
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
@@ -24,7 +24,7 @@
 *     OUTPUT = CHARACTER * ( CHI__SZNAME ) (Given)
 *        Name of the new catalogue containing only the selected entries.
 *     CRITERIA = CHARACTER * ( CHI__SZEXP ) (Given)
-*        Criteria to be applied to each entry in the input catalogue to 
+*        Criteria to be applied to each entry in the input catalogue to
 *        determine if this entry is to be copied into the output catalogue.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status.
@@ -34,7 +34,7 @@
 *     that use this routine will run very slowly when CHI_SEARCH has to use
 *     method of searching.
 *
-*     The input and output catalogues are RESET to their first entries on  
+*     The input and output catalogues are RESET to their first entries on
 *     exit from this routine.
 
 
@@ -55,7 +55,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Parsing the criteria has two effects. It checks the criteria is
-*    a valid CHI expression and it eliminates any sexagesimal formats 
+*    a valid CHI expression and it eliminates any sexagesimal formats
 *    as part of the CONVERT function
 *
 *    (Not required CHI_XSEARCH used.)
@@ -94,7 +94,7 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Split the output name into database part and catname part.
 *
       call chi_splitname(output, outdbname, outcatname, status)

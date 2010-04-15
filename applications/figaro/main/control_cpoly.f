@@ -190,7 +190,7 @@
 
       call zero_dble(ss,MAX_KPLUS1)
       call zero_dble(athree,3*maxnpts+3*MAX_KPLUS1)
-     
+
 * do polynomial fit
 
       fstatus = fit_cpolb(w,npts(k),xpos(1,k),ypos(1,k),a,ss,kmax,
@@ -286,16 +286,16 @@
           if(used(k)) then
 
 *      Copy correct coeffficients from A into AA
-             
+
              do kk=1,kp1
                 aa(kk,k)=a(kp1,kk)
                 coeffs(kk) =a(kp1,kk)
              end do
-             
+
              do kk=1,3*maxnpts+3*MAX_KPLUS1
                 a3all(kk,k)=athree(kk)
              end do
-             
+
              if(plot) then
 
 *        Calculate and plot residuals for this tooth

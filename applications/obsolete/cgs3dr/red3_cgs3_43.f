@@ -52,12 +52,12 @@ C
 
       CALL DSA_OPEN(STATUS)
 C
-C     Get the name of the input file 
+C     Get the name of the input file
 C
       CALL PAR_GET0C ('INPUT', INPUT, STATUS)
       CALL DSA_NAMED_INPUT ('INPUT',INPUT,STATUS)
 C
-C     Determine dimensions of input. 
+C     Determine dimensions of input.
 C
       CALL DSA_DATA_SIZE ('INPUT', 4, NDIM, DIMS, ELEMENTS,
      : STATUS)
@@ -112,7 +112,7 @@ C
       CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', OPTR, SLOT,
      : STATUS)
       IF (VARIANCE) THEN
-         CALL DSA_MAP_VARIANCE ('OUTPUT', 'WRITE', 'FLOAT', OVPTR, 
+         CALL DSA_MAP_VARIANCE ('OUTPUT', 'WRITE', 'FLOAT', OVPTR,
      :      SLOT, STATUS)
       ENDIF
       CALL DSA_MAP_AXIS_DATA ('OUTPUT', 1, 'WRITE', 'FLOAT', AOPTR,
@@ -149,8 +149,8 @@ C
 C     Reduce the input data into the output file
 C
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL CGS3_3 (NWAVE, NBEAMS, NCYC, NPOL, VARIANCE, %val(IPTR), 
-     :      %val(IVPTR), %val(AIPTR), %val(OPTR), %val(OVPTR), 
+         CALL CGS3_3 (NWAVE, NBEAMS, NCYC, NPOL, VARIANCE, %val(IPTR),
+     :      %val(IVPTR), %val(AIPTR), %val(OPTR), %val(OVPTR),
      :      %val(AOPTR), %val(A2OPTR))
       ENDIF
 
@@ -159,7 +159,7 @@ C
 
       END
 
-      SUBROUTINE CGS3_3 (NWAVE, NBEAMS, NCYC, NPOL, VARIANCE, IN_DATA, 
+      SUBROUTINE CGS3_3 (NWAVE, NBEAMS, NCYC, NPOL, VARIANCE, IN_DATA,
      : IN_VARIANCE, IN_AXIS, OUT_DATA, OUT_VARIANCE, OUT_AXIS,
      : OUT_AXIS2)
 C
@@ -210,7 +210,7 @@ C
          DO I = 1, NWAVE
             DO K = 1, NPOL
                IF (NBEAMS .EQ. 2 ) THEN
-                  OUT_DATA(NWAVE-I+1,J,K) = 
+                  OUT_DATA(NWAVE-I+1,J,K) =
      :             (IN_DATA(K,I,1,J)-IN_DATA(K,I,2,J))/2.0
                ELSE
                   OUT_DATA(NWAVE-I+1,J,K) = IN_DATA(K,I,1,J)
@@ -225,7 +225,7 @@ C
             DO I = 1, NWAVE
                DO K = 1, NPOL
                   IF (NBEAMS .EQ. 2 ) THEN
-                     OUT_VARIANCE(NWAVE-I+1,J,K) = 
+                     OUT_VARIANCE(NWAVE-I+1,J,K) =
      :                (IN_VARIANCE(K,I,1,J)+IN_VARIANCE(K,I,2,J))/4.0
                   ELSE
                      OUT_VARIANCE(NWAVE-I+1,J,K) = IN_VARIANCE(K,I,1,J)
@@ -234,7 +234,7 @@ C
             END DO
          END DO
       END IF
-C        
+C
 C     Reverse the axis array
 C
       DO I = 1, NWAVE

@@ -45,11 +45,11 @@
 #include "error.h"
 #include "GaiaWorldCoords.h"
 
-/** 
+/**
  *  Set the equinox from the string. The equinox is just a double
  *  extracted from number portion. Returns 0 if a number was found.
  */
-static int getEquinox( const char* equinoxStr, double& equinox ) 
+static int getEquinox( const char* equinoxStr, double& equinox )
 {
     if ( !equinoxStr || strcmp( equinoxStr, "J2000" ) == 0 ) {
         equinox = 2000.0;
@@ -122,7 +122,7 @@ GaiaWorldCoords::GaiaWorldCoords( const char* ra_str, const char* dec_str,
  * convert to hours by dividing by 15.
  */
 GaiaWorldCoords::GaiaWorldCoords( const char* ra_str, const char* dec_str,
-                                  int check_range, const char *equinoxStr, 
+                                  int check_range, const char *equinoxStr,
                                   int hflag )
     : WorldCoords(),
       check_range_( check_range )
@@ -149,8 +149,8 @@ GaiaWorldCoords::GaiaWorldCoords( const char* ra_str, const char* dec_str,
  *  If hmsFlag is non-zero, in H:M:S [+-]D:M:S format, otherwise in decimal
  *  degrees. The coordinates are converted to the given equinox.
  */
-void GaiaWorldCoords::format( char* ra_buf, char* dec_buf, 
-                              const char* equinoxStr, int hmsFlag ) 
+void GaiaWorldCoords::format( char* ra_buf, char* dec_buf,
+                              const char* equinoxStr, int hmsFlag )
 {
     double equinox = 2000.;
     if ( getEquinox( equinoxStr, equinox ) == 0 ) {
@@ -161,7 +161,7 @@ void GaiaWorldCoords::format( char* ra_buf, char* dec_buf,
         GaiaWorldCoords tmp = *this;
         tmp.convertEquinox( "J2000", equinoxStr );
         if ( hmsFlag ) {
-            tmp.ra_.print( ra_buf ); 
+            tmp.ra_.print( ra_buf );
             tmp.dec_.print( dec_buf );
         }
         else {
@@ -177,14 +177,14 @@ void GaiaWorldCoords::format( char* ra_buf, char* dec_buf,
  *  If hmsFlag is non-zero, in H:M:S [+-]D:M:S format, otherwise in decimal
  *  degrees.
  */
-void GaiaWorldCoords::format( char* ra_buf, char* dec_buf, double equinox, 
-                              int hmsFlag ) 
+void GaiaWorldCoords::format( char* ra_buf, char* dec_buf, double equinox,
+                              int hmsFlag )
 {
     if ( equinox == 2000.0 ) {
         if ( hmsFlag ) {
-            ra_.print( ra_buf ); 
+            ra_.print( ra_buf );
             dec_.print( dec_buf );
-        } 
+        }
         else {
             sprintf( ra_buf, "%.17g", ra_deg() );
             sprintf( dec_buf, "%.17g", dec_deg() );
@@ -195,7 +195,7 @@ void GaiaWorldCoords::format( char* ra_buf, char* dec_buf, double equinox,
         GaiaWorldCoords tmp = *this;
         tmp.convertEquinox( 2000.0, equinox );
         if ( hmsFlag ) {
-            tmp.ra_.print( ra_buf ); 
+            tmp.ra_.print( ra_buf );
             tmp.dec_.print( dec_buf );
         }
         else {

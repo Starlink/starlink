@@ -162,8 +162,8 @@ C# IL>=a, OL>=0
 *                     default choice device data), removed obsolete
 *                     locals and GKNA1 function. Introduced second
 *                     choice device in all WDT files.
-*     22/08/89  RMK   Changed pattern index check in set fill area 
-*                     attributes to allow for user-defined patterns as 
+*     22/08/89  RMK   Changed pattern index check in set fill area
+*                     attributes to allow for user-defined patterns as
 *                     well as predefined ones (S79).
 *     24/10/89  RMK   In GK0SRO, use MOD to ensure that the colour
 *                     indices are valid (S350).

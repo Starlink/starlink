@@ -167,7 +167,7 @@
      :                    xinfo(2)(:lenx2)//' '//xinfo(1)(:lenx1),' ')
           if ( isnew ) call cnf_unregp(oxptr)
           if ( isneww ) call cnf_unregp(owptr)
-     
+
           call sla_wait(0.3)
         end do
       else

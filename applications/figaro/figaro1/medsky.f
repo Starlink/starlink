@@ -77,7 +77,7 @@ C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
 C     27th Jan 1997  MJCL / Starlink, UCL.  I have, somewhat
 C                    arbitrarily, modified the estimate of physical
-C                    memory.  The old value of 1 Mbyte maximum is too low 
+C                    memory.  The old value of 1 Mbyte maximum is too low
 C                    for efficient use of contemporary machines.  The
 C                    value is now set at 16384 Kbytes in the parameter
 C                    PHYS_AVAIL.
@@ -116,13 +116,13 @@ C
 C
 C     Local variables
 C
-      INTEGER   BPTR             ! Pointer to current pixel in input 
+      INTEGER   BPTR             ! Pointer to current pixel in input
                                  ! data
       INTEGER   CURBATPIX        ! Current size of batch of pixels
       INTEGER   DIMS(10)         ! Sizes of dimensions of data
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number of data array
-      LOGICAL   FAULT            ! Indicates error while reading the 
+      LOGICAL   FAULT            ! Indicates error while reading the
                                  ! input file
       LOGICAL   FIRST            ! Current image is the first one?
       LOGICAL   FIRSTPASS        ! 1st batch of pixels is being done?
@@ -144,7 +144,7 @@ C
       INTEGER   LSLOT            ! Map slot number log image array
       INTEGER   MAXBATPIX        ! Maximum number of pixels per pass
                                  ! through file
-      REAL      MEDIANS(MAX_FILES) ! Overall median values for the 
+      REAL      MEDIANS(MAX_FILES) ! Overall median values for the
                                  ! different images
       LOGICAL   MOREFILES        ! More input images?
       LOGICAL   MOREPIX          ! More pixels to do?
@@ -154,7 +154,7 @@ C
       INTEGER   NFB              ! The number of bytes in a 'FLOAT'
       INTEGER   NFILE            ! Number of images in the input file
       INTEGER   NPIX             ! Number of pixels in the current batch
-      INTEGER   PHYBYTES         ! Total amount of physical memory 
+      INTEGER   PHYBYTES         ! Total amount of physical memory
                                  ! available
       LOGICAL   PISNL            ! Previous CNF pointer to log data new?
       LOGICAL   PISNEW           ! Previous CNF pointer to data new?
@@ -167,13 +167,13 @@ C
       INTEGER   STATUS           ! Running status for DSA_ routines
       CHARACTER STRING*80        ! Used to format lines of log file
       INTEGER   TPTR             ! Temporary dynamic mem pointer
-      INTEGER   WBYTES           ! Amount of workspace required per 
+      INTEGER   WBYTES           ! Amount of workspace required per
                                  ! batch
       INTEGER   WMEDPTR          ! Dynamic-memory pointer to image-
                                  ! median work array
-      REAL      WORK(MAX_FILES)  ! Work array used only if LOG is 
+      REAL      WORK(MAX_FILES)  ! Work array used only if LOG is
                                  ! specified
-      INTEGER   WPTR             ! Dynamic-memory pointer to workspace 
+      INTEGER   WPTR             ! Dynamic-memory pointer to workspace
       INTEGER   WSLOT            ! Map slot number of workspace
 C
 C     Initial values
@@ -305,9 +305,9 @@ C
       DO WHILE (MOREPIX)
 C
 C        For each image in the list file, map its data and transfer the
-C        section containing the appropriate pixels for this pass into 
-C        the workspace array. The 'geometry' of the process is shown 
-C        below, for NFILE images (they are always treated as 
+C        section containing the appropriate pixels for this pass into
+C        the workspace array. The 'geometry' of the process is shown
+C        below, for NFILE images (they are always treated as
 C        one-dimensional) and a batch of pixels NPIX long:
 C
 C                                STAGE 1          STAGE 2
@@ -327,7 +327,7 @@ C        +--------------------+      |  |       |                 |
 C        |    |segment_N|     |      |  | 1   N | median_N -------+
 C        +--------------------+      v  +-------+
 C
-C        STAGE 1 - All the pixels in the current segment are transferred 
+C        STAGE 1 - All the pixels in the current segment are transferred
 C                  to the work array for each image.
 C        STAGE 2 - The median of the values in each row of the work
 C                  array is found, and repeated for every row.
@@ -343,11 +343,11 @@ C
                CALL DSA_MAP_DATA('NEXT','READ','FLOAT',DPTR,DSLOT,
      :                           STATUS)
 C
-C              If this the first file in the list, work out how much 
-C              memory is currently available. This is done here as we 
-C              have all the data mapped in and want to know what the 
-C              optimum number of pixels is to minimise page faulting. 
-C              This is very sensitive to the factor of PHYBYTES, 
+C              If this the first file in the list, work out how much
+C              memory is currently available. This is done here as we
+C              have all the data mapped in and want to know what the
+C              optimum number of pixels is to minimise page faulting.
+C              This is very sensitive to the factor of PHYBYTES,
 C              currently 0.75. Too high and page faulting rises steeply,
 C              too low and maximum use of memory isn't being made.
 C              Both will result in a longer execution time.
@@ -425,7 +425,7 @@ C
          CALL FIG_MEDX2D(%VAL(CNF_PVAL(WPTR)),NFILE,NPIX,LOGNS,WORK,
      :                        %VAL(CNF_PVAL(OPTR)),
      :                   %VAL(CNF_PVAL(LOGPTR)))
-         
+
          CALL DYN_INCAD(OPTR,'FLOAT',CURBATPIX,TPTR,ISNEW,STATUS)
          IF (PISNEW) CALL CNF_UNREGP(OPTR)
          OPTR = TPTR

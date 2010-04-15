@@ -47,7 +47,7 @@
  *                   (options) file to fail if either the environment variable
  *                   couldn't be found or the file couldn't be opened.
  *   19/07/89  RMK   Changed DELETE section to decrement the counter for the
- *                   number of open windows (S351).               
+ *                   number of open windows (S351).
  *   13/11/90  KEVP  Set workstation viewport to display space (C58).
  */
 
@@ -57,7 +57,7 @@
 #include <sys/ioctl.h>				/* For obtaining ... */
 #include <sun/fbio.h>				/* ... frame buffer details */
 #include <pixrect/pixrect_hs.h>			/* For label font access */
-#include <suntool/sunview.h>			
+#include <suntool/sunview.h>
 /* For window_set() params */
 #include <suntool/canvas.h>			/* For Canvas type */
 #include "../../drivers/sun/varinc/wwinfo.h"				/* For ww */
@@ -128,10 +128,10 @@ f77_integer gk9sww_(function, key)
     };
 
   static char			/* Default cursor */
-    gks_cursor[] = 
+    gks_cursor[] =
     {
       WWXOR, 0, 0, 0, 0,
-      0, 16, 0, 16, 
+      0, 16, 0, 16,
       0377, 0200, 0377,    0, 0376,    0, 0374,    0,
       0376,    0, 0377,    0, 0357, 0200, 0307, 0300,
       0203, 0340,   01, 0360,    0, 0370,    0, 0174,
@@ -177,14 +177,14 @@ f77_integer gk9sww_(function, key)
     y_size =			/* ... default from WDT */
       gkywdt_.kdsry[wsid];
 
-  char   
+  char
     *fgets(),			/* For reading lines from the options file */
     *sprintf(),			/* For creating option_tag from KCID(KWKIX) */
     *getenv(),			/* To obtain value of option_tag,  if any */
     option_tag[7],		/* Option environment variable name */
     *option_file,		/* For the return value from getenv() */
     option_entry[81];		/* For lines from the option file */
-  
+
 
   if(*function == ICREAT)
   {
@@ -293,7 +293,7 @@ f77_integer gk9sww_(function, key)
 	   * and reset as appropriate.  dd is initialised by the first call
 	   * to wwxget(),  so this is only done once dd is valid.
 	   */
-	  
+
 	  if(dd != (wwstate *)0)
 	    if(gkywdt_.kpci[wsid] > 2)
 	      dd->d_colours = 256;
@@ -397,7 +397,7 @@ f77_integer gk9sww_(function, key)
     ddbm = ddwin->w_bm;
   }
   else if(*function == IDELET)
-  { 
+  {
     /* Free window and collapse ww default pointers */
 
     wwfree(windows[*key]);

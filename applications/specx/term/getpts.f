@@ -79,7 +79,7 @@ C   Set up prompt ( first point pair only )
         OFFER = .FALSE.
 *       CALL IPUT_SCREEN ('**Invalid default interval**', 1, 1, 2)
         PRINT *,'**Invalid default interval**'
-      ELSE 
+      ELSE
         IF (.NOT.ITERM) THEN
           WRITE(PROMPT, '(''[''F8.2'',''F8.2''] ''''"'')',IOSTAT=IERR) P
         END IF
@@ -110,7 +110,7 @@ C-------------------------
 *            CALL IPUT_SCREEN ('**Insufficient baseline regions**',1,1,2)
             PRINT *,'**Insufficient baseline regions**'
             JDEF=-1
-          ELSE 
+          ELSE
             DONE=.TRUE.
           END IF
 
@@ -123,13 +123,13 @@ C   If defaults exist then use them.
           IF (OFFER)  THEN
             N = N+1
 C   ..... no defaults set up => error
-          ELSE 
+          ELSE
 *           CALL IPUT_SCREEN ('** No default interval setup **',1,1,2)
             PRINT *,'** No default interval setup **'
           END IF
 
 C-------------------------------------
-C  Error in last attempt to input data? 
+C  Error in last attempt to input data?
 C-------------------------------------
 
         ELSE IF (JDEF.EQ.-1)   THEN
@@ -153,11 +153,11 @@ C-------------------------
 
 C  .......if not through go and get another pair.
 
-        IF(N.LT.NMAX.AND..NOT.DONE)   THEN  
+        IF(N.LT.NMAX.AND..NOT.DONE)   THEN
 
           FORMAT = ' '
           OFFER  = .FALSE.
-          IF (N.LT.NOLD)   THEN   
+          IF (N.LT.NOLD)   THEN
             CALL PPAIR (P, IPTS(N*2+1), NCH, XSCALE, IFAIL)
             IF (IFAIL.EQ.0)   THEN
               FORMAT = 'F8.2,'','',F8.2'

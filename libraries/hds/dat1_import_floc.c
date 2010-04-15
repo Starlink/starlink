@@ -26,8 +26,8 @@
  *    dat1_import_floc( const char flocator[DAT__SZLOC], int len, HDSLoc *clocator, int * status);
 
  *  Description:
- *    This function should be used to convert a Fortran HDS locator 
- *    (implemented as a string buffer) to a C locator struct. It is 
+ *    This function should be used to convert a Fortran HDS locator
+ *    (implemented as a string buffer) to a C locator struct. It is
  *     for internal usage by HDS only. The public version is datImportFloc.
 
  *  Arguments

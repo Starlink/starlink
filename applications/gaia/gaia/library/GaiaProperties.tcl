@@ -112,7 +112,7 @@ itcl::class gaia::GaiaProperties {
    #  Destructor:
    #  -----------
    destructor {
-      
+
       #  Does nothing, use save_properties when changes are made.
    }
 

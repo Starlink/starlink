@@ -50,14 +50,14 @@
 *     27-FEB-1991 (DSB):
 *        Name changed from HMFFT to KPG1_HMFFT
 *     11-JAN-1993 (DSB):
-*        Converted to double precision and Included in IRM 
+*        Converted to double precision and Included in IRM
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -87,7 +87,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Copy the input to the working space to avoid the input being 
+*  Copy the input to the working space to avoid the input being
 *  overwritten.
       DO PIX = 1, NPIX
          DO LIN = 1, NLIN
@@ -132,7 +132,7 @@
          END DO
       END DO
 
-*  Transform each row of the output array. 
+*  Transform each row of the output array.
       DO LIN = 1, NLIN
 
          IFAIL = -1

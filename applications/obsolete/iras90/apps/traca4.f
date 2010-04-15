@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -62,7 +62,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER PARAM1*( * ) 
+      CHARACTER PARAM1*( * )
       CHARACTER PARAM2*( * )
       INTEGER NDISP
 
@@ -87,7 +87,7 @@
      :               .FALSE., METHOD, STATUS )
 
 *  Remove the leading blank of METHOD.
-      CALL CHR_LDBLK( METHOD )      
+      CALL CHR_LDBLK( METHOD )
 
 *  If the specified method is 'FREE', get the offset values for each
 *  trace from the environment.

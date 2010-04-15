@@ -30,9 +30,9 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
 *  Description:
 *     A wininfo structure is allocated and filled with the specification of
 *     the specified window. This structure is used by GWM_ProcessEvent
-*     in order to minimize the amount of work that has to be done in 
+*     in order to minimize the amount of work that has to be done in
 *     response to events.
-*     
+*
 *
 *  Function return value:
 *     status = int
@@ -55,12 +55,12 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -98,18 +98,18 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
     long *local_offset;
     char *name, *prop_name;
     XWindowAttributes winatt;
-        
+
     local_info = (struct wininfo*)malloc( sizeof( struct wininfo ));
     if (!(local_info)) return GWM_MEM_ALLOC;
 
-/*	  
+/*
 **  Display id.
-*/	  
+*/
     local_info->display = display;
 
-/*	  
+/*
 **  Window id.
-*/	  
+*/
     local_info->win_id = win_id;
 
 /*
@@ -131,7 +131,7 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
        	XA_INTEGER, &actual_type, &actual_format, &(local_info->ctsize),
 	&bytes_after, (unsigned char**)(&ctable_i));
 
-    local_info->ctable = (unsigned long*)malloc( 
+    local_info->ctable = (unsigned long*)malloc(
 	sizeof(unsigned long) * local_info->ctsize );
     if (!(local_info->ctable)) return GWM_MEM_ALLOC;
     for ( i = 0; i < local_info->ctsize; i++ )
@@ -143,7 +143,7 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
 */
     atom = XInternAtom(display, "GWM_name", True );
     status = XGetWindowProperty( display, win_id, atom,0, 32, False, XA_STRING,
-	&actual_type, &actual_format, &nitems, &bytes_after, 
+	&actual_type, &actual_format, &nitems, &bytes_after,
 	(unsigned char**)(&name));
     prop_name = malloc( strlen((char*)name) + 5 );
     if ( !prop_name ) return GWM_MEM_ALLOC;
@@ -153,9 +153,9 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
     local_info->winname_atom = XInternAtom( display, prop_name, True );
     free( prop_name );
 
-/*	  
+/*
 **  Pixmap id.
-*/	  
+*/
     atom = XInternAtom(display, "GWM_pixmap", False );
     status = XGetWindowProperty( display, win_id , atom, 0, 1, False,
 	XA_PIXMAP, &actual_type, &actual_format, &nitems, &bytes_after,
@@ -169,17 +169,17 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
     local_info->pix_atom = atom;
     XFree( (char*)local_pix_id );
 
-/*	  
+/*
 **  Window size and position
-*/	  
+*/
     local_info->x_pos = winatt.x;
     local_info->y_pos = winatt.y;
     local_info->win_width = winatt.width;
     local_info->win_height = winatt.height;
 
-/*	  
-**  Pixmap size 
-*/	  
+/*
+**  Pixmap size
+*/
     status = XGetGeometry( display, local_info->pix_id, &root, &i1, &i2,
 	    &local_info->pix_width, &local_info->pix_height, &border, &depth);
     if ( !status )
@@ -188,9 +188,9 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
 	goto free_resources;
     }
 
-/*	  
+/*
 **  Offsets
-*/	  
+*/
     atom = XInternAtom(display, "GWM_x_offset", False );
     status = XGetWindowProperty( display, win_id , atom, 0, 1, False,
 	XA_INTEGER, &actual_type, &actual_format, &nitems, &bytes_after,
@@ -217,9 +217,9 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
     local_info->yoff_atom = atom;
     XFree( (char*)local_offset );
 
-/*	  
+/*
 **  overlay mask
-*/	  
+*/
     atom = XInternAtom(display, "GWM_ov_mask", False );
     status = XGetWindowProperty( display, win_id , atom, 0, 1, False,
 	XA_INTEGER, &actual_type, &actual_format, &nitems, &bytes_after,
@@ -232,9 +232,9 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
     local_info->mask  = *local_mask;
     XFree( (char*)local_mask );
 
-/*	  
+/*
 **  Overlay offsets
-*/	  
+*/
     atom = XInternAtom(display, "GWM_x_ov_offset", False );
     status = XGetWindowProperty( display, win_id , atom, 0, 1, False,
 	XA_INTEGER, &actual_type, &actual_format, &nitems, &bytes_after,
@@ -271,9 +271,9 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
 */
     local_info->cmap = winatt.colormap;
 
-/*	  
+/*
 **  Copy pointer to wininfo structure to output argument
-*/	  
+*/
     *info = local_info;
     return GWM_SUCCESS;
 

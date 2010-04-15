@@ -19,49 +19,49 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
 *     C.
 
 *  Invocation:
-*     void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode, 
+*     void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
 *                     HDSLoc *loc, int *status )
 
 *  Description:
 *     This function fills a specified HDS object with primitive values
-*     read from a vector entry in an AST KeyMap. It is the inverse of 
-*     kpg1Hdsky. The HDS object must already exist and must be a 
+*     read from a vector entry in an AST KeyMap. It is the inverse of
+*     kpg1Hdsky. The HDS object must already exist and must be a
 *     primitive array or scalar. The values to store in the HDS object
-*     are read from the KeyMap entry that has a key equal to the name 
+*     are read from the KeyMap entry that has a key equal to the name
 *     of the HDS object. The vector read from the KeyMap is interpreted
 *     as an N-dimension array, where N is the number of dimensions in the
-*     HDS object. Array slices can be re-arranged as they are copied from 
+*     HDS object. Array slices can be re-arranged as they are copied from
 *     KeyMap to HDS object. The "axis" argument specifies which axis is
 *     being re-arranged. Each array slice is perpendicular to this axis.
 *     The KeyMap array and the HDS array are assumed to have the same
 *     dimensions on all other axes.
 
 *  Arguments:
-*     keymap 
+*     keymap
 *        An AST pointer to the KeyMap.
 *     map
-*        An array which indicates how to map slices in the KeyMap array 
-*        onto slices in the HDS array. The length of the supplied array 
+*        An array which indicates how to map slices in the KeyMap array
+*        onto slices in the HDS array. The length of the supplied array
 *        should be equal to the HDS array dimension specified by "axis".
 *        Element J of this array says where the data for the J'th slice
-*        of the HDS array should come from, where J is the index along 
-*        the axis specified by "axis". The value of element J is a 
+*        of the HDS array should come from, where J is the index along
+*        the axis specified by "axis". The value of element J is a
 *        zero-based index along axis "axis" of the array read from the KeyMap.
-*     axis 
+*     axis
 *        The index of the axis to be re-arranged. The first axis is axis 1.
 *        Note, the current version of this routine only allows the array
-*        to be re-arranged on the last axis. An error is reported if any 
+*        to be re-arranged on the last axis. An error is reported if any
 *        other axis is specified. This may change in the future.
-*     mode 
+*     mode
 *        Specifies what happens if the supplied KeyMap does not contain
 *        an entry with the name of the supplied HDS object.
 *
 *        1 - Report an error.
 *
 *        2 - Do nothing
-*     loc 
+*     loc
 *        An HDS locator for a primitive scalar or array object.
-*     status 
+*     status
 *        The inherited status.
 
 *  Notes:
@@ -76,12 +76,12 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -107,7 +107,7 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
    int ndim;
    int haskey;
    int hslice;
-   int i;   
+   int i;
    int kdim;
    int kmtype;
    int kslice;
@@ -116,7 +116,7 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
    int veclen;
    size_t elsize;
    size_t el;
-   void *data;            
+   void *data;
    void *hp;
    void *kp;
    void *pntr;
@@ -169,7 +169,7 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
          msgSeti( "A", axis );
          msgSeti( "N", ndim );
          errRep( "", "KPG1_KYHDS: Supplied value for AXIS (^A) is illegal "
-                 "- it should be in the range 1 to ^N (programming error).", 
+                 "- it should be in the range 1 to ^N (programming error).",
                  status );
       }
    }
@@ -251,7 +251,7 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
                     "axis, but axis ^A (of ^N) was specified (programming "
                     "error).", status );
          }
-      } 
+      }
 
 /* Get the vector step between slices. */
       step = 1;
@@ -264,13 +264,13 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
    on if it is not within the bounds of the KeyMap array. */
          kslice = map[ hslice ];
          if( kslice >= 0 && kslice < kdim ) {
- 
+
 /* Get pointers to the start of the slice in KeyMap and HDS arrays. */
             hp = ( (char *) pntr ) + hslice*step*elsize;
             kp = ( (char *) data ) + kslice*step*elsize;
 
 /* Copy the slice data. */
-            memcpy( hp, kp, elsize*step );            
+            memcpy( hp, kp, elsize*step );
          }
       }
 

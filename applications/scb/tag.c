@@ -49,7 +49,7 @@ int yydebug;
 *        Debugging.  It may be followed immediately by the letters 'l',
 *        'y' or both.  This turns on the debugging messages in the lex
 *        part and/or the yacc part of the processor respectively.
-*        This will only work if lex and yacc have been compiled to 
+*        This will only work if lex and yacc have been compiled to
 *        enable debugging reports.
 *
 *  Authors:
@@ -107,7 +107,7 @@ int yydebug;
          argv++;
          argc--;
       }
-   
+
 /* Open standard input and output appropriately according to command line
    arguments, in the normal filter-type way. */
       switch( argc ) {
@@ -133,7 +133,7 @@ int yydebug;
       preleng = 0;
       prealloc = 0;
       preval = "";
-         
+
 /* Call the parser. */
       retval = yyparse();
 
@@ -159,7 +159,7 @@ int yydebug;
 *     Check that memory has been allocated successfully.
 *
 *  Description:
-*     This routine checks that a pointer does not point to NULL.  It 
+*     This routine checks that a pointer does not point to NULL.  It
 *     should be called on any pointer value which is got by a call to
 *     malloc, realloc or calloc.
 *
@@ -203,7 +203,7 @@ int yydebug;
 *
 *  Arguments:
 *     n = int
-*        The number of strings to be concatenated.  n may be zero, in 
+*        The number of strings to be concatenated.  n may be zero, in
 *        which case a newly allocated string of length zero is returned.
 *     sp1, sp2, ... = char *
 *        The other arguments are all strings, and there are n of them.
@@ -267,11 +267,11 @@ int yydebug;
 
 
 /*
-*  Define the elements of the list of as-yet unoutput strings. 
+*  Define the elements of the list of as-yet unoutput strings.
 *  This list is maintained so that if there is an error in the yacc
 *  grammar parsing, in which case yacc throws away all the tokens
 *  back to the end of the last unerroneous unit, we can output
-*  the text which has been omitted.  Under normal (non-error) 
+*  the text which has been omitted.  Under normal (non-error)
 *  circumstances however this list is simply discarded at the end of
 *  each correctly parsed unit at the same time that the unit is output.
 *
@@ -291,7 +291,7 @@ int yydebug;
 *     Clear the list of unoutput strings.
 *
 *  Description:
-*     This routine reclaims the memory used by the list of unoutput 
+*     This routine reclaims the memory used by the list of unoutput
 *     strings and initialises the values of the start and end pointers.
 *
 *  Authors:
@@ -387,8 +387,8 @@ int yydebug;
 *     Get unoutput string.
 *
 *  Description:
-*     This routine returns a string which consists of all the strings 
-*     which have had uadd() called on them since the last call to 
+*     This routine returns a string which consists of all the strings
+*     which have had uadd() called on them since the last call to
 *     unew().
 *
 *  Authors:
@@ -516,7 +516,7 @@ int yydebug;
                if ( prealloc == 0 )
                   preval = (char *) memok( malloc( BUFINC + 1 ) );
                else
-                  preval = (char *) memok( realloc( preval, 
+                  preval = (char *) memok( realloc( preval,
                                                     prealloc + BUFINC + 1 ) );
                prealloc++;
             }

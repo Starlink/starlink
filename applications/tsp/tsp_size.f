@@ -22,7 +22,7 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) LOC		(Fixed string,descr) A locator to the NDF
-C                       structure.     
+C                       structure.
 C     (>) MAXDIM        (Integer,ref) Size of DIMS
 C     (<) DIMS          (Integer array,ref) Array to receive the
 C                       size of each dimension.
@@ -30,7 +30,7 @@ C     (<) ACTDIM        (Integer,ref) Actual number of dimensions.
 C     (!) STATUS	(Integer,ref) The Status
 C
 C  External subroutines / functions used:
-C              
+C
 C     Various HDS routines
 C
 C  Support: Jeremy Bailey, JAC
@@ -47,7 +47,7 @@ C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-C              
+C
 C     Parameters
 C
       CHARACTER*(DAT__SZLOC) LOC
@@ -59,7 +59,7 @@ C     Local variables
 C
       INTEGER ID
 
-C                                    
+C
 
       IF (STATUS .EQ. SAI__OK) THEN
 

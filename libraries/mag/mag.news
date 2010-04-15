@@ -15,23 +15,23 @@ which contained an entry for each tape device on the system). This system,
 which was intended to assist portability and allowed users to use 'pet' names
 for devices, has caused many difficulties so an alternative system will now be
 used in default. The user may refer to a device by its normal name (/dev/rmt0h
-for example) and this will be used without the need for it to be defined in 
+for example) and this will be used without the need for it to be defined in
 the system-wide device dataset. The ability to have 'pet' names for devices is
 retained as an option.
 
-NOTE THAT THE SYSTEM-WIDE DEVICE DATASET (/star/etc/devdataset) MUST BE 
+NOTE THAT THE SYSTEM-WIDE DEVICE DATASET (/star/etc/devdataset) MUST BE
 RETAINED UNTIL ALL PROGRAMS HAVE BEEN LINKED WITH MAG V2.0 OR LATER.
 
-The user's private device dataset (USRDEVDATA.sdf) which was formerly created 
+The user's private device dataset (USRDEVDATA.sdf) which was formerly created
 in the working directory will now be created in the user's ADAM_USER directory
-(usually ~/adam) by default - 
+(usually ~/adam) by default -
 
 THEREFORE CO-OPERATING PROGRAMS WHICH RELY ON THE TAPE POSITION DATA WITHIN
-THE DATASET MUST ALL BE LINKED WITH THE SAME VERSION OF MAG (or have 
+THE DATASET MUST ALL BE LINKED WITH THE SAME VERSION OF MAG (or have
 environment variable ADAM_USER or USRDEVDATA set appropriately - see SUN/171
 for details).
 
-Some other, minor changes have been made to the code. In particular, UPDATE 
+Some other, minor changes have been made to the code. In particular, UPDATE
 mode (read and write) is now an option when opening tapes.
 
 SUN/171 describing the MAG package and how to use it is released.

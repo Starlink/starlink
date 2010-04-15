@@ -7,7 +7,7 @@ proc initP4 taskname {
     set df env(HOME)/cgs4dr_configs/default.p4
 
 # Set the nbs name
-    $taskname set noticeboard $P4NoticeBoard -setresponse "cgs4drClear $taskname" 
+    $taskname set noticeboard $P4NoticeBoard -setresponse "cgs4drClear $taskname"
 
 # Open the noticeboard and restore the defaults from file
     $taskname obey open_nb "" -inform "cgs4drInform $taskname %V" -endmsg {set done 1}

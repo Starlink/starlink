@@ -624,7 +624,7 @@ C+
          IF (DVALUE.LT.DMIN) DMIN=DVALUE
          DARRAY(I)=DVALUE
       END DO
-      
+
 *  Set Y range for plot so points will fit as well, and allow ~10%
 *  headroom, and for case where everything lies on a straight line.
       DO I=1,NLID

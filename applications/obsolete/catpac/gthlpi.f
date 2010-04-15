@@ -109,7 +109,7 @@
 
 *  Output enabled: write prompt, if any.
 
-            IF ( PROMPT .NE. '  ' ) 
+            IF ( PROMPT .NE. '  ' )
      :        WRITE ( LUTERM, '(1X,A,$)' ) PROMPT
 
 *  Get a line of uppercase input.

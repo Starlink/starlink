@@ -7,7 +7,7 @@
 *    CALL FS_FUNC(IFLAG,M,N,XC,RC,AJC,LJC,MIW,LIW,WN,NIW)
 
 * Purpose:
-*  Evaluate the residuals and their first derivatives for double with 
+*  Evaluate the residuals and their first derivatives for double with
 *  fixed separation.
 
 * Description
@@ -27,9 +27,9 @@
 *   LJC = INTEGER (Given)
 *        =M
 *   LIW = INTEGER (Given)
-*       
+*
 *   NIW = INTEGER (Given)
-*       
+*
 *   RC(M) = DOUBLE PRECISION ARRAY (Returned)
 *        Residuals of fit?
 *   AJC(LJC,N) = DOUBLE PRECISION ARRAY (Returned)

@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     1-MAR-1993 (RFWS):
 *        Original version.
 *     7-JUL-1994 (PDRAPER):
-*        Changed IMG_DELET call to IMG_CANCL. 
+*        Changed IMG_DELET call to IMG_CANCL.
 *     7-DEC_1995 (PDRAPER):
 *        Changed to delete the NDF.
 *     {enter_further_changes_here}
@@ -87,7 +87,7 @@
       INTEGER NY                 ! Second dimension size of image
       INTEGER PNTR( 1 )          ! Pointer to mapped data
       LOGICAL OLDFLG             ! NDF error tracing status
-      
+
 *  Local Data:
       DATA NX, NY / 10, 20 /
 
@@ -98,7 +98,7 @@
 
 *  Enable NDF error-tracing in case something goes wrong.
       CALL NDF_TRACE( .TRUE., OLDFLG )
-      
+
 *  Create a new _REAL image.
       CALL IMG_NEW( 'IMAGE', NX, NY, PNTR( 1 ), STATUS )
 
@@ -176,7 +176,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -250,7 +250,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

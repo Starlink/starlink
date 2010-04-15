@@ -17,7 +17,7 @@
 *        The global status.
 
 *  Description:
-*     This routine calculates the Laplacian of the supplied 2-d NDF, and 
+*     This routine calculates the Laplacian of the supplied 2-d NDF, and
 *     subtracts it from the original array to create the output NDF. The
 *     subtractions can be done a specified integer number of times.
 *     This operation can be approximated by a convolution with the kernel:
@@ -48,14 +48,14 @@
 
 *  Examples:
 *     laplace a 10 b
-*        This subtracts 10 Laplacians from the NDF called a, to make the 
+*        This subtracts 10 Laplacians from the NDF called a, to make the
 *        NDF called b. NDF b inherits its title from a.
 
 *  Related Applications:
 *     KAPPA: SHADOW, MEDIAN; Figaro: ICONV3.
 
 *  Implementation Status:
-*     -  This routine correctly processes the WCS, AXIS, DATA, and VARIANCE 
+*     -  This routine correctly processes the WCS, AXIS, DATA, and VARIANCE
 *     components of an NDF data structure. QUALITY is propagated.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -106,7 +106,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER NDIM               ! Maximum dimensionality
       PARAMETER( NDIM = 2 )
 
@@ -159,7 +159,7 @@
 
 *  Create a new output NDF based on the input NDF.  Propagate the WCS, axis,
 *  quality and units components.
-      CALL LPG_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF2, 
+      CALL LPG_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF2,
      :               STATUS )
 
 *  See if the input NDF has a variance component and set the list of
@@ -174,7 +174,7 @@
 *  Determine the data type to use for processing and set the output data
 *  type accordingly.
       CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', INDF1, INDF1, COMP, ITYPE, DTYPE, 
+     :                '_DOUBLE', INDF1, INDF1, COMP, ITYPE, DTYPE,
      :                STATUS )
       CALL NDF_STYPE( DTYPE, INDF2, COMP, STATUS )
 
@@ -189,47 +189,47 @@
 *  Select the appropriate routine for the data type being processed and
 *  multiply the data array by the constant.
       IF( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_LAPLB( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+         CALL KPS1_LAPLB( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
- 
+
       ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_LAPLUB( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                     %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+         CALL KPS1_LAPLUB( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                     %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                     %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                     NBAD, STATUS )
- 
+
       ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_LAPLD( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+         CALL KPS1_LAPLD( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
- 
+
       ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_LAPLI( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+         CALL KPS1_LAPLI( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
- 
+
       ELSE IF( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_LAPLR( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+         CALL KPS1_LAPLR( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
- 
+
       ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_LAPLW( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+         CALL KPS1_LAPLW( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
- 
+
       ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_LAPLUW( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+         CALL KPS1_LAPLUW( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
- 
+
       END IF
 
 *  Set the output bad pixel flag value unless the NDF is primitive.
@@ -248,47 +248,47 @@
 *  Select the appropriate routine for the data type being processed and
 *  multiply the variance array by the squared constant.
          IF( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_LAPLB( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+            CALL KPS1_LAPLB( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_LAPLUB( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                        %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+            CALL KPS1_LAPLUB( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                        %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                        %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                        NBAD, STATUS )
- 
+
          ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_LAPLD( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+            CALL KPS1_LAPLD( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_LAPLI( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+            CALL KPS1_LAPLI( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_LAPLR( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+            CALL KPS1_LAPLR( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_LAPLW( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+            CALL KPS1_LAPLW( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_LAPLUW( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                        %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+            CALL KPS1_LAPLUW( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                        %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                        %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                        NBAD, STATUS )
- 
+
          END IF
 
 *  Set the output bad pixel flag value unless the NDF is primitive.
@@ -301,7 +301,7 @@
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
-      
+
 *  Tidy up.
  999  CONTINUE
 

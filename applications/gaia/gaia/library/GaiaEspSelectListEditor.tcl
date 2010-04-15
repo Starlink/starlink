@@ -112,7 +112,7 @@ itcl::class gaia::GaiaEspSelectListEditor {
 		    -command [code $this add_source]
 	}
 	$itk_component(AddSource) configure -highlightbackground black
-        if { $short_help != {} } { 
+        if { $short_help != {} } {
             $short_help add_short_help $itk_component(AddSource) \
                {Add an object to the list}
         }
@@ -121,7 +121,7 @@ itcl::class gaia::GaiaEspSelectListEditor {
 		    -text "Delete object" \
 		    -command [code $this delete_source]
 	}
-        if { $short_help != {} } { 
+        if { $short_help != {} } {
            $short_help add_short_help $itk_component(DeleteSource) \
               {Remove selected objects from the list}
         }
@@ -196,7 +196,7 @@ body gaia::GaiaEspSelectListEditor::add_source {} {
     # namespace prepended, so that we can examine it outside this
     # current object.
     lappend object_list_ [namespace current]::$newobj
-    
+
     $newobj configure -update_callback [code $this update_source_]
     $newobj select_source [code $this add_source_finish_]
 }
@@ -219,13 +219,13 @@ body gaia::GaiaEspSelectListEditor::add_source_finish_ {} {
 }
 
 # Update the table contents, after GaiaEspSelectObject::update_circle_
-# has changed the drawing on the canvas.  Don't be too clever here -- 
+# has changed the drawing on the canvas.  Don't be too clever here --
 # clear the table and start again.
 body gaia::GaiaEspSelectListEditor::update_source_ {id} {
     remake_table_
 }
 
-# Maintain the list of elements 
+# Maintain the list of elements
 # in the same order as the objects in object_list_
 body gaia::GaiaEspSelectListEditor::remake_table_ {} {
     set newcontents {}
@@ -242,7 +242,7 @@ body gaia::GaiaEspSelectListEditor::remake_table_ {} {
 }
 
 # Delete a source from the canvas, the table, and the object_list_
-# The elements in the table are in the same order as the elements in 
+# The elements in the table are in the same order as the elements in
 # object_list_ (maintained so by update_source_).
 #
 # Could also delete object when they are selected on the canvas, using

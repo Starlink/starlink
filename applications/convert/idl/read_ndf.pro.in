@@ -15,23 +15,23 @@
 ;;
 ;;    [bad_value] (Given)
 ;;       Optional - A value to replace in the IDL array any occurrence of
-;;       the PRIMDAT bad value in the NDF component.  The value must be the 
+;;       the PRIMDAT bad value in the NDF component.  The value must be the
 ;;       same type as the array.
 ;;
 ;;    [component=comp_name] (Given)
-;;       Optional - A string expression specifying the NDF component to be 
-;;       read.  It may be 'DATA', 'VARIANCE' or 'QUALITY' and defaults to 
-;;       'DATA'. The case of the string does not matter and it may be 
+;;       Optional - A string expression specifying the NDF component to be
+;;       read.  It may be 'DATA', 'VARIANCE' or 'QUALITY' and defaults to
+;;       'DATA'. The case of the string does not matter and it may be
 ;;       abbreviated to one or more characters.
-;;       
+;;
 ;; RETURNED VALUE:
 ;;    An IDL array of a size and type corresponding with the NDF. The type
 ;;    correspondence is as follows:
-;;          _REAL -> floating 
-;;          _DOUBLE -> double-precision 
-;;          _UBYTE -> byte 
-;;          _WORD -> integer 
-;;          _INTEGER -> longword integer 
+;;          _REAL -> floating
+;;          _DOUBLE -> double-precision
+;;          _UBYTE -> byte
+;;          _WORD -> integer
+;;          _INTEGER -> longword integer
 ;;
 ;; DEFICIENCES:
 ;;      - No conversion of the given bad value to the appropriate type for
@@ -58,13 +58,13 @@
 ;;
 ;;	IDL> data_array = read_ndf('my_ndf_file')
 ;;
-;;    creates an IDL floating array, data_array, with the same dimensions as 
+;;    creates an IDL floating array, data_array, with the same dimensions as
 ;;    the NDF and containing the values from its DATA component.
 ;;
 ;;	IDL> data_array = read_ndf('my_ndf_file', !values.f_nan)
 ;;
 ;;    As above except that any occurrence of a bad value (VAL__BADR as defined
-;;    by the Starlink PRIMDAT package) in the NDF will be replaced by NaN in 
+;;    by the Starlink PRIMDAT package) in the NDF will be replaced by NaN in
 ;;    the IDL array.
 ;;
 ;;	IDL> quality = read_ndf('my_ndf_file',comp='q')
@@ -82,13 +82,13 @@
 
 ;;      Make sure we're not running under 64 bit Solaris.
 
-	IF ( !VERSION.ARCH EQ 'sparc' ) THEN BEGIN 
+	IF ( !VERSION.ARCH EQ 'sparc' ) THEN BEGIN
           IF (!VERSION.MEMORY_BITS eq 64) THEN BEGIN
             MESSAGE,"Starlink converters only run on 32-bit IDL (% idl -32)"
           ENDIF
 	ENDIF
 
-;;	Determine the entry point and library name to use in the 
+;;	Determine the entry point and library name to use in the
 ;;	CALL_EXTERNAL function. These are edited in when during make.
 
         ENTRY_PREFIX = '@ENTRY_PREFIX@'
@@ -98,10 +98,10 @@
 	DUM = findfile(LIB_NAME, COUNT=CNT)
 
 	IF(CNT eq 0)THEN BEGIN
-;;	  The library file has not been made. Write a message and 
+;;	  The library file has not been made. Write a message and
 ;; 	  exit.
 	  MESSAGE, "The library file: "+ LIB_NAME +" Does not exist."
-	END 
+	END
 
 ;; Statements initalising returned values.
         NDIM=7L
@@ -127,7 +127,7 @@
                  DATA_TYPE,     $;String to contain data type (returned)
                  NDIM,          $;Number of dimensions (returned)
                  DIMS           $;Array to contain dimension values (returned)
-                 ) ) THEN MESSAGE, "Failed to probe the NDF for information."; 
+                 ) ) THEN MESSAGE, "Failed to probe the NDF for information.";
 
 ;;      Create an IDL array here for the NDF data to be read into.
 ;;      First select the IDL command to use

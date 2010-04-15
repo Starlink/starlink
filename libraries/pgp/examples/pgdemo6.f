@@ -40,7 +40,7 @@ C
       CALL PGBOX('bcts',0.1,5,'bcts',0.1,5)
 C
 C Loop to read and display cursor position. Initial position for cursor
-C is center of viewport. 
+C is center of viewport.
 C
       X = 0.5
       Y = 0.5

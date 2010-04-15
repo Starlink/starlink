@@ -43,7 +43,7 @@
 *  Status:
       INTEGER STATUS        ! Global status.
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  NUMROW,   ! Number of rows       in the catalogue.
      :  NUMCOL,   !   "    "  columns    "   "     "     .
      :  NUMPAR,   !   "    "  parameters "   "     "     .

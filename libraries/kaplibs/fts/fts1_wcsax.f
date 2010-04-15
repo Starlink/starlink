@@ -14,10 +14,10 @@
 
 *  Description:
 *     This routine creates NDF Axis structures from an AXIS Frame in the
-*     supplied FrameSet. It looks for AXIS and PIXEL Frames in the 
-*     supplied FrameSet. If either of these Frames is not found, it does 
-*     nothing. Otherwise, it attempts to create AXIS structures in the NDF 
-*     from the AXIS Frame in the FrameSet. The AXIS Centre, Label and Unit 
+*     supplied FrameSet. It looks for AXIS and PIXEL Frames in the
+*     supplied FrameSet. If either of these Frames is not found, it does
+*     nothing. Otherwise, it attempts to create AXIS structures in the NDF
+*     from the AXIS Frame in the FrameSet. The AXIS Centre, Label and Unit
 *     components are set.
 
 *  Arguments:
@@ -40,12 +40,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -94,10 +94,10 @@
       CHARACTER UNIT*80          ! Axis Units string
       INTEGER EL                 ! Number of elements in mapped array
       INTEGER IAX                ! Current axis index
-      INTEGER IAXIS              ! Index of the AXIS Frame 
-      INTEGER ICURR              ! Index of Current Frame 
+      INTEGER IAXIS              ! Index of the AXIS Frame
+      INTEGER ICURR              ! Index of Current Frame
       INTEGER IP                 ! Pointer to mapped AXIS Centre array
-      INTEGER IPIXEL             ! Index of the PIXEL Frame 
+      INTEGER IPIXEL             ! Index of the PIXEL Frame
       INTEGER MAP1               ! n-D PIXEL to n-D AXIS mapping
       INTEGER MAP2               ! 1-D PIXEL to n-D PIXEL mapping
       INTEGER MAP3               ! n-D AXIS to 1-D AXIS mapping
@@ -114,21 +114,21 @@
 *  Ensure there are no defined AXIS structures in the NDF.
       CALL NDF_RESET( INDF, 'AXIS', STATUS )
 
-*  Save the index of the original current Frame in the FrameSet, so 
+*  Save the index of the original current Frame in the FrameSet, so
 *  that it can be re-instated later.
       ICURR = AST_GETI( FS, 'CURRENT', STATUS )
 
-*  Search for a PIXEL Frame in the FrameSet. If one is found, it becomes 
+*  Search for a PIXEL Frame in the FrameSet. If one is found, it becomes
 *  the current Frame. If one is not found, do nothing.
-      IF( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ), 
+      IF( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ),
      :                      'PIXEL', STATUS ) .NE. AST__NULL ) THEN
 
 *  If found, get the index of the PIXEL Frame.
          IPIXEL = AST_GETI( FS, 'CURRENT', STATUS )
 
-*  Search for an AXIS Frame in the FrameSet. If one is found, it becomes 
+*  Search for an AXIS Frame in the FrameSet. If one is found, it becomes
 *  the current Frame. If one is not found, do nothing.
-         IF( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ), 
+         IF( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ),
      :                         'AXIS', STATUS ) .NE. AST__NULL ) THEN
 
 *  If found, get the index of the AXIS Frame.
@@ -162,7 +162,7 @@
 *  from 1-D to n-D, MAP3 goes from n-D to 1-D.
                MAP2 = AST_PERMMAP( 1, IAX, NDIM, OUTPRM, 0.0D0, ' ',
      :                                STATUS )
-               MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, IAX, 0.0D0, ' ', 
+               MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, IAX, 0.0D0, ' ',
      :                                STATUS )
 
 *  Concatenate the Mappings together, to get a mapping between axis
@@ -174,14 +174,14 @@
 *  Map the NDF's Axis Centre array. The NDF library will fill this array
 *  with the pixel coordinates at the centre of each pixel (the default
 *  Axis coordinate system).
-               CALL NDF_AMAP( INDF, 'CENTRE', IAX, '_DOUBLE', 
+               CALL NDF_AMAP( INDF, 'CENTRE', IAX, '_DOUBLE',
      :                           'UPDATE', IP, EL, STATUS )
 
 *  Check we can safely use %VAL on the pointer returned by NDF_AMAP.
-               IF( STATUS .EQ. SAI__OK ) THEN                  
+               IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Map these pixel coordinates into AXIS coordinates.
-                  CALL AST_TRAN1( MAP5, EL, %VAL( CNF_PVAL( IP ) ), 
+                  CALL AST_TRAN1( MAP5, EL, %VAL( CNF_PVAL( IP ) ),
      :                            .TRUE.,
      :                            %VAL( CNF_PVAL( IP ) ), STATUS )
                END IF
@@ -203,7 +203,7 @@
                END IF
 
 *  If the Axis has a set value for the Unit attribute, use it as
-*  the NDF AXIS unit.  Note that NDF_ACPUT does not truncate 
+*  the NDF AXIS unit.  Note that NDF_ACPUT does not truncate
 *  trailing blanks.
                IF( AST_TEST( FS, 'Unit(' // AXIS( : NC ) // ')',
      :                       STATUS ) ) THEN

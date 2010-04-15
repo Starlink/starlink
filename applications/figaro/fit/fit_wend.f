@@ -8,7 +8,7 @@ C     up the rest of the FITS buffer with blanks.
 C
 C     Parameters -    (">" input, "!" modified, "<" output)
 C
-C     (<) STATUS     (Integer) Return code.  0 => OK.  Non-zero 
+C     (<) STATUS     (Integer) Return code.  0 => OK.  Non-zero
 C                    values will be error codes caused by a tape
 C                    I/O error.  These can be decoded by FIT_ERROR.
 C

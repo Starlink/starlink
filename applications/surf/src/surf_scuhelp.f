@@ -93,7 +93,7 @@
 *
 *        -  a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
-* 
+*
 *        -  an ellipsis "..." to display all the text below the
 *           current point in the hierarchy.  For example, "BLOCK..."
 *           displays information on the BLOCK topic as well as
@@ -104,11 +104,11 @@
 *
 *        -  Just give the first few characters, e.g. "PARA" for
 *           Parameters.
-* 
+*
 *        -  Some topics are composed of several words separated by
 *           underscores.  Each word of the keyword may be abbreviated,
 *           e.g. "Colour_Set" can be shortened to "C_S".
-* 
+*
 *        -  The characters "%" and "*" act as wildcards, where the
 *           percent sign matches any single character, and asterisk
 *           matches any sequence of characters.  Thus to display
@@ -117,7 +117,7 @@
 *
 *        -  If a word contains, but does end with an asterisk wildcard,
 *           it must not be truncated.
-* 
+*
 *        -  The entered string must not contain leading or embedded
 *           spaces.
 *
@@ -138,7 +138,7 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999, 2004 
+*     Copyright (C) 1995,1996,1997,1998,1999, 2004
 *     Particle Physics and Astronomy Research Council. All Rights Reserved.
 
 *  History:

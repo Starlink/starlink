@@ -10,9 +10,9 @@ C     Returns the dimensions of an axis data array.
 C
 C  Description:
 C     This routine returns the dimensions and total number of elements
-C     in a specified axis data array.   If the axis data does not in 
+C     in a specified axis data array.   If the axis data does not in
 C     fact exist, this routine returns as if it were a 1D array of the
-C     same size as the corresponding dimension of the data array.  
+C     same size as the corresponding dimension of the data array.
 C     This behaviour is in line with that of DSA_MAP_AXIS_DATA.
 C
 C  Language:
@@ -27,11 +27,11 @@ C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
 C                      with the structure.
 C     (>) AXIS         (Integer,ref) The number of the axis in question.
-C     (>) MAX_DIM      (Integer,ref) The maximum number of dimensions 
-C                      for the data.  
+C     (>) MAX_DIM      (Integer,ref) The maximum number of dimensions
+C                      for the data.
 C     (<) NDIM         (Integer,ref) The actual number of dimensions in
 C                      the data.
-C     (<) DIMS         (Integer array,ref) The number of elements in 
+C     (<) DIMS         (Integer array,ref) The number of elements in
 C                      each axis of the data.  Elements DIMS(NDIM+1)
 C                      to DIMS(MAX_DIM), if any, are set to 1.
 C     (<) ELEMENTS     (Integer,ref) The total number of elements in the

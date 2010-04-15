@@ -1,4 +1,4 @@
-      SUBROUTINE GRP1_RDIND( UNIT, INFILE, SLOT, INDX, EDEP, EIFILE, 
+      SUBROUTINE GRP1_RDIND( UNIT, INFILE, SLOT, INDX, EDEP, EIFILE,
      :                       EMODGP, EMODIN, NADDED, FLAG, STATUS )
 *+
 *  Name:
@@ -16,10 +16,10 @@
 
 *  Description:
 *     Each record in the specified file is stored in the supplied group,
-*     starting at the index given by argument INDX. Each record is 
-*     stored as a single element (i.e. no expansion takes place). Each 
+*     starting at the index given by argument INDX. Each record is
+*     stored as a single element (i.e. no expansion takes place). Each
 *     element is enclosed between opening and closing kernel dilimiters.
-*     The number of records added to the group is returned in argument 
+*     The number of records added to the group is returned in argument
 *     NADDED.
 
 *  Arguments:
@@ -54,7 +54,7 @@
 *     NADDED = INTEGER (Returned)
 *        The number of elements added to the group given by SLOT.
 *     FLAG = LOGICAL (Returned)
-*        Returned true if the last element in the file is flagged. The 
+*        Returned true if the last element in the file is flagged. The
 *        flag character is removed in this case.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -69,12 +69,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -146,7 +146,7 @@
       CHARACTER GEXP*(GRP__SZNAM)! A group expression read from a file
       CHARACTER KCLCC*1          ! Closing kernel delimiter character
       CHARACTER KOPCC*1          ! Opening kernel delimiter character
-      CHARACTER LGEXP*(GRP__SZNAM)! Last times group expression 
+      CHARACTER LGEXP*(GRP__SZNAM)! Last times group expression
       CHARACTER LINE*(GRP__SZNAM)! A line of text read from the file
       INTEGER COM                ! Index of the comment character
       INTEGER GF                 ! First free character in GEXP.
@@ -181,7 +181,7 @@
       IF( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Open the text file specified after the first character.
-         OPEN( UNIT = UNIT, FILE = FILE, STATUS = 'OLD', 
+         OPEN( UNIT = UNIT, FILE = FILE, STATUS = 'OLD',
      :         IOSTAT = IOERR )
 
 *  Check for errors, setting a suitable STATUS value and reporting the
@@ -233,7 +233,7 @@
          VERB = .FALSE.
 
 *  Loop round while text can be read from the file, and no error occurs.
-         DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND. 
+         DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND.
      :             STATUS .EQ. SAI__OK )
 
 *  Create a copy of the text read form the file in which any control
@@ -245,11 +245,11 @@
 *  If a comment character is defined...
             IF( COMOK ) THEN
 
-*  Search for the first occurrence of the comment character in the 
+*  Search for the first occurrence of the comment character in the
 *  group expression.
                COM = GRP1_INDEX( GEXP, COMC, ESCC, ESCOK )
 
-*  If a comment character was found, set the rest of the group 
+*  If a comment character was found, set the rest of the group
 *  expression blank (including the comment character itself).
                IF( COM .GT. 0 ) GEXP( COM : ) = ' '
 
@@ -258,7 +258,7 @@
 
             END IF
 
-*  If a comment character was found in the first column, ignore this 
+*  If a comment character was found in the first column, ignore this
 *  record.
             IF( COM .NE. GF ) THEN
 
@@ -267,7 +267,7 @@
 
 *  See if the last character is a flag character.
                IF( TLEN .GT. 0 ) THEN
-                  FLAG = GRP1_CHKCC( GEXP, TLEN, FLAGC, ESCC, ESCOK ) 
+                  FLAG = GRP1_CHKCC( GEXP, TLEN, FLAGC, ESCC, ESCOK )
      :                   .AND. FLAGOK
                ELSE
                   FLAG = .FALSE.
@@ -291,11 +291,11 @@
 *  Store this record in the group, giving it an indirection depth of
 *  one more than that of the supplied group expression, and storing the
 *  index of the file given in the indirection element.
-               CALL GRP1_PTELM( SLOT, INDX + NADDED, GEXP, EDEP + 1, 
+               CALL GRP1_PTELM( SLOT, INDX + NADDED, GEXP, EDEP + 1,
      :                          INDIND, EMODGP, EMODIN, STATUS )
 
 *  Save a copy of the record.
-               LGEXP = GEXP            
+               LGEXP = GEXP
 
 *  Increment the number of elements added to the group.
                NADDED = NADDED + 1
@@ -310,7 +310,7 @@
 *  Close the text file.
          CLOSE( UNIT )
 
-*  If the last record read from the file terminated with a flag 
+*  If the last record read from the file terminated with a flag
 *  character, remove it.
          IF( FLAG ) THEN
             IF( GF .EQ. 2 ) THEN
@@ -320,7 +320,7 @@
             END IF
 
 *  Save the new value.
-            CALL GRP1_PTELM( SLOT, INDX + NADDED - 1, LGEXP, EDEP + 1, 
+            CALL GRP1_PTELM( SLOT, INDX + NADDED - 1, LGEXP, EDEP + 1,
      :                       INDIND, EMODGP, EMODIN, STATUS )
 
          END IF

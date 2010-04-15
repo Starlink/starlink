@@ -80,7 +80,7 @@
 
 *  Arguments Given:
       CHARACTER NAME*(*)
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -100,7 +100,7 @@
       INTEGER DOT
       INTEGER F
       INTEGER FINISH
-      INTEGER IAT 
+      INTEGER IAT
       INTEGER L
       INTEGER N1
       INTEGER N2
@@ -127,9 +127,9 @@
          IAT = 0
          CALL CHR_APPND( DIR, FILE, IAT )
          CALL CHR_APPND( BN, FILE, IAT )
-      
+
 *  Attempt to open the container file.
-         CALL HDS_OPEN( FILE, 'UPDATE', LOC, STATUS ) 
+         CALL HDS_OPEN( FILE, 'UPDATE', LOC, STATUS )
 
 *  If no such file exists, annul the error and create it. Its name is the
 *  same as the base name of the file, and its type is set to NDG__STRUC.
@@ -149,10 +149,10 @@
          MORE = .TRUE.
          SKIP_THIS = .FALSE.
          START = 1
-         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
 *  Find the index of the next dot in the path.
-            DOT = INDEX( PATH( START : PLEN ), '.' ) 
+            DOT = INDEX( PATH( START : PLEN ), '.' )
 
 *  If no dot was found, this must be the final field in the path (i.e.
 *  the NDF name) and so we do not need to ensure it exists. So we leave
@@ -160,7 +160,7 @@
             IF( DOT .EQ. 0 ) THEN
                MORE = .FALSE.
 
-*  Delete any existing NDF so that a new one can be created. 
+*  Delete any existing NDF so that a new one can be created.
                CALL DAT_ERASE( XLOC, PATH( START : PLEN ), STATUS )
 
 *  Annul any error which occurred deleting ther object.
@@ -187,12 +187,12 @@
 *  before the first opening parenthesis.
                   OPPAR = INDEX( PATH( F : L ), '(' )
 
-*  If not found, the component name is the whole field.          
+*  If not found, the component name is the whole field.
                   IF( OPPAR .EQ. 0 ) THEN
                      N1 = F
                      N2 = L
 
-*  Othrwise, it is the string before the opening parenthesis.             
+*  Othrwise, it is the string before the opening parenthesis.
                   ELSE
                      OPPAR = OPPAR + F - 1
                      N1 = F
@@ -233,7 +233,7 @@
                      IF( OPPAR .EQ. 0 ) THEN
                         CALL DAT_CLONE( LOC2, XLOC, STATUS )
 
-*  If there was an array subscript, we need to get a locator to the correct 
+*  If there was an array subscript, we need to get a locator to the correct
 *  cell. An error will be reported if the array is not big enough to
 *  fit the specified cell in. Tough!
                      ELSE IF( STATUS .EQ. SAI__OK ) THEN

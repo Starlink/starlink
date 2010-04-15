@@ -48,7 +48,7 @@ Cbegin
 
       if ( TBZ.ne.0 ) then						!Load input tables into stack
          do k = 1, TBZ
-            call tbca_load ( %val(IP(k)), TBVX(k), TBY, k, %val(ipstk), 
+            call tbca_load ( %val(IP(k)), TBVX(k), TBY, k, %val(ipstk),
      +                       TBXM, TBY )
             if ( ST_FAILED ) return
          enddo
@@ -69,16 +69,16 @@ Cbegin
          call coprr ( %val(ipd), 1, TBY, 1, 1, 1, TBY,
      +                %val(IPO), TBVXO, TBY, (NCOL(k)+5), 1 )
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBCA_GCL -- Get input and output info from the command line
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine tbca_gcl ( )
 
       implicit none
@@ -87,16 +87,16 @@ C  alan penny                         RAL                1991 Dec
 C--
       logical more, gotit
       integer j, k, kv, ierr, tbxmax, ny, kopt, kn1, kn2
-      character ntexta*7, ntextb*8, title*50, ctemp*2, texta*132, 
+      character ntexta*7, ntextb*8, title*50, ctemp*2, texta*132,
      +          textb*70, ineqna*4, ineqnb*5, intab*3, thelp*68,
      +          inheada*5, inheadb*6, head*20, tempname*1
       character*2 chnum(27)
       character*1000 choice
       data choice / 'NONE:TA:TB:TC:TD:TE:TF:TG:TH:TI:TJ:TK:TL:TM:
      +                    TN:TO:TP:TQ:TR:TS:TT:TU:TV:TW:TX:TY:TZ' /
-      data chnum / 'NO', 'TA', 'TB', 'TC', 'TD', 'TE', 'TF', 'TG', 
-     +             'TH', 'TI', 'TJ', 'TK', 'TL', 'TM', 'TN', 'TO', 
-     +             'TP', 'TQ', 'TR', 'TS', 'TT', 'TU', 'TV', 'TW', 
+      data chnum / 'NO', 'TA', 'TB', 'TC', 'TD', 'TE', 'TF', 'TG',
+     +             'TH', 'TI', 'TJ', 'TK', 'TL', 'TM', 'TN', 'TO',
+     +             'TP', 'TQ', 'TR', 'TS', 'TT', 'TU', 'TV', 'TW',
      +             'TX', 'TY', 'TZ' /
 
 Cbegin
@@ -131,8 +131,8 @@ Cbegin
                textb = texta(1:70)
                call uppcase ( textb, EXPRS(k) )
                call tbca_polish ( EXPRS(k), OPCODE(1,k), NOPCODE(k),	!Translate it into reverse polish notation
-     +                            TBID(1,k), NTB(k), IMP(1,k), 
-     +                            IMPC(1,k), VARID(1,k), NVAR(k), 
+     +                            TBID(1,k), NTB(k), IMP(1,k),
+     +                            IMPC(1,k), VARID(1,k), NVAR(k),
      +                            IMPV(1,k), CON(1,k), NCON(k), ierr )
                if ( ST_FAILED ) return
                if ( ierr.ne.0 ) gotit = .false.
@@ -186,7 +186,7 @@ Cbegin
             if ( k.eq.1 ) then
                TBY = ny
             elseif ( ny.ne.TBY ) then
-               call printo ( 
+               call printo (
      +                'ERROR: Tables must have same number of rows' )
                ST_FAILED = .true.
                return
@@ -199,7 +199,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( NVARTOT.gt.0 ) then						!Get input variables
-         do k = 1, NVARTOT		
+         do k = 1, NVARTOT
             call get1r ( VARTOT(k), VAR(k), 0.0, -1.0e37, +1.0e37 )
             if ( ST_FAILED ) return
          enddo
@@ -273,7 +273,7 @@ Cbegin
             TBVXO = TBVX(kv)
             if ( tbxmax.gt.TBXO ) then
                TBXO = tbxmax
-               TBVXO = TBXO + 5 
+               TBVXO = TBXO + 5
             endif
             TEMPLATE = kv
             CLEAR = .true.
@@ -291,7 +291,7 @@ Cbegin
             if ( ST_FAILED ) return
          endif
       endif
-       
+
       call optabw ( 'OUT', IPO, TBVXO, TBY, .true., ierr )		!Get output table
       if ( ST_FAILED ) return
       if ( ierr.eq.1 ) then
@@ -370,11 +370,11 @@ Cbegin
       else
          if ( CLEAR ) then
             call azeror ( %val(IPO), TBVXO*TBY )
-            call coprr ( %val(IP(TEMPLATE)), TBVX(TEMPLATE), TBY, 
+            call coprr ( %val(IP(TEMPLATE)), TBVX(TEMPLATE), TBY,
      +                   1, 5, 1, TBY, %val(IPO), TBVXO, TBY, 1, 1 )
          else
-            call coprr ( %val(IP(TEMPLATE)), TBVX(TEMPLATE), TBY, 
-     +                   1, TBVX(TEMPLATE), 1, TBY, %val(IPO), TBVXO, 
+            call coprr ( %val(IP(TEMPLATE)), TBVX(TEMPLATE), TBY,
+     +                   1, TBVX(TEMPLATE), 1, TBY, %val(IPO), TBVXO,
      +                   TBY, 1, 1 )
             if ( TBVXO.gt.TBVX(TEMPLATE) ) then
                do k = 1, TBY
@@ -406,7 +406,7 @@ C  alan penny                RAL                1991 Dec
       character*2      tbid(70)		!o: Tables identifiers
       integer          ntb		!o: Number of different tables
       integer          imp(70)		!o: Pointers to tables
-      integer          impc(70)		!o: Pointers to columns 
+      integer          impc(70)		!o: Pointers to columns
       character*1      varid(70)	!o: Variables identifiers
       integer          nvar		!o: Number of variable
       integer          impv(70)		!o: Pointers to variables
@@ -426,9 +426,9 @@ C--
       parameter ( maxsym=38 )
 
       character*7 oper(-3:maxsym), opsymb(-3:maxsym)
-      integer opl(-3:maxsym), opr(-3:maxsym), l(-3:maxsym), 
+      integer opl(-3:maxsym), opr(-3:maxsym), l(-3:maxsym),
      +        prl(-3:maxsym), prr(-3:maxsym)
- 
+
       data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),		!Set up table of operators,
      +        prr(j),j=-3,10 ) /					! symbols and their priorities
      +  '       ', 'LDCON  ', 1, 0, 0, 10, 10,
@@ -483,25 +483,25 @@ C--
      +  'CC     ', 'CC     ', 2, 0, 0, 10, 10,
      +  '%      ', '/      ', 1, 1, 1,  5,  5 /
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
       ierr = 0
       ncin = 0
- 
+
       do k = 1, len(exprs)						!Remove embedded blanks
          if ( exprs(k:k).ne.' ' .and. ncin.lt.80  ) then		!Count no of characters
             ncin = ncin + 1
             in(ncin:ncin) = exprs(k:k)
          endif
       enddo
- 
+
       exprs = in(1:ncin)						!Return the expression with blanks removed
- 
+
       ncin = ncin+1							!Append an '= ' operator to terminate the expression
       in(ncin:) = '='
- 
+
       ntb = 0								!Initiallise counters
       nvar = 0
       ncon = 0
@@ -509,28 +509,28 @@ Cbegin
       j = 0
 
       opnext = .false.							!Indicates if an operator is expected next
-									! first entity must not look like an operator 
+									! first entity must not look like an operator
 
       lmore = .true.							!Loop thru OPLs until '='found
       do while ( lmore )
 
-         found = .false.						!Search through the list of symbols to 
+         found = .false.						!Search through the list of symbols to
          nsymb = -1							! identify which comes next
          do while ( nsymb.lt.maxsym .and. .not.found )
             nsymb = nsymb + 1
-            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like 
+            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like
                test = in(k:min(k+l(nsymb)-1,81))			! an operator or operand from the left, as appropriate
                if ( test.eq.oper(nsymb) ) found = .true.
              endif
          enddo
- 
-         if ( .not.found ) then						!If symbol was not found: - 
+
+         if ( .not.found ) then						!If symbol was not found: -
             if ( opnext ) then						!Error if an operator expected
                ierr = 3
                call printo ( 'ERROR: Cant understand Equation - ' )
                call printo ( 'ERROR: '//exprs )
                return
-            else if ( in(k:k).eq.'T' .and. ischar(in(k+1:k+1)) .and.	!If an operand was expected, it may be 
+            else if ( in(k:k).eq.'T' .and. ischar(in(k+1:k+1)) .and.	!If an operand was expected, it may be
      +               isnumb(in(k+2:k+2)) ) then				! a table, variable or const.
                nsymb = -1						!If it is a table, add name to table stack
                ntb = ntb + 1
@@ -549,7 +549,7 @@ Cbegin
                call chartoi ( colid, impc(ntb), istat )			!Add column to column stack
                if ( istat.ne.0 .or. impc(ntb).eq.0 ) then
                   ierr = 1
-                  call printo ( 
+                  call printo (
      +            'ERROR: Bad column ID - '//tbid(ntb)//colid )
                   call printo ( 'ERROR: '//exprs )
                   return
@@ -563,7 +563,7 @@ Cbegin
                nnum = 0							!Otherwise it may be a constant...
                numchr = ' '						! extract contiguous numerical characters
 
-               atend = .false.						!Character may be part of a numerical constant 
+               atend = .false.						!Character may be part of a numerical constant
                ll = k - 1						! if it is 0..9 or '.'
                do while ( ll.lt.ncin .and. .not.atend )			! or if it is an 'e' following one of the above
                   ll = ll + 1						! or if it is a sign following an 'e'
@@ -576,7 +576,7 @@ Cbegin
                   endif
                enddo
                call chartor ( numchr(:nnum), const, iok )		!Try to read these characters as a constant
- 
+
                if ( iok.eq.0 .and. nnum.ne.0 ) then			!If successful, add constant to stack
                   ncon = ncon + 1
                   con(ncon) = const
@@ -588,20 +588,20 @@ Cbegin
                   call printo ( 'ERROR: '//exprs )
                   return
                endif
-  
+
             endif
          endif
- 
-         j = j + 1							!Put the identified symbol into the output 
-         symb(j) = nsymb						! array and move the input pointer to the 
+
+         j = j + 1							!Put the identified symbol into the output
+         symb(j) = nsymb						! array and move the input pointer to the
          k = k + l(nsymb)						! next symbol
          if ( nsymb.eq.-1 ) k = k + kextra
- 
+
          opnext = opr(nsymb).ne.1					!Decide whether an operator or operand follows
          if ( opsymb(nsymb).eq.'=' ) lmore = .false.
 
       enddo
- 
+
       call azeroi ( stk(0), j+1 )					!Zero operator stack for converting to reverse polish
       tos = 0
       isymb = 1
@@ -610,11 +610,11 @@ Cbegin
       lmore = .true.
       do while ( lmore )
          lmore = .false.
- 
-         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have 
+
+         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have
      +        oper(symb(isymb)).eq.')' ) then				! matching parentheses, cancel them
- 
-            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the 
+
+            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the
  									! opening parenthesis then send it to the output stream
 
                output = opsymb(stk(tos))				!Remove the enclosed '(' from functions first
@@ -627,8 +627,8 @@ Cbegin
                lmore = .true.
              endif
 
-         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has 
-            output = opsymb(stk(tos))					! a high enough priority, transfer it to 
+         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has
+            output = opsymb(stk(tos))					! a high enough priority, transfer it to
             tos = tos - 1						! the output stream
          else
             tos = tos + 1						!Otherwise, transfer the next symbol to the stack
@@ -636,11 +636,11 @@ Cbegin
             isymb = isymb + 1
             lmore = .true. 						!Return for next test
          endif
- 
+
          if ( .not.lmore ) then
 
-            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output, 
-               ierr = 4							! it results from unpaired parentheses 
+            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output,
+               ierr = 4							! it results from unpaired parentheses
                call printo ( 'ERROR: ) missing from Equation -' )	! in the input expression...quit qith error
                call printo ( 'ERROR: '//exprs )
                return
@@ -651,27 +651,27 @@ Cbegin
                return
             endif
 
-            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it 
+            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it
                noper = noper + 1					! if it is unary + or a comma
                opcode(noper) = output
             endif
- 
+
             if ( output.ne.'=' ) lmore = .true.				!Return for next symbol if not the end
 
          endif
 
       enddo
- 
-      if ( ntb.ge.1 ) then						!If tables or variables are referenced, sort 
-         call tbca_sort ( tbid, ntb, imp, ndiff, symb )			! their names into alphabetical order and obtain 
-         ntb = ndiff							! pointers to allow them to be accessed in their 
+
+      if ( ntb.ge.1 ) then						!If tables or variables are referenced, sort
+         call tbca_sort ( tbid, ntb, imp, ndiff, symb )			! their names into alphabetical order and obtain
+         ntb = ndiff							! pointers to allow them to be accessed in their
       endif								! original order
       if ( nvar.ge.1 ) then
          call tbca_sort ( varid, nvar, impv, ndiff, symb )
          nvar = ndiff
       endif
- 
- 
+
+
       end
 
 
@@ -686,7 +686,7 @@ C  alan penny                     RAL            1991 Dec
       implicit none
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
- 
+
       integer      tbx			!i: Max X size of input tables
       integer      tby			!i: Max Y size of input tables
       real         tb(tbx,tby,*)	!i: Input tables
@@ -719,7 +719,7 @@ C--
      + 'ACOS  ','ATAN  ','ATAN2 ','SINH  ','COSH  ','TANH  ','ABS   ',
      + 'AINT  ','ANINT ','MOD   ','SIGN  ','DIM   ','MIN   ','MAX   ',
      + 'CLIP  ','GAUSS ','RAN   ','RR    ','CC    ' /
-Cbegin 
+Cbegin
 
 
       if ( ST_FAILED ) return
@@ -738,33 +738,33 @@ Cbegin
                opwhich(k) = j
                found = .true.
             endif
-         enddo 
+         enddo
          if ( .not.found ) then
             ierr = 1
             return
          endif
       enddo
-      
+
       do j = 1, tby							!Do for all rows in a column
 
          tos = 0							!Initialise the arith, table,
          numitab = 0							! variable, constant stack pointers
          nvar = 0
-         ncon = 0 
- 
+         ncon = 0
+
          nop = 0							!Do the operations
          more = .true.
          bad = .false.
 
          do while ( nop.lt.nopcode .and. more )
-            nop = nop + 1 
+            nop = nop + 1
 
             go to ( 101,102,103,104,105,106,107,108,109,110,111,112,
      +              113,114,115,116,117,118,119,120,121,122,123,124,
      +              125,126,127,128,129,130,131,132,133,134,135,
      +              136,137 ),
      +            opwhich(nop)
-           
+
  101        continue
                tos = tos + 1						!Load constant on to stack
                ncon = ncon + 1
@@ -977,27 +977,27 @@ Cbegin
                tos = tos + 1                                            !CC : Column number
                s(tos) = kx
             go to 100
- 
+
  100        continue
 
             if ( bad ) then						!Invalid arithmetic operation done
                tbcol(j) = 0.0
                more = .false.
             endif
- 
+
          enddo
- 
+
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBCA_TBDIFF -- Get number of diff input tables and point to stack
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine tbca_tbdiff ( )
 
       implicit none
@@ -1012,7 +1012,7 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      TBZ = 0 
+      TBZ = 0
       if ( NUMEQN.eq.0 ) return
 
       do k = 1, NUMEQN
@@ -1055,7 +1055,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBCA_VARDIFF -- Get number of diff input variables and point to stack
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine tbca_vardiff ( )
 
       implicit none
@@ -1070,7 +1070,7 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      NVARTOT = 0 
+      NVARTOT = 0
       if ( NUMEQN.eq.0 ) return
 
       do k = 1, NUMEQN
@@ -1115,7 +1115,7 @@ C
 C  alan penny                 ral                     1991 Dec
 
       subroutine tbca_load ( tb, tbvx, tby, nin, tbs, tbxs, tbys )
- 
+
       implicit none
 
       integer     tbvx			!i: X size (inc 5 for name) of input table
@@ -1128,7 +1128,7 @@ C  alan penny                 ral                     1991 Dec
 C--
       integer j, k
 Cbegin
- 
+
 
       do k = 1, tbys
          if ( k.le.tby ) then
@@ -1138,17 +1138,17 @@ Cbegin
                else
                   tbs(j,k,nin) = 0.0
                endif
-            enddo 
+            enddo
          else
             do j = 1, tbys
                tbs((j+5),k,nin) = 0.0
-            enddo 
+            enddo
          endif
-      enddo 
- 
- 
+      enddo
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBCA_SORT -- Sort identifiers to alphabetical order
@@ -1158,7 +1158,7 @@ C  alan penny            ral                     1991 Dec
       subroutine tbca_sort ( c, nc, imp, ndiff, iw )
 
       implicit none
- 
+
       integer        nc		!i: Number of identifiers
       character*(*)  c(nc)	!i/o: Identiers
       integer        imp(nc)	!o: pointer to identifier place in stack
@@ -1169,7 +1169,7 @@ C--
       character*80 text
       logical repeat
 Cbegin
- 
+
 
       ndiff = 1								!Only 1?
       iw(1) = 1
@@ -1177,12 +1177,12 @@ Cbegin
       if ( nc.le.1 ) return
 
       nn = min(80,len(c(1)))						!Length of input strings
- 
+
       do k = 1, nc							!Initiallise pointers in workspace
          iw(k) = k
       enddo
 
-      repeat = .true.							!Perform a bubble sort to put 
+      repeat = .true.							!Perform a bubble sort to put
       do while ( repeat ) 						! character strings into alphabetical order
          repeat = .false.
          do k = 1, nc-1
@@ -1195,20 +1195,20 @@ Cbegin
                iw(k+1) = iw(k)
                iw(k) = it
             endif
-         enddo 
+         enddo
       enddo
- 
-      ndiff = 1								!Pointers now point to original positions. scan list to 
+
+      ndiff = 1								!Pointers now point to original positions. scan list to
       imp(iw(1)) = 1							! remove repeated entries and reverse the pointing direction
       do k = 2, nc
-         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and 
+         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and
             ndiff = ndiff + 1						! put it in the correct place in the list
             c(ndiff) = c(k)
          endif
          imp(iw(k)) = ndiff						!Set the appropriate output pointer to its new location
       enddo
- 
- 
+
+
       end
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C This is T_TBCHART.FOR
@@ -1221,9 +1221,9 @@ C TBCH_SETUP     Load the default parameters
 C TBCH_PRANGE    Get plot range
 C TBCH_PSIZE     Get plot size
 C TBCH_MRANGE    Get magnitude range
-C TBCH_MSCALE    Get magnitude circle size scale 
-C TBCH_LSIZE     Get Labels size 
-C TBCH_GETDATA   Get Table 
+C TBCH_MSCALE    Get magnitude circle size scale
+C TBCH_LSIZE     Get Labels size
+C TBCH_GETDATA   Get Table
 C TBCH_CLEAR     Clear display
 C TBCH_OPEN      Open device
 C TBCH_CLOSE     Close device
@@ -1266,7 +1266,7 @@ Cbegin
 
          call tbch_option_setup ( ktopt, 1, .false. )			!Do the work
          call get_choice ( ktopt, 1 )					!Get choice
-         
+
          if ( ktopt.eq.'getdata' ) call tbch_getdata			!Open a set of files
 
          if ( ktopt.eq.'plot' ) call tbch_plot ( 1 )			!Display points
@@ -1328,7 +1328,7 @@ C--
 
       integer opt_num
       parameter ( opt_num=16 )
-  
+
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
@@ -1347,7 +1347,7 @@ C--
      + 'GKS name of a device, type -ask-.',
      + 'For a device which makes a file, you must press the close',
      + 'button to close the device, before plotting the file.' /
-  
+
       data opt_text(3), opt_head(3), (opt_help(j,3),j=1,6) /
      + 'close', 'Close the graphical device ',
      + 'One may need to close the plot output display. It is a',
@@ -1356,7 +1356,7 @@ C--
      + 'output from printer (this file only becomes available when',
      + 'the device is -closed-). ',
      + '[All plot options open a device, if it is closed.]'/
-     
+
       data opt_text(4), opt_head(4), (opt_help(j,4),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
@@ -1384,39 +1384,39 @@ C--
      + 'Place the cursor outside the area of the plot (but still',
      + 'in the window) and press for return. [Only give a quick',
      + 'press on return, for you may work the panel again.]'/
-   
+
       data opt_text(8), opt_head(8), (opt_help(j,8),j=1,6) /
      + 'label', 'Plot by each star its name from input table',
-     + 'The (up to) 20 character name for each star kept in the ', 
+     + 'The (up to) 20 character name for each star kept in the ',
      + 'the first input table are plotted by the stars. If there',
      + 'is no room by them, the names are plotted at the nearest',
      + 'clear space and a line drawn connecting name and star.',
-     + ' ', 
+     + ' ',
      + 'Name sizes are set via the LSIZE option and parameter.'/
 
       data opt_text(9), opt_head(9), (opt_help(j,9),j=1,6) /
      + 'plot', 'Plot the stars as filled-in circles' ,
      + 'The X,Y,Mag values of the stars are taken from input',
      + 'table columns 6,7,8. These are plotted as filled circles',
-     + 'whose radii are - (magmin-magnitude)*magscale - . Thus', 
-     + 'brighter stars are plotted bigger. The - magmin and  ', 
-     + 'magscale factors are input via the MSCALE option. MRANGE', 
+     + 'whose radii are - (magmin-magnitude)*magscale - . Thus',
+     + 'brighter stars are plotted bigger. The - magmin and  ',
+     + 'magscale factors are input via the MSCALE option. MRANGE',
      + 'and PRANGE control the range in mag and posn plotted. '/
 
       data opt_text(10), opt_head(10), (opt_help(j,10),j=1,6) /
      + 'ring_rem', 'Remove rings written round stars',
      + ' ', 'Remove the large ring round each solid circle.',
      + ' ', 'This removes the rings which you have written to',
-     + 'help you to sort out stars which overlap each other.', 
+     + 'help you to sort out stars which overlap each other.',
      + ' '/
 
       data opt_text(11), opt_head(11), (opt_help(j,11),j=1,6) /
      + 'lsize', 'Set the size of the names written by the stars',
-     + ' ', 
+     + ' ',
      + 'If the star names are written by the stars, this controls',
      + 'how large the type of the names is. The character size',
-     + 'is proportional to the number input via the LSIZE ', 
-     + 'parameter. The default is 1.0.', 
+     + 'is proportional to the number input via the LSIZE ',
+     + 'parameter. The default is 1.0.',
      + ' '/
 
       data opt_text(12), opt_head(12), (opt_help(j,12),j=1,6) /
@@ -1431,10 +1431,10 @@ C--
       data opt_text(13), opt_head(13), (opt_help(j,13),j=1,6) /
      + 'mscale', 'Set rate which stars get bigger with magnitude',
      + 'The radii of the filled circles stars are plotted as is',
-     + 'set by the equation - radius=(magmin-magnitude)*magscale -', 
+     + 'set by the equation - radius=(magmin-magnitude)*magscale -',
      + ' ',
      + 'This option lets you change the values MAGMIN and ',
-     + 'MAGSCALE via the MMIN and MSCALE parameters. ', 
+     + 'MAGSCALE via the MMIN and MSCALE parameters. ',
      + ' '/
 
       data opt_text(14), opt_head(14), (opt_help(j,14),j=1,6) /
@@ -1486,7 +1486,7 @@ C--
       data sect_text(3) / 'getdata' /
       data sect_text(4) / 'clear:close:open' /
       data sect_text(5) / 'panel:exit' /
-    
+
       integer help_num
       parameter ( help_num=3 )
       character*68 help_text(help_num)
@@ -1499,19 +1499,19 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
 
 
       end
-  
-  
+
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBCH_SETUP -- Load the default parameters
@@ -1564,7 +1564,7 @@ Cbegin
 
       end
 
-      
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBCH_PRANGE -- Get plot range
 C
@@ -1575,7 +1575,7 @@ C     a j penny                 ral               1991 May
       implicit none
       include 'tbchart.inc'
       include 'STARMAN_INC'
-      
+
       real    table(TBVX,TBY)		!i: Input table
 C--
       integer k
@@ -1638,7 +1638,7 @@ C     a j penny                 ral               1991 May
       implicit none
       include 'tbchart.inc'
       include 'STARMAN_INC'
-      
+
       real    table(TBVX,TBY)		!i: Input table
 C--
       real rv, oldx, oldy
@@ -1689,7 +1689,7 @@ Cbegin
       call cswopr ( PSY(1), PSY(2) )
 
       GOTPSIZE = .true.
-      if ( (PSX(2)-PSX(1)).ne.oldx .or. 
+      if ( (PSX(2)-PSX(1)).ne.oldx .or.
      +     (PSY(2)-PSY(1)).ne.oldy ) NEWWORK = .true.
 
 
@@ -1770,7 +1770,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBCH_MSCALE -- Get magnitude circle size scale 
+C TBCH_MSCALE -- Get magnitude circle size scale
 C
 C     a j penny                 ral               1991 May
 
@@ -1797,7 +1797,7 @@ Cbegin
       endif
 
       if ( IN_MAG ) then
-         if ( .not.GOTMSCALE ) then      
+         if ( .not.GOTMSCALE ) then
             MAGMIN = -100.0
             do k = 1, TBY
                rv = table(8,k)
@@ -1809,7 +1809,7 @@ Cbegin
          call get1r ( 'MMIN', MAGMIN, MAGMIN, -1.0e10, 1.0e10 )
          if ( ST_FAILED ) return
       else
-         if ( .not.GOTMSCALE ) then      
+         if ( .not.GOTMSCALE ) then
             MAGMIN = -1000.0
             do k = 1, TBY
                rv = table(8,k)
@@ -1832,7 +1832,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBCH_LSIZE -- Get Labels size 
+C TBCH_LSIZE -- Get Labels size
 C
 C     a j penny                 ral               1991 May
 
@@ -1858,7 +1858,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBCH_GETDATA -- Get Table 
+C TBCH_GETDATA -- Get Table
 C
 C     a j penny                 ral               1991 May
 
@@ -1925,11 +1925,11 @@ Cbegin
          if ( kbad(4).eq.0 ) then
             IN_MAG = .false.
             call pargi ( khead(4) )
-            call printd ( 
+            call printd (
      +                '   X, Y, Height are in columns %d , %d , %d ' )
          else
             IN_MAG = .true.
-            call printd ( 
+            call printd (
      +  '   X,Y are in columns %d , %d ; Column 3 is taken as magns' )
             khead(3) = 3
             kbad(3) = 0
@@ -2074,7 +2074,7 @@ Cbegin
       if ( kopt.eq.1 ) then
          call tbch_doplot ( %val(IPTAB) )				!Plot the data
       else
-         if ( GOTWORK .and. NEWWORK ) then				!Get work space for 
+         if ( GOTWORK .and. NEWWORK ) then				!Get work space for
             call wrkcan ( 'WORKA' )					! modelling picture
             GOTWORK = .false.
          endif
@@ -2189,7 +2189,7 @@ Cbegin
       call gd_bbuf
       if ( kopt.eq.2 ) call pgsci ( 0 )
 
-      do k = 1, TBY		
+      do k = 1, TBY
          x = table(6,k)
          y = table(7,k)
          am = table(8,k)
@@ -2254,8 +2254,8 @@ Cbegin
       ttsize = abs(PSY(2)-PSY(1))/real(NY)
 
       do k = 1, TBY							!Fill stars into dummy array
-         x = table(6,k) 
-         y = table(7,k) 
+         x = table(6,k)
+         y = table(7,k)
          am = table(8,k)
          if ( am.lt.MAGMIN .and. 					!Select only 'good' stars
      +        x.ge.PRX(1) .and. x.le.PRX(2) .and.
@@ -2330,7 +2330,7 @@ Cbegin
 
                   if ( more ) then
 
-                     kxa = xd						!See if any of this 
+                     kxa = xd						!See if any of this
                      kxb = xd + clen 					! position already occupied
                      kya = yd
                      kyb = yd + 2.0
@@ -2361,8 +2361,8 @@ Cbegin
                            px = xs - 0.3*ttsize*cos(ang)
                            py = ys - 0.3*ttsize*sin(ang)
                            call pgmove ( px, py )
-                           px = x + (r+0.5)*ttsize*cos(ang)	
-                           py = y + (r+0.5)*ttsize*sin(ang)	
+                           px = x + (r+0.5)*ttsize*cos(ang)
+                           py = y + (r+0.5)*ttsize*sin(ang)
                            call pgdraw ( px, py )
                         endif
 
@@ -2426,7 +2426,7 @@ Cbegin
 
          call pgcurse ( x, y, ch )
 
-         if ( x.gt.PSX(2) .or. x.lt.PSX(1) .or. 
+         if ( x.gt.PSX(2) .or. x.lt.PSX(1) .or.
      +        y.gt.PSY(2) .or. y.lt.PSY(1) ) then
             more = .false.
          else
@@ -2437,7 +2437,7 @@ Cbegin
                xa = table(6,k)						!Only for 'good' stars
                ya = table(7,k)
                am = table(8,k)
-               if ( am.lt.MAGMIN .and. x.ge.PRX(1) .and. x.le.PRX(2) 
+               if ( am.lt.MAGMIN .and. x.ge.PRX(1) .and. x.le.PRX(2)
      +              .and. y.ge.PRY(1) .and. y.le.PRY(2) .and.
      +              am.ge.DML(1) .and. am.le.DML(2) ) then
                   dx = x - xa
@@ -2529,7 +2529,7 @@ Cbegin
 
 
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBCH_FINDCOL -- Find columns (x:y:mag:ht) is in
@@ -2541,7 +2541,7 @@ C   alan penny          ral               1995 March
       implicit none
       include 'STARMAN_INC'
 
-      character*(*) tfile       !i: Name of parameter with input file 
+      character*(*) tfile       !i: Name of parameter with input file
       integer       kdo(4)	!i: Do (x:y:mag:ht) search flag (0=no;1=yes)
       integer       kwarn(4)	!i: Warn (x:y:mag:ht) error flag (0=no;1=yes)
       integer       ktbx	!i: No of columns
@@ -2570,7 +2570,7 @@ Cbegin
             khead(1) = 1
             kbad(2) = 1
             if ( kwarn(1).eq.1 ) then
-               call printo ( 
+               call printo (
      +                ' WARNING: Header for X positions not found')
                call printo ( '          Must be x or X')
                call printo ( '          Assumed to be in column 1')
@@ -2581,7 +2581,7 @@ Cbegin
          endif
       endif
 
-      if ( kdo(2).eq.1 ) then 
+      if ( kdo(2).eq.1 ) then
          khead(2) = 0
          kbad(2) = 0
          do k = ktbx, 1, -1
@@ -2596,7 +2596,7 @@ Cbegin
             khead(2) = 2
             kbad(2) = 1
             if ( kwarn(2).eq.1 ) then
-               call printo ( 
+               call printo (
      +               ' WARNING: Header for Y positions not found')
                call printo ( '          Must be y or Y')
                call printo ( '          Assumed to be in column 2')
@@ -2618,8 +2618,8 @@ Cbegin
                call lowcase ( thead, ahead )
                call lbgone ( ahead )
                if ( ahead.eq.'mag' .or. ahead.eq.'mags' .or.
-     +              ahead.eq.'magn' .or. ahead.eq.'magns' .or. 
-     +              ahead.eq.'magnitudes' .or. ahead.eq.'magnitudes' ) 
+     +              ahead.eq.'magn' .or. ahead.eq.'magns' .or.
+     +              ahead.eq.'magnitudes' .or. ahead.eq.'magnitudes' )
      +              khead(3) = k
              endif
          enddo
@@ -2627,9 +2627,9 @@ Cbegin
             khead(3) = 3
             kbad(3) = 1
             if ( kwarn(3).eq.1 ) then
-               call printo ( 
+               call printo (
      +              ' WARNING: Header for magnitudes not found')
-               call printo ( 
+               call printo (
      +         '          Must be mag/mags/magn/magns/magnitude/s')
                call printo ( '          (Case not important)')
                call printo ( '          Assumed to be in column 3')
@@ -2651,7 +2651,7 @@ Cbegin
                call lowcase ( thead, ahead )
                call lbgone ( ahead )
                if ( ahead.eq.'ht' .or. ahead.eq.'hts' .or.
-     +              ahead.eq.'height' .or. ahead.eq.'heights' ) 
+     +              ahead.eq.'height' .or. ahead.eq.'heights' )
      +              khead(4) = k
             endif
          enddo
@@ -2659,10 +2659,10 @@ Cbegin
             khead(4) = 3
             kbad(4) = 1
             if ( kwarn(4).eq.1 ) then
-               call printo ( 
+               call printo (
      +                     ' WARNING: Header for heights not found')
                call printo ( '          Must be ht/hts/height/heights')
-               call printo ( '          (Case not important)') 
+               call printo ( '          (Case not important)')
                call printo ( '          Assumed to be in column 3')
                call gthead ( tfile, 3, thead, ierr )
                if ( ierr.eq.0 ) then
@@ -2690,7 +2690,7 @@ C
 C    Contains:-
 C
 C T_TBCOMPS     Find stars within/not within a given annulus of other stars
-C TBCO_CHECK    Find number and locations of rows to output 
+C TBCO_CHECK    Find number and locations of rows to output
 C TBCO_TRANS    Load selected rows into output
 
 
@@ -2705,7 +2705,7 @@ C         A J Penny            RAL			1991 May
       include 'STARMAN_INC'
       include 'ST_TABLE_INC'
 C--
-      character title*50 
+      character title*50
       integer ierr, ipin, ipo, iv, ipk, kmeth, k
       real topl, botl
 
@@ -2763,8 +2763,8 @@ Cbegin
          ST_FAILED = .true.
          return
       endif
-      call gtdesc ( 'IN', 'TITLE', title, 'Output from Tbcomps', iv, 
-     +              ierr )	
+      call gtdesc ( 'IN', 'TITLE', title, 'Output from Tbcomps', iv,
+     +              ierr )
       call get1c  ( 'TITLE', title, title, .true. )
       if ( ST_FAILED ) return
       call ptdesc ( 'OUT', 'TITLE', title )
@@ -2776,7 +2776,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBCO_CHECK -- Find number and locations of rows to output 
+C TBCO_CHECK -- Find number and locations of rows to output
 C
 C    a j penny               rgo                      82-11-4
 
@@ -2986,9 +2986,9 @@ Cbegin
       call tbcu_check ( kc, numc, %val(ipwc), kr, numr, %val(ipwr) )	!Set up for output
 
       if ( TBXO.lt.1 .or. TBYO.lt.1 ) then				!Check output size
-         if ( TBXO.lt.1 ) call printo ( 	
+         if ( TBXO.lt.1 ) call printo (
      +      'WARNING: Output table has no columns - no file made' )
-         if ( TBYO.lt.1 ) call printo ( 
+         if ( TBYO.lt.1 ) call printo (
      +      'WARNING: Output table has no rows - no file made' )
          return
       endif
@@ -3079,7 +3079,7 @@ Cbegin
             enddo
          enddo
       endif
-         
+
       TBYO = 0
       do k = 1, TBY
          if ( rowc(k).eq.1 ) TBYO = TBYO + 1
@@ -3137,7 +3137,7 @@ Cbegin
          if ( colc(k).eq.1 ) then
             ky = ky + 1
             head = ' '
-            call gthead ( 'IN', k, head, ierr )				
+            call gthead ( 'IN', k, head, ierr )
             call pthead ( 'OUT', ky, head, ierr )
          endif
       enddo
@@ -3162,8 +3162,8 @@ C    Contains:-
 C
 C T_TBDES      List, write, delete descriptors of a table
 C TBD_LIST     List descriptors
-C TBD_SINGLE   Put out wanted descriptors 
-C TBD_ALL      Put out all descriptors 
+C TBD_SINGLE   Put out wanted descriptors
+C TBD_ALL      Put out all descriptors
 C TBD_WRITE    Write descriptors to table
 C TBD_DELETE   Delete descriptors from a table
 C TBD_COPY     Copy descriptors from one table to another
@@ -3198,7 +3198,7 @@ C--
      + 'Write     Write descriptors to table' /
 Cbegin
 
-    
+
       call get_job ( 'OPTION', topt, kout, 1, th, nth )
       if ( ST_FAILED ) return
 
@@ -3232,7 +3232,7 @@ C--
       logical all, onlyone
 Cbegin
 
-    
+
       if ( ST_FAILED ) return
 
       call optabr ( 'IN', ip, TBVX, TBY, .false., ierr )		!Obtain input table
@@ -3254,7 +3254,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBD_SINGLE -- Put out wanted descriptors 
+C TBD_SINGLE -- Put out wanted descriptors
 C
 C  alan penny                 ral                1990-06-15
 
@@ -3288,7 +3288,7 @@ Cbegin
          call printo ( 'No Headers or Descriptors' )
          return
       endif
-      call gtdesc ( 'IN', 'TITLE', textb, ' ', iv, ierr )   
+      call gtdesc ( 'IN', 'TITLE', textb, ' ', iv, ierr )
       if ( ierr.ne.0 ) then
          call printo ( 'No Title' )
       else
@@ -3336,7 +3336,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBD_ALL -- Put out all descriptors 
+C TBD_ALL -- Put out all descriptors
 C
 C  alan penny                 ral                1990-06-15
 
@@ -3367,7 +3367,7 @@ Cbegin
          call printo ( 'No Headers or Descriptors' )
          return
       endif
-      call gtdesc ( 'IN', 'TITLE', text, ' ', iv, ierr )   
+      call gtdesc ( 'IN', 'TITLE', text, ' ', iv, ierr )
       if ( ierr.ne.0 ) then
          call printo ( 'No Title' )
       else
@@ -3439,9 +3439,9 @@ Cbegin
      +            descr(7:7).lt.'0' .or. descr(7:7).gt.'9'  ) then
                if ( first ) then
                   call printo ( ' ' )
-                  call printo ( 
+                  call printo (
      +                  'Descriptors that are not Column Headers' )
-                  call printo ( 
+                  call printo (
      +                  '---------------------------------------' )
                   call printo ( ' ' )
                   first = .false.
@@ -3467,7 +3467,7 @@ Cbegin
       enddo
       if ( first ) then
          call printo ( ' ' )
-                  call printo ( 
+                  call printo (
      +               'No descriptors that are not Column Headers' )
          call printo ( ' ' )
       endif
@@ -3490,7 +3490,7 @@ C  p morris      leeds                   Jun 1992
 C--
       integer ierr, iv, ip
       real rv
-      character desnam*20, desna*20, val*72, type*30, atype*30, 
+      character desnam*20, desna*20, val*72, type*30, atype*30,
      +          utype*30
       logical bv, loop, first
 Cbegin
@@ -3582,7 +3582,7 @@ Cbegin
          if ( desnam.eq.' ' ) then
             loop = .false.
          else
-            call dldes ( 'IN', desnam, ierr ) 
+            call dldes ( 'IN', desnam, ierr )
          endif
          if ( ierr .ne. 0 ) then
             ST_FAILED = .false.
@@ -3753,7 +3753,7 @@ C--
       character text*70, texth*30, itext*3, iitext*7
       logical more, ok
       integer tbx(9), tby(9), tbvx(9), tbxo, tbyo, tbvxo, ipin(9),
-     +        ipout, kshx(9), kshy(9), j, ja, i, ierr, iv, 
+     +        ipout, kshx(9), kshy(9), j, ja, i, ierr, iv,
      +        tbxst, tbxen, tbyst, tbyen, kn, kxd, kyd
 Cbegin
 
@@ -3821,9 +3821,9 @@ Cbegin
       tbyst = 1
       tbxen = tbx(1)
       do j = 1, kn
-         tbxst = min(tbxst,(kshx(j)+1)) 
+         tbxst = min(tbxst,(kshx(j)+1))
          tbyst = min(tbyst,(kshy(j)+1))
-         tbxen = max(tbxen,(tbx(j)+kshx(j))) 
+         tbxen = max(tbxen,(tbx(j)+kshx(j)))
       enddo
       tbxo = tbxen - tbxst + 1
       tbvxo = tbxo + 5
@@ -3842,7 +3842,7 @@ Cbegin
       do j = 1, kn							!Put in lists
          kxd = 2 + kshx(j) - tbxst
          kyd = 2 + kshy(j) - tbyst
-         call coprr ( %val(ipin(j)), tbvx(j), tby(j), 1, 5, 1, tby(j), 
+         call coprr ( %val(ipin(j)), tbvx(j), tby(j), 1, 5, 1, tby(j),
      +                %val(ipout), tbvxo, tbyo, 1, kyd )
          call coprr ( %val(ipin(j)), tbvx(j), tby(j), 6, tbvx(j),
      +                1, tby(j), %val(ipout), tbvxo, tbyo, kxd+5, kyd )
@@ -3874,7 +3874,7 @@ Cbegin
             if ( i.eq.0 ) call pthead ( 'OUT', kxd, texth, i )
          enddo
       enddo
-      
+
 
       end
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -3932,7 +3932,7 @@ C--
       integer istat
 Cbegin
 
-      
+
       if ( ST_FAILED ) return
 
       call get1i ( 'NUMCOL', TBX, 2, 1, 20 )			!No of output columns
@@ -4084,7 +4084,7 @@ Cbegin
             write ( idbuf(2:), '(1x,i18)' ) ndef
             call lbgone ( idbuf(2:) )
          endif
-      
+
          if ( more ) then
             if ( k.lt.3 ) call printo ( 'ERROR: Row repeated' )
             if ( k.ge.3 ) call printo ( 'ERROR: Row set to zeros' )
@@ -4120,7 +4120,7 @@ Cbegin
 
       call get1c ( 'TITLE', cv, 'Output from TBKEY', .true. )
       if ( ST_FAILED ) return
- 
+
       do k = 1, TBX							!Add new column headers
          ihead = ' '
          if ( k.eq.1 ) ihead = 'X'
@@ -4289,7 +4289,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       n = min(3,TBX)
-      
+
       if ( DOHEAD.eq.1 ) then						!Get headers
          NCOL(1) = 1
          NCOL(2) = 2
@@ -4300,7 +4300,7 @@ Cbegin
          call gtdesc ( 'IN', 'TITLE', title, ' ', iv, ierr ) 		!Get title
          text = 'Title is:  '//title
 
-         texta = '      Name             '	
+         texta = '      Name             '
          textb = '      ----             '
          kn = 24
          do k = 1, n
@@ -4327,7 +4327,7 @@ Cbegin
 
       endif
 
-      do k = 1, TBY							!Type out lines				
+      do k = 1, TBY							!Type out lines
          call namegt ( tb, TBVX, TBY, k, name )				! with names and up to 3 values
          do j = 1, n
             rv(j)= tb((5+j),k)
@@ -4335,7 +4335,7 @@ Cbegin
          enddo
          write ( textd, '(1x,a20,3(2x,a12,2x))' ) name,(textc(j),j=1,n)
          if ( DOTYPE ) call printo ( textd )
-         if ( DOFILE ) write ( 1, '(1x,a70)' ) textd 
+         if ( DOFILE ) write ( 1, '(1x,a70)' ) textd
       enddo
 
 
@@ -4370,7 +4370,7 @@ Cbegin
       if ( DOHEAD.eq.1 ) then						!Get headers
          call tbli_dohead ( TBX, 2 )
       elseif ( DOHEAD.eq.2 ) then
-         call tbli_allhead 
+         call tbli_allhead
       endif
 
       do k = 1, TBY							!Print entries
@@ -4379,7 +4379,7 @@ Cbegin
          text  = ' '
          if ( NUMID.ne.0 ) text = name(1:NUMID)
          kn = 1 + NUMID + 2
-         
+
          do j = 1, min(4,TBX)						!Load values
             rv = tb((5+j),k)
             call valform ( rv, textc )
@@ -4403,7 +4403,7 @@ Cbegin
             enddo
             if ( DOTYPE ) call printo ( text )
             if ( DOFILE ) call tbli_wri ( text )
-   
+
             jj = jj - 4
             j = j + 1
          enddo
@@ -4582,7 +4582,7 @@ Cbegin
 
       enddo
       if ( kx.lt.1 ) return
-      
+
       if ( DOHEAD.eq.1 ) then						!Get headers
          call tbli_dohead ( kx, 1 )
       elseif ( DOHEAD.eq.2 ) then
@@ -4595,7 +4595,7 @@ Cbegin
          text  = ' '
          if ( NUMID.ne.0 ) text = name(1:NUMID)
          kn = 1 + NUMID
-         
+
          do j = 1, min(4,kx)						!Load values
             rv = tb((5+NCOL(j)),k)
             call valform ( rv, textc )
@@ -4619,7 +4619,7 @@ Cbegin
             enddo
             if ( DOTYPE ) call printo ( text )
             if ( DOFILE ) call tbli_wri ( text )
-   
+
             jj = jj - 4
             j = j + 1
          enddo
@@ -4847,7 +4847,7 @@ C--
       real    rv
       logical more
       character*7 forcha(16), forchb(16)
-      character btext*10, atext*10, ntext*10, name*20, forin*7, 
+      character btext*10, atext*10, ntext*10, name*20, forin*7,
      +          forinb*13, texta*4000, textb*200, text*80
 
       integer      nmax
@@ -4896,7 +4896,7 @@ Cbegin
 
       enddo
       if ( kx.lt.1 ) return
-      
+
       if ( DOHEAD.eq.1 ) then						!Get headers
          call tbli_dohead ( kx, 1 )
       elseif ( DOHEAD.eq.2 ) then
@@ -4932,7 +4932,7 @@ Cbegin
 
          if ( dotype ) then
             write ( texta, forcha ) (name(j:j),j=1,20), (val(j),j=1,kx)
-            call tbli_lintidy ( texta, 200, NUMID, naft, 1, textb, klen) 
+            call tbli_lintidy ( texta, 200, NUMID, naft, 1, textb, klen)
             knum = 1 + ((klen-1)/70)
             do kk = 1, knum
                ks = 1 + (kk-1)*70
@@ -4972,7 +4972,7 @@ C  alan penny                 ral                1990-06-15
 C--
       integer nmax
       parameter ( nmax=15 )
-      integer j, k, ka, kb, kc, ke, kcc(nmax), kcd(nmax), klen, iv, 
+      integer j, k, ka, kb, kc, ke, kcc(nmax), kcd(nmax), klen, iv,
      +        ierr, kk, knum, ks, kl
       character*13 forchc(18), forchd(18), forina, forinb
       character text*80, title*50, texta*4000, textb*200
@@ -5005,7 +5005,7 @@ Cbegin
          if ( naft(k).eq.0 ) ke = ke - 1
 
          if ( ke.gt.0 ) then
-            write ( forina, '(i2,''x,'',i2,''a1,'',i2,''x,'')' ) kb, 
+            write ( forina, '(i2,''x,'',i2,''a1,'',i2,''x,'')' ) kb,
      +                                                        kc, ke
          else
             write ( forina, '(i2,''x,'',i2,''a1,'')' ) kb, kc
@@ -5037,7 +5037,7 @@ Cbegin
          ke = nbef(k) + naft(k) + 2 - kb - kc
          if ( naft(k).eq.0 ) ke = ke - 1
          if ( ke.gt.0 ) then
-            write ( forina, '(i2,''x,'',i2,''a1,'',i2,''x,'')' ) kb, 
+            write ( forina, '(i2,''x,'',i2,''a1,'',i2,''x,'')' ) kb,
      +                                                         kc, ke
          else
             write ( forina, '(i2,''x,'',i2,''a1,'')' ) kb, kc
@@ -5066,7 +5066,7 @@ Cbegin
             call printo ( text )
          enddo
       endif
-      
+
       if ( dofile ) then
          text = ' Title is:-   '//title
          write ( 1, '(a)' ) text
@@ -5251,7 +5251,7 @@ Cbegin
          read ( 1, '(10x,i7)', end=1, err=1 ) ndes
          if ( ndes.ne.0 ) then
             do k = 1, ndes
-               read ( 1, '(a1)', end=1, err=1 ) 
+               read ( 1, '(a1)', end=1, err=1 )
             enddo
          endif
 
@@ -5304,7 +5304,7 @@ Cbegin
 
       return
 
-    1 call printo ( 
+    1 call printo (
      +        'ERROR: Error reading input file - getting table size' )
       ST_FAILED = .true.
 
@@ -5329,7 +5329,7 @@ C  alan penny                 ral                1990-06-15
       integer     nlines		!i: No of lines in input file per output row
       integer     hlines		!i: No of lines at start of input file to ignore
 C--
-      integer j, jj, k, kk, ierr, ks(1000), ke(1000), numc, ja, jb, 
+      integer j, jj, k, kk, ierr, ks(1000), ke(1000), numc, ja, jb,
      +        kd, kee, ndes, ka, iv, iverr
       logical more
       character text*1000, title*50, name*20, head*20, thead*7, tc*100,
@@ -5344,7 +5344,7 @@ Cbegin
       call ident ( tb, TBVX, TBY )					!Load default empty output file
       do k = 1, TBY
          call amovkr ( 0.0, tb(6,k), TBX )
-      enddo  
+      enddo
 
       call printo ( ' ' )
       if ( dohead ) then						!Put header
@@ -5352,7 +5352,7 @@ Cbegin
          read ( 1, '(10x,a)', end=1, err=1 ) text
          j = index(text,'is:')
          title = text(j+4:j+53)
-         read ( 1, '(a1)', end=1,err=1 ) 
+         read ( 1, '(a1)', end=1,err=1 )
          read ( 1, '(a1)',end=1, err=1 )
          call printo ( '[Title; column number; row number] - read' )
 
@@ -5412,7 +5412,7 @@ Cbegin
          enddo
          if ( hlines.ne.0 ) then
             do k = 1, hlines
-               read ( 1, '(a1)', end=1,err=1 ) 
+               read ( 1, '(a1)', end=1,err=1 )
             enddo
             call printo ( 'Starter lines - read' )
          endif
@@ -5475,7 +5475,7 @@ Cbegin
                   endif
                endif
             enddo
-                   
+
             call amovr ( rv, tb(jj,kk), (numc-jb) )			!Put data
             jj = jj + numc - jb
 
@@ -5488,17 +5488,17 @@ Cbegin
       enddo
       call printo ( 'Data - read' )
 
-      
-      return								!Put out the input format 
+
+      return								!Put out the input format
     1 call printo ( 'ERROR: Error reading input file' )			! error messages
       ST_FAILED = .true.
       return
 
     2 iv = (kk-1)*nlines + k
       call pargi ( iv )
-      if ( iverr.eq.1 ) call printd ( 
+      if ( iverr.eq.1 ) call printd (
      +               'ERROR: Error in input: in data line no %d')
-      if ( iverr.eq.2 ) call printd ( 
+      if ( iverr.eq.2 ) call printd (
      +         'ERROR: Error in input: in format of data line no %d' )
       call charln ( text, iv )
       iv = min(70,iv)
@@ -5525,10 +5525,10 @@ C TBMA_TRANSB   Move entries from input tables to output tables (same)
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C T_TBMATCH -- Extract entries with matching names in two tables
-C  Take two tables lists and makes two new ones which are copies of the old ones, 
-C  but only contain the entries which do (or optionally do not) have 
-C  identifiers which occur in the other file. The new file entries are in 
-C  the same order as in their old files, except if choosing the matching 
+C  Take two tables lists and makes two new ones which are copies of the old ones,
+C  but only contain the entries which do (or optionally do not) have
+C  identifiers which occur in the other file. The new file entries are in
+C  the same order as in their old files, except if choosing the matching
 C  entries, the 2nd file entries are in the order they occur in the 1st file.
 C
 C         A J Penny            RAL                       1991 May
@@ -5590,7 +5590,7 @@ Cbegin
          call tbma_checka ( %val(ip1), %val(ip2), %val(ipw1), 		!Find no of entries passed
      +                     %val(ipw2), kacc )
       else
-         call tbma_checkb ( %val(ip1), %val(ip2), %val(ipw1), 
+         call tbma_checkb ( %val(ip1), %val(ip2), %val(ipw1),
      +                     %val(ipw2), %val(ipw3) )
       endif
 
@@ -5613,7 +5613,7 @@ Cbegin
             return
          endif
 
-         call tcopdes ( 'IN1', 'OUT1', ierr )				!Get title to output list 	
+         call tcopdes ( 'IN1', 'OUT1', ierr )				!Get title to output list
          call gtdesc ( 'IN1', 'TITLE', title, 'Output from Tbmatch',	! and store it and the descriptors
      +                 iv, ierr )
          if ( ierr.ne.0 ) title = 'Output from Tbmatch'
@@ -5631,7 +5631,7 @@ Cbegin
             return
          endif
 
-         call tcopdes ( 'IN2', 'OUT2', ierr )				!Get title to output list 
+         call tcopdes ( 'IN2', 'OUT2', ierr )				!Get title to output list
          call gtdesc ( 'IN2', 'TITLE', title, 'Output from Tbmatch',	! and store it and the descriptors
      +                 iv, ierr )
          if ( ierr.ne.0 ) title = 'Output from Tbmatch'
@@ -5640,18 +5640,18 @@ Cbegin
          call ptdesc ( 'OUT2', 'TITLE', title )
       endif
 
-      if ( kacc.eq.1 .and. same ) then					!Do the loading of the  
+      if ( kacc.eq.1 .and. same ) then					!Do the loading of the
          if ( TBYO1.ne.0 ) then						! the input to the output
-            call tbma_transb ( %val(ip1), TBVX1, TBY1, %val(ipo1), 
+            call tbma_transb ( %val(ip1), TBVX1, TBY1, %val(ipo1),
      +                        TBYO1, %val(ipw1) )
-            call tbma_transb ( %val(ip2), TBVX2, TBY2, %val(ipo2), 
+            call tbma_transb ( %val(ip2), TBVX2, TBY2, %val(ipo2),
      +                        TBYO2, %val(ipw2) )
          endif
       else
          if ( TBYO1.ne.0 ) call tbma_transa ( %val(ip1), TBVX1, TBY1,
      +                          %val(ipo1), TBYO1, %val(ipw1), kacc )
-         if ( TBYO2.ne.0 ) call tbma_transa ( %val(ip2), TBVX2, TBY2, 
-     +                          %val(ipo2), TBYO2, %val(ipw2), kacc )	
+         if ( TBYO2.ne.0 ) call tbma_transa ( %val(ip2), TBVX2, TBY2,
+     +                          %val(ipo2), TBYO2, %val(ipw2), kacc )
       endif
 
 
@@ -5840,7 +5840,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( kacc.eq.1 ) then
- 
+
          do k = 1, tby
             kout = nd(k)
             if ( kout.ne.0 ) call amovr ( tbi(1,k), tbo(1,kout), tbvx )
@@ -5855,7 +5855,7 @@ Cbegin
                call amovr ( tbi(1,k), tbo(1,kout), tbvx )
             endif
          enddo
- 
+
       endif
 
 
@@ -5883,7 +5883,7 @@ C--
       integer k, ka
 Cbegin
 
- 
+
       if ( ST_FAILED ) return
 
       do k = 1, tbyo
@@ -5894,9 +5894,9 @@ Cbegin
 
        end
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C T_TBNATIVE.F -- Converts Starman table between different machines. 
-C   Table mapped as real, then as basic (bytes). This preserves the name 
-C   info in which is held in the first five reals of each row, and which 
+C T_TBNATIVE.F -- Converts Starman table between different machines.
+C   Table mapped as real, then as basic (bytes). This preserves the name
+C   info in which is held in the first five reals of each row, and which
 C   is thus corrupted if mapped as real on different machines
 C
 C   pat morris    leeds     May 1992
@@ -5910,7 +5910,7 @@ C   pat morris    leeds     May 1992
       include 'DAT_PAR'
       include 'NDF_PAR'
 C--
-      integer indf, outdf, num, iptr, optr, status, 
+      integer indf, outdf, num, iptr, optr, status,
      +        ndim(2), num2, nx, ny
       character*(DAT__SZLOC) loc, dloc, nloc
       character*(NDF__SZFRM) form
@@ -5945,7 +5945,7 @@ Cbegin
          ST_FAILED = .true.
          return
       endif
-     
+
       call ndf_prop ( indf, 'DATA', 'OUT', outdf, status )		!Propagate NDF
 
       call ndf_map ( outdf, 'DATA', '_REAL', 'UPDATE', optr,
@@ -5966,7 +5966,7 @@ Cbegin
       call printd ( 'Contents Check:  %d x %d bytes should'//
      +              ' be = %d no. of byte elements' )
 
-      call copzz ( %val(iptr), nx*4, ny, 1, 20, 1, ny,			!Copy first 5 reals for each column across 
+      call copzz ( %val(iptr), nx*4, ny, 1, 20, 1, ny,			!Copy first 5 reals for each column across
      +             %val(optr), nx*4, ny, 1, 1 )				! as bytes
 
       call dat_annul ( dloc, status )
@@ -6077,7 +6077,7 @@ Cbegin
 
          if ( NCOLO.ne.0 ) then
             if ( TBVXI(k).lt.(NCOLO+5) ) then				!Too narrow
-               call printo ( 
+               call printo (
      +             'ERROR: Table too narrow for use of flag column' )
                ST_FAILED = .true.
                return
@@ -6117,7 +6117,7 @@ Cbegin
       call printo ( 'Making sorting tables for files to match names' )
 
       TBYO = 0
-      do k = 1, KTOT							!Load names from file 1 and 		
+      do k = 1, KTOT							!Load names from file 1 and
          call tbnm_loadn1 ( %val(IPI(k)), TBVXI(k), TBYI(k), k, 	! add any extra names from other files
      +                      %val(IPNAMES) )
          if ( k.eq.1 ) then
@@ -6127,7 +6127,7 @@ Cbegin
          else
             call pargi ( k )
             call pargi ( TBYO )
-            call printd ( 
+            call printd (
      +      'Added extra output names from file %d - total rows = %d' )
          endif
       enddo
@@ -6136,7 +6136,7 @@ Cbegin
       call printd ( 'Output files have %d rows' )
 
       do k = 1, KTOT							!Load actual positions for those there
-         call tbnm_loadn2 ( %val(IPI(k)), TBVXI(k), TBYI(k), 
+         call tbnm_loadn2 ( %val(IPI(k)), TBVXI(k), TBYI(k),
      +                      k, %val(IPNAMES), %val(IPNUMS)  )
          call pargi ( k )
          call printd ( 'Loaded sorting table for file %d' )
@@ -6181,11 +6181,11 @@ Cbegin
             if ( kd.eq.0 ) found = .true.
             kk = kk + 1
          enddo
-     
+
          if ( .not.found ) then
             if ( TBYO.eq.KMAXR ) then
                call pargi ( TBYO )
-               call printd ( 
+               call printd (
      +              'ERROR: Too many star names: there are over %d' )
                ST_FAILED  = .true.
             else
@@ -6224,7 +6224,7 @@ C--
       logical found
 Cbegin
 
-    
+
       do kk = 1, TBYO
 
          k = 1
@@ -6286,14 +6286,14 @@ Cbegin
             call lbgone ( itext(3:) )
             call gtdesc ( itext, 'TITLE', title, 			!Lad title and descriptors
      +                    'Output from Tbnmatch', iv, ierr )
-            call get1c ( 'TITLE', title, title, .true. )	
+            call get1c ( 'TITLE', title, title, .true. )
             if ( ST_FAILED ) return
             call tcopdes ( itext, otext, ierr )
             call ptdesc ( otext, 'TITLE', title )
          endif
 
          if ( k.eq.KTOT ) loop = .false.
-   
+
       enddo
 
 
@@ -6346,7 +6346,7 @@ Cbegin
 
 
       if ( ST_FAILED ) return
-      
+
       call coprr ( %val(IPNAMES), 5, KMAXR, 1, 5, 1, TBYO, tbo, tbvx, 	!Copy names
      +             TBYO, 1, 1 )
 
@@ -6374,7 +6374,7 @@ C TBPL_OPTION_SETUP Set up option choices
 C TBPL_PRANGE    Get plot range
 C TBPL_HRANGE    Get histogram range
 C TBPL_PSIZE     Get plot size
-C TBPL_GETTB     Get Table 
+C TBPL_GETTB     Get Table
 C TBPL_GETIM     Get Image
 C TBPL_CLEAR     Clear display
 C TBPL_OPEN      Open device
@@ -6443,7 +6443,7 @@ Cbegin
 
       call type_hchoice							!Type option help
       call tbpl_option_setup ( ktopt, 1, .true. )			!Do the work
-      if ( ktype.eq.2 ) call choice_panel_sw	
+      if ( ktype.eq.2 ) call choice_panel_sw
 
       loop = .true.
       do while ( loop )
@@ -6525,14 +6525,14 @@ C   alan penny                        ral              1990-01-31
       logical  koutside                 !i: Is this called from outside loop?
 C--
       integer j, k
-   
+
       integer opt_num
       parameter ( opt_num=19 )
 
       character*12 opt_text(opt_num)
       character*68 opt_head(opt_num)
       character*68 opt_help(6,opt_num)
-   
+
       data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
      + 'all_clear', 'Clear plot and axes',
      + 'Clear the plotted data and axes.',
@@ -6548,7 +6548,7 @@ C--
      + 'GKS name of a device, type -ask-.',
      + 'For a device which makes a file, you must press the close',
      + 'button to close the device, before plotting the file.' /
-   
+
       data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
      + 'close', 'Close the plot device',
      + 'One may need to close the plot output display. It is a',
@@ -6557,7 +6557,7 @@ C--
      + 'output from printer (this file only becomes available when',
      + 'the device is -closed-). ',
      + '[All plot options open a device, if it is closed.]'/
-      
+
       data opt_text(4), opt_head(4), (opt_help(j,4),j=1,6) /
      + 'panel', 'Switch between panel and keyboard option selection',
      + 'This returns you to using the keyboard for option choice.',
@@ -6575,34 +6575,34 @@ C--
      + 'line', 'Plot a line joining the points on the graph ',
      + 'A line joining the points already loaded is plotted on',
      + 'the graph. (A plot device is opened if not open.)',
-     + 'The line may be displayed with an XY offset.', 
+     + 'The line may be displayed with an XY offset.',
      + 'You set the type of the line (solid;dashed;',
-     + 'dot-dashed;fine dots;dot-dot-dot-dash) with this option', 
+     + 'dot-dashed;fine dots;dot-dot-dot-dash) with this option',
      + 'with the LSTYLE option. '/
 
       data opt_text(7), opt_head(7), (opt_help(j,7),j=1,6) /
      + 'cursor', 'Use cursor to get values at point in graph ',
      + 'Place the cursor at any point in the graph and press',
-     + 'any button. The X,Y value will be typed out. If a table', 
+     + 'any button. The X,Y value will be typed out. If a table',
      + 'has been input, the position of the nearest point is given.',
-     + 'Place the cursor outside the area of the plot (but still', 
+     + 'Place the cursor outside the area of the plot (but still',
      + 'in the window) and press for return. [Only give a quick',
      + 'dab on the return button, or you may upset the -panel-.]'/
 
       data opt_text(8), opt_head(8), (opt_help(j,8),j=1,6) /
      + 'histogram', 'Calculate and plot a histogram of the X data',
      + 'Take the X values of the loaded data points and calculate',
-     + 'their histogram, and plot it out. ', 
-     + ' ', 
-     + 'You are asked for the X range in X values to use (HRANGE ', 
-     + 'parameter), and the number of bins (NBIN) in this range', 
+     + 'their histogram, and plot it out. ',
+     + ' ',
+     + 'You are asked for the X range in X values to use (HRANGE ',
+     + 'parameter), and the number of bins (NBIN) in this range',
      + 'to put values into. Plot scaling is done automatically. '/
 
       data opt_text(9), opt_head(9), (opt_help(j,9),j=1,6) /
      + 'points', 'Plot the points on the graph ',
      + 'The points already loaded are plotted on the graph.',
      + '(A plot device is opened if not open.)',
-     + 'The points may be displayed with an XY offset.', 
+     + 'The points may be displayed with an XY offset.',
      + 'You set the type of the symbol used via the LSTYLE',
      + 'parameter. This is the PGPLOT symbol code, from 0 to 31',
      + ' ' /
@@ -6614,29 +6614,29 @@ C--
      + 'nearly fill the window and then scale the axes separately',
      + 'to fill this shape. The second is to have both axes scaled',
      + 'the same amount (say as for a map), and then the shape of the',
-     + 'plot depends on the relative X and Y plotted data ranges' / 
+     + 'plot depends on the relative X and Y plotted data ranges' /
 
       data opt_text(11), opt_head(11), (opt_help(j,11),j=1,6) /
      + 'prange', 'Set the range of data in X and Y to be plotted',
-     + ' ', 
+     + ' ',
      + 'This sets the range in X and Y that data are allowed to be',
-     + 'plotted in. Data points falling outside the permitted ', 
-     + 'XY rectangle will not be plotted.', 
-     + ' ', 
+     + 'plotted in. Data points falling outside the permitted ',
+     + 'XY rectangle will not be plotted.',
+     + ' ',
      + 'The defaults are -1.0*10^20 to +1.0.10^20.  '/
 
       data opt_text(12), opt_head(12), (opt_help(j,12),j=1,6) /
      + 'psize', 'Set the range of the graph axes in X and Y',
-     + ' ', 
+     + ' ',
      + 'This sets the range of the scales on the X and Y axes of',
-     + 'the plot. ', 
-     + ' ', 
-     + 'The defaults are from a bit below the minimum of all the', 
+     + 'the plot. ',
+     + ' ',
+     + 'The defaults are from a bit below the minimum of all the',
      + 'data to a bit above the maximum. '/
 
       data opt_text(13), opt_head(13),(opt_help(j,13),j=1,6) /
      + 'get_table', 'Get the file(s)s with the tables(s) to plot',
-     + 'The data are taken from Starman tables in files. X values', 
+     + 'The data are taken from Starman tables in files. X values',
      + 'of points are taken from one column in one table, and Y ',
      + 'values from a column in another (or the same) table. Input',
      + 'parameters are IN1 NCOL1 IN2 NCOL2. If two tables are',
@@ -6653,7 +6653,7 @@ C--
      + 'contour', 'Plot the counter map of the image',
      + 'The image already loaded is plotted as a contour map.',
      + '(A plot device is opened if not open.)',
-     + ' ', 
+     + ' ',
      + 'A section of the image is chosen, and a contour map made,',
      + 'and displayed at an offset position in the graph. The default',
      + 'range is the min and max, with 10 steps between.' /
@@ -6662,9 +6662,9 @@ C--
      + 'display', 'Display the image as a picture',
      + 'The image already loaded is displayed as a picture.',
      + '(A plot device is opened if not open.)',
-     + ' ', 
-     + 'A section of the image is chosen, and is displayed at an', 
-     + 'offset position in the graph, as a grey-scale image, with', 
+     + ' ',
+     + 'A section of the image is chosen, and is displayed at an',
+     + 'offset position in the graph, as a grey-scale image, with',
      + 'default range +3/-2std dev of mean with black=highvalues ' /
 
       data opt_text(17), opt_head(17), (opt_help(j,17),j=1,6) /
@@ -6701,7 +6701,7 @@ C--
       integer sect_num
       parameter ( sect_num=8 )
       character*10 sect_head(sect_num)
-      data sect_head / 'TABLES', 'IMAGES', 'OTHER', 'INPUT', 'ACTIONS', 
+      data sect_head / 'TABLES', 'IMAGES', 'OTHER', 'INPUT', 'ACTIONS',
      +                 'SETUP', 'GRAPH', 'CONTROL' /
       character*200 sect_text(sect_num)
       data sect_text(1)/ 'points:line:histogram' /
@@ -6726,18 +6726,18 @@ Cbegin
 
       if ( ST_FAILED ) return
 
-      call setup_option ( ktopt, set_num, koutside, 
+      call setup_option ( ktopt, set_num, koutside,
      +                    sect_num, sect_text, sect_head,
      +                    title, option, ncode,
-     +                    1, opt_num, opt_text, 
-     +                    1, opt_head, 
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
      +                    1, opt_help,
      +                    1, help_num, help_text,
      +                    1, def_x, def_y, def_text )
 
 
       end
-  
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBPL_SETUP -- Load the default parameters
@@ -6797,7 +6797,7 @@ Cbegin
 
       end
 
-      
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBPL_PRANGE -- Get plot range
 C
@@ -6808,7 +6808,7 @@ C     a j penny                 ral               1991 May
       implicit none
       include 'tbplot.inc'
       include 'STARMAN_INC'
-      
+
       real        table1(TBVX1,TBY1)	!i: Input data
       real        table2(TBVX2,TBY2)	!i: Input data
       integer     kopt			!i: Definitely get new range (1)
@@ -6841,20 +6841,20 @@ Cbegin
             YMAX = max(YMAX,table2((NCOL2+5),k))
          enddo
 
-         PRX(1) = XMIN 
-         PRX(2) = XMAX 
-         PRY(1) = YMIN 
-         PRY(2) = YMAX 
+         PRX(1) = XMIN
+         PRX(2) = XMAX
+         PRY(1) = YMIN
+         PRY(2) = YMAX
 
       endif
 
       if ( kopt.eq.1 ) GOTPSIZE = .false.
 
       if ( .not.GOTPLIMS ) then
-         PRX(1) = XMIN 
-         PRX(2) = XMAX 
-         PRY(1) = YMIN 
-         PRY(2) = YMAX 
+         PRX(1) = XMIN
+         PRX(2) = XMAX
+         PRY(1) = YMIN
+         PRY(2) = YMAX
       endif
 
       call get2r ( 'XRANGE', PRX(1), PRX(2), .true., -1.0e20, 1.0e20 )
@@ -6870,7 +6870,7 @@ Cbegin
 
       end
 
-      
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBPL_HRANGE -- Get histogram range
 C
@@ -6881,7 +6881,7 @@ C     a j penny                 ral               1991 May
       implicit none
       include 'tbplot.inc'
       include 'STARMAN_INC'
-      
+
       real        table1(TBVX1,TBY1)	!i: Input data
 C--
       integer k
@@ -6905,14 +6905,14 @@ Cbegin
             XMAX = max(XMAX,table1((NCOL1+5),k))
          enddo
 
-         PHX(1) = XMIN 
-         PHX(2) = XMAX 
+         PHX(1) = XMIN
+         PHX(2) = XMAX
 
       endif
 
       if ( .not.GOTHLIMS ) then
-         PHX(1) = XMIN 
-         PHX(2) = XMAX 
+         PHX(1) = XMIN
+         PHX(2) = XMAX
       endif
 
       call get2r ( 'HRANGE', PHX(1), PHX(2), .true., -1.0e20, 1.0e20 )
@@ -6938,7 +6938,7 @@ C     a j penny                 ral               1991 May
       implicit none
       include 'tbplot.inc'
       include 'STARMAN_INC'
-      
+
       real        table1(TBVX1,TBY1)	!i: Input data
       real        table2(TBVX2,TBY2)	!i: Input data
       integer     kopt			!i: Flag for get new size definitely (1)
@@ -6971,20 +6971,20 @@ Cbegin
             YMAX = max(YMAX,table2((NCOL2+5),k))
          enddo
 
-         PSX(1) = XMIN - 0.05*(XMAX-XMIN)      
-         PSX(2) = XMAX + 0.05*(XMAX-XMIN)      
-         PSY(1) = YMIN - 0.05*(YMAX-YMIN)      
-         PSY(2) = YMAX + 0.05*(YMAX-YMIN)      
+         PSX(1) = XMIN - 0.05*(XMAX-XMIN)
+         PSX(2) = XMAX + 0.05*(XMAX-XMIN)
+         PSY(1) = YMIN - 0.05*(YMAX-YMIN)
+         PSY(2) = YMAX + 0.05*(YMAX-YMIN)
 
       endif
 
       if ( kopt.eq.1 ) GOTPSIZE = .false.
 
       if ( .not.GOTPSIZE ) then
-         PSX(1) = XMIN - 0.05*(XMAX-XMIN)      
-         PSX(2) = XMAX + 0.05*(XMAX-XMIN)      
-         PSY(1) = YMIN - 0.05*(YMAX-YMIN)      
-         PSY(2) = YMAX + 0.05*(YMAX-YMIN)      
+         PSX(1) = XMIN - 0.05*(XMAX-XMIN)
+         PSX(2) = XMAX + 0.05*(XMAX-XMIN)
+         PSY(1) = YMIN - 0.05*(YMAX-YMIN)
+         PSY(2) = YMAX + 0.05*(YMAX-YMIN)
       endif
 
       call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20, 1.0e20 )
@@ -7000,7 +7000,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBPL_GETTB -- Get Table 
+C TBPL_GETTB -- Get Table
 C
 C     a j penny                 ral               1991 May
 
@@ -7053,7 +7053,7 @@ Cbegin
             TBY2 = TBY1
             TBX2 = TBX1
             call get1i ( 'NCOL2', NCOL2, 1, 1, TBX2 )
-            if ( ST_FAILED ) return 
+            if ( ST_FAILED ) return
             call gthead ( 'IN1', NCOL2, YHEAD, istat )
          endif
          if ( ST_FAILED ) return
@@ -7351,7 +7351,7 @@ Cbegin
             j = j + 1
             x = table1((NCOL1+5),j) + dx
             y = table2((NCOL2+5),j) + dy
-            if ( x.ge.PRX(1) .and. x.le.PRX(2) .and. y.ge.PRY(1) 
+            if ( x.ge.PRX(1) .and. x.le.PRX(2) .and. y.ge.PRY(1)
      +           .and. y.le.PRY(2) ) call pgpoint ( 1, x, y, kch )
          enddo
       else
@@ -7408,7 +7408,7 @@ Cbegin
 
          call pgcurse ( x, y, ch )
 
-         if ( x.gt.max(PSX(1),PSX(2)) .or. x.lt.min(PSX(1),PSX(2)) .or. 
+         if ( x.gt.max(PSX(1),PSX(2)) .or. x.lt.min(PSX(1),PSX(2)) .or.
      +      y.gt.max(PSY(1),PSY(2)) .or. y.lt.min(PSY(1),PSY(2)) ) then
             more = .false.
          else
@@ -7436,7 +7436,7 @@ Cbegin
                call pargc ( name )
                call pargr ( xa )
                call pargr ( ya )
-               call printd ( 
+               call printd (
      +   'Nearest point is number %d : Name %c : X = %f : Y = %f ' )
             endif
          endif
@@ -7487,7 +7487,7 @@ Cbegin
       NXS = min(ia,ib)
       NXE = max(ia,ib)
 
-      ia = 1								!Get Y window 
+      ia = 1								!Get Y window
       ib = NY
       call get2i ( 'IMYRANGE', ia, ib, .true., 1, NY )
       if ( ST_FAILED ) return
@@ -7504,10 +7504,10 @@ Cbegin
          PSX(2) = NXE
          PSY(1) = NYS
          PSY(2) = NYE
-         call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20, 
+         call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20,
      +                1.0e20 )
          if ( ST_FAILED ) return
-         call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e20, 
+         call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e20,
      +                1.0e20 )
          if ( ST_FAILED ) return
          GOTPSIZE = .true.
@@ -7540,14 +7540,14 @@ Cbegin
          return
       endif
       if ( IMTYPE.eq.'SHORT' ) then
-         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL, 
+         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL,
      +                 %val(ipconr) )
       else
-         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL, 
+         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL,
      +                 %val(ipconr) )
       endif
 
@@ -7616,9 +7616,9 @@ C  alan penny                ral                      1990-06-15
       include 'ST_GRAPH_INC'
       include 'ST_DS_GEN_INC'
 C--
-      integer lx, ly, ierr, ipconr, ipcons, j, ja, ngood, nbad, 
+      integer lx, ly, ierr, ipconr, ipcons, j, ja, ngood, nbad,
      +        kl, lens, kp(4), istat, ia, ib
-      real alx, aly, tr(6), abot, atop 
+      real alx, aly, tr(6), abot, atop
       character*200 text
       logical kas, kab
       data tr / 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 /
@@ -7643,7 +7643,7 @@ Cbegin
       NXS = min(ia,ib)
       NXE = max(ia,ib)
 
-      ia = 1								!Get Y window 
+      ia = 1								!Get Y window
       ib = NY
       call get2i ( 'IMYRANGE', ia, ib, .true., 1, NY )
       if ( ST_FAILED ) return
@@ -7660,10 +7660,10 @@ Cbegin
          PSX(2) = NXE
          PSY(1) = NYS
          PSY(2) = NYE
-         call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20, 
+         call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20,
      +                1.0e20 )
          if ( ST_FAILED ) return
-         call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e20, 
+         call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e20,
      +                1.0e20 )
          if ( ST_FAILED ) return
          GOTPSIZE = .true.
@@ -7696,18 +7696,18 @@ Cbegin
          return
       endif
       if ( IMTYPE.eq.'SHORT' ) then
-         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL, 
+         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL,
      +                 %val(ipconr) )
       else
-         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE, 
+         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
      +                %val(ipcons), lx, ly, 1, 1 )
-         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL, 
+         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL,
      +                 %val(ipconr) )
       endif
 
-      call ds_imgscl ( %val(IPIM), NX, NY, IMTYPE, 1, NX, 1, NY )       
+      call ds_imgscl ( %val(IPIM), NX, NY, IMTYPE, 1, NX, 1, NY )
       atop = BS*DSVMIN + BZ
       abot = BS*DSVMAX + BZ
       call get2r ( 'VPRANGE', abot, atop, .true., -1.0e10, 1.0e10 )
@@ -7745,7 +7745,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBPL_TEXT -- Put out text 
+C TBPL_TEXT -- Put out text
 C
 C  alan penny                ral                      1990-06-15
 
@@ -7756,7 +7756,7 @@ C  alan penny                ral                      1990-06-15
       include 'STARMAN_INC'
       include 'ST_GRAPH_INC'
 C--
-      integer kl, lens 
+      integer kl, lens
       real x, y
       character*200 text
       external lens
@@ -7796,7 +7796,7 @@ C  alan penny                ral                      1990-06-15
       include 'STARMAN_INC'
       include 'ST_GRAPH_INC'
 C--
-      integer klx, kly, lens 
+      integer klx, kly, lens
       character*200 textx, texty
       external lens
 Cbegin
@@ -7842,7 +7842,7 @@ C
 C         A J Penny            RGO                                82-11-4
 
       subroutine t_tbpmatch ()
-    
+
       implicit none
       include 'STARMAN_INC'
       include 'ST_TABLE_INC'
@@ -7896,7 +7896,7 @@ Cbegin
          call get1i ( 'NUMCOL', kcol, 1, 1, TBVX2-5 )
          if ( ST_FAILED ) return
       endif
-      
+
       call gtwrki ( 'WORK', TBY2, ipnwk, ierr )
       if ( ierr.ne.0 ) then
          ST_FAILED = .true.
@@ -7917,7 +7917,7 @@ Cbegin
             call printd ( 'Number in second list matched = %d' )
          else
             call pargi ( TBYO1 )
-            call printd ( 
+            call printd (
      +              'Number of stars with matching positions = %d' )
          endif
       endif
@@ -7991,7 +7991,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       ttol = tolern*tolern
- 
+
       if ( kmeth.eq.5 ) then
          call azeroi ( ngot, TBY2 )
          TBYO1 = 0
@@ -8067,7 +8067,7 @@ C TBPM_DOIT -- Load the output table
 C
 C alan penny                    ral           1990-06-06
 
-      subroutine tbpm_doit ( tb1, tb2, tbo1, tbo2, ngot, tolern, 
+      subroutine tbpm_doit ( tb1, tb2, tbo1, tbo2, ngot, tolern,
      +                       kmeth, kcol )
 
       implicit none
@@ -8273,9 +8273,9 @@ C TBSH_WMESS      Put up waiting message
 C TBSH_SEEPOS     Get column, row of given position
 C TBSH_GETPOS     Get column, row of actual holes table
 C TBSH_HELP       Output help
-C TBSH_INPUT      Get new input 
+C TBSH_INPUT      Get new input
 C TBSH_BLANK      Blank present display
-C TBSH_CALC       Calculate a column 
+C TBSH_CALC       Calculate a column
 C TBSH_STORE      Store output (part 1)
 C TBSH_STOREA     Store output (part 2)
 C TBSH_CHANGE     Change data, name, header in table
@@ -8288,7 +8288,7 @@ C TBSH_BCONVERT   Convert an actual holes row/column number to a 'visible' one
 C TBSH_WCHECK     Find how many rows will survive
 C TBSH_WFLAGB     Flag 'bad' rows in table as not to be used
 C TBSH_CALCGCL    Get calculator input info from the command line
-C TBSH_CALCLOAD   Load present array into no 'holes' array 
+C TBSH_CALCLOAD   Load present array into no 'holes' array
 C TBSH_POLISH     Decode equation and sort into reverse Polish
 C TBSH_DOCALC     Do the calculations
 C TBSH_LOAD       Copy table into a 3-D stack
@@ -8304,8 +8304,8 @@ C TBSH_HIST       Plot histogram of a column
 C TBSH_HISTA      Set up and start histogram
 C TBSH_PLOT       Plot two columns
 C TBSH_PLOTA      Set up and start plotting two columns
-C TBSH_COMPRESS   Remove 'holes' in array 
-C TBSH_LOADCOL    Load a table column into a 'no-holes' vector 
+C TBSH_COMPRESS   Remove 'holes' in array
+C TBSH_LOADCOL    Load a table column into a 'no-holes' vector
 C TBSH_SLOADB     Reverse order of values in a real number vector
 C TBSH_TRANS      Load output with sorted input
 C TBSH_RENUM      Renumber names
@@ -8323,7 +8323,7 @@ C TBSH_NAMCLEAR   Clear a character array
 C TBSH_LINE       Plot a line
 C TBSH_BOX        Plot a box
 C TBSH_CHGET      Get a 20 character string from 5 integers
-C TBSH_CHPUT      Get 5 integers from a 20 character string 
+C TBSH_CHPUT      Get 5 integers from a 20 character string
 
 
 
@@ -8402,7 +8402,7 @@ C TBSH_SETRC -- Set starting valid row/columns
 C
 C   alan penny             RAL               1991 July
 
-      subroutine tbsh_setrc ( tbi, tbvxi, tbyi, kcx, kcy, new, tbn, 
+      subroutine tbsh_setrc ( tbi, tbvxi, tbyi, kcx, kcy, new, tbn,
      +                        tbh )
 
       implicit none
@@ -8482,12 +8482,12 @@ Cbegin
       call tbsh_wmess ( 4, 0 )						!Tell user program is working
 
       xs = XDOFF							!Sheet box
-      xe = xs + real(NUMX)*XBOX 
+      xe = xs + real(NUMX)*XBOX
       ys = 10.0
       ye = 10.0 + real(NUMY)*YBOX
       call tbsh_box ( xs, ys, xe, ye, 2 )
 
-      do k = 1, NUMX-1		
+      do k = 1, NUMX-1
         x = xs + real(k)*XBOX
         call tbsh_line ( x, ye, x, ys, 2 )
       enddo
@@ -8522,7 +8522,7 @@ Cbegin
          call tbsh_line ( x, ys, x, ye, 2 )
       enddo
 
-      call gd_ebuf 
+      call gd_ebuf
       call gd_updt
 
 
@@ -8541,15 +8541,15 @@ C   alan penny             RAL               1991 July
       include 'STARMAN_INC'
 C--
       character*12 text(NCWORDS)
-      data text /     'Help',       'Input',      'Store',       'Exit',     
+      data text /     'Help',       'Input',      'Store',       'Exit',
      +              'Format',     'Command',     'Insert',  'Calculate',
-     +                'Weed',    'Renumber',    'Sort Up',  'Sort Down', 
-     +               'Stats',   'Correlate',       'Plot',  'Histogram',  
+     +                'Weed',    'Renumber',    'Sort Up',  'Sort Down',
+     +               'Stats',   'Correlate',       'Plot',  'Histogram',
      +            'Position',        'Left',      'Right',
      +                  'Up',        'Down',  'Left page', 'Right page',
      +             'Up page',   'Down page',   'Add Cols',   'Add Rows',
-     +            'Insert Cols',  'Insert Rows',   'Delete Col',  
-     +         'Delete Cols',  
+     +            'Insert Cols',  'Insert Rows',   'Delete Col',
+     +         'Delete Cols',
      +          'Delete Row',  'Delete Rows',      'Title',    'Undo' /
 
       integer j, k, ka
@@ -8562,7 +8562,7 @@ Cbegin
       call gd_bbuf
 
       xs = 10.0								!Control box
-      xe = xs + real(NXCW)*XBOX 
+      xe = xs + real(NXCW)*XBOX
       ys = 10.0 + real(NUMY)*YBOX + 10.0 + 2.0*YBOX + 10.0
       ye = ys + real(NYCW)*YBOX
       call tbsh_box ( xs, ys, xe, ye, 5 )
@@ -8582,11 +8582,11 @@ Cbegin
       ka = 0
       do k = 1, NYCW
          do j = 1, NXCW
-            x = xa + (j-1)*XBOX 
+            x = xa + (j-1)*XBOX
             ka = ka + 1
             if ( ka.le.NCWORDS ) call tbsh_text (x, y, text(ka), 12, 2)
          enddo
-         y = y - YBOX 
+         y = y - YBOX
       enddo
 
       call gd_ebuf
@@ -8662,21 +8662,21 @@ C--
       character blank*20
       data blank / '                    ' /
 Cbegin
-  
+
 
       if ( ST_FAILED ) return
 
       call gd_bbuf
 
       y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
-      
+
       kty = KYSTART
       call tbsh_convert ( kty, 2, kcx, kcy )
       kyout = 0
       do while ( kty.le.TBY .and. kyout.lt.NUMY )
-         
+
          if ( kcy(kty).eq.1 ) then
-          
+
             x = XDOFF + 0.05*XBOX
             ktx = KXSTART
             call tbsh_convert ( ktx, 1, kcx, kcy )
@@ -8760,12 +8760,12 @@ Cbegin
       xa = 10.0 + 0.05*XBOX
       xb = xa + 7.0*CHXSIZE
       y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
-      
+
       kty = KYSTART
       call tbsh_convert ( kty, 2, %val(IPX), kcy )
       kyout = 0
       do while ( kty.le.TBY .and. kyout.lt.NUMY )
-         
+
          if ( kcy(kty).eq.1 ) then
             kn = KYSTART + kyout
             write ( text, '(i6)' ) kn
@@ -8824,12 +8824,12 @@ Cbegin
       x = XDOFF + 0.05*XBOX
       ya = 20.0 + 0.5*CHYSIZE + real(NUMY)*YBOX
       yb = ya + YBOX
-  
+
       ktx = KXSTART
       call tbsh_convert ( ktx, 1, kcx, %val(IPY) )
       kxout = 0
       do while ( ktx.le.TBX .and. kxout.lt.NUMX )
-         
+
          if ( kcx(ktx).eq.1 ) then
             kn = KXSTART + kxout
             write ( text, '(i6)' ) kn
@@ -8883,7 +8883,7 @@ Cbegin
       do while ( loop )
 
          kdef = kopt							!Get option
-         call tbsh_getopt ( kopt, kdef )      
+         call tbsh_getopt ( kopt, kdef )
 
          if ( kopt.eq.1 ) call tbsh_help				!Help option
 
@@ -8904,7 +8904,7 @@ Cbegin
 
          if ( kopt.eq.7 ) call tbsh_insert ( %val(IPD) )		!Insert a set of data
 
-         if ( kopt.eq.8 ) call tbsh_calc 				!Calculate a column 
+         if ( kopt.eq.8 ) call tbsh_calc 				!Calculate a column
 
          if ( kopt.eq.9 ) call tbsh_weed				!Weed on column
 
@@ -8966,7 +8966,7 @@ Cbegin
          call printo ( ' Is this ok?' )
          call get1b ( 'OK', ok, .false. )
          if ( ST_FAILED ) return
-         if ( ok ) loop = .false. 	
+         if ( ok ) loop = .false.
       else
          loop = .false.
       endif
@@ -9023,10 +9023,10 @@ CXA      endif
          yb = 30.0 + real(NUMY+2+NYCW-1)*YBOX + 0.05*YBOX		!Look in commands
          ka = 0
          do k = 1, NYCW
-            ya = yb - real(k-1)*YBOX 
+            ya = yb - real(k-1)*YBOX
             xb = 10.0 + 0.05*XBOX
             do j = 1, NXCW
-               xa = xb + real(j-1)*XBOX 
+               xa = xb + real(j-1)*XBOX
                ka = ka + 1
                if ( ka.le.NCWORDS ) then
                   xs = xa
@@ -9076,12 +9076,12 @@ C--
       real xc, yc
       integer kopta(NCWORDS+1)
       data kopta / 3, 3, 2, 3, 3,
-     +             3, 2, 3, 3, 4, 
-     +             2, 2, 2, 2, 2, 
-     +             2, 2, 4, 4, 4, 
-     +             4, 4, 4, 4, 4, 
-     +             2, 2, 2, 2, 2, 
-     +             3, 2, 3, 3, 3, 
+     +             3, 2, 3, 3, 4,
+     +             2, 2, 2, 2, 2,
+     +             2, 2, 4, 4, 4,
+     +             4, 4, 4, 4, 4,
+     +             2, 2, 2, 2, 2,
+     +             3, 2, 3, 3, 3,
      +             3 /
       character*18 text(4)
       data text / 'Waiting (Option)  ', 'Waiting (Position)',
@@ -9098,7 +9098,7 @@ Cbegin
       k = kf
       if ( kf.eq.2 ) then
          k = 2
-         if ( kopt.ne.0 ) k = kopta(kopt) 
+         if ( kopt.ne.0 ) k = kopta(kopt)
       endif
 
       ka = 3
@@ -9172,14 +9172,14 @@ Cbegin
          KNROW = KNROW + KYSTART - 1
       elseif ( KNCOL.gt.0 ) then
          KNCOL = KNCOL + KXSTART - 1
-      elseif ( KNROW.gt.0 ) then       
+      elseif ( KNROW.gt.0 ) then
          KNROW = KNROW + KYSTART - 1
       endif
 
       if ( KNCOL.gt.0 ) call tbsh_convert ( KNCOL, 1, %val(IPX),	!Convert input number to 'real'
      +                                      %val(IPY) )
       if ( KNROW.gt.0 ) call tbsh_convert ( KNROW, 2, %val(IPX),
-     +                                      %val(IPY) )	
+     +                                      %val(IPY) )
 
       if ( KNCOL.ge.0 .or. KNROW.ge.0 ) found = .true.
 
@@ -9199,12 +9199,12 @@ C    alan penny           ral                       1991 July
       include 'STARMAN_INC'
 
       integer    kopt		!i: Flag for choice (1=column;2=row;3=specific)
-      integer    ncol		!o: Column chosen (actual holes table number) 
+      integer    ncol		!o: Column chosen (actual holes table number)
 				!         (-1=not found;0=in header)
-      integer    nrow		!o: Row chosen (actual holes table number) 
+      integer    nrow		!o: Row chosen (actual holes table number)
 				!         (-1=not found;0=in name)
 C--
-      real x, y, xs, xe, ys, ye, xsa, xea, ysa, yea 
+      real x, y, xs, xe, ys, ye, xsa, xea, ysa, yea
       character*1 ch
       integer ierr, k
       logical foundr, foundc
@@ -9236,8 +9236,8 @@ Cbegin
       endif
 
       call tbsh_wmess ( 2, 0 )
-      x = X_OLD 
-      y = Y_OLD 
+      x = X_OLD
+      y = Y_OLD
       ierr = pgcurse ( x, y, ch )					!Find where cursor placed
       X_OLD = x
       Y_OLD = y
@@ -9284,7 +9284,7 @@ Cbegin
 
       endif
 
-      if ( ( kopt.eq.1 .and. .not.foundc ) .or. 
+      if ( ( kopt.eq.1 .and. .not.foundc ) .or.
      +     ( kopt.eq.2 .and. .not.foundr )  .or.
      +     ( kopt.eq.3 .and. (.not.foundr .or. .not.foundc)) ) then
          call printo ( 'Bad cursor position - Start again' )
@@ -9297,7 +9297,7 @@ Cbegin
          nrow = nrow + KYSTART - 1
       elseif ( ncol.gt.0 ) then
          ncol = ncol + KXSTART - 1
-      elseif ( nrow.gt.0 ) then       
+      elseif ( nrow.gt.0 ) then
          nrow = nrow + KYSTART - 1
       endif
 
@@ -9508,7 +9508,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBSH_INPUT -- Get new input 
+C TBSH_INPUT -- Get new input
 C
 C    alan penny           ral                       1991 July
 
@@ -9634,7 +9634,7 @@ C    alan penny           ral                       1991 July
       include 'tbsheet.inc'
       include 'STARMAN_INC'
 C--
-      integer j, k 
+      integer j, k
       real x, y, xa, xb, ya, yb
       character blank*20
       data blank / '                    ' /
@@ -9647,7 +9647,7 @@ Cbegin
 
       y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX			!Blank data
       do k = 1, NUMY
-         x = XDOFF + 0.05*XBOX 
+         x = XDOFF + 0.05*XBOX
          do j = 1, NUMX
             call tbsh_text ( x, y, blank, 12, 2 )
             x = x + XBOX
@@ -9657,7 +9657,7 @@ Cbegin
 
       xa = 10.0 + 0.05*XBOX						!Blank Names
       xb = xa + 7.0*CHXSIZE
-      y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX 	
+      y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
       do k = 1, NUMY
          call tbsh_text ( xa, y, blank, 6, 2 )
          call tbsh_text ( xb, y, blank, CHNAMES, 2 )
@@ -9710,7 +9710,7 @@ Cbegin
       call get1c ( 'TITLE', atitle, TITLE, .true. )
       call ptdesc ( 'OUT', 'TITLE', atitle )
 
-      call tbsh_storea ( %val(IPD), %val(IPH), %val(IPN), %val(IPX), 
+      call tbsh_storea ( %val(IPD), %val(IPH), %val(IPN), %val(IPX),
      +                   %val(IPY), %val(ipo) )
 
       call canpar ( 'OUT' )
@@ -9768,7 +9768,7 @@ Cbegin
          endif
       enddo
 
-           
+
       end
 
 
@@ -9877,7 +9877,7 @@ Cbegin
       if ( ST_FAILED ) return
       call get1i ( 'COLNUM', NUMX, NUMX, 2, 100 )
       if ( ST_FAILED ) return
-   
+
       call get1b ( 'MONO', mono, .false. )				!Set colour
       if ( ST_FAILED ) return
       if ( mono ) then
@@ -10009,7 +10009,7 @@ Cbegin
       if ( ncol.eq.-1 ) return
 
       call tbsh_wmess ( 3, 0 )
-      bot = 0.0						
+      bot = 0.0
       top = 0.0
       call get2r ( 'LIMITS', bot, top, .true., -1.0e20, 1.0e20 )	!Get the limits
       if ( ST_FAILED ) return
@@ -10105,7 +10105,7 @@ C    a j penny               rgo                      82-11-4
       include 'tbsheet.inc'
       include 'STARMAN_INC'
 
-      integer   n		!i/o: Real row/column number -> Visible 
+      integer   n		!i/o: Real row/column number -> Visible
       integer   kopt		!i: Option [1=Column(X);2=Row(Y)]
       integer   kcx(TBXM)	!i: Column selection list
       integer   kcy(TBYM)	!i: Row selection list
@@ -10113,7 +10113,7 @@ C--
       integer k, j
 Cbegin
 
-     
+
       if ( ST_FAILED ) return
 
       j = 0
@@ -10254,20 +10254,20 @@ Cbegin
       if ( TBZ.ne.0 ) then						!Load input tables into stack
          do k = 1, TBZ
             if ( TBTOT(k)(2:2).eq.'9' ) then
-               call tbsh_loada (  %val(IPD), %val(IPX), %val(IPY), 
+               call tbsh_loada (  %val(IPD), %val(IPX), %val(IPY),
      +                            k, %val(ipstk), TBXMA, TBYA )
             else
-               call tbsh_load ( %val(IPCA(k)), TBVX(k), TBYA, k, 
+               call tbsh_load ( %val(IPCA(k)), TBVX(k), TBYA, k,
      +                          %val(ipstk), TBXMA, TBYA )
             endif
          enddo
       endif
 
       call tbsh_docalc ( %val(ipstk), TBXMA, TBYA, OPCODE, NOPCODE, 	!Do the calculations
-     +                   IMP, IMPC, IMPV, VAR, CON, %val(ipdd), 
+     +                   IMP, IMPC, IMPV, VAR, CON, %val(ipdd),
      +                   KSEED, ncol, ierr )
- 
-      call tbsh_loadb ( %val(ipdd), ncol, %val(IPD), %val(IPX), 
+
+      call tbsh_loadb ( %val(ipdd), ncol, %val(IPD), %val(IPX),
      +                  %val(IPY) )
 
       call wrkcan ( 'STACKCALC' )
@@ -10279,16 +10279,16 @@ Cbegin
             call canpar ( temp )
          endif
       enddo
-    
+
 
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_CALCGCL -- Get calculator input info from the command line
 C
 C  alan penny                         RAL                1991 Dec
- 
+
       subroutine tbsh_calcgcl ( ierro )
 
       implicit none
@@ -10338,7 +10338,7 @@ Cbegin
             else
                intab = 'IN '
                intab(3:3) = TBTOT(k)(2:2)
-               call optabr ( intab, IPCA(k), TBVX(k), ny, .false., 
+               call optabr ( intab, IPCA(k), TBVX(k), ny, .false.,
      +                       ierr )
                if ( ierr.ne.0 ) then
                   if ( ierr.eq.3 ) then
@@ -10357,7 +10357,7 @@ Cbegin
                return
             endif
             if ( ny.ne.TBYA ) then
-               call printo ( 
+               call printo (
      +             'ERROR: Tables must have same number of rows' )
                ierro = 1
                return
@@ -10368,7 +10368,7 @@ Cbegin
 
       NVARTOT = NVAR							!Translate into TBCALC names
       if ( NVARTOT.gt.0 ) then						!Get input variables
-         do k = 1, NVARTOT		
+         do k = 1, NVARTOT
             VARTOT(k) = VARID(k)
             call get1r ( VARTOT(k), VAR(k), 0.0, -1.0e37, +1.0e37 )
             if ( ST_FAILED ) return
@@ -10388,7 +10388,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBSH_CALCLOAD -- Load present array into no 'holes' array 
+C TBSH_CALCLOAD -- Load present array into no 'holes' array
 C
 C  alan penny                 ral                1991 July
 
@@ -10439,7 +10439,7 @@ C
 C  alan penny                RAL                1991 Dec
 
       subroutine tbsh_polish ( exprs, opcode, noper, tbid, ntb, imp,
-     +                         impc, varid, nvar, impv, con, ncon, 
+     +                         impc, varid, nvar, impv, con, ncon,
      +                         ierr )
 
       implicit none
@@ -10451,7 +10451,7 @@ C  alan penny                RAL                1991 Dec
       character*2      tbid(70)		!o: Tables identifiers
       integer          ntb		!o: Number of different tables
       integer          imp(70)		!o: Pointers to tables
-      integer          impc(70)		!o: Pointers to columns 
+      integer          impc(70)		!o: Pointers to columns
       character*1      varid(26)	!o: Variables identifiers
       integer          nvar		!o: Number of variable
       integer          impv(26)		!o: Pointers to variables
@@ -10470,9 +10470,9 @@ C--
       parameter ( maxsym=38 )
 
       character*7 oper(-4:maxsym), opsymb(-4:maxsym)
-      integer opl(-4:maxsym), opr(-4:maxsym), l(-4:maxsym), 
+      integer opl(-4:maxsym), opr(-4:maxsym), l(-4:maxsym),
      +        prl(-4:maxsym), prr(-4:maxsym)
- 
+
       data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),		!Set up table of operators,
      +        prr(j),j=-4,10 ) /					! symbols and their priorities
      +  '       ', 'LDCOL  ', 3, 0, 0, 10, 10,
@@ -10528,25 +10528,25 @@ C--
      +  'CC     ', 'CC     ', 2, 0, 0, 10, 10,
      +  '%      ', '/      ', 1, 1, 1,  5,  5 /
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
       ierr = 0
       ncin = 0
- 
+
       do k = 1, len(exprs)						!Remove embedded blanks
          if ( exprs(k:k).ne.' ' .and. ncin.lt.130  ) then		!Count no of characters
             ncin = ncin + 1
             in(ncin:ncin) = exprs(k:k)
          endif
       enddo
- 
+
       exprs = in(1:ncin)						!Return the expression with blanks removed
- 
+
       ncin = ncin+1							!Append an '= ' operator to terminate the expression
       in(ncin:) = '='
- 
+
       ntb = 0								!Initiallise counters
       nvar = 0
       ncon = 0
@@ -10554,28 +10554,28 @@ Cbegin
       j = 0
 
       opnext = .false.							!Indicates if an operator is expected next
-									! first entity must not look like an operator 
+									! first entity must not look like an operator
 
       lmore = .true.							!Loop thru OPLs until '='found
       do while ( lmore )
 
-         found = .false.						!Search through the list of symbols to 
+         found = .false.						!Search through the list of symbols to
          nsymb = -1							! identify which comes next
          do while ( nsymb.lt.maxsym .and. .not.found )
             nsymb = nsymb + 1
-            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like 
+            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like
                test = in(k:min(k+l(nsymb)-1,130))			! an operator or operand from the left, as appropriate
                if ( test.eq.oper(nsymb) ) found = .true.
              endif
          enddo
- 
-         if ( .not.found ) then						!If symbol was not found: - 
+
+         if ( .not.found ) then						!If symbol was not found: -
             if ( opnext ) then						!Error if an operator expected
                ierr = 3
                call printo ( 'ERROR: Cant understand Equation - ' )
                call printo ( 'ERROR: '//exprs )
                return
-            else if ( in(k:k).eq.'T' .and. ischar(in(k+1:k+1)) .and.	!If an operand was expected, it may be 
+            else if ( in(k:k).eq.'T' .and. ischar(in(k+1:k+1)) .and.	!If an operand was expected, it may be
      +               isnumb(in(k+2:k+2)) ) then				! a table, variable or const.
                nsymb = -1						!If it is a table, add name to table stack
                ntb = ntb + 1
@@ -10594,12 +10594,12 @@ Cbegin
                call chartoi ( colid, impc(ntb), istat )			!Add column to column stack
                if ( istat.ne.0 .or. impc(ntb).eq.0 ) then
                   ierr = 1
-                  call printo ( 
+                  call printo (
      +            'ERROR: Bad column ID - '//tbid(ntb)//colid )
                   call printo ( 'ERROR: '//exprs )
                   return
                endif
-            elseif ( in(k:k+2).eq.'COL'.and.isnumb(in(k+3:k+3)) ) then 	!If an operand was expected, it may be 
+            elseif ( in(k:k+2).eq.'COL'.and.isnumb(in(k+3:k+3)) ) then 	!If an operand was expected, it may be
                nsymb = -4						! a table, variable or const.
                ntb = ntb + 1						!If it is a table, add name to table stack
                tbid(ntb) = 'T9'
@@ -10636,7 +10636,7 @@ Cbegin
                nnum = 0							!Otherwise it may be a constant...
                numchr = ' '						! extract contiguous numerical characters
 
-               atend = .false.						!Character may be part of a numerical constant 
+               atend = .false.						!Character may be part of a numerical constant
                ll = k - 1						! if it is 0..9 or '.'
                do while ( ll.lt.ncin .and. .not.atend )			! or if it is an 'e' following one of the above
                   ll = ll + 1						! or if it is a sign following an 'e'
@@ -10649,7 +10649,7 @@ Cbegin
                   endif
                enddo
                call chartor ( numchr(:nnum), const, iok )		!Try to read these characters as a constant
- 
+
                if ( iok.eq.0 .and. nnum.ne.0 ) then			!If successful, add constant to stack
                   ncon = ncon + 1
                   con(ncon) = const
@@ -10661,20 +10661,20 @@ Cbegin
                   call printo ( 'ERROR: '//exprs )
                   return
                endif
-  
+
             endif
          endif
- 
-         j = j + 1							!Put the identified symbol into the output 
-         symb(j) = nsymb						! array and move the input pointer to the 
+
+         j = j + 1							!Put the identified symbol into the output
+         symb(j) = nsymb						! array and move the input pointer to the
          k = k + l(nsymb)						! next symbol
          if ( nsymb.eq.-1 .or. nsymb.eq.-4 ) k = k + kextra
- 
+
          opnext = opr(nsymb).ne.1					!Decide whether an operator or operand follows
          if ( opsymb(nsymb).eq.'=' ) lmore = .false.
 
       enddo
- 
+
       call azeroi ( stk(0), j+1 )					!Zero operator stack for converting to reverse polish
       tos = 0
       isymb = 1
@@ -10683,11 +10683,11 @@ Cbegin
       lmore = .true.
       do while ( lmore )
          lmore = .false.
- 
-         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have 
+
+         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have
      +        oper(symb(isymb)).eq.')' ) then				! matching parentheses, cancel them
- 
-            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the 
+
+            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the
  									! opening parenthesis then send it to the output stream
 
                output = opsymb(stk(tos))				!Remove the enclosed '(' from functions first
@@ -10700,8 +10700,8 @@ Cbegin
                lmore = .true.
              endif
 
-         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has 
-            output = opsymb(stk(tos))					! a high enough priority, transfer it to 
+         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has
+            output = opsymb(stk(tos))					! a high enough priority, transfer it to
             tos = tos - 1						! the output stream
          else
             tos = tos + 1						!Otherwise, transfer the next symbol to the stack
@@ -10709,11 +10709,11 @@ Cbegin
             isymb = isymb + 1
             lmore = .true. 						!Return for next test
          endif
- 
+
          if ( .not.lmore ) then
 
-            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output, 
-               ierr = 4							! it results from unpaired parentheses 
+            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output,
+               ierr = 4							! it results from unpaired parentheses
                call printo ( 'ERROR: ) missing from Equation -' )	! in the input expression...quit qith error
                call printo ( 'ERROR: '//exprs )
                return
@@ -10724,27 +10724,27 @@ Cbegin
                return
             endif
 
-            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it 
+            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it
                noper = noper + 1					! if it is unary + or a comma
                opcode(noper) = output
             endif
- 
+
             if ( output.ne.'=' ) lmore = .true.				!Return for next symbol if not the end
 
          endif
 
       enddo
- 
-      if ( ntb.ge.1 ) then						!If tables or variables are referenced, sort 
-         call tbsh_sortc ( tbid, ntb, imp, ndiff, symb )			! their names into alphabetical order and obtain 
-         ntb = ndiff							! pointers to allow them to be accessed in their 
+
+      if ( ntb.ge.1 ) then						!If tables or variables are referenced, sort
+         call tbsh_sortc ( tbid, ntb, imp, ndiff, symb )			! their names into alphabetical order and obtain
+         ntb = ndiff							! pointers to allow them to be accessed in their
       endif								! original order
       if ( nvar.ge.1 ) then
          call tbsh_sortc ( varid, nvar, impv, ndiff, symb )
          nvar = ndiff
       endif
- 
- 
+
+
       end
 
 
@@ -10753,14 +10753,14 @@ C TBSH_DOCALC -- do the calculations
 C
 C  alan penny                     RAL            1991 Dec
 
-      subroutine tbsh_docalc ( tb, tbx, tby, opcode, nopcode, imp, 
-     +                         impc, impv, var, con, tbcol, kseed, 
+      subroutine tbsh_docalc ( tb, tbx, tby, opcode, nopcode, imp,
+     +                         impc, impv, var, con, tbcol, kseed,
      +                         kx, ierr )
 
       implicit none
       include 'ST_LIMITS_INC'
       include 'STARMAN_INC'
- 
+
       integer      tbx			!i: Max X size of input tables
       integer      tby			!i: Max Y size of input tables
       real         tb(tbx,tby,*)	!i: Input tables
@@ -10793,7 +10793,7 @@ C--
      + 'ACOS  ','ATAN  ','ATAN2 ','SINH  ','COSH  ','TANH  ','ABS   ',
      + 'AINT  ','ANINT ','MOD   ','SIGN  ','DIM   ','MIN   ','MAX   ',
      + 'CLIP  ','GAUSS ','RAN   ','RR    ','CC    ' /
-Cbegin 
+Cbegin
 
 
       if ( ST_FAILED ) return
@@ -10812,33 +10812,33 @@ Cbegin
                opwhich(k) = j
                found = .true.
             endif
-         enddo 
+         enddo
          if ( .not.found ) then
             ierr = 1
             return
          endif
       enddo
-      
+
       do j = 1, tby							!Do for all rows in a column
 
          tos = 0							!Initialise the arith, table,
          numitab = 0							! variable, constant stack pointers
          nvar = 0
-         ncon = 0 
- 
+         ncon = 0
+
          nop = 0							!Do the operations
          more = .true.
          bad = .false.
 
          do while ( nop.lt.nopcode .and. more )
-            nop = nop + 1 
+            nop = nop + 1
 
             go to (  99,101,102,103,104,105,106,107,108,109,110,111,
      +              112,113,114,115,116,117,118,119,120,121,122,123,
      +              124,125,126,127,128,129,130,131,132,133,134,135,
      +              136,137 ),
      +            opwhich(nop)
-           
+
   99        continue
                tos = tos + 1						!Load column on to stack
                numitab = numitab + 1
@@ -11062,14 +11062,14 @@ Cbegin
                tbcol(j) = 0.0
                more = .false.
             endif
- 
+
          enddo
- 
+
       enddo
- 
- 
+
+
       end
- 
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_LOAD -- Copy table into a 3-D stack
@@ -11077,7 +11077,7 @@ C
 C  alan penny                 ral                     1991 Dec
 
       subroutine tbsh_load ( tb, tbvx, tby, nin, tbs, tbxs, tbys )
- 
+
       implicit none
       include 'STARMAN_INC'
 
@@ -11103,9 +11103,9 @@ Cbegin
          do j = 1, ja
             tbs(j,k,nin) = tb((j+5),k)
          enddo
-      enddo 
- 
- 
+      enddo
+
+
       end
 
 
@@ -11115,7 +11115,7 @@ C
 C  alan penny                 ral                     1991 Dec
 
       subroutine tbsh_loada ( tb, kcx, kcy, nin, tbs, tbxs, tbys )
- 
+
       implicit none
       include 'tbsheet.inc'
       include 'STARMAN_INC'
@@ -11130,7 +11130,7 @@ C  alan penny                 ral                     1991 Dec
 C--
       integer j, k, kx, ky
 Cbegin
-  
+
 
       if ( ST_FAILED ) return
 
@@ -11150,10 +11150,10 @@ Cbegin
          endif
       enddo
 
- 
+
       end
 
- 
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_LOADB -- Load column to master and display
 C
@@ -11175,7 +11175,7 @@ C--
       logical xmore
       real val, x, y
 Cbegin
-  
+
 
       if ( ST_FAILED ) return
 
@@ -11194,14 +11194,14 @@ Cbegin
       kx = ncol
 
       y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
-      
+
       kty = KYSTART
       call tbsh_convert ( kty, 2, kcx, kcy )
       kyout = 0
       do while ( kty.le.TBY .and. kyout.lt.NUMY )
-         
+
          if ( kcy(kty).eq.1 ) then
-          
+
             x = XDOFF + 0.05*XBOX
             ktx = KXSTART
             call tbsh_convert ( ktx, 1, kcx, kcy )
@@ -11245,7 +11245,7 @@ C  alan penny            ral                     1991 Dec
 
       implicit none
       include 'STARMAN_INC'
- 
+
       integer        nc		!i: Number of identifiers
       character*(*)  c(nc)	!i/o: Identiers
       integer        imp(nc)	!o: pointer to identifier place in stack
@@ -11256,17 +11256,17 @@ C--
       character*130 text
       logical repeat
 Cbegin
- 
+
 
       if ( ST_FAILED ) return
 
       nn = min(130,len(c(1)))						!Length of input strings
- 
+
       do k = 1, nc							!Initiallise pointers in workspace
          iw(k) = k
       enddo
 
-      repeat = .true.							!Perform a bubble sort to put 
+      repeat = .true.							!Perform a bubble sort to put
       do while ( repeat ) 						! character strings into alphabetical order
          repeat = .false.
          do k = 1, nc-1
@@ -11279,12 +11279,12 @@ Cbegin
                iw(k+1) = iw(k)
                iw(k) = it
             endif
-         enddo 
+         enddo
       enddo
- 
+
       ndiff = 1								!Pointers now point to original positions. scan list to remove
       imp(iw(1)) = 1							! repeated entries and reverse the pointing direction
- 
+
       do k = 2, nc
          if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and put it
             ndiff = ndiff + 1						! in the correct place in the list
@@ -11292,11 +11292,11 @@ Cbegin
          endif
          imp(iw(k)) = ndiff						!Set the appropriate output pointer to its new location
       enddo
- 
- 
+
+
       end
-  
- 
+
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_SORT -- Sort table
 C
@@ -11334,19 +11334,19 @@ Cbegin
       call tbsh_compress ( %val(IPD), %val(IPN), %val(IPH), %val(IPX),	!Remove holes
      +                     %val(IPY) )
 
-      call coprr ( %val(IPD), TBXM, TBYM, ncol, ncol, 1, TBY,		!Copy the sorting parameter into 
+      call coprr ( %val(IPD), TBXM, TBYM, ncol, ncol, 1, TBY,		!Copy the sorting parameter into
      +             %val(ipval), 1, TBY, 1, 1 )				! the working area and perform sort
       call anumincr ( %val(ipnum), TBY )
       call sort2r ( %val(ipval), %val(ipnum), TBY )
-      if ( kacc.eq.2 ) call tbsh_sloadb ( %val(ipnum), TBY ) 
+      if ( kacc.eq.2 ) call tbsh_sloadb ( %val(ipnum), TBY )
 
       call gtwrkr ( 'TBDA', TBXM*TBY, ipda, ierr )			!Load the new data and names
       if ( ierr.ne.0 ) return
       call gtwrkr ( 'TBNA', 5*TBY, ipna, ierr )
       if ( ierr.ne.0 ) return
-      call tbsh_trans ( %val(IPD), %val(IPN), %val(ipda), %val(ipna), 
+      call tbsh_trans ( %val(IPD), %val(IPN), %val(ipda), %val(ipna),
      +                  %val(ipnum) )
-  
+
       call tbsh_nload ( %val(IPN), %val(IPY) )				!Load screen
       call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )
 
@@ -11446,7 +11446,7 @@ Cbegin
          call printo ( ' ' )
          call wrkcan ( 'A' )
       endif
-    
+
 
       end
 
@@ -11488,7 +11488,7 @@ Cbegin
 
 
       end
-  
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_DOSTAT2 -- Do the calcs for two columns
@@ -11510,7 +11510,7 @@ C--
       integer k
 Cbegin
 
-   
+
       if ( ST_FAILED ) return
 
       sx = 0.0d0
@@ -11583,7 +11583,7 @@ Cbegin
 
       end
 
-    
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_INSERT -- Insert a set of data
 C
@@ -11628,7 +11628,7 @@ Cbegin
       if ( nxe.eq.-1 ) return
 
       call tbsh_wmess ( 3, 0 )
- 
+
       call cswopi ( nxs, nxe )
       call cswopi ( nys, nye )
 
@@ -11789,7 +11789,7 @@ Cbegin
 
       end
 
-    
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_PLOT -- Plot two columns
 C
@@ -11912,7 +11912,7 @@ Cbegin
       xsmax = xmax + 0.05*(xmax-xmin)
       ysmin = ymin - 0.05*(ymax-ymin)
       ysmax = ymax + 0.05*(ymax-ymin)
-  
+
       call get2r ( 'DEVLIMX', xsmin, xsmax, .true., -1.0e20, 1.0e20 )
       if ( ST_FAILED ) return
 
@@ -11922,7 +11922,7 @@ Cbegin
       call get1b ( 'ASPECT', aspect, .false. )
       ka = 0
       if ( aspect ) ka = 1
-  
+
       call pgsci ( 1 )
 
       call gd_dobox ( xsmin, xsmax, head, ysmin, ysmax, head2, ' ', ka )
@@ -11974,7 +11974,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBSH_COMPRESS -- Remove 'holes' in array 
+C TBSH_COMPRESS -- Remove 'holes' in array
 C
 C  alan penny                 ral                1991 July
 
@@ -12046,7 +12046,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBSH_LOADCOL -- Load a table column into a 'no-holes' vector 
+C TBSH_LOADCOL -- Load a table column into a 'no-holes' vector
 C
 C  alan penny                 ral                1991 July
 
@@ -12097,7 +12097,7 @@ C--
       real va
 Cbegin
 
-  
+
       if ( ST_FAILED ) return
 
       if ( num.le.1 ) return
@@ -12190,7 +12190,7 @@ Cbegin
       enddo
 
       call tbsh_nload ( tbn, kcy )
-   
+
       RESTORE = .false.
       CHANGED = .true.
 
@@ -12250,7 +12250,7 @@ Cbegin
 
       if ( kxo.ne.KXSTART ) call tbsh_hload ( %val(IPH), %val(IPX) )
       if ( kyo.ne.KYSTART ) call tbsh_nload ( %val(IPN), %val(IPY)  )
-      if ( kxo.ne.KXSTART .or. kyo.ne.KYSTART  ) call tbsh_dload ( 
+      if ( kxo.ne.KXSTART .or. kyo.ne.KYSTART  ) call tbsh_dload (
      +                                %val(IPD), %val(IPX), %val(IPY) )
 
       CHANGED = .true.
@@ -12345,7 +12345,7 @@ Cbegin
          call tbsh_nload ( %val(IPN), kcy )				!Load screen
          call tbsh_dload ( %val(IPD), kcx, kcy )
       endif
-    
+
       CHANGED = .true.
       RESTORE = .true.
 
@@ -12398,7 +12398,7 @@ Cbegin
          call tbsh_getpos ( 2, ncol, nrow )
          if ( nrow.eq.-1 ) return
          call tbsh_wmess ( 3, 0 )
-         call tbsh_addr ( k, nrow, %val(IPD), %val(IPN), 
+         call tbsh_addr ( k, nrow, %val(IPD), %val(IPN),
      +                    %val(IPX), %val(IPY) )
       endif
 
@@ -12406,7 +12406,7 @@ Cbegin
          call tbsh_getpos ( 1, ncol, nrow )
          if ( ncol.eq.-1 ) return
          call tbsh_wmess ( 3, 0 )
-         call tbsh_addc ( k, ncol, %val(IPD), %val(IPH), 
+         call tbsh_addc ( k, ncol, %val(IPD), %val(IPH),
      +                    %val(IPX), %val(IPY) )
       endif
 
@@ -12470,7 +12470,7 @@ Cbegin
                      tbn(jj,kk) = tbn(jj,kk-1)
                   enddo
                   kcy(kk) = kcy(kk-1)
-               endif               
+               endif
             enddo
             kcy(k) = 1
             call tbsh_chput ( name, tbn(1,k) )
@@ -12533,7 +12533,7 @@ Cbegin
       if ( ST_FAILED ) return
 
       if ( TBX.eq.TBXM ) then
-         call printo ( 
+         call printo (
      +        'ERROR: Cannot add more columns, table is too big' )
          return
       endif
@@ -12547,7 +12547,7 @@ Cbegin
       call printo ( '       the number of columns added' )
       call printo ( ' ' )
 
-      call tbsh_getvals ( data, 20, num, ierr ) 
+      call tbsh_getvals ( data, 20, num, ierr )
 
       if ( ierr.ne.0 .or. num.eq.0 ) then
          return
@@ -12593,7 +12593,7 @@ Cbegin
 
       do k = 1, num							!Load numbers
          ka = nncol + k
-         do j = 1, TBY 
+         do j = 1, TBY
             tb(ka,j) = data(k)
          enddo
          kcx(ka) = 1
@@ -12699,7 +12699,7 @@ Cbegin
             endif
 
          endif
- 
+
       enddo
 
 
@@ -12859,7 +12859,7 @@ Cbegin
          if ( rval.lt.10.0 ) j = j - 1
          if ( j.lt.20 ) text(j:) = ' '
       endif
-  
+
       call lbgone ( text )
       kl = min(len,lens(text))
       atc = text(1:kl)
@@ -12887,7 +12887,7 @@ Cbegin
       endif
 
       j = jb								!Remove trailing '0's
-      more = .true.	
+      more = .true.
       do while ( more )
          if ( atc(j:j).eq.'0' .and. atc((j-1):(j-1)).ne.'.' ) then
             atc(j:j) = ' '
@@ -12902,7 +12902,7 @@ Cbegin
             more = .false.
          endif
       enddo
-      
+
       call pgsci ( kc-1 )						!Write number
       call pgtext ( x, y, atc )
 
@@ -12938,7 +12938,7 @@ Cbegin
       xa(1) = x - 0.1*CHXSIZE
       ya(1) = y - 0.3*CHYSIZE
       xa(2) = xa(1)
-      ya(2) = ya(1) + CHYSIZE 
+      ya(2) = ya(1) + CHYSIZE
       xa(3) = xa(1) + real(len)*CHXSIZE
       ya(3) = ya(2)
       xa(4) = xa(3)
@@ -12961,7 +12961,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBSH_NAMCLEAR -- Clear a character array
 C
 C a j penny             stsci                  1987-03-22
- 
+
       subroutine tbsh_namclear ( tb, n )
 
       implicit none
@@ -13076,7 +13076,7 @@ C    alan penny           ral                       1991 July
 
       implicit none
       include 'STARMAN_INC'
-      
+
       integer        kin(5)	!i: Input
       character*20   text	!o: Output
 C--
@@ -13102,7 +13102,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBSH_CHPUT -- Get 5 integers from a 20 character string 
+C TBSH_CHPUT -- Get 5 integers from a 20 character string
 C
 C    alan penny           ral                       1991 July
 
@@ -13110,7 +13110,7 @@ C    alan penny           ral                       1991 July
 
       implicit none
       include 'STARMAN_INC'
-      
+
       character*20   text	!i: Input
       integer        kout(5)	!0: Output
 C--
@@ -13180,17 +13180,17 @@ Cbegin
          return
       endif
 
-      call coprr ( %val(ipin), TBVX, TBY, kpar, kpar, 1, TBY,		!Copy the sorting parameter into 
+      call coprr ( %val(ipin), TBVX, TBY, kpar, kpar, 1, TBY,		!Copy the sorting parameter into
      +             %val(ipval), 1, TBY, 1, 1 )				! the working area and perform sort
       call tbso_xloada ( %val(ipnum) )
       call sort2r ( %val(ipval), %val(ipnum), TBY )
-      if ( kacc.eq.2 ) call tbso_xloadb ( %val(ipnum) ) 
+      if ( kacc.eq.2 ) call tbso_xloadb ( %val(ipnum) )
 
       call optabw ( 'OUT', ipo, TBVX, TBY, .false., ierr )		!Open output table
       if ( ierr.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
 
-      call tcopdes ( 'IN', 'OUT', ierr )				!Get title to output list and 
+      call tcopdes ( 'IN', 'OUT', ierr )				!Get title to output list and
       if ( ierr.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
       call gtdesc ( 'IN', 'TITLE', title, 'Output from Tbsort',iv,ierr)	! store it and the descriptors
@@ -13248,7 +13248,7 @@ C--
       real va
 Cbegin
 
-  
+
       if ( ST_FAILED ) return
 
       if ( TBY.le.1 ) return
@@ -13291,7 +13291,7 @@ Cbegin
 
       do k = 1, TBY
          ka = nint(num(k))
-         call coprr ( in, TBVX, TBY, 1, TBVX, ka, ka, 
+         call coprr ( in, TBVX, TBY, 1, TBVX, ka, ka,
      +                out, TBVX, TBY, 1, k )
       enddo
 
@@ -13305,7 +13305,7 @@ C It contains:-
 C
 C T_TBSTAT       Get statistics for one or two columns in tables
 C TBST_SETUP     Load the default parameters
-C TBST_GETDATA   Get Table 
+C TBST_GETDATA   Get Table
 C TBST_DOCALC    Set up the calcs
 C TBST_DOSTAT1   Do the calcs for one column
 C TBST_DOSTAT2   Do the calcs for two columns
@@ -13353,9 +13353,9 @@ Cbegin
 
       end
 
-      
+
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBST_GETDATA -- Get Table 
+C TBST_GETDATA -- Get Table
 C
 C     a j penny                 ral               1991 May
 
@@ -13601,17 +13601,17 @@ Cbegin
       end
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C T_TBTRAN_AUTO.F -- Transform one XY table to another automatically
-C 
+C
 C Contains:-
 C T_TBTRAN_AUTO   Transform one XY table to another automatically
 C TBTAU_GCL       Get command line input
 C TBTAU_DOCALCS   Do the calculations
-C TBTAU_TRIS      Calculate side lengths of triangles 
+C TBTAU_TRIS      Calculate side lengths of triangles
 C TBTAU_SORT_TRI  Sort table into brightest first
 C TBTAU_MATCH     Match triangles by sides ratios
 C TBTAU_TCALC     Calc mean transform from matched triangles
 C TBTAU_OUT       Put out transformed input table
-C TBTAU_LOADXY    Load sorted positions 
+C TBTAU_LOADXY    Load sorted positions
 C TBTAU_MAG       Convert heights to mags
 C
 C
@@ -13629,32 +13629,32 @@ C
 C   The user inputs a list of star positions from each
 C   image.
 C
-C   The program works out the triangle between the three 
+C   The program works out the triangle between the three
 C   brightest stars in each list. It then looks at the two
 C   triangles, and sees if they are the same by comparing
-C   the ratios in each triangle of the length of longest 
-C   side to the length of next longest, and to the length 
-C   of the shortest side. If the ratios are the same within 
-C   a chosen tolerance, then the triangle probably must have 
+C   the ratios in each triangle of the length of longest
+C   side to the length of next longest, and to the length
+C   of the shortest side. If the ratios are the same within
+C   a chosen tolerance, then the triangle probably must have
 C   been made with the same stars.
 C
 C   If the triangles do not match, then this is repeated
-C   with the four brightest in each list. The program works 
-C   out all the possible triangles between the stars in each 
-C   list. It then looks at each triangle in one list, and 
+C   with the four brightest in each list. The program works
+C   out all the possible triangles between the stars in each
+C   list. It then looks at each triangle in one list, and
 C   sees if there is a matching triangle in the other list.
-C   If there is no match, this is then repeated with the five 
+C   If there is no match, this is then repeated with the five
 C   brightest stars, and so on, until a match is made.
 C
-C   The matched triangles gives a list of matching stars. 
-C   These stars can then be used to calculate the 
+C   The matched triangles gives a list of matching stars.
+C   These stars can then be used to calculate the
 C   transformation.
 C
-C   The first ('input') list is then transformed into the 
+C   The first ('input') list is then transformed into the
 C   coordinate system of the second ('master') list.
-C   
-C   
-C 
+C
+C
+C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
 
@@ -13726,7 +13726,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBTAU_GCL -- Get command line input
-C 
+C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
 
@@ -13787,7 +13787,7 @@ Cbegin
          ST_FAILED = .true.
          return
       elseif ( TBVXM.lt.7 ) then
-          call printo ('ERROR: Master must have at least two columns')       
+          call printo ('ERROR: Master must have at least two columns')
           ST_FAILED = .true.
           return
       endif
@@ -13854,7 +13854,7 @@ C        alan penny                    ral      1994 Nov
       real    mdata(2,TBYM)	!i: Master file sorted XY posns
       real    idata(2,TBY)	!i: Input file sorted XY posns
 C--
-      integer level, ntriangs, nstars, istat, num, ipr_m, 
+      integer level, ntriangs, nstars, istat, num, ipr_m,
      +        ipn_m, ipr_i, ipn_i, ippi, ippm, ipuse, ipout, ntris
       character*50 title, cv
       logical found, ok
@@ -13912,16 +13912,16 @@ Cbegin
      +                        %val(ipr_i), %val(ipn_i) )
 
             call tbtau_match ( %val(ipr_m), %val(ipn_m), %val(ipr_i),	!Look for matches
-     +                         %val(ipn_i), ntriangs, pair, num, tpair, 
+     +                         %val(ipn_i), ntriangs, pair, num, tpair,
      +                         ntris )
 
             call tbtau_tcalc ( mdata, idata, pair, num, tpair, 		 !Calc transform from matches
-     +                         ntriangs, ntris, %val(ippm), %val(ippi), 
+     +                         ntriangs, ntris, %val(ippm), %val(ippi),
      +                         %val(ipuse), level, nstars, found )
 
-            call wrkcan ( 'TR_MR' ) 
+            call wrkcan ( 'TR_MR' )
             call wrkcan ( 'TR_MN' )
-            call wrkcan ( 'TR_IR' ) 
+            call wrkcan ( 'TR_IR' )
             call wrkcan ( 'TR_IN' )
 
          endif
@@ -13933,16 +13933,16 @@ Cbegin
          call optabw ( 'OUT', ipout, TBVX, TBY, .true., istat )
          if ( ST_FAILED ) return
          if ( istat.eq.0 ) then
-            call tbtau_out ( %val(IPIN), %val(ipout) ) 
+            call tbtau_out ( %val(IPIN), %val(ipout) )
             call tcopdes ( 'IN', 'OUT', istat )
             if ( ST_FAILED ) return
-            call gtdesc ( 'IN', 'TITLE', cv, 
+            call gtdesc ( 'IN', 'TITLE', cv,
      +                    'Output from TBTRAN_AUTO', num, istat )
             call get1c ( 'TITLE', title, cv, .true. )
             call ptdesc ( 'OUT', 'TITLE', title )
            endif
       endif
-          
+
       call wrkcan ( 'PI' )
       call wrkcan ( 'PM' )
       call wrkcan ( 'USE' )
@@ -13952,12 +13952,12 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBTAU_TRIS -- Calculate side lengths of triangles 
-C 
+C TBTAU_TRIS -- Calculate side lengths of triangles
+C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
 
-      subroutine tbtau_tris ( data, ny, nstars, ntriangs, rtri, 
+      subroutine tbtau_tris ( data, ny, nstars, ntriangs, rtri,
      +                        ntri )
 
       implicit none
@@ -13968,7 +13968,7 @@ C        alan penny                    ral      1994 Nov
       integer  nstars			!i: No of stars to do
       integer  ntriangs			!i: Number of triangles
       real     rtri(3,ntriangs)		!o: Triangle side lengths
-      integer  ntri(3,ntriangs)		!o: Star numbers in triangles 
+      integer  ntri(3,ntriangs)		!o: Star numbers in triangles
 C--
       integer i, j, k, m, n
       real dx, dy
@@ -14002,22 +14002,22 @@ Cbegin
 
            call tbtau_sort_tri ( tarr )					!Sort into correct order - longest side first
 
-           n = n + 1							!Load ouput 
+           n = n + 1							!Load ouput
            do m = 1, 3
               rtri(m,n) = tarr(m,1)
               ntri(m,n) = nint(tarr(m,2))
            enddo
 
-        enddo	
-       enddo	
-      enddo	
+        enddo
+       enddo
+      enddo
 
       end
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBTAU_SORT_TRI -- Sort table into brightest first
-C 
+C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
 
@@ -14059,7 +14059,7 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBTAU_MATCH -- Match triangles by sides ratios
-C 
+C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
 
@@ -14083,7 +14083,7 @@ C        alan penny                    ral      1994 Nov
       integer  tpair(2,3,NTMAX)		!o: Star numbers for all matched triangles
 C--
       integer km, ki, k, m, m1, m2
-      real rv, dimin1, dimax1, dmmin1, dmmax1, dimin2, dimax2, 
+      real rv, dimin1, dimax1, dmmin1, dmmax1, dimin2, dimax2,
      +     dmmin2, dmmax2
       logical got, ok1, ok2
 Cbegin
@@ -14104,22 +14104,22 @@ Cbegin
             dimin1 = (rtri_in(2,ki)-TOLER)/(rtri_in(1,ki)+TOLER)
             rv = max(1.0e-7,(rtri_in(1,ki)-TOLER))
             dimax1 = (rtri_in(2,ki)+TOLER)/rv
-            if ( dimin1.ge.dmmin1 .and. dimin1.le.dmmax1 ) ok1 = .true. 
-            if ( dimax1.ge.dmmin1 .and. dimax1.le.dmmax1 ) ok1 = .true. 
-            if ( dmmin1.ge.dimin1 .and. dmmin1.le.dimax1 ) ok1 = .true. 
-            if ( dmmax1.ge.dimin1 .and. dmmin1.le.dimax1 ) ok1 = .true. 
+            if ( dimin1.ge.dmmin1 .and. dimin1.le.dmmax1 ) ok1 = .true.
+            if ( dimax1.ge.dmmin1 .and. dimax1.le.dmmax1 ) ok1 = .true.
+            if ( dmmin1.ge.dimin1 .and. dmmin1.le.dimax1 ) ok1 = .true.
+            if ( dmmax1.ge.dimin1 .and. dmmin1.le.dimax1 ) ok1 = .true.
 
-            ok2 = .false.						!Difference of ratios of 
+            ok2 = .false.						!Difference of ratios of
             dmmin2 = (rtri_mas(3,km)-TOLER)/(rtri_mas(1,km)+TOLER)	! first and third sides
             rv = max(1.0e-7,(rtri_mas(1,km)-TOLER))
             dmmax2 = (rtri_mas(3,km)+TOLER)/rv
             dimin2 = (rtri_in(3,ki)-TOLER)/(rtri_in(1,ki)+TOLER)
             rv = max(1.0e-7,(rtri_in(1,ki)-TOLER))
             dimax2 = (rtri_in(3,ki)+TOLER)/rv
-            if ( dimin2.ge.dmmin2 .and. dimin2.le.dmmax2 ) ok2 = .true. 
-            if ( dimax2.ge.dmmin2 .and. dimax2.le.dmmax2 ) ok2 = .true. 
-            if ( dmmin2.ge.dimin2 .and. dmmin2.le.dimax2 ) ok2 = .true. 
-            if ( dmmax2.ge.dimin2 .and. dmmin2.le.dimax2 ) ok2 = .true. 
+            if ( dimin2.ge.dmmin2 .and. dimin2.le.dmmax2 ) ok2 = .true.
+            if ( dimax2.ge.dmmin2 .and. dimax2.le.dmmax2 ) ok2 = .true.
+            if ( dmmin2.ge.dimin2 .and. dmmin2.le.dimax2 ) ok2 = .true.
+            if ( dmmax2.ge.dimin2 .and. dmmin2.le.dimax2 ) ok2 = .true.
 
 CX            if ( ok1 .and. ok2 ) write
 CX     +        ( 6,'(1x,2i5,f10.1,8f6.3)')km,ki,rtri_mas(1,km),
@@ -14142,8 +14142,8 @@ CX     +        dmmin1,dmmax1,dimin1,dimax1,dmmin2,dmmax2,dimin2,dimax2
 
                      if ( num.ge.1 ) then				!Check we dont have match for either star already
                         do k = 1, num
-                           if ( pair(1,k).eq.m1 .or. 
-     +                          pair(2,k).eq.m2 ) got = .true.	
+                           if ( pair(1,k).eq.m1 .or.
+     +                          pair(2,k).eq.m2 ) got = .true.
                         enddo
                      endif
 
@@ -14167,11 +14167,11 @@ CX     +        dmmin1,dmmax1,dimin1,dimax1,dmmin2,dmmax2,dimin2,dimax2
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBTAU_TCALC -- Calc mean transform from matched triangles
-C 
+C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
 
-      subroutine tbtau_tcalc ( mdata, idata, pair,  num, tpair, 
+      subroutine tbtau_tcalc ( mdata, idata, pair,  num, tpair,
      +                         ntriangs, ntris, pm, pi, use, level,
      +                         nstars, found )
 
@@ -14214,7 +14214,7 @@ Cbegin
       call pargi ( level )
       call pargi ( nstars )
       call pargi ( ntris )
-      call printd ( 
+      call printd (
      +   'Level %d : Stars searched - %d : Triangles searched - %d' )
 
       if ( ntris.eq.1 .and. (TBYM.eq.3 .or. TBY.eq.3) ) then
@@ -14228,7 +14228,7 @@ Cbegin
             pi(num,1) = idata(1,tpair(2,j,1))
             pi(num,2) = idata(2,tpair(2,j,1))
          enddo
- 
+
          call tran_doit ( pi, pm, TBYM, num, KFIT, SIGLIM, use,trc, 	!Do the transform
      +                    ngood, sd )
          if ( ST_FAILED ) return
@@ -14284,7 +14284,7 @@ Cbegin
          xmin = xmin - 0.5*(xmax-xmin)
          ymax = ymax + 0.5*(ymax-ymin)
          ymin = ymin - 0.5*(ymax-ymin)
-   
+
          kkgot = 0
          do k = 1, ntris
             do j = 1, 3
@@ -14293,7 +14293,7 @@ Cbegin
                pi(j,1) = idata(1,tpair(2,j,k))
                pi(j,2) = idata(2,tpair(2,j,k))
             enddo
-            call tran_doit ( pi, pm, TBYM, 3, KFIT, SIGLIM, use, 
+            call tran_doit ( pi, pm, TBYM, 3, KFIT, SIGLIM, use,
      +                       trc, ngood, sd )
             do j = 1, 6                                               	!Check values O$
                if ( abs(trc(j)).lt.1.0e-13 ) then
@@ -14342,7 +14342,7 @@ Cbegin
 
             nv = max(1,min(NTMATCH,(ntris-2)))
             if ( npos(k).eq.0 .and. nok.ge.nv ) then
-               npos(k) = 1 
+               npos(k) = 1
                nmatch = nmatch + 1
             endif
 
@@ -14408,9 +14408,9 @@ Cbegin
                         if ( num.lt.NTMAX ) then
                            num = num + 1
                            nok = .true.
-                           if ( num.ne.1 ) then   
+                           if ( num.ne.1 ) then
                               do kk = 1, num-1
-                                 if ( nstar(kk).eq.tpair(1,j,k) ) 
+                                 if ( nstar(kk).eq.tpair(1,j,k) )
      +                                nok = .false.
                               enddo
                            endif
@@ -14457,7 +14457,7 @@ Cbegin
             call pargr ( trc(6) )
             call printd ( '   Y = %f + %f*Xin + %f *Yin ')
             call printo ( ' ' )
-  
+
             call amovr ( trc(1), XEQN, 3 )
             call amovr ( trc(4), YEQN, 3 )
             call put3r ( 'XCOEFF', trc(1), trc(2), trc(3) )		!Put in output parameters
@@ -14483,14 +14483,14 @@ CX     +          atrc(4,k)
 CX         if ( abs(trc(1)+35).lt.50 .and. abs(trc(2)-1.0).lt.0.2 .and.
 CX     +        abs(trc(3)+0.2).lt.0.2 .and. abs(trc(4)-35).lt.50 .and.
 CX     +        abs(trc(5)-0.2).lt.0.2 .and. abs(trc(6)-1.0).lt.0.2 )
-CX     +   then 
+CX     +   then
 CX            if ( kkgot.eq.0 ) then
 CX               kkgot = 1
 CX               do kk = 1, 4
 CX                  fxdd(kk) = pos(1,kk,k)
 CX                  fydd(kk) = pos(2,kk,k)
 CX               enddo
-CX               write (6,'(1x, ''B '',i4, 1x, 2(f7.1,2f8.2,2x))' ) 
+CX               write (6,'(1x, ''B '',i4, 1x, 2(f7.1,2f8.2,2x))' )
 CX     +           k, trc(1), trc(2), trc(3), trc(4), trc(5), trc(6)
 CX            else
 CX               do kk = 1, 4
@@ -14499,7 +14499,7 @@ CX                  ddy(kk) = pos(2,kk,k) - fydd(kk)
 CX               enddo
 CX           dds = atrc(2,k)*atrc(2,k) + atrc(5,k)*atrc(5,k)
 CX           otol = FTOLER*sqrt(dds)
-CX            write(6,'(1x,''B '',i4,1x,2(f7.1,2f8.2,2x),f4.1,8f4.0)') 
+CX            write(6,'(1x,''B '',i4,1x,2(f7.1,2f8.2,2x),f4.1,8f4.0)')
 CX     +           k, trc(1), trc(2), trc(3), trc(4), trc(5), trc(6),
 CX     +                otol,(ddx(kk),ddy(kk),kk=1,4)
 CX            endif
@@ -14521,7 +14521,7 @@ CX                            print*,'A1 ', num, pi(num,1),pi(num,2)
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C TBTAU_OUT -- Put out transformed input table
-C 
+C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
 
@@ -14561,7 +14561,7 @@ Cbegin
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBTAU_LOADXY -- Load sorted positions 
+C TBTAU_LOADXY -- Load sorted positions
 C
 C        pat morris                  Leeds      1994 Jan
 C        alan penny                    ral      1994 Nov
@@ -14573,9 +14573,9 @@ C        alan penny                    ral      1994 Nov
 
       integer nx		!i:
       integer ny		!i:
-      real    in(nx,ny)		!i: 
-      real    out(2,ny)		!o: 
-      real    order(ny)		!i: 
+      real    in(nx,ny)		!i:
+      real    out(2,ny)		!o:
+      real    order(ny)		!i:
 C--
       integer k, kl
 Cbegin
@@ -14608,7 +14608,7 @@ C        alan penny                    ral      1994 Nov
       include 'STARMAN_INC'
 
       integer n			!i:
-      real    a(n)		!i/o: 
+      real    a(n)		!i/o:
 C--
       integer k
       real rv
@@ -14688,7 +14688,7 @@ Cbegin
       if ( ierr.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
 
-      call tcopdes ( 'IN', 'OUT', ierr )				!Get title to output list and 
+      call tcopdes ( 'IN', 'OUT', ierr )				!Get title to output list and
       if ( ierr.ne.0 ) then
          ST_FAILED = .true.
          return
@@ -14723,7 +14723,7 @@ C--
       integer k
 Cbegin
 
-  
+
       if ( ST_FAILED ) return
 
       call amovr ( in, out, TBVX*TBY )					!Transfer whole table
@@ -14783,7 +14783,7 @@ Cbegin
       trc(4) = shift(2) - cen(1)*mag*sn - cen(2)*mag*cs
       trc(5) = mag*sn
       trc(6) = mag*cs
- 
+
       call pargr ( trc(1) )						!Output results
       call pargr ( trc(2) )
       call pargr ( trc(3) )
@@ -14841,7 +14841,7 @@ CbegCbegin
       call optabr ( 'IN1', ip1, TBVX1, TBY1, .false., ierr )		!Input 1st table
       if ( ierr.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
-     
+
       call optabr ( 'IN2', ip2, TBVX2, TBY2, .false., ierr )		!Input 2nd table
       if ( ST_FAILED ) return
       if ( ierr.ne.0 ) then
@@ -14874,7 +14874,7 @@ CbegCbegin
       if ( ierr.ne.0 ) ST_FAILED = .true.
       if ( ST_FAILED ) return
 
-      call tbtrm_load ( %val(ip1), %val(ip2), %val(ipwk1), 
+      call tbtrm_load ( %val(ip1), %val(ip2), %val(ipwk1),
      +                  %val(ipwk2), donames )
       if ( ST_FAILED ) return
       if ( TBYO.eq.0 ) then
@@ -14893,7 +14893,7 @@ CbegCbegin
       call printd ( 'Number of points used = %d ' )
       call pargr ( sd )
       call printd ( 'Std Dev of points from fit = %f ' )
-      call pargr ( trc(1) )				
+      call pargr ( trc(1) )
       call pargr ( trc(2) )
       call pargr ( trc(3) )
       call printd ( 'X2 = %f + %f *X1 + %f *Y1 ')
@@ -15049,7 +15049,7 @@ Cbegin
          call get1i ( 'ROW', nrow, 1, 1, TBY )
       endif
       if ( ST_FAILED ) return
-      
+
       if ( dohead ) then						!Get column from header
          found = .false.
          k = 0
@@ -15121,7 +15121,7 @@ C TBWE_DOIT   Move 'good' rows from input table to output table
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C T_TBWEED -- Make a table with only those entries with parameters in ranges
-C This makes a new table which is a copy of the old table, but only those 
+C This makes a new table which is a copy of the old table, but only those
 C rows whose defined parameters fall in (or outside )the assigned ranges are
 C copied over.
 C
@@ -15230,13 +15230,13 @@ Cbegin
          else
             botlimin = 0.0						!Get the limits
             toplimin = 0.0
-            if ( k.lt.10 ) then					
+            if ( k.lt.10 ) then
                write ( namea, '(''LIMS'',i1)' ) k
-               call get2r ( namea, botlimin, toplimin, .true., 
+               call get2r ( namea, botlimin, toplimin, .true.,
      +                      -1.0e20, 1.0e20 )
             else
                write ( nameb, '(''LIMS'',i2)' ) k
-               call get2r ( nameb, botlimin, toplimin, .true., 
+               call get2r ( nameb, botlimin, toplimin, .true.,
      +                      -1.0e20, 1.0e20 )
             endif
             if ( ST_FAILED ) return
@@ -15324,7 +15324,7 @@ C    alan penny              ral              1990-06-12
       real	toplim(10)		!i: Top limits
       integer	kacc			!i: Accept or reject flag (a/r=1/2)
 C--
-      integer n, j, k, ka 
+      integer n, j, k, ka
       real d
       logical ok
 Cbegin
@@ -15346,7 +15346,7 @@ Cbegin
          enddo
          if ( ok ) then
             n = n + 1
-            call coprr ( tb, TBVX, TBY, 1, TBVX, k, k, 
+            call coprr ( tb, TBVX, TBY, 1, TBVX, k, k,
      +                   tbo, TBVX, TBYO, 1, n )
          endif
       enddo
@@ -15517,11 +15517,11 @@ C         A.J.Penny                RAL               1991 May
       subroutine tblist ( ierradam )
 
       implicit none
-      
+
       integer      ierradam       !o: ADAM error flag
 C--
 Cbegin
- 
+
       call starman_start
 
       call t_tblist
@@ -15792,7 +15792,7 @@ Cbegin
       end
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C TBTRAN_LOAD -- (Program) Load transformation between positions 
+C TBTRAN_LOAD -- (Program) Load transformation between positions
 C   See TBTRAN_LOAD.HLP for details
 C
 C         A.J.Penny             RAL                     1991 May

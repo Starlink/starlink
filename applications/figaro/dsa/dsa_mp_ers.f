@@ -9,10 +9,10 @@ C     Maps the error data array in a structure.
 C
 C  Description:
 C     This routine maps the error data array in a structure, returning
-C     the address of the mapped array.  The whole array is mapped.  If 
-C     there is in fact no error data array, then an array of zeros is 
+C     the address of the mapped array.  The whole array is mapped.  If
+C     there is in fact no error data array, then an array of zeros is
 C     generated and its address is returned, unless the mapping is for
-C     write or update, in which case an array of zeros is created in 
+C     write or update, in which case an array of zeros is created in
 C     the data structure and mapped.
 C
 C  Language:
@@ -24,14 +24,14 @@ C
 C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
 C
 C     (>) REF_NAME     (Fixed string,descr) The reference name associated
-C                      with the structure. 
+C                      with the structure.
 C     (>) MODE         (Fixed string,descr) One of 'READ','WRITE', or
 C                      'UPDATE', indicating the way the data is going to
 C                      be accessed.  Only the first character is significant.
 C     (>) TYPE         (Fixed string,descr) The type of data array to be
 C                      mapped onto the structure array.  This can be 'BYTE',
-C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.  
-C                      If type conversion is needed, it will be performed 
+C                      'CHAR','FLOAT','DOUBLE','SHORT','USHORT' or 'INT'.
+C                      If type conversion is needed, it will be performed
 C                      automatically.
 C     (<) ADDRESS      (Integer,ref) The address of the mapped array.
 C     (<) SLOT         (Integer,ref) A handle value associated with this
@@ -41,11 +41,11 @@ C     (!) STATUS       (Integer,ref) Status return code.  If a bad status
 C                      value is passed to it, this routine returns
 C                      immediately.
 C
-C  External variables used:  
+C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     ICH_FOLD, ICH_CI, ICH_LEN, DSA_FIND_REF, DSA_SEEK_ERRORS, 
+C     ICH_FOLD, ICH_CI, ICH_LEN, DSA_FIND_REF, DSA_SEEK_ERRORS,
 C     DSA_DATA_SIZE, DSA_MAP_ARRAY, DSA_MAP_DUMMY, DSA_NFILL_ARRAY
 C     DSA_GET_ACTUAL_NAME, DSA__ERROR_NAME, DSA__CREATE_ARRAY,
 C     DSA_VARIANCE_TO_ERR, DSA_GET_WORK_ARRAY
@@ -60,10 +60,10 @@ C  Version date: 26th October 1994
 C-
 C  Common variable details:
 C     (>) MAX_AXES  (Integer parameter) Maximum number of axes in data.
-C     (>) ERROR_UPDATE (Logical array) Indicates that the error array has 
+C     (>) ERROR_UPDATE (Logical array) Indicates that the error array has
 C                   been updated (or at least, mapped for update).
 C     (<) MAP_CALL_VSLOT(Integer array) Work entry used for err<->variance
-C                       array conversions.  
+C                       array conversions.
 C     (>) VARIANCE_CODE (Integer parameter) Error type is `variance'
 C
 C  Subroutine / function details:
@@ -140,10 +140,10 @@ C
       CHARACTER NUMBER*16                   ! Used to format numbers
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       CHARACTER STRUCTURE*128               ! Name of structure
       CHARACTER TYPE_UC*8                   ! Upper case version of TYPE
-      INTEGER   WORK_ADDRESS                ! Address of work array used 
+      INTEGER   WORK_ADDRESS                ! Address of work array used
       INTEGER   WORK_SLOT                   ! Slot number of work array used
 C
 C     Return immediately on bad status
@@ -162,7 +162,7 @@ C     the error array should match.
 C
       CALL DSA_DATA_SIZE (REF_NAME,MAX_AXES,NDIM,DIMS,NELM,STATUS)
 C
-C     See if there in in fact any error data.  
+C     See if there in in fact any error data.
 C
       CALL DSA_SEEK_ERRORS (REF_NAME,EXIST,STATUS)
 C
@@ -179,7 +179,7 @@ C        array.
 C
 C        Look up the reference name in the tables and get the name
 C        of the main structure object, then get the name of the error array.
-C          
+C
          CALL DSA_FIND_REF (REF_NAME_UC,REF_SLOT,OBJ_NAME,LENGTH,STATUS)
          CALL DSA__ERROR_NAME (REF_SLOT,OBJ_NAME,LENGTH,ERR_TYPE)
 C
@@ -219,12 +219,12 @@ C
          END IF
 C
 C        Now, allow for the possibility that the array we just mapped
-C        was actually a variance array.  
+C        was actually a variance array.
 C
          IF (ERR_TYPE.EQ.VARIANCE_CODE) THEN
 C
-C           It was, so we need to get a workspace array to serve as the actual 
-C           error array, and need to convert the data into it.  First get the 
+C           It was, so we need to get a workspace array to serve as the actual
+C           error array, and need to convert the data into it.  First get the
 C           work array.
 C
             CALL DSA_GET_WORK_ARRAY (NELM,TYPE,WORK_ADDRESS,
@@ -235,7 +235,7 @@ C           Now we flag the map call slot to indicate that it represents
 C           the mapping of a variance array tied to an error work array.
 C           Not that the use of the -ve slot # indicates the way round the
 C           conversion has been done.
-C     
+C
             MAP_CALL_VSLOT(SLOT)=-WORK_SLOT
 C
 C           And now we have to process the variance array into an error
@@ -264,7 +264,7 @@ C
             END IF
             ADDRESS=WORK_ADDRESS
          END IF
-C        
+C
       ELSE
 C
 C        There is no error array, so we need to generate a dummy one.

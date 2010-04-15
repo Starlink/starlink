@@ -35,11 +35,11 @@
 *     Iterative K-sigma clipping may also be applied as an option
 *     (see Parameter CLIP).
 *
-*     Order statistics (median and percentiles) may optionally be 
+*     Order statistics (median and percentiles) may optionally be
 *     derived and displayed (see Parameters ORDER and PERCENTILES).
 *     Although this can be a relatively slow operation on large arrays,
-*     unlike application HISTAT the reported order statistics are 
-*     accurate, not approximations, irrespective of the distribution of 
+*     unlike application HISTAT the reported order statistics are
+*     accurate, not approximations, irrespective of the distribution of
 *     values being analysed.
 
 *  Usage:
@@ -232,7 +232,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -388,13 +388,13 @@
 *  calculated.  Constrain the values to be between the minimum and
 *  maximum data values.
          CALL ERR_MARK
-         CALL PAR_GDRVR( 'PERCENTILES', NPRCTL, 0.0, 100.0, PERCNT, 
+         CALL PAR_GDRVR( 'PERCENTILES', NPRCTL, 0.0, 100.0, PERCNT,
      :                   NUMPER, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Null is a valid response to say do not compute percentiles.  Make
 *  the number of percentiles one and flag the value, so that the
-*  calculation and display routines can handle and recognise that 
+*  calculation and display routines can handle and recognise that
 *  there are no percentile values to calculate and report.
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -463,7 +463,7 @@
      :                            STATUS )
 
 *  Obtain the numeric type of the NDF array component to be analysed.
-      CALL NDF_MTYPE( '_BYTE,_WORD,_INTEGER,_REAL,_DOUBLE', NDF, NDF, 
+      CALL NDF_MTYPE( '_BYTE,_WORD,_INTEGER,_REAL,_DOUBLE', NDF, NDF,
      :                COMP, TYPE, DTYPE, STATUS )
 
 *  Map the array using this numeric type and see whether there may be
@@ -474,10 +474,10 @@
       ELSE
          CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
       END IF
-      
+
 *  Call the appropriate routine to compute the statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_STATB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_STATB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NCLIP, CLIP,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
      :                    DMAX, SUM, MEAN, STDEV, NGOODC,
@@ -485,32 +485,32 @@
      :                    MEANC, STDEVC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_STATD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_STATD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NCLIP, CLIP,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
      :                    DMAX, SUM, MEAN, STDEV, NGOODC,
      :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                    MEANC, STDEVC, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_STATI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_STATI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NCLIP, CLIP,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
      :                    DMAX, SUM, MEAN, STDEV, NGOODC,
      :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                    MEANC, STDEVC, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+         CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NCLIP, CLIP,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
      :                    DMAX, SUM, MEAN, STDEV, NGOODC,
      :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                    MEANC, STDEVC, STATUS )
- 
+
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_STATW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    NCLIP, CLIP, 
+         CALL KPG1_STATW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    NCLIP, CLIP,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
      :                    DMAX, SUM, MEAN, STDEV, NGOODC,
      :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
@@ -596,7 +596,7 @@
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT, 
+     :                    MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
      :                    PERVAL, MAXWCS, MINWCS, STATUS )
       ELSE
          CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
@@ -642,21 +642,21 @@
                CALL CHR_PUTC( ', ', BUF, NC )
             END IF
             CALL CHR_PUTR( CLIP( ICLIP ), BUF, NC )
- 3       CONTINUE        
+ 3       CONTINUE
          CALL CHR_PUTC( ' standard deviations:', BUF, NC )
 
 *  Display the heading, followed by the clipped statistics using the
 *  most appropriate floating-point precision.
          CALL MSG_OUT( 'CLIPDONE', BUF( : NC ), STATUS )
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
-     :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC, 
+            CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
+     :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                       STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
      :                       PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
          ELSE
-            CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
+            CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                       STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ), 
+     :                       STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
      :                       PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
          END IF
 
@@ -664,12 +664,12 @@
          IF ( LOGFIL ) THEN
             CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
+               CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                          STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
      :                          PERCNT, PERVAL, IFIL, STATUS )
             ELSE
-               CALL KPG1_STFLR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
+               CALL KPG1_STFLR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                          STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
      :                          PERCNT, PERVAL, IFIL, STATUS )
@@ -693,13 +693,13 @@
       CALL PAR_PUT1I( 'MAXPOS', NDIM, MAXPC, STATUS )
       CALL PAR_PUT1I( 'MINPOS', NDIM, MINPC, STATUS )
       IF ( ORDER ) CALL PAR_PUT0D( 'MEDIAN', MEDIAN, STATUS )
-      
+
 *  Only write percentiles values if any percentiles were given.
       IF ( DOPRCT ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, STATUS )
 
 
 *  Arrive here if an error occurs.
- 99   CONTINUE     
+ 99   CONTINUE
 
 *  Annul the WCS FrameSet
       CALL AST_ANNUL( IWCS, STATUS )

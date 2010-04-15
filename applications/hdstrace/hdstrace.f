@@ -94,7 +94,7 @@
 *        True indicates that data values are to start on a new line
 *        below the name and type, and indented from the name.
 *        Otherwise the values are appended to the same line. [FALSE]
-*     NLINES = LITERAL (Read) 
+*     NLINES = LITERAL (Read)
 *        The maximum number of lines in which data values of each
 *        primitive array component may be displayed, but excluding the
 *        continuation line used to show the last few values.  Note that
@@ -135,7 +135,7 @@
 *     earlier applications like LS and the original TRACE, though the
 *     order of the attributes of an object has been fixed and
 *     rearranged for standardisation, particularly for documentation
-*     purposes.  
+*     purposes.
 
 *  Algorithm:
 *     Get a locator to the HDS object
@@ -331,7 +331,7 @@
       CALL PAR_GDR0I( 'TYPIND', 15, 10, 40, .FALSE., CMNTYP, STATUS )
       IF ( .NOT. NEWLIN ) THEN
          CALL PAR_GDR0I( 'VALIND', 15, 10, 40, .FALSE., CMNVAL, STATUS )
-      ELSE 
+      ELSE
          CMNVAL = 15
       ENDIF
 
@@ -381,7 +381,7 @@
          GOTO 999
       END IF
 
-      IF ( LOGEXM ) 
+      IF ( LOGEXM )
      :   CALL MSG_OUT( 'LOG', 'Logging to $LOGFILE', STATUS )
 
 *    Set the indentation column.
@@ -427,7 +427,7 @@
       END IF
 
 *    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    
+
 *    For the wide page...
 
       IF ( WIDEPG ) THEN

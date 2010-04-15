@@ -14,7 +14,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -28,8 +28,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -51,8 +51,8 @@
      :  ODIMS( NDIMS ),        ! dimensions of output DATA_ARRAYs
      :  ACTDIM,                ! actual dimensions from NDF_DIM
      :  NELEMENTS,             ! number of elements mapped by NDF_MAP
-     :  PNTRI1,                !    "     " input      " 
-     :  PNTRI2,                !    "     " input      " 
+     :  PNTRI1,                !    "     " input      "
+     :  PNTRI2,                !    "     " input      "
      :  PNTRO                  ! pointer to output DATA_ARRAY
 
       REAL
@@ -84,11 +84,11 @@
          CALL NDF_DIM( LOCI2, NDIMS, DIMS2, ACTDIM, STATUS )
 
 *      test if input images same size
-	IF( DIMS1( 1) .EQ. DIMS2( 1) .AND. 
+	IF( DIMS1( 1) .EQ. DIMS2( 1) .AND.
      :	    DIMS1( 2) .EQ. DIMS2( 2)) THEN
 
 *        set the output image dimensions
-	  ODIMS( 1) = DIMS1( 1) 
+	  ODIMS( 1) = DIMS1( 1)
 	  ODIMS( 2) = DIMS1( 2)
 
 *        create the output image and get a title for it
@@ -113,7 +113,7 @@
 	      CALL PAR_GET0R( 'PLATESCALE', PLATESCALE, STATUS)
 
 *            pass everything to the calculation routine
-              CALL CALCOLSUB( DIMS1( 1), DIMS1( 2), %VAL( PNTRI1), 
+              CALL CALCOLSUB( DIMS1( 1), DIMS1( 2), %VAL( PNTRI1),
      :	                      %VAL( PNTRI2), %VAL( PNTRO), LSB1, LSB2,
      :	                      PLATESCALE, STATUS)
 
@@ -126,17 +126,17 @@
 
 	ELSE
 
-	  CALL MSG_OUT( 'ERR', 
+	  CALL MSG_OUT( 'ERR',
      :	    'Error, input images different sizes',
      :	    STATUS)
 	  CALL MSG_SETI( 'X1', DIMS1( 1))
 	  CALL MSG_SETI( 'Y1', DIMS1( 2))
-	  CALL MSG_OUT( 'ERR', 
+	  CALL MSG_OUT( 'ERR',
      :	    'Images 1 is ^X1,^Y1',
      :	    STATUS)
 	  CALL MSG_SETI( 'X2', DIMS2( 1))
 	  CALL MSG_SETI( 'Y2', DIMS2( 2))
-	  CALL MSG_OUT( 'ERR', 
+	  CALL MSG_OUT( 'ERR',
      :	    'Images 2 is ^X2,^Y2',
      :	    STATUS)
 

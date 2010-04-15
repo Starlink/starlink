@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_MLPCP( NX, NY, DATA, ABSDIM, INDX, ABSAXS, YLOG, 
+      SUBROUTINE KPS1_MLPCP( NX, NY, DATA, ABSDIM, INDX, ABSAXS, YLOG,
      :                       NOMGRD, LINDAT, MN, MX, MEAN, STATUS )
 *+
 *  Name:
@@ -12,20 +12,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MLPCP( NX, NY, DATA, ABSDIM, INDX, ABSAXS, YLOG, 
+*     CALL KPS1_MLPCP( NX, NY, DATA, ABSDIM, INDX, ABSAXS, YLOG,
 *                      NOMGRD, LINDAT, MN, MX, MEAN, STATUS )
 
 *  Description:
-*     This routine copies a line of data from the supplied 2D array into 
+*     This routine copies a line of data from the supplied 2D array into
 *     the returned 1D array, and gets statistics.
 
 *  Arguments:
 *     NX = INTEGER (Given)
-*        The number of grid elements along the first axis of the data 
-*        array. 
+*        The number of grid elements along the first axis of the data
+*        array.
 *     NY = INTEGER (Given)
-*        The number of grid elements along the second axis of the data 
-*        array. 
+*        The number of grid elements along the second axis of the data
+*        array.
 *     DATA( NX, NY ) = DOUBLE PRECISION (Given)
 *        The 2D data array.
 *     ABSDIM = INTEGER (Given)
@@ -35,7 +35,7 @@
 *        The grid index of the line to be copied. This refers to the
 *        ordinate axis implied by ABSAXS.
 *     ABSAXS = INTEGER (Given)
-*        The index of the abscissa (horizontal) grid axis. This should be 1 
+*        The index of the abscissa (horizontal) grid axis. This should be 1
 *        or 2. The other axis is the ordinate (vertical) axis.
 *     YLOG = LOGICAL (Given)
 *        If .TRUE., then the log of the data value is to be copied.
@@ -53,7 +53,7 @@
 *        The maximum value in the returned LINDAT array.
 *     MEAN = DOUBLE PRECISION (Returned)
 *        The mean value in the returned LINDAT array, after a single
-*        clipping iteration at 3 sigma. Returned equal to VAL__BADD if 
+*        clipping iteration at 3 sigma. Returned equal to VAL__BADD if
 *        the line contains no usable data.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
@@ -90,12 +90,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER NX
@@ -154,7 +154,7 @@
                LINDAT( I ) = AST__BAD
 
 *  Check both the data value and horizontal position are good.
-               DATVAL = DATA( I, INDX ) 
+               DATVAL = DATA( I, INDX )
                IF( NOMGRD( I ) .NE. AST__BAD .AND.
      :             DATVAL .NE. VAL__BADD ) THEN
 
@@ -166,10 +166,10 @@
             END DO
 
 *  Now do the linear case.
-         ELSE 
+         ELSE
 
             DO I = 1, ABSDIM
-               DATVAL = DATA( I, INDX ) 
+               DATVAL = DATA( I, INDX )
 
                IF( NOMGRD( I ) .NE. AST__BAD .AND.
      :             DATVAL .NE. VAL__BADD ) THEN
@@ -195,7 +195,7 @@
                LINDAT( I ) = AST__BAD
 
 *  Check both the data value and horizontal position are good.
-               DATVAL = DATA( INDX, I ) 
+               DATVAL = DATA( INDX, I )
                IF( NOMGRD( I ) .NE. AST__BAD .AND.
      :             DATVAL .NE. VAL__BADD ) THEN
 
@@ -207,10 +207,10 @@
             END DO
 
 *  Now do the linear case.
-         ELSE 
+         ELSE
 
             DO I = 1, ABSDIM
-               DATVAL = DATA( INDX, I ) 
+               DATVAL = DATA( INDX, I )
 
                IF( NOMGRD( I ) .NE. AST__BAD .AND.
      :             DATVAL .NE. VAL__BADD ) THEN
@@ -227,9 +227,9 @@
 
 *  Now find the statistics of the values in the line, after 1 rejection
 *  iteration at 3 sigma.
-      CALL KPG1_STATD( .TRUE., ABSDIM, LINDAT, 1, 3.0, NGOOD, IMIN, 
-     :                 MN, IMAX, MX, SUM, AVE, STDEV, NGOODC, 
-     :                 IMINC, DMINC, IMAXC, DMAXC, SUMC, MEAN, STDEVC, 
+      CALL KPG1_STATD( .TRUE., ABSDIM, LINDAT, 1, 3.0, NGOOD, IMIN,
+     :                 MN, IMAX, MX, SUM, AVE, STDEV, NGOODC,
+     :                 IMINC, DMINC, IMAXC, DMAXC, SUMC, MEAN, STDEVC,
      :                 STATUS )
 
       END

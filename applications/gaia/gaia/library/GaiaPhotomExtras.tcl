@@ -6,7 +6,7 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Defines a class of object for controlling optional photometry 
+#     Defines a class of object for controlling optional photometry
 #     parameters.
 
 #  Description:
@@ -99,7 +99,7 @@
 #     See method statements below.
 
 #  Inheritance:
-#     This widget inherits the FrameWidget class (also assumes part of 
+#     This widget inherits the FrameWidget class (also assumes part of
 #     a TopLevelWidget).
 
 #  Copyright:

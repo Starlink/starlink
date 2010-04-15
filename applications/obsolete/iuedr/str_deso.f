@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Design field size for O-format.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -31,22 +31,22 @@
 
 *   Import:
       INTEGER IVALUE      ! integer value
- 
+
 *   Export:
       INTEGER FIELD       ! minimum field size
- 
+
 *   External references:
       INTEGER str_LEN     ! string length
- 
+
 *   Local variables:
       BYTE STR(256)       ! temporary string to hold number
 
 *   Code value
       CALL gen_ITOO(IVALUE, 43, 256, STR)
- 
+
 *   Remove blanks
       CALL str_RMBLK(STR)
- 
+
 *   Find length
       FIELD = str_LEN(STR)
 

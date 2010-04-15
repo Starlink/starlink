@@ -70,7 +70,7 @@
 *     1997 November 15 (MJC):
 *        Allow for extensions which are primitive arrays.
 *     2006 May 8 (MJC):
-*        Allow for the different component paths of on-the-fly 
+*        Allow for the different component paths of on-the-fly
 *        conversions.
 *     2008 February 7 (MJC):
 *        Only search for the first MORE component.
@@ -81,7 +81,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -182,7 +182,7 @@
       CALL CHR_TRCHR( '.', ' ', EXPATH, STATUS )
 
 *  Break the path into words.  Extension must be at least the second
-*  item because the first is the top-level NDF name.  The extensions 
+*  item because the first is the top-level NDF name.  The extensions
 *  normally begin at level 3 in an NDF, but allow for on-the-fly
 *  conversion where the path is longer.  Find only the first MORE
 *  component in case there extensions within the extensions.  Since
@@ -191,7 +191,7 @@
       CALL CHR_DCWRD( EXPATH, MAXWRD, NWORD, START, END, WORDS, STATUS )
       GOMORE = .TRUE.
       DO LEVEL = 2, NWORD
-         IF ( WORDS( LEVEL ) .EQ. 'MORE' .AND. GOMORE ) THEN 
+         IF ( WORDS( LEVEL ) .EQ. 'MORE' .AND. GOMORE ) THEN
             ELEVEL = LEVEL + 1
             GOMORE =.FALSE.
          END IF
@@ -199,7 +199,7 @@
 
 *  Extract the extension's name, number of dimensions and their values,
 *  dimensions, and indices to a structure element.
-      CALL COF_EXDIM( FUNIT, WORDS( ELEVEL ), DAT__MXDIM, NAME, NDIM, 
+      CALL COF_EXDIM( FUNIT, WORDS( ELEVEL ), DAT__MXDIM, NAME, NDIM,
      :                DIMS, INDICE, STATUS )
 
       CALL NDF_XSTAT( NDF, NAME, THERE, STATUS )
@@ -232,11 +232,11 @@
 *  locator to the current array element for an array of extensions.
       ELSE
          IF ( NDIM .EQ. 0 ) THEN
-            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0, 
+            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0,
      :                     SXLOC( ELEVEL - 2 ), STATUS )
          ELSE
             CALL NDF_XNEW( NDF, NAME, EXTYPE, NDIM, DIMS, LOC, STATUS )
-            CALL DAT_CELL( LOC, NDIM, INDICE, 
+            CALL DAT_CELL( LOC, NDIM, INDICE,
      :                     SXLOC( ELEVEL - 2 ), STATUS )
             CALL DAT_ANNUL( LOC, STATUS )
          END IF

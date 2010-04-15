@@ -18,7 +18,7 @@
 *  Description:
 *     This program tests the installation of the stand-alone ATL
 *     package. Note, it is not an exhaustive test of the ATL_ system
-*     itself. 
+*     itself.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -29,12 +29,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -107,7 +107,7 @@ int main( void ){
          status = SAI__ERROR;
          errRep( "", "Error 1; current Frame is not a SkyFrame.", &status );
       }
-   }  
+   }
 
 /* Check its Domain. */
    if( astOK && strcmp( "SKY-ROI1", astGetC( cfrm, "Domain" ) ) ){

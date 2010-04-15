@@ -27,17 +27,17 @@
 	  END DO
 
 !	  type *,'Start, end = ',pen_start, pen_end
-!	  type *,'Start guns = ',colours( 1, pen_start), 
+!	  type *,'Start guns = ',colours( 1, pen_start),
 !     *	                         colours( 2, pen_start),
 !     *	                         colours( 3, pen_start)
-!	  type *,'End guns   = ',colours( 1, pen_end), 
+!	  type *,'End guns   = ',colours( 1, pen_end),
 !     *	                         colours( 2, pen_end),
 !     *	                         colours( 3, pen_end)
 
 * loop to interpolate the missing pens between the start and end pens
 
 	  DO K = PEN_START+1, PEN_END-1
-	    COLOURS( 1, K) = COLOURS( 1, PEN_START) + 
+	    COLOURS( 1, K) = COLOURS( 1, PEN_START) +
      *	 ( K-PEN_START)*( COLOURS( 1, PEN_END)-COLOURS( 1, PEN_START))/
      *   (PEN_END-PEN_START+1)
 	    COLOURS( 2, K) = COLOURS( 2, PEN_START) +
@@ -54,4 +54,4 @@
 	  PEN_END = PEN_START + 1
 	END DO
 
-	END 
+	END

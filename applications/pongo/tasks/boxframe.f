@@ -48,7 +48,7 @@
 *           - "V" -- Orient numeric labels vertically (this is only
 *           applicable to Y -- the default is to write Y-axis labels
 *           parallel to the axis).
-*           - "1" -- Force decimal labelling. 
+*           - "1" -- Force decimal labelling.
 *           - "2" -- Force exponential labelling.
 *
 *        A set of special letters control the plotting of RA and DEC
@@ -56,15 +56,15 @@
 *
 *           - "Z" for (DD) HH MM SS.S time labelling
 *           - "H" means superscript numbers with d, h, m, & s  symbols
-*           - "D" means superscript numbers with    o, ', & '' symbols 
+*           - "D" means superscript numbers with    o, ', & '' symbols
 *           - "F" causes the first label (left- or bottom-most) to
 *                 be omitted. Useful for sub-panels that abut each other.
 *                 Care is needed because first label carries sign as well.
 *           - "O" means omit leading zeros in numbers < 10
 *                 E.g.  3h 3m 1.2s rather than 03h 03m 01.2s  Useful
-*                 to help save space on X-axes. The day field does not 
+*                 to help save space on X-axes. The day field does not
 *                 use this facility.
-* 
+*
 *        Note that to use these features your data values should be in
 *        radians (PONGO automatically converts HH:MM:SS.SSS strings to
 *        radians, and the DEGTOR command from degrees to radians).
@@ -113,7 +113,7 @@
 *        default if your data are stored in the HH:MM:SS.SSS,
 *        DD:MM:SS.SSS formats) and then set the "Z" character in the
 *        XOPT and YOPT parameters. A good combination of options are:
-*         
+*
 *           XOPT='BCNSTZHG' YOPT='BCNSTZDG'
 *
 *        For more about this (in particular how the interval options are
@@ -139,7 +139,7 @@
 *     21-JUN-1994 (PDRAPER):
 *        Added check for device open.
 *     30-MAY-1996 (PDRAPER):
-*        Added options to plot RA and DEC. Added "1" & "2" to XOPT 
+*        Added options to plot RA and DEC. Added "1" & "2" to XOPT
 *        and YOPT descriptions.
 *     {enter_further_changes_here}
 
@@ -218,7 +218,7 @@
 *  time).
                RALM1 =  24.0 * 3600.0 * XMIN / S2PI
                RALM2 =  24.0 * 3600.0 * XMAX / S2PI
-               DECLM1 = 24.0 * 3600.0 * 15.0 * YMIN / S2PI 
+               DECLM1 = 24.0 * 3600.0 * 15.0 * YMIN / S2PI
                DECLM2 = 24.0 * 3600.0 * 15.0 * YMAX / S2PI
                CALL PGSWIN( RALM1, RALM2, DECLM1, DECLM2 )
                CALL PGTBOX( XOPT, XTIC, NXSUB, YOPT, YTIC, NYSUB )

@@ -65,9 +65,9 @@
 *        The Analogue-to-Digital Conversion factor. This number converts
 *        input ADUs to detected electrons. This value is used to
 *        estimate the Poissonian noise in the output (debiassed) data
-*        values.  If the EXPAND parameter is true, then the output is 
+*        values.  If the EXPAND parameter is true, then the output is
 *        multiplied by ADC so that the output is in counts (electrons)
-*        rather than ADUs.  If variances are not being generated 
+*        rather than ADUs.  If variances are not being generated
 *        then this value will not be used.
 *
 *        If a global value for this parameter has been set using
@@ -172,9 +172,9 @@
 *        CCDSETUP then those values will be used.  If USESET is true then a
 *        value specific to the Set Index of each image will be sought.
 *     FIXORIGIN = _LOGICAL (Read)
-*        Whether to fix the origins of the output NDFs to 1,1, rather 
-*        than the lower corner as defined by the EXTENT parameter. 
-*        This option is of particular use if the analysis package 
+*        Whether to fix the origins of the output NDFs to 1,1, rather
+*        than the lower corner as defined by the EXTENT parameter.
+*        This option is of particular use if the analysis package
 *        you are going to use does not support origins.
 *        [FALSE]
 *     FMODE = LITERAL (Read)
@@ -209,7 +209,7 @@
 *        A list of the names of the NDFs which contain the raw CCD
 *        data. Note that at present the input data must have a common
 *        processing mode, i.e. have the same ADC factor, readout noise
-*        etc. These values are represented by the parameter values of 
+*        etc. These values are represented by the parameter values of
 *        the task.  The input data must also use the same master bias
 *        frame except if USESET is true and the input and bias images
 *        contain suitable CCDPACK Set header information, in which
@@ -304,7 +304,7 @@
 *           IN > *
 *           OUT > *
 *        signifies that all the NDFs in the current directory should be
-*        used and the output NDFs should have the same names. 
+*        used and the output NDFs should have the same names.
 *
 *        Other types of modification can also occur, such as,
 *           OUT > tmp_*
@@ -340,7 +340,7 @@
 *        estimates.
 *
 *        If a global value has been set using CCDSETUP then this will
-*        be used.   If USESET is true then a value specific to the 
+*        be used.   If USESET is true then a value specific to the
 *        Set Index of each image will be sought.
 *        [Dynamic default or 1.0]
 *     SATURATE = _LOGICAL (Read)
@@ -352,7 +352,7 @@
 *        The data saturation value. Only used if SATURATE is TRUE.
 *
 *        If a global value has been set using CCDSETUP then this will
-*        be used.  If USESET is true then a value specific to the 
+*        be used.  If USESET is true then a value specific to the
 *        Set Index of each image will be sought.
 *        [1.0D6]
 *     SETBAD = _LOGICAL (Read)
@@ -422,7 +422,7 @@
 *     USESET = _LOGICAL (Read)
 *        Whether to use Set header information or not.  If USESET is
 *        false then any Set header information will be ignored.
-*        If USESET is true, then the BIAS parameter is 
+*        If USESET is true, then the BIAS parameter is
 *        taken to refer to a group of files, and each IN file will
 *        be processed using a master bias image with a Set Index
 *        attribute which matches its own.  An IN file with no Set
@@ -430,7 +430,7 @@
 *        no Set header, so USESET can safely be set true
 *        when the input files contain no Set header information.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [FALSE]
 *     WMODE = LITERAL (Read)
@@ -564,12 +564,12 @@
 *     EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
 *     SATURATION, SETSAT and USESET) have global values. These global values
 *     will always take precedence, except when an assignment is made on
-*     the command line.  If USESET is true, then global values of some 
+*     the command line.  If USESET is true, then global values of some
 *     of these parameters (ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT,
 *     MASK, RNOISE, SATURATION) specific to the Set Index of each image
-*     will be used if available.  In general global values may be set 
-*     and reset using the CCDSETUP and CCDCLEAR commands, however, 
-*     the BIAS parameter may only be set by a run of the application 
+*     will be used if available.  In general global values may be set
+*     and reset using the CCDSETUP and CCDCLEAR commands, however,
+*     the BIAS parameter may only be set by a run of the application
 *     MAKEBIAS.
 *
 *     If the parameter USEEXT is TRUE then the following parameters
@@ -578,8 +578,8 @@
 *     extensions instead.
 
 *  Copyright:
-*     Copyright (C) 1991-1994 Science & Engineering Research Council. 
-*     Copyright (C) 1995-2005 Central Laboratory of the Research Councils. 
+*     Copyright (C) 1991-1994 Science & Engineering Research Council.
+*     Copyright (C) 1995-2005 Central Laboratory of the Research Councils.
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -1268,9 +1268,9 @@
 *  processed correctly according to whether it has been zeroed or not.
              CALL CCD1_DEBIA( ITYPE, BAD, GENVAR, USEEXT, IDIN, EL,
      :                        IPIN, IDIM( 1 ), IDIM( 2 ), LBNDC( 1 ),
-     :                        LBNDC( 2 ), IPOUT, GOTBIA, ZEROED, 
-     :                        ZEROCK, IPBIAS, HAVBV, IPBVAR, HAVIV, 
-     :                        IPOVAR, IPWRK, PRESER, DTYPE, 
+     :                        LBNDC( 2 ), IPOUT, GOTBIA, ZEROED,
+     :                        ZEROCK, IPBIAS, HAVBV, IPBVAR, HAVIV,
+     :                        IPOVAR, IPWRK, PRESER, DTYPE,
      :                        IDSO( NBIAS ), ADC, STATUS )
 
 *  Write out the data units, must be ADUs at this stage (unless the user
@@ -1445,7 +1445,7 @@
 *  TRIM SECTION
 ************************************************************************
 *  Get the section extents for the useful output area.
-            CALL CCD1_GTSEC( USEEXT, IDIN, LBND, UBND, LBNDS, UBNDS, 
+            CALL CCD1_GTSEC( USEEXT, IDIN, LBND, UBND, LBNDS, UBNDS,
      :                       EXTSEC, STATUS )
 
 *  Unmap everything in the current output NDF. Some form of conflict
@@ -1456,7 +1456,7 @@
             CALL NDF_SECT( IDOUT, 2, LBNDS, UBNDS, IDSUB, STATUS )
 
 *  Propagate this section to the output NDF.
-            CALL NDG_NDFPR( IDSUB, 
+            CALL NDG_NDFPR( IDSUB,
      :                      'Data,Variance,Quality,Axis,Units,WCS',
      :                      GIDOUT, INDEX, IDSOUT, STATUS )
 
@@ -1481,7 +1481,7 @@
 
 *  Offer the option to set the origin of the NDF to 1,1.
             CALL PAR_GET0L( 'FIXORIGIN', FORI, STATUS )
-            IF ( FORI ) THEN 
+            IF ( FORI ) THEN
                SHIFT( 1 ) = 1 - LBNDS( 1 )
                SHIFT( 2 ) = 1 - LBNDS( 2 )
                CALL NDF_SHIFT( 2, SHIFT, IDSOUT, STATUS )

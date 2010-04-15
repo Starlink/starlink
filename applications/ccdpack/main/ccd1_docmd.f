@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,11 +98,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Generate the string to perform the command (use the environment
-*  variable CCDPACK_DIR and an explicit sh as some systems use the shell 
+*  variable CCDPACK_DIR and an explicit sh as some systems use the shell
 *  as set by the $SHELL variable). The final command looks something like.
 *
 *     /bin/sh -c "$CCDPACK_DIR/ccdexecute CSH script logfile"
-*  or 
+*  or
 *     /bin/sh -c "$CCDPACK_DIR/ccdexecute ICL script logfile"
 *
       COMMAND = '/bin/sh -c "$CCDPACK_DIR/ccdexecute'

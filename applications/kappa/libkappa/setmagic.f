@@ -57,7 +57,7 @@
 *        propagates the title from the input NDF to the output NDF. [!]
 
 *  Examples:
-*     setmagic irasmap aitoff repval=-2000000 
+*     setmagic irasmap aitoff repval=-2000000
 *        This copies the NDF called irasmap to the NDF aitoff, except
 *        that any pixels with the IPAC blank value of -2000000 are
 *        flagged with the standard bad value in aitoff.
@@ -208,7 +208,7 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Associate the input NDF. 
+*  Associate the input NDF.
 *  ========================
 
 *  Begin an NDF context.
@@ -296,7 +296,7 @@
      :                   DTYPE, STATUS )
 
       ELSE IF ( LCOMP( 2 ) ) THEN
-         CALL LPG_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
+         CALL LPG_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
 *  For this purpose Error and Variance structures are synonymous.
@@ -317,7 +317,7 @@
 *  ==================================================
       DO I = 1, 2
          IF ( LCOMP( I ) ) THEN
-      
+
 *  Map the data arrays.
             CALL KPG1_MAP( NDFI, COMP( I ), ITYPE, 'READ', PNTRI, EL,
      :                    STATUS )
@@ -344,9 +344,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          RSUVAL,
-     :                          VAL__BADR, 
+     :                          VAL__BADR,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
@@ -368,9 +368,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          BSUVAL,
-     :                          VAL__BADB, 
+     :                          VAL__BADB,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
@@ -388,9 +388,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          REPVAL,
-     :                          VAL__BADD, 
+     :                          VAL__BADD,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
@@ -412,9 +412,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ISUVAL,
-     :                          VAL__BADI, 
+     :                          VAL__BADI,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
@@ -436,9 +436,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           BSUVAL,
-     :                           VAL__BADUB, 
+     :                           VAL__BADUB,
      :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                           STATUS )
 
@@ -460,9 +460,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           WSUVAL,
-     :                           VAL__BADUW, 
+     :                           VAL__BADUW,
      :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                           STATUS )
 
@@ -484,9 +484,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          WSUVAL,
-     :                          VAL__BADW, 
+     :                          VAL__BADW,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
             END IF

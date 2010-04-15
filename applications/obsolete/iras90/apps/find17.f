@@ -30,7 +30,7 @@
 *     SOP by determining whether the source position is sufficiently
 *     far from the position of the Sun, at the time the SOP was taken,
 *     for it to be feasible for IRAS to observe the source.
-*     
+*
 *     The subroutine first calculates the satellite angles of the
 *     source (i.e. The satellite angles that IRAS would have had if it
 *     were to have observed the source position).
@@ -45,7 +45,7 @@
 *           Solar longitude of the SOP to calculate Satellite angles
 *           from the ecliptic position of the source. This uses the
 *           subroutine FIND41.
-*           
+*
 *     It then determines whether the satellite sun angle ( theta ) for
 *     the source is within the bounds imposed by the geometry of the
 *     mission. (ie you can't observe too close to the Sun)
@@ -76,7 +76,7 @@
 *        .TRUE. if test is passed
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*        
+*
 *  External Routines Used:
 *     FINDCRDD routines:
 *        FIND12, FIND15, FIND41
@@ -94,7 +94,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -105,12 +105,12 @@
 *  FINDCRDD common (in FICOMN.FOR) is not included. The two variables
 *  required from it SODEC and SORA for the source under consideration
 *  are supplied via the argument list.
-                                      
+
 *  Arguments Given:
       REAL SODEC
       REAL SORA
       REAL SPSLG
-      
+
 *  Arguments Returned:
       REAL SLELA5
       REAL SLELAT
@@ -175,7 +175,7 @@
 
 *  Check whether the status from FIND41 is O.K
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Check whether source psi is within the correct range ie 0 to 2*PI
 *  and if not normalise it
       IF ( SLPSI .LT. 0.0 ) SLPSI = SLPSI + TWOPI

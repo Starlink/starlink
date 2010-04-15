@@ -17,14 +17,14 @@ C     primitive.  However, if a structure array element is specified,
 C     DTA_LOCATE will return a locator to the element itself.  If
 C     the array exists but does not contain the specified element,
 C     DTA_LOCATE returns an error.
-C     
+C
 C     Parameters -   (">" input, "<" output)
 C
 C     (>) NAME      (Character) The object name.  This should be
 C                   in upper case, and should already have been
 C                   analysed by DTA_SPLITN to obtain its level
 C                   structure.
-C     (>) LEVELS    (Integer) The number of components in the 
+C     (>) LEVELS    (Integer) The number of components in the
 C                   object name. (As found by DTA_SPLITN).
 C     (>) LASTC     (Integer LASTC(LEVELS)) Positions of the
 C                   last characters in each of the component names
@@ -42,7 +42,7 @@ C     (<) LEV       (Integer) The last level searched.  If the
 C                   object is found, this will be equal to LEVELS.
 C     (<) STATUS    (Integer) Returns a status code.
 C                   0 => No errors.  NOTE: this does not imply that
-C                        the object was found, merely that the 
+C                        the object was found, merely that the
 C                        structure was not illegal and there were no
 C                        lower level errors (I/O, for example).
 C                   DTA_INVLEV => One of the higher level components
@@ -50,7 +50,7 @@ C                                 of NAME is not a structure.
 C                   DTA_STRARY => NAME contains a structure array,
 C                                 which this system cannot handle.
 C                   Lower level routines may return other error codes.
-C                   If STATUS is non-zero, the values for FOUND, 
+C                   If STATUS is non-zero, the values for FOUND,
 C                   OBJLOC, ENVLOC etc. may not be meaningful.
 C
 C     Subroutines / functions called -
@@ -81,9 +81,9 @@ C     21st Jun 1988  KS / AAO.  Modified to support structure arrays.
 C     8th  Mar 1990  KS / AAO.  Structure array element locators were
 C                    being cached with the name of the array not the
 C                    element.  Fixed.
-C     8th  Jan 1992  KS / AAO.  Syntax of include statements changed to 
-C                    remove VMS logical names and to use lower case, to 
-C                    enable compilation on a SUN.  
+C     8th  Jan 1992  KS / AAO.  Syntax of include statements changed to
+C                    remove VMS logical names and to use lower case, to
+C                    enable compilation on a SUN.
 C     24th Jan 1992  KS / AAO. EMS calls added to control error reporting.
 C     14th Oct 1992  HME / UoE, Starlink.  Now use (!) EMS_STATUS in
 C                    call to DAT_FIND.
@@ -158,7 +158,7 @@ C
          END IF
          IF (STRUC.AND.(ACTDIM.GT.0)) THEN
 C
-C           It is a structure array.  Now, we have to look to see if NAME 
+C           It is a structure array.  Now, we have to look to see if NAME
 C           actually contained dimension info for the final element.
 C           If so, we get the locator to the element itself.
 C
@@ -226,9 +226,9 @@ C
             ENDED=.TRUE.
          ELSE
 C
-C           It's OK. Make this the environment, go down one level, and 
-C           look for the next component in the object name.  Note that 
-C           LEV will always be at least 2 at this point, so LASTC(LEV-1) 
+C           It's OK. Make this the environment, go down one level, and
+C           look for the next component in the object name.  Note that
+C           LEV will always be at least 2 at this point, so LASTC(LEV-1)
 C           is safe.  If dimension info is included in the object name,
 C           we process it but clip it off when we call DAT_FIND.  Note that
 C           the DAT_FIND call may well fail, and so we have to control its
@@ -266,7 +266,7 @@ C              OK, the component exists, so we've got down one more
 C              level.  First of all, see if this new component is an
 C              array, and whether or not that's what we expected. (If
 C              the object name had dimension info included, we check
-C              for a structure array - note that dimension info, even 
+C              for a structure array - note that dimension info, even
 C              if specified in NAME, is not included in OBJNAM for the
 C              final level.)
 C
@@ -280,9 +280,9 @@ C
                END IF
                LNAME=LASTC(LEV)
                IF (STRUC.AND.(ACTDIM.GT.0)) THEN
-C  
+C
 C                 It is a structure array.  Now, what do we want?
-C                 If we're at the bottom level, then whether or not we want 
+C                 If we're at the bottom level, then whether or not we want
 C                 the array itself or the element depends on whether
 C                 NAME contains dimension information for the final element.
 C                 (Note that this is known already, having been determined
@@ -302,7 +302,7 @@ C
                      END IF
                   ELSE
 C
-C                    If we are at up upper level, we must have been 
+C                    If we are at up upper level, we must have been
 C                    given dimension information in NAME.  If not, we
 C                    have an error.
 C
@@ -312,8 +312,8 @@ C
                      END IF
                   END IF
 C
-C                 If it is the specific element we need, we get a locator 
-C                 to that and throw away the original locator.  
+C                 If it is the specific element we need, we get a locator
+C                 to that and throw away the original locator.
 C
                   IF (DIMPTR.GT.0) THEN
                      CALL DAT_CELL(LOC,NDIM,DIMS,ELMLOC,STATUS)
@@ -324,9 +324,9 @@ C
                      END IF
                      LOC=ELMLOC
                   END IF
-               END IF                
+               END IF
 C
-C              Put this component in the name cache, and associate 
+C              Put this component in the name cache, and associate
 C              its locator with a group for annulment later.
 C
                CALL DTA_CACHEN(NAME(:LNAME),LOC,LEV,STATUS)

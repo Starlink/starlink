@@ -13,12 +13,12 @@
 *     CALL KPG1_SAXAT( INDF, COMP, AXIS, LOG, FRAME, STATUS )
 
 *  Description:
-*     This routine sets the Symbol, Units and Label attributes of a 
-*     specified axis in an AST Frame so that they describe the values 
-*     in a specified array component of an NDF. The Symbol is set to 
-*     the name of the NDF array component (note, this is short and has 
-*     no spaces so that it can be used as a column name in a catalogue), 
-*     the Label is set to the NDF Label component, and Units is set to 
+*     This routine sets the Symbol, Units and Label attributes of a
+*     specified axis in an AST Frame so that they describe the values
+*     in a specified array component of an NDF. The Symbol is set to
+*     the name of the NDF array component (note, this is short and has
+*     no spaces so that it can be used as a column name in a catalogue),
+*     the Label is set to the NDF Label component, and Units is set to
 *     the NDF Units component.
 
 *  Arguments:
@@ -31,9 +31,9 @@
 *     LOG = LOGICAL (Given)
 *        If .TRUE., then the attribute values are modified so that they
 *        are appropriate for a logarithmic axis. The modified attribute
-*        values are of the form "Log10(...)" where "..." is the 
+*        values are of the form "Log10(...)" where "..." is the
 *        attribute value used for non-logarithmic axes. PGPLOT escape
-*        characters are included in the attribute values to produce a 
+*        characters are included in the attribute values to produce a
 *        sub-scripted "10".
 *     FRAME = INTEGER (Given)
 *        The identifier for the AST Frame to be modified.
@@ -49,12 +49,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,7 +88,7 @@
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
 *  needed.
-      PARAMETER( BCKSLH = '\\' )    
+      PARAMETER( BCKSLH = '\\' )
 
 *  Arguments Given:
       INTEGER INDF
@@ -134,7 +134,7 @@
       CALL CHR_PUTI( AXIS, SATT, IAT )
       CALL CHR_APPND( ')', SATT, IAT )
 
-*  Get the Units component from the NDF (and square them if dealing with 
+*  Get the Units component from the NDF (and square them if dealing with
 *  variance).
       UNITS = ' '
       CALL KPG1_DAUNI( INDF, COMP, UNITS, NCU, STATUS )
@@ -143,27 +143,27 @@
       LAB = ' '
       CALL NDF_CGET( INDF, 'LABEL', LAB, STATUS )
 
-*  If the label is blank, use the name of the NDF array component 
+*  If the label is blank, use the name of the NDF array component
 *  followed by " value" instead.
       IF( LAB .EQ. ' ' ) THEN
          LAB = COMP
          IAT = CHR_LEN( LAB )
          CALL CHR_APPND( ' value', LAB, IAT )
 
-*  Otherwise, if the array component is Variance or Quality, append the 
+*  Otherwise, if the array component is Variance or Quality, append the
 *  array component name to the end of the label.
       ELSE
          IAT = CHR_LEN( LAB )
 
-         IF( COMP( 1 : 1 ) .EQ. 'v' .OR. 
+         IF( COMP( 1 : 1 ) .EQ. 'v' .OR.
      :       COMP( 1 : 1 ) .EQ. 'V' ) THEN
             CALL CHR_APPND( ' variance', LAB, IAT )
 
-         ELSE IF( COMP( 1 : 1 ) .EQ. 'e' .OR. 
+         ELSE IF( COMP( 1 : 1 ) .EQ. 'e' .OR.
      :       COMP( 1 : 1 ) .EQ. 'E' ) THEN
             CALL CHR_APPND( ' error', LAB, IAT )
 
-         ELSE IF( COMP( 1 : 1 ) .EQ. 'q' .OR. 
+         ELSE IF( COMP( 1 : 1 ) .EQ. 'q' .OR.
      :            COMP( 1 : 1 ) .EQ. 'Q' ) THEN
             CALL CHR_APPND( ' quality', LAB, IAT )
 
@@ -183,7 +183,7 @@
          CALL CHR_APPND( ')', TEXT, IAT )
          CALL AST_SETC( FRAME, SATT, TEXT( : IAT ), STATUS )
 
-*  The Label is "Log10(label)". 
+*  The Label is "Log10(label)".
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
@@ -191,11 +191,11 @@
          CALL CHR_APPND( ')', TEXT, IAT )
          CALL AST_SETC( FRAME, LATT, TEXT( : IAT ), STATUS )
 
-*  The Units string (if not blank) is "Log10(units)". 
+*  The Units string (if not blank) is "Log10(units)".
          IF( UNITS .NE. ' ' ) THEN
             TEXT = ' '
             IAT = 0
-            CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, 
+            CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT,
      :                      IAT )
             CALL CHR_APPND( UNITS, TEXT, IAT )
             CALL CHR_APPND( ')', TEXT, IAT )

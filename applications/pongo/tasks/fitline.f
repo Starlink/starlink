@@ -43,12 +43,12 @@
 *        TRUE is used.
 *     XMIN = _REAL (Read)
 *        The minimum X value to be used in the fit.
-*        
+*
 *        The value of the global parameter PONGO_XMIN is used. If
 *        PONGO_XMIN is not defined, the default value 0.0 is used.
 *     XMAX = _REAL (Read)
 *        The maximum X value to be used in the fit.
-*        
+*
 *        The value of the global parameter PONGO_XMAX is used. If
 *        PONGO_XMAX is not defined, the default value 1.0 is used.
 
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -100,7 +100,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       LOGICAL WEIGHT             ! Whether weighted fit is required
 
@@ -132,7 +132,7 @@
       CALL PAR_GET0R( 'XMAX', XMAXP, STATUS )
       CALL PAR_GET0I( 'COLOUR', COLIDX, STATUS )
       CALL PAR_GET0L( 'WEIGHT', WEIGHT, STATUS )
-      
+
 *  Check the inherited status and act.
       IF ( STATUS .EQ. SAI__OK ) THEN
          WTMODE = 0
@@ -145,7 +145,7 @@
 
 *  Cannot use wieghted fit mode, inform the user that no error
 *  data exist.
-               CALL MSG_OUT( ' ', 
+               CALL MSG_OUT( ' ',
      :                       'No error data available, using ' //
      :                       'uniform weight.',
      :                       STATUS)
@@ -161,7 +161,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Plot the best fit line.
-            IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN 
+            IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN
                CALL PGMOVE( XMINP, INTCPT + SLOPE * XMINP )
                CALL PGQCI( COLSAV )
                CALL PGSCI( COLIDX )
@@ -171,7 +171,7 @@
                CALL MSG_OUT( ' ', 'Unable to plot results -- device ' //
      :                            'not opened', STATUS )
             END IF
-               
+
 *  Report the statistics.
             CALL PON_SHOLINE( XMINP, XMAXP, YMIN, YMAX, NDAT, WEIGHT,
      :                        XMEAN, YMEAN, XSIG, YSIG, INTCPT, SLOPE,

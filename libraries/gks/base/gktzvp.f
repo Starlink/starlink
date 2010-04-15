@@ -3,7 +3,7 @@ C# IL>=a, OL>=0
 *
 * (C) COPYRIGHT ICL & SERC  1984
 *
- 
+
 *---------------------------------------------------------------------
 *
 *  RUTHERFORD / ICL GKS SYSTEM
@@ -287,7 +287,7 @@ C# IL>=a, OL>=0
          IF(FINAL)GOTO 131
   130 CONTINUE
   131 CONTINUE
- 
+
 *     Remove top peak if both its edges are identical.
       DO 200 J0=1,NV/2
          JEA(1) = JETNXT(0)
@@ -301,7 +301,7 @@ C# IL>=a, OL>=0
          ENDIF
   200 CONTINUE
   201 CONTINUE
- 
+
   999 CONTINUE
- 
+
          END

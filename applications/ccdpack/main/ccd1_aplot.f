@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine creates an AST Plot object from an AST FrameSet,
-*     optionally (according to the value of the USEPIC argument) 
+*     optionally (according to the value of the USEPIC argument)
 *     aligning it with an existing picture in the AGI database.
-*     This will only work if a WCS component has been stored in 
+*     This will only work if a WCS component has been stored in
 *     the MORE.AST_PLOT component of the AGI picture (i.e. TRANSFORM
 *     components are not handled).
 *
@@ -24,7 +24,7 @@
 *     corresponds to millimetres from the bottom left corner of the
 *     plotting surface.  A new BASEPIC and CURPIC frame will also
 *     be added unless they are already present.  The Current frame
-*     of the returned Plot will be inherited from the supplied 
+*     of the returned Plot will be inherited from the supplied
 *     Frameset.
 
 *  Arguments:
@@ -37,18 +37,18 @@
 *        USEPIC is true.
 *     USEPIC = LOGICAL (Given)
 *        If true an attempt will be made to construct the returned Plot
-*        using the AST information associated with the AGI picture 
+*        using the AST information associated with the AGI picture
 *        identified by PICID.
 *     PLOT = INTEGER (Returned)
 *        An AST Plot object which can be used to plot on the underlying
-*        PGPLOT plotting surface.  If USEPIC is false, it will be a 
+*        PGPLOT plotting surface.  If USEPIC is false, it will be a
 *        copy of FSET turned into a plot by adding a suitable Base frame.
-*        If USEPIC is true and it is possible to retrieve an AST 
-*        frameset from the .MORE.AST_PLOT, component of the AGI 
-*        picture identified by PICID it will be a copy of FSET joined 
-*        with that frameset.  In any case, the Current frame of PLOT 
-*        will be the same as the Current frame of FSET, and frames in 
-*        PLOT will be in the same order as they were in FSET, though 
+*        If USEPIC is true and it is possible to retrieve an AST
+*        frameset from the .MORE.AST_PLOT, component of the AGI
+*        picture identified by PICID it will be a copy of FSET joined
+*        with that frameset.  In any case, the Current frame of PLOT
+*        will be the same as the Current frame of FSET, and frames in
+*        PLOT will be in the same order as they were in FSET, though
 *        the frame indices may not be the same.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -94,15 +94,15 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
-      
+
 *  Arguments Given:
       INTEGER FSET
       INTEGER PICID
       LOGICAL USEPIC
-      
+
 *  Arguments Returned:
       INTEGER PLOT
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -150,7 +150,7 @@
 *  Begin a new AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Get the PGPLOT viewport in millimeters and ensure that the current 
+*  Get the PGPLOT viewport in millimeters and ensure that the current
 *  plotting window corresponds to this.  This is the coordinate system
 *  which is used by the Base (GRAPHICS) frame in the plot.
       CALL PGQWIN( RBBOX( 1 ), RBBOX( 3 ), RBBOX( 2 ), RBBOX( 4 ) )
@@ -171,7 +171,7 @@
 
 *  Attempt to get a locator to the MORE.AST_PLOT component.
             CALL DAT_THERE( MORLOC, 'AST_PLOT', THERE, STATUS )
-            IF ( THERE .AND. STATUS .EQ. SAI__OK ) THEN 
+            IF ( THERE .AND. STATUS .EQ. SAI__OK ) THEN
                CALL DAT_FIND( MORLOC, 'AST_PLOT', APLOC, STATUS )
 
 *  Attempt to get a locator to the MORE.AST_PLOT.DATA component.
@@ -193,7 +193,7 @@
 *  Read an object from the Channel, thus transferring the data.
                      PLOT = AST_READ( CHAN, STATUS )
 
-*  If we have successfully retrieved a Plot object, we can now attempt 
+*  If we have successfully retrieved a Plot object, we can now attempt
 *  to attach the supplied Frameset to it.
                      IF ( AST_ISAPLOT( PLOT, STATUS )
      :                    .AND. STATUS .EQ. SAI__OK ) THEN
@@ -202,7 +202,7 @@
                         DMN = AST_GETC( FSET, 'Domain', STATUS )
 
 *  Assemble a list of domains in which to seek alignment.
-                        IAT = 0 
+                        IAT = 0
                         IF ( DMN .NE. ' ' ) THEN
                            CALL CHR_APPND( DMN, DMNLST, IAT )
                            CALL CHR_APPND( ',', DMNLST, IAT )
@@ -210,7 +210,7 @@
                         CALL CHR_APPND( 'SKY,PIXEL,GRID,AGI_WORLD,',
      :                                  DMNLST, IAT )
 
-*  Store information about the framesets which will be messed up by 
+*  Store information about the framesets which will be messed up by
 *  subsequent calls.
                         JBASF = AST_GETI( FSET, 'Base', STATUS )
                         JCURF = AST_GETI( FSET, 'Current', STATUS )
@@ -227,7 +227,7 @@
                         MATFRM = AST_GETFRAME( FSET, AST__BASE, STATUS )
                         MATDMN = AST_GETC( MATFRM, 'Domain', STATUS )
 
-*  Reset the Base and Current frames of the framesets modified by 
+*  Reset the Base and Current frames of the framesets modified by
 *  AST_CONVERT.
                         CALL AST_SETI( PLOT, 'Base', JBASP, STATUS )
                         CALL AST_SETI( FSET, 'Base', JBASF, STATUS )
@@ -250,7 +250,7 @@
 *  Release the .MORE locator.
             CALL DAT_ANNUL( MORLOC, STATUS )
          END IF
-            
+
 *  If all is well, inform the user in which domain the alignment was
 *  achieved.
          IF ( STATUS .EQ. SAI__OK .AND. PLOT .NE. AST__NULL ) THEN
@@ -268,7 +268,7 @@
      :         STATUS )
          END IF
 
-*  If no interaction with AGI was requested, construct a default Plot 
+*  If no interaction with AGI was requested, construct a default Plot
 *  instead using the supplied frameset as a basis.
       ELSE
          PLOT = AST_PLOT( FSET, GBOX, BBOX, ' ', STATUS )
@@ -300,18 +300,18 @@
 
 *  We now find the bounds of the view surface in BASEPIC co-ordinates (i.e.
 *  co-ordinates normalised so that the shorter axis has length 1.0).
-         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT.
      :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) /
      :                        ABS( BX( 4 ) - BX( 2 ) ) )
             OUTB( 2 ) = 1.0D0
          ELSE
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
             OUTB( 1 ) = 1.0D0
-            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) /
      :                        ABS( BX( 3 ) - BX( 1 ) ) )
          END IF
 
@@ -353,18 +353,18 @@
 
 *  We now find the bounds of the current window in CURPIC co-ordinates (i.e.
 *  co-ordinates normalised so that the shorter axis has length 1.0).
-         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT.
      :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) /
      :                        ABS( BX( 4 ) - BX( 2 ) ) )
             OUTB( 2 ) = 1.0D0
          ELSE
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
             OUTB( 1 ) = 1.0D0
-            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) /
      :                        ABS( BX( 3 ) - BX( 1 ) ) )
          END IF
 

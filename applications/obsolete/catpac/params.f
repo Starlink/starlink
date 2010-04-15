@@ -44,7 +44,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -85,7 +85,7 @@
            call msg_setc('catname',incat)
            call msg_seti('nump',numparams)
            call msg_out('message 1','There are ^nump parameters in the
-     : ^catname catalogue', status) 
+     : ^catname catalogue', status)
            call msg_out('message 2','The parameters are ',status)
            do icount = 1, numparams
              call msg_setc('parname',paramnames(icount))
@@ -93,7 +93,7 @@
            enddo
          elseif (status .eq. CHP__CATNOTFND) then
            call msg_setc('catname',incat)
-           call err_rep('message 3','The catalogue ^catname could not 
+           call err_rep('message 3','The catalogue ^catname could not
      : be found.', status)
          else
            call err_rep('message 4','An unidentified error ocurred in

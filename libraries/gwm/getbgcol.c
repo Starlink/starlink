@@ -46,12 +46,12 @@ int GWM_GetBgCol( Display *display, Window win_id, char **bg)
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,10 +76,10 @@ int GWM_GetBgCol( Display *display, Window win_id, char **bg)
     int actual_format;
     char *local_bg;
     unsigned long nitems, bytes_after;
-        
-/*	  
+
+/*
 **  Background Colour
-*/	  
+*/
     atom = XInternAtom(display, "GWM_background", False );
     if (!atom) return GWM_NO_BACKGROUND;
 
@@ -87,7 +87,7 @@ int GWM_GetBgCol( Display *display, Window win_id, char **bg)
 	XA_STRING, &actual_type, &actual_format, &nitems, &bytes_after,
 	(unsigned char**)(&local_bg));
     if ( status != Success || nitems == 0) return GWM_NO_BACKGROUND;
-    
+
     *bg = local_bg;
     return GWM_SUCCESS;
 }

@@ -1,9 +1,9 @@
 *
 * This file contains grim looking code for replacing some NAG routines
-* The main ones are 
+* The main ones are
 *
 * double precision function dsi (x) = integral sin(x)/x
-* 
+*
 * TRM @soton 1/09/97
 
       double precision function dsi (x)
@@ -808,7 +808,7 @@ c
 c
       return
       end
-      
+
       subroutine fdump()
 
       iwunit=i1mach(4)

@@ -142,7 +142,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -181,7 +181,7 @@
       INTEGER UBND( MAXDIM )     ! NDF dimensions
       INTEGER XPTR1              ! Pointer to IN spectroscopic values
       INTEGER XPTR, DPTR, EPTR   ! Pointers to OUT centres, data, vars
-      INTEGER EMXPTR, EMNPTR     ! Pointers to max, min variances. 
+      INTEGER EMXPTR, EMNPTR     ! Pointers to max, min variances.
       REAL UNFACT                ! Logarithm of unit conversion factor
       CHARACTER * ( 64 ) LABEL   ! Axis label
       CHARACTER * ( 64 ) UNITS   ! Axis unit
@@ -305,7 +305,7 @@
 * If a temperature error is given, work out the maximum and minimum
 * intensity values and then calculate the average errors on these
 * intensities and convert to variance.
-      IF (ERRFLG) THEN 
+      IF (ERRFLG) THEN
 
 *    Create temporary arrays for the maximum and minimum variances.
         CALL PSX_CALLOC( NELM, '_REAL', EMXPTR, STATUS)
@@ -324,7 +324,7 @@
      :                 %VAL( CNF_PVAL(EMNPTR) ), STATUS )
 
 *    Calculate the variance from the maximum and minimum spectra.
-        CALL SPD_ERTMP( NELM, %VAL(CNF_PVAL(DPTR)), 
+        CALL SPD_ERTMP( NELM, %VAL(CNF_PVAL(DPTR)),
      :                  %VAL(CNF_PVAL(EMXPTR)), %VAL(CNF_PVAL(EMNPTR)),
      :                  %VAL(CNF_PVAL(EPTR)), STATUS )
 
@@ -332,7 +332,7 @@
         CALL PSX_FREE( EMXPTR, STATUS )
         CALL PSX_FREE( EMNPTR, STATUS )
       END IF
-      
+
 *  Close down.
 
  500  CONTINUE

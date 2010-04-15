@@ -96,7 +96,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -252,12 +252,12 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -495,13 +495,13 @@ The construction and properties of optical fibres are beyond the scope
 of this cookbook; for details see the reviews by Barden\cite{BARDEN98},
 Heacox and Connes\cite{HEACOX92} and Nelson\cite{NELSON88}.  Of course,
 the major uses of optical fibres are outside astronomy.  For an
-accessible introduction to these wider uses see 
+accessible introduction to these wider uses see
 \htmladdnormallink{Hecht's}{http://www.sff.net/people/Jeff.Hecht/}
 \htmladdnormallink{{\it Understanding Fiber Optics}}
-{http://www.sff.net/people/jeff.hecht/UFO.html}\/\cite{HECHT98} 
-and for the 
+{http://www.sff.net/people/jeff.hecht/UFO.html}\/\cite{HECHT98}
+and for the
 \htmladdnormallink{history}{http://www.sff.net/people/Jeff.Hecht/history.html}
-of the subject see his 
+of the subject see his
 \htmladdnormallink{{\it City of Light}}
 {http://www.sff.net/people/Jeff.Hecht/City.html}\/\cite{HECHT99}.
 If you do read any non-astronomical literature about optical fibres
@@ -568,7 +568,7 @@ of the CCD see dispersed light from the target object and neighbouring
 columns see dispersed light from the night sky adjacent to the object.
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=4in]{sc14_spectrograph.ps}
    \begin{quote}
    \caption{Schematic of a traditional astronomical slit spectrograph
@@ -596,7 +596,7 @@ rows and occupying a distinct, separated range of columns.  In essence
 the operation of a fibre-fed spectrograph is as simple as that.
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=4in]{sc14_bundle.ps}
    \begin{quote}
    \caption[Fibre bundle for a fibre-fed spectrograph]{Fibre bundle
@@ -778,10 +778,10 @@ yourself.
 \subsection{Aperture definition or tramlining}
 
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=5in]{sc14_objframe.ps}
    \begin{quote}
-   \caption[CCD frame of target object spectra acquired with 
+   \caption[CCD frame of target object spectra acquired with
     WYFFOS/AUTOFIB2]{CCD frame containing spectra of target objects
     observed with the WYFFOS/AUTOFIB2 fibre spectrograph on the WHT.
     Each horizontal line is an individual spectrum obtained through a
@@ -859,7 +859,7 @@ The remaining two aspects are described below.
 
 \pagebreak
 \begin{figure}[htbp]
-   \centering 
+   \centering
    \includegraphics[totalheight=4in]{sc14_spslice.ps}
    \begin{quote}
    \caption[A slice across a spectrum]{A slice across a spectrum.
@@ -911,7 +911,7 @@ weight to high signal-to-noise pixels close to the centre of the
 spectrum and lower weight to lower signal-to-noise pixels close to the
 edge (see Figure~\ref{SPSLICE}).  Optimal extraction offers significant
 advantages for faint, noisy spectra and does no harm for less noisy,
-well-exposed spectra.  Extraction is discussed further in 
+well-exposed spectra.  Extraction is discussed further in
 \xref{SC/7, Section 4.6}{sc7}{extraction}.
 
 \subsection{\label{SCATTER}Scattered light correction}
@@ -1287,7 +1287,7 @@ AAO.  It includes the following facilities: bias and dark subtraction,
 tram-line mapping of the spectra from individual fibres on the CCD and
 their extraction, arc identification, wavelength calibration, fibre
 throughput calibration and sky subtraction.  The 2dF data reduction
-software is comprehensively documented in the 
+software is comprehensively documented in the
 \htmladdnormallink{ {\it 2dF User Manual}\/}
 {http://www.aao.gov.au/2df/manual.html}\cite{BAILEY97}.
 The software is mostly written in Fortran and uses various Starlink
@@ -1350,7 +1350,7 @@ data; see Section~\ref{IRAFIBSP} for details.
 \subsection{\label{WYFFOS_I}WYFFOS/AUTOFIB2}
 
 The 4.2m William Herschel Telescope (WHT) has a prime-focus corrector
-and associated 
+and associated
 \newline atmospheric-dispersion compensator with a one degree
 field of view.  The WYFFOS/AUTOFIB2 system exploits this field of
 view with up to about 150 fibres.  WYFFOS and AUTOFIB2 are separate
@@ -1471,7 +1471,7 @@ Section~\ref{FLAIR} is an example of reducing FLAIR observations with {\tt
 dofibers}.  FLAIR data can also be reduced using the Starlink packages
 Figaro (see \xref{SUN/86}{sun86}{}\cite{SUN86}),
 CCDPACK (see \xref{SUN/139}{sun139}{}\cite{SUN139}) and
-KAPPA (see \xref{SUN/95}{sun95}{}\cite{SUN95}), 
+KAPPA (see \xref{SUN/95}{sun95}{}\cite{SUN95}),
 though this is unusual.
 
 \subsection{Additional software}
@@ -1521,7 +1521,7 @@ the special-purpose packages for reducing WYFFOS/AUTOFIB2 and FLAIR
 data (see Section~\ref{WYFFOS_S} and \ref{FLAIR_S} respectively),
 which themselves use {\tt dofibers}, are optional IRAF packages.
 
-The use of IRAF on Starlink systems is described in 
+The use of IRAF on Starlink systems is described in
 \xref{SG/12: {\it An Introduction to IRAF}}{sg12}{}\/\cite{SG12}.
 If you are not familiar with IRAF this document is a convenient
 introduction.  Another useful document is {\it A Beginner's Guide to
@@ -1606,7 +1606,7 @@ proceed if you know only approximate coordinates which are
 insufficiently accurate to position the fibres.
 
 If your objects are included in one of the general-purpose on-line object
-databases, such as 
+databases, such as
 \htmladdnormallink{SIMBAD}{http://simbad.u-strasbg.fr/Simbad}
 for Galactic objects or
 \htmladdnormallink{NED}{http://nedwww.ipac.caltech.edu/}
@@ -1632,9 +1632,9 @@ O and E survey plates and covers most of the northern sky to within
 the UKST J and SES R  surveys.  Compilation of the catalogue is still in
 progress and data are added as they become available.  Further details
 of the catalogues and instructions on how to extract lists of target
-objects can be found on the Web pages of the 
+objects can be found on the Web pages of the
 \htmladdnormallink{Astronomy Survey Unit}
-{http://www.ast.cam.ac.uk/\~{}mike/casu/} at the 
+{http://www.ast.cam.ac.uk/\~{}mike/casu/} at the
 \htmladdnormallink{Institute of Astronomy}{http://www.ast.cam.ac.uk/},
 Cambridge.  See URL:
 
@@ -1721,7 +1721,7 @@ and is not really a direct alternative.  A low dispersion prism (or
 a grating) is placed in front of the telescope objective and produces
 low resolution spectra in the focal surface of all the objects in the
 field of view.  The technique has been used for many years, mostly in
-conjunction with Schmidt telescopes.  Because spectra are produced 
+conjunction with Schmidt telescopes.  Because spectra are produced
 throughout the field of view, which is typically large for Schmidt
 telescopes, the images are usually recorded on photographic plates.
 A good-quality low dispersion prism plate obtained with the UKST might
@@ -1752,7 +1752,7 @@ analogous to preparing a plug plate in fibre spectroscopy.
 
 The advantages of multi-slit spectroscopy are that it has all the
 accuracy and capabilities of single-slit spectroscopy.  It is
-feasible to carry out flux calibration.  Accurate sky subtraction 
+feasible to carry out flux calibration.  Accurate sky subtraction
 is certainly easier and perhaps more accurate (though the arguments
 are not simple; see Section~\ref{SKYSUB} above and Wyse and
 Gilmore\cite{WYSE92}).  Also there are no throughput losses associated
@@ -2217,23 +2217,23 @@ rawflair0024.imh[420,578][short]: Bias
 
   \begin{quote}
   \begin{verbatim}
-# 
+#
 # Summary of AutoFred fibre placement.  Date 06/29/98  Time 16:2
 # Field 454. For F/88 Smartt et al
-# 
+#
 # Fibred-up by S.Smartt
-# 
+#
 # 29/6/98
-1 1 0 
-2 1 12 
-3 1 0 
-4 1 1 
-5 1 0 
-6 1 5 
-7 1 0 
-8 0 999 
-9 1 0 
-10 1 18 
+1 1 0
+2 1 12
+3 1 0
+4 1 1
+5 1 0
+6 1 5
+7 1 0
+8 0 999
+9 1 0
+10 1 18
    .
    .
 \end{verbatim}
@@ -2553,10 +2553,10 @@ Dispersion correct arc arcapid.t.ms: w1 = 3893.338768145233, w2 = 4729.910906658
   \end{quote}
 
    A plot similar to Figure~\ref{FLAIR_OBJECT} should appear.
-   The axis ranges are adjusted in the usual way.  Use {\tt )} and 
+   The axis ranges are adjusted in the usual way.  Use {\tt )} and
    {\tt (} to step through the spectra (forwards and backwards
    respectively).  When you have finished inspecting the spectra type
-   {\tt q} to quit.  
+   {\tt q} to quit.
 
   \begin{figure}[htbp]
      \centering
@@ -2673,7 +2673,7 @@ The procedure to use 2dFDR is as follows.
      \end{quote}
   \end{figure}
 
-  \item Click on the {\sf Commands} menu (the rightmost of the three 
+  \item Click on the {\sf Commands} menu (the rightmost of the three
    items in the menu bar in the top left of the window) and
    select the {\sf Find Fibres\ldots} option.  A window similar to
    Figure~\ref{2DF_FIND_FIBRES} should appear.  You need to select a
@@ -2833,7 +2833,7 @@ Any mistakes, of course, are my own.
 
 % \section{References}
 
-%  \bibitem{ } 
+%  \bibitem{ }
 
 \newpage
 \addcontentsline{toc}{section}{References}
@@ -2899,7 +2899,7 @@ Any mistakes, of course, are my own.
    D.S.~Berry and A.C.~Davenhall, 1998, \xref{SUN/55.10}{sun55}{}:
    {\it CONVERT -- A Format-conversion Package}\, (Starlink).
 
-  \bibitem{SUN190} A.C.~Davenhall, 1998, \xref{SUN/190.6}{sun190}{}: 
+  \bibitem{SUN190} A.C.~Davenhall, 1998, \xref{SUN/190.6}{sun190}{}:
    {\it CURSA -- Catalogue and Table Manipulation Applications}\, (Starlink).
 
   \bibitem{SC5} A.C.~Davenhall, G.J.~Privett and M.B.~Taylor, 1999,
@@ -2919,7 +2919,7 @@ Any mistakes, of course, are my own.
   \bibitem{HEACOX92} W.D.~Heacox and P.~Connes, 1992, {\it Astron.
    Astrophys. Rev}, {\bf 3}, pp169-199.
 
-  \bibitem{HECHT98} J.Hecht, 1998, 
+  \bibitem{HECHT98} J.Hecht, 1998,
    \htmladdnormallink{{\it Understanding Fiber Optics}}
    {http://www.sff.net/people/jeff.hecht/UFO.html},
    (Prentice Hall: Saddle River, New Jersey).
@@ -2981,7 +2981,7 @@ Any mistakes, of course, are my own.
   \bibitem{PARKER97B} Q.A.~Parker and M.~Hartley, 1997, in Kontizas {\it
    et al. op. cit.}\/ (\cite{KONTIZAS97}), pp17-23.
 
-  \bibitem{PARKER98} Q.A.~Parker, F.G.~Watson and S.~Miziarski, 1998, in 
+  \bibitem{PARKER98} Q.A.~Parker, F.G.~Watson and S.~Miziarski, 1998, in
    Arribas {\it et al. op. cit.}\/ (\cite{ARRIBAS98}), pp80-91.
 
   \bibitem{PARRY97} I.R.~Parry, 1997, in Kontizas {\it et al. op. cit.}\/

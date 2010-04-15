@@ -49,13 +49,13 @@
 *     character to integer the single value and use for the upper
 *     and lower limits.
 *     - If there is a separator and the wildcard comes before it set
-*     the lower limit to the minimum integer and convert the upper 
+*     the lower limit to the minimum integer and convert the upper
 *     limit.
-*     - If there is a separator and the wildcard comes after it set the 
-*     upper limit to the largest positive integer and convert the lower 
+*     - If there is a separator and the wildcard comes after it set the
+*     upper limit to the largest positive integer and convert the lower
 *     limit.
 *     - If there is a separator and no wildcard determine the first and
-*     last numbers either side of the separator by type conversion.  If 
+*     last numbers either side of the separator by type conversion.  If
 *     the first is greater than the last then swap them.
 
 *  Copyright:
@@ -69,12 +69,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -157,7 +157,7 @@
          IF ( NSEP .EQ. 0 ) THEN
             IF ( WILD .EQ. 0 ) THEN
 
-*  Convert the string to an integer.  Upper and lower limits are 
+*  Convert the string to an integer.  Upper and lower limits are
 *  identical.
                CALL CHR_CTOI( NOS, FIRST, STATUS )
                IF ( STATUS .EQ. SAI__OK ) LAST = FIRST
@@ -180,10 +180,10 @@
 
 *  Extract the last number.
                CALL CHR_CTOI( NOS( NSEP+1: ), LAST, STATUS )
-      
+
 *  Does it have a wildcard after the delimiter?
             ELSE IF ( WILD .GE. NSEP + 1 ) THEN
-              
+
 *  Extract the first number.
                CALL CHR_CTOI( NOS( :NSEP-1 ), FIRST, STATUS )
 

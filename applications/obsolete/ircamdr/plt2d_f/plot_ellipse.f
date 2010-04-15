@@ -111,7 +111,7 @@
 
 * plot ELLIPSE
 
-	CALL SGS_ELLIPS( XPOS, YPOS, 
+	CALL SGS_ELLIPS( XPOS, YPOS,
      :	                 ELLIPSE_MAJOR*MAGNIF/2.0/ARCSEC_PIXEL,
      :	                 ELLIPSE_ECC, ELLIPSE_ANG)
 

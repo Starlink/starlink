@@ -1,18 +1,18 @@
 *+  CHI_APELM - Parse expression as an element or a constant.
       subroutine chi_apelm( expression, ed, status)
-*    Description : 
+*    Description :
 *     Parse an expression as an element or a constant.
 *    Invocation
 *     CALL CHI_APELM( EXPRESSION, ED, STATUS)
-*    Parameters : 
+*    Parameters :
 *     EXPRESSION=CHARACTER(INPUT)
 *           The element expression (fieldname)
 *     ED=INTEGER(OUTPUT)
 *           The element descriptor
 *     STATUS=INTEGER(UPDATE)
 *           Status variable
-*    Method : 
-*     Look up the field name in the catalogue.  
+*    Method :
+*     Look up the field name in the catalogue.
 *     If it does not exist then
 *        Look up the element in the other catalogues that are open
 *        assuming that the fieldname is prefixed
@@ -20,19 +20,19 @@
 *           Get a free element descriptor from the top of table
 *           Remove any units (delimited in square brackets [])
 *           Decode the string as a FORTRAN constant
-*           Define the expression as a temporary parameter 
+*           Define the expression as a temporary parameter
 *        Endif
 *     Endif
-*    Authors : 
+*    Authors :
 *     Jon Fairclough (RAL::IPMAF)
 *     Esther Gurney (IPMAF::EJG)
 *     Alan Wood (STADAT::ARW)
-*    History : 
+*    History :
 *     2-Feb-1992: Original
-*    Type Definitions : 
-      implicit none 
-*    Global constants : 
-      include 'sae_par'                 ! SAI Symbolic Constants 
+*    Type Definitions :
+      implicit none
+*    Global constants :
+      include 'sae_par'                 ! SAI Symbolic Constants
       include 'chi_par'
       include 'chipar_par'
       include 'chipar1_par'
@@ -41,8 +41,8 @@
       character*(*) expression
 *    Export
       integer ed
-*    Status : 
-      integer status 
+*    Status :
+      integer status
 *    External references
       integer chr_len
       integer chi_atype
@@ -57,7 +57,7 @@
       integer Cname_len
       character*(CHI__SZTYP) ctype
       character*(CHI__SZCNAME) fname1, fname2
-*- 
+*-
 *    Begin
 *
       if (status .ne. SAI__OK) then
@@ -91,12 +91,12 @@
          l1 = chr_len (expression)
          Eunit(ed) = ' '
 *             Decode the string
-         call chi_adecode(expression(:l1), ctype, width, 
+         call chi_adecode(expression(:l1), ctype, width,
      :                         Eformt(ed), Enull(ed), status)
          Etype(ed)= chi_atype(ctype,status)
          Ename(ed) = expression
 *         Eformt(ed) = Enfrmt(ed)
-         Ecomnt(ed) = 'CONSTANT'  ! Unique tag ? 
+         Ecomnt(ed) = 'CONSTANT'  ! Unique tag ?
       endif
 *
       end

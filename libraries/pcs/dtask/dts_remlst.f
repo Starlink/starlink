@@ -106,7 +106,7 @@
       FOUND = .FALSE.
       DONE = .FALSE.
 
-      DO WHILE ( ( .NOT. FOUND ) .AND. ( .NOT. DONE ) .AND. 
+      DO WHILE ( ( .NOT. FOUND ) .AND. ( .NOT. DONE ) .AND.
      :  ( NACTS .GT. 0 ) )
          IF ( ACTNAME(N) .EQ. NAME ) THEN
             FOUND = .TRUE.

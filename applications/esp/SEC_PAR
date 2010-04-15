@@ -30,7 +30,7 @@
 
 *  Global constants:
 
-*  The maximum size of the results arrays. 
+*  The maximum size of the results arrays.
       INTEGER SEC__RESUL
       PARAMETER ( SEC__RESUL = 4096 )
 
@@ -38,7 +38,7 @@
       REAL SEC__PIVAL
       PARAMETER ( SEC__PIVAL = 3.1415926 )
 
-*  The value of the geometric constant needed to convert radians to 
+*  The value of the geometric constant needed to convert radians to
 *  degrees format.
       REAL SEC__RADS
       PARAMETER ( SEC__RADS = 1./2./SEC__PIVAL*360. )

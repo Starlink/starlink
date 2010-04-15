@@ -13,11 +13,11 @@
 *     CALL ARY1_DSCL( IDCB, STATUS )
 
 *  Description:
-*     The routine ensures that values are available for the scale factor 
-*     and zero offset associated an entry in the DCB. The routine does 
-*     nothing if this information is already available. Otherwise, it 
-*     obtains the information by inspecting the data object itself and 
-*     stores the results in the DCB. Only those checks necessary to obtain 
+*     The routine ensures that values are available for the scale factor
+*     and zero offset associated an entry in the DCB. The routine does
+*     nothing if this information is already available. Otherwise, it
+*     obtains the information by inspecting the data object itself and
+*     stores the results in the DCB. Only those checks necessary to obtain
 *     the scaling information are performed on the data object.
 
 *  Arguments:
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -59,7 +59,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,7 +111,7 @@
          IF ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  Create a temporary HDS structure to hold the scale and zero terms in
-*  their original data type. 
+*  their original data type.
             CALL DAT_TEMP( 'SCZR', 0, 0, DCB_SCLOC( IDCB ), STATUS )
 
 *  See if there is a SCALE component present in the data object
@@ -177,7 +177,7 @@
 
 9999     CONTINUE
       END IF
-       
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DSCL', STATUS )
 

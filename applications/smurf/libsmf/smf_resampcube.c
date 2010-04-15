@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, 
-*                     AstMapping *iskymap, AstFrame *ispecfrm, 
-*                     AstMapping *ispecmap, Grp *detgrp, int moving, 
-*                     int slbnd[ 3 ], int subnd[ 3 ], int interp, 
-*                     const double params[], float *in_data, 
+*     smf_resampcube( smfData *data, AstSkyFrame *abskyfrm,
+*                     AstMapping *iskymap, AstFrame *ispecfrm,
+*                     AstMapping *ispecmap, Grp *detgrp, int moving,
+*                     int slbnd[ 3 ], int subnd[ 3 ], int interp,
+*                     const double params[], float *in_data,
 *                     float *out_data, int *overlap, int *status );
 
 *  Arguments:
@@ -25,25 +25,25 @@
 *        Pointer to the smfData structure describing the template time
 *        series file.
 *     abskyfrm = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe 
+*        A SkyFrame that specifies the coordinate system used to describe
 *        the spatial axes of the input sky cube. This should represent
-*        absolute sky coordinates rather than offsets even if "moving" is 
+*        absolute sky coordinates rather than offsets even if "moving" is
 *        non-zero.
 *     iskymap = AstFrameSet * (Given)
-*        A Mapping from 2D sky coordinates in the sky cube to 2D spatial 
+*        A Mapping from 2D sky coordinates in the sky cube to 2D spatial
 *        grid coordinates in the sky cube.
 *     ispecfrm = AstFrame * (Given)
 *        Pointer to the SpecFrame within the current Frame of the sky
 *        cube's WCS Frameset.
 *     ispecmap = AstMapping * (Given)
-*        Pointer to the Mapping from the SpecFrame to the third GRID axis 
+*        Pointer to the Mapping from the SpecFrame to the third GRID axis
 *        within the current Frame of the sky cube's WCS Frameset.
 *     detgrp = Grp * (Given)
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
 *     moving = int (Given)
-*        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted so that the position specified by 
+*        A flag indicating if the telescope is tracking a moving object. If
+*        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        sky cube.
 *     slbnd = int [ 3 ] (Given)
@@ -52,30 +52,30 @@
 *        The upper pixel index bounds of the sky cube.
 *     interp = int (Given)
 *        Specifies the scheme to be used for interpolating the sky cube data
-*        array to find each output detector sample value. See docs for 
+*        array to find each output detector sample value. See docs for
 *        astResample (SUN/211) for the allowed values.
 *     params = const double[] (Given)
 *        An optional pointer to an array of double which should contain any
-*        additional parameter values required by the interpolation scheme. 
-*        See docs for astResample (SUN/211) for further information. If no 
+*        additional parameter values required by the interpolation scheme.
+*        See docs for astResample (SUN/211) for further information. If no
 *        additional parameters are required, this array is not used and a
-*        NULL pointer may be given. 
+*        NULL pointer may be given.
 *     in_data = float * (Given)
 *        The 3D data array for the input sky cube. If a NULL pointer is
-*        supplied, then "out_data" and "interp" are ignored, but the 
+*        supplied, then "out_data" and "interp" are ignored, but the
 *        "overlap" value is still returned.
 *     out_data = float * (Returned)
 *        The 3D data array for the output time series array. Ignored if
 *        "in_data" is NULL.
 *     overlap = int * (Returned)
 *        Returned non-zero if any spectra in the template fall within the
-*        bounds of the skycube. 
+*        bounds of the skycube.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
 *  Description:
 *     The data array of the supplied sky cube is resampled at the
-*     detector sample positions specified by the input template. The 
+*     detector sample positions specified by the input template. The
 *     resampled values are stored in the output time series cube.
 
 *  Authors:
@@ -131,17 +131,17 @@
 #define FUNC_NAME "smf_resampcube"
 
 void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
-                     AstFrame *ispecfrm, AstMapping *ispecmap, 
-                     Grp *detgrp, int moving, int slbnd[ 3 ], 
-                     int subnd[ 3 ], int interp, const double params[], 
+                     AstFrame *ispecfrm, AstMapping *ispecmap,
+                     Grp *detgrp, int moving, int slbnd[ 3 ],
+                     int subnd[ 3 ], int interp, const double params[],
                      float *in_data, float *out_data, int *overlap,
                      int *status ){
 
 /* Local Variables */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
-   AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */           
+   AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */
    AstFrame *specframe = NULL; /* SpecFrame in input WCS */
-   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
+   AstFrameSet *fs = NULL;     /* WCS FramesSet from input */
    AstMapping *fsmap = NULL;   /* Mapping extracted from FrameSet */
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
    dim_t ndet;                 /* No of detectors in the input */
@@ -184,34 +184,34 @@ void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
 /* Store the total number of elements in the sky cube. */
    nout = nxy*dim[ 2 ];
 
-/* We want a description of the spectral WCS axis in the template. If the 
-   template has a WCS FrameSet containing a SpecFrame, use it, otherwise 
-   we will obtain it from the FITS header later. NOTE, if we knew that all 
-   the templates would have the same spectral axis calibration, then the 
-   spectral WCS need only be obtained from the first template. However, in 
-   the general case, I presume that data files may be combined that use 
-   different spectral axis calibrations, and so these differences need to 
+/* We want a description of the spectral WCS axis in the template. If the
+   template has a WCS FrameSet containing a SpecFrame, use it, otherwise
+   we will obtain it from the FITS header later. NOTE, if we knew that all
+   the templates would have the same spectral axis calibration, then the
+   spectral WCS need only be obtained from the first template. However, in
+   the general case, I presume that data files may be combined that use
+   different spectral axis calibrations, and so these differences need to
    be taken into account. */
-   if( hdr->tswcs ) {   
+   if( hdr->tswcs ) {
       fs = astClone( hdr->tswcs );
-   
+
 /* The first axis should be a SpecFrame. See if this is so. If not annull
    the specframe pointer. */
       specax = 1;
       specframe = astPickAxes( fs, 1, &specax, NULL );
       if( !astIsASpecFrame( specframe ) ) specframe = astAnnul( specframe );
-   } 
+   }
 
-/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the 
-   FITS extension of the template NDF. Take a copy of the FITS header (so that 
-   the contents of the header are not changed), and then read a FrameSet 
+/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the
+   FITS extension of the template NDF. Take a copy of the FITS header (so that
+   the contents of the header are not changed), and then read a FrameSet
    out of it. */
    if( !specframe ) {
       fc = astCopy( hdr->fitshdr );
       astClear( fc, "Card" );
       fs = astRead( fc );
 
-/* Extract the SpecFrame that describes the spectral axis from the current 
+/* Extract the SpecFrame that describes the spectral axis from the current
    Frame of this FrameSet. This is assumed to be the third WCS axis (NB
    the different axis number). */
       specax = 3;
@@ -219,25 +219,25 @@ void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
    }
 
 /* Split off the 1D Mapping for this single axis from the 3D Mapping for
-   the whole WCS. This results in "specmap" holding the Mapping from 
+   the whole WCS. This results in "specmap" holding the Mapping from
    SpecFrame value to GRID value. */
    fsmap = astGetMapping( fs, AST__CURRENT, AST__BASE );
    astMapSplit( fsmap, 1, &specax, pixax, &specmap );
 
-/* Invert the Mapping for the spectral axis so that it goes from template 
+/* Invert the Mapping for the spectral axis so that it goes from template
    GRID coord to spectral coord. */
    astInvert( specmap );
 
-/* Get a Mapping that converts values in the template spectral system 
+/* Get a Mapping that converts values in the template spectral system
    to the corresponding values in the sky cube spectral system. */
    fs = astConvert( specframe, ispecfrm, "" );
 
-/* Concatenate these Mappings with the supplied spectral Mapping to get 
+/* Concatenate these Mappings with the supplied spectral Mapping to get
    a Mapping from the template spectral grid axis (pixel axis 1) to the
    sky cube spectral grid axis (pixel axis 3). */
    ssmap = astCmpMap( astCmpMap( specmap, astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                 1, " " ), 
+                                 1, " " ),
                       ispecmap, 1, " " );
 
 /* Issue a warning if any of the detector names specified in "detgrp"
@@ -250,15 +250,15 @@ void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
    code that is faster than AST. We also use this code if we are just
    checking if the time series and sky cube have any overlap. */
    if( interp == AST__NEAREST || ! in_data ) {
-      smf_resampcube_nn( data, nchan, ndet, nslice, nxy, 
-                         dim, (AstMapping *) ssmap, abskyfrm, iskymap, 
+      smf_resampcube_nn( data, nchan, ndet, nslice, nxy,
+                         dim, (AstMapping *) ssmap, abskyfrm, iskymap,
                          detgrp, moving, in_data, out_data, overlap, status );
 
 /* For all other interpolation schemes, we use AST. */
    } else {
-      smf_resampcube_ast( data, nchan, ndet, nslice, nel, dim, 
-                          (AstMapping *) ssmap, abskyfrm, iskymap, 
-                          detgrp, moving, interp, params, in_data, out_data, 
+      smf_resampcube_ast( data, nchan, ndet, nslice, nel, dim,
+                          (AstMapping *) ssmap, abskyfrm, iskymap,
+                          detgrp, moving, interp, params, in_data, out_data,
                           status );
    }
 

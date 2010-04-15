@@ -75,10 +75,10 @@
 #        export_run
 #           Produces an export copy of the built package suitable for
 #           passing to another user.  A compressed tar file is created
-#           in the $EXPORT directory containing copies of the built 
-#           files for the package (the current directory is used by 
+#           in the $EXPORT directory containing copies of the built
+#           files for the package (the current directory is used by
 #           default if the environment variable EXPORT is not defined).
-#           The package should normally be built, installed and tested 
+#           The package should normally be built, installed and tested
 #           (see above) before using this target.  After unpacking the
 #           exported file on a similar machine, the recipient may simply
 #           install it for use.
@@ -340,7 +340,7 @@ RANLIB = @RANLIB@
 TAR_IN=@TAR_IN@
 TAR_OUT=@TAR_OUT@
 
-#  Commands for adding, deleting and extracting files to/from an object 
+#  Commands for adding, deleting and extracting files to/from an object
 #  archive (.a).
 #unused AR_IN = ar -r
 #unused AR_DEL = ar -d
@@ -416,7 +416,7 @@ CATLIBINSTALLDIR=catlib-install
 ## necessary to fix this, then the best way would probably be to
 ## delete the wcslib portions from catlib/astrotcl/wcslib and link
 ## against the Calabretta wcslib explicitly.  So this stuff might need
-## reanimated. 
+## reanimated.
 ##
 ## Uses
 ## WCSLIBDIR=wcslib/C
@@ -718,7 +718,7 @@ install:
 
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(BUILT_FILES)
 #
-#  Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the 
+#  Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the
 #  package is installed (at least in part).
 	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 #
@@ -817,7 +817,7 @@ install:
 
 # Very simple install, used for testing and development ONLY.
 # Insist that AUTOASTROM_DIR be defined, and that the directory it
-# points to exists.  Only ever used by the developer, so it's brutish 
+# points to exists.  Only ever used by the developer, so it's brutish
 # when it fails.
 test-install:
 	@ test -n "$$AUTOASTROM_DIR" || (echo "Define AUTOASTROM_DIR" && false)
@@ -847,7 +847,7 @@ test-install:
 #  files and returning them to the source directory.
 
 #  The deinstall target checks that the package is installed in the INSTALL
-#  directory.  If so, it causes the do_deinstall target to be made which 
+#  directory.  If so, it causes the do_deinstall target to be made which
 #  performs the deinstallation.
 
 deinstall:
@@ -1165,7 +1165,7 @@ clean:
 #  Invoke unbuild/distclean in the subdirectories also.  Only do this
 #  if there is actually a makefile there -- if not, the directory
 #  hasn't been configured, let alone built, so there's probably
-#  nothing there to tidy up. 
+#  nothing there to tidy up.
 #  [ Within moggy, a simple `make -f Makefile.in' won't do, since the
 #  unconfigured Makefile will fail to clean out the SkyCat directories.
 #  Within catlib, Makefile.in doesn't handle distclean well. ]
@@ -1201,8 +1201,8 @@ sun242.xml:
 #
 # Details of how to configure and build the components of the
 # autoastrom package.  Moggy is written as a largely separable
-# package, and the version of astrom in the directory astrom is merely 
-# a modification of the standard Starlink ASTROM package, which may be 
+# package, and the version of astrom in the directory astrom is merely
+# a modification of the standard Starlink ASTROM package, which may be
 # folded back into the main distribution.
 #
 # When we configure SkyCat (within the configuration of moggy) and

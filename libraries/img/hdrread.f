@@ -20,12 +20,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -41,11 +41,11 @@
 *  Notes:
 *     - The headers accessed by this routine are FITS items.
 *
-*     - The output is written using MSG routines rather than 
+*     - The output is written using MSG routines rather than
 *       print statements. MSG is documented in SUN/104.
 *
 *     - The PAR routines are described in SUN/114.
-      
+
 *-
 
 *  Local Variables:
@@ -55,7 +55,7 @@
 
 *  Get the name of the FITS item we are to read.
       CALL PAR_GET0C( 'ITEM', ITEM, ISTAT )
-      
+
 *  See if it exists (this call also accesses the image).
       CALL HDR_NUMB( 'IN', ' ', ITEM, N, ISTAT )
       IF ( N .GT. 0 ) THEN
@@ -74,7 +74,7 @@
          CALL MSG_SETC( 'ITEM', ITEM )
          CALL MSG_OUT( ' ', 'The header item ''^ITEM'' doesn''t exist.',
      :                 ISTAT )
-      END IF   
+      END IF
 
 *  Free the input image.
       CALL IMG_FREE( 'IN', ISTAT )

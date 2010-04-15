@@ -1,7 +1,7 @@
       SUBROUTINE CAP_GCINI (CNAME, CI, STATUS)
 *+
 *  Name:
-*     CAP_GCINI 
+*     CAP_GCINI
 *  Purpose:
 *     Initialise StarGaze for a new catalogue.
 *  Language:

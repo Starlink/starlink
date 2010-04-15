@@ -21,13 +21,13 @@
 
 *  Description:
 *     This application creates a new SpecFrame and optionally initialises
-*     its attributes. A SpecFrame is a specialised form of one-dimensional 
-*     Frame which represents various coordinate systems used to describe 
-*     positions within an electro-magnetic spectrum. The particular 
-*     coordinate system to be used is specified by setting the SpecFrame's 
-*     System attribute (the default is wavelength) qualified, as necessary, 
-*     by other attributes such as the rest frequency, the standard of rest, 
-*     the epoch of observation, units, etc (see the description of the System 
+*     its attributes. A SpecFrame is a specialised form of one-dimensional
+*     Frame which represents various coordinate systems used to describe
+*     positions within an electro-magnetic spectrum. The particular
+*     coordinate system to be used is specified by setting the SpecFrame's
+*     System attribute (the default is wavelength) qualified, as necessary,
+*     by other attributes such as the rest frequency, the standard of rest,
+*     the epoch of observation, units, etc (see the description of the System
 *     attribute for details).
 
 *  Usage:
@@ -35,8 +35,8 @@
 
 *  ADAM Parameters:
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new SpecFrame. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new SpecFrame.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new SpecFrame.
 
@@ -87,7 +87,7 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.

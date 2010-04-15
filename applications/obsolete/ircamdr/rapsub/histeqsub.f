@@ -1,14 +1,14 @@
 
 *+  HISTEQSUB - equalises the histogram of a 2-d image
 
-      SUBROUTINE HISTEQSUB( DIMS1, DIMS2, ARRAY, XSTART, YSTART, 
-     :                      XFINISH, YFINISH, NUMBIN, OLDHIST, MAP, 
+      SUBROUTINE HISTEQSUB( DIMS1, DIMS2, ARRAY, XSTART, YSTART,
+     :                      XFINISH, YFINISH, NUMBIN, OLDHIST, MAP,
      :                      STATUS )
 
 *    Description :
 *
 *     This routine takes as input a 2-d image and equalises (linearises)
-*     its histogram. Output is an equalised version of the input image. 
+*     its histogram. Output is an equalised version of the input image.
 *     The histogram equalisation takes place over a specified region of
 *     the array, and uses a specified number of bins in the algorithm.
 *
@@ -47,7 +47,7 @@
 *                : Processing" 1977 (UKTH::MARK)
 *     14-04-1986 : Major reshuffle and tidy (REVA::MJM)
 *     12-AUG-1994  Changed DIM arguments so that routine will compile and
-*                  changed input DIM arguments for GENHIS, MAXMIN, REMAP 
+*                  changed input DIM arguments for GENHIS, MAXMIN, REMAP
 *                  (SKL@JACH)
 *    Type Definitions :
 
@@ -105,13 +105,13 @@
 
 
 *    get the maximum and minimum values in the required sub-array
-      CALL MAXMIN( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH, 
-     :             YFINISH, NUMPIX, MAXIMUM, MINIMUM, MAXPOS, MINPOS, 
+      CALL MAXMIN( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH,
+     :             YFINISH, NUMPIX, MAXIMUM, MINIMUM, MAXPOS, MINPOS,
      :             STATUS )
 
 *    generate a histogram of the required sub-array
-      CALL GENHIS( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH, 
-     :             YFINISH, MAXIMUM, MINIMUM, NUMBIN, OLDHIST, 
+      CALL GENHIS( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH,
+     :             YFINISH, MAXIMUM, MINIMUM, NUMBIN, OLDHIST,
      :             STATUS )
 
 *    initialise the cumulative probability variable
@@ -139,7 +139,7 @@
 
 *    finally, remap the required subsection of the array according to
 *    the key contained in the MAPHIST array
-      CALL REMAP( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH, 
+      CALL REMAP( DIMS1, DIMS2, ARRAY, XSTART, YSTART, XFINISH,
      :            YFINISH, MAXIMUM, MINIMUM, NUMBIN, MAP, STATUS )
 
 

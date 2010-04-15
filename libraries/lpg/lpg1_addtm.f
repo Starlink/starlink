@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,12 +84,12 @@
 *           be open by the NDF system. In this case the temporary NDF
 *           is copied to the requested position once the application has
 *           finished.  The TMPLST group holds adjacent pairs of file
-*           specs; the first one in each pair is the spec of the temporary 
+*           specs; the first one in each pair is the spec of the temporary
 *           output NDF, the second is the spec of the requested output NDF.
 *        OPNLST = INTEGER (Read)
 *           A GRP identifier for a group holding the full specification
 *           for any existing NDFs which have been opened for read-only
-*           input by this invocation of the application. 
+*           input by this invocation of the application.
 *        REPLACE = LOGICAL (Read)
 *           Should the user be allowed to use the same input as both
 *           input and output? If so, a temporary NDF will be used to
@@ -114,7 +114,7 @@
       INTEGER FINDX                    ! Index of requested NDF in opened list
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Do nothing if the replacing of input NDFs with corresponding output
@@ -156,7 +156,7 @@
             FIELDS( 6 ) = TMPNAM
             CALL NDG_PTSUP( IGRP1, INDX, FIELDS, STATUS )
 
-*  Store the temporary NDF spec and the requested NDF spec in the list of 
+*  Store the temporary NDF spec and the requested NDF spec in the list of
 *  temporary NDFs in the LPG common block.
             CALL GRP_PUT( TMPLST, 1, TMPNAM, 0, STATUS )
             CALL GRP_PUT( TMPLST, 1, REQSPC, 0, STATUS )

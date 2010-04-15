@@ -1,9 +1,9 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
-# 
+#
 
 # Test script that forks itself in order to pass a message between
-# the child and the parent. This is similar to the message relay 
+# the child and the parent. This is similar to the message relay
 # script implemented in Starlink::AMS::Init
 
 BEGIN { $| = 1; print "1..7\n"; }
@@ -30,7 +30,7 @@ sub REAPER {
 # Setup a response to SIGALRM
 #  Only happens during timeouts
 
-$SIG{ALRM} = sub { die "Timeout!!"}; 
+$SIG{ALRM} = sub { die "Timeout!!"};
 
 
 
@@ -77,10 +77,10 @@ if ($pid = fork) {
   exit;
 } else {
   # Error forking
-  print "not ok 2\n"; 
+  print "not ok 2\n";
   die "Error forking: $!\n";
 
-} 
+}
 
 # ADAM messaging is now running
 # Need to listen for something from the child
@@ -114,7 +114,7 @@ if ($reply[6] eq "TEST") {
 
 # Work out the location of the child in the messaging system
 
-$ADAM_STATUS = adam_reply($reply[3], $reply[4], "ACTSTART", $reply[1], 
+$ADAM_STATUS = adam_reply($reply[3], $reply[4], "ACTSTART", $reply[1],
 			  "RESPONSE" );
 if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK) {
   print "not ok 6\n";

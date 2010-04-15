@@ -56,7 +56,7 @@
              call dat_type(nloc,type,status)
 
       exist = status.eq.SAI__OK
-             call dta_annul(nloc,status)           
+             call dta_annul(nloc,status)
 
 
       if(exist) then

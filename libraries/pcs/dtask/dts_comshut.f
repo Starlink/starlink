@@ -1,4 +1,4 @@
-      SUBROUTINE DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
+      SUBROUTINE DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT,
      :  AKEY, VALUE, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
+*     CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT,
 *     :  AKEY, VALUE, STATUS )
 
 *  Description:
@@ -96,11 +96,11 @@
 
 *  Arguments Given:
       INTEGER PATH               ! message path needed for reply
-      INTEGER MESSID             ! transaction number needed for reply 
+      INTEGER MESSID             ! transaction number needed for reply
       INTEGER MESSTATUS          ! status to be returned in completion
-                                 ! message 
+                                 ! message
       INTEGER CONTEXT            ! context to be returned in completion
-                                 ! message 
+                                 ! message
       CHARACTER*(*) AKEY         ! keyword of action required
       CHARACTER*(*) VALUE        ! command line parameter string
 
@@ -111,15 +111,15 @@
       INTEGER MESLEN                     ! length of value
       CHARACTER*(MESSYS__TNAME) MYNAME   ! name of this task
       INTEGER NLENGTH                    ! actual length of MYNAME
-      CHARACTER*(MESSYS__TNAME) BADNAME  ! name of other task when 
-                                         ! failed to close 
+      CHARACTER*(MESSYS__TNAME) BADNAME  ! name of other task when
+                                         ! failed to close
                                          ! communications
       INTEGER ISTAT                      ! local status
 *.
 
 
 *
-*   Clear-out the error reporting system, then send the final 
+*   Clear-out the error reporting system, then send the final
 *   acknowledgement which shuts down the communications for
 *   the transaction.
 *
@@ -142,7 +142,7 @@
          IF ( ISTAT .NE. SAI__OK ) THEN
             BADNAME = 'unknown'
          ENDIF
-         CALL MSG_SETC ( 'BADNAME', BADNAME )            
+         CALL MSG_SETC ( 'BADNAME', BADNAME )
          CALL MSG_SETC ( 'AKEY', AKEY )
          IF ( VALUE .EQ. ' ' ) THEN
             CALL ERR_REP ( ' ', 'to task ^BADNAME, action '//

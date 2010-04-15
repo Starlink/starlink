@@ -33,7 +33,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -47,8 +47,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -69,7 +69,7 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI                 !    "     " input      " 
+     :  PNTRI                 !    "     " input      "
 
       REAL
      :  DATAVAL,              ! value below which number is added
@@ -106,7 +106,7 @@
             CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                    PNTRO, NELEMENTS, STATUS )
 
-*          check for error before getting exclusion region and 
+*          check for error before getting exclusion region and
 *          accessing pointers
             IF( STATUS .EQ. SAI__OK ) THEN
 
@@ -115,8 +115,8 @@
 	      CALL PAR_GET0R( 'VALADD', VALADD, STATUS)
 
 *            pass everything to the work routine
-              CALL WRAPCORSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :	                       ODIMS( 1), ODIMS( 2), %VAL( PNTRO), 
+              CALL WRAPCORSUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :	                       ODIMS( 1), ODIMS( 2), %VAL( PNTRO),
      :                         DATAVAL, VALADD,
      :	                       STATUS)
 

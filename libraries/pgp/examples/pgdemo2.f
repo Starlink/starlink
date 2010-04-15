@@ -129,7 +129,7 @@ C by manipulating the viewport.
 C
       CALL PGSWIN(-1.,1.,-1.,1.)
 C
-C Loop through all known symbols (N=0-31 and -1 to -8). 
+C Loop through all known symbols (N=0-31 and -1 to -8).
 C
       DO 10 N=0,39
           IF (N.LE.31) WRITE (LABEL,'(I2)') N
@@ -176,7 +176,7 @@ C-----------------------------------------------------------------------
 
       SUBROUTINE PGEX23
 C-----------------------------------------------------------------------
-C Demonstration program for the PGPLOT plotting package. 
+C Demonstration program for the PGPLOT plotting package.
 C-----------------------------------------------------------------------
       INTEGER I
       CHARACTER*80 SAMPLE(8)
@@ -323,7 +323,7 @@ C
       CALL PGSCI(1)
       CALL PGSFS(2)
       CALL PGPOLY(5, SX, SY)
-C     
+C
 C       The next polygon should be invisible.
       CALL PGSFS(1)
       CALL PGSCI(4)
@@ -420,7 +420,7 @@ C
       CALL PGSLW(3)
       CALL PGCIRC(X*0.5, Y*0.5, R*1.3)
       CALL PGSLS(1)
-      CALL PGSLW(1)      
+      CALL PGSLW(1)
 C
 C Demonstrate different line-styles
 C

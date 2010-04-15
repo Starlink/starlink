@@ -43,7 +43,7 @@ C     DTA_ERROR, DTA_RNVAR, DTA_TYVAR, DTA_STRUC, DSA_WRNAME, DSA_WRUSER,
 C     DSA_ENCDIM, ICH_LEN
 C
 C  Prior requirements:
-C     DSA_OPEN should have been called to initialise the system.  The 
+C     DSA_OPEN should have been called to initialise the system.  The
 C     environment for the array should already exist.
 C
 C  Support: Keith Shortridge, AAO
@@ -103,7 +103,7 @@ C
       INTEGER   IPT                 ! Pointer to dimension string
       LOGICAL   KNOWN               ! True if structured type is known to us
       INTEGER   LENAME              ! Length of ARRAY_NAME excluding dimensions
-      INTEGER   LENGTH              ! Length of OBJECT 
+      INTEGER   LENGTH              ! Length of OBJECT
       CHARACTER OBJECT*80           ! Generated object name
       CHARACTER STRING*64           ! Used for error text & dimensions
       LOGICAL   STRUCT              ! Indicates array is structured
@@ -114,7 +114,7 @@ C     If bad status passed, return immediately
 C
       IF (STATUS.NE.0) RETURN
 C
-C     First create the name of the array.  
+C     First create the name of the array.
 C
       IF (ENV.EQ.' ') THEN
          OBJECT=NAME
@@ -122,7 +122,7 @@ C
          OBJECT=ENV(:ICH_LEN(ENV))//NAME
       END IF
       LENGTH=ICH_LEN(OBJECT)
-C         
+C
 C     Now see if this is a structured array or a primitive. This also
 C     serves to check that it really does already exist.
 C

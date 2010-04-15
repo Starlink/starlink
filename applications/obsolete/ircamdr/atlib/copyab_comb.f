@@ -1,16 +1,16 @@
 
 
-*+  COPYAB_COMB - puts the odd and even columns of data in two images into 
+*+  COPYAB_COMB - puts the odd and even columns of data in two images into
 *                 one image
 
-	SUBROUTINE COPYAB_COMB( IDIMS1, IDIMS2, ARRAY_INA, ARRAY_INB, 
+	SUBROUTINE COPYAB_COMB( IDIMS1, IDIMS2, ARRAY_INA, ARRAY_INB,
      :	                        ODIMS1, ODIMS2, ARRAY_OUT, STATUS)
 
 * Description :
 *
 * This routine ...
 *
-* Invocation : 	
+* Invocation :
 *
 * Parameters :
 *
@@ -43,7 +43,7 @@
 
 * Local variables :
 
-	INTEGER 
+	INTEGER
      :  IDIMS1,  ! dimensions of input DATA_ARRAY
      :  IDIMS2,  ! dimensions of input DATA_ARRAY
      :  ODIMS1,  ! dimensions of output DATA_ARRAY

@@ -58,18 +58,18 @@
       INTEGER
      :  I            ! array index
 *-
- 
+
 *   check for error on entry
       IF ( STATUS .EQ. SAI__OK ) THEN
- 
+
 *      loop through the array
          DO I = 1,DIM
- 
+
 *         apply the formula
             ARRAY (I) = BIAS + ( SCALE * ARRAY (I) )
- 
+
          ENDDO
- 
+
       ENDIF
- 
+
       END

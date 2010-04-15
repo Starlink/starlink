@@ -27,7 +27,7 @@
 *     the first word on the line.
 
 *    Deficiencies :
-*     Accepts very limited syntax, eg, is likely to break up quoted 
+*     Accepts very limited syntax, eg, is likely to break up quoted
 *     strings if they constitute the first 'word'.
 
 *    Bugs :
@@ -107,7 +107,7 @@
             WORDLEN = LENGTH - START + 1
             WORD = LINE(START:)
             PARMS = ' '
-   
+
          ELSE
 *
 *       blank the output parameters

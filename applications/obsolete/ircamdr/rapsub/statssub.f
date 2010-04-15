@@ -37,7 +37,7 @@
 *     Uses awfully clunky fixes to make sure that non-zero standard
 *     deviations do not sneak through when every pixel has an identical
 *     large and non-trivial value. Another way of fixing the root of
-*     these problems (rounding errors it would appear), is to use 
+*     these problems (rounding errors it would appear), is to use
 *     REAL*16 variables for the maths - this is Vax specific, and also
 *     takes longer to do the arithmetic.
 *
@@ -144,7 +144,7 @@
 
 *    now form returned quantities - the standard deviation (sigma)
 *    is formed from the equation for the variance (sigma squared) :
-*                                               _ 
+*                                               _
 *     variance  =   Sum over n pixels ( x   -   x )**2
 *                                        i
 *                   ----------------------------------
@@ -152,11 +152,11 @@
 *                               ( n - 1 )
 *
 *    this can be algebraically manipulated to the following :
-*                                       _ 
+*                                       _
 *     variance  =   Sum(( x )**2)  -  n.x**2
-*                          i                
+*                          i
 *                   ------------------------
-*                  
+*
 *                           ( n - 1 )
 *
 *    and then standard deviation equals sqrt( variance )
@@ -173,7 +173,7 @@
 *    this is so then the variance should be zero - also check for
 *    negative variances which can arise through rounding errors
       IF( NUMPIX .EQ. 1 .OR. DMAXIMUM .EQ. DMINIMUM .OR.
-     :                           VARIANCE .LT. 0.0D0 ) THEN      
+     :                           VARIANCE .LT. 0.0D0 ) THEN
          VARIANCE  =  0.0D0
       ELSE
          VARIANCE  =  VARIANCE / ( DNUMPIX - 1.0D0 )
@@ -187,7 +187,7 @@
       MEAN     =  SNGL( DMEAN )
       MAXIMUM  =  SNGL( DMAXIMUM )
       MINIMUM  =  SNGL( DMINIMUM )
-      STDDEV   =  SNGL( DSTDDEV )  
+      STDDEV   =  SNGL( DSTDDEV )
 
 
 *    that's it - return

@@ -223,7 +223,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       IF ( OPENF ) THEN
-      
+
 *       Attempt to obtain and open a file to output listing.  A null
 *       input forces an exit, but not an error.
 

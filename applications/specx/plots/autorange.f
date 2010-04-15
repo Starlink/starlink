@@ -42,7 +42,7 @@ C   Include a useful statement function
         PRINT *,'Something wrong with auto-scaling, range is 0?'
         RANGE=1
       END IF
-      LOGDR = LOC(DLOG10(DABS(RANGE))) 
+      LOGDR = LOC(DLOG10(DABS(RANGE)))
       DR    = 10.d0**(LOGDR-1)
 
 C   Make sure there are between 5 and 10 intervals.

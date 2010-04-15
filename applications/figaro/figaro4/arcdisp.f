@@ -192,7 +192,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -336,7 +336,7 @@
 *  coordinates.
       CALL SPD_EAED( NDF(1), LOC(1), 'UPDATE', '_REAL',
      :   'laboratory values', 'unknown', PNTR(1), NDF(2), I, STATUS )
-      CALL SPD_UAAHR( DIM(1), %VAL( CNF_PVAL(PNTR(1)) ), 1E-5, XSTART, 
+      CALL SPD_UAAHR( DIM(1), %VAL( CNF_PVAL(PNTR(1)) ), 1E-5, XSTART,
      :                XEND, LINEAR, STATUS )
       IF ( .NOT. LINEAR .OR.
      :      XSTART .NE. LBND(1)-0.5 .OR. XEND .NE. UBND(1)-0.5 ) THEN
@@ -363,7 +363,7 @@
 
 *  Check that the results structure conforms to our needs.
       CALL SPD_WZMC( NCOMP, TNPAR, %VAL(CNF_PVAL(PNTR(8))),
-     :               %VAL( CNF_PVAL(PNTR(7)) ), 
+     :               %VAL( CNF_PVAL(PNTR(7)) ),
      :               %VAL( CNF_PVAL(PNTR(11)) ), STATUS,
      :               %VAL(CNF_CVAL(XCLEN)), %VAL(CNF_CVAL(XCLEN)) )
 

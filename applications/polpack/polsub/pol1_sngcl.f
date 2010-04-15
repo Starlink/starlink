@@ -1,24 +1,24 @@
-      SUBROUTINE POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21, 
-     :                       MAT31, MAT22, MAT32, MAT33, 
+      SUBROUTINE POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21,
+     :                       MAT31, MAT22, MAT32, MAT33,
      :                       COUNT, DOUT, VOUT, COUT, STATUS )
 *+
 *  Name:
 *     POL1_SNGCL
 
 *  Purpose:
-*     Calculate the Stokes vectors, variances and co-variances for single-beam 
+*     Calculate the Stokes vectors, variances and co-variances for single-beam
 *     data.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21, MAT31, MAT22, 
-*                      MAT32, MAT33, COUNT, DOUT, VOUT, COUT, 
+*     CALL POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21, MAT31, MAT22,
+*                      MAT32, MAT33, COUNT, DOUT, VOUT, COUT,
 *                      STATUS )
 
 *  Description:
-*     This routine calculates the Stokes vectors, variances and co-variances 
+*     This routine calculates the Stokes vectors, variances and co-variances
 *     for a single-beam data set, and writes them into the supplied arrays.
 *     The method used is described by Sparks & Axon (PASP ????).
 
@@ -35,15 +35,15 @@
 *        Column 1, row 1 of the matrix giving the effective intensities.
 *     MAT21( EL ) = REAL (Given)
 *        Column 2, row 1 of the matrix giving the effective intensities
-*        (equals column 1, row 2). 
+*        (equals column 1, row 2).
 *     MAT31( EL ) = REAL (Given)
 *        Column 3, row 1 of the matrix giving the effective intensities
-*        (equals column 1, row 3). 
+*        (equals column 1, row 3).
 *     MAT22( EL ) = REAL (Given)
 *        Column 2, row 2 of the matrix giving the effective intensities.
 *     MAT32( EL ) = REAL (Given)
 *        Column 3, row 2 of the matrix giving the effective intensities
-*        (equals column 2, row 3). 
+*        (equals column 2, row 3).
 *     MAT33( EL ) = REAL (Given)
 *        Column 3, row 3 of the matrix giving the effective intensities.
 *     COUNT( EL ) = REAL (Given)
@@ -52,15 +52,15 @@
 *        The output Stokes vectors. Plane 1 holds I, plane 2 holds Q
 *        and plane 3 holds U.
 *     VOUT( EL, 3 ) = REAL (Returned)
-*        The output variance values. 
+*        The output variance values.
 *     COUT( EL ) = REAL (Returned)
-*        The output QU co-variance values. 
+*        The output QU co-variance values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -152,33 +152,33 @@
             COUT( I ) = VAL__BADR
 
 *  Otherwise, calculate the required values.
-         ELSE 
+         ELSE
             Y1 = 2.0*IE1( I )
             Y2 = 2.0*IE2( I )
             Y3 = 2.0*IE3( I )
 
-            V11 = D6*D6 - D9*D5 
-            V22 = D3*D3 - D1*D9 
-            V33 = D2*D2 - D5*D1 
-            V23 = D6*D1 - D2*D3 
-            V31 = D5*D3 - D2*D6 
-            V21 = D2*D9 - D6*D3 
+            V11 = D6*D6 - D9*D5
+            V22 = D3*D3 - D1*D9
+            V33 = D2*D2 - D5*D1
+            V23 = D6*D1 - D2*D3
+            V31 = D5*D3 - D2*D6
+            V21 = D2*D9 - D6*D3
 
             DOUT( I, 1 ) = ( Y1*V11 + Y2*V21 + Y3*V31 ) / DEN
             DOUT( I, 2 ) = ( Y1*V21 + Y2*V22 + Y3*V23 ) / DEN
             DOUT( I, 3 ) = ( Y1*V31 + Y2*V23 + Y3*V33 ) / DEN
 
-*  Store the I, Q and U variances, and the the QU co-variance in the output 
+*  Store the I, Q and U variances, and the the QU co-variance in the output
 *  arrays. Store bad values if the matrix is singular. The variances are
 *  the diagonal elements of the inverted curvature matrix, and the QU
 *  co-variance is column 3 row 2 of the inverted curvature matrix.
-            VOUT( I, 1 ) = 4.0*V11/DEN 
+            VOUT( I, 1 ) = 4.0*V11/DEN
             IF( VOUT( I, 1 ) .LT. VLIM ) VOUT( I, 1 ) = VAL__BADR
 
-            VOUT( I, 2 ) = 4.0*V22/DEN 
+            VOUT( I, 2 ) = 4.0*V22/DEN
             IF( VOUT( I, 2 ) .LT. VLIM ) VOUT( I, 2 ) = VAL__BADR
 
-            VOUT( I, 3 ) = 4.0*V33/DEN 
+            VOUT( I, 3 ) = 4.0*V33/DEN
             IF( VOUT( I, 3 ) .LT. VLIM ) VOUT( I, 3 ) = VAL__BADR
 
             COUT( I ) = 4.0*V23/DEN

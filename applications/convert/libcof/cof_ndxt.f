@@ -99,46 +99,46 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'         ! HDS standard constants
-      
+
 *  Global Variables:
       INCLUDE 'F2NDF1_CMN'      ! EXTABLE lists
 *        NCMP = INTEGER    (Read)
 *           Number of component lines in EXTABLE
 *        NEXTS = INTEGER   (Read)
 *           Number of extension sets in EXTABLE
-*        EXTNS(MAXCMP,MAXEXT) = CHARACTER*32 (Read) 
+*        EXTNS(MAXCMP,MAXEXT) = CHARACTER*32 (Read)
 *           Extension table from EXTABLE
 *        DONE(MAXCMP,MAXEXT) = LOGICAL (Read and Write)
 *           If extension specifier matched
-      
+
 *  Arguments Given:
       INTEGER FUNIT
       INTEGER NHDU
-      
+
 *  Arguments Returned:
       LOGICAL MATCH
       INTEGER IEXT
       INTEGER ICMP
       LOGICAL MORE
-      
+
 *  Status:
       INTEGER STATUS            ! Global status
 
 *  External References:
-      
+
 *  Local Constants:
-      
+
 *  Local Variables:
       INTEGER I       ! Loop counter
       INTEGER J       ! Loop counter
       INTEGER UNUSED  ! Unused extension counter
       INTEGER EXTN    ! Numeric extension specifier
-      
+
 *.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise return value to FALSE (no match)
-      MATCH = .FALSE.      
+      MATCH = .FALSE.
 *  Initialise UNUSED counter
       UNUSED = 0
 
@@ -189,7 +189,7 @@
             END IF  ! not done
          END DO  ! each component
       END DO  ! each extension set
-              
+
 99    CONTINUE
       MORE = UNUSED .GT. 0
 

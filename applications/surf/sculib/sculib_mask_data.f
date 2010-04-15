@@ -1,6 +1,6 @@
-      SUBROUTINE SCULIB_MASK_DATA (USE_SECT, TYPE, N_SPEC, DATA_SPEC, 
-     :     DEMOD_POINTER, N_SWITCHES ,N_EXPOSURES, N_INTEGRATIONS, 
-     :     N_MEASUREMENTS, N_POS, N_BOLS, N_BEAM, SWITCH_EXPECTED, 
+      SUBROUTINE SCULIB_MASK_DATA (USE_SECT, TYPE, N_SPEC, DATA_SPEC,
+     :     DEMOD_POINTER, N_SWITCHES ,N_EXPOSURES, N_INTEGRATIONS,
+     :     N_MEASUREMENTS, N_POS, N_BOLS, N_BEAM, SWITCH_EXPECTED,
      :     VALUE, BVALUE, BITNUM, BIT_STATE, DATA_PTR,
      :     STATUS)
 *+
@@ -100,7 +100,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -133,7 +133,7 @@
       INTEGER       DATA_PTR
 
 *  Status:
-      INTEGER STATUS  
+      INTEGER STATUS
 
 *  External routines:
 
@@ -150,7 +150,7 @@
       INTEGER EXP_S_PTR      ! Selected exposures
       INTEGER I              ! Loop counter
       INTEGER INT_S_END      ! Selected integrations
-      INTEGER INT_S_PTR      ! Selected integrations 
+      INTEGER INT_S_PTR      ! Selected integrations
       INTEGER MASK_BIT       ! Bit number used in mask
       INTEGER MEAS_S_END     ! End selected measurements
       INTEGER MEAS_S_PTR     ! Selected measurements
@@ -192,23 +192,23 @@
      :     STATUS)
       CALL SCULIB_MALLOC (N_EXPOSURES * VAL__NBI, EXP_S_PTR, EXP_S_END,
      :     STATUS)
-      CALL SCULIB_MALLOC (N_INTEGRATIONS * VAL__NBI, INT_S_PTR, 
+      CALL SCULIB_MALLOC (N_INTEGRATIONS * VAL__NBI, INT_S_PTR,
      :     INT_S_END, STATUS)
-      CALL SCULIB_MALLOC (N_MEASUREMENTS * VAL__NBI, 
+      CALL SCULIB_MALLOC (N_MEASUREMENTS * VAL__NBI,
      :     MEAS_S_PTR, MEAS_S_END, STATUS)
 
-*     Setup a mask array. This is necessary for multiple specs 
+*     Setup a mask array. This is necessary for multiple specs
 *     when inverting the section mask
 
-      CALL SCULIB_MALLOC(N_POS * N_BOLS * N_BEAM * VAL__NBUB, BYTE_PTR, 
-     :     BYTE_END, STATUS) 
+      CALL SCULIB_MALLOC(N_POS * N_BOLS * N_BEAM * VAL__NBUB, BYTE_PTR,
+     :     BYTE_END, STATUS)
 
 *     Now fill this with zeroes. Work out the actual mask first
 *     (ie set to one) before masking the QUALITY array itself.
 
       BTEMP = 0
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLB(N_POS * N_BOLS * N_BEAM, BTEMP, 
+         CALL SCULIB_CFILLB(N_POS * N_BOLS * N_BEAM, BTEMP,
      :        %VAL(CNF_PVAL(BYTE_PTR)))
       END IF
 
@@ -223,40 +223,40 @@
       DO I = 1, N_SPEC
 
          CALL SCULIB_DECODE_SPEC (DATA_SPEC(I), DEMOD_POINTER,
-     :        N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
-     :        N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, 
-     :        %VAL(CNF_PVAL(POS_S_PTR)), %VAL(CNF_PVAL(SW_S_PTR)), 
+     :        N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
+     :        N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED,
+     :        %VAL(CNF_PVAL(POS_S_PTR)), %VAL(CNF_PVAL(SW_S_PTR)),
      :        %VAL(CNF_PVAL(EXP_S_PTR)),
-     :        %VAL(CNF_PVAL(INT_S_PTR)), %VAL(CNF_PVAL(MEAS_S_PTR)), 
+     :        %VAL(CNF_PVAL(INT_S_PTR)), %VAL(CNF_PVAL(MEAS_S_PTR)),
      :        %VAL(CNF_PVAL(BOL_S_PTR)),
      :        STATUS)
-         
+
          CALL SCULIB_SET_QUAL (.TRUE., %VAL(CNF_PVAL(BYTE_PTR)), N_BOLS,
-     :        N_POS, N_BEAM, %VAL(CNF_PVAL(BOL_S_PTR)), 
+     :        N_POS, N_BEAM, %VAL(CNF_PVAL(BOL_S_PTR)),
      :        %VAL(CNF_PVAL(POS_S_PTR)),
      :        MASK_BIT, BIT_SWITCH, STATUS)
 
       END DO
 
-*     Now we have our mask array where a 1 indicates that 
+*     Now we have our mask array where a 1 indicates that
 *     the point is in the required section.
 *     We need to modify our data
 
       IF (TYPE .EQ. 'BYTE') THEN
 
-         CALL SCULIB_SET_DATA_UB (USE_SECT, 
+         CALL SCULIB_SET_DATA_UB (USE_SECT,
      :        N_BOLS, N_POS, N_BEAM, %VAL(CNF_PVAL(BYTE_PTR)),
      :        BVALUE, %val(cnf_pval(DATA_PTR)), STATUS)
 
       ELSE IF (TYPE .EQ. 'REAL') THEN
 
-         CALL SCULIB_SET_DATA (USE_SECT, N_BOLS, N_POS, 
+         CALL SCULIB_SET_DATA (USE_SECT, N_BOLS, N_POS,
      :        N_BEAM, %VAL(CNF_PVAL(BYTE_PTR)),
      :        VALUE, %val(cnf_pval(DATA_PTR)), STATUS)
 
       ELSE IF (TYPE .EQ. 'BIT') THEN
 
-         CALL SCULIB_SET_DATA_BIT(USE_SECT, N_BOLS, N_POS, 
+         CALL SCULIB_SET_DATA_BIT(USE_SECT, N_BOLS, N_POS,
      :        N_BEAM, %VAL(CNF_PVAL(BYTE_PTR)),
      :        BITNUM, BIT_STATE, %val(cnf_pval(DATA_PTR)), STATUS)
 

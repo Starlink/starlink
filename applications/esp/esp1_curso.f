@@ -1,4 +1,4 @@
-       
+
 
 
       SUBROUTINE ELF1_CURSO(GRADEV,POINT,NAME,COLOUR,NDF1,X,Y,
@@ -8,11 +8,11 @@
 *     ELF1_CURSO
 
 *  Purpose:
-*     Multi-purpose routine that allows use of the SGS cursor for returning 
-*     the co-ordinate for a given type of image and also controls all SGS 
+*     Multi-purpose routine that allows use of the SGS cursor for returning
+*     the co-ordinate for a given type of image and also controls all SGS
 *     graphics displays (such as that displaying the galaxy origin)
 *
-*     The routine is used for more than one purpose to 
+*     The routine is used for more than one purpose to
 *     avoid unecessary duplication of code.
 
 *  Language:
@@ -44,22 +44,22 @@
 *        Co-ordinate information obtained via the cursor or to be
 *        displayed on the workstation.
 *     RLIM = REAL (Given and Returned)
-*        Sampling radius maximum.  
+*        Sampling radius maximum.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Description:
 *     The routine undertakes several different tasks. These have been
-*     placed together in one routine to avoid unnecessary duplication 
+*     placed together in one routine to avoid unnecessary duplication
 *     of code. The tasks undertaken are:
 *
-*     - allowing the user to use the SGS cursor to specify the location of 
-*     the galaxy to be used and the quadrant in which the graphical results 
-*     display are to be shown. The routines include text messages to be 
-*     shown to instruct the user. 
-*    
-*     - return a locator/identifier value from the AGI database, this allows 
-*     the NDF that was used to generate the most recently displayed image 
+*     - allowing the user to use the SGS cursor to specify the location of
+*     the galaxy to be used and the quadrant in which the graphical results
+*     display are to be shown. The routines include text messages to be
+*     shown to instruct the user.
+*
+*     - return a locator/identifier value from the AGI database, this allows
+*     the NDF that was used to generate the most recently displayed image
 *     named DATA, to be accessed.
 *
 *     - allow simple SGS routines to be used to display lines etc on top
@@ -67,12 +67,12 @@
 *     recently named DATA.
 *
 *     - inspecting the AGI database to ensure that (as required) the co-ordinate
-*     values are being returned for the file most recently stored with 
+*     values are being returned for the file most recently stored with
 *     the database name DATA.
 *
 *     - sets up a new AGI databse entry (ELLFOU) to define part of the screen
-*     so that PGPLOT routines may be used to update the display and show 
-*     the results graphically in a form more sophisticated than SGS would 
+*     so that PGPLOT routines may be used to update the display and show
+*     the results graphically in a form more sophisticated than SGS would
 *     normally allow.
 *
 *     - close down the AGI resources and SGS at the end of each call so
@@ -80,12 +80,12 @@
 
 *  Notes:
 *     This program is a massively disembowelled version of KAPPA program
-*     CURSOR with a few bits of ZAPLIN used here and there. 
+*     CURSOR with a few bits of ZAPLIN used here and there.
 *
-*     The application only acts on the most recent picture in the 
+*     The application only acts on the most recent picture in the
 *     graphics database named 'DATA' and also an entry called 'ELLFOU' which
 *     contains a graphical display of the profile results.
- 
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     {enter_new_authors_here}
@@ -119,9 +119,9 @@
 
 *  Arguments Given and Returned.
       INTEGER NDF1               ! NDF identifier for the current picture
-      REAL X(10)                 ! Position information from the cursor 
+      REAL X(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstation
-      REAL Y(10)                 ! Position information from the cursor 
+      REAL Y(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstatio
       REAL RLIM                  ! Sampling radius maximum
 
@@ -173,10 +173,10 @@
 *   Create informational messages for use with the cursor.
       CALL ELF1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
 
-*   Start the graphics system. If this is the first time the routine has 
-*   been used then an identifier/locator to the NDF for the displayed 
+*   Start the graphics system. If this is the first time the routine has
+*   been used then an identifier/locator to the NDF for the displayed
 *   image is returned as NDF1.
-      IF (POINT.EQ.0) THEN 
+      IF (POINT.EQ.0) THEN
          CALL ELF1_AGIC2(GRADEV,0,1,NAME,NDF1,DEVCAN,PICID,STATUS)
          POINT=1
       ELSE
@@ -191,23 +191,23 @@
       IF ((POINT.NE.2).AND.(POINT.NE.9)) THEN
          XIN=0.5*(X1+X2)
          YIN=0.5*(Y1+Y2)
-      ELSE 
+      ELSE
          XIN=X(POINT-1)
          YIN=Y(POINT-1)
-      END IF  
+      END IF
 
 *   Actually sets the position (code above calculated it).
       CALL SGS_SETCU(XIN,YIN)
       CURSIZ=0.004*MIN(X2-X1,Y2-Y1)
 
 *   Draw the radius limit for the profiling. Is done here so that
-*   the value for X1 and Y1 need not be retained between calls to this 
+*   the value for X1 and Y1 need not be retained between calls to this
 *   routine.
       IF (POINT.EQ.3) THEN
          CALL ELF1_GRBIT(POINT,COLOUR,CURSIZ,X,Y,RLIM,STATUS)
          GOTO 980
       END IF
-   
+
 
 *   Set up the screen sector that will be used to display the graph results.
       IF (POINT.EQ.7) THEN
@@ -225,11 +225,11 @@
             X(7)=X2
          END IF
 
-*      Sort out the y co-ordinates for the quadrant required. 
+*      Sort out the y co-ordinates for the quadrant required.
          IF (Y(6)-Y1.LT.TEMPY) THEN
             Y(6)=Y1
             Y(7)=Y1+TEMPY
-         ELSE           
+         ELSE
             Y(6)=Y1+TEMPY
             Y(7)=Y2
          END IF
@@ -246,11 +246,11 @@
             X(7)=X1+TEMPX*1.9
          END IF
 
-*      Sort out the y co-ordinates for within the quadrant required. 
+*      Sort out the y co-ordinates for within the quadrant required.
          IF (Y(6)-Y1.LT.TEMPY) THEN
             Y(6)=Y1+TEMPY*.15
             Y(7)=Y1+TEMPY*.85
-         ELSE           
+         ELSE
             Y(6)=Y1+TEMPY*1.15
             Y(7)=Y1+TEMPY*1.85
          END IF
@@ -289,7 +289,7 @@
 *   Value 2 as an emergency exit.
 *   Values 1 and 3 used to show the current position.
       DO WHILE ((HITVAL.NE.4).AND.(STATUS.EQ.SAI__OK))
- 
+
 *      Start a new error context.
          CALL ERR_MARK
 
@@ -308,8 +308,8 @@
             CALL ERR_REP(' ','You have opted to leave the'/
      :                   /' program.',STATUS)
             GOTO 980
-         END IF   
-                         
+         END IF
+
 *         Convert the world co-ordinates to data system.
          IF ((HITVAL.EQ.1).OR.(HITVAL.EQ.3).OR.(HITVAL.EQ.4)) THEN
             X(POINT)=XIN
@@ -319,7 +319,7 @@
                CALL ESP1_CRPT(IWCS,XIN-X1,YIN-Y1,STATUS)
             END IF
          END IF
- 
+
 *      Release the new error context.
          CALL ERR_RLSE
 
@@ -328,7 +328,7 @@
 *   Draw the galaxy origin.
       IF (POINT.EQ.1) CALL ELF1_GRBIT(POINT,COLOUR,CURSIZ,X,Y,
      :                                RLIM,STATUS)
-  
+
 *   Convert the world co-ordinate to data co-ordinates so that it can be
 *   transfered on return to ELF1_CMODE.
       X(10)=REAL(INT(X(1)-X1+1.))
@@ -358,11 +358,11 @@
 *     ELP1_CURSO
 
 *  Purpose:
-*     Multi-purpose routine that allows use of the SGS cursor for returning 
-*     the co-ordinate for a given type of image and also controls all SGS 
+*     Multi-purpose routine that allows use of the SGS cursor for returning
+*     the co-ordinate for a given type of image and also controls all SGS
 *     graphics displays (such as that displaying the galaxy origin)
 *
-*     The routine is used for more than one purpose to 
+*     The routine is used for more than one purpose to
 *     avoid unecessary duplication of code.
 
 *  Language:
@@ -399,16 +399,16 @@
 
 *  Description:
 *     The routine undertakes several different tasks. These have been
-*     placed together in one routine to avoid unnecessary duplication 
+*     placed together in one routine to avoid unnecessary duplication
 *     of code. The tasks undertaken are:
 *
-*     - allowing the user to use the SGS cursor to specify the location of 
-*     the galaxy to be used and the quadrant in which the graphical results 
-*     display are to be shown. The routines include text messages to be 
-*     shown to instruct the user. 
-*    
-*     - return a locator/identifier value from the AGI database, this allows 
-*     the NDF that was used to generate the most recently displayed image 
+*     - allowing the user to use the SGS cursor to specify the location of
+*     the galaxy to be used and the quadrant in which the graphical results
+*     display are to be shown. The routines include text messages to be
+*     shown to instruct the user.
+*
+*     - return a locator/identifier value from the AGI database, this allows
+*     the NDF that was used to generate the most recently displayed image
 *     named DATA, to be accessed.
 *
 *     - allow simple SGS routines to be used to display lines etc on top
@@ -416,12 +416,12 @@
 *     recently named DATA.
 *
 *     - inspecting the AGI database to ensure that (as required) the co-ordinate
-*     values are being returned for the file most recently stored with 
+*     values are being returned for the file most recently stored with
 *     the database name DATA.
 *
 *     - sets up a new AGI databse entry (ELLPRO) to define part of the screen
-*     so that PGPLOT routines may be used to update the display and show 
-*     the results graphically in a form more sophisticated than SGS would 
+*     so that PGPLOT routines may be used to update the display and show
+*     the results graphically in a form more sophisticated than SGS would
 *     normally allow.
 *
 *     - close down the AGI resources and SGS at the end of each call so
@@ -429,12 +429,12 @@
 
 *  Notes:
 *     This program is a massively disembowelled version of KAPPA program
-*     CURSOR with a few bits of ZAPLIN used here and there. 
+*     CURSOR with a few bits of ZAPLIN used here and there.
 *
-*     The application only acts on the most recent picture in the 
+*     The application only acts on the most recent picture in the
 *     graphics database named 'DATA' and also an entry called 'ELLPRO' which
 *     contains a graphical display of the profile results.
- 
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     {enter_new_authors_here}
@@ -467,11 +467,11 @@
 
 *  Arguments Given and Returned.
       INTEGER NDF1               ! NDF identifier for the current picture
-      REAL X(10)                 ! Position information from the cursor 
+      REAL X(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstation
-      REAL Y(10)                 ! Position information from the cursor 
+      REAL Y(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstatio
-      REAL RLIM                  ! Radius of the most distant permitted 
+      REAL RLIM                  ! Radius of the most distant permitted
                                  ! profile ellipse
 
 *  Status:
@@ -520,10 +520,10 @@
 *   Create informational messages for use with the cursor.
       CALL ELP1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
 
-*   Start the graphics system. If this is the first time the routine has 
-*   been used then an identifier/locator to the NDF for the displayed 
+*   Start the graphics system. If this is the first time the routine has
+*   been used then an identifier/locator to the NDF for the displayed
 *   image is returned as NDF1.
-      IF (POINT.EQ.0) THEN 
+      IF (POINT.EQ.0) THEN
          CALL ELP1_AGIC2(GRADEV,0,1,NAME,NDF1,DEVCAN,
      :                   PICID,STATUS)
          POINT=1
@@ -539,17 +539,17 @@
       IF ((POINT.NE.2).AND.(POINT.NE.9)) THEN
          XIN=0.5*(X1+X2)
          YIN=0.5*(Y1+Y2)
-      ELSE 
+      ELSE
          XIN=X(POINT-1)
          YIN=Y(POINT-1)
-      END IF  
+      END IF
 
 *   Actually sets the position (code above calculated it).
       CALL SGS_SETCU(XIN,YIN)
       CURSIZ=0.004*MIN(X2-X1,Y2-Y1)
 
 *   Draw the radius limit for the profiling. Is done here so that
-*   the value for X1 and Y1 need not be retained between calls to this 
+*   the value for X1 and Y1 need not be retained between calls to this
 *   routine.
       IF (POINT.EQ.3) THEN
          CALL ELP1_GRBIT(POINT,COLOUR,CURSIZ,X,Y,RLIM,STATUS)
@@ -572,11 +572,11 @@
             X(7)=X2
          END IF
 
-*      Sort out the y co-ordinates for the quadrant required. 
+*      Sort out the y co-ordinates for the quadrant required.
          IF (Y(6)-Y1.LT.TEMPY) THEN
             Y(6)=Y1
             Y(7)=Y1+TEMPY
-         ELSE           
+         ELSE
             Y(6)=Y1+TEMPY
             Y(7)=Y2
          END IF
@@ -593,11 +593,11 @@
             X(7)=X1+TEMPX*1.9
          END IF
 
-*      Sort out the y co-ordinates for within the quadrant required. 
+*      Sort out the y co-ordinates for within the quadrant required.
          IF (Y(6)-Y1.LT.TEMPY) THEN
             Y(6)=Y1+TEMPY*.15
             Y(7)=Y1+TEMPY*.85
-         ELSE           
+         ELSE
             Y(6)=Y1+TEMPY*1.15
             Y(7)=Y1+TEMPY*1.85
          END IF
@@ -634,7 +634,7 @@
 *   Value 2 as an emergency exit.
 *   Values 1 and 3 used to show the current position.
       DO WHILE ((HITVAL.NE.4).AND.(STATUS.EQ.SAI__OK))
-        
+
 *      Start a new error context.
          CALL ERR_MARK
 
@@ -656,15 +656,15 @@
          END IF
 
 *      Convert the world co-ordinates to data system.
-         IF ((HITVAL.EQ.1).OR.(HITVAL.EQ.3).OR.(HITVAL.EQ.4)) THEN 
-            X(POINT)=XIN                       
+         IF ((HITVAL.EQ.1).OR.(HITVAL.EQ.3).OR.(HITVAL.EQ.4)) THEN
+            X(POINT)=XIN
             Y(POINT)=YIN
 *         Display the cursor results if necessary.
             IF (POINT.LT.6) THEN
                CALL ESP1_CRPT(IWCS,XIN-X1,YIN-Y1,STATUS)
             END IF
          END IF
-                
+
 *      Release the new error context.
          CALL ERR_RLSE
 
@@ -673,7 +673,7 @@
 *   Draw the galaxy origin.
       IF (POINT.EQ.1) CALL ELP1_GRBIT(POINT,COLOUR,CURSIZ,X,Y,
      :                                RLIM,STATUS)
-  
+
 *   Convert the world co-ordinate to data co-ordinates so that it can be
 *   transfered on return to ELP1_CMODE.
       X(10)=REAL(INT(X(1)-X1+1.))
@@ -687,7 +687,7 @@
 
 *   Exit point for errors that occurred before the graphics device
 *   was opened.
-                 
+
  9999 CONTINUE
 
 *   Exit AST context.
@@ -703,11 +703,11 @@
 *     GAU1_CURSO
 
 *  Purpose:
-*     Multi-purpose routine that allows use of the SGS cursor for returning 
-*     the co-ordinate for a given type of image and also controls all SGS 
+*     Multi-purpose routine that allows use of the SGS cursor for returning
+*     the co-ordinate for a given type of image and also controls all SGS
 *     graphics displays (such as that displaying the source origin)
 *
-*     The routine is used for more than one purpose to 
+*     The routine is used for more than one purpose to
 *     avoid unecessary duplication of code.
 
 *  Language:
@@ -741,15 +741,15 @@
 
 *  Description:
 *     The routine undertakes several different tasks. These have been
-*     placed together in one routine to avoid unnecessary duplication 
+*     placed together in one routine to avoid unnecessary duplication
 *     of code. The tasks undertaken are:
 *
-*     - allowing the user to use the SGS cursor to specify the location of 
-*     and size the sources to be used. The routines include text messages 
-*     to be shown to instruct the user. 
-*    
-*     - return a locator/identifier value from the AGI database, this 
-*     ensures that the NDF and co-ordinates used are those of the 
+*     - allowing the user to use the SGS cursor to specify the location of
+*     and size the sources to be used. The routines include text messages
+*     to be shown to instruct the user.
+*
+*     - return a locator/identifier value from the AGI database, this
+*     ensures that the NDF and co-ordinates used are those of the
 *     most recently displayed image named DATA.
 *
 *     - allow simple SGS routines to be used to display lines etc on top
@@ -761,11 +761,11 @@
 
 *  Notes:
 *     This program is a massively disembowelled version of KAPPA program
-*     CURSOR with a few bits of ZAPLIN used here and there. 
+*     CURSOR with a few bits of ZAPLIN used here and there.
 *
-*     The application only acts on the most recent picture in the 
-*     graphics database named 'DATA'. 
- 
+*     The application only acts on the most recent picture in the
+*     graphics database named 'DATA'.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     {enter_new_authors_here}
@@ -797,13 +797,13 @@
 
 *  Arguments Given and Returned.
       INTEGER NDF1               ! NDF identifier for the current picture
-      REAL X(10)                 ! Position information from the cursor 
+      REAL X(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstation
-      REAL Y(10)                 ! Position information from the cursor 
+      REAL Y(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstatio
 
 *  Arguments Returned.
-      INTEGER ISTAT              ! Indicates if selection was aborted. 
+      INTEGER ISTAT              ! Indicates if selection was aborted.
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -849,8 +849,8 @@
       CALL GAU1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Start the graphics system. If this is the first time the routine has 
-*   been used then an identifier/locator to the NDF for the displayed 
+*   Start the graphics system. If this is the first time the routine has
+*   been used then an identifier/locator to the NDF for the displayed
 *   image is returned as NDF1.
       IF (POINT.EQ.0) THEN
          CALL GAU1_AGIC2(GRADEV,0,1,NDF1,DEVCAN,
@@ -869,10 +869,10 @@
       IF (POINT.LT.2) THEN
          XIN=0.5*(X1+X2)
          YIN=0.5*(Y1+Y2)
-      ELSE 
+      ELSE
          XIN=X(POINT-1)
          YIN=Y(POINT-1)
-      END IF  
+      END IF
 
 *   Actually sets the position (code above calculated it).
       CALL SGS_SETCU(XIN,YIN)
@@ -898,7 +898,7 @@
 *   Value -1 or -9999 as an emergency exit.
 *   Values 0 used to show the current position.
       DO WHILE ((HITVAL.NE.3).AND.(STATUS.EQ.SAI__OK))
-        
+
 *      Start a new error context.
          CALL ERR_MARK
 
@@ -911,7 +911,7 @@
          CALL SGS_REQCU(XIN,YIN,HITVAL)
          X(POINT)=XIN
          Y(POINT)=YIN
-         
+
 *      Convert CTRL-C input.
          IF(HITVAL.EQ.-9999) HITVAL=-1
 
@@ -931,7 +931,7 @@
             CALL ESP1_CRPT(IWCS,XIN-X1,YIN-Y1,STATUS)
             CALL MSG_BLANK(STATUS)
          END IF
-         
+
 *      Release the new error context.
          CALL ERR_RLSE
 
@@ -963,7 +963,7 @@
          CALL SGS_ARC(X(1),Y(1),RADIUS,TEMP1,TEMP2)
          CALL SGS_FLUSH
       END IF
- 
+
  980  CONTINUE
 
 *   Closedown the AGI/SGS/PGPLOT interface.
@@ -972,7 +972,7 @@
 
 *   Exit point for errors that occurred before the graphics device
 *   was opened.
-                 
+
  9999 CONTINUE
 
 *   Exit AST context.
@@ -987,10 +987,10 @@
 *     GRA1_CURSO
 
 *  Purpose:
-*     Multi-purpose routine that allows use of the SGS cursor for returning 
-*     the co-ordinate for a given type of image and also controls all SGS 
-*     graphics displays (such as that displaying the shape/position of the 
-*     user defined sector). The routine is used for more than one purpose to 
+*     Multi-purpose routine that allows use of the SGS cursor for returning
+*     the co-ordinate for a given type of image and also controls all SGS
+*     graphics displays (such as that displaying the shape/position of the
+*     user defined sector). The routine is used for more than one purpose to
 *     avoid unecessary duplication of code.
 
 *  Language:
@@ -1013,11 +1013,11 @@
 *        The global status.
 
 *  Description:
-*     The routine allows the user to use the SGS cursor to specify the 
+*     The routine allows the user to use the SGS cursor to specify the
 *     radius range to be used.
 *
 *     It inspects the AGI database to ensure that the co-ordinate
-*     system values are being returned for the file most recently stored 
+*     system values are being returned for the file most recently stored
 *     within the database name GRAPHS.
 *
 *     It closes down the AGI resources and SGS at the end of each call so
@@ -1025,12 +1025,12 @@
 
 *  Notes:
 *     This program is a massively disembowelled version of KAPPA program
-*     CURSOR with a few bits of ZAPLIN used here and there. 
+*     CURSOR with a few bits of ZAPLIN used here and there.
 *
-*     The application only acts on the most recent picture in the 
-*     graphics database called 'GRAPHS' which contains a graphical display 
+*     The application only acts on the most recent picture in the
+*     graphics database called 'GRAPHS' which contains a graphical display
 *     of the profile results.
- 
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     {enter_new_authors_here}
@@ -1058,9 +1058,9 @@
                                  ! selected
 
 *  Arguments Given and Returned:
-      REAL X                     ! Position information from the cursor 
+      REAL X                     ! Position information from the cursor
                                  ! or to be displayed on the workstation
-      REAL Y                     ! Position information from the cursor 
+      REAL Y                     ! Position information from the cursor
                                  ! or to be displayed on the workstatio
 
 *  Status:
@@ -1096,7 +1096,7 @@
 
 *   Check inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-    
+
 *   Create informative messages for use with the cursor.
 
 *   Select a point defining the lower limit for the radius of data
@@ -1135,11 +1135,11 @@
       IF (POINT.EQ.8) THEN
          XIN=0.5*(X1+X2)
          YIN=0.5*(Y1+Y2)
-      END IF  
+      END IF
 
 *   Actually sets the position (code above calculated it).
       CALL SGS_SETCU(XIN,YIN)
-      CURSIZ=0.004*MIN(X2-X1,Y2-Y1)   
+      CURSIZ=0.004*MIN(X2-X1,Y2-Y1)
 
 *   Put out a blank line to ensure the commentary appears on the alpha
 *   plane of the terminal.
@@ -1173,7 +1173,7 @@
 
 *      Get the result from the cursor.
          IF ((HITVAL.GT.0).AND.(HITVAL.LT.4)) THEN
-                         
+
 *         Note that an input was obtained.
             USED=USED+1
 
@@ -1182,7 +1182,7 @@
 
          ELSE
             IF (USED.EQ.0) THEN
-               CALL MSG_OUT(' ','No points selected!!!',STATUS) 
+               CALL MSG_OUT(' ','No points selected!!!',STATUS)
                IF (STATUS.EQ.SAI__OK) HITVAL=1
             END IF
          END IF
@@ -1191,7 +1191,7 @@
          CALL ERR_RLSE
 
       END DO
-  
+
  980  CONTINUE
 
 *   Closedown the AGI/SGS/PGPLOT interface.
@@ -1210,10 +1210,10 @@
 *     SEC1_CURSO
 
 *  Purpose:
-*     Multi-purpose routine that allows use of the SGS cursor for returning 
-*     the co-ordinate for a given type of image and also controls all SGS 
-*     graphics displays (such as that displaying the shape/position of the 
-*     user defined sector). The routine is used for more than one purpose to 
+*     Multi-purpose routine that allows use of the SGS cursor for returning
+*     the co-ordinate for a given type of image and also controls all SGS
+*     graphics displays (such as that displaying the shape/position of the
+*     user defined sector). The routine is used for more than one purpose to
 *     avoid unecessary duplication of code.
 
 *  Language:
@@ -1255,16 +1255,16 @@
 
 *  Description:
 *     The routine undertakes several different tasks. These have been
-*     placed together in one routine to avoid unnecessary duplication 
+*     placed together in one routine to avoid unnecessary duplication
 *     of code. The tasks undertaken are:
 *
-*     - allowing the user to use the SGS cursor to specify the location of 
-*     the sector to be used and the quadrant in which the graphical results 
-*     display are to be shown. The routines include text messages to be 
-*     shown to instruct the user. 
-*    
-*     - return a locator/identifier value from the AGI database, that allows 
-*     the NDF that was used to generate the most recently displayed image 
+*     - allowing the user to use the SGS cursor to specify the location of
+*     the sector to be used and the quadrant in which the graphical results
+*     display are to be shown. The routines include text messages to be
+*     shown to instruct the user.
+*
+*     - return a locator/identifier value from the AGI database, that allows
+*     the NDF that was used to generate the most recently displayed image
 *     named DATA, to be accessed.
 *
 *     - allow simple SGS routines to be used to display lines etc on top
@@ -1272,13 +1272,13 @@
 *     recently named DATA.
 *
 *     - inspecting the AGI database to ensure that (as required) the co-ordinate
-*     values are being returned for the file most recently stored with 
+*     values are being returned for the file most recently stored with
 *     the database name DATA (as with an image) or from a database entry named
 *     SECTOR (as with a results graph).
 *
 *     - sets up a new AGI databse entry (SECTOR) to define part of the screen
-*     so that PGPLOT routines may be used to update the display and show 
-*     the results graphically in a form more sophisticated than SGS would 
+*     so that PGPLOT routines may be used to update the display and show
+*     the results graphically in a form more sophisticated than SGS would
 *     normally allow.
 *
 *     - close down the AGI resources and SGS at the end of each call so
@@ -1286,18 +1286,18 @@
 
 *  Notes:
 *     This program is a massively disembowelled version of KAPPA program
-*     CURSOR with a few bits of ZAPLIN used here and there. 
+*     CURSOR with a few bits of ZAPLIN used here and there.
 *
-*     The application only acts on the most recent picture in the 
+*     The application only acts on the most recent picture in the
 *     graphics database named 'DATA' and also an entry called 'SECTOR' which
 *     contains a graphical display of the profile results.
 *
 *    Within ESP the scale lengths are calculated by assuming an
 *     exponential brightness profile for spiral galaxies and a
 *     quarter power law for elliptical galaxies. The scale length
-*     value given is derived from the decay constant of the 
-*     exponential functions. 
- 
+*     value given is derived from the decay constant of the
+*     exponential functions.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     {enter_new_authors_here}
@@ -1332,9 +1332,9 @@
 *  Arguments Given and Returned.
       INTEGER NDF1               ! NDF identifier for the current picture
       REAL ANGWID                ! Angular width of the sector
-      REAL X(10)                 ! Position information from the cursor 
+      REAL X(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstation
-      REAL Y(10)                 ! Position information from the cursor 
+      REAL Y(10)                 ! Position information from the cursor
                                  ! or to be displayed on the workstatio
       REAL RADIUS                ! Radius of the sector to be used in
                                  ! world units
@@ -1384,11 +1384,11 @@
 
 *   Create informational messages for use with the cursor.
       CALL SEC1_MESSG(POINT,TERMES,IMGMES,NTERMS,NIMGMS,STATUS)
-      
-*   Start the graphics system. If this is the first time the routine has 
-*   been used then an identifier/locator to the NDF for the displayed 
+
+*   Start the graphics system. If this is the first time the routine has
+*   been used then an identifier/locator to the NDF for the displayed
 *   image is returned as NDF1.
-      IF (POINT.EQ.0) THEN 
+      IF (POINT.EQ.0) THEN
          CALL SEC1_AGIC2(GRADEV,0,1,NAME,NDF1,DEVCAN,
      :                   PICID,STATUS)
          POINT=1
@@ -1404,24 +1404,24 @@
       IF ((POINT.NE.2).AND.(POINT.NE.3).AND.(POINT.NE.9)) THEN
          XIN=0.5*(X1+X2)
          YIN=0.5*(Y1+Y2)
-      ELSE 
+      ELSE
          XIN=X(POINT-1)
          YIN=Y(POINT-1)
-      END IF  
-      
+      END IF
+
 *   Actually sets the position (code above calculated it).
       CALL SGS_SETCU(XIN,YIN)
       CURSIZ=0.004*MIN(X2-X1,Y2-Y1)
 
 *   Draw the sector(s) that will be used and then exit. Is done here so that
-*   the value for X1 and Y1 need not be retained between calls to this 
+*   the value for X1 and Y1 need not be retained between calls to this
 *   routine.
       IF ((POINT.EQ.4).OR.(POINT.EQ.5)) THEN
          CALL SEC1_GRBIT(POINT,CURSIZ,X,Y,POSANG,
      :                   ANGWID,RADIUS,COLOUR,STATUS)
          GOTO 980
       END IF
-   
+
 
 *   Set up the screen sector that will be used to display the graph results.
       IF (POINT.EQ.7) THEN
@@ -1439,11 +1439,11 @@
             X(7)=X2
          END IF
 
-*      Sort out the y co-ordinates for the quadrant required. 
+*      Sort out the y co-ordinates for the quadrant required.
          IF (Y(6)-Y1.LT.TEMPY) THEN
             Y(6)=Y1
             Y(7)=Y1+TEMPY
-         ELSE           
+         ELSE
             Y(6)=Y1+TEMPY
             Y(7)=Y2
          END IF
@@ -1461,11 +1461,11 @@
             X(7)=X1+TEMPX*1.9
          END IF
 
-*      Sort out the y co-ordinates for within the quadrant required. 
+*      Sort out the y co-ordinates for within the quadrant required.
          IF (Y(6)-Y1.LT.TEMPY) THEN
             Y(6)=Y1+TEMPY*.15
             Y(7)=Y1+TEMPY*.85
-         ELSE           
+         ELSE
             Y(6)=Y1+TEMPY*1.15
             Y(7)=Y1+TEMPY*1.85
          END IF
@@ -1523,7 +1523,7 @@
      :                   /' program.',STATUS)
             GOTO 980
          END IF
- 
+
 *      Convert the world co-ordinates to data system.
          IF ((HITVAL.EQ.1).OR.(HITVAL.EQ.3).OR.(HITVAL.EQ.4)) THEN
             X(POINT)=XIN
@@ -1533,7 +1533,7 @@
                CALL ESP1_CRPT(IWCS,XIN-X1+1.0,YIN-Y1+1.0,STATUS)
             END IF
          END IF
- 
+
 *      Release the new error context.
          CALL ERR_RLSE
 
@@ -1545,7 +1545,7 @@
          CALL SEC1_GRBIT(POINT,CURSIZ,X,Y,POSANG,
      :                   ANGWID,RADIUS,COLOUR,STATUS)
       END IF
-  
+
 *   Convert the world co-ordinate to data co-ordinates so that it can be
 *   transfered on return to SEC1_CMODE.
       X(10)=REAL(INT(X(1)-X1+1.))

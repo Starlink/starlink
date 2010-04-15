@@ -69,8 +69,8 @@
 *  Copyright:
 *     Copyright (C) 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
-*     Councils. 
-*     Copyright (C) 2007 Science & Technology Facilities Council.  All 
+*     Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.  All
 *     Rights Reserved.
 
 *  Licence:
@@ -115,7 +115,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -186,14 +186,14 @@
 *  Create an AST Frame with Unit set to the product of the two supplied
 *  Units.
          TMPFRM = AST_FRAME( 1, ' ', STATUS )
-         
+
          NEWUN = '('
          IAT = 1
          CALL CHR_APPND( UNIT1, NEWUN, IAT )
          CALL CHR_APPND( ')*(', NEWUN, IAT )
          CALL CHR_APPND( UNIT2, NEWUN, IAT )
          CALL CHR_APPND( ')', NEWUN, IAT )
-         
+
          CALL AST_SETC( TMPFRM, 'Unit(1)', NEWUN( : IAT ), STATUS )
 
 *  Retrieve the normalised Unit string, and free the Frame.
@@ -201,7 +201,7 @@
          CALL AST_ANNUL( TMPFRM, STATUS )
       END IF
 
-*  Set the list of components to be propagated from NDF1. 
+*  Set the list of components to be propagated from NDF1.
       CLIST = 'WCS,Axis,Quality'
 
 *  Create a new output NDF based on the first input NDF. Propagate the
@@ -210,7 +210,7 @@
 
 *  Set the output Unit component, if the are defined.
       IAT = CHR_LEN( NEWUN )
-      IF( IAT .GT. 0 ) CALL NDF_CPUT( NEWUN( : IAT ), NDF3, 'Unit', 
+      IF( IAT .GT. 0 ) CALL NDF_CPUT( NEWUN( : IAT ), NDF3, 'Unit',
      :                                STATUS )
 
 *  See whether a variance component is defined in both the input NDFs
@@ -245,33 +245,33 @@
 *  Integer data...
       IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_MULI( BAD, VAR, EL,
-     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR3( 2 ) ) ),
      :                   NERR, STATUS )
 
 *  Real data...
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPG1_MULR( BAD, VAR, EL,
-     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR3( 2 ) ) ),
      :                   NERR, STATUS )
 
 *  Double precision data...
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_MULD( BAD, VAR, EL,
-     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR3( 2 ) ) ),
      :                   NERR, STATUS )
       END IF
@@ -288,7 +288,7 @@
 
 *  Obtain a title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDF3, 'Title', STATUS )
-      
+
 *  End the NDF context.
       CALL NDF_END( STATUS )
 

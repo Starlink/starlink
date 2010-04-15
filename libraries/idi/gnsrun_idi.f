@@ -18,12 +18,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -47,15 +47,15 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'GNS_ERR'
       INCLUDE 'GNS_PAR'
-      
+
       INTEGER STATUS, ICNTX, LD, IERR, IWKS
 
       INTEGER IDISP, ISIZE(2), LUTDEP, MAXCOL, NVAL, LEN
       CHARACTER IDITYP*3, NAM*10
-      
+
       CHARACTER MSG*(GNS__SZMSG)
       CHARACTER DESCR*(GNS__SZDES),
-     :          NAME*(GNS__SZNAM) 
+     :          NAME*(GNS__SZNAM)
       CHARACTER*72 WKSTN
 
       LOGICAL GNS_FILTI
@@ -124,7 +124,7 @@
          PRINT *, MSG(:LEN)
          PRINT *, 'Please see your system manager'
          GO TO 9999
-      END IF      
+      END IF
 
 *   Reset the device
       CALL IIDRST(IDISP,IERR)
@@ -153,11 +153,11 @@
          PRINT *, MSG(:LEN)
          PRINT *, 'Please see your system manager'
          GO TO 9999
-      END IF      
-            
+      END IF
+
 *   Close down
       CALL IIDCLO(IDISP,IERR)
       CALL GNS_STOP('IDI', STATUS)
-      
+
  9999 CONTINUE
       END

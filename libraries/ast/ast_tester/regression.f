@@ -31,7 +31,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -101,12 +101,12 @@
 
 
       DATA BBOX / 10.0, -10.0, 290.0, 300.0,
-     :            -300.0, -300.0, 500.0, 500.0, 
+     :            -300.0, -300.0, 500.0, 500.0,
      :            1.0, 1.0, 1787.0, 447.0 /
 
 
 
-      DATA ATTRS/ 'Grid=1,tickall=0', 
+      DATA ATTRS/ 'Grid=1,tickall=0',
      :            'Grid=1,labelling=interior',
      :            'Grid=0' /
 
@@ -114,7 +114,7 @@
 *.
 
 *  Initialize inherited global status.
-      STATUS = SAI__OK 
+      STATUS = SAI__OK
 
 *  Use object caching to minimise allocation of new memory
       OC = AST_TUNE( 'ObjectCaching', 1, STATUS )
@@ -129,7 +129,7 @@
 *  Display the AST version number.
       VERS = AST_VERSION()
       MAJ = VERS/1000000
-      VERS = VERS - 1000000*MAJ 
+      VERS = VERS - 1000000*MAJ
       MIN = VERS/1000
       REV = VERS - 1000*MIN
       WRITE(*,'(A,I2,A,I1,A,I2)') 'AST version ',MAJ,'.',MIN,'-',REV
@@ -145,19 +145,19 @@
       CARDS( 5*80 + 1: ) = 'CUNIT1  = ''GHz'''
 
       CALL AST_PUTCARDS( FC, CARDS, STATUS )
-      WRITE(*,'(A,I2)') 'PutCards Ncards = ',AST_GETI( FC, 'NCARD', 
+      WRITE(*,'(A,I2)') 'PutCards Ncards = ',AST_GETI( FC, 'NCARD',
      :                                                 STATUS )
-      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD', 
+      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD',
      :                                               STATUS )
 
       CALL AST_SETI( FC, 'CARD', 10, STATUS )
-      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD', 
+      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD',
      :                                               STATUS )
-      
+
       CALL AST_PUTCARDS( FC, CARDS, STATUS )
-      WRITE(*,'(A,I2)') 'PutCards Ncards = ',AST_GETI( FC, 'NCARD', 
+      WRITE(*,'(A,I2)') 'PutCards Ncards = ',AST_GETI( FC, 'NCARD',
      :                                                 STATUS )
-      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD', 
+      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD',
      :                                               STATUS )
       CALL AST_SHOW( FC, STATUS )
 
@@ -190,21 +190,21 @@
 *  be written out using REG_SINK.
          WRITE(*,'(A)') ' '
          WRITE(*,'(A)') 'REG_SINK:'
-         CALL AST_ANNUL( FC, STATUS )            
+         CALL AST_ANNUL( FC, STATUS )
 
 * Create another FrameSet with Native encoding. Write the FrameSet to
 * it, and then annul the FitsChan (this will cause the FITS cards to be
 * written to stdout).
-         FC = AST_FITSCHAN( AST_NULL, REG_SINK, 'Encoding=native', 
+         FC = AST_FITSCHAN( AST_NULL, REG_SINK, 'Encoding=native',
      :                      STATUS )
          WRITE(*,'(A)') ' '
-         WRITE(*,'(A,I2)') 'Objects written: ', AST_WRITE( FC, FS, 
+         WRITE(*,'(A,I2)') 'Objects written: ', AST_WRITE( FC, FS,
      :                                                     STATUS )
          WRITE(*,'(A)') ' '
          WRITE(*,'(A)') 'Native Encoding:'
          CALL AST_ANNUL( FC, STATUS )
 
-*  Create a Plot which maps the area specified by BBOX the Base Frame 
+*  Create a Plot which maps the area specified by BBOX the Base Frame
 *  of the FrameSet onto the GBOX area in graphics coords.
          PLOT = AST_PLOT( FS, GBOX, BBOX( 1, I), ' grf = 1 , '//
      :                    'title = A FITS test', STATUS )
@@ -296,16 +296,16 @@
 *  Set or get a Plot graphics attribute.
 *  -------------------------------------
       INTEGER FUNCTION REG_ATTR(  ATT, VAL, OLDVAL, PRIM )
-      IMPLICIT NONE 
+      IMPLICIT NONE
 
 *  Includes:
       INCLUDE 'AST_PAR'
       INCLUDE 'GRF_PAR'
 
 *  Arguments:
-      INTEGER ATT 
+      INTEGER ATT
       DOUBLE PRECISION VAL
-      INTEGER PRIM 
+      INTEGER PRIM
       DOUBLE PRECISION OLDVAL
 
 *  Local Variables:
@@ -342,7 +342,7 @@
       ELSE
          WRITE(*,'(A,I2)') 'Bad PRIM value: ', PRIM
       END IF
-      
+
 *  Return the old value.
       OLDVAL = ATTRS( I, J )
 
@@ -500,7 +500,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
 *  header for each value of REG_FTEST.
 *  ======================================================================
       INTEGER FUNCTION REG_SOURCE( CARD, STATUS )
-      IMPLICIT NONE        
+      IMPLICIT NONE
       INCLUDE 'SAE_PAR'
 
       INTEGER CMN_FTEST          ! Which FITS test are we doing?
@@ -508,7 +508,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
       COMMON /REG/ CMN_FTEST, CMN_LINE
 
       CHARACTER CARD*80
-      INTEGER STATUS     
+      INTEGER STATUS
 
 * Check the inherited status
       REG_SOURCE = 0
@@ -518,7 +518,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
       REG_SOURCE = 1
 
 *  The following code defines the FITS headers and is generated automatically
-*  from FITS header files using script make_regtest (in the AST development 
+*  from FITS header files using script make_regtest (in the AST development
 *  system)....
 
 
@@ -1500,7 +1500,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
          END IF
 
 
-*  Insert new header code here.... (create new header code using script 
+*  Insert new header code here.... (create new header code using script
 *  "make_regtest" in the AST development archive).
       ELSE
          REG_SOURCE = 0

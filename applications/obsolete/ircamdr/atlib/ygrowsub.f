@@ -1,4 +1,4 @@
-	SUBROUTINE YGROWSUB( DIMS1, DIMS2, ARRIN, ODIMS1, ODIMS2, 
+	SUBROUTINE YGROWSUB( DIMS1, DIMS2, ARRIN, ODIMS1, ODIMS2,
      :                       ARROUT, STATUS)
 
 *  HISTORY
@@ -9,15 +9,15 @@
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
+	INTEGER
      :	  DIMS1, DIMS2,
      :	  ODIMS1, ODIMS2,
      :	  STATUS,
      :	  J,
      :	  K
 
-	REAL 
-     :	  ARROUT( ODIMS1, ODIMS2), 
+	REAL
+     :	  ARROUT( ODIMS1, ODIMS2),
      :	  ARRIN( DIMS1, DIMS2)
 
 *      scan through all the input pixels ...

@@ -6,10 +6,10 @@
 *     This subroutine performs the 4 arithmetic functions, ADD, SUBTRACT,
 *     MULTIPLY and DIVIDE between an integration array and those components
 *     of a full observation result array that were taken at the same
-*     detector position 
+*     detector position
 *    Invocation :
 *     CALL RED4_INDEX_ARITHMETIC (OPERATION, INTDATA, INTQUAL,
-*    :   INTVAR, INTDIM1, INTDIM2, INDEX, INDEX_DIM1, INDEX_DIM2, 
+*    :   INTVAR, INTDIM1, INTDIM2, INDEX, INDEX_DIM1, INDEX_DIM2,
 *    :   DET_INDEX, OBSDATA, OBSQUAL, OBSVAR, OBSDIM1, OBSDIM2, STATUS)
 *    Parameters :
 *     parameter[(dimensions)]=type(access)
@@ -52,14 +52,14 @@
 *                                             MULTIPLY - mult the INT by the OBS
 *                                             DIVIDE - divide the INT by the OBS
       INTEGER INTDIM1, INTDIM2           ! dims of integration data
-      INTEGER INDEX_DIM1, INDEX_DIM2     ! dims of index array 
+      INTEGER INDEX_DIM1, INDEX_DIM2     ! dims of index array
       INTEGER*2 INDEX(INDEX_DIM1,INDEX_DIM2) ! the array that points to the
 *                                              columns of the observation data
 *                                              that correspond to integrations
 *                                              taken at various detector positions
       INTEGER DET_INDEX                   ! the detector position at which this
 *                                              integration was taken
-*                                             
+*
       INTEGER OBSDIM1, OBSDIM2            ! dims of observation data
       REAL OBSDATA(OBSDIM1,OBSDIM2)       ! observation data array
       BYTE OBSQUAL(OBSDIM1,OBSDIM2)       ! observation data quality
@@ -67,7 +67,7 @@
 *    Input-Output:
       REAL INTDATA(INTDIM1,INTDIM2)       ! integration data array
       BYTE INTQUAL(INTDIM1,INTDIM2)       ! integration quality array
-      REAL INTVAR(INTDIM1,INTDIM2)        ! integration data variances      
+      REAL INTVAR(INTDIM1,INTDIM2)        ! integration data variances
 
 *    External references :
 *    Global variables :
@@ -115,7 +115,7 @@
          END DO
       ELSE IF ( OPERATION .EQ. 'SUBTRACT' ) THEN
 
-*      Subtract the observation data array from the integration data 
+*      Subtract the observation data array from the integration data
 *      array at the same index positions, and add the variance arrays.
          DO J = 1, INTDIM2
             DO I = 1, INTDIM1
@@ -150,7 +150,7 @@
 
                IF ( INTQUAL(I,J) .EQ. GOOD ) THEN
 
-                  INTVAR(I,J) = 
+                  INTVAR(I,J) =
      :               INTVAR(I,J)*OBSDATA(IPOS,J)*OBSDATA(IPOS,J) +
      :               OBSVAR(IPOS,J)*INTDATA(I,J)*INTDATA(I,J)
 
@@ -182,7 +182,7 @@
 
                   IF ( ABS(SQUARE) .GT. VAL__MINR ) THEN
 
-                     INTVAR(I,J) = 
+                     INTVAR(I,J) =
      :                  INTVAR(I,J)/SQUARE +
      :                  OBSVAR(IPOS,J)*INTDATA(I,J)*INTDATA(I,J)/
      :                  (SQUARE*SQUARE)

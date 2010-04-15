@@ -111,7 +111,7 @@ C-----------------------------------------------------------------------
 
       INTEGER   PROC_MODE
       COMMON /JPI/    PROC_MODE
-      
+
 *     Local variables:
 
       INTEGER   ILC
@@ -251,11 +251,11 @@ C---------------
 
       ELSE IF(COMMAND.EQ.'PAUSE')  THEN
         CALL GEN_PAUSE (IFAIL)
-         
+
 C---------------
 C  EXIT :
 C---------------
-      
+
       ELSE IF(COMMAND.EQ.'EXIT')  THEN
         CALL SXGDEVEND
         CALL CLOSE_PLOT (JPLOT, IPSEQ, IDEV)
@@ -263,8 +263,8 @@ C---------------
         STATUS = 0
         CALL NDF_END  (STATUS)
         CALL HDS_STOP (STATUS)
-        STOP ' '     
- 
+        STOP ' '
+
 C                  *********************************************
 C                  *                                           *
 C                  *  Initialization/Parameter setting         *
@@ -335,7 +335,7 @@ C-------------
 C-------------
 C  INDEX-FILE: List headers of spectra in data file
 C-------------
-      
+
       ELSE IF (COMMAND.EQ.'INDEX-FILE')  THEN
         CALL GETFIL ('X', IFILE, IFAIL)
         IF (IFAIL.EQ.0)   CALL INDXFL (IFILE, IFAIL)
@@ -343,7 +343,7 @@ C-------------
 C-------------
 C  INFO-FILE: List headers of spectra in data file
 C-------------
-      
+
       ELSE IF (COMMAND.EQ.'INFO-FILE')  THEN
         CALL GETFIL ('X', IFILE, IFAIL)
         IF (IFAIL.EQ.0)   CALL INFOFL (IFILE, IFAIL)
@@ -414,18 +414,18 @@ C                  *********************************************
 C-------------
 C  READ-SPECTRUM: Read spectrum from random-access file
 C-------------
-      
+
       ELSE IF(COMMAND.EQ.'READ-SPECTRUM')  THEN
         CALL GETFIL   ('R', INFILE, IFAIL)
         IF (IFAIL.NE.0) RETURN
         CALL READSCAN (INFILE, IFAIL)
         IF (IFAIL.NE.0) RETURN
         DUMP_OK = .TRUE.
-      
+
 C------------------
 C  WRITE-SPECTRUM : Copy spectrum to output file
 C------------------
-      
+
       ELSE IF(COMMAND.EQ.'WRITE-SPECTRUM')  THEN
         IF(ICHECK(1,IFAIL).NE.1)   RETURN
         CALL GETFIL ('W', OUTFILE, IFAIL)
@@ -443,7 +443,7 @@ C-----------------
 C------------------
 C  WRITE-ASCII-SPECTRUM : Write current spectrum to ascii file
 C------------------
-      
+
       ELSE IF (COMMAND.EQ.'WRITE-ASCII-SPECTRUM')  THEN
         IF (ICHECK (1,IFAIL).NE.1)   RETURN
         CALL WRITE_ASCII_DATA (XSCALE, IFAIL)
@@ -522,7 +522,7 @@ C------------------
 C------------------
 C  READ-GSD-RASTER
 C------------------
- 
+
       ELSE IF (COMMAND.EQ.'READ-GSD-RASTER') THEN
         CALL READ_GSD_RAS (IFAIL)
         DUMP_OK = .TRUE.
@@ -539,11 +539,11 @@ C                  *********************************************
 C------------------
 C  SET-LIST-FILE : Set listing file for list and print output
 C------------------
-      
+
       ELSE IF (COMMAND .EQ. 'SET-LIST-FILE')  THEN
         CALL ASK_LIST_FILE (IFAIL)
         DUMP_OK = .TRUE.
-      
+
 C------------------
 C  LIST-SPECTRUM: List on console/LP.
 C------------------
@@ -551,7 +551,7 @@ C------------------
       ELSE IF(COMMAND.EQ.'LIST-SPECTRUM')  THEN
         IF(ICHECK(1,IFAIL).NE.1)   RETURN
         CALL LISTP(BUF)
-      
+
 C------------------
 C  PRINT-SPECTRUM-HEADER: Print full scan header
 C------------------
@@ -590,32 +590,32 @@ C---------------
         IF(ISLCTQ(NQ,IFAIL).NE.1)   RETURN
         CALL ADD(NQ,IFAIL)
         DUMP_OK = .TRUE.
-      
+
 C---------------------
 C  SUBTRACT-SPECTRA : Subtracts spectrum in X-register from that in Y-register
 C---------------------
-      
+
       ELSE IF(COMMAND.EQ.'SUBTRACT-SPECTRA')  THEN
         IF(ICHECK(2,IFAIL).NE.1)   RETURN
         IF(ISLCTQ(NQ,IFAIL).NE.1)   RETURN
         CALL SU(NQ,IFAIL)
         DUMP_OK = .TRUE.
-      
+
 C---------------------
 C  MULTIPLY-SPECTRUM : Multiply by scalar
 C---------------------
-      
+
       ELSE IF(COMMAND.EQ.'MULTIPLY-SPECTRUM')  THEN
         IF(ICHECK(1,IFAIL).NE.1)   RETURN
         IF(ISLCTQ(NQ,IFAIL).NE.1)   RETURN
         CALL GEN_GETR4('Factor? ',FACT,'E10.3',FACT,JDEF)
         CALL MULT(FACT,NQ)
         DUMP_OK = .TRUE.
-      
+
 C-------------------
 C  DIVIDE-SPECTRUM : Divide by scalar
 C-------------------
-      
+
       ELSE IF (COMMAND.EQ.'DIVIDE-SPECTRUM')  THEN
         IF (ICHECK (1,IFAIL).NE.1)    RETURN
         IF (ISLCTQ (NQ,IFAIL).NE.1)   RETURN
@@ -627,7 +627,7 @@ C-------------------
         ELSE
           IFAIL = 35
         END IF
-      
+
 C--------------------------
 C AVERAGE-SPECTRA : Average scans in bottom two stack positions taking
 C--------------------------           account of relative integration times.
@@ -639,7 +639,7 @@ C--------------------------           account of relative integration times.
         ELSE IF (ICHECK(1,IFAIL).NE.1) THEN
           RETURN
         END IF
-        
+
 
 C--------------------------
 C  FORM-QUOTIENT-SPECTRUM : Form ratio Y(i)/X(i)
@@ -668,12 +668,12 @@ C------------------
 C------------------
 C  CLEAR-STACK : Set flag to mark whole stack empty
 C------------------
-      
+
       ELSE IF(COMMAND.EQ.'CLEAR-STACK')  THEN
         XCLEAR  = .TRUE.
         JTOP    = 0
         DUMP_OK = .TRUE.
-      
+
 C---------------
 C  ROLL-STACK :
 C---------------
@@ -703,7 +703,7 @@ C---------------
         DUMP_OK = .TRUE.
 
 C---------------
-C  POP-STACK-DOWN : Lower stack 
+C  POP-STACK-DOWN : Lower stack
 C---------------
 
       ELSE IF(COMMAND.EQ.'POP-STACK-DOWN')  THEN
@@ -756,14 +756,14 @@ C                  ****************************************
 C----------------------------
 C  REMOVE-LINEAR-BASELINE : Fit base line to data and subtract it.
 C----------------------------
-      
+
       ELSE IF(COMMAND.EQ.'REMOVE-LINEAR-BASELINE')  THEN
         IF(ICHECK(1,IFAIL).NE.1)   RETURN
         IF(ISLCTQ(NQ,IFAIL).NE.1)   RETURN
         NQ=ISLCT1Q(NQ,IFAIL)
         IF(IFAIL.EQ.0)  CALL BASFIT(NQ,XSCALE,BUF,IFAIL)
         DUMP_OK = .TRUE.
-      
+
 C----------------------------
 C  FIT-POLYNOMIAL-BASELINE : True least-squares fit of pure polynomial baseline
 C----------------------------
@@ -790,7 +790,7 @@ C----------------------------     + harmonic sinusoids) and remove from data.
         DUMP_OK = .TRUE.
 
 C----------------------------
-C FIT-GAUSSIAN-MODEL calculate least-squares fit to data and 
+C FIT-GAUSSIAN-MODEL calculate least-squares fit to data and
 C----------------------------          push into stack
 
       ELSE IF(COMMAND.EQ.'FIT-GAUSSIAN-MODEL')  THEN
@@ -804,7 +804,7 @@ C----------------------------          push into stack
 
 C----------------------------
 C  ENTER-GAUSSIAN-MODEL: Enter a new gaussian model into the program
-C---------------------------- 
+C----------------------------
 
       ELSE IF (COMMAND.EQ.'ENTER-GAUSSIAN-MODEL') THEN
         CALL ENTER_GAUSS (IFAIL)
@@ -827,7 +827,7 @@ C----------------------------
 
 C                  ****************************************
 C                  *                                      *
-C                  *    1-D (spectral) plots              *     
+C                  *    1-D (spectral) plots              *
 C                  *                                      *
 C                  ****************************************
 
@@ -941,13 +941,13 @@ C                  ****************************************
 C-----------------
 C SMOOTH-SPECTRUM : Apply N-pt running mean over data
 C-----------------
-      
+
       ELSE IF (COMMAND.EQ.'SMOOTH-SPECTRUM')  THEN
         IF (ICHECK (1, IFAIL).NE.1)   RETURN
         IF (ISLCTQ (NQ, IFAIL).NE.1)   RETURN
         CALL SMOOTH_DATA (NQ, BUF, 256, IFAIL)
         DUMP_OK = .TRUE.
-      
+
 C-----------------
 C HANN-SPECTRUM : Apply hanning smoothing to half-resolution
 C-----------------
@@ -1009,7 +1009,7 @@ C-----------------
         DUMP_OK = .TRUE.
 
 C-----------------
-C  SLIDE-QUADRANT : Do 'HALVES' on Kitt Peak parallel 
+C  SLIDE-QUADRANT : Do 'HALVES' on Kitt Peak parallel
 C-----------------
 
       ELSE IF(COMMAND.EQ.'SLIDE-QUADRANT')  THEN
@@ -1052,7 +1052,7 @@ C-----------------
         IF(ISLCTQ(NQ,IFAIL).NE.1)   RETURN
         CALL OFFSSP(NQ)
         DUMP_OK = .TRUE.
-      
+
 C-----------------
 C  BIN-SPECTRUM: Average data into bins of width NBIN starting at channel NSTART
 C-----------------
@@ -1140,7 +1140,7 @@ C-----------------
         DUMP_OK = .TRUE.
 
 C-----------------
-C  SET-VELOCITY-FRAME : Set velocity frame, and law 
+C  SET-VELOCITY-FRAME : Set velocity frame, and law
 C-----------------
 
       ELSE IF(COMMAND.EQ.'SET-VELOCITY-FRAME')  THEN
@@ -1180,7 +1180,7 @@ C                  ****************************************
 C-----------------
 C FIND-SPECTRUM-STATISTICS : Find mean and standard deviation of X-register
 C-----------------
-      
+
       ELSE IF(COMMAND.EQ.'FIND-SPECTRUM-STATISTICS')  THEN
         IF (ICHECK(1,IFAIL).NE.1)    RETURN
         IF (ISLCTQ(NQ,IFAIL).NE.1)   RETURN
@@ -1290,7 +1290,7 @@ C-----------------------
 C-----------------------
 C  DAS-MERGE : For DAS, truncate quadrants then merge.
 C-----------------------
- 
+
       ELSE IF(COMMAND.EQ.'DAS-MERGE')  THEN
         IF((ICHECK(1,IFAIL).NE.1).OR.NQUAD.LT.2) RETURN
 C     Logical arguments must be different variables else the routine
@@ -1371,7 +1371,7 @@ C-----------------------
         END IF
         CALL ASK_INTERP (IFAIL)
         IF (IFAIL.EQ.0) CALL SET_INTERP_WEIGHTS (FWHM, WMAX, IFAIL)
-        IF (IFAIL.EQ.0 .AND. .NOT.INTERP_WAIT) 
+        IF (IFAIL.EQ.0 .AND. .NOT.INTERP_WAIT)
      &                  CALL INTERPOLATE_CUBE   (XSCALE, BUF, IFAIL)
         DUMP_OK = .TRUE.
 

@@ -39,7 +39,7 @@ C Get input file name, open the file, and read its header.
 C
       CALL TBLANK
       CALL GETNAM ('Input file name:', MAGFIL)
-      IF ((MAGFIL .EQ. 'END OF FILE') .OR. 
+      IF ((MAGFIL .EQ. 'END OF FILE') .OR.
      .     (MAGFIL .EQ. 'EXIT')) THEN
          MAGFIL = ' '
          RETURN

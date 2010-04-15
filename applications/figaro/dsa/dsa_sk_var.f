@@ -9,7 +9,7 @@ C     Determines whether or not a variance data array exists.
 C
 C  Description:
 C     This routine looks to see if a data structure contains a data
-C     array - or other information that could generate a data array - 
+C     array - or other information that could generate a data array -
 C     giving the variance information for that structure.  Although it
 C     is quite indifferent as to the existence or non-existence of
 C     such an array, it will output a warning message if it finds

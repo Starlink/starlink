@@ -58,12 +58,12 @@ f     The IntraMap class does not define any new routines beyond those
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,7 +79,7 @@ f     The IntraMap class does not define any new routines beyond those
 *        Added a "this" pointer to the external transformation function
 *        used by an IntraMap.
 *     20-JUN-2001 (DSB):
-*        Add an "astClone" call to prevent the pointer for "this" being 
+*        Add an "astClone" call to prevent the pointer for "this" being
 *        annulled at the end of the Transform method.
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitIntraMapVtab
@@ -157,9 +157,9 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(IntraMap)
@@ -173,17 +173,17 @@ astMAKE_INITGLOBALS(IntraMap)
    only function allowed to modify the contents of the static tran_data
    array). */
 static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 ); 
-#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 ); 
+#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 );
+#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 );
 
 /* A mutex used to serialise invocations of extrnal transformation
    functions (which may not be thread-safe). */
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
-#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 );
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 
@@ -391,7 +391,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "intramap.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astEqual protected
@@ -418,8 +418,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstIntraMap *that;        
-   AstIntraMap *this;        
+   AstIntraMap *that;
+   AstIntraMap *this;
    int nin;
    int nout;
    int result;
@@ -444,9 +444,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       nout = astGetNout( this );
       if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
 
-/* If the Invert flags for the two IntraMaps differ, it may still be possible 
-   for them to be equivalent. First compare the IntraMaps if their Invert 
-   flags are the same. In this case all the attributes of the two IntraMaps 
+/* If the Invert flags for the two IntraMaps differ, it may still be possible
+   for them to be equivalent. First compare the IntraMaps if their Invert
+   flags are the same. In this case all the attributes of the two IntraMaps
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
 
@@ -456,7 +456,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                result = 1;
             }
 
-/* If the Invert flags for the two IntraMaps differ, the attributes of the two 
+/* If the Invert flags for the two IntraMaps differ, the attributes of the two
    IntraMaps must be inversely related to each other. */
          } else {
 
@@ -466,7 +466,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          }
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
@@ -487,7 +487,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astGetObjSize protected
@@ -593,7 +593,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Obtain a pointer to the IntraMap structure. */
@@ -651,7 +651,7 @@ void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name, int *status
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -824,13 +824,13 @@ static void IntraReg( const char *name, int nin, int nout,
 *     status
 *        Pointer to the inherited status variable.
 */
-   
+
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char *clname;                 /* Pointer to cleaned name string */
    int found;                    /* Transformation function found? */
    int ifun;                     /* Loop counter for function information */
-   
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -935,11 +935,11 @@ static void IntraReg( const char *name, int nin, int nout,
    name. */
    if ( !astOK ) clname = astFree( clname );
 
-/* Mark the end of the section in which memory allocations may never be  
+/* Mark the end of the section in which memory allocations may never be
    freed (other than by any AST exit handler). */
    astEndPM;
 
-/* Unlock the mutex that ensures that only one thread can run this function 
+/* Unlock the mutex that ensures that only one thread can run this function
    at any one time. */
    UNLOCK_MUTEX1;
 
@@ -1867,7 +1867,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    npoint = astGetNpoint( in );
    ncoord_in = astGetNcoord( in );
    ncoord_out = astGetNcoord( result );
-   ptr_in = (const double **) astGetPoints( in );      
+   ptr_in = (const double **) astGetPoints( in );
    ptr_out = astGetPoints( result );
 
 /* Determine whether to apply the forward or inverse transformation,
@@ -1888,7 +1888,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
       LOCK_MUTEX2;
       ( *tran_data[ this->ifun ].tran_wrap )( tran_data[ this->ifun ].tran,
                                               id, npoint, ncoord_in, ptr_in,
-                                              forward, ncoord_out, ptr_out, 
+                                              forward, ncoord_out, ptr_out,
                                               status );
       UNLOCK_MUTEX2;
 
@@ -2581,7 +2581,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 *     nin
 *        The number of input coordinates.
 *     nout
-*        The number of output coordinates. 
+*        The number of output coordinates.
 
 *  Returned Value:
 *     A pointer to the new IntraMap.
@@ -2649,7 +2649,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
                                   "used by the \"%s\" transformation function "
                                   "(%d).", status, name, nin, tran_data[ ifun ].name,
                                   tran_data[ ifun ].nin  );
-            
+
 /* Similarly check the number of output coordinates. */
          } else if ( ( nout != tran_data[ ifun ].nout ) &&
                      ( tran_data[ ifun ].nout != AST__ANY ) ) {

@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
-*                                 const double telpos[3], AstFrameSet **fset, 
+*                                 const double telpos[3], AstFrameSet **fset,
 *                                 smfDetposWcsCache *cache, int *status );
 
 *  Arguments:
@@ -48,7 +48,7 @@
 *  Description:
 *     This function is used to create an AST FrameSet for the
 *     specified time slice from the "detpos" values in the supplied
-*     smfHead structure. 
+*     smfHead structure.
 *
 *     The returned FrameSet has a 2D GRID Frame as the base Frame, and a
 *     SkyFrame describing tracking coordinates as the current Frame. The
@@ -121,7 +121,7 @@
 #define FUNC_NAME "smf_detpos_wcs"
 
 /* Seconds per day */
-#define SPD 86400.0                    
+#define SPD 86400.0
 
 smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
                                    const double telpos[3],
@@ -198,7 +198,7 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
 
 /* Check the memory was allocated succesfully. */
       if( cache->lonlut && cache->latlut ) {
-  
+
 /* Copy the lon and lat values for the requested time slice from the
    smfHead structure to the local lut arrays. */
          p2 = cache->lonlut;
@@ -256,31 +256,31 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
    the SkyFrame from AZEL to the AST equivalent of the TRACKING Frame. */
       if( !hdr->dpazel ) {
          astSetC( cache->sky, "System", sc2ast_convert_system( hdr->state->tcs_tr_sys,
-                                                     status ) ); 
+                                                     status ) );
       }
    }
 
 /* Take a copy of the skyframe, and then modify its Epoch attribute. We take a
-   copy since otherwise all FrameSets returned by this function would share 
+   copy since otherwise all FrameSets returned by this function would share
    the same current Frame, and so the attribute change would affect them all.
    Always use TCS_TAI. smf_open_file corrects the JCMTState structure
-   if TCS_TAI is missing. Remember to convert from TAI to TDB (as required by 
+   if TCS_TAI is missing. Remember to convert from TAI to TDB (as required by
    the Epoch attribute). */
    csky = astClone( cache->sky );
    astSet( csky, "Epoch=MJD %.*g, dut1=%.*g",
            DBL_DIG, hdr->state->tcs_tai + 32.184/SPD,
-           DBL_DIG, dut1 ); 
+           DBL_DIG, dut1 );
 
 /* Create the FrameSet */
    *fset = astFrameSet( cache->grid, " " );
    astAddFrame( *fset, AST__BASE, map, csky );
 
 /* Free resources */
-   map =astAnnul( map );      
-   csky =astAnnul( csky );      
+   map =astAnnul( map );
+   csky =astAnnul( csky );
 
-/* Exempt the FrameSet pointer from the AST context system rather because 
-   we do not know when, or in which context, it will be used. It will be 
+/* Exempt the FrameSet pointer from the AST context system rather because
+   we do not know when, or in which context, it will be used. It will be
    annulled either in smf_tslice_ast or in smf_close_file. */
    astExempt( *fset );
 

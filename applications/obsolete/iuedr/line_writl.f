@@ -36,7 +36,7 @@
 
 *   Import:
       BYTE CNTRL(MAXTOK)   ! control string
- 
+
       LOGICAL LVALUE       ! logical value
 
 *   CMLINE:

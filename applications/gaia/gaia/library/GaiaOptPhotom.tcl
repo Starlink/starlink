@@ -253,7 +253,7 @@ itcl::class gaia::GaiaOptPhotom {
                         -allow_resize 0 \
 			-coupled 1 \
                         -notify_changed_cmd [code $this changed_psf]]
-      
+
       #  Create the GaiaPhotomList object to deal with the details of
       #  the objects that are being measured.
       set object_list_ [GaiaPhotomList \#auto \
@@ -556,7 +556,7 @@ itcl::class gaia::GaiaOptPhotom {
          catch {$autophotom_ delete_sometime}
          set autophotom_ {}
       }
-      if { $namer_ != {} } { 
+      if { $namer_ != {} } {
 	 catch {object delete $namer_}
       }
    }
@@ -627,7 +627,7 @@ itcl::class gaia::GaiaOptPhotom {
          delete object $this
       }
    }
-      
+
    #  Read and display positions from a PHOTOM file.
    method read_file {{filename ""} {update 0}} {
       if { $filename == "" } {
@@ -648,9 +648,9 @@ itcl::class gaia::GaiaOptPhotom {
 
    #  Measure the current objects. Note we need the PSF object first.
    method measure_objects { {silent 0} } {
-      if { [$psf_list_ write_file "GaiaPhotomIn.Dat"] } { 
+      if { [$psf_list_ write_file "GaiaPhotomIn.Dat"] } {
          if { [$object_list_ append_file "" "GaiaPhotomIn.Dat"] } {
-         
+
             if { $autophotom_ == {} } {
                #  Start autophotom application.
                global env
@@ -698,7 +698,7 @@ itcl::class gaia::GaiaOptPhotom {
                    usemags=$ok \
                   $more"
             } else {
-               if { ! $silent } { 
+               if { ! $silent } {
                   error_dialog "No image is displayed"
                }
             }
@@ -765,7 +765,7 @@ itcl::class gaia::GaiaOptPhotom {
    private method created_object {} {
       toggle_sky_button_
       $itk_component(DefineObject) configure -state normal
-      if { $auto_measure_ } {  
+      if { $auto_measure_ } {
          measure_objects 1
       }
    }
@@ -780,11 +780,11 @@ itcl::class gaia::GaiaOptPhotom {
    }
 
    #  Notification that the define_object method has been
-   #  completed for a PSF object. 
+   #  completed for a PSF object.
    private method created_psf {} {
       toggle_psf_sky_button_
       $itk_component(DefinePSF) configure -state normal
-      if { $auto_measure_ } {  
+      if { $auto_measure_ } {
          measure_objects 1
       }
    }
@@ -802,7 +802,7 @@ itcl::class gaia::GaiaOptPhotom {
    #  (we just allow the radius to be modified). Objects in other
    #  list need to reflect this change.
    private method changed_psf {} {
-      if { $propagate_ } { 
+      if { $propagate_ } {
 	 set propagate_ 0
 	 $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
 	 $object_list_ config_all major [$psf_list_ cget -semimajor]
@@ -810,7 +810,7 @@ itcl::class gaia::GaiaOptPhotom {
       }
    }
    private method changed_object {} {
-      if { $propagate_ } { 
+      if { $propagate_ } {
 	 set propagate_ 0
 	 $psf_list_ configure -semimajor [$object_list_ cget -semimajor]
 	 $psf_list_ config_all major [$object_list_ cget -semimajor]
@@ -834,7 +834,7 @@ itcl::class gaia::GaiaOptPhotom {
    #  skymethod is not annulus the button state isn't changed until a
    #  new object is created (see created_object method).
    private method sky_method_changed {type args} {
-      if { $type == "object" } { 
+      if { $type == "object" } {
          if { $args != {} } {
             if { [lindex $args 0] == "annulus" } {
                set skymethod_($this) 1
@@ -866,7 +866,7 @@ itcl::class gaia::GaiaOptPhotom {
          toggle_psf_sky_button_
       }
    }
-   
+
    #  View all measurements in new window (controlled by
    #  GaiaPhotomList).
    method view {{value ""}} {
@@ -885,18 +885,18 @@ itcl::class gaia::GaiaOptPhotom {
 
    #  Add a menu for controlling the aperture colours.
    protected method make_colours_menu_ {m} {
-      
+
       #  Object & PSF colours.
       $m add cascade -label Objects -menu [menu $m.objcol]
       $m add cascade -label PSF -menu [menu $m.psfcol]
       set objmen $m.objcol
       set psfmen $m.psfcol
-      
+
       set psf {}
-      foreach men "$m.objcol $m.psfcol" { 
+      foreach men "$m.objcol $m.psfcol" {
 
          #  Add the menus
-         foreach {label name} {{Selected colour}   selcol 
+         foreach {label name} {{Selected colour}   selcol
             {Deselected colour} descol
             {Selected sky colour} selskycol
             {Deselected sky colour} desskycol} {

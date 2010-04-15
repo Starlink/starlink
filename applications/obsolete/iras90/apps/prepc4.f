@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -106,7 +106,7 @@
 
 *  Set up the type of map to be searched for (noise or data). It is the
 *  opposite of the current map type given in the first element of the
-*  work array. 
+*  work array.
       IF( WORK( 1, II ) .EQ. 'NOISE' ) THEN
          INFO( 1 ) = 'DATA'
 
@@ -121,14 +121,14 @@
 
 *  If the current NDF is neither a data or a noise map, no pair exists.
 *  Return with IDATA equal to the index of the input NDF.
-      ELSE      
+      ELSE
          IDATA = II
          GO TO 999
       END IF
 
 *  Store the values of the other items of information being searched
 *  for.
-      DO J = 2, NITEM            
+      DO J = 2, NITEM
          INFO( J ) = WORK( J, II )
       END DO
 
@@ -142,9 +142,9 @@
 *  found between the work values and the current NDF values.
          J = 0
          PAIR = .TRUE.
-         DO WHILE( PAIR .AND. J .LT. NITEM ) 
+         DO WHILE( PAIR .AND. J .LT. NITEM )
             J = J + 1
-            PAIR = CHR_SIMLR( INFO( J ), WORK( J, INDEX ) ) 
+            PAIR = CHR_SIMLR( INFO( J ), WORK( J, INDEX ) )
          END DO
 
       END DO
@@ -157,7 +157,7 @@
             INOISE = INDEX
             IDATA = II
 
-         ELSE                      
+         ELSE
             INOISE = II
             IDATA = INDEX
          END IF
@@ -181,6 +181,6 @@
       END IF
 
 *  Finish
- 999  CONTINUE      
+ 999  CONTINUE
 
       END

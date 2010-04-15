@@ -15,7 +15,7 @@ C Returns:
 C  PGBEG         : a status return value. A value of 1 indicates
 C                    successful completion, any other value indicates
 C                    an error. In the event of error a message is
-C                    written on the standard error unit.  
+C                    written on the standard error unit.
 C                    To test the return value, call
 C                    PGBEG as a function, eg IER=PGBEG(...); note
 C                    that PGBEG must be declared INTEGER in the

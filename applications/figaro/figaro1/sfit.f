@@ -7,7 +7,7 @@ C     Figaro function to generate a spectrum by fitting a polynomial
 C     to an input spectrum.  An orthogonal polynomial of specified
 C     order is fitted either to the spectrum or to its logarithm, and
 C     the result is used to generate a new spectrum.
-C       
+C
 C     Command parameters -
 C
 C     SPECTRUM    (Character) The name of the spectrum to be fitted.
@@ -16,10 +16,10 @@ C     ORDER       (Numeric) The order to be used for the fit.
 C
 C     OUTPUT      (Character) The name of the output file to
 C                 be created.  If this is the same as the input
-C                 spectrum, the data in the input spectrum will 
+C                 spectrum, the data in the input spectrum will
 C                 be modified.
 C
-C     Command keywords - 
+C     Command keywords -
 C
 C     LOGS        Indicates that the logs of the pixel values
 C                 of the input spectrum are to be fitted.
@@ -38,7 +38,7 @@ C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C     17th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
 C     24th May 1998  ACD / UoE, Starlink.  Increased max. order to 30.
-C      4th Jul 2001  VGG / RAL, Starlink.  Error Propogation included. 
+C      4th Jul 2001  VGG / RAL, Starlink.  Error Propogation included.
 C      7th Jul 2001  ACD / UoE, Starlink.  Small amount of cosmetic
 C                    tidying.
 C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
@@ -108,10 +108,10 @@ C
       CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
-C                                            
+C
 C     Check for the existence of errors and map the variance array if
-C     one exists.       
-C                                                      
+C     one exists.
+C
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE ('SPECT',VEXIST,STATUS)
       IF (VEXIST) THEN
@@ -132,7 +132,7 @@ C
      :               %VAL(CNF_PVAL(DXPTR)),%VAL(CNF_PVAL(DYPTR)),
      :               %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(WKPTR)),
      :               %VAL(CNF_PVAL(OPTR)))
-C     
+C
 C     Tidy up
 C
   500 CONTINUE
@@ -159,7 +159,7 @@ C     (>) ORDER     (Integer) The order of the polynomial to be
 C                   fitted to INPUT. Note that this routine has
 C                   workspace for ORDER<=30.
 C     (>) LOGS      (Logical) If true, the fit will be to the
-C                   logarithms of the values in INPUT.  If false, 
+C                   logarithms of the values in INPUT.  If false,
 C                   the fit will be to the actual values.
 C     (W) DX        (Double precision DX(NX)) Workspace - used to hold
 C                   the X values for the fit.
@@ -196,7 +196,7 @@ C     Local variables
 C
       INTEGER DEGP1,I,IFAIL,IFAIL2,NDEG
       DOUBLE PRECISION XVAL,EPS
-C     
+C
 C     Check value of ORDER
 C
       DEGP1=MIN(MAX(ORDER+1,2),MAXDP1)

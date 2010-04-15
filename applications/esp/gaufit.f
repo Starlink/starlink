@@ -12,29 +12,29 @@
 *  Invocation:
 *     CALL GAUFIT( STATUS )
 
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Description: 
+*  Description:
 *     Uses a minimisation routine to determine the 2-D Gaussian profiles
 *     of multiple sources on an NDF format image. This will be especially
 *     useful for those using JCMT data (see also \xref{JCMTDR}{sun132}{}).
 *
-*     Source locations can be specified using a cursor or by 
-*     text file. The user is allowed to restrain the extent to which 
-*     each minimisation iteration is allowed to modify the location, 
-*     breadth or position angle of the sources. This is 
+*     Source locations can be specified using a cursor or by
+*     text file. The user is allowed to restrain the extent to which
+*     each minimisation iteration is allowed to modify the location,
+*     breadth or position angle of the sources. This is
 *     essential when the package is used with overlapping sources.
 *
-*     Input text files must contain the x and y coordinates of the 
-*     source in the Current co-ordinates of the NDF, and may in 
-*     addition contain estimates for the position angle, Sa, Sb 
-*     (std deviation of the Gaussian functions in 2 directions - 
+*     Input text files must contain the x and y coordinates of the
+*     source in the Current co-ordinates of the NDF, and may in
+*     addition contain estimates for the position angle, Sa, Sb
+*     (std deviation of the Gaussian functions in 2 directions -
 *     major axis then minor) and the peak value.
 *
-*     Output image options are for the generation of the complete whole 
-*     image model or an image containing the residuals in the regions 
+*     Output image options are for the generation of the complete whole
+*     image model or an image containing the residuals in the regions
 *     surrounding the sources.
 *
 *     There are two separate fitting algorithms within GAUFIT, a
@@ -45,28 +45,28 @@
 *     indicated by prefacing the variant descriptions with either [PS:]
 *     for parameter-search mode (lsqfit=false) or [LSQ:] for
 *     least-squares (lsqfit=true)
-*   
-*      
+*
+*
 *  Usage:
 *     GAUFIT IN INFILE OUT MODE MODEL IMGDEV
 *            MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE
 *            BACK SIGMA NSIGMA
 *            LSQFIT=false AUTOL XINC YINC SAINC SBINC PINC ANGINC NITER
-* 
+*
 *     GAUFIT IN INFILE OUT MODE MODEL IMGDEV
 *            MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE
 *            BACK SIGMA NSIGMA
 *            LSQFIT=true CALCSD MAXITER
 
-*  ADAM Parameters:                   
+*  ADAM Parameters:
 *     ANGCON = _LOGICAL (Read)
 *        Angle rotation convention. Defines if clockwise or
 *        anticlockwise is considered positive. TRUE=Clockwise.
 *     ANGINC = _REAL (Read)
 *        [PS:] The amount by which the angle of a source may vary.
 *        Arbitrary range 0 to 1. 1 = free to move as required.
-*        0 = unable to move.  
-*     ANGOFF = _REAL (Read) 
+*        0 = unable to move.
+*     ANGOFF = _REAL (Read)
 *        Angular offset for position angles generated. Units degrees.
 *     AUTOL = _LOGICAL (Read)
 *        [PS:] Is the source origin provided to be refined?
@@ -85,11 +85,11 @@
 *     FWHM = _LOGICAL (Read)
 *        Are the gaussian widths to be read and written as FWHM or
 *        standard deviations?
-*     IMGDEV = _DEVICE (Read) 
-*        Name of the graphics device on which the results graph should 
+*     IMGDEV = _DEVICE (Read)
+*        Name of the graphics device on which the results graph should
 *        be displayed.
 *     INFILE = _CHAR (Read)
-*        Name of a text file containing the co-ordinates of sources 
+*        Name of a text file containing the co-ordinates of sources
 *        to be profiled.  Co-ordinates are in the Current co-ordinate
 *        system of the WCS component of IN.
 *     IN = _NDF (Read)
@@ -99,7 +99,7 @@
 *        routine, or the older parameter-search method?
 *     MAXITER = _INTEGER (Read)
 *        [LSQ:] Upper-bound on the iteration count within the
-*        least-squares method 
+*        least-squares method
 *        (-1 indicates that you are happy
 *        with the default limit).  The default maximum count is large, and
 *        intended as an upper bound on the iteration count, to stop it spinning
@@ -107,7 +107,7 @@
 *        need to change this unless you suspect that the limit is genuinely
 *        being reached by a correct calculation.
 *     MODE = _LOGICAL (Read)
-*        Whether the application is to run in file input mode or 
+*        Whether the application is to run in file input mode or
 *        interactively. Interactive MODE=TRUE. File mode=FALSE.
 *     MODEL = _NDF (Read)
 *        The output NDF.
@@ -119,22 +119,22 @@
 *        [PS:] The number of iterations performed by the parameter-search
 *        routine.
 *     NSIGMA = _REAL (Read)
-*        Number of sigma above sky at which pixels are considered 
+*        Number of sigma above sky at which pixels are considered
 *        to be significant. [LSQ:] If you give back=-1, then this is ignored.
 *     OUT = _CHAR (Read)
-*        File name for the output text file containing the profile 
+*        File name for the output text file containing the profile
 *        data.
 *     PINC = _REAL (Read)
 *        [PS:] The amount by which the peak of a source may vary.
-*        1 = free to move as required. 0 = unable to move.  
+*        1 = free to move as required. 0 = unable to move.
 *     PSIZE = _REAL (Read)
 *        The size of each pixel in arc seconds.  If the image contains
-*        a SKY co-ordinate frame this value will be determined 
+*        a SKY co-ordinate frame this value will be determined
 *        automatically.
 *     SAINC = _REAL (Read)
 *        [PS:] The amount by which the standard deviation of a source may vary
-*        per iteration. Largest axis. 1 = free to move as required. 
-*        0 = unable to move.  
+*        per iteration. Largest axis. 1 = free to move as required.
+*        0 = unable to move.
 *     SBINC = _REAL (Read)
 *        [PS:] The amount by which the standard deviation of a source may vary
 *        per iteration. Smallest axis.
@@ -144,26 +144,26 @@
 *     XINC = _REAL (Read)
 *        [PS:] The amount by which the x coordinate of a source may vary
 *        per iteration. 1 = free to move as required.
-*        0 = unable to move.  
+*        0 = unable to move.
 *     YINC = _REAL (Read)
 *        [PS:] The amount by which the x coordinate of a source may vary
 *        per iteration. 1 = free to move as required.
-*        0 = unable to move.  
+*        0 = unable to move.
 *
 *  Examples:
 *     gaufit mode=false infile=coords.dat in=image out=sources
 *            modtyp=w model=imodel
 *
-*        Will read source coordinates from the text file coords.dat. 
-*        The image on which these appear is image, the output image 
+*        Will read source coordinates from the text file coords.dat.
+*        The image on which these appear is image, the output image
 *        containing the model for each pixel will be imodel.
-*        The coordinates provided by the file are in the Current 
+*        The coordinates provided by the file are in the Current
 *        coordinate system of the WCS component of the NDF image.
 *
 *     gaufit mode=true out=test1 modtyp=r angoff=90
-*        
-*        The sources will be identified by cursor. The output 
-*        image test1 will only show the residual (discrepancy 
+*
+*        The sources will be identified by cursor. The output
+*        image test1 will only show the residual (discrepancy
 *        between the models and the source image in the vicinity
 *        of the sources. The resultant position angles will be
 *        modified by 90 degrees.
@@ -196,17 +196,17 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
-         
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       LOGICAL MODE                    ! Interactive or file mode
 
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Enter AST context.
       CALL AST_BEGIN(STATUS)
@@ -241,8 +241,8 @@
 *   Exit AST context.
       CALL AST_END(STATUS)
 
-      END 
-       
+      END
+
 
 
       SUBROUTINE GAU1_OUTIM(ELEMS,ARRAY1,ARRAY2,STATUS)
@@ -253,25 +253,25 @@
 *  Purpose:
 *     Transfers the working image (containing residuals) to the
 *     output image.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL GAU1_OUTIM(ELEMS,ARRAY1,ARRAY2,STATUS)
-    
+
 *  Description:
-*      Copies values from the array containing the residuals. 
-*      The residuals array is the actual image minus the 
+*      Copies values from the array containing the residuals.
+*      The residuals array is the actual image minus the
 *      model image.
 
-*  Arguments:               
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        Number of pixels in the image.
 *     ARRAY1(ELEMS) = REAL (Given)
-*        The output image. 
+*        The output image.
 *     ARRAY2(ELEMS) = REAL (Returned)
-*        The residuals image. 
+*        The residuals image.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -289,16 +289,16 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                         
-      INTEGER ELEMS                   ! Number of pixels 
+*  Arguments Given:
+      INTEGER ELEMS                   ! Number of pixels
       REAL ARRAY1(ELEMS)              ! Residuals image
       REAL ARRAY2(ELEMS)              ! Output image
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -314,7 +314,7 @@
         ARRAY2(I)=ARRAY1(I)
  10   CONTINUE
 
-      END 
+      END
 
 
       SUBROUTINE GAU1_PRO(NSOUR,MODTYP,XINC,YINC,
@@ -323,7 +323,7 @@
      :                    NITER,RLIM,BACK,SIGMA,
      :                    ELEMS,UPIX,POINT,PRANGE,GUESS,
      :                    STATUS)
-*+              
+*+
 *  Name:
 *     GAU1_PRO
 
@@ -342,8 +342,8 @@
 
 *  Description:
 *     The routine minimises the residuals of the model/source fits
-*     by creating the models for a variety of parameter values and 
-*     performing a walk through parameter space in the direction that 
+*     by creating the models for a variety of parameter values and
+*     performing a walk through parameter space in the direction that
 *     minimises the residual. Not ideal but it works reasonably well
 *     given the time restraints.
 
@@ -367,19 +367,19 @@
 *     ANGCON = LOGICAL (Given)
 *        Angle rotation convention. Defines if clockwise or
 *        anticlockwise is considered positive. TRUE=Clockwise.
-*     ANGOFF = REAL (Given) 
+*     ANGOFF = REAL (Given)
 *        Angular offset for position angles generated. Units degrees.
 *     PSIZE = REAL (Given)
 *        Pixel size for display.  Units arcsec
 *     NITER = INTEGER (Given)
 *        Number of iterations.
 *     RLIM(10) = REAL (Given)
-*        The maximum distance from the origin at which profiling 
+*        The maximum distance from the origin at which profiling
 *        takes place.
 *     BACK = REAL (Given)
 *        The background count for the image.
 *     SIGMA = REAL (Given)
-*        Standard deviation value of BACK. 
+*        Standard deviation value of BACK.
 *     ELEMS = INTEGER (Given)
 *        Number of elements/pixels in the image array. Units pixels.
 *     UPIX = INTEGER (Given)
@@ -435,10 +435,10 @@
       REAL PINC                       ! Size of movement in peak value
       REAL RLIM(10)                   ! Maximum source radius used
       REAL SAINC                      ! Variation in Sa allowed
-      REAL SBINC                      ! Variation in Sb allowed   
+      REAL SBINC                      ! Variation in Sb allowed
       REAL SIGMA                      ! Std deviation of BACK
       REAL XINC                       ! Size of movement in X
-      REAL YINC                       ! Size of movement in Y 
+      REAL YINC                       ! Size of movement in Y
 
 *  Arguments Given and Returned:
       REAL GUESS(10,7)                ! Current estimates of the parameters
@@ -452,7 +452,7 @@
       REAL KEEP                       ! Temporary storage
       REAL PASS(10,7)                 ! Current parameters value
       REAL RESID                      ! Normalised residuals
-      REAL STEP1                      ! Parameter increment   
+      REAL STEP1                      ! Parameter increment
       REAL BEST                       ! Minimum residual so far
       REAL TEMP1                      ! Temporary value
 
@@ -462,8 +462,8 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Set up the loops required.
-      
-*   For each source set up the parameters for each Gaussian. 
+
+*   For each source set up the parameters for each Gaussian.
       DO 50 I=1,NSOUR
          DO 60 J=1,7
 
@@ -488,7 +488,7 @@
       CALL MSG_OUT(' ','Initial arbitrary residual ^DEV',STATUS)
       CALL MSG_BLANK(STATUS)
 
-*   Do the number of iterations requested.      
+*   Do the number of iterations requested.
       DO 2000 L2=1,NITER
 
 *      Tell the users the number of iteration underway.
@@ -519,20 +519,20 @@
      :                            %VAL(CNF_PVAL(POINT(5))),
      :                            %VAL(CNF_PVAL(POINT(6))),
      :                            RESID,STATUS)
-               
-*               Test for better residuals.                
+
+*               Test for better residuals.
                   IF(RESID.LT.BEST)THEN
                      KEEP=PASS(I,7)
                      BEST=RESID
                   END IF
- 
-*               Increment the angle.               
+
+*               Increment the angle.
                   PASS(I,7)=PASS(I,7)+STEP1
-  
+
  80            CONTINUE
 
 *            Set the angle to the best value.
-               PASS(I,7)=KEEP*.3333+TEMP1*.6667       
+               PASS(I,7)=KEEP*.3333+TEMP1*.6667
 
 *            Vary sigma x.
                BEST=1E20
@@ -550,8 +550,8 @@
      :                            %VAL(CNF_PVAL(POINT(5))),
      :                            %VAL(CNF_PVAL(POINT(6))),
      :                            RESID,STATUS)
-            
-*               Test for better residuals.                
+
+*               Test for better residuals.
                   IF(RESID.LT.BEST)THEN
                      KEEP=PASS(I,5)
                      BEST=RESID
@@ -582,7 +582,7 @@
      :                            %VAL(CNF_PVAL(POINT(6))),
      :                            RESID,STATUS)
 
-*               Test for better residuals.                
+*               Test for better residuals.
                   IF(RESID.LT.BEST)THEN
                      KEEP=PASS(I,6)
                      BEST=RESID
@@ -592,7 +592,7 @@
                   PASS(I,6)=PASS(I,6)+STEP1
 
  220           CONTINUE
-               
+
 *            Set sigma y to the best value.
                PASS(I,6)=KEEP*.333+TEMP1*.667
 
@@ -601,7 +601,7 @@
 *         Vary peak value.
             BEST=1E20
             STEP1=PASS(I,4)*.05*PINC
-            IF (STEP1.GT.SIGMA/3.) STEP1=SIGMA/3. 
+            IF (STEP1.GT.SIGMA/3.) STEP1=SIGMA/3.
             TEMP1=PASS(I,4)
             PASS(I,4)=PASS(I,4)-4.5*STEP1
             DO 205 K=-4,4
@@ -615,7 +615,7 @@
      :                   %VAL(CNF_PVAL(POINT(6))),
      :                   RESID,STATUS)
 
-*            Test for better residuals.                 
+*            Test for better residuals.
                IF(RESID.LT.BEST)THEN
                   KEEP=PASS(I,4)
                   BEST=RESID
@@ -628,7 +628,7 @@
 
 *      Set peak value to the best value.
          PASS(I,4)=KEEP*.3333+TEMP1*.6667
-     
+
 *       Vary x coordinate
            BEST=1E20
            STEP1=1.*XINC
@@ -645,7 +645,7 @@
      :                         %VAL(CNF_PVAL(POINT(6))),
      ;                         RESID,STATUS)
 
-*            Test for better residuals.                
+*            Test for better residuals.
                IF(RESID.LT.BEST)THEN
                   KEEP=PASS(I,1)
                   BEST=RESID
@@ -655,7 +655,7 @@
                PASS(I,1)=PASS(I,1)+STEP1
 
  215        CONTINUE
-            
+
 *         Set x to the best value.
             PASS(I,1)=KEEP*.3333+TEMP1*.6667
 
@@ -675,7 +675,7 @@
      :                         %VAL(CNF_PVAL(POINT(6))),
      :                         RESID,STATUS)
 
-*            Test for better residuals.                
+*            Test for better residuals.
                IF(RESID.LT.BEST)THEN
                   KEEP=PASS(I,2)
                   BEST=RESID
@@ -688,16 +688,16 @@
 
 *      Set y value to the best value.
          PASS(I,2)=KEEP*.3333+TEMP1*.6667
- 
+
 *      Indicate the current parameter values.
          CALL GAU1_DISP(I,ANGCON,ANGOFF,PSIZE,PASS,STATUS)
 
 
  170  CONTINUE
-             
+
 *   Indicate the current residuals.
       CALL MSG_BLANK(STATUS)
-      CALL MSG_FMTR('DEV','F6.1',BEST)    
+      CALL MSG_FMTR('DEV','F6.1',BEST)
       CALL MSG_OUT(' ','Current arbitrary residual ^DEV',STATUS)
 
  2000 CONTINUE
@@ -709,14 +709,14 @@
             GUESS(I,J)=PASS(I,J)
  4000    CONTINUE
  3000  CONTINUE
-     
+
 *   Build the output image.
       IF(MODTYP.EQ.GAU2WHOLE) THEN
 
-*      Model of the whole image.       
+*      Model of the whole image.
          CALL GAU1_BUILD2(NSOUR,BACK,PRANGE,PASS,ELEMS,
      :                   %VAL(CNF_PVAL(POINT(3))),STATUS)
-      
+
 
       ELSE
 
@@ -728,7 +728,7 @@
      :                   %VAL(CNF_PVAL(POINT(5))),
      :                   %VAL(CNF_PVAL(POINT(6))),
      :                   RESID,STATUS)
-      
+
       END IF
 
  9999 CONTINUE
@@ -746,22 +746,22 @@
 *     Store the locations of all pixels in ARRAY2 that are non-bad.
 *     Their locations are stored as indices and x/y pairs to allow the
 *     fastest possible processing later.
-      
+
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *      CALL GAU1_TRAN2(ELEMS,ARRAY2,UPIX,XMAX
-*                      ARRAY4,ARRAY5,ARRAY6,STATUS)    
+*                      ARRAY4,ARRAY5,ARRAY6,STATUS)
 
 *  Description:
 *      Look through the ARRAY2 image and find the index,
-*      X co-ordinate and Y co-ordinate of non-bad pixels and store them 
+*      X co-ordinate and Y co-ordinate of non-bad pixels and store them
 *      in ARRAY4, ARRAY5 and ARRAY6 respectively.
 
-*  Arguments:               
+*  Arguments:
 *     ELEMS = INTEGER (Given)
-*        Number of elements in the data NDF. 
+*        Number of elements in the data NDF.
 *     ARRAY2(ELEMS) = REAL (Given)
 *        Array into which the mapped NDF will be transfered.
 *     UPIX = INTEGER (Given)
@@ -791,12 +791,12 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in ARRAY2
       INTEGER UPIX                    ! Number of non-bad pixels in ARRAY2
       INTEGER XMAX                    ! Width of the image
@@ -806,8 +806,8 @@
       INTEGER ARRAY4(UPIX)            ! Indices
       INTEGER ARRAY5(UPIX)            ! X co-ordinate
       INTEGER ARRAY6(UPIX)            ! Y co-ordinate
-     
-*  Status:     
+
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
@@ -816,12 +816,12 @@
       INTEGER X                       ! X co-ordinate
       INTEGER Y                       ! Y co-ordinate
 *.
-      
+
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Find all pixels in the image that are non-bad and determine
-*   their co-ordinates. 
+*   their co-ordinates.
       N=0
       DO 2000 I=1,ELEMS
 
@@ -837,7 +837,7 @@
 *         Calculate X and Y value for the current pixel.
             Y=I/XMAX+1
             X=I-(Y-1)*XMAX
-     
+
 *         Store the values.
             ARRAY5(N)=X
             ARRAY6(N)=Y
@@ -866,13 +866,13 @@
 *  Invocation:
 *      CALL GAU1_DISP(I,ANGCON,ANGOFF,PSIZE,PASS,STATUS)
 
-*  Arguments:         
+*  Arguments:
 *     I = INTEGER (Given)
 *        Index of the PASS array elements to be used.
 *     ANGCON = LOGICAL (Given)
 *        Angle rotation convention. Defines if clockwise or
 *        anticlockwise is considered positive. TRUE=Clockwise.
-*     ANGOFF = Given (Given) 
+*     ANGOFF = Given (Given)
 *        Angular offset for position angles generated. Units degrees.
 *     PSIZE = REAL (Given)
 *        Pixel size/arcsec.  See psize in gau1_cmode for discussion.
@@ -901,33 +901,33 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 
-*  Arguments Given:                              
+*  Arguments Given:
       LOGICAL ANGCON                  ! Position angle convention
       INTEGER I                       ! Index of current parameters
       REAL ANGOFF                     ! Position angle offset
       REAL PSIZE		      ! Pixel size in arcsec
       REAL PASS(10,7)                 ! Current parameters value
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
       REAL VALUE                      ! Temporary angle value
       CHARACTER WIDA*5,WIDB*5,UNITLAB*2
-*   pass(i,5) and pass(i,6) are sigma in pixels.  
+*   pass(i,5) and pass(i,6) are sigma in pixels.
 *   Convert to arsecs (if PSIZE >= 1e-6) by multiplying by PSIZE
 *   Convert to FWHM (if PSIZE > 0) by multiplying by 2sqrt(log(2))
       REAL SIZECONV		      ! Conversion factor sigma/px -> ?
       CHARACTER LINE*80		      ! output line
 
 *.
-      
+
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Display the heading if I=1.
       IF(I.EQ.1) THEN
@@ -953,7 +953,7 @@
      :     /'   '//WIDA//'/'//UNITLAB//'     '//WIDB//'/'/
      :     /UNITLAB//'         Peak ', STATUS)
       END IF
-     
+
 *   Calculate the conversion factor
       SIZECONV = 1.0
       IF (PSIZE.GT.0.0) THEN
@@ -964,7 +964,7 @@
 *      Display in units of arcsec, rather than pixels
          SIZECONV = SIZECONV * ABS(PSIZE)
       END IF
-     
+
 *   Adjust the ang according to the convention.
       VALUE=PASS(I,7)
       IF(ANGCON) VALUE=-VALUE
@@ -973,7 +973,7 @@
 *   Apply limits.
       IF (VALUE.GT.179.99)  VALUE=VALUE-180.
       IF (VALUE.LT.-179.99) VALUE=VALUE+180.
-      
+
 *   Indicate the current parameter values.
       WRITE(LINE, 100) I,PASS(I,1),PASS(I,2),VALUE,
      :     PASS(I,5)*SIZECONV,PASS(I,6)*SIZECONV,PASS(I,4)

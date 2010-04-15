@@ -243,7 +243,7 @@ struct a_rem_call_out {
 
 struct a_mess_out {
 
-	int	mess_out_type;		/* type of message - says which map is 
+	int	mess_out_type;		/* type of message - says which map is
 					   relevant for the message */
          union
 		{

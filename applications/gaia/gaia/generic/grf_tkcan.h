@@ -4,28 +4,28 @@
  *+
  *  Name:
  *     grf_tkcan.h
- 
+
  *  Type:
  *     C include file.
- 
+
  *  Purpose:
  *     Define the interface to the grf_tkcan external routines
- 
+
  *  Invocation:
  *     #include "grf_tkcan.h"
- 
+
  *  Description:
  *     This include file defines the interface to the grf_tkcan
- *     routines that are not part of the standard grf interface. 
- 
+ *     routines that are not part of the standard grf interface.
+
  *  Inheritance:
  *     The grf_tkcan module is not a class and does not inherit.
- 
+
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -41,10 +41,10 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     PWD: Peter W. Draper (Starlink)
- 
+
  *  History:
  *     18-AUG-1997 (PWD):
  *        Original version.

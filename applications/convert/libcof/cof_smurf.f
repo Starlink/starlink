@@ -1,6 +1,6 @@
-      SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, 
-     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
-     :                      DUPLEX, PROEXT, PROHIS, SUMS, ENCOD, 
+      SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR,
+     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
+     :                      DUPLEX, PROEXT, PROHIS, SUMS, ENCOD,
      :                      NATIVE, STATUS )
 *+
 *  Name:
@@ -20,7 +20,7 @@
 *  Description:
 *     This routine converts contents of a SMURF extension to FITS.  Each
 *     NDF is converted in turn in standard fashion.  It is assumed that
-*     the NDFs do not contain their own metadata, thus may inherit the 
+*     the NDFs do not contain their own metadata, thus may inherit the
 *     metadata in the FITS airlock and HISTORY records from the parent
 *     NDF.  Any other components of the structure are converted to a
 *     binary table, as in the general case of extension conversion.
@@ -48,18 +48,18 @@
 *        to zero, as it is used for the adjustable array ARRNAM; instead
 *        specify NOARR=1 and and set ARRNAM to 'HEADER'.
 *     ARRNAM( NOARR ) = CHARACTER * ( * ) (Given)
-*        The names (in uppercase) of the NDF array components to write 
-*        to the FITS file.  These should be in the order to be written. 
+*        The names (in uppercase) of the NDF array components to write
+*        to the FITS file.  These should be in the order to be written.
 *        If the DATA component is present it should be first.
 *     BITPIX = INTEGER (Given)
 *        The number of bits per pixel (FITS BITPIX) required for the
 *        output FITS file.  In addition there are three special values.
-*        A value of 0 means use the BITPIX of the input array.  A value 
-*        of -1 means use the value of the BITPIX keyword in the NDF's 
-*        FITS extension; if the extension or BITPIX card is absent, the 
-*        BITPIX of the input array is used.  BITPIX=1 requests that any 
-*        scaled arrays in the NDF be copied to the scaled data type.  
-*        In the absence of a scaled array, behaviour reverts to 
+*        A value of 0 means use the BITPIX of the input array.  A value
+*        of -1 means use the value of the BITPIX keyword in the NDF's
+*        FITS extension; if the extension or BITPIX card is absent, the
+*        BITPIX of the input array is used.  BITPIX=1 requests that any
+*        scaled arrays in the NDF be copied to the scaled data type.
+*        In the absence of a scaled array, behaviour reverts to
 *        BITPIX=-1, which may in turn be effectively BITPIX=0.
 *     BLOCKF = INTEGER (Given)
 *        The blocking factor for the output file.  It must be a positive
@@ -77,8 +77,8 @@
 *        COF_WHEAD for details.
 *     DUPLEX = LOGICAL (Give)
 *        This qualifies the effect of PROFIT=.TRUE.  A .FALSE. value
-*        means that the airlocks headers only appear with the primary 
-*        array.  Supplying .TRUE., propagates the FITS airlock headers 
+*        means that the airlocks headers only appear with the primary
+*        array.  Supplying .TRUE., propagates the FITS airlock headers
 *        for other array components of the NDF.
 *     PROEXT = LOGICAL (Given)
 *        If .TRUE., the NDF extensions (other than the FITS extension)
@@ -92,9 +92,9 @@
 *        If .TRUE., DATASUM and CHECKSUM headers are written to each
 *        HDU.
 *     ENCOD = CHARACTER * ( * ) (Given)
-*        The encoding to use. If this is blank, then a default encoding 
+*        The encoding to use. If this is blank, then a default encoding
 *        is chosen based on the contents of the FITS extension. The
-*        supplied string should be a recognised AST encoding such as 
+*        supplied string should be a recognised AST encoding such as
 *        'DSS', 'FITS-WCS', 'NATIVE', etc (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Should a NATIVE encoding of the WCS info be included in the
@@ -141,7 +141,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -194,7 +194,7 @@
       LOGICAL WRITTN             ! Dummy structure is written?
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
       CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
-      
+
 *.
 
 *  Check the inherited global status.
@@ -229,10 +229,10 @@
 *  Look for any non-NDF components.
 *  ================================
 
-*  The SMURF/SMURF_EXT type should define the contents, but it is 
-*  not clear how rigid or final this structure is.  Since we need 
-*  FITS2NDF to be able to recreate the original NDF structure, yet 
-*  use generic code, the SMURF structure must be first recreated to 
+*  The SMURF/SMURF_EXT type should define the contents, but it is
+*  not clear how rigid or final this structure is.  Since we need
+*  FITS2NDF to be able to recreate the original NDF structure, yet
+*  use generic code, the SMURF structure must be first recreated to
 *  hold its named NDFs.
 
 *  Enumerate the SMURF extension components.
@@ -276,7 +276,7 @@
 
 *  Convert the NDF, but using the parent NDF's metadata.
             CALL COF_NEX2F( NAME, FUNIT, NDF, NDFE, FILNAM, 1,
-     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
+     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
      :                      STATUS )
 
@@ -342,6 +342,6 @@
          CALL DAT_ANNUL( CLOC, STATUS )
       END DO
 
-  999 CONTINUE      
+  999 CONTINUE
 
       END

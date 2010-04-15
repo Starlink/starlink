@@ -70,8 +70,8 @@
 *  Copyright:
 *     Copyright (C) 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
-*     Councils. 
-*     Copyright (C) 2007 Science & Technology Facilities Council.  All 
+*     Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.  All
 *     Rights Reserved.
 
 *  Licence:
@@ -117,7 +117,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -176,7 +176,7 @@
          CLIST = 'WCS,Axis,Quality,Unit'
       ELSE
          CLIST = 'WCS,Axis,Quality'
-      END IF 
+      END IF
 
 *  Create a new output NDF based on the first input NDF. Propagate the
 *  WCS, axis and quality components.
@@ -204,43 +204,43 @@
 *  add the data arrays.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL VEC_ADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL VEC_ADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                   IERR, NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL VEC_ADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL VEC_ADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL VEC_ADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL VEC_ADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL VEC_ADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                   IERR, NERR, STATUS )
       END IF
@@ -279,43 +279,43 @@
 *  Select the appropriate routine to add the input variance arrays.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL VEC_ADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL VEC_ADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                      %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                      IERR, NERR, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL VEC_ADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL VEC_ADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL VEC_ADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL VEC_ADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                      %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                      IERR, NERR, STATUS )
          END IF
@@ -333,7 +333,7 @@
 
 *  Obtain the output title and insert it into the output NDF.
       CALL NDF_CINP( 'TITLE', NDF3, 'Title', STATUS )
-      
+
 *  End the NDF context.
       CALL NDF_END( STATUS )
 

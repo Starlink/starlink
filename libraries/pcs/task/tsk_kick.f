@@ -79,7 +79,7 @@
       CHARACTER*(*) NAME     ! name of action to be rescheduled
       INTEGER LENGTH         ! number of significant bytes in VALUE
       CHARACTER*(*) VALUE    ! a set of bytes to be passed to the
-                             ! main-line code 
+                             ! main-line code
 *  Status:
       INTEGER STATUS
 *.

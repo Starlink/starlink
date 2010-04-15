@@ -1,5 +1,5 @@
 *+  RED4_DO_COADD - Coadd an integration into current observation
-      SUBROUTINE RED4_DO_COADD( INTEGRATION, INTQUALITY, INTDIM1, 
+      SUBROUTINE RED4_DO_COADD( INTEGRATION, INTQUALITY, INTDIM1,
      :   INTDIM2, IDX_ARRAY, INDDIM1, INDDIM2, DET_INDEX, DATA, VARIANCE,
      :   QUALITY, COADDS, DATADIM1, DATADIM2, STATUS )
 *    Description :
@@ -8,9 +8,9 @@
 *     integration are pointed to by the index array. The observation array
 *     contains the running mean of all the integrations co-added into it.
 *     Variances are calculated from the spread of values co-added into
-*     the observation. 
+*     the observation.
 *    Invocation :
-*      CALL RED4_DO_COADD (INTEGRATION, INTQUALITY, INTDIM1, 
+*      CALL RED4_DO_COADD (INTEGRATION, INTQUALITY, INTDIM1,
 *     :   INTDIM2, IDX_ARRAY, INDDIM1, INDDIM2, DET_INDEX, DATA, VARIANCE,
 *     :   QUALITY, COADDS, DATADIM1, DATADIM2, STATUS)
 *    Parameters :
@@ -141,7 +141,7 @@
       BYTE GOOD                          ! Good quality value
       PARAMETER ( GOOD = 0 )
       BYTE BAD                           ! Bad quality value
-      PARAMETER ( BAD = 1 )     
+      PARAMETER ( BAD = 1 )
       DOUBLE PRECISION BAD_VARIANCE      ! Bad variance value
       PARAMETER ( BAD_VARIANCE = 0.0D0 )
 *    Local variables :
@@ -209,7 +209,7 @@
 *               This is not the first integration to be applied.
 *               It will need to be co-added with the previous
 *               integrations.
-*               The method for obtaining the current sum and "sum of 
+*               The method for obtaining the current sum and "sum of
 *               squares" depends on whether this is the second or
 *               a subsequent integration.
                   IF ( NUM .EQ. 1 ) THEN

@@ -1,11 +1,11 @@
 *+  RED4_FILE_OBSERVATION_2 - File a specified observation in the index file
-      SUBROUTINE RED4_FILE_OBSERVATION_2( OBSERVATION, REDOBS, 
+      SUBROUTINE RED4_FILE_OBSERVATION_2( OBSERVATION, REDOBS,
      :   TYPE, STATUS )
 *    Description :
 *     This routine files the given observation in the index file,
 *     together with the parameters defining the setup of the instrument
-*     during that observation. The index file is used to record the 
-*     observations that have been reduced, and is searched from time to 
+*     during that observation. The index file is used to record the
+*     observations that have been reduced, and is searched from time to
 *     time for suitable calibration observations.
 *    Invocation :
 *     CALL RED4_FILE_OBSERVATION_2( OBSERVATION, REDOBS, STATUS )
@@ -77,7 +77,7 @@
 *                  after 24 hours. Modified so that the number
 *                  of elapsed days since observation 1 is taken
 *                  into account.                                    (SMB)
-*     11-Dec-1990: Split into RED4_FILE_OBSERVATION and 
+*     11-Dec-1990: Split into RED4_FILE_OBSERVATION and
 *                  RED4_FILE_OBSERVATION_2. Description altered.
 *                  Reading of date from observation 1 made more
 *                  efficient by remembering the previous file name
@@ -88,7 +88,7 @@
 *                  it is possible for different observations to be
 *                  made in NDR mode with different effective detector
 *                  sizes, and the calibration frames for these must
-*                  not get mixed up. Because of the GOTOs, it is 
+*                  not get mixed up. Because of the GOTOs, it is
 *                  possible for attempts to be made to close the index
 *                  file without opening it. Flags added to prevent
 *                  this.                                            (SMB)
@@ -169,14 +169,14 @@
 
       IF (STATUS .NE. ADAM__OK) RETURN
 
-*    From the name of the observation file construct the name of the 
+*    From the name of the observation file construct the name of the
 *    index file, which should have a name of the form CGS4_890818.INDEX
       CALL RED4_OBSTOINDEX( OBSERVATION, INDEX_FILE, STATUS )
 
 *    Open the index file
       CALL RIO_OPEN (INDEX_FILE, 'APPEND', 'UNFORMATTED', OBSRECSZ,
      : FD, STATUS)
-  
+
       IF (STATUS .EQ. SAI__OK) THEN
 
 *       Open the DSA system
@@ -245,7 +245,7 @@
      :             /'Second error getting FITS item', STATUS )
                END IF
 
-               CALL RED4_DAY_DIFFERENCE( IDATE1, IDATE2, NDAYS, STATUS ) 
+               CALL RED4_DAY_DIFFERENCE( IDATE1, IDATE2, NDAYS, STATUS )
             ELSE
 
 *            The observation being filed IS the first observation.
@@ -287,7 +287,7 @@
                   OBSREC.QUALITY = 'BAD'
                 ELSE
                   OBSREC.QUALITY = 'GOOD'
-                  IF ( (OBSREC.TYPE.NE.TYPE) .AND. 
+                  IF ( (OBSREC.TYPE.NE.TYPE) .AND.
      :                 (TYPE.NE.'WHATEVER_IT_IS') ) THEN
                     CALL MSG_SETC( 'OBS', OBSERVATION )
                     CALL MSG_SETC( 'RT', OBSREC.TYPE )
@@ -313,7 +313,7 @@
 *             The instrument configuration index.
                CALL DSA_SEEK_FITS( 'REDOBS', 'CNFINDEX', EXIST, ACCESS,
      :          ELEMENTS, STRLEN, DSA_STATUS )
-               IF ( EXIST ) THEN 
+               IF ( EXIST ) THEN
                   CALL DSA_GET_FITS_I( 'REDOBS', 'CNFINDEX', 0,
      :             OBSREC.CNFINDEX, COMMENT, DSA_STATUS )
                ELSE

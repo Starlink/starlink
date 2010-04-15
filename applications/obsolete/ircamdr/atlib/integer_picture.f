@@ -54,7 +54,7 @@
 *
 	DO WHILE ( LINE_COUNT .LT. LEN)
 *
-* calculate start column 
+* calculate start column
 *
 	  COLUMN_COUNT = CST - CIC
 
@@ -62,7 +62,7 @@
 
 	  I = 0
 
-* Setup the end of the column scan 
+* Setup the end of the column scan
 
 	  CEN = CST + ( CIC*( CNB - 1))
 
@@ -72,7 +72,7 @@
 
 * Loop until the end of the column scan
 
-	  DO WHILE ( COLUMN_COUNT .LT. CEN) 
+	  DO WHILE ( COLUMN_COUNT .LT. CEN)
 
 * Increment the column number variable
 

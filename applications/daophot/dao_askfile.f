@@ -31,7 +31,7 @@ C*** End of declarations inserted by SPAG
 
       INTEGER CHR_LEN
 
-      OPROMP = ' ' 
+      OPROMP = ' '
 C
 C Find the colon or question mark terminating the prompt.
 C

@@ -25,7 +25,7 @@
 *        The file base name. Ends with the character preceeding the first
 *        "." or "(" or "[" following the directory path.
 *     SUF = CHARACTER * ( * ) (Returned)
-*        Any string following the file base name, and preceeding any 
+*        Any string following the file base name, and preceeding any
 *        opening parenthesis. SUF will either be blank, or begin with a
 *        dot or a "[".
 *     SEC = CHARACTER * ( * ) (Returned)
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -137,7 +137,7 @@
       SECEND = -1
       IF( SPEC( LSPEC : LSPEC ) .EQ. ')' ) THEN
          CALL CHR_LASTO( SPEC, '(', SECBEG )
-         IF( SECBEG .GT. 0 ) THEN 
+         IF( SECBEG .GT. 0 ) THEN
             SECEND = LSPEC
             LSPEC = SECBEG - 1
          END IF
@@ -151,21 +151,21 @@
 *  the end of the remaining string.
       IF( SUFBEG .GT. 0 ) THEN
          SUFBEG = BNBEG + SUFBEG - 1
-         SUFEND = LSPEC  
+         SUFEND = LSPEC
          LSPEC = SUFBEG - 1
 
 *  Otherwise, if the last remaining character is a "]" the suffix
 *  consists of a foreign extension specifier.
       ELSE IF( SPEC( LSPEC : LSPEC ) .EQ. ']' ) THEN
 
-*  Find the last "[" in the string. This marks the start of the suffix. 
+*  Find the last "[" in the string. This marks the start of the suffix.
          CALL CHR_LASTO( SPEC, '[', SUFBEG )
-         IF( SUFBEG .GT. 0 ) THEN 
+         IF( SUFBEG .GT. 0 ) THEN
             SUFEND = LSPEC
             LSPEC = SUFBEG - 1
          END IF
 
-      END IF         
+      END IF
 
 *  The end of the remaining string is the end of the basename.
       BNEND = LSPEC

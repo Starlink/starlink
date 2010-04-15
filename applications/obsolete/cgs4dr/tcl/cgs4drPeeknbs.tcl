@@ -52,7 +52,7 @@ proc cgs4drPeeknbs {taskname} {
     }
     bind $ilab <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PeekNbsBox1.html"
     bind $inbs <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PeekNbsBox1.html"
-  
+
 # If user presses OK, send it to the task
     set bv [dialogShow .cgs4drDialogue .cgs4drDialogue]
     if {$bv==0} {

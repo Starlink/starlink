@@ -14,10 +14,10 @@
 
 #  Description:
 #     This routine checks the directories $CCDstarhtml for a directory
-#     $document.htx and an index file htx.index within this. If this is 
-#     located it checks for the existence of a label. If this is located 
-#     the name of the associated document is returned, otherwise a 
-#     blank string is returned. The document index file is assumed to 
+#     $document.htx and an index file htx.index within this. If this is
+#     located it checks for the existence of a label. If this is located
+#     the name of the associated document is returned, otherwise a
+#     blank string is returned. The document index file is assumed to
 #     have the format
 #
 #        < filename.html label
@@ -64,7 +64,7 @@
 #        Patched to work with HTX version 1.1-1. Index files now
 #        located within document directory. Should use the showme
 #        command instead of this routine,
-#          catch {showme -l docname label} 
+#          catch {showme -l docname label}
 #        will return exit status of showme (1 for failure). The
 #        search directories are HTX_PATH.
 #     {enter_further_changes_here}
@@ -95,7 +95,7 @@
                         break
                      }
                   } else {
-                     
+
 #  If blank label could be reference to whole document.
                      if { $label == "" } {
                         if { [info exists filename] } {
@@ -107,7 +107,7 @@
                   unset thislabel
                   set filename ""
                }
-               
+
 #  Construct filename.
                if { "$filename" != "" } {
                   set filename "$directory/$document.htx/$filename\#xref_$label"

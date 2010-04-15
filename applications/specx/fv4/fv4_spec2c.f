@@ -38,14 +38,14 @@
 *        Replace the XCOPY with a new routine MV4_SPECW2 to convert bad
 *        values properly.
 *     16 Aug 2004 (timj):
-*        Use CNF_PVAL for HDS mapped data arrays 
+*        Use CNF_PVAL for HDS mapped data arrays
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

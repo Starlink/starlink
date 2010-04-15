@@ -63,32 +63,32 @@
 
          ELSE IF ( NAME .EQ. 'CGS3_41' ) THEN
 
-*  Extract the data from a CGS3 hypercube 
+*  Extract the data from a CGS3 hypercube
 
             CALL RED3_CGS3_41 (STATUS)
 
          ELSE IF ( NAME .EQ. 'CGS3_42') THEN
- 
+
 *  Convert CGS3 data hyper-cube into image of spectra versus cycle number,
 *  of for polarimetry spectra versus plate position.
 
             CALL RED3_CGS3_42 (STATUS)
 
          ELSE IF ( NAME .EQ. 'CGS3_43') THEN
- 
+
 *  Convert CGS3 data hyper-cube into cube of spectra versus cycle number,
 *  for polarimetry only
 
             CALL RED3_CGS3_43 (STATUS)
 
          ELSE IF ( NAME .EQ. 'CGS3_BAD_CYCLE' ) THEN
- 
+
 *  Set bad quality on duff cycles in CGS3 spectrum versus cycle image
 
             CALL RED3_CGS3_SETBAD (STATUS)
 
          ELSE IF ( NAME .EQ. 'CGS3_DET' ) THEN
- 
+
 *  extract detector calibration spectrum from raw calibration data
 
             CALL RED3_CGS3_DET (STATUS)
@@ -100,13 +100,13 @@
             CALL RED3_EXTRACT (STATUS)
 
          ELSE IF ( NAME .EQ. 'ADJOIN3') THEN
- 
+
 *  Use RED3's ADJOIN
 
             CALL RED3_ADJOIN (STATUS)
 
          ELSE IF ( NAME .EQ. 'SCALE' ) THEN
- 
+
 *  Scale an input image/spectrum
 
             CALL RED3_SCALE (STATUS)
@@ -133,5 +133,5 @@
          END IF
 
       END IF
-    
+
       END

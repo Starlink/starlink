@@ -13,7 +13,7 @@
 *     CALL KPG1_PRNTH( STRING, OP, CL STATUS )
 
 *  Description:
-*     The routine returns the indices of the first opening parenthesis and 
+*     The routine returns the indices of the first opening parenthesis and
 *     the last closing parenthesis in the supplied string. Both are
 *     returned equal to zero if either parenthesis is not found.
 
@@ -27,7 +27,7 @@
 *        Position within STRING at which the last occurence of ")" is
 *        located.
 *     STATUS = INTEGER (Given and Returned)
-*        The global status.   
+*        The global status.
 
 *  Copyright:
 *     Copyright (C) 1998 CLRC
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

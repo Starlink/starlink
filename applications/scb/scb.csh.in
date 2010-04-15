@@ -12,8 +12,8 @@
 #     source scb.csh
 #
 #  Description:
-#     This procedure starts the SCB system for use from the C shell by 
-#     setting aliases for the commands it provides and setting up some 
+#     This procedure starts the SCB system for use from the C shell by
+#     setting aliases for the commands it provides and setting up some
 #     environment variables.
 #
 #  Authors:
@@ -26,7 +26,7 @@
 #        Modified for preprocessing by configure script.
 #-
 
-#  The following environment variable assignments are edited by the 
+#  The following environment variable assignments are edited by the
 #  configure script.
       setenv STARLINK "@STARLINK@"
       setenv SCB_INDEX "@SCB_INDEX@"
@@ -46,7 +46,7 @@
 
 #  Indicate that the SCB commands are available.
 #  This startup message is a bit on the verbose side, but you might want
-#  different settings of the environment variables for different 
+#  different settings of the environment variables for different
 #  occasions, so it's as well to be reminded of the values of the more
 #  important ones.
       echo " "

@@ -257,7 +257,7 @@
                IF (REJCAT  .AND.  SI .NE. CAT__NOID  .AND.
      :             STATUS .EQ. SAI__OK) THEN
                   CALL CAT_TIQAI (SI, 'PTR', SELPTR, STATUS)
-                  CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(SELPTR)), 
+                  CALL CAT_SLIST (NUMSEL, %VAL(CNF_PVAL(SELPTR)),
      :              CRIT, .TRUE., CI, DRJI, SIR, NUMREJ, STATUS)
                ELSE
                   SIR = CAT__NOID

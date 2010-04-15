@@ -127,7 +127,7 @@
 
 	IF( STATUS. NE. SAI__OK) THEN
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                'Error : IMAGE_CLEAR : During NDF_ASSOC scratch',
      :                  STATUS )
 
@@ -137,13 +137,13 @@
 
 *      reset pixel boundaries of scratch file
         CALL NDF_SBND( 2, LBND, NAXIS, LOCSR, STATUS)
-   
-	CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE', 
+
+	CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE',
      :	              POINTER_SCRATCH, NELEMENTS, STATUS)
 
 	IF( STATUS. NE. SAI__OK) THEN
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                'Error : IMAGE_CLEAR : During NDF_MAP scratch',
      :                  STATUS )
 
@@ -199,12 +199,12 @@
 
 * call subroutine to set temp image to minimum value in last image plotted
 
-	CALL IMAGE_SETVAL( NAXIS(1), NAXIS(2), 
+	CALL IMAGE_SETVAL( NAXIS(1), NAXIS(2),
      :                     %VAL( POINTER_SCRATCH), STATUS)
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                'Error : IMAGE_CLEAR : after IMAGE_SETVAL',
      :                  STATUS )
 
@@ -240,7 +240,7 @@
 
 	IF( STATUS .NE. SAI__OK) THEN
 
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                'Error : IMAGE_CLEAR : after NDF_ANNULs',
      :                  STATUS )
 

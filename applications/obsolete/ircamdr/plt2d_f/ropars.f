@@ -1,6 +1,6 @@
 	SUBROUTINE ROPARS( STATUS)
 
-* Description : 
+* Description :
 *
 * Invocation :
 *     CALL ROPARS( STATUS)
@@ -20,7 +20,7 @@
 *     07-09-1993 : THIS VERSION FROM LINCONT (JACH::CAA)
 *     17-Feb-94    (most) DAT routines changed to NDF (SKL@JACH)
 *                  and slightly different parameters obtained
-*                  from new data format 
+*                  from new data format
 *     25-Jul-94  Changed error reporting to ERR clls, removed VALUE (SKL@JACH)
 *     30-Dec=94  Added UTstart and UTend to fits items got (CAA@JACH)
 *     11-Apr-94  Changed to use AB's new search routine (CAA@JACH)
@@ -50,14 +50,14 @@
 * Local variables :
 !        CHARACTER*(DAT__SZLOC) LOC_FITS ! HDS locator for FITS array
 !	CHARACTER*80 ARRAY(NELEMENTS)   ! array of FITS info
- 
-!        INTEGER NUMBER                  ! For DO loop    
-	INTEGER          		! 
+
+!        INTEGER NUMBER                  ! For DO loop
+	INTEGER          		!
      :    LOC_IMAGE,			! NDF locator for input file structure
 !     :    PNTR,                         ! DAT pointer to mapped array
-!     :	  EL,     	                ! number of elements mapped 
+!     :	  EL,     	                ! number of elements mapped
 !     :    PARLIS(PARNUM),               ! element of FITS array required
-     :    INT_PAR                       !     
+     :    INT_PAR                       !
 !     :    VAL_LENGTH                    ! Length of trimmed FITS string
 
         REAL REAL_PAR                   ! Real value of parameter
@@ -75,7 +75,7 @@
 	   RETURN
 	END IF
 
-*      associate with image file 
+*      associate with image file
 	CALL NDF_ASSOC( 'IMAGE_NAME', 'READ', LOC_IMAGE, STATUS )
 	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'IMAGE FILE NOT FOUND', STATUS )
@@ -83,11 +83,11 @@
 	  RETURN
 	END IF
 
-*      check if FITS extension exists 
+*      check if FITS extension exists
 !        CALL NDF_XSTAT( LOC_IMAGE, 'FITS', FILLED, STATUS)
 !
 !	IF( FILLED .NE. .TRUE. ) THEN
-!          CALL MSG_OUT('ERR', 'EXTENSION TO FILE DOES NOT EXIST', 
+!          CALL MSG_OUT('ERR', 'EXTENSION TO FILE DOES NOT EXIST',
 !     :                 STATUS )
 !          CALL NDF_ANNUL( LOC_IMAGE, STATUS )
 !	  RETURN
@@ -95,9 +95,9 @@
 
 *      get access to FITS info array
 
-!        CALL NDF_XLOC( LOC_IMAGE, 'FITS', 'READ', LOC_FITS, STATUS)      
+!        CALL NDF_XLOC( LOC_IMAGE, 'FITS', 'READ', LOC_FITS, STATUS)
 !	IF( STATUS .NE. SAI__OK) THEN
-!          CALL ERR_REP('ERR', 
+!          CALL ERR_REP('ERR',
 !     :                 'Error getting access to FITS array - NDF_XLOC',
 !     :                 STATUS )
 !          CALL DAT_ANNUL( LOC_FITS, STATUS )
@@ -108,12 +108,12 @@
 
 *      use DAT_ routines to read primitive array
 
-!        CALL DAT_MAPV( LOC_FITS, '_CHAR*80', 'READ', PNTR, 
+!        CALL DAT_MAPV( LOC_FITS, '_CHAR*80', 'READ', PNTR,
 !     :                 EL, STATUS)
 
 
 !	IF( (STATUS .NE. SAI__OK) .OR. (EL .LT. MINEL) ) THEN
-!          CALL MSG_OUT('ERR', 
+!          CALL MSG_OUT('ERR',
 !     :          'Error mapping FITS array or too few FITS elements',
 !     :                 STATUS )
 !          CALL DAT_ANNUL( LOC_FITS, STATUS )
@@ -140,20 +140,20 @@
 *      get values of observational parameters
 
 !        DO NUMBER = 1, PARNUM
-!          IF ( (PARLIS(NUMBER) .GT. NELEMENTS) .OR. 
+!          IF ( (PARLIS(NUMBER) .GT. NELEMENTS) .OR.
 !     :          (PARLIS(NUMBER) .LT. 1 ) ) THEN
 !             PARVAL(NUMBER) = ' '
 !          ELSE
 !
-!             CALL FITS_VAL( EL, %VAL(PNTR), PARLIS(NUMBER),  
+!             CALL FITS_VAL( EL, %VAL(PNTR), PARLIS(NUMBER),
 !     :                      PARVAL(NUMBER), VAL_LENGTH, STATUS )
 !
 D            WRITE (6,*) ( 'VALUE   ', PARVAL(NUMBER))
-! 
+!
 !          END IF
 !        END DO
 
-*      get parameters from FITS list using AB's routine and set it in 
+*      get parameters from FITS list using AB's routine and set it in
 *      interface file
         CALL NDFX_GET_FITSR (LOC_IMAGE, 'AMSTART', REAL_PAR, STATUS)
 !        CALL CHR_CTOR( PARVAL(1), REAL_PAR, STATUS )
@@ -204,7 +204,7 @@ D            WRITE (6,*) ( 'VALUE   ', PARVAL(NUMBER))
 	CALL PAR_PUT0C( 'MODE', CHAR_PAR, STATUS)
 
 	IF( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP('ERR', 
+          CALL ERR_REP('ERR',
      :                 'WARNING: ERROR AFTER PUTTING PARAMETER VALUES',
      :                 STATUS )
         END IF

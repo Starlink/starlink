@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_BOX( XS, YS, XOUT, YOUT, OVER, STATUS )
-      
+
 *+
 *  Name:
 *     CCD1_BOX
@@ -67,7 +67,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      
+
 *  Arguments Given:
       INTEGER XS, YS
       DOUBLE PRECISION XOUT( 4 ), YOUT( 4 )
@@ -89,26 +89,26 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set up co-ordinates relative to unit square at origin
-      DO I  = 1, 4   
+      DO I  = 1, 4
          PX(I) = XOUT(I) - DBLE(XS) +0.5D0
          PY(I) = YOUT(I) - DBLE(YS) +0.5D0
-      END DO   
-      
+      END DO
+
 *  For each line in the polygon calulate the area common to the unit square,
-*  Allow negative area for subsequent `vector' addition of sub-areas. 
+*  Allow negative area for subsequent `vector' addition of sub-areas.
       SUM = 0.0D0
       DO I = 1, 3
-         CALL CCD1_SGARE( PX(I), PY(I), PX(I+1), PY(I+1), 
+         CALL CCD1_SGARE( PX(I), PY(I), PX(I+1), PY(I+1),
      :                     AREA, STATUS )
          SUM = SUM + AREA
       END DO
-         
-      CALL CCD1_SGARE( PX(4), PY(4), PX(1), PY(1), AREA, STATUS )      
+
+      CALL CCD1_SGARE( PX(4), PY(4), PX(1), PY(1), AREA, STATUS )
       SUM = SUM + AREA
-            
+
       OVER = SUM
-  
-*  Time at the bar please...      
+
+*  Time at the bar please...
 999   END
 
 

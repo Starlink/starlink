@@ -34,7 +34,7 @@
 *     1989:  Original version                                    (JFL)
 *     22-Jan-1990: History added. Method added from notes made
 *                  after studying source code.                   (SMB)
-*     4-Feb-1990: New version of RED4_SEEK_OBSERVATION that copies BIAS 
+*     4-Feb-1990: New version of RED4_SEEK_OBSERVATION that copies BIAS
 *                 observation into 'virtual common', if not already there. (JFL)
 *     20-Feb-1990: Null bad pixel mask changed from ' ' to '#',
 *                  as it was difficult to process ' ' with ICL
@@ -130,7 +130,7 @@
 *    Status :
       INTEGER STATUS
 *    Input :
-      CHARACTER*(*) INT_NAME             ! the basic name of the integration 
+      CHARACTER*(*) INT_NAME             ! the basic name of the integration
 *                                        !    file to be reduced, e.g. I890816_1_1
 *    External references :
       INTEGER DSA_TYPESIZE               ! DSA type size enquiry function
@@ -144,7 +144,7 @@
 *    Local Constants :
 *    Local variables :
       INTEGER FLOATSIZE                  ! Bytes per element of 'FLOAT' array
-      INTEGER NDIM                       ! the dimensions of the integration 
+      INTEGER NDIM                       ! the dimensions of the integration
 *                                             array
       INTEGER DIMS( MAXDIM )             !                "
       INTEGER N_EXPOSURES                ! the number of exposures that were
@@ -187,9 +187,9 @@
       CHARACTER*80 BIAS_NAME             ! The name of the file containing the
 *                                             reduced BIAS observation
       CHARACTER*20 INT_TYPE              ! type of integration
-      CHARACTER*80 MASK                  ! name of file containing dud-pixel 
+      CHARACTER*80 MASK                  ! name of file containing dud-pixel
 *                                             info
-      CHARACTER*80 LINCOEFFS             ! name of file containing 
+      CHARACTER*80 LINCOEFFS             ! name of file containing
 *                                        !    linearisation coefficients
       CHARACTER*40 OBJECT_NAME           ! The name of the object.
       CHARACTER*32 CHAR_ARRAY(2)         ! array to hold data units and title
@@ -211,7 +211,7 @@
 *    The integration structure has already been opened as 'INT_IN'
 *    and the parent observation file as 'OBSERVATION' before this
 *    routine is called
-*    first of all try to check that we have all the information for 
+*    first of all try to check that we have all the information for
 *    the integration reduction proceed.
 *    Get the INT_TYPE (i.e. the observation mode; CHOP, STARE etc...)
       DSA_STATUS = SAI__OK
@@ -353,7 +353,7 @@
 *    Find the size of the input data array
       DSA_STATUS = STATUS
       CALL DSA_DATA_SIZE ('INT_IN', MAXDIM, NDIM, DIMS, NELM,
-     :  DSA_STATUS) 
+     :  DSA_STATUS)
 
 *    and the number of elements in a single plane of that array
       NPLANE = DIMS(1) * DIMS(2)
@@ -390,22 +390,22 @@
 
       IF ( VERBOSE ) THEN
 
-         IF ( .NOT. PROCEED_BIAS ) CALL MSG_OUT( ' ', 
+         IF ( .NOT. PROCEED_BIAS ) CALL MSG_OUT( ' ',
      :      'No BIAS subtraction will be performed', STATUS )
       END IF
 
 *    If non-destructive reads are not being used, then we need a ready
 *    reduced BIAS observation for this reduction. RED4_GET_OBSERVATION
 *    will copy the most suitable observation into virtual memory
-*    (pointers held in RED4_COMMON) 
+*    (pointers held in RED4_COMMON)
       IF ( PROCEED_BIAS .AND. (INDEX(INT_TYPE,'NDR').EQ.0) ) THEN
 
 *      Find the name of the observation file responsible for this
-*      integration, from it construct the name of the the observation 
+*      integration, from it construct the name of the the observation
 *      index file which should have a name of the form CGS4_yymmdd.INDEX
 *      Index files are found in the directory whose logical name is
 *      CGS4_INDEX.
-         CALL DSA_GET_FITS_C( 'INT_IN', 'OBSFILE', 0, OBSFILE, COMMENT, 
+         CALL DSA_GET_FITS_C( 'INT_IN', 'OBSFILE', 0, OBSFILE, COMMENT,
      :     DSA_STATUS )
 
          IF ( DSA_STATUS .NE. SAI__OK ) THEN
@@ -440,7 +440,7 @@
       ENDIF
 
 *    Find what dud-pixel mask is to be used, if any. Map in the quality
-*    array if need be and check its size. 
+*    array if need be and check its size.
       CALL PAR_GET0C ('MASK', MASK, STATUS)
       CALL PAR_CANCL ('MASK', STATUS)
       CPOS = INDEX (MASK, ':')
@@ -463,8 +463,8 @@
          DSA_STATUS = STATUS
          CALL DSA_NAMED_INPUT ('MASK', MASK, DSA_STATUS)
 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS ) 
-         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS ) 
+         CALL DSA_MATCH_DIMENSION( 'MASK', 1, 'INT_IN', 1, DSA_STATUS )
+         CALL DSA_MATCH_DIMENSION( 'MASK', 2, 'INT_IN', 2, DSA_STATUS )
 
          CALL DSA_MAP_DATA ('MASK', 'READ', 'BYTE', MASK_DATA,
      :      MASK_SLOT, DSA_STATUS)
@@ -473,7 +473,7 @@
 *    Now we're as sure as can be that everything's gonna be jus' fine,
 *    so open the output file according to the reduced integration template
 *    and with the correct filename e.g. RI890801_1_1 from I890801_1_1
-      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE', 
+      CALL DSA_NAMED_INPUT ('INTRED_TEMPLATE',
      :   INTRED_TEMPLATE, DSA_STATUS)
 
       IF ( DSA_STATUS .NE. SAI__OK ) THEN
@@ -492,13 +492,13 @@
       ENDIF
 
       DSA_STATUS = STATUS
-      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE', 
+      CALL DSA_NAMED_OUTPUT ('INT_RED', INT_RED, 'INTRED_TEMPLATE',
      :   0, 0, DSA_STATUS)
 
 *    Copy the contents of the FITS structure from the raw integration file
 *    over to the reduced integration file (deleting the old structure first,
 *    if present)
-      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE, 
+      CALL RED4_COPY_STRUCTURE( 'INT_IN.'//FITS_STRUCTURE,
      :   'INT_RED.'//FITS_STRUCTURE, STATUS )
 
 *   Abort if an error has occurred. This is bad practise, but has been
@@ -512,11 +512,11 @@
       END IF
 
 *    Map in the data array of the reduced integration file, and the
-*    variance and quality arrays 
+*    variance and quality arrays
       DSA_STATUS = STATUS
       CALL DSA_USE_QUALITY ('INT_RED', DSA_STATUS)
 
-      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA, 
+      CALL DSA_MAP_DATA ('INT_RED', 'WRITE', 'FLOAT', RED_DATA,
      :   DATA_SLOT, DSA_STATUS)
       CALL DSA_MAP_QUALITY ('INT_RED', 'WRITE', 'BYTE', RED_QUAL,
      :   QUAL_SLOT, DSA_STATUS)
@@ -575,7 +575,7 @@
 *       work out the SECTOR statistics, if enabled
          IF (INDEX(INT_TYPE,'SECTORS') .NE. 0) THEN
 
-*          the plane of the integration array holding the statistical 
+*          the plane of the integration array holding the statistical
 *          information
             IN_DATA = IN_DATA + FLOATSIZE * NPLANE
 
@@ -589,7 +589,7 @@
      :           N_EXPOSURES, %val(RED_VAR), STATUS )
             ELSE
 
-               CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA), 
+               CALL RED4_SXX_TO_SESQ( %val(RED_DATA), %val(IN_DATA),
      :           NPLANE, N_EXPOSURES, %val(RED_VAR), STATUS)
             END IF
          ENDIF
@@ -618,10 +618,10 @@
                CALL MSG_SETC( 'LINCOEFFS', LINCOEFFS )
                CALL MSG_OUT( ' ', 'Linearising using '/
      :           /'^NCOEFFS^NTH order polynomial in ^LINCOEFFS',
-     :           STATUS ) 
+     :           STATUS )
             END IF
 
-            CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE, 
+            CALL RED4_LINEARISE( N_COEFFS, LCOEFFS, NPLANE,
      :         %val(RED_DATA), %val(RED_VAR), %val(RED_QUAL),
      :         STATUS )
          END IF
@@ -650,12 +650,12 @@
       CALL DSA_SET_DATA_INFO ('INT_RED', 2, CHAR_ARRAY, 0, 0.0D0,
      :  DSA_STATUS)
 
-*    Obtain the name of the object and write it to the reduced 
+*    Obtain the name of the object and write it to the reduced
 *    integration structure in the standard Figaro way.
       CALL DSA_GET_FITS_C( 'OBSERVATION', 'OBJECT', 0, OBJECT_NAME,
      :  COMMENT, DSA_STATUS )
       CALL DSA_SET_OBJECT( 'INT_RED', OBJECT_NAME, DSA_STATUS )
-   
+
 *    End of reduction
 *    Record how the reduction went in the CGS4_INTRED extension
 *    Date & time
@@ -680,7 +680,7 @@
      :     ' ', DSA_STATUS)
       END IF
 
-*    the name of the BIAS observation, if used 
+*    the name of the BIAS observation, if used
       IF ( PROCEED_BIAS .AND. (INDEX(INT_TYPE,'NDR').EQ.0) ) THEN
 
          CLEN = MAX( 1, CHR_LEN( BIAS_NAME ) )
@@ -696,7 +696,7 @@
 *    the standard Figaro OBS structure).
       CALL DSA_PUT_FITS_F( 'INT_RED', 'EXPOSED', INTEGRATION_TIME,
      :  ' ', DSA_STATUS )
-      CALL DSA_SET_EXPOSURE( 'INT_RED', INTEGRATION_TIME, DSA_STATUS ) 
+      CALL DSA_SET_EXPOSURE( 'INT_RED', INTEGRATION_TIME, DSA_STATUS )
 
 *    whether linearised or not, and the linearisation coefficients
       IF ( INDEX( LINCOEFFS, '#' ) .EQ. 0 ) THEN

@@ -15,7 +15,7 @@
 *     status on input.
 *  Arguments:
 *     PARAM  =  CHARACTER*(*) (Given)
-*        Name of the external parameter with which the error is 
+*        Name of the external parameter with which the error is
 *        associated.
 *     MESSGE  =  CHARACTER*(*) (Given)
 *        Message to be reported with the error.
@@ -31,7 +31,7 @@
 *     Construct the parameter name for the second message.
 *     Report the error messages.
 *
-*     Notes: 
+*     Notes:
 *
 *     (1) This routine contains code for reporting the error via both
 *         the ADAM error system and a simple Fortran PRINT statement.
@@ -50,12 +50,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -151,7 +151,7 @@ C     END IF
 
 *
 *    Report the errors.
-*    Code for reporting the error both via the ADAM error system and 
+*    Code for reporting the error both via the ADAM error system and
 *    via a Fortran PRINT statement is included below.  Comment out
 *    whichever is not required.
 
@@ -160,7 +160,7 @@ C     CALL ERR_REP (PARA1, ERRMSG(1 : MSGLEN), STATUS)
 
 C     PRINT2000, OUTBUF(1 : OUTLEN), ERRMSG(1 : MSGLEN)
 C2000 FORMAT(1X, '*** ERROR ***' /
-C    :  1X, A / 
+C    :  1X, A /
 C    :  1X, A /
 C    :  1X, '*************' )
 

@@ -1,5 +1,5 @@
       SUBROUTINE IRA1_DRMS( ACEN, BCEN, GAPLON, GAPLAT, SCS, IDA, IMLO,
-     :                      IMHI, IPLO, IPHI, LBND, UBND, 
+     :                      IMHI, IPLO, IPHI, LBND, UBND,
      :                      MAXLAB, MAXTIC, ALAX, LABS, NLABS, TICKS,
      :                      NTICKS, STATUS )
 *+
@@ -18,13 +18,13 @@
 *                     MAXTIC, ALAX, LABS, NLABS, TICKS, NTICKS, STATUS )
 
 *  Description:
-*     This routine draws each of the meridians in turn. Positions and 
-*     directions of longitude tick marks are returned, together with 
-*     information about the positions of longitude "end" labels (i.e. 
-*     longitude labels placed at the start or end of each meridian). 
-*     The longest meridian is also found. If end labels cannot be used 
-*     (eg if a pole is in the image, or if north is at a position angle 
-*     of 90 degrees), then latitude labels are placed on the longest 
+*     This routine draws each of the meridians in turn. Positions and
+*     directions of longitude tick marks are returned, together with
+*     information about the positions of longitude "end" labels (i.e.
+*     longitude labels placed at the start or end of each meridian).
+*     The longest meridian is also found. If end labels cannot be used
+*     (eg if a pole is in the image, or if north is at a position angle
+*     of 90 degrees), then latitude labels are placed on the longest
 *     meridian.
 
 *  Arguments:
@@ -216,7 +216,7 @@
 
 *  Set up the longitude of the meridian and draw it.
                A = ACEN + I*GAPLON
-               CALL IRA_DRMER( IDA, A, CSTART, CINC, SCS, LBND, UBND, 
+               CALL IRA_DRMER( IDA, A, CSTART, CINC, SCS, LBND, UBND,
      :                         STATUS )
                CALL SGS_FLUSH
 

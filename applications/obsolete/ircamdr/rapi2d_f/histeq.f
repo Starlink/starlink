@@ -60,7 +60,7 @@
 *     14-04-1986 : Tidied and modified (REVA::MJM)
 *     11-MAR-94    Changed DAT_, CMP_ to NDF_ (SKL@JACH)
 *     11-Aug-1994  Changed input DIMS for COPY2D and HISTEQSUB (SKL@JACH)
-*                   
+*
 *    Type Definitions :
 
       IMPLICIT NONE               ! no default typing allowed
@@ -68,7 +68,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'           ! global SSE definitions
-      INCLUDE 'NDF_PAR'           
+      INCLUDE 'NDF_PAR'
       INCLUDE 'NDF_ERR'
 
 *    Status :
@@ -84,7 +84,7 @@
 
 *    Local variables :
 
-      INTEGER 
+      INTEGER
      :  NELEMENTS,                ! number of elements mapped
      :  NDIM,                     ! dimensions from NDF_DIM
      :  IDIMS( NDIMS ),           ! dimensions of input image
@@ -111,12 +111,12 @@
 
 *    get a locator to input image data structure
       CALL GETINP( 'INPIC', LOCI, STATUS )
- 
+
 *    if no error so far then continue
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map the DATA_ARRAY component of the input data structure
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimensions
@@ -135,7 +135,7 @@
          CALL AIF_GET0I( 'YSTART', 1, 1, IDIMS(2), YSTART, STATUS )
 
 *       get x and y end coords of sub-array to be processed
-         CALL AIF_GET0I( 'XFINISH', IDIMS(1), 1, IDIMS(1), 
+         CALL AIF_GET0I( 'XFINISH', IDIMS(1), 1, IDIMS(1),
      :                    XFINISH, STATUS )
          CALL AIF_GET0I( 'YFINISH', IDIMS(2), 1, IDIMS(2),
      :                    YFINISH, STATUS )
@@ -153,17 +153,17 @@
 *          map in a DATA_ARRAY component
             CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                  PNTRO, NELEMENTS, STATUS )
-        
+
 *             check status before accessing pointers
                IF ( STATUS .EQ. SAI__OK ) THEN
 
 *                copy the input array into the output array
-                  CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ), 
+                  CALL COPY2D( IDIMS(1), IDIMS(2), %VAL( PNTRI ),
      :                         %VAL( PNTRO ), STATUS )
 
 *                call the working subroutine to perform the magic
-                  CALL HISTEQSUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ), 
-     :                         XSTART, YSTART, XFINISH, YFINISH, 
+                  CALL HISTEQSUB( IDIMS(1), IDIMS(2), %VAL( PNTRO ),
+     :                         XSTART, YSTART, XFINISH, YFINISH,
      :                         NUMBIN, OLDHIST, MAP, STATUS )
 
                END IF

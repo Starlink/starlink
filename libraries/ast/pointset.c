@@ -21,12 +21,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -100,7 +100,7 @@
 *
 *        void astClear<Attribute>_( AstPointSet *this, int axis )
 *
-*     which implement a method for clearing a single value in a specified 
+*     which implement a method for clearing a single value in a specified
 *     multi-valued attribute for an axis of a PointSet. The "axis" value
 *     must be in the range 0 to (ncoord-1).
 
@@ -153,7 +153,7 @@ void astClear##attr##_( AstPointSet *this, int axis, int *status ) { \
 \
 /* Invoke the required method via the virtual function table. */ \
    (**astMEMBER(this,PointSet,Clear##attr))( this, axis, status ); \
-}   
+}
 
 
 /*
@@ -184,7 +184,7 @@ void astClear##attr##_( AstPointSet *this, int axis, int *status ) { \
 *
 *        <Type> astGet<Attribute>_( AstPointSet *this, int axis )
 *
-*     which implement a method for getting a single value from a specified 
+*     which implement a method for getting a single value from a specified
 *     multi-valued attribute for an axis of a PointSet. The "axis" value
 *     must be in the range 0 to (ncoord-1).
 
@@ -257,7 +257,7 @@ type astGet##attr##_( AstPointSet *this, int axis, int *status ) { \
 *     MAKE_SET
 
 *  Purpose:
-*     Implement a method to set a single value in a multi-valued attribute 
+*     Implement a method to set a single value in a multi-valued attribute
 *     for a PointSet.
 
 *  Type:
@@ -281,7 +281,7 @@ type astGet##attr##_( AstPointSet *this, int axis, int *status ) { \
 *        void astSet<Attribute>_( AstPointSet *this, int axis, <Type> value )
 *
 *     which implement a method for setting a single value in a specified
-*     multi-valued attribute for a PointSet. The "axis" value must be in 
+*     multi-valued attribute for a PointSet. The "axis" value must be in
 *     the range 0 to (ncoord-1).
 
 *  Parameters:
@@ -352,7 +352,7 @@ void astSet##attr##_( AstPointSet *this, int axis, type value, int *status ) { \
 *     MAKE_TEST
 
 *  Purpose:
-*     Implement a method to test if a single value has been set in a 
+*     Implement a method to test if a single value has been set in a
 *     multi-valued attribute for a class.
 
 *  Type:
@@ -375,7 +375,7 @@ void astSet##attr##_( AstPointSet *this, int axis, type value, int *status ) { \
 *
 *        int astTest<Attribute>_( AstPointSet *this, int axis )
 *
-*     which implement a method for testing if a single value in a specified 
+*     which implement a method for testing if a single value in a specified
 *     multi-valued attribute has been set for a class. The "axis" value
 *     must be in the range 0 to (ncoord-1).
 
@@ -478,7 +478,7 @@ static int (* parent_getobjsize)( AstObject *, int * );
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
    globals->Class_Init = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0;
@@ -493,8 +493,8 @@ astMAKE_INITGLOBALS(PointSet)
 
 
 
-/* If thread safety is not needed, declare and initialise globals at static 
-   variables. */ 
+/* If thread safety is not needed, declare and initialise globals at static
+   variables. */
 #else
 
 static char getattrib_buff[ 101 ];
@@ -557,7 +557,7 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that, int *sta
 
 *  Synopsis:
 *     #include "pointset.h"
-*     AstPointSet *astAppendPoints( AstPointSet *this, AstPointSet *that ) 
+*     AstPointSet *astAppendPoints( AstPointSet *this, AstPointSet *that )
 
 *  Class Membership:
 *     PointSet method.
@@ -591,7 +591,7 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that, int *sta
    int ic;
    int n1;
    int n2;
-   int ncoord; 
+   int ncoord;
    size_t nb2;
    size_t nb1;
 
@@ -629,7 +629,7 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that, int *sta
          }
 
 /* Copy any axis accuracies from "this". */
-         result->acc = this->acc ? 
+         result->acc = this->acc ?
                   astStore( NULL, this->acc, sizeof( double )*(size_t) ncoord )
                   : NULL;
       }
@@ -687,8 +687,8 @@ static void BndPoints( AstPointSet *this, double *lbnd, double *ubnd, int *statu
    double ub;
    int ic;
    int ip;
-   int nc;     
-   int np;     
+   int nc;
+   int np;
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -719,7 +719,7 @@ static void BndPoints( AstPointSet *this, double *lbnd, double *ubnd, int *statu
             }
          }
 
-/* Search through the remaining points. Update the bounds if the axis 
+/* Search through the remaining points. Update the bounds if the axis
    value is good. */
          for( ; ip < np; ip++,p++ ) {
             if( *p != AST__BAD ) {
@@ -801,7 +801,7 @@ static void CheckPerm( AstPointSet *this, const int *perm, const char *method, i
 /* Initialise. */
    valid = 1;
 
-/* Obtain the number of PointSet axes and allocate a temporary array of 
+/* Obtain the number of PointSet axes and allocate a temporary array of
    integers with the same number of elements. */
    ncoord = astGetNcoord( this );
    there = astMalloc( sizeof( int ) * (size_t) ncoord );
@@ -926,7 +926,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Synopsis:
 *     #include "pointset.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
+*     int Equal( AstObject *this, AstObject *that, int *status )
 
 *  Class Membership:
 *     PointSet member function (over-rides the astEqual protected
@@ -949,7 +949,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Notes:
 *     - The two PointSets are considered equivalent if they have the same
-*     number of points, the same number of axis values per point, and the 
+*     number of points, the same number of axis values per point, and the
 *     same axis values to within the absolute tolerance specified by the
 *     Accuracy attribute of the two PointSets.
 *     - A value of zero will be returned if this function is invoked
@@ -1034,7 +1034,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                            break;
                         }
 
-/* Otherwise (if both axis values are good), compare axis values, and break if 
+/* Otherwise (if both axis values are good), compare axis values, and break if
    they differ by more than the absolute accuracy. */
                      } else if( fabs( *p_this - *p_that ) > acc ) {
                         result = 0;
@@ -1162,7 +1162,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Initialise. */
    result = NULL;
 
-/* Check the global error status. */   
+/* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Get a pointer to the thread specific global data structure. */
@@ -1217,7 +1217,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     int GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     PointSet member function (over-rides the astGetObjSize protected
@@ -1504,7 +1504,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1596,7 +1596,7 @@ static void PermPoints( AstPointSet *this, int forward, const int perm[], int *s
 
 *  Synopsis:
 *     #include "pointset.h"
-*     void astPermPoints( AstPointSet *this, int forward, const int perm[] ) 
+*     void astPermPoints( AstPointSet *this, int forward, const int perm[] )
 
 *  Class Membership:
 *     PointSet method.
@@ -1610,13 +1610,13 @@ static void PermPoints( AstPointSet *this, int forward, const int perm[], int *s
 *     forward
 *        The direction in which the permutation is to be applied. This
 *        controls the use of the "perm" arrays. If a non-zero value is
-*        given, then the indices into the "perm" array correspond to the 
+*        given, then the indices into the "perm" array correspond to the
 *        indices of the coordinates in the returned PointSet, and the
-*        values stored in the "perm" array correspond to the indices of 
+*        values stored in the "perm" array correspond to the indices of
 *        the coordinates in the supplied PointSet. If a zero value is
-*        given, then the indices into the "perm" array correspond to the 
+*        given, then the indices into the "perm" array correspond to the
 *        indices of the coordinates in the supplied PointSet, and the
-*        values stored in the "perm" array correspond to the indices of 
+*        values stored in the "perm" array correspond to the indices of
 *        the coordinates in the returnedPointSet.
 *     perm
 *        An array of int (with one element for each axis of the PointSet)
@@ -1775,14 +1775,14 @@ static void SetNpoint( AstPointSet *this, int npoint, int *status ) {
 
 *  Description:
 *     This function reduces the number of points stored in a PointSet.
-*     Points with indices beyond the new size will be discarded. 
+*     Points with indices beyond the new size will be discarded.
 
 *  Parameters:
 *     this
 *        Pointer to the PointSet.
 *     npoint
 *        The new value for the number of points in the PointSet. Must be
-*        less than or equal to the original size of the PointSet, and 
+*        less than or equal to the original size of the PointSet, and
 *        greater than zero.
 *-
 */
@@ -2123,11 +2123,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 *     Floating point.
 
 *  Description:
-*     This attribute holds the absolute accuracy for each axis in the 
+*     This attribute holds the absolute accuracy for each axis in the
 *     PointSet. It has a separate value for each axis. It is used when
 *     comparing two PointSets using the protected astEqual method inherited
-*     from the Object class. The default value for each axis is AST__BAD 
-*     which causes the a default accuracy of each axis value to be calculated 
+*     from the Object class. The default value for each axis is AST__BAD
+*     which causes the a default accuracy of each axis value to be calculated
 *     as  1.0E8*min( abs(axis value)*DBL_EPSILON, DBL_MIN ).
 
 *  Applicability:
@@ -2193,7 +2193,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->ptr = NULL;
    out->values = NULL;
    out->acc = NULL;
- 
+
 /* Copy axis accuracies. */
    if( in->acc ){
       out->acc = astStore( NULL, in->acc, sizeof( double )*(size_t) in->ncoord );
@@ -2336,7 +2336,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    int makeComment;              /* Include a comment? */
    int point;                    /* Loop counter for points */
    int set;                      /* Attribute value set? */
-   
+
 /* Check the global error status. */
    if ( !astOK ) return;
 

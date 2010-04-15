@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -93,7 +93,7 @@
 /* Type Definitions. */
 /* ================= */
 
-/* This structure contains information describing a single generic entry in 
+/* This structure contains information describing a single generic entry in
    a KeyMap. This structure is extended by other structures to hold data of
    specific data types. */
 
@@ -117,7 +117,7 @@ typedef struct AstKeyMap {
 
 /* Attributes specific to objects in this class. */
    int sizeguess;                      /* Guess at KeyMap size */
-   AstMapEntry **table;                /* Hash table containing pointers to 
+   AstMapEntry **table;                /* Hash table containing pointers to
                                           the KeyMap entries */
    int *nentry;                        /* No. of Entries in each table element */
    int mapsize;                        /* Length of table */
@@ -194,7 +194,7 @@ typedef struct AstKeyMapVtab {
 
 } AstKeyMapVtab;
 
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 
 /* Define a structure holding all data items that are global within this
    class. */
@@ -208,7 +208,7 @@ typedef struct AstKeyMapGlobals {
    char ConvertValue_Buff[ AST__KEYMAP_CONVERTVALUE_BUFF_LEN + 1 ];
    char *MapKey_Strings[ AST__KEYMAP_MAPKEY_MAX_STRINGS ];
    int MapKey_Istr;
-   int MapKey_Init; 
+   int MapKey_Init;
 } AstKeyMapGlobals;
 
 #endif
@@ -241,7 +241,7 @@ void astInitKeyMapVtab_( AstKeyMapVtab *, const char *, int * );
 AstKeyMap *astLoadKeyMap_( void *, size_t, AstKeyMapVtab *, const char *, AstChannel *, int * );
 
 /* Thread-safe initialiser for all global data used by this module. */
-#if defined(THREAD_SAFE) 
+#if defined(THREAD_SAFE)
 void astInitKeyMapGlobals_( AstKeyMapGlobals * );
 #endif
 

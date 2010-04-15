@@ -1,6 +1,6 @@
 proc red4Fits {taskname method} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global Red4Widgets
 

@@ -36,7 +36,7 @@
 
 * Description:
 *    This application outputs the contents of a specified primitive HDS
-*    data object of up to 7 dimensions, to a selected output. 
+*    data object of up to 7 dimensions, to a selected output.
 *
 *    A subset of the object (which may itself be a subset) may be specified.
 *    For integer data hex, octal or decimal formats may be chosen.
@@ -51,7 +51,7 @@
 *
 *    % hdisplay accept width=132
 *       Outputs the current HDS object to the terminal with page width 132.
- 
+
 * Authors :
 *    RJV: R.J.Vallance (Birmingham University)
 *    DJA: D.J.Allan (Birmingham University)
@@ -60,29 +60,29 @@
 
 * History :
 *    ??-???-???? (RJV):
-*       V1.0   Original version 
+*       V1.0   Original version
 *    05-MAY-1989 (RJV):
-*       V1.0-1 Optional format for all types 
+*       V1.0-1 Optional format for all types
 *    15-MAY-1989 (DJA):
-*       V1.0-2 Fixed bug where program crashed with scalars 
+*       V1.0-2 Fixed bug where program crashed with scalars
 *    05-DEC-1990 (DJA):
-*       V1.3-0 Allows full 80 char for device name 
+*       V1.3-0 Allows full 80 char for device name
 *    28-MAY-1991 (DJA):
-*       V1.4-0 Full 7D treatment 
+*       V1.4-0 Full 7D treatment
 *    29-AUG-1991 (DJA):
-*       V1.5-0 Use PRS_GETSLICE to parse slice spec 
+*       V1.5-0 Use PRS_GETSLICE to parse slice spec
 *    08-MAY-1992 (DJA):
-*       V1.6-0 Bug fix when displaying _DOUBLEs 
+*       V1.6-0 Bug fix when displaying _DOUBLEs
 *    22-MAY-1992 (DJA):
-*       V1.6-1 Fixed probelm with display of _CHAR*81 objects 
+*       V1.6-1 Fixed probelm with display of _CHAR*81 objects
 *    01-JUN-1992 (DJA):
-*       V1.6-2 And cured problem with wid=132 caused by above 
+*       V1.6-2 And cured problem with wid=132 caused by above
 *    04-MAY-1994 (DJA):
-*       V1.7-0 Fixed UNIX character problems by using AIO 
+*       V1.7-0 Fixed UNIX character problems by using AIO
 *    24-NOV-1994 (DJA):
-*       V1.8-0 Now use USI for user interface 
+*       V1.8-0 Now use USI for user interface
 *    05-MAY-1995 (DJA):
-*       V1.8-1 Fixed bug in display of non _INTEGER integer types 
+*       V1.8-1 Fixed bug in display of non _INTEGER integer types
 *    06-SEP-2001 (AJC):
 *       V3.0-0 Remove Asterix stuff
 *              Improve prologue
@@ -668,7 +668,7 @@
 
 *                  Output column headings
                     CALL AIO_WRITE( OCH, LINE(:PAGE_WID), STATUS )
-                    
+
 *                  Construct each row of data in window
                     DO Y = JL, JH
                       CALL CHR_FILL( BLANK, LINE(:PAGE_WID) )

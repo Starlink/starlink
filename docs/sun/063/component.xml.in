@@ -12,7 +12,7 @@
      of the Fortran is improved, whilst remaining logically equivalent
      to the original program. The result improves the readability and
      maintainability of badly-written Fortran.
-  </p></abstract>  
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>

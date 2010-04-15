@@ -1,24 +1,24 @@
       SUBROUTINE CIRANGE(WMIN,WMAX,IMIN,IMAX,IAUTOLIM,PFLUX,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C     C I R A N G E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C WMIN (<), WMAX (<), IMIN (><), IMAX (><), IAUTOLIM (><),
 C PFLUX (<), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C
 C This routine sets the wavelength range for the plots using the cursor.
@@ -32,7 +32,7 @@ C-
       REAL WMIN,WMAX,IMIN,IMAX,X
       CHARACTER*1 CH
       LOGICAL IAUTOLIM,PFLUX
-     
+
       IAUTOLIM = .FALSE.
       IF (PFLUX) THEN
        CALL PGVPORT(0.1,0.9,0.1,0.3)

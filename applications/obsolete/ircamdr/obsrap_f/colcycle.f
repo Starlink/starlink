@@ -15,7 +15,7 @@
 *     NCYCLES =  INTEGER( READ )
 *           number of cycles of input colour table
 *     OUTPIC =  IMAGE( WRITE )
-*           output image 
+*           output image
 *
 *    Method :
 *
@@ -39,8 +39,8 @@
 *    Global constants :
 
 	INCLUDE  'SAE_PAR'          ! SSE global definitions
-        INCLUDE  'NDF_PAR'       
-        INCLUDE  'NDF_ERR'       
+        INCLUDE  'NDF_PAR'
+        INCLUDE  'NDF_ERR'
 
 *    Status :
 
@@ -53,7 +53,7 @@
 
 *    Local variables :
 
-	INTEGER 
+	INTEGER
      :    LOCI,           ! input data structure
      :    LOCO,           ! OUTPUT data structure
      :    DIMS( NDIMS ),  ! dimensions of input DATA_ARRAY
@@ -104,7 +104,7 @@
             CALL MSG_SETI( 'XDIM', DIMS( 1 ) )
             CALL MSG_SETI( 'YDIM', DIMS( 2 ) )
 
-	    CALL MSG_OUT( 'MESSAGE', 
+	    CALL MSG_OUT( 'MESSAGE',
      :	           'Error, Input image dimensions invalid ^XDIM, ^YDIM',
      :             STATUS)
 	    CALL MSG_OUT( 'MESSAGE',
@@ -130,11 +130,11 @@
           CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                  PNTRO, NELEMENTS, STATUS )
 
-          IF ( STATUS .EQ. SAI__OK ) THEN 
+          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          now call the subroutine to do the work
 
-            CALL COLCYCLESUB( DIMS, %VAL( PNTRI ), %VAL( PNTRO), 
+            CALL COLCYCLESUB( DIMS, %VAL( PNTRI ), %VAL( PNTRO),
      :	                      NCYCLES, STATUS )
 
 *          end of if-no-error-then-call-subroutine check

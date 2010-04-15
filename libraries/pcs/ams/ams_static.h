@@ -34,10 +34,10 @@ int *remote,      /* flag for whether task is remote (returned) */
 int *status       /* global status (given and returned) */
 );
 
-/*=  AMS_CALL_OUT */ 
+/*=  AMS_CALL_OUT */
 
-static void ams_call_out 
-( 
+static void ams_call_out
+(
 char *machname,    /* name of remote machine (given) */
 int netind,        /* index to network parameters (given) */
 int *machnum,      /* number allocated to machine in MESSYS common blocks
@@ -48,7 +48,7 @@ int *status        /* global status (given and returned) */
 /*=  AMS_ENDTRANS */
 
 static void ams_endtrans
-( 
+(
 struct a_loc_msg_in * loc_msg_in,  /* the end-transaction message in
                                       internal format (given) */
 int *path,                         /* the communications path to the
@@ -69,13 +69,13 @@ int *status                        /* global status (given and returned) */
 
 #if USE_ON_EXIT
 static void ams_exit1
-( 
+(
  int iarg,		/* SunOS on_exit argument */
  void * arg
 );
 #endif
 
-/*=  AMS_FREEPATH */ 
+/*=  AMS_FREEPATH */
 
 static void ams_freepath
 (
@@ -122,8 +122,8 @@ int *status             /* global status (given and returned) */
 
 /*=  AMS_NALOOKUP */
 
-static void ams_nalookup 
-( 
+static void ams_nalookup
+(
 char *name,        /* full machine/task name (given) */
 int *path,         /* path number for communication to task (returned) */
 int *netind,       /* index to network type (returned) */
@@ -137,13 +137,13 @@ int *status        /* global status (given and returned) */
 
 static void ams_newtrans
 (
-struct a_loc_gsoc_start_in *loc_gsoc_start_in, 
+struct a_loc_gsoc_start_in *loc_gsoc_start_in,
                                    /* start-transaction message in internal
                                       format (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
-int *path,                         /* the communications path to the other 
+int *path,                         /* the communications path to the other
                                       task (returned) */
-int *messid,                       /* the message identifier for this 
+int *messid,                       /* the message identifier for this
                                       transaction (returned) */
 int message_name_s,                /* space for name (given) */
 int message_value_s,               /* space for value (given) */
@@ -225,13 +225,13 @@ int *status                       /* global status (given and returned) */
 
 static void ams_rnewtrans
 (
-struct a_rem_gsoc_start_in *rem_gsoc_start_in, 
-                                   /* the initialize-transaction message in 
+struct a_rem_gsoc_start_in *rem_gsoc_start_in,
+                                   /* the initialize-transaction message in
                                       internal format (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
-int *path,                         /* the communications path to the other 
+int *path,                         /* the communications path to the other
                                       task (returned) */
-int *messid,                       /* the message identifier for this 
+int *messid,                       /* the message identifier for this
                                       transaction (returned) */
 int message_name_s,                /* space for name (given) */
 int message_value_s,               /* space for value (given) */
@@ -245,8 +245,8 @@ int *status                        /* global status (given and returned) */
 
 /*=  AMS_RREJECT */
 
-static void ams_rreject 
-( 
+static void ams_rreject
+(
 struct a_rem_ack_in *rem_ack_in,   /* received ack_in structure (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
 int *status                        /* global status (given and returned) */
@@ -316,17 +316,17 @@ int *status             /* global status (given and returned) */
 
 /*=  AMS_SENDINIT */
 
-static void ams_sendinit 
-( 
-int path,           /* path for init (given) */ 
+static void ams_sendinit
+(
+int path,           /* path for init (given) */
 int messid,         /* temporary transaction (given) */
 int *status         /* global status (given and returned) */
 );
 
 /*=  AMS_SENDINITACK */
 
-static void ams_sendinitack 
-( 
+static void ams_sendinitack
+(
 int local,            /* flag for local or remote (given) */
 sendq_type ackq,      /* the other task's init acknowldege queue (given) */
 int otherpathno,      /* other task's path number (given) */
@@ -377,7 +377,7 @@ int parm                          /* the timeout parameter (given) */
 /*=  AMS_TRANSLATE */
 
 static void ams_translate
-( 
+(
 struct a_loc_msg_in *loc_msg_in,  /* the message in internal format
                                      (given) */
 sendq_type reply_q,               /* reply queue (given) */

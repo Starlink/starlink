@@ -1,4 +1,4 @@
-      SUBROUTINE SUBPAR_FINDKEY ( KEYWORD, SPECIAL, LOGICAL, NAMECODE, 
+      SUBROUTINE SUBPAR_FINDKEY ( KEYWORD, SPECIAL, LOGICAL, NAMECODE,
      :                            STATUS )
 *+
 *  Name:
@@ -65,12 +65,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -203,7 +203,7 @@
                IF ( INNAME .EQ. SKEYS( I ) ) THEN
                   FOUND = .TRUE.
                   MATCHES = 1
-                  NCODE = - I           
+                  NCODE = - I
                END IF
             END DO
          END IF
@@ -220,7 +220,7 @@
      :      THEN
                IF ( INNAME .EQ. PARKEY( NAMECODE ) ) FOUND = .TRUE.
             END IF
-           
+
          END DO
 
 *      If an exact match wasn't found, try for an abbreviation.
@@ -255,11 +255,11 @@
 
                   NAMECODE = NAMECODE + 1
 
-                  IF ( .NOT. ( LOGICAL .AND. 
+                  IF ( .NOT. ( LOGICAL .AND.
      :            ( MOD(PARTYPE( NAMECODE ),10)
      :              .NE. SUBPAR__LOGICAL ) ) )
      :            THEN
-                     IF 
+                     IF
      :               ( INNAME( : L1 ) .EQ. PARKEY( NAMECODE )( : L1 ) )
      :               THEN
                         MATCHES = MATCHES + 1
@@ -327,8 +327,8 @@
                ELSE
 
 *              Display the list of options or other error message.
-                  CALL SUBPAR_EFLSH( STATUS )         
- 
+                  CALL SUBPAR_EFLSH( STATUS )
+
                   CALL PSX_GETENV( 'ADAM_NOPROMPT', ABBRV, STATUS )
                   IF ( STATUS .EQ. SAI__OK ) THEN
 *              If ADAM_NOPROMPT is set abort
@@ -337,8 +337,8 @@
      :               'Prompting for unambiguous value prohibited',
      :                STATUS )
                      NAMECODE = 0
-                      
-                     
+
+
                   ELSE
 *              otherwise cancel the error message from PSX_GETENV
                      CALL EMS_ANNUL( STATUS )

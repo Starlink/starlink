@@ -7,7 +7,7 @@
 *
 *   Description:
 *      Encode white space into value as specified by format.
-* 
+*
 *   Authors:
 *      Jack Giddings
 *
@@ -31,16 +31,16 @@
 
 *   Import:
       BYTE FORMAT(256)     ! single format
- 
+
       INTEGER MAXC         ! size of VALUE
- 
+
 *   Export:
       BYTE VALUE(MAXC)     ! value token
- 
+
 *   Local variables:
       LOGICAL RIGHT        ! whether right justified
       LOGICAL FIXED        ! whether fixed point
- 
+
       BYTE EDIT            ! edit character
 
       INTEGER FIELD        ! field size

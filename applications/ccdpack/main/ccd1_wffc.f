@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL CCD1_WFFC( LIST, PREFIX, USEPRO, PROTEC, CONTIN, TRAIL, 
+*      CALL CCD1_WFFC( LIST, PREFIX, USEPRO, PROTEC, CONTIN, TRAIL,
 *                      FILT, FD, FTYPES, GIDIN, NNDF, VALID, POINT,
 *                      NFRAME, TEMP, STATUS )
 
@@ -69,8 +69,8 @@
 *        contain the indices of the frames selected for flatfielding.
 *     NFRAME = INTEGER (Returned)
 *        Number of frames located.
-*     TEMP = CHARACTER * ( * ) (Returned) 
-*        The name of the temporary file that is used to contain the 
+*     TEMP = CHARACTER * ( * ) (Returned)
+*        The name of the temporary file that is used to contain the
 *        NDF names. You should arrange to delete this.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -114,7 +114,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -143,7 +143,7 @@
 
 *  Arguments Returned:
       INTEGER NFRAME
-      CHARACTER * ( *) TEMP 
+      CHARACTER * ( *) TEMP
 
 *  Status:
       INTEGER STATUS             ! Global status

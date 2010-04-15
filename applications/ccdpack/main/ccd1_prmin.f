@@ -45,7 +45,7 @@
 *        The global status.
 
 *  Notes:
-*     -  The INDIN/INDOUT arrays are supplied for use in re-ordering 
+*     -  The INDIN/INDOUT arrays are supplied for use in re-ordering
 *     any associated data.
 
 *  Copyright:
@@ -89,7 +89,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -132,7 +132,7 @@
       NOUT = 0
 
 *  If only have one point then just return it.
-      IF ( NIN .EQ. 1 ) THEN 
+      IF ( NIN .EQ. 1 ) THEN
          NOUT = -1
          I = 1
       ELSE
@@ -158,7 +158,7 @@
                NOUT = NOUT + 1
                XOUT( NOUT ) = XIN( I )
                YOUT( NOUT ) = YIN( I )
-               
+
 *  Record its original position.
                INDOUT( NOUT ) = INDIN( I )
             END IF

@@ -47,7 +47,7 @@
 #        show_output
 #
 #     If true then a scrolled listbox is created and any output from
-#     the application is shown. If set to the name of a widget then 
+#     the application is shown. If set to the name of a widget then
 #     the output is directed into that (unless it no longer exists).
 
 #  Methods:
@@ -137,7 +137,7 @@
 #     5-MAR-1999 (PWD):
 #        Changed name in error messages to reflect the command.
 #     5-MAR-2001 (DSB):
-#        Added public method getparam. 
+#        Added public method getparam.
 #     9-MAR-2001 (PWD):
 #        Renamed GaiaApp from GaiaPolApp (and StarApp before that).
 #     7-FEB-2006 (PWD):
@@ -179,9 +179,9 @@ itcl::class gaia::GaiaApp {
       if { [winfo exists $Scrollbox_] } {
          destroy $Scrollbox
       }
-      
+
       #  And top-level widget.
-      if { [winfo exists $Top_] } { 
+      if { [winfo exists $Top_] } {
          destroy $Top_
       }
    }
@@ -227,7 +227,7 @@ itcl::class gaia::GaiaApp {
    }
 
    #  Run the application. Single string as arguments.
-   public method runwiths {qual} { 
+   public method runwiths {qual} {
       if { $application != {} } {
 
          #  Make sure monolith is running.
@@ -240,7 +240,7 @@ itcl::class gaia::GaiaApp {
             run_next_command_
          }
       }
-   } 
+   }
 
 
    #  Return status of application.
@@ -251,7 +251,7 @@ itcl::class gaia::GaiaApp {
    #  Delete the application when ready. Do it now if nothing is queued.
    public method delete_sometime {} {
       set delete_sometime_ 1
-      if { [$command_queue_ size] == 0 && 
+      if { [$command_queue_ size] == 0 &&
            $application_status_ != {running...} } {
          catch {delete object $this}
 
@@ -301,7 +301,7 @@ itcl::class gaia::GaiaApp {
 
    #  Method to deal with the inform return of a task.
    protected method inform_ {output} {
-      
+
       #  Check for an error. Note this is start of the error (!!), so
       #  output_ isn't complete yet, so we wait for application_status_
       #  to change, should be done by the command_completed_ method.
@@ -332,7 +332,7 @@ itcl::class gaia::GaiaApp {
 
    #  Start monolith.
    protected method start_monolith_ {} {
-  
+
       #  Check if the monolith is already loaded and running.
       set start 1
       if { [info exists monotask_($monolith_)] } {
@@ -450,7 +450,7 @@ itcl::class gaia::GaiaApp {
    public variable notify {} {}
 
    #  Notify command to be executed when a parameter value has been
-   #  obtained. The command should accept two arguments; the parameter 
+   #  obtained. The command should accept two arguments; the parameter
    #  name and the parameter value.
    public variable parnotify {} {}
 

@@ -15,7 +15,7 @@
 *  Description:
 *     This routine uses the specified environment parameter to obtain the
 *     name of a catalogue component, selected from those available in the
-*     supplied catalogue. A CAT identifier (see SUN/181) for the selected 
+*     supplied catalogue. A CAT identifier (see SUN/181) for the selected
 *     component is returned.
 
 *  Arguments:
@@ -25,9 +25,9 @@
 *        A CAT identifier for the supplied catalogue.
 *     TYPE = INTEGER (Given)
 *        A symbolic constant specifying the type of component to be
-*        obtained. Choose from CAT__FITYP (column), CAT__QITYP (parameter, 
+*        obtained. Choose from CAT__FITYP (column), CAT__QITYP (parameter,
 *        CAT__EITYP (expression), CAT__IITYPE (index), CAT__SITYP
-*        (selection), CAT__JITYP (join), CAT__FETYP (vector column element). 
+*        (selection), CAT__JITYP (join), CAT__FETYP (vector column element).
 *        These constants are defined in include file CAT_PAR.
 *     DEF = CHARACTER * ( * ) (Given)
 *        The name to use as the dynamic default for the parameter. No
@@ -40,7 +40,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -56,15 +56,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'CAT_PAR'          ! CAT constants 
-      INCLUDE 'CAT_ERR'          ! CAT error constants 
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CAT_PAR'          ! CAT constants
+      INCLUDE 'CAT_ERR'          ! CAT error constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -92,7 +92,7 @@
 *  Initialise.
       GI = CAT__NOID
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Store a textual description of the type of component required.
@@ -112,7 +112,7 @@
          DESC = 'join'
       ELSE IF( TYPE .EQ. CAT__IITYP ) THEN
          DESC = 'index'
-      ELSE 
+      ELSE
          DESC = 'component'
       END IF
 
@@ -124,20 +124,20 @@
 
 *  Loop until a good component name has been obtained, or an error occurs.
       GOOD = .FALSE.
-      DO WHILE ( .NOT. GOOD .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE ( .NOT. GOOD .AND. STATUS .EQ. SAI__OK )
 
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, NAME, STATUS )
 
 *  Abort if an abort request or null value was obtained.
-         IF( STATUS .EQ. PAR__ABORT .OR. 
+         IF( STATUS .EQ. PAR__ABORT .OR.
      :       STATUS .EQ. PAR__NULL ) GO TO 999
 
 *  Attempt to get an identifier for the named item.
          CALL CAT_TIDNT( CI, NAME, GI, STATUS )
 
 *  If it exists, check that the component is of the correct type.
-         IF( STATUS .EQ. SAI__OK ) THEN         
+         IF( STATUS .EQ. SAI__OK ) THEN
             CALL CAT_TIDTP( GI, IDTYP, STATUS )
 
 *  If the component is not of the correct type, report an error.
@@ -186,8 +186,8 @@
          IF( STATUS .EQ. SAI__OK ) THEN
             GOOD = .TRUE.
 
-*  Otherwise, flush the error, release the component identifier, cancel 
-*  the parameter, display a list of valid component names, and go round 
+*  Otherwise, flush the error, release the component identifier, cancel
+*  the parameter, display a list of valid component names, and go round
 *  for a new value.
          ELSE
             CALL CAT_TRLSE( GI, STATUS )
@@ -198,7 +198,7 @@
             N = 1
             TBUF = ' '
             IAT = 0
-            DO WHILE( GI .NE. CAT__NOID ) 
+            DO WHILE( GI .NE. CAT__NOID )
                CALL CAT_TIQAC( GI, 'NAME', NAME, STATUS )
                CALL CAT_TRLSE( GI, STATUS )
                CALL CHR_APPND( ' ', TBUF, IAT )
@@ -237,7 +237,7 @@
 
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         STATUS = PAR__NULL 
+         STATUS = PAR__NULL
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL MSG_SETC( 'DESC', DESC )
          CALL ERR_REP( 'POL1_GTCTC_5', 'Null value obtained for  '//
@@ -249,7 +249,7 @@
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL MSG_SETC( 'DESC', DESC )
          CALL ERR_REP( 'POL1_GTCTC_6', 'Failed to obtain the name of '//
-     :                 'a catalogue ^DESC using parameter %^PARAM.', 
+     :                 'a catalogue ^DESC using parameter %^PARAM.',
      :                 STATUS )
       END IF
 

@@ -1,5 +1,5 @@
       SUBROUTINE
-     : CHI_CRECAT( INPUT, ESTNUMENTS, NUMCOLS, CNAMES, CFORMATS, 
+     : CHI_CRECAT( INPUT, ESTNUMENTS, NUMCOLS, CNAMES, CFORMATS,
      : CUNITS, CCOMMENTS, STATUS)
 *+
 *  Name:
@@ -12,15 +12,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHI_CRECAT( INPUT, ESTNUMENTS, NUMCOLS, CNAMES, CFORMATS, 
+*     CALL CHI_CRECAT( INPUT, ESTNUMENTS, NUMCOLS, CNAMES, CFORMATS,
 *     CUNITS, CCOMMENTS, STATUS)
 
 *  Description:
-*     Creates a new catalogue that contains no entries. 
-*     The CHI routines that write data into this catalogue will be more 
-*     efficient if you can provide a good estimate for the size of the   
-*     catalogue.  (The number of entries). 
-*     The column formats are checked. If an invalid format is found an error 
+*     Creates a new catalogue that contains no entries.
+*     The CHI routines that write data into this catalogue will be more
+*     efficient if you can provide a good estimate for the size of the
+*     catalogue.  (The number of entries).
+*     The column formats are checked. If an invalid format is found an error
 *     is reported and the offending column and format are returned in CNAMES(1)
 *     and  CFORMATS(1).
 *
@@ -58,7 +58,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -93,29 +93,29 @@
 *    Split the input name into database part and catname part.
 *
       call chi_splitname(input, dbname, catname, status)
-* 
+*
 *    Call CRECAT on the appropriate low level system
 *
        if (dbname .eq. 'HDS') then
          do count = 1, numcols
          enddo
-         call chi_hcrecat(catname, 100, numcols, cnames, cformats, 
+         call chi_hcrecat(catname, 100, numcols, cnames, cformats,
      :   cunits, ccomments, status)
 *
 *       elseif (dbname .eq. 'BIN') then
-*         call chi_bnoent(catname, 100, numcols, cnames, cformats, 
+*         call chi_bnoent(catname, 100, numcols, cnames, cformats,
 *     :   cunits, ccomments, status)
 *
 *       elseif (dbname .eq. 'CDF') then
-*         call chi_ccrecat(catname, 100, numcols, cnames, cformats, 
+*         call chi_ccrecat(catname, 100, numcols, cnames, cformats,
 *     :   cunits, ccomments, status)
 *
 *       elseif (dbname .eq. 'FIT') then
-*         call chi_fcrecat(catname, 100, numcols, cnames, cformats, 
+*         call chi_fcrecat(catname, 100, numcols, cnames, cformats,
 *     :   cunits, ccomments, status)
 *
 *       elseif (dbname .eq. 'REX') then
-*         call chi_rcrecat(catname, 100, numcols, cnames, cformats, 
+*         call chi_rcrecat(catname, 100, numcols, cnames, cformats,
 *     :   cunits, ccomments, status)
 *
 *

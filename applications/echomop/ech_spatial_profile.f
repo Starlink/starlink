@@ -372,7 +372,7 @@
      :              DEKKER_ABOVE_AT, DEKKER_BELOW_AT )
                DEK_BELOW( IORD ) = DEKKER_BELOW_AT
                DEK_ABOVE( IORD ) = DEKKER_ABOVE_AT
-         
+
 *        Determine object extent.
             ELSE
                CALL ECH_OBJECT_LIMITS( TOTAL, SUBSTEPS, SKY_LOLIM,
@@ -380,7 +380,7 @@
      :              OBJ_ABOVE, OBJ_BELOW, DEK_ABOVE( IORD ),
      :              DEK_BELOW( IORD ),
      :              SKY_ABOVE_AT, SKY_BELOW_AT, STATUS )
-         
+
 *           Set non zero values in the mask arrays to denote object/sky
 *           attributes. The mask arrays consist of a profile mask per
 *           order with a spatial resolution of 1 pixel

@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_SWLIS( NDFGRP, FIOGRP, NLIST, NLGRP, NNOLIS, 
+      SUBROUTINE CCD1_SWLIS( NDFGRP, FIOGRP, NLIST, NLGRP, NNOLIS,
      :                       NDFS, USEWCS, USESET, FRMS, MAPPIX,
      :                       MAPSET, ISUP, NSUP, ILIS, ILISOF,
      :                       INLSUP, STATUS )
@@ -22,12 +22,12 @@
 *     lists.  It writes various informative comments via the CCDPACK
 *     logging system to the user.  Additionally,
 *     if USEWCS is true it retrieves certain WCS-related information,
-*     and if USESET is true it retrieves certain Set-related 
-*     information, from the NDF with which the position list is 
-*     associated.  If NDFS is true, it will print a summary of 
+*     and if USESET is true it retrieves certain Set-related
+*     information, from the NDF with which the position list is
+*     associated.  If NDFS is true, it will print a summary of
 *     the NDFs from which each list has come.
 *
-*     The WCS-related information it returns is principally the 
+*     The WCS-related information it returns is principally the
 *     mapping between the PIXEL frame and the Current coordinate
 *     frame of the NDF.
 *
@@ -35,7 +35,7 @@
 *     about the mapping between each input list and superlists formed
 *     by amalgamating all the lists in the same alignment Set.
 *     Lists are considered to be in the same Set for alignment
-*     purposes if (1) USESET is true, and they are associated 
+*     purposes if (1) USESET is true, and they are associated
 *     with NDFs which (2) have the same non-blank Set Name attribute
 *     and (3) have a CCD_SET frame in their WCS framesets.
 *     If USESET is false or for other reasons none of the input
@@ -45,8 +45,8 @@
 *  Arguments:
 *     NDFGRP = INTEGER (Given)
 *        The GRP identifier of a group giving the NDFs with which
-*        position lists are associated.  This will only be accessed 
-*        if NDFS is true.  If NDFs is true, it will have the same 
+*        position lists are associated.  This will only be accessed
+*        if NDFS is true.  If NDFs is true, it will have the same
 *        number of members as FIOGRP.
 *     FIOGRP = INTEGER (Given)
 *        The GRP identifier giving the names of the lists themselves.
@@ -54,13 +54,13 @@
 *        The number of elements in the NDFGRP group.
 *     NLGRP = INTEGER (Given)
 *        A GRP identifier for a list of NDFs with no associated lists.
-*        If NNOLIS is positive, the Set information of the NDFs in 
+*        If NNOLIS is positive, the Set information of the NDFs in
 *        this group is read to fill the INLSUP array.
 *     NNOLIS = INTEGER (Given)
 *        If positive, the number of members of NLGRP.
 *     NDFS = LOGICAL (Given)
 *        Indicates whether the NDFGRP group contains the names of NDFs
-*        which reference position lists in their 
+*        which reference position lists in their
 *        .MORE.CCDPACK.CURRENT_LIST component or the names of position
 *        lists themselves.
 *     USEWCS = LOGICAL (Given)
@@ -70,7 +70,7 @@
 *        Whether Set-related information is being used.  May only be
 *        true if NDFS is true.
 *     FRMS( NLIST ) = INTEGER (Returned)
-*        The Current frame of the WCS component of each NDF.  Only 
+*        The Current frame of the WCS component of each NDF.  Only
 *        returned if USEWCS is true.
 *     MAPPIX( NLIST ) = INTEGER (Returned)
 *        For each of the NDFs in NDFGRP, an AST mapping from the PIXEL-
@@ -82,7 +82,7 @@
 *        working frame of the WCS component of NDFs in the corresponding
 *        superlist.  The working frame is in the PIXEL domain if USEWCS
 *        is false and the Current frame if USEWCS is true.
-*        If there is no consistent mapping for the Set, AST__NULL is 
+*        If there is no consistent mapping for the Set, AST__NULL is
 *        returned.  This array is required as workspace.
 *        Only returned if USESET is true.
 *     ISUP( NLIST ) = INTEGER (Returned)
@@ -93,10 +93,10 @@
 *        The number of superlists constructed from the NDFGRP group.
 *        If USESET is false this will be returned equal to NLIST.
 *     ILIS( NLIST ) = INTEGER (Returned)
-*        This array contains numbers 1..NLIST sorted into superlist 
+*        This array contains numbers 1..NLIST sorted into superlist
 *        order, i.e. all the ones from the first superlist are first,
 *        then all the ones from the second superlist ....  If USESET
-*        is false, it will be returned as 1, 2, 3, ....  You can 
+*        is false, it will be returned as 1, 2, 3, ....  You can
 *        index into it using ILISOF.
 *        Taken together, ILISOF and ILIS are a sort of inversion of ISUP.
 *     ILISOF( NLIST + 1 ) = INTEGER (Returned)
@@ -162,7 +162,7 @@
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
-      
+
 *  Arguments Given:
       INTEGER NDFGRP
       INTEGER FIOGRP
@@ -171,10 +171,10 @@
       INTEGER NNOLIS
       LOGICAL NDFS
       LOGICAL USEWCS
-      
+
 *  Arugments Given and Returned:
       LOGICAL USESET
-      
+
 *  Arguments Returned:
       INTEGER FRMS( NLIST )
       INTEGER MAPPIX( NLIST )
@@ -184,13 +184,13 @@
       INTEGER ILIS( NLIST )
       INTEGER ILISOF( NLIST + 1 )
       INTEGER INLSUP( NNOLIS )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of character string
-      EXTERNAL CHR_LEN    
+      EXTERNAL CHR_LEN
 
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for writing out text
@@ -231,7 +231,7 @@
 *  Initialise different domain flag.
       DIFDMN = .FALSE.
 
-*  If necessary write a header to the user for the names of the 
+*  If necessary write a header to the user for the names of the
 *  associated NDFs.
       IF ( NDFS ) THEN
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -253,7 +253,7 @@
       NSUP = 0
       IF ( USESET ) THEN
          CALL GRP_NEW( 'CCD:NAMES', NAMGRP, STATUS )
-      ELSE 
+      ELSE
          NAMGRP = GRP__NOID
       END IF
 
@@ -340,7 +340,7 @@
                      CALL CCD1_PSIZE( IWCS, JWORK, PSIZE, STATUS )
 
 *  Now transform two points near the origin using the maybe-unit mapping.
-*  It's just possible that this region of the coordinate space is 
+*  It's just possible that this region of the coordinate space is
 *  illegal, in which case we'll get a spurious pass, but this seems
 *  very unlikely.
                      XP( 1 ) = 0D0
@@ -462,7 +462,7 @@
 
 *  If the CCD_SET->work mappings have been inconsistent, warn the user
 *  of this fact.
-         IF ( ILISOF( I + 1 ) - ILISOF( I ) .GT. 1 .AND. 
+         IF ( ILISOF( I + 1 ) - ILISOF( I ) .GT. 1 .AND.
      :        MAPSET( I ) .EQ. AST__NULL ) THEN
             IF ( USEWCS ) THEN
                CALL MSG_SETC( 'WORK', 'Current' )

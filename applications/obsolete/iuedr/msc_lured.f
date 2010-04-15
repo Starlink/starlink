@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE MSC_LURED
 *
-*   Description: 
+*   Description:
 *      LU decomposition of matrix.
 *
 *   History:
@@ -22,10 +22,10 @@
 *   Import:
       INTEGER M                    ! declared size of A-matrix and B-vector
       INTEGER N                    ! used size of A-matrix and B-vector
- 
+
 *   Import-Export:
       DOUBLE PRECISION A(M, M)     ! matrix operator
- 
+
 *   Local variables:
       INTEGER I                    ! block index
       INTEGER IP1                  ! number of lines to be reduced
@@ -34,7 +34,7 @@
       INTEGER NM1                  ! number of blocks to be reduced
 
       DOUBLE PRECISION FACT        ! normalisation factor
- 
+
       IF (N.GT.1) THEN
 
          NM1 = N - 1

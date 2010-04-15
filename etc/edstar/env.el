@@ -235,7 +235,7 @@ Authors:
   (setq sym (intern "FUNCTION_DECLARATIONS" starfort-mode-placeholder-table))
   (set sym "
 \\*	Type Definitions:
-\\	IMPLICIT NONE              ! No implicit typing	
+\\	IMPLICIT NONE              ! No implicit typing
 \\
 [global_constants]
 [global_variables]
@@ -335,7 +335,7 @@ name to 6 characters") (desc . "Symbolic name") (sep . ", ")))
   (setplist sym '((help . "Please supply an argument value.")))
 
   (setq sym (intern "LOCAL_CONSTANT_SPECIFICATION" starfort-mode-placeholder-table))
-  (set sym "{data_type} {constant_name}   ! [constant_description]	
+  (set sym "{data_type} {constant_name}   ! [constant_description]
 \\	PARAMETER ( {constant_name} = {cons} )")
   (setplist sym '((vert . t)))
 
@@ -424,7 +424,7 @@ may not be obvious to a beginner.")))
   (setq sym (intern "SUBROUTINE_DECLARATIONS" starfort-mode-placeholder-table))
   (set sym "
 \\*	Type Definitions:
-\\	IMPLICIT NONE              ! No implicit typing	
+\\	IMPLICIT NONE              ! No implicit typing
 \\
 [global_constants]
 [global_variables]
@@ -510,7 +510,7 @@ may not be obvious to a beginner.")))
   (setplist sym '((help . "Please supply an argument value.")))
 
   (setq sym (intern "SUBROUTINE_PROGRAM_MODULE" starfort-mode-placeholder-table))
-  (set sym "SUBROUTINE {routine_name}( [p]... )	
+  (set sym "SUBROUTINE {routine_name}( [p]... )
 \\*+
 \\*{subroutine_prologue}
 \\*-
@@ -649,7 +649,7 @@ associated description of the parameter's purpose.")))
   (setplist sym '((help . "Please supply an argument value.")))
 
   (setq sym (intern "LSE$BLOCK_COMMENT" starfort-mode-placeholder-table))
-  (set sym " 
+  (set sym "
 *  [comment]")
 
   (setq sym (intern "PSTART" starfort-mode-placeholder-table))
@@ -889,7 +889,7 @@ detailed.") (desc . "Text of a contextual error message")))
 
   (setq sym (intern "STATUS_ARGUMENT" starfort-mode-placeholder-table))
   (set sym "\\*	Status:
-\\	INTEGER STATUS             ! Global status	
+\\	INTEGER STATUS             ! Global status
 \\")
   (setplist sym '((desc . "Define the STATUS argument")))
 
@@ -3543,7 +3543,7 @@ specify its default value in square brackets [...] if appropriate.")))
 CALL ERR_REP( '{routine_name}_ERR',
 \\     :	'{routine_name}: {context_message}.',
 \\     :	STATUS )
-END IF	
+END IF
 ")
   (setplist sym '((desc . "Report contextual information following an error")))
 
@@ -4409,7 +4409,7 @@ alternative.")))
   (setq sym (intern "BLOCK_DATA_DECLARATIONS" starfort-mode-placeholder-table))
   (set sym "
 \\*	Type Definitions:
-\\	IMPLICIT NONE              ! No implicit typing	
+\\	IMPLICIT NONE              ! No implicit typing
 \\
 [global_constants]
 [global_variables]
@@ -4661,7 +4661,7 @@ alternative.")))
   (setplist sym '((help . "Please supply an argument value.")))
 
   (setq sym (intern "A_TASK_PROGRAM_MODULE" starfort-mode-placeholder-table))
-  (set sym "SUBROUTINE {routine_name}( STATUS )	
+  (set sym "SUBROUTINE {routine_name}( STATUS )
 \\*+
 \\*{a_task_prologue}
 \\*-
@@ -5057,15 +5057,15 @@ both the connection and the file.")))
   (setq sym (intern "A_TASK_DECLARATIONS" starfort-mode-placeholder-table))
   (set sym "
 \\*	Type Definitions:
-\\	IMPLICIT NONE              ! No implicit typing	
+\\	IMPLICIT NONE              ! No implicit typing
 \\
 \\*	Global Constants:
-\\	INCLUDE 'SAE_PAR'          ! Standard SAE constants	
+\\	INCLUDE 'SAE_PAR'          ! Standard SAE constants
 \\	[include_global_constants]...
 
 [global_variables]
 \\*	Status:
-\\	INTEGER STATUS             ! Global status	
+\\	INTEGER STATUS             ! Global status
 \\
 [external_references]
 [local_constants]
@@ -5275,7 +5275,7 @@ column four.") (head . "
 
   (setq sym (intern "ADAM_ACTION" starfort-mode-placeholder-table))
   (set sym "\\*	[comment]
-\\	ELSE IF ( NAME .EQ. '{action_name}' ) THEN	
+\\	ELSE IF ( NAME .EQ. '{action_name}' ) THEN
 CALL {action_name}( STATUS )
 ")
   (setplist sym '((desc . "Test for and execute an action in an ADAM monolith") (vert . t) (head . "
@@ -5346,7 +5346,7 @@ CALL {action_name}( STATUS )
   (setplist sym '((help . "Please supply an argument value.")))
 
   (setq sym (intern "LSE$LINE_COMMENT" starfort-mode-placeholder-table))
-  (set sym " 
+  (set sym "
 ! [comment]")
 
   (setq sym (intern "IFILE" starfort-mode-placeholder-table))
@@ -5370,7 +5370,7 @@ CALL {action_name}( STATUS )
   (setplist sym '((help . "Please supply an argument value.")))
 
   (setq sym (intern "MONOLITH_PROGRAM_MODULE" starfort-mode-placeholder-table))
-  (set sym "SUBROUTINE {routine_name}( STATUS )	
+  (set sym "SUBROUTINE {routine_name}( STATUS )
 \\*+
 \\*{monolith_prologue}
 \\*-
@@ -5393,14 +5393,14 @@ CALL {action_name}( STATUS )
 [ADAM_action]...
 
 \\*	If the action name is not recognised, then report an error.
-\\	ELSE	
+\\	ELSE
 STATUS = SAI__ERROR
 CALL MSG_SETC( 'NAME', NAME )
 CALL ERR_REP( '{routine_name}_ERR',
 \\     :	'{routine_name}: The action name ''^NAME'' is ' //
 \\     :	'not recognised by the {routine_name} monolith.',
 \\     :	STATUS )
-END IF	
+END IF
 
 END")
   (setplist sym '((desc . "ADAM monolith program module")))
@@ -5660,17 +5660,17 @@ how improvements might be made.")))
   (setq sym (intern "MONOLITH_DECLARATIONS" starfort-mode-placeholder-table))
   (set sym "
 \\*	Type Definitions:
-\\	IMPLICIT NONE              ! No implicit typing	
+\\	IMPLICIT NONE              ! No implicit typing
 \\
 \\*	Global Constants:
-\\	INCLUDE 'SAE_PAR'          ! Standard SAE constants	
-\\	INCLUDE 'PAR_PAR'          ! PAR_ public constants	
+\\	INCLUDE 'SAE_PAR'          ! Standard SAE constants
+\\	INCLUDE 'PAR_PAR'          ! PAR_ public constants
 \\
 \\*	Status:
-\\	INTEGER STATUS             ! Global status	
+\\	INTEGER STATUS             ! Global status
 \\
 \\*	Local Variables:
-\\	CHARACTER * ( PAR__SZNAM ) NAME ! Action name	
+\\	CHARACTER * ( PAR__SZNAM ) NAME ! Action name
 \\")
   (setplist sym '((desc . "MONOLITH declarations")))
 
@@ -12142,7 +12142,7 @@ END IF	")
 
   (setq sym (intern "DO_WHILE" starfort-mode-token-table))
   (set sym "DO WHILE ( {logical_exp} )
-{executable_statement}...	
+{executable_statement}...
 END DO	")
   (setplist sym '((class . token) (desc . "Pre-tested indefinite DO (DO WHILE)")))
 

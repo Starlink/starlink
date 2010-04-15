@@ -1,15 +1,15 @@
-      SUBROUTINE CURSA (STATUS) 
+      SUBROUTINE CURSA (STATUS)
 
-*    Top-level subroutine for monolith CURSA. 
-*    Created automatically on Thu Nov 30 13:59:41 GMT 2000. 
+*    Top-level subroutine for monolith CURSA.
+*    Created automatically on Thu Nov 30 13:59:41 GMT 2000.
 
-      IMPLICIT NONE 
-      INTEGER STATUS 
+      IMPLICIT NONE
+      INTEGER STATUS
 
-      INCLUDE 'SAE_PAR' 
-      CHARACTER ACTION*15 
+      INCLUDE 'SAE_PAR'
+      CHARACTER ACTION*15
 
-      CALL TASK_GET_NAME (ACTION, STATUS) 
+      CALL TASK_GET_NAME (ACTION, STATUS)
 
       IF (ACTION .EQ. 'CATCHART') THEN
          CALL CATCHART (STATUS)

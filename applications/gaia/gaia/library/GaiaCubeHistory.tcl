@@ -11,9 +11,9 @@
 #  Description:
 #     This class provides the facilities needed to manage a menu for
 #     displaying cubes that have been opened in previous sessions and
-#     moving back and forth between cubes opened in the current session 
-#     (note this also restores the units and system).  An instance is 
-#     usually used by GaiaCube to control the "Go" menu, but such lists 
+#     moving back and forth between cubes opened in the current session
+#     (note this also restores the units and system).  An instance is
+#     usually used by GaiaCube to control the "Go" menu, but such lists
 #     have other uses (but a GaiaCube instance is still required).
 
 #  Invocations:
@@ -194,7 +194,7 @@ itcl::class gaia::GaiaCubeHistory {
    #  Also adds "Back" and "Forward" items to move in the list of cubes that
    #  have been opened in the current session (and recorded using add_history).
    public method update_history_menu {menu} {
-      
+
       #  Clear existing items.
       $menu delete 0 end
 
@@ -218,7 +218,7 @@ itcl::class gaia::GaiaCubeHistory {
       $gaia_cube add_menu_short_help $menu "Forward" \
          {Go forward again to the next cube}
 
-      if { [info exists forward_list_(cube)] && 
+      if { [info exists forward_list_(cube)] &&
            [llength $forward_list_(cube)] } {
          $menu entryconfig "Forward" -state normal
       }
@@ -229,7 +229,7 @@ itcl::class gaia::GaiaCubeHistory {
    }
 
    #  Add the first N known cubes to a given menu. See update_history_menu
-   #  if also requiring a Back/Forward mechanism. 
+   #  if also requiring a Back/Forward mechanism.
    public method add_history_menu_items {menu n} {
 
       set catalog $history_catalog_
@@ -349,7 +349,7 @@ itcl::class gaia::GaiaCubeHistory {
 
    #  Add the "last cube" to the last_cube_ list.
    public method record_last_cube {} {
-      
+
       #  Don't add if present as last cube or no cube loaded.
       if { $last_cube_ != {} } {
          if { [info exists back_list_(cube)] } {

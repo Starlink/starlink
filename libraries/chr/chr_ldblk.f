@@ -14,8 +14,8 @@
 
 *  Description:
 *     Remove any leading blanks from the character string.
-*     The remaining characters are moved to the left to eliminate the 
-*     resulting empty space, and the end of the string is filled with 
+*     The remaining characters are moved to the left to eliminate the
+*     resulting empty space, and the end of the string is filled with
 *     blanks.
 
 *  Arguments:
@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -58,7 +58,7 @@
 *     20-JUN-1984 (ACD):
 *        Original version.
 *     30-JUN-1984 (ACD):
-*        Modified to update a single string rather than generating a 
+*        Modified to update a single string rather than generating a
 *        new one. This was done to be consistent with the other
 *        CHR_ routines.
 *     16-NOV-1984 (ACD):
@@ -69,7 +69,7 @@
 *     13-JUN-1989 (AJC):
 *        Revise for speed. Use of the declared length of string as
 *        CHR_LEN is expensive.
-*        Also remove initial check for all spaces; it costs every 
+*        Also remove initial check for all spaces; it costs every
 *        time and only if the string is blank and .GT. about 20 chars.
 *     {enter_further_changes_here}
 
@@ -107,8 +107,8 @@
 *  leading blanks to be removed.
       IF ( ( START .GT. 1 ) .AND. ( START .LE. STOP ) ) THEN
 
-*     Shunt up the non-blank characters to the start of the string. 
-*     Do the whole string because it is just as expensive to find the 
+*     Shunt up the non-blank characters to the start of the string.
+*     Do the whole string because it is just as expensive to find the
 *     used length.
          LENCPY = STOP - START + 1
 
@@ -117,7 +117,7 @@
             STRING( CURSHF : CURSHF ) = STRING( CURORG : CURORG )
  30      CONTINUE
 
-*     Remove the characters at the end of the string that are now 
+*     Remove the characters at the end of the string that are now
 *     duplicated.
          STRING( LENCPY+1 : ) = ' '
       END IF

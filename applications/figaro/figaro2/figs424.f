@@ -3,7 +3,7 @@ C+
 C
 C     F I G S 4 2 4
 C
-C     Given a FIGS image-mode data hypercubecube as produced by the FIGS 
+C     Given a FIGS image-mode data hypercubecube as produced by the FIGS
 C     data acquisition system, processes it to produce a hypercube in
 C     which the data has been sorted into wavelength order in accordance
 C     with the wavelength parameters included in the hypercube.
@@ -21,7 +21,7 @@ C
 C     Input data -
 C
 C     HCUBE is assumed to have a structure with the actual
-C     cube data in HCUBE.Z.DATA  
+C     cube data in HCUBE.Z.DATA
 C
 C     This routine assumes that the first axis of the cube data
 C     represents wavelength, that the second and third represent the
@@ -31,14 +31,14 @@ C     wavelength, the .Y represents the image X axis and so forth)
 C     and the fourth axis represents scan cycle number.
 C     The data is sorted into wavelength order using the various
 C     grating parameters read from the .FITS sub-structure of HCUBE.
-C     The data is only re-ordered in the first dimension of the 
+C     The data is only re-ordered in the first dimension of the
 C     hypercube.
 C
 C     Output data -
 C
 C     OUTPUT is created with the same structure as HCUBE, but with
 C     a .X structure added to contain the wavelength information.
-C     
+C
 C                                     KS / AAO 25th Nov 1985
 C
 C     Modified:
@@ -280,7 +280,7 @@ C     Local variables
 C
       INTEGER IT, IU, IY
 C
-C     Loop through all the wavelength vectors in the cube and 
+C     Loop through all the wavelength vectors in the cube and
 C     re-order them.
 C
       DO IU=1,NU

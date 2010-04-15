@@ -12,7 +12,7 @@
 *Input:
 
       INTEGER REF_NO					!Reference number of files.
-      DOUBLE PRECISION DPVAL				!Hidden double precision value. 
+      DOUBLE PRECISION DPVAL				!Hidden double precision value.
       CHARACTER*(*) FIELD				!Field after which double precision value is to be inserted.
 
 *  Common blocks
@@ -27,7 +27,7 @@
 
       CHARACTER*10  BA					!Byte array.
       DOUBLE PRECISION STORE				!Location to store the passed double precision value in.
- 
+
       INTEGER FIELD_LENGTH				!Length of field which precedes insertion.
       INTEGER BYTENO					!Byte number of preceding record.
       CHARACTER*6 FORMAT				!Format of field.

@@ -56,7 +56,7 @@
 *     22-MAR-1993 (AJJB):
 *        Replaced OPEN statement, with call to
 *        a new routine, FILEOPEN, which was found to be necessary when
-*        porting, as the CARRIAGECONTROL specifier is used which is 
+*        porting, as the CARRIAGECONTROL specifier is used which is
 *        necessary on the Vax but unsupported on the Sun machines, so
 *        that we can just have a different version of FILEOPEN for the
 *        different machines to take care of this.
@@ -79,7 +79,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -127,7 +127,7 @@ C
       CALL PAR_GET0C( 'QFILE', NAME, STATUS )
       CALL PAR_CANCL( 'QFILE', STATUS )
       FILE=NAME
-      
+
 * Check whether file already exists - if so loop round for new filename
 
       INQUIRE( FILE = FILE, EXIST = EXIST )
@@ -136,13 +136,13 @@ C
      :                      ' a new filename', STATUS )
        GOTO 100           ! Loop round for new filename
       ENDIF
-      
+
 * This call replaces the statement :
 *      OPEN (UNIT=3,FILE=FILE,STATUS='NEW',
 *     :      CARRIAGECONTROL='LIST')
 *
       CALL FILEOPEN(3, FILE, 'NEW', ' ', ' ', .TRUE., 0, .FALSE.,
-     :     STATUS )      
+     :     STATUS )
 
       IF (STATUS .NE. SAI__OK) GOTO 900
 C
@@ -188,7 +188,7 @@ C
          CALL MSG_OUT( ' ', 'order in which they are entered.',
      :      STATUS )
          CALL MSG_OUT( ' ', 'There are four points to be entered.',
-     :      STATUS ) 
+     :      STATUS )
          CALL MSG_BLANK( STATUS )
       DO ICO=1,4
   210    CONTINUE

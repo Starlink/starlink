@@ -144,7 +144,7 @@
       INTEGER J                  ! PSF pixel Y index.
       INTEGER PIXEL              ! Pixel index.
       INTEGER ROW                ! Row index.
-   
+
       REAL ACTUAL                ! Actual no. of PSF pixels included in
                                  ! a particular weight.
       REAL NEWWGT                ! Corrected weight value.
@@ -202,7 +202,7 @@
 
                PWGRID( IX, IY ) = PWGRID( IX, IY ) + PSF( I, J )
 
-*  Increment the number of PSF pixels which have been added into this 
+*  Increment the number of PSF pixels which have been added into this
 *  weight grid value.
                WORK( IX, IY ) = WORK( IX, IY ) + 1.0
 
@@ -235,14 +235,14 @@
             DO IX = PLO, PHI
                IF( WORK( IX, IY ) .GT. 0.0 ) WTOT = WTOT + 1.0
             END DO
-         END DO            
+         END DO
 
 *  Find the nominal number of PSF pixels per weight value.
          NOM = REAL( ( PXHI - PXLO + 1 )*( PYHI - PYLO + 1 ) )/WTOT
 
-*  Apply a correction factor to each weight value which takes account 
-*  of the fact that some weights will by chance (due to the nearest 
-*  neighbour interpolation) contain more PSF values than others. This 
+*  Apply a correction factor to each weight value which takes account
+*  of the fact that some weights will by chance (due to the nearest
+*  neighbour interpolation) contain more PSF values than others. This
 *  reduces the noise in the pixel weight grids.
          WGTSUM = 0.0
 
@@ -257,17 +257,17 @@
                END IF
 
             END DO
-         END DO            
+         END DO
 
 *  If possible, divide the weight values by the total weight sum, to
-*  ensure a total data sum of unity in the weight grid. 
+*  ensure a total data sum of unity in the weight grid.
          IF( WGTSUM .NE. 0.0 ) THEN
 
             DO IY = RLO, RHI
                DO IX = PLO, PHI
                   PWGRID( IX, IY ) = PWGRID( IX, IY )/WGTSUM
                END DO
-            END DO            
+            END DO
 
 *  Otherwise, report an error.
          ELSE

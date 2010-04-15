@@ -13,7 +13,7 @@ static char const rcsid[] = "@(#) $Id$";
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ** Library General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU Library General Public
 ** License along with this library; if not, write to the
 ** Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -222,7 +222,7 @@ static void MakeInvisible(HtmlElement *pFirst, HtmlElement *pLast){
 
 /*
 ** For the markup <a href=XXX>, find out if the URL has been visited
-** before or not.  Return COLOR_Visited or COLOR_Unvisited, as 
+** before or not.  Return COLOR_Visited or COLOR_Unvisited, as
 ** appropriate.
 **
 ** This routine may invoke a callback procedure which could delete
@@ -258,7 +258,7 @@ static int GetLinkColor(HtmlWidget *htmlPtr, char *zURL){
     TestPoint(0);
     goto errorOut;
   }
-  result = Tcl_GetBoolean(htmlPtr->interp, 
+  result = Tcl_GetBoolean(htmlPtr->interp,
                           Tcl_GetStringResult(htmlPtr->interp), &isVisited);
   if( result!=TCL_OK ){
     TestPoint(0);
@@ -541,7 +541,7 @@ void HtmlAddStyle(HtmlWidget *htmlPtr, HtmlElement *p){
         p->list.compact = HtmlMarkupArg(p,"compact",0)!=0;
         inDt = 0;
         TestPoint(0);
-        break; 
+        break;
       case Html_EM:
         style.font = ItalicFont( FontSize(style.font) );
         PushStyleStack(htmlPtr, Html_EndEM, style);
@@ -560,7 +560,7 @@ void HtmlAddStyle(HtmlWidget *htmlPtr, HtmlElement *p){
           }else{
             size = atoi(z);
           }
-          if( size <= 0 ){ 
+          if( size <= 0 ){
             size = 1;
           }
           if( size >= N_FONT_SIZE ){
@@ -572,7 +572,7 @@ void HtmlAddStyle(HtmlWidget *htmlPtr, HtmlElement *p){
         if( z ){
           style.color = HtmlGetColorByName(htmlPtr, z);
         }
-        PushStyleStack(htmlPtr, 
+        PushStyleStack(htmlPtr,
             p->base.type==Html_FONT ? Html_EndFONT : Html_EndBASEFONT, style);
         break;
       case Html_FORM: {
@@ -750,7 +750,7 @@ void HtmlAddStyle(HtmlWidget *htmlPtr, HtmlElement *p){
         }else{
           TestPoint(0);
         }
-        p->list.compact = htmlPtr->innerList!=0 || 
+        p->list.compact = htmlPtr->innerList!=0 ||
                           HtmlMarkupArg(p,"compact",0)!=0;
         htmlPtr->innerList = p;
         break;
@@ -1036,11 +1036,11 @@ void HtmlAddStyle(HtmlWidget *htmlPtr, HtmlElement *p){
 ** This routine only computes the sizes of individual elements.  The
 ** size of aggregate elements (like tables) are computed separately.
 **
-** The HTML_Visible flag is also set on every element that results 
+** The HTML_Visible flag is also set on every element that results
 ** in ink on the page.
 **
 ** This routine may invoke a callback procedure which could delete
-** the HTML widget. 
+** the HTML widget.
 */
 void HtmlSizer(HtmlWidget *htmlPtr){
   HtmlElement *p;

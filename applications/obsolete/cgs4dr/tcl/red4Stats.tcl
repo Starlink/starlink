@@ -1,6 +1,6 @@
 proc red4Stats {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -111,7 +111,7 @@ proc red4Stats {taskname} {
 # Do the stats
         set param "data='[string trim $Red4Widgets(RO)]' plane='[string trim $Red4Widgets(GS_PLANE)]'"
         if {$Red4Widgets(GS_WHOLE) == 1} {
-          set Red4Widgets(GS_DIST) 1 
+          set Red4Widgets(GS_DIST) 1
           set Red4Widgets(GS_DIEN) 256
           set Red4Widgets(GS_DIIN) 1
           set Red4Widgets(GS_DJST) 1

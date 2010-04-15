@@ -1,16 +1,16 @@
 *+LTX_DECODE_DSCF  Decodes dscf Print info
       SUBROUTINE LTX_DECODE_DSCF(STRING,SIZE,IFIELD,IFILE)
       IMPLICIT NONE
- 
+
 *  Calling Arguments
       CHARACTER*(*) STRING		! Print instructions to be decoded
       INTEGER IFIELD			! Start field, this variable
       INTEGER SIZE			! Array size (if .gt. 1)
       INTEGER IFILE			! 1: Cover, 2: Target
- 
+
 *  Global Variables
       INCLUDE 'com_form_latex.inc'
- 
+
 *******************************************************************************
 *  History
 *     1988 October	M Ricketts	1st Version
@@ -27,7 +27,7 @@
 * Parameter
       INTEGER PAGE_MAX
       PARAMETER(PAGE_MAX=6)
- 
+
 *  Local Variables
       INTEGER P1, P2, PCOMMA, I, J, IPAGE, PMINUS, NF
       REAL RYSTART, RYDEC
@@ -35,14 +35,14 @@
       CHARACTER*3 PAGES				! 'ONE' or 'ALL'
       CHARACTER*6 YST
       CHARACTER*22 FIELD
- 
+
 *  Executable Code
       DO J = 1,SIZE				! Clear print flags
          DO I=1,PAGE_MAX
             PR_ON(IFIELD+J-1,I,IFILE) = .FALSE.
          END DO
       END DO
- 
+
       P1 = 1
       P2 = INDEX(STRING(P1:),':') - 1		! Get next field end
       IF (P2 - P1.GT.0) THEN
@@ -82,14 +82,14 @@ c
 	 ELSE
 		READ(field(:INDEX(field,'/') - 1),'(I)') ipage
 	END IF
- 
+
          PCOMMA = INDEX(FIELD,',')		! Separate x,y fields
          XSTART(IFIELD,IPAGE,IFILE) = FIELD(3:PCOMMA-1)
 	PR_ON(IFIELD,ipage,IFILE)  = .TRUE.
- 
+
          IF (SIZE.EQ.1) THEN
             YSTART(IFIELD,IPAGE,IFILE) = FIELD(PCOMMA+1:)
- 
+
          ELSE
             PMINUS = INDEX(FIELD,'-')		! If present fill whole array
             IF (PMINUS .EQ. 0) THEN
@@ -102,7 +102,7 @@ c
                RYDEC   = MDH_CTOR(FIELD(PMINUS+1:))
                RYSTART = MDH_CTOR(YST)
             END IF
- 
+
             IF (ARRAY_FILL) THEN		! Put in rest of start locations
                NF = IFIELD
                DO I=2,SIZE
@@ -114,7 +114,7 @@ c
                END DO
             END IF
          END IF					! Filling array
- 
+
          IF (PAGES.EQ. 'ALL') THEN		! Fill other pages
             DO I=1,PAGE_MAX
                PR_ON(IFIELD,I,IFILE)  = .TRUE.
@@ -132,7 +132,7 @@ c
             END DO
 c            MORE_FIELDS = .FALSE.
          END IF
- 
+
 *     See if any more fields to decode
          IF (MORE_FIELDS .AND. pages .NE. 'ALL') THEN
             STRING = STRING(P2+2:)
@@ -140,10 +140,10 @@ c            MORE_FIELDS = .FALSE.
             P2 = INDEX(STRING(P1:),':') - 1
             IF (P2-P1 .LE. 0 ) MORE_FIELDS = .FALSE.
          END IF
- 
+
 	pages = 'ONE'
       END DO					! While more fields
- 
+
       IFIELD = IFIELD + SIZE
- 
+
       END

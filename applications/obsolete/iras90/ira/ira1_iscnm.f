@@ -22,7 +22,7 @@
 *     NC = INTEGER (Given)
 *        The axis required; 1 for longitude, 2 for latitude.
 *     DESCR = CHARACTER * ( * ) (Returned)
-*        A full description of the axis name (see routine IRA_SCNAM). 
+*        A full description of the axis name (see routine IRA_SCNAM).
 *        This should have a declared length of IRA__SZSCD.
 *     LD = INTEGER (Returned)
 *        No. of used characters in DESCR.

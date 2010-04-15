@@ -19,7 +19,7 @@ C                 calling routine.
 C     (>) OUTVAR  (Real array OUTVAR(NELM)) The output variance array
 C                 Note that INVAR and OUTVAR may be the same array in the
 C                 calling routine.
-C     
+C
 C     Common variables used -  None
 C
 C     Subroutines / functions used -  None
@@ -39,7 +39,7 @@ C     Local variables
 C
       INTEGER I
       REAL CONST
-C 
+C
 C     Set CONST as natural log of 10
 C
       CONST = LOG(10.0)

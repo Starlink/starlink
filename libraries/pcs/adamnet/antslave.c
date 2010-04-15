@@ -75,8 +75,8 @@ int main()
    }
    for ( j=0; j<2; j++ )
    {
-      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status, 
-        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path, 
+      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status,
+        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path,
         &messid, &status );
       if ( status == SAI__OK )
       {
@@ -89,9 +89,9 @@ int main()
 
       outmsg_status = DTASK__ACTSTART;
 
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
       if ( status == SAI__OK )
       {
       printf ( "slave: sent first reply ok\n" );
@@ -104,9 +104,9 @@ int main()
       }
 
       outmsg_status = SAI__OK;
-      ams_reply ( path, messid, outmsg_function, outmsg_status, 
-        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
-        &status ); 
+      ams_reply ( path, messid, outmsg_function, outmsg_status,
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value,
+        &status );
    }
    if ( status != 0 )
    {

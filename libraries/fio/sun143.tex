@@ -18,17 +18,17 @@
 \newcommand{\stardocauthors}   {P M Allan \\ A J Chipperfield}
 \newcommand{\stardocdate}      {20 July 2001}
 \newcommand{\stardoctitle}     {FIO/RIO \\ [1ex]
-                                FORTRAN file I/O routines} 
+                                FORTRAN file I/O routines}
 \newcommand{\stardocversion}   {Version 1.5}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 \newcommand{\stardocabstract}
 {FIO/RIO is a subroutine package that allows a FORTRAN programmer to access
 sequential and direct access data files in a machine independent manner. The
 package consists of stand alone FIO and RIO routines, which can be used
-independently of the Starlink software environment, plus routines to interface 
+independently of the Starlink software environment, plus routines to interface
 to the Starlink parameter system.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ to the Starlink parameter system.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -515,12 +515,12 @@ to the Starlink parameter system.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -567,7 +567,7 @@ to the Starlink parameter system.}
 
 \section{Introduction}
 
-The FIO/RIO package is intended for handling record oriented files 
+The FIO/RIO package is intended for handling record oriented files
 (e.g.\ simple text files) in both ADAM tasks and stand-alone FORTRAN programs.
 Although most bulk data will be stored in HDS files, there are occasions when
 the use of HDS is not appropriate. Writing formatted sequential files that are
@@ -588,8 +588,8 @@ primarily used to handle unformatted, direct access files, although some can
 handle formatted, direct access files as well.
 
 FIO and RIO use a common table of file descriptors so that file descriptors
-created by RIO routines may be used with appropriate FIO routines: 
-e.g.\ FIO\_FNAME returns the filename associated with a file descriptor 
+created by RIO routines may be used with appropriate FIO routines:
+e.g.\ FIO\_FNAME returns the filename associated with a file descriptor
 obtained via either FIO or RIO.
 
 The normal Starlink `inherited status' error handling strategy is employed
@@ -953,11 +953,11 @@ that you have prompted a user for the name of an input file and you then try to
 open a file using the returned string. If the program fails to open the file,
 this might be for one of several reasons. It may be that the file
 does not exist, or that the file exists, but you do not have the right to
-access the file, or that the string typed in is not a valid file name 
-(e.g.\ {\tt [PMA\}TEST.DAT} on VMS). 
-In all of these situations, you can rely on the error reporting to tell the 
-user what has gone wrong, but all the program cares about is that it has 
-failed to open the file and that it should re-prompt the user. 
+access the file, or that the string typed in is not a valid file name
+(e.g.\ {\tt [PMA\}TEST.DAT} on VMS).
+In all of these situations, you can rely on the error reporting to tell the
+user what has gone wrong, but all the program cares about is that it has
+failed to open the file and that it should re-prompt the user.
 A program can test for a general class of errors by using the logical function
 FIO\_TEST. This takes a character argument and a status value and returns TRUE
 if the value of STATUS is in the class of errors described by the character
@@ -1010,7 +1010,7 @@ classes in a future release of FIO/RIO.
 
 \subsection{Note to software developers}
 \begin{quote}
-{\it 
+{\it
 The routines that provide the interface to the ADAM parameter system report
 errors by calling the ERR library. All other routines report errors by calling
 the EMS library.}
@@ -1059,7 +1059,7 @@ To compile and link an ADAM program that uses FIO, type:
 
 The current version of FIO/RIO is distributed as a shareable image. Before
 compiling a program that uses any of the FIO include files, or linking any
-program that uses FIO, type 
+program that uses FIO, type
 
 \begin{quote}{\tt
 \$ FIO\_DEV
@@ -1905,7 +1905,7 @@ Linux:       &No trailing spaces added   &FIO\_\_EOF
          file name and which error occurred.
       }
       \sstexamplesubsection{
-         CALL FIO\_REP( UNIT, {\tt ' '}, IOSTAT, 
+         CALL FIO\_REP( UNIT, {\tt ' '}, IOSTAT,
                 'Failed to open $\wedge$FNAME', STATUS )
       }{
          This example provides an explicit error message containing the
@@ -2745,7 +2745,7 @@ FIO\_\_TOMNY & Too many open files \\
 
 \section{Implementation details}
 
-The implementation uses FORTRAN I/O and FORTRAN 77 standards are used with 
+The implementation uses FORTRAN I/O and FORTRAN 77 standards are used with
 the following exceptions:
 
 \subsection{Alpha OSF/1}
@@ -2783,7 +2783,7 @@ only read access is permitted.
 \item The ACCESS $=$ APPEND keyword is available to permit the useful but
 non-standard facility of appending to files.
 \item The RECL option on the OPEN statement is allowed with sequential files.
-\item Keywords BLOCKSIZE ($=$ 11*512) and ORGANIZATION (= 'RELATIVE') are used 
+\item Keywords BLOCKSIZE ($=$ 11*512) and ORGANIZATION (= 'RELATIVE') are used
 when creating direct access files.
 \item A byte array is used as the buffer for direct access I/O.
 \end{itemize}
@@ -2793,7 +2793,7 @@ Note that the VMS implementation is frozen at release 1.4.
 
 \subsection{in version 1.5}
 The Unix makefile etc.\ have been updated to version 5, and an `END='
-specifier inserted in RIO\_READ to trap a problem on Solaris if the record 
+specifier inserted in RIO\_READ to trap a problem on Solaris if the record
 number is beyond the end of the file.
 
 This release also runs on Linux.

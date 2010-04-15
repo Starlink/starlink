@@ -122,11 +122,11 @@
          do kk =1,kp1
             coeffs(kk) = aa(kk,j)
          end do
-         
+
          do kkk=1,3*maxnpts2+3*mord
             loca3(kkk)=a3all(kkk,j)
          end do
-         
+
 
 *
 * initialize valid range of cheby fit for each tooth

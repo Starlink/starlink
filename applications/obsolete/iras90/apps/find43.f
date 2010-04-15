@@ -30,7 +30,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-      
+
 *  External Routines Used:
 *     None
 
@@ -48,7 +48,7 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

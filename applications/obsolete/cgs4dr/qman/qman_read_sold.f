@@ -1,4 +1,4 @@
-*+  QMAN_READ_SOLD - Get record number at minimum time 
+*+  QMAN_READ_SOLD - Get record number at minimum time
       SUBROUTINE QMAN_READ_SOLD( STATUS )
 *    Invocation :
 *     CALL QMAN_READ_SOLD( STATUS )
@@ -20,7 +20,7 @@
       INCLUDE 'QMAN_COMMON.BLK'       ! Task common block
 *    Local variables :
       INTEGER ICOUNT                  ! Counter
-      DOUBLE PRECISION MINDATE        ! Maximum date 
+      DOUBLE PRECISION MINDATE        ! Maximum date
 *-
 
 *   Return immediately if status bad.

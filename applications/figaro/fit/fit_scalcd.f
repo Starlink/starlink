@@ -11,7 +11,7 @@ C     signed integers.  The user has to choose which of these
 C     representations should be used, trading off precision
 C     against compactness of data.  This routine is the same
 C     as FIT_SCALC, except that the SCALES and ZEROS arguments
-C     are double precision.  This routine is to be prefered 
+C     are double precision.  This routine is to be prefered
 C     over FIT_SCALC for this reason.
 C
 C     Parameters -   (">" input, "<" output)
@@ -22,7 +22,7 @@ C                  treated here as 1-dimensional for generality.
 C     (>) NELM     (Integer) The number of elements in DATA.
 C     (>) CHECK    (Logical) If true, the routine will pass through
 C                  the data applying the scaling for each integer
-C                  representaion and then applying the inverse 
+C                  representaion and then applying the inverse
 C                  operation to the result.  The maximum errors
 C                  found will be returned in ERRORS.
 C     (<) VMIN     (Real) Minimum value in DATA.
@@ -31,7 +31,7 @@ C     (<) SCALES   (Double pecision array SCALES(3)) Gives the
 C                  scale factors for the three integer types.
 C                  SCALES(1) is for 8 bit, (2) for 16 bit, and
 C                  (3) for 32 bit.
-C     (<) ZEROS    (Double precision array ZEROS(3)) Gives the zero 
+C     (<) ZEROS    (Double precision array ZEROS(3)) Gives the zero
 C                  values for the three integer types.
 C     (<) ERRORS   (Real array ERRORS(3)) If CHECK is specified,
 C                  ERRORS will be returned with the maximum errors
@@ -74,9 +74,9 @@ C
          IF (DATA(I).LT.VMIN) VMIN=DATA(I)
       END DO
 C
-C     Now get the three scales and zeros.  Note that we don't 
+C     Now get the three scales and zeros.  Note that we don't
 C     try to make use of the VERY ends of the integer ranges, to
-C     allow a little slop for rounding errors etc.  
+C     allow a little slop for rounding errors etc.
 C
       RANGE=VMAX-VMIN
       IF (RANGE.LT.1.E-35) THEN

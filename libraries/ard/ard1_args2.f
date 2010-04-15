@@ -16,7 +16,7 @@
 *  Description:
 *     If a new argument list is being constructed, look for the opening
 *     parenthesis. Then go on to copy the remaining text from the ARD
-*     expression into the returned group, up to the closing parenthesis 
+*     expression into the returned group, up to the closing parenthesis
 *     or the end of the element (which ever comes first). If
 *     the closing parenthesis has not been reached, return in order for
 *     a new element to be obtained so that the construction of the
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -116,7 +116,7 @@
 *  Find the next non-blank character in ELEM. This should be the opening
 *  parenthesis which marks the start of the argument list.
          CC = ELEM( I : I )
-         DO WHILE( CC .EQ. ' ' .AND. I .LT. L ) 
+         DO WHILE( CC .EQ. ' ' .AND. I .LT. L )
             I = I + 1
             CC = ELEM( I : I )
          END DO
@@ -127,7 +127,7 @@
 
 *  If the next non-blank character is an opening parenthesis, indicate
 *  that the argument list has been started by setting the number of
-*  arguments read so far to zero. 
+*  arguments read so far to zero.
          IF( CC .EQ. '(' ) THEN
             NARG = 0
 
@@ -151,7 +151,7 @@
 *  current element until a closing parenthesis at depth zero is
 *  found.
          START = I
-         DO WHILE( I .LE. L .AND. MORE .AND. STATUS .EQ. SAI__OK ) 
+         DO WHILE( I .LE. L .AND. MORE .AND. STATUS .EQ. SAI__OK )
 
             IF( ELEM( I: I ) .EQ. '(' ) THEN
                DEPTH = DEPTH + 1
@@ -164,7 +164,7 @@
             END IF
 
             I = I + 1
-         END DO            
+         END DO
 
 *  Determine the index of the last usable character.
          IF( MORE ) THEN
@@ -175,7 +175,7 @@
 
 *  Store the string as a new element in the returned group.
          IF( START .LE. J ) THEN
-            IF( ELEM( START : J ) .NE. ' ' ) THEN 
+            IF( ELEM( START : J ) .NE. ' ' ) THEN
                NARG = NARG + 1
                CALL GRP_PUT( IGRP, 1, ELEM( START : J ), 0, STATUS )
             END IF

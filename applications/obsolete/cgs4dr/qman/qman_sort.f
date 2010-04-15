@@ -30,7 +30,7 @@
 *   Check the password (if specified)
       CALL QMAN_CHECK_PWD( STATUS )
 
-*   Get the sort mode 
+*   Get the sort mode
       CALL CHR_FILL( ' ', MODE )
       CALL PAR_GET0C( 'SORT_MODE', MODE, STATUS )
       CALL CHR_UCASE( MODE )

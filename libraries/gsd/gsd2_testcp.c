@@ -7,21 +7,21 @@
 
  * Language:
  *    ANSI C
- 
+
  * Type of Module:
  *    C function.
- 
+
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -40,7 +40,7 @@
  * Copyright:
  *    Copyright (C) 1994-2004 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
- 
+
  *-
 
  */
@@ -59,12 +59,12 @@ void dumpoutput ( int nelem, double darray[], float farray[], int iarray[],
   printf("  %23s %15s %12s %7s %2s %5s\n","D","R","I","W","L","B");
   for ( i = 0; i < BUFSIZE; i++ )
     (void) printf( "%2d %22.15g%s %14.8g%s %11d%s %6d%s %1d%s %4d%s\n",
-		   i, 
-		   darray[i], (darray[i] == VAL__BADD ? "*" : " "), 
-		   farray[i], (farray[i] == VAL__BADR ? "*" : " "), 
-		   iarray[i], (iarray[i] == VAL__BADI ? "*" : " "), 
-		   warray[i], (warray[i] == VAL__BADW ? "*" : " "), 
-		   larray[i], (larray[i] == VAL__BADB ? "*" : " "), 
+		   i,
+		   darray[i], (darray[i] == VAL__BADD ? "*" : " "),
+		   farray[i], (farray[i] == VAL__BADR ? "*" : " "),
+		   iarray[i], (iarray[i] == VAL__BADI ? "*" : " "),
+		   warray[i], (warray[i] == VAL__BADW ? "*" : " "),
+		   larray[i], (larray[i] == VAL__BADB ? "*" : " "),
 		   barray[i], (barray[i] == VAL__BADB ? "*" : " ")
 		   );
 

@@ -47,8 +47,8 @@
 *        zero. In this case, the elements of MATRIX should contain
 *        only the diagonal elements, stored consecutively.
 *
-*        A value of 2 indicates that a "unit" matrix is required, whose 
-*        diagonal elements are set to unity (with all other elements zero).  
+*        A value of 2 indicates that a "unit" matrix is required, whose
+*        diagonal elements are set to unity (with all other elements zero).
 *        In this case, the MATRIX parameter is not used.
 *     MATRIX() = _DOUBLE (Read)
 *        The array of matrix elements to be used, stored according to
@@ -57,11 +57,11 @@
 *        The number of input coordinates (i.e. the number of columns in the
 *        matrix).
 *     NOUT = INTEGER (Read)
-*        The number of output coordinates (i.e. the number of rows in the 
+*        The number of output coordinates (i.e. the number of rows in the
 *        matrix).
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new MatrixMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new MatrixMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new MatrixMap.
 
@@ -118,32 +118,32 @@
       INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
 *  Get the number of input and output axes required.
-      CALL PAR_GDR0I( 'NIN', 2, 1, NDF__MXDIM, .FALSE., NIN, STATUS ) 
-      CALL PAR_GDR0I( 'NOUT', NIN, 1, NDF__MXDIM, .FALSE., NOUT, 
-     :                STATUS ) 
+      CALL PAR_GDR0I( 'NIN', 2, 1, NDF__MXDIM, .FALSE., NIN, STATUS )
+      CALL PAR_GDR0I( 'NOUT', NIN, 1, NDF__MXDIM, .FALSE., NOUT,
+     :                STATUS )
 
 *  Get the matrix form.
-      CALL PAR_GDR0I( 'FORM', 0, 0, 2, .FALSE., FORM, STATUS ) 
+      CALL PAR_GDR0I( 'FORM', 0, 0, 2, .FALSE., FORM, STATUS )
 
 *  Determine the number of matrix elements required.
       IF( FORM .EQ. 0 ) THEN
          NEL = NOUT*NIN
       ELSE IF( FORM .EQ. 1 ) THEN
          NEL = MIN( NOUT, NIN )
-      ELSE 
+      ELSE
          NEL = 0
       END IF
 
-*  Get the matrix elements 
-      IF( NEL .GT. 0 ) THEN 
-         CALL PAR_EXACD( 'MATRIX', NEL, MATRIX, STATUS ) 
+*  Get the matrix elements
+      IF( NEL .GT. 0 ) THEN
+         CALL PAR_EXACD( 'MATRIX', NEL, MATRIX, STATUS )
       END IF
 
 *  Create the required MatrixMap.

@@ -17,7 +17,7 @@
 *     of and NDF is absent, by erasing it if necessary.  If it is not
 *     there in the first place, it will exit silently.  If it has to
 *     erase the item and the COMENT argument is true, it will write
-*     a short message through the log system indicating what it has 
+*     a short message through the log system indicating what it has
 *     done.
 
 *  Arguments:
@@ -70,7 +70,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS system constants
-      
+
 *  Arguments Given:
       INTEGER INDF
       CHARACTER * ( * ) ITEM
@@ -82,19 +82,19 @@
 *  External References:
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Non-blank length of a character string
-      
+
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locator for CCDPACK extension
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Start a new error context.
       CALL ERR_MARK
 
-*  Attempt to get a locator for the .MORE.CCDPACK extension (but don't 
+*  Attempt to get a locator for the .MORE.CCDPACK extension (but don't
 *  create one specially).
       CALL CCD1_CEXT( INDF, .FALSE., 'UPDATE', LOCEXT, STATUS )
 
@@ -112,7 +112,7 @@
          IF ( COMENT ) THEN
             CALL MSG_SETC( 'ITEM', ITEM )
             CALL NDF_MSG( 'NDF', INDF )
-            CALL CCD1_MSG( ' ', 
+            CALL CCD1_MSG( ' ',
      :'  Removing CCDPACK extension item ^ITEM for NDF ^NDF', STATUS )
          END IF
       END IF

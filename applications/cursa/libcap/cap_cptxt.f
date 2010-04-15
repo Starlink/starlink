@@ -121,7 +121,7 @@
 *
 *       Reset access to the input catalogue textual information.
 
-         CALL CAT_RSTXT (CIIN, STATUS) 
+         CALL CAT_RSTXT (CIIN, STATUS)
 
 *
 *       Copy the lines of header text.
@@ -131,7 +131,7 @@
          DO WHILE (MORE)
 
 *
-*          Attempt to get the next line of text from the input 
+*          Attempt to get the next line of text from the input
 *          catalogue and proceed if the status is ok and the input
 *          of text is not finished.
 

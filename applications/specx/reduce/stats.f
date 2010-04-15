@@ -2,7 +2,7 @@ C-----------------------------------------------------------------------
 
       SUBROUTINE STATS (NQ, XSCALE, BUF, IFAIL)
 
-C Subroutine to calculate mean and standard deviation of data in 
+C Subroutine to calculate mean and standard deviation of data in
 C part of the spectrum and then using the integration time to calculate
 C and effective noise temperature for the receiver on the basis that the
 C final spectrum is the sum or difference of an on- and an off- beam.
@@ -75,7 +75,7 @@ C       Avoid uninitialised II
       END IF
 
       N     = 0
-      SUM   = 0.0      
+      SUM   = 0.0
       SUMSQ = 0.0
 
       DO NP = 1,NFSSPX

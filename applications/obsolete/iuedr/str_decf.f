@@ -63,35 +63,35 @@
 
 *   Import:
       BYTE FORMAT(MAXTOK)   ! edit format
- 
+
 *   Export:
       LOGICAL RIGHT         ! whether need to right justify in field
- 
+
       INTEGER FIELD         ! minimum field size
- 
+
       LOGICAL FIXED         ! whether fixed point
- 
+
       INTEGER PREC          ! required precision
- 
+
       BYTE EDIT             ! edit type character
- 
+
 *   External references:
       INTEGER str_INDEX     ! index of character in string
       INTEGER str_LEN       ! string length
       INTEGER str_TYPE      ! character lexical type
- 
+
 *   Local variables:
       LOGICAL TERM          ! whether terminator found
 
       INTEGER LDIGIT        ! decoded digit
-      INTEGER FIRST         ! first character position 
+      INTEGER FIRST         ! first character position
       INTEGER LAST          ! last chararcter position
       INTEGER NUM           ! decoded number
 
 *   String length
       FIRST = 1
       LAST = str_LEN(FORMAT)
- 
+
 *   Default values
       RIGHT = TRUE
       FIXED = FALSE
@@ -99,7 +99,7 @@
       TERM = FALSE
       PREC = -1
       EDIT = BLANK
- 
+
 *   Work through format end on the <edit> character
       DO WHILE (FIRST.LE.LAST)
 

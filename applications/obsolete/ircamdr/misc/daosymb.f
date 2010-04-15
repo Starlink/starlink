@@ -23,7 +23,7 @@ c
       else if( stype .eq. 3) then
         type *,'Input size of comment '
         read(5,*)csize
-      else 
+      else
         type *,'Input diameter of circle in arcseconds'
         read(5,*)size
         type *,'Input size of comment '

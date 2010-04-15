@@ -71,7 +71,7 @@ extern value paren_interpret              ( node *n, int op );  /* expr.c */
  *
  ******************************************************************************
  */
-char *hds_path; 
+char *hds_path;
 char *icl_hdscomp;
 HDSLoc * hds_tloc = NULL;
 HDSLoc * hds_vloc = NULL;
@@ -129,7 +129,7 @@ init_hdsfile(void)
     hdsdim dims[1];
     int status;
     int there;
-  
+
     char *file;
     char ascpid[10];
 /*
@@ -153,7 +153,7 @@ init_hdsfile(void)
     file = strconcat( hds_path, "icl");
 /*
  * See if we have an existing HDS file
- */    
+ */
     emsMark();
 
     ndims = 0;
@@ -166,8 +166,8 @@ init_hdsfile(void)
 	hdsNew(file, "ICLVARS", "ICLVARS", ndims, dims, &hds_tloc, &status );
     }
     emsRlse();
-/* 
- * Create the top level component from the pid of this incarnation of ICL 
+/*
+ * Create the top level component from the pid of this incarnation of ICL
  */
     datThere(hds_tloc, ascpid, &there, &status );
 
@@ -177,7 +177,7 @@ init_hdsfile(void)
 
 /*
  * Obtain the file locators for the "VARIABLES" component
- */ 
+ */
     datThere( tloc, "VARIABLES", &there, &status );
 
     if (!there) datNew( tloc, "VARIABLES", "VARS", ndims, dims, &status );
@@ -212,7 +212,7 @@ deinit_hdsfile(void)
 {
     int status = SAI__OK;
     char ascpid[10];
-   
+
     if (hds_vars_used) {
 
         datAnnul( &hds_vloc, &status );
@@ -234,7 +234,7 @@ deinit_hdsfile(void)
  *
  ******************************************************************************
  */
-value 
+value
 name_interpret_hds(node *n, int op)
 {
     extern value  name_interpret(node *n, int op);		/* expr.c */
@@ -263,7 +263,7 @@ name_interpret_hds(node *n, int op)
 
     if( isexc(val = lookup_variable_value(string_part(n->val))) )
 	return val;
-    
+
     if (val.type == TYPE_STRING && val.u.string[0] == '@')
 	return val;
 /*
@@ -288,7 +288,7 @@ name_interpret_hds(node *n, int op)
       case TYPE_LOGICAL:
 	strcpy( ctype, "_LOGICAL" );
 	break;
-      case TYPE_STRING:        
+      case TYPE_STRING:
 	strcpy( ctype, "_CHAR*256" );
     }
     str = string_part(n->val);
@@ -324,7 +324,7 @@ name_interpret_hds(node *n, int op)
       case TYPE_LOGICAL:
 	datPut0L( comp_loc, logical_part(val), &status );
 	break;
-      case TYPE_STRING:        
+      case TYPE_STRING:
 	datPut0C( comp_loc, string_part(val), &status );
     }
     datAnnul( &comp_loc, &status );
@@ -388,23 +388,23 @@ reload_vars_hds(void)
 	        val = value_string( cval );
 	    }
 
-	} else if ( ( !strcmp( type, "_REAL" ) ) || 
+	} else if ( ( !strcmp( type, "_REAL" ) ) ||
 		    ( !strcmp( type, "_DOUBLE" ) ) ) {
 
 	    datGet0R( comp_loc, &rval, &status );
 	    if ( status == SAI__OK )
-		val = value_real( rval );                    
+		val = value_real( rval );
 
 	} else if  ( !strcmp( type, "_INTEGER" ) ) {
 
 	    datGet0I( comp_loc, &ival, &status );
 	    if ( status == SAI__OK )
-		val = value_integer( ival );                    
+		val = value_integer( ival );
 
 	} else if  ( !strcmp( type, "_LOGICAL" ) ) {
 	    datGet0L( comp_loc, &lval, &status );
 	    if ( status == SAI__OK )
-		val = value_logical( lval );                    
+		val = value_logical( lval );
 	} else {
 	    status = SAI__ERROR;
 	    emsSetc( "TYPE", type );
@@ -423,7 +423,7 @@ reload_vars_hds(void)
         else
             if (isexc( val=assign_helper1( node, val )))
                return val;
-/* 
+/*
  * delete the component from HDS
  */
 	datAnnul( &comp_loc, &status );
@@ -460,7 +460,7 @@ reload_vars_hds(void)
  * Description:
  *    The filename is assembled by appending GLOBAL to hds_path which has
  *    been set in hds_init.
- *    If the file does not exist, and it is to be opened for writing, it is 
+ *    If the file does not exist, and it is to be opened for writing, it is
  *    created.
  *
  * Author:
@@ -468,7 +468,7 @@ reload_vars_hds(void)
  *
  *****************************************************************************
  */
-void openpar( char *taskname, char *actname, char *mode, 
+void openpar( char *taskname, char *actname, char *mode,
               HDSLoc **floc, int *status )
 {
   HDSLoc * loc = NULL;
@@ -478,16 +478,16 @@ void openpar( char *taskname, char *actname, char *mode,
   int there;
   int true;
 
-/* 
+/*
  * Construct the filename
  */
     filename = strconcat(hds_path, taskname);
-/* 
+/*
  * Set an error reporting context
  */
     emsMark();
-/* 
- * Now find the parameter file 
+/*
+ * Now find the parameter file
  */
     hdsOpen(filename, mode, &loc, status );
     free(filename);
@@ -512,7 +512,7 @@ void openpar( char *taskname, char *actname, char *mode,
                 *status = SAI__ERROR;
                 emsSetc( "NAME", actname );
                 emsRep( " ",
-                    "Failed to find parameter file component for action ^NAME", 
+                    "Failed to find parameter file component for action ^NAME",
                     status );
             }
 
@@ -523,13 +523,13 @@ void openpar( char *taskname, char *actname, char *mode,
          */
          datClone( loc, floc, status );
 
-            
+
 /* Make floc a primary locator */
  	 datPrmry( 1, floc, &true, status );
 /* Close the file (It will remain open till floc is annulled) */
 	 datAnnul( &loc, status );
     }
-/* 
+/*
  * Now release the error context
  */
     emsRlse();
@@ -537,13 +537,13 @@ void openpar( char *taskname, char *actname, char *mode,
 
 /*
  ******************************************************************************
- * 
+ *
  * P R O C _ G E T P A R ( node *n )
- * 
+ *
  * GETPAR taskname parametername (variable)
- * 
+ *
  * Get the value of a task's parameter from the task's parameter file
- * 
+ *
  * Author: A J Chipperfield
  *
  * History:
@@ -574,10 +574,10 @@ proc_getpar( node *n)
     char fcval[257];
     char cval[257];
     node *nw, *variable;
-/* 
+/*
  * Check number of parameters
  */
-    if ( nargs < 3 ) 
+    if ( nargs < 3 )
         return exception("TOOFEWPARS  Insufficient parameters for GETPAR");
     if ( nargs > 3 )
         return exception("TOOMANYPARS  Too many parameters for GETPAR");
@@ -591,7 +591,7 @@ proc_getpar( node *n)
     command = string_part(val);
     if (strlen(command) >= (size_t) MESSYS__TNAME)
 	return exception("GETPAR : Command name too long");
-/* 
+/*
  * Get and check "parameter" parameter
  */
     if (isexc(val = interpret(arglist[1])))
@@ -602,14 +602,14 @@ proc_getpar( node *n)
     parameter = string_part(val);
     if (strlen(parameter) >= (size_t) MESSYS__TNAME)
 	return exception("GETPAR : Parameter name too long");
-/* 
+/*
  * Get and check "variable" parameter
  */
     variable = arglist[2];
     if (variable->interpret != paren_interpret)
 	return exception
 	("GETPAR : Assignment to parameter which is not a variable");
-/* 
+/*
  * Find the name_interpret node
  */
     while (variable->interpret == paren_interpret)
@@ -617,7 +617,7 @@ proc_getpar( node *n)
     if (variable->interpret != name_interpret)
 	return exception
 	("GETPAR : Assignment to parameter which is not a variable");
-/* 
+/*
  * Look up command in global symbol table
  * This gets the taskname, including any path, into taskname
  */
@@ -626,7 +626,7 @@ proc_getpar( node *n)
     taskname = strip_path(string_part(nw->val));
     if (strlen(taskname) >= (size_t) MESSYS__TNAME)
 	return exception("TASKERR  Taskname too long");
-/* 
+/*
  * Now get the action name
  */
     actname = string_part(nw->sub[0]->val);
@@ -634,9 +634,9 @@ proc_getpar( node *n)
 	return exception("GETPAR : Action name too long");
 
     status = SAI__OK;
-    (void) openpar( taskname, actname, "READ", 
+    (void) openpar( taskname, actname, "READ",
                     &floc, &status );
-	/* 
+	/*
          * If all OK, Find parameter component
          */
 	if (status == SAI__OK)
@@ -656,7 +656,7 @@ proc_getpar( node *n)
 	    {
             /* Find type of parameter component */
 	      datType( ploc, type, &status );
-            /* 
+            /*
              * Check if it is a 'name' structure
              */
 	        if ( !strncmp( type, "ADAM_PARNAME", 12) )
@@ -677,7 +677,7 @@ proc_getpar( node *n)
                      ( !strncmp( type, "ADAM_PARNAME", 12) ) )
                 {
 		  datGet0C( cloc, fcval, sizeof(fcval), &status );
-                    if ( status == SAI__OK )                    
+                    if ( status == SAI__OK )
                     {
                     /* If it is a name,add the @ */
                         if (!strncmp( type, "ADAM_PARNAME", 12 ))
@@ -690,7 +690,7 @@ proc_getpar( node *n)
                         val = value_string( cval );
                     }
 
-                } else if ( ( !strncmp( type, "_REAL", 5 ) ) || 
+                } else if ( ( !strncmp( type, "_REAL", 5 ) ) ||
                             ( !strncmp( type, "_DOUBLE", 7) ) )
                     {
 		      datGet0R( cloc, &rval, &status );
@@ -702,14 +702,14 @@ proc_getpar( node *n)
 		  {
 		    datGet0I( cloc, &ival, &status );
                     if ( status == SAI__OK )
-                        val = value_integer( ival );                    
+                        val = value_integer( ival );
                     else ;
 
                 } else if  ( !strncmp( type, "_LOGICAL", 8) )
                     {
 		      datGet0L( cloc, &lval, &status );
                     if ( status == SAI__OK )
-                        val = value_logical( lval );                    
+                        val = value_logical( lval );
                     else ;
 
                 } else
@@ -740,7 +740,7 @@ proc_getpar( node *n)
     } else
         emsRep( " ",
 	    "GETPAR : Failed to open parameter file", &status );
-/* 
+/*
  * Now return appropriate status
  */
     emsRlse();
@@ -771,7 +771,7 @@ proc_getpar( node *n)
  * Description:
  *    The filename is assembled by appending GLOBAL to hds_path which has
  *    been set in hds_init.
- *    If the file does not exist, and it is to be opened for writing, it is 
+ *    If the file does not exist, and it is to be opened for writing, it is
  *    created.
  *
  * Author:
@@ -821,7 +821,7 @@ void openglobal( char *mode, HDSLoc **loc, int *status )
  *    parname = *char (Given)
  *       The name of the component which must exist
  *    type = *char (Given)
- *       The required type 
+ *       The required type
  *    btype = *char (Given)
  *       The type to be created if type is "?" and the component does not
  *       exist.
@@ -867,7 +867,7 @@ char hdstype[DAT__SZTYP+1];
 /* If there is one, get a locator to it and check it's OK */
 	  datFind( loc, parameter, ploc, status );
 	  datType( *ploc, hdstype, status );
-           
+
 /* See if the existing component is OK.
  * If type is not "?" check the type against the existing component type
  */
@@ -876,7 +876,7 @@ char hdstype[DAT__SZTYP+1];
 
 /* Else may be any primitive type (hdstype starts with "_") */
             } else if ( !(hdstype[0] == '_') ) new = 1;
-               
+
 /* If we need a new component, delete the old one */
             if ( new ) {
 	      datAnnul( ploc, status );
@@ -884,7 +884,7 @@ char hdstype[DAT__SZTYP+1];
             }
          }
 
-/* Now set hdstype to the required type of the component 
+/* Now set hdstype to the required type of the component
  * or backup type if type is "?"
  */
          type[0]=='?'?strcpy( hdstype, btype ): strcpy( hdstype, type );
@@ -905,7 +905,7 @@ char hdstype[DAT__SZTYP+1];
 	     datNew( *ploc, "NAMEPTR", "_CHAR*132", ndims, dims, status );
 
            } else {
-   /* 
+   /*
     * Not a name - create a component of the required type
     */
 	     datNew( loc, parameter, hdstype, ndims, dims, status );
@@ -934,18 +934,18 @@ char hdstype[DAT__SZTYP+1];
 
 /*
  ******************************************************************************
- * 
+ *
  * P R O C _ S E T P A R ( node *n )
- * 
+ *
  * SETPAR taskname parametername value
- * 
+ *
  * Set the value of a task's parameter in the task's parameter file
- * The specifed parameter file must exist and have the specified action 
- * component in it. However, if a component for the specified parameter 
- * does not exist, one will be created of type _CHAR*132 unless the 
+ * The specifed parameter file must exist and have the specified action
+ * component in it. However, if a component for the specified parameter
+ * does not exist, one will be created of type _CHAR*132 unless the
  * value starts with @, in which case it is assumed to be a name and a
  * `name' component will be created.
- * 
+ *
  * Author: A J Chipperfield
  *
  * History:
@@ -969,15 +969,15 @@ proc_setpar(node *n)
     char type[DAT__SZTYP+1];
     int hname;
     node *nw;
-/* 
+/*
  * Check number of parameters
  */
-    if ( nargs < 3 ) 
+    if ( nargs < 3 )
         return exception("TOOFEWPARS  Insufficient parameters for SETPAR");
     if ( nargs > 3 )
         return exception("TOOMANYPARS  Too many parameters for SETPAR");
-/* 
- * Get and check "command" parameter 
+/*
+ * Get and check "command" parameter
  */
     if (isexc(val = interpret(arglist[0])))
 	return val;
@@ -986,8 +986,8 @@ proc_setpar(node *n)
     command = string_part(val);
     if (strlen(command) >= (size_t) MESSYS__TNAME)
 	return exception("TASKERR: Command name too long");
-/* 
- * Get and check "parameter" parameter 
+/*
+ * Get and check "parameter" parameter
  */
     if (isexc(val = interpret(arglist[1])))
 	return val;
@@ -996,28 +996,28 @@ proc_setpar(node *n)
     parameter = string_part(val);
     if (strlen(parameter) >= (size_t) MESSYS__TNAME)
 	return exception("TASKERR: Parameter name too long");
-/* 
- * Get and check "value" parameter 
+/*
+ * Get and check "value" parameter
  */
     if (isexc(val = interpret_to_string(arglist[2])))
 	return val;
     if (!isstringtype(val))
 	return (exception("SETPAR : Third parameter must be a value"));
     value = string_part(val);
-/* 
- * Find if value is a name 
+/*
+ * Find if value is a name
  */
     hname = (value[0]=='@') ? 1: 0;
-/* 
+/*
  * Look up command in global symbol table
- * This gets the taskname, including any path, into taskname 
+ * This gets the taskname, including any path, into taskname
  */
     if ((nw = lookup_symbol(command, SYM_DEFINED)) == NODENIL)
 	return exception( "SETPAR : Specified command is not defined" );
     taskname = strip_path(string_part(nw->val));
     if (strlen(taskname) >= (size_t) MESSYS__TNAME)
 	return exception("TASKERR  Taskname too long");
-/* 
+/*
  * Now get the action name
  */
     actname = string_part(nw->sub[0]->val);	/* the action */
@@ -1027,7 +1027,7 @@ proc_setpar(node *n)
 
 /* Now open the parameter file */
     status = SAI__OK;
-    (void) openpar( taskname, actname, "UPDATE", 
+    (void) openpar( taskname, actname, "UPDATE",
                     &floc, &status );
 
 /*
@@ -1038,11 +1038,11 @@ proc_setpar(node *n)
         hname?strcpy(type, "ADAM_PARNAME"): strcpy(type, "?");
 
 /*   Ensure a component of the right type exists */
-        (void) ensure_exists( floc, parameter, 
+        (void) ensure_exists( floc, parameter,
                               type, "_CHAR*132", &ploc,
                               &status );
-   /* 
-    * Now write the value into the appropriate component 
+   /*
+    * Now write the value into the appropriate component
     *  skipping the first character (@) if hname is 1
     */
 
@@ -1067,13 +1067,13 @@ proc_setpar(node *n)
 }
 
 /******************************************************************************
- * 
+ *
  *	P R O C _ G E T G L O B A L ( node *n )
- * 
+ *
  * GETGLOBAL parametername (variable)
- * 
+ *
  * Get the value of a GLOBAL parameter from the GLOBAL parameter file
- * 
+ *
  * Author: A J Chipperfield
  *
  * History:
@@ -1106,32 +1106,32 @@ proc_getglobal( node *n)
     char cval[257];
     char ctmp[258];
     node *variable;
-/* 
+/*
  * Check number of parameters
  */
-    if ( nargs < 2 ) 
+    if ( nargs < 2 )
         return exception("TOOFEWPARS  Insufficient parameters for GETGLOBAL");
     if ( nargs > 2 )
         return exception("TOOMANYPARS  Too many parameters for GETGLOBAL");
 /*
- * Get and check "parameter" parameter 
+ * Get and check "parameter" parameter
  */
     if (isexc(val = interpret(arglist[0])))
 	return val;
     if (!isstringtype(val))
-	return 
+	return
             (exception("GETGLOBAL : First parameter must be a parameter name"));
     parameter = string_part(val);
     if (strlen(parameter) >= (size_t) MESSYS__TNAME)
 	return exception("GETGLOBAL : Parameter name too long");
 /*
- * Get and check "variable" parameter 
+ * Get and check "variable" parameter
  */
     variable = arglist[1];
     if (variable->interpret != paren_interpret)	return exception
      ("GETGLOBAL : Assignment to parameter which is not a variable");
 /*
- * Find the name_interpret node 
+ * Find the name_interpret node
  */
     while (variable->interpret == paren_interpret)
 	variable = variable->sub[0];
@@ -1154,7 +1154,7 @@ proc_getglobal( node *n)
             status = SAI__ERROR;
             emsSetc( "NAME", parameter );
             emsRep( " ",
-                "GETGLOBAL : Failed to find HDS component for parameter ^name", 
+                "GETGLOBAL : Failed to find HDS component for parameter ^name",
                 &status );
         }
 	if (status == SAI__OK)
@@ -1174,7 +1174,7 @@ proc_getglobal( node *n)
                  * It is not a 'name' structure - clone the parameter locator
                  */
 	      datClone(ploc, &cloc, &status );
-                   
+
             if ( status == SAI__OK )
             {
             /* Now get the value, in the appropriate type */
@@ -1182,7 +1182,7 @@ proc_getglobal( node *n)
                      ( !strncmp( type, "ADAM_PARNAME", 12) ) )
                 {
 		  datGet0C( cloc, cval, sizeof(cval), &status );
-                    if ( status == SAI__OK )                    
+                    if ( status == SAI__OK )
                     {
                     /* If it is a name, add the @ */
                         if ( !strncmp( type, "ADAM_PARNAME", 12) )
@@ -1194,33 +1194,33 @@ proc_getglobal( node *n)
                         val = value_string( ctmp );
                     } else ;
 
-                } else if ( ( !strncmp( type, "_REAL", 5) ) || 
+                } else if ( ( !strncmp( type, "_REAL", 5) ) ||
                             ( !strncmp( type, "_DOUBLE", 7) ) )
                     {
 		      datGet0R( cloc, &rval, &status );
                     if ( status == SAI__OK )
-                        val = value_real( rval );                    
+                        val = value_real( rval );
                     else ;
 
                 } else if  ( !strncmp( type, "_INTEGER", 8) )
                     {
 		      datGet0I( cloc, &ival, &status );
                     if ( status == SAI__OK )
-                        val = value_integer( ival );                    
+                        val = value_integer( ival );
                     else ;
 
                 } else if  ( !strncmp( type, "_LOGICAL", 8) )
                     {
 		      datGet0L( cloc, &lval, &status );
                     if ( status == SAI__OK )
-                        val = value_logical( lval );                    
+                        val = value_logical( lval );
                     else ;
 
                 } else
                     {
                     status = SAI__ERROR;
                     emsSetc( "TYPE", type);
-                    emsRep(" ", 
+                    emsRep(" ",
 			"GETGLOBAL : Non-standard HDS component type ^TYPE",
 			&status);
                     }
@@ -1243,7 +1243,7 @@ proc_getglobal( node *n)
     } else
         emsRep( " ",
 	    "GETGLOBAL : Failed to open GLOBAL parameter file", &status );
-/* 
+/*
  * Now return appropriate status
  */
     emsRlse();
@@ -1256,17 +1256,17 @@ proc_getglobal( node *n)
 
 /*
  ******************************************************************************
- * 
+ *
  *	P R O C _ S E T G L O B A L ( node *n )
- * 
+ *
  * SETGLOBAL parametername value
- * 
+ *
  * Set the value of a GLOBAL parameter in the GLOBAL parameter file
- * If a component for the specified parameter does not exist, one will 
- * be created of type _CHAR*132 unless the value starts with @, in 
- * which case it is assumed to be a name and a `name' component will be 
+ * If a component for the specified parameter does not exist, one will
+ * be created of type _CHAR*132 unless the value starts with @, in
+ * which case it is assumed to be a name and a `name' component will be
  * created.
- * 
+ *
  * Author: A J Chipperfield
  *
  * History:
@@ -1293,7 +1293,7 @@ proc_setglobal(node *n)
 /*
  * Check number of parameters
  */
-    if ( nargs < 2 ) 
+    if ( nargs < 2 )
         return exception("TOOFEWPARS  Insufficient parameters for SETGLOBAL");
     if ( nargs > 2 )
         return exception("TOOMANYPARS  Too many parameters for SETGLOBAL");
@@ -1303,7 +1303,7 @@ proc_setglobal(node *n)
     if (isexc(val = interpret(arglist[0])))
 	return val;
     if (!isstringtype(val))
-	return 
+	return
            (exception("SETGLOBAL : First parameter must be a parameter name"));
     parameter = string_part(val);
     if (strlen(parameter) >= (size_t) MESSYS__TNAME)
@@ -1316,7 +1316,7 @@ proc_setglobal(node *n)
     if (!isstringtype(val))
 	return (exception("SETGLOBAL : Second parameter must be a value"));
     value = string_part(val);
-/* 
+/*
  * Find if value is a name
  */
     hname = (value[0]=='@') ? 1: 0;
@@ -1330,11 +1330,11 @@ proc_setglobal(node *n)
 
        hname? strcpy(type, "ADAM_PARNAME"): strcpy(type, "?");
 
-       (void) ensure_exists( loc, parameter, 
+       (void) ensure_exists( loc, parameter,
                              type, "_CHAR*132", &ploc,
                              &status );
-       /* 
-        * Now write the value into the appropriate component 
+       /*
+        * Now write the value into the appropriate component
         *  skipping the first character (@) if hname is 1
         */
             /* Write a normal value */
@@ -1350,7 +1350,7 @@ proc_setglobal(node *n)
     } else
         emsRep( " ",
 	    "SETGLOBAL : Failed to open GLOBAL parameter file", &status );
-/* 
+/*
  * Now return appropriate status
  */
     emsRlse();
@@ -1362,16 +1362,16 @@ proc_setglobal(node *n)
 }
 
 /******************************************************************************
- * 
+ *
  *	P R O C _ C R E A T E G L O B A L ( node *n )
- * 
+ *
  * CREATEGLOBAL parametername type
- * 
+ *
  * Set the value of a GLOBAL parameter in the GLOBAL parameter file.
  * If a component for the specified parameter already exists, it will
  * deleted and one of the specified type created.
  * If type is ADAM_PARNAME, a 'name' structure will be created.
- * 
+ *
  * Author: A J Chipperfield
  *
  * History:
@@ -1395,7 +1395,7 @@ proc_createglobal(node *n)
 /*
  * Check number of parameters
  */
-    if ( nargs < 2 ) 
+    if ( nargs < 2 )
        return exception("TOOFEWPARS  Insufficient parameters for CREATEGLOBAL");
     if ( nargs > 2 )
        return exception("TOOMANYPARS  Too many parameters for CREATEGLOBAL");
@@ -1405,7 +1405,7 @@ proc_createglobal(node *n)
     if (isexc(val = interpret(arglist[0])))
 	return val;
     if (!isstringtype(val))
-	return 
+	return
           (exception(
 		    "CREATEGLOBAL : First parameter must be a parameter name"));
     parameter = string_part(val);
@@ -1417,7 +1417,7 @@ proc_createglobal(node *n)
     if (isexc(val = interpret(arglist[1])))
 	return val;
     if (!isstringtype(val))
-	return 
+	return
           (exception("CREATEGLOBAL : Second parameter must be a `type'"));
     type = string_part(val);
     if (strlen(type) >= (size_t) MESSYS__TNAME)
@@ -1439,7 +1439,7 @@ proc_createglobal(node *n)
              !strcasecmp( type, "_LOGICAL" ) ||
              !strcasecmp( type, "ADAM_PARNAME" ) ) {
 
-            (void) ensure_exists( loc, parameter, 
+            (void) ensure_exists( loc, parameter,
                                   type, type, &ploc,
                                   &status );
             if ( status == SAI__OK ) {
@@ -1464,7 +1464,7 @@ proc_createglobal(node *n)
     } else
         emsRep( " ",
 	    "CREATEGLOBAL : Failed to open GLOBAL parameter file", &status );
-/* 
+/*
  * Now return appropriate status
  */
     emsRlse();

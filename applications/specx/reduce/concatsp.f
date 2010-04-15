@@ -47,7 +47,7 @@
       NQUAD2 = NQUAD
       VLSR2  = VLSR
       CALL XY
-      
+
 *     Check VLSR the same
 
       IF (VLSR .ne. VLSR2) THEN
@@ -63,7 +63,7 @@
 *     New data size:
 
       NQTOT   = NQUAD + NQUAD2
-      NDATTOT = NTOT(NQUAD) + NTOT2(NQUAD2) 
+      NDATTOT = NTOT(NQUAD) + NTOT2(NQUAD2)
 
       PRINT *, 'Total quadrants in final spectrum = ', NQTOT
 

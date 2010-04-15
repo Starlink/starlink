@@ -207,7 +207,7 @@ itcl::class gaia::GaiaImagePick {
       ::close $fd
    }
 
-   # Format a floating point value (which may also be empty). 
+   # Format a floating point value (which may also be empty).
    # Overridden to increase accuracy to hundredths.
    protected method format_val {val} {
       if {"$val" == ""} {

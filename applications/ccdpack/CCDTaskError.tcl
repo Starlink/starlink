@@ -63,7 +63,7 @@ proc CCDTaskError { task error } {
    global TASK
 
 #.
-   if { $error != "" } { 
+   if { $error != "" } {
       set TASK($task,error)  $error
       CCDIssueInfo "Application exited in error:\n$error"
    }

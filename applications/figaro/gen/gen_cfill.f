@@ -30,7 +30,7 @@ C     Local variables
 C
       INTEGER I
 C
-C     Set region 
+C     Set region
 C
       DO I=I1,I2
          DATA(I)=VALUE

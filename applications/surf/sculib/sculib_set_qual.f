@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS, 
+      SUBROUTINE SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS,
      :     N_BEAM, BOL_S, POS_S, BIT_POS, BIT_SWITCH, STATUS)
 *+
 *  Name:
@@ -13,7 +13,7 @@
 *     or the inverse of the mask. This is used to mask scuba sections.
 
 *  Invocation:
-*     CALL SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS, N_BEAM, 
+*     CALL SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS, N_BEAM,
 *    :  BOL_S, POS_S, BIT_POS, BIT_SWITCH, STATUS)
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *     N_BEAM                  = INTEGER (Given)
 *           number of beams used
 *     BOL_S (N_BOLS)          = INTEGER (Given)
-*           array containing 1s for bolometers whose quality is to be 
+*           array containing 1s for bolometers whose quality is to be
 *           changed
 *     POS_S (N_POS)           = INTEGER (Given)
 *           array containing 1s for positions whose quality is to be
@@ -124,11 +124,11 @@
                      IF (BOL_S(BOL) .EQ. 1) THEN
 
                         DO BEAM = 1, N_BEAM
-                           QUALITY (BOL,POS,BEAM) = 
-     :                          SCULIB_BITON (QUALITY(BOL,POS,BEAM), 
+                           QUALITY (BOL,POS,BEAM) =
+     :                          SCULIB_BITON (QUALITY(BOL,POS,BEAM),
      :                          BIT_POS)
                         END DO
-         
+
                      END IF
                   END DO
 
@@ -139,22 +139,22 @@
 
             DO POS = 1, N_POS
                IF (POS_S(POS) .EQ. 1) THEN
-                  
+
                   DO BOL = 1, N_BOLS
                      IF (BOL_S(BOL) .EQ. 1) THEN
 
                         DO BEAM = 1, N_BEAM
-                           QUALITY (BOL,POS,BEAM) = 
-     :                          SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), 
+                           QUALITY (BOL,POS,BEAM) =
+     :                          SCULIB_BITOFF (QUALITY(BOL,POS,BEAM),
      :                          BIT_POS)
                         END DO
-                        
+
                      END IF
                   END DO
-                  
+
                END IF
             END DO
-            
+
          END IF
       ELSE
 *     This is the inverse section
@@ -167,18 +167,18 @@
 *     We know that this entire row is unmasked
                   DO BOL = 1, N_BOLS
                      DO BEAM = 1, N_BEAM
-                        QUALITY (BOL,POS,BEAM) = 
-     :                       SCULIB_BITON (QUALITY(BOL,POS,BEAM), 
+                        QUALITY (BOL,POS,BEAM) =
+     :                       SCULIB_BITON (QUALITY(BOL,POS,BEAM),
      :                       BIT_POS)
-                     END DO 
+                     END DO
                   END DO
                ELSE
 *     Only set if unmasked
                   DO BOL = 1, N_BOLS
                      IF (BOL_S(BOL) .EQ. 0) THEN
                         DO BEAM = 1, N_BEAM
-                           QUALITY (BOL,POS,BEAM) = 
-     :                          SCULIB_BITON (QUALITY(BOL,POS,BEAM), 
+                           QUALITY (BOL,POS,BEAM) =
+     :                          SCULIB_BITON (QUALITY(BOL,POS,BEAM),
      :                          BIT_POS)
                         END DO
                      END IF
@@ -194,18 +194,18 @@
 *     We know that this entire row is unmasked
                   DO BOL = 1, N_BOLS
                      DO BEAM = 1, N_BEAM
-                        QUALITY (BOL,POS,BEAM) = 
-     :                       SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), 
+                        QUALITY (BOL,POS,BEAM) =
+     :                       SCULIB_BITOFF (QUALITY(BOL,POS,BEAM),
      :                       BIT_POS)
-                     END DO 
+                     END DO
                   END DO
                ELSE
 *     Only set if unmasked
                   DO BOL = 1, N_BOLS
                      IF (BOL_S(BOL) .EQ. 0) THEN
                         DO BEAM = 1, N_BEAM
-                           QUALITY (BOL,POS,BEAM) = 
-     :                          SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), 
+                           QUALITY (BOL,POS,BEAM) =
+     :                          SCULIB_BITOFF (QUALITY(BOL,POS,BEAM),
      :                          BIT_POS)
                         END DO
                      END IF

@@ -1,5 +1,5 @@
 *+  RED4_LINEARISE - Linearise data with a polymonial
-      SUBROUTINE RED4_LINEARISE( NCOEFF, COEFF, NELM, DATA, VARIANCE, 
+      SUBROUTINE RED4_LINEARISE( NCOEFF, COEFF, NELM, DATA, VARIANCE,
      :  QUALITY, STATUS )
 *    Description :
 *     This routine applies a polynomial of given coefficients to a
@@ -9,7 +9,7 @@
 *     which have been assigned a good quality value and which have
 *     non-zero data values.
 *    Invocation :
-*     CALL RED4_LINEARISE( NCOEFF, COEFF, NELM, DATA, VARIANCE, 
+*     CALL RED4_LINEARISE( NCOEFF, COEFF, NELM, DATA, VARIANCE,
 *     :  QUALITY, STATUS )
 *    Parameters :
 *     NCOEFF               = INTEGER( READ )
@@ -120,7 +120,7 @@
 
 *   Set up the maximum possible data value which, when raised to the
 *   highest power needed by the polynomial only just stays within the
-*   allowed range for a real number. (Note that using integer 
+*   allowed range for a real number. (Note that using integer
 *   arithmetic to calculate TENPOWER rounds this figure down).
       TENPOWER = MAXTENPOWER / NCOEFF
       MAXDATA = 10.0 ** TENPOWER

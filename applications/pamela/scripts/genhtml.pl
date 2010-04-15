@@ -7,11 +7,11 @@
 require "document.pl";
 
 (@ARGV == 1) or die "usage: genhtml.pl directory\n";
- 
+
 $html = shift;
 
 @files = ('debias.pl', 'fixhead.pl', 'reduce.pl', 'rotate.pl', 'makebias.csh',
-	  'fixrun.csh', 'whtdiv.csh', 'repet.pl', 'renumber.pl', 'loganal.pl', 
+	  'fixrun.csh', 'whtdiv.csh', 'repet.pl', 'renumber.pl', 'loganal.pl',
 	  'ultradas.csh', 'loopdisplay.csh', 'listformat.csh', 'uniqformat.csh',
 	  'splitbysource.pl', 'lsnosdf.csh');
 
@@ -42,7 +42,7 @@ be useful. These can be found in the subdirectory 'scripts' of the pamela
 distribution. html-based documentation can be accessed below. Shift-click
 on "script file" in each case to download the script. The file name lists
 should be a series of name in a column without the .sdf ending. You can
-do this with commands such as 
+do this with commands such as
 <ul>
 'ls r*.sdf | sed s/\.sdf// >! flist'
 </ul>

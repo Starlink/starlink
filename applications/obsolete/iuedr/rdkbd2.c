@@ -6,7 +6,7 @@
 *     Obtain a string from the controlling terminal, pre-loading the
 *     keyboard buffer with a supplied string, and allowing editing of
 *     the keyboard buffer using arrow keys and control keys.
- 
+
 *  Language:
 *     ANSI C (callable from fortran)
 
@@ -14,7 +14,7 @@
 *     RDKBD2( STRING, PBUF, LPRM, TERM, LENOUT )
 
 *  Description:
-*     The prompt supplied in argument PBUF is written to the screen, 
+*     The prompt supplied in argument PBUF is written to the screen,
 *     followed by any string supplied in argument STRING. The text cursor
 *     is placed at the end of this string. The user may then enter
 *     text using the following editing facilities:
@@ -28,18 +28,18 @@
 *        down-arrow  - End input.
 *        left-arrow  - Move text cursor one character to the left.
 *        right-arrow - Move text cursor one character to the right.
-*        delete/backspace - Delete the character to left of the cursor 
-*                      and move remaining text one character to the left. 
+*        delete/backspace - Delete the character to left of the cursor
+*                      and move remaining text one character to the left.
 *        return      - End input.
 *
-*     Movement of the text cursor is limited by the current end of the 
+*     Movement of the text cursor is limited by the current end of the
 *     input buffer and the end of the prompt string.
 *
-*     The contents of the buffer are returned in argument STRING when any 
+*     The contents of the buffer are returned in argument STRING when any
 *     of the "End input" keys listed above is pressed (a code identifying
 *     the specific key pressed is returned in argument TERM).
 *
-*     The controlling terminal is first opened as device /dev/tty. The 
+*     The controlling terminal is first opened as device /dev/tty. The
 *     "termios" facilities are then used to disable canonical processing
 *     of key presses by the C IO system. This means that each call
 *     to the read function is satisfied when a single key stroke is
@@ -49,14 +49,14 @@
 *     is performed internally by this function using expliciy calls to
 *     the write function. An ANSI escape sequence is written to the
 *     terminal to try and ensure that the keypad returns normal keycodes,
-*     rather than application keycodes. On completion, the original terminal 
+*     rather than application keycodes. On completion, the original terminal
 *     characteristics are re-instated.
 
 *  Arguments:
 *     STRING = CHARACTER * ( * ) (Given and Returned)
 *        The string supplied by the user. If the string is not blank
-*        on entry, then the supplied string is pre-loaded into the 
-*        keyboard buffer, and the text cursor is placed at the end of 
+*        on entry, then the supplied string is pre-loaded into the
+*        keyboard buffer, and the text cursor is placed at the end of
 *        supplied text.
 *     PBUF = CHARACTER * ( * ) (Given)
 *        The prompt text.
@@ -80,7 +80,7 @@
 *  Notes:
 *     -  Only works on UNIX!
 *     -  This is an interim solution to providing command line recall.
-*     When BKM gets round to extracting the command line recall code 
+*     When BKM gets round to extracting the command line recall code
 *     from ICL, that should be used instead.
 
 *  Authors:
@@ -93,7 +93,7 @@
 *     {enter_changes_here}
 
 *  Bugs:
-*     -  Does not use TERMIOS or TERMCAP databases, so may not work on 
+*     -  Does not use TERMIOS or TERMCAP databases, so may not work on
 *     non-ANSI terminals. The escape sequences used are hard-wired into
 *     the following code.
 *     {note_any_bugs_here}
@@ -173,16 +173,16 @@ GENPTR_INTEGER(lenout)
          while( *term == 0 ) {
 
 /*  Read a single byte from the keyboard. */
-            read( fd, buf, 1); 
+            read( fd, buf, 1);
 
 /*  If an escape character has been obtained, read the next byte. */
             if( buf[ 0 ] == 27 ) {
-               read( fd, &buf[1], 1); 
+               read( fd, &buf[1], 1);
 
 /*  If the escape sequence is an arrow key, get the next byte which
  *  specifies the particular arrow key. */
                if( buf[1] == 91 ){
-                  read( fd, &buf[2], 1); 
+                  read( fd, &buf[2], 1);
 
 /*  Store the terminator if up or down arrow was pressed. */
 /*  Cursor up */
@@ -207,7 +207,7 @@ GENPTR_INTEGER(lenout)
                         i--;
                      }
                   }
-                       
+
                }
 
 /*  Now deal with non-escape characters. */
@@ -230,7 +230,7 @@ GENPTR_INTEGER(lenout)
 
 /* ^D - End of input */
                } else if( buf[0] == 4 ){
-                  *term = 4;                  
+                  *term = 4;
 
 /* ^N - Toggle insert overstrike mode */
                } else if( buf[0] == 14 ){

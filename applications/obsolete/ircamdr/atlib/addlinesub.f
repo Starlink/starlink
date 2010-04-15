@@ -1,26 +1,26 @@
-	SUBROUTINE ADDLINESUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT, 
+	SUBROUTINE ADDLINESUB( DIMSX, DIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT,
      :	                       COLORROW, LINENUM, LINEVAL, STATUS)
 
 	IMPLICIT NONE
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER 
-     :	  DIMSX, 
-     :	  DIMSY, 
-     :	  ODIMSX, 
-     :	  ODIMSY, 
+	INTEGER
+     :	  DIMSX,
+     :	  DIMSY,
+     :	  ODIMSX,
+     :	  ODIMSY,
      :	  STATUS,
      :	  J,
      :	  K,
      :	  LINENUM
 
-	REAL 
-     :	  ARROUT( ODIMSX, ODIMSY), 
+	REAL
+     :	  ARROUT( ODIMSX, ODIMSY),
      :	  ARRIN( DIMSX, DIMSY),
      :	  LINEVAL
 
-	CHARACTER*(*) 
+	CHARACTER*(*)
      :	  COLORROW
 
 *      put column or row identifer to upper case and test

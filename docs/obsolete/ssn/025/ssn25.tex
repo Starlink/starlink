@@ -40,7 +40,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %\begin{rawtex}
 \makeatletter
@@ -108,7 +108,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -192,12 +192,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -232,12 +232,12 @@
 % \setcounter{page}{1}
 
 \section{\xlabel{introduction}Introduction}
- 
+
 This document describes how to install {\tt PERIOD} version 4.2, a
 software package designed to search for periodicities in data.  A
 detailed description of how to use {\tt PERIOD} can be found in
 \xref{SUN/167}{sun167}{} and the program itself contains extensive
-on-line help. 
+on-line help.
 
 This release of {\tt PERIOD} makes use of {\tt FITSIO} routines
 to read {\tt OGIP FITS} files so that must be installed if {\tt
@@ -246,8 +246,8 @@ the Starlink Software Connection, which is also required to build the
 package.
 
 Version 4.2 represents the first Starlink port of this package to
-to encompass LINUX. It is also  the first version of {\tt PERIOD} to use 
-PGPLOT routines rather than the XANADU {\tt PLT} routine.  
+to encompass LINUX. It is also  the first version of {\tt PERIOD} to use
+PGPLOT routines rather than the XANADU {\tt PLT} routine.
 
 \section{\xlabel{installation}Installation}
 
@@ -288,29 +288,29 @@ would be {\tt /star/period}.
 % zcat /tmp/period.tar.Z | tar xvf -
 \end{verbatim}
 \end{myquote}
- 
+
 You must then set an environment variable to identify the type of
 operating system you are using.  The example given below shows the
 value of SYSTEM needed to create the Solaris 2 version of the software.
 The values required for other Starlink supported systems may be found
 in the files {\tt mk} and {\tt makefile}.
 
-\begin{myquote} 
-\begin{verbatim} 
+\begin{myquote}
+\begin{verbatim}
 % setenv SYSTEM sun4_Solaris
-\end{verbatim} 
+\end{verbatim}
 \end{myquote}
 
 The UNIX `make' facility may then be employed to generate {\tt PERIOD}
 in the current directory, and clean up after itself.  The `make' facility
-should be driven the the {\tt mk} script provided which sets certain 
+should be driven the the {\tt mk} script provided which sets certain
 system dependent make macros before invoking the makefile:
 
-\begin{myquote} 
-\begin{verbatim} 
-% ./mk build 
-% ./mk clean 
-\end{verbatim} 
+\begin{myquote}
+\begin{verbatim}
+% ./mk build
+% ./mk clean
+\end{verbatim}
 \end{myquote}
 
 \subsection{Ready-to-run distribution}
@@ -332,9 +332,9 @@ The ready-to-run distribution only requires installation, as follows.
 \subsection{Installing PERIOD}
 
 The makefile will install the binary and help files in the standard
-locations on Starlink systems:  the binary in {\tt INSTALL\_BIN}, the 
-documentation in {\tt INSTALL\_DOCS} and the help files in 
-{\tt INSTALL\_HELP}.  
+locations on Starlink systems:  the binary in {\tt INSTALL\_BIN}, the
+documentation in {\tt INSTALL\_DOCS} and the help files in
+{\tt INSTALL\_HELP}.
 
 For {\tt PERIOD}, {\tt INSTALL\_BIN} is {\tt \$INSTALL/bin/period},
 {\tt INSTALL\_DOCS} is {\tt \$INSTALL/docs}, and
@@ -362,7 +362,7 @@ To install {\tt PERIOD}, invoke `make' thus:
 \end{verbatim}
 \end{myquote}
 
-Once the software is installed, you should then define an alias for 
+Once the software is installed, you should then define an alias for
 {\tt PERIOD} in your {\tt .cshrc} file:
 
 \begin{myquote}
@@ -389,22 +389,22 @@ detect its presence and define both the alias and environment variable
 automatically on login.
 
 \section{\xlabel{version4.2}Version 4.2}
- 
+
 Version 4.2 is the second release of {\tt PERIOD} under the UNIX operating
 system but the first to encompass the LINUX operating system.
- 
-The XANADU {\tt PLT} plotting system (not available for LINUX) employed by 
-previous versions of {\tt PERIOD} has been replaced by the more widely 
+
+The XANADU {\tt PLT} plotting system (not available for LINUX) employed by
+previous versions of {\tt PERIOD} has been replaced by the more widely
 available PGPLOT system. This has involved the loss of some of {\tt PLT}
 interactive plotting functions. However, these were rarely employed by users
 and it is felt that the small loss of functionality is greatly outweighed by
 the ability to run the software on a much larger number of machines.
- 
+
 \section{\xlabel{version4.1}Version 4.1}
 
 Version 4.1 is the first release of {\tt PERIOD} under the UNIX operating
 system.  The functionality of the system is essentially the same as
-that of version 4.0 but with the ability to read some types of 
+that of version 4.0 but with the ability to read some types of
 {\tt OGIP FITS} files.  One minor difference is that the directory
 structure restrictions present within the VMS version have been
 removed.
@@ -412,7 +412,7 @@ removed.
 \section{\xlabel{version4.0}Version 4.0}
 
 Version 4.0 of {\tt PERIOD} is the fourth general release of the
-package, and the second release on Starlink. 
+package, and the second release on Starlink.
 
 The major change over version 3.0 is a number of bug fixes (most
 importantly to {\tt PERIOD\_CLEAN}), the removal of the {\tt CHAOS} and

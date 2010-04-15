@@ -16,7 +16,7 @@
 
 *  Description:
 *     Initialize common variables for a parse.
-* 
+*
 
 *  Arguments:
 *     INPUT1 = CHARACTER * ( CHI__SZNAME ) (Given)
@@ -44,7 +44,7 @@
 *     None
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -72,7 +72,7 @@
       integer numflds2
       logical fmdataacc(chi__numcols)
       logical fdataacc(chi__numcols)
-      
+
 
 *  Arguments Given:
       CHARACTER * ( * ) INPUT1
@@ -88,7 +88,7 @@
 *
 *   Get all the information about the first catalogues fields.
 *
-      CALL CHI_GALLCD(INPUT1, NUMFLDS1, F1NAMES, FFORMATS, 
+      CALL CHI_GALLCD(INPUT1, NUMFLDS1, F1NAMES, FFORMATS,
      :  F1TYPES, FXUNITS, FCOMMENTS, FMDATAACC, FDATAACC, STATUS)
 *
 *   Copy the information into the common variables.
@@ -112,12 +112,12 @@
         EUNIT(I) = FXUNITS(I)
 *        ENULL(I) = FNULLS(I)
         ECOMNT(I) = FCOMMENTS(I)
-       
+
       ENDDO
 *
 *   Get all the information about the first catalogues fields.
 *
-      CALL CHI_GALLCD(INPUT2, NUMFLDS2, F2NAMES, FFORMATS, 
+      CALL CHI_GALLCD(INPUT2, NUMFLDS2, F2NAMES, FFORMATS,
      :  F2TYPES, FXUNITS, FCOMMENTS, FMDATAACC, FDATAACC, STATUS)
 *
 *   Copy the information into the common variables.
@@ -143,7 +143,7 @@
         EUNIT(I) = FXUNITS(J)
 *        ENULL(I) = FNULLS(J)
         ECOMNT(I) = FCOMMENTS(J)
-       
+
       ENDDO
       ENITEMS = NUMFLDS
 *

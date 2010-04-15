@@ -84,7 +84,7 @@ C
 C           Zero fill the un-mapped elements
 C
             CALL GEN_FILL(FBYTES,0,OUTPUT(FXSTO,IY))
-C  
+C
          END DO
 C
 C        Zero fill the un-mapped rows
@@ -105,7 +105,7 @@ C
 C           Zero fill the un-mapped elements
 C
             CALL GEN_FILL(FBYTES,0,OUTPUT(FXSTO,IY))
-C  
+C
          END DO
 C
 C        Zero fill the un-mapped rows

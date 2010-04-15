@@ -25,7 +25,7 @@ C  Call:
 C     CALL PAR_CNPAR(NAME)
 C
 C  Parameters:      (">" input, "<" output)
-C     (>) NAME      (Fixed string, descr) The name of the parameter.  
+C     (>) NAME      (Fixed string, descr) The name of the parameter.
 C                   Case insignificant, must end either with spaces
 C                   or with the end of the string.
 C
@@ -35,7 +35,7 @@ C     mode especially, it could easily lead to a program looping
 C     indefinitely.  As a general rule, PAR_CNPAR should be
 C     restricted to programs that cannot be used in batch mode.
 C     In fact, even then, PAR_QNUM, PAR_QUEST etc are better, and
-C     really PAR_CNVAR has been provided only to make it easy to 
+C     really PAR_CNVAR has been provided only to make it easy to
 C     convert programs written for other parameter systems that
 C     have this feature (the Starlink Interim Environment, for
 C     example.)

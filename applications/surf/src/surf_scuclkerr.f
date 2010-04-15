@@ -8,13 +8,13 @@
 
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Type of Module:
 *     ADAM A-task
- 
+
 *  Invocation:
 *     CALL SURF_SCUCLKERR( STATUS )
- 
+
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
@@ -44,7 +44,7 @@
 *        Message filter level. Default is NORM.
 *     LAG = REAL (Write).
 *        The discrepancy between the LST stored in the FITS header
-*        and the LST when data acquisition begins. This provides 
+*        and the LST when data acquisition begins. This provides
 *        a measure of the lag in starting up the observation (including
 *        slew times). The value is stored in seconds.
 *     MJD = DOUBLE (Write)
@@ -82,7 +82,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 
 *  Type Definitions:
@@ -90,7 +90,7 @@
 
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! SSE global definitions
-      INCLUDE 'DAT_PAR'         ! DAT__ 
+      INCLUDE 'DAT_PAR'         ! DAT__
       INCLUDE 'SURF_PAR'        ! SURF constants
       INCLUDE 'MSG_PAR'         ! MSG__ constants
       INCLUDE 'PRM_PAR'         ! bad values
@@ -120,7 +120,7 @@
                                 ! (radians)
       DOUBLE PRECISION DTEMP    ! Scratch double
       DOUBLE PRECISION ETA      ! Y offset between bol 1 and 2 (radians)
-      CHARACTER*80     FITS (SCUBA__MAX_FITS) 
+      CHARACTER*80     FITS (SCUBA__MAX_FITS)
                                 ! array of FITS keywords
 
       INTEGER          IERR     ! For VEC_
@@ -224,7 +224,7 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM,' ', 
+      CALL MSG_OUTIF (MSG__NORM,' ',
      :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
      :     STATUS)
 
@@ -242,7 +242,7 @@
       END IF
 
 *     see if the observation completed normally or was aborted
- 
+
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
      :  STATE, STATUS)
       CALL CHR_UCASE (STATE)
@@ -252,7 +252,7 @@
       END IF
 
 *     Read LST_STRT array
-      CALL CMP_MAPV(IN_SCUCDX_LOC, 'LST_STRT', '_DOUBLE', 'READ', 
+      CALL CMP_MAPV(IN_SCUCDX_LOC, 'LST_STRT', '_DOUBLE', 'READ',
      :     LST_STRT_PTR, ITEMP, STATUS)
 
 *     Copy the LST_STRT value to a scalar
@@ -278,7 +278,7 @@
 
 *     UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(LST_STRT_PTR)), 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(LST_STRT_PTR)),
      :                    UT1,
      :     RTEMP, LAG, STATUS)
 
@@ -290,14 +290,14 @@
 
 *     coords of telescope centre
 
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'CENT_CRD', IN_CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (IN_CENTRE_COORDS)
 
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LAT', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LAT_RAD, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LONG', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LONG_RAD, STATUS)
 
@@ -311,7 +311,7 @@
      :        STATUS)
          CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'MJD1', IN_MJD1, STATUS)
-         CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+         CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'MJD2', IN_MJD2, STATUS)
       END IF
 
@@ -341,7 +341,7 @@
 
       DO I = 1, NLOOPS
 
-*     Calculate new MJD 
+*     Calculate new MJD
          UT1 = UT1_REF + ( CLOCK_ERR / D2PI )
 
 *     Calculate the apparent RA/Dec of the tracking centre
@@ -362,8 +362,8 @@
 *         print *,'INPUT', IN_LONG_RAD, IN_LAT_RAD
 
 *     Now get the clock error
-         CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN, 
-     :        %VAL(CNF_PVAL(LST_STRT_PTR)), 
+         CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN,
+     :        %VAL(CNF_PVAL(LST_STRT_PTR)),
      :        CLOCK_ERR, LST_AZEL, STATUS )
 
       END DO
@@ -401,7 +401,7 @@
 *     at the other
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SLA_DS2TP( XPOS(1), YPOS(1), XPOS(2), YPOS(2), XI, 
+         CALL SLA_DS2TP( XPOS(1), YPOS(1), XPOS(2), YPOS(2), XI,
      :        ETA, SLA_STATUS)
 
          IF (SLA_STATUS .EQ. 0) THEN
@@ -446,7 +446,7 @@
      :     STATUS )
 
 *     LST_STRT
-      CALL SCULIB_RAD2STRING(%VAL(CNF_PVAL(LST_STRT_PTR)), 
+      CALL SCULIB_RAD2STRING(%VAL(CNF_PVAL(LST_STRT_PTR)),
      :                       1, .TRUE., STEMP,
      :     STATUS )
       CALL MSG_SETC( 'LST', STEMP )

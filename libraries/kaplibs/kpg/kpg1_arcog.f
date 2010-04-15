@@ -13,9 +13,9 @@
 *     CALL KPG1_ARCOG( PARAM, INDF, MCOMP, COMP, STATUS )
 
 *  Description:
-*     This routine allows the user to select an NDF array component 
-*     selected from the ones available in the supplied NDF. Any of 
-*     'Data', 'Quality', 'Variance', and 'Error' can be selected if 
+*     This routine allows the user to select an NDF array component
+*     selected from the ones available in the supplied NDF. Any of
+*     'Data', 'Quality', 'Variance', and 'Error' can be selected if
 *     they are present in the NDF. The user is re-prompted until a
 *     valid component name is obtained, or an error occurs.
 
@@ -25,9 +25,9 @@
 *     INDF = INTEGER (Given)
 *        The NDF identifier.
 *     MCOMP = CHARACTER * ( * ) (Returned)
-*        The name of the selected array component for use with NDF_MAP. 
-*        The  returned values are 'Data', 'Quality', 'Variance', and 
-*        'Error' for the array components DATA, QUALITY, VARIANCE, and 
+*        The name of the selected array component for use with NDF_MAP.
+*        The  returned values are 'Data', 'Quality', 'Variance', and
+*        'Error' for the array components DATA, QUALITY, VARIANCE, and
 *        ERROR respectively. Returned equal to 'Data' if an error occurs.
 *     COMP = CHARACTER * ( * ) (Returned)
 *        Equal to MCOMP except that 'Variance' is substituted in place of
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -70,7 +70,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,10 +102,10 @@
 
 *  Loop until a valid component name has been obtained, or an error occurs.
       LOOP = .TRUE.
-      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK ) 
+      DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
 *  Obtain a component name, chosen from all possible component names.
-         CALL PAR_CHOIC( PARAM, 'Data', 'Data,Quality,Error,Variance', 
+         CALL PAR_CHOIC( PARAM, 'Data', 'Data,Quality,Error,Variance',
      :                   .FALSE., MCOMP, STATUS )
 
 
@@ -125,7 +125,7 @@
          END IF
 
 *  See if the selected component is in a defined state.
-         CALL NDF_STATE( INDF, COMP, THERE, STATUS ) 
+         CALL NDF_STATE( INDF, COMP, THERE, STATUS )
 
 *  If the selected component is not available, and no error has occurred...
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN

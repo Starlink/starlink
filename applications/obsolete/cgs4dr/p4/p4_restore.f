@@ -21,7 +21,7 @@
 
 *    Check for error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *    Restore the configuration from the specified file to common block
       CALL PAR_GET0I( 'PORT', PORT, STATUS )
       CALL PAR_CANCL( 'PORT', STATUS )

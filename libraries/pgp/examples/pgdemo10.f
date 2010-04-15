@@ -1,9 +1,9 @@
       PROGRAM PGDE10
 C-----------------------------------------------------------------------
-C Demonstration program for PGPLOT. 
-C This program shows how the default colors can be 
+C Demonstration program for PGPLOT.
+C This program shows how the default colors can be
 C overridden with PGSCRN (or PGSCR). On some devices (those with a color
-C lookup table), changing the background color (color index 0) takes 
+C lookup table), changing the background color (color index 0) takes
 C effect immediately, but on others it only affects elements that are
 C explicitly drawn in the background color. Thus it is necessary to fill
 C the page with the background color, which is here done with PGERAS,
@@ -49,7 +49,7 @@ C
       CALL PGSLW(3)
       CALL PGSCF(2)
       CALL PGBOX('BCNST', 0.0, 0, 'BCNSTV', 0.0, 0)
-      CALL PGLAB('\fix', ' ', 
+      CALL PGLAB('\fix', ' ',
      :           '\frPGPLOT Graph: \fi y = x\u\fr2\de\u-\fix\d')
 C
 C Plot the graph.

@@ -35,7 +35,7 @@
 
 *   Import:
       BYTE STR(ARB)     ! string to be written
- 
+
 *   CMERR:
       INCLUDE 'CMERR'
 

@@ -44,7 +44,7 @@
 *        Calculate the size of the rotation box
 *        If SHORT is greater than the maximum allowed size for the
 *          rotation box then
-*           The smallest number of squares, NUMSQ, of side less than or 
+*           The smallest number of squares, NUMSQ, of side less than or
 *           equal to the maximum allowed size of the rotation box, which can
 *           be fitted along the shortest side of the input array is calculated.
 *           The size of the rotation box, ROTSIZ, is then given by dividing

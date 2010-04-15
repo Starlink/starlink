@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_WTFN_REGRID_1 (WEIGHT, IN_DATA, X, Y, NPIX, 
+*     CALL SCULIB_WTFN_REGRID_1 (WEIGHT, IN_DATA, X, Y, NPIX,
 *    :     PIXSPACE, NI, NJ, ICEN, JCEN, WEIGHTSIZE, SCLSZ,
 *    :     AV_WEIGHT, SCRATCH, STATUS)
 
@@ -48,7 +48,7 @@
 *     JCEN = INTEGER (Given)
 *        the y index of the centre of the output array
 *     WEIGHTSIZE                       = INTEGER (Given)
-*        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL, 
+*        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL,
 *        1 for LINEAR)
 *     SCLSZ                            = REAL
 *        1 scale length in the same units as PIXSPACE
@@ -84,7 +84,7 @@
 *  Bugs:
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                              ! No implicit typing
 
@@ -127,7 +127,7 @@
       REAL RDIST                                 ! Size in pixels of res el
       REAL RDIST_SQ                              ! RDIST squared
       INTEGER PIX_RANGE                          ! Pixel range
-      
+
 *   local data
 *.
 
@@ -152,8 +152,8 @@
       END DO
 
 *  go through the input pixels of this dataset, set all elements of
-*  the scratch array to zero that lie within one res element of an input 
-*  point. 
+*  the scratch array to zero that lie within one res element of an input
+*  point.
 
       DO PIX = 1, NPIX
          IF (IN_DATA(PIX) .NE. VAL__BADR) THEN
@@ -174,7 +174,7 @@
             END DO
          END IF
       END DO
- 
+
 *  go through the scratch array and, where it's pixels are  0, increment
 *  the corresponding `average weight' pixel by the weight of the input
 *  dataset

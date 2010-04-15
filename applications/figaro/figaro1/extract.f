@@ -14,7 +14,7 @@ C                are to be taken.
 C
 C     'YSTART'   The Y-value of the first row to be used.
 C                If IMAGE has a Y axis structure, the data from this
-C                is used.  If not, the row numbers are used, 
+C                is used.  If not, the row numbers are used,
 C                starting from 1.
 C
 C     'YEND'     The Y-value of the last row to be used.
@@ -33,7 +33,7 @@ C     Modified:
 C
 C     8th  Jul 1988  Rewritten to use DSA routines.  KS / AAO.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
-C     19th Mar 1997  JJL / Southampton, Starlink. Error propagation included. 
+C     19th Mar 1997  JJL / Southampton, Starlink. Error propagation included.
 C     29th Jul 1997  MJCL / Starlink, UCL.  Initialised EXIST to .FALSE.
 C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
@@ -65,7 +65,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       STATUS=0

@@ -153,7 +153,7 @@
          NDETS = NAVAIL
 
       END IF
-      
+
 *  Remove the comma from the end of the list.
       DETLIS( IAT : IAT ) = ' '
       IAT = IAT - 1

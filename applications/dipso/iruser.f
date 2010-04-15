@@ -24,5 +24,5 @@
      : '' of DIPSO'')') CMD
 
       OK = .FALSE.
-   
+
       END

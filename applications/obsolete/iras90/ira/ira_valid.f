@@ -35,7 +35,7 @@
 *        will transform to valid positions in all sky coordinate
 *        systems (the reverse is not true since some projections do not
 *        cover the entire sky).  See ID2 section "Sky Coordinates" for
-*        more information on Sky Coordinate Systems. A blank value will 
+*        more information on Sky Coordinate Systems. A blank value will
 *        cause the system associated with IDA to be used.
 *     IDA = INTEGER (Given)
 *        The IRA identifier for the astrometry information.
@@ -45,12 +45,12 @@
 *        exit. Otherwise IN1 holds values of the sky longitude on entry
 *        and the corresponding local longitude on exit. See ID/2
 *        appendix D for a description of the local sky coordinate
-*        system, and the (U,V) coordinate system. 
+*        system, and the (U,V) coordinate system.
 *     IN2( NVAL ) = DOUBLE PRECISION (Given and Returned)
 *        If FORWRD is true, then IN2 holds values of the second image
 *        coordinate (Y) on entry, and the corresponding V values on
 *        exit. Otherwise IN2 holds values of the sky latitude on entry
-*        and the corresponding local latitude on exit.  
+*        and the corresponding local latitude on exit.
 *     OK( NVAL ) = LOGICAL (Returned)
 *        True if the corresponding input coordinates would transform to
 *        valid output coordinates.
@@ -123,9 +123,9 @@
 *  Check that the IRA identifier is OK.
       CALL IRA1_CHECK( IDA, STATUS )
 
-*  If a blank SCS was given, use the value associated with IDA.      
+*  If a blank SCS was given, use the value associated with IDA.
       IF( SCS .EQ. ' ' ) THEN
-         LSCS = ACM_SCS( IDA ) 
+         LSCS = ACM_SCS( IDA )
       ELSE
          LSCS = SCS
       END IF

@@ -22,7 +22,7 @@
 *       HDS object to receive data. <GLOBAL.HDSOBJ>
 *    BINARY = _LOGICAL (Read)
 *       Whether file is binary. [NO]
- 
+
 * Description:
 *    Values are read, one per record, from the file and written to the
 *    specified HDS object. The number of values to be read is calculated
@@ -171,7 +171,7 @@
 
         ELSE
             STATUS=SAI__ERROR
-            CALL ERR_REP( ' ', 'Not a primitive or primitive array', 
+            CALL ERR_REP( ' ', 'Not a primitive or primitive array',
      :       STATUS)
         ENDIF
 

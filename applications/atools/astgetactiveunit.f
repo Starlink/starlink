@@ -21,24 +21,24 @@
 
 *  Description:
 *     This application displays the current value of the ActiveUnit flag for
-*     a Frame (see the description of the ASTSETACTIVEUNIT command for a 
-*     description of the ActiveUnit flag). The value of the flag is also 
+*     a Frame (see the description of the ASTSETACTIVEUNIT command for a
+*     description of the ActiveUnit flag). The value of the flag is also
 *     written to an output parameter.
 
 *  Usage:
-*     astgetactunit this 
+*     astgetactunit this
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
-*        An NDF or text file holding the Frame. If an NDF is supplied, 
+*        An NDF or text file holding the Frame. If an NDF is supplied,
 *        the WCS FrameSet will be used.
 *     VALUE = _LOGICAL (Write)
 *        On exit, this holds a boolean value indicating if the ActiveUnit
 *        flag was set or not.
 
 *  Notes:
-*     - This application corresponds to the AST routine AST_GETACTIVEUNIT. 
-*     The name has been abbreviated due to a limitation on the length of 
+*     - This application corresponds to the AST routine AST_GETACTIVEUNIT.
+*     The name has been abbreviated due to a limitation on the length of
 *     ADAM command names.
 
 *  Copyright:
@@ -89,7 +89,7 @@
       LOGICAL VAL
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -114,7 +114,7 @@
 *  Give a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ASTGETACTIVEUNIT_ERR', 'Error getting the '//
-     :                 'value of the ActiveUnit flag for an AST Frame.', 
+     :                 'value of the ActiveUnit flag for an AST Frame.',
      :                 STATUS )
       END IF
 

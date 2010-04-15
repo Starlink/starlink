@@ -8,7 +8,7 @@
 *     CLEANSIZE (input)                  The side length of the extracted image
 *     INTEGER
 
-*     SKY,SKYSIGMA (input)               The median sky value and error as 
+*     SKY,SKYSIGMA (input)               The median sky value and error as
 *     REAL                               calculated by subroutine sky
 
 
@@ -29,7 +29,7 @@ C     First subtract sky from array and find max pixel
 
       MAX=0.
 
-      DO J=1,CLEANSIZE      
+      DO J=1,CLEANSIZE
          DO I=1,CLEANSIZE
             CONTARRAY(I,J)=CLEANARRAY(I,J)-SKY
             IF (CONTARRAY(I,J).GT.MAX) THEN
@@ -52,7 +52,7 @@ C     Provisionally try 3 contour levels
       TR(3)=0.
       TR(4)=0.
       TR(5)=0.
-      TR(6)=1.   
+      TR(6)=1.
 
       CALL PGBEGIN(9,'?',1,1)
       CALL PGPAPER(6.0,1.0)

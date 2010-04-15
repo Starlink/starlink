@@ -15,13 +15,13 @@ f     AST_POLYGON
 *     collection of vertices, within a 2-dimensional Frame. The vertices
 *     are connected together by geodesic curves within the encapsulated Frame.
 *     For instance, if the encapsulated Frame is a simple Frame then the
-*     geodesics will be straight lines, but if the Frame is a SkyFrame then 
+*     geodesics will be straight lines, but if the Frame is a SkyFrame then
 *     the geodesics will be great circles. Note, the vertices must be
 *     supplied in an order such that the inside of the polygon is to the
 *     left of the boundary as the vertices are traversed. Supplying them
 *     in the reverse order will effectively negate the polygon.
 *
-*     Within a SkyFrame, neighbouring vertices are always joined using the 
+*     Within a SkyFrame, neighbouring vertices are always joined using the
 *     shortest path. Thus if an edge of 180 degrees or more in length is
 *     required, it should be split into section each of which is less
 *     than 180 degrees. The closed path joining all the vertices in order
@@ -46,8 +46,8 @@ c     following functions may also be applied to all Polygons:
 f     In addition to those routines applicable to all Regions, the
 f     following routines may also be applied to all Polygons:
 *
-c     - astDownsize: Reduce the number of vertices in a Polygon. 
-f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon. 
+c     - astDownsize: Reduce the number of vertices in a Polygon.
+f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon.
 c     - astOutline<X>: Create a Polygon outlining values in a pixel array
 f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 
@@ -62,12 +62,12 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -177,9 +177,9 @@ static void (* parent_resetcache)( AstRegion *, int * );
 
 
 #ifdef THREAD_SAFE
-/* Define how to initialise thread-specific globals. */ 
+/* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(Polygon)
@@ -215,7 +215,7 @@ AstPolygon *astPolygonId_( void *, int, int, const double *, void *, const char 
 /* Define a macro that expands to a single prototype for function
    FindInsidePoint for a given data type and operation. */
 #define FINDINSIDEPOINT_PROTO0(X,Xtype,Oper) \
-static void FindInsidePoint##Oper##X( Xtype, Xtype *, int[2], int[2], int *, int *, int *, int * ); 
+static void FindInsidePoint##Oper##X( Xtype, Xtype *, int[2], int[2], int *, int *, int *, int * );
 
 /* Define a macro that expands to a set of prototypes for all operations
    for function FindInsidePoint for a given data type. */
@@ -241,7 +241,7 @@ FINDINSIDEPOINT_PROTO(S,short int)
 FINDINSIDEPOINT_PROTO(US,unsigned short int)
 FINDINSIDEPOINT_PROTO(B,signed char)
 FINDINSIDEPOINT_PROTO(UB,unsigned char)
-FINDINSIDEPOINT_PROTO(F,float) 
+FINDINSIDEPOINT_PROTO(F,float)
 
 /* Define a macro that expands to a single prototype for function
    TraceEdge for a given data type and operation. */
@@ -272,7 +272,7 @@ TRACEEDGE_PROTO(S,short int)
 TRACEEDGE_PROTO(US,unsigned short int)
 TRACEEDGE_PROTO(B,signed char)
 TRACEEDGE_PROTO(UB,unsigned char)
-TRACEEDGE_PROTO(F,float) 
+TRACEEDGE_PROTO(F,float)
 
 /* Non-generic function prototypes. */
 static AstMapping *Simplify( AstMapping *, int * );
@@ -307,7 +307,7 @@ static Segment *AddToChain( Segment *head, Segment *seg, int *status ){
 *     AddToChain
 
 *  Purpose:
-*     Add a Segment into the linked list of Segments, maintaining the 
+*     Add a Segment into the linked list of Segments, maintaining the
 *     required order in the list.
 
 *  Type:
@@ -318,7 +318,7 @@ static Segment *AddToChain( Segment *head, Segment *seg, int *status ){
 *     Segment *AddToChain( Segment *head, Segment *seg, int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     The linked list of Segments maintained by astDownsize is searched
@@ -403,10 +403,10 @@ static void Cache( AstPolygon *this, int *status ){
 *     void Cache( AstPolygon *this, int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
-*     This function uses the PointSet stored in the parent Region to calculate 
+*     This function uses the PointSet stored in the parent Region to calculate
 *     some intermediate values which are useful in other methods. These
 *     values are stored within the Polygon structure.
 
@@ -437,28 +437,28 @@ static void Cache( AstPolygon *this, int *status ){
 
 /* Get a pointer to the base Frame. */
       frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
-   
+
 /* Get the number of vertices. */
       nv = astGetNpoint( ((AstRegion *) this)->points );
-   
+
 /* Get pointers to the coordinate data in the parent Region structure. */
       ptr = astGetPoints( ((AstRegion *) this)->points );
-   
+
 /* Free any existing edge information in the Polygon structure. */
       if( this->edges ) {
          for( i = 0; i < nv; i++ ) {
             this->edges[ i ] = astFree( this->edges[ i ] );
          }
-   
+
 /* Allocate memory to store new edge information if necessary. */
       } else {
          this->edges = astMalloc( sizeof( AstLineDef *)*(size_t) nv );
          this->startsat = astMalloc( sizeof( double )*(size_t) nv );
       }
-   
+
 /* Check pointers can be used safely. */
       if( this->edges ) {
-   
+
 /* Create and store a description of each edge. Also form the total
    distance round the polygon, and the distance from the first vertex
    at which each edge starts. */
@@ -475,11 +475,11 @@ static void Cache( AstPolygon *this, int *status ){
 
             this->startsat[ i ] = this->totlen;
             this->totlen += this->edges[ i ]->length;
-         }     
+         }
 
 /* We now look for a point that is inside the polygon. We want a point
    that is well within the polygon, since points that are only just inside
-   the polygon can give numerical problems. Loop round each edge with 
+   the polygon can give numerical problems. Loop round each edge with
    non-zero length. */
          maxwid = -1.0;
          for( i = 0; i < nv; i++ ) {
@@ -497,8 +497,8 @@ static void Cache( AstPolygon *this, int *status ){
    width and also store the current polygon centre. */
                if( polwid > maxwid && polwid != AST__BAD ) {
                   maxwid = polwid;
-                  (this->in)[ 0 ] = polcen[ 0 ];                  
-                  (this->in)[ 1 ] = polcen[ 1 ];                  
+                  (this->in)[ 0 ] = polcen[ 0 ];
+                  (this->in)[ 1 ] = polcen[ 1 ];
                }
             }
          }
@@ -510,14 +510,14 @@ static void Cache( AstPolygon *this, int *status ){
    "polcen" array. Set a flag indicating if the vertices are stored in
    anti-clockwise order. */
          if( maxwid < 0.0 ) {
-            (this->in)[ 0 ] = polcen[ 0 ];                  
-            (this->in)[ 1 ] = polcen[ 1 ];                  
+            (this->in)[ 0 ] = polcen[ 0 ];
+            (this->in)[ 1 ] = polcen[ 1 ];
             this->acw = 0;
          } else {
             this->acw = 1;
          }
       }
-   
+
 /* Free resources */
       frm = astAnnul( frm );
 
@@ -526,7 +526,7 @@ static void Cache( AstPolygon *this, int *status ){
    }
 }
 
-static AstPolygon *Downsize( AstPolygon *this, double maxerr, int maxvert, 
+static AstPolygon *Downsize( AstPolygon *this, double maxerr, int maxvert,
                              int *status ) {
 /*
 *++
@@ -551,7 +551,7 @@ f     RESULT = AST_DOWNSIZE( THIS, MAXERR, MAXVERT, STATUS )
 *  Description:
 *     This function returns a pointer to a new Polygon that contains a
 *     subset of the vertices in the supplied Polygon. The subset is
-*     chosen so that the returned Polygon is a good approximation to 
+*     chosen so that the returned Polygon is a good approximation to
 *     the supplied Polygon, within the limits specified by the supplied
 *     parameter values. That is, the density of points in the returned
 *     Polygon is greater at points where the curvature of the boundary of
@@ -566,14 +566,14 @@ f     MAXERR = DOUBLE PRECISION (Given)
 *        The maximum allowed discrepancy between the supplied and
 *        returned Polygons, expressed as a geodesic distance within the
 *        Polygon's coordinate frame. If this is zero or less, the
-*        returned Polygon will have the number of vertices specified by 
+*        returned Polygon will have the number of vertices specified by
 c        maxvert.
 f        MAXVERT.
-c     maxvert 
+c     maxvert
 f     MAXVERT = INTEGER (Given)
 *        The maximum allowed number of vertices in the returned Polygon.
-*        If this is less than 3, the number of vertices in the returned 
-*        Polygon will be the minimum needed to achieve the maximum 
+*        If this is less than 3, the number of vertices in the returned
+*        Polygon will be the minimum needed to achieve the maximum
 *        discrepancy specified by
 c        maxerr.
 f        MAXERR.
@@ -608,7 +608,7 @@ f     function is invoked with STATUS set to an error value, or if it
    frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
 
 /* Create a PointSet holding the vertices of the downsized polygon. */
-   pset = DownsizePoly( ((AstRegion *) this)->points, maxerr, maxvert, 
+   pset = DownsizePoly( ((AstRegion *) this)->points, maxerr, maxvert,
                         frm, status );
 
 /* Take a deep copy of the supplied Polygon. */
@@ -628,7 +628,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
-static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr, 
+static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
                                   int maxvert, AstFrame *frm, int *status ) {
 /*
 *  Name:
@@ -642,7 +642,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 
 *  Synopsis:
 *    #include "polygon.h"
-*    AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr, int maxvert, 
+*    AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr, int maxvert,
 *                               AstFrame *frm, int *status )
 
 *  Class Membership:
@@ -651,25 +651,25 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 *  Description:
 *     This function returns a pointer to a new PointSet that contains a
 *     subset of the vertices in the supplied PointSet. The subset is
-*     chosen so that the returned polygon is a good approximation to 
+*     chosen so that the returned polygon is a good approximation to
 *     the supplied polygon, within the limits specified by the supplied
 *     parameter values. That is, the density of points in the returned
 *     polygon is greater at points where the curvature of the boundary of
 *     the supplied polygon is greater.
 
 *  Parameters:
-*     pset 
+*     pset
 *        Pointer to the PointSet holding the polygon vertices.
 *     maxerr
 *        The maximum allowed discrepancy between the supplied and
 *        returned Polygons, expressed as a geodesic distance within the
 *        Polygon's coordinate frame. If this is zero or less, the
-*        returned Polygon will have the number of vertices specified by 
+*        returned Polygon will have the number of vertices specified by
 *        maxvert.
-*     maxvert 
+*     maxvert
 *        The maximum allowed number of vertices in the returned Polygon.
-*        If this is less than 3, the number of vertices in the returned 
-*        Polygon will be the minimum needed to achieve the maximum 
+*        If this is less than 3, the number of vertices in the returned
+*        Polygon will be the minimum needed to achieve the maximum
 *        discrepancy specified by
 *        maxerr.
 *     frm
@@ -738,11 +738,11 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
       x = ptr[ 0 ];
       y = ptr[ 1 ];
 
-/* Allocate memory for an array to hold the original indices of the vertices 
+/* Allocate memory for an array to hold the original indices of the vertices
    to be used to create the returned Polygon. This array is expanded as
    needed. */
       newpoly = astMalloc( 10*sizeof( int ) );
- 
+
 /* Check the pointers can be used safely. */
       if( astOK ) {
 
@@ -757,7 +757,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 
          i1y = i1x = 0;
          i2y = i2x = nv/2;
-         
+
          for( i3 = 0; i3 < nv; i3++ ) {
             if( y[ i3 ] < y1 ) {
                y1 = y[ i3 ];
@@ -786,10 +786,10 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          }
 
 /* The index with vertex i1 is definitely going to be one of our three
-   vertices. We are going to use the line from i1 to i2 to choose the two 
-   other vertices to use. Create a structure describing the segment of the 
-   Polygon from the lowest value on the selected axis (X or Y) to the 
-   highest value. As always, the polygons is traversed in an anti-clockwise 
+   vertices. We are going to use the line from i1 to i2 to choose the two
+   other vertices to use. Create a structure describing the segment of the
+   Polygon from the lowest value on the selected axis (X or Y) to the
+   highest value. As always, the polygons is traversed in an anti-clockwise
    direction. */
          seg1 = NewSegment( NULL, i1, i2, nv, status );
 
@@ -798,8 +798,8 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          FindMax( seg1, frm, x, y, nv, 0, status );
 
 /* Likewise, create a structure describing the remained of the Polygon
-   (i.e. the segment from the highest value on the selected axis to the 
-   lowest value). Then find the vertex within this segment which is 
+   (i.e. the segment from the highest value on the selected axis to the
+   lowest value). Then find the vertex within this segment which is
    furthest away from the line on the right hand side. */
          seg2 = NewSegment( NULL, i2, i1, nv, status );
          FindMax( seg2, frm, x, y, nv, 0, status );
@@ -839,16 +839,16 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          seg2 = NewSegment( seg2, i2, i3, nv, status );
          seg3 = NewSegment( NULL, i3, i1, nv, status );
 
-/* Record these 3 vertices in an array holding the original indices of 
-   the vertices to be used to create the returned Polygon. */   
+/* Record these 3 vertices in an array holding the original indices of
+   the vertices to be used to create the returned Polygon. */
          newpoly[ 0 ] = i1;
-         newpoly[ 1 ] = i2; 
+         newpoly[ 1 ] = i2;
          newpoly[ 2 ] = i3;
 
 /* Indicate the new polygon currently has 3 vertices. */
          newlen = 3;
 
-/* Search the old vertices between the start and end of segment 3, looking 
+/* Search the old vertices between the start and end of segment 3, looking
    for the vertex which lies furthest from the line of segment 3. The
    residual between this point and the line is stored in the Segment
    structure, as is the index of the vertex at which this maximum residual
@@ -856,13 +856,13 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          FindMax( seg3, frm, x, y, nv, 1, status );
 
 /* The "head" variable points to the head of a double linked list of
-   Segment structures. This list is ordered by residual, so that the 
-   Segment with the maximum residual is at the head, and the Segment 
+   Segment structures. This list is ordered by residual, so that the
+   Segment with the maximum residual is at the head, and the Segment
    with the minimum residual is at the tail. Initially "seg3" is at the
    head. */
          head = seg3;
 
-/* Search the old vertices between the start and end of segment 1, looking 
+/* Search the old vertices between the start and end of segment 1, looking
    for the vertex which lies furthest from the line of segment 1. The
    residual between this point and the line is stored in the Segment
    structure, as is the index of the vertex at which this maximum residual
@@ -884,7 +884,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          if( maxvert < 3 ) maxvert = nv;
 
 /* Loop round adding an extra vertex to the returned Polygon until the
-   maximum residual between the new and old polygons is no more than 
+   maximum residual between the new and old polygons is no more than
    "maxerr". Abort early if the specified maximum number of vertices is
    reached. */
          while( head->error > maxerr && newlen < maxvert ) {
@@ -907,7 +907,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
    The split occurs at the vertex that had the highest error. */
             seg1 = NewSegment( NULL, head->imax, head->i2, nv, status );
             seg2 = head;
-            seg2->i2 = head->imax; 
+            seg2->i2 = head->imax;
 
 /* We do not know where these two new segments should be in the ordered
    linked list, so remove them from the list. */
@@ -938,7 +938,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
          if( newlen == nv ) {
             result = astCopy( pset );
 
-/* Otherwise, sort the indices of the vertices to be retained so that they 
+/* Otherwise, sort the indices of the vertices to be retained so that they
    are in the same order as they were in the supplied Polygon. */
          } else if( astOK ){
             qsort( newpoly, newlen, sizeof( int ), IntCmp );
@@ -983,13 +983,13 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     void FindInsidePoint<Oper><X>( <Xtype> value, <Xtype> array[], 
-*                                    int lbnd[ 2 ], int ubnd[ 2 ], 
-*                                    int *inx, int *iny, int *iv, 
+*     void FindInsidePoint<Oper><X>( <Xtype> value, <Xtype> array[],
+*                                    int lbnd[ 2 ], int ubnd[ 2 ],
+*                                    int *inx, int *iny, int *iv,
 *                                    int *status );
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     The central pixel in the array is checked to see if its value meets
@@ -1002,26 +1002,26 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 *        The data value defining valid pixels.
 *     array
 *        The data array.
-*     lbnd 
+*     lbnd
 *        The lower pixel index bounds of the array.
-*     ubnd 
+*     ubnd
 *        The upper pixel index bounds of the array.
-*     inx 
+*     inx
 *        Pointer to an int in which to return the X pixel index of the
-*        first point that meets the requirements implied by <oper> and 
+*        first point that meets the requirements implied by <oper> and
 *        "value".
 *     iny
 *        Pointer to an int in which to return the Y pixel index of the
-*        first point that meets the requirements implied by <oper> and 
+*        first point that meets the requirements implied by <oper> and
 *        "value".
 *     iv
 *        Pointer to an int in which to return the vector index of the
-*        first point that meets the requirements implied by <oper> and 
+*        first point that meets the requirements implied by <oper> and
 *        "value".
 *     status
 *        Pointer to the inherited status variable.
 
-*  Notes: 
+*  Notes:
 *     - <Oper> must be one of LT, LE, EQ, NE, GE, GT.
 
 
@@ -1306,7 +1306,7 @@ static void FindInsidePoint##Oper##X( Xtype value, Xtype array[], \
    } \
    astError( AST__NONIN, "astOutline"#X": Could not find a pixel value %s " \
              "%g in the supplied array.", status, text, (double) value ); \
-} 
+}
 
 /* Define a macro that uses the above macro to to create implementations
    of FindInsidePoint for all operations. */
@@ -1321,7 +1321,7 @@ MAKE_FINDINSIDEPOINT(X,Xtype,NE,AST__NE)
 /* Expand the above macro to generate a function for each required
    data type and operation. */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-MAKEALL_FINDINSIDEPOINT(LD,long double) 
+MAKEALL_FINDINSIDEPOINT(LD,long double)
 #endif
 MAKEALL_FINDINSIDEPOINT(D,double)
 MAKEALL_FINDINSIDEPOINT(L,long int)
@@ -1338,14 +1338,14 @@ MAKEALL_FINDINSIDEPOINT(F,float)
 #undef MAKE_FINDINSIDEPOINT
 #undef MAKEALL_FINDINSIDEPOINT
 
-static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y, 
+static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
                      int nv, int abs, int *status ){
 /*
 *  Name:
 *     FindMax
 
 *  Purpose:
-*     Find the maximum discrepancy between a given line segment and the 
+*     Find the maximum discrepancy between a given line segment and the
 *     Polygon being downsized.
 
 *  Type:
@@ -1353,19 +1353,19 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     void FindMax( Segment *seg, AstFrame *frm, double *x, double *y, 
+*     void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
 *                   int nv, int abs, int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
-*     The supplied Segment structure describes a range of vertices in 
+*     The supplied Segment structure describes a range of vertices in
 *     the polygon being downsized. This function checks each of these
 *     vertices to find the one that lies furthest from the line joining the
 *     first and last vertices in the segment. The maximum error, and the
 *     vertex index at which this maximum error is found, is stored in the
-*     Segment structure. 
+*     Segment structure.
 
 *  Parameters:
 *     seg
@@ -1381,7 +1381,7 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
 *        Total number of vertics in the old Polygon..
 *     abs
 *        If non-zero, then the stored maximum is the position with
-*        maximum absolute error. Otherwise, the stored maximum is the 
+*        maximum absolute error. Otherwise, the stored maximum is the
 *        position with maximum positive error (positive errors are to the
 *        right when travelling from start to end of the segment).
 *     status
@@ -1435,25 +1435,25 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
    simple Frame. */
    } else if( !strcmp( astGetClass( frm ), "Frame" ) ) {
 
-/* Point "a" is the vertex that marks the start of the segment. Point "b" 
+/* Point "a" is the vertex that marks the start of the segment. Point "b"
    is the vertex that marks the end of the segment. */
-      ax = x[ i1 ];      
-      ay = y[ i1 ];      
+      ax = x[ i1 ];
+      ay = y[ i1 ];
       bax = x[ i2 ] - ax;
       bay = y[ i2 ] - ay;
       ba = sqrt( bax*bax + bay*bay );
-   
+
 /* Initialise the largest error found so far. */
       seg->error = -1.0;
 
-/* Check the vertices from the start (plus one) up to the end (minus one) 
+/* Check the vertices from the start (plus one) up to the end (minus one)
    or the last vertex (which ever comes first). */
       for( i = i1 + 1; i < i2b; i++ ) {
 
-/* Position "c" is the vertex being tested. Find the squared distance from 
+/* Position "c" is the vertex being tested. Find the squared distance from
    "c" to the line joining "a" and "b". */
-         cax = x[ i ] - ax;      
-         cay = y[ i ] - ay;      
+         cax = x[ i ] - ax;
+         cay = y[ i ] - ay;
          error = ( bay*cax - cay*bax )/ba;
          if( abs ) error = fabs( error );
 
@@ -1464,15 +1464,15 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
             seg->imax = i;
          }
       }
-   
+
 /* If the end vertex is in the next cycle, check the remaining vertex
    posI would have thought a telentitions in the same way. */
       if( i2b != i2 ) {
 
          for( i = 0; i < i2; i++ ) {
 
-            cax = x[ i ] - ax;      
-            cay = y[ i ] - ay;      
+            cax = x[ i ] - ax;
+            cay = y[ i ] - ay;
             error = ( bay*cax - cay*bax )/ba;
             if( abs ) error = fabs( error );
 
@@ -1484,7 +1484,7 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
          }
       }
 
-/* If the polygon is not defined in a simple Frame, we use the overloaded 
+/* If the polygon is not defined in a simple Frame, we use the overloaded
    Frame methods to do the geometry. */
    } else {
 
@@ -1499,7 +1499,7 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
          px = ptr1[ 0 ];
          py = ptr1[ 1 ];
 
-         for( i = i1 + 1; i < i2b; i++ ){ 
+         for( i = i1 + 1; i < i2b; i++ ){
             *(px++) = x[ i ];
             *(py++) = y[ i ];
          }
@@ -1561,7 +1561,7 @@ static int GetBounded( AstRegion *this, int *status ) {
 
 *  Synopsis:
 *     #include "polygon.h"
-*     int GetBounded( AstRegion *this, int *status ) 
+*     int GetBounded( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Polygon method (over-rides the astGetBounded method inherited from
@@ -1570,7 +1570,7 @@ static int GetBounded( AstRegion *this, int *status ) {
 *  Description:
 *     This function returns a flag indicating if the Region is bounded.
 *     The implementation provided by the base Region class is suitable
-*     for Region sub-classes representing the inside of a single closed 
+*     for Region sub-classes representing the inside of a single closed
 *     curve (e.g. Circle, Interval, Box, etc). Other sub-classes (such as
 *     CmpRegion, PointList, etc ) may need to provide their own
 *     implementations.
@@ -1647,7 +1647,7 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -1738,7 +1738,7 @@ static int IntCmp( const void *a, const void *b ){
 *     int IntCmp( const void *a, const void *b )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     See the docs for "qsort".
@@ -1758,7 +1758,7 @@ static int IntCmp( const void *a, const void *b ){
    return *((int*)a) - *((int*)b);
 }
 
-static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert, 
+static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert,
                             int *status ){
 /*
 *  Name:
@@ -1773,15 +1773,15 @@ static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     Segment *NewSegment( Segment *seg, int i1, int i2, int nvert, 
+*     Segment *NewSegment( Segment *seg, int i1, int i2, int nvert,
 *                          int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     This function initialises the contents of a structure describing
-*     the specified range of vertices within a Polygon. The cyclic nature 
+*     the specified range of vertices within a Polygon. The cyclic nature
 *     of vertex indices is taken into account.
 *
 *     If no structure is supplied, memory is allocated to hold a new
@@ -1792,12 +1792,12 @@ static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert,
 *        Pointer to a structure to initialise, or NULL if a new structure
 *        is to be allocated.
 *     i1
-*        The index of a vertex within the old Polygon (supplied to 
-*        astDownsize) that marks the start of the new line segment in 
+*        The index of a vertex within the old Polygon (supplied to
+*        astDownsize) that marks the start of the new line segment in
 *        the downsized polygon.
 *     i2
-*        The index of a vertex within the old Polygon (supplied to 
-*        astDownsize) that marks the end of the new line segment in 
+*        The index of a vertex within the old Polygon (supplied to
+*        astDownsize) that marks the end of the new line segment in
 *        the downsized polygon.
 *     nvert
 *        Total number of vertics in the old Polygon..
@@ -1816,7 +1816,7 @@ static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert,
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
-/* Get a pointer to the structure to be initialised, allocating memory 
+/* Get a pointer to the structure to be initialised, allocating memory
    for a new structure if none was supplied. */
    result = seg ? seg : astMalloc( sizeof( Segment ) );
 
@@ -1825,7 +1825,7 @@ static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert,
 
 /* If the supplied ending index is less than the starting index, the
    ending index must have gone all the way round the polygon and started
-   round again. Increase the ending index by the number of vertices to 
+   round again. Increase the ending index by the number of vertices to
    put it in the same cycle as the starting index. */
       if( i2 < i1 ) i2 += nvert;
 
@@ -1837,7 +1837,7 @@ static Segment *NewSegment( Segment *seg, int i1, int i2, int nvert,
          result->i1 = i1;
          result->i2 = i2;
 
-/* If the supplied starting index is within the second cycle (i.e. nvert 
+/* If the supplied starting index is within the second cycle (i.e. nvert
    or greater) the ending index will be even greater, so we can reduce
    both by "nvert" to put them both in the first cycle. The goal is that
    the starting index should always be in the first cycle, but the ending
@@ -1881,33 +1881,33 @@ f                              MAXVERT, INSIDE, STARPIX, STATUS )
 
 *  Description:
 *     This is a set of functions that create a Polygon enclosing a single
-*     contiguous set of pixels that have a specified value within a gridded 
-*     2-dimensional data array (e.g. an image). 
+*     contiguous set of pixels that have a specified value within a gridded
+*     2-dimensional data array (e.g. an image).
 *
 *     A basic 2-dimensional Frame is used to represent the pixel coordinate
 *     system in the returned Polygon. The Domain attribute is set to
-*     "PIXEL", the Title attribute is set to "Pixel coordinates", and the 
+*     "PIXEL", the Title attribute is set to "Pixel coordinates", and the
 *     Unit attribute for each axis is set to "pixel". All other
-*     attributes are left unset. The nature of the pixel coordinate system 
-*     is determined by parameter 
+*     attributes are left unset. The nature of the pixel coordinate system
+*     is determined by parameter
 c     "starpix".
 f     STARPIX.
 *
-*     The 
+*     The
 c     "maxerr" and "maxvert"
 f     MAXERR and MAXVERT
 *     parameters can be used to control how accurately the returned
 *     Polygon represents the required region in the data array. The
 *     number of vertices in the returned Polygon will be the minimum
-*     needed to achieve the required accuracy. 
+*     needed to achieve the required accuracy.
 *
-*     You should use a function which matches the numerical type of the 
-*     data you are processing by replacing <X> in the generic function 
-*     name 
-c     astOutline<X> 
-f     AST_OUTLINE<X> 
-c     by an appropriate 1- or 2-character type code. For example, if you 
-*     are procesing data with type 
+*     You should use a function which matches the numerical type of the
+*     data you are processing by replacing <X> in the generic function
+*     name
+c     astOutline<X>
+f     AST_OUTLINE<X>
+c     by an appropriate 1- or 2-character type code. For example, if you
+*     are procesing data with type
 c     "float", you should use the function astOutlineF
 f     REAL, you should use the function AST_OUTLINER
 *     (see the "Data Type Codes" section below for the codes appropriate to
@@ -1916,10 +1916,10 @@ f     REAL, you should use the function AST_OUTLINER
 *  Parameters:
 c     value
 f     VALUE = <Xtype> (Given)
-*        A data value that specifies the pixels to be outlined. 
+*        A data value that specifies the pixels to be outlined.
 c     oper
 f     OPER = INTEGER (Given)
-*        Indicates how the 
+*        Indicates how the
 c        "value"
 f        VALUE
 *        parameter is used to select the outlined pixels. It can
@@ -1939,7 +1939,7 @@ f        - AST__GT: outline pixels with value greater than VALUE.
 c     array
 f     ARRAY( * ) = <Xtype> (Given)
 c        Pointer to a
-f        A 
+f        A
 *        2-dimensional array containing the data to be processed.  The
 *        numerical type of this array should match the 1- or
 *        2-character type code appended to the function name (e.g. if
@@ -1979,45 +1979,45 @@ c        "starpix".
 f        STARPIX.
 c     maxerr
 f     MAXERR = DOUBLE PRECISION (Given)
-*        Together with 
+*        Together with
 c        "maxvert",
 f        MAXVERT,
 *        this determines how accurately the returned Polygon represents
 *        the required region of the data array. It gives the target
-*        discrepancy between the returned Polygon and the accurate outline 
-*        in the data array, expressed as a number of pixels. Insignificant 
-*        vertices are removed from the accurate outline, one by one, until 
-*        the number of vertices remaining in the returned Polygon equals 
-c        "maxvert", 
+*        discrepancy between the returned Polygon and the accurate outline
+*        in the data array, expressed as a number of pixels. Insignificant
+*        vertices are removed from the accurate outline, one by one, until
+*        the number of vertices remaining in the returned Polygon equals
+c        "maxvert",
 f        MAXVERT,
-*        or the largest discrepancy between the accurate outline and the 
-*        returned Polygon is greater than 
+*        or the largest discrepancy between the accurate outline and the
+*        returned Polygon is greater than
 c        "maxerr". If "maxerr"
 f        MAXERR. If MAXERR
-*        is zero or less, its value is ignored and the returned Polygon will 
-*        have the number of vertices specified by 
+*        is zero or less, its value is ignored and the returned Polygon will
+*        have the number of vertices specified by
 c        "maxvert".
 f        MAXVERT.
-c     maxvert 
+c     maxvert
 f     MAXVERT = INTEGER (Given)
-*        Together with 
+*        Together with
 c        "maxerr",
 f        MAXERR,
 *        this determines how accurately the returned Polygon represents
-*        the required region of the data array. It gives the maximum 
-*        allowed number of vertices in the returned Polygon. Insignificant 
-*        vertices are removed from the accurate outline, one by one, until 
-*        the number of vertices remaining in the returned Polygon equals 
-c        "maxvert", 
+*        the required region of the data array. It gives the maximum
+*        allowed number of vertices in the returned Polygon. Insignificant
+*        vertices are removed from the accurate outline, one by one, until
+*        the number of vertices remaining in the returned Polygon equals
+c        "maxvert",
 f        MAXVERT,
-*        or the largest discrepancy between the accurate outline and the 
-*        returned Polygon is greater than 
+*        or the largest discrepancy between the accurate outline and the
+*        returned Polygon is greater than
 c        "maxerr". If "maxvert"
 f        MAXERR. If MAXVERT
-*        is less than 3, its value is ignored and the number of vertices in 
-*        the returned Polygon will be the minimum needed to ensure that the 
+*        is less than 3, its value is ignored and the number of vertices in
+*        the returned Polygon will be the minimum needed to ensure that the
 *        discrepancy between the accurate outline and the returned
-*        Polygon is less than 
+*        Polygon is less than
 c        "maxerr".
 f        MAXERR.
 c     inside
@@ -2025,12 +2025,12 @@ f     INSIDE( 2 ) = INTEGER (Given)
 c        Pointer to an array of two integers
 f        An array
 *        containing the indices of a pixel known to be inside the
-*        required region. This is needed because the supplied data 
-*        array may contain several disjoint areas of pixels that satisfy 
+*        required region. This is needed because the supplied data
+*        array may contain several disjoint areas of pixels that satisfy
 *        the criterion specified by
 c        "value" and "oper".
 f        VALUE and OPER.
-*        In such cases, the area described by the returned Polygon will 
+*        In such cases, the area described by the returned Polygon will
 *        be the one that contains the pixel specified by
 c        "inside".
 f        INSIDE.
@@ -2041,7 +2041,7 @@ f        LBND and UBND,
 c        "value" and "oper",
 f        VALUE and OPER,
 *        then this function will search for a suitable pixel. The search
-*        starts at the central pixel and proceeds in a spiral manner until 
+*        starts at the central pixel and proceeds in a spiral manner until
 *        a pixel is found that meets the specified crierion.
 c     starpix
 f     STARPIX = LOGICAL (Given)
@@ -2055,10 +2055,10 @@ f        .TRUE.,
 c        If zero,
 f        If .FALSE.,
 *        the definition of pixel coordinate used by other AST functions
-c        such as astResample, astMask, 
-f        such as AST_RESAMPLE, AST_MASK, 
-*        etc., is used. In this definition, a pixel with integer index I 
-*        spans a range of pixel coordinate from (I-0.5) to (I+0.5) (i.e. 
+c        such as astResample, astMask,
+f        such as AST_RESAMPLE, AST_MASK,
+*        etc., is used. In this definition, a pixel with integer index I
+*        spans a range of pixel coordinate from (I-0.5) to (I+0.5) (i.e.
 *        pixel centres have integral pixel coordinates).
 c     boxsize
 f     BOXSIZE = INTEGER (Given)
@@ -2072,20 +2072,20 @@ f        The global status.
 *  Returned Value:
 c     astOutline<X>()
 f     AST_OUTLINE<X> = INTEGER
-*        The number of pixels to which a value of 
-c        "badval" 
-f        BADVAL 
+*        The number of pixels to which a value of
+c        "badval"
+f        BADVAL
 *        has been assigned.
 
 *  Notes:
 *     - This function proceeds by first finding a very accurate polygon,
 *     and then removing insignificant vertices from this fine polygon
-*     using 
+*     using
 c     astDownsize.
 f     AST_DOWNSIZE.
-*     - The returned Polygon is the outer boundary of the contiguous set 
+*     - The returned Polygon is the outer boundary of the contiguous set
 *     of pixels that includes ths specified "inside" point, and satisfy
-*     the specified value requirement. This set of pixels may potentially 
+*     the specified value requirement. This set of pixels may potentially
 *     include "holes" where the pixel values fail to meet the specified
 *     value requirement. Such holes will be ignored by this function.
 *     - A value of zero will be returned if this function is invoked
@@ -2464,7 +2464,7 @@ MAKE_OUTLINE(F,float)
 /* Undefine the macros. */
 #undef MAKE_OUTLINE
 
-static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv, 
+static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
                          double cen[ 2 ], int *status ){
 /*
 *  Name:
@@ -2478,25 +2478,25 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv, 
+*     double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 *                       double cen[ 2 ], int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
-*     This function defines a line perpendicular to a given polygon edge, 
-*     passing through the mid point of the edge, extending towards the 
+*     This function defines a line perpendicular to a given polygon edge,
+*     passing through the mid point of the edge, extending towards the
 *     inside of the polygon. It returns the distance that can be travelled
 *     along this line before any of the other polygon edges are hit (the
-*     "width" of the polygon perpendicular to the given edge). It also 
+*     "width" of the polygon perpendicular to the given edge). It also
 *     puts the position corresponding to half that distance into "cen".
 
 *  Parameters:
 *     frm
 *        The Frame in which the lines are defined.
 *     edges
-*        Array of "nv" pointers to AstLineDef structures, each defining an 
+*        Array of "nv" pointers to AstLineDef structures, each defining an
 *        edge of the polygon.
 *     i
 *        The index of the edge that is to define the polygon width.
@@ -2510,7 +2510,7 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 
 *  Returnd Value:
 *     The width of the polygon perpendicular to the given edge, or
-*     AST__BAD if the width cannot be determined (usually because the 
+*     AST__BAD if the width cannot be determined (usually because the
 *     vertices been supplied in a clockwise direction, effectively
 *     negating the Polygon).
 
@@ -2519,7 +2519,7 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 /* Local Variables: */
    AstLineDef *line;
    double *cross;
-   double d;        
+   double d;
    double end[ 2 ];
    double l1;
    double l2;
@@ -2533,14 +2533,14 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 
 /* Create a Line description for a line perpendicular to the specified
    edge, passing through the mid point of the edge, and extending towards
-   the inside of the polygon. First move away from the start along the 
+   the inside of the polygon. First move away from the start along the
    line to the mid point. This gives the start of the new line. */
    l1 = 0.5*( edges[ i ]->length );
    astLineOffset( frm, edges[ i ], l1, 0.0, start );
 
 /* We now move away from this position at right angles to the line. We
    start off by moving 5 times the length of the specified edge. For
-   some Frames (e.g. SkyFrames) this may result in a position that is 
+   some Frames (e.g. SkyFrames) this may result in a position that is
    much too close (i.e. if it goes all the way round the great circle
    and comes back to the beginning). Therefore, we check that the end
    point is the requested distance from the start point, and if not, we
@@ -2560,8 +2560,8 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
    for( j = 0; j < nv; j++ ) {
       if( j != i ) {
 
-/* Find the position at which the line created above crosses the current 
-   edge. Skip to the next edge if the line does not intersect the edge 
+/* Find the position at which the line created above crosses the current
+   edge. Skip to the next edge if the line does not intersect the edge
    within the length of the edge. */
          if( astLineCrossing( frm, line, edges[ j ], &cross ) ) {
 
@@ -2587,7 +2587,7 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 /* The usual reason for not finding a width is if the polygon vertices
    are supplied in clockwise order, effectively negating the polygon, and
    resulting in the "inside" of the polygon being the infinite region
-   outside a polygonal hole. In this case, the end point of the line 
+   outside a polygonal hole. In this case, the end point of the line
    perpendicular to the initial edge can be returned as a representative
    "inside" point. */
    } else {
@@ -2606,7 +2606,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     RegBaseBox
 
 *  Purpose:
-*     Returns the bounding box of an un-negated Region in the base Frame of 
+*     Returns the bounding box of an un-negated Region in the base Frame of
 *     the encapsulated FrameSet.
 
 *  Type:
@@ -2621,7 +2621,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     method inherited from the Region class).
 
 *  Description:
-*     This function returns the upper and lower axis bounds of a Region in 
+*     This function returns the upper and lower axis bounds of a Region in
 *     the base Frame of the encapsulated FrameSet, assuming the Region
 *     has not been negated. That is, the value of the Negated attribute
 *     is ignored.
@@ -2632,12 +2632,12 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 *     lbnd
 *        Pointer to an array in which to return the lower axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     ubnd
 *        Pointer to an array in which to return the upper axis bounds
 *        covered by the Region in the base Frame of the encapsulated
-*        FrameSet. It should have at least as many elements as there are 
+*        FrameSet. It should have at least as many elements as there are
 *        axes in the base Frame.
 *     status
 *        Pointer to the inherited status variable.
@@ -2687,7 +2687,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
       frm = astGetFrame( this_region->frameset, AST__BASE );
 
 /* Find the upper and lower bounds of the box enclosing all the vertices.
-   The box is expressed in terms of axis offsets from the first vertex, in 
+   The box is expressed in terms of axis offsets from the first vertex, in
    order to avoid problems with boxes that cross RA=0 or RA=12h */
       lbnd[ 0 ] = 0.0;
       lbnd[ 1 ] = 0.0;
@@ -2725,7 +2725,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
       ubnd[ 0 ] += x0;
       ubnd[ 1 ] += y0;
 
-/* The astNormBox requires a Mapping which can be used to test points in 
+/* The astNormBox requires a Mapping which can be used to test points in
    this base Frame. Create a copy of the Polygon and then set its
    FrameSet so that the current Frame in the copy is the same as the base
    Frame in the original. */
@@ -2755,7 +2755,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 *     RegBaseMesh
 
 *  Purpose:
-*     Return a PointSet containing a mesh of points on the boundary of a 
+*     Return a PointSet containing a mesh of points on the boundary of a
 *     Region in its base Frame.
 
 *  Type:
@@ -2781,7 +2781,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Pointer to the PointSet. Annul the pointer using astAnnul when it 
+*     Pointer to the PointSet. Annul the pointer using astAnnul when it
 *     is no longer needed.
 
 *  Notes:
@@ -2817,7 +2817,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* If the Region structure contains a pointer to a PointSet holding 
+/* If the Region structure contains a pointer to a PointSet holding
    a previously created mesh, return it. */
    if( this_region->basemesh ) {
       result = astClone( this_region->basemesh );
@@ -2843,30 +2843,30 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 /* Find the total geodesic distance around the boundary. */
          total = 0.0;
 
-         start[ 0 ] = vptr[ 0 ][ 0 ];                                 
-         start[ 1 ] = vptr[ 1 ][ 0 ];                                 
+         start[ 0 ] = vptr[ 0 ][ 0 ];
+         start[ 1 ] = vptr[ 1 ][ 0 ];
 
          for( iv = 1; iv < nv; iv++ ) {
-            end[ 0 ] = vptr[ 0 ][ iv ];                                 
-            end[ 1 ] = vptr[ 1 ][ iv ];                                 
+            end[ 0 ] = vptr[ 0 ][ iv ];
+            end[ 1 ] = vptr[ 1 ][ iv ];
 
             d = astDistance( frm, start, end );
-            if( d != AST__BAD ) total += fabs( d );              
+            if( d != AST__BAD ) total += fabs( d );
             lens[ iv ] = d;
             start[ 0 ] = end[ 0 ];
             start[ 1 ] = end[ 1 ];
          }
 
-         end[ 0 ] = vptr[ 0 ][ 0 ];                                 
-         end[ 1 ] = vptr[ 1 ][ 0 ];                                 
+         end[ 0 ] = vptr[ 0 ][ 0 ];
+         end[ 1 ] = vptr[ 1 ][ 0 ];
 
          d = astDistance( frm, start, end );
-         if( d != AST__BAD ) total += fabs( d );              
+         if( d != AST__BAD ) total += fabs( d );
          lens[ 0 ] = d;
 
 /* Find the number of mesh points per unit geodesic distance. */
-         if( total > 0.0 ){ 
-            mp = astGetMeshSize( this )/total;         
+         if( total > 0.0 ){
+            mp = astGetMeshSize( this )/total;
 
 /* Find the total number of mesh points required. */
             np = 0;
@@ -2881,15 +2881,15 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 
 /* Initialise the index of the next point to be added to the returned
    PointSet. */
-               next = 0; 
+               next = 0;
 
 /* Loop round each good edge of the polygon. The edge ends at vertex "iv". */
-               start[ 0 ] = vptr[ 0 ][ 0 ];                                 
-               start[ 1 ] = vptr[ 1 ][ 0 ];                                 
-      
+               start[ 0 ] = vptr[ 0 ][ 0 ];
+               start[ 1 ] = vptr[ 1 ][ 0 ];
+
                for( iv = 1; iv < nv; iv++ ) {
-                  end[ 0 ] = vptr[ 0 ][ iv ];                                 
-                  end[ 1 ] = vptr[ 1 ][ iv ];                                 
+                  end[ 0 ] = vptr[ 0 ][ iv ];
+                  end[ 1 ] = vptr[ 1 ][ iv ];
                   if( lens[ iv ] != AST__BAD ) {
 
 /* Add the position of the starting vertex to the returned mesh. */
@@ -2899,7 +2899,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 
 /* Find the number of points on this edge, and the geodesic distance
    between them. */
-                     n = 1 + (int) ( lens[ iv ]*mp ); 
+                     n = 1 + (int) ( lens[ iv ]*mp );
 
 /* If more than one point, find the distance between points. */
                      if( n > 1 ) {
@@ -2924,16 +2924,16 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
                   start[ 0 ] = end[ 0 ];
                   start[ 1 ] = end[ 1 ];
                }
-      
+
 /* Now do the edge which ends at the first vertex. */
-               end[ 0 ] = vptr[ 0 ][ 0 ];                                 
-               end[ 1 ] = vptr[ 1 ][ 0 ];                                 
+               end[ 0 ] = vptr[ 0 ][ 0 ];
+               end[ 1 ] = vptr[ 1 ][ 0 ];
                if( lens[ 0 ] != AST__BAD ) {
                   rptr[ 0 ][ next ] = start[ 0 ];
                   rptr[ 1 ][ next ] = start[ 1 ];
                   next++;
 
-                  n = 1 + (int)( lens[ 0 ]*mp ); 
+                  n = 1 + (int)( lens[ 0 ]*mp );
                   if( n > 1 ) {
                      delta = lens[ 0 ]/n;
                      for( ip = 1; ip < n; ip++ ) {
@@ -2949,7 +2949,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
                if( next != np && astOK ) {
                   astError( AST__INTER, "astRegBaseMesh(%s): Error in the "
                             "allocated PointSet size (%d) - should have "
-                            "been %d (internal AST programming error).", status, 
+                            "been %d (internal AST programming error).", status,
                             astGetClass( this ), np, next );
                }
 
@@ -3012,12 +3012,12 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *     this
 *        Pointer to the Polygon.
 *     pset
-*        Pointer to the PointSet. The points are assumed to refer to the 
+*        Pointer to the PointSet. The points are assumed to refer to the
 *        base Frame of the FrameSet encapsulated by "this".
 *     unc
 *        Pointer to a Region representing the uncertainties in the points
-*        given by "pset". The Region is assumed to represent the base Frame 
-*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed 
+*        given by "pset". The Region is assumed to represent the base Frame
+*        of the FrameSet encapsulated by "this". Zero uncertainity is assumed
 *        if NULL is supplied.
 *     mask
 *        Pointer to location at which to return a pointer to a newly
@@ -3047,17 +3047,17 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    double **ptr2;               /* Pointer to axis values in "pset2" */
    double **vptr;               /* Pointer to axis values at vertices */
    double edge_len;             /* Length of current edge */
-   double end[2];               /* Position of end of current edge */ 
+   double end[2];               /* Position of end of current edge */
    double l1;                   /* Length of bounding box diagonal */
    double l2;                   /* Length of bounding box diagonal */
-   double lbnd_tunc[2];         /* Lower bounds of "this" uncertainty Region */ 
-   double lbnd_unc[2];          /* Lower bounds of supplied uncertainty Region */ 
+   double lbnd_tunc[2];         /* Lower bounds of "this" uncertainty Region */
+   double lbnd_unc[2];          /* Lower bounds of supplied uncertainty Region */
    double par;                  /* Parallel component */
    double parmax;               /* Max acceptable parallel component */
    double prp;                  /* Perpendicular component */
-   double start[2];             /* Position of start of current edge */ 
-   double ubnd_tunc[2];         /* Upper bounds of "this" uncertainty Region */ 
-   double ubnd_unc[2];          /* Upper bounds of supplied uncertainty Region */ 
+   double start[2];             /* Position of start of current edge */
+   double ubnd_tunc[2];         /* Upper bounds of "this" uncertainty Region */
+   double ubnd_unc[2];          /* Upper bounds of supplied uncertainty Region */
    double wid;                  /* Width of acceptable margin around polygon */
    int *m;                      /* Pointer to next mask value */
    int i;                       /* Edge index */
@@ -3104,7 +3104,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    ptr1 = astGetPoints( pset1 );
    np = astGetNpoint( pset1 );
 
-/* Create a PointSet to hold the resolved components and get pointers to its 
+/* Create a PointSet to hold the resolved components and get pointers to its
    axis data. */
    pset2 = astPointSet( np, 2, "", status );
    ptr2 = astGetPoints( pset2 );
@@ -3112,16 +3112,16 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Create a mask array if required. */
    if( mask ) *mask = astMalloc( sizeof(int)*(size_t) np );
 
-/* We now find the maximum distance on each axis that a point can be from the 
+/* We now find the maximum distance on each axis that a point can be from the
    boundary of the Polygon for it still to be considered to be on the boundary.
-   First get the Region which defines the uncertainty within the Polygon 
+   First get the Region which defines the uncertainty within the Polygon
    being checked (in its base Frame), and get its bounding box. The current
    Frame of the uncertainty Region is the same as the base Frame of the
    Polygon. */
-   tunc = astGetUncFrm( this, AST__BASE );      
-   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   tunc = astGetUncFrm( this, AST__BASE );
+   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc );
 
-/* Find the geodesic length within the base Frame of "this" of the diagonal of 
+/* Find the geodesic length within the base Frame of "this" of the diagonal of
    the bounding box. */
    frm = astGetFrame( this_region->frameset, AST__BASE );
    l1 = astDistance( frm, lbnd_tunc, ubnd_tunc );
@@ -3129,7 +3129,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box in the same Frame. */
    if( unc ) {
-      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
 
 /* Find the geodesic length of the diagonal of this bounding box. */
       l2 = astDistance( frm, lbnd_unc, ubnd_unc );
@@ -3139,8 +3139,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
       l2 = 0.0;
    }
 
-/* The required border width is half of the total diagonal of the two bounding 
-   boxes. */   
+/* The required border width is half of the total diagonal of the two bounding
+   boxes. */
    if( astOK ) {
       wid = 0.5*( l1 + l2 );
 
@@ -3156,7 +3156,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Find the length of this edge. */
          edge_len = astDistance( frm, start, end );
 
-/* Resolve all the supplied mesh points into components parallel and 
+/* Resolve all the supplied mesh points into components parallel and
    perpendicular to this edge. */
          (void) astResolvePoints( frm, start, end, pset1, pset2 );
 
@@ -3174,7 +3174,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
                   ptr1[ 0 ][ ip ] = AST__BAD;
                   ptr1[ 1 ][ ip ] = AST__BAD;
                }
-            } 
+            }
          }
 
 /* The end of the current edge becomes the start of the next. */
@@ -3184,28 +3184,28 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* See if any good points are left in pset1. If so, it means that those
    points were not on any edge of hte Polygon. We use two alogorithms
-   here depending on whether we are creating a mask array, since we can 
+   here depending on whether we are creating a mask array, since we can
    abort the check upon finding the first good point if we are not
    producing a mask. */
       result = 1;
       if( mask ) {
          m = *mask;
          for( ip = 0; ip < np; ip++, m++ ) {
-            if( ptr1[ 0 ][ ip ] != AST__BAD && 
+            if( ptr1[ 0 ][ ip ] != AST__BAD &&
                 ptr1[ 1 ][ ip ] != AST__BAD ) {
                *m = 0;
                result = 0;
             } else {
                *m = 1;
-            } 
+            }
          }
       } else {
          for( ip = 0; ip < np; ip++, m++ ) {
-            if( ptr1[ 0 ][ ip ] != AST__BAD && 
+            if( ptr1[ 0 ][ ip ] != AST__BAD &&
                 ptr1[ 1 ][ ip ] != AST__BAD ) {
                result = 0;
                break;
-            } 
+            }
          }
       }
    }
@@ -3226,7 +3226,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr, 
+static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
                      int *status ){
 /*
 *+
@@ -3252,7 +3252,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 *     Region, if possible. The required positions are indicated by a
 *     supplied list of scalar parameter values in the range zero to one.
 *     Zero corresponds to some arbitrary starting point on the boundary,
-*     and one corresponds to the end (which for a closed region will be 
+*     and one corresponds to the end (which for a closed region will be
 *     the same place as the start).
 
 *  Parameters:
@@ -3265,7 +3265,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 *     dist
 *        Pointer to an array of "n" scalar parameter values in the range
 *        0 to 1.0.
-*     ptr 
+*     ptr
 *        A pointer to an array of pointers. The number of elements in
 *        this array should equal tthe number of axes in the Frame spanned
 *        by the Region. Each element of the array should be a pointer to
@@ -3295,10 +3295,10 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    int j;
    int ncur;
    int nv;
-   int monotonic;        
+   int monotonic;
 
 /* Check inherited status, and the number of points to return, returning
-   a non-zero value to indicate that this class supports the astRegTrace 
+   a non-zero value to indicate that this class supports the astRegTrace
    method. */
    if( ! astOK || n == 0 ) return 1;
 
@@ -3312,7 +3312,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    frm = astGetFrame( this_region->frameset, AST__BASE );
 
 /* We first determine the required positions in the base Frame of the
-   Region, and then transform them into the current Frame. Get the 
+   Region, and then transform them into the current Frame. Get the
    base->current Mapping, and the number of current Frame axes. */
    map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
 
@@ -3336,9 +3336,9 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 
 /* Get the number of vertices. */
       nv = astGetNpoint( this_region->points );
-   
+
 /* If we have a reasonable number of pointsand there are a reasonable
-   number of vertices, we can be quicker if we know if the parameteric 
+   number of vertices, we can be quicker if we know if the parameteric
    distances are monotonic increasing. Find out now. */
       if( n > 5 && nv > 5 ) {
 
@@ -3363,7 +3363,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 
 /* Loop round each vertex until we find one which is beyond the required
    point. If the supplied distances are monotonic increasing, we can
-   start the checks at the same vertex that was used for the previous 
+   start the checks at the same vertex that was used for the previous
    since we know there will never be a backward step. */
          for( j = j0; j < nv; j++ ) {
             if( this->startsat[ j ] > d ) break;
@@ -3423,7 +3423,7 @@ static Segment *RemoveFromChain( Segment *head, Segment *seg, int *status ){
 *     Segment *RemoveFromChain( Segment *head, Segment *seg, int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     The supplied Segment is removed form the list, and the gap is
@@ -3483,7 +3483,7 @@ static void ResetCache( AstRegion *this, int *status ){
 *     inherited from the parent Region class).
 
 *  Description:
-*     This function clears cached information from the supplied Region 
+*     This function clears cached information from the supplied Region
 *     structure.
 
 *  Parameters:
@@ -3515,7 +3515,7 @@ static void SetPointSet( AstPolygon *this, AstPointSet *pset, int *status ){
 *     void SetPointSet( AstPolygon *this, AstPointSet *pset, int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     The PointSet in the supplied Polygon is annulled, are stored in the supplied
@@ -3673,9 +3673,9 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    pointer. */
    simpler = ( new != this );
 
-/* We attempt to simplify the Polygon by re-defining it within its current 
-   Frame. Transforming the Polygon from its base to its current Frame may 
-   result in the region no longer being an polygon. We test this by 
+/* We attempt to simplify the Polygon by re-defining it within its current
+   Frame. Transforming the Polygon from its base to its current Frame may
+   result in the region no longer being an polygon. We test this by
    transforming a set of bounds on the Polygon boundary. This can only be
    done if the current Frame is 2-dimensional. Also, there is only any
    point in doing it if the Mapping from base to current Frame in the
@@ -3715,8 +3715,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Create a new Polygon using these transformed vertices. */
          newpol = ok ? astPolygon( frm, nv, nv, mem, unc, "", status ) : NULL;
 
-/* See if all points within the mesh created from the original Polygon fall 
-   on the boundary of the new Polygon, to within the uncertainty of the 
+/* See if all points within the mesh created from the original Polygon fall
+   on the boundary of the new Polygon, to within the uncertainty of the
    Region. */
          if( newpol && astRegPins( newpol, mesh, NULL, NULL ) ) {
 
@@ -3738,7 +3738,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    }
    map = astAnnul( map );
 
-/* If any simplification could be performed, copy Region attributes from 
+/* If any simplification could be performed, copy Region attributes from
    the supplied Region to the returned Region, and return a pointer to it.
    If the supplied Region had no uncertainty, ensure the returned Region
    has no uncertainty. Otherwise, return a clone of the supplied pointer. */
@@ -3758,7 +3758,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    return result;
 }
 
-static void SmoothPoly( AstPointSet *pset, int boxsize, double strength, 
+static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
                         int *status ) {
 /*
 *  Name:
@@ -3772,23 +3772,23 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     void SmoothPoly( AstPointSet *pset, int boxsize, double strength, 
+*     void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 *                      int *status )
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     This function smooths a polygon, without changing the number of
 *     vertices. It assumes plane geometry, so should not be used to
 *     smooth polygons defined within a SkyFrame or CmpFrame.
 *
-*     Each vertex is replaced by a new vertex determined as follows: the 
-*     mean X and Y axis value of the vertices in a section of the polygon 
+*     Each vertex is replaced by a new vertex determined as follows: the
+*     mean X and Y axis value of the vertices in a section of the polygon
 *     centred on the vertex being replaced are found (the length of the
-*     section is given by parameter "boxsize"). The new vertex position 
-*     is then the weighted mean of this mean (X,Y) position and the old 
-*     vertex position. The weight for the mean (X,Y) position is given 
+*     section is given by parameter "boxsize"). The new vertex position
+*     is then the weighted mean of this mean (X,Y) position and the old
+*     vertex position. The weight for the mean (X,Y) position is given
 *     by parameter "strength", and the weight for the old vertex
 *     position is (1.0 - strength)
 
@@ -3816,7 +3816,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
    double *oldx;
    double *oldy;
    double *ox;
-   double *oy;        
+   double *oy;
    double *px;
    double *py;
    double *qx;
@@ -3852,13 +3852,13 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
       a = strength;
       b = 1.0 - a;
 
-/* Ensure the box size is sufficiently small for there to be room for 
+/* Ensure the box size is sufficiently small for there to be room for
    two boxes along the polygon. */
       half_width = nv/4 - 1;
       if( boxsize < half_width ) half_width = boxsize;
       if( half_width < 1 ) half_width = 1;
 
-/* Modify the weight for the fully smoothed position to include the 
+/* Modify the weight for the fully smoothed position to include the
    normalisation factor needed to account for the box width. */
       a /= 2*half_width + 1;
 
@@ -3867,7 +3867,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
       px = oldx + 1;
       qx = oldx + nv;
       sx = (oldx)[ 0 ];
-   
+
       py = oldy + 1;
       qy = oldy + nv;
       sy = (oldy)[ 0 ];
@@ -3877,7 +3877,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
          sy += *(py++) + *(--qy);
       }
 
-/* Replacing vertices within the first half box will include vertices at 
+/* Replacing vertices within the first half box will include vertices at
    both ends of the polygon. Set up the pointers accordingly, and then
    find replacements for each vertex in the first half box.*/
       ox = oldx;
@@ -3886,18 +3886,18 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
       ny = newy;
       for( i = 0; i < half_width; i++ ) {
 
-/* Form the new vertex (x,y) values as the weighted mean of the mean 
+/* Form the new vertex (x,y) values as the weighted mean of the mean
    (x,y) values in the box, and the old (x,y) values. */
          *(nx++) = a*sx + b*( *(ox++) );
          *(ny++) = a*sy + b*( *(oy++) );
 
-/* Add in the next vertex X and Y axis values to the running sums, and 
+/* Add in the next vertex X and Y axis values to the running sums, and
    remove the position that has now passed out of the box. */
          sx += *(px++) - *(qx++);
          sy += *(py++) - *(qy++);
       }
 
-/* Adjust the pointer for the rest of the polygon, up to one half box away 
+/* Adjust the pointer for the rest of the polygon, up to one half box away
    from the end. In this section, the smoothing box does not touch either
    end of the polygon. */
       top = nv - half_width - 1;
@@ -3905,18 +3905,18 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
       qy = oldy;
       for( ; i < top; i++ ){
 
-/* Form the new vertex (x,y) values as the weighted mean of the mean 
+/* Form the new vertex (x,y) values as the weighted mean of the mean
    (x,y) values in the box, and the old (x,y) values. */
          *(nx++) = a*sx + b*( *(ox++) );
          *(ny++) = a*sy + b*( *(oy++) );
 
-/* Add in the next vertex X and Y axis values to the running sums, and 
+/* Add in the next vertex X and Y axis values to the running sums, and
    remove the position that has now passed out of the box. */
          sx += *(px++) - *(qx++);
          sy += *(py++) - *(qy++);
       }
 
-/* Now do the last half box (which includes vertices from the start of 
+/* Now do the last half box (which includes vertices from the start of
    the polygon). */
       top = nv;
       px = oldx;
@@ -3948,13 +3948,13 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     void TraceEdge<Oper><X>( <Xtype> value, <Xtype> array[], 
+*     void TraceEdge<Oper><X>( <Xtype> value, <Xtype> array[],
 *                              int lbnd[ 2 ], int ubnd[ 2 ], int iv0,
 *                              int ix0, int iy0, int starpix, int full,
 *                              int *status );
 
 *  Class Membership:
-*     Polygon member function 
+*     Polygon member function
 
 *  Description:
 *     This function forms a polygon enclosing the region of the data
@@ -3971,17 +3971,17 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 *        The data value defining valid pixels.
 *     array
 *        The data array.
-*     lbnd 
+*     lbnd
 *        The lower pixel index bounds of the array.
-*     ubnd 
+*     ubnd
 *        The upper pixel index bounds of the array.
 *     iv0
 *        The vector index of a pixel inside the region such that the
-*        pixel to the right is NOT inside the region. This defines the 
+*        pixel to the right is NOT inside the region. This defines the
 *        start of the polygon.
 *     ix0
 *        The X pixel index of the pixel specified by "iv0".
-*     inx 
+*     inx
 *        The X pixel index of a point which must be inside the polygon
 *        for the polygon to be acceptable.
 *     iny
@@ -3990,10 +3990,10 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 *     starpix
 *        If non-zero, the usual Starlink definition of pixel coordinate
 *        is used (integral values at pixel corners). Otherwise, the
-*        system used by other AST functions such as astResample is used 
+*        system used by other AST functions such as astResample is used
 *        (integral values at pixel centres).
 *     full
-*        If non-zero, the full polygon is stored. If zero, vertices in the 
+*        If non-zero, the full polygon is stored. If zero, vertices in the
 *        middle of straight sections of the Polygon are omitted.
 *     status
 *        Pointer to the inherited status variable.
@@ -4002,7 +4002,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 *     A pointer to a PointSet holding the vertices of the polygon, or
 *     NULL if the polygon did not contain "(inx,iny)".
 
-*  Notes: 
+*  Notes:
 *     - <Oper> must be one of LT, LE, EQ, GE, GT, NE.
 
 
@@ -4326,7 +4326,7 @@ MAKE_TRACEEDGE(X,Xtype,GT,AST__GT)
 /* Expand the above macro to generate a function for each required
    data type and operation. */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-MAKEALL_TRACEEDGE(LD,long double) 
+MAKEALL_TRACEEDGE(LD,long double)
 #endif
 MAKEALL_TRACEEDGE(D,double)
 MAKEALL_TRACEEDGE(L,long int)
@@ -4442,7 +4442,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    npoint = astGetNpoint( result );
 
 /* Get a pointer to the output axis values. */
-   ptr_out = astGetPoints( result );   
+   ptr_out = astGetPoints( result );
 
 /* Find the number of axes in the current Frame. This need not be 2 (the
    number of axes in the *base* Frame must be 2 however). */
@@ -4484,7 +4484,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
          if( *px == AST__BAD || *py == AST__BAD ) {
             in_region = 0;
 
-/* Otherwise, we first determine if the point is inside, outside, or on, 
+/* Otherwise, we first determine if the point is inside, outside, or on,
    the Polygon boundary. Initialially it is unknown. */
          } else {
 
@@ -4562,7 +4562,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                ptr_out[ icoord ][ point ] = AST__BAD;
             }
          }
-      } 
+      }
    }
 
 /* Free resources */
@@ -4679,7 +4679,7 @@ static void Delete( AstObject *obj, int *status ) {
 /* Annul all resources. */
    ps = ((AstRegion *) this)->points;
    if( this->edges && ps ) {
- 
+
 /* Ensure we get a value for "nv" even if an error has occurred. */
       istat = astStatus;
       astClearStatus;
@@ -4755,11 +4755,11 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    values are for information only and will not be read back. */
 
 /* A flag indicating the convention used for determining the interior of
-   the polygon. A zero value indicates that the old AST system is in 
-   use (inside to the left when moving anti-clockwise round the vertices  
-   as viewed from the outside of the celestial sphere). A non-zero value 
-   indicates the STC system is in use (inside to the left when moving 
-   anti-clockwise round the vertices as viewed from the inside of the 
+   the polygon. A zero value indicates that the old AST system is in
+   use (inside to the left when moving anti-clockwise round the vertices
+   as viewed from the outside of the celestial sphere). A non-zero value
+   indicates the STC system is in use (inside to the left when moving
+   anti-clockwise round the vertices as viewed from the inside of the
    celestial sphere). AST currently uses the STC system. */
    astWriteInt( channel, "Order", 1, 0, 1, "Polygon uses STC vertex order convention" );
 }
@@ -4771,7 +4771,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(Polygon,Region)
 astMAKE_CHECK(Polygon)
 
-AstPolygon *astPolygon_( void *frame_void, int npnt, int dim, 
+AstPolygon *astPolygon_( void *frame_void, int npnt, int dim,
                          const double *points, AstRegion *unc,
                          const char *options, int *status, ...) {
 /*
@@ -4788,7 +4788,7 @@ f     AST_POLYGON
 
 *  Synopsis:
 c     #include "polygon.h"
-c     AstPolygon *astPolygon( AstFrame *frame, int npnt, int dim, 
+c     AstPolygon *astPolygon( AstFrame *frame, int npnt, int dim,
 c                             const double *points, AstRegion *unc,
 c                             const char *options, ... )
 f     RESULT = AST_POLYGON( FRAME, NPNT, DIM, POINTS, UNC, OPTIONS, STATUS )
@@ -4797,20 +4797,20 @@ f     RESULT = AST_POLYGON( FRAME, NPNT, DIM, POINTS, UNC, OPTIONS, STATUS )
 *     Polygon constructor.
 
 *  Description:
-*     This function creates a new Polygon object and optionally initialises 
+*     This function creates a new Polygon object and optionally initialises
 *     its attributes.
 *
 *     The Polygon class implements a polygonal area, defined by a
 *     collection of vertices, within a 2-dimensional Frame. The vertices
 *     are connected together by geodesic curves within the encapsulated Frame.
 *     For instance, if the encapsulated Frame is a simple Frame then the
-*     geodesics will be straight lines, but if the Frame is a SkyFrame then 
+*     geodesics will be straight lines, but if the Frame is a SkyFrame then
 *     the geodesics will be great circles. Note, the vertices must be
 *     supplied in an order such that the inside of the polygon is to the
 *     left of the boundary as the vertices are traversed. Supplying them
 *     in the reverse order will effectively negate the polygon.
 *
-*     Within a SkyFrame, neighbouring vertices are always joined using the 
+*     Within a SkyFrame, neighbouring vertices are always joined using the
 *     shortest path. Thus if an edge of 180 degrees or more in length is
 *     required, it should be split into section each of which is less
 *     than 180 degrees. The closed path joining all the vertices in order
@@ -4826,12 +4826,12 @@ f     RESULT = AST_POLYGON( FRAME, NPNT, DIM, POINTS, UNC, OPTIONS, STATUS )
 c     frame
 f     FRAME = INTEGER (Given)
 *        A pointer to the Frame in which the region is defined. It must
-*        have exactly 2 axes. A deep copy is taken of the supplied Frame. 
-*        This means that any subsequent changes made to the Frame using the 
+*        have exactly 2 axes. A deep copy is taken of the supplied Frame.
+*        This means that any subsequent changes made to the Frame using the
 *        supplied pointer will have no effect the Region.
 c     npnt
 f     NPNT = INTEGER (Given)
-*        The number of points in the Region. 
+*        The number of points in the Region.
 c     dim
 f     DIM = INTEGER (Given)
 c        The number of elements along the second dimension of the "points"
@@ -4843,46 +4843,46 @@ c        given should not be less than "npnt".
 f        given should not be less than NPNT.
 c     points
 f     POINTS( DIM, 2 ) = DOUBLE PRECISION (Given)
-c        The address of the first element of a 2-dimensional array of 
+c        The address of the first element of a 2-dimensional array of
 c        shape "[2][dim]" giving the physical coordinates of the vertices.
-c        These should be stored such that the value of coordinate 
-c        number "coord" for point number "pnt" is found in element 
+c        These should be stored such that the value of coordinate
+c        number "coord" for point number "pnt" is found in element
 c        "in[coord][pnt]".
 f        A 2-dimensional array giving the physical coordinates of the
-f        vertices. These should be stored such that the value of coordinate 
+f        vertices. These should be stored such that the value of coordinate
 f        number COORD for point number PNT is found in element IN(PNT,COORD).
 c     unc
 f     UNC = INTEGER (Given)
-*        An optional pointer to an existing Region which specifies the 
-*        uncertainties associated with the boundary of the Box being created. 
-*        The uncertainty in any point on the boundary of the Box is found by 
-*        shifting the supplied "uncertainty" Region so that it is centred at 
+*        An optional pointer to an existing Region which specifies the
+*        uncertainties associated with the boundary of the Box being created.
+*        The uncertainty in any point on the boundary of the Box is found by
+*        shifting the supplied "uncertainty" Region so that it is centred at
 *        the boundary point being considered. The area covered by the
 *        shifted uncertainty Region then represents the uncertainty in the
 *        boundary position. The uncertainty is assumed to be the same for
 *        all points.
 *
-*        If supplied, the uncertainty Region must be of a class for which 
-*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
-*        or be a Prism containing centro-symetric component Regions. A deep 
-*        copy of the supplied Region will be taken, so subsequent changes to 
-*        the uncertainty Region using the supplied pointer will have no 
-*        effect on the created Box. Alternatively, 
-f        a null Object pointer (AST__NULL) 
-c        a NULL Object pointer 
-*        may be supplied, in which case a default uncertainty is used 
+*        If supplied, the uncertainty Region must be of a class for which
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.)
+*        or be a Prism containing centro-symetric component Regions. A deep
+*        copy of the supplied Region will be taken, so subsequent changes to
+*        the uncertainty Region using the supplied pointer will have no
+*        effect on the created Box. Alternatively,
+f        a null Object pointer (AST__NULL)
+c        a NULL Object pointer
+*        may be supplied, in which case a default uncertainty is used
 *        equivalent to a box 1.0E-6 of the size of the Box being created.
 *
-*        The uncertainty Region has two uses: 1) when the 
+*        The uncertainty Region has two uses: 1) when the
 c        astOverlap
-f        AST_OVERLAP 
+f        AST_OVERLAP
 *        function compares two Regions for equality the uncertainty
 *        Region is used to determine the tolerance on the comparison, and 2)
 *        when a Region is mapped into a different coordinate system and
-*        subsequently simplified (using 
+*        subsequently simplified (using
 c        astSimplify),
 f        AST_SIMPLIFY),
-*        the uncertainties are used to determine if the transformed boundary 
+*        the uncertainties are used to determine if the transformed boundary
 *        can be accurately represented by a specific shape of Region.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
@@ -4942,8 +4942,8 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise the Polygon, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitPolygon( NULL, sizeof( AstPolygon ), !class_init, 
-                         &class_vtab, "Polygon", frame, npnt, 
+   new = astInitPolygon( NULL, sizeof( AstPolygon ), !class_init,
+                         &class_vtab, "Polygon", frame, npnt,
                          dim, points, unc );
 
 /* If successful, note that the virtual function table has been
@@ -4966,7 +4966,7 @@ f     function is invoked with STATUS set to an error value, or if it
 }
 
 AstPolygon *astPolygonId_( void *frame_void, int npnt, int dim,
-                           const double *points, void *unc_void, 
+                           const double *points, void *unc_void,
                            const char *options, ... ) {
 /*
 *  Name:
@@ -5033,8 +5033,8 @@ AstPolygon *astPolygonId_( void *frame_void, int npnt, int dim,
 
 /* Initialise the Polygon, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = astInitPolygon( NULL, sizeof( AstPolygon ), !class_init, 
-                         &class_vtab, "Polygon", frame, npnt, dim, 
+   new = astInitPolygon( NULL, sizeof( AstPolygon ), !class_init,
+                         &class_vtab, "Polygon", frame, npnt, dim,
                          points, unc );
 
 /* If successful, note that the virtual function table has been
@@ -5057,8 +5057,8 @@ AstPolygon *astPolygonId_( void *frame_void, int npnt, int dim,
 }
 
 
-AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *vtab, 
-                             const char *name, AstFrame *frame, int npnt, 
+AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *vtab,
+                             const char *name, AstFrame *frame, int npnt,
                              int dim, const double *points, AstRegion *unc, int *status ) {
 /*
 *+
@@ -5073,8 +5073,8 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
 
 *  Synopsis:
 *     #include "polygon.h"
-*     AstPolygon *astInitPolygon( void *mem, size_t size, int init, AstPolygonVtab *vtab, 
-*                                 const char *name, AstFrame *frame, int npnt, 
+*     AstPolygon *astInitPolygon( void *mem, size_t size, int init, AstPolygonVtab *vtab,
+*                                 const char *name, AstFrame *frame, int npnt,
 *                                 int dim, const double *points, AstRegion *unc )
 
 *  Class Membership:
@@ -5117,7 +5117,7 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
 *     frame
 *        A pointer to the Frame in which the region is defined.
 *     npnt
-*        The number of points in the Region. 
+*        The number of points in the Region.
 *     dim
 *        The number of elements along the second dimension of the "points"
 *        array (which contains the point coordinates). This value is
@@ -5125,25 +5125,25 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
 *        located if they do not entirely fill this array. The value
 *        given should not be less than "npnt".
 *     points
-*        The address of the first element of a 2-dimensional array of 
-*        shape "[2][dim]" giving the physical coordinates of the 
-*        points. These should be stored such that the value of coordinate 
-*        number "coord" for point number "pnt" is found in element 
+*        The address of the first element of a 2-dimensional array of
+*        shape "[2][dim]" giving the physical coordinates of the
+*        points. These should be stored such that the value of coordinate
+*        number "coord" for point number "pnt" is found in element
 *        "in[coord][pnt]".
 *     unc
 *        A pointer to a Region which specifies the uncertainty in the
-*        supplied positions (all points in the new Polygon being 
-*        initialised are assumed to have the same uncertainty). A NULL 
-*        pointer can be supplied, in which case default uncertainties equal 
-*        to 1.0E-6 of the dimensions of the new Polygon's bounding box are 
-*        used. If an uncertainty Region is supplied, it must be either a Box, 
+*        supplied positions (all points in the new Polygon being
+*        initialised are assumed to have the same uncertainty). A NULL
+*        pointer can be supplied, in which case default uncertainties equal
+*        to 1.0E-6 of the dimensions of the new Polygon's bounding box are
+*        used. If an uncertainty Region is supplied, it must be either a Box,
 *        a Circle or an Ellipse, and its encapsulated Frame must be related
 *        to the Frame supplied for parameter "frame" (i.e. astConvert
-*        should be able to find a Mapping between them). Two positions 
-*        the "frame" Frame are considered to be co-incident if their 
+*        should be able to find a Mapping between them). Two positions
+*        the "frame" Frame are considered to be co-incident if their
 *        uncertainty Regions overlap. The centre of the supplied
-*        uncertainty Region is immaterial since it will be re-centred on the 
-*        point being tested before use. A deep copy is taken of the supplied 
+*        uncertainty Region is immaterial since it will be re-centred on the
+*        point being tested before use. A deep copy is taken of the supplied
 *        Region.
 
 *  Returned Value:
@@ -5201,7 +5201,7 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
 
 /* Initialise a Region structure (the parent class) as the first component
    within the Polygon structure, allocating memory if necessary. */
-      new = (AstPolygon *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab, 
+      new = (AstPolygon *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab,
                                           name, frame, pset, unc );
       if ( astOK ) {
 
@@ -5230,7 +5230,7 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
    return new;
 }
 
-AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab, 
+AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
                              const char *name, AstChannel *channel, int *status ) {
 /*
 *+
@@ -5245,7 +5245,7 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     AstPolygon *astLoadPolygon( void *mem, size_t size, AstPolygonVtab *vtab, 
+*     AstPolygon *astLoadPolygon( void *mem, size_t size, AstPolygonVtab *vtab,
 *                                 const char *name, AstChannel *channel )
 
 *  Class Membership:
@@ -5371,7 +5371,7 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
       new->stale = 1;
 
 /* If the order in which the vertices were written used the old AST
-   convention, negate the Polygon so that it is consistent with the 
+   convention, negate the Polygon so that it is consistent with the
    current conevtion (based on STC). */
       if( ! order ) astNegate( new );
 
@@ -5396,7 +5396,7 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
    same interface. */
 
 
-AstPolygon *astDownsize_( AstPolygon *this, double maxerr, int maxvert, 
+AstPolygon *astDownsize_( AstPolygon *this, double maxerr, int maxvert,
                           int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Polygon,Downsize))( this, maxerr, maxvert, status );

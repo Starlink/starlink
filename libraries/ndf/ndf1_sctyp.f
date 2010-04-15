@@ -4,7 +4,7 @@
 *     NDF1_SCTYP
 
 *  Purpose:
-*     Obtain the numeric data type of a scaled NDF array component 
+*     Obtain the numeric data type of a scaled NDF array component
 *     identified by its ACB entry.
 
 *  Language:
@@ -16,8 +16,8 @@
 *  Description:
 *     The routine returns the numeric data type of a scaled array
 *     component of an NDF as an upper case character string.  The NDF
-*     is identified by its entry in the ACB. The returned type describes 
-*     the values stored in the array, before they are unscaled using 
+*     is identified by its entry in the ACB. The returned type describes
+*     the values stored in the array, before they are unscaled using
 *     the associated scale and zero values. Use NDF1_TYP if you
 *     need the data type of the array after it has been unscaled.
 
@@ -51,12 +51,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -75,7 +75,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 

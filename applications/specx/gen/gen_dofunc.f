@@ -41,7 +41,7 @@ CD     CHARACTER function*4
 *     First get the argument in REAL type
 
       READ (opnd_type2(2:gen_ilen(opnd_type2)), '(I3)') nbytes
-      CALL gen_cvt_type (%val(opnd_addr2), opnd_type2, nbytes, 
+      CALL gen_cvt_type (%val(opnd_addr2), opnd_type2, nbytes,
      &                    arg,            'R4',        4,       ierr)
 
 *     Evaluate function

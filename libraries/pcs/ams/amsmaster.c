@@ -107,13 +107,13 @@ int main()
 
    for ( j=0; j<100; j++ )
    {
-      ams_send ( path, outmsg_function, outmsg_status, outmsg_context, 
+      ams_send ( path, outmsg_function, outmsg_status, outmsg_context,
         outmsg_name, outmsg_length, outmsg_value, &messid, &status );
-      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
-      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
-        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN,
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length,
         inmsg_value, &status );
    }
    if ( status != 0 )

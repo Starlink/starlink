@@ -5,7 +5,7 @@
 *   Name:
 *      SUBROUTINE ITFCOR
 *
-*   Description: 
+*   Description:
 *      Perform ITF correction to image subset.
 *
 *   History:
@@ -23,18 +23,18 @@
 
 *   Import:
       INTEGER NSUB             ! number of subset pixels
- 
+
 *   Import-Export:
       INTEGER*2 DSUB(NSUB)     ! DATA values
- 
+
       BYTE QSUB(NSUB)          ! QUAL values
- 
+
       REAL*8 RSUB(NSUB)          ! R-coordinates
       REAL*8 WSUB(NSUB)          ! W-coordinates
- 
+
 *   External references:
       LOGICAL STR_SIMLR        ! caseless string equality
- 
+
       REAL*8 LWRITF              ! LWR ITF correction
       REAL*8 SWPITF              ! SWP ITF correction
 

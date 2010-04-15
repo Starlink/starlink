@@ -20,11 +20,11 @@
 *        The global status.
 
 *  Description:
-*     An output NDF is produced by squashing or stretching an input 
+*     An output NDF is produced by squashing or stretching an input
 *     NDF along one or more of its dimensions.  The shape of the
 *     output NDF can be specified in one of two ways, according to
-*     the value of the MODE parameter; either a distortion factor 
-*     is given for each dimension, or its lower and upper pixel 
+*     the value of the MODE parameter; either a distortion factor
+*     is given for each dimension, or its lower and upper pixel
 *     bounds are given explicitly.
 
 *  Usage:
@@ -35,40 +35,40 @@
 
 *  ADAM Parameters:
 *     AXIS = _INTEGER (Read)
-*        Assigning a value to this parameter indicates that a single 
-*        axis should be squashed or stretched.  If a null (!) value is 
-*        supplied for AXIS, a squash or stretch factor must be supplied 
-*        for each axis in the manner indicated by the MODE parameter. 
-*        If a non-null value is supplied for AXIS, it should be the 
+*        Assigning a value to this parameter indicates that a single
+*        axis should be squashed or stretched.  If a null (!) value is
+*        supplied for AXIS, a squash or stretch factor must be supplied
+*        for each axis in the manner indicated by the MODE parameter.
+*        If a non-null value is supplied for AXIS, it should be the
 *        integer index of the axis to be squashed or stretched (the
 *        first axis has index 1).  In this case, only a single squash or
-*        stretch factor should be supplied, and all other axes will be 
-*        left unchanged.  If MODE is set to "PixelScale" then the 
-*        supplied value should be the index of a WCS axis.  Otherwise 
+*        stretch factor should be supplied, and all other axes will be
+*        left unchanged.  If MODE is set to "PixelScale" then the
+*        supplied value should be the index of a WCS axis.  Otherwise
 *        it should be the index of a pixel axis.  [!]
 *     FACTORS( ) = _DOUBLE (Read)
-*        This parameter is only used if MODE="Factors".  It defines the 
+*        This parameter is only used if MODE="Factors".  It defines the
 *        factor by which each dimension will be distorted to produce the
-*        output NDF.  A factor greater than one is a stretch and less 
-*        than one is a squash.  If no value has been supplied for 
+*        output NDF.  A factor greater than one is a stretch and less
+*        than one is a squash.  If no value has been supplied for
 *        parameter AXIS, the number of values supplied for FACTORS must
-*        be the same as the number of pixel axes in the NDF.  If a 
+*        be the same as the number of pixel axes in the NDF.  If a
 *        non-null value has been supplied for parameter AXIS, then
 *        only a single value should be supplied for FACTORS and that
-*        value will be used to distort the axis indicated by parameter 
+*        value will be used to distort the axis indicated by parameter
 *        AXIS.
 *     IN = NDF (Read)
 *        The NDF to be squashed or stretched.
 *     LBOUND( ) = _INTEGER (Read)
 *        This parameter is only used if MODE="Bounds".  It specifies the
-*        lower pixel-index values of the output NDF.  If no value has 
+*        lower pixel-index values of the output NDF.  If no value has
 *        been supplied for parameter AXIS, the number of values supplied
-*        for LBOUND must be the same as the number of pixel axes in the 
+*        for LBOUND must be the same as the number of pixel axes in the
 *        NDF.  If a non-null value has been supplied for parameter AXIS,
-*        then only a single value should be supplied for LBOUND and the 
+*        then only a single value should be supplied for LBOUND and the
 *        supplied value will be used as the new lower bounds on the axis
-*        indicated by parameter AXIS.  If null (!) is given, the lower 
-*        pixel bounds of the input NDF will be used.  
+*        indicated by parameter AXIS.  If null (!) is given, the lower
+*        pixel bounds of the input NDF will be used.
 *     METHOD = LITERAL (Read)
 *        The interpolation method used to perform the one-dimensional
 *        resampling operations which constitute the squash or stretch.
@@ -102,39 +102,39 @@
 *        given in the "Sub-Pixel Interpolation Schemes" section below.
 *        ["Auto"]
 *     MODE = LITERAL (Read)
-*        This determines how the shape of the output NDF is to be 
+*        This determines how the shape of the output NDF is to be
 *        specified.  The allowed values and their meanings are as
 *        follows.
 *
-*        -  "Factors"    -- the FACTORS parameter will be used to 
+*        -  "Factors"    -- the FACTORS parameter will be used to
 *                           determine the factor by which each dimension
-*                           should be multiplied.  
+*                           should be multiplied.
 *
-*        -  "Bounds"     -- the LBOUND and UBOUND parameters will be 
+*        -  "Bounds"     -- the LBOUND and UBOUND parameters will be
 *                           used to get the lower and upper pixel bounds
-*                           of the output NDF. 
+*                           of the output NDF.
 *
-*        -  "PixelScale" -- the PIXSCALE parameter will be used to 
-*                           obtain the new pixel scale to use for each 
-*                           WCS axis. 
+*        -  "PixelScale" -- the PIXSCALE parameter will be used to
+*                           obtain the new pixel scale to use for each
+*                           WCS axis.
 *
 *        ["Factors"]
 *     OUT = NDF (Write)
 *        The squashed or stretched NDF.
 *     PIXSCALE = LITERAL (Read)
 *        The PIXSCALE parameter is only used if parameter MODE is set to
-*        "PixelScale".  It should be supplied holding the required new 
+*        "PixelScale".  It should be supplied holding the required new
 *        pixel scales.  In this context, a pixel scale for a WCS axis is
-*        the increment in WCS axis value caused by a movement of one 
-*        pixel along the WCS axis, and are measured at the first pixel 
-*        in the array.  The suggested default value are the current 
-*        pixel scales.  If no value has been supplied for parameter 
-*        AXIS, the number of values supplied for PIXSCALE must be the 
+*        the increment in WCS axis value caused by a movement of one
+*        pixel along the WCS axis, and are measured at the first pixel
+*        in the array.  The suggested default value are the current
+*        pixel scales.  If no value has been supplied for parameter
+*        AXIS, the number of values supplied for PIXSCALE must be the
 *        same as the number of WCS axes in the NDF.  If a non-null value
-*        has been supplied for parameter AXIS, then only a single value 
-*        should be supplied for PIXSCALE and that value will be used as 
-*        the new pixel scale on the WCS axis indicated by parameter 
-*        AXIS. 
+*        has been supplied for parameter AXIS, then only a single value
+*        should be supplied for PIXSCALE and that value will be used as
+*        the new pixel scale on the WCS axis indicated by parameter
+*        AXIS.
 *     PARAMS( ) = _DOUBLE (Read)
 *        Parameters required to control the resampling scheme.  One or
 *        more values may be required to specify the exact resampling
@@ -145,14 +145,14 @@
 *        title to be used. [!]
 *     UBOUND( ) = _INTEGER (Read)
 *        This parameter is only used if MODE="Bounds".  It specifies the
-*        upper pixel-index values of the output NDF.  If no value has 
+*        upper pixel-index values of the output NDF.  If no value has
 *        been supplied for parameter AXIS, the number of values supplied
-*        for UBOUND must be the same as the number of pixel axes in the 
+*        for UBOUND must be the same as the number of pixel axes in the
 *        NDF.  If a non-null value has been supplied for parameter AXIS,
-*        then only a single value should be supplied for UBOUND and the 
+*        then only a single value should be supplied for UBOUND and the
 *        supplied value will be used as the new upper bounds on the axis
 *        indicated by parameter AXIS.  If null (!) is given, the upper
-*        pixel bounds of the input NDF will be used.  
+*        pixel bounds of the input NDF will be used.
 
 *  Examples:
 *     sqorst block blocktall [1,2,1]
@@ -163,27 +163,27 @@
 *        to half a pixel in the input NDF.  The default resampling
 *        scheme, linear interpolation in the stretch direction, is used.
 *     sqorst block blocktall [1,2,1] method=sincsinc params=[2,2]
-*        The same operation as the previous example is performed, 
+*        The same operation as the previous example is performed,
 *        except that a Lanczos kernel is used for the interpolation.
 *     sqorst cygnus1 squish1 mode=bounds lbound=[1,1] ubound=[50,50]
-*        This turns the two-dimensional NDF cygnus1 into a new NDF 
-*        squish1 which has 50 pixels along each side.  The same region 
-*        of sky is represented, but the input image is squashed along 
+*        This turns the two-dimensional NDF cygnus1 into a new NDF
+*        squish1 which has 50 pixels along each side.  The same region
+*        of sky is represented, but the input image is squashed along
 *        both axes to fit the specified dimensions.
 *     sqorst fred mode=pixelscale pixscale=5 axis=3
 *        This resamples a cube NDF called fred on to a velocity scale
 *        of 5 km/s per pixel along its third axis.
 *
 *  Sub-Pixel Interpolation Schemes:
-*     When squashing or stretching an NDF, a separate one-dimensional 
+*     When squashing or stretching an NDF, a separate one-dimensional
 *     resampling operation is performed for each of the dimensions
 *     in which a resize is being done.  By default (when METHOD="Auto")
-*     this is done using linear interpolation, unless it is a 
+*     this is done using linear interpolation, unless it is a
 *     squash of a factor of FACT=2 or more, in which case a block
-*     averaging scheme which averages over FACT pixels.  For many 
+*     averaging scheme which averages over FACT pixels.  For many
 *     purposes this default scheme will be adequate, but for greater
-*     control over the resampling process the METHOD and PARAMS 
-*     parameters can be used.  Detailed discussion of the use of these 
+*     control over the resampling process the METHOD and PARAMS
+*     parameters can be used.  Detailed discussion of the use of these
 *     parameters can be found in the "Sub-pixel Interpolation Schemes"
 *     section of the REGRID task documentation.
 
@@ -206,10 +206,10 @@
 
 *  Implementation Status:
 *     -  The LABEL, UNITS, and HISTORY components, and all extensions
-*     are propagated.  TITLE is controlled by the TITLE parameter. 
+*     are propagated.  TITLE is controlled by the TITLE parameter.
 *     DATA. VARIANCE, AXIS and WCS are propagated after appropriate
-*     modification.  The QUALITY component is also propagated if 
-*     nearest-neighbour interpolation is being used. 
+*     modification.  The QUALITY component is also propagated if
+*     nearest-neighbour interpolation is being used.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -247,7 +247,7 @@
 *     16-JAN-2002 (DSB):
 *        Added propagation of QUALITY and AXIS.
 *     3-SEP-2002 (DSB):
-*        Avoid use of PSX_CALLOC since it cannot handle all HDS data 
+*        Avoid use of PSX_CALLOC since it cannot handle all HDS data
 *        types.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
@@ -378,7 +378,7 @@
 
 *  Determine the number of bytes per value for the selected data type.
 *  We do this becaise PSX_CALLOC cannot accept the whole range of HDS
-*  data types. So we work out the numberof bytes needed and use 
+*  data types. So we work out the numberof bytes needed and use
 *  PSX_MALLOC instead.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          BPV = VAL__NBB
@@ -404,12 +404,12 @@
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999    
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the axis to squash or stretch.
       CALL PAR_GDR0I( 'AXIS', 0, 1, NDIM, .FALSE., AXIS, STATUS )
 
-*  If a null value was supplied for AXIS, annul the error and set AXIS 
+*  If a null value was supplied for AXIS, annul the error and set AXIS
 *  to zero to indicate that all axes should be squashed and stretched.
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -417,10 +417,10 @@
       END IF
 
 *  Find out how the output shape will be supplied.
-      CALL PAR_CHOIC( 'MODE', 'FACTORS', 'FACTORS,BOUNDS,PIXELSCALE', 
+      CALL PAR_CHOIC( 'MODE', 'FACTORS', 'FACTORS,BOUNDS,PIXELSCALE',
      :                .FALSE., MODE, STATUS )
 
-*  Work out the output shape either by expansion factors or by 
+*  Work out the output shape either by expansion factors or by
 *  explicitly supplied bounds.
       IF ( MODE .EQ. 'FACTORS' ) THEN
 
@@ -478,7 +478,7 @@
             CALL PAR_GRM1I( 'UBOUND', NDIM, BMIN, LBNDO, BMAX, .FALSE.,
      :                      UBNDO, STATUS )
          ELSE
-            CALL PAR_GDR0I( 'UBOUND', VAL__MINI, LBNDO( AXIS ), 
+            CALL PAR_GDR0I( 'UBOUND', VAL__MINI, LBNDO( AXIS ),
      :                      VAL__MAXI, .FALSE., UBNDO( AXIS ), STATUS )
          END IF
 
@@ -497,13 +497,13 @@
          END DO
 
 *  Now deal with MODE=PIXELSCALE...
-      ELSE 
+      ELSE
 
 *  Get the WCS FrameSet from the iput NDF.
          CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
 
 *  See how many axes there are in the current WCS coordinate Frame.
-*  Note, this need not necesarily be the same as the number of pixel 
+*  Note, this need not necesarily be the same as the number of pixel
 *  axes (NDIM).
          NWCS = AST_GETI( IWCS, 'Nout', STATUS )
 
@@ -515,7 +515,7 @@
          END DO
 
 *  Get the current pixel scales for each WCS axis. This returns both
-*  formatted and unformatted versions of the scales, together with 
+*  formatted and unformatted versions of the scales, together with
 *  strings indicating the units of each WCS axis.
          CALL KPG1_PIXSC( IWCS, GFIRST, PIXSC, FPIXSC, UPIXSC, STATUS )
 
@@ -526,18 +526,18 @@
          IF ( AXIS .EQ. 0 ) THEN
 
             DO I = 1, NWCS
-               CALL CHR_APPND( FPIXSC( I ), TEXT, IAT )            
+               CALL CHR_APPND( FPIXSC( I ), TEXT, IAT )
                IF ( I .NE. NWCS ) THEN
-                  CALL CHR_APPND( ',', TEXT, IAT )            
+                  CALL CHR_APPND( ',', TEXT, IAT )
                   IAT = IAT + 1
                END IF
             END DO
 
          ELSE
-            CALL CHR_APPND( FPIXSC( AXIS ), TEXT, IAT )            
+            CALL CHR_APPND( FPIXSC( AXIS ), TEXT, IAT )
          END IF
 
-         CALL PAR_DEF0C( 'PIXSCALE', TEXT( : IAT ), STATUS )       
+         CALL PAR_DEF0C( 'PIXSCALE', TEXT( : IAT ), STATUS )
 
 *  Get new values for the required pixel scales.
          CALL PAR_GET0C( 'PIXSCALE', TEXT, STATUS )
@@ -560,7 +560,7 @@
                IAT = START
                DO WHILE( IAT .LE. TLEN .AND.
      :                   TEXT( IAT : IAT ) .NE. ' ' .AND.
-     :                   TEXT( IAT : IAT ) .NE. ',' ) 
+     :                   TEXT( IAT : IAT ) .NE. ',' )
                   IAT = IAT + 1
                END DO
 
@@ -568,9 +568,9 @@
 *  each pair of numerical values in the string).
                COMMA = ( TEXT( IAT : IAT ) .EQ. ',' )
 
-*  Read a floating point value from the beginning of the remainder of 
+*  Read a floating point value from the beginning of the remainder of
 *  the pixscale string, up to the first comma or space.
-               CALL CHR_CTOD( TEXT( START : IAT - 1 ), NEWSCL( I ), 
+               CALL CHR_CTOD( TEXT( START : IAT - 1 ), NEWSCL( I ),
      :                        STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETI( 'I', I )
@@ -606,10 +606,10 @@
                START = IAT + 1
                MORE = .TRUE.
                DO WHILE( START .LE. TLEN .AND. MORE )
-          
+
                   IF ( TEXT( START : START ) .EQ. ' ' ) THEN
                      START = START + 1
-       
+
                   ELSE IF ( TEXT( START : START ) .EQ. ',' ) THEN
                      IF ( COMMA ) THEN
                         MORE = .FALSE.
@@ -636,7 +636,7 @@
 
       END IF
 
-*  Create a new NDF by propagation from the input one. 
+*  Create a new NDF by propagation from the input one.
       CALL LPG_PROP( NDFI, 'AXIS', 'OUT', NDFO, STATUS )
 
 *  Get a title from the parameter system.
@@ -711,9 +711,9 @@
 *  Put the correct WCS FrameSet in the new NDF.
 *  ============================================
 
-*  Construct a Mapping representing the transformation between the 
+*  Construct a Mapping representing the transformation between the
 *  old pixel coordinates and the new ones.  This is just used to
-*  fix up the WCS FrameSet, the resampling routine generates its 
+*  fix up the WCS FrameSet, the resampling routine generates its
 *  own Mappings.
       DO I = 1, NDIM
          PIA( I ) = 0.5D0*DBLE( LBNDI( I ) - 1 + UBNDI( I ) )
@@ -763,13 +763,13 @@
          END DO
 
 *  Iterate over each dimension applying non-Unit Mappings in turn.
-*  We do this one dimension at a time rather than using a single 
-*  invocation of AST_RESAMPLE<X> to prevent leakage of pixel values in 
+*  We do this one dimension at a time rather than using a single
+*  invocation of AST_RESAMPLE<X> to prevent leakage of pixel values in
 *  unaltered dimensions, which can't be done in some (all?) of the
-*  provided sub-pixel resampling schemes.  This will be a bit less 
+*  provided sub-pixel resampling schemes.  This will be a bit less
 *  efficient, but in most cases SQORST will probably be only
 *  used along one dimension at a time in any case.
-         DO I = 1, LASTDM 
+         DO I = 1, LASTDM
 
 *  Do we need to resample in this dimension?
             IF ( DIMO( I ) .NE. DIMI( I ) ) THEN
@@ -793,14 +793,14 @@
 *  If this axis has a defined AXIS Centre array, we need to overwrite
 *  the  AXIS Centre array propagated from the input NDF, by resampling
 *  the input AXIS Centre array.  See if it is defined.  If so, map the
-*  input and output AXIS Centre array as _DOUBLE.  Reset other AXIS 
+*  input and output AXIS Centre array as _DOUBLE.  Reset other AXIS
 *  arrays in the output.
-               CALL NDF_ASTAT( NDFI, 'Centre', I, HASAXI, STATUS ) 
+               CALL NDF_ASTAT( NDFI, 'Centre', I, HASAXI, STATUS )
                IF ( HASAXI ) THEN
                   CALL NDF_AMAP( NDFI, 'Centre', I, '_DOUBLE', 'READ',
-     :                           IPAXI, EL, STATUS ) 
+     :                           IPAXI, EL, STATUS )
                   CALL NDF_AMAP( NDFO, 'Centre', I, '_DOUBLE', 'WRITE',
-     :                           IPAXO, EL, STATUS ) 
+     :                           IPAXO, EL, STATUS )
                   CALL NDF_AREST( NDFO, 'Variance,Width', I, STATUS )
                END IF
 
@@ -847,142 +847,142 @@
 
 *  Do the resampling along the current dimension.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
-                  CALL KPS1_RS1B( NDIM, I, FACTS, 
+                  CALL KPS1_RS1B( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
      :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
-     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
      :                            %VAL( CNF_PVAL( IPWV1 ) ),
-     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
      :                            %VAL( CNF_PVAL( IPWD2 ) ),
-     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
      :                            %VAL( CNF_PVAL( IPWQ2 ) ),
-     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
      :                            %VAL( CNF_PVAL( IPVAR2 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPS1_RS1UB( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
      :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
-     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
      :                            %VAL( CNF_PVAL( IPWV1 ) ),
-     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
      :                            %VAL( CNF_PVAL( IPWD2 ) ),
-     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
      :                            %VAL( CNF_PVAL( IPWQ2 ) ),
-     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
      :                            %VAL( CNF_PVAL( IPVAR2 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPS1_RS1W( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
      :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
-     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
      :                            %VAL( CNF_PVAL( IPWV1 ) ),
-     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
      :                            %VAL( CNF_PVAL( IPWD2 ) ),
-     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
      :                            %VAL( CNF_PVAL( IPWQ2 ) ),
-     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
      :                            %VAL( CNF_PVAL( IPVAR2 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPS1_RS1UW( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
      :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
-     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
      :                            %VAL( CNF_PVAL( IPWV1 ) ),
-     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
      :                            %VAL( CNF_PVAL( IPWD2 ) ),
-     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
      :                            %VAL( CNF_PVAL( IPWQ2 ) ),
-     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
      :                            %VAL( CNF_PVAL( IPVAR2 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPS1_RS1I( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
      :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
-     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
      :                            %VAL( CNF_PVAL( IPWV1 ) ),
-     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
      :                            %VAL( CNF_PVAL( IPWD2 ) ),
-     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
      :                            %VAL( CNF_PVAL( IPWQ2 ) ),
-     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
      :                            %VAL( CNF_PVAL( IPVAR2 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPS1_RS1R( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
      :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
-     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
      :                            %VAL( CNF_PVAL( IPWV1 ) ),
-     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
      :                            %VAL( CNF_PVAL( IPWD2 ) ),
-     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
      :                            %VAL( CNF_PVAL( IPWQ2 ) ),
-     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
      :                            %VAL( CNF_PVAL( IPVAR2 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPS1_RS1D( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
      :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
-     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
      :                            %VAL( CNF_PVAL( IPWV1 ) ),
-     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
      :                            %VAL( CNF_PVAL( IPWD2 ) ),
-     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
      :                            %VAL( CNF_PVAL( IPWQ2 ) ),
-     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
      :                            %VAL( CNF_PVAL( IPVAR2 ) ),
-     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
                END IF
@@ -999,7 +999,7 @@
                   CALL PSX_FREE( IPWQ2, STATUS )
                END IF
 
-*  Release the input array, which may be the original mapped NDF 
+*  Release the input array, which may be the original mapped NDF
 *  component or intermediately allocated workspace.
                IF ( IPDAT1 .EQ. IPDATI ) THEN
                   CALL NDF_UNMAP( NDFI, 'DATA', STATUS )
@@ -1019,12 +1019,12 @@
                   END IF
                END IF
 
-               IF ( HASAXI ) THEN 
-                  CALL NDF_AUNMP( NDFI, 'Centre', I, STATUS ) 
-                  CALL NDF_AUNMP( NDFO, 'Centre', I, STATUS ) 
+               IF ( HASAXI ) THEN
+                  CALL NDF_AUNMP( NDFI, 'Centre', I, STATUS )
+                  CALL NDF_AUNMP( NDFO, 'Centre', I, STATUS )
                END IF
 
-*  The output values for array shapes and pointers for this iteration 
+*  The output values for array shapes and pointers for this iteration
 *  become input values for the next iteration.
                DIM1( I ) = DIM2( I )
                IPDAT1 = IPDAT2
@@ -1042,44 +1042,44 @@
 *  Copy data directly between arrays.
 *  ==================================
 
-*  If no resampling had to be done (this includes the case where 
+*  If no resampling had to be done (this includes the case where
 *  LBOUND and UBOUND are changed by the same amount) then we just need
 *  to copy the data from the input arrays to the output arrays.
       ELSE
 
 *  Map the input and output data arrays.
-         CALL NDF_MAP( NDFI, 'DATA', ITYPE, 'READ', IPDATI, EL, 
+         CALL NDF_MAP( NDFI, 'DATA', ITYPE, 'READ', IPDATI, EL,
      :                 STATUS )
          CALL NDF_MAP( NDFO, 'DATA', ITYPE, 'WRITE', IPDATO, EL,
      :                 STATUS )
 
 *  Copy the data array across.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_CPNDB( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+            CALL KPG1_CPNDB( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                       1, EL,
      :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                        1, EL,
      :                        %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_CPNDW( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+            CALL KPG1_CPNDW( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                       1, EL,
      :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_CPNDUW( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+            CALL KPG1_CPNDUW( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                        1, EL,
      :                        %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+            CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                       1, EL,
      :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CPNDR( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+            CALL KPG1_CPNDR( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                       1, EL,
      :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+            CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                       1, EL,
      :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          END IF
@@ -1097,39 +1097,39 @@
 
 *  Copy the variance array across.
             IF ( ITYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_CPNDB( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+               CALL KPG1_CPNDB( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                          1, EL,
-     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-               CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+               CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                           1, EL,
-     :                           %VAL( CNF_PVAL( IPVARO ) ), 
+     :                           %VAL( CNF_PVAL( IPVARO ) ),
      :                           EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-               CALL KPG1_CPNDW( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+               CALL KPG1_CPNDW( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                          1, EL,
-     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-               CALL KPG1_CPNDUW( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+               CALL KPG1_CPNDUW( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                           1, EL,
-     :                           %VAL( CNF_PVAL( IPVARO ) ), 
+     :                           %VAL( CNF_PVAL( IPVARO ) ),
      :                           EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+               CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                          1, EL,
-     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_CPNDR( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+               CALL KPG1_CPNDR( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                          1, EL,
-     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+               CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                          1, EL,
-     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          EL2, STATUS )
             END IF
 
@@ -1142,11 +1142,11 @@
          IF ( HASQUA ) THEN
             CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, EL,
      :                    STATUS )
-            CALL NDF_MAP( NDFO, 'QUALITY', '_UBYTE', 'WRITE', IPQUAO, 
+            CALL NDF_MAP( NDFO, 'QUALITY', '_UBYTE', 'WRITE', IPQUAO,
      :                    EL, STATUS )
 
 *  Copy the quality array across.
-            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPQUAI ) ), 
+            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPQUAI ) ),
      :                        1, EL,
      :                        %VAL( CNF_PVAL( IPQUAO ) ), EL2, STATUS )
 
@@ -1168,7 +1168,7 @@
 
 *  Report a contextual message if anything went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'SQORST_ERR2', 
+         CALL ERR_REP( 'SQORST_ERR2',
      :                 'SQORST: Unable to squash/stretch NDF.', STATUS )
       END IF
 

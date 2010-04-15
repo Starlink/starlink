@@ -1,6 +1,6 @@
 proc red4CreWinMask {taskname} {
 #+
-# Creates a dialog box for red4 action 
+# Creates a dialog box for red4 action
 #-
     global env
     global Red4Widgets
@@ -33,7 +33,7 @@ proc red4CreWinMask {taskname} {
     set Red4Widgets(WM_ENT03) [entry $mid.e2]
     set l3 [label $mid.l3 -text "Ncols"]
     set Red4Widgets(WM_ENT04) [entry $mid.e3]
-    pack $ilabel $l1 $Red4Widgets(WM_ENT02) $l2 $Red4Widgets(WM_ENT03) $l3 $Red4Widgets(WM_ENT04) -in $mid -side left -padx 2 
+    pack $ilabel $l1 $Red4Widgets(WM_ENT02) $l2 $Red4Widgets(WM_ENT03) $l3 $Red4Widgets(WM_ENT04) -in $mid -side left -padx 2
     $Red4Widgets(WM_ENT02) insert end $Red4Widgets(MBPM_IMIN)
     $Red4Widgets(WM_ENT03) insert end $Red4Widgets(MBPM_JMIN)
     $Red4Widgets(WM_ENT04) insert end $Red4Widgets(MBPM_NCOL)
@@ -45,7 +45,7 @@ proc red4CreWinMask {taskname} {
     set Red4Widgets(WM_ENT06) [entry $bot.e5]
     set l6 [label $bot.l6 -text "Nrows"]
     set Red4Widgets(WM_ENT07) [entry $bot.e6]
-    pack $jlabel $l4 $Red4Widgets(WM_ENT05) $l5 $Red4Widgets(WM_ENT06) $l6 $Red4Widgets(WM_ENT07) -in $bot -side left -padx 2 
+    pack $jlabel $l4 $Red4Widgets(WM_ENT05) $l5 $Red4Widgets(WM_ENT06) $l6 $Red4Widgets(WM_ENT07) -in $bot -side left -padx 2
     $Red4Widgets(WM_ENT05) insert end $Red4Widgets(MBPM_IMAX)
     $Red4Widgets(WM_ENT06) insert end $Red4Widgets(MBPM_JMAX)
     $Red4Widgets(WM_ENT07) insert end $Red4Widgets(MBPM_NROW)

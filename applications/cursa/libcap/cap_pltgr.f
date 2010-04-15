@@ -492,7 +492,7 @@
 
 *
 *       Set the common block variable indicating which symbol has been
-*       used.  If the component PSYMB is a column rather than a 
+*       used.  If the component PSYMB is a column rather than a
 *       parameter then it is assumed that several symbols have been
 *       used and the common block variable is set to the value
 *       indicating 'various'.

@@ -32,10 +32,10 @@
 *        A pointer to the AST Frame describing user coords.
 *     LBINTB( 2 ) = INTEGER (Returned)
 *        The lower pixel bounds of the smallest box which contains all
-*        interior points in the region. 
+*        interior points in the region.
 *     UBINTB( 2 ) = INTEGER (Returned)
 *        The upper pixel bounds of the smallest box which contains all
-*        interior points in the region. 
+*        interior points in the region.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -48,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -72,7 +72,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -97,7 +97,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION 
+      DOUBLE PRECISION
      :        RLB,                 ! Axis lower bound in pixel coords
      :        RUB,                 ! Axis upper bound in pixel coords
      :        UBXLB( ARD__MXDIM ), ! Lower bounds of bounding box in user coords
@@ -113,10 +113,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get a bounding box for the region in user coords. 
+*  Get a bounding box for the region in user coords.
       CALL ARD1_UBBOX( 2, FRM, TYPE, NPAR, PAR, UBXLB, UBXUB, STATUS )
 
-*  Find the corresponding bounding box in pixel indices. 
+*  Find the corresponding bounding box in pixel indices.
       DO I = 1, 2
 
 *  Find the bounds in pixel coords on the current axis.
@@ -125,7 +125,7 @@
 
 *  Convert from pixel coords to pixel indices and store as the new
 *  interior bounding box. INclude a safety margin of 1 pixel.
-         LBINTB( I ) = INT( RLB ) 
+         LBINTB( I ) = INT( RLB )
          UBINTB( I ) = INT( RUB ) + 2
 
       END DO

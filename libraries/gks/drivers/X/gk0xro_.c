@@ -48,7 +48,7 @@ f77_integer gk0xro_(x, y, nxpix, nypix, xdim, raster)
               *raster;		/* Raster array (In) */
 {
   extern GC XDefaultGC();	/* for getting default GC */
-  extern int gk0xunportask();   
+  extern int gk0xunportask();
 
   f77_integer
     b_left,			/* Bounding box left limit */
@@ -80,12 +80,12 @@ f77_integer gk0xro_(x, y, nxpix, nypix, xdim, raster)
 
   for (line_offset = 0, yr = 0; yr < *nypix; line_offset += *xdim, yr++)
     for (xr = 0; xr < *nxpix; xr++)
-    { 
+    {
       /* Set pixel value, ensuring that it is inside the wkstn colour table */
-      value = (int)raster[line_offset+xr] % gkywdt_.kpci[wsid]; 
+      value = (int)raster[line_offset+xr] % gkywdt_.kpci[wsid];
 
       XSetForeground(display, LGC, (unsigned long)gk0xcc_(&value));
-      XDrawPoint(display, (Drawable *)gk0xunportask(ddbm,ASKBMMEMORY),LGC, 
+      XDrawPoint(display, (Drawable *)gk0xunportask(ddbm,ASKBMMEMORY),LGC,
                  x0 + xr, y0 + yr);
     }
 

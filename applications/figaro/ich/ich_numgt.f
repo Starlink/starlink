@@ -4,7 +4,7 @@ C+
 C
 C     I C H _ N U M G T
 C
-C     Examines a character string containing a sequence of 
+C     Examines a character string containing a sequence of
 C     free-format numbers and returns those numbers.  ICH_NUMGT
 C     is really just a sequence of calls to ICH_NUMBR.
 C
@@ -29,7 +29,7 @@ C
 C     (>) TERMS       (Character) The set of characters that are
 C                     allowed to terminate the string.  Note that
 C                     TERMS should be a subset of DELIMS.
-C     
+C
 C     (>) NVALS       (Integer) The number of values expected in
 C                     the string.
 C
@@ -46,7 +46,7 @@ C                          or the end of the string was reached.
 C                     1  => Error.  There was a non-numeric string
 C                          found.
 C
-C     (<) NEXT        (Integer) The number of the character 
+C     (<) NEXT        (Integer) The number of the character
 C                     following the delimiter of the last value.
 C                     If this is past the end of STRING, NEXT is
 C                     returned as zero.

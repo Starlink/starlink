@@ -109,7 +109,7 @@ C     If there is, we can go into more detail.
 C
       IF (IFILE.EQ.0) THEN
          CALL DSA_WRUSER(NAME(:LENGTH))
-      ELSE 
+      ELSE
          IF (IDOT.EQ.0) THEN
             CALL DSA_WRUSER('the main object ')
          ELSE

@@ -1,7 +1,7 @@
 C+
       SUBROUTINE ECH_ARCONE(NLARCS,ARC1,ARC2,ARC3,NARCS,ARC)
 C
-C     E C H _ A R C O N E 
+C     E C H _ A R C O N E
 C
 C     ECHARC utility. Combines the entries from the arrays ARCn
 C     (n=1,2,3) into the ONE single array ARC.

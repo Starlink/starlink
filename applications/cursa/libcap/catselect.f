@@ -255,7 +255,7 @@
 *        as sexagesimal hours then the hours, minutes and seconds must
 *        be separated by a colon (':').  Optionally fractional
 *        seconds can be specified by including a decimal point and the
-*        required number of places of decimals.  A negative angle may 
+*        required number of places of decimals.  A negative angle may
 *        be specified by preceding the value by a minus sign.
 *
 *        Examples: an angle of 10 hours, 30 minutes and 15.3 seconds
@@ -272,7 +272,7 @@
 *        as sexagesimal degrees then the degrees, minutes and seconds must
 *        be separated by a colon (':').  Optionally fractional
 *        seconds can be specified by including a decimal point and the
-*        required number of places of decimals.  A negative angle may 
+*        required number of places of decimals.  A negative angle may
 *        be specified by preceding the value by a minus sign.
 *
 *        Examples: a negative angle of 33 degrees, 30 minutes and 15.2
@@ -521,7 +521,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 *  Local Variables:
-      INTEGER 
+      INTEGER
      :  CIIN,       ! Identifier for the input  catalogue.
      :  CIOUT,      !     "       "   "  output     "    .
      :  CIREJ,      !     "       "   "  rejects    "     (optional).
@@ -649,7 +649,7 @@
      :              STATUS)
                   CALL MSG_OUT (' ', 'N ... every Nth entry.',
      :              STATUS)
-C                 CALL MSG_OUT (' ', 
+C                 CALL MSG_OUT (' ',
 C     :              'L ... N largest or smallest entries for '/
 C     :              /'some column.', STATUS)
                   CALL MSG_OUT (' ', 'H ... list options.',
@@ -733,7 +733,7 @@ C     :              /'some column.', STATUS)
                   CALL PAR_GET0C ('MAXRNG', MAXRNG, STATUS)
                   CALL PAR_CANCL ('MAXRNG', STATUS)
 
-                  CALL CAP_RANGE (CIIN, PNAME, MINRNG, MAXRNG, 
+                  CALL CAP_RANGE (CIIN, PNAME, MINRNG, MAXRNG,
      :              REJCAT, SI, NUMSEL, SIR, NUMREJ, CRIT, STATUS)
 
 *
@@ -857,7 +857,7 @@ C     :              /'some column.', STATUS)
                   IF (STATUS .EQ. SAI__OK) THEN
 
 *
-*                   Determine the names of the polygon X and Y columns 
+*                   Determine the names of the polygon X and Y columns
 *                   for the selection.
 
                      CALL PAR_DEF0C ('XPLCOL', XCOL, STATUS)

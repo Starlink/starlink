@@ -1,4 +1,4 @@
-*+  ADDLINE - add line in image at user specified value 
+*+  ADDLINE - add line in image at user specified value
 
       SUBROUTINE ADDLINE ( STATUS )
 
@@ -31,7 +31,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -46,8 +46,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -68,7 +68,7 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
+     :  PNTRI,                !    "     " input      "
      :  LINENUM               ! line number (col or row) to be modified
 
       REAL
@@ -108,18 +108,18 @@
             CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :                    PNTRO, NELEMENTS, STATUS )
 
-*          check for error before getting exclusion region and 
+*          check for error before getting exclusion region and
 *          accessing pointers
             IF( STATUS .EQ. SAI__OK ) THEN
 
-*            ask user for input 
+*            ask user for input
 	      CALL PAR_GET0C( 'COLORROW', COLORROW, STATUS)
 	      CALL PAR_GET0I( 'LINENUM', LINENUM, STATUS)
 	      CALL PAR_GET0R( 'LINEVAL', LINEVAL, STATUS)
 
 *            pass everything to the work routine
-              CALL ADDLINESUB( DIMS( 1), DIMS( 2), %VAL( PNTRI), 
-     :	                       ODIMS( 1), ODIMS( 2), %VAL( PNTRO), 
+              CALL ADDLINESUB( DIMS( 1), DIMS( 2), %VAL( PNTRI),
+     :	                       ODIMS( 1), ODIMS( 2), %VAL( PNTRO),
      :                         COLORROW, LINENUM, LINEVAL,
      :	                       STATUS)
 

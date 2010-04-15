@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_AGNST( IPLOT, NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2, 
+      SUBROUTINE KPS1_AGNST( IPLOT, NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2,
      :                       X, Y, NREG, STATUS )
 
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_AGNST( IPLOT, NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2, X, Y, 
+*     CALL KPS1_AGNST( IPLOT, NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2, X, Y,
 *                      NREG, STATUS )
 
 *  Description:
@@ -45,7 +45,7 @@
 *     Y2 = REAL (Given)
 *        World y co-ordinate of the top right-hand corner of image.
 *     X( NPTS ) = DOUBLE PRECISION (Given)
-*        The x co-ordinate of the points and other region defining 
+*        The x co-ordinate of the points and other region defining
 *        information. Given in the current Frame of IPLOT.
 *     Y( NPTS ) = DOUBLE PRECISION (Given)
 *        The y co-ordinate of the points and other region-defining
@@ -88,7 +88,7 @@
 *     11-NOV-1994 (GJP)
 *        Added ARD further keywords.
 *     5-DEC-1994 (DSB)
-*        Tidied up.  Name changed from ARDG1_STRING to KPS1_AGNST. 
+*        Tidied up.  Name changed from ARDG1_STRING to KPS1_AGNST.
 *        Store the ARD description in a GRP group instead of
 *        writing it directly to a file.  Round values to 1 decimal
 *        place.
@@ -111,7 +111,7 @@
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER IPLOT
@@ -132,14 +132,14 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      DOUBLE PRECISION PI        
+      DOUBLE PRECISION PI
       PARAMETER ( PI = 3.1415926535898D0 )
 
       DOUBLE PRECISION PIBY2
       PARAMETER ( PIBY2 = PI/2 )
 
-      DOUBLE PRECISION RTOD      
-      PARAMETER ( RTOD = 180/PI ) 
+      DOUBLE PRECISION RTOD
+      PARAMETER ( RTOD = 180/PI )
 
 *  Local Variables:
       CHARACTER LINE*(GRP__SZNAM)! Buffer for writing ARD output file
@@ -148,9 +148,9 @@
       DOUBLE PRECISION P3( NDF__MXDIM ) ! Position 3
       DOUBLE PRECISION P4( NDF__MXDIM ) ! Position 4
       DOUBLE PRECISION P5( NDF__MXDIM ) ! Position 5
-      DOUBLE PRECISION PA1       ! Position angle 
-      DOUBLE PRECISION PA2       ! Position angle 
-      DOUBLE PRECISION PA3       ! Position angle 
+      DOUBLE PRECISION PA1       ! Position angle
+      DOUBLE PRECISION PA2       ! Position angle
+      DOUBLE PRECISION PA3       ! Position angle
       DOUBLE PRECISION MD        ! Min distance to edge
       DOUBLE PRECISION D1        ! A distance
       DOUBLE PRECISION D2        ! A distance
@@ -174,12 +174,12 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the initial value for output string.
-      LINE = ' ' 
+      LINE = ' '
 
 *  Set the "characters used" counter to zero.
       NC = 0
 
-*  Get a pointer to the Frame in which positions are supplied (the current 
+*  Get a pointer to the Frame in which positions are supplied (the current
 *  Frame of IPLOT).
       CFRM = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
 
@@ -214,7 +214,7 @@
          NC = NC + 1
          CALL CHR_APPND( AST_FORMAT( CFRM, 2, WD, STATUS ), LINE, NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
- 
+
 *  Frame.
       ELSE IF ( ARDDEF .EQ. 'FRAME' ) THEN
 
@@ -226,13 +226,13 @@
      :       MIN( ABS( Y2 - YC ), ABS( YC - Y1 ) ) ) THEN
             IF( ABS( X2 - XC ) .LT. ABS( XC - X1 ) ) THEN
                XC = X2
-            ELSE           
+            ELSE
                XC = X1
             END IF
          ELSE
             IF( ABS( Y2 - YC ) .LT. ABS( YC - Y1 ) ) THEN
                YC = Y2
-            ELSE           
+            ELSE
                YC = Y1
             END IF
          END IF
@@ -251,7 +251,7 @@
 *  Create the string.
          CALL CHR_APPND( 'FRAME(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, MD, STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, MD, STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
 
@@ -261,11 +261,11 @@
 *  Create the string.
          CALL CHR_APPND( 'POINT(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
 
@@ -275,7 +275,7 @@
 *  Create the string.
          CALL CHR_APPND( 'ROW(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
 
@@ -285,7 +285,7 @@
 *  Create the string.
          CALL CHR_APPND( 'RECT(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
@@ -332,7 +332,7 @@
          PA2 = PA2 + DANG
 
 *  Offset in this direction for half the box width to arrive at the box
-*  centre. Turn through 90 degrees to get the position angle parallel to 
+*  centre. Turn through 90 degrees to get the position angle parallel to
 *  the first side at the centre.
          PA3 = AST_OFFSET2( CFRM, P4, PA2, 0.5*WD, P5, STATUS )
          PA3 = PA3 - DANG
@@ -340,7 +340,7 @@
 *  Create the string.
          CALL CHR_APPND( 'ROTBOX(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, P5( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, P5( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
@@ -365,7 +365,7 @@
 *  Create the string.
          CALL CHR_APPND( 'COLUMN(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
 
@@ -380,7 +380,7 @@
          SMA = AST_DISTANCE( CFRM, P1, P2, STATUS )
 
 *  Find the angle from axis 1 to the semi-major axis. Invert because ARD
-*  measures angles anti-clockwise (+x through +y) but AST measures them 
+*  measures angles anti-clockwise (+x through +y) but AST measures them
 *  clockwise (+x through -y).
          PA1 = -AST_AXANGLE( CFRM, P1, P2, 1, STATUS )
 
@@ -401,7 +401,7 @@
 *  Create the string.
          CALL CHR_APPND( 'ELLIPSE(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
@@ -419,11 +419,11 @@
          NC = NC + 1
          CALL CHR_PUTR( REAL( PA1*RTOD ), LINE, NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
- 
-*  Circle. 
+
+*  Circle.
       ELSE IF ( ARDDEF .EQ. 'CIRCLE' ) THEN
 
-*  Find the circle radius. 
+*  Find the circle radius.
          P1( 1 ) = X( 1 )
          P1( 2 ) = Y( 1 )
          P2( 1 ) = X( 2 )
@@ -433,15 +433,15 @@
 *  Create the string.
          CALL CHR_APPND( 'CIRCLE(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, RADIUS, STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, RADIUS, STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
 
@@ -451,19 +451,19 @@
 *  Create the string.
          CALL CHR_APPND( 'LINE(', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 2 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 2 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
-         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 2 ), STATUS ), LINE, 
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 2 ), STATUS ), LINE,
      :                   NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
 

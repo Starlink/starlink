@@ -14,7 +14,7 @@
 #     This class creates a widget consisting of two orthogonal
 #     arrows. It is intended for using in positioning other widgets in
 #     two dimensions (like fine adjusting the scroll position of an
-#     image). 
+#     image).
 
 #  Invocations:
 #
@@ -78,11 +78,11 @@
 itk::usual ScrollArrows {}
 
 itcl::class gaia::ScrollArrows {
-   
+
    #  Inheritances:
    #  -------------
    inherit util::FrameWidget
-   
+
    #  Constructor.
    constructor {args} {
       eval itk_initialize $args
@@ -126,7 +126,7 @@ itcl::class gaia::ScrollArrows {
       table $w_ $itk_component(right) 1,2
       table $w_ $itk_component(down)  2,1
    }
-   
+
    #  Destructor:
    #  -----------
    destructor  {

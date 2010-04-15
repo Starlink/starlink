@@ -15,7 +15,7 @@
 *  Description:
 *     The given string is right-justified by filling out the spaces
 *     between words with additional blank space. The right margin is
-*     taken as the declared length of the given string. Unprintable 
+*     taken as the declared length of the given string. Unprintable
 *     characters are interpreted as blanks.
 
 *  Arguments:
@@ -31,12 +31,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -164,7 +164,7 @@
                INEW = INEW - PAD
                STRING( INEW : INEW+PAD-1 ) = ' '
 
-*           Pad the last NGAP0 gaps with an extra space to make up any 
+*           Pad the last NGAP0 gaps with an extra space to make up any
 *           remainder.
                IF ( NGAP .LE. NGAP0 ) THEN
                   INEW = INEW - 1

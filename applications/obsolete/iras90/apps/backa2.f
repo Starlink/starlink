@@ -166,8 +166,8 @@
 
 *  Now describe the estimated background.
       IF( TYPE .EQ. 'UNIFORM' ) THEN
-         CALL MSG_SETR( 'R', REMOVE )         
-         CALL MSG_SETC( 'U', IRC__MJPS )         
+         CALL MSG_SETR( 'R', REMOVE )
+         CALL MSG_SETC( 'U', IRC__MJPS )
          CALL MSG_LOAD( ' ', '   A uniform background of ^R ^U was '//
      :                  'subtracted', TEXT( L ), LENGTH, STATUS )
          L = L + 1
@@ -178,14 +178,14 @@
          L = L + 1
 
          CALL MSG_SETR( 'G', REAL( GRAD*IRA__AM2R ) )
-         CALL MSG_SETC( 'U', IRC__MJPS )         
+         CALL MSG_SETC( 'U', IRC__MJPS )
          CALL MSG_LOAD( ' ', '     Gradient: ^G ^U per arc-minute',
      :                  TEXT( L ), LENGTH, STATUS )
          L = L + 1
 
          CALL MSG_SETI( 'DN', DNLOW )
          CALL MSG_SETR( 'O', OFFSET )
-         CALL MSG_SETC( 'U', IRC__MJPS )         
+         CALL MSG_SETC( 'U', IRC__MJPS )
          CALL MSG_SETI( 'S', SLOW )
 
          CALL MSG_LOAD( ' ', '     Offset: ^O ^U at sample ^S in '//

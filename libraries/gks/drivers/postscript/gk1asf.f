@@ -73,7 +73,7 @@
       LCOORD = 7
       LCF    = 7
       GOTO 999
- 
+
    15 CONTINUE
 *     Test for Format F7.1 (all coords within A3 rectangle will fit)
       ISTART = IR
@@ -86,13 +86,13 @@
       LCOORD = 8
       LCF    = 7
       GOTO 999
- 
+
    25 CONTINUE
- 
+
 *     Else return maximum format (few coords should have to go here)
       FCOORD = '(F11.1) '
       LCOORD = 12
       LCF    = 8
- 
+
   999 CONTINUE
       END

@@ -6,7 +6,7 @@
 2004-07-20  Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* Versions/Versions.pm: Recognize MANIFEST files
-	
+
 2004-07-19  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Config/Makefile.PL: Now recognizes STARCONF_DEFAULT variables

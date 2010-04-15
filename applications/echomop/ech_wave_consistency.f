@@ -383,7 +383,7 @@
             SAMPLE_COUNT( IORD ) = 0
          END DO
 
-*     Loop through each X-increment using order polynomials to predict 
+*     Loop through each X-increment using order polynomials to predict
 *     wavelengths.
          X_STEP = MAX( 1, NX / ( MAXIMUM_SAMPLE / 4 ) )
          XCOUNT = 0
@@ -414,9 +414,9 @@
 
 *              If X and X+1 samples are in a stable polynomial region then.
                   IF ( ABS( FIT_COORD( IORD ) - NEXT ) .LT. 1.0 .AND.
-     :                 FIT_COORD( IORD ) .GE. 
+     :                 FIT_COORD( IORD ) .GE.
      :                 SEAR_START_WAVE( IORD ) .AND.
-     :                 FIT_COORD( IORD ) .LE. 
+     :                 FIT_COORD( IORD ) .LE.
      :                 SEAR_END_WAVE( IORD ) ) THEN
 
 *                 Save order number and wavelength.
@@ -439,7 +439,7 @@
      :           COUNT, O_NUMBER, Y_COORDS, FIT_WORK_XREAL,
      :           NREJ, THRESH, STATUS )
 
-*        Loop evaluating predicted Y-coordinates for each order at this 
+*        Loop evaluating predicted Y-coordinates for each order at this
 *        increment.
             DO IORD = 1, N_ORDERS
                FIT2_COORD  = TEMP_COEFFS( IPOLY )
@@ -468,7 +468,7 @@
                      MEAN_DEVIATION( IORD ) = MEAN_DEVIATION( IORD ) +
      :                     DEVIATION
                      MEANSQ_DEVIATION( IORD ) =
-     :                     MEANSQ_DEVIATION( IORD ) + 
+     :                     MEANSQ_DEVIATION( IORD ) +
      :                     DEVIATION * DEVIATION
                      SAMPLE_COUNT( IORD ) = SAMPLE_COUNT( IORD )  + 1
                      MEANDEV_AT_X( XCOUNT ) = MEANDEV_AT_X( XCOUNT ) +
@@ -527,9 +527,9 @@
 *              If x and x+1 samples are in a stable polynomial region then
 *              save order number and Y-coordinate.
                   IF ( ABS( FIT_COORD( IORD ) - NEXT ) .LT. 1.0 .AND.
-     :                 FIT_COORD( IORD ) .GE. 
+     :                 FIT_COORD( IORD ) .GE.
      :                 SEAR_START_WAVE( IORD ) .AND.
-     :                 FIT_COORD( IORD ) .LE. 
+     :                 FIT_COORD( IORD ) .LE.
      :                 SEAR_END_WAVE( IORD ) ) THEN
                      COUNT = COUNT + 1
                      O_NUMBER( COUNT ) = DBLE( ORDER_IDNUMS( IORD ) )
@@ -551,7 +551,7 @@
      :           O_NUMBER, Y_COORDS, FIT_WORK_XREAL,
      :           NREJ, THRESH, STATUS )
 
-*        Loop evaluating predicted Y-coordinates for each order at this 
+*        Loop evaluating predicted Y-coordinates for each order at this
 *        increment.
             DO iord = 1, n_orders
                fit2_coord  = temp_coeffs ( ipoly )
@@ -662,7 +662,7 @@
                   X_GRAPH( I ) = REAL( X_TRACE_COORD( I ) )
                   Y_GRAPH( I ) = REAL( TRACE_RE_FITS( I, IORD ) )
                END DO
-               WAVE_FIT_DELTA = 3 * ABS( Y_GRAPH( XCOUNT ) - 
+               WAVE_FIT_DELTA = 3 * ABS( Y_GRAPH( XCOUNT ) -
      :               Y_GRAPH( 1 ) ) / X_GRAPH( XCOUNT )
                IF ( WAVE_COEFFS( 1, IORD ) .EQ. ECH__BAD_DOUBLE .OR.
      :              WAVE_COEFFS( 1, IORD ) .EQ. 0.0 ) THEN

@@ -36,7 +36,7 @@ C
 C   END     Coordinate in each dimension of IMAGE at which the subset
 C           operation is to end. (real, array)(prompted for).
 C
-C   OUTPUT  Name of the structure containing the image subset. May be the 
+C   OUTPUT  Name of the structure containing the image subset. May be the
 C           same as IMAGE. (character)(prompted for).
 C
 C   Keywords
@@ -46,7 +46,7 @@ C
 C
 C   Propagation of data structure
 C   -----------------------------
-C   - All standard objects except the data array and axes are copied from 
+C   - All standard objects except the data array and axes are copied from
 C     IMAGE.
 C   - Data array and axes are reshaped.
 C
@@ -54,11 +54,11 @@ C
 C   Method
 C   ------
 C   - The structure IMAGE is copied to OUTPUT, with the exception of the
-C     data array and axes. DSA_RESHAPE_ routines are called to modify the 
-C     dimensions of the OUTPUT axis and data arrays. 
+C     data array and axes. DSA_RESHAPE_ routines are called to modify the
+C     dimensions of the OUTPUT axis and data arrays.
 C   - The calibrations of the appropriate parts of the IMAGE axes are copied
-C     to the OUTPUT axes. 
-C   - A subroutine appropriate to the data type is called to transfer the 
+C     to the OUTPUT axes.
+C   - A subroutine appropriate to the data type is called to transfer the
 C     required subset of the IMAGE data array to the OUTPUT data array.
 C
 C
@@ -72,7 +72,7 @@ C     DSA_MAP_AXIS_DATA
 C     DSA_MAP_DATA
 C     DSA_MAP_ERRORS
 C     DSA_MAP_QUALITY
-C     DSA_OPEN 
+C     DSA_OPEN
 C     DSA_OUTPUT
 C     DSA_RESHAPE_AXIS
 C     DSA_RESHAPE_DATA
@@ -107,8 +107,8 @@ C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
 C   INCLUDE 'MAGIC_VALUES'
 C   INCLUDE 'NUMERIC_RANGES'
-C                                             
-C     
+C
+C
 C   Extensions to FORTRAN77
 C   -----------------------
 C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
@@ -133,7 +133,7 @@ C   06-OCT-1994   - Removed lots of unused variables. (GJP)
 C
 C
 C+-----------------------------------------------------------------------------
-C      
+C
       IMPLICIT NONE
 C
 C     Functions used
@@ -208,7 +208,7 @@ C
       IF(STATUS.NE.0)GO TO 500
 C
 C     Get information about IMAGE
-C                                      
+C
       CALL NDP_GET_IMAGE_INFO('IMAGE',.TRUE.,.FALSE.,TYPE,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
       CALL DSA_SEEK_ERRORS('IMAGE',ERR,STATUS)
@@ -225,22 +225,22 @@ C
       END DO
 C
 C     Map IMAGE axes
-C             
+C
       DO I=1,NDIM
         CALL DSA_MAP_AXIS_DATA
      &    ('IMAGE',I,'READ','FLOAT',ADDRESS,AXSLOT(I),STATUS)
         IF(STATUS.NE.0)GO TO 500
         AXPTR(I)=DYN_ELEMENT(ADDRESS)
-      END DO   
+      END DO
 C
 C     Set coordinate limits
-C                                                  
+C
       DO I=1,NDIM
         SMIN(I)=GEN_ELEMF(DYNAMIC_MEM(AXPTR(I)),1)
         EMIN(I)=SMIN(I)
         SMAX(I)=GEN_ELEMF(DYNAMIC_MEM(AXPTR(I)),DIMS(I))
         EMAX(I)=SMAX(I)
-      END DO 
+      END DO
 C
 C     Get coordinates of subset
 C
@@ -255,11 +255,11 @@ C
       END DO
 C
 C     Compute dimensions and number of elements in subset
-C                                 
+C
       J=0
       ONDIM=0
       ONELM=1
-      DO I=1,NDIM                                 
+      DO I=1,NDIM
         IF(STAPIX(I).NE.ENDPIX(I))THEN
           J=J+1
           ONDIM=ONDIM+1
@@ -267,14 +267,14 @@ C
           ONELM=ONELM*ODIMS(J)
         END IF
       END DO
-C                    
+C
 C     Open file for OUTPUT
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',NO_DATA,NEW_FILE,STATUS)
       IF(STATUS.NE.0)GO TO 500
 C
 C     Reshape OUTPUT data array
-C                     
+C
       CALL DSA_WRUSER('%SUBSET-I-RESHAPE  ')
       CALL DSA_WRUSER('Reshaping output data array\\N')
       CALL DSA_RESHAPE_DATA('OUTPUT','IMAGE',ONDIM,ODIMS,STATUS)
@@ -299,10 +299,10 @@ C
           OAXPTR(J)=DYN_ELEMENT(ADDRESS)
 C
 C     - copy values from corresponding IMAGE axis
-C           
+C
           CALL SUBSET_NEWAXIS
      &      (DYNAMIC_MEM(AXPTR(I)),DYNAMIC_MEM(OAXPTR(J)),
-     &       DIMS(I),ODIMS(J),STAPIX(I))       
+     &       DIMS(I),ODIMS(J),STAPIX(I))
         END IF
       END DO
 C
@@ -324,7 +324,7 @@ C
         CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,ISLOT,STATUS)
       END IF
       IF(STATUS.NE.0)GO TO 500
-      IMPTR=DYN_ELEMENT(ADDRESS)                 
+      IMPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Map OUTPUT data array
 C
@@ -424,7 +424,7 @@ C
       REAL      ARRAY(NELM),OARRAY(ONELM)
 C
 C     Local variables
-C                     
+C
       INTEGER   I            ! Loop counter
       INTEGER   J            ! Loop counter
 C
@@ -437,7 +437,7 @@ C
 C
       END
 
-                
-                                                      
 
-                                                   
+
+
+

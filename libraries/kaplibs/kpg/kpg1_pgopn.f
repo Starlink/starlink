@@ -15,8 +15,8 @@
 *  Description:
 *     This routine opens the graphics database and activates a PGPLOT
 *     workstation selected using the specified parameter. The user's
-*     palette and colour table is then re-instated, over-riding the 
-*     those established by PGPLOT. 
+*     palette and colour table is then re-instated, over-riding the
+*     those established by PGPLOT.
 *
 *     The device should normally be shut down using KPG1_PGCLS.
 
@@ -24,7 +24,7 @@
 *     PNAME = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use.
 *     MODE = CHARACTER * ( * ) (Given)
-*        The AGI access mode; "WRITE" or "UPDATE". Write causes the 
+*        The AGI access mode; "WRITE" or "UPDATE". Write causes the
 *        current picture to be cleared (the contents of the database are
 *        unaffected).
 *     IPIC = INTEGER (Returned)
@@ -33,8 +33,8 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1999, 2002, 2003, 2004 Central Laboratory of the 
-*     Research Councils.  Copyright (C) 2005, 2006 Particle Physics & 
+*     Copyright (C) 1999, 2002, 2003, 2004 Central Laboratory of the
+*     Research Councils.  Copyright (C) 2005, 2006 Particle Physics &
 *     Astronomy Research Council.  All Rights Reserved.
 
 *  Licence:
@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -65,7 +65,7 @@
 *     18-MAR-2003 (DSB):
 *        Check STATUS before calling PGPLOT routines ("CALL PG...") .
 *     12-OCT-2004 (DSB):
-*        Call to PGERAS replaced by KPG1_PGCLR in order to clear the current 
+*        Call to PGERAS replaced by KPG1_PGCLR in order to clear the current
 *        picture rather than the whole device if mode is WRITE.
 *     6-JAN-2005 (DSB):
 *        Check STATUS before calling PGQCR.
@@ -77,7 +77,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,8 +98,8 @@
       CHARACTER CHR_UPPER        ! Return an uppercase character
 
 *  Local Variables:
-      REAL ROLD, GOLD, BOLD      ! Default background RGB values 
-      REAL R, G, B               ! User's background RGB values 
+      REAL ROLD, GOLD, BOLD      ! Default background RGB values
+      REAL R, G, B               ! User's background RGB values
 *.
 
 *  Check the inherited global status.
@@ -128,17 +128,17 @@
       IF( STATUS .EQ. SAI__OK ) CALL PGQCR( 0, ROLD, GOLD, BOLD )
 
 *  PGPLOT resets the colour table each time it is opened. So re-instate
-*  the user's palette and LUT by loading them from previously saved files 
+*  the user's palette and LUT by loading them from previously saved files
 *  (see KPG1_PLSAV and KPG1_LTSAV).
       CALL KPG1_PLLOD( STATUS )
       CALL KPG1_LTLOD( STATUS )
 
-*  If the device was cleared on opening (within AGI_ASSOC), it will have 
+*  If the device was cleared on opening (within AGI_ASSOC), it will have
 *  been cleared using the default background colour provided by PGPLOT.
 *  We have now loaded a potentially different user palette, which may
 *  have a different background colour, so clear the screen again if the
 *  backgrond colour has changed.
-      IF( STATUS .EQ. SAI__OK .AND. 
+      IF( STATUS .EQ. SAI__OK .AND.
      :    CHR_UPPER( MODE( 1:1 ) ) .EQ. 'W' ) THEN
          CALL PGQCR( 0, R, G, B )
          IF( R .NE. ROLD .OR. G .NE. GOLD .OR. B .NE. BOLD ) THEN
@@ -147,7 +147,7 @@
       END IF
 
 *  Attempt to close down the device if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) CALL KPG1_PGCLS( PNAME, .FALSE., 
+      IF( STATUS .NE. SAI__OK ) CALL KPG1_PGCLS( PNAME, .FALSE.,
      :                                           STATUS )
 
       END

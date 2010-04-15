@@ -101,7 +101,7 @@
 *     Enter it in the hash table
 
       N = GEN_HASHINS (NAME(INDEX(NAME,'*')+1:), 503,
-     &                 ENTRY, NO_ENTRIES) 
+     &                 ENTRY, NO_ENTRIES)
       IF (N .EQ. -1) THEN
         PRINT *,'-- gen_makesym1 --'
         PRINT *,'   hash table full'

@@ -134,7 +134,7 @@ itcl::class gaia::LabelScale {
          increment $sign
       }
    }
-   
+
    #  Stop incrementing.
    protected method stop_increment {} {
       if { $afterId_ != {} } {
@@ -156,7 +156,7 @@ itcl::class gaia::LabelScale {
       }
       set afterId_ [after $itk_option(-delay) [code $this increment $sign]]
    }
-   
+
    #  This method is called for changes in the scale widget. It does
    #  nothing unless the value has changed, since the Scale has a
    #  motion event that is constantly being invoked.
@@ -168,12 +168,12 @@ itcl::class gaia::LabelScale {
          }
       }
    }
-   
+
    #  Set the value (match scale interface).
    public method set {value} {
       configure -value $value
    }
-   
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -190,31 +190,31 @@ itcl::class gaia::LabelScale {
          $itk_component(right) configure -bitmap right
       }
    }
-   
+
    #  Scale range -from.
    itk_option define -from from From 0 {
       $itk_component(scale) config -from $itk_option(-from)
    }
-   
+
    #  Scale range -to.
    itk_option define -to to To 1 {
       $itk_component(scale) config -to $itk_option(-to)
    }
-   
+
    #  Set the value for scale.
    itk_option define -value value Value 0 {
       $itk_component(scale) set $itk_option(-value)
    }
-   
+
    #  Flag: if true, display left and right arrows for incrementing the value
    itk_option define -show_arrows show_arrows Show_arrows 0
-   
+
    #  Amount to add or subtract for each button push
    itk_option define -increment increment Increment 1
-   
+
    #  Command to execute when the value changes
    itk_option define -command command Command {}
-   
+
    #  Set the state to normal or disabled (greyed out)
    itk_option define -state state State normal {
       $itk_component(scale) config -state $itk_option(-state)
@@ -236,6 +236,6 @@ itcl::class gaia::LabelScale {
 
    #  Common variables: (shared by all instances)
    #  -----------------
-   
+
 #  End of class definition.
 }

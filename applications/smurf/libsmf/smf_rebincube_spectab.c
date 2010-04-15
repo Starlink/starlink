@@ -15,7 +15,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping ssmap, 
+*     smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping ssmap,
 *                            int **pspectab, int *status )
 
 *  Arguments:
@@ -25,14 +25,14 @@
 *     nchanout = dim_t (Given)
 *        The number of spectral channels in the output (or sky cube) NDF.
 *     ssmap = AstMapping * (Given)
-*        A Mapping that goes from time series spectral grid axis (pixel 
+*        A Mapping that goes from time series spectral grid axis (pixel
 *        axis 1) to the sky cube spectral grid axis (pixel axis 3).
 *     pspectab = int ** (Returned)
 *        An address at which to store a pointer to an array of "int"s.
 *        This array will have "nchan" elements, and each element will
-*        hold the integer index (zero-based) of the nearest neighbouring 
-*        output channel. A value of -1 will be stored for input channels 
-*        that do not have any corresponding output channel. The returned 
+*        hold the integer index (zero-based) of the nearest neighbouring
+*        output channel. A value of -1 will be stored for input channels
+*        that do not have any corresponding output channel. The returned
 *        pointer should be freed using astFree when no longer needed. A
 *        NULL pointer is returned if an error occurs.
 *     status = int * (Given and Returned)
@@ -90,7 +90,7 @@
 
 #define FUNC_NAME "smf_rebincube_spectab"
 
-void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap, 
+void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap,
                             int **pspectab, int *status ){
 
 /* Local Variables */
@@ -127,7 +127,7 @@ void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap,
       if( w2[ ichan ] != AST__BAD ) {
          spectab[ ichan ] = floor( w2[ ichan ] + 0.5 ) - 1;
          if( spectab[ ichan ] < 0 || spectab[ ichan ] >= nchanout ) {
-            spectab[ ichan ] = -1; 
+            spectab[ ichan ] = -1;
          }
       } else {
          spectab[ ichan ] = -1;

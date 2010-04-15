@@ -1,4 +1,4 @@
-      SUBROUTINE NDP_GET_IMAGE_INFO                         
+      SUBROUTINE NDP_GET_IMAGE_INFO
      &  (REF_NAME,DISPLAY,WARNING,TYPE_UC,BADPIX,STATUS)
 C+
 C
@@ -10,8 +10,8 @@ C   Description
 C   -----------
 C   Returns the data array type of an image and its bad data flag value.
 C
-C   Also, if instructed, displays the following information about the image: 
-C     full file name, 
+C   Also, if instructed, displays the following information about the image:
+C     full file name,
 C     object name (i.e. image label),
 C     data range,
 C     data array type,
@@ -20,12 +20,12 @@ C     presence of quality or error arrays
 C     and for each axis:
 C       dimension,
 C       range of calibrations,
-C       label, 
+C       label,
 C       units.
-C     
-C   Also, if instructed, displays a warning message if the data array type 
-C   is SHORT or INT, to advise the user of possible integer truncation and 
-C   overflow errors. This would only be appropriate when the calling program 
+C
+C   Also, if instructed, displays a warning message if the data array type
+C   is SHORT or INT, to advise the user of possible integer truncation and
+C   overflow errors. This would only be appropriate when the calling program
 C   performs floating point computations.
 C
 C
@@ -51,13 +51,13 @@ C     DSA_DATA_TYPE
 C     DSA_GET_ACTUAL_NAME
 C     DSA_GET_AXIS_INFO
 C     DSA_GET_DATA_INFO
-C     DSA_GET_RANGE  
+C     DSA_GET_RANGE
 C     DSA_MAP_AXIS_DATA
 C     DSA_SEEK_AXIS
 C     DSA_SEEK_FLAGGED_VALUES
 C     DSA_SEEK_ERRORS
 C     DSA_SEEK_QUALITY
-C     DSA_SEEK_RANGE  
+C     DSA_SEEK_RANGE
 C     DSA_UNMAP
 C     DSA_WRUSER
 C
@@ -77,7 +77,7 @@ C
 C   INCLUDE statements
 C   ------------------
 C   INCLUDE 'DYNAMIC_MEMORY'
-C                                                
+C
 C
 C   Extensions to FORTRAN77
 C   -----------------------
@@ -182,14 +182,14 @@ C
 C
 C  - get data array label and units.
 C
-        CALL DSA_GET_DATA_INFO(REF_NAME,2,DATINFO,0,DUMREAL,STATUS) 
+        CALL DSA_GET_DATA_INFO(REF_NAME,2,DATINFO,0,DUMREAL,STATUS)
         IF(ICH_LEN(DATINFO(2)).GT.0)THEN
           CALL DSA_WRUSER
-     &      ('  Label = '//DATINFO(2)(:ICH_LEN(DATINFO(2)))//'\\N')       
+     &      ('  Label = '//DATINFO(2)(:ICH_LEN(DATINFO(2)))//'\\N')
         END IF
         IF(ICH_LEN(DATINFO(1)).GT.0)THEN
           CALL DSA_WRUSER
-     &      ('  Units = '//DATINFO(1)(:ICH_LEN(DATINFO(1)))//'\\N')       
+     &      ('  Units = '//DATINFO(1)(:ICH_LEN(DATINFO(1)))//'\\N')
         END IF
       END IF
 C
@@ -204,7 +204,7 @@ C  Remove the word SIMPLE from the front of TYPE_UC so that ADDND etc
 C  can cope with the input they receive.
 
 C  Check that SIMPLE is at the front.
-      IF (TYPE_UC(1:2).EQ.'SI') THEN 
+      IF (TYPE_UC(1:2).EQ.'SI') THEN
          TYPE88=TYPE_UC(8:8)
          IF (TYPE88.EQ.'F') TYPE_UC='FLOAT'
          IF (TYPE88.EQ.'D') TYPE_UC='DOUBLE'
@@ -227,8 +227,8 @@ C
       IF(TYPE_UC.EQ.'CSTRUCT')THEN
         CALL DSA_WRUSER('Will be converted to FLOAT for processing\\N')
       END IF
-C     
-C  Get bad pixel flag. 
+C
+C  Get bad pixel flag.
 C
       CALL DSA_SEEK_FLAGGED_VALUES(REF_NAME,BADPIX,STATUS)
       IF(STATUS.NE.0)GO TO 500
@@ -242,22 +242,22 @@ C
           CALL DSA_WRUSER('  Magic values are absent\\N')
         END IF
       END IF
-C  
+C
 C  Now find out quality and error info
-C    
+C
       IF (DISPLAY) THEN
         CALL DSA_SEEK_QUALITY(REF_NAME,QUAL,STATUS)
         CALL DSA_SEEK_ERRORS(REF_NAME,ERRS,STATUS)
-        IF (QUAL) 
+        IF (QUAL)
      &      CALL DSA_WRUSER('  Quality data present\\n')
-        IF (ERRS) 
+        IF (ERRS)
      &      CALL DSA_WRUSER('  Error data present\\n')
       END IF
 C
 C  Get data array size for comparison with axis sizes.
 C
       CALL DSA_DATA_SIZE(REF_NAME,6,NDIM,DIMS,NELM,STATUS)
-      IF(STATUS.NE.0)GO TO 500      
+      IF(STATUS.NE.0)GO TO 500
 C
 C  Get axis information and display if requested -
 C
@@ -265,11 +265,11 @@ C
         CALL DSA_WRUSER('  ')
         CALL DSA_WRUSER('Axis information:')
         CALL DSA_WRUSER('\\N')
-      END IF                                      
+      END IF
 C
       DO I=1,NDIM
 C
-C  - get axis size, check for multi-dimensionality, and check that it matches 
+C  - get axis size, check for multi-dimensionality, and check that it matches
 C    the data array.
 C
         CALL DSA_AXIS_SIZE(REF_NAME,I,6,AXNDIM,AXDIMS,AXNELM,STATUS)
@@ -293,13 +293,13 @@ C
           GO TO 500
         END IF
         IF(DISPLAY)THEN
-          CALL DSA_WRUSER('    Axis '//ICH_CI(I)//' dimension = ')    
+          CALL DSA_WRUSER('    Axis '//ICH_CI(I)//' dimension = ')
           DUMINT=ICH_ENCODE(STRING,REAL(AXDIMS(1)),1,0,NEXT)
           CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
         END IF
 C
 C  - if the axis exists, map it and get its range. Cannot use DSA_AXIS_RANGE
-C    for this because it always sets START to the minimum and END to the 
+C    for this because it always sets START to the minimum and END to the
 C    maximum, which does not allow for decreasing axis values.
 C
         CALL DSA_SEEK_AXIS(REF_NAME,I,EXIST,STATUS)
@@ -322,14 +322,14 @@ C
           CALL DSA_WRUSER(' to ')
           DUMINT=ICH_ENCODE(STRING,END,1,2,NEXT)
           CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
-C                                                    
+C
 C  - get label and units.
 C
           CALL DSA_GET_AXIS_INFO(REF_NAME,I,2,AXINFO,0,DUMREAL,STATUS)
           IF(ICH_LEN(AXINFO(2)).GT.0)THEN
             CALL DSA_WRUSER
      &        ('           label     = '//AXINFO(2)(:ICH_LEN(AXINFO(2)))
-     &        //'\\N')       
+     &        //'\\N')
           END IF
           IF(ICH_LEN(AXINFO(1)).GT.0)THEN
             CALL DSA_WRUSER

@@ -80,7 +80,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INCLUDE 'CHT_ERR'          ! Chart error constants
-                                 
+
 *  Arguments Given:
       INTEGER ARG1
       CHARACTER * ( * ) ARG2
@@ -90,10 +90,10 @@
       LOGICAL ARG6
       INTEGER ARG7
       LOGICAL ARG8
-      
+
 *  Arguments Given and Returned:
       INTEGER STATUS
-      
+
 *  Local Constants:
       CHARACTER * ( 7 ) STADEF   ! Default value for STATUS specifier
       PARAMETER ( STADEF = 'UNKNOWN' )
@@ -152,9 +152,9 @@
       IF ( STAT(1:2) .EQ. BLANK )  STAT = STADEF
       IF ( ACCESS(1:2) .EQ. BLANK ) ACCESS = ACCDEF
       IF ( FORM(1:2) .EQ. BLANK .AND. ACCESS(1:10) .EQ. 'SEQUENTIAL' )
-     :     FORM = SEQDEF 
+     :     FORM = SEQDEF
       IF ( FORM(1:2) .EQ. BLANK .AND. ACCESS(1:6) .EQ. 'DIRECT' )
-     :     FORM = DIRDEF 
+     :     FORM = DIRDEF
 
 * Convert RECL specifier from longwords (as required on DEC machines) to
 * bytes (as required on Sun machines) if need be.
@@ -162,7 +162,7 @@
 
       IF (FORM(:11) .EQ. 'UNFORMATTED' ) RECL = RECL * 4 / BYTEPRU
 
-      
+
 * Pick OPEN statement with appropriate specifiers according to what
 * calling routine requires :
 
@@ -172,9 +172,9 @@
      :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500 )
 
       ELSE IF ( .NOT. RDONLY .AND. CARIGE ) THEN
-            
+
         IF ( RECL .EQ. 0 ) THEN
-      
+
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, FORM = FORM,
 #if HAVE_FC_OPEN_CARRIAGECONTROLLIST
@@ -192,11 +192,11 @@
      :          ERR = 500 )
 
         ENDIF
-      
+
       ELSEIF ( RDONLY .AND. .NOT. CARIGE ) THEN
 
         IF ( RECL .EQ. 0 ) THEN
-      
+
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, FORM = FORM,
 #if HAVE_FC_OPEN_READONLY
@@ -212,13 +212,13 @@
      :          READONLY,
 #endif
      :          ERR = 500)
-            
+
         ENDIF
 
       ELSEIF ( RDONLY .AND. CARIGE ) THEN
 
         IF ( RECL .EQ. 0 ) THEN
-      
+
             OPEN ( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, FORM = FORM,
 #if HAVE_FC_OPEN_READONLY
@@ -241,7 +241,7 @@
 #endif
      :          ERR = 500 )
 
-        ENDIF     
+        ENDIF
 
       ENDIF
 
@@ -253,5 +253,5 @@
 
       STATUS = CHT__NOFIL
       CALL ERR_REP( ' ', 'FILEOPEN: Can''t open ' // FILE, STATUS )
-      
+
       END

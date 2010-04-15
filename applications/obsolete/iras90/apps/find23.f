@@ -28,7 +28,7 @@
 *     not the source is added to the list. In either case the scan
 *     source number is ammended to point to the position of the
 *     associated source in this list. The number of sources is counted.
-*     
+*
 *     -  The subroutine sets up a HDS file containing places for
 *     plate details, scan details and source details. The plate details
 *     are entered from the plate record.
@@ -38,13 +38,13 @@
 *
 *     - The source details are entered in the order in which they were
 *     specified in the list.
-*     
+*
 
 *  Arguments:
 *     IPLAT = INTEGER (Given)
 *        Plate position in plate common
 *     FD = INTEGER (Given)
-*        File descriptor obtained from FIO 
+*        File descriptor obtained from FIO
 *     OUTNAM = CHARACTER * ( * )
 *        Output file name for plate HDS file
 *     STATUS = INTEGER (Given and Returned)
@@ -83,7 +83,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -104,13 +104,13 @@
       INCLUDE 'CMP_ERR'          ! CMP errors
 
 *  Global Variables:
-      INCLUDE 'FICOMN' ! Common blocks for FINDCRDD      
-                                       
+      INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
+
 *  Arguments Given:
       INTEGER IPLAT
       INTEGER FD
       CHARACTER * ( * ) OUTNAM
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -118,7 +118,7 @@
       INTEGER ENDVAL             ! Value of pointer which indicates end
                                  ! of linked list
       PARAMETER ( ENDVAL = 99999 )
-      
+
 *  Local Variables:
       CHARACTER * ( 97 ) BUFFER  ! Output buffer for use with FIO
       INTEGER ELSCA( 7 )         ! Number of elements in SCAN vectors
@@ -139,7 +139,7 @@
       CHARACTER * ( DAT__SZLOC ) LOCSCA( 7 )  ! Locators to vectors
                                               ! within the SCAN
                                               ! component of the HDS
-                                              ! file. 
+                                              ! file.
       CHARACTER * ( DAT__SZLOC ) LOCSO ! Locator to SOURCE component of
                                        ! HDS file
       CHARACTER * ( DAT__SZLOC ) LOCSOU( 13 ) ! Locators to vectors
@@ -204,18 +204,18 @@
 *  Examine subsequent scans in the scan linked list and add their
 *  sources to the list.
 * *********************************************************************
- 200     CONTINUE        
+ 200     CONTINUE
 
 *  Are there any more scans or does the scan pointer in the current scan
 *  contain the end of list value
          IF ( SCNSCP( SCPOS ) .NE. ENDVAL ) THEN
-      
+
 *  Set the current scan to the next one pointed to
             SCPOS = SCNSCP( SCPOS )
 
 *  Set the source found flag to .FALSE.
             SOFOUN = .FALSE.
-      
+
 *  Check whether the source for this scan is already in the list of
 *  sources
             DO 300  ILISO = 1, NOLISO
@@ -239,27 +239,27 @@
 
 *  Set the pointer for the position in the list of sources, in the scan
 *  to point to this source
-               SCSOLI( SCPOS ) = NOLISO            
+               SCSOLI( SCPOS ) = NOLISO
             END IF
 
 *  GO TO examine next scan in linked list
             GO TO 200
-         
+
 *  End if for check on whether the scan last examined was the last in
 *  the linked list
          END IF
-            
+
 * *********************************************************************
 *  End of examining all scans and making source list
 * *********************************************************************
 
 * *********************************************************************
-*  Set up HDS object for output 
+*  Set up HDS object for output
 * *********************************************************************
 
 *  Put the number of scans for this plate into a suitable variable
          PLNSC = PLNOSC( IPLAT )
-      
+
 *  Create an HDS file with a top level of IRAS_SCANS_REQU
          CALL HDS_NEW( OUTNAM, OUTNAM, 'IRAS_SCANS_REQU',
      :                 0, 0, LOCO, STATUS )
@@ -287,7 +287,7 @@
      :   STATUS )
          CALL DAT_NEW( LOCSC, 'SC_OVERLAP', '_LOGICAL', 1, PLNSC,
      :   STATUS )
-      
+
 *  Get locator to the SOURCE component
          CALL DAT_FIND( LOCO, 'SOURCE', LOCSO, STATUS )
 
@@ -295,28 +295,28 @@
          CALL DAT_NEWC( LOCSO, 'SO_NAME', NMLEN, 1, NOLISO, STATUS )
          CALL DAT_NEWC( LOCSO, 'SO_TITLE', TILEN, 1, NOLISO, STATUS )
          CALL DAT_NEWC( LOCSO, 'SO_COORD1', IRA__SZFSC, 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEWC( LOCSO, 'SO_COORD2', IRA__SZFSC, 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEWC( LOCSO, 'SO_COORD_SYS', IRA__SZSCS, 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEW( LOCSO, 'SO_RA', '_REAL', 1, NOLISO, STATUS )
          CALL DAT_NEW( LOCSO, 'SO_DEC', '_REAL',1, NOLISO, STATUS )
          CALL DAT_NEW( LOCSO, 'SO_INSCAN_SIZE', '_REAL', 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEW( LOCSO, 'SO_XSCAN_SIZE', '_REAL',1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEW( LOCSO, 'SO_WAVE1_REQ', '_LOGICAL', 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEW( LOCSO, 'SO_WAVE2_REQ', '_LOGICAL', 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEW( LOCSO, 'SO_WAVE3_REQ', '_LOGICAL', 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
          CALL DAT_NEW( LOCSO, 'SO_WAVE4_REQ', '_LOGICAL', 1, NOLISO,
-     :   STATUS )      
+     :   STATUS )
 
 * *********************************************************************
-*  Output data to HDS object 
+*  Output data to HDS object
 * *********************************************************************
 
 * *********************************************************************
@@ -366,7 +366,7 @@
 *  For first scan in linked list
          SCPOS = PLFSCP( IPLAT )
          ISCAN = 1
-      
+
          CALL FIND35( ELSCA( 1 ), ISCAN, SCSOP( SCPOS ),
      :   %VAL( PNTRSC( 1 )), STATUS )
          CALL FIND35( ELSCA( 2 ), ISCAN, SCOBS( SCPOS ),
@@ -387,11 +387,11 @@
 *  Are there any more scans or does the scan pointer in the current scan
 *  contain the end of list value
          IF ( SCNSCP( SCPOS ) .NE. ENDVAL ) THEN
-      
+
 *  Set the current scan to the next one pointed to
             SCPOS = SCNSCP( SCPOS )
             ISCAN = ISCAN + 1
-      
+
 *  Enter data
             CALL FIND35( ELSCA( 1 ), ISCAN, SCSOP( SCPOS ),
      :      %VAL( PNTRSC( 1 )), STATUS )
@@ -420,7 +420,7 @@
          CALL DAT_ANNUL( LOCSCA( 5 ), STATUS )
          CALL DAT_ANNUL( LOCSCA( 6 ), STATUS )
          CALL DAT_ANNUL( LOCSCA( 7 ), STATUS )
-      
+
 * *********************************************************************
 *  Data for SOURCE component
 * *********************************************************************
@@ -467,7 +467,7 @@
      :                  PNTRSO( 12 ), ELSOU( 12 ), STATUS )
          CALL DAT_MAPV( LOCSOU( 13 ), '_LOGICAL', 'WRITE',
      :                  PNTRSO( 13 ), ELSOU( 13 ), STATUS )
-      
+
 *  Set position in the output HDS SOURCE to zero
          ISOURC = 0
 
@@ -523,7 +523,7 @@
          CALL DAT_ANNUL( LOCSOU( 11 ), STATUS )
          CALL DAT_ANNUL( LOCSOU( 12 ), STATUS )
          CALL DAT_ANNUL( LOCSOU( 13 ), STATUS )
-      
+
 *  Annul locators to top level objects
          CALL DAT_ANNUL( LOCSO, STATUS )
          CALL DAT_ANNUL( LOCSC, STATUS )
@@ -537,7 +537,7 @@
          CALL MSG_FMTC( 'C2', 'A6', PLID( IPLAT) )
          CALL MSG_OUT( ' ', 'A scans required file has been prepared'//
      :    ' for ^C1, you will need to use ^C2 for EXCRDD'//
-     :    ' extraction', STATUS )      
+     :    ' extraction', STATUS )
 
 *  Write the message on description of plates file
           BUFFER = ' A scans required file has been prepared for

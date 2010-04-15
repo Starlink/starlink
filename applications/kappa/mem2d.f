@@ -256,7 +256,7 @@
 *        in star.  The PSF is truncated to one sixteenth of its peak
 *        amplitude.
 *     mem2d m51_hires m51_hires niter=70 psf=star
-*        If the previous example failed to converge within the default 
+*        If the previous example failed to converge within the default
 *        50 iterations, the deconvolution can be started again from
 *        its current state, rather than having to start again from
 *        scratch.  Here NITER gives the upper limit on the total number
@@ -377,7 +377,7 @@
 *     27-FEB-1991 (DSB):
 *        KAPPA subroutine prefixes added (KPS_ and KPG_)
 *     1991 July 4 (MJC):
-*        Propagated AXIS and UNITS.  Added Usage and Implementation 
+*        Propagated AXIS and UNITS.  Added Usage and Implementation
 *        Status to the documentation.  Made error reports more helpful
 *        and added a missing bad status assignment.
 *     1991 July 18 (MJC):
@@ -421,7 +421,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -446,7 +446,7 @@
 *        C1_YMG = INTEGER (Read/Write)
 *           The width of the margin along the Y axis in pixels.
 *        C1_ICF = REAL (Read/Write)
-*           The FWHM of the Gaussian ICF 
+*           The FWHM of the Gaussian ICF
 *        C1_IP( 40 ) = INTEGER (Read/Write)
 *           Pointers to the mapped external work arrays. Zero if no
 *           external work array is needed.
@@ -461,7 +461,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants: 
+*  Local Constants:
       INTEGER NDIM               ! Dimensionality required
       PARAMETER( NDIM = 2 )
 
@@ -491,7 +491,7 @@
                                  ! end ! of the previous run of MEM2D
       INTEGER  LBNDIN( NDIM )    ! Lower bounds of the input NDF
       REAL     MEAN              ! Mean data value in the input image
-      LOGICAL  MEM2DX            ! True if the input NDF has a MEM2D 
+      LOGICAL  MEM2DX            ! True if the input NDF has a MEM2D
 				 ! extension
       INTEGER  METHOD            ! Previous value of MEM3 argument
                                  ! METHOD
@@ -539,7 +539,7 @@
       INTEGER  SUBND( NDIM )     ! Significant upper bounds of the PSF
       INTEGER  SUBNDI( NDIM )    ! Significant upper bounds of the input
                                  ! image
-      LOGICAL  UPDATE		 ! True if the output NDF is to be 
+      LOGICAL  UPDATE		 ! True if the output NDF is to be
                                  ! updated at the end of each iteration
       INTEGER  UBNDIN( NDIM )    ! Upper bounds of the input NDF
       LOGICAL  VAR               ! True if the input NDF has a VARIANCE
@@ -577,7 +577,7 @@
       ANALYS = .FALSE.
       CALL NDF_XSTAT( INDF, 'MEM2D', MEM2DX, STATUS )
 
-*  If it does contain a MEM2D extension get the information out of the 
+*  If it does contain a MEM2D extension get the information out of the
 *  extension and put it in the relevant common blocks or into the
 *  arguments of KPS1_MEMGA.
       IF ( MEM2DX ) THEN
@@ -586,8 +586,8 @@
      :                    NITER, ITER, ILEVEL, METHOD, IMAGE, ISTAT,
      :                    STATUS )
 
-*  Set the default for parameter ANALYSE based on the value of ISTAT. 
-*  N.B. the conjugate gradient status digits (5th,6th and 7th) can be 
+*  Set the default for parameter ANALYSE based on the value of ISTAT.
+*  N.B. the conjugate gradient status digits (5th,6th and 7th) can be
 *  ignored.
          ANALYS = MOD( ISTAT, 10000 ) .EQ. 0
 
@@ -605,50 +605,50 @@
          IF ( .NOT. MEM2DX ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF )
-            CALL ERR_REP( 'MEM2D_ERR0', 
+            CALL ERR_REP( 'MEM2D_ERR0',
      :        'MEM2D: No analysis information found in input NDF ^NDF.',
      :        STATUS )
             GO TO 999
          END IF
 
-*  Give a warning if the user is trying to analyse an unfinished 
+*  Give a warning if the user is trying to analyse an unfinished
 *  deconvolution.
          IF ( MOD( ISTAT, 10000 ) .NE. 0 ) THEN
             CALL MSG_OUT( 'REPORT', ' ', STATUS )
-            CALL MSG_OUT( 'REPORT', 
+            CALL MSG_OUT( 'REPORT',
      :        'WARNING: You are trying to analyse an unfinished '/
      :        /'deconvolution.', STATUS )
-         END IF      
+         END IF
 
 *  Tell the user the name of the NDF being analysed
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
          CALL MSG_SETC( 'IMAGE', IMAGE )
-         CALL MSG_OUT( 'REPORT', 
+         CALL MSG_OUT( 'REPORT',
      :     '  Analysing the deconvolution of ^IMAGE.', STATUS )
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
 
-*  Get an NDF holding the analysis mask, and create a section from it 
+*  Get an NDF holding the analysis mask, and create a section from it
 *  matching the input NDF. Map the data array of the section.
          CALL LPG_ASSOC( 'MASK', 'READ', MNDF, STATUS )
          CALL NDF_SECT( MNDF, NDIMS, LBNDIN, UBNDIN, MSNDF, STATUS )
-         CALL KPG1_MAP( MSNDF, 'DATA', '_REAL', 'READ', IPMASK, NEL, 
+         CALL KPG1_MAP( MSNDF, 'DATA', '_REAL', 'READ', IPMASK, NEL,
      :                 STATUS )
 
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  See how much run-time information is to be given to the user.
-         ILEVD = ILEVEL 
+         ILEVD = ILEVEL
          CALL PAR_GDR0I( 'ILEVEL', ILEVD, 0, 3, .TRUE., ILEVEL, STATUS )
 
-*  Call MEMIN to call the MEMSYS3 inference routine, to do the 
+*  Call MEMIN to call the MEMSYS3 inference routine, to do the
 *  analysis (file <2> is used as work space).
          IF ( C1_WEXT ) THEN
             CALL KPS1_MEMIN( 'SUM', 'DSUM', %VAL( IPMASK ), C1_DIM( 1 ),
-     :                       C1_DIM( 2 ), ALPHA, DEF, SIGMA, ILEVEL, 
+     :                       C1_DIM( 2 ), ALPHA, DEF, SIGMA, ILEVEL,
      :                       %VAL( C1_IP( 2 ) ), STATUS )
          ELSE
             CALL KPS1_MEMIN( 'SUM', 'DSUM', %VAL( IPMASK ), C1_DIM( 1 ),
-     :                       C1_DIM( 2 ), ALPHA, DEF, SIGMA, ILEVEL, 
+     :                       C1_DIM( 2 ), ALPHA, DEF, SIGMA, ILEVEL,
      :                       ME_ST( ME_KB( 2 ) ), STATUS )
          END IF
 
@@ -659,7 +659,7 @@
 
 *  Now deal with cases where a convolution is to be performed...........
 
-*  If the input NDF contains a MEM2D extension, tell the user that 
+*  If the input NDF contains a MEM2D extension, tell the user that
 *  this is a continuation of a previous run of MEM2D.  Give a warning
 *  message if the deconvolution is already complete.
       IF ( MEM2DX ) THEN
@@ -672,10 +672,10 @@
 
          IF ( MOD( ISTAT, 10000 ) .EQ. 0 ) THEN
             CALL MSG_OUT( 'REPORT', ' ', STATUS )
-            CALL MSG_OUT( 'REPORT', 
+            CALL MSG_OUT( 'REPORT',
      :        'WARNING: The deconvolution is already finished.',
      :        STATUS )
-         END IF      
+         END IF
 
 *  Allow the user to give new values for certain `safe' parameters.
          ILEVD = ILEVEL
@@ -725,7 +725,7 @@
          MODEL = 'CONSTANT'
 
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-         MODEL = 'NDF'               
+         MODEL = 'NDF'
 
       END IF
 
@@ -762,7 +762,7 @@
      :        'MEM2D: PSF ^PSFNDF contains some bad pixels.', STATUS )
             GO TO 999
          END IF
-      
+
 *  Map the PSF.
          CALL KPG1_MAP( PSFNDF, 'DATA', '_REAL', 'READ', IPPSF, NELPSF,
      :                 STATUS )
@@ -800,7 +800,7 @@
 *  the internal image size is large enough to provide such a work array.
          C1_NPX = MAX( 6, XSIZE )
          C1_NLN = MAX( 6, YSIZE )
-         
+
 *  Store the resulting size in C1_COM and update the margin size
 *  accordingly.
          C1_XMG = ( C1_NPX - C1_DIM( 1 ) ) / 2
@@ -814,9 +814,9 @@
 
 *  Get the co-ordinates of the centre of the PSF within the image.  The
 *  default is the centre of the PSF image.
-         CALL PAR_GDR0I( 'XCENTRE', SLBND( 1 ) + PDIMS( 1 ) / 2, 
+         CALL PAR_GDR0I( 'XCENTRE', SLBND( 1 ) + PDIMS( 1 ) / 2,
      :                   SLBND( 1 ), SUBND( 1 ), .FALSE., XCEN, STATUS )
-         CALL PAR_GDR0I( 'YCENTRE', SLBND( 2 ) + PDIMS( 2 ) / 2, 
+         CALL PAR_GDR0I( 'YCENTRE', SLBND( 2 ) + PDIMS( 2 ) / 2,
      :                   SLBND( 2 ), SUBND( 2 ), .FALSE., YCEN, STATUS )
 
 *  Store the Fourier transform of the PSF in the internal file <3>.
@@ -824,15 +824,15 @@
 *  being used, use the poitners in C1_IP to find the internal files.
 *  Otherwise find them in the ME_ST array.
          IF ( C1_WEXT ) THEN
-            CALL KPS1_MEMFP( %VAL( IPPSF ), %VAL( C1_IP( 2 ) ), 
-     :                       PDIMS( 1 ), PDIMS( 2 ), 
-     :                       XCEN - SLBND( 1 ) + 1, 
-     :                       YCEN - SLBND( 2 ) + 1, %VAL( C1_IP( 3 ) ), 
+            CALL KPS1_MEMFP( %VAL( IPPSF ), %VAL( C1_IP( 2 ) ),
+     :                       PDIMS( 1 ), PDIMS( 2 ),
+     :                       XCEN - SLBND( 1 ) + 1,
+     :                       YCEN - SLBND( 2 ) + 1, %VAL( C1_IP( 3 ) ),
      :                       STATUS )
          ELSE
             CALL KPS1_MEMFP( %VAL( IPPSF ), ME_ST( ME_KB( 2 ) ),
-     :                       PDIMS( 1 ), PDIMS( 2 ), 
-     :                       XCEN - SLBND( 1 ) + 1, 
+     :                       PDIMS( 1 ), PDIMS( 2 ),
+     :                       XCEN - SLBND( 1 ) + 1,
      :                       YCEN - SLBND( 2 ) + 1, ME_ST( ME_KB( 3 ) ),
      :                       STATUS )
          END IF
@@ -841,7 +841,7 @@
       ELSE
 
 *  Get the Full Width at Half Maximum of the Gaussian.
-         CALL PAR_GDR0R( 'FWHMPSF', 10.0, 0.0, 
+         CALL PAR_GDR0R( 'FWHMPSF', 10.0, 0.0,
      :                   REAL( MIN( C1_DIM(1), C1_DIM(2) ) ), .FALSE.,
      :                   FWHM, STATUS )
 
@@ -860,7 +860,7 @@
 *  the internal image size is large enough to provide such a work array.
          C1_NPX = MAX( 6, XSIZE )
          C1_NLN = MAX( 6, YSIZE )
-         
+
 *  Store the resulting size in C1_COM and update the margin size
 *  accordingly.
          C1_XMG = ( C1_NPX - C1_DIM(1) )/2
@@ -904,24 +904,24 @@
       END IF
 
 *  Get the width of the Gaussian Intrinsic Correlation Function to use.
-      CALL PAR_GDR0R( 'FWHMICF', 2.0, 0.0, 
+      CALL PAR_GDR0R( 'FWHMICF', 2.0, 0.0,
      :                REAL( MIN( C1_DIM(1), C1_DIM(2) ) ), .FALSE.,
      :                C1_ICF, STATUS )
 
-*  Blur the PSF in file <3> with the ICF.  Internal file <1> and 
+*  Blur the PSF in file <3> with the ICF.  Internal file <1> and
 *  <2> are used as work space.
       IF ( C1_WEXT ) THEN
          CALL KPS1_ICBLU( C1_ICF, .TRUE., %VAL( C1_IP( 1 ) ),
-     :                    %VAL( C1_IP( 2 ) ), %VAL( C1_IP( 3 ) ), 
+     :                    %VAL( C1_IP( 2 ) ), %VAL( C1_IP( 3 ) ),
      :                    STATUS )
       ELSE
          CALL KPS1_ICBLU( C1_ICF, .TRUE., ME_ST( ME_KB( 1 ) ),
-     :                    ME_ST( ME_KB( 2 ) ), ME_ST( ME_KB( 3 ) ), 
+     :                    ME_ST( ME_KB( 2 ) ), ME_ST( ME_KB( 3 ) ),
      :                    STATUS )
       END IF
 
 *  If the NDF has a variance component, map it.
-      CALL NDF_STATE( INDF, 'VARIANCE', VAR, STATUS )      
+      CALL NDF_STATE( INDF, 'VARIANCE', VAR, STATUS )
 
       IF ( VAR ) THEN
          CALL KPG1_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVAR, NEL,
@@ -936,28 +936,28 @@
 *  See what sort of noise to use.
       CALL PAR_CHOIC( 'NOISE', 'GAUSSIAN', 'GAUSSIAN,POISSON', .FALSE.,
      :                NOISE, STATUS )
-      
-*  Set up internal files <21> and <22>, and find the mean input data 
+
+*  Set up internal files <21> and <22>, and find the mean input data
 *  value and a rough estimate of the noise in the input.
       IF ( C1_WEXT ) THEN
-         CALL KPS1_MEMCS( %VAL( IPIN ), %VAL( IPVAR ), C1_DIM( 1 ), 
-     :                    C1_DIM( 2 ), VAR, ILEVEL, C1_XMG, C1_YMG, 
-     :                    %VAL( C1_IP( 21 ) ), %VAL( C1_IP( 22 ) ), 
-     :                    STDEV, MEAN, STATUS) 
+         CALL KPS1_MEMCS( %VAL( IPIN ), %VAL( IPVAR ), C1_DIM( 1 ),
+     :                    C1_DIM( 2 ), VAR, ILEVEL, C1_XMG, C1_YMG,
+     :                    %VAL( C1_IP( 21 ) ), %VAL( C1_IP( 22 ) ),
+     :                    STDEV, MEAN, STATUS)
       ELSE
-         CALL KPS1_MEMCS( %VAL( IPIN ), %VAL( IPVAR ), C1_DIM( 1 ), 
-     :                    C1_DIM( 2 ), VAR, ILEVEL, C1_XMG, C1_YMG, 
-     :                    ME_ST( ME_KB( 21 ) ), ME_ST( ME_KB( 22 ) ), 
-     :                    STDEV, MEAN, STATUS) 
+         CALL KPS1_MEMCS( %VAL( IPIN ), %VAL( IPVAR ), C1_DIM( 1 ),
+     :                    C1_DIM( 2 ), VAR, ILEVEL, C1_XMG, C1_YMG,
+     :                    ME_ST( ME_KB( 21 ) ), ME_ST( ME_KB( 22 ) ),
+     :                    STDEV, MEAN, STATUS)
       END IF
 
-*  If the mean data value is not positive, MEMSYS3 will have a hard 
+*  If the mean data value is not positive, MEMSYS3 will have a hard
 *  time (in fact it will probably take an infinite amount of CPU to get
 *  no where).  Abort.
       IF ( MEAN .LE. 0.0 ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'INDF', INDF )
-         CALL ERR_REP( 'MEM2D_ERR2', 
+         CALL ERR_REP( 'MEM2D_ERR2',
      :     'MEM2D: Mean data value in input NDF ^INDF is negative.',
      :     STATUS )
          GO TO 999
@@ -972,11 +972,11 @@
 *  the input image, and map the data array.
       ELSE
          CALL NDF_SECT( MODNDF, NDIMS, LBNDIN, UBNDIN, MODSEC, STATUS )
-         CALL KPG1_MAP( MODSEC, 'DATA', '_REAL', 'READ', IPMOD, NEL, 
+         CALL KPG1_MAP( MODSEC, 'DATA', '_REAL', 'READ', IPMOD, NEL,
      :                 STATUS )
 
 *  Store the model in internal file <20>, replacing bad pixels with the
-*  value zero, to exclude them from the reconstruction.         
+*  value zero, to exclude them from the reconstruction.
          IF ( C1_WEXT ) THEN
             CALL KPS1_MEM20( %VAL( IPMOD ), C1_DIM( 1 ), C1_DIM( 2 ),
      :                       %VAL( C1_IP( 20 ) ), STATUS )
@@ -1014,7 +1014,7 @@
          CALL KPG1_MAP( NMDNDF, 'DATA', '_REAL', 'WRITE/BAD', IPNMOD,
      :                 NEL, STATUS )
 
-         CALL KPS1_MEMNM( DEF, C1_DIM( 1 ), C1_DIM( 2 ), 
+         CALL KPS1_MEMNM( DEF, C1_DIM( 1 ), C1_DIM( 2 ),
      :                    ME_ST( ME_KB( 1 ) ), ME_ST( ME_KB( 20 ) ),
      :                    ME_ST( ME_KB( 22 ) ), ME_ST( ME_KB( 2 ) ),
      :                    %VAL( IPNMOD ), STATUS )

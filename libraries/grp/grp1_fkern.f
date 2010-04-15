@@ -1,4 +1,4 @@
-      SUBROUTINE GRP1_FKERN( SLOT, FIRST, TEXT, NEXT, P1, P2, K1, K2, 
+      SUBROUTINE GRP1_FKERN( SLOT, FIRST, TEXT, NEXT, P1, P2, K1, K2,
      :                       S1, S2, T1, T2, F, L, STATUS )
 *+
 *  Name:
@@ -44,8 +44,8 @@
 *        The index (within TEXT) of the first character to be
 *        considered.
 *     TEXT = CHARACTER * ( * ) (Given and Returned)
-*        The text of the element or group expression. Any comment 
-*        contained in the supplied value is removed from the returned 
+*        The text of the element or group expression. Any comment
+*        contained in the supplied value is removed from the returned
 *        value.
 *     NEXT = INTEGER (Returned)
 *        The index (within TEXT) of the element DELIMITER character
@@ -99,12 +99,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -125,7 +125,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -189,7 +189,7 @@
       P1 = 1
       P2 = 0
       K1 = FIRST
-      K2 = FIRST - 1 
+      K2 = FIRST - 1
       S1 = 1
       S2 = 0
       T1 = 1
@@ -201,7 +201,7 @@
 *  Get the group's current comment character.
       CALL GRP1_CONC( SLOT, GRP__PCOMC, COMC, COMOK, STATUS )
 
-*  If a comment character is defined search for the first occurrence 
+*  If a comment character is defined search for the first occurrence
 *  of the comment character in the supplied group expression.
       IF( COMOK ) THEN
          COM = GRP1_INDEX( TEXT, COMC, ESCC, ESCOK )
@@ -212,7 +212,7 @@
       END IF
 
 *  Set up the bounds of the part of the element or group expression to
-*  be used. 
+*  be used.
       F = FIRST
       L = CHR_LEN( TEXT )
 
@@ -266,13 +266,13 @@
                      F = FL
                      L = LL
                      K1 = K1L
-                     K2 = K2L      
+                     K2 = K2L
                      P1 = P1L
-                     P2 = P2L      
+                     P2 = P2L
                      S1 = S1L
-                     S2 = S2L      
+                     S2 = S2L
                      T1 = T1L
-                     T2 = T2L      
+                     T2 = T2L
                      NEXT = 0
                   END IF
 
@@ -298,16 +298,16 @@
                   F = FL
                   L = LL
                   P1 = P1L
-                  P2 = P2L      
+                  P2 = P2L
                   S1 = S1L
-                  S2 = S2L      
+                  S2 = S2L
                   T1 = T1L
-                  T2 = T2L      
+                  T2 = T2L
 
 *  If the kernel is different to the kernel on the previous pass, then
 *  we cannot be sure that the inner-most kernel has been found. Go
 *  round again to see if any further nested kernels exist within the
-*  kernel just found. 
+*  kernel just found.
                ELSE
                   K1L = K1
                   K2L = K2
@@ -327,7 +327,7 @@
             ELSE
                MORE = .FALSE.
             END IF
-   
+
 *  Indicate that this is the end of the first pass through the loop.
             FPASS = .FALSE.
 

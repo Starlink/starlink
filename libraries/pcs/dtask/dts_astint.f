@@ -1,4 +1,4 @@
-      SUBROUTINE DTASK_ASTINT ( DTASK_APPLIC, ANAME, VALUE, STATUS ) 
+      SUBROUTINE DTASK_ASTINT ( DTASK_APPLIC, ANAME, VALUE, STATUS )
 *+
 *  Name:
 *     DTASK_ASTINT
@@ -13,10 +13,10 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL DTASK_ASTINT ( DTASK_APPLIC, ANAME, VALUE, STATUS ) 
+*     CALL DTASK_ASTINT ( DTASK_APPLIC, ANAME, VALUE, STATUS )
 
 *  Description:
-*     Interpret a message received from an AST routine. If necessary, 
+*     Interpret a message received from an AST routine. If necessary,
 *     activate the application.
 
 *  Arguments:
@@ -90,7 +90,7 @@
       INTEGER ACTPTR               ! action pointer
 *.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN 
+      IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *   The name carried in the message is the action name.
 *
@@ -104,7 +104,7 @@
          STATUS = SAI__OK
          CALL SUBPAR_PUTPATH ( ACTPATH(ACTPTR), ACTMESSID(ACTPTR),
      :     STATUS )
-         CALL TASK_PUT_MESSINFO ( 0, 0, ' ', VALUE, 0, 
+         CALL TASK_PUT_MESSINFO ( 0, 0, ' ', VALUE, 0,
      :     MESSYS__ASTINT )
          CALL DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE, STATUS )
       ELSE

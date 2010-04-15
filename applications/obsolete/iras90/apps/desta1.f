@@ -1,4 +1,4 @@
-      SUBROUTINE DESTA1( INDF1, INDF2, SHIGH, SLOW, DETNO, DETOFF, 
+      SUBROUTINE DESTA1( INDF1, INDF2, SHIGH, SLOW, DETNO, DETOFF,
      :                   UNITS, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL DESTA1( INDF1, INDF2, SHIGH, SLOW, DETNO, DETOFF, UNITS, 
+*     CALL DESTA1( INDF1, INDF2, SHIGH, SLOW, DETNO, DETOFF, UNITS,
 *                  STATUS )
 
 *  Description:
@@ -91,7 +91,7 @@
 *  The first task is to set up the text of the history record. First
 *  list the input and output CRDD files...
       CALL NDF_MSG( 'OUT', INDF2 )
-      CALL MSG_LOAD( ' ', ' ^OUT created by DESTCRDD', TEXT( L ), 
+      CALL MSG_LOAD( ' ', ' ^OUT created by DESTCRDD', TEXT( L ),
      :               LENGTH, STATUS )
       L = L + 1
 

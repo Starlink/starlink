@@ -50,7 +50,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LATEX2HTML to signify text that it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -249,12 +249,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -334,10 +334,10 @@ large that a pared down version to fit on a single CD cannot be produced.}
 %% speed of the \cdrom\ drive.  A \cdrom\ drive with a speed of {$24\times$}
 %% or better is recommended.
 
-Those readers who received this document after requesting a \cdrom\ 
+Those readers who received this document after requesting a \cdrom\
 distribution will not necessarily have been sent all four CDs, but
 should have received the discs relevant to the system(s) on which the
-software is intended to run.  
+software is intended to run.
 
 %% This may include one or more of the runtime CDs and one of the Update CDs.
 
@@ -353,7 +353,7 @@ want to create or update.
 
 The first part describes the changes to the Starlink software released
 with the new issue of the Starlink distribution \cdroms, and gives details
-of system requirements for those users new to and/or not familiar with 
+of system requirements for those users new to and/or not familiar with
 Starlink software.  It also describes the techniques used to mount \cdroms\
 on the various supported systems and the conventions used in this document
 and by the tools on the CDs to locate the \cdrom\ once mounted.
@@ -374,9 +374,9 @@ software.}
 
 %% You can use the runtime \cdroms\ to create a complete new installation
 %% (without source) on local disk, or you can run the Starlink software
-%% direct from the \cdrom.   Note that due to space considerations, some 
+%% direct from the \cdrom.   Note that due to space considerations, some
 %% of the less popular packages have had to be omitted from the
-%% runtime CDs, including CGS4DR.    
+%% runtime CDs, including CGS4DR.
 
 %% Due to the size of the runtime sets, the documentation is not included on
 %% the runtime CDs.  A copy of the runtime documentation set is provided on
@@ -411,13 +411,13 @@ You cannot run a copy of the Starlink software direct from the \cdroms.
 \label{comments}
 
 Please send any comments you may have about this document or the Starlink
-Software to the Starlink Software Librarian 
+Software to the Starlink Software Librarian
 (\htmladdnormallink{\texttt{ussc@star.rl.ac.uk}}{mailto:ussc@star.rl.ac.uk}).
 
 \subsection{\xlabel{acknowledgments}\label{acknowledgements}Acknowledgements}
 
-This document has evolved considerably from previous versions.  The author 
-would like to thank M. J. Bly, Brian McIlwrath (\texttt{bkm@star.rl.ac.uk}), David 
+This document has evolved considerably from previous versions.  The author
+would like to thank M. J. Bly, Brian McIlwrath (\texttt{bkm@star.rl.ac.uk}), David
 Rawlinson and Chris Clayton for their technical contributions and suggestions.
 
 
@@ -432,7 +432,7 @@ There are two supported operating systems this release (Linux and Solaris).
 containing packages that built and tested OK.} STARJAVA and AUTOASTROM are
 not included on the Tru64 CD. No support will be given on problems relating
 to applications running under Tru64.
- 
+
 The Linux distribution comes in two flavours this time, Starlink for
 RedHat 9.0 and RedHat 7.3. Both CDs will be available.
 
@@ -442,35 +442,35 @@ The DOCS package has been updated and so it must be removed from
 your old installation before attempting a software update. ORACDR and
 JCMTDR should also be remove before the update is performed. Additionaly
 you should remove TREEVIEW, SPLAT JNIHDS and JNIAST first if you select to
-install STARJAVA, see below. 
+install STARJAVA, see below.
 
 Some applications are built with version 2.0 of the astrometry
 library AST. While AST 2.0 understands AST's old format for world
-co-ordinate systems like the RA \& Dec., earlier AST versions don't 
-understand the new format. It is recommended that you update all the 
+co-ordinate systems like the RA \& Dec., earlier AST versions don't
+understand the new format. It is recommended that you update all the
 packages that are indicated as updates in this release to take advantage
-of the new AST. This particularly affects GAIA and KAPPA, where errors 
+of the new AST. This particularly affects GAIA and KAPPA, where errors
 may occur when opening NDFs if the updates are not done.
 
-The \texttt{/star} soft link to your installation directory is now 
-compulsory. When performing an installation the \texttt{/star} 
-soft link should be created and the \texttt{INSTALL} and 
-\texttt{STARLINK} environment variables set to \texttt{/star} before you 
+The \texttt{/star} soft link to your installation directory is now
+compulsory. When performing an installation the \texttt{/star}
+soft link should be created and the \texttt{INSTALL} and
+\texttt{STARLINK} environment variables set to \texttt{/star} before you
 start the installation:
 
 \begin{quote}
 \begin{verbatim}
 % ln -s /path/to/install /star
 % setenv INSTALL /star
-% setenv STARLINK /star 
+% setenv STARLINK /star
 \end{verbatim}
 \end{quote}
 
 \texttt{/path/to/install} is the actual installation directory where
-the software will be placed, and should be set to an appropriate 
-directory that you can write to and that has enough space. You will 
-need to be root user to create the soft link \texttt{/star}, but after it is 
-created you should do the installation as the user that can write 
+the software will be placed, and should be set to an appropriate
+directory that you can write to and that has enough space. You will
+need to be root user to create the soft link \texttt{/star}, but after it is
+created you should do the installation as the user that can write
 to \texttt{/path/to/install} (not root!).
 
 The HTX package has been updated so that the \texttt{findme} and
@@ -484,7 +484,7 @@ feature you must set the \texttt{HTX\_BROWSER} environment variable to
 \end{verbatim}
 \end{quote}
 
-You should now permanently add the \texttt{source /star/etc/login} and 
+You should now permanently add the \texttt{source /star/etc/login} and
 \texttt{source /star/etc/cshrc} commands to your \texttt{\$HOME/.login}
 and \texttt{\$HOME/.cshrc} files respectively:
 
@@ -511,19 +511,19 @@ additions. STARJAVA can now be considered as a separate entity from
 the classic Starlink applications and libraries, although in this
 release it is provided as a standard Starlink package. TREEVIEW, SPLAT
 JNIHDS and JNIAST have been moved to STARJAVA, if you need the updates to
-these packages then you must first deinstall the old versions before 
-installing STARJAVA. 
+these packages then you must first deinstall the old versions before
+installing STARJAVA.
 
-STARJAVA can be run from the CD-ROM if you have the Java Runtime 
+STARJAVA can be run from the CD-ROM if you have the Java Runtime
 Environment (JRE) v1.4 (or greater) and Java Advanced Imaging (JAI)
-1.1\_2-rc (or greater) installed. The software will still run without 
-the JAI but with reduced functionality. All the files in the distribution 
+1.1\_2-rc (or greater) installed. The software will still run without
+the JAI but with reduced functionality. All the files in the distribution
 of STARJAVA are in the directory \texttt{starjava} on the CD-ROM.
 Running the software from the CD-ROM will work for the Solaris, Linux
 and Windows operating systems. There are five applications
 that you can run, SOG, SPLAT, FROG, TREEVIEW and TABLECOPY. To run
 the applications you need to supply the \texttt{jar} filename for
-the application to the \texttt{java} command: 
+the application to the \texttt{java} command:
 
 \begin{quote}
 \begin{verbatim}
@@ -553,13 +553,13 @@ c:\> java -jar D:\starjava\lib\table\table.jar       (TABLECOPY)
 \texttt{D:} is the letter of your CD-ROM drive.
 
 The \texttt{java} command must be on your path for any of these commands to work.
-See the document \xref{}{sun251}{} \texttt{Getting Started with the Starlink 
+See the document \xref{}{sun251}{} \texttt{Getting Started with the Starlink
 Java Infrastructure and Applications Set} for further details on command
 line switches that can be used with the applications.
 
 If you experience problems with JRE v1.4.1\_02 distributed with
 RedHat 9.0 CD, such as problems with the Java Plugin for Mozilla,
-or Java crashes (SIGSEGV). Then a possible cure is to set the 
+or Java crashes (SIGSEGV). Then a possible cure is to set the
 environment variable \texttt{LD\_ASSUME\_KERNEL}:
 
 \begin{quote}
@@ -572,14 +572,14 @@ environment variable \texttt{LD\_ASSUME\_KERNEL}:
 
 There is a new installation tool on the CD-ROM this time called \texttt{quick\_install}.
 This tool can be run directly from the CD-ROM to do a full fresh installation of
-the Starlink Software. It can not be used for updating existing installations. 
-The script requires root access to create the soft link \texttt{/star}. 
+the Starlink Software. It can not be used for updating existing installations.
+The script requires root access to create the soft link \texttt{/star}.
 
 When running the script you will be asked to supply the full path to the
 desired installation directory and to the CD-ROM. The CD-ROM must be mounted!
 It will also ask you if you would like to setup the Starlink news service,
 but this can be skipped if you are installing a personal copy of the software,
-as it is only used for site wide installations.  
+as it is only used for site wide installations.
 
 Basically, just follow the prompts given by the script and you will have a
 full installation as quickly as possible.
@@ -588,7 +588,7 @@ The \texttt{quick\_install} script creates an install log in your home directory
 
 \begin{quote}
 \begin{verbatim}
-% $HOME/quick_log 
+% $HOME/quick_log
 \end{verbatim}
 \end{quote}
 
@@ -597,60 +597,60 @@ This will be useful to diagnose problems if the installation should fail.
 \subsection{\label{windows}\xlabel{windows}STARJAVA for Microsoft Windows}
 
 There is a Microsoft Windows version of STARJAVA which can be downloaded from \\
-\htmladdnormallink{\texttt{ftp://ftp.starlink.ac.uk/pub/ussc/windows/starjava.exe}}{ftp://ftp.starlink.ac.uk/pub/ussc/windows/starjava.exe} 
-and is also included on the Starlink CD-ROM in directory \texttt{windows}. 
-To install STARJAVA just run the executable and you will be presented with a standard 
-Windows graphical installer. You will have the options to install all applications and 
-documentation, plus the Java Runtime Environment (JRE) and Java Advanced Imaging (JAI). 
-JRE and JAI have their own installers, but these are started by the STARJAVA installer 
-(if they are selected for installation). A full installation of everything is approximately 
+\htmladdnormallink{\texttt{ftp://ftp.starlink.ac.uk/pub/ussc/windows/starjava.exe}}{ftp://ftp.starlink.ac.uk/pub/ussc/windows/starjava.exe}
+and is also included on the Starlink CD-ROM in directory \texttt{windows}.
+To install STARJAVA just run the executable and you will be presented with a standard
+Windows graphical installer. You will have the options to install all applications and
+documentation, plus the Java Runtime Environment (JRE) and Java Advanced Imaging (JAI).
+JRE and JAI have their own installers, but these are started by the STARJAVA installer
+(if they are selected for installation). A full installation of everything is approximately
 191 Mb. You will also be presented with the option to select the installation directory.
-Desktop icons (optional) and Start Menu Icons will be created with links to the 
+Desktop icons (optional) and Start Menu Icons will be created with links to the
 GUI applications and documentation. See the document \xref{}{sun251}{}
-\texttt{Getting Started with the Starlink Java Infrastructure and Applications Set} 
+\texttt{Getting Started with the Starlink Java Infrastructure and Applications Set}
 for further details.
 
 \section{\xlabel{conditions_of_use}Conditions of Use}
 \label{conditions_of_use}
 
-Starlink has recently revised the conditions of use of the Starlink 
+Starlink has recently revised the conditions of use of the Starlink
 software. The software is still distributed free of distribution charge,
 but is now under GPL License.
 
 \begin{quote}
 \latexonlysmall
 \begin{center}\textbf{STARLINK SOFTWARE COPYRIGHT}\end{center}
- 
+
 \textbf{PREAMBLE}
 
 The purpose of this document is to state the terms and conditions
 under which Starlink software, documentation, data and other associated
 material (``the Software'') may be used.
 
-\par 
+\par
 \textbf{NOTICE TO USER:}
-\par 
+\par
 \textbf{BY USING THE SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
 WHICH APPLY TO ITS USE.}
- 
+
 \begin{enumerate}
 
-\item The Starlink Software Collection is Copyright 1980-2003, Council 
- for the Central Laboratory of the Research Councils (``CCLRC''), 
+\item The Starlink Software Collection is Copyright 1980-2003, Council
+ for the Central Laboratory of the Research Councils (``CCLRC''),
  except where noted internally, or discussed below.
 
 \item The Starlink Project has recently made the decision to license its
- own software under the GNU General Public License (GPL) as published 
- by the Free Software Foundation; either version 2 of the License, 
- or (at your option) any later version. However, this transition is 
- not, and may never be, complete, and the following points should be 
+ own software under the GNU General Public License (GPL) as published
+ by the Free Software Foundation; either version 2 of the License,
+ or (at your option) any later version. However, this transition is
+ not, and may never be, complete, and the following points should be
  borne in mind.
 
   * All the code produced by the Starlink Project itself
     is copyright CCLRC and is distributed under the terms of the GPL.
 
   * Some software packages include a CONDITIONS statement which
-    refers to, or contains the text within, $<$\ldots$>$.  
+    refers to, or contains the text within, $<$\ldots$>$.
     These are also
     copyright CCLRC and this conditions statement should be taken
     to refer instead to the GPL.
@@ -668,22 +668,22 @@ WHICH APPLY TO ITS USE.}
     This set of packages includes at least Figaro.
 
 \item If you wish to use the code for a purpose for which the licence
- conditions, authorship or copyright are important, you should 
+ conditions, authorship or copyright are important, you should
  consult the project at \texttt{ussc@star.rl.ac.uk}.
 
-\item This Software is distributed in the hope that it will be useful, but 
- WITHOUT ANY WARRANTY; without even the implied warranty of 
+\item This Software is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  Public License for more details.
 
-\item You should have received a copy of the GNU General Public License along 
- with this Software; if not, write to the Free Software Foundation, Inc., 
- 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA. You can also find 
+\item You should have received a copy of the GNU General Public License along
+ with this Software; if not, write to the Free Software Foundation, Inc.,
+ 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA. You can also find
  the GPL on the GNU web site.
- 
+
 \item Some of the code distributed here refers to an earlier version of
  the Starlink Software Licence, located at
- \htmladdnormallink{\texttt{http://www.starlink.ac.uk/store/conditions.html}}{http://www.starlink.ac.uk/store/conditions.html}, 
+ \htmladdnormallink{\texttt{http://www.starlink.ac.uk/store/conditions.html}}{http://www.starlink.ac.uk/store/conditions.html},
  which permitted non-commercial use only.  This licence has been
  superseded, and any references to that licence should be taken to
  refer to this licence instead.
@@ -778,7 +778,7 @@ modification follow.
 
 \addtocounter{enumi}{-1}
 
-\item 
+\item
 
 This License applies to any program or other work which contains a notice
 placed by the copyright holder saying it may be distributed under the
@@ -816,7 +816,7 @@ above, provided that you also meet all of these conditions:
 
 \begin{enumerate}
 
-\item 
+\item
 
 You must cause the modified files to carry prominent notices stating that
 you changed the files and the date of any change.
@@ -1116,59 +1116,59 @@ General Public License instead of this License.
 %\begin{quote}
 %\latexonlysmall
 %\begin{center}\textbf{STARLINK SOFTWARE LICENCE}\end{center}
-% 
+%
 %\textbf{PREAMBLE}
 %
 %The purpose of this document is to state the terms and conditions
 %under which Starlink software, documentation, data and other associated
 %material (``the Software'') may be used.
-%\par 
+%\par
 %\textbf{NOTICE TO USER:}
-%\par 
+%\par
 %\textbf{BY USING THE SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
 %WHICH APPLY TO ITS USE.}
-% 
+%
 %\begin{enumerate}
 %\item  The Software is owned by the Council for the Central Laboratory of the
 %Research Councils (``CCLRC'') unless a statement to the contrary appears
 %within the Software itself.
-% 
+%
 %\item The Software is made available free of charge for use in teaching and
 %research by:
 %\begin{enumerate}
 %\item private individuals for non-profit research; and
 %\item non-profit educational, academic and research institutions.
 %\end{enumerate}
-% 
+%
 %\item Commercial use of the Software is specifically excluded from the terms
 %and conditions of this licence.  Commercial use of the Software is subject
 %to the prior written agreement of CCLRC on terms to be agreed.
-% 
+%
 %\item The provision of any version of the Software under the terms and
 %conditions specified herein does not imply that future versions will also
 %be made available under the same terms and conditions.
-% 
+%
 %\item The user may modify the Software for his own purposes.  The user may
 %distribute the modified software provided that CCLRC is informed and that
 %a copy of the modified software is made available to CCLRC on request.
 %All modifications made by the user shall be clearly identified to show how
 %the modified software differs from the original Software.
-% 
+%
 %\item In any published work produced by the user and which includes results
 %achieved by using the Software, the user shall acknowledge that the Software
 %was used in producing the information contained in such publication.
-% 
+%
 %\item The user may incorporate or embed the Software into other software
 %products which he may then give away free of charge but not sell provided
 %the user makes due acknowledgement of the use which he has made of the
 %Software in creating such software products.   Any redistribution of the
 %Software in this way shall be made under the same terms and conditions
 %under which the user received it from CCLRC.
-% 
+%
 %\item The user shall not cause the Software to be brought into disrepute,
 %either by misuse, or use for inappropriate tasks, or by inappropriate
 %modification.
-% 
+%
 %\item The Software is provided to the user ``as is'' and CCLRC makes no
 %warranty as to its suitability or performance.   CCLRC does not and
 %cannot warrant the performance or results which the user may obtain by
@@ -1190,7 +1190,7 @@ This section details changes to the Starlink packages at this release.
 All packages in the distribution have been rebuilt from a common source set.
 Details of each \cdrom\ are described in later sections.  A list of all
 the packages is available in appendix~\ref{available_software}, and tables
-of the sizes of installed packages are available in 
+of the sizes of installed packages are available in
 appendix~\ref{package_sizes}.
 
 \subsection{\xlabel{new_packages}New packages}
@@ -1200,28 +1200,28 @@ The following new packages are available in this release.
 
 \begin{description}
 
-%\item[HDSTOOLS] is a suite of utilities for editing, inspecting and manipulating 
-%HDS files.  The new document -- \textit{\xref{HDSTOOLS -- Tools To Display and Edit 
+%\item[HDSTOOLS] is a suite of utilities for editing, inspecting and manipulating
+%HDS files.  The new document -- \textit{\xref{HDSTOOLS -- Tools To Display and Edit
 %HDS Objects}{sun245}{}\/} (SUN/245) describes the package.
 
-\item[AUTOASTROM v0.5-7] Autoastrometry of mosaics. The new document (SUN/242) 
+\item[AUTOASTROM v0.5-7] Autoastrometry of mosaics. The new document (SUN/242)
 \textit{\xref{AUTOASTROM -- Autoastrometry for Mosaics}{sun242}{}\/}
 describes the package. AUTOASTROM is not available under Tru64 Unix.
 
 \item[JCMTDR v1.2-2] Applications for reducing JCMT GSD on-the-fly data.
-The documents SC/1 \textit{\xref{JCMTDR Cookbook}{sc1}{}\/} and 
-SUN/132 \textit{\xref{Applications for Reducing JCMT GSD Data 1.2-2 User's manual}{sun132}{}\/} 
+The documents SC/1 \textit{\xref{JCMTDR Cookbook}{sc1}{}\/} and
+SUN/132 \textit{\xref{Applications for Reducing JCMT GSD Data 1.2-2 User's manual}{sun132}{}\/}
 describe the package.
 
 \item[STARJAVA v1.0b] Starlink Java Infrastructure and Applications Set.
-The new document (SUN/251) 
-\textit{\xref{Getting Started with the Starlink Java Infrastructure 
+The new document (SUN/251)
+\textit{\xref{Getting Started with the Starlink Java Infrastructure
 and Applications Set}{sun251}{}\/}
-describes the package and \texttt{/star/starjava/javadocs/index.html} 
+describes the package and \texttt{/star/starjava/javadocs/index.html}
 describes the Starlink STARJAVA classes API. There are miscellaneous
 documents in \texttt{/star/starjava/docs/} for individula package information and
 third party application documentation.
- 
+
 The STARJAVA package contains the following applications and classes. Note,
 SPLAT, TREEVIEW, JNIAST and JNIHDS have been moved to the STARJAVA
 package, instead of being individual packages.
@@ -1235,7 +1235,7 @@ package, instead of being individual packages.
 \item[ TOPCAT V0.3b] Tool for OPerations on Catalogues and Tables (new)
 \item[ TREEVIEW V2.1-3] Hierarchical data viewer (update)
 
-\item[CLASS LIBRARIES in STARJAVA] 
+\item[CLASS LIBRARIES in STARJAVA]
 \item[ ARRAY V0.2] N-dimensional array manipulation and I/O (new)
 \item[ ASTGUI V1.0] AST specific UI components (new)
 \item[ AXIS V1.0b2] Third generation Apache SOAP (new)
@@ -1243,7 +1243,7 @@ package, instead of being individual packages.
 \item[ DOM4J V0.1] Third party DOM access library (org.dom4j.*) (new)
 \item[ FITS V0.1] STARJAVA-specific FITS access (new)
 \item[ HDS V0.1] Non-native HDS utility classes (new)
-\item[ HDX V0.1] A flexible, extensible, data model for astronomical images, 
+\item[ HDX V0.1] A flexible, extensible, data model for astronomical images,
 tables and other metadata (new)
 \item[ JAIUTIL V1.0] Utility classes for JAI (new)
 \item[ JETTY V4.0.4] HTTP Server and Servlet Container (new)
@@ -1261,12 +1261,12 @@ tables and other metadata (new)
 \end{description}
 
 The STARJAVA package can be considered to be independent of the standard USSC,
-and in future will be distributed separately. All the STARJAVA applications 
+and in future will be distributed separately. All the STARJAVA applications
 and classes are distributed under the GPL licence.
 
-The SPLAT documentation (SUN/243) \textit{\xref{SPLAT - A Spectral Analysis 
-Tool}{sun243}{}\/} has been updated and can be found in 
-\texttt{/star/starjava/docs/splat/sun243.htx/sun243.html}. It also appears 
+The SPLAT documentation (SUN/243) \textit{\xref{SPLAT - A Spectral Analysis
+Tool}{sun243}{}\/} has been updated and can be found in
+\texttt{/star/starjava/docs/splat/sun243.htx/sun243.html}. It also appears
 in the DOCS package and can be seen with the command \texttt{showme sun243}.
 
 STARJAVA is not available under Tru64 Unix.
@@ -1279,14 +1279,14 @@ STARJAVA is not available under Tru64 Unix.
 
 \begin{description}
 \item[ASTROM v3.7] Update - Now reports its astrometry information additionally
-through generated FITS WCS headers (this is still provisional, see the notes on this 
-topic in the documentation, SUN/5). There are new arguments on the command line, 
+through generated FITS WCS headers (this is still provisional, see the notes on this
+topic in the documentation, SUN/5). There are new arguments on the command line,
 allowing you to request a summary and log files (the latter easily parseable).
 
-\item[ATOOLS v1.5] Update - New commands added: \texttt{astinvert}, \\ 
-\texttt{astmapbox}, \texttt{astspecframe}, \texttt{astsetrefpos} and \texttt{astgetrefpos}. 
-These are straight analogues of the corresponding AST routines. When reading or writing AST objects, 
-ATOOLS commands now indicate the nature of the file accessed (i.e. whether it is an NDF, 
+\item[ATOOLS v1.5] Update - New commands added: \texttt{astinvert}, \\
+\texttt{astmapbox}, \texttt{astspecframe}, \texttt{astsetrefpos} and \texttt{astgetrefpos}.
+These are straight analogues of the corresponding AST routines. When reading or writing AST objects,
+ATOOLS commands now indicate the nature of the file accessed (i.e. whether it is an NDF,
 a FITS file or a text file).
 
 \item[CCDPACK v4.0-15] Fix - Release v4.0-15 is a bug fix update of CCDPACK
@@ -1297,7 +1297,7 @@ spectra. Improved propagation of existing world co-ordinate system (WCS)
 headers in \texttt{NDF2FITS}.
 
 \item[DIPSO v3.6-1] Update - The \texttt{READ} command has been modified so that it will
-attempt to read spectral axis information from the WCS component of an NDF. 
+attempt to read spectral axis information from the WCS component of an NDF.
 The \texttt{WRITE} command has been modified so that it will add a WCS component to the
 output NDF describing the spectral axis.
 
@@ -1317,17 +1317,17 @@ units, spectral systems and reference frames.
 
 \item[ORAC-DR v4.0-1] Update - Support for UIST and INGRID in all observation modes.
 Support for ISAAC in imaging mode, and preliminary support for spectroscopy mode.
-Four new recipes including \texttt{NOD\_SKY\_FLAT\_THERMAL} recipe for reduction of thermal data 
+Four new recipes including \texttt{NOD\_SKY\_FLAT\_THERMAL} recipe for reduction of thermal data
 using sky observations for flat-fielding. Plus many other updates and fixes.
 
 \item[PERIOD v5.0-2] Fix - is a bug fix release.
-  
+
 \item[PISA v2.4-5] Fix - is a bug fix release.
 
 \item[POLPACK v3.1-2] Update - Minor Updates.
 
 \item[SPECX v6.8-1] Update - New Commands: \texttt{SET-DATA-DIRECTORY} and \texttt{SWITCH-DATE}.
-Plus several bug fixes. 
+Plus several bug fixes.
 
 \item[SURF v1.6-11] Fix - is a bug fix release.
 
@@ -1357,7 +1357,7 @@ release.
 \item[AST v2.0-9] Update - The implementation of the \texttt{astWrite} \texttt{(AST\_WRITE)}
 function within the \texttt{FitsChan} class has been modified. Support for spectral
 coordinate systems has been introduced through the addition of two new classes,
-\texttt{SpecFrame} and \texttt{SpecMap}. Facilities have been added to the \texttt{Frame} 
+\texttt{SpecFrame} and \texttt{SpecMap}. Facilities have been added to the \texttt{Frame}
 class which allow differences in axis units to be taken into account when finding a Mapping
 between two Frames. Various bug fixes.
 \item[CFITSIO v2.4.40b] Update - The CFITSIO function library v2.4.40b is now
@@ -1376,22 +1376,22 @@ specifications.
 fix.
 
 \item[INIT v1.1-24] Update - Command definitions for AUTOASTROM, JCMTDR
-and STARJAVA added. 
+and STARJAVA added.
 
-\item[JRE v1.4.1\_02] Update - Java Runtime Environment v1.4.1\_02 and Java 
+\item[JRE v1.4.1\_02] Update - Java Runtime Environment v1.4.1\_02 and Java
 Advanced Imaging v1\_1\_2-rc.
 
 \item[KAPLIBS v2.3] Update - \texttt{kpg1\_dsfrm} modified to include details of \\
-AST SpecFrames. \texttt{kpg1\_asmrg} modified to attempt alignment in Domain SPECTRAL. 
-Script \texttt{kaplibs\_link added} for linking standalone applications. \texttt{GETHLP} 
+AST SpecFrames. \texttt{kpg1\_asmrg} modified to attempt alignment in Domain SPECTRAL.
+Script \texttt{kaplibs\_link added} for linking standalone applications. \texttt{GETHLP}
 moved from KAPPA to \texttt{KAPLIBS:KAPGEN}.
 
-\item[MERS v1.8] Update - \texttt{MSG1\_GREF} is completely revised to simplify its interface 
+\item[MERS v1.8] Update - \texttt{MSG1\_GREF} is completely revised to simplify its interface
 with the parameter system, using a new routine \texttt{SUBPAR\_GREF}. Plus bug fixes.
 
 \item[MESSGEN v1.1-3] Fix - Bug fixes.
 
-\item[PCS v4.1-1] Update - A new subroutine \texttt{SUBPAR\_GREF} provides the functionality 
+\item[PCS v4.1-1] Update - A new subroutine \texttt{SUBPAR\_GREF} provides the functionality
 required by the MERS routine \texttt{MSG1\_GREF}. Plus bug fixes.
 
 \item[PERL v5.8.0] Update - The Starlink installation of PERL is at Perl V5.8.0.
@@ -1400,7 +1400,7 @@ required by the MERS routine \texttt{MSG1\_GREF}. Plus bug fixes.
 Astro-FITS-CFITSIO-1.01, Inline-0.44, Parse-RecDescent-1.94, Pod-Escapes-1.03,
 Pod-Simple-0.96, Text-Balanced-1.94 and Tk-HistEntry-0.40.
 
-\item[PGPLOT v5.2.2-2] Update - Bug fixes and updates from the original PGPLOT source. 
+\item[PGPLOT v5.2.2-2] Update - Bug fixes and updates from the original PGPLOT source.
 
 \item[PRIMDAT v1.3-1] Fix - Bug fixes.
 
@@ -1424,7 +1424,7 @@ There are no changes to the base set at this release.
 \subsection{\xlabel{withdrawn_packages}Withdrawn Packages}
 \label{withdrawn_packages}
 
-There are no packages withdrawn at this release. 
+There are no packages withdrawn at this release.
 
 \subsection{New, updated or withdrawn documents}
 
@@ -1438,13 +1438,13 @@ or withdrawn.
 %There are no new documents at this release.
 
 \begin{itemize}
-\item \textit{\xref{SUN/246.01 ORAC-DR - integral field spectroscopy data 
+\item \textit{\xref{SUN/246.01 ORAC-DR - integral field spectroscopy data
 reduction 4.0 User Guide (NEW)}{sun246}{}\/}
 
-\item \textit{\xref{SUN/251.01 STARJAVA - Getting Started with the Starlink Java 
+\item \textit{\xref{SUN/251.01 STARJAVA - Getting Started with the Starlink Java
 Infrastructure and Applications Set (NEW)}{sun251}{}\/}
 
-\item \textit{JAVADOCS/1.0b STARJAVA - \texttt{/star/starjava/javadocs/index.html} -\\ 
+\item \textit{JAVADOCS/1.0b STARJAVA - \texttt{/star/starjava/javadocs/index.html} -\\
 Starlink STARJAVA classes API (NEW)}
 
 \end{itemize}
@@ -1504,8 +1504,8 @@ Both sets of files will continue to be available to UK starlink sites
 via a private distribution mechanism.
 
 Other users may query the world list of astronomers by using the
-\htmladdnormallink{Astrosearch}{http://www.starlink.ac.uk/astrolist/astrosearch.html} 
-utility on the Starlink Web server\latex{~at 
+\htmladdnormallink{Astrosearch}{http://www.starlink.ac.uk/astrolist/astrosearch.html}
+utility on the Starlink Web server\latex{~at
 \texttt{http://www.starlink.ac.uk/astrolist/astrosearch.html}}.
 
 \subsection{Size changes}
@@ -1523,7 +1523,7 @@ systems to run the Starlink Software.
 % \textit{The disk space requirements listed below for \textbf{runtime} systems
 % listed below apply to the Spring 1999 \cdrom.  There are no runtime
 % \cdroms for the Autumn 1999 distribution.}
- 
+
 \subsection{\xlabel{dec_alpha_digital_unix}Compaq Alpha / Tru64 Unix}
 \label{dec_alpha_digital_unix}
 
@@ -1534,7 +1534,7 @@ are as follows:
 
 \item System -- Any Compaq Alpha system with a minimum of 128Mb memory
 running Tru64 Unix v5.1 or higher.  It should have swap space 2-3
-times larger than its physical memory.  Total virtual memory should be 
+times larger than its physical memory.  Total virtual memory should be
 adequate for your data processing needs.
 
 \textbf{It is known that this build will not run on versions of Tru64
@@ -1567,7 +1567,7 @@ are as follows:
 processor.  A Pentium II class processor or above is highly recommended.
 
 \item Memory -- 64Mb minimum, 128Mb recommended.  Swap space should be
-2-3 times larger than the physical memory. Total virtual memory should be 
+2-3 times larger than the physical memory. Total virtual memory should be
 adequate for your data processing needs.
 
 \item Disk -- A complete installation requires \rhafull.
@@ -1577,8 +1577,8 @@ requires from 100Mb to 200Mb.   Additional space is required for user
 data.  A 3Gb disk or partition is the recommended minimum if you wish
 to install the whole collection.
 
-\item Linux -- There are two Linux versions of the Starlink Software, 
-one built under RedHat Linux 7.3 using the 2.4.18 kernel and the other 
+\item Linux -- There are two Linux versions of the Starlink Software,
+one built under RedHat Linux 7.3 using the 2.4.18 kernel and the other
 built under RedHat Linux 9.0 using the 2.4.20 kernel.
 
 RedHat Linux 7.3 is the Linux distribution supported by Starlink but it
@@ -1655,7 +1655,7 @@ Starlink software.  ORAC-DR requires tc-shell.
 \newpage
 \section{\xlabel{mounting_the_cdroms}Mounting the \cdroms}
 \label{mounting_the_cdroms}
- 
+
 The \cdroms\ are written in \texttt{iso9660} format and so should be
 mounted as described in the following sections.  It is assumed that you
 are logged in as \texttt{root} and are using the Bourne shell
@@ -1679,7 +1679,7 @@ options       CDFS
 in your \texttt{/sys/conf/SYSTEM\_NAME} kernel configuration file.  You should
 rebuild and reinstall your kernel if required.
 
-The instructions below assume the device name of the \cdrom\ drive is 
+The instructions below assume the device name of the \cdrom\ drive is
 \texttt{/dev/rz4c}.  This may differ on your machine.
 
 To mount the \cdrom\ at boot time add the following entry to your
@@ -1730,7 +1730,7 @@ similar to this:
 
 The device name \texttt{/dev/scd0} may vary depending on your system.  The
 \texttt{exec} option is necessary to allow you to run binaries and
-scripts from the \cdrom.   The tools on the CDs will not run if you do not 
+scripts from the \cdrom.   The tools on the CDs will not run if you do not
 use this option.
 
 If a \cdrom\ is already mounted, then you should first dismount it
@@ -1871,7 +1871,7 @@ in Bourne or Bash shell, and
 in C-shell or tc-shell.
 
 \textbf{This environment variable is important because the remainder of this
-document assumes that it exists and the tools on the 
+document assumes that it exists and the tools on the
 \cdroms\ will not run without it.}
 
 
@@ -1895,17 +1895,17 @@ The installation \cdroms\ are only distribution
 media -- you cannot run the Starlink software directly off them.
 They contain the software sets required to create new installations of
 the Starlink software and the tools required to update existing
-installations.  
+installations.
 
 The \axp\ and \sol\ \cdroms\ contains the base set installation kits.
 
 The \rha\ and \rhb\ \cdroms\ contains the set of compilers and associated
-packages for Linux.  
+packages for Linux.
 
 The following sections describe the contents of the \cdroms, what
 options are available for using them, and the tools provided.
 
-The methods for installing or updating are then described in separate 
+The methods for installing or updating are then described in separate
 sections and apply to all version of the \cdroms.
 
 \subsection{\xlabel{installation_cdrom_contents}Installation \cdrom\ contents}
@@ -1917,15 +1917,15 @@ The \cdroms\ have the following files and directories:
 \rha\ and \rhb
 \begin{verbatim}
 % ls $CDROM
-CONDITIONS.html  README_FIRST.html  README_JAVA 
-docs  INSTALL  linux_bits  news  packages  quick-install  
+CONDITIONS.html  README_FIRST.html  README_JAVA
+docs  INSTALL  linux_bits  news  packages  quick-install
 Summer-2003  starjava  tools  windows
 \end{verbatim}
 \axp\ and \sol:
 \begin{verbatim}
 % ls $CDROM
-CONDITIONS.html  README_FIRST.html  README_JAVA 
-Summer-2003  docs  packages  quick-install  INSTALL  
+CONDITIONS.html  README_FIRST.html  README_JAVA
+Summer-2003  docs  packages  quick-install  INSTALL
 base  news  starjava  tools  windows
 \end{verbatim}
 \end{quote}
@@ -1940,11 +1940,11 @@ starjava  Summer-2003  tools  windows
                                Microsoft Windows and instructions on how to
                                run STARJAVA from the CD-ROM (Windows and Unix).
 
-\item \texttt{starjava} -- A directory containing runtime STARJAVA files, see 
+\item \texttt{starjava} -- A directory containing runtime STARJAVA files, see
                            the README\_JAVA file.
 
-\item \texttt{windows} -- A directory containing the Windows STARJAVA installation 
-                          files (starjava.exe) 
+\item \texttt{windows} -- A directory containing the Windows STARJAVA installation
+                          files (starjava.exe)
 
 \item \texttt{CONDITIONS.html} -- The distribution and use conditions which
 you must read.
@@ -1976,20 +1976,20 @@ the packages.
 \item \texttt{tools} -- Various tools for installations and updates.
 
 
-\item \texttt{quick\_install} -- A tool for doing a full installation of the 
-Starlink Software (should not be used for updating existing systems). 
+\item \texttt{quick\_install} -- A tool for doing a full installation of the
+Starlink Software (should not be used for updating existing systems).
 
 \end{itemize}
 
 The following sections contain recipes for updating existing software
-installations and creating new ones.  
+installations and creating new ones.
 
 \subsection{\xlabel{using_the_cdroms}Using the \cdroms}
 \label{using_the_cdroms}
 
 The \cdroms\ give you the ability to update your existing
 installation of Starlink Software or to install a new tailored
-installation.  Which you choose to use depends upon your requirements. 
+installation.  Which you choose to use depends upon your requirements.
 
 \begin{itemize}
 
@@ -2004,11 +2004,11 @@ This category includes most UK Starlink sites.
 
 \item If your installation is old and has not been updated since you got
 it, or has got out-of-date, or has not been well maintained, you should
-scrap it and start from scratch either with a fresh installation tailored 
-to your requirements, or a full installation. 
+scrap it and start from scratch either with a fresh installation tailored
+to your requirements, or a full installation.
 
 \item If you do not have an existing installation you have no choice but to
-create a new one.  
+create a new one.
 
 \end{itemize}
 
@@ -2031,7 +2031,7 @@ Starting from scratch is the preferred option.
 \subsubsection{Updating an existing installation}
 
 Updating your installation gives you the opportunity to update as many
-packages as you want within your existing installation.  
+packages as you want within your existing installation.
 
 If you have packages installed for which no update is available, you
 should update the rest of your installation to get the updated packages
@@ -2041,7 +2041,7 @@ for which updates are provided in the appendix on
 \ref{available_software})}.
 
 Most UK Starlink Sites and sites that have recently installed complete
-Starlink software installations from \cdrom\ should consider updating 
+Starlink software installations from \cdrom\ should consider updating
 their existing installations.
 
 \subsubsection{\xlabel{starting_from_scratch}Starting from scratch}
@@ -2050,11 +2050,11 @@ their existing installations.
 Starting from scratch allows you to tailor a software installation to your
 requirements with complete control over what you have installed, or to
 make a complete installation of the whole system without worrying about what
-is available.   
+is available.
 
 If your Starlink software installation was obtained before the Autumn
 1997 \cdrom\ distribution you should consider starting again, unless
-you have software installed for which there are no update sets in this 
+you have software installed for which there are no update sets in this
 distribution.
 
 If you \emph{do} have packages installed for which there are no
@@ -2086,12 +2086,12 @@ tool for reinstating old versions of software packages though it is possible
 to reinstall old copies from previous Updates CDs.
 
 There are a number of dependencies within the Starlink software.  This
-means that if you update or install a package, you may at the same 
+means that if you update or install a package, you may at the same
 time have to update or install the other packages that it depends on.
 The tool is NOT aware of these dependencies which are listed in the
 \htmlref{dependencies section}{software_dependencies}
 \latex{(see appendix~\ref{software_dependencies})}.
-The order of installing dependent packages does not generally matter except 
+The order of installing dependent packages does not generally matter except
 that HTX must be installed first for new installations.
 
 \newpage
@@ -2108,7 +2108,7 @@ existing installation.
 Sites that have installations based on the Spring 2000 runtime \cdrom\
 distributions should replace it with a new
 \htmlref{tailored installation}{installing_from_scratch} (see
-section~\ref{installing_from_scratch}). 
+section~\ref{installing_from_scratch}).
 
 The general sequence of events is as follows:
 
@@ -2139,7 +2139,7 @@ owner of the Starlink software installation you intend to update.
 \subsection{\xlabel{pre-update_tasks_and_setups}Pre-update tasks and setups}
 \label{pre-update_tasks_and_setups}
 
-The pre-update tasks can be broken down into sets: 
+The pre-update tasks can be broken down into sets:
 
 \begin{enumerate}
 \item mount the appropriate \cdrom, set environment variables, and warn users,
@@ -2149,7 +2149,7 @@ The pre-update tasks can be broken down into sets:
 \item update packages requiring a special sequence.
 \end{enumerate}
 
-The following sections describe the pre-update tasks in more detail.  You 
+The following sections describe the pre-update tasks in more detail.  You
 must complete each task before proceeding to update your installation.
 
 It is assumed that you execute these tasks as the owner of the
@@ -2160,7 +2160,7 @@ Use of C-shell or tc-shell is assumed.
 
 The first step is to \htmlref{mount}{mounting_the_cdrom} the appropriate
 \cdrom\ \latex{(see section~\ref{mounting_the_cdroms})}
-and set some environment variables as follows:   
+and set some environment variables as follows:
 
 \begin{enumerate}
 
@@ -2178,7 +2178,7 @@ or \texttt{sun4\_Solaris} for Solaris (\emph{e.g.,} \texttt{`setenv SYSTEM
 ix86\_Linux'}).
 
 \item Set \texttt{INSTALL} to indicate the root directory of your
-installation.  This is most often \texttt{/star} but may be any absolute 
+installation.  This is most often \texttt{/star} but may be any absolute
 directory name (\emph{e.g.,} \texttt{`setenv INSTALL /star'}). It
 is now compulsory to have /star as a real directory or as a soft
 link to your installation directory. For this reason we recommend
@@ -2194,7 +2194,7 @@ variables to define the local print command, the local contact name and
 contact email address:
 
 \begin{itemize}
-\item Set \texttt{LOCALPRINT} to define the print command used by the 
+\item Set \texttt{LOCALPRINT} to define the print command used by the
 `Print' option in NEWS.
 \item Set \texttt{MAINTAINER} to the administrator of the NEWS system.
 \item Set \texttt{NEWSEMAIL} to the administrator's email address.
@@ -2204,7 +2204,7 @@ If you do not wish to install the Starlink PERL set you should set the
 \texttt{PERL} environment variable to point to an appropriate Perl
 installation.   \textbf{Note:} the ORAC-DR pipeline system requires the
 Starlink PERL installation and the PERLMODS and STARPERL packages so if
-you wish to install ORAC-DR, please install PERL, PERLMODS and STARPERL too. 
+you wish to install ORAC-DR, please install PERL, PERLMODS and STARPERL too.
 
 The two sets of quotes are important in these definitions.
 
@@ -2232,7 +2232,7 @@ depends on how fast your processor/disk system is.
 
 There are a number of old documents not distributed with particular
 packages that have been withdrawn from the Starlink software over the
-years for which source files may still be present in existing installations.  
+years for which source files may still be present in existing installations.
 These should be removed to save space.
 
 In addition, document files sometimes become detached from their
@@ -2261,10 +2261,10 @@ updated at each release to remove appropriate files.}
 
 %There are no old/obsolete packages to remove at this release.
 
- Various withdrawn, obsolete or moved package sets should be removed before 
- attempting an update.   
+ Various withdrawn, obsolete or moved package sets should be removed before
+ attempting an update.
 
- \textit{\textbf{It is essential that these packages are removed 
+ \textit{\textbf{It is essential that these packages are removed
  before you attempt to update!}}
 
  \begin{enumerate}
@@ -2310,7 +2310,7 @@ The \texttt{update} tool does not know about beta-test directories so
 packages installed from the standard directories on top of beta-tests
 will cause the update process to fail.
 
-\emph{The recommended action is to make permanent the version of a package 
+\emph{The recommended action is to make permanent the version of a package
 that is in use.}
 
 The beta-test versions of software on your system should be swapped with the
@@ -2366,11 +2366,11 @@ problems updating your installation.
 
 %\subsubsection{Update packages requiring a special sequence}
 %
-%At this release, several documents have been moved to and from the DOCS 
+%At this release, several documents have been moved to and from the DOCS
 %package. It is therefore necessary to update the DOCS package as shown above.
 %
 %If you are updating everything in one pass using the `update everything',
-%or `update core' methods, the update tool will update DOCS and PCS in the 
+%or `update core' methods, the update tool will update DOCS and PCS in the
 %correct order.
 %
 %If you are updating packages one-by-one or in component blocks, you
@@ -2381,7 +2381,7 @@ problems updating your installation.
 \label{updating_the_installation}
 
 When you have completed the pre-update tasks described in the previous
-section, you can move on to the actual update.  
+section, you can move on to the actual update.
 
 The \texttt{update} tool is in \texttt{\$CDROM/tools} and is capable
 of updating an entire software installation in one pass if it does not
@@ -2430,7 +2430,7 @@ available updating your installed versions.
 \end{quote}
 
 The \texttt{force} keyword tells the \texttt{update} tool not to prompt
-for instructions when it detects that the package is not installed.  
+for instructions when it detects that the package is not installed.
 
 Omit those package names that you do not require.
 
@@ -2444,11 +2444,11 @@ the instructions provided with the distribution.
 
 This completes the update of an existing installation.
 
-\textbf{General Notes:} 
+\textbf{General Notes:}
 
-The \texttt{update} tool keeps a journal of its activity in 
-\texttt{\$INSTALL/sources/logs/update\_log}, as well as 
-displaying its progress on screen.  
+The \texttt{update} tool keeps a journal of its activity in
+\texttt{\$INSTALL/sources/logs/update\_log}, as well as
+displaying its progress on screen.
 
 In \texttt{\$INSTALL/sources/logs} there will also be a log file
 \texttt{package\_update\_log} for each package, which contains the
@@ -2484,10 +2484,10 @@ A dialog similar to the following will occur:
 \begin{small}
 \begin{verbatim}
 % $CDROM/tools/update kappa
- 
+
 Starlink software update tool
- 
- 
+
+
 Attempting to update KAPPA.
 Proceeding to update KAPPA.
 ... checking for compressed source.
@@ -2497,7 +2497,7 @@ Proceeding to update KAPPA.
 ... unpacking new version.
 ... installing new version.
 KAPPA updated
- 
+
 Hypertext cross-reference linkup.
 Updating index file for document: sun95
 27 hypertext documents need re-linking
@@ -2506,9 +2506,9 @@ Updating index file for document: sun95
    updating cross-references in document sun95 (152 files to modify)...
       ...document sun95 linked
 Hypertext cross-reference linkup complete.
- 
+
 Completed processing.
- 
+
 \end{verbatim}
 \end{small}
 \end{quote}
@@ -2523,13 +2523,13 @@ updated, this happens:
 \begin{small}
 \begin{verbatim}
 % $CDROM/tools/update convert
- 
+
 Starlink software update tool
- 
- 
+
+
 Attempting to update CONVERT.
 CONVERT has already been updated.
- 
+
 Completed processing.
 \end{verbatim}
 \end{small}
@@ -2537,7 +2537,7 @@ Completed processing.
 
 All packages can be updated by specifying their name in lower case,
 except STARX\@.  To update STARX on its own, use
-\texttt{`\$CDROM/tools/update starX'}.  The package names can be found by 
+\texttt{`\$CDROM/tools/update starX'}.  The package names can be found by
 referring to the appendix on \htmlref{available software}{available_software}.
 
 If you do elect to update the installation one package at a time, do
@@ -2546,7 +2546,7 @@ not forget to add any new packages that might be required.
 \subsubsection{\xlabel{updating_several_packages}Updating several packages}
 \label{updating_several_packages}
 
-Updating all 100 or so packages one by one would become tedious so you can 
+Updating all 100 or so packages one by one would become tedious so you can
 specify more than one package to the \texttt{update} tool.  Suppose you
 wanted to update ASTROM, COCO and RV\@.  You could do them all in one pass thus:
 
@@ -2571,28 +2571,28 @@ large sets of packages which can be updated by specifying a keyword.
 The known groups are:
 
 \begin{description}
- 
+
 \item[\texttt{everything}] All the available packages, information files and
 documentation.
 
 \item[\texttt{libraries}] All the subroutine libraries.
- 
+
 \item[\texttt{systems}] All the systems components.
- 
+
 \item[\texttt{utilities}] All the non-astronomical utilities.
- 
+
 \item[\texttt{examples}] The four example sets.
- 
+
 \item[\texttt{info}] The information files.
- 
+
 \item[\texttt{docs}] Documents not attached to software.
- 
+
 \item[\texttt{core}] All the packages, including the documentation, except
 the examples, applications and astronomical utilities.
- 
+
 \item[\texttt{applications}] All the applications and astronomical
 utilities.
- 
+
 \end{description}
 
 You can therefore update all the subroutine libraries thus:
@@ -2633,8 +2633,8 @@ keyword as the first argument to the \texttt{update} tool.  Thus:
 \end{verbatim}
 \end{quote}
 
-will update all the non-astronomical utilities, missing out any 
-packages not in your installation. 
+will update all the non-astronomical utilities, missing out any
+packages not in your installation.
 
 Alternatively, you can force the \texttt{update} tool to install a
 package it detects you do not have, rather than prompting for
@@ -2669,7 +2669,7 @@ automatically update the information files and the document set.
 Note that the Starlink user's names lists have been removed from the INFO
 package and are distributed privately to UK starlink sites only.  If you
 have access to the distribution you should remember to (re)install the
-latest file set using the instructions provided with the distribution. 
+latest file set using the instructions provided with the distribution.
 
 \subsubsection{\xlabel{the_runtime_set}The RUNTIME package}
 \label{the_runtime_set}
@@ -2703,7 +2703,7 @@ the various packages in the \texttt{\$CDROM/news} directory.  There is also
 a news item \texttt{news\_ussc.txt} which summarises the release.
 
 If you are running the Starlink NEWS system the news files should be
-installed in your local news directory (usually 
+installed in your local news directory (usually
 \texttt{\$INSTALL/local/utility/news}) with appropriate expiry dates.
 
 \subsubsection{\xlabel{deinstalling_packages}Deinstalling packages}
@@ -2717,10 +2717,10 @@ wish to deinstall a package you can do it thus:
 % $CDROM/tools/remove package
 \end{verbatim}
 \end{quote}
- 
-This will remove \texttt{package} from your system.  Since the 
+
+This will remove \texttt{package} from your system.  Since the
 \texttt{remove} tool deletes the \texttt{package\_updated} file the
-you can add the package back again from the CD using the 
+you can add the package back again from the CD using the
 \texttt{update} tool.
 
 \subsection{\xlabel{using_the_updated_system}Using the updated system}
@@ -2742,21 +2742,21 @@ are loaded.
 \label{installing_from_scratch}
 
 Starting from scratch is the easy way to obtain a complete new Starlink
-software installation or to create a tailored installation.  
+software installation or to create a tailored installation.
 
 The advantages to starting again from scratch are that you get a `clean'
 installation without the spurious files that inevitably remain in an old
-and frequently updated software system.  
+and frequently updated software system.
 
 The disadvantage is that you cannot easily preserve any packages from old
 distributions which Starlink is no longer distributing.
 
-If you have a limited installation that has packages which are 
+If you have a limited installation that has packages which are
 no longer distributed, you can start again from scratch but you will
 have to preserve any such packages.  This is not trivial but the
 procedure is straightforward.
 The Starlink Software Librarian \texttt{ussc@star.rl.ac.uk} can offer
-advice on preserving packages previously distributed by Starlink.  
+advice on preserving packages previously distributed by Starlink.
 
 \textit{\textbf{The following packages do not have update sets in this
 distribution}}
@@ -2773,7 +2773,7 @@ The sequence of events for creating a new installation is as follows:
 \item \textbf{Pre-installation tasks}.  The pre-installation tasks set your
 system up to receive a new installation.
 
-\item \textbf{Install the packages}.  You can install as many or as few 
+\item \textbf{Install the packages}.  You can install as many or as few
 packages as you need.
 
 \end{enumerate}
@@ -2824,8 +2824,8 @@ or \texttt{sun4\_Solaris} for Solaris (\emph{e.g.,} \texttt{`setenv SYSTEM
 ix86\_Linux'}).
 
 \item Set \texttt{INSTALL} to indicate the root directory of your new
-or existing installation.  For new installations, this is most often 
-\texttt{/star} but may be any absolute directory name (\emph{e.g.,} 
+or existing installation.  For new installations, this is most often
+\texttt{/star} but may be any absolute directory name (\emph{e.g.,}
 \texttt{`setenv INSTALL /star'}).
 
 \item If your \texttt{INSTALL} variable is set to something other than
@@ -2838,7 +2838,7 @@ variables to define the local print command, the local contact name and
 contact email address:
 
 \begin{itemize}
-\item Set \texttt{LOCALPRINT} to define the print command used by the 
+\item Set \texttt{LOCALPRINT} to define the print command used by the
 `Print' option in NEWS.
 \item Set \texttt{MAINTAINER} to the administrator of the NEWS system.
 \item Set \texttt{NEWSEMAIL} to the administrator's email address.
@@ -2847,7 +2847,7 @@ contact email address:
 The news system administrator is usually the owner of the Starlink software
 installation.
 
-If you do not intend to use the Starlink PERL package, you should also 
+If you do not intend to use the Starlink PERL package, you should also
 set \texttt{PERL} to indicate where it is.
 
 The two sets of quotes are important in these definitions.
@@ -2933,7 +2933,7 @@ create directories for the sources and log files.  This should be done
 using a user account that is to be the `owner' of the Starlink
 installation.  For example:
 
-\begin{quote}   
+\begin{quote}
 \begin{verbatim}
 % mkdir /wherever/starlink
 % mkdir /wherever/starlink/sources
@@ -2951,7 +2951,7 @@ link \texttt{/star} to point to this area:
 \end{quote}
 
 The majority of the Starlink software will run without the soft
-link \texttt{/star} but there are some exceptions:  
+link \texttt{/star} but there are some exceptions:
 
 \begin{enumerate}
 
@@ -2970,7 +2970,7 @@ is built specifically to work with the \texttt{/star} soft link.
 If you need to use SURF or ORAC-DR (or the \texttt{xrv} GUI) then you must use
 a \texttt{/star} soft link with \texttt{INSTALL} set to \texttt{/star}.
 
-If you cannot use a \texttt{/star} soft link you must remember to set the 
+If you cannot use a \texttt{/star} soft link you must remember to set the
 \texttt{STARLINK} environment variable as well as the \texttt{INSTALL}
 variable as detailed in the previous section.
 
@@ -2981,7 +2981,7 @@ The following sections detail various installation options.
 
 This method is recommended if you want a system that you can modify
 later by removing things you do not need but it uses a lot of disk space.
-You can always add back removed packages if you decide you want them at 
+You can always add back removed packages if you decide you want them at
 a later date.
 
 \subsubsection{\xlabel{installing_a_new_system-everything_quick_install}Installing a new system -- everything
@@ -2990,14 +2990,14 @@ with the quick\_install script}
 
 There is a new installation tool on the CD-ROM this time called \texttt{quick\_install}.
 This tool can be run directly from the CD-ROM to do a full fresh installation of
-the Starlink Software. It can not be used for updating existing installations. 
-The script requires root access to create the soft link \texttt{/star}. 
+the Starlink Software. It can not be used for updating existing installations.
+The script requires root access to create the soft link \texttt{/star}.
 
 When running the script you will be asked to supply the full path to the
 desired installation directory and to the CD-ROM. The CD-ROM must be mounted!
 It will also ask you if you would like to setup the Starlink news service,
 but this can be skipped if you are installing a personal copy of the software,
-as it is only used for site wide installations.  
+as it is only used for site wide installations.
 
 Basically, just follow the prompts given by the script and you will have a
 full installation as quickly as possible.
@@ -3006,7 +3006,7 @@ The \texttt{quick\_install} script creates an install log in your home directory
 
 \begin{quote}
 \begin{verbatim}
-% $HOME/quick_log 
+% $HOME/quick_log
 \end{verbatim}
 \end{quote}
 
@@ -3016,7 +3016,7 @@ This will be useful to diagnose problems if the installation should fail.
 by hand}
 \label{installing_a_new_system-everything_by_hand}
 
-Installing all the packages on a new system by hand is easy and uses the 
+Installing all the packages on a new system by hand is easy and uses the
 \texttt{update} tool.
 
 To obtain a complete installation of everything use the following
@@ -3031,9 +3031,9 @@ recipe:
 \end{verbatim}
 \end{quote}
 
-The \texttt{update} tool keeps a journal of its activity in 
-\texttt{\$INSTALL/sources/logs/update\_log}, as well as 
-displaying its progress on screen.  
+The \texttt{update} tool keeps a journal of its activity in
+\texttt{\$INSTALL/sources/logs/update\_log}, as well as
+displaying its progress on screen.
 
 In \texttt{\$INSTALL/sources/logs} there will also be a log file
 \texttt{package\_update\_log} for each package, which contains the
@@ -3047,7 +3047,7 @@ for each package successfully updated.  These files stop the
 The resulting installation has a copy of the sources directory system
 containing the software maintenance makefiles and scripts.  This allows
 the installation to be updated from the Starlink Software Store so you can
-install fixes and patches if required.  
+install fixes and patches if required.
 
 When you have a complete installation, you can initialise the software
 and start using it.  Section~\ref{initialise_starlink_software} gives details.
@@ -3073,16 +3073,16 @@ happens when you install a package.
 % $CDROM/tools/update htx
 \end{verbatim}
 \end{quote}
- 
+
 The dialogue will look like this:
 
 \begin{quote}
 \begin{verbatim}
 
 % $CDROM/tools/update htx
- 
+
 Starlink software update tool
- 
+
 
 Attempting to update HTX.
 Warning: HTX is not in your current installation.
@@ -3099,10 +3099,10 @@ Updating index file for document: sun188
    updating cross-references in document sun188 (10 files to modify)...
       ...document sun188 linked
 Hypertext cross-reference linkup complete.
- 
+
 Completed processing.
- 
-% 
+
+%
 \end{verbatim}
 \end{quote}
 
@@ -3116,20 +3116,20 @@ document collection.
 Since HTX is the first package installed, any references it has will be
 resolved by making hyperlinks to RAL.
 
-The \texttt{update} tool will write log files of what occurs in the 
-\texttt{\$INSTALL/sources/logs} directory.  
+The \texttt{update} tool will write log files of what occurs in the
+\texttt{\$INSTALL/sources/logs} directory.
 
 The main log is a journal of each invocation of the \texttt{update} tool
 called \texttt{update\_log}.  After the first installation of HTX is
-should look something like this: 
+should look something like this:
 
 \begin{quote}
 \begin{verbatim}
 % cat update_log
- 
+
 Info: update tool run starting: Fri Oct 10 11:34:51 BST 2002
- 
- 
+
+
 Info: Attempting to update HTX.
 Warning: HTX is not in your current installation.
 Info: Proceeding to add HTX.
@@ -3201,7 +3201,7 @@ or all the packages can be named at once:
 \end{quote}
 
 The tool will loop through all the packages prompting for confirmation of
-the installation of each package.  
+the installation of each package.
 
 For each package, a log file is created of the output of the installation
 process, the \texttt{update\_log} journal is updated and a tag file
@@ -3214,13 +3214,13 @@ terminate:
 \begin{quote}
 \begin{verbatim}
 % $CDROM/tools/update convert
- 
+
 Starlink software update tool
- 
- 
+
+
 Attempting to update CONVERT.
 CONVERT has already been updated.
- 
+
 Completed processing.
 \end{verbatim}
 \end{quote}
@@ -3234,18 +3234,18 @@ each specified package will be installed without prompting:
 \begin{quote}
 \begin{verbatim}
 % $CDROM/tools/update force observe
- 
+
 Starlink software update tool
- 
+
 Keyword (force) set.  Prompting for install instructions disabled.
- 
+
 Attempting to update OBSERVE.
 Warning: OBSERVE is not in your current installation.
 Proceeding to add OBSERVE.
 ... unpacking new version.
 ... installing new version.
 OBSERVE updated
- 
+
 Completed processing.
 
 %
@@ -3272,7 +3272,7 @@ data files, and INIT is the package of software initialisation scripts
 and the help text file.  The INFO package contains the standard
 document indices and user lists.
 
-Each can be installed using the \texttt{update} tool.  They are all 
+Each can be installed using the \texttt{update} tool.  They are all
 standard packages and may be installed appropriately:
 
 \begin{quote}
@@ -3322,7 +3322,7 @@ during the last phase:
 % unsetenv HTX_NOLINK
 % $CDROM/tools/update init runtime docs info
   ...
-\end{verbatim}  
+\end{verbatim}
 \end{quote}
 
 If you have completed your installation and omitted the hypertext
@@ -3360,21 +3360,21 @@ several keywords which define groups of packages.  The keywords are:
 \item[\texttt{libraries}] All the subroutine libraries.
 
 \item[\texttt{systems}] All the systems components.
- 
+
 \item[\texttt{utilities}] All the non-astronomical utilities.
 
 \item[\texttt{examples}] The four example sets.
 
 \item[\texttt{info}] The information files.
 
-\item[\texttt{docs}] Documents not attached to software. 
+\item[\texttt{docs}] Documents not attached to software.
 
 \item[\texttt{core}] All the packages, including the documentation, except
-the examples, applications and astronomical utilities. 
+the examples, applications and astronomical utilities.
 
 \item[\texttt{applications}] All the applications and astronomical
-utilities. 
- 
+utilities.
+
 \end{description}
 
 The following table gives the sizes of the various components in Mb (to
@@ -3386,7 +3386,7 @@ the nearest 0.1Mb):
 libraries          444.0       436.8       428.9       513.4
 examples            53.7        40.8        38.5        71.4
 systems              1.5         1.5         1.5         1.5
-utilities           21.9        21.9        21.9        21.9 
+utilities           21.9        21.9        21.9        21.9
 applications       998.3       963.5       960.6      1092.2
 documents          299.5       299.5       299.5       299.5
 everything        1818.9      1764.0      1750.9      1999.9
@@ -3399,17 +3399,17 @@ systems and your local systems, the actual size of an installation may
 vary but not by much.
 
 To create a program development installation, you need to install the
-subroutine libraries and possibly the example material, as well as the 
+subroutine libraries and possibly the example material, as well as the
 RUNTIME and INIT packages.  To do this you would use the following:
 
 \begin{quote}
 \begin{verbatim}
 % setenv HTX_NOLINK
-% $CDROM/tools/update htx 
+% $CDROM/tools/update htx
   ...
-% $CDROM/tools/update force libraries 
+% $CDROM/tools/update force libraries
   ...
-% $CDROM/tools/update force examples 
+% $CDROM/tools/update force examples
   ...
 % unsetenv HTX_NOLINK
 % $CDROM/tools/update runtime init docs info
@@ -3434,12 +3434,12 @@ BUT:
 
 \begin{quote}
 \emph{If you are adding one of the libraries or utilities, you must
-remember to deinstall the RUNTIME package before you add the extra 
+remember to deinstall the RUNTIME package before you add the extra
 package(s), and reinstall it after you have added the new package}.
 \end{quote}
 
 This is because the RUNTIME package consists of files that are normally
-provided in a complete installation by the various library and utility 
+provided in a complete installation by the various library and utility
 packages.  The
 RUNTIME package will only install these for use if your installation
 does not have them already, so the RUNTIME copies need to be removed
@@ -3502,7 +3502,7 @@ Assuming the user uses the \texttt{tcsh} shell:
 \end{verbatim}
 \end{quote}
 
-or 
+or
 
 \begin{quote}
 \begin{verbatim}
@@ -3515,14 +3515,14 @@ or
 
 The Starlink Software Collection is now available on your machine and
 can be run in the usual manner.   You need not do anything further unless
-you wish to run GAIA, in which case you should add the command 
+you wish to run GAIA, in which case you should add the command
 \texttt{source /star/etc/cshrc} to your \verb+${HOME}/.cshrc+ file.
 
-If you have the software on local disk and want to use it each time you 
-log in, you can put the \texttt{source /star/etc/login} command in your 
+If you have the software on local disk and want to use it each time you
+log in, you can put the \texttt{source /star/etc/login} command in your
 \verb+${HOME}/.login+ file and the \texttt{source /star/etc/cshrc}
 command in your \verb+${HOME}/.cshrc+ file. Simlilarly for \\
-\texttt{source /star/starjava/etc/login} and 
+\texttt{source /star/starjava/etc/login} and
 \texttt{source /star/starjava/etc/cshrc}.
 
 \subsection{\xlabel{getting_more_information}Getting more information}
@@ -3531,7 +3531,7 @@ command in your \verb+${HOME}/.cshrc+ file. Simlilarly for \\
 All the software has its own documentation, which is all contained in the
 directory \texttt{/star/docs}.  Most of the documents are available in
 hypertext form.  \LaTeX\ \texttt{.dvi} files are available for use with
-\texttt{xdvi} where hypertext is not available.  
+\texttt{xdvi} where hypertext is not available.
 
 A good starting point to discover what is available in the collection
 is to browse the \xref{Starlink Software Collection}{sun1}{} document
@@ -3553,7 +3553,7 @@ The \texttt{showme} command uses \texttt{netscape} as its default browser
 of \texttt{netscape} installed on your system.
 
 You can find the documents relating to a particular topic by using the
-\texttt{findme}. For example, to find the Starlink Cookbook series: 
+\texttt{findme}. For example, to find the Starlink Cookbook series:
 
 \begin{quote}
 \begin{verbatim}
@@ -3594,7 +3594,7 @@ reset   gaia            = starlink$gaia/
 reset   kappa           = starlink$kappa/
 reset   pongo           = starlink$pongo/
 reset   polpack         = starlink$polpack/
- 
+
 task    $ccdpack        = ccdpack$ccdpack.cl
 task    figaro.pkg      = figaro$figaro.cl
 task    $gaia           = gaia$gaia.cl
@@ -3628,33 +3628,33 @@ CL\@.  CCDPACK commands are made available by selecting the
 \latexonlysmall
 \begin{verbatim}
 % convert
- 
+
    CONVERT commands are now available -- (Version 1.1, 1998 January)
- 
+
    Defaults for automatic NDF conversion are set.
- 
+
    Type conhelp for help on CONVERT commands.
    Type "showme sun55" to browse the hypertext documentation.
 
 % cl
     NOAO Digital Unix/IRAF Revision 2.11 Tue Dec 23 23:16:53 MST 1997
     This is the EXPORT version of DUNX/IRAF V2.11 for Digital Unix 4.0.
-... 
+...
       ccdpack.    figaro.     kappa.      noao.       pongo.      system.
       dataio.     gaia.       language.   obsolete.   proto.      utilities.
-      dbms.       images.     lists.      plot.       softools.   
+      dbms.       images.     lists.      plot.       softools.
 cl> ccdpack
    CCDPACK commands are now available -- (Version 2.2-0)
- 
+
       calcor        ccdndfac      flatcor       pairndf       tranndf
       ccdalign      ccdnote       idicurs       picinfo       use_fits
       ccdclear      ccdsetup      import        plotlist      use_globals
       ccdedit       ccdshow       makebias      present       use_imh
       ccdexercise   debias        makecal       reduce        use_ndf
       ccdexp        findcent      makeflat      register      xreduce
-      ccdgenerate   findobj       makemos       schedule      
+      ccdgenerate   findobj       makemos       schedule
       ccdimp        findoff       nagmakemos    tranlist
-cc> 
+cc>
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -3678,7 +3678,7 @@ cc>
 % screen size functions.
 
 % To get around this the Starlink packages for the Winter 2000/1 release
-% were built on RedHat 6.1 but linked against the standard non-shared 
+% were built on RedHat 6.1 but linked against the standard non-shared
 % \texttt{ncurses} library from that distribution.  They should therefore run on
 % RedHat versions 6.0, 6.1 and 6.2, and any other Linux distribution based
 % on Glibc v2.1 or higher.
@@ -3689,16 +3689,16 @@ cc>
 % will fail, in others, the binaries will crash immediately on startup.
 % The runtime distribution for Linux has an appropriate version of the
 % \texttt{ncurses} library installed as \texttt{libcurses.a} in \texttt{/star/lib}
-% which the Starlink linking scripts will automatically pick up in preference 
+% which the Starlink linking scripts will automatically pick up in preference
 % to the system \texttt{ncurses} libaries.
 
 \subsubsection{Problems locating the terminfo database}
 
 Some binaries may have difficulty locating the \texttt{terminfo} files.
-This is because they are located in different places in some Linux 
-distributions compared to the location in a RedHat distribution.  The 
-binaries are linked non-shared with the \texttt{ncurses} library which 
-uses the \texttt{terminfo} files so the expected location of these files 
+This is because they are located in different places in some Linux
+distributions compared to the location in a RedHat distribution.  The
+binaries are linked non-shared with the \texttt{ncurses} library which
+uses the \texttt{terminfo} files so the expected location of these files
 is hardcoded in the binary.
 
 To get round this problem put a soft link in your system from the
@@ -3721,7 +3721,7 @@ The Linux \cdroms\ contain copies of the \texttt{glibc} RPM sets
 which are known to work with the Starlink software.  If your installed
 sets have lower version numbers and you experience problems running the
 Starlink packages, you should install those from the \cdrom\ or those
-with the same version number or higher from your Linux distribution. 
+with the same version number or higher from your Linux distribution.
 
 Section~\ref{compilers} describes how to install RPM sets.
 
@@ -3752,7 +3752,7 @@ which the built set can be generated by one command.  The built sets
 are provided in \texttt{\$CDROM/linux-bits/RPMS} on the Linux
 \cdroms.
 
-The RPM system places files in pre-determined places that are standard for 
+The RPM system places files in pre-determined places that are standard for
 most Linux systems, so you do not have to worry about where the files go.
 RPM itself keeps track of and can remove the files easily.
 
@@ -3818,7 +3818,7 @@ To deinstall a package, use the \texttt{--erase} directive to RPM,
 % \subsubsection{RPM for non-RedHat systems}
 %
 %Users of Linux distributions other than RedHat may not have access to
-%the RPM system, so the Linux \cdroms\ 
+%the RPM system, so the Linux \cdroms\
 %contain a version in compressed tar form that may be installed on most
 %Linux systems as follows (\texttt{root} access required):
 %
@@ -3829,10 +3829,10 @@ To deinstall a package, use the \texttt{--erase} directive to RPM,
 %\end{verbatim}
 %\end{quote}
 %
-%This unpacks the the RPM files into their required locations.  The 
-%`\texttt{P}' option for \texttt{tar} ensures that the files are installed 
+%This unpacks the the RPM files into their required locations.  The
+%`\texttt{P}' option for \texttt{tar} ensures that the files are installed
 %in their absolute position relative to the \texttt{/} (root) directory.
-%The \texttt{rpm} binary will be installed in \texttt{/bin} and is 
+%The \texttt{rpm} binary will be installed in \texttt{/bin} and is
 %a non-dynamic binary which has no shared library dependencies.
 
 \subsection{\label{compilers}\xlabel{compilers}Compilers}
@@ -3894,8 +3894,8 @@ be installed by the \texttt{update} tool.  Instead, each has its own
 installation notes included on the \cdrom.
 
 To install the Base set packages you need the standard \texttt{SYSTEM}
-and \texttt{CDROM} environment variables set, and in some cases 
-\texttt{INSTALL} must be set too.  Please refer to the appropriate 
+and \texttt{CDROM} environment variables set, and in some cases
+\texttt{INSTALL} must be set too.  Please refer to the appropriate
 package readme file in \texttt{\$CDROM/base}.
 
 There are no updates to the Base set at this release.
@@ -3906,7 +3906,7 @@ There are no updates to the Base set at this release.
 \section{\xlabel{available_software}Available Software}
 \label{available_software}
 
-This section lists the software packages available on the Summer 2003 \cdrom. 
+This section lists the software packages available on the Summer 2003 \cdrom.
 The list has been divided into three sections:
 
 \begin{enumerate}
@@ -3919,8 +3919,8 @@ The list has been divided into three sections:
 \label{applications_and_astronomical_utilities}
 
 The following list of application packages and astronomical utilities
-is available.  In some case where noted, update sets are not available for 
-one or more platforms.  
+is available.  In some case where noted, update sets are not available for
+one or more platforms.
 \begin{itemize}
 \item ASTROM -- Basic astrometry
 \item ASURV -- Astronomical survival techniques
@@ -3954,12 +3954,12 @@ one or more platforms.
 \item NAOS -- guide star finding tool for NAOMI
 \item OBSERVE -- Astronomical object observability tool
 \item ORAC-DR -- Data reduction pipeline
-\item PERIOD -- Periodic data analysis 
+\item PERIOD -- Periodic data analysis
 \item PHOTOM -- Photometry applications
 \item PISA -- Position, shape and intensity analysis
 \item POLMAP -- Polarimetry
 \item POLPACK -- Dual-beam imaging polarimetry
-\item PONGO -- Interactive graphics 
+\item PONGO -- Interactive graphics
 \item RV -- Radial velocity calculation
 \item SAOIMAGE -- Image display GUI
 \item SKYCAL -- Sky calendar and interactive almanac
@@ -4075,10 +4075,10 @@ required for the package to run, others listed are advisable.
 \item[DATACUBE:] requires CONVERT, KAPPA, FIGARO
 \item[FIGARO:] requires HDSTRACE as replacement for \texttt{EXAM} task.
 \item[FLUXES:] requires JPL
-\item[GAIA:] requires ESP, EXTRACTOR, KAPPA and PHOTOM for additional 
+\item[GAIA:] requires ESP, EXTRACTOR, KAPPA and PHOTOM for additional
 toolbox functions.
-\item[ORAC-DR:] requires PERL, PERLMODS, STARPERL, CCDPACK, CONVERT, CURSA, 
-FIGARO, GAIA, KAPPA, PHOTOM, PISA, POLPACK, SURF and tc-shell. 
+\item[ORAC-DR:] requires PERL, PERLMODS, STARPERL, CCDPACK, CONVERT, CURSA,
+FIGARO, GAIA, KAPPA, PHOTOM, PISA, POLPACK, SURF and tc-shell.
 \item[PERLMODS:] requires PERL
 \item[POLPACK:] requires TCLSYS and STARTCL
 \item[PONGO:] requires ICL
@@ -4116,40 +4116,40 @@ kilobytes as reported by the \texttt{du -sk} command.
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|}
 \hline \hline
-\textbf{Package} & \texttt{Tru64 Unix 5.1} & \texttt{RedHat 7.3} & \texttt{RedHat 9.0} & \texttt{Solaris 9} \\ \hline \hline 
-A2PS & 226 & 211 & 210 & 207 \\ 
-AGI & 2655 & 2176 & 2151 & 2700 \\ 
-ARD & 2066 & 1490 & 1450 & 2090 \\ 
-ARY & 3421 & 2429 & 2365 & 4109 \\ 
-AST & 31888 & 29328 & 29431 & 30014 \\ 
-ASTROM & 2854 & 2301 & 2245 & 2813 \\ 
-ASURV & 683 & 578 & 538 & 802 \\ 
-ATOOLS & 9543 & 7423 & 7299 & 9071 \\ 
-AUTOASTROM & - & 5600 & 5208 & 5800 \\ 
-CAT & 6252 & 7476 & 7412 & 8108 \\ 
-CAT-EXAMPLES & 20705 & 16299 & 15866 & 20194 \\ 
-CCDPACK & 66714 & 52069 & 50556 & 61144 \\ 
-CFITSIO & 4898 & 5801 & 5049 & 3729 \\ 
-CGS4DR & 22011 & - & - & 20905 \\ 
-CHR & 2096 & 2028 & 2000 & 2086 \\ 
-CNF & 3105 & 3094 & 3089 & 3128 \\ 
-COCO & 737 & 579 & 543 & 913 \\ 
-CONVERT & 22331 & 17233 & 16963 & 20747 \\ 
-CURSA & 23755 & 19640 & 19366 & 22883 \\ 
-DAOPHOT & 25003 & 19994 & 19655 & 25093 \\ 
-DATACUBE & 36398 & 34766 & 34627 & 36341 \\ 
-DIPSO & 69919 & 66470 & 66269 & 68896 \\ 
-DOCFIND & 174 & 174 & 174 & 174 \\ 
-DOCS & 308572 & 308529 & 308529 & 308529 \\ 
-ECHOMOP & 63186 & 55320 & 54916 & 61464 \\ 
-ECHWIND & 830 & 726 & 655 & 1221 \\ 
-EMAIL & 289 & 289 & 289 & 289 \\ 
-EMS & 1167 & 1142 & 1130 & 1271 \\ 
-ERR & 1973 & 1906 & 1894 & 1956 \\ 
-ESP & 18567 & 15055 & 14855 & 17455 \\ 
-EXTRACTOR & 24656 & 22559 & 22479 & 23839 \\ 
-FIGARO & 75613 & 58542 & 57551 & 69522 \\ 
-FINDCOORDS & 255 & 254 & 254 & 254 \\ 
+\textbf{Package} & \texttt{Tru64 Unix 5.1} & \texttt{RedHat 7.3} & \texttt{RedHat 9.0} & \texttt{Solaris 9} \\ \hline \hline
+A2PS & 226 & 211 & 210 & 207 \\
+AGI & 2655 & 2176 & 2151 & 2700 \\
+ARD & 2066 & 1490 & 1450 & 2090 \\
+ARY & 3421 & 2429 & 2365 & 4109 \\
+AST & 31888 & 29328 & 29431 & 30014 \\
+ASTROM & 2854 & 2301 & 2245 & 2813 \\
+ASURV & 683 & 578 & 538 & 802 \\
+ATOOLS & 9543 & 7423 & 7299 & 9071 \\
+AUTOASTROM & - & 5600 & 5208 & 5800 \\
+CAT & 6252 & 7476 & 7412 & 8108 \\
+CAT-EXAMPLES & 20705 & 16299 & 15866 & 20194 \\
+CCDPACK & 66714 & 52069 & 50556 & 61144 \\
+CFITSIO & 4898 & 5801 & 5049 & 3729 \\
+CGS4DR & 22011 & - & - & 20905 \\
+CHR & 2096 & 2028 & 2000 & 2086 \\
+CNF & 3105 & 3094 & 3089 & 3128 \\
+COCO & 737 & 579 & 543 & 913 \\
+CONVERT & 22331 & 17233 & 16963 & 20747 \\
+CURSA & 23755 & 19640 & 19366 & 22883 \\
+DAOPHOT & 25003 & 19994 & 19655 & 25093 \\
+DATACUBE & 36398 & 34766 & 34627 & 36341 \\
+DIPSO & 69919 & 66470 & 66269 & 68896 \\
+DOCFIND & 174 & 174 & 174 & 174 \\
+DOCS & 308572 & 308529 & 308529 & 308529 \\
+ECHOMOP & 63186 & 55320 & 54916 & 61464 \\
+ECHWIND & 830 & 726 & 655 & 1221 \\
+EMAIL & 289 & 289 & 289 & 289 \\
+EMS & 1167 & 1142 & 1130 & 1271 \\
+ERR & 1973 & 1906 & 1894 & 1956 \\
+ESP & 18567 & 15055 & 14855 & 17455 \\
+EXTRACTOR & 24656 & 22559 & 22479 & 23839 \\
+FIGARO & 75613 & 58542 & 57551 & 69522 \\
+FINDCOORDS & 255 & 254 & 254 & 254 \\
 \hline
 \end{tabular}
 \caption{Package sizes data part 1}
@@ -4162,48 +4162,48 @@ FINDCOORDS & 255 & 254 & 254 & 254 \\
 \hline \hline
 \textbf{Package} & \texttt{Tru64 Unix 5.1} & \texttt{RedHat 7.3} & \texttt{RedHat 9.0} & \texttt{Solaris 9} \\ \hline \hline
 \hline
-FIO & 1100 & 1081 & 1073 & 1107 \\ 
-FITSIO & 2247 & 1846 & 1758 & 2374 \\ 
-FLUXES & 1314 & 1098 & 1042 & 1490 \\ 
-GAIA & 38697 & 32586 & 32281 & 37933 \\ 
-GENERIC & 247 & 235 & 234 & 244 \\ 
-GKS & 4663 & 3830 & 3774 & 4414 \\ 
-GNS & 1525 & 1258 & 1213 & 1979 \\ 
-GRAPHPAR & 625 & 578 & 573 & 636 \\ 
-GRP & 2214 & 1918 & 1902 & 2406 \\ 
-GSD & 602 & 589 & 583 & 618 \\ 
-GWM & 871 & 753 & 747 & 901 \\ 
-HDS & 3536 & 3344 & 3336 & 3856 \\ 
-HDSTOOLS & 1880 & 1468 & 1413 & 1902 \\ 
-HDSTRACE & 1874 & 1537 & 1485 & 1932 \\ 
-HLP & 947 & 943 & 848 & 1430 \\ 
-HTX & 1321 & 1321 & 1321 & 1321 \\ 
-ICL & 2855 & 2558 & 2515 & 2904 \\ 
-IDI & 1731 & 1452 & 1371 & 2206 \\ 
-IFD & 953 & 953 & 953 & 953 \\ 
-IMG & 2715 & 2353 & 2313 & 2729 \\ 
-INFO & 522 & 522 & 522 & 522 \\ 
-INIT & 170 & 170 & 170 & 170 \\ 
-IRAFSTAR & 1646 & 1409 & 1273 & 1561 \\ 
-IRCAMPACK & 9458 & 7466 & 7365 & 9094 \\ 
-IUEDR & 20268 & 17355 & 17095 & 19203 \\ 
-JPEG & 1339 & 962 & 932 & 1110 \\ 
-JPL & 6080 & 6368 & 5987 & 7230 \\ 
-JRE & 102660 & 121280 & 121280 & 172458 \\ 
-KAPLIBS & 22681 & 19339 & 19134 & 20342 \\ 
-KAPPA & 131736 & 117519 & 120758 & 126659 \\ 
-KAPRH & 20403 & 17561 & 17369 & 19481 \\ 
-MAG & 1695 & 1439 & 1386 & 1851 \\ 
-MESSGEN & 265 & 229 & 229 & 233 \\ 
-NAOS & 1076 & 1076 & 1076 & 1076 \\ 
-NBS & 1814 & 1666 & 1660 & 1865 \\ 
-NCAR & 3178 & 2486 & 2424 & 2623 \\ 
-NCAR-EXAMPLES & 19571 & 14583 & 13498 & 31281 \\ 
-NDF & 18117 & 22941 & 22861 & 24461 \\ 
-NDG & 1108 & 871 & 844 & 1096 \\ 
-NEWS & 230 & 230 & 230 & 230 \\ 
-OBSERVE & 3126 & 2710 & 2638 & 3510 \\ 
-ONE & 295 & 296 & 295 & 303 \\ 
+FIO & 1100 & 1081 & 1073 & 1107 \\
+FITSIO & 2247 & 1846 & 1758 & 2374 \\
+FLUXES & 1314 & 1098 & 1042 & 1490 \\
+GAIA & 38697 & 32586 & 32281 & 37933 \\
+GENERIC & 247 & 235 & 234 & 244 \\
+GKS & 4663 & 3830 & 3774 & 4414 \\
+GNS & 1525 & 1258 & 1213 & 1979 \\
+GRAPHPAR & 625 & 578 & 573 & 636 \\
+GRP & 2214 & 1918 & 1902 & 2406 \\
+GSD & 602 & 589 & 583 & 618 \\
+GWM & 871 & 753 & 747 & 901 \\
+HDS & 3536 & 3344 & 3336 & 3856 \\
+HDSTOOLS & 1880 & 1468 & 1413 & 1902 \\
+HDSTRACE & 1874 & 1537 & 1485 & 1932 \\
+HLP & 947 & 943 & 848 & 1430 \\
+HTX & 1321 & 1321 & 1321 & 1321 \\
+ICL & 2855 & 2558 & 2515 & 2904 \\
+IDI & 1731 & 1452 & 1371 & 2206 \\
+IFD & 953 & 953 & 953 & 953 \\
+IMG & 2715 & 2353 & 2313 & 2729 \\
+INFO & 522 & 522 & 522 & 522 \\
+INIT & 170 & 170 & 170 & 170 \\
+IRAFSTAR & 1646 & 1409 & 1273 & 1561 \\
+IRCAMPACK & 9458 & 7466 & 7365 & 9094 \\
+IUEDR & 20268 & 17355 & 17095 & 19203 \\
+JPEG & 1339 & 962 & 932 & 1110 \\
+JPL & 6080 & 6368 & 5987 & 7230 \\
+JRE & 102660 & 121280 & 121280 & 172458 \\
+KAPLIBS & 22681 & 19339 & 19134 & 20342 \\
+KAPPA & 131736 & 117519 & 120758 & 126659 \\
+KAPRH & 20403 & 17561 & 17369 & 19481 \\
+MAG & 1695 & 1439 & 1386 & 1851 \\
+MESSGEN & 265 & 229 & 229 & 233 \\
+NAOS & 1076 & 1076 & 1076 & 1076 \\
+NBS & 1814 & 1666 & 1660 & 1865 \\
+NCAR & 3178 & 2486 & 2424 & 2623 \\
+NCAR-EXAMPLES & 19571 & 14583 & 13498 & 31281 \\
+NDF & 18117 & 22941 & 22861 & 24461 \\
+NDG & 1108 & 871 & 844 & 1096 \\
+NEWS & 230 & 230 & 230 & 230 \\
+OBSERVE & 3126 & 2710 & 2638 & 3510 \\
+ONE & 295 & 296 & 295 & 303 \\
 \hline
 \end{tabular}
 \caption{Package sizes data part 2}
@@ -4216,49 +4216,49 @@ ONE & 295 & 296 & 295 & 303 \\
 \hline \hline
 \textbf{Package} & \texttt{Tru64 Unix 5.1} & \texttt{RedHat 7.3} & \texttt{RedHat 9.0} & \texttt{Solaris 9} \\ \hline \hline
 \hline
-ORACDR & 102804 & 102803 & 102803 & 102803 \\ 
-PAR & 1997 & 1829 & 1804 & 1933 \\ 
-PCS & 7242 & 6557 & 6429 & 7318 \\ 
-PDA & 4913 & 3881 & 3817 & 5281 \\ 
-PERIOD & 2639 & 1988 & 1908 & 2924 \\ 
-PERL & 81329 & 78079 & 78907 & 82825 \\ 
-PERLMODS & 27047 & 26309 & 26083 & 27217 \\ 
-PGP & 1841 & 1665 & 1617 & 1849 \\ 
-PGP-EXAMPLES & 12020 & 8891 & 8163 & 17667 \\ 
-PGPLOT & 10119 & 4125 & 2371 & 3833 \\ 
-PHOTOM & 12424 & 10201 & 10022 & 12201 \\ 
-PISA & 24306 & 19894 & 19620 & 23722 \\ 
-POLMAP & 8553 & 6817 & 6705 & 8305 \\ 
-POLPACK & 26933 & 23410 & 23063 & 25609 \\ 
-PONGO & 23356 & 22355 & 22251 & 23395 \\ 
-PRM & 1541 & 933 & 868 & 1335 \\ 
-PSMERGE & 229 & 220 & 218 & 215 \\ 
-PSX & 949 & 944 & 940 & 985 \\ 
-REF & 464 & 449 & 448 & 469 \\ 
-RUNTIME & 1436 & 1377 & 1376 & 1393 \\ 
-RV & 1103 & 1095 & 1055 & 1271 \\ 
-SAE & 160 & 160 & 160 & 160 \\ 
-SAOIMAGE & 1065 & 873 & 825 & 1209 \\ 
-SGS & 3994 & 3328 & 3192 & 5282 \\ 
-SKYCAL & 717 & 647 & 645 & 762 \\ 
-SLA & 6326 & 6046 & 6014 & 6494 \\ 
-SNX & 662 & 617 & 613 & 629 \\ 
-SNX-EXAMPLES & 2693 & 2002 & 1850 & 3954 \\ 
-SOFTLINK & 244 & 244 & 244 & 244 \\ 
-SPECX & 24022 & 20638 & 20413 & 23066 \\ 
-SPT & 74 & 64 & 62 & 57 \\ 
-STAR2HTML & 20884 & 20884 & 20884 & 20884 \\ 
-STARJAVA & - & 120974 & 120497 & 126137 \\ 
-STARPERL & 17481 & 15389 & 15205 & 19465 \\ 
-STARTCL & 4489 & 3398 & 2966 & 4693 \\ 
-STARX & 192 & 192 & 192 & 192 \\ 
-SURF & 44383 & 41125 & 40926 & 43433 \\ 
-SX & 15619 & - & - & 14616 \\ 
-TCLSYS & 37509 & 31135 & 29757 & 33391 \\ 
-TRN & 2524 & 2292 & 2284 & 2540 \\ 
-TSP & 10516 & 7872 & 7753 & 9788 \\ 
-XDISPLAY & 260 & 260 & 260 & 260 \\ 
-XRT & 13362 & 13754 & 13522 & 10018 \\ 
+ORACDR & 102804 & 102803 & 102803 & 102803 \\
+PAR & 1997 & 1829 & 1804 & 1933 \\
+PCS & 7242 & 6557 & 6429 & 7318 \\
+PDA & 4913 & 3881 & 3817 & 5281 \\
+PERIOD & 2639 & 1988 & 1908 & 2924 \\
+PERL & 81329 & 78079 & 78907 & 82825 \\
+PERLMODS & 27047 & 26309 & 26083 & 27217 \\
+PGP & 1841 & 1665 & 1617 & 1849 \\
+PGP-EXAMPLES & 12020 & 8891 & 8163 & 17667 \\
+PGPLOT & 10119 & 4125 & 2371 & 3833 \\
+PHOTOM & 12424 & 10201 & 10022 & 12201 \\
+PISA & 24306 & 19894 & 19620 & 23722 \\
+POLMAP & 8553 & 6817 & 6705 & 8305 \\
+POLPACK & 26933 & 23410 & 23063 & 25609 \\
+PONGO & 23356 & 22355 & 22251 & 23395 \\
+PRM & 1541 & 933 & 868 & 1335 \\
+PSMERGE & 229 & 220 & 218 & 215 \\
+PSX & 949 & 944 & 940 & 985 \\
+REF & 464 & 449 & 448 & 469 \\
+RUNTIME & 1436 & 1377 & 1376 & 1393 \\
+RV & 1103 & 1095 & 1055 & 1271 \\
+SAE & 160 & 160 & 160 & 160 \\
+SAOIMAGE & 1065 & 873 & 825 & 1209 \\
+SGS & 3994 & 3328 & 3192 & 5282 \\
+SKYCAL & 717 & 647 & 645 & 762 \\
+SLA & 6326 & 6046 & 6014 & 6494 \\
+SNX & 662 & 617 & 613 & 629 \\
+SNX-EXAMPLES & 2693 & 2002 & 1850 & 3954 \\
+SOFTLINK & 244 & 244 & 244 & 244 \\
+SPECX & 24022 & 20638 & 20413 & 23066 \\
+SPT & 74 & 64 & 62 & 57 \\
+STAR2HTML & 20884 & 20884 & 20884 & 20884 \\
+STARJAVA & - & 120974 & 120497 & 126137 \\
+STARPERL & 17481 & 15389 & 15205 & 19465 \\
+STARTCL & 4489 & 3398 & 2966 & 4693 \\
+STARX & 192 & 192 & 192 & 192 \\
+SURF & 44383 & 41125 & 40926 & 43433 \\
+SX & 15619 & - & - & 14616 \\
+TCLSYS & 37509 & 31135 & 29757 & 33391 \\
+TRN & 2524 & 2292 & 2284 & 2540 \\
+TSP & 10516 & 7872 & 7753 & 9788 \\
+XDISPLAY & 260 & 260 & 260 & 260 \\
+XRT & 13362 & 13754 & 13522 & 10018 \\
 \hline
 \end{tabular}
 \caption{Package sizes data part 3}
@@ -4272,14 +4272,14 @@ XRT & 13362 & 13754 & 13522 & 10018 \\
 This section outlines information useful to those wishing to port
 applications to Linux or to develop programs using the Starlink subroutine
 libraries on the \cdrom\@.  The expert in this area is Brian McIlwrath
-(\texttt{bkm@star.rl.ac.uk}) who can provide further advice if required. 
- 
+(\texttt{bkm@star.rl.ac.uk}) who can provide further advice if required.
+
 \subsection{Which FORTRAN compiler?}
 
 There are two public domain compilers on Linux and a few recent commercial
 examples.  The two public domain ones (\texttt{g77} and \texttt{f2c}) are
 quite closely related and both are based on the GNU C compiler \texttt{gcc}.
-They currently produce compatible object code and share much of a common 
+They currently produce compatible object code and share much of a common
 run-time library.
 
 There are now commercial Linux FORTRAN compilers on the market from firms
@@ -4301,15 +4301,15 @@ has proved to produce very reliable code.  There are, however, a few
 minor misfeatures and debugging support for \texttt{gdb} is far less
 than perfect.
 
-The current release of the GCC compiler set including \texttt{gcc}, 
+The current release of the GCC compiler set including \texttt{gcc},
 \texttt{gcc-c++} and \texttt{gcc-g77} at version 1.1.2-12 has been
 used to compile the code on this \cdrom.  The compiler is supplied in
-RedHat RPM format on the Linux \cdroms\ in the \texttt{linux-bits/RPMS} 
+RedHat RPM format on the Linux \cdroms\ in the \texttt{linux-bits/RPMS}
 directory.
 
 \texttt{g77} is designed to be a fairly standard ANSI FORTRAN compiler
 and, while it \textbf{does} support commonly used extensions such as
-\texttt{INCLUDE} (and even many less common ones such as \texttt{\%VAL()} 
+\texttt{INCLUDE} (and even many less common ones such as \texttt{\%VAL()}
 and \texttt{\%LOC()}), more exotic VAX syntax will probably cause it to fail.
 
 Documentation on \texttt{g77} will be installed from the RPMs into the
@@ -4325,7 +4325,7 @@ Some points to be aware of in using \texttt{g77} are:
 
 \item \texttt{g77} will \textbf{not} by default initialise local program
 unit variables to zero.  A compiler option switch (\texttt{-finit-local-zero})
-is available but, as such automatic initialisation is not guaranteed on ANY 
+is available but, as such automatic initialisation is not guaranteed on ANY
 system, its use is actively discouraged.
 
 \item \texttt{g77} will not yet cope with constant functions in
@@ -4377,14 +4377,14 @@ builds on Linux.
 \subsection{\xlabel{f2c}f2c}
 \label{f2c}
 
-The first public domain FORTRAN compiler widely available was the 
+The first public domain FORTRAN compiler widely available was the
 FORTRAN to C converter \texttt{f2c} and this was used in the
 original port of Starlink code to Linux.  A few enhancements to the
 compiler were at that time necessary -- mainly to provide access to the
 Starlink HDS data system using VMS \texttt{\%LOC()} and \texttt{\%VAL()}
 constructs.  The Starlink version of \texttt{f2c} has been extensively
 tested in the past but is no longer maintained or kept up to date with any
-``official'' releases and is no longer provided on the \cdrom.  
+``official'' releases and is no longer provided on the \cdrom.
 
 \end{document}
 

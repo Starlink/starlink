@@ -49,11 +49,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG__constants
-      
+
 *  Arguments Given:
       CHARACTER * ( * ) COMM
       CHARACTER * ( * ) REP
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -79,9 +79,9 @@
 
 *  Check message reporting level
       ISVERB = MSG_FLEVOK( MSG__VERB, STATUS )
-      
+
 *  Reinstate the original error context with its active error status.
-      CALL ERR_END( STATUS )      
+      CALL ERR_END( STATUS )
 
 *  If the current filter level is verbose, return as we are (i.e. leave
 *  the current error report stack in tact).  For normal or quiet
@@ -89,9 +89,9 @@
 *  re-report it using a blank error report.
       IF( .NOT. ISVERB ) THEN
          OSTAT = STATUS
-         CALL ERR_ANNUL( STATUS )      
+         CALL ERR_ANNUL( STATUS )
          STATUS = OSTAT
-         CALL ERR_REP( 'REREP_ERR1', ' ', STATUS )            
-      END IF            
-      
+         CALL ERR_REP( 'REREP_ERR1', ' ', STATUS )
+      END IF
+
       END

@@ -5,7 +5,7 @@ proc skyext
   create zz skysub.txt
   loop for jj = j1 to j2
     im1 = "skysub"&jj
-    print "Extracting median from image  " (im1) 
+    print "Extracting median from image  " (im1)
     obeyw rapi2d histo (im1) \
     getpar glob histo_median (medval)
     print "  Median = " (medval)

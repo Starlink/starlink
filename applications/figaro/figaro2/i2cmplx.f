@@ -1,12 +1,12 @@
 C+
       SUBROUTINE I2CMPLX
 C
-C     I 2 C M P L X 
+C     I 2 C M P L X
 C
 C     Sets the imaginary part of an existing complex data structure.
 C     The complex data structure will probably have been created in the
 C     first instance by R2CMPLX, which leaves the imaginary part zero.
-C     I2CMPLX takes the data array from a specified file (usually not a 
+C     I2CMPLX takes the data array from a specified file (usually not a
 C     complex one - note that if it is complex, it is the modulus that
 C     is used) and uses it to form the imaginary part of the complex
 C     data.
@@ -15,9 +15,9 @@ C     Command parameters -
 C
 C     IDATA       (Character) The data structure containing the array
 C                 that is to form the imaginary part of the complex
-C                 data.  That is, the data array of IDATA becomes the 
+C                 data.  That is, the data array of IDATA becomes the
 C                 imaginary data array of the output complex structure.
-C     CDATA       (Character) The resulting complex data structure.  
+C     CDATA       (Character) The resulting complex data structure.
 C                 Note that this is an already existing structure.
 C
 C                                             KS / AAO 8th Sept 1986
@@ -84,7 +84,7 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C     
+C
 C     Initial values
 C
       FAULT=.FALSE.
@@ -95,7 +95,7 @@ C
       CALL DSA_OPEN(STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
-C     Get name of imaginary data and open the file.  
+C     Get name of imaginary data and open the file.
 C
       CALL DSA_INPUT ('IDATA','IDATA',STATUS)
       IF (STATUS.NE.0) GOTO 500
@@ -183,7 +183,7 @@ C    :                        STATUS)
 C
 C     Copy the data from the input array into the imaginary array.
 C     If no format change is involved, then this is a simple copy
-C     Otherwise, the data has to be re-dimensioned as well.  
+C     Otherwise, the data has to be re-dimensioned as well.
 C
       IF (CHANGE) THEN
          CALL FIG_CHCOPY(NDIM,DIMS0,DIMS,NELM0,NELM,

@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -75,7 +75,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIO_ERR'          ! FIO system status constants
       INCLUDE 'FIO_PAR'          ! FIO parameters
-      
+
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -88,7 +88,7 @@
 *  Local Constants:
       INTEGER MAXLIN             ! Maximum number of input lines in data
                                  ! files
-      PARAMETER ( MAXLIN = 10000 ) ! Needs implementing dynamically 
+      PARAMETER ( MAXLIN = 10000 ) ! Needs implementing dynamically
                                    ! when PSX arrives.
 
 *  Local Variables:
@@ -97,17 +97,17 @@
       CHARACTER * ( 256 ) LINE   ! line of data from file
       INTEGER NUMBS( MAXLIN )    ! indices of input files
       INTEGER I                  ! number of entries in first file
-      INTEGER IFS1, 
-     :        IFS2, 
+      INTEGER IFS1,
+     :        IFS2,
      :        IFS3               ! FIO system file descriptors
       LOGICAL OPNF1,             ! set when corresponding files are
      :        OPNF2,             ! open
-     :        OPNF3  
+     :        OPNF3
       INTEGER NCHAR              ! dummy
       INTEGER ISTART,            ! positions of start and end of integer
      :        IEND               ! character string ( first word )
       INTEGER K                  ! loop variable
-      INTEGER INDEX              ! current index value of second file 
+      INTEGER INDEX              ! current index value of second file
       INTEGER IMATCH             ! number of matched entries
 *.
 
@@ -123,7 +123,7 @@
       CALL PSA1_ASFIO( 'TWO', 'READ', 'LIST', 0, IFS2, OPNF2,
      :                 STATUS )
       CALL FIO_FNAME( IFS2, FNAME2, STATUS )
-      
+
 *  Read in indices from the first file.
       I = 0
 3     CONTINUE
@@ -148,7 +148,7 @@
          END IF
 
 *  Convert the string into an integer.
-         CALL CHR_CTOI( LINE( ISTART : IEND ), NUMBS( I ), 
+         CALL CHR_CTOI( LINE( ISTART : IEND ), NUMBS( I ),
      :                  STATUS )
          IF( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'FNAME', FNAME1 )
@@ -174,7 +174,7 @@
          END IF
 
 *  Decode the line reading in first number.
-         ISTART = 0 
+         ISTART = 0
          CALL CHR_FIWS( LINE, ISTART, STATUS )
          IEND = ISTART
          CALL CHR_FIWE( LINE, IEND, STATUS )

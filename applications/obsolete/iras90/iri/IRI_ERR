@@ -18,7 +18,7 @@
       INTEGER IRI__INCOM  ! Incompatible items found in IMAGE_INFO.
       INTEGER IRI__MISF   ! Missing field position items.
       INTEGER IRI__NOT2D  ! NDF is not two dimensional.
-      
+
 *  IRAS90 error numbers 301 to 330 are reserved for use by IRI
       PARAMETER (
      :           IRI__BADAS = 134250498 + 65536*FAC90 + 8*301,

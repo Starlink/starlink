@@ -13,11 +13,11 @@
 *     CALL ARD1_DMWCS( AWCS, PAR, UWCS, STATUS )
 
 *  Description:
-*     This routine creates a new user FrameSet (UWCS) from the 
+*     This routine creates a new user FrameSet (UWCS) from the
 *     supplied parameters. If the current Frame already has the
-*     required number of axes, then it is returned unchanged. 
+*     required number of axes, then it is returned unchanged.
 *     Otherwise, the first "NDIM" axex are picked form the supplied
-*     FrameSet and made the new current Frame. 
+*     FrameSet and made the new current Frame.
 
 *  Arguments:
 *     AWCS = INTEGER (Given)
@@ -39,12 +39,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -63,15 +63,15 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'ARD_ERR'          ! ARD error constants 
-      INCLUDE 'ARD_CONST'        ! ARD private constants 
+      INCLUDE 'ARD_ERR'          ! ARD error constants
+      INCLUDE 'ARD_CONST'        ! ARD private constants
 
 *  Arguments Given:
       INTEGER AWCS
@@ -100,10 +100,10 @@
       INTEGER OUTAX( ARD__MXDIM )! Output axes to pick
 *.
 
-*  Check the inherited status. 
+*  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the required number of current Frame axes. 
+*  Get the required number of current Frame axes.
       NDIM = NINT( PAR( 1 ) )
 
 *  If the current Frame already has the right number of axes, do nothing.
@@ -116,11 +116,11 @@
 
 *  Pick the required axes from the current Frame.
          FR = AST_GETFRAME( UWCS, AST__CURRENT, STATUS )
-         NEWFR = AST_PICKAXES( FR, NDIM, AXES, JUNK, STATUS ) 
+         NEWFR = AST_PICKAXES( FR, NDIM, AXES, JUNK, STATUS )
          CALL AST_ANNUL( FR, STATUS )
          CALL AST_ANNUL( JUNK, STATUS )
 
-*  Use this to form a new FrameSet. It has index 1 in the new FrameSet.       
+*  Use this to form a new FrameSet. It has index 1 in the new FrameSet.
          FS = AST_FRAMESET( NEWFR, ' ', STATUS )
          CALL AST_ANNUL( NEWFR, STATUS )
 
@@ -135,12 +135,12 @@
                FR = AST_GETFRAME( UWCS, IFRAME, STATUS )
 
 *  Get the Mapping from the current Frame to this Frame.
-               MAP = AST_GETMAPPING( UWCS, AST__CURRENT, IFRAME, 
+               MAP = AST_GETMAPPING( UWCS, AST__CURRENT, IFRAME,
      :                               STATUS )
 
 *  Split of the required axes from this mapping. Report an error if this
 *  cannot be done.
-               CALL AST_MAPSPLIT( MAP, NDIM, AXES, OUTAX, MAP, STATUS ) 
+               CALL AST_MAPSPLIT( MAP, NDIM, AXES, OUTAX, MAP, STATUS )
                IF( MAP .EQ. AST__NULL ) THEN
                   IF( STATUS .EQ. SAI__OK ) THEN
                      STATUS = ARD__NOTAL
@@ -152,13 +152,13 @@
      :                             'independently of the remaining '//
      :                             'WCS axes.', status )
                   END IF
-               
+
 *  If the required axes could be split from the Mapping, pick the
 *  appropriate axes from the frame, and add the split Frame into the new
-*  FrameSet using the split Mapping. 
+*  FrameSet using the split Mapping.
                ELSE
                   NOUT = AST_GETI( MAP, 'Nout', STATUS )
-                  NEWFR = AST_PICKAXES( FR, NOUT, AXES, JUNK, STATUS ) 
+                  NEWFR = AST_PICKAXES( FR, NOUT, AXES, JUNK, STATUS )
                   CALL AST_ANNUL( JUNK, STATUS )
                   CALL AST_ADDFRAME( FS, 1, MAP, NEWFR, STATUS )
                   CALL AST_ANNUL( MAP, STATUS )
@@ -167,7 +167,7 @@
 *  If we have just added the original Base Frame into the new FrameSet,
 *  set it to be the base Frame in the new FrameSet too.
                   IF( IFRAME .EQ. IBASE ) THEN
-                     CALL AST_SETI( FS, 'Base', 
+                     CALL AST_SETI( FS, 'Base',
      :                              AST_GETI( FS, 'Current', STATUS ),
      :                              STATUS )
                   END IF
@@ -175,7 +175,7 @@
                END IF
                CALL AST_ANNUL( FR, STATUS )
             END IF
-         END DO               
+         END DO
 
 *  The original current Frame is Frame 1 in the new FrameSet.
          CALL AST_SETI( FS, 'Current', 1, STATUS )
@@ -184,7 +184,7 @@
 *  original FrameSet. Otherwise, annul the new FrameSet.
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL AST_ANNUL( UWCS, STATUS )
-            UWCS = FS        
+            UWCS = FS
          ELSE
             CALL AST_ANNUL( FS, STATUS )
          END IF

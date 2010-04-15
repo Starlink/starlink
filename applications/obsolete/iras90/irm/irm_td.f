@@ -69,7 +69,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -113,7 +113,7 @@
       INTEGER LTEXT              ! Length of remaining text.
       CHARACTER MONTHS*48        ! List of month abbreviations.
       INTEGER NDF                ! No. of date fields found.
-      LOGICAL NONBLK             ! True if any non-blank fields have 
+      LOGICAL NONBLK             ! True if any non-blank fields have
                                  ! yet been found.
       INTEGER NTF                ! No. of time fields found.
       INTEGER NTICKS             ! Integer representation of current
@@ -125,7 +125,7 @@
       INTEGER TSTRCT             ! Pointer to C time structure.
       INTEGER WDAY               ! Current day in week.
       INTEGER YDAY               ! Current day in year.
-      
+
 *  Local Data:
       DATA MONTHS / 'JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC,' /
 
@@ -144,7 +144,7 @@
       CSEC = REAL( JSECS )
       JM = JM + 1
 
-*  Take a local copy of the string,  convert to upper case and remove 
+*  Take a local copy of the string,  convert to upper case and remove
 *  leading spaces.
       TEXT = STRING
       CALL CHR_UCASE( TEXT )
@@ -217,24 +217,24 @@
             LDELIM = DELIM
 
 *  If the field is a date field, increment the relevant field count
-*  and store it if possible. 
+*  and store it if possible.
             IF( DELIM .EQ. '-' .OR. DELIM .EQ. ' ' ) THEN
                NDF = NDF + 1
 
                IF( NDF .LE. 3 ) THEN
                   IF( POS .GT. 1 ) DFLD( NDF ) = TEXT( : POS - 1 )
-               ELSE 
+               ELSE
                   STATUS = SAI__ERROR
                END IF
 
-*  If there is room for another time field, increment the relevant 
+*  If there is room for another time field, increment the relevant
 *  field count and store it if possible.
             ELSE
                NTF = NTF + 1
 
                IF( NTF .LE. 3 ) THEN
                   IF( POS .GT. 1 ) TFLD( NTF ) = TEXT( : POS - 1 )
-               ELSE 
+               ELSE
                   STATUS = SAI__ERROR
                END IF
 
@@ -256,7 +256,7 @@
          IF( NTF .EQ. 2 ) THEN
 
 *  ...see if the second one contains a decimal point.
-            IF( INDEX( TFLD( 2 ), '.' ) .NE. 0 ) THEN            
+            IF( INDEX( TFLD( 2 ), '.' ) .NE. 0 ) THEN
 
 *  If it does, the first field is the minutes and the second field is
 *  the seconds. Store the fields in their correct position, setting the
@@ -267,7 +267,7 @@
 
 *  If the second field does not contain a decimal point, assume the two
 *  time fields are hours and minutes. Set the seconds field blank.
-            ELSE                           
+            ELSE
                TFLD( 3 ) = ' '
 
             END IF
@@ -276,7 +276,7 @@
          ELSE IF( NTF .EQ. 1 ) THEN
 
 *  ...see it contains a decimal point.
-            IF( INDEX( TFLD( 1 ), '.' ) .NE. 0 ) THEN            
+            IF( INDEX( TFLD( 1 ), '.' ) .NE. 0 ) THEN
 
 *  If it does, it is the seconds field. Set the hours and minutes blank.
                TFLD( 3 ) = TFLD( 1 )
@@ -285,7 +285,7 @@
 
 *  If it does not, assume the field is the hours field. Set the minutes
 *  and seconds blank.
-            ELSE                           
+            ELSE
                TFLD( 3 ) = ' '
                TFLD( 2 ) = ' '
 
@@ -294,7 +294,7 @@
          END IF
 
 *----------------------------------------------------------------
-*  Now deal with the cases where there is one date field. Any missing 
+*  Now deal with the cases where there is one date field. Any missing
 *  time fields are assumed to be trailing fields and are  left blank.
       ELSE IF( NDF .EQ. 1 ) THEN
 
@@ -326,7 +326,7 @@
 
 
 *----------------------------------------------------------------
-*  Now deal with the cases where there are two date fields. Any missing 
+*  Now deal with the cases where there are two date fields. Any missing
 *  time fields are assumed to be trailing fields and are  left blank.
       ELSE IF( NDF .EQ. 2 ) THEN
 
@@ -342,7 +342,7 @@
             IM = ( INDEX( MONTHS, DFLD( 1 )( : 3 )//',' ) + 3 )/4
             IF( IM .NE. 0 ) THEN
 
-*  If it is, set the year blank and assume the second date field is the 
+*  If it is, set the year blank and assume the second date field is the
 *  day.
                DFLD( 3 ) = DFLD( 2 )
                DFLD( 2 ) = DFLD( 1 )
@@ -356,12 +356,12 @@
 
          END IF
 
-      END IF            
+      END IF
 
 *  Set a flag indicating that no non-blank fields have yet been found.
       NONBLK = .FALSE.
 
-*  If the year field was supplied, convet it to numerical form. 
+*  If the year field was supplied, convet it to numerical form.
 *  Otherwise use the current value.
       IF( DFLD( 1 ) .NE. ' ' ) THEN
          CALL CHR_CTOI( DFLD( 1 ), IY, STATUS )
@@ -370,8 +370,8 @@
          IY = JY
       END IF
 
-*  If the month field was supplied, convert it to numerical form. 
-*  Otherwise set it to 1 unless no non-blank fields have yet been 
+*  If the month field was supplied, convert it to numerical form.
+*  Otherwise set it to 1 unless no non-blank fields have yet been
 *  found, in which case set it to the current value.
       IF( DFLD( 2 ) .NE. ' ' ) THEN
          IM = ( INDEX( MONTHS, DFLD( 2 )( : 3 )//',' ) + 3 )/4
@@ -382,11 +382,11 @@
             IM = 1
          ELSE
             IM = JM
-         END IF            
+         END IF
       END IF
 
-*  If the day field was supplied, convert it to numerical form. 
-*  Otherwise set it to 1 unless no non-blank fields have yet been 
+*  If the day field was supplied, convert it to numerical form.
+*  Otherwise set it to 1 unless no non-blank fields have yet been
 *  found, in which case set it to the current value.
       IF( DFLD( 3 ) .NE. ' ' ) THEN
          CALL CHR_CTOI( DFLD( 3 ), ID, STATUS )
@@ -396,11 +396,11 @@
             ID = 1
          ELSE
             ID = JD
-         END IF            
+         END IF
       END IF
 
-*  If the hour field was supplied, convert it to numerical form. 
-*  Otherwise set it to 0 unless no non-blank fields have yet been 
+*  If the hour field was supplied, convert it to numerical form.
+*  Otherwise set it to 0 unless no non-blank fields have yet been
 *  found, in which case set it to the current value.
       IF( TFLD( 1 ) .NE. ' ' ) THEN
          CALL CHR_CTOI( TFLD( 1 ), IHOUR, STATUS )
@@ -410,11 +410,11 @@
             IHOUR = 0
          ELSE
             IHOUR = JHOUR
-         END IF            
+         END IF
       END IF
 
-*  If the minutes field was supplied, convert it to numerical form. 
-*  Otherwise set it to 0 unless no non-blank fields have yet been 
+*  If the minutes field was supplied, convert it to numerical form.
+*  Otherwise set it to 0 unless no non-blank fields have yet been
 *  found, in which case set it to the current value.
       IF( TFLD( 2 ) .NE. ' ' ) THEN
          CALL CHR_CTOI( TFLD( 2 ), IMIN, STATUS )
@@ -424,11 +424,11 @@
             IMIN = 0
          ELSE
             IMIN = JMIN
-         END IF            
+         END IF
       END IF
 
-*  If the seconds field was supplied, convert it to numerical form. 
-*  Otherwise set it to 0 unless no non-blank fields have yet been 
+*  If the seconds field was supplied, convert it to numerical form.
+*  Otherwise set it to 0 unless no non-blank fields have yet been
 *  found, in which case set it to the current value.
       IF( TFLD( 3 ) .NE. ' ' ) THEN
          CALL CHR_CTOR( TFLD( 3 ), SEC, STATUS )
@@ -438,7 +438,7 @@
             SEC = 0
          ELSE
             SEC = CSEC
-         END IF            
+         END IF
       END IF
 
 *  If all has gone OK, try to convert the hours, minutes and seconds
@@ -467,7 +467,7 @@
 
             END IF
 
-         END IF      
+         END IF
 
       END IF
 
@@ -483,9 +483,9 @@
      :                 'IRM_TD: Illegal date/time given - "^S"',
      :                 STATUS )
 
-      END IF      
+      END IF
 
 *  Release the error stack.
       CALL ERR_RLSE
-      
+
       END

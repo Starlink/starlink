@@ -14,27 +14,27 @@
 *     CALL COF_WCSIM( FC, INDF, NENCOD, ENCODS, STATUS )
 
 *  Description:
-*     An attempt is made to read an AST FrameSet (see SUN/210) from the 
-*     supplied FitsChan. If succesful, it is added into the FrameSet 
+*     An attempt is made to read an AST FrameSet (see SUN/210) from the
+*     supplied FitsChan. If succesful, it is added into the FrameSet
 *     representing the NDF's WCS component. This is done by connecting
 *     the base Frames of the two FrameSets with a UnitMap (on the
 *     assumption that they are equivalent). The modified FrameSet is
 *     then stored back in the NDF (the NDF library will automatically
-*     remove any PIXEL, FRACTION, GRID and AXIS Frames from the FrameSet 
+*     remove any PIXEL, FRACTION, GRID and AXIS Frames from the FrameSet
 *     as these are generated afresh each time NDF_GTWCS is called).
 *
 *     The supplied FitsChan may contain more than one description (or
-*     "encoding") of the FrameSet to be added to the NDF, each 
+*     "encoding") of the FrameSet to be added to the NDF, each
 *     encoding using a different set of header cards. These encodings
 *     may not all be consistent with each other. For instance, if a
-*     Starlink application stores a FrameSet twice in a FITS header using 
-*     FITS-IRAF and AST native encodings, an IRAF application may then 
-*     modify the FITS-IRAF encoding without making equivalent modifications 
+*     Starlink application stores a FrameSet twice in a FITS header using
+*     FITS-IRAF and AST native encodings, an IRAF application may then
+*     modify the FITS-IRAF encoding without making equivalent modifications
 *     to the native encoding. In this case, we should use the FITS-IRAF
-*     encoding in preference to the native encoding when reconstructing 
-*     the NDFs WCS component. On the other hand, if the two encodings were 
-*     still consistent, it would be preferable to use the native encoding 
-*     since the FITS-IRAF encoding may not give a complete description of the 
+*     encoding in preference to the native encoding when reconstructing
+*     the NDFs WCS component. On the other hand, if the two encodings were
+*     still consistent, it would be preferable to use the native encoding
+*     since the FITS-IRAF encoding may not give a complete description of the
 *     original FrameSet.
 *
 *     The choice of encoding has several stages:
@@ -42,10 +42,10 @@
 *     o  If the caller has supplied a list of preferred encodings in the
 *     ENCODS argument, then the first available encoding in this list is
 *     used.
-*     o  If no preferred encodings are supplied, then a check is made to 
-*     see if a native encoding is available. If there is no native encoding, 
-*     then the default encoding supplied by AST is used. This will be a 
-*     non-native encoding selected on the basis of the header cards available 
+*     o  If no preferred encodings are supplied, then a check is made to
+*     see if a native encoding is available. If there is no native encoding,
+*     then the default encoding supplied by AST is used. This will be a
+*     non-native encoding selected on the basis of the header cards available
 *     in the FitsChan.
 *     o  If a native encoding is available, and is the only available
 *     encoding, then it is used.
@@ -68,7 +68,7 @@
 *     NENCOD = INTEGER (Given)
 *        The number of encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
-*        The preferred encodings to use, in order of preference (most 
+*        The preferred encodings to use, in order of preference (most
 *        preferable first). Ignored if NENCOD is zero.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -146,10 +146,10 @@
 *  Local Variables:
       CHARACTER ASTCOD( DEFNCD )*13 ! The non-native AST encoding names
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
-      INTEGER FC2                ! AST identifier for temporary FitsChan 
+      INTEGER FC2                ! AST identifier for temporary FitsChan
       INTEGER I                  ! Axis count
       INTEGER IBASE              ! Index of the Base Frame.
-      INTEGER ICURR              ! Index of Current Frame 
+      INTEGER ICURR              ! Index of Current Frame
       INTEGER IENCOD             ! Index of the current encoding
       INTEGER INPRM( NDF__MXDIM )! FITS axis for each NDF axis
       INTEGER IWCS               ! AST identifier for NDF's WCS information
@@ -163,18 +163,18 @@
       INTEGER TMPF               ! Template 2D Frame
 
 *  Store names of non-native AST encodings to use.
-      DATA ASTCOD / 'FITS-IRAF', 'FITS-WCS', 'DSS', 'FITS-AIPS', 
+      DATA ASTCOD / 'FITS-IRAF', 'FITS-WCS', 'DSS', 'FITS-AIPS',
      :              'FITS-AIPS++', 'FITS-PC', 'FITS-CLASS' /
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If the supplied FitsChan contains a native encoding, then reset any 
+*  If the supplied FitsChan contains a native encoding, then reset any
 *  Axis structures which are currently defined in the NDF. This is done
 *  because earlier routines may have created Axis structures based
-*  on the values of the CRVAL, CDELT, CRPIX keywords, but the native 
-*  AST FrameSet is the prefered origin for Axis information.       
+*  on the values of the CRVAL, CDELT, CRPIX keywords, but the native
+*  AST FrameSet is the prefered origin for Axis information.
       IF( AST_GETC( FC, 'ENCODING', STATUS ) .EQ. 'NATIVE' ) THEN
          CALL NDF_RESET( INDF, 'AXIS', STATUS )
       END IF
@@ -186,15 +186,15 @@
 *  the others.
 *  ==================================================================
 
-*  If a list of encodings preferences was supplied, attempt to read an 
-*  Object using each encoding in turn until an Object (FrameSet) is read 
+*  If a list of encodings preferences was supplied, attempt to read an
+*  Object using each encoding in turn until an Object (FrameSet) is read
 *  succesfully.
       IF( NENCOD .GT. 0 ) THEN
 
          DO IENCOD = 1, NENCOD
 
 *  Use a copy of the FitsChan in order to leave the supplied FitsChan
-*  unchanged (AST reads are destructive, removing the cards read from 
+*  unchanged (AST reads are destructive, removing the cards read from
 *  the FitsChan).
             FC2 = AST_COPY( FC, STATUS )
 
@@ -202,14 +202,14 @@
             CALL AST_SETC( FC2, 'ENCODING', ENCODS( IENCOD ), STATUS )
 
 *  Some encodings (eg NATIVE) can store more than one Object in a FITS header.
-*  We use the first FrameSet in the header. 
+*  We use the first FrameSet in the header.
             CALL COF_FNDFS( FC2, OBJ, STATUS )
 
 *  Annul the FitsChan.
             CALL AST_ANNUL( FC2, STATUS )
 
 *  Break out of the loop if we have found a usable Object.
-            IF( OBJ .NE. AST__NULL ) GO TO 10            
+            IF( OBJ .NE. AST__NULL ) GO TO 10
 
          END DO
 
@@ -219,16 +219,16 @@
          IF( OBJ .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'ENC', ENCODS( 1 ) )
-         
-            IF( NENCOD .EQ. 1 ) THEN 
+
+            IF( NENCOD .EQ. 1 ) THEN
                CALL ERR_REP( 'COF_WCSIM_ERR1', 'WCS information could'//
-     :                       ' not be read using the ^ENC encoding.', 
+     :                       ' not be read using the ^ENC encoding.',
      :                       STATUS )
             ELSE
                DO IENCOD = 2, NENCOD
                   CALL MSG_SETC( 'ENC', ',' )
                   CALL MSG_SETC( 'ENC', ENCODS( IENCOD ) )
-               END DO                
+               END DO
                CALL ERR_REP( 'COF_WCSIM_ERR2', 'WCS information could'//
      :                       ' not be read using any of the supplied '//
      :                       'encodings (^ENC).', STATUS )
@@ -236,7 +236,7 @@
             END IF
          END IF
 
-*  If no preferences for encodings were supplied, we have to decide which 
+*  If no preferences for encodings were supplied, we have to decide which
 *  of the available encodings to use.
       ELSE
 
@@ -251,7 +251,7 @@
 *  If a FrameSet could not be read using native encoding, use the default
 *  non-native encoding.
          IF( NATOBJ .EQ. AST__NULL ) THEN
-            
+
             OBJ = AST_READ( FC, STATUS )
             IF( OBJ .NE. AST__NULL ) THEN
                IF( .NOT. AST_ISAFRAMESET( OBJ, STATUS ) ) THEN
@@ -260,7 +260,7 @@
             END IF
 
 *  If a FrameSet was read using native encoding...
-         ELSE 
+         ELSE
 
 *  Consider each possible non-native encoding in turn...
             DO IENCOD = 1, DEFNCD
@@ -269,7 +269,7 @@
 *  an error if keywords required for the specified encoding are not
 *  found. Therefore annul any errors generated by AST_READ.
                FC2 = AST_COPY( FC, STATUS )
-               CALL AST_SETC( FC2, 'ENCODING', ASTCOD( IENCOD ), 
+               CALL AST_SETC( FC2, 'ENCODING', ASTCOD( IENCOD ),
      :                        STATUS )
 
                CALL ERR_BEGIN( STATUS )
@@ -286,14 +286,14 @@
                   END IF
                END IF
 
-*  If a FrameSet was obtained...       
+*  If a FrameSet was obtained...
                IF( OBJ .NE. AST__NULL ) THEN
 
 *  See if the FrameSet is inconsistent with the FrameSet read earlier using
-*  native encoding. If so, annul the native FrameSet and break out of the 
+*  native encoding. If so, annul the native FrameSet and break out of the
 *  loop. If the native and non-native FrameSets are consistent, then
 *  annul the non-native FrameSet, and go on to consider the next encoding.
-                  IF( COF_WCSDF( ASTCOD( IENCOD ), NATOBJ, OBJ, 
+                  IF( COF_WCSDF( ASTCOD( IENCOD ), NATOBJ, OBJ,
      :                           STATUS ) ) THEN
                      CALL AST_ANNUL( NATOBJ, STATUS )
                      GO TO 20
@@ -325,7 +325,7 @@
          CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
 
 *  Create a Frame which can be used as a template when searching for
-*  other Frames. 
+*  other Frames.
          TMPF = AST_FRAME( NDIM, ' ', STATUS )
 
 *  Get the current NDF FrameSet. This will contain Frames generated
@@ -336,7 +336,7 @@
 *  merged FrameSet passed to COF_WCSAX will not contain two AXIS Frames.
 *  AST_FINDFRAME will make the AXIS Frame the Current Frame if it finds it,
 *  so we need just remove the Current Frame.
-         IF( AST_FINDFRAME( IWCS, TMPF, 'AXIS', STATUS ) 
+         IF( AST_FINDFRAME( IWCS, TMPF, 'AXIS', STATUS )
      :       .NE. AST__NULL ) THEN
             CALL AST_REMOVEFRAME( IWCS, AST__CURRENT, STATUS )
          END IF
@@ -359,14 +359,14 @@
 *  FrameSet. Usually this could be just a UnitMap since the two Base
 *  Frames are considered to be equivalent. But sometimes, the FITS header
 *  may not include descriptions for all axes. In these cases we use a PermMap
-*  with 1.0 being used for any unconnected axes. 
-         IF( NDIM .EQ. NBFITS ) THEN 
+*  with 1.0 being used for any unconnected axes.
+         IF( NDIM .EQ. NBFITS ) THEN
             MAP = AST_UNITMAP( NDIM, ' ', STATUS )
 
 *  If the two frames have different numbers of axes, we use a PermMap.
          ELSE
 
-*  First set up the arrays describing the connections between input and 
+*  First set up the arrays describing the connections between input and
 *  output axes in the PermMap.
             DO I = 1, NDIM
                IF( I .LE. NBFITS ) THEN
@@ -375,7 +375,7 @@
                   INPRM( I ) = -1
                END IF
             END DO
-   
+
             DO I = 1, NBFITS
                IF( I .LE. NDIM ) THEN
                   OUTPRM( I ) = I
@@ -391,26 +391,26 @@
 
 *  Add the new FrameSet into the NDF's FrameSet, using the above Mapping
 *  to connect the two base Frames. AST_ADDFRAME uses the current Frame
-*  in the FrameSet being added, so first set the current Frame to be 
+*  in the FrameSet being added, so first set the current Frame to be
 *  the base Frame.
          CALL AST_SETI( OBJ, 'Current', IBASE, STATUS )
          CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, OBJ, STATUS )
          CALL AST_ANNUL( MAP, STATUS )
 
-*  We now need to re-instate the original current Frame. The index of the 
+*  We now need to re-instate the original current Frame. The index of the
 *  original current Frame will have increased to take account of all the
-*  Frames in the original NDF FrameSet. 
+*  Frames in the original NDF FrameSet.
          CALL AST_SETI( IWCS, 'Current', ICURR + NFRAME, STATUS )
 
 *  We now have two copies of the original base Frame (one from the NDF
 *  FrameSet and one from the new FrameSet). Remove the one from the new
-*  FrameSet. 
+*  FrameSet.
          CALL AST_REMOVEFRAME( IWCS, IBASE + NFRAME, STATUS )
 
 *  Any AXIS Frame in the FrameSet read from the FITS file should take
 *  priority over Axis structures established earlier by this application.
-*  Check that there was an AXIS Frame in the FITS file. 
-         IF( AST_FINDFRAME( OBJ, TMPF, 'AXIS', STATUS ) 
+*  Check that there was an AXIS Frame in the FITS file.
+         IF( AST_FINDFRAME( OBJ, TMPF, 'AXIS', STATUS )
      :       .NE. AST__NULL ) THEN
 
 *  If so, there will be a copy of it in the NDF's FrameSet (because the
@@ -431,12 +431,12 @@
 *  NDF's AXIS structures.
          CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
-*  If the Current Frame has no Domain, but is equivalent to the AXIS Frame 
+*  If the Current Frame has no Domain, but is equivalent to the AXIS Frame
 *  (i.e. connected by a UnitMap), then remove the Current Frame and
-*  re-store the FrameSet in the NDF. This is done to avoid having a Frame 
-*  which is effectively an AXIS Frame left in the WCS component. The NDF 
-*  library will remove all Frames with the Domain AXIS, but when non-Native 
-*  encodings are used (eg FITS-IRAF etc) no Domain values are stored, and so 
+*  re-store the FrameSet in the NDF. This is done to avoid having a Frame
+*  which is effectively an AXIS Frame left in the WCS component. The NDF
+*  library will remove all Frames with the Domain AXIS, but when non-Native
+*  encodings are used (eg FITS-IRAF etc) no Domain values are stored, and so
 *  the  NDF library will not be able to recognise the Frame as an AXIS Frame.
          CALL COF_WCSUT( INDF, STATUS )
 

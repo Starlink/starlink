@@ -44,12 +44,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -68,7 +68,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -135,7 +135,7 @@
          END DO
 
 *  Transform them into WCS coords.
-         CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT, 
+         CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT,
      :                   STATUS )
 
 *  Apply the required scaling to each WCS axis. This modifies the second
@@ -155,7 +155,7 @@
          END DO
 
 *  Transform the modified positions back into GRID coords.
-         CALL AST_TRANN( MAP, 2, NWCS, 2, OUT, .FALSE., NPIX, 2, IN, 
+         CALL AST_TRANN( MAP, 2, NWCS, 2, OUT, .FALSE., NPIX, 2, IN,
      :                   STATUS )
 
 *  Find the expansion factors on each grid axis.
@@ -168,7 +168,7 @@
       ELSE
 
 *  Invert the Mapping so that we can split it by WCS axis.
-         CALL AST_INVERT( MAP, STATUS ) 
+         CALL AST_INVERT( MAP, STATUS )
 
 *  Do each WCS axis.
          DO I = 1, NWCS
@@ -200,7 +200,7 @@
 
       END IF
 
-*  Arrive here if an error occurs.     
+*  Arrive here if an error occurs.
  999  CONTINUE
 
 *  End the AST context.

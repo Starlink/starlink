@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -50,15 +50,15 @@ RUTHERFORD APPLETON LABORATORY\\
 The SCAR Beginners Guide (SUN/106) and the associated demonstration should allow
 beginners to use SCAR for straight forward catalogue tasks. Problems can
 often be resolved by using the online help facility, in particular replying
-with a '?' to any prompt will give further help about that parameter. This 
+with a '?' to any prompt will give further help about that parameter. This
 document gives complete information about the CAR routines, parameters and
-the QCAR language. The appropriate section of this document should be read 
-by any user 
-experiencing a problem when running a CAR routine. It will also be useful for 
+the QCAR language. The appropriate section of this document should be read
+by any user
+experiencing a problem when running a CAR routine. It will also be useful for
 advanced users who want to
 do more complex catalogue tasks. For convienience the entries in the CAR
-routines section and in the parameters section are alphabetically ordered. 
- 
+routines section and in the parameters section are alphabetically ordered.
+
 \section {Introduction}
 
 The Starlink Catalogue Access and Reporting system (SCAR) is a relational
@@ -84,9 +84,9 @@ Throughout this document ADC and FACTS are synonymous.
 \item The online database
 \item The offline database
 \end{itemize}
-First time users should consult SUN/106 which covers getting started and 
+First time users should consult SUN/106 which covers getting started and
 introduces users to the facilities available in SCAR.
-Section 3 describes, in alphabetical order, the CAR routines to access and 
+Section 3 describes, in alphabetical order, the CAR routines to access and
 manipulate the catalogues available on-line. This is followed by the parameter
 definitions
 and information about the QCAR language.
@@ -103,17 +103,17 @@ The offline database is described in SUN/79.
 New versions of SCAR will appear from time to time.
 All software changes are documented in SCARDOC1.TEX in SCAR\_DOC\_DIR.
 
-Many people have contributed to the SCAR system, including S Wright, 
-J Fairclough, A Hobson, J Day, E Gershuny, B Stewart, J Cooke, S Leggett, 
-D Kelly, C Davenhall, C Singh, D. Giaretta, A. Wood and it's maintenance 
+Many people have contributed to the SCAR system, including S Wright,
+J Fairclough, A Hobson, J Day, E Gershuny, B Stewart, J Cooke, S Leggett,
+D Kelly, C Davenhall, C Singh, D. Giaretta, A. Wood and it's maintenance
 is the responsibility of IPMAF.
 
 
 \section {CAR routines, Parameters and QCAR Language}
 
 This section details the CAR routines, so you can see the various options
-available. 
-To understand more about the input fields, or to do complex queries you may 
+available.
+To understand more about the input fields, or to do complex queries you may
 need to refer to the following section.
 There are details of individual parameters given in a separate section.
 SCAR takes as default the current directory, so if you
@@ -130,7 +130,7 @@ for both the data and DSCF files:
 \subsection {CAR Routines Summary}
 CAR procedures are of four types:
 \begin{enumerate}
-\item Procedures that perform database management functions, {\em eg.} extract 
+\item Procedures that perform database management functions, {\em eg.} extract
 sources from the catalogue.
 \item Procedures that manipulate and display catalogue data.
 \item Procedures that perform statistics.
@@ -143,7 +143,7 @@ You run the program by prefixing the program name with the package name,
 eg.\ CAR\_SEARCH.
 Detailed specifications for all these programs are given below.
 \subsubsection {Database Management Functions}
-You can do the following to a data catalogue (omitting the CAR\_): 
+You can do the following to a data catalogue (omitting the CAR\_):
 \begin{description}
 \begin{description}
 \item [SEARCH] it to select subsets.
@@ -178,13 +178,13 @@ than 132 characters.
 In order to generate statistics on the contents of a catalogue you can use:
 \begin{description}
 \begin{description}
-\item [LITTLEBIG] to find either the largest or smallest numbers in the 
+\item [LITTLEBIG] to find either the largest or smallest numbers in the
   catalogue.
 \item [SAMPLE] to select every Nth object from the catalogue.
 \item [HISTOGRAM] to plot a histogram of a given field.
 \item [SCATTER] to plot two fields, and perform regression analysis.
 \item [CORRELATE] to correlate (non-parametrically) two fields.
-\item [LINCOR] to compute the Pearson product-moment linear correlation 
+\item [LINCOR] to compute the Pearson product-moment linear correlation
   coefficient.
 \end{description}
 \end{description}
@@ -198,7 +198,7 @@ In order to generate statistics on the contents of a catalogue you can use:
 \item [ASPIC] -- Creates a description file for an ASPIC/IAM catalogue.
 \item [ASCII] -- Converts a description file for BINARY data to one for ASCII
  data.
-\item [BINARY] -- Converts a description file for ASCII data to one for BINARY 
+\item [BINARY] -- Converts a description file for ASCII data to one for BINARY
  data.
 \item [POLYGON] -- Creates a description file of polygon vertices.
 \end{description}
@@ -211,7 +211,7 @@ In order to generate statistics on the contents of a catalogue you can use:
 \item [COUNTREC] -- Counts the number of objects in a sequential file.
 \item [COSMAGCAL] -- Calculates magnitudes from COSMOS magnitudes.
 \item [HARDCOPY] -- Produces hardcopy of output produced by graphics programs.
-\item [MOUNT] -- Allocates a deck, mounts a foreign tape and assigns it a 
+\item [MOUNT] -- Allocates a deck, mounts a foreign tape and assigns it a
 logical name.
 \item [DISMOUNT] -- Dismounts a tape, deallocates a deck and deassigns the
 logical name.
@@ -225,7 +225,7 @@ logical name.
 \subsection {CAR Routines}
 
 \subsubsection{CAR\_AITOFF}
- 
+
 Plots catalogue objects in the all-sky Aitoff projection
 
 A complete sky plot is made, in equal area projection, with the sources
@@ -234,19 +234,19 @@ Aitoff plots can be in any one of the four coordinate systems:
 equatorial, ecliptic, galactic and supergalactic.
 Your selected catalogue must contain the necessary fields to make the plot.
 If they are absent, generate them first with CALC.
- 
+
 Equatorial fields are RA and DEC, galactic are GLONG and GLAT,
 supergalactic are SGLONG and SGLAT, and ecliptic are ELONG
 and ELAT.
 
 You can control the Y axis scale, (YSCALE), aspect ratio (AR or
-XSCALE/YSCALE) and origin location (XSHIFT and YSHIFT). 
+XSCALE/YSCALE) and origin location (XSHIFT and YSHIFT).
 Values of YSCALE=1, AR=1, XSHIFT=0 and YSHIFT=0 will give you a plot
 that fills the device screen.
 All the options are repeated when the plot is redrawn, except the input
 catalogue.
 The symbol required should be typed in, in response to the marker query.
- 
+
 \begin{verbatim}
     Invocation: ICL> CAR_AITOFF
       Parameter list:
@@ -265,16 +265,16 @@ The symbol required should be typed in, in response to the marker query.
 \subsubsection{CAR\_ASCII}
 
 Converts a description file to specify ascii data (formatted)
- 
+
 The ASCII command converts a description file for a catalogue  of
 unformatted  data  to a description file for a catalogue of formatted
 data.
 You supply as input the name of the description file for the
 binary data (e.g: DSCFIRPS) and as output the name of a description
-file for the ascii data (e.g: DSCFIRPSF). 
+file for the ascii data (e.g: DSCFIRPSF).
 You will be asked if you want spaces between the fields.
 ASCII is the inverse of BINARY.
- 
+
 \begin{verbatim}
     Invocation: ICL> CAR_ASCII
       Parameter list:
@@ -282,7 +282,7 @@ ASCII is the inverse of BINARY.
        output          = Name of output catalogue
        spaces          = Do you want spaces between fields?
 \end{verbatim}
- 
+
 \subsubsection{CAR\_ASPIC}
 
 Creates a description file for an ASPIC/IAM catalogue
@@ -291,29 +291,29 @@ ASPIC creates an ADC description file suitable for use with a
 catalogue created from the output of the IAM version.
 You are prompted for the name of the output catalogue.
 
-A standard catalogue for holding data from the ASPIC/IAM version 
+A standard catalogue for holding data from the ASPIC/IAM version
 has the following fields;
 \begin{verbatim}
     UXCEN        Unweighted X centroid                pixels
-    UYCEN            "      Y    "                      "   
-    UMAJAX       Unweighted semi-major axis             "   
-    UMINAX           "      semi-minor  "               "   
+    UYCEN            "      Y    "                      "
+    UMAJAX       Unweighted semi-major axis             "
+    UMINAX           "      semi-minor  "               "
     UTHETA           "      orientation               degrees
     IXCEN        Intensity weighted X centroid        pixels
-    IYCEN            "        "     Y    "              "   
-    IMAJAX       Intensity weighted semi-major axis     "   
-    IMINAX           "        "     semi-minor  "       "   
+    IYCEN            "        "     Y    "              "
+    IMAJAX       Intensity weighted semi-major axis     "
+    IMINAX           "        "     semi-minor  "       "
     ITHETA           "        "     orientation       degrees
     AREA         Image area                           pixels
     MAG          Total magnitude                      magnitudes
     MAXINT       Maximum intensity in image
     XMIN         X minimum pixel in image             pixels
-    XMAX         X maximum   "   "    "                 "   
-    YMIN         Y minimum   "   "    "                 "   
-    YMAX         Y maximum   "   "    "                 "   
+    XMAX         X maximum   "   "    "                 "
+    YMIN         Y minimum   "   "    "                 "
+    YMAX         Y maximum   "   "    "                 "
     CLASS        Often used as a classification parameter
     SPARE1       Unused, user definable
-    SPARE2         "      "       "   
+    SPARE2         "      "       "
  \end{verbatim}
  All fields are of type REAL, except `CLASS', which is INTEGER.\\
  Notes\\
@@ -326,13 +326,13 @@ has the following fields;
        output          = Name of output catalogue
        title           = Name or short description for file or plot
 \end{verbatim}
- 
+
 \subsubsection{CAR\_BINARY}
 
 Converts description of ascii data to a description of binary data (unformatted)
 
 The BINARY command converts a description file for a catalogue of ascii
-(formatted) data to a description file for a catalogue of unformatted data. 
+(formatted) data to a description file for a catalogue of unformatted data.
 You supply as input the name of description file
 for the formatted data (e.g: DSCFIRPSF) and as output the name for
 the description file of unformatted data (e.g: DSCFIRPS).
@@ -354,13 +354,13 @@ CONVERT.
        output          = Name of output catalogue
        isam            = ISAM (Y) or Direct access (N) file?
 \end{verbatim}
- 
+
 \subsubsection{CAR\_CALC}
 
 Allows you to generate and display new fields for a catalogue
 
 The OUTPUT catalogue contains the keys and pointers to the INPUT
-plus new columns for each new field you define. 
+plus new columns for each new field you define.
 The output file always overwrites any existing file of the same name.
 You are really creating an index to the ``real'' catalogue, with values for
 your new columns.
@@ -373,12 +373,12 @@ You can `define' expressions that are just fields in the input catalogue.
 You can use this to display the values of the fields in your expressions.
 
 CALC calculates the new fields for the first few records
-of the catalogue and then prompts you with SCROLL.  
+of the catalogue and then prompts you with SCROLL.
 If you are satisfied with the results, you must jump to the end with the J
-command.  
-If you are not satisfied type E, and CALC exits without calculating the 
-rest of the fields.  
-If you type +, the next page of results are shown.  
+command.
+If you are not satisfied type E, and CALC exits without calculating the
+rest of the fields.
+If you type +, the next page of results are shown.
 You can type P to print any page.
 The information on the screen is written to a file with the extension `.CAR'
 and the same name as the output.
@@ -388,7 +388,7 @@ your final OUTPUT (you will see all the data) or CONVERT it back to a
 simple catalogue --- that is add the new columns to your catalogue.
 
 {\bf Units:} When adding or subtracting a constant in a QCAR expression (in
-DEFINE below) you must generally specify the constant in the units of the 
+DEFINE below) you must generally specify the constant in the units of the
 operand of the operator, which you can find by looking up the field(s) concerned
 in the HELP information for the catalogue.
 However, when it is a Radian quantity (eg RA, dec), you must present the
@@ -424,7 +424,7 @@ Get the number of objects in a catalogue
 \end{verbatim}
 
 \subsubsection{CAR\_CHART}
- 
+
 Plot catalogue objects in a finding chart
 
 CHART first asks you for the STYLE, two styles are possible:
@@ -446,7 +446,7 @@ is the name of each plate parameter set, they are:
 \begin{description}
 \begin{description}
 \item [PSS] -- Palomar Sky Survey 2 degrees by 2 degrees in GNOMONIC projection
-\item [PSS/BIG] -- Palomar Sky Survey 4 degrees by 4 degrees in GNOMONIC 
+\item [PSS/BIG] -- Palomar Sky Survey 4 degrees by 4 degrees in GNOMONIC
   projection
 \item [ESOB] -- ESO R plate 2 degrees by 2 degrees in GNOMONIC projection
 \item [ESOB/BIG] -- ESO R plate 4 degrees by 4 degrees in GNOMONIC projection
@@ -458,34 +458,34 @@ You can store the parameters of more than one style, so it is easy to switch
 plot style.
 You can set up your own symbol table to control the size and shape of the
 symbols plotted for each object (see STYLE in parameter subsection).
-The symbol control file (SCAR\_DAT\_PATH:SYMB.DAT) defines the fields for 
+The symbol control file (SCAR\_DAT\_PATH:SYMB.DAT) defines the fields for
 constructing error box/ellipse, colour codes and symbols sizes.
 Plotting symbols have been set up for the IRPS, AS85, MLNS and CSIS
-catalogues. 
+catalogues.
 All other catalogues have a default symbol.
 A key of the symbol codes is produced with each hard copy plot, and this shows
 a list of each catalogue and the symbol(s) corresponding to it.
 The catalogue symbol key produced after CHART is run, is only useful when a
 photometric plot is requested, in the astrometric option the CODE
 column may not be set.
- 
+
 Positioning an overlay on an optical plate is assisted if your
-finding chart has background stars plotted.  
-You can request this by answering YES to the STARS question.  
-If you do want background stars, you are asked for the limiting magnitude 
+finding chart has background stars plotted.
+You can request this by answering YES to the STARS question.
+If you do want background stars, you are asked for the limiting magnitude
 (MAG), 8th magnitude seems to give enough stars without overcrowding.
 The background stars are taken from the RGO Astrometry Catalogue (AS85).
- 
+
 You are then asked for the names of the INPUT catalogues containing
-the objects to be plotted on the finding chart.  
+the objects to be plotted on the finding chart.
 There is no need to SEARCH and MERGE subsets first.
-All the objects in the catalogues, within the chart dimensions, will be 
+All the objects in the catalogues, within the chart dimensions, will be
 selected from the catalogue and plotted on the chart.
- 
-When you opt to number the objects plotted, a summary listing is produced 
+
+When you opt to number the objects plotted, a summary listing is produced
 of the sources on each plate to aid identification.
 To aid identification of plotted objects CHART produces
-a listing of the objects plotted in CHART.CAR.  
+a listing of the objects plotted in CHART.CAR.
 You can make identification of objects easier by answering YES to the
 questions about whether you want to number the INPUT catalogue
 objects (NUMBER\_INPUT) or the backgound stars (NUMBER\_STARS).
@@ -493,20 +493,20 @@ Normally one answers YES to the former and NO to the latter
 so that labels do not clutter up the chart.
 You then have to nominate the DEVICE for plotting, typing HELP
 will give you a list of devices.
- 
+
 When producing finding charts, several plates may be specified at once, and the
 program will extract the sources covered by each plate and produce plots for
 each.
-You have to enter the positions of the chart centres.  
-If you reply TT to the CENTRES prompt, you will be asked for the  
-RA, DEC, Equinox, and Title of each chart.  
+You have to enter the positions of the chart centres.
+If you reply TT to the CENTRES prompt, you will be asked for the
+RA, DEC, Equinox, and Title of each chart.
 You can create a list of plate centres and input it instead of entering field
 centres interactively; this should be a FACTs style file with NAME, RA, DEC as
 fields and EQUINOX as a field or parameter.
 Input the file name in response to the CENTRES prompt and
 the catalogue of that name will be opened and the centre positions
-read from there. 
-Up to 30 centres are possible.  
+read from there.
+Up to 30 centres are possible.
 You are asked for START\_RECORD from which to begin taking centres.
 
 \begin{verbatim}
@@ -563,7 +563,7 @@ in terms of fields in the input catalogue.
 As the astrometric functions (see QCAR) are built into CONVERT, you can derive
 new coordinates.
 \end{itemize}
-Answer YES to the INDEX query, if you want to output an index. 
+Answer YES to the INDEX query, if you want to output an index.
 If you have input an ordinary catalogue an index will be made.
 If you input an index, the indexed information will be retained and the indexed
 data inserted. If the answer to the INDEX query was NO, and the input is an
@@ -572,9 +572,9 @@ If you answer NO to the OPTIONS query, only the first five of the above
 functions are possible, if you answer YES, all are possible.
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -630,47 +630,47 @@ CORRELATE computes non-parameteric correlation coefficients
 between numeric fields in a catalogue, (see also LINCOR and SCATTER
 which calculate the Pearson regression coefficient).
 Two correlation coefficients are computed for each pair of fields,
-Kendall's Tau and Spearman's Rho. 
-These coefficients measure the strength of any monotonic relation 
-between the two fields. 
+Kendall's Tau and Spearman's Rho.
+These coefficients measure the strength of any monotonic relation
+between the two fields.
 They both take values of +1.0 for perfect correlation, --1.0 for perfect
 anti-correlation and 0.0 for no correlation, though in general the
-values of the two coefficients are not equal. 
-These coefficients are further discussed in the NAG manual (Chapter G02) 
+values of the two coefficients are not equal.
+These coefficients are further discussed in the NAG manual (Chapter G02)
 and a more introductory discussion is given by Sprent (1981).
 
-When CORRELATE is run you are prompted for the name of the catalogue 
-to be analysed. 
+When CORRELATE is run you are prompted for the name of the catalogue
+to be analysed.
 You are given a choice of analysing all the numeric fields, or choosing
 certain fields.
-CORRELATE will only access fields which are of type INTEGER, REAL 
+CORRELATE will only access fields which are of type INTEGER, REAL
 or DOUBLE PRECISION.
 The results are written to a file called $<$catalogue name$>$.LIS
-in the current directory. 
+in the current directory.
 This file is suitable for printing.
 
 Fields in SCAR catalogues can contain ``missing values" where a
 measurement was not available for a particular field for a given
-object. 
+object.
 In such cases the value of the field for the object is
 set to the ``null value" defined for the field in the description
 file, and these values are excluded from the correlations.
 It is the responsibility of the user to ensure that the null values
 chosen for the fields to be correlated do not overlap with
-the range of genuine data values. 
-If such an overlap does occur genuine data will be excluded from 
-the correlation. 
-Because REAL and DOUBLE PRECISION values cannot be tested for equality, 
-a range of values within \underline{+}1.0E--13 of the null value will 
+the range of genuine data values.
+If such an overlap does occur genuine data will be excluded from
+the correlation.
+Because REAL and DOUBLE PRECISION values cannot be tested for equality,
+a range of values within \underline{+}1.0E--13 of the null value will
 be treated as missing values.
 
 If a field to be correlated contains a missing value for a
 particular object all the fields for that object will be excluded
 from the correlation (this is casewise treatment of missing values
-in the terminology of the NAG manual). 
-This approach has the disadvantage that some good data are discarded, 
-but it ensures that all the coefficients are based on the same number 
-of data points. 
+in the terminology of the NAG manual).
+This approach has the disadvantage that some good data are discarded,
+but it ensures that all the coefficients are based on the same number
+of data points.
 It can also lead to a considerable increase in computational efficiency.
 Further details are given in the NAG manual (Chapter G02).
 
@@ -678,7 +678,7 @@ If there are more than a few hundred entries in the catalogue the
 time required to compute the coefficients is not negligible.
 The application is not suitable for large catalogues containing
 of the order of 100,000 objects.
- 
+
 \begin{verbatim}
     Invocation: ICL> CAR_CORRELATE
       Parameter list:
@@ -692,22 +692,22 @@ of the order of 100,000 objects.
 \end{verbatim}
 
 \subsubsection{CAR\_COSMAGCAL}
- 
+
 Compute calibrated magnitude from COSMOS IAM magnitude
 
 COSMAGCAL computes a ``calibrated" magnitude from the standard
 COSMOS IAM parameters for step size and plate scale (STPSIZ and
 PLTSCL) and the fields for COSMOS magnitude and sky intensity
-(COSMAG and ISKY) contained in a Haggis catalogue. 
-It is assumed the step size is in microns and the plate scale is 
+(COSMAG and ISKY) contained in a Haggis catalogue.
+It is assumed the step size is in microns and the plate scale is
 in arcsec/mm.
-You are prompted for the name of the catalogue. 
+You are prompted for the name of the catalogue.
 If the catalogue is a standard COSMOS IAM catalogue, the parameters
 containing STPSIZ and PLTSCL are obtained automatically from
-the catalogue. 
-If these parameters cannot be found, you will be prompted for them. 
-You are prompted for the names of the fields containing 
-the COSMOS magnitude (COSMAG) and the sky intensity (ISKY) and 
+the catalogue.
+If these parameters cannot be found, you will be prompted for them.
+You are prompted for the names of the fields containing
+the COSMOS magnitude (COSMAG) and the sky intensity (ISKY) and
 for the field to hold the ``calibrated" magnitude.
 CONVERT must be run after this routine.
 
@@ -731,7 +731,7 @@ null value for the output field is written to the catalogue.
 \end{verbatim}
 
 \subsubsection{CAR\_COUNTREC}
- 
+
 Get the number of objects in a sequential file
 
 COUNTREC does not require a description file for the
@@ -750,7 +750,7 @@ used for quickly finding the size of a direct access file.
 
 Switch on the VMS debugger --- for PROGRAMMERS only
 
-This command can be used when testing SCAR, which should have been linked 
+This command can be used when testing SCAR, which should have been linked
 with the command {\tt SCAR\_MLINK SCAR "/DEBUG"}.
 \begin{verbatim}
     Invocation: ICL> CAR_DEBUG
@@ -760,22 +760,22 @@ with the command {\tt SCAR\_MLINK SCAR "/DEBUG"}.
 
 Select the objects in one catalogue and not in another
 
-The DIFFER routine is very similar to JOIN routine.  
+The DIFFER routine is very similar to JOIN routine.
 DIFFER selects all the objects in the first catalogue you specify in
 your input list that do NOT have a matching partner in the second
 catalogue you specify.
 The prompts are the same as in JOIN except the order of the
 catalogues in your INPUT list is crucial.
 Objects in the first catalogue that fail the MATCH criterion are
-written to your OUTPUT catalogue.  
-In SIMPLE mode your output catalogue is a local index to the first 
+written to your OUTPUT catalogue.
+In SIMPLE mode your output catalogue is a local index to the first
 catalogue.\\
 For example
 \begin{verbatim}
-    INPUT=[CATX,IRPS] OUTPUT=CATY 
+    INPUT=[CATX,IRPS] OUTPUT=CATY
 \end{verbatim}
 Selects all the CATX records not in the IRPS and puts them in CATY
-whereas 
+whereas
 \begin{verbatim}
     INPUT=[IRPS,CATX] OUTPUT=IRPS1
 \end{verbatim}
@@ -789,14 +789,14 @@ The MATCH criterion must be expressed as a QCAR expression.\\
 {\bf Units:} In a MATCH condition, when adding or subtracting a constant or
 comparing it with an arithmetic expression, you must generally specify the
 constant in the same units as the operand.
-However, when the operand is a Radian quantity (eg RA, dec), you must present 
+However, when the operand is a Radian quantity (eg RA, dec), you must present
 the constant in the appropriate form for example HHMMSS for RA
 and SDDMMSS for Dec.
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -867,39 +867,39 @@ that the new file replaces the old unedited file, and DELETES it.
 
 The main reasons for a CAR editor is to permit:
 \begin{itemize}
-\item The controlled allocation of values into a fixed format file so you 
+\item The controlled allocation of values into a fixed format file so you
 can create FACTs catalogues of your own without ``punching errors".
 \item The editing of unformatted files.
-\item The correction of files without rewriting the whole file, so you 
+\item The correction of files without rewriting the whole file, so you
 can amend large binary files quickly.
 \end{itemize}
 The VAX/EDT editor does not allow the above three functions.
 In addition the features of EDIT allow you to browse through a
 catalogue and save selected records for future analysis.
-The EDIT routine works like a line editor. 
-It does not buffer the whole file, only the current record, so large 
+The EDIT routine works like a line editor.
+It does not buffer the whole file, only the current record, so large
 files can edited.
 There is a delete function provided for KEYED access (ISAM) files,
-but for other access modes it is not supported (yet). 
-However you can simulate a delete operation by skipping records and not 
+but for other access modes it is not supported (yet).
+However you can simulate a delete operation by skipping records and not
 copying them from the input file to the edited file.
 
-You INPUT the name of the file you wish to EDIT, a description file for 
+You INPUT the name of the file you wish to EDIT, a description file for
 this data file must already exist.
 You can create the description file using FORM1 or FORM2.
 EDIT finds the description file and tries to find a data file
-corresponding to the description for the INPUT. 
-If the data file is not found EDIT switches to CREATE mode, and you 
+corresponding to the description for the INPUT.
+If the data file is not found EDIT switches to CREATE mode, and you
 insert the data values.
-If EDIT finds the data file, it asks you how you want to ACCESS it. 
-Options are READ, WRITE or UPDATE. 
-If you select READ no output file is opened. 
-If you select WRITE a new output data file is opened. 
+If EDIT finds the data file, it asks you how you want to ACCESS it.
+Options are READ, WRITE or UPDATE.
+If you select READ no output file is opened.
+If you select WRITE a new output data file is opened.
 If you select UPDATE you write back to the INPUT file.
 If you are updating a file, you are advised to make a copy of it and the
 description file before you start (use DCL COPY etc).
 
-You have a `main buffer' for holding your current record and you have a 
+You have a `main buffer' for holding your current record and you have a
 `memory buffer' for saving a record.
 You change the entire `main buffer' record by positioning (P),
 searching (S), inserting (I), unloading (--) the memory buffer,
@@ -908,12 +908,12 @@ You can replace (R) a field value in the main buffer.
 A format statement is given for information as to the range and precision
 in which the data is stored, in insert (I) and replace (R), but you can
 add fields in any format.
-Records are written to the output file by the action of a write (W), 
+Records are written to the output file by the action of a write (W),
 copy (C), append (A), or rewrite/update (U) command.
 After the write action, the buffer is loaded automatically with the next record.
 In CREATE mode this next record is a null record.
 Records can be deleted from the file you are writing to using
-the delete command (D). 
+the delete command (D).
 Only KEYED access files permit this.
 When writing a new file you can read from either the input
 file or the output file, selection is made using the file command (F).
@@ -1032,17 +1032,17 @@ The commands available from EDIT are as follows:
    values of each field in turn, which you can add in any format
 \item [L]: List the contents of the main buffer and its record number
 \item [N]: Next record meeting search criterion is read into the main buffer
-\item [P]: Position the displayed file by absolute record number. The record 
+\item [P]: Position the displayed file by absolute record number. The record
    is loaded into the main buffer
 \item [Q]: Quit editor (in WRITE mode this deletes the OUTPUT file)
 \item [R]: Replace a field value in the main buffer with a new value
-\item [S]: Search the input file, using a QCAR expression. The next 
+\item [S]: Search the input file, using a QCAR expression. The next
    record satisfying the selection criteria is loaded into the main buffer
 \item [U]: Rewrite the main buffer to the OUTPUT file
 \item [W]: Write the main buffer to the OUTPUT file
 \item [X]: Cancel the search
 \end{description}
-\begin{verbatim} 
+\begin{verbatim}
     Invocation: ICL> CAR_EDIT
       Parameter list:
        input           = Name of input catalogue
@@ -1050,7 +1050,7 @@ The commands available from EDIT are as follows:
        select          = NO=>all fields output, YES=>prompted for names
        command         = Edit command. Type H for list of commands
        number          = Number of records to copy (0=rest)
-       record          = Absolute record number 
+       record          = Absolute record number
        name            = Desired field or parameter name
        value           = Value of field
        answer          = Answer should be YES or NO
@@ -1064,12 +1064,12 @@ The commands available from EDIT are as follows:
 \subsubsection{CAR\_EXTAPE}
 
 Dump a catalogue from a foreign tape to disk file
- 
- 
-The EXTAPE command allows you to examine the contents of an ascii tape 
+
+
+The EXTAPE command allows you to examine the contents of an ascii tape
 interactively and dump it to a sequential file.
 The tape is normally mounted with the MOUNT command, but this is not essential.
-You can specify the logical record length after viewing the data, and then 
+You can specify the logical record length after viewing the data, and then
 dump the data from tape to a file with a specified logical record length.
 \begin{verbatim}
     Invocation: ICL> CAR_EXTAPE
@@ -1086,33 +1086,33 @@ dump the data from tape to a file with a specified logical record length.
 
 Create a description file in screen mode
 
-CAR\_FORM1 is a utility to aid in building description files. It will place 
+CAR\_FORM1 is a utility to aid in building description files. It will place
 user supplied information in the correct position in the description file.
 The obligatory parameters come first. When you have supplied the appropriate
-values for these parameters there is an opportunity to insert optional 
+values for these parameters there is an opportunity to insert optional
 parameters and the fields. Note that the RECORDSIZE parameter requires no
 value as this is calculated and inserted for you. Use keyword 'P' for
-parameter, 'F' for field and 'E' for endfield. After specifying 'E' for 
+parameter, 'F' for field and 'E' for endfield. After specifying 'E' for
 endfield CAR\_FORM1 requests a comment for each parameter or field and
 possible ADCNOTES and CATNOTES. During CAR\_FORM1 the bottom screen line
-gives information about the input required. 
+gives information about the input required.
 
-This routine allows you to visualise the description file as you are 
+This routine allows you to visualise the description file as you are
 making it.
 For each field of the description file you are prompted for input.
 \begin{description}
 \item [Entering data] --
 For each field to be entered, a prompt appears along the bottom line of the
 screen.
-This tells you the name, format (ie.\ `F',`A',`I',`L',`E' or `D') and maximum 
+This tells you the name, format (ie.\ `F',`A',`I',`L',`E' or `D') and maximum
 length of the description file field to be entered.
 To enter data, type in the value required and hit $<$RETURN$>$.
 The program will right justify numeric input data, move onto the next field
 and await input.
-If no input is required for a description file field, $<$RETURN$>$ will move 
+If no input is required for a description file field, $<$RETURN$>$ will move
 onto the next field.
 A check is also made to ensure that the VALUE is within the length as
-specified in the prompt line, if not the entry is rejected. 
+specified in the prompt line, if not the entry is rejected.
 The RECORDSIZE parameter is automatically calculated for you.
 \item [Mistakes] --
 If you make a mistake entering any field on the current line, move back to the
@@ -1131,18 +1131,18 @@ The routine writes all input to a file in the local directory, JOURNAL.DAT.
 In the event of a system break or accidental exit from the routine, the
 description file can be recovered by editing this file.
 \end{description}
-If at any point you need help type `?' and $<$RETURN$>$, then type 
-CAR\_FORM1 in response to the CAR\_HELP menu. 
-After the help session is finished the program will return to the point 
+If at any point you need help type `?' and $<$RETURN$>$, then type
+CAR\_FORM1 in response to the CAR\_HELP menu.
+After the help session is finished the program will return to the point
 at which you left off.
- 
+
  It is recommended that long CATNOTES and ADCNOTES are added later
-with the VMS editor. 
-HELP modules within CATNOTES and ADCNOTES can be added by placing the 
+with the VMS editor.
+HELP modules within CATNOTES and ADCNOTES can be added by placing the
 module number, at least 3, in the third column of the description file.
 Remember that the record length for help modules follows the formula:
 MAX\_RECORDLENGTH = (80-2*Help\_Key\_No).
- 
+
 \begin{verbatim}
     Invocation: ICL> CAR_FORM1
 \end{verbatim}
@@ -1152,14 +1152,14 @@ MAX\_RECORDLENGTH = (80-2*Help\_Key\_No).
 Create a catalogue description from scratch
 
 The FORM2 routine allows you to create a description file
-from scratch. 
-In contrast to the screen based FORM1, which performs the same 
-function, FORM2 operates in prompt mode. 
-The main advantage of FORM2 over FORM1 is that it permits description 
+from scratch.
+In contrast to the screen based FORM1, which performs the same
+function, FORM2 operates in prompt mode.
+The main advantage of FORM2 over FORM1 is that it permits description
 files to be included.
 When you create a description file from scratch you must first define
-the mandatory parameters TITLE, MEDIUM, ACCESSMODE. 
-If the ACCESSMODE is DIRECT you must also define NRECORDS and KEYFIELD 
+the mandatory parameters TITLE, MEDIUM, ACCESSMODE.
+If the ACCESSMODE is DIRECT you must also define NRECORDS and KEYFIELD
 parameters, if you know their values.
 For the output file name, give the suffix for the description file, DSCF
 will be automatically added.
@@ -1185,7 +1185,7 @@ Summary of keyword commands:
 \item [S]: Default START -- on/off
 \item [Z]: End input
 \end{description}
- 
+
 \begin{verbatim}
     Invocation: ICL> CAR_FORM2
       Parameter list:
@@ -1202,8 +1202,8 @@ Summary of keyword commands:
        nullval         = Null value of Field or value of Parameter
        comment         = Lexical definition of the field/parameter
        express         = Functional definition of the field/parameter
-                        (`!' is inserted if there is a functional definition, 
-                        otherwise it is not. If you put in HHMMSS without a 
+                        (`!' is inserted if there is a functional definition,
+                        otherwise it is not. If you put in HHMMSS without a
                         functional definition, put `!' at the end of the COMMENT)
        note            = Text of ADCnote or CATnote
        include         = Name of catalogue
@@ -1213,7 +1213,7 @@ Summary of keyword commands:
        batch           = Batch processing Y/N?
        selfields       = Names of selected fields eg. [RA,DEC]
 \end{verbatim}
- 
+
 \subsubsection{CAR\_GETPAR}
 
 Get a parameter value when in the ICL environment.
@@ -1222,7 +1222,7 @@ CAR\_GETPAR INPUT=IRPS PARAM=MEDIUM prints a message to the screen and if in ICL
 the variable is set. This can be accessed by
 
 \begin{verbatim}
- 
+
                  GETPAR CAR_GETPAR RESULT (X)
                  =(X)
 
@@ -1238,7 +1238,7 @@ the variable is set. This can be accessed by
 You can use this procedure to produce your output after a run of the graphics
 routines HISTOGRAM, SCATTER, AITOFF, CHART.
 
-There is one mandatory parameter and two other optional parameters, as 
+There is one mandatory parameter and two other optional parameters, as
 described below:
 \begin{description}
 \begin{description}
@@ -1267,51 +1267,51 @@ name of the field, or QCAR expression, to be plotted along the XAXIS.
 The field values are read in from the catalogue and the mean, mode,
 standard deviation, maximum and minumum values are presented to you.
 You should note XMAX, XMIN and MODESZ for designing the
-axis scales of your plot.  
+axis scales of your plot.
 You can use constants to convert units for the X axis, for example
 GLONG*57.295779 to give an axis in degrees, and you can label the
 axis at the same time, so a reply to XAXIS could be:
 \begin{verbatim}
     GLONG!GLONG*57.295779 \DEGREES|
 \end{verbatim}
-The reporting package will write the statistical data to HIST.CAR. 
+The reporting package will write the statistical data to HIST.CAR.
 You can identify any statistic by looking up HIST in the catalogues
-help.  
+help.
 It also appends the actual counts for each bin to this file.
 The plotting loop starts, by asking you for a TITLE for the diagram.
 
 In the bar chart style of histogram points are allotted to bins
 of user specified size, and the height of the bar measures the
-number of points in the bin.  
-In the continuous line style points are plotted and connected by a 
-line.  
-The answer to BARCHART sets the style. 
+number of points in the bin.
+In the continuous line style points are plotted and connected by a
+line.
+The answer to BARCHART sets the style.
 The BINSIZE sets the X dimension of a bin.
-The answer to SHAPE decides whether the plot will use the data to 
-determine the limits or whether you want to set your own with the 
+The answer to SHAPE decides whether the plot will use the data to
+determine the limits or whether you want to set your own with the
 parameters, XMIN, NBINS, YMIN and YMAX.
 
 You are asked to identify an output DEVICE for displaying the
 histogram.
-The diagram will then be drawn on the selected device.  
-On an interactive device a cursor will be drawn.  
-You can move the cursor arround (by tracker ball, joystick or the arrow 
-keys) to aid reading positions off the X and Y scales. 
-Type ``1'' to to read the cursor position, anything else exits 
+The diagram will then be drawn on the selected device.
+On an interactive device a cursor will be drawn.
+You can move the cursor arround (by tracker ball, joystick or the arrow
+keys) to aid reading positions off the X and Y scales.
+Type ``1'' to to read the cursor position, anything else exits
 interactive mode.
 
 When you have finished examining the diagram hit the select button
 (e.g: any alpha key on a TEK terminal) and the screen is cleared.
 You then have the option of filing the bin counts (STORE).
 If you answer ``YES'' to the ``REDRAW'' prompt, you will start the
-drawing loop again.  
+drawing loop again.
 You may specify a hardcopy device second time around, or use HARDCOPY.
 Graphical output will be sent to the file indicated in the list of
 devices and will be in your current directory.
-Statistical data will be sent to HIST.CAR.  
+Statistical data will be sent to HIST.CAR.
 
 {\bf Units:} When adding or subtracting a constant in a QCAR expression (in
-DEFINE below) you must generally specify the constant in the units of the 
+DEFINE below) you must generally specify the constant in the units of the
 operand of the operator, which you can find by looking up the field(s) concerned
 in the HELP information for the catalogue.
 However, when it is a Radian quantity (eg RA, dec), you must present the
@@ -1346,45 +1346,45 @@ constant in the appropriate form e.g. HHMMSS and SDDMMSS.
 Produce a finding chart plot for COSMOS objects
 
 This routine produces a finding chart type of plot for catalogued
-objects.  
-The routine is designed with image data, in particular COSMOS, in mind 
-and is largely based on the DOTPLOT and IGPLOT HAGGIS routines.   
+objects.
+The routine is designed with image data, in particular COSMOS, in mind
+and is largely based on the DOTPLOT and IGPLOT HAGGIS routines.
 You can specify whether the plot is to be an overlay or not.
-A map or overlay is produced, with the objects represented either as 
-dots, or by some symbol which gives information on the object (usually 
-the image size and orientation), or concentric symbols (giving image 
-contour information).  
+A map or overlay is produced, with the objects represented either as
+dots, or by some symbol which gives information on the object (usually
+the image size and orientation), or concentric symbols (giving image
+contour information).
 There is a maximum number of objects that can be plotted for each of
 these modes : 1~000~000, 10~000, 1~000 respectively.
-The input catalogue can be either an index or master catalogue. 
+The input catalogue can be either an index or master catalogue.
 You select which fields are to be plotted as X and Y, and which
-fields are to be used for drawing the symbols.  
-The X and Y fields must have the same units, or be recognised time and 
+fields are to be used for drawing the symbols.
+The X and Y fields must have the same units, or be recognised time and
 angle coordinates.
-If precessed coordinates are required, the precession must be done first 
+If precessed coordinates are required, the precession must be done first
 using CALC.
 You can superimpose data from more than catalogue, or from
-different fields of the same catalogue, on to the plot.  
-This means for example that you can create indexes to catalogues 
-and plot the different classes of object on the same plot, distinguished 
+different fields of the same catalogue, on to the plot.
+This means for example that you can create indexes to catalogues
+and plot the different classes of object on the same plot, distinguished
 by symbol and/or line type.
-  
-You specify labels for the X and Y axes, and a title for the plot.  
-These labels can be up to 40 characters long.  
-The time and date are written at the bottom of the plot. 
-If the plot is an overlay it is annotated further, and there is also an 
+
+You specify labels for the X and Y axes, and a title for the plot.
+These labels can be up to 40 characters long.
+The time and date are written at the bottom of the plot.
+If the plot is an overlay it is annotated further, and there is also an
 option to display certain `housekeeping' parameter information on the plot.
 Housekeeping information is written down the right hand side of the
-plot, for up to 3 catalogues if the plot is an overlay, or 4 otherwise.  
-The catalogue title, title comments, and the number of records in the 
-catalogue are obtained from the description file and displayed.  
+plot, for up to 3 catalogues if the plot is an overlay, or 4 otherwise.
+The catalogue title, title comments, and the number of records in the
+catalogue are obtained from the description file and displayed.
 A description of the plot mode and line type is also given, and you
 can give further information of up to 40 characters.
 The device is selected from a list of devices which support GKS7.2 (SUN/83).
 
 A square grid can be superimposed on the plot unless right ascension
 and declination are being plotted as an overlay.
-The direction of `North' and `East' is indicated on the plot.  
+The direction of `North' and `East' is indicated on the plot.
 The following information is displayed on the top right of the plot: the
 plot centre, equinox and scale, and, if the X,Y are right ascension
 and declination, the RA range (at the dec centre) and the dec range
@@ -1392,19 +1392,19 @@ and declination, the RA range (at the dec centre) and the dec range
 
 You are given the option of automatic scaling (using the smallest
 and largest values of the X and Y fields of the first input
-catalogue), or of specifying the X and Y ranges.  
-Note: auto-scaling by the first catalogue means that data may be lost 
+catalogue), or of specifying the X and Y ranges.
+Note: auto-scaling by the first catalogue means that data may be lost
 when subsequent catalogues are overlaid.
 
 If an overlay is not required, the plot will be scaled to fit the
 device, with the X and Y scales forced to be the same, as a map is
-being produced.  
-If an overlay is being plotted X and Y will be in metres, and a warning 
+being produced.
+If an overlay is being plotted X and Y will be in metres, and a warning
 will be given if objects have been lost off the display surface.
 You can use the HARDCOPY routine to produce hardcopy output.
 
 \begin{description}
-\item{Plotting information} 
+\item{Plotting information}
  \begin{itemize}
 \item The units of the fields are restricted.
 The units are obtained from the catalogue description file, and must
@@ -1416,25 +1416,25 @@ be as follows -
             area : PIXELS
       pixel size : ARCSEC, 0.1 MICRON, MICRON, MM
 \end{verbatim}
-\item The units of area measure must be `pixels'. 
-The routine decodes this into an angular or linear extent by obtaining 
-the value of a parameter in the description file which gives the pixel 
-side in units of arcsec, 0.1 micron, micron or mm.  
-The name of this parameter (given by the parameter `STPNAM') is defaulted 
-to STPSIZ.  
+\item The units of area measure must be `pixels'.
+The routine decodes this into an angular or linear extent by obtaining
+the value of a parameter in the description file which gives the pixel
+side in units of arcsec, 0.1 micron, micron or mm.
+The name of this parameter (given by the parameter `STPNAM') is defaulted
+to STPSIZ.
 If the program fails to obtain the value from the description file, you are
 prompted for the value in units of 0.1 micron.
 \item The parameter `CROSS' determines whether a central cross is to be
 drawn on the plot, the value is defaulted to `NO'.
 \item The plotted points can be labelled with the value of a specified
-catalogue field.  
-The value is written out according to the null format of the field, as given 
+catalogue field.
+The value is written out according to the null format of the field, as given
 in the description file.
 The description file can be edited to change this format.
 \item There is a choice of 5 line types, if you are not plotting dots,
-crosses or gunsights.  
+crosses or gunsights.
 These are: solid, dash, dot, dash-dot, dash-dot-dot.
-\item If {\bf points} are selected, a point is drawn at each X,Y value with 
+\item If {\bf points} are selected, a point is drawn at each X,Y value with
 a marker chosen from the following GKS markers:
 \begin{verbatim}
     1=dot `.'  2=plus sign `+'  3=asterisk `*'  4=circle `o'  5=cross `x'
@@ -1444,11 +1444,11 @@ a marker chosen from the following GKS markers:
     1: ellipse  2: rectangle  3: circle  4: cross  5: gunsight
 \end{verbatim}
 In each case the size of the symbol gives the image extent, and in
-mode 1, information on the image orientation is also given.  
-If the X,Y are celestial, i.e. right ascension and declination, then, 
+mode 1, information on the image orientation is also given.
+If the X,Y are celestial, i.e. right ascension and declination, then,
 unless the plot is an overlay, the units of the image extent must also be
-celestial. 
-Similarly, if the X,Y are not celestial then, for every case, the image 
+celestial.
+Similarly, if the X,Y are not celestial then, for every case, the image
 extent must also be non-celestial, i.e. real units.\\
 {\bf Ellipse}: You are prompted for the name of the fields which give
 the value of : semi-major axis, semi-minor axis, and orientation.
@@ -1456,33 +1456,33 @@ The units of these fields, as given in the catalogue description
 file, are restricted.\\
 {\bf Rectangle}: You are prompted for the name of the fields which
 give the value of minimum X value, maximum X value, minimum Y
-value, maximum Y value.  
-These fields must have units of time, angle, radian, 0.1 micron, micron, 
+value, maximum Y value.
+These fields must have units of time, angle, radian, 0.1 micron, micron,
 or mm.\\
 {\bf Circle}: You are prompted for the name of the field which
-gives the value of the image area, in pixels.  
+gives the value of the image area, in pixels.
 The circle is drawn such that the area of the circle equals this area.\\
 {\bf Cross}: You are prompted for the name of the field which gives
-the value of the image area, in pixels.  
-The cross is drawn such that the area of the square with sides equal to 
+the value of the image area, in pixels.
+The cross is drawn such that the area of the square with sides equal to
 the length of each bar of the cross would equal this area.\\
 {\bf Gunsight}: You are prompted for the name of the field which gives
-the value of the image area, in pixels.  
-The gunsight is drawn such that the area of the square with sides equal 
+the value of the image area, in pixels.
+The gunsight is drawn such that the area of the square with sides equal
 to the extent of each bar of the gunsight would equal this area.
-\item If {\bf concentric} symbols are selected, nine concentric ellipses 
-are drawn at each X,Y.  
-You are prompted for the names of the fields which give the value of 
-semi-major axis, semi-minor axis, orientation, image area, and areal 
+\item If {\bf concentric} symbols are selected, nine concentric ellipses
+are drawn at each X,Y.
+You are prompted for the names of the fields which give the value of
+semi-major axis, semi-minor axis, orientation, image area, and areal
 profiles.
 The last must be a generic field in the catalogue, consisting of an array
-of 8 elements.  
-If the X,Y are celestial, i.e. right ascension and declination, then, 
-unless the plot is an overlay, the units of the image extent must also be 
-celestial.  
-Similarly, if the X,Y are not celestial then, for every case, the image 
-extent must also be non-celestial, i.e. real units.  
-The units of these fields, as given in the catalogue description file, are 
+of 8 elements.
+If the X,Y are celestial, i.e. right ascension and declination, then,
+unless the plot is an overlay, the units of the image extent must also be
+celestial.
+Similarly, if the X,Y are not celestial then, for every case, the image
+extent must also be non-celestial, i.e. real units.
+The units of these fields, as given in the catalogue description file, are
 restricted.
  \end{itemize}
 \item{Coordinate information}
@@ -1507,21 +1507,21 @@ value in years.
 \end{verbatim}
 \item If the X,Y are right ascension and declination, you will be
 prompted for the desired values of the plot centre's right ascension
-and declination.  
-In this case a tangent plane projection is performed with the celestial 
+and declination.
+In this case a tangent plane projection is performed with the celestial
 sphere touching the plane at the plot centre.
-You will be prompted for the desired values of the plot scale in 
+You will be prompted for the desired values of the plot scale in
 arcsec/mm.
 \item If the X,Y are right ascension and declination, the plot will have
-the centre and scale as specified for the first catalogue. 
+the centre and scale as specified for the first catalogue.
 If the equinox differs from the previous catalogue value an error message
-will be displayed and that input will be terminated. 
+will be displayed and that input will be terminated.
 If the epoch differs a warning message will be given.
 \item If the X,Y fields are not right ascension and declination the routine
 will attempt to obtain the value of the parameter ORIENT from the
-catalogue description file.  
-If it fails, you will be prompted for the value, which is an integer 
-from 1 to 8 describing the following orientations for X increasing to the 
+catalogue description file.
+If it fails, you will be prompted for the value, which is an integer
+from 1 to 8 describing the following orientations for X increasing to the
 right and Y to the top:
 \begin{verbatim}
          top    : N E S W N W S E
@@ -1530,13 +1530,13 @@ right and Y to the top:
 \end{verbatim}
 \item If the X,Y are not right ascension and declination, the routine
 will obtain the right ascension and declination centre for each
-catalogue plotted, and also the SCALE, either from the description file 
+catalogue plotted, and also the SCALE, either from the description file
 using the parameters RACEN and DECEN, or, if this fails, from you.
 \item If the X,Y are not right ascension and declination, you will
 be prevented from superimposing catalogues that do not have the same
-centre and scale.  
-If the equinox differs from the previous catalogue value an error message 
-will be displayed and that input will be terminated. 
+centre and scale.
+If the equinox differs from the previous catalogue value an error message
+will be displayed and that input will be terminated.
 If the epoch differs a warning message will be given.
 \end{itemize}
 \end{description}
@@ -1597,30 +1597,30 @@ Join two catalogues on a common field
 The JOIN routine allows you to join two catalogues on a common field
 or fields.
 To speed things up, you should put the smaller catalogue first in the list.
-This process can also be used for associating two astronomical objects by 
+This process can also be used for associating two astronomical objects by
 position or name.
 JOIN requires that the two input catalogues be sorted in the same order,
-on a field which has the same units in both catalogues.  
+on a field which has the same units in both catalogues.
 For positional associations this order must be the latitude coordinate.
 In the equatorial coordinate system, this field is of course DEC.
 (The IRPS catalogue has been sorted by DEC.)
-The JOIN is effected by a MATCH specification, which is a QCAR expression 
+The JOIN is effected by a MATCH specification, which is a QCAR expression
 that relates the keyfields of the two catalogues to be joined.
 As the keyfields may have the same fieldnames, the fieldnames in a MATCH
 specification should be prefixed by the characters of the catalogue
 name, followed by double underscore, eg. IRPS\_\,\_DEC.
 For example when you are associating two catalogues you would primarily
-demand that the positions of the sources are nearly the same.  
+demand that the positions of the sources are nearly the same.
 The QCAR function GREAT\_CIRCLE can be used for this.
-This calculates the great circle distance between two positions, the result 
-being expressed in arcsecs.    
-The function has four arguments, LONG1, LAT1, LONG2, LAT2, so it can be 
+This calculates the great circle distance between two positions, the result
+being expressed in arcsecs.
+The function has four arguments, LONG1, LAT1, LONG2, LAT2, so it can be
 used in any coordinate system.
 
 {\bf Units:} In a MATCH condition, when adding or subtracting a constant or
 comparing it with an arithmetic expression, you must generally specify the
 constant in the same units as the operand.
-However, when the operand is a Radian quantity (eg RA, dec), you must present 
+However, when the operand is a Radian quantity (eg RA, dec), you must present
 the constant in the appropriate form for example HHMMSS for RA
 and SDDMMSS for Dec.
 
@@ -1639,9 +1639,9 @@ a RCBG object, the MATCH condition is
 \begin{verbatim}
     GREAT_CIRCLE(RCBG__RA,RCBG__DEC,IRPS__RA,IRPS__DEC).LE.90.END.
 \end{verbatim}
-The two catalogues in this example are both sorted on DEC.  
+The two catalogues in this example are both sorted on DEC.
 
-{\em Example 3:} If you have a list of galaxies and you want to look for 
+{\em Example 3:} If you have a list of galaxies and you want to look for
 nearby, but not coincident, IRAS sources, the match condition would be:
 \begin{verbatim}
     GREAT_CIRCLE(RCBG__RA,RCBG__DEC,IRPS__RA,IRPS__DEC).LT.360.AND.
@@ -1663,8 +1663,8 @@ brightest stars have high quality fluxes at the longer wavelengths.
 You can see from the above example that you can include relational expressions,
 other than those which just relate keyfields, to `tighten' the join criterion.
 
-{\em Example 5:} If you wanted to associate IRAS sources with your own 
-catalogue TEST which contains a field PERR for the maximum error of the 
+{\em Example 5:} If you wanted to associate IRAS sources with your own
+catalogue TEST which contains a field PERR for the maximum error of the
 position, then the criterion:
 \begin{verbatim}
     GREAT_CIRCLE(TEST__RA,TEST__DEC,IRPS__RA,IRPS__DEC).LT.PERR.END.
@@ -1674,9 +1674,9 @@ and the SCOPE parameter for CAR\_JOIN requires a non zero value. In this example
 the SCOPE should be the maximum possible value for PERR.
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -1715,39 +1715,39 @@ The linear correlation coefficient measures the strength of any
 linear relation between the two fields for which it is computed.
 The coefficient takes values ranging from +1.0 to --1.0; +1.0
 implies perfect correlation, --1.0 perfect anti-correlation
-and 0.0 no correlation. 
-The coefficient is discussed further in the NAG manual (Chapter G02) 
+and 0.0 no correlation.
+The coefficient is discussed further in the NAG manual (Chapter G02)
 and most statistics books, see for example Bevington (1969).
 When LINCOR is run you are first prompted for the name
-of the catalogue which is to be analysed. 
-You are then asked whether you wish to analyse all the numeric fields in 
-the catalogue or whether you wish to select the fields to be correlated. 
-If you choose to select the fields to be correlated you are prompted for 
-the names of the fields which you require. 
-LINCOR will only access fields which are of type INTEGER, REAL or DOUBLE 
-PRECISION. 
-The results are written to a file called $<$catalogue name$>$.LIS which 
+of the catalogue which is to be analysed.
+You are then asked whether you wish to analyse all the numeric fields in
+the catalogue or whether you wish to select the fields to be correlated.
+If you choose to select the fields to be correlated you are prompted for
+the names of the fields which you require.
+LINCOR will only access fields which are of type INTEGER, REAL or DOUBLE
+PRECISION.
+The results are written to a file called $<$catalogue name$>$.LIS which
 is suitable for printing.
 Fields in SCAR catalogues can contain ``missing values" where a
 measurement was not available for a particular field for a given
-object. 
-In such cases the value of the field for the object is set to the ``null 
-value" defined for the field in the description file. 
+object.
+In such cases the value of the field for the object is set to the ``null
+value" defined for the field in the description file.
 Such values are excluded from the correlations.
 It is your responsibility to ensure that the null values
 chosen for the fields that are to be correlated do not overlap with
-the range of genuine data values. 
-If such an overlap does occur genuine data will be excluded from the 
-correlation, because REAL and DOUBLE PRECISION values cannot be tested for 
-equality and so a range of values within \underline{+}1.0E--13 of the null 
+the range of genuine data values.
+If such an overlap does occur genuine data will be excluded from the
+correlation, because REAL and DOUBLE PRECISION values cannot be tested for
+equality and so a range of values within \underline{+}1.0E--13 of the null
 value will be treated as missing values.
 If a field to be correlated contains a missing value for a
 particular object all the fields for that object will be excluded
 from the correlation (this is casewise treatment of missing values
-in the terminology of the NAG manual). 
-This approach has the disadvantage that some good data are discarded, but 
-it ensures that all the coefficients are based on the same number of data 
-points. 
+in the terminology of the NAG manual).
+This approach has the disadvantage that some good data are discarded, but
+it ensures that all the coefficients are based on the same number of data
+points.
 It can also lead to a considerable increase in computational efficiency.
 Further details are given in the NAG manual (Chapter G02).
 \begin{verbatim}
@@ -1763,24 +1763,24 @@ Further details are given in the NAG manual (Chapter G02).
      "Data reduction and error analysis for the physical sciences".
       p119. McGraw-Hill, New York.
 \end{verbatim}
- 
+
 \subsubsection{CAR\_LISTOUT}
 
 Write out values of specified fields of a catalogue
 
 LIST writes out values of fields specified by you, from a
-catalogue specified by you.  
-The output takes the form of columns, and the field name input is 
-terminated, either by you or when the required output width goes 
-over a maximum value.  
+catalogue specified by you.
+The output takes the form of columns, and the field name input is
+terminated, either by you or when the required output width goes
+over a maximum value.
 A header and running record number are optional.
 The output can be directed either to the screen, or to a specified
-formatted file, or both.  
-The default maximum width for a file is 132, and for the screen 75, 
-characters.  
-If both file and screen are selected the default width is 75 characters.  
-There is a default column spacing of 2 characters.  
-The column width is set by the field length, or if a header is required, 
+formatted file, or both.
+The default maximum width for a file is 132, and for the screen 75,
+characters.
+If both file and screen are selected the default width is 75 characters.
+There is a default column spacing of 2 characters.
+The column width is set by the field length, or if a header is required,
 by the length of the longest character string, field value, name or units.
 Angular fields are converted to character strings as specified in
 the comments section of the description file, unless the parameter
@@ -1810,15 +1810,15 @@ Read a user file into the SCAR system
 LISTIN reads a simple VMS file containing columns of numbers into a
 catalogue. The input data file and a description file for the output
 must exist prior to running LISTIN.
-The input file consists of columns of numbers or characters which are to 
-be copied into the catalogue. 
-It may be created with an editor or by another program. 
+The input file consists of columns of numbers or characters which are to
+be copied into the catalogue.
+It may be created with an editor or by another program.
 Columns are identified by the name of the field.
 Columns need to be separated by one or more blanks.
 Fields with embedded blanks are illegal.
 Occasionally there may be a field in the input file which can not
-to be copied to the output catalogue.  
-This field should be given the name `OMIT'.  
+to be copied to the output catalogue.
+This field should be given the name `OMIT'.
 Consider the following input file:
 \begin{verbatim}
     NAME        OMIT      MAG      T
@@ -1829,13 +1829,13 @@ Consider the following input file:
     .          .         .         .
 \end{verbatim}
 The first, third and fourth columns will be copied to fields named `NAME'
-`MAG' and `T' respectively. 
+`MAG' and `T' respectively.
 The second column will not be copied.
 Occasionally it may be required to change the name of the omitted
-from the standard `OMIT'. 
-This might be because for some reason the catalogue has a field called 
-`OMIT' to which fields are to be written. 
-This end may be achieved by giving a value for the parameter OMTFLD other 
+from the standard `OMIT'.
+This might be because for some reason the catalogue has a field called
+`OMIT' to which fields are to be written.
+This end may be achieved by giving a value for the parameter OMTFLD other
 than the default `OMIT'.
 \begin{verbatim}
     Invocation: ICL> CAR_LISTIN
@@ -1850,39 +1850,39 @@ than the default `OMIT'.
 
 Extracts largest or smallest numbers from a catalogue
 
-LITTLEBIG selects a given number of objects with the largest or smallest 
+LITTLEBIG selects a given number of objects with the largest or smallest
 values for a particular field.
 You are prompted for the name of the input catalogue,
-which may be either a master or an index catalogue. 
-A name for the output catalogue, to hold the selected objects, is next 
+which may be either a master or an index catalogue.
+A name for the output catalogue, to hold the selected objects, is next
 requested.
 If a description file for the output catalogue did not previously exist
 one is created, based on the description file of the input
 catalogue and you are asked if this operation is to be done
-in simple or complex mode. 
-(In simple mode the description file is created automatically, in complex 
+in simple or complex mode.
+(In simple mode the description file is created automatically, in complex
 mode you control what it contains.)
 Once the description file for the output catalogue of selected
 objects has been created, you are asked if a second output
-catalogue of rejected objects is to be created. 
-If it is, you are prompted for the name of that catalogue. 
+catalogue of rejected objects is to be created.
+If it is, you are prompted for the name of that catalogue.
 Again, if no description file exists, one is created, either in simple or
-complex mode. 
-The routine inquires whether the largest or smallest values for this field 
+complex mode.
+The routine inquires whether the largest or smallest values for this field
 are to be obtained (the response here may be abbreviated L or S), and the
 number of objects to be selected.
-The routine prompts for the maximum number of objects which may be 
-selected. 
-The purpose of this option is to allow procedures to be implemented which 
+The routine prompts for the maximum number of objects which may be
+selected.
+The purpose of this option is to allow procedures to be implemented which
 limit the maximum permitted size of the output catalogue.
-The selection then proceeds and the requested catalogues are generated.  
-The output catalogues are not sorted on the selected field; you may wish 
+The selection then proceeds and the requested catalogues are generated.
+The output catalogues are not sorted on the selected field; you may wish
 to do this before reporting.
 
 The three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -1917,10 +1917,10 @@ SELFIELDS parameter will be selected.
 
 Merge two or more catalogues
 
-The MERGE routine adds two or more catalogues together.  
+The MERGE routine adds two or more catalogues together.
 The resulting catalogue is sorted on fields, specified by you, which
 have the same units in each of the input catalogues.
-If there is no common keyfield, the keyfield NUMBER (record number) should 
+If there is no common keyfield, the keyfield NUMBER (record number) should
 be specified for the output file.
 Currently the maximum number of input files permitted is nine.
 In SIMPLE mode the default output is a global index to the input files.
@@ -1929,9 +1929,9 @@ Note that each input local index implies two files and each global index
 implies at least two.
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -1976,25 +1976,25 @@ command.
 \begin{verbatim}
     Invocation: ICL> CAR_MOUNT
 \end{verbatim}
- 
+
 \subsubsection{CAR\_OLIST}
 
-Write out values of specified fields of a catalogue in the specified 
+Write out values of specified fields of a catalogue in the specified
 order
 
 OLIST writes out values of fields specified by you, from a
-catalogue specified by you, in an order specified by you.  
-The output takes the form of columns, and the field name input is 
-terminated, either by you or when the required output width goes 
-over a maximum value.  
+catalogue specified by you, in an order specified by you.
+The output takes the form of columns, and the field name input is
+terminated, either by you or when the required output width goes
+over a maximum value.
 A header and running record number are optional.
 The output can be directed either to the screen, or to a specified
-formatted file, or both.  
-The default maximum width for a file is 132, and for the screen 75, 
-characters.  
-If both file and screen are selected the default width is 75 characters.  
-There is a default column spacing of 2 characters.  
-The column width is set by the field length, or if a header is required, 
+formatted file, or both.
+The default maximum width for a file is 132, and for the screen 75,
+characters.
+If both file and screen are selected the default width is 75 characters.
+There is a default column spacing of 2 characters.
+The column width is set by the field length, or if a header is required,
 by the length of the longest character string, field value, name or units.
 Angular fields are converted to character strings as specified in
 the comments section of the description file, unless the parameter
@@ -2021,12 +2021,12 @@ changed by editing the description file.
 
 Generate description file for polygon vertices
 
-One way of selecting objects is to specify the corners of a box.  
+One way of selecting objects is to specify the corners of a box.
 The POLYGON routine enables the search area to be of any polygon shape.
 POLYGON creates a description file for a catalogue which
-defines a set of fields containing the positions of the corners of the 
-polygon.  
-This description is used by the WITHIN routine to select objects 
+defines a set of fields containing the positions of the corners of the
+polygon.
+This description is used by the WITHIN routine to select objects
 inside or outside the polygon.
 The polygon does not need to be ``closed'', i.e. by respecifying the first
 corner at the end.
@@ -2037,7 +2037,7 @@ The catalogue created will contain the following fields:-
      YPOLY            R*4      Y coordinates of polygon vertices
 \end{verbatim}
 The units are usually radians.
-POLYGON asks for the name of data file holding the XPOLY and YPOLY values 
+POLYGON asks for the name of data file holding the XPOLY and YPOLY values
 (e.g. Z) and creates the description file (e.g. DSCFZ.DAT).
 You use EDIT to put in the values of the polygon corner positions.
 The number of corners is taken from NRECORDS.
@@ -2051,19 +2051,19 @@ The number of corners is taken from NRECORDS.
 \end{verbatim}
 
 \subsubsection{CAR\_PRINT}
- 
+
 Produce a catalogue report to a file with minimal prompting
- 
-The PRINT routine allows you to produce printable reports of sections of 
-catalogues with a minimum of prompts. 
+
+The PRINT routine allows you to produce printable reports of sections of
+catalogues with a minimum of prompts.
 This makes it ideal for use in batch processing.
 It allows you to select the start and end records as well as the fields to be
 included in the report.
 The width and header options are similar to those provided in REPORT.
-The routine defaults are no header, width of 132 characters, all fields, 
+The routine defaults are no header, width of 132 characters, all fields,
 and the complete catalogue in the report.
 The default output file for the report is $<$catalogue name$>$.CAR.
-  
+
 \begin{verbatim}
     Invocation: ICL> CAR_PRINT
       Parameter list:
@@ -2072,57 +2072,57 @@ The default output file for the report is $<$catalogue name$>$.CAR.
        selfields       = List of the fields to be included in the report
        srecord         = Start record for the report
        erecord         = End record for the report
-       width           = WIDTH must be between 32 and 160 
+       width           = WIDTH must be between 32 and 160
        header          = Do you require a page header?
 \end{verbatim}
 
 \subsubsection{CAR\_RECALC}
- 
+
 Update the values of existing fields in a catalogue
 
-RECALC allows you to generate new values from fields in a catalogue 
-and to write the computed values back into existing fields in the 
-catalogue. 
-A QCAR-style arithmetic expression is used to compute the new values, and 
-the new values overwrite the previously existing values in the destination 
-field.  
-The catalogue can be a master catalogue, a local index, or a global index; 
+RECALC allows you to generate new values from fields in a catalogue
+and to write the computed values back into existing fields in the
+catalogue.
+A QCAR-style arithmetic expression is used to compute the new values, and
+the new values overwrite the previously existing values in the destination
+field.
+The catalogue can be a master catalogue, a local index, or a global index;
 however for a global index only fields in the master being indexed can be
 updated, not fields held in the index itself.
 
-You are prompted for the name of the catalogue to be processed. 
-Since the values in the catalogue are to be updated you must have write 
+You are prompted for the name of the catalogue to be processed.
+Since the values in the catalogue are to be updated you must have write
 access to the catalogue files.
-For index catalogues you must also have write access to the catalogues 
-being indexed, i.e. the master catalogue of a local index and the two or more 
+For index catalogues you must also have write access to the catalogues
+being indexed, i.e. the master catalogue of a local index and the two or more
 masters of a global index.
-You are prompted for the field for which the new values are to be 
-computed and the QCAR-style arithmetic expression to be used in calculating 
+You are prompted for the field for which the new values are to be
+computed and the QCAR-style arithmetic expression to be used in calculating
 the new values.
-You complete the specification of the updated field by supplying new 
+You complete the specification of the updated field by supplying new
 units and null values. RECALC uses the format of the null values you supply
-to be the null format so be sure to express the null value to the correct 
-accuracy padding with 0's if necesseary. 
-Finally you are asked if all the values supplied are correct. 
+to be the null format so be sure to express the null value to the correct
+accuracy padding with 0's if necesseary.
+Finally you are asked if all the values supplied are correct.
 If they are not you are allowed to re-enter them.
-The prompting for fields to be updated and their new functional definitions 
-continues whilst you have new fields to update. 
-To terminate the process you enter ``\#" in response to the prompt 
+The prompting for fields to be updated and their new functional definitions
+continues whilst you have new fields to update.
+To terminate the process you enter ``\#" in response to the prompt
 to enter a new field name.
-Once details for all the fields to be changed have been supplied, they are 
+Once details for all the fields to be changed have been supplied, they are
 updated for all the records in the catalogue.
 
-If you supply a blank NULLVAL, the existing null format will be retained.  
-If you supply a non-blank NULLVAL, that value will be used to determine a 
-new null format string.  
-This is, of course, necessary if the expression you give results in a range 
+If you supply a blank NULLVAL, the existing null format will be retained.
+If you supply a non-blank NULLVAL, that value will be used to determine a
+new null format string.
+This is, of course, necessary if the expression you give results in a range
 of values that cannot be represented using the original null format.
 
-Note that if the values of the expression you supply fall out of range of the 
-internal format, RECALC will report an arithmetic error when trying to put 
-the field in the file.  
-In this case your catalogue data file has been corrupted.  
-You should regenerate it and use CALC, or ensure that the new file you 
+Note that if the values of the expression you supply fall out of range of the
+internal format, RECALC will report an arithmetic error when trying to put
+the field in the file.
+In this case your catalogue data file has been corrupted.
+You should regenerate it and use CALC, or ensure that the new file you
 generate has a suitable format for the range of data you expect.
 \begin{verbatim}
     Invocation: ICL> CAR_RECALC
@@ -2137,36 +2137,36 @@ generate has a suitable format for the range of data you expect.
 \end{verbatim}
 
 \subsubsection{CAR\_REPORT}
- 
+
 Produce a catalogue report, to view it on the screen or as printout
- 
-The REPORT routine allows you to view a catalogue online and produce 
-printable reports for further study. 
-It allows you to treat a catalogue like any book, as you can flick from 
-page to page to find what you want.  
-You are encouraged to set up DCL symbols and templates for viewing your 
-favourite catalogue, so you do not have to type in all the start up 
+
+The REPORT routine allows you to view a catalogue online and produce
+printable reports for further study.
+It allows you to treat a catalogue like any book, as you can flick from
+page to page to find what you want.
+You are encouraged to set up DCL symbols and templates for viewing your
+favourite catalogue, so you do not have to type in all the start up
 parameters each time (see How to make a template, section 4.6.1).
 
 REPORT measures the current screen width and then chooses a
-suitable style for output. 
-If there are few enough fields, it outputs a table, if not, it will output 
+suitable style for output.
+If there are few enough fields, it outputs a table, if not, it will output
 the data in forms style.
 If you are using a VT100-type terminal, you can give the command DCL
-SET TERMINAL/WIDTH=width to control the report width. 
-The maximum width setting is 160 (suitable for some line printers) and the 
+SET TERMINAL/WIDTH=width to control the report width.
+The maximum width setting is 160 (suitable for some line printers) and the
 minimum setting 32.
-REPORT measures the current screen depth. 
-You can control the depth of the report page by the DCL SET 
-TERMINAL/PAGE=depth command. 
+REPORT measures the current screen depth.
+You can control the depth of the report page by the DCL SET
+TERMINAL/PAGE=depth command.
 The maximum depth setting is 60, the default is 24 on most terminals.
-If you prefer a scrolling display, then do DCL SET TERMINAL/UNKNOWN before 
+If you prefer a scrolling display, then do DCL SET TERMINAL/UNKNOWN before
 starting REPORT.
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -2183,7 +2183,7 @@ SELFIELDS parameter will be selected.
        select          = NO=>all fields output, YES=>prompted for names
        batch           = Batch processing Y/N?
        selfields       = Names of selected fields eg. [RA,DEC]
-       scroll          = + next, - last, 0 refresh, J jump, P print, H help, E end 
+       scroll          = + next, - last, 0 refresh, J jump, P print, H help, E end
        more            = + for more output, 0 to refresh screen, H help, P print
        record          = The absolute number of the next record to be displayed
     (  field           = YES or NO to select field                               )
@@ -2195,39 +2195,39 @@ SELFIELDS parameter will be selected.
 
 Select every Nth object in a catalogue
 
-SAMPLE extracts every Nth object from a catalogue and writes the selected 
-objects to a second catalogue. 
-Optionally the rejected objects may be written to another catalogue. 
+SAMPLE extracts every Nth object from a catalogue and writes the selected
+objects to a second catalogue.
+Optionally the rejected objects may be written to another catalogue.
 SAMPLE might typically be used to extract a small random sample from a large
-dataset. 
-The small sample might be examined interactively to determine suitable 
-processing procedures, which would be applied to the entire dataset in batch. 
+dataset.
+The small sample might be examined interactively to determine suitable
+processing procedures, which would be applied to the entire dataset in batch.
 
-Firstly you are prompted for the name of the input catalogue, which may 
-be either a master or an index catalogue. 
-The output catalogue to hold the selected objects is also requested. 
+Firstly you are prompted for the name of the input catalogue, which may
+be either a master or an index catalogue.
+The output catalogue to hold the selected objects is also requested.
 If a description file for the output catalogue did not previously exist,
-one is created, based on the description file of the input catalogue and 
-you are asked if this operation is to be done in simple or complex mode. 
-(In simple mode the description file is created automatically, in complex 
+one is created, based on the description file of the input catalogue and
+you are asked if this operation is to be done in simple or complex mode.
+(In simple mode the description file is created automatically, in complex
 mode you control what it contains.)
-Once the description file for the output catalogue of selected objects has 
-been created, you are asked if a second output catalogue (of rejected 
-objects) is to be created. 
-If it is, you are prompted for the name of the catalogue and again if 
-no description file exists, one is created. 
-The mode used to create the description file for this catalogue (simple or 
+Once the description file for the output catalogue of selected objects has
+been created, you are asked if a second output catalogue (of rejected
+objects) is to be created.
+If it is, you are prompted for the name of the catalogue and again if
+no description file exists, one is created.
+The mode used to create the description file for this catalogue (simple or
 complex) is the same as that used for the first output catalogue.
-Finally you are asked to give the frequency with which objects are to 
-be selected from the input catalogue, ie. to select every tenth, twentieth, 
-or hundredth object, etc. 
-The number of selected objects is displayed and the requested catalogues 
+Finally you are asked to give the frequency with which objects are to
+be selected from the input catalogue, ie. to select every tenth, twentieth,
+or hundredth object, etc.
+The number of selected objects is displayed and the requested catalogues
 are generated.
-In most cases it is necessary for SAMPLE to read through the entire catalogue 
-in order to select the required objects. 
+In most cases it is necessary for SAMPLE to read through the entire catalogue
+in order to select the required objects.
 However in some cases it is sufficient just to read the records that are
-to be selected. 
-In particular the entire catalogue must be read if either of the following 
+to be selected.
+In particular the entire catalogue must be read if either of the following
 conditions apply:-
 \begin{itemize}
 \item The access mode of the catalogue is sequential.
@@ -2235,20 +2235,20 @@ conditions apply:-
      catalogue as well as the selected objects being written to
      the first output catalogue.
 \end{itemize}
-However if individual records in the catalogue can be read directly (the 
-access mode is `KEYED' or `DIRECT') and no catalogue of rejected objects 
-is to be produced then the objects to be selected can be read and copied 
-directly. 
-In this case even large catalogues can be processed interactively without 
-undue delay. 
+However if individual records in the catalogue can be read directly (the
+access mode is `KEYED' or `DIRECT') and no catalogue of rejected objects
+is to be produced then the objects to be selected can be read and copied
+directly.
+In this case even large catalogues can be processed interactively without
+undue delay.
 For example, if every 100th object were being selected from a 200,000 object
-(direct access) catalogue it would only be necessary to read the 2000 objects 
+(direct access) catalogue it would only be necessary to read the 2000 objects
 to be selected, which would take a negligible amount of elapsed time.
 
 The three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -2277,40 +2277,40 @@ SELFIELDS parameter will be selected.
 \end{verbatim}
 
 \subsubsection{CAR\_SCATTER}
- 
+
 Make a scatterplot of two fields and perform regression analysis
 
-Linear regression is performed on the two specified fields and a scatter 
-diagram with the line of best fit is plotted. 
+Linear regression is performed on the two specified fields and a scatter
+diagram with the line of best fit is plotted.
 You may specify any of the diagram parameters and also draw up to two of
 your own lines on the diagram.
-You will be prompted for the name of the input catalogue and fieldnames, or 
-QCAR expressions, for the X axis and Y axis.  
-If the field name or expression is too long to be fitted on the diagram, you 
-are asked for an alternative string, for one or both of XLABEL and YLABEL.  
-If the units of an expression cannot be determined, you will be asked for one 
-or both of XUNITS and YUNITS.  
-Points in the scatter diagram may also be labelled, using the value of a 
+You will be prompted for the name of the input catalogue and fieldnames, or
+QCAR expressions, for the X axis and Y axis.
+If the field name or expression is too long to be fitted on the diagram, you
+are asked for an alternative string, for one or both of XLABEL and YLABEL.
+If the units of an expression cannot be determined, you will be asked for one
+or both of XUNITS and YUNITS.
+Points in the scatter diagram may also be labelled, using the value of a
 field, LABEL, for which you are asked.
-The data is read in and the regression calculations are done using standard 
-NAG routines (G02CAF).  
-You should note the X and Y minima and maxima, for deciding on the range of 
+The data is read in and the regression calculations are done using standard
+NAG routines (G02CAF).
+You should note the X and Y minima and maxima, for deciding on the range of
 the diagram's X and Y axes (XMIN, XMAX, YMIN and YMAX).
-The drawing loop then begins; you can redraw the diagram as many times as you 
+The drawing loop then begins; you can redraw the diagram as many times as you
 like, on any of the devices available.
-You are asked for the diagram title and a MARKER character for points to mark 
+You are asked for the diagram title and a MARKER character for points to mark
 each object.
-If the regression analysis produced results, you are asked if you want to plot 
-the regression line.  
-You can also plot your own lines of gradient M1,M2 and intercept C1,C2 if 
+If the regression analysis produced results, you are asked if you want to plot
+the regression line.
+You can also plot your own lines of gradient M1,M2 and intercept C1,C2 if
 you answer YES to the questions LINE1 and LINE2.
-The output device is requested, and the plotting is done.  
-On interactive devices you can label points in the scatterplot using the 
-mouse, joystick, or arrow keys to move the cursor: note that `shift'ing the 
+The output device is requested, and the plotting is done.
+On interactive devices you can label points in the scatterplot using the
+mouse, joystick, or arrow keys to move the cursor: note that `shift'ing the
 arrow keys speeds up cursor movement, and hitting $<$RETURN$>$ ends the
 interactive mode.
 The drawing loop ends with the REDRAW prompt.
-Statistical data will be sent to SCAT.CAR.  
+Statistical data will be sent to SCAT.CAR.
 See the procedure HARDCOPY for obtaining hardcopy after the run.
 \begin{verbatim}
     Invocation: ICL> CAR_SCATTER
@@ -2351,66 +2351,66 @@ See the procedure HARDCOPY for obtaining hardcopy after the run.
 \end{verbatim}
 
 \subsubsection{CAR\_SEARCH}
- 
+
 Select objects from a catalogue meeting user defined criteria
 
 SEARCH selects objects from the input catalogue, which meet certain criteria
 specified in the QCAR query language.
-A search of the catalogue is optimised by originally sorting the catalogue 
+A search of the catalogue is optimised by originally sorting the catalogue
 on a popular field.
-This field is called the primary KEYFIELD, and in astronomical catalogues 
-this is one of the position fields, usually declination. 
+This field is called the primary KEYFIELD, and in astronomical catalogues
+this is one of the position fields, usually declination.
 If you know the keyfield value you want, location of the data is much faster.
-For example, if you want to find someone's telephone number you don't start 
-at the beginning of the directory and then turn over each page until you 
-reach the page you want.  
-You make use of the fact that the telephone directory is sorted in 
-alphabetical order and you flick through the pages until you find the name 
+For example, if you want to find someone's telephone number you don't start
+at the beginning of the directory and then turn over each page until you
+reach the page you want.
+You make use of the fact that the telephone directory is sorted in
+alphabetical order and you flick through the pages until you find the name
 you want.
-If you do not restrict a keyfield then every record in the catalogue will be 
-checked for your query.  
-Sometimes you may want to do this, for example when you are selecting objects 
+If you do not restrict a keyfield then every record in the catalogue will be
+checked for your query.
+Sometimes you may want to do this, for example when you are selecting objects
 from the whole sky.
 
 Some catalogues are sorted into declination  zones  and  then  within
-that zone they are sorted on right ascension.  
+that zone they are sorted on right ascension.
 When you specify the catalogue you wish to search, you will be informed what
 the keyfield is.
-There is more than one keyfield, and they have a seniority order.   
-The position of a record is dictated by its primary keyfield value and then 
-by its secondary keyfield value.  
-In CAR up to 9 secondary keys can be defined: KEYFIELD\_1 to KEYFIELD\_9.  
+There is more than one keyfield, and they have a seniority order.
+The position of a record is dictated by its primary keyfield value and then
+by its secondary keyfield value.
+In CAR up to 9 secondary keys can be defined: KEYFIELD\_1 to KEYFIELD\_9.
 You can use all the keyfields to speed up the search.
 
 SCAR does not realise that 24hr RA is the same as 0hr RA, and so queries
 spanning the boundary must be split into two parts.
 
-When you have found roughly the objects you want, using the RANGE of the 
-primary keyfield, it is common to use further criteria to restrict the 
-database you are making, through the QUERY option.  
+When you have found roughly the objects you want, using the RANGE of the
+primary keyfield, it is common to use further criteria to restrict the
+database you are making, through the QUERY option.
 Such criteria are applied to all the records in the RANGE.
-The SEARCH program will not select those records which have null values for 
+The SEARCH program will not select those records which have null values for
 fields referenced in the criterion expressions.
 
 The RANGE specification is a QCAR expression, with some restrictions; only
-key fieldnames and constants may be used, and the only logical operator 
+key fieldnames and constants may be used, and the only logical operator
 allowed is .AND..
-If you have no range answer .END. to the query, and the entire catalogue will 
-be searched, which can take a long time (for example, the IRPS takes 25000 
+If you have no range answer .END. to the query, and the entire catalogue will
+be searched, which can take a long time (for example, the IRPS takes 25000
 records per CPU minute).\\
 The QUERY specification is a QCAR expression, defining the objects you want
 from the restricted set selected by RANGE.
 This expression can contain any of the fields of the catalogue, or arithmetic
 expressions including them.
 In the evaluation sequence .AND. comes before .OR..\\
-{\em Example 1}: The keyfield of the IRPS is declination. 
+{\em Example 1}: The keyfield of the IRPS is declination.
 In order to select records from +103045 to +123045 in DEC, and to restrict
 the RA from 10h30m to 11h20m, you use;
 \begin{verbatim}
     RANGE Key criterion - finish with .END.> DEC>+103545.AND.DEC<+123045.END.
     QUERY - Criterion - finish with .END.> RA>103000.AND.RA<112000.END.
 \end{verbatim}
-{\em Example 2}: The keyfields of the CSIS are DECBAND and RA. 
+{\em Example 2}: The keyfields of the CSIS are DECBAND and RA.
 This means the catalogue is sorted in declination bands, and within each dec
 band the objects are sorted by right ascension.
 In order to select everything from DEC +80 to +82 and between RA 12h and 13h;
@@ -2420,14 +2420,14 @@ In order to select everything from DEC +80 to +82 and between RA 12h and 13h;
     QUERY - Criterion - finish with .END.> .END.
 \end{verbatim}
 {\em Example 3}: If you wish to ignore the fact that the catalogue is sorted
-then every entry in the catalogue will be examined. For example the keyfield 
+then every entry in the catalogue will be examined. For example the keyfield
 of the GCVS is DEC but to find a variable star with NAME SGRMV.
 (N.B. the constellation name comes first);
 \begin{verbatim}
     RANGE Key criterion - finish with .END.> .END.
     QUERY - Criterion - finish with .END.> NAME.EQ."SGRMV".END.
 \end{verbatim}
-{\em Example 4}: Suppose you have specified a DEC range for the IRPS, and you 
+{\em Example 4}: Suppose you have specified a DEC range for the IRPS, and you
 want to look for sources with RA around 24h, you use;
 \begin{verbatim}
     RANGE Key criterion - finish with .END.> DEC>+200000.AND.DEC<+250000.END.
@@ -2446,7 +2446,7 @@ flux densities, in your restricted RA, you use;
 \begin{verbatim}
     RANGE Key criterion - finish with .END.> DEC>+103545.AND.DEC<+123045.END.
     QUERY - Criterion - finish with .END.> RA>103000.AND.RA<112000.AND.
-    QUERY - Criterion - finish with .END.> Q(3).EQ.3.AND.Q(4).EQ.3.AND. 
+    QUERY - Criterion - finish with .END.> Q(3).EQ.3.AND.Q(4).EQ.3.AND.
     QUERY - Criterion - finish with .END.> FLUX(4)/FLUX(3).GT.3.END.
 \end{verbatim}
 {\em Example 7}: Suppose you want to find a particular IRAS source, you may
@@ -2463,9 +2463,9 @@ If the DEC range selected is suitable, you could find a number of sources;
 \end{verbatim}
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -2473,7 +2473,7 @@ SELFIELDS parameter will be selected.
 {\bf Units:} When adding or subtracting a constant, or
 comparing it with an arithmetic expression, you must generally specify the
 constant in the same units as the operand.
-However, when it is a Radian quantity (eg RA, dec), you must present 
+However, when it is a Radian quantity (eg RA, dec), you must present
 the constant in the appropriate form for example HHMMSS for RA
 and SDDMMSS for Dec.
 \begin{verbatim}
@@ -2484,7 +2484,7 @@ and SDDMMSS for Dec.
     (  newout          = Create a new o/p file (Y), or else use existing one (N)?)
        title           = Name or short description for file or plot
        simple          = YES to make default output, NO to specify it
-       range           = Give the selection criterion for key field 
+       range           = Give the selection criterion for key field
                          finish with .END.
                          (e.g. DEC>+103000.AND.DEC<+110000.END.)
        query           = Give the selection criterion - finish with .END.
@@ -2506,7 +2506,7 @@ and SDDMMSS for Dec.
 
 Defines default values for some commonly used flags
 
-You can use SETUP to define default values for the NEWOUT, MODE, SELECT, 
+You can use SETUP to define default values for the NEWOUT, MODE, SELECT,
 SIMPLE, and HEADER parameters.
 You only need to run this routine once.
 After the default values have been defined by you, they will be HIDDEN, so you
@@ -2516,7 +2516,7 @@ The values are stored in ADAM\_USER:GLOBAL.SDF, where they will remain until
 the file is deleted or edited.
 After deleting GLOBAL.SDF, ADAMSTART must be rerun to create a new GLOBAL.SDF,
 and the parameters will be prompted for again.
-When you want to run a routine and use different values for some (or all) of 
+When you want to run a routine and use different values for some (or all) of
 the defaulted parameters, you type in the new values on the command line.
 
 {\em Example} After running SETUP to set MODE=2 which directs output to the
@@ -2545,61 +2545,61 @@ If you want to write the data to a file FRED.CAR instead, you type
 
 Sort a catalogue on one or more fields
 
-The SORT routine is a utility for reordering catalogues.  
+The SORT routine is a utility for reordering catalogues.
 Up to ten keys can be specified, a primary key and 9 secondary keys.
 The order of each key can be ascending or descending.
 The program employs the VAX/VMS sort software, and is extremely efficient.
-Whilst catalogues can be sorted directly using VAX/VMS sort, the SORT 
-routine also the handles the production of description files for the sorted 
+Whilst catalogues can be sorted directly using VAX/VMS sort, the SORT
+routine also the handles the production of description files for the sorted
 data, and instructs the sorter in the location of the fields which will
 become keys.
 
-When you sort a catalogue on declination you must be aware that the normal 
-text format for DEC strings SDDMMSS is such that the physical order (sources 
-from one pole to another) does not correspond to the ASCII order (+ comes 
-before -- in the ASCII collating sequence). 
+When you sort a catalogue on declination you must be aware that the normal
+text format for DEC strings SDDMMSS is such that the physical order (sources
+from one pole to another) does not correspond to the ASCII order (+ comes
+before -- in the ASCII collating sequence).
 Because of this, when you are sorting on DEC, before using a catalogue with
 JOIN, you must ensure that the units of DEC are numeric --- viz: RADIAN.
 SORT must be run before JOIN.
 
 There two ways of sorting a file in VMS, file sort and record sort.
-File sort passes the whole file to the sorter and gets back a  file sorted  
-according  to  the  key  specification.  
+File sort passes the whole file to the sorter and gets back a  file sorted
+according  to  the  key  specification.
 This is the DCL SORT command packaged for CAR.
-In a file sort use TAG if your filespace is limited. 
-In a TAG sort the sorter keeps only the keyfield values and record pointers 
-in its workspace.  
-TAG is slower for small files but faster for larger (100~000 records plus) 
+In a file sort use TAG if your filespace is limited.
+In a TAG sort the sorter keeps only the keyfield values and record pointers
+in its workspace.
+TAG is slower for small files but faster for larger (100~000 records plus)
 files.
 If you opt to change the record format then a record sort is used.
-Record sort uses the VAX/VMS sort record interface.   
-Records are passed individually to the sorter, and when all the records have 
-been passed, the sort takes place.  
+Record sort uses the VAX/VMS sort record interface.
+Records are passed individually to the sorter, and when all the records have
+been passed, the sort takes place.
 Records are then got back from the sorter and written to the output file.
 Record sort encapsulates a CONVERT operation followed by a simple SORT.
-You should only need to use it when your filespace is limited as there is no 
+You should only need to use it when your filespace is limited as there is no
 intermediate file.
-Record sort is substantially slower than File sort as it uses FORTRAN I/O 
+Record sort is substantially slower than File sort as it uses FORTRAN I/O
 to read and write the input and output files.
-SORT uses two workfiles, SORTWORK0 and SORTWORK1, if it needs to buffer 
-information on disk, when sorting a large file. 
-You should assign these files to a disk where there is adequate unused 
+SORT uses two workfiles, SORTWORK0 and SORTWORK1, if it needs to buffer
+information on disk, when sorting a large file.
+You should assign these files to a disk where there is adequate unused
 capacity, e.g. DCL ASSIGN DISK\$IRAS: SORTWORK0.
 
-When a KEYED access (ISAM) file is sorted, it is only rewritten according 
-to the new key specifications.  
-Note that KEYED access files permit 4 keys, which must be of INTEGER or 
-CHARACTER data type.  
-The radian quantities can be stored as integer if the units scale factor is 
---8 for RA, and --9 for DEC, longitude and and latitude.  
-A further restriction on KEYED accessmode files is that the primary key 
-values should be unique, so for astronomical catalogues make NAME the 
+When a KEYED access (ISAM) file is sorted, it is only rewritten according
+to the new key specifications.
+Note that KEYED access files permit 4 keys, which must be of INTEGER or
+CHARACTER data type.
+The radian quantities can be stored as integer if the units scale factor is
+--8 for RA, and --9 for DEC, longitude and and latitude.
+A further restriction on KEYED accessmode files is that the primary key
+values should be unique, so for astronomical catalogues make NAME the
 primary key, and position fields the alternate keys.
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -2625,23 +2625,23 @@ SELFIELDS parameter will be selected.
     (  generic         = YES or NO to select generic                             )
     (  groups          = Array section e.g: A(n:m) or B(i:j,n:m)                 )
 \end{verbatim}
- 
+
 \subsubsection{CAR\_SPLIT}
 
 Split a catalogue into two catalogues according to a criterion
 
-SPLIT is a variant of SEARCH that allows you to split a catalogue into 
-two catalogues according to a selection criterion.  
-The first catalogue, OUTPUT, contains the objects matching the selection 
-criterion.  
-The second catalogue, REJECTS, contains the objects not fitting the selection 
-criterion.  
+SPLIT is a variant of SEARCH that allows you to split a catalogue into
+two catalogues according to a selection criterion.
+The first catalogue, OUTPUT, contains the objects matching the selection
+criterion.
+The second catalogue, REJECTS, contains the objects not fitting the selection
+criterion.
 The entire input catalogue is scanned.
 
 The last three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -2674,35 +2674,35 @@ SELFIELDS parameter will be selected.
 
 Select points inside or outside a polygon
 
-WITHIN selects objects from a catalogue that lie either inside or outside 
-a specified polygon. 
-The coordinates of the corners defining the polygon are themselves held as 
+WITHIN selects objects from a catalogue that lie either inside or outside
+a specified polygon.
+The coordinates of the corners defining the polygon are themselves held as
 a catalogue, made using POLYGON and EDIT.
-You are prompted for the name of the catalogue holding the polygon, 
-followed by the names of the fields that hold the X and Y coords of the 
-polygon corners, and the name of the input catalogue, which may be either 
-a master or an index catalogue. 
-The name for output catalogue to hold the selected objects is requested. 
-If a description file for the output catalogue did not previously exist, one 
+You are prompted for the name of the catalogue holding the polygon,
+followed by the names of the fields that hold the X and Y coords of the
+polygon corners, and the name of the input catalogue, which may be either
+a master or an index catalogue.
+The name for output catalogue to hold the selected objects is requested.
+If a description file for the output catalogue did not previously exist, one
 is created based on the description file of the input catalogue and you are
 asked if this operation is to be done in simple or complex mode.
-Once the description file for the output catalogue of selected objects has 
-been created, you are asked if a second output catalogue of rejected 
-objects is to be created. 
-If it is, you are prompted for the name of the catalogue and again if 
-no description file exists, one is created. 
-The mode used to create the description file for this catalogue is the same 
+Once the description file for the output catalogue of selected objects has
+been created, you are asked if a second output catalogue of rejected
+objects is to be created.
+If it is, you are prompted for the name of the catalogue and again if
+no description file exists, one is created.
+The mode used to create the description file for this catalogue is the same
 as that used for the first output catalogue.
-You are prompted for the names of the fields holding the X and Y 
-coordinates of the data. 
-Finally you are asked to choose whether points inside or outside the 
-specified polygon are to be selected. 
+You are prompted for the names of the fields holding the X and Y
+coordinates of the data.
+Finally you are asked to choose whether points inside or outside the
+specified polygon are to be selected.
 The permitted responses here may be abbreviated to `I' or `O'.
 
 The three queries below (field, generic, groups) only appear, when you use
-SELECT, if your terminal is not configured as VT100-like, so the full-screen 
+SELECT, if your terminal is not configured as VT100-like, so the full-screen
 menu cannot be implemented.
-The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to 
+The array required is input through GROUPS, e.g. IRPS fluxes are F(1) to
 F(4), FQUALs are Q(1) to Q(4).
 If you answer 'YES' to the SELECT and BATCH parameters the fields given by the
 SELFIELDS parameter will be selected.
@@ -2739,13 +2739,13 @@ SELFIELDS parameter will be selected.
 
 Convert an ascii file for listing on a printer
 
-The WRAP command writes an output file with a 132 character ``wrap".  
-It can be used for producing a printable version of a catalogue with records 
-longer than 132 characters.  
-The input and output filenames are prompted for by the program. 
+The WRAP command writes an output file with a 132 character ``wrap".
+It can be used for producing a printable version of a catalogue with records
+longer than 132 characters.
+The input and output filenames are prompted for by the program.
 You can use this routine to print out formatted catalogues of a catalogue
-when your printer has NOWRAP set.  
-WRAP may be used after you have converted your file to ascii.  
+when your printer has NOWRAP set.
+WRAP may be used after you have converted your file to ascii.
 Note that the output is not an FACTS format catalogue.
 \begin{verbatim}
     Invocation: ICL> CAR_WRAP
@@ -2753,52 +2753,52 @@ Note that the output is not an FACTS format catalogue.
        input           = Name of input catalogue
        output          = Name of output catalogue
 \end{verbatim}
- 
+
 \subsection{Summary of parameter definitions}
 \begin{description}
 \begin{itemize}
 \item{\bf ACCESS} File access type - one of READ, WRITE, UPDATE
 \item{\bf ACTION} Dump file(D)/Reject file(R)/View more(V)
-\item{\bf ANGLE} Angular coordinates will be displayed as radians (YES) or 
+\item{\bf ANGLE} Angular coordinates will be displayed as radians (YES) or
 converted to character string as specified in the comments field (NO).
 \item{\bf AR} The aspect ratio of X/Y. 1.33 is the usual value for the CANON
  or screen.
-\item{\bf ASCEND} To sort the values in ascending order, a list should be 
-given, specifying whether the keyfields in the KEYS list are 
+\item{\bf ASCEND} To sort the values in ascending order, a list should be
+given, specifying whether the keyfields in the KEYS list are
 ascending (YES) or descending (NO).
-If you have more than one key to specify enclose the list in square brackets.  
+If you have more than one key to specify enclose the list in square brackets.
 \begin{verbatim}
     Examples:        primary key (e.g. DEC) ascends : YES or Y
     primary and secondary (e.g. [DEC,RA]) descending: [NO,NO] or [N,N]
 \end{verbatim}
 \item{\bf ASCII} YES for ascii or NO for binary output.
-Answer YES if you want an ascii output file, NO if you want a binary file. 
-If you answer YES to this prompt, you will be asked if you want spaces 
-between each field so the ascii file is easy to read. 
+Answer YES if you want an ascii output file, NO if you want a binary file.
+If you answer YES to this prompt, you will be asked if you want spaces
+between each field so the ascii file is easy to read.
 You can print ascii file when it has been made.
 \item{\bf BARCHART} Do you want to plot barchart(Y) or line graph(N)?
-\item{\bf BATCH} If you answer Y then all parameters can be specified on the 
+\item{\bf BATCH} If you answer Y then all parameters can be specified on the
 command line.
 You should supply all parameter values in the command line.
 \item{\bf BINSIZE} Give the bin size for the histogram (in HISTOGRAM).
 A guide  to sensible values can be obtained from the statistical data.
-\item{\bf C1} When plotting your own LINE1 C1 is the intercept and M1 the 
+\item{\bf C1} When plotting your own LINE1 C1 is the intercept and M1 the
 gradient.
-\item{\bf C2} When plotting your own LINE2 C2 is the intercept and M2 the 
+\item{\bf C2} When plotting your own LINE2 C2 is the intercept and M2 the
 gradient.
 \item{\bf CALMAG} Field to contain the calibrated magnitude.
 \item{\bf CENTRES} Name of centres file for plotting finding charts.
-If you are going to enter your plate centres interactively, type TT, 
-otherwise give the name of the file which contains your plate centres. 
-This file should be a FACTs style file with an EQUINOX defined as a a 
+If you are going to enter your plate centres interactively, type TT,
+otherwise give the name of the file which contains your plate centres.
+This file should be a FACTs style file with an EQUINOX defined as a a
 parameter or a field and NAME, RA and DEC defined as fields in RADIANs.
 It could be another catalogue for example.
-The maximum number of centres allowed is 30.  
-If your catalogue contains more than 30 objects, only the first 30 will be 
+The maximum number of centres allowed is 30.
+If your catalogue contains more than 30 objects, only the first 30 will be
 used.
-You can use the START\_RECORD parameter to set the first centre position to 
+You can use the START\_RECORD parameter to set the first centre position to
 be used.
-\item{\bf COMMAND} This is the EDIT command. 
+\item{\bf COMMAND} This is the EDIT command.
 You can type H for a list of commands.
 \begin{verbatim}
     +   Copies the main buffer to the memory buffer
@@ -2813,35 +2813,35 @@ You can type H for a list of commands.
     F - Changes between the INPUT and OUTPUT file, for displaying records
         in WRITE mode
     H - Get help on commands
-    I - Insert a record. You will be prompted for the values  of each 
-        field in turn. You can add them in any format - the format 
-        displayed is for information only, showing the range and 
+    I - Insert a record. You will be prompted for the values  of each
+        field in turn. You can add them in any format - the format
+        displayed is for information only, showing the range and
         precision in which the data is stored.
     L - List the contents of the main buffer and its record number
-    N - Loads the next record meeting the search criterion into the main 
+    N - Loads the next record meeting the search criterion into the main
         buffer
-    P - Position the INPUT file by record number. The record is loaded 
+    P - Position the INPUT file by record number. The record is loaded
         into the main buffer.
     Q - QUIT - this option leaves the editor, and deletes any data files
         created during the edit, except the description files
     R - Replace a field value with a new value. You can replace them in
         any format - the format displayed is for information only, showing
         the range and precision in which the data is stored.
-    S - Position the INPUT file by QCAR expression.  EDIT searches forward 
-        from the current record to find the next occurrence of the VALUE of 
+    S - Position the INPUT file by QCAR expression.  EDIT searches forward
+        from the current record to find the next occurrence of the VALUE of
         FIELD, and the record is loaded into the main buffer.
     U - Rewrites the main buffer to the OUTPUT file
-    W - Write to the OUTPUT file. In CREATE and UPDATE mode the current 
+    W - Write to the OUTPUT file. In CREATE and UPDATE mode the current
         contents of the main buffer are appended to the output file and the
         buffer is reinitialised. In EDIT mode you will prompted with NUMBER,
         the number of records you wish to write to the output file. NUMBER=1
-        is the current record. NUMBER>1 copies the current record and 
-        successive records from the INPUT file to the OUTPUT file and then 
+        is the current record. NUMBER>1 copies the current record and
+        successive records from the INPUT file to the OUTPUT file and then
         loads the next record into the main buffer.
     X - Cancels the search.
 \end{verbatim}
 \item {\bf COMMENT} Comment on the field or expression defining field.
-\item{\bf COORDINATES} Give coordinate system code --- 
+\item{\bf COORDINATES} Give coordinate system code ---
 1: equatorial, 2: galactic, 3: supergalactic, 4: ecliptic.
 Equatorial fields are RA and DEC, galactic are GLONG and GLAT,
 supergalactic are SGLONG and SGLAT, and ecliptic are ELONG
@@ -2849,13 +2849,13 @@ and ELAT.
 \item{\bf  COSMAG} Field containing the COSMOS magnitude.
 \item{\bf DEC} Give DEC of centre in double quotes i.e. not +610000 as usual
 but {\tt "+61 00 00"} (E to end for CHART).
-Enter the DEC of your plate centre in any format using spaces and commas to 
+Enter the DEC of your plate centre in any format using spaces and commas to
 separate hours minutes and seconds.
 If you have more than one number, enclose the string in double quotes.
 Type E when you have no more centres.
 \item{\bf COUNT} Include a running record count in the output (Y/N)?
 \item {\bf DEFINE} QCAR expression for evaluating field or parameter
-\item{\bf DEVICE} An uptodate list of options for the DEVICE parameter can be 
+\item{\bf DEVICE} An uptodate list of options for the DEVICE parameter can be
 found by replying HELP to this prompt.
 \item{\bf DEVTYPE} Device type. -1 uses terminal setting, 0 scrolls.
 DEVTYPE allows the application programmer to force VIO
@@ -2865,13 +2865,13 @@ by giving the value 0 (UNKNOWN).  If you give the value -1
 then actual terminal setting will be used
 \item{\bf DIRECT} Is the plot (in CHART) to be a direct or reverse overlay?
 The options are --- Yes: E to right, emulsion down; No: E to left, emulsion up.
-\item{\bf EQUINOX} Give the equinox for the centre, and it will be precessed 
+\item{\bf EQUINOX} Give the equinox for the centre, and it will be precessed
 from the catalog equinox to this value.
 \item {\bf ERRBOX} Do you want an error box?
 \item{\bf EXPRESS} Give the functional definition of the field/parameter.
-In the functional definition of the FIELD `!' is inserted if there is a 
+In the functional definition of the FIELD `!' is inserted if there is a
 functional definition, used in FORM2.
-If you put in HHMMSS etc without a functional definition then put `!' at 
+If you put in HHMMSS etc without a functional definition then put `!' at
 the end of the COMMENT.
 \item{\bf FIELD} A field is a single parameter, which may be defined using
 an arithmetrical expression.
@@ -2880,15 +2880,15 @@ an arithmetrical expression.
 R*.
 \item{\bf FORMAT2} Format of the null value: Iw, A, Dw.d, Fw.d, Ew.d, Lw.
 \item{\bf FREQ} Select every Nth object, give N.
-\item{\bf GENERIC} A generic is an array of similar fields, e.g. IRPS fluxes 
+\item{\bf GENERIC} A generic is an array of similar fields, e.g. IRPS fluxes
 are stored as F(4).
 \item{\bf GROUPS} Give array section e.g: A(n:m) or B(i:j,n:m).
 Note that this parameter is used for selecting fields when not in screen mode.
-This is needed to specify subsets of, for example, the IRPS fluxes, via 
-F(1:2), flux qualities via Q(2:3). 
+This is needed to specify subsets of, for example, the IRPS fluxes, via
+F(1:2), flux qualities via Q(2:3).
 You can specify up to 2 array sections.
-If you give more than one section you must enclose the input string in 
-square brackets.  
+If you give more than one section you must enclose the input string in
+square brackets.
 \begin{verbatim}
     Examples are:
         1) A(1:2) selects A(1) and A(2)
@@ -2899,50 +2899,50 @@ square brackets.
 \item{\bf HEADER} Do you require a page header (Y/N)?
 \item {\bf INCLUDE} Name of a catalogue description file to be included.
 \item{\bf INDEX}   Output an Index (Y) or Master (N) catalogue.
-Answer YES if you want to output an index. 
-If you have input a master catalogue, a local index will be made. 
-If you have input an index, the index information will be retained and the 
-indexed data inserted. 
-Answer NO if you do not want to output an index. 
+Answer YES if you want to output an index.
+If you have input a master catalogue, a local index will be made.
+If you have input an index, the index information will be retained and the
+indexed data inserted.
+Answer NO if you do not want to output an index.
 If your input is an index, the index information will be removed and the
 indexed data inserted.
-A Master catalogue is self contained and contains no pointers to other 
-catalogues. 
-If you have answered Yes to the ascii prompt, you would normally generate a 
-Master catalogue, as an ascii catalogue is something you may want to archive 
+A Master catalogue is self contained and contains no pointers to other
+catalogues.
+If you have answered Yes to the ascii prompt, you would normally generate a
+Master catalogue, as an ascii catalogue is something you may want to archive
 or export.
-An Index catalogue contains pointers to another catalogue where the actual 
-data is held. 
-You would normally select fields when generating an Index catalogue (answer 
-YES to the SELECT prompt). 
-When you select fields for an Index, you normally select the keyfields of the 
+An Index catalogue contains pointers to another catalogue where the actual
+data is held.
+You would normally select fields when generating an Index catalogue (answer
+YES to the SELECT prompt).
+When you select fields for an Index, you normally select the keyfields of the
 input catalogue.
-While Master catalogues have the advantages of being self contained, they have 
-the disadvantage of taking a longer time to write than Index catalogues and 
+While Master catalogues have the advantages of being self contained, they have
+the disadvantage of taking a longer time to write than Index catalogues and
 are more expensive in the use of disk space, because they contain more data.
-The disadvantage of Index catalogue is, that if the Master catalogue it 
+The disadvantage of Index catalogue is, that if the Master catalogue it
 depends on changes, the Index may become invalid.
-SCAR commands (unless explicitly indicated otherwise) will accept an Index 
+SCAR commands (unless explicitly indicated otherwise) will accept an Index
 catalogue as input, and process it like a Master catalogue.
-\item{\bf INFILE} Give the name of the input file (for LISTIN), to be 
+\item{\bf INFILE} Give the name of the input file (for LISTIN), to be
 reformatted as an ADC catalogue.
 \item{\bf INPUT} Give the name of the input catalogue.
 The data file INPUT must have a corresponding description file
 with filename DSCFINPUT in existence which describes the physical
 format of the INPUT data.
 The search procedure for the INPUT file is $[\;]$INPUT.DAT, INPUT,
-SCAR\_DAT\_PATH:INPUT.DAT.  
-The first item in the list is a file in the default directory.  
+SCAR\_DAT\_PATH:INPUT.DAT.
+The first item in the list is a file in the default directory.
 The second item is a JOB logical name INPUT defined by you.
 The third item causes SCAR to look in the central data file directories.
 The search path for description files is similar.
-The INPUT filename may be 1 to 35 characters long.  
-If you use the JOIN routine (the filename length + the longest 
-fieldname + 2) should be less than or equal to 17 characters, as the INPUT 
-filename is used to label fields globally.  
-Fieldnames have a maximum length 17 characters.  
-It is therefore recommended that the length of the INPUT filename be 7 
-characters or less. 
+The INPUT filename may be 1 to 35 characters long.
+If you use the JOIN routine (the filename length + the longest
+fieldname + 2) should be less than or equal to 17 characters, as the INPUT
+filename is used to label fields globally.
+Fieldnames have a maximum length 17 characters.
+It is therefore recommended that the length of the INPUT filename be 7
+characters or less.
 
 Where an application expects a list of input catalogs, enclose the
 list in square brackets $[\;]$.
@@ -2985,28 +2985,28 @@ Up to 4 keys are permitted.
 The data types must be INTEGER or CHARACTER, so for RADIAN quantities a scale
 factor of --8 is used so they can be stored as I*4.
 \item{\bf ISKY} Field containing the sky intensity.
-\item{\bf KEYS} Give the key fields e.g: DEC or [DEC,RA], as a list of the 
-fieldnames common to each of the input catalogues, and which will be used 
+\item{\bf KEYS} Give the key fields e.g: DEC or [DEC,RA], as a list of the
+fieldnames common to each of the input catalogues, and which will be used
 as keyfields in the output catalogue.
-If there is more than one keyfield in the list then enclose the list in 
-square brackets. 
+If there is more than one keyfield in the list then enclose the list in
+square brackets.
 \begin{verbatim}
     Examples:              order by declination: DEC
      order by declination, then right ascension: [DEC,RA]
     order by name, declination, right ascension: [NAME,DEC,RA]
 \end{verbatim}
-In SEQUENTIAL and DIRECT type files, the order of the keys in the list 
-determines the sort order; the first keyfield is the primary key, the 
-second the secondary key etc.  
-Records with identical first key values will be sorted in order of the next 
+In SEQUENTIAL and DIRECT type files, the order of the keys in the list
+determines the sort order; the first keyfield is the primary key, the
+second the secondary key etc.
+Records with identical first key values will be sorted in order of the next
 key in the list.
 Up to 10 fields can be specified for SEQUENTIAL and DIRECT access modes.
 
-In KEYED type files the first key is the primary key and must have unique 
-values for each record.  
+In KEYED type files the first key is the primary key and must have unique
+values for each record.
 The subsequent keys are alternate keys, which may have duplicate values.
 Up to 4 keys are allowed for KEYED accessmodes.
-In KEYED access files it is usually best to make a NAME field the primary 
+In KEYED access files it is usually best to make a NAME field the primary
 key, and position fields alternate keys.
 \item{\bf KEYWORD} This has a different parameter list in CALC and FORM2,
 that for CALC being restricted to P for parameter, F for field, E to end,
@@ -3016,11 +3016,11 @@ FORM2 has several other options.
 The input value of the LABEL is plotted beside any point to identify it.
 \item{\bf LENGTH} Total number of bytes allocated to the field.
 \item{\bf LINE0} Plot the regression line in SCATTER?
-Answer YES if you want the line representing the Y on X correlation to be 
+Answer YES if you want the line representing the Y on X correlation to be
 drawn, otherwise NO.
-\item{\bf LINE1} Plot your own line (Y/N)? When plotting your own LINE1 C1 
+\item{\bf LINE1} Plot your own line (Y/N)? When plotting your own LINE1 C1
 is the intercept and M1 the gradient.
-\item{\bf LINE2} Plot your own line (Y/N)? When plotting your own LINE2 C2 
+\item{\bf LINE2} Plot your own line (Y/N)? When plotting your own LINE2 C2
 is the intercept and M2 the gradient.
 
 \item {\bf LIB} Name of catalogue VMS help library.
@@ -3028,31 +3028,31 @@ is the intercept and M2 the gradient.
 \item{\bf LREC} Logical record length of the data
 \item{\bf MAG} Give the limiting magnitude for plotting background stars.
 Only stars brighter than this limit will be plotted from the RGO Astrometry
-catalogue, AS85.   
+catalogue, AS85.
 The value depends on where you are in the sky, but typically 8 gives you
 enough stars on your plot to position it without overcrowding it.
-\item{\bf M1} When plotting your own LINE1 C1 
+\item{\bf M1} When plotting your own LINE1 C1
 is the intercept and M1 the gradient.
-\item{\bf M2} When plotting your own LINE2 C2 
+\item{\bf M2} When plotting your own LINE2 C2
 is the intercept and M2 the gradient.
 \item {\bf MARKER} Marker character one of .,+,o,x
 \item{\bf MARKS} Number of tape marks.
 \item{\bf MATCH}
 This requires a QCAR logical expression that relates the primary keyfields
 of the two catalogues to be JOINed, or DIFFERenced.
-As the keyfields may have the same fieldnames, the fieldnames in a MATCH 
+As the keyfields may have the same fieldnames, the fieldnames in a MATCH
 specification should be prefixed by the catalogue name (no longer limited to
 the first 4 characters), followed by double underscore.  e.g:  IRPS\_\,\_DEC.
 
-To associate sources in one catalogue with those in another the QCAR function 
-GREAT\_CIRCLE can be used. 
-This calculates the great circle distance between two positions.   
-The result of the evaluation is expressed in arc seconds.   
-The function has four arguments, LONG1, LAT1, LONG2, LAT2.  
+To associate sources in one catalogue with those in another the QCAR function
+GREAT\_CIRCLE can be used.
+This calculates the great circle distance between two positions.
+The result of the evaluation is expressed in arc seconds.
+The function has four arguments, LONG1, LAT1, LONG2, LAT2.
 It can therefore be used in any coordinate system.
 
 Where you wish to JOIN two catalogues on a common field to within a specified
-tolerance the function DIFF is used. 
+tolerance the function DIFF is used.
 This function evaluates the absolute difference between two values.
 It has two arguments, the names of the two fields.\\
 {\em Example 1}: To JOIN the IRPS and AIPS, the MATCH condition is:
@@ -3060,9 +3060,9 @@ It has two arguments, the names of the two fields.\\
     IRPS__NAME.EQ.AIPS__NAME.AND.IRPS__DEC.EQ.AIPS__DEC.END.
 \end{verbatim}
   The two catalogues IRPS and  AIPS  are  sorted  by  DEC.\\
-{\em Example 2}: To associate every IRPS source within 90 arcsec of a RCBG 
+{\em Example 2}: To associate every IRPS source within 90 arcsec of a RCBG
 source the match condition is:
-\begin{verbatim} 
+\begin{verbatim}
     GREAT_CIRCLE(RCBG__RA,RCBG__DEC,IRPS__RA,IRPS__DEC).LE.90.END.
 \end{verbatim}
 If you have a list of galaxies and you want to look for nearby, but
@@ -3081,32 +3081,32 @@ exclude accidental associations with stars, then the criterion:
   GREAT_CIRCLE(RCBG__RA,RCBG__DEC,IRPS__RA,IRPS__DEC).LT.180.AND.
   IRPS__FLUX(2)/IRPS__FLUX(3).LT.3.AND.IRPS__Q(3).EQ.3.END.
 \end{verbatim}
-would effectively do this.  
-Ordinary stars have flux ratios at 25:60 microns of about 10 and only the 
+would effectively do this.
+Ordinary stars have flux ratios at 25:60 microns of about 10 and only the
 brightest stars have high quality fluxes at the longer wavelengths.
-You can see from the above example that you can include relational 
-expressions, other than those which just relate keyfields, to ``tighten" 
+You can see from the above example that you can include relational
+expressions, other than those which just relate keyfields, to ``tighten"
 the join criterion.
 \item {\bf MAXSEL} Maximum number of objects permitted for selection.
 \item{\bf MODE} There are 4 possible modes.
 In mode 3, only those sources you request are loaded into the file, so when
-you jump to the end no more sources are stored. 
+you jump to the end no more sources are stored.
 \begin{verbatim}
-    Possible reporting modes are:  
+    Possible reporting modes are:
         0 - file                        2 - screen
-        1 - screen & default file       3 - screen & request file 
+        1 - screen & default file       3 - screen & request file
 \end{verbatim}
-\item{\bf MORE} When displaying on the screen and the complete record fills 
-more than one page '+' for more output, '0' to refresh screen, 'H' help, 
+\item{\bf MORE} When displaying on the screen and the complete record fills
+more than one page '+' for more output, '0' to refresh screen, 'H' help,
 'P' print.
 \item {\bf NAME} Desired field or parameter name. The name of the field or
 parameter to be created or acted upon.
 \item{\bf NBINS} Give the number of bins you want in the histogram, which
 determines the X axis range.
-The upper limit of the X axis is determined by the number of bins needed, 
+The upper limit of the X axis is determined by the number of bins needed,
 the bin size and the lower X axis limit.
 \item{\bf NEWOUT} Asks if you want to create a new version of an existing
-output file. 
+output file.
 If set to YES (TRUE) SCAR will ignore existing DSCF files with that name, and
 will create a new version, prompting you for input.
 \item{\bf NREC} The exact number of records or an upper limit
@@ -3114,20 +3114,20 @@ will create a new version, prompting you for input.
 \item{\bf NULLVAL} Null value of a Field or the value of a Parameter
 \item{\bf NUMBER} Number of records to copy (0=rest).
 \item{\bf NUMBER\_INPUT} Number the INPUT catalogue objects on a plot?
-Answer YES if you want the objects from the INPUT catalogues numbered 
+Answer YES if you want the objects from the INPUT catalogues numbered
 and an accompanying listing produced in CHART.CAR.
-\item{\bf NUMBER\_STARS} Number the background stars on a plot? 
-Answer YES if you want the stars on  the  plate numbered and an accompanying 
+\item{\bf NUMBER\_STARS} Number the background stars on a plot?
+Answer YES if you want the stars on  the  plate numbered and an accompanying
 listing produced in CHART.CAR.
-Normally you would answer NO to this question since the background stars are 
+Normally you would answer NO to this question since the background stars are
 just used to align the chart.
 \item {\bf NUMSEL} The actual number of objects to be selected.
-\item{\bf OMTFLD} The name of columns in input file not to be copied. This 
-parameter allows you to change the name of columns that you want to omit. 
+\item{\bf OMTFLD} The name of columns in input file not to be copied. This
+parameter allows you to change the name of columns that you want to omit.
 Normally you would use the default name which is OMIT.
 \item{\bf OPTIONS} Do you want to specify options?
-If you opt to specify the output then you are asked a series of questions 
-about the output style.  
+If you opt to specify the output then you are asked a series of questions
+about the output style.
 If you prefer not to answer these questions and use the defaults, they are:
 \begin{verbatim}
     Fields copied in original format
@@ -3137,8 +3137,8 @@ If you prefer not to answer these questions and use the defaults, they are:
 \item{\bf OVERLAY} Is the plot (in CHART) to be scaled as an overlay?
 If yes the plot will overlay on top of a plate or chart.
 \item{\bf PARAM}  The name of parameter whose value is required.
-\item{\bf PLATE} Give name of parameter set in PLATE catalogue, used by 
-CHART. 
+\item{\bf PLATE} Give name of parameter set in PLATE catalogue, used by
+CHART.
 \begin{verbatim}
   o PSS - Palomar Sky Survey 2 degrees by 2 degrees in gnomonic
     projection.
@@ -3153,7 +3153,7 @@ CHART.
   o SRC/BIG - SRC J plate 4 degrees by 4 degrees in gnomonic
     projection.
 \end{verbatim}
-For TEK screens, select PSS, ESOB or SRC.  
+For TEK screens, select PSS, ESOB or SRC.
 For CANON\_L select the /BIG styles.
 
 The parameter definitions for the finding charts you can make
@@ -3199,10 +3199,10 @@ to modify this file and define your private parameter file as PLATE.
 \item{\bf PRINTFILE} Name of VMS file to which output is directed.
 \item{\bf QUERY} The QUERY specification is a QCAR expression defining the
 objects you want to select which have been extracted by RANGE. This
-expression can contain any of the fields in the catalogue, or arithmetic 
+expression can contain any of the fields in the catalogue, or arithmetic
 expressions of them, and it must be terminated by .END..
 
-Suppose you have specified a DEC range. You can restrict the RA range to 
+Suppose you have specified a DEC range. You can restrict the RA range to
 10 hours 30 minutes to 11 hours 20 minutes by:
 \begin{verbatim}
     RA>103000.AND.RA<112000.END.
@@ -3226,22 +3226,22 @@ you can speed up the search by restricting the DEC range, and then using:
     NAME.EQ."03456+0123".END.
 \end{verbatim}
 \item{\bf RA} Give RA of a plate centre in double quotes (E to end for CHART).
-Enter the RA of your plate centre in any format, using spaces and commas to 
+Enter the RA of your plate centre in any format, using spaces and commas to
 separate hours minutes and seconds.
 If you have more than one number, enclose the string in double quotes.
 Type E when you have no more centres.
-\item{\bf RANGE} The RANGE specification is a QCAR expression with some 
+\item{\bf RANGE} The RANGE specification is a QCAR expression with some
 restrictions; only key fieldnames and constants may be used, and the only
 logical operator permitted is .AND.. The expression must be terminated by
 .END..
 
-The primary keyfield of the IRPS is DEC. In order to select all records 
+The primary keyfield of the IRPS is DEC. In order to select all records
 from +103045 to +123045 you would specify:
 \begin{verbatim}
     DEC>+103045.AND.DEC<+123045.END.
 \end{verbatim}
-The CSIS is sorted in declination bands and within each dec band it is 
-sorted by right ascension. The keyfields are DECBAND and RA. In order to 
+The CSIS is sorted in declination bands and within each dec band it is
+sorted by right ascension. The keyfields are DECBAND and RA. In order to
 select everything from DEC +80 to +82 and between RA 12 hours and
 13 hours you would specify:
 \begin{verbatim}
@@ -3254,35 +3254,35 @@ entry in the catalogue will be considered.
 \end{verbatim}
 \item {\bf READY} The reply should be yes to continue or no to respecify.
 \item{\bf RECORD} The absolute record number of the next record to be displayed
-\item {\bf REDRAW} Redraw the diagram? - yes or no. All the options are 
+\item {\bf REDRAW} Redraw the diagram? - yes or no. All the options are
 repeated when the plot is redrawn except the input catalogue.
-\item{\bf REJECT} Do you want to create a catalogue to contain the records 
+\item{\bf REJECT} Do you want to create a catalogue to contain the records
 that are REJECTed (Y/N)?
 \item{bf REJECTS} The name of the output catalogue for the rejected records.
 \item{\bf SATISFIED} After a RANGE and QUERY, or a MATCH, you are asked if
-you are satisfied with what you have typed in. 
-This gives you an opportunity to check (on the preceding lines) for 
+you are satisfied with what you have typed in.
+This gives you an opportunity to check (on the preceding lines) for
 spelling mistakes and logical errors.
 If you answer YES the computer will endeavour to execute the request, with
 very little checking of its own.
 \item{\bf SAVE} When asked about saving the FIELD or PARAMETER definition,
-answer YES to save it, NO to discard it. 
-If you save it then it is written to the description file, otherwise it is 
+answer YES to save it, NO to discard it.
+If you save it then it is written to the description file, otherwise it is
 discarded.
 \item{\bf SCALE} Scale factor for units (or exponent). Value=Value*10**EXPONENT.
-\item{\bf SCOPE} The scope refers to the scope of possible matches in the 
-second catalogue for each entry in the first catalogue. In most joins the 
+\item{\bf SCOPE} The scope refers to the scope of possible matches in the
+second catalogue for each entry in the first catalogue. In most joins the
 join criteria is expression relational operator constant or constant
 relational operator expression in which case the scope is defined by
-the constant and the default 0 should be taken as the value of the 
+the constant and the default 0 should be taken as the value of the
 scope parameter for example
 \begin{verbatim}
-          great_circle(t__ra,t__dec,s__ra,s__dec).lt.300.end. 
+          great_circle(t__ra,t__dec,s__ra,s__dec).lt.300.end.
 \end{verbatim}
- When the join criteria is expression relational 
+ When the join criteria is expression relational
 operator expression the scope parameter is required for example
 \begin{verbatim}
-          great_circle(t__ra,t__dec,s__ra,s__dec).lt.err.end. 
+          great_circle(t__ra,t__dec,s__ra,s__dec).lt.err.end.
 \end{verbatim}
 where err is a field that contains the maximum error in position
 for this entry. SCOPE should be the maximum value of err over all
@@ -3290,8 +3290,8 @@ enteries. If the scope is too large the join will be correct but
 slow, too small and the join result may be incomplete.
 \item{\bf SCROLL} When displaying a catalogue on the screen use '+' to go onto
 the next page, '-' to bring up the previous page, '0' to refresh the current
-page, 'J' to jump to a specified record (you will be prompted for the record 
-number), 'P' print the current page , 'H' help, 'E' end. CAR\_CALC displays the 
+page, 'J' to jump to a specified record (you will be prompted for the record
+number), 'P' print the current page , 'H' help, 'E' end. CAR\_CALC displays the
 values of the new fields that have just been created, 'J' at this point causes
 the calculation for the new fields to be calculated for all the records in the
 catalogue.
@@ -3301,17 +3301,17 @@ If you want to select certain fields for output (not the default set) you will
 be subsequently asked for the field/generic/group names.
 \item {\bf SELECT\_NUMERIC} Reply NO to select all the numeric fields, YES
 to select the fields.
-\item{\bf SELFIELDS} Used in conjunction with batch. SELFIELDS allows you to 
+\item{\bf SELFIELDS} Used in conjunction with batch. SELFIELDS allows you to
 provide a list of fields you wish to select. Example [DEC,RA,FLUX(1)]
-\item{\bf SHAPE} For SHAPE=0 the grid window fills the available area using 
-the limits of the data computed. 
+\item{\bf SHAPE} For SHAPE=0 the grid window fills the available area using
+the limits of the data computed.
 SHAPE$>$0 specifies a shape determined by the range you specify for X and Y,
-this is the aspect ratio.  
+this is the aspect ratio.
 The value --1.61803 gives the golden rectangle.
-For further information, see the GRID/SHAPE parameter in the NCAR manual. 
+For further information, see the GRID/SHAPE parameter in the NCAR manual.
 \item{\bf SIMPLE} YES to create default output, NO to specify the fields.
 The default output depends on the database process.
-The default output is usually of the index type, to speed the processing and 
+The default output is usually of the index type, to speed the processing and
 conserve disk space.
 \begin{verbatim}
     Options for subroutine default output style:
@@ -3320,18 +3320,18 @@ conserve disk space.
         JOIN        Global Index
         MERGE       Global Index
 \end{verbatim}
-If you find that you need to convert every output file you make, using the 
-options mode (SIMPLE=NO) with each database operation will save you that 
+If you find that you need to convert every output file you make, using the
+options mode (SIMPLE=NO) with each database operation will save you that
 step.
 \item{\bf SPACE} The number of blank spaces between columns.
 \item {\bf SPACES}  Do you want spaces between fields? Putting spaces between
 the fields when creating an ascii catalogue makes the resulting catalogue
 data file easier to look at.
 \item{\bf STARS} Should the background stars be plotted?
-If background are to be plotted then you should enter YES, otherwise 
-the answer is NO. 
+If background are to be plotted then you should enter YES, otherwise
+the answer is NO.
 The stars are taken from the RGO Astrometry catalogue, AS85.
-If you want to align an overlay on a photographic plate you will need 
+If you want to align an overlay on a photographic plate you will need
 background stars.
 \item{\bf START} The position of start of the field in bytes.
 \item{\bf START\_RECORD} If you are reading centers from a file START\_RECORD
@@ -3339,21 +3339,21 @@ allows to specify where to start taking centres from'
 \item{\bf STORE} Do you want to store the bin counts in HIST.CAR (Y/N)?
 \item{\bf STPSIZ} Step (or pixel) size for the dataset.
 \item{\bf STYLE} This is used to determine what kind of plot CHART will
-produce (Astrometric or Photometric), and to control the symbols it uses. 
-It determines whether the object markers will be related to position and 
+produce (Astrometric or Photometric), and to control the symbols it uses.
+It determines whether the object markers will be related to position and
 positional errors, or magnitudes/fluxes.
 The symbol control file (logical name SYMB) defines the fields for
 constructing error box/ellipse, colour codes and symbols sizes.
 Plotting symbols have been set up for the IRPS, AS85, MLNS and CSIS
-catalogues. 
+catalogues.
 All other catalogues get a default symbol.
-You can replace the default SYMBol file by setting up your own SYMBol 
+You can replace the default SYMBol file by setting up your own SYMBol
 control file.
 Information is available in SCAR\_DAT\_DIR:DSCFSYMB.DAT.
 A description of the SYMB file contents is given below.
 
-1) Astrometric Symbols --- in the symbol file you can specify the fields to 
-be used for dimensioning the error box/ellipse and orienting it. 
+1) Astrometric Symbols --- in the symbol file you can specify the fields to
+be used for dimensioning the error box/ellipse and orienting it.
 These are:
 \begin{verbatim}
     o BOX    - RECTANGLE/ELLIPSE are permitted
@@ -3361,25 +3361,25 @@ These are:
     o MINOR  - Shorter side of box (QCAR expression - Unit: ARCSEC)
     o POSANG - Position Angle Expression (In Degrees East of North)
 \end{verbatim}
-For BOX=RECTANGLE, MAJOR is the length of longer side, MINOR the length of 
-the shorter side. 
-If your position errors are DELX and DELY in arc seconds you would specify 
+For BOX=RECTANGLE, MAJOR is the length of longer side, MINOR the length of
+the shorter side.
+If your position errors are DELX and DELY in arc seconds you would specify
 2*DELX and 2*DELY.
 For BOX=ELLIPSE, MAJOR is 2*semi-major axis and MINOR is 2*semi-minor axis.
 
-2) Photometric Symbols --- there is a vocabulary of 32 symbols for plotting 
-sources. 
-Each symbol can be varied in size and shape to represent the brightness and 
+2) Photometric Symbols --- there is a vocabulary of 32 symbols for plotting
+sources.
+Each symbol can be varied in size and shape to represent the brightness and
 colour (found from the ratios of fluxes) of the object.
 The catalogue considered here is IRPS, with flux densities (in Janskys) at
 4 wavelengths.
-The symbol size is a QCAR expression defined to calculate the flux in each 
-of the wavebands. 
-The unit of the expression should be magnitude.  
-To compare the brightness of sources at different wavelengths the 
-wavelength*flux density (nu*Snu) expression is derived (in units of 10**--15 
+The symbol size is a QCAR expression defined to calculate the flux in each
+of the wavebands.
+The unit of the expression should be magnitude.
+To compare the brightness of sources at different wavelengths the
+wavelength*flux density (nu*Snu) expression is derived (in units of 10**--15
 Watts per square meter).
-Zero point relations (cf: Allen, Astrophysical quantities p:197) have been 
+Zero point relations (cf: Allen, Astrophysical quantities p:197) have been
 used for MV and MB.
 \begin{verbatim}
     Band       Log10(nu*Snu)
@@ -3390,88 +3390,88 @@ used for MV and MB.
     60mic      1.70+log10(S60)
     100mic     1.48+log10(S100)
 \end{verbatim}
-These expressions are normalised to the MB scale by subtracting 7.47 and 
-multiplying by --2.5. 
-To set a minimum size for legibility the CHART program uses a cutoff in 
-magnitude at 11.5.  
-This gives a minimum symbol size of about 2mm, which means a cutoff in 
+These expressions are normalised to the MB scale by subtracting 7.47 and
+multiplying by --2.5.
+To set a minimum size for legibility the CHART program uses a cutoff in
+magnitude at 11.5.
+This gives a minimum symbol size of about 2mm, which means a cutoff in
 scaling at about 10 Janskies for IRAS sources.
 For each source the largest flux is used to scale the symbol size.
 Up to 4 wavebands are permitted by the algorithm.
 A colour code formula is defined by a set of Boolean flags, i.e. T/F or 1/0.
 You can specify conditions for each catalogue to fulfil.
 As an example: the IRAS catalogue (which is allowed to have four condition
-expressions) has four bands in which flux qualities are given, Q(1:4). 
-Each Q can have values 1 ,2, 3. 
-A valid flux measurement is Q(n)$>$1 so a condition, COND(1), is set 
+expressions) has four bands in which flux qualities are given, Q(1:4).
+Each Q can have values 1 ,2, 3.
+A valid flux measurement is Q(n)$>$1 so a condition, COND(1), is set
 Q(1).GT.1 etc.
-Suppose for a source the 4 condition expressions give T,T,T,F (the Boolean 
-flag for that source), this is assembled to give 1110 (=14) for symbol 
-number OFFSET+14.  
-Since the IRPS has OFFSET set to 0, the source would be plotted with the 
-shape of symbol 14. 
+Suppose for a source the 4 condition expressions give T,T,T,F (the Boolean
+flag for that source), this is assembled to give 1110 (=14) for symbol
+number OFFSET+14.
+Since the IRPS has OFFSET set to 0, the source would be plotted with the
+shape of symbol 14.
 Symbols are allocated contiguously for each catalogue starting from
-OFFSET+1.  
+OFFSET+1.
 \item{bf SWIDTH} Required width of screen listing must be between 32 and 75.
 \item{\bf TAPE\_DEVICE} Tape device name.
 \item{\bf TITLE} The name or short description for file or plot is given.
 For database programs, up to 50 characters are allowed.
-For HISTOGRAM, SCATTER and AITOFF, up to 20 characters is acceptable.  
+For HISTOGRAM, SCATTER and AITOFF, up to 20 characters is acceptable.
 In CHART strings are truncated to 10 characters.
-\item{\bf UNIT} Requires the units of the field. 
-If the units of an expression are unknown or cannot be derived, you will 
-be prompted for them.  
+\item{\bf UNIT} Requires the units of the field.
+If the units of an expression are unknown or cannot be derived, you will
+be prompted for them.
 They are used for labelling the field.
 \item{\bf VALUE} Value of a field.
-\item{\bf WIDTH} The WIDTH must be between 32 and 160 characters. 
-If you have selected MODE=0 (in REPORT) you will be prompted for the width 
-of the report. 
-Obviously you will want to set it to the width of your output device 
-(e.g. 132 for a line printer, although some line printers will take 160).  
+\item{\bf WIDTH} The WIDTH must be between 32 and 160 characters.
+If you have selected MODE=0 (in REPORT) you will be prompted for the width
+of the report.
+Obviously you will want to set it to the width of your output device
+(e.g. 132 for a line printer, although some line printers will take 160).
 In any other mode, the width is taken from the setting of the screen width
 on your terminal.
 \item{\bf XAXIS} Give field or QCAR expression for X axis.
-Field is a simple field name (e.g. DEC).  
+Field is a simple field name (e.g. DEC).
 The QCAR expression follows the normal QCAR syntax rules.
 When providing an expression you can prefix the expression with the XLABEL,
-and use `!' as the delimiter; for example VELOCITY!V.  
+and use `!' as the delimiter; for example VELOCITY!V.
 The string VELOCITY will be used to label the X axis.
 \item {\bf XERR\_LIM} Maximum number of arithmetic errors in X.
-\item{\bf XLABEL} Give a label for the X axis. 
+\item{\bf XLABEL} Give a label for the X axis.
 If the expression is too long for the axis label (when XAXIS is invoked),
-the prompt XLABEL will appear. 
+the prompt XLABEL will appear.
 Type in a shorter axis label (less than 17 characters) and press return.
 \item{\bf XMAX} Give the upper limit for the X axis.
 \item{\bf XMIN} Give the lower limit for the X axis.
 \item{\bf XSCALE} Give the X axis scale factor.
 XSCALE=1 will file the make the chart fit the screen in the X direction.
-\item{\bf XSHIFT} Give the X axis origin. 
-XSHIFT is measured in world coordinates,  which are usually defined so that 
-0,0 is the bottom left hand corner, and the shortest side of the screen 
-measures 1 in that direction. 
-For example the RH extremity of a TEK screen is about 1.4. 
+\item{\bf XSHIFT} Give the X axis origin.
+XSHIFT is measured in world coordinates,  which are usually defined so that
+0,0 is the bottom left hand corner, and the shortest side of the screen
+measures 1 in that direction.
+For example the RH extremity of a TEK screen is about 1.4.
 \item{\bf XTREMA} Select LARGEst or SMALLest values in the field?
 \item{\bf XUNITS} Units for the X axis'
 \item{\bf YAXIS} Give field or QCAR expression for Y axis.
-Field is a simple field name (e.g. DEC).  
+Field is a simple field name (e.g. DEC).
 The QCAR expression follows the normal QCAR syntax rules.
 When providing an expression you can prefix the expression with the YLABEL,
-and use `!' as the delimiter; for example VELOCITY!V.  
+and use `!' as the delimiter; for example VELOCITY!V.
 The string VELOCITY will be used to label the Y axis.
 \item{\bf YERR\_LIM} Maximum number of arithmetic errors in Y.
-\item{\bf YLABEL} Give a label for the Y axis. 
+\item{\bf YLABEL} Give a label for the Y axis.
 If the expression is too long for the axis label (when YAXIS is invoked),
-the prompt YLABEL will appear. 
+the prompt YLABEL will appear.
 Type in a shorter axis label (less than 17 characters) and press return.
 \item{\bf YMAX} Give the upper limit for the Y axis.
 \item{\bf YMIN} Give the lower limit for the Y axis.
 \item{\bf YSCALE} Give the Y axis scale factor.
 YSCALE=1 will file the make the chart fit the screen in the Y direction.
-\item{\bf YSHIFT} Give the Y axis origin. 
-YSHIFT is measured in world coordinates which are usually defined so that 
-0,0 is the bottom left hand corner, and the shortest side of the screen 
-measures 1 in that direction. 
-For example the RH extremity of a TEK screen is about 1.4. 
+\item{\bf YSHIFT} Give the Y axis origin.
+YSHIFT is measured in world coordinates which are usually defined so that
+0,0 is the bottom left hand corner, and the shortest side of the screen
+measures 1 in that direction.
+For example the RH extremity of a TEK screen is about 1.4.
 \item{\bf YUNITS} Units for the Y axis.
 \end{itemize}
 \end{description}
@@ -3510,10 +3510,10 @@ A {\em logical expression} is either a relational expression, or a combination
 of relational expressions connected by any of the logical operators
 (.NOT., .AND., .OR., .XOR.).
 \subsubsection {Radian constants}
-{\bf Syntax:} In most online catalogues, positional quantities (RA, DEC, LAT, 
-LONG, etc.) are represented in radians, but when such quantities are to be 
-displayed to the user, more approachable units are generally desirable: 
-DEGREES, ARCMINS, ARCSECS, or some combination of these for ANGLE quantities; 
+{\bf Syntax:} In most online catalogues, positional quantities (RA, DEC, LAT,
+LONG, etc.) are represented in radians, but when such quantities are to be
+displayed to the user, more approachable units are generally desirable:
+DEGREES, ARCMINS, ARCSECS, or some combination of these for ANGLE quantities;
 HOURS, MINS, SECS, or some combination for TIME quantities.
 
 CAR provides two mechanisms for dealing with the problem of representing radian
@@ -3543,7 +3543,7 @@ truncate it to 6 digits without warning.
 
 If there is a decimal point in the constant, then it, and any digits following
 it, will be ignored.
-This applies equally to a constant which is enclosed in {\tt " "} marks 
+This applies equally to a constant which is enclosed in {\tt " "} marks
 (i.e.\ looking like a string constant) and to one looking like a simple number.
 There must be 6 actual digits preceding the point; if there are more, the first
 6 will be used without any warning that the constant has been truncated.
@@ -3561,7 +3561,7 @@ but not:
 \end{verbatim}
 which will provoke an explanatory error message.
 
-{\bf Semantics:} A QCAR Radian constant can only be recognized by context.  
+{\bf Semantics:} A QCAR Radian constant can only be recognized by context.
 The rules are quite simple, but you must be careful because you will not be
 warned by the CAR program that a constant has (or has not) been treated as a
 Radian constant.
@@ -3588,7 +3588,7 @@ If you add, subtract, or compare a constant with it, that constant will be
 interpreted as DEGREES and will be interpreted as an ordinary integer, real, or
 double precision number.
 The same applies if you add, subtract, or compare a constant with the result of
-ASIN, ACOS or ATAN.   
+ASIN, ACOS or ATAN.
 And if you add, subtract, or compare a constant with the result of
 GREAT\_CIRCLE, the constant will be interpreted in ARCSECS.
 
@@ -3658,7 +3658,7 @@ dictionary (description file) for that catalogue.
 \>Logical\>eg.\>.TRUE., .FALSE. (only !).\\
 \>Character\>eg.\>``ABCDED".
 \end{tabbing}
-Strings must be enclosed in double quotes ({\tt "}), except in the special case 
+Strings must be enclosed in double quotes ({\tt "}), except in the special case
 of Radian constants (see 4.5.2 above).
 You can define the units of a constant by enclosing them with a backslash and
 vertical line; eg.\  $\backslash$KM/SEC$|$.
@@ -3785,9 +3785,9 @@ All EPOCHs are given years, unless an alternative unit follows it in square
 brackets (MJD = Modified Julian Date for example).
 \begin{verbatim}
   Function      Arguments                   Equinox    Result is Radian Quantity
-  GLONG_EG50    RA, DEC                      B1950          No (degrees)       
+  GLONG_EG50    RA, DEC                      B1950          No (degrees)
   GLAT_EG50     RA, DEC                      B1950          No (   "   )
-  RA_GE50       GLONG, GLAT                  B1950         Yes 
+  RA_GE50       GLONG, GLAT                  B1950         Yes
   DEC_GE50      GLONG, GLAT                  B1950         Yes
   RA_FK4PRE     EPOCH1, EPOCH2, RA, DEC      B1950         Yes
   DEC_FK4PRE    EPOCH1, EPOCH2, RA, DEC      B1950         Yes
@@ -3877,7 +3877,7 @@ position agreement between the objects in it; see program JOIN (3.24).
 \item CALC to generate the definition of a new field
 \end{itemize}
 
-The CSI?EXP functions are used for expanding the compressed information in 
+The CSI?EXP functions are used for expanding the compressed information in
 the CSI79 catalogue. CSI1EXP expands the first byte of the IDENT field, CSI2EXP
 the second and so on. Futher details of the expansion can be found in the
 appendix.
@@ -3891,7 +3891,7 @@ The standard Fortran relational operators are allowed:
 \end{verbatim}
 Alternative symbols for each operator are shown in parentheses.
 The result of a relational expression is a logical value, either: .TRUE.
-or .FALSE., eg.\ 
+or .FALSE., eg.\
 \begin{verbatim}
     RA.LT."001000"
     FLUX(3)/FLUX(4)>2
@@ -3908,14 +3908,14 @@ The result of a logical expression is a logical value:
 {\tt .TRUE. or .FALSE.}
 \end{quote}
 
-{\em Usage:} Logical expressions are used, for example, in the following 
+{\em Usage:} Logical expressions are used, for example, in the following
 CAR routines:
 \begin{itemize}
 \item SEARCH to specify the RANGE and QUERY conditions
 (KEY\_CRITERION and CRITERION parameters in Description file)
-\item JOIN to specify the MATCH condition (JOIN\_CRITERION 
+\item JOIN to specify the MATCH condition (JOIN\_CRITERION
 parameter in Description files)
-\item DIFFER, to specify the MATCH condition (JOIN\_CRITERION 
+\item DIFFER, to specify the MATCH condition (JOIN\_CRITERION
 parameter in Description files)
 \end{itemize}
 {\em Examples:}
@@ -4034,7 +4034,7 @@ FIELDNAMEs used in the CAR system are:
 \item [TITLE] -
 This contains the name of the catalogue and is mandatory.
 FORMAT2 should be A.
-VALUE should be a mnemonic ($<$7 characters in the worst case, but some 
+VALUE should be a mnemonic ($<$7 characters in the worst case, but some
 routines allow up to 50 characters).
 COMMENT should be the ordinary title.
 \item [MEDIUM] -
@@ -4229,7 +4229,7 @@ FIELDNAMEs can be given according to the rules of Fortran 77:
 \begin{verbatim}
     ARRAY([lb:]ub [,[lb:]ub]..........)
 \end{verbatim}
-with up to seven dimensions permitted, (if a string is enclosed by $[\;]$ then 
+with up to seven dimensions permitted, (if a string is enclosed by $[\;]$ then
 it is optional).
 The START of a generic field is the first byte of the array.
 The LENGTH, FORMAT, EXPONENT, UNIT, NULLFORMAT, NULLVALUE describe the length,
@@ -4426,7 +4426,7 @@ have a single field with that name in the index, each index record will contain
 the value from the CATALOGUE referenced by that index record.
 You can keep fields with the same name apart by creating separate fields in your
 index with the fieldnames consisting of the first four letters of the
-CATALOGUE value, followed by the two characters $\_\,\_$, then the fieldname 
+CATALOGUE value, followed by the two characters $\_\,\_$, then the fieldname
 from the indexed catalogue (eg.\ IRPS$\_\,\_$FLUX(4)).
 
 Using Global Indexes you can create your own catalogues which reference many
@@ -4479,9 +4479,9 @@ On the VAX, the range of values permitted is:
            ; I*1 : -128 to 127.
 \end{verbatim}
 \subsubsection {Acronyms}
-Catalogues are referred to by, usually, a 4 or 5 character acronym 
+Catalogues are referred to by, usually, a 4 or 5 character acronym
 loosely related to the title of the catalogue, although there is no restriction
-on how long or short the name must be. 
+on how long or short the name must be.
 The description filename for each catalogue consists of DSCF suffixed with the
 acronym.
 Eg.\ DSCFIRPS is the description file for the IRAS catalogue.
@@ -4539,7 +4539,7 @@ an easily interpreted code letter is given. The form is
                 M .........................'IDS'
                 N .........................'ADS'
                 O .........................'SAO'
-   CSI3EXP 
+   CSI3EXP
                 P .........................'UBV'
                 Q .........................'GCVS'
                 R .........................'GCTP'
@@ -4577,5 +4577,5 @@ an easily interpreted code letter is given. The form is
                 t .........................'DM2'
 
 \end{verbatim}
- 
+
 \end{document}

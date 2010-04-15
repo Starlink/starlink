@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 #
-# !!begin 
+# !!begin
 # !!title  Groups data by source type
 # !!author T.R.Marsh
 # !!created  10 December 2005
 # !!root   splitbysource
-# !!index  splitbysource.pl 
+# !!index  splitbysource.pl
 # !!descr  Perl script for grouping data by source
 # !!head1 Data grouping script
 #
@@ -30,7 +30,7 @@
 #
 # !!end
 
-use strict; 
+use strict;
 
 @ARGV or die "usage: file1 file2 ...\n";
 
@@ -52,7 +52,7 @@ my $log    = 'zzz_splitbysource.log';
 
 # Generate a script to list header info. This part would have
 # to be altered if the header was not in .MORE.FITS. By printing out
-# the whole of the FITS header, the routine should be less sensitive 
+# the whole of the FITS header, the routine should be less sensitive
 # to the exact posistion of items, but still may need varying according
 # to the data format.
 
@@ -65,7 +65,7 @@ foreach $file (@ARGV){
     push @files, $file;
     if(-e "$file.sdf"){
 	print SCRIPT "echo File name = $file\n";
-	print SCRIPT "$STAR/bin/hdstrace $file.more.pamela\n"; 
+	print SCRIPT "$STAR/bin/hdstrace $file.more.pamela\n";
     }else{
 	die "No file = $file.sdf exists!\n";
     }
@@ -102,7 +102,7 @@ my ($dir1, $dir2);
 foreach $file (@files){
 
     if(defined $source{$file} && defined $night{$file}){
-	
+
 	if($source{$file} =~ /DATA/ || $source{$file} =~ /ARC/){
 	    $dir1 = "data";
 	}elsif($source{$file} =~ /BIAS/){
@@ -122,7 +122,7 @@ foreach $file (@files){
 
 	(-e $dir1) or mkdir $dir1;
 	(-e "$dir1/$dir2") or mkdir "$dir1/$dir2";
-	
+
 	rename "$file.sdf", "$dir1/$dir2/$file.sdf";
 	print "$file.sdf ---> $dir1/$dir2/$file.sdf\n";
 

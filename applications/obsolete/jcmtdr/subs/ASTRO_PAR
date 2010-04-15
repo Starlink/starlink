@@ -29,7 +29,7 @@
       PARAMETER (DST2UT=86400d0/86636.55536d0)
 
 *  Conversion factor from mBar to mmHg
-      DOUBLE PRECISION MBAR2MMHG 
+      DOUBLE PRECISION MBAR2MMHG
       PARAMETER ( MBAR2MMHG = 1.333224d0 )
 
 *  The speed of light

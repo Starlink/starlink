@@ -1,7 +1,7 @@
 1 DATACUBE_Version_1.2
 
   A new release of DATACUBE (V1.2) has been made.  Further
-  details can be found in SUN/237.  This can be viewed with 
+  details can be found in SUN/237.  This can be viewed with
   the commands "showme sun237".  The main changes are:
 
 2 New_Commands
@@ -15,25 +15,25 @@
 2 Modified_Commands
  The following scripts have been modified:
 
-   o  peakmap and velmap both now have a -a option to inspect and 
-   approve the fit at each spatial pixel.  They also have a -l 
+   o  peakmap and velmap both now have a -a option to inspect and
+   approve the fit at each spatial pixel.  They also have a -l
    option to log the Gaussian fit parameters and their errors in a
-   Small Text List file.  
+   Small Text List file.
 
-   Both permit case-insensitive responses to prompts except where 
-   a prompt requires a file name. 
+   Both permit case-insensitive responses to prompts except where
+   a prompt requires a file name.
 
    o  peakmap inteprets a non-positive number of contours to mean
-   no contour overlay required.  There is a new -ci option to 
+   no contour overlay required.  There is a new -ci option to
    specify the colour index of contours.
 
-   o  velmap now recognises DSBSPECTRUM as a valid spectral domain.  
+   o  velmap now recognises DSBSPECTRUM as a valid spectral domain.
 
 
 1 DATACUBE_Version_1.1
 
   A new release of DATACUBE (V1.1) has been made.  Further
-  details can be found in SUN/237.  This can be viewed with 
+  details can be found in SUN/237.  This can be viewed with
   the commands "showme sun237".  The main changes are:
 
 2 New_Commands
@@ -41,11 +41,11 @@
  The following new scripts have been added:
 
    o  gridspec
-      Averages groups of spatially neighbouring spectra of a 
+      Averages groups of spatially neighbouring spectra of a
       three-dimensional IFU NDF and then plots these averaged spectra
       in a grid.
    o  velmoment
-      Builds a velocity map from the collapsed intensity-weighted 
+      Builds a velocity map from the collapsed intensity-weighted
       spectral co-ordinates.  It supports spatial compression.
 
 2 Modified_Commands
@@ -57,26 +57,26 @@
    o  multistack and stacker plot ordinate limits now always
    make visible all the spectra, regardless of the chosen offset.
 
-   o  passband  does not dump WCS mappings in NDFCOPY.  Ensured that 
-   the plots of spectra use the axis co-ordinate system.  Removed 
+   o  passband  does not dump WCS mappings in NDFCOPY.  Ensured that
+   the plots of spectra use the axis co-ordinate system.  Removed
    unused -r option.
 
-   o  peakmap now has -c option to specify the number of contour 
-   levels to plot; this may be zero to prevent contours be overlaid. 
+   o  peakmap now has -c option to specify the number of contour
+   levels to plot; this may be zero to prevent contours be overlaid.
 
    o  step now plots the image slices in an optimally shaped grid
    rather than full size in quick succession, and thereby permits
-   comparison of the slices. 
+   comparison of the slices.
 
-   o  velmap generalised the transformation of the measured line 
-   displacements from the rest-frame co-ordinate in the current 
+   o  velmap generalised the transformation of the measured line
+   displacements from the rest-frame co-ordinate in the current
    spectral system into one of four velocity measurements using
    WCSTRAN.  Added a SpecFrame to achieve this functionality for
    UK data-cube files.  Also recognises the SKY-DSBSPECTRUM Domain.
 
    Added the -s option to define the co-ordinate system of the
-   derived velocities.  Ensured that the plots of spectra use the 
-   axis co-ordinate system.  The script inquires the WCS for the 
+   derived velocities.  Ensured that the plots of spectra use the
+   axis co-ordinate system.  The script inquires the WCS for the
    rest-frame frequency to avoid unnecessary prompting.
 
    Changed lower percentile for display from 15 to 2.  Use spectrum
@@ -89,25 +89,25 @@
 2 General_changes
 
    o  The package applications COPYAXIS, GETBOUND, and PUTAXIS have
-   been withdrawn.  The scripts that invoked these now call 
+   been withdrawn.  The scripts that invoked these now call
    KAPPA:SETAXIS, NDFTRACE, and SETAXIS respectively.
 
    o  The scripts have been generalised to spectral co-ordinate systems
    other than Wavelength in Angstrom.  Units are reported too.
 
    o  A bug displacing by +1 pixel negative pixel indices determined
-   by the cursor has been fixed.  It was present in most of the 
+   by the cursor has been fixed.  It was present in most of the
    scripts.
 
    o  Spectrum plots now use the histogram style for greater clarity.
 
-   o  Reset KAPPA:DISPLAY parameters in a few scripts, so that 
-   features enabled in other scripts, like a key, do not bleed 
+   o  Reset KAPPA:DISPLAY parameters in a few scripts, so that
+   features enabled in other scripts, like a key, do not bleed
    through.
 
    o  Tidied the scripts.  Changes included the silent removal and
-   creation of files, alphabetical ordering of the options, 
-   documentation of default values of options, corrections to grammar 
+   creation of files, alphabetical ordering of the options,
+   documentation of default values of options, corrections to grammar
    and punctuation, avoidance of :r, command-line rubbish disposal,
    and aligned output.
 

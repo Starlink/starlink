@@ -68,7 +68,7 @@
 *
 *     (>) IMAGE         (File) The name of the raw echelle image.
 *     (>) YSTART        (Integer) The starting and ending Y positions to
-*     (>) YEND          (Integer) search for orders. Default entire 
+*     (>) YEND          (Integer) search for orders. Default entire
 *                       image.
 *     (>) PERISCOPE     (Keyword) Whether or not the periscope is
 *                       fitted. Default TRUE.
@@ -99,7 +99,7 @@
 *  External variables used:
 *
 *     None
-*                                                  
+*
 *  Prior requirements:
 *     None
 *
@@ -110,22 +110,22 @@
 *  History:
 *     31 May 1988  WFL.  Original version.
 *     14 Sep 1988  WFL.  Add comments to main routine
-*     23 Nov 1989  KS.  Change use of DIMS as arguments to 
-*                  FIG_FINDTRACK, since new version of Fortran compiler 
-*                  no longer allows variables used in dummy array 
+*     23 Nov 1989  KS.  Change use of DIMS as arguments to
+*                  FIG_FINDTRACK, since new version of Fortran compiler
+*                  no longer allows variables used in dummy array
 *                  declarators to be array elements.  (I think this is a
 *                  bug!)
 *     24 Sep 1992  HME.  Lowercase file names. Replace call to
 *                  discontinued M01AAF by call to M01DAF. Change CALL
 *                  EXIT into RETURN. (!) Output default lowercase,
 *                  output lowercase extension (mask.dst). Input
-*                  lowercase extension. SDIST file sdist.dat, OPEN 
+*                  lowercase extension. SDIST file sdist.dat, OPEN
 *                  statements without CARRIAGECONTROL keyword.
 *     03 Aug 1993  HME.  Convert to DSA, use PAR_ABORT.
 *     18 Apr 1995  HME.  No longer use NAG, need more workspace for
 *                  FIG_DXYFIT.
 *     20 Mar 1996  HME.  Fixed broken format string (the line just broke
-*                  in the middle of the string, now two strings are 
+*                  in the middle of the string, now two strings are
 *                  concatenated.)
 *     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 *                  file names to 132 chars.
@@ -182,7 +182,7 @@
       YEND = NINT(VALUE)
       IF (PAR_ABORT()) GO TO 9999
 *
-*     Get number of first order in range 
+*     Get number of first order in range
 *
       CALL PAR_RDVAL('MSTART',1.0,1000.0,1.0,' ',VALUE)
       MSTART=VALUE
@@ -246,7 +246,7 @@
 *     Close DSA.
 *
       CALL DSA_CLOSE(STATUS)
-*                                                
+*
       END
 
       SUBROUTINE FIG_FINDTRACK(IMAGE,DIMS1,DIMS2,PERISCOPE,YSTART,YEND,
@@ -255,7 +255,7 @@
 *  18 Apr 1995 (hme):
 *     Change MIDX, MIDY from REAL*8 to REAL. They are no longer passed
 *     to MO1DAF, but to GEN_QFISORT.
-                               
+
       INTEGER XMED,XAVE,IRES,IDEG,MDEG,MAXP,MAXO,MAXY
       PARAMETER (XMED=3,XAVE=3,IRES=5,IDEG=6,MDEG=10)
       PARAMETER (MAXP=4096,MAXO=1000,MAXY=4096)
@@ -285,7 +285,7 @@
          XCUT(I) = XCUT(I) / FLOAT(XAVE+1+XAVE)
 *        DO J = -XMED,+XMED
 *           XSLICE(J) = IMAGE(IMID+J,I)
-*        END DO        
+*        END DO
 *        CALL GEN_QFSORT(XSLICE,XMED+1+XMED)
 *        XCUT(I) = XSLICE(0)
       END DO
@@ -312,7 +312,7 @@
       IF(NUM.GT.0)THEN
          DO ITRACK = 1,NUM
             WIDTH(ITRACK) = END(ITRACK) - START(ITRACK)
-         END DO                          
+         END DO
          CALL GEN_QFSORT(WIDTH,NUM)
          IF(NUM.GT.2)THEN
             ORHWID = WIDTH(NUM-2) / 2.0
@@ -377,7 +377,7 @@
                   J=J+JD
                ELSE
                   J=J+ISIGN(1,JD)
-               END IF          
+               END IF
 
             END DO
             JS=IMID-1

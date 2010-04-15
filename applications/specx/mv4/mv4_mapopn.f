@@ -41,7 +41,7 @@
 *     02 Sep 1994 (hme):
 *        Actually, do return the Starlink status. The calling routine
 *        must decide why this one failed.
-*     09 Oct 1995 (timj): 
+*     09 Oct 1995 (timj):
 *        Upgrade to map version 4.2
 *     10 June 2003 (timj):
 *        Add bounds check and store NSPEC and NPTS1 from POSN
@@ -57,7 +57,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -149,7 +149,7 @@
       CALL NDF_XLOC(  IDXNDF, 'POSN', 'UPDATE', TLOC, STATUS )
 
 * Map POSN array to POSPTR
-      CALL NDF_OPEN( TLOC, ' ', 'UPDATE', 'OLD', POSNDF, 
+      CALL NDF_OPEN( TLOC, ' ', 'UPDATE', 'OLD', POSNDF,
      :               MPLACE, STATUS )
 
       CALL NDF_MAP(   POSNDF, 'DATA', '_REAL', 'UPDATE',
@@ -166,7 +166,7 @@
       END IF
 
 *  Set NSPEC from here prior to reading the header itself
-*  Ideally the header should already have been read.      
+*  Ideally the header should already have been read.
       IF (STATUS .EQ. SAI__OK) THEN
          NSPEC = SPDIM(2)
          NPTS1 = SPDIM(1)

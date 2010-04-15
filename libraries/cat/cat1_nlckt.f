@@ -12,7 +12,7 @@
 *     Check whether a field value is null or not.  The check is made by
 *     comparing the value for the field against the null value (if any)
 *     for the column.  If they are equal then then the field value is
-*     null.  
+*     null.
 *
 *     A logical flag is returned indicating whether the value is null
 *     or not.
@@ -37,7 +37,7 @@
 *        .FALSE. -  the value is not null; a genuine datum is available.
 *     OUTVAL  =  BYTE (Returned)
 *        The output value.  If INVAL is a genuine datum then OUTVAL is a
-*        copy of it.  If INVAL is null then OUTVAL contains the 
+*        copy of it.  If INVAL is null then OUTVAL contains the
 *        StarBase null value of the appropriate data type.  Note that
 *        in this case OUTVAL *always* contains the appropriate StarBase
 *        null value, *not* any null value which may have been specified
@@ -56,7 +56,7 @@
 *       end if
 *     else if the column supports explicit null values then
 *       Obtain the null value for the column.
-*       If the explicit null value is equal to the actual field value 
+*       If the explicit null value is equal to the actual field value
 *       then
 *         Set the null flag to true.
 *         Set the return value to the appropriate StarBase null.
@@ -64,7 +64,7 @@
 *         Set the null flag to false.
 *         Set the return value to the given field value.
 *       end if
-*     else if the column supports locum values (and hence the value 
+*     else if the column supports locum values (and hence the value
 *     cannot be null)
 *       Set the null flag to false.
 *       Set the return value to the given field value.
@@ -81,12 +81,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -164,7 +164,7 @@
             END IF
 
 *
-*       Second, a null value has been explictly specified for the 
+*       Second, a null value has been explictly specified for the
 *       column.
 
          ELSE IF (NULTYP .EQ. CAT__NULLS) THEN
@@ -237,7 +237,7 @@
 *     Check whether a field value is null or not.  The check is made by
 *     comparing the value for the field against the null value (if any)
 *     for the column.  If they are equal then then the field value is
-*     null.  
+*     null.
 *
 *     A logical flag is returned indicating whether the value is null
 *     or not.
@@ -262,7 +262,7 @@
 *        .FALSE. -  the value is not null; a genuine datum is available.
 *     OUTVAL  =  CHARACTER*(*) (Returned)
 *        The output value.  If INVAL is a genuine datum then OUTVAL is a
-*        copy of it.  If INVAL is null then OUTVAL contains the 
+*        copy of it.  If INVAL is null then OUTVAL contains the
 *        StarBase null value of the appropriate data type.  Note that
 *        in this case OUTVAL *always* contains the appropriate StarBase
 *        null value, *not* any null value which may have been specified
@@ -281,7 +281,7 @@
 *       end if
 *     else if the column supports explicit null values then
 *       Obtain the null value for the column.
-*       If the explicit null value is equal to the actual field value 
+*       If the explicit null value is equal to the actual field value
 *       then
 *         Set the null flag to true.
 *         Set the return value to the appropriate StarBase null.
@@ -289,7 +289,7 @@
 *         Set the null flag to false.
 *         Set the return value to the given field value.
 *       end if
-*     else if the column supports locum values (and hence the value 
+*     else if the column supports locum values (and hence the value
 *     cannot be null)
 *       Set the null flag to false.
 *       Set the return value to the given field value.
@@ -373,7 +373,7 @@
             END IF
 
 *
-*       Second, a null value has been explictly specified for the 
+*       Second, a null value has been explictly specified for the
 *       column.
 
          ELSE IF (NULTYP .EQ. CAT__NULLS) THEN
@@ -446,7 +446,7 @@
 *     Check whether a field value is null or not.  The check is made by
 *     comparing the value for the field against the null value (if any)
 *     for the column.  If they are equal then then the field value is
-*     null.  
+*     null.
 *
 *     A logical flag is returned indicating whether the value is null
 *     or not.
@@ -471,7 +471,7 @@
 *        .FALSE. -  the value is not null; a genuine datum is available.
 *     OUTVAL  =  DOUBLE PRECISION (Returned)
 *        The output value.  If INVAL is a genuine datum then OUTVAL is a
-*        copy of it.  If INVAL is null then OUTVAL contains the 
+*        copy of it.  If INVAL is null then OUTVAL contains the
 *        StarBase null value of the appropriate data type.  Note that
 *        in this case OUTVAL *always* contains the appropriate StarBase
 *        null value, *not* any null value which may have been specified
@@ -490,7 +490,7 @@
 *       end if
 *     else if the column supports explicit null values then
 *       Obtain the null value for the column.
-*       If the explicit null value is equal to the actual field value 
+*       If the explicit null value is equal to the actual field value
 *       then
 *         Set the null flag to true.
 *         Set the return value to the appropriate StarBase null.
@@ -498,7 +498,7 @@
 *         Set the null flag to false.
 *         Set the return value to the given field value.
 *       end if
-*     else if the column supports locum values (and hence the value 
+*     else if the column supports locum values (and hence the value
 *     cannot be null)
 *       Set the null flag to false.
 *       Set the return value to the given field value.
@@ -582,7 +582,7 @@
             END IF
 
 *
-*       Second, a null value has been explictly specified for the 
+*       Second, a null value has been explictly specified for the
 *       column.
 
          ELSE IF (NULTYP .EQ. CAT__NULLS) THEN
@@ -655,7 +655,7 @@
 *     Check whether a field value is null or not.  The check is made by
 *     comparing the value for the field against the null value (if any)
 *     for the column.  If they are equal then then the field value is
-*     null.  
+*     null.
 *
 *     A logical flag is returned indicating whether the value is null
 *     or not.
@@ -680,7 +680,7 @@
 *        .FALSE. -  the value is not null; a genuine datum is available.
 *     OUTVAL  =  INTEGER (Returned)
 *        The output value.  If INVAL is a genuine datum then OUTVAL is a
-*        copy of it.  If INVAL is null then OUTVAL contains the 
+*        copy of it.  If INVAL is null then OUTVAL contains the
 *        StarBase null value of the appropriate data type.  Note that
 *        in this case OUTVAL *always* contains the appropriate StarBase
 *        null value, *not* any null value which may have been specified
@@ -699,7 +699,7 @@
 *       end if
 *     else if the column supports explicit null values then
 *       Obtain the null value for the column.
-*       If the explicit null value is equal to the actual field value 
+*       If the explicit null value is equal to the actual field value
 *       then
 *         Set the null flag to true.
 *         Set the return value to the appropriate StarBase null.
@@ -707,7 +707,7 @@
 *         Set the null flag to false.
 *         Set the return value to the given field value.
 *       end if
-*     else if the column supports locum values (and hence the value 
+*     else if the column supports locum values (and hence the value
 *     cannot be null)
 *       Set the null flag to false.
 *       Set the return value to the given field value.
@@ -791,7 +791,7 @@
             END IF
 
 *
-*       Second, a null value has been explictly specified for the 
+*       Second, a null value has been explictly specified for the
 *       column.
 
          ELSE IF (NULTYP .EQ. CAT__NULLS) THEN
@@ -864,7 +864,7 @@
 *     Check whether a field value is null or not.  The check is made by
 *     comparing the value for the field against the null value (if any)
 *     for the column.  If they are equal then then the field value is
-*     null.  
+*     null.
 *
 *     A logical flag is returned indicating whether the value is null
 *     or not.
@@ -889,7 +889,7 @@
 *        .FALSE. -  the value is not null; a genuine datum is available.
 *     OUTVAL  =  LOGICAL (Returned)
 *        The output value.  If INVAL is a genuine datum then OUTVAL is a
-*        copy of it.  If INVAL is null then OUTVAL contains the 
+*        copy of it.  If INVAL is null then OUTVAL contains the
 *        StarBase null value of the appropriate data type.  Note that
 *        in this case OUTVAL *always* contains the appropriate StarBase
 *        null value, *not* any null value which may have been specified
@@ -908,7 +908,7 @@
 *       end if
 *     else if the column supports explicit null values then
 *       Obtain the null value for the column.
-*       If the explicit null value is equal to the actual field value 
+*       If the explicit null value is equal to the actual field value
 *       then
 *         Set the null flag to true.
 *         Set the return value to the appropriate StarBase null.
@@ -916,7 +916,7 @@
 *         Set the null flag to false.
 *         Set the return value to the given field value.
 *       end if
-*     else if the column supports locum values (and hence the value 
+*     else if the column supports locum values (and hence the value
 *     cannot be null)
 *       Set the null flag to false.
 *       Set the return value to the given field value.
@@ -1000,7 +1000,7 @@
             END IF
 
 *
-*       Second, a null value has been explictly specified for the 
+*       Second, a null value has been explictly specified for the
 *       column.
 
          ELSE IF (NULTYP .EQ. CAT__NULLS) THEN
@@ -1073,7 +1073,7 @@
 *     Check whether a field value is null or not.  The check is made by
 *     comparing the value for the field against the null value (if any)
 *     for the column.  If they are equal then then the field value is
-*     null.  
+*     null.
 *
 *     A logical flag is returned indicating whether the value is null
 *     or not.
@@ -1098,7 +1098,7 @@
 *        .FALSE. -  the value is not null; a genuine datum is available.
 *     OUTVAL  =  REAL (Returned)
 *        The output value.  If INVAL is a genuine datum then OUTVAL is a
-*        copy of it.  If INVAL is null then OUTVAL contains the 
+*        copy of it.  If INVAL is null then OUTVAL contains the
 *        StarBase null value of the appropriate data type.  Note that
 *        in this case OUTVAL *always* contains the appropriate StarBase
 *        null value, *not* any null value which may have been specified
@@ -1117,7 +1117,7 @@
 *       end if
 *     else if the column supports explicit null values then
 *       Obtain the null value for the column.
-*       If the explicit null value is equal to the actual field value 
+*       If the explicit null value is equal to the actual field value
 *       then
 *         Set the null flag to true.
 *         Set the return value to the appropriate StarBase null.
@@ -1125,7 +1125,7 @@
 *         Set the null flag to false.
 *         Set the return value to the given field value.
 *       end if
-*     else if the column supports locum values (and hence the value 
+*     else if the column supports locum values (and hence the value
 *     cannot be null)
 *       Set the null flag to false.
 *       Set the return value to the given field value.
@@ -1209,7 +1209,7 @@
             END IF
 
 *
-*       Second, a null value has been explictly specified for the 
+*       Second, a null value has been explictly specified for the
 *       column.
 
          ELSE IF (NULTYP .EQ. CAT__NULLS) THEN
@@ -1282,7 +1282,7 @@
 *     Check whether a field value is null or not.  The check is made by
 *     comparing the value for the field against the null value (if any)
 *     for the column.  If they are equal then then the field value is
-*     null.  
+*     null.
 *
 *     A logical flag is returned indicating whether the value is null
 *     or not.
@@ -1307,7 +1307,7 @@
 *        .FALSE. -  the value is not null; a genuine datum is available.
 *     OUTVAL  =  INTEGER*2 (Returned)
 *        The output value.  If INVAL is a genuine datum then OUTVAL is a
-*        copy of it.  If INVAL is null then OUTVAL contains the 
+*        copy of it.  If INVAL is null then OUTVAL contains the
 *        StarBase null value of the appropriate data type.  Note that
 *        in this case OUTVAL *always* contains the appropriate StarBase
 *        null value, *not* any null value which may have been specified
@@ -1326,7 +1326,7 @@
 *       end if
 *     else if the column supports explicit null values then
 *       Obtain the null value for the column.
-*       If the explicit null value is equal to the actual field value 
+*       If the explicit null value is equal to the actual field value
 *       then
 *         Set the null flag to true.
 *         Set the return value to the appropriate StarBase null.
@@ -1334,7 +1334,7 @@
 *         Set the null flag to false.
 *         Set the return value to the given field value.
 *       end if
-*     else if the column supports locum values (and hence the value 
+*     else if the column supports locum values (and hence the value
 *     cannot be null)
 *       Set the null flag to false.
 *       Set the return value to the given field value.
@@ -1418,7 +1418,7 @@
             END IF
 
 *
-*       Second, a null value has been explictly specified for the 
+*       Second, a null value has been explictly specified for the
 *       column.
 
          ELSE IF (NULTYP .EQ. CAT__NULLS) THEN

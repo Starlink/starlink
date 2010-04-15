@@ -84,7 +84,7 @@
 #define AST__GLOBALS ast_globals
 
 /* Defines a macro that gives access to a specific global data item. */
-#define astGLOBAL(class,name) (AST__GLOBALS->class.name) 
+#define astGLOBAL(class,name) (AST__GLOBALS->class.name)
 
 
 /* Declares the pointer for the structure holding thread-specific values
@@ -95,7 +95,7 @@
 /* A macro that should be invoked in each function that refers to a
    global data item. The "This" parameter should be a pointer to an
    Object, or NULL. It ensures the thread-specific data key has been
-   created. It also allocates and initialises memory to hold the global 
+   created. It also allocates and initialises memory to hold the global
    data. */
 #define astGET_GLOBALS(This) \
 \
@@ -120,7 +120,7 @@
          fprintf( stderr, "Starlink AST failed to store Thread-Specific " \
                   "Data pointer." ); \
       } \
-   } 
+   }
 
 
 /* A macro that expands to the value of a unique integer identifier for
@@ -146,62 +146,62 @@ typedef struct AstGlobals {
    AstMappingGlobals Mapping;
    AstFrameGlobals Frame;
    AstChannelGlobals Channel;
-   AstCmpMapGlobals CmpMap;         
-   AstKeyMapGlobals KeyMap;         
-   AstFitsChanGlobals FitsChan;       
-   AstCmpFrameGlobals CmpFrame;       
-   AstDSBSpecFrameGlobals DSBSpecFrame;   
-   AstFrameSetGlobals FrameSet;       
-   AstLutMapGlobals LutMap;         
-   AstMathMapGlobals MathMap;        
-   AstPcdMapGlobals PcdMap;         
-   AstPointSetGlobals PointSet;         
-   AstSkyAxisGlobals SkyAxis;        
-   AstSkyFrameGlobals SkyFrame;       
-   AstSlaMapGlobals SlaMap;         
-   AstSpecFrameGlobals SpecFrame;      
-   AstSphMapGlobals SphMap;         
-   AstTimeFrameGlobals TimeFrame;      
-   AstWcsMapGlobals WcsMap;         
-   AstZoomMapGlobals ZoomMap;        
-   AstFluxFrameGlobals FluxFrame;      
-   AstSpecFluxFrameGlobals SpecFluxFrame;  
-   AstGrismMapGlobals GrismMap;       
-   AstIntraMapGlobals IntraMap;       
-   AstPlotGlobals Plot;         
+   AstCmpMapGlobals CmpMap;
+   AstKeyMapGlobals KeyMap;
+   AstFitsChanGlobals FitsChan;
+   AstCmpFrameGlobals CmpFrame;
+   AstDSBSpecFrameGlobals DSBSpecFrame;
+   AstFrameSetGlobals FrameSet;
+   AstLutMapGlobals LutMap;
+   AstMathMapGlobals MathMap;
+   AstPcdMapGlobals PcdMap;
+   AstPointSetGlobals PointSet;
+   AstSkyAxisGlobals SkyAxis;
+   AstSkyFrameGlobals SkyFrame;
+   AstSlaMapGlobals SlaMap;
+   AstSpecFrameGlobals SpecFrame;
+   AstSphMapGlobals SphMap;
+   AstTimeFrameGlobals TimeFrame;
+   AstWcsMapGlobals WcsMap;
+   AstZoomMapGlobals ZoomMap;
+   AstFluxFrameGlobals FluxFrame;
+   AstSpecFluxFrameGlobals SpecFluxFrame;
+   AstGrismMapGlobals GrismMap;
+   AstIntraMapGlobals IntraMap;
+   AstPlotGlobals Plot;
    AstPlot3DGlobals Plot3D;
-   AstRegionGlobals Region;         
+   AstRegionGlobals Region;
    AstBoxGlobals Box;
-   AstXmlGlobals Xml;         
-   AstXmlChanGlobals XmlChan;       
-   AstCircleGlobals Circle;                     
-   AstCmpRegionGlobals CmpRegion;                  
-   AstDssMapGlobals DssMap;                     
-   AstEllipseGlobals Ellipse;                    
-   AstIntervalGlobals Interval;                   
-   AstMatrixMapGlobals MatrixMap;                  
-   AstNormMapGlobals NormMap;                    
-   AstNullRegionGlobals NullRegion;                 
-   AstPermMapGlobals PermMap;                    
-   AstPointListGlobals PointList;                  
-   AstPolyMapGlobals PolyMap;                    
-   AstPolygonGlobals Polygon;                    
-   AstPrismGlobals Prism;                      
-   AstRateMapGlobals RateMap;                    
-   AstSelectorMapGlobals SelectorMap;                
-   AstShiftMapGlobals ShiftMap;                   
-   AstSpecMapGlobals SpecMap;                    
-   AstStcGlobals Stc;                        
-   AstStcCatalogEntryLocationGlobals StcCatalogEntryLocation;    
-   AstStcObsDataLocationGlobals StcObsDataLocation;         
-   AstSwitchMapGlobals SwitchMap;                  
-   AstTimeMapGlobals TimeMap;                    
-   AstTranMapGlobals TranMap;                    
-   AstUnitMapGlobals UnitMap;                    
-   AstWinMapGlobals WinMap;                     
-   AstStcResourceProfileGlobals	StcResourceProfile;         
-   AstStcSearchLocationGlobals StcSearchLocation;          
-   AstStcsChanGlobals StcsChan;        
+   AstXmlGlobals Xml;
+   AstXmlChanGlobals XmlChan;
+   AstCircleGlobals Circle;
+   AstCmpRegionGlobals CmpRegion;
+   AstDssMapGlobals DssMap;
+   AstEllipseGlobals Ellipse;
+   AstIntervalGlobals Interval;
+   AstMatrixMapGlobals MatrixMap;
+   AstNormMapGlobals NormMap;
+   AstNullRegionGlobals NullRegion;
+   AstPermMapGlobals PermMap;
+   AstPointListGlobals PointList;
+   AstPolyMapGlobals PolyMap;
+   AstPolygonGlobals Polygon;
+   AstPrismGlobals Prism;
+   AstRateMapGlobals RateMap;
+   AstSelectorMapGlobals SelectorMap;
+   AstShiftMapGlobals ShiftMap;
+   AstSpecMapGlobals SpecMap;
+   AstStcGlobals Stc;
+   AstStcCatalogEntryLocationGlobals StcCatalogEntryLocation;
+   AstStcObsDataLocationGlobals StcObsDataLocation;
+   AstSwitchMapGlobals SwitchMap;
+   AstTimeMapGlobals TimeMap;
+   AstTranMapGlobals TranMap;
+   AstUnitMapGlobals UnitMap;
+   AstWinMapGlobals WinMap;
+   AstStcResourceProfileGlobals	StcResourceProfile;
+   AstStcSearchLocationGlobals StcSearchLocation;
+   AstStcsChanGlobals StcsChan;
 } AstGlobals;
 
 
@@ -209,17 +209,17 @@ typedef struct AstGlobals {
 /* ============================= */
 
 
-/* The pthreads key that is associated with the thread-specific data for 
+/* The pthreads key that is associated with the thread-specific data for
    each thread. Declared in global.c. */
-extern pthread_key_t starlink_ast_globals_key; 
+extern pthread_key_t starlink_ast_globals_key;
 
 /* The pthreads key that is associated with the thread-specific status
    value for each thread. Declared in global.c. */
-extern pthread_key_t starlink_ast_status_key; 
+extern pthread_key_t starlink_ast_status_key;
 
-/* This is a flag indicating that the thread-specific data key has not yet  
-   been created. Declared in globals.c. */ 
-extern pthread_once_t starlink_ast_globals_initialised; 
+/* This is a flag indicating that the thread-specific data key has not yet
+   been created. Declared in globals.c. */
+extern pthread_once_t starlink_ast_globals_initialised;
 
 /* Function Prototypes: */
 /* ==================== */
@@ -232,8 +232,8 @@ AstGlobals *astGlobalsInit_( void );
 #else
 
 #define astDECLARE_GLOBALS
-#define astGET_GLOBALS(This) 
-#define astINIT_GLOBALS 
+#define astGET_GLOBALS(This)
+#define astINIT_GLOBALS
 
 #endif
 #endif

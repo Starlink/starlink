@@ -39,7 +39,7 @@
 *     KMXIO needs a configure test. Currently just pick something.
 *     FIO uses 40.
 
-* This version is for 4.2 BSD/System V UNIX on Pyramids and Suns. 
+* This version is for 4.2 BSD/System V UNIX on Pyramids and Suns.
 
       INTEGER    KNIBYT
       INTEGER    KRCBYT

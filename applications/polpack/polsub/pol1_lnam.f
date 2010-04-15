@@ -44,7 +44,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -63,7 +63,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,7 +117,7 @@
          CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )
  1    CONTINUE
 
-      IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN 
+      IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Write a comment about the name of the list.
          CALL FIO_FNAME( FD, FNAME, STATUS )

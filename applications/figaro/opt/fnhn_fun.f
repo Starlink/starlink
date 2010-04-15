@@ -25,7 +25,7 @@
 *    XC(5) = INTEGER ARRAY (Given)
 *        Fit parameters
 *    N = INTEGER (Given)
-*       
+*
 *    DATA(M) = DOUBLE PRECISION ARRAY (Given)
 *        X data
 *    DENS(M) = DOUBLE PRECISION ARRAY (Given)

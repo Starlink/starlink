@@ -32,9 +32,9 @@
 *     The basic method used is to supply a list of NDFs and an
 *     optional reference NDF.  The first NDF or the reference
 *     NDF is initially displayed and you are invited to mark
-*     the positions of centroidable image features on it using a 
-*     graphical interface.  This window then remains on the screen for 
-*     reference while you identify the same features on each of the 
+*     the positions of centroidable image features on it using a
+*     graphical interface.  This window then remains on the screen for
+*     reference while you identify the same features on each of the
 *     other images in the same way.
 *
 *     After centroiding you are then given the option to stop. If
@@ -63,17 +63,17 @@
 *     The graphical interface used for marking features on the image
 *     should be fairly self-explanatory.  The image can be scrolled using
 *     the scrollbars, the window can be resized, and there are controls
-*     for zooming the image in or out, changing the style of display and 
+*     for zooming the image in or out, changing the style of display and
 *     altering the percentile cutoff limits.  The displayed index numbers
-*     of any identified features on each image must match those on the 
-*     reference image (though it is not necessary to identify all of 
-*     the features from the reference image on each one), and there is 
+*     of any identified features on each image must match those on the
+*     reference image (though it is not necessary to identify all of
+*     the features from the reference image on each one), and there is
 *     also a control for selecting the number of the next point to mark.
-*     Points are added by clicking mouse button 1 (usually the left one) 
-*     and may be removed by clicking mouse button 3 (usually the right 
+*     Points are added by clicking mouse button 1 (usually the left one)
+*     and may be removed by clicking mouse button 3 (usually the right
 *     one).  It is possible to edit the points marked on the reference
-*     image while you are marking points on the other images.  When 
-*     you have selected all the points you wish to on a given image, 
+*     image while you are marking points on the other images.  When
+*     you have selected all the points you wish to on a given image,
 *     click the 'Done' button and you will be presented with the next
 *     one.
 
@@ -88,7 +88,7 @@
 *        transformations (this is the usual case).
 *        [FALSE]
 *     EXTRAS = _LOGICAL (Read)
-*        If this parameter is true, then for each NDF (or Set of 
+*        If this parameter is true, then for each NDF (or Set of
 *        NDFs, if USESET is true) from the IN list you will be
 *        prompted to enter a group of corresponding names which
 *        represent more files of the same type pointing at (almost)
@@ -154,8 +154,8 @@
 *        will be given sensible defaults.
 *        [""]
 *     MAXCANV = INTEGER (Read and Write)
-*        A value in pixels for the maximum initial X or Y dimension of 
-*        the region in which the image is displayed.  Note this is the      
+*        A value in pixels for the maximum initial X or Y dimension of
+*        the region in which the image is displayed.  Note this is the
 *        scrolled region, and may be much bigger than the sizes given
 *        by WINX and WINY, which limit the size of the window on the
 *        X display.  It can be overridden during operation by zooming
@@ -168,13 +168,13 @@
 *        [1280]
 *     MORE = LITERAL (Read)
 *        If EXTRAS is true, this parameter is used to get a list of
-*        images corresponding to each one which is named by the IN 
+*        images corresponding to each one which is named by the IN
 *        parameter.  These lists are always got interactively; MORE
 *        values cannot be given on the command line.  For any given
 *        response the null value (!) may be supplied, indicating that
 *        there are no similarly aligned images.  If the original image
-*        is included again in the supplied MORE value, it will be 
-*        ignored, since it already forms part of the group being 
+*        is included again in the supplied MORE value, it will be
+*        ignored, since it already forms part of the group being
 *        considered.
 *        [!]
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
@@ -188,7 +188,7 @@
 *     REFNDF = LITERAL (Read)
 *        The name of an additional reference image (or Set); this is the
 *        first image displayed and the one which will be visible while
-*        you are marking points on all the others.  If the null value 
+*        you are marking points on all the others.  If the null value
 *        (!) is supplied then no additional reference image will be
 *        used, and the first one in the IN list will be the first
 *        displayed.
@@ -199,18 +199,18 @@
 *        group images according to their Set Name attribute before
 *        displaying them, rather than treating them one by one.
 *        All images in the IN list which share the same (non-blank)
-*        Set Name attribute, and which have a CCD_SET attached 
+*        Set Name attribute, and which have a CCD_SET attached
 *        coordinate system, will be shown together as a single
 *        image in the viewer for object marking, plotted in their
 *        CCD_SET coordinates.
 *
-*        If USESET is false, then regardless of Set headers, each 
+*        If USESET is false, then regardless of Set headers, each
 *        individual NDF will be displayed for marking separately.
-*        If the input images have no Set headers, or if they have 
+*        If the input images have no Set headers, or if they have
 *        no CCD_SET coordinates in their WCS components, the value
 *        of this parameter will make no difference.
 *
-*        If a global value for this parameter has been set using 
+*        If a global value for this parameter has been set using
 *        CCDSETUP than that value will be used.
 *        [FALSE]
 *     WINX = INTEGER (Read and Write)
@@ -246,12 +246,12 @@
 *
 *     ccdalign "x1008,x1009,x1010" refndf=xmos extras=yes continue
 *        Here the EXTRAS parameter is true, so for each of the named
-*        images you will be prompted for a list of other images 
+*        images you will be prompted for a list of other images
 *        which were taken pointing in the same direction.
 *        The file `xmos' is being used as the reference image,
 *        so that will be presented first for marking features.
-*        When you have marked features on all four images, the 
-*        program will go on to match them all up and produce a 
+*        When you have marked features on all four images, the
+*        program will go on to match them all up and produce a
 *        global registration, attaching a new coordinate system in
 *        which they are all registered to each file.
 
@@ -306,7 +306,7 @@
 *        Added call to SLV_RESET to work around problems with
 *        KAPPA:DISPLAY dynamic parameters (X/YMAGN and CENTRE) not
 *        updating. This is a problem when using images of differing
-*        sizes.  
+*        sizes.
 *     1-APR-1999 (MBT):
 *        Modified to use WCS components.
 *     19-MAY-2000 (MBT):
@@ -316,7 +316,7 @@
 *        Removed the above IDI_ASSOC call since it causes obscure
 *        problems on alpha_osf1 and sun4_solaris.
 *     29-AUG-2000 (MBT):
-*        Replaced use of CCDNDFAC A-task/routine, to try to fix weird 
+*        Replaced use of CCDNDFAC A-task/routine, to try to fix weird
 *        platform-dependent parameter-related problems, with the normal
 *        routine CCD1_NGLIS.  Turned out to be an NDG bug, but it's
 *        cleaner this way anyway.
@@ -470,7 +470,7 @@
       REFGR = GRP__NOID
 
 *  Find out the environment we're running under. If it's IRAF then
-*  INDEF is used instead of ! as a NULL symbol. 
+*  INDEF is used instead of ! as a NULL symbol.
       CALL CCD1_SETEX( NULL, NL, STATUS )
       CCDGID = -1
 
@@ -499,12 +499,12 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NUM', NSET )
          CALL MSG_SETI( 'MAX', MAXGRP )
-         CALL ERR_REP( 'CCDALIGN_TOOMANY', 
+         CALL ERR_REP( 'CCDALIGN_TOOMANY',
      :'CCDALIGN: ^NUM supplied groups exceeds maximum (^MAX)', STATUS )
          GO TO 99
       END IF
 
-*  See whether we will solicit extra members of each group apart from the 
+*  See whether we will solicit extra members of each group apart from the
 *  leaders.
       CALL PAR_GET0L( 'EXTRAS', EXTRAS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -535,7 +535,7 @@
             CALL FIO_WRITE( FD, NDFNAM( : CHR_LEN( NDFNAM ) ), STATUS )
             CALL GRP_PUT( GRGR( I ), 1, NDFNAM, 0, STATUS )
          END DO
-            
+
 *  If requested, get the extra members of the group.
          IF ( EXTRAS ) THEN
 
@@ -547,7 +547,7 @@
 *  NDFs for the group leader.
                CALL GRP_GET( SNAMGR, I, 1, SNAME, STATUS )
                CALL MSG_SETC( 'SETNAM', SNAME )
-               CALL MSG_OUT( ' ', 
+               CALL MSG_OUT( ' ',
      :'Enter extra NDFs in the same sky position as Set "^SETNAM":',
      :                       STATUS )
                LINE = 'Member NDFs are:'
@@ -562,12 +562,12 @@
 *  If not using Sets, just output the name of the group leader NDF.
                CALL GRP_GET( LDRGR, I, 1, NDFNAM, STATUS )
                CALL MSG_SETC( 'NAME', NDFNAM )
-               CALL MSG_OUT( ' ', 
+               CALL MSG_OUT( ' ',
      :'Enter extra NDFs in the same sky position as NDF "^NAME"',
      :                       STATUS )
             END IF
 
-*  Now get the user to input extra NDFs for the group via the MORE 
+*  Now get the user to input extra NDFs for the group via the MORE
 *  parameter.
             CALL PAR_CANCL( 'MORE', STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -582,7 +582,7 @@
             ELSE
 
 *  If we do have extra NDFs, write them out to the list file and store
-*  in the group.  If any are the same as group leader NDFs, don't 
+*  in the group.  If any are the same as group leader NDFs, don't
 *  bother to write them again.
                DO J = 1, NMOR
                   CALL GRP_GET( MORGR, J, 1, NDFNAM, STATUS )
@@ -623,14 +623,14 @@
          IF ( STATUS .EQ. SAI__OK .AND. RNSET .NE. 1 ) THEN
             NTRY = NTRY + 1
             IF ( NTRY .LT. 5 ) THEN
-               CALL CCD1_MSG( ' ', 
+               CALL CCD1_MSG( ' ',
      :'The REFNDF parameter must only comprise members of a single Set',
      :                        STATUS )
                CALL PAR_CANCL( 'REFNDF', STATUS )
                GO TO 4
             ELSE
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'CCDALIGN_REFNDF', 
+               CALL ERR_REP( 'CCDALIGN_REFNDF',
      :'CCDALIGN: Failed to get value for REFNDF parameter', STATUS )
                GO TO 99
             END IF
@@ -641,7 +641,7 @@
          CALL CCD1_NDFGL( 'REFNDF', 0, 1, REFGR, NREF, STATUS )
       END IF
 
-*  See if we have a reference NDF or not.  A NULL response is OK, annul 
+*  See if we have a reference NDF or not.  A NULL response is OK, annul
 *  the error and take it as having no reference NDF.
       IF ( STATUS .EQ. PAR__NULL ) THEN
          HAVREF = .FALSE.
@@ -652,7 +652,7 @@
 *  I don't think this can happen, but if it does then bail out.
       ELSE
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'CCDALIGN_BADREF', 
+         CALL ERR_REP( 'CCDALIGN_BADREF',
      :                 'CCDALIGN: Error getting REFNDF value', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -767,8 +767,8 @@
          CALL MSG_LOAD( ' ', 'ndf^LISTID', LISTID, LENG, STATUS )
          NAMLST = 'ccdalign_' // LISTID( :LENG ) // '.list'
 
-*  If this group does not represent a Set (i.e. it has only one member), 
-*  then assume that the same position list applies to all the NDFs in 
+*  If this group does not represent a Set (i.e. it has only one member),
+*  then assume that the same position list applies to all the NDFs in
 *  the group.  The list will already be in Pixel coordinates.
          IF ( NMEM( I ) .EQ. 1 ) THEN
 
@@ -781,7 +781,7 @@
 
 *  Write all the points in the position list to the file.
             CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPIND( I ) ) ),
-     :                       %VAL( CNF_PVAL( IPXPOS( I ) ) ), 
+     :                       %VAL( CNF_PVAL( IPXPOS( I ) ) ),
      :                       %VAL( CNF_PVAL( IPYPOS( I ) ) ),
      :                       NPOINT( I ), LINE, 1024, STATUS )
 
@@ -795,7 +795,7 @@
      :            'inlist=' // FNAME( :CHR_LEN( FNAME ) ) // ' accept'
             CALL SLV_OBEYW( CCDREG, 'ccdedit', CMD, ' ', STATUS )
 
-*  If this is a Set, we have to be more careful.  For each NDF in 
+*  If this is a Set, we have to be more careful.  For each NDF in
 *  the group, construct an individual list file consisting of all the
 *  points in the Set list which fall within the boundaries of the NDF
 *  (since any given point may come from a different Set member of the
@@ -803,7 +803,7 @@
 *  coordinates.
          ELSE
 
-*  Allocate enough space to hold transformed coordinates, and a subset 
+*  Allocate enough space to hold transformed coordinates, and a subset
 *  of this Set's position list.
             CALL CCD1_MALL( NPOINT( I ), '_DOUBLE', IPX1, STATUS )
             CALL CCD1_MALL( NPOINT( I ), '_DOUBLE', IPY1, STATUS )
@@ -825,10 +825,10 @@
                MAP = AST_GETMAPPING( IWCS, JSET, JPIX, STATUS )
 
 *  Transform the positions into pixel coordinates.
-               CALL AST_TRAN2( MAP, NPOINT( I ), 
+               CALL AST_TRAN2( MAP, NPOINT( I ),
      :                         %VAL( CNF_PVAL( IPXPOS( I ) ) ),
      :                         %VAL( CNF_PVAL( IPYPOS( I ) ) ), .TRUE.,
-     :                         %VAL( CNF_PVAL( IPX1 ) ), 
+     :                         %VAL( CNF_PVAL( IPX1 ) ),
      :                         %VAL( CNF_PVAL( IPY1 ) ), STATUS )
 
 *  Get its bounds.
@@ -840,18 +840,18 @@
 
 *  Select only those points in this Set's position list which fall
 *  within the bounds of this NDF.
-               CALL CCD1_CHUSB( %VAL( CNF_PVAL( IPIND( I ) ) ), 
+               CALL CCD1_CHUSB( %VAL( CNF_PVAL( IPIND( I ) ) ),
      :                          %VAL( CNF_PVAL( IPX1 ) ),
      :                          %VAL( CNF_PVAL( IPY1 ) ), NPOINT( I ),
-     :                          XLO, XHI, YLO, YHI, 
+     :                          XLO, XHI, YLO, YHI,
      :                          %VAL( CNF_PVAL( IPI2 ) ),
-     :                          %VAL( CNF_PVAL( IPX2 ) ), 
+     :                          %VAL( CNF_PVAL( IPX2 ) ),
      :                          %VAL( CNF_PVAL( IPY2 ) ), N2, STATUS )
 
 *  Now write a list and associate it with this NDF.  First construct
 *  a name for the list file.
                CALL MSG_SETI( 'IX', J )
-               CALL MSG_LOAD( ' ', 'ccdalign_' // 
+               CALL MSG_LOAD( ' ', 'ccdalign_' //
      :                        LISTID( :CHR_LEN( LISTID ) ) //
      :                        '_^IX.fea', FNAME, LENG, STATUS )
 
@@ -860,9 +860,9 @@
                CALL CCD1_FIOHD( FD, 'Output from CCDALIGN', STATUS )
 
 *  Write the chosen points into it.
-               CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPI2 ) ), 
+               CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPI2 ) ),
      :                          %VAL( CNF_PVAL( IPX2 ) ),
-     :                          %VAL( CNF_PVAL( IPY2 ) ), 
+     :                          %VAL( CNF_PVAL( IPY2 ) ),
      :                          N2, LINE, 1024, STATUS )
 
 *  Close the list file.
@@ -910,7 +910,7 @@
 
 *  See if the user wants to continue past this point.
       CALL MSG_BLANK( STATUS )
-      LINE = 
+      LINE =
      :'You may stop processing at this point if all you require are '//
      :'labelled position lists associated with NDFs. If you want to '//
      :'determine the NDF registrations, then this procedure will aid '//
@@ -940,10 +940,10 @@
 *  ccdalign_ndfs.list and copy the contents of all the groups files
 *  into it.
       REGNAM = ' '
-      CALL CCD1_OPFIO( 'ccdalign_ndfs.list', 'WRITE', 'LIST', 0, FDOUT, 
+      CALL CCD1_OPFIO( 'ccdalign_ndfs.list', 'WRITE', 'LIST', 0, FDOUT,
      :                 STATUS )
       DO 6 I = 1, NSET
-         CALL MSG_SETI( 'I', I ) 
+         CALL MSG_SETI( 'I', I )
          CALL MSG_LOAD( ' ', 'ccdalign_ndf^I.list', NAMLST,
      :                  OPLEN, STATUS )
          CALL CCD1_OPFIO( NAMLST, 'READ', 'LIST', 0, FD, STATUS )
@@ -952,13 +952,13 @@
 *  While we can read this file, copy its contents into the total list.
 *  Save the name of the very first NDF in the list for use later.
  7       CONTINUE
-         IF ( STATUS .EQ. SAI__OK ) THEN 
+         IF ( STATUS .EQ. SAI__OK ) THEN
             CALL FIO_READ( FD, NDFNAM, NDFLEN, STATUS )
             CALL FIO_WRITE( FDOUT, NDFNAM, STATUS )
             IF ( REGNAM .EQ. ' ' ) REGNAM = NDFNAM
             GO TO 7
          END IF
-         IF ( STATUS .EQ. FIO__EOF ) THEN 
+         IF ( STATUS .EQ. FIO__EOF ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF
          CALL ERR_RLSE
@@ -972,7 +972,7 @@
       CALL MSG_OUT( ' ',  '   Determining initial transformations.',
      :              STATUS )
       CALL MSG_BLANK( STATUS )
-      CALL MSG_SETI( 'FITTYP', FITTYP ) 
+      CALL MSG_SETI( 'FITTYP', FITTYP )
       CALL MSG_SETL( 'USESET', USESET )
       CALL MSG_LOAD( ' ', 'fittype=^FITTYP useset=^USESET ', CMD,
      :               OPLEN, STATUS )
@@ -989,10 +989,10 @@
 *  image features beyond the initial reference set.
 *  Associate extended reference set with all NDFs
 
-*  Transform the reference list from pixel coordinates of the reference 
+*  Transform the reference list from pixel coordinates of the reference
 *  NDF to CCD_REG1 coordinates, in which all the frames are registered.
       CALL MSG_SETC( 'REGNAM', REGNAM )
-      CALL MSG_LOAD( ' ', 
+      CALL MSG_LOAD( ' ',
      :               'logto=n '//
      :               'ndfnames=false '//
      :               'inlist=ccdalign_ref.ext '//
@@ -1039,10 +1039,10 @@
       CALL MSG_OUT( ' ',  '   Determining final transformations.',
      :              STATUS )
       CALL MSG_BLANK( STATUS )
-      CALL MSG_SETI( 'FITTYP', FITTYP ) 
+      CALL MSG_SETI( 'FITTYP', FITTYP )
       CALL MSG_SETL( 'USESET', USESET )
       CALL MSG_LOAD( ' ', 'fittype=^FITTYP useset=^USESET ', CMD,
-     :               OPLEN, STATUS ) 
+     :               OPLEN, STATUS )
       CMD( OPLEN + 1: ) = ' ndfnames=true '//
      :      'inlist=^ccdalign_ndfs.list '//
      :      'refpos=1 '//

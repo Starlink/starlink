@@ -35,8 +35,8 @@
 *        The number of coordinate values for the ZoomMap (the same value
 *        is used for both input and output axes).
 *     OPTIONS = LITERAL (Read)
-*        A string containing an optional comma-separated list of attribute 
-*        assignments to be used for initialising the new ZoomMap. 
+*        A string containing an optional comma-separated list of attribute
+*        assignments to be used for initialising the new ZoomMap.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new ZoomMap.
 *     ZOOM = _DOUBLE (Read)
@@ -85,7 +85,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Status:
       INTEGER STATUS
@@ -93,10 +93,10 @@
 *  Local Variables:
       DOUBLE PRECISION ZOOM
       INTEGER NCOORD
-      INTEGER RESULT       
+      INTEGER RESULT
 *.
 
-*  Check inherited status.      
+*  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
@@ -104,7 +104,7 @@
 
 *  Get the required parameter values.
       CALL PAR_GET0I( 'NCOORD', NCOORD, STATUS )
-      CALL PAR_GET0D( 'ZOOM', ZOOM, STATUS ) 
+      CALL PAR_GET0D( 'ZOOM', ZOOM, STATUS )
 
 *  Create the required ZoomMap.
       RESULT = AST_ZOOMMAP( NCOORD, ZOOM, ' ', STATUS )

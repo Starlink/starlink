@@ -164,7 +164,7 @@
 *                   (RL.STAR::CUR).
 *     1990 Jan 8  : Corrected SGS status (RL.STAR::CUR).
 *     1990 Feb 20 : AIF_OPFIO renamed AIF_ASFIO (RAL::CUR).
-*     1990 Nov 29 : Tested for comment strings, made the label a 
+*     1990 Nov 29 : Tested for comment strings, made the label a
 *                   standard comment, and stored floating-point
 *                   co-ordinates in the x-y list files (RAL::CUR).
 *     1991 Jun 10 : Added LBND argument as temporary patch for INSPECT
@@ -216,7 +216,7 @@
 
 *    Local Constants :
 
-      INTEGER  
+      INTEGER
      :  NCHLIN                 ! maximum number of characters in a
                                ! an output record
       PARAMETER ( NCHLIN = 80 )
@@ -375,7 +375,7 @@
 
                   LINE = LABEL
 
-*                Past the first line so switch of the flag to read 
+*                Past the first line so switch of the flag to read
 *                subsequent data records.
 
                   LINEIN = .FALSE.
@@ -389,7 +389,7 @@
                   HASH = INDEX( LINE, '#' )
 
 *                Watch for blank lines or comment lines. A hash or
-*                shriek in the first column indicates a comment line. 
+*                shriek in the first column indicates a comment line.
 *                In such cases the line can be ignored.
 
                   IF ( SHRIEK .NE. 1 .AND. HASH .NE. 1 .AND.
@@ -527,7 +527,7 @@
             LABEL = '# '//LABEL( :NCHLIN-2 )
 
 *          Find the length of the label.
- 
+
             NCHAR = CHR_LEN( LABEL )
          END IF
 
@@ -724,7 +724,7 @@
      :        CALL SGS_CLRBL( XL - CROARM, XL + CROARM,
      :                        YL - CROARM, YL + CROARM )
             XC = VAL__BADI
-               
+
          END IF
       END DO
 

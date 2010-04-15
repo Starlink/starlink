@@ -104,7 +104,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,7 +147,7 @@
 
 *  Create a new output NDF based on the input NDF.  Propagate the WCS, axis,
 *  quality and units components.
-      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2,
      :               STATUS )
 
 *  See if the input NDF has a variance component and set the list of
@@ -177,42 +177,42 @@
 *  Select the appropriate routine for the data type being processed and
 *  multiply the data array by the constant.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_CMULB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CMULB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_CMULUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CMULUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                     CONST,
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     NBAD, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CMULD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CMULD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_CMULI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CMULI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CMULR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CMULR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_CMULW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CMULW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                    CONST,
      :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
- 
+
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_CMULUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+         CALL KPG1_CMULUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                     CONST,
-     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     NBAD, STATUS )
- 
+
       END IF
 
 *  Set the output bad pixel flag value unless the NDF is primitive.
@@ -234,47 +234,47 @@
 *  Select the appropriate routine for the data type being processed and
 *  multiply the variance array by the squared constant.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_CMULB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+            CALL KPG1_CMULB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                       CONST,
-     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_CMULUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+            CALL KPG1_CMULUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                        CONST,
-     :                        %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                        %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                        NBAD, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMULD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+            CALL KPG1_CMULD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                       CONST,
-     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_CMULI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+            CALL KPG1_CMULI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                       CONST,
-     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMULR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+            CALL KPG1_CMULR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                       CONST,
-     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_CMULW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+            CALL KPG1_CMULW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                       CONST,
-     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                       NBAD, STATUS )
- 
+
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_CMULUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+            CALL KPG1_CMULUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
      :                        CONST,
-     :                        %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                        %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
      :                        NBAD, STATUS )
- 
+
          END IF
 
 *  Set the output bad pixel flag value unless the NDF is primitive.
@@ -287,7 +287,7 @@
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDF2, 'Title', STATUS )
-      
+
 *  End the NDF context.
       CALL NDF_END( STATUS )
 

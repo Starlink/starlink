@@ -65,7 +65,7 @@ DECnet DLM circuits over the network. We also purchased the
 Coloured Books software to provide access to the many computers attached to
 SERCnet that did not use DECnet. The situation between 1983 and 1987 remained
 fairly stable and a typical VAX set up is shown in
-figure~\ref{early-configuration}. 
+figure~\ref{early-configuration}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -101,7 +101,7 @@ private ethernets were joined to larger site wide ethernets. For example the
 ethernet at RAL has some hundreds of VAXs connected to it and the Manchester
 LAN spreads out as far as Jodrell Bank, although admittedly not at
 10Mbits/sec. The situation was now as shown in figure~\ref{vaxcluster} and
-little had changed as far as off site networking was concerned. 
+little had changed as far as off site networking was concerned.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -168,7 +168,7 @@ that had the synchronous interface, however, they did not use the Coloured
 Books software, simply due to the cost of providing it on all machines in a
 cluster. This is the stage that most nodes are currently at. They either have a
 single machine configured as shown in figure~\ref{early-configuration} or a
-cluster as shown in figure~\ref{vaxcluster}. 
+cluster as shown in figure~\ref{vaxcluster}.
 
 It is worth noting that until 1989, Starlink was the only project allowed to
 run DECnet over the JANET network. There is an important political point here.
@@ -471,7 +471,7 @@ network line speed from 9.6K baud (or 7.2K baud in the case of Jodrell Bank) to
 prospect of getting three was distinctly small. By purchasing a DEMSA, we only
 need a single connection point to JANET. DEMSAs have further advantages in that
 they never need to go down for disk backups and since they are inherently
-simple machines, they should very rarely break down. 
+simple machines, they should very rarely break down.
 
 There are various hardware and software configurations available. The hardware
 is a DEMSA or a DEMSB. These are also known as DEC microservers. These come
@@ -503,7 +503,7 @@ If you use a DEMSA to provide both your DECnet connection and your PSI
 connection to JANET at present, then you may need to purchase a second DEMSA
 when we move to DECnet/OSI. Another possibility is to use your current DEMSA to
 provide your DECnet connection and to use a Spider gateway, if your site has
-one, to provide your PSI (and hence Coloured Books) connection.         
+one, to provide your PSI (and hence Coloured Books) connection.
 
 \section{What does {\em my} site need?}
 
@@ -541,7 +541,7 @@ As mentioned above, the packaging of the software will be changed with
 DECnet/OSI. If you have two DEMSA (in preparation for DECnet/OSI), but no
 Spider gateway, then you do not need PSI plus LLC2 to communicate around
 Starlink and the wide world, however, you may still want them to access other
-non-DECnet computers on your ethernet. 
+non-DECnet computers on your ethernet.
 
 \section{A Case Study}
 
@@ -570,13 +570,13 @@ the DEMSA and the Spider gateway is only used for test purposes. This is
 because the original configuration of the Spider gateways did not allow the
 registration of more than 200 site names. This restriction has now been
 overcome, however, it is still more convenient to use the DEMSA than the Spider
-gateway. 
+gateway.
 
 When we make the transition to DECnet/OSI, the DEMSA will not be able to
 handle both DECnet and X.25 protocols. The way that this situation will
 probably be handled will be to use the DEMSA for DECnet traffic as at present
 and to use the Spider gateways for X.25 traffic. At that point the PSI-access
-software would be redundant. 
+software would be redundant.
 
 \section{The Colour Books authorization file}
 
@@ -641,7 +641,7 @@ is more usual to have the subaddress present.
 Things start to get more complicated when a Spider gateway is involved and it
 depends on whether the gateway is at your site or the remote site. The
 appropriate entry in the NAD to make a call from Manchester to RAL out through
-the Spider gateway at Manchester is  
+the Spider gateway at Manchester is
 
 \begin{verbatim}
     ADD SITE UK.AC.RUTHERFORD.STARLINK CONS "08003900309D7E" -
@@ -659,7 +659,7 @@ the Spider gateway at Manchester is
             /AUTO_REVERSE-
             /WINDOW_SIZE=4-
             /PACKET_SIZE=256
-\end{verbatim} 
+\end{verbatim}
 
 There are several new points here. Firstly the network name is now CONS, not
 JANET. This is the network name at Manchester for making a call using LLC2
@@ -737,7 +737,7 @@ The fact that the other machine is also a VAX is not particularly important.
 This time the primary address is the ethernet address of the machine that you
 are contacting. If the remote machine is a VAX, this can be either the physical
 address (the AA-00- one) or the hardware address (the 08-00- one). The facility
-expression now contains the real NSAP of the remote computer. At Manchester the 
+expression now contains the real NSAP of the remote computer. At Manchester the
 last two digits are a code to indicate the type of facility, however, this is
 not in use at all sites. Cambridge, at least, has a different suffix to
 indicate the type of facility at present.

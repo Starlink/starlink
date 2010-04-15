@@ -56,7 +56,7 @@
 #     -  This script contains comments. To convert it into a legal "sed" script
 #     these should be removed.
 #     -  The combined length of this script and of the "edtail.sed" script
-#     must be shorter (and preferably much shorter) than the limits on 
+#     must be shorter (and preferably much shorter) than the limits on
 #     total length of a "sed" script required by the "multised" script.
 
 #  Implementation Deficiencies:

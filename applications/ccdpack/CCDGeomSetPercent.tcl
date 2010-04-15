@@ -69,10 +69,10 @@ proc CCDGeomSetPercent { Top args } {
 #.
 
 #  Set defaults.
-   if { ![info exists PERCENTILES(low)] } { 
+   if { ![info exists PERCENTILES(low)] } {
       set PERCENTILES(low) 5
    }
-   if { ![info exists PERCENTILES(high)] } { 
+   if { ![info exists PERCENTILES(high)] } {
       set PERCENTILES(high) 95
    }
 
@@ -91,7 +91,7 @@ proc CCDGeomSetPercent { Top args } {
       scale $topwin.high -from 0 -to 100 -label Upper -showvalue 1 \
              -variable PERCENTILES(high) -orient hori -resolution 0.25
    CCDCcdWidget Choice choice Ccd::choice $Topwin.choice
-	      
+
 #-----------------------------------------------------------------------------
 #  Extra configuration.
 #-----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ proc CCDGeomSetPercent { Top args } {
       "$Topwin kill $Topwin
        global PERCENTILES
        if { $PERCENTILES(low) != \$PERCENTILES(low) || \
-            $PERCENTILES(high) != \$PERCENTILES(high) } { 
+            $PERCENTILES(high) != \$PERCENTILES(high) } {
           eval $args
        }
       "

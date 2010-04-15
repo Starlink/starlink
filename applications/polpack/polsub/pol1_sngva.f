@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGVA( EL, DIN, T, PHI, EPS, DIMST, STOKES, SUM1, 
+      SUBROUTINE POL1_SNGVA( EL, DIN, T, PHI, EPS, DIMST, STOKES, SUM1,
      :                       SUM2, TVAR, WORK, DEZERO, ZERO, STATUS )
 
 *+
@@ -12,16 +12,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGVA( EL, DIN, T, PHI, EPS, DIMST, STOKES, SUM1, SUM2, 
+*     CALL POL1_SNGVA( EL, DIN, T, PHI, EPS, DIMST, STOKES, SUM1, SUM2,
 *                      TVAR, WORK, DEZERO, ZERO, STATUS )
 
 *  Description:
 *     For each pixel, this routine finds the residual between the
-*     supplied input intensity value (DIN), and the corresponding 
+*     supplied input intensity value (DIN), and the corresponding
 *     intensity value implied by the Stokes vectors (STOKES). The
 *     corresponding pixel in SUM1 is incremented by 1.0 (if the
-*     input intensity value and Stokes vectors is good), and the 
-*     corresponding pixel in SUM2 is incremented by the square of 
+*     input intensity value and Stokes vectors is good), and the
+*     corresponding pixel in SUM2 is incremented by the square of
 *     the residual.
 *
 *     Also returns the mean squared residual (i.e. the mean variance) in
@@ -64,7 +64,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -78,7 +78,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,7 +102,7 @@
       REAL WORK( EL )
 
 *  Arguments Returned:
-      REAL TVAR 
+      REAL TVAR
       REAL ZERO
 
 *  Status:
@@ -115,13 +115,13 @@
 *  Local Variables:
       INTEGER HI
       INTEGER HIST( NBIN )
-      INTEGER I    
+      INTEGER I
       INTEGER J
       INTEGER LO
       INTEGER POP
       INTEGER TSUM1
       REAL DELTA
-      REAL DHI    
+      REAL DHI
       REAL DLO
       REAL EXPECT
       REAL K1
@@ -132,7 +132,7 @@
       REAL RES
       REAL SQRES
       REAL TLIM
-      REAL TSUM2   
+      REAL TSUM2
 
 *.
 
@@ -145,7 +145,7 @@
       K3 = EPS*SIN( 2*PHI )
 
 *  Increment the max and min residual values.
-      MAXRES = VAL__MINR 
+      MAXRES = VAL__MINR
       MINRES = VAL__MAXR
 
 *  Do each pixel.
@@ -159,11 +159,11 @@
 
 *  Calculate the expected intensity value on the basis of the supplied
 *  Stokes vector.
-            EXPECT = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 ) 
+            EXPECT = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 )
      :                                   + K3*STOKES( I, 3 ) )
 
 *  Store the residual.
-            RES = EXPECT - DIN( I ) 
+            RES = EXPECT - DIN( I )
             WORK( I ) = RES
 
 *  Increment the max and min residual values.
@@ -185,8 +185,8 @@
       IF( .NOT. DEZERO ) THEN
          ZERO = 0.0
 
-*  Otherwise, if delta is zero, the mean variance value is equal to the 
-*  maximum residual (and the minimum residual). In this case there is no 
+*  Otherwise, if delta is zero, the mean variance value is equal to the
+*  maximum residual (and the minimum residual). In this case there is no
 *  need to form the histogram.
       ELSE IF( DELTA .EQ. 0 ) THEN
          ZERO = MAXRES
@@ -222,13 +222,13 @@
 *  Find the data value corresponding to these percentiles.
          J = 1
          POP = HIST( J )
-         DO WHILE( POP .LT. LO .AND. J .LE. NBIN ) 
+         DO WHILE( POP .LT. LO .AND. J .LE. NBIN )
             J = J + 1
             POP = POP + HIST( J )
          END DO
          DLO = ( J - 1 )*DELTA + MINRES
 
-         DO WHILE( POP .LT. HI .AND. J .LE. NBIN ) 
+         DO WHILE( POP .LT. HI .AND. J .LE. NBIN )
             J = J + 1
             POP = POP + HIST( J )
          END DO
@@ -245,7 +245,7 @@
                   TSUM1 = TSUM1 + 1
                END IF
             END IF
-         END DO                  
+         END DO
 
          IF( TSUM1 .EQ. 0 ) THEN
             STATUS = SAI__ERROR
@@ -271,7 +271,7 @@
             SQRES = ( WORK( I ) - ZERO )**2
 
 *  Increment the running sum images.
-            SUM1( I ) = SUM1( I ) + 1.0      
+            SUM1( I ) = SUM1( I ) + 1.0
             SUM2( I ) = SUM2( I ) + SQRES
 
 *  Increment the running sum values for this single image.

@@ -1,6 +1,6 @@
-      SUBROUTINE TRACB9( BSMP, ESMP, X, Y, BSEG, ESEG, XOFFST, YOFFST, 
-     :                   YAMPLF, YSLOPE, XLMT, YLMT, XORDER, YORDER, 
-     :                   PEN, STATUS )      
+      SUBROUTINE TRACB9( BSMP, ESMP, X, Y, BSEG, ESEG, XOFFST, YOFFST,
+     :                   YAMPLF, YSLOPE, XLMT, YLMT, XORDER, YORDER,
+     :                   PEN, STATUS )
 *+
 *  Name:
 *     TRACB9
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL TRACB9( BSMP, ESMP, X, Y, BSEG, ESEG, XOFFST, YOFFST, 
-*                  YAMPLF, YSLOPE, XLMT, YLMT, XORDER, YORDER, 
-*                  PEN, STATUS )      
+*     CALL TRACB9( BSMP, ESMP, X, Y, BSEG, ESEG, XOFFST, YOFFST,
+*                  YAMPLF, YSLOPE, XLMT, YLMT, XORDER, YORDER,
+*                  PEN, STATUS )
 
 *  Description:
 *     This routine is used for drawing an additional curve segement on
@@ -49,10 +49,10 @@
 *     YSLOPE = REAL (Given)
 *        The slope in Y direction of the curve.
 *     XLMT( 2 ) = REAL (Given)
-*        The lower and upper X limits of the NCAR display in user's 
+*        The lower and upper X limits of the NCAR display in user's
 *        coordinates. XLMT( 2 ) should always be greater than XLMT( 1 ).
 *     YLMT( 2 ) = REAL (Given)
-*        The lower and upper Y limits of the NCAR display in user's 
+*        The lower and upper Y limits of the NCAR display in user's
 *        coordinates. YLMT( 2 ) should always be greater than YLMT( 1 ).
 *     XORDER = INTEGER (Given)
 *        When it is 0, the x coordinates of the NCAR display increases
@@ -85,7 +85,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -117,7 +117,7 @@
       INTEGER I                  ! Do loop index
       INTEGER OLDPEN             ! Previous pen number
       INTEGER OLDZON             ! Previous zone identifier
-      INTEGER ZID                ! Identifier of new zone 
+      INTEGER ZID                ! Identifier of new zone
 
       LOGICAL PENUP              ! Pen up flag
 
@@ -152,19 +152,19 @@
 
 *  Save old zone identifier and pen number.
       CALL SGS_IPEN( OLDPEN )
-      CALL SGS_ICURZ( OLDZON ) 
+      CALL SGS_ICURZ( OLDZON )
       CALL SGS_IZONE( OLDX1, OLDX2, OLDY1, OLDY2, OLDXM, OLDYM )
 
 *  Select the NCAR grid window as new zone.
       CALL SGS_ZONE( 0.0, 1.0, 0.0, 1.0, ZID, STATUS )
 
 *  If the map of the X axis of original NCAR display is not increasing
-*  from left to right, reverse the drawing order for X axis. 
+*  from left to right, reverse the drawing order for X axis.
       IF ( XORDER .NE. 0 ) THEN
          X1 = -XLMT( 2 )
          X2 = -XLMT( 1 )
          XFACT = -1.0
-         
+
 *  Otherwis keep the drawing order.
       ELSE
          X1 = XLMT( 1 )
@@ -187,7 +187,7 @@
       END IF
 
 *  Set the x and y coordinates of the new zone as the limits of the grid
-*  window in user's coordinates. 
+*  window in user's coordinates.
       CALL SGS_SW( X1, X2, Y1, Y2, STATUS )
 
 *  Set the pen number for the curve.
@@ -213,7 +213,7 @@
 
 *  while the pen is up previously, set the pen down.
             IF ( PENUP ) THEN
-               CALL SGS_BPOLY( XFACT * ( X( I ) + XOFFST ), 
+               CALL SGS_BPOLY( XFACT * ( X( I ) + XOFFST ),
      :                         YFACT * ( YAMPLF * Y( I ) + YOFFST +
      :                               YSLOPE * ( X( I ) - XCENTR ) ) )
                PENUP = .FALSE.
@@ -221,8 +221,8 @@
 *  or the pen is down previously, draw the line from previous point to
 *  this point.
             ELSE
-               CALL SGS_APOLY( XFACT * ( X( I ) + XOFFST ), 
-     :                         YFACT * ( YAMPLF * Y( I ) + YOFFST + 
+               CALL SGS_APOLY( XFACT * ( X( I ) + XOFFST ),
+     :                         YFACT * ( YAMPLF * Y( I ) + YOFFST +
      :                               YSLOPE * ( X( I ) - XCENTR ) ) )
             END IF
 

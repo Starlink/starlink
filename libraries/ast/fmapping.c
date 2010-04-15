@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -208,11 +208,11 @@ static void ast_resample_ukern1( double offset, const double params[],
 /* These functions implement the remainder of the FORTRAN interface. */
 
 F77_SUBROUTINE(ast_decompose)( INTEGER(THIS),
-                               INTEGER(MAP1), 
-                               INTEGER(MAP2), 
-                               LOGICAL(SERIES), 
-                               INTEGER(INVERT1), 
-                               INTEGER(INVERT2), 
+                               INTEGER(MAP1),
+                               INTEGER(MAP2),
+                               LOGICAL(SERIES),
+                               INTEGER(INVERT1),
+                               INTEGER(INVERT2),
                                INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_INTEGER(MAP1)
@@ -670,7 +670,7 @@ F77_SUBROUTINE(ast_trangrid)( INTEGER(THIS),
    GENPTR_INTEGER(THIS)
    GENPTR_INTEGER(NCOORD_IN)
    GENPTR_INTEGER_ARRAY(LBND)
-   GENPTR_INTEGER_ARRAY(UBND) 
+   GENPTR_INTEGER_ARRAY(UBND)
    GENPTR_DOUBLE(TOL)
    GENPTR_INTEGER(MAXPIX)
    GENPTR_LOGICAL(FORWARD)

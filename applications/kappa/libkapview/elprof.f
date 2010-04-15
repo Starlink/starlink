@@ -23,23 +23,23 @@
 *     This application will bin the input image into elliptical annuli,
 *     or into a `fan' of adjacent sectors, centred on a specified
 *     position.  The typical data values in each bin are found (see
-*     parameter ESTIMATOR), and stored in a 1-dimensional NDF which 
-*     can be examined using LINPLOT, INSPECT, etc.  A 2-dimensional mask 
-*     image can optionally be produced indicating which bin each input 
+*     parameter ESTIMATOR), and stored in a 1-dimensional NDF which
+*     can be examined using LINPLOT, INSPECT, etc.  A 2-dimensional mask
+*     image can optionally be produced indicating which bin each input
 *     pixel was placed in.
 *
-*     The area of the input image which is to be binned is the annulus 
-*     enclosed between the two concentric ellipses defined by parameter 
-*     RATIO, ANGMAJ, RMIN and RMAX. The binned area can be restricted to 
-*     an azimuthal section of this annulus using parameter ANGLIM. Input 
-*     data outside the area selected by these parameters is ignored. The 
-*     selected area can be binned in two ways, specified by parameter 
+*     The area of the input image which is to be binned is the annulus
+*     enclosed between the two concentric ellipses defined by parameter
+*     RATIO, ANGMAJ, RMIN and RMAX. The binned area can be restricted to
+*     an azimuthal section of this annulus using parameter ANGLIM. Input
+*     data outside the area selected by these parameters is ignored. The
+*     selected area can be binned in two ways, specified by parameter
 *     RADIAL:
 *
-*     - If radial binning is selected (the default), then each bin is 
-*     an elliptical annulus concentric with the ellipses bounding the 
-*     binned area. The number of bins is specified by parameter NBIN 
-*     and the radial thickness of each bin is specified by WIDTH. 
+*     - If radial binning is selected (the default), then each bin is
+*     an elliptical annulus concentric with the ellipses bounding the
+*     binned area. The number of bins is specified by parameter NBIN
+*     and the radial thickness of each bin is specified by WIDTH.
 *
 *     - If azimuthal binning is selected, then each bin is a sector
 *     (i.e. a wedge-shape), with its vertex given by parameters XC and
@@ -126,10 +126,10 @@
 *        (see parameter RADIAL) this is the width of each annulus in
 *        pixels (measured on the major axis).  If an azimuthal profile
 *        is being created, it is the opening angle of each sector, in
-*        degrees.  If a null (!) value is supplied, the value used is chosen 
-*        so that there are no gaps between adjacent bins.  Smaller values 
-*        will result in gaps appearing between adjacent bins.  The supplied 
-*        value must be small enough to ensure that adjacent bins do not 
+*        degrees.  If a null (!) value is supplied, the value used is chosen
+*        so that there are no gaps between adjacent bins.  Smaller values
+*        will result in gaps appearing between adjacent bins.  The supplied
+*        value must be small enough to ensure that adjacent bins do not
 *        overlap. The supplied value must be at least 1.0. [!]
 *     XC = _REAL (Read)
 *        The x pixel co-ordinate of the centre of the ellipse, and the
@@ -239,12 +239,12 @@
       REAL DTOR                  ! Factor to convert degrees to radians
       PARAMETER ( DTOR = 1.7453293E-2 )
 
-      REAL RTOD                  ! Factor to convert radians to degrees 
+      REAL RTOD                  ! Factor to convert radians to degrees
       PARAMETER ( RTOD = 57.29578 )
-      
+
       REAL PI                    ! Pi
       PARAMETER ( PI = 3.1415927 )
-      
+
 *  Local Variables:
       CHARACTER ESTIM*15         ! Method to use to estimate output values
       INTEGER ACTVAL             ! Actual no. of values obtained
@@ -258,7 +258,7 @@
       INTEGER IPDO               ! Pointer to mapped output DATA array
       INTEGER IPI( 2 )           ! Pointer to mapped input DATA and VARIANCE arrays
       INTEGER IPMASK             ! Pointer to ARD mask array
-      INTEGER IPMOUT             ! Pointer to mapped output mask 
+      INTEGER IPMOUT             ! Pointer to mapped output mask
       INTEGER IPVO               ! Pointer to mapped output VARIANCE array
       INTEGER IPW1               ! Pointer to mapped work array
       INTEGER IPW2               ! Pointer to mapped work array
@@ -295,7 +295,7 @@
       CALL NDF_BEGIN
 
 *  Get an input NDF with exactly two significant dimensions.
-      CALL KPG1_GTNDF( 'IN', 2, .TRUE., 'READ', INDF1, SDIM, SLBND, 
+      CALL KPG1_GTNDF( 'IN', 2, .TRUE., 'READ', INDF1, SDIM, SLBND,
      :                 SUBND, STATUS )
 
 *  Create the output NDF to hold the mean data values.  It will be
@@ -315,12 +315,12 @@
       ELSE
 
 *  Map the only DATA array of the input NDF.
-         CALL KPG1_MAP( INDF1, 'Data', '_REAL', 'READ', IPI, EL, 
+         CALL KPG1_MAP( INDF1, 'Data', '_REAL', 'READ', IPI, EL,
      :                  STATUS )
       END IF
-         
+
 *  Obtain the method to use for estimating the smoothed pixel values.
-      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,Weighted Mean', 
+      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,Weighted Mean',
      :                .FALSE., ESTIM, STATUS )
       IF( ESTIM .EQ. 'MEAN' ) THEN
          WMEAN = .FALSE.
@@ -328,7 +328,7 @@
          WMEAN = .TRUE.
       ELSE
          WMEAN = .FALSE.
-      END IF       
+      END IF
 
 *  Get the number of bins required. Use a minimum of one.
       CALL PAR_GDR0I( 'NBIN', 0, 1, VAL__MAXI, .FALSE., NBIN, STATUS )
@@ -338,31 +338,31 @@
 
 *  Map the AXIS CENTRE and WIDTH array of the output NDF.
       CALL NDF_AMAP( INDF2, 'CENTRE,WIDTH', 1, '_REAL', 'WRITE', IPAX,
-     :               NBIN, STATUS )      
+     :               NBIN, STATUS )
 
 *  Map its DATA array, and, if needed, its VARIANCE array.
       CALL KPG1_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPDO, NBIN,
      :              STATUS )
       IF ( VAR ) CALL KPG1_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE',
-     :                         IPVO, NBIN, STATUS )      
+     :                         IPVO, NBIN, STATUS )
 
 *  See if radial or tangential binning is to be used.
       CALL PAR_GET0L( 'RADIAL', RADIAL, STATUS )
 
 *  Get the x and y pixel co-ordinates of the centre of the ellipse.
 *  Use the centre of the NDF as the dynamic default.
-      CALL PAR_DEF0R( 'XC', 0.5 * REAL( SUBND( 1 ) + SLBND( 1 ) ), 
+      CALL PAR_DEF0R( 'XC', 0.5 * REAL( SUBND( 1 ) + SLBND( 1 ) ),
      :                STATUS )
       CALL PAR_GET0R( 'XC', XC, STATUS )
 
-      CALL PAR_DEF0R( 'YC', 0.5 * REAL( SUBND( 2 ) + SLBND( 2 ) ), 
+      CALL PAR_DEF0R( 'YC', 0.5 * REAL( SUBND( 2 ) + SLBND( 2 ) ),
      :                STATUS )
       CALL PAR_GET0R( 'YC', YC, STATUS )
 
 *  Find the distance from the ellipse centre to the furthest corner.
-      RLIM = SQRT( MAX( XC - REAL ( SLBND( 1 ) - 1 ), 
-     :                  REAL( SUBND( 1 ) ) - XC )**2 + 
-     :             MAX( YC - REAL ( SLBND( 2 ) - 1 ), 
+      RLIM = SQRT( MAX( XC - REAL ( SLBND( 1 ) - 1 ),
+     :                  REAL( SUBND( 1 ) ) - XC )**2 +
+     :             MAX( YC - REAL ( SLBND( 2 ) - 1 ),
      :                  REAL( SUBND( 2 ) ) - YC )**2 )
 
 *  Store the value which will be used to represent the first region
@@ -373,13 +373,13 @@
       IF ( RADIAL ) THEN
 
 *  Store the output NDF's LABEL component.
-         CALL NDF_CPUT( 'Radially binned values', INDF2, 'LABEL', 
+         CALL NDF_CPUT( 'Radially binned values', INDF2, 'LABEL',
      :                   STATUS )
 
 *  Store information about the output NDF's AXIS component.
          CALL NDF_ACPUT( 'Radius', INDF2, 'LABEL', 1, STATUS )
          CALL NDF_ACPUT( 'Pixels', INDF2, 'UNITS', 1, STATUS )
-         
+
 *  Get the orientation of the major axis, in degrees.  Ensure it is in
 *  the range 0--360, and then convert to radians.
          CALL PAR_GDR0R( 'ANGMAJ', 0.0, 0.0, 360.0, .FALSE., ANGMAJ,
@@ -398,8 +398,8 @@
             CALL MSG_OUT( 'ELPROF_MSG', '  Using %RATIO = 1.0', STATUS )
             RATIO = 1.0
 
-         END IF 
-      
+         END IF
+
 *  Get the major-axis radius of the inner edge of the inner-most
 *  elliptical annulus.  Limit it to be positive (greater than 0.0) so
 *  that ARD will not try to create an ellipse of zero area.
@@ -411,12 +411,12 @@
          END IF
 
          RMIN = MAX( 0.1, RMIN )
-      
+
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the major-axis radius of the outer edge of the outer-most
-*  elliptical annulus.  
+*  elliptical annulus.
          CALL PAR_GET0R( 'RMAX', RMAX, STATUS )
 
 *  Use the distance to the furthest corner if a null value was supplied.
@@ -427,13 +427,13 @@
 
 *  Constrain the used value to be at least RMIN + NBIN.
          IF ( RMAX .LT. RMIN + REAL( NBIN ) ) THEN
-            RMAX = RMIN + REAL( NBIN ) 
+            RMAX = RMIN + REAL( NBIN )
             CALL MSG_SETR( 'R', RMAX )
             CALL MSG_OUT( 'ELPROF_MSG', '  Using %RMAX = ^R', STATUS )
          END IF
 
 *  Get the orientations of the two radii defining the sector in which
-*  the integrations are to be done, in degrees, in the range 0--360. 
+*  the integrations are to be done, in degrees, in the range 0--360.
 *  Convert to radians.
          CALL PAR_GET1R( 'ANGLIM', 2, ANGLIM, ACTVAL, STATUS )
          IF ( ACTVAL .EQ. 1 ) ANGLIM( 2 ) = ANGLIM( 1 )
@@ -468,7 +468,7 @@
 *  annuli.  The supplied value is not allowed to be larger than this
 *  default.
          MAXWID = ( RMAX - RMIN ) / REAL( NBIN )
-         CALL PAR_GDR0R( 'WIDTH', MAXWID, 1.0, MAXWID, .FALSE., WIDTH, 
+         CALL PAR_GDR0R( 'WIDTH', MAXWID, 1.0, MAXWID, .FALSE., WIDTH,
      :                   STATUS )
 
 *  If a null value was supplied, use the dynamic default.
@@ -483,7 +483,7 @@
          ELSE
             RSTEP = 0.0
          END IF
-         
+
 *  If the step size is close to the annulus width, set the annulus
 *  width to the exact step size.  This allows for some rounding errors
 *  in the conversions between RMAX, RMIN, WIDTH, NBIN and RSTEP, and
@@ -491,7 +491,7 @@
 *  RSTEP and WIDTH are only different due to rounding errors.
          IF ( ABS( RSTEP - WIDTH ) .LT.
      :        2.0 * VAL__EPSR * ( RSTEP + WIDTH ) ) THEN
-            RSTEP = WIDTH 
+            RSTEP = WIDTH
          END IF
 
 *  Get some temporary workspace.
@@ -500,33 +500,33 @@
 *  Create the ARD description, storing the axis value for each bin in
 *  the AXIS component of the output NDF.
          CALL KPS1_ELPR1( NX, NY, ANGMAJ, RATIO, NBIN, RSTEP, RMIN,
-     :                    WIDTH, XC, YC, ANGLIM( 1 ), ANGLIM( 2 ), 
-     :                    USESEC, REGVAL, IGRP, 
+     :                    WIDTH, XC, YC, ANGLIM( 1 ), ANGLIM( 2 ),
+     :                    USESEC, REGVAL, IGRP,
      :                    %VAL( CNF_PVAL( IPW1 ) ),
-     :                    %VAL( CNF_PVAL( IPAX( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPAX( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPAX( 2 ) ) ), STATUS )
 
 *  Propagate WCS from input to output.
-         CALL KPS1_ELPR5( INDF1, INDF2, ANGMAJ, RATIO, NBIN, RMIN, 
+         CALL KPS1_ELPR5( INDF1, INDF2, ANGMAJ, RATIO, NBIN, RMIN,
      :                    RMAX, XC, YC, STATUS )
 
 *  If tangetial (sector) bins are being used...
       ELSE
 
 *  Store the output NDF's LABEL component.
-         CALL NDF_CPUT( 'Azimuthally binned values', INDF2, 'LABEL', 
+         CALL NDF_CPUT( 'Azimuthally binned values', INDF2, 'LABEL',
      :                   STATUS )
 
 *  Store information about the output NDF's AXIS component.
          CALL NDF_ACPUT( 'Azimuthal angle', INDF2, 'LABEL', 1, STATUS )
          CALL NDF_ACPUT( 'Degrees', INDF2, 'UNITS', 1, STATUS )
-         
+
 *  Abort if an error has occurred.
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the orientation of the major axis, in degrees, in the range
 *  0--360.  Convert to radians.
-         CALL PAR_GDR0R( 'ANGMAJ', 0.0, 0.0, 360.0, .FALSE., ANGMAJ, 
+         CALL PAR_GDR0R( 'ANGMAJ', 0.0, 0.0, 360.0, .FALSE., ANGMAJ,
      :                   STATUS )
          ANGMAJ = ANGMAJ * DTOR
 
@@ -537,10 +537,10 @@
 *  Get the major-axis radius of the inner edge of the elliptical
 *  annulus.  Limit it to be positive (greater than 0.0) so that ARD
 *  will not try to create an ellipse of zero area.
-         CALL PAR_GDR0R( 'RMIN', 0.0, 0.0, VAL__MAXR, .FALSE., RMIN, 
+         CALL PAR_GDR0R( 'RMIN', 0.0, 0.0, VAL__MAXR, .FALSE., RMIN,
      :                   STATUS )
          RMIN = MAX( 0.1, RMIN )
-      
+
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -574,8 +574,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the width of each annulus, constraining it to be at least 0.1
-*  degree. 
-         CALL PAR_GDR0R( 'WIDTH', MAXWID, 0.1, MAXWID, .FALSE., WIDTH, 
+*  degree.
+         CALL PAR_GDR0R( 'WIDTH', MAXWID, 0.1, MAXWID, .FALSE., WIDTH,
      :                   STATUS )
          WIDTH = DTOR * WIDTH
 
@@ -593,30 +593,30 @@
             PASTEP  = ( ANGLIM( 2 ) - ANGLIM( 1 ) - WIDTH )
      :                / REAL( NBIN - 1 )
          END IF
-         
+
 *  If the step size is close to the sector width, set the sector width
 *  to the exact step size.  This prevents the following error report
 *  from being produced when PASTEP and WIDTH are only different due to
 *  rounding errors.
          IF ( ABS( PASTEP - WIDTH ) .LT.
      :       2.0 * VAL__EPSR * ( PASTEP + WIDTH ) ) THEN
-            PASTEP = WIDTH 
+            PASTEP = WIDTH
          END IF
-      
+
 *  Get some temporary workspace.
-         CALL PSX_CALLOC( 3 + NBIN, '_INTEGER', IPW1, STATUS )         
+         CALL PSX_CALLOC( 3 + NBIN, '_INTEGER', IPW1, STATUS )
 
 *  See if the binning area covers the entire image. We can speed up the
 *  binning process if it does.
-         USEANN = ( RMIN .GT. 0.0 .OR. 
-     :              RMAX .LT. MAX( NX, NY ) .OR. 
+         USEANN = ( RMIN .GT. 0.0 .OR.
+     :              RMAX .LT. MAX( NX, NY ) .OR.
      :              MAXWID .LT. 2*PI )
-   
+
 *  Create the ARD description, storing the axis value for each bin in
 *  the AXIS component of the output NDF.
          CALL KPS1_ELPR2( NX, NY, USEANN, ANGMAJ, RATIO, RMIN, RMAX, XC,
-     :                    YC , NBIN, ANGLIM( 1 ), WIDTH, PASTEP, REGVAL, 
-     :                    IGRP, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                    YC , NBIN, ANGLIM( 1 ), WIDTH, PASTEP, REGVAL,
+     :                    IGRP, %VAL( CNF_PVAL( IPW1 ) ),
      :                    %VAL( CNF_PVAL( IPAX( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPAX( 2 ) ) ), STATUS )
       END IF
@@ -626,22 +626,22 @@
       CALL PSX_CALLOC( NBIN, '_INTEGER', IPW2, STATUS )
 
 *  Find the mean and variance of the data values in each bin.
-      CALL KPS1_ELPR3( VAR, SLBND( 1 ), SUBND( 1 ), SLBND( 2 ), 
-     :                 SUBND( 2 ), %VAL( CNF_PVAL( IPI( 1 ) ) ), 
+      CALL KPS1_ELPR3( VAR, SLBND( 1 ), SUBND( 1 ), SLBND( 2 ),
+     :                 SUBND( 2 ), %VAL( CNF_PVAL( IPI( 1 ) ) ),
      :                 %VAL( CNF_PVAL( IPI( 2 ) ) ),
-     :                 IGRP, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 IGRP, %VAL( CNF_PVAL( IPW1 ) ),
      :                 NBIN, WMEAN, REGVAL,
-     :                 %VAL( CNF_PVAL( IPDO ) ), 
-     :                 %VAL( CNF_PVAL( IPVO ) ), 
+     :                 %VAL( CNF_PVAL( IPDO ) ),
+     :                 %VAL( CNF_PVAL( IPVO ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 %VAL( CNF_PVAL( IPMASK ) ), STATUS )
 
 *  Store a new title in the output NDF.
       CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDF1, INDF2, STATUS )
-      
+
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
 *  Get an NDF in which to store the mask.
       CALL LPG_PROP( INDF1, 'WCS,AXIS', 'MASK', INDF3, STATUS )
 
@@ -656,7 +656,7 @@
 
 *  Copy the mask to the output NDF, transforming the mask values from
 *  integer bin indices, into bin AXIS CENTRE values.
-         CALL KPS1_ELPR4( EL, %VAL( CNF_PVAL( IPMASK ) ), NBIN, 
+         CALL KPS1_ELPR4( EL, %VAL( CNF_PVAL( IPMASK ) ), NBIN,
      :                    %VAL( CNF_PVAL( IPAX( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPMOUT ) ), STATUS )
 
@@ -664,7 +664,7 @@
          CALL KPG1_CCPRO( 'MTITLE', 'TITLE', INDF1, INDF3, STATUS )
 
       END IF
-      
+
 *  Jump to here if an error occurs.
  999  CONTINUE
 
@@ -672,16 +672,16 @@
       CALL PSX_FREE( IPMASK, STATUS )
       CALL PSX_FREE( IPW1, STATUS )
       CALL PSX_FREE( IPW2, STATUS )
-      
+
 *  Delete the group containing the ARD description.
       CALL GRP_DELET( IGRP, STATUS )
-      
+
 *  If an error has occurred, attempt to delete the output NDF.
-      IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF2, STATUS )      
+      IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF2, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
-      
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
            CALL ERR_REP( 'ELPROF_ERR1', 'ELPROF: Unable to create an '/

@@ -325,7 +325,7 @@ C    :           '! ',  i5, i5, i5, i5, i5)
                   IF (STYPI(CURCMP) .NE. CAT__TYPEC  .AND.
      :                STYPI(CURCMP) .NE. CAT__TYPEL) THEN
                      CALL CAP_GSTAR (SNNROW(CURCMP),
-     :                 %VAL(CNF_PVAL(SCLPTR(CURCMP))), 
+     :                 %VAL(CNF_PVAL(SCLPTR(CURCMP))),
      :                 %VAL(CNF_PVAL(WRKPTR)),
      :                 MINVL, MINVLN,   MAXVL, MAXVLN,   RANGE, RANGEN,
      :                 QUAR1, QUAR1N,   QUAR3, QUAR3N,   IQRNG, IQRNGN,

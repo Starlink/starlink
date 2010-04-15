@@ -32,7 +32,7 @@
 *     using parameter SIZE.
 
 *  Usage:
-*     SKYPHOT 
+*     SKYPHOT
 
 *  ADAM Parameters:
 *     BACKVAL = REAL (Read)
@@ -125,9 +125,9 @@
 *        SIZE - Change the value of the SIZE parameter.
 *
 *        BACKVAL - Change the value of the BACKVAL parameter.
-*        
+*
 *     PEN = INTEGER (Read)
-*        The SGS pen number used to draw the graphics specified by 
+*        The SGS pen number used to draw the graphics specified by
 *        parameter PLOT.                                             [3]
 *     PLOT = LOGICAL (Read)
 *        If a true value is supplied, then the area over which the flux
@@ -166,7 +166,7 @@
 *        arc-minutes is displayed, and the application exits.
 
 *  Notes:
-*     - Flux density values are displayed in units of Janskys, and 
+*     - Flux density values are displayed in units of Janskys, and
 *     surface brightness values in mega-Janskys per steradian.
 *     - The last displayed values are written to output parameters
 *     FLUX, MEAN and SIGMA and can be accessed by subsequent
@@ -195,7 +195,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -208,7 +208,7 @@
       INCLUDE 'IRI_PAR'          ! IRI_ constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-                               
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -222,7 +222,7 @@
       CHARACTER FILE*(GRP__SZFNM) ! Name of input text file.
       CHARACTER MODE*8            ! Source of input coordinates.
       CHARACTER OPTION*8          ! Option for next operation.
-      CHARACTER SCS*(IRA__SZSCS)  ! Sky coordinates system in which 
+      CHARACTER SCS*(IRA__SZSCS)  ! Sky coordinates system in which
                                   ! keyboard input is expected, and in
                                   ! which output values are displayed.
       CHARACTER SHAPE*9           ! Aperture shape.
@@ -466,10 +466,10 @@
 
 *  If cursor mode is selected...
             IF( MODE .EQ. 'CURSOR' ) THEN
-         
+
 *  If a graphics device has already been set up, use it. Otherwise,
 *  open the AGI database and set up the specified device.
-               IF( .NOT. DEVOPN ) THEN 
+               IF( .NOT. DEVOPN ) THEN
                   CALL SPHOB1( 'DEVICE', PICID, X1, X2, Y1, Y2, STATUS )
 
 *  If all has gone OK, indicate that the graphics device is now open.
@@ -508,7 +508,7 @@
      :'any button (position the cursor outside the image to exit).',
      :                               STATUS )
                   END IF
-      
+
                   CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Record the source of input coordinates  in the log file.
@@ -528,18 +528,18 @@
                CALL SGS_REQCU( X, Y, NKEY )
 
 *  If the cursor position is outside the area including the picture and
-*  the safety margin, flag that the current operation is complete, 
-*  switch off the cursor, complete any polyline, and set the first and 
+*  the safety margin, flag that the current operation is complete,
+*  switch off the cursor, complete any polyline, and set the first and
 *  last points bad.
                IF( X .LT. X1 .OR. X .GT. X2 .OR.
      :             Y .LT. Y1 .OR. Y .GT. Y2 ) THEN
                   MORE = .FALSE.
                   CALL SGS_CUVIS( .FALSE. )
-                  
+
                   IF( FIRSTX .NE. VAL__BADR .AND.
      :                FIRSTY .NE. VAL__BADR .AND.
      :                LASTX .NE. VAL__BADR .AND.
-     :                LASTY .NE. VAL__BADR .AND. 
+     :                LASTY .NE. VAL__BADR .AND.
      :                PLOT .AND. SHAPE .EQ. 'POLYGON' ) THEN
 
                      CALL SGS_LINE( FIRSTX, FIRSTY, LASTX, LASTY )
@@ -549,19 +549,19 @@
                      FIRSTY = VAL__BADR
                      LASTX = VAL__BADR
                      LASTY = VAL__BADR
-                  
+
                   END IF
 
 *  If the position is within the usable area, see if any graphics are
 *  to be produced.
-               ELSE 
+               ELSE
                   IF( PLOT ) THEN
 
 *  If a polyline is being produced...
                      IF( SHAPE .EQ. 'POLYGON' ) THEN
 
-*  If this is the first position, draw a dot, and store the starting 
-*  coordinates.                     
+*  If this is the first position, draw a dot, and store the starting
+*  coordinates.
                         IF( NEWOP ) THEN
                            CALL SGS_MARK( X, Y, 1 )
                            FIRSTX = X
@@ -604,8 +604,8 @@
 *  If no file contents are available...
                   IF( .NOT. GOTFIL ) THEN
 
-*  Get the name of a file from the environment, read its contents into 
-*  a GRP group, and close the file. The name of the coordinate system 
+*  Get the name of a file from the environment, read its contents into
+*  a GRP group, and close the file. The name of the coordinate system
 *  used by the data in the file is returned in COORDS.
                      CALL SPHOA0( 'FILE', IGRP, COORDS, SIZE, FILE,
      :                            LFILE, STATUS )
@@ -614,7 +614,7 @@
                      CALL PAR_CANCL( 'FILE', STATUS )
 
 *  If all has gone well, indicate that the contents of a file are now
-*  available, and initialise the pointer to the first coordinate. 
+*  available, and initialise the pointer to the first coordinate.
 *  Record the source of coordinates in the log file.
                      IF( STATUS .EQ. SAI__OK ) THEN
                         GOTFIL = .TRUE.
@@ -631,7 +631,7 @@
                      ELSE
                         CALL GRP_DELET( IGRP, STATUS )
 
-                     END IF               
+                     END IF
 
                   END IF
 
@@ -648,7 +648,7 @@
                ELSE
                   CALL GRP_GET( IGRP, INDEX, 2, TEXT, STATUS )
 
-*  Increment the index of the next pair of coordinates.               
+*  Increment the index of the next pair of coordinates.
                   INDEX = INDEX + 2
 
 *  Convert the text strings into floating point sky coordinate values.
@@ -687,7 +687,7 @@
                   END IF
 
                END IF
- 
+
 *  Get the sky coordinates of the aperture centre from the environment
 *  and then cancel the parameter values.
                CALL MSG_BLANKIF( MSG__NORM, STATUS )
@@ -743,7 +743,7 @@
 
 *  If the aperture is a polygon, store the new coordinates. Report an
 *  error if the coordinate list is full.
-                  IF( SHAPE .EQ. 'POLYGON' ) THEN      
+                  IF( SHAPE .EQ. 'POLYGON' ) THEN
                      NVERT = NVERT + 1
 
                      IF( NVERT .GT. MXVERT .AND.
@@ -753,7 +753,7 @@
                         CALL ERR_REP( 'SKYPHOT_ERR2', 'SKYPHOT: '//
      :                                'Maximum number of vertices '//
      :                                '(^MAX) exceeded.', STATUS )
-                     ELSE 
+                     ELSE
                         XVERT( NVERT ) = X
                         YVERT( NVERT ) = Y
 
@@ -806,7 +806,7 @@
 *  requested or an error occurs.
             OPTION = ' '
             DO WHILE( OPTION .NE. 'CONTINUE' .AND. .NOT. EXIT .AND.
-     :                STATUS .EQ. SAI__OK ) 
+     :                STATUS .EQ. SAI__OK )
 
 *  Get the next operation to perform, and then cancel the parameter.
                CALL PAR_CHOIC( 'OPTION', 'Continue', 'Continue,Exit,'//
@@ -816,7 +816,7 @@
                CALL PAR_CANCL( 'OPTION', STATUS )
 
 *  If an exit has been requested, flag it.
-               IF( OPTION .EQ. 'EXIT' ) THEN      
+               IF( OPTION .EQ. 'EXIT' ) THEN
                   EXIT = .TRUE.
 
 *  If the user has requested a change of mode, cancel the old value and
@@ -842,7 +842,7 @@
      :                             STATUS )
                   END IF
 
-*  If the user has requested a change of graphics pen, cancel the 
+*  If the user has requested a change of graphics pen, cancel the
 *  old value and get a new value.
                ELSE IF( OPTION .EQ. 'PEN' ) THEN
                   CALL PAR_CANCL( 'PEN', STATUS )
@@ -864,7 +864,7 @@
                      CALL FIO_WRITE( FD, TEXT( 1 )( : IAT ), STATUS )
                   END IF
 
-*  If a non-polygonal shape is now being used, but the current aperture 
+*  If a non-polygonal shape is now being used, but the current aperture
 *  size is zero, get a value for the aperture size and log it.
                   IF( SHAPE .NE. 'POLYGON' .AND.
      :                ASIZE( 1 ) .EQ. 0.0 ) THEN
@@ -952,7 +952,7 @@
 
 *  If looping is not required, indicate an immediate exit.
          ELSE
-            EXIT = .TRUE.            
+            EXIT = .TRUE.
 
          ENDIF
 
@@ -995,5 +995,5 @@
      :                 'SKYPHOT: Error finding integrated flux values.',
      :                 STATUS )
       END IF
-      
+
       END

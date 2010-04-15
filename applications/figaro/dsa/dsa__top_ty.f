@@ -54,7 +54,7 @@ C  Subroutine / function details:
 C     DSA__NDF_TOP_NAME     Classify an NDF top level item and warn if unknown
 C
 C  Common variable details:
-C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C     (>) OBJ_NAMES     (String array) Name (as recognised by DTA_) of data
 C                       object corresponding to reference name.
 C     (>) NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
 C                       NDF format (described in SGP38).  If false, format is

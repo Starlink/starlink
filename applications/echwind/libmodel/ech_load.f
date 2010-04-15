@@ -124,7 +124,7 @@
 *     08 Dec 1989  : Original version (AAOEPP::WFL)
 *     23 Sep 1994  : Added COLLXE, PRFACE, PRAPEX, BLAZE0, THETACAM, GAMAFAC
 *                    (MPF/RGO)
-*     05 Feb 1997  : Modified calls to str$upcase to str_upcase for 
+*     05 Feb 1997  : Modified calls to str$upcase to str_upcase for
 *                    Linux port (BLY,RAL).
 *     21 Aug 2005  : Use str_len rather than lnblnk to be more portable (TJ,JACH)
 *

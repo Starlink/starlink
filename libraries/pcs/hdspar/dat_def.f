@@ -57,9 +57,9 @@
 
 *  History:
 *     10-DEC-1984 (BDK)
-*        Original 
+*        Original
 *      1-SEP-1993 (AJC)
-*        Correctly comment inherited LOC size 
+*        Correctly comment inherited LOC size
 *     16-JUN-1998 (AJC)
 *        Re-format prologue
 *     {enter_further_changes_here}

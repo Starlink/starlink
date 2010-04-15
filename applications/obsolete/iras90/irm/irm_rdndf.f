@@ -1,4 +1,4 @@
-      SUBROUTINE  IRM_RDNDF( PARAM, MAXSIZ, MINSIZ, TEXT, IGRP, SIZE, 
+      SUBROUTINE  IRM_RDNDF( PARAM, MAXSIZ, MINSIZ, TEXT, IGRP, SIZE,
      :                       STATUS )
 *+
 *  Name:
@@ -32,12 +32,12 @@
 *     supplied with the value zero no limit is imposed on the number of
 *     NDFs within the group.  If the final group contains less than the
 *     minimum no. of NDFs specified by argument MINSIZ, then the user is
-*     asked to supply more NDFs. All messages issued by this routine 
+*     asked to supply more NDFs. All messages issued by this routine
 *     have a priority level of MSG__NORM.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The parameter (of type LITERAL). 
+*        The parameter (of type LITERAL).
 *     MAXSIZ = INTEGER (Given)
 *        The maximum number of NDFs which can be allowed in the
 *        returned group. If zero is supplied, no limit is imposed.
@@ -46,12 +46,12 @@
 *        returned group. If zero is supplied, then the returned group
 *        may contain no NDFs.
 *     TEXT = CHARACTER * ( * ) (Given)
-*        The text to display between issuing prompts for successive 
+*        The text to display between issuing prompts for successive
 *        group expressions. If blank then no text is displayed.
 *     IGRP = INTEGER (Returned)
 *        The GRP identifier for the returned group holding all the
 *        specified NDFs. The group should be deleted using GRP_DELET
-*        when it is no longer needed. If an error occurs, the value 
+*        when it is no longer needed. If an error occurs, the value
 *        GRP__NOID is returned.
 *     SIZE = INTEGER (Returned)
 *        The number of files in the output group. SIZE is returned equal
@@ -209,7 +209,7 @@
          IF( .NOT. FLAG ) THEN
 
 *  Check that the minimum no. of NDFS has been supplied. If not, ask the
-*  user for more NDFs, and set FLAG to cause another prompt to be 
+*  user for more NDFs, and set FLAG to cause another prompt to be
 *  issued.
             IF( SIZE .LT. MINSIZ ) THEN
 
@@ -235,7 +235,7 @@
 
 *  If an error has occured, return SIZE with the value 1 to avoid
 *  potential access violations if SIZE is used as the dimension of a
-*  passed array. Also, attempt to delete the group and set IGRP to 
+*  passed array. Also, attempt to delete the group and set IGRP to
 *  GRP__NOID.
  999  CONTINUE
       IF( STATUS .NE. SAI__OK ) THEN

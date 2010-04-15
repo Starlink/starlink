@@ -19,7 +19,7 @@
 !    stars, even the ones with sigma greater than 0.1. The results for all
 !    stars are outputted to the file `prefix'anstd.results. This outputs
 !    the star name, airmass of the observation (the H observation for the J-H
-!    colour, and the K observation for the H-K colour), the type of the 
+!    colour, and the K observation for the H-K colour), the type of the
 !    observation (whether it is an `I'ndividual, or a `M'osaic), the zeropoint,
 !    the sigma, and the residual.
 !
@@ -30,7 +30,7 @@
 !    have a sigma less than 0.1. The other ones are flagged by having their
 !    source name prefixed with `## ', and the residual is not displayed.
 !
-! 5) This program also derives colours and magnitudes for the new faint 
+! 5) This program also derives colours and magnitudes for the new faint
 !    standards. Using the same algorithm as to calculate the zeropoints, it
 !    calculates the instramental colour and then applies the airmass to the
 !    appropriate extinction curve in order to derive a zeropoint, and then
@@ -41,16 +41,16 @@
 !    magnitudes in the individual measurements, and the stnadrd deviations of
 !    both the slope and the intercept for the extinction curves. For the
 !    linear relation y = mx + b, let the slope have an absolut unceratinty of
-!    delm, and the intercept of an absolute uncertainty of delb. dely, 
+!    delm, and the intercept of an absolute uncertainty of delb. dely,
 !    therefore, is given by dely = sqrt( (delm*x)**2 + delb**2). We then
-!    have to add our y result to the inst. colour/magnitude, which is 
-!    z+/-delz. The final uncertainty, delf, is therefore 
+!    have to add our y result to the inst. colour/magnitude, which is
+!    z+/-delz. The final uncertainty, delf, is therefore
 !    sqrt( dely**2 + delz**2).
 !
 !    I made no restrictions on the scatter of the points. That is, magnitudes
 !    and colours were calculated no matter what the sigma of the observations
 !    was.
-       
+
 	implicit none
 
 	integer l1, chr_len
@@ -61,11 +61,11 @@
         integer c1, c2, c3, tallyj, tallyk, mark
 
 ! These arrays hopd the data from the stdred_photometry.results file.
- 
+
 	real ap1( 2000), ap2( 2000), ap3( 2000), nstdj( 2000), nstdk( 2000)
 	real ps( 2000), zp( 2000), am( 2000), actmag( 2000), residj( 2000)
         real residk( 2000), kmag
-	real objmsky( 2000), i3mag( 2000), calzp( 2000), zp1( 2000),zp2( 2000) 
+	real objmsky( 2000), i3mag( 2000), calzp( 2000), zp1( 2000),zp2( 2000)
 
 ! These are the statistics variables
 
@@ -76,7 +76,7 @@
         real*8 ksum, ksumsq, kmean, kmeanam, ksumam, ksumamsq, ksumprod
         real*8 kssq, jssq, hssq, jstanderr, kstanderr, hstanderr
         real*8 hstd, jstd, kstd, jintstd, hintstd, kintstd, tempstd
-        real*8 jmh, actjmh, hmk, acthmk, actj, instj, acth, insth, actk, instk 
+        real*8 jmh, actjmh, hmk, acthmk, actj, instj, acth, insth, actk, instk
 
 	character file1*80, dline*132, lines( 2000)*132, file2*80, date*80
 	character words( 20)*80, all( 20, 2000)*80, objnam( 2000)*30
@@ -119,7 +119,7 @@
         end do
 
 ! Read all the photometry lines, and put them into the array `lines'
-    
+
 	more = .true.
 	nlines = 0
 	do while ( more)
@@ -128,7 +128,7 @@
 	  lines( nlines) = dline
 ! Turn them into uppercase
 	  call chr_ucase( dline)
-! Get the positions of the first and last characters in the line 
+! Get the positions of the first and last characters in the line
 	  call chr_fandl( dline, n, m)
 	  if( dline( n:n+7) .eq. 'FILENAME') then
 	    lstart = nlines + 1
@@ -136,7 +136,7 @@
 	end do
   200	continue
 	nlines = nlines - lstart
-	type *, 'Number of photometry lines of data in file = ', 
+	type *, 'Number of photometry lines of data in file = ',
      :	  nlines
 	close( 142)
 
@@ -157,16 +157,16 @@
 	  call chr_fandl( all( 1, l), n, m)
 	  ipos1 = index( all( 1, l), '_')
 ! Make sure we find the object name
-          if((all( 1, l)( ipos1+4:ipos1+4) .ne. 'f') .and. 
-     :       (all( 1, l)( ipos1+4:ipos1+4) .ne. 'm') .and. 
-     :       (all( 1, l)( ipos1+4:ipos1+4) .ne. 'd') .and. 
+          if((all( 1, l)( ipos1+4:ipos1+4) .ne. 'f') .and.
+     :       (all( 1, l)( ipos1+4:ipos1+4) .ne. 'm') .and.
+     :       (all( 1, l)( ipos1+4:ipos1+4) .ne. 'd') .and.
      :       (all( 1, l)( ipos1+4:ipos1+4) .ne. '_')) then
              if( (ipos1+2) .eq. '_') then
                    ipos1 = ipos1+2
              else
                    ipos1 = ipos1+3
              end if
-          end if  
+          end if
 	  objnam( l) = all( 1, l)( n:ipos1-1)
 	  call chr_ucase( objnam( l))
 	  ipos2 = index( all( 1, l), '.')
@@ -251,7 +251,7 @@
         high = .false.
 ! Now we go through each line and calculate the J-H and H-K zeropoints for
 ! each FS star. This algorithm expects the photometry in a J, H, K order, but
-! can handle problems such as no J observation, no K observation, etc.  
+! can handle problems such as no J observation, no K observation, etc.
         do while ( j .le. nlines)
           j = j + 1
           if( actmag( j) .ne. -99.99) then
@@ -264,7 +264,7 @@
             else
               tempmean = tempsum/numpix
 	      variance = ( tempsumsq - numpix*tempmean**2)
-              if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN      
+              if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN
                 variance  =  0.0d0
               else
                 variance  =  variance/( numpix-1.0d0)
@@ -287,7 +287,7 @@
 ! If we've come across a J...
                   if( mark .ne. 0) then
 ! If the object names of this H and the previous J are the same...
-                    if( lle( objnam( j), objnam( mark)) .and. 
+                    if( lle( objnam( j), objnam( mark)) .and.
      :                     lge( objnam( j), objnam( mark))) then
                       acth = actmag( j)
                       insth = i3mag( j)
@@ -317,20 +317,20 @@
                     end if
                   else
 ! If we haven't come across a J, but the next one is a K...
-                    if( ( lle( objnam( j+1), objnam( j)) .and. 
+                    if( ( lle( objnam( j+1), objnam( j)) .and.
      :                     lge( objnam( j+1), objnam( j))) .and.
      :                     ( filt(j+1) .eq. 'K')) then
                       acth = actmag( j)
                       insth = i3mag( j)
                       mark = j
                       tempstd = std
-                    end if 
+                    end if
                   end if
               else if( filt(j ) .eq. 'K') then
 ! If we've come across an H...
                   if( mark .ne. 0) then
 ! If that H and this K, have the same object names...
-                    if ( lle( objnam( j), objnam( mark)) .and. 
+                    if ( lle( objnam( j), objnam( mark)) .and.
      :                     lge( objnam( j), objnam( mark))) then
                       actk = actmag( j)
                       instk = i3mag( j)
@@ -340,14 +340,14 @@
                         zp2( tallyk) = -99.99
                         tallyk = tallyk + 1
                       end if
-! Similarly to J-H... 
+! Similarly to J-H...
                       tempstd = sqrt(tempstd**2 + std**2)
                       nstdk(tallyk) = tempstd
                       hmk = insth - instk
                       acthmk = acth - actk
                       zp2(tallyk) = acthmk - hmk
                       if( sngl( tempstd) .le. 0.1) then
-                        c3 = c3 + 1 
+                        c3 = c3 + 1
                         hsum = hsum + dble( zp2( tallyk))
                         hsumsq = hsumsq + dble( zp2( tallyk))**2
                         hsumam = hsumam + dble(am( j)-1)
@@ -358,7 +358,7 @@
                       flag = .true.
                     end if
                   end if
-              end if 
+              end if
               if ( flag) then
                  mark = 0
                  flag = .false.
@@ -391,7 +391,7 @@
 	    end do
 	    tempmean = tempsum/numpix
 	    variance = ( tempsumsq - numpix*tempmean**2)
-            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN      
+            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN
               variance  =  0.0d0
             else
               variance  =  variance/( numpix-1.0d0)
@@ -408,7 +408,7 @@
 	      if( itype .eq. 'I') then
 ! If its sigma is less than 0.1...
 	        if( sngl( std) .le. 0.1) then
-! Compute the parameters needed to compute the extinction curve 
+! Compute the parameters needed to compute the extinction curve
                   do p = gstart( j), gend( j)
                      ksum = ksum + dble(calzp( p))
                      ksumsq = ksumsq + dble(calzp( p))**2
@@ -446,10 +446,10 @@
         kmeanam = ksumam/kcount
         kmean = ksum/kcount
         slopek = (ksumprod - ksumam * kmean)/(ksumamsq - ksumam * kmeanam)
-        kint = kmean - slopek * kmeanam        
+        kint = kmean - slopek * kmeanam
         kssq = (ksumsq - kint * ksum - slopek * ksumprod)/kcount
         kstanderr = dsqrt(kssq)
-        kstd = dsqrt(kssq/(ksumamsq - (ksumam**2/kcount)))               
+        kstd = dsqrt(kssq/(ksumamsq - (ksumam**2/kcount)))
 
 
 ! Using the same algorithm to find and compute the J-H and H-K zeropints, we
@@ -473,7 +473,7 @@
             else
               tempmean = tempsum/numpix
 	      variance = ( tempsumsq - numpix*tempmean**2)
-              if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN      
+              if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN
                 variance  =  0.0d0
               else
                 variance  =  variance/( numpix-1.0d0)
@@ -488,7 +488,7 @@
               end if
               if( filt( j) .eq. 'H') then
                 if( mark .ne. 0) then
-                  if ( lle( objnam( j), objnam( mark)) .and. 
+                  if ( lle( objnam( j), objnam( mark)) .and.
      :                   lge( objnam( j), objnam( mark))) then
                     tallyj = tallyj + 1
 ! Compute the residual
@@ -500,11 +500,11 @@
 ! If the sigma is less than 0.1, output with the residual included,
 ! and compute the parameter needed for the intercept's sigma...
                     if( sngl( tempstd) .le. 0.1) then
-                      write(144, '(a5,4f10.3,f10.5)') objnam(j)(n:m), 
+                      write(144, '(a5,4f10.3,f10.5)') objnam(j)(n:m),
      :                    am(j), sngl( zp1(tallyj)), sngl( tempstd), resid
-                      jresidsq = jresidsq + resid**2  
+                      jresidsq = jresidsq + resid**2
 ! otherwise, flag the observation, and don't output the residual
-                    else 
+                    else
                       write(144, '(a,a,4f10.3)') '**  ', objnam( j)(n:m),
      :                  am( j), sngl(zp1(tallyj)), sngl( tempstd)
                     end if
@@ -512,7 +512,7 @@
                     mark = j
                   end if
                 else
-                  if( ( lle( objnam( j+1), objnam( j)) .and. 
+                  if( ( lle( objnam( j+1), objnam( j)) .and.
      :                   lge( objnam( j+1), objnam( j))) .and.
      :                   ( filt(j+1) .eq. 'K')) then
                     mark = j
@@ -523,7 +523,7 @@
 ! similarly for H-K
               if( filt(j ) .eq. 'K') then
                 if( mark .ne. 0) then
-                  if ( lle( objnam( j), objnam( mark)) .and. 
+                  if ( lle( objnam( j), objnam( mark)) .and.
      :                   lge( objnam( j), objnam( mark))) then
                     tallyk = tallyk + 1
                     if( zp2(tallyk) .eq. -99.99) then
@@ -535,7 +535,7 @@
                     if( m .lt. 12) m = 12
                     tempstd = sqrt(tempstd**2 + std**2)
                     if( sngl( tempstd) .le. 0.1) then
-                      write(145, '(a5,4f10.3,f10.5)') objnam(j)(n:m), 
+                      write(145, '(a5,4f10.3,f10.5)') objnam(j)(n:m),
      :                    am(j), sngl( zp2(tallyk)), sngl( tempstd), resid
                       hresidsq = hresidsq + resid**2
                     else
@@ -553,7 +553,7 @@
             end if
           end if
         end do
-        
+
 ! Here we output the `prefix'anstd.results file, as well as the `prefix'k.zp
 ! file, iterating by groups...
         tallyj = 0
@@ -573,7 +573,7 @@
 	    end do
 	    tempmean = tempsum/numpix
 	    variance = ( tempsumsq - numpix*tempmean**2)
-            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN      
+            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN
               variance  =  0.0d0
             else
               variance  =  variance/( numpix-1.0d0)
@@ -596,7 +596,7 @@
                    resid = tempmean - (kint + slopek * (am( gstart( j))-1))
                    kresidsq = kresidsq + resid**2
                    c2 = c2 + 1
-                   write( 146, '(a5,4f10.3,f10.5)') objnam( gstart( j))( n:m), 
+                   write( 146, '(a5,4f10.3,f10.5)') objnam( gstart( j))( n:m),
      :             am( gstart( j)),
      :	           sngl( tempmean), sngl( std),resid
 ! otherwise, don't output the residual
@@ -609,14 +609,14 @@
                 end if
               else
 ! compute the residual for the mosaic
-                resid = tempmean - (kint + slopek * (am( gstart( j))-1))  
+                resid = tempmean - (kint + slopek * (am( gstart( j))-1))
               end if
            end if
            if( filt( gstart( j)) .eq. 'J') then
 ! Now output the J-H zp, residual, etc. to the anstd.results file
              if( itype .eq. 'M') then
                tallyj = tallyj + 1
-               write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f10.5)') 
+               write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f10.5)')
      :	         objnam( gstart( j))( n:m),
      :	         'J-H','     ',itype,'   ',
      :	         am( gstart( j)), zp1(tallyj), '   ', nstdj(tallyj),
@@ -627,7 +627,7 @@
              if( itype .eq. 'M') then
                tallyk = tallyk + 1
                if( zp2(tallyk) .ne. -99.99) then
-                 write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f10.5)') 
+                 write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f10.5)')
      :	             objnam( gstart( j))( n:m),
      :	             'H-K','     ',itype,'   ',
      :               am( gstart( j)), zp2(tallyk), '   ', nstdk(tallyk),
@@ -636,12 +636,12 @@
              end if
            else if( filt( gstart( j)) .eq. 'K') then
 ! Finally for K
-             write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f10.5)') 
+             write( 143, '(a,a,a,a,a,2f10.3,a,f7.3,a,f10.3,a,f10.5)')
      :       objnam( gstart( j))( n:m),
      :	     filt( gstart( j))( n2:m2),'  ',itype,'   ',
      :	     am( gstart( j)), sngl( tempmean), '   ', sngl( std),'     ',resid
            end if
-          end if 
+          end if
         end do
 
 ! Compute the sigmas for the intercepts...
@@ -649,7 +649,7 @@
         hintstd = sqrt( (hresidsq/(c3*(c3-2))) + hmeanam * (hstd**2) )
         kintstd = sqrt( (kresidsq/(c2*(c2-2))) + kmeanam * (kstd**2) )
 
-! And output the statisitics to the end of the *.zp files     
+! And output the statisitics to the end of the *.zp files
         write( 144, '(a,f10.5,2x,f6.3)') 'Best fit: slope and intercept = ',
      :  slopej,jint
         write( 144, '(a,f10.5,2x,f6.3)') 'Standard deviation of slope and '//
@@ -665,11 +665,11 @@
         write( 146, '(a,f10.5,2x,f6.3)') 'Best fit: slope and intercept = ',
      :  slopek,kint
         write( 146, '(a,f10.5,2x,f6.3)') 'Standard deviation of slope and '//
-     :  'standard deviation of points: ',kstd, kstanderr    
+     :  'standard deviation of points: ',kstd, kstanderr
         write( 146, '(a, f10.5)') 'Standard deviation of intercept: ', kintstd
 
 ! Now we start on computing the magnitudes and colours for the new faint
-! standard stars. I reused alot of the same code and variables as above 
+! standard stars. I reused alot of the same code and variables as above
         j = 0
         numpix = 0
         tempsum = 0
@@ -691,7 +691,7 @@
 ! If the line is a mosaic
               tempmean = tempsum/numpix
 	      variance = ( tempsumsq - numpix*tempmean**2)
-              if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN      
+              if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN
                 variance  =  0.0d0
               else
                 variance  =  variance/( numpix-1.0d0)
@@ -706,7 +706,7 @@
                 tempstd = std
               else if( filt(j ) .eq. 'H') then
                   if( mark .ne. 0) then
-                    if( lle( objnam( j), objnam( mark)) .and. 
+                    if( lle( objnam( j), objnam( mark)) .and.
      :                     lge( objnam( j), objnam( mark))) then
                       insth = i3mag( j)
                       tallyj = tallyj + 1
@@ -718,24 +718,24 @@
 ! Now get the actual J-H
                       zp1(tallyj) = zp1(tallyj) + jmh
 ! Compute and store the errors...
-                      nstdj(tallyj) = sqrt( ((jstd*dble( am(j)-1))**2 + 
+                      nstdj(tallyj) = sqrt( ((jstd*dble( am(j)-1))**2 +
      :                                    jintstd**2) + (tempstd**2))
                       mark = j
                       tempstd = std
                     end if
                   else
-                    if( ( lle( objnam( j+1), objnam( j)) .and. 
+                    if( ( lle( objnam( j+1), objnam( j)) .and.
      :                     lge( objnam( j+1), objnam( j))) .and.
      :                     ( filt(j+1) .eq. 'K')) then
                       insth = i3mag( j)
                       mark = j
                       tempstd = std
-                    end if 
+                    end if
                   end if
               else if( filt(j ) .eq. 'K') then
 ! Similarly for H-K
                   if( mark .ne. 0) then
-                    if ( lle( objnam( j), objnam( mark)) .and. 
+                    if ( lle( objnam( j), objnam( mark)) .and.
      :                     lge( objnam( j), objnam( mark))) then
                       instk = i3mag( j)
                       tallyk = tallyk + 1
@@ -746,13 +746,13 @@
                       tempstd = sqrt(tempstd**2 + std**2)
                       hmk = insth - instk
                       zp2(tallyk) = hint + slopeh * dble( am(j)-1)
-                      zp2(tallyk) = zp2(tallyk) + hmk 
-                      nstdk(tallyk) = sqrt( ((hstd * dble( am(j)-1))**2 + 
+                      zp2(tallyk) = zp2(tallyk) + hmk
+                      nstdk(tallyk) = sqrt( ((hstd * dble( am(j)-1))**2 +
      :                        hintstd**2) + (tempstd**2))
                       flag = .true.
                     end if
                   end if
-              end if 
+              end if
               if ( flag) then
                  mark = 0
                  flag = .false.
@@ -780,7 +780,7 @@
 	    end do
 	    tempmean = tempsum/numpix
 	    variance = ( tempsumsq - numpix*tempmean**2)
-            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN      
+            if( numpix .eq. 1 .or. variance .lt. 0.0d0) THEN
               variance  =  0.0d0
             else
               variance  =  variance/( numpix-1.0d0)
@@ -799,7 +799,7 @@
              if( itype .eq. 'M') then
 ! If we are on a J mosaic, output the appropriate J-H colour and error
                tallyj = tallyj + 1
-               write( 147, '(a,a,a,f10.3,f10.3,a,f7.3)') 
+               write( 147, '(a,a,a,f10.3,f10.3,a,f7.3)')
      :	         objnam( gstart( j))( n:m),
      :	         'J-H','  ',
      :	         am( gstart( j)), zp1(tallyj), '   ', nstdj(tallyj)
@@ -809,7 +809,7 @@
 ! If we are on a H mosaic, output the appropriate H-K colour and error
                tallyk = tallyk + 1
                if( zp2(tallyk) .ne. -99.99) then
-                 write( 147, '(a,a,a,f10.3,f10.3,a,f7.3)') 
+                 write( 147, '(a,a,a,f10.3,f10.3,a,f7.3)')
      :	             objnam( gstart( j))( n:m),
      :	             'H-K','  ',
      :               am( gstart( j)), zp2(tallyk), '   ', nstdk(tallyk)
@@ -820,15 +820,15 @@
 ! If we are on a K mosaic, comput and out put the K magnitude and error
              kmag  = kint + slopek * (am( gstart( j))-1)
              kmag = kmag + tempmean
-             std = sqrt( ((kstd * dble(am( gstart( j))-1))**2 + 
+             std = sqrt( ((kstd * dble(am( gstart( j))-1))**2 +
      :               kintstd**2) + (std**2))
-             write( 147, '(a,a,a,f7.3,a,f7.3,a,f7.3)') 
+             write( 147, '(a,a,a,f7.3,a,f7.3,a,f7.3)')
      :       objnam( gstart( j))( n:m),
      :	     filt( gstart( j))( n2:m2),'  ',
      :	     am( gstart( j)),'   ', sngl( kmag), '   ', sngl( std)
             end if
            end if
-          end if 
+          end if
         end do
 
 ! Close the output files...

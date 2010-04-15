@@ -5,17 +5,17 @@
 **************************************************************************
 
       SUBROUTINE DBS_CLOSE( REF_NO , EXIT )
- 
+
 *  Calling Arguments
       CHARACTER*(*) EXIT	! Indicates if new file to be kept.
       INTEGER       REF_NO	! Reference number of data set.
- 
+
 *  Global Variables
       INCLUDE 'aaa_dbs_params.inc'
       INCLUDE 'com_dbs_iof.inc'		! Includes ARRAY
 
 *  Local Variables
-      CHARACTER*128 FILENAME	! Actual file name.	
+      CHARACTER*128 FILENAME	! Actual file name.
       CHARACTER*128 TEMPFILENAME
       INTEGER       LUNDB	! Logical unit number.
       INTEGER       FL

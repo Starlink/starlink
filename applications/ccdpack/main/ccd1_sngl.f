@@ -1,6 +1,6 @@
       SUBROUTINE CCD1_SNGL( MAXDIS, XIN1, YIN1, INDI1, NREC1, XIN2,
      :                      YIN2, INDI2, NREC2, XOUT1, YOUT1, XOUT2,
-     :                      YOUT2, NOUT, XOFF, YOFF, INDO1, INDO2, 
+     :                      YOUT2, NOUT, XOFF, YOFF, INDO1, INDO2,
      :                      STATUS )
 *+
 *  Name:
@@ -27,7 +27,7 @@
 
 *  Arguments:
 *     MAXDIS = DOUBLE PRECISION (Given)
-*        The maximum acceptable displacement in pixels between two 
+*        The maximum acceptable displacement in pixels between two
 *        frames.  If an object match requires a displacement greater
 *        than this it will be rejected.  If it is set to zero, there
 *        are no restrictions.
@@ -107,7 +107,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
-      
+
 *  Arguments Given:
       DOUBLE PRECISION MAXDIS
       INTEGER NREC1
@@ -141,7 +141,7 @@
       DOUBLE PRECISION XO        ! X offset
       DOUBLE PRECISION YO        ! Y offset
       INTEGER I                  ! Loop variable
-      
+
 *.
 
 *  Check inherited global status.
@@ -164,7 +164,7 @@
 *  List 1 is the one with a single value.
       IF ( NREC1 .EQ. 1 ) THEN
 
-*  Calculate the offset between the point in list 1 and each point in 
+*  Calculate the offset between the point in list 1 and each point in
 *  list 2.
          DO 1 I = 1, NREC2
             XO = XIN1( 1 ) - XIN2( I )
@@ -197,7 +197,7 @@
 *  List 2 is the one with a single value.
       ELSE IF ( NREC2 .EQ. 1 ) THEN
 
-*  Calculate the offset between each point in list 1 and the point in 
+*  Calculate the offset between each point in list 1 and the point in
 *  list 2.
          DO 2 I = 1, NREC1
             XO = XIN1( I ) - XIN2( 1 )
@@ -215,7 +215,7 @@
                D2CUR = D2
                MATCH = .TRUE.
             END IF
- 2       CONTINUE 
+ 2       CONTINUE
 
 *  If a match was achieved, set list 2 output values.
          IF ( MATCH ) THEN
@@ -225,12 +225,12 @@
             INDO2( 1 ) = INDI2( 1 )
          ELSE
             NOUT = 0
-         END IF       
+         END IF
 
 *  Neither list has a single value - this ought not to happen.
       ELSE
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'CCD1_SNGL_BADPAR', 
+         CALL ERR_REP( 'CCD1_SNGL_BADPAR',
      :   'Bad call of CCD1_SNGL: neither list has one element', STATUS )
       END IF
 
@@ -240,7 +240,7 @@
       ELSE
          NOUT = 0
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'CCD1_SNGL_MAXDISP', 
+         CALL ERR_REP( 'CCD1_SNGL_MAXDISP',
      :'  1-object Match failed: minimum displacement exceeds MAXDISP',
      :                 STATUS )
       END IF

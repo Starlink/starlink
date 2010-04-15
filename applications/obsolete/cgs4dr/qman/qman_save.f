@@ -17,7 +17,7 @@
 *    Global variables :
       INCLUDE 'QMAN_GLOBAL.PAR'       ! QMAN common block
       INCLUDE 'QMAN_COMMON.BLK'       ! QMAN global parameter constants
-*    Extermnal references : 
+*    Extermnal references :
        INTEGER CHR_LEN                ! Finds used length of string
 *    Local variables :
        CHARACTER*( MSG_VAL_LEN ) FILE ! Output filename
@@ -39,7 +39,7 @@
 *   Check the password (if specified)
       CALL QMAN_CHECK_PWD( STATUS )
 
-*   Get the output file 
+*   Get the output file
       CALL CHR_FILL( ' ', FILE )
       CALL PAR_GET0C( 'FILE', FILE, STATUS )
       CALL CHR_FILL( ' ', MODE )
@@ -48,11 +48,11 @@
 
 *   Open it for write access
       IF ( MODE .EQ. 'NEW' ) THEN
-         CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'WRITE', 
-     :     'LIST', 0, FD, STATUS )      
+         CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'WRITE',
+     :     'LIST', 0, FD, STATUS )
       ELSE
-         CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'APPEND', 
-     :     'LIST', 0, FD, STATUS )      
+         CALL FIO_OPEN( FILE(1:CHR_LEN(FILE)), 'APPEND',
+     :     'LIST', 0, FD, STATUS )
       ENDIF
       IF ( STATUS .NE. SAI__OK ) THEN
         STATUS = SAI__ERROR

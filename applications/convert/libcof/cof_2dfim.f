@@ -36,7 +36,7 @@
 *     LOGHDR = LOGICAL (Given)
 *        If .TRUE., a record of the FITS headers is written to a log
 *        file given by descriptor FDL.  If .FALSE., no log is made and
-*        argument FDL is ignored. 
+*        argument FDL is ignored.
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
 *        LOGHDR is .FALSE..
@@ -66,7 +66,7 @@
 *        -  The primary data array becomes the NDF's data array.  Any
 *        NaN values present become bad values in the NDF.
 *        -  The keywords CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn are
-*        used to create the NDF axis structure. 
+*        used to create the NDF axis structure.
 *        -  The OBJECT, LABEL, BUNITS keywords define the NDF's title,
 *        label, and units components respectively, if they are defined.
 *        -  HISTORY cards in a special format created by NDF2FITS are
@@ -152,7 +152,7 @@
 *     5-APR-2000 (AJC):
 *        Add CHECK argument to COF_SBND.
 *     30-AUG-2000 (AJC):
-*        Correct description FITS_EXT_n not NDF_EXT_n.  Add separate 
+*        Correct description FITS_EXT_n not NDF_EXT_n.  Add separate
 *        FITS unit numbers in call to COF_WRTAB.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
@@ -164,7 +164,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -197,13 +197,13 @@
       INTEGER  FITSOK             ! Good status for FITSIO library
       PARAMETER ( FITSOK = 0 )
       INTEGER  CLASS_LEN          ! Maximum length of observation-class
-      PARAMETER ( CLASS_LEN = 10 ) ! string 
+      PARAMETER ( CLASS_LEN = 10 ) ! string
 
 *  Local Variables:
       LOGICAL BAD                ! Bad values may be present in array?
       INTEGER BITPIX             ! FITS file's BITPIX
       CHARACTER * ( 256 ) BUFFER ! BUFFER for writing error messages
-      CHARACTER * ( CLASS_LEN ) CLASS   ! Observation class 
+      CHARACTER * ( CLASS_LEN ) CLASS   ! Observation class
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to CLASS structure
       CHARACTER * ( DAT__SZLOC ) CLLOC ! Locator to CLASS component
       INTEGER COLEXT             ! Character where extension name begins
@@ -327,7 +327,7 @@
 *  =============
 
 *  Check that if the current HDU is the primary, or that it is an
-*  IMAGE, and thus can be processed by the following routine.  
+*  IMAGE, and thus can be processed by the following routine.
          IF ( FIRST. OR. XTENS .EQ. 'IMAGE' ) THEN
 
 *  The FMTCNV flag decides whether or not the data scaling is required.
@@ -524,7 +524,7 @@
 
 *  Create the mask and assign .TRUE. to all of its elements.
                CALL PSX_CALLOC( NHEAD, '_LOGICAL', REPNTR, STATUS )
-               CALL CON_CONSL( .TRUE., NHEAD, 
+               CALL CON_CONSL( .TRUE., NHEAD,
      :                         %VAL( CNF_PVAL( REPNTR ) ), STATUS )
             END IF
 
@@ -535,7 +535,7 @@
 *  This is to avoid growing duplication of potentially bulky text, if
 *  using FITS files with Starlink tasks.
             IF ( EXNDF .AND. COMP .EQ. 'Data' ) THEN
-               CALL COF_CHISR( FUNIT, NDFE, NHEAD, 
+               CALL COF_CHISR( FUNIT, NDFE, NHEAD,
      :                         %VAL( CNF_PVAL( REPNTR ) ),
      :                         STATUS )
             END IF
@@ -562,7 +562,7 @@
 *  is a simple array and is merely filled with dummy data, so test for
 *  this.
             IF ( DARRAY .AND. .NOT. NONSDA ) THEN
-               CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCNV, ITYPE, 
+               CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCNV, ITYPE,
      :                         STATUS )
 
 *  Specify the bounds of the NDF array component.
@@ -584,27 +584,27 @@
 *  have bad pixels.
                IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL FTGPVB( FUNIT, 0, 1, EL, VAL__BADUB,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL FTGPVI( FUNIT, 0, 1, EL, VAL__BADW,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL FTGPVJ( FUNIT, 0, 1, EL, VAL__BADI,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL FTGPVE( FUNIT, 0, 1, EL, VAL__BADR,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGPVD( FUNIT, 0, 1, EL, VAL__BADD,
-     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                         BAD, FSTAT )
 
                END IF
@@ -678,7 +678,7 @@
 
 *  Create the FIBRES extension in the NDF.
 *  =======================================
-            IF ( EXTNAM .EQ. 'FIBRES' .OR. 
+            IF ( EXTNAM .EQ. 'FIBRES' .OR.
      :           EXTNAM .EQ. 'FIBRES_IFU' ) THEN
 
 *  Create the structure to hold the BINTABLE data.
@@ -764,7 +764,7 @@
      :                           STATUS )
 
 *  Call routine to create the <TABLE> structure from the FITS binary
-*  or ASCII table.  Header and Data FUNITs are the same (no 
+*  or ASCII table.  Header and Data FUNITs are the same (no
 *  inheritance).
                   CALL COF_WRTAB( FUNIT, FUNIT, XLOC, STATUS )
 

@@ -60,12 +60,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -131,7 +131,7 @@
 *  ...BOUNDS access; prevents the array's bounds from being altered.
          IF ( CHR_SIMLR( ACCESS, 'BOUNDS' ) ) THEN
             ACB_ACC( ARY__BOUND, IACB ) = .FALSE.
-      
+
 *  ...DELETE access; prevents the array being deleted.
          ELSE IF ( CHR_SIMLR( ACCESS, 'DELETE' ) ) THEN
             ACB_ACC( ARY__DELET, IACB ) = .FALSE.
@@ -144,7 +144,7 @@
             ACB_ACC( ARY__TYPE, IACB ) = .FALSE.
             ACB_ACC( ARY__SCALE, IACB ) = .FALSE.
             ACB_ACC( ARY__WRITE, IACB ) = .FALSE.
-            
+
 *  ...SCALE access; prevents the array's scale and zero values being altered.
          ELSE IF ( CHR_SIMLR( ACCESS, 'SCALE' ) ) THEN
             ACB_ACC( ARY__SCALE, IACB ) = .FALSE.
@@ -172,7 +172,7 @@
      :      'programming error).', STATUS )
          END IF
       END IF
-       
+
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN

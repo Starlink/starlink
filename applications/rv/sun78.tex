@@ -44,7 +44,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -113,7 +113,7 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -204,12 +204,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -252,7 +252,7 @@ rest -- typically either the Sun or an LSR.
 
 As a secondary function, RV computes light time components to the Sun,
 thus allowing the times of phenomena observed from a terrestrial
-observatory to be referred to a heliocentric frame of reference.  
+observatory to be referred to a heliocentric frame of reference.
 ({\it n.b.}\ It will of course, in addition, be necessary to express the
 observations in the appropriate timescale as well as applying light
 time corrections.  In particular, it is likely that an observed UTC
@@ -273,7 +273,7 @@ $20~{\rm km~s}^{-1}$ towards $\alpha=18^{\rm h} \delta=+30^{\circ}$
 vicinity of the Sun which is in circular orbit around the
 Galactic centre.)}
 the Galactic centre, and the mean motion of the Local
-Group, are tabulated, in ${\rm km~s}^{-1}$. 
+Group, are tabulated, in ${\rm km~s}^{-1}$.
 Light time components to the Sun, in seconds, are tabulated also.
 
 The accuracies, of better than $0.01~{\rm km~s}^{-1}$ and $0.1~{\rm s}$, are
@@ -349,18 +349,18 @@ although the ``Equinox'' and ``Days (n)'' pull--down menus can be used
 to quickly select commonly used values.
 
 Once all the input parameters have been correctly set (particularly
-the output file), click on the red run button. A dialog button will 
+the output file), click on the red run button. A dialog button will
 pop up to confirm that the program has successfully run and confirm the
-output file name. 
+output file name.
 
-The ``Help'' button brings up brief usage instructions and input 
-parameter formats. 
+The ``Help'' button brings up brief usage instructions and input
+parameter formats.
 
 The ``Exit'' button terminates the program.
 
 The report produced by {\tt{xrv}} is identical to that produced by
 the terminal mode version of RV; {\tt{xrv}} produces its report by
-running the terminal--mode {\tt{rv}} on your behalf. 
+running the terminal--mode {\tt{rv}} on your behalf.
 
 \section{Further Terminal Operating Modes}
 
@@ -493,15 +493,15 @@ produce the following two pages of output:
 \verb|               E 149 03 57.9   S 31 16 37|\\
 \\
 \verb|Starting UTC date:   1977/01/25  =  JD 2443168.5|\\
-\\ 
+\\
 \verb|Equatorial coordinates:   08 33 39.30  -45 00 12.0   B1950.0|\\
 \verb|                          08 35 20.68  -45 10 37.6   J2000.0|\\
 \verb|                          08 34 36.82  -45 06 00.8   geocentric apparent|\\
-\\ 
+\\
 \verb|Galactic coordinates:   L2 = 263.5526  B2 =  -2.7876|\\
-\\ 
+\\
 \verb|Ecliptic coordinates:   L  = 153.0557  B  = -60.3641  (mean equinox of date)|\\
-\\ 
+\\
 \\
 \verb|      UTC            ZD     EARTH         SUN            LSR (K)   LSR (D)     GALAXY    LOCAL GROUP|\\
 \\

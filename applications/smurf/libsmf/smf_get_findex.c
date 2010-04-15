@@ -31,7 +31,7 @@
 *  Description:
 *     Calculate the index of the nearest frequency in an FFT to a given
 *     frequency in Hz (using rounding). Checks that the index is between
-*     0 and the Nyquist frequency (setting bad status if necessary). 
+*     0 and the Nyquist frequency (setting bad status if necessary).
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -39,7 +39,7 @@
 
 *  History:
 *     2008-09-15 (EC)
-*        Initial version. 
+*        Initial version.
 *     {enter_further_changes_here}
 
 *  Copyright:

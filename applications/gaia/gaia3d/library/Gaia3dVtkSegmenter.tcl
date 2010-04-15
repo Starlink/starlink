@@ -270,7 +270,7 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
       $tpdf Delete
    }
 
-   #  Connect this to a given stencil filter (vtkPolyDataToImageStencil). 
+   #  Connect this to a given stencil filter (vtkPolyDataToImageStencil).
    #  Used to apply the current mask to some data (the surfaces in the
    #  discrete marching cubes are picked out by this and can be applied to
    #  another dataset attached to an vtkImageStencil).

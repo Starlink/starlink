@@ -41,7 +41,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -235,9 +235,9 @@
      :                  WK, XNDF2, I, STATUS )
       ELSE
          CALL NDF_AMAP( NDF1, 'CENTRE', 1, MTYPE, 'READ',
-     :                  XK, I, STATUS ) 
+     :                  XK, I, STATUS )
          CALL NDF_AMAP( NDF1, 'WIDTH',  1, MTYPE, 'READ',
-     :                  WK, I, STATUS ) 
+     :                  WK, I, STATUS )
       END IF
 
 *  Map the input data and variances.

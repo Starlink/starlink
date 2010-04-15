@@ -33,7 +33,7 @@ C                         structure name included as well, as in
 C                         DISK$DATA:[DIR]FILENAME.STRUCT.
 C     (<) EXIST           (Logical, ref) Returned true if the file
 C                         exists and if any specified structure exists
-C                         within the file.  
+C                         within the file.
 C     (!) STATUS          (Integer, ref) Status code.  If bad status is
 C                         passed to this routine, it returns immediately.
 C

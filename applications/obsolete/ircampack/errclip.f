@@ -34,7 +34,7 @@
 *        The input NDF. An error is reported if it contains no VARIANCE
 *        component.
 *     OUT = NDF (Write)
-*        The output NDF. 
+*        The output NDF.
 *     LIMIT = REAL (Read)
 *        Either the maximum acceptable standard deviation or variance
 *        value, or the minimum acceptable signal to noise ratio
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -145,7 +145,7 @@
          CALL MSG_OUT( 'ERRCLIP_MSG2', '  Applying an upper limit on '//
      :                 'variance.', STATUS )
 
-      ELSE 
+      ELSE
          CALL MSG_OUT( 'ERRCLIP_MSG3', '  Applying a lower limit on '//
      :                 'signal to noise ratio.', STATUS )
 
@@ -188,7 +188,7 @@
 
       ELSE IF( TYPE .EQ. 'VARIANCE' ) THEN
          CALL MSG_OUT( 'ERRCLIP_MSG5','  ^NBAD pixels had variances'//
-     :                 'greater than ^LIM (^UNITS)**2 in ''^NDF''.', 
+     :                 'greater than ^LIM (^UNITS)**2 in ''^NDF''.',
      :                 STATUS )
 
       ELSE IF( TYPE .EQ. 'SNR' ) THEN
@@ -199,7 +199,7 @@
          CALL MSG_SETC( 'TYPE', TYPE )
          CALL ERR_REP( 'ERRCLIP_ERR2', 'Unknown limit type '//
      :                 '''^TYPE'' (programming error).', STATUS )
-      END IF      
+      END IF
 
 *  If an error occurred, delete the output NDF.
       IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF2, STATUS )

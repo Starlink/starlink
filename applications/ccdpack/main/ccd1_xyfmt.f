@@ -14,10 +14,10 @@
 
 *  Description:
 *     This routine returns strings representing the value of an X and
-*     a Y coordinate, in a format dicated by the FRAME parameter.  
+*     a Y coordinate, in a format dicated by the FRAME parameter.
 *     If FRAME is an AST pointer to a Frame object, then the
 *     characteristics of this frame will determine the formatting.
-*     If it is set to AST__NULL, the formatting will be done in a 
+*     If it is set to AST__NULL, the formatting will be done in a
 *     default way.
 
 *  Arguments:
@@ -71,7 +71,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -121,7 +121,7 @@
             ELSE
                CALL AST_SETC( FRM, 'Format(2)', '+idmst.2', STATUS )
             END IF
-         ELSE 
+         ELSE
             CALL AST_SETC( FRM, 'Format(1)', '%+14.6f', STATUS )
             CALL AST_SETC( FRM, 'Format(2)', '%+14.6f', STATUS )
          END IF

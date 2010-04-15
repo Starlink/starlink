@@ -4,7 +4,7 @@
   Color tables copyright Smithsonian Astrophysical Observatory 1989 */
 
 #define LVX NUMDCOL
- 
+
       int	LUTC_STORED; 		/* Number of stored LUTs */
       int	LUTC_ENDS;		/* LUT end types (1=black/white;2=wh/bl;3=col/col;4=wrap */
       float     LUTC_VAL[150][3];	/* RGB arrays */

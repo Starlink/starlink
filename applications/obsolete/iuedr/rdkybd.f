@@ -132,7 +132,7 @@
 
 *
 * GET A STRING FROM THE USER TERMINATED WITH EITHER RETURN, UP ARROW OR
-* DOWN ARROW. 
+* DOWN ARROW.
 *
          istat = rdkbd2(string,pbuf,lprm,term,lenout)
          if( istat .eq. 0 ) then
@@ -141,7 +141,7 @@
 * UPDATE THE COMMAND TO RECALL IF STRING WAS TERMINATED BY A CURSOR KEY
 *
             if(term.eq.upcurs) then
-               if(pr.ne.move(DSB_pw( cycle ),1).and.slstat.eq.0) 
+               if(pr.ne.move(DSB_pw( cycle ),1).and.slstat.eq.0)
      :            pr=move(pr,-1)
 
             else if(term.eq.dncurs) then
@@ -170,7 +170,7 @@
                if(istat.eq.1) then
                   more=.false.
                   istat = 0
-               else if(istat.eq.2 ) then               
+               else if(istat.eq.2 ) then
                   istat = 0
                endif
 
@@ -187,7 +187,7 @@
 *
 * IF SOMETHING WENT WRONG, GIVE A MESSAGE AND EXIT.
 *
-         else 
+         else
             write(*,*) '*** Error ',istat,' reading input from terminal'
             more = .false.
             string = ' '

@@ -1,4 +1,4 @@
-      SUBROUTINE DESTA0( IDC, DHIGH, DLOW, SHIGH, SLOW, DATIN, DATTMP, 
+      SUBROUTINE DESTA0( IDC, DHIGH, DLOW, SHIGH, SLOW, DATIN, DATTMP,
      :                   HBOX, NITER, NSIGMA, UNITS, WSLOW, WSHIGH, OK,
      :                   QNAME, LOCS, DATOUT, DETNO, DETOFF, BSB, NSUM,
      :                   BAD, WORK1, WORK2, WORK3, STATUS )
@@ -47,7 +47,7 @@
 *        The input data.
 *     DATTMP( SLOW:SHIGH, DLOW:DHIGH ) = REAL (Given)
 *        A copy of the input data from which have been removed (by being
-*        set bad) any samples which do not satisfy the users quality 
+*        set bad) any samples which do not satisfy the users quality
 *        expression.
 *     HBOX = INTEGER (Given)
 *        Half the width of the smoothing box. The full width used is
@@ -84,7 +84,7 @@
 *     DETOFF( DLOW:DHIGH ) = REAL (Returned)
 *        The offset subtracted from each detector.
 *     BSB = REAL (Returned)
-*        The mean background surface brightnesses, taken over all the 
+*        The mean background surface brightnesses, taken over all the
 *        detector data streams (in MJy/sr).
 *     NSUM = INTEGER (Returned)
 *        The number of values which were averaged together to form the
@@ -113,7 +113,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -141,7 +141,7 @@
       LOGICAL OK
       CHARACTER QNAME*(*)
       CHARACTER LOCS(5)*(*)
-      
+
 *  Arguments Returned:
       REAL DATOUT( SLOW:SHIGH, DLOW:DHIGH )
       INTEGER DETNO( DLOW:DHIGH )
@@ -157,7 +157,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER IRC_DETNO          ! Detector number corresponding to a 
+      INTEGER IRC_DETNO          ! Detector number corresponding to a
                                  ! given detector index.
 
 *  Local Variables:
@@ -206,9 +206,9 @@
 
 *  Clean the input data by removing sources which are (roughly
 *  speaking) smaller than the box size. Removed samples are set bad.
-         CALL IRM_CLEAN( SLOW, SHIGH, DATTMP( SLOW, DET ), WSLOW, 
-     :                   WSHIGH, HBOX, NITER, NSIGMA, 
-     :                   DATOUT( SLOW, DET ), RMS, WORK1, WORK2, WORK3, 
+         CALL IRM_CLEAN( SLOW, SHIGH, DATTMP( SLOW, DET ), WSLOW,
+     :                   WSHIGH, HBOX, NITER, NSIGMA,
+     :                   DATOUT( SLOW, DET ), RMS, WORK1, WORK2, WORK3,
      :                   STATUS )
 
 *  If there were no good values in the input data, annul the error and
@@ -220,7 +220,7 @@
 *  Tell the user that this detector contains no good data.
             CALL MSG_SETI( 'DN', DETNO( DET ) )
             CALL MSG_OUTIF( MSG__VERB, 'DESTA0_MSG1',
-     :                      '    Detector #^DN contains no good data', 
+     :                      '    Detector #^DN contains no good data',
      :                      STATUS )
 
 *  Otherwise, find the median of the remaining good data.
@@ -233,7 +233,7 @@
             CALL MSG_SETC( 'U', UNITS )
             CALL MSG_SETR( 'OFF', DETOFF( DET ) )
             CALL MSG_OUTIF( MSG__VERB, 'DESTA0_MSG2',
-     :           '    Detector #^DN has a background value of ^OFF ^U', 
+     :           '    Detector #^DN has a background value of ^OFF ^U',
      :                      STATUS )
 
 *  Calculate the scale factor for converting the median data value to
@@ -278,7 +278,7 @@
      :          '    ^NEXCL samples excluded from the calculation of '//
      :          'detector offsets', STATUS )
 
-*  Store the mean of the median surface brightness values. This is 
+*  Store the mean of the median surface brightness values. This is
 *  taken to be the background surface brightness.
       IF( NSUM .GT. 0 ) THEN
          BSB = SBSUM/NSUM
@@ -331,7 +331,7 @@
 
 *  Subtract the offset from the input data values, and store in the
 *  output data array.
-            DO SAMP = SLOW, SHIGH         
+            DO SAMP = SLOW, SHIGH
                INVAL = DATIN( SAMP, DET )
                IF( INVAL .NE. VAL__BADR ) THEN
                   DATOUT( SAMP, DET ) = INVAL - OFFSET

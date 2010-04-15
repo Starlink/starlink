@@ -76,7 +76,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'          ! global SSE definitions
-      INCLUDE  'NDF_PAR'          
+      INCLUDE  'NDF_PAR'
       INCLUDE  'NDF_ERR'
 
 *    Status :
@@ -99,7 +99,7 @@
      :     NUMBER                 ! number of times Laplacian is removed
 
       INTEGER                     ! locators to :
-     :     LOCI,                  ! input image structure  
+     :     LOCI,                  ! input image structure
      :     LOCO                   ! output  "       "
 
 *-
@@ -116,7 +116,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *       map its DATA_ARRAY component onto a pointer
-         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ', 
+         CALL NDF_MAP( LOCI, 'DATA', '_REAL', 'READ',
      :                  PNTRI, NELEMENTS, STATUS )
 
 *       get dimesnions
@@ -132,7 +132,7 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          map its DATA_ARRAY component onto a pointer
-            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE', 
+            CALL NDF_MAP( LOCO, 'DATA', '_REAL', 'WRITE',
      :               PNTRO, NELEMENTS, STATUS )
 
 *          check status before accessing pointers

@@ -1,5 +1,5 @@
 { Procedure DRB_STDPROC : auto scans RO lis file and creates batch file
-proc drb_stdproc 
+proc drb_stdproc
   get plt2d name_prefix (ropref)
   print "Using RO prefix " (ropref)
   utd = substr(ropref,3,6)

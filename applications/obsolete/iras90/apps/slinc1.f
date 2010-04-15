@@ -1,4 +1,4 @@
-      SUBROUTINE SLINC1( PNLON, PNLAT, PNARC, MODE, IRA, SCS, LBND, 
+      SUBROUTINE SLINC1( PNLON, PNLAT, PNARC, MODE, IRA, SCS, LBND,
      :                   UBND, MXNSCT, NPARL, PLON, PLAT, PSCTLN,
      :                   STATUS )
 *+
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SLINC1( PNLON, PNLAT, PNARC, TOL, IRA, SCS, 
+*     CALL SLINC1( PNLON, PNLAT, PNARC, TOL, IRA, SCS,
 *                  MXNSCT, NPARL, PLON, PLAT, PSCTLN, STATUS )
-      
+
 *  Description:
 *     This subroutine is used to draw sections of parallels
 *     interactively. The user will be continuously prompted to specify
@@ -25,7 +25,7 @@
 *     supplied by the user is a zeor, the subroutine will draw a longest
 *     parallel section over the image passing the given position.
 *     The spcifications of the ploted sections are appended to the
-*     ones on entry and returned.  
+*     ones on entry and returned.
 
 *  Arguments:
 *     PNLON = CHARACTER*( * ) (Given)
@@ -73,7 +73,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
-                
+
 *  Arguments Given:
       CHARACTER*( * ) PNLON
       CHARACTER*( * ) PNLAT
@@ -142,12 +142,12 @@
      :                      SCS, .FALSE., LON, LAT, STATUS )
 
 *  If a null response is obtained, set exit flag and annul the error
-*  status.      
+*  status.
             IF ( STATUS .EQ. PAR__NULL ) THEN
                EXIT = .TRUE.
                CALL ERR_ANNUL( STATUS )
             END IF
-      
+
 *  Otherwise get the begin position from the cursor.
          ELSE
 
@@ -156,7 +156,7 @@
      :   '  Position the cursor at the start of the curve and press '//
      :   'any button (position the cursor outside the image to exit).',
      :                            STATUS )
-      
+
             CALL IRM_SKCUR( IRA, SCS, LBND, UBND, LON, LAT, OUT,
      :                      STATUS )
 
@@ -205,9 +205,9 @@
             CALL PAR_CANCL( PNLAT, STATUS )
          END IF
          CALL PAR_CANCL( PNARC, STATUS )
- 
+
       END DO
 
  999  CONTINUE
-      
+
       END

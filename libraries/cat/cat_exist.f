@@ -3,16 +3,16 @@
 *  Name:
 *     CAT_EXIST
 *  Purpose:
-*     Attempt to open a catalogue, the name being taken from the ADAM 
+*     Attempt to open a catalogue, the name being taken from the ADAM
 *     parameter system.
 *  Language:
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT_EXIST (PCNAME, MODE; CI; STATUS)
 *  Description:
-*     Attempt to open a catalogue, the name being taken from the ADAM 
-*     parameter system.  If the attempt fails then instead of 
-*     re-prompting the routine returns with an error status.  This 
+*     Attempt to open a catalogue, the name being taken from the ADAM
+*     parameter system.  If the attempt fails then instead of
+*     re-prompting the routine returns with an error status.  This
 *     routine can be used to check the existence of a catalogue.
 *  Arguments:
 *     PCNAME  =  CHARACTER*(*) (Given)
@@ -63,12 +63,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -108,7 +108,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
 *
-*       Mark the error stack, so that flushing errors does not disturb 
+*       Mark the error stack, so that flushing errors does not disturb
 *       any pre-existing errors in the error stack.
 
          CALL ERR_MARK
@@ -175,7 +175,7 @@
             CI = CAT__NOID
 
 *
-*          If an abort was requested, then annul any error messages and 
+*          If an abort was requested, then annul any error messages and
 *          substitute a more appropriate one.
 
             IF (STATUS .EQ. PAR__ABORT) THEN
@@ -187,7 +187,7 @@
      :           /'parameter ''%^PCNAME'' aborted.', STATUS)
 
 *
-*          If a null value was specified, then annul any error messages 
+*          If a null value was specified, then annul any error messages
 *          and substitute a more appropriate one.
 
 
@@ -200,7 +200,7 @@
      :           /' ''%^PCNAME''.', STATUS)
 
 *
-*          For all other errors, add context information and report the 
+*          For all other errors, add context information and report the
 *          error.
 
             ELSE

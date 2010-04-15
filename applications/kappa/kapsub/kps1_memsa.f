@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_MEMSA( PARAM, MODE, EXTEND, INDF, RATE, ALPHA, 
-     :                       BETA, DEF, SIGMA, NITER, ITER, ILEVEL, 
+      SUBROUTINE KPS1_MEMSA( PARAM, MODE, EXTEND, INDF, RATE, ALPHA,
+     :                       BETA, DEF, SIGMA, NITER, ITER, ILEVEL,
      :                       METHOD, STDEV, ISTAT, STATUS )
 *+
 *  Name:
@@ -124,7 +124,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -160,7 +160,7 @@
 
 *  Local Variables:
       LOGICAL      BAD           ! TRUE if o/p contains any bad pixels
-      LOGICAL      EXISTS        ! True if o/p already contains an 
+      LOGICAL      EXISTS        ! True if o/p already contains an
 				 ! extension for analysis information
       CHARACTER * ( 9 ) FORM     ! Storage form of o/p; SIMPLE or
                                  ! PRIMITIVE.
@@ -249,9 +249,9 @@
             CALL DAT_NEW0I( LOC1, 'C1_XMG', STATUS )
             CALL DAT_NEW0I( LOC1, 'C1_YMG', STATUS )
             CALL DAT_NEW0R( LOC1, 'C1_ICF', STATUS )
-         
+
 *  Arguments to this routine.
-            CALL DAT_NEW0R( LOC1, 'RATE', STATUS ) 
+            CALL DAT_NEW0R( LOC1, 'RATE', STATUS )
             CALL DAT_NEW0R( LOC1, 'ALPHA', STATUS )
             CALL DAT_NEW0R( LOC1, 'BETA', STATUS )
             CALL DAT_NEW0R( LOC1, 'DEF', STATUS )
@@ -272,43 +272,43 @@
 
 *  MEMSYS3 areas:
          IF ( C1_WEXT ) THEN
-            CALL CMP_PUT1R( LOC1, 'FILE1', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE1', SZAREA,
      :                      %VAL( CNF_PVAL( C1_IP( 1 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE3', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE3', SZAREA,
      :                      %VAL( CNF_PVAL( C1_IP( 3 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE21', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE21', SZAREA,
      :                      %VAL( CNF_PVAL( C1_IP( 21 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE22', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE22', SZAREA,
      :                      %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE23', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE23', SZAREA,
      :                      %VAL( CNF_PVAL( C1_IP( 23 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE24', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE24', SZAREA,
      :                      %VAL( CNF_PVAL( C1_IP( 24 ) ) ),
      :                      STATUS )
 
-            IF ( ME_KB(20) .GT. 0 ) CALL CMP_PUT1R( LOC1, 'FILE20', 
-     :                                              SZAREA, 
-     :                                              
+            IF ( ME_KB(20) .GT. 0 ) CALL CMP_PUT1R( LOC1, 'FILE20',
+     :                                              SZAREA,
+     :
      :   %VAL( CNF_PVAL( C1_IP( 20 ) ) ),
      :                                              STATUS )
 
          ELSE
-            CALL CMP_PUT1R( LOC1, 'FILE1', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE1', SZAREA,
      :                      ME_ST( ME_KB( 1 ) ), STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE3', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE3', SZAREA,
      :                      ME_ST( ME_KB( 3 ) ), STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE21', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE21', SZAREA,
      :                      ME_ST( ME_KB( 21 ) ), STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE22', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE22', SZAREA,
      :                      ME_ST( ME_KB( 22 ) ), STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE23', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE23', SZAREA,
      :                      ME_ST( ME_KB( 23 ) ), STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE24', SZAREA, 
+            CALL CMP_PUT1R( LOC1, 'FILE24', SZAREA,
      :                      ME_ST( ME_KB( 24 ) ), STATUS )
 
             IF ( ME_KB(20) .GT. 0 ) THEN
@@ -346,21 +346,21 @@
             CALL CMP_PUT0I( LOC1, 'C1_YMG', C1_YMG, STATUS )
             CALL CMP_PUT0R( LOC1, 'C1_ICF', C1_ICF, STATUS )
          END IF
-         
+
 *  Arguments to this routine.
          CALL CMP_PUT0R( LOC1, 'RATE', RATE, STATUS )
          CALL CMP_PUT0R( LOC1, 'ALPHA', ALPHA, STATUS )
-         CALL CMP_PUT0R( LOC1, 'BETA', BETA, STATUS ) 
-         CALL CMP_PUT0R( LOC1, 'SIGMA', SIGMA, STATUS ) 
-         CALL CMP_PUT0I( LOC1, 'NITER', NITER, STATUS ) 
-         CALL CMP_PUT0I( LOC1, 'ITER', ITER, STATUS ) 
-         CALL CMP_PUT0I( LOC1, 'ILEVEL', ILEVEL, STATUS ) 
-         CALL CMP_PUT0I( LOC1, 'ISTAT', ISTAT, STATUS ) 
+         CALL CMP_PUT0R( LOC1, 'BETA', BETA, STATUS )
+         CALL CMP_PUT0R( LOC1, 'SIGMA', SIGMA, STATUS )
+         CALL CMP_PUT0I( LOC1, 'NITER', NITER, STATUS )
+         CALL CMP_PUT0I( LOC1, 'ITER', ITER, STATUS )
+         CALL CMP_PUT0I( LOC1, 'ILEVEL', ILEVEL, STATUS )
+         CALL CMP_PUT0I( LOC1, 'ISTAT', ISTAT, STATUS )
 
          IF ( .NOT. EXISTS ) THEN
-            CALL CMP_PUT0R( LOC1, 'DEF', DEF, STATUS ) 
-            CALL CMP_PUT0R( LOC1, 'STDEV', STDEV, STATUS ) 
-            CALL CMP_PUT0I( LOC1, 'METHOD', METHOD, STATUS ) 
+            CALL CMP_PUT0R( LOC1, 'DEF', DEF, STATUS )
+            CALL CMP_PUT0R( LOC1, 'STDEV', STDEV, STATUS )
+            CALL CMP_PUT0I( LOC1, 'METHOD', METHOD, STATUS )
 
 *  The name of the input NDF
             CALL NDF_MSG( 'NAME', INDF )
@@ -379,38 +379,38 @@
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Now deal with cases where the MEMSYS3 areas are stored in 
+*  Now deal with cases where the MEMSYS3 areas are stored in
 *  a dynamically allocated external work array.
       IF ( C1_WEXT ) THEN
 
 *  Copy the final "hidden" image in file <1> to file <5> and blur with
-*  the ICF, to get the required deconvolved image. Files <2> and <4> 
+*  the ICF, to get the required deconvolved image. Files <2> and <4>
 *  are used as work space. (The "hidden" image must be left in file <1>
 *  for analysis/continuation).
          CALL VEC_RTOR( .FALSE., SZAREA, %VAL( CNF_PVAL( C1_IP( 1 ) ) ),
-     :                  %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+     :                  %VAL( CNF_PVAL( C1_IP( 5 ) ) ),
      :                  IERR, NERR, STATUS )
-         CALL KPS1_ICBLU( C1_ICF, .FALSE., 
+         CALL KPS1_ICBLU( C1_ICF, .FALSE.,
      :                    %VAL( CNF_PVAL( C1_IP( 2 ) ) ),
-     :                    %VAL( CNF_PVAL( C1_IP( 4 ) ) ), 
+     :                    %VAL( CNF_PVAL( C1_IP( 4 ) ) ),
      :                    %VAL( CNF_PVAL( C1_IP( 5 ) ) ),
      :                    STATUS )
 
 *  Copy the deconvolved image from file <5> to the output NDF.
          IF ( ME_KB( 20 ) .GT. 0) THEN
-            CALL KPS1_MEMOU( %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+            CALL KPS1_MEMOU( %VAL( CNF_PVAL( C1_IP( 5 ) ) ),
      :                       %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
-     :                       C1_DIM( 1 ), C1_DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( C1_IP( 20 ) ) ), 
+     :                       C1_DIM( 1 ), C1_DIM( 2 ),
+     :                       %VAL( CNF_PVAL( C1_IP( 20 ) ) ),
      :                       C1_NPX, C1_NLN,
-     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ),
      :                       BAD,
      :                       STATUS )
          ELSE
-            CALL KPS1_MEMOU( %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+            CALL KPS1_MEMOU( %VAL( CNF_PVAL( C1_IP( 5 ) ) ),
      :                       %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
-     :                       C1_DIM( 1 ), C1_DIM( 2 ), DEF, 1, 1, 
-     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       C1_DIM( 1 ), C1_DIM( 2 ), DEF, 1, 1,
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ),
      :                       BAD,
      :                       STATUS )
          END IF
@@ -427,33 +427,33 @@
 *  Copy the deconvolved image from file <5> to the output NDF.
          IF ( ME_KB( 20 ) .GT. 0) THEN
             CALL KPS1_MEMOU( ME_ST( ME_KB( 5 ) ), ME_ST( ME_KB( 22 ) ),
-     :                       C1_DIM( 1 ), C1_DIM( 2 ), 
-     :                       ME_ST( ME_KB( 20 ) ), C1_NPX, C1_NLN, 
-     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       C1_DIM( 1 ), C1_DIM( 2 ),
+     :                       ME_ST( ME_KB( 20 ) ), C1_NPX, C1_NLN,
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ),
      :                       BAD,
      :                       STATUS )
          ELSE
             CALL KPS1_MEMOU( ME_ST( ME_KB( 5 ) ), ME_ST( ME_KB( 22 ) ),
-     :                       C1_DIM( 1 ), C1_DIM( 2 ), DEF, 1, 1, 
-     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       C1_DIM( 1 ), C1_DIM( 2 ), DEF, 1, 1,
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ),
      :                       BAD,
      :                       STATUS )
          END IF
 
-      END IF      
+      END IF
 
-*  Unless the output NDF is primitive, set the bad pixel flag 
+*  Unless the output NDF is primitive, set the bad pixel flag
 *  in the output NDF.
       CALL NDF_FORM( ONDF, 'DATA', FORM, STATUS )
 
       IF ( FORM .NE. 'PRIMITIVE' ) THEN
-         CALL NDF_SBAD( BAD, ONDF, 'DATA', STATUS )    
+         CALL NDF_SBAD( BAD, ONDF, 'DATA', STATUS )
       END IF
 
 *  Update the output title.
-      CALL NDF_CINP( 'TITLE', ONDF, 'TITLE', STATUS ) 
+      CALL NDF_CINP( 'TITLE', ONDF, 'TITLE', STATUS )
 
-*  Force the HDS file associated with the given parameter to be 
+*  Force the HDS file associated with the given parameter to be
 *  updated, so that its memory cache coincides with the data on disk.
       CALL DAT_UPDAT( PARAM, STATUS )
 

@@ -7,7 +7,7 @@
 *     Creates a graph of edges for PAIRNDF intercomparisons.
 
 *  Language:
-*     Starlink FORTRAN 77  
+*     Starlink FORTRAN 77
 
 *  Invocation:
 *     CALL CCD1_CRGR2( WEIGHT, NW, NODES, GRAPH, NEDGES, STATUS )
@@ -74,7 +74,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

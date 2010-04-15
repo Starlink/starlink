@@ -15,7 +15,7 @@
 
 *  Description:
 *     Create a unique name from the catalogue name and the field name.
-* 
+*
 
 *  Arguments:
 *     INPUT = CHARACTER * ( CHI__SZNAME ) (Given)
@@ -41,7 +41,7 @@
 *     None
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -83,7 +83,7 @@
       OUTFNAME = INPUT
       LENFNAME = CHR_LEN( FNAME )
       LENINPUT = CHR_LEN( INPUT )
-      IF ( LENINPUT .GT. 4 ) THEN 
+      IF ( LENINPUT .GT. 4 ) THEN
         LENINPUT = 4
       ENDIF
       CALL CHR_APPND('_',OUTFNAME,LENINPUT)

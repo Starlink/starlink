@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -83,7 +83,7 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -239,12 +239,12 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -493,7 +493,7 @@ respectively; the integer NPTS is the number of (x,y) values; XLAB, YLAB and
 GLAB are character strings giving the three labels (x-axis, y-axis and graph).
 Trailing blanks in the labels are ignored.
 Greek letters and special symbols can be used by including PWRITX function
-codes in the strings (see Appendix \ref{PWRT_sect}) by virtue of linking with 
+codes in the strings (see Appendix \ref{PWRT_sect}) by virtue of linking with
 the Starlink version of AGPWRT (\S\ref{link_sect} and \S\ref{text_sect}).
 
 When using SNX, the format of numeric labels is ``0.4", ``$-0.25$" instead of
@@ -830,7 +830,7 @@ The values 0 and $\pm2$ produce proportionally-spaced strings and
 allow fancy characters to be used;
 $\pm1$ produces monospaced strings consisting of ordinary letters
 (including lowercase), numbers and punctuation characters.
-You would use $\pm1$ for plotting a table -- 
+You would use $\pm1$ for plotting a table --
 the AUTOGRAPH numeric labels are plotted using this value.
 There is no provision for centred monospaced strings.
 
@@ -954,13 +954,13 @@ application with SNX the command line would be
 \end{verbatim}
 \end{quote}
 
-SUN/144 gives further details of compiling and linking ADAM applications 
+SUN/144 gives further details of compiling and linking ADAM applications
 with the UNIX operating system.
 
 
 \subsection {Use with the VAX/VMS operating system}
 
-When developing ADAM applications, all logical names and symbols used 
+When developing ADAM applications, all logical names and symbols used
 during compiling and linking are defined by executing the procedures
 
 \begin{quote}
@@ -984,8 +984,8 @@ $ ALINK application,NCAR_DIR:SNX_LINK_ADAM/OPT
 
 \subsection {Overview}
 
-This section discusses the portability of SNX, including the coding 
-standard adopted and a list of those Starlink packages which 
+This section discusses the portability of SNX, including the coding
+standard adopted and a list of those Starlink packages which
 need to be ported to the target machine before a port of SNX can proceed.
 
 
@@ -993,11 +993,11 @@ need to be ported to the target machine before a port of SNX can proceed.
 
 The standard of Fortran used for the coding of SNX is fundamentally Fortran 77,
 using the Starlink Fortran coding conventions described in SGP/16.
-Several common extensions to the Fortran 77 standard are used in the SNX source 
+Several common extensions to the Fortran 77 standard are used in the SNX source
 code; they are as follows:
 
 \begin {itemize}
-\item symbolic subprogram names may be longer than six characters (but are 
+\item symbolic subprogram names may be longer than six characters (but are
 always shorter than ten characters);
 \item symbolic subprogram names include the ``\_'' symbol;
 \item the full ASCII character set is assumed in character constants.
@@ -1008,7 +1008,7 @@ SNX requires NCAR, SGS and GKS Vn. 7.2 or GKS Vn. 7.4 to be available.
 
 
 \section {Demonstration -- the XYPLOT Program} \label{demo1_sect}
- 
+
 The following pages contain a listing of the Fortran source for a
 program called XYPLOT, plus a sample input file and the plot it
 produces.  As well as demonstrating several of the facilities described
@@ -1029,7 +1029,7 @@ $ RUN XYPLOT
 \end{verbatim}
 \end {quote}
 
-On UNIX, this program may already be installed in directory 
+On UNIX, this program may already be installed in directory
 {\tt /star/bin/examples/snx}.  If it has been deinstalled and removed to save
 space, you can copy the entire source directory to a scratch dircetory, and
 with the SYSTEM environment variable set appropriately, build and run it thus:
@@ -1153,13 +1153,13 @@ text without PWRITX codes.
 A Bogus Star 'V:-50IGL'Y'H:-80KRU'C  DLT 1986
 Wavelength / '.A'
 F'GLB'K'NRU' / 10'S'-26'N' erg cm'S'-2'N' s'S'-1'N' '.AS'-1
-   4004.000      0.1888006    
+   4004.000      0.1888006
    4008.000      0.0000000E+00
    4012.000      0.0000000E+00
-   4016.000      0.3046547    
-   4020.000      0.3328641    
+   4016.000      0.3046547
+   4020.000      0.3328641
    4024.000      3.8437031E-02
-   4028.000      0.2980890    
+   4028.000      0.2980890
              :
              :
              :
@@ -1179,7 +1179,7 @@ file and try again.
 
 XYPLOT produced the following graph when the example input file given
 in the previous section was used.
-Further copies can be obtained by running XYPLOT and replying with the 
+Further copies can be obtained by running XYPLOT and replying with the
 name of the example input file to the `Filename?' prompt.
 
 \begin{figure}
@@ -1208,7 +1208,7 @@ $ RUN SPEED
 \end{verbatim}
 \end {quote}
 
-On UNIX, this program may already be installed in directory 
+On UNIX, this program may already be installed in directory
 {\tt /star/bin/examples/snx}.  If it has been deinstalled and removed to save
 space, you can copy the entire source directory to a scratch dircetory, and
 with the SYSTEM environment variable set appropriately, build and run it thus:
@@ -1223,8 +1223,8 @@ with the SYSTEM environment variable set appropriately, build and run it thus:
 
 
 The program will prompt ``Filename?" (respond NCAR\_DIR:SPEED.DAT on VAX/VMS
-and {\bf /star/\-starlink/\-lib/\-snx/speed.dat} on UNIX) and ``Workstation?" 
-(give the SGS workstation name). 
+and {\bf /star/\-starlink/\-lib/\-snx/speed.dat} on UNIX) and ``Workstation?"
+(give the SGS workstation name).
 The prompt:
 
 \begin {quote}
@@ -1408,14 +1408,14 @@ the ``S" or ``H" options are used.
 Simulated Stellar Spectrum
 Wavelength
 Flux
-   5000.000       6.738085    
-   5004.000       8.849804    
-   5008.000       9.914771    
-   5012.000       9.484353    
-   5016.000       9.981673    
-   5020.000       11.45505    
-   5024.000       8.954852    
-   5028.000       11.32500    
+   5000.000       6.738085
+   5004.000       8.849804
+   5008.000       9.914771
+   5012.000       9.484353
+   5016.000       9.981673
+   5020.000       11.45505
+   5024.000       8.954852
+   5028.000       11.32500
              :
              :
              :
@@ -1446,7 +1446,7 @@ $ RUN INDEMO
 \end{verbatim}
 \end {quote}
 
-On UNIX, this program may already be installed in directory 
+On UNIX, this program may already be installed in directory
 {\tt /star/bin/examples/snx}.  If it has been deinstalled and removed to save
 space, you can copy the entire source directory to a scratch dircetory, and
 with the SYSTEM environment variable set appropriately, build and run it thus:
@@ -1587,11 +1587,11 @@ characters (the Roman characters being those in the ``complex" font).
 
 This routine is a substitute for the NCAR routine of the
 same name, but allowing the PWRITX character drawing routine
-to be used instead of the usual PWRIT, giving access to special fonts, 
+to be used instead of the usual PWRIT, giving access to special fonts,
 {\em etc.}
 
 The character string accepted by the PWRITX routine includes
-control codes to switch font, {\em etc.} 
+control codes to switch font, {\em etc.}
 This implementation of
 AGPWRT accepts and passes PWRITX codes and also inserts the
 appropriate codes where lowercase and certain other characters
@@ -1738,7 +1738,7 @@ ICEN argument (special use to select string drawing routine):
 \begin{tabular}{ll}
 ICEN & Meaning\\
 \\
---100 & Selects PWRIT routine, which gives access to GKS fonts, precision, 
+--100 & Selects PWRIT routine, which gives access to GKS fonts, precision,
 {em etc.}\\
 \\
 +100 & Selects PWRITX routine, which gives access to special fonts and other

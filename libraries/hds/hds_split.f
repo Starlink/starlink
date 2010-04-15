@@ -51,7 +51,7 @@
 *     file can not be opened by HDS the ".sdf" will be assumed to be part of
 *     the filename. This approach is not full proof since HDS_SPLIT is not
 *     always called with a full path to a valid file. In generaly the best place
-*     for disambiguating would be the caller but this routine is used in places 
+*     for disambiguating would be the caller but this routine is used in places
 *     other than HDS_FIND so it is better to absorb the overhead. The HDS open
 *     will only occur for the .sdf case. The earlier note comments that some
 *     validation occurs but not all, this is probably at odds with that sentiment.
@@ -117,14 +117,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'DAT_ERR'          ! DAT_ error codes      
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -320,7 +320,7 @@
                DO 1 IEND = L, F, -1
                   IF ( NAME( IEND : IEND ) .EQ. '/' ) GO TO 2
  1             CONTINUE
- 2             CONTINUE              
+ 2             CONTINUE
             END IF
 
 *  Having located the end of the directory specification (if any), now
@@ -365,7 +365,7 @@
 *  The main problem here is that we have to *assume* that there is no SDF component
 *  OR we have to actually look...
 *  Have to watch out for .sdfx components.
-            IF ( IEND + DAT__SZFLX .LE. L .AND. 
+            IF ( IEND + DAT__SZFLX .LE. L .AND.
      :           CHR_SIMLR( NAME(F2+1:F2+DAT__SZFLX), DAT__FLEXT )) THEN
 *     Must disambiguate .sdf from .sdfx
                OFFSET = F2 + DAT__SZFLX + 1
@@ -391,7 +391,7 @@
                   LSTAT = SAI__OK
                   CALL HDS_OPEN( NAME(F1:F2), 'READ', TESTLOC, LSTAT )
                   IF ( LSTAT .EQ. SAI__OK ) THEN
-*     File opened okay, so now disambiguate (taking substring requires local 
+*     File opened okay, so now disambiguate (taking substring requires local
 *     buffer).
                      FLEXT = DAT__FLEXT
                      CALL DAT_THERE( TESTLOC, FLEXT( 2 : DAT__SZFLX ),

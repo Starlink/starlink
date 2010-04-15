@@ -152,7 +152,7 @@ sub new {
 
   my $proto = shift;
   my $class = ref($proto) || $proto;
- 
+
   my $nbs = {};  # Anon hash
 
   $nbs->{Path} = undef;  # Path to item (incl name)
@@ -163,15 +163,15 @@ sub new {
   $nbs->{Nchilds} = undef;    # Number of children
   $nbs->{Pos}   = 0;      # Position in structure
   $nbs->{Debug} = 0;
-   
+
   # Bless task into class
   bless($nbs, $class);
- 
+
   # If we have arguments then assume we are trying
   # to load a new top level notice board
 
   if (@_) { $nbs->loadnbs(@_);};
- 
+
   return $nbs;
 
 }
@@ -244,9 +244,9 @@ True if this is a top-level object. False otherwise.
 
 sub top {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $val = shift;
-    if ($val) { 
+    if ($val) {
       $self->{Top} = 1;
     } else {
       $self->{Top} = 0;
@@ -305,7 +305,7 @@ sub nchilds {
     if ($status == &SAI__OK) {
       $self->{Nchilds} = $num;
     }
-  } 
+  }
 
   return $self->{Nchilds};
 }
@@ -354,7 +354,7 @@ sub loadnbs {
   # Populate the object
   $self->status($status);
   if ($self->isokay) {
-    $self->id($id);  
+    $self->id($id);
     $self->path($self->name);
     $self->top(1);
     $self->rootid($id);
@@ -450,10 +450,10 @@ sub size {
 
   my $self = shift;
   my ($size, $maxsize, $primitive,  $status);
-  my ($bsize, $bmaxsize, $type, $bytes_per_unit); 
- 
+  my ($bsize, $bmaxsize, $type, $bytes_per_unit);
+
   $status = $self->status;
-  
+
   nbs_get_primitive($self->id, $primitive, $status);
 
   # If we have a primitive then we can proceed
@@ -465,9 +465,9 @@ sub size {
 
     # Now get the type (should I go through the method call here?
     nbs_get_type($self->id, $type, $status);
-    
+
     # From the type work out the number of bytes per unit
-    
+
     # First need strip leading _
     $type =~ s/^_//;
 
@@ -486,7 +486,7 @@ sub size {
   } else {
    print "It is not a primitive\n" if $self->debug;
    $status = &NBS__NOTPRIMITIVE;
- 
+
   }
 
   return ($size, $maxsize, $status);
@@ -512,7 +512,7 @@ sub nth_name {
    my $id = $self->id;
    my ($child, $name);
    my $status = $self->status;
-   
+
    # Check num
    return undef if ($num < 0 || $num > $self->nchilds);
 
@@ -552,7 +552,7 @@ sub find {
 
   my ($start_id, $path, $lump, $parent_id, $child_id, $status);
 
-  # Now need to parse the input name.  
+  # Now need to parse the input name.
   # Split on the '.'
 
   my @bits = split(/\./, $new);
@@ -567,7 +567,7 @@ sub find {
      # Starting from current object
      $start_id = $self->id;
      $path = $self->path . $new;
-     shift @bits;  # Shift off the blank entry (parent)   
+     shift @bits;  # Shift off the blank entry (parent)
   }
 
   # Loop through the names until we find the one we are looking
@@ -578,7 +578,7 @@ sub find {
   $parent_id = $start_id;  # This is the first parent
 
   foreach $lump (@bits) {
-    
+
     nbs_find_item($parent_id, $lump, $child_id, $status);
 
     last if $status != &SAI__OK;
@@ -603,7 +603,7 @@ sub find {
     # Store the new object
     $new_obj->id($child_id);
 
-  } 
+  }
 
   return $new_obj;
 
@@ -629,7 +629,7 @@ sub get {
   my ($status, @values, $value, $type, $primitive);
 
   $status = $self->status;
-  
+
   nbs_get_primitive($self->id, $primitive, $status);
 
   # If we have a primitive then we can proceed
@@ -637,7 +637,7 @@ sub get {
 
     # Now get the type (should I go through the method call here?
     nbs_get_type($self->id, $type, $status);
-    
+
 
     # First need strip leading
     if ($status == &SAI__OK) {
@@ -646,19 +646,19 @@ sub get {
         nbs_get_value_i($self->id, \@values, $status);
 
       } elsif ($type eq '_REAL') {
-  
+
         nbs_get_value_f($self->id, \@values, $status);
 
       } elsif ($type eq '_DOUBLE') {
-  
+
         nbs_get_value_d($self->id, \@values, $status);
 
       } elsif ($type eq '_LOGICAL') {
-  
+
         nbs_get_value_l($self->id, \@values, $status);
 
       } elsif ($type eq '_CHAR') {
-  
+
         nbs_get_value_c($self->id, $value, $status);
         push(@values, $value);
 
@@ -701,7 +701,7 @@ sub put {
   my ($status, $type, $old, $string, $primitive);
 
   $status = $self->status;
-  
+
   nbs_get_primitive($self->id, $primitive, $status);
 
   # If we have a primitive then we can proceed
@@ -709,7 +709,7 @@ sub put {
 
     # Now get the type (should I go through the method call here?
     nbs_get_type($self->id, $type, $status);
-    
+
     # Now need to get permission to work on this noticeboard
     nbs_tune_noticeboard($self->rootid, "WORLD WRITE", 1, $old, $status);
 
@@ -725,15 +725,15 @@ sub put {
         nbs_put_value_f($self->id, $#values+1, \@values, $status);
 
       } elsif ($type eq '_DOUBLE') {
-  
+
         nbs_put_value_d($self->id, $#values+1, \@values, $status);
 
       } elsif ($type eq '_LOGICAL') {
-  
+
         nbs_put_value_l($self->id, $#values+1, \@values, $status);
 
       } elsif ($type eq '_CHAR') {
-  
+
         nbs_put_value_c($self->id, $values[0], $status);
 
       } else {
@@ -744,7 +744,7 @@ sub put {
         print "Cannot put data for $name into item of type $type\n";
 
       }
-    } 
+    }
 
   } else {
 
@@ -824,7 +824,7 @@ Noticeboard structures can be tied to perl hashes also:
    tie (%hash, ref($what), $what);
 
 Now %hash can be used to update the entire noticeboard structure.
-Note that keys are always assumed to be relative to the 
+Note that keys are always assumed to be relative to the
 tied object -- in effect this means that a '.' is automatically
 prepended to all keys if one is not found. (see find()
 for more information on relative addressing).
@@ -848,7 +848,7 @@ list the hash.
   $nbs = new Starlink::NBS($nbsname);
   tie %hash, ref($nbs), $nbs;
 
-  print Dumper(\%hash);  
+  print Dumper(\%hash);
 
 A method is supplied for tieing NBS objects to variables:
 
@@ -867,8 +867,8 @@ returned.
 
 sub tienbs {
   my $self = shift;
-  my ($tie, %tie); 
- 
+  my ($tie, %tie);
+
   # Check if it is a primitive
   my ($prim,$status) = $self->primitive;
   if ($status == &SAI__OK) {
@@ -889,13 +889,13 @@ sub tienbs {
 
 
 # Method to tie a scalar to a notice board item
-# Expects a  Starlink::NBS object that is pointing to 
+# Expects a  Starlink::NBS object that is pointing to
 # a primitive noticeboard entry
 
 sub TIESCALAR {
   my $class = shift;
   my $obj = shift;
-  
+
   # Check that we have been supplied an object
   unless (UNIVERSAL::isa($obj, "Starlink::NBS")) {
     carp "NBS:Tiescalar can not tie a non-NBS object";
@@ -918,7 +918,7 @@ sub TIESCALAR {
 sub TIEHASH {
   my $class = shift;
   my $obj = shift;
-  
+
   # Check that we have been supplied an object
   unless (UNIVERSAL::isa($obj, "Starlink::NBS")) {
     carp "NBS:Tiehash can not tie a non-NBS object";
@@ -946,7 +946,7 @@ sub TIEHASH {
 
 
 # Method to retrieve the value of the tied object
-# Now we need to distinguish between a tied scalar and a 
+# Now we need to distinguish between a tied scalar and a
 # tied hash (since we are allowing both to be tied in this
 # module)
 
@@ -999,7 +999,7 @@ sub FETCH {
     # We are a tied scalar
     # We know we are a primitive
     print "TIED scalar\n" if $self->debug;
-    
+
     ($status, my $value) = $self->get;
     if ($status == &SAI__OK) {
       return $value;
@@ -1031,7 +1031,7 @@ sub STORE {
 
     if ($status == &SAI__OK) {
       if ($prim) {
-	
+
 	# If we have been given a scalar
 	if (not ref($value)) {
 	  $status = $obj->put($value);
@@ -1052,7 +1052,7 @@ sub STORE {
 	  # Need to loop over the keys and put each object into
 	  # shared memory (note this does not mean that we create
 	  # the shared memory portion)
-	  
+
 	  foreach my $nkey (keys %$value) {
 	    # Recursion
 	    $obj->STORE($nkey, $$value{$nkey});
@@ -1061,7 +1061,7 @@ sub STORE {
 	}
 
       }
-    } 
+    }
 
   } else {
     # Tied scalar
@@ -1075,7 +1075,7 @@ sub STORE {
     ems1_get_facility_error($status, my $facility, my $ident, my $text);
     carp "NBS::STORE: Error storing $value in $name$key\n".
       "$status: $text\n";
-  } 
+  }
 
 
 }
@@ -1134,7 +1134,7 @@ sub NEXTKEY {
 
   my $lastkey = shift;
   my $curr = $self->pos;
-  
+
   # Increment counter
   $curr++;
   $self->pos($curr);
@@ -1207,7 +1207,7 @@ Starlink can be contacted at http://www.starlink.ac.uk/
 
 =head1 AUTHOR
 
-T. Jenness (t.jenness@jach.hawaii.edu). Copyright T. Jenness and 
+T. Jenness (t.jenness@jach.hawaii.edu). Copyright T. Jenness and
 Particle Physics and Astronomy Research Council 1997, 1998.
 All Rights Reserved.
 

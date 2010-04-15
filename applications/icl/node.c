@@ -99,7 +99,7 @@ string_op(int yaccopcode)
  *
  ******************************************************************************
  */
-static node 
+static node
 *nodebuild(value(*interpreter) (), value val, int nsub)
 {
     node *new = (node *) malloc(sizeof(node));
@@ -199,7 +199,7 @@ node3(value(*interpreter) (), value val, node *n0, node *n1, node *n2)
  ******************************************************************************
  */
 node *
-node4(value(*interpreter) (), value val, node *n0, node *n1, node *n2, 
+node4(value(*interpreter) (), value val, node *n0, node *n1, node *n2,
       node *n3)
 {
     node *new = nodebuild(interpreter, val, 4);

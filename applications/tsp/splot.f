@@ -10,14 +10,14 @@ C     Function:
 C        Plot a polarization spectrum with a single Stokes parameter
 C
 C     Description:
-C        SPLOT produces a plot of a polarization spectrum. The plot is 
+C        SPLOT produces a plot of a polarization spectrum. The plot is
 C        divided into two panels. The lower panel is the total intensity,
 C        the top panel is the percentage polarization for a single Stokes
 C        parameter. If the dataset contains only one Stokes parameter that
 C        Stokes parameter is plotted. If the spectrum contains more than
 C        one Stokes parameter any one of them may be chosen for plotting.
-C        The polarization data is binned into variable size bins to give 
-C        a constant polarization error per bin. Plotting is done with the 
+C        The polarization data is binned into variable size bins to give
+C        a constant polarization error per bin. Plotting is done with the
 C        NCAR/SGS/GKS graphics system.
 C
 C     Parameters:
@@ -26,7 +26,7 @@ C                               have at least one Stokes parameter.
 C    (2) BINERR     (Real)     The percentage error for each polarization
 C                               bin.
 C    (3) DEVICE     (Device)   The Graphics device (any valid GKS device).
-C    (4) LABEL      (Char)     A label for the plot.             
+C    (4) LABEL      (Char)     A label for the plot.
 C        STOKESPAR  (Char)     The Stokes parameter to be plotted (Q,U,V).
 C        AUTO       (Logical)  True if plot is to be autoscaled.
 C    (C) IMIN       (Real)     Minimum Intensity level to plot.
@@ -34,22 +34,22 @@ C    (C) IMAX       (Real)     Maximum Intensity level to plot.
 C    (C) PMIN       (Real)     Minimum Polarization level to plot.
 C    (C) PMAX       (Real)     Maximum Polarization level to plot.
 C
-C     Support: 
+C     Support:
 C         Jeremy Bailey, AAO
 C
-C     Version date: 
+C     Version date:
 C         19/8/1988
 C
 C-
 C
 C  History:
-C    1/9/1987   Original Version.   JAB/AAO 
+C    1/9/1987   Original Version.   JAB/AAO
 C    26/2/1988   TSP Monolith version.  JAB/AAO
 C    29/4/1988   Use X-label from data. JAB/AAO
 C    19/8/1988   Handle abort on LABEL or DEVICE.  JAB/AAO
 C
       IMPLICIT NONE
-      INCLUDE 'SAE_PAR'        
+      INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -66,7 +66,7 @@ C
       REAL BINERR
 
 *  Autoscale flag
-      LOGICAL AUTO                               
+      LOGICAL AUTO
 
 *  Input OK flag
       LOGICAL OK
@@ -76,26 +76,26 @@ C
 
 *  Scaling levels
       REAL IMIN,IMAX
-      REAL PMIN,PMAX    
+      REAL PMIN,PMAX
       INTEGER NUM
       LOGICAL Q,U,V
 
 *  HDS locators
       CHARACTER*(DAT__SZLOC) TLOC,LOC,ILOC,STLOC,SLOC,ELOC,LLOC
       CHARACTER*64 LABEL,UNITS,XLABEL,YLABEL
-      INTEGER L1,L2                     
+      INTEGER L1,L2
 
 *  ICH function
-      INTEGER CHR_LEN                            
-                                               
+      INTEGER CHR_LEN
+
 *  Get the data
-                                       
+
       CALL DAT_ASSOC('INPUT','READ',LOC,STATUS)
       CALL TSP_SIZE(LOC,3,DIMS,ACTDIM,STATUS)
       SIZE = DIMS(1)
 
 *  Get the Stokes parameter objects
-                 
+
       CALL TSP_STOKES(LOC,NUM,Q,U,V,STATUS)
 
 *  If more than one Stokes parameter ask which one to use
@@ -114,16 +114,16 @@ C
 *  If not cancel parameter and prompt again
               IF (.NOT. OK) CALL PAR_CANCL('STOKESPAR',STATUS)
           ENDDO
-      ELSE                                               
+      ELSE
 
 *  If only one stokes parameter use that
 
-          IF (Q) THEN 
+          IF (Q) THEN
              STOKES = 'Q'
           ELSE IF (U) THEN
              STOKES = 'U'
           ELSE IF (V) THEN
-             STOKES = 'V'               
+             STOKES = 'V'
           ELSE
              CALL MSG_OUT('MSG','No Stokes Parameter in Dataset',
      :            STATUS)
@@ -162,11 +162,11 @@ C
 
       CALL TSP_RLU(LOC,LABEL,UNITS,STATUS)
       L1 = CHR_LEN(LABEL)
-      L2 = CHR_LEN(UNITS)                
+      L2 = CHR_LEN(UNITS)
       IF (LABEL .EQ. ' ') THEN
           YLABEL = 'Intensity$'
       ELSE
-          YLABEL = LABEL(1:L1)//' '//UNITS(1:L2)//'$'      
+          YLABEL = LABEL(1:L1)//' '//UNITS(1:L2)//'$'
       ENDIF
 
 *  Get temporary array for binned data
@@ -175,7 +175,7 @@ C
 
 *  Get the Binning error
 
-      CALL PAR_GET0R('BINERR',BINERR,STATUS) 
+      CALL PAR_GET0R('BINERR',BINERR,STATUS)
 
 *  Autoscaling?
 
@@ -213,7 +213,7 @@ C
 
       print *,'finished'
 
-*  Tidy up      
+*  Tidy up
 
       CALL TSP_UNMAP(ILOC,STATUS)
       CALL TSP_UNMAP(SLOC,STATUS)
@@ -224,7 +224,7 @@ C
       print *,'exiting'
       END
 
-      
+
 
 
       SUBROUTINE TSP_SPBIN(SIZE,INT,STOKES,ERROR,BINERR,BINNED,STATUS)
@@ -241,7 +241,7 @@ C
 *   in percentage polarization.
 *
 *   Bins with no data are filled with the bad value  (VAL__BADR)
-*       
+*
 *    (>)  SIZE   (Integer)            The number of spectral points
 *    (>)  INT    (Real array(SIZE))   The intensity array
 *    (>)  STOKES (Real array(SIZE))   The stokes parameter array
@@ -249,31 +249,31 @@ C
 *    (>)  BINERR (Real)               Error per bin (percent)
 *    (<)  BINNED (Real array(SIZE))   Binned stokes array
 *    (!)  STATUS (Integer)            Status value
-*   
+*
 *    Jeremy Bailey   12/7/1990
 *
 *    Modified:
 *        16/12/1991  -  Handle bad values
 *
-*+   
+*+
 
 
-      IMPLICIT NONE                                       
+      IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
 *  Parameters
-      INTEGER SIZE                                      
+      INTEGER SIZE
       REAL BINERR
       REAL INT(SIZE),STOKES(SIZE),ERROR(SIZE),BINNED(SIZE)
-      INTEGER STATUS      
+      INTEGER STATUS
 
-*  Local variables       
+*  Local variables
       LOGICAL BIG_ENOUGH, MORE_DATA
       INTEGER BIN_START, BIN_END
       REAL BIN_STOKES, BIN_INT, BIN_VAR
-      INTEGER I 
+      INTEGER I
 
 *  Bin the data
 
@@ -286,7 +286,7 @@ C
          BIN_END = 1
 
 *  Loop over bins
-                    
+
          DO WHILE (MORE_DATA)
 
 *  initialize accumulated values for bin
@@ -297,7 +297,7 @@ C
             BIN_VAR = 0.0
             BIG_ENOUGH = .FALSE.
 
-*  add data into the bin until there is enough data to give 
+*  add data into the bin until there is enough data to give
 *  required polarization accuracy
 
             DO WHILE (.NOT. BIG_ENOUGH)
@@ -334,12 +334,12 @@ C
                ENDIF
             ENDDO
             MORE_DATA = BIN_END .LE. SIZE
-         ENDDO   
+         ENDDO
       ENDIF
       END
-                     
 
-                  
+
+
 
 
        SUBROUTINE TSP_SPLOT(SIZE,INT,TEMP,LAMBDA,PMIN,PMAX,
@@ -349,12 +349,12 @@ C
 *   T S P _ S P L O T
 *
 *   Subroutine to do the stokes plot. This routine plots
-*   the intensity and stokes parameter arrays as a function of 
-*   wavelength. It includes the PAR_ calls to get the plot device 
+*   the intensity and stokes parameter arrays as a function of
+*   wavelength. It includes the PAR_ calls to get the plot device
 *   and plot label.
 *
 *   Parameters:
-*       
+*
 *  (>)   SIZE    (Integer)           The number of spectral points
 *  (>)   INT     (Real array(SIZE))  The intensity array
 *  (>)   TEMP    (Real array(SIZE))  Temporary array for the binned data
@@ -382,8 +382,8 @@ C
 
 *  Data arrays
       REAL INT(SIZE),TEMP(SIZE),LAMBDA(SIZE)
-      REAL IMIN,IMAX 
-      REAL PMIN,PMAX          
+      REAL IMIN,IMAX
+      REAL PMIN,PMAX
       CHARACTER*(*) XLABEL,YLABEL
       INTEGER STATUS
 
@@ -449,7 +449,7 @@ C
          CALL AGSETI('LINE/NUMBER.',100)
          CALL AGSETF('LINE/CHAR.',0.040)
          CALL AGSETC('LINE/TEXT.','Polarization (%)$')
-                                    
+
 *  Title Size
 
          CALL AGSETC('LABEL/NAME.','T')
@@ -468,18 +468,18 @@ C
 
          CALL AGSETF('Y/MIN.',PMIN)
          CALL AGSETF('Y/MAX.',PMAX)
-         CALL AGSETF('Y/NICE.',0.0)                  
+         CALL AGSETF('Y/NICE.',0.0)
 
 *  Blank X-axis label
 
          CALL AGSETC('LABEL/NAME.','B')
          CALL AGSETI('LINE/NUMBER.',-100)
          CALL AGSETC('LINE/TEXT.',' $')
-         CALL AGSETF('B/MA/CO.',2.0)    
+         CALL AGSETF('B/MA/CO.',2.0)
          CALL AGSETF('T/MA/CO.',2.0)
 
 *  Plot the Stokes data
-                                        
+
          CALL EZXY(LAMBDA,TEMP,SIZE,LABEL//'$')
 
 *  Bottom half of screen for intensity plot
@@ -505,11 +505,11 @@ C
          CALL AGSETF('B/WI.',0.040)
          CALL AGSETF('X/NICE.',0.0)
 
-*  Plot scaling                    
+*  Plot scaling
 
          CALL AGSETF('Y/MIN.',IMIN)
          CALL AGSETF('Y/MAX.',IMAX)
-         CALL AGSETF('Y/NICE.',0.0)                  
+         CALL AGSETF('Y/NICE.',0.0)
 
 *  Numbering on X-axis
 

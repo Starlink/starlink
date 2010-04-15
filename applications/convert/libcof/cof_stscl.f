@@ -22,7 +22,7 @@
 *  Arguments:
 *     FUNITH = INTEGER (Given)
 *        The FITS unit number associated with the header.  This may
-*        differ from that associated with the data if a merged header 
+*        differ from that associated with the data if a merged header
 *        has been constructed.
 *     NDFO = INTEGER (Given)
 *        The identifier to the NDF to have scale and offset applied.
@@ -43,7 +43,7 @@
 *     the FITS file to the NDF, and unmapped.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics & Astronomy Research 
+*     Copyright (C) 2007 Particle Physics & Astronomy Research
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -72,7 +72,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -82,9 +82,9 @@
       INCLUDE 'PRM_PAR'          ! VAL__EPSD
 
 *  Arguments Given:
-      INTEGER FUNITH             ! FITS unit for the (merged?) FITS 
+      INTEGER FUNITH             ! FITS unit for the (merged?) FITS
                                  ! header
-      INTEGER NDFO               ! NDF identifier                           
+      INTEGER NDFO               ! NDF identifier
       CHARACTER * ( * ) COMP     ! NDF array component
       CHARACTER * ( * ) TYPE     ! Desired scaled data type
 
@@ -104,10 +104,10 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Find the data type required for the output array based upon the 
-*  number of significant digits in the BSCALE and BZERO keywords.  If 
+*  Find the data type required for the output array based upon the
+*  number of significant digits in the BSCALE and BZERO keywords.  If
 *  these have values of 1.0D0 and 0.0D0 respectively either explicitly,
-*  or because one or both are absent, then the data type can be set to 
+*  or because one or both are absent, then the data type can be set to
 *  the null string.
       IF ( TYPE .EQ. ' ' ) THEN
          CALL COF_DSTYP( FUNITH, 'BSCALE', 'BZERO', STYPE, STATUS )

@@ -33,7 +33,7 @@
 *
 *    Authors :
 *
-*     Colin Aspin (JACH::CAA) 
+*     Colin Aspin (JACH::CAA)
 *
 *    History :
 *
@@ -48,8 +48,8 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'       ! global SSE definitions
-      INCLUDE 'NDF_PAR'       
-      INCLUDE 'NDF_ERR'       
+      INCLUDE 'NDF_PAR'
+      INCLUDE 'NDF_ERR'
 
 *    Status :
 
@@ -68,7 +68,7 @@
      :  ACTDIM,               ! actual dimensions from NDF_DIM
      :  NELEMENTS,            ! number of elements mapped by NDF_MAP
      :  PNTRO,                ! pointer to output DATA_ARRAY
-     :  PNTRI,                !    "     " input      " 
+     :  PNTRI,                !    "     " input      "
      :	YSIZE,                ! y size of output image
      :  LOCI,                 ! locator for input IMAGE structure
      :  LOCO                  ! locator for output IMAGE structure
@@ -112,7 +112,7 @@
 
 *            create the output image and get a title for it
 
-	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO, 
+	      CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, ODIMS, LOCO,
      :                     STATUS )
 
 *            check for error
@@ -130,8 +130,8 @@
 
 *                pass everything to the rapid median calculation routine
 
-	          CALL YGROWSUB( DIMS(1), DIMS(2), %VAL( PNTRI), 
-     :	                         ODIMS(1), ODIMS(2), %VAL( PNTRO), 
+	          CALL YGROWSUB( DIMS(1), DIMS(2), %VAL( PNTRI),
+     :	                         ODIMS(1), ODIMS(2), %VAL( PNTRO),
      :                           STATUS)
 
 	        END IF

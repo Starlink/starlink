@@ -320,7 +320,7 @@
          END DO
       END DO
 
-*  Cleaning proceeds in two phases, first the 'object' regions and then 
+*  Cleaning proceeds in two phases, first the 'object' regions and then
 *  the 'sky'.
 
 *  Initialising phase-of-process flags.
@@ -346,18 +346,18 @@
             CLIPPED_COUNT = 0
             LAST_PROB = 0.0
             USED_PIXELS = 0
-      
+
 *        Loop Setting up flag array for pixels to be used at this offset.
             DO IY_DELTA = DEK_BELOW( IORD ), DEK_ABOVE( IORD )
                IGNORED( IY_DELTA ) = .FALSE.
                PROCESS( IY_DELTA ) = .FALSE.
-      
+
 *           If pixel should be processed then.
                IF ( ( ( SKY_MASK( IY_DELTA, IORD ) .GT. 0 ) .AND.
      :              .NOT. SKY_CLEANED ) .OR.
      :              ( OBJ_MASK( IY_DELTA, IORD ) .GT. 0) .AND.
      :              SKY_CLEANED ) THEN
-      
+
 *              Setup flag and count usable pixels in image.
                   PROCESS( IY_DELTA )  = .TRUE.
                   PCOUNT = 0
@@ -368,18 +368,18 @@
      :                    PCOUNT = PCOUNT + 1
                      ENDIF
                   END DO
-      
+
 *              If any good pixels at all then increment used counter.
                   IF ( PCOUNT .GT. 0 ) THEN
                      USED_PIXELS = USED_PIXELS + 1
-      
+
 *              Else set ignore-this-increment flag.
                   ELSE
                      IGNORED( IY_DELTA ) = .TRUE.
                   ENDIF
                ENDIF
             END DO
-      
+
 *        Set default expectation values to all increments identical.
             DO IY_DELTA = DEK_BELOW( IORD ), DEK_ABOVE( IORD )
                IF ( PROCESS( IY_DELTA ) .AND.
@@ -388,7 +388,7 @@
      :                  FLOAT( USED_PIXELS )
                END IF
             END DO
-      
+
 *        Loop until no more pixels to clip from this order.
             DO WHILE ( CLIP )
                CALL ECH_DECOS_PREDICT(
@@ -398,7 +398,7 @@
      :              EXPECTED_PERCENT, PIXEL_COUNT, MEAN, SIGMA,
      :              MCOUNT, MEAN_ENERGY, Y_TRACE_COORD, DATA,
      :              INDEX_X, INDEX_Y, STATUS )
-      
+
 *            If enough values in the data set.
                IF ( PIXEL_COUNT .GT. 20 ) THEN
                   CALL ECH_DECOS_THEORETICAL(
@@ -411,22 +411,22 @@
      :                 LAST_PROB, DATA, DATA_SRT, XAXIS, YAXIS,
      :                 GAUSSIAN, INDEX_X,INDEX_Y, CLIPPED_COUNT,
      :                 CLIP, STATUS )
-      
+
 *           Flag this increment as non-processable, stop clipping.
                ELSE
                   CLIP = .FALSE.
                ENDIF
             END DO
-      
+
 *        Display results, fit polynomials.
             CALL ECH_DECOS_FIT_PROFINC(
      :           NX, NY, IMAGE, QUALITY, DEK_BELOW( IORD ),
      :           DEK_ABOVE( IORD ), PROCESS, COUNT, ENERGY,
-     :           MAXIMUM_POLY, 
+     :           MAXIMUM_POLY,
      :           FIT_POLY( 1,-MAX_SLICE_PIXELS / 2,IORD ),
      :           FIT_ORDER, DATA_SRT, FRACTION, XAXIS, YAXIS,
      :           W_TO_FIT, Y_TRACE_COORD, STATUS )
-      
+
 *        If required, estimate sky.
             IF ( .NOT. SKY_CLEANED )
      :          CALL ECH_DECOS_ESTIMATE_SKY(
@@ -512,7 +512,7 @@
       IMPLICIT NONE
       INTEGER COUNT
       INTEGER RESULT( 0 : 12 )
-      
+
       DATA RESULT
      :      / 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 36288,
      :        3628800, 39916800, 479001600 /

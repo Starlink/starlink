@@ -14,7 +14,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
@@ -85,7 +85,7 @@ GSD2ACSIS is a SMURF routine used to convert DAS and AOSC data stored in the GSD
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -700,12 +700,12 @@ GSD2ACSIS is a SMURF routine used to convert DAS and AOSC data stored in the GSD
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -820,7 +820,7 @@ The JCMTSTATE extension contains stores the timestep-specific data.
 {\bf RTS\_NUM}
 
 The RTS sequence number increments at each time step of the observation, beginning with RTS\_NUM = 1 for the first time step.  The total number of RTS steps is:
-\begin{equation} 
+\begin{equation}
 NSCAN \times NO\_SCAN\_PNTS
 \end{equation}
 
@@ -1095,7 +1095,7 @@ The OBSIDSS header simply appends the subsystem number to the OBSID.
 
 {\bf OBJECT}
 
-GSD files store two strings for the source name: \objectA{} and \objectB.  These two names are concatenated to produce the OBJECT header.  
+GSD files store two strings for the source name: \objectA{} and \objectB.  These two names are concatenated to produce the OBJECT header.
 
 {\bf STANDARD}
 
@@ -1107,7 +1107,7 @@ Prior to Feb 2nd, 2003, observation numbers were assigned to individual projects
 
 {\bf NSUBSCAN}
 
-For longer observations split over several files, the NSUBSCAN would represent this file's place in the sequence of data.  For GSD2ACSIS converted files we would expect this number to always be 1 as only one output file per subsystem would be written. 
+For longer observations split over several files, the NSUBSCAN would represent this file's place in the sequence of data.  For GSD2ACSIS converted files we would expect this number to always be 1 as only one output file per subsystem would be written.
 
 {\bf OBSEND}
 
@@ -1119,7 +1119,7 @@ The UTDATE is a 8 digit integer represnting the UT date of the observation in YY
 
 {\bf DATE-OBS}
 
-The DATE-OBS header is a string representation of the UTC datetime of the start of the observation in the format YYYY-MM-DDTHH:MM:SS (eg. 2004-01-01T01:01:01).  
+The DATE-OBS header is a string representation of the UTC datetime of the start of the observation in the format YYYY-MM-DDTHH:MM:SS (eg. 2004-01-01T01:01:01).
 The GSD \obsUTd{} and \obsUTh{} headers are used to create the DATE-OBS header, but as these GSD headers are in UT1 time, the \obsUTC{} header is used to convert to a UTC datetime.
 
 {\bf DATE-END}
@@ -1132,7 +1132,7 @@ The DATE-END is derived by adding the length of the observation to the DATE-OBS.
 
 {\bf INSTAP}
 
-AST\_\_UNDEFS (string bad value).  
+AST\_\_UNDEFS (string bad value).
 
 **NOTE: Possibly this should be the same as the value stored in REFRECEP.
 
@@ -1542,7 +1542,7 @@ AST\_\_UNDEFF (float bad value).
 
 The map height is:
 
-\begin{equation} 
+\begin{equation}
 MAP\_HGHT \,=\, NO\_X\_MAP\_PNTS \times CELL\_X
 \end{equation}
 
@@ -1556,7 +1556,7 @@ The MAP\_PA is defined to be the SCAN\_PA - 90.0$^{\circ}$.
 
 The map width is:
 
-\begin{equation} 
+\begin{equation}
 MAP\_WDTH \,=\, NO\_Y\_MAP\_PNTS \times CELL\_Y
 \end{equation}
 
@@ -1591,13 +1591,13 @@ Same as LOCL\_CRD.
 
 For observations where the \obsDirection{} is 'HORIZONTAL', the SCAN\_VEL is:
 
-\begin{equation} 
+\begin{equation}
 SCAN\_VEL \,=\, CELL\_X \times NO\_X\_MAP\_PNTS / SCAN\_TIME
 \end{equation}
 
 For observations where the \obsDirection{} is 'VERTICAL', the SCAN\_VEL is:
 
-\begin{equation} 
+\begin{equation}
 SCAN\_VEL \,=\, CELL\_Y \times NO\_Y\_MAP\_PNTS / SCAN\_TIME
 \end{equation}
 
@@ -1652,13 +1652,13 @@ If \scanRev{} is 1 (true), SCAN\_PAT is 'BOUSTROPHEDON', otherwise SCAN\_PAT is 
 
 For observations where SAM\_MODE is 'raster' and \obsDirection{} is 'HORIZONTAL', STEPTIME is:
 
-\begin{equation} 
+\begin{equation}
 STEPTIME \,=\,SCAN\_TIME / NO\_X\_MAP\_PNTS
 \end{equation}
 
 For observations where SAM\_MODE is 'raster' and \obsDirection{} is 'VERTICAL', STEPTIME is:
 
-\begin{equation} 
+\begin{equation}
 STEPTIME \,=\, SCAN\_TIME / NO\_Y\_MAP\_PNTS
 \end{equation}
 
@@ -1710,7 +1710,7 @@ AST\_\_UNDEFI (integer bad value).
 
 {\bf STARTIDX}
 
-For observations where SAM\_MODE is 'sample' or 'raster', STARTIDX is 1.  In 'grid' observations, the STARTIDX is the index into the grid of the first pair of coordinates found in the \mapTable{}.  
+For observations where SAM\_MODE is 'sample' or 'raster', STARTIDX is 1.  In 'grid' observations, the STARTIDX is the index into the grid of the first pair of coordinates found in the \mapTable{}.
 
 {\bf FOCAXIS}
 
@@ -1827,7 +1827,7 @@ The WCS frameset requires two further inputs in order to be created.  These are 
 
 \subsection{\xlabel{WCS_USING}Using the WCS frameset}
 
-The WCS frameset is used to generate the TCS tracking and AZEL base and offset coordinates found in the JCMTState NDF extension.  
+The WCS frameset is used to generate the TCS tracking and AZEL base and offset coordinates found in the JCMTState NDF extension.
 At each time step of the observation, the time can be obtained from the \scanTableA array (see TCS\_TAI
 \begin{htmlonly}
 \ref{tcstai}

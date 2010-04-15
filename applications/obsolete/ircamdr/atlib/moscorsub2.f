@@ -1,15 +1,15 @@
 *+  MOSCORSUB2 - applies correction to image after moscor
 
-      SUBROUTINE MOSCORSUB2 ( IDIMSX, IDIMSY, ARRIN, ODIMSX, ODIMSY, 
+      SUBROUTINE MOSCORSUB2 ( IDIMSX, IDIMSY, ARRIN, ODIMSX, ODIMSY,
      :	                      ARROUT, DCOFF, STATUS )
 
 *    Description :
 *
-*     This routine subtracts a constant from an image 
+*     This routine subtracts a constant from an image
 *
 *    Invocation :
 *
-*     CALL MOSCORSUB2 ( IDIMSX, IDIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT, 
+*     CALL MOSCORSUB2 ( IDIMSX, IDIMSY, ARRIN, ODIMSX, ODIMSY, ARROUT,
 *                       DCOFF, STATUS )
 *
 *    Parameters :
@@ -66,7 +66,7 @@
 
       REAL
      :    ARRIN( IDIMSX, IDIMSY ),   ! input image
-     :    ARROUT( ODIMSX, ODIMSY ),  ! output image 
+     :    ARROUT( ODIMSX, ODIMSY ),  ! output image
      :    DCOFF                      ! calculated  d.c. sky offset
 
 *    Status :

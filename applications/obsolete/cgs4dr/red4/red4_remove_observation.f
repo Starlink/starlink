@@ -1,12 +1,12 @@
 *+  RED4_REMOVE_OBSERVATION - Subtract an observation from a reduced group file
       SUBROUTINE RED4_REMOVE_OBSERVATION( STATUS )
 *    Description :
-*     This routine removes a reduced observation belonging to a particular 
+*     This routine removes a reduced observation belonging to a particular
 *     group from a reduced group file, provided that observation has
 *     previously been co-added. It is assumed that reduced observations
-*     of type OBJECT were added to the contents of the reduced group 
+*     of type OBJECT were added to the contents of the reduced group
 *     file, and reduced observations of type SKY were subtracted from the
-*     contents of the reduced group file, after being optionally 
+*     contents of the reduced group file, after being optionally
 *     multiplied by a weighting factor indicated by the SKY_WT parameter.
 *     Observations may also have been weighted according to their variance
 *     if observing conditions dictate.
@@ -129,7 +129,7 @@
 *            Convert the observation file name, together with the
 *            group number obtained above, into the name of the
 *            reduced group file.
-               CALL RED4_ROBSTOGRP( OBSRED, GRPNUM, GRPRED, STATUS ) 
+               CALL RED4_ROBSTOGRP( OBSRED, GRPNUM, GRPRED, STATUS )
 
 *            Issue a message.
                CALL MSG_SETC( 'OBSTYPE', OBSTYPE )
@@ -187,7 +187,7 @@
                IF ( STATUS .EQ. ADAM__OK ) THEN
 
 *               Check to see if this coadd structure exists. If it does
-*               not, then observation has not been previously applied 
+*               not, then observation has not been previously applied
 *               and therefore cannot be removed.
                   CALL RED4_SEEK_ITEM( COADDED_OBS, COADD_NAME,
      :               FOUND, STATUS )
@@ -197,9 +197,9 @@
 *                  The observation has been applied.
 *                  We may now proceed with the actual processing
 *                  of the data.
-                     CALL RED4_REMOVE_OBSERVATION_2( OBSTYPE, 
+                     CALL RED4_REMOVE_OBSERVATION_2( OBSTYPE,
      :                 COADDED_OBS, COADD_NAME, VARIANCE_WT, SKY_WT,
-     :                 STATUS ) 
+     :                 STATUS )
                   ELSE
 
 *                  The observation has not been applied. Issue a
@@ -226,7 +226,7 @@
                CALL ERR_REP( ' ', 'RED4_REMOVE_OBSERVATION: '/
      :           /'Only OBJECT and SKY '/
      :           /'observations may be co-added into a group',
-     :           STATUS ) 
+     :           STATUS )
             END IF
          ELSE
 

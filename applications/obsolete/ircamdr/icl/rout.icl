@@ -54,7 +54,7 @@ proc rout ronum1 ronum2
     print "Mean airmass      = " (meanam)
     print "RA,DEC offsets    = " (raoff) (decoff)
     set precision 5
-    print "Mean Obs UT (hrs) = " (meanut) 
+    print "Mean Obs UT (hrs) = " (meanut)
     print " "
     dline = jj&"     "&meanut
     write cfile (dline)

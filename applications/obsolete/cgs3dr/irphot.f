@@ -3,7 +3,7 @@
 *     Read in ASCII file (output from cgs3_phred) and do preliminary
 *     reduction on it
 
-*     24-Aug-1995 : original release 
+*     24-Aug-1995 : original release
 *       includes features: 1) output runs flagged as stds, with std mags
 *       2) iterate on list of standards
 *       3) give derived extinction for 10 and 20 microns (if both observed)
@@ -16,7 +16,7 @@
 *       make sure you process all the runs here.  Also, warn user if input
 *       file contains multiple occurrences of a given run.
 *     22-Nov-95 : rename to IRPHOT
- 
+
       IMPLICIT NONE
 
       INTEGER MAX_RECORDS
@@ -50,11 +50,11 @@
       REAL N_DERIVED, Q_DERIVED, QEXT_ERR, QRMS_RES
       REAL FLUX_MULT, FLUX, FLUX_ERR
       LOGICAL IF_CHANGED, IF_TEN, IF_TWENTY
- 
+
       DATA LU/6/, N_EXT/0.15/, Q_EXT/0.42/
- 
+
 10    continue
- 
+
       NSTDS = 0
       IF_TEN = .FALSE.
       IF_TWENTY = .FALSE.
@@ -63,7 +63,7 @@
         IF_STD(I) = .FALSE.
       ENDDO
 
-      WRITE ( LU, 23 ) 
+      WRITE ( LU, 23 )
 23    FORMAT ( / ' Enter name of input file: ', $ )
       READ ( 5, 33 ) IN_FILE
       OPEN ( UNIT=1,FILE=IN_FILE(1:60),STATUS='OLD',ERR=960)
@@ -109,9 +109,9 @@
       GOTO 40
 43    FORMAT(I4,1X,A10,1X,A8,1X,F8.4,2X,F8.4,2X,F8.4,2X,G12.6,
      :   1X,G12.6)
- 
+
 50    CLOSE ( UNIT = 1, ERR=980)
- 
+
       DO I = 1,LAST_RUN
         IF ( IF_RUN(I) ) THEN
           IF ( COUNTS(I) .GT. 0.0 ) THEN
@@ -254,7 +254,7 @@
 123     FORMAT ( ' Enter run number: ', $ )
         READ ( 5, * ) RUN
         IF ( .NOT. IF_RUN(RUN) ) THEN
-          WRITE(*,'(1X,A)') 
+          WRITE(*,'(1X,A)')
      :          'Invalid run # (non-defined or negative signal)'
           GOTO 120
         ENDIF
@@ -263,16 +263,16 @@
           NSTDS = NSTDS - 1
           IF_CHANGED = .TRUE.
         ELSE
-          WRITE(*,'(1X,A)') 
+          WRITE(*,'(1X,A)')
      :          'That run is not presently flagged as a standard'
         ENDIF
         GOTO 110
       ELSE
         IF ( IF_CHANGED ) GOTO 60
       ENDIF
-      
+
       IF ( NSTDS .LE. 0 ) THEN
-        WRITE(*,'(1X,A)') 
+        WRITE(*,'(1X,A)')
      :        'You have not flagged any observations as stds!'
         GOTO 70
       ENDIF
@@ -314,7 +314,7 @@ C     Decide on extinctions
 183     FORMAT ( ' Enter name of output file for reduced mags: ', $ )
         READ ( 5, 187 ) OUT_FILE
 187     FORMAT ( A60 )
- 
+
         OPEN ( UNIT=1,FILE=OUT_FILE(1:60),STATUS='NEW',ERR=960 )
 
         WRITE ( 1, 193 ) IN_FILE
@@ -342,7 +342,7 @@ C     Decide on extinctions
 
         IF ( IF_TEN ) THEN
           WRITE ( 1, 233 ) N_EXT, NZP, SIGMAN
-233       FORMAT ( ' Adopted 10 micron extinction = ', F6.3 / 
+233       FORMAT ( ' Adopted 10 micron extinction = ', F6.3 /
      :             ' 10 micron zero point = ', F6.3, ' +/- ', F6.3 / )
         ENDIF
 
@@ -400,7 +400,7 @@ C     Decide on extinctions
      :   1X,F6.3)
 
 313     FORMAT ( ' ' )
- 
+
       WRITE ( LU, 323 )
 323   FORMAT ( ' Output the results in Janskys? ', $ )
       IF ( .NOT. NY(5)  ) GOTO 400
@@ -419,7 +419,7 @@ C     Decide on extinctions
       DO I = 1,LAST_RUN
         IF ( IF_RUN(I) ) THEN
           IF ( WAVE_ST(I) .LT. 10.0 ) THEN
-            FLUX_MULT = 39.8	! 10 micron calibr	
+            FLUX_MULT = 39.8	! 10 micron calibr
           ELSE
             FLUX_MULT = 10.4	! 20 micron calibr
           ENDIF
@@ -444,17 +444,17 @@ C     Decide on extinctions
 
 
 400   CLOSE ( UNIT=1, ERR=980 )
- 
+
       WRITE ( LU, 433 )
 433   FORMAT ( ' Continue? ', $ )
       INY = NY(5)
       IF ( INY  ) GOTO 10
       GOTO 990
- 
+
 C
 C	FILE ACCESS ERROR MESSAGES **************************************
 C
-960	WRITE (LU,963) 
+960	WRITE (LU,963)
 963	FORMAT (' Error opening file ')
 	GOTO 990
 *
@@ -464,7 +464,7 @@ C
 C
 980	WRITE (LU,983)
 983	FORMAT (' Error closing file' )
- 
+
 990     CONTINUE
- 
+
         END

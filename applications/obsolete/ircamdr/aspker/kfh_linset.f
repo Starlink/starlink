@@ -1,6 +1,6 @@
-*+  KFH_LINSET - Calculates the X,Y positions of points 
+*+  KFH_LINSET - Calculates the X,Y positions of points
 *                ready for interpolation.
-      SUBROUTINE KFH_LINSET(X1,Y1,X2,Y2,LINDAT,NPTS)                                
+      SUBROUTINE KFH_LINSET(X1,Y1,X2,Y2,LINDAT,NPTS)
 *    Description :
 *     This routine calculates the X,Y positions of points
 *     at radii of integral pixel spacings from the first
@@ -21,7 +21,7 @@
 *           The Y-coordinate of the second point to
 *           which the slice will be taken.
 *     LINDAT(0:1023,2) = REAL
-*           The array which will contain the X,Y 
+*           The array which will contain the X,Y
 *           positions of points.
 *     NPTS = INTEGER
 *           The number of points in the array.
@@ -40,7 +40,7 @@
 *     26 September 1983
 *    Type Definitions :
       IMPLICIT NONE
-*    Local variables :                                                                               
+*    Local variables :
       REAL A                             ! The difference between the
 *                                        ! Y-coordinates.
       REAL B                             ! The difference between the
@@ -53,7 +53,7 @@
       INTEGER I                          ! General variable.
       REAL LINDAT(0:1023,2)              ! The array which is to contain
 *                                        ! the X,Y positions of points
-*                                        ! for interpolation.                                                     
+*                                        ! for interpolation.
       INTEGER NPTS                       ! The number of X,Y positions of
 *                                        ! points for interpolation.
       REAL ST                            ! Sine of the THETA.
@@ -74,25 +74,25 @@
 *                                        ! point.
 *-
 
-*                                                                               
-*    Calculate the X,Y positions of points at radii of                           
-*    integral pixel spacings from the first point.                                
-*                                                                               
+*
+*    Calculate the X,Y positions of points at radii of
+*    integral pixel spacings from the first point.
+*
 
       A = Y2-Y1
       B = X2-X1
-      THETA = ATAN2(A,B)                                               
-      CT = COS(THETA)                                                           
-      ST = SIN(THETA)                                                           
+      THETA = ATAN2(A,B)
+      CT = COS(THETA)
+      ST = SIN(THETA)
       EXPR = (X2-X1)**2 + (Y2-Y1)**2
-      SEP = SQRT(EXPR)                                      
-      NPTS = NINT(SEP)                                                         
-                                                                               
-      DO I = 0,NPTS-1                                                             
+      SEP = SQRT(EXPR)
+      NPTS = NINT(SEP)
 
-        LINDAT(I,1) = I*CT + X1                                                 
-        LINDAT(I,2) = I*ST + Y1                                                 
+      DO I = 0,NPTS-1
 
-      ENDDO                                                                     
+        LINDAT(I,1) = I*CT + X1
+        LINDAT(I,2) = I*ST + Y1
 
-      END                                                                       
+      ENDDO
+
+      END

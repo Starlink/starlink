@@ -64,12 +64,12 @@
 
          ELSE
 
-*      Return virtual size as recorded in common      
+*      Return virtual size as recorded in common
             XSZMAX = GRXMAX(GRCIDE) - GRXMIN(GRCIDE)
             YSZMAX = GRYMAX(GRCIDE) - GRYMIN(GRCIDE)
          END IF
-      
-*     Default size is always maximum size      
+
+*     Default size is always maximum size
          XSZDEF = XSZMAX
          YSZDEF = YSZMAX
 

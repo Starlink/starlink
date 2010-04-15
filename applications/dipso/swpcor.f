@@ -97,7 +97,7 @@ C    Initialise arrays and read in data on first-time call to SWPCOR
           READ (IUNIT29,'(4I4,F12.3)',END=150)
      :    JPTS, JIAPER, JCAM, JYR,  YRCORR(JIAPER, JCAM, JYR)
           YRCORR(JIAPER,JCAM,JYR) = YRCORR(JIAPER,JCAM,JYR) - 1900.
-          READ (IUNIT29,'(12F6.3)') 
+          READ (IUNIT29,'(12F6.3)')
      :    (TCORR(I,JIAPER,JCAM,JYR),I=1,JPTS)
           GOTO 100
   150     CONTINUE
@@ -136,7 +136,7 @@ C    Interpolate to YR
        FRAC = (YR-YRCORR(IIAPER,ICAM,IYR))
      :        /(YRCORR(IIAPER,ICAM,IYR+1)-YRCORR(IIAPER,ICAM,IYR))
        DO 600 I = 1, JPTS
-          IF (TCORR(I,IIAPER,ICAM,IYR).EQ.0. .OR. 
+          IF (TCORR(I,IIAPER,ICAM,IYR).EQ.0. .OR.
      :    TCORR(I,IIAPER,ICAM,IYR+1).EQ.0.) THEN
              WRITE (*,'(''   IUECOR:  edit zero time correction for''/
      :       ''   Year:'',F6.2/

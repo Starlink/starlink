@@ -109,31 +109,31 @@
 
 *  Call the appropriate CCG1_STSAT routine.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_SSATB( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_SSATB( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_SSATUB( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_SSATUB( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                     EL, SETSAT, SATVAL,
      :                     NSAT, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_SSATW( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_SSATW( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_SSATUW( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_SSATUW( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                     EL, SETSAT, SATVAL,
      :                     NSAT, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_SSATI( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_SSATI( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_SSATR( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_SSATR( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_SSATD( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+         CALL CCG1_SSATD( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       END IF

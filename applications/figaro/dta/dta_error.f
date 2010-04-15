@@ -34,10 +34,10 @@ C     11th Mar 1986.  KS / AAO.  HDS error codes added.
 C     20th Aug 1987.  KS / AAO.  DTA_HDSTXT replaced by EXC_$MSG.
 C     10th Jun 1988.  KS / AAO.  DTA_INVCPY added.
 C     8th  Nov 1988.  KS / AAO.  DTA_UNSAFE added.
-C     8th  Jan 1992.  KS / AAO.  Syntax of include statements changed to 
-C                     remove VMS logical names and to use lower case, to 
+C     8th  Jan 1992.  KS / AAO.  Syntax of include statements changed to
+C                     remove VMS logical names and to use lower case, to
 C                     enable compilation on a SUN.
-C     21st Jan 1992.  KS / AAO.  EXC$MSG no longer supported by HDS. 
+C     21st Jan 1992.  KS / AAO.  EXC$MSG no longer supported by HDS.
 C                     DTA_HSDTXT now used again. No DTA routine now produces
 C                     the DTA_RMSERR or DTA_SSERR codes, so these have been
 C                     removed.

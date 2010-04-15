@@ -13,7 +13,7 @@
 #     [incr Tk] Mega-Widget
 
 #  Description:
-#     This class provides a very simple control which just contains a 
+#     This class provides a very simple control which just contains a
 #     checkbutton.  It inherits from the Control class, and so inherits
 #     any appropriate behaviour from there.
 
@@ -154,6 +154,6 @@
    proc checkcontrol { pathname args } {
       uplevel Checkcontrol $pathname $args
    }
-   
+
 
 # $Id$

@@ -1,31 +1,31 @@
- 
+
       SUBROUTINE MAG1_CODE(STATUS)
 *+
 *  Name:
 *     MAG1_CODE
- 
+
 *  Purpose:
 *     convert MIO status to MAG status value.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MAG1_CODE(STATUS)
- 
+
 *  Description:
 *     An MAG status value is found corresponding to the supplied
 *     MIO status value.
- 
+
 *  Arguments:
 *     STATUS=INTEGER (Given and Returned)
 *        On import it contains an error code from the MIO package which is
 *        converted to the equivalent MAG error code for export.
- 
+
 *  Algorithm:
 *     Go through the list of MIO codes, and return the associated MAG
 *     status.
- 
+
 *  Copyright:
 *     Copyright (C) 1983, 1985, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -35,12 +35,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -49,7 +49,7 @@
 *  Authors:
 *     Sid Wright (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     21-Jul-1983:  Original. (UCL::SLW)
 *     24-Sep-1985:  Revised and additional MIO codes. (RAL::AJC)
@@ -60,35 +60,35 @@
 *    22-Jan-1993:  Change include file names
 *           Convert code to uppercase using SPAG (RAL::BKM)
 *     {enter_further_changes_here}
- 
+
 *  Notes:
 *     Formerly known as MAG_$CODE
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type definition:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'MAG_ERR'         ! MAG Errors
       INCLUDE 'MIO_ERR'         ! MIO Errors
- 
+
 *  Status:
       INTEGER STATUS            ! status value suitable for applications
- 
+
 *  Local Constants:
       INTEGER MAXCDS            ! Maximum number of status values
       PARAMETER (MAXCDS=43)
- 
+
 *  Local Variables:
       INTEGER CODES(MAXCDS)     ! MIO codes
       INTEGER STATES(MAXCDS)    ! MAG status values
       INTEGER I                 ! Loop index
- 
+
 *  Local Data:
       DATA STATES(1)/MAG__TOOTD/, CODES(1)/MIO__TOOTD/
       DATA STATES(2)/MAG__ILLTD/, CODES(2)/MIO__ILLTD/
@@ -133,10 +133,10 @@
       DATA STATES(41)/MAG__DVNMT/, CODES(41)/MIO__DVNMT/
       DATA STATES(42)/MAG__UNKSS/, CODES(42)/MIO__UNKSS/
       DATA STATES(43)/MAG__BADSS/, CODES(43)/MIO__BADSS/
- 
+
 *.
- 
- 
+
+
       DO 100 I = 1, MAXCDS
          IF ( STATUS.EQ.CODES(I) ) THEN
             STATUS = STATES(I)
@@ -144,6 +144,6 @@
          END IF
  100  CONTINUE
  1    CONTINUE
- 
+
       RETURN
       END

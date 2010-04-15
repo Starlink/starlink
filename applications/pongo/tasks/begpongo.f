@@ -28,7 +28,7 @@
 *     begpongo [device] [action] [clear] [overlay]
 *        { label=?
 *        action
-      
+
 *  ADAM Parameters:
 *     ACTION = _CHAR (Read and Write)
 *        If 'B', the plotting device will be cleared and the whole of
@@ -114,7 +114,7 @@
 *     19-OCT-1992 (PCTR):
 *        Added contextual error report on exit.
 *     10-AUG-1993 (PCTR):
-*        Removed the BASE and OVERLAY parameters and replaced them with 
+*        Removed the BASE and OVERLAY parameters and replaced them with
 *        the ACTION parameter.
 *     2-JUN-1994 (PDRAPER):
 *        Removed unused variable LSTAT.
@@ -154,7 +154,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       CHARACTER * ( 20 ) ACTION  ! Action prameter value
       CHARACTER * ( 80 ) COMMENT ! Picture comment
@@ -192,8 +192,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check to see if PGPLOT is already open.
-      IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN 
-      
+      IF ( PON_DEVOP( .FALSE., STATUS ) ) THEN
+
 *  Report an error that PGPLOT is already active.
          STATUS = SAI__ERROR
          CALL ERR_REP( 'BEGPONGO_OPEN',
@@ -213,14 +213,14 @@
 *  Check the inherited status and abort if there are any errors.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-         IF ( ACTION .NE. 'B' .AND. ACTION .NE. 'C' 
+         IF ( ACTION .NE. 'B' .AND. ACTION .NE. 'C'
      :        .AND. ACTION .NE. 'L' ) THEN
 
 *  The value of ACTION is not valid, report an error.
             CALL MSG_SETC( 'ACTION', ACTION )
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'BEGPONGO_BADACT', 
-     :              'The value of ACTION (^ACTION) is not valid.', 
+            CALL ERR_REP( 'BEGPONGO_BADACT',
+     :              'The value of ACTION (^ACTION) is not valid.',
      :              STATUS )
          ELSE
 
@@ -233,7 +233,7 @@
             END IF
             CALL AGI_BEGIN
             CALL AGP_ACTIV( STATUS )
-            
+
 *  Select the required picture.
             IF ( ACTION .EQ. 'B' ) THEN
 
@@ -263,7 +263,7 @@
                IF ( PICLAB .NE. LABEL .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Annul the last search start and select the base picture as current.
-                  IF ( PICIDS .NE. BASEID ) CALL AGI_ANNUL( PICIDS, 
+                  IF ( PICIDS .NE. BASEID ) CALL AGI_ANNUL( PICIDS,
      :                                                      STATUS )
                   CALL AGI_SELP( BASEID, STATUS )
 
@@ -278,7 +278,7 @@
 *  been found.
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'LABEL', LABEL )
-                  CALL ERR_REP( 'BEGPLOT_NOLAB', 
+                  CALL ERR_REP( 'BEGPLOT_NOLAB',
      :               'The picture label (^LABEL) was not found in ' //
      :                 'the AGI database.', STATUS )
                END IF
@@ -287,16 +287,16 @@
 *  ACTION='C', use the current picture, unless overlaid, in which case
 *  find the last DATA picture.
                PICID = INPICID
-               IF ( OVER ) THEN 
+               IF ( OVER ) THEN
                   CALL AGI_RCL( 'DATA', INPICID, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
 
-*  There is no DATA picture in the current frame so the application 
+*  There is no DATA picture in the current frame so the application
 *  will have to exit.
                      CALL ERR_REP( 'BEGPONGO_NDATAP',
      :'The current AGI database picture is not a DATA picture and it '//
      :'does not contain a DATA picture. This means it is not '//
-     :'possible to overlay.', STATUS ) 
+     :'possible to overlay.', STATUS )
                      GO TO 99
                   END IF
                END IF
@@ -340,7 +340,7 @@
                END IF
             ELSE
 
-*  Create a new viewport so that axes, etc. lie within the 
+*  Create a new viewport so that axes, etc. lie within the
 *  initial picture.
                CALL AGP_NVIEW( .TRUE., STATUS )
 
@@ -356,7 +356,7 @@
             CALL PAR_PUT0R( 'YMIN', YMINP, STATUS )
             CALL PAR_PUT0R( 'XMAX', XMAXP, STATUS )
             CALL PAR_PUT0R( 'YMAX', YMAXP, STATUS )
-            
+
 *  If not in base frame then set up the character sizes.
             IF ( ACTION .NE. 'B' ) THEN
                IF ( STATUS .EQ. SAI__OK ) THEN
@@ -368,9 +368,9 @@
                END IF
 
 *  Put the character height back into the global parameter.
-               CALL PAR_PUT0R( 'CHEIGHT', NEWCHEIGHT, STATUS )      
+               CALL PAR_PUT0R( 'CHEIGHT', NEWCHEIGHT, STATUS )
             END IF
-            
+
 *  Switch off PGPLOT new page prompting.
             CALL PGASK( .FALSE. )
          END IF

@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WALA6( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2, JB1, JB2, 
-*                      XAMAP, YAMAP, XA, YA, XB, YB, NK, ICOL, JROW, NBAD, 
+*     CALL KPS1_WALA6( MAP, LBNDX, UBNDX, LBNDY, UBNDY, IB1, IB2, JB1, JB2,
+*                      XAMAP, YAMAP, XA, YA, XB, YB, NK, ICOL, JROW, NBAD,
 *                      STATUS )
 
 *  Description:
@@ -110,7 +110,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -206,8 +206,8 @@
 *  Increment the number of distinct test points, and store the X and Y
 *  indicies of the current test point.
                   NK = NK + 1
-                  I( NK ) = ICOL( COL )                  
-                  J( NK ) = JROW( ROW )                  
+                  I( NK ) = ICOL( COL )
+                  J( NK ) = JROW( ROW )
 
                END IF
 
@@ -261,7 +261,7 @@
       IF( NL .GT. 0 ) THEN
 
 *  Convert output pixel coordinates to input pixel co-ordinates.
-         CALL AST_TRAN2( MAP, NL, XX, YY, .FALSE., XX, YY, STATUS ) 
+         CALL AST_TRAN2( MAP, NL, XX, YY, .FALSE., XX, YY, STATUS )
 
 *  Now store the input pixel coordinates in the returned arrays.
          NBAD = 0

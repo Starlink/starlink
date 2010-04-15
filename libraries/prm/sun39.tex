@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -55,11 +55,11 @@ DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
 
 This document describes version 1.0 of the \name{PRIMDAT} package, which
 is a collection of Fortran functions and subroutines providing support for
-``primitive data processing''. 
+``primitive data processing''.
 Routines from this package may be used to perform arithmetic, mathematical
 operations, type conversion and inter-comparison of any of the primitive
 numerical data types supported by the Starlink Hierarchical Data System HDS
-(SUN/92). 
+(SUN/92).
 
 It provides:
 
@@ -71,13 +71,13 @@ This package provides processing facilities for {\bf all} the numerical
 \name{\_INTEGER}, \name{\_REAL} and \name{\_DOUBLE} numerical types  and
 even in \name{VAX} Fortran there are no operators for the unsigned types
 \name{\_UWORD} and \name{\_UBYTE} (those for \name{\_BYTE} are also
-somewhat restricted). 
+somewhat restricted).
 
 \item {\bf A uniform interface.}\\
 A consistent naming scheme is used which facilitates the production of {\em
 generic} routines for processing data of any numerical type (\name{SUN/7}
 describes the \name{GENERIC} compiler and contains further information on
-this subject). 
+this subject).
 
 \item {\bf Improved portability and efficiency.}\\
 By using this package, applications can process non-standard data types
@@ -89,32 +89,32 @@ take advantage of these features without compromising their own portability.
 \item {\bf Facilities for processing {\em bad} data.}\\
 The {\em bad values} defined by Starlink for flagging undefined data
 may be processed and consistently propagated.
-Recognition of these {\em bad values} may easily be disabled when not 
-required in order to save processing time. 
+Recognition of these {\em bad values} may easily be disabled when not
+required in order to save processing time.
 
 \item {\bf Handling of numerical errors.}\\
 Numerical errors (such as division by zero or numerical overflow) may be
 handled automatically and converted into appropriate {\em bad values} for
-subsequent recognition. 
+subsequent recognition.
 Error codes are returned to allow such occurrences to be reported, or
-recovery action taken, as desired. 
+recovery action taken, as desired.
 
 \item {\bf A set of constants.}\\
 A set of machine-specific symbolic constants is provided to support the
 processing facilities in this package and to simplify the task of
-transporting software to other machines which may have different arithmetic 
+transporting software to other machines which may have different arithmetic
 capabilities.
 
 \end{itemize}
 
 Note that only the {\bf numerical} \name{HDS} data types (\name{\_BYTE},
 \name{\_UBYTE}, \name{\_WORD}, \name{\_UWORD}, \name{\_INTEGER},
-\name{\_REAL} \& \name{\_DOUBLE}) are supported at present. 
+\name{\_REAL} \& \name{\_DOUBLE}) are supported at present.
 There is currently no provision for the non-numerical \name{\_LOGICAL} and
 \name{\_CHAR} types, nor for any other Fortran (or \name{VAX} Fortran) types
-such as \name{COMPLEX}. 
+such as \name{COMPLEX}.
 The \name{CHR} facility should be used for processing character data and for
-converting between character and numerical data types. 
+converting between character and numerical data types.
 
 Note added March 2004: This manual refers throughout to VAX floats.
 The package was ported to Unix in 1991, and accordingly most of the
@@ -126,9 +126,9 @@ instead; the manual has not been updated to match.
 The routines in this package have names of the form
 \mbox{$<$fac$>$\_$<$name$>$}, where \mbox{$<$fac$>$} is a three character
 facility name and \mbox{$<$name$>$} specifies the operation which the
-routine performs. 
+routine performs.
 
-The routines are divided into three facilities as follows: 
+The routines are divided into three facilities as follows:
 
 \begin{center}
 \begin{tabular}{c|p{33em}}
@@ -136,57 +136,57 @@ The routines are divided into three facilities as follows:
 {\bf $<$fac$>$} & {\bf Facility provides\ldots } \\
 \hline
 \\
-VAL & Arithmetic, mathematical functions and type conversion on single 
+VAL & Arithmetic, mathematical functions and type conversion on single
 (scalar) {\em values}.
 Handling of numerical errors and {\em bad value} propagation are
-incorporated.\\ 
-\\ 
+incorporated.\\
+\\
 VEC & Arithmetic, mathematical functions and type conversion on {\em
 vectorised arrays}, allowing more efficient processing of large numbers of
-data. 
+data.
 Handling of numerical errors and {\em bad value} propagation are
-incorporated.\\ 
+incorporated.\\
 \\
 NUM & Lower level routines for arithmetic, mathematical functions, type
-conversion and inter-comparison of single {\em numbers}. 
+conversion and inter-comparison of single {\em numbers}.
 Operations are performed without protection against numerical errors and
 without regard for {\em bad} values.
-\\ 
+\\
 \end{tabular}
 \end{center}
 
 Note that a distinction is drawn between three classes of primitive data,
 which differ in their interpretation and in the algorithms best suited to
-processing them: 
+processing them:
 
 \begin{itemize}
 
 \item {\bf Values} (\name{VAL} facility) are scalar data which may take one
 of the Starlink-defined {\em bad values} (sometimes called ``magic''
-values), whose presence signifies that the affected datum is undefined. 
-Numerical errors which occur while processing {\em values} will result in 
+values), whose presence signifies that the affected datum is undefined.
+Numerical errors which occur while processing {\em values} will result in
 the generation of a {\em bad value} as a result.
 Subsequent recognition of {\em bad values} on input may (or may not) occur,
 depending on the logical setting of the \fortvar{BAD} routine argument
-(section~\ref{section:bad}). 
+(section~\ref{section:bad}).
 
 \item {\bf Vectorised arrays} (\name{VEC} facility) are 1-dimensional arrays
 of {\em values} (or arrays treated as 1-dimensional) whose elements are
-processed in the way described above. 
+processed in the way described above.
 The routines provided are optimised to perform processing in an efficient
-manner when the size of the array is large. 
+manner when the size of the array is large.
 
 \item {\bf Numbers} (\name{NUM} facility) are always interpreted literally
 as scalar numerical quantities ({\em i.e. bad} values are not recognised on
-input and are not explicitly generated on output). 
+input and are not explicitly generated on output).
 Numerical errors which occur while processing {\em numbers} will cause the
-application to terminate ({\em i.e.} crash). 
+application to terminate ({\em i.e.} crash).
 
 \end{itemize}
 
 Italics are used throughout this document to refer to {\em values}, {\em
 vectorised arrays} and {\em numbers} when it is important to emphasise the
-particular meaning (and the implied processing rules) described here. 
+particular meaning (and the implied processing rules) described here.
 
 \subsection{Propagation of {\em Bad} Data}
 \label{section:bad}
@@ -196,35 +196,35 @@ routines\footnote{The \name{NUM\_} functions do not have a built-in error
 handling capability and are not discussed here.}  depends on the generation,
 recognition and propagation of {\em bad values} in the data, and also on
 the presence of an integer \fortvar{STATUS} argument carried by each
-routine. 
+routine.
 
 {\em Bad values} are a set of special numerical constants (one for each data
 type) which are defined by Starlink to be used for flagging ``bad'' or
 ``undefined'' data.
-The philosophy and conventions surrounding their use are described in SGP/38. 
+The philosophy and conventions surrounding their use are described in SGP/38.
 The Starlink ``{\em bad} constants'' which specify these values have
 symbolic names\footnote{
 These symbolic constants are defined in the include file \name{PRM\_PAR}.}
-of the form: 
+of the form:
 
 \begin{quote}
 VAL\_\_BAD$<$T$>$
 \end{quote}
 
-where \name{$<$T$>$} is one of the data type codes in 
+where \name{$<$T$>$} is one of the data type codes in
 Table~\ref{table:types} (also see section~\ref{section:badconstants}).
-{\em Bad values} may be set explicitly by assigning the value of one of 
+{\em Bad values} may be set explicitly by assigning the value of one of
 these constants to a variable.
 They are also set by \name{VAL\_} and \name{VEC\_} routines when numerical
 errors occur --- implying that the result of the attempted operation is
-undefined. 
+undefined.
 
 \begin{table}
 \begin{center}
 \begin{tabular}{|c|rl|c|}
 \hline
 \begin{tabular}{c} {\bf Type Code } \\ {\bf $<$T$>$ } \end{tabular} &
-\multicolumn{2}{|c|}{\bf HDS Type } & {\bf Fortran Type } \\ 
+\multicolumn{2}{|c|}{\bf HDS Type } & {\bf Fortran Type } \\
 \hline
 UB & \_UBYTE & (unsigned byte) & BYTE \\
 B & \_BYTE & (byte) & BYTE \\
@@ -236,75 +236,75 @@ D & \_DOUBLE & (double precision) & DOUBLE PRECISION \\
 \hline
 \end{tabular}
 \caption{The data type codes used in constants and routine names, and the
-\name{HDS} and \name{VAX} Fortran types to which they correspond.} 
+\name{HDS} and \name{VAX} Fortran types to which they correspond.}
 \label{table:types}
 \end{center}
 \end{table}
 
 Recognition of {\em bad values} involves comparing them for equality with
 the appropriate ``{\em bad} constant'', and may be used to control
-subsequent processing. 
+subsequent processing.
 Most frequently, this control takes the form of ``propagation'' --- {\em
 i.e.} the outcome of any operation attempted on a {\em bad} operand is
 itself {\em bad}; so that the {\em bad value} is ``propagated'' to the
-result. 
+result.
 After a sequence of such operations, the resulting {\em bad values} make it
 possible to identify all those results which have been rendered invalid by
-errors occurring {\em en route}. 
+errors occurring {\em en route}.
 
 The \name{VAL\_} and \name{VEC\_} routines have the ability to recognise
-and propagate {\em bad values} in this manner (the precise processing rules 
+and propagate {\em bad values} in this manner (the precise processing rules
 are described in sections~\ref{section:val:error} \& \ref{section:vec:error}).
 In some circumstances, however, appreciable amounts of processing time can
 be saved if it is known in advance that {\em bad values} are not present and
-that their recognition is not necessary. 
+that their recognition is not necessary.
 Also, it is occasionally necessary to disable {\em bad value} recognition so
 that the numerical values specified by the ``{\em bad} constants'' may
-themselves be processed as if they were valid data. 
+themselves be processed as if they were valid data.
 
 Because of this, recognition and propagation of {\em bad values} by the
 \name{VAL\_} and \name{VEC\_} routines is controlled by a logical value
-\fortvar{BAD}, which appears at the start of each routine's argument list. 
+\fortvar{BAD}, which appears at the start of each routine's argument list.
 If \fortvar{BAD} is set \name{.TRUE.}, then {\em bad} input arguments are
-recognised and propagated to the result. 
+recognised and propagated to the result.
 Conversely, if \fortvar{BAD} is set \name{.FALSE.}, then input argument
 values are interpreted literally (there is no {\em bad value} recognition),
 although {\em bad values} may still be generated on output if numerical
-errors occur. 
-Most of the routines execute more efficiently if \fortvar{BAD} is 
+errors occur.
+Most of the routines execute more efficiently if \fortvar{BAD} is
 \name{.FALSE.} (Appendix~\ref{appendix:statistics}).
 
 It is up to the calling routine to ensure that the \fortvar{BAD} argument
 has an appropriate logical value when \name{VAL\_} and \name{VEC\_} routines
-are invoked. 
+are invoked.
 This value will often depend on whether numerical errors have occurred in
 previous stages of processing, so each routine also carries a
 \fortvar{STATUS} argument which may be used to detect the occurrence of such
-errors. 
+errors.
 
 \subsection{The \fortvar{STATUS} Argument}
 
-Each \name{VAL\_} and \name{VEC\_} routine takes a standard 
+Each \name{VAL\_} and \name{VEC\_} routine takes a standard
 integer \fortvar{STATUS} variable as its final argument.
 In normal use, this \fortvar{STATUS} variable should be set to
 \name{SAI\_\_OK} when the routine is invoked, otherwise it will return
 immediately without action.\footnote{
 In the case of the \name{VAL\_} functions, a {\em bad} function result will
-be returned.} 
+be returned.}
 
 On exit, the \fortvar{STATUS} value will still be set to \name{SAI\_\_OK}
 unless a numerical error has occurred, in which case it will be set to an
-appropriate error code (Appendix~\ref{appendix:errors}). 
+appropriate error code (Appendix~\ref{appendix:errors}).
 \name{PRIMDAT} error codes may be tested to detect when a particular
 numerical error has occurred, and may also be used to report these errors
-(using the \name{ADAM} \name{ERR\_} routines for instance). 
+(using the \name{ADAM} \name{ERR\_} routines for instance).
 
 Note that routines in this package do not report errors themselves.
 This is partly an efficiency consideration.
 In many circumstances, the automatic generation of a {\em bad value} will
 itself be an adequate response to a numerical error and, in such cases, the
 \fortvar{STATUS} variable may simply be reset to \name{SAI\_\_OK} and
-processing can continue. 
+processing can continue.
 
 \section{THE \name{VAL\_} FUNCTIONS}
 
@@ -312,10 +312,10 @@ processing can continue.
 
 The \name{VAL\_} functions are a set of Fortran functions which perform
 arithmetic, mathematical operations and type conversion on single (scalar)
-{\em values} stored using any numerical data type. 
+{\em values} stored using any numerical data type.
 These functions will handle numerical errors which occur during their
 evaluation (such as division by zero or overflow) and can also recognise and
-propagate the standard Starlink {\em bad values}. 
+propagate the standard Starlink {\em bad values}.
 
 They are normally invoked by statements of the form:
 
@@ -335,7 +335,7 @@ where \name{$<$name$>$} specifies the operation to be performed and:
 input arguments are to be recognised;
 
 \item \fortvar{ARG}, \fortvar{ARG1} and \fortvar{ARG2} are the input
-arguments; 
+arguments;
 
 \item \fortvar{STATUS} is an integer error status variable.
 
@@ -348,22 +348,22 @@ The \name{VAL\_} functions are designed primarily for ease of use and
 robustness, with efficiency being a secondary consideration.
 In fact, the
 overhead involved in invoking many of these functions exceeds the time
-required to actually perform the calculation. 
+required to actually perform the calculation.
 Consequently, \name{VAL\_} functions should {\bf \underline{not}} be used
-for processing large arrays of data. 
+for processing large arrays of data.
 Rather, they are best used for relatively small numbers of calculations (up
 to a few thousand), when they can enhance the robustness and flexibility of
 applications by handling numerical errors and {\em bad values} with the
-minimum of programming effort. 
+minimum of programming effort.
 
 The \name{VEC\_} routines (section~\ref{section:vec}) should normally be
-used for processing larger arrays of data. 
+used for processing larger arrays of data.
 
 \subsection{\name{VAL\_} Error Handling}
 \label{section:val:error}
 
 The error handling strategy used by the \name{VAL\_} routines consists of
-returning a {\em bad} function result under the following circumstances: 
+returning a {\em bad} function result under the following circumstances:
 
 \begin{enumerate}
 
@@ -373,17 +373,17 @@ is invoked.
 \item If the \fortvar{BAD} argument is set to \name{.TRUE.} and any of
 the input arguments is {\em bad}.
 
-\item If any numerical error occurs during evaluation of the function --- in 
+\item If any numerical error occurs during evaluation of the function --- in
 this latter case an appropriate error code will also be returned via the
-\fortvar{STATUS} argument. 
+\fortvar{STATUS} argument.
 
 \end{enumerate}
 
 \subsection{\name{VAL\_} Arithmetic and Mathematical Functions}
 
-Arithmetic and mathematical operations may be performed on scalar {\em 
+Arithmetic and mathematical operations may be performed on scalar {\em
 values} stored using any numerical data type by invoking appropriate
-\name{VAL\_} functions, using statements such as: 
+\name{VAL\_} functions, using statements such as:
 
 \begin{quote}
 \begin{tabular}{rl}
@@ -395,20 +395,20 @@ or & \verb#RESULT = VAL_#$<$FUNC$><$T$>$\verb#( BAD, ARG1, ARG2, STATUS )#
 Here, the \name{VAL\_} function takes an argument (or arguments) of type
 \name{$<$T$>$} and returns a result which is also of type \name{$<$T$>$},
 having performed the arithmetic or mathematical operation specified by
-\name{$<$FUNC$>$}. 
+\name{$<$FUNC$>$}.
 The data type code \name{$<$T$>$} may be any of those specified in
 Table~\ref{table:types} and \name{$<$FUNC$>$} may be any of the function
-codes specified in Tables~\ref{table:functions} \& 
+codes specified in Tables~\ref{table:functions} \&
 \ref{table:floatfunctions}.
 The number of input arguments (1 or 2) appropriate to each function is also
-indicated in these latter Tables. 
+indicated in these latter Tables.
 
 \begin{table}
 \begin{center}
 \begin{tabular}{|c|c|l|}
 \hline
 \begin{tabular}{c}
-{\bf Function Code } \\ {\bf $<$FUNC$>$ } 
+{\bf Function Code } \\ {\bf $<$FUNC$>$ }
 \end{tabular} &
 \begin{tabular}{c}
 {\bf Number of} \\
@@ -438,15 +438,15 @@ SIGN & 2 & Fortran SIGN (transfer of sign) function \\
 \hline
 \multicolumn{1}{|r}{\footnotesize Notes:} &
 \multicolumn{2}{l|}{\footnotesize *Equivalent to
-NINT(REAL(ARG1)$/$REAL(ARG2)) for non-floating quantities} \\ 
+NINT(REAL(ARG1)$/$REAL(ARG2)) for non-floating quantities} \\
 \multicolumn{1}{|l}{} &
 \multicolumn{2}{l|}{\footnotesize **Equivalent to AINT(ARG1$/$ARG2) for
-floating quantities} \\ 
+floating quantities} \\
 \hline
 \end{tabular}
 \caption{Function codes used in routine names and the operations to which they
-correspond. 
-The functions shown here are implemented for {\bf all} the numerical data 
+correspond.
+The functions shown here are implemented for {\bf all} the numerical data
 types (type codes UB, B, UW, W, I, R \& D).}
 \label{table:functions}
 \end{center}
@@ -455,13 +455,13 @@ types (type codes UB, B, UW, W, I, R \& D).}
 Thus, for example, the function \name{VAL\_ADDUW} adds two unsigned word
 arguments to produce an unsigned word result, while \name{VAL\_SQRTD}
 evaluates the square root of a double precision argument, returning a double
-precision result. 
+precision result.
 
 \subsection{\name{VAL\_} Type Conversion Functions}
 
 Conversion of scalar {\em values} between numerical data types may be
 performed by invoking the appropriate \name{VAL\_} type conversion functions,
-using statements such as: 
+using statements such as:
 
 \begin{quote}
 \verb#RESULT = VAL_#$<$T$_{1}>$\verb#TO#$<$T$_{2}>$\verb#( BAD, ARG, STATUS )#
@@ -469,24 +469,24 @@ using statements such as:
 
 Here, the \name{VAL\_} function takes an argument of type \name{$<$T$_{1}>$}
 and returns a result of type \name{$<$T$_{2}>$}, having performed type
-conversion. 
+conversion.
 The data type codes \name{$<$T$_{1}>$} and \name{$<$T$_{2}>$} may be any of
-those specified in Table~\ref{table:types}. 
+those specified in Table~\ref{table:types}.
 
 Thus, for example, the function \name{VAL\_BTOUW} converts a byte argument
 to an unsigned word result, while \name{VAL\_DTOI} converts from double
-precision to integer. 
+precision to integer.
 
 Note that conversions from floating point types (\name{\_REAL} or
 \name{\_DOUBLE}) to non-floating point types result in rounding of the data
-(not truncation as would happen with a Fortran assignment statement). 
+(not truncation as would happen with a Fortran assignment statement).
 
 \begin{table}
 \begin{center}
 \begin{tabular}{|c|c|l|}
 \hline
 \begin{tabular}{c}
-{\bf Function Code } \\ {\bf $<$FUNC$>$ } 
+{\bf Function Code } \\ {\bf $<$FUNC$>$ }
 \end{tabular} &
 \begin{tabular}{c}
 {\bf Number of} \\
@@ -513,14 +513,14 @@ COSH & 1 & hyperbolic cosine function: $\cosh (\mbox{ARG})$ \\
 TANH & 1 & hyperbolic tangent function: $\tanh (\mbox{ARG})$ \\
 \hline
 \multicolumn{1}{|r}{\footnotesize Notes:} &
-\multicolumn{2}{l|}{\footnotesize *Argument(s)/result in radians} \\ 
+\multicolumn{2}{l|}{\footnotesize *Argument(s)/result in radians} \\
 \multicolumn{1}{|l}{} &
 \multicolumn{2}{l|}{\footnotesize **Argument(s)/result in degrees} \\
 \hline
 \end{tabular}
 \caption{Function codes used in routine names and the operations to which they
-correspond. 
-The functions shown here are only implemented for the floating point data types 
+correspond.
+The functions shown here are only implemented for the floating point data types
 (type codes R \& D).}
 \label{table:floatfunctions}
 \end{center}
@@ -528,11 +528,11 @@ The functions shown here are only implemented for the floating point data types
 
 \subsection{Declaring the \name{VAL\_} Functions}
 
-Since the \name{VAL\_} functions return a result via the routine name, 
-appropriate declarations of their Fortran type must be made before they are 
+Since the \name{VAL\_} functions return a result via the routine name,
+appropriate declarations of their Fortran type must be made before they are
 used.
-Thus, for instance, an application which used the routines \name{VAL\_ADDUB} 
-and \name{VAL\_DTOI} would require the declarations: 
+Thus, for instance, an application which used the routines \name{VAL\_ADDUB}
+and \name{VAL\_DTOI} would require the declarations:
 
 \begin{quote}
 \verb#BYTE VAL_ADDUB#\\
@@ -540,7 +540,7 @@ and \name{VAL\_DTOI} would require the declarations:
 \end{quote}
 
 A routine suitable for processing by the \name{GENERIC} compiler might
-require equivalent generic declarations: 
+require equivalent generic declarations:
 
 \begin{quote}
 \verb#<TYPE> VAL_ADD<T>#\\
@@ -553,10 +553,10 @@ require equivalent generic declarations:
 
 The \name{VEC\_} routines are a set of subroutines which perform arithmetic,
 mathematical operations and type conversion on {\em vectorised arrays} of
-data stored using any numerical type. 
+data stored using any numerical type.
 They incorporate handling of numerical errors and propagation of the
 standard {\em bad values} in a way that is fully compatible with the
-\name{VAL\_} functions. 
+\name{VAL\_} functions.
 
 \name{VEC\_} routines are invoked by statements of the form:
 
@@ -578,12 +578,12 @@ where \name{$<$name$>$} specifies the operation to be performed and:
 input arguments are to be recognised;
 
 \item \fortvar{N} is an integer value specifying the number of array
-elements to process; 
+elements to process;
 
 \item \fortvar{ARG}, \fortvar{ARG1} and \fortvar{ARG2} are the input
-arguments (each is an \fortvar{N}-element {\em vectorised array}); 
+arguments (each is an \fortvar{N}-element {\em vectorised array});
 
-\item \fortvar{RESULT} is an \fortvar{N}-element {\em vectorised} output 
+\item \fortvar{RESULT} is an \fortvar{N}-element {\em vectorised} output
 array;
 
 \item \fortvar{IERR} is an integer output argument which identifies the
@@ -602,24 +602,24 @@ number of numerical errors which occur;
 The \name{VEC\_} routines are designed for optimum efficiency when
 processing large arrays of data and are consequently {\bf \underline{far}}
 more efficient at performing this task than the corresponding \name{VAL\_}
-functions. 
+functions.
 When possible, \name{VEC\_} routines should always be used in preference to
 \name{VAL\_} functions unless the number of calculations to be performed is
-small (typically 1000 or less). 
+small (typically 1000 or less).
 
 The main disadvantage in using \name{VEC\_} routines is likely to be the
 additional programming effort, because workspace arrays will probably be
 required and may have to be acquired dynamically --- unless only a single
-operation is being performed. 
+operation is being performed.
 Also, certain operations cannot be performed using \name{VEC\_} routines
 (summing the pixels in an image for example) and, in such cases,
 routines from the \name{NUM} facility (section~\ref{section:num}) may have
-to be used instead. 
-Note, however, that if \name{NUM\_} routines are used, then security against 
+to be used instead.
+Note, however, that if \name{NUM\_} routines are used, then security against
 numerical errors is more difficult to achieve and (especially in the case of
 arithmetic operations) \name{VAX}-specific programming techniques may be
 required.
-The resulting applications will not then be portable. 
+The resulting applications will not then be portable.
 
 \subsection{\name{VEC\_} Error Handling}
 \label{section:vec:error}
@@ -643,18 +643,18 @@ error code will also be returned via the \fortvar{STATUS} argument.
 
 \end{enumerate}
 
-On exit, the \fortvar{IERR} argument will contain the index of the first 
-array element which generated a numerical error (or zero if there were no 
-errors) and \fortvar{NERR} will contain a count of the number of 
+On exit, the \fortvar{IERR} argument will contain the index of the first
+array element which generated a numerical error (or zero if there were no
+errors) and \fortvar{NERR} will contain a count of the number of
 numerical errors which occurred.
 If more than one error occurred, then the \fortvar{STATUS} value returned will
-be appropriate to the {\bf first} of these. 
+be appropriate to the {\bf first} of these.
 
 \subsection{\name{VEC\_} Arithmetic and Mathematical Routines}
 
 Arithmetic and mathematical operations may be performed on {\em vectorised
 arrays} of data of any numerical type by invoking appropriate \name{VEC\_}
-routines, using statements such as: 
+routines, using statements such as:
 
 \begin{quote}
 \begin{tabular}{rl}
@@ -668,26 +668,26 @@ or & \verb#CALL VEC_#$<$FUNC$><$T$>$
 Here, the \name{VEC\_} routine takes a {\em vectorised} input argument array
 (or arrays) with \fortvar{N} elements of type \name{$<$T$>$} and returns a {\em
 vectorised} result array which is also of type \name{$<$T$>$}, having performed
-the arithmetic or mathematical operation specified by \name{$<$FUNC$>$} on 
-each array element. 
+the arithmetic or mathematical operation specified by \name{$<$FUNC$>$} on
+each array element.
 The data type code \name{$<$T$>$} may be any of those specified in
 Table~\ref{table:types} and \name{$<$FUNC$>$} may be any of the function
-codes specified in Tables~\ref{table:functions} \& 
+codes specified in Tables~\ref{table:functions} \&
 \ref{table:floatfunctions}.
 The number of input argument arrays (1 or 2) appropriate to each function is
 also indicated in these latter Tables.
 
 Thus, for example, the subroutine \name{VEC\_ADDUW} adds two {\em vectorised}
 unsigned word arrays to produce an array of unsigned word results, while
-\name{VEC\_SQRTD} evaluates the square root of a single {\em vectorised 
+\name{VEC\_SQRTD} evaluates the square root of a single {\em vectorised
 array} of double precision {\em values}, returning an array of double
-precision results. 
+precision results.
 
 \subsection{\name{VEC\_} Type Conversion Routines}
 
 Conversion of {\em vectorised arrays} between numerical data types may be
 performed by invoking the appropriate \name{VEC\_} type conversion routines,
-using statements such as: 
+using statements such as:
 
 \begin{quote}
 \verb#CALL VEC_#$<$T$_{1}>$\verb#TO#$<$T$_{2}>$
@@ -697,18 +697,18 @@ using statements such as:
 Here, the \name{VEC\_} routine takes a {\em vectorised} input argument array
 with \fortvar{N} elements of type \name{$<$T$_{1}>$} and returns a {\em
 vectorised} result array of type \name{$<$T$_{2}>$}, having performed type
-conversion on each array element. 
+conversion on each array element.
 The data type codes \name{$<$T$_{1}>$} and \name{$<$T$_{2}>$} may be any of
-those specified in Table~\ref{table:types}. 
+those specified in Table~\ref{table:types}.
 
 Thus, for example, the subroutine \name{VEC\_BTOUW} converts a {\em
 vectorised array} of byte data into unsigned word data, while
 \name{VEC\_DTOI} converts a {\em vectorised array} from double precision to
-integer. 
+integer.
 
 Note that conversions from floating point types (\name{\_REAL} or
 \name{\_DOUBLE}) to non-floating point types result in rounding of the data
-(not truncation as would happen with a Fortran assignment statement). 
+(not truncation as would happen with a Fortran assignment statement).
 
 \section{THE NUM\_ FUNCTIONS}
 
@@ -718,12 +718,12 @@ The \name{NUM\_} functions perform arithmetic, mathematical operations, type
 conversion and inter-comparison on {\em numbers}, operating at a rather
 lower level than the \name{VAL\_} or \name{VEC\_} routines --- in fact many
 of these latter routines are currently implemented using the \name{NUM}
-facility. 
+facility.
 
 At present, all the \name{NUM\_} routines are implemented as Fortran
 statement functions whose definitions must be incorporated into an
 application with appropriate \name{INCLUDE} statements
-(section~\ref{section:include}). 
+(section~\ref{section:include}).
 
 They are normally invoked by statements of the form:
 
@@ -739,31 +739,31 @@ where \name{$<$name$>$} specifies the operation to be performed and
 
 \subsection{Applicability \& Efficiency}
 
-The \name{NUM\_} functions are the most flexible routines in this package. 
+The \name{NUM\_} functions are the most flexible routines in this package.
 Being implemented as statement functions, they will normally be expanded
 ``in-line'' by the \name{VAX}~Fortran compiler and may therefore be used in
-any situation without incurring the overhead of an external function call. 
-The expanded function definition can subsequently take part in the 
+any situation without incurring the overhead of an external function call.
+The expanded function definition can subsequently take part in the
 compiler's optimisation process and will therefore result in code which
 executes very efficiently (although some of the machine-specific features
-used by \name{VEC\_} routines cannot be accessed in this way). 
+used by \name{VEC\_} routines cannot be accessed in this way).
 
 However, the \name{NUM\_} functions are also the least robust routines in
-this package. 
+this package.
 This is because they incorporate no protection against numerical errors
 (such as division by zero or overflow), neither do they generate or
-recognise {\em bad} data --- which they will always treat as valid. 
+recognise {\em bad} data --- which they will always treat as valid.
 If a numerical error occurs when a \name{NUM\_} function is invoked, the
 application will immediately terminate ({\em i.e.} crash).
 
 The robustness of \name{NUM\_} functions may be improved by incorporating
 explicit checks on the {\em numbers} being processed and by ensuring that
 the functions are not invoked if their arguments may be undefined (under
-error conditions, for instance). 
+error conditions, for instance).
 Such checks will always degrade the execution efficiency, however, and the
 equivalent \name{VEC\_} routine (section~\ref{section:vec}) is then likely
-to be at least as efficient. 
-Consequently, use of the \name{NUM\_} functions is generally appropriate 
+to be at least as efficient.
+Consequently, use of the \name{NUM\_} functions is generally appropriate
 only when:
 
 \begin{itemize}
@@ -782,18 +782,18 @@ is applicable.
 For applications where \name{VAX}-specific code is acceptable, the
 \name{NUM} facility also includes a simple \name{VAX} condition handler
 which can be used to recover from numerical errors
-(section~\ref{section:num:error}). 
+(section~\ref{section:num:error}).
 This may be used with the \name{NUM\_} functions (and Fortran arithmetic
 expressions) to combine robustness with efficiency and flexibility in cases
-where other routines from this package are not suitable. 
+where other routines from this package are not suitable.
 However, the programming effort required is relatively high and the
-resulting applications will not be portable. 
+resulting applications will not be portable.
 
 \subsection{\name{NUM\_} Arithmetic and Mathematical Functions}
 
 Arithmetic and mathematical operations may be performed on {\em numbers}
 stored using any numerical data type by invoking appropriate \name{NUM\_}
-functions, using statements such as: 
+functions, using statements such as:
 
 \begin{quote}
 \begin{tabular}{ll}
@@ -805,24 +805,24 @@ or & \verb#RESULT = NUM_#$<$FUNC$><$T$>$\verb#( ARG1, ARG2 )#
 Here, the \name{NUM\_} function takes an argument (or arguments) of type
 \name{$<$T$>$} and returns a result which is also of type \name{$<$T$>$},
 having performed the arithmetic or mathematical operation specified by
-\name{$<$FUNC$>$}. 
+\name{$<$FUNC$>$}.
 The data type code \name{$<$T$>$} may be any of those specified in
 Table~\ref{table:types} and \name{$<$FUNC$>$} may be any of the function
-codes specified in Tables~\ref{table:functions} \& 
-\ref{table:floatfunctions}. 
+codes specified in Tables~\ref{table:functions} \&
+\ref{table:floatfunctions}.
 The number of function arguments (1 or 2) appropriate to each function is
-also indicated in these latter Tables. 
+also indicated in these latter Tables.
 
 Thus, for example, the function \name{NUM\_ADDUW} adds two unsigned word
 arguments to produce an unsigned word result, while \name{NUM\_SQRTD}
 evaluates the square root of a double precision argument, returning a double
-precision result. 
+precision result.
 
 \subsection{NUM\_ Type Conversion Functions}
 
 Conversion of {\em numbers} between numerical data types may be performed by
 invoking the appropriate \name{NUM\_} type conversion functions, using
-statements such as: 
+statements such as:
 
 \begin{quote}
 \verb#RESULT = NUM_#$<$T$_{1}>$\verb#TO#$<$T$_{2}>$\verb#( ARG )#
@@ -830,24 +830,24 @@ statements such as:
 
 Here, the \name{NUM\_} function takes an argument of type \name{$<$T$_{1}>$}
 and returns a result of type \name{$<$T$_{2}>$}, having performed type
-conversion. 
+conversion.
 The data type codes \name{$<$T$_{1}>$} and \name{$<$T$_{2}>$} may be any of
-those specified in Table~\ref{table:types}. 
+those specified in Table~\ref{table:types}.
 
 Thus, for example, the function \name{NUM\_BTOUW} converts a byte argument
 to an unsigned word result, while \name{NUM\_DTOI} converts from double
-precision to integer. 
+precision to integer.
 
 Note that conversions from floating point types (\name{\_REAL} or
 \name{\_DOUBLE}) to non-floating point types result in rounding of the data
-(not truncation as would happen with a Fortran assignment statement). 
+(not truncation as would happen with a Fortran assignment statement).
 
 \subsection{NUM\_ Inter-comparison Functions}
 \label{section:logicals}
 
 Inter-comparison of {\em numbers} stored using any numerical data type, to
 test for equality or inequality relations, may be performed by invoking the
-appropriate \name{NUM\_} inter-comparison functions, using statements such as: 
+appropriate \name{NUM\_} inter-comparison functions, using statements such as:
 
 \begin{quote}
 \verb#RESULT = NUM_#$<$ROPER$><$T$>$\verb#( ARG1, ARG2 )#
@@ -855,10 +855,10 @@ appropriate \name{NUM\_} inter-comparison functions, using statements such as:
 
 Here, the \name{NUM\_} function takes two arguments of type \name{$<$T$>$}
 and returns a logical result, having compared its arguments according to the
-relational operation specified by \name{$<$ROPER$>$}. 
+relational operation specified by \name{$<$ROPER$>$}.
 The data type code \name{$<$T$>$} may be any of those in
 Table~\ref{table:types} and \name{$<$ROPER$>$} may be any of the relational
-operation codes specified in Table~\ref{table:logicals}. 
+operation codes specified in Table~\ref{table:logicals}.
 
 \begin{table}
 \begin{center}
@@ -878,7 +878,7 @@ LE & ARG1 .LE. ARG2 \\
 \hline
 \end{tabular}
 \caption{The relational operation codes used in the names of \name{NUM\_}
-functions and the inter-comparisons to which they correspond.} 
+functions and the inter-comparisons to which they correspond.}
 \label{table:logicals}
 \end{center}
 \end{table}
@@ -888,16 +888,16 @@ Thus, for example, the logical function \name{NUM\_GTUB} returns a
 greater than the unsigned byte {\em number} \name{ARG2}, while
 \name{NUM\_LED} returns \name{.TRUE.} if the double precision {\em number}
 \name{ARG1} is less than or equal to the double precision {\em number}
-\name{ARG2}. 
+\name{ARG2}.
 
-Note that equivalent inter-comparison functions are not available in the 
+Note that equivalent inter-comparison functions are not available in the
 \name{VAL} or \name{VEC} facilities.
 
 \subsection{Declaring and Defining the NUM\_ Functions}
 \label{section:include}
 
 The \name{NUM} facility is implemented as a set of Fortran statement
-functions.  To use them, an application must: 
+functions.  To use them, an application must:
 
 \begin{enumerate}
 
@@ -909,7 +909,7 @@ Fortran types;
 \end{enumerate}
 
 Two files are provided which contain Fortran statements to perform these
-tasks and they may be included in an application with the statements: 
+tasks and they may be included in an application with the statements:
 
 \begin{verbatim}
       INCLUDE 'NUM_DEC'
@@ -917,28 +917,28 @@ tasks and they may be included in an application with the statements:
 \end{verbatim}
 
 which should appear (in this order) immediately after any local Fortran
-variables have been declared and before the executable code begins. 
+variables have been declared and before the executable code begins.
 These statements will declare and define the entire set of \name{NUM\_}
 functions.
 
 In almost all cases, however, compilation time can be considerably reduced
 by defining only a sub-set of these functions.
 Files are therefore provided which allow the function definitions to be
-selected according to the data type of their arguments. 
+selected according to the data type of their arguments.
 When using this option, the following two statements should first be used to
 declare and define the type conversion functions and their arguments (since
 these are used by all the other \name{NUM\_} functions they must always be
-present): 
+present):
 
 \begin{verbatim}
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
 \end{verbatim}
 
-If the application only uses the \name{NUM\_} functions to perform type 
+If the application only uses the \name{NUM\_} functions to perform type
 conversion, then this is all that is required.
 However, to additionally declare and define the \name{NUM\_} functions which
-process a particular argument data type, the statements: 
+process a particular argument data type, the statements:
 
 \begin{quote}
 \verb#       INCLUDE 'NUM_DEC_#$<$T$>$\verb#'#\\
@@ -946,7 +946,7 @@ process a particular argument data type, the statements:
 \end{quote}
 
 should then be used (here, the argument type code \name{$<$T$>$} is one of
-those specified in Table~\ref{table:types}). 
+those specified in Table~\ref{table:types}).
 Thus, to give a complete example, the \name{NUM\_} functions for processing
 unsigned word data would be declared and defined using the following four
 statements:
@@ -960,7 +960,7 @@ statements:
 
 Note that to comply with Fortran restrictions on statement order, all the
 type declaration statements (\name{NUM\_DEC\_} files) have to appear {\bf
-before} the function definition statements (\name{NUM\_DEF\_} files). 
+before} the function definition statements (\name{NUM\_DEF\_} files).
 
 \subsection{\name{NUM} Error Handling}
 \label{section:num:error}
@@ -969,7 +969,7 @@ Because the \name{NUM\_} functions do not have any built-in error handling
 capability, the \name{NUM} facility provides a simple \name{VAX} condition
 handler which may be used to explicitly implement error handling, both for
 the \name{NUM\_} functions and straightforward Fortran arithmetic
-expressions. 
+expressions.
 
 {\em Note that using this capability involves calls to \name{VAX} Run
 Time Library (\name{RTL}) routines and will therefore result in applications
@@ -982,44 +982,44 @@ The technique is best explained by an example:
 
 \begin{quote}
 \begin{verbatim}
-      SUBROUTINE EXAMPL( N, DATA )                
-                                                  
-*   Declare constants and variables.              
-      INCLUDE 'SAE_PAR'                           
-      INCLUDE 'PRM_PAR'                           
-      INTEGER N, I                                
-      REAL DATA( N )                              
-                                                  
-*   Declare the condition handler.                
+      SUBROUTINE EXAMPL( N, DATA )
+
+*   Declare constants and variables.
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+      INTEGER N, I
+      REAL DATA( N )
+
+*   Declare the condition handler.
       INTEGER NUM_TRAP                            [1]
-      EXTERNAL NUM_TRAP                           
-                                                  
+      EXTERNAL NUM_TRAP
+
 *   Include the NUM_CMN common block definition, which defines
-*   the variable NUM_ERROR.                       
+*   the variable NUM_ERROR.
       INCLUDE 'NUM_CMN'                           [2]
-                                                  
-*   Establish the condition handler.              
+
+*   Establish the condition handler.
       CALL LIB$ESTABLISH( NUM_TRAP )              [3]
-                                                  
-*   Initialise.                                   
+
+*   Initialise.
       NUM_ERROR = SAI__OK                         [4]
-                                                  
-*   Perform the calculations.                     
-      DO 1 I = 1, N                               
+
+*   Perform the calculations.
+      DO 1 I = 1, N
          DATA( I ) = 1.0 / ( DATA( I ) ** 2 )     [5]
-                                                  
-*   Check if an error occurred.                   
+
+*   Check if an error occurred.
          IF( NUM_ERROR .NE. SAI__OK ) THEN        [6]
-                                                  
+
 *   If so, reset the NUM_ERROR flag and define the result.
             NUM_ERROR = SAI__OK                   [7]
-            DATA( I ) = VAL__BADR                 
-         ENDIF                                    
-    1 CONTINUE                                    
-                                                  
+            DATA( I ) = VAL__BADR
+         ENDIF
+    1 CONTINUE
+
 *   Remove the condition handler and exit the routine.
       CALL LIB$REVERT                             [8]
-      END                                         
+      END
 \end{verbatim}
 \end{quote}
 
@@ -1028,48 +1028,48 @@ Programming notes:
 \begin{enumerate}
 
 \item The integer function \name{NUM\_TRAP} is provided as a standard
-condition handler which traps numerical errors. 
+condition handler which traps numerical errors.
 This routine must be declared in an EXTERNAL statement.
 
 \item The common block \name{NUM\_CMN} is defined using an \name{INCLUDE}
 statement.
 It contains a single integer variable called \name{NUM\_ERROR} which
-communicates with the condition handler. 
+communicates with the condition handler.
 
 \item The \name{VAX} \name{RTL} routine \name{LIB\$ESTABLISH} is called to
 establish the condition handler.
 From this point on, numerical errors will not cause the application to
-crash, but will be intercepted by the \name{NUM\_TRAP} routine. 
+crash, but will be intercepted by the \name{NUM\_TRAP} routine.
 This behaviour is local to the routine from which \name{LIB\$ESTABLISH} is
 called.
 The behaviour of \name{VAL\_} and \name{VEC\_} routines and the handling of
-non-numerical errors is not affected. 
+non-numerical errors is not affected.
 
 \item The common block variable \name{NUM\_ERROR} is initialised to
-\name{SAI\_\_OK}. 
+\name{SAI\_\_OK}.
 This is important because numerical errors will not be detected otherwise.
 
 \item Calculations are performed which may potentially fail.  These may
 include calls to \name{NUM\_} functions and need not be confined to a single
-expression or statement. 
+expression or statement.
 In the above example floating point overflow or division by zero could
-occur, according to the contents of the \fortvar{DATA} array. 
+occur, according to the contents of the \fortvar{DATA} array.
 
 \item  After a calculation, the status variable \name{NUM\_ERROR} is tested.
-If it is not \name{SAI\_\_OK}, then a numerical error has occurred. 
+If it is not \name{SAI\_\_OK}, then a numerical error has occurred.
 The value of \name{NUM\_ERROR} may be used as a status code for reporting
-the error if required. 
+the error if required.
 
 \item  If an error has occurred, suitable action is taken.
-This must include resetting the numerical error status \name{NUM\_ERROR} to 
+This must include resetting the numerical error status \name{NUM\_ERROR} to
 \name{SAI\_\_OK} and defining the result of any calculations which failed.
 This will usually be done using a flag for later identification (normally
-one of the Starlink {\em bad values}). 
+one of the Starlink {\em bad values}).
 
 \item Finally, the condition handler is removed by calling the \name{RTL}
 routine \name{LIB\$REVERT}.  This is strictly only necessary if further
 calculations which do not require error handling are to be performed in the
-same routine. 
+same routine.
 
 \end{enumerate}
 
@@ -1077,17 +1077,17 @@ It is important to note that when a calculation fails, more than
 one numerical error may occur.
 This is because the (erroneous) result of the first operation to fail can be
 re-used in subsequent parts of an arithmetic expression and may precipitate
-further errors. 
+further errors.
 To ensure that \name{NUM\_ERROR} indicates the true (first) cause of an error
 in such cases, this variable behaves as a latch; once set, it will not again
 change in response to an error until it has first been reset to
-\name{SAI\_\_OK}. 
+\name{SAI\_\_OK}.
 
-Note also, that the result of a calculation which fails (or may have 
-failed) must {\bf \underline{not}} be used {\bf under any circumstances}. 
+Note also, that the result of a calculation which fails (or may have
+failed) must {\bf \underline{not}} be used {\bf under any circumstances}.
 It may either contain an erroneous result or an invalid floating point
 number (a reserved operand) which will cause any application which processes
-it to crash. 
+it to crash.
 Such results {\bf must} immediately be replaced with a well-defined value.
 
 \section{CONSTANTS}
@@ -1096,18 +1096,18 @@ Such results {\bf must} immediately be replaced with a well-defined value.
 
 This section describes a set of constants which support the processing
 facilities in this package by specifying machine-specific quantities
-associated with each data type. 
+associated with each data type.
 These constants are identified by symbolic names which are defined (using
-Fortran \name{PARAMETER} statements) in the file \name{PRM\_PAR}. 
-The definitions may be incorporated into an application with the statement: 
+Fortran \name{PARAMETER} statements) in the file \name{PRM\_PAR}.
+The definitions may be incorporated into an application with the statement:
 
 \begin{verbatim}
       INCLUDE 'PRM_PAR'
 \end{verbatim}
 
-Here, as elsewhere in this package, a distinction is drawn between {\em 
+Here, as elsewhere in this package, a distinction is drawn between {\em
 values} (which may be flagged as {\em bad}) and {\em numbers} (which are
-always interpreted literally). 
+always interpreted literally).
 The constants accordingly have names with one of the two forms:
 
 \begin{quote}
@@ -1118,16 +1118,16 @@ or & NUM\_\_$<$const$><$T$>$
 \end{quote}
 
 where \name{$<$T$>$} is one of the type codes in Table~\ref{table:types} and
-\name{$<$const$>$} specifies the quantity which the constant represents. 
+\name{$<$const$>$} specifies the quantity which the constant represents.
 In most cases, the two forms of the constant are necessarily identical and
-only the \name{VAL\_\_} form is provided. 
+only the \name{VAL\_\_} form is provided.
 
 The constants are also available in the C include file \name{prm\_par.h}.
 
 Note that many of these constants may need to change if transported to
 another machine.\footnote{
 The constants given here are appropriate to \name{VAX} machines using F- and
-D-type floating point number representations. 
+D-type floating point number representations.
 Only a simple description of floating point arithmetic is given.
 Applications requiring a more complete description should use routines
 from the \name{NAG} library, with which the values given here are compatible.}
@@ -1141,7 +1141,7 @@ When writing software which is intended to be portable you should therefore:
 numerical values);
 
 \item Never make implicit assumptions about the values these constants might
-take. 
+take.
 
 \end{itemize}
 
@@ -1156,15 +1156,15 @@ The following sections describe them in more detail.
 {\bf Constant} & {\bf Type} & {\bf Quantity represented} \\
 \hline
 VAL\_\_BAD$<$T$>$ & *$<$T$>$ & {\em Bad value}, used for flagging undefined
-data. 
+data.
 \\
 VAL\_\_EPS$<$T$>$ & $<$T$>$ & Machine precision.
 \\
-VAL\_\_MAX$<$T$>$ & $<$T$>$ & Maximum (most positive) non-{\em bad value}. 
+VAL\_\_MAX$<$T$>$ & $<$T$>$ & Maximum (most positive) non-{\em bad value}.
 \\
 NUM\_\_MAX$<$T$>$ & $<$T$>$ & Maximum (most positive) {\em number}.
 \\
-VAL\_\_MIN$<$T$>$ & $<$T$>$ & Minimum (most negative) non-{\em bad value}. 
+VAL\_\_MIN$<$T$>$ & $<$T$>$ & Minimum (most negative) non-{\em bad value}.
 \\
 NUM\_\_MIN$<$T$>$ & $<$T$>$ & Minimum (most negative) {\em number}.
 \\
@@ -1173,17 +1173,17 @@ by a value.
 \\
 VAL\_\_SML$<$T$>$ & $<$T$>$ & Smallest positive (non-zero) value.
 \\
-VAL\_\_SZ$<$T$>$ & \_INTEGER & Number of characters required to format a 
-value as a decimal string. 
+VAL\_\_SZ$<$T$>$ & \_INTEGER & Number of characters required to format a
+value as a decimal string.
 \\
 \hline
 \multicolumn{1}{|c}{} &
-\multicolumn{2}{l|}{\footnotesize *Type=$<$T$>$ indicates that the 
+\multicolumn{2}{l|}{\footnotesize *Type=$<$T$>$ indicates that the
 constant's data type matches the type code $<$T$>$.} \\
 \hline
 \end{tabular}
 \caption{A summary of the constants available, showing their data types and
-the quantities they represent.} 
+the quantities they represent.}
 \label{table:constants}
 \end{center}
 \end{table}
@@ -1191,11 +1191,11 @@ the quantities they represent.}
 \subsection{Bad Data Values}
 \label{section:badconstants}
 
-Constants with names of the form \name{VAL\_\_BAD$<$T$>$} represent the 
+Constants with names of the form \name{VAL\_\_BAD$<$T$>$} represent the
 Starlink-defined {\em bad} (or ``magic'') {\em values} to be used for
-flagging {\em bad} or undefined data. 
+flagging {\em bad} or undefined data.
 The use of these constants is discussed in SGP/38, which also defines the
-values to be used on \name{VAX} machines. 
+values to be used on \name{VAX} machines.
 These are:
 
 \begin{quote}
@@ -1205,7 +1205,7 @@ These are:
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
 \multicolumn{1}{c|}{\bf Value} &
-\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\ 
+\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\
 \hline
 VAL\_\_BADUB & \_UBYTE & 255 & FF \\
 VAL\_\_BADB & \_BYTE & $-$128 & 80 \\
@@ -1228,25 +1228,25 @@ Note that the operations permitted on {\em bad values} are restricted to:
 \item Testing a variable for equality with a ``{\em bad} constant'';
 
 \item Assigning a non-{\em bad value} to a variable to replace one which was
-previously {\em bad}. 
+previously {\em bad}.
 
 \end{itemize}
 
 Software which aims to be portable may assume that the {\em bad values}
 described by these constants will always lie at the extreme end of the
-{\em number} range which can be represented by each data type. 
+{\em number} range which can be represented by each data type.
 However, no assumptions should be made about {\bf which} end of the range
 (upper or lower) this will be --- an explicit test should be made if it is
-necessary to determine this. 
+necessary to determine this.
 
 \subsection{Machine Precision}
 
-Constants with names of the form \name{VAL\_\_EPS$<$T$>$} represent the 
+Constants with names of the form \name{VAL\_\_EPS$<$T$>$} represent the
 machine precision when performing calculations using each data type.
 The machine precision $\epsilon$ is the smallest positive value such that
 \mbox{($1+\epsilon)$} can be represented on the machine and is distinguishable
-from 1 using the data type in question. 
-The data types of these constants match the quantities they describe, as 
+from 1 using the data type in question.
+The data types of these constants match the quantities they describe, as
 follows:
 
 \begin{quote}
@@ -1256,7 +1256,7 @@ follows:
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
 \multicolumn{1}{c|}{\bf Value} &
-\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\ 
+\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\
 \hline
 VAL\_\_EPSUB & \_UBYTE & 1 & 01 \\
 VAL\_\_EPSB & \_BYTE & 1 & 01 \\
@@ -1272,10 +1272,10 @@ VAL\_\_EPSD & \_DOUBLE & 2.7755575615628914E$-$17 & 0000000000002500 \\
 
 \subsection{Maximum Data Values}
 
-Constants with names of the form \name{VAL\_\_MAX$<$T$>$} represent the 
+Constants with names of the form \name{VAL\_\_MAX$<$T$>$} represent the
 maximum (most positive) non-{\em bad values} which can be represented
-on the machine. 
-The data types of these constants match the quantities they describe, as 
+on the machine.
+The data types of these constants match the quantities they describe, as
 follows:
 
 \begin{quote}
@@ -1285,7 +1285,7 @@ follows:
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
 \multicolumn{1}{c|}{\bf Value} &
-\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\ 
+\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\
 \hline
 VAL\_\_MAXUB & \_UBYTE & 254 & FE \\
 VAL\_\_MAXB & \_BYTE & 127 & 7F \\
@@ -1299,9 +1299,9 @@ VAL\_\_MAXD & \_DOUBLE & 1.701411834604923D$+$38 & FFFFFFFFFFFF7FFF \\
 \end{center}
 \end{quote}
 
-Constants with names of the form \name{NUM\_\_MAX$<$T$>$} represent the 
-maximum (most positive) {\em numbers} which can be represented on the machine. 
-The data types of these constants also match the quantities they describe, as 
+Constants with names of the form \name{NUM\_\_MAX$<$T$>$} represent the
+maximum (most positive) {\em numbers} which can be represented on the machine.
+The data types of these constants also match the quantities they describe, as
 follows:
 
 \begin{quote}
@@ -1311,7 +1311,7 @@ follows:
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
 \multicolumn{1}{c|}{\bf Value} &
-\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\ 
+\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\
 \hline
 NUM\_\_MAXUB & \_UBYTE & 255 & FF \\
 NUM\_\_MAXB & \_BYTE & 127 & 7F \\
@@ -1327,10 +1327,10 @@ NUM\_\_MAXD & \_DOUBLE & 1.701411834604923D$+$38 & FFFFFFFFFFFF7FFF \\
 
 \subsection{Minimum Data Values}
 
-Constants with names of the form \name{VAL\_\_MIN$<$T$>$} represent the 
+Constants with names of the form \name{VAL\_\_MIN$<$T$>$} represent the
 minimum (most negative) non-{\em bad values} which can be represented
-on the machine. 
-The data types of these constants match the quantities they describe, as 
+on the machine.
+The data types of these constants match the quantities they describe, as
 follows:
 
 \begin{quote}
@@ -1340,7 +1340,7 @@ follows:
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
 \multicolumn{1}{c|}{\bf Value} &
-\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\ 
+\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\
 \hline
 VAL\_\_MINUB & \_UBYTE & 0 & 00 \\
 VAL\_\_MINB & \_BYTE & $-$127 & 81 \\
@@ -1354,10 +1354,10 @@ VAL\_\_MIND & \_DOUBLE & $-$1.701411834604923D$+$38 & FFFEFFFFFFFFFFFF \\
 \end{center}
 \end{quote}
 
-Constants with names of the form \name{NUM\_\_MIN$<$T$>$} represent the 
+Constants with names of the form \name{NUM\_\_MIN$<$T$>$} represent the
 minimum (most negative) {\em numbers} which can be represented on the
-machine. 
-The data types of these constants also match the quantities they describe, as 
+machine.
+The data types of these constants also match the quantities they describe, as
 follows:
 
 \begin{quote}
@@ -1367,7 +1367,7 @@ follows:
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
 \multicolumn{1}{c|}{\bf Value} &
-\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\ 
+\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\
 \hline
 NUM\_\_MINUB & \_UBYTE & 0 & 00 \\
 NUM\_\_MINB & \_BYTE & $-$128 & 80 \\
@@ -1385,8 +1385,8 @@ NUM\_\_MIND & \_DOUBLE & $-$1.701411834604923D$+$38 & FFFFFFFFFFFFFFFF \\
 
 Constants with names of the form \name{VAL\_\_NB$<$T$>$} represent the
 number of basic machine units (bytes) required to hold one value of each
-data type. 
-All these constants are of type \name{\_INTEGER}, with values as follows: 
+data type.
+All these constants are of type \name{\_INTEGER}, with values as follows:
 
 \begin{quote}
 \begin{center}
@@ -1394,7 +1394,7 @@ All these constants are of type \name{\_INTEGER}, with values as follows:
 \hline
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
-{\bf Value} \\ 
+{\bf Value} \\
 \hline
 VAL\_\_NBUB & \_INTEGER & 1 \\
 VAL\_\_NBB & \_INTEGER & 1 \\
@@ -1410,9 +1410,9 @@ VAL\_\_NBD & \_INTEGER & 8 \\
 
 \subsection{Smallest Value}
 
-Constants with names of the form \name{VAL\_\_SML$<$T$>$} represent the 
+Constants with names of the form \name{VAL\_\_SML$<$T$>$} represent the
 smallest positive (non-zero) value which can be represented on the machine.
-The data types of these constants match the quantities they describe, as 
+The data types of these constants match the quantities they describe, as
 follows:
 
 \begin{quote}
@@ -1422,7 +1422,7 @@ follows:
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
 \multicolumn{1}{c|}{\bf Value} &
-\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\ 
+\multicolumn{1}{c|}{\bf Hexadecimal Pattern} \\
 \hline
 VAL\_\_SMLUB & \_UBYTE & 1 & 01 \\
 VAL\_\_SMLB & \_BYTE & 1 & 01 \\
@@ -1440,9 +1440,9 @@ VAL\_\_SMLD & \_DOUBLE & 2.9387358770557188E$-$39 & 0000000000000080 \\
 
 Constants with names of the form \name{VAL\_\_SZ$<$T$>$} specify the maximum
 number of characters required to represent each numerical data type when
-formatted as a decimal string. 
+formatted as a decimal string.
 All these constants are of type \name{\_INTEGER} and should be used when
-declaring character variables to hold formatted numerical data. 
+declaring character variables to hold formatted numerical data.
 Their values are:
 
 \begin{quote}
@@ -1451,7 +1451,7 @@ Their values are:
 \hline
 \multicolumn{1}{|c|}{\bf Constant} &
 \multicolumn{1}{c|}{\bf Type} &
-{\bf Value} \\ 
+{\bf Value} \\
 \hline
 VAL\_\_SZUB & \_INTEGER & 3 \\
 VAL\_\_SZB & \_INTEGER & 4 \\
@@ -1472,7 +1472,7 @@ VAL\_\_SZD & \_INTEGER & 22 \\
 \label{compunix}
 Before attempting to compile or link applications, the Starlink
 executables directory (normally /star/bin) should be added to your PATH.
-Links to the installed include files for PRIMDAT may then be set up 
+Links to the installed include files for PRIMDAT may then be set up
 in your current working directory by executing the command:
 
 \begin{verbatim}
@@ -1496,7 +1496,7 @@ for ADAM applications.
 
 \subsection{VMS}
 The files required for compilation and linking with the routines in this
-package reside in a directory with logical name \name{PRIMDAT\_DIR}. 
+package reside in a directory with logical name \name{PRIMDAT\_DIR}.
 Before attempting to compile or link applications, logical names must be
 defined for the required files by executing the \name{DCL} command:
 
@@ -1505,12 +1505,12 @@ defined for the required files by executing the \name{DCL} command:
 \end{verbatim}
 
 Applications which contain Fortran \name{INCLUDE} statements referring to
-files in this directory may then be compiled. 
+files in this directory may then be compiled.
 
 Applications should be linked with routines from this package using the link
-options file \name{PRM\_LINK}. 
+options file \name{PRM\_LINK}.
 For instance, to link an application called \name{PROG}, the \name{DCL}
-command: 
+command:
 
 \begin{verbatim}
     $ LINK PROG,PRM_LINK/OPT
@@ -1518,13 +1518,13 @@ command:
 
 might be used.
 To link an \name{ADAM} application, the \name{\$LINK} command would be
-replaced by the \name{ADAM} command \name{\$ALINK}. 
+replaced by the \name{ADAM} command \name{\$ALINK}.
 
 \section{CHANGES IN THIS DOCUMENT}
 Although PRIMDAT is now available for Unix platforms, the major part of this
-document has not been revised and is still VMS oriented. 
+document has not been revised and is still VMS oriented.
 The use of PRIMDAT is similar for both systems but note that exception
-handling is not available for all platforms (in particular, not for 
+handling is not available for all platforms (in particular, not for
 Alpha OSF/1).
 
 Section \ref{compunix} has been added for Unix users.
@@ -1538,9 +1538,9 @@ Section \ref{compunix} has been added for Unix users.
 \label{appendix:statistics}
 
 This Appendix gives performance statistics for the \name{PRIMDAT} routines
-in the form of typical execution times. 
-These are provided primarily to assist in the choice of routine for a 
-particular purpose, but they also provide a benchmark against which 
+in the form of typical execution times.
+These are provided primarily to assist in the choice of routine for a
+particular purpose, but they also provide a benchmark against which
 alternative algorithms and future improvements can be judged.
 
 In practice, execution times depend on many factors, such as the
@@ -1550,16 +1550,16 @@ Consequently, great care should be exercised if comparing the figures given
 here with the performance of a real application.
 Nevertheless, the figures do give a good indication of the {\bf relative}
 efficiency of the routines, and are generally repeatable within 5 or 10 per
-cent. 
+cent.
 Users who know of more efficient algorithms are encouraged to contact the
 author so that they may be tested under identical conditions and, if
-appropriate, incorporated into this package. 
+appropriate, incorporated into this package.
 
 The statistics presented here have been gathered on the Durham
 \name{MicroVAX}~II (\name{DUMV1}), using a program which processes a
 sequence of data obtained from an input array (or arrays) and returns the
-results to a separate output array. 
-For instance, in the case of the \name{NUM\_ADDR} function, it is equivalent 
+results to a separate output array.
+For instance, in the case of the \name{NUM\_ADDR} function, it is equivalent
 to the simple loop:
 
 \begin{verbatim}
@@ -1570,24 +1570,24 @@ to the simple loop:
 
 The figures given represent the \name{CPU} time used to calculate one result
 ({\em i.e.} the total \name{CPU} time used by this loop divided by
-\fortvar{N}), each being the median of five separate determinations. 
+\fortvar{N}), each being the median of five separate determinations.
 Note that the cost of executing the loop and of accessing the arguments and
 assigning the result is included, since these overheads will typically
-feature in most real applications. 
+feature in most real applications.
 
 The cost of page faults is not included, however.
 These will usually occur when data arrays are accessed for the first time
 (and subsequently if the array is large or has not been accessed for a while).
 The cost of page faults is difficult to quantify, as it may be
 installation-dependent and will also depend on the level of system activity
-at the time. 
+at the time.
 However, as a very rough guide, page faulting on the Durham \name{MicroVAX}~II
 adds a broad average of around 7$\mu$s to the \name{CPU} time figure for
 routines which access a single \name{\_REAL} argument array and around 11$\mu$s
 for routines accessing two \name{\_REAL} argument arrays.
 Page faults also impose a larger {\bf elapsed} time overhead, so that their
 effect can be substantial and can often make small apparent differences in
-routine performance seem insignificant in practice. 
+routine performance seem insignificant in practice.
 
 \newpage
 
@@ -1686,7 +1686,7 @@ TANH$<$T$>$ &  247 &  237 &  170 &  163 &      &      &      &      &      &    
 \multicolumn{2}{c|}{\bf UB}\\
 \hline
 %   NOTE TO AUTHOR - the contents of the STATS_VEC.TEX file should be
-%                    included at this point... 
+%                    included at this point...
 ADD$<$T$>$ &   21 & 10.6 & 16.6 &  8.6 & 11.2 &  6.6 & 11.7 &  6.3 & 17.0 & 12.8 & 11.4 &  6.8 & 19.4 & 14.8 \\
 SUB$<$T$>$ &   21 & 10.6 & 16.6 &  8.6 & 11.2 &  6.6 & 11.7 &  6.3 & 17.1 & 12.8 & 11.5 &  6.8 & 19.3 & 14.8 \\
 MUL$<$T$>$ &   23 & 12.2 & 17.4 &  9.3 & 15.2 & 10.6 & 16.5 & 11.1 &   21 & 17.0 & 15.1 & 10.1 &   25 &   20 \\
@@ -1949,8 +1949,8 @@ UBTO$<$T$>$ &  7.1 &  6.7 &  3.1 &  4.1 &  3.1 &  3.9 &  0.3 \\
 
 This Appendix describes the error conditions recognised by this package
 and the associated codes and messages.
-If it is necessary to test for any of these error conditions, then symbolic 
-constants (defined by Fortran \name{PARAMETER} statements) should be used to 
+If it is necessary to test for any of these error conditions, then symbolic
+constants (defined by Fortran \name{PARAMETER} statements) should be used to
 identify the error code in question.
 
 The names of \name{PRIMDAT} error codes are of the form:
@@ -1961,15 +1961,15 @@ PRM\_\_$<$code$>$
 
 where $<$code$>$ specifies the error condition.
 Their numerical values are defined in the file \name{PRM\_ERR}, and may be
-incorporated into an application with the statement: 
+incorporated into an application with the statement:
 
 \begin{verbatim}
       INCLUDE 'PRM_ERR'
 \end{verbatim}
 
-The following gives the names of the symbolic constants defined in this 
+The following gives the names of the symbolic constants defined in this
 file, together with the associated error messages and an explanation of each
-error condition: 
+error condition:
 
 \begin{description}
 
@@ -1980,30 +1980,30 @@ An invalid argument was supplied to a mathematical function.
 An attempt was made to perform floating point division by zero.
 
 \item {\bf PRM\_\_FLTOF, floating point overflow}\\
-The absolute value of the result of a floating point calculation or type 
+The absolute value of the result of a floating point calculation or type
 conversion exceeded the largest floating point number which can be
-represented on the machine. 
+represented on the machine.
 
 \item {\bf PRM\_\_FLTUF, floating point underflow}\\
-The absolute value of the result of a floating point calculation or type 
+The absolute value of the result of a floating point calculation or type
 conversion was smaller than the smallest non-zero floating point number
 which can be represented on the machine.
 This error condition will not normally be used on a \name{VAX} unless
-underflow detection has been explicitly enabled. 
+underflow detection has been explicitly enabled.
 
 \item {\bf PRM\_\_INTDZ, integer divide by zero}\\
 An attempt was made to perform integer division by zero.
 
 \item {\bf PRM\_\_INTOF, integer overflow}\\
-The result of an integer (non-floating point) calculation or type conversion 
+The result of an integer (non-floating point) calculation or type conversion
 was outside the number range which can be represented by the data type in
-question. 
+question.
 
 \item {\bf PRM\_\_LOGZN, logarithm of zero or negative number}\\
 An attempt was made to take the logarithm of zero or a negative number.
 
 \item {\bf PRM\_\_SLOST, numerical significance lost}\\
-Numerical significance was lost during evaluation of a mathematical 
+Numerical significance was lost during evaluation of a mathematical
 function; a result could not be calculated with any meaningful precision.
 
 \item {\bf PRM\_\_SQRNG, square root of negative number}\\

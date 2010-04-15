@@ -64,12 +64,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -87,7 +87,7 @@
 *        Check that NDF extension is an HDS Structure before using
 *        it with HDS routines which require a structure.
 *     7-MAR-2008 (DSB):
-*        Check that NDF extension is a scalar before using it with HDS 
+*        Check that NDF extension is a scalar before using it with HDS
 *        routines which require a scalar.
 *     10-JUL-2008 (TIMJ):
 *        Initialise QNLOC and XNAME to resolve valgrind warnings.
@@ -164,13 +164,13 @@
          CALL NDF_XNAME( INDF, I, XN, STATUS )
          CALL NDF_XLOC( INDF, XN, 'READ', XLOC, STATUS )
 
-*  See if the extension is a scalar structure containing a component 
+*  See if the extension is a scalar structure containing a component
 *  named QUALITY_NAMES.
-         CALL DAT_STRUC( XLOC, THERE, STATUS ) 
+         CALL DAT_STRUC( XLOC, THERE, STATUS )
          CALL DAT_SIZE( XLOC, SIZE, STATUS )
          IF( SIZE .NE. 1 ) THERE = .FALSE.
          IF( THERE ) CALL DAT_THERE( XLOC, IRQ__QINAM, THERE, STATUS )
-       
+
 *  If it does, get a locator to it, return the extension name and
 *  increment the number of structures found.
          IF( THERE ) THEN

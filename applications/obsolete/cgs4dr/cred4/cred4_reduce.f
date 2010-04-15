@@ -43,9 +43,9 @@
         INVAL = 'READ_MODE="NEWEST" DESTRUCTIVE=TRUE '/
      :    /'PASSWORD="'//QMAN_PWRD(1:CHR_LEN(QMAN_PWRD))//'" '/
      :    /'LOCKWORD="'//QMAN_LWRD(1:CHR_LEN(QMAN_LWRD))//'"'
-        CALL TASK_OBEY( QMAN_ALIAS(1:CHR_LEN(QMAN_ALIAS)), 'READ', 
-     :    INVAL(1:CHR_LEN(INVAL)), OUTVAL, QMAN_PATH, 
-     :    QMAN_MESSID, STATUS )	
+        CALL TASK_OBEY( QMAN_ALIAS(1:CHR_LEN(QMAN_ALIAS)), 'READ',
+     :    INVAL(1:CHR_LEN(INVAL)), OUTVAL, QMAN_PATH,
+     :    QMAN_MESSID, STATUS )
         IF ( STATUS .NE. DTASK__ACTSTART ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'CRED4_REDUCE: '/
@@ -57,7 +57,7 @@
 *      Wait (indefinitely) for task to complete
         CALL ERR_ANNUL( STATUS )
         CALL TASK_DONE( -1, QMAN_PATH, QMAN_MESSID, OUTVAL, STATUS )
-        IF ( ( STATUS .NE. DTASK__ACTCOMPLETE ) .AND. 
+        IF ( ( STATUS .NE. DTASK__ACTCOMPLETE ) .AND.
      :       ( STATUS .NE. DTASK__ACTINFORM ) ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'CRED4_REDUCE: '/

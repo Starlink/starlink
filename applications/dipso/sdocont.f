@@ -1,4 +1,4 @@
- 
+
        SUBROUTINE SDOCONT
      : (WAVE, FLUX, NPOINT, WORK)
 !

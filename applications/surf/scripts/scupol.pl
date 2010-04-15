@@ -23,7 +23,7 @@
 # 5-Aug-1998 : ACC (modified to Perl from original C-Shell script)
 #
 # 20-Nov-1998: ACC (modified for smoothing data by setting the
-#                     REBIN_METHOD=gaussian parameter of the 
+#                     REBIN_METHOD=gaussian parameter of the
 #                           intrebin calculations)
 # 11-FEB-1999: TJ (use new SURF REMIP script)
 #                 (Run GLITCH on images before calculating q,u,i)
@@ -35,7 +35,7 @@ print "                   S C U P O L \n";
 print "                   ^^^^^^^^^^^ \n";
 print " \n";
 print "    A Data Reduction Recipe for SCUBA Polarimetry\n";
-print " \n";  
+print " \n";
 print "               Antonio Chrysostomou \n";
 print "  Joint Astronomy Centre & University of Hertfordshire\n";
 print " \n";
@@ -268,7 +268,7 @@ sub srcrot {
       $rot = PI
     }
   }
-  
+
   $rot = $rot/D2R;
 
   return $rot

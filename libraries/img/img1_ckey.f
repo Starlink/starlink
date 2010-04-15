@@ -38,12 +38,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -69,31 +69,31 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IMG_ERR'          ! IMG error codes
-      
+
 *  Arguments Given:
       INTEGER NCARD
       CHARACTER * ( * ) BLOCK( NCARD )
-      
+
 *  Arguments Returned:
       INTEGER N
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER I                  ! Loop variable
-      
+
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
 *  Look at each record and count only non-blank ones until the 'END'
 *  keyword is reached.
       N = 0
       DO 1 I = 1, NCARD
          IF ( BLOCK( I ) .NE. ' ' ) THEN
-            IF ( BLOCK( I )( 1: 3 ) .NE. 'END' ) THEN 
+            IF ( BLOCK( I )( 1: 3 ) .NE. 'END' ) THEN
                N = N + 1
             ELSE
 

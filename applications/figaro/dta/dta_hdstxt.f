@@ -19,8 +19,8 @@ C
 C                                          KS / AAO 11th March 1986
 C     Modified:
 C
-C     20th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     20th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C+
       IMPLICIT NONE

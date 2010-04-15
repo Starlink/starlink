@@ -3,7 +3,7 @@ C+
 C
 C     F I T _ M W R I T
 C
-C     Writes the main FITS buffer, FBUFF, onto tape (or disk).  Note 
+C     Writes the main FITS buffer, FBUFF, onto tape (or disk).  Note
 C     this version does not perform the standard FITS clean-up
 C     operations when the end-of-tape is encountered; instead, it
 C     will return an end-of-tape I/O error.  A later version may
@@ -26,12 +26,12 @@ C     (>) FBUFF      (Byte array) The main FITS buffer.
 C     (<) MTERR      (Character) Description of the last tape I/O error.
 C     (<) MTSTAT     (Integer) Last TIO_ error code
 C     (>) LUFILE     (Integer) Logical unit number for disk file, if used.
-C     (!) TBUFF      (Byte array) Is the large buffer in which logical 
-C                    blocks (built up in FBUFF) are blocked up into actual 
+C     (!) TBUFF      (Byte array) Is the large buffer in which logical
+C                    blocks (built up in FBUFF) are blocked up into actual
 C                    tape records.
-C     (>) TBLOCK     (Integer) Is the current blocking factor - number of 
+C     (>) TBLOCK     (Integer) Is the current blocking factor - number of
 C                    logical records in each actual tape record.
-C     (!) BCOUNT     (Integer) Is the number of logical records already held 
+C     (!) BCOUNT     (Integer) Is the number of logical records already held
 C                    in TBUFF.
 C     (!) RINDEX     (Integer) Disk file record index, if a direct access
 C                    file is being written to. Zero otherwise.

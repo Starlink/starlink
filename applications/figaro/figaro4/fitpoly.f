@@ -223,7 +223,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -451,7 +451,7 @@
      :                    %VAL( CNF_PVAL(PNTR(4))+DBLSIZ*MSKELM ),
      :                    %VAL( CNF_PVAL(PNTR(4))+2*DBLSIZ*MSKELM ),
      :                    ORDER, NDEG, EPS, %VAL( CNF_PVAL(PNTR(5)) ),
-     :                    IFAIL1, 
+     :                    IFAIL1,
      :                    %VAL( CNF_PVAL(PNTR(5))+DBLSIZ*NELM ),
      :                    IFAIL2 )
          STATUS = IFAIL2
@@ -473,7 +473,7 @@
 *     Get the ordinary polynomial coefficient (as DOUBLE array).
          IF ( STATUS .NE. SAI__OK ) GO TO 500
          CALL ERR_MARK
-         CALL PDA_DPCOEF( NDEG, 0D0, COEFF, 
+         CALL PDA_DPCOEF( NDEG, 0D0, COEFF,
      :                    %VAL( CNF_PVAL(PNTR(5))+DBLSIZ*NELM ),
      :                    STATUS )
          IF ( STATUS .NE. 0 ) THEN
@@ -593,7 +593,7 @@
 
 *           Plot (the whole lot).
                CALL SPD_WAAL( .TRUE., FITTED, VARUSE, ZONID, PLABEL,
-     :                        RMIN, RMAX, NELM, 
+     :                        RMIN, RMAX, NELM,
      :                        %VAL( CNF_PVAL(PNTR(1)) ),
      :                        %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
      :                        MASK, PLTRES, FITX, FITY, MSKELM,

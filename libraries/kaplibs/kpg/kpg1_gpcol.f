@@ -42,12 +42,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -66,7 +66,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -98,8 +98,8 @@
      :  NWORD                    ! Number of RGB intensities
 
       REAL
-     :  RGBMAX,                  ! Maximum RGB intensity 
-     :  RGBMIN                   ! Minimum RGB intensity 
+     :  RGBMAX,                  ! Maximum RGB intensity
+     :  RGBMIN                   ! Minimum RGB intensity
 
       CHARACTER
      :  COLOUR( 3 ) * 18,        ! The colour or RGB values obtained via
@@ -188,7 +188,7 @@
 
             CALL CHR_DCWRD( COLOUR( 1 ), 3, NWORD, IS, IE, WORDS,
      :                      ISTAT )
-      
+
             IF ( INDEX( COLOUR( 1 ), ',' ) .EQ. 0 .AND.
      :           NWORD .NE. 3 ) THEN
 
@@ -245,7 +245,7 @@
 *                the next word to after the delimeter.  Find the start
 *                of the next word, unless the last has already been
 *                found.
-                
+
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      NWORD = NWORD + 1
                      INDEXS = INDEXE + 2

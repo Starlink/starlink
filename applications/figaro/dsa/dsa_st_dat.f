@@ -10,7 +10,7 @@ C
 C  Description:
 C     Sets a number of items in a data structure that relate directly
 C     to the data array itself.  If these items do not in fact exist, then
-C     they are created.  At present, only a very limited number of items 
+C     they are created.  At present, only a very limited number of items
 C     are supported.
 C
 C  Language:
@@ -76,7 +76,7 @@ C     27th Feb 1990   Modified to use DSA__ routines rather than assuming
 C                     the original Figaro data format.  KS/AAO.
 C     12th Mar 1990   Now uses DSA__CREATE_DATA_EXTRA rather than using
 C                     DSA__CREATE_EXTRA.  KS/AAO.
-C     5th  Apr 1991   Now makes sure existing string items are long enough for 
+C     5th  Apr 1991   Now makes sure existing string items are long enough for
 C                     the strings to be written to them.
 C     21st Aug 1992   Automatic portability modifications
 C                     ("INCLUDE" syntax etc) made. KS/AAO
@@ -134,7 +134,7 @@ C
 C
 C     Make sure the data structure exists by trying to create it - if it
 C     already exists, this fails, but we ignore that.
-C     
+C
       CALL DSA__CREATE_DATA_ENV (REF_SLOT,DTA_STATUS)
 C
 C     Set the data units

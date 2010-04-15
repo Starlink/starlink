@@ -13,16 +13,16 @@
 *     CALL CHR_SKCHR( CHARS, STRING, FORWD, IPOSN )
 
 *  Description:
-*     Increment a character pointer, IPOSN, either forward or 
-*     backward through a string, until the character pointed to 
-*     is not one of a specified set of characters. The direction of 
-*     the search is given by the argument FORWD. If no such 
-*     character position exists (i.e all remaining characters in the 
+*     Increment a character pointer, IPOSN, either forward or
+*     backward through a string, until the character pointed to
+*     is not one of a specified set of characters. The direction of
+*     the search is given by the argument FORWD. If no such
+*     character position exists (i.e all remaining characters in the
 *     string are members of the specified set), the pointer is returned
-*     set to one more than the length of the string if the search is 
-*     in the forward direction, or zero if the search is in the reverse 
-*     direction. If the initial value of IPOSN does not point at one of 
-*     the characters in the string, then the routine will return without 
+*     set to one more than the length of the string if the search is
+*     in the forward direction, or zero if the search is in the reverse
+*     direction. If the initial value of IPOSN does not point at one of
+*     the characters in the string, then the routine will return without
 *     action.
 
 *  Arguments:
@@ -32,7 +32,7 @@
 *        The string to be searched.
 *     FORWD = LOGICAL (Given)
 *        The search direction: if .TRUE. then proceed through the string
-*        in a forward direction, otherwise work backwards through the 
+*        in a forward direction, otherwise work backwards through the
 *        string.
 *     IPOSN = INTEGER (Given and Returned)
 *        The character pointer.
@@ -46,12 +46,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -76,7 +76,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -1,5 +1,5 @@
 **==infile.spg  processed by SPAG 4.54K  at 14:22 on  4 Oct 1996
- 
+
 ************************************************************************
       SUBROUTINE INFILE(IFILE,FILE,IFLAG)
       IMPLICIT NONE

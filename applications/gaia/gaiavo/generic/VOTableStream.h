@@ -41,8 +41,8 @@
 using namespace std;
 
 namespace gaia {
-    
-    class VOTableStream 
+
+    class VOTableStream
     {
     public:
 
@@ -66,8 +66,8 @@ namespace gaia {
         ~VOTableStream();
 
         /*  Read vector of given types from the stream and print the formatted
-         *  values to the output stream. */ 
-        bool readPrint( datatype type, int quantity, bool havenull, 
+         *  values to the output stream. */
+        bool readPrint( datatype type, int quantity, bool havenull,
                         string &nullstring, ostream *out );
 
         /*  Native type access to the values in the stream. */
@@ -83,7 +83,7 @@ namespace gaia {
 
         /*  The stream containing encoded binary data. */
         streambuf *in_;
-        
+
         /*  The stream is always bigendian. */
         bool bigendian_;
 

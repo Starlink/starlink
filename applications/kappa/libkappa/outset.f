@@ -22,38 +22,38 @@
 *     specified component of a given 2-dimensional NDF.
 
 *  Usage:
-*     outset in out centre diam 
+*     outset in out centre diam
 
 *  ADAM Parameters:
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the centre of the circle. The position must
-*        be given in the current co-ordinate Frame of the NDF (supplying 
+*        be given in the current co-ordinate Frame of the NDF (supplying
 *        a colon ":" will display details of the current co-ordinate
-*        Frame). The position should be supplied as a list of formatted 
-*        axis values separated by spaces or commas. See also parameter 
+*        Frame). The position should be supplied as a list of formatted
+*        axis values separated by spaces or commas. See also parameter
 *        USEAXIS. The current co-ordinate Frame can be changed using
 *        KAPPA:WCSFRAME.
 *     COMP = LITERAL (Read)
 *        The NDF array component to be masked.  It may be "Data", or
-*        "Variance", or "Error" (where "Error" is equivalent to 
+*        "Variance", or "Error" (where "Error" is equivalent to
 *        "Variance"). ["Data"]
 *     CONST = LITERAL (Given)
-*        The constant numerical value to assign to the masked pixels, or 
+*        The constant numerical value to assign to the masked pixels, or
 *         the string "bad". ["bad"]
 *     DIAM = LITERAL (Read)
-*        The diameter of the circle. If the current co-ordinate Frame of 
+*        The diameter of the circle. If the current co-ordinate Frame of
 *        the NDF is a SKY Frame (e.g. RA and DEC), then the value should be
 *        supplied as an increment of celestial latitude (e.g. DEC). Thus,
 *        "10.2" means 10.2 arc-seconds, "30:0" would mean 30 arc-minutes,
 *        and "1:0:0" would mean 1 degree. If the current co-ordinate
-*        Frame is not a SKY Frame, then the diameter should be specified 
+*        Frame is not a SKY Frame, then the diameter should be specified
 *        as an increment along axis 1 of the current co-ordinate Frame.
 *        Thus, if the current Frame is PIXEL, the value should be given
 *        simply as a number of pixels.
 *     IN = NDF (Read)
 *        The name of the source NDF.
 *     INSIDE = _LOGICAL (Read)
-*        If a TRUE value is supplied, the constant value is assigned to the 
+*        If a TRUE value is supplied, the constant value is assigned to the
 *        inside of the circle. Otherwise, it is assigned to the outside. [FALSE]
 *     OUT = NDF (Write)
 *        The name of the masked NDF.
@@ -64,14 +64,14 @@
 *  Examples:
 *     outset neb1 nebm "13.5,201.3" 20 const=0
 *        This copies NDF "neb1" to "nebm", setting pixels to zero in the
-*        DATA array if they fall outside the specified circle. Assuming the 
-*        current co-ordinate Frame of neb1 is PIXEL, the circle is centred 
-*        at pixel co-ordinates (13.5, 201.3) and has a diameter of 20 pixels. 
+*        DATA array if they fall outside the specified circle. Assuming the
+*        current co-ordinate Frame of neb1 is PIXEL, the circle is centred
+*        at pixel co-ordinates (13.5, 201.3) and has a diameter of 20 pixels.
 *     outset neb1 nebm "15:23:43.2 -22:23:34.2" "10:0" inside comp=var
 *        This copies NDF "neb1" to "nebm", setting pixels bad in the
-*        variance array if they fall inside the specified circle. Assuming 
-*        the current co-ordinate Frame of neb1 is a SKY Frame describing RA 
-*        and DEC, the aperture is centred at RA 15:23:43.2 and 
+*        variance array if they fall inside the specified circle. Assuming
+*        the current co-ordinate Frame of neb1 is a SKY Frame describing RA
+*        and DEC, the aperture is centred at RA 15:23:43.2 and
 *        DEC -22:23:34.2, and has a diameter of 10 arc-minutes.
 
 *  Related Applications:
@@ -130,11 +130,11 @@
       INCLUDE 'PRM_PAR'          ! VAL_ data constants
       INCLUDE 'AST_PAR'          ! AST_ data constants and functions
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-               
-*  Status:     
+
+*  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Variables:      
+*  Local Variables:
       CHARACTER COMP*8           ! Name of array component to mask
       CHARACTER CONTXT*40        ! Text version of constant value
       CHARACTER TEXT*(GRP__SZNAM)! General text bufferName of ARD file
@@ -148,7 +148,7 @@
       INTEGER EL                 ! Total number of pixels in the image
       INTEGER IAT                ! Used length of a string
       INTEGER IGRP               ! Group identifier
-      INTEGER INDF1              ! Identifier for the source NDF  
+      INTEGER INDF1              ! Identifier for the source NDF
       INTEGER INDF2              ! Identifier for the output NDF
       INTEGER IPMASK             ! Pointer to the ARD logical mask
       INTEGER IPOUT              ! Pointer to the data component of for the output NDF
@@ -177,12 +177,12 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain an identifier for the NDF structure to be examined.       
+*  Obtain an identifier for the NDF structure to be examined.
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
-*  Determine which array component is to be masked, converting 'ERROR' into 
+*  Determine which array component is to be masked, converting 'ERROR' into
 *  'VARIANCE'.
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE., 
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE.,
      :                COMP, STATUS )
       IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
 
@@ -196,12 +196,12 @@
          CALL ERR_REP( 'OUTSET_ERR1', 'The ^COMP component is '//
      :                 'undefined in the NDF structure ^NDF', STATUS )
       END IF
-      
+
 *  Obtain the numeric type of the NDF array component to be masked.
       CALL NDF_TYPE( INDF1, COMP, TYPE, STATUS )
 
 *  Get the WCS FrameSet and the bounds of the significant axes.
-      CALL KPG1_ASGET( INDF1, 2, .FALSE., .TRUE., .TRUE., SDIM, 
+      CALL KPG1_ASGET( INDF1, 2, .FALSE., .TRUE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
 *  Get a pointer to the current Frame.
@@ -218,7 +218,7 @@
          DAX = 1
       END IF
       DIAM= AST__BAD
-      CALL KPG1_GTAXV( 'DIAM', 1, .TRUE., CURFRM, DAX, DIAM, NVAL, 
+      CALL KPG1_GTAXV( 'DIAM', 1, .TRUE., CURFRM, DAX, DIAM, NVAL,
      :                 STATUS )
 
 *  Create the ARD description.
@@ -238,28 +238,28 @@
 
 *  Put this text into a GRP group.
       CALL GRP_NEW( ' ', IGRP, STATUS )
-      CALL GRP_PUT( IGRP, 1, TEXT( : IAT ), 0, STATUS ) 
-          
-*  Store the WCS FrameSet. Since no COFRAME or WCS statements were included 
-*  in the ARD description above, positions will be interpreted as being in 
+      CALL GRP_PUT( IGRP, 1, TEXT( : IAT ), 0, STATUS )
+
+*  Store the WCS FrameSet. Since no COFRAME or WCS statements were included
+*  in the ARD description above, positions will be interpreted as being in
 *  the current Frame of the WCS FrameSet.
       CALL ARD_WCS( IWCS, 'PIXEL', STATUS )
-          
+
 *  Allocate the memory needed for the logical mask array.
       CALL NDF_SIZE( INDF1, EL, STATUS )
       CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
-      
+
 *  Create the mask.  Value 2 should be used to represent pixels
 *  specified by the first keyword in the ARD description. TRCOEF is
 *  ignored because we have previously called ARD_WCS.
       REGVAL = 2
       CALL ARD_WORK( IGRP, 2, SLBND, SUBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), 
+     :               %VAL( CNF_PVAL( IPMASK ) ),
      :               LBNDI, UBNDI, LBNDE, UBNDE,
      :               STATUS )
-       
+
 *  Propagate the bits of the source NDF required.
-      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
+      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS',
      :               'OUT', INDF2, STATUS )
 
 *  Get the title for the output NDF.
@@ -277,44 +277,44 @@
       BAD = ( CONTXT .EQ. 'BAD' )
       IF( .NOT. BAD ) CALL CHR_CTOD( CONTXT, CONST, STATUS )
 
-*  See if the value is to be assigned to the inside or the outside of the 
+*  See if the value is to be assigned to the inside or the outside of the
 *  region.
       CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
 
 *  Correct the output image to have bad pixels where indicated on the
 *  mask.  Call the appropriate routine for the data type.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, 
+         CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL,
      :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, 
+         CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL,
      :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, 
+         CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL,
      :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, 
+         CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
      :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, 
+         CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL,
      :                     %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, 
+         CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL,
      :                     %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, 
+         CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL,
      :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
@@ -330,7 +330,7 @@
       CALL GRP_DELET( IGRP, STATUS )
 
 *  End the NDF context.
-      CALL NDF_END( STATUS )                              
+      CALL NDF_END( STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

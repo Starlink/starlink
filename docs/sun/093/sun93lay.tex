@@ -37,7 +37,7 @@
 \def\clearsectnumber{\sectnumber=0}
 \def\section{\advance\sectnumber by 1
    \newsect{\the\chapnumber.\the\sectnumber~}}
-\outer\def\newsect#1\par {\vskip 0pt plus .25\vsize \penalty -250 
+\outer\def\newsect#1\par {\vskip 0pt plus .25\vsize \penalty -250
     \vskip 0pt plus -.25\vsize \bigskip \vskip \parskip \message{#1}
     \leftline {\bf #1} \nobreak }
 %-------------------------------------------------------------------------
@@ -71,7 +71,7 @@
   \output={\global\setbox\partialpage=\vbox{\unvbox255\bigskip}}\eject
   \output={\doublecolumnout} \hsize=8.5truecm \vsize=45truecm}
 
-\def\enddoublecolumns{\output={\balancecolumns}\eject 
+\def\enddoublecolumns{\output={\balancecolumns}\eject
   \endgroup \pagegoal=\vsize}
 
 \def\doublecolumnout{\splittopskip=\topskip \splitmaxdepth=\maxdepth
@@ -125,7 +125,7 @@
 \def\endaddress{\par\endgroup}
 
 \def\subdir#1\par {\ifdim\lastskip>0pt\removelastskip\fi
-	\vskip 0pt plus .08\vsize \penalty -250 
+	\vskip 0pt plus .08\vsize \penalty -250
 	\vskip 0pt plus -.08\vsize \bigskip\bigskip \message{#1}
 	\centerline {\bf #1} \bigskip\nobreak }
 
@@ -133,7 +133,7 @@
 	\dimen1=\ht1 \advance\dimen1 by -\baselineskip \lower\dimen1\box1}
 
 \def\boxit{\ifdim\lastskip>0pt\removelastskip\fi
-	\vskip 0pt plus .08\vsize \penalty -250 
+	\vskip 0pt plus .08\vsize \penalty -250
 	\vskip 0pt plus -.08\vsize \bigskip\bigskip
 	\afterassignment\startboxit
 	\setbox0=\vbox}

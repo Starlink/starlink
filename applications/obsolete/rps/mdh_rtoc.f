@@ -11,7 +11,7 @@
 
       WRITE( DUMMY , '( F )' ) RNUM
       I = MDH_ENDWORD( DUMMY )
-      
+
       DO WHILE ( DUMMY( I:I ) .EQ. '0' )
 
         I = I - 1

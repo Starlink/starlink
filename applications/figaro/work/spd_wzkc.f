@@ -141,7 +141,7 @@
 
       IGNORE = 0
 
-*%      Initialise start/end of the linked list    
+*%      Initialise start/end of the linked list
         status = 0
         used_max = .FALSE.
         log1 = LOG ( 1.0 )
@@ -155,22 +155,22 @@
            next_index(1,icf) = 2
            next_index(2,icf) = 2
            prev_index(1,icf) = 1
-           prev_index(2,icf) = 1 
+           prev_index(2,icf) = 1
            ratios(1,1,icf) = 0.0
            ratios(2,1,icf) = 1.0e20
 
 *%         Determine maximum number of neighbours to left/right we can use
            left_max_neighb = icf - 1
-           right_max_neighb = num_actv_ftrs - icf 
+           right_max_neighb = num_actv_ftrs - icf
 
 *%         Loop from 1st left hand neighbour to max left hand neighbour
 *%          Loop from next left hand neighbour to max left-1 hand neighbour
 *%           Loop from 1st right hand neighbour to max right hand neighbour
 *%            Loop from next right hand neighbour to max right-1 hand neighbour
            DO l1 = 1 , MIN ( left_max_neighb , meta_scope ) - 1
-            DO l2 = l1 + 1 , MIN ( left_max_neighb , meta_scope ) 
+            DO l2 = l1 + 1 , MIN ( left_max_neighb , meta_scope )
              DO r1 = 1 , MIN ( right_max_neighb , meta_scope ) - 1
-              DO r2 = r1 + 1 , MIN ( right_max_neighb , meta_scope ) 
+              DO r2 = r1 + 1 , MIN ( right_max_neighb , meta_scope )
 
 *%              Increment counter
 *%              If still room for more ratios in the arrays then
@@ -186,51 +186,51 @@
 *%               Calculate ratio 1 (l1/r1) and store its characteristics
                   left = l1
                   right = r1
-                  IF ( icf-left .GT. 0 .AND. 
+                  IF ( icf-left .GT. 0 .AND.
      :                icf+right .LE. num_actv_ftrs ) THEN
-                  ratio =    ( positions ( icf ) - 
-     :                      positions ( icf - left )   )   
+                  ratio =    ( positions ( icf ) -
+     :                      positions ( icf - left )   )
      :                                                              /
-     :                     ( positions ( icf + right ) - 
-     :                     positions ( icf  )         )   
+     :                     ( positions ( icf + right ) -
+     :                     positions ( icf  )         )
                   ratios ( n_samples , 1 , icf ) = ratio
 
 *%               Calculate ratio 2 (l1/r2) and store its characteristics
                   left = l1
                   right = r2
-                  IF ( icf-left .GT. 0 .AND. 
+                  IF ( icf-left .GT. 0 .AND.
      :                icf+right .LE. num_actv_ftrs ) THEN
-                  ratio =    ( positions ( icf ) - 
-     :                      positions ( icf - left )   )   
+                  ratio =    ( positions ( icf ) -
+     :                      positions ( icf - left )   )
      :                                                              /
-     :                     ( positions ( icf + right ) - 
-     :                     positions ( icf  )         )   
+     :                     ( positions ( icf + right ) -
+     :                     positions ( icf  )         )
                   ratios ( n_samples , 2 , icf ) = ratio
 
 *%               Calculate ratio 3 (l2/r1) and store its characteristics
                   left = l2
                   right = r1
-                  IF ( icf-left .GT. 0 .AND. 
+                  IF ( icf-left .GT. 0 .AND.
      :                icf+right .LE. num_actv_ftrs ) THEN
-                  ratio =    ( positions ( icf ) - 
-     :                      positions ( icf - left )   )   
+                  ratio =    ( positions ( icf ) -
+     :                      positions ( icf - left )   )
      :                                                              /
-     :                     ( positions ( icf + right ) - 
-     :                     positions ( icf  )         )   
+     :                     ( positions ( icf + right ) -
+     :                     positions ( icf  )         )
                   ratios ( n_samples , 3 , icf ) = ratio
 
 *%               Calculate ratio 4 (l2/r2) and store its characteristics
                   left = l2
                   right = r2
-                  IF ( icf-left .GT. 0 .AND. 
+                  IF ( icf-left .GT. 0 .AND.
      :                icf+right .LE. num_actv_ftrs ) THEN
-                  ratio =    ( positions ( icf ) - 
-     :                      positions ( icf - left )   )   
+                  ratio =    ( positions ( icf ) -
+     :                      positions ( icf - left )   )
      :                                                              /
-     :                     ( positions ( icf + right ) - 
-     :                     positions ( icf  )         )   
+     :                     ( positions ( icf + right ) -
+     :                     positions ( icf  )         )
                   ratios ( n_samples , 4 , icf ) = ratio
-                 
+
                   left_offset ( n_samples , 1 , icf ) = nl1
                   right_offset ( n_samples , 1 , icf ) = nr1
                   left_offset ( n_samples , 2 , icf ) = nl2
@@ -241,14 +241,14 @@
 *                the entry with the next highest value for 'ratios(??,1)'
 *                ie ?? = next_index(i). Similarly with 'prev_index(i)'.
                   index = 1
-                  DO WHILE ( ratios ( n_samples , 1 , icf ) .GT.  
+                  DO WHILE ( ratios ( n_samples , 1 , icf ) .GT.
      :                      ratios ( index , 1 , icf )    )
                     index = next_index ( index , icf )
                   END DO
-                  next_index ( n_samples , icf ) = index 
-                  prev_index ( n_samples , icf ) = 
+                  next_index ( n_samples , icf ) = index
+                  prev_index ( n_samples , icf ) =
      :                                   prev_index ( index , icf )
-                  next_index ( prev_index 
+                  next_index ( prev_index
      :                         ( index , icf ) , icf  ) = n_samples
                   prev_index ( index , icf ) = n_samples
 
@@ -283,14 +283,14 @@
 *%      Report if we used up all available storage for ratios
         IF ( used_max ) THEN
            n_samples = max_meta_index
-           IF ( INFO ) CALL MSG_OUT( 'FDB_REPORT', 
-     :                'Reached maximum line-group components', IGNORE ) 
+           IF ( INFO ) CALL MSG_OUT( 'FDB_REPORT',
+     :                'Reached maximum line-group components', IGNORE )
            status = -1
         ENDIF
 
         IF ( INFO ) THEN
            WRITE ( report_string , 1000 ) used_total
-           CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE ) 
+           CALL MSG_OUT( 'FDB_REPORT', report_string, IGNORE )
         END IF
 
 *

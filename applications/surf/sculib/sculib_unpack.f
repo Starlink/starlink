@@ -21,7 +21,7 @@
 *          - fill the image slice with zeroes and bad quality after the packed
 *             slice ends.
 *
-*        else 
+*        else
 *          - fill the image slice with zeroes and bad quality
 *
 *        endif
@@ -39,13 +39,13 @@
 *     NBS_DIM3                            = INTEGER (Given)
 *           third dimension of the RESNBS array
 *     RESNBS (NBS_DIM1, NBS_DIM2, NBS_DIM3)) = REAL (Given)
-*           the noticeboard `resampled data' 
+*           the noticeboard `resampled data'
 *     ISTART (RES_DIM2)                   = INTEGER (Given)
 *           the I index of the start of each packed slice
 *     NPIX (RES_DIM2)                     = INTEGER (Given)
-*           the number of pixels in each packed slice 
+*           the number of pixels in each packed slice
 *     POINTER (RES_DIM2)                  = INTEGER (Given)
-*           the pointer to the start of each packed slice 
+*           the pointer to the start of each packed slice
 *     SUB                                 = INTEGER (Given)
 *           the number of the sub-instrument map to be unpacked
 *     RES_DIM1                            = INTEGER (Given)
@@ -147,7 +147,7 @@
                RES_DS (I,J) = RESNBS (1, SUB, POINTER(J)+I-ISTART(J))
                RES_VS (I,J) = RESNBS (2, SUB, POINTER(J)+I-ISTART(J))
                RES_WS (I,J) = RESNBS (3, SUB, POINTER(J)+I-ISTART(J))
-               RES_QS (I,J) = 
+               RES_QS (I,J) =
      :           NINT (RESNBS (4, SUB, POINTER(J)+I-ISTART(J)))
             END DO
 
@@ -175,6 +175,6 @@
 
          END IF
 
-      END DO      
+      END DO
 
       END

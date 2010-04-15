@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ RUTHERFORD APPLETON LABORATORY\\
 %------------------------------------------------------------------------------
 \section{INTRODUCTION}
 This document describes the way in which GKS, SGS and DIAGRAM have
-been incorporated into ADAM. 
+been incorporated into ADAM.
 {\em Note that DIAGRAM is now virtually obsolete.}
 The document also includes sections on
 the high-level graphics package NCAR which is not fully integrated
@@ -90,8 +90,8 @@ The directory structure for each package is shown in Figure \ref{pic}.
 \end{figure}
 Logical names {\it pkg}\_ENV and {\it pkg}\_DIR are assigned
 to the top level and [.SSC] directories respectively.
-{\it pkg}\_ENV contains the environment layer, ie subroutines handling 
-activation and de-activation of the package under ADAM, the 
+{\it pkg}\_ENV contains the environment layer, ie subroutines handling
+activation and de-activation of the package under ADAM, the
 association between the package and physical devices, and the reporting of
 errors to ADAM.
 
@@ -107,7 +107,7 @@ heading. The environment specific subroutines are contained in libraries named
 {\it pkg}\/PAR.OLB and {\it pkg}\/PAR.TLB.
 
 {\it pkg}\_DIR contains those parts of the Starlink Software Collection's
-stand-alone release of the package which are required. 
+stand-alone release of the package which are required.
 For Starlink sites, the logical names SGS\_DIR and GKS\_DIR be assigned to the
 actual stand-alone system directories to save disk space.
 
@@ -121,7 +121,7 @@ be re-compiled. The stand-alone libraries cannot be used as they will result
 in unrecognized status values.
 
 The [.TEST] directory contains test programs for the package.
-They may mostly be compiled, linked and run in the normal way. 
+They may mostly be compiled, linked and run in the normal way.
 Some deliberate errors are produced so check before getting too worried.
 
 \section{GKS ADAM IMPLEMENTATION}
@@ -132,7 +132,7 @@ form GKS\_name. They handle:
 \begin{itemize}
 \item The activation and de-activation of GKS under ADAM.
 \item The connection between GKS and the physical devices.
-\item The allocation of `graphics descriptors' which tabulate the connection 
+\item The allocation of `graphics descriptors' which tabulate the connection
 between ADAM parameters and GKS workstations.
 \item The reporting of GKS errors to ADAM.
 \end{itemize}
@@ -140,12 +140,12 @@ between ADAM parameters and GKS workstations.
 \subsection{THE STAND-ALONE LAYER}
 This corresponds with the standard Starlink release although the standard
 error handling subroutines GERHND and GERLOG will not be used (see below).
-The ISO standard (G) form of name is used for GKS kernel subroutines throughout 
+The ISO standard (G) form of name is used for GKS kernel subroutines throughout
 the ADAM implementation
 of the graphics systems.This is because SGS and NCAR both use the standard form.
 If for any reason it is
 essential to use the GKS\_ form in an application, try including
-GKS\_DIR:GKSLIBG/LIB in the link command. 
+GKS\_DIR:GKSLIBG/LIB in the link command.
 {\em No guarantees are given. The wrong error handler may be loaded}
 
 \subsection{ERROR HANDLING}
@@ -157,14 +157,14 @@ It sets a flag in common to indicate to the environment layer (or SGS) that
 an error has occurred
 and then calls the ADAM GKS error logging subroutine GKS\_ERLOG regardless
 of whether or not inherited status mode is in use.
-GKS\_ERLOG is a modification of the standard error logger and uses a 
-modification of the RAL/ICL implementation internal subroutine GKGEM 
-(renamed GKS\_KGEM) to obtain the standard GKS error message text from a 
-direct access file defined by the logical name GKS\_EMF. 
+GKS\_ERLOG is a modification of the standard error logger and uses a
+modification of the RAL/ICL implementation internal subroutine GKGEM
+(renamed GKS\_KGEM) to obtain the standard GKS error message text from a
+direct access file defined by the logical name GKS\_EMF.
 Currently this is the method used by the RAL
 implementation of GKS.
 In case the GKS release style of error message file changes, the program
-GKSEMF.FOR and its input data file GKSEMF.DAT are included in GKS\_ENV. 
+GKSEMF.FOR and its input data file GKSEMF.DAT are included in GKS\_ENV.
 
 Having obtained the text of the error message, GKS\_ERLOG reports the error
 to ADAM using ERR\_REP so that the message may be output or annulled in the
@@ -176,12 +176,12 @@ The alternative is held in the module GKS\_ERLOGB in GKS\_ENV:GKSPAR.TLB.
 In order to incorporate it into the object library, it must be extracted and
 compiled and the resultant object file used to replace GKS\_ERLOG in
 GKS\_ENV:GKSPAR.OLB.
-{\em Note that if the complete library is re-built, care must be exercised to 
-ensure that the primary error logger and not the fallback one is included in 
+{\em Note that if the complete library is re-built, care must be exercised to
+ensure that the primary error logger and not the fallback one is included in
 the object library.}
 
 GKS environment layer subroutines use subroutine GKS\_GSTAT to interrogate
-the error flag set by GERHND.   
+the error flag set by GERHND.
 
 \section{SGS ADAM IMPLEMENTATION}
 
@@ -190,7 +190,7 @@ Handles:
 \begin{itemize}
 \item The activation and de-activation of SGS under ADAM.
 \item The connection between SGS and the physical devices.
-\item The allocation of `zone descriptors' which tabulate the connection 
+\item The allocation of `zone descriptors' which tabulate the connection
 between ADAM parameters SGS zones.
 \item The reporting of SGS errors to ADAM.
 \end{itemize}
@@ -215,7 +215,7 @@ error message.
 \subsection{ERROR HANDLING}
 SGS replaces the standard GKS error handler with one of
 its own. However, as the ADAM GKS error handler does for both SGS and GKS
-under ADAM that is used in preference. 
+under ADAM that is used in preference.
 The subroutine SGS\_$GKERR is used to check for GKS error under SGS (The
 text of any GKS error will already have been reported but not output).
 SGS errors are reported via subroutine SGS\_$ERR which is altered as described
@@ -229,7 +229,7 @@ Handles:
 \item The activation and de-activation of DIAGRAM under ADAM.
 \item The connection between DIAGRAM and the physical devices. This is done
 via the appropriate SGS environment layer subroutines.
-\item The allocation of `diagram descriptors' which tabulate the connection 
+\item The allocation of `diagram descriptors' which tabulate the connection
 between ADAM parameters DIAGRAM diagrams.
 \item The reporting of DIAGRAM and DIP errors to ADAM.
 \end{itemize}
@@ -270,7 +270,7 @@ GKS\_ASSOC performs GKS initialization if necessary via GKS\_ACTIV which
 calls GOPKS. It ensures that the workstation specified by the associated
 parameter is activated performing the functions GOPWK and GACWK.
 
-GKS\_ANNUL will just close a workstation, 
+GKS\_ANNUL will just close a workstation,
 GKS\_CANCL will close a workstation and also cancel the parameter,
 and GKS\_DEACT will close all open workstations and GKS.
 
@@ -293,7 +293,7 @@ For information on programming using GKS, see SUN/83.
 SGS\_ASSOC performs SGS initialization if necessary via SGS\_ACTIV which calls
 SGS\_INIT. It then call SGS\_OPNWK rather than SGS\_OPEN.
 
-SGS\_ANNUL will just close a workstation, 
+SGS\_ANNUL will just close a workstation,
 SGS\_CANCL will close a workstation and also cancel the parameter,
 and SGS\_DEACT will close all open workstations and SGS.
 
@@ -313,10 +313,10 @@ CALL SGS_DEACT
 For information on programming using SGS, see SUN/85.
 
 \subsection{DIAGRAM}
-DIA\_ASSOC performs DIAGRAM initialization if necessary via DIA\_ACTIV which 
+DIA\_ASSOC performs DIAGRAM initialization if necessary via DIA\_ACTIV which
 calls SGS\_ASSOC.
 
-DIA\_ANNUL will just close a workstation, 
+DIA\_ANNUL will just close a workstation,
 DIA\_CANCL will close a workstation and also cancel the parameter,
 and DIA\_DEACT will close all open workstations and DIAGRAM.
 

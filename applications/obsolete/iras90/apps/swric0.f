@@ -6,7 +6,7 @@
 *     SWRIC0
 
 *  Purpose:
-*     Write definition of texts in to their corresponding arrays. 
+*     Write definition of texts in to their corresponding arrays.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,7 +18,7 @@
 
 *  Description:
 *     This subroutine write the definitions of text stored in a GRP
-*     group into their own arrays. 
+*     group into their own arrays.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -67,7 +67,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -306,7 +306,7 @@
                C1 = ARGS( 2 )( FIRST : FIRST )
                C2 = ARGS( 2 )( LAST : LAST )
 
-               IF( ( C1 .EQ. '"' .AND. C2 .EQ. '"' ) .OR. 
+               IF( ( C1 .EQ. '"' .AND. C2 .EQ. '"' ) .OR.
      :             ( C1 .EQ. '''' .AND. C2 .EQ. '''' ) ) THEN
                   FIRST = FIRST + 1
                   LAST = LAST - 1
@@ -319,7 +319,7 @@
 
                   CALL IRA_CONVT( 1, A, B, FSCS, SCS, EPOCH, LON( NTXT),
      :                            LAT( NTXT ), STATUS )
-                  
+
                   IF( LAST .GE. FIRST ) THEN
                      TXT( NTXT ) = ARGS( 2 )( FIRST : LAST )
                   ELSE
@@ -343,7 +343,7 @@
      :     'SWRIC0: Maximum no. of text strings (^M) has been exceeded',
      :                          STATUS )
                   GO TO 999
-               END IF      
+               END IF
 
 *  If the current element did not have the format of a longitude value,
 *  add a context message.

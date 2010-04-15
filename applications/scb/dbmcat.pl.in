@@ -16,18 +16,18 @@
 
 #  Description:
 #     This utility is for examining the DBM files representing StarIndex
-#     objects used to store the indexes used by the SCB package for 
+#     objects used to store the indexes used by the SCB package for
 #     indexing files and routines.
 #
 #     It is not required for any part of the package operation, but is
-#     provided for manual examination of these files.  It will mainly 
+#     provided for manual examination of these files.  It will mainly
 #     be useful for debugging, but may also be useful (in combination
 #     with, for instance, grep(1)) for making more flexible queries
-#     of the index files than are permitted by the 'type=regex' 
+#     of the index files than are permitted by the 'type=regex'
 #     argument of the scb.pl extractor program.
 #
 #     It can be used in two modes: if the name of the index only is
-#     specified, then every record in the index is printed (in an 
+#     specified, then every record in the index is printed (in an
 #     unpredictable order); the format is
 #
 #        key    => value value value ...
@@ -38,12 +38,12 @@
 
 #  Arguments:
 #     filename
-#        Name of the index file.  This is the name of the index as 
-#        submitted to the StarIndex::new() routine, i.e. without 
+#        Name of the index file.  This is the name of the index as
+#        submitted to the StarIndex::new() routine, i.e. without
 #        whatever file extensions (.db, .dir, ...) may appear when
 #        the file is actually written.  The full path must be given.
 #     key
-#        One or more keys of the index may be specified.  They must be 
+#        One or more keys of the index may be specified.  They must be
 #        exact.
 
 #  Notes:
@@ -95,7 +95,7 @@ my $index = StarIndex->new($indexfile, 'read');
 
 
 #  If keys have been specified, pull them out one by one and print key,
-#  (list of values) pairs.  The get() method returns a whole list of 
+#  (list of values) pairs.  The get() method returns a whole list of
 #  values for in each call.
 
 if (@ARGV) {
@@ -107,8 +107,8 @@ if (@ARGV) {
 }
 
 #  Otherwise, iterate through index.  The each() method gives one key
-#  and one value, but all the values for one key will be returned 
-#  adjacent to each other.  To build up each list of values, keep 
+#  and one value, but all the values for one key will be returned
+#  adjacent to each other.  To build up each list of values, keep
 #  calling each() until the key is different from last time.
 
 else {

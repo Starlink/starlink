@@ -21,7 +21,7 @@
 
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
-*        The name of the supposed POLPACK extension item. 
+*        The name of the supposed POLPACK extension item.
 *     OK = LOGICAL (Returned)
 *        Set true if the NAME is recognised, otherwise is FALSE.
 *     TYPE = CHARACTER * ( * ) (Returned)
@@ -32,7 +32,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
 *     DSB: David S. Berry (STARLINK)
@@ -54,7 +54,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -65,7 +65,7 @@
       CHARACTER * ( * ) NAME
 
 *  Arguments Returned:
-      LOGICAL OK 
+      LOGICAL OK
       CHARACTER * ( * ) TYPE
 
 *  Status:

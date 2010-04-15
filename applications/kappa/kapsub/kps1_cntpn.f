@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_CNTPN( PARAM1, PARAM2, PARAM3, IPLOT, NCONT, 
+      SUBROUTINE KPS1_CNTPN( PARAM1, PARAM2, PARAM3, IPLOT, NCONT,
      :                       CNTLEV, IGRP, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CNTPN( PARAM1, PARAM2, PARAM3, IPLOT, NCONT, CNTLEV, 
+*     CALL KPS1_CNTPN( PARAM1, PARAM2, PARAM3, IPLOT, NCONT, CNTLEV,
 *                      IGRP, STATUS )
 
 *  Description:
@@ -22,10 +22,10 @@
 *     PARAM1.  If no such pens are given then, then a set of pens is
 *     created automatically if pen rotation is selected using PARAM2.
 *     Line colour rotates if there are at least three available colours,
-*     otherwise line style rotates.  If contours below the threshold 
+*     otherwise line style rotates.  If contours below the threshold
 *     given by PARAM3 are to be drawn differently, then line style is
-*     used to distinguish the contours unless line style has already 
-*     been used for rotating pens, in which case line width is used 
+*     used to distinguish the contours unless line style has already
+*     been used for rotating pens, in which case line width is used
 *     instead.
 
 *  Arguments:
@@ -48,7 +48,7 @@
 *     IGRP = INTEGER (Returned)
 *        A GRP identifier for a group holding the AST attribute settings
 *        defining each pen. The group contains one element for each
-*        contour level. Each element holds a comma separated list of 
+*        contour level. Each element holds a comma separated list of
 *        attribute settings for an AST Plot.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -83,9 +83,9 @@
 *     16-MAR-1998 (DSB):
 *        Original version.
 *     25-JAN-2001 (DSB):
-*        Add parameter PEN1 which is used to remember the last pen 
-*        colour used when rotating pens.  This enables rotation to 
-*        continue between invocations of the application.  Changed 
+*        Add parameter PEN1 which is used to remember the last pen
+*        colour used when rotating pens.  This enables rotation to
+*        continue between invocations of the application.  Changed
 *        NROT from 3 to 5.
 *     9-FEB-2001 (DSB):
 *        Modified to make the COLOUR and STYLE attribues included in the
@@ -95,7 +95,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -134,7 +134,7 @@
 
 *  Local Variables:
       CHARACTER ATTR*( 80 )       ! AST attribute setting
-      CHARACTER PENDEF*( GRP__SZNAM ) ! AST attribute settings for 
+      CHARACTER PENDEF*( GRP__SZNAM ) ! AST attribute settings for
                                   ! current pen
       INTEGER DOWN                ! Lowest colour index
       INTEGER I                   ! Current contour index
@@ -143,13 +143,13 @@
       INTEGER IPLOTT              ! AST pointer to Plot with current pen
                                   ! set
       INTEGER J1                  ! Index at start of attribute setting
-      INTEGER J2                  ! Index of comma at end of attribute 
+      INTEGER J2                  ! Index of comma at end of attribute
                                   ! setting
       INTEGER NC                  ! No. of characters in formatted value
-      INTEGER NPEN                ! Number of explicit pen definitions 
+      INTEGER NPEN                ! Number of explicit pen definitions
                                   ! given
       INTEGER PENHI               ! Highest pen number
-      INTEGER STY1                ! PGPLOT style for contours above 
+      INTEGER STY1                ! PGPLOT style for contours above
                                   ! threshold
       INTEGER STY2                ! PGPLOT style for contours below
                                   ! threshold
@@ -176,7 +176,7 @@
 *  Use a semicolon as the separator character because AST required
 *  the individual attribute settings within the pen definition to be
 *  separated by commas.
-      CALL GRP_SETCC( IGRP, 'DELIMITER', ';', STATUS ) 
+      CALL GRP_SETCC( IGRP, 'DELIMITER', ';', STATUS )
 
 *  Get a group of strings holding pen definitions from the environment.
       CALL KPG1_GTGRP( PARAM1, IGRP, NPEN, STATUS )
@@ -190,22 +190,22 @@
 *  If some pen definitions were supplied, check them...
       IF( NPEN .GT. 0 ) THEN
 
-*  Take a deep copy of the supplied Plot.  This Plot will be modify 
-*  using the supplied pen definitions.  A copy is used so that the 
+*  Take a deep copy of the supplied Plot.  This Plot will be modify
+*  using the supplied pen definitions.  A copy is used so that the
 *  original plotting attributes are not changed.
          IPLOTT = AST_COPY( IPLOT, STATUS )
 
-*  Scan through each pen 
-         DO IPEN = 1, NPEN 
+*  Scan through each pen
+         DO IPEN = 1, NPEN
 
-*  Get the next list of AST Attribute settings from the group. 
+*  Get the next list of AST Attribute settings from the group.
             CALL GRP_GET( IGRP, IPEN, 1, PENDEF, STATUS )
 
 *  Abort if an error has occurred.
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Loop round each comma-delimited attribute in the definitions,
-*  translating colour names and any defined synonyms, and storing it in 
+*  translating colour names and any defined synonyms, and storing it in
 *  the Plot.
             IF( PENDEF .NE. ' ' ) THEN
                J1 = 1
@@ -221,7 +221,7 @@
                IF( STATUS .NE. SAI__OK .AND. BADAT ) THEN
 
                   CALL MSG_SETI( 'I', IPEN )
-                  CALL MSG_SETC( 'I', CHR_NTH( IPEN ) )               
+                  CALL MSG_SETC( 'I', CHR_NTH( IPEN ) )
                   CALL ERR_REP( 'KPS1_CNTPN_1', 'Invalid pen '//
      :                         'definition supplied for the ^I '//
      :                         'contour level.', STATUS )
@@ -284,8 +284,8 @@
 *  Set the first pen to use next time.
                CALL PAR_PUT0I( 'PEN1', IPEN, STATUS )
 
-*  If there are fewer than NROT colours available, create pen 
-*  definitions that rotate the pen styles (so long as there are enough 
+*  If there are fewer than NROT colours available, create pen
+*  definitions that rotate the pen styles (so long as there are enough
 *  styles).
             ELSE IF( NROT .LE. NPGSTY ) THEN
                NPEN = NCONT
@@ -327,7 +327,7 @@
 *  Do each contour.
                DO I = 1, NCONT
 
-*  If this contour already has a pen definition in the group (produced 
+*  If this contour already has a pen definition in the group (produced
 *  by pen rotation), append the new line width to it.
                   IF( I .LE. NPEN ) THEN
                      CALL GRP_GET( IGRP, I, 1, ATTR, STATUS )

@@ -23,7 +23,7 @@
 *     Create a catalogue containing new fields for the new Right Ascension and
 *     Declination after the correction has been made for proper motion.
 *     Calculated using SLA_PM. See SUN 67.
-* 
+*
 *     Proper motions should be given in secs/yr and arcsec/yr.
 *     Parallax should be given in arcseconds.
 *     Radial velocity should be given in km/sec (+ve if receeding)
@@ -68,16 +68,16 @@
 *     This application creates a new catalogue that contains extra fields for
 *     Right Ascension and Declination after a proper motion correction.
 *     The naming of these new fields can lead to confusion. Traditionally
-*     the field names RA and DEC are used for the Right Ascension and 
+*     the field names RA and DEC are used for the Right Ascension and
 *     Declination fields in the catalogue. It is stongly suggested that the
-*     field names of Right Ascension and Declination at a new epoch take the 
+*     field names of Right Ascension and Declination at a new epoch take the
 *     form RA1970, DEC1970. You may go on to rename the field RA to RA1950 and
 *     DEC to DEC1950 and RA1970 to RA and DEC1970 to DEC using the UPFIELD
 *     application but you must also then update the catalogues Epoch parameter
 *     to 1970.
-*     
-*     Care should also be taken when renaming fields. Renaming RA1970 to RA 
-*     before renaming RA to RA1950, in the above example, would result in two 
+*
+*     Care should also be taken when renaming fields. Renaming RA1970 to RA
+*     before renaming RA to RA1950, in the above example, would result in two
 *     fields named RA in the same catalogue.
 
 *  Authors:
@@ -91,7 +91,7 @@
 *     None known.
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -139,7 +139,7 @@
        call par_get0c('RADVEL', radvel, status)
        call par_get0r('EP0', ep0, status)
        call par_get0r('EP1', ep1, status)
-* 
+*
 *    Create suggested names for the new fields.
 *
        raep1 = 'RA1'

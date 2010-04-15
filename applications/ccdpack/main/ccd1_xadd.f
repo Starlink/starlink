@@ -115,7 +115,7 @@
 *  Arguments Returned:
       DOUBLE PRECISION VALUE
       LOGICAL EXISTS
-      LOGICAL FRMEXT 
+      LOGICAL FRMEXT
 
 *  Status:
       INTEGER STATUS             ! Global status

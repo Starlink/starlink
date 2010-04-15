@@ -11,7 +11,7 @@
 
 #  Parameters:
 #      listbox = window (read)
-#        The name of the listbox which should be used. 
+#        The name of the listbox which should be used.
 #      args = string (read)
 #        If defined this specifies the command to use when deleting the
 #        items from the listbox (which may be a scrollbox or variant in
@@ -49,7 +49,7 @@
 #      3-MAR-1994 (PDRAPER):
 #         Added check for listbox name.
 #      8-MAR-1994 (PDRAPER):
-#         Now uses the selection in listbox, does not assume that 
+#         Now uses the selection in listbox, does not assume that
 #         this is the X11 selection.
 #      {enter_further_changes_here}
 
@@ -63,7 +63,7 @@
 #  Decide on the command to delete the items from the widget.
       if { $args != {} } {
          set command $args
-      } { 
+      } {
          set command delete
       }
 
@@ -71,7 +71,7 @@
       set indices [$listbox curselection]
       if { $indices != {} } {
 
-#  Ok now delete each one. Need to start high and go low as indices change 
+#  Ok now delete each one. Need to start high and go low as indices change
 #  for each modification
          foreach index [lsort -integer -decreasing $indices] {
             $listbox $command $index

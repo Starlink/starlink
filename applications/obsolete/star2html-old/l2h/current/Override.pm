@@ -6,7 +6,7 @@ use Cwd;
 @EXPORT_OK = qw($DEBUG getpwuid link setenv getenv symlink rename
                 getcwd syswait find_executable absolute_path
                 substitute_var_val $LATEX2HTMLDIR $TEMPDIR
-		make_directory_absolute unlink $dd $envkey $image_pre); 
+		make_directory_absolute unlink $dd $envkey $image_pre);
 
 $OS = $^O;                      # MSWin32, linux, OS/2 (or Warp? don't
                                 # know)
@@ -45,7 +45,7 @@ sub getpwuid {
     my ($username, $passwd, $gid, $realname, $home, $shell, $age, $comment);
     $username = $ENV{'USER'};
     $passwd = "XXXXX";
-    $uid = 9999; # not used with os2 
+    $uid = 9999; # not used with os2
     $gid = 8888; # not used with os2
     $age = "not used";
     $comment = "no comment";
@@ -89,7 +89,7 @@ sub getpwuid {
     eval $tmp."(@_);";
   }
 }
-                 
+
 sub link {
     local ($from, $to) = @_;
     if ($OS =~ os2) {
@@ -102,7 +102,7 @@ sub link {
     } else {
 	CORE::link($from,$to) ;
     }
-}  
+}
 
 sub symlink {
     local ($to, $from) = @_;
@@ -146,7 +146,7 @@ sub getenv($) {
   my $envkey = shift;
   if ($OS =~ os2) {
       defined($ENV{$envkey}) ? split (";", $ENV{$envkey}) : undef;
-  } else {	
+  } else {
     defined($ENV{$envkey}) ? split (":", $ENV{$envkey}) : undef;
   }
 }
@@ -163,7 +163,7 @@ sub setenv($@) {
 
 # perl uses os2 rename which will complain about existing files, files
 # in use and so forth, therefore we use 'cp' instead.
-# Note that in many cases unlink fails. The old files must than be deleted 
+# Note that in many cases unlink fails. The old files must than be deleted
 # manually after l2h finishes.
 sub rename {
     my ($from,$to) = @_;
@@ -175,7 +175,7 @@ sub rename {
     } else {
         CORE::rename($from,$to);
     }
-}  
+}
 
 sub unlink {
     my ($from) = @_;
@@ -184,7 +184,7 @@ sub unlink {
 #    } else {
 	CORE::unlink($from) ;
 #    }
-}  
+}
 
 # Given a directory name in either relative or absolute form, returns
 # the absolute form.

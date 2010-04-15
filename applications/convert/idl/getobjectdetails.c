@@ -87,7 +87,7 @@ int getidlstringsize( IDL_VPTR var, IDL_STRING *data );
 char *gethdstype( UCHAR idltype );
 
 void getobjectdetails( IDL_VPTR var, void *data, char *taglist[],
-                    char hdstype[], int *numtags, 
+                    char hdstype[], int *numtags,
                     int *ndims, int dims[], int *elt_len, int *status ) {
 
 UCHAR idltype;     /* Type of variable */
@@ -116,10 +116,10 @@ char *tok;
 
          if ( !strcmp( *taglist, "HDSSTRUCTYPE" ) ) {
 /* Get the tag info */
-            offset = IDL_StructTagInfoByIndex( 
+            offset = IDL_StructTagInfoByIndex(
                var->value.s.sdef, 0, IDL_MSG_LONGJMP, &tmpvar );
             strcpy( hdstype, IDL_STRING_STR((IDL_STRING *)data+offset) );
-         }            
+         }
 
 /* If it's an array structure -    */
          if ( dimptr=strpbrk(hdstype,"(") ) {

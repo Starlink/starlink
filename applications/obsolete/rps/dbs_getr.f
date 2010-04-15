@@ -1,7 +1,7 @@
 *+DBS_GETR       Get Real value from d/b given file, field nos.
 *-  Author M.D.C.Harris ( R.A.L )                    	17th February 1987.
 *	9 Apr 1992	M. Duesterhaus		port to unix
-*****************************************************************************	
+*****************************************************************************
       REAL FUNCTION DBS_GETR( REF_NO , FIELDNO )
 
 *INPUT:
@@ -28,6 +28,6 @@
 
 
       RBYT = DBS_GETC(REF_NO, FIELDNO)
-      DBS_GETR = MDH_CTOR(RBYT)		
+      DBS_GETR = MDH_CTOR(RBYT)
 
       END

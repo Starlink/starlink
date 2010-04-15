@@ -6,7 +6,7 @@
 *    Description :
 *
 *     This routine adds a 2-d array into a (usually larger) output data
-*     array, and is used to make a mosaic of arrays. The offset of the 
+*     array, and is used to make a mosaic of arrays. The offset of the
 *     small array relative to the large one is given. For each valid
 *     pixel of the small array, the value of that pixel is added to
 *     the input value of the corresponding pixel in the big array, but
@@ -30,9 +30,9 @@
 *     IDIM2 = INTEGER( READ )
 *         The second dimension of the input 2-d array.
 *     XOFSET = INTEGER( READ )
-*         x offset of image from bottom left 
+*         x offset of image from bottom left
 *     YOFSET = INTEGER( READ )
-*         y offset of image from bottom left 
+*         y offset of image from bottom left
 *     ODIM1 = INTEGER( READ )
 *         The first dimension of the output 2-d array and mask.
 *     ODIM2 = INTEGER( READ )
@@ -46,7 +46,7 @@
 *
 *    Method :
 *
-*     Check for error on entry 
+*     Check for error on entry
 *     If o.k. then
 *     For each pixel
 *        Find position of current pixel in output array

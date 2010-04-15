@@ -17,7 +17,7 @@
 *    DIA = INTEGER (Given)
 *        zone to select
 *    STATUS = INTEGER (Returned)
-*       
+*
 *
 *    T.N.Wilkins Manchester
 *    Name changed TNW 8/7/88

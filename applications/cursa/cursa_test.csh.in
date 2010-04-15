@@ -74,21 +74,21 @@ echo "catheader..."
 
 echo " "
 echo "catview..."
-@bindir@/catview < catview.script 
+@bindir@/catview < catview.script
 
 #
 # Tidy up.
 
-rm -f gsc5828.FIT 
-rm -f select5828.FIT 
-rm -f join5828.FIT 
-rm -f sort5828.FIT 
+rm -f gsc5828.FIT
+rm -f select5828.FIT
+rm -f join5828.FIT
+rm -f sort5828.FIT
 rm -f copy5828.FIT
 
-rm -f 5828.gsc 
+rm -f 5828.gsc
 rm -f catselect.script
-rm -f catpair.script 
-rm -f catview.script 
+rm -f catpair.script
+rm -f catview.script
 rm -f targets.TXT
 
 cd ..

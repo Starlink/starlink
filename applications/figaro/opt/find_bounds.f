@@ -17,11 +17,11 @@
 *        Fitting details
 * In OPT_CMN
 *    MAX_TIMES = INTEGER (Given)
-*       
+*
 *    TIMES = INTEGER (Given)
-*       
+*
 *    MAX_CMP = INTEGER (Given)
-*       
+*
 
 * Authors:
 *  TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92 then

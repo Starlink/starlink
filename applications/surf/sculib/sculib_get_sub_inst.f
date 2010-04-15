@@ -16,7 +16,7 @@
 
 *  Description:
 *     This routine finds which sub-instruments are present in the
-*     file. If there is only one this is returned, otherwise 
+*     file. If there is only one this is returned, otherwise
 *     the user is given a choice.
 
 *  Arguments:
@@ -60,9 +60,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -74,7 +74,7 @@
       INTEGER         N_FITS
       CHARACTER * (*) PACKAGE
       CHARACTER * (*) PARAM
-      
+
 *  Arguments given & returned:
       CHARACTER * (*) FITS(N_FITS)
 
@@ -110,14 +110,14 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 *  find and report the sub instruments used and filters for this observation
- 
+
       CALL SCULIB_GET_FITS_I (N_FITS, N_FITS, FITS, 'N_SUBS',
      :  N_SUB, STATUS)
- 
+
       CALL MSG_SETC('PKG',PACKAGE)
       CALL MSG_OUT (' ', '^PKG: file contains data for the '//
      :  'following sub-instrument(s)', STATUS)
- 
+
       IF (N_SUB .GT. 0) THEN
 
 *     Get SUB_instrument list
@@ -125,7 +125,7 @@
          DO I = 1, N_SUB
             ITEMP = 4
             CALL CHR_PUTI (I, STEMP, ITEMP)
-            CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+            CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
      :        STEMP, SUB_INSTRUMENT(I), STATUS)
             CALL CHR_UCASE (SUB_INSTRUMENT(I))
          END DO
@@ -155,21 +155,21 @@
             CALL MSG_SETC ('FILT', SUB_FILTER(I))
             CALL MSG_OUT (' ', ' - ^SUB with filter ^FILT', STATUS)
          END DO
-      END IF 
+      END IF
 
 *  get the sub-instrument of interest and check it's OK
- 
+
       IF (N_SUB .EQ. 1) THEN
- 
+
 *  If we only have one wavelength we dont need to ask
- 
+
          SUB_POINTER = 1
          SUB_REQUIRED = SUB_INSTRUMENT(SUB_POINTER)
       ELSE
          SUB_POINTER = VAL__BADI
- 
+
 *  Put all possible answers in a string
- 
+
          IF (N_SUB .GT. 0) THEN
             SUBLIST = ' '
             IPOSN = 0
@@ -178,16 +178,16 @@
                CALL CHR_APPND(',',SUBLIST,IPOSN)
                CALL CHR_APPND(SUB_INSTRUMENT(I), SUBLIST, IPOSN)
             END DO
- 
+
 *  Ask for the sub array
 
             CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
      :           .TRUE., SUB_REQUIRED, STATUS)
             CALL CHR_UCASE (SUB_REQUIRED)
- 
+
             DO I = 1, N_SUB
                IF (SUB_REQUIRED .EQ. SUB_INSTRUMENT(I)) THEN
-                  SUB_POINTER =I 
+                  SUB_POINTER =I
                END IF
             END DO
          END IF
@@ -206,7 +206,7 @@
 
 *  modify the FITS keywords to reflect the fact that the data only come
 *  from 1 sub-instrument in the output file
- 
+
 *     Check status since SUB_POINTER can be set to bad (and therefore
 *     ruin the array lookup) if status was not good.
       IF (STATUS .EQ. SAI__OK) THEN
@@ -217,7 +217,7 @@
      :        'SUB_1', SUB_INSTRUMENT(SUB_POINTER), STATUS)
          CALL SCULIB_REWRITE_FITS_C (N_FITS, N_FITS, FITS,
      :        'FILT_1', SUB_FILTER(SUB_POINTER), STATUS)
-         CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS, 
+         CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS,
      :        'WAVE_1', SUB_WAVE(SUB_POINTER), STATUS)
 
 *     Setup current values of wavelength and filter

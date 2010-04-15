@@ -43,12 +43,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -110,30 +110,30 @@
       INTEGER RR( MXSTK )        ! Stack for right sub-file limits
       INTEGER STK                ! Recursion stack pointer
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. CAT__OK ) RETURN
- 
+
 *  Initialise.
       STK = 1
       LL( 1 ) = 1
       RR( 1 ) = EL
- 
+
 *  Loop until the stack is empty.
  1    CONTINUE                   ! Start of 'DO WHILE' loop
       IF ( STK .GT. 0 ) THEN
- 
+
 *  If the current sub-file is sorted, then pop the recursion stack.
          IF ( LL( STK ) .GE. RR( STK ) ) THEN
             STK = STK - 1
- 
+
 *  Otherwise, partition the current sub-file.
          ELSE
- 
+
 *  Set the sub-file limits.
             L = LL( STK )
             R = RR( STK )
- 
+
 *  Find the index of a pointer to a suitable partition value (the
 *  median of three possible elements) by performing an elementary
 *  exchange sort.
@@ -155,44 +155,44 @@
                I2 = I3
                I3 = ITMP
             END IF
- 
+
 *  Store the partition value.
             XPART = X( IP( I2 ) )
- 
+
 *  Initialise for partitioning.
             I = L
             J = R
- 
+
 *  Loop to partition the subfile, incrementing I and decrementing J
 *  until an exchange of values is indicated. Note we need not check the
 *  array bounds as XPART is known to be present and acts as a sentinel.
  2          CONTINUE             ! Start of 'DO WHILE' loop
- 
+
  3          CONTINUE             ! Start of 'DO WHILE' loop
             IF ( X( IP( I ) ) .LT. XPART ) THEN
                I = I + 1
                GO TO 3
             END IF
- 
+
  4          CONTINUE             ! Start of 'DO WHILE' loop
             IF ( X( IP( J ) ) .GT. XPART ) THEN
                J = J - 1
                GO TO 4
             END IF
- 
+
 *  Exchange pairs of values when necessary by interchanging their
 *  pointers.
             IF ( I .LT. J ) THEN
                ITMP = IP( I )
                IP( I ) = IP( J )
                IP( J ) = ITMP
- 
+
 *  Return to locate another pair of values to exchange,
                I = I + 1
                J = J - 1
                GO TO 2
             END IF
- 
+
 *  Push sub-file limits on to the stacks to further subdivide this
 *  region, retaining the smaller part (which will be partitioned next).
             IF ( ( J - L ) .LT. ( R - I ) ) THEN
@@ -204,13 +204,13 @@
                RR( STK + 1 ) = RR( STK )
                RR( STK ) = I - 1
             END IF
- 
+
 *  Increment the stack counter.
             STK = STK + 1
          END IF
- 
+
 *  Iterate until the stack is empty.
          GO TO 1
       END IF
- 
+
       END

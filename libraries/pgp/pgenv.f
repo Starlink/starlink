@@ -40,7 +40,7 @@ C      AXIS = 30 : draw box and label both axes logarithmically.
 C
 C For other axis options, use routine PGBOX. PGENV can be persuaded to
 C call PGBOX with additional axis options by defining an environment
-C parameter PGPLOT_ENVOPT containing the required option codes. 
+C parameter PGPLOT_ENVOPT containing the required option codes.
 C Examples:
 C   PGPLOT_ENVOPT=P      ! draw Projecting tick marks
 C   PGPLOT_ENVOPT=I      ! Invert the tick marks

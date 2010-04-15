@@ -19,10 +19,10 @@ int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
 *     int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status )
 
 *  Description:
-*     This function returns the 1D vector index and 3D grid indices of the 
+*     This function returns the 1D vector index and 3D grid indices of the
 *     next pixel to be processed in a rectangular subsection of a 3D array,
-*     as specified by a supplied CupidBoxIter structure, which should have 
-*     been created using cupidBoxIterator, and acts rather like a Java 
+*     as specified by a supplied CupidBoxIter structure, which should have
+*     been created using cupidBoxIterator, and acts rather like a Java
 *     Iterator.
 *
 *     Upon return, the CupidBoxIter structure is modified so that it
@@ -35,7 +35,7 @@ int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
 *        of the array to be processed, as created by cupidBoxIterator.
 *     xx
 *        Array in which to return the 3D grid indices of the next pixel
-*        to be processed. 
+*        to be processed.
 *     iv
 *        Pointer to an int in which to return the 1D vector index of the
 *        next pixel to be processed, within the array defined by the "dim"
@@ -102,7 +102,7 @@ int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
 /* Set a flag if there are no more pixels left. */
    iter->done = 0;
 
-/* If we have not reached the upper bound on the X axis, move on to the next 
+/* If we have not reached the upper bound on the X axis, move on to the next
    X grid value. */
    t = xx[ 0 ] + iter->gap;
    if( t <= iter->ubnd0 ) {
@@ -114,7 +114,7 @@ int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
    } else {
       iter->xx0 = iter->lbnd0;
 
-/* If we have not reached the upper bound on the Y axis, move on to the next 
+/* If we have not reached the upper bound on the Y axis, move on to the next
    Y grid value, and move the vector index on to the start of the next x row. */
       t = xx[ 1 ] + iter->gap;
       if( t <= iter->ubnd1 ) {
@@ -127,8 +127,8 @@ int cupidNextIt( CupidBoxIter *iter, int xx[3], int *iv, int *status ){
       } else {
          iter->xx1 = iter->lbnd1;
 
-/* If we have not reached the upper bound on the Z axis, move on to the next 
-   Z grid value, and move the vector index on to the start of the next xy 
+/* If we have not reached the upper bound on the Z axis, move on to the next
+   Z grid value, and move the vector index on to the start of the next xy
    plane. */
          t = xx[ 2 ] + iter->gap;
          if( t <= iter->ubnd2 ) {

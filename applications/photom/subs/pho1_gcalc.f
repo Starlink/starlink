@@ -1,7 +1,7 @@
       SUBROUTINE PHO1_GCALC( MAGS, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
      :                       LAREA, LVSTAR, LSKY, LSKYARE, LSIGMA,
-     :                       LVSKY, LSKYMAG, PHOTON, LBIASLE, MAJOR, 
-     :                       ECCEN, ANGLE, CODE, LETIME, BUFFER, 
+     :                       LVSKY, LSKYMAG, PHOTON, LBIASLE, MAJOR,
+     :                       ECCEN, ANGLE, CODE, LETIME, BUFFER,
      :                       STATUS )
 
 *+
@@ -17,7 +17,7 @@
 *  Invocation :
 *     CALL PHO1_GCALC( MAGS, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
 *                      LAREA, LVSTAR, LSKY, LSKYARE, LSIGMA,
-*                      LVSKY, LSKYMAG, PHOTON, LBIASLE, MAJOR, 
+*                      LVSKY, LSKYMAG, PHOTON, LBIASLE, MAJOR,
 *                      ECCEN, ANGLE, CODE, LETIME, BUFFER, STATUS )
 
 *  Description :
@@ -69,7 +69,7 @@
 *     BUFFER = CHARACTER * ( * ) (Returned)
 *        The aperture measurements formatted into a string. The output
 *        contains the following fields:
-*           X Y MAG MAGERR SKY SIGNAL CODE MAJOR ECCEN ANGLE 
+*           X Y MAG MAGERR SKY SIGNAL CODE MAJOR ECCEN ANGLE
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -82,7 +82,7 @@
 *     18-APR-1996 (PWD):
 *        Original version based on NE's OUTRES.
 *     5-NOV-1996 (PWD):
-*        Added MAGS parameter and converted to not output magnitudes 
+*        Added MAGS parameter and converted to not output magnitudes
 *        when this is FALSE.
 *     30-DEC-2000 (AA):
 *        Bug fix, signal was corrected for exposure time, but the error wasn't
@@ -136,7 +136,7 @@
       CHARACTER * ( 9 ) CXCEN, CYCEN, CMAG, CERRMG
       CHARACTER * ( 5 ) CA, CE, CT
       CHARACTER * ( 11 ) CSKY, CSIG
-      DOUBLE PRECISION PADU, STAR, AREA, VSTAR, SKY, SKYARE, SIGMA, 
+      DOUBLE PRECISION PADU, STAR, AREA, VSTAR, SKY, SKYARE, SIGMA,
      :                 VSKY, SKYMAG, BIASLE, ETIME ! Local DBLE variables
 *.
 
@@ -211,18 +211,18 @@
 
 *   The magnitude error = (2.5/ln(10)) * (errsig/signal) which comes
 *   from differentiating the magnitude calculation. Check that the
-*   signal is not zero, otherwise set an error condition. If MAGS is 
+*   signal is not zero, otherwise set an error condition. If MAGS is
 *   FALSE then we do not want a magnitude conversion.
       FACTOR = 0.0
 
-      IF ( MAGS ) THEN 
+      IF ( MAGS ) THEN
          IF ( ABS( SIGNAL ) .GT. 1.0D-6 ) THEN
             FACTOR = ABS( ERRSIG / SIGNAL )
             ERRMAG = 1.08574D0 * FACTOR
          ELSE
             ERFLAG = .TRUE.
          ENDIF
-      ELSE 
+      ELSE
          ERRMAG = ERRSIG
       END IF
 
@@ -240,7 +240,7 @@
 *   Calculate the stars magnitude. A magnitude of skymag means that the
 *   star and sky are the same brightness. If the signal is negative then
 *   flag an error.
-      IF ( MAGS ) THEN 
+      IF ( MAGS ) THEN
          IF ( SIGNAL .GT. 0.0D0 ) THEN
             MAG = SKYMAG - 2.5D0 * LOG10( ABS( SIGNAL ) )
          ELSE
@@ -250,7 +250,7 @@
 
 *   If not calculating the magnitude of the star, derive the mean
 *   signal. Change the error too.
-         IF ( AREA .GT. 0.0D0 ) THEN 
+         IF ( AREA .GT. 0.0D0 ) THEN
             MAG = SIGNAL / AREA
             ERRMAG = ERRMAG / AREA
          ELSE
@@ -259,14 +259,14 @@
       END IF
 
 *   If there is no signal or an error has occured, give it a nominal value
-      IF ( MAGS ) THEN 
+      IF ( MAGS ) THEN
          IF ( ( FACTOR .GT. 5.0D0 ) .OR. ERFLAG ) THEN
             MAG = SKYMAG
             ERRMAG = 99.999D0
             CODE = '?'
          ENDIF
       ELSE
-         IF ( ERFLAG ) THEN 
+         IF ( ERFLAG ) THEN
             MAG = 0.0D0
             ERRMAG = 0.0D0
             CODE = '?'

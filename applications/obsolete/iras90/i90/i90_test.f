@@ -4,7 +4,7 @@
 *     I90_TEST
 
 *  Purpose:
-*     Test installation of the IRAS satellite and mission data 
+*     Test installation of the IRAS satellite and mission data
 *     subsystem, I90.
 
 *  Language:
@@ -49,7 +49,7 @@
 *  Initialise the inherited global status.
       STATUS = SAI__OK
 
-*  Check that the third detector in cross scan order for band 2 is 
+*  Check that the third detector in cross scan order for band 2 is
 *  detector #43.
       IF( I90__BDETS( 3, 2 ) .NE. 43 ) THEN
          STATUS = SAI__ERROR

@@ -141,7 +141,7 @@
  10   CONTINUE
 
 *   Determine the mean value.
-      IF (FOUND.GT.1) THEN 
+      IF (FOUND.GT.1) THEN
          MEAN=MEAN/REAL(FOUND)
       ELSE
          MEAN=0.0
@@ -195,14 +195,14 @@
 *     Using interpolation, the values associated with all the
 *     ellipse fit points (contained in arrays XR and YR) are obtained.
 *
-*     If the FAST parameter has been passed with a TRUE value then all 
+*     If the FAST parameter has been passed with a TRUE value then all
 *     pixel count values are obtained by bi-linear interpolation.
 *     Otherwise, for small radii (radius <= 3 pixels) two routines are
-*     used to model the surface of the image. One requires a full 8x8 
+*     used to model the surface of the image. One requires a full 8x8
 *     mesh, the other as many points as possible from the mesh. The mesh is
 *     centred on the object of interest. These methods are substantially
 *     slower. The second is only used if the first failed to find a complete
-*     set of mesh points due to bad points or the object being near the 
+*     set of mesh points due to bad points or the object being near the
 *     edge of the image.
 *
 *     These are then used to calculate an estimate of the mean pixel
@@ -340,7 +340,7 @@
       INTEGER WSSIZE            ! Size of workspace given to esp1_median
       SAVE WS, WSSIZE
       DATA WSSIZE/-1/
-      
+
 *   Function
       REAL ESP1_MEDIAN          ! Returns median
 
@@ -369,7 +369,7 @@
      :                    VA,STATUS)
 
       ELSE
-                   
+
 *        Use bi-linear interpolation.
          CALL ELP1_INTER0(ELEMS,%VAL(CNF_PVAL(ARRP(1))),
      :                    NUMPOI,XR,YR,PRANGE,USED,
@@ -390,7 +390,7 @@
             SUMSQ=SUMSQ+VA(I)**2
          END IF
  10   CONTINUE
-      
+
       N = REAL(FOUND)
 
 *   Only continue if enough 'fit' ellipse pixels have been assigned
@@ -404,7 +404,7 @@
          MEAN=SUMV/N
 
 *      Calculate the sample standard deviation (as distinct from the
-*      distribution sd) using 
+*      distribution sd) using
 *      $S^2=\frac{n\sum^n X_i^2 - (\sum^n X_i)^2}{n(n-1)}$.  This is
 *      equivalent to the definition $S^2=(\sum^n (X_i-\bar X)^2)/(n-1)$
 *      but with less roundoff error.
@@ -412,19 +412,19 @@
          SDP = SQRT (SQD/(N-1.))
 *         SDP = SQRT( (N*SUMSQ-SUMV**2)/(N*(N-1.)))
 
-*      Calculate the standard error in the mean ($S_{\bar X}=S/\sqrt n$).  
+*      Calculate the standard error in the mean ($S_{\bar X}=S/\sqrt n$).
 *      OK - we should use the t-distribution for this, but this'll be
 *      accurate enough as long as N >~ 30 or so.
          SDP=SDP/SQRT(N)
 
-*      Just before going in to calculate the residual, shove out a 
+*      Just before going in to calculate the residual, shove out a
 *      one-time message confirming which residual we're going to
 *      calculate.  WSSIZE = -1 is the initial value - the test in
 *      ELP__RESMD below depends simply on it being initialised negative.
          IF (WSSIZE .EQ. -1) THEN
             CALL MSG_BLANK (STATUS)
             IF (RTYPE .EQ. ELP__RESMN) THEN
-               CALL MSG_OUT (' ','Residual calculation: weighted SD', 
+               CALL MSG_OUT (' ','Residual calculation: weighted SD',
      :              STATUS)
             ELSEIF (RTYPE .EQ. ELP__RESMD) THEN
                CALL MSG_OUT (' ','Residual calculation: absolute diffs',
@@ -464,7 +464,7 @@
                IF (STATUS .NE. SAI__OK) GOTO 9999
             ENDIF
             STAT = ESP1_MEDIAN(VA,USED,NUMPOI,%VAL(CNF_PVAL(WS)),STATUS)
-            
+
 *         Use the sum of the absolute differences as the `residual'.
 *         I've no detailed justification for this, but it `matches' the
 *         use of the median as an estimator (mumble, bluff...)
@@ -472,13 +472,13 @@
             DO I=1,NUMPOI
                IF (USED(I).NE.0) RESID=RESID+ABS(VA(I)-STAT)
             ENDDO
-            
+
          ELSE IF (RTYPE .EQ. ELP__RESLS) THEN
 *         A simple least-squares residual
             RESID = SQD
             STAT = MEAN
 
-         ELSE 
+         ELSE
 *         Unrecognised RTYPE
             CALL ERR_REP (' ','ELP1_STATS: unrecognised rtype', STATUS)
             STATUS = SAI__ERROR

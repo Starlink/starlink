@@ -58,9 +58,9 @@
 
 *  History:
 *     20-MAR-1985 (BDK)
-*        Original 
+*        Original
 *     04-MAY-1987 (BDK)
-*        Change to call SUBPAR_DELET 
+*        Change to call SUBPAR_DELET
 *     16-JUN-1998 (AJC)
 *        Re-format prologue
 *     {enter_further_changes_here}

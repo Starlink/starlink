@@ -3,30 +3,30 @@
 *+
 *  Name:
 *     MIO_ACTIV
- 
+
 *  Purpose:
 *     initialise MIO system.
- 
+
 *  Language:
 *     Starlink Fortran
- 
+
 *  Invocation:
 *     CALL MIO_ACTIV(STATUS)
- 
+
 *  Description:
 *     The MIO system is initialised.
- 
+
 *  Arguments:
 *     STATUS=INTEGER (Given and Returned)
 *        Variable holding the status value.   If this variable is not
 *        SAI__OK on input, then the routine will return without action.  If
 *        the routine fails to complete, this variable will be set to an
 *        appropriate error number.
- 
+
 *  Algorithm:
 *     The MIO error codes are given to SEM and the MIO common blocks are
 *     initialised.
- 
+
 *  Copyright:
 *     Copyright (C) 1983, 1986, 1991, 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -50,7 +50,7 @@
 *  Authors:
 *     Sid Wright  (UCL::SLW)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     17-Apr-1983:  Starlink Version. (UCL::SLW)
 *     30-May-1986:  ADAM version   (RLVAD::AJC)
@@ -63,32 +63,32 @@
 *     22-Jan-1993:  Change include file names
 *           Convert code to uppercase using SPAG (RAL::BKM)
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
 *    Status return :
       INTEGER STATUS            ! Status
- 
+
 *.
- 
- 
+
+
 C      print *,'mio_activ:status', status
 *    Execution allowed ?
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
 *    Initialise common blocks
       CALL MIO_START(STATUS)
- 
- 
+
+
 C      print *,'mio_activ:  completed'
- 
+
       RETURN
       END

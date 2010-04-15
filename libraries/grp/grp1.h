@@ -52,18 +52,18 @@
 
 /* The contents of the Grp struct are not public so define it here. */
 typedef struct Grp {
-   F77_INTEGER_TYPE igrp; /* Currently refers to the Fortran GRP ID */  
-   int slot;              /* The slot number associated with the GRP ID */  
+   F77_INTEGER_TYPE igrp; /* Currently refers to the Fortran GRP ID */
+   int slot;              /* The slot number associated with the GRP ID */
 } Grp;
 
 /* Internally we need to know what GRP__NOID is defined as from Fortran */
 enum { GRP__FNOID = 0 };
 
-/* Include grp.h to pick up the public function prototypes, etc. First 
+/* Include grp.h to pick up the public function prototypes, etc. First
    define grpINTERNAL to prevent the Grp typedef from being redefined.  */
 
 #define grpINTERNAL 1
 #include "grp.h"
-#undef grpINTERNAL 
+#undef grpINTERNAL
 
 #endif

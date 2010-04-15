@@ -59,7 +59,7 @@ CD      PRINT *, 'String types - copy', MIN(nb_in,nb_out), ' bytes'
         CALL xcopy (nb_out, %REF(null_str), output)
         CALL xcopy (MIN(nb_in,nb_out), input, output)
 
-      ELSE 
+      ELSE
 
         CALL xcopy (nb_in, input, logical)
 CD      PRINT *, 'Conversion IS necessary'

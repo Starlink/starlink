@@ -16,25 +16,25 @@
 *     CHARVAL, PTRVAL, STATUS)
 *
 *  Description:
-*     Get parameter data from a catalogue. A parameters value is either a 
+*     Get parameter data from a catalogue. A parameters value is either a
 *     character string that can be interpreted
 *     using the format or a pointer to an array or structure.
 *
 *     PARDES is the parameter designation.
 *
-*     PARDES = 1 This is a scalar parameter. The parameter value is a 
-*     character string CHP__SZCVAL long in CHARVAL. Use the PFORMAT to 
+*     PARDES = 1 This is a scalar parameter. The parameter value is a
+*     character string CHP__SZCVAL long in CHARVAL. Use the PFORMAT to
 *     interpret the value. PTRVAL is ignored.
 *
-*     PARDES = 2 This is a structure parameter. PTRVAL points to the parameter 
+*     PARDES = 2 This is a structure parameter. PTRVAL points to the parameter
 *     structure and its associated information. PFORMAT and CHARVAL are
 *     both ignored.
 *
-*     PARDES = 3 This is an array parameter. PTRVAL points to the array and 
+*     PARDES = 3 This is an array parameter. PTRVAL points to the array and
 *     its associated information. CHARVAL is ignored.
 *
-*     PARDES = 4 This is a scalar parameter. The parameter value is a 
-*     long length character string. PTRVALS points to the character string 
+*     PARDES = 4 This is a scalar parameter. The parameter value is a
+*     long length character string. PTRVALS points to the character string
 *     and its associated information. CHARVAL is ignored.
 
 *  Arguments:
@@ -61,7 +61,7 @@
 *  Notes:
 *     Always remember to release any allocated virtual memory.
 *
-*     If the parameter does not exist in the catalogue a parameter not found 
+*     If the parameter does not exist in the catalogue a parameter not found
 *     error will be reported.
 *
 *  Anticipated Errors:
@@ -81,7 +81,7 @@
 *     {note_new_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,11 +130,11 @@
       numpars = CPnumpars(cd)
       do cc = 1, numpars
         if(PPname(cd,cc) .EQ. pname) then
-          pformat = PPformat(cd,cc) 
-          pardes = PPpardes(cd,cc) 
+          pformat = PPformat(cd,cc)
+          pardes = PPpardes(cd,cc)
           charval = PPcharval(cd,cc)
-          ptrval = PPptrval(cd,cc) 
-          parrshp = PParrshp(cd,cc) 
+          ptrval = PPptrval(cd,cc)
+          parrshp = PParrshp(cd,cc)
           if (parrshp .ge. 1) then
             do asc = 1, parrshp
               parrdim(asc) = PParrdim(cd,cc,asc)

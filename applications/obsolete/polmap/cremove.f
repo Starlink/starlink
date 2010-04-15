@@ -2,24 +2,24 @@
      &                 STOKES_U,STOKES_UV,LAMBDA,NPTS,OUT_LU)
 C+
 C
-C Subroutine: 
+C Subroutine:
 C
 C       C R E M O V E
 C
 C
 C Author: Tim Harries (tjh@st-and.ac.uk)
 C
-C Parameters: 
+C Parameters:
 C
 C NPARAMS (<), PARAMS (<), STOKES_I (><), STOKES_Q (><), STOKES_QV (><),
 C STOKES_U (><), STOKES_UV (><), LAMBDA (><), NPTS (><), OUT_LU (<)
 C
-C History: 
-C  
-C   May 1994 Created
-C 
+C History:
 C
-C  
+C   May 1994 Created
+C
+C
+C
 C
 C Removes continuum flux across a wavelength range defined interactively.
 C The cursor is used to define to points and the continuum flux is found
@@ -65,7 +65,7 @@ C
         CALL WR_ERROR('Additional parameters ignored',OUT_LU)
       ENDIF
 C
-      WRITE(OUT_LU,*) 
+      WRITE(OUT_LU,*)
      &'Press a key to set the start wavelength-intensity'
       CALL PGCURSE(WMIN,ISTART,CH)
       WMAX=WMIN
@@ -87,7 +87,7 @@ C
       CALL LOCATE(LAMBDA,NPTS,WMIN,WS)
       IF (WS.EQ.0) WS = 1
       CALL LOCATE(LAMBDA,NPTS,WMAX,WE)
- 
+
       GRAD=(IEND-ISTART)/(WMAX-WMIN)
       NEWNPTS=0
       DO I=WS,WE-1

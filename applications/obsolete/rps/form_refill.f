@@ -7,7 +7,7 @@
       INTEGER KTARGET		!	0 - Cover section, n - Target record no.
 				!	-ve - new target
       INTEGER STATUS		! Out	Exit status, 0 = OK
- 
+
 ********************************************************************************
 *  History
 *     1988 Dec	M Ricketts	Based on Mark Harris' FORM_FILL
@@ -20,15 +20,15 @@
 *  Global Variables
       INCLUDE 'com_form_points.inc'
       INCLUDE 'com_form_files.inc'
- 
+
       INTEGER CHECKSUM
       COMMON /KEEPCHECK/ CHECKSUM
- 
+
 * Functions
 
       CHARACTER*17 DBS_INFOC	! Gets character information about the record.
       LOGICAL      DBS_GETL	! Gets a logical value from the record.
- 
+
 *  Local Variables
       CHARACTER*3  CNUM		! Character version of target number.
       INTEGER      HDID		! Header ID.
@@ -44,9 +44,9 @@
      &   'Target Record','     Constraints'/
 
 * _______________________ Executable Code ______________________________________
- 
+
       ED_TYPE = 'OLD'						! If adding new recs, set NEW******************
- 
+
       IF (form_part .EQ. 'COVER') THEN
          title = title_data(1)
        ELSE IF (form_part .EQ. 'GEN') THEN
@@ -56,24 +56,24 @@
        ELSE
          GOTO 99
       END IF
- 
+
       IF (KTARGET.GT.0 ) THEN							! If on Target form read the record
          CALL FORM_READ(REF_TARGET,IREC,STATUS)
          IF (STATUS.NE.0) GOTO 99
       END IF
- 
+
 
       IF (FORM_PART.EQ.'COVER' .OR. FORM_PART.EQ.'GEN') THEN
- 
+
          CALL FORM_INIT(FORM_PART) ! Initialise data collection routines.
          CALL FORM_VALS( FORM_PART, ED_TYPE, MESID, HDID, TITLE, XTYPE)		!   Get the proposal values.
- 
+
       ELSE
- 
+
          IF (KTARGET .LT. 0) THEN						! Either a new target or old rec to edit
             ED_TYPE = 'NEW'
             KTARG = -KTARGET
-            WRITE( CNUM , '(I3)' )KTARG 
+            WRITE( CNUM , '(I3)' )KTARG
             CALL DBS_PUTC(REF_TARGET,FLD_TARG_NUMBER,CNUM,IERR)			! Put Target no. in form
          ELSE
             ED_TYPE = 'OLD'
@@ -98,7 +98,7 @@
             END DO
 
          END IF									!    Getting constraints or not
- 
+
       END IF									! Type of record, Cover or target, etc
 
 99    CONTINUE

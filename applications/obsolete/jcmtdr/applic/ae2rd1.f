@@ -13,21 +13,21 @@
 *     CALL AE2RD1
 
 *  Description:
-*   This application rebins raw JCMT map(s) (az,el or RA, Dec) to RA, Dec 
-*   by convolution with a modified Bessel function. The pixel spacing of the 
-*   output map defaults to the minimum of the nominal pixel spacings of the 
+*   This application rebins raw JCMT map(s) (az,el or RA, Dec) to RA, Dec
+*   by convolution with a modified Bessel function. The pixel spacing of the
+*   output map defaults to the minimum of the nominal pixel spacings of the
 *   input maps. The width of the convolving Bessel function is such that
-*   it is fully sampled at the spacing of the output map. To minimise edge 
-*   effects the Bessel function is truncated at a radius of 7 half-widths 
+*   it is fully sampled at the spacing of the output map. To minimise edge
+*   effects the Bessel function is truncated at a radius of 7 half-widths
 *   from the centre, and apodised over its outer third by a cosine function.
-*   
+*
 *   Seen in Fourier space the method consists of Fourier transforming
 *   the input dataset(s), multiplying the transform by a cylindrical
 *   top hat (the F.T. of the Bessel function), then transforming back
 *   into image space. The method should offer a marginal improvement
 *   in signal to noise over the old NOD2 CONVERT algorithm because
 *   that multiplied the transform of the input data by a square top
-*   hat function which would include noise at spatial frequencies 
+*   hat function which would include noise at spatial frequencies
 *   to which the telescope beam is insensitive.
 *
 *   The application can read in up to 10 separate input datasets.
@@ -47,17 +47,17 @@
 *     be used to normalise the contribution of each input pixel as it is
 *     coadded in to the convolution sum for each output pixel. Another
 *     way of looking at it would be to consider the area of each discrete
-*     contribution to the 2-d convolution integral, $\delta {\rm A}$, to be 
-*     the area of an output pixel, with the value of the input data point 
-*     there equal to the {\em average} of the input pixels that fall inside 
-*     it. The purpose of this normalisation is to allow the contribution 
-*     of pixels outside the mapped boundary (assumed to be zero) to be 
+*     contribution to the 2-d convolution integral, $\delta {\rm A}$, to be
+*     the area of an output pixel, with the value of the input data point
+*     there equal to the {\em average} of the input pixels that fall inside
+*     it. The purpose of this normalisation is to allow the contribution
+*     of pixels outside the mapped boundary (assumed to be zero) to be
 *     correctly added into the convolution later on.
 *
 *     Second, the application works through the input pixels coadding the
 *     contribution of each into the convolution sum and convolution weight
 *     of each output pixel. The coadded contribution is normalised by
-*     the `total weight' associated with each input pixel. Thus, if 
+*     the `total weight' associated with each input pixel. Thus, if
 *     the area of a given input pixel is covered by 2 input maps each
 *     of unit weight, then the coadded contribution of each pixel will
 *     be divided by 2, so normalising the total contribution of pixels
@@ -65,7 +65,7 @@
 *
 *     Third, a final pass is made through the output data, coadding into
 *     the convolution weight the contribution of those pixels
-*     that are outside the measured area. This is in an effort to 
+*     that are outside the measured area. This is in an effort to
 *     correctly normalise the convolution at the edges of the measured
 *     area, and assumes that all pixels outside the measured area are zero.
 *     Lastly, the convolution sum is divided by the convolution weight
@@ -75,10 +75,10 @@
 *   will lower the brightness of objects that are within the range of the
 *   convolution function (7 pixels) of the map edge, though the effect
 *   is only a few percent unless the object is very close (2 or 3 pixels)
-*   to the edge. To assess the possible damage you should use 
-*   FAKE to construct a dummy object of known brightness at the 
+*   to the edge. To assess the possible damage you should use
+*   FAKE to construct a dummy object of known brightness at the
 *   position of interest and observe the effect of AE2RD1 on the flux.
-*   
+*
 
 
 *  [optional_subroutine_items]...
@@ -115,14 +115,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE                    ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'                ! Standard SAE constants
       INCLUDE 'ASTRO_PAR'
-                                 
+
 
 *  Dynamic memory include file - defines DYNAMIC_MEM
       INCLUDE 'DYNAMIC_MEMORY'
@@ -174,7 +174,7 @@
       INTEGER ADDRESS                  ! DSA address
       INTEGER INPTR                    ! DSA pointer for input data array
       INTEGER XAXPTR                   !    "       "      "   x-axis
-      INTEGER YAXPTR                   !    "       "      " 
+      INTEGER YAXPTR                   !    "       "      "
       INTEGER IN_D_SLOT                ! DSA slot number of input data array
       INTEGER IN_A1_SLOT               !    "       "      "      axis 1
       INTEGER IN_A2_SLOT               !    "       "      "      axis 2
@@ -191,7 +191,7 @@
       INTEGER NXOUT, NYOUT             ! dimensions of output array
       INTEGER OUT_D_PTR                ! DSA pointer to output data array
       INTEGER OUT_V_PTR                !  "     "      " output variance array
-      INTEGER OXAXPTR                  !  "     "      " output x axis 
+      INTEGER OXAXPTR                  !  "     "      " output x axis
       INTEGER OYAXPTR                  !  "     "      "    "   y
       INTEGER TOT_WT_PTR               ! DSA pointer to total weights of input
                                        !   data onto output pixels
@@ -242,7 +242,7 @@
       DOUBLE PRECISION DIGNORE         !
       CHARACTER*(80) INFILE            ! name of input file
       CHARACTER*(80) INFILU            ! dto in upper case
-      CHARACTER*(80) FILENAME (MAX_FILES) ! names of all input files 
+      CHARACTER*(80) FILENAME (MAX_FILES) ! names of all input files
       CHARACTER*(10) CENTRE_CRD        ! coord system for input file map centre
       CHARACTER*(10) LOCAL_CRD         ! coord system for input file local
                                        !   offsets
@@ -258,7 +258,7 @@
       CHARACTER*(128) DTA_NAME         ! temp variable for holding DTA names
       CHARACTER*(128) POS_STRUC_NAME   ! name of structure containing
                                        ! position related parameters
-      CHARACTER*(128) PLST_DTA_NAME    ! name of LST array in pointing 
+      CHARACTER*(128) PLST_DTA_NAME    ! name of LST array in pointing
                                        ! correction structure
       CHARACTER*(128) PDAZ_DTA_NAME    ! .. array containing az pointing
                                        !    correction
@@ -295,7 +295,7 @@
       IF (PAR_ABORT()) THEN
          FAULT = .TRUE.
          GOTO 500
-      END IF   
+      END IF
 
 *  Initialise DSA system, find size of variable types, bad values
 
@@ -323,11 +323,11 @@
             IF (PAR_ABORT()) THEN
                FAULT = .TRUE.
                GOTO 500
-            END IF   
+            END IF
             CALL PAR_CNPAR ('INFILE')
          END IF
 
-*  convert file to upper case, open the file unless the end of the file 
+*  convert file to upper case, open the file unless the end of the file
 *  list has been reached
 
          INFILU = INFILE
@@ -339,7 +339,7 @@
 
 *  check that the MORE.JCMT structure is there
 
-            CALL DTA_CRNAM ('IN', 'MORE.JCMT', 0, 0, JCMT_DTA_NAME, 
+            CALL DTA_CRNAM ('IN', 'MORE.JCMT', 0, 0, JCMT_DTA_NAME,
      :         DSTAT)
             CALL DTA_STRUC (JCMT_DTA_NAME, STRUC, DSTAT)
             IF (DSTAT.EQ.DTA_NOTFND .OR. .NOT. STRUC) THEN
@@ -369,7 +369,7 @@
                GOTO 500
             END IF
 
-*  Check the LST values are present 
+*  Check the LST values are present
 
             CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST', 0, 0, DTA_NAME,
      :         DSTAT)
@@ -386,7 +386,7 @@
 
 *  check position structure present
 
-            CALL DTA_CRNAM (JCMT_DTA_NAME, 'MAP', 0, 0, 
+            CALL DTA_CRNAM (JCMT_DTA_NAME, 'MAP', 0, 0,
      :         POS_STRUC_NAME,
      :         DSTAT)
             CALL DTA_STRUC (POS_STRUC_NAME, STRUC, DSTAT)
@@ -402,7 +402,7 @@
 
 *  telescope structure name
 
-            CALL DTA_CRNAM (JCMT_DTA_NAME, 'TEL', 0, 0, 
+            CALL DTA_CRNAM (JCMT_DTA_NAME, 'TEL', 0, 0,
      :         TEL_STRUC_NAME, DSTAT)
             CALL DTA_STRUC (TEL_STRUC_NAME, STRUC, DSTAT)
             IF (DSTAT.EQ.DTA_NOTFND .OR. .NOT. STRUC ) THEN
@@ -427,18 +427,18 @@
 *  copy it into scratch file.
 
             CALL DSA_DATA_SIZE ('IN', 2, NDIM, DIMS, NELM, STATUS)
-            CALL DSA_MAP_DATA ('IN', 'READ', 'FLOAT', ADDRESS, 
+            CALL DSA_MAP_DATA ('IN', 'READ', 'FLOAT', ADDRESS,
      :         IN_D_SLOT, STATUS)
             INPTR = DYN_ELEMENT(ADDRESS)
             NPIXEL(FILE) = NELM
             NX = DIMS(1)
             NY = DIMS(2)
             IF (NY .LT. 1) NY = 1
-            CALL DSA_GET_WORK_ARRAY (NPIXEL(FILE), 'FLOAT', ADDRESS, 
+            CALL DSA_GET_WORK_ARRAY (NPIXEL(FILE), 'FLOAT', ADDRESS,
      :         SLOT, STATUS)
             DATPTR (FILE) = DYN_ELEMENT(ADDRESS)
             IF (STATUS .EQ. SAI__OK) THEN
-               CALL GEN_MOVE (FLOAT_SIZE*NPIXEL(FILE), 
+               CALL GEN_MOVE (FLOAT_SIZE*NPIXEL(FILE),
      :            DYNAMIC_MEM(INPTR), DYNAMIC_MEM(DATPTR(FILE)))
             END IF
 
@@ -453,7 +453,7 @@
 
 *  map the LST array
 
-            CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST.DATA_ARRAY', 0, 0, 
+            CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST.DATA_ARRAY', 0, 0,
      :         LST_DTA_NAME, DSTAT)
             CALL DTA_MRVARD (LST_DTA_NAME, NELM, ADDRESS, DSTAT)
             LSTPTR = DYN_ELEMENT(ADDRESS)
@@ -466,7 +466,7 @@
                END IF
             END IF
 
-*  exit if things have already gone wrong 
+*  exit if things have already gone wrong
 
             IF (STATUS .NE. SAI__OK) THEN
                FAULT = .TRUE.
@@ -490,7 +490,7 @@
 
 *  date of observation in modified Julian days
 
-            CALL JCMT_GETD (POS_STRUC_NAME, 'MJD_START', MJDSTART, 
+            CALL JCMT_GETD (POS_STRUC_NAME, 'MJD_START', MJDSTART,
      :         STATUS)
 
 *  get telescope parameters
@@ -500,10 +500,10 @@
 *  Get workspace for the list of derived RAs and DECs after the
 *  transformation from ALT-AZ
 
-            CALL DSA_GET_WORK_ARRAY (NPIXEL(FILE), 'DOUBLE', ADDRESS, 
+            CALL DSA_GET_WORK_ARRAY (NPIXEL(FILE), 'DOUBLE', ADDRESS,
      :         SLOT, STATUS)
             RAPPTR (FILE) = DYN_ELEMENT(ADDRESS)
-            CALL DSA_GET_WORK_ARRAY (NPIXEL(FILE), 'DOUBLE', ADDRESS, 
+            CALL DSA_GET_WORK_ARRAY (NPIXEL(FILE), 'DOUBLE', ADDRESS,
      :         SLOT, STATUS)
             DECPPTR (FILE) = DYN_ELEMENT(ADDRESS)
 
@@ -513,7 +513,7 @@
                FAULT = .TRUE.
                GOTO 500
             END IF
-      
+
 *  calculate the transformed list of ra and dec for each pixel. This routine
 *  will output results in B1950 or J2000 coords according to the value
 *  of the B1950 flag.
@@ -522,13 +522,13 @@
                CALL JCMT_OFFSET2RADEC (CENTRE_CRD, EPOCH, RAFILE,
      :            DECFILE, LOCAL_CRD, V2Y, X2Y, MJDSTART, LAT,
      :            NX, NY, DYNAMIC_MEM(XAXPTR), DYNAMIC_MEM(YAXPTR),
-     :            DYNAMIC_MEM(LSTPTR), B1950, 
+     :            DYNAMIC_MEM(LSTPTR), B1950,
      :            DYNAMIC_MEM(RAPPTR(FILE)), DYNAMIC_MEM(DECPPTR(FILE)),
      :            STATUS)
             ENDIF
 
 *  also transform the map centre to B1950 if required
-  
+
             IF (STATUS .EQ. SAI__OK) THEN
                IF (B1950) THEN
                   IF (CENTRE_CRD .EQ. 'RB') THEN
@@ -544,7 +544,7 @@
                   END IF
                ELSE
                   IF (CENTRE_CRD .EQ. 'RB') THEN
-                     CALL SLA_PRECES ('FK4', EPOCH, 1950.0D0, 
+                     CALL SLA_PRECES ('FK4', EPOCH, 1950.0D0,
      :                  RAFILE, DECFILE)
                      CALL SLA_FK45Z (RAFILE, DECFILE, 1950.0D0,
      :                  RAFILE, DECFILE)
@@ -562,7 +562,7 @@
 
             POINTING_CORRECTION = .FALSE.
             IF (STATUS .EQ. SAI__OK) THEN
-               CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.LST', 0, 0, 
+               CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.LST', 0, 0,
      :            PLST_DTA_NAME, DSTAT)
                CALL DTA_SZVAR (PLST_DTA_NAME, 1, NDIM, NCORR, DSTAT)
                CALL DTA_MRVARD (PLST_DTA_NAME, NCORR, ADDRESS, DSTAT)
@@ -579,7 +579,7 @@
                      POINT_DAZPTR = DYN_ELEMENT (ADDRESS)
                      CALL DTA_CRNAM (JCMT_DTA_NAME, 'PCORR.D_ALT',
      :                  0, 0, PDALT_DTA_NAME, DSTAT)
-                     CALL DTA_MRVARF (PDALT_DTA_NAME, NCORR, ADDRESS, 
+                     CALL DTA_MRVARF (PDALT_DTA_NAME, NCORR, ADDRESS,
      :                  DSTAT)
                      IF (DSTAT .NE. 0) THEN
                         IGNORE = 0
@@ -588,7 +588,7 @@
                      ELSE
                         POINT_DALTPTR = DYN_ELEMENT (ADDRESS)
                         POINTING_CORRECTION = .TRUE.
-                     END IF      
+                     END IF
                   END IF
                END IF
             END IF
@@ -606,7 +606,7 @@
                   IGNORE = 0
                   CALL PAR_WRUSER ('AE2RD1 - Applying pointing '//
      :              'corrections', IGNORE)
-                  CALL JCMT_CORRECT_POINTING (NPIXEL(FILE), 
+                  CALL JCMT_CORRECT_POINTING (NPIXEL(FILE),
      :               DYNAMIC_MEM (RAPPTR(FILE)),
      :               DYNAMIC_MEM (DECPPTR(FILE)),
      :               DYNAMIC_MEM (LSTPTR),
@@ -651,12 +651,12 @@
                WEIGHT(1) = 1.0
             ELSE
                CALL PAR_SDVAL ('WEIGHT', 1.0, STATUS)
-               CALL PAR_RDVAL ('WEIGHT', 0.0, 100.0, 1.0, ' ', 
+               CALL PAR_RDVAL ('WEIGHT', 0.0, 100.0, 1.0, ' ',
      :            WEIGHT(FILE))
                IF (PAR_ABORT()) THEN
                   FAULT = .TRUE.
                   GOTO 500
-               END IF   
+               END IF
                CALL PAR_CNPAR ('WEIGHT')
             END IF
 
@@ -759,7 +759,7 @@
          IF (PAR_ABORT()) THEN
             FAULT = .TRUE.
             GOTO 500
-         END IF   
+         END IF
          NSTRT = 1
          CALL SLA_DAFIN (STEMP1, NSTRT, RACEN, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
@@ -785,7 +785,7 @@
          IF (PAR_ABORT()) THEN
             FAULT = .TRUE.
             GOTO 500
-         END IF   
+         END IF
          NSTRT = 1
          CALL SLA_DAFIN (STEMP1, NSTRT, DECCEN, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
@@ -798,7 +798,7 @@
 
       END IF
 
-*  make the default pixel spacing of the output map the minimum of that of 
+*  make the default pixel spacing of the output map the minimum of that of
 *  the input data
 
       OUT_PIXSPACE = PIXSPACE (1)
@@ -815,11 +815,11 @@
      :      DECMAX, DECMIN)
          IF (N_FILES .GT. 1) THEN
             DO FILE = 2, N_FILES
-               CALL JCMT_RANGED (DYNAMIC_MEM(RAPPTR(FILE)), 1, 
+               CALL JCMT_RANGED (DYNAMIC_MEM(RAPPTR(FILE)), 1,
      :            NPIXEL(FILE), TMAX, TMIN)
                RAMAX = MAX (RAMAX, TMAX)
                RAMIN = MIN (RAMIN, TMIN)
-               CALL JCMT_RANGED (DYNAMIC_MEM(DECPPTR(FILE)), 1, 
+               CALL JCMT_RANGED (DYNAMIC_MEM(DECPPTR(FILE)), 1,
      :            NPIXEL(FILE), TMAX, TMIN)
                DECMAX = MAX (DECMAX, TMAX)
                DECMIN = MIN (DECMIN, TMIN)
@@ -879,7 +879,7 @@
 *  map the output data array, initialise to zeroes.
 
       CALL DSA_MAP_DATA ('OUT', 'UPDATE', 'FLOAT', ADDRESS, SLOT,
-     :   STATUS) 
+     :   STATUS)
       OUT_D_PTR = DYN_ELEMENT(ADDRESS)
       IF (STATUS .EQ. SAI__OK) THEN
          CALL GEN_CFILL (1, NXOUT*NYOUT, 0.0, DYNAMIC_MEM(OUT_D_PTR))
@@ -906,10 +906,10 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          DO FILE = 1, N_FILES
-            CALL JCMT_BESSEL_REGRID_1 (WEIGHT(FILE), 
+            CALL JCMT_BESSEL_REGRID_1 (WEIGHT(FILE),
      :         DYNAMIC_MEM (RAPPTR(FILE)), DYNAMIC_MEM (DECPPTR(FILE)),
      :         NPIXEL (FILE), OUT_PIXSPACE, NXOUT, NYOUT, ICEN, JCEN,
-     :         RACEN, DECCEN, DYNAMIC_MEM (TOT_WT_PTR), 
+     :         RACEN, DECCEN, DYNAMIC_MEM (TOT_WT_PTR),
      :         DYNAMIC_MEM (SCRATCH_PTR), STATUS)
          END DO
       END IF
@@ -928,8 +928,8 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          DO FILE = 1, N_FILES
-            CALL JCMT_BESSEL_REGRID_2 (DYNAMIC_MEM(DATPTR(FILE)), 
-     :         WEIGHT(FILE), FBAD, 
+            CALL JCMT_BESSEL_REGRID_2 (DYNAMIC_MEM(DATPTR(FILE)),
+     :         WEIGHT(FILE), FBAD,
      :         DYNAMIC_MEM(RAPPTR(FILE)), DYNAMIC_MEM(DECPPTR(FILE)),
      :         NPIXEL(FILE), OUT_PIXSPACE, NXOUT, NYOUT, ICEN, JCEN,
      :         RACEN, DECCEN, DYNAMIC_MEM (TOT_WT_PTR),
@@ -968,7 +968,7 @@
 *     and multiply by minus the pixel size to give an offset in arcsec
 *     +ve in increasing RA
 
-         CALL GEN_MULCAF (DYNAMIC_MEM(OXAXPTR), NXOUT, 
+         CALL GEN_MULCAF (DYNAMIC_MEM(OXAXPTR), NXOUT,
      :      REAL(-OUT_PIXSPACE*DR2AS), DYNAMIC_MEM(OXAXPTR))
 
       END IF
@@ -986,7 +986,7 @@
          CALL GEN_NFILLF (NYOUT, DYNAMIC_MEM(OYAXPTR))
          CALL GEN_ADDCAF (DYNAMIC_MEM(OYAXPTR), NYOUT, REAL(-JCEN),
      :      DYNAMIC_MEM(OYAXPTR))
-         CALL GEN_MULCAF (DYNAMIC_MEM(OYAXPTR), NYOUT, 
+         CALL GEN_MULCAF (DYNAMIC_MEM(OYAXPTR), NYOUT,
      :      REAL(OUT_PIXSPACE*DR2AS), DYNAMIC_MEM(OYAXPTR))
       END IF
       CHAR_ITEMS(1) = 'ARCSEC'
@@ -1005,7 +1005,7 @@
       CALL DSA_SET_OBJECT ('OUT', OUT_OBJECT, STATUS)
 
 *  create a `.MORE.JCMT_COORDS' structure to hold the RA, Dec and coordinate
-*  system in a manner more accessible to the IRASTAG application than the 
+*  system in a manner more accessible to the IRASTAG application than the
 *  FITS structure is
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -1015,31 +1015,31 @@
 *  store RA, Dec and coordinate system
 
          CALL DTA_CRVAR ('OUT.MORE.JCMT_COORDS.RACEN', 'DOUBLE', DSTAT)
-         CALL DTA_WRVARD ('OUT.MORE.JCMT_COORDS.RACEN', 1, RACEN, 
+         CALL DTA_WRVARD ('OUT.MORE.JCMT_COORDS.RACEN', 1, RACEN,
      :      DSTAT)
 
-         CALL DTA_CRVAR ('OUT.MORE.JCMT_COORDS.DECCEN', 'DOUBLE', 
+         CALL DTA_CRVAR ('OUT.MORE.JCMT_COORDS.DECCEN', 'DOUBLE',
      :      DSTAT)
-         CALL DTA_WRVARD ('OUT.MORE.JCMT_COORDS.DECCEN', 1, DECCEN, 
+         CALL DTA_WRVARD ('OUT.MORE.JCMT_COORDS.DECCEN', 1, DECCEN,
      :      DSTAT)
 
-         CALL DTA_CRNAM ('OUT.MORE.JCMT_COORDS', 'SYSTEM', 1, 64, 
+         CALL DTA_CRNAM ('OUT.MORE.JCMT_COORDS', 'SYSTEM', 1, 64,
      :      DTA_NAME, DSTAT)
          CALL DTA_CRVAR (DTA_NAME, 'CHAR', DSTAT)
-         CALL DTA_WRVARC ('OUT.MORE.JCMT_COORDS.SYSTEM', 
+         CALL DTA_WRVARC ('OUT.MORE.JCMT_COORDS.SYSTEM',
      :      ICH_LEN(SYSTEM), SYSTEM, DSTAT)
 
 *  pixel coords of centre and pixel size in radians
 
          CALL DTA_CRVAR ('OUT.MORE.JCMT_COORDS.ICEN', 'INT', DSTAT)
-         CALL DTA_WRVARI ('OUT.MORE.JCMT_COORDS.ICEN', 1, ICEN, 
+         CALL DTA_WRVARI ('OUT.MORE.JCMT_COORDS.ICEN', 1, ICEN,
      :      DSTAT)
 
          CALL DTA_CRVAR ('OUT.MORE.JCMT_COORDS.JCEN', 'INT', DSTAT)
-         CALL DTA_WRVARI ('OUT.MORE.JCMT_COORDS.JCEN', 1, JCEN, 
+         CALL DTA_WRVARI ('OUT.MORE.JCMT_COORDS.JCEN', 1, JCEN,
      :      DSTAT)
-          
-         CALL DTA_CRVAR ('OUT.MORE.JCMT_COORDS.PIXSIZE', 'DOUBLE', 
+
+         CALL DTA_CRVAR ('OUT.MORE.JCMT_COORDS.PIXSIZE', 'DOUBLE',
      :      DSTAT)
          CALL DTA_WRVARD ('OUT.MORE.JCMT_COORDS.PIXSIZE', 1,
      :      OUT_PIXSPACE, DSTAT)
@@ -1054,7 +1054,7 @@
          ELSE
             WRITE (STEMP(6:7),'(I2.2)') FILE
          END IF
-         CALL DSA_PUT_FITS_C ('OUT', STEMP(:8), FILENAME(FILE), 
+         CALL DSA_PUT_FITS_C ('OUT', STEMP(:8), FILENAME(FILE),
      :      'Name of input file whose data has been included in '//
      :      'the result', STATUS)
       END DO
@@ -1068,7 +1068,7 @@
          ELSE
             WRITE (STEMP(4:5),'(I2.2)') FILE
          END IF
-         CALL DSA_PUT_FITS_F ('OUT', STEMP(:8), WEIGHT(FILE), 
+         CALL DSA_PUT_FITS_F ('OUT', STEMP(:8), WEIGHT(FILE),
      :      'Weight assigned to input dataset', STATUS)
       END DO
 

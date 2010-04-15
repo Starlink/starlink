@@ -101,7 +101,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      LOGICAL CHR_SIMLR          ! True if strings are equal apart from 
+      LOGICAL CHR_SIMLR          ! True if strings are equal apart from
                                  ! case.
 
 *  Local Variables:

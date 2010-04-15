@@ -12,7 +12,7 @@
 
 *  Notes:
 *     - Given the size of the NDG library, providing a complete C
-*     interface is probably not worth the effort. Instead, I suggest that 
+*     interface is probably not worth the effort. Instead, I suggest that
 *     people who want to use NDG from C extend this file (and
 *     ndg.h) to include any functions which they need but which are
 *     not already included.
@@ -62,7 +62,7 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h" 
+#include "f77.h"
 #include "sae_par.h"
 #include "par_par.h"
 #include "star/grp.h"
@@ -74,7 +74,7 @@
 
 F77_SUBROUTINE(ndg_assoc)( CHARACTER(PARAM), LOGICAL(VERB), INTEGER(IGRP), INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(PARAM) );
 
-void ndgAssoc( const char * param, int verb, Grp ** igrp, size_t *size, int * flag, int *status 
+void ndgAssoc( const char * param, int verb, Grp ** igrp, size_t *size, int * flag, int *status
 ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
@@ -106,7 +106,7 @@ void ndgAssoc( const char * param, int verb, Grp ** igrp, size_t *size, int * fl
 
 F77_SUBROUTINE(ndg_creat)( CHARACTER(PARAM), INTEGER(IGRP0), INTEGER(IGRP), INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(PARAM) );
 
-void ndgCreat( const char * param, const Grp *igrp0, Grp ** igrp, size_t *size, int * flag, int *status 
+void ndgCreat( const char * param, const Grp *igrp0, Grp ** igrp, size_t *size, int * flag, int *status
 ){
    DECLARE_INTEGER(IGRP0);
    DECLARE_INTEGER(IGRP);
@@ -129,7 +129,7 @@ void ndgCreat( const char * param, const Grp *igrp0, Grp ** igrp, size_t *size, 
 
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
-   
+
    F77_IMPORT_INTEGER( STATUS, *status );
    *igrp = (Grp *) grpF2C( IGRP, status );
 

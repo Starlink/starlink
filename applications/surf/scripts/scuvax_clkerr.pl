@@ -253,7 +253,7 @@ sub rad2string ($$) {
     if ($istime) {
 	slaDr2tf(2, $rad, $sign, @ihmsf);
     } else {
-	slaDr2af(2, $rad, $sign, @ihmsf);	
+	slaDr2af(2, $rad, $sign, @ihmsf);
     }
     # Format the string
     my $string = sprintf("%d %d %d.%02d", @ihmsf);
@@ -483,7 +483,7 @@ This program uses the fact that the azimuth and elevation stored
 in the SCUBA data headers (C<STRT_ELD> and C<STRT_AZD> are read
 from the telescope at the same time that the (incorrect) start
 time for the first switch is read (and stored in the C<LST_STRT>
-array). The SCUBA headers therefore allow the actual LST to be 
+array). The SCUBA headers therefore allow the actual LST to be
 calculated from the hour angle and the RA/Dec the telescope was
 known to be observing.
 

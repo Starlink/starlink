@@ -61,7 +61,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -110,7 +110,7 @@
 
 *  Running as a subprocess of some command language.
          NVAL = INDEX( ENV, 'ccdpack_scr' )
-         IF ( NVAL .NE. 0 ) THEN 
+         IF ( NVAL .NE. 0 ) THEN
             PID = ENV( NVAL + 11: )
          END IF
       END IF
@@ -120,7 +120,7 @@
       CALL CCD1_LINFLT
 
 *  Test the action name against each valid value in turn, calling the
-*  appropriate routine...  
+*  appropriate routine...
       IF ( ACTION .EQ. 'CCDALIGN' ) THEN
          CALL CCDALIGN( PID, STATUS )
 

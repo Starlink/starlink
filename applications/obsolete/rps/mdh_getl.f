@@ -48,7 +48,7 @@
       LEN = MDH_ENDWORD( QUERY )
 
       DO WHILE ( QUERY( LEN:LEN ) .EQ. '/' )
-										
+
         NBLANKS = NBLANKS + 1
         LEN = LEN - 1
 
@@ -63,7 +63,7 @@
         WRITE (* , '( X,A,$ )' ) QUERY( I:LEN ) //' ( Default is NO): '          !  Write giving default as NO
 
       END IF                                                                    ! End if.
-                                                                     
+
       IERR = .TRUE.                                                             ! Set error indicator to no error.
 
       DO WHILE ( IERR )                                                         ! Do while no valid answer.

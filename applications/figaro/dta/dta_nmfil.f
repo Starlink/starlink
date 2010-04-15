@@ -39,8 +39,8 @@ C
 C                                       KS / AAO 26th May 1986
 C     Modified:
 C
-C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to 
-C                      remove VMS logical names and to use lower case, to 
+C     10th Jan  1992.  KS / AAO.  Syntax of include statements changed to
+C                      remove VMS logical names and to use lower case, to
 C                      enable compilation on a SUN.
 C     12th Apr 1993.  HME / UoE, Starlink. For DTACACHE must include SAE_PAR
 C                     and DAT_PAR as well.

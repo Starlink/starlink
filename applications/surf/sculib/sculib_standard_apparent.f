@@ -8,7 +8,7 @@
 *     convert apparent RA,Decs from one date to another
 
 *  Description:
-*     This routine converts a list of apparent RA,Decs for one date into 
+*     This routine converts a list of apparent RA,Decs for one date into
 *     apparent coordinates at another. To do this it calls SLA_MAPPA and
 *     SLA_AMPQK to convert the input coordinates into mean coordinates for
 *     a J2000.0 equinox, then SLA_MAPPA and SLA_MAPQKZ to convert the mean

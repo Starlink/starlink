@@ -30,7 +30,7 @@
 *     CLASS = CHARACTER * ( * ) (Given)
 *        A list of acceptable workstation classes as defined by GNS,
 *        each separated by a comma.  See SUN/57 for a list. Note, as
-*        GNS does not yet support PGPLOT, no checks are mode on GNS 
+*        GNS does not yet support PGPLOT, no checks are mode on GNS
 *        class when using PGPLOT. Class checks are ignored if a blank
 *        string is supplied.
 *     CRITER = CHARACTER * ( * ) (Given)
@@ -43,7 +43,7 @@
 *        Minimum number of intensities or colour indices required.  The
 *        routine ensures that there are at least the specified number.
 *     UP = INTEGER (Returned)
-*        The highest available colour index available. 
+*        The highest available colour index available.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -59,12 +59,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -86,14 +86,14 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CTM_PAR'          ! Colour-table-management definitions
-c      INCLUDE 'GNS_PAR'          ! GNS constants 
+c      INCLUDE 'GNS_PAR'          ! GNS constants
 
 *  Arguments Given:
       CHARACTER PNDEV*(*)
@@ -102,7 +102,7 @@ c      INCLUDE 'GNS_PAR'          ! GNS constants
       INTEGER MININT
 
 *  Arguments Returned:
-      INTEGER UP 
+      INTEGER UP
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -118,14 +118,14 @@ c      INCLUDE 'GNS_PAR'          ! GNS constants
 *  Local Variables:
 c     CHARACTER ACLASS( MAXOPT )*( GNS__SZKEY) ! The array of class options
       CHARACTER VAL*1            ! PGPLOT information string
-      INTEGER CI1                ! Minimum colour index 
+      INTEGER CI1                ! Minimum colour index
 c     INTEGER I                  ! Loop counter
       INTEGER ICOL               ! Index of colour keyword in criteria
       INTEGER ICUR               ! Index of cursor keyword in criteria
 c     INTEGER MAXNOC             ! Maximum length of the array elements
-c     INTEGER MCH( MAXOPT )      ! Number of initial characters to compare to 
+c     INTEGER MCH( MAXOPT )      ! Number of initial characters to compare to
 c                                ! obtain each class option uniquely
-c     INTEGER MINCH              ! Number of initial characters to compare to 
+c     INTEGER MINCH              ! Number of initial characters to compare to
 c                                ! obtain a class uniquely
 c     INTEGER NCLASS             ! Number of acceptable classes supplied
       INTEGER NCRIT              ! Number of characters in the criteria
@@ -140,7 +140,7 @@ c     LOGICAL LOOP               ! Loop searching for a class to match?
 *  >>>> The following code which checks the GNS classes is commented out
 *  >>>> because GNS does not yet support PGPLOT.
 
-c      IF( CLASS .NE. ' ' ) THEN   
+c      IF( CLASS .NE. ' ' ) THEN
 c
 *  Extract the classes from the comma-separated string.
 *  ====================================================
@@ -205,8 +205,8 @@ c      END IF
          ICOL = INDEX( CRITER, 'COLOUR' )
          IF ( ICOL .GT. 0 ) THEN
 
-*  If colour is not available but was required, report a helpful error 
-*  message.  Note do not exit as the workstation may fail on more than 
+*  If colour is not available but was required, report a helpful error
+*  message.  Note do not exit as the workstation may fail on more than
 *  one criterion.
             IF ( UP .EQ. 1 .AND. MININT .GT. 1 ) THEN
                STATUS = SAI__ERROR
@@ -221,11 +221,11 @@ c      END IF
 *  ==================================================
          ICUR = INDEX( CRITER, 'CURSOR' )
          IF ( ICUR .GT. 0 ) THEN
-           
+
 *  Inquire whether there is a cursor.
             CALL PGQINF( 'CURSOR', VAL, VLEN )
 
-*  A cursor is not available but was required so report a helpful error 
+*  A cursor is not available but was required so report a helpful error
 *  message.
             IF( VLEN .EQ. 0 .OR. VAL( 1 : 1 ) .NE. 'Y' ) THEN
                STATUS = SAI__ERROR
@@ -253,7 +253,7 @@ c      END IF
 
   980    CONTINUE
 
-*  Stop the GNS system for PGPLOT (PGPLOT is not yet supported by GNS, so 
+*  Stop the GNS system for PGPLOT (PGPLOT is not yet supported by GNS, so
 *  this is commented out).
 c      CALL GNS_STOP( 'PGPLOT', STATUS )
 

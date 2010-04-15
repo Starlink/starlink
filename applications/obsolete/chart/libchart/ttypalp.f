@@ -57,14 +57,14 @@
 *        Removed the VAL function from the end of this file, as it is
 *        redundant - a newer, simpler version of the function is in
 *        VAL.F (VAL.FOR).
-*        
+*
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -96,10 +96,10 @@
       DIMENSION NPW(23), SPW(22), FNST(22)
       CHARACTER*80 TEXT
 
-      
+
 
 *  Local Data:
-      
+
       DATA NPW / 2880, 150, 92, 68, 52, 44, 38, 34, 30, 28,
      : 26, 26, 24, 24, 24, 24, 24, 24, 24, 26, 26, 28, 30 /
       DATA SPW / 20, 20, 20, 20, 20, 20, 20, 21, 22, 23, 24,
@@ -116,7 +116,7 @@
 *
 *   PALF,ESOF = Plate Sizes in mm.
 *
- 
+
       CALL MSG_OUT( ' ', ' ', STATUS )
       CALL MSG_OUT( ' ', 'Position on Sky Survey plates', STATUS )
       CALL MSG_OUT( ' ', ' ', STATUS )
@@ -133,7 +133,7 @@
       SURVEY(1) = DL.GT.(-45.0)*RDDG
       SURVEY(2) = DP.LT.(18.0*RDDG)
       SURVEY(3) = DP.LT.(-17.5*RDDG)
- 
+
       DO 100 K=1,3
          IF (SURVEY(K)) THEN
 *
@@ -230,7 +230,7 @@ C
                NCRAM=0
             END IF
             PCA = NRAC * 60.0 * RDST
- 
+
             CALL CONST(PCA,PCR, STATUS )
             CALL PROJ(1,AL,DL,X,Y, STATUS )
 *
@@ -267,4 +267,4 @@ C
       CALL MSG_OUT( ' ', 'of the actual plate, not the emulsion',
      :       STATUS )
       END
- 
+

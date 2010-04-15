@@ -13,7 +13,7 @@
 *     CALL ARY1_DFPPL( LOCP, NAME, LOC< STATUS )
 
 *  Description:
-*     The routine creates an placeholder object for a deferred 
+*     The routine creates an placeholder object for a deferred
 *     primitive array.
 
 *  Arguments:
@@ -36,12 +36,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -60,7 +60,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -88,18 +88,18 @@
 
 *  Check the component does not already exist.
       CALL DAT_THERE( LOCP, NAME, THERE, STATUS )
-      IF( .NOT. THERE ) THEN 
+      IF( .NOT. THERE ) THEN
 
 *  Create an ARRAY structure in the given parent object, and get a
 *  locator to it.
-         CALL DAT_NEW( LOCP, NAME, 'ARRAY', 0, 0, STATUS ) 
+         CALL DAT_NEW( LOCP, NAME, 'ARRAY', 0, 0, STATUS )
          CALL DAT_FIND( LOCP, NAME, LOC, STATUS )
 
 *  Put a VARIANT component in here indicating that the ARRAY is a deferred
 *  primitive array.
          CALL DAT_NEW0C( LOC, 'VARIANT', 9, STATUS )
          CALL CMP_PUT0C( LOC, 'VARIANT', 'PRIMITIVE', STATUS )
-      END IF       
+      END IF
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DFPPL', STATUS )

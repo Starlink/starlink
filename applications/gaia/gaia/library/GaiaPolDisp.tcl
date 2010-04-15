@@ -11,9 +11,9 @@
 
 #  Description:
 #     This class handles the visualisation of polarimetry data by drawing
-#     vectors on the canvas. It handles the drawing of the vectors, the key, 
+#     vectors on the canvas. It handles the drawing of the vectors, the key,
 #     the selection of vectors using the mouse, and the highlighting of vectors.
-#    
+#
 #  Invocations:
 #
 #        GaiaPolDisp object_name [configuration options]
@@ -89,9 +89,9 @@ itcl::class gaia::GaiaPolDisp {
    constructor { w image rtdimage canvas pbar selcmd hgFont klfont actcmd} {
       upvar this parent
 
-#  Now initialize the class data. If this constructor has been invoked 
-#  to construct the base class part of some super class, do not 
-#  initialize the data since this will be done as a consequence of 
+#  Now initialize the class data. If this constructor has been invoked
+#  to construct the base class part of some super class, do not
+#  initialize the data since this will be done as a consequence of
 #  initializeing the super class data.
       if { [$this info class] == "::gaia::GaiaPolDisp" } {
          init $w $image $rtdimage $canvas $pbar $selcmd $hgFont $klfont $actcmd
@@ -101,7 +101,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Destructor
 #  ----------
    destructor {
-      catch { 
+      catch {
 
 #  Remove the trace which causes method newZoom to be changed whenever
 #  the zoom factor changes.
@@ -119,14 +119,14 @@ itcl::class gaia::GaiaPolDisp {
       }
    }
 
-#  Override the parent Init method to initialise the contents of the 
-#  memory allocated by the GaiaPolDisp constructor using a user-supplied 
+#  Override the parent Init method to initialise the contents of the
+#  memory allocated by the GaiaPolDisp constructor using a user-supplied
 #  argument list.
 #  ----------------------------------------------------------------------
    protected method init { w image rtdimage canvas pbar selcmd hgFont klfont actcmd} {
 
 #  First initialize the parent class data
-      gaia::GaiaPolObject::init 
+      gaia::GaiaPolObject::init
 
 #  Now initialize this class.
       set w_ $w
@@ -192,7 +192,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  If the catalogue was displayed over a blank image created by a
 #  GaiaPolDisp, decrement its reference count. If zero, remove the blank image.
-      if { $blankimage_ } { 
+      if { $blankimage_ } {
          set blankimage_ 0
 
          if { [info exists blankref_($rtdimage_)] } {
@@ -225,10 +225,10 @@ itcl::class gaia::GaiaPolDisp {
 #  item to be recreated from scratch, then the canvas is cleared first of
 #  all canvas items created by this GaiaPolDisp, and new canvas items are
 #  created for every (non-deleted) row in the catalogue. Unless $addact
-#  is zero, an action is added to the list of undoable action which causes 
-#  the previous catalogue and style to be re-drawn. If $force is non-zero, 
+#  is zero, an action is added to the list of undoable action which causes
+#  the previous catalogue and style to be re-drawn. If $force is non-zero,
 #  then the supplied catalogue is displayed even if it seems to be exactly the
-#  same as the currently displayed catalogue. 
+#  same as the currently displayed catalogue.
 #  ----------------------------------------------------------------------
    public method draw {cat prevcat style prevsty {addact 1} {force 0} } {
 
@@ -240,7 +240,7 @@ itcl::class gaia::GaiaPolDisp {
       set noNewZoom_ 1
 
 #  If no catalogiue is currently displayed, or if we have no current
-#  style, or if a redisplay has been forced, we need to draw the supplied 
+#  style, or if a redisplay has been forced, we need to draw the supplied
 #  catalogue from scratch.
       if { $prevcat == "" || $prevsty == "" || $force } {
          set clear 1
@@ -285,7 +285,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Ensure there is an image to plot over. A blank image is created if
 #  necessary.
-            checkImage $cat 
+            checkImage $cat
 
 #  A blank values for $rows means "use all rows".
             set rows ""
@@ -298,7 +298,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  If we do not need to draw every vector again, get a list of the rows
 #  which need changing and the corresponding states. ALso get lists of
-#  the canvas item options which need to be reconfigured to render a 
+#  the canvas item options which need to be reconfigured to render a
 #  vector as selected or unselected.
          } else {
             set rows $catch
@@ -323,10 +323,10 @@ itcl::class gaia::GaiaPolDisp {
 #  Ensure canvas bindings are set up.
          setBindings
 
-#  Draw a new key. 
-         Key 
+#  Draw a new key.
+         Key
 
-#  If a suitable action command has been supplied, add actions to the undoable 
+#  If a suitable action command has been supplied, add actions to the undoable
 #  action list, unless inhibited by the caller.
          if { $addact && $actcmd_ != "" } {
 
@@ -362,14 +362,14 @@ itcl::class gaia::GaiaPolDisp {
 #  Ensure any old key is deleted.
       noKey
 
-#  If the key is currently enabled, and the vector style is known, draw a 
+#  If the key is currently enabled, and the vector style is known, draw a
 #  new key.
       if { $kenabled_ && $style_ != "" && $cat_ != "" } {
 
 #  Get the vector length to use.
          set kvval [getKvVal]
 
-#  Create a canvas text item for the label. It is initially centred at canvas 
+#  Create a canvas text item for the label. It is initially centred at canvas
 #  coords (0,0) and is later moved to its correct position.
          set klid_ [$canvas_ create text 0 0 -anchor center \
                                              -font $klfont_ \
@@ -381,7 +381,7 @@ itcl::class gaia::GaiaPolDisp {
          lassign [$canvas_ bbox $klid_] lx0 ly0 lx1 ly1
          set lw [expr abs($lx1 - $lx0)]
          set lh [expr abs($ly1 - $ly0)]
-		            
+
 #  Find the required length of the vector in canvas coords.
          $rtdimage_ convert coords 0.0 0.0 "image" vx0 vy0 "canvas"
          $rtdimage_ convert coords 1.0 0.0 "image" vx1 vy1 "canvas"
@@ -400,13 +400,13 @@ itcl::class gaia::GaiaPolDisp {
             set vcol $kvcol_
          }
 
-#  Create a canvas line item for the vector, half a text height under the 
+#  Create a canvas line item for the vector, half a text height under the
 #  text label.
 	 set vy [expr 1.0*$lh]
          set kvid_ [$canvas_ create line $vx0 $vy $vx1 $vy -fill $vcol \
                                                            -tags PolKey \
 	                                                   -width $kvwid_ ]
-	 
+
 #  Find the bounding box of the label and vector.
          lassign [$canvas_ bbox $kvid_ $klid_] kx0 ky0 kx1 ky1
 
@@ -420,7 +420,7 @@ itcl::class gaia::GaiaPolDisp {
          set ky0 [expr $ky0 - $bd]
          set ky1 [expr $ky1 + $bd]
 
-#  Create a canvas rectangle item for the background. 
+#  Create a canvas rectangle item for the background.
          set kbid_ [$canvas_ create rectangle $kx0 $ky0 $kx1 $ky1 \
                                               -fill $kbgcol_ \
 					      -outline $kbdcol_ \
@@ -430,14 +430,14 @@ itcl::class gaia::GaiaPolDisp {
 #  We now need to move the all components to their correct initial positions.
 #  Get the bounding box of the whole key.
          lassign [$canvas_ bbox $kbid_ $kvid_ $klid_] kx0 ky0 kx1 ky1
-	    
-#  Find the width and height of the whole key. 
-         set kh [expr $ky1 - $ky0] 
+
+#  Find the width and height of the whole key.
+         set kh [expr $ky1 - $ky0]
          set kw [expr $kx1 - $kx0]
 
-#  Now find the preferred position for the key. If a key has previously been 
-#  used, the centre coords of the rectangle (in image coords) will be $klx_ and 
-#  $kly_. If so we try to centre the new rectangle at the same position as the 
+#  Now find the preferred position for the key. If a key has previously been
+#  used, the centre coords of the rectangle (in image coords) will be $klx_ and
+#  $kly_. If so we try to centre the new rectangle at the same position as the
 #  old one. On this assumption, find the canvas coords of the top left and
 #  bottom right of the rectangle.
          if { $klx_ != "" && $kly_ != "" } {
@@ -447,9 +447,9 @@ itcl::class gaia::GaiaPolDisp {
 	    set x1 [expr $x + 0.5*$kw]
             set y1 [expr $y + 0.5*$kh]
 
-#  If no previous key position is available, we try to place the left 
+#  If no previous key position is available, we try to place the left
 #  edge of the key against the right edge of the image (separated by a
-#  small gap), and align the top of the key with the top of the image. 
+#  small gap), and align the top of the key with the top of the image.
          } else {
 
 #  Find the canvas coords at the top right corner of the image
@@ -458,7 +458,7 @@ itcl::class gaia::GaiaPolDisp {
             set hgt [$rtdimage_ height]
             $rtdimage_ convert coords $wid $hgt "image" x y "canvas"
 
-#  Find the canvas coords at the top left and bottom right corner of the key 
+#  Find the canvas coords at the top left and bottom right corner of the key
 #  bounding box which this would produce.
             set x0 [expr $x + 10]
 	    set y0 $y
@@ -468,7 +468,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  The preferred placement for the key found above may place the key off
 #  the screen (for instance if the image has been zoomed). So we now restrict
-#  the position of the top right corner of the key to be within the visible 
+#  the position of the top right corner of the key to be within the visible
 #  part of the image... Find the canvas coords at the top left and bottom right
 #  corners of the visible section of the canvas.
          set cx0 [$canvas_ canvasx 0]
@@ -477,22 +477,22 @@ itcl::class gaia::GaiaPolDisp {
          set cy1 [$canvas_ canvasy [winfo height $canvas_]]
 
 #  Restrict the horizontal position of the key.
-         if { $x0 < $cx0 } { 
+         if { $x0 < $cx0 } {
 	    set x0 $cx0
 	    set x1 [expr $cx0 + $kw]
 	 } elseif { $x1 > $cx1 } {
 	    set x1 $cx1
 	    set x0 [expr $cx1 - $kw]
-	 } 
-	       
+	 }
+
 #  Restrict the vertical position of the key.
-         if { $y0 < $cy0 } { 
+         if { $y0 < $cy0 } {
 	    set y0 $cy0
 	    set y1 [expr $cy0 + $kh]
 	 } elseif { $y1 > $cy1 } {
 	    set y1 $cy1
 	    set y0 [expr $cy1 - $kh]
-	 } 
+	 }
 
 #  Find the shift in x and y required to put the rectangle at the above
 #  position.
@@ -506,16 +506,16 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Raise the key to the top of the display stack.
          raiseKey
-      }      
+      }
    }
 
 #  Called when the zoom factor in the "Choose Zoom factor" menubutton
-#  associated with $image_ changes. Ensure the key looks right at the 
+#  associated with $image_ changes. Ensure the key looks right at the
 #  new zoom factor.
 #  -------------------------------------------------------------------
    public method newZoom {name1 name2 op} {
-      if { ! $noNewZoom_ } { 
-         Key 
+      if { ! $noNewZoom_ } {
+         Key
       }
    }
 
@@ -523,7 +523,7 @@ itcl::class gaia::GaiaPolDisp {
 #  ---------------
    public method noKey {} {
 
-#  Get the bounding box of the outer rectangle forming the background to 
+#  Get the bounding box of the outer rectangle forming the background to
 #  the key.
       if { $kbid_ != "" } {
          lassign [$canvas_ bbox $kbid_ ] kx0 ky0 kx1 ky1
@@ -534,7 +534,7 @@ itcl::class gaia::GaiaPolDisp {
                                    klx_ kly_ "image"
       }
 
-#  Delete the canvas items forming the key   
+#  Delete the canvas items forming the key
       if { $kvid_ != "" } {
          $canvas_ delete $kvid_
          set kvid_ ""
@@ -590,11 +590,11 @@ itcl::class gaia::GaiaPolDisp {
 #  default value will be used instead of the supplied value.
 #  --------------------------------------------------------------
    public method setKvVal {x} { set kvval_ $x }
-   
-#  Get the key vector length (x is in data units). If kvval_ is blank use a 
-#  nice default value  
+
+#  Get the key vector length (x is in data units). If kvval_ is blank use a
+#  nice default value
 #  --------------------------------------------------------------
-   public method getKvVal {} { 
+   public method getKvVal {} {
 
 #  If kvval_ is non-blank value return it.
       if { [string trim $kvval_] != "" } {
@@ -617,7 +617,7 @@ itcl::class gaia::GaiaPolDisp {
 #  style).
          if { $kvdef_ == "" && $style_ != "" && $cat_ != "" } {
 
-#  Get the length of the image diagonal as a number of image pixels 
+#  Get the length of the image diagonal as a number of image pixels
             set wid [$rtdimage_ width]
             set hgt [$rtdimage_ height]
             set diag [expr sqrt($wid*$wid + $hgt*$hgt)]
@@ -628,7 +628,7 @@ itcl::class gaia::GaiaPolDisp {
                set d [expr 0.05*$diag/$mag_]
 
 #  We now find a "nice" value which is close to this value.
-               set kvdef_ [nice $d]    
+               set kvdef_ [nice $d]
             }
          }
 
@@ -643,7 +643,7 @@ itcl::class gaia::GaiaPolDisp {
 #  ------------------------------------------------
    public method getSelShape {} { return $selshape_ }
    public method setSelShape {s} { set selshape_ $s }
-   
+
 #  Format the object into a string.
 #  --------------------------------
    public method toString {} {
@@ -651,7 +651,7 @@ itcl::class gaia::GaiaPolDisp {
       return $ret
    }
 
-#  Zoom so that the image fills the screen. 
+#  Zoom so that the image fills the screen.
 #  -----------------------------------------
    public method zoom_to_image {} {
 
@@ -684,14 +684,14 @@ itcl::class gaia::GaiaPolDisp {
             set c [$canvas_ coords $id]
             set x [expr 0.5*( [lindex $c 0] + [lindex $c 2] )]
             set y [expr 0.5*( [lindex $c 1] + [lindex $c 3] )]
-   
+
             if { $first } {
                set x0 $x
                set y0 $y
                set x1 $x
                set y1 $y
                set first 0
-   
+
             } else {
                set x0 [min $x0 $x]
                set y0 [min $y0 $y]
@@ -711,7 +711,7 @@ itcl::class gaia::GaiaPolDisp {
       } else {
 
 #  If the bounding box of the vector centres has zero size (i.e. if there
-#  is only a single selected vector visible), use the bounding box of the 
+#  is only a single selected vector visible), use the bounding box of the
 #  whole vector.
          if { $x0 == $x1 || $y0 == $y1 } {
             lassign [$canvas_ bbox "S$disid_"] x0 y0 x1 y1
@@ -742,19 +742,19 @@ itcl::class gaia::GaiaPolDisp {
 #  First handle dragging of the key for $this.
       if { $root_item_ == "key" } {
 
-#  Find the shift in X and Y from the previous position to the supplied 
+#  Find the shift in X and Y from the previous position to the supplied
 #  current pointer position.
          set dx [expr $cx - $rootx_]
          set dy [expr $cy - $rooty_]
 
 #  Move each component of the key by this amount.
-         $canvas_ move $kbid_ $dx $dy         
-         $canvas_ move $klid_ $dx $dy         
-         $canvas_ move $kvid_ $dx $dy         
+         $canvas_ move $kbid_ $dx $dy
+         $canvas_ move $klid_ $dx $dy
+         $canvas_ move $kvid_ $dx $dy
 
 #  Save the current position.
-         set rootx_ $cx 
-         set rooty_ $cy 
+         set rootx_ $cx
+         set rooty_ $cy
 
 #  Do nothing if we are dragging the key for another GaiaPolDisp.
       } elseif { $root_item_ == "akey" } {
@@ -763,7 +763,7 @@ itcl::class gaia::GaiaPolDisp {
       } elseif { $selshape_ == "box" } {
 
 # Find the min and max values on each axis of the selected area. The
-# position at which the button was pressed (rootx_,rooty_) gives one 
+# position at which the button was pressed (rootx_,rooty_) gives one
 # corner of the box, and the current cursor position gives the other.
          if { $cx < $rootx_ } {
             set xmin $cx
@@ -795,9 +795,9 @@ itcl::class gaia::GaiaPolDisp {
 # Now handle circular vector selection...
       } elseif { $selshape_ == "circle" } {
 
-# Find the the coordinates of two diagonally opposite corners of a 
-# rectangular region enclosing the circle. The centre is the 
-# position at which the button was pressed (rootx_,rooty_), and the 
+# Find the the coordinates of two diagonally opposite corners of a
+# rectangular region enclosing the circle. The centre is the
+# position at which the button was pressed (rootx_,rooty_), and the
 # the current cursor position gives one corner.
          set dx [expr $cx - $rootx_]
          set dy [expr $cy - $rooty_]
@@ -821,7 +821,7 @@ itcl::class gaia::GaiaPolDisp {
       }
    }
 
-#  Ensure that there is an image over which vectors can be drawn. If we 
+#  Ensure that there is an image over which vectors can be drawn. If we
 #  have an image display, but no image is loaded, generate a dummy
 #  image.
 #  ---------------------------------------------------------------------
@@ -837,7 +837,7 @@ itcl::class gaia::GaiaPolDisp {
          if { ![catch {$cat mkImage $rtdimage_} mess] } {
 
 #  Zoom the image to fill the screen.
-            zoom_to_image 
+            zoom_to_image
 
 #  Enable the image options panel, since we now have an image.
             catch {[$image_ component info] configure -state normal}
@@ -858,10 +858,10 @@ itcl::class gaia::GaiaPolDisp {
       } else {
 
 #  If it is a blank image created by a GaiaPolDisp, then increment its
-#  reference count so long as this GaiaPolDisp has not already registered 
+#  reference count so long as this GaiaPolDisp has not already registered
 #  an interest in the image.
          if { !$blankimage_ && [info exists blankref_($rtdimage_)] } {
-            incr blankref_($rtdimage_) 
+            incr blankref_($rtdimage_)
             set blankimage_ 1
          }
       }
@@ -882,7 +882,7 @@ itcl::class gaia::GaiaPolDisp {
          resetBindings
 
 #  Remove all vectors displayed by this GaiaPolDisp.
-         $canvas_ delete $disid_ 
+         $canvas_ delete $disid_
 
 #  Ensure no flashing.
          setFlash 0 0
@@ -909,10 +909,10 @@ itcl::class gaia::GaiaPolDisp {
        return [$rtdimage_ convert coords $in_x $in_y $in_units {} {} $out_units]
    }
 
-#  Flash vectors by changing the colour of them. This method reschedules itself 
-#  each time it is called, toggling the value of argument on each time. It does 
-#  not reschedule itself is the appropriate data member (flashsel_ for selected 
-#  vectors or flashuns_ for unselected vectors) is set to a false value. Argument 
+#  Flash vectors by changing the colour of them. This method reschedules itself
+#  each time it is called, toggling the value of argument on each time. It does
+#  not reschedule itself is the appropriate data member (flashsel_ for selected
+#  vectors or flashuns_ for unselected vectors) is set to a false value. Argument
 #  sel indicates if the selected or unselected vectors are to be flashed. $col
 #  is the colour the vectors should have when visible.
 #  -----------------------------------------------------------------------
@@ -924,7 +924,7 @@ itcl::class gaia::GaiaPolDisp {
       } else {
          set more $flashuns_
          set tag "U$disid_"
-      }      
+      }
 
       if { $on || !$more } {
          if { $sel } {
@@ -940,7 +940,7 @@ itcl::class gaia::GaiaPolDisp {
 
       $canvas_ itemconfigure $tag -fill $c
 
-      if { $more } { 
+      if { $more } {
          after 500 [code $this flash $sel $on]
       }
 
@@ -972,8 +972,8 @@ itcl::class gaia::GaiaPolDisp {
       return [list [expr $x/$l] [expr $y/$l] ]
 
    }
-   
-#  Return the name (file or object name) of the currently loaded image, 
+
+#  Return the name (file or object name) of the currently loaded image,
 #  or empty if no image is loaded.
 #  -------------------------------------------------------------------
     protected method get_image_name {} {
@@ -988,7 +988,7 @@ itcl::class gaia::GaiaPolDisp {
 #  at the top right of the image (assuming normal viewing). If a key is
 #  already visible, re-display it so that it moves to the "reset" position.
 #  ---------------------------------------------------------------------
-   protected method KReset {} { 
+   protected method KReset {} {
       set klx_ ""
       set kly_ ""
       if { $klid_ != "" } {
@@ -1007,7 +1007,7 @@ itcl::class gaia::GaiaPolDisp {
          if { $lab_id_ != "" } {
 
 #  Delete the label.
-            $canvas_ delete $lab_id_ 
+            $canvas_ delete $lab_id_
 
 #  Get the current state of the vector.
             if { [info exists vstates_($vec_id_)] } {
@@ -1016,7 +1016,7 @@ itcl::class gaia::GaiaPolDisp {
                   set col [$style_ getSclr]
                } else {
                   set col [$style_ getUclr]
-               } 
+               }
 
             } else {
                set state "D"
@@ -1040,23 +1040,23 @@ itcl::class gaia::GaiaPolDisp {
             raiseKey
 
 #  Clear globals
-            set lab_id_ "" 
+            set lab_id_ ""
             set vec_id_ ""
             set vec_st_ ""
 	 }
-	 
+
 #  When entering, highlight the vector unless highlighting is not enabled. Do
-#  nothing if a label is already displayed.	 
+#  nothing if a label is already displayed.
       } elseif { $hgEnabled_ && $lab_id_ == "" } {
-      
+
 #  Format the vector length for the vector currently under the pointer.
          set vec_id_ [$canvas_ find withtag current]
          set text [format "$hgFmt_" $vlens_($vec_id_)]
-	 
+
 #  Ignore blank labels
          if { $text != "" } {
 
-#  Decide on the anchor position of the text to minimise the chance of the 
+#  Decide on the anchor position of the text to minimise the chance of the
 #  label obscuring the vector.
             lassign [$canvas_ coords $vec_id_] x0 y0 x1 y1
             if { ($x0-$x1)*($y0-$y1) < 0 } {
@@ -1065,32 +1065,32 @@ itcl::class gaia::GaiaPolDisp {
    	       set anc "sw"
             }
 
-#  Create the text label. This will be drawn on top of the vector, and so will 
+#  Create the text label. This will be drawn on top of the vector, and so will
 #  cause the vector no longer to be the current object. This will trigger the
 #  <LEAVE> binding, causing this method to be re-entered in order to erase the
 #  label, etc, etc. BUT... we do not yet set lab_id_ (which is checked by the
-#  above code), so the re-entered binding will do nothing, and we are saved 
-#  from an infinite loop.   
+#  above code), so the re-entered binding will do nothing, and we are saved
+#  from an infinite loop.
             set id [$canvas_ create text [$canvas_ canvasx $x] \
 	                                 [$canvas_ canvasy $y] \
 			      -text $text -anchor $anc \
 		              -fill $hgColour_ -font $hgFont_ ]
 
-#  NOW save the canvas identifier for the label.	 
+#  NOW save the canvas identifier for the label.
             set lab_id_ $id
-	 
+
 #  Highlight and raise this vector.
-            $canvas_ itemconfigure $vec_id_ -fill $hgColour_ 
+            $canvas_ itemconfigure $vec_id_ -fill $hgColour_
             $canvas_ raise $vec_id_
 
 #  Get the current state of the vector.
             set vec_st_ $vstates_($vec_id_)
-         }	 
+         }
       }
    }
 
-#  Find the anticlockwise angle in degrees from vertical (-ve canvas Y) to 
-#  north within the displayed image. If north varies over the image, then 
+#  Find the anticlockwise angle in degrees from vertical (-ve canvas Y) to
+#  north within the displayed image. If north varies over the image, then
 #  a blank value is returned.
 #  ---------------------------------------------------------------------
    protected method meanNth {equ} {
@@ -1099,7 +1099,7 @@ itcl::class gaia::GaiaPolDisp {
       set wd [$rtdimage_ width]
       set ht [$rtdimage_ height]
 
-#  Find the anti-clockwise angle from -ve canvas Y to north at the 4 
+#  Find the anti-clockwise angle from -ve canvas Y to north at the 4
 #  corners of the image and at the middle (in radians).
       set n(1) [fndNth 0 0 $equ]
       set n(2) [fndNth 0 $ht $equ]
@@ -1126,7 +1126,7 @@ itcl::class gaia::GaiaPolDisp {
          set mnsn [expr $sms / 5.0 ]
          set mncs [expr $smc / 5.0 ]
 
-#  Find the cos of the angular deviation between the first north value and 
+#  Find the cos of the angular deviation between the first north value and
 #  the mean north value.
          set dev [expr $mncs*[lindex $n(1) 0] + $mnsn*[lindex $n(1) 1]]
 
@@ -1157,17 +1157,17 @@ itcl::class gaia::GaiaPolDisp {
          set y [expr -($x)]
       } else {
          set y $x
-      } 
+      }
 
-#  Split the absolute number into a power of ten (n) and a mantissa (a) 
-#  between zero and ten.   
+#  Split the absolute number into a power of ten (n) and a mantissa (a)
+#  between zero and ten.
       set l [expr log10($y)]
       set n [expr floor($l)]
       set a [expr pow(10.0,($l-$n) )]
 
-#  Convert the mantissa into a nice round number (the closest of 1, 2, 
+#  Convert the mantissa into a nice round number (the closest of 1, 2,
 #  4 or 5). If the mantissa is above 7.5, use 1 and increase the exponent
-#  by 1.   
+#  by 1.
       if { $a < 1.5 } {
          set a 1
       } elseif { $a < 3 } {
@@ -1178,17 +1178,17 @@ itcl::class gaia::GaiaPolDisp {
          set a 5
       } else {
          set a 1
-         set n [expr $n + 1]   
+         set n [expr $n + 1]
       }
 
-#  Return the combination of the exponent and mantissa, with the correct 
+#  Return the combination of the exponent and mantissa, with the correct
 #  sign.
       if { $x < 0.0 } {
          return [expr -($a*pow(10.0, $n))]
       } else {
          return [expr ($a*pow(10.0, $n))]
-      } 
-   }  
+      }
+   }
 
 #  Draw new vectors or reconfigure existing vectors.
 #  -------------------------------------------------
@@ -1198,10 +1198,10 @@ itcl::class gaia::GaiaPolDisp {
       set ret 0
 
 #  Get data from the catalogue. This is a list of rows, in which
-#  each row is a list of column values. 
+#  each row is a list of column values.
       set data [$cat getData]
 
-#  Get access to an array of row states (selected, unselected, deleted) 
+#  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
       upvar 0 [$cat getStates] states
 
@@ -1219,11 +1219,11 @@ itcl::class gaia::GaiaPolDisp {
       set nvec [$style getNvec]
 
 #  Store the probability of skipping over any single vector.
-      if { $nvec != "" } { 
-         set prob [expr 1.0 - (double($nvec)/double($ntot))] 
+      if { $nvec != "" } {
+         set prob [expr 1.0 - (double($nvec)/double($ntot))]
       } else {
          set prob 0.0
-      } 
+      }
 
 #  Get the indices of the columns defining vector length (in arbitrary
 #  units) and angle (in degrees anti-clockwise from the reference
@@ -1251,9 +1251,9 @@ itcl::class gaia::GaiaPolDisp {
       set rot [$style getArot]
 
 #  Get the pixel origin of the displayed image. If the vectors are
-#  displayed over a blank image use the lower pixel bounds stored with 
+#  displayed over a blank image use the lower pixel bounds stored with
 #  the catalogue. Otherwise, use the origin of the displayed ndf.
-      if { [info exists blankref_($rtdimage_)] && 
+      if { [info exists blankref_($rtdimage_)] &&
            $blankref_($rtdimage_) > 0 } {
          lassign [$cat getPixBounds] xo yo xh yh
       } else {
@@ -1274,12 +1274,12 @@ itcl::class gaia::GaiaPolDisp {
             set equ [$cat getEquinox]
 
 #  See if north is in the same direction over the entire image. If so,
-#  the anti-clockwise angle in degrees from upwards (-ve Y) to north is 
+#  the anti-clockwise angle in degrees from upwards (-ve Y) to north is
 #  returned. Otherwise, a blank string is returned.
             set north [meanNth $equ]
 
 #  If the angle is fixed, add it onto the rot value. Also store the name
-#  of the procedure to use to find the canvas coords at the end points of 
+#  of the procedure to use to find the canvas coords at the end points of
 #  the vector.
             if { $north != "" } {
                set rot [expr $rot + $north]
@@ -1289,10 +1289,10 @@ itcl::class gaia::GaiaPolDisp {
             }
 
 #  Store units.
-            set units "deg $equ" 
+            set units "deg $equ"
 
 #  Store zero offsets
-            set ox 0 
+            set ox 0
             set oy 0
 
          } else {
@@ -1310,8 +1310,8 @@ itcl::class gaia::GaiaPolDisp {
          if { $col1 >= 0 && $col2 >= 0 } {
 
 #  If the catalogue does have WCS but the image does not, the angles in the
-#  catalogue will be relative to north, but we will not know where north 
-#  is because the image does not have WCS. Issue a warning and assume 
+#  catalogue will be relative to north, but we will not know where north
+#  is because the image does not have WCS. Issue a warning and assume
 #  that north is upwards. Only do this if the warning has not already been
 #  issued.
             if { [$cat gotWcs] && ![$cat getWarned] } {
@@ -1323,7 +1323,7 @@ itcl::class gaia::GaiaPolDisp {
             set ox $ox_
             set oy $oy_
 
-#  Store the name of the procedure to use to find the canvas coords at the 
+#  Store the name of the procedure to use to find the canvas coords at the
 #  end points of the vector.
             set draw draw1
 
@@ -1338,23 +1338,23 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Check for and remove the "pretend" option "-flash" in the options setting
 #  string for unselected vectors.
-      set gotuflash [regexp {\-flash +([0-9]+)} $usty match uflash] 
+      set gotuflash [regexp {\-flash +([0-9]+)} $usty match uflash]
       if { $gotuflash } {
          regsub {\-flash +([0-9]+)} $usty "" newsty
-         set usty $newsty 
+         set usty $newsty
       }
 
 #  Check for and remove the "pretend" option "-flash" in the options setting
 #  string for selected vectors.
-      set gotsflash [regexp {\-flash +([0-9]+)} $ssty match sflash] 
+      set gotsflash [regexp {\-flash +([0-9]+)} $ssty match sflash]
       if { $gotsflash } {
          regsub {\-flash +([0-9]+)} $ssty "" newsty
-         set ssty $newsty 
+         set ssty $newsty
       }
 
 #  Set up the progress bar accordingly.
       set inc [expr ($nrow+19)/20]
-      set irow -1 
+      set irow -1
       set j -1
       $pbar_ config -to $nrow
       update idletasks
@@ -1393,7 +1393,7 @@ itcl::class gaia::GaiaPolDisp {
 #  for this row.
          if { $state == "D" } {
             if { $cid != "" } {
-               $canvas_ addtag "DD" withtag $cid 
+               $canvas_ addtag "DD" withtag $cid
                unset vstates_($cid)
                unset vlens_($cid)
                unset vrows_($cid)
@@ -1404,14 +1404,14 @@ itcl::class gaia::GaiaPolDisp {
 
                set cid ""
                set newcid 1
-            }               
+            }
 
 #  Otherwise, the required state is "selected" or "unselected".
          } else {
 
 #  If no canvas item currently exists for this vector, create one now,
-#  initially invisible. Skip over each vector with a probability of $prob, 
-#  in order to keep the number of displayed vectors down to something like 
+#  initially invisible. Skip over each vector with a probability of $prob,
+#  in order to keep the number of displayed vectors down to something like
 #  $nvec.
             if { $cid == "" && $prob <= [random] } {
 
@@ -1443,7 +1443,7 @@ itcl::class gaia::GaiaPolDisp {
                      set cid [$canvas_ create line $cx $cy $ex $ey -fill "" \
                                  -tags $disid_]
 #  Increment the number of new vectors created by this call.
-                     incr ret 
+                     incr ret
 
 #  Save information about this canvas item.
                      set vlens_($cid) $lval
@@ -1453,16 +1453,16 @@ itcl::class gaia::GaiaPolDisp {
                }
             }
 
-#  Now tag the canvas item appropriately for the required state. Note, we may 
-#  still not have a canvas item since the vector may have zero length, so 
+#  Now tag the canvas item appropriately for the required state. Note, we may
+#  still not have a canvas item since the vector may have zero length, so
 #  check $cid first.
             if { $cid != "" } {
                if { $state == "U" } {
-                  $canvas_ addtag "UU" withtag $cid 
+                  $canvas_ addtag "UU" withtag $cid
                   set vstates_($cid) "U"
 
                } else {
-                  $canvas_ addtag "SS" withtag $cid 
+                  $canvas_ addtag "SS" withtag $cid
                   set vstates_($cid) "S"
                }
             }
@@ -1475,22 +1475,22 @@ itcl::class gaia::GaiaPolDisp {
              } else {
                 unset vectors_($row)
              }
-         }             
+         }
       }
 
 #  Now configured the canvas items appropriately for the required states,
-#  and assign the correct tag. 
+#  and assign the correct tag.
       eval $canvas_ itemconfigure UU $usty
       $canvas_ dtag UU "S$disid_"
       $canvas_ addtag "U$disid_" withtag UU
-      $canvas_ dtag UU 
+      $canvas_ dtag UU
 
       eval $canvas_ itemconfigure SS $ssty
       $canvas_ dtag SS "U$disid_"
-      $canvas_ addtag "S$disid_" withtag SS 
-      $canvas_ dtag SS 
+      $canvas_ addtag "S$disid_" withtag SS
+      $canvas_ dtag SS
 
-      $canvas_ delete DD 
+      $canvas_ delete DD
 
 #  Raise all selected vectors.
       $canvas_ raise "S$disid_"
@@ -1502,7 +1502,7 @@ itcl::class gaia::GaiaPolDisp {
       if { $gotsflash } { setFlash 1 $sflash }
 
 #  Return the number of new vectors created by this call.
-      return $ret 
+      return $ret
 
    }
 
@@ -1520,7 +1520,7 @@ itcl::class gaia::GaiaPolDisp {
 #  -----------------------------------------------------------------
    protected method ReleaseBind {x y} {
 
-#  If we have been dragging the key, save the new image coords of the centre 
+#  If we have been dragging the key, save the new image coords of the centre
 #  of the text label.
       if { $root_item_ == "key" } {
          lassign [$canvas_ bbox $klid_] lx0 ly0 lx1 ly1
@@ -1534,19 +1534,19 @@ itcl::class gaia::GaiaPolDisp {
 #  We have no selection as yet
          set type ""
 
-#  Find the bounds of the box or circle to be searched. 
+#  Find the bounds of the box or circle to be searched.
          if { $sarea_ != "" } {
-            set x1 [lindex $sarea_ 0] 
-            set y1 [lindex $sarea_ 1] 
-            set x2 [lindex $sarea_ 2] 
-            set y2 [lindex $sarea_ 3] 
+            set x1 [lindex $sarea_ 0]
+            set y1 [lindex $sarea_ 1]
+            set x2 [lindex $sarea_ 2]
+            set y2 [lindex $sarea_ 3]
 
 #  Delete the selection box or circle.
             $canvas_ delete selreg
             set sarea_ ""
 
 #  Set the type of selection to "box" or "circle".
-            set type $selshape_ 
+            set type $selshape_
 
 #  If no region was given...
          } else {
@@ -1554,7 +1554,7 @@ itcl::class gaia::GaiaPolDisp {
 #  If the button was clicked over a vector, set the selection type to
 #  "row".
             if { $root_item_ == "vector" } {
-               set type "rows" 
+               set type "rows"
 
 #  Otherwise, use a small box or circle centred on the root position.
             } else {
@@ -1562,7 +1562,7 @@ itcl::class gaia::GaiaPolDisp {
                set y1 [expr $rooty_ - 4]
                set x2 [expr $rootx_ + 4]
                set y2 [expr $rooty_ + 4]
-               set type $selshape_ 
+               set type $selshape_
             }
          }
 
@@ -1661,7 +1661,7 @@ itcl::class gaia::GaiaPolDisp {
             canvasbind $this $canvas_ $image_id_ <Control-Shift-ButtonPress-1> add "[code $this SingleBind %x %y 0]"
          }
 
-#  Now set up bindings for the image so that procedure SingleBind is called 
+#  Now set up bindings for the image so that procedure SingleBind is called
 #  when button 1 is pressed over any vector drawn by this class. If the
 #  shift and control keys are also pressed, set the 3rd arg to 1.
          canvasbind $this $canvas_ $disid_ <ButtonPress-1> add "[code $this SingleBind %x %y 1]"
@@ -1679,7 +1679,7 @@ itcl::class gaia::GaiaPolDisp {
       }
    }
 
-#  Switch flashing on or off 
+#  Switch flashing on or off
 #  -------------------------
    protected method setFlash {sel flash} {
       if { $sel } {
@@ -1706,7 +1706,7 @@ itcl::class gaia::GaiaPolDisp {
             }
          }
       }
-   }      
+   }
 
 #  Indicate what is going on.
 #  --------------------------
@@ -1732,16 +1732,16 @@ itcl::class gaia::GaiaPolDisp {
          if { $root_id_ == "" } {
             set root_item_ ""
 
-#  Otherwise, get a list of tags for the item under the pointer. 	 
+#  Otherwise, get a list of tags for the item under the pointer.
          } else {
             set tags [$canvas_ gettags $root_id_]
 
-#  If the current item is part of the key created by this PolDisp, then note 
+#  If the current item is part of the key created by this PolDisp, then note
 #  it.
             if { $root_id_ == $kbid_ || $root_id_ == $klid_ || $root_id_ == $kvid_ } {
                set root_item_ key
 
-#  If the current item is part of the key created by another PolDisp, then 
+#  If the current item is part of the key created by another PolDisp, then
 #  note it.
             } elseif { [lsearch -exact $tags PolKey] != -1 } {
                set root_item_ akey
@@ -1781,7 +1781,7 @@ itcl::class gaia::GaiaPolDisp {
 
 
 #  Zoom to a displayed region. The arguments are the canvas coords of the
-#  bounding box to be zoomed into. 
+#  bounding box to be zoomed into.
 #  ----------------------------------------------------------------------
    protected method zoom_to_region {x0 y0 x1 y1} {
       set dw [$image_ dispwidth]
@@ -1828,7 +1828,7 @@ itcl::class gaia::GaiaPolDisp {
          $image_ scale $scale $scale
          update idletasks
 
-#  Now scroll to new position. Get the new bounding box for the rectangle 
+#  Now scroll to new position. Get the new bounding box for the rectangle
 #  created above, and then delete the item.
          lassign [$canvas_ bbox $box_id] x0 y0 x1 y1
          $canvas_ delete $box_id
@@ -1846,13 +1846,13 @@ itcl::class gaia::GaiaPolDisp {
 #  ======================
 
 #  Allows a GaiaPolDisp to register or de-register bindings with a given
-#  widget. $disp is the GaiaPolDisp, $w is the widget, $ev is the event, 
-#  $opt is "add" or "remove", $cmd is the command to be bound to the event 
+#  widget. $disp is the GaiaPolDisp, $w is the widget, $ev is the event,
+#  $opt is "add" or "remove", $cmd is the command to be bound to the event
 #  (only used if $opt is "add").
 #
 #  Any bindings which exist before the first GaiaPolDisp is created are
 #  saved and removed before binding the supplied command to the event.
-#  These original bindings are re-instated when the bindigns for the final 
+#  These original bindings are re-instated when the bindigns for the final
 #  active GaiaPolDisp are removed.
 #  ----------------------------------------------------------------------
    proc widgetbind {disp w ev opt cmd} {
@@ -1888,9 +1888,9 @@ itcl::class gaia::GaiaPolDisp {
 #  Remove all bindings from the widget for this event.
          bind $w $ev ""
 
-#  Get a list of any bindings for the GaiaPolDisp class which now 
+#  Get a list of any bindings for the GaiaPolDisp class which now
 #  need to be reinstated.
-         set bs [array names wbind_ "*,$w,$ev" ]         
+         set bs [array names wbind_ "*,$w,$ev" ]
 
 #  If there are now none left, reinstate the original bindings present
 #  before the first active GaiaPolDisp was created.
@@ -1910,13 +1910,13 @@ itcl::class gaia::GaiaPolDisp {
    }
 
 #  Allows a GaiaPolDisp to register or de-register bindings with a given
-#  canvas item. $disp is the GaiaPolDisp, $c is the canvas, $tag is the 
-#  item, $ev is the event, $opt is "add" or "remove", $cmd is the 
+#  canvas item. $disp is the GaiaPolDisp, $c is the canvas, $tag is the
+#  item, $ev is the event, $opt is "add" or "remove", $cmd is the
 #  command to be bound to the event (only used if $opt is "add").
 #
 #  Any bindings which exist before the first GaiaPolDisp is created are
 #  saved and removed before binding the supplied command to the event.
-#  These original bindings are re-instated when the bindigns for the final 
+#  These original bindings are re-instated when the bindigns for the final
 #  active GaiaPolDisp are removed.
 #  ----------------------------------------------------------------------
    proc canvasbind { disp c tag ev opt cmd} {
@@ -1952,9 +1952,9 @@ itcl::class gaia::GaiaPolDisp {
 #  Remove all bindings from the canvas item for this event.
          $c bind $tag $ev ""
 
-#  Get a list of any bindings for the GaiaPolDisp class which now 
+#  Get a list of any bindings for the GaiaPolDisp class which now
 #  need to be reinstated.
-         set bs [array names cbind_ "*,$c,$tag,$ev"]         
+         set bs [array names cbind_ "*,$c,$tag,$ev"]
 
 #  If there are now none left, reinstate the original bindings present
 #  before the first active GaiaPolDisp was created.
@@ -1978,19 +1978,19 @@ itcl::class gaia::GaiaPolDisp {
    proc random {} {
       set r_ [expr fmod( $r_*41475557.0, 1.0 )]
       return $r_
-   } 
+   }
 
 #  Returns the canvas coords of the two ends of a vector (angles
 #  specified relative to -ve canvas Y axis ("upwards") ).
 #
 #     rtdim - The rtdimage on which the vector is to be drawn
-#     a1 a2 - The vector position 
+#     a1 a2 - The vector position
 #     units - The units of a1 and a2 ("image" or "deg $equ")
 #     xsz   - Width of an image pixel in canvas units
 #     ysz   - Height of an image pixel in canvas units
 #     len   - length of the vector in image pixels
-#     ang   - anticlockwise angle from upwards (-ve canvas Y) to the vector, 
-#             in radians. 
+#     ang   - anticlockwise angle from upwards (-ve canvas Y) to the vector,
+#             in radians.
 #     ncx ncy - Names of variables to receive the canvas X,Y at one end
 #               of the vector.
 #     nex ney - Names of variables to receive the canvas X,Y at the other
@@ -2010,7 +2010,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Convert the given position to canvas coords.
       $rtdim convert coords $a1 $a2 $units px py "canvas"
 
-#  Correct by adding 0.5 onto each (why is this necessary? without it 
+#  Correct by adding 0.5 onto each (why is this necessary? without it
 #  vectors are plotted half a pixel out when plotted over an existing
 #  image). Catch errors caused by non-numeric pos values (eg "-inf").
       if { ![catch {set px [expr $px + 0.5]}] &&
@@ -2020,9 +2020,9 @@ itcl::class gaia::GaiaPolDisp {
          if { ![catch {set ss [expr abs( $px ) + abs( $py ) ]}] &&
               $ss < 1.0E20 } {
 
-#  Get canvas coords at the two ends of the vector. 
-            set dx [expr $xsz*$len*0.5*sin( $ang )] 
-            set dy [expr $ysz*$len*0.5*cos( $ang )] 
+#  Get canvas coords at the two ends of the vector.
+            set dx [expr $xsz*$len*0.5*sin( $ang )]
+            set dy [expr $ysz*$len*0.5*cos( $ang )]
             set cx [expr $px + $dx]
             set cy [expr $py + $dy]
             set ex [expr $px - $dx]
@@ -2040,7 +2040,7 @@ itcl::class gaia::GaiaPolDisp {
 #     xsz   - Width of an image pixel in canvas units
 #     ysz   - Height of an image pixel in canvas units
 #     len   - length of the vector in image pixels
-#     ang   - anticlockwise angle from north to the vector, in radians. 
+#     ang   - anticlockwise angle from north to the vector, in radians.
 #     ncx ncy - Names of variables to receive the canvas X,Y at one end
 #               of the vector.
 #     nex ney - Names of variables to receive the canvas X,Y at the other
@@ -2060,11 +2060,11 @@ itcl::class gaia::GaiaPolDisp {
 #  Convert the supplied position to canvas coords.
       $rtdim convert coords $a1 $a2 $units px py "canvas"
 
-#  Convert a second position about 1 arcsec to the north of the supplied 
+#  Convert a second position about 1 arcsec to the north of the supplied
 #  position.
       $rtdim convert coords $a1 [expr $a2 + 0.0003 ] $units px2 py2 "canvas"
 
-#  Correct by adding 0.5 onto each (why is this necessary? without it 
+#  Correct by adding 0.5 onto each (why is this necessary? without it
 #  vectors are plotted half a pixel out when plotted over an existing
 #  image). Catch errors caused by non-numeric pos values (eg "-inf").
       if { ![catch {set px [expr $px + 0.5]}] &&
@@ -2076,7 +2076,7 @@ itcl::class gaia::GaiaPolDisp {
          if { ![catch {set ss [expr abs( $px ) + abs( $py ) + abs( $px2 ) + abs( $py2 )]}] &&
                        $ss < 1.0E20 } {
 
-#  Get canvas coords at the two ends of the vector. 
+#  Get canvas coords at the two ends of the vector.
             set cos [expr cos( $ang )]
             set sin [expr sin( $ang )]
             set ofx [expr $px - $px2]
@@ -2102,7 +2102,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Options:
 #  ========
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -2110,7 +2110,7 @@ itcl::class gaia::GaiaPolDisp {
       variable blankimage_ 0
 
 #  A command to call to add an undoable action to the current list of
-#  undoable actions. The command is called with 3 args; 
+#  undoable actions. The command is called with 3 args;
 #  1 - the string "cat" or "style" indicating if a cat or style has changed
 #  2 - a pointer to the new cat or style object
 #  3 - a description of the action which created the new cat or style
@@ -2153,7 +2153,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Name of GaiaImageCtrl widget.
       variable image_ ""
 
-#  The canvas id of the image.  
+#  The canvas id of the image.
       variable image_id_ ""
 
 #  Key options...
@@ -2226,16 +2226,16 @@ itcl::class gaia::GaiaPolDisp {
       variable vec_st_ ""
 
 #  An array of canvas IDs, indexed by catalogue row number.
-      variable vectors_ 
+      variable vectors_
 
 #  An array of vector lengths indexed by vector canvas ID.
-      variable vlens_ 
+      variable vlens_
 
 #  An array of row indices indexed by vector canvas ID.
-      variable vrows_ 
+      variable vrows_
 
 #  An array of vector states ("U" or "S") indexed by vector canvas ID.
-      variable vstates_ 
+      variable vstates_
 
 #  Top level window.
       variable w_ ""
@@ -2246,21 +2246,21 @@ itcl::class gaia::GaiaPolDisp {
 #  Common (i.e. static) data members:
 #  ==================================
 
-#  An array of canvas item binding scripts, indexed by ($canvas,$tag,$event). 
-#  These are the bindings which existed before the first GaiaPolDisp was 
+#  An array of canvas item binding scripts, indexed by ($canvas,$tag,$event).
+#  These are the bindings which existed before the first GaiaPolDisp was
 #  created.
    common cobind_
 
-#  An array of canvas item binding scripts, indexed by 
-#  ($this,$canvas,$tag,$event). These are the bindings which are created by 
+#  An array of canvas item binding scripts, indexed by
+#  ($this,$canvas,$tag,$event). These are the bindings which are created by
 #  instances of GaiaPolDisp.
    common cbind_
 
-#  An array of widget binding scripts, indexed by ($widget,$event). These are 
+#  An array of widget binding scripts, indexed by ($widget,$event). These are
 #  the bindings which existed before the first GaiaPolDisp was created.
    common wobind_
 
-#  An array of widget binding scripts, indexed by ($this,$widget,$event). 
+#  An array of widget binding scripts, indexed by ($this,$widget,$event).
 #  These are the bindings which are created by instances of GaiaPolDisp.
    common wbind_
 

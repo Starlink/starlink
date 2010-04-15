@@ -41,7 +41,7 @@
 *                     for preconnected streams and setting of the
 *                     newly introduced ISPREC flag (S434).
 *     30/01/91  PLP   Changed runtime filenames for release 1.32.
-*     07/02/91  PLP   Added preconnection flag setting ERPREC for 
+*     07/02/91  PLP   Added preconnection flag setting ERPREC for
 *                     the error logfile(S441).
 *     24/02/91  PLP   Changed runtime filenames for release 1.33.
 *     24/02/91  PLP   Changed runtime filenames for release 1.34.
@@ -176,7 +176,7 @@
 *       searched for a filename to open.  If no such name is found error
 *       26 is set and KNIL returned in ICHAN.  These workstations aren't
 *       interactive,  so ISWKT(KWKIX) is set to false.
-*       
+*
 *     KFWKT
 *       Interactive workstations are opened on pairs of consecutive
 *       LUNs.  If the preconnected streams to the control tty (5 and 6)
@@ -189,7 +189,7 @@
 *       When an interactive workstation connection is opened, then the
 *       GKS break character is guaranteed using GKIOSB and ISWKT(KWKIX)
 *       is set to true.
-*     
+*
 *-----------------------------------------------------------------------
 
 * WDT File - closes Error Message File
@@ -328,7 +328,7 @@
             ISPREC(KWKIX) = .TRUE.
           ELSE
 *           Search for a suitable environment variable.  Open the system
-*           default file if the variable isn't found. Set the preconnected 
+*           default file if the variable isn't found. Set the preconnected
 *           flag to FALSE.
             ISPREC(KWKIX) = .FALSE.
             WRITE(ENVCON, '(A, I2.2)') 'GCON', KEY2
@@ -336,7 +336,7 @@
 *           Make sure files will not be overwritten - select a new
 *           filename if that supplied already exists.
             IF (LNBLNK(FNAME).EQ.0) THEN
-*              Construct default filename when the environment variable is 
+*              Construct default filename when the environment variable is
 *              not found. Follow the Unix pattern: fort.x, where x is the
 *              connection ID.
                FNAME='fort'
@@ -345,21 +345,21 @@
                WRITE(AXS(1:LFIELD+1), FORM)'.', KEY2
                NMEND=LNBLNK(FNAME)
                FNAME(NMEND+1:NMEND+LFIELD+1)=AXS(1:LFIELD+1)
-            ENDIF 
+            ENDIF
             NFNAME=FNAME
             NMEND=LNBLNK(NFNAME)
 *           Check whether file exists or not.
             DO 100 J=1,MAXNFA
                LFIELD=INT(ALOG10(FLOAT(J))) + 1
                INQUIRE(FILE=NFNAME, EXIST=THERE)
-               IF(THERE) THEN 
+               IF(THERE) THEN
 *                The file NFNAME exists - append .J to its end and check again.
                  FORM(6:6)= GKAN1(LFIELD+48)
                  WRITE(NFNAME(NMEND+1:NMEND+LFIELD+1),FORM)'.', J
                ELSE
 *                The file NFNAME does not exist - leave the loop.
                  GOTO 200
-               ENDIF 
+               ENDIF
   100       CONTINUE
 *           MAXFNA attempts to construct a non-existent filename and
 *           no luck - give up!

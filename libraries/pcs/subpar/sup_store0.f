@@ -3,21 +3,21 @@
 *+
 *  Name:
 *     SUBPAR_STORE0
- 
+
 *  Purpose:
 *     Create storage and store a value, returning locator for storage
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_STORE0( NAMECODE, ACTION, STRING, SLEN, LOC, STATUS)
- 
+
 *  Description:
 *     Create parameter storage of the correct type and store the value,
 *     converting the given string to the required type.
 *     Return a locator for the storage.
- 
+
 *  Arguments:
 *     NAMECODE = INTEGER (given)
 *        Name code for parameter
@@ -31,7 +31,7 @@
 *        The locator for the storage
 *     STATUS = INTEGER (given and returned)
 *        Global status
- 
+
 *  Copyright:
 *     Copyright (C) 1998, 1999 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -41,12 +41,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -54,29 +54,29 @@
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
- 
+
 *  History:
 *     16-DEC-1998 (AJC):
 *        Original version
 *     18-MAY-1999 (AJC):
 *        Removed unused CHR_LEN
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'SUBPAR_ERR'
       INCLUDE 'SUBPAR_PAR'
       INCLUDE 'LEX_PAR'
- 
+
 *  Arguments Given:
       INTEGER NAMECODE
       INTEGER ACTION
@@ -85,19 +85,19 @@
 
 *  Arguments Returned:
       CHARACTER*(DAT__SZLOC) LOC
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
+
 *  External routines :
       INTEGER STRING_IANYL       ! Index to character within string
- 
+
 *  Local Constants:
       CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
- 
+
 *  Local Variables:
       INTEGER TYPE                ! Declared type of parameter
       CHARACTER*15 HDSTYPE        ! Type of object to create
@@ -106,19 +106,19 @@
       INTEGER I                   ! miscellaneous pointer
 
 *  Local Data:
-      DATA POSTYPES/'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER', 
+      DATA POSTYPES/'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
      :     '_LOGICAL'/
 *.
- 
+
        IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       TYPE = MOD( PARTYPE(NAMECODE), 10 )
       IF ( TYPE.GT.5 ) THEN
          STATUS = SUBPAR__IVPRTYPE
-         CALL EMS_REP('SUP_STORE07', 
+         CALL EMS_REP('SUP_STORE07',
      :     'SUBPAR_STORE0: Invalid parameter type - '
      :     //'system error', STATUS)
- 
+
       ELSE
          IF ( TYPE .NE. SUBPAR__NOTYPE ) THEN
             HDSTYPE = POSTYPES(TYPE)
@@ -149,14 +149,14 @@
          END IF
 
 *  Now create HDS component of the right type and store the value
-         CALL SUBPAR_CRINT( NAMECODE, HDSTYPE, 0, DIMS, LOC, 
+         CALL SUBPAR_CRINT( NAMECODE, HDSTYPE, 0, DIMS, LOC,
      :      STATUS)
          CALL SUBPAR_PUT( LOC, HDSTYPE, 0, DIMS,
      :      STRING(1:SLEN), STATUS)
          IF ( STATUS .NE. SAI__OK ) THEN
-            CALL SUBPAR_CANCL( NAMECODE, STATUS ) 
+            CALL SUBPAR_CANCL( NAMECODE, STATUS )
          END IF
 
       END IF
- 
+
       END

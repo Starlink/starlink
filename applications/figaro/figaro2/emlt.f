@@ -5,14 +5,14 @@ C     E M L T
 C
 C     Figaro version of the original SDRSYS routine EMLT, which analyses
 C     emission lines in a spectrum, fitting gaussians to the strongest
-C     lines and logging their positions, widths and centers.  
-C     Optionally, it will also give line centers using a centre of 
-C     moment analysis, and can also produce a synthetic spectrum 
-C     generated from the positions and widths of the located lines.  
-C     Note: Figaro and SDRSYS differ in their pixel numbering, Figaro 
+C     lines and logging their positions, widths and centers.
+C     Optionally, it will also give line centers using a centre of
+C     moment analysis, and can also produce a synthetic spectrum
+C     generated from the positions and widths of the located lines.
+C     Note: Figaro and SDRSYS differ in their pixel numbering, Figaro
 C     counting from 1 and SDRSYS counting from 0, so there will be a
 C     discrepancy of 1 between the output from the two versions for any
-C     pixel-number values; wavelength values produced by the two should 
+C     pixel-number values; wavelength values produced by the two should
 C     be the same.
 C
 C     Parameters -
@@ -34,7 +34,7 @@ C                 generated.
 C
 C     Keywords -
 C
-C     MOMENTS     If specified, a center of moment analysis is also 
+C     MOMENTS     If specified, a center of moment analysis is also
 C                 performed on all lines found.
 C     SYNTH       If specified, a synthetic spectrum is generated.
 C
@@ -42,7 +42,7 @@ C     User variables -  (">" input, "<" output)
 C
 C     (<) EMLT_LINES    (Real) Number of lines found.
 C     (<) EMLT_BIN      (Real array) List of line centres (pixels).
-C     (<) EMLT_POS      (Real array) List of line centres (wavelength 
+C     (<) EMLT_POS      (Real array) List of line centres (wavelength
 C                                    units).
 C     (<) EMLT_FWHM_BIN (Real array) List of FWHM (pixels).
 C     (<) EMLT_FWHM_ANG (Real array) List of FWHM (wavelength units).
@@ -51,7 +51,7 @@ C     (<) EMLT_PEAK     (Real array) List of peak heights.
 C
 C                                               KS / AAO  4th March 1988
 C     Modified:
-C  
+C
 C     16 Aug 1988  Some output formatting problems corrected.  KS/AAO.
 C     25 Jan 1989  Bug in dispersion calculation when only a subset of
 C                  the data used now corrected.  KS/AAO.
@@ -91,11 +91,11 @@ C
       INTEGER   AXDIMS(6)        ! Axis array dimensions
       INTEGER   BINPTR           ! Dynamic-memory pointer for workspace
                                  ! array
-      INTEGER   BNAPTR           ! Dynamic-memory pointer for workspace 
+      INTEGER   BNAPTR           ! Dynamic-memory pointer for workspace
       INTEGER   BYTES            ! Number of bytes in one cross-section
       LOGICAL   CALIB            ! Axis is calibrated (not just 1..NX)?
       INTEGER   DIMS(6)          ! Data array dimensions
-      INTEGER   DPTR             ! Dynamic-memory pointer for spectral 
+      INTEGER   DPTR             ! Dynamic-memory pointer for spectral
                                  ! data
       DOUBLE PRECISION DUMMY     ! Dummy numeric argument
       INTEGER   FAPTR            ! Dynamic-memory pointer for workspace
@@ -105,7 +105,7 @@ C
       INTEGER   IPTR             ! Dynamic-memory pointer for input data
       LOGICAL   ISNEW            ! Is address new to CNF?
       LOGICAL   ISNEWX           ! Is XPTR address new to CNF?
-      INTEGER   ISPEC            ! Loop index through data 
+      INTEGER   ISPEC            ! Loop index through data
                                  ! cross-sections
       INTEGER   IXEN             ! Last spectral element to be used
       INTEGER   IXSPEC           ! Counts through axis cross-sections
@@ -123,7 +123,7 @@ C
                                  ! FIG_EMLT
       INTEGER   NSPECT           ! Number of spectra in data
       INTEGER   NX               ! First dimension of data array
-      INTEGER   OPTR             ! Dynamic-memory pointer for output 
+      INTEGER   OPTR             ! Dynamic-memory pointer for output
                                  ! data
       INTEGER   PKPTR            ! Dynamic-memory pointer for workspace
       LOGICAL   PISNEW           ! Previous CNF pointer new?
@@ -132,14 +132,14 @@ C
       INTEGER   STAPTR           ! Dynamic-memory pointer for workspace
       INTEGER   STATUS           ! Running status for DSA_ routines
       CHARACTER STRING*20        ! Used for formatting spectrum numbers
-      INTEGER   STRPTR           ! Dynamic-memory pointer for workspace 
+      INTEGER   STRPTR           ! Dynamic-memory pointer for workspace
                                  ! array
       LOGICAL   SYNTH            ! Value of SYNTH keyword
       INTEGER   TPTR             ! Temp dynamic-memory pointer
       CHARACTER UNITS*10         ! Axis units
       REAL      VALUE            ! Real value of numeric parameter
       REAL      WEND             ! Last axis value - ignored
-      INTEGER   WIDPTR           ! Dynamic-memory pointer for workspace 
+      INTEGER   WIDPTR           ! Dynamic-memory pointer for workspace
                                  ! array
       INTEGER   WPTR             ! Dynamic-memory pointer for workspace
                                  ! array
@@ -227,7 +227,7 @@ C
 C
 C     We have to be a little bit careful about the data array we pass
 C     to FIG_EMLT, since it modifies it in the course of its analysis.
-C     If we are creating a synthetic spectrum, this is fine, since we 
+C     If we are creating a synthetic spectrum, this is fine, since we
 C     can just pass it the original contents of the output array (which
 C     match the input), let it clobber it, and then let it write the
 C     synthetic spectrum into it.  If we just have an input spectrum
@@ -254,7 +254,7 @@ C
 C     Now we loop through all the spectra in the DATA.  If we are
 C     producing a synthetic spectrum, we can just pass FIG_EMLT the
 C     output array.  Otherwise, we copy the data into the work array
-C     first.  If the data is wavelength calibrated, we have to run 
+C     first.  If the data is wavelength calibrated, we have to run
 C     through the wavelength array as well as the data array.
 C
       CALL PAR_WRUSER(' ',STATUS)
@@ -336,7 +336,7 @@ C     F I G _ E M L T
 C
 C     Analyses emission lines in a spectrum, producing a list of
 C     their centers and widths, optionally from a center of moments
-C     analysis, usually from a gaussian fit.  This is essentially 
+C     analysis, usually from a gaussian fit.  This is essentially
 C     the bulk of the code from the SDRSYS routine EMLT, hacked
 C     about dreadfully to turn it into the main routine of a Figaro
 C     application.  The body of the code is unchanged, but all the
@@ -359,12 +359,12 @@ C                 specified as true, Y is returned containing a synthetic
 C                 spectrum generated from the fitted lines.
 C     (>) NX      (Integer) The number of elements in the data.
 C     (>) N1      (Integer) The number of the first element to be used
-C                 in the analysis.  
+C                 in the analysis.
 C     (>) N2      (Integer) The number of the last element to be used
 C                 in the analysis.
 C     (>) FWHM0   (Real) If non-zero, all lines fitted are constrained
 C                 to this half-width (in pixels).
-C     (>) NOCENS  (Integer) If set to 1, the center of moments analysis 
+C     (>) NOCENS  (Integer) If set to 1, the center of moments analysis
 C                 is bypassed.
 C     (>) LINES   (Integer) If non-zero, only the LINES strongest lines
 C                 in the spectrum will be analysed.
@@ -410,11 +410,11 @@ C     30th Jul 1996  Moved DATA statements.  MJCL/Starlink, UCL.
 C     26th Oct 2001  All the lines values written out into ADAM parameter
 C                    arrays rather than just writing the values for a single
 C                    line to scalar ADAM parameters.  Also write a parameter
-C                    giving the number of lines.  ACD / UoE, Starlink. 
+C                    giving the number of lines.  ACD / UoE, Starlink.
 C     31st Oct 2001  Corrected arguments in call to VAR_SETARY.
 C                    ACD / UoE, Starlink.
 C     24th Apr 2002  Ensured that the output ADAM parameters have the correct
-C                    values when no lines are found.  ACD / UoE, Starlink. 
+C                    values when no lines are found.  ACD / UoE, Starlink.
 C+
       IMPLICIT NONE
 C
@@ -548,7 +548,7 @@ C
          SIGMX = SIGMX + FLOAT(N101 -NLCP1)*Y(N101)
   101    CONTINUE
 C
-      XCMOM = FLOAT(NLCP1) + SIGMX /SIGM 
+      XCMOM = FLOAT(NLCP1) + SIGMX /SIGM
 C
 C   CENTROID
       SIGMH = SIGM /2.
@@ -565,7 +565,7 @@ C
       XCENTR = FLOAT(NC) + SIGML /Y(NC+2) +1.5
 C
 C   STRENGTH
-      WRITE (LOG,'(F8.1,7X,F8.1,7X,G12.4)',IOSTAT=IGNORE) 
+      WRITE (LOG,'(F8.1,7X,F8.1,7X,G12.4)',IOSTAT=IGNORE)
      :                                           XCMOM,XCENTR,STREN
       CALL PAR_WRUSER (LOG,STATUS)
       IF (LOGLU.NE.0) WRITE (LOGLU,'(A)',IOSTAT=IGNORE) LOG
@@ -716,7 +716,7 @@ C  OUTPUT FORMAT
       FMTSTR = '(F8.2,F12.N,F7.2,F10.N,F10.3,F10.3)'
       FMTSTR(11:11) = CHAR (ICHAR('0') + NDPA)
       FMTSTR(22:22) = FMTSTR(11:11)
-      IF ((STRMAX.GT.32000.0).OR.(STRMAX.LT.0.1)) 
+      IF ((STRMAX.GT.32000.0).OR.(STRMAX.LT.0.1))
      :                          FMTSTR(24:34) = '2(1PE10.3)'
 C
       DO 180 N180 = 1,LINE

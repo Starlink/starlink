@@ -43,7 +43,7 @@
 *        false). Any unambiguous abbreviation will do. This need not be
 *        the same as the SCS identified by IDA.  See ID2 section "Sky
 *        Coordinates" for more information on Sky Coordinate Systems.
-*        A blank value will cause the system associated with IDA to be 
+*        A blank value will cause the system associated with IDA to be
 *        used.
 *     IDA = INTEGER (Given)
 *        The IRA identifier for the astrometry information.
@@ -69,12 +69,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -149,9 +149,9 @@
       CALL IRA1_CHECK( IDA, STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  If a blank SCS was given, use the value associated with IDA.      
+*  If a blank SCS was given, use the value associated with IDA.
       IF( SCS .EQ. ' ' ) THEN
-         LSCS = ACM_SCS( IDA ) 
+         LSCS = ACM_SCS( IDA )
       ELSE
          LSCS = SCS
       END IF

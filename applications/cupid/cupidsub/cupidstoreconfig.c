@@ -22,7 +22,7 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status ){
 *     void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status )
 
 *  Description:
-*     This function extracts each keyword/value pair from the given 
+*     This function extracts each keyword/value pair from the given
 *     configuration keymap, and stores them in the CUPID extension.
 
 *  Parameters:
@@ -110,7 +110,7 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status ){
       for( i = 1; i <= n; i++ ) {
          grpGet( grp, i, 1, &pname, GRP__SZNAM + 1, status );
          nc = astChrLen( name );
-         if( nc > ncmax ) ncmax = nc; 
+         if( nc > ncmax ) ncmax = nc;
       }
 
 /* Create a suitable array of character strings in the CUPID extension,

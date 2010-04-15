@@ -30,8 +30,8 @@ Error m_SXRand( Object *in, Object*out){
 *     Realisation
 
 *  Description:
-*     The SXRand module creates a set of random vectors. 
-*     Each vector has "ndim" components, each chosen independantly from the 
+*     The SXRand module creates a set of random vectors.
+*     Each vector has "ndim" components, each chosen independantly from the
 *     distibution specified by "dist". The vectors can be returned as a list
 *     of "nvec" vectors (if "nvec" is an integer), or as the "data"
 *     component of a field (if "nvec" is a field).
@@ -39,8 +39,8 @@ Error m_SXRand( Object *in, Object*out){
 *     If "dist" is 1, then a uniform distribution between "a" and "b" is
 *     used. If "dist" is 2 then a normal distribution with mean "a" and
 *     standard deviation "b" is used. If "dist" is 3, then a Poisson
-*     distribution is used with mean "a". Integer values are returned for 
-*     a Poisson distribution, and double precision values are returned for 
+*     distribution is used with mean "a". Integer values are returned for
+*     a Poisson distribution, and double precision values are returned for
 *     uniform and normal distributions.
 
 *  Parameters:
@@ -58,12 +58,12 @@ Error m_SXRand( Object *in, Object*out){
 *        output vectors
 
 *  Components:
-*     If "nvec" is a field, a "data" component is added to 
-*     the output field, replacing any existing "data" component. The output 
-*     data will be dependant on "positions" if the input field had no "data" 
-*     component. Otherwise, it will have the same dependancy as the input 
-*     field. Any components which are dependant on "data" are modified. All 
-*     other components are copied from the input field. 
+*     If "nvec" is a field, a "data" component is added to
+*     the output field, replacing any existing "data" component. The output
+*     data will be dependant on "positions" if the input field had no "data"
+*     component. Otherwise, it will have the same dependancy as the input
+*     field. Any components which are dependant on "data" are modified. All
+*     other components are copied from the input field.
 
 *  Examples:
 
@@ -83,12 +83,12 @@ Error m_SXRand( Object *in, Object*out){
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -119,7 +119,7 @@ Error m_SXRand( Object *in, Object*out){
       int     nvec;     /* No. of vectors */
       Object  o=NULL;   /* Output object */
       float   rval;     /* Float value */
-  
+
 
 /*  If the "ndim" object was not supplied, create random scalars. */
 
@@ -287,7 +287,7 @@ static Error DoSXRand( Object o, int ndim, int dist, double a,
 
 /*  Indicate that the data component values have changed, and complete the
  *  output field. */
-         
+
          DXChangedComponentValues( (Field) o, "data" );
          if( !DXEndField( (Field) o ) ) return( ERROR );
 
@@ -338,13 +338,13 @@ Array SXRandFill( int nvec, int ndim, int dist, double a, double b ){
 *     nvec = int (Given)
 *        number of vectors
 *     ndim = int (Given)
-*        dimensionality for each vector 
+*        dimensionality for each vector
 *     dist = integer (Given)
 *        distribution to use: 1 - uniform, 2 - normal, 3 - Poisson
 *     a = double (given)
 *        first parameter describing the distribution
 *     b = double (given)
-*        second parameter describing the distribution 
+*        second parameter describing the distribution
 
 *  Returned Value:
 *     The DX object describing the created array, or NULL if an error
@@ -377,7 +377,7 @@ Array SXRandFill( int nvec, int ndim, int dist, double a, double b ){
 
 /*  Initialise the random number generator seed to the current time plus
  *  thenumber of entries into this routine. */
-           
+
       seed = (int) time( NULL ) + (entry++);
       (void) zufalli_( seed );
 
@@ -402,13 +402,13 @@ Array SXRandFill( int nvec, int ndim, int dist, double a, double b ){
 
 /*  Fill the array with the random values, scaling value from [0,1] to
  *  [a,b] */
-           
+
          (void) zufall_( nvec*ndim, data );
 
          bma = b - a;
          for( i=0; i<ndim*nvec; i++ ){
             data[i] = bma*data[i] + a;
-         }                              
+         }
 
 
 /*  Now do normal distributions. */
@@ -429,7 +429,7 @@ Array SXRandFill( int nvec, int ndim, int dist, double a, double b ){
 
          for( i=0; i<ndim*nvec; i++ ){
             data[i] = b*data[i] + a;
-         }                              
+         }
 
 
 /*  Now do Poisson distributions. */

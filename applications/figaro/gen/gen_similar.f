@@ -10,7 +10,7 @@ C
 C  Description:
 C     GEN_SIMILAR compares two floating point values, not for equality,
 C     but for near equality - being the same, give or take a bit of
-C     rounding error.  
+C     rounding error.
 C
 C  Language:
 C     FORTRAN
@@ -25,13 +25,13 @@ C     (>) VALUE2  (Real, ref) The second of the two numbers
 C
 C  Returns -
 C     (<) STATUS  (Logical, function value) True if the values are
-C                 similar, false otherwise.  
+C                 similar, false otherwise.
 C
 C  External subroutines / functions used:   None
 C
 C  External variables used:  None
 C
-C  Author: Keith Shortridge, AAO 
+C  Author: Keith Shortridge, AAO
 C
 C  Date: 1st March 1989
 C-

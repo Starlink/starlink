@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentstyle{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -116,7 +116,7 @@
                           \rule{\textwidth}{0.5mm}  % draw thick line
                           \settowidth{\specname}{{\Large {\bf #1}}}
                         % left and right box width is text width plus gap
-                          \addtolength{\specname}{4ex} 
+                          \addtolength{\specname}{4ex}
                         % caption width is width of page less the two names
                         % less than empirical fudge factor
                           \setlength{\speccaption}{\textwidth}
@@ -222,7 +222,7 @@ provides a more versatile way of handling graphical information.
 There are some applications, however, for which the high level packages are
 not appropriate and SGS or even GKS should be considered.
 
-SGS (The Simple Graphics System) in its stand-alone use is fully described 
+SGS (The Simple Graphics System) in its stand-alone use is fully described
 in SUN/85.
 This guide will therefore only deal with issues relating to use of SGS in
 ADAM application programs.
@@ -245,7 +245,7 @@ SGS\_DEACT.
 \section{THE SGS PARAMETER ROUTINES}
 As with all other packages in the Software Environment, the only access to
 objects outside of application programs is via Program Parameters.
-SGS has three environment-level subroutines (the SGS `parameter' or SGSPAR 
+SGS has three environment-level subroutines (the SGS `parameter' or SGSPAR
 routines) which provide the necessary interaction with the outside world.
 They are :
 
@@ -290,7 +290,7 @@ Here is a skeletal example of a program using SGS :
 \end{quote}
 
 SGS\_ASSOC should be the first SGS routine to be called in the application.
-It obtains (via the parameter system) the name of the graphics workstation 
+It obtains (via the parameter system) the name of the graphics workstation
 to be used, creates an initial SGS zone on the workstation, and returns an
 SGS zone identifier which can be used in subsequent SGS subroutine calls.
 
@@ -302,10 +302,10 @@ workstation name as defined by GNS (see SUN/57).
 The second argument is the access mode required. This can be one of :
 \begin{description}
 \item[READ]   The application is only going to `read' from the workstation
-({\em i.e.}\ perform cursor or similar operations). 
+({\em i.e.}\ perform cursor or similar operations).
 Screens will not be cleared when vdu workstations are opened.
 \item[WRITE]  The application is going to `write' on the workstation,
-{\em i.e.}\ actually do some graphics. 
+{\em i.e.}\ actually do some graphics.
 Workstations are completely initialized when they are opened.
 \item[UPDATE] The application will modify the graphics on the workstation.
 Screens will not be cleared when vdu workstations are opened.
@@ -320,8 +320,8 @@ The fourth argument is the usual status value. It follows the ADAM error
 strategy as described in SG/4.
 
 When the application has finished using the workstation, it should be closed
-using SGS\_CANCL unless it is required to keep the parameter active 
-(to update a global parameter for example), in which case SGS\_ANNUL 
+using SGS\_CANCL unless it is required to keep the parameter active
+(to update a global parameter for example), in which case SGS\_ANNUL
 should be used.
 
 When the application has finished using SGS, it should be de-activated by
@@ -361,7 +361,7 @@ ROUTINE_NAME: Text
 but where there routine name is not useful, it will be omitted.
 
 If it is required to test for particular status values, symbolic names should
-be used. 
+be used.
 They can be defined by including, in the application,  the statements:
 \begin{quote}
 \begin{verbatim}
@@ -373,7 +373,7 @@ The names are listed in Section \ref{errs}.
 
 Note that a substitute SGS error handling routine is linked with ADAM
 applications.
-This will result in conforming error reports and ADAM status values being 
+This will result in conforming error reports and ADAM status values being
 returned, even from SGS stand-alone routines.
 
 \section{COMPILING AND LINKING}
@@ -427,7 +427,7 @@ SGS\_\_ZNOUT     & New zone not inside current zone \\
 SGS\_\_ZNZEX     & Too many Zones \\
 SGS\_\_ZONNB     & Specified zone is not a base zone \\
 SGS\_\_ZONNF     & Specified zone does not exist \\
-SGS\_\_ZONTB     & Requested zone bigger than current zone 
+SGS\_\_ZONTB     & Requested zone bigger than current zone
 \end{tabular}
 
 
@@ -440,8 +440,8 @@ SGS\_\_ZONTB     & Requested zone bigger than current zone
 cancelling the parameter}
 \begin{manroutinedescription}
 \manroutineitem {Description }{}
-     De-activate and close the graphics workstation whose base zone 
-     ({\mantt{ZONE}}) was obtained using {\mantt{SGS\_ASSOC}}, and annul 
+     De-activate and close the graphics workstation whose base zone
+     ({\mantt{ZONE}}) was obtained using {\mantt{SGS\_ASSOC}}, and annul
      the zone identifier.
      Do not cancel the associated parameter.
 \manroutineitem {Invocation }{}
@@ -548,5 +548,5 @@ unchanged
 \end{manroutinedescription}
 
 \manrule
- 
+
 \end{document}

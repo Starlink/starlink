@@ -74,7 +74,7 @@ C
       INTEGER   DTA_STATUS                  ! DTA_ routine status codes
       INTEGER   LENGTH                      ! Length of structure name
       CHARACTER NAME*80                     ! DTA_ name for range structure
-      INTEGER   REF_SLOT                    ! Reference table slot # 
+      INTEGER   REF_SLOT                    ! Reference table slot #
       INTEGER   VALID                       ! Value of validity flag
 C
 C     Return immediately on bad status

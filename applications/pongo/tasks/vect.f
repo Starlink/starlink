@@ -25,7 +25,7 @@
 *  ADAM Parameters:
 *     ERSCALE = _REAL (Read and Write)
 *        Factor for scaling all vectors.
-*        
+*
 *        [The value of the global parameter PONGO_ERSCALE is used. If
 *        PONGO_ERSCALE is not defined, the default value 1.0 is used.]
 *     ZMULT = _LOGICAL (Read)
@@ -64,7 +64,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -81,7 +81,7 @@
 *  External References:
       EXTERNAL PON_DEVOP
       LOGICAL PON_DEVOP          ! PGPLOT device is open
-      
+
 *  Local Variables:
       INTEGER IDAT               ! Loop index
 
@@ -96,7 +96,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Is the plotting device open?
-      IF ( PON_DEVOP ( .TRUE., STATUS ) ) THEN 
+      IF ( PON_DEVOP ( .TRUE., STATUS ) ) THEN
          CALL PAR_GET0R( 'ERSCALE', SCALE, STATUS )
          CALL PAR_GET0L( 'ZMULT', ZMULT, STATUS )
 
@@ -115,7 +115,7 @@
  10         CONTINUE
          END IF
       END IF
-      IF ( STATUS .NE. SAI__OK ) THEN 
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'VECT_END',
      :                 'VECT: Cannot draw vectors for each data point.',
      :                 STATUS )

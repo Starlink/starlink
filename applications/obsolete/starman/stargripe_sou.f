@@ -1,8 +1,8 @@
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C STARMANGRIPE --  Tells about comments and suggestions system for Starman
 C
 C         a.j.penny                ral                   1994 Dec
- 
+
       subroutine starmangripe ( ierradam )
 
       implicit none
@@ -35,7 +35,7 @@ C  alan penny                   ral            1994 Dec
       include 'STARMAN_INC'
 C--
       integer k
-      character*72 text(14)     
+      character*72 text(14)
       data text /
      + ' ',
      + '   To make a comment on any aspect of Starman, or to report',

@@ -61,7 +61,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -102,8 +102,8 @@
 
          ELSE
             EXTNAM = COMP(NPOS+1:)
-                        
-         END IF                        
+
+         END IF
       END IF
 
       END

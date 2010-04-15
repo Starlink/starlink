@@ -17,9 +17,9 @@
 *  Description:
 *     This routine searches a buffer containing the header card images
 *     from a FITS file for the next card with keyword COMMENT.  The
-*     search begins at a defined card image; and ends when the next end 
+*     search begins at a defined card image; and ends when the next end
 *     of a header block, marked by the END keyword, is encountered or
-*     the buffer is exhausted.  The routine returns the comment string, 
+*     the buffer is exhausted.  The routine returns the comment string,
 *     and the number of the card image within the buffer array that
 *     contains the comment.  If the keyword is is present %THERE is
 *     true, otherwise it is false.

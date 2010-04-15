@@ -4,7 +4,7 @@
 *     PDA_V11
 
 *  Purpose:
-*     Calculates an approximation to the variance of the largest 
+*     Calculates an approximation to the variance of the largest
 *     normal order statistic.
 
 *  Description:
@@ -77,7 +77,7 @@ c
      +     d2 = -1.783195691545387d0, d3 = 0.488682076188729d0,
      +     d4 = -0.078737246197474d0, d5 = 0.00662561987806d0,
      +     d6 = -0.226486218258d-3, b4 = -0.8531d-3)
-c     
+c
       pda_v11 = zero
       ifault = 1
       if (n .lt. 1) return
@@ -86,7 +86,7 @@ c
          pda_v11 = one
          return
       end if
-c     
+c
       x = n
       if (n .gt. 370) then
          x = (x**mpt15 - one) / mpt15
@@ -102,6 +102,6 @@ c
          x = log(d0 + x)
          pda_v11 = exp(d1 + x*(d2 + x*(d3 + x*(d4 + x*(d5 + x*d6)))))
       end if
-c     
+c
       return
       end

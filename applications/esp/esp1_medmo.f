@@ -20,14 +20,14 @@
 *                     BINWID,LOW,ADEV,SFACT,SEEHIS,
 *                     NUMBER,SDEV,BARRAY,SMOBAR,
 *                     MEDIAN,PEAKV,SFACTA,MODE,STATUS)
-                                   
+
 *  Description:
 *     Places the values from the mapped image array into a binning
 *     array. The array is used as a histogram. The routine then
 *     determines values for the peak height, mode, median, and std dev
 *     of the histogram.
 
-*  Arguments:               
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        The number of pixels in the image. Units pixels.
 *     ARRAY(ELEMS)= REAL (Given)
@@ -68,7 +68,7 @@
 *        Units counts.
 *     PEAKV(3) = DOUBLE PRECISION (Returned)
 *        Esimates of the peak number of pixels found with a given count
-*        value in the count value versus occurence histogram.       
+*        value in the count value versus occurence histogram.
 *        Units pixels.
 *     SFACTA = INTEGER (Returned)
 *        Gaussian filter radius actually employed when smoothing
@@ -93,7 +93,7 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
@@ -102,21 +102,21 @@
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
-      INTEGER BARSIZ                  ! Size of the binning arrays used 
+      INTEGER BARSIZ                  ! Size of the binning arrays used
       INTEGER NUMBER                  ! The number of pixels to be used
       INTEGER POINT2                  ! Pointer to the binning array
       INTEGER POINT3                  ! Pointer to the smoothed bin array
       INTEGER SFACT                   ! Requested radius for the Gaussian
-                                      ! filter used to smooth the 
+                                      ! filter used to smooth the
                                       ! histogram
       REAL ARRAY(ELEMS)               ! Array containing the image data
-      REAL BINWID                     ! Width of the bins used to find 
+      REAL BINWID                     ! Width of the bins used to find
                                       ! median and mode (only differs
                                       ! from 1 when count range exceeds
                                       ! HIS__BINLI)
       REAL LOW                        ! Binning arrays origin offset and
                                       ! lowest value found in image
-      DOUBLE PRECISION ADEV           ! Absolute deviation of data 
+      DOUBLE PRECISION ADEV           ! Absolute deviation of data
       LOGICAL SEEHIS                  ! User graphics or not choice
 
 *  Arguments Given and Returned:
@@ -128,18 +128,18 @@
                                       ! filter actually used to smooth
                                       ! the histogram
       DOUBLE PRECISION BARRAY(BARSIZ) ! Binning array for the pixel cnts
-      DOUBLE PRECISION MEDIAN         ! Median value for the image 
+      DOUBLE PRECISION MEDIAN         ! Median value for the image
       DOUBLE PRECISION MODE(4)        ! Mode values for the image
-      DOUBLE PRECISION PEAKV(3)       ! Highest value found in the 
+      DOUBLE PRECISION PEAKV(3)       ! Highest value found in the
       DOUBLE PRECISION SMOBAR(BARSIZ) ! Smoothed binning array
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables: 
+*  Local variables:
       INTEGER HIIND                   ! Temporary store
       INTEGER I                       ! Temporary loop variable
-      INTEGER INDEX                   ! Array element index in which to 
+      INTEGER INDEX                   ! Array element index in which to
                                       ! bin a given pixel count value
       INTEGER J                       ! Temporary loop variable
       INTEGER LOIND                   ! Temporary store
@@ -151,10 +151,10 @@
       REAL CONS                       ! Constant term of linear
                                       ! relationship fitted by
                                       ! subroutine HIS1_LINRE
-      REAL GRAD                       ! Gradient term of linear 
-                                      ! relationship fitted by 
+      REAL GRAD                       ! Gradient term of linear
+                                      ! relationship fitted by
                                       ! subroutine HIS1_LINRE
-      REAL HEIG(HIS__CHORM)           ! The values at which chords 
+      REAL HEIG(HIS__CHORM)           ! The values at which chords
                                       ! (slices) were taken through the
                                       ! histogram
       REAL VALUE1                     ! Temporary storage variable
@@ -163,15 +163,15 @@
       REAL Y1(HIS__CHORM)             ! Y value array passed to
                                       ! subroutine HIS1_LINRE
       DOUBLE PRECISION HALF           ! Half the number of non-bad
-                                      ! in the binning arrays 
+                                      ! in the binning arrays
       DOUBLE PRECISION HIVAL          ! Highest value found in the bin
                                       ! array
       DOUBLE PRECISION LOVAL          ! Lowest value found in the bin
                                       ! array
       DOUBLE PRECISION SFTOT          ! Total of smoothing factors used
-      DOUBLE PRECISION SMOFAC(-HIS__SFLIM:HIS__SFLIM) 
+      DOUBLE PRECISION SMOFAC(-HIS__SFLIM:HIS__SFLIM)
                                       ! Smoothing factors for a Gaussian
-                                      ! filter to smooth array BARRAY  
+                                      ! filter to smooth array BARRAY
       DOUBLE PRECISION SMOTOT         ! Total of values in the smoothed
                                       ! bin array SMOBAR
       DOUBLE PRECISION TOTAL          ! Sum of the bin array BARRAY
@@ -180,31 +180,31 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN        
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Clear the contents of the BARRAY and SMOBAR.
       DO 11 I=1,BARSIZ
          SMOBAR(I)=0.0
          BARRAY(I)=0.0
  11   CONTINUE
-      
-*   Assign all non-bad pixels of the image 
+
+*   Assign all non-bad pixels of the image
 *   array to a binning array to allow the mode and median
 *   to be calculated.
       DO 312 I=1,ELEMS
 
          VALUE1=ARRAY(I)
-         IF (VALUE1.NE.VAL__BADR) THEN 
+         IF (VALUE1.NE.VAL__BADR) THEN
 
-*         Calculate which bin element an image pixel count must be 
+*         Calculate which bin element an image pixel count must be
 *         assigned to.
             INDEX=INT((VALUE1-LOW)/BINWID+1)
 
 *         Increment the count in the appropriate bin.
             BARRAY(INDEX)=BARRAY(INDEX)+1.
 
-         END IF 
- 312  CONTINUE       
+         END IF
+ 312  CONTINUE
 
 *   Look through the bin array to find the highest value therein.
 *   This is taken as a simple first estimate of the mode value.
@@ -213,8 +213,8 @@
       HIVAL=0
       DO 320 I=1,BARSIZ
 
-*      Set HIVAL and MODEC as a new highest value has been found.    
-         IF (BARRAY(I).GT.HIVAL) THEN 
+*      Set HIVAL and MODEC as a new highest value has been found.
+         IF (BARRAY(I).GT.HIVAL) THEN
             MODEC=I
             HIVAL=BARRAY(I)
          END IF
@@ -224,7 +224,7 @@
 
  320  CONTINUE
 
-*   Assigned unsmoothed mode and peak value. 
+*   Assigned unsmoothed mode and peak value.
       MODE(1)=LOW+(REAL(MODEC)-1.)*BINWID
       PEAKV(1)=HIVAL
 
@@ -235,8 +235,8 @@
       HALF=REAL(NUMBER)/2.
 
 *   Add bin array contents to the total until it exceeds HALF.
-      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ)) 
-         INDEX=INDEX+1 
+      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ))
+         INDEX=INDEX+1
          TOTAL=TOTAL+BARRAY(INDEX)
       END DO
 
@@ -249,21 +249,21 @@
 *   Use approximate interpolation to estimate the median position
 *   given the contents of the bin in which it occurs.
       MEDIAN=LOW+(INDEX-1)*BINWID
-      
+
       SFACTA=SFACT
       IF (SFACTA.EQ.-1) THEN
 
-*      Use the absolute deviation as an upper limit for the smoothing 
+*      Use the absolute deviation as an upper limit for the smoothing
 *      filter radius.
          SFACTA=NINT(ADEV/BINWID)
-         
+
 *      Look through the BARRAY to find if all the points within +-
-*      SFACTA indices of the modal index have values greater than 
+*      SFACTA indices of the modal index have values greater than
 *      20% of the highest value. Retains the first values from either
 *      side of the mode that are not.
          IF (SFACTA.LT.1) SFACTA=1
 
-*      Calculate an average value for the region of the BARRAY around the 
+*      Calculate an average value for the region of the BARRAY around the
 *      largest value.
          VALUE=0.0
          J=0
@@ -284,7 +284,7 @@
             END IF
  330     CONTINUE
 
-*      Look for the upper limit.          
+*      Look for the upper limit.
          HIIND=MODEC+SFACTA
          IF (HIIND.GT.BARSIZ) HIIND=BARSIZ
          DO 331 I=MODEC+SFACTA,MODEC+1,-1
@@ -300,19 +300,19 @@
          IF (SFACTA.GT.HIS__SFLIM) SFACTA=HIS__SFLIM
 
       ELSE
-     
+
 *      Set the filter radius and impose an upper limit.
          SFACTA=SFACTA/BINWID
          IF (SFACTA.GT.HIS__SFLIM) SFACTA=HIS__SFLIM
-         
+
       END IF
 
 *   Calculate the weighting factors that should be applied to pixels
-*   when using the Gaussian filter to smooth the histogram. 
+*   when using the Gaussian filter to smooth the histogram.
       IF (SFACTA.EQ.0) THEN
 
 *      Only one point is to be included in the smoothing routine. ie
-*      no smoothing to take place so the weighting factor for that 
+*      no smoothing to take place so the weighting factor for that
 *      pixel is 1.0.
          SMOFAC(0)=1.0
 
@@ -328,14 +328,14 @@
                TOTAL=TOTAL+SMOFAC(I)
             ELSE
                TOTAL=TOTAL+SMOFAC(I)*2.
-            END IF 
+            END IF
  350     CONTINUE
 
 *      Modify the weighting factors so that the sum of them is unity.
          DO 360 I=-SFACTA,SFACTA
             SMOFAC(I)=SMOFAC(I)/TOTAL
- 360     CONTINUE  
- 
+ 360     CONTINUE
+
       END IF
 
 *   Smooth the BARRAY and put the new values into array SMOBAR.
@@ -343,7 +343,7 @@
       SMOTOT=0.0
       DO 380 I=SFACTA+1,BARSIZ-SFACTA-1
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          DO 370 J=-SFACTA,SFACTA
@@ -354,20 +354,20 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 380  CONTINUE 
+ 380  CONTINUE
 
 *   Smooth the data at the edges of the array.
 *   Low value edge.
       DO 382 I=1,SFACTA
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          SFTOT=0.0
          DO 381 J=-SFACTA,SFACTA
 
 *         Only use values that are defined. i.e. within the array bounds.
-            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN 
+            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN
                SMOBAR(I)=SMOBAR(I)+SMOFAC(J)*BARRAY(I+J)
                SFTOT=SFTOT+SMOFAC(J)
             END IF
@@ -379,7 +379,7 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 382  CONTINUE 
+ 382  CONTINUE
 
 *   Smooth the data at the edges of the array.
 *   high value edge.
@@ -388,14 +388,14 @@
 *      Set initial value of the smoothed array element.
          SMOBAR(I)=0.0
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          SFTOT=0.0
          DO 383 J=-SFACTA,SFACTA
 
 *         Only use values that are defined. i.e. within the array bounds.
-            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN 
+            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN
                SMOBAR(I)=SMOBAR(I)+SMOFAC(J)*BARRAY(I+J)
                SFTOT=SFTOT+SMOFAC(J)
             END IF
@@ -407,14 +407,14 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 384  CONTINUE        
+ 384  CONTINUE
 
 *   Convert the SFACTA value used to show the radius of the smoothing
 *   filter in terms of the actual array indices used (necessary only
-*   when the difference between HIGH and LOW is greater 
+*   when the difference between HIGH and LOW is greater
 *   than HIS__BINLI.
-      SFACTA=NINT(SFACTA*BINWID)     
-      
+      SFACTA=NINT(SFACTA*BINWID)
+
 
 *   Search the array of smoothed values for its modal value and also
 *   recalculate/estimate the value of the mode.
@@ -423,30 +423,30 @@
       HIVAL=VAL__MIND
       DO 390 I=1,BARSIZ
 
-*      Reset HIVAL and MODEC as a new highest value has been found.    
-         IF (SMOBAR(I).GT.HIVAL) THEN 
+*      Reset HIVAL and MODEC as a new highest value has been found.
+         IF (SMOBAR(I).GT.HIVAL) THEN
             MODEC=I
             HIVAL=SMOBAR(I)
-         END IF                  
+         END IF
 
 *      Reset LOVAL as a new lowest value has been found
          IF (SMOBAR(I).LT.LOVAL) LOVAL=SMOBAR(I)
 
  390  CONTINUE
 
-*   Assigned smoothed mode value. 
+*   Assigned smoothed mode value.
       MODE(2)=LOW+(REAL(MODEC)-1.)*BINWID
       PEAKV(2)=HIVAL
 
-*   Sum the elements of the smoothed bin array and stop when the sum 
+*   Sum the elements of the smoothed bin array and stop when the sum
 *   exceeds half that of the number of non-bad pixels in the image.
       INDEX=0
       TOTAL=0.0
       HALF=SMOTOT/2.
 
 *   Add bin array contents to the total until it exceeds HALF.
-      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ)) 
-         INDEX=INDEX+1 
+      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ))
+         INDEX=INDEX+1
          TOTAL=TOTAL+SMOBAR(INDEX)
       END DO
 
@@ -460,27 +460,27 @@
 *   given the contents of the bin in which it occurs.
       MEDIAN=LOW+(INDEX-1+(HALF-TOTAL)/SMOBAR(INDEX+1))*BINWID
 
-*   Take chords through the histogram peak and get values for 
-*   histogram chord 
+*   Take chords through the histogram peak and get values for
+*   histogram chord
       CALL HIS1_CHORD(HIVAL,LOVAL,MODEC,%VAL(CNF_PVAL(POINT3)),LOW,ADEV,
      :                BARSIZ,BINWID,NUMDAT,HEIG,X1,Y1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-           
+
 *   Determine the linear relationship between histogram width
 *   and value at which the width was determined. Extrapolate to zero
 *   width (peak) and thereby estimate a mode value.
-      IF (NUMDAT.GT.2) THEN 
+      IF (NUMDAT.GT.2) THEN
          CALL HIS1_LINRE(X1,Y1,NUMDAT,GRAD,CONS,STATUS)
          IF (NUMDAT.GT.2) MODE(3)=CONS
       END IF
 
-*   Set up the data for matrix inversion to provide 
+*   Set up the data for matrix inversion to provide
 *   an interpolated value for the mode.
       CALL HIS1_PARA(ADEV,%VAL(CNF_PVAL(POINT3)),BARSIZ,LOW,BINWID,
      :               MODE,SDEV,PEAKV,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Display histogram if user has opted for graphics.      
+*   Display histogram if user has opted for graphics.
       IF (SEEHIS) THEN
          CALL HIS1_GRAPH(ADEV,%VAL(CNF_PVAL(POINT2)),
      :                   PEAKV(1),LOW,MODE,MEDIAN,
@@ -491,7 +491,7 @@
       END IF
 
  9999 CONTINUE
-                    
+
       END
 
 
@@ -515,14 +515,14 @@
 *                     BINWID,LOW,ADEV,SFACT,
 *                     NUMBER,STATUS,SDEV,BARRAY,SMOBAR,
 *                     MEDIAN,PEAKV,SFACTA,MODE)
-                                   
+
 *  Description:
 *     Places the values from the mapped image array into a binning
 *     array. The array is used as a histogram. The routine then
 *     determines values for the peak height, mode, median and standard
 *     deviation of the histogram.
 
-*  Arguments:              
+*  Arguments:
 *     TYPE = INTEGER (Given)
 *        Method to be used to calculate mode vale.
 *     ELEMS = INTEGER (Given)
@@ -565,7 +565,7 @@
 *        Units counts.
 *     PEAKV(3) = DOUBLE PRECISION (Returned)
 *        Esimates of the peak number of pixels found with a given count
-*        value in the count value versus occurence histogram.       
+*        value in the count value versus occurence histogram.
 *        Units pixels.
 *     SFACTA = INTEGER (Returned)
 *        Gaussian filter radius actually employed when smoothing
@@ -588,7 +588,7 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
@@ -597,23 +597,23 @@
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
-      INTEGER BARSIZ                  ! Size of the binning arrays used 
+      INTEGER BARSIZ                  ! Size of the binning arrays used
       INTEGER NUMBER                  ! The number of pixels to be used
       INTEGER POINT2(1)               ! Pointer to the binning array
       INTEGER POINT3(1)               ! Pointer to the smoothed bin array
       INTEGER SFACT                   ! Requested radius for the Gaussian
-                                      ! filter used to smooth the 
+                                      ! filter used to smooth the
                                       ! histogram
       INTEGER TYPE                    ! Defines the method of calculation
                                       ! for mode to be chosen
       REAL ARRAY(ELEMS)               ! Array containing the image data
-      REAL BINWID                     ! Width of the bins used to find 
+      REAL BINWID                     ! Width of the bins used to find
                                       ! median and mode (only differs
                                       ! from 1 when count range exceeds
                                       ! HSB__BINLI)
       REAL LOW                        ! Binning arrays origin offset and
                                       ! lowest value found in image
-      DOUBLE PRECISION ADEV           ! Absolute deviation of data 
+      DOUBLE PRECISION ADEV           ! Absolute deviation of data
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION SDEV(2)        ! Standard deviation
@@ -623,18 +623,18 @@
                                       ! filter actually used to smooth
                                       ! the histogram
       DOUBLE PRECISION BARRAY(BARSIZ) ! Binning array for the pixel cnts
-      DOUBLE PRECISION MEDIAN         ! Median value for the image 
+      DOUBLE PRECISION MEDIAN         ! Median value for the image
       DOUBLE PRECISION MODE(4)        ! Mode values for the image
-      DOUBLE PRECISION PEAKV(3)       ! Highest value found in the 
+      DOUBLE PRECISION PEAKV(3)       ! Highest value found in the
       DOUBLE PRECISION SMOBAR(BARSIZ) ! Smoothed binning array
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables: 
+*  Local variables:
       INTEGER HIIND                   ! Temporary store
       INTEGER I                       ! Temporary loop variable
-      INTEGER INDEX                   ! Array element index in which to 
+      INTEGER INDEX                   ! Array element index in which to
                                       ! bin a given pixel count value
       INTEGER J                       ! Temporary loop variable
       INTEGER LOIND                   ! Temporary store
@@ -646,10 +646,10 @@
       REAL CONS                       ! Constant term of linear
                                       ! relationship fitted by
                                       ! subroutine HSB1_LINRE
-      REAL GRAD                       ! Gradient term of linear 
-                                      ! relationship fitted by 
+      REAL GRAD                       ! Gradient term of linear
+                                      ! relationship fitted by
                                       ! subroutine HSB1_LINRE
-      REAL HEIG(HSB__CHORM)           ! The values at which chords 
+      REAL HEIG(HSB__CHORM)           ! The values at which chords
                                       ! (slices) were taken through the
                                       ! histogram
       REAL VALUE1                     ! Temporary storage variable
@@ -658,15 +658,15 @@
       REAL Y1(HSB__CHORM)             ! Y value array passed to
                                       ! subroutine HSB1_LINRE
       DOUBLE PRECISION HALF           ! Half the number of non-bad
-                                      ! in the binning arrays 
+                                      ! in the binning arrays
       DOUBLE PRECISION HIVAL          ! Highest value found in the bin
                                       ! array
       DOUBLE PRECISION LOVAL          ! Lowest value found in the bin
                                       ! array
       DOUBLE PRECISION SFTOT          ! Total of smoothing factors used
-      DOUBLE PRECISION SMOFAC(-HSB__SFLIM:HSB__SFLIM) 
+      DOUBLE PRECISION SMOFAC(-HSB__SFLIM:HSB__SFLIM)
                                       ! Smoothing factors for a Gaussian
-                                      ! filter to smooth array BARRAY  
+                                      ! filter to smooth array BARRAY
       DOUBLE PRECISION SMOTOT         ! Total of values in the smoothed
                                       ! bin array SMOBAR
       DOUBLE PRECISION TOTAL          ! Sum of the bin array BARRAY
@@ -675,7 +675,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN        
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Clear the contents of the BARRAY and SMOBAR.
       DO 11 I=1,BARSIZ
@@ -683,21 +683,21 @@
          BARRAY(I)=0.0
  11   CONTINUE
 
-*   Assign all non-bad pixels of the image 
+*   Assign all non-bad pixels of the image
 *   array to a binning array to allow the mode and median
 *   to be calculated.
       DO 312 I=1,ELEMS
          VALUE1=ARRAY(I)
-         IF (VALUE1.NE.VAL__BADR) THEN 
+         IF (VALUE1.NE.VAL__BADR) THEN
 
-*         Calculate which bin element an image pixel count must be 
+*         Calculate which bin element an image pixel count must be
 *         assigned to.
             INDEX=INT((VALUE1-LOW)/BINWID+1.)
 
 *         Increment the count in the appropriate bin.
             BARRAY(INDEX)=BARRAY(INDEX)+1.
-         END IF 
- 312  CONTINUE 
+         END IF
+ 312  CONTINUE
 
 *   Look through the bin array to find the highest value therein.
 *   This is taken as a simple first estimate of the mode value.
@@ -706,8 +706,8 @@
       HIVAL=0
       DO 320 I=1,BARSIZ
 
-*      Set HIVAL and MODEC as a new highest value has been found.    
-         IF (BARRAY(I).GT.HIVAL) THEN 
+*      Set HIVAL and MODEC as a new highest value has been found.
+         IF (BARRAY(I).GT.HIVAL) THEN
             MODEC=I
             HIVAL=BARRAY(I)
          END IF
@@ -717,11 +717,11 @@
 
  320  CONTINUE
 
-*   Assigned unsmoothed mode and peak value. 
+*   Assigned unsmoothed mode and peak value.
       MODE(1)=LOW+(REAL(MODEC)-1.)*BINWID
       PEAKV(1)=HIVAL
 
-*     Bypass the rest of this subroutine since the required mode 
+*     Bypass the rest of this subroutine since the required mode
 *     type has been derived.
       IF ((TYPE.LT.2).AND.(TYPE.NE.0)) GOTO 9999
 
@@ -732,8 +732,8 @@
       HALF=REAL(NUMBER)/2.
 
 *   Add bin array contents to the total until it exceeds HALF.
-      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ)) 
-         INDEX=INDEX+1 
+      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ))
+         INDEX=INDEX+1
          TOTAL=TOTAL+BARRAY(INDEX)
       END DO
 
@@ -746,21 +746,21 @@
 *   Use approximate interpolation to estimate the median position
 *   given the contents of the bin in which it occurs.
       MEDIAN=LOW+(INDEX-1)*BINWID
-      
+
       SFACTA=SFACT
       IF (SFACTA.EQ.-1) THEN
 
-*      Use the absolute deviation as an upper limit for the smoothing 
+*      Use the absolute deviation as an upper limit for the smoothing
 *      filter radius.
          SFACTA=NINT(ADEV/BINWID)
 
 *      Look through the BARRAY to find if all the points within +-
-*      SFACTA indices of the modal index have values greater than 
+*      SFACTA indices of the modal index have values greater than
 *      20% of the highest value. Retains the first values from either
 *      side of the mode that are not.
          IF (SFACTA.LT.1) SFACTA=1
 
-*      Calculate an average value for the region of the BARRAY around the 
+*      Calculate an average value for the region of the BARRAY around the
 *      largest value.
          VALUE=0.0
          J=0
@@ -781,7 +781,7 @@
             END IF
  330     CONTINUE
 
-*      Look for the upper limit.          
+*      Look for the upper limit.
          HIIND=MODEC+SFACTA
          IF (HIIND.GT.BARSIZ) HIIND=BARSIZ
          DO 331 I=MODEC+SFACTA,MODEC+1,-1
@@ -797,20 +797,20 @@
          IF (SFACTA.GT.HSB__SFLIM) SFACTA=HSB__SFLIM
 
       ELSE
-     
+
 *      Set the filter radius and impose an upper limit.
          SFACTA=SFACTA/BINWID
          IF (SFACTA.GT.HSB__SFLIM) SFACTA=HSB__SFLIM
-         
+
       END IF
 
 
 *   Calculate the weighting factors that should be applied to pixels
-*   when using the Gaussian filter to smooth the histogram. 
+*   when using the Gaussian filter to smooth the histogram.
       IF (SFACTA.EQ.0) THEN
 
 *      Only one point is to be included in the smoothing routine. ie
-*      no smoothing to take place so the weighting factor for that 
+*      no smoothing to take place so the weighting factor for that
 *      pixel is 1.0.
          SMOFAC(0)=1.0
 
@@ -826,14 +826,14 @@
                TOTAL=TOTAL+SMOFAC(I)
             ELSE
                TOTAL=TOTAL+SMOFAC(I)*2.
-            END IF 
+            END IF
  350     CONTINUE
 
 *      Modify the weighting factors so that the sum of them is unity.
          DO 360 I=-SFACTA,SFACTA
             SMOFAC(I)=SMOFAC(I)/TOTAL
- 360     CONTINUE  
- 
+ 360     CONTINUE
+
       END IF
 
 *   Smooth the BARRAY and put the new values into array SMOBAR.
@@ -841,7 +841,7 @@
       SMOTOT=0.0
       DO 380 I=SFACTA+1,BARSIZ-SFACTA-1
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          DO 370 J=-SFACTA,SFACTA
@@ -852,20 +852,20 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 380  CONTINUE 
+ 380  CONTINUE
 
 *   Smooth the data at the edges of the array.
 *   Low value edge.
       DO 382 I=1,SFACTA
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          SFTOT=0.0
          DO 381 J=-SFACTA,SFACTA
 
 *         Only use values that are defined. i.e. within the array bounds.
-            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN 
+            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN
                SMOBAR(I)=SMOBAR(I)+SMOFAC(J)*BARRAY(I+J)
                SFTOT=SFTOT+SMOFAC(J)
             END IF
@@ -877,7 +877,7 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 382  CONTINUE 
+ 382  CONTINUE
 
 *   Smooth the data at the edges of the array.
 *   high value edge.
@@ -886,14 +886,14 @@
 *      Set initial value of the smoothed array element.
          SMOBAR(I)=0.0
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          SFTOT=0.0
          DO 383 J=-SFACTA,SFACTA
 
 *         Only use values that are defined. i.e. within the array bounds.
-            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN 
+            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN
                SMOBAR(I)=SMOBAR(I)+SMOFAC(J)*BARRAY(I+J)
                SFTOT=SFTOT+SMOFAC(J)
             END IF
@@ -905,13 +905,13 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 384  CONTINUE        
+ 384  CONTINUE
 
 *   Convert the SFACTA value used to show the radius of the smoothing
 *   filter in terms of the actual array indices used (necessary only
-*   when the difference between HIGH and LOW is greater 
+*   when the difference between HIGH and LOW is greater
 *   than HSB__BINLI.
-      SFACTA=NINT(SFACTA*BINWID)     
+      SFACTA=NINT(SFACTA*BINWID)
 
 *   Search the array of smoothed values for its modal value and also
 *   recalculate/estimate the value of the mode.
@@ -920,34 +920,34 @@
       HIVAL=VAL__MIND
       DO 390 I=1,BARSIZ
 
-*      Reset HIVAL and MODEC as a new highest value has been found.    
-         IF (SMOBAR(I).GT.HIVAL) THEN 
+*      Reset HIVAL and MODEC as a new highest value has been found.
+         IF (SMOBAR(I).GT.HIVAL) THEN
             MODEC=I
             HIVAL=SMOBAR(I)
-         END IF                  
+         END IF
 
 *      Reset LOVAL as a new lowest value has been found
          IF (SMOBAR(I).LT.LOVAL) LOVAL=SMOBAR(I)
 
  390  CONTINUE
 
-*   Assigned smoothed mode value. 
+*   Assigned smoothed mode value.
       MODE(2)=LOW+(REAL(MODEC)-1.)*BINWID
       PEAKV(2)=HIVAL
 
-*     Bypass the rest of this subroutine since the required mode 
+*     Bypass the rest of this subroutine since the required mode
 *     type has been derived.
       IF ((TYPE.LT.3).AND.(TYPE.NE.0)) GOTO 9999
 
-*   Sum the elements of the smoothed bin array and stop when the sum 
+*   Sum the elements of the smoothed bin array and stop when the sum
 *   exceeds half that of the number of non-bad pixels in the image.
       INDEX=0
       TOTAL=0.0
       HALF=SMOTOT/2.
 
 *   Add bin array contents to the total until it exceeds HALF.
-      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ)) 
-         INDEX=INDEX+1 
+      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ))
+         INDEX=INDEX+1
          TOTAL=TOTAL+SMOBAR(INDEX)
       END DO
 
@@ -961,33 +961,33 @@
 *   given the contents of the bin in which it occurs.
       MEDIAN=LOW+(INDEX-1+(HALF-TOTAL)/SMOBAR(INDEX+1))*BINWID
 
-*   Take chords through the histogram peak and get values for 
-*   histogram chord 
+*   Take chords through the histogram peak and get values for
+*   histogram chord
       CALL HSB1_CHORD(HIVAL,LOVAL,MODEC,%VAL(CNF_PVAL(POINT3(1))),
      :                LOW,ADEV,
      :                BARSIZ,BINWID,STATUS,NUMDAT,HEIG,X1,Y1)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-           
+
 *   Determine the linear relationship between histogram width
 *   and value at which the width was determined. Extrapolate to zero
 *   width (peak) and thereby estimate a mode value.
-      IF (NUMDAT.GT.2) THEN 
+      IF (NUMDAT.GT.2) THEN
          CALL HSB1_LINRE(X1,Y1,NUMDAT,STATUS,GRAD,CONS)
          IF (NUMDAT.GT.2) MODE(3)=CONS
       END IF
 
-*     Bypass the rest of this subroutine since the required mode 
+*     Bypass the rest of this subroutine since the required mode
 *     type has been derived.
       IF ((TYPE.LT.4).AND.(TYPE.NE.0)) GOTO 9999
 
-*   Set up the data for matrix inversion to provide 
+*   Set up the data for matrix inversion to provide
 *   an interpolated value for the mode.
       CALL HSB1_PARA(ADEV,%VAL(CNF_PVAL(POINT3(1))),BARSIZ,LOW,BINWID,
      :               MODE,SDEV,PEAKV,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
  9999 CONTINUE
-                    
+
       END
 
 
@@ -1011,14 +1011,14 @@
 *                     BINWID,LOW,ADEV,SFACT,
 *                     NUMBER,SDEV,BARRAY,SMOBAR,
 *                     MEDIAN,PEAKV,SFACTA,MODE,STATUS)
-                                   
+
 *  Description:
 *     Places the values from the mapped image array into a binning
 *     array. The array is used as a histogram. The routine then
 *     determines values for the peak height, mode, median and standard
 *     deviation of the histogram.
 
-*  Arguments:              
+*  Arguments:
 *     ELEMS = INTEGER (Given)
 *        The number of pixels in the image. Units pixels.
 *     ARRAY(ELEMS)= REAL (Given)
@@ -1057,7 +1057,7 @@
 *        Units counts.
 *     PEAKV(3) = DOUBLE PRECISION (Returned)
 *        Esimates of the peak number of pixels found with a given count
-*        value in the count value versus occurence histogram.       
+*        value in the count value versus occurence histogram.
 *        Units pixels.
 *     SFACTA = INTEGER (Returned)
 *        Gaussian filter radius actually employed when smoothing
@@ -1082,7 +1082,7 @@
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
-                                                                        
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
@@ -1091,21 +1091,21 @@
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
-      INTEGER BARSIZ                  ! Size of the binning arrays used 
+      INTEGER BARSIZ                  ! Size of the binning arrays used
       INTEGER NUMBER                  ! The number of pixels to be used
       INTEGER POINT2(1)               ! Pointer to the binning array
       INTEGER POINT3(1)               ! Pointer to the smoothed bin array
       INTEGER SFACT                   ! Requested radius for the Gaussian
-                                      ! filter used to smooth the 
+                                      ! filter used to smooth the
                                       ! histogram
       REAL ARRAY(ELEMS)               ! Array containing the image data
-      REAL BINWID                     ! Width of the bins used to find 
+      REAL BINWID                     ! Width of the bins used to find
                                       ! median and mode (only differs
                                       ! from 1 when count range exceeds
                                       ! LOB__BINLI)
       REAL LOW                        ! Binning arrays origin offset and
                                       ! lowest value found in image
-      DOUBLE PRECISION ADEV           ! Absolute deviation of data 
+      DOUBLE PRECISION ADEV           ! Absolute deviation of data
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION SDEV(2)        ! Standard deviation and standard deviation
@@ -1116,18 +1116,18 @@
                                       ! filter actually used to smooth
                                       ! the histogram
       DOUBLE PRECISION BARRAY(BARSIZ) ! Binning array for the pixel cnts
-      DOUBLE PRECISION MEDIAN         ! Median value for the image 
+      DOUBLE PRECISION MEDIAN         ! Median value for the image
       DOUBLE PRECISION MODE(4)        ! Mode values for the image
-      DOUBLE PRECISION PEAKV(3)       ! Highest value found in the 
+      DOUBLE PRECISION PEAKV(3)       ! Highest value found in the
       DOUBLE PRECISION SMOBAR(BARSIZ) ! Smoothed binning array
 
-*  Status:     
+*  Status:
       INTEGER STATUS                  ! Global status
 
-*  Local variables: 
+*  Local variables:
       INTEGER HIIND                   ! Temporary store
       INTEGER I                       ! Temporary loop variable
-      INTEGER INDEX                   ! Array element index in which to 
+      INTEGER INDEX                   ! Array element index in which to
                                       ! bin a given pixel count value
       INTEGER J                       ! Temporary loop variable
       INTEGER LOIND                   ! Temporary store
@@ -1139,10 +1139,10 @@
       REAL CONS                       ! Constant term of linear
                                       ! relationship fitted by
                                       ! subroutine LOB1_LINRE
-      REAL GRAD                       ! Gradient term of linear 
-                                      ! relationship fitted by 
+      REAL GRAD                       ! Gradient term of linear
+                                      ! relationship fitted by
                                       ! subroutine LOB1_LINRE
-      REAL HEIG(LOB__CHORM)           ! The values at which chords 
+      REAL HEIG(LOB__CHORM)           ! The values at which chords
                                       ! (slices) were taken through the
                                       ! histogram
       REAL VALUE1                     ! Temporary storage variable
@@ -1151,15 +1151,15 @@
       REAL Y1(LOB__CHORM)             ! Y value array passed to
                                       ! subroutine LOB1_LINRE
       DOUBLE PRECISION HALF           ! Half the number of non-bad
-                                      ! in the binning arrays 
+                                      ! in the binning arrays
       DOUBLE PRECISION HIVAL          ! Highest value found in the bin
                                       ! array
       DOUBLE PRECISION LOVAL          ! Lowest value found in the bin
                                       ! array
       DOUBLE PRECISION SFTOT          ! Total of smoothing factors used
-      DOUBLE PRECISION SMOFAC(-LOB__SFLIM:LOB__SFLIM) 
+      DOUBLE PRECISION SMOFAC(-LOB__SFLIM:LOB__SFLIM)
                                       ! Smoothing factors for a Gaussian
-                                      ! filter to smooth array BARRAY  
+                                      ! filter to smooth array BARRAY
       DOUBLE PRECISION SMOTOT         ! Total of values in the smoothed
                                       ! bin array SMOBAR
       DOUBLE PRECISION TOTAL          ! Sum of the bin array BARRAY
@@ -1168,7 +1168,7 @@
 *.
 
 *   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN        
+      IF (STATUS.NE.SAI__OK) RETURN
 
 *   Clear the contents of the BARRAY and SMOBAR.
       DO 11 I=1,BARSIZ
@@ -1176,21 +1176,21 @@
          BARRAY(I)=0.0
  11   CONTINUE
 
-*   Assign all non-bad pixels of the image 
+*   Assign all non-bad pixels of the image
 *   array to a binning array to allow the mode and median
 *   to be calculated.
       DO 312 I=1,ELEMS
          VALUE1=ARRAY(I)
-         IF (VALUE1.NE.VAL__BADR) THEN 
+         IF (VALUE1.NE.VAL__BADR) THEN
 
-*         Calculate which bin element an image pixel count must be 
+*         Calculate which bin element an image pixel count must be
 *         assigned to.
             INDEX=INT((VALUE1-LOW)/BINWID+1.)
-           
+
 *         Increment the count in the appropriate bin.
             BARRAY(INDEX)=BARRAY(INDEX)+1.
-         END IF 
- 312  CONTINUE 
+         END IF
+ 312  CONTINUE
 
 *   Look through the bin array to find the highest value therein.
 *   This is taken as a simple first estimate of the mode value.
@@ -1198,9 +1198,9 @@
       LOVAL=0
       HIVAL=0
       DO 320 I=1,BARSIZ
-         
-*      Set HIVAL and MODEC as a new highest value has been found.    
-         IF (BARRAY(I).GT.HIVAL) THEN 
+
+*      Set HIVAL and MODEC as a new highest value has been found.
+         IF (BARRAY(I).GT.HIVAL) THEN
             MODEC=I
             HIVAL=BARRAY(I)
          END IF
@@ -1210,7 +1210,7 @@
 
  320  CONTINUE
 
-*   Assigned unsmoothed mode and peak value. 
+*   Assigned unsmoothed mode and peak value.
       MODE(1)=LOW+(REAL(MODEC)-1.)*BINWID
       PEAKV(1)=HIVAL
 
@@ -1221,8 +1221,8 @@
       HALF=REAL(NUMBER)/2.
 
 *   Add bin array contents to the total until it exceeds HALF.
-      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ)) 
-         INDEX=INDEX+1 
+      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ))
+         INDEX=INDEX+1
          TOTAL=TOTAL+BARRAY(INDEX)
       END DO
 
@@ -1235,21 +1235,21 @@
 *   Use approximate interpolation to estimate the median position
 *   given the contents of the bin in which it occurs.
       MEDIAN=LOW+(INDEX-1)*BINWID
-      
+
       SFACTA=SFACT
       IF (SFACTA.EQ.-1) THEN
 
-*      Use the absolute deviation as an upper limit for the smoothing 
+*      Use the absolute deviation as an upper limit for the smoothing
 *      filter radius.
          SFACTA=NINT(ADEV/BINWID)
 
 *      Look through the BARRAY to find if all the points within +-
-*      SFACTA indices of the modal index have values greater than 
+*      SFACTA indices of the modal index have values greater than
 *      20% of the highest value. Retains the first values from either
 *      side of the mode that are not.
          IF (SFACTA.LT.1) SFACTA=1
 
-*      Calculate an average value for the region of the BARRAY around the 
+*      Calculate an average value for the region of the BARRAY around the
 *      largest value.
          VALUE=0.0
          J=0
@@ -1270,7 +1270,7 @@
             END IF
  330     CONTINUE
 
-*      Look for the upper limit.          
+*      Look for the upper limit.
          HIIND=MODEC+SFACTA
          IF (HIIND.GT.BARSIZ) HIIND=BARSIZ
          DO 331 I=MODEC+SFACTA,MODEC+1,-1
@@ -1286,20 +1286,20 @@
          IF (SFACTA.GT.LOB__SFLIM) SFACTA=LOB__SFLIM
 
       ELSE
-     
+
 *      Set the filter radius and impose an upper limit.
          SFACTA=SFACTA/BINWID
          IF (SFACTA.GT.LOB__SFLIM) SFACTA=LOB__SFLIM
-         
+
       END IF
 
 
 *   Calculate the weighting factors that should be applied to pixels
-*   when using the Gaussian filter to smooth the histogram. 
+*   when using the Gaussian filter to smooth the histogram.
       IF (SFACTA.EQ.0) THEN
 
 *      Only one point is to be included in the smoothing routine. ie
-*      no smoothing to take place so the weighting factor for that 
+*      no smoothing to take place so the weighting factor for that
 *      pixel is 1.0.
          SMOFAC(0)=1.0
 
@@ -1315,14 +1315,14 @@
                TOTAL=TOTAL+SMOFAC(I)
             ELSE
                TOTAL=TOTAL+SMOFAC(I)*2.
-            END IF 
+            END IF
  350     CONTINUE
 
 *      Modify the weighting factors so that the sum of them is unity.
          DO 360 I=-SFACTA,SFACTA
             SMOFAC(I)=SMOFAC(I)/TOTAL
- 360     CONTINUE  
- 
+ 360     CONTINUE
+
       END IF
 
 *   Smooth the BARRAY and put the new values into array SMOBAR.
@@ -1330,7 +1330,7 @@
       SMOTOT=0.0
       DO 380 I=SFACTA+1,BARSIZ-SFACTA-1
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          DO 370 J=-SFACTA,SFACTA
@@ -1341,20 +1341,20 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 380  CONTINUE 
+ 380  CONTINUE
 
 *   Smooth the data at the edges of the array.
 *   Low value edge.
       DO 382 I=1,SFACTA
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          SFTOT=0.0
          DO 381 J=-SFACTA,SFACTA
 
 *         Only use values that are defined. i.e. within the array bounds.
-            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN 
+            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN
                SMOBAR(I)=SMOBAR(I)+SMOFAC(J)*BARRAY(I+J)
                SFTOT=SFTOT+SMOFAC(J)
             END IF
@@ -1366,7 +1366,7 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 382  CONTINUE 
+ 382  CONTINUE
 
 *   Smooth the data at the edges of the array.
 *   high value edge.
@@ -1375,14 +1375,14 @@
 *      Set initial value of the smoothed array element.
          SMOBAR(I)=0.0
 
-*      Look at the histogram elements on either side of the 
+*      Look at the histogram elements on either side of the
 *      element being considered and calculate the contribution
 *      from each.
          SFTOT=0.0
          DO 383 J=-SFACTA,SFACTA
 
 *         Only use values that are defined. i.e. within the array bounds.
-            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN 
+            IF ((I+J.GE.1).AND.(I+J.LE.BARSIZ)) THEN
                SMOBAR(I)=SMOBAR(I)+SMOFAC(J)*BARRAY(I+J)
                SFTOT=SFTOT+SMOFAC(J)
             END IF
@@ -1394,13 +1394,13 @@
 
 *      Determine the total for the smoothed array.
          SMOTOT=SMOTOT+SMOBAR(I)
- 384  CONTINUE        
+ 384  CONTINUE
 
 *   Convert the SFACTA value used to show the radius of the smoothing
 *   filter in terms of the actual array indices used (necessary only
-*   when the difference between HIGH and LOW is greater 
+*   when the difference between HIGH and LOW is greater
 *   than LOB__BINLI.
-      SFACTA=NINT(SFACTA*BINWID)     
+      SFACTA=NINT(SFACTA*BINWID)
 
 *   Search the array of smoothed values for its modal value and also
 *   recalculate/estimate the value of the mode.
@@ -1409,30 +1409,30 @@
       HIVAL=VAL__MIND
       DO 390 I=1,BARSIZ
 
-*      Reset HIVAL and MODEC as a new highest value has been found.    
-         IF (SMOBAR(I).GT.HIVAL) THEN 
+*      Reset HIVAL and MODEC as a new highest value has been found.
+         IF (SMOBAR(I).GT.HIVAL) THEN
             MODEC=I
             HIVAL=SMOBAR(I)
-         END IF                  
+         END IF
 
 *      Reset LOVAL as a new lowest value has been found
          IF (SMOBAR(I).LT.LOVAL) LOVAL=SMOBAR(I)
 
  390  CONTINUE
 
-*   Assigned smoothed mode value. 
+*   Assigned smoothed mode value.
       MODE(2)=LOW+(REAL(MODEC)-1.)*BINWID
       PEAKV(2)=HIVAL
-      
-*   Sum the elements of the smoothed bin array and stop when the sum 
+
+*   Sum the elements of the smoothed bin array and stop when the sum
 *   exceeds half that of the number of non-bad pixels in the image.
       INDEX=0
       TOTAL=0.0
       HALF=SMOTOT/2.
 
 *   Add bin array contents to the total until it exceeds HALF.
-      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ)) 
-         INDEX=INDEX+1 
+      DO WHILE ((TOTAL.LT.HALF).AND.(INDEX.LE.BARSIZ))
+         INDEX=INDEX+1
          TOTAL=TOTAL+SMOBAR(INDEX)
       END DO
 
@@ -1446,27 +1446,27 @@
 *   given the contents of the bin in which it occurs.
       MEDIAN=LOW+(INDEX-1+(HALF-TOTAL)/SMOBAR(INDEX+1))*BINWID
 
-*   Take chords through the histogram peak and get values for 
-*   histogram chord 
+*   Take chords through the histogram peak and get values for
+*   histogram chord
       CALL LOB1_CHORD(HIVAL,LOVAL,MODEC,%VAL(CNF_PVAL(POINT3(1))),
      :                LOW,ADEV,
      :                BARSIZ,BINWID,NUMDAT,HEIG,X1,Y1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-           
+
 *   Determine the linear relationship between histogram width
 *   and value at which the width was determined. Extrapolate to zero
 *   width (peak) and thereby estimate a mode value.
-      IF (NUMDAT.GT.2) THEN 
+      IF (NUMDAT.GT.2) THEN
          CALL LOB1_LINRE(X1,Y1,NUMDAT,GRAD,CONS,STATUS)
          IF (NUMDAT.GT.2) MODE(3)=CONS
       END IF
 
-*   Set up the data for matrix inversion to provide 
+*   Set up the data for matrix inversion to provide
 *   an interpolated value for the mode.
       CALL LOB1_PARA(ADEV,%VAL(CNF_PVAL(POINT3(1))),BARSIZ,LOW,BINWID,
      :               MODE,SDEV,PEAKV,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
  9999 CONTINUE
-                    
+
       END

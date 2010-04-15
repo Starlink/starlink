@@ -8,7 +8,7 @@
 *     been produced to simplify the high-level code by removing the
 *     frequently used low level DTA calls and checks.
 *    Invocation :
-*      CALL RED4_CREATE_STRUCTURE( NAME, STATUS ) 
+*      CALL RED4_CREATE_STRUCTURE( NAME, STATUS )
 *    Parameters :
 *     NAME          = CHARACTER*(*)( READ )
 *        The DTA address of the structure to be created.
@@ -70,7 +70,7 @@
          CALL MSG_SETC( 'TYPE', TYPE )
          CALL ERR_REP( ' ', 'RED4_CREATE_STRUCTURE: '/
      :     /'Error creating ^NAME of type ^TYPE '/
-     :     /'(DTA reason follows)', STATUS ) 
+     :     /'(DTA reason follows)', STATUS )
          CALL DTA_ERROR( DTA_STATUS, ERROR )
          CALL MSG_SETC( 'ERROR', ERROR )
          CALL ERR_REP( ' ', 'RED4_CREATE_STRUCTURE: '/

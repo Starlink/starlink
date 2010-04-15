@@ -96,7 +96,7 @@
       GO TO (1000,1100,1200,1300,1400),KMD+1
 *            tran setp sets enqp enqs
 
-*  Illegal KMD value. 
+*  Illegal KMD value.
       GO TO 9910
 
 *
@@ -156,7 +156,7 @@
              END IF
            ELSE IF ( type .EQ. 'ENVIR' ) THEN
              fn = env_path(1:i) // fn(lindex+1:)
-             nchar = nchar - lindex + i 
+             nchar = nchar - lindex + i
            END IF
         ELSE IF ( sysname .NE. 'VMS' ) THEN
            fn = PREFIX(1:HLP_LENGTH(PREFIX)) // fn

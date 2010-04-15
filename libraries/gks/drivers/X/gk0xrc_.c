@@ -1,14 +1,14 @@
 /*
  * gk0xrc_.c --- Module for handling a choice tool on the Xlib workstation for
- * RAL GKS. 
+ * RAL GKS.
  *
  * Written by: A C Arnold, University of Manchester Computer Graphics Unit,
- * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405 
+ * Oxford Road, Manchester M13 9PL Tel: 061-273 7121 x 5405
  *
- * Maintenance Log: 
+ * Maintenance Log:
  *
- * 26/02/87  PJWR  Corrected #includes for integration. 
- * 18/03/87  TAW   Changed name to gk9src_. 
+ * 26/02/87  PJWR  Corrected #includes for integration.
+ * 18/03/87  TAW   Changed name to gk9src_.
  * 06/05/87  PJWR  Corrected to use GKS drawing area of
  *                 bitmap rather than the entire bitmap.
  * 14/08/87  PJWR  Corrected number of integers in call to gkrqip_.
@@ -19,7 +19,7 @@
  * 27/11/87  ACA   Dynamically allocate space for choice boxes etc.
  * 01/12/87  ACA   Fixed bug in displaying light box. 2nd row was wrong.
  * 26/01/88  TAW   Changed PET -1 code to return values from 1 instead
- *                 of from 32 (ascii values) 
+ *                 of from 32 (ascii values)
  * 20/09/88 TAW    Changed to use with Xlib workstation.
  * 21/09/88  TAW   Changed choiceecb to xchoiceecb.
  */
@@ -61,7 +61,7 @@
 char *calloc();
 void cfree();
 
-static int 
+static int
   buttonsopen1(), buttons(), buttonsclose1(),
   buttonsopen2(),
   menuopen(), menuecho(), menuerase(), menuclose(),
@@ -132,7 +132,7 @@ gk0xrc_(choice)
 
 /****************************************************************************/
 
-static int 
+static int
 buttonsopen1()
 {
 	int width, height, left, top;
@@ -155,7 +155,7 @@ buttonsopen1()
 	left = 1;				/* Start at left side +1 */
 	top = 1;				/* And at "top" +1 */
 	oldboxno = -1;				/* Forget old box */
-        
+
         choiceboxes = (box *)calloc((unsigned)NBOXES, sizeof(box));/* Allocate space for boxes */
 	boxno = 0;
 	for (i = 0; i < NROWS; i++) {		/* Compute all the boxes */
@@ -166,7 +166,7 @@ buttonsopen1()
 		top += height;
 		left = 1;
 	};
-	
+
 	for (i = 0; i < NBOXES; i++) {		/* Draw all the boxes */
 		char label[5];
 		gk0xbmbox(choiceboxes[i], BMEDGES | BMCLEAR); /* Draw edges of box */
@@ -175,7 +175,7 @@ buttonsopen1()
 	}
 }
 
-static int 
+static int
 buttons()
 {
 	boxno = -1;				/* assume outside */
@@ -196,7 +196,7 @@ buttons()
 	}
 }
 
-static int 
+static int
   buttonsclose1()
 {
 	cfree((char *)choiceboxes);		/* Free the space used */
@@ -206,7 +206,7 @@ static int
 
 /****************************************************************************/
 
-static int 
+static int
   buttonsopen2()
 {						/* PET 2 */
 	f77_integer kints = KINTGS, nints, nreals,
@@ -235,7 +235,7 @@ static int
 
 static int nitems;				/* Number of items */
 
-static int 
+static int
   menuopen()
 {						/* PET 3 (Menus) */
 	int chht, chwd, longest, maxlen;
@@ -245,7 +245,7 @@ static int
 	f77_integer kchars = KCHARS, nints, nreals,
 	hpoff, hpoffzero = 0,
 	idrent[2], id[2], chint[MAXCHOICELEN];
-	
+
 	nints = 2;
 	nreals = 0;
 	gkdrge_(&inta[KIPD], &kchars, &nints, &nreals,
@@ -300,7 +300,7 @@ static int
 	choiceboxes[0] = gk0xboxbuild(0, 0, chwd, chht);
 	for (i = 1; i < nitems; i++)
 	  choiceboxes[i] = gk0xboxshift(choiceboxes[i - 1], 0, chht);
-	
+
 	/* Initialise globals so proper echoing works */
 
 	oldboxno = -1;
@@ -321,12 +321,12 @@ static int
 	cfree((char *)itemchars);
 }
 
-static int 
+static int
   menuecho()
 {
 }
 
-static int 
+static int
   menuerase()
 {
 	if (dd->d_event != IPLEAVE) {		/* Ignore outside box */
@@ -345,7 +345,7 @@ static int
 	}
 }
 
-static int 
+static int
   menuclose()
 {
 	cfree((char *)choiceboxes);		/* Free the space */
@@ -384,7 +384,7 @@ static int emugets(s,n,ep)
 {
 	int stop;
 	char key,keyecho[4];
-	
+
 	stop = FALSE;
 	while (!stop) {				/* Loop processing input */
 		gk0xipwait();			/* Get some input */
@@ -442,7 +442,7 @@ static int str_cb_cmp(s1,s2)
 		i++;};
 	return(s1[i] - s2[i]);
 }
-static int 
+static int
   stringopen()
 {
 	char *lsearch();
@@ -453,7 +453,7 @@ static int
 	f77_integer kchars = KCHARS, nints, nreals,
 	hpoff, hpoffzero = 0, idrent[2], id[2],
 	chint[MAXCHOICELEN];
-	
+
 	/* Now get and display items */
 	nints = 2;
 	nreals = 0;
@@ -514,11 +514,11 @@ static int
 	}
 }
 
-static int 
+static int
   string()
 {
 	char str[MAXCHOICELEN],*ptr,*lfind();
-	
+
 	pos(ep,0,ep->p_ymax);			/* Position on bottom line */
 	gk0xemuprint(ep,"\033K",2);			/* Erase the line */
 	gk0xemuprint(ep,"Choice: ",8);		/* Prompt the user */
@@ -530,7 +530,7 @@ static int
 	    boxno = -1;				/* Invalid choice */
 }
 
-static int 
+static int
   stringclose()
 {
 	cfree((char *)itemtable);		/* Free the space */
@@ -541,14 +541,14 @@ static int
 
 /*****************************************************************************/
 
-static int 
+static int
   keyopen()
 {
 	gk0xoe(echoarea,"Choice device");	/* Open the echo area */
 	gk0xftprint(ddbm->bm_box,"Hit a printing key",FTCENTRE);
 }
 
-static int 
+static int
   key()
 {
 	char key;
@@ -566,7 +566,7 @@ static int
 	}
 }
 
-static int 
+static int
   keyclose()
 {
 	gk0xce();				/* Close the echo area */
@@ -575,22 +575,22 @@ static int
 
 /*****************************************************************************/
 
-static int 
+static int
   segopen()
 {
 }
 
-static int 
+static int
   seg()
 {
 }
 
-static int 
+static int
   segclose()
 {
 }
 
-static int 
+static int
   noaction()
 {						/* Dummy routine */
 }

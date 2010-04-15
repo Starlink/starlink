@@ -1,4 +1,4 @@
-      SUBROUTINE ERRCL( LIMIT, TYPE, EL, DIN, VIN, DOUT, VOUT, BAD, 
+      SUBROUTINE ERRCL( LIMIT, TYPE, EL, DIN, VIN, DOUT, VOUT, BAD,
      :                  NBAD, STATUS )
 *+
 *  Name:
@@ -56,7 +56,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -130,7 +130,7 @@
 *  If one of the input values were bad, put both bad in the output
 *  arrays and set the returned bad pixel flag.
             ELSE
-               DOUT( I ) = VAL__BADD      
+               DOUT( I ) = VAL__BADD
                VOUT( I ) = VAL__BADD
                BAD = .TRUE.
             END IF
@@ -168,7 +168,7 @@
 *  If one of the input values were bad, put both bad in the output
 *  arrays and set the returned bad pixel flag.
             ELSE
-               DOUT( I ) = VAL__BADD      
+               DOUT( I ) = VAL__BADD
                VOUT( I ) = VAL__BADD
                BAD = .TRUE.
             END IF
@@ -190,7 +190,7 @@
 
 *  Compare the SNR with the limit, and store bad values in the
 *  output arrays if it is to low.
-               IF( ABS( DATVAL ) .LT. 
+               IF( ABS( DATVAL ) .LT.
      :             ABS( SQRT( MAX( 0.0D0, VARVAL ) )*LIMIT ) ) THEN
                   DOUT( I ) = VAL__BADD
                   VOUT( I ) = VAL__BADD
@@ -207,7 +207,7 @@
 *  If one of the input values were bad, put both bad in the output
 *  arrays and set the returned bad pixel flag.
             ELSE
-               DOUT( I ) = VAL__BADD      
+               DOUT( I ) = VAL__BADD
                VOUT( I ) = VAL__BADD
                BAD = .TRUE.
             END IF
